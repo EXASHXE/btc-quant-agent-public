@@ -10,6 +10,7 @@ from typing import Any
 from ..config import AppConfig
 from ..data.binance import BinancePublicClient
 from ..domain import Direction, Signal, SignalStatus
+from ..engine import QuantEngine
 from ..storage import Repository
 from .binance_signed import BinanceSignedClient
 from .guard import ExecutionBlocked, ExecutionGuard
@@ -20,6 +21,12 @@ def _floor_to(value: float, increment: float) -> float:
     if increment <= 0:
         raise ExecutionBlocked("exchange filter increment is unavailable")
     return math.floor((value + 1e-12) / increment) * increment
+
+
+def _ceil_to(value: float, increment: float) -> float:
+    if increment <= 0:
+        raise ExecutionBlocked("exchange filter increment is unavailable")
+    return math.ceil((value - 1e-12) / increment) * increment
 
 
 class ExecutionService:
@@ -82,20 +89,101 @@ class ExecutionService:
             self.config.data.request_timeout_seconds,
         )
 
-    def build_entry_plan(self, signal_id: str, now_ms: int | None = None) -> ExecutionPlan:
+    def refresh_signal_state(self, signal_id: str, now_ms: int | None = None) -> Signal:
         signal = self.repository.get_signal(signal_id)
         if signal is None:
             raise KeyError(f"unknown signal: {signal_id}")
+        if signal.data_health != "OK":
+            raise ExecutionBlocked("signal data_health is not OK")
+        current = now_ms or self.public_client.server_time_ms()
+        if current > signal.expires_at_ms:
+            self.repository.update_signal_status(signal_id, SignalStatus.EXPIRED)
+            raise ExecutionBlocked("signal TTL expired during execution revalidation")
+        try:
+            candles_15m = self.public_client.klines(
+                signal.symbol, "15m", self.config.data.history_limit_15m
+            )
+            candles_1h = self.public_client.klines(
+                signal.symbol, "1h", self.config.data.history_limit_1h
+            )
+            candles_4h = self.public_client.klines(
+                signal.symbol, "4h", self.config.data.history_limit_4h
+            )
+        except Exception as exc:
+            raise ExecutionBlocked(f"failed to refresh market state: {exc}") from exc
+        if not candles_15m:
+            raise ExecutionBlocked("latest closed 15m market state is unavailable")
+        if candles_15m[-1].close_time_ms > signal.data_timestamp_ms:
+            reason = QuantEngine(self.config).invalidation_reason(
+                signal, candles_4h, candles_1h, candles_15m, current
+            )
+            if reason is not None:
+                status = (
+                    SignalStatus.EXPIRED
+                    if reason == "TTL_EXPIRED"
+                    else SignalStatus.INVALIDATED
+                )
+                if status == SignalStatus.INVALIDATED:
+                    self.repository.invalidate_signal(signal_id, reason)
+                else:
+                    self.repository.update_signal_status(signal_id, status)
+                raise ExecutionBlocked(f"signal failed execution revalidation: {reason}")
+        refreshed = self.repository.get_signal(signal_id)
+        assert refreshed is not None
+        if refreshed.status != SignalStatus.ACTIVE:
+            raise ExecutionBlocked("signal is no longer ACTIVE")
+        return refreshed
+
+    def build_entry_plan(self, signal_id: str, now_ms: int | None = None) -> ExecutionPlan:
         current = now_ms or int(time.time() * 1000)
-        if signal.status != SignalStatus.ACTIVE or current > signal.expires_at_ms:
-            raise ExecutionBlocked("only a fresh ACTIVE signal can become an execution plan")
+        signal = self.refresh_signal_state(signal_id, current)
         filters = self.public_client.symbol_filters(signal.symbol)
-        entry = (signal.entry_low + signal.entry_high) / 2.0
-        entry = _floor_to(entry, filters["tick_size"])
-        quantity = _floor_to(signal.recommended_notional / entry, filters["step_size"])
+        tick = filters["tick_size"]
+        legal_low = _ceil_to(signal.entry_low, tick)
+        legal_high = _floor_to(signal.entry_high, tick)
+        if legal_low > legal_high:
+            raise ExecutionBlocked("entry range contains no legal exchange tick")
+        midpoint = (signal.entry_low + signal.entry_high) / 2.0
+        entry = _floor_to(midpoint, tick) if signal.direction == Direction.LONG else _ceil_to(midpoint, tick)
+        entry = min(max(entry, legal_low), legal_high)
+        stop = (
+            _floor_to(signal.stop_loss, tick)
+            if signal.direction == Direction.LONG
+            else _ceil_to(signal.stop_loss, tick)
+        )
+        take_profit = (
+            _floor_to(signal.take_profit, tick)
+            if signal.direction == Direction.LONG
+            else _ceil_to(signal.take_profit, tick)
+        )
+        if signal.direction == Direction.LONG:
+            risk_distance, reward_distance = entry - stop, take_profit - entry
+        else:
+            risk_distance, reward_distance = stop - entry, entry - take_profit
+        if risk_distance <= 0 or reward_distance <= 0:
+            raise ExecutionBlocked("rounded SL/TP geometry is invalid")
+        friction_rate = (
+            signal.estimated_fee_usdt
+            + signal.estimated_slippage_usdt
+            + signal.estimated_funding_usdt
+        ) / signal.recommended_notional
+        rounded_loss_rate = risk_distance / entry + friction_rate
+        risk_capped_notional = min(
+            signal.recommended_notional, signal.max_loss_usdt / rounded_loss_rate
+        )
+        quantity = _floor_to(risk_capped_notional / entry, filters["step_size"])
         notional = quantity * entry
         if quantity < filters["min_quantity"] or notional < filters["min_notional"]:
             raise ExecutionBlocked("risk-sized order is below exchange minimum filters")
+        cost_scale = notional / signal.recommended_notional
+        friction = friction_rate * signal.recommended_notional * cost_scale
+        estimated_max_loss = notional * risk_distance / entry + friction
+        rounded_reward = notional * reward_distance / entry - friction
+        rounded_rr_net = rounded_reward / estimated_max_loss
+        if estimated_max_loss > signal.max_loss_usdt + 1e-9:
+            raise ExecutionBlocked("rounded plan exceeds immutable signal risk budget")
+        if rounded_rr_net < self.config.strategy.rr_min:
+            raise ExecutionBlocked("rounded plan RR is below strategy minimum")
         created = current
         plan_id = hashlib.sha256(f"entry:{signal.signal_id}:{created}".encode()).hexdigest()[:20]
         unsigned = ExecutionPlan(
@@ -107,8 +195,8 @@ class ExecutionService:
             order_type=self.config.execution.entry_order_type.upper(),
             quantity=quantity,
             entry_price=entry,
-            stop_price=_floor_to(signal.stop_loss, filters["tick_size"]),
-            take_profit_price=_floor_to(signal.take_profit, filters["tick_size"]),
+            stop_price=stop,
+            take_profit_price=take_profit,
             notional_usdt=notional,
             leverage=min(int(signal.display_leverage), self.config.execution.max_leverage),
             validation_status=signal.validation_status,
@@ -118,6 +206,8 @@ class ExecutionService:
                 created + self.config.execution.plan_ttl_seconds * 1000,
             ),
             signal_expires_at_ms=signal.expires_at_ms,
+            rounded_rr_net=rounded_rr_net,
+            estimated_max_loss_usdt=estimated_max_loss,
             plan_hash="",
         )
         plan = replace(unsigned, plan_hash=unsigned.calculated_hash())
@@ -138,6 +228,7 @@ class ExecutionService:
             raise ExecutionBlocked(f"entry plan is already {raw_plan['status']}")
         plan = ExecutionPlan.from_dict(raw_plan["payload"])
         current = now_ms or int(time.time() * 1000)
+        self.refresh_signal_state(plan.signal_id, current)
         mode = ExecutionMode(self.config.execution.mode)
         open_positions = 0
         daily_loss = self.repository.daily_realized_loss_usdt(current)

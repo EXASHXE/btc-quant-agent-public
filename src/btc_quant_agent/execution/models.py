@@ -34,6 +34,8 @@ class ExecutionPlan:
     created_at_ms: int
     expires_at_ms: int
     signal_expires_at_ms: int
+    rounded_rr_net: float
+    estimated_max_loss_usdt: float
     plan_hash: str
 
     def unsigned_dict(self) -> dict[str, Any]:
@@ -53,6 +55,8 @@ class ExecutionPlan:
     @classmethod
     def from_dict(cls, payload: dict[str, Any]) -> ExecutionPlan:
         values = dict(payload)
+        values.setdefault("rounded_rr_net", 0.0)
+        values.setdefault("estimated_max_loss_usdt", 0.0)
         values["direction"] = Direction(values["direction"])
         values["mode"] = ExecutionMode(values["mode"])
         return cls(**values)

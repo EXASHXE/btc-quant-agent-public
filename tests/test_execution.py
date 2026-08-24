@@ -7,12 +7,32 @@ from unittest.mock import patch
 from helpers import signal
 
 from btc_quant_agent.config import AppConfig, ExecutionConfig
+from btc_quant_agent.domain import Candle
 from btc_quant_agent.execution.guard import ExecutionBlocked
 from btc_quant_agent.execution.service import ExecutionService
 from btc_quant_agent.storage import Repository
 
 
 class FakePublicClient:
+    def server_time_ms(self) -> int:
+        return 1_100_000
+
+    def klines(self, _symbol: str, interval: str, _limit: int):
+        duration = {"15m": 900_000, "1h": 3_600_000, "4h": 14_400_000}[interval]
+        return [
+            Candle(
+                "BTCUSDT",
+                interval,
+                900_000 - duration,
+                899_999,
+                100,
+                101,
+                99,
+                100,
+                10,
+            )
+        ]
+
     def symbol_filters(self, symbol: str) -> dict[str, float]:
         return {
             "step_size": 0.001,
@@ -62,7 +82,12 @@ class ExecutionTests(unittest.TestCase):
     def setUp(self) -> None:
         self.tempdir = tempfile.TemporaryDirectory()
         self.repository = Repository(str(Path(self.tempdir.name) / "execution.db"))
-        current_signal = replace(signal(), created_at_ms=1_000_000, expires_at_ms=2_000_000)
+        current_signal = replace(
+            signal(),
+            data_timestamp_ms=899_999,
+            created_at_ms=1_000_000,
+            expires_at_ms=2_000_000,
+        )
         self.repository.save_signal(current_signal, 0)
 
     def tearDown(self) -> None:
@@ -105,6 +130,45 @@ class ExecutionTests(unittest.TestCase):
             reconciled = service.reconcile(plan.plan_id)
         self.assertEqual(reconciled["status"], "PROTECTED")
         self.assertEqual(len(signed.protective), 2)
+
+    def test_degraded_signal_cannot_prepare(self) -> None:
+        degraded = replace(
+            signal(),
+            signal_id="degraded",
+            fingerprint="degraded-fingerprint",
+            data_timestamp_ms=899_999,
+            expires_at_ms=2_000_000,
+            data_health="DEGRADED",
+        )
+        self.repository.save_signal(degraded, 0)
+        service = ExecutionService(
+            AppConfig(execution=ExecutionConfig(mode="paper")),
+            self.repository,
+            FakePublicClient(),
+        )
+        with self.assertRaisesRegex(ExecutionBlocked, "data_health"):
+            service.build_entry_plan("degraded", now_ms=1_100_000)
+
+    def test_direction_aware_rounding_preserves_geometry_and_risk(self) -> None:
+        item = replace(
+            signal(),
+            signal_id="short",
+            fingerprint="short-fingerprint",
+            direction=signal().direction.SHORT,
+            data_timestamp_ms=899_999,
+            expires_at_ms=2_000_000,
+            entry_low=99.91,
+            entry_high=100.09,
+            stop_loss=102.01,
+            take_profit=95.09,
+        )
+        self.repository.save_signal(item, 0)
+        plan = ExecutionService(AppConfig(), self.repository, FakePublicClient()).build_entry_plan(
+            "short", now_ms=1_100_000
+        )
+        self.assertGreater(plan.stop_price, plan.entry_price)
+        self.assertLess(plan.take_profit_price, plan.entry_price)
+        self.assertLessEqual(plan.estimated_max_loss_usdt, item.max_loss_usdt)
 
 
 if __name__ == "__main__":
