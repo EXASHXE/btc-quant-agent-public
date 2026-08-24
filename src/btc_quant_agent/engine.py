@@ -35,8 +35,10 @@ class QuantEngine:
         derivatives: DerivativesSnapshot | None,
         now_ms: int,
         *,
-        include_order_book: bool = True,
+        include_order_book: bool | None = None,
     ) -> ScanResult:
+        if include_order_book is None:
+            include_order_book = self.config.strategy.enable_order_book_factor
         quality_4h = validate_candles(candles_4h, "4h", now_ms)
         quality_1h = validate_candles(candles_1h, "1h", now_ms)
         quality_15m = validate_candles(candles_15m, "15m", now_ms)
