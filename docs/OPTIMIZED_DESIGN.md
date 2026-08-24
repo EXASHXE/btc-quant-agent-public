@@ -162,7 +162,7 @@ ATR percentile < high_vol_threshold
 | 衍生品 | 20 | OI 变化、Funding、Basis、账户多空比 |
 | 波动与流动性 | 15 | ATR/带宽分位、Spread、前五档 Imbalance |
 
-缺失分组不伪造中性值，而是从可用分母中移除并标记风险。默认要求归一化分数至少 72，至少四个可用分组为正。4H 不对齐、15m RSI 过度延伸、极端逆风 Funding 或点差超过 5 bps 属于硬拒绝。`setup_score` 是规则完整度，仍不是统计胜率。
+缺失分组不伪造中性值，而是从可用分母中移除并标记风险。默认要求归一化分数至少 72，至少四个可用分组为正。4H 不对齐、15m RSI 过度延伸、极端逆风 Funding 或点差超过 5 bps 属于硬拒绝。`pattern_score` 是形态完整度，`factor_score` 是分组规则确认度；两者都不是统计胜率。
 
 ## 7. Alpha 规则
 
@@ -243,7 +243,7 @@ notional × total_loss_pct <= equity × risk_per_trade
 }
 ```
 
-`setup_score` 只是规则完整度，不能称为胜率。只有已冻结模型通过样本外校准后，`p_win` 才可非空；`expected_r` 必须同时使用校准概率、真实 RR 和成本计算。
+`pattern_score` 与 `factor_score` 都只是确定性规则分数，不能称为胜率。只有已冻结模型通过样本外校准后，`p_win` 才可非空；`expected_r` 必须同时使用校准概率、真实 RR 和成本计算。
 
 ## 10. 三套独立状态
 

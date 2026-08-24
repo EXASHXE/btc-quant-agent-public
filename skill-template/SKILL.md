@@ -24,7 +24,8 @@ Use the bundled `scripts/quant_tool.py` wrapper. Treat QuantCore output as autho
 
 - Never alter Direction, Entry, SL, TP, RR, probability, expected R, or position size.
 - Never invent market data or statistical probability.
-- Treat `setup_score` as rule completeness, not win probability.
+- Treat `pattern_score` as deterministic pattern completeness and `factor_score` as grouped
+  rule confirmation; neither is win probability.
 - If `p_win` or `expected_r` is null, say it has not been statistically calibrated.
 - Reject expired or invalidated entries.
 - Treat `expires_at_ms` as anchored to market decision data, not the time the user requested a scan.

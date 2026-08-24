@@ -5,11 +5,20 @@ from pathlib import Path
 
 from helpers import signal
 
-from btc_quant_agent.domain import SignalStatus, UserDecision
+from btc_quant_agent.domain import Signal, SignalStatus, UserDecision
 from btc_quant_agent.storage import Repository
 
 
 class StorageTests(unittest.TestCase):
+    def test_legacy_setup_score_payload_remains_readable(self) -> None:
+        payload = signal().as_dict()
+        payload.pop("pattern_score")
+        payload.pop("factor_score")
+        payload["setup_score"] = 77
+        restored = Signal.from_dict(payload)
+        self.assertEqual(restored.factor_score, 77.0)
+        self.assertIsNone(restored.pattern_score)
+
     def test_connection_is_closed_on_success_and_exception(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             repo = Repository(str(Path(directory) / "test.db"))

@@ -127,7 +127,7 @@ class Candidate:
     entry_high: float
     invalidation_level: float
     target_level: float
-    setup_score: int
+    pattern_score: int
     structure_id: str
     reasons: tuple[str, ...]
     risks: tuple[str, ...] = ()
@@ -172,7 +172,8 @@ class Signal:
     take_profit: float
     rr_gross: float
     rr_net: float
-    setup_score: int
+    pattern_score: int | None
+    factor_score: float
     p_win: float | None
     expected_r: float | None
     recommended_notional: float
@@ -204,6 +205,9 @@ class Signal:
     @classmethod
     def from_dict(cls, payload: dict[str, Any]) -> Signal:
         values = dict(payload)
+        legacy_score = values.pop("setup_score", None)
+        values.setdefault("factor_score", float(legacy_score or 0.0))
+        values.setdefault("pattern_score", None)
         values.setdefault("invalidation_level", values.get("stop_loss"))
         values.setdefault("macro_4h", {})
         values.setdefault("structure_15m", "UNCONFIRMED")

@@ -15,6 +15,8 @@ def explain_signal(signal: Signal) -> dict[str, Any]:
         "reasons": signal.reasons,
         "risks": signal.risks,
         "factor_scores": signal.factor_scores,
+        "pattern_score": signal.pattern_score,
+        "factor_score": signal.factor_score,
         "factor_evidence": signal.factor_evidence,
         "positive_factor_groups": signal.positive_factor_groups,
         "numbers_are_immutable": True,
