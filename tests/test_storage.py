@@ -1,3 +1,4 @@
+import sqlite3
 import tempfile
 import unittest
 from pathlib import Path
@@ -9,6 +10,19 @@ from btc_quant_agent.storage import Repository
 
 
 class StorageTests(unittest.TestCase):
+    def test_connection_is_closed_on_success_and_exception(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            repo = Repository(str(Path(directory) / "test.db"))
+            with repo._connect() as connection:
+                connection.execute("SELECT 1")
+            with self.assertRaises(sqlite3.ProgrammingError):
+                connection.execute("SELECT 1")
+
+            with self.assertRaisesRegex(RuntimeError, "boom"), repo._connect() as failed_connection:
+                raise RuntimeError("boom")
+            with self.assertRaises(sqlite3.ProgrammingError):
+                failed_connection.execute("SELECT 1")
+
     def test_dedup_decision_and_expiry(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             repo = Repository(str(Path(directory) / "test.db"))
