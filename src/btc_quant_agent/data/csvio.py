@@ -6,7 +6,6 @@ from pathlib import Path
 
 from ..domain import Candle
 
-
 FIELDS = [
     "symbol",
     "interval",

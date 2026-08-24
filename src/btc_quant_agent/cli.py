@@ -3,13 +3,17 @@ from __future__ import annotations
 import argparse
 import json
 import time
+from dataclasses import asdict
 from typing import Any
 
-from .backtest import BacktestEngine, metrics, monte_carlo
+from .backtest import BacktestEngine, bootstrap, metrics, monte_carlo
 from .config import load_config
 from .data.binance import BinancePublicClient
+from .data.collector import collect_derivative_snapshot
 from .data.csvio import read_candles, write_candles
 from .data.derivatives import HistoricalDerivativeStore
+from .data.funding import read_funding_events_csv
+from .data.manifest import build_manifest, write_manifest
 from .engine import QuantEngine
 from .explain import explain_signal
 from .service import QuantService
@@ -82,6 +86,16 @@ def build_parser() -> argparse.ArgumentParser:
         "--derivatives", help="historical derivatives CSV for backward as-of replay"
     )
     backtest.add_argument("--monte-carlo", type=int, default=2000)
+    backtest.add_argument("--funding-events", help="point-in-time funding settlement CSV")
+
+    collector = sub.add_parser(
+        "collect-derivatives", help="append a point-in-time public derivatives snapshot"
+    )
+    collector.add_argument("--path", default="./data/BTCUSDT-derivatives.csv")
+    collector.add_argument("--manifest")
+    collector.add_argument("--samples", type=int, default=1)
+    collector.add_argument("--interval-seconds", type=int, default=900)
+    collector.add_argument("--include-order-book", action="store_true")
 
     daemon = sub.add_parser("daemon", help="poll at closed 15m boundaries")
     daemon.add_argument("--once", action="store_true")
@@ -151,7 +165,42 @@ def main(argv: list[str] | None = None) -> int:
         client = BinancePublicClient(service.config.data)
         bars = client.historical_klines("BTCUSDT", args.interval, args.start_ms, args.end_ms)
         write_candles(args.path, bars)
-        _print({"status": "written", "path": args.path, "candles": len(bars)})
+        manifest = build_manifest(
+            args.path,
+            source="Binance USD-M public REST klines",
+            rows=[asdict(bar) for bar in bars],
+            timestamp_field="open_time_ms",
+            expected_interval_ms={"1m": 60_000, "5m": 300_000, "15m": 900_000,
+                                  "1h": 3_600_000, "4h": 14_400_000}[args.interval],
+        )
+        manifest_path = f"{args.path}.manifest.json"
+        write_manifest(manifest_path, manifest)
+        _print(
+            {
+                "status": "written",
+                "path": args.path,
+                "candles": len(bars),
+                "data_manifest": manifest_path,
+            }
+        )
+        return 0
+    if args.command == "collect-derivatives":
+        if args.samples < 1 or args.interval_seconds < 1:
+            _print({"error": "samples and interval-seconds must be positive"})
+            return 2
+        client = BinancePublicClient(service.config.data)
+        collected_manifest = None
+        for index in range(args.samples):
+            collected_manifest = collect_derivative_snapshot(
+                client,
+                args.path,
+                include_order_book=args.include_order_book,
+                manifest_path=args.manifest,
+            )
+            if index + 1 < args.samples:
+                time.sleep(args.interval_seconds)
+        assert collected_manifest is not None
+        _print({"status": "collected", "manifest": collected_manifest.as_dict()})
         return 0
     if args.command == "backtest":
         bars = read_candles(args.path)
@@ -162,7 +211,12 @@ def main(argv: list[str] | None = None) -> int:
             derivative_store = (
                 HistoricalDerivativeStore.from_csv(args.derivatives) if args.derivatives else None
             )
-            outcomes = BacktestEngine(QuantEngine(service.config), derivative_store).run(bars)
+            funding_events = (
+                read_funding_events_csv(args.funding_events) if args.funding_events else []
+            )
+            outcomes = BacktestEngine(
+                QuantEngine(service.config), derivative_store, funding_events
+            ).run(bars)
         except ValueError as exc:
             _print({"error": str(exc)})
             return 2
@@ -171,6 +225,10 @@ def main(argv: list[str] | None = None) -> int:
                 "validation_status": service.config.runtime.validation_status,
                 "metrics": metrics(outcomes),
                 "monte_carlo": monte_carlo(outcomes, args.monte_carlo),
+                "bootstrap": bootstrap(outcomes, args.monte_carlo),
+                "block_bootstrap": bootstrap(
+                    outcomes, args.monte_carlo, block_size=max(1, round(len(outcomes) ** 0.5))
+                ),
                 "outcomes": [item.as_dict() for item in outcomes],
             }
         )

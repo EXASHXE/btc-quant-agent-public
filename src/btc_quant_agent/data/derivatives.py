@@ -2,13 +2,13 @@ from __future__ import annotations
 
 import csv
 from bisect import bisect_right
+from collections.abc import Sequence
 from dataclasses import asdict, fields, replace
 from pathlib import Path
-from typing import Any, Sequence
+from typing import Any
 
 from ..config import DataConfig
 from ..domain import DerivativesSnapshot
-
 
 DERIVATIVE_FIELDS = [field.name for field in fields(DerivativesSnapshot)]
 
@@ -117,6 +117,10 @@ class HistoricalDerivativeStore:
     def from_csv(cls, path: str | Path) -> HistoricalDerivativeStore:
         with Path(path).open("r", encoding="utf-8", newline="") as handle:
             rows = list(csv.DictReader(handle))
+        return cls.from_rows(rows)
+
+    @classmethod
+    def from_rows(cls, rows: Sequence[dict[str, Any]]) -> HistoricalDerivativeStore:
         snapshots: list[DerivativesSnapshot] = []
         integer_fields = {
             "observed_at_ms",
@@ -144,6 +148,9 @@ class HistoricalDerivativeStore:
 
     def as_rows(self) -> list[dict[str, Any]]:
         return [asdict(snapshot) for snapshot in self._snapshots]
+
+    def as_snapshots(self) -> tuple[DerivativesSnapshot, ...]:
+        return self._snapshots
 
 
 def write_historical_derivatives_csv(

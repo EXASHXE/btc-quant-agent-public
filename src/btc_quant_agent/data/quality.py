@@ -2,9 +2,9 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 from dataclasses import dataclass
+from itertools import pairwise
 
 from ..domain import Candle
-
 
 INTERVAL_MS = {
     "1m": 60_000,
@@ -35,7 +35,7 @@ def validate_candles(
         issues.append("timestamp disorder")
     if len(opens) != len(set(opens)):
         issues.append("duplicate candle")
-    for previous, current in zip(candles, candles[1:]):
+    for previous, current in pairwise(candles):
         if current.open_time_ms - previous.open_time_ms != expected:
             issues.append(f"missing candle before {current.open_time_ms}")
             break
