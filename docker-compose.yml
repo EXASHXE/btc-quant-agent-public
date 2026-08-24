@@ -1,0 +1,26 @@
+services:
+  quantd:
+    build: .
+    restart: unless-stopped
+    environment:
+      BTC_QUANT_CONFIG: /app/configs/default.toml
+      BTC_QUANT_DB_PATH: /app/var/quant.db
+      FEISHU_WEBHOOK_URL: ${FEISHU_WEBHOOK_URL:-}
+      FEISHU_WEBHOOK_SECRET: ${FEISHU_WEBHOOK_SECRET:-}
+    volumes:
+      - ./var:/app/var
+      - ./configs:/app/configs:ro
+    command: ["quantctl", "daemon", "--poll-seconds", "30"]
+
+  api:
+    build: .
+    restart: unless-stopped
+    environment:
+      BTC_QUANT_CONFIG: /app/configs/default.toml
+      BTC_QUANT_DB_PATH: /app/var/quant.db
+    volumes:
+      - ./var:/app/var
+      - ./configs:/app/configs:ro
+    command: ["uvicorn", "btc_quant_agent.api:app", "--host", "0.0.0.0", "--port", "8787"]
+    ports:
+      - "127.0.0.1:8787:8787"

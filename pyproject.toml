@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "btc-quant-agent"
+version = "0.2.1"
+description = "Causal BTCUSDT signal research and shadow-trading engine"
+readme = "README.md"
+requires-python = ">=3.11"
+license = {text = "MIT"}
+authors = [{name = "BTC Quant Agent"}]
+dependencies = []
+
+[project.optional-dependencies]
+api = ["fastapi>=0.115,<1", "uvicorn>=0.30,<1"]
+dev = ["pytest>=8,<9", "pytest-cov>=6,<8", "ruff>=0.9,<1", "mypy>=1.15,<2"]
+
+[project.scripts]
+quantctl = "btc_quant_agent.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.mypy]
+python_version = "3.11"
+files = ["src/btc_quant_agent"]
+strict = true
+warn_unused_ignores = true

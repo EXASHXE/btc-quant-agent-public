@@ -1,0 +1,94 @@
+[runtime]
+symbol = "BTCUSDT"
+strategy_version = "0.2.1"
+feature_version = "0.2.1"
+validation_status = "EXPERIMENTAL"
+decision_interval = "15m"
+ttl_minutes = 45
+cooldown_minutes = 90
+max_data_age_seconds = 120
+
+[strategy]
+ema_fast = 7
+ema_mid = 25
+ema_slow = 99
+atr_period = 14
+adx_period = 14
+adx_trend_min = 20.0
+slope_lookback = 5
+pivot_left = 2
+pivot_right = 2
+pullback_atr_tolerance = 0.35
+breakout_atr_min = 0.12
+retest_atr_tolerance = 0.30
+volume_z_min = -0.25
+rr_min = 1.80
+stop_atr_buffer = 0.25
+high_vol_atr_percentile = 0.90
+max_signal_age_bars = 3
+extreme_bar_atr = 2.5
+level_lookback_bars = 160
+rsi_period = 14
+roc_period = 12
+bb_period = 20
+cvd_window = 20
+factor_score_min = 72.0
+min_positive_factor_groups = 4
+rsi_long_min = 45.0
+rsi_long_max = 72.0
+rsi_short_min = 28.0
+rsi_short_max = 55.0
+funding_extreme_abs = 0.001
+max_spread_bps = 5.0
+max_abs_basis_rate = 0.003
+enable_momentum_group = true
+enable_participation_group = true
+enable_derivatives_group = true
+enable_volatility_liquidity_group = true
+
+[risk]
+account_equity_usdt = 100.0
+risk_per_trade = 0.005
+max_notional_usdt = 100.0
+min_notional_usdt = 5.0
+display_leverage = 20.0
+taker_fee_rate = 0.0005
+slippage_bps_per_side = 2.0
+funding_rate_estimate = 0.0
+
+[data]
+rest_base_url = "https://fapi.binance.com"
+request_timeout_seconds = 10.0
+history_limit_15m = 500
+history_limit_1h = 500
+history_limit_4h = 500
+oi_stale_seconds = 900
+funding_stale_seconds = 900
+derivatives_stale_seconds = 900
+
+[backtest]
+trend_pullback_holding_minutes = 720
+breakout_retest_holding_minutes = 480
+
+[execution]
+# disabled | paper | testnet | live. The shipped default cannot place orders.
+mode = "disabled"
+auto_execute = false
+allow_live = false
+max_leverage = 5
+max_notional_usdt = 100.0
+max_daily_loss_usdt = 2.0
+max_open_positions = 1
+plan_ttl_seconds = 120
+recv_window_ms = 5000
+position_mode = "ONE_WAY"
+margin_type = "ISOLATED"
+entry_order_type = "LIMIT"
+require_protective_orders = true
+testnet_base_url = "https://testnet.binancefuture.com"
+
+[storage]
+sqlite_path = "./var/quant.db"
+
+[notify]
+feishu_enabled = false
