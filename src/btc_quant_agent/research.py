@@ -25,6 +25,7 @@ from .config import AppConfig
 from .data.derivatives import HistoricalDerivativeStore
 from .domain import Candle
 from .engine import QuantEngine
+from .structure import confirmed_levels
 
 
 def _segment(outcomes: Sequence[TradeOutcome], attribute: str) -> dict[str, dict[str, Any]]:
@@ -127,6 +128,11 @@ def replay_decisions(
             ),
             now_ms=now_ms,
         )
+        support, resistance = confirmed_levels(
+            list(history["15m"])[-engine.config.strategy.level_lookback_bars :],
+            engine.config.strategy.pivot_left,
+            engine.config.strategy.pivot_right,
+        )
         output.append(
             {
                 "timestamp_ms": now_ms,
@@ -134,6 +140,9 @@ def replay_decisions(
                 "macro_4h": result.diagnostics.get("macro_4h"),
                 "regime_1h": result.diagnostics.get("regime"),
                 "structure_15m": result.diagnostics.get("structure_15m"),
+                "ema_15m": result.diagnostics.get("ema_15m"),
+                "support": support[-3:],
+                "resistance": resistance[-3:],
                 "factor_groups": result.diagnostics.get("factor_scores", {}),
                 "factor_score": result.diagnostics.get("factor_score"),
                 "setup": result.signal.setup.value if result.signal else None,

@@ -80,6 +80,11 @@ class QuantEngine:
                 "ema_slow": features_4h.ema_slow,
             },
             "rsi_15m": features_15m.rsi,
+            "ema_15m": {
+                "fast": features_15m.ema_fast,
+                "mid": features_15m.ema_mid,
+                "slow": features_15m.ema_slow,
+            },
             "roc_15m": features_15m.roc,
             "bb_width_percentile_15m": features_15m.bb_width_percentile,
             "cvd_slope_15m": features_15m.cvd_slope,
