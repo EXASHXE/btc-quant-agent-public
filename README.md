@@ -1,4 +1,4 @@
-# BTC Quant Signal Agent v0.2.1
+# BTC Quant Signal Agent v0.2.2
 
 一个面向 `BTCUSDT` USDⓈ-M 永续合约的低频量化项目：确定性核心负责产生 `LONG / SHORT / WAIT`，并提供受控的下单、保护单、撤单和平仓适配器。执行默认 `disabled`，默认配置不会读取密钥或发送订单。
 

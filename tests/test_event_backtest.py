@@ -71,6 +71,24 @@ class EventBacktestTests(unittest.TestCase):
         self.assertEqual(outcomes[0].outcome, "PENDING")
         self.assertIsNone(outcomes[0].entered_at_ms)
 
+    def test_signal_fills_and_resolves_only_on_next_arriving_bar(self) -> None:
+        class FillEngine(ScriptedEngine):
+            def scan(self, bars_4h, bars_1h, bars_15m, derivatives, now_ms, **kwargs):
+                result = super().scan(bars_4h, bars_1h, bars_15m, derivatives, now_ms, **kwargs)
+                assert result.signal
+                result.signal.entry_low = 99.0
+                result.signal.entry_high = 101.0
+                result.signal.stop_loss = 90.0
+                result.signal.take_profit = 100.2
+                return result
+
+        engine = FillEngine()
+        outcomes = EventDrivenBacktestEngine(engine).run(  # type: ignore[arg-type]
+            candles(16, "1m", 60_000)
+        )
+        self.assertEqual(outcomes[0].outcome, "WIN")
+        self.assertEqual(outcomes[0].entered_at_ms, 900_000)
+
     def test_multi_year_complexity_uses_bounded_decision_history(self) -> None:
         engine = ScriptedEngine()
         EventDrivenBacktestEngine(engine).run(candles(10_000, "1m", 60_000))  # type: ignore[arg-type]

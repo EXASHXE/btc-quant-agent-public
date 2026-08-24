@@ -3,7 +3,14 @@ from dataclasses import replace
 
 from helpers import signal
 
-from btc_quant_agent.backtest import FundingEvent, resolve_signal
+from btc_quant_agent.backtest import (
+    FundingEvent,
+    TradeOutcome,
+    bootstrap,
+    metrics,
+    monte_carlo,
+    resolve_signal,
+)
 from btc_quant_agent.domain import Candle
 
 
@@ -90,6 +97,46 @@ class BacktestTests(unittest.TestCase):
         self.assertLess(charged.funding_pnl_usdt, 0)
         self.assertEqual(not_crossed.funding_pnl_usdt, 0)
         self.assertLess(charged.net_pnl_usdt or 0, not_crossed.net_pnl_usdt or 0)
+
+    def test_metrics_and_resampling_statistics_cover_research_outputs(self) -> None:
+        outcomes = [
+            TradeOutcome(
+                "w",
+                "WIN",
+                100,
+                102,
+                2.0,
+                0,
+                60_000,
+                gross_pnl_usdt=2.0,
+                net_pnl_usdt=1.8,
+                holding_minutes=1,
+            ),
+            TradeOutcome(
+                "l1",
+                "LOSS",
+                100,
+                99,
+                -1.0,
+                60_000,
+                120_000,
+                gross_pnl_usdt=-1.0,
+                net_pnl_usdt=-1.2,
+                holding_minutes=1,
+            ),
+            TradeOutcome("l2", "LOSS", 100, 99, -0.5, 120_000, 180_000, holding_minutes=1),
+        ]
+        summary = metrics(outcomes)
+        self.assertEqual(summary["trades"], 3)
+        self.assertEqual(summary["max_losing_streak"], 2)
+        self.assertAlmostEqual(summary["profit_factor"] or 0, 4 / 3)
+        self.assertIsNotNone(monte_carlo(outcomes, simulations=20, seed=1)["p95_max_drawdown_r"])
+        bootstrapped = bootstrap(outcomes, simulations=20, seed=1, block_size=2)
+        self.assertIsNotNone(bootstrapped["p05_expectancy_r"])
+
+    def test_empty_simulations_are_explicitly_null(self) -> None:
+        self.assertIsNone(monte_carlo([])["p95_max_drawdown_r"])
+        self.assertIsNone(bootstrap([])["p99_max_drawdown_r"])
 
 
 if __name__ == "__main__":

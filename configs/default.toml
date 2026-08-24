@@ -1,7 +1,7 @@
 [runtime]
 symbol = "BTCUSDT"
-strategy_version = "0.2.1"
-feature_version = "0.2.1"
+strategy_version = "0.2.2"
+feature_version = "0.2.2"
 validation_status = "EXPERIMENTAL"
 decision_interval = "15m"
 ttl_minutes = 45

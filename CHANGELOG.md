@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.2.2 - Research Hardening
+
+- 将回测改为逐根 1m 事件推进，统一 pending、fill、失效、TTL、cooldown、fingerprint 与持仓生命周期。
+- 用有界 Live 等价历史窗口和 bisect as-of 查询移除主循环二次复杂度。
+- Funding 改为跨 settlement timestamp 才发生的现金流，并在风险端加入事件数压力预算。
+- 新增 point-in-time derivatives collector、checksum/coverage/gap data manifest，OrderBook 默认关闭。
+- 修复 SQLite connection leak；执行前拒绝 DEGRADED、刷新信号并按方向取整后重算风险/RR。
+- API 全路由增加 Bearer token；拆分 `pattern_score` 与 `factor_score` 并兼容旧数据库 JSON。
+- 新增 replay、ablation、walk-forward、holdout、stability、cost stress、bootstrap 与可复现研究产物。
+- 策略状态仍为 `EXPERIMENTAL`，执行仍默认 `disabled`，不包含 Edge 或收益声明。
+
 ## 0.2.1 - Quant Correctness Fix
 
 - 按止损、双边费用、双边滑点和不利 Funding 的完整损失率计算仓位；增加最小名义本金拒绝。

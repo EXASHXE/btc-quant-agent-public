@@ -12,8 +12,8 @@ from typing import Any
 @dataclass(frozen=True)
 class RuntimeConfig:
     symbol: str = "BTCUSDT"
-    strategy_version: str = "0.2.1"
-    feature_version: str = "0.2.1"
+    strategy_version: str = "0.2.2"
+    feature_version: str = "0.2.2"
     validation_status: str = "EXPERIMENTAL"
     decision_interval: str = "15m"
     ttl_minutes: int = 45
@@ -29,7 +29,7 @@ class RuntimeConfig:
         }:
             raise ValueError("unsupported validation_status")
         if self.decision_interval != "15m":
-            raise ValueError("v0.2.1 supports a 15m decision interval only")
+            raise ValueError("v0.2.2 supports a 15m decision interval only")
         if min(self.ttl_minutes, self.cooldown_minutes, self.max_data_age_seconds) <= 0:
             raise ValueError("runtime TTL, cooldown, and max data age must be positive")
 
