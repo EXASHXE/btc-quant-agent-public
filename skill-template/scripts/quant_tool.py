@@ -99,11 +99,15 @@ def api_call(base_url: str, args: argparse.Namespace) -> int:
     }
     method, path, payload = routes[args.action]
     data = json.dumps(payload).encode() if payload is not None else None
+    token = os.getenv("BTC_QUANT_API_TOKEN", "")
+    if not token:
+        print('{"error":"BTC_QUANT_API_TOKEN is required when BTC_QUANT_API_URL is set"}')
+        return 2
     request = urllib.request.Request(
         base_url.rstrip("/") + path,
         data=data,
         method=method,
-        headers={"Content-Type": "application/json"},
+        headers={"Content-Type": "application/json", "Authorization": f"Bearer {token}"},
     )
     try:
         with urllib.request.urlopen(request, timeout=20) as response:

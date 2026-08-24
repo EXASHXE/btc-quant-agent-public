@@ -7,6 +7,7 @@ services:
       BTC_QUANT_DB_PATH: /app/var/quant.db
       FEISHU_WEBHOOK_URL: ${FEISHU_WEBHOOK_URL:-}
       FEISHU_WEBHOOK_SECRET: ${FEISHU_WEBHOOK_SECRET:-}
+      BTC_QUANT_API_TOKEN: ${BTC_QUANT_API_TOKEN:-}
     volumes:
       - ./var:/app/var
       - ./configs:/app/configs:ro
@@ -18,6 +19,7 @@ services:
     environment:
       BTC_QUANT_CONFIG: /app/configs/default.toml
       BTC_QUANT_DB_PATH: /app/var/quant.db
+      BTC_QUANT_API_TOKEN: ${BTC_QUANT_API_TOKEN:-}
     volumes:
       - ./var:/app/var
       - ./configs:/app/configs:ro

@@ -5,6 +5,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 from fastapi import HTTPException
+from fastapi.security import HTTPAuthorizationCredentials
 from helpers import signal
 
 from btc_quant_agent import api
@@ -14,6 +15,18 @@ from btc_quant_agent.storage import Repository
 
 
 class ApiCorrectnessTests(unittest.TestCase):
+    def test_bearer_auth_rejects_missing_or_wrong_token(self) -> None:
+        with patch.dict("os.environ", {"BTC_QUANT_API_TOKEN": "expected"}):
+            with self.assertRaises(HTTPException) as missing:
+                api._require_api_token(None)
+            with self.assertRaises(HTTPException) as wrong:
+                api._require_api_token(HTTPAuthorizationCredentials(scheme="Bearer", credentials="wrong"))
+            api._require_api_token(
+                HTTPAuthorizationCredentials(scheme="Bearer", credentials="expected")
+            )
+        self.assertEqual(missing.exception.status_code, 401)
+        self.assertEqual(wrong.exception.status_code, 401)
+
     @staticmethod
     def _endpoint(app: object, path: str, method: str):
         return next(

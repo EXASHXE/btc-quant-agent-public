@@ -85,6 +85,7 @@ uvicorn btc_quant_agent.api:app --host 127.0.0.1 --port 8787
 
 ```bash
 export BTC_QUANT_DB_PATH=./var/quant.db
+export BTC_QUANT_API_TOKEN='generate-a-long-random-token'
 export FEISHU_WEBHOOK_URL='https://open.feishu.cn/open-apis/bot/v2/hook/...'
 export FEISHU_WEBHOOK_SECRET='...'
 ```
@@ -115,7 +116,7 @@ export BINANCE_TESTNET_API_SECRET='...'
 不利 Funding 合计后不得超过 `account_equity_usdt × risk_per_trade`。若计算仓位低于
 `min_notional_usdt`，系统直接返回 `WAIT`，不会为满足交易所最小名义本金而超出风险预算。
 
-REST API 没有内置用户认证，必须只绑定可信本机或放在经过认证的反向代理后；尤其不要在启用执行模式时暴露到公网。
+REST API 的所有路由都要求 `Authorization: Bearer <BTC_QUANT_API_TOKEN>`，并继续默认只绑定可信本机；不要把执行 API 直接暴露到公网。
 
 ## 设计与验证
 
