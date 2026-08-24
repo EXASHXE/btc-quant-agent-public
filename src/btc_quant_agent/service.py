@@ -35,7 +35,9 @@ class QuantService:
         candles_15m = self.client.klines(symbol, "15m", self.config.data.history_limit_15m)
         candles_1h = self.client.klines(symbol, "1h", self.config.data.history_limit_1h)
         candles_4h = self.client.klines(symbol, "4h", self.config.data.history_limit_4h)
-        derivatives = self.client.derivatives(symbol)
+        derivatives = self.client.derivatives(
+            symbol, include_order_book=self.config.strategy.enable_order_book_factor
+        )
         now_ms = max(now_ms, derivatives.observed_at_ms)
         engine = QuantEngine(self.config)
         self.repository.expire_signals(now_ms)
@@ -51,7 +53,14 @@ class QuantService:
             )
             if self.config.notify.feishu_enabled and webhook and active.notified_at_ms:
                 send_invalidation(webhook, active, reason, secret)
-        result = engine.scan(candles_4h, candles_1h, candles_15m, derivatives, now_ms)
+        result = engine.scan(
+            candles_4h,
+            candles_1h,
+            candles_15m,
+            derivatives,
+            now_ms,
+            include_order_book=self.config.strategy.enable_order_book_factor,
+        )
         self.repository.record_event("scan", result.as_dict())
         if result.signal is None:
             return result

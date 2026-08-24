@@ -20,7 +20,9 @@ class FakeClient:
         sizes = {"15m": 900_000, "1h": 3_600_000, "4h": 14_400_000}
         return candles(2, interval, sizes[interval])
 
-    def derivatives(self, _symbol: str) -> DerivativesSnapshot:
+    def derivatives(
+        self, _symbol: str, *, include_order_book: bool = False
+    ) -> DerivativesSnapshot:
         return DerivativesSnapshot(observed_at_ms=1_800_000)
 
 

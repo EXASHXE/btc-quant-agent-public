@@ -29,10 +29,13 @@ def build_position_plan(
     round_trip_fee_rate = 2 * risk.taker_fee_rate
     round_trip_slippage_rate = 2 * risk.slippage_bps_per_side / 10_000
     effective_funding = risk.funding_rate_estimate if funding_rate is None else funding_rate
-    adverse_funding = (
+    observed_adverse_funding = (
         max(effective_funding, 0.0)
         if candidate.direction == Direction.LONG
         else max(-effective_funding, 0.0)
+    )
+    adverse_funding = max(observed_adverse_funding, risk.funding_stress_rate) * (
+        risk.max_expected_funding_events
     )
     stop_distance_pct = gross_risk / entry
     total_loss_pct = (
