@@ -485,7 +485,11 @@ class EventDrivenBacktestEngine:
                 list(history["1h"]),
                 list(history["15m"]),
                 derivatives=(
-                    self.derivatives.snapshot_at(now_ms, self.engine.config.data)
+                    self.derivatives.snapshot_at(
+                        now_ms,
+                        self.engine.config.data,
+                        include_order_book=self.engine.config.strategy.enable_order_book_factor,
+                    )
                     if self.derivatives
                     else None
                 ),

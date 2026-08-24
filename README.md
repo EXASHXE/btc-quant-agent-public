@@ -54,6 +54,12 @@ quantctl daemon --once
 quantctl download ./data/BTCUSDT-1m.csv --start-ms 1754006400000 --end-ms 1756684800000 --interval 1m
 quantctl backtest ./data/BTCUSDT-1m.csv
 quantctl backtest ./data/BTCUSDT-1m.csv --derivatives ./data/BTCUSDT-derivatives.csv
+quantctl collect-derivatives --path ./data/BTCUSDT-derivatives.csv
+quantctl replay ./data/BTCUSDT-1m.csv --start-ms 1609459200000 --end-ms 1612137600000
+quantctl research ./data/BTCUSDT-1m.csv \
+  --data-manifest ./data/BTCUSDT-1m.csv.manifest.json \
+  --derivatives ./data/BTCUSDT-derivatives.csv \
+  --funding-events ./data/BTCUSDT-funding.csv
 ```
 
 执行工作流（默认配置的第二步会被拒绝）：
@@ -132,3 +138,8 @@ REST API 的所有路由都要求 `Authorization: Bearer <BTC_QUANT_API_TOKEN>`�
 v0.2.1 只完成量化正确性修复，仍保留 `EXPERIMENTAL`。Pivot 序列/BOS/CHOCH、供需区、
 Funding 分位与更完整 OI 状态机属于 v0.2.2；Walk-forward、消融、成本压力和 Bootstrap
 研究报告属于 v0.3.0，不能因本版本测试通过而视为已验证盈利能力。
+
+正式 `research` 运行需要 `pip install -e '.[research]'` 以写入 Parquet。每个 run 会在
+`artifacts/research/<run_id>/` 保存报告、交易、权益曲线、冻结配置、数据清单和 Git/config/
+dataset/random-seed provenance。没有真实 point-in-time derivatives 时，baseline 会显式关闭
+derivatives 与 order-book 分组，相关消融不会被当作有效多年证据。

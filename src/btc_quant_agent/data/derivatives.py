@@ -104,12 +104,16 @@ class HistoricalDerivativeStore:
         self._timestamps = tuple(item.observed_at_ms for item in self._snapshots)
 
     def snapshot_at(
-        self, decision_time_ms: int, config: DataConfig
+        self,
+        decision_time_ms: int,
+        config: DataConfig,
+        *,
+        include_order_book: bool = False,
     ) -> DerivativesSnapshot | None:
         index = bisect_right(self._timestamps, decision_time_ms) - 1
         selected = self._snapshots[index] if index >= 0 else None
         sanitized, _ = sanitize_derivatives(
-            selected, decision_time_ms, config, include_order_book=False
+            selected, decision_time_ms, config, include_order_book=include_order_book
         )
         return sanitized
 

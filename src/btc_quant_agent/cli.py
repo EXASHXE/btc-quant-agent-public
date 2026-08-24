@@ -16,6 +16,7 @@ from .data.funding import read_funding_events_csv
 from .data.manifest import build_manifest, write_manifest
 from .engine import QuantEngine
 from .explain import explain_signal
+from .research import replay_decisions, run_full_suite, write_research_artifacts
 from .service import QuantService
 
 
@@ -96,6 +97,20 @@ def build_parser() -> argparse.ArgumentParser:
     collector.add_argument("--samples", type=int, default=1)
     collector.add_argument("--interval-seconds", type=int, default=900)
     collector.add_argument("--include-order-book", action="store_true")
+
+    replay = sub.add_parser("replay", help="emit every causal 15m decision and rejection")
+    replay.add_argument("path")
+    replay.add_argument("--derivatives")
+    replay.add_argument("--start-ms", type=int)
+    replay.add_argument("--end-ms", type=int)
+
+    research = sub.add_parser("research", help="run the frozen validation suite")
+    research.add_argument("path")
+    research.add_argument("--data-manifest", required=True)
+    research.add_argument("--derivatives")
+    research.add_argument("--funding-events")
+    research.add_argument("--output")
+    research.add_argument("--seed", type=int, default=7)
 
     daemon = sub.add_parser("daemon", help="poll at closed 15m boundaries")
     daemon.add_argument("--once", action="store_true")
@@ -201,6 +216,57 @@ def main(argv: list[str] | None = None) -> int:
                 time.sleep(args.interval_seconds)
         assert collected_manifest is not None
         _print({"status": "collected", "manifest": collected_manifest.as_dict()})
+        return 0
+    if args.command == "replay":
+        bars = read_candles(args.path)
+        if args.start_ms is not None:
+            bars = [bar for bar in bars if bar.open_time_ms >= args.start_ms]
+        if args.end_ms is not None:
+            bars = [bar for bar in bars if bar.close_time_ms <= args.end_ms]
+        derivative_store = (
+            HistoricalDerivativeStore.from_csv(args.derivatives) if args.derivatives else None
+        )
+        _print(
+            replay_decisions(
+                bars,
+                QuantEngine(service.config),
+                derivative_store,
+            )
+        )
+        return 0
+    if args.command == "research":
+        bars = read_candles(args.path)
+        if not bars or any(bar.interval != "1m" for bar in bars):
+            _print({"error": "research requires a non-empty canonical 1m CSV"})
+            return 2
+        derivative_store = (
+            HistoricalDerivativeStore.from_csv(args.derivatives) if args.derivatives else None
+        )
+        funding_events = (
+            read_funding_events_csv(args.funding_events) if args.funding_events else []
+        )
+        suite = run_full_suite(
+            bars,
+            service.config,
+            derivative_store,
+            funding_events,
+            seed=args.seed,
+        )
+        output = args.output or (
+            "artifacts/research/" + time.strftime("%Y%m%dT%H%M%SZ", time.gmtime())
+        )
+        try:
+            write_research_artifacts(
+                output,
+                suite,
+                service.config,
+                data_manifest_path=args.data_manifest,
+                seed=args.seed,
+            )
+        except RuntimeError as exc:
+            _print({"error": str(exc)})
+            return 2
+        _print({"status": "written", "output": output})
         return 0
     if args.command == "backtest":
         bars = read_candles(args.path)
