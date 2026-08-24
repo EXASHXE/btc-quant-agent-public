@@ -3,7 +3,7 @@ from dataclasses import replace
 
 from helpers import signal
 
-from btc_quant_agent.backtest import resolve_signal
+from btc_quant_agent.backtest import FundingEvent, resolve_signal
 from btc_quant_agent.domain import Candle
 
 
@@ -78,6 +78,18 @@ class BacktestTests(unittest.TestCase):
         )
         self.assertEqual(outcome.outcome, "TIMEOUT")
         self.assertEqual(outcome.exit_price, last_valid.close)
+
+    def test_funding_is_charged_only_when_position_crosses_settlement(self) -> None:
+        entry = Candle("BTCUSDT", "1m", 60_000, 119_999, 100, 101, 99.5, 100.5, 10)
+        exit_bar = Candle("BTCUSDT", "1m", 120_000, 179_999, 100.5, 104, 100, 103, 10)
+        event = FundingEvent(120_000, 0.001, 100.0)
+        charged = resolve_signal(signal(), [entry, exit_bar], funding_events=[event])
+        not_crossed = resolve_signal(
+            signal(), [entry, exit_bar], funding_events=[FundingEvent(60_000, 0.001)]
+        )
+        self.assertLess(charged.funding_pnl_usdt, 0)
+        self.assertEqual(not_crossed.funding_pnl_usdt, 0)
+        self.assertLess(charged.net_pnl_usdt or 0, not_crossed.net_pnl_usdt or 0)
 
 
 if __name__ == "__main__":

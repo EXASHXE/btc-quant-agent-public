@@ -72,6 +72,7 @@ class StrategyConfig:
     enable_participation_group: bool = True
     enable_derivatives_group: bool = True
     enable_volatility_liquidity_group: bool = True
+    enable_order_book_factor: bool = False
 
 
 @dataclass(frozen=True)
@@ -84,6 +85,8 @@ class RiskConfig:
     taker_fee_rate: float = 0.0005
     slippage_bps_per_side: float = 2.0
     funding_rate_estimate: float = 0.0
+    funding_stress_rate: float = 0.0005
+    max_expected_funding_events: int = 2
 
     def __post_init__(self) -> None:
         if self.account_equity_usdt <= 0 or not 0 < self.risk_per_trade <= 0.05:
@@ -92,8 +95,10 @@ class RiskConfig:
             raise ValueError("risk notional bounds are invalid")
         if self.display_leverage <= 0:
             raise ValueError("display leverage must be positive")
-        if min(self.taker_fee_rate, self.slippage_bps_per_side) < 0:
+        if min(self.taker_fee_rate, self.slippage_bps_per_side, self.funding_stress_rate) < 0:
             raise ValueError("fees and slippage cannot be negative")
+        if self.max_expected_funding_events < 0:
+            raise ValueError("max_expected_funding_events cannot be negative")
 
 
 @dataclass(frozen=True)
