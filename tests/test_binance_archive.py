@@ -39,7 +39,8 @@ class BinanceArchiveTests(unittest.TestCase):
     def test_months_and_dataset_boundaries_are_utc(self) -> None:
         start = datetime(2021, 11, 1, tzinfo=UTC)
         end = datetime(2022, 2, 1, tzinfo=UTC)
-        self.assertEqual(_months(start, end), [(2021, 11), (2021, 12), (2022, 1), (2022, 2)])
+        self.assertEqual(_months(start, end), [(2021, 11), (2021, 12), (2022, 1)])
+        self.assertEqual(_months(start, start), [])
 
     def test_parse_audits_ohlc_volume_duplicates_and_order(self) -> None:
         rows = [

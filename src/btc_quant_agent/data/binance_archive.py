@@ -10,7 +10,7 @@ import urllib.error
 import urllib.request
 import zipfile
 from dataclasses import asdict
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from itertools import pairwise
 from pathlib import Path
 from typing import Any
@@ -35,8 +35,11 @@ KLINE_COLUMNS = (
 
 
 def _months(start: datetime, end: datetime) -> list[tuple[int, int]]:
+    if end <= start:
+        return []
     cursor = datetime(start.year, start.month, 1, tzinfo=UTC)
-    final = datetime(end.year, end.month, 1, tzinfo=UTC)
+    last_included = end - timedelta(microseconds=1)
+    final = datetime(last_included.year, last_included.month, 1, tzinfo=UTC)
     output: list[tuple[int, int]] = []
     while cursor <= final:
         output.append((cursor.year, cursor.month))
