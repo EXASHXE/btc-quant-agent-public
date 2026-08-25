@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.3.0 - Formal Research, Inconclusive Low Sample
+
+- 构建并校验 Binance 官方 BTCUSDT USD-M 永续 1m、funding 与 mark-price 研究数据；
+  2,934,720 根 K 线零缺失、零重复、零合成。
+- 增加 UTC 开发/holdout 硬边界、候选配置/提交/标签证书及 exactly-once holdout 门。
+- 修复月度 mark-price 缺日，使用带官方 SHA-256 的 daily 归档回填；高周期抽样 OHLC
+  全部一致，并记录 Binance 1m/高周期成交活动差异。
+- A/B/C 消融保留共同硬安全核；成本压力只重定价冻结成交，不改变策略决策。
+- 优化滚动特征计算并增加同一不可变数据集的跨消融缓存，附完整序列等价性测试。
+- 冻结 Run 0 在开发集只有 13 笔 filled trades，expectancy `-0.1035R`、PF `0.8627`；
+  结论为 `INSUFFICIENT_SAMPLE_FOR_OPTIMIZATION`。
+- 按预注册停止规则跳过参数研究、候选标签和最终 holdout；策略仍为 `EXPERIMENTAL`，
+  执行仍默认 `disabled`。
+
 ## 0.2.2 - Research Hardening
 
 - 将回测改为逐根 1m 事件推进，统一 pending、fill、失效、TTL、cooldown、fingerprint 与持仓生命周期。

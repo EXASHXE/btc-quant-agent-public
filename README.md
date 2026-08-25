@@ -1,4 +1,4 @@
-# BTC Quant Signal Agent v0.2.2
+# BTC Quant Signal Agent v0.3.0
 
 一个面向 `BTCUSDT` USDⓈ-M 永续合约的低频量化项目：确定性核心负责产生 `LONG / SHORT / WAIT`，并提供受控的下单、保护单、撤单和平仓适配器。执行默认 `disabled`，默认配置不会读取密钥或发送订单。
 
@@ -60,6 +60,13 @@ quantctl research ./data/BTCUSDT-1m.csv \
   --data-manifest ./data/BTCUSDT-1m.csv.manifest.json \
   --derivatives ./data/BTCUSDT-derivatives.csv \
   --funding-events ./data/BTCUSDT-funding.csv
+
+# 正式 v0.3.0 数据与开发集研究（不会读取 holdout 策略结果）
+quantctl build-official-dataset --root ./data/research/BTCUSDT \
+  --start 2021-01-01 --end-exclusive 2026-08-01
+quantctl audit-official-timeframes --root ./data/research/BTCUSDT
+python tools/run_formal_research.py --root ./data/research/BTCUSDT \
+  --output ./artifacts/research/<unique_run_id>
 ```
 
 执行工作流（默认配置的第二步会被拒绝）：
@@ -141,5 +148,10 @@ Funding 分位与更完整 OI 状态机属于 v0.2.2；Walk-forward、消融、�
 
 正式 `research` 运行需要 `pip install -e '.[research]'` 以写入 Parquet。每个 run 会在
 `artifacts/research/<run_id>/` 保存报告、交易、权益曲线、冻结配置、数据清单和 Git/config/
-dataset/random-seed provenance。没有真实 point-in-time derivatives 时，baseline 会显式关闭
+dataset/random-seed provenance。v0.3.0 的冻结 Run 0 只有 13 笔 filled trades，结论为
+`INCONCLUSIVE_LOW_SAMPLE` / `INSUFFICIENT_SAMPLE_FOR_OPTIMIZATION`；未运行参数网格，未打开
+最终 holdout。没有真实 point-in-time derivatives 时，baseline 会显式关闭
 derivatives 与 order-book 分组，相关消融不会被当作有效多年证据。
+
+正式证据见 `docs/V0.3.0_DATA_AUDIT.md`、`docs/V0.3.0_RESEARCH_REPORT.md` 与
+`docs/V0.3.0_REPLAY_AUDIT.md`。策略状态继续为 `EXPERIMENTAL`，这些研究结果不构成交易建议。

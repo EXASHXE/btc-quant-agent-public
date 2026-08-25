@@ -1,0 +1,689 @@
+{
+  "LONG": [
+    {
+      "decision": "LONG",
+      "direction": "LONG",
+      "ema_15m": {
+        "fast": 43504.24551525655,
+        "mid": 43164.572568129355,
+        "slow": 42085.18001036666
+      },
+      "factor_score": 100.0,
+      "health": "DEGRADED",
+      "macro_4h": {
+        "close": 43670.3,
+        "ema_mid": 40510.26007816844,
+        "ema_slow": 38305.981087793414
+      },
+      "reason": "confirmed",
+      "reason_code": "CONFIRMED",
+      "regime": "TREND_UP",
+      "setup": "BREAKOUT_RETEST",
+      "signal_id": "BTCUSDT-20210807-0444-LONG-39d173",
+      "structure_15m": "HH_HL",
+      "timestamp_ms": 1628311500000
+    },
+    {
+      "decision": "LONG",
+      "direction": "LONG",
+      "ema_15m": {
+        "fast": 24041.710958345306,
+        "mid": 23818.65642685823,
+        "slow": 23361.183549197805
+      },
+      "factor_score": 100.0,
+      "health": "DEGRADED",
+      "macro_4h": {
+        "close": 23720.0,
+        "ema_mid": 22189.45397205698,
+        "ema_slow": 21191.140323723674
+      },
+      "reason": "confirmed",
+      "reason_code": "CONFIRMED",
+      "regime": "TREND_UP",
+      "setup": "BREAKOUT_RETEST",
+      "signal_id": "BTCUSDT-20220720-1529-LONG-15bfbe",
+      "structure_15m": "HH_HL",
+      "timestamp_ms": 1658331000000
+    },
+    {
+      "decision": "LONG",
+      "direction": "LONG",
+      "ema_15m": {
+        "fast": 21848.230578518807,
+        "mid": 21772.869819364154,
+        "slow": 21664.927116706254
+      },
+      "factor_score": 100.0,
+      "health": "DEGRADED",
+      "macro_4h": {
+        "close": 21649.2,
+        "ema_mid": 20997.276464289967,
+        "ema_slow": 20560.666235777408
+      },
+      "reason": "confirmed",
+      "reason_code": "CONFIRMED",
+      "regime": "TREND_UP",
+      "setup": "BREAKOUT_RETEST",
+      "signal_id": "BTCUSDT-20220912-0729-LONG-060737",
+      "structure_15m": "LH_HL",
+      "timestamp_ms": 1662967800000
+    }
+  ],
+  "NO_SIGNAL": [
+    {
+      "decision": "NO_SIGNAL",
+      "direction": null,
+      "ema_15m": null,
+      "factor_score": null,
+      "health": "DATA_INVALID",
+      "macro_4h": null,
+      "reason": "no candles; no candles",
+      "reason_code": "INVALID_CANDLES",
+      "regime": null,
+      "setup": null,
+      "signal_id": null,
+      "structure_15m": null,
+      "timestamp_ms": 1609460100000
+    },
+    {
+      "decision": "NO_SIGNAL",
+      "direction": null,
+      "ema_15m": null,
+      "factor_score": null,
+      "health": "DATA_INVALID",
+      "macro_4h": null,
+      "reason": "no candles; no candles",
+      "reason_code": "INVALID_CANDLES",
+      "regime": null,
+      "setup": null,
+      "signal_id": null,
+      "structure_15m": null,
+      "timestamp_ms": 1609461000000
+    },
+    {
+      "decision": "NO_SIGNAL",
+      "direction": null,
+      "ema_15m": null,
+      "factor_score": null,
+      "health": "DATA_INVALID",
+      "macro_4h": null,
+      "reason": "no candles; no candles",
+      "reason_code": "INVALID_CANDLES",
+      "regime": null,
+      "setup": null,
+      "signal_id": null,
+      "structure_15m": null,
+      "timestamp_ms": 1609461900000
+    },
+    {
+      "decision": "NO_SIGNAL",
+      "direction": null,
+      "ema_15m": null,
+      "factor_score": null,
+      "health": "DATA_INVALID",
+      "macro_4h": null,
+      "reason": "no candles",
+      "reason_code": "INVALID_CANDLES",
+      "regime": null,
+      "setup": null,
+      "signal_id": null,
+      "structure_15m": null,
+      "timestamp_ms": 1609462800000
+    },
+    {
+      "decision": "NO_SIGNAL",
+      "direction": null,
+      "ema_15m": null,
+      "factor_score": null,
+      "health": "DATA_INVALID",
+      "macro_4h": null,
+      "reason": "no candles",
+      "reason_code": "INVALID_CANDLES",
+      "regime": null,
+      "setup": null,
+      "signal_id": null,
+      "structure_15m": null,
+      "timestamp_ms": 1609463700000
+    },
+    {
+      "decision": "NO_SIGNAL",
+      "direction": null,
+      "ema_15m": null,
+      "factor_score": null,
+      "health": "DATA_INVALID",
+      "macro_4h": null,
+      "reason": "no candles",
+      "reason_code": "INVALID_CANDLES",
+      "regime": null,
+      "setup": null,
+      "signal_id": null,
+      "structure_15m": null,
+      "timestamp_ms": 1609464600000
+    },
+    {
+      "decision": "NO_SIGNAL",
+      "direction": null,
+      "ema_15m": null,
+      "factor_score": null,
+      "health": "DATA_INVALID",
+      "macro_4h": null,
+      "reason": "no candles",
+      "reason_code": "INVALID_CANDLES",
+      "regime": null,
+      "setup": null,
+      "signal_id": null,
+      "structure_15m": null,
+      "timestamp_ms": 1609465500000
+    },
+    {
+      "decision": "NO_SIGNAL",
+      "direction": null,
+      "ema_15m": null,
+      "factor_score": null,
+      "health": "DATA_INVALID",
+      "macro_4h": null,
+      "reason": "no candles",
+      "reason_code": "INVALID_CANDLES",
+      "regime": null,
+      "setup": null,
+      "signal_id": null,
+      "structure_15m": null,
+      "timestamp_ms": 1609466400000
+    },
+    {
+      "decision": "NO_SIGNAL",
+      "direction": null,
+      "ema_15m": null,
+      "factor_score": null,
+      "health": "DATA_INVALID",
+      "macro_4h": null,
+      "reason": "no candles",
+      "reason_code": "INVALID_CANDLES",
+      "regime": null,
+      "setup": null,
+      "signal_id": null,
+      "structure_15m": null,
+      "timestamp_ms": 1609467300000
+    },
+    {
+      "decision": "NO_SIGNAL",
+      "direction": null,
+      "ema_15m": null,
+      "factor_score": null,
+      "health": "DATA_INVALID",
+      "macro_4h": null,
+      "reason": "no candles",
+      "reason_code": "INVALID_CANDLES",
+      "regime": null,
+      "setup": null,
+      "signal_id": null,
+      "structure_15m": null,
+      "timestamp_ms": 1609468200000
+    }
+  ],
+  "SHORT": [
+    {
+      "decision": "SHORT",
+      "direction": "SHORT",
+      "ema_15m": {
+        "fast": 54850.79914995812,
+        "mid": 55230.5437593905,
+        "slow": 55611.46846950525
+      },
+      "factor_score": 100.0,
+      "health": "DEGRADED",
+      "macro_4h": {
+        "close": 54556.02,
+        "ema_mid": 56706.507389916485,
+        "ema_slow": 58520.30146388072
+      },
+      "reason": "confirmed",
+      "reason_code": "CONFIRMED",
+      "regime": "TREND_DOWN",
+      "setup": "BREAKOUT_RETEST",
+      "signal_id": "BTCUSDT-20210421-1159-SHORT-22e155",
+      "structure_15m": "LH_LL",
+      "timestamp_ms": 1619006400000
+    },
+    {
+      "decision": "SHORT",
+      "direction": "SHORT",
+      "ema_15m": {
+        "fast": 42432.82424416461,
+        "mid": 42885.4276204041,
+        "slow": 43716.952336158116
+      },
+      "factor_score": 100.0,
+      "health": "DEGRADED",
+      "macro_4h": {
+        "close": 42882.53,
+        "ema_mid": 46186.86575772353,
+        "ema_slow": 51491.98032547985
+      },
+      "reason": "confirmed",
+      "reason_code": "CONFIRMED",
+      "regime": "TREND_DOWN",
+      "setup": "BREAKOUT_RETEST",
+      "signal_id": "BTCUSDT-20210519-0129-SHORT-a984c6",
+      "structure_15m": "HH_LL",
+      "timestamp_ms": 1621387800000
+    },
+    {
+      "decision": "SHORT",
+      "direction": "SHORT",
+      "ema_15m": {
+        "fast": 35531.229697856485,
+        "mid": 35964.41737255443,
+        "slow": 36871.98679673126
+      },
+      "factor_score": 100.0,
+      "health": "DEGRADED",
+      "macro_4h": {
+        "close": 35799.22,
+        "ema_mid": 37876.41694261145,
+        "ema_slow": 42054.588266907216
+      },
+      "reason": "confirmed",
+      "reason_code": "CONFIRMED",
+      "regime": "TREND_DOWN",
+      "setup": "BREAKOUT_RETEST",
+      "signal_id": "BTCUSDT-20210528-2114-SHORT-9ae892",
+      "structure_15m": "LH_HL",
+      "timestamp_ms": 1622236500000
+    },
+    {
+      "decision": "SHORT",
+      "direction": "SHORT",
+      "ema_15m": {
+        "fast": 41368.703629348565,
+        "mid": 41634.77128818646,
+        "slow": 42223.401744472125
+      },
+      "factor_score": 100.0,
+      "health": "DEGRADED",
+      "macro_4h": {
+        "close": 41446.3,
+        "ema_mid": 42790.86712069763,
+        "ema_slow": 44508.48159848498
+      },
+      "reason": "confirmed",
+      "reason_code": "CONFIRMED",
+      "regime": "TREND_DOWN",
+      "setup": "BREAKOUT_RETEST",
+      "signal_id": "BTCUSDT-20210928-1714-SHORT-9c476b",
+      "structure_15m": "LH_HL",
+      "timestamp_ms": 1632849300000
+    },
+    {
+      "decision": "SHORT",
+      "direction": "SHORT",
+      "ema_15m": {
+        "fast": 52489.36091049375,
+        "mid": 53042.79825106869,
+        "slow": 54665.31566617616
+      },
+      "factor_score": 100.0,
+      "health": "DEGRADED",
+      "macro_4h": {
+        "close": 52003.89,
+        "ema_mid": 55968.460269274874,
+        "ema_slow": 57461.19100000838
+      },
+      "reason": "confirmed",
+      "reason_code": "CONFIRMED",
+      "regime": "TREND_DOWN",
+      "setup": "BREAKOUT_RETEST",
+      "signal_id": "BTCUSDT-20211204-0429-SHORT-a38766",
+      "structure_15m": "HH_HL",
+      "timestamp_ms": 1638592200000
+    },
+    {
+      "decision": "SHORT",
+      "direction": "SHORT",
+      "ema_15m": {
+        "fast": 42538.41374420024,
+        "mid": 42830.19669485103,
+        "slow": 43247.0619049107
+      },
+      "factor_score": 100.0,
+      "health": "DEGRADED",
+      "macro_4h": {
+        "close": 42722.1,
+        "ema_mid": 44245.90862532819,
+        "ema_slow": 44623.40466546292
+      },
+      "reason": "confirmed",
+      "reason_code": "CONFIRMED",
+      "regime": "TREND_DOWN",
+      "setup": "BREAKOUT_RETEST",
+      "signal_id": "BTCUSDT-20220408-2229-SHORT-d976f1",
+      "structure_15m": "LH_HL",
+      "timestamp_ms": 1649457000000
+    },
+    {
+      "decision": "SHORT",
+      "direction": "SHORT",
+      "ema_15m": {
+        "fast": 38409.63308385278,
+        "mid": 38648.40830935229,
+        "slow": 39104.38942044041
+      },
+      "factor_score": 100.0,
+      "health": "DEGRADED",
+      "macro_4h": {
+        "close": 38314.2,
+        "ema_mid": 39289.87398976082,
+        "ema_slow": 40249.5114490713
+      },
+      "reason": "confirmed",
+      "reason_code": "CONFIRMED",
+      "regime": "TREND_DOWN",
+      "setup": "BREAKOUT_RETEST",
+      "signal_id": "BTCUSDT-20220429-1959-SHORT-87da9e",
+      "structure_15m": "LH_HL",
+      "timestamp_ms": 1651262400000
+    },
+    {
+      "decision": "SHORT",
+      "direction": "SHORT",
+      "ema_15m": {
+        "fast": 29295.687015698135,
+        "mid": 29573.00293972013,
+        "slow": 29910.371084515027
+      },
+      "factor_score": 100.0,
+      "health": "DEGRADED",
+      "macro_4h": {
+        "close": 29818.1,
+        "ema_mid": 30070.186296966465,
+        "ema_slow": 32638.995495944808
+      },
+      "reason": "confirmed",
+      "reason_code": "CONFIRMED",
+      "regime": "TREND_DOWN",
+      "setup": "BREAKOUT_RETEST",
+      "signal_id": "BTCUSDT-20220518-1514-SHORT-31fa81",
+      "structure_15m": "LH_LL",
+      "timestamp_ms": 1652886900000
+    },
+    {
+      "decision": "SHORT",
+      "direction": "SHORT",
+      "ema_15m": {
+        "fast": 28858.962358343604,
+        "mid": 29010.648606411563,
+        "slow": 29264.778356890234
+      },
+      "factor_score": 100.0,
+      "health": "DEGRADED",
+      "macro_4h": {
+        "close": 29004.7,
+        "ema_mid": 29499.54463113336,
+        "ema_slow": 30643.402680331954
+      },
+      "reason": "confirmed",
+      "reason_code": "CONFIRMED",
+      "regime": "TREND_DOWN",
+      "setup": "BREAKOUT_RETEST",
+      "signal_id": "BTCUSDT-20220527-0614-SHORT-5417f9",
+      "structure_15m": "LH_HL",
+      "timestamp_ms": 1653632100000
+    },
+    {
+      "decision": "SHORT",
+      "direction": "SHORT",
+      "ema_15m": {
+        "fast": 56591.77250991829,
+        "mid": 56898.555187003745,
+        "slow": 57752.40796547878
+      },
+      "factor_score": 100.0,
+      "health": "DEGRADED",
+      "macro_4h": {
+        "close": 56632.9,
+        "ema_mid": 58448.982506334105,
+        "ema_slow": 59767.05410153585
+      },
+      "reason": "confirmed",
+      "reason_code": "CONFIRMED",
+      "regime": "TREND_DOWN",
+      "setup": "BREAKOUT_RETEST",
+      "signal_id": "BTCUSDT-20240904-0529-SHORT-bffeaa",
+      "structure_15m": "LH_LL",
+      "timestamp_ms": 1725427800000
+    }
+  ],
+  "WAIT": [
+    {
+      "decision": "WAIT",
+      "direction": null,
+      "ema_15m": {
+        "fast": 56479.12905400822,
+        "mid": 55937.86487552274,
+        "slow": 55243.71293829158
+      },
+      "factor_score": null,
+      "health": "OK",
+      "macro_4h": {
+        "close": 56591.65,
+        "ema_mid": 56138.02798488451,
+        "ema_slow": 55717.37675378741
+      },
+      "reason": "regime=TRANSITION",
+      "reason_code": "REGIME_TRANSITION",
+      "regime": "TRANSITION",
+      "setup": null,
+      "signal_id": null,
+      "structure_15m": "LH_HL",
+      "timestamp_ms": 1616587200000
+    },
+    {
+      "decision": "WAIT",
+      "direction": null,
+      "ema_15m": {
+        "fast": 56586.84429050616,
+        "mid": 56012.64373125177,
+        "slow": 55277.04492070169
+      },
+      "factor_score": null,
+      "health": "OK",
+      "macro_4h": {
+        "close": 56591.65,
+        "ema_mid": 56138.02798488451,
+        "ema_slow": 55717.37675378741
+      },
+      "reason": "regime=TRANSITION",
+      "reason_code": "REGIME_TRANSITION",
+      "regime": "TRANSITION",
+      "setup": null,
+      "signal_id": null,
+      "structure_15m": "LH_HL",
+      "timestamp_ms": 1616588100000
+    },
+    {
+      "decision": "WAIT",
+      "direction": null,
+      "ema_15m": {
+        "fast": 56650.75821787962,
+        "mid": 56076.47882884779,
+        "slow": 55308.34567554763
+      },
+      "factor_score": null,
+      "health": "OK",
+      "macro_4h": {
+        "close": 56591.65,
+        "ema_mid": 56138.02798488451,
+        "ema_slow": 55717.37675378741
+      },
+      "reason": "regime=TRANSITION",
+      "reason_code": "REGIME_TRANSITION",
+      "regime": "TRANSITION",
+      "setup": null,
+      "signal_id": null,
+      "structure_15m": "LH_HL",
+      "timestamp_ms": 1616589000000
+    },
+    {
+      "decision": "WAIT",
+      "direction": null,
+      "ema_15m": {
+        "fast": 56719.67616340971,
+        "mid": 56141.85968816719,
+        "slow": 55340.69998838557
+      },
+      "factor_score": null,
+      "health": "OK",
+      "macro_4h": {
+        "close": 56591.65,
+        "ema_mid": 56138.02798488451,
+        "ema_slow": 55717.37675378741
+      },
+      "reason": "regime=TRANSITION",
+      "reason_code": "REGIME_TRANSITION",
+      "regime": "TRANSITION",
+      "setup": null,
+      "signal_id": null,
+      "structure_15m": "HH_HL",
+      "timestamp_ms": 1616589900000
+    },
+    {
+      "decision": "WAIT",
+      "direction": null,
+      "ema_15m": {
+        "fast": 56768.64462255729,
+        "mid": 56201.37432753895,
+        "slow": 55372.21675766606
+      },
+      "factor_score": null,
+      "health": "OK",
+      "macro_4h": {
+        "close": 56591.65,
+        "ema_mid": 56138.02798488451,
+        "ema_slow": 55717.37675378741
+      },
+      "reason": "regime=TRANSITION",
+      "reason_code": "REGIME_TRANSITION",
+      "regime": "TRANSITION",
+      "setup": null,
+      "signal_id": null,
+      "structure_15m": "HH_HL",
+      "timestamp_ms": 1616590800000
+    },
+    {
+      "decision": "WAIT",
+      "direction": null,
+      "ema_15m": {
+        "fast": 56805.79846691797,
+        "mid": 56256.442456189805,
+        "slow": 55403.11040352209
+      },
+      "factor_score": null,
+      "health": "OK",
+      "macro_4h": {
+        "close": 56591.65,
+        "ema_mid": 56138.02798488451,
+        "ema_slow": 55717.37675378741
+      },
+      "reason": "regime=TRANSITION",
+      "reason_code": "REGIME_TRANSITION",
+      "regime": "TRANSITION",
+      "setup": null,
+      "signal_id": null,
+      "structure_15m": "HH_HL",
+      "timestamp_ms": 1616591700000
+    },
+    {
+      "decision": "WAIT",
+      "direction": null,
+      "ema_15m": {
+        "fast": 56850.51885018848,
+        "mid": 56312.46072879059,
+        "slow": 55434.74132859868
+      },
+      "factor_score": null,
+      "health": "OK",
+      "macro_4h": {
+        "close": 56591.65,
+        "ema_mid": 56138.02798488451,
+        "ema_slow": 55717.37675378741
+      },
+      "reason": "regime=TRANSITION",
+      "reason_code": "REGIME_TRANSITION",
+      "regime": "TRANSITION",
+      "setup": null,
+      "signal_id": null,
+      "structure_15m": "HH_HL",
+      "timestamp_ms": 1616592600000
+    },
+    {
+      "decision": "WAIT",
+      "direction": null,
+      "ema_15m": {
+        "fast": 56847.236637641356,
+        "mid": 56352.83990349901,
+        "slow": 55462.80266271487
+      },
+      "factor_score": null,
+      "health": "OK",
+      "macro_4h": {
+        "close": 56591.65,
+        "ema_mid": 56138.02798488451,
+        "ema_slow": 55717.37675378741
+      },
+      "reason": "regime=TRANSITION",
+      "reason_code": "REGIME_TRANSITION",
+      "regime": "TRANSITION",
+      "setup": null,
+      "signal_id": null,
+      "structure_15m": "HH_HL",
+      "timestamp_ms": 1616593500000
+    },
+    {
+      "decision": "WAIT",
+      "direction": null,
+      "ema_15m": {
+        "fast": 56836.55497823102,
+        "mid": 56387.58375707601,
+        "slow": 55489.653360177144
+      },
+      "factor_score": null,
+      "health": "OK",
+      "macro_4h": {
+        "close": 56591.65,
+        "ema_mid": 56138.02798488451,
+        "ema_slow": 55717.37675378741
+      },
+      "reason": "regime=TRANSITION",
+      "reason_code": "REGIME_TRANSITION",
+      "regime": "TRANSITION",
+      "setup": null,
+      "signal_id": null,
+      "structure_15m": "HH_HL",
+      "timestamp_ms": 1616594400000
+    },
+    {
+      "decision": "WAIT",
+      "direction": null,
+      "ema_15m": {
+        "fast": 56837.801233673265,
+        "mid": 56422.503468070165,
+        "slow": 55516.68209149079
+      },
+      "factor_score": null,
+      "health": "OK",
+      "macro_4h": {
+        "close": 56591.65,
+        "ema_mid": 56138.02798488451,
+        "ema_slow": 55717.37675378741
+      },
+      "reason": "regime=TRANSITION",
+      "reason_code": "REGIME_TRANSITION",
+      "regime": "TRANSITION",
+      "setup": null,
+      "signal_id": null,
+      "structure_15m": "HH_HL",
+      "timestamp_ms": 1616595300000
+    }
+  ]
+}

@@ -1,0 +1,2481 @@
+{
+  "ablation": {
+    "A_trend_structure": {
+      "by_direction": {
+        "LONG": {
+          "avg_loss_r": -1.1491257006633329,
+          "avg_win_r": 1.6833027277275106,
+          "expectancy_r": -0.08696504001676664,
+          "fees_usdt": 0.4651394155113603,
+          "filled_trades": 8,
+          "funding_pnl_usdt": -0.046220504705790366,
+          "gross_pnl_usdt": 0.34955552635462817,
+          "losses": 5,
+          "max_drawdown_r": 4.442530516725633,
+          "max_losing_streak": 4,
+          "median_holding_minutes": 130.0,
+          "net_pnl_usdt": -0.3478601600670665,
+          "outcome_counts": {
+            "LOSS": 5,
+            "WIN": 3
+          },
+          "p90_holding_minutes": 340.0,
+          "profit_factor": 0.8789131041569206,
+          "signals": 8,
+          "slippage_usdt": 0.18605576620454412,
+          "total_r": -0.6957203201341331,
+          "trades": 8,
+          "win_rate": 0.375,
+          "wins": 3
+        },
+        "SHORT": {
+          "avg_loss_r": -1.1908294307777116,
+          "avg_win_r": 1.8967967592633208,
+          "expectancy_r": -0.047264175206958914,
+          "fees_usdt": 1.3802457829968502,
+          "filled_trades": 27,
+          "funding_pnl_usdt": 0.01752210740170155,
+          "gross_pnl_usdt": 1.2767556234999429,
+          "losses": 17,
+          "max_drawdown_r": 5.019547515050061,
+          "max_losing_streak": 4,
+          "median_holding_minutes": 71.0,
+          "net_pnl_usdt": -0.6380663652939453,
+          "outcome_counts": {
+            "LOSS": 16,
+            "TIMEOUT": 1,
+            "WIN": 10
+          },
+          "p90_holding_minutes": 258.0,
+          "profit_factor": 0.936962734317015,
+          "signals": 27,
+          "slippage_usdt": 0.55209831319874,
+          "total_r": -1.2761327305878907,
+          "trades": 27,
+          "win_rate": 0.37037037037037035,
+          "wins": 10
+        }
+      },
+      "by_regime": {
+        "TREND_DOWN": {
+          "avg_loss_r": -1.1908294307777116,
+          "avg_win_r": 1.8967967592633208,
+          "expectancy_r": -0.047264175206958914,
+          "fees_usdt": 1.3802457829968502,
+          "filled_trades": 27,
+          "funding_pnl_usdt": 0.01752210740170155,
+          "gross_pnl_usdt": 1.2767556234999429,
+          "losses": 17,
+          "max_drawdown_r": 5.019547515050061,
+          "max_losing_streak": 4,
+          "median_holding_minutes": 71.0,
+          "net_pnl_usdt": -0.6380663652939453,
+          "outcome_counts": {
+            "LOSS": 16,
+            "TIMEOUT": 1,
+            "WIN": 10
+          },
+          "p90_holding_minutes": 258.0,
+          "profit_factor": 0.936962734317015,
+          "signals": 27,
+          "slippage_usdt": 0.55209831319874,
+          "total_r": -1.2761327305878907,
+          "trades": 27,
+          "win_rate": 0.37037037037037035,
+          "wins": 10
+        },
+        "TREND_UP": {
+          "avg_loss_r": -1.1491257006633329,
+          "avg_win_r": 1.6833027277275106,
+          "expectancy_r": -0.08696504001676664,
+          "fees_usdt": 0.4651394155113603,
+          "filled_trades": 8,
+          "funding_pnl_usdt": -0.046220504705790366,
+          "gross_pnl_usdt": 0.34955552635462817,
+          "losses": 5,
+          "max_drawdown_r": 4.442530516725633,
+          "max_losing_streak": 4,
+          "median_holding_minutes": 130.0,
+          "net_pnl_usdt": -0.3478601600670665,
+          "outcome_counts": {
+            "LOSS": 5,
+            "WIN": 3
+          },
+          "p90_holding_minutes": 340.0,
+          "profit_factor": 0.8789131041569206,
+          "signals": 8,
+          "slippage_usdt": 0.18605576620454412,
+          "total_r": -0.6957203201341331,
+          "trades": 8,
+          "win_rate": 0.375,
+          "wins": 3
+        }
+      },
+      "by_setup": {
+        "BREAKOUT_RETEST": {
+          "avg_loss_r": -1.181351310297171,
+          "avg_win_r": 1.84752890583198,
+          "expectancy_r": -0.05633865859205782,
+          "fees_usdt": 1.8453851985082104,
+          "filled_trades": 35,
+          "funding_pnl_usdt": -0.02869839730408882,
+          "gross_pnl_usdt": 1.6263111498545713,
+          "losses": 22,
+          "max_drawdown_r": 7.347734694811948,
+          "max_losing_streak": 6,
+          "median_holding_minutes": 94.0,
+          "net_pnl_usdt": -0.9859265253610119,
+          "outcome_counts": {
+            "LOSS": 21,
+            "TIMEOUT": 1,
+            "WIN": 13
+          },
+          "p90_holding_minutes": 258.0,
+          "profit_factor": 0.9241295257875645,
+          "signals": 35,
+          "slippage_usdt": 0.7381540794032843,
+          "total_r": -1.9718530507220238,
+          "trades": 35,
+          "win_rate": 0.37142857142857144,
+          "wins": 13
+        }
+      },
+      "by_year": {
+        "2021": {
+          "avg_loss_r": -1.2703845751641953,
+          "avg_win_r": 1.9999111527819675,
+          "expectancy_r": -0.18028599918214105,
+          "fees_usdt": 0.6372730983678699,
+          "filled_trades": 15,
+          "funding_pnl_usdt": 0.00704570126393873,
+          "gross_pnl_usdt": -0.4670083574149791,
+          "losses": 10,
+          "max_drawdown_r": 7.347734694811948,
+          "max_losing_streak": 6,
+          "median_holding_minutes": 94.0,
+          "net_pnl_usdt": -1.352144993866058,
+          "outcome_counts": {
+            "LOSS": 10,
+            "WIN": 5
+          },
+          "p90_holding_minutes": 257.0,
+          "profit_factor": 0.7871282412742936,
+          "signals": 15,
+          "slippage_usdt": 0.254909239347148,
+          "total_r": -2.704289987732116,
+          "trades": 15,
+          "win_rate": 0.3333333333333333,
+          "wins": 5
+        },
+        "2022": {
+          "avg_loss_r": -1.0685463889020659,
+          "avg_win_r": 1.8206037315997101,
+          "expectancy_r": 0.1352661613070075,
+          "fees_usdt": 0.7252859027781521,
+          "filled_trades": 12,
+          "funding_pnl_usdt": -0.004890278696275131,
+          "gross_pnl_usdt": 1.831887510427733,
+          "losses": 7,
+          "max_drawdown_r": 3.528892901227306,
+          "max_losing_streak": 3,
+          "median_holding_minutes": 157.0,
+          "net_pnl_usdt": 0.8115969678420449,
+          "outcome_counts": {
+            "LOSS": 6,
+            "TIMEOUT": 1,
+            "WIN": 5
+          },
+          "p90_holding_minutes": 340.0,
+          "profit_factor": 1.2170096220091409,
+          "signals": 12,
+          "slippage_usdt": 0.2901143611112608,
+          "total_r": 1.6231939356840899,
+          "trades": 12,
+          "win_rate": 0.4166666666666667,
+          "wins": 5
+        },
+        "2023": {
+          "avg_loss_r": null,
+          "avg_win_r": 1.737879121557205,
+          "expectancy_r": 1.737879121557205,
+          "fees_usdt": 0.06391762203849195,
+          "filled_trades": 1,
+          "funding_pnl_usdt": 0.0,
+          "gross_pnl_usdt": 0.9584242316324911,
+          "losses": 0,
+          "max_drawdown_r": 0.0,
+          "max_losing_streak": 0,
+          "median_holding_minutes": 26.0,
+          "net_pnl_usdt": 0.8689395607786025,
+          "outcome_counts": {
+            "WIN": 1
+          },
+          "p90_holding_minutes": 26.0,
+          "profit_factor": null,
+          "signals": 1,
+          "slippage_usdt": 0.025567048815396783,
+          "total_r": 1.737879121557205,
+          "trades": 1,
+          "win_rate": 1.0,
+          "wins": 1
+        },
+        "2024": {
+          "avg_loss_r": -1.1496166100797929,
+          "avg_win_r": 1.4919591413973285,
+          "expectancy_r": -0.6213014597843687,
+          "fees_usdt": 0.30981570771136313,
+          "filled_trades": 5,
+          "funding_pnl_usdt": -0.0334924421648398,
+          "gross_pnl_usdt": -1.0860192165001734,
+          "losses": 4,
+          "max_drawdown_r": 4.5984664403191715,
+          "max_losing_streak": 4,
+          "median_holding_minutes": 60.0,
+          "net_pnl_usdt": -1.5532536494609217,
+          "outcome_counts": {
+            "LOSS": 4,
+            "WIN": 1
+          },
+          "p90_holding_minutes": 147.0,
+          "profit_factor": 0.324447108783026,
+          "signals": 5,
+          "slippage_usdt": 0.12392628308454526,
+          "total_r": -3.1065072989218434,
+          "trades": 5,
+          "win_rate": 0.2,
+          "wins": 1
+        },
+        "2025": {
+          "avg_loss_r": -1.2075919122621759,
+          "avg_win_r": 1.6854630909528163,
+          "expectancy_r": 0.23893558934532022,
+          "fees_usdt": 0.10909286761233342,
+          "filled_trades": 2,
+          "funding_pnl_usdt": 0.0026386222930873796,
+          "gross_pnl_usdt": 0.38902698170949956,
+          "losses": 1,
+          "max_drawdown_r": 1.2075919122621759,
+          "max_losing_streak": 1,
+          "median_holding_minutes": 135.0,
+          "net_pnl_usdt": 0.23893558934532022,
+          "outcome_counts": {
+            "LOSS": 1,
+            "WIN": 1
+          },
+          "p90_holding_minutes": 135.0,
+          "profit_factor": 1.395722407411165,
+          "signals": 2,
+          "slippage_usdt": 0.043637147044933364,
+          "total_r": 0.47787117869064044,
+          "trades": 2,
+          "win_rate": 0.5,
+          "wins": 1
+        }
+      },
+      "overall": {
+        "avg_loss_r": -1.181351310297171,
+        "avg_win_r": 1.84752890583198,
+        "expectancy_r": -0.05633865859205782,
+        "fees_usdt": 1.8453851985082104,
+        "filled_trades": 35,
+        "funding_pnl_usdt": -0.02869839730408882,
+        "gross_pnl_usdt": 1.6263111498545713,
+        "losses": 22,
+        "max_drawdown_r": 7.347734694811948,
+        "max_losing_streak": 6,
+        "median_holding_minutes": 94.0,
+        "net_pnl_usdt": -0.9859265253610119,
+        "outcome_counts": {
+          "LOSS": 21,
+          "TIMEOUT": 1,
+          "WIN": 13
+        },
+        "p90_holding_minutes": 258.0,
+        "profit_factor": 0.9241295257875645,
+        "signals": 35,
+        "slippage_usdt": 0.7381540794032843,
+        "total_r": -1.9718530507220238,
+        "trades": 35,
+        "win_rate": 0.37142857142857144,
+        "wins": 13
+      }
+    },
+    "B_plus_momentum": {
+      "by_direction": {
+        "LONG": {
+          "avg_loss_r": -1.1403173226457985,
+          "avg_win_r": 1.6560145308126635,
+          "expectancy_r": -0.20820670482631118,
+          "fees_usdt": 0.34119256791918506,
+          "filled_trades": 6,
+          "funding_pnl_usdt": -0.046220504705790366,
+          "gross_pnl_usdt": -0.10073001468628406,
+          "losses": 4,
+          "max_drawdown_r": 3.258171303992161,
+          "max_losing_streak": 3,
+          "median_holding_minutes": 147.0,
+          "net_pnl_usdt": -0.6246201144789334,
+          "outcome_counts": {
+            "LOSS": 4,
+            "WIN": 2
+          },
+          "p90_holding_minutes": 340.0,
+          "profit_factor": 0.726120044800481,
+          "signals": 6,
+          "slippage_usdt": 0.13647702716767404,
+          "total_r": -1.249240228957867,
+          "trades": 6,
+          "win_rate": 0.3333333333333333,
+          "wins": 2
+        },
+        "SHORT": {
+          "avg_loss_r": -1.1161155169081574,
+          "avg_win_r": 1.9154201412034317,
+          "expectancy_r": 0.2312336644747711,
+          "fees_usdt": 0.9704633665612835,
+          "filled_trades": 18,
+          "funding_pnl_usdt": 0.012339955733003224,
+          "gross_pnl_usdt": 3.427411737725733,
+          "losses": 10,
+          "max_drawdown_r": 4.397440658192348,
+          "max_losing_streak": 4,
+          "median_holding_minutes": 62.0,
+          "net_pnl_usdt": 2.0811029802729397,
+          "outcome_counts": {
+            "LOSS": 9,
+            "TIMEOUT": 1,
+            "WIN": 8
+          },
+          "p90_holding_minutes": 261.0,
+          "profit_factor": 1.3729189225928822,
+          "signals": 18,
+          "slippage_usdt": 0.3881853466245134,
+          "total_r": 4.162205960545879,
+          "trades": 18,
+          "win_rate": 0.4444444444444444,
+          "wins": 8
+        }
+      },
+      "by_regime": {
+        "TREND_DOWN": {
+          "avg_loss_r": -1.1161155169081574,
+          "avg_win_r": 1.9154201412034317,
+          "expectancy_r": 0.2312336644747711,
+          "fees_usdt": 0.9704633665612835,
+          "filled_trades": 18,
+          "funding_pnl_usdt": 0.012339955733003224,
+          "gross_pnl_usdt": 3.427411737725733,
+          "losses": 10,
+          "max_drawdown_r": 4.397440658192348,
+          "max_losing_streak": 4,
+          "median_holding_minutes": 62.0,
+          "net_pnl_usdt": 2.0811029802729397,
+          "outcome_counts": {
+            "LOSS": 9,
+            "TIMEOUT": 1,
+            "WIN": 8
+          },
+          "p90_holding_minutes": 261.0,
+          "profit_factor": 1.3729189225928822,
+          "signals": 18,
+          "slippage_usdt": 0.3881853466245134,
+          "total_r": 4.162205960545879,
+          "trades": 18,
+          "win_rate": 0.4444444444444444,
+          "wins": 8
+        },
+        "TREND_UP": {
+          "avg_loss_r": -1.1403173226457985,
+          "avg_win_r": 1.6560145308126635,
+          "expectancy_r": -0.20820670482631118,
+          "fees_usdt": 0.34119256791918506,
+          "filled_trades": 6,
+          "funding_pnl_usdt": -0.046220504705790366,
+          "gross_pnl_usdt": -0.10073001468628406,
+          "losses": 4,
+          "max_drawdown_r": 3.258171303992161,
+          "max_losing_streak": 3,
+          "median_holding_minutes": 147.0,
+          "net_pnl_usdt": -0.6246201144789334,
+          "outcome_counts": {
+            "LOSS": 4,
+            "WIN": 2
+          },
+          "p90_holding_minutes": 340.0,
+          "profit_factor": 0.726120044800481,
+          "signals": 6,
+          "slippage_usdt": 0.13647702716767404,
+          "total_r": -1.249240228957867,
+          "trades": 6,
+          "win_rate": 0.3333333333333333,
+          "wins": 2
+        }
+      },
+      "by_setup": {
+        "BREAKOUT_RETEST": {
+          "avg_loss_r": -1.1230303185474835,
+          "avg_win_r": 1.863539019125278,
+          "expectancy_r": 0.12137357214950055,
+          "fees_usdt": 1.3116559344804686,
+          "filled_trades": 24,
+          "funding_pnl_usdt": -0.033880548972787146,
+          "gross_pnl_usdt": 3.326681723039449,
+          "losses": 14,
+          "max_drawdown_r": 4.985403097651598,
+          "max_losing_streak": 4,
+          "median_holding_minutes": 63.0,
+          "net_pnl_usdt": 1.4564828657940063,
+          "outcome_counts": {
+            "LOSS": 13,
+            "TIMEOUT": 1,
+            "WIN": 10
+          },
+          "p90_holding_minutes": 261.0,
+          "profit_factor": 1.1852745891106748,
+          "signals": 24,
+          "slippage_usdt": 0.5246623737921874,
+          "total_r": 2.912965731588013,
+          "trades": 24,
+          "win_rate": 0.4166666666666667,
+          "wins": 10
+        }
+      },
+      "by_year": {
+        "2021": {
+          "avg_loss_r": -1.2150485035485252,
+          "avg_win_r": 1.9999111527819675,
+          "expectancy_r": 0.39243132461672114,
+          "fees_usdt": 0.4474638349104145,
+          "filled_trades": 10,
+          "funding_pnl_usdt": 0.004502171888327785,
+          "gross_pnl_usdt": 2.584103820069858,
+          "losses": 5,
+          "max_drawdown_r": 4.985403097651598,
+          "max_losing_streak": 4,
+          "median_holding_minutes": 94.0,
+          "net_pnl_usdt": 1.9621566230836058,
+          "outcome_counts": {
+            "LOSS": 5,
+            "WIN": 5
+          },
+          "p90_holding_minutes": 197.0,
+          "profit_factor": 1.6459517022911154,
+          "signals": 10,
+          "slippage_usdt": 0.1789855339641658,
+          "total_r": 3.9243132461672117,
+          "trades": 10,
+          "win_rate": 0.5,
+          "wins": 5
+        },
+        "2022": {
+          "avg_loss_r": -1.0097431003205941,
+          "avg_win_r": 1.819470731664266,
+          "expectancy_r": 0.05121208667372848,
+          "fees_usdt": 0.4983885378915548,
+          "filled_trades": 8,
+          "funding_pnl_usdt": -0.004890278696275131,
+          "gross_pnl_usdt": 0.9074825784393658,
+          "losses": 5,
+          "max_drawdown_r": 2.2410012101602286,
+          "max_losing_streak": 2,
+          "median_holding_minutes": 118.0,
+          "net_pnl_usdt": 0.20484834669491397,
+          "outcome_counts": {
+            "LOSS": 4,
+            "TIMEOUT": 1,
+            "WIN": 3
+          },
+          "p90_holding_minutes": 480.0,
+          "profit_factor": 1.0811486987650123,
+          "signals": 8,
+          "slippage_usdt": 0.19935541515662192,
+          "total_r": 0.40969669338982784,
+          "trades": 8,
+          "win_rate": 0.375,
+          "wins": 3
+        },
+        "2024": {
+          "avg_loss_r": -1.1496166100797929,
+          "avg_win_r": 1.4919591413973285,
+          "expectancy_r": -0.6213014597843687,
+          "fees_usdt": 0.30981570771136313,
+          "filled_trades": 5,
+          "funding_pnl_usdt": -0.0334924421648398,
+          "gross_pnl_usdt": -1.0860192165001734,
+          "losses": 4,
+          "max_drawdown_r": 4.5984664403191715,
+          "max_losing_streak": 4,
+          "median_holding_minutes": 60.0,
+          "net_pnl_usdt": -1.5532536494609217,
+          "outcome_counts": {
+            "LOSS": 4,
+            "WIN": 1
+          },
+          "p90_holding_minutes": 147.0,
+          "profit_factor": 0.324447108783026,
+          "signals": 5,
+          "slippage_usdt": 0.12392628308454526,
+          "total_r": -3.1065072989218434,
+          "trades": 5,
+          "win_rate": 0.2,
+          "wins": 1
+        },
+        "2025": {
+          "avg_loss_r": null,
+          "avg_win_r": 1.6854630909528163,
+          "expectancy_r": 1.6854630909528163,
+          "fees_usdt": 0.05598785396713611,
+          "filled_trades": 1,
+          "funding_pnl_usdt": 0.0,
+          "gross_pnl_usdt": 0.9211145410303987,
+          "losses": 0,
+          "max_drawdown_r": 0.0,
+          "max_losing_streak": 0,
+          "median_holding_minutes": 56.0,
+          "net_pnl_usdt": 0.8427315454764082,
+          "outcome_counts": {
+            "WIN": 1
+          },
+          "p90_holding_minutes": 56.0,
+          "profit_factor": null,
+          "signals": 1,
+          "slippage_usdt": 0.022395141586854444,
+          "total_r": 1.6854630909528163,
+          "trades": 1,
+          "win_rate": 1.0,
+          "wins": 1
+        }
+      },
+      "overall": {
+        "avg_loss_r": -1.1230303185474835,
+        "avg_win_r": 1.863539019125278,
+        "expectancy_r": 0.12137357214950055,
+        "fees_usdt": 1.3116559344804686,
+        "filled_trades": 24,
+        "funding_pnl_usdt": -0.033880548972787146,
+        "gross_pnl_usdt": 3.326681723039449,
+        "losses": 14,
+        "max_drawdown_r": 4.985403097651598,
+        "max_losing_streak": 4,
+        "median_holding_minutes": 63.0,
+        "net_pnl_usdt": 1.4564828657940063,
+        "outcome_counts": {
+          "LOSS": 13,
+          "TIMEOUT": 1,
+          "WIN": 10
+        },
+        "p90_holding_minutes": 261.0,
+        "profit_factor": 1.1852745891106748,
+        "signals": 24,
+        "slippage_usdt": 0.5246623737921874,
+        "total_r": 2.912965731588013,
+        "trades": 24,
+        "win_rate": 0.4166666666666667,
+        "wins": 10
+      }
+    },
+    "C_plus_participation": {
+      "by_direction": {
+        "LONG": {
+          "avg_loss_r": -1.0860571013307203,
+          "avg_win_r": 1.8200699202279984,
+          "expectancy_r": -0.35952534594104074,
+          "fees_usdt": 0.24102446572305403,
+          "filled_trades": 4,
+          "funding_pnl_usdt": -0.01272806254095057,
+          "gross_pnl_usdt": -0.36888837732885527,
+          "losses": 3,
+          "max_drawdown_r": 3.258171303992161,
+          "max_losing_streak": 3,
+          "median_holding_minutes": 256.0,
+          "net_pnl_usdt": -0.7190506918820814,
+          "outcome_counts": {
+            "LOSS": 3,
+            "WIN": 1
+          },
+          "p90_holding_minutes": 340.0,
+          "profit_factor": 0.5586170125548369,
+          "signals": 4,
+          "slippage_usdt": 0.09640978628922162,
+          "total_r": -1.438101383764163,
+          "trades": 4,
+          "win_rate": 0.25,
+          "wins": 1
+        },
+        "SHORT": {
+          "avg_loss_r": -1.1161155169081574,
+          "avg_win_r": 1.9238682632190716,
+          "expectancy_r": 0.1356425102030545,
+          "fees_usdt": 0.9284660640996723,
+          "filled_trades": 17,
+          "funding_pnl_usdt": 0.012339955733003224,
+          "gross_pnl_usdt": 2.440473870732501,
+          "losses": 10,
+          "max_drawdown_r": 4.397440658192348,
+          "max_losing_streak": 4,
+          "median_holding_minutes": 60.0,
+          "net_pnl_usdt": 1.1529613367259635,
+          "outcome_counts": {
+            "LOSS": 9,
+            "TIMEOUT": 1,
+            "WIN": 7
+          },
+          "p90_holding_minutes": 197.0,
+          "profit_factor": 1.2066025100914062,
+          "signals": 17,
+          "slippage_usdt": 0.37138642563986896,
+          "total_r": 2.305922673451927,
+          "trades": 17,
+          "win_rate": 0.4117647058823529,
+          "wins": 7
+        }
+      },
+      "by_regime": {
+        "TREND_DOWN": {
+          "avg_loss_r": -1.1161155169081574,
+          "avg_win_r": 1.9238682632190716,
+          "expectancy_r": 0.1356425102030545,
+          "fees_usdt": 0.9284660640996723,
+          "filled_trades": 17,
+          "funding_pnl_usdt": 0.012339955733003224,
+          "gross_pnl_usdt": 2.440473870732501,
+          "losses": 10,
+          "max_drawdown_r": 4.397440658192348,
+          "max_losing_streak": 4,
+          "median_holding_minutes": 60.0,
+          "net_pnl_usdt": 1.1529613367259635,
+          "outcome_counts": {
+            "LOSS": 9,
+            "TIMEOUT": 1,
+            "WIN": 7
+          },
+          "p90_holding_minutes": 197.0,
+          "profit_factor": 1.2066025100914062,
+          "signals": 17,
+          "slippage_usdt": 0.37138642563986896,
+          "total_r": 2.305922673451927,
+          "trades": 17,
+          "win_rate": 0.4117647058823529,
+          "wins": 7
+        },
+        "TREND_UP": {
+          "avg_loss_r": -1.0860571013307203,
+          "avg_win_r": 1.8200699202279984,
+          "expectancy_r": -0.35952534594104074,
+          "fees_usdt": 0.24102446572305403,
+          "filled_trades": 4,
+          "funding_pnl_usdt": -0.01272806254095057,
+          "gross_pnl_usdt": -0.36888837732885527,
+          "losses": 3,
+          "max_drawdown_r": 3.258171303992161,
+          "max_losing_streak": 3,
+          "median_holding_minutes": 256.0,
+          "net_pnl_usdt": -0.7190506918820814,
+          "outcome_counts": {
+            "LOSS": 3,
+            "WIN": 1
+          },
+          "p90_holding_minutes": 340.0,
+          "profit_factor": 0.5586170125548369,
+          "signals": 4,
+          "slippage_usdt": 0.09640978628922162,
+          "total_r": -1.438101383764163,
+          "trades": 4,
+          "win_rate": 0.25,
+          "wins": 1
+        }
+      },
+      "by_setup": {
+        "BREAKOUT_RETEST": {
+          "avg_loss_r": -1.1091789594672103,
+          "avg_win_r": 1.9108934703451874,
+          "expectancy_r": 0.04132482331846496,
+          "fees_usdt": 1.1694905298227263,
+          "filled_trades": 21,
+          "funding_pnl_usdt": -0.00038810680794734665,
+          "gross_pnl_usdt": 2.0715854934036457,
+          "losses": 13,
+          "max_drawdown_r": 4.985403097651597,
+          "max_losing_streak": 4,
+          "median_holding_minutes": 62.0,
+          "net_pnl_usdt": 0.43391064484388203,
+          "outcome_counts": {
+            "LOSS": 12,
+            "TIMEOUT": 1,
+            "WIN": 8
+          },
+          "p90_holding_minutes": 256.0,
+          "profit_factor": 1.0601845926235398,
+          "signals": 21,
+          "slippage_usdt": 0.46779621192909054,
+          "total_r": 0.8678212896877642,
+          "trades": 21,
+          "win_rate": 0.38095238095238093,
+          "wins": 8
+        }
+      },
+      "by_year": {
+        "2021": {
+          "avg_loss_r": -1.2150485035485252,
+          "avg_win_r": 2.035818119203971,
+          "expectancy_r": 0.22978110656369546,
+          "fees_usdt": 0.4054665324488033,
+          "filled_trades": 9,
+          "funding_pnl_usdt": 0.004502171888327785,
+          "gross_pnl_usdt": 1.5971659530766262,
+          "losses": 5,
+          "max_drawdown_r": 4.985403097651597,
+          "max_losing_streak": 4,
+          "median_holding_minutes": 62.0,
+          "net_pnl_usdt": 1.0340149795366296,
+          "outcome_counts": {
+            "LOSS": 5,
+            "WIN": 4
+          },
+          "p90_holding_minutes": 197.0,
+          "profit_factor": 1.3404028650763518,
+          "signals": 9,
+          "slippage_usdt": 0.16218661297952133,
+          "total_r": 2.068029959073259,
+          "trades": 9,
+          "win_rate": 0.4444444444444444,
+          "wins": 4
+        },
+        "2022": {
+          "avg_loss_r": -1.0097431003205941,
+          "avg_win_r": 1.819470731664266,
+          "expectancy_r": 0.05121208667372848,
+          "fees_usdt": 0.4983885378915548,
+          "filled_trades": 8,
+          "funding_pnl_usdt": -0.004890278696275131,
+          "gross_pnl_usdt": 0.9074825784393658,
+          "losses": 5,
+          "max_drawdown_r": 2.2410012101602286,
+          "max_losing_streak": 2,
+          "median_holding_minutes": 118.0,
+          "net_pnl_usdt": 0.20484834669491397,
+          "outcome_counts": {
+            "LOSS": 4,
+            "TIMEOUT": 1,
+            "WIN": 3
+          },
+          "p90_holding_minutes": 480.0,
+          "profit_factor": 1.0811486987650123,
+          "signals": 8,
+          "slippage_usdt": 0.19935541515662192,
+          "total_r": 0.40969669338982784,
+          "trades": 8,
+          "win_rate": 0.375,
+          "wins": 3
+        },
+        "2024": {
+          "avg_loss_r": -1.0984561512427131,
+          "avg_win_r": null,
+          "expectancy_r": -1.0984561512427131,
+          "fees_usdt": 0.20964760551523207,
+          "filled_trades": 3,
+          "funding_pnl_usdt": 0.0,
+          "gross_pnl_usdt": -1.3541775791427446,
+          "losses": 3,
+          "max_drawdown_r": 3.295368453728139,
+          "max_losing_streak": 3,
+          "median_holding_minutes": 60.0,
+          "net_pnl_usdt": -1.6476842268640697,
+          "outcome_counts": {
+            "LOSS": 3
+          },
+          "p90_holding_minutes": 132.0,
+          "profit_factor": 0.0,
+          "signals": 3,
+          "slippage_usdt": 0.08385904220609283,
+          "total_r": -3.2953684537281394,
+          "trades": 3,
+          "win_rate": 0.0,
+          "wins": 0
+        },
+        "2025": {
+          "avg_loss_r": null,
+          "avg_win_r": 1.6854630909528163,
+          "expectancy_r": 1.6854630909528163,
+          "fees_usdt": 0.05598785396713611,
+          "filled_trades": 1,
+          "funding_pnl_usdt": 0.0,
+          "gross_pnl_usdt": 0.9211145410303987,
+          "losses": 0,
+          "max_drawdown_r": 0.0,
+          "max_losing_streak": 0,
+          "median_holding_minutes": 56.0,
+          "net_pnl_usdt": 0.8427315454764082,
+          "outcome_counts": {
+            "WIN": 1
+          },
+          "p90_holding_minutes": 56.0,
+          "profit_factor": null,
+          "signals": 1,
+          "slippage_usdt": 0.022395141586854444,
+          "total_r": 1.6854630909528163,
+          "trades": 1,
+          "win_rate": 1.0,
+          "wins": 1
+        }
+      },
+      "overall": {
+        "avg_loss_r": -1.1091789594672103,
+        "avg_win_r": 1.9108934703451874,
+        "expectancy_r": 0.04132482331846496,
+        "fees_usdt": 1.1694905298227263,
+        "filled_trades": 21,
+        "funding_pnl_usdt": -0.00038810680794734665,
+        "gross_pnl_usdt": 2.0715854934036457,
+        "losses": 13,
+        "max_drawdown_r": 4.985403097651597,
+        "max_losing_streak": 4,
+        "median_holding_minutes": 62.0,
+        "net_pnl_usdt": 0.43391064484388203,
+        "outcome_counts": {
+          "LOSS": 12,
+          "TIMEOUT": 1,
+          "WIN": 8
+        },
+        "p90_holding_minutes": 256.0,
+        "profit_factor": 1.0601845926235398,
+        "signals": 21,
+        "slippage_usdt": 0.46779621192909054,
+        "total_r": 0.8678212896877642,
+        "trades": 21,
+        "win_rate": 0.38095238095238093,
+        "wins": 8
+      }
+    },
+    "D_plus_derivatives": {
+      "status": "SKIPPED_NO_POINT_IN_TIME_DATA"
+    },
+    "E_plus_order_book": {
+      "status": "SKIPPED_NO_POINT_IN_TIME_DATA"
+    }
+  },
+  "baseline": {
+    "by_direction": {
+      "LONG": {
+        "avg_loss_r": -1.1413784863622185,
+        "avg_win_r": 1.8200699202279984,
+        "expectancy_r": -0.15422901749881293,
+        "fees_usdt": 0.17524077677235383,
+        "filled_trades": 3,
+        "funding_pnl_usdt": -0.009265663234458144,
+        "gross_pnl_usdt": 0.023259224467534034,
+        "losses": 2,
+        "max_drawdown_r": 2.282756972724437,
+        "max_losing_streak": 2,
+        "median_holding_minutes": 109.0,
+        "net_pnl_usdt": -0.2313435262482194,
+        "outcome_counts": {
+          "LOSS": 2,
+          "WIN": 1
+        },
+        "p90_holding_minutes": 256.0,
+        "profit_factor": 0.797312172068747,
+        "signals": 3,
+        "slippage_usdt": 0.07009631070894154,
+        "total_r": -0.4626870524964388,
+        "trades": 3,
+        "win_rate": 0.3333333333333333,
+        "wins": 1
+      },
+      "SHORT": {
+        "avg_loss_r": -1.0735104903593107,
+        "avg_win_r": 2.2105867897672145,
+        "expectancy_r": -0.0882813063213532,
+        "fees_usdt": 0.591274739645265,
+        "filled_trades": 10,
+        "funding_pnl_usdt": 0.00783778384467544,
+        "gross_pnl_usdt": 0.37854032005192945,
+        "losses": 7,
+        "max_drawdown_r": 2.5170291073470974,
+        "max_losing_streak": 2,
+        "median_holding_minutes": 63.0,
+        "net_pnl_usdt": -0.441406531606766,
+        "outcome_counts": {
+          "LOSS": 6,
+          "TIMEOUT": 1,
+          "WIN": 3
+        },
+        "p90_holding_minutes": 140.0,
+        "profit_factor": 0.8825198700709151,
+        "signals": 10,
+        "slippage_usdt": 0.236509895858106,
+        "total_r": -0.882813063213532,
+        "trades": 10,
+        "win_rate": 0.3,
+        "wins": 3
+      }
+    },
+    "by_regime": {
+      "TREND_DOWN": {
+        "avg_loss_r": -1.0735104903593107,
+        "avg_win_r": 2.2105867897672145,
+        "expectancy_r": -0.0882813063213532,
+        "fees_usdt": 0.591274739645265,
+        "filled_trades": 10,
+        "funding_pnl_usdt": 0.00783778384467544,
+        "gross_pnl_usdt": 0.37854032005192945,
+        "losses": 7,
+        "max_drawdown_r": 2.5170291073470974,
+        "max_losing_streak": 2,
+        "median_holding_minutes": 63.0,
+        "net_pnl_usdt": -0.441406531606766,
+        "outcome_counts": {
+          "LOSS": 6,
+          "TIMEOUT": 1,
+          "WIN": 3
+        },
+        "p90_holding_minutes": 140.0,
+        "profit_factor": 0.8825198700709151,
+        "signals": 10,
+        "slippage_usdt": 0.236509895858106,
+        "total_r": -0.882813063213532,
+        "trades": 10,
+        "win_rate": 0.3,
+        "wins": 3
+      },
+      "TREND_UP": {
+        "avg_loss_r": -1.1413784863622185,
+        "avg_win_r": 1.8200699202279984,
+        "expectancy_r": -0.15422901749881293,
+        "fees_usdt": 0.17524077677235383,
+        "filled_trades": 3,
+        "funding_pnl_usdt": -0.009265663234458144,
+        "gross_pnl_usdt": 0.023259224467534034,
+        "losses": 2,
+        "max_drawdown_r": 2.282756972724437,
+        "max_losing_streak": 2,
+        "median_holding_minutes": 109.0,
+        "net_pnl_usdt": -0.2313435262482194,
+        "outcome_counts": {
+          "LOSS": 2,
+          "WIN": 1
+        },
+        "p90_holding_minutes": 256.0,
+        "profit_factor": 0.797312172068747,
+        "signals": 3,
+        "slippage_usdt": 0.07009631070894154,
+        "total_r": -0.4626870524964388,
+        "trades": 3,
+        "win_rate": 0.3333333333333333,
+        "wins": 1
+      }
+    },
+    "by_setup": {
+      "BREAKOUT_RETEST": {
+        "avg_loss_r": -1.088592267248846,
+        "avg_win_r": 2.1129575723824106,
+        "expectancy_r": -0.103500008900767,
+        "fees_usdt": 0.7665155164176188,
+        "filled_trades": 13,
+        "funding_pnl_usdt": -0.001427879389782704,
+        "gross_pnl_usdt": 0.4017995445194635,
+        "losses": 9,
+        "max_drawdown_r": 3.6608570743755147,
+        "max_losing_streak": 3,
+        "median_holding_minutes": 63.0,
+        "net_pnl_usdt": -0.6727500578549854,
+        "outcome_counts": {
+          "LOSS": 8,
+          "TIMEOUT": 1,
+          "WIN": 4
+        },
+        "p90_holding_minutes": 256.0,
+        "profit_factor": 0.8626666591758101,
+        "signals": 13,
+        "slippage_usdt": 0.3066062065670475,
+        "total_r": -1.3455001157099709,
+        "trades": 13,
+        "win_rate": 0.3076923076923077,
+        "wins": 4
+      }
+    },
+    "by_year": {
+      "2021": {
+        "avg_loss_r": -1.1876741236166357,
+        "avg_win_r": 2.3647835644057458,
+        "expectancy_r": -0.003521560942508587,
+        "fees_usdt": 0.29433053092247047,
+        "filled_trades": 6,
+        "funding_pnl_usdt": 0.0,
+        "gross_pnl_usdt": 0.4014980604639328,
+        "losses": 4,
+        "max_drawdown_r": 3.6608570743755147,
+        "max_losing_streak": 3,
+        "median_holding_minutes": 94.0,
+        "net_pnl_usdt": -0.010564682827525762,
+        "outcome_counts": {
+          "LOSS": 4,
+          "WIN": 2
+        },
+        "p90_holding_minutes": 140.0,
+        "profit_factor": 0.9955523646522858,
+        "signals": 6,
+        "slippage_usdt": 0.11773221236898819,
+        "total_r": -0.021129365655051524,
+        "trades": 6,
+        "win_rate": 0.3333333333333333,
+        "wins": 2
+      },
+      "2022": {
+        "avg_loss_r": -1.0183252925838115,
+        "avg_win_r": 1.8611315803590753,
+        "expectancy_r": -0.058506334936182625,
+        "fees_usdt": 0.3784963518009792,
+        "filled_trades": 6,
+        "funding_pnl_usdt": -0.001427879389782704,
+        "gross_pnl_usdt": 0.35580376710260564,
+        "losses": 4,
+        "max_drawdown_r": 2.241001210160229,
+        "max_losing_streak": 2,
+        "median_holding_minutes": 63.0,
+        "net_pnl_usdt": -0.17551900480854787,
+        "outcome_counts": {
+          "LOSS": 3,
+          "TIMEOUT": 1,
+          "WIN": 2
+        },
+        "p90_holding_minutes": 480.0,
+        "profit_factor": 0.9138197754259836,
+        "signals": 6,
+        "slippage_usdt": 0.1513985407203917,
+        "total_r": -0.35103800961709575,
+        "trades": 6,
+        "win_rate": 0.3333333333333333,
+        "wins": 2
+      },
+      "2024": {
+        "avg_loss_r": -0.9733327404378236,
+        "avg_win_r": null,
+        "expectancy_r": -0.9733327404378236,
+        "fees_usdt": 0.09368863369416915,
+        "filled_trades": 1,
+        "funding_pnl_usdt": 0.0,
+        "gross_pnl_usdt": -0.355502283047075,
+        "losses": 1,
+        "max_drawdown_r": 0.9733327404378236,
+        "max_losing_streak": 1,
+        "median_holding_minutes": 132.0,
+        "net_pnl_usdt": -0.4866663702189118,
+        "outcome_counts": {
+          "LOSS": 1
+        },
+        "p90_holding_minutes": 132.0,
+        "profit_factor": 0.0,
+        "signals": 1,
+        "slippage_usdt": 0.03747545347766766,
+        "total_r": -0.9733327404378236,
+        "trades": 1,
+        "win_rate": 0.0,
+        "wins": 0
+      }
+    },
+    "overall": {
+      "avg_loss_r": -1.088592267248846,
+      "avg_win_r": 2.1129575723824106,
+      "expectancy_r": -0.103500008900767,
+      "fees_usdt": 0.7665155164176188,
+      "filled_trades": 13,
+      "funding_pnl_usdt": -0.001427879389782704,
+      "gross_pnl_usdt": 0.4017995445194635,
+      "losses": 9,
+      "max_drawdown_r": 3.6608570743755147,
+      "max_losing_streak": 3,
+      "median_holding_minutes": 63.0,
+      "net_pnl_usdt": -0.6727500578549854,
+      "outcome_counts": {
+        "LOSS": 8,
+        "TIMEOUT": 1,
+        "WIN": 4
+      },
+      "p90_holding_minutes": 256.0,
+      "profit_factor": 0.8626666591758101,
+      "signals": 13,
+      "slippage_usdt": 0.3066062065670475,
+      "total_r": -1.3455001157099709,
+      "trades": 13,
+      "win_rate": 0.3076923076923077,
+      "wins": 4
+    }
+  },
+  "baseline_feature_policy": {
+    "derivatives_enabled": false,
+    "order_book_enabled": false,
+    "reason": "derivatives disabled because point-in-time history was not supplied"
+  },
+  "block_bootstrap": {
+    "p05_expectancy_r": -0.435329698026643,
+    "p95_max_drawdown_r": 7.321714148751028,
+    "p95_recovery_trades": 13,
+    "p99_max_drawdown_r": 8.177107759712097,
+    "worst_losing_streak": 6
+  },
+  "bootstrap": {
+    "p05_expectancy_r": -0.7137253351507312,
+    "p95_max_drawdown_r": 10.908818354937411,
+    "p95_recovery_trades": 13,
+    "p99_max_drawdown_r": 13.411532441516766,
+    "worst_losing_streak": 13
+  },
+  "cost_stress": {
+    "1.0x": {
+      "by_direction": {
+        "LONG": {
+          "avg_loss_r": -1.1413784863622185,
+          "avg_win_r": 1.8200699202279984,
+          "expectancy_r": -0.15422901749881293,
+          "fees_usdt": 0.17524077677235383,
+          "filled_trades": 3,
+          "funding_pnl_usdt": -0.009265663234458144,
+          "gross_pnl_usdt": 0.023259224467534034,
+          "losses": 2,
+          "max_drawdown_r": 2.282756972724437,
+          "max_losing_streak": 2,
+          "median_holding_minutes": 109.0,
+          "net_pnl_usdt": -0.2313435262482194,
+          "outcome_counts": {
+            "LOSS": 2,
+            "WIN": 1
+          },
+          "p90_holding_minutes": 256.0,
+          "profit_factor": 0.797312172068747,
+          "signals": 3,
+          "slippage_usdt": 0.07009631070894154,
+          "total_r": -0.4626870524964388,
+          "trades": 3,
+          "win_rate": 0.3333333333333333,
+          "wins": 1
+        },
+        "SHORT": {
+          "avg_loss_r": -1.0735104903593107,
+          "avg_win_r": 2.2105867897672145,
+          "expectancy_r": -0.0882813063213532,
+          "fees_usdt": 0.591274739645265,
+          "filled_trades": 10,
+          "funding_pnl_usdt": 0.00783778384467544,
+          "gross_pnl_usdt": 0.37854032005192945,
+          "losses": 7,
+          "max_drawdown_r": 2.5170291073470974,
+          "max_losing_streak": 2,
+          "median_holding_minutes": 63.0,
+          "net_pnl_usdt": -0.441406531606766,
+          "outcome_counts": {
+            "LOSS": 6,
+            "TIMEOUT": 1,
+            "WIN": 3
+          },
+          "p90_holding_minutes": 140.0,
+          "profit_factor": 0.8825198700709151,
+          "signals": 10,
+          "slippage_usdt": 0.236509895858106,
+          "total_r": -0.882813063213532,
+          "trades": 10,
+          "win_rate": 0.3,
+          "wins": 3
+        }
+      },
+      "by_regime": {
+        "TREND_DOWN": {
+          "avg_loss_r": -1.0735104903593107,
+          "avg_win_r": 2.2105867897672145,
+          "expectancy_r": -0.0882813063213532,
+          "fees_usdt": 0.591274739645265,
+          "filled_trades": 10,
+          "funding_pnl_usdt": 0.00783778384467544,
+          "gross_pnl_usdt": 0.37854032005192945,
+          "losses": 7,
+          "max_drawdown_r": 2.5170291073470974,
+          "max_losing_streak": 2,
+          "median_holding_minutes": 63.0,
+          "net_pnl_usdt": -0.441406531606766,
+          "outcome_counts": {
+            "LOSS": 6,
+            "TIMEOUT": 1,
+            "WIN": 3
+          },
+          "p90_holding_minutes": 140.0,
+          "profit_factor": 0.8825198700709151,
+          "signals": 10,
+          "slippage_usdt": 0.236509895858106,
+          "total_r": -0.882813063213532,
+          "trades": 10,
+          "win_rate": 0.3,
+          "wins": 3
+        },
+        "TREND_UP": {
+          "avg_loss_r": -1.1413784863622185,
+          "avg_win_r": 1.8200699202279984,
+          "expectancy_r": -0.15422901749881293,
+          "fees_usdt": 0.17524077677235383,
+          "filled_trades": 3,
+          "funding_pnl_usdt": -0.009265663234458144,
+          "gross_pnl_usdt": 0.023259224467534034,
+          "losses": 2,
+          "max_drawdown_r": 2.282756972724437,
+          "max_losing_streak": 2,
+          "median_holding_minutes": 109.0,
+          "net_pnl_usdt": -0.2313435262482194,
+          "outcome_counts": {
+            "LOSS": 2,
+            "WIN": 1
+          },
+          "p90_holding_minutes": 256.0,
+          "profit_factor": 0.797312172068747,
+          "signals": 3,
+          "slippage_usdt": 0.07009631070894154,
+          "total_r": -0.4626870524964388,
+          "trades": 3,
+          "win_rate": 0.3333333333333333,
+          "wins": 1
+        }
+      },
+      "by_setup": {
+        "BREAKOUT_RETEST": {
+          "avg_loss_r": -1.088592267248846,
+          "avg_win_r": 2.1129575723824106,
+          "expectancy_r": -0.103500008900767,
+          "fees_usdt": 0.7665155164176188,
+          "filled_trades": 13,
+          "funding_pnl_usdt": -0.001427879389782704,
+          "gross_pnl_usdt": 0.4017995445194635,
+          "losses": 9,
+          "max_drawdown_r": 3.6608570743755147,
+          "max_losing_streak": 3,
+          "median_holding_minutes": 63.0,
+          "net_pnl_usdt": -0.6727500578549854,
+          "outcome_counts": {
+            "LOSS": 8,
+            "TIMEOUT": 1,
+            "WIN": 4
+          },
+          "p90_holding_minutes": 256.0,
+          "profit_factor": 0.8626666591758101,
+          "signals": 13,
+          "slippage_usdt": 0.3066062065670475,
+          "total_r": -1.3455001157099709,
+          "trades": 13,
+          "win_rate": 0.3076923076923077,
+          "wins": 4
+        }
+      },
+      "by_year": {
+        "2021": {
+          "avg_loss_r": -1.1876741236166357,
+          "avg_win_r": 2.3647835644057458,
+          "expectancy_r": -0.003521560942508587,
+          "fees_usdt": 0.29433053092247047,
+          "filled_trades": 6,
+          "funding_pnl_usdt": 0.0,
+          "gross_pnl_usdt": 0.4014980604639328,
+          "losses": 4,
+          "max_drawdown_r": 3.6608570743755147,
+          "max_losing_streak": 3,
+          "median_holding_minutes": 94.0,
+          "net_pnl_usdt": -0.010564682827525762,
+          "outcome_counts": {
+            "LOSS": 4,
+            "WIN": 2
+          },
+          "p90_holding_minutes": 140.0,
+          "profit_factor": 0.9955523646522858,
+          "signals": 6,
+          "slippage_usdt": 0.11773221236898819,
+          "total_r": -0.021129365655051524,
+          "trades": 6,
+          "win_rate": 0.3333333333333333,
+          "wins": 2
+        },
+        "2022": {
+          "avg_loss_r": -1.0183252925838115,
+          "avg_win_r": 1.8611315803590753,
+          "expectancy_r": -0.058506334936182625,
+          "fees_usdt": 0.3784963518009792,
+          "filled_trades": 6,
+          "funding_pnl_usdt": -0.001427879389782704,
+          "gross_pnl_usdt": 0.35580376710260564,
+          "losses": 4,
+          "max_drawdown_r": 2.241001210160229,
+          "max_losing_streak": 2,
+          "median_holding_minutes": 63.0,
+          "net_pnl_usdt": -0.17551900480854787,
+          "outcome_counts": {
+            "LOSS": 3,
+            "TIMEOUT": 1,
+            "WIN": 2
+          },
+          "p90_holding_minutes": 480.0,
+          "profit_factor": 0.9138197754259836,
+          "signals": 6,
+          "slippage_usdt": 0.1513985407203917,
+          "total_r": -0.35103800961709575,
+          "trades": 6,
+          "win_rate": 0.3333333333333333,
+          "wins": 2
+        },
+        "2024": {
+          "avg_loss_r": -0.9733327404378236,
+          "avg_win_r": null,
+          "expectancy_r": -0.9733327404378236,
+          "fees_usdt": 0.09368863369416915,
+          "filled_trades": 1,
+          "funding_pnl_usdt": 0.0,
+          "gross_pnl_usdt": -0.355502283047075,
+          "losses": 1,
+          "max_drawdown_r": 0.9733327404378236,
+          "max_losing_streak": 1,
+          "median_holding_minutes": 132.0,
+          "net_pnl_usdt": -0.4866663702189118,
+          "outcome_counts": {
+            "LOSS": 1
+          },
+          "p90_holding_minutes": 132.0,
+          "profit_factor": 0.0,
+          "signals": 1,
+          "slippage_usdt": 0.03747545347766766,
+          "total_r": -0.9733327404378236,
+          "trades": 1,
+          "win_rate": 0.0,
+          "wins": 0
+        }
+      },
+      "overall": {
+        "avg_loss_r": -1.088592267248846,
+        "avg_win_r": 2.1129575723824106,
+        "expectancy_r": -0.103500008900767,
+        "fees_usdt": 0.7665155164176188,
+        "filled_trades": 13,
+        "funding_pnl_usdt": -0.001427879389782704,
+        "gross_pnl_usdt": 0.4017995445194635,
+        "losses": 9,
+        "max_drawdown_r": 3.6608570743755147,
+        "max_losing_streak": 3,
+        "median_holding_minutes": 63.0,
+        "net_pnl_usdt": -0.6727500578549854,
+        "outcome_counts": {
+          "LOSS": 8,
+          "TIMEOUT": 1,
+          "WIN": 4
+        },
+        "p90_holding_minutes": 256.0,
+        "profit_factor": 0.8626666591758101,
+        "signals": 13,
+        "slippage_usdt": 0.3066062065670475,
+        "total_r": -1.3455001157099709,
+        "trades": 13,
+        "win_rate": 0.3076923076923077,
+        "wins": 4
+      }
+    },
+    "1.5x": {
+      "by_direction": {
+        "LONG": {
+          "avg_loss_r": -1.2280181609999437,
+          "avg_win_r": 1.738746518787695,
+          "expectancy_r": -0.2390966010707308,
+          "fees_usdt": 0.26286116515853075,
+          "filled_trades": 3,
+          "funding_pnl_usdt": -0.013898494851687215,
+          "gross_pnl_usdt": 0.023259224467534034,
+          "losses": 2,
+          "max_drawdown_r": 2.4560363219998873,
+          "max_losing_streak": 2,
+          "median_holding_minutes": 109.0,
+          "net_pnl_usdt": -0.3586449016060962,
+          "outcome_counts": {
+            "LOSS": 2,
+            "WIN": 1
+          },
+          "p90_holding_minutes": 256.0,
+          "profit_factor": 0.707948210379836,
+          "signals": 3,
+          "slippage_usdt": 0.1051444660634123,
+          "total_r": -0.7172898032121924,
+          "trades": 3,
+          "win_rate": 0.3333333333333333,
+          "wins": 1
+        },
+        "SHORT": {
+          "avg_loss_r": -1.1617785754790628,
+          "avg_win_r": 2.14323003782707,
+          "expectancy_r": -0.1702759914872228,
+          "fees_usdt": 0.8869121094678974,
+          "filled_trades": 10,
+          "funding_pnl_usdt": 0.011756675767013159,
+          "gross_pnl_usdt": 0.37854032005192945,
+          "losses": 7,
+          "max_drawdown_r": 2.6455815644956617,
+          "max_losing_streak": 2,
+          "median_holding_minutes": 63.0,
+          "net_pnl_usdt": -0.851379957436114,
+          "outcome_counts": {
+            "LOSS": 6,
+            "TIMEOUT": 1,
+            "WIN": 3
+          },
+          "p90_holding_minutes": 140.0,
+          "profit_factor": 0.7906215336170982,
+          "signals": 10,
+          "slippage_usdt": 0.354764843787159,
+          "total_r": -1.702759914872228,
+          "trades": 10,
+          "win_rate": 0.3,
+          "wins": 3
+        }
+      },
+      "by_regime": {
+        "TREND_DOWN": {
+          "avg_loss_r": -1.1617785754790628,
+          "avg_win_r": 2.14323003782707,
+          "expectancy_r": -0.1702759914872228,
+          "fees_usdt": 0.8869121094678974,
+          "filled_trades": 10,
+          "funding_pnl_usdt": 0.011756675767013159,
+          "gross_pnl_usdt": 0.37854032005192945,
+          "losses": 7,
+          "max_drawdown_r": 2.6455815644956617,
+          "max_losing_streak": 2,
+          "median_holding_minutes": 63.0,
+          "net_pnl_usdt": -0.851379957436114,
+          "outcome_counts": {
+            "LOSS": 6,
+            "TIMEOUT": 1,
+            "WIN": 3
+          },
+          "p90_holding_minutes": 140.0,
+          "profit_factor": 0.7906215336170982,
+          "signals": 10,
+          "slippage_usdt": 0.354764843787159,
+          "total_r": -1.702759914872228,
+          "trades": 10,
+          "win_rate": 0.3,
+          "wins": 3
+        },
+        "TREND_UP": {
+          "avg_loss_r": -1.2280181609999437,
+          "avg_win_r": 1.738746518787695,
+          "expectancy_r": -0.2390966010707308,
+          "fees_usdt": 0.26286116515853075,
+          "filled_trades": 3,
+          "funding_pnl_usdt": -0.013898494851687215,
+          "gross_pnl_usdt": 0.023259224467534034,
+          "losses": 2,
+          "max_drawdown_r": 2.4560363219998873,
+          "max_losing_streak": 2,
+          "median_holding_minutes": 109.0,
+          "net_pnl_usdt": -0.3586449016060962,
+          "outcome_counts": {
+            "LOSS": 2,
+            "WIN": 1
+          },
+          "p90_holding_minutes": 256.0,
+          "profit_factor": 0.707948210379836,
+          "signals": 3,
+          "slippage_usdt": 0.1051444660634123,
+          "total_r": -0.7172898032121924,
+          "trades": 3,
+          "win_rate": 0.3333333333333333,
+          "wins": 1
+        }
+      },
+      "by_setup": {
+        "BREAKOUT_RETEST": {
+          "avg_loss_r": -1.1764984833725918,
+          "avg_win_r": 2.0421091580672264,
+          "expectancy_r": -0.1861576706218785,
+          "fees_usdt": 1.1497732746264282,
+          "filled_trades": 13,
+          "funding_pnl_usdt": -0.0021418190846740565,
+          "gross_pnl_usdt": 0.4017995445194635,
+          "losses": 9,
+          "max_drawdown_r": 3.876778450695877,
+          "max_losing_streak": 3,
+          "median_holding_minutes": 63.0,
+          "net_pnl_usdt": -1.2100248590422102,
+          "outcome_counts": {
+            "LOSS": 8,
+            "TIMEOUT": 1,
+            "WIN": 4
+          },
+          "p90_holding_minutes": 256.0,
+          "profit_factor": 0.7714451680807365,
+          "signals": 13,
+          "slippage_usdt": 0.45990930985057127,
+          "total_r": -2.4200497180844205,
+          "trades": 13,
+          "win_rate": 0.3076923076923077,
+          "wins": 4
+        }
+      },
+      "by_year": {
+        "2021": {
+          "avg_loss_r": -1.2642707938768931,
+          "avg_win_r": 2.311945533280531,
+          "expectancy_r": -0.07219868482441845,
+          "fees_usdt": 0.44149579638370573,
+          "filled_trades": 6,
+          "funding_pnl_usdt": 0.0,
+          "gross_pnl_usdt": 0.4014980604639328,
+          "losses": 4,
+          "max_drawdown_r": 3.876778450695877,
+          "max_losing_streak": 3,
+          "median_holding_minutes": 94.0,
+          "net_pnl_usdt": -0.21659605447325536,
+          "outcome_counts": {
+            "LOSS": 4,
+            "WIN": 2
+          },
+          "p90_holding_minutes": 140.0,
+          "profit_factor": 0.9143395325106489,
+          "signals": 6,
+          "slippage_usdt": 0.1765983185534823,
+          "total_r": -0.4331921089465107,
+          "trades": 6,
+          "win_rate": 0.3333333333333333,
+          "wins": 2
+        },
+        "2022": {
+          "avg_loss_r": -1.1067265868090232,
+          "avg_win_r": 1.7722727828539218,
+          "expectancy_r": -0.14706013025470824,
+          "fees_usdt": 0.5677445277014688,
+          "filled_trades": 6,
+          "funding_pnl_usdt": -0.0021418190846740565,
+          "gross_pnl_usdt": 0.35580376710260564,
+          "losses": 4,
+          "max_drawdown_r": 2.6211073003159444,
+          "max_losing_streak": 2,
+          "median_holding_minutes": 63.0,
+          "net_pnl_usdt": -0.44118039076412474,
+          "outcome_counts": {
+            "LOSS": 3,
+            "TIMEOUT": 1,
+            "WIN": 2
+          },
+          "p90_holding_minutes": 480.0,
+          "profit_factor": 0.8006823021952689,
+          "signals": 6,
+          "slippage_usdt": 0.22709781108058752,
+          "total_r": -0.8823607815282495,
+          "trades": 6,
+          "win_rate": 0.3333333333333333,
+          "wins": 2
+        },
+        "2024": {
+          "avg_loss_r": -1.1044968276096603,
+          "avg_win_r": null,
+          "expectancy_r": -1.1044968276096603,
+          "fees_usdt": 0.14053295054125373,
+          "filled_trades": 1,
+          "funding_pnl_usdt": 0.0,
+          "gross_pnl_usdt": -0.355502283047075,
+          "losses": 1,
+          "max_drawdown_r": 1.1044968276096603,
+          "max_losing_streak": 1,
+          "median_holding_minutes": 132.0,
+          "net_pnl_usdt": -0.5522484138048301,
+          "outcome_counts": {
+            "LOSS": 1
+          },
+          "p90_holding_minutes": 132.0,
+          "profit_factor": 0.0,
+          "signals": 1,
+          "slippage_usdt": 0.05621318021650149,
+          "total_r": -1.1044968276096603,
+          "trades": 1,
+          "win_rate": 0.0,
+          "wins": 0
+        }
+      },
+      "overall": {
+        "avg_loss_r": -1.1764984833725918,
+        "avg_win_r": 2.0421091580672264,
+        "expectancy_r": -0.1861576706218785,
+        "fees_usdt": 1.1497732746264282,
+        "filled_trades": 13,
+        "funding_pnl_usdt": -0.0021418190846740565,
+        "gross_pnl_usdt": 0.4017995445194635,
+        "losses": 9,
+        "max_drawdown_r": 3.876778450695877,
+        "max_losing_streak": 3,
+        "median_holding_minutes": 63.0,
+        "net_pnl_usdt": -1.2100248590422102,
+        "outcome_counts": {
+          "LOSS": 8,
+          "TIMEOUT": 1,
+          "WIN": 4
+        },
+        "p90_holding_minutes": 256.0,
+        "profit_factor": 0.7714451680807365,
+        "signals": 13,
+        "slippage_usdt": 0.45990930985057127,
+        "total_r": -2.4200497180844205,
+        "trades": 13,
+        "win_rate": 0.3076923076923077,
+        "wins": 4
+      }
+    },
+    "2.0x": {
+      "by_direction": {
+        "LONG": {
+          "avg_loss_r": -1.3146578356376688,
+          "avg_win_r": 1.6574231173473917,
+          "expectancy_r": -0.3239641846426487,
+          "fees_usdt": 0.35048155354470767,
+          "filled_trades": 3,
+          "funding_pnl_usdt": -0.01853132646891629,
+          "gross_pnl_usdt": 0.023259224467534034,
+          "losses": 2,
+          "max_drawdown_r": 2.6293156712753376,
+          "max_losing_streak": 2,
+          "median_holding_minutes": 109.0,
+          "net_pnl_usdt": -0.4859462769639731,
+          "outcome_counts": {
+            "LOSS": 2,
+            "WIN": 1
+          },
+          "p90_holding_minutes": 256.0,
+          "profit_factor": 0.6303629250205116,
+          "signals": 3,
+          "slippage_usdt": 0.14019262141788308,
+          "total_r": -0.9718925539279462,
+          "trades": 3,
+          "win_rate": 0.3333333333333333,
+          "wins": 1
+        },
+        "SHORT": {
+          "avg_loss_r": -1.2500466605988145,
+          "avg_win_r": 2.0758732858869258,
+          "expectancy_r": -0.2522706766530924,
+          "fees_usdt": 1.18254947929053,
+          "filled_trades": 10,
+          "funding_pnl_usdt": 0.01567556768935088,
+          "gross_pnl_usdt": 0.37854032005192945,
+          "losses": 7,
+          "max_drawdown_r": 2.9960177196649678,
+          "max_losing_streak": 2,
+          "median_holding_minutes": 63.0,
+          "net_pnl_usdt": -1.261353383265462,
+          "outcome_counts": {
+            "LOSS": 6,
+            "TIMEOUT": 1,
+            "WIN": 3
+          },
+          "p90_holding_minutes": 140.0,
+          "profit_factor": 0.7117014170012247,
+          "signals": 10,
+          "slippage_usdt": 0.473019791716212,
+          "total_r": -2.522706766530924,
+          "trades": 10,
+          "win_rate": 0.3,
+          "wins": 3
+        }
+      },
+      "by_regime": {
+        "TREND_DOWN": {
+          "avg_loss_r": -1.2500466605988145,
+          "avg_win_r": 2.0758732858869258,
+          "expectancy_r": -0.2522706766530924,
+          "fees_usdt": 1.18254947929053,
+          "filled_trades": 10,
+          "funding_pnl_usdt": 0.01567556768935088,
+          "gross_pnl_usdt": 0.37854032005192945,
+          "losses": 7,
+          "max_drawdown_r": 2.9960177196649678,
+          "max_losing_streak": 2,
+          "median_holding_minutes": 63.0,
+          "net_pnl_usdt": -1.261353383265462,
+          "outcome_counts": {
+            "LOSS": 6,
+            "TIMEOUT": 1,
+            "WIN": 3
+          },
+          "p90_holding_minutes": 140.0,
+          "profit_factor": 0.7117014170012247,
+          "signals": 10,
+          "slippage_usdt": 0.473019791716212,
+          "total_r": -2.522706766530924,
+          "trades": 10,
+          "win_rate": 0.3,
+          "wins": 3
+        },
+        "TREND_UP": {
+          "avg_loss_r": -1.3146578356376688,
+          "avg_win_r": 1.6574231173473917,
+          "expectancy_r": -0.3239641846426487,
+          "fees_usdt": 0.35048155354470767,
+          "filled_trades": 3,
+          "funding_pnl_usdt": -0.01853132646891629,
+          "gross_pnl_usdt": 0.023259224467534034,
+          "losses": 2,
+          "max_drawdown_r": 2.6293156712753376,
+          "max_losing_streak": 2,
+          "median_holding_minutes": 109.0,
+          "net_pnl_usdt": -0.4859462769639731,
+          "outcome_counts": {
+            "LOSS": 2,
+            "WIN": 1
+          },
+          "p90_holding_minutes": 256.0,
+          "profit_factor": 0.6303629250205116,
+          "signals": 3,
+          "slippage_usdt": 0.14019262141788308,
+          "total_r": -0.9718925539279462,
+          "trades": 3,
+          "win_rate": 0.3333333333333333,
+          "wins": 1
+        }
+      },
+      "by_setup": {
+        "BREAKOUT_RETEST": {
+          "avg_loss_r": -1.2644046994963378,
+          "avg_win_r": 1.9712607437520424,
+          "expectancy_r": -0.26881533234299,
+          "fees_usdt": 1.5330310328352377,
+          "filled_trades": 13,
+          "funding_pnl_usdt": -0.002855758779565408,
+          "gross_pnl_usdt": 0.4017995445194635,
+          "losses": 9,
+          "max_drawdown_r": 4.2455947887808625,
+          "max_losing_streak": 3,
+          "median_holding_minutes": 63.0,
+          "net_pnl_usdt": -1.747299660229435,
+          "outcome_counts": {
+            "LOSS": 8,
+            "TIMEOUT": 1,
+            "WIN": 4
+          },
+          "p90_holding_minutes": 256.0,
+          "profit_factor": 0.6929078059113591,
+          "signals": 13,
+          "slippage_usdt": 0.613212413134095,
+          "total_r": -3.49459932045887,
+          "trades": 13,
+          "win_rate": 0.3076923076923077,
+          "wins": 4
+        }
+      },
+      "by_year": {
+        "2021": {
+          "avg_loss_r": -1.3408674641371507,
+          "avg_win_r": 2.2591075021553166,
+          "expectancy_r": -0.1408758087063282,
+          "fees_usdt": 0.5886610618449409,
+          "filled_trades": 6,
+          "funding_pnl_usdt": 0.0,
+          "gross_pnl_usdt": 0.4014980604639328,
+          "losses": 4,
+          "max_drawdown_r": 4.092699827016239,
+          "max_losing_streak": 3,
+          "median_holding_minutes": 94.0,
+          "net_pnl_usdt": -0.42262742611898463,
+          "outcome_counts": {
+            "LOSS": 4,
+            "WIN": 2
+          },
+          "p90_holding_minutes": 140.0,
+          "profit_factor": 0.8424052199704368,
+          "signals": 6,
+          "slippage_usdt": 0.23546442473797638,
+          "total_r": -0.8452548522379693,
+          "trades": 6,
+          "win_rate": 0.3333333333333333,
+          "wins": 2
+        },
+        "2022": {
+          "avg_loss_r": -1.195127881034235,
+          "avg_win_r": 1.6834139853487682,
+          "expectancy_r": -0.2356139255732339,
+          "fees_usdt": 0.7569927036019584,
+          "filled_trades": 6,
+          "funding_pnl_usdt": -0.002855758779565408,
+          "gross_pnl_usdt": 0.35580376710260564,
+          "losses": 4,
+          "max_drawdown_r": 3.0711066707867953,
+          "max_losing_streak": 2,
+          "median_holding_minutes": 63.0,
+          "net_pnl_usdt": -0.7068417767197017,
+          "outcome_counts": {
+            "LOSS": 3,
+            "TIMEOUT": 1,
+            "WIN": 2
+          },
+          "p90_holding_minutes": 480.0,
+          "profit_factor": 0.7042819484271349,
+          "signals": 6,
+          "slippage_usdt": 0.3027970814407834,
+          "total_r": -1.4136835534394034,
+          "trades": 6,
+          "win_rate": 0.3333333333333333,
+          "wins": 2
+        },
+        "2024": {
+          "avg_loss_r": -1.2356609147814972,
+          "avg_win_r": null,
+          "expectancy_r": -1.2356609147814972,
+          "fees_usdt": 0.1873772673883383,
+          "filled_trades": 1,
+          "funding_pnl_usdt": 0.0,
+          "gross_pnl_usdt": -0.355502283047075,
+          "losses": 1,
+          "max_drawdown_r": 1.2356609147814972,
+          "max_losing_streak": 1,
+          "median_holding_minutes": 132.0,
+          "net_pnl_usdt": -0.6178304573907486,
+          "outcome_counts": {
+            "LOSS": 1
+          },
+          "p90_holding_minutes": 132.0,
+          "profit_factor": 0.0,
+          "signals": 1,
+          "slippage_usdt": 0.07495090695533532,
+          "total_r": -1.2356609147814972,
+          "trades": 1,
+          "win_rate": 0.0,
+          "wins": 0
+        }
+      },
+      "overall": {
+        "avg_loss_r": -1.2644046994963378,
+        "avg_win_r": 1.9712607437520424,
+        "expectancy_r": -0.26881533234299,
+        "fees_usdt": 1.5330310328352377,
+        "filled_trades": 13,
+        "funding_pnl_usdt": -0.002855758779565408,
+        "gross_pnl_usdt": 0.4017995445194635,
+        "losses": 9,
+        "max_drawdown_r": 4.2455947887808625,
+        "max_losing_streak": 3,
+        "median_holding_minutes": 63.0,
+        "net_pnl_usdt": -1.747299660229435,
+        "outcome_counts": {
+          "LOSS": 8,
+          "TIMEOUT": 1,
+          "WIN": 4
+        },
+        "p90_holding_minutes": 256.0,
+        "profit_factor": 0.6929078059113591,
+        "signals": 13,
+        "slippage_usdt": 0.613212413134095,
+        "total_r": -3.49459932045887,
+        "trades": 13,
+        "win_rate": 0.3076923076923077,
+        "wins": 4
+      }
+    }
+  },
+  "decision_audit": {
+    "decision_counts": {
+      "LONG": 3,
+      "NO_SIGNAL": 7919,
+      "SHORT": 10,
+      "WAIT": 170247
+    },
+    "reason_code_counts": {
+      "CONFIRMED": 13,
+      "FACTOR_REJECTED": 590,
+      "FEATURE_ERROR": 7904,
+      "INVALID_CANDLES": 15,
+      "NO_SETUP": 28611,
+      "REGIME_HIGH_VOLATILITY": 22913,
+      "REGIME_RANGE": 19484,
+      "REGIME_TRANSITION": 98361,
+      "RISK_PLAN_REJECTED": 288
+    },
+    "row_count": 178179
+  },
+  "monte_carlo": {
+    "p95_max_drawdown_r": 7.977260485011614,
+    "p99_max_drawdown_r": 9.797330405239611
+  },
+  "parameter_stability": {
+    "status": "SKIPPED_INSUFFICIENT_SAMPLE_FOR_OPTIMIZATION"
+  },
+  "protocol": {
+    "development_end_ms_exclusive": 1769904000000,
+    "development_start_ms": 1609459200000,
+    "holdout_accessed": false,
+    "sample_classification": "INSUFFICIENT_SAMPLE_FOR_OPTIMIZATION",
+    "scope": "DEVELOPMENT_ONLY"
+  },
+  "provenance": {
+    "config_hash": "52e176c8bdcfce94",
+    "dataset_checksums": [
+      "82d058b2e9e5bfbd20bf36026abec045fb778ddb72582277e0dac00846ae9901"
+    ],
+    "feature_version": "0.2.2",
+    "git_commit_sha": "b99f3399fe27a5e103134fb3c377d424742b86ff",
+    "random_seed": 7,
+    "strategy_version": "0.2.2",
+    "validation_status": "EXPERIMENTAL"
+  },
+  "walk_forward": [
+    {
+      "test": [
+        1648771200000,
+        1656633600000
+      ],
+      "test_metrics": {
+        "avg_loss_r": -0.9781240548797422,
+        "avg_win_r": 1.902193240490152,
+        "expectancy_r": -0.25804473103726855,
+        "fees_usdt": 0.2656619458656239,
+        "filled_trades": 4,
+        "funding_pnl_usdt": 0.00783778384467544,
+        "gross_pnl_usdt": -0.15200052170733902,
+        "losses": 3,
+        "max_drawdown_r": 1.8322999601750174,
+        "max_losing_streak": 2,
+        "median_holding_minutes": 63.0,
+        "net_pnl_usdt": -0.5160894620745371,
+        "outcome_counts": {
+          "LOSS": 2,
+          "TIMEOUT": 1,
+          "WIN": 1
+        },
+        "p90_holding_minutes": 480.0,
+        "profit_factor": 0.6482453941639069,
+        "signals": 4,
+        "slippage_usdt": 0.10626477834624957,
+        "total_r": -1.0321789241490742,
+        "trades": 4,
+        "win_rate": 0.25,
+        "wins": 1
+      },
+      "train": [
+        1609459200000,
+        1640995200000
+      ],
+      "validation": [
+        1640995200000,
+        1648771200000
+      ]
+    },
+    {
+      "test": [
+        1656633600000,
+        1664582400000
+      ],
+      "test_metrics": {
+        "avg_loss_r": -1.13892900569602,
+        "avg_win_r": 1.8200699202279984,
+        "expectancy_r": 0.3405704572659892,
+        "fees_usdt": 0.11283440593535526,
+        "filled_trades": 2,
+        "funding_pnl_usdt": -0.009265663234458144,
+        "gross_pnl_usdt": 0.5078042888099447,
+        "losses": 1,
+        "max_drawdown_r": 1.13892900569602,
+        "max_losing_streak": 1,
+        "median_holding_minutes": 256.0,
+        "net_pnl_usdt": 0.3405704572659892,
+        "outcome_counts": {
+          "LOSS": 1,
+          "WIN": 1
+        },
+        "p90_holding_minutes": 256.0,
+        "profit_factor": 1.5980538831880229,
+        "signals": 2,
+        "slippage_usdt": 0.0451337623741421,
+        "total_r": 0.6811409145319784,
+        "trades": 2,
+        "win_rate": 0.5,
+        "wins": 1
+      },
+      "train": [
+        1617235200000,
+        1648771200000
+      ],
+      "validation": [
+        1648771200000,
+        1656633600000
+      ]
+    },
+    {
+      "test": [
+        1664582400000,
+        1672531200000
+      ],
+      "test_metrics": {
+        "avg_loss_r": null,
+        "avg_win_r": null,
+        "expectancy_r": null,
+        "fees_usdt": 0,
+        "filled_trades": 0,
+        "funding_pnl_usdt": 0,
+        "gross_pnl_usdt": 0,
+        "losses": 0,
+        "max_drawdown_r": 0.0,
+        "max_losing_streak": 0,
+        "median_holding_minutes": null,
+        "net_pnl_usdt": 0,
+        "outcome_counts": {},
+        "p90_holding_minutes": null,
+        "profit_factor": null,
+        "signals": 0,
+        "slippage_usdt": 0,
+        "total_r": 0,
+        "trades": 0,
+        "win_rate": null,
+        "wins": 0
+      },
+      "train": [
+        1625097600000,
+        1656633600000
+      ],
+      "validation": [
+        1656633600000,
+        1664582400000
+      ]
+    },
+    {
+      "test": [
+        1672531200000,
+        1680307200000
+      ],
+      "test_metrics": {
+        "avg_loss_r": null,
+        "avg_win_r": null,
+        "expectancy_r": null,
+        "fees_usdt": 0,
+        "filled_trades": 0,
+        "funding_pnl_usdt": 0,
+        "gross_pnl_usdt": 0,
+        "losses": 0,
+        "max_drawdown_r": 0.0,
+        "max_losing_streak": 0,
+        "median_holding_minutes": null,
+        "net_pnl_usdt": 0,
+        "outcome_counts": {},
+        "p90_holding_minutes": null,
+        "profit_factor": null,
+        "signals": 0,
+        "slippage_usdt": 0,
+        "total_r": 0,
+        "trades": 0,
+        "win_rate": null,
+        "wins": 0
+      },
+      "train": [
+        1633046400000,
+        1664582400000
+      ],
+      "validation": [
+        1664582400000,
+        1672531200000
+      ]
+    },
+    {
+      "test": [
+        1680307200000,
+        1688169600000
+      ],
+      "test_metrics": {
+        "avg_loss_r": null,
+        "avg_win_r": null,
+        "expectancy_r": null,
+        "fees_usdt": 0,
+        "filled_trades": 0,
+        "funding_pnl_usdt": 0,
+        "gross_pnl_usdt": 0,
+        "losses": 0,
+        "max_drawdown_r": 0.0,
+        "max_losing_streak": 0,
+        "median_holding_minutes": null,
+        "net_pnl_usdt": 0,
+        "outcome_counts": {},
+        "p90_holding_minutes": null,
+        "profit_factor": null,
+        "signals": 0,
+        "slippage_usdt": 0,
+        "total_r": 0,
+        "trades": 0,
+        "win_rate": null,
+        "wins": 0
+      },
+      "train": [
+        1640995200000,
+        1672531200000
+      ],
+      "validation": [
+        1672531200000,
+        1680307200000
+      ]
+    },
+    {
+      "test": [
+        1688169600000,
+        1696118400000
+      ],
+      "test_metrics": {
+        "avg_loss_r": null,
+        "avg_win_r": null,
+        "expectancy_r": null,
+        "fees_usdt": 0,
+        "filled_trades": 0,
+        "funding_pnl_usdt": 0,
+        "gross_pnl_usdt": 0,
+        "losses": 0,
+        "max_drawdown_r": 0.0,
+        "max_losing_streak": 0,
+        "median_holding_minutes": null,
+        "net_pnl_usdt": 0,
+        "outcome_counts": {},
+        "p90_holding_minutes": null,
+        "profit_factor": null,
+        "signals": 0,
+        "slippage_usdt": 0,
+        "total_r": 0,
+        "trades": 0,
+        "win_rate": null,
+        "wins": 0
+      },
+      "train": [
+        1648771200000,
+        1680307200000
+      ],
+      "validation": [
+        1680307200000,
+        1688169600000
+      ]
+    },
+    {
+      "test": [
+        1696118400000,
+        1704067200000
+      ],
+      "test_metrics": {
+        "avg_loss_r": null,
+        "avg_win_r": null,
+        "expectancy_r": null,
+        "fees_usdt": 0,
+        "filled_trades": 0,
+        "funding_pnl_usdt": 0,
+        "gross_pnl_usdt": 0,
+        "losses": 0,
+        "max_drawdown_r": 0.0,
+        "max_losing_streak": 0,
+        "median_holding_minutes": null,
+        "net_pnl_usdt": 0,
+        "outcome_counts": {},
+        "p90_holding_minutes": null,
+        "profit_factor": null,
+        "signals": 0,
+        "slippage_usdt": 0,
+        "total_r": 0,
+        "trades": 0,
+        "win_rate": null,
+        "wins": 0
+      },
+      "train": [
+        1656633600000,
+        1688169600000
+      ],
+      "validation": [
+        1688169600000,
+        1696118400000
+      ]
+    },
+    {
+      "test": [
+        1704067200000,
+        1711929600000
+      ],
+      "test_metrics": {
+        "avg_loss_r": null,
+        "avg_win_r": null,
+        "expectancy_r": null,
+        "fees_usdt": 0,
+        "filled_trades": 0,
+        "funding_pnl_usdt": 0,
+        "gross_pnl_usdt": 0,
+        "losses": 0,
+        "max_drawdown_r": 0.0,
+        "max_losing_streak": 0,
+        "median_holding_minutes": null,
+        "net_pnl_usdt": 0,
+        "outcome_counts": {},
+        "p90_holding_minutes": null,
+        "profit_factor": null,
+        "signals": 0,
+        "slippage_usdt": 0,
+        "total_r": 0,
+        "trades": 0,
+        "win_rate": null,
+        "wins": 0
+      },
+      "train": [
+        1664582400000,
+        1696118400000
+      ],
+      "validation": [
+        1696118400000,
+        1704067200000
+      ]
+    },
+    {
+      "test": [
+        1711929600000,
+        1719792000000
+      ],
+      "test_metrics": {
+        "avg_loss_r": null,
+        "avg_win_r": null,
+        "expectancy_r": null,
+        "fees_usdt": 0,
+        "filled_trades": 0,
+        "funding_pnl_usdt": 0,
+        "gross_pnl_usdt": 0,
+        "losses": 0,
+        "max_drawdown_r": 0.0,
+        "max_losing_streak": 0,
+        "median_holding_minutes": null,
+        "net_pnl_usdt": 0,
+        "outcome_counts": {},
+        "p90_holding_minutes": null,
+        "profit_factor": null,
+        "signals": 0,
+        "slippage_usdt": 0,
+        "total_r": 0,
+        "trades": 0,
+        "win_rate": null,
+        "wins": 0
+      },
+      "train": [
+        1672531200000,
+        1704067200000
+      ],
+      "validation": [
+        1704067200000,
+        1711929600000
+      ]
+    },
+    {
+      "test": [
+        1719792000000,
+        1727740800000
+      ],
+      "test_metrics": {
+        "avg_loss_r": -0.9733327404378236,
+        "avg_win_r": null,
+        "expectancy_r": -0.9733327404378236,
+        "fees_usdt": 0.09368863369416915,
+        "filled_trades": 1,
+        "funding_pnl_usdt": 0.0,
+        "gross_pnl_usdt": -0.355502283047075,
+        "losses": 1,
+        "max_drawdown_r": 0.9733327404378236,
+        "max_losing_streak": 1,
+        "median_holding_minutes": 132.0,
+        "net_pnl_usdt": -0.4866663702189118,
+        "outcome_counts": {
+          "LOSS": 1
+        },
+        "p90_holding_minutes": 132.0,
+        "profit_factor": 0.0,
+        "signals": 1,
+        "slippage_usdt": 0.03747545347766766,
+        "total_r": -0.9733327404378236,
+        "trades": 1,
+        "win_rate": 0.0,
+        "wins": 0
+      },
+      "train": [
+        1680307200000,
+        1711929600000
+      ],
+      "validation": [
+        1711929600000,
+        1719792000000
+      ]
+    },
+    {
+      "test": [
+        1727740800000,
+        1735689600000
+      ],
+      "test_metrics": {
+        "avg_loss_r": null,
+        "avg_win_r": null,
+        "expectancy_r": null,
+        "fees_usdt": 0,
+        "filled_trades": 0,
+        "funding_pnl_usdt": 0,
+        "gross_pnl_usdt": 0,
+        "losses": 0,
+        "max_drawdown_r": 0.0,
+        "max_losing_streak": 0,
+        "median_holding_minutes": null,
+        "net_pnl_usdt": 0,
+        "outcome_counts": {},
+        "p90_holding_minutes": null,
+        "profit_factor": null,
+        "signals": 0,
+        "slippage_usdt": 0,
+        "total_r": 0,
+        "trades": 0,
+        "win_rate": null,
+        "wins": 0
+      },
+      "train": [
+        1688169600000,
+        1719792000000
+      ],
+      "validation": [
+        1719792000000,
+        1727740800000
+      ]
+    },
+    {
+      "test": [
+        1735689600000,
+        1743465600000
+      ],
+      "test_metrics": {
+        "avg_loss_r": null,
+        "avg_win_r": null,
+        "expectancy_r": null,
+        "fees_usdt": 0,
+        "filled_trades": 0,
+        "funding_pnl_usdt": 0,
+        "gross_pnl_usdt": 0,
+        "losses": 0,
+        "max_drawdown_r": 0.0,
+        "max_losing_streak": 0,
+        "median_holding_minutes": null,
+        "net_pnl_usdt": 0,
+        "outcome_counts": {},
+        "p90_holding_minutes": null,
+        "profit_factor": null,
+        "signals": 0,
+        "slippage_usdt": 0,
+        "total_r": 0,
+        "trades": 0,
+        "win_rate": null,
+        "wins": 0
+      },
+      "train": [
+        1696118400000,
+        1727740800000
+      ],
+      "validation": [
+        1727740800000,
+        1735689600000
+      ]
+    },
+    {
+      "test": [
+        1743465600000,
+        1751328000000
+      ],
+      "test_metrics": {
+        "avg_loss_r": null,
+        "avg_win_r": null,
+        "expectancy_r": null,
+        "fees_usdt": 0,
+        "filled_trades": 0,
+        "funding_pnl_usdt": 0,
+        "gross_pnl_usdt": 0,
+        "losses": 0,
+        "max_drawdown_r": 0.0,
+        "max_losing_streak": 0,
+        "median_holding_minutes": null,
+        "net_pnl_usdt": 0,
+        "outcome_counts": {},
+        "p90_holding_minutes": null,
+        "profit_factor": null,
+        "signals": 0,
+        "slippage_usdt": 0,
+        "total_r": 0,
+        "trades": 0,
+        "win_rate": null,
+        "wins": 0
+      },
+      "train": [
+        1704067200000,
+        1735689600000
+      ],
+      "validation": [
+        1735689600000,
+        1743465600000
+      ]
+    },
+    {
+      "test": [
+        1751328000000,
+        1759276800000
+      ],
+      "test_metrics": {
+        "avg_loss_r": null,
+        "avg_win_r": null,
+        "expectancy_r": null,
+        "fees_usdt": 0,
+        "filled_trades": 0,
+        "funding_pnl_usdt": 0,
+        "gross_pnl_usdt": 0,
+        "losses": 0,
+        "max_drawdown_r": 0.0,
+        "max_losing_streak": 0,
+        "median_holding_minutes": null,
+        "net_pnl_usdt": 0,
+        "outcome_counts": {},
+        "p90_holding_minutes": null,
+        "profit_factor": null,
+        "signals": 0,
+        "slippage_usdt": 0,
+        "total_r": 0,
+        "trades": 0,
+        "win_rate": null,
+        "wins": 0
+      },
+      "train": [
+        1711929600000,
+        1743465600000
+      ],
+      "validation": [
+        1743465600000,
+        1751328000000
+      ]
+    },
+    {
+      "test": [
+        1759276800000,
+        1767225600000
+      ],
+      "test_metrics": {
+        "avg_loss_r": null,
+        "avg_win_r": null,
+        "expectancy_r": null,
+        "fees_usdt": 0,
+        "filled_trades": 0,
+        "funding_pnl_usdt": 0,
+        "gross_pnl_usdt": 0,
+        "losses": 0,
+        "max_drawdown_r": 0.0,
+        "max_losing_streak": 0,
+        "median_holding_minutes": null,
+        "net_pnl_usdt": 0,
+        "outcome_counts": {},
+        "p90_holding_minutes": null,
+        "profit_factor": null,
+        "signals": 0,
+        "slippage_usdt": 0,
+        "total_r": 0,
+        "trades": 0,
+        "win_rate": null,
+        "wins": 0
+      },
+      "train": [
+        1719792000000,
+        1751328000000
+      ],
+      "validation": [
+        1751328000000,
+        1759276800000
+      ]
+    }
+  ]
+}

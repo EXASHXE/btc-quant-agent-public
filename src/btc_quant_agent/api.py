@@ -4,6 +4,7 @@ import os
 import secrets
 import time
 
+from . import __version__
 from .config import load_config
 from .execution.guard import ExecutionBlocked
 from .explain import explain_signal
@@ -54,7 +55,7 @@ def _require_api_token(
 def create_app() -> FastAPI:
     app = FastAPI(
         title="BTC Quant Signal API",
-        version="0.2.2",
+        version=__version__,
         dependencies=[Depends(_require_api_token)],
     )
     service = QuantService.create(load_config())

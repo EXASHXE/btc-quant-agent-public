@@ -1,0 +1,47 @@
+{
+  "artifacts": {
+    "config.toml": {
+      "bytes": 2137,
+      "sha256": "dff244d1dac3a6a34971236f39b3ed584ad099f63384abede482b3b477c6a6a2"
+    },
+    "data_manifest.json": {
+      "bytes": 45234,
+      "sha256": "928e913f41e74077359cbdf804aaf95d452ee1e1b80d5f05d28eafe4e0b639f2"
+    },
+    "decision_replay.parquet": {
+      "bytes": 6671068,
+      "sha256": "e7d02b2ad9ada2051b3cb0c6759a4a1c9437e05a48fc35cccb8574975291025c"
+    },
+    "decision_samples.json": {
+      "bytes": 18223,
+      "sha256": "2c8f958b3171bd95b901e0127953f775b8693e284ccf6a6fbb3076e56d8bbf07"
+    },
+    "equity_curve.csv": {
+      "bytes": 477,
+      "sha256": "ecda6ca58146532a9c61ada705dd88753ff94a0b402518f86c1685d95345b21f"
+    },
+    "research_report.json": {
+      "bytes": 76284,
+      "sha256": "efdb1295292f38869fe86a5d790b95c287b6fafb654dd7a6444f735c688fa1af"
+    },
+    "research_report.md": {
+      "bytes": 171,
+      "sha256": "4576ed31d70284856d2a9f2f567d7efcba9ccac3b88598af8f74d468ce45c543"
+    },
+    "trades.parquet": {
+      "bytes": 7055,
+      "sha256": "c093cdd5356a80630e9d3e7f057a16bd4ed623c10b5b835f4aaed7fab3b55ea2"
+    }
+  },
+  "classification": "INSUFFICIENT_SAMPLE_FOR_OPTIMIZATION",
+  "config_hash": "52e176c8bdcfce94",
+  "dataset_checksum_sha256": "82d058b2e9e5bfbd20bf36026abec045fb778ddb72582277e0dac00846ae9901",
+  "git_commit_sha": "b99f3399fe27a5e103134fb3c377d424742b86ff",
+  "holdout_accessed": false,
+  "immutable_run_id": "run0-dev-frozen-v022-seed7-20260825",
+  "performance": {
+    "elapsed_seconds": 842.23,
+    "max_rss_kib": 3038356
+  },
+  "random_seed": 7
+}
