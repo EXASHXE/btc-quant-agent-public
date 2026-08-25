@@ -24,8 +24,18 @@ from .backtest import (
 from .config import AppConfig
 from .data.derivatives import HistoricalDerivativeStore
 from .domain import Candle
-from .engine import QuantEngine
+from .engine import HistoricalFeatureCache, QuantEngine
 from .structure import confirmed_levels
+
+DEV_START_MS = int(datetime(2021, 1, 1, tzinfo=UTC).timestamp() * 1000)
+DEV_END_MS = int(datetime(2026, 2, 1, tzinfo=UTC).timestamp() * 1000)
+
+
+def _add_months(timestamp_ms: int, months: int) -> int:
+    value = datetime.fromtimestamp(timestamp_ms / 1000, UTC)
+    month_index = value.year * 12 + value.month - 1 + months
+    shifted = datetime(month_index // 12, month_index % 12 + 1, 1, tzinfo=UTC)
+    return int(shifted.timestamp() * 1000)
 
 
 def _segment(outcomes: Sequence[TradeOutcome], attribute: str) -> dict[str, dict[str, Any]]:
@@ -61,15 +71,12 @@ def walk_forward_report(
     validation_months: int = 3,
     test_months: int = 3,
 ) -> list[dict[str, Any]]:
-    month_ms = 30 * 86_400_000
-    train = train_months * month_ms
-    validation = validation_months * month_ms
-    test = test_months * month_ms
     folds: list[dict[str, Any]] = []
     cursor = start_ms
-    while cursor + train + validation + test <= end_ms:
-        test_start = cursor + train + validation
-        test_end = test_start + test
+    while _add_months(cursor, train_months + validation_months + test_months) <= end_ms:
+        train_end = _add_months(cursor, train_months)
+        test_start = _add_months(train_end, validation_months)
+        test_end = _add_months(test_start, test_months)
         test_outcomes = [
             item
             for item in outcomes
@@ -77,14 +84,52 @@ def walk_forward_report(
         ]
         folds.append(
             {
-                "train": [cursor, cursor + train],
-                "validation": [cursor + train, test_start],
+                "train": [cursor, train_end],
+                "validation": [train_end, test_start],
                 "test": [test_start, test_end],
                 "test_metrics": metrics(test_outcomes),
             }
         )
-        cursor += test
+        cursor = _add_months(cursor, test_months)
     return folds
+
+
+def sample_classification(outcomes: Sequence[TradeOutcome]) -> str:
+    filled = sum(item.entered_at_ms is not None for item in outcomes)
+    if filled < 50:
+        return "INSUFFICIENT_SAMPLE_FOR_OPTIMIZATION"
+    if filled < 150:
+        return "LOW_SAMPLE"
+    return "ELIGIBLE_FOR_PARAMETER_RESEARCH"
+
+
+def stress_costs(
+    outcomes: Sequence[TradeOutcome], multiplier: float
+) -> list[TradeOutcome]:
+    """Reprice frozen trades so a cost stress cannot alter strategy decisions."""
+    if multiplier <= 0:
+        raise ValueError("cost multiplier must be positive")
+    stressed: list[TradeOutcome] = []
+    for item in outcomes:
+        if item.r_multiple is None or item.gross_pnl_usdt is None:
+            stressed.append(item)
+            continue
+        fees = item.fees_usdt * multiplier
+        slippage = item.slippage_usdt * multiplier
+        funding = item.funding_pnl_usdt * multiplier
+        net = item.gross_pnl_usdt - fees - slippage + funding
+        net_r = net / item.risk_usdt if item.risk_usdt else item.r_multiple
+        stressed.append(
+            replace(
+                item,
+                fees_usdt=fees,
+                slippage_usdt=slippage,
+                funding_pnl_usdt=funding,
+                net_pnl_usdt=net,
+                r_multiple=net_r,
+            )
+        )
+    return stressed
 
 
 def replay_decisions(
@@ -162,19 +207,23 @@ def ablation_configs(config: AppConfig, has_derivatives: bool) -> dict[str, AppC
             enable_momentum_group=False,
             enable_participation_group=False,
             enable_derivatives_group=False,
-            enable_volatility_liquidity_group=False,
+            enable_volatility_liquidity_group=True,
+            enable_volatility_liquidity_score=False,
             enable_order_book_factor=False,
         ),
         "B_plus_momentum": replace(
             base,
             enable_participation_group=False,
             enable_derivatives_group=False,
-            enable_volatility_liquidity_group=False,
+            enable_volatility_liquidity_group=True,
+            enable_volatility_liquidity_score=False,
             enable_order_book_factor=False,
         ),
         "C_plus_participation": replace(
             base,
             enable_derivatives_group=False,
+            enable_volatility_liquidity_group=True,
+            enable_volatility_liquidity_score=False,
             enable_order_book_factor=False,
         ),
     }
@@ -198,6 +247,12 @@ def run_full_suite(
     *,
     seed: int,
 ) -> dict[str, Any]:
+    if not candles:
+        raise ValueError("development research requires non-empty 1m candles")
+    if candles[0].open_time_ms != DEV_START_MS or candles[-1].close_time_ms >= DEV_END_MS:
+        raise ValueError(
+            "development research is restricted to [2021-01-01, 2026-02-01) UTC"
+        )
     baseline_config = (
         config
         if derivatives is not None
@@ -210,11 +265,29 @@ def run_full_suite(
             ),
         )
     )
+    feature_cache = HistoricalFeatureCache()
 
-    def run(candidate: AppConfig, events: Sequence[FundingEvent] = funding_events) -> list[TradeOutcome]:
-        return BacktestEngine(QuantEngine(candidate), derivatives, events).run(candles)
+    baseline_decisions: list[dict[str, Any]] = []
 
-    baseline = run(baseline_config)
+    def run(
+        candidate: AppConfig,
+        events: Sequence[FundingEvent] = funding_events,
+        *,
+        capture_decisions: bool = False,
+    ) -> list[TradeOutcome]:
+        backtest = BacktestEngine(
+            QuantEngine(candidate, feature_cache),
+            derivatives,
+            events,
+            capture_decisions=capture_decisions,
+        )
+        outcomes = backtest.run(candles)
+        if capture_decisions:
+            baseline_decisions.extend(backtest.decision_log)
+        return outcomes
+
+    baseline = run(baseline_config, capture_decisions=True)
+    classification = sample_classification(baseline)
     ablation: dict[str, Any] = {}
     for name, candidate in ablation_configs(baseline_config, derivatives is not None).items():
         ablation[name] = (
@@ -222,36 +295,36 @@ def run_full_suite(
             if candidate is None
             else research_summary(run(candidate))
         )
-    stability = {
-        str(score): research_summary(
-            run(
-                replace(
-                    baseline_config,
-                    strategy=replace(
-                        baseline_config.strategy, factor_score_min=float(score)
-                    ),
+    stability = (
+        {
+            str(score): research_summary(
+                run(
+                    replace(
+                        baseline_config,
+                        strategy=replace(
+                            baseline_config.strategy, factor_score_min=float(score)
+                        ),
+                    )
                 )
             )
-        )
-        for score in (65, 68, 70, 72, 75, 78, 80)
+            for score in (65, 68, 70, 72, 75, 78, 80)
+        }
+        if classification == "ELIGIBLE_FOR_PARAMETER_RESEARCH"
+        else {"status": f"SKIPPED_{classification}"}
+    )
+    cost_stress = {
+        f"{multiplier:.1f}x": research_summary(stress_costs(baseline, multiplier))
+        for multiplier in (1.0, 1.5, 2.0)
     }
-    cost_stress: dict[str, Any] = {}
-    for multiplier in (1.0, 1.5, 2.0):
-        stressed = replace(
-            baseline_config,
-            risk=replace(
-                baseline_config.risk,
-                taker_fee_rate=baseline_config.risk.taker_fee_rate * multiplier,
-                slippage_bps_per_side=baseline_config.risk.slippage_bps_per_side * multiplier,
-                funding_stress_rate=baseline_config.risk.funding_stress_rate * multiplier,
-            ),
-        )
-        stressed_events = [replace(event, funding_rate=event.funding_rate * multiplier) for event in funding_events]
-        cost_stress[f"{multiplier:.1f}x"] = research_summary(run(stressed, stressed_events))
-    start_ms, end_ms = candles[0].open_time_ms, candles[-1].close_time_ms
-    holdout_start = end_ms - 6 * 30 * 86_400_000
-    holdout = [item for item in baseline if item.exited_at_ms and item.exited_at_ms >= holdout_start]
+    start_ms, end_ms = candles[0].open_time_ms, candles[-1].close_time_ms + 1
     return {
+        "protocol": {
+            "scope": "DEVELOPMENT_ONLY",
+            "development_start_ms": DEV_START_MS,
+            "development_end_ms_exclusive": DEV_END_MS,
+            "sample_classification": classification,
+            "holdout_accessed": False,
+        },
         "baseline": research_summary(baseline),
         "baseline_feature_policy": {
             "derivatives_enabled": baseline_config.strategy.enable_derivatives_group,
@@ -263,13 +336,13 @@ def run_full_suite(
             ),
         },
         "ablation": ablation,
-        "walk_forward": walk_forward_report(baseline, start_ms, holdout_start),
-        "final_holdout_6m": research_summary(holdout),
+        "walk_forward": walk_forward_report(baseline, start_ms, end_ms),
         "parameter_stability": stability,
         "cost_stress": cost_stress,
         "monte_carlo": monte_carlo(baseline, seed=seed),
         "bootstrap": bootstrap(baseline, seed=seed),
         "block_bootstrap": bootstrap(baseline, seed=seed, block_size=max(1, round(len(baseline) ** 0.5))),
+        "decisions": baseline_decisions,
         "outcomes": baseline,
     }
 
@@ -283,8 +356,25 @@ def write_research_artifacts(
     seed: int,
 ) -> None:
     target = Path(output_dir)
+    if target.exists() and any(target.iterdir()):
+        raise FileExistsError(f"immutable research run already exists: {target}")
     target.mkdir(parents=True, exist_ok=True)
     outcomes = suite.pop("outcomes")
+    decisions = suite.pop("decisions")
+    decision_counts: dict[str, int] = {}
+    reject_counts: dict[str, int] = {}
+    for decision in decisions:
+        action = str(decision["decision"])
+        reason = str(decision["reason_code"])
+        decision_counts[action] = decision_counts.get(action, 0) + 1
+        reject_counts[reason] = reject_counts.get(reason, 0) + 1
+    suite["decision_audit"] = {
+        "row_count": len(decisions),
+        "decision_counts": dict(sorted(decision_counts.items())),
+        "reason_code_counts": dict(
+            sorted(reject_counts.items(), key=lambda item: (-item[1], item[0]))
+        ),
+    }
     commit = subprocess.run(
         ["git", "rev-parse", "HEAD"], capture_output=True, check=False, text=True
     ).stdout.strip()
@@ -325,6 +415,16 @@ def write_research_artifacts(
     except ImportError as exc:
         raise RuntimeError("install the research extra to write trades.parquet") from exc
     pq.write_table(pa.Table.from_pylist([item.as_dict() for item in outcomes]), target / "trades.parquet")
+    pq.write_table(pa.Table.from_pylist(decisions), target / "decision_replay.parquet")
+    samples: dict[str, list[dict[str, Any]]] = {}
+    for action in sorted(decision_counts):
+        samples[action] = [
+            decision for decision in decisions if decision["decision"] == action
+        ][:10]
+    (target / "decision_samples.json").write_text(
+        json.dumps(samples, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
     with (target / "config.toml").open("w", encoding="utf-8") as handle:
         for section, values in asdict(config).items():
             handle.write(f"[{section}]\n")

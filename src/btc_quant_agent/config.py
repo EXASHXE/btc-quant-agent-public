@@ -72,6 +72,7 @@ class StrategyConfig:
     enable_participation_group: bool = True
     enable_derivatives_group: bool = True
     enable_volatility_liquidity_group: bool = True
+    enable_volatility_liquidity_score: bool = True
     enable_order_book_factor: bool = False
 
 

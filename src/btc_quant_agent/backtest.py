@@ -6,6 +6,7 @@ from collections import deque
 from collections.abc import Sequence
 from dataclasses import asdict, dataclass
 from itertools import pairwise
+from typing import Any
 
 from .config import BacktestConfig
 from .data.derivatives import HistoricalDerivativeStore
@@ -43,6 +44,7 @@ class TradeOutcome:
     direction: str | None = None
     setup: str | None = None
     regime: str | None = None
+    risk_usdt: float | None = None
 
     @property
     def net_r(self) -> float | None:
@@ -138,6 +140,7 @@ def _completed_outcome(
         signal.direction.value,
         signal.setup.value,
         signal.regime.value,
+        signal.max_loss_usdt,
     )
 
 
@@ -225,7 +228,7 @@ def resolve_signal(
     )
 
 
-def metrics(outcomes: Sequence[TradeOutcome]) -> dict[str, float | int | None]:
+def metrics(outcomes: Sequence[TradeOutcome]) -> dict[str, Any]:
     resolved = [item for item in outcomes if item.r_multiple is not None]
     values = [item.r_multiple for item in resolved if item.r_multiple is not None]
     wins = [value for value in values if value > 0]
@@ -241,7 +244,14 @@ def metrics(outcomes: Sequence[TradeOutcome]) -> dict[str, float | int | None]:
     gross_profit = sum(wins)
     gross_loss = abs(sum(losses))
     holding = sorted(item.holding_minutes for item in resolved if item.holding_minutes is not None)
+    outcome_counts = {
+        name: sum(item.outcome == name for item in outcomes)
+        for name in sorted({item.outcome for item in outcomes})
+    }
     return {
+        "signals": len(outcomes),
+        "filled_trades": sum(item.entered_at_ms is not None for item in outcomes),
+        "outcome_counts": outcome_counts,
         "trades": len(values),
         "wins": len(wins),
         "losses": len(losses),
@@ -253,6 +263,10 @@ def metrics(outcomes: Sequence[TradeOutcome]) -> dict[str, float | int | None]:
         "max_drawdown_r": max_drawdown,
         "max_losing_streak": max_losing_streak,
         "median_holding_minutes": holding[len(holding) // 2] if holding else None,
+        "p90_holding_minutes": (
+            holding[min(len(holding) - 1, math.ceil(0.9 * len(holding)) - 1)] if holding else None
+        ),
+        "total_r": sum(values),
         "gross_pnl_usdt": sum(item.gross_pnl_usdt or 0.0 for item in resolved),
         "fees_usdt": sum(item.fees_usdt for item in resolved),
         "slippage_usdt": sum(item.slippage_usdt for item in resolved),
@@ -359,10 +373,14 @@ class EventDrivenBacktestEngine:
         engine: QuantEngine,
         derivatives: HistoricalDerivativeStore | None = None,
         funding_events: Sequence[FundingEvent] = (),
+        *,
+        capture_decisions: bool = False,
     ):
         self.engine = engine
         self.derivatives = derivatives
         self.funding_events = tuple(sorted(funding_events, key=lambda event: event.timestamp_ms))
+        self.capture_decisions = capture_decisions
+        self.decision_log: list[dict[str, Any]] = []
 
     def _update_open(self, trade: _OpenTrade, bar: Candle) -> TradeOutcome | None:
         if bar.close_time_ms > trade.holding_deadline_ms:
@@ -496,6 +514,26 @@ class EventDrivenBacktestEngine:
                 now_ms=now_ms,
                 include_order_book=self.engine.config.strategy.enable_order_book_factor,
             )
+            if self.capture_decisions:
+                self.decision_log.append(
+                    {
+                        "timestamp_ms": now_ms,
+                        "decision": result.action,
+                        "reason_code": result.reason_code,
+                        "reason": result.reason,
+                        "health": result.health,
+                        "signal_id": result.signal.signal_id if result.signal else None,
+                        "direction": (
+                            result.signal.direction.value if result.signal else None
+                        ),
+                        "setup": result.signal.setup.value if result.signal else None,
+                        "factor_score": result.diagnostics.get("factor_score"),
+                        "regime": result.diagnostics.get("regime"),
+                        "macro_4h": result.diagnostics.get("macro_4h"),
+                        "structure_15m": result.diagnostics.get("structure_15m"),
+                        "ema_15m": result.diagnostics.get("ema_15m"),
+                    }
+                )
             candidate_signal = result.signal
             if candidate_signal is None:
                 continue

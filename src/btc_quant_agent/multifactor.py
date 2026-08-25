@@ -161,7 +161,7 @@ def assess_factors(
     elif config.enable_derivatives_group:
         risks.append("衍生品横截面不足，derivatives 分组未计分")
 
-    if config.enable_volatility_liquidity_group:
+    if config.enable_volatility_liquidity_group and config.enable_volatility_liquidity_score:
         volatility = 0.0
         volatility_max = 9.0
         if 0.10 <= features_15m.atr_percentile < config.high_vol_atr_percentile:

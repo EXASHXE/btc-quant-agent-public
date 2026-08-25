@@ -1,4 +1,5 @@
 import unittest
+from dataclasses import replace
 
 from btc_quant_agent.config import StrategyConfig
 from btc_quant_agent.domain import (
@@ -39,6 +40,25 @@ def features(close: float = 110.0, ema_mid: float = 105.0, ema_slow: float = 100
 
 
 class MultiFactorTests(unittest.TestCase):
+    def test_ablation_can_remove_score_without_removing_spread_safety(self) -> None:
+        candidate = Candidate(
+            Direction.LONG,
+            Setup.TREND_PULLBACK,
+            109.0,
+            110.0,
+            102.0,
+            125.0,
+            80,
+            "structure",
+            (),
+        )
+        derivatives = DerivativesSnapshot(observed_at_ms=1, spread_bps=10.0)
+        config = replace(StrategyConfig(), enable_volatility_liquidity_score=False)
+        result = assess_factors(
+            candidate, features(), features(), features(), derivatives, config
+        )
+        self.assertEqual(result.blocked_reason, "order book spread too wide")
+
     def test_aligned_independent_groups_pass(self) -> None:
         candidate = Candidate(
             Direction.LONG,

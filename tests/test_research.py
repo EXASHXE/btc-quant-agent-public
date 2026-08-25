@@ -9,6 +9,8 @@ from btc_quant_agent.research import (
     ablation_configs,
     replay_decisions,
     research_summary,
+    sample_classification,
+    stress_costs,
     walk_forward_report,
 )
 
@@ -41,6 +43,11 @@ class ResearchTests(unittest.TestCase):
         self.assertFalse(
             variants["C_plus_participation"].strategy.enable_derivatives_group
         )
+        for name in ("A_trend_structure", "B_plus_momentum", "C_plus_participation"):
+            variant = variants[name]
+            assert variant is not None
+            self.assertTrue(variant.strategy.enable_volatility_liquidity_group)
+            self.assertFalse(variant.strategy.enable_volatility_liquidity_score)
 
     def test_walk_forward_is_strictly_chronological(self) -> None:
         folds = walk_forward_report([], 0, 24 * 30 * 86_400_000)
@@ -48,6 +55,39 @@ class ResearchTests(unittest.TestCase):
         for fold in folds:
             self.assertLessEqual(fold["train"][1], fold["validation"][0])
             self.assertLessEqual(fold["validation"][1], fold["test"][0])
+
+    def test_sample_gate_uses_filled_trade_count(self) -> None:
+        unfilled = TradeOutcome("u", "UNFILLED", None, None, None, None, None)
+        filled = TradeOutcome("f", "WIN", 100, 101, 1.0, 1, 2)
+        self.assertEqual(
+            sample_classification([unfilled, *([filled] * 49)]),
+            "INSUFFICIENT_SAMPLE_FOR_OPTIMIZATION",
+        )
+        self.assertEqual(sample_classification([filled] * 50), "LOW_SAMPLE")
+        self.assertEqual(
+            sample_classification([filled] * 150), "ELIGIBLE_FOR_PARAMETER_RESEARCH"
+        )
+
+    def test_cost_stress_reprices_frozen_decisions_only(self) -> None:
+        outcome = TradeOutcome(
+            "frozen",
+            "WIN",
+            100,
+            102,
+            1.7,
+            1,
+            2,
+            gross_pnl_usdt=2.0,
+            fees_usdt=0.1,
+            slippage_usdt=0.1,
+            funding_pnl_usdt=-0.1,
+            net_pnl_usdt=1.7,
+            risk_usdt=1.0,
+        )
+        stressed = stress_costs([outcome], 2.0)[0]
+        self.assertEqual(stressed.signal_id, outcome.signal_id)
+        self.assertEqual(stressed.entered_at_ms, outcome.entered_at_ms)
+        self.assertAlmostEqual(stressed.r_multiple or 0, 1.4)
 
     def test_replay_emits_each_closed_15m_decision_without_future_data(self) -> None:
         rows = replay_decisions(candles(60, "1m", 60_000), QuantEngine(AppConfig()))

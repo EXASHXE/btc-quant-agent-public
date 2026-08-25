@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 from collections.abc import Sequence
+from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from typing import Any
 
@@ -14,6 +15,7 @@ from .domain import (
     ScanResult,
     Signal,
     SignalStatus,
+    TimeframeFeatures,
 )
 from .features import build_features
 from .multifactor import assess_factors, macro_aligned
@@ -22,10 +24,75 @@ from .risk import build_position_plan
 from .strategies import find_candidate
 from .structure import confirmed_levels
 
+_FEATURE_CONFIG_FIELDS = (
+    "ema_fast",
+    "ema_mid",
+    "ema_slow",
+    "atr_period",
+    "adx_period",
+    "slope_lookback",
+    "pivot_left",
+    "pivot_right",
+    "rsi_period",
+    "roc_period",
+    "bb_period",
+    "cvd_window",
+)
+
+
+@dataclass
+class HistoricalFeatureCache:
+    """Opt-in cache for repeated research replays over one immutable dataset."""
+
+    values: dict[tuple[object, ...], TimeframeFeatures] = field(default_factory=dict)
+
+    def key(
+        self, interval: str, candles: Sequence[Candle], config: AppConfig
+    ) -> tuple[object, ...]:
+        return (
+            interval,
+            len(candles),
+            candles[0].open_time_ms,
+            candles[-1].open_time_ms,
+            *(getattr(config.strategy, name) for name in _FEATURE_CONFIG_FIELDS),
+        )
+
 
 class QuantEngine:
-    def __init__(self, config: AppConfig):
+    def __init__(
+        self,
+        config: AppConfig,
+        historical_feature_cache: HistoricalFeatureCache | None = None,
+    ):
         self.config = config
+        self._feature_cache: dict[str, tuple[tuple[Candle, ...], TimeframeFeatures]] = {}
+        self._historical_feature_cache = historical_feature_cache
+
+    def _features(
+        self, interval: str, candles: Sequence[Candle]
+    ) -> TimeframeFeatures:
+        frozen = tuple(candles)
+        cached = self._feature_cache.get(interval)
+        if cached is not None and cached[0] == frozen:
+            return cached[1]
+        historical_cache = self._historical_feature_cache
+        historical_key = (
+            historical_cache.key(interval, frozen, self.config)
+            if historical_cache is not None
+            else None
+        )
+        if historical_key is not None:
+            assert historical_cache is not None
+            historical = historical_cache.values.get(historical_key)
+            if historical is not None:
+                self._feature_cache[interval] = (frozen, historical)
+                return historical
+        features = build_features(frozen, self.config.strategy)
+        self._feature_cache[interval] = (frozen, features)
+        if historical_key is not None:
+            assert historical_cache is not None
+            historical_cache.values[historical_key] = features
+        return features
 
     def scan(
         self,
@@ -60,9 +127,9 @@ class QuantEngine:
             )
 
         try:
-            features_4h = build_features(candles_4h, self.config.strategy)
-            features_1h = build_features(candles_1h, self.config.strategy)
-            features_15m = build_features(candles_15m, self.config.strategy)
+            features_4h = self._features("4h", candles_4h)
+            features_1h = self._features("1h", candles_1h)
+            features_15m = self._features("15m", candles_15m)
         except ValueError as exc:
             return ScanResult("NO_SIGNAL", "DATA_INVALID", str(exc), reason_code="FEATURE_ERROR")
 
