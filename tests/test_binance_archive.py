@@ -9,14 +9,21 @@ from unittest.mock import patch
 
 from btc_quant_agent.data.binance_archive import (
     _download_verified,
+    _funding_mark_minute,
     _months,
     _parse_klines,
+    _utc_day,
     _write_parquet,
     read_parquet_candles,
 )
 
 
 class BinanceArchiveTests(unittest.TestCase):
+    def test_funding_timestamp_uses_containing_utc_mark_price_minute(self) -> None:
+        self.assertEqual(_funding_mark_minute(1_609_459_200_002), 1_609_459_200_000)
+        self.assertEqual(_funding_mark_minute(1_609_459_259_999), 1_609_459_200_000)
+        self.assertEqual(_utc_day(1_609_459_200_002), "2021-01-01")
+
     def test_verified_download_retries_transient_network_failure(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             target = Path(directory) / "archive.zip"

@@ -10,7 +10,7 @@ from typing import Any
 from .backtest import BacktestEngine, bootstrap, metrics, monte_carlo
 from .config import load_config
 from .data.binance import BinancePublicClient
-from .data.binance_archive import build_official_dataset
+from .data.binance_archive import audit_official_timeframes, build_official_dataset
 from .data.collector import collect_derivative_snapshot
 from .data.csvio import read_candles, write_candles
 from .data.derivatives import HistoricalDerivativeStore
@@ -118,6 +118,14 @@ def build_parser() -> argparse.ArgumentParser:
     dataset.add_argument("--root", default="./data/research/BTCUSDT")
     dataset.add_argument("--start", default="2021-01-01")
     dataset.add_argument("--end-exclusive", default="2026-08-01")
+
+    timeframe_audit = sub.add_parser(
+        "audit-official-timeframes", help="validate local resampling against official archives"
+    )
+    timeframe_audit.add_argument("--root", default="./data/research/BTCUSDT")
+    timeframe_audit.add_argument(
+        "--months", nargs="+", default=["2021-01", "2022-06", "2024-03", "2026-01", "2026-07"]
+    )
 
     daemon = sub.add_parser("daemon", help="poll at closed 15m boundaries")
     daemon.add_argument("--once", action="store_true")
@@ -234,6 +242,11 @@ def main(argv: list[str] | None = None) -> int:
         end = datetime.fromisoformat(args.end_exclusive).replace(tzinfo=UTC)
         _print(build_official_dataset(args.root, start, end))
         return 0
+    if args.command == "audit-official-timeframes":
+        months = [(int(value[:4]), int(value[5:7])) for value in args.months]
+        report = audit_official_timeframes(args.root, months)
+        _print(report)
+        return 0 if report["price_time_passed"] else 2
     if args.command == "replay":
         bars = read_candles(args.path)
         if args.start_ms is not None:

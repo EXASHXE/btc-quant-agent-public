@@ -5,6 +5,7 @@ import hashlib
 import importlib
 import io
 import json
+import math
 import time
 import urllib.error
 import urllib.request
@@ -18,6 +19,7 @@ from typing import Any
 from ..domain import Candle
 
 ARCHIVE_ROOT = "https://data.binance.vision/data/futures/um/monthly"
+DAILY_ARCHIVE_ROOT = "https://data.binance.vision/data/futures/um/daily"
 KLINE_COLUMNS = (
     "open_time_ms",
     "open",
@@ -152,6 +154,14 @@ def _read_mark_prices(path: Path) -> dict[int, float]:
     return {int(item["open_time_ms"]): float(item["open"]) for item in rows}
 
 
+def _funding_mark_minute(timestamp_ms: int) -> int:
+    return timestamp_ms - (timestamp_ms % 60_000)
+
+
+def _utc_day(timestamp_ms: int) -> str:
+    return datetime.fromtimestamp(timestamp_ms / 1000, UTC).strftime("%Y-%m-%d")
+
+
 def build_official_dataset(
     root: str | Path,
     start: datetime,
@@ -200,16 +210,35 @@ def build_official_dataset(
         mark_archive = target / "raw" / "mark_price" / filename
         archive_checksums[mark_url] = _download_verified(mark_url, mark_archive)
         marks = _read_mark_prices(mark_archive)
+        monthly_funding: list[dict[str, Any]] = []
         for row in _zip_rows(funding_archive):
             timestamp = int(row[0])
             if start_ms <= timestamp < end_ms:
-                funding_events.append(
+                mark_minute_ms = _funding_mark_minute(timestamp)
+                monthly_funding.append(
                     {
                         "timestamp_ms": timestamp,
                         "funding_rate": float(row[2]),
-                        "mark_price": marks.get(timestamp),
+                        "mark_price": marks.get(mark_minute_ms),
                     }
                 )
+        missing_days = sorted(
+            {
+                _utc_day(int(item["timestamp_ms"]))
+                for item in monthly_funding
+                if item["mark_price"] is None
+            }
+        )
+        for day in missing_days:
+            daily_name = f"{symbol}-1m-{day}.zip"
+            daily_url = f"{DAILY_ARCHIVE_ROOT}/markPriceKlines/{symbol}/1m/{daily_name}"
+            daily_archive = target / "raw" / "mark_price_daily" / daily_name
+            archive_checksums[daily_url] = _download_verified(daily_url, daily_archive)
+            marks.update(_read_mark_prices(daily_archive))
+        for item in monthly_funding:
+            if item["mark_price"] is None:
+                item["mark_price"] = marks.get(_funding_mark_minute(int(item["timestamp_ms"])))
+        funding_events.extend(monthly_funding)
 
     all_opens.sort()
     gaps = [
@@ -230,6 +259,9 @@ def build_official_dataset(
         dataset_digest.update(f"{name}:{checksum}\n".encode())
     dataset_digest.update(f"funding_events.csv:{_sha256(funding_path)}\n".encode())
     funding_timestamps = [int(item["timestamp_ms"]) for item in funding_events]
+    missing_mark_prices = sum(item["mark_price"] is None for item in funding_events)
+    if missing_mark_prices:
+        raise ValueError(f"missing official mark prices for {missing_mark_prices} funding events")
     manifest = {
         "source": "Binance Public Data, USD-M Futures monthly archives",
         "source_root": ARCHIVE_ROOT,
@@ -259,9 +291,12 @@ def build_official_dataset(
             "start_ms": funding_timestamps[0] if funding_timestamps else None,
             "end_ms": funding_timestamps[-1] if funding_timestamps else None,
             "duplicate_count": len(funding_timestamps) - len(set(funding_timestamps)),
-            "missing_mark_prices": sum(item["mark_price"] is None for item in funding_events),
+            "missing_mark_prices": missing_mark_prices,
             "checksum_sha256": _sha256(funding_path),
-            "mark_price_semantics": "official 1m mark-price candle open at settlement timestamp",
+            "mark_price_semantics": (
+                "official 1m mark-price candle open for the UTC minute containing the "
+                "settlement timestamp"
+            ),
         },
     }
     (target / "data_manifest.json").write_text(
@@ -304,6 +339,120 @@ def read_parquet_candles(
         )
         for row in rows
     ]
+
+
+def audit_official_timeframes(
+    root: str | Path,
+    samples: list[tuple[int, int]],
+    *,
+    symbol: str = "BTCUSDT",
+    intervals: tuple[str, ...] = ("15m", "1h", "4h"),
+) -> dict[str, Any]:
+    """Compare local 1m resampling with checksum-verified official archives."""
+    from ..backtest import INTERVAL_MS, resample
+
+    target = Path(root)
+    comparisons: list[dict[str, Any]] = []
+    for year, month in samples:
+        month_start = datetime(year, month, 1, tzinfo=UTC)
+        month_end = datetime(
+            year + (1 if month == 12 else 0),
+            1 if month == 12 else month + 1,
+            1,
+            tzinfo=UTC,
+        )
+        start_ms = int(month_start.timestamp() * 1000)
+        end_ms = int(month_end.timestamp() * 1000)
+        base = read_parquet_candles(target, start_ms=start_ms, end_ms=end_ms, symbol=symbol)
+        for interval in intervals:
+            filename = f"{symbol}-{interval}-{year:04d}-{month:02d}.zip"
+            url = f"{ARCHIVE_ROOT}/klines/{symbol}/{interval}/{filename}"
+            archive = target / "raw" / "timeframe_audit" / interval / filename
+            checksum = _download_verified(url, archive)
+            official_rows, official_audit = _parse_klines(_zip_rows(archive))
+            official = {
+                int(row["open_time_ms"]): row
+                for row in official_rows
+                if start_ms <= int(row["open_time_ms"]) < end_ms
+            }
+            derived = {bar.open_time_ms: bar for bar in resample(base, interval)}
+            timestamp_match = set(derived) == set(official)
+            price_mismatches = activity_mismatches = 0
+            max_price_abs_error = max_activity_abs_error = 0.0
+            for timestamp in sorted(set(derived) & set(official)):
+                bar = derived[timestamp]
+                row = official[timestamp]
+                price_pairs = (
+                    (bar.open, float(row["open"])),
+                    (bar.high, float(row["high"])),
+                    (bar.low, float(row["low"])),
+                    (bar.close, float(row["close"])),
+                )
+                activity_pairs = (
+                    (bar.volume, float(row["volume"])),
+                    (bar.quote_volume, float(row["quote_volume"])),
+                    (bar.taker_buy_base_volume, float(row["taker_buy_base_volume"])),
+                    (float(bar.trades), float(row["trades"])),
+                )
+                price_errors = [abs(left - right) for left, right in price_pairs]
+                activity_errors = [abs(left - right) for left, right in activity_pairs]
+                max_price_abs_error = max(max_price_abs_error, *price_errors)
+                max_activity_abs_error = max(max_activity_abs_error, *activity_errors)
+                if any(
+                    not math.isclose(left, right, rel_tol=1e-12, abs_tol=1e-7)
+                    for left, right in price_pairs
+                ):
+                    price_mismatches += 1
+                if any(
+                    not math.isclose(left, right, rel_tol=1e-12, abs_tol=1e-7)
+                    for left, right in activity_pairs
+                ):
+                    activity_mismatches += 1
+            comparisons.append(
+                {
+                    "month": f"{year:04d}-{month:02d}",
+                    "interval": interval,
+                    "base_rows": len(base),
+                    "derived_rows": len(derived),
+                    "official_rows": len(official),
+                    "timestamp_match": timestamp_match,
+                    "price_mismatch_rows": price_mismatches,
+                    "activity_mismatch_rows": activity_mismatches,
+                    "max_price_abs_error": max_price_abs_error,
+                    "max_activity_abs_error": max_activity_abs_error,
+                    "official_invalid_ohlc": official_audit["invalid_ohlc"],
+                    "official_archive_sha256": checksum,
+                    "interval_ms": INTERVAL_MS[interval],
+                }
+            )
+    price_time_passed = all(
+        item["timestamp_match"]
+        and item["price_mismatch_rows"] == 0
+        and item["official_invalid_ohlc"] == 0
+        for item in comparisons
+    )
+    activity_passed = all(item["activity_mismatch_rows"] == 0 for item in comparisons)
+    report = {
+        "source": "checksum-verified Binance monthly kline archives",
+        "samples": [f"{year:04d}-{month:02d}" for year, month in samples],
+        "intervals": list(intervals),
+        "passed": price_time_passed and activity_passed,
+        "price_time_passed": price_time_passed,
+        "activity_passed": activity_passed,
+        "status": (
+            "PASS"
+            if price_time_passed and activity_passed
+            else "PASS_WITH_SOURCE_ACTIVITY_ANOMALIES"
+            if price_time_passed
+            else "FAIL"
+        ),
+        "comparisons": comparisons,
+    }
+    (target / "timeframe_audit.json").write_text(
+        json.dumps(report, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    return report
 
 
 def candle_rows(candles: list[Candle]) -> list[dict[str, Any]]:
