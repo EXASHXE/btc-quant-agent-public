@@ -4,11 +4,13 @@ import argparse
 import json
 import time
 from dataclasses import asdict
+from datetime import UTC, datetime
 from typing import Any
 
 from .backtest import BacktestEngine, bootstrap, metrics, monte_carlo
 from .config import load_config
 from .data.binance import BinancePublicClient
+from .data.binance_archive import build_official_dataset
 from .data.collector import collect_derivative_snapshot
 from .data.csvio import read_candles, write_candles
 from .data.derivatives import HistoricalDerivativeStore
@@ -112,6 +114,11 @@ def build_parser() -> argparse.ArgumentParser:
     research.add_argument("--output")
     research.add_argument("--seed", type=int, default=7)
 
+    dataset = sub.add_parser("build-official-dataset", help="build verified Binance monthly data")
+    dataset.add_argument("--root", default="./data/research/BTCUSDT")
+    dataset.add_argument("--start", default="2021-01-01")
+    dataset.add_argument("--end-exclusive", default="2026-08-01")
+
     daemon = sub.add_parser("daemon", help="poll at closed 15m boundaries")
     daemon.add_argument("--once", action="store_true")
     daemon.add_argument("--poll-seconds", type=int, default=30)
@@ -185,8 +192,13 @@ def main(argv: list[str] | None = None) -> int:
             source="Binance USD-M public REST klines",
             rows=[asdict(bar) for bar in bars],
             timestamp_field="open_time_ms",
-            expected_interval_ms={"1m": 60_000, "5m": 300_000, "15m": 900_000,
-                                  "1h": 3_600_000, "4h": 14_400_000}[args.interval],
+            expected_interval_ms={
+                "1m": 60_000,
+                "5m": 300_000,
+                "15m": 900_000,
+                "1h": 3_600_000,
+                "4h": 14_400_000,
+            }[args.interval],
         )
         manifest_path = f"{args.path}.manifest.json"
         write_manifest(manifest_path, manifest)
@@ -217,6 +229,11 @@ def main(argv: list[str] | None = None) -> int:
         assert collected_manifest is not None
         _print({"status": "collected", "manifest": collected_manifest.as_dict()})
         return 0
+    if args.command == "build-official-dataset":
+        start = datetime.fromisoformat(args.start).replace(tzinfo=UTC)
+        end = datetime.fromisoformat(args.end_exclusive).replace(tzinfo=UTC)
+        _print(build_official_dataset(args.root, start, end))
+        return 0
     if args.command == "replay":
         bars = read_candles(args.path)
         if args.start_ms is not None:
@@ -242,9 +259,7 @@ def main(argv: list[str] | None = None) -> int:
         derivative_store = (
             HistoricalDerivativeStore.from_csv(args.derivatives) if args.derivatives else None
         )
-        funding_events = (
-            read_funding_events_csv(args.funding_events) if args.funding_events else []
-        )
+        funding_events = read_funding_events_csv(args.funding_events) if args.funding_events else []
         suite = run_full_suite(
             bars,
             service.config,
