@@ -1,10 +1,15 @@
+import hashlib
+import io
 import tempfile
 import unittest
+import urllib.error
 from datetime import UTC, datetime
 from pathlib import Path
+from unittest.mock import patch
 
 from btc_quant_agent.data.binance_archive import (
     _months,
+    _download_verified,
     _parse_klines,
     _write_parquet,
     read_parquet_candles,
@@ -12,6 +17,25 @@ from btc_quant_agent.data.binance_archive import (
 
 
 class BinanceArchiveTests(unittest.TestCase):
+    def test_verified_download_retries_transient_network_failure(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            target = Path(directory) / "archive.zip"
+            target.write_bytes(b"verified")
+            checksum = hashlib.sha256(b"verified").hexdigest()
+            with (
+                patch(
+                    "urllib.request.urlopen",
+                    side_effect=[
+                        urllib.error.URLError("temporary"),
+                        io.BytesIO(f"{checksum}  archive.zip\n".encode()),
+                    ],
+                ),
+                patch("btc_quant_agent.data.binance_archive.time.sleep"),
+            ):
+                self.assertEqual(
+                    _download_verified("https://example.test/archive.zip", target), checksum
+                )
+
     def test_months_and_dataset_boundaries_are_utc(self) -> None:
         start = datetime(2021, 11, 1, tzinfo=UTC)
         end = datetime(2022, 2, 1, tzinfo=UTC)

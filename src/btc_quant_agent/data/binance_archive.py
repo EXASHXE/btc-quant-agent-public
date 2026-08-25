@@ -6,6 +6,7 @@ import importlib
 import io
 import json
 import time
+import urllib.error
 import urllib.request
 import zipfile
 from dataclasses import asdict
@@ -59,18 +60,31 @@ def _sha256(path: Path) -> str:
 def _download_verified(url: str, target: Path) -> str:
     target.parent.mkdir(parents=True, exist_ok=True)
     checksum_url = url + ".CHECKSUM"
-    with urllib.request.urlopen(checksum_url, timeout=60) as response:
-        expected = str(response.read().decode("utf-8").split()[0])
-    if not target.exists() or _sha256(target) != expected:
-        temporary = target.with_suffix(target.suffix + ".part")
-        with urllib.request.urlopen(url, timeout=120) as response, temporary.open("wb") as handle:
-            while chunk := response.read(1024 * 1024):
-                handle.write(chunk)
-        if _sha256(temporary) != expected:
-            temporary.unlink(missing_ok=True)
-            raise ValueError(f"official archive checksum mismatch: {url}")
-        temporary.replace(target)
-    return expected
+    last_error: Exception | None = None
+    for attempt in range(5):
+        try:
+            with urllib.request.urlopen(checksum_url, timeout=60) as response:
+                expected = str(response.read().decode("utf-8").split()[0])
+            if not target.exists() or _sha256(target) != expected:
+                temporary = target.with_suffix(target.suffix + ".part")
+                temporary.unlink(missing_ok=True)
+                with (
+                    urllib.request.urlopen(url, timeout=120) as response,
+                    temporary.open("wb") as handle,
+                ):
+                    while chunk := response.read(1024 * 1024):
+                        handle.write(chunk)
+                if _sha256(temporary) != expected:
+                    temporary.unlink(missing_ok=True)
+                    raise ValueError(f"official archive checksum mismatch: {url}")
+                temporary.replace(target)
+            return expected
+        except (urllib.error.URLError, TimeoutError, OSError) as exc:
+            last_error = exc
+            if attempt < 4:
+                time.sleep(2**attempt)
+    assert last_error is not None
+    raise last_error
 
 
 def _zip_rows(path: Path) -> list[list[str]]:
