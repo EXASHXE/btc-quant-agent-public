@@ -184,12 +184,25 @@ class QuantEngine:
             include_order_book=include_order_book,
         )
         diagnostics["stale_derivative_fields"] = list(stale_fields)
-        if derivatives is None:
+        required_stale_fields: set[str] = set()
+        if self.config.strategy.enable_derivatives_group:
+            required_stale_fields.update(
+                {"snapshot", "open_interest", "funding", "taker", "basis", "long_short"}
+            )
+        if self.config.strategy.enable_order_book_factor:
+            required_stale_fields.update({"snapshot", "order_book"})
+        missing_required_snapshot = derivatives is None and bool(required_stale_fields)
+        required_stale = [name for name in stale_fields if name in required_stale_fields]
+        diagnostics["required_stale_derivative_fields"] = required_stale
+        if missing_required_snapshot:
             health = "DEGRADED"
-            derivative_risks.append("衍生品快照缺失，未使用 OI/Funding/Taker Flow 确认")
-        elif stale_fields:
+            derivative_risks.append("策略要求的衍生品快照缺失")
+        elif required_stale:
             health = "DEGRADED"
-            derivative_risks.extend(f"衍生品字段过期或尚不可见：{name}" for name in stale_fields)
+            derivative_risks.extend(
+                f"策略要求的衍生品字段过期或尚不可见：{name}"
+                for name in required_stale
+            )
 
         assessment = assess_factors(
             candidate,

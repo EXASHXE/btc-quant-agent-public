@@ -125,6 +125,46 @@ class EngineCorrectnessTests(unittest.TestCase):
         self.assertIsNone(sanitized.open_interest_change_pct)
         self.assertEqual(sanitized.funding_rate, 0.0001)
 
+    def test_derivatives_disabled_missing_snapshot_health_ok(self) -> None:
+        config = AppConfig(
+            strategy=replace(
+                AppConfig().strategy,
+                enable_derivatives_group=False,
+                enable_order_book_factor=False,
+            )
+        )
+        self.assertEqual(self._scan(config, 900_000, None).health, "OK")
+
+    def test_derivatives_enabled_missing_snapshot_degraded(self) -> None:
+        self.assertEqual(self._scan(AppConfig(), 900_000, None).health, "DEGRADED")
+
+    def test_orderbook_disabled_missing_depth_health_ok(self) -> None:
+        now_ms = 900_000
+        config = AppConfig(
+            strategy=replace(
+                AppConfig().strategy,
+                enable_derivatives_group=False,
+                enable_order_book_factor=False,
+            )
+        )
+        snapshot = DerivativesSnapshot(observed_at_ms=now_ms)
+        self.assertEqual(self._scan(config, now_ms, snapshot).health, "OK")
+
+    def test_required_stale_derivative_field_degrades_health(self) -> None:
+        now_ms = 900_001
+        snapshot = DerivativesSnapshot(
+            observed_at_ms=now_ms,
+            open_interest=1000.0,
+            open_interest_time_ms=0,
+            funding_time_ms=now_ms,
+            taker_time_ms=now_ms,
+            basis_time_ms=now_ms,
+            long_short_time_ms=now_ms,
+        )
+        result = self._scan(AppConfig(), now_ms, snapshot)
+        self.assertEqual(result.health, "DEGRADED")
+        self.assertIn("open_interest", result.diagnostics["required_stale_derivative_fields"])
+
     def test_same_snapshot_100_times_has_identical_signal_json(self) -> None:
         values = [
             json.dumps(self._scan(AppConfig(), 900_000).signal.as_dict(), sort_keys=True)
