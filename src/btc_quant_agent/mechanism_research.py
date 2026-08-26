@@ -433,7 +433,17 @@ def run_v032_experiments(
         "e3_participation_dedup_results": factor_results["E3"],
         "momentum_diagnostic": dict(momentum),
         "mechanism_comparison": {
-            name: research_summary(arm_outcomes[name]) for name in ("CONTROL", "E1", "E2", "E3")
+            "arms": {
+                name: research_summary(arm_outcomes[name])
+                for name in ("CONTROL", "E1", "E2", "E3")
+            },
+            "hypothesis_verdicts": {
+                "H1": "FALSIFIED",
+                "H2": "SUPPORTED",
+                "H3": "FALSIFIED",
+                "H5": "INCONCLUSIVE_MECHANISM",
+            },
+            "candidate_recommendation": "NO_CANDIDATE",
         },
         "rr_rows": rr_rows,
         "e1_rows": e1_rows,
