@@ -93,10 +93,29 @@ def _stage_report(
     yearly: Counter[tuple[str, str, str, int]],
     setup: str,
 ) -> dict[str, Any]:
+    expected = {
+        "TREND_PULLBACK": (
+            "TP_01_REGIME_ELIGIBLE", "TP_02_SWING_LEVEL_EXISTS",
+            "TP_03_EMA25_ZONE_TOUCHED", "TP_04_STRUCTURE_INTACT",
+            "TP_05_EMA7_RECLAIM", "TP_06_PREVIOUS_EXTREME_BREAK",
+            "TP_07_VOLUME_PASS", "TP_08_TARGET_EXISTS",
+            "TP_09_PATTERN_CANDIDATE", "TP_10_4H_MACRO_ALIGNED",
+            "TP_11_RSI_GATE", "TP_12_FACTOR_SCORE", "TP_13_POSITIVE_GROUPS",
+            "TP_14_RR_RISK_PLAN", "TP_15_CONFIRMED",
+        ),
+        "BREAKOUT_RETEST": (
+            "BR_01_REGIME_ELIGIBLE", "BR_02_CONFIRMED_PIVOT_EXISTS",
+            "BR_03_BREAKOUT_CLOSE_PASS", "BR_04_BREAKOUT_DISTANCE_PASS",
+            "BR_05_RETEST_TOUCH_PASS", "BR_06_RETEST_CLOSE_HOLDS_LEVEL",
+            "BR_07_CONTINUATION_CANDLE", "BR_08_VOLUME_PASS",
+            "BR_09_TARGET_EXISTS_OR_ATR_PROJECTION", "BR_10_PATTERN_CANDIDATE",
+            "BR_11_4H_MACRO", "BR_12_RSI", "BR_13_FACTOR_SCORE",
+            "BR_14_POSITIVE_GROUPS", "BR_15_RISK_PLAN", "BR_16_CONFIRMED",
+        ),
+    }
     directions: dict[str, Any] = {}
     for direction in ("LONG", "SHORT"):
-        stages = [key[2] for key in counts if key[0] == setup and key[1] == direction]
-        ordered = sorted(set(stages), key=lambda value: int(value.split("_")[1]))
+        ordered = expected[setup]
         initial = counts[(setup, direction, ordered[0])] if ordered else 0
         previous = initial
         rows = []
