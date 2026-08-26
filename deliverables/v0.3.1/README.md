@@ -1,7 +1,9 @@
 # v0.3.1 Delivery Bundle
 
-Classification: `FUNNEL_DIAGNOSIS_COMPLETE`  
-Strategy status: `EXPERIMENTAL`  
+Classification: `FUNNEL_DIAGNOSIS_COMPLETE`
+
+Strategy status: `EXPERIMENTAL`
+
 Holdout: sealed / not accessed
 
 This folder contains copies of the v0.3.1 human-readable delivery documents:
