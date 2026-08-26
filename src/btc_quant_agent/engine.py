@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import hashlib
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from typing import Any
@@ -10,6 +10,7 @@ from .config import AppConfig
 from .data.derivatives import sanitize_derivatives
 from .data.quality import validate_candles
 from .domain import (
+    Candidate,
     Candle,
     DerivativesSnapshot,
     ScanResult,
@@ -18,7 +19,7 @@ from .domain import (
     TimeframeFeatures,
 )
 from .features import build_features
-from .multifactor import assess_factors, macro_aligned
+from .multifactor import FactorAssessment, assess_factors, macro_aligned
 from .regime import classify_regime
 from .risk import build_position_plan
 from .strategies import find_candidate
@@ -63,10 +64,21 @@ class QuantEngine:
         self,
         config: AppConfig,
         historical_feature_cache: HistoricalFeatureCache | None = None,
+        *,
+        research_candidate_transform: Callable[
+            [Candidate, TimeframeFeatures], Candidate
+        ]
+        | None = None,
+        research_factor_transform: Callable[
+            [FactorAssessment, Candidate, TimeframeFeatures], FactorAssessment
+        ]
+        | None = None,
     ):
         self.config = config
         self._feature_cache: dict[str, tuple[tuple[Candle, ...], TimeframeFeatures]] = {}
         self._historical_feature_cache = historical_feature_cache
+        self._research_candidate_transform = research_candidate_transform
+        self._research_factor_transform = research_factor_transform
 
     def _features(
         self, interval: str, candles: Sequence[Candle]
@@ -180,6 +192,8 @@ class QuantEngine:
                 diagnostics=diagnostics,
                 reason_code="NO_SETUP",
             )
+        if self._research_candidate_transform is not None:
+            candidate = self._research_candidate_transform(candidate, features_15m)
 
         derivative_risks: list[str] = list(candidate.risks)
         health = "OK"
@@ -218,6 +232,10 @@ class QuantEngine:
             derivatives,
             self.config.strategy,
         )
+        if self._research_factor_transform is not None:
+            assessment = self._research_factor_transform(
+                assessment, candidate, features_15m
+            )
         diagnostics["factor_score"] = assessment.score
         diagnostics["factor_scores"] = assessment.group_scores
         diagnostics["positive_factor_groups"] = assessment.positive_groups
