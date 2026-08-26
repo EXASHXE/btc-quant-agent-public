@@ -166,17 +166,18 @@ def _trend_trace(
     _stage(
         stages,
         "TP_01_REGIME_ELIGIBLE",
-        len(candles) >= 6 and regime == expected_regime and not_extreme,
-        "REGIME_OR_EXTREME_BAR",
+        len(candles) >= 6 and regime == expected_regime,
+        "REGIME_NOT_ELIGIBLE",
     )
-    _stage(stages, "TP_02_SWING_LEVEL_EXISTS", structure_level is not None, "SWING_LEVEL_MISSING")
-    _stage(stages, "TP_03_EMA25_ZONE_TOUCHED", touched, "EMA25_ZONE_NOT_TOUCHED")
-    _stage(stages, "TP_04_STRUCTURE_INTACT", intact, "STRUCTURE_BROKEN")
-    _stage(stages, "TP_05_EMA7_RECLAIM", reclaim, "EMA7_NOT_RECLAIMED")
-    _stage(stages, "TP_06_PREVIOUS_EXTREME_BREAK", previous_break, "PREVIOUS_EXTREME_NOT_BROKEN")
-    _stage(stages, "TP_07_VOLUME_PASS", volume_pass, "VOLUME_BELOW_THRESHOLD")
-    _stage(stages, "TP_08_TARGET_EXISTS", bool(target_options), "TARGET_MISSING")
-    _stage(stages, "TP_09_PATTERN_CANDIDATE", candidate is not None, "PATTERN_NOT_CREATED")
+    _stage(stages, "TP_02_EXTREME_BAR_PASS", not_extreme, "EXTREME_BAR_REJECTED")
+    _stage(stages, "TP_03_SWING_LEVEL_EXISTS", structure_level is not None, "SWING_LEVEL_MISSING")
+    _stage(stages, "TP_04_EMA25_ZONE_TOUCHED", touched, "EMA25_ZONE_NOT_TOUCHED")
+    _stage(stages, "TP_05_STRUCTURE_INTACT", intact, "STRUCTURE_BROKEN")
+    _stage(stages, "TP_06_EMA7_RECLAIM", reclaim, "EMA7_NOT_RECLAIMED")
+    _stage(stages, "TP_07_PREVIOUS_EXTREME_BREAK", previous_break, "PREVIOUS_EXTREME_NOT_BROKEN")
+    _stage(stages, "TP_08_VOLUME_PASS", volume_pass, "VOLUME_BELOW_THRESHOLD")
+    _stage(stages, "TP_09_TARGET_EXISTS", bool(target_options), "TARGET_MISSING")
+    _stage(stages, "TP_10_PATTERN_CANDIDATE", candidate is not None, "PATTERN_NOT_CREATED")
 
     factor: FactorAssessment | None = None
     risk_plan = None
@@ -195,17 +196,17 @@ def _trend_trace(
         risk_plan = build_position_plan(candidate, features_15m.atr, strategy, config.risk)
     else:
         macro_pass = rsi_pass = score_pass = positive_pass = False
-    _stage(stages, "TP_10_4H_MACRO_ALIGNED", macro_pass, "MACRO_MISALIGNED")
-    _stage(stages, "TP_11_RSI_GATE", rsi_pass, "RSI_OUT_OF_RANGE")
-    _stage(stages, "TP_12_FACTOR_SCORE", score_pass, "FACTOR_SCORE_BELOW_THRESHOLD")
-    _stage(stages, "TP_13_POSITIVE_GROUPS", positive_pass, "POSITIVE_GROUPS_BELOW_THRESHOLD")
-    _stage(stages, "TP_14_RR_RISK_PLAN", risk_plan is not None, "RISK_PLAN_REJECTED")
+    _stage(stages, "TP_11_4H_MACRO_ALIGNED", macro_pass, "MACRO_MISALIGNED")
+    _stage(stages, "TP_12_RSI_GATE", rsi_pass, "RSI_OUT_OF_RANGE")
+    _stage(stages, "TP_13_FACTOR_SCORE", score_pass, "FACTOR_SCORE_BELOW_THRESHOLD")
+    _stage(stages, "TP_14_POSITIVE_GROUPS", positive_pass, "POSITIVE_GROUPS_BELOW_THRESHOLD")
+    _stage(stages, "TP_15_RR_RISK_PLAN", risk_plan is not None, "RISK_PLAN_REJECTED")
     confirmed = bool(
         result.signal
         and result.signal.setup == Setup.TREND_PULLBACK
         and result.signal.direction == direction
     )
-    _stage(stages, "TP_15_CONFIRMED", confirmed, "NOT_CONFIRMED")
+    _stage(stages, "TP_16_CONFIRMED", confirmed, "NOT_CONFIRMED")
     timestamp = latest.close_time_ms + 1
     value = datetime.fromtimestamp(timestamp / 1000, UTC)
     return SetupFunnelTrace(
@@ -288,18 +289,19 @@ def _breakout_trace(
     _stage(
         stages,
         "BR_01_REGIME_ELIGIBLE",
-        len(candles) >= 8 and regime == expected_regime and not_extreme,
-        "REGIME_OR_EXTREME_BAR",
+        len(candles) >= 8 and regime == expected_regime,
+        "REGIME_NOT_ELIGIBLE",
     )
-    _stage(stages, "BR_02_CONFIRMED_PIVOT_EXISTS", level is not None, "PIVOT_MISSING")
-    _stage(stages, "BR_03_BREAKOUT_CLOSE_PASS", close_pass, "BREAKOUT_CLOSE_FAILED")
-    _stage(stages, "BR_04_BREAKOUT_DISTANCE_PASS", distance_pass, "BREAKOUT_DISTANCE_FAILED")
-    _stage(stages, "BR_05_RETEST_TOUCH_PASS", touch_pass, "RETEST_NOT_TOUCHED")
-    _stage(stages, "BR_06_RETEST_CLOSE_HOLDS_LEVEL", hold_pass, "RETEST_CLOSE_FAILED")
-    _stage(stages, "BR_07_CONTINUATION_CANDLE", continuation, "CONTINUATION_CANDLE_FAILED")
-    _stage(stages, "BR_08_VOLUME_PASS", volume_pass, "VOLUME_BELOW_THRESHOLD")
-    _stage(stages, "BR_09_TARGET_EXISTS_OR_ATR_PROJECTION", True, "TARGET_UNAVAILABLE")
-    _stage(stages, "BR_10_PATTERN_CANDIDATE", candidate is not None, "PATTERN_NOT_CREATED")
+    _stage(stages, "BR_02_EXTREME_BAR_PASS", not_extreme, "EXTREME_BAR_REJECTED")
+    _stage(stages, "BR_03_CONFIRMED_PIVOT_EXISTS", level is not None, "PIVOT_MISSING")
+    _stage(stages, "BR_04_BREAKOUT_CLOSE_PASS", close_pass, "BREAKOUT_CLOSE_FAILED")
+    _stage(stages, "BR_05_BREAKOUT_DISTANCE_PASS", distance_pass, "BREAKOUT_DISTANCE_FAILED")
+    _stage(stages, "BR_06_RETEST_TOUCH_PASS", touch_pass, "RETEST_NOT_TOUCHED")
+    _stage(stages, "BR_07_RETEST_CLOSE_HOLDS_LEVEL", hold_pass, "RETEST_CLOSE_FAILED")
+    _stage(stages, "BR_08_CONTINUATION_CANDLE", continuation, "CONTINUATION_CANDLE_FAILED")
+    _stage(stages, "BR_09_VOLUME_PASS", volume_pass, "VOLUME_BELOW_THRESHOLD")
+    _stage(stages, "BR_10_TARGET_EXISTS_OR_ATR_PROJECTION", True, "TARGET_UNAVAILABLE")
+    _stage(stages, "BR_11_PATTERN_CANDIDATE", candidate is not None, "PATTERN_NOT_CREATED")
 
     factor: FactorAssessment | None = None
     risk_plan = None
@@ -318,17 +320,17 @@ def _breakout_trace(
         risk_plan = build_position_plan(candidate, features_15m.atr, strategy, config.risk)
     else:
         macro_pass = rsi_pass = score_pass = positive_pass = False
-    _stage(stages, "BR_11_4H_MACRO", macro_pass, "MACRO_MISALIGNED")
-    _stage(stages, "BR_12_RSI", rsi_pass, "RSI_OUT_OF_RANGE")
-    _stage(stages, "BR_13_FACTOR_SCORE", score_pass, "FACTOR_SCORE_BELOW_THRESHOLD")
-    _stage(stages, "BR_14_POSITIVE_GROUPS", positive_pass, "POSITIVE_GROUPS_BELOW_THRESHOLD")
-    _stage(stages, "BR_15_RISK_PLAN", risk_plan is not None, "RISK_PLAN_REJECTED")
+    _stage(stages, "BR_12_4H_MACRO", macro_pass, "MACRO_MISALIGNED")
+    _stage(stages, "BR_13_RSI", rsi_pass, "RSI_OUT_OF_RANGE")
+    _stage(stages, "BR_14_FACTOR_SCORE", score_pass, "FACTOR_SCORE_BELOW_THRESHOLD")
+    _stage(stages, "BR_15_POSITIVE_GROUPS", positive_pass, "POSITIVE_GROUPS_BELOW_THRESHOLD")
+    _stage(stages, "BR_16_RISK_PLAN", risk_plan is not None, "RISK_PLAN_REJECTED")
     confirmed = bool(
         result.signal
         and result.signal.setup == Setup.BREAKOUT_RETEST
         and result.signal.direction == direction
     )
-    _stage(stages, "BR_16_CONFIRMED", confirmed, "NOT_CONFIRMED")
+    _stage(stages, "BR_17_CONFIRMED", confirmed, "NOT_CONFIRMED")
     timestamp = latest.close_time_ms + 1
     value = datetime.fromtimestamp(timestamp / 1000, UTC)
     return SetupFunnelTrace(

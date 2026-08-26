@@ -15,13 +15,14 @@ from btc_quant_agent.funnel_research import (
 
 def _trace(failed: str | None = None) -> SetupFunnelTrace:
     names = (
-        "BR_01_REGIME_ELIGIBLE", "BR_02_CONFIRMED_PIVOT_EXISTS",
-        "BR_03_BREAKOUT_CLOSE_PASS", "BR_04_BREAKOUT_DISTANCE_PASS",
-        "BR_05_RETEST_TOUCH_PASS", "BR_06_RETEST_CLOSE_HOLDS_LEVEL",
-        "BR_07_CONTINUATION_CANDLE", "BR_08_VOLUME_PASS",
-        "BR_09_TARGET_EXISTS_OR_ATR_PROJECTION", "BR_10_PATTERN_CANDIDATE",
-        "BR_11_4H_MACRO", "BR_12_RSI", "BR_13_FACTOR_SCORE",
-        "BR_14_POSITIVE_GROUPS", "BR_15_RISK_PLAN", "BR_16_CONFIRMED",
+        "BR_01_REGIME_ELIGIBLE", "BR_02_EXTREME_BAR_PASS",
+        "BR_03_CONFIRMED_PIVOT_EXISTS", "BR_04_BREAKOUT_CLOSE_PASS",
+        "BR_05_BREAKOUT_DISTANCE_PASS", "BR_06_RETEST_TOUCH_PASS",
+        "BR_07_RETEST_CLOSE_HOLDS_LEVEL", "BR_08_CONTINUATION_CANDLE",
+        "BR_09_VOLUME_PASS", "BR_10_TARGET_EXISTS_OR_ATR_PROJECTION",
+        "BR_11_PATTERN_CANDIDATE", "BR_12_4H_MACRO", "BR_13_RSI",
+        "BR_14_FACTOR_SCORE", "BR_15_POSITIVE_GROUPS", "BR_16_RISK_PLAN",
+        "BR_17_CONFIRMED",
     )
     stages = tuple(
         StageObservation(name, name != failed, name != failed, "PASS" if name != failed else "FAIL")
@@ -34,7 +35,7 @@ def _trace(failed: str | None = None) -> SetupFunnelTrace:
 
 
 def test_single_gate_ablation_changes_only_declared_gate() -> None:
-    counts = _counterfactual_counts(_trace("BR_12_RSI"))
+    counts = _counterfactual_counts(_trace("BR_13_RSI"))
     assert counts["D2"]
     assert not counts["D1"]
     assert not any(counts[name] for name in ("D3", "D4", "D5", "D6", "D7", "D8"))

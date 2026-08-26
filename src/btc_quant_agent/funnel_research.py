@@ -70,15 +70,15 @@ def _counterfactual_counts(trace: SetupFunnelTrace) -> dict[str, bool]:
     prefix = "TP" if trace.setup == "TREND_PULLBACK" else "BR"
     ignored = {
         "D1": set(),
-        "D2": {f"{prefix}_{11 if prefix == 'TP' else 12:02d}_RSI_GATE" if prefix == "TP" else "BR_12_RSI"},
-        "D3": {"TP_07_VOLUME_PASS" if prefix == "TP" else "BR_08_VOLUME_PASS"},
-        "D4": {"TP_10_4H_MACRO_ALIGNED" if prefix == "TP" else "BR_11_4H_MACRO"},
-        "D5": {"TP_12_FACTOR_SCORE" if prefix == "TP" else "BR_13_FACTOR_SCORE"},
-        "D6": {"TP_13_POSITIVE_GROUPS" if prefix == "TP" else "BR_14_POSITIVE_GROUPS"},
-        "D7": {"TP_08_TARGET_EXISTS"} if prefix == "TP" else {"BR_09_TARGET_EXISTS_OR_ATR_PROJECTION"},
-        "D8": {"TP_14_RR_RISK_PLAN" if prefix == "TP" else "BR_15_RISK_PLAN"},
+        "D2": {"TP_12_RSI_GATE" if prefix == "TP" else "BR_13_RSI"},
+        "D3": {"TP_08_VOLUME_PASS" if prefix == "TP" else "BR_09_VOLUME_PASS"},
+        "D4": {"TP_11_4H_MACRO_ALIGNED" if prefix == "TP" else "BR_12_4H_MACRO"},
+        "D5": {"TP_13_FACTOR_SCORE" if prefix == "TP" else "BR_14_FACTOR_SCORE"},
+        "D6": {"TP_14_POSITIVE_GROUPS" if prefix == "TP" else "BR_15_POSITIVE_GROUPS"},
+        "D7": {"TP_09_TARGET_EXISTS"} if prefix == "TP" else {"BR_10_TARGET_EXISTS_OR_ATR_PROJECTION"},
+        "D8": {"TP_15_RR_RISK_PLAN" if prefix == "TP" else "BR_16_RISK_PLAN"},
     }
-    final_stage = "TP_15_CONFIRMED" if prefix == "TP" else "BR_16_CONFIRMED"
+    final_stage = "TP_16_CONFIRMED" if prefix == "TP" else "BR_17_CONFIRMED"
     output: dict[str, bool] = {}
     for diagnostic, removed in ignored.items():
         relevant = {
@@ -95,22 +95,23 @@ def _stage_report(
 ) -> dict[str, Any]:
     expected = {
         "TREND_PULLBACK": (
-            "TP_01_REGIME_ELIGIBLE", "TP_02_SWING_LEVEL_EXISTS",
-            "TP_03_EMA25_ZONE_TOUCHED", "TP_04_STRUCTURE_INTACT",
-            "TP_05_EMA7_RECLAIM", "TP_06_PREVIOUS_EXTREME_BREAK",
-            "TP_07_VOLUME_PASS", "TP_08_TARGET_EXISTS",
-            "TP_09_PATTERN_CANDIDATE", "TP_10_4H_MACRO_ALIGNED",
-            "TP_11_RSI_GATE", "TP_12_FACTOR_SCORE", "TP_13_POSITIVE_GROUPS",
-            "TP_14_RR_RISK_PLAN", "TP_15_CONFIRMED",
+            "TP_01_REGIME_ELIGIBLE", "TP_02_EXTREME_BAR_PASS",
+            "TP_03_SWING_LEVEL_EXISTS", "TP_04_EMA25_ZONE_TOUCHED",
+            "TP_05_STRUCTURE_INTACT", "TP_06_EMA7_RECLAIM",
+            "TP_07_PREVIOUS_EXTREME_BREAK", "TP_08_VOLUME_PASS",
+            "TP_09_TARGET_EXISTS", "TP_10_PATTERN_CANDIDATE",
+            "TP_11_4H_MACRO_ALIGNED", "TP_12_RSI_GATE", "TP_13_FACTOR_SCORE",
+            "TP_14_POSITIVE_GROUPS", "TP_15_RR_RISK_PLAN", "TP_16_CONFIRMED",
         ),
         "BREAKOUT_RETEST": (
-            "BR_01_REGIME_ELIGIBLE", "BR_02_CONFIRMED_PIVOT_EXISTS",
-            "BR_03_BREAKOUT_CLOSE_PASS", "BR_04_BREAKOUT_DISTANCE_PASS",
-            "BR_05_RETEST_TOUCH_PASS", "BR_06_RETEST_CLOSE_HOLDS_LEVEL",
-            "BR_07_CONTINUATION_CANDLE", "BR_08_VOLUME_PASS",
-            "BR_09_TARGET_EXISTS_OR_ATR_PROJECTION", "BR_10_PATTERN_CANDIDATE",
-            "BR_11_4H_MACRO", "BR_12_RSI", "BR_13_FACTOR_SCORE",
-            "BR_14_POSITIVE_GROUPS", "BR_15_RISK_PLAN", "BR_16_CONFIRMED",
+            "BR_01_REGIME_ELIGIBLE", "BR_02_EXTREME_BAR_PASS",
+            "BR_03_CONFIRMED_PIVOT_EXISTS", "BR_04_BREAKOUT_CLOSE_PASS",
+            "BR_05_BREAKOUT_DISTANCE_PASS", "BR_06_RETEST_TOUCH_PASS",
+            "BR_07_RETEST_CLOSE_HOLDS_LEVEL", "BR_08_CONTINUATION_CANDLE",
+            "BR_09_VOLUME_PASS", "BR_10_TARGET_EXISTS_OR_ATR_PROJECTION",
+            "BR_11_PATTERN_CANDIDATE", "BR_12_4H_MACRO", "BR_13_RSI",
+            "BR_14_FACTOR_SCORE", "BR_15_POSITIVE_GROUPS", "BR_16_RISK_PLAN",
+            "BR_17_CONFIRMED",
         ),
     }
     directions: dict[str, Any] = {}
@@ -283,16 +284,16 @@ def run_funnel_diagnostic(
                 if passes:
                     gate_counts[(diagnostic, trace.setup, year, trace.direction)] += 1
             if trace.setup == "TREND_PULLBACK":
-                swing_stage = trace.stages[1]
+                swing_stage = trace.stages[2]
                 level_availability[(year, trace.direction, "available")] += int(
                     swing_stage.predicate_passed
                 )
                 level_availability[(year, trace.direction, "evaluated")] += 1
-                if all(item.passed for item in trace.stages[:7]) and not trace.stages[7].predicate_passed:
+                if all(item.passed for item in trace.stages[:8]) and not trace.stages[8].predicate_passed:
                     target_missing[(year, trace.direction)] += 1
             if trace.candidate is not None:
                 candidates.append(_candidate_row(trace, features_15m))
-            pattern_index = 8 if trace.setup == "TREND_PULLBACK" else 9
+            pattern_index = 9 if trace.setup == "TREND_PULLBACK" else 10
             pattern_predicates = trace.stages[: pattern_index + 1]
             distance = sum(not item.predicate_passed for item in pattern_predicates)
             row = {

@@ -88,7 +88,7 @@ def test_trend_pullback_stage_predicates_match_strategy_logic(
         candles, features, features, features, Regime.TREND_UP, AppConfig(), _result()
     )
     long_trace = next(item for item in traces if item.setup == "TREND_PULLBACK" and item.direction == "LONG")
-    assert long_trace.stages[8].predicate_passed == (expected is not None)
+    assert long_trace.stages[9].predicate_passed == (expected is not None)
 
 
 @patch(
@@ -110,7 +110,51 @@ def test_breakout_stage_predicates_match_strategy_logic(
         candles, features, features, features, Regime.TREND_UP, AppConfig(), _result()
     )
     long_trace = next(item for item in traces if item.setup == "BREAKOUT_RETEST" and item.direction == "LONG")
-    assert long_trace.stages[9].predicate_passed == (expected is not None)
+    assert long_trace.stages[10].predicate_passed == (expected is not None)
+
+
+def test_setup_funnel_regime_denominator_matches_classifier() -> None:
+    candles = [_bar(i, 99, 100, 98, 99) for i in range(8)]
+    features = _feature()
+    traces = trace_setup_funnels(
+        candles, features, features, features, Regime.TREND_UP, AppConfig(), _result()
+    )
+    assert sum(item.stages[0].predicate_passed for item in traces) == 2
+    assert all(
+        item.stages[0].predicate_passed == (
+            item.direction == "LONG"
+        )
+        for item in traces
+    )
+
+
+def test_funnel_regime_denominator_matches_classifier() -> None:
+    test_setup_funnel_regime_denominator_matches_classifier()
+
+
+def test_extreme_bar_is_separate_funnel_stage() -> None:
+    candles = [_bar(i, 99, 100, 98, 99) for i in range(7)]
+    candles.append(_bar(7, 99, 110, 90, 99))
+    features = _feature(atr=2.0)
+    traces = trace_setup_funnels(
+        candles, features, features, features, Regime.TREND_UP, AppConfig(), _result()
+    )
+    long_traces = [item for item in traces if item.direction == "LONG"]
+    assert all(item.stages[0].predicate_passed for item in long_traces)
+    assert all(item.stages[1].stage.endswith("EXTREME_BAR_PASS") for item in long_traces)
+    assert all(not item.stages[1].predicate_passed for item in long_traces)
+
+
+def test_funnel_stage_labels_match_predicates() -> None:
+    candles = [_bar(i, 99, 100, 98, 99) for i in range(8)]
+    features = _feature()
+    traces = trace_setup_funnels(
+        candles, features, features, features, Regime.TREND_UP, AppConfig(), _result()
+    )
+    for trace in traces:
+        assert trace.stages[0].stage.endswith("REGIME_ELIGIBLE")
+        assert trace.stages[1].stage.endswith("EXTREME_BAR_PASS")
+        assert trace.stages[0].predicate_passed == (trace.direction == "LONG")
 
 
 def test_funnel_instrumentation_does_not_change_decision() -> None:
