@@ -1,0 +1,142 @@
+{
+  "protocol_id": "btc-quant-agent-v0.3.2-minimal-mechanisms-v1",
+  "scope": {
+    "symbol": "BTCUSDT",
+    "market": "BINANCE_USDM_PERPETUAL",
+    "development_start": "2021-01-01T00:00:00Z",
+    "development_end_exclusive": "2026-02-01T00:00:00Z",
+    "holdout_start": "2026-02-01T00:00:00Z",
+    "holdout_end_exclusive": "2026-08-01T00:00:00Z",
+    "holdout_forbidden": true
+  },
+  "control": {
+    "strategy_version": "0.2.2",
+    "feature_version": "0.2.2",
+    "rr_min": 1.8,
+    "stop_atr_buffer": 0.25,
+    "taker_fee_rate": 0.0005,
+    "slippage_bps_per_side": 2.0,
+    "funding_stress_rate": 0.0005,
+    "max_expected_funding_events": 2,
+    "derivatives_alpha": false,
+    "order_book_factor": false,
+    "validation_status": "EXPERIMENTAL"
+  },
+  "correctness_fix": {
+    "regime_eligible_predicate": "history_ready AND regime_equals_direction",
+    "extreme_bar_predicate": "latest_range < 2.5 * ATR",
+    "requirement": "TP_and_BR_regime_eligible_sum_equals_TREND_UP_plus_TREND_DOWN"
+  },
+  "experiments": [
+    {
+      "id": "E0",
+      "name": "RR_COMPONENT_DECOMPOSITION",
+      "change": "NONE_READ_ONLY",
+      "sequential_order": [
+        "VALID_POSITIVE_GEOMETRY",
+        "GROSS_RR_1_8",
+        "AFTER_FEE_1_8",
+        "AFTER_FEE_SLIPPAGE_1_8",
+        "AFTER_FUNDING_STRESS_1_8",
+        "MIN_NOTIONAL_PASS",
+        "FROZEN_RISK_PLAN_PASS"
+      ],
+      "reject_reasons": [
+        "INVALID_GEOMETRY",
+        "GROSS_RR_BELOW_THRESHOLD",
+        "FEE_DRAG_CROSSED_THRESHOLD",
+        "SLIPPAGE_DRAG_CROSSED_THRESHOLD",
+        "FUNDING_STRESS_CROSSED_THRESHOLD",
+        "MIN_NOTIONAL_REJECT",
+        "PASS"
+      ]
+    },
+    {
+      "id": "E1",
+      "name": "TP_FIXED_ATR_TARGET",
+      "eligible_events": "existing frozen Trend Pullback candidates with confirmed target only",
+      "change": "target only",
+      "long_target": "latest_close + 2.5 * ATR",
+      "short_target": "latest_close - 2.5 * ATR",
+      "atr_multiplier": 2.5,
+      "frozen_fields": [
+        "entry",
+        "invalidation",
+        "stop_buffer",
+        "rr_min",
+        "regime",
+        "EMA",
+        "volume",
+        "RSI",
+        "factor_logic",
+        "holding_time",
+        "cost_model"
+      ],
+      "target_missing_rescue": false
+    },
+    {
+      "id": "E2",
+      "name": "TREND_SCORE_DEDUP",
+      "change": "remove trend_structure numerator and denominator only",
+      "factor_score_min": 72.0,
+      "positive_group_rule": "min(config.min_positive_factor_groups, available_groups)",
+      "hard_gates_unchanged": true
+    },
+    {
+      "id": "E3",
+      "name": "PARTICIPATION_VOLUME_CREDIT_DEDUP",
+      "change": "remove setup-passed Volume Z base 6/6 from participation score only",
+      "setup_volume_gate_unchanged": true,
+      "participation_max": 8.0,
+      "cvd_aligned_score": 8.0,
+      "cvd_not_aligned_score": 0.0,
+      "derivatives_alpha": false,
+      "taker_score": false
+    }
+  ],
+  "momentum_diagnostic": {
+    "strategy_arm": false,
+    "categories": ["RSI_ONLY_REJECT", "ROC_ONLY_REJECT", "BOTH", "NEITHER"]
+  },
+  "prohibitions": {
+    "combined_arms": ["E1+E2", "E1+E3", "E2+E3", "E1+E2+E3"],
+    "parameter_search": false,
+    "candidate_freeze": false,
+    "holdout_consumption": false,
+    "live_execution": false,
+    "regime_changes": false,
+    "cost_changes": false
+  },
+  "primary_metrics": {
+    "E0": ["sequential_pass_counts", "reject_reason_counts", "required_target_distance"],
+    "E1": ["risk_plan_survival", "filled_trades", "target_reach_rate", "stop_rate", "timeout_rate", "barrier_incidence", "MFE", "MAE", "year_coverage"],
+    "E2": ["score_bins", "score_100_share", "unique_scores", "score_variance", "rank_order", "factor_rejects", "risk_gate_count", "confirmed_count"],
+    "E3": ["score_distribution", "positive_group_survival", "removed_winners", "removed_losers", "removed_average_r", "candidate_count"]
+  },
+  "secondary_metrics": [
+    "filled_trades",
+    "expectancy_r",
+    "profit_factor",
+    "max_drawdown_r",
+    "by_year",
+    "by_setup",
+    "by_direction"
+  ],
+  "hypothesis_rules": {
+    "allowed_verdicts": [
+      "SUPPORTED",
+      "FALSIFIED",
+      "INCONCLUSIVE_LOW_SAMPLE",
+      "INCONCLUSIVE_MECHANISM"
+    ],
+    "H1": "support requires clearly nonzero TP risk survival, multi-year coverage, no large majority crossing intermediate barriers, and MFE compatible with 2.5 ATR; fewer than 20 filled trades remains low sample",
+    "H2": "identify dominant RR component; funding sub-hypothesis is weak or falsified if funding creates few incremental rejects",
+    "H3": "support depends on materially reduced 100-bin saturation and meaningful rank dispersion, not PnL",
+    "H5": "evaluate CVD independently after volume credit removal; small removal sample permits INCONCLUSIVE_LOW_SAMPLE"
+  },
+  "overall_allowed_status": [
+    "MECHANISM_EXPERIMENTS_COMPLETE",
+    "MECHANISM_EXPERIMENTS_BLOCKED"
+  ],
+  "random_seed": 32
+}
