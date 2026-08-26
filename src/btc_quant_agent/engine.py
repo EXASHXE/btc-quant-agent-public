@@ -94,6 +94,12 @@ class QuantEngine:
             historical_cache.values[historical_key] = features
         return features
 
+    def diagnostic_features(
+        self, interval: str, candles: Sequence[Candle]
+    ) -> TimeframeFeatures:
+        """Return the same cached features used by ``scan`` for read-only diagnostics."""
+        return self._features(interval, candles)
+
     def scan(
         self,
         candles_4h: Sequence[Candle],

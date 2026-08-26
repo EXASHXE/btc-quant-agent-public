@@ -14,6 +14,8 @@ class FactorAssessment:
     evidence: tuple[str, ...]
     risks: tuple[str, ...]
     blocked_reason: str | None = None
+    raw_score: float = 0.0
+    available_max: float = 0.0
 
 
 def macro_aligned(features: TimeframeFeatures, direction: Direction) -> bool:
@@ -209,4 +211,6 @@ def assess_factors(
         tuple(evidence),
         tuple(risks),
         blocked,
+        raw,
+        available,
     )

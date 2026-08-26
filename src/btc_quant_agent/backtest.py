@@ -45,6 +45,12 @@ class TradeOutcome:
     setup: str | None = None
     regime: str | None = None
     risk_usdt: float | None = None
+    entry_low: float | None = None
+    entry_high: float | None = None
+    stop_loss: float | None = None
+    take_profit: float | None = None
+    rr_gross: float | None = None
+    rr_net: float | None = None
 
     @property
     def net_r(self) -> float | None:
@@ -141,6 +147,12 @@ def _completed_outcome(
         signal.setup.value,
         signal.regime.value,
         signal.max_loss_usdt,
+        signal.entry_low,
+        signal.entry_high,
+        signal.stop_loss,
+        signal.take_profit,
+        signal.rr_gross,
+        signal.rr_net,
     )
 
 
