@@ -1,0 +1,78 @@
+{
+  "version": "0.3.4",
+  "overall_status": "CAUSAL_ENTRY_VALIDATION_COMPLETE",
+  "formal_run": "artifacts/research/v0.3.4_causal_entry_20260828T130000Z",
+  "formal_run_git_sha": "27f8fc6d2ae833f73a60f13fed84b2124f57b4dc",
+  "protocol_sha256": "e1e2251c36c022d210164cd0764055e85e775879f0ff8af2a2730603a2965f05",
+  "holdout_accessed": false,
+  "answers": {
+    "1_static_18_causal_fills": 2,
+    "2_prospective_rr_pass": 18,
+    "3_fills_cumulative": {
+      "le_15m": 0,
+      "le_30m": 1,
+      "le_45m": 2
+    },
+    "4_expired": 16,
+    "5_invalidated_before_fill": 0,
+    "6_final_valid_opened_trades": 2,
+    "7_performance": {
+      "expectancy_r": -0.8246511295204417,
+      "profit_factor": 0,
+      "max_drawdown_r": 1.6493022590408835,
+      "win_rate": 0
+    },
+    "8_year_direction_stability": {
+      "stable": false,
+      "filled_cells": [
+        "2023_SHORT",
+        "2025_SHORT"
+      ],
+      "both_losses": true
+    },
+    "9_signed_return_candidate_control_delta_atr": {
+      "1h": -0.06218127696237938,
+      "2h": -0.5377183641234399,
+      "4h": -0.4098370606100966,
+      "8h": -0.1093503072955786,
+      "12h": -0.03797306386986565
+    },
+    "10_signed_return_bootstrap_ci": {
+      "4h": {
+        "p05": -0.7735935648475146,
+        "p50": -0.3751070114235231,
+        "p95": 0.15271403447889767
+      },
+      "8h": {
+        "p05": -0.8417790537562115,
+        "p50": -0.19512880996565451,
+        "p95": 0.448059185072509
+      }
+    },
+    "11_reach_delta": {
+      "4h": {
+        "plus_1_atr": 0.1079136690647482,
+        "plus_2_5_atr": 0.11510791366906475
+      },
+      "8h": {
+        "plus_1_atr": 0.05899280575539567,
+        "plus_2_5_atr": 0.10503597122302155
+      }
+    },
+    "12_directional_follow_through_validated": false,
+    "13_h9_verdict": "FALSIFIED",
+    "14_h10_verdict": "INCONCLUSIVE_MECHANISM",
+    "15_candidate_recommendation": "NO_CANDIDATE"
+  },
+  "matched_controls": {
+    "candidate_count": 139,
+    "k": 5,
+    "rows": 695,
+    "full_coverage_candidates": 139
+  },
+  "performance": {
+    "runtime_seconds": 549.341744098987,
+    "peak_rss_mib": 2967.10546875
+  }
+}
+
