@@ -161,20 +161,36 @@ def _mfe_mae(
     lows: Sequence[float],
     direction: Direction,
     entry: float,
-) -> tuple[float, float, float, float]:
+) -> tuple[float, float, float | None, float | None]:
     if not highs:
-        return 0.0, 0.0, 0.0, 0.0
+        return 0.0, 0.0, None, None
     if direction == Direction.LONG:
-        mfe = max(highs) - entry
-        mae = entry - min(lows)
-        mfe_idx = next(i for i, value in enumerate(highs) if value - entry >= mfe)
-        mae_idx = next(i for i, value in enumerate(lows) if entry - value >= mae)
+        mfe = max(0.0, max(highs) - entry)
+        mae = max(0.0, entry - min(lows))
+        mfe_idx = (
+            next((i for i, value in enumerate(highs) if value - entry >= mfe), None)
+            if mfe > 0.0
+            else None
+        )
+        mae_idx = (
+            next((i for i, value in enumerate(lows) if entry - value >= mae), None)
+            if mae > 0.0
+            else None
+        )
     else:
-        mfe = entry - min(lows)
-        mae = max(highs) - entry
-        mfe_idx = next(i for i, value in enumerate(lows) if entry - value >= mfe)
-        mae_idx = next(i for i, value in enumerate(highs) if value - entry >= mae)
-    return mfe, mae, float(mfe_idx), float(mae_idx)
+        mfe = max(0.0, entry - min(lows))
+        mae = max(0.0, max(highs) - entry)
+        mfe_idx = (
+            next((i for i, value in enumerate(lows) if entry - value >= mfe), None)
+            if mfe > 0.0
+            else None
+        )
+        mae_idx = (
+            next((i for i, value in enumerate(highs) if value - entry >= mae), None)
+            if mae > 0.0
+            else None
+        )
+    return mfe, mae, mfe_idx, mae_idx
 
 
 def _excursion_row(
@@ -209,8 +225,8 @@ def _excursion_row(
         "mfe_stop_r": mfe / stop_distance if stop_distance > 0 else None,
         "mae_stop_r": mae / stop_distance if stop_distance > 0 else None,
         "mfe_mae_ratio": mfe / mae if mae > 0 else None,
-        "time_to_mfe_minutes": mfe_idx + 1,
-        "time_to_mae_minutes": mae_idx + 1,
+        "time_to_mfe_minutes": None if mfe_idx is None else mfe_idx + 1,
+        "time_to_mae_minutes": None if mae_idx is None else mae_idx + 1,
     }
 
 

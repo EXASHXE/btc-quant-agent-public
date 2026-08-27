@@ -253,6 +253,64 @@ def test_long_short_excursion_symmetry() -> None:
     assert long_mae_idx == pytest.approx(short_mfe_idx)
 
 
+def test_mfe_mae_are_nonnegative() -> None:
+    highs = [99.0, 98.5, 99.5]
+    lows = [99.0, 98.0, 99.2]
+    long_mfe, long_mae, long_mfe_idx, _long_mae_idx = _mfe_mae(
+        highs, lows, Direction.LONG, 100.0
+    )
+    assert long_mfe == 0.0
+    assert long_mae == 2.0
+    assert long_mfe_idx is None
+    short_mfe, short_mae, _short_mfe_idx, short_mae_idx = _mfe_mae(
+        highs, lows, Direction.SHORT, 100.0
+    )
+    assert short_mfe == 2.0
+    assert short_mae == 0.0
+    assert short_mae_idx is None
+    empty_mfe, empty_mae, empty_mfe_idx, empty_mae_idx = _mfe_mae(
+        [], [], Direction.LONG, 100.0
+    )
+    assert (empty_mfe, empty_mae, empty_mfe_idx, empty_mae_idx) == (
+        0.0,
+        0.0,
+        None,
+        None,
+    )
+
+
+def test_excursion_zero_favorable_move_semantics() -> None:
+    from btc_quant_agent.geometry_research import _excursion_row
+
+    opens = [DEV_START_MS + i * 60_000 for i in range(4)]
+    highs = [99.0, 99.5, 99.2, 99.8]
+    lows = [98.0, 97.5, 98.2, 98.8]
+    series = _OneMinuteSeries(
+        [
+            Candle("BTCUSDT", "1m", o, o + 59_999, 99.0, h, low, 99.0, 1.0)
+            for o, h, low in zip(opens, highs, lows, strict=True)
+        ]
+    )
+    row = {
+        "candidate_id": "x",
+        "scope": "TP_POST_FACTOR",
+        "in_scope_a": True,
+        "in_scope_b": True,
+        "setup": "TREND_PULLBACK",
+        "direction": "LONG",
+        "timestamp_ms": DEV_START_MS + 1,
+        "year": 2021,
+        "decision_close_ms": DEV_START_MS + 60_000 - 1,
+        "close": 100.0,
+        "atr": 2.0,
+    }
+    result = _excursion_row(row, series, 3, frozen_stop=96.0)
+    assert result["mfe_atr"] == 0.0
+    assert result["time_to_mfe_minutes"] is None
+    assert result["mae_atr"] == pytest.approx(2.5 / 2.0)
+    assert result["time_to_mae_minutes"] == 1
+
+
 def test_required_target_reconstruction_matches_v032() -> None:
     config = _config()
     candidate = _tp_candidate(target=104.0)
