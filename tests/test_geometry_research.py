@@ -178,8 +178,8 @@ def test_excursion_starts_after_decision() -> None:
     lows = [99.0 - i for i in range(10)]
     series = _OneMinuteSeries(
         [
-            Candle("BTCUSDT", "1m", o, o + 59_999, 100.0, h, l, 100.0, 1.0)
-            for o, h, l in zip(opens, highs, lows, strict=True)
+            Candle("BTCUSDT", "1m", o, o + 59_999, 100.0, h, low, 100.0, 1.0)
+            for o, h, low in zip(opens, highs, lows, strict=True)
         ]
     )
     decision_close_ms = DEV_START_MS + 3 * 60_000 - 1
@@ -214,8 +214,8 @@ def test_reachability_uses_absolute_favorable_level() -> None:
     lows = [99.9, 99.8, 99.7, 99.6, 99.5, 99.4, 99.3, 99.2]
     series = _OneMinuteSeries(
         [
-            Candle("BTCUSDT", "1m", o, o + 59_999, 100.0, h, l, 100.0, 1.0)
-            for o, h, l in zip(opens, highs, lows, strict=True)
+            Candle("BTCUSDT", "1m", o, o + 59_999, 100.0, h, low, 100.0, 1.0)
+            for o, h, low in zip(opens, highs, lows, strict=True)
         ]
     )
     row = {
@@ -362,8 +362,8 @@ def test_excursion_row_fields_and_ratios() -> None:
     lows = [100.0, 99.5, 98.5, 97.5, 96.5, 95.5]
     series = _OneMinuteSeries(
         [
-            Candle("BTCUSDT", "1m", o, o + 59_999, 100.0, h, l, 100.0, 1.0)
-            for o, h, l in zip(opens, highs, lows, strict=True)
+            Candle("BTCUSDT", "1m", o, o + 59_999, 100.0, h, low, 100.0, 1.0)
+            for o, h, low in zip(opens, highs, lows, strict=True)
         ]
     )
     row = {
@@ -393,8 +393,8 @@ def test_barrier_row_reach_and_continuation() -> None:
     lows = [100.0, 99.0, 98.0, 97.0, 96.0, 95.0]
     series = _OneMinuteSeries(
         [
-            Candle("BTCUSDT", "1m", o, o + 59_999, 100.0, h, l, 100.0, 1.0)
-            for o, h, l in zip(opens, highs, lows, strict=True)
+            Candle("BTCUSDT", "1m", o, o + 59_999, 100.0, h, low, 100.0, 1.0)
+            for o, h, low in zip(opens, highs, lows, strict=True)
         ]
     )
     row = {
