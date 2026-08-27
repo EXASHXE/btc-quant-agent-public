@@ -277,6 +277,8 @@ def test_directionality_horizons_never_cross_holdout() -> None:
         "direction": "LONG",
     }
     assert directionality_label(identity, series, 60)["incomplete"] is True
+    exact_identity = {**identity, "decision_close_ms": DEV_END_MS - 60 * 60_000}
+    assert directionality_label(exact_identity, series, 60)["incomplete"] is False
 
 
 def test_bootstrap_is_deterministic() -> None:

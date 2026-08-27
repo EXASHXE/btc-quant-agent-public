@@ -79,7 +79,7 @@ class IndexedOneMinuteSeries:
         self, decision_close_ms: int, horizon_minutes: int
     ) -> tuple[Sequence[Candle], bool]:
         end_ms = decision_close_ms + horizon_minutes * 60_000
-        incomplete = end_ms >= DEV_END_MS
+        incomplete = end_ms > DEV_END_MS
         start = self.index_after(decision_close_ms)
         end = bisect.bisect_right(self.opens, min(end_ms, DEV_END_MS - 1))
         return self.bars[start:end], incomplete
@@ -764,7 +764,7 @@ def _by_year_direction(
     trades: Sequence[dict[str, Any]],
 ) -> dict[str, Any]:
     output: dict[str, Any] = {}
-    for year in range(2021, 2026):
+    for year in range(2021, 2027):
         for direction in ("LONG", "SHORT"):
             key = f"{year}_{direction}"
             candidate_ids = {
@@ -803,16 +803,20 @@ def run_v034_causal_entry_validation(
     )
     if frozen.execution.mode != "disabled" or frozen.execution.auto_execute or frozen.execution.allow_live:
         raise ValueError("v0.3.4 requires disabled execution")
-    v033 = run_v033_geometry_audit(candles_1m, frozen, funding_events)
+    v033 = run_v033_geometry_audit(
+        candles_1m, frozen, funding_events, capture_trend_controls=True
+    )
     tp_all = list(v033["tp_geometry_rows"])
     candidates = [row for row in tp_all if row["scope"] == "TP_POST_FACTOR"]
     if len(candidates) != 139:
         raise RuntimeError("v0.3.4 frozen Scope-B reproduction failed")
     series = IndexedOneMinuteSeries(candles_1m)
     pending, trades, funnel = run_retrace_lifecycle(candidates, series, frozen, funding_events)
-    pool = collect_trend_control_pool(
-        candles_1m, frozen, {int(row["timestamp_ms"]) for row in tp_all}
-    )
+    tp_pattern_times = {int(row["timestamp_ms"]) for row in tp_all}
+    pool = [
+        {**row, "is_tp_pattern": int(row["timestamp_ms"]) in tp_pattern_times}
+        for row in v033["trend_control_rows"]
+    ]
     matches = match_controls(candidates, pool)
     labels = build_directionality_rows(candidates, matches, pool, series)
     directionality = summarize_directionality(labels)

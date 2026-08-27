@@ -724,6 +724,8 @@ def run_v033_geometry_audit(
     candles_1m: Sequence[Candle],
     config: AppConfig,
     funding_events: Sequence[FundingEvent],
+    *,
+    capture_trend_controls: bool = False,
 ) -> dict[str, Any]:
     del funding_events
     if not candles_1m or candles_1m[0].open_time_ms != DEV_START_MS:
@@ -754,9 +756,10 @@ def run_v033_geometry_audit(
     engine = QuantEngine(frozen, HistoricalFeatureCache())
     tp_rows: list[dict[str, Any]] = []
     br_rows: list[dict[str, Any]] = []
+    trend_control_rows: list[dict[str, Any]] = []
     denominator: Counter[str] = Counter()
     loop_started = time.perf_counter()
-    for decision_bar in completed["15m"]:
+    for bar_index, decision_bar in enumerate(completed["15m"]):
         for interval in ("15m", "1h", "4h"):
             bars = completed[interval]
             while (
@@ -788,6 +791,27 @@ def run_v033_geometry_audit(
             continue
         denominator["TREND_DECISION"] += 1
         year = _year_of(now_ms)
+        if capture_trend_controls:
+            trend_control_rows.append(
+                {
+                    "control_id": f"CTRL:{now_ms}",
+                    "timestamp_ms": now_ms,
+                    "decision_close_ms": decision_bar.close_time_ms,
+                    "bar_index": bar_index,
+                    "year": year,
+                    "direction": (
+                        Direction.LONG.value
+                        if regime.value == "TREND_UP"
+                        else Direction.SHORT.value
+                    ),
+                    "regime": regime.value,
+                    "atr": f15.atr,
+                    "atr_percentile": f15.atr_percentile,
+                    "atr_decile": min(9, int(f15.atr_percentile * 10)),
+                    "close": f15.close,
+                    "is_tp_pattern": False,
+                }
+            )
         history_15m = list(histories["15m"])
         traces = trace_setup_funnels(
             history_15m, f4, f1, f15, regime, frozen, scan_outcome
@@ -1232,6 +1256,7 @@ def run_v033_geometry_audit(
         "excursion_rows": excursion_rows,
         "reachability_rows": reachability_rows,
         "barrier_rows": barrier_rows,
+        "trend_control_rows": trend_control_rows,
         "performance": {
             "decision_loop_seconds": loop_runtime,
             "total_runtime_seconds": time.perf_counter() - started,
@@ -1370,6 +1395,7 @@ def write_v033_artifacts(
     excursion_rows = result.pop("excursion_rows")
     reachability_rows = result.pop("reachability_rows")
     barrier_rows = result.pop("barrier_rows")
+    result.pop("trend_control_rows", None)
     for rows in (tp_rows, br_rows, excursion_rows, reachability_rows, barrier_rows):
         assert_v033_development_only(rows)
     provenance = {
