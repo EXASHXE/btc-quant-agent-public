@@ -475,6 +475,10 @@ def test_write_artifacts_rejects_holdout_rows(tmp_path: Path) -> None:
 def test_write_artifacts_emits_expected_files(tmp_path: Path) -> None:
     from btc_quant_agent.geometry_research import write_v033_artifacts
 
+    manifest = tmp_path / "data_manifest.json"
+    manifest.write_text(
+        json.dumps({"checksum_sha256": "0" * 64}), encoding="utf-8"
+    )
     result = {
         "scope": {"holdout_accessed": False},
         "scope_counts": {},
@@ -496,7 +500,6 @@ def test_write_artifacts_emits_expected_files(tmp_path: Path) -> None:
         "barrier_rows": [{"timestamp_ms": DEV_START_MS}],
     }
     protocol = Path("configs/research/v0.3.3_geometry_protocol.json")
-    manifest = Path("data/research/BTCUSDT/data_manifest.json")
     target = write_v033_artifacts(
         tmp_path / "run", result, _config(), protocol, manifest, seed=33
     )
