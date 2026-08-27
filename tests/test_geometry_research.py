@@ -23,6 +23,7 @@ from btc_quant_agent.geometry_research import (
     _mfe_mae,
     _net_rr,
     _OneMinuteSeries,
+    _reachability_row,
     _tp_geometry_row,
     assert_v033_development_only,
     run_v033_geometry_audit,
@@ -205,6 +206,33 @@ def test_excursion_never_reads_holdout() -> None:
     )
     with pytest.raises(ValueError, match="holdout"):
         _OneMinuteSeries([*bars, holdout_bar])
+
+
+def test_reachability_uses_absolute_favorable_level() -> None:
+    opens = [DEV_START_MS + i * 60_000 for i in range(8)]
+    highs = [100.0, 100.4, 101.0, 101.2, 100.8, 101.5, 101.1, 101.9]
+    lows = [99.9, 99.8, 99.7, 99.6, 99.5, 99.4, 99.3, 99.2]
+    series = _OneMinuteSeries(
+        [
+            Candle("BTCUSDT", "1m", o, o + 59_999, 100.0, h, l, 100.0, 1.0)
+            for o, h, l in zip(opens, highs, lows, strict=True)
+        ]
+    )
+    row = {
+        "candidate_id": "x", "scope": "TP_POST_FACTOR",
+        "in_scope_a": True, "in_scope_b": True,
+        "setup": "TREND_PULLBACK", "direction": "LONG",
+        "timestamp_ms": DEV_START_MS + 1, "year": 2021,
+        "decision_close_ms": DEV_START_MS + 60_000 - 1,
+        "close": 100.0,
+    }
+    result = _reachability_row(
+        row, series, "atr_0.5", 0.5, favorable=101.0,
+        frozen_stop=98.5, invalidation=99.0, local_extreme=99.5,
+    )
+    assert result["reached"] is True
+    assert result["reached_minutes"] == 2
+    assert result["reached_before_stop"] is True
 
 
 def test_long_short_excursion_symmetry() -> None:

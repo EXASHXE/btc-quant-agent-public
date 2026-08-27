@@ -124,6 +124,8 @@
     },
     "entry_references": {
       "references": ["frozen_midpoint_entry", "final_confirmation_close", "ema7_at_candidate"],
+      "supplementary_reference": "pullback_extreme_entry_supplementary",
+      "supplementary_note": "the pullback extreme is knowable at candidate time from the last five 15m bars; it is a static diagnostic anchor only and does not select an entry",
       "outputs": ["stop_distance_atr", "target_distance_atr", "gross_rr", "frozen_cost_net_rr"],
       "static_rule": "diagnostic only; frozen entry remains unchanged"
     }
@@ -161,13 +163,14 @@
     "allowed_verdicts": ["SUPPORTED", "FALSIFIED", "INCONCLUSIVE_LOW_SAMPLE", "INCONCLUSIVE_MECHANISM"],
     "H6_confirmed_swing_too_old_or_far": {
       "evidence": "invalidation pivot age and distance distributions per year and direction",
-      "support_rule": "median invalidation age or distance materially exceeds the pullback local extreme with no multi-year exception",
-      "falsification_rule": "invalidation distance is dominated by recent structure and local-extreme stops do not materially raise net RR"
+      "support_rule": "median invalidation distance exceeds the median pullback local-extreme distance by at least 0.5 ATR in every year with at least 5 candidates (material width), regardless of pivot age",
+      "falsification_rule": "any full year shows a swing-to-extreme gap below 0.5 ATR, or local-extreme stops materially raise net RR pass beyond the frozen stop baseline while the gap is absent",
+      "insufficient_alone_note": "supported width is not required to rescue net RR by itself; the binding target constraint is judged separately by H8"
     },
     "H7_previous_extreme_break_confirmation_too_late": {
-      "evidence": "EMA25 touch to candidate lag, EMA7 reclaim to candidate move, overshoot ATR",
-      "support_rule": "median touch-to-candidate price move consumes a large share of the structural reward",
-      "falsification_rule": "counterfactual entry references fail to lift net RR toward 1.8"
+      "evidence": "pullback extreme to candidate close move, EMA7 reclaim to candidate move, overshoot ATR, and the supplementary pullback-extreme entry reference",
+      "support_rule": "median pullback-extreme-to-final-close move consumes at least 40% of the median structural reward distance, or the supplementary pullback-extreme entry reference crosses net RR 1.8 while the frozen references do not",
+      "falsification_rule": "counterfactual entry references including the pullback extreme fail to lift net RR toward 1.8"
     },
     "H8_nearest_confirmed_target_too_close": {
       "evidence": "target distance ATR, required vs actual gap, barrier count before 2.5 ATR",

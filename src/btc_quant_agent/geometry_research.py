@@ -193,6 +193,8 @@ def _excursion_row(
     return {
         "candidate_id": row["candidate_id"],
         "scope": row["scope"],
+        "in_scope_a": row.get("in_scope_a", False),
+        "in_scope_b": row.get("in_scope_b", False),
         "setup": row["setup"],
         "direction": row["direction"],
         "timestamp_ms": row["timestamp_ms"],
@@ -217,18 +219,16 @@ def _reachability_row(
     series: _OneMinuteSeries,
     threshold_label: str,
     level_atr: float | None,
-    level: float,
+    favorable: float,
     *,
     frozen_stop: float,
     invalidation: float,
     local_extreme: float | None,
 ) -> dict[str, Any]:
     decision_close_ms = int(row["decision_close_ms"])
-    entry = float(row["close"])
     direction = Direction(row["direction"])
     highs, lows, _start, incomplete = series.window(decision_close_ms, REACH_HORIZON_MINUTES)
     long = direction == Direction.LONG
-    favorable = entry + level if long else entry - level
     stop_idx: int | None = None
     invalidation_idx: int | None = None
     local_idx: int | None = None
@@ -255,6 +255,8 @@ def _reachability_row(
     return {
         "candidate_id": row["candidate_id"],
         "scope": row["scope"],
+        "in_scope_a": row.get("in_scope_a", False),
+        "in_scope_b": row.get("in_scope_b", False),
         "setup": row["setup"],
         "direction": row["direction"],
         "timestamp_ms": row["timestamp_ms"],
@@ -302,6 +304,8 @@ def _barrier_row(
     return {
         "candidate_id": row["candidate_id"],
         "scope": row["scope"],
+        "in_scope_a": row.get("in_scope_a", False),
+        "in_scope_b": row.get("in_scope_b", False),
         "setup": row["setup"],
         "direction": row["direction"],
         "timestamp_ms": row["timestamp_ms"],
@@ -439,7 +443,7 @@ def _tp_geometry_row(
         else None
     )
     swing_extreme_gap = (
-        invalidation - pullback_extreme if long else pullback_extreme - invalidation
+        pullback_extreme - invalidation if long else invalidation - pullback_extreme
     )
     return {
         "candidate_id": f"{now_ms}:TP:{candidate.direction.value}",
@@ -787,9 +791,9 @@ def run_v033_geometry_audit(
                 )
     loop_runtime = time.perf_counter() - loop_started
 
-    tp_pattern = [row for row in tp_rows if row["scope"] == "TP_PATTERN"]
+    tp_pattern = list(tp_rows)
     tp_post = [row for row in tp_rows if row["scope"] == "TP_POST_FACTOR"]
-    br_post = [row for row in br_rows if row["scope"] == "BR_POST_FACTOR"]
+    br_post = list(br_rows)
     br_risk = [row for row in br_rows if row["scope"] == "BR_RISK_PASS"]
     counts = {
         "trend_decisions": denominator["TREND_DECISION"],
@@ -1014,6 +1018,43 @@ def run_v033_geometry_audit(
                 else None
             ),
         }
+    supplementary_rows: list[dict[str, Any]] = []
+    for row in tp_post:
+        extreme = row.get("pullback_local_extreme")
+        if extreme is None:
+            continue
+        ref = float(extreme)
+        stop_distance = abs(ref - float(row["frozen_stop"]))
+        target_distance = abs(float(row["target"]) - ref)
+        atr = float(row["atr"])
+        net = (
+            _net_rr(target_distance / ref, stop_distance / ref, cost_rate)
+            if ref > 0 and stop_distance > 0
+            else None
+        )
+        supplementary_rows.append(
+            {
+                "reference": "pullback_extreme_entry_supplementary",
+                "stop_distance_atr": stop_distance / atr if atr > 0 else None,
+                "target_distance_atr": target_distance / atr if atr > 0 else None,
+                "gross_rr": target_distance / stop_distance if stop_distance > 0 else None,
+                "net_rr": net,
+                "net_rr_pass": net is not None and net >= frozen.strategy.rr_min,
+            }
+        )
+    entry_reference_diagnostic["pullback_extreme_entry_supplementary"] = {
+        "distributions": {
+            field: _distribution(_values(supplementary_rows, field))
+            for field in ("stop_distance_atr", "target_distance_atr", "gross_rr", "net_rr")
+        },
+        "net_rr_pass_count": sum(bool(row["net_rr_pass"]) for row in supplementary_rows),
+        "net_rr_pass_rate": (
+            sum(bool(row["net_rr_pass"]) for row in supplementary_rows)
+            / len(supplementary_rows)
+            if supplementary_rows
+            else None
+        ),
+    }
 
     local_extreme_summary = {
         "scope_b_tp_post_factor": {
@@ -1185,6 +1226,28 @@ def run_v033_geometry_audit(
     return result
 
 
+def _h6_distance_exceeds_local_extreme_across_years(
+    tp_post: list[dict[str, Any]], minimum_per_year: int = 5
+) -> bool | None:
+    years: dict[str, list[tuple[float, float]]] = {}
+    for row in tp_post:
+        invalidation = row.get("invalidation_distance_atr")
+        extreme = row.get("local_extreme_distance_atr")
+        if invalidation is None or extreme is None:
+            continue
+        years.setdefault(str(row["year"]), []).append((float(invalidation), float(extreme)))
+    checked = 0
+    for pairs in years.values():
+        if len(pairs) < minimum_per_year:
+            continue
+        checked += 1
+        median_invalidation = statistics.median(pair[0] for pair in pairs)
+        median_extreme = statistics.median(pair[1] for pair in pairs)
+        if median_invalidation - median_extreme < 0.5:
+            return False
+    return True if checked >= 2 else None
+
+
 def _hypothesis_verdicts(
     result: dict[str, Any], tp_post: list[dict[str, Any]]
 ) -> dict[str, Any]:
@@ -1203,6 +1266,9 @@ def _hypothesis_verdicts(
     touch_move = _distribution(
         _values(tp_post, "touch_to_candidate_price_move_atr")
     )["median"]
+    extreme_move = _distribution(
+        _values(tp_post, "pullback_extreme_to_final_close_atr")
+    )["median"]
     local_pass_rate = result["local_extreme_stop_diagnostic"]["scope_b_tp_post_factor"][
         "net_rr_pass_rate"
     ] or 0.0
@@ -1210,28 +1276,33 @@ def _hypothesis_verdicts(
         item["net_rr_pass_rate"] or 0.0
         for item in result["entry_reference_diagnostic"].values()
     )
+    extreme_ref_pass = (
+        result["entry_reference_diagnostic"][
+            "pullback_extreme_entry_supplementary"
+        ]["net_rr_pass_rate"]
+        or 0.0
+    )
     two_half_atr = result["reachability_summary"]["scope_b_tp_post_factor"]["atr_2.5"]
 
     def numeric(value: object) -> float:
         return float(value) if isinstance(value, (int, float)) else 0.0
 
-    age_old = numeric(invalidation_age) >= 240.0
-    distance_far = numeric(invalidation_distance) >= 1.5
-    extreme_near = numeric(local_extreme_distance) <= 0.6 * max(
-        numeric(invalidation_distance), 1e-9
-    )
-    if age_old and distance_far and extreme_near and local_pass_rate > 0.10:
+    distance_exceeds = _h6_distance_exceeds_local_extreme_across_years(tp_post)
+    if distance_exceeds is True:
         verdicts["H6"] = "SUPPORTED"
-    elif local_pass_rate <= 0.05 and best_ref_pass <= 0.05:
+    elif distance_exceeds is False:
         verdicts["H6"] = "FALSIFIED"
-    else:
+    elif local_pass_rate > 0.10:
         verdicts["H6"] = "INCONCLUSIVE_MECHANISM"
+    else:
+        verdicts["H6"] = "INCONCLUSIVE_LOW_SAMPLE"
 
-    if numeric(target_distance) > 0 and numeric(touch_move) >= 0.4 * numeric(
-        target_distance
-    ):
+    if (
+        numeric(extreme_move) >= 0.4 * numeric(target_distance)
+        and numeric(target_distance) > 0
+    ) or numeric(extreme_ref_pass) > 0.10:
         verdicts["H7"] = "SUPPORTED"
-    elif best_ref_pass <= 0.05 and numeric(touch_move) < 0.2 * max(
+    elif best_ref_pass <= 0.05 and numeric(extreme_move) < 0.2 * max(
         numeric(target_distance), 1e-9
     ):
         verdicts["H7"] = "FALSIFIED"
@@ -1253,9 +1324,12 @@ def _hypothesis_verdicts(
         "target_distance_atr_median": target_distance,
         "required_reward_atr_median": required_reward,
         "touch_to_candidate_price_move_atr_median": touch_move,
+        "pullback_extreme_to_final_close_atr_median": extreme_move,
         "local_extreme_stop_pass_rate": local_pass_rate,
         "best_entry_reference_pass_rate": best_ref_pass,
+        "pullback_extreme_entry_pass_rate": extreme_ref_pass,
         "atr_2_5_reached_before_stop_rate": reach_before_stop_2_5,
+        "h6_distance_exceeds_local_extreme_across_years": distance_exceeds,
     }
     return verdicts
 
