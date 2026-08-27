@@ -352,3 +352,166 @@ def test_br_reference_row_static_geometry() -> None:
             "fixture", ("fixture",),
         )
     )
+
+
+def test_excursion_row_fields_and_ratios() -> None:
+    from btc_quant_agent.geometry_research import _excursion_row
+
+    opens = [DEV_START_MS + i * 60_000 for i in range(6)]
+    highs = [100.0, 101.0, 104.0, 103.0, 105.0, 102.0]
+    lows = [100.0, 99.5, 98.5, 97.5, 96.5, 95.5]
+    series = _OneMinuteSeries(
+        [
+            Candle("BTCUSDT", "1m", o, o + 59_999, 100.0, h, l, 100.0, 1.0)
+            for o, h, l in zip(opens, highs, lows, strict=True)
+        ]
+    )
+    row = {
+        "candidate_id": "x", "scope": "TP_POST_FACTOR",
+        "in_scope_a": True, "in_scope_b": True,
+        "setup": "TREND_PULLBACK", "direction": "LONG",
+        "timestamp_ms": DEV_START_MS + 1, "year": 2021,
+        "decision_close_ms": DEV_START_MS + 60_000 - 1,
+        "close": 100.0, "atr": 2.0,
+    }
+    result = _excursion_row(row, series, 5, frozen_stop=96.0)
+    assert result["horizon_minutes"] == 5
+    assert result["incomplete"] is False
+    assert result["mfe_atr"] == pytest.approx(5.0 / 2.0)
+    assert result["mae_atr"] == pytest.approx(4.5 / 2.0)
+    assert result["mfe_stop_r"] == pytest.approx(5.0 / 4.0)
+    assert result["mfe_mae_ratio"] == pytest.approx(5.0 / 4.5)
+    assert result["time_to_mfe_minutes"] == 4
+    assert result["time_to_mae_minutes"] == 5
+
+
+def test_barrier_row_reach_and_continuation() -> None:
+    from btc_quant_agent.geometry_research import _barrier_row
+
+    opens = [DEV_START_MS + i * 60_000 for i in range(6)]
+    highs = [100.0, 101.0, 103.0, 105.0, 106.0, 108.0]
+    lows = [100.0, 99.0, 98.0, 97.0, 96.0, 95.0]
+    series = _OneMinuteSeries(
+        [
+            Candle("BTCUSDT", "1m", o, o + 59_999, 100.0, h, l, 100.0, 1.0)
+            for o, h, l in zip(opens, highs, lows, strict=True)
+        ]
+    )
+    row = {
+        "candidate_id": "x", "scope": "TP_PATTERN",
+        "in_scope_a": True, "in_scope_b": False,
+        "setup": "TREND_PULLBACK", "direction": "LONG",
+        "timestamp_ms": DEV_START_MS + 1, "year": 2021,
+        "decision_close_ms": DEV_START_MS + 60_000 - 1,
+        "close": 100.0, "atr": 2.0,
+        "first_barrier_distance_atr": 1.5,
+        "confirmed_barriers_before_2_5_atr_target": 2,
+    }
+    result = _barrier_row(row, 103.0, series)
+    assert result["first_confirmed_barrier_reached_in_12h"] is True
+    assert result["first_confirmed_barrier_reach_minutes"] == 2
+    assert result["max_continuation_excursion_after_barrier_atr"] == pytest.approx(
+        (108.0 - 103.0) / 2.0
+    )
+
+
+def test_h6_year_stability_rule() -> None:
+    from btc_quant_agent.geometry_research import (
+        _h6_distance_exceeds_local_extreme_across_years,
+    )
+
+    rows = [
+        {
+            "year": year,
+            "invalidation_distance_atr": 2.6,
+            "local_extreme_distance_atr": 1.7,
+        }
+        for year in (2021, 2022, 2023, 2024)
+        for _ in range(10)
+    ]
+    assert _h6_distance_exceeds_local_extreme_across_years(rows) is True
+    for index in range(5):
+        rows[index]["invalidation_distance_atr"] = 1.5
+    assert _h6_distance_exceeds_local_extreme_across_years(rows) is False
+
+
+def test_distribution_helpers() -> None:
+    from btc_quant_agent.geometry_research import _distribution, _summary_block
+
+    dist = _distribution([1.0, 2.0, 3.0, 4.0])
+    assert dist["count"] == 4
+    assert dist["median"] == 2.5
+    assert dist["p25"] == 1.0
+    assert dist["p75"] == 3.0
+    assert _distribution([])["median"] is None
+    block = _summary_block(
+        [{"direction": "LONG", "year": 2021, "value": 2.0}],
+        ("value",),
+        splits=("direction", "year"),
+    )
+    assert block["overall"]["value"]["median"] == 2.0
+    assert block["by_direction"]["LONG"]["value"]["count"] == 1
+    assert block["by_year"]["2021"]["value"]["count"] == 1
+
+
+def test_write_artifacts_rejects_holdout_rows(tmp_path: Path) -> None:
+    from btc_quant_agent.geometry_research import write_v033_artifacts
+
+    result = {
+        "scope": {}, "tp_geometry_rows": [{"timestamp_ms": DEV_END_MS}],
+        "br_geometry_reference_rows": [{"timestamp_ms": DEV_START_MS}],
+        "excursion_rows": [{"timestamp_ms": DEV_START_MS}],
+        "reachability_rows": [{"timestamp_ms": DEV_START_MS}],
+        "barrier_rows": [{"timestamp_ms": DEV_START_MS}],
+    }
+    protocol = Path("configs/research/v0.3.3_geometry_protocol.json")
+    manifest = Path("data/research/BTCUSDT/data_manifest.json")
+    with pytest.raises(ValueError, match="holdout firewall"):
+        write_v033_artifacts(
+            tmp_path / "run", result, _config(), protocol, manifest, seed=33
+        )
+
+
+def test_write_artifacts_emits_expected_files(tmp_path: Path) -> None:
+    from btc_quant_agent.geometry_research import write_v033_artifacts
+
+    result = {
+        "scope": {"holdout_accessed": False},
+        "scope_counts": {},
+        "invalidation_age_summary": {},
+        "entry_lag_summary": {},
+        "target_geometry_summary": {},
+        "local_extreme_stop_diagnostic": {},
+        "entry_reference_diagnostic": {},
+        "excursion_summary": {},
+        "reachability_summary": {},
+        "barrier_summary": {},
+        "tp_vs_br_comparison": {},
+        "hypothesis_verdicts": {},
+        "overall_status": "GEOMETRY_AUDIT_COMPLETE",
+        "tp_geometry_rows": [{"timestamp_ms": DEV_START_MS}],
+        "br_geometry_reference_rows": [{"timestamp_ms": DEV_START_MS}],
+        "excursion_rows": [{"timestamp_ms": DEV_START_MS}],
+        "reachability_rows": [{"timestamp_ms": DEV_START_MS}],
+        "barrier_rows": [{"timestamp_ms": DEV_START_MS}],
+    }
+    protocol = Path("configs/research/v0.3.3_geometry_protocol.json")
+    manifest = Path("data/research/BTCUSDT/data_manifest.json")
+    target = write_v033_artifacts(
+        tmp_path / "run", result, _config(), protocol, manifest, seed=33
+    )
+    for name in (
+        "protocol.json", "protocol.sha256", "data_manifest.json",
+        "tp_geometry.parquet", "br_geometry_reference.parquet",
+        "excursion_1h_2h_4h_8h_12h.parquet", "reachability.parquet",
+        "barrier_audit.parquet", "invalidation_age_summary.json",
+        "entry_lag_summary.json", "target_geometry_summary.json",
+        "local_extreme_stop_diagnostic.json", "entry_reference_diagnostic.json",
+        "reachability_summary.json", "barrier_summary.json",
+        "tp_vs_br_comparison.json", "experiment_summary.json",
+    ):
+        assert (target / name).exists()
+    with pytest.raises(FileExistsError):
+        write_v033_artifacts(
+            tmp_path / "run", result, _config(), protocol, manifest, seed=33
+        )

@@ -1,0 +1,73 @@
+{
+  "classification": "GEOMETRY_AUDIT_COMPLETE",
+  "strategy_status": "EXPERIMENTAL",
+  "execution": {"mode": "disabled", "auto_execute": false, "allow_live": false},
+  "holdout": {"accessed": false, "consumed": false},
+  "answers": {
+    "q1_tp_invalidation_pivot_age": {
+      "median_bars": 7, "p75_bars": 9, "p90_bars": 11,
+      "median_minutes": 120, "p75_minutes": 150, "p90_minutes": 180,
+      "conclusion": "not old; the swing is recent but far"
+    },
+    "q2_frozen_tp_stop_median_atr": {
+      "scope_a_pattern_404": 2.43, "scope_b_post_factor_139": 2.36
+    },
+    "q3_local_extreme_stop_median_atr": {"scope_b": 1.54, "delta_atr": 0.82, "delta_pct": -35},
+    "q4_how_much_of_rr_reject_explained": {
+      "local_extreme_stop_net_rr_pass": 0,
+      "frozen_net_rr_pass": 0,
+      "gross_rr_shift": {"frozen": 0.348, "local_stop": 0.526},
+      "share_of_gross_deficit_explained": 0.12,
+      "share_of_pass_boundary_explained": 0.0,
+      "conclusion": "stop width alone explains zero of the pass/reject boundary; the target is binding once the stop is tightened"
+    },
+    "q5_ema25_touch_to_candidate_lag": {
+      "median_bars": 2, "median_minutes": 30,
+      "touch_bar_close_move_atr_median": 0.0, "touch_bar_close_move_atr_p90": 2.12,
+      "pullback_extreme_to_close_atr_median": 1.686,
+      "ema7_reclaim_to_close_atr_median": 0.0, "ema7_reclaim_to_close_atr_p90": 2.26,
+      "overshoot_atr_median": 0.367
+    },
+    "q6_tp_frozen_target_median_atr": {"scope_b": 0.851, "p75": 1.277, "p90": 1.906},
+    "q7_tp_future_mfe_mae": {
+      "4h_mfe_atr": 1.95, "4h_mae_atr": 2.21,
+      "8h_mfe_atr": 2.99, "8h_mae_atr": 3.00,
+      "12h_mfe_atr": 3.58, "12h_mae_atr": 3.33
+    },
+    "q8_reach_before_frozen_stop_12h": {
+      "atr_1_0": {"reached_before_stop": 100, "eligible": 139, "rate": 0.719},
+      "atr_2_5": {"reached_before_stop": 69, "eligible": 139, "rate": 0.496}
+    },
+    "q9_frozen_structural_target_reach": {
+      "reached": 117, "eligible": 139, "reached_before_stop": 108, "rate_before_stop": 0.777
+    },
+    "q10_required_target_reach": {
+      "required_atr_median": 6.338,
+      "reached": 40, "eligible": 139, "reached_before_stop": 29, "rate_before_stop": 0.209
+    },
+    "q11_tp_vs_br_biggest_geometry_difference": {
+      "tp_stop_atr": 2.357, "br_risk_pass_stop_atr": 0.869,
+      "tp_invalidation_distance_atr": 2.573, "br_invalidation_distance_atr": 0.619,
+      "tp_target_atr": 0.851, "br_risk_pass_target_atr": 3.044,
+      "tp_gross_rr": 0.348, "br_gross_rr": 1.371, "br_risk_pass_gross_rr": 3.343,
+      "root_cause": "BR anchors its stop to the fresh retest bar (0.75 ATR); TP anchors to the confirmed swing 0.81 ATR beyond the pullback extreme; pivot ages are similar so age is not the difference"
+    },
+    "q12_h6_h7_h8_v034_arms": {
+      "H6": "SUPPORTED (real width, insufficient alone)",
+      "H7": "SUPPORTED (binding single fix: pullback-extreme entry passes 18/139 = 12.9% net RR 1.8 with everything else frozen)",
+      "H8": "SUPPORTED (0.85 ATR target vs 6.34 ATR required)",
+      "recommended_v0.3.4": "E-GEO-ENTRY minimal arm (TP entry reference = pullback local extreme); optional E-GEO-STOP second arm only if the first reaches >= 20 risk-pass trades"
+    },
+    "q13_keep_trend_pullback": {
+      "recommendation": "keep TP frozen as research scope, do not run as an active arm; TP direction has real follow-through (71.9% reach +1 ATR before stop) but the frozen geometry cannot express it; remove nothing, defer the active decision to v0.3.4 geometry arms"
+    }
+  },
+  "provenance": {
+    "git_commit_sha": "fc001d783d4e10bf855096faee5ec24b70d84db9",
+    "config_hash": "52e176c8bdcfce94",
+    "dataset_checksum": "82d058b2e9e5bfbd20bf36026abec045fb778ddb72582277e0dac00846ae9901",
+    "protocol_checksum": "035aa3c492450c8fe33dce68131086c2e432b2887438b99caeb3ed8e24b0e003",
+    "random_seed": 33,
+    "artifacts": "artifacts/research/v0.3.3_geometry_20260827T120000Z/"
+  }
+}
