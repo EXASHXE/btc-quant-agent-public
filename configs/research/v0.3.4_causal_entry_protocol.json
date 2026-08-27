@@ -1,0 +1,238 @@
+{
+  "protocol_id": "btc-quant-agent-v0.3.4-causal-entry-directionality-v1",
+  "scope": {
+    "symbol": "BTCUSDT",
+    "market": "BINANCE_USDM_PERPETUAL",
+    "development_start": "2021-01-01T00:00:00Z",
+    "development_end_exclusive": "2026-02-01T00:00:00Z",
+    "holdout_start": "2026-02-01T00:00:00Z",
+    "holdout_end_exclusive": "2026-08-01T00:00:00Z",
+    "holdout_forbidden": true
+  },
+  "control": {
+    "strategy_version": "0.2.2",
+    "feature_version": "0.2.2",
+    "rr_min": 1.8,
+    "stop_atr_buffer": 0.25,
+    "taker_fee_rate": 0.0005,
+    "slippage_bps_per_side": 2.0,
+    "funding_stress_rate": 0.0005,
+    "max_expected_funding_events": 2,
+    "ttl_minutes": 45,
+    "max_signal_age_bars": 3,
+    "trend_pullback_holding_minutes": 720,
+    "account_equity_usdt": 100.0,
+    "risk_per_trade": 0.005,
+    "min_notional_usdt": 5.0,
+    "max_notional_usdt": 100.0,
+    "derivatives_alpha": false,
+    "order_book_factor": false,
+    "validation_status": "EXPERIMENTAL"
+  },
+  "correctness_fix": {
+    "mfe_mae_nonnegative": true,
+    "long_mfe": "max(0, max(high) - reference)",
+    "long_mae": "max(0, reference - min(low))",
+    "short_mfe": "max(0, reference - min(low))",
+    "short_mae": "max(0, max(high) - reference)",
+    "zero_favorable_move_time_to_extreme": "None when the clamped excursion is 0 (no positive favorable or adverse move inside the window); empty windows return excursions 0.0 and times None",
+    "v033_formal_artifacts_unchanged": true,
+    "clamp_smoke_required": true
+  },
+  "candidate_scopes": {
+    "denominators": {
+      "trend_decisions": 29580,
+      "tp_pattern_candidates": 404
+    },
+    "scope_b_tp_post_factor_candidates": {
+      "name": "TP_POST_FACTOR",
+      "definition": "frozen v0.3.3 funnel: 4H macro aligned, 1H trend regime, 15m trend-pullback pattern, frozen factor gates with no blocked reason",
+      "frozen_v033_count": 139
+    }
+  },
+  "e_retrace_arm": {
+    "name": "E-RETRACE",
+    "candidate_generation": "completely frozen v0.3.3 decision replay; a candidate must appear at its original final confirmation bar; no cooldown deduplication and no position-state censoring so the funnel reproduces the frozen 139",
+    "limit_price": "historical pullback local extreme from the last five 15m bars (min low for LONG, max high for SHORT), fully known at candidate time",
+    "causal_fill_rule": {
+      "eligibility_start": "first 1m bar with open_time_ms strictly after the candidate decision close",
+      "long": "future 1m low <= limit_price fills",
+      "short": "future 1m high >= limit_price fills",
+      "fill_price": "limit_price exactly",
+      "gap_through_never_improves_price": true,
+      "retroactive_fill": false
+    },
+    "ttl": {
+      "ttl_minutes": 45,
+      "max_signal_age_bars": 3,
+      "rule": "expires_at_ms = decision close + min(ttl_minutes * 60000, max_signal_age_bars * 900000); extension forbidden",
+      "ttl_scan": false
+    },
+    "pending_invalidation": {
+      "evaluated_on": "each closed 15m decision boundary and each arriving 1m bar for expiry",
+      "rules": [
+        "SIGNAL_EXPIRY",
+        "STRUCTURAL_INVALIDATION_LEVEL_BREACHED_15M_CLOSE",
+        "DATA_INVALID"
+      ],
+      "regime_change_cancellation": false,
+      "note": "the frozen runtime does not cancel pending signals merely because a later regime or macro label changes, so v0.3.4 does not invent that rule",
+      "rr_recheck": "deferred to fill time; the runtime's continuous RR-vs-current-close recheck assumes the entry sits near the current price, which does not apply to a retrace limit whose RR is validated prospectively at the limit price and re-confirmed at fill",
+      "no_new_rules_invented": true
+    },
+    "same_1m_ambiguity": {
+      "entry_and_stop": "stop-first: LOSS at the stop price",
+      "entry_and_target": "fill-then-resolve with stop priority: WIN at the target price only when the stop is not touched on the same bar (the project's existing conservative ordering)",
+      "favorable_ordering": false
+    },
+    "frozen_execution": {
+      "entry_execution_only": true,
+      "stop": "original TP invalidation level with the 0.25 ATR buffer (unchanged)",
+      "target": "original structural target (unchanged)",
+      "rr_min": 1.8,
+      "costs": "taker fee 0.0005 per side, slippage 2 bps per side, funding stress 0.0005 x 2 events for planning, actual funding settlements applied as point-in-time cashflow",
+      "holding_timeout_minutes": 720,
+      "local_stop": false,
+      "target_change": false,
+      "rr_reduction": false,
+      "maker_discount": false
+    },
+    "position_policy": {
+      "per_candidate_independent": true,
+      "max_open_positions_constraint_applied": false,
+      "note": "each of the 139 candidates is tracked as an independent sub-position with fixed frozen-equity sizing; the runtime max_open_positions=1 policy would censor the candidate funnel and is deliberately not applied; concurrent-open counts are reported",
+      "cooldown_dedup": false,
+      "note_cooldown": "candidate events are counted exactly as the frozen v0.3.3 funnel with no fingerprint cooldown between orders"
+    },
+    "risk_plan": {
+      "prospective": "at signal creation: stop, target, gross/net RR, and notional computed from the limit price with the frozen cost model",
+      "at_fill": "re-confirm net RR >= 1.8, notional >= minimum, not expired, not invalidated; only compliant fills open trades",
+      "rr_failed_at_fill_note": "under frozen geometry the at-fill recheck must reproduce the prospective plan because the fill price equals the limit price; any occurrence indicates an implementation error"
+    },
+    "funnel_reason_codes": [
+      "NO_PROSPECTIVE_RR",
+      "UNFILLED_EXPIRED",
+      "INVALIDATED_BEFORE_FILL",
+      "RR_FAILED_AT_FILL",
+      "FILLED"
+    ],
+    "fill_timing_buckets_minutes": [15, 30, 45],
+    "right_censoring": {
+      "PENDING_AT_END": "orders still pending at development end; excluded from resolved statistics but kept in fill-rate denominators",
+      "OPEN_AT_END": "trades still open at development end; excluded from performance metrics"
+    }
+  },
+  "matched_controls": {
+    "purpose": "isolate the incremental directional information of TP post-factor candidates beyond merely being in a trend regime",
+    "k_per_candidate": 5,
+    "pool": "all 15m trend-regime decision bars (TREND_UP / TREND_DOWN) in the development window, excluding the 404 TP pattern candidate bars",
+    "matching": {
+      "same_year": true,
+      "direction": "TREND_UP maps to LONG, TREND_DOWN maps to SHORT; must equal the candidate direction",
+      "same_1h_regime": true,
+      "same_1h_regime_note": "by construction of the direction rule; candidate directions only occur in their aligned trend regime",
+      "volatility": "same 15m ATR-percentile decile, decile = min(9, floor(atr_percentile * 10))",
+      "not_tp_pattern_candidate": true,
+      "min_bar_distance": 96,
+      "min_bar_distance_minutes": 1440,
+      "selection": "deterministic: the K eligible controls with the smallest absolute 15m bar distance from the candidate, ties broken by the earlier decision close",
+      "deterministic": true,
+      "sharing": "a control point may be matched to more than one candidate",
+      "coverage": "recorded when fewer than K eligible controls exist"
+    }
+  },
+  "directionality": {
+    "reference": "decision close of the candidate or control bar",
+    "horizons_minutes": [60, 120, 240, 480, 720],
+    "signed_return": "LONG: (future_close - reference) / ATR; SHORT: (reference - future_close) / ATR; future_close is the close of the last 1m bar inside the horizon window",
+    "mfe_mae": "nonnegative semantics as defined in correctness_fix",
+    "reach_thresholds_atr": [1.0, 1.5, 2.5],
+    "incomplete_rule": "windows truncated at development_end_exclusive (or empty) are marked incomplete and excluded from that horizon's statistics",
+    "statistics": {
+      "delta_definition": "per horizon and metric: median(candidates) - median(pooled matched controls); reach deltas are rate differences",
+      "metrics": [
+        "signed_return_atr",
+        "mfe_atr",
+        "mae_atr",
+        "reach_1_0",
+        "reach_1_5",
+        "reach_2_5"
+      ],
+      "bootstrap": "candidate-level cluster-aware: resample candidates with replacement, each carrying its matched controls; one resample per simulation shared by all metrics",
+      "bootstrap_simulations": 2000,
+      "bootstrap_ci": ["p05", "p50", "p95"],
+      "leave_one_year_out": "reported for the 4h and 8h signed-return deltas",
+      "horizon_cherry_picking": false
+    }
+  },
+  "hypotheses": {
+    "allowed_verdicts": [
+      "SUPPORTED",
+      "FALSIFIED",
+      "INCONCLUSIVE_LOW_SAMPLE",
+      "INCONCLUSIVE_MECHANISM"
+    ],
+    "H9_directional_edge": {
+      "statement": "TP post-factor candidates contain incremental directional information beyond merely being in a trend regime",
+      "gate": "at least 30 candidates with complete 4h labels and mean matched controls per candidate >= 3.0, otherwise INCONCLUSIVE_LOW_SAMPLE",
+      "support_rule": "all of: 4h and 8h signed-return deltas > 0; bootstrap p05 of the 4h and 8h deltas >= -0.05 ATR; +1 ATR reach delta > 0 at both 4h and 8h; +2.5 ATR reach delta > 0 at 4h or 8h; leave-one-year-out 4h and 8h deltas remain positive for every excluded year",
+      "falsification_rule": "both 4h and 8h signed-return deltas <= 0, or bootstrap p95 <= 0 for both the 4h and 8h deltas",
+      "otherwise": "INCONCLUSIVE_MECHANISM (e.g. positive point estimates with confidence intervals too wide)"
+    },
+    "H10_causal_retrace_entry": {
+      "statement": "after confirmation, a causal retrace limit to the known pullback extreme converts late-entry geometry into executable RR-compliant trades",
+      "primary_metrics": [
+        "prospective_pass_count",
+        "limit_fill_rate",
+        "valid_fills",
+        "final_trades"
+      ],
+      "secondary_metrics": [
+        "expectancy_r",
+        "profit_factor",
+        "max_drawdown_r",
+        "win_rate",
+        "year_direction_stability"
+      ],
+      "verdict_rules": {
+        "supported": "valid_fills >= 20 AND filled / limit_placed >= 0.30 AND opened / filled >= 0.50",
+        "falsified_when_evaluable": "valid_fills >= 20 while any supported condition fails",
+        "inconclusive_low_sample": "10 <= valid_fills < 20",
+        "below_10_falsified_if": "prospective_rr_pass_count < 10 (even a perfect fill rate could not produce 10 RR-compliant trades)",
+        "below_10_inconclusive_mechanism_if": "prospective_rr_pass_count >= 10 but valid_fills < 10 (execution too rare to evaluate)"
+      },
+      "static_diagnostic_not_a_fill": "the v0.3.3 static 18/139 supplementary diagnostic is never counted as a fill"
+    }
+  },
+  "candidate_gate": {
+    "allowed_recommendations": [
+      "NO_CANDIDATE",
+      "RECOMMEND_FOR_V0.3.5_CANDIDATE_RESEARCH"
+    ],
+    "rule": "RECOMMEND_FOR_V0.3.5_CANDIDATE_RESEARCH iff H10 is SUPPORTED and H9 is not FALSIFIED; otherwise NO_CANDIDATE",
+    "candidate_freeze": false,
+    "holdout_consumption": false,
+    "live_execution": false,
+    "note": "even a profitable development result cannot freeze a candidate in v0.3.4; an independent v0.3.5 review decides"
+  },
+  "prohibitions": {
+    "retroactive_entry": false,
+    "candidate_bar_fill": false,
+    "future_selected_entry": false,
+    "ttl_scan": false,
+    "limit_price_scan": false,
+    "stop_scan": false,
+    "target_scan": false,
+    "rr_min_reduction": false,
+    "parameter_search": false,
+    "pnl_based_selection": false,
+    "holdout_consumption": false,
+    "candidate_freeze": false,
+    "live_execution": false
+  },
+  "overall_allowed_status": [
+    "CAUSAL_ENTRY_VALIDATION_COMPLETE",
+    "CAUSAL_ENTRY_VALIDATION_BLOCKED"
+  ],
+  "random_seed": 34
+}
