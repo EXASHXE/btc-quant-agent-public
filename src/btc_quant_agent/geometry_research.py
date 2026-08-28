@@ -694,6 +694,67 @@ def _br_geometry_row(
     }
 
 
+def _br_qualification_row(
+    trace: SetupFunnelTrace,
+    history_15m: list[Candle],
+    features_15m: TimeframeFeatures,
+    frozen: AppConfig,
+    now_ms: int,
+    year: int,
+    bar_index: int,
+) -> dict[str, Any]:
+    candidate = trace.candidate
+    factor = trace.factor
+    assert candidate is not None and factor is not None
+    decomposition = decompose_rr(candidate, features_15m.atr, frozen.strategy, frozen.risk)
+    stages = {item.stage: item for item in trace.stages}
+    momentum_aligned = (
+        features_15m.roc > 0
+        if candidate.direction == Direction.LONG
+        else features_15m.roc < 0
+    )
+    participation_score = factor.group_scores.get("participation_flow")
+    return {
+        "candidate_id": f"{now_ms}:BR:{candidate.direction.value}",
+        "timestamp_ms": now_ms,
+        "decision_close_ms": history_15m[-1].close_time_ms,
+        "bar_index": bar_index,
+        "year": year,
+        "direction": candidate.direction.value,
+        "setup": candidate.setup.value,
+        "regime": trace.regime,
+        "close": features_15m.close,
+        "atr": features_15m.atr,
+        "atr_percentile": features_15m.atr_percentile,
+        "atr_decile": min(9, int(features_15m.atr_percentile * 10)),
+        "entry_low": candidate.entry_low,
+        "entry_high": candidate.entry_high,
+        "invalidation_level": candidate.invalidation_level,
+        "target": candidate.target_level,
+        "target_source": trace.target_source,
+        "macro_pass": stages["BR_12_4H_MACRO"].predicate_passed,
+        "rsi_pass": stages["BR_13_RSI"].predicate_passed,
+        "momentum_roc_aligned": momentum_aligned,
+        "participation_available": participation_score is not None,
+        "participation_pass": (
+            participation_score is not None and participation_score >= 50.0
+        ),
+        "participation_score": participation_score,
+        "factor_score": factor.score,
+        "positive_groups": factor.positive_groups,
+        "factor_score_pass": stages["BR_14_FACTOR_SCORE"].predicate_passed,
+        "positive_groups_pass": stages["BR_15_POSITIVE_GROUPS"].predicate_passed,
+        "post_macro_rsi": (
+            stages["BR_12_4H_MACRO"].predicate_passed
+            and stages["BR_13_RSI"].predicate_passed
+        ),
+        "post_factor": factor.blocked_reason is None,
+        "factor_blocked_reason": factor.blocked_reason,
+        "factor_group_scores": factor.group_scores,
+        **decomposition.as_dict(),
+    }
+
+
 def _year_of(now_ms: int) -> int:
     return datetime.fromtimestamp(now_ms / 1000, UTC).year
 
@@ -726,6 +787,7 @@ def run_v033_geometry_audit(
     funding_events: Sequence[FundingEvent],
     *,
     capture_trend_controls: bool = False,
+    capture_breakout_qualification: bool = False,
 ) -> dict[str, Any]:
     del funding_events
     if not candles_1m or candles_1m[0].open_time_ms != DEV_START_MS:
@@ -757,6 +819,7 @@ def run_v033_geometry_audit(
     tp_rows: list[dict[str, Any]] = []
     br_rows: list[dict[str, Any]] = []
     trend_control_rows: list[dict[str, Any]] = []
+    breakout_qualification_rows: list[dict[str, Any]] = []
     denominator: Counter[str] = Counter()
     loop_started = time.perf_counter()
     for bar_index, decision_bar in enumerate(completed["15m"]):
@@ -825,10 +888,17 @@ def run_v033_geometry_audit(
                 tp_rows.append(
                     _tp_geometry_row(trace, history_15m, f15, frozen, now_ms, year)
                 )
-            elif factor is not None and factor.blocked_reason is None:
-                br_rows.append(
-                    _br_geometry_row(trace, history_15m, f15, frozen, now_ms, year)
-                )
+            else:
+                if capture_breakout_qualification and factor is not None:
+                    breakout_qualification_rows.append(
+                        _br_qualification_row(
+                            trace, history_15m, f15, frozen, now_ms, year, bar_index
+                        )
+                    )
+                if factor is not None and factor.blocked_reason is None:
+                    br_rows.append(
+                        _br_geometry_row(trace, history_15m, f15, frozen, now_ms, year)
+                    )
     loop_runtime = time.perf_counter() - loop_started
 
     tp_pattern = list(tp_rows)
@@ -1257,6 +1327,7 @@ def run_v033_geometry_audit(
         "reachability_rows": reachability_rows,
         "barrier_rows": barrier_rows,
         "trend_control_rows": trend_control_rows,
+        "breakout_qualification_rows": breakout_qualification_rows,
         "performance": {
             "decision_loop_seconds": loop_runtime,
             "total_runtime_seconds": time.perf_counter() - started,
@@ -1396,6 +1467,7 @@ def write_v033_artifacts(
     reachability_rows = result.pop("reachability_rows")
     barrier_rows = result.pop("barrier_rows")
     result.pop("trend_control_rows", None)
+    result.pop("breakout_qualification_rows", None)
     for rows in (tp_rows, br_rows, excursion_rows, reachability_rows, barrier_rows):
         assert_v033_development_only(rows)
     provenance = {
