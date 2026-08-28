@@ -313,6 +313,8 @@ def _permutation_analysis(
     label_rows: Sequence[dict[str, Any]],
     *,
     stratum_fields: Sequence[str],
+    seed: int = SEED,
+    simulations: int = SIMULATIONS,
 ) -> dict[str, Any]:
     by_event_horizon = {
         (str(row["event_id"]), int(row["horizon_minutes"])): row
@@ -322,8 +324,8 @@ def _permutation_analysis(
     groups: dict[tuple[Any, ...], list[dict[str, Any]]] = collections.defaultdict(list)
     for row in identities:
         groups[tuple(row[field] for field in stratum_fields)].append(row)
-    rng = random.Random(SEED)
-    output: dict[str, Any] = {"seed": SEED, "simulations": SIMULATIONS, "horizons": {}}
+    rng = random.Random(seed)
+    output: dict[str, Any] = {"seed": seed, "simulations": simulations, "horizons": {}}
     for horizon in PRIMARY_HORIZONS:
         eligible = [
             row for row in identities if (str(row["event_id"]), horizon) in by_event_horizon
@@ -333,7 +335,7 @@ def _permutation_analysis(
             for row in eligible
         ]
         point_directions: dict[str, str] = {}
-        point_rng = random.Random(SEED + horizon)
+        point_rng = random.Random(seed + horizon)
         for group in groups.values():
             directions = [str(row["funding_direction"]) for row in group]
             point_rng.shuffle(directions)
@@ -350,7 +352,7 @@ def _permutation_analysis(
 
         point_null = [score(row, point_directions[str(row["event_id"])]) for row in eligible]
         deltas: list[float] = []
-        for _ in range(SIMULATIONS):
+        for _ in range(simulations):
             permuted: dict[str, str] = {}
             for group in groups.values():
                 directions = [str(row["funding_direction"]) for row in group]
@@ -806,6 +808,9 @@ def _movement_analysis(
     opportunities: Sequence[dict[str, Any]],
     controls: Sequence[dict[str, Any]],
     series: IndexedOneMinuteSeries,
+    *,
+    seed: int = SEED,
+    simulations: int = SIMULATIONS,
 ) -> tuple[dict[str, Any], dict[str, Any]]:
     metrics = (
         "future_range_atr",
@@ -907,16 +912,16 @@ def _movement_analysis(
     summary["day_clusters"] = len(
         {row["day_cluster"] for row in paired if row["horizon_minutes"] == 480}
     )
-    bootstrap: dict[str, Any] = {"seed": SEED, "simulations": SIMULATIONS}
+    bootstrap: dict[str, Any] = {"seed": seed, "simulations": simulations}
     for horizon in PRIMARY_HORIZONS:
         rows = [row for row in paired if row["horizon_minutes"] == horizon]
         clusters: dict[str, list[dict[str, Any]]] = collections.defaultdict(list)
         for row in rows:
             clusters[str(row["day_cluster"])].append(row)
         ids = sorted(clusters)
-        rng = random.Random(SEED + horizon)
+        rng = random.Random(seed + horizon)
         values = []
-        for _ in range(SIMULATIONS):
+        for _ in range(simulations):
             sample = (
                 [row for _id in [rng.choice(ids) for _ in ids] for row in clusters[_id]]
                 if ids

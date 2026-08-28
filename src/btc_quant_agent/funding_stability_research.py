@@ -574,8 +574,28 @@ def run_v038_funding_stability(
     price_series = StrictAfterPriceSeries(candles)
     onset_labels = _funding_label_rows(onsets, price_series)
     member_labels = _funding_label_rows(members, price_series)
-    h22_summary, h22_boot, _, h22_splits = _h19_summary(onsets, onset_labels)
-    h22_perm = _permutation_analysis(onsets, onset_labels, stratum_fields=("year", "atr_decile"))
+    h22_summary, _, _, h22_splits = _h19_summary(onsets, onset_labels)
+    h22_boot = {
+        "seed": SEED,
+        "simulations": SIMULATIONS,
+        **{
+            f"{horizon}m": _cluster_bootstrap_median(
+                [row for row in onset_labels if row["horizon_minutes"] == horizon],
+                "signed_return_atr",
+                "week_cluster",
+                seed=SEED,
+                simulations=SIMULATIONS,
+            )
+            for horizon in (240, 480, 1440)
+        },
+    }
+    h22_perm = _permutation_analysis(
+        onsets,
+        onset_labels,
+        stratum_fields=("year", "atr_decile"),
+        seed=SEED,
+        simulations=SIMULATIONS,
+    )
     h22 = h22_verdict(h22_summary, h22_boot, h22_perm, h22_splits)
     h23 = _state_attribution(onsets, onset_labels, valid)
     controls = list(replay["trend_control_rows"])
@@ -607,7 +627,13 @@ def run_v038_funding_stability(
     movement_matches = _match_movement_controls(
         all_candidates, controls, features, {int(row["timestamp_ms"]) for row in all_union}
     )
-    movement, movement_boot = _movement_analysis(all_candidates, movement_matches, indexed)
+    movement, movement_boot = _movement_analysis(
+        all_candidates,
+        movement_matches,
+        indexed,
+        seed=SEED,
+        simulations=SIMULATIONS,
+    )
     movement["bootstrap"] = movement_boot
     movement["same_positive_direction_as_v037"] = all(
         float(movement["horizons"][f"{h}m"]["metrics"]["future_range_atr"]["delta"]) > 0
