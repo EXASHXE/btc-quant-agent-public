@@ -9,6 +9,7 @@ class EpisodeAccumulator:
     """Causally collapse consecutive identical 1h trend states into episodes."""
 
     rows: list[dict[str, Any]] = field(default_factory=list)
+    continuation_rows: list[dict[str, Any]] = field(default_factory=list)
     previous_regime: str | None = None
     active_index: int | None = None
     last_1h_close_ms: int | None = None
@@ -31,6 +32,15 @@ class EpisodeAccumulator:
                 row["end_close_ms"] = close_ms
                 row["duration_bars"] = int(row["duration_bars"]) + 1
                 row["duration_hours"] = int(row["duration_bars"])
+            if self.active_index is not None:
+                episode = self.rows[self.active_index]
+                continuation = dict(snapshot)
+                continuation["episode_id"] = episode["episode_id"]
+                continuation["continuation_id"] = (
+                    f"{episode['episode_id']}:C{int(episode['duration_bars']) - 1}"
+                )
+                continuation["continuation_index"] = int(episode["duration_bars"]) - 1
+                self.continuation_rows.append(continuation)
         else:
             self.active_index = None
         self.previous_regime = regime

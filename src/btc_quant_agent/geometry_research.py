@@ -1333,6 +1333,7 @@ def run_v033_geometry_audit(
         "trend_control_rows": trend_control_rows,
         "breakout_qualification_rows": breakout_qualification_rows,
         "directional_episode_rows": episode_accumulator.rows,
+        "directional_continuation_rows": episode_accumulator.continuation_rows,
         "performance": {
             "decision_loop_seconds": loop_runtime,
             "total_runtime_seconds": time.perf_counter() - started,

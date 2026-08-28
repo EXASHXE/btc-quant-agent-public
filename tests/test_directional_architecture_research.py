@@ -65,6 +65,9 @@ def test_regime_episode_construction_is_causal() -> None:
     assert len(accumulator.rows) == 2
     assert accumulator.rows[0]["duration_hours"] == 2
     assert accumulator.rows[1]["duration_hours"] == 1
+    assert len(accumulator.continuation_rows) == 3
+    assert accumulator.continuation_rows[1]["episode_id"] == accumulator.rows[0]["episode_id"]
+    assert accumulator.continuation_rows[1]["continuation_index"] == 1
 
 
 def test_episode_has_no_future_feature_access() -> None:

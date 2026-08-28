@@ -102,6 +102,7 @@ def build_episode_labels(
     return [
         {
             "episode_id": episode["episode_id"],
+            "continuation_id": episode.get("continuation_id"),
             "timestamp_ms": episode["timestamp_ms"],
             "year": episode["year"],
             "direction": episode["direction"],
@@ -453,6 +454,84 @@ def _real_stats(labels: Sequence[dict[str, Any]]) -> dict[str, Any]:
                     ),
                 }
                 for direction in ("LONG", "SHORT")
+            },
+        }
+    return output
+
+
+def _split_real_stats(labels: Sequence[dict[str, Any]]) -> dict[str, Any]:
+    return {
+        split: {
+            f"{horizon}m": {
+                "count": len(
+                    [
+                        row
+                        for row in labels
+                        if row["split"] == split
+                        and row["horizon_minutes"] == horizon
+                        and not row["incomplete"]
+                    ]
+                ),
+                "signed_return_atr_median": _median(
+                    [
+                        float(row["signed_return_atr"])
+                        for row in labels
+                        if row["split"] == split
+                        and row["horizon_minutes"] == horizon
+                        and not row["incomplete"]
+                    ]
+                ),
+                "by_direction": {
+                    direction: _median(
+                        [
+                            float(row["signed_return_atr"])
+                            for row in labels
+                            if row["split"] == split
+                            and row["direction"] == direction
+                            and row["horizon_minutes"] == horizon
+                            and not row["incomplete"]
+                        ]
+                    )
+                    for direction in ("LONG", "SHORT")
+                },
+            }
+            for horizon in PRIMARY_HORIZONS
+        }
+        for split in ("EARLY", "LATE")
+    }
+
+
+def _continuation_analysis(labels: Sequence[dict[str, Any]]) -> dict[str, Any]:
+    np = importlib.import_module("numpy")
+    output: dict[str, Any] = {
+        "continuation_rows": len({str(row["continuation_id"]) for row in labels}),
+        "cluster_unit": "episode_id",
+        "seed": SEED,
+        "simulations": SIMULATIONS,
+        "horizons": {},
+    }
+    for horizon in PRIMARY_HORIZONS:
+        rows = [
+            row for row in labels if row["horizon_minutes"] == horizon and not row["incomplete"]
+        ]
+        clusters: dict[str, list[float]] = collections.defaultdict(list)
+        for row in rows:
+            clusters[str(row["episode_id"])].append(float(row["signed_return_atr"]))
+        ids = sorted(clusters)
+        rng = np.random.default_rng(SEED + horizon)
+        medians: list[float] = []
+        for _ in range(SIMULATIONS):
+            indices = rng.integers(0, len(ids), size=len(ids))
+            sample = [value for index in indices for value in clusters[ids[int(index)]]]
+            medians.append(statistics.median(sample))
+        output["horizons"][f"{horizon}m"] = {
+            "row_count": len(rows),
+            "episode_clusters": len(ids),
+            "signed_return_atr_median": _median([float(row["signed_return_atr"]) for row in rows]),
+            "cluster_bootstrap": {
+                "p05": _percentile(medians, 0.05),
+                "p50": _percentile(medians, 0.50),
+                "p95": _percentile(medians, 0.95),
             },
         }
     return output
@@ -930,9 +1009,12 @@ def run_v036_directional_architecture(
         capture_directional_episodes=True,
     )
     episodes = list(replay["directional_episode_rows"])
+    continuations = list(replay["directional_continuation_rows"])
     _development_only(episodes)
+    _development_only(continuations)
     series = IndexedOneMinuteSeries(candles)
     labels = build_episode_labels(episodes, series)
+    continuation_labels = build_episode_labels(continuations, series)
     label_by_id = {(str(row["episode_id"]), int(row["horizon_minutes"])): row for row in labels}
     permuted = permute_directions_preserving_strata(episodes, seed)
     permutation_rows = _paired_same_episode_rows(episodes, series, permuted)
@@ -1021,31 +1103,12 @@ def run_v036_directional_architecture(
         "median_duration_hours": _median([float(row["duration_hours"]) for row in episodes]),
         "by_year": dict(sorted(collections.Counter(int(row["year"]) for row in episodes).items())),
         "real_direction": real,
+        "continuation_analysis": _continuation_analysis(continuation_labels),
     }
+    split_real = _split_real_stats(labels)
     late_real_positive = all(
-        _median(
-            [
-                float(row["signed_return_atr"])
-                for row in labels
-                if row["split"] == "LATE"
-                and row["horizon_minutes"] == horizon
-                and not row["incomplete"]
-            ]
-        )
-        is not None
-        and float(
-            _median(
-                [
-                    float(row["signed_return_atr"])
-                    for row in labels
-                    if row["split"] == "LATE"
-                    and row["horizon_minutes"] == horizon
-                    and not row["incomplete"]
-                ]
-            )
-            or 0
-        )
-        > 0
+        split_real["LATE"][f"{horizon}m"]["signed_return_atr_median"] is not None
+        and float(split_real["LATE"][f"{horizon}m"]["signed_return_atr_median"]) > 0
         for horizon in PRIMARY_HORIZONS
     )
     proposed = ladder["proposed_direction_architecture"]
@@ -1082,6 +1145,7 @@ def run_v036_directional_architecture(
         },
         "direction_ladder": ladder,
         "early_late_confirmation": {
+            "real_direction": split_real,
             "h14_real_minus_permutation": permutation["stability"]["early_late"],
             "late_real_direction_positive_4h_8h": late_real_positive,
         },
