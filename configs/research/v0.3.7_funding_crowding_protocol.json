@@ -1,0 +1,127 @@
+{
+  "protocol_id": "btc-quant-agent-v0.3.7-funding-crowding-qualification-v1",
+  "scope": {
+    "symbol": "BTCUSDT",
+    "market": "BINANCE_USDM_PERPETUAL",
+    "development": "[2021-01-01T00:00:00Z, 2026-02-01T00:00:00Z)",
+    "early": "[2021-01-01T00:00:00Z, 2024-01-01T00:00:00Z)",
+    "late_internal_confirmation": "[2024-01-01T00:00:00Z, 2026-02-01T00:00:00Z)",
+    "holdout": "[2026-02-01T00:00:00Z, 2026-08-01T00:00:00Z)",
+    "holdout_forbidden": true
+  },
+  "frozen_state": {
+    "strategy_version": "0.2.2",
+    "feature_version": "0.2.2",
+    "validation_status": "EXPERIMENTAL",
+    "execution_mode": "disabled",
+    "auto_execute": false,
+    "allow_live": false,
+    "candidate_freeze": false,
+    "paper_testnet_live": false,
+    "tp_br_runtime_parameter_changes": false,
+    "seed": 37,
+    "bootstrap_simulations": 2000
+  },
+  "funding_data": {
+    "required_source": "Binance official USD-M Futures historical fundingRate archive represented by the verified canonical formal dataset",
+    "allowed_fields": ["timestamp_ms", "funding_rate", "mark_price"],
+    "development_feature_filter": "timestamp_ms < 2026-02-01T00:00:00Z",
+    "holdout_rows": "manifest/count metadata only; rates and labels are forbidden",
+    "audit": ["sha256", "row counts", "sorted timestamps", "duplicates", "interval irregularity", "Development min/max/median rate", "missing mark prices", "first/last Development timestamp"],
+    "block_if_point_in_time_unverified": true
+  },
+  "primary_feature": {
+    "name": "FUNDING_90D_CAUSAL_PERCENTILE",
+    "history_events": 270,
+    "history": "the 270 settlements strictly preceding the current settlement; current event excluded",
+    "percentile": "(count(history_rate < current_rate) + 0.5 * count(history_rate == current_rate)) / 270",
+    "warmup": "WARMUP_INCOMPLETE until 270 prior events exist",
+    "direction_rule": {"percentile_lte_0_25": "LONG", "percentile_gte_0_75": "SHORT", "otherwise": "NO_BIAS"},
+    "threshold_scan": false,
+    "window_scan": false
+  },
+  "funding_availability": {
+    "settlement_available_at": "funding timestamp_ms",
+    "standalone_reference": "open price of the first canonical 1m bar whose open_time_ms is strictly greater than settlement timestamp_ms",
+    "standalone_label_start": "that same strictly-after 1m reference bar",
+    "atr": "latest fully closed frozen 1H ATR(14) and ATR percentile whose close_time_ms <= settlement timestamp_ms",
+    "opportunity_asof": "latest settled funding timestamp_ms <= opportunity timestamp_ms using bisect_right",
+    "stale_rule": "funding age > 8h + 5min is STALE_FUNDING and excluded",
+    "future_funding_forbidden": true,
+    "predicted_funding_forbidden": true
+  },
+  "h19": {
+    "statement": "Extreme settled-funding crowding contains contrarian directional information for subsequent BTCUSDT returns.",
+    "event_unit": "tail funding settlement with complete 270-event warmup",
+    "horizons_minutes": [240, 480, 1440],
+    "primary_horizons_minutes": [240, 480],
+    "labels": ["funding-direction signed close return / 1H ATR", "raw BTC close return / 1H ATR", "MFE", "MAE", "reach 1/1.5/2.5 ATR"],
+    "null_permutation": "within same year and 1H ATR decile, permute LONG/SHORT labels preserving counts; 2000 simulations seed 37",
+    "tail_spread": "median raw return for bottom quartile minus median raw return for top quartile",
+    "matched_tail_pairs": "bottom vs top, same year and 1H ATR decile, K=1 nearest absolute settlement time with >=24h separation, earlier tie-break",
+    "spearman": "funding percentile versus future raw return; expected negative; secondary only",
+    "uncertainty": "UTC calendar-week cluster bootstrap, 2000 simulations, seed 37",
+    "sample_gate": {"complete_8h_events_min": 300, "long_min": 100, "short_min": 100, "week_clusters_min": 80},
+    "support": "4h/8h real signed medians >0; real-minus-permutation deltas >0; weekly-bootstrap p05 for real signed median >=-0.05 ATR; bottom-minus-top spreads >0 with weekly-bootstrap p05 >=-0.05; Spearman <0; Early and Late signed medians >0; LONG and SHORT subgroup medians >=-0.05 at both primary horizons",
+    "falsify": "both 4h and 8h signed medians <=0, or both bottom-top spreads <=0, or both real-minus-permutation deltas <=0",
+    "otherwise": "INCONCLUSIVE_MECHANISM",
+    "below_gate": "INCONCLUSIVE_LOW_SAMPLE"
+  },
+  "h20": {
+    "statement": "Funding extreme direction provides directional information on existing direction-agnostic BR/TP opportunity events.",
+    "union": "exact timestamp union of frozen BR_PATTERN and TP_PATTERN; preserve BR, TP, or BR+TP tag",
+    "original_pattern_direction_used": false,
+    "event_reference": "original opportunity decision close and frozen 15m ATR",
+    "horizons_minutes": [240, 480],
+    "primary_sample": "opportunity event with latest non-stale settled funding and extreme Funding bias",
+    "null_permutation": "within year, frozen 15m ATR decile, and setup tag when feasible, permute Funding direction preserving counts",
+    "uncertainty": "UTC calendar-day cluster bootstrap, 2000 simulations, seed 37",
+    "sample_gate": {"complete_8h_events_min": 100, "long_min": 30, "short_min": 30, "day_clusters_min": 60},
+    "support": "4h/8h pooled signed medians >0; real-minus-permutation deltas >0; day-cluster p05 for real signed median >=-0.05; Early/Late medians >0; LONG/SHORT subgroup medians >=-0.05",
+    "falsify": "both pooled 4h and 8h signed medians <=0, or both real-minus-permutation deltas <=0",
+    "otherwise": "INCONCLUSIVE_MECHANISM",
+    "below_gate": "INCONCLUSIVE_LOW_SAMPLE",
+    "setup_breakdowns": "BR-only, TP-only, and BR+TP are secondary and cannot replace pooled verdict"
+  },
+  "h21": {
+    "statement": "Funding-conditioned opportunity events retain elevated direction-agnostic movement.",
+    "metrics": ["future high-low range / ATR", "max absolute excursion / ATR", "absolute close return / ATR", "movement >=1.5 ATR", "movement >=2.5 ATR"],
+    "controls": "non-pattern trend-regime decision points matched same year, frozen 15m ATR decile, same funding tail side, >=24h separation; K=5 deterministic nearest, earlier tie-break, reuse allowed",
+    "uncertainty": "opportunity UTC-day cluster bootstrap, 2000 simulations, seed 37",
+    "support": "4h/8h future-range and max-excursion deltas >0; future-range bootstrap p05 >=-0.05 at both; Early/Late future-range deltas >0",
+    "falsify": "future-range and max-excursion deltas are <=0 at both horizons, or future-range p95 <=0 at both",
+    "otherwise": "INCONCLUSIVE_MECHANISM",
+    "below_gate": "INCONCLUSIVE_LOW_SAMPLE when fewer than 30 complete 8h events or 20 day clusters"
+  },
+  "early_late": {
+    "tuning_on_early": false,
+    "late_is_oos": false,
+    "required_h19": ["4h/8h signed medians", "bottom-top spread", "LONG/SHORT contributions"],
+    "required_h20": ["4h/8h pooled medians", "LONG/SHORT and setup-tag breakdown"]
+  },
+  "forward_derivatives_audit": {
+    "read_only": true,
+    "historical_hypothesis_input": false,
+    "checks": ["collector callable", "manifest/checksum logic", "independent field timestamps", "order book default disabled", "actual CSV coverage/samples/gaps if present"]
+  },
+  "prohibitions": {
+    "oi_basis_longshort_orderbook_alpha": false,
+    "rest_historical_backfill": false,
+    "fabrication_or_interpolation": false,
+    "cross_asset": false,
+    "funding_window_or_threshold_scan": false,
+    "horizon_selection": false,
+    "contrarian_rule_reversal": false,
+    "pnl_entry_stop_target_optimization": false,
+    "holdout": false,
+    "candidate_freeze": false
+  },
+  "recommendation_gate": {
+    "A_RECOMMEND_FUNDING_DIRECTION_PLUS_OPPORTUNITY_PROTOTYPE": "H19, H20, and H21 all SUPPORTED",
+    "B_RECOMMEND_FUNDING_DIRECTION_FOLLOWUP": "H19 SUPPORTED and H20/H21 inconclusive rather than falsified",
+    "C_RECOMMEND_NEXT_NEW_FEATURE_FAMILY_CROSS_ASSET": "H19 FALSIFIED",
+    "D_INCONCLUSIVE_CONTINUE_FUNDING_DIAGNOSTIC": "genuine unresolved data/statistical mechanism",
+    "candidate_freeze": false,
+    "holdout_consumption": false
+  }
+}
