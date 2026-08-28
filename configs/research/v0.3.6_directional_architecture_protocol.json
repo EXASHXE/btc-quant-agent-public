@@ -1,0 +1,173 @@
+{
+  "protocol_id": "btc-quant-agent-v0.3.6-directional-architecture-reset-v1",
+  "scope": {
+    "symbol": "BTCUSDT",
+    "market": "BINANCE_USDM_PERPETUAL",
+    "development_start": "2021-01-01T00:00:00Z",
+    "development_end_exclusive": "2026-02-01T00:00:00Z",
+    "early_development": "[2021-01-01T00:00:00Z, 2024-01-01T00:00:00Z)",
+    "late_internal_confirmation": "[2024-01-01T00:00:00Z, 2026-02-01T00:00:00Z)",
+    "holdout": "[2026-02-01T00:00:00Z, 2026-08-01T00:00:00Z)",
+    "holdout_forbidden": true,
+    "incomplete_future_windows": "exclude when the full horizon would reach development_end_exclusive"
+  },
+  "frozen_control": {
+    "strategy_version": "0.2.2",
+    "feature_version": "0.2.2",
+    "validation_status": "EXPERIMENTAL",
+    "execution_mode": "disabled",
+    "auto_execute": false,
+    "allow_live": false,
+    "candidate_freeze": false,
+    "paper_testnet_live": false,
+    "derivatives_alpha": false,
+    "order_book_factor": false,
+    "seed": 36,
+    "bootstrap_simulations": 2000,
+    "parameter_scan": false,
+    "pnl_selection": false,
+    "reverse_failed_signal": false
+  },
+  "episode_event": {
+    "source": "closed 1h bars resampled causally from canonical 1m data",
+    "regime": "frozen classify_regime using EMA(25/99), five-bar slopes, ADX(14)>=20, ATR-percentile<0.9, and confirmed 1h structure HH_HL or LH_LL",
+    "onset": "first closed 1h bar whose state is TREND_UP or TREND_DOWN when the preceding eligible closed 1h state is not the same trend direction",
+    "end": "last consecutive closed 1h bar in that identical trend state",
+    "anchor_timestamp": "onset 1h close_time_ms + 1; all features use bars with close_time_ms <= onset close_time_ms",
+    "direction": "TREND_UP=LONG; TREND_DOWN=SHORT",
+    "episode_id": "EP:<anchor_timestamp_ms>:<direction>",
+    "primary_unit": "episode onset",
+    "secondary_unit": "closed continuation bars clustered by episode_id",
+    "atr_normalizer": "frozen 1h ATR(14) at episode onset",
+    "atr_decile": "min(9, floor(frozen 1h ATR percentile * 10))"
+  },
+  "frozen_features": {
+    "macro_4h_aligned": "frozen macro_aligned on the latest closed 4h features at onset: LONG close>EMA25>EMA99 with EMA25 slope>0 and EMA99 slope>=0; SHORT exact mirror",
+    "structure_15m_aligned": "latest closed 15m frozen confirmed-pivot structure is HH_HL for LONG or LH_LL for SHORT; pivot_left=2 and pivot_right=2, so only pivots confirmed by the anchor are visible",
+    "rsi_15m_aligned": "latest closed 15m RSI(14) is in frozen LONG [45,72] or SHORT [28,55] range",
+    "roc_15m_aligned": "latest closed 15m ROC(12)>0 for LONG or <0 for SHORT",
+    "momentum_both_aligned": "rsi_15m_aligned AND roc_15m_aligned",
+    "no_threshold_changes": true
+  },
+  "future_labels": {
+    "horizons_minutes": [60, 120, 240, 480, 720],
+    "primary_horizons_minutes": [240, 480],
+    "reference": "episode onset 1h close",
+    "signed_close_return_atr": "LONG=(future close-reference)/onset ATR; SHORT=(reference-future close)/onset ATR",
+    "mfe_mae": "nonnegative direction-aware favorable and adverse extremes divided by onset ATR",
+    "reach_atr": [1.0, 1.5, 2.5],
+    "holdout_firewall": "the read ends before development_end_exclusive and every complete label requires anchor+horizon < development_end_exclusive"
+  },
+  "h14_nulls": {
+    "permutation": {
+      "construction": "within each year and onset 1h ATR decile, deterministically permute LONG/SHORT labels using seed 36; observed label multiset and frequency in every stratum are preserved",
+      "comparison": "real direction signed return minus signed return under permuted direction",
+      "simulations": 2000
+    },
+    "matched_opposite": {
+      "matching": ["same year", "same onset 1h ATR decile", "opposite regime direction", "at least 24h absolute anchor separation"],
+      "k": 1,
+      "selection": "nearest absolute anchor time, earlier anchor tie-break, control reuse allowed",
+      "comparison": "candidate future raw path scored in candidate direction minus matched opposite episode future path scored in its own frozen regime direction"
+    },
+    "bootstrap": "episode-cluster resampling with replacement, 2000 simulations, seed 36, p05/p50/p95",
+    "stability": ["LONG/SHORT split", "year split", "leave-one-year-out", "Early/Late fixed split"]
+  },
+  "increment_matching": {
+    "H15_macro": "aligned vs not aligned at episode onset; same year, direction and 1h ATR decile; K=1 nearest time with >=24h separation",
+    "H16_structure": "confirmed structure aligned vs non-confirming/inconsistent; same year, direction and 1h ATR decile; K=1 nearest time with >=24h separation",
+    "H17_rsi": "RSI aligned vs non-aligned; same year, direction and 1h ATR decile; K=1 nearest time with >=24h separation",
+    "H17_roc": "ROC aligned vs non-aligned; same year, direction and 1h ATR decile; K=1 nearest time with >=24h separation",
+    "H17_both": "both RSI+ROC aligned vs not-both; same year, direction and 1h ATR decile; K=1 nearest time with >=24h separation",
+    "matching_uses_future_labels": false,
+    "delta": "median(aligned)-median(matched non-aligned), except reach metrics use rate difference",
+    "bootstrap": "matched episode-pair cluster, 2000 simulations, seed 36"
+  },
+  "direction_ladder": {
+    "D0": "1h trend-regime episode direction",
+    "D1": "D0 AND frozen 4h macro aligned",
+    "D2": "D1 AND frozen confirmed 15m structure aligned",
+    "D3": "D2 AND frozen RSI and ROC both aligned",
+    "nested_required": true,
+    "reported_metrics": ["count", "4h/8h signed return", "MFE", "MAE", "reach rates", "year/direction stability"],
+    "selection_hierarchy": "If H14 is not SUPPORTED choose NONE. Otherwise start D0 and add D1, D2, then D3 only when the adjacent layer has >=30 complete 4h episodes, 4h and 8h signed-return deltas are nonnegative, both bootstrap p05 are >=-0.10 ATR, Early and Late adjacent deltas are nonnegative, and neither LONG nor SHORT 4h/8h median signed return becomes negative. Stop at the first failing layer.",
+    "not_a_strategy_arm": true,
+    "pnl_forbidden": true
+  },
+  "opportunity_layer": {
+    "events": {
+      "BR_PATTERN": "frozen v0.3.5 raw breakout-retest pattern events before factor/risk gates",
+      "TP_PATTERN": "frozen v0.3.3 raw trend-pullback pattern events before factor/risk gates"
+    },
+    "controls": "for each setup separately, K=5 non-pattern 15m trend-regime decision controls matched on year, regime direction, frozen 15m ATR decile and >=24h separation; deterministic nearest time and control reuse allowed",
+    "direction_agnostic": true,
+    "horizons_minutes": [240, 480],
+    "metrics": {
+      "future_range_atr": "(max future high-min future low)/anchor 15m ATR",
+      "max_excursion_atr": "max(abs(max future high-reference), abs(min future low-reference))/anchor ATR",
+      "mfe_plus_mae_atr": "direction-aware MFE+MAE, algebraically movement magnitude and not direction correctness",
+      "absolute_close_return_atr": "abs(future close-reference)/anchor ATR",
+      "movement_reach": [1.5, 2.5]
+    },
+    "bootstrap": "event plus matched controls cluster, 2000 simulations, seed 36",
+    "setup_support_rule": "at 4h and 8h, future_range_atr, max_excursion_atr and movement>=1.5 deltas are all >0; future_range bootstrap p05 >=-0.05 at both horizons; future_range delta is >0 in Early and Late",
+    "setup_falsification_rule": "future_range_atr, max_excursion_atr and movement>=1.5 deltas are all <=0 at both primary horizons, or future_range bootstrap p95 <=0 at both",
+    "H18_rule": "SUPPORTED if BR_PATTERN or TP_PATTERN satisfies setup support; FALSIFIED if both satisfy setup falsification; otherwise INCONCLUSIVE_MECHANISM; fewer than 30 complete 4h events for both setups yields INCONCLUSIVE_LOW_SAMPLE"
+  },
+  "hypotheses": {
+    "allowed_verdicts": ["SUPPORTED", "FALSIFIED", "INCONCLUSIVE_LOW_SAMPLE", "INCONCLUSIVE_MECHANISM"],
+    "H14": {
+      "statement": "The frozen 1h TREND_UP/TREND_DOWN regime contains directional information at regime-episode onset.",
+      "sample_gate": "at least 100 complete 4h episodes, at least 30 LONG and 30 SHORT, and at least 50 matched-opposite pairs",
+      "support": "4h/8h real-minus-permutation and real-minus-matched-opposite signed deltas >0; all four p05 >=-0.05 ATR; LONG and SHORT real signed medians >0 at both horizons; every leave-one-year-out real-minus-permutation delta >0 at 4h/8h; Early and Late real-minus-permutation deltas >0 at both horizons",
+      "falsify": "real-minus-permutation 4h and 8h point deltas <=0, or both p95 <=0, or real direction signed medians <=0 at both primary horizons",
+      "otherwise": "INCONCLUSIVE_MECHANISM"
+    },
+    "H15": {
+      "statement": "Frozen 4h macro alignment adds directional information within 1h trend episode onsets.",
+      "sample_gate": "at least 30 complete 4h matched pairs",
+      "support": "4h/8h signed deltas >0; both p05 >=-0.05; Early/Late deltas nonnegative at both; at least four leave-one-year-out horizon-pairs are positive",
+      "falsify": "4h/8h signed deltas <=0 or both p95 <=0",
+      "otherwise": "INCONCLUSIVE_MECHANISM"
+    },
+    "H16": {
+      "statement": "Frozen confirmed 15m structure alignment adds directional information within 1h trend episode onsets.",
+      "sample_gate": "at least 30 complete 4h matched pairs",
+      "support": "same deterministic gate as H15",
+      "falsify": "same deterministic gate as H15",
+      "otherwise": "INCONCLUSIVE_MECHANISM"
+    },
+    "H17": {
+      "statement": "Frozen RSI and/or ROC alignment adds directional information within 1h trend episode onsets.",
+      "component_gate": "each RSI, ROC and both comparison independently requires 30 complete 4h matched pairs; otherwise that component is INCONCLUSIVE_LOW_SAMPLE",
+      "component_support": "same deterministic gate as H15",
+      "component_falsify": "same deterministic gate as H15",
+      "overall": "SUPPORTED if the preregistered both-aligned component is SUPPORTED; FALSIFIED if all evaluable components are FALSIFIED; INCONCLUSIVE_LOW_SAMPLE if both-aligned is low sample and no component supports; otherwise INCONCLUSIVE_MECHANISM"
+    },
+    "H18": {
+      "statement": "Existing TP/BR patterns detect elevated future movement even though they do not provide reliable direction.",
+      "verdict": "fixed by opportunity_layer.H18_rule"
+    }
+  },
+  "final_recommendation": {
+    "RECOMMEND_DIRECTION_PLUS_OPPORTUNITY_PROTOTYPE": "H14 SUPPORTED, proposed architecture not NONE, Late real direction remains positive, and H18 SUPPORTED",
+    "RECOMMEND_DIRECTION_ONLY_PROTOTYPE": "H14 SUPPORTED, proposed architecture not NONE, Late real direction remains positive, and H18 FALSIFIED",
+    "RECOMMEND_NEW_FEATURE_FAMILY_RESEARCH": "H14 FALSIFIED or proposed architecture NONE because the frozen price-only Direction foundation has no stable information",
+    "INCONCLUSIVE_CONTINUE_ARCHITECTURE_DIAGNOSTIC": "all other outcomes",
+    "candidate_research": false,
+    "holdout_consumption": false
+  },
+  "prohibitions": {
+    "ema_adx_atr_regime_changes": false,
+    "swing_pivot_changes": false,
+    "rsi_roc_changes": false,
+    "new_indicator_selection": false,
+    "reverse_tp_br_trading": false,
+    "rr_stop_target_ttl_scan": false,
+    "pnl_backtest_selection": false,
+    "machine_learning": false,
+    "fabricated_historical_features": false,
+    "holdout": false,
+    "candidate_freeze": false
+  }
+}
