@@ -646,6 +646,7 @@ def run_v035_breakout_qualification(
             "risk_pass": sum(
                 int(row["year"]) == year
                 and row["direction"] == direction
+                and bool(row["post_factor"])
                 and bool(row["frozen_risk_plan_pass"])
                 for row in candidates
             ),
