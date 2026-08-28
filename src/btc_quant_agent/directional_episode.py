@@ -32,7 +32,10 @@ class EpisodeAccumulator:
                 row["end_close_ms"] = close_ms
                 row["duration_bars"] = int(row["duration_bars"]) + 1
                 row["duration_hours"] = int(row["duration_bars"])
-            if self.active_index is not None:
+            if (
+                self.active_index is not None
+                and int(self.rows[self.active_index]["duration_bars"]) >= 2
+            ):
                 episode = self.rows[self.active_index]
                 continuation = dict(snapshot)
                 continuation["episode_id"] = episode["episode_id"]

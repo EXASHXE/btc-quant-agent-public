@@ -65,9 +65,18 @@ def test_regime_episode_construction_is_causal() -> None:
     assert len(accumulator.rows) == 2
     assert accumulator.rows[0]["duration_hours"] == 2
     assert accumulator.rows[1]["duration_hours"] == 1
-    assert len(accumulator.continuation_rows) == 3
-    assert accumulator.continuation_rows[1]["episode_id"] == accumulator.rows[0]["episode_id"]
-    assert accumulator.continuation_rows[1]["continuation_index"] == 1
+    assert len(accumulator.continuation_rows) == 1
+    assert accumulator.continuation_rows[0]["episode_id"] == accumulator.rows[0]["episode_id"]
+    assert accumulator.continuation_rows[0]["continuation_index"] == 1
+
+
+def test_continuation_semantics_do_not_count_onset_as_continuation() -> None:
+    accumulator = EpisodeAccumulator()
+    first = DEV_START_MS + 10 * 3_600_000 - 1
+    accumulator.add(_snapshot(first, "TREND_UP", "LONG"))
+    assert accumulator.continuation_rows == []
+    accumulator.add(_snapshot(first + 3_600_000, "TREND_UP", "LONG"))
+    assert [row["continuation_index"] for row in accumulator.continuation_rows] == [1]
 
 
 def test_episode_has_no_future_feature_access() -> None:
