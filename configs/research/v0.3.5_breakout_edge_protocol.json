@@ -1,0 +1,251 @@
+{
+  "protocol_id": "btc-quant-agent-v0.3.5-breakout-edge-qualification-v1",
+  "scope": {
+    "symbol": "BTCUSDT",
+    "market": "BINANCE_USDM_PERPETUAL",
+    "development_start": "2021-01-01T00:00:00Z",
+    "development_end_exclusive": "2026-02-01T00:00:00Z",
+    "holdout_start": "2026-02-01T00:00:00Z",
+    "holdout_end_exclusive": "2026-08-01T00:00:00Z",
+    "holdout_forbidden": true,
+    "tp_status": "TP_RESEARCH_SUSPENDED_AFTER_V0.3.4"
+  },
+  "control": {
+    "strategy_version": "0.2.2",
+    "feature_version": "0.2.2",
+    "validation_status": "EXPERIMENTAL",
+    "execution_mode": "disabled",
+    "auto_execute": false,
+    "allow_live": false,
+    "derivatives_alpha": false,
+    "order_book_factor": false,
+    "rr_min": 1.8,
+    "ttl_minutes": 45,
+    "max_signal_age_bars": 3,
+    "holding_minutes": 480,
+    "taker_fee_rate": 0.0005,
+    "slippage_bps_per_side": 2,
+    "funding_stress_rate": 0.0005,
+    "max_expected_funding_events": 2
+  },
+  "scope_definitions": {
+    "BR_PATTERN": "frozen breakout_retest returns a candidate at the decision close, before factor and risk gates",
+    "BR_POST_MACRO_RSI": "BR_PATTERN with frozen 4h macro alignment and 15m RSI hard gates passed",
+    "BR_POST_FACTOR": "BR_PATTERN with frozen assess_factors blocked_reason=None (macro, RSI, factor score and positive-group chain)",
+    "BR_GROSS_RR_PASS": "BR_POST_FACTOR with gross RR >= 1.8",
+    "BR_AFTER_FEE_PASS": "BR_POST_FACTOR with RR after frozen round-trip fee >= 1.8",
+    "BR_AFTER_SLIPPAGE_PASS": "BR_POST_FACTOR with RR after fee and frozen slippage >= 1.8",
+    "BR_RISK_PASS": "BR_POST_FACTOR with frozen fee, slippage, funding reserve, notional and geometry plan passed",
+    "BR_HISTORICAL_FILLED": "frozen v0.2.2 event-driven baseline trade has entered_at_ms"
+  },
+  "expected_reference_counts": {
+    "br_pattern_approx": 546,
+    "br_post_factor": 185,
+    "br_gross_rr_pass": 63,
+    "br_after_fee_reference_approx": 44,
+    "br_after_slippage_reference_approx": 32,
+    "br_risk_pass": 14,
+    "br_historical_filled": 13,
+    "note": "current frozen code is authoritative; differences from approximate historical references are reported and never forced"
+  },
+  "funnel_stages": [
+    "BR_PATTERN",
+    "MACRO_ALIGNED",
+    "RSI_GATE",
+    "MOMENTUM_ROC_ALIGNED",
+    "PARTICIPATION_AVAILABLE",
+    "PARTICIPATION_PASS",
+    "FACTOR_SCORE_PASS",
+    "POSITIVE_GROUP_PASS",
+    "GROSS_RR_PASS",
+    "FEE_PASS",
+    "SLIPPAGE_PASS",
+    "FUNDING_PASS",
+    "RISK_PASS",
+    "FILLED",
+    "RESOLVED"
+  ],
+  "matched_controls": {
+    "k_per_candidate": 5,
+    "same_year": true,
+    "same_direction": true,
+    "same_1h_regime": true,
+    "atr_percentile_decile": true,
+    "exclude_any_br_pattern": true,
+    "min_bar_distance": 96,
+    "selection": "deterministic nearest absolute bar distance; earlier decision close tie-break",
+    "control_reuse_allowed": true,
+    "reuse_diagnostics": [
+      "unique_controls",
+      "total_matched_rows",
+      "reuse_distribution",
+      "max_reuse_count",
+      "effective_unique_control_ratio"
+    ]
+  },
+  "directionality": {
+    "reference": "decision close",
+    "horizons_minutes": [
+      60,
+      120,
+      240,
+      480,
+      720
+    ],
+    "primary_horizons_minutes": [
+      240,
+      480
+    ],
+    "metrics": [
+      "signed_return_atr",
+      "mfe_atr",
+      "mae_atr",
+      "mfe_mae_ratio",
+      "reach_1_0",
+      "reach_1_5",
+      "reach_2_5"
+    ],
+    "incomplete_rule": "exclude any window whose end is after development_end_exclusive",
+    "bootstrap": {
+      "unit": "candidate plus its matched controls",
+      "simulations": 2000,
+      "seed": 35,
+      "ci": [
+        "p05",
+        "p50",
+        "p95"
+      ]
+    },
+    "leave_one_year_out": [
+      240,
+      480
+    ]
+  },
+  "gate_ladder": {
+    "nested_stages": [
+      "S1_BR_PATTERN",
+      "S2_MACRO_RSI_PASS",
+      "S3_BR_POST_FACTOR",
+      "S4_GROSS_RR_PASS",
+      "S5_BR_RISK_PASS"
+    ],
+    "adjacent_deltas": [
+      "S2-S1",
+      "S3-S2",
+      "S4-S3",
+      "S5-S4"
+    ],
+    "interpretation": "observational selection attribution, not causal"
+  },
+  "near_miss": {
+    "gates": [
+      "MOMENTUM_ROC",
+      "PARTICIPATION",
+      "FACTOR_SCORE",
+      "GROSS_RR"
+    ],
+    "matching": [
+      "same_year",
+      "same_direction",
+      "same_setup",
+      "same_atr_decile",
+      "minimum_96_bar_distance"
+    ],
+    "k_per_pass": 1,
+    "no_future_label_matching": true,
+    "gross_rr_near_miss": "post-factor, valid geometry, gross RR <1.8; nearest gross RR below 1.8 after identity matching",
+    "small_sample_gate": 20
+  },
+  "rr_relationship": {
+    "threshold_scan": false,
+    "metrics": [
+      "pearson_gross_rr_signed_return",
+      "spearman_gross_rr_signed_return",
+      "pearson_net_rr_signed_return",
+      "spearman_net_rr_signed_return",
+      "rr_mfe_mae"
+    ],
+    "horizons_minutes": [
+      240,
+      480
+    ]
+  },
+  "trade_audit": {
+    "baseline_source": "immutable v0.2.2 Development run artifact, identity/hash verified",
+    "risk_pass_lifecycle_count": 14,
+    "baseline_trade_count": 13,
+    "loss_paths": {
+      "immediate_failure": "LOSS with MFE <0.5R",
+      "favorable_then_reversal": "LOSS with MFE >=0.5R",
+      "reached_1r_then_stopped": "LOSS with MFE >=1.0R",
+      "timeout": "TIMEOUT"
+    }
+  },
+  "hypotheses": {
+    "allowed_verdicts": [
+      "SUPPORTED",
+      "FALSIFIED",
+      "INCONCLUSIVE_LOW_SAMPLE",
+      "INCONCLUSIVE_MECHANISM"
+    ],
+    "H11": {
+      "statement": "BR pattern candidates contain incremental directional information beyond same trend regime and volatility bucket",
+      "gate": "at least 100 complete 4h candidates and mean controls >=3",
+      "support": "4h and 8h signed-return deltas >0; both bootstrap p05 >=-0.05 ATR; +1 ATR reach deltas >0; every leave-one-year-out 4h/8h delta >0",
+      "falsify": "both 4h and 8h signed-return deltas <=0, or both bootstrap p95 <=0",
+      "otherwise": "INCONCLUSIVE_MECHANISM"
+    },
+    "H12": {
+      "statement": "Frozen non-risk factor gates improve BR directional quality beyond raw BR pattern",
+      "gate": "at least 100 BR patterns and at least 30 post-factor candidates with complete 4h labels",
+      "support": "post-factor minus pattern signed-return delta >0 at 4h and 8h, both cluster-bootstrap p05 >=-0.05 ATR, +1 ATR reach delta nonnegative at both, and positive direction in at least four complete years",
+      "falsify": "post-factor minus pattern signed-return delta <=0 at both 4h and 8h, or bootstrap p95 <=0 at both",
+      "otherwise": "INCONCLUSIVE_MECHANISM"
+    },
+    "H13": {
+      "statement": "RR/risk gate has useful directional selection value beyond merely enlarging payoff geometry",
+      "gate": "at least 20 final risk-pass candidates with complete 4h labels",
+      "support": "risk-pass minus post-factor signed-return delta >0 at 4h and 8h with p05 >=-0.05 and positive multi-year evidence",
+      "falsify_when_evaluable": "at least 20 risk-pass candidates and both 4h/8h deltas <=0",
+      "below_20": "INCONCLUSIVE_LOW_SAMPLE"
+    }
+  },
+  "recommendation_gate": {
+    "H11_falsified": "RECOMMEND_STRATEGY_ARCHITECTURE_RESET",
+    "H11_supported_H12_falsified": "RECOMMEND_BR_FOR_MINIMAL_MECHANISM_RESEARCH",
+    "H11_H12_supported_H13_not_supported": "RECOMMEND_BR_FOR_MINIMAL_MECHANISM_RESEARCH",
+    "all_supported_year_stable": "RECOMMEND_BR_FOR_CANDIDATE_RESEARCH",
+    "otherwise": "INCONCLUSIVE_CONTINUE_DIAGNOSTIC",
+    "candidate_freeze": false,
+    "holdout_consumption": false
+  },
+  "prohibitions": {
+    "parameter_search": false,
+    "pnl_based_stage_selection": false,
+    "breakout_distance_change": false,
+    "retest_tolerance_change": false,
+    "pivot_lookback_change": false,
+    "ema_change": false,
+    "rsi_change": false,
+    "factor_threshold_change": false,
+    "positive_groups_change": false,
+    "rr_change": false,
+    "stop_buffer_change": false,
+    "target_fallback_change": false,
+    "holding_change": false,
+    "ttl_change": false,
+    "new_indicator": false,
+    "machine_learning": false,
+    "derivatives_alpha": false,
+    "order_book": false,
+    "holdout_consumption": false,
+    "candidate_freeze": false,
+    "live_execution": false
+  },
+  "overall_allowed_status": [
+    "BREAKOUT_EDGE_QUALIFICATION_COMPLETE",
+    "BREAKOUT_EDGE_QUALIFICATION_BLOCKED"
+  ],
+  "random_seed": 35
+}
+
