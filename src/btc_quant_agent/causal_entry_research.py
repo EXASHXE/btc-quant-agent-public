@@ -469,7 +469,7 @@ def match_controls(
     eligible_pool: dict[tuple[int, str, str, int], list[dict[str, Any]]] = {}
     timestamp_to_pool = {int(row["timestamp_ms"]): row for row in control_pool}
     for control in control_pool:
-        if control["is_tp_pattern"]:
+        if control.get("is_excluded_pattern", control.get("is_tp_pattern", False)):
             continue
         key = (
             int(control["year"]),

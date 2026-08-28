@@ -9,6 +9,8 @@ import pytest
 from btc_quant_agent.breakout_edge_research import (
     EXPECTED,
     _development_only,
+    _h12_verdict,
+    _h13_verdict,
     _pearson,
     _spearman,
     _stage_delta,
@@ -52,7 +54,7 @@ def _candidate(timestamp: int, *, is_pattern: bool, decile: int = 4) -> dict[str
         "atr": 2.0,
         "atr_decile": decile,
         "close": 100.0,
-        "is_tp_pattern": is_pattern,
+        "is_excluded_pattern": is_pattern,
     }
 
 
@@ -65,7 +67,48 @@ def test_br_matched_controls_exclude_br_patterns() -> None:
     ]
     matches = match_controls([candidate], pool)
     assert len(matches) == 5
-    assert all(not row["is_tp_pattern"] for row in matches)
+    assert all(not row["is_excluded_pattern"] for row in matches)
+
+
+def _verdict_inputs(value: float = 0.1) -> tuple[dict[str, object], dict[str, object]]:
+    deltas = {
+        horizon: {"signed_return_atr": value, "reach_1_0": value}
+        for horizon in ("240m", "480m")
+    }
+    bootstrap = {
+        horizon: {"p05": -0.04, "p50": value, "p95": 0.2}
+        for horizon in ("240m", "480m")
+    }
+    return deltas, bootstrap
+
+
+def test_v035_h12_verdict_matches_protocol() -> None:
+    deltas, bootstrap = _verdict_inputs()
+    assert _h12_verdict(
+        deltas,
+        bootstrap,
+        pattern_complete_4h=100,
+        post_factor_complete_4h=30,
+        positive_complete_years=4,
+    ) == "SUPPORTED"
+    deltas["240m"]["reach_1_0"] = -0.01  # type: ignore[index]
+    assert _h12_verdict(
+        deltas,
+        bootstrap,
+        pattern_complete_4h=100,
+        post_factor_complete_4h=30,
+        positive_complete_years=4,
+    ) == "INCONCLUSIVE_MECHANISM"
+
+
+def test_v035_h13_uses_sample_gate_not_hardcode() -> None:
+    deltas, bootstrap = _verdict_inputs()
+    assert _h13_verdict(
+        deltas, bootstrap, risk_complete_4h=14, positive_complete_years=4
+    ) == "INCONCLUSIVE_LOW_SAMPLE"
+    assert _h13_verdict(
+        deltas, bootstrap, risk_complete_4h=20, positive_complete_years=4
+    ) == "SUPPORTED"
 
 
 def test_br_controls_match_year_direction_regime_atr() -> None:

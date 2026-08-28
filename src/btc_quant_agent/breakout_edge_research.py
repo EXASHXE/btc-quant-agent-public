@@ -153,6 +153,7 @@ def _stage_bootstrap(
     *,
     seed: int,
     simulations: int = BOOTSTRAP_SIMULATIONS,
+    reference_ids: set[str] | None = None,
 ) -> dict[str, Any]:
     clusters: dict[str, list[dict[str, Any]]] = collections.defaultdict(list)
     for row in pattern_labels:
@@ -164,9 +165,10 @@ def _stage_bootstrap(
         values: list[float] = []
         for _ in range(simulations):
             sample_ids = [rng.choice(ids) for _ in ids]
-            all_values = [
+            reference_values = [
                 float(row["signed_return_atr"])
                 for identity in sample_ids
+                if reference_ids is None or identity in reference_ids
                 for row in clusters[identity]
                 if row["horizon_minutes"] == horizon and not row["incomplete"]
             ]
@@ -177,8 +179,10 @@ def _stage_bootstrap(
                 for row in clusters[identity]
                 if row["horizon_minutes"] == horizon and not row["incomplete"]
             ]
-            if all_values and selected:
-                values.append(statistics.median(selected) - statistics.median(all_values))
+            if reference_values and selected:
+                values.append(
+                    statistics.median(selected) - statistics.median(reference_values)
+                )
         output[f"{horizon}m"] = {
             "p05": _percentile(values, 0.05),
             "p50": _percentile(values, 0.50),
@@ -526,6 +530,98 @@ def _h11(summary: dict[str, Any], bootstrap: dict[str, Any], loyo: dict[str, Any
     return "INCONCLUSIVE_MECHANISM"
 
 
+def _h12_verdict(
+    deltas: dict[str, Any],
+    bootstrap: dict[str, Any],
+    *,
+    pattern_complete_4h: int,
+    post_factor_complete_4h: int,
+    positive_complete_years: int,
+) -> str:
+    """Apply every H12 gate exactly as preregistered in the v0.3.5 protocol."""
+    if pattern_complete_4h < 100 or post_factor_complete_4h < 30:
+        return "INCONCLUSIVE_LOW_SAMPLE"
+    d4 = float(deltas["240m"]["signed_return_atr"])
+    d8 = float(deltas["480m"]["signed_return_atr"])
+    if (d4 <= 0 and d8 <= 0) or (
+        float(bootstrap["240m"]["p95"]) <= 0
+        and float(bootstrap["480m"]["p95"]) <= 0
+    ):
+        return "FALSIFIED"
+    if (
+        d4 > 0
+        and d8 > 0
+        and float(bootstrap["240m"]["p05"]) >= -0.05
+        and float(bootstrap["480m"]["p05"]) >= -0.05
+        and float(deltas["240m"]["reach_1_0"]) >= 0
+        and float(deltas["480m"]["reach_1_0"]) >= 0
+        and positive_complete_years >= 4
+    ):
+        return "SUPPORTED"
+    return "INCONCLUSIVE_MECHANISM"
+
+
+def _h13_verdict(
+    deltas: dict[str, Any],
+    bootstrap: dict[str, Any],
+    *,
+    risk_complete_4h: int,
+    positive_complete_years: int,
+) -> str:
+    """Evaluate H13 through its sample gate instead of hard-coding the current verdict."""
+    if risk_complete_4h < 20:
+        return "INCONCLUSIVE_LOW_SAMPLE"
+    d4 = float(deltas["240m"]["signed_return_atr"])
+    d8 = float(deltas["480m"]["signed_return_atr"])
+    if d4 <= 0 and d8 <= 0:
+        return "FALSIFIED"
+    if (
+        d4 > 0
+        and d8 > 0
+        and float(bootstrap["240m"]["p05"]) >= -0.05
+        and float(bootstrap["480m"]["p05"]) >= -0.05
+        and positive_complete_years >= 4
+    ):
+        return "SUPPORTED"
+    return "INCONCLUSIVE_MECHANISM"
+
+
+def _positive_stage_years(
+    labels: Sequence[dict[str, Any]], selected_ids: set[str]
+) -> int:
+    years = sorted({int(row["year"]) for row in labels})
+    positive = 0
+    for year in years:
+        complete = [
+            row
+            for row in labels
+            if int(row["year"]) == year
+            and row["horizon_minutes"] in {240, 480}
+            and not row["incomplete"]
+        ]
+        if not complete:
+            continue
+        deltas: list[float] = []
+        for horizon in (240, 480):
+            all_values = [
+                float(row["signed_return_atr"])
+                for row in complete
+                if row["horizon_minutes"] == horizon
+            ]
+            selected_values = [
+                float(row["signed_return_atr"])
+                for row in complete
+                if row["horizon_minutes"] == horizon
+                and str(row["candidate_id"]) in selected_ids
+            ]
+            if not all_values or not selected_values:
+                break
+            deltas.append(statistics.median(selected_values) - statistics.median(all_values))
+        if len(deltas) == 2 and all(delta > 0 for delta in deltas):
+            positive += 1
+    return positive
+
+
 def _leave_one_year_out(rows: Sequence[dict[str, Any]]) -> dict[str, Any]:
     years = sorted({int(row["year"]) for row in rows if row["kind"] == "CANDIDATE"})
     return {
@@ -572,7 +668,10 @@ def run_v035_breakout_qualification(
     candidates = list(result["breakout_qualification_rows"])
     pattern_times = {int(row["timestamp_ms"]) for row in candidates}
     pool = [
-        {**row, "is_tp_pattern": int(row["timestamp_ms"]) in pattern_times}
+        {
+            **row,
+            "is_excluded_pattern": int(row["timestamp_ms"]) in pattern_times,
+        }
         for row in result["trend_control_rows"]
     ]
     counts = {
@@ -605,6 +704,14 @@ def run_v035_breakout_qualification(
     )
     near_matches, near_summary = _match_gate_near_misses(candidates, series)
     risk_pass = [row for row in candidates if row["post_factor"] and row["frozen_risk_plan_pass"]]
+    risk_ids = {str(row["candidate_id"]) for row in risk_pass}
+    h13_bootstrap = _stage_bootstrap(
+        pattern_labels, risk_ids, seed=seed, reference_ids=post_ids
+    )
+    h13_deltas = _stage_delta(
+        gate_ladder["stages"]["S5_BR_RISK_PASS"],
+        gate_ladder["stages"]["S3_BR_POST_FACTOR"],
+    )
     lifecycle, trade_audit, loss_paths = _baseline_audit(risk_pass, series, Path(baseline_dir))
     counts["BR_HISTORICAL_FILLED"] = len(trade_audit)
     if counts != EXPECTED:
@@ -612,20 +719,21 @@ def run_v035_breakout_qualification(
             f"BREAKOUT_EDGE_QUALIFICATION_BLOCKED counts={counts} expected={EXPECTED}"
         )
     h11 = _h11(directionality, bootstrap, loyo)
-    d4 = float(h12_deltas["240m"]["signed_return_atr"])
-    d8 = float(h12_deltas["480m"]["signed_return_atr"])
-    if d4 <= 0 and d8 <= 0:
-        h12 = "FALSIFIED"
-    elif (
-        d4 > 0
-        and d8 > 0
-        and float(h12_bootstrap["240m"]["p05"]) >= -0.05
-        and float(h12_bootstrap["480m"]["p05"]) >= -0.05
-    ):
-        h12 = "SUPPORTED"
-    else:
-        h12 = "INCONCLUSIVE_MECHANISM"
-    h13 = "INCONCLUSIVE_LOW_SAMPLE"
+    h12 = _h12_verdict(
+        h12_deltas,
+        h12_bootstrap,
+        pattern_complete_4h=int(gate_ladder["stages"]["S1_BR_PATTERN"]["240m"]["count"]),
+        post_factor_complete_4h=int(
+            gate_ladder["stages"]["S3_BR_POST_FACTOR"]["240m"]["count"]
+        ),
+        positive_complete_years=_positive_stage_years(pattern_labels, post_ids),
+    )
+    h13 = _h13_verdict(
+        h13_deltas,
+        h13_bootstrap,
+        risk_complete_4h=int(gate_ladder["stages"]["S5_BR_RISK_PASS"]["240m"]["count"]),
+        positive_complete_years=_positive_stage_years(pattern_labels, risk_ids),
+    )
     recommendation = (
         "RECOMMEND_STRATEGY_ARCHITECTURE_RESET"
         if h11 == "FALSIFIED"
@@ -681,6 +789,8 @@ def run_v035_breakout_qualification(
             **gate_ladder,
             "post_factor_vs_pattern": h12_deltas,
             "post_factor_vs_pattern_bootstrap": h12_bootstrap,
+            "risk_pass_vs_post_factor": h13_deltas,
+            "risk_pass_vs_post_factor_bootstrap": h13_bootstrap,
         },
         "gate_near_miss_summary": near_summary,
         "rr_directionality_relationship": _rr_relationship(candidates, series),
