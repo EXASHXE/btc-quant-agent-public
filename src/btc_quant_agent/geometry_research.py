@@ -19,11 +19,13 @@ from typing import Any
 
 from .backtest import FundingEvent, resample
 from .config import AppConfig
+from .directional_episode import EpisodeAccumulator
 from .domain import Candle, Direction, Setup, TimeframeFeatures
 from .engine import HistoricalFeatureCache, QuantEngine
 from .funnel import SetupFunnelTrace, trace_setup_funnels
 from .indicators import ema
 from .mechanism import decompose_rr
+from .multifactor import macro_aligned
 from .regime import classify_regime
 from .research import DEV_END_MS, DEV_START_MS
 from .structure import confirmed_pivots
@@ -41,8 +43,7 @@ ZONE_SCAN_BARS = 40
 
 def assert_v033_development_only(rows: Sequence[dict[str, Any]]) -> None:
     if any(
-        int(row["timestamp_ms"]) < DEV_START_MS
-        or int(row["timestamp_ms"]) >= DEV_END_MS
+        int(row["timestamp_ms"]) < DEV_START_MS or int(row["timestamp_ms"]) >= DEV_END_MS
         for row in rows
     ):
         raise ValueError("v0.3.3 holdout firewall rejected artifact row")
@@ -83,10 +84,7 @@ def _split_distributions(
     for row in rows:
         groups.setdefault(str(row[split_field]), []).append(row)
     return {
-        key: {
-            field: _distribution(_values(items, field))
-            for field in fields
-        }
+        key: {field: _distribution(_values(items, field)) for field in fields}
         for key, items in sorted(groups.items())
     }
 
@@ -98,9 +96,7 @@ def _summary_block(
     splits: Sequence[str] = ("direction", "year"),
 ) -> dict[str, Any]:
     output: dict[str, Any] = {
-        "overall": {
-            field: _distribution(_values(rows, field)) for field in fields
-        },
+        "overall": {field: _distribution(_values(rows, field)) for field in fields},
     }
     for split in splits:
         output[f"by_{split}"] = _split_distributions(rows, fields, split)
@@ -122,9 +118,7 @@ def _frozen_cost_rate(frozen: AppConfig) -> float:
     )
 
 
-def _scan_back_streak(
-    condition: Callable[[int], bool], last: int, limit: int
-) -> int | None:
+def _scan_back_streak(condition: Callable[[int], bool], last: int, limit: int) -> int | None:
     first = max(0, last - limit + 1)
     index = last
     while index >= first and condition(index):
@@ -138,8 +132,7 @@ class _OneMinuteSeries:
 
     def __init__(self, candles_1m: Sequence[Candle]) -> None:
         if any(
-            bar.open_time_ms < DEV_START_MS or bar.open_time_ms >= DEV_END_MS
-            for bar in candles_1m
+            bar.open_time_ms < DEV_START_MS or bar.open_time_ms >= DEV_END_MS for bar in candles_1m
         ):
             raise ValueError("v0.3.3 excursion series rejects holdout rows")
         self.opens = [bar.open_time_ms for bar in candles_1m]
@@ -252,9 +245,7 @@ def _reachability_row(
     for index, (high, low) in enumerate(zip(highs, lows, strict=True)):
         if stop_idx is None and ((low <= frozen_stop) if long else (high >= frozen_stop)):
             stop_idx = index
-        if invalidation_idx is None and (
-            (low <= invalidation) if long else (high >= invalidation)
-        ):
+        if invalidation_idx is None and ((low <= invalidation) if long else (high >= invalidation)):
             invalidation_idx = index
         if (
             local_idx is None
@@ -287,9 +278,7 @@ def _reachability_row(
         "invalidation_first_touch_minutes": (
             invalidation_idx + 1 if invalidation_idx is not None else None
         ),
-        "local_extreme_first_touch_minutes": (
-            local_idx + 1 if local_idx is not None else None
-        ),
+        "local_extreme_first_touch_minutes": (local_idx + 1 if local_idx is not None else None),
     }
 
 
@@ -327,9 +316,7 @@ def _barrier_row(
         "timestamp_ms": row["timestamp_ms"],
         "year": row["year"],
         "first_confirmed_barrier_distance_atr": row["first_barrier_distance_atr"],
-        "confirmed_barriers_before_2_5_atr_target": row[
-            "confirmed_barriers_before_2_5_atr_target"
-        ],
+        "confirmed_barriers_before_2_5_atr_target": row["confirmed_barriers_before_2_5_atr_target"],
         "first_confirmed_barrier_reached_in_12h": reached_minutes is not None,
         "first_confirmed_barrier_reach_minutes": reached_minutes,
         "max_continuation_excursion_after_barrier_atr": continuation,
@@ -377,9 +364,7 @@ def _tp_geometry_row(
         for index, bar in enumerate(recent)
         if (bar.low if long else bar.high) == pullback_extreme
     )
-    touch_index = _zone_touch_index(
-        last_index, lows, highs, ema_mid_series, tolerance, long
-    )
+    touch_index = _zone_touch_index(last_index, lows, highs, ema_mid_series, tolerance, long)
     reclaim_index = _scan_back_streak(
         (
             (lambda index: closes[index] > ema_fast_series[index])
@@ -399,9 +384,7 @@ def _tp_geometry_row(
         else pullback_extreme + strategy.stop_atr_buffer * atr
     )
     diagnostic_risk = (
-        entry_midpoint - local_extreme_stop
-        if long
-        else local_extreme_stop - entry_midpoint
+        entry_midpoint - local_extreme_stop if long else local_extreme_stop - entry_midpoint
     )
     diagnostic_stop_distance_atr = diagnostic_risk / atr if atr > 0 else None
     reward = decomposition.reward_distance_usdt
@@ -430,37 +413,25 @@ def _tp_geometry_row(
         pivot.price
         for pivot in pivot_160
         if pivot.kind == ("HIGH" if long else "LOW")
-        and (
-            close < pivot.price < projected_25
-            if long
-            else projected_25 < pivot.price < close
-        )
+        and (close < pivot.price < projected_25 if long else projected_25 < pivot.price < close)
     )
     first_barrier = intermediate_barriers_25[0] if intermediate_barriers_25 else None
     break_overshoot = (
-        (latest.close - prior.high) / atr if long else (prior.low - latest.close) / atr
-    ) if atr > 0 else None
+        ((latest.close - prior.high) / atr if long else (prior.low - latest.close) / atr)
+        if atr > 0
+        else None
+    )
     decision_close_ms = latest.close_time_ms
     invalidation_distance = close - invalidation if long else invalidation - close
-    local_extreme_distance = (
-        close - pullback_extreme if long else pullback_extreme - close
-    )
-    ema25_touch_depth = (
-        ema_mid - pullback_extreme if long else pullback_extreme - ema_mid
-    )
+    local_extreme_distance = close - pullback_extreme if long else pullback_extreme - close
+    ema25_touch_depth = ema_mid - pullback_extreme if long else pullback_extreme - ema_mid
     touch_move = (
-        (close - closes[touch_index]) / atr
-        if touch_index is not None and atr > 0
-        else None
+        (close - closes[touch_index]) / atr if touch_index is not None and atr > 0 else None
     )
     reclaim_move = (
-        (close - closes[reclaim_index]) / atr
-        if reclaim_index is not None and atr > 0
-        else None
+        (close - closes[reclaim_index]) / atr if reclaim_index is not None and atr > 0 else None
     )
-    swing_extreme_gap = (
-        pullback_extreme - invalidation if long else invalidation - pullback_extreme
-    )
+    swing_extreme_gap = pullback_extreme - invalidation if long else invalidation - pullback_extreme
     return {
         "candidate_id": f"{now_ms}:TP:{candidate.direction.value}",
         "scope": (
@@ -469,9 +440,7 @@ def _tp_geometry_row(
             else "TP_PATTERN"
         ),
         "in_scope_a": True,
-        "in_scope_b": (
-            trace.factor is not None and trace.factor.blocked_reason is None
-        ),
+        "in_scope_b": (trace.factor is not None and trace.factor.blocked_reason is None),
         "setup": "TREND_PULLBACK",
         "direction": candidate.direction.value,
         "timestamp_ms": now_ms,
@@ -489,9 +458,7 @@ def _tp_geometry_row(
             invalidation_pivot.open_time_ms if invalidation_pivot is not None else None
         ),
         "invalidation_pivot_age_bars": (
-            last_index - invalidation_pivot.pivot_index
-            if invalidation_pivot is not None
-            else None
+            last_index - invalidation_pivot.pivot_index if invalidation_pivot is not None else None
         ),
         "invalidation_pivot_age_minutes": (
             (decision_close_ms - invalidation_pivot.open_time_ms) / 60_000.0
@@ -508,14 +475,20 @@ def _tp_geometry_row(
         "frozen_stop_distance_atr": decomposition.stop_distance_atr,
         "ema25_touch_depth_atr": ema25_touch_depth / atr if atr > 0 else None,
         "pullback_extreme_to_confirmed_swing_atr": swing_extreme_gap / atr if atr > 0 else None,
-        "pullback_extreme_to_final_close_atr": (
-            local_extreme_distance / atr if atr > 0 else None
-        ),
+        "pullback_extreme_to_final_close_atr": (local_extreme_distance / atr if atr > 0 else None),
         "ema25_to_final_close_atr": (
-            (close - ema_mid) / atr if long and atr > 0 else (ema_mid - close) / atr if atr > 0 else None
+            (close - ema_mid) / atr
+            if long and atr > 0
+            else (ema_mid - close) / atr
+            if atr > 0
+            else None
         ),
         "ema7_to_final_close_atr": (
-            (close - ema_fast) / atr if long and atr > 0 else (ema_fast - close) / atr if atr > 0 else None
+            (close - ema_fast) / atr
+            if long and atr > 0
+            else (ema_fast - close) / atr
+            if atr > 0
+            else None
         ),
         "first_ema25_zone_touch_bar_offset": (
             last_index - touch_index if touch_index is not None else None
@@ -527,15 +500,11 @@ def _tp_geometry_row(
             last_index - reclaim_index if reclaim_index is not None else None
         ),
         "first_ema7_reclaim_timestamp_ms": (
-            history_15m[reclaim_index].close_time_ms
-            if reclaim_index is not None
-            else None
+            history_15m[reclaim_index].close_time_ms if reclaim_index is not None else None
         ),
         "previous_extreme_break_timestamp_ms": decision_close_ms,
         "final_candidate_timestamp_ms": decision_close_ms,
-        "touch_to_candidate_bars": (
-            last_index - touch_index if touch_index is not None else None
-        ),
+        "touch_to_candidate_bars": (last_index - touch_index if touch_index is not None else None),
         "touch_to_candidate_minutes": (
             15 * (last_index - touch_index) if touch_index is not None else None
         ),
@@ -643,9 +612,7 @@ def _br_geometry_row(
     level_pivot = _match_pivot(pivot_160, "HIGH" if long else "LOW", level)
     return {
         "candidate_id": f"{now_ms}:BR:{candidate.direction.value}",
-        "scope": (
-            "BR_RISK_PASS" if decomposition.reject_reason == "PASS" else "BR_POST_FACTOR"
-        ),
+        "scope": ("BR_RISK_PASS" if decomposition.reject_reason == "PASS" else "BR_POST_FACTOR"),
         "in_scope_a": False,
         "in_scope_b": False,
         "setup": "BREAKOUT_RETEST",
@@ -709,9 +676,7 @@ def _br_qualification_row(
     decomposition = decompose_rr(candidate, features_15m.atr, frozen.strategy, frozen.risk)
     stages = {item.stage: item for item in trace.stages}
     momentum_aligned = (
-        features_15m.roc > 0
-        if candidate.direction == Direction.LONG
-        else features_15m.roc < 0
+        features_15m.roc > 0 if candidate.direction == Direction.LONG else features_15m.roc < 0
     )
     participation_score = factor.group_scores.get("participation_flow")
     return {
@@ -736,17 +701,14 @@ def _br_qualification_row(
         "rsi_pass": stages["BR_13_RSI"].predicate_passed,
         "momentum_roc_aligned": momentum_aligned,
         "participation_available": participation_score is not None,
-        "participation_pass": (
-            participation_score is not None and participation_score >= 50.0
-        ),
+        "participation_pass": (participation_score is not None and participation_score >= 50.0),
         "participation_score": participation_score,
         "factor_score": factor.score,
         "positive_groups": factor.positive_groups,
         "factor_score_pass": stages["BR_14_FACTOR_SCORE"].predicate_passed,
         "positive_groups_pass": stages["BR_15_POSITIVE_GROUPS"].predicate_passed,
         "post_macro_rsi": (
-            stages["BR_12_4H_MACRO"].predicate_passed
-            and stages["BR_13_RSI"].predicate_passed
+            stages["BR_12_4H_MACRO"].predicate_passed and stages["BR_13_RSI"].predicate_passed
         ),
         "post_factor": factor.blocked_reason is None,
         "factor_blocked_reason": factor.blocked_reason,
@@ -764,8 +726,7 @@ def _reach_rate(rows: Sequence[dict[str, Any]]) -> dict[str, Any]:
     reached = sum(bool(item["reached"]) for item in eligible)
     reached_before_stop = sum(bool(item["reached_before_stop"]) for item in eligible)
     stop_first = sum(
-        bool(item["reached"]) and not bool(item["reached_before_stop"])
-        for item in eligible
+        bool(item["reached"]) and not bool(item["reached_before_stop"]) for item in eligible
     )
     return {
         "eligible_candidates": len(eligible),
@@ -774,9 +735,7 @@ def _reach_rate(rows: Sequence[dict[str, Any]]) -> dict[str, Any]:
         "reached_before_stop": reached_before_stop,
         "stop_first": stop_first,
         "reached_rate": reached / len(eligible) if eligible else None,
-        "reached_before_stop_rate": (
-            reached_before_stop / len(eligible) if eligible else None
-        ),
+        "reached_before_stop_rate": (reached_before_stop / len(eligible) if eligible else None),
         "stop_first_rate": stop_first / len(eligible) if eligible else None,
     }
 
@@ -788,6 +747,7 @@ def run_v033_geometry_audit(
     *,
     capture_trend_controls: bool = False,
     capture_breakout_qualification: bool = False,
+    capture_directional_episodes: bool = False,
 ) -> dict[str, Any]:
     del funding_events
     if not candles_1m or candles_1m[0].open_time_ms != DEV_START_MS:
@@ -795,9 +755,7 @@ def run_v033_geometry_audit(
     if candles_1m[-1].close_time_ms >= DEV_END_MS:
         raise ValueError("v0.3.3 geometry audit rejects holdout rows")
     started = time.perf_counter()
-    completed = {
-        interval: resample(candles_1m, interval) for interval in ("15m", "1h", "4h")
-    }
+    completed = {interval: resample(candles_1m, interval) for interval in ("15m", "1h", "4h")}
     series = _OneMinuteSeries(candles_1m)
     del candles_1m
     frozen = replace(
@@ -811,15 +769,14 @@ def run_v033_geometry_audit(
         "1h": frozen.data.history_limit_1h,
         "4h": frozen.data.history_limit_4h,
     }
-    histories: dict[str, deque[Candle]] = {
-        name: deque(maxlen=limits[name]) for name in completed
-    }
+    histories: dict[str, deque[Candle]] = {name: deque(maxlen=limits[name]) for name in completed}
     cursors = {name: 0 for name in completed}
     engine = QuantEngine(frozen, HistoricalFeatureCache())
     tp_rows: list[dict[str, Any]] = []
     br_rows: list[dict[str, Any]] = []
     trend_control_rows: list[dict[str, Any]] = []
     breakout_qualification_rows: list[dict[str, Any]] = []
+    episode_accumulator = EpisodeAccumulator()
     denominator: Counter[str] = Counter()
     loop_started = time.perf_counter()
     for bar_index, decision_bar in enumerate(completed["15m"]):
@@ -849,6 +806,47 @@ def run_v033_geometry_audit(
         f1 = engine.diagnostic_features("1h", list(histories["1h"]))
         f15 = engine.diagnostic_features("15m", list(histories["15m"]))
         regime = classify_regime(f1, frozen.strategy)
+        if capture_directional_episodes:
+            current_regime = regime.value
+            direction = Direction.LONG if current_regime == "TREND_UP" else Direction.SHORT
+            anchor_ms = f1.bar_close_time_ms + 1
+            structure_aligned = (
+                f15.structure == "HH_HL"
+                if direction == Direction.LONG
+                else f15.structure == "LH_LL"
+            )
+            rsi_aligned = (
+                frozen.strategy.rsi_long_min <= f15.rsi <= frozen.strategy.rsi_long_max
+                if direction == Direction.LONG
+                else frozen.strategy.rsi_short_min <= f15.rsi <= frozen.strategy.rsi_short_max
+            )
+            roc_aligned = f15.roc > 0 if direction == Direction.LONG else f15.roc < 0
+            episode_accumulator.add(
+                {
+                    "episode_id": f"EP:{anchor_ms}:{direction.value}",
+                    "timestamp_ms": anchor_ms,
+                    "anchor_timestamp_ms": anchor_ms,
+                    "decision_close_ms": f1.bar_close_time_ms,
+                    "year": _year_of(anchor_ms),
+                    "direction": direction.value,
+                    "regime": current_regime,
+                    "close": f1.close,
+                    "atr": f1.atr,
+                    "atr_percentile": f1.atr_percentile,
+                    "atr_decile": min(9, int(f1.atr_percentile * 10)),
+                    "macro_4h_aligned": macro_aligned(f4, direction),
+                    "structure_15m": f15.structure,
+                    "structure_15m_aligned": structure_aligned,
+                    "rsi_15m": f15.rsi,
+                    "rsi_15m_aligned": rsi_aligned,
+                    "roc_15m": f15.roc,
+                    "roc_15m_aligned": roc_aligned,
+                    "momentum_both_aligned": rsi_aligned and roc_aligned,
+                    "feature_4h_close_ms": f4.bar_close_time_ms,
+                    "feature_1h_close_ms": f1.bar_close_time_ms,
+                    "feature_15m_close_ms": f15.bar_close_time_ms,
+                }
+            )
         denominator[str(regime)] += 1
         if regime.value not in {"TREND_UP", "TREND_DOWN"}:
             continue
@@ -876,18 +874,14 @@ def run_v033_geometry_audit(
                 }
             )
         history_15m = list(histories["15m"])
-        traces = trace_setup_funnels(
-            history_15m, f4, f1, f15, regime, frozen, scan_outcome
-        )
+        traces = trace_setup_funnels(history_15m, f4, f1, f15, regime, frozen, scan_outcome)
         for trace in traces:
             candidate = trace.candidate
             factor = trace.factor
             if candidate is None:
                 continue
             if candidate.setup == Setup.TREND_PULLBACK:
-                tp_rows.append(
-                    _tp_geometry_row(trace, history_15m, f15, frozen, now_ms, year)
-                )
+                tp_rows.append(_tp_geometry_row(trace, history_15m, f15, frozen, now_ms, year))
             else:
                 if capture_breakout_qualification and factor is not None:
                     breakout_qualification_rows.append(
@@ -896,9 +890,7 @@ def run_v033_geometry_audit(
                         )
                     )
                 if factor is not None and factor.blocked_reason is None:
-                    br_rows.append(
-                        _br_geometry_row(trace, history_15m, f15, frozen, now_ms, year)
-                    )
+                    br_rows.append(_br_geometry_row(trace, history_15m, f15, frozen, now_ms, year))
     loop_runtime = time.perf_counter() - loop_started
 
     tp_pattern = list(tp_rows)
@@ -1040,54 +1032,70 @@ def run_v033_geometry_audit(
             scope_rows = [
                 item
                 for item in excursion_rows
-                if item["horizon_minutes"] == horizon
-                and predicate(item)
-                and not item["incomplete"]
+                if item["horizon_minutes"] == horizon and predicate(item) and not item["incomplete"]
             ]
             block[scope] = {
                 field: _distribution(_values(scope_rows, field))
                 for field in (
-                    "mfe_atr", "mae_atr", "mfe_pct", "mae_pct",
-                    "mfe_stop_r", "mae_stop_r", "mfe_mae_ratio",
-                    "time_to_mfe_minutes", "time_to_mae_minutes",
+                    "mfe_atr",
+                    "mae_atr",
+                    "mfe_pct",
+                    "mae_pct",
+                    "mfe_stop_r",
+                    "mae_stop_r",
+                    "mfe_mae_ratio",
+                    "time_to_mfe_minutes",
+                    "time_to_mae_minutes",
                 )
             }
         mfe_mae_summary[f"{horizon}m"] = block
 
     tp_core_fields = (
-        "invalidation_pivot_age_bars", "invalidation_pivot_age_minutes",
-        "invalidation_distance_atr", "local_extreme_distance_atr",
-        "confirmed_swing_vs_local_extreme_gap_atr", "frozen_stop_distance_atr",
+        "invalidation_pivot_age_bars",
+        "invalidation_pivot_age_minutes",
+        "invalidation_distance_atr",
+        "local_extreme_distance_atr",
+        "confirmed_swing_vs_local_extreme_gap_atr",
+        "frozen_stop_distance_atr",
         "target_distance_atr",
     )
     lag_fields = (
-        "touch_to_candidate_bars", "touch_to_candidate_minutes",
+        "touch_to_candidate_bars",
+        "touch_to_candidate_minutes",
         "touch_to_candidate_price_move_atr",
         "ema7_reclaim_to_candidate_price_move_atr",
         "previous_extreme_break_overshoot_atr",
     )
     pullback_fields = (
-        "ema25_touch_depth_atr", "pullback_extreme_to_confirmed_swing_atr",
-        "pullback_extreme_to_final_close_atr", "ema25_to_final_close_atr",
-        "ema7_to_final_close_atr", "pullback_local_extreme_bar_offset",
-        "first_ema25_zone_touch_bar_offset", "first_ema7_reclaim_bar_offset",
+        "ema25_touch_depth_atr",
+        "pullback_extreme_to_confirmed_swing_atr",
+        "pullback_extreme_to_final_close_atr",
+        "ema25_to_final_close_atr",
+        "ema7_to_final_close_atr",
+        "pullback_local_extreme_bar_offset",
+        "first_ema25_zone_touch_bar_offset",
+        "first_ema7_reclaim_bar_offset",
     )
     target_fields = (
-        "target_distance_atr", "target_pivot_age_minutes",
-        "intermediate_confirmed_pivots_to_target", "required_reward_atr",
+        "target_distance_atr",
+        "target_pivot_age_minutes",
+        "intermediate_confirmed_pivots_to_target",
+        "required_reward_atr",
         "required_minus_actual_target_gap_atr",
         "reward_distance_atr_over_stop_distance_atr",
     )
     br_core_fields = (
-        "frozen_stop_distance_atr", "invalidation_distance_atr", "target_distance_atr",
-        "gross_rr", "breakout_level_pivot_age_minutes", "required_reward_atr",
+        "frozen_stop_distance_atr",
+        "invalidation_distance_atr",
+        "target_distance_atr",
+        "gross_rr",
+        "breakout_level_pivot_age_minutes",
+        "required_reward_atr",
     )
 
     entry_reference_diagnostic: dict[str, Any] = {}
     cost_rate = _frozen_cost_rate(frozen)
-    reference_getters: tuple[
-        tuple[str, Callable[[dict[str, Any]], float]], ...
-    ] = (
+    reference_getters: tuple[tuple[str, Callable[[dict[str, Any]], float]], ...] = (
         ("frozen_midpoint_entry", lambda row: float(row["entry_reference"])),
         ("final_confirmation_close", lambda row: float(row["close"])),
         ("ema7_at_candidate", lambda row: float(row["ema7"])),
@@ -1109,9 +1117,7 @@ def run_v033_geometry_audit(
                     "reference": reference,
                     "stop_distance_atr": stop_distance / atr if atr > 0 else None,
                     "target_distance_atr": target_distance / atr if atr > 0 else None,
-                    "gross_rr": (
-                        target_distance / stop_distance if stop_distance > 0 else None
-                    ),
+                    "gross_rr": (target_distance / stop_distance if stop_distance > 0 else None),
                     "net_rr": net,
                     "net_rr_pass": net is not None and net >= frozen.strategy.rr_min,
                 }
@@ -1159,8 +1165,7 @@ def run_v033_geometry_audit(
         },
         "net_rr_pass_count": sum(bool(row["net_rr_pass"]) for row in supplementary_rows),
         "net_rr_pass_rate": (
-            sum(bool(row["net_rr_pass"]) for row in supplementary_rows)
-            / len(supplementary_rows)
+            sum(bool(row["net_rr_pass"]) for row in supplementary_rows) / len(supplementary_rows)
             if supplementary_rows
             else None
         ),
@@ -1180,8 +1185,7 @@ def run_v033_geometry_audit(
                 bool(row["local_extreme_stop_net_rr_pass"]) for row in tp_post
             ),
             "net_rr_pass_rate": (
-                sum(bool(row["local_extreme_stop_net_rr_pass"]) for row in tp_post)
-                / len(tp_post)
+                sum(bool(row["local_extreme_stop_net_rr_pass"]) for row in tp_post) / len(tp_post)
                 if tp_post
                 else None
             ),
@@ -1328,6 +1332,7 @@ def run_v033_geometry_audit(
         "barrier_rows": barrier_rows,
         "trend_control_rows": trend_control_rows,
         "breakout_qualification_rows": breakout_qualification_rows,
+        "directional_episode_rows": episode_accumulator.rows,
         "performance": {
             "decision_loop_seconds": loop_runtime,
             "total_runtime_seconds": time.perf_counter() - started,
@@ -1360,38 +1365,25 @@ def _h6_distance_exceeds_local_extreme_across_years(
     return True if checked >= 2 else None
 
 
-def _hypothesis_verdicts(
-    result: dict[str, Any], tp_post: list[dict[str, Any]]
-) -> dict[str, Any]:
+def _hypothesis_verdicts(result: dict[str, Any], tp_post: list[dict[str, Any]]) -> dict[str, Any]:
     verdicts: dict[str, Any] = {}
-    invalidation_age = _distribution(
-        _values(tp_post, "invalidation_pivot_age_minutes")
-    )["median"]
-    invalidation_distance = _distribution(
-        _values(tp_post, "invalidation_distance_atr")
-    )["median"]
-    local_extreme_distance = _distribution(
-        _values(tp_post, "local_extreme_distance_atr")
-    )["median"]
+    invalidation_age = _distribution(_values(tp_post, "invalidation_pivot_age_minutes"))["median"]
+    invalidation_distance = _distribution(_values(tp_post, "invalidation_distance_atr"))["median"]
+    local_extreme_distance = _distribution(_values(tp_post, "local_extreme_distance_atr"))["median"]
     target_distance = _distribution(_values(tp_post, "target_distance_atr"))["median"]
     required_reward = _distribution(_values(tp_post, "required_reward_atr"))["median"]
-    touch_move = _distribution(
-        _values(tp_post, "touch_to_candidate_price_move_atr")
-    )["median"]
-    extreme_move = _distribution(
-        _values(tp_post, "pullback_extreme_to_final_close_atr")
-    )["median"]
-    local_pass_rate = result["local_extreme_stop_diagnostic"]["scope_b_tp_post_factor"][
-        "net_rr_pass_rate"
-    ] or 0.0
+    touch_move = _distribution(_values(tp_post, "touch_to_candidate_price_move_atr"))["median"]
+    extreme_move = _distribution(_values(tp_post, "pullback_extreme_to_final_close_atr"))["median"]
+    local_pass_rate = (
+        result["local_extreme_stop_diagnostic"]["scope_b_tp_post_factor"]["net_rr_pass_rate"] or 0.0
+    )
     best_ref_pass = max(
-        item["net_rr_pass_rate"] or 0.0
-        for item in result["entry_reference_diagnostic"].values()
+        item["net_rr_pass_rate"] or 0.0 for item in result["entry_reference_diagnostic"].values()
     )
     extreme_ref_pass = (
-        result["entry_reference_diagnostic"][
-            "pullback_extreme_entry_supplementary"
-        ]["net_rr_pass_rate"]
+        result["entry_reference_diagnostic"]["pullback_extreme_entry_supplementary"][
+            "net_rr_pass_rate"
+        ]
         or 0.0
     )
     two_half_atr = result["reachability_summary"]["scope_b_tp_post_factor"]["atr_2.5"]
@@ -1410,8 +1402,7 @@ def _hypothesis_verdicts(
         verdicts["H6"] = "INCONCLUSIVE_LOW_SAMPLE"
 
     if (
-        numeric(extreme_move) >= 0.4 * numeric(target_distance)
-        and numeric(target_distance) > 0
+        numeric(extreme_move) >= 0.4 * numeric(target_distance) and numeric(target_distance) > 0
     ) or numeric(extreme_ref_pass) > 0.10:
         verdicts["H7"] = "SUPPORTED"
     elif best_ref_pass <= 0.05 and numeric(extreme_move) < 0.2 * max(
@@ -1477,9 +1468,7 @@ def write_v033_artifacts(
         "strategy_version": config.runtime.strategy_version,
         "feature_version": config.runtime.feature_version,
         "config_hash": config.config_hash,
-        "dataset_checksum": json.loads(manifest.read_text(encoding="utf-8"))[
-            "checksum_sha256"
-        ],
+        "dataset_checksum": json.loads(manifest.read_text(encoding="utf-8"))["checksum_sha256"],
         "protocol_checksum": _sha256(protocol),
         "random_seed": seed,
         "validation_status": config.runtime.validation_status,
