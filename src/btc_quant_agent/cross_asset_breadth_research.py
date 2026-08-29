@@ -98,10 +98,27 @@ def build_hourly_features(
             "week_cluster": datetime.fromtimestamp(timestamp / 1000, UTC).strftime("%G-W%V"),
             "day_cluster": datetime.fromtimestamp(timestamp / 1000, UTC).strftime("%Y-%m-%d"),
         }
-        snapshot = engine.diagnostic_features(
-            "1h", list(btc_hourly[max(0, index - config.data.history_limit_1h + 1) : index + 1])
-        )
         btc_return = btc.close / btc_hourly[index - 4].close - 1
+        try:
+            snapshot = engine.diagnostic_features(
+                "1h",
+                list(btc_hourly[max(0, index - config.data.history_limit_1h + 1) : index + 1]),
+            )
+        except (IndexError, ValueError):
+            output.append(
+                {
+                    **base,
+                    "feature_status": "DATA_UNAVAILABLE",
+                    "direction": "NO_BIAS",
+                    "funding_direction": "NO_BIAS",
+                    "btc_trailing_4h_return": btc_return,
+                    "btc_mom_direction": btc_momentum_direction(btc_return),
+                    "btc_mom_bucket": (
+                        "POSITIVE" if btc_return > 0 else "NEGATIVE" if btc_return < 0 else "ZERO"
+                    ),
+                }
+            )
+            continue
         base.update(
             {
                 "atr": snapshot.atr,
