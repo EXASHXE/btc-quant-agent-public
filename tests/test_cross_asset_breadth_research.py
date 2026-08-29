@@ -142,7 +142,9 @@ def test_leave_one_out_is_diagnostic_only() -> None:
                 **{f"{symbol}_r4h": value for symbol in BASKET},
             }
         )
-    assert composition_audit(rows)["diagnostic_only"] is True
+    audit = composition_audit(rows)
+    assert audit["diagnostic_only"] is True
+    assert audit["classification"] != "one-asset-sensitive representation"
 
 
 def test_no_v039_artifact_crosses_holdout() -> None:

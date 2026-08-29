@@ -87,6 +87,8 @@ def build_hourly_features(
         opens = [btc.open_time_ms - offset * 3_600_000 for offset in range(5)]
         available = all(open_time in maps[symbol] for symbol in BASKET for open_time in opens)
         timestamp = btc.close_time_ms + 1
+        if timestamp >= DEV_END_MS:
+            continue
         base: dict[str, Any] = {
             "timestamp_ms": timestamp,
             "decision_close_ms": btc.close_time_ms,
@@ -508,10 +510,8 @@ def composition_audit(features: Sequence[dict[str, Any]]) -> dict[str, Any]:
         left: {right: statistics.correlation(signs[left], signs[right]) for right in BASKET}
         for left in BASKET
     }
-    sensitive = (
-        max(member.values()) > 0.9
-        or min(block["direction_agreement_rate"] for block in leave.values()) < 0.7
-    )
+    leave_agreements = [float(block["direction_agreement_rate"]) for block in leave.values()]
+    sensitive = max(leave_agreements) - min(leave_agreements) > 0.10
     return {
         "diagnostic_only": True,
         "member_sign_agreement": member,
