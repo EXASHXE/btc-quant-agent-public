@@ -147,6 +147,20 @@ def test_artifact_firewall_rejects_holdout_timestamp() -> None:
         assert_development_only({"rows": [{"timestamp_ms": DEV_END_MS}]})
 
 
+def test_feature_generator_excludes_decision_known_at_holdout_boundary() -> None:
+    bars = [
+        _bar(DEV_END_MS - (20 - index) * 900_000, interval="15m", price=float(index))
+        for index in range(20)
+    ]
+    states = [{
+        "feature_1h_close_ms": DEV_END_MS - 3_600_001,
+        "market_state": "RANGE", "atr": 1.0, "atr_percentile": .5, "atr_decile": 5,
+    }]
+    rows = build_features_15m(bars, states)
+    assert len(rows) == 19
+    assert all(row["timestamp_ms"] < DEV_END_MS for row in rows)
+
+
 def test_matching_rejects_outcomes_and_k_over_five() -> None:
     candidate = {**_feature(0, "LONG_FADE"), "event_id": "c", "abs_z": 2.1}
     control = {**_feature(100, "LONG_FADE", "TREND_UP"), "event_id": "n", "abs_z": 2.2}

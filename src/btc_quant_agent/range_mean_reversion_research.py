@@ -113,7 +113,7 @@ def build_features_15m(
     closes: collections.deque[float] = collections.deque(maxlen=20)
     previous_open: int | None = None
     for bar in candles_15m:
-        if bar.close_time_ms >= DEV_END_MS:
+        if bar.close_time_ms + 1 >= DEV_END_MS:
             break
         contiguous = previous_open is None or bar.open_time_ms - previous_open == 900_000
         if not contiguous:
