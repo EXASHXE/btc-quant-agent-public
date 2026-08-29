@@ -734,6 +734,15 @@ def _git_sha() -> str:
     return subprocess.run(["git", "rev-parse", "HEAD"], check=True, capture_output=True, text=True).stdout.strip()
 
 
+def _preregistration_sha(protocol: Path) -> str:
+    return subprocess.run(
+        ["git", "log", "-1", "--format=%H", "--", str(protocol)],
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout.strip()
+
+
 def write_v0310_artifacts(
     output: str | Path, result: dict[str, Any], config: AppConfig, protocol_path: str | Path,
     manifest_path: str | Path,
@@ -750,6 +759,7 @@ def write_v0310_artifacts(
     (target / "config.sha256").write_text(hashlib.sha256(config_snapshot.encode()).hexdigest() + "\n", encoding="utf-8")
     provenance = {
         "git_sha": _git_sha(), "protocol_sha256": _sha256(protocol),
+        "preregistration_commit_sha": _preregistration_sha(protocol),
         "dataset_manifest_file_sha256": _sha256(manifest),
         "dataset_checksum_sha256": json.loads(manifest.read_text(encoding="utf-8"))["checksum_sha256"],
         "config_hash": config.config_hash, "seed": SEED, "bootstrap_simulations": SIMULATIONS,

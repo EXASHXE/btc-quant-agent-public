@@ -13,6 +13,7 @@ from btc_quant_agent.domain import Candle, Regime
 from btc_quant_agent.range_mean_reversion_research import (
     SEED,
     DevelopmentMinuteSeries,
+    _preregistration_sha,
     assert_development_only,
     boll20,
     build_episodes,
@@ -191,6 +192,9 @@ def test_protocol_freezes_seed_and_ambiguity_rule() -> None:
     protocol = json.loads(Path("configs/research/v0.3.10_range_mean_reversion_protocol.json").read_text())
     assert protocol["randomness"] == {"seed": 40, "bootstrap_simulations": 2000, "quantiles": [0.05, 0.5, 0.95]}
     assert "conservatively" in protocol["entry_and_labels"]["ambiguous_primary_rule"]
+    assert _preregistration_sha(
+        Path("configs/research/v0.3.10_range_mean_reversion_protocol.json")
+    ) == "dc9fb05b42d894b15478d4756559de59cf1ce6e2"
 
 
 def test_execution_remains_disabled() -> None:
