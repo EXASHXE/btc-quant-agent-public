@@ -359,6 +359,9 @@ def _interaction_analysis(
     candidates: Sequence[dict[str, Any]],
     matches: Sequence[dict[str, Any]],
     series: IndexedOneMinuteSeries,
+    *,
+    seed: int = SEED,
+    simulations: int = SIMULATIONS,
 ) -> tuple[dict[str, Any], list[dict[str, Any]]]:
     candidate_labels = [
         {
@@ -443,7 +446,7 @@ def _interaction_analysis(
             "signed_median": statistics.median(float(row["signed_return_atr"]) for row in labels),
             "candidate_minus_control_delta": statistics.median(deltas) if deltas else None,
             "candidate_minus_control_bootstrap": _cluster_bootstrap_median(
-                delta_rows, "delta", "day_cluster", seed=SEED, simulations=SIMULATIONS
+                delta_rows, "delta", "day_cluster", seed=seed, simulations=simulations
             )
             if delta_rows
             else None,
@@ -481,7 +484,7 @@ def _interaction_analysis(
             },
         }
         bootstrap[f"{horizon}m"] = _cluster_bootstrap_median(
-            labels, "signed_return_atr", "day_cluster", seed=SEED, simulations=SIMULATIONS
+            labels, "signed_return_atr", "day_cluster", seed=seed, simulations=simulations
         )
     summary["bootstrap"] = bootstrap
     return summary, pair_rows
@@ -583,7 +586,7 @@ def run_v038_funding_stability(
                 [row for row in onset_labels if row["horizon_minutes"] == horizon],
                 "signed_return_atr",
                 "week_cluster",
-                seed=SEED,
+                seed=seed,
                 simulations=SIMULATIONS,
             )
             for horizon in (240, 480, 1440)
@@ -593,7 +596,7 @@ def run_v038_funding_stability(
         onsets,
         onset_labels,
         stratum_fields=("year", "atr_decile"),
-        seed=SEED,
+        seed=seed,
         simulations=SIMULATIONS,
     )
     h22 = h22_verdict(h22_summary, h22_boot, h22_perm, h22_splits)
