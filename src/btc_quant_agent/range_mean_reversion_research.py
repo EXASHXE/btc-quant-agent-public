@@ -34,6 +34,7 @@ PRIMARY_HORIZONS = (240, 480)
 LATE_START_MS = 1_704_067_200_000
 MATCH_K = 5
 MIN_SEPARATION_MS = 24 * 60 * 60_000
+PREREGISTRATION_COMMIT_SHA = "dc9fb05b42d894b15478d4756559de59cf1ce6e2"
 
 
 def _sha256(path: Path) -> str:
@@ -735,12 +736,11 @@ def _git_sha() -> str:
 
 
 def _preregistration_sha(protocol: Path) -> str:
-    return subprocess.run(
-        ["git", "log", "-1", "--format=%H", "--", str(protocol)],
-        check=True,
-        capture_output=True,
-        text=True,
-    ).stdout.strip()
+    if protocol.name != "v0.3.10_range_mean_reversion_protocol.json":
+        raise ValueError("unexpected v0.3.10 protocol path")
+    # CI uses a depth-one checkout, so git-log cannot reliably discover the
+    # earlier preregistration commit. This identity was frozen before formal code.
+    return PREREGISTRATION_COMMIT_SHA
 
 
 def write_v0310_artifacts(
