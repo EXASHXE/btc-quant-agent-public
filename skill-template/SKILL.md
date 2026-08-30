@@ -1,6 +1,6 @@
 ---
 name: btc-quant-signal
-description: Operate the local BTCUSDT quantitative engine for deterministic multi-factor scans, immutable signal explanations, Shadow performance, and explicitly confirmed execution-plan operations. Use for LONG, SHORT, WAIT, entry, stop, target, RR, sizing, signal status, or when the user explicitly asks to prepare, submit, reconcile, cancel, or close a BTCUSDT order. Execution is disabled by default and remains separately gated.
+description: Operate the registry-gated BTCUSDT quantitative engine for opportunity scans, immutable signal explanations, forward-data health, and separately gated execution operations. Current runtime has no qualified Direction Engine and may return OPPORTUNITY_ONLY, but not actionable LONG/SHORT. Execution is disabled by default.
 ---
 
 # BTC Quant Signal
@@ -11,9 +11,9 @@ Use the bundled `scripts/quant_tool.py` wrapper. Treat QuantCore output as autho
 
 1. Run `health` before a live scan. If data is invalid or degraded, state that clearly.
 2. Run `scan` for a current decision. Never infer LONG or SHORT yourself.
-3. If QuantCore returns `WAIT` or `NO_SIGNAL`, preserve that result and its machine-readable
+3. If QuantCore returns `WAIT`, `NO_SIGNAL`, or `OPPORTUNITY_ONLY`, preserve that result and its machine-readable
    `reason_code`; do not reinterpret stale data or a rejected setup as tradable.
-4. For a signal, report validation status, direction, entry range, stop, target, net RR, planned loss, notional, display margin, reasons, risks, and expiry.
+4. For an opportunity, report setup, `SUPPORTED_MOVEMENT`, `ANALYSIS_ONLY`, counter-evidence, and that Direction is unqualified. Do not report entry, stop, target, RR, or size. For a qualified signal, report its immutable fields.
 5. Use `show` before discussing an existing signal so TTL/status is current.
 6. Use `decision` only after the user explicitly says they accepted or ignored a signal.
 7. For any order-related request, run `execution-status` first. Do not proceed when mode is `disabled`.
@@ -23,6 +23,8 @@ Use the bundled `scripts/quant_tool.py` wrapper. Treat QuantCore output as autho
 ## Hard constraints
 
 - Never alter Direction, Entry, SL, TP, RR, probability, expected R, or position size.
+- Never promote `ANALYSIS_ONLY` evidence or `legacy_pattern_side` into actionable Direction.
+- Agent may explain evidence but may not bypass Research Registry eligibility.
 - Never invent market data or statistical probability.
 - Treat `pattern_score` as deterministic pattern completeness and `factor_score` as grouped
   rule confirmation; neither is win probability.

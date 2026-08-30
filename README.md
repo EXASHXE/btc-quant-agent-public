@@ -1,6 +1,6 @@
-# BTC Quant Signal Agent v0.3.0
+# BTC Quant Agent v0.3.11
 
-一个面向 `BTCUSDT` USDⓈ-M 永续合约的低频量化项目：确定性核心负责产生 `LONG / SHORT / WAIT`，并提供受控的下单、保护单、撤单和平仓适配器。执行默认 `disabled`，默认配置不会读取密钥或发送订单。
+一个面向 `BTCUSDT` USDⓈ-M 永续合约的低频量化研究项目。v0.3.11 的正常 Runtime 由 Research Registry 限制：TP/BR 只可输出 `OPPORTUNITY_ONLY`，当前没有合格 Direction Engine，因此不能输出 actionable `LONG/SHORT`。执行默认 `disabled`，默认配置不会读取密钥或发送订单。
 
 > 风险提示：这是研究与 Shadow Trading 工具，不是收益承诺。默认策略状态为 `EXPERIMENTAL`。在完成足量样本外验证与 30–60 天前向观察前，不应据此进行真实高杠杆交易。
 
@@ -20,6 +20,8 @@
 - 因果、风控、状态与回测单元测试
 - 历史衍生品 backward as-of 对齐、逐字段陈旧清洗和可复现快照
 - 信号 TTL 锚定决策数据时间，15m 新收盘后动态失效检查
+- Research / Strategy / Feature Registry 与 fail-closed Runtime Gate
+- append-only SQLite 前向衍生品 PIT archive、审计、导出和 systemd user timer
 
 Meta Model、NautilusTrader 适配和飞书交互回调被保留为后续里程碑。没有校准模型时，`p_win` 和 `expected_r` 必须为 `null`，避免把规则评分冒充统计胜率。
 
@@ -38,7 +40,7 @@ ruff check .
 mypy
 ```
 
-`scan` 读取 Binance 公开市场数据。若所在网络无法访问 Binance，先使用 CSV/Parquet 数据做离线回放；程序不会为缺失数据生成信号。
+`scan` 读取 Binance 公开市场数据。`OPPORTUNITY_ONLY` 中的 `legacy_pattern_side` 仅是研究元数据，Agent/API/Execution 不得把它恢复为方向。若所在网络无法访问 Binance，先使用 CSV/Parquet 数据做离线回放；程序不会为缺失数据生成信号。
 
 ## 常用命令
 
@@ -50,6 +52,12 @@ quantctl decision <signal_id> accept --entry 77450
 quantctl performance --days 30
 quantctl health
 quantctl execution status
+quantctl research-registry validate
+quantctl research-registry status
+quantctl derivatives collect-once
+quantctl derivatives status
+quantctl derivatives audit
+quantctl derivatives export
 quantctl daemon --once
 quantctl download ./data/BTCUSDT-1m.csv --start-ms 1754006400000 --end-ms 1756684800000 --interval 1m
 quantctl backtest ./data/BTCUSDT-1m.csv
@@ -137,7 +145,7 @@ REST API 的所有路由都要求 `Authorization: Bearer <BTC_QUANT_API_TOKEN>`�
 
 1. 只使用已经收盘且在决策时刻可获得的数据。
 2. 同一数据、配置和版本必须生成相同输出。
-3. 实时与回测复用同一个 `QuantEngine`。
+3. 正常服务显式使用 `RUNTIME_GATED`；冻结研究显式使用 `LEGACY_RESEARCH_V022` 和 `configs/frozen/v0.2.2.toml`。
 4. `WAIT` 是默认状态；数据失效时强制 `NO_SIGNAL`。
 5. 代码完成不等于策略有效；`VALIDATED` 必须由样本外证据取得。
 6. 增加指标不能证明胜率提高；必须用时间序列 Walk-forward、消融和成本压力测试验证。
@@ -153,5 +161,6 @@ dataset/random-seed provenance。v0.3.0 的冻结 Run 0 只有 13 笔 filled tra
 最终 holdout。没有真实 point-in-time derivatives 时，baseline 会显式关闭
 derivatives 与 order-book 分组，相关消融不会被当作有效多年证据。
 
-正式证据见 `docs/V0.3.0_DATA_AUDIT.md`、`docs/V0.3.0_RESEARCH_REPORT.md` 与
-`docs/V0.3.0_REPLAY_AUDIT.md`。策略状态继续为 `EXPERIMENTAL`，这些研究结果不构成交易建议。
+v0.3.11 的 Registry、Runtime 对齐和前向数据运维见 `docs/RESEARCH_REGISTRY.md`、
+`docs/V0.3.11_RUNTIME_ALIGNMENT_FORWARD_DATA_REPORT.md` 与
+`docs/FORWARD_DERIVATIVES_OPERATIONS.md`。策略状态继续为 `EXPERIMENTAL`，这些研究结果不构成交易建议。

@@ -1,0 +1,49 @@
+{
+  "as_of_utc": "2026-08-30T15:48:27Z",
+  "answers": {
+    "01_latest_test_total": 315,
+    "02_overall_coverage_percent": 59,
+    "03_registry_component_count": 7,
+    "04_actionable_direction_component_count": 0,
+    "05_tp_br_runtime_outputs_long_short_signal": false,
+    "06_tp_br_runtime_outputs_opportunity_only": true,
+    "07_opportunity_has_no_entry_sl_tp_size": true,
+    "08_legacy_research_replay_preserves_frozen_behavior": true,
+    "09_execution_rejects_existing_legacy_signal": true,
+    "10_forward_store_path": "/root/workspace/project/Quant-agent/data/forward/BTCUSDT/derivatives.sqlite3",
+    "11_observed_record_count": 2,
+    "11_fully_available_snapshot_count": 1,
+    "12_first_observed_at_ms": 1788104389366,
+    "12_last_observed_at_ms": 1788104785709,
+    "13_required_field_availability": {
+      "funding_rate": 0.5,
+      "open_interest": 0.5,
+      "taker_buy_sell_ratio": 0.5,
+      "basis_rate": 0.5,
+      "long_short_account_ratio": 0.5
+    },
+    "14_endpoint_error_detected": true,
+    "14_endpoint_error": "First scheduled attempt recorded Network is unreachable for all six public endpoint groups; no values were fabricated.",
+    "15_largest_gap_slots": 0,
+    "16_scheduler_active": true,
+    "17_scheduler_blocker": null,
+    "18_next_planned_collection_ms": 1788105620000,
+    "19_forward_research_eligibility": "INSUFFICIENT_FORWARD_HISTORY",
+    "20_final_holdout": "SEALED",
+    "21_execution": "DISABLED",
+    "22_v0_3_12_recommendation": "Use an independent historically point-in-time on-chain or market-flow family while forward derivatives remain below coverage; qualify genuine PIT OI/Taker/Basis/Positioning only after the frozen coverage gate passes."
+  },
+  "quality": {
+    "ruff": "PASS",
+    "mypy_strict": "PASS",
+    "compileall": "PASS",
+    "critical_coverage_percent": {
+      "engine": 93,
+      "forward_store": 88,
+      "research_registry": 86,
+      "execution_service": 61,
+      "binance_public_client": 54,
+      "quant_service": 59
+    }
+  }
+}

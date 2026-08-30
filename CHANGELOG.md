@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.3.11 - Runtime Alignment, Registry, Forward PIT Foundation
+
+- 将正常 Runtime 默认切换为 Registry-gated 模式；TP/BR 保留为 `OPPORTUNITY_ONLY`，不再生成 actionable `LONG/SHORT`。
+- 新增机器可读 Research Registry、validator/status/show CLI，以及 Execution 的前置 fail-closed Registry Gate。
+- 旧 v0.2.2 研究仅可通过 `LEGACY_RESEARCH_V022` 与冻结配置显式重放。
+- 新增 WAL SQLite append-only derivatives store、collection run ledger、status/audit/export 与 UTC 15 分钟 systemd user timer。
+- 修正 PIT `observed_at_ms` 为所有已尝试 endpoint 处理完成后的本地可用时间，并保留各字段 source timestamp。
+- Final Holdout 保持 `SEALED`，执行保持 `disabled`；本版本没有 Alpha、Candidate、Paper、Testnet 或 Live 声明。
+
 ## 0.3.0 - Formal Research, Inconclusive Low Sample
 
 - 构建并校验 Binance 官方 BTCUSDT USD-M 永续 1m、funding 与 mark-price 研究数据；
