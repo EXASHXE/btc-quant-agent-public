@@ -1,0 +1,129 @@
+{
+  "protocol_id": "btc-quant-agent-v0.3.12-spot-perp-taker-flow-v1",
+  "version": "v0.3.12",
+  "study": "Spot-Perpetual Taker Flow Direction Qualification",
+  "research_only": true,
+  "scope": {
+    "development": "[2021-01-01T00:00:00Z, 2026-02-01T00:00:00Z)",
+    "development_start_ms": 1609459200000,
+    "development_end_ms_exclusive": 1769904000000,
+    "early": "[2021-01-01T00:00:00Z, 2024-01-01T00:00:00Z)",
+    "late": "[2024-01-01T00:00:00Z, 2026-02-01T00:00:00Z)",
+    "final_holdout": "[2026-02-01T00:00:00Z, 2026-08-01T00:00:00Z)",
+    "final_holdout_access": "forbidden",
+    "firewall": "Every feature, event, match, label, future bar and formal artifact timestamp must be strictly before development_end_ms_exclusive; crossing future windows are incomplete and excluded."
+  },
+  "safety": {
+    "strategy_status": "EXPERIMENTAL",
+    "normal_runtime_maximum_stage": "OPPORTUNITY_ONLY",
+    "qualified_direction_engine": "NONE",
+    "execution_mode": "disabled",
+    "auto_execute": false,
+    "allow_live": false,
+    "candidate_freeze": false,
+    "runtime_integration": false
+  },
+  "datasets": {
+    "spot": {
+      "dataset_id": "BTCUSDT_SPOT_1M_BINANCE_V0312_DEV_20210101_20260201",
+      "source": "checksum-verified Binance Public Data monthly spot BTCUSDT 1m kline archives",
+      "fields": ["open_time", "close_time", "volume", "taker_buy_base_asset_volume"],
+      "timestamp_normalization": "detect magnitude per row; timestamps >= 10^15 are integer-divided by 1000 from microseconds to milliseconds; validate an exact 1m grid after normalization",
+      "missing_rule": "no interpolation, forward fill, REST backfill or synthetic bars",
+      "integrity": "volume >= 0; 0 <= taker_buy_base_volume <= volume plus 1e-9 tolerance; strict unique monotonic open_time"
+    },
+    "perpetual": {
+      "dataset_id": "BTCUSDT_CANONICAL_1M_V030",
+      "source": "checksum-verified Binance USD-M perpetual BTCUSDT canonical 1m dataset",
+      "checksum_sha256": "82d058b2e9e5bfbd20bf36026abec045fb778ddb72582277e0dac00846ae9901"
+    }
+  },
+  "feature": {
+    "identity": "SPOT_PERP_TAKER_FLOW_SPREAD_1H",
+    "decision_timeframe": "15m",
+    "lookback_complete_1m_bars": 60,
+    "window": "the 60 exact consecutive spot and perpetual 1m bars ending at the decision close; every bar must be fully closed",
+    "spot_imbalance": "2 * sum(spot_taker_buy_base_volume) / sum(spot_base_volume) - 1",
+    "perp_imbalance": "2 * sum(perp_taker_buy_base_volume) / sum(perp_base_volume) - 1",
+    "flow_spread": "spot_imbalance - perp_imbalance",
+    "direction": {"flow_spread > 0": "LONG", "flow_spread < 0": "SHORT", "flow_spread == 0": "NO_BIAS"},
+    "unavailable": "either 60-bar window incomplete/misaligned/gapped/future, or either summed volume <= 0",
+    "price_direction_inputs": false,
+    "magnitude_threshold": null
+  },
+  "episodes": {
+    "definition": "maximal consecutive available 15m decisions with the same flow direction",
+    "breaks_on": ["direction change", "NO_BIAS", "DATA_UNAVAILABLE", "gap"],
+    "primary_unit": "episode onset",
+    "raw_decisions": "serial-dependence diagnostic only",
+    "clusters": ["UTC day", "UTC week"]
+  },
+  "labels": {
+    "reference": "OPEN of first canonical BTCUSDT perpetual 1m bar strictly after decision close",
+    "normalizer": "latest fully closed BTCUSDT 1h ATR",
+    "primary_horizons_minutes": [240, 480],
+    "secondary_horizons_minutes": [120, 1440],
+    "signed_return": "LONG: (future_close-reference)/ATR; SHORT: (reference-future_close)/ATR",
+    "metrics": ["signed_return_atr", "nonnegative_mfe_atr", "nonnegative_mae_atr", "reach_1_atr", "reach_1_5_atr", "reach_2_5_atr"],
+    "holdout_crossing": "incomplete and excluded"
+  },
+  "randomness": {"seed": 42, "simulations": 2000, "quantiles": [0.05, 0.5, 0.95]},
+  "h32": {
+    "statement": "SPOT_PERP_TAKER_FLOW_SPREAD_1H episode onset contains directional information for subsequent BTCUSDT returns.",
+    "sample_gate": {"complete_8h": 1000, "long": 300, "short": 300, "utc_weeks": 100},
+    "bootstrap": "UTC calendar-week cluster bootstrap at 4h and 8h",
+    "permutation": {"strata": ["year", "BTC 1h ATR decile", "BTC trailing 1h price return sign"], "metric": "real-minus-permutation signed median delta"},
+    "stability": ["Early/Late", "LONG/SHORT", "leave-one-year-out 4h/8h"],
+    "support": "4h and 8h signed medians > 0; real-minus-permutation deltas > 0; bootstrap p05 >= -0.05 ATR at both; Early/Late and LONG/SHORT medians >= -0.05 at both; no leave-one-year-out exclusion flips both horizons materially negative",
+    "falsification": "both 4h and 8h signed medians <= 0 OR both real-minus-permutation deltas <= 0",
+    "otherwise": ["INCONCLUSIVE_MECHANISM", "INCONCLUSIVE_LOW_SAMPLE"]
+  },
+  "h33": {
+    "statement": "Spot-perpetual flow spread adds Direction information beyond BTC contemporaneous trailing 1h price momentum.",
+    "population": "same flow episode onsets",
+    "btc_baseline": "trailing BTC 1h return >0 LONG, <0 SHORT, =0 NO_BIAS",
+    "primary_metric": "paired flow-signed minus BTC-momentum-signed return at 4h and 8h",
+    "bootstrap": "UTC calendar-week clustered paired bootstrap",
+    "permutation": "same H32 frozen strata",
+    "diagnostic_only": ["Spot-only taker imbalance sign", "Perpetual-only taker imbalance sign", "agreement rate", "aligned/opposed events"],
+    "support": "paired median delta > 0 at 4h and 8h; bootstrap p05 >= -0.05 at both; stratified permutation delta > 0 at both",
+    "falsification": "both paired deltas <= 0"
+  },
+  "h34": {
+    "statement": "Spot-perpetual flow Direction provides incremental directional information when the frozen TP/BR Opportunity Layer fires.",
+    "opportunities": ["trend_pullback_opportunity", "breakout_retest_opportunity", "exact-timestamp union"],
+    "legacy_pattern_side_used": false,
+    "flow_join": "latest fully known flow direction as of opportunity decision close",
+    "sample_gate": {"complete_8h": 150, "long": 30, "short": 30, "utc_days": 60},
+    "controls": {"same": ["year", "flow side", "BTC 1h ATR decile", "BTC trailing 1h momentum sign"], "not_opportunity": true, "minimum_temporal_separation_hours": 24, "k_max": 5, "selection": "nearest deterministic", "reuse": true, "outcomes_forbidden": true},
+    "bootstrap": "UTC calendar-day clustered bootstrap, separately for pooled signed return and matched candidate-control delta",
+    "support": "4h/8h pooled signed medians > 0; matched deltas > 0; signed and matched bootstrap p05 >= -0.05; Early/Late and LONG/SHORT >= -0.05",
+    "falsification": "both pooled medians <= 0 OR both matched deltas <= 0"
+  },
+  "movement_smoke": "reproduce frozen TP/BR opportunity movement counts/metrics without using legacy_pattern_side as Direction",
+  "family_stop_rules": {
+    "H32_FALSIFIED": "STOP_SPOT_PERP_FLOW_FAMILY",
+    "H32_SUPPORTED_H33_FALSIFIED": "STOP_AS_NON_INCREMENTAL",
+    "H32_H33_SUPPORTED_H34_FALSIFIED": "RECOMMEND_FLOW_DIRECTION_FOLLOWUP",
+    "H32_H33_SUPPORTED_H34_NOT_FALSIFIED_AND_GATES_PASS": "RECOMMEND_DIRECTION_PLUS_OPPORTUNITY_INTEGRATION_RESEARCH",
+    "otherwise": "INCONCLUSIVE_FLOW_FAMILY"
+  },
+  "registry": {
+    "component_id": "spot_perp_taker_flow_direction",
+    "role": "DIRECTION",
+    "runtime_eligibility_always": "BLOCKED",
+    "active_direction_engine_state": "NONE",
+    "runtime_maximum_stage": "OPPORTUNITY_ONLY"
+  },
+  "prohibitions": [
+    "lookback scan", "magnitude threshold", "rolling percentile", "EMA smoothing", "volume weighting variants", "quote-volume formal arm", "sign reversal", "Spot-only or Perp-only post-hoc formal arm", "Early/Late parameter selection", "RSI/MACD/ADX", "Funding/XAB reactivation", "TP/BR parameter changes", "Range parameter changes", "Final Holdout", "candidate freeze", "paper/testnet/live", "runtime Direction integration"
+  ],
+  "provenance": {
+    "start_sha": "c2fb00ed806bb4dd57dcc7f605479e75f60514ac",
+    "preregistration_commit_sha": "recorded after this file-only commit",
+    "formal_code_sha": "recorded before canonical execution",
+    "protocol_sha256": "computed from the committed protocol file before formal execution",
+    "spot_dataset_sha256": "recorded after checksum-verified build",
+    "perpetual_dataset_sha256": "82d058b2e9e5bfbd20bf36026abec045fb778ddb72582277e0dac00846ae9901"
+  }
+}
