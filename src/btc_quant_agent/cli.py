@@ -5,20 +5,28 @@ import json
 import time
 from dataclasses import asdict
 from datetime import UTC, datetime
+from pathlib import Path
 from typing import Any
 
 from .backtest import BacktestEngine, bootstrap, metrics, monte_carlo
-from .config import load_config
+from .config import AppConfig, load_config
 from .data.binance import BinancePublicClient
 from .data.binance_archive import audit_official_timeframes, build_official_dataset
 from .data.collector import collect_derivative_snapshot
 from .data.csvio import read_candles, write_candles
 from .data.derivatives import HistoricalDerivativeStore
+from .data.forward_store import (
+    ForwardDerivativeStore,
+    collect_once,
+    next_collection_time_ms,
+    scheduler_status,
+)
 from .data.funding import read_funding_events_csv
 from .data.manifest import build_manifest, write_manifest
-from .engine import QuantEngine
+from .engine import EngineMode, QuantEngine
 from .explain import explain_signal
 from .research import replay_decisions, run_full_suite, write_research_artifacts
+from .research_registry import RegistryError, ResearchRegistry
 from .service import QuantService
 
 
@@ -28,6 +36,10 @@ def _print(payload: Any) -> None:
 
 def _service(config_path: str | None) -> QuantService:
     return QuantService.create(load_config(config_path))
+
+
+def _historical_config(config_path: str | None) -> AppConfig:
+    return load_config(config_path or "configs/frozen/v0.2.2.toml")
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -100,6 +112,30 @@ def build_parser() -> argparse.ArgumentParser:
     collector.add_argument("--interval-seconds", type=int, default=900)
     collector.add_argument("--include-order-book", action="store_true")
 
+    derivatives = sub.add_parser("derivatives", help="append-safe forward PIT derivatives")
+    derivatives_sub = derivatives.add_subparsers(dest="derivatives_command", required=True)
+    for name in ("collect-once", "run", "status", "audit", "export"):
+        command = derivatives_sub.add_parser(name)
+        command.add_argument("--store", default="./data/forward/BTCUSDT/derivatives.sqlite3")
+        if name in {"collect-once", "run"}:
+            command.add_argument("--symbol", default="BTCUSDT")
+            command.add_argument("--include-order-book", action="store_true")
+        if name == "run":
+            command.add_argument("--max-samples", type=int)
+        if name == "export":
+            command.add_argument("--csv")
+            command.add_argument("--manifest")
+
+    registry = sub.add_parser("research-registry", help="inspect research eligibility")
+    registry.add_argument(
+        "--registry", default="configs/research_registry.json", help="registry JSON path"
+    )
+    registry_sub = registry.add_subparsers(dest="registry_command", required=True)
+    registry_sub.add_parser("validate")
+    registry_sub.add_parser("status")
+    registry_show = registry_sub.add_parser("show")
+    registry_show.add_argument("component_id")
+
     replay = sub.add_parser("replay", help="emit every causal 15m decision and rejection")
     replay.add_argument("path")
     replay.add_argument("--derivatives")
@@ -135,6 +171,31 @@ def build_parser() -> argparse.ArgumentParser:
 
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
+    if args.command == "research-registry":
+        try:
+            registry = ResearchRegistry.load(args.registry)
+            if args.registry_command == "validate":
+                _print(
+                    {
+                        "status": "VALID",
+                        "schema_version": registry.schema_version,
+                        "registry_version": registry.registry_version,
+                        "component_count": len(registry.components),
+                    }
+                )
+            elif args.registry_command == "status":
+                _print(registry.status())
+            else:
+                component = registry.get(args.component_id)
+                payload = asdict(component)
+                payload["research_status"] = component.research_status.value
+                payload["runtime_eligibility"] = component.runtime_eligibility.value
+                _print(payload)
+        except RegistryError as exc:
+            _print({"status": "INVALID", "error": str(exc)})
+            return 2
+        return 0
+
     service = _service(args.config)
     if args.command == "scan":
         _print(service.scan(args.symbol, not args.no_notify).as_dict())
@@ -237,6 +298,78 @@ def main(argv: list[str] | None = None) -> int:
         assert collected_manifest is not None
         _print({"status": "collected", "manifest": collected_manifest.as_dict()})
         return 0
+    if args.command == "derivatives":
+        store = ForwardDerivativeStore(args.store)
+        if args.derivatives_command == "collect-once":
+            record = collect_once(
+                BinancePublicClient(service.config.data),
+                store,
+                symbol=args.symbol,
+                include_order_book=args.include_order_book,
+            )
+            successful = any(record.field_availability.values())
+            collection_status = (
+                "COLLECTED"
+                if not record.endpoint_errors
+                else "PARTIAL" if successful else "FAILED"
+            )
+            _print(
+                {
+                    "status": collection_status,
+                    "symbol": record.symbol,
+                    "observed_at_ms": record.observed_at_ms,
+                    "payload_hash": record.payload_hash,
+                    "field_availability": record.field_availability,
+                    "endpoint_errors": record.endpoint_errors,
+                    "store": str(store.path),
+                }
+            )
+            return 0 if successful else 2
+        if args.derivatives_command == "run":
+            if args.max_samples is not None and args.max_samples < 1:
+                _print({"error": "max-samples must be positive"})
+                return 2
+            client = BinancePublicClient(service.config.data)
+            collected = 0
+            while args.max_samples is None or collected < args.max_samples:
+                now_ms = int(time.time() * 1000)
+                target_ms = next_collection_time_ms(now_ms)
+                time.sleep(max(0.0, (target_ms - now_ms) / 1000))
+                record = collect_once(
+                    client,
+                    store,
+                    symbol=args.symbol,
+                    include_order_book=args.include_order_book,
+                )
+                collected += 1
+                _print(
+                    {
+                        "status": "COLLECTED",
+                        "sample": collected,
+                        "observed_at_ms": record.observed_at_ms,
+                        "endpoint_errors": record.endpoint_errors,
+                    }
+                )
+            return 0
+        if args.derivatives_command == "status":
+            _print(store.status(scheduler=scheduler_status()))
+            return 0
+        if args.derivatives_command == "audit":
+            report = store.audit()
+            _print(report)
+            return (
+                0
+                if not (
+                    report["conflict_count"]
+                    or report["source_timestamp_after_observed_at"]
+                    or report["impossible_value_timestamps"]
+                )
+                else 2
+            )
+        export_csv = args.csv or str(Path(args.store).with_name("derivatives.csv"))
+        export_manifest = args.manifest or f"{export_csv}.manifest.json"
+        _print(store.export(export_csv, export_manifest))
+        return 0
     if args.command == "build-official-dataset":
         start = datetime.fromisoformat(args.start).replace(tzinfo=UTC)
         end = datetime.fromisoformat(args.end_exclusive).replace(tzinfo=UTC)
@@ -248,6 +381,7 @@ def main(argv: list[str] | None = None) -> int:
         _print(report)
         return 0 if report["price_time_passed"] else 2
     if args.command == "replay":
+        historical_config = _historical_config(args.config)
         bars = read_candles(args.path)
         if args.start_ms is not None:
             bars = [bar for bar in bars if bar.open_time_ms >= args.start_ms]
@@ -259,12 +393,13 @@ def main(argv: list[str] | None = None) -> int:
         _print(
             replay_decisions(
                 bars,
-                QuantEngine(service.config),
+                QuantEngine(historical_config, mode=EngineMode.LEGACY_RESEARCH_V022),
                 derivative_store,
             )
         )
         return 0
     if args.command == "research":
+        historical_config = _historical_config(args.config)
         bars = read_candles(args.path)
         if not bars or any(bar.interval != "1m" for bar in bars):
             _print({"error": "research requires a non-empty canonical 1m CSV"})
@@ -275,7 +410,7 @@ def main(argv: list[str] | None = None) -> int:
         funding_events = read_funding_events_csv(args.funding_events) if args.funding_events else []
         suite = run_full_suite(
             bars,
-            service.config,
+            historical_config,
             derivative_store,
             funding_events,
             seed=args.seed,
@@ -287,7 +422,7 @@ def main(argv: list[str] | None = None) -> int:
             write_research_artifacts(
                 output,
                 suite,
-                service.config,
+                historical_config,
                 data_manifest_path=args.data_manifest,
                 seed=args.seed,
             )
@@ -297,6 +432,7 @@ def main(argv: list[str] | None = None) -> int:
         _print({"status": "written", "output": output})
         return 0
     if args.command == "backtest":
+        historical_config = _historical_config(args.config)
         bars = read_candles(args.path)
         if not bars or any(bar.interval != "1m" for bar in bars):
             _print({"error": "backtest requires a non-empty canonical 1m CSV"})
@@ -309,14 +445,16 @@ def main(argv: list[str] | None = None) -> int:
                 read_funding_events_csv(args.funding_events) if args.funding_events else []
             )
             outcomes = BacktestEngine(
-                QuantEngine(service.config), derivative_store, funding_events
+                QuantEngine(historical_config, mode=EngineMode.LEGACY_RESEARCH_V022),
+                derivative_store,
+                funding_events,
             ).run(bars)
         except ValueError as exc:
             _print({"error": str(exc)})
             return 2
         _print(
             {
-                "validation_status": service.config.runtime.validation_status,
+                "validation_status": historical_config.runtime.validation_status,
                 "metrics": metrics(outcomes),
                 "monte_carlo": monte_carlo(outcomes, args.monte_carlo),
                 "bootstrap": bootstrap(outcomes, args.monte_carlo),

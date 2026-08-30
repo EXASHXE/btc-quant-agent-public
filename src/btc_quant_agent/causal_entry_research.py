@@ -22,7 +22,7 @@ from typing import Any
 from .backtest import FundingEvent, resample
 from .config import AppConfig
 from .domain import Candidate, Candle, Direction, Regime, Setup
-from .engine import HistoricalFeatureCache, QuantEngine
+from .engine import EngineMode, HistoricalFeatureCache, QuantEngine
 from .geometry_research import run_v033_geometry_audit
 from .regime import classify_regime
 from .research import DEV_END_MS, DEV_START_MS
@@ -419,7 +419,9 @@ def collect_trend_control_pool(
         name: deque(maxlen=limits[name]) for name in completed
     }
     cursors = {name: 0 for name in completed}
-    engine = QuantEngine(config, HistoricalFeatureCache())
+    engine = QuantEngine(
+        config, HistoricalFeatureCache(), mode=EngineMode.LEGACY_RESEARCH_V022
+    )
     rows: list[dict[str, Any]] = []
     for bar_index, decision_bar in enumerate(completed["15m"]):
         for interval in ("15m", "1h", "4h"):

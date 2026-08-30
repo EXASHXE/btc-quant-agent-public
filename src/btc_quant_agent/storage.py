@@ -8,7 +8,7 @@ from contextlib import contextmanager
 from pathlib import Path
 from typing import Any
 
-from .domain import Signal, SignalStatus, UserDecision
+from .domain import OpportunityEvidence, Signal, SignalStatus, UserDecision
 
 
 class Repository:
@@ -70,6 +70,15 @@ class Repository:
                     created_at_ms INTEGER NOT NULL,
                     payload_json TEXT NOT NULL
                 );
+                CREATE TABLE IF NOT EXISTS opportunities (
+                    opportunity_id TEXT PRIMARY KEY,
+                    detector_id TEXT NOT NULL,
+                    detected_at_ms INTEGER NOT NULL,
+                    expires_at_ms INTEGER NOT NULL,
+                    payload_json TEXT NOT NULL
+                );
+                CREATE INDEX IF NOT EXISTS idx_opportunities_detected
+                ON opportunities(detected_at_ms DESC);
                 CREATE TABLE IF NOT EXISTS execution_plans (
                     plan_id TEXT PRIMARY KEY,
                     kind TEXT NOT NULL,
@@ -111,6 +120,33 @@ class Repository:
                     signal.created_at_ms,
                     signal.expires_at_ms,
                     json.dumps(signal.as_dict(), ensure_ascii=False, sort_keys=True),
+                ),
+            )
+        return True
+
+    def save_opportunity(self, opportunity: OpportunityEvidence) -> bool:
+        with self._connect() as connection:
+            existing = connection.execute(
+                "SELECT payload_json FROM opportunities WHERE opportunity_id = ?",
+                (opportunity.opportunity_id,),
+            ).fetchone()
+            payload = json.dumps(opportunity.as_dict(), ensure_ascii=False, sort_keys=True)
+            if existing:
+                stored_payload = json.loads(str(existing["payload_json"]))
+                incoming_payload = json.loads(payload)
+                stored_payload.pop("detected_at_ms", None)
+                incoming_payload.pop("detected_at_ms", None)
+                if stored_payload != incoming_payload:
+                    raise ValueError("conflicting immutable opportunity")
+                return False
+            connection.execute(
+                "INSERT INTO opportunities VALUES (?, ?, ?, ?, ?)",
+                (
+                    opportunity.opportunity_id,
+                    opportunity.detector_id,
+                    opportunity.detected_at_ms,
+                    opportunity.expires_at_ms,
+                    payload,
                 ),
             )
         return True

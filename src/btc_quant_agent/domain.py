@@ -37,6 +37,14 @@ class UserDecision(StrEnum):
     IGNORE = "IGNORE"
 
 
+class RuntimeStage(StrEnum):
+    NO_OPPORTUNITY = "NO_OPPORTUNITY"
+    OPPORTUNITY_ONLY = "OPPORTUNITY_ONLY"
+    DIRECTION_CANDIDATE = "DIRECTION_CANDIDATE"
+    TRADEABLE_CANDIDATE = "TRADEABLE_CANDIDATE"
+    ACTIONABLE_SIGNAL = "ACTIONABLE_SIGNAL"
+
+
 @dataclass(frozen=True)
 class Candle:
     symbol: str
@@ -148,6 +156,31 @@ class PositionPlan:
     estimated_funding_usdt: float
 
 
+@dataclass(frozen=True)
+class OpportunityEvidence:
+    opportunity_id: str
+    symbol: str
+    detector_id: str
+    setup: Setup
+    detected_at_ms: int
+    data_timestamp_ms: int
+    expires_at_ms: int
+    regime: Regime
+    research_status: str
+    runtime_eligibility: str
+    movement_evidence: tuple[str, ...]
+    reasons: tuple[str, ...]
+    risks: tuple[str, ...]
+    legacy_pattern_side: Direction
+    legacy_side_is_actionable: bool = False
+
+    def as_dict(self) -> dict[str, Any]:
+        payload = asdict(self)
+        for key in ("setup", "regime", "legacy_pattern_side"):
+            payload[key] = str(payload[key])
+        return payload
+
+
 @dataclass
 class Signal:
     signal_id: str
@@ -229,6 +262,9 @@ class ScanResult:
     signal: Signal | None = None
     diagnostics: dict[str, Any] = field(default_factory=dict)
     reason_code: str = "UNSPECIFIED"
+    opportunity: OpportunityEvidence | None = None
+    runtime_stage: RuntimeStage = RuntimeStage.NO_OPPORTUNITY
+    registry_snapshot: dict[str, Any] = field(default_factory=dict)
 
     def as_dict(self) -> dict[str, Any]:
         return {
@@ -238,4 +274,7 @@ class ScanResult:
             "signal": self.signal.as_dict() if self.signal else None,
             "diagnostics": self.diagnostics,
             "reason_code": self.reason_code,
+            "opportunity": self.opportunity.as_dict() if self.opportunity else None,
+            "runtime_stage": self.runtime_stage.value,
+            "registry_snapshot": self.registry_snapshot,
         }

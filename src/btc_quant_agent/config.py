@@ -12,8 +12,8 @@ from typing import Any
 @dataclass(frozen=True)
 class RuntimeConfig:
     symbol: str = "BTCUSDT"
-    strategy_version: str = "0.2.2"
-    feature_version: str = "0.2.2"
+    strategy_version: str = "0.3.11"
+    feature_version: str = "0.3.11"
     validation_status: str = "EXPERIMENTAL"
     decision_interval: str = "15m"
     ttl_minutes: int = 45

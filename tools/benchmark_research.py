@@ -10,7 +10,7 @@ from btc_quant_agent.backtest import BacktestEngine
 from btc_quant_agent.config import load_config
 from btc_quant_agent.data.binance_archive import read_parquet_candles
 from btc_quant_agent.data.funding import read_funding_events_csv
-from btc_quant_agent.engine import QuantEngine
+from btc_quant_agent.engine import EngineMode, QuantEngine
 from btc_quant_agent.research_protocol import DEV_START_MS
 
 
@@ -39,7 +39,9 @@ def main() -> None:
         ),
     )
     run_started = time.perf_counter()
-    outcomes = BacktestEngine(QuantEngine(config), None, funding).run(candles)
+    outcomes = BacktestEngine(
+        QuantEngine(config, mode=EngineMode.LEGACY_RESEARCH_V022), None, funding
+    ).run(candles)
     run_seconds = time.perf_counter() - run_started
     print(
         json.dumps(

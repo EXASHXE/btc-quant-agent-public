@@ -20,7 +20,7 @@ from .backtest import FundingEvent, resample
 from .causal_entry_research import IndexedOneMinuteSeries
 from .config import AppConfig
 from .domain import Candle
-from .engine import HistoricalFeatureCache, QuantEngine
+from .engine import EngineMode, HistoricalFeatureCache, QuantEngine
 from .funding_crowding_research import (
     PRIMARY_HORIZONS,
     StrictAfterPriceSeries,
@@ -215,7 +215,9 @@ def _decorate_market_state(
 ) -> None:
     hourly = resample(candles, "1h")
     closes = [bar.close_time_ms for bar in hourly]
-    engine = QuantEngine(config, HistoricalFeatureCache())
+    engine = QuantEngine(
+        config, HistoricalFeatureCache(), mode=EngineMode.LEGACY_RESEARCH_V022
+    )
     import bisect
 
     for row in rows:

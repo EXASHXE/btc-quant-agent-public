@@ -24,7 +24,7 @@ from .backtest import (
 from .config import AppConfig
 from .data.derivatives import HistoricalDerivativeStore
 from .domain import Candle
-from .engine import HistoricalFeatureCache, QuantEngine
+from .engine import EngineMode, HistoricalFeatureCache, QuantEngine
 from .structure import confirmed_levels
 
 DEV_START_MS = int(datetime(2021, 1, 1, tzinfo=UTC).timestamp() * 1000)
@@ -276,7 +276,7 @@ def run_full_suite(
         capture_decisions: bool = False,
     ) -> list[TradeOutcome]:
         backtest = BacktestEngine(
-            QuantEngine(candidate, feature_cache),
+            QuantEngine(candidate, feature_cache, mode=EngineMode.LEGACY_RESEARCH_V022),
             derivatives,
             events,
             capture_decisions=capture_decisions,

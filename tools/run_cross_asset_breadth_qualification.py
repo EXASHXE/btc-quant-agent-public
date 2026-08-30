@@ -32,7 +32,7 @@ def main() -> None:
     if basket_manifest["end_ms_exclusive"] != DEV_END_MS:
         raise ValueError("cross-asset Holdout firewall")
     candles = read_parquet_candles(btc_root, start_ms=DEV_START_MS, end_ms=DEV_END_MS)
-    config = load_config(args.config)
+    config = load_config(args.config or "configs/frozen/v0.2.2.toml")
     config = replace(
         config,
         strategy=replace(

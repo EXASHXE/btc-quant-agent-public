@@ -11,6 +11,7 @@ from ..config import AppConfig
 from ..data.binance import BinancePublicClient
 from ..domain import Direction, Signal, SignalStatus
 from ..engine import QuantEngine
+from ..research_registry import RegistryError, load_registry
 from ..storage import Repository
 from .binance_signed import BinanceSignedClient
 from .guard import ExecutionBlocked, ExecutionGuard
@@ -57,6 +58,14 @@ class ExecutionService:
             and credentials_present
             and live_armed
         )
+        try:
+            registry = load_registry()
+            registry_gate = "PASS" if registry.qualified_direction_engine_count else "BLOCKED"
+            qualified = registry.qualified_direction_engine_count
+        except RegistryError:
+            registry_gate = "FAIL_CLOSED"
+            qualified = 0
+        ready = ready and qualified > 0
         return {
             "mode": mode.value,
             "order_submission_enabled": ready,
@@ -67,7 +76,22 @@ class ExecutionService:
             "max_leverage": self.config.execution.max_leverage,
             "max_daily_loss_usdt": self.config.execution.max_daily_loss_usdt,
             "protective_orders_required": self.config.execution.require_protective_orders,
+            "research_registry_gate": registry_gate,
+            "qualified_direction_engine": "NONE",
+            "qualified_direction_engine_count": qualified,
+            "runtime_actionability": "OPPORTUNITY_ONLY"
+            if registry_gate != "FAIL_CLOSED"
+            else "NO_OPPORTUNITY",
         }
+
+    def _assert_signal_registry_actionable(self, _signal_id: str) -> None:
+        try:
+            registry = load_registry()
+            active = registry.get("active_direction_engine")
+        except RegistryError as exc:
+            raise ExecutionBlocked("RESEARCH_REGISTRY_NOT_ACTIONABLE") from exc
+        if not active.actionable or registry.qualified_direction_engine_count == 0:
+            raise ExecutionBlocked("RESEARCH_REGISTRY_NOT_ACTIONABLE")
 
     def _signed_client(self) -> BinanceSignedClient:
         if self._injected_signed_client:
@@ -119,9 +143,7 @@ class ExecutionService:
             )
             if reason is not None:
                 status = (
-                    SignalStatus.EXPIRED
-                    if reason == "TTL_EXPIRED"
-                    else SignalStatus.INVALIDATED
+                    SignalStatus.EXPIRED if reason == "TTL_EXPIRED" else SignalStatus.INVALIDATED
                 )
                 if status == SignalStatus.INVALIDATED:
                     self.repository.invalidate_signal(signal_id, reason)
@@ -135,6 +157,7 @@ class ExecutionService:
         return refreshed
 
     def build_entry_plan(self, signal_id: str, now_ms: int | None = None) -> ExecutionPlan:
+        self._assert_signal_registry_actionable(signal_id)
         current = now_ms or int(time.time() * 1000)
         signal = self.refresh_signal_state(signal_id, current)
         filters = self.public_client.symbol_filters(signal.symbol)
@@ -144,7 +167,11 @@ class ExecutionService:
         if legal_low > legal_high:
             raise ExecutionBlocked("entry range contains no legal exchange tick")
         midpoint = (signal.entry_low + signal.entry_high) / 2.0
-        entry = _floor_to(midpoint, tick) if signal.direction == Direction.LONG else _ceil_to(midpoint, tick)
+        entry = (
+            _floor_to(midpoint, tick)
+            if signal.direction == Direction.LONG
+            else _ceil_to(midpoint, tick)
+        )
         entry = min(max(entry, legal_low), legal_high)
         stop = (
             _floor_to(signal.stop_loss, tick)

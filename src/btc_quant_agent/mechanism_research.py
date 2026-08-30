@@ -20,7 +20,7 @@ from typing import Any
 from .backtest import BacktestEngine, FundingEvent, TradeOutcome, metrics, resample
 from .config import AppConfig
 from .domain import Candidate, Candle, Direction, Setup, TimeframeFeatures
-from .engine import HistoricalFeatureCache, QuantEngine
+from .engine import EngineMode, HistoricalFeatureCache, QuantEngine
 from .funnel import trace_setup_funnels
 from .mechanism import (
     EXPERIMENT_ARMS,
@@ -84,6 +84,7 @@ def _run_arm(
         cache,
         research_candidate_transform=candidate_transform,
         research_factor_transform=factor_transform,
+        mode=EngineMode.LEGACY_RESEARCH_V022,
     )
     backtest = BacktestEngine(engine, None, funding, capture_decisions=name != "CONTROL")
     started = time.perf_counter()
@@ -232,7 +233,7 @@ def run_v032_experiments(
     limits = {"15m": frozen.data.history_limit_15m, "1h": frozen.data.history_limit_1h, "4h": frozen.data.history_limit_4h}
     histories: dict[str, deque[Candle]] = {name: deque(maxlen=limits[name]) for name in completed}
     cursors = {name: 0 for name in completed}
-    engine = QuantEngine(frozen, cache)
+    engine = QuantEngine(frozen, cache, mode=EngineMode.LEGACY_RESEARCH_V022)
     rr_rows: list[dict[str, Any]] = []
     candidate_rows: list[dict[str, Any]] = []
     e1_rows: list[dict[str, Any]] = []

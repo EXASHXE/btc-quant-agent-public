@@ -1,7 +1,7 @@
 [runtime]
 symbol = "BTCUSDT"
-strategy_version = "0.3.11"
-feature_version = "0.3.11"
+strategy_version = "0.2.2"
+feature_version = "0.2.2"
 validation_status = "EXPERIMENTAL"
 decision_interval = "15m"
 ttl_minutes = 45
@@ -75,7 +75,6 @@ trend_pullback_holding_minutes = 720
 breakout_retest_holding_minutes = 480
 
 [execution]
-# disabled | paper | testnet | live. The shipped default cannot place orders.
 mode = "disabled"
 auto_execute = false
 allow_live = false

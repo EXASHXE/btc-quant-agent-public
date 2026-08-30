@@ -4,6 +4,7 @@ import hashlib
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
+from enum import StrEnum
 from typing import Any
 
 from .config import AppConfig
@@ -13,6 +14,8 @@ from .domain import (
     Candidate,
     Candle,
     DerivativesSnapshot,
+    OpportunityEvidence,
+    RuntimeStage,
     ScanResult,
     Signal,
     SignalStatus,
@@ -21,6 +24,7 @@ from .domain import (
 from .features import build_features
 from .multifactor import FactorAssessment, assess_factors, macro_aligned
 from .regime import classify_regime
+from .research_registry import RegistryError, ResearchRegistry, load_registry
 from .risk import build_position_plan
 from .strategies import find_candidate
 from .structure import confirmed_levels
@@ -39,6 +43,11 @@ _FEATURE_CONFIG_FIELDS = (
     "bb_period",
     "cvd_window",
 )
+
+
+class EngineMode(StrEnum):
+    RUNTIME_GATED = "RUNTIME_GATED"
+    LEGACY_RESEARCH_V022 = "LEGACY_RESEARCH_V022"
 
 
 @dataclass
@@ -65,24 +74,28 @@ class QuantEngine:
         config: AppConfig,
         historical_feature_cache: HistoricalFeatureCache | None = None,
         *,
-        research_candidate_transform: Callable[
-            [Candidate, TimeframeFeatures], Candidate
-        ]
+        research_candidate_transform: Callable[[Candidate, TimeframeFeatures], Candidate]
         | None = None,
         research_factor_transform: Callable[
             [FactorAssessment, Candidate, TimeframeFeatures], FactorAssessment
         ]
         | None = None,
+        mode: EngineMode = EngineMode.RUNTIME_GATED,
+        registry: ResearchRegistry | None = None,
     ):
         self.config = config
         self._feature_cache: dict[str, tuple[tuple[Candle, ...], TimeframeFeatures]] = {}
         self._historical_feature_cache = historical_feature_cache
         self._research_candidate_transform = research_candidate_transform
         self._research_factor_transform = research_factor_transform
+        self.mode = mode
+        self._registry = registry
+        if mode == EngineMode.RUNTIME_GATED and (
+            research_candidate_transform is not None or research_factor_transform is not None
+        ):
+            raise ValueError("research transforms require explicit LEGACY_RESEARCH_V022 mode")
 
-    def _features(
-        self, interval: str, candles: Sequence[Candle]
-    ) -> TimeframeFeatures:
+    def _features(self, interval: str, candles: Sequence[Candle]) -> TimeframeFeatures:
         frozen = tuple(candles)
         cached = self._feature_cache.get(interval)
         if cached is not None and cached[0] == frozen:
@@ -106,9 +119,7 @@ class QuantEngine:
             historical_cache.values[historical_key] = features
         return features
 
-    def diagnostic_features(
-        self, interval: str, candles: Sequence[Candle]
-    ) -> TimeframeFeatures:
+    def diagnostic_features(self, interval: str, candles: Sequence[Candle]) -> TimeframeFeatures:
         """Return the same cached features used by ``scan`` for read-only diagnostics."""
         return self._features(interval, candles)
 
@@ -195,6 +206,90 @@ class QuantEngine:
         if self._research_candidate_transform is not None:
             candidate = self._research_candidate_transform(candidate, features_15m)
 
+        if self.mode == EngineMode.RUNTIME_GATED:
+            detector_id = {
+                "TREND_PULLBACK": "trend_pullback_opportunity",
+                "BREAKOUT_RETEST": "breakout_retest_opportunity",
+            }[candidate.setup.value]
+            try:
+                registry = self._registry or load_registry()
+                component = registry.get(detector_id)
+            except RegistryError as exc:
+                return ScanResult(
+                    "WAIT",
+                    "DEGRADED",
+                    str(exc),
+                    diagnostics=diagnostics,
+                    reason_code="RESEARCH_REGISTRY_BLOCKED",
+                    runtime_stage=RuntimeStage.NO_OPPORTUNITY,
+                    registry_snapshot={"status": "FAIL_CLOSED", "error": str(exc)},
+                )
+            eligible = (
+                component.role == "OPPORTUNITY"
+                and component.research_status.value == "SUPPORTED_MOVEMENT"
+                and component.runtime_eligibility.value == "ANALYSIS_ONLY"
+            )
+            if not eligible:
+                return ScanResult(
+                    "WAIT",
+                    "DEGRADED",
+                    f"registry blocks detector {detector_id}",
+                    diagnostics=diagnostics,
+                    reason_code="RESEARCH_REGISTRY_BLOCKED",
+                    runtime_stage=RuntimeStage.NO_OPPORTUNITY,
+                    registry_snapshot={
+                        "component_id": detector_id,
+                        "research_status": component.research_status.value,
+                        "runtime_eligibility": component.runtime_eligibility.value,
+                    },
+                )
+            decision_interval_ms = _interval_ms(self.config.runtime.decision_interval)
+            expires_at_ms = candles_15m[-1].close_time_ms + min(
+                self.config.runtime.ttl_minutes * 60_000,
+                self.config.strategy.max_signal_age_bars * decision_interval_ms,
+            )
+            identity = (
+                f"{self.config.runtime.symbol}:{detector_id}:"
+                f"{candidate.structure_id}:{candles_15m[-1].close_time_ms}"
+            )
+            opportunity = OpportunityEvidence(
+                opportunity_id="opp-" + hashlib.sha256(identity.encode()).hexdigest()[:20],
+                symbol=self.config.runtime.symbol,
+                detector_id=detector_id,
+                setup=candidate.setup,
+                detected_at_ms=now_ms,
+                data_timestamp_ms=candles_15m[-1].close_time_ms,
+                expires_at_ms=expires_at_ms,
+                regime=regime,
+                research_status=component.research_status.value,
+                runtime_eligibility=component.runtime_eligibility.value,
+                movement_evidence=component.evidence_paths,
+                reasons=candidate.reasons,
+                risks=candidate.risks,
+                legacy_pattern_side=candidate.direction,
+                legacy_side_is_actionable=False,
+            )
+            diagnostics["legacy_pattern_side"] = candidate.direction.value
+            diagnostics["qualified_direction_engine"] = "NONE"
+            return ScanResult(
+                "OPPORTUNITY_ONLY",
+                "OK",
+                "supported movement opportunity; no research-qualified Direction Engine",
+                signal=None,
+                diagnostics=diagnostics,
+                reason_code="OPPORTUNITY_SUPPORTED_MOVEMENT",
+                opportunity=opportunity,
+                runtime_stage=RuntimeStage.OPPORTUNITY_ONLY,
+                registry_snapshot={
+                    "schema_version": registry.schema_version,
+                    "registry_version": registry.registry_version,
+                    "component_id": component.component_id,
+                    "research_status": component.research_status.value,
+                    "runtime_eligibility": component.runtime_eligibility.value,
+                    "qualified_direction_engine": "NONE",
+                },
+            )
+
         derivative_risks: list[str] = list(candidate.risks)
         health = "OK"
         derivatives, stale_fields = sanitize_derivatives(
@@ -220,8 +315,7 @@ class QuantEngine:
         elif required_stale:
             health = "DEGRADED"
             derivative_risks.extend(
-                f"策略要求的衍生品字段过期或尚不可见：{name}"
-                for name in required_stale
+                f"策略要求的衍生品字段过期或尚不可见：{name}" for name in required_stale
             )
 
         assessment = assess_factors(
@@ -233,9 +327,7 @@ class QuantEngine:
             self.config.strategy,
         )
         if self._research_factor_transform is not None:
-            assessment = self._research_factor_transform(
-                assessment, candidate, features_15m
-            )
+            assessment = self._research_factor_transform(assessment, candidate, features_15m)
         diagnostics["factor_score"] = assessment.score
         diagnostics["factor_scores"] = assessment.group_scores
         diagnostics["positive_factor_groups"] = assessment.positive_groups
@@ -340,12 +432,14 @@ class QuantEngine:
         )
         diagnostics["fingerprint"] = fingerprint
         return ScanResult(
-            signal.direction.value,
-            health,
-            "confirmed",
-            signal,
-            diagnostics,
-            "CONFIRMED",
+            action=signal.direction.value,
+            health=health,
+            reason="confirmed",
+            signal=signal,
+            diagnostics=diagnostics,
+            reason_code="CONFIRMED",
+            runtime_stage=RuntimeStage.ACTIONABLE_SIGNAL,
+            registry_snapshot={"engine_mode": EngineMode.LEGACY_RESEARCH_V022.value},
         )
 
     def invalidation_reason(

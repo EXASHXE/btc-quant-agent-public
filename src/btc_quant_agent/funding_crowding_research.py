@@ -29,7 +29,7 @@ from .data.collector import collect_derivative_snapshot
 from .data.derivatives import DERIVATIVE_FIELDS, HistoricalDerivativeStore
 from .directional_architecture_research import movement_label
 from .domain import Candle
-from .engine import HistoricalFeatureCache, QuantEngine
+from .engine import EngineMode, HistoricalFeatureCache, QuantEngine
 from .geometry_research import run_v033_geometry_audit
 from .research import DEV_END_MS, DEV_START_MS
 
@@ -223,7 +223,9 @@ def _decorate_funding_features(
 ) -> None:
     hourly = resample(candles, "1h")
     closes = [bar.close_time_ms for bar in hourly]
-    engine = QuantEngine(config, HistoricalFeatureCache())
+    engine = QuantEngine(
+        config, HistoricalFeatureCache(), mode=EngineMode.LEGACY_RESEARCH_V022
+    )
     for row in feature_rows:
         if row["feature_status"] == "WARMUP_INCOMPLETE":
             continue

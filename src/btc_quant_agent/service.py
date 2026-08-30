@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from .config import AppConfig
 from .data.binance import BinancePublicClient
 from .domain import ScanResult, UserDecision
-from .engine import QuantEngine
+from .engine import EngineMode, QuantEngine
 from .execution.service import ExecutionService
 from .notify.feishu import send_invalidation, send_signal
 from .shadow import update_shadow
@@ -39,7 +39,7 @@ class QuantService:
             symbol, include_order_book=self.config.strategy.enable_order_book_factor
         )
         now_ms = max(now_ms, derivatives.observed_at_ms)
-        engine = QuantEngine(self.config)
+        engine = QuantEngine(self.config, mode=EngineMode.RUNTIME_GATED)
         self.repository.expire_signals(now_ms)
         webhook = os.getenv("FEISHU_WEBHOOK_URL")
         secret = os.getenv("FEISHU_WEBHOOK_SECRET")
@@ -62,6 +62,8 @@ class QuantService:
             include_order_book=self.config.strategy.enable_order_book_factor,
         )
         self.repository.record_event("scan", result.as_dict())
+        if result.opportunity is not None:
+            self.repository.save_opportunity(result.opportunity)
         if result.signal is None:
             return result
         inserted = self.repository.save_signal(result.signal, self.config.runtime.cooldown_minutes)
@@ -99,12 +101,35 @@ class QuantService:
         )
 
     def health(self) -> dict[str, object]:
+        from .data.forward_store import ForwardDerivativeStore, scheduler_status
+        from .research_registry import RegistryError, load_registry
+
+        registry_status: dict[str, object]
+        try:
+            registry = load_registry()
+            registry_status = {
+                "research_registry_gate": "VALID",
+                "qualified_direction_engine": "NONE",
+                "runtime_actionability": registry.runtime_maximum_stage,
+            }
+        except RegistryError as exc:
+            registry_status = {
+                "research_registry_gate": "FAIL_CLOSED",
+                "qualified_direction_engine": "NONE",
+                "runtime_actionability": "NO_OPPORTUNITY",
+                "error": str(exc),
+            }
+        forward = ForwardDerivativeStore("data/forward/BTCUSDT/derivatives.sqlite3").status(
+            scheduler=scheduler_status()
+        )
         report: dict[str, object] = {
             "status": "OK",
             "database": self.config.storage.sqlite_path,
             "strategy_version": self.config.runtime.strategy_version,
             "validation_status": self.config.runtime.validation_status,
             "execution": self.execution.status(),
+            **registry_status,
+            "forward_derivatives": forward,
         }
         try:
             report["binance_public_data"] = self.client.connectivity()

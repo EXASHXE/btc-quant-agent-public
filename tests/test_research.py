@@ -4,7 +4,7 @@ from helpers import candles
 
 from btc_quant_agent.backtest import TradeOutcome
 from btc_quant_agent.config import AppConfig
-from btc_quant_agent.engine import QuantEngine
+from btc_quant_agent.engine import EngineMode, QuantEngine
 from btc_quant_agent.research import (
     ablation_configs,
     replay_decisions,
@@ -90,7 +90,10 @@ class ResearchTests(unittest.TestCase):
         self.assertAlmostEqual(stressed.r_multiple or 0, 1.4)
 
     def test_replay_emits_each_closed_15m_decision_without_future_data(self) -> None:
-        rows = replay_decisions(candles(60, "1m", 60_000), QuantEngine(AppConfig()))
+        rows = replay_decisions(
+            candles(60, "1m", 60_000),
+            QuantEngine(AppConfig(), mode=EngineMode.LEGACY_RESEARCH_V022),
+        )
         self.assertEqual(len(rows), 4)
         self.assertEqual(rows[0]["timestamp_ms"], 900_000)
         self.assertIn(rows[0]["decision"], {"WAIT", "NO_SIGNAL"})

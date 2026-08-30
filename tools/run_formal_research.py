@@ -38,7 +38,7 @@ def main() -> None:
         for event in read_funding_events_csv(root / "funding_events.csv")
         if DEV_START_MS <= event.timestamp_ms < DEV_END_MS
     ]
-    config = load_config(args.config)
+    config = load_config(args.config or "configs/frozen/v0.2.2.toml")
     config = replace(
         config,
         strategy=replace(

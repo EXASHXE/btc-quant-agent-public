@@ -22,7 +22,7 @@ def main() -> None:
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     validate_research_manifest(manifest)
     candles = read_parquet_candles(root, start_ms=DEV_START_MS, end_ms=DEV_END_MS)
-    config = load_config(args.config)
+    config = load_config(args.config or "configs/frozen/v0.2.2.toml")
     result = run_v0310(candles, config)
     output = write_v0310_artifacts(args.output, result, config, args.protocol, manifest_path)
     print(json.dumps({

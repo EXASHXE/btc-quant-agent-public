@@ -21,7 +21,7 @@ from .backtest import FundingEvent, resample
 from .config import AppConfig
 from .directional_episode import EpisodeAccumulator
 from .domain import Candle, Direction, Setup, TimeframeFeatures
-from .engine import HistoricalFeatureCache, QuantEngine
+from .engine import EngineMode, HistoricalFeatureCache, QuantEngine
 from .funnel import SetupFunnelTrace, trace_setup_funnels
 from .indicators import ema
 from .mechanism import decompose_rr
@@ -771,7 +771,9 @@ def run_v033_geometry_audit(
     }
     histories: dict[str, deque[Candle]] = {name: deque(maxlen=limits[name]) for name in completed}
     cursors = {name: 0 for name in completed}
-    engine = QuantEngine(frozen, HistoricalFeatureCache())
+    engine = QuantEngine(
+        frozen, HistoricalFeatureCache(), mode=EngineMode.LEGACY_RESEARCH_V022
+    )
     tp_rows: list[dict[str, Any]] = []
     br_rows: list[dict[str, Any]] = []
     trend_control_rows: list[dict[str, Any]] = []

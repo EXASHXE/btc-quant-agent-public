@@ -15,7 +15,7 @@ from btc_quant_agent.domain import (
     Setup,
     TimeframeFeatures,
 )
-from btc_quant_agent.engine import QuantEngine
+from btc_quant_agent.engine import EngineMode, QuantEngine
 from btc_quant_agent.multifactor import FactorAssessment
 
 
@@ -81,7 +81,9 @@ class EngineCorrectnessTests(unittest.TestCase):
             patch("btc_quant_agent.engine.build_position_plan", return_value=self.plan),
             patch("btc_quant_agent.engine.confirmed_levels", return_value=([100.0], [125.0])),
         ):
-            return QuantEngine(config).scan(*self.candles, derivatives, now_ms)
+            return QuantEngine(config, mode=EngineMode.LEGACY_RESEARCH_V022).scan(
+                *self.candles, derivatives, now_ms
+            )
 
     def test_signal_ttl_is_anchored_to_decision_data_timestamp(self) -> None:
         result = self._scan(AppConfig(), 900_000)
@@ -119,7 +121,9 @@ class EngineCorrectnessTests(unittest.TestCase):
             patch("btc_quant_agent.engine.build_position_plan", return_value=self.plan),
             patch("btc_quant_agent.engine.confirmed_levels", return_value=([], [])),
         ):
-            QuantEngine(AppConfig()).scan(*self.candles, derivatives, now_ms)
+            QuantEngine(AppConfig(), mode=EngineMode.LEGACY_RESEARCH_V022).scan(
+                *self.candles, derivatives, now_ms
+            )
         sanitized = assess.call_args.args[4]
         self.assertIsNone(sanitized.open_interest)
         self.assertIsNone(sanitized.open_interest_change_pct)
@@ -223,7 +227,9 @@ class EngineCorrectnessTests(unittest.TestCase):
             patch("btc_quant_agent.engine.assess_factors", return_value=selected_assessment),
             patch("btc_quant_agent.engine.build_position_plan", return_value=selected_plan),
         ):
-            return QuantEngine(AppConfig()).scan(*self.candles, None, 900_000)
+            return QuantEngine(AppConfig(), mode=EngineMode.LEGACY_RESEARCH_V022).scan(
+                *self.candles, None, 900_000
+            )
 
     def test_invalidation_rechecks_ttl_data_regime_macro_and_rr(self) -> None:
         result = self._scan(AppConfig(), 900_000)

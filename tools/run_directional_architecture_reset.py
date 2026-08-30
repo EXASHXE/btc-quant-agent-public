@@ -33,7 +33,7 @@ def main() -> None:
     manifest_path = root / "data_manifest.json"
     validate_research_manifest(json.loads(manifest_path.read_text(encoding="utf-8")))
     candles = read_parquet_candles(root, start_ms=DEV_START_MS, end_ms=DEV_END_MS)
-    config = load_config(args.config)
+    config = load_config(args.config or "configs/frozen/v0.2.2.toml")
     config = replace(
         config,
         strategy=replace(

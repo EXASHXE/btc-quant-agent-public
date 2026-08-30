@@ -21,7 +21,7 @@ from .backtest import resample
 from .causal_entry_research import IndexedOneMinuteSeries
 from .config import AppConfig
 from .domain import Candle
-from .engine import HistoricalFeatureCache, QuantEngine
+from .engine import EngineMode, HistoricalFeatureCache, QuantEngine
 from .funding_crowding_research import (
     PRIMARY_HORIZONS,
     _cluster_bootstrap_median,
@@ -79,7 +79,9 @@ def build_hourly_features(
     maps = {
         symbol: {int(row["open_time_ms"]): row for row in rows} for symbol, rows in basket.items()
     }
-    engine = QuantEngine(config, HistoricalFeatureCache())
+    engine = QuantEngine(
+        config, HistoricalFeatureCache(), mode=EngineMode.LEGACY_RESEARCH_V022
+    )
     output: list[dict[str, Any]] = []
     for index, btc in enumerate(btc_hourly):
         if index < 4:

@@ -24,6 +24,16 @@ class BinanceDataError(RuntimeError):
     pass
 
 
+@dataclass(frozen=True)
+class DerivativeCollection:
+    collection_started_at_ms: int
+    observed_at_ms: int
+    snapshot: DerivativesSnapshot
+    attempted_fields: tuple[str, ...]
+    field_availability: dict[str, bool]
+    endpoint_errors: dict[str, str]
+
+
 @dataclass
 class BinancePublicClient:
     config: DataConfig
@@ -115,27 +125,58 @@ class BinancePublicClient:
         return self._parse_klines(ordered, symbol, interval, end_time_ms + 1)
 
     def derivatives(self, symbol: str, *, include_order_book: bool = False) -> DerivativesSnapshot:
+        return self.collect_derivatives(symbol, include_order_book=include_order_book).snapshot
+
+    def collect_derivatives(
+        self, symbol: str, *, include_order_book: bool = False
+    ) -> DerivativeCollection:
         symbol = symbol.upper()
-        observed_at = int(time.time() * 1000)
-        premium = self._get("/fapi/v1/premiumIndex", {"symbol": symbol})
-        oi = self._optional_get("/fapi/v1/openInterest", {"symbol": symbol}) or {}
-        oi_history = self._optional_get(
-            "/futures/data/openInterestHist",
-            {"symbol": symbol, "period": "1h", "limit": 2},
-        ) or []
-        taker = self._optional_get(
-            "/futures/data/takerlongshortRatio", {"symbol": symbol, "period": "15m", "limit": 1}
-        ) or []
-        long_short = self._optional_get(
-            "/futures/data/globalLongShortAccountRatio",
-            {"symbol": symbol, "period": "1h", "limit": 1},
-        ) or []
-        basis = self._optional_get(
-            "/futures/data/basis",
-            {"pair": symbol, "contractType": "PERPETUAL", "period": "5m", "limit": 1},
-        ) or []
+        started = int(time.time() * 1000)
+        errors: dict[str, str] = {}
+
+        def attempt(name: str, path: str, params: dict[str, Any]) -> Any:
+            try:
+                return self._get(path, params)
+            except BinanceDataError as exc:
+                errors[name] = str(exc)
+                return None
+
+        premium = attempt("funding_mark_index", "/fapi/v1/premiumIndex", {"symbol": symbol}) or {}
+        oi = attempt("open_interest", "/fapi/v1/openInterest", {"symbol": symbol}) or {}
+        oi_history = (
+            attempt(
+                "open_interest_history",
+                "/futures/data/openInterestHist",
+                {"symbol": symbol, "period": "1h", "limit": 2},
+            )
+            or []
+        )
+        taker = (
+            attempt(
+                "taker",
+                "/futures/data/takerlongshortRatio",
+                {"symbol": symbol, "period": "15m", "limit": 1},
+            )
+            or []
+        )
+        long_short = (
+            attempt(
+                "long_short",
+                "/futures/data/globalLongShortAccountRatio",
+                {"symbol": symbol, "period": "1h", "limit": 1},
+            )
+            or []
+        )
+        basis = (
+            attempt(
+                "basis",
+                "/futures/data/basis",
+                {"pair": symbol, "contractType": "PERPETUAL", "period": "5m", "limit": 1},
+            )
+            or []
+        )
         depth = (
-            self._optional_get("/fapi/v1/depth", {"symbol": symbol, "limit": 20}) or {}
+            attempt("order_book", "/fapi/v1/depth", {"symbol": symbol, "limit": 20}) or {}
             if include_order_book
             else {}
         )
@@ -159,36 +200,67 @@ class BinancePublicClient:
         if best_bid is not None and best_ask is not None:
             mid = (best_bid + best_ask) / 2.0
             spread_bps = (best_ask - best_bid) / mid * 10_000 if mid else None
-        mark_price = float(premium["markPrice"])
-        index_price = float(premium["indexPrice"])
-        return DerivativesSnapshot(
+        mark_price = float(premium["markPrice"]) if "markPrice" in premium else None
+        index_price = float(premium["indexPrice"]) if "indexPrice" in premium else None
+        observed_at = int(time.time() * 1000)
+        snapshot = DerivativesSnapshot(
             observed_at_ms=observed_at,
             mark_price=mark_price,
             index_price=index_price,
-            premium_bps=(mark_price / index_price - 1.0) * 10_000 if index_price else None,
-            funding_rate=float(premium["lastFundingRate"]),
-            funding_time_ms=int(premium.get("time", observed_at)),
+            premium_bps=(mark_price / index_price - 1.0) * 10_000
+            if mark_price is not None and index_price
+            else None,
+            funding_rate=float(premium["lastFundingRate"])
+            if "lastFundingRate" in premium
+            else None,
+            funding_time_ms=int(premium["time"]) if "time" in premium else None,
             open_interest=float(oi["openInterest"]) if "openInterest" in oi else None,
-            open_interest_time_ms=int(oi.get("time", observed_at)) if oi else None,
+            open_interest_time_ms=int(oi["time"]) if "time" in oi else None,
             open_interest_change_pct=oi_change,
             taker_buy_sell_ratio=(
                 float(latest_taker["buySellRatio"]) if "buySellRatio" in latest_taker else None
             ),
-            taker_time_ms=int(latest_taker.get("timestamp", observed_at)),
+            taker_time_ms=int(latest_taker["timestamp"]) if "timestamp" in latest_taker else None,
             basis_rate=float(latest_basis["basisRate"]) if "basisRate" in latest_basis else None,
-            basis_time_ms=int(latest_basis.get("timestamp", observed_at)) if latest_basis else None,
+            basis_time_ms=int(latest_basis["timestamp"]) if "timestamp" in latest_basis else None,
             long_short_account_ratio=(
                 float(latest_long_short["longShortRatio"])
                 if "longShortRatio" in latest_long_short
                 else None
             ),
             long_short_time_ms=(
-                int(latest_long_short.get("timestamp", observed_at)) if latest_long_short else None
+                int(latest_long_short["timestamp"]) if "timestamp" in latest_long_short else None
             ),
             order_book_imbalance=imbalance,
             spread_bps=spread_bps,
-            order_book_time_ms=int(depth.get("E", observed_at)) if depth else None,
+            order_book_time_ms=int(depth["E"]) if "E" in depth else None,
         )
+        availability = {
+            "mark_price": snapshot.mark_price is not None,
+            "index_price": snapshot.index_price is not None,
+            "premium_bps": snapshot.premium_bps is not None,
+            "funding_rate": snapshot.funding_rate is not None,
+            "open_interest": snapshot.open_interest is not None,
+            "open_interest_change_pct": snapshot.open_interest_change_pct is not None,
+            "taker_buy_sell_ratio": snapshot.taker_buy_sell_ratio is not None,
+            "basis_rate": snapshot.basis_rate is not None,
+            "long_short_account_ratio": snapshot.long_short_account_ratio is not None,
+            "order_book_imbalance": snapshot.order_book_imbalance is not None,
+            "spread_bps": snapshot.spread_bps is not None,
+        }
+        attempted = (
+            "mark_price",
+            "index_price",
+            "premium_bps",
+            "funding_rate",
+            "open_interest",
+            "open_interest_change_pct",
+            "taker_buy_sell_ratio",
+            "basis_rate",
+            "long_short_account_ratio",
+            *(("order_book_imbalance", "spread_bps") if include_order_book else ()),
+        )
+        return DerivativeCollection(started, observed_at, snapshot, attempted, availability, errors)
 
     def _optional_get(self, path: str, params: dict[str, Any]) -> Any | None:
         try:

@@ -17,7 +17,7 @@ from typing import Any
 from .backtest import BacktestEngine, FundingEvent, TradeOutcome, metrics, resample
 from .config import AppConfig
 from .domain import Candle, Regime
-from .engine import HistoricalFeatureCache, QuantEngine
+from .engine import EngineMode, HistoricalFeatureCache, QuantEngine
 from .funnel import SetupFunnelTrace, explain_regime_classification, trace_setup_funnels
 from .regime import classify_regime
 from .research import DEV_END_MS, DEV_START_MS, ablation_configs, research_summary
@@ -207,9 +207,11 @@ def run_funnel_diagnostic(
     runtimes: dict[str, float] = {}
     for name, candidate in variants.items():
         variant_started = time.perf_counter()
-        outcomes[name] = BacktestEngine(QuantEngine(candidate, cache), None, funding_events).run(
-            candles_1m
-        )
+        outcomes[name] = BacktestEngine(
+            QuantEngine(candidate, cache, mode=EngineMode.LEGACY_RESEARCH_V022),
+            None,
+            funding_events,
+        ).run(candles_1m)
         runtimes[name] = time.perf_counter() - variant_started
 
     completed = {interval: resample(candles_1m, interval) for interval in ("15m", "1h", "4h")}
@@ -222,7 +224,7 @@ def run_funnel_diagnostic(
         key: deque(maxlen=limits[key]) for key in completed
     }
     cursors = {key: 0 for key in completed}
-    engine = QuantEngine(frozen, cache)
+    engine = QuantEngine(frozen, cache, mode=EngineMode.LEGACY_RESEARCH_V022)
     regime_counts: Counter[str] = Counter()
     regime_year: Counter[tuple[str, int]] = Counter()
     regime_quarter: Counter[tuple[str, str]] = Counter()

@@ -1,0 +1,11 @@
+[Unit]
+Description=Collect BTCUSDT PIT derivatives after each UTC quarter-hour
+
+[Timer]
+OnCalendar=*-*-* *:00,15,30,45:20 UTC
+Persistent=true
+AccuracySec=1s
+Unit=btc-quant-forward-derivatives.service
+
+[Install]
+WantedBy=timers.target

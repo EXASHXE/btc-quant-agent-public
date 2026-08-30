@@ -38,7 +38,7 @@ def main() -> None:
     funding_path = root / "funding_events.csv"
     funding_audit, funding_events = audit_funding_data(funding_path, manifest)
     candles = read_parquet_candles(root, start_ms=DEV_START_MS, end_ms=DEV_END_MS)
-    config = load_config(args.config)
+    config = load_config(args.config or "configs/frozen/v0.2.2.toml")
     config = replace(
         config,
         strategy=replace(

@@ -80,6 +80,11 @@ class FakeSignedClient:
 
 class ExecutionTests(unittest.TestCase):
     def setUp(self) -> None:
+        self.registry_gate = patch.object(
+            ExecutionService, "_assert_signal_registry_actionable", return_value=None
+        )
+        self.registry_gate.start()
+        self.addCleanup(self.registry_gate.stop)
         self.tempdir = tempfile.TemporaryDirectory()
         self.repository = Repository(str(Path(self.tempdir.name) / "execution.db"))
         current_signal = replace(
