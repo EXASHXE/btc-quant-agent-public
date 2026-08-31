@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "btc-quant-agent"
-version = "0.3.11"
+version = "0.3.12"
 description = "Registry-gated BTCUSDT opportunity research and forward PIT data engine"
 readme = "README.md"
 requires-python = ">=3.11"

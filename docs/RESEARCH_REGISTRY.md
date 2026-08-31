@@ -1,4 +1,4 @@
-# Research Registry Policy (v0.3.11)
+# Research Registry Policy (v0.3.12)
 
 `configs/research_registry.json` is the sole machine-readable source of research qualification for normal Runtime. Missing files, parse failures, unknown components, invalid schema, or missing evidence fail closed.
 
@@ -14,7 +14,7 @@
 | `range_boll20_2z_mean_reversion` | DIAGNOSTIC | INCONCLUSIVE | ANALYSIS_ONLY | NOT_CANDIDATE |
 | `active_direction_engine` | DIRECTION | REJECTED / NONE | BLOCKED | no qualified engine |
 
-Registry schema is `1.0.0`, registry version is `v0.3.11`, qualified Direction count is `0`, maximum Runtime stage is `OPPORTUNITY_ONLY`, and Final Holdout is `SEALED`.
+Registry schema is `1.0.0`, registry version is `v0.3.12`, qualified Direction count is `0`, maximum Runtime stage is `OPPORTUNITY_ONLY`, and Final Holdout is `SEALED`. The v0.3.12 Spot–Perpetual taker-flow component is `INCONCLUSIVE/BLOCKED`; H33 and H34 were falsified.
 
 ## Validation and use
 
@@ -33,4 +33,3 @@ Historical research may opt into `LEGACY_RESEARCH_V022` only with `configs/froze
 ## Reopening governance
 
 A stopped family has `eligible_for_reuse=false`. Reopening requires a new mechanism ID, a genuinely independent information source, and a written rationale. Changing thresholds, windows, baskets, or signs is not a new mechanism. `INCONCLUSIVE` never grants Runtime eligibility. Final Holdout access remains separately governed and cannot be opened by a Registry edit.
-

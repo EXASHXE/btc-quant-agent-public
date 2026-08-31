@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "registry_version": "v0.3.11",
+  "registry_version": "v0.3.12",
   "final_holdout": "SEALED",
   "runtime_maximum_stage": "OPPORTUNITY_ONLY",
   "components": [
@@ -129,24 +129,44 @@
       "state": "NOT_CANDIDATE"
     },
     {
+      "component_id": "spot_perp_taker_flow_direction",
+      "component_type": "FEATURE",
+      "feature_family": "spot_perp_market_flow",
+      "role": "DIRECTION",
+      "version": "v0.3.12",
+      "research_status": "INCONCLUSIVE",
+      "runtime_eligibility": "BLOCKED",
+      "hypothesis_ids": ["H32", "H33", "H34"],
+      "versions_tested": ["v0.3.12"],
+      "development_window": "2021-01-01T00:00:00Z/2026-02-01T00:00:00Z",
+      "dataset_ids": ["BTCUSDT_CANONICAL_1M_V030", "BTCUSDT_SPOT_1M_BINANCE_V0312_DEV_20210101_20260201"],
+      "development_reuse_count": 1,
+      "final_holdout_accessed": false,
+      "evidence_paths": ["deliverables/v0.3.12/V0.3.12_SPOT_PERP_FLOW_QUALIFICATION_REPORT.md"],
+      "reason": "H32 was mixed and inconclusive; H33 incremental value and H34 opportunity-conditioned value were falsified. No actionable Direction is qualified.",
+      "stopped_family": false,
+      "eligible_for_reuse": false,
+      "last_updated": "2026-08-31"
+    },
+    {
       "component_id": "active_direction_engine",
       "component_type": "DIRECTION_ENGINE",
       "feature_family": "runtime_policy",
       "role": "DIRECTION",
-      "version": "v0.3.11",
+      "version": "v0.3.12",
       "research_status": "REJECTED",
       "runtime_eligibility": "BLOCKED",
       "hypothesis_ids": [],
-      "versions_tested": ["v0.3.11"],
+      "versions_tested": ["v0.3.11", "v0.3.12"],
       "development_window": "2021-01-01T00:00:00Z/2026-02-01T00:00:00Z",
       "dataset_ids": [],
       "development_reuse_count": 0,
       "final_holdout_accessed": false,
-      "evidence_paths": ["deliverables/v0.3.6/V0.3.6_DIRECTIONAL_ARCHITECTURE_RESET_REPORT.md", "deliverables/v0.3.10/V0.3.10_RECOMMENDATION.md"],
-      "reason": "No direction component is currently qualified.",
+      "evidence_paths": ["deliverables/v0.3.6/V0.3.6_DIRECTIONAL_ARCHITECTURE_RESET_REPORT.md", "deliverables/v0.3.10/V0.3.10_RECOMMENDATION.md", "deliverables/v0.3.12/V0.3.12_RECOMMENDATION.md"],
+      "reason": "No direction component is currently qualified; v0.3.12 flow research did not establish standalone, incremental, or opportunity-conditioned Direction.",
       "stopped_family": false,
       "eligible_for_reuse": false,
-      "last_updated": "2026-08-30",
+      "last_updated": "2026-08-31",
       "state": "NONE"
     }
   ]

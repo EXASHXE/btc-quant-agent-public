@@ -150,6 +150,16 @@ def test_registry_holdout_state_is_sealed() -> None:
     assert not any(item.final_holdout_accessed for item in registry.components.values())
 
 
+def test_v0312_flow_component_is_blocked_and_runtime_stays_opportunity_only() -> None:
+    registry = ResearchRegistry.load()
+    flow = registry.get("spot_perp_taker_flow_direction")
+    assert registry.registry_version == "v0.3.12"
+    assert flow.research_status.value == "INCONCLUSIVE"
+    assert flow.runtime_eligibility.value == "BLOCKED"
+    assert registry.qualified_direction_engine_count == 0
+    assert registry.runtime_maximum_stage == "OPPORTUNITY_ONLY"
+
+
 @pytest.mark.parametrize("setup", [Setup.TREND_PULLBACK, Setup.BREAKOUT_RETEST])
 def test_runtime_legacy_tp_br_do_not_emit_actionable_long_short(setup: Setup) -> None:
     result = _runtime_scan(setup)

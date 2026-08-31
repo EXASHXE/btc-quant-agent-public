@@ -1,0 +1,39 @@
+{
+  "dataset_id": "BTCUSDT_SPOT_1M_BINANCE_V0312_DEV_20210101_20260201",
+  "source": "Binance Public Data, Spot BTCUSDT monthly 1m kline archives",
+  "coverage": {
+    "start_ms": 1609459200000,
+    "end_ms_exclusive": 1769904000000,
+    "expected_minutes": 2674080,
+    "rows": 2673007,
+    "missing_minutes": 1073
+  },
+  "integrity": {
+    "official_archives_verified": 61,
+    "duplicates": 0,
+    "out_of_order": 0,
+    "invalid_volume_or_taker_volume": 0,
+    "zero_volume": 161,
+    "synthetic_rows": 0,
+    "gap_count": 7,
+    "largest_gap_minutes": 284
+  },
+  "known_gaps": [
+    {"after_ms": 1613014800000, "before_ms": 1613019600000, "missing": 79},
+    {"after_ms": 1614995940000, "before_ms": 1615001400000, "missing": 90},
+    {"after_ms": 1618883940000, "before_ms": 1618893000000, "missing": 150},
+    {"after_ms": 1619323200000, "before_ms": 1619340300000, "missing": 284},
+    {"after_ms": 1628819940000, "before_ms": 1628836200000, "missing": 270},
+    {"after_ms": 1632898740000, "before_ms": 1632906000000, "missing": 120},
+    {"after_ms": 1679661540000, "before_ms": 1679666400000, "missing": 80}
+  ],
+  "timestamp_normalization": {
+    "rule": "values >= 10^15 are integer-divided by 1000; smaller values are milliseconds",
+    "normalized_unit": "milliseconds",
+    "source_timestamp_values": {"milliseconds": 4205534, "microseconds": 1140480},
+    "audit_passed": true,
+    "thousand_x_offset_detected": false
+  },
+  "canonical_checksum_sha256": "8b952072d196de65fab7d1a67326213d012a80a816d85a0155827d2263512d1e"
+}
+

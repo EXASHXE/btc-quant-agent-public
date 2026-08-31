@@ -51,3 +51,9 @@
 ## 0.2.0
 
 - 实现 4H Macro、1H Regime、15m Setup、五组因子、Shadow Trading 和受控执行适配器。
+# v0.3.12
+
+- Added checksum-verified Binance Spot BTCUSDT 1m flow archives with explicit ms/µs timestamp normalization and gap auditing.
+- Added the preregistered `SPOT_PERP_TAKER_FLOW_SPREAD_1H` H32–H34 Development-only qualification pipeline.
+- Kept the new Direction component blocked after mixed standalone evidence and falsified incremental/opportunity-conditioned results.
+- Preserved `OPPORTUNITY_ONLY`, disabled execution, sealed Final Holdout, and the uninterrupted Forward Derivatives collector.

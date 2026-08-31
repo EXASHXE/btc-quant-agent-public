@@ -1,6 +1,6 @@
-# BTC Quant Agent v0.3.11
+# BTC Quant Agent v0.3.12
 
-一个面向 `BTCUSDT` USDⓈ-M 永续合约的低频量化研究项目。v0.3.11 的正常 Runtime 由 Research Registry 限制：TP/BR 只可输出 `OPPORTUNITY_ONLY`，当前没有合格 Direction Engine，因此不能输出 actionable `LONG/SHORT`。执行默认 `disabled`，默认配置不会读取密钥或发送订单。
+一个面向 `BTCUSDT` USDⓈ-M 永续合约的低频量化研究项目。v0.3.12 完成 Spot–Perpetual taker-flow Direction 资格研究，但未建立可用的增量 Direction；正常 Runtime 仍由 Research Registry 限制为 `OPPORTUNITY_ONLY`，不能输出 actionable `LONG/SHORT`。执行默认 `disabled`，默认配置不会读取密钥或发送订单。
 
 > 风险提示：这是研究与 Shadow Trading 工具，不是收益承诺。默认策略状态为 `EXPERIMENTAL`。在完成足量样本外验证与 30–60 天前向观察前，不应据此进行真实高杠杆交易。
 
