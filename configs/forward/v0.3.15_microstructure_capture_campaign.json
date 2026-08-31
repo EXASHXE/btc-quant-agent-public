@@ -1,0 +1,37 @@
+{
+  "schema_version": "1.0.0",
+  "campaign_id": "MICROSTRUCTURE_FORWARD_V0315_20260831T190000Z",
+  "symbol": "BTCUSDT",
+  "venue": "Binance USD-M Futures",
+  "created_from_git_sha": "c9fa49213cf0fee670633ce6dec3a89c8a9a68c7",
+  "capture_start_utc": "2026-08-31T19:00:00Z",
+  "capture_start_ms": 1788202800000,
+  "capture_start_rule": "Fixed future UTC boundary selected before collector implementation; never moved based on capture quality or research outcome",
+  "source_streams": {
+    "diff_depth": "wss://fstream.binance.com/public/stream?streams=btcusdt@depth@100ms",
+    "aggregate_trade": "wss://fstream.binance.com/market/stream?streams=btcusdt@aggTrade",
+    "rest_bootstrap_resync_only": "https://fapi.binance.com/fapi/v1/depth?symbol=BTCUSDT&limit=1000"
+  },
+  "official_docs_checked_utc": "2026-08-31T18:13:00Z",
+  "local_receive_timestamp_policy": {
+    "wall_clock": "UTC Unix milliseconds captured immediately after frame receipt",
+    "monotonic": "time.monotonic_ns captured immediately after frame receipt",
+    "exchange_event_time_never_replaced_by_receive_time": true
+  },
+  "sequence_validation_policy": {
+    "bootstrap": "buffer depth; REST snapshot; discard u < lastUpdateId; require first bridge U <= lastUpdateId <= u",
+    "continuity": "every subsequent pu must equal previous u",
+    "discontinuity": "append GAP audit event then clear book and REST resync",
+    "duplicate": "u <= current update id is stale and never double-applied"
+  },
+  "rest_snapshot_usage": "BOOTSTRAP_OR_RESYNC_ONLY",
+  "retrospective_evidence_backfill": false,
+  "aggregation_intervals": ["1s", "1m", "15m"],
+  "raw_retention_policy": "UTC-daily SQLite WAL partitions; immutable closed-partition SHA-256 manifest; raw files ignored by Git",
+  "data_schema_version": "microstructure.v1",
+  "direction_claim": "NONE",
+  "alpha_claim": "NONE",
+  "runtime_integration": "DISABLED",
+  "execution_integration": "DISABLED",
+  "final_holdout_access": false
+}
