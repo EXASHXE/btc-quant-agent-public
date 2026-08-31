@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import json
+import socket
+import ssl
 import time
 import urllib.error
 import urllib.parse
@@ -21,7 +23,41 @@ INTERVAL_MS = {
 
 
 class BinanceDataError(RuntimeError):
-    pass
+    def __init__(self, message: str, error_class: str = "UNKNOWN", retryable: bool = False):
+        super().__init__(message)
+        self.error_class = error_class
+        self.retryable = retryable
+
+
+def classify_public_error(exc: BaseException) -> tuple[str, bool]:
+    reason = exc.reason if isinstance(exc, urllib.error.URLError) else exc
+    if isinstance(exc, urllib.error.HTTPError):
+        if exc.code == 429:
+            return "HTTP_429", True
+        if 500 <= exc.code <= 599:
+            return "HTTP_5XX", True
+        return "HTTP_4XX_NON_RETRYABLE", False
+    if isinstance(reason, socket.gaierror):
+        return "DNS_ERROR", True
+    if isinstance(reason, ssl.SSLError):
+        text = str(reason).lower()
+        return (
+            "TLS_HANDSHAKE_TIMEOUT"
+            if "timed out" in text or "handshake" in text
+            else "CONNECTION_RESET",
+            True,
+        )
+    if isinstance(reason, (TimeoutError, socket.timeout)):
+        text = str(reason).lower()
+        return (
+            "TLS_HANDSHAKE_TIMEOUT" if "handshake" in text else "CONNECT_TIMEOUT",
+            True,
+        )
+    if isinstance(reason, (ConnectionResetError, BrokenPipeError)):
+        return "CONNECTION_RESET", True
+    if isinstance(exc, (json.JSONDecodeError, UnicodeDecodeError, ValueError)):
+        return "SCHEMA_ERROR", False
+    return "UNKNOWN", False
 
 
 @dataclass(frozen=True)
@@ -32,6 +68,7 @@ class DerivativeCollection:
     attempted_fields: tuple[str, ...]
     field_availability: dict[str, bool]
     endpoint_errors: dict[str, str]
+    endpoint_telemetry: dict[str, Any] | None = None
 
 
 @dataclass
@@ -49,8 +86,18 @@ class BinancePublicClient:
                 request, timeout=self.config.request_timeout_seconds
             ) as response:
                 return json.loads(response.read().decode("utf-8"))
-        except (urllib.error.URLError, TimeoutError, json.JSONDecodeError) as exc:
-            raise BinanceDataError(f"Binance public data request failed: {exc}") from exc
+        except (
+            urllib.error.URLError,
+            TimeoutError,
+            json.JSONDecodeError,
+            UnicodeDecodeError,
+        ) as exc:
+            error_class, retryable = classify_public_error(exc)
+            raise BinanceDataError(
+                f"Binance public data request failed [{error_class}]: {exc}",
+                error_class,
+                retryable,
+            ) from exc
 
     def server_time_ms(self) -> int:
         payload = self._get("/fapi/v1/time")
@@ -133,13 +180,99 @@ class BinancePublicClient:
         symbol = symbol.upper()
         started = int(time.time() * 1000)
         errors: dict[str, str] = {}
+        telemetry: dict[str, Any] = {}
+
+        def valid_payload(name: str, payload: Any) -> bool:
+            if name == "funding_mark_index":
+                return isinstance(payload, dict) and {
+                    "markPrice",
+                    "indexPrice",
+                    "lastFundingRate",
+                    "time",
+                }.issubset(payload)
+            if name == "open_interest":
+                return isinstance(payload, dict) and {"openInterest", "time"}.issubset(payload)
+            required = {
+                "open_interest_history": "sumOpenInterest",
+                "taker": "buySellRatio",
+                "long_short": "longShortRatio",
+                "basis": "basisRate",
+            }
+            if name in required:
+                return (
+                    isinstance(payload, list)
+                    and bool(payload)
+                    and isinstance(payload[-1], dict)
+                    and required[name] in payload[-1]
+                    and "timestamp" in payload[-1]
+                )
+            if name == "order_book":
+                return isinstance(payload, dict) and "bids" in payload and "asks" in payload
+            return True
 
         def attempt(name: str, path: str, params: dict[str, Any]) -> Any:
-            try:
-                return self._get(path, params)
-            except BinanceDataError as exc:
-                errors[name] = str(exc)
-                return None
+            attempts: list[dict[str, Any]] = []
+            for number in range(1, 4):
+                attempt_started = time.perf_counter()
+                try:
+                    payload = self._get(path, params)
+                    if not valid_payload(name, payload):
+                        latency = round((time.perf_counter() - attempt_started) * 1_000, 3)
+                        attempts.append(
+                            {
+                                "attempt": number,
+                                "status": "FAILED",
+                                "latency_ms": latency,
+                                "error_class": "SCHEMA_ERROR",
+                            }
+                        )
+                        errors[name] = "SCHEMA_ERROR: required response fields absent"
+                        telemetry[name] = {
+                            "attempt_count": number,
+                            "success": False,
+                            "final_error_class": "SCHEMA_ERROR",
+                            "attempts": attempts,
+                        }
+                        return None
+                    attempts.append(
+                        {
+                            "attempt": number,
+                            "status": "SUCCESS",
+                            "latency_ms": round(
+                                (time.perf_counter() - attempt_started) * 1_000, 3
+                            ),
+                            "error_class": None,
+                        }
+                    )
+                    telemetry[name] = {
+                        "attempt_count": number,
+                        "success": True,
+                        "final_error_class": None,
+                        "attempts": attempts,
+                    }
+                    return payload
+                except BinanceDataError as exc:
+                    attempts.append(
+                        {
+                            "attempt": number,
+                            "status": "FAILED",
+                            "latency_ms": round(
+                                (time.perf_counter() - attempt_started) * 1_000, 3
+                            ),
+                            "error_class": exc.error_class,
+                        }
+                    )
+                    if not exc.retryable or number == 3:
+                        errors[name] = str(exc)
+                        telemetry[name] = {
+                            "attempt_count": number,
+                            "success": False,
+                            "final_error_class": exc.error_class,
+                            "attempts": attempts,
+                        }
+                        return None
+                    time.sleep(0.1 * number)
+            raise AssertionError("bounded retry loop exhausted unexpectedly")
 
         premium = attempt("funding_mark_index", "/fapi/v1/premiumIndex", {"symbol": symbol}) or {}
         oi = attempt("open_interest", "/fapi/v1/openInterest", {"symbol": symbol}) or {}
@@ -260,7 +393,29 @@ class BinancePublicClient:
             "long_short_account_ratio",
             *(("order_book_imbalance", "spread_bps") if include_order_book else ()),
         )
-        return DerivativeCollection(started, observed_at, snapshot, attempted, availability, errors)
+        source_times = {
+            "funding_mark_index": snapshot.funding_time_ms,
+            "open_interest": snapshot.open_interest_time_ms,
+            "open_interest_history": (
+                int(oi_history[-1]["timestamp"]) if oi_history else None
+            ),
+            "taker": snapshot.taker_time_ms,
+            "long_short": snapshot.long_short_time_ms,
+            "basis": snapshot.basis_time_ms,
+            "order_book": snapshot.order_book_time_ms,
+        }
+        for name, source_timestamp in source_times.items():
+            if name in telemetry:
+                telemetry[name]["source_timestamp_ms"] = source_timestamp
+        return DerivativeCollection(
+            started,
+            observed_at,
+            snapshot,
+            attempted,
+            availability,
+            errors,
+            telemetry,
+        )
 
     def _optional_get(self, path: str, params: dict[str, Any]) -> Any | None:
         try:

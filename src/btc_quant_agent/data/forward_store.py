@@ -15,6 +15,7 @@ from pathlib import Path
 from typing import Any
 
 from ..domain import DerivativesSnapshot
+from ..evidence_epoch import EvidenceEpoch
 from .binance import BinancePublicClient, DerivativeCollection
 from .derivatives import DERIVATIVE_FIELDS
 
@@ -51,6 +52,8 @@ class ForwardDerivativeRecord:
     payload_hash: str
     trigger_source: str = "MANUAL"
     scheduled_slot_ms: int | None = None
+    endpoint_telemetry: dict[str, Any] | None = None
+    evidence_epoch_id: str | None = None
 
     @classmethod
     def from_collection(
@@ -60,15 +63,32 @@ class ForwardDerivativeRecord:
         collection: DerivativeCollection,
         *,
         trigger_source: str = "MANUAL",
+        evidence_epoch: EvidenceEpoch | None = None,
     ) -> ForwardDerivativeRecord:
+        if collection.observed_at_ms < collection.collection_started_at_ms:
+            raise ValueError("observed_at_ms must reflect final assembly after collection start")
+        source_timestamps = (
+            collection.snapshot.funding_time_ms,
+            collection.snapshot.open_interest_time_ms,
+            collection.snapshot.taker_time_ms,
+            collection.snapshot.basis_time_ms,
+            collection.snapshot.long_short_time_ms,
+            collection.snapshot.order_book_time_ms,
+        )
+        if any(
+            value is not None and value > collection.observed_at_ms
+            for value in source_timestamps
+        ):
+            raise ValueError("source timestamp cannot be after observed_at_ms")
         payload = {
             "symbol": symbol.upper(),
             "observed_at_ms": collection.observed_at_ms,
-            "collector_version": "0.3.13",
+            "collector_version": "0.3.14",
             **asdict(collection.snapshot),
             "field_availability": collection.field_availability,
             "endpoint_errors": collection.endpoint_errors,
             "attempted_fields": collection.attempted_fields,
+            "endpoint_telemetry": collection.endpoint_telemetry or {},
         }
         digest = hashlib.sha256(
             json.dumps(payload, sort_keys=True, separators=(",", ":")).encode()
@@ -78,7 +98,7 @@ class ForwardDerivativeRecord:
             collection_id,
             collection.collection_started_at_ms,
             collection.observed_at_ms,
-            "0.3.13",
+            "0.3.14",
             collection.snapshot,
             collection.field_availability,
             collection.endpoint_errors,
@@ -86,6 +106,15 @@ class ForwardDerivativeRecord:
             digest,
             trigger_source,
             (collection.collection_started_at_ms // CADENCE_MS) * CADENCE_MS,
+            collection.endpoint_telemetry or {},
+            (
+                evidence_epoch.epoch_id
+                if evidence_epoch is not None
+                and trigger_source == "SCHEDULED"
+                and (collection.collection_started_at_ms // CADENCE_MS) * CADENCE_MS
+                >= evidence_epoch.epoch_start_ms
+                else None
+            ),
         )
 
 
@@ -151,7 +180,9 @@ class ForwardDerivativeStore:
                     successful_fields TEXT NOT NULL,
                     error_summary TEXT NOT NULL,
                     trigger_source TEXT NOT NULL DEFAULT 'LEGACY_UNKNOWN',
-                    scheduled_slot_ms INTEGER
+                    scheduled_slot_ms INTEGER,
+                    endpoint_telemetry_json TEXT NOT NULL DEFAULT '{}',
+                    evidence_epoch_id TEXT
                 );
                 """
             )
@@ -167,6 +198,15 @@ class ForwardDerivativeStore:
             if "scheduled_slot_ms" not in columns:
                 connection.execute(
                     "ALTER TABLE collection_runs ADD COLUMN scheduled_slot_ms INTEGER"
+                )
+            if "endpoint_telemetry_json" not in columns:
+                connection.execute(
+                    "ALTER TABLE collection_runs ADD COLUMN endpoint_telemetry_json "
+                    "TEXT NOT NULL DEFAULT '{}'"
+                )
+            if "evidence_epoch_id" not in columns:
+                connection.execute(
+                    "ALTER TABLE collection_runs ADD COLUMN evidence_epoch_id TEXT"
                 )
 
     def append(self, record: ForwardDerivativeRecord) -> bool:
@@ -235,8 +275,8 @@ class ForwardDerivativeStore:
         connection.execute(
             "INSERT OR IGNORE INTO collection_runs "
             "(run_id, started_at_ms, finished_at_ms, status, attempted_fields, "
-            "successful_fields, error_summary, trigger_source, scheduled_slot_ms) "
-            "VALUES (?,?,?,?,?,?,?,?,?)",
+            "successful_fields, error_summary, trigger_source, scheduled_slot_ms, "
+            "endpoint_telemetry_json, evidence_epoch_id) VALUES (?,?,?,?,?,?,?,?,?,?,?)",
             (
                 record.collection_id,
                 record.collection_started_at_ms,
@@ -247,8 +287,126 @@ class ForwardDerivativeStore:
                 json.dumps(record.endpoint_errors, sort_keys=True),
                 record.trigger_source,
                 record.scheduled_slot_ms,
+                json.dumps(record.endpoint_telemetry or {}, sort_keys=True),
+                record.evidence_epoch_id,
             ),
         )
+
+    def evidence_epoch_metrics(
+        self, epoch: EvidenceEpoch, *, now_ms: int | None = None
+    ) -> dict[str, Any]:
+        now = now_ms if now_ms is not None else int(time.time() * 1_000)
+        cadence_ms = epoch.cadence_minutes * 60_000
+        latest_expected = (
+            (now - epoch.post_boundary_delay_seconds * 1_000) // cadence_ms
+        ) * cadence_ms
+        expected_slots = (
+            list(range(epoch.epoch_start_ms, latest_expected + 1, cadence_ms))
+            if latest_expected >= epoch.epoch_start_ms
+            else []
+        )
+        with self._connect() as connection:
+            rows = connection.execute(
+                "SELECT * FROM collection_runs WHERE evidence_epoch_id=? "
+                "AND trigger_source='SCHEDULED' ORDER BY scheduled_slot_ms,finished_at_ms,run_id",
+                (epoch.epoch_id,),
+            ).fetchall()
+        by_slot: dict[int, sqlite3.Row] = {}
+        for row in rows:
+            slot = int(row["scheduled_slot_ms"])
+            by_slot.setdefault(slot, row)
+        fully = {
+            slot for slot, row in by_slot.items() if self._run_is_fully_available(row)
+        }
+        partial = {
+            slot
+            for slot, row in by_slot.items()
+            if slot not in fully and bool(json.loads(str(row["successful_fields"])))
+        }
+        failed = set(by_slot) - fully - partial
+        missing = set(expected_slots) - set(by_slot)
+        bad_run = longest_bad = 0
+        for slot in expected_slots:
+            if slot in fully:
+                bad_run = 0
+            else:
+                bad_run += 1
+                longest_bad = max(longest_bad, bad_run)
+        field_coverage = {
+            field: (
+                sum(
+                    field in set(json.loads(str(by_slot[slot]["successful_fields"])))
+                    for slot in expected_slots
+                    if slot in by_slot
+                )
+                / len(expected_slots)
+                if expected_slots
+                else 0.0
+            )
+            for field in epoch.required_fields
+        }
+        age_days = max(0.0, (now - epoch.epoch_start_ms) / 86_400_000)
+        eligible = (
+            age_days >= epoch.minimum_days
+            and len(fully) >= epoch.minimum_fully_available_snapshots
+            and all(
+                value >= epoch.minimum_required_field_availability
+                for value in field_coverage.values()
+            )
+            and longest_bad
+            <= epoch.maximum_consecutive_failed_or_missing_scheduled_slots
+        )
+        return {
+            "active_epoch_id": epoch.epoch_id,
+            "epoch_start_ms": epoch.epoch_start_ms,
+            "epoch_start_rule": epoch.epoch_start_rule,
+            "epoch_age_days": age_days,
+            "expected_scheduled_slots": len(expected_slots),
+            "recorded_scheduled_slots": len(set(by_slot) & set(expected_slots)),
+            "fully_available_scheduled_slots": len(fully & set(expected_slots)),
+            "partial_slots": len(partial & set(expected_slots)),
+            "failed_slots": len(failed & set(expected_slots)),
+            "missing_slots": len(missing),
+            "active_epoch_success_rate": len(fully & set(expected_slots))
+            / len(expected_slots)
+            if expected_slots
+            else 0.0,
+            "required_field_coverage": field_coverage,
+            "max_consecutive_bad_or_missing_slots": longest_bad,
+            "snapshot_progress": len(fully & set(expected_slots))
+            / epoch.minimum_fully_available_snapshots,
+            "days_progress": min(1.0, age_days / epoch.minimum_days),
+            "eligibility_state": (
+                "ELIGIBLE_FOR_PREREGISTERED_RESEARCH"
+                if eligible
+                else "INITIALIZING"
+                if not expected_slots
+                else "INSUFFICIENT_FORWARD_HISTORY"
+            ),
+            "manual_runs_count_for_eligibility": False,
+            "legacy_runs_count_for_eligibility": False,
+            "backfilled_rows": 0,
+            "recent_endpoint_error_classes": [
+                {
+                    "scheduled_slot_ms": int(row["scheduled_slot_ms"]),
+                    "classes": sorted(
+                        {
+                            str(value.get("final_error_class"))
+                            for value in json.loads(str(row["endpoint_telemetry_json"])).values()
+                            if value.get("final_error_class")
+                        }
+                    ),
+                }
+                for row in rows[-10:]
+            ],
+            "recent_endpoint_telemetry": [
+                {
+                    "scheduled_slot_ms": int(row["scheduled_slot_ms"]),
+                    "endpoints": json.loads(str(row["endpoint_telemetry_json"])),
+                }
+                for row in rows[-3:]
+            ],
+        }
 
     def _run_rows(self) -> list[sqlite3.Row]:
         with self._connect() as connection:
@@ -562,14 +720,17 @@ def collect_once(
     symbol: str = "BTCUSDT",
     include_order_book: bool = False,
     trigger_source: str | None = None,
+    evidence_epoch_path: str | Path = "configs/forward/v0.3.14_derivatives_evidence_epoch.json",
 ) -> ForwardDerivativeRecord:
     collection = client.collect_derivatives(symbol, include_order_book=include_order_book)
     identity = hashlib.sha256(
         f"{symbol}:{collection.collection_started_at_ms}:{collection.observed_at_ms}".encode()
     ).hexdigest()[:24]
     source = trigger_source or os.getenv("BTC_QUANT_TRIGGER_SOURCE") or "MANUAL"
+    epoch_path = Path(evidence_epoch_path)
+    epoch = EvidenceEpoch.load(epoch_path) if epoch_path.exists() else None
     record = ForwardDerivativeRecord.from_collection(
-        symbol, identity, collection, trigger_source=source
+        symbol, identity, collection, trigger_source=source, evidence_epoch=epoch
     )
     store.append(record)
     return record

@@ -1,6 +1,6 @@
-# BTC Quant Agent v0.3.13
+# BTC Quant Agent v0.3.14
 
-一个面向 `BTCUSDT` USDⓈ-M 永续合约的低频量化研究项目。v0.3.13 启动真实、无方向的 TP/BR Opportunity Forward Shadow，并增强 Derivatives PIT collector 的网络诊断与可靠性账本；正常 Runtime 仍由 Research Registry 限制为 `OPPORTUNITY_ONLY`，不能输出 actionable `LONG/SHORT`。执行默认 `disabled`，默认配置不会读取密钥或发送订单。
+一个面向 `BTCUSDT` USDⓈ-M 永续合约的低频量化研究项目。v0.3.14 通过预注册 Evidence Epoch 修复 Derivatives PIT eligibility gap，并加入端点重试遥测、统一 forward watchdog 与 Opportunity outcome resolver；正常 Runtime 仍由 Research Registry 限制为 `OPPORTUNITY_ONLY`，不能输出 actionable `LONG/SHORT`。执行默认 `disabled`，默认配置不会读取密钥或发送订单。
 
 > 风险提示：这是研究与 Shadow Trading 工具，不是收益承诺。默认策略状态为 `EXPERIMENTAL`。在完成足量样本外验证与 30–60 天前向观察前，不应据此进行真实高杠杆交易。
 

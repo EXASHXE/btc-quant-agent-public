@@ -1,0 +1,11 @@
+[Unit]
+Description=Resolve mature opportunity labels hourly
+
+[Timer]
+OnCalendar=*-*-* *:07:00 UTC
+Persistent=true
+AccuracySec=1s
+Unit=btc-quant-opportunity-resolve.service
+
+[Install]
+WantedBy=timers.target

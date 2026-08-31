@@ -26,6 +26,7 @@ from .data.manifest import build_manifest, write_manifest
 from .data.network_diagnostic import diagnose_binance_network
 from .engine import EngineMode, QuantEngine
 from .explain import explain_signal
+from .forward_evidence import forward_evidence_status
 from .opportunity_forward import (
     OpportunityCampaign,
     OpportunityForwardStore,
@@ -142,6 +143,31 @@ def build_parser() -> argparse.ArgumentParser:
         command = opportunity_sub.add_parser(name)
         command.add_argument(
             "--store", default="./data/forward/BTCUSDT/opportunity_shadow.sqlite3"
+        )
+        command.add_argument(
+            "--campaign",
+            default="configs/forward/v0.3.13_opportunity_shadow_campaign.json",
+        )
+
+    forward_evidence = sub.add_parser(
+        "forward-evidence", help="unified non-alpha forward evidence watchdog"
+    )
+    forward_evidence_sub = forward_evidence.add_subparsers(
+        dest="forward_evidence_command", required=True
+    )
+    for name in ("status", "audit"):
+        command = forward_evidence_sub.add_parser(name)
+        command.add_argument(
+            "--derivatives-store",
+            default="./data/forward/BTCUSDT/derivatives.sqlite3",
+        )
+        command.add_argument(
+            "--opportunity-store",
+            default="./data/forward/BTCUSDT/opportunity_shadow.sqlite3",
+        )
+        command.add_argument(
+            "--epoch",
+            default="configs/forward/v0.3.14_derivatives_evidence_epoch.json",
         )
         command.add_argument(
             "--campaign",
@@ -424,6 +450,22 @@ def main(argv: list[str] | None = None) -> int:
             report = {
                 **report,
                 "audit": opportunity_store.audit(campaign.campaign_id),
+            }
+        _print(report)
+        return 0
+    if args.command == "forward-evidence":
+        report = forward_evidence_status(
+            derivatives_store_path=args.derivatives_store,
+            opportunity_store_path=args.opportunity_store,
+            epoch_path=args.epoch,
+            campaign_path=args.campaign,
+        )
+        if args.forward_evidence_command == "audit":
+            report["audit"] = {
+                "backfill_occurred": False,
+                "manual_improves_eligibility": False,
+                "legacy_improves_eligibility": False,
+                "outcomes_mutate_observations": False,
             }
         _print(report)
         return 0

@@ -524,8 +524,7 @@ def _git_sha() -> str:
     return subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip()
 
 
-def opportunity_scheduler_status() -> dict[str, Any]:
-    unit = "btc-quant-opportunity-forward.timer"
+def _timer_status(unit: str) -> dict[str, Any]:
     try:
         enabled = subprocess.run(
             ["systemctl", "--user", "is-enabled", unit],
@@ -542,6 +541,14 @@ def opportunity_scheduler_status() -> dict[str, Any]:
         return {"unit": unit, "detected": enabled, "active": active}
     except (OSError, subprocess.TimeoutExpired) as exc:
         return {"unit": unit, "detected": False, "active": False, "error": str(exc)}
+
+
+def opportunity_scheduler_status() -> dict[str, Any]:
+    return _timer_status("btc-quant-opportunity-forward.timer")
+
+
+def opportunity_resolver_scheduler_status() -> dict[str, Any]:
+    return _timer_status("btc-quant-opportunity-resolve.timer")
 
 
 def collect_opportunity_once(

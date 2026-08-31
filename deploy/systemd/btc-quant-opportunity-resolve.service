@@ -1,0 +1,13 @@
+[Unit]
+Description=Resolve mature directionless opportunity forward outcome labels
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/root/workspace/project/Quant-agent
+ExecStart=/root/workspace/project/Quant-agent/.venv/bin/quantctl opportunity-forward resolve --store /root/workspace/project/Quant-agent/data/forward/BTCUSDT/opportunity_shadow.sqlite3 --campaign /root/workspace/project/Quant-agent/configs/forward/v0.3.13_opportunity_shadow_campaign.json
+Environment=PYTHONUNBUFFERED=1
+EnvironmentFile=-%h/.config/btc-quant-agent/network.env
+PrivateTmp=true
+NoNewPrivileges=true

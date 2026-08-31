@@ -22,6 +22,10 @@ mkdir -p "${unit_target}"
 mkdir -p "$(dirname "${network_env}")"
 install -m 0644 "${unit_source}/btc-quant-opportunity-forward.service" "${unit_target}/"
 install -m 0644 "${unit_source}/btc-quant-opportunity-forward.timer" "${unit_target}/"
+install -m 0644 "${unit_source}/btc-quant-opportunity-resolve.service" "${unit_target}/"
+install -m 0644 "${unit_source}/btc-quant-opportunity-resolve.timer" "${unit_target}/"
 systemctl --user daemon-reload
 systemctl --user enable --now btc-quant-opportunity-forward.timer
+systemctl --user enable --now btc-quant-opportunity-resolve.timer
 systemctl --user status --no-pager btc-quant-opportunity-forward.timer
+systemctl --user status --no-pager btc-quant-opportunity-resolve.timer
