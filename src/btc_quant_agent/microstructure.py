@@ -554,6 +554,7 @@ async def run_daemon(campaign: MicrostructureCampaign, root: str | Path) -> None
             session_id = store.session_start(int(time.time() * 1000), "depth")
             book, buffered = LocalOrderBook(), []
             previous_best: tuple[float, float, float, float] | None = None
+            snapshot_task: asyncio.Task[dict[str, Any]] | None = None
             try:
                 async for message in socket:
                     ns, ms = time.monotonic_ns(), int(time.time() * 1000)
@@ -561,18 +562,26 @@ async def run_daemon(campaign: MicrostructureCampaign, root: str | Path) -> None
                     store.append_depth(event)
                     if book.update_id is None:
                         buffered.append(event)
-                        snapshot = await asyncio.to_thread(
-                            client._get,
-                            "/fapi/v1/depth",
-                            {"symbol": campaign.symbol, "limit": 1000},
-                        )
+                        if snapshot_task is None:
+                            snapshot_task = asyncio.create_task(
+                                asyncio.to_thread(
+                                    client._get,
+                                    "/fapi/v1/depth",
+                                    {"symbol": campaign.symbol, "limit": 1000},
+                                )
+                            )
+                        if not snapshot_task.done():
+                            continue
+                        snapshot = snapshot_task.result()
                         try:
                             book.bootstrap(snapshot, buffered)
                             latest_event = buffered[-1]
                             buffered.clear()
+                            snapshot_task = None
                             previous_best = book.best()
                             store.append_book_sample(latest_event, book.stats(), None)
                         except SequenceGap:
+                            snapshot_task = None
                             continue
                     else:
                         book.apply(event)
@@ -588,6 +597,8 @@ async def run_daemon(campaign: MicrostructureCampaign, root: str | Path) -> None
                 store.gap(int(time.time() * 1000), "DEPTH_GAP_RESYNC", type(exc).__name__)
                 await asyncio.sleep(1)
             finally:
+                if snapshot_task is not None and not snapshot_task.done():
+                    snapshot_task.cancel()
                 store.session_end(int(time.time() * 1000), session_id)
 
     try:
