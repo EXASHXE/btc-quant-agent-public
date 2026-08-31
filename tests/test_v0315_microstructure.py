@@ -77,6 +77,8 @@ def test_store_deduplicates_events_and_reports_real_latency(tmp_path: Path) -> N
     assert status["latency_ms"]["p50"] == 10
     assert status["aggregate_buckets"] == 3
     assert status["aggregation_intervals_ms"] == [1_000, 60_000, 900_000]
+    assert status["duplicate_count"] == 2
+    assert status["conflict_count"] == 0
     assert status["direction_claim"] == "NONE"
 
 
@@ -98,8 +100,13 @@ def test_book_samples_aggregate_without_future_data_and_gap_marks_bucket(tmp_pat
         "SELECT book_sample_count,ofi_sum,gap_count FROM aggregates "
         "WHERE interval_ms=60000 AND bucket_start_ms=60000"
     ).fetchone()
+    fifteen_minute_row = connection.execute(
+        "SELECT book_sample_count,gap_count FROM aggregates "
+        "WHERE interval_ms=900000 AND bucket_start_ms=0"
+    ).fetchone()
     connection.close()
     assert row == (1, 3.5, 1)
+    assert fifteen_minute_row == (1, 1)
 
 
 def test_event_ofi_is_sign_symmetric_and_has_no_future_price() -> None:

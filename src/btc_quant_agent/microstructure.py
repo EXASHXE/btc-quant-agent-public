@@ -238,6 +238,7 @@ class MicrostructureStore:
               PRIMARY KEY(interval_ms,bucket_start_ms));
             CREATE TABLE IF NOT EXISTS sessions(session_id TEXT PRIMARY KEY,start_ms INTEGER,
               end_ms INTEGER,status TEXT);
+            CREATE TABLE IF NOT EXISTS audit_counters(name TEXT PRIMARY KEY,value INTEGER NOT NULL);
             """
         )
         try:
@@ -261,7 +262,24 @@ class MicrostructureStore:
                     digest,
                 ),
             )
+            if cursor.rowcount == 0:
+                existing = connection.execute(
+                    "SELECT payload_hash FROM depth_events WHERE event_time_ms=? AND final_update_id=?",
+                    (event.event_time_ms, event.final_update_id),
+                ).fetchone()
+                self._increment(
+                    connection,
+                    "duplicate_depth" if existing and existing[0] == digest else "conflict_depth",
+                )
         return cursor.rowcount == 1
+
+    @staticmethod
+    def _increment(connection: sqlite3.Connection, name: str) -> None:
+        connection.execute(
+            """INSERT INTO audit_counters VALUES(?,1)
+            ON CONFLICT(name) DO UPDATE SET value=value+1""",
+            (name,),
+        )
 
     def append_trade(self, trade: AggTrade) -> bool:
         digest = hashlib.sha256(json.dumps(asdict(trade), sort_keys=True).encode()).hexdigest()
@@ -281,6 +299,15 @@ class MicrostructureStore:
                     digest,
                 ),
             )
+            if cursor.rowcount == 0:
+                existing = connection.execute(
+                    "SELECT payload_hash FROM agg_trades WHERE aggregate_trade_id=?",
+                    (trade.aggregate_trade_id,),
+                ).fetchone()
+                self._increment(
+                    connection,
+                    "duplicate_trade" if existing and existing[0] == digest else "conflict_trade",
+                )
             if cursor.rowcount == 1:
                 for interval in self.INTERVALS_MS:
                     bucket = trade.event_time_ms // interval * interval
@@ -319,6 +346,8 @@ class MicrostructureStore:
                     ofi,
                 ),
             )
+            if cursor.rowcount == 0:
+                self._increment(connection, "duplicate_book_sample")
             if cursor.rowcount == 1:
                 for interval in self.INTERVALS_MS:
                     bucket = event.event_time_ms // interval * interval
@@ -402,6 +431,7 @@ class MicrostructureStore:
         now = now_ms or int(time.time() * 1000)
         depth = trades = gaps = book_samples = aggregate_buckets = 0
         gap_affected_buckets = 0
+        closed_buckets = complete_buckets = duplicate_count = conflict_count = 0
         connected_ms = 0
         latencies: list[int] = []
         integrity = True
@@ -422,6 +452,20 @@ class MicrostructureStore:
                         "SELECT count(*) FROM aggregates WHERE gap_count > 0"
                     ).fetchone()[0]
                 )
+                for interval, start, trade_count, sample_count, gap_count in connection.execute(
+                    """SELECT interval_ms,bucket_start_ms,trade_count,book_sample_count,gap_count
+                    FROM aggregates"""
+                ):
+                    if int(start) + int(interval) <= now:
+                        closed_buckets += 1
+                        complete_buckets += int(
+                            int(trade_count) > 0 and int(sample_count) > 0 and int(gap_count) == 0
+                        )
+                for name, value in connection.execute("SELECT name,value FROM audit_counters"):
+                    if str(name).startswith("duplicate_"):
+                        duplicate_count += int(value)
+                    elif str(name).startswith("conflict_"):
+                        conflict_count += int(value)
                 for start, end in connection.execute("SELECT start_ms,end_ms FROM sessions"):
                     connected_ms += max(0, int(end or now) - int(start))
                 integrity = (
@@ -444,6 +488,8 @@ class MicrostructureStore:
 
         expected_ms = max(0, now - self.start_ms)
         uptime_ratio = min(1.0, connected_ms / expected_ms) if expected_ms else 0.0
+        continuity_ratio = book_samples / depth if depth else 0.0
+        completeness_ratio = complete_buckets / closed_buckets if closed_buckets else 0.0
 
         return {
             "campaign_id": self.campaign_id,
@@ -453,12 +499,18 @@ class MicrostructureStore:
             "book_samples": book_samples,
             "aggregate_buckets": aggregate_buckets,
             "gap_affected_buckets": gap_affected_buckets,
+            "closed_aggregate_buckets": closed_buckets,
+            "complete_aggregate_buckets": complete_buckets,
+            "aggregate_completeness_ratio": completeness_ratio,
             "aggregation_intervals_ms": list(self.INTERVALS_MS),
             "gap_count": gaps,
             "resync_count": gaps,
             "connected_seconds": connected_ms / 1000,
             "expected_seconds": expected_ms / 1000,
             "uptime_ratio": uptime_ratio,
+            "depth_sequence_continuity_ratio": continuity_ratio,
+            "duplicate_count": duplicate_count,
+            "conflict_count": conflict_count,
             "latency_ms": {"p50": pct(0.5), "p95": pct(0.95), "p99": pct(0.99)},
             "chunk_integrity": integrity,
             "data_role": "FUTURE_RESEARCH_DATA",
