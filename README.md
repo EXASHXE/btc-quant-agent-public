@@ -1,6 +1,6 @@
-# BTC Quant Agent v0.3.14
+# BTC Quant Agent v0.3.15
 
-一个面向 `BTCUSDT` USDⓈ-M 永续合约的低频量化研究项目。v0.3.14 通过预注册 Evidence Epoch 修复 Derivatives PIT eligibility gap，并加入端点重试遥测、统一 forward watchdog 与 Opportunity outcome resolver；正常 Runtime 仍由 Research Registry 限制为 `OPPORTUNITY_ONLY`，不能输出 actionable `LONG/SHORT`。执行默认 `disabled`，默认配置不会读取密钥或发送订单。
+一个面向 `BTCUSDT` USDⓈ-M 永续合约的低频量化研究项目。v0.3.15 将 Derivatives 正式 eligibility 统一到 v0.3.14 active epoch，并新增完全隔离、预注册、只面向未来研究的 diff-depth 与 aggregate-trade 微观结构采集链。正常 Runtime 仍由 Research Registry 限制为 `OPPORTUNITY_ONLY`，不能输出 actionable `LONG/SHORT`。执行默认 `disabled`，默认配置不会读取密钥或发送订单。
 
 > 风险提示：这是研究与 Shadow Trading 工具，不是收益承诺。默认策略状态为 `EXPERIMENTAL`。在完成足量样本外验证与 30–60 天前向观察前，不应据此进行真实高杠杆交易。
 
@@ -58,6 +58,10 @@ quantctl derivatives collect-once
 quantctl derivatives status
 quantctl derivatives audit
 quantctl derivatives export
+quantctl opportunity-forward status
+quantctl microstructure-forward status
+quantctl microstructure-forward audit
+quantctl forward-evidence status
 quantctl daemon --once
 quantctl download ./data/BTCUSDT-1m.csv --start-ms 1754006400000 --end-ms 1756684800000 --interval 1m
 quantctl backtest ./data/BTCUSDT-1m.csv
@@ -164,3 +168,5 @@ derivatives 与 order-book 分组，相关消融不会被当作有效多年证�
 v0.3.11 的 Registry、Runtime 对齐和前向数据运维见 `docs/RESEARCH_REGISTRY.md`、
 `docs/V0.3.11_RUNTIME_ALIGNMENT_FORWARD_DATA_REPORT.md` 与
 `docs/FORWARD_DERIVATIVES_OPERATIONS.md`。策略状态继续为 `EXPERIMENTAL`，这些研究结果不构成交易建议。
+
+v0.3.15 微观结构采集严格使用独立存储和 systemd user service；REST depth 只用于本地订单簿 bootstrap/resync，WebSocket `U/u/pu` 连续性失败会记录 gap 后重建。1s、1m、15m 聚合只包含机械数据质量与流量统计，不进行方向、Alpha、Holdout 或执行解释。正式交付见 `deliverables/v0.3.15/`。

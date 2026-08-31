@@ -27,6 +27,7 @@ from .data.network_diagnostic import diagnose_binance_network
 from .engine import EngineMode, QuantEngine
 from .explain import explain_signal
 from .forward_evidence import forward_evidence_status
+from .microstructure import MicrostructureCampaign, MicrostructureStore, run_daemon
 from .opportunity_forward import (
     OpportunityCampaign,
     OpportunityForwardStore,
@@ -172,6 +173,26 @@ def build_parser() -> argparse.ArgumentParser:
         command.add_argument(
             "--campaign",
             default="configs/forward/v0.3.13_opportunity_shadow_campaign.json",
+        )
+        command.add_argument(
+            "--microstructure-root",
+            default="data/forward/BTCUSDT/microstructure",
+        )
+        command.add_argument(
+            "--microstructure-campaign",
+            default="configs/forward/v0.3.15_microstructure_capture_campaign.json",
+        )
+
+    microstructure = sub.add_parser(
+        "microstructure-forward", help="data-only PIT depth and aggregate-trade capture"
+    )
+    micro_sub = microstructure.add_subparsers(dest="microstructure_command", required=True)
+    for name in ("run", "status", "audit"):
+        command = micro_sub.add_parser(name)
+        command.add_argument("--root", default="data/forward/BTCUSDT/microstructure")
+        command.add_argument(
+            "--campaign",
+            default="configs/forward/v0.3.15_microstructure_capture_campaign.json",
         )
 
     registry = sub.add_parser("research-registry", help="inspect research eligibility")
@@ -459,6 +480,8 @@ def main(argv: list[str] | None = None) -> int:
             opportunity_store_path=args.opportunity_store,
             epoch_path=args.epoch,
             campaign_path=args.campaign,
+            microstructure_root=args.microstructure_root,
+            microstructure_campaign_path=args.microstructure_campaign,
         )
         if args.forward_evidence_command == "audit":
             report["audit"] = {
@@ -466,6 +489,26 @@ def main(argv: list[str] | None = None) -> int:
                 "manual_improves_eligibility": False,
                 "legacy_improves_eligibility": False,
                 "outcomes_mutate_observations": False,
+            }
+        _print(report)
+        return 0
+    if args.command == "microstructure-forward":
+        micro_campaign = MicrostructureCampaign.load(args.campaign)
+        micro_store = MicrostructureStore(
+            args.root, micro_campaign.campaign_id, micro_campaign.start_ms
+        )
+        if args.microstructure_command == "run":
+            import asyncio
+
+            asyncio.run(run_daemon(micro_campaign, args.root))
+            return 0
+        report = micro_store.status()
+        if args.microstructure_command == "audit":
+            report["audit"] = {
+                "retrospective_backfill": False,
+                "runtime_integration": "DISABLED",
+                "execution_integration": "DISABLED",
+                "final_holdout_access": False,
             }
         _print(report)
         return 0

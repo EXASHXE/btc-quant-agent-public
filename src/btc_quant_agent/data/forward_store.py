@@ -591,7 +591,12 @@ class ForwardDerivativeStore:
             ),
         }
 
-    def status(self, *, scheduler: dict[str, Any] | None = None) -> dict[str, Any]:
+    def status(
+        self,
+        *,
+        scheduler: dict[str, Any] | None = None,
+        evidence_epoch_path: str | Path = "configs/forward/v0.3.14_derivatives_evidence_epoch.json",
+    ) -> dict[str, Any]:
         rows = self._rows()
         now = int(time.time() * 1000)
         first = int(rows[0]["observed_at_ms"]) if rows else None
@@ -607,11 +612,11 @@ class ForwardDerivativeStore:
             if first is not None and last is not None
             else 0
         )
-        eligible = (
-            duration_days >= RESEARCH_MIN_DAYS
-            and int(reliability["fully_available_snapshot_count"]) >= RESEARCH_MIN_SNAPSHOTS
-            and all(value >= RESEARCH_MIN_FIELD_AVAILABILITY for value in availability.values())
-            and int(reliability["largest_gap_slots"]) <= RESEARCH_MAX_PERSISTENT_GAP_SLOTS
+        epoch_path = Path(evidence_epoch_path)
+        active_epoch = (
+            self.evidence_epoch_metrics(EvidenceEpoch.load(epoch_path), now_ms=now)
+            if epoch_path.exists()
+            else None
         )
         with self._connect() as connection:
             errors = connection.execute(
@@ -674,9 +679,16 @@ class ForwardDerivativeStore:
             }
             if latest_run
             else None,
-            "research_eligibility": "ELIGIBLE_FOR_PREREGISTERED_RESEARCH"
-            if eligible
-            else "INSUFFICIENT_FORWARD_HISTORY",
+            "active_epoch": active_epoch,
+            "archive_pre_epoch": {
+                **reliability,
+                "classification": "NOT_FOR_ELIGIBILITY",
+            },
+            "research_eligibility": (
+                active_epoch["eligibility_state"]
+                if active_epoch is not None
+                else "NO_ACTIVE_EVIDENCE_EPOCH"
+            ),
             "research_gate": {
                 "minimum_days": RESEARCH_MIN_DAYS,
                 "minimum_snapshots": RESEARCH_MIN_SNAPSHOTS,

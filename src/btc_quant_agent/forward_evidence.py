@@ -6,6 +6,7 @@ from typing import Any
 
 from .data.forward_store import ForwardDerivativeStore, scheduler_status
 from .evidence_epoch import EvidenceEpoch
+from .microstructure import MicrostructureCampaign, MicrostructureStore
 from .opportunity_forward import (
     OpportunityCampaign,
     OpportunityForwardStore,
@@ -21,6 +22,9 @@ def forward_evidence_status(
     epoch_path: str | Path,
     campaign_path: str | Path,
     now_ms: int | None = None,
+    microstructure_root: str | Path = "data/forward/BTCUSDT/microstructure",
+    microstructure_campaign_path: str
+    | Path = "configs/forward/v0.3.15_microstructure_capture_campaign.json",
 ) -> dict[str, Any]:
     now = now_ms if now_ms is not None else int(time.time() * 1_000)
     epoch = EvidenceEpoch.load(epoch_path)
@@ -41,6 +45,10 @@ def forward_evidence_status(
     opportunity["unresolved_mature_labels"] = len(
         opportunity_store.unresolved(campaign.campaign_id, now)
     )
+    micro_campaign = MicrostructureCampaign.load(microstructure_campaign_path)
+    microstructure = MicrostructureStore(
+        microstructure_root, micro_campaign.campaign_id, micro_campaign.start_ms
+    ).status(now)
     return {
         "derivatives": {
             "active_epoch": active,
@@ -53,6 +61,7 @@ def forward_evidence_status(
             },
         },
         "opportunity_forward": opportunity,
+        "microstructure_forward": microstructure,
         "alpha_interpretation": "NONE",
         "execution": "DISABLED",
         "final_holdout": "SEALED",

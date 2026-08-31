@@ -1,0 +1,22 @@
+[Unit]
+Description=BTCUSDT data-only microstructure forward capture
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/root/workspace/project/Quant-agent
+ExecStart=/root/workspace/project/Quant-agent/.venv/bin/quantctl microstructure-forward run --root /root/workspace/project/Quant-agent/data/forward/BTCUSDT/microstructure --campaign /root/workspace/project/Quant-agent/configs/forward/v0.3.15_microstructure_capture_campaign.json
+Environment=PYTHONUNBUFFERED=1
+EnvironmentFile=-%h/.config/btc-quant-agent/network.env
+Restart=on-failure
+RestartSec=5s
+StartLimitIntervalSec=300
+StartLimitBurst=10
+TimeoutStopSec=20s
+KillSignal=SIGINT
+PrivateTmp=true
+NoNewPrivileges=true
+
+[Install]
+WantedBy=default.target
