@@ -236,8 +236,8 @@ class MicrostructureStore:
               top5_imbalance_sum REAL DEFAULT 0,top20_imbalance_sum REAL DEFAULT 0,
               ofi_sum REAL DEFAULT 0,gap_count INTEGER DEFAULT 0,
               PRIMARY KEY(interval_ms,bucket_start_ms));
-            CREATE TABLE IF NOT EXISTS sessions(session_id TEXT PRIMARY KEY,start_ms INTEGER,
-              end_ms INTEGER,status TEXT);
+            CREATE TABLE IF NOT EXISTS sessions(session_id TEXT PRIMARY KEY,stream TEXT,
+              start_ms INTEGER,end_ms INTEGER,status TEXT);
             CREATE TABLE IF NOT EXISTS audit_counters(name TEXT PRIMARY KEY,value INTEGER NOT NULL);
             """
         )
@@ -390,11 +390,12 @@ class MicrostructureStore:
                     (interval, bucket),
                 )
 
-    def session_start(self, timestamp_ms: int) -> str:
-        session_id = f"{timestamp_ms}-{time.monotonic_ns()}"
+    def session_start(self, timestamp_ms: int, stream: str) -> str:
+        session_id = f"{stream}-{timestamp_ms}-{time.monotonic_ns()}"
         with self._connect(timestamp_ms) as connection:
             connection.execute(
-                "INSERT INTO sessions VALUES(?,?,NULL,'CONNECTED')", (session_id, timestamp_ms)
+                "INSERT INTO sessions VALUES(?,?,?,NULL,'CONNECTED')",
+                (session_id, stream, timestamp_ms),
             )
         return session_id
 
@@ -432,7 +433,7 @@ class MicrostructureStore:
         depth = trades = gaps = book_samples = aggregate_buckets = 0
         gap_affected_buckets = 0
         closed_buckets = complete_buckets = duplicate_count = conflict_count = 0
-        connected_ms = 0
+        connected_ms_by_stream = {"depth": 0, "trade": 0}
         latencies: list[int] = []
         integrity = True
         for path in sorted(self.root.glob("microstructure-*.sqlite3")):
@@ -466,8 +467,10 @@ class MicrostructureStore:
                         duplicate_count += int(value)
                     elif str(name).startswith("conflict_"):
                         conflict_count += int(value)
-                for start, end in connection.execute("SELECT start_ms,end_ms FROM sessions"):
-                    connected_ms += max(0, int(end or now) - int(start))
+                for stream, start, end in connection.execute(
+                    "SELECT stream,start_ms,end_ms FROM sessions"
+                ):
+                    connected_ms_by_stream[str(stream)] += max(0, int(end or now) - int(start))
                 integrity = (
                     integrity
                     and connection.execute("PRAGMA integrity_check").fetchone()[0] == "ok"
@@ -487,6 +490,7 @@ class MicrostructureStore:
             return ordered[min(len(ordered) - 1, int(value * len(ordered)))] if ordered else None
 
         expected_ms = max(0, now - self.start_ms)
+        connected_ms = min(connected_ms_by_stream.values())
         uptime_ratio = min(1.0, connected_ms / expected_ms) if expected_ms else 0.0
         continuity_ratio = book_samples / depth if depth else 0.0
         completeness_ratio = complete_buckets / closed_buckets if closed_buckets else 0.0
@@ -506,6 +510,9 @@ class MicrostructureStore:
             "gap_count": gaps,
             "resync_count": gaps,
             "connected_seconds": connected_ms / 1000,
+            "connected_seconds_by_stream": {
+                key: value / 1000 for key, value in connected_ms_by_stream.items()
+            },
             "expected_seconds": expected_ms / 1000,
             "uptime_ratio": uptime_ratio,
             "depth_sequence_continuity_ratio": continuity_ratio,
@@ -528,10 +535,10 @@ async def run_daemon(campaign: MicrostructureCampaign, root: str | Path) -> None
     wait_seconds = max(0.0, (campaign.start_ms - int(time.time() * 1000)) / 1000)
     if wait_seconds:
         await asyncio.sleep(wait_seconds)
-    session_id = store.session_start(int(time.time() * 1000))
 
     async def trade_loop() -> None:
         async for socket in websockets.connect(campaign.trade_url, open_timeout=15):
+            session_id = store.session_start(int(time.time() * 1000), "trade")
             try:
                 async for message in socket:
                     ns, ms = time.monotonic_ns(), int(time.time() * 1000)
@@ -539,9 +546,12 @@ async def run_daemon(campaign: MicrostructureCampaign, root: str | Path) -> None
             except Exception as exc:  # noqa: BLE001 - disconnects and malformed frames are gaps
                 store.gap(int(time.time() * 1000), "TRADE_DISCONNECT", type(exc).__name__)
                 await asyncio.sleep(1)
+            finally:
+                store.session_end(int(time.time() * 1000), session_id)
 
     async def depth_loop() -> None:
         async for socket in websockets.connect(campaign.depth_url, open_timeout=15):
+            session_id = store.session_start(int(time.time() * 1000), "depth")
             book, buffered = LocalOrderBook(), []
             previous_best: tuple[float, float, float, float] | None = None
             try:
@@ -577,10 +587,11 @@ async def run_daemon(campaign: MicrostructureCampaign, root: str | Path) -> None
             except Exception as exc:  # noqa: BLE001 - any depth failure requires clean resync
                 store.gap(int(time.time() * 1000), "DEPTH_GAP_RESYNC", type(exc).__name__)
                 await asyncio.sleep(1)
+            finally:
+                store.session_end(int(time.time() * 1000), session_id)
 
     try:
         await asyncio.gather(depth_loop(), trade_loop())
     finally:
         now_ms = int(time.time() * 1000)
-        store.session_end(now_ms, session_id)
         store.closed_partition_manifest(now_ms)

@@ -110,6 +110,18 @@ def test_book_samples_aggregate_without_future_data_and_gap_marks_bucket(tmp_pat
     assert fifteen_minute_row == (1, 1)
 
 
+def test_connected_coverage_requires_both_streams(tmp_path: Path) -> None:
+    campaign = MicrostructureCampaign.load(CAMPAIGN)
+    store = MicrostructureStore(tmp_path, campaign.campaign_id, campaign.start_ms)
+    depth_session = store.session_start(campaign.start_ms, "depth")
+    store.session_start(campaign.start_ms + 200, "trade")
+    status = store.status(campaign.start_ms + 1_000)
+    assert status["connected_seconds_by_stream"] == {"depth": 1.0, "trade": 0.8}
+    assert status["connected_seconds"] == 0.8
+    assert status["uptime_ratio"] == 0.8
+    store.session_end(campaign.start_ms + 1_000, depth_session)
+
+
 def test_event_ofi_is_sign_symmetric_and_has_no_future_price() -> None:
     previous = (100.0, 2.0, 101.0, 3.0)
     current = (100.0, 4.0, 101.0, 1.0)
