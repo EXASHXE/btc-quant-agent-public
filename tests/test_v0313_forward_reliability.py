@@ -255,6 +255,27 @@ def test_forward_scan_uses_runtime_gated_only_and_never_emits_signal() -> None:
         )
 
 
+def test_unhealthy_runtime_scan_is_not_misclassified_as_success() -> None:
+    campaign = _campaign()
+    result = ScanResult(
+        action="NO_SIGNAL",
+        health="DATA_INVALID",
+        reason="stale decision candle",
+        reason_code="STALE_DECISION_DATA",
+        runtime_stage=RuntimeStage.NO_OPPORTUNITY,
+    )
+    with pytest.raises(ValueError, match="STALE_DECISION_DATA"):
+        observation_from_scan(
+            result,
+            campaign,
+            scheduled_slot_ms=1,
+            collection_started_at_ms=2,
+            observed_at_ms=3,
+            config=AppConfig(),
+            git_sha=campaign.start_git_sha,
+        )
+
+
 def test_forward_store_restart_safe(tmp_path: Path) -> None:
     path = tmp_path / "opportunity.sqlite3"
     original = _observation(2 * DAY_MS)

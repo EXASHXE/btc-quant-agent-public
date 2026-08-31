@@ -565,6 +565,10 @@ def collect_opportunity_once(
             RuntimeStage.OPPORTUNITY_ONLY,
         }:
             raise RuntimeError("opportunity forward scan attempted actionable Direction")
+        if result.health != "OK":
+            raise RuntimeError(
+                f"runtime scan unavailable: {result.reason_code}: {result.reason}"
+            )
         observation = observation_from_scan(
             result,
             campaign,
@@ -608,6 +612,8 @@ def observation_from_scan(
     config: AppConfig,
     git_sha: str,
 ) -> ForwardObservation:
+    if result.health != "OK":
+        raise ValueError(f"unhealthy runtime scan: {result.reason_code}: {result.reason}")
     if result.signal is not None or result.action in {"LONG", "SHORT"}:
         raise ValueError("opportunity campaign cannot accept an actionable signal")
     diagnostics = result.diagnostics
