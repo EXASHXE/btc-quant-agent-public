@@ -1,0 +1,1 @@
+{"archive_attempts":87,"archive_rows_preserved":true,"retry_max_attempts":3,"retry_backoff_seconds":[0.1,0.2],"latest_natural_run_utc":"2026-08-31T12:15:20Z","latest_natural_result":"FULL_SUCCESS_PRE_EPOCH","endpoint_errors":0,"scheduler_enabled":true,"scheduler_active":true,"operational_state":"COLLECTING"}
