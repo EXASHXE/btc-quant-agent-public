@@ -3,7 +3,7 @@
   "campaign_id": "OPPORTUNITY_FORWARD_V0313_20260831T050656Z",
   "campaign_start_utc": "2026-08-31T05:06:56Z",
   "campaign_start_ms": 1788152816561,
-  "start_git_sha": "8e0dfd66a7bbec7c607b8e0fddf19b674d4342ba",
+  "start_git_sha": "8e0dfd662acbf21244e817decc475762ff451ccb",
   "registry_version": "v0.3.12",
   "strategy_version": "0.3.11",
   "feature_version": "0.3.11",
