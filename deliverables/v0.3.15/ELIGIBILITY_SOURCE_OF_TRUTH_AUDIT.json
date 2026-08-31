@@ -1,0 +1,22 @@
+{
+  "audit_version": "v0.3.15",
+  "formal_source_of_truth": "DERIVATIVES_PIT_EPOCH_V0314_001",
+  "derivatives_status_field": "active_epoch.eligibility_state",
+  "forward_evidence_status_field": "derivatives.active_epoch.eligibility_state",
+  "formal_values_equal": true,
+  "formal_eligibility_at_snapshot": "INSUFFICIENT_FORWARD_HISTORY",
+  "archive": {
+    "field": "archive_pre_epoch",
+    "classification": "NOT_FOR_ELIGIBILITY",
+    "preserved": true
+  },
+  "eligibility_exclusions": {
+    "manual_runs": true,
+    "legacy_runs": true,
+    "backfilled_rows": true,
+    "pre_epoch_outages": true
+  },
+  "automated_consistency_test": "PASS",
+  "split_brain_repaired": true,
+  "alpha_interpretation": "NONE"
+}

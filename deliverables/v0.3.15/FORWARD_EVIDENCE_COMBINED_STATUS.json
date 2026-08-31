@@ -1,0 +1,69 @@
+{
+  "snapshot_utc": "2026-08-31T19:04:42Z",
+  "derivatives": {
+    "active_epoch_id": "DERIVATIVES_PIT_EPOCH_V0314_001",
+    "eligibility_state": "INSUFFICIENT_FORWARD_HISTORY",
+    "formal_derivatives_cli_value": "INSUFFICIENT_FORWARD_HISTORY",
+    "formal_forward_evidence_cli_value": "INSUFFICIENT_FORWARD_HISTORY",
+    "values_equal": true,
+    "expected_scheduled_slots": 27,
+    "recorded_scheduled_slots": 27,
+    "fully_available_scheduled_slots": 9,
+    "failed_slots": 18,
+    "partial_slots": 0,
+    "missing_slots": 0,
+    "active_epoch_success_rate": 0.3333333333333333,
+    "required_field_coverage": {
+      "basis_rate": 0.3333333333333333,
+      "funding_rate": 0.3333333333333333,
+      "long_short_account_ratio": 0.3333333333333333,
+      "open_interest": 0.3333333333333333,
+      "taker_buy_sell_ratio": 0.3333333333333333
+    },
+    "scheduler_active": true,
+    "archive_pre_epoch_classification": "NOT_FOR_ELIGIBILITY",
+    "manual_runs_count_for_eligibility": false,
+    "legacy_runs_count_for_eligibility": false,
+    "backfilled_rows": 0
+  },
+  "opportunity_forward": {
+    "campaign_id": "OPPORTUNITY_FORWARD_V0313_20260831T050656Z",
+    "h35_state": "FORWARD_CAMPAIGN_ACCUMULATING",
+    "campaign_age_days": 0.5817874537037037,
+    "scheduled_slots_recorded": 56,
+    "successful_scans": 28,
+    "missed_decision_slots": 28,
+    "opportunity_count": 0,
+    "resolved_4h_opportunity_count": 0,
+    "resolved_8h_opportunity_count": 0,
+    "unique_eligible_controls": 0,
+    "scheduler_active": true,
+    "resolver_scheduler_active": true,
+    "unresolved_mature_labels": 2,
+    "direction_claim": "NONE"
+  },
+  "microstructure_forward": {
+    "campaign_id": "MICROSTRUCTURE_FORWARD_V0315_20260831T190000Z",
+    "state": "COLLECTING",
+    "depth_events": 1682,
+    "agg_trade_events": 1699,
+    "book_samples": 1475,
+    "connected_seconds": 247.845,
+    "expected_seconds": 282.64,
+    "gap_count": 2,
+    "resync_count": 2,
+    "aggregate_completeness_ratio": 0.562015503875969,
+    "chunk_integrity": true,
+    "direction_claim": "NONE",
+    "alpha_claim": "NONE"
+  },
+  "cross_chain_isolation": {
+    "microstructure_changes_derivatives_gate": false,
+    "microstructure_changes_h35_gate": false,
+    "outcomes_mutate_observations": false,
+    "backfill_occurred": false
+  },
+  "alpha_interpretation": "NONE",
+  "execution": "DISABLED",
+  "final_holdout": "SEALED"
+}

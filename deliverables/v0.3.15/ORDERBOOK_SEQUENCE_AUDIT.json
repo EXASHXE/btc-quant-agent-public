@@ -1,0 +1,44 @@
+{
+  "audit_version": "v0.3.15",
+  "official_semantics": {
+    "buffer_before_snapshot": true,
+    "discard_rule": "u < lastUpdateId",
+    "first_bridge_rule": "U <= lastUpdateId <= u",
+    "continuity_rule": "pu == previous_u",
+    "gap_action": "append_gap_clear_book_and_resnapshot",
+    "reconnect_action": "new_empty_book_and_resnapshot",
+    "rest_role": "BOOTSTRAP_OR_RESYNC_ONLY"
+  },
+  "trade_semantics": {
+    "m_true": "buyer_is_maker=true; aggressive_side=SELL",
+    "m_false": "buyer_is_maker=false; aggressive_side=BUY",
+    "exchange_and_receive_timestamps_separate": true
+  },
+  "event_ofi": {
+    "definition": "I[p_b>=P_b]q_b - I[p_b<=P_b]Q_b - I[p_a<=P_a]q_a + I[p_a>=P_a]Q_a",
+    "uses_future_price": false,
+    "emits_direction": false
+  },
+  "automated_cases": {
+    "snapshot_buffer_bridge": "PASS",
+    "stale_update_discard": "PASS",
+    "first_bridge_required": "PASS",
+    "pu_continuity": "PASS",
+    "gap_forces_reset": "PASS",
+    "duplicate_not_double_applied": "PASS",
+    "reconnect_starts_empty": "PASS",
+    "maker_aggressor_mapping": "PASS",
+    "event_receive_time_separation": "PASS",
+    "one_minute_boundary": "PASS",
+    "fifteen_minute_boundary": "PASS",
+    "gap_bucket_incomplete": "PASS",
+    "ofi_sign_symmetry": "PASS"
+  },
+  "test_result": {
+    "pytest": "PASS",
+    "passed": 364,
+    "failed": 0
+  },
+  "direction_claim": "NONE",
+  "hidden_iceberg_claim": "NONE"
+}

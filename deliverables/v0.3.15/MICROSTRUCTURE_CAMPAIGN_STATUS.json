@@ -1,0 +1,51 @@
+{
+  "snapshot_utc": "2026-08-31T19:04:42Z",
+  "campaign_id": "MICROSTRUCTURE_FORWARD_V0315_20260831T190000Z",
+  "campaign_start_utc": "2026-08-31T19:00:00Z",
+  "campaign_age_seconds": 282.64,
+  "service": {
+    "enabled": true,
+    "active_state": "active",
+    "sub_state": "running",
+    "n_restarts": 0
+  },
+  "state": "COLLECTING",
+  "data_role": "FUTURE_RESEARCH_DATA",
+  "depth_events": 1682,
+  "agg_trade_events": 1699,
+  "book_samples": 1475,
+  "connected_seconds": 247.845,
+  "connected_seconds_by_stream": {
+    "depth": 247.845,
+    "trade": 256.52
+  },
+  "expected_seconds": 282.64,
+  "uptime_ratio": 0.8768928672516275,
+  "depth_sequence_continuity_ratio": 0.8769322235434007,
+  "gap_count": 2,
+  "resync_count": 2,
+  "gap_detail": "Two preserved DEPTH_GAP_RESYNC/BinanceDataError events occurred during initial REST bootstrap; natural capture recovered.",
+  "duplicate_count": 0,
+  "conflict_count": 0,
+  "latency_receive_minus_exchange_ms": {
+    "p50": -693,
+    "p95": 10,
+    "p99": 84,
+    "clock_skew_note": "Negative values are retained because the host clock was measured about 1232 ms behind Binance server time; no clamping or fabricated correction was applied."
+  },
+  "aggregation": {
+    "intervals_ms": [1000, 60000, 900000],
+    "buckets": 262,
+    "closed_buckets": 258,
+    "complete_buckets": 145,
+    "completeness_ratio": 0.562015503875969,
+    "gap_affected_buckets": 4
+  },
+  "chunk_integrity": true,
+  "retrospective_backfill": false,
+  "runtime_integration": "DISABLED",
+  "execution_integration": "DISABLED",
+  "final_holdout_access": false,
+  "direction_claim": "NONE",
+  "alpha_claim": "NONE"
+}
