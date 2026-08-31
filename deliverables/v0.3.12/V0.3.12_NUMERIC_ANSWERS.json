@@ -29,8 +29,7 @@
     "26_quality": {"tests": 332, "overall_coverage_pct": 59, "spot_flow_module_coverage_pct": 61, "ruff": "PASS", "mypy": "PASS", "compileall": "PASS"},
     "27_performance": {"runtime_seconds": 1175.9882441359805, "runtime_minutes": 19.599804068933007, "peak_rss_mib": 3287.38671875},
     "28_recommendation": "INCONCLUSIVE_FLOW_FAMILY",
-    "29_provenance": {"branch": "codex/v0.3.12-spot-perp-taker-flow-qualification", "start_sha": "c2fb00ed806bb4dd57dcc7f605479e75f60514ac", "prereg_commit_sha": "ca647f23f75a452ba4af28ad8a1ba503f05fc9a1", "formal_code_sha": "d8c9fee21ed7c2926385c5ff8355cf0c0054054f", "delivery_sha": "reported after immutable delivery commit", "protocol_sha256": "d95aad10731450b3dcec3ef88997676068655cc9054ab9505accb42939184d1a", "btc_dataset_sha256": "82d058b2e9e5bfbd20bf36026abec045fb778ddb72582277e0dac00846ae9901", "spot_dataset_sha256": "8b952072d196de65fab7d1a67326213d012a80a816d85a0155827d2263512d1e"},
-    "30_github_delivery": {"required": true, "confirmed": "pending push verification"}
+    "29_provenance": {"branch": "codex/v0.3.12-spot-perp-taker-flow-qualification", "start_sha": "c2fb00ed806bb4dd57dcc7f605479e75f60514ac", "prereg_commit_sha": "ca647f23f75a452ba4af28ad8a1ba503f05fc9a1", "formal_code_sha": "d8c9fee21ed7c2926385c5ff8355cf0c0054054f", "delivery_bundle_commit_sha": "3c00294bf6d7dd4d226466dbab028e59f27f9052", "protocol_sha256": "d95aad10731450b3dcec3ef88997676068655cc9054ab9505accb42939184d1a", "btc_dataset_sha256": "82d058b2e9e5bfbd20bf36026abec045fb778ddb72582277e0dac00846ae9901", "spot_dataset_sha256": "8b952072d196de65fab7d1a67326213d012a80a816d85a0155827d2263512d1e"},
+    "30_github_delivery": {"required": true, "confirmed": true, "remote_branch": "origin/codex/v0.3.12-spot-perp-taker-flow-qualification"}
   }
 }
-
