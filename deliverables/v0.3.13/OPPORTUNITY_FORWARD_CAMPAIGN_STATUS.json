@@ -1,0 +1,40 @@
+{
+  "captured_at_utc": "2026-08-31T05:32:10Z",
+  "campaign_id": "OPPORTUNITY_FORWARD_V0313_20260831T050656Z",
+  "campaign_start_utc": "2026-08-31T05:06:56Z",
+  "campaign_start_ms": 1788152816561,
+  "campaign_start_sha": "8e0dfd662acbf21244e817decc475762ff451ccb",
+  "formal_code_sha": "03caa112e046949389e48260723430d39934276d",
+  "scheduler_detected": true,
+  "scheduler_enabled": true,
+  "scheduler_active": true,
+  "scheduled_slots_recorded": 2,
+  "successful_scans": 1,
+  "missed_decision_slots": 1,
+  "opportunity_count": 0,
+  "tp_count": 0,
+  "br_count": 0,
+  "resolved_4h_opportunity_count": 0,
+  "resolved_8h_opportunity_count": 0,
+  "unique_eligible_controls": 0,
+  "matched_pairs": {
+    "240m": 0,
+    "480m": 0
+  },
+  "control_reuse_distribution": {
+    "240m": {},
+    "480m": {}
+  },
+  "audit": {
+    "duplicate_slot_count": 0,
+    "retrospective_feature_backfill_rows": 0,
+    "missed_slots_are_immutable": true,
+    "outcome_resolution_is_separate": true,
+    "direction_action_columns": []
+  },
+  "h35_state": "FORWARD_CAMPAIGN_ACCUMULATING",
+  "direction_claim": "NONE",
+  "execution": "DISABLED",
+  "operational_state": "ACTIVE"
+}
+

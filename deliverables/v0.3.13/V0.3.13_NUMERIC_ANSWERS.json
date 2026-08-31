@@ -1,0 +1,85 @@
+{
+  "schema_version": "1.0.0",
+  "version": "v0.3.13",
+  "start_sha": "8e0dfd662acbf21244e817decc475762ff451ccb",
+  "formal_code_sha": "03caa112e046949389e48260723430d39934276d",
+  "quality": {
+    "tests_passed": 345,
+    "tests_failed": 0,
+    "overall_coverage_percent": 59,
+    "critical_module_coverage_percent": {
+      "data.forward_store": 90,
+      "opportunity_forward": 76,
+      "engine": 93,
+      "data.network_diagnostic": 37
+    },
+    "ruff": "PASS",
+    "strict_mypy": "PASS_56_SOURCE_FILES",
+    "compileall": "PASS",
+    "latest_pre_push_remote_ci": "PASS"
+  },
+  "derivatives_collector": {
+    "root_cause": "proxy/VPN environment was present in the interactive shell but absent from the systemd user manager; DNS succeeded, while direct TCP routing returned Errno 101 NETWORK_UNREACHABLE. HTTPS endpoints work through the optional user-local proxy environment.",
+    "manual_full_collection_success": true,
+    "manual_full_success_observed_at_ms": 1788152762880,
+    "latest_manual_attempt_result": "PARTIAL_TWO_OI_ENDPOINT_ERRORS",
+    "systemd_context_full_collection_success": true,
+    "systemd_context_full_success_observed_at_ms": 1788153597010,
+    "natural_timer_run_completed": true,
+    "natural_timer_run_result": "PARTIAL_OPEN_INTEREST_TLS_TIMEOUT",
+    "scheduler_active": true,
+    "scheduler_enabled": true,
+    "total_attempts_before": 57,
+    "total_attempts_after": 60,
+    "fully_available_snapshots_before": 2,
+    "fully_available_snapshots_after": 3,
+    "partial_snapshots_after": 3,
+    "failed_attempts_after": 54,
+    "required_field_availability": {
+      "funding_rate": 0.08333333333333333,
+      "open_interest": 0.05,
+      "taker_buy_sell_ratio": 0.08333333333333333,
+      "basis_rate": 0.08333333333333333,
+      "long_short_account_ratio": 0.08333333333333333
+    },
+    "scheduled_attempt_count": 2,
+    "scheduled_slot_success_rate": 0.5,
+    "consecutive_failure_count": 1,
+    "largest_gap_slots": 54,
+    "backfill_occurred": false,
+    "coverage_days": 0.5768888425925925,
+    "coverage_gate": "INSUFFICIENT_FORWARD_HISTORY",
+    "coverage_projection": "RECOVERABLE_WITH_FUTURE_SUCCESS",
+    "required_following_fully_available_successes": 2497,
+    "operational_state": "DEGRADED"
+  },
+  "opportunity_campaign": {
+    "campaign_id": "OPPORTUNITY_FORWARD_V0313_20260831T050656Z",
+    "start_time_utc": "2026-08-31T05:06:56Z",
+    "start_ms": 1788152816561,
+    "start_sha": "8e0dfd662acbf21244e817decc475762ff451ccb",
+    "scheduler_active": true,
+    "scheduler_enabled": true,
+    "scheduled_slots": 2,
+    "successful_forward_scans": 1,
+    "missed_decision_slots": 1,
+    "observed_tp_opportunities": 0,
+    "observed_br_opportunities": 0,
+    "resolved_4h_opportunities": 0,
+    "resolved_8h_opportunities": 0,
+    "unique_eligible_controls": 0,
+    "h35_state": "FORWARD_CAMPAIGN_ACCUMULATING",
+    "operational_state": "ACTIVE"
+  },
+  "safety": {
+    "strategy": "EXPERIMENTAL",
+    "normal_runtime_maximum": "OPPORTUNITY_ONLY",
+    "qualified_direction_count": 0,
+    "qualified_direction_engine": "NONE",
+    "execution": "DISABLED",
+    "candidate_freeze": "NONE",
+    "final_holdout": "SEALED"
+  },
+  "v0.3.14_recommendation": "CONTINUE_FORWARD_ACCUMULATION"
+}
+

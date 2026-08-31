@@ -1,0 +1,50 @@
+{
+  "captured_at_utc": "2026-08-31T05:32:10Z",
+  "store_committed": false,
+  "append_only": true,
+  "backfilled_rows": 0,
+  "legacy_failed_rows_retained": 54,
+  "total_attempt_count": 60,
+  "scheduled_attempt_count": 2,
+  "manual_attempt_count": 2,
+  "legacy_unknown_attempt_count": 56,
+  "fully_available_snapshot_count": 3,
+  "partial_snapshot_count": 3,
+  "failed_attempt_count": 54,
+  "scheduled_slot_success_rate": 0.5,
+  "required_field_availability": {
+    "funding_rate": 0.08333333333333333,
+    "open_interest": 0.05,
+    "taker_buy_sell_ratio": 0.08333333333333333,
+    "basis_rate": 0.08333333333333333,
+    "long_short_account_ratio": 0.08333333333333333
+  },
+  "coverage_days": 0.5768888425925925,
+  "largest_gap_slots": 54,
+  "last_success_at_ms": 1788153597010,
+  "last_failure_at_ms": 1788153381688,
+  "consecutive_failure_count": 1,
+  "snapshot_count": 59,
+  "snapshot_duplicate_count": 0,
+  "snapshot_conflict_count": 0,
+  "source_timestamp_after_observed_at": 0,
+  "impossible_value_timestamps": 0,
+  "latest_scheduled_run": {
+    "finished_at_ms": 1788154232562,
+    "status": "PARTIAL",
+    "remaining_error_class": "TLS_HANDSHAKE_TIMEOUT",
+    "remaining_error_endpoint": "openInterest"
+  },
+  "gate": {
+    "minimum_days": 30,
+    "minimum_snapshots": 2500,
+    "minimum_required_field_availability": 0.95,
+    "maximum_persistent_gap_slots": 4,
+    "current_state": "INSUFFICIENT_FORWARD_HISTORY",
+    "projection_state": "RECOVERABLE_WITH_FUTURE_SUCCESS",
+    "required_following_fully_available_successes": 2497,
+    "alpha_claim": "NONE"
+  },
+  "operational_state": "DEGRADED"
+}
+

@@ -1,0 +1,35 @@
+{
+  "checked_at_ms": 1788153545561,
+  "target_host": "fapi.binance.com",
+  "root_cause": "SYSTEMD_PROXY_ENVIRONMENT_NOT_INHERITED",
+  "dns": {
+    "status": "OK",
+    "address_count": 2
+  },
+  "direct_route": {
+    "status": "NETWORK_UNREACHABLE_OR_TIMEOUT",
+    "detail": "direct TCP route failed while DNS resolution succeeded"
+  },
+  "proxy": {
+    "configured": true,
+    "scheme": "http",
+    "host": "LOCALHOST_REDACTED_SUMMARY",
+    "port_configured": true,
+    "credentials": false,
+    "environment_file_committed": false,
+    "environment_file_mode": "0600"
+  },
+  "endpoints": {
+    "ping": {"status": "OK", "http_status": 200},
+    "premiumIndex": {"status": "OK", "http_status": 200},
+    "openInterest": {"status": "OK", "http_status": 200},
+    "openInterestHist": {"status": "OK", "http_status": 200},
+    "takerlongshortRatio": {"status": "OK", "http_status": 200},
+    "globalLongShortAccountRatio": {"status": "OK", "http_status": 200},
+    "basis": {"status": "OK", "http_status": 200}
+  },
+  "diagnostic_overall_status": "OK",
+  "collector_operational_status": "DEGRADED",
+  "remaining_observation": "The first natural timer run had an intermittent TLS handshake timeout on openInterest; other required endpoints succeeded."
+}
+
