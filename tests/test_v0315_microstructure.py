@@ -13,6 +13,7 @@ from btc_quant_agent.data.forward_store import (
 )
 from btc_quant_agent.domain import DerivativesSnapshot
 from btc_quant_agent.evidence_epoch import EvidenceEpoch
+from btc_quant_agent.forward_evidence import forward_evidence_status
 from btc_quant_agent.microstructure import (
     AggTrade,
     DepthEvent,
@@ -136,10 +137,24 @@ def test_derivatives_status_uses_epoch_source_of_truth_not_archive(tmp_path: Pat
                 "BTCUSDT", f"legacy-{index}", collection, trigger_source="LEGACY_UNKNOWN"
             )
         )
-    status = store.status(evidence_epoch_path=EPOCH)
+    status = store.status(evidence_epoch_path=EPOCH, now_ms=epoch.epoch_start_ms)
     assert status["research_eligibility"] == status["active_epoch"]["eligibility_state"]
     assert status["archive_pre_epoch"]["classification"] == "NOT_FOR_ELIGIBILITY"
     assert status["archive_pre_epoch"]["largest_gap_slots"] >= 6
+
+    combined = forward_evidence_status(
+        derivatives_store_path=store.path,
+        opportunity_store_path=tmp_path / "opportunity.sqlite3",
+        epoch_path=EPOCH,
+        campaign_path=ROOT / "configs/forward/v0.3.13_opportunity_shadow_campaign.json",
+        microstructure_root=tmp_path / "microstructure",
+        microstructure_campaign_path=CAMPAIGN,
+        now_ms=epoch.epoch_start_ms,
+    )
+    assert (
+        status["research_eligibility"]
+        == combined["derivatives"]["active_epoch"]["eligibility_state"]
+    )
 
 
 def test_campaign_is_data_only_and_frozen() -> None:

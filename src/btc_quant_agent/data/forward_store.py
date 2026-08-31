@@ -596,9 +596,10 @@ class ForwardDerivativeStore:
         *,
         scheduler: dict[str, Any] | None = None,
         evidence_epoch_path: str | Path = "configs/forward/v0.3.14_derivatives_evidence_epoch.json",
+        now_ms: int | None = None,
     ) -> dict[str, Any]:
         rows = self._rows()
-        now = int(time.time() * 1000)
+        now = now_ms if now_ms is not None else int(time.time() * 1000)
         first = int(rows[0]["observed_at_ms"]) if rows else None
         last = int(rows[-1]["observed_at_ms"]) if rows else None
         reliability = self.reliability_metrics()
