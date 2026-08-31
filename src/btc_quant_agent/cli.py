@@ -500,7 +500,10 @@ def main(argv: list[str] | None = None) -> int:
         if args.microstructure_command == "run":
             import asyncio
 
-            asyncio.run(run_daemon(micro_campaign, args.root))
+            try:
+                asyncio.run(run_daemon(micro_campaign, args.root))
+            except KeyboardInterrupt:
+                return 0
             return 0
         report = micro_store.status()
         if args.microstructure_command == "audit":
