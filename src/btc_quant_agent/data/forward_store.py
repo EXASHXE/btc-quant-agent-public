@@ -3,6 +3,7 @@ from __future__ import annotations
 import csv
 import hashlib
 import json
+import os
 import sqlite3
 import subprocess
 import time
@@ -48,15 +49,22 @@ class ForwardDerivativeRecord:
     endpoint_errors: dict[str, str]
     attempted_fields: tuple[str, ...]
     payload_hash: str
+    trigger_source: str = "MANUAL"
+    scheduled_slot_ms: int | None = None
 
     @classmethod
     def from_collection(
-        cls, symbol: str, collection_id: str, collection: DerivativeCollection
+        cls,
+        symbol: str,
+        collection_id: str,
+        collection: DerivativeCollection,
+        *,
+        trigger_source: str = "MANUAL",
     ) -> ForwardDerivativeRecord:
         payload = {
             "symbol": symbol.upper(),
             "observed_at_ms": collection.observed_at_ms,
-            "collector_version": "0.3.11",
+            "collector_version": "0.3.13",
             **asdict(collection.snapshot),
             "field_availability": collection.field_availability,
             "endpoint_errors": collection.endpoint_errors,
@@ -70,12 +78,14 @@ class ForwardDerivativeRecord:
             collection_id,
             collection.collection_started_at_ms,
             collection.observed_at_ms,
-            "0.3.11",
+            "0.3.13",
             collection.snapshot,
             collection.field_availability,
             collection.endpoint_errors,
             collection.attempted_fields,
             digest,
+            trigger_source,
+            (collection.collection_started_at_ms // CADENCE_MS) * CADENCE_MS,
         )
 
 
@@ -139,15 +149,34 @@ class ForwardDerivativeStore:
                     status TEXT NOT NULL,
                     attempted_fields TEXT NOT NULL,
                     successful_fields TEXT NOT NULL,
-                    error_summary TEXT NOT NULL
+                    error_summary TEXT NOT NULL,
+                    trigger_source TEXT NOT NULL DEFAULT 'LEGACY_UNKNOWN',
+                    scheduled_slot_ms INTEGER
                 );
                 """
             )
+            columns = {
+                str(row["name"])
+                for row in connection.execute("PRAGMA table_info(collection_runs)").fetchall()
+            }
+            if "trigger_source" not in columns:
+                connection.execute(
+                    "ALTER TABLE collection_runs ADD COLUMN trigger_source TEXT NOT NULL "
+                    "DEFAULT 'LEGACY_UNKNOWN'"
+                )
+            if "scheduled_slot_ms" not in columns:
+                connection.execute(
+                    "ALTER TABLE collection_runs ADD COLUMN scheduled_slot_ms INTEGER"
+                )
 
     def append(self, record: ForwardDerivativeRecord) -> bool:
         snapshot = record.snapshot
         conflict = False
+        successful = any(record.field_availability.values())
         with self._connect() as connection:
+            if not successful:
+                self._insert_run(connection, record, "FAILED")
+                return False
             existing = connection.execute(
                 "SELECT payload_hash FROM derivative_snapshots WHERE symbol=? AND observed_at_ms=?",
                 (record.symbol, record.observed_at_ms),
@@ -188,7 +217,6 @@ class ForwardDerivativeStore:
                         record.payload_hash,
                     ),
                 )
-                successful = any(record.field_availability.values())
                 run_status = (
                     "COMPLETE"
                     if not record.endpoint_errors
@@ -205,7 +233,10 @@ class ForwardDerivativeStore:
     ) -> None:
         successful = sorted(key for key, value in record.field_availability.items() if value)
         connection.execute(
-            "INSERT OR IGNORE INTO collection_runs VALUES (?,?,?,?,?,?,?)",
+            "INSERT OR IGNORE INTO collection_runs "
+            "(run_id, started_at_ms, finished_at_ms, status, attempted_fields, "
+            "successful_fields, error_summary, trigger_source, scheduled_slot_ms) "
+            "VALUES (?,?,?,?,?,?,?,?,?)",
             (
                 record.collection_id,
                 record.collection_started_at_ms,
@@ -214,8 +245,121 @@ class ForwardDerivativeStore:
                 json.dumps(record.attempted_fields),
                 json.dumps(successful),
                 json.dumps(record.endpoint_errors, sort_keys=True),
+                record.trigger_source,
+                record.scheduled_slot_ms,
             ),
         )
+
+    def _run_rows(self) -> list[sqlite3.Row]:
+        with self._connect() as connection:
+            return connection.execute(
+                "SELECT * FROM collection_runs ORDER BY finished_at_ms, run_id"
+            ).fetchall()
+
+    @staticmethod
+    def _run_is_fully_available(row: sqlite3.Row) -> bool:
+        fields = set(json.loads(str(row["successful_fields"])))
+        return set(REQUIRED_RESEARCH_FIELDS).issubset(fields)
+
+    def reliability_metrics(self) -> dict[str, Any]:
+        runs = self._run_rows()
+        fully = [row for row in runs if self._run_is_fully_available(row)]
+        partial = [
+            row
+            for row in runs
+            if str(row["status"]) == "PARTIAL" and not self._run_is_fully_available(row)
+        ]
+        failed = [row for row in runs if str(row["status"]) in {"FAILED", "CONFLICT"}]
+        scheduled = [row for row in runs if str(row["trigger_source"]) == "SCHEDULED"]
+        scheduled_full = [row for row in scheduled if self._run_is_fully_available(row)]
+        denominator = scheduled if scheduled else runs
+        numerator = scheduled_full if scheduled else fully
+        consecutive = 0
+        for row in reversed(runs):
+            if self._run_is_fully_available(row):
+                break
+            consecutive += 1
+        longest_failure_run = current_failure_run = 0
+        for row in runs:
+            if self._run_is_fully_available(row):
+                current_failure_run = 0
+            else:
+                current_failure_run += 1
+                longest_failure_run = max(longest_failure_run, current_failure_run)
+        attempt_count = len(runs)
+        required_availability = {
+            field: (
+                sum(field in set(json.loads(str(row["successful_fields"]))) for row in runs)
+                / attempt_count
+                if attempt_count
+                else 0.0
+            )
+            for field in REQUIRED_RESEARCH_FIELDS
+        }
+        first = int(runs[0]["finished_at_ms"]) if runs else None
+        last = int(runs[-1]["finished_at_ms"]) if runs else None
+        coverage_days = (last - first) / 86_400_000 if first is not None and last is not None else 0
+        remaining_slots = max(
+            0, int((RESEARCH_MIN_DAYS - coverage_days) * 86_400_000 // CADENCE_MS)
+        )
+        projected_attempts = attempt_count + remaining_slots
+        projected_full = len(fully) + remaining_slots
+        reachable = (
+            projected_full >= RESEARCH_MIN_SNAPSHOTS
+            and (
+                projected_full / projected_attempts >= RESEARCH_MIN_FIELD_AVAILABILITY
+                if projected_attempts
+                else False
+            )
+        )
+        availability_successes_needed = max(
+            0,
+            int(
+                (
+                    RESEARCH_MIN_FIELD_AVAILABILITY * attempt_count - len(fully)
+                )
+                / (1 - RESEARCH_MIN_FIELD_AVAILABILITY)
+                + 0.999999999
+            ),
+        )
+        required_following_successes = max(
+            RESEARCH_MIN_SNAPSHOTS - len(fully), availability_successes_needed
+        )
+        return {
+            "total_attempt_count": attempt_count,
+            "scheduled_attempt_count": len(scheduled),
+            "manual_attempt_count": sum(str(row["trigger_source"]) == "MANUAL" for row in runs),
+            "legacy_unknown_attempt_count": sum(
+                str(row["trigger_source"]) == "LEGACY_UNKNOWN" for row in runs
+            ),
+            "fully_available_snapshot_count": len(fully),
+            "partial_snapshot_count": len(partial),
+            "failed_attempt_count": len(failed),
+            "scheduled_slot_success_rate": len(numerator) / len(denominator) if denominator else 0,
+            "scheduled_slot_success_rate_denominator": (
+                "SCHEDULED_ONLY" if scheduled else "ALL_ATTEMPTS_FALLBACK"
+            ),
+            "required_field_availability": required_availability,
+            "coverage_days": coverage_days,
+            "largest_gap_slots": longest_failure_run,
+            "last_success_at_ms": int(fully[-1]["finished_at_ms"]) if fully else None,
+            "last_failure_at_ms": int(failed[-1]["finished_at_ms"]) if failed else None,
+            "consecutive_failure_count": consecutive,
+            "backfilled_rows": 0,
+            "coverage_gate_projection": {
+                "state": (
+                    "RECOVERABLE_WITH_FUTURE_SUCCESS"
+                    if reachable
+                    else "CURRENT_WINDOW_GATE_MATHEMATICALLY_UNREACHABLE"
+                ),
+                "required_following_fully_available_successes": required_following_successes,
+                "remaining_slots_before_30_days": remaining_slots,
+                "best_case_fully_available_snapshots": projected_full,
+                "best_case_required_field_availability": (
+                    projected_full / projected_attempts if projected_attempts else 0
+                ),
+            },
+        }
 
     def count(self) -> int:
         with self._connect() as connection:
@@ -270,6 +414,7 @@ class ForwardDerivativeStore:
             conflicts = connection.execute(
                 "SELECT COUNT(*) AS n FROM collection_runs WHERE status='CONFLICT'"
             ).fetchone()
+        reliability = self.reliability_metrics()
         return {
             "path": str(self.path),
             "sample_count": len(rows),
@@ -282,6 +427,10 @@ class ForwardDerivativeStore:
             "source_timestamp_after_observed_at": future_sources,
             "impossible_value_timestamps": impossible,
             "backfilled_rows": 0,
+            "collection_ledger": reliability,
+            "legacy_failed_rows_retained": sum(
+                not any(json.loads(str(row["field_availability_json"])).values()) for row in rows
+            ),
         }
 
     def status(self, *, scheduler: dict[str, Any] | None = None) -> dict[str, Any]:
@@ -289,10 +438,8 @@ class ForwardDerivativeStore:
         now = int(time.time() * 1000)
         first = int(rows[0]["observed_at_ms"]) if rows else None
         last = int(rows[-1]["observed_at_ms"]) if rows else None
-        availability = {
-            field: sum(row[field] is not None for row in rows) / len(rows) if rows else 0.0
-            for field in REQUIRED_RESEARCH_FIELDS
-        }
+        reliability = self.reliability_metrics()
+        availability = reliability["required_field_availability"]
         audit = self.audit()
         duration_days = (
             (last - first) / 86_400_000 if first is not None and last is not None else 0.0
@@ -304,9 +451,9 @@ class ForwardDerivativeStore:
         )
         eligible = (
             duration_days >= RESEARCH_MIN_DAYS
-            and len(rows) >= RESEARCH_MIN_SNAPSHOTS
+            and int(reliability["fully_available_snapshot_count"]) >= RESEARCH_MIN_SNAPSHOTS
             and all(value >= RESEARCH_MIN_FIELD_AVAILABILITY for value in availability.values())
-            and int(audit["largest_gap_slots"]) <= RESEARCH_MAX_PERSISTENT_GAP_SLOTS
+            and int(reliability["largest_gap_slots"]) <= RESEARCH_MAX_PERSISTENT_GAP_SLOTS
         )
         with self._connect() as connection:
             errors = connection.execute(
@@ -341,6 +488,7 @@ class ForwardDerivativeStore:
             "store_exists": self.path.exists(),
             "health": forward_health,
             "sample_count": len(rows),
+            **reliability,
             "first_observed_at_ms": first,
             "last_observed_at_ms": last,
             "last_sample_age_seconds": (now - last) / 1000 if last is not None else None,
@@ -348,7 +496,7 @@ class ForwardDerivativeStore:
             "expected_samples": expected,
             "missing_cadence_slots": max(0, expected - len(rows)),
             "gap_count": audit["gap_count"],
-            "largest_gap_slots": audit["largest_gap_slots"],
+            "legacy_snapshot_largest_gap_slots": audit["largest_gap_slots"],
             "required_field_coverage": availability,
             "recent_endpoint_errors": [
                 {
@@ -413,12 +561,16 @@ def collect_once(
     *,
     symbol: str = "BTCUSDT",
     include_order_book: bool = False,
+    trigger_source: str | None = None,
 ) -> ForwardDerivativeRecord:
     collection = client.collect_derivatives(symbol, include_order_book=include_order_book)
     identity = hashlib.sha256(
         f"{symbol}:{collection.collection_started_at_ms}:{collection.observed_at_ms}".encode()
     ).hexdigest()[:24]
-    record = ForwardDerivativeRecord.from_collection(symbol, identity, collection)
+    source = trigger_source or os.getenv("BTC_QUANT_TRIGGER_SOURCE") or "MANUAL"
+    record = ForwardDerivativeRecord.from_collection(
+        symbol, identity, collection, trigger_source=source
+    )
     store.append(record)
     return record
 

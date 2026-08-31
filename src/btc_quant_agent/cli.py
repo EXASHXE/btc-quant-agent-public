@@ -23,8 +23,16 @@ from .data.forward_store import (
 )
 from .data.funding import read_funding_events_csv
 from .data.manifest import build_manifest, write_manifest
+from .data.network_diagnostic import diagnose_binance_network
 from .engine import EngineMode, QuantEngine
 from .explain import explain_signal
+from .opportunity_forward import (
+    OpportunityCampaign,
+    OpportunityForwardStore,
+    collect_opportunity_once,
+    opportunity_scheduler_status,
+    resolve_opportunity_outcomes,
+)
 from .research import replay_decisions, run_full_suite, write_research_artifacts
 from .research_registry import RegistryError, ResearchRegistry
 from .service import QuantService
@@ -114,7 +122,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     derivatives = sub.add_parser("derivatives", help="append-safe forward PIT derivatives")
     derivatives_sub = derivatives.add_subparsers(dest="derivatives_command", required=True)
-    for name in ("collect-once", "run", "status", "audit", "export"):
+    for name in ("collect-once", "run", "status", "audit", "export", "diagnose-network"):
         command = derivatives_sub.add_parser(name)
         command.add_argument("--store", default="./data/forward/BTCUSDT/derivatives.sqlite3")
         if name in {"collect-once", "run"}:
@@ -125,6 +133,20 @@ def build_parser() -> argparse.ArgumentParser:
         if name == "export":
             command.add_argument("--csv")
             command.add_argument("--manifest")
+
+    opportunity = sub.add_parser(
+        "opportunity-forward", help="directionless forward opportunity movement campaign"
+    )
+    opportunity_sub = opportunity.add_subparsers(dest="opportunity_command", required=True)
+    for name in ("collect-once", "status", "audit", "resolve", "report"):
+        command = opportunity_sub.add_parser(name)
+        command.add_argument(
+            "--store", default="./data/forward/BTCUSDT/opportunity_shadow.sqlite3"
+        )
+        command.add_argument(
+            "--campaign",
+            default="configs/forward/v0.3.13_opportunity_shadow_campaign.json",
+        )
 
     registry = sub.add_parser("research-registry", help="inspect research eligibility")
     registry.add_argument(
@@ -299,6 +321,13 @@ def main(argv: list[str] | None = None) -> int:
         _print({"status": "collected", "manifest": collected_manifest.as_dict()})
         return 0
     if args.command == "derivatives":
+        if args.derivatives_command == "diagnose-network":
+            report = diagnose_binance_network(
+                base_url=service.config.data.rest_base_url,
+                timeout=service.config.data.request_timeout_seconds,
+            )
+            _print(report)
+            return 0 if report["overall_status"] == "OK" else 2
         store = ForwardDerivativeStore(args.store)
         if args.derivatives_command == "collect-once":
             record = collect_once(
@@ -369,6 +398,34 @@ def main(argv: list[str] | None = None) -> int:
         export_csv = args.csv or str(Path(args.store).with_name("derivatives.csv"))
         export_manifest = args.manifest or f"{export_csv}.manifest.json"
         _print(store.export(export_csv, export_manifest))
+        return 0
+    if args.command == "opportunity-forward":
+        campaign = OpportunityCampaign.load(args.campaign)
+        opportunity_store = OpportunityForwardStore(args.store)
+        if args.opportunity_command == "collect-once":
+            observation = collect_opportunity_once(service, opportunity_store, campaign)
+            _print(asdict(observation))
+            return 0 if observation.status == "SUCCESSFUL_SCAN" else 2
+        if args.opportunity_command == "audit":
+            report = opportunity_store.audit(campaign.campaign_id)
+            _print(report)
+            return 0 if not report["direction_action_columns"] else 2
+        if args.opportunity_command == "resolve":
+            _print(
+                resolve_opportunity_outcomes(
+                    BinancePublicClient(service.config.data), opportunity_store, campaign
+                )
+            )
+            return 0
+        report = opportunity_store.status(
+            campaign, scheduler=opportunity_scheduler_status()
+        )
+        if args.opportunity_command == "report":
+            report = {
+                **report,
+                "audit": opportunity_store.audit(campaign.campaign_id),
+            }
+        _print(report)
         return 0
     if args.command == "build-official-dataset":
         start = datetime.fromisoformat(args.start).replace(tzinfo=UTC)
