@@ -5,7 +5,9 @@ from pathlib import Path
 
 import pytest
 
-from btc_quant_agent.config import AppConfig
+from btc_quant_agent.config import AppConfig, DataConfig
+from btc_quant_agent.data.binance import BinancePublicClient
+from btc_quant_agent.data.forward_store import ForwardDerivativeRecord
 from btc_quant_agent.evidence_epoch import EvidenceEpochRegistry
 from btc_quant_agent.forward_evidence import forward_operations_health
 from btc_quant_agent.opportunity_forward import (
@@ -199,6 +201,35 @@ def test_derivatives_old_terminal_and_successor_start_remain_frozen() -> None:
     assert old.status == "FAILED_GAP_GATE_TERMINAL"
     assert old.terminal_at_ms == 1788183927140
     assert successor.start_ms == 1788255000000
+
+
+def test_derivatives_observed_at_conservatively_extends_for_server_clock(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    def payload(path: str, params: object = None) -> object:
+        if path.endswith("premiumIndex"):
+            return {"markPrice": "100", "indexPrice": "100", "lastFundingRate": "0.1", "time": 2_000}
+        if path.endswith("openInterest"):
+            return {"openInterest": "10", "time": 1_000}
+        if path.endswith("openInterestHist"):
+            return [{"sumOpenInterest": "9", "timestamp": 900}, {"sumOpenInterest": "10", "timestamp": 1_000}]
+        if path.endswith("takerlongshortRatio"):
+            return [{"buySellRatio": "1", "timestamp": 1_000}]
+        if path.endswith("globalLongShortAccountRatio"):
+            return [{"longShortRatio": "1", "timestamp": 1_000}]
+        if path.endswith("basis"):
+            return [{"basisRate": "0.01", "timestamp": 1_000}]
+        raise AssertionError(path)
+
+    client = BinancePublicClient(DataConfig())
+    monkeypatch.setattr(client, "_get", payload)
+    monkeypatch.setattr("btc_quant_agent.data.binance.time.time", lambda: 1.0)
+    collection = client.collect_derivatives("BTCUSDT")
+    assert collection.observed_at_ms == 2_000
+    assert collection.snapshot.observed_at_ms == 2_000
+    assert collection.endpoint_telemetry is not None
+    assert collection.endpoint_telemetry["_observation_clock"]["conservative_clock_extension_ms"] == 1_000
+    ForwardDerivativeRecord.from_collection("BTCUSDT", "clock", collection)
 
 
 def test_operations_health_is_structured_and_cannot_authorize_execution() -> None:

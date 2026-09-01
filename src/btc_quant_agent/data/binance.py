@@ -7,7 +7,7 @@ import time
 import urllib.error
 import urllib.parse
 import urllib.request
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import Any
 
 from ..config import DataConfig
@@ -20,6 +20,7 @@ INTERVAL_MS = {
     "1h": 3_600_000,
     "4h": 14_400_000,
 }
+MAX_SOURCE_CLOCK_EXTENSION_MS = 5_000
 
 
 class BinanceDataError(RuntimeError):
@@ -335,9 +336,9 @@ class BinancePublicClient:
             spread_bps = (best_ask - best_bid) / mid * 10_000 if mid else None
         mark_price = float(premium["markPrice"]) if "markPrice" in premium else None
         index_price = float(premium["indexPrice"]) if "indexPrice" in premium else None
-        observed_at = int(time.time() * 1000)
+        local_observed_at = int(time.time() * 1000)
         snapshot = DerivativesSnapshot(
-            observed_at_ms=observed_at,
+            observed_at_ms=local_observed_at,
             mark_price=mark_price,
             index_price=index_price,
             premium_bps=(mark_price / index_price - 1.0) * 10_000
@@ -403,6 +404,26 @@ class BinancePublicClient:
             "long_short": snapshot.long_short_time_ms,
             "basis": snapshot.basis_time_ms,
             "order_book": snapshot.order_book_time_ms,
+        }
+        observed_at = max(
+            local_observed_at,
+            *(value for value in source_times.values() if value is not None),
+        )
+        if observed_at - local_observed_at > MAX_SOURCE_CLOCK_EXTENSION_MS:
+            raise BinanceDataError(
+                "source clock exceeds conservative observation bound",
+                "SOURCE_CLOCK_SKEW",
+                False,
+            )
+        snapshot = replace(snapshot, observed_at_ms=observed_at)
+        telemetry["_observation_clock"] = {
+            "success": True,
+            "attempt_count": 0,
+            "attempts": [],
+            "final_error_class": None,
+            "local_assembly_time_ms": local_observed_at,
+            "effective_observed_at_ms": observed_at,
+            "conservative_clock_extension_ms": observed_at - local_observed_at,
         }
         for name, source_timestamp in source_times.items():
             if name in telemetry:
