@@ -1,0 +1,25 @@
+{
+  "schema_version": "1.0.0",
+  "campaigns": [
+    {
+      "campaign_id": "OPPORTUNITY_FORWARD_V0313_20260831T050656Z",
+      "config_path": "configs/forward/v0.3.13_opportunity_shadow_campaign.json",
+      "start_ms": 1788152816561,
+      "hypothesis_id": "H35_OPPORTUNITY_FORWARD",
+      "status": "H35_DATA_QUALITY_AT_RISK",
+      "formal_role": "DATA_QUALITY_AT_RISK_ARCHIVE",
+      "immutable_history": true,
+      "superseded_by": "OPPORTUNITY_FORWARD_V0317_20260901T160000Z"
+    },
+    {
+      "campaign_id": "OPPORTUNITY_FORWARD_V0317_20260901T160000Z",
+      "config_path": "configs/forward/v0.3.17_opportunity_successor_campaign.json",
+      "start_ms": 1788278400000,
+      "hypothesis_id": "H36_OPPORTUNITY_FORWARD_REPLICATION",
+      "status": "PREREGISTERED_NOT_STARTED",
+      "formal_role": "FORMAL_SUCCESSOR_PENDING",
+      "immutable_history": true,
+      "superseded_by": null
+    }
+  ]
+}
