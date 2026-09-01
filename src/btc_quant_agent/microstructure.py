@@ -559,6 +559,10 @@ class MicrostructureStore:
         return session_id
 
     def heartbeat(self, timestamp_ms: int, instance_id: str) -> None:
+        # A fast supervisor restart can occur before the previous lease expires.
+        # Recheck on every heartbeat so that such an orphan is closed once the
+        # frozen timeout elapses instead of remaining open until another restart.
+        self.recover_orphan_instances(timestamp_ms)
         for path in sorted(self.root.glob("microstructure-*.sqlite3")):
             if self._is_finalized(path):
                 continue

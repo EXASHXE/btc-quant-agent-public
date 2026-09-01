@@ -221,6 +221,21 @@ def test_orphan_lease_closes_coverage_and_records_host_gap(tmp_path: Path) -> No
     assert status["gap_type_counts"] == {"PROCESS_OR_HOST_GAP": 1}
 
 
+def test_fast_restart_recovers_old_instance_after_lease_on_new_heartbeat(
+    tmp_path: Path,
+) -> None:
+    store = _micro(tmp_path)
+    _healthy_coverage(store, 1, 5_000)
+    replacement = store.instance_start(10_000, "replacement")
+    store.session_start(10_000, "trade", replacement)
+    store.session_start(10_000, "depth", replacement)
+    store.depth_sequence_state(10_000, replacement, True)
+    store.heartbeat(21_000, replacement)
+    status = store.status(21_000)
+    assert status["orphan_instance_count"] == 1
+    assert status["gap_type_counts"] == {"PROCESS_OR_HOST_GAP": 1}
+
+
 def test_gap_taxonomy_and_resync_are_reported_separately(tmp_path: Path) -> None:
     store = _micro(tmp_path)
     store.gap(100, "TRADE_DISCONNECT", "socket")
