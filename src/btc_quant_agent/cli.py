@@ -171,6 +171,10 @@ def build_parser() -> argparse.ArgumentParser:
             default="configs/forward/v0.3.14_derivatives_evidence_epoch.json",
         )
         command.add_argument(
+            "--epoch-registry",
+            default="configs/forward/derivatives_evidence_epochs.json",
+        )
+        command.add_argument(
             "--campaign",
             default="configs/forward/v0.3.13_opportunity_shadow_campaign.json",
         )
@@ -479,6 +483,7 @@ def main(argv: list[str] | None = None) -> int:
             derivatives_store_path=args.derivatives_store,
             opportunity_store_path=args.opportunity_store,
             epoch_path=args.epoch,
+            epoch_registry_path=args.epoch_registry,
             campaign_path=args.campaign,
             microstructure_root=args.microstructure_root,
             microstructure_campaign_path=args.microstructure_campaign,

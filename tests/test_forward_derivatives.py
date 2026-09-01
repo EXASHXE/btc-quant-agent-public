@@ -233,7 +233,7 @@ def test_status_reports_field_coverage(tmp_path: Path) -> None:
     assert status["scheduler_detected"] is True
     assert status["scheduler_active"] is False
     assert status["health"] == "DEGRADED"
-    assert status["research_eligibility"] == "INSUFFICIENT_FORWARD_HISTORY"
+    assert status["research_eligibility"] == "FAILED_GAP_GATE_TERMINAL"
     assert status["research_gate"]["minimum_days"] == 30
     assert status["research_gate"]["minimum_snapshots"] == 2_500
 

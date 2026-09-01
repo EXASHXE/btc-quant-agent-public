@@ -436,6 +436,53 @@ class OpportunityForwardStore:
             ],
         }
 
+    @staticmethod
+    def _miss_root_cause(row: sqlite3.Row) -> str:
+        errors = tuple(str(value) for value in json.loads(str(row["network_data_errors_json"])))
+        text = " | ".join(errors).lower()
+        if "http error 451" in text:
+            return "NETWORK_HTTP_451"
+        if "ssl" in text or "tls" in text:
+            return "NETWORK_TLS"
+        if "timed out" in text or "timeout" in text:
+            return "NETWORK_TIMEOUT"
+        if "connection" in text:
+            return "NETWORK_CONNECTION"
+        if "keyerror: -1" in text:
+            return "MARKET_DATA_INSUFFICIENT"
+        if "decision_close_ms" in text:
+            return "RUNTIME_CONTRACT_ERROR"
+        if str(row["market_data_health"]) != "OK":
+            return "MARKET_DATA_HEALTH_OTHER"
+        return "OTHER"
+
+    def missed_slot_audit(self, campaign_id: str) -> dict[str, Any]:
+        missed = [
+            row
+            for row in self.observations(campaign_id)
+            if row["status"] == "MISSED_DECISION_SLOT"
+        ]
+        chronology = [
+            {
+                "scheduled_slot_ms": int(row["scheduled_slot_ms"]),
+                "root_cause": self._miss_root_cause(row),
+                "market_data_health": str(row["market_data_health"]),
+                "errors": json.loads(str(row["network_data_errors_json"])),
+            }
+            for row in missed
+        ]
+        distribution = Counter(item["root_cause"] for item in chronology)
+        return {
+            "missed_slot_count": len(missed),
+            "root_cause_distribution": dict(sorted(distribution.items())),
+            "chronology": chronology,
+            "classification_deterministic": True,
+            "missingness_independent_of_market_state_proven": False,
+            "data_quality_state": (
+                "H35_DATA_QUALITY_AT_RISK" if missed else "NO_RECORDED_MISSED_SLOTS"
+            ),
+        }
+
     def status(
         self,
         campaign: OpportunityCampaign,
@@ -475,6 +522,7 @@ class OpportunityForwardStore:
             and len(unique_controls) >= 100
             and len(distinct_days) >= 20
         )
+        missed_audit = self.missed_slot_audit(campaign.campaign_id)
         return {
             "campaign_id": campaign.campaign_id,
             "campaign_start_ms": campaign.campaign_start_ms,
@@ -484,6 +532,8 @@ class OpportunityForwardStore:
             "scheduled_slots_recorded": len(rows),
             "successful_scans": len(successful),
             "missed_decision_slots": sum(row["status"] == "MISSED_DECISION_SLOT" for row in rows),
+            "missed_slot_root_causes": missed_audit["root_cause_distribution"],
+            "data_quality_state": missed_audit["data_quality_state"],
             "opportunity_count": len(opportunities),
             "tp_count": sum(row["detector_id"] == "trend_pullback_opportunity" for row in opportunities),
             "br_count": sum(row["detector_id"] == "breakout_retest_opportunity" for row in opportunities),

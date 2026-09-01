@@ -113,8 +113,10 @@ def test_book_samples_aggregate_without_future_data_and_gap_marks_bucket(tmp_pat
 def test_connected_coverage_requires_both_streams(tmp_path: Path) -> None:
     campaign = MicrostructureCampaign.load(CAMPAIGN)
     store = MicrostructureStore(tmp_path, campaign.campaign_id, campaign.start_ms)
-    depth_session = store.session_start(campaign.start_ms, "depth")
-    store.session_start(campaign.start_ms + 200, "trade")
+    instance = store.instance_start(campaign.start_ms, "test-instance")
+    depth_session = store.session_start(campaign.start_ms, "depth", instance)
+    store.session_start(campaign.start_ms + 200, "trade", instance)
+    store.heartbeat(campaign.start_ms + 1_000, instance)
     status = store.status(campaign.start_ms + 1_000)
     assert status["connected_seconds_by_stream"] == {"depth": 1.0, "trade": 0.8}
     assert status["connected_seconds"] == 0.8

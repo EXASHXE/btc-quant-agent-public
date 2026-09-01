@@ -15,7 +15,7 @@ from pathlib import Path
 from typing import Any
 
 from ..domain import DerivativesSnapshot
-from ..evidence_epoch import EvidenceEpoch
+from ..evidence_epoch import EvidenceEpoch, resolve_formal_epoch
 from .binance import BinancePublicClient, DerivativeCollection
 from .derivatives import DERIVATIVE_FIELDS
 
@@ -356,6 +356,9 @@ class ForwardDerivativeStore:
             and longest_bad
             <= epoch.maximum_consecutive_failed_or_missing_scheduled_slots
         )
+        terminal_gap_failure = (
+            longest_bad > epoch.maximum_consecutive_failed_or_missing_scheduled_slots
+        )
         return {
             "active_epoch_id": epoch.epoch_id,
             "epoch_start_ms": epoch.epoch_start_ms,
@@ -377,11 +380,19 @@ class ForwardDerivativeStore:
             / epoch.minimum_fully_available_snapshots,
             "days_progress": min(1.0, age_days / epoch.minimum_days),
             "eligibility_state": (
-                "ELIGIBLE_FOR_PREREGISTERED_RESEARCH"
+                "FAILED_GAP_GATE_TERMINAL"
+                if terminal_gap_failure
+                else "ELIGIBLE_FOR_PREREGISTERED_RESEARCH"
                 if eligible
                 else "INITIALIZING"
                 if not expected_slots
-                else "INSUFFICIENT_FORWARD_HISTORY"
+                else "ACCUMULATING"
+            ),
+            "terminal_failure": terminal_gap_failure,
+            "terminal_reason": (
+                "MAX_CONSECUTIVE_BAD_OR_MISSING_EXCEEDED"
+                if terminal_gap_failure
+                else None
             ),
             "manual_runs_count_for_eligibility": False,
             "legacy_runs_count_for_eligibility": False,
@@ -596,6 +607,8 @@ class ForwardDerivativeStore:
         *,
         scheduler: dict[str, Any] | None = None,
         evidence_epoch_path: str | Path = "configs/forward/v0.3.14_derivatives_evidence_epoch.json",
+        evidence_epoch_registry_path: str
+        | Path = "configs/forward/derivatives_evidence_epochs.json",
         now_ms: int | None = None,
     ) -> dict[str, Any]:
         rows = self._rows()
@@ -613,12 +626,13 @@ class ForwardDerivativeStore:
             if first is not None and last is not None
             else 0
         )
-        epoch_path = Path(evidence_epoch_path)
-        active_epoch = (
-            self.evidence_epoch_metrics(EvidenceEpoch.load(epoch_path), now_ms=now)
-            if epoch_path.exists()
-            else None
+        epoch, lifecycle = resolve_formal_epoch(
+            now,
+            registry_path=evidence_epoch_registry_path,
+            fallback_epoch_path=evidence_epoch_path,
         )
+        active_epoch = self.evidence_epoch_metrics(epoch, now_ms=now)
+        active_epoch["lifecycle"] = lifecycle.__dict__.copy() if lifecycle is not None else None
         with self._connect() as connection:
             errors = connection.execute(
                 "SELECT run_id, finished_at_ms, error_summary FROM collection_runs "
@@ -687,8 +701,6 @@ class ForwardDerivativeStore:
             },
             "research_eligibility": (
                 active_epoch["eligibility_state"]
-                if active_epoch is not None
-                else "NO_ACTIVE_EVIDENCE_EPOCH"
             ),
             "research_gate": {
                 "minimum_days": RESEARCH_MIN_DAYS,
@@ -734,14 +746,19 @@ def collect_once(
     include_order_book: bool = False,
     trigger_source: str | None = None,
     evidence_epoch_path: str | Path = "configs/forward/v0.3.14_derivatives_evidence_epoch.json",
+    evidence_epoch_registry_path: str
+    | Path = "configs/forward/derivatives_evidence_epochs.json",
 ) -> ForwardDerivativeRecord:
     collection = client.collect_derivatives(symbol, include_order_book=include_order_book)
     identity = hashlib.sha256(
         f"{symbol}:{collection.collection_started_at_ms}:{collection.observed_at_ms}".encode()
     ).hexdigest()[:24]
     source = trigger_source or os.getenv("BTC_QUANT_TRIGGER_SOURCE") or "MANUAL"
-    epoch_path = Path(evidence_epoch_path)
-    epoch = EvidenceEpoch.load(epoch_path) if epoch_path.exists() else None
+    epoch, _ = resolve_formal_epoch(
+        collection.collection_started_at_ms,
+        registry_path=evidence_epoch_registry_path,
+        fallback_epoch_path=evidence_epoch_path,
+    )
     record = ForwardDerivativeRecord.from_collection(
         symbol, identity, collection, trigger_source=source, evidence_epoch=epoch
     )
