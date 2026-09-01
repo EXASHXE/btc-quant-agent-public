@@ -5,6 +5,7 @@ import hashlib
 import json
 import sqlite3
 import subprocess
+import threading
 import time
 import uuid
 from collections import Counter
@@ -498,7 +499,9 @@ class MicrostructureStore:
                         (interval, bucket),
                     )
 
-    def recover_orphan_instances(self, now_ms: int) -> int:
+    def recover_orphan_instances(
+        self, now_ms: int, *, exclude_instance_id: str | None = None
+    ) -> int:
         cutoff = now_ms - self.protocol.lease_timeout_ms
         recovered: list[tuple[int, str]] = []
         for path in sorted(self.root.glob("microstructure-*.sqlite3")):
@@ -516,8 +519,9 @@ class MicrostructureStore:
                 continue
             rows = connection.execute(
                 """SELECT instance_id,last_heartbeat_ms FROM process_instances
-                WHERE status='ACTIVE' AND last_heartbeat_ms < ?""",
-                (cutoff,),
+                WHERE status='ACTIVE' AND last_heartbeat_ms < ?
+                AND (? IS NULL OR instance_id != ?)""",
+                (cutoff, exclude_instance_id, exclude_instance_id),
             ).fetchall()
             for instance_id, last_heartbeat in rows:
                 lease_end = int(last_heartbeat) + self.protocol.lease_timeout_ms
@@ -577,7 +581,9 @@ class MicrostructureStore:
         # A fast supervisor restart can occur before the previous lease expires.
         # Recheck on every heartbeat so that such an orphan is closed once the
         # frozen timeout elapses instead of remaining open until another restart.
-        self.recover_orphan_instances(timestamp_ms)
+        self.recover_orphan_instances(
+            timestamp_ms, exclude_instance_id=instance_id
+        )
         for path in sorted(self.root.glob("microstructure-*.sqlite3")):
             if self._is_finalized(path):
                 continue
@@ -1086,10 +1092,19 @@ async def run_daemon(campaign: MicrostructureCampaign, root: str | Path) -> None
         await asyncio.sleep(wait_seconds)
     instance_id = store.instance_start(int(time.time() * 1000))
 
-    async def heartbeat_loop() -> None:
-        while True:
+    heartbeat_stop = threading.Event()
+
+    def heartbeat_worker() -> None:
+        while not heartbeat_stop.is_set():
             store.heartbeat(int(time.time() * 1000), instance_id)
-            await asyncio.sleep(store.protocol.heartbeat_interval_ms / 1000)
+            heartbeat_stop.wait(store.protocol.heartbeat_interval_ms / 1000)
+
+    heartbeat_thread = threading.Thread(
+        target=heartbeat_worker,
+        name="microstructure-heartbeat",
+        daemon=True,
+    )
+    heartbeat_thread.start()
 
     async def clock_loop() -> None:
         while True:
@@ -1113,6 +1128,7 @@ async def run_daemon(campaign: MicrostructureCampaign, root: str | Path) -> None
                 async for message in socket:
                     ns, ms = time.monotonic_ns(), int(time.time() * 1000)
                     store.append_trade(AggTrade.parse(json.loads(message)["data"], ms, ns))
+                    await asyncio.sleep(0)
             except Exception as exc:  # noqa: BLE001 - disconnects and malformed frames are gaps
                 store.gap(int(time.time() * 1000), "TRADE_DISCONNECT", type(exc).__name__)
                 await asyncio.sleep(1)
@@ -1174,6 +1190,7 @@ async def run_daemon(campaign: MicrostructureCampaign, root: str | Path) -> None
                         )
                         store.append_book_sample(event, book.stats(), ofi)
                         previous_best = current_best
+                    await asyncio.sleep(0)
             except SequenceGap as exc:
                 failed_at = int(time.time() * 1000)
                 store.depth_sequence_state(failed_at, instance_id, False)
@@ -1190,8 +1207,10 @@ async def run_daemon(campaign: MicrostructureCampaign, root: str | Path) -> None
                 store.session_end(int(time.time() * 1000), session_id)
 
     try:
-        await asyncio.gather(depth_loop(), trade_loop(), heartbeat_loop(), clock_loop())
+        await asyncio.gather(depth_loop(), trade_loop(), clock_loop())
     finally:
+        heartbeat_stop.set()
+        heartbeat_thread.join(timeout=store.protocol.heartbeat_interval_ms / 1000 + 1)
         now_ms = int(time.time() * 1000)
         store.instance_end(now_ms, instance_id)
         store.finalize_partitions(now_ms)

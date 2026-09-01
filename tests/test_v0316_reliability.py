@@ -236,6 +236,16 @@ def test_fast_restart_recovers_old_instance_after_lease_on_new_heartbeat(
     assert status["gap_type_counts"] == {"PROCESS_OR_HOST_GAP": 1}
 
 
+def test_delayed_heartbeat_never_orphans_its_own_active_instance(tmp_path: Path) -> None:
+    store = _micro(tmp_path)
+    instance = _healthy_coverage(store, 1, 5_000)
+    store.heartbeat(30_000, instance)
+    status = store.status(30_000)
+    assert status["orphan_instance_count"] == 0
+    assert status["latest_heartbeat_ms"] == 30_000
+    assert status["heartbeat_age_seconds"] == 0.0
+
+
 def test_gap_taxonomy_and_resync_are_reported_separately(tmp_path: Path) -> None:
     store = _micro(tmp_path)
     store.gap(100, "TRADE_DISCONNECT", "socket")
