@@ -1,0 +1,45 @@
+{
+  "schema_version": "1.0.0",
+  "snapshot_utc": "2026-09-01T05:28:41.796Z",
+  "derivatives": {
+    "old_epoch_expected_slots": 68,
+    "old_epoch_recorded_slots": 68,
+    "old_epoch_full_slots": 49,
+    "old_epoch_partial_slots": 1,
+    "old_epoch_failed_slots": 18,
+    "old_epoch_missing_slots": 0,
+    "old_epoch_max_consecutive_bad_or_missing": 18,
+    "terminal_at_ms": 1788183927140,
+    "first_natural_recovery_slot_ms": 1788196500000,
+    "successor_start_ms": 1788255000000
+  },
+  "opportunity": {
+    "scheduled_slots_recorded": 97,
+    "successful_scans": 69,
+    "missed_slots": 28,
+    "opportunities": 0,
+    "network_misses": 22,
+    "market_data_misses": 5,
+    "runtime_contract_misses": 1
+  },
+  "microstructure": {
+    "continuous_validation_seconds": 996.364,
+    "depth_events": 368630,
+    "agg_trade_events": 342681,
+    "book_samples": 368407,
+    "orphan_instances": 1,
+    "process_or_host_gaps": 1,
+    "uptime_ratio": 0.9953746538989013,
+    "depth_sequence_continuity_ratio": 0.9989106119771871,
+    "aggregate_completeness_ratio": 0.9583333333333334,
+    "clock_offset_ms": 1246.5,
+    "clock_rtt_ms": 381,
+    "finalized_partitions": 1
+  },
+  "quality": {
+    "pytest_passed": 381,
+    "ruff": "PASS",
+    "strict_mypy": "PASS",
+    "compileall": "PASS"
+  }
+}

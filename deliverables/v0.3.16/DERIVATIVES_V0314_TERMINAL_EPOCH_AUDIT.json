@@ -1,0 +1,22 @@
+{
+  "schema_version": "1.0.0",
+  "epoch_id": "DERIVATIVES_PIT_EPOCH_V0314_001",
+  "status": "FAILED_GAP_GATE_TERMINAL",
+  "terminal_failure": true,
+  "terminal_reason": "MAX_CONSECUTIVE_BAD_OR_MISSING_EXCEEDED",
+  "terminal_at_ms": 1788183927140,
+  "terminal_trigger_slot_utc": "2026-08-31T13:45:00Z",
+  "bad_slots_at_terminal_transition": 5,
+  "maximum_allowed_consecutive_bad_or_missing_slots": 4,
+  "historical_max_consecutive_bad_or_missing_slots": 18,
+  "terminal_state_is_irreversible": true,
+  "later_success_can_restore_collection_health": true,
+  "later_success_can_restore_epoch_eligibility": false,
+  "all_rows_preserved": true,
+  "manual_runs_count_for_eligibility": false,
+  "legacy_runs_count_for_eligibility": false,
+  "backfill_allowed": false,
+  "formal_eligibility_role": "FORMAL_TERMINAL",
+  "superseded_by": "DERIVATIVES_PIT_EPOCH_V0316_002"
+}
+

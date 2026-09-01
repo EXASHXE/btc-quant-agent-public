@@ -1,0 +1,47 @@
+{
+  "schema_version": "1.0.0",
+  "protocol_id": "MICROSTRUCTURE_RELIABILITY_V0316_001",
+  "heartbeat_interval_seconds": 5,
+  "lease_timeout_seconds": 15,
+  "process_instance_identity": true,
+  "orphan_recovery_checked_on_every_heartbeat": true,
+  "real_crash_test": {
+    "signal": "SIGKILL",
+    "systemd_auto_restart_seconds": 5,
+    "orphan_instances_recovered": 1,
+    "gap_type_created": "PROCESS_OR_HOST_GAP",
+    "old_session_extended_to_query_now": false
+  },
+  "completeness": {
+    "trade_coverage_minimum": 0.95,
+    "depth_coverage_minimum": 0.95,
+    "depth_sequence_valid_minimum": 0.95,
+    "explicit_gap_overlap_makes_incomplete": true,
+    "event_count_is_liveness": false,
+    "quiet_trade_bucket_can_be_complete": true,
+    "eventful_partial_coverage_bucket_can_be_complete": false
+  },
+  "gap_taxonomy": [
+    "DEPTH_SEQUENCE_GAP",
+    "DEPTH_BOOTSTRAP_FAILURE",
+    "DEPTH_RECONNECT",
+    "TRADE_DISCONNECT",
+    "PROCESS_OR_HOST_GAP",
+    "REST_BOOTSTRAP_FAILURE"
+  ],
+  "legacy_gap_type_preserved": "DEPTH_GAP_RESYNC",
+  "coverage_before_v0316_is_verified": false,
+  "continuous_real_run_minimum_seconds": 900,
+  "continuous_real_run_observed_seconds": 996.364,
+  "final_snapshot": {
+    "depth_events": 368630,
+    "agg_trade_events": 342681,
+    "book_samples": 368407,
+    "uptime_ratio": 0.9953746538989013,
+    "depth_sequence_continuity_ratio": 0.9989106119771871,
+    "aggregate_completeness_ratio": 0.9583333333333334,
+    "gap_type_counts": {"DEPTH_GAP_RESYNC": 2, "PROCESS_OR_HOST_GAP": 1}
+  },
+  "direction_claim": "NONE",
+  "alpha_claim": "NONE"
+}

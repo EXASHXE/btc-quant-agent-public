@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0.0",
+  "status": "PREREGISTERED_NOT_STARTED",
+  "operative_successor_epoch_id": "DERIVATIVES_PIT_EPOCH_V0316_002",
+  "config_path": "configs/forward/v0.3.16_derivatives_evidence_epoch_002.json",
+  "freeze_sha": "e502790a29edd8c064b6352b00efbc785d9525b0",
+  "start_utc": "2026-09-01T09:30:00Z",
+  "start_ms": 1788255000000,
+  "start_is_future_fixed_15m_boundary": true,
+  "start_movable": false,
+  "gates": {
+    "minimum_days": 30,
+    "minimum_fully_available_snapshots": 2500,
+    "minimum_required_field_availability": 0.95,
+    "maximum_consecutive_failed_or_missing_scheduled_slots": 4
+  },
+  "eligibility_isolation": {
+    "old_epoch_rows": false,
+    "manual_rows": false,
+    "legacy_rows": false,
+    "backfill_rows": false
+  },
+  "cancelled_before_start": {
+    "epoch_id": "DERIVATIVES_PIT_EPOCH_V0316_001",
+    "config_preserved": true,
+    "observations_recorded": 0,
+    "start_moved": false,
+    "reason": "Fast-restart lease timing defect discovered by real crash test before activation"
+  },
+  "old_terminal_epoch_remains_terminal": true
+}
+

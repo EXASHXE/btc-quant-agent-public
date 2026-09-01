@@ -1,0 +1,19 @@
+{
+  "schema_version": "1.0.0",
+  "measurement_endpoint": "Binance /fapi/v1/time",
+  "measurement_interval_seconds": 60,
+  "estimator": "server_time_minus_local_request_midpoint",
+  "maximum_acceptable_rtt_ms": 2000,
+  "raw_exchange_timestamps_modified": false,
+  "raw_receive_timestamps_modified": false,
+  "clock_adjusted_latency_role": "DIAGNOSTIC_ONLY",
+  "signed_raw_latency_preserved": true,
+  "latest_measurement": {
+    "measured_at_ms": 1788240484642,
+    "server_minus_local_midpoint_ms": 1246.5,
+    "rtt_ms": 381,
+    "quality": "OK"
+  },
+  "raw_signed_receive_minus_exchange_ms": {"p50": -715, "p95": 503, "p99": 1950},
+  "clock_adjusted_diagnostic_ms": {"p50": 531.5, "p95": 1749.5, "p99": 3196.5}
+}

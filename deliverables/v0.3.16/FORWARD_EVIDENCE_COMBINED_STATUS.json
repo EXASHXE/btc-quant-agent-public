@@ -1,0 +1,38 @@
+{
+  "schema_version": "1.0.0",
+  "snapshot_utc": "2026-09-01T05:28:41.796Z",
+  "derivatives": {
+    "formal_epoch_id": "DERIVATIVES_PIT_EPOCH_V0314_001",
+    "formal_state_before_successor_start": "FAILED_GAP_GATE_TERMINAL",
+    "successor_epoch_id": "DERIVATIVES_PIT_EPOCH_V0316_002",
+    "successor_start_utc": "2026-09-01T09:30:00Z",
+    "old_epoch_slots": {"expected": 68, "recorded": 68, "full": 49, "partial": 1, "failed": 18, "missing": 0},
+    "scheduler_active": true
+  },
+  "opportunity_forward": {
+    "campaign_id": "OPPORTUNITY_FORWARD_V0313_20260831T050656Z",
+    "state": "FORWARD_CAMPAIGN_ACCUMULATING",
+    "data_quality_state": "H35_DATA_QUALITY_AT_RISK",
+    "scheduler_active": true,
+    "resolver_scheduler_active": true,
+    "slots": {"recorded": 97, "successful": 69, "missed": 28, "opportunities": 0}
+  },
+  "microstructure_forward": {
+    "campaign_id": "MICROSTRUCTURE_FORWARD_V0315_20260831T190000Z",
+    "state": "COLLECTING",
+    "service_active": true,
+    "coverage_semantics": "COVERAGE_LIVENESS_SEQUENCE_VALIDITY_NO_GAP",
+    "chunk_integrity": true,
+    "partition_integrity": true,
+    "continuous_validation_seconds": 996.364
+  },
+  "chain_isolation": {
+    "microstructure_can_change_derivatives_gate": false,
+    "microstructure_can_change_h35_gate": false,
+    "manual_or_legacy_can_change_successor_gate": false
+  },
+  "direction_candidate": "NONE",
+  "alpha_interpretation": "NONE",
+  "execution": "DISABLED",
+  "final_holdout": "SEALED"
+}

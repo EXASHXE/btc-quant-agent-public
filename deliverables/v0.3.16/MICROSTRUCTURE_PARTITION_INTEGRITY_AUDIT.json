@@ -1,0 +1,19 @@
+{
+  "schema_version": "1.0.0",
+  "protocol_id": "MICROSTRUCTURE_RELIABILITY_V0316_001",
+  "finalization_grace_after_utc_midnight_seconds": 3600,
+  "checkpoint_before_hash": true,
+  "open_sessions_block_finalization": true,
+  "manifest_digest_is_immutable": true,
+  "finalized_partition_count": 1,
+  "partition": "microstructure-2026-08-31.sqlite3",
+  "partition_sha256": "46002b27cfd1baa4b079b96c0c6ffbd4f48c1552f35ccf0b52ae7686e1f700ff",
+  "manifest_sha256": "886bbb7f18ee7970139907f887eea60805e8f9fadd556371b5fec944c00de868",
+  "repeat_finalization_manifest_stable": true,
+  "repeat_finalization_partition_digest_stable": true,
+  "checksum_drift": [],
+  "missing_partitions": [],
+  "integrity_ok": true,
+  "tamper_detection_unit_test": "PASS"
+}
+
