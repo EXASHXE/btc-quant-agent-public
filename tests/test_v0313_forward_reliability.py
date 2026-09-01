@@ -219,12 +219,12 @@ def test_directionless_movement_uses_strict_next_open_and_frozen_atr() -> None:
     assert not ({"direction", "signed_return", "trade_return"} & result.keys())
 
 
-def test_h35_remains_accumulating_below_preregistered_gate(tmp_path: Path) -> None:
+def test_h35_remains_data_quality_at_risk_archive(tmp_path: Path) -> None:
     campaign = _campaign()
     store = OpportunityForwardStore(tmp_path / "opportunity.sqlite3")
     store.append_observation(_observation(campaign.campaign_start_ms, opportunity=True))
     status = store.status(campaign, now_ms=campaign.campaign_start_ms + 31 * DAY_MS)
-    assert status["h35_state"] == "FORWARD_CAMPAIGN_ACCUMULATING"
+    assert status["h35_state"] == "DATA_QUALITY_AT_RISK_ARCHIVE"
     assert status["direction_claim"] == "NONE"
     assert status["execution"] == "DISABLED"
 

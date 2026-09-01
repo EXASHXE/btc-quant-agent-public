@@ -305,5 +305,5 @@ def test_unified_forward_watchdog_separates_epoch_and_archive(
     )
     assert report["derivatives"]["active_epoch"]["eligibility_state"] == "INITIALIZING"
     assert report["derivatives"]["archive_pre_epoch"]["all_rows_preserved"] is True
-    assert report["opportunity_forward"]["resolver_scheduler_active"] is True
+    assert report["opportunity_forward"]["successor_h36"]["resolver_scheduler_active"] is True
     assert report["alpha_interpretation"] == "NONE"

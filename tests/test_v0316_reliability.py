@@ -148,9 +148,9 @@ def test_derivatives_and_unified_status_share_formal_epoch(tmp_path: Path) -> No
         ("HTTP Error 451", "NETWORK_HTTP_451"),
         ("SSL unexpected EOF", "NETWORK_TLS"),
         ("read timed out", "NETWORK_TIMEOUT"),
-        ("connection reset", "NETWORK_CONNECTION"),
+        ("connection reset", "NETWORK_TLS"),
         ("KeyError: -1", "MARKET_DATA_INSUFFICIENT"),
-        ("KeyError: 'decision_close_ms'", "RUNTIME_CONTRACT_ERROR"),
+        ("KeyError: 'decision_close_ms'", "RUNTIME_CONTRACT"),
     ],
 )
 def test_opportunity_miss_root_cause_is_deterministic(

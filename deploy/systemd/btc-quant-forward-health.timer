@@ -1,0 +1,12 @@
+[Unit]
+Description=Check BTC Quant Agent forward evidence health every 15 minutes
+
+[Timer]
+OnCalendar=*-*-* *:08,23,38,53:00 UTC
+Persistent=true
+AccuracySec=1s
+Unit=btc-quant-forward-health.service
+
+[Install]
+WantedBy=timers.target
+

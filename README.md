@@ -1,6 +1,6 @@
-# BTC Quant Agent v0.3.16
+# BTC Quant Agent v0.3.17
 
-一个面向 `BTCUSDT` USDⓈ-M 永续合约的低频量化研究项目。v0.3.16 将超过冻结 gap gate 的 Derivatives epoch 固化为不可恢复终态，并为微观结构采集加入 heartbeat/lease、覆盖率完整性、分类型 gap、时钟偏移审计和不可变日分区。正常 Runtime 仍由 Research Registry 限制为 `OPPORTUNITY_ONLY`，不能输出 actionable `LONG/SHORT`。执行默认 `disabled`，默认配置不会读取密钥或发送订单。
+一个面向 `BTCUSDT` USDⓈ-M 永续合约的低频量化研究项目。v0.3.17 保留受数据质量影响的 H35 历史 campaign，并预注册完全隔离、带 wall-clock scan coverage gate 的 H36 Opportunity replication。Derivatives 与 Microstructure 继续使用既有冻结链。正常 Runtime 仍由 Research Registry 限制为 `OPPORTUNITY_ONLY`，不能输出 actionable `LONG/SHORT`。执行默认 `disabled`，默认配置不会读取密钥或发送订单。
 
 > 风险提示：这是研究与 Shadow Trading 工具，不是收益承诺。默认策略状态为 `EXPERIMENTAL`。在完成足量样本外验证与 30–60 天前向观察前，不应据此进行真实高杠杆交易。
 
@@ -169,4 +169,4 @@ v0.3.11 的 Registry、Runtime 对齐和前向数据运维见 `docs/RESEARCH_REG
 `docs/V0.3.11_RUNTIME_ALIGNMENT_FORWARD_DATA_REPORT.md` 与
 `docs/FORWARD_DERIVATIVES_OPERATIONS.md`。策略状态继续为 `EXPERIMENTAL`，这些研究结果不构成交易建议。
 
-v0.3.16 微观结构采集严格使用独立存储和 systemd user service；REST depth 只用于本地订单簿 bootstrap/resync，WebSocket `U/u/pu` 连续性失败会记录 gap 后重建。1s、1m、15m 完整性由双流覆盖、depth sequence validity 与 gap overlap 决定，事件数量不能替代 liveness。所有指标只用于数据可靠性，不进行方向、Alpha、Holdout 或执行解释。正式交付见 `deliverables/v0.3.16/`。
+v0.3.17 统一状态明确分离 v0.3.14 terminal Derivatives archive、v0.3.16 Derivatives successor、H35 data-quality-risk archive、H36 clean successor 与 v0.3.15 Microstructure accumulation。`quantctl forward-evidence health` 提供结构化 data-only 运维健康状态。所有指标只用于数据可靠性，不进行方向、Alpha、Holdout 或执行解释。正式交付见 `deliverables/v0.3.17/`。

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import sqlite3
 import subprocess
 import time
@@ -41,16 +42,63 @@ class OpportunityCampaign:
     symbol: str
     detector_ids: tuple[str, ...]
     seed: int
+    hypothesis_id: str
+    source_campaign_id: str | None
+    post_boundary_delay_seconds: int
+    minimum_successful_scheduled_scan_ratio: float | None
+    maximum_consecutive_missed_decision_slots: int | None
+    minimum_calendar_days: int
+    minimum_resolved_opportunities: int
+    preferred_resolved_opportunities: int
+    minimum_unique_matched_controls: int
+    minimum_distinct_utc_days: int
 
     @classmethod
     def load(cls, path: str | Path) -> OpportunityCampaign:
         raw = json.loads(Path(path).read_text(encoding="utf-8"))
+        study = raw.get("h36", raw.get("h35"))
+        if not isinstance(study, dict):
+            raise TypeError("opportunity campaign hypothesis gate is missing")
+        quality = raw.get("data_quality_gate")
         if raw["normal_runtime_mode"] != "RUNTIME_GATED":
             raise ValueError("opportunity campaign requires RUNTIME_GATED")
         if raw["direction_claim"] != "NONE" or raw["immutability"]["execution"] != "DISABLED":
             raise ValueError("opportunity campaign violates direction/execution firewall")
         if tuple(raw["movement_horizons_minutes"]) != HORIZONS:
             raise ValueError("opportunity campaign horizons changed")
+        if tuple(raw["detector_ids"]) != (
+            "trend_pullback_opportunity",
+            "breakout_retest_opportunity",
+        ):
+            raise ValueError("opportunity detector identity changed")
+        if tuple(raw["movement_metrics"]) != (
+            "future_range_atr",
+            "max_up_excursion_atr",
+            "max_down_excursion_atr",
+            "max_abs_excursion_atr",
+        ):
+            raise ValueError("opportunity movement labels changed")
+        if (
+            str(raw["reference_rule"])
+            != "OPEN of first fully available 1m bar strictly after decision close"
+            or str(raw["atr_rule"])
+            != "frozen 15m ATR observed at the original forward scan"
+            or str(raw["registry_version"]) != "v0.3.12"
+            or str(raw["strategy_version"]) != "0.3.11"
+            or str(raw["feature_version"]) != "0.3.11"
+            or str(raw["config_hash"]) != "e19b352002ff3197"
+        ):
+            raise ValueError("opportunity replication identity changed")
+        if quality is not None and int(raw["campaign_start_ms"]) % CADENCE_MS:
+            raise ValueError("opportunity successor must start on a UTC 15m boundary")
+        if quality is not None and (
+            float(quality["minimum_successful_scheduled_scan_ratio"]) != 0.95
+            or int(quality["maximum_consecutive_missed_decision_slots"]) != 4
+            or not bool(quality["missing_wall_clock_slots_count_as_missed"])
+            or bool(quality["retrospective_retry_or_backfill_allowed"])
+            or not bool(quality["terminal_state_is_irreversible"])
+        ):
+            raise ValueError("opportunity successor weakens frozen data-quality gates")
         return cls(
             campaign_id=str(raw["campaign_id"]),
             campaign_start_ms=int(raw["campaign_start_ms"]),
@@ -61,8 +109,112 @@ class OpportunityCampaign:
             config_hash=str(raw["config_hash"]),
             symbol=str(raw["symbol"]),
             detector_ids=tuple(str(value) for value in raw["detector_ids"]),
-            seed=int(raw["h35"]["seed"]),
+            seed=int(study["seed"]),
+            hypothesis_id=str(raw.get("hypothesis_id", "H35_OPPORTUNITY_FORWARD")),
+            source_campaign_id=(
+                str(raw["source_campaign_id"])
+                if raw.get("source_campaign_id") is not None
+                else None
+            ),
+            post_boundary_delay_seconds=(
+                int(quality["post_boundary_delay_seconds"]) if quality else 0
+            ),
+            minimum_successful_scheduled_scan_ratio=(
+                float(quality["minimum_successful_scheduled_scan_ratio"])
+                if quality
+                else None
+            ),
+            maximum_consecutive_missed_decision_slots=(
+                int(quality["maximum_consecutive_missed_decision_slots"])
+                if quality
+                else None
+            ),
+            minimum_calendar_days=int(study["minimum_calendar_days"]),
+            minimum_resolved_opportunities=int(
+                study["minimum_resolved_opportunities"]
+                if "minimum_resolved_opportunities" in study
+                else study["minimum_opportunity_events"]
+            ),
+            preferred_resolved_opportunities=int(
+                study["preferred_resolved_opportunities"]
+                if "preferred_resolved_opportunities" in study
+                else study["preferred_opportunity_events"]
+            ),
+            minimum_unique_matched_controls=int(study["minimum_unique_matched_controls"]),
+            minimum_distinct_utc_days=int(study["minimum_distinct_utc_days"]),
         )
+
+    @property
+    def has_data_quality_gate(self) -> bool:
+        return self.minimum_successful_scheduled_scan_ratio is not None
+
+
+@dataclass(frozen=True)
+class OpportunityCampaignLifecycle:
+    campaign_id: str
+    config_path: str
+    start_ms: int
+    hypothesis_id: str
+    status: str
+    formal_role: str
+    immutable_history: bool
+    superseded_by: str | None
+
+
+@dataclass(frozen=True)
+class OpportunityCampaignRegistry:
+    campaigns: tuple[OpportunityCampaignLifecycle, ...]
+
+    @classmethod
+    def load(cls, path: str | Path) -> OpportunityCampaignRegistry:
+        raw = json.loads(Path(path).read_text(encoding="utf-8"))
+        campaigns = tuple(
+            OpportunityCampaignLifecycle(
+                campaign_id=str(item["campaign_id"]),
+                config_path=str(item["config_path"]),
+                start_ms=int(item["start_ms"]),
+                hypothesis_id=str(item["hypothesis_id"]),
+                status=str(item["status"]),
+                formal_role=str(item["formal_role"]),
+                immutable_history=bool(item["immutable_history"]),
+                superseded_by=(
+                    str(item["superseded_by"])
+                    if item.get("superseded_by") is not None
+                    else None
+                ),
+            )
+            for item in raw["campaigns"]
+        )
+        if len({item.campaign_id for item in campaigns}) != len(campaigns):
+            raise ValueError("duplicate opportunity campaign id")
+        if any(not item.immutable_history for item in campaigns):
+            raise ValueError("opportunity campaign history must remain immutable")
+        registry = cls(campaigns)
+        for item in campaigns:
+            campaign = OpportunityCampaign.load(item.config_path)
+            if (
+                campaign.campaign_id != item.campaign_id
+                or campaign.campaign_start_ms != item.start_ms
+                or campaign.hypothesis_id != item.hypothesis_id
+            ):
+                raise ValueError("opportunity campaign registry/config identity mismatch")
+        return registry
+
+    def archive(self) -> tuple[OpportunityCampaign, OpportunityCampaignLifecycle]:
+        lifecycle = next(
+            item
+            for item in self.campaigns
+            if item.formal_role == "DATA_QUALITY_AT_RISK_ARCHIVE"
+        )
+        return OpportunityCampaign.load(lifecycle.config_path), lifecycle
+
+    def successor(self) -> tuple[OpportunityCampaign, OpportunityCampaignLifecycle]:
+        lifecycle = next(
+            item
+            for item in self.campaigns
+            if item.formal_role in {"FORMAL_SUCCESSOR_PENDING", "FORMAL_SUCCESSOR_ACTIVE"}
+        )
+        return OpportunityCampaign.load(lifecycle.config_path), lifecycle
 
 
 @dataclass(frozen=True)
@@ -86,6 +238,7 @@ class ForwardObservation:
     git_sha: str
     config_hash: str
     network_data_errors: tuple[str, ...]
+    trigger_source: str
     payload_hash: str
 
     @classmethod
@@ -109,7 +262,10 @@ class ForwardObservation:
         git_sha: str,
         config_hash: str,
         network_data_errors: Sequence[str] = (),
+        trigger_source: str = "SCHEDULED",
     ) -> ForwardObservation:
+        if campaign.has_data_quality_gate and scheduled_slot_ms < campaign.campaign_start_ms:
+            raise ValueError("pre-start observation cannot enter successor campaign")
         payload = {
             "campaign_id": campaign.campaign_id,
             "scheduled_slot_ms": scheduled_slot_ms,
@@ -128,6 +284,7 @@ class ForwardObservation:
             "git_sha": git_sha,
             "config_hash": config_hash,
             "network_data_errors": tuple(network_data_errors),
+            "trigger_source": trigger_source,
         }
         digest = hashlib.sha256(
             json.dumps(payload, sort_keys=True, separators=(",", ":")).encode()
@@ -155,6 +312,7 @@ class ForwardObservation:
             git_sha=git_sha,
             config_hash=config_hash,
             network_data_errors=tuple(network_data_errors),
+            trigger_source=trigger_source,
             payload_hash=digest,
         )
 
@@ -204,6 +362,7 @@ class OpportunityForwardStore:
                     git_sha TEXT NOT NULL,
                     config_hash TEXT NOT NULL,
                     network_data_errors_json TEXT NOT NULL,
+                    trigger_source TEXT NOT NULL DEFAULT 'LEGACY_UNKNOWN',
                     payload_hash TEXT NOT NULL,
                     UNIQUE(campaign_id, scheduled_slot_ms)
                 );
@@ -233,8 +392,32 @@ class OpportunityForwardStore:
                 );
                 """
             )
+            columns = {
+                str(row[1])
+                for row in connection.execute(
+                    "PRAGMA table_info(scan_observations)"
+                ).fetchall()
+            }
+            if "trigger_source" not in columns:
+                connection.execute(
+                    "ALTER TABLE scan_observations ADD COLUMN trigger_source TEXT "
+                    "NOT NULL DEFAULT 'LEGACY_UNKNOWN'"
+                )
 
-    def append_observation(self, observation: ForwardObservation) -> bool:
+    def append_observation(
+        self,
+        observation: ForwardObservation,
+        *,
+        campaign: OpportunityCampaign | None = None,
+    ) -> bool:
+        if campaign is not None and (
+            observation.campaign_id != campaign.campaign_id
+            or (
+                campaign.has_data_quality_gate
+                and observation.scheduled_slot_ms < campaign.campaign_start_ms
+            )
+        ):
+            raise ValueError("observation violates frozen campaign identity or start")
         with self._connect() as connection:
             existing = connection.execute(
                 "SELECT payload_hash FROM scan_observations WHERE campaign_id=? "
@@ -257,7 +440,12 @@ class OpportunityForwardStore:
                     )
                 return False
             connection.execute(
-                "INSERT INTO scan_observations VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                """INSERT INTO scan_observations(
+                observation_id,campaign_id,scheduled_slot_ms,collection_started_at_ms,
+                observed_at_ms,status,market_data_health,decision_close_ms,regime,atr_15m,
+                atr_percentile_decile,opportunity_present,opportunity_id,detector_id,setup,
+                registry_version,git_sha,config_hash,network_data_errors_json,trigger_source,
+                payload_hash) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
                 (
                     observation.observation_id,
                     observation.campaign_id,
@@ -278,6 +466,7 @@ class OpportunityForwardStore:
                     observation.git_sha,
                     observation.config_hash,
                     json.dumps(observation.network_data_errors),
+                    observation.trigger_source,
                     observation.payload_hash,
                 ),
             )
@@ -434,6 +623,12 @@ class OpportunityForwardStore:
             "direction_action_columns": [
                 name for name in columns if name in {"direction", "signal", "entry", "stop", "size"}
             ],
+            "scheduled_observation_count": sum(
+                str(row["trigger_source"]) == "SCHEDULED" for row in rows
+            ),
+            "manual_or_legacy_observation_count": sum(
+                str(row["trigger_source"]) != "SCHEDULED" for row in rows
+            ),
         }
 
     @staticmethod
@@ -447,13 +642,15 @@ class OpportunityForwardStore:
         if "timed out" in text or "timeout" in text:
             return "NETWORK_TIMEOUT"
         if "connection" in text:
-            return "NETWORK_CONNECTION"
+            return "NETWORK_TLS"
         if "keyerror: -1" in text:
             return "MARKET_DATA_INSUFFICIENT"
         if "decision_close_ms" in text:
-            return "RUNTIME_CONTRACT_ERROR"
+            return "RUNTIME_CONTRACT"
+        if "process" in text or "host" in text:
+            return "PROCESS_OR_HOST_GAP"
         if str(row["market_data_health"]) != "OK":
-            return "MARKET_DATA_HEALTH_OTHER"
+            return "OTHER"
         return "OTHER"
 
     def missed_slot_audit(self, campaign_id: str) -> dict[str, Any]:
@@ -483,6 +680,90 @@ class OpportunityForwardStore:
             ),
         }
 
+    @staticmethod
+    def _successful_scan(row: sqlite3.Row, *, require_scheduled: bool = True) -> bool:
+        return (
+            str(row["status"]) == "SUCCESSFUL_SCAN"
+            and (not require_scheduled or str(row["trigger_source"]) == "SCHEDULED")
+            and str(row["market_data_health"]) == "OK"
+            and row["decision_close_ms"] is not None
+            and int(row["decision_close_ms"]) < int(row["collection_started_at_ms"])
+        )
+
+    def data_quality_metrics(
+        self, campaign: OpportunityCampaign, *, now_ms: int
+    ) -> dict[str, Any]:
+        if not campaign.has_data_quality_gate:
+            return {
+                "state": "H35_DATA_QUALITY_AT_RISK",
+                "formal_role": "DATA_QUALITY_AT_RISK_ARCHIVE",
+                "wall_clock_gate_enabled": False,
+            }
+        cadence_ms = CADENCE_MS
+        latest_expected = (
+            (now_ms - campaign.post_boundary_delay_seconds * 1_000) // cadence_ms
+        ) * cadence_ms
+        expected_slots = (
+            list(range(campaign.campaign_start_ms, latest_expected + 1, cadence_ms))
+            if latest_expected >= campaign.campaign_start_ms
+            else []
+        )
+        rows = self.observations(campaign.campaign_id)
+        by_slot = {int(row["scheduled_slot_ms"]): row for row in rows}
+        successful_slots = {
+            slot for slot, row in by_slot.items() if self._successful_scan(row)
+        }
+        missing_slots = set(expected_slots) - set(by_slot)
+        recorded_missed_slots = {
+            slot for slot in expected_slots if slot in by_slot and slot not in successful_slots
+        }
+        longest = current = 0
+        for slot in expected_slots:
+            if slot in successful_slots:
+                current = 0
+            else:
+                current += 1
+                longest = max(longest, current)
+        assert campaign.maximum_consecutive_missed_decision_slots is not None
+        terminal = longest > campaign.maximum_consecutive_missed_decision_slots
+        ratio = len(successful_slots & set(expected_slots)) / len(expected_slots) if expected_slots else 0.0
+        categories = Counter(
+            self._miss_root_cause(row)
+            for slot, row in by_slot.items()
+            if slot in recorded_missed_slots
+        )
+        if missing_slots:
+            categories["PROCESS_OR_HOST_GAP"] += len(missing_slots)
+        return {
+            "state": (
+                "DATA_QUALITY_TERMINAL"
+                if terminal
+                else "PREREGISTERED_NOT_STARTED"
+                if not expected_slots
+                else "ACTIVE_ACCUMULATING"
+            ),
+            "formal_role": "FORMAL_SUCCESSOR",
+            "wall_clock_gate_enabled": True,
+            "expected_scheduled_slots": len(expected_slots),
+            "recorded_scheduled_slots": len(set(by_slot) & set(expected_slots)),
+            "successful_scheduled_scans": len(successful_slots & set(expected_slots)),
+            "recorded_missed_decision_slots": len(recorded_missed_slots),
+            "missing_wall_clock_slots": len(missing_slots),
+            "total_missed_slots": len(recorded_missed_slots | missing_slots),
+            "successful_scheduled_scan_ratio": ratio,
+            "minimum_successful_scheduled_scan_ratio": (
+                campaign.minimum_successful_scheduled_scan_ratio
+            ),
+            "max_consecutive_missed_decision_slots": longest,
+            "maximum_allowed_consecutive_missed_decision_slots": (
+                campaign.maximum_consecutive_missed_decision_slots
+            ),
+            "terminal_failure": terminal,
+            "terminal_state_is_irreversible": True,
+            "miss_root_causes": dict(sorted(categories.items())),
+            "manual_or_backfill_counts_for_quality": False,
+        }
+
     def status(
         self,
         campaign: OpportunityCampaign,
@@ -490,10 +771,14 @@ class OpportunityForwardStore:
         scheduler: dict[str, Any] | None = None,
         now_ms: int | None = None,
     ) -> dict[str, Any]:
-        now = now_ms or int(time.time() * 1_000)
+        now = now_ms if now_ms is not None else int(time.time() * 1_000)
         rows = self.observations(campaign.campaign_id)
         outcomes = self.outcomes()
-        successful = [row for row in rows if row["status"] == "SUCCESSFUL_SCAN"]
+        successful = [
+            row
+            for row in rows
+            if self._successful_scan(row, require_scheduled=campaign.has_data_quality_gate)
+        ]
         opportunities = [row for row in successful if bool(row["opportunity_present"])]
         resolved = {
             horizon: {
@@ -516,11 +801,16 @@ class OpportunityForwardStore:
             if str(row["observation_id"]) in resolved[480]
         }
         age_days = max(0.0, (now - campaign.campaign_start_ms) / 86_400_000)
+        quality = self.data_quality_metrics(campaign, now_ms=now)
         evaluable = (
-            len(opportunity_resolved_8h) >= 30
-            and age_days >= 30
-            and len(unique_controls) >= 100
-            and len(distinct_days) >= 20
+            campaign.has_data_quality_gate
+            and not quality["terminal_failure"]
+            and quality["successful_scheduled_scan_ratio"]
+            >= campaign.minimum_successful_scheduled_scan_ratio
+            and len(opportunity_resolved_8h) >= campaign.minimum_resolved_opportunities
+            and age_days >= campaign.minimum_calendar_days
+            and len(unique_controls) >= campaign.minimum_unique_matched_controls
+            and len(distinct_days) >= campaign.minimum_distinct_utc_days
         )
         missed_audit = self.missed_slot_audit(campaign.campaign_id)
         return {
@@ -533,7 +823,8 @@ class OpportunityForwardStore:
             "successful_scans": len(successful),
             "missed_decision_slots": sum(row["status"] == "MISSED_DECISION_SLOT" for row in rows),
             "missed_slot_root_causes": missed_audit["root_cause_distribution"],
-            "data_quality_state": missed_audit["data_quality_state"],
+            "data_quality_state": quality["state"],
+            "data_quality_gate": quality,
             "opportunity_count": len(opportunities),
             "tp_count": sum(row["detector_id"] == "trend_pullback_opportunity" for row in opportunities),
             "br_count": sum(row["detector_id"] == "breakout_retest_opportunity" for row in opportunities),
@@ -556,13 +847,27 @@ class OpportunityForwardStore:
                 )
                 for horizon in HORIZONS
             },
-            "h35_state": "EVALUABLE" if evaluable else "FORWARD_CAMPAIGN_ACCUMULATING",
-            "h35_gate": {
-                "minimum_resolved_opportunities": 30,
-                "preferred_resolved_opportunities": 50,
-                "minimum_calendar_days": 30,
-                "minimum_unique_matched_controls": 100,
-                "minimum_distinct_utc_days": 20,
+            "hypothesis_id": campaign.hypothesis_id,
+            "hypothesis_state": (
+                "DATA_QUALITY_AT_RISK_ARCHIVE"
+                if not campaign.has_data_quality_gate
+                else "DATA_QUALITY_TERMINAL"
+                if quality["terminal_failure"]
+                else "EVALUABLE"
+                if evaluable
+                else "FORWARD_CAMPAIGN_ACCUMULATING"
+            ),
+            "h35_state": (
+                "DATA_QUALITY_AT_RISK_ARCHIVE"
+                if not campaign.has_data_quality_gate
+                else None
+            ),
+            "hypothesis_gate": {
+                "minimum_resolved_opportunities": campaign.minimum_resolved_opportunities,
+                "preferred_resolved_opportunities": campaign.preferred_resolved_opportunities,
+                "minimum_calendar_days": campaign.minimum_calendar_days,
+                "minimum_unique_matched_controls": campaign.minimum_unique_matched_controls,
+                "minimum_distinct_utc_days": campaign.minimum_distinct_utc_days,
                 "distinct_resolved_days": len(distinct_days),
             },
             "direction_claim": "NONE",
@@ -608,8 +913,10 @@ def collect_opportunity_once(
     *,
     now_ms: int | None = None,
 ) -> ForwardObservation:
-    started = now_ms or int(time.time() * 1_000)
+    started = now_ms if now_ms is not None else int(time.time() * 1_000)
     scheduled_slot = (started // CADENCE_MS) * CADENCE_MS
+    if campaign.has_data_quality_gate and scheduled_slot < campaign.campaign_start_ms:
+        raise ValueError("successor campaign has not reached its frozen start")
     registry = ResearchRegistry.load()
     if registry.registry_version != campaign.registry_version:
         raise ValueError("campaign registry version mismatch; start a new campaign")
@@ -654,8 +961,9 @@ def collect_opportunity_once(
             git_sha=_git_sha(),
             config_hash=service.config.config_hash,
             network_data_errors=(f"{type(exc).__name__}: {exc}",),
+            trigger_source=os.environ.get("BTC_QUANT_TRIGGER_SOURCE", "MANUAL"),
         )
-    store.append_observation(observation)
+    store.append_observation(observation, campaign=campaign)
     return observation
 
 
@@ -695,6 +1003,7 @@ def observation_from_scan(
         registry_version=campaign.registry_version,
         git_sha=git_sha,
         config_hash=config.config_hash,
+        trigger_source=os.environ.get("BTC_QUANT_TRIGGER_SOURCE", "MANUAL"),
     )
 
 

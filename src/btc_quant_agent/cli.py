@@ -26,7 +26,7 @@ from .data.manifest import build_manifest, write_manifest
 from .data.network_diagnostic import diagnose_binance_network
 from .engine import EngineMode, QuantEngine
 from .explain import explain_signal
-from .forward_evidence import forward_evidence_status
+from .forward_evidence import forward_evidence_status, forward_operations_health
 from .microstructure import MicrostructureCampaign, MicrostructureStore, run_daemon
 from .opportunity_forward import (
     OpportunityCampaign,
@@ -156,7 +156,7 @@ def build_parser() -> argparse.ArgumentParser:
     forward_evidence_sub = forward_evidence.add_subparsers(
         dest="forward_evidence_command", required=True
     )
-    for name in ("status", "audit"):
+    for name in ("status", "audit", "health"):
         command = forward_evidence_sub.add_parser(name)
         command.add_argument(
             "--derivatives-store",
@@ -177,6 +177,10 @@ def build_parser() -> argparse.ArgumentParser:
         command.add_argument(
             "--campaign",
             default="configs/forward/v0.3.13_opportunity_shadow_campaign.json",
+        )
+        command.add_argument(
+            "--opportunity-registry",
+            default="configs/forward/opportunity_forward_campaigns.json",
         )
         command.add_argument(
             "--microstructure-root",
@@ -485,6 +489,7 @@ def main(argv: list[str] | None = None) -> int:
             epoch_path=args.epoch,
             epoch_registry_path=args.epoch_registry,
             campaign_path=args.campaign,
+            opportunity_campaign_registry_path=args.opportunity_registry,
             microstructure_root=args.microstructure_root,
             microstructure_campaign_path=args.microstructure_campaign,
         )
@@ -495,6 +500,10 @@ def main(argv: list[str] | None = None) -> int:
                 "legacy_improves_eligibility": False,
                 "outcomes_mutate_observations": False,
             }
+        if args.forward_evidence_command == "health":
+            health = forward_operations_health(report)
+            _print(health)
+            return 0 if health["state"] == "HEALTHY" else 2
         _print(report)
         return 0
     if args.command == "microstructure-forward":

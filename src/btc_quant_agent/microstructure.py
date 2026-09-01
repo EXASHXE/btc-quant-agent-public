@@ -4,6 +4,7 @@ import asyncio
 import hashlib
 import json
 import sqlite3
+import subprocess
 import time
 import uuid
 from collections import Counter
@@ -16,6 +17,20 @@ from typing import Any
 
 from .config import DataConfig
 from .data.binance import BinancePublicClient
+
+
+def microstructure_service_status() -> dict[str, Any]:
+    unit = "btc-quant-microstructure-forward.service"
+    try:
+        active = subprocess.run(
+            ["systemctl", "--user", "is-active", unit],
+            capture_output=True,
+            check=False,
+            timeout=5,
+        ).returncode == 0
+        return {"unit": unit, "detected": True, "active": active}
+    except (OSError, subprocess.TimeoutExpired) as exc:
+        return {"unit": unit, "detected": False, "active": False, "error": str(exc)}
 
 
 class SequenceGap(RuntimeError):
@@ -816,6 +831,7 @@ class MicrostructureStore:
         depth_valid_segments: list[tuple[int, int]] = []
         gap_rows: list[tuple[int, int, str]] = []
         clocks: list[tuple[int, float, int, str]] = []
+        latest_heartbeat_ms: int | None = None
         integrity = True
         for path in sorted(self.root.glob("microstructure-*.sqlite3")):
             try:
@@ -860,6 +876,12 @@ class MicrostructureStore:
                             "SELECT count(*) FROM process_instances WHERE status='ORPHANED'"
                         ).fetchone()[0]
                     )
+                    heartbeat_row = connection.execute(
+                        "SELECT MAX(last_heartbeat_ms) FROM process_instances"
+                    ).fetchone()
+                    if heartbeat_row and heartbeat_row[0] is not None:
+                        measured = int(heartbeat_row[0])
+                        latest_heartbeat_ms = max(latest_heartbeat_ms or measured, measured)
                 if "clock_measurements" in tables:
                     clocks += [
                         (int(measured), float(offset), int(rtt), str(quality))
@@ -959,6 +981,31 @@ class MicrostructureStore:
 
         partition_audit = self.partition_integrity_audit()
 
+        rolling_reliability: dict[str, dict[str, Any]] = {}
+        for label, window_ms in (("24h", 86_400_000), ("7d", 7 * 86_400_000)):
+            window_start = max(evaluation_start, now - window_ms)
+            window_expected = max(0, now - window_start)
+            trade_covered = self._covered_ms(segments["trade"], window_start, now)
+            depth_covered = self._covered_ms(segments["depth"], window_start, now)
+            valid_covered = self._covered_ms(depth_valid_segments, window_start, now)
+            rolling_reliability[label] = {
+                "window_start_ms": window_start,
+                "observed_seconds": window_expected / 1000,
+                "trade_coverage_ratio": (
+                    trade_covered / window_expected if window_expected else 0.0
+                ),
+                "depth_coverage_ratio": (
+                    depth_covered / window_expected if window_expected else 0.0
+                ),
+                "sequence_valid_coverage_ratio": (
+                    valid_covered / window_expected if window_expected else 0.0
+                ),
+                "gap_count": sum(
+                    gap_start < now and gap_end >= window_start
+                    for gap_start, gap_end, _ in gap_rows
+                ),
+            }
+
         return {
             "campaign_id": self.campaign_id,
             "campaign_age_seconds": max(0.0, (now - self.start_ms) / 1000),
@@ -989,6 +1036,13 @@ class MicrostructureStore:
             "depth_sequence_continuity_ratio": continuity_ratio,
             "depth_sequence_valid_seconds": depth_valid_ms / 1000,
             "orphan_instance_count": orphan_count,
+            "latest_heartbeat_ms": latest_heartbeat_ms,
+            "heartbeat_age_seconds": (
+                (now - latest_heartbeat_ms) / 1000
+                if latest_heartbeat_ms is not None
+                else None
+            ),
+            "rolling_reliability": rolling_reliability,
             "duplicate_count": duplicate_count,
             "conflict_count": conflict_count,
             "latency_ms": {

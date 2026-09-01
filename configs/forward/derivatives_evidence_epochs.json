@@ -27,11 +27,11 @@
       "epoch_id": "DERIVATIVES_PIT_EPOCH_V0316_002",
       "config_path": "configs/forward/v0.3.16_derivatives_evidence_epoch_002.json",
       "start_ms": 1788255000000,
-      "status": "PREREGISTERED_NOT_STARTED",
+      "status": "ACTIVE_ACCUMULATING",
       "terminal_reason": null,
       "terminal_at_ms": null,
       "superseded_by": null,
-      "formal_eligibility_role": "FORMAL_SUCCESSOR_PENDING",
+      "formal_eligibility_role": "FORMAL_ACTIVE",
       "immutable_history": true
     }
   ]
