@@ -1,0 +1,43 @@
+{
+  "schema_version": "1.0.0",
+  "protocol_id": "MICROSTRUCTURE_RELIABILITY_V0316_001",
+  "created_from_git_sha": "62d3f518ba76e616c83cebd9f694662e65fc948a",
+  "campaign_id": "MICROSTRUCTURE_FORWARD_V0315_20260831T190000Z",
+  "heartbeat_interval_seconds": 5,
+  "lease_timeout_seconds": 15,
+  "coverage": {
+    "intervals_ms": [1000, 60000, 900000],
+    "minimum_trade_stream_coverage_ratio": 0.95,
+    "minimum_depth_stream_coverage_ratio": 0.95,
+    "minimum_depth_sequence_valid_ratio": 0.95,
+    "explicit_gap_overlap_makes_incomplete": true,
+    "event_count_is_not_coverage": true,
+    "quiet_trade_bucket_can_be_complete": true
+  },
+  "clock": {
+    "measurement_interval_seconds": 60,
+    "maximum_acceptable_rtt_ms": 2000,
+    "offset_estimator": "server_time_minus_local_request_midpoint",
+    "raw_timestamps_immutable": true,
+    "adjusted_latency_role": "DIAGNOSTIC_ONLY"
+  },
+  "partition_finalization": {
+    "utc_daily": true,
+    "grace_after_utc_midnight_seconds": 3600,
+    "checkpoint_before_hash": true,
+    "existing_manifest_digest_is_immutable": true,
+    "digest_drift_state": "INTEGRITY_FAILURE"
+  },
+  "gap_taxonomy": [
+    "DEPTH_SEQUENCE_GAP",
+    "DEPTH_BOOTSTRAP_FAILURE",
+    "DEPTH_RECONNECT",
+    "TRADE_DISCONNECT",
+    "PROCESS_OR_HOST_GAP",
+    "REST_BOOTSTRAP_FAILURE"
+  ],
+  "direction_claim": "NONE",
+  "alpha_claim": "NONE",
+  "execution": "DISABLED",
+  "final_holdout_access": false
+}
