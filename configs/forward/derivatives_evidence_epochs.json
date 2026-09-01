@@ -8,7 +8,7 @@
       "status": "FAILED_GAP_GATE_TERMINAL",
       "terminal_reason": "max_consecutive_bad_or_missing_slots=5 first exceeded frozen maximum=4",
       "terminal_at_ms": 1788183927140,
-      "superseded_by": "DERIVATIVES_PIT_EPOCH_V0316_001",
+      "superseded_by": "DERIVATIVES_PIT_EPOCH_V0316_002",
       "formal_eligibility_role": "FORMAL_TERMINAL",
       "immutable_history": true
     },
@@ -16,6 +16,17 @@
       "epoch_id": "DERIVATIVES_PIT_EPOCH_V0316_001",
       "config_path": "configs/forward/v0.3.16_derivatives_evidence_epoch.json",
       "start_ms": 1788253200000,
+      "status": "CANCELLED_BEFORE_START",
+      "terminal_reason": "Fast supervisor restart exposed a lease-recovery timing defect before epoch activation; no epoch observations existed and the frozen start was not moved",
+      "terminal_at_ms": 1788239525000,
+      "superseded_by": "DERIVATIVES_PIT_EPOCH_V0316_002",
+      "formal_eligibility_role": "CANCELLED_BEFORE_START",
+      "immutable_history": true
+    },
+    {
+      "epoch_id": "DERIVATIVES_PIT_EPOCH_V0316_002",
+      "config_path": "configs/forward/v0.3.16_derivatives_evidence_epoch_002.json",
+      "start_ms": 1788255000000,
       "status": "PREREGISTERED_NOT_STARTED",
       "terminal_reason": null,
       "terminal_at_ms": null,
