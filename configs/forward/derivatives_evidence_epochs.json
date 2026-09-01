@@ -8,8 +8,19 @@
       "status": "FAILED_GAP_GATE_TERMINAL",
       "terminal_reason": "max_consecutive_bad_or_missing_slots=5 first exceeded frozen maximum=4",
       "terminal_at_ms": 1788183927140,
-      "superseded_by": null,
+      "superseded_by": "DERIVATIVES_PIT_EPOCH_V0316_001",
       "formal_eligibility_role": "FORMAL_TERMINAL",
+      "immutable_history": true
+    },
+    {
+      "epoch_id": "DERIVATIVES_PIT_EPOCH_V0316_001",
+      "config_path": "configs/forward/v0.3.16_derivatives_evidence_epoch.json",
+      "start_ms": 1788253200000,
+      "status": "PREREGISTERED_NOT_STARTED",
+      "terminal_reason": null,
+      "terminal_at_ms": null,
+      "superseded_by": null,
+      "formal_eligibility_role": "FORMAL_SUCCESSOR_PENDING",
       "immutable_history": true
     }
   ]
