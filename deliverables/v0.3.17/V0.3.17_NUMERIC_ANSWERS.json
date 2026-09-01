@@ -1,0 +1,42 @@
+{
+  "schema_version": "1.0.0",
+  "snapshot_utc": "2026-09-01T16:19:31.685Z",
+  "h35": {
+    "observations": 139,
+    "successful_scans": 111,
+    "misses": 28,
+    "opportunities": 0
+  },
+  "h36": {
+    "expected_slots": 2,
+    "recorded_slots": 2,
+    "successful_slots": 2,
+    "missed_slots": 0,
+    "scan_ratio": 1.0,
+    "max_consecutive_misses": 0,
+    "opportunities": 0
+  },
+  "derivatives_v0316": {
+    "expected_slots": 28,
+    "recorded_slots": 27,
+    "full_slots": 26,
+    "partial_slots": 1,
+    "failed_slots": 0,
+    "missing_slots": 1,
+    "max_consecutive_bad_or_missing": 1
+  },
+  "microstructure": {
+    "campaign_age_days": 0.8885611689814815,
+    "heartbeat_age_seconds": 3.549,
+    "rolling_24h_trade_coverage": 0.9970127101586931,
+    "rolling_24h_depth_coverage": 0.9015483949883231,
+    "rolling_24h_sequence_valid_coverage": 0.90150128799329,
+    "finalized_partitions": 1
+  },
+  "quality": {
+    "pytest_passed": 394,
+    "ruff": "PASS",
+    "strict_mypy": "PASS",
+    "compileall": "PASS"
+  }
+}

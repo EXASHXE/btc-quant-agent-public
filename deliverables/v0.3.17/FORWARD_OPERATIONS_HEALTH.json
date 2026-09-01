@@ -1,0 +1,20 @@
+{
+  "schema_version": "1.0.0",
+  "snapshot_utc": "2026-09-01T16:19:31.685Z",
+  "state": "HEALTHY",
+  "failures": [],
+  "warnings": [],
+  "systemd_timer": "btc-quant-forward-health.timer",
+  "timer_active": true,
+  "last_natural_run_exit_status": 0,
+  "last_natural_run_utc": "2026-09-01T16:08:08Z",
+  "checks": [
+    "derivatives successor scheduler and gap gate",
+    "H36 scheduler, miss gate, and mature resolver delay",
+    "microstructure daemon and heartbeat freshness",
+    "partition checksum drift"
+  ],
+  "structured_json_only": true,
+  "notification_backend_added": false,
+  "execution": "DISABLED"
+}

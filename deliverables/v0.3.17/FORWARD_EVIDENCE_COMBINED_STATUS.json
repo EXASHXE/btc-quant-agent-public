@@ -1,0 +1,24 @@
+{
+  "schema_version": "1.0.0",
+  "snapshot_utc": "2026-09-01T16:19:31.685Z",
+  "derivatives": {
+    "v0.3.14": "TERMINAL_ARCHIVE",
+    "v0.3.16": "ACTIVE_ACCUMULATING"
+  },
+  "opportunity": {
+    "H35": "DATA_QUALITY_AT_RISK_ARCHIVE",
+    "H36": "ACTIVE_ACCUMULATING"
+  },
+  "microstructure": {
+    "v0.3.15": "ACTIVE_ACCUMULATING"
+  },
+  "operations_health": "HEALTHY",
+  "chain_can_grant_direction": false,
+  "direction_candidate": "NONE",
+  "strategy": "EXPERIMENTAL",
+  "runtime_maximum": "OPPORTUNITY_ONLY",
+  "execution": "DISABLED",
+  "auto_execute": false,
+  "candidate_freeze": "NONE",
+  "final_holdout": "SEALED"
+}

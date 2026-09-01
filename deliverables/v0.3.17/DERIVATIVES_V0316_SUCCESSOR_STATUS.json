@@ -1,0 +1,37 @@
+{
+  "schema_version": "1.0.0",
+  "epoch_id": "DERIVATIVES_PIT_EPOCH_V0316_002",
+  "start_utc": "2026-09-01T09:30:00Z",
+  "start_ms": 1788255000000,
+  "start_moved": false,
+  "state": "ACTIVE_ACCUMULATING",
+  "expected_slots": 28,
+  "recorded_slots": 27,
+  "full_slots": 26,
+  "partial_slots": 1,
+  "failed_slots": 0,
+  "missing_slots": 1,
+  "required_field_availability": {
+    "funding_rate": 0.9642857142857143,
+    "open_interest": 0.9642857142857143,
+    "taker_buy_sell_ratio": 0.9642857142857143,
+    "basis_rate": 0.9285714285714286,
+    "long_short_account_ratio": 0.9642857142857143
+  },
+  "max_consecutive_bad_or_missing": 1,
+  "terminal_failure": false,
+  "known_missing_slot": {
+    "slot_utc": "2026-09-01T10:00:00Z",
+    "cause": "LOCAL_RECEIVE_CLOCK_BEHIND_SOURCE_TIMESTAMP",
+    "retrospectively_replaced": false
+  },
+  "known_partial_slot": {
+    "slot_utc": "2026-09-01T11:15:00Z",
+    "endpoint": "basis",
+    "error_class": "SCHEMA_ERROR"
+  },
+  "scheduler_active": true,
+  "scheduler_enabled": true,
+  "post_clock_fix_natural_success_verified": true,
+  "manual_legacy_backfill_count_for_gate": false
+}

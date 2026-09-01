@@ -1,0 +1,61 @@
+{
+  "schema_version": "1.0.0",
+  "campaign_id": "MICROSTRUCTURE_FORWARD_V0315_20260831T190000Z",
+  "state": "ACTIVE_ACCUMULATING",
+  "campaign_age_days": 0.8885611689814815,
+  "depth_events": 751413,
+  "agg_trade_events": 1016901,
+  "book_samples": 751186,
+  "heartbeat_age_seconds": 3.549,
+  "uptime_ratio": 0.9015483949883231,
+  "depth_sequence_continuity_ratio": 0.9999477487894216,
+  "aggregate_completeness_ratio": 0.9003934410205029,
+  "rolling_24h": {
+    "observed_seconds": 40206.343,
+    "trade_coverage_ratio": 0.9970127101586931,
+    "depth_coverage_ratio": 0.9015483949883231,
+    "sequence_valid_coverage_ratio": 0.90150128799329,
+    "gap_count": 3
+  },
+  "rolling_7d": {
+    "observed_seconds": 40206.343,
+    "trade_coverage_ratio": 0.9970127101586931,
+    "depth_coverage_ratio": 0.9015483949883231,
+    "sequence_valid_coverage_ratio": 0.90150128799329,
+    "gap_count": 3
+  },
+  "gap_type_counts": {"DEPTH_GAP_RESYNC": 2, "PROCESS_OR_HOST_GAP": 2, "TRADE_DISCONNECT": 1},
+  "resync_count": 2,
+  "orphan_instances": 2,
+  "clock": {
+    "server_minus_local_midpoint_ms": 900.5,
+    "rtt_ms": 523,
+    "quality": "OK",
+    "raw_timestamps_modified": false
+  },
+  "partition_integrity": {
+    "finalized_partition_count": 1,
+    "checksum_drift": [],
+    "missing_partitions": [],
+    "integrity_ok": true
+  },
+  "duplicate_count": 0,
+  "conflict_count": 0,
+  "service_active": true,
+  "heartbeat_thread_fix_active": true,
+  "research_ready": false,
+  "not_ready_reasons": [
+    "campaign age is below 30 days",
+    "rolling depth coverage is below 95% because historical gaps remain preserved",
+    "rolling sequence-valid coverage is below 95% because historical gaps remain preserved"
+  ],
+  "future_readiness_guideline": {
+    "minimum_calendar_days": 30,
+    "minimum_trade_coverage": 0.95,
+    "minimum_depth_coverage": 0.95,
+    "minimum_sequence_valid_coverage": 0.95,
+    "unresolved_checksum_drift_allowed": false
+  },
+  "direction_claim": "NONE",
+  "alpha_claim": "NONE"
+}

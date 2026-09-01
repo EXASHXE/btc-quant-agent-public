@@ -1,0 +1,21 @@
+{
+  "schema_version": "1.0.0",
+  "campaign_id": "OPPORTUNITY_FORWARD_V0313_20260831T050656Z",
+  "formal_role": "DATA_QUALITY_AT_RISK_ARCHIVE",
+  "data_quality_state": "H35_DATA_QUALITY_AT_RISK",
+  "observations": 139,
+  "successful_scans": 111,
+  "immutable_misses": 28,
+  "miss_root_causes": {
+    "NETWORK_HTTP_451": 16,
+    "NETWORK_TLS": 5,
+    "NETWORK_TIMEOUT": 1,
+    "MARKET_DATA_INSUFFICIENT": 5,
+    "RUNTIME_CONTRACT": 1
+  },
+  "rows_deleted": 0,
+  "rows_backfilled": 0,
+  "rows_relabeled": 0,
+  "validated_evidence": false,
+  "superseded_by": "OPPORTUNITY_FORWARD_V0317_20260901T160000Z"
+}
