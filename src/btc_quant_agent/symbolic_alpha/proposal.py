@@ -13,6 +13,7 @@ class ProposalConstraints:
     maximum_lookback: int
     windows: tuple[int, ...]
     operators: tuple[Operator, ...]
+    required_features: frozenset[str] = frozenset()
 
 
 class FormulaProposalEngine(Protocol):
@@ -57,7 +58,7 @@ class RandomGrammarProposalEngine:
         rng = random.Random(seed)
         features = tuple(sorted(feature_lookbacks))
         unique: dict[str, Formula] = {}
-        attempts = invalid = duplicate = over_lookback = over_tokens = 0
+        attempts = invalid = duplicate = over_lookback = over_tokens = old_only = 0
         maximum_attempts = max(n * 100, 1_000)
         while len(unique) < n and attempts < maximum_attempts:
             attempts += 1
@@ -68,6 +69,11 @@ class RandomGrammarProposalEngine:
                     continue
                 if formula.max_lookback(feature_lookbacks) > constraints.maximum_lookback:
                     over_lookback += 1
+                    continue
+                if constraints.required_features and not (
+                    set(formula.input_features) & constraints.required_features
+                ):
+                    old_only += 1
                     continue
                 if formula.formula_hash in unique:
                     duplicate += 1
@@ -84,6 +90,7 @@ class RandomGrammarProposalEngine:
             "duplicates_rejected": duplicate,
             "over_lookback_rejected": over_lookback,
             "over_token_limit_rejected": over_tokens,
+            "old_only_rejections": old_only,
         }
 
 
@@ -103,4 +110,3 @@ class LocalTransformerProposalEngine:
         constraints: ProposalConstraints,
     ) -> tuple[list[Formula], dict[str, int]]:
         raise RuntimeError("tiny Transformer training was not preregistered for the formal run")
-

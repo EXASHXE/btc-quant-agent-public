@@ -81,7 +81,9 @@ def _rolling(values: Series, window: int, mode: str) -> Series:
     return output
 
 
-def _hourly_market(root: Path, start_ms: int, end_ms: int, spot: bool) -> dict[str, np.ndarray[Any, Any]]:
+def _hourly_market(
+    root: Path, start_ms: int, end_ms: int, spot: bool
+) -> dict[str, np.ndarray[Any, Any]]:
     hours = (end_ms - start_ms) // HOUR_MS
     count = np.zeros(hours, dtype=np.int16)
     open_value = np.full(hours, np.nan)
@@ -141,7 +143,9 @@ def _series(values: np.ndarray[Any, Any]) -> Series:
     return [None if not math.isfinite(float(value)) else float(value) for value in values]
 
 
-def build_features(perp_root: Path, spot_root: Path) -> tuple[list[int], dict[str, Series], Series, dict[str, Any]]:
+def build_features(
+    perp_root: Path, spot_root: Path
+) -> tuple[list[int], dict[str, Series], Series, dict[str, Any]]:
     start_ms = _timestamp("2021-01-01T00:00:00Z")
     end_ms = HOLDOUT_START_MS
     timestamps = list(range(start_ms, end_ms, HOUR_MS))
@@ -162,8 +166,14 @@ def build_features(perp_root: Path, spot_root: Path) -> tuple[list[int], dict[st
             ret1[index] = math.log(current / float(close[index - 1]))
         if index >= 4 and current and close[index - 4]:
             ret4[index] = math.log(current / float(close[index - 4]))
-        if current and math.isfinite(float(perp["high"][index])) and math.isfinite(float(perp["low"][index])):
-            atr_component[index] = (float(perp["high"][index]) - float(perp["low"][index])) / current
+        if (
+            current
+            and math.isfinite(float(perp["high"][index]))
+            and math.isfinite(float(perp["low"][index]))
+        ):
+            atr_component[index] = (
+                float(perp["high"][index]) - float(perp["low"][index])
+            ) / current
     perp_imbalance: Series = [
         None if base is None or base <= 0 or buy is None else 2 * buy / base - 1
         for base, buy in zip(volume, taker, strict=True)
@@ -187,7 +197,9 @@ def build_features(perp_root: Path, spot_root: Path) -> tuple[list[int], dict[st
     current_funding: float | None = None
     for index, hour in enumerate(timestamps):
         decision_close = hour + HOUR_MS
-        while event_index < len(funding_events) and funding_events[event_index][0] <= decision_close:
+        while (
+            event_index < len(funding_events) and funding_events[event_index][0] <= decision_close
+        ):
             current_funding = funding_events[event_index][1]
             event_index += 1
         funding[index] = current_funding
@@ -242,7 +254,12 @@ def _multiple_testing(
         result = vm.execute(formula, features)
         assert result.values is not None and result.failure is None
         signs.append(
-            [0.0 if result.values[index] in (None, 0) else (1.0 if result.values[index] > 0 else -1.0) for index in rows]
+            [
+                0.0
+                if result.values[index] in (None, 0)
+                else (1.0 if result.values[index] > 0 else -1.0)
+                for index in rows
+            ]
         )
     matrix = np.asarray(signs)
     counts = np.sum(matrix != 0, axis=1)
@@ -309,10 +326,14 @@ def _compact_forward(raw: dict[str, Any]) -> dict[str, Any]:
         "opportunity_h36": {
             "campaign_id": opportunity["campaign_id"],
             "campaign_age_days": opportunity["campaign_age_days"],
-            "successful_scan_ratio": opportunity["data_quality_gate"]["successful_scheduled_scan_ratio"],
+            "successful_scan_ratio": opportunity["data_quality_gate"][
+                "successful_scheduled_scan_ratio"
+            ],
             "expected_slots": opportunity["data_quality_gate"]["expected_scheduled_slots"],
             "missed_slots": opportunity["data_quality_gate"]["total_missed_slots"],
-            "max_miss_streak": opportunity["data_quality_gate"]["max_consecutive_missed_decision_slots"],
+            "max_miss_streak": opportunity["data_quality_gate"][
+                "max_consecutive_missed_decision_slots"
+            ],
             "opportunity_count": opportunity["opportunity_count"],
             "resolved_4h": opportunity["resolved_4h_opportunity_count"],
             "resolved_8h": opportunity["resolved_8h_opportunity_count"],
@@ -445,14 +466,13 @@ def run(root: Path, artifact: Path, preregistration_sha: str) -> dict[str, Any]:
             cost_rate=cost_rate,
             bootstrap_seed=search_config["seed"],
             bootstrap_resamples=1_000,
+            sample_step_hours=8,
         )
         validation_rows.append(
             {"formula": item.formula, "discovery": item.metrics, "validation": metrics}
         )
     validation_rows.sort(
-        key=lambda row: (
-            -(row["validation"].net_mean_return or -1e9), row["formula"].formula_hash
-        )
+        key=lambda row: (-(row["validation"].net_mean_return or -1e9), row["formula"].formula_hash)
     )
     frozen = validation_rows[: search_config["top_k_frozen_before_pseudo_forward"]]
     firewall = EvaluationFirewall()
@@ -476,6 +496,7 @@ def run(root: Path, artifact: Path, preregistration_sha: str) -> dict[str, Any]:
             cost_rate=cost_rate,
             bootstrap_seed=search_config["seed"] + 1,
             bootstrap_resamples=1_000,
+            sample_step_hours=8,
         )
     multiple_testing = _multiple_testing(
         [item.formula for item in search.ranked],
@@ -496,12 +517,19 @@ def run(root: Path, artifact: Path, preregistration_sha: str) -> dict[str, Any]:
             "validation_events": validation.event_count >= gate["minimum_validation_events"],
             "pseudo_forward_events": pseudo.event_count >= gate["minimum_pseudo_forward_events"],
             "long_balance": pseudo.long_fraction is not None
-            and gate["minimum_long_fraction"] <= pseudo.long_fraction <= gate["maximum_long_fraction"],
-            "discovery_net": (discovery.net_mean_return or -1) >= gate["minimum_discovery_net_mean_return_8h"],
-            "validation_net": (validation.net_mean_return or -1) >= gate["minimum_validation_net_mean_return_8h"],
-            "pseudo_forward_net": (pseudo.net_mean_return or -1) >= gate["minimum_pseudo_forward_net_mean_return_8h"],
-            "validation_ci": (validation.bootstrap_ci_low or -1) >= gate["minimum_validation_bootstrap_ci_low"],
-            "pseudo_forward_ci": (pseudo.bootstrap_ci_low or -1) >= gate["minimum_pseudo_forward_bootstrap_ci_low"],
+            and gate["minimum_long_fraction"]
+            <= pseudo.long_fraction
+            <= gate["maximum_long_fraction"],
+            "discovery_net": (discovery.net_mean_return or -1)
+            >= gate["minimum_discovery_net_mean_return_8h"],
+            "validation_net": (validation.net_mean_return or -1)
+            >= gate["minimum_validation_net_mean_return_8h"],
+            "pseudo_forward_net": (pseudo.net_mean_return or -1)
+            >= gate["minimum_pseudo_forward_net_mean_return_8h"],
+            "validation_ci": (validation.bootstrap_ci_low or -1)
+            >= gate["minimum_validation_bootstrap_ci_low"],
+            "pseudo_forward_ci": (pseudo.bootstrap_ci_low or -1)
+            >= gate["minimum_pseudo_forward_bootstrap_ci_low"],
             "positive_validation_folds": sum(
                 value is not None and value > 0 for value in validation.chronological_fold_means
             )
@@ -605,12 +633,9 @@ def run(root: Path, artifact: Path, preregistration_sha: str) -> dict[str, Any]:
         "run_id": artifact.name,
         "created_at": datetime.now(UTC).isoformat(),
         "preregistration_sha": preregistration_sha,
-        "artifacts": {
-            path.name: _digest(path) for path in sorted(artifact.glob("*.json"))
-        },
+        "artifacts": {path.name: _digest(path) for path in sorted(artifact.glob("*.json"))},
         "raw_data": {
-            str(path.relative_to(root)): _sha256(path)
-            for path in sorted(raw_root.rglob("*.zip"))
+            str(path.relative_to(root)): _sha256(path) for path in sorted(raw_root.rglob("*.zip"))
         },
         "safety": protocol["safety"],
     }
@@ -631,7 +656,11 @@ def main() -> None:
     parser.add_argument("--artifact", type=Path, required=True)
     parser.add_argument("--preregistration-sha", required=True)
     args = parser.parse_args()
-    print(json.dumps(run(args.root.resolve(), args.artifact.resolve(), args.preregistration_sha), indent=2))
+    print(
+        json.dumps(
+            run(args.root.resolve(), args.artifact.resolve(), args.preregistration_sha), indent=2
+        )
+    )
 
 
 if __name__ == "__main__":

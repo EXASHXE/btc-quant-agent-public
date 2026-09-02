@@ -25,6 +25,14 @@ class EvaluationMetrics:
     bootstrap_ci_low: float | None
     bootstrap_ci_high: float | None
     chronological_fold_means: tuple[float | None, ...]
+    bootstrap_block_hours: int | None
+    bootstrap_block_events: int | None
+
+
+def block_hours_to_events(block_hours: int, sample_step_hours: int) -> int:
+    if block_hours <= 0 or sample_step_hours <= 0:
+        raise ValueError("block_hours and sample_step_hours must be positive")
+    return math.ceil(block_hours / sample_step_hours)
 
 
 class EvaluationFirewall:
@@ -56,7 +64,9 @@ def forward_returns(close: Series, horizon: int) -> Series:
     return output
 
 
-def _block_bootstrap_ci(values: list[float], seed: int, resamples: int, block: int) -> tuple[float, float]:
+def _block_bootstrap_ci(
+    values: list[float], seed: int, resamples: int, block: int
+) -> tuple[float, float]:
     if not values:
         return math.nan, math.nan
     rng = random.Random(seed)
@@ -68,7 +78,9 @@ def _block_bootstrap_ci(values: list[float], seed: int, resamples: int, block: i
             sample.extend(values[(start + offset) % len(values)] for offset in range(block))
         estimates.append(fmean(sample[: len(values)]))
     estimates.sort()
-    return estimates[int(0.025 * (len(estimates) - 1))], estimates[int(0.975 * (len(estimates) - 1))]
+    return estimates[int(0.025 * (len(estimates) - 1))], estimates[
+        int(0.975 * (len(estimates) - 1))
+    ]
 
 
 def evaluate_formula(
@@ -80,7 +92,8 @@ def evaluate_formula(
     cost_rate: float,
     bootstrap_seed: int,
     bootstrap_resamples: int = 0,
-    bootstrap_block: int = 168,
+    bootstrap_block_hours: int = 168,
+    sample_step_hours: int = 1,
     folds: int = 4,
 ) -> EvaluationMetrics:
     result = FormulaVM().execute(formula, features)
@@ -108,9 +121,10 @@ def evaluate_formula(
     )
     ci_low: float | None = None
     ci_high: float | None = None
+    block_events = block_hours_to_events(bootstrap_block_hours, sample_step_hours)
     if bootstrap_resamples and pnl:
         ci_low, ci_high = _block_bootstrap_ci(
-            pnl, bootstrap_seed, bootstrap_resamples, bootstrap_block
+            pnl, bootstrap_seed, bootstrap_resamples, block_events
         )
     fold_means: list[float | None] = []
     for fold in range(folds):
@@ -131,4 +145,6 @@ def evaluate_formula(
         bootstrap_ci_low=ci_low,
         bootstrap_ci_high=ci_high,
         chronological_fold_means=tuple(fold_means),
+        bootstrap_block_hours=bootstrap_block_hours if bootstrap_resamples else None,
+        bootstrap_block_events=block_events if bootstrap_resamples else None,
     )

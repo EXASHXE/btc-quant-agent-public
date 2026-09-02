@@ -60,11 +60,15 @@ def test_protocol_is_frozen_and_holdout_sealed() -> None:
 
 
 def test_archive_paths_and_timestamp_units() -> None:
-    assert OFFICIAL_SPECS["spot_aggTrades"].monthly_url("2024-01").endswith(
-        "/spot/monthly/aggTrades/BTCUSDT/BTCUSDT-aggTrades-2024-01.zip"
+    assert (
+        OFFICIAL_SPECS["spot_aggTrades"]
+        .monthly_url("2024-01")
+        .endswith("/spot/monthly/aggTrades/BTCUSDT/BTCUSDT-aggTrades-2024-01.zip")
     )
-    assert OFFICIAL_SPECS["markPriceKlines_1m"].monthly_url("2024-01").endswith(
-        "/futures/um/monthly/markPriceKlines/BTCUSDT/1m/BTCUSDT-1m-2024-01.zip"
+    assert (
+        OFFICIAL_SPECS["markPriceKlines_1m"]
+        .monthly_url("2024-01")
+        .endswith("/futures/um/monthly/markPriceKlines/BTCUSDT/1m/BTCUSDT-1m-2024-01.zip")
     )
     assert normalize_timestamp(1_735_689_600_000) == (1_735_689_600_000, "milliseconds")
     assert normalize_timestamp(1_735_689_600_000_000) == (
@@ -230,7 +234,7 @@ def test_provisional_signal_and_execution_are_blocked() -> None:
         decision=SandboxDecision.WAIT,
         formula_hash="abc",
         source="HISTORICAL_PROXY",
-        entry_price=None,
+        planned_entry_reference=None,
         stop_price=None,
         take_profit_price=None,
         size=0,
@@ -272,7 +276,7 @@ def test_event_replay_uses_only_future_bars_and_conservative_same_bar_fill() -> 
         decision=SandboxDecision.LONG,
         formula_hash="abc",
         source="CANONICAL_HISTORICAL",
-        entry_price=100,
+        planned_entry_reference=100,
         stop_price=90,
         take_profit_price=110,
         size=1,
@@ -295,7 +299,7 @@ def test_wait_replay_produces_no_trade() -> None:
         decision=SandboxDecision.WAIT,
         formula_hash="abc",
         source="HISTORICAL_PROXY",
-        entry_price=None,
+        planned_entry_reference=None,
         stop_price=None,
         take_profit_price=None,
         size=0,
