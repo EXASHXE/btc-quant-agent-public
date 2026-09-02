@@ -346,7 +346,13 @@ def build(
         for future in as_completed(futures):
             result = future.result()
             downloads.append(result)
-            print(result["status"], result["family"], result["month"], flush=True)
+            print(
+                result["status"],
+                result["family"],
+                result["month"],
+                result.get("error", ""),
+                flush=True,
+            )
     downloads.sort(key=lambda item: (item["family"], item["month"]))
     verified = [item for item in downloads if item["status"] == "VERIFIED"]
     if download_only:
