@@ -8,6 +8,12 @@ from pathlib import Path
 import pytest
 
 from btc_quant_agent.data.historical_provenance import HistoricalDataRole
+from btc_quant_agent.data.official_derivatives_features import (
+    NEW_FEATURE_IDS,
+    OfficialHourlyInputs,
+    build_official_derivatives_features,
+    feature_availability_audit,
+)
 from btc_quant_agent.symbolic_alpha.dsl import Formula, FormulaToken, Operator, TokenKind
 from btc_quant_agent.symbolic_alpha.evaluate import (
     EvaluationFirewall,
@@ -260,3 +266,36 @@ def test_vm_operator_paths_and_firewall_rejection() -> None:
     firewall.freeze_top_k([formulas[0]])
     with pytest.raises(PermissionError, match="outside"):
         firewall.authorize_pseudo_forward(formulas[1])
+
+
+def test_new_official_feature_family_is_causal_and_missing_stays_unavailable() -> None:
+    rows = [
+        OfficialHourlyInputs(
+            index * 3_600_000,
+            float(index),
+            101.0 + index,
+            100.0 + index,
+            60.0,
+            40.0,
+            55.0,
+            45.0,
+        )
+        for index in range(30)
+    ]
+    before = build_official_derivatives_features(rows)
+    mutated = [
+        *rows[:25],
+        *[replace(row, premium_close=9999, mark_close=9999) for row in rows[25:]],
+    ]
+    after = build_official_derivatives_features(mutated)
+    assert set(before) == NEW_FEATURE_IDS
+    assert all(before[name][:25] == after[name][:25] for name in NEW_FEATURE_IDS)
+    missing = list(rows)
+    missing[10] = replace(missing[10], premium_close=None, perp_buy_notional=None)
+    unavailable = build_official_derivatives_features(missing)
+    assert unavailable["PREMIUM_INDEX_LEVEL_1H"][10] is None
+    assert unavailable["PREMIUM_INDEX_Z_24H"][23] is None
+    assert unavailable["PERP_AGG_BUY_IMBALANCE_1H"][10] is None
+    audit = feature_availability_audit(unavailable, missing)
+    assert audit["synthetic_rows"] == 0
+    assert audit["missing_intervals_filled"] == 0
