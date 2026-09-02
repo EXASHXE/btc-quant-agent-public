@@ -161,6 +161,10 @@ def _download_resumable(url: str, partial: Path) -> None:
         for start in range(prefix_size, remote_size, segment_size)
     ]
     paths = [partial.with_name(f"{partial.name}.{start}-{end}.segment") for start, end in segments]
+    expected_paths = set(paths)
+    for stale in partial.parent.glob(f"{partial.name}.*.segment"):
+        if stale not in expected_paths:
+            stale.unlink()
     with ThreadPoolExecutor(max_workers=SEGMENT_CONNECTIONS) as pool:
         futures = [
             pool.submit(_download_segment, url, path, start, end)
@@ -191,6 +195,9 @@ def _download_one(root: Path, family: str, month: str) -> dict[str, Any]:
             partial = target.with_suffix(target.suffix + ".part")
             _download_resumable(url, partial)
             if _sha256(partial) != expected:
+                partial.unlink()
+                for stale in partial.parent.glob(f"{partial.name}.*.segment"):
+                    stale.unlink()
                 raise ValueError("official checksum mismatch after resumable transfer")
             partial.replace(target)
         return {
