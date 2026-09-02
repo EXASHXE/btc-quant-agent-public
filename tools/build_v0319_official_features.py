@@ -22,6 +22,7 @@ from btc_quant_agent.data.official_derivatives_features import OfficialHourlyInp
 START = datetime(2021, 1, 1, tzinfo=UTC)
 END = datetime(2026, 2, 1, tzinfo=UTC)
 HOUR_MS = 3_600_000
+SEGMENT_CONNECTIONS = 8
 
 
 def _months() -> list[str]:
@@ -65,6 +66,106 @@ def _official_checksum(url: str) -> str:
     return expected
 
 
+def _remote_size(url: str) -> int:
+    result = subprocess.run(
+        [
+            "curl",
+            "--head",
+            "--location",
+            "--fail",
+            "--silent",
+            "--show-error",
+            "--retry",
+            "10",
+            "--retry-all-errors",
+            "--max-time",
+            "300",
+            url,
+        ],
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    if result.returncode:
+        raise ConnectionError(result.stderr.strip())
+    lengths = [
+        int(line.split(":", 1)[1].strip())
+        for line in result.stdout.splitlines()
+        if line.lower().startswith("content-length:")
+    ]
+    if not lengths or lengths[-1] <= 0:
+        raise ValueError("official archive response omitted content length")
+    return lengths[-1]
+
+
+def _download_segment(url: str, path: Path, start: int, end: int) -> None:
+    expected_size = end - start + 1
+    current_size = path.stat().st_size if path.exists() else 0
+    if current_size > expected_size:
+        raise ValueError(f"oversized partial segment: {path}")
+    if current_size == expected_size:
+        return
+    with path.open("ab") as output:
+        result = subprocess.run(
+            [
+                "curl",
+                "--location",
+                "--fail",
+                "--silent",
+                "--show-error",
+                "--retry",
+                "10",
+                "--retry-all-errors",
+                "--connect-timeout",
+                "60",
+                "--max-time",
+                "3600",
+                "--range",
+                f"{start + current_size}-{end}",
+                url,
+            ],
+            stdout=output,
+            stderr=subprocess.PIPE,
+            check=False,
+        )
+    if result.returncode:
+        raise ConnectionError(result.stderr.decode().strip())
+    if path.stat().st_size != expected_size:
+        raise ValueError(f"official server returned an invalid byte range: {path}")
+
+
+def _download_resumable(url: str, partial: Path) -> None:
+    remote_size = _remote_size(url)
+    prefix_size = partial.stat().st_size if partial.exists() else 0
+    if prefix_size > remote_size:
+        raise ValueError("local partial archive is larger than the official object")
+    if prefix_size == remote_size:
+        return
+    remaining = remote_size - prefix_size
+    segment_size = max(1, (remaining + SEGMENT_CONNECTIONS - 1) // SEGMENT_CONNECTIONS)
+    segments = [
+        (start, min(start + segment_size - 1, remote_size - 1))
+        for start in range(prefix_size, remote_size, segment_size)
+    ]
+    paths = [partial.with_name(f"{partial.name}.{start}-{end}.segment") for start, end in segments]
+    with ThreadPoolExecutor(max_workers=SEGMENT_CONNECTIONS) as pool:
+        futures = [
+            pool.submit(_download_segment, url, path, start, end)
+            for path, (start, end) in zip(paths, segments, strict=True)
+        ]
+        for future in as_completed(futures):
+            future.result()
+    with partial.open("ab") as output:
+        for path in paths:
+            with path.open("rb") as source:
+                while chunk := source.read(8 * 1024 * 1024):
+                    output.write(chunk)
+    for path in paths:
+        path.unlink()
+    if partial.stat().st_size != remote_size:
+        raise ValueError("segmented official archive assembly size mismatch")
+
+
 def _download_one(root: Path, family: str, month: str) -> dict[str, Any]:
     spec = OFFICIAL_SPECS[family]
     url = spec.monthly_url(month)
@@ -74,28 +175,7 @@ def _download_one(root: Path, family: str, month: str) -> dict[str, Any]:
         target.parent.mkdir(parents=True, exist_ok=True)
         if not target.exists() or _sha256(target) != expected:
             partial = target.with_suffix(target.suffix + ".part")
-            transfer = subprocess.run(
-                [
-                    "curl",
-                    "--location",
-                    "--fail",
-                    "--silent",
-                    "--show-error",
-                    "--retry",
-                    "10",
-                    "--retry-all-errors",
-                    "--continue-at",
-                    "-",
-                    "--output",
-                    str(partial),
-                    url,
-                ],
-                text=True,
-                capture_output=True,
-                check=False,
-            )
-            if transfer.returncode:
-                raise ConnectionError(transfer.stderr.strip())
+            _download_resumable(url, partial)
             if _sha256(partial) != expected:
                 raise ValueError("official checksum mismatch after resumable transfer")
             partial.replace(target)
