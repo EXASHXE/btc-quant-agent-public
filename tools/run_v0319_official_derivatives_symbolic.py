@@ -36,12 +36,21 @@ from btc_quant_agent.symbolic_alpha.proposal import (
 from btc_quant_agent.symbolic_alpha.registry import FeatureDefinition, formula_entry, write_registry
 from btc_quant_agent.symbolic_alpha.search import run_discovery_search
 from btc_quant_agent.symbolic_alpha.vm import FormulaVM, Series
-from tools.run_historical_symbolic_factory import (
-    _forward_snapshot,
-    _indices,
-    _multiple_testing,
-    build_features,
-)
+
+if __package__:
+    from tools.run_historical_symbolic_factory import (
+        _forward_snapshot,
+        _indices,
+        _multiple_testing,
+        build_features,
+    )
+else:
+    from run_historical_symbolic_factory import (  # type: ignore[no-redef]
+        _forward_snapshot,
+        _indices,
+        _multiple_testing,
+        build_features,
+    )
 
 
 def _digest(path: Path) -> str:
