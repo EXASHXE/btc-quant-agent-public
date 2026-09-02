@@ -246,6 +246,12 @@ def _multiple_testing(
         )
     matrix = np.asarray(signs)
     counts = np.sum(matrix != 0, axis=1)
+    eligible = counts > 1
+    if not np.any(eligible):
+        raise ValueError("multiple-testing audit has no formula with at least two events")
+    excluded_count = int(np.sum(~eligible))
+    matrix = matrix[eligible]
+    counts = counts[eligible]
     observed_pnl = matrix * outcomes
     observed_mean = np.sum(observed_pnl, axis=1) / counts
     observed_variance = np.maximum(
@@ -274,6 +280,7 @@ def _multiple_testing(
         "null_best_t_stat_p95": float(np.quantile(null_best, 0.95)),
         "familywise_adjusted_p_value": adjusted_p,
         "passed_0_05": adjusted_p <= 0.05,
+        "zero_or_single_event_formulas_excluded": excluded_count,
     }
 
 
