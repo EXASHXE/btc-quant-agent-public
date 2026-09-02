@@ -319,6 +319,11 @@ def run(root: Path, data_root: Path, artifact: Path, preregistration_sha: str) -
         "formal_role": "OFFICIAL_HISTORICAL_TIMESTAMPED",
         "final_holdout_rows": 0,
     }
+    recommendation = (
+        "CONTINUE_OFFICIAL_DERIVATIVES_SYMBOLIC_NO_CANDIDATE"
+        if multiple["passed_0_05"]
+        else "STOP_OFFICIAL_DERIVATIVES_SYMBOLIC_FAMILY"
+    )
     search_audit = {
         "preregistration_sha": preregistration_sha,
         "protocol_sha256": _digest(protocol_path),
@@ -333,7 +338,7 @@ def run(root: Path, data_root: Path, artifact: Path, preregistration_sha: str) -
         "candidate_results": results,
         "candidate_exists": False,
         "provisional_shadow_started": False,
-        "recommendation": "CONTINUE_OFFICIAL_DERIVATIVES_SYMBOLIC_NO_CANDIDATE",
+        "recommendation": recommendation,
     }
     outputs = {
         "protocol.json": protocol,
