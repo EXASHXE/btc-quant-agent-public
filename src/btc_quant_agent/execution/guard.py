@@ -61,6 +61,11 @@ class ExecutionGuard:
         daily_realized_loss_usdt: float = 0.0,
         automatic: bool = False,
     ) -> None:
+        if plan.validation_status.startswith("PROVISIONAL") or plan.validation_status in {
+            "NOT_FORWARD_VALIDATED",
+            "NOT_RUNTIME_ACTIONABLE",
+        }:
+            raise ExecutionBlocked("provisional or non-runtime signal cannot enter execution")
         self._mode_gate(plan.mode)
         if plan.calculated_hash() != plan.plan_hash or confirmation_hash != plan.plan_hash:
             raise ExecutionBlocked("execution plan hash mismatch")
