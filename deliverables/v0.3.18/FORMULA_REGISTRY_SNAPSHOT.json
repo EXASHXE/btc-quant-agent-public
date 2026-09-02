@@ -1,0 +1,1996 @@
+{
+  "formulas": [
+    {
+      "complexity": 4,
+      "correlation_to_existing_candidates": null,
+      "discovery_window": "[2021-01-01T00:00:00Z, 2024-01-01T00:00:00Z)",
+      "formula_hash": "ba9137e01c0d23b4f176ac0a793e57d4536f12dab191e1230f0907b62c562dcd",
+      "formula_id": "V0318_RANDOM_001",
+      "formula_tokens_or_ast": [
+        {
+          "kind": "CONSTANT",
+          "value": 0.5
+        },
+        {
+          "kind": "FEATURE",
+          "value": "TRADE_COUNT_Z_24H"
+        },
+        {
+          "kind": "OPERATOR",
+          "parameter": 48,
+          "value": "ROLL_SUM_N"
+        },
+        {
+          "kind": "FEATURE",
+          "value": "TAKER_BUY_IMBALANCE_1H"
+        },
+        {
+          "kind": "OPERATOR",
+          "parameter": 12,
+          "value": "DELAY_N"
+        },
+        {
+          "kind": "OPERATOR",
+          "value": "MUL"
+        },
+        {
+          "kind": "OPERATOR",
+          "value": "MUL"
+        }
+      ],
+      "input_data_roles": [
+        "CANONICAL_HISTORICAL"
+      ],
+      "input_feature_ids": [
+        "TAKER_BUY_IMBALANCE_1H",
+        "TRADE_COUNT_Z_24H"
+      ],
+      "max_lookback": 70,
+      "metrics_by_fold": {
+        "discovery": {
+          "bootstrap_ci_high": null,
+          "bootstrap_ci_low": null,
+          "chronological_fold_means": [
+            0.0007280121597054231,
+            0.0012501833750012533,
+            0.0009966093714729386,
+            0.0006345897528426293
+          ],
+          "event_count": 3275,
+          "gross_mean_return": 0.0009024018972761871,
+          "long_count": 1579,
+          "long_fraction": 0.4821374045801527,
+          "net_mean_return": 0.0009024018972761871,
+          "short_count": 1696,
+          "standard_error": 0.00034104071935513105,
+          "t_stat": 2.6460239087652813,
+          "turnover": 0.5054978619425778,
+          "wait_count": 9
+        }
+      },
+      "operator_set": [
+        "DELAY_N",
+        "MUL",
+        "ROLL_SUM_N"
+      ],
+      "proposal_engine": "RANDOM_GRAMMAR_SEARCH",
+      "pseudo_forward_window": "[2025-02-01T00:00:00Z, 2026-02-01T00:00:00Z)",
+      "research_eligibility": false,
+      "runtime_eligibility": false,
+      "search_budget": 512,
+      "search_run_id": "v0.3.18_historical_symbolic_20260902T124500Z",
+      "search_seed": 3182026,
+      "status": "FAILED_VALIDATION",
+      "validation_window": "[2024-02-01T00:00:00Z, 2025-01-01T00:00:00Z)"
+    },
+    {
+      "complexity": 6,
+      "correlation_to_existing_candidates": null,
+      "discovery_window": "[2021-01-01T00:00:00Z, 2024-01-01T00:00:00Z)",
+      "formula_hash": "2ee933def45cf2193c3d140bd336a021d6259b482f07964d5594d9c50481334e",
+      "formula_id": "V0318_RANDOM_002",
+      "formula_tokens_or_ast": [
+        {
+          "kind": "FEATURE",
+          "value": "TAKER_BUY_IMBALANCE_1H"
+        },
+        {
+          "kind": "OPERATOR",
+          "parameter": 12,
+          "value": "ROLL_MEAN_N"
+        },
+        {
+          "kind": "OPERATOR",
+          "value": "SIGN"
+        },
+        {
+          "kind": "CONSTANT",
+          "value": -0.5
+        },
+        {
+          "kind": "FEATURE",
+          "value": "QUOTE_VOLUME_Z_24H"
+        },
+        {
+          "kind": "FEATURE",
+          "value": "SPOT_TAKER_BUY_IMBALANCE_1H"
+        },
+        {
+          "kind": "OPERATOR",
+          "value": "GATE"
+        },
+        {
+          "kind": "FEATURE",
+          "value": "QUOTE_VOLUME_Z_24H"
+        },
+        {
+          "kind": "FEATURE",
+          "value": "TRADE_COUNT_Z_24H"
+        },
+        {
+          "kind": "OPERATOR",
+          "value": "MAX"
+        },
+        {
+          "kind": "OPERATOR",
+          "value": "DIV"
+        },
+        {
+          "kind": "OPERATOR",
+          "value": "ADD"
+        }
+      ],
+      "input_data_roles": [
+        "CANONICAL_HISTORICAL"
+      ],
+      "input_feature_ids": [
+        "QUOTE_VOLUME_Z_24H",
+        "SPOT_TAKER_BUY_IMBALANCE_1H",
+        "TAKER_BUY_IMBALANCE_1H",
+        "TRADE_COUNT_Z_24H"
+      ],
+      "max_lookback": 23,
+      "metrics_by_fold": {
+        "discovery": {
+          "bootstrap_ci_high": null,
+          "bootstrap_ci_low": null,
+          "chronological_fold_means": [
+            0.0009187363396304285,
+            0.0010258614135995165,
+            0.0008913619747115696,
+            0.0004475771984093961
+          ],
+          "event_count": 3279,
+          "gross_mean_return": 0.0008208543895297701,
+          "long_count": 1441,
+          "long_fraction": 0.43946325099115585,
+          "net_mean_return": 0.0008208543895297701,
+          "short_count": 1838,
+          "standard_error": 0.0003424960905784173,
+          "t_stat": 2.3966825085316668,
+          "turnover": 0.35295912141549723,
+          "wait_count": 5
+        }
+      },
+      "operator_set": [
+        "ADD",
+        "DIV",
+        "GATE",
+        "MAX",
+        "ROLL_MEAN_N",
+        "SIGN"
+      ],
+      "proposal_engine": "RANDOM_GRAMMAR_SEARCH",
+      "pseudo_forward_window": "[2025-02-01T00:00:00Z, 2026-02-01T00:00:00Z)",
+      "research_eligibility": false,
+      "runtime_eligibility": false,
+      "search_budget": 512,
+      "search_run_id": "v0.3.18_historical_symbolic_20260902T124500Z",
+      "search_seed": 3182026,
+      "status": "FAILED_VALIDATION",
+      "validation_window": "[2024-02-01T00:00:00Z, 2025-01-01T00:00:00Z)"
+    },
+    {
+      "complexity": 7,
+      "correlation_to_existing_candidates": null,
+      "discovery_window": "[2021-01-01T00:00:00Z, 2024-01-01T00:00:00Z)",
+      "formula_hash": "10693e4c8e3155b40b9e3baa74a954fb44b3831811bbe4a50934f0ccbf7faedb",
+      "formula_id": "V0318_RANDOM_003",
+      "formula_tokens_or_ast": [
+        {
+          "kind": "FEATURE",
+          "value": "ATR_24H"
+        },
+        {
+          "kind": "FEATURE",
+          "value": "LOG_RETURN_4H"
+        },
+        {
+          "kind": "OPERATOR",
+          "value": "MAX"
+        },
+        {
+          "kind": "OPERATOR",
+          "value": "NEG"
+        },
+        {
+          "kind": "CONSTANT",
+          "value": -0.5
+        },
+        {
+          "kind": "OPERATOR",
+          "parameter": 4,
+          "value": "ROLL_SUM_N"
+        },
+        {
+          "kind": "CONSTANT",
+          "value": -0.5
+        },
+        {
+          "kind": "OPERATOR",
+          "parameter": 48,
+          "value": "EMA_N"
+        },
+        {
+          "kind": "FEATURE",
+          "value": "TAKER_BUY_IMBALANCE_1H"
+        },
+        {
+          "kind": "OPERATOR",
+          "parameter": 48,
+          "value": "ROLL_SUM_N"
+        },
+        {
+          "kind": "OPERATOR",
+          "value": "MAX"
+        },
+        {
+          "kind": "OPERATOR",
+          "value": "GATE"
+        }
+      ],
+      "input_data_roles": [
+        "CANONICAL_HISTORICAL"
+      ],
+      "input_feature_ids": [
+        "ATR_24H",
+        "LOG_RETURN_4H",
+        "TAKER_BUY_IMBALANCE_1H"
+      ],
+      "max_lookback": 47,
+      "metrics_by_fold": {
+        "canonical_formula": [
+          {
+            "kind": "FEATURE",
+            "value": "ATR_24H"
+          },
+          {
+            "kind": "FEATURE",
+            "value": "LOG_RETURN_4H"
+          },
+          {
+            "kind": "OPERATOR",
+            "value": "MAX"
+          },
+          {
+            "kind": "OPERATOR",
+            "value": "NEG"
+          },
+          {
+            "kind": "CONSTANT",
+            "value": -0.5
+          },
+          {
+            "kind": "OPERATOR",
+            "parameter": 4,
+            "value": "ROLL_SUM_N"
+          },
+          {
+            "kind": "CONSTANT",
+            "value": -0.5
+          },
+          {
+            "kind": "OPERATOR",
+            "parameter": 48,
+            "value": "EMA_N"
+          },
+          {
+            "kind": "FEATURE",
+            "value": "TAKER_BUY_IMBALANCE_1H"
+          },
+          {
+            "kind": "OPERATOR",
+            "parameter": 48,
+            "value": "ROLL_SUM_N"
+          },
+          {
+            "kind": "OPERATOR",
+            "value": "MAX"
+          },
+          {
+            "kind": "OPERATOR",
+            "value": "GATE"
+          }
+        ],
+        "discovery": {
+          "bootstrap_ci_high": null,
+          "bootstrap_ci_low": null,
+          "chronological_fold_means": [
+            5.806497840794181e-05,
+            0.0014867244418343421,
+            0.0011687352842087084,
+            0.00034156925703638654
+          ],
+          "event_count": 3278,
+          "gross_mean_return": 0.0007638652373877468,
+          "long_count": 1292,
+          "long_fraction": 0.3941427699816962,
+          "net_mean_return": 0.0007638652373877468,
+          "short_count": 1986,
+          "standard_error": 0.0003416352523801919,
+          "t_stat": 2.235908712774384,
+          "turnover": 0.13854134879462923,
+          "wait_count": 6
+        },
+        "formula_hash": "10693e4c8e3155b40b9e3baa74a954fb44b3831811bbe4a50934f0ccbf7faedb",
+        "gate_checks": {
+          "discovery_events": true,
+          "discovery_net": true,
+          "long_balance": true,
+          "multiple_testing": false,
+          "positive_pseudo_forward_folds": false,
+          "positive_validation_folds": false,
+          "pseudo_forward_ci": false,
+          "pseudo_forward_events": true,
+          "pseudo_forward_net": false,
+          "validation_ci": false,
+          "validation_events": true,
+          "validation_net": false
+        },
+        "passed_all_frozen_gates": false,
+        "pseudo_forward": {
+          "bootstrap_ci_high": 2.1514738361897398e-05,
+          "bootstrap_ci_low": -0.001284229738557783,
+          "chronological_fold_means": [
+            -4.512339154157933e-05,
+            -0.0015946637603217045,
+            -0.0006391391005747902,
+            -0.00024665354261499406
+          ],
+          "event_count": 1094,
+          "gross_mean_return": 0.0005680762327674366,
+          "long_count": 341,
+          "long_fraction": 0.3117001828153565,
+          "net_mean_return": -0.0006319237672325633,
+          "short_count": 753,
+          "standard_error": 0.0003798793216122498,
+          "t_stat": -1.6634855631272822,
+          "turnover": 0.1445562671546203,
+          "wait_count": 0
+        },
+        "validation": {
+          "bootstrap_ci_high": 0.0004306107716491917,
+          "bootstrap_ci_low": -0.0009743806796499082,
+          "chronological_fold_means": [
+            -0.000937688251981101,
+            -0.0003934172383919538,
+            0.0005025283321462407,
+            -0.00013157742960592494
+          ],
+          "event_count": 998,
+          "gross_mean_return": 0.0009599163456529559,
+          "long_count": 287,
+          "long_fraction": 0.2875751503006012,
+          "net_mean_return": -0.000240083654347044,
+          "short_count": 711,
+          "standard_error": 0.00048252592610051423,
+          "t_stat": -0.497555968209328,
+          "turnover": 0.13239719157472418,
+          "wait_count": 6
+        }
+      },
+      "operator_set": [
+        "EMA_N",
+        "GATE",
+        "MAX",
+        "NEG",
+        "ROLL_SUM_N"
+      ],
+      "proposal_engine": "RANDOM_GRAMMAR_SEARCH",
+      "pseudo_forward_window": "[2025-02-01T00:00:00Z, 2026-02-01T00:00:00Z)",
+      "research_eligibility": false,
+      "runtime_eligibility": false,
+      "search_budget": 512,
+      "search_run_id": "v0.3.18_historical_symbolic_20260902T124500Z",
+      "search_seed": 3182026,
+      "status": "FAILED_VALIDATION",
+      "validation_window": "[2024-02-01T00:00:00Z, 2025-01-01T00:00:00Z)"
+    },
+    {
+      "complexity": 4,
+      "correlation_to_existing_candidates": null,
+      "discovery_window": "[2021-01-01T00:00:00Z, 2024-01-01T00:00:00Z)",
+      "formula_hash": "b1192e8aa6cd56b411035db95e2d8d462f685f5f866433ca41635e27faaf42a9",
+      "formula_id": "V0318_RANDOM_004",
+      "formula_tokens_or_ast": [
+        {
+          "kind": "FEATURE",
+          "value": "ATR_24H"
+        },
+        {
+          "kind": "OPERATOR",
+          "parameter": 8,
+          "value": "DELAY_N"
+        },
+        {
+          "kind": "FEATURE",
+          "value": "REALIZED_VOL_24H"
+        },
+        {
+          "kind": "FEATURE",
+          "value": "FUNDING_LEVEL"
+        },
+        {
+          "kind": "OPERATOR",
+          "value": "MUL"
+        },
+        {
+          "kind": "OPERATOR",
+          "value": "ADD"
+        },
+        {
+          "kind": "OPERATOR",
+          "parameter": 24,
+          "value": "ROLL_Z_N"
+        }
+      ],
+      "input_data_roles": [
+        "CANONICAL_HISTORICAL"
+      ],
+      "input_feature_ids": [
+        "ATR_24H",
+        "FUNDING_LEVEL",
+        "REALIZED_VOL_24H"
+      ],
+      "max_lookback": 55,
+      "metrics_by_fold": {
+        "canonical_formula": [
+          {
+            "kind": "FEATURE",
+            "value": "ATR_24H"
+          },
+          {
+            "kind": "OPERATOR",
+            "parameter": 8,
+            "value": "DELAY_N"
+          },
+          {
+            "kind": "FEATURE",
+            "value": "REALIZED_VOL_24H"
+          },
+          {
+            "kind": "FEATURE",
+            "value": "FUNDING_LEVEL"
+          },
+          {
+            "kind": "OPERATOR",
+            "value": "MUL"
+          },
+          {
+            "kind": "OPERATOR",
+            "value": "ADD"
+          },
+          {
+            "kind": "OPERATOR",
+            "parameter": 24,
+            "value": "ROLL_Z_N"
+          }
+        ],
+        "discovery": {
+          "bootstrap_ci_high": null,
+          "bootstrap_ci_low": null,
+          "chronological_fold_means": [
+            0.0010622201493929347,
+            0.0013741901666701065,
+            0.00010732764725925387,
+            0.0002507938163313665
+          ],
+          "event_count": 3277,
+          "gross_mean_return": 0.0006984962835986208,
+          "long_count": 1550,
+          "long_fraction": 0.4729935916997254,
+          "net_mean_return": 0.0006984962835986208,
+          "short_count": 1727,
+          "standard_error": 0.0003413227217234187,
+          "t_stat": 2.046439451999412,
+          "turnover": 0.26404151404151405,
+          "wait_count": 7
+        },
+        "formula_hash": "b1192e8aa6cd56b411035db95e2d8d462f685f5f866433ca41635e27faaf42a9",
+        "gate_checks": {
+          "discovery_events": true,
+          "discovery_net": true,
+          "long_balance": true,
+          "multiple_testing": false,
+          "positive_pseudo_forward_folds": false,
+          "positive_validation_folds": false,
+          "pseudo_forward_ci": false,
+          "pseudo_forward_events": true,
+          "pseudo_forward_net": false,
+          "validation_ci": false,
+          "validation_events": true,
+          "validation_net": false
+        },
+        "passed_all_frozen_gates": false,
+        "pseudo_forward": {
+          "bootstrap_ci_high": -0.0014700911483285716,
+          "bootstrap_ci_low": -0.002797840290485327,
+          "chronological_fold_means": [
+            -0.0021210916874975848,
+            -0.001472338701718266,
+            -0.0028234953042622765,
+            -0.002058374159403412
+          ],
+          "event_count": 1094,
+          "gross_mean_return": -0.0009181787684623235,
+          "long_count": 546,
+          "long_fraction": 0.4990859232175503,
+          "net_mean_return": -0.0021181787684623234,
+          "short_count": 548,
+          "standard_error": 0.0003792522005343635,
+          "t_stat": -5.58514562467357,
+          "turnover": 0.2607502287282708,
+          "wait_count": 0
+        },
+        "validation": {
+          "bootstrap_ci_high": 0.000328761588733873,
+          "bootstrap_ci_low": -0.001305305336383215,
+          "chronological_fold_means": [
+            0.000932858704114443,
+            -0.0017171738138968256,
+            -0.0008721631157579732,
+            -0.0006840031475341536
+          ],
+          "event_count": 1004,
+          "gross_mean_return": 0.0006148796567313726,
+          "long_count": 492,
+          "long_fraction": 0.4900398406374502,
+          "net_mean_return": -0.0005851203432686273,
+          "short_count": 512,
+          "standard_error": 0.0004810399068984134,
+          "t_stat": -1.2163654925041256,
+          "turnover": 0.23928215353938184,
+          "wait_count": 0
+        }
+      },
+      "operator_set": [
+        "ADD",
+        "DELAY_N",
+        "MUL",
+        "ROLL_Z_N"
+      ],
+      "proposal_engine": "RANDOM_GRAMMAR_SEARCH",
+      "pseudo_forward_window": "[2025-02-01T00:00:00Z, 2026-02-01T00:00:00Z)",
+      "research_eligibility": false,
+      "runtime_eligibility": false,
+      "search_budget": 512,
+      "search_run_id": "v0.3.18_historical_symbolic_20260902T124500Z",
+      "search_seed": 3182026,
+      "status": "FAILED_VALIDATION",
+      "validation_window": "[2024-02-01T00:00:00Z, 2025-01-01T00:00:00Z)"
+    },
+    {
+      "complexity": 1,
+      "correlation_to_existing_candidates": null,
+      "discovery_window": "[2021-01-01T00:00:00Z, 2024-01-01T00:00:00Z)",
+      "formula_hash": "3f26660f7600b90366507dbda6957056abd54e8df0cd79a36f69377599cff04e",
+      "formula_id": "V0318_RANDOM_005",
+      "formula_tokens_or_ast": [
+        {
+          "kind": "FEATURE",
+          "value": "TAKER_BUY_IMBALANCE_1H"
+        },
+        {
+          "kind": "OPERATOR",
+          "parameter": 48,
+          "value": "EMA_N"
+        }
+      ],
+      "input_data_roles": [
+        "CANONICAL_HISTORICAL"
+      ],
+      "input_feature_ids": [
+        "TAKER_BUY_IMBALANCE_1H"
+      ],
+      "max_lookback": 47,
+      "metrics_by_fold": {
+        "discovery": {
+          "bootstrap_ci_high": null,
+          "bootstrap_ci_low": null,
+          "chronological_fold_means": [
+            0.0008405461039621609,
+            0.0010550542684176392,
+            0.000849240254590693,
+            4.086590578320844e-05
+          ],
+          "event_count": 3278,
+          "gross_mean_return": 0.0006963360495727525,
+          "long_count": 1288,
+          "long_fraction": 0.39292251372788284,
+          "net_mean_return": 0.0006963360495727525,
+          "short_count": 1990,
+          "standard_error": 0.000341679288307836,
+          "t_stat": 2.0379814445919484,
+          "turnover": 0.17027769301190113,
+          "wait_count": 6
+        }
+      },
+      "operator_set": [
+        "EMA_N"
+      ],
+      "proposal_engine": "RANDOM_GRAMMAR_SEARCH",
+      "pseudo_forward_window": "[2025-02-01T00:00:00Z, 2026-02-01T00:00:00Z)",
+      "research_eligibility": false,
+      "runtime_eligibility": false,
+      "search_budget": 512,
+      "search_run_id": "v0.3.18_historical_symbolic_20260902T124500Z",
+      "search_seed": 3182026,
+      "status": "FAILED_VALIDATION",
+      "validation_window": "[2024-02-01T00:00:00Z, 2025-01-01T00:00:00Z)"
+    },
+    {
+      "complexity": 2,
+      "correlation_to_existing_candidates": null,
+      "discovery_window": "[2021-01-01T00:00:00Z, 2024-01-01T00:00:00Z)",
+      "formula_hash": "57a59388461b05f6f22a0b503456e382d7c2d9ea866b2fcd68befc1fc8d7e520",
+      "formula_id": "V0318_RANDOM_006",
+      "formula_tokens_or_ast": [
+        {
+          "kind": "FEATURE",
+          "value": "REALIZED_VOL_24H"
+        },
+        {
+          "kind": "FEATURE",
+          "value": "TAKER_BUY_IMBALANCE_1H"
+        },
+        {
+          "kind": "OPERATOR",
+          "parameter": 4,
+          "value": "ROLL_MEAN_N"
+        },
+        {
+          "kind": "OPERATOR",
+          "value": "MIN"
+        }
+      ],
+      "input_data_roles": [
+        "CANONICAL_HISTORICAL"
+      ],
+      "input_feature_ids": [
+        "REALIZED_VOL_24H",
+        "TAKER_BUY_IMBALANCE_1H"
+      ],
+      "max_lookback": 24,
+      "metrics_by_fold": {
+        "discovery": {
+          "bootstrap_ci_high": null,
+          "bootstrap_ci_low": null,
+          "chronological_fold_means": [
+            0.0011767936436972042,
+            0.001071834031002003,
+            -1.678952610997862e-05,
+            0.0004608156888174325
+          ],
+          "event_count": 3281,
+          "gross_mean_return": 0.000673098738909564,
+          "long_count": 1468,
+          "long_fraction": 0.44742456568119476,
+          "net_mean_return": 0.000673098738909564,
+          "short_count": 1813,
+          "standard_error": 0.00034244650630408584,
+          "t_stat": 1.965558785148958,
+          "turnover": 0.45945121951219514,
+          "wait_count": 3
+        }
+      },
+      "operator_set": [
+        "MIN",
+        "ROLL_MEAN_N"
+      ],
+      "proposal_engine": "RANDOM_GRAMMAR_SEARCH",
+      "pseudo_forward_window": "[2025-02-01T00:00:00Z, 2026-02-01T00:00:00Z)",
+      "research_eligibility": false,
+      "runtime_eligibility": false,
+      "search_budget": 512,
+      "search_run_id": "v0.3.18_historical_symbolic_20260902T124500Z",
+      "search_seed": 3182026,
+      "status": "FAILED_VALIDATION",
+      "validation_window": "[2024-02-01T00:00:00Z, 2025-01-01T00:00:00Z)"
+    },
+    {
+      "complexity": 1,
+      "correlation_to_existing_candidates": null,
+      "discovery_window": "[2021-01-01T00:00:00Z, 2024-01-01T00:00:00Z)",
+      "formula_hash": "c0ee5dd1d0d080a3c097280397b899a19fa9368ed5089b80e6712ab71a0850cb",
+      "formula_id": "V0318_RANDOM_007",
+      "formula_tokens_or_ast": [
+        {
+          "kind": "FEATURE",
+          "value": "TAKER_BUY_IMBALANCE_1H"
+        },
+        {
+          "kind": "OPERATOR",
+          "parameter": 4,
+          "value": "ROLL_MEAN_N"
+        }
+      ],
+      "input_data_roles": [
+        "CANONICAL_HISTORICAL"
+      ],
+      "input_feature_ids": [
+        "TAKER_BUY_IMBALANCE_1H"
+      ],
+      "max_lookback": 3,
+      "metrics_by_fold": {
+        "discovery": {
+          "bootstrap_ci_high": null,
+          "bootstrap_ci_low": null,
+          "chronological_fold_means": [
+            0.0011644047458287648,
+            0.0010862136028591185,
+            -2.8027438116657534e-05,
+            0.0004608156888174325
+          ],
+          "event_count": 3283,
+          "gross_mean_return": 0.0006707013138447334,
+          "long_count": 1468,
+          "long_fraction": 0.4471519951264088,
+          "net_mean_return": 0.0006707013138447334,
+          "short_count": 1815,
+          "standard_error": 0.0003422552011714297,
+          "t_stat": 1.959652655530546,
+          "turnover": 0.45917123705057894,
+          "wait_count": 1
+        }
+      },
+      "operator_set": [
+        "ROLL_MEAN_N"
+      ],
+      "proposal_engine": "RANDOM_GRAMMAR_SEARCH",
+      "pseudo_forward_window": "[2025-02-01T00:00:00Z, 2026-02-01T00:00:00Z)",
+      "research_eligibility": false,
+      "runtime_eligibility": false,
+      "search_budget": 512,
+      "search_run_id": "v0.3.18_historical_symbolic_20260902T124500Z",
+      "search_seed": 3182026,
+      "status": "FAILED_VALIDATION",
+      "validation_window": "[2024-02-01T00:00:00Z, 2025-01-01T00:00:00Z)"
+    },
+    {
+      "complexity": 2,
+      "correlation_to_existing_candidates": null,
+      "discovery_window": "[2021-01-01T00:00:00Z, 2024-01-01T00:00:00Z)",
+      "formula_hash": "3a2a781b00f76534059d29bfd5a42bb776d3db6e4d2ff2175b66245a9be03692",
+      "formula_id": "V0318_RANDOM_008",
+      "formula_tokens_or_ast": [
+        {
+          "kind": "FEATURE",
+          "value": "TRADE_COUNT_Z_24H"
+        },
+        {
+          "kind": "OPERATOR",
+          "value": "NEG"
+        },
+        {
+          "kind": "OPERATOR",
+          "parameter": 8,
+          "value": "DECAY_N"
+        }
+      ],
+      "input_data_roles": [
+        "CANONICAL_HISTORICAL"
+      ],
+      "input_feature_ids": [
+        "TRADE_COUNT_Z_24H"
+      ],
+      "max_lookback": 30,
+      "metrics_by_fold": {
+        "discovery": {
+          "bootstrap_ci_high": null,
+          "bootstrap_ci_low": null,
+          "chronological_fold_means": [
+            0.0011518273538084613,
+            0.0004851845233462527,
+            0.0009912163217052625,
+            -7.619272237518696e-05
+          ],
+          "event_count": 3280,
+          "gross_mean_return": 0.0006380088691211974,
+          "long_count": 1763,
+          "long_fraction": 0.5375,
+          "net_mean_return": 0.0006380088691211974,
+          "short_count": 1517,
+          "standard_error": 0.0003425049283758358,
+          "t_stat": 1.8627728136545258,
+          "turnover": 0.5468130527599878,
+          "wait_count": 4
+        }
+      },
+      "operator_set": [
+        "DECAY_N",
+        "NEG"
+      ],
+      "proposal_engine": "RANDOM_GRAMMAR_SEARCH",
+      "pseudo_forward_window": "[2025-02-01T00:00:00Z, 2026-02-01T00:00:00Z)",
+      "research_eligibility": false,
+      "runtime_eligibility": false,
+      "search_budget": 512,
+      "search_run_id": "v0.3.18_historical_symbolic_20260902T124500Z",
+      "search_seed": 3182026,
+      "status": "FAILED_VALIDATION",
+      "validation_window": "[2024-02-01T00:00:00Z, 2025-01-01T00:00:00Z)"
+    },
+    {
+      "complexity": 5,
+      "correlation_to_existing_candidates": null,
+      "discovery_window": "[2021-01-01T00:00:00Z, 2024-01-01T00:00:00Z)",
+      "formula_hash": "97b39aee5b70e885cad8c2f67977043936414b3070b26b1fc3397c5ae5759f6d",
+      "formula_id": "V0318_RANDOM_009",
+      "formula_tokens_or_ast": [
+        {
+          "kind": "CONSTANT",
+          "value": -0.5
+        },
+        {
+          "kind": "OPERATOR",
+          "parameter": 48,
+          "value": "EMA_N"
+        },
+        {
+          "kind": "FEATURE",
+          "value": "TAKER_BUY_IMBALANCE_1H"
+        },
+        {
+          "kind": "FEATURE",
+          "value": "SPOT_TAKER_BUY_IMBALANCE_1H"
+        },
+        {
+          "kind": "OPERATOR",
+          "value": "MUL"
+        },
+        {
+          "kind": "OPERATOR",
+          "value": "MAX"
+        },
+        {
+          "kind": "FEATURE",
+          "value": "ATR_24H"
+        },
+        {
+          "kind": "OPERATOR",
+          "parameter": 12,
+          "value": "EMA_N"
+        },
+        {
+          "kind": "OPERATOR",
+          "value": "DIV"
+        }
+      ],
+      "input_data_roles": [
+        "CANONICAL_HISTORICAL"
+      ],
+      "input_feature_ids": [
+        "ATR_24H",
+        "SPOT_TAKER_BUY_IMBALANCE_1H",
+        "TAKER_BUY_IMBALANCE_1H"
+      ],
+      "max_lookback": 47,
+      "metrics_by_fold": {
+        "discovery": {
+          "bootstrap_ci_high": null,
+          "bootstrap_ci_low": null,
+          "chronological_fold_means": [
+            0.002168678231361794,
+            -0.00010057714580503282,
+            -0.0002637990835368368,
+            0.0006557619084029097
+          ],
+          "event_count": 3276,
+          "gross_mean_return": 0.0006150159776057085,
+          "long_count": 2284,
+          "long_fraction": 0.6971916971916972,
+          "net_mean_return": 0.0006150159776057085,
+          "short_count": 992,
+          "standard_error": 0.00034187427387792624,
+          "t_stat": 1.7989536639580945,
+          "turnover": 0.40977099236641223,
+          "wait_count": 8
+        }
+      },
+      "operator_set": [
+        "DIV",
+        "EMA_N",
+        "MAX",
+        "MUL"
+      ],
+      "proposal_engine": "RANDOM_GRAMMAR_SEARCH",
+      "pseudo_forward_window": "[2025-02-01T00:00:00Z, 2026-02-01T00:00:00Z)",
+      "research_eligibility": false,
+      "runtime_eligibility": false,
+      "search_budget": 512,
+      "search_run_id": "v0.3.18_historical_symbolic_20260902T124500Z",
+      "search_seed": 3182026,
+      "status": "FAILED_VALIDATION",
+      "validation_window": "[2024-02-01T00:00:00Z, 2025-01-01T00:00:00Z)"
+    },
+    {
+      "complexity": 5,
+      "correlation_to_existing_candidates": null,
+      "discovery_window": "[2021-01-01T00:00:00Z, 2024-01-01T00:00:00Z)",
+      "formula_hash": "762533ea4dcbbbdbe386cf503b6ebb3fe11a78c4edd722af0ed2576bb565b3b6",
+      "formula_id": "V0318_RANDOM_010",
+      "formula_tokens_or_ast": [
+        {
+          "kind": "FEATURE",
+          "value": "ATR_24H"
+        },
+        {
+          "kind": "FEATURE",
+          "value": "TRADE_COUNT_Z_24H"
+        },
+        {
+          "kind": "OPERATOR",
+          "value": "SIGN"
+        },
+        {
+          "kind": "OPERATOR",
+          "value": "MAX"
+        },
+        {
+          "kind": "FEATURE",
+          "value": "LOG_RETURN_4H"
+        },
+        {
+          "kind": "FEATURE",
+          "value": "FUNDING_LEVEL"
+        },
+        {
+          "kind": "OPERATOR",
+          "value": "NEG"
+        },
+        {
+          "kind": "OPERATOR",
+          "parameter": 24,
+          "value": "ROLL_Z_N"
+        },
+        {
+          "kind": "OPERATOR",
+          "value": "CLIP"
+        }
+      ],
+      "input_data_roles": [
+        "CANONICAL_HISTORICAL"
+      ],
+      "input_feature_ids": [
+        "ATR_24H",
+        "FUNDING_LEVEL",
+        "LOG_RETURN_4H",
+        "TRADE_COUNT_Z_24H"
+      ],
+      "max_lookback": 24,
+      "metrics_by_fold": {
+        "canonical_formula": [
+          {
+            "kind": "FEATURE",
+            "value": "ATR_24H"
+          },
+          {
+            "kind": "FEATURE",
+            "value": "TRADE_COUNT_Z_24H"
+          },
+          {
+            "kind": "OPERATOR",
+            "value": "SIGN"
+          },
+          {
+            "kind": "OPERATOR",
+            "value": "MAX"
+          },
+          {
+            "kind": "FEATURE",
+            "value": "LOG_RETURN_4H"
+          },
+          {
+            "kind": "FEATURE",
+            "value": "FUNDING_LEVEL"
+          },
+          {
+            "kind": "OPERATOR",
+            "value": "NEG"
+          },
+          {
+            "kind": "OPERATOR",
+            "parameter": 24,
+            "value": "ROLL_Z_N"
+          },
+          {
+            "kind": "OPERATOR",
+            "value": "CLIP"
+          }
+        ],
+        "discovery": {
+          "bootstrap_ci_high": null,
+          "bootstrap_ci_low": null,
+          "chronological_fold_means": [
+            0.00107013961083762,
+            3.411551243609884e-05,
+            0.002291052013025401,
+            0.0007814128141756771
+          ],
+          "event_count": 1265,
+          "gross_mean_return": 0.0010439722665329734,
+          "long_count": 1265,
+          "long_fraction": 1.0,
+          "net_mean_return": 0.0010439722665329734,
+          "short_count": 0,
+          "standard_error": 0.0005926733679107815,
+          "t_stat": 1.761463097646946,
+          "turnover": 0.0,
+          "wait_count": 2019
+        },
+        "formula_hash": "762533ea4dcbbbdbe386cf503b6ebb3fe11a78c4edd722af0ed2576bb565b3b6",
+        "gate_checks": {
+          "discovery_events": true,
+          "discovery_net": true,
+          "long_balance": false,
+          "multiple_testing": false,
+          "positive_pseudo_forward_folds": false,
+          "positive_validation_folds": true,
+          "pseudo_forward_ci": false,
+          "pseudo_forward_events": true,
+          "pseudo_forward_net": false,
+          "validation_ci": false,
+          "validation_events": false,
+          "validation_net": true
+        },
+        "passed_all_frozen_gates": false,
+        "pseudo_forward": {
+          "bootstrap_ci_high": -0.0006136267196989823,
+          "bootstrap_ci_low": -0.0023972874038103754,
+          "chronological_fold_means": [
+            -0.0023726198495492134,
+            3.771074386080178e-05,
+            -0.0020907989663806227,
+            -0.0019146974583852728
+          ],
+          "event_count": 517,
+          "gross_mean_return": -0.00038573889920114307,
+          "long_count": 517,
+          "long_fraction": 1.0,
+          "net_mean_return": -0.001585738899201143,
+          "short_count": 0,
+          "standard_error": 0.0005443096193219538,
+          "t_stat": -2.913303096088026,
+          "turnover": 0.0,
+          "wait_count": 577
+        },
+        "validation": {
+          "bootstrap_ci_high": 0.0018572037912068166,
+          "bootstrap_ci_low": -0.0007450369424789699,
+          "chronological_fold_means": [
+            0.0018910708933376063,
+            0.00048502270995863083,
+            -0.00120413042835462,
+            0.0011114221587280493
+          ],
+          "event_count": 383,
+          "gross_mean_return": 0.0017673992719032645,
+          "long_count": 383,
+          "long_fraction": 1.0,
+          "net_mean_return": 0.0005673992719032647,
+          "short_count": 0,
+          "standard_error": 0.0008177626484794063,
+          "t_stat": 0.6938434678550294,
+          "turnover": 0.0,
+          "wait_count": 621
+        }
+      },
+      "operator_set": [
+        "CLIP",
+        "MAX",
+        "NEG",
+        "ROLL_Z_N",
+        "SIGN"
+      ],
+      "proposal_engine": "RANDOM_GRAMMAR_SEARCH",
+      "pseudo_forward_window": "[2025-02-01T00:00:00Z, 2026-02-01T00:00:00Z)",
+      "research_eligibility": false,
+      "runtime_eligibility": false,
+      "search_budget": 512,
+      "search_run_id": "v0.3.18_historical_symbolic_20260902T124500Z",
+      "search_seed": 3182026,
+      "status": "FAILED_VALIDATION",
+      "validation_window": "[2024-02-01T00:00:00Z, 2025-01-01T00:00:00Z)"
+    },
+    {
+      "complexity": 5,
+      "correlation_to_existing_candidates": null,
+      "discovery_window": "[2021-01-01T00:00:00Z, 2024-01-01T00:00:00Z)",
+      "formula_hash": "51900562fbb8e594d5a7789397d6785448dd35683420efb800bf4cc3873a046f",
+      "formula_id": "V0318_RANDOM_011",
+      "formula_tokens_or_ast": [
+        {
+          "kind": "FEATURE",
+          "value": "FUNDING_LEVEL"
+        },
+        {
+          "kind": "FEATURE",
+          "value": "QUOTE_VOLUME_Z_24H"
+        },
+        {
+          "kind": "OPERATOR",
+          "value": "DIV"
+        },
+        {
+          "kind": "FEATURE",
+          "value": "TAKER_BUY_IMBALANCE_1H"
+        },
+        {
+          "kind": "OPERATOR",
+          "value": "NEG"
+        },
+        {
+          "kind": "FEATURE",
+          "value": "REALIZED_VOL_24H"
+        },
+        {
+          "kind": "OPERATOR",
+          "value": "DELAY_1"
+        },
+        {
+          "kind": "OPERATOR",
+          "value": "CLIP"
+        },
+        {
+          "kind": "OPERATOR",
+          "value": "SIGN"
+        }
+      ],
+      "input_data_roles": [
+        "CANONICAL_HISTORICAL"
+      ],
+      "input_feature_ids": [
+        "FUNDING_LEVEL",
+        "QUOTE_VOLUME_Z_24H",
+        "REALIZED_VOL_24H",
+        "TAKER_BUY_IMBALANCE_1H"
+      ],
+      "max_lookback": 25,
+      "metrics_by_fold": {
+        "canonical_formula": [
+          {
+            "kind": "FEATURE",
+            "value": "FUNDING_LEVEL"
+          },
+          {
+            "kind": "FEATURE",
+            "value": "QUOTE_VOLUME_Z_24H"
+          },
+          {
+            "kind": "OPERATOR",
+            "value": "DIV"
+          },
+          {
+            "kind": "FEATURE",
+            "value": "TAKER_BUY_IMBALANCE_1H"
+          },
+          {
+            "kind": "OPERATOR",
+            "value": "NEG"
+          },
+          {
+            "kind": "FEATURE",
+            "value": "REALIZED_VOL_24H"
+          },
+          {
+            "kind": "OPERATOR",
+            "value": "DELAY_1"
+          },
+          {
+            "kind": "OPERATOR",
+            "value": "CLIP"
+          },
+          {
+            "kind": "OPERATOR",
+            "value": "SIGN"
+          }
+        ],
+        "discovery": {
+          "bootstrap_ci_high": null,
+          "bootstrap_ci_low": null,
+          "chronological_fold_means": [
+            0.0030868725307586944,
+            -0.0005886642657631264,
+            0.00026206002527483804,
+            0.0001420733902287005
+          ],
+          "event_count": 2107,
+          "gross_mean_return": 0.0007244647333138445,
+          "long_count": 1253,
+          "long_fraction": 0.5946843853820598,
+          "net_mean_return": 0.0007244647333138445,
+          "short_count": 854,
+          "standard_error": 0.000441835276169458,
+          "t_stat": 1.6396715526987236,
+          "turnover": 0.47435897435897434,
+          "wait_count": 1177
+        },
+        "formula_hash": "51900562fbb8e594d5a7789397d6785448dd35683420efb800bf4cc3873a046f",
+        "gate_checks": {
+          "discovery_events": true,
+          "discovery_net": true,
+          "long_balance": true,
+          "multiple_testing": false,
+          "positive_pseudo_forward_folds": false,
+          "positive_validation_folds": false,
+          "pseudo_forward_ci": false,
+          "pseudo_forward_events": true,
+          "pseudo_forward_net": false,
+          "validation_ci": false,
+          "validation_events": true,
+          "validation_net": false
+        },
+        "passed_all_frozen_gates": false,
+        "pseudo_forward": {
+          "bootstrap_ci_high": -0.0006498615817245294,
+          "bootstrap_ci_low": -0.002010766769877755,
+          "chronological_fold_means": [
+            -0.0028245050743721358,
+            -0.00045473457000353405,
+            -0.0009679197489707898,
+            -0.000817996688170356
+          ],
+          "event_count": 560,
+          "gross_mean_return": -6.628902037920394e-05,
+          "long_count": 324,
+          "long_fraction": 0.5785714285714286,
+          "net_mean_return": -0.0012662890203792038,
+          "short_count": 236,
+          "standard_error": 0.000507807646440381,
+          "t_stat": -2.493639135321433,
+          "turnover": 0.47942754919499103,
+          "wait_count": 534
+        },
+        "validation": {
+          "bootstrap_ci_high": 0.00013373615941432248,
+          "bootstrap_ci_low": -0.001329565585569443,
+          "chronological_fold_means": [
+            0.0010704147545747141,
+            -0.00043038140365122114,
+            -0.001091033027916703,
+            -0.0020395053676312996
+          ],
+          "event_count": 591,
+          "gross_mean_return": 0.0005745090332334988,
+          "long_count": 335,
+          "long_fraction": 0.5668358714043993,
+          "net_mean_return": -0.0006254909667665011,
+          "short_count": 256,
+          "standard_error": 0.0006204946948185291,
+          "t_stat": -1.0080520784298297,
+          "turnover": 0.488135593220339,
+          "wait_count": 413
+        }
+      },
+      "operator_set": [
+        "CLIP",
+        "DELAY_1",
+        "DIV",
+        "NEG",
+        "SIGN"
+      ],
+      "proposal_engine": "RANDOM_GRAMMAR_SEARCH",
+      "pseudo_forward_window": "[2025-02-01T00:00:00Z, 2026-02-01T00:00:00Z)",
+      "research_eligibility": false,
+      "runtime_eligibility": false,
+      "search_budget": 512,
+      "search_run_id": "v0.3.18_historical_symbolic_20260902T124500Z",
+      "search_seed": 3182026,
+      "status": "FAILED_VALIDATION",
+      "validation_window": "[2024-02-01T00:00:00Z, 2025-01-01T00:00:00Z)"
+    },
+    {
+      "complexity": 2,
+      "correlation_to_existing_candidates": null,
+      "discovery_window": "[2021-01-01T00:00:00Z, 2024-01-01T00:00:00Z)",
+      "formula_hash": "2278d3fc1336d0ba19d3ca57ee2fa36d344921ba17d181dc68c9b49b062eac7c",
+      "formula_id": "V0318_RANDOM_012",
+      "formula_tokens_or_ast": [
+        {
+          "kind": "FEATURE",
+          "value": "LOG_RETURN_1H"
+        },
+        {
+          "kind": "OPERATOR",
+          "value": "DELAY_1"
+        },
+        {
+          "kind": "OPERATOR",
+          "value": "DELAY_1"
+        }
+      ],
+      "input_data_roles": [
+        "CANONICAL_HISTORICAL"
+      ],
+      "input_feature_ids": [
+        "LOG_RETURN_1H"
+      ],
+      "max_lookback": 3,
+      "metrics_by_fold": {
+        "discovery": {
+          "bootstrap_ci_high": null,
+          "bootstrap_ci_low": null,
+          "chronological_fold_means": [
+            0.00134732878778223,
+            0.001054580974834673,
+            0.0004516797991683999,
+            -0.0006747415765643698
+          ],
+          "event_count": 3281,
+          "gross_mean_return": 0.0005443403249937826,
+          "long_count": 1636,
+          "long_fraction": 0.49862846693081375,
+          "net_mean_return": 0.0005443403249937826,
+          "short_count": 1645,
+          "standard_error": 0.00034250590349083266,
+          "t_stat": 1.589287423795754,
+          "turnover": 0.47286585365853656,
+          "wait_count": 3
+        }
+      },
+      "operator_set": [
+        "DELAY_1"
+      ],
+      "proposal_engine": "RANDOM_GRAMMAR_SEARCH",
+      "pseudo_forward_window": "[2025-02-01T00:00:00Z, 2026-02-01T00:00:00Z)",
+      "research_eligibility": false,
+      "runtime_eligibility": false,
+      "search_budget": 512,
+      "search_run_id": "v0.3.18_historical_symbolic_20260902T124500Z",
+      "search_seed": 3182026,
+      "status": "FAILED_VALIDATION",
+      "validation_window": "[2024-02-01T00:00:00Z, 2025-01-01T00:00:00Z)"
+    },
+    {
+      "complexity": 1,
+      "correlation_to_existing_candidates": null,
+      "discovery_window": "[2021-01-01T00:00:00Z, 2024-01-01T00:00:00Z)",
+      "formula_hash": "e885763b2c1d9da5e4cb548f9da61f65ca277e7612546378ac0bb419ca4cef80",
+      "formula_id": "V0318_RANDOM_013",
+      "formula_tokens_or_ast": [
+        {
+          "kind": "FEATURE",
+          "value": "TAKER_BUY_IMBALANCE_1H"
+        },
+        {
+          "kind": "OPERATOR",
+          "parameter": 8,
+          "value": "DELAY_N"
+        }
+      ],
+      "input_data_roles": [
+        "CANONICAL_HISTORICAL"
+      ],
+      "input_feature_ids": [
+        "TAKER_BUY_IMBALANCE_1H"
+      ],
+      "max_lookback": 8,
+      "metrics_by_fold": {
+        "discovery": {
+          "bootstrap_ci_high": null,
+          "bootstrap_ci_low": null,
+          "chronological_fold_means": [
+            -7.954919419742773e-05,
+            0.0011711017329396345,
+            0.00037075211381120603,
+            0.0007035696581003047
+          ],
+          "event_count": 3283,
+          "gross_mean_return": 0.0005416577393362471,
+          "long_count": 1552,
+          "long_fraction": 0.4727383490709717,
+          "net_mean_return": 0.0005416577393362471,
+          "short_count": 1731,
+          "standard_error": 0.00034232483252526544,
+          "t_stat": 1.5822916945304277,
+          "turnover": 0.5006093845216332,
+          "wait_count": 1
+        }
+      },
+      "operator_set": [
+        "DELAY_N"
+      ],
+      "proposal_engine": "RANDOM_GRAMMAR_SEARCH",
+      "pseudo_forward_window": "[2025-02-01T00:00:00Z, 2026-02-01T00:00:00Z)",
+      "research_eligibility": false,
+      "runtime_eligibility": false,
+      "search_budget": 512,
+      "search_run_id": "v0.3.18_historical_symbolic_20260902T124500Z",
+      "search_seed": 3182026,
+      "status": "FAILED_VALIDATION",
+      "validation_window": "[2024-02-01T00:00:00Z, 2025-01-01T00:00:00Z)"
+    },
+    {
+      "complexity": 3,
+      "correlation_to_existing_candidates": null,
+      "discovery_window": "[2021-01-01T00:00:00Z, 2024-01-01T00:00:00Z)",
+      "formula_hash": "d78dd9bcf48926082885bf5dbd5063e91e5269ce7b6eadbfd78efc3b7b5a03c2",
+      "formula_id": "V0318_RANDOM_014",
+      "formula_tokens_or_ast": [
+        {
+          "kind": "FEATURE",
+          "value": "LOG_RETURN_1H"
+        },
+        {
+          "kind": "OPERATOR",
+          "value": "DELAY_1"
+        },
+        {
+          "kind": "OPERATOR",
+          "value": "DELAY_1"
+        },
+        {
+          "kind": "OPERATOR",
+          "parameter": 8,
+          "value": "EMA_N"
+        }
+      ],
+      "input_data_roles": [
+        "CANONICAL_HISTORICAL"
+      ],
+      "input_feature_ids": [
+        "LOG_RETURN_1H"
+      ],
+      "max_lookback": 10,
+      "metrics_by_fold": {
+        "discovery": {
+          "bootstrap_ci_high": null,
+          "bootstrap_ci_low": null,
+          "chronological_fold_means": [
+            0.0016247244822355836,
+            0.0001715430476767442,
+            0.00035607948332253274,
+            -8.742531385927057e-06
+          ],
+          "event_count": 3282,
+          "gross_mean_return": 0.0005356241546716687,
+          "long_count": 1680,
+          "long_fraction": 0.5118829981718465,
+          "net_mean_return": 0.0005356241546716687,
+          "short_count": 1602,
+          "standard_error": 0.00034241790678198145,
+          "t_stat": 1.5642410751979225,
+          "turnover": 0.4553489789698263,
+          "wait_count": 2
+        }
+      },
+      "operator_set": [
+        "DELAY_1",
+        "EMA_N"
+      ],
+      "proposal_engine": "RANDOM_GRAMMAR_SEARCH",
+      "pseudo_forward_window": "[2025-02-01T00:00:00Z, 2026-02-01T00:00:00Z)",
+      "research_eligibility": false,
+      "runtime_eligibility": false,
+      "search_budget": 512,
+      "search_run_id": "v0.3.18_historical_symbolic_20260902T124500Z",
+      "search_seed": 3182026,
+      "status": "FAILED_VALIDATION",
+      "validation_window": "[2024-02-01T00:00:00Z, 2025-01-01T00:00:00Z)"
+    },
+    {
+      "complexity": 2,
+      "correlation_to_existing_candidates": null,
+      "discovery_window": "[2021-01-01T00:00:00Z, 2024-01-01T00:00:00Z)",
+      "formula_hash": "aef7d72e4e7f6b9aace733175b1232c5284e4abdb763b18091e297e537f6b343",
+      "formula_id": "V0318_RANDOM_015",
+      "formula_tokens_or_ast": [
+        {
+          "kind": "FEATURE",
+          "value": "SPOT_PERP_FLOW_SPREAD"
+        },
+        {
+          "kind": "OPERATOR",
+          "value": "DELAY_1"
+        },
+        {
+          "kind": "OPERATOR",
+          "parameter": 4,
+          "value": "DELAY_N"
+        }
+      ],
+      "input_data_roles": [
+        "CANONICAL_HISTORICAL"
+      ],
+      "input_feature_ids": [
+        "SPOT_PERP_FLOW_SPREAD"
+      ],
+      "max_lookback": 5,
+      "metrics_by_fold": {
+        "canonical_formula": [
+          {
+            "kind": "FEATURE",
+            "value": "SPOT_PERP_FLOW_SPREAD"
+          },
+          {
+            "kind": "OPERATOR",
+            "value": "DELAY_1"
+          },
+          {
+            "kind": "OPERATOR",
+            "parameter": 4,
+            "value": "DELAY_N"
+          }
+        ],
+        "discovery": {
+          "bootstrap_ci_high": null,
+          "bootstrap_ci_low": null,
+          "chronological_fold_means": [
+            0.0014605794740015878,
+            0.000584562274981463,
+            -0.0002872561430772661,
+            0.00036445320159702444
+          ],
+          "event_count": 3279,
+          "gross_mean_return": 0.0005303010804142427,
+          "long_count": 1343,
+          "long_fraction": 0.4095760902714242,
+          "net_mean_return": 0.0005303010804142427,
+          "short_count": 1936,
+          "standard_error": 0.0003422449067306569,
+          "t_stat": 1.5494783705622361,
+          "turnover": 0.46674801708358754,
+          "wait_count": 5
+        },
+        "formula_hash": "aef7d72e4e7f6b9aace733175b1232c5284e4abdb763b18091e297e537f6b343",
+        "gate_checks": {
+          "discovery_events": true,
+          "discovery_net": true,
+          "long_balance": true,
+          "multiple_testing": false,
+          "positive_pseudo_forward_folds": false,
+          "positive_validation_folds": false,
+          "pseudo_forward_ci": false,
+          "pseudo_forward_events": true,
+          "pseudo_forward_net": false,
+          "validation_ci": false,
+          "validation_events": true,
+          "validation_net": false
+        },
+        "passed_all_frozen_gates": false,
+        "pseudo_forward": {
+          "bootstrap_ci_high": -0.0005520844369998358,
+          "bootstrap_ci_low": -0.0014567152279474484,
+          "chronological_fold_means": [
+            -0.0010478917412018712,
+            -0.0014020829258569055,
+            -0.00122995006127236,
+            -0.00041931842477447364
+          ],
+          "event_count": 1094,
+          "gross_mean_return": 0.0001753978225333974,
+          "long_count": 455,
+          "long_fraction": 0.41590493601462525,
+          "net_mean_return": -0.0010246021774666025,
+          "short_count": 639,
+          "standard_error": 0.0003802307252127292,
+          "t_stat": -2.694685383179816,
+          "turnover": 0.46203110704483075,
+          "wait_count": 0
+        },
+        "validation": {
+          "bootstrap_ci_high": -1.8755148921012616e-05,
+          "bootstrap_ci_low": -0.0010579653385196098,
+          "chronological_fold_means": [
+            -0.00014047682396597556,
+            0.0001246322166375744,
+            -0.0008930480545163268,
+            -0.0011775151224194002
+          ],
+          "event_count": 1004,
+          "gross_mean_return": 0.000678398053933968,
+          "long_count": 434,
+          "long_fraction": 0.43227091633466136,
+          "net_mean_return": -0.000521601946066032,
+          "short_count": 570,
+          "standard_error": 0.0004809547700202025,
+          "t_stat": -1.0845135105825483,
+          "turnover": 0.4646061814556331,
+          "wait_count": 0
+        }
+      },
+      "operator_set": [
+        "DELAY_1",
+        "DELAY_N"
+      ],
+      "proposal_engine": "RANDOM_GRAMMAR_SEARCH",
+      "pseudo_forward_window": "[2025-02-01T00:00:00Z, 2026-02-01T00:00:00Z)",
+      "research_eligibility": false,
+      "runtime_eligibility": false,
+      "search_budget": 512,
+      "search_run_id": "v0.3.18_historical_symbolic_20260902T124500Z",
+      "search_seed": 3182026,
+      "status": "FAILED_VALIDATION",
+      "validation_window": "[2024-02-01T00:00:00Z, 2025-01-01T00:00:00Z)"
+    },
+    {
+      "complexity": 4,
+      "correlation_to_existing_candidates": null,
+      "discovery_window": "[2021-01-01T00:00:00Z, 2024-01-01T00:00:00Z)",
+      "formula_hash": "5a83706cde13bb3f4bddaf66de3f9ad54e48f72fb4f483dcf9f24dff1d141680",
+      "formula_id": "V0318_RANDOM_016",
+      "formula_tokens_or_ast": [
+        {
+          "kind": "FEATURE",
+          "value": "LOG_RETURN_1H"
+        },
+        {
+          "kind": "OPERATOR",
+          "value": "SIGN"
+        },
+        {
+          "kind": "FEATURE",
+          "value": "SPOT_TAKER_BUY_IMBALANCE_1H"
+        },
+        {
+          "kind": "OPERATOR",
+          "parameter": 24,
+          "value": "ROLL_Z_N"
+        },
+        {
+          "kind": "OPERATOR",
+          "value": "DIV"
+        },
+        {
+          "kind": "OPERATOR",
+          "parameter": 24,
+          "value": "ROLL_MEAN_N"
+        }
+      ],
+      "input_data_roles": [
+        "CANONICAL_HISTORICAL"
+      ],
+      "input_feature_ids": [
+        "LOG_RETURN_1H",
+        "SPOT_TAKER_BUY_IMBALANCE_1H"
+      ],
+      "max_lookback": 46,
+      "metrics_by_fold": {
+        "discovery": {
+          "bootstrap_ci_high": null,
+          "bootstrap_ci_low": null,
+          "chronological_fold_means": [
+            0.0008690471339926342,
+            0.001127468690278502,
+            0.0002913553757810842,
+            -0.00017105942412727184
+          ],
+          "event_count": 3236,
+          "gross_mean_return": 0.0005292029439812371,
+          "long_count": 2158,
+          "long_fraction": 0.6668726823238567,
+          "net_mean_return": 0.0005292029439812371,
+          "short_count": 1078,
+          "standard_error": 0.0003442935052132256,
+          "t_stat": 1.5370692039441598,
+          "turnover": 0.22565687789799072,
+          "wait_count": 48
+        }
+      },
+      "operator_set": [
+        "DIV",
+        "ROLL_MEAN_N",
+        "ROLL_Z_N",
+        "SIGN"
+      ],
+      "proposal_engine": "RANDOM_GRAMMAR_SEARCH",
+      "pseudo_forward_window": "[2025-02-01T00:00:00Z, 2026-02-01T00:00:00Z)",
+      "research_eligibility": false,
+      "runtime_eligibility": false,
+      "search_budget": 512,
+      "search_run_id": "v0.3.18_historical_symbolic_20260902T124500Z",
+      "search_seed": 3182026,
+      "status": "FAILED_VALIDATION",
+      "validation_window": "[2024-02-01T00:00:00Z, 2025-01-01T00:00:00Z)"
+    },
+    {
+      "complexity": 2,
+      "correlation_to_existing_candidates": null,
+      "discovery_window": "[2021-01-01T00:00:00Z, 2024-01-01T00:00:00Z)",
+      "formula_hash": "b7fe687211856174c26c88aafa53c85cef389907b66f66c7bcfedb4e425319bb",
+      "formula_id": "V0318_RANDOM_017",
+      "formula_tokens_or_ast": [
+        {
+          "kind": "FEATURE",
+          "value": "SPOT_PERP_FLOW_SPREAD"
+        },
+        {
+          "kind": "FEATURE",
+          "value": "LOG_RETURN_1H"
+        },
+        {
+          "kind": "OPERATOR",
+          "parameter": 48,
+          "value": "ROLL_Z_N"
+        },
+        {
+          "kind": "OPERATOR",
+          "value": "MUL"
+        }
+      ],
+      "input_data_roles": [
+        "CANONICAL_HISTORICAL"
+      ],
+      "input_feature_ids": [
+        "LOG_RETURN_1H",
+        "SPOT_PERP_FLOW_SPREAD"
+      ],
+      "max_lookback": 48,
+      "metrics_by_fold": {
+        "discovery": {
+          "bootstrap_ci_high": null,
+          "bootstrap_ci_low": null,
+          "chronological_fold_means": [
+            0.0006943803120776983,
+            0.0008008375280488253,
+            -1.1291305324814875e-06,
+            0.000592811656244462
+          ],
+          "event_count": 3276,
+          "gross_mean_return": 0.000521725091459626,
+          "long_count": 1355,
+          "long_fraction": 0.4136141636141636,
+          "net_mean_return": 0.000521725091459626,
+          "short_count": 1921,
+          "standard_error": 0.0003419216285649706,
+          "t_stat": 1.525861624049003,
+          "turnover": 0.46625954198473285,
+          "wait_count": 8
+        }
+      },
+      "operator_set": [
+        "MUL",
+        "ROLL_Z_N"
+      ],
+      "proposal_engine": "RANDOM_GRAMMAR_SEARCH",
+      "pseudo_forward_window": "[2025-02-01T00:00:00Z, 2026-02-01T00:00:00Z)",
+      "research_eligibility": false,
+      "runtime_eligibility": false,
+      "search_budget": 512,
+      "search_run_id": "v0.3.18_historical_symbolic_20260902T124500Z",
+      "search_seed": 3182026,
+      "status": "FAILED_VALIDATION",
+      "validation_window": "[2024-02-01T00:00:00Z, 2025-01-01T00:00:00Z)"
+    },
+    {
+      "complexity": 2,
+      "correlation_to_existing_candidates": null,
+      "discovery_window": "[2021-01-01T00:00:00Z, 2024-01-01T00:00:00Z)",
+      "formula_hash": "7608b7dcc381c4aaa29cf5a9e6dcabc19c74a823743c17cbfd993f136cb996cf",
+      "formula_id": "V0318_RANDOM_018",
+      "formula_tokens_or_ast": [
+        {
+          "kind": "FEATURE",
+          "value": "QUOTE_VOLUME_Z_24H"
+        },
+        {
+          "kind": "OPERATOR",
+          "parameter": 8,
+          "value": "ROLL_Z_N"
+        },
+        {
+          "kind": "OPERATOR",
+          "parameter": 48,
+          "value": "ROLL_Z_N"
+        }
+      ],
+      "input_data_roles": [
+        "CANONICAL_HISTORICAL"
+      ],
+      "input_feature_ids": [
+        "QUOTE_VOLUME_Z_24H"
+      ],
+      "max_lookback": 77,
+      "metrics_by_fold": {
+        "discovery": {
+          "bootstrap_ci_high": null,
+          "bootstrap_ci_low": null,
+          "chronological_fold_means": [
+            0.001372026705092976,
+            0.0006185766166270958,
+            -0.00035164956359358163,
+            0.00041741681423969167
+          ],
+          "event_count": 3274,
+          "gross_mean_return": 0.0005140950279860731,
+          "long_count": 1737,
+          "long_fraction": 0.5305436774587661,
+          "net_mean_return": 0.0005140950279860731,
+          "short_count": 1537,
+          "standard_error": 0.00034131300894361277,
+          "t_stat": 1.506227464277534,
+          "turnover": 0.5215398716773603,
+          "wait_count": 10
+        }
+      },
+      "operator_set": [
+        "ROLL_Z_N"
+      ],
+      "proposal_engine": "RANDOM_GRAMMAR_SEARCH",
+      "pseudo_forward_window": "[2025-02-01T00:00:00Z, 2026-02-01T00:00:00Z)",
+      "research_eligibility": false,
+      "runtime_eligibility": false,
+      "search_budget": 512,
+      "search_run_id": "v0.3.18_historical_symbolic_20260902T124500Z",
+      "search_seed": 3182026,
+      "status": "FAILED_VALIDATION",
+      "validation_window": "[2024-02-01T00:00:00Z, 2025-01-01T00:00:00Z)"
+    },
+    {
+      "complexity": 3,
+      "correlation_to_existing_candidates": null,
+      "discovery_window": "[2021-01-01T00:00:00Z, 2024-01-01T00:00:00Z)",
+      "formula_hash": "756b05ca0213369058acd0b6b6db040bf5fa417d68989c8d24ccc2fa1802885a",
+      "formula_id": "V0318_RANDOM_019",
+      "formula_tokens_or_ast": [
+        {
+          "kind": "FEATURE",
+          "value": "TRADE_COUNT_Z_24H"
+        },
+        {
+          "kind": "OPERATOR",
+          "parameter": 8,
+          "value": "DECAY_N"
+        },
+        {
+          "kind": "OPERATOR",
+          "value": "NEG"
+        },
+        {
+          "kind": "OPERATOR",
+          "parameter": 48,
+          "value": "ROLL_Z_N"
+        }
+      ],
+      "input_data_roles": [
+        "CANONICAL_HISTORICAL"
+      ],
+      "input_feature_ids": [
+        "TRADE_COUNT_Z_24H"
+      ],
+      "max_lookback": 77,
+      "metrics_by_fold": {
+        "discovery": {
+          "bootstrap_ci_high": null,
+          "bootstrap_ci_low": null,
+          "chronological_fold_means": [
+            0.0006192534059127699,
+            0.0005156449518921202,
+            0.0009470712771673641,
+            -3.7294326973774424e-05
+          ],
+          "event_count": 3274,
+          "gross_mean_return": 0.00051100267335604,
+          "long_count": 1743,
+          "long_fraction": 0.532376298106292,
+          "net_mean_return": 0.00051100267335604,
+          "short_count": 1531,
+          "standard_error": 0.00034131442775546376,
+          "t_stat": 1.4971610685093866,
+          "turnover": 0.5401772074549344,
+          "wait_count": 10
+        }
+      },
+      "operator_set": [
+        "DECAY_N",
+        "NEG",
+        "ROLL_Z_N"
+      ],
+      "proposal_engine": "RANDOM_GRAMMAR_SEARCH",
+      "pseudo_forward_window": "[2025-02-01T00:00:00Z, 2026-02-01T00:00:00Z)",
+      "research_eligibility": false,
+      "runtime_eligibility": false,
+      "search_budget": 512,
+      "search_run_id": "v0.3.18_historical_symbolic_20260902T124500Z",
+      "search_seed": 3182026,
+      "status": "FAILED_VALIDATION",
+      "validation_window": "[2024-02-01T00:00:00Z, 2025-01-01T00:00:00Z)"
+    },
+    {
+      "complexity": 3,
+      "correlation_to_existing_candidates": null,
+      "discovery_window": "[2021-01-01T00:00:00Z, 2024-01-01T00:00:00Z)",
+      "formula_hash": "dd93fcaf892b8fbec71dfd7553ac12d6bd43704c728fcd0b65f0e55686806ba9",
+      "formula_id": "V0318_RANDOM_020",
+      "formula_tokens_or_ast": [
+        {
+          "kind": "FEATURE",
+          "value": "SPOT_PERP_FLOW_SPREAD"
+        },
+        {
+          "kind": "CONSTANT",
+          "value": -1.0
+        },
+        {
+          "kind": "OPERATOR",
+          "parameter": 48,
+          "value": "ROLL_MEAN_N"
+        },
+        {
+          "kind": "OPERATOR",
+          "value": "DIV"
+        },
+        {
+          "kind": "FEATURE",
+          "value": "ATR_24H"
+        },
+        {
+          "kind": "OPERATOR",
+          "value": "MUL"
+        }
+      ],
+      "input_data_roles": [
+        "CANONICAL_HISTORICAL"
+      ],
+      "input_feature_ids": [
+        "ATR_24H",
+        "SPOT_PERP_FLOW_SPREAD"
+      ],
+      "max_lookback": 47,
+      "metrics_by_fold": {
+        "discovery": {
+          "bootstrap_ci_high": null,
+          "bootstrap_ci_low": null,
+          "chronological_fold_means": [
+            0.0014377530878776047,
+            0.0008966354154116429,
+            8.037992899350831e-06,
+            -0.0003032513742289642
+          ],
+          "event_count": 3276,
+          "gross_mean_return": 0.0005097937804899085,
+          "long_count": 1858,
+          "long_fraction": 0.5671550671550671,
+          "net_mean_return": 0.0005097937804899085,
+          "short_count": 1418,
+          "standard_error": 0.00034192712389753016,
+          "t_stat": 1.490942791197475,
+          "turnover": 0.46595419847328245,
+          "wait_count": 8
+        }
+      },
+      "operator_set": [
+        "DIV",
+        "MUL",
+        "ROLL_MEAN_N"
+      ],
+      "proposal_engine": "RANDOM_GRAMMAR_SEARCH",
+      "pseudo_forward_window": "[2025-02-01T00:00:00Z, 2026-02-01T00:00:00Z)",
+      "research_eligibility": false,
+      "runtime_eligibility": false,
+      "search_budget": 512,
+      "search_run_id": "v0.3.18_historical_symbolic_20260902T124500Z",
+      "search_seed": 3182026,
+      "status": "FAILED_VALIDATION",
+      "validation_window": "[2024-02-01T00:00:00Z, 2025-01-01T00:00:00Z)"
+    }
+  ],
+  "safety": {
+    "execution": "DISABLED",
+    "final_holdout": "SEALED",
+    "qualified_direction_engine": "NONE",
+    "runtime_maximum": "OPPORTUNITY_ONLY",
+    "strategy": "EXPERIMENTAL"
+  },
+  "schema_version": 1
+}

@@ -1,0 +1,367 @@
+{
+  "artifact_manifest_sha256": "78bef232538f56c85ae8a7323728a75ad6ad4ca4cf5d1ffe8f595250700015c7",
+  "candidate_exists": false,
+  "formal_implementation_sha": "51681874488216a25564d156e87c65c8afa04109",
+  "forward_end": {
+    "alpha_interpretation": "NONE",
+    "captured_at_ms": 1788324660977,
+    "derivatives_v0316": {
+      "expected_scheduled_slots": 78,
+      "failed_slots": 0,
+      "fully_available_scheduled_slots": 75,
+      "max_consecutive_bad_or_missing_slots": 1,
+      "missing_slots": 1,
+      "partial_slots": 2,
+      "recorded_scheduled_slots": 77,
+      "required_field_coverage": {
+        "basis_rate": 0.9615384615384616,
+        "funding_rate": 0.9871794871794872,
+        "long_short_account_ratio": 0.9871794871794872,
+        "open_interest": 0.9871794871794872,
+        "taker_buy_sell_ratio": 0.9871794871794872
+      },
+      "scheduler_active": true,
+      "scheduler_enabled": true,
+      "terminal_failure": false
+    },
+    "execution": "DISABLED",
+    "final_holdout": "SEALED",
+    "microstructure_v0315": {
+      "agg_trade_events": 1688327,
+      "book_samples": 1193072,
+      "campaign_age_seconds": 121848.589,
+      "depth_events": 1193300,
+      "depth_sequence_continuity_ratio": 0.9999767115844952,
+      "gap_count": 6,
+      "heartbeat_age_seconds": 0.428,
+      "orphan_instance_count": 2,
+      "partition_integrity": {
+        "checksum_drift": [],
+        "finalized_partition_count": 1,
+        "integrity_ok": true,
+        "manifest_path": "data/forward/BTCUSDT/microstructure/finalized-partitions.v0316.sha256.json",
+        "missing_partitions": []
+      },
+      "resync_count": 2,
+      "rolling_reliability": {
+        "24h": {
+          "depth_coverage_ratio": 0.9536220988396467,
+          "gap_count": 4,
+          "observed_seconds": 85283.247,
+          "sequence_valid_coverage_ratio": 0.9535998904919744,
+          "trade_coverage_ratio": 0.9985857245796469,
+          "window_start_ms": 1788239365342
+        },
+        "7d": {
+          "depth_coverage_ratio": 0.9536220988396467,
+          "gap_count": 4,
+          "observed_seconds": 85283.247,
+          "sequence_valid_coverage_ratio": 0.9535998904919744,
+          "trade_coverage_ratio": 0.9985857245796469,
+          "window_start_ms": 1788239365342
+        }
+      },
+      "service": {
+        "active": true,
+        "detected": true,
+        "unit": "btc-quant-microstructure-forward.service"
+      },
+      "state": "COLLECTING",
+      "uptime_ratio": 0.9536220988396467
+    },
+    "opportunity_h36": {
+      "campaign_age_days": 0.5352845949074074,
+      "campaign_id": "OPPORTUNITY_FORWARD_V0317_20260901T160000Z",
+      "expected_slots": 52,
+      "max_miss_streak": 0,
+      "missed_slots": 0,
+      "opportunity_count": 0,
+      "resolved_4h": 0,
+      "resolved_8h": 0,
+      "resolver_scheduler_active": true,
+      "scheduler_active": true,
+      "successful_scan_ratio": 1.0,
+      "terminal_failure": false
+    }
+  },
+  "forward_start": {
+    "alpha_interpretation": "NONE",
+    "captured_at_ms": 1788324056904,
+    "derivatives_v0316": {
+      "expected_scheduled_slots": 77,
+      "failed_slots": 0,
+      "fully_available_scheduled_slots": 74,
+      "max_consecutive_bad_or_missing_slots": 1,
+      "missing_slots": 1,
+      "partial_slots": 2,
+      "recorded_scheduled_slots": 76,
+      "required_field_coverage": {
+        "basis_rate": 0.961038961038961,
+        "funding_rate": 0.987012987012987,
+        "long_short_account_ratio": 0.987012987012987,
+        "open_interest": 0.987012987012987,
+        "taker_buy_sell_ratio": 0.987012987012987
+      },
+      "scheduler_active": true,
+      "scheduler_enabled": true,
+      "terminal_failure": false
+    },
+    "execution": "DISABLED",
+    "final_holdout": "SEALED",
+    "microstructure_v0315": {
+      "agg_trade_events": 1683972,
+      "book_samples": 1187155,
+      "campaign_age_seconds": 121244.714,
+      "depth_events": 1187383,
+      "depth_sequence_continuity_ratio": 0.999976537494632,
+      "gap_count": 6,
+      "heartbeat_age_seconds": -0.316,
+      "orphan_instance_count": 2,
+      "partition_integrity": {
+        "checksum_drift": [],
+        "finalized_partition_count": 1,
+        "integrity_ok": true,
+        "manifest_path": "data/forward/BTCUSDT/microstructure/finalized-partitions.v0316.sha256.json",
+        "missing_partitions": []
+      },
+      "resync_count": 2,
+      "rolling_reliability": {
+        "24h": {
+          "depth_coverage_ratio": 0.9532964179280876,
+          "gap_count": 4,
+          "observed_seconds": 84679.372,
+          "sequence_valid_coverage_ratio": 0.9532740512057647,
+          "trade_coverage_ratio": 0.9985806933003707,
+          "window_start_ms": 1788239365342
+        },
+        "7d": {
+          "depth_coverage_ratio": 0.9532964179280876,
+          "gap_count": 4,
+          "observed_seconds": 84679.372,
+          "sequence_valid_coverage_ratio": 0.9532740512057647,
+          "trade_coverage_ratio": 0.9985806933003707,
+          "window_start_ms": 1788239365342
+        }
+      },
+      "service": {
+        "active": true,
+        "detected": true,
+        "unit": "btc-quant-microstructure-forward.service"
+      },
+      "state": "COLLECTING",
+      "uptime_ratio": 0.9532964179280876
+    },
+    "opportunity_h36": {
+      "campaign_age_days": 0.5282953009259259,
+      "campaign_id": "OPPORTUNITY_FORWARD_V0317_20260901T160000Z",
+      "expected_slots": 51,
+      "max_miss_streak": 0,
+      "missed_slots": 0,
+      "opportunity_count": 0,
+      "resolved_4h": 0,
+      "resolved_8h": 0,
+      "resolver_scheduler_active": true,
+      "scheduler_active": true,
+      "successful_scan_ratio": 1.0,
+      "terminal_failure": false
+    }
+  },
+  "forward_store_historical_writes": 0,
+  "historical_dataset": {
+    "feature_available_counts": {
+      "ATR_24H": 44545,
+      "FUNDING_LEVEL": 44568,
+      "LOG_RETURN_1H": 44567,
+      "LOG_RETURN_4H": 44564,
+      "QUOTE_VOLUME_Z_24H": 44545,
+      "REALIZED_VOL_24H": 44544,
+      "SPOT_PERP_FLOW_SPREAD": 44546,
+      "SPOT_TAKER_BUY_IMBALANCE_1H": 44547,
+      "TAKER_BUY_IMBALANCE_1H": 44567,
+      "TRADE_COUNT_Z_24H": 44545
+    },
+    "funding_asof_rule": "last settled funding event at or before decision close",
+    "holdout_rows_loaded": 0,
+    "hour_count": 44568,
+    "perp_complete_hours": 44568,
+    "perp_incomplete_hours": 0,
+    "spot_complete_hours": 44547,
+    "spot_incomplete_hours": 21,
+    "synthetic_hours": 0
+  },
+  "official_archive_probe": {
+    "aggtrade_sample_rows_each": 10000,
+    "available": 24,
+    "manifest_sha256": "2e924a8a58cfcd2fa2ffea654ab9893f4e11ce315ae42d7d345be25f85b513d6",
+    "missing_or_unreachable": 0,
+    "requests": 24,
+    "sample_checksum_matches": true
+  },
+  "preregistration_sha": "9df1ce0e1db3684c9c9ec65efa82a21c296dc13e",
+  "primary_recommendation": "CONTINUE_SYMBOLIC_DISCOVERY_NO_CANDIDATE",
+  "protocol_sha256": "6b181964dd7734fcbdf08e07fb5bce400c6a0d8872cb4c5a99f4c74a68dffdf4",
+  "provisional_shadow_started": false,
+  "raw_data": {
+    "data/research/v0.3.18_official_samples/perp_aggTrades/BTCUSDT-aggTrades-2024-01-01.zip": "ed5c4326e6ccdec61504bc7d9bed594c4fe0a88f845c7a6ec5b934c97c01cb1c",
+    "data/research/v0.3.18_official_samples/spot_aggTrades/BTCUSDT-aggTrades-2024-01-01.zip": "9572fa650e2a7850e528fc6d0c3ec7874211af47947416f75004f0f95751dca3"
+  },
+  "run_id": "v0.3.18_historical_symbolic_20260902T124500Z",
+  "safety": {
+    "auto_execute": false,
+    "candidate_freeze": "NONE",
+    "execution": "DISABLED",
+    "external_llm_formula_generation": false,
+    "final_holdout": "SEALED",
+    "historical_tags": [
+      "PROVISIONAL_SANDBOX_ONLY",
+      "NOT_FORWARD_VALIDATED",
+      "NOT_RUNTIME_ACTIONABLE"
+    ],
+    "paid_vendor_purchase_authorized": false,
+    "qualified_direction_engine": "NONE",
+    "runtime_maximum": "OPPORTUNITY_ONLY",
+    "strategy": "EXPERIMENTAL"
+  },
+  "search": {
+    "attempts": 820,
+    "duplicates_rejected": 293,
+    "formula_evaluations": 512,
+    "invalid_formulas": 0,
+    "multiple_testing": {
+      "block_hours": 168,
+      "familywise_adjusted_p_value": 0.3582089552238806,
+      "null_best_t_stat_p95": 3.329185579956317,
+      "observed_best_t_stat": 2.646427974417597,
+      "passed_0_05": false,
+      "permutations": 200,
+      "procedure": "EMPIRICAL_BEST_SCORE_CIRCULAR_BLOCK_PERMUTATION",
+      "sample_step_hours": 8,
+      "zero_or_single_event_formulas_excluded": 32
+    },
+    "over_lookback_rejected": 3,
+    "over_token_limit_rejected": 12,
+    "pseudo_forward_touches": 5,
+    "top_k_frozen_before_pseudo_forward": 5,
+    "valid_unique_formulas": 512,
+    "validation_candidates": 20,
+    "vm_failures": 0
+  },
+  "top_frozen_candidate": {
+    "canonical_formula": [
+      {
+        "kind": "FEATURE",
+        "value": "ATR_24H"
+      },
+      {
+        "kind": "FEATURE",
+        "value": "TRADE_COUNT_Z_24H"
+      },
+      {
+        "kind": "OPERATOR",
+        "value": "SIGN"
+      },
+      {
+        "kind": "OPERATOR",
+        "value": "MAX"
+      },
+      {
+        "kind": "FEATURE",
+        "value": "LOG_RETURN_4H"
+      },
+      {
+        "kind": "FEATURE",
+        "value": "FUNDING_LEVEL"
+      },
+      {
+        "kind": "OPERATOR",
+        "value": "NEG"
+      },
+      {
+        "kind": "OPERATOR",
+        "parameter": 24,
+        "value": "ROLL_Z_N"
+      },
+      {
+        "kind": "OPERATOR",
+        "value": "CLIP"
+      }
+    ],
+    "discovery": {
+      "bootstrap_ci_high": null,
+      "bootstrap_ci_low": null,
+      "chronological_fold_means": [
+        0.00107013961083762,
+        3.411551243609884e-05,
+        0.002291052013025401,
+        0.0007814128141756771
+      ],
+      "event_count": 1265,
+      "gross_mean_return": 0.0010439722665329734,
+      "long_count": 1265,
+      "long_fraction": 1.0,
+      "net_mean_return": 0.0010439722665329734,
+      "short_count": 0,
+      "standard_error": 0.0005926733679107815,
+      "t_stat": 1.761463097646946,
+      "turnover": 0.0,
+      "wait_count": 2019
+    },
+    "formula_hash": "762533ea4dcbbbdbe386cf503b6ebb3fe11a78c4edd722af0ed2576bb565b3b6",
+    "gate_checks": {
+      "discovery_events": true,
+      "discovery_net": true,
+      "long_balance": false,
+      "multiple_testing": false,
+      "positive_pseudo_forward_folds": false,
+      "positive_validation_folds": true,
+      "pseudo_forward_ci": false,
+      "pseudo_forward_events": true,
+      "pseudo_forward_net": false,
+      "validation_ci": false,
+      "validation_events": false,
+      "validation_net": true
+    },
+    "passed_all_frozen_gates": false,
+    "pseudo_forward": {
+      "bootstrap_ci_high": -0.0006136267196989823,
+      "bootstrap_ci_low": -0.0023972874038103754,
+      "chronological_fold_means": [
+        -0.0023726198495492134,
+        3.771074386080178e-05,
+        -0.0020907989663806227,
+        -0.0019146974583852728
+      ],
+      "event_count": 517,
+      "gross_mean_return": -0.00038573889920114307,
+      "long_count": 517,
+      "long_fraction": 1.0,
+      "net_mean_return": -0.001585738899201143,
+      "short_count": 0,
+      "standard_error": 0.0005443096193219538,
+      "t_stat": -2.913303096088026,
+      "turnover": 0.0,
+      "wait_count": 577
+    },
+    "validation": {
+      "bootstrap_ci_high": 0.0018572037912068166,
+      "bootstrap_ci_low": -0.0007450369424789699,
+      "chronological_fold_means": [
+        0.0018910708933376063,
+        0.00048502270995863083,
+        -0.00120413042835462,
+        0.0011114221587280493
+      ],
+      "event_count": 383,
+      "gross_mean_return": 0.0017673992719032645,
+      "long_count": 383,
+      "long_fraction": 1.0,
+      "net_mean_return": 0.0005673992719032647,
+      "short_count": 0,
+      "standard_error": 0.0008177626484794063,
+      "t_stat": 0.6938434678550294,
+      "turnover": 0.0,
+      "wait_count": 621
+    }
+  },
+  "version": "0.3.18"
+}

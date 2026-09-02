@@ -1,0 +1,36 @@
+{
+  "feature_data_audit": {
+    "feature_available_counts": {
+      "ATR_24H": 44545,
+      "FUNDING_LEVEL": 44568,
+      "LOG_RETURN_1H": 44567,
+      "LOG_RETURN_4H": 44564,
+      "QUOTE_VOLUME_Z_24H": 44545,
+      "REALIZED_VOL_24H": 44544,
+      "SPOT_PERP_FLOW_SPREAD": 44546,
+      "SPOT_TAKER_BUY_IMBALANCE_1H": 44547,
+      "TAKER_BUY_IMBALANCE_1H": 44567,
+      "TRADE_COUNT_Z_24H": 44545
+    },
+    "funding_asof_rule": "last settled funding event at or before decision close",
+    "holdout_rows_loaded": 0,
+    "hour_count": 44568,
+    "perp_complete_hours": 44568,
+    "perp_incomplete_hours": 0,
+    "spot_complete_hours": 44547,
+    "spot_incomplete_hours": 21,
+    "synthetic_hours": 0
+  },
+  "final_holdout_rows_loaded": 0,
+  "historical_l2_synthesized": false,
+  "perp_manifest_sha256": "928e913f41e74077359cbdf804aaf95d452ee1e1b80d5f05d28eafe4e0b639f2",
+  "roles": {
+    "existing_checksum_verified_klines": "CANONICAL_HISTORICAL",
+    "existing_microstructure": "FORWARD_PIT_ONLY",
+    "historical_l2_without_vendor": "UNAVAILABLE_OR_UNTRUSTWORTHY",
+    "local_running_collectors": "TRUE_FORWARD_LOCAL_PIT",
+    "official_archive": "OFFICIAL_HISTORICAL_TIMESTAMPED",
+    "vendor_imports": "VENDOR_RECORDED_HISTORICAL_PIT_PROXY"
+  },
+  "spot_manifest_sha256": "59bab3914fef973aaae04592540a51894e72c1d74e780c3dd830fbedc4b4acfa"
+}
