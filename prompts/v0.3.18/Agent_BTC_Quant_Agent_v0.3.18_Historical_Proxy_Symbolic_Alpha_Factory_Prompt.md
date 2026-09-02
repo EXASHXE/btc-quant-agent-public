@@ -1,21 +1,36 @@
-# BTC Quant Agent v0.3.18 — Historical Proxy Acceleration & Causal Symbolic Alpha Factory
+# BTC Quant Agent v0.3.18 — Historical Data Acceleration & Causal Symbolic Alpha Factory
+
+> Revision: 2026-09-02 — expand official Binance historical data coverage, add vendor-PIT data path, clarify AlphaGPT Transformer semantics, and allow a frozen provisional candidate to start an isolated real-time shadow before the 30-day infrastructure gates mature.
 
 ## 0. Objective
 
 This round accelerates strategy construction **without weakening Forward Evidence truthfulness**.
 
-The project must continue the existing v0.3.16/v0.3.17 Forward campaigns unchanged, but in parallel build a **historical-development candidate sandbox** and a **causal symbolic alpha factory** inspired by the useful architectural ideas in `imbue-bit/AlphaGPT`.
+Continue the existing v0.3.16/v0.3.17 Forward campaigns unchanged, but in parallel build a historical-development candidate sandbox and a causal symbolic alpha factory inspired by the useful ideas in `imbue-bit/AlphaGPT`.
 
-This is NOT permission to trade real money. It is also NOT permission to reinterpret historical proxy results as Forward validation.
+The key acceleration principle is:
+
+```text
+True Forward evidence keeps accumulating in real calendar time
+                +
+Official / audited historical data is used now to discover and build candidates
+                +
+A strong historical candidate may be frozen and placed into a separate real-time shadow immediately
+```
+
+This is NOT permission to trade real money. Historical or vendor-reconstructed data does not become true local Forward PIT merely because it is high quality.
 
 Primary goals:
 
-1. Use historical Development data and strictly chronological masked/purged evaluation to build the end-to-end candidate framework now instead of waiting 30 days before writing strategy code.
-2. Audit which historical derivatives / trade-flow datasets can be reconstructed with trustworthy timestamp provenance, and clearly separate them from true Forward PIT data.
-3. Implement a causal Formula DSL + deterministic VM + Formula Registry, inspired by AlphaGPT but without importing its look-ahead / full-series normalization / simplistic best-backtest-wins semantics.
-4. Implement a bounded symbolic search baseline (Random Grammar Search first; Genetic optional only if time remains). Do not train a Transformer policy generator yet.
-5. Allow historical results to create only `PROVISIONAL_SANDBOX_CANDIDATE`, never `VALIDATED_FORWARD`, `LIVE_ELIGIBLE`, or execution authorization.
-6. Continue H36 Opportunity, Derivatives successor, and Microstructure Forward collection with no gate reset or start-time movement.
+1. Exhaust the free official Binance historical archives before waiting for new Forward data.
+2. Build a strict historical provenance matrix that distinguishes official archives, vendor-recorded historical PIT proxies, Development proxies, and true local Forward PIT.
+3. Add official Spot and USD-M Perpetual aggregate-trade history where available, plus mark/index/premium/funding history, with checksum and timestamp-unit audits.
+4. Evaluate whether vendor historical data such as Tardis / Amberdata / Kaiko / CoinGlass can materially add OI, L2 diff-depth, liquidation, positioning, and receive-timestamp information; do not make a paid vendor a hard blocker.
+5. Implement an AlphaGPT-inspired causal Formula DSL, deterministic VM, Formula Registry, and bounded symbolic proposal/evaluation pipeline.
+6. Required search baseline is Random Grammar Search. Create a clean interface for Genetic and a **local tiny Transformer formula proposal engine**; a tiny Transformer may be implemented/trained only after the Random baseline is complete and only under an equal/frozen Discovery-only budget. Do not call an external LLM API to generate formal search formulas.
+7. Build a full research-only candidate path with hypothetical LONG/SHORT/WAIT, Entry/SL/TP/sizing, fees/slippage/funding, and event-driven PnL.
+8. If and only if a candidate passes the frozen historical validation + internal pseudo-forward gate, freeze it and start a separate **PROVISIONAL_CANDIDATE_FORWARD_SHADOW** from a future fixed UTC boundary. It must not authorize orders or alter normal Runtime.
+9. Keep Final Holdout sealed and existing H36 / Derivatives / Microstructure campaigns unchanged.
 
 ---
 
@@ -33,7 +48,7 @@ Formal/published v0.3.17 delivery SHA:
 7ffadae819b03fb5d9de57a0c8b85c3ca6acb637
 ```
 
-The v0.3.17 branch may contain prompt-only commits after the formal delivery. Always start from the **latest remote HEAD** of:
+The v0.3.17 branch may contain prompt-only commits after the formal result. Always fetch first and identify the actual latest remote HEAD of:
 
 ```text
 codex/v0.3.17-opportunity-successor-forward-stabilization
@@ -45,9 +60,18 @@ Work branch:
 codex/v0.3.18-historical-proxy-symbolic-alpha-factory
 ```
 
-A branch with this name may already exist. Before implementation, fetch and fast-forward/rebase it to the latest remote v0.3.17 HEAD if necessary.
+The branch may already exist. Ensure it contains the latest v0.3.17 lineage and this revised prompt before implementation. Do not merge to `main` automatically.
 
-Do not merge to `main` automatically.
+Before changing code, report:
+
+```bash
+git status
+git branch --show-current
+git fetch --all --prune
+git log -10 --oneline
+git rev-parse HEAD
+gh auth status
+```
 
 ---
 
@@ -65,9 +89,9 @@ candidate_freeze = NONE
 final_holdout = SEALED
 ```
 
-No Binance order submission, no paper/testnet/live authorization, no Final Holdout access.
+No Binance order submission, no paper/testnet/live authorization, and no Final Holdout access.
 
-A historical sandbox may compute hypothetical LONG/SHORT labels and hypothetical PnL **inside research only**, but those objects must be explicitly tagged:
+Historical and provisional objects must be explicitly tagged:
 
 ```text
 PROVISIONAL_SANDBOX_ONLY
@@ -75,133 +99,280 @@ NOT_FORWARD_VALIDATED
 NOT_RUNTIME_ACTIONABLE
 ```
 
+A separate real-time provisional shadow, if started, must remain:
+
+```text
+PROVISIONAL_CANDIDATE_FORWARD_SHADOW
+execution = DISABLED
+runtime_actionable = false
+```
+
 ---
 
-## 3. Important statistical principle: faster collection does not replace calendar time
+## 3. Faster sampling does not replace calendar time
 
-Do NOT claim that collecting 5m or 1m snapshots makes 7 calendar days equivalent to 30 calendar days.
+Do NOT claim that collecting every 5m or 1m makes 7 calendar days equivalent to 30 days. Higher-frequency samples are strongly autocorrelated and do not reproduce market-regime diversity.
 
-Higher-frequency sampling may improve feature resolution, but effective independent sample size remains constrained by market autocorrelation and regime diversity.
+Preserve all existing formal Forward gates unchanged.
 
-Therefore preserve the existing formal Forward gates unchanged.
-
-You MAY add an isolated auxiliary high-frequency derivatives capture campaign (recommended 5m, only if endpoint rate limits and semantics permit), but:
+You MAY add an isolated auxiliary high-frequency Derivatives PIT capture (recommended 5m only if endpoint limits and semantics permit), but it must be labeled:
 
 ```text
 AUXILIARY_HIGH_FREQ_PIT
+formal_gate_eligible = false
 ```
 
-must never count toward the existing formal v0.3.16 15m evidence gate.
+It must never count toward the existing v0.3.16 15m evidence epoch.
 
-If implemented, record:
-- exact endpoint set;
-- schedule;
-- rate-limit budget;
-- source timestamps;
-- observed timestamps;
-- duplicate/gap semantics;
-- explicit `formal_gate_eligible=false`.
-
-Microstructure is already stream-based; do not attempt to create fake additional independent samples by re-bucketing the same events.
+Record endpoint set, schedule, rate-limit budget, source timestamps, observed timestamps, gaps, duplicates, and formal-role isolation.
 
 ---
 
-## 4. Historical data acceleration track
+## 4. Historical data acceleration: use the richest trustworthy data now
 
-### 4.1 Historical data provenance audit
+### 4.1 Source hierarchy and formal roles
 
-Before any alpha search, create a machine-readable audit of historical sources available to the repository.
+Use the following hierarchy:
 
-At minimum classify each dataset as one of:
+```text
+Tier 1 — Binance official public archive / official historical endpoint
+    => CANONICAL_HISTORICAL or OFFICIAL_HISTORICAL_TIMESTAMPED
+
+Tier 2 — reputable vendor that recorded exchange data historically
+    => VENDOR_RECORDED_HISTORICAL_PIT_PROXY
+
+Tier 3 — our own running collectors at the time of observation
+    => TRUE_FORWARD_LOCAL_PIT
+```
+
+Never collapse these roles into one another.
+
+The provenance audit must support at least:
 
 ```text
 CANONICAL_HISTORICAL
 OFFICIAL_HISTORICAL_TIMESTAMPED
+VENDOR_RECORDED_HISTORICAL_PIT_PROXY
 DEVELOPMENT_PROXY
 FORWARD_PIT_ONLY
 UNAVAILABLE_OR_UNTRUSTWORTHY
 ```
 
-Audit at least:
-- BTCUSDT canonical 1m OHLCV;
-- taker-buy volume / quote volume / trade count already present in canonical candles;
-- official funding history;
-- spot aggregate trades if available from official archive/history;
-- perpetual aggregate trades if available from official archive/history;
-- historical OI series if an official endpoint/archive can provide timestamped historical values;
-- historical basis / premium / mark-price series;
-- global long-short account ratio historical series;
-- taker buy/sell ratio historical series;
-- L2 diff-depth history;
-- order-book snapshots.
+### 4.2 Binance official archive: P0, do this before paid/vendor data
 
-Do not assume an endpoint supports 2021-2026 history merely because the current REST endpoint exposes a current value.
+Audit and, where usable, ingest the official Binance public-data / Binance Vision archives for BTCUSDT.
 
-For every historical source record:
+At minimum investigate and verify actual archive coverage/schema/checksums for:
 
 ```text
-source_name
+Spot BTCUSDT aggTrades
+USD-M Futures BTCUSDT aggTrades
+Spot BTCUSDT 1m klines
+USD-M BTCUSDT 1m klines
+USD-M markPriceKlines
+USD-M indexPriceKlines
+USD-M premiumIndexKlines / premium data
+settled funding history
+```
+
+Important correction to older assumptions: current REST lookback limits do NOT imply that historical `aggTrades` are unavailable. Official Binance public archives provide downloadable daily/monthly historical files for Spot and USD-M datasets. Use archive files rather than attempting to reconstruct years of history from a current short-lookback REST endpoint.
+
+Requirements:
+
+- Prefer official monthly files plus official `.CHECKSUM` verification when available.
+- Record exact archive path pattern actually used; do not assume a path without testing it.
+- Build a manifest of requested/downloaded/missing months.
+- Preserve source files or their hashes in the data manifest; large raw data remains gitignored.
+- No gap filling or synthetic trades.
+- Duplicate IDs/timestamps must be audited.
+- Validate price/quantity/trade-id monotonic semantics where applicable.
+- Normalize timestamp units explicitly and test them.
+
+### 4.3 Timestamp semantics are a first-class requirement
+
+For every dataset record:
+
+```text
 provider
-endpoint_or_archive
+source_name
 symbol
 coverage_start
 coverage_end
-time_resolution
-source_timestamp_semantics
+resolution_or_event_type
+exchange_event_timestamp_field
+source_timestamp_unit
+local_or_vendor_receive_timestamp_field (if any)
 retrieval_timestamp
 checksum_or_manifest
-lookback_limit
+lookback_limit_if_rest
 point_in_time_interpretation
 known_biases
 formal_role
 ```
 
-If only recent history is available, use it only as a recent Development proxy and say so.
+Special care:
 
-Do NOT backfill any historical row into Forward Evidence stores.
+- Binance public Spot archive timestamps changed to microsecond-scale for newer data. Detect/validate unit by documented dataset semantics plus value-range sanity checks; do not silently interpret microseconds as milliseconds.
+- Futures datasets may use different timestamp semantics from Spot; test each dataset independently.
+- Preserve the original raw timestamp and add normalized milliseconds as a derived field.
+- A normalization test must include both millisecond and microsecond examples.
 
-### 4.2 Strict historical masking semantics
+### 4.4 What to derive from official aggTrades
 
-Historical masking is allowed to accelerate framework construction, but masking alone does not restore global project innocence because earlier versions have already inspected parts of Development.
+Use `aggTrades` to construct causal historical market-flow features that are richer than candle-level taker totals, subject to verified schema semantics.
 
-Therefore all such evaluation must be named:
+Potential registered features include:
+
+```text
+SPOT_AGG_BUY_NOTIONAL
+SPOT_AGG_SELL_NOTIONAL
+SPOT_AGG_NET_TAKER_FLOW
+SPOT_AGG_TRADE_COUNT_IMBALANCE
+SPOT_AGG_MEAN_TRADE_SIZE
+SPOT_AGG_TRADE_SIZE_SKEW_PROXY
+SPOT_AGG_BURSTINESS
+
+PERP_AGG_BUY_NOTIONAL
+PERP_AGG_SELL_NOTIONAL
+PERP_AGG_NET_TAKER_FLOW
+PERP_AGG_TRADE_COUNT_IMBALANCE
+PERP_AGG_MEAN_TRADE_SIZE
+PERP_AGG_TRADE_SIZE_SKEW_PROXY
+PERP_AGG_BURSTINESS
+
+SPOT_PERP_NET_FLOW_SPREAD
+SPOT_PERP_FLOW_LEAD_LAG_CAUSAL
+MARK_INDEX_BASIS
+PREMIUM_LEVEL
+FUNDING_LEVEL
+```
+
+Use the maker/buyer-maker field only after verifying its direction convention. Document how aggressor BUY/SELL is derived.
+
+Do NOT silently create an "iceberg" or "absorption" label from aggTrades alone. Such terms require explicit operational definitions and preferably order-book context.
+
+### 4.5 Historical OI / positioning / L2: vendor path, not fabrication
+
+Current exchange REST retention for OI / long-short / related positioning may be limited. Do not pretend it provides 2021-2026 PIT simply because an endpoint exists today.
+
+Audit vendor options at minimum:
+
+```text
+Tardis.dev
+Amberdata
+Kaiko
+CoinGlass
+```
+
+Priorities:
+
+- Tardis.dev: tick trades, incremental L2/order-book reconstruction, OI/funding/liquidations/derivative ticker where supported, exchange timestamp and vendor/local receive timestamp.
+- Amberdata: institutional historical derivatives/order-book/OI/liquidation coverage where supported.
+- Kaiko: institutional L1/L2 historical market data and normalized exchange feeds.
+- CoinGlass: OI/funding/positioning history; treat primarily as derivatives-sentiment/positioning, not tick-L2 ground truth.
+
+For each provider record:
+
+```text
+dataset
+BTCUSDT venue/instrument exact mapping
+coverage dates
+frequency/event granularity
+exchange timestamp available?
+receive timestamp available?
+L2 sequence reconstructable?
+OI semantics
+liquidation semantics
+cost/access requirement
+sample file/API availability
+license/redistribution constraints
+recommended_formal_role
+```
+
+Do NOT purchase anything automatically and do NOT make vendor access a blocker for v0.3.18. First complete the Tier-1 official-data path. If credentials/data are not available, implement a clean vendor import adapter/manifest contract and report what additional feature families would become available.
+
+### 4.6 Historical L2 prohibition
+
+Never synthesize historical L2, OFI, microprice, depth imbalance, or queue dynamics from OHLCV/candle data.
+
+Historical L2 features are allowed only when a genuine historical incremental depth/order-book source is obtained and audited. Otherwise these remain `FORWARD_PIT_ONLY` from the existing Microstructure campaign.
+
+---
+
+## 5. Historical masking / pseudo-forward protocol
+
+Historical masking accelerates development but does not restore global project innocence because earlier research already inspected parts of Development.
+
+All such evaluation must be called:
 
 ```text
 DEVELOPMENT_INTERNAL_PSEUDO_FORWARD
 ```
 
-Never call it true OOS or Forward.
+Never call it true Forward or untouched OOS.
 
-Implement a frozen chronological split protocol before any search results are inspected.
+Before any formal search result is viewed, preregister and commit a protocol JSON containing:
 
-Recommended architecture:
+- exact Discovery/search window;
+- validation/selection window;
+- internal pseudo-forward window;
+- purge interval;
+- embargo interval;
+- label horizons;
+- maximum formula lookback;
+- search seed;
+- search budget;
+- top-K allowed to touch pseudo-forward;
+- provisional-candidate gate.
 
-- Discovery/search window: earlier Development only.
-- Selection/validation window: later Development, never used for formula generation reward.
-- Internal pseudo-forward window: final Development segment before `DEV_END`, touched only once per frozen top-K candidate set.
-- Purge/embargo at boundaries >= maximum label horizon and maximum formula lookback.
+Use strictly chronological splits. Purge/embargo must be at least the maximum of label horizon and formula lookback necessary to prevent boundary leakage.
 
-You may choose exact dates based on existing Development coverage, but they MUST be frozen in a protocol JSON before running the formula search.
+Final Holdout remains:
 
-Final Holdout `[2026-02-01, 2026-08-01)` remains sealed and untouched.
+```text
+[2026-02-01, 2026-08-01)
+SEALED
+```
+
+Do not access it.
 
 ---
 
-## 5. AlphaGPT-inspired architecture to implement
+## 6. AlphaGPT-inspired architecture: borrow the good parts, not the leakage
 
-Reference project:
+Reference:
 
 ```text
 https://github.com/imbue-bit/AlphaGPT
 ```
 
-Borrow the architecture ideas, not its research shortcuts.
+Prefer clean-room implementation. If direct code is copied, preserve Apache-2.0 attribution/license requirements.
 
-Prefer clean-room reimplementation. If any code is copied directly, preserve required Apache-2.0 attribution/license notices.
+### 6.1 Clarify what the AlphaGPT Transformer is
 
-### 5.1 Causal Formula DSL
+The AlphaGPT Transformer is NOT an OpenAI/Gemini/Claude API call and is NOT a general-purpose LLM.
 
-Create a deterministic formula vocabulary over registered features.
+It is a small local PyTorch Transformer policy over a tiny formula-token vocabulary:
+
+```text
+feature tokens + operator tokens -> next formula token
+```
+
+The useful architectural concept is:
+
+```text
+Proposal model proposes an interpretable formula
+        ↓
+Deterministic VM executes it
+        ↓
+External quant evaluator scores it
+```
+
+Formal v0.3.18 search must never depend on an external natural-language model API. LLMs may help humans propose research hypotheses in documentation, but their output is not a formal formula-search oracle.
+
+### 6.2 Causal Formula DSL
+
+Implement a deterministic formula vocabulary over registered features.
 
 Recommended operators:
 
@@ -218,6 +389,7 @@ MAX
 GATE
 DELAY_1
 DELAY_N
+ROLL_SUM_N
 ROLL_MEAN_N
 ROLL_STD_N
 ROLL_Z_N
@@ -227,60 +399,69 @@ CLIP
 ```
 
 Rules:
-- every operator must declare arity;
-- every operator must declare causal lookback;
+
+- every operator declares arity and causal lookback;
 - no full-series normalization;
 - no future-dependent mean/std/median/MAD;
 - no `torch.roll` wrap-around contamination;
-- startup unavailable rows must remain unavailable/masked, not wrap from the end;
-- divide-by-zero handling must be explicit;
-- NaN/Inf handling must be explicit and auditable;
-- a formula's total lookback must be computable before execution;
-- unavailable input feature -> unavailable formula output, not silently zero unless the protocol explicitly defines a zero value.
+- startup unavailable rows stay unavailable/masked;
+- divide-by-zero handling is explicit;
+- NaN/Inf handling is explicit and auditable;
+- formula total lookback is computable before execution;
+- unavailable input => unavailable output unless zero has an explicit economic meaning frozen in protocol.
 
-Suggested files:
+Suggested package:
 
 ```text
 src/btc_quant_agent/symbolic_alpha/dsl.py
 src/btc_quant_agent/symbolic_alpha/vm.py
 src/btc_quant_agent/symbolic_alpha/registry.py
+src/btc_quant_agent/symbolic_alpha/proposal.py
 src/btc_quant_agent/symbolic_alpha/search.py
+src/btc_quant_agent/symbolic_alpha/evaluate.py
 ```
 
-### 5.2 Deterministic Stack/Expression VM
+### 6.3 Deterministic VM
 
-Inspired by AlphaGPT's StackVM, but production-research-grade:
+Inspired by AlphaGPT StackVM, but research-grade:
 
-- deterministic;
-- typed formula tokens / AST or postfix representation;
-- exact serialization;
-- exact formula hash;
-- no blanket `except Exception: return None`;
-- return structured failure reason;
-- unit tests for every operator;
-- causality tests proving output at time `t` is unchanged when future rows `>t` are modified.
+- typed postfix/AST representation;
+- exact serialization and canonical hash;
+- deterministic execution;
+- structured failure reasons, no blanket `except Exception: return None`;
+- operator-level unit tests;
+- formula-level causality tests;
+- feature provenance and availability checks;
+- reproducible output hash where practical.
 
-### 5.3 Formula Registry
+Critical causality property:
 
-Add a machine-readable registry, e.g.:
+> Mutating all market rows after time `t` must not change formula output at or before `t`.
+
+### 6.4 Formula Registry
+
+Add a machine-readable registry such as:
 
 ```text
 configs/formula_registry.json
 ```
 
-Each candidate records:
+Record at minimum:
 
 ```text
 formula_id
 formula_hash
 formula_tokens_or_ast
 input_feature_ids
+input_data_roles
 operator_set
 max_lookback
+proposal_engine
 search_run_id
+search_seed
 search_budget
 complexity
-training_window
+Discovery_window
 validation_window
 pseudo_forward_window
 metrics_by_fold
@@ -290,161 +471,249 @@ research_eligibility
 runtime_eligibility
 ```
 
-Allowed statuses should distinguish at least:
+Statuses:
 
 ```text
 DISCOVERY_ONLY
 FAILED_VALIDATION
-PROVISIONAL_SANDBOX_CANDIDATE
 REJECTED_REDUNDANT
 REJECTED_UNSTABLE
+PROVISIONAL_SANDBOX_CANDIDATE
+PROVISIONAL_FORWARD_SHADOW
 ```
 
-No v0.3.18 formula may become `VALIDATED_FORWARD` or `LIVE_ELIGIBLE`.
+No v0.3.18 formula may become `VALIDATED_FORWARD`, `LIVE_ELIGIBLE`, or Runtime-authorized.
 
 ---
 
-## 6. Search engine: start simple before Transformer
+## 7. Proposal engines: benchmark simple search before AI
 
-Do NOT implement or train the AlphaGPT Transformer policy generator in this round.
-
-First establish a transparent baseline:
-
-### P0: Random Grammar Search
-
-Use a fixed random seed and frozen search budget.
-
-The search budget MUST be pre-registered before results.
-
-For example, choose a bounded budget such as 2,000-10,000 valid unique formulas depending runtime; record the exact final number in the protocol.
-
-Formula generation constraints:
-- maximum token/AST depth;
-- maximum lookback;
-- reject algebraically trivial formulas where feasible;
-- deduplicate by canonical formula hash;
-- complexity penalty;
-- avoid repeated evaluation of identical formulas.
-
-### Optional P1: Genetic search
-
-Only if Random Search + evaluation pipeline is complete and tested.
-
-If implemented, freeze mutation/crossover/population/generation budget before formal run.
-
-### Explicitly prohibited in v0.3.18
-
-- Transformer/RL training;
-- reward tuning after observing validation/pseudo-forward;
-- unlimited search until a profitable formula appears;
-- reversing a failed formula post hoc;
-- scanning many thresholds on validation/test;
-- using Final Holdout for search or selection.
-
----
-
-## 7. Feature families allowed in symbolic search
-
-Only features with defensible historical provenance may enter historical search.
-
-Potential allowed inputs include, subject to the provenance audit:
-
-- price/return/ATR/volatility features;
-- canonical taker participation / volume features;
-- funding history;
-- spot/perpetual aggregate-trade flow features if historical coverage is valid;
-- historical mark/premium/basis features if officially timestamped;
-- any derivatives historical series proven by the audit to be timestamped and causally usable.
-
-Do NOT synthesize historical L2 OFI from candles.
-
-Do NOT pretend current-forward OI/basis/long-short snapshots existed historically if they cannot be reconstructed with trustworthy timestamped history.
-
-Microstructure L2 features remain Forward-only unless a genuine historical L2 source with adequate provenance is found and audited.
-
----
-
-## 8. Evaluation protocol for symbolic candidates
-
-The formula generator/search objective may only use the Discovery window.
-
-Validation must be separate from search reward.
-
-For each top candidate evaluate at minimum:
-- signed forward return at frozen horizons;
-- hit rate / calibration if converted to directional score;
-- trade count or event count;
-- expectancy in R only if a frozen sandbox entry/exit rule is defined in protocol;
-- PF / MDD only if actual sandbox trades are generated causally;
-- turnover;
-- fees/slippage stress where applicable;
-- Early/Late stability;
-- LONG/SHORT side stability;
-- chronological fold stability;
-- bootstrap confidence interval;
-- candidate correlation/redundancy.
-
-### Multiple-testing governance
-
-Because formula search evaluates many candidates, explicitly record:
+Define an interface such as:
 
 ```text
-number_of_unique_formulas_evaluated
-number_reaching_validation
+FormulaProposalEngine
+    propose(n, feature_registry, operator_registry, seed, constraints)
+```
+
+### P0 — Random Grammar Search (required)
+
+Required formal baseline.
+
+Freeze before results:
+
+- seed;
+- valid unique formula budget;
+- maximum AST/token length;
+- maximum total lookback;
+- complexity penalty;
+- allowed features/operators;
+- duplicate canonicalization rules.
+
+Budget must be finite. Do not continue searching until a profitable formula appears.
+
+### P1 — Genetic Search (optional)
+
+Only after Random pipeline is complete. Freeze population, generations, mutation/crossover probabilities, and total formula-evaluation budget before results.
+
+### P2 — Tiny local Transformer Proposal Engine (optional but architecture should be ready)
+
+You MAY implement a small local PyTorch Transformer proposal engine inspired by AlphaGPT if P0 is complete and time/runtime permit.
+
+It must be explicitly documented as:
+
+```text
+LOCAL_FORMULA_POLICY_MODEL
+NOT_LLM
+NO_EXTERNAL_API
+DISCOVERY_PROPOSAL_ONLY
+```
+
+Requirements if trained:
+
+- vocabulary contains only formula tokens, not natural language;
+- small model only; no need for billion-parameter architecture;
+- training reward may use Discovery data only;
+- Validation and pseudo-forward outcomes must never flow into gradients, reward tuning, early stopping, or model selection;
+- freeze architecture, optimizer, steps, formula-evaluation budget, reward definition, seed, and complexity penalty before training;
+- reward must penalize complexity, turnover/cost fragility, and trivial/redundant formulas where appropriate;
+- compare against Random Search at equal or clearly normalized formula-evaluation budget;
+- generated formulas still pass through the deterministic VM and the exact same external evaluator;
+- no model inference is required in production Runtime after a formula is frozen.
+
+Do NOT copy AlphaGPT's full-series normalization, look-ahead semantics, "best in-sample backtest wins", or unused architectural complexity merely because it exists. Do not add LoRD/MTP/critic machinery unless an explicit preregistered ablation justifies it.
+
+---
+
+## 8. Search feature families
+
+### Tier-1 official historical features may include after audit
+
+```text
+price / log return
+ATR / realized volatility
+volume / quote volume / trade count
+kline taker-buy participation
+funding
+mark/index/premium/basis
+Spot aggTrade aggressive-flow features
+Perp aggTrade aggressive-flow features
+Spot-vs-Perp flow spread / causal lead-lag features
+```
+
+### Vendor historical features may additionally include only if acquired/audited
+
+```text
+Open Interest
+incremental L2 depth
+OFI
+depth imbalance
+microprice displacement
+book depletion/replenishment
+liquidations
+positioning / long-short ratios
+vendor receive-latency features where economically justified
+```
+
+Keep feature availability timestamps causal. A feature computed from a bar/event is available only after all required source events are fully known under its source semantics.
+
+Do not let Formula Search invent a feature whose historical provenance is weaker than the registry says.
+
+---
+
+## 9. Candidate evaluation and multiple-testing governance
+
+Search/reward sees Discovery only.
+
+Validation is separate from proposal/reward.
+
+The internal pseudo-forward segment is touched only once by a frozen top-K set selected without pseudo-forward outcomes.
+
+For each top candidate report at minimum:
+
+- signed return at frozen horizons;
+- event/trade counts;
+- LONG/SHORT balance;
+- Early/Late stability;
+- chronological-fold stability;
+- bootstrap CI;
+- turnover;
+- fees/slippage/funding sensitivity where applicable;
+- candidate correlation/redundancy;
+- complexity;
+- agreement/disagreement with simple baselines.
+
+If a frozen sandbox entry/exit rule is defined, also report:
+
+```text
+expectancy_R
+profit_factor
+max_drawdown_R
+max_losing_streak
+holding_time
+fees
+slippage
+funding
+net_R
+```
+
+Multiple-testing audit must record:
+
+```text
+unique_formulas_evaluated
+invalid_formulas
+validation_candidates
 top_k_frozen_before_pseudo_forward
 search_seed
 search_budget
+proposal_engine
 ```
 
-The internal pseudo-forward segment may be evaluated only for the frozen top-K selected without seeing pseudo-forward outcomes.
+Use at least one multiple-testing-aware procedure suitable to the metric, for example:
 
-At minimum report a multiple-testing-aware caution metric or procedure. Preferred options include one or more of:
-- Deflated Sharpe Ratio where appropriate;
-- empirical null/permutation distribution of best-search score;
+- empirical-null/permutation distribution of best search score;
 - bootstrap Reality-Check-style comparison;
-- FDR control across candidate hypotheses.
+- Deflated Sharpe Ratio where appropriate;
+- FDR control for a hypothesis set.
 
-Do not make a strong Alpha claim from nominal p-values after thousands of searches.
+A nominal p-value after thousands of formulas is not sufficient.
 
 ---
 
-## 9. Build a candidate-ready sandbox framework now
+## 10. Build the full provisional trading sandbox now
 
-The user's goal is to avoid waiting 30 days before building the trading framework.
+Do not wait 30 days to write the tradable architecture.
 
-Therefore implement a **research-only candidate sandbox** that can take a frozen provisional formula and combine it with the existing directionless TP/BR Opportunity layer.
-
-Conceptual path:
+Research-only conceptual path:
 
 ```text
-Historical/proxy Direction Score
+Historical Direction Formula
         +
-TP/BR Opportunity
+Frozen TP/BR Opportunity
         ↓
-PROVISIONAL_SANDBOX_SIGNAL
+LONG / SHORT / WAIT
         ↓
-Frozen research Entry / SL / TP / sizing simulation
+research Entry / SL / TP / sizing
         ↓
-Historical event-driven evaluation
+1m causal event-driven replay
+        ↓
+fees + slippage + funding
+        ↓
+PROVISIONAL_SANDBOX_CANDIDATE
 ```
 
 Requirements:
-- completely isolated from Runtime signal authorization;
-- execution service must reject these objects;
-- `source=HISTORICAL_PROXY`;
-- `runtime_actionable=false`;
-- realistic fee/slippage configuration reused from project research framework;
-- no optimized final equity curve as sole objective;
-- include WAIT/no-trade state;
-- preserve deterministic reproducibility.
 
-This builds the future tradable architecture now, while Forward Evidence keeps accumulating in parallel.
+- isolated from normal Runtime authorization;
+- `source=HISTORICAL_PROXY` or exact audited role;
+- `runtime_actionable=false`;
+- execution service rejects these signals;
+- reuse project risk/cost semantics where possible;
+- no future bars for signal generation;
+- fills simulated only from bars/events strictly after the decision timestamp;
+- include WAIT/no-trade state;
+- deterministic reproduction;
+- do not optimize solely on terminal equity.
+
+Preregister a provisional-candidate acceptance gate before search. Prefer reusing the project's robust historical candidate standards unless there is a documented reason to change them.
+
+A candidate failing robustness remains rejected even if its best in-sample equity curve is attractive.
 
 ---
 
-## 10. Forward campaigns must continue unchanged
+## 11. Acceleration step: frozen provisional real-time shadow
 
-Do not reset/restart/move the starts of:
+If and only if a historical candidate passes the frozen validation + internal pseudo-forward + robustness gate, do NOT wait for the current 30-day data gates before beginning to observe it in real time.
+
+Instead:
+
+1. Freeze exact formula hash, feature definitions, TP/BR combination logic, Entry/SL/TP/sizing, fee assumptions, strategy/config/registry hashes.
+2. Commit that freeze before observing any real-time candidate outcomes.
+3. Choose a future fixed UTC start boundary.
+4. Start an independent campaign:
+
+```text
+PROVISIONAL_CANDIDATE_FORWARD_SHADOW_V0318_...
+```
+
+5. Compute real-time hypothetical LONG/SHORT/WAIT and hypothetical fills/PnL only; never submit orders.
+6. Do not modify formula/parameters after shadow begins. A changed candidate requires a new campaign ID.
+7. Record every expected decision slot, missing slot, data-quality state, signal/no-signal, and outcome so selection bias cannot hide failures.
+8. This campaign is additional evidence only and does not alter:
+
+```text
+qualified_direction_engine = NONE
+runtime_maximum = OPPORTUNITY_ONLY
+execution = DISABLED
+candidate_freeze = NONE
+```
+
+If no candidate passes, do not create a fake shadow campaign.
+
+---
+
+## 12. Existing Forward campaigns must continue unchanged
+
+Do not move/reset/restart the formal start of:
 
 ```text
 OPPORTUNITY_FORWARD_V0317_20260901T160000Z
@@ -452,35 +721,48 @@ DERIVATIVES_PIT_EPOCH_V0316_002
 MICROSTRUCTURE_FORWARD_V0315_20260831T190000Z
 ```
 
-Take a fresh status snapshot during the task and report:
-- current expected/full/missing/partial Derivatives counts;
-- H36 scan ratio / miss streak / opportunity count / resolved count;
-- Microstructure age / trade coverage / depth coverage / sequence-valid coverage / partition integrity.
+Take fresh start/end snapshots during v0.3.18 and report:
 
-If a Forward campaign has terminally failed under its frozen gate, report it; do not repair by moving the start.
+- Derivatives expected/full/partial/failed/missing, per-field availability, max bad gap;
+- H36 scan ratio, miss streak, opportunity count, 4h/8h resolved counts;
+- Microstructure age, trade/depth/sequence-valid coverage, gaps/resyncs, partition checksum integrity;
+- systemd health state.
+
+Historical/vendor research must never write/backfill these stores.
 
 ---
 
-## 11. Tests
+## 13. Required tests
 
-Add strong tests covering at minimum:
+Add tests covering at least:
 
-1. future-row mutation cannot change formula output at earlier timestamps;
-2. no full-series normalization;
-3. no `torch.roll` wrap-around leakage;
-4. every rolling operator respects lookback;
-5. formula max-lookback calculation;
-6. deterministic formula hash / serialization;
-7. VM structured error handling;
-8. duplicate formula rejection;
-9. frozen search seed and budget;
-10. chronological split boundaries + purge/embargo;
-11. pseudo-forward not touched during search/selection;
-12. Final Holdout access blocked;
-13. historical-proxy candidates are Runtime-blocked;
-14. execution rejects provisional sandbox signals;
-15. Forward stores are not mutated/backfilled by historical research;
-16. existing H36/Derivatives/Microstructure safety states unchanged.
+1. official archive checksum validation;
+2. Spot/Futures historical timestamp-unit normalization including ms and µs cases;
+3. aggTrade aggressor-side mapping against documented schema examples;
+4. no gaps silently filled;
+5. provider/formal-role provenance serialization;
+6. vendor rows cannot be mislabeled as TRUE_FORWARD_LOCAL_PIT;
+7. future-row mutation cannot change formula output at earlier timestamps;
+8. no full-series normalization;
+9. no `torch.roll` wrap-around leakage;
+10. every rolling operator respects lookback;
+11. formula max-lookback calculation;
+12. deterministic formula serialization/hash;
+13. VM structured error handling;
+14. duplicate formula rejection;
+15. frozen search seed/budget;
+16. Random and optional Transformer evaluation-budget accounting;
+17. optional Transformer receives Discovery reward only;
+18. validation and pseudo-forward cannot enter proposal training/reward;
+19. chronological split + purge/embargo;
+20. pseudo-forward untouched during search/selection;
+21. Final Holdout access blocked;
+22. provisional candidate is Runtime-blocked;
+23. execution rejects provisional signals;
+24. provisional real-time shadow, if created, cannot place orders;
+25. candidate shadow start is future-fixed and formula freeze predates outcomes;
+26. existing H36/Derivatives/Microstructure stores are unchanged by historical research;
+27. existing normal Runtime remains max OPPORTUNITY_ONLY.
 
 Run:
 
@@ -494,85 +776,128 @@ python -m compileall -q src skill-template/scripts
 
 ---
 
-## 12. Deliverables — MUST be committed and pushed to GitHub
+## 14. Formal artifacts
 
-Create:
-
-```text
-deliverables/v0.3.18/
-├── README.md
-├── V0.3.18_HISTORICAL_PROXY_SYMBOLIC_ALPHA_REPORT.md
-├── V0.3.18_NUMERIC_ANSWERS.json
-├── V0.3.18_RECOMMENDATION.md
-├── HISTORICAL_DATA_PROVENANCE_AUDIT.json
-├── SYMBOLIC_DSL_SPEC.md
-├── FORMULA_SEARCH_AUDIT.json
-├── PROVISIONAL_CANDIDATE_REGISTRY.json
-├── PSEUDO_FORWARD_EVALUATION.json
-└── FORWARD_EVIDENCE_STATUS_SNAPSHOT.json
-```
-
-Also include the frozen research protocol under:
+Store formal run artifacts under a timestamped gitignored research directory, for example:
 
 ```text
-configs/research/v0.3.18_historical_proxy_symbolic_alpha_protocol.json
+artifacts/research/v0.3.18_historical_symbolic_<run_id>/
 ```
 
-The protocol MUST be committed before the formal search implementation/run or, if implementation scaffolding already exists, at minimum before any formal result-generating search is executed. Clearly document commit chronology.
+Include manifests, protocol, source audit, formula candidates, search audit, fold results, pseudo-forward results, sandbox trades, bootstrap/permutation outputs, and candidate-freeze artifact if applicable.
 
-At task completion:
+Do not commit large raw Binance/vendor data, SQLite databases, Parquet event files, or model checkpoints to Git unless they are intentionally small test fixtures.
+
+---
+
+## 15. Mandatory GitHub delivery bundle
+
+Create and **commit + push** at least:
+
+```text
+deliverables/v0.3.18/README.md
+deliverables/v0.3.18/V0.3.18_HISTORICAL_PROXY_SYMBOLIC_ALPHA_REPORT.md
+deliverables/v0.3.18/V0.3.18_NUMERIC_ANSWERS.json
+deliverables/v0.3.18/V0.3.18_RECOMMENDATION.md
+deliverables/v0.3.18/HISTORICAL_DATA_PROVENANCE_AUDIT.json
+deliverables/v0.3.18/BINANCE_OFFICIAL_ARCHIVE_AUDIT.json
+deliverables/v0.3.18/VENDOR_HISTORICAL_DATA_OPTIONS.md
+deliverables/v0.3.18/FORMULA_DSL_AND_VM_AUDIT.md
+deliverables/v0.3.18/FORMULA_REGISTRY_SNAPSHOT.json
+deliverables/v0.3.18/SYMBOLIC_SEARCH_AUDIT.json
+deliverables/v0.3.18/ALPHAGPT_REFERENCE_ADAPTATION.md
+deliverables/v0.3.18/FORWARD_CAMPAIGNS_STATUS.json
+```
+
+If a candidate exists, also include:
+
+```text
+deliverables/v0.3.18/PROVISIONAL_CANDIDATE.json
+deliverables/v0.3.18/PROVISIONAL_CANDIDATE_TRADES_SUMMARY.json
+```
+
+If a provisional real-time shadow is started, also include:
+
+```text
+deliverables/v0.3.18/PROVISIONAL_CANDIDATE_SHADOW_FREEZE.json
+deliverables/v0.3.18/PROVISIONAL_CANDIDATE_SHADOW_STATUS.json
+```
+
+The report must clearly separate:
+
+```text
+Historical discovery result
+Historical validation result
+Development-internal pseudo-forward result
+Vendor-proxy result (if any)
+True Forward campaign status
+```
+
+Do not blur these evidence classes.
+
+---
+
+## 16. Git / remote completion requirements
+
+Commit implementation and delivery files to:
+
+```text
+codex/v0.3.18-historical-proxy-symbolic-alpha-factory
+```
+
+Push the branch to GitHub.
+
+Verify remotely, not only locally:
 
 ```bash
+git fetch origin
 git status
-git log --oneline --decorate -12
-git ls-tree -r --name-only HEAD deliverables/v0.3.18
-git push -u origin codex/v0.3.18-historical-proxy-symbolic-alpha-factory
+git log -8 --oneline
+git ls-tree -r origin/codex/v0.3.18-historical-proxy-symbolic-alpha-factory -- deliverables/v0.3.18 prompts/v0.3.18
+git rev-parse HEAD
+git rev-parse origin/codex/v0.3.18-historical-proxy-symbolic-alpha-factory
 ```
 
-Create/update a PR after implementation and deliverables exist.
+Create/update the research PR after delivery. Do not merge it automatically.
 
-The task is NOT complete until all required deliverables are readable from GitHub remote.
+Final response must provide:
+
+```text
+branch
+preregistration SHA
+formal implementation SHA
+formal delivery/report SHA
+CI run/conclusion
+PR number
+remote deliverables verification
+raw-data location/manifest hashes
+Forward campaign start/end health
+```
 
 ---
 
-## 13. Recommendation tree
+## 17. Allowed final recommendations
 
-Final recommendation must choose exactly one primary state:
-
-```text
-A. PROVISIONAL_SYMBOLIC_DIRECTION_CANDIDATE_FOUND
-B. SYMBOLIC_PIPELINE_VALID_NO_ROBUST_CANDIDATE
-C. HISTORICAL_PROXY_DATA_INSUFFICIENT_FOR_DIRECTION_RESEARCH
-D. STOP_SYMBOLIC_SEARCH_PENDING_NEW_DATA
-```
-
-Even under A:
+Choose exactly one primary recommendation consistent with evidence:
 
 ```text
-qualified_direction_engine = NONE
-runtime_maximum = OPPORTUNITY_ONLY
-execution = DISABLED
-final_holdout = SEALED
+START_PROVISIONAL_CANDIDATE_FORWARD_SHADOW
+CONTINUE_SYMBOLIC_DISCOVERY_NO_CANDIDATE
+RECOMMEND_VENDOR_PIT_DATA_EXPANSION
+STOP_CURRENT_HISTORICAL_FEATURE_SET
 ```
 
-A only means the framework has found a **historical-development provisional candidate worth validating later**.
+A vendor recommendation may be a secondary engineering recommendation, but do not claim paid data guarantees Alpha.
 
-It is not a Forward-validated trading signal.
+Regardless of outcome:
 
----
+```text
+Strategy = EXPERIMENTAL
+Qualified Direction Engine = NONE
+Normal Runtime maximum = OPPORTUNITY_ONLY
+Execution = DISABLED
+Final Holdout = SEALED
+Live trading = NOT AUTHORIZED
+```
 
-## 14. Forward-looking architecture after v0.3.18
-
-If A:
-- freeze the provisional formula;
-- do NOT continue tuning it on pseudo-forward;
-- wait for eligible Derivatives/Microstructure Forward data;
-- compare the frozen formula against future Forward observations;
-- only after true OOS/Forward support consider Candidate Strategy / Holdout / Paper/Testnet.
-
-If B/C/D:
-- keep the Symbolic DSL/VM/Registry infrastructure;
-- do not increase search budget post hoc just to find a winner;
-- revisit once new independent data families mature.
-
-A later Transformer/AlphaGPT-style generator is allowed only after Random/Genetic baselines exist and sufficient data supports nested chronological validation.
+The purpose of v0.3.18 is to **compress development latency, not validation standards**: use the best trustworthy historical data now, borrow AlphaGPT's interpretable symbolic search architecture, freeze any promising candidate early, and let true Forward evidence challenge it while the 30-day campaigns continue accumulating.
