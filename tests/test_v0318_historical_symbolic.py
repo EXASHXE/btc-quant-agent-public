@@ -31,8 +31,10 @@ from btc_quant_agent.symbolic_alpha.proposal import (
 )
 from btc_quant_agent.symbolic_alpha.sandbox import (
     ProvisionalSignal,
+    ReplayBar,
     SandboxDecision,
     assert_shadow_start_is_valid,
+    replay_signal,
 )
 from btc_quant_agent.symbolic_alpha.vm import FormulaVM
 
@@ -262,3 +264,40 @@ def test_provisional_signal_and_execution_are_blocked() -> None:
     with pytest.raises(ValueError, match="future-fixed"):
         assert_shadow_start_is_valid(100, 100)
 
+
+def test_event_replay_uses_only_future_bars_and_conservative_same_bar_fill() -> None:
+    signal = ProvisionalSignal(
+        signal_id="long-1",
+        decision_timestamp_ms=100,
+        decision=SandboxDecision.LONG,
+        formula_hash="abc",
+        source="CANONICAL_HISTORICAL",
+        entry_price=100,
+        stop_price=90,
+        take_profit_price=110,
+        size=1,
+    )
+    bars = [
+        ReplayBar(100, 159, 100, 200, 1, 100),
+        ReplayBar(101, 160, 100, 111, 89, 105),
+    ]
+    trade = replay_signal(signal, bars, fee_rate=0.0004, slippage_rate=0.0002)
+    assert trade is not None
+    assert trade.entry_time_ms == 101
+    assert trade.exit_reason == "STOP_AND_TARGET_SAME_BAR_CONSERVATIVE_STOP"
+    assert trade.net_r < -1
+
+
+def test_wait_replay_produces_no_trade() -> None:
+    signal = ProvisionalSignal(
+        signal_id="wait-1",
+        decision_timestamp_ms=100,
+        decision=SandboxDecision.WAIT,
+        formula_hash="abc",
+        source="HISTORICAL_PROXY",
+        entry_price=None,
+        stop_price=None,
+        take_profit_price=None,
+        size=0,
+    )
+    assert replay_signal(signal, [], fee_rate=0.0004, slippage_rate=0.0002) is None

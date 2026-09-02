@@ -170,3 +170,5 @@ v0.3.11 的 Registry、Runtime 对齐和前向数据运维见 `docs/RESEARCH_REG
 `docs/FORWARD_DERIVATIVES_OPERATIONS.md`。策略状态继续为 `EXPERIMENTAL`，这些研究结果不构成交易建议。
 
 v0.3.17 统一状态明确分离 v0.3.14 terminal Derivatives archive、v0.3.16 Derivatives successor、H35 data-quality-risk archive、H36 clean successor 与 v0.3.15 Microstructure accumulation。`quantctl forward-evidence health` 提供结构化 data-only 运维健康状态。所有指标只用于数据可靠性，不进行方向、Alpha、Holdout 或执行解释。正式交付见 `deliverables/v0.3.17/`。
+
+v0.3.18 增加 checksum 审计的 Binance Spot/USD-M 历史市场数据路径、严格来源角色、因果 Formula DSL、确定性 VM、固定预算 Random Grammar Search、Validation/pseudo-forward 防火墙与 research-only event replay。历史研究不会读取 Final Holdout，也不会写入 Forward stores；provisional 信号在执行入口被明确拒绝。正式交付见 `deliverables/v0.3.18/`。
