@@ -41,7 +41,7 @@ class FormulaRegistryEntry:
 
     def __post_init__(self) -> None:
         if self.runtime_eligibility:
-            raise ValueError("v0.3.18 formulas cannot be Runtime eligible")
+            raise ValueError("research symbolic formulas cannot be Runtime eligible")
         allowed = {
             "DISCOVERY_ONLY",
             "FAILED_VALIDATION",
@@ -51,7 +51,7 @@ class FormulaRegistryEntry:
             "PROVISIONAL_FORWARD_SHADOW",
         }
         if self.status not in allowed:
-            raise ValueError(f"invalid v0.3.18 formula status: {self.status}")
+            raise ValueError(f"invalid symbolic formula status: {self.status}")
 
     def as_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -94,4 +94,3 @@ def write_registry(path: str | Path, entries: list[FormulaRegistryEntry]) -> Non
         "formulas": [entry.as_dict() for entry in entries],
     }
     target.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-
