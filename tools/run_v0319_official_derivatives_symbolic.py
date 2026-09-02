@@ -113,6 +113,7 @@ def run(root: Path, data_root: Path, artifact: Path, preregistration_sha: str) -
     if raw_manifest["final_holdout_rows"] != 0:
         raise PermissionError("Final Holdout archive rows are forbidden")
     artifact.mkdir(parents=True, exist_ok=True)
+    _write(artifact / "raw_data_manifests/raw_data_manifest.json", raw_manifest)
     start_forward = _forward_snapshot()
     timestamps, old_features, close, old_audit = build_features(
         root / "data/research/BTCUSDT", root / "data/research/BTCUSDT_SPOT"
@@ -354,7 +355,10 @@ def run(root: Path, data_root: Path, artifact: Path, preregistration_sha: str) -
         "run_id": artifact.name,
         "created_at_ms": int(time.time() * 1000),
         "preregistration_sha": preregistration_sha,
-        "files": {path.name: _digest(path) for path in sorted(artifact.glob("*.json"))},
+        "files": {
+            str(path.relative_to(artifact)): _digest(path)
+            for path in sorted(artifact.rglob("*.json"))
+        },
         "historical_writes_to_forward_stores": 0,
         "final_holdout_rows_loaded": 0,
     }
