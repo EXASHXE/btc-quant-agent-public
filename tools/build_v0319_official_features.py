@@ -7,6 +7,7 @@ import json
 import subprocess
 import time
 import urllib.error
+import urllib.request
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import asdict
 from datetime import UTC, datetime
@@ -16,7 +17,7 @@ from typing import Any
 import pyarrow as pa
 import pyarrow.parquet as pq
 
-from btc_quant_agent.data.binance_archive import _download_verified, _sha256
+from btc_quant_agent.data.binance_archive import _sha256
 from btc_quant_agent.data.binance_market_archive import OFFICIAL_SPECS
 from btc_quant_agent.data.official_derivatives_features import OfficialHourlyInputs
 
@@ -44,7 +45,36 @@ def _download_one(root: Path, family: str, month: str) -> dict[str, Any]:
     url = spec.monthly_url(month)
     target = _target(root, family, month)
     try:
-        expected = _download_verified(url, target)
+        with urllib.request.urlopen(url + ".CHECKSUM", timeout=60) as response:
+            expected = response.read().decode("utf-8").split()[0]
+        target.parent.mkdir(parents=True, exist_ok=True)
+        if not target.exists() or _sha256(target) != expected:
+            partial = target.with_suffix(target.suffix + ".part")
+            transfer = subprocess.run(
+                [
+                    "curl",
+                    "--location",
+                    "--fail",
+                    "--silent",
+                    "--show-error",
+                    "--retry",
+                    "10",
+                    "--retry-all-errors",
+                    "--continue-at",
+                    "-",
+                    "--output",
+                    str(partial),
+                    url,
+                ],
+                text=True,
+                capture_output=True,
+                check=False,
+            )
+            if transfer.returncode:
+                raise ConnectionError(transfer.stderr.strip())
+            if _sha256(partial) != expected:
+                raise ValueError("official checksum mismatch after resumable transfer")
+            partial.replace(target)
         return {
             "family": family,
             "month": month,
@@ -55,7 +85,13 @@ def _download_one(root: Path, family: str, month: str) -> dict[str, Any]:
             "local_sha256": _sha256(target),
             "bytes": target.stat().st_size,
         }
-    except (OSError, TimeoutError, ValueError, urllib.error.URLError) as exc:
+    except (
+        ConnectionError,
+        OSError,
+        TimeoutError,
+        ValueError,
+        urllib.error.URLError,
+    ) as exc:
         return {
             "family": family,
             "month": month,
@@ -138,8 +174,13 @@ def _aggregate_archive(record: dict[str, Any]) -> tuple[list[list[str]], dict[st
     return rows, stats
 
 
-def build(root: Path, workers: int) -> dict[str, Any]:
-    families = (
+def build(
+    root: Path,
+    workers: int,
+    selected_families: tuple[str, ...] | None = None,
+    download_only: bool = False,
+) -> dict[str, Any]:
+    all_families = (
         "markPriceKlines_1m",
         "indexPriceKlines_1m",
         "premiumIndexKlines_1m",
@@ -147,6 +188,7 @@ def build(root: Path, workers: int) -> dict[str, Any]:
         "spot_aggTrades",
         "fundingRate",
     )
+    families = selected_families or all_families
     requests = [(family, month) for family in families for month in _months()]
     downloads: list[dict[str, Any]] = []
     with ThreadPoolExecutor(max_workers=workers) as pool:
@@ -160,6 +202,12 @@ def build(root: Path, workers: int) -> dict[str, Any]:
             print(result["status"], result["family"], result["month"], flush=True)
     downloads.sort(key=lambda item: (item["family"], item["month"]))
     verified = [item for item in downloads if item["status"] == "VERIFIED"]
+    if download_only:
+        return {
+            "request_count": len(downloads),
+            "verified_count": len(verified),
+            "incomplete_count": len(downloads) - len(verified),
+        }
     aggregates: dict[str, dict[int, tuple[float, ...]]] = {family: {} for family in families}
     for record in verified:
         family = str(record["family"])
@@ -235,9 +283,14 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--root", type=Path, required=True)
     parser.add_argument("--workers", type=int, default=8)
+    parser.add_argument("--families", nargs="*", choices=tuple(OFFICIAL_SPECS))
+    parser.add_argument("--download-only", action="store_true")
     args = parser.parse_args()
     args.root.mkdir(parents=True, exist_ok=True)
-    print(json.dumps(build(args.root.resolve(), args.workers), indent=2))
+    selected = tuple(args.families) if args.families else None
+    print(
+        json.dumps(build(args.root.resolve(), args.workers, selected, args.download_only), indent=2)
+    )
 
 
 if __name__ == "__main__":
