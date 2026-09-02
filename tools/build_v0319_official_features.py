@@ -246,16 +246,20 @@ END { if(cur!="") print cur,count,closing; print "#STATS",rows,ms,us,order,dup,g
 """
 
 AGG_AWK = r"""
-BEGIN { OFS=","; OFMT="%.17g"; CONVFMT="%.17g"; cur=""; rows=0; ms=0; us=0; order=0; dup=0; lastid=-1; firstts=-1; buy=0; sell=0 }
+BEGIN { OFS=","; OFMT="%.17g"; CONVFMT="%.17g"; cur=""; source=0; rows=0; ms=0; us=0; order=0; torder=0; dup=0; conflict=0; lastid=-1; lastseen=-1; firstts=-1; lastts=-1; previous=""; buy=0; sell=0 }
 $1 ~ /^[0-9]+$/ {
+ source++;
  id=$1+0; raw=$6+0; if(raw>=1000000000000000){ts=int(raw/1000);us++}else{ts=raw;ms++}
- if(firstts<0) firstts=ts; if(lastid>=0 && id<lastid) order++; if(id==lastid) dup++; lastid=id
+ if(firstts<0 || ts<firstts) firstts=ts; if(ts>lastts) lastts=ts
+ if(lastid>=0 && id<lastid) order++; if(lastseen>=0 && ts<lastseen) torder++; lastseen=ts
+ if(id==lastid){dup++; if($0!=previous) conflict++; next}
+ lastid=id; previous=$0
  h=int(ts/3600000)*3600000
  if(cur!="" && h!=cur){print cur,count,buy,sell; count=0;buy=0;sell=0}
  cur=h; notional=($2+0)*($3+0); maker=tolower($7); if(maker=="true")sell+=notional;else buy+=notional
- count++;rows++;lastts=ts
+ count++;rows++
 }
-END { if(cur!="") print cur,count,buy,sell; print "#STATS",rows,ms,us,order,dup,firstts,lastts }
+END { if(cur!="") print cur,count,buy,sell; print "#STATS",source,rows,ms,us,order,torder,dup,conflict,firstts,lastts }
 """
 
 FUNDING_AWK = r"""
@@ -269,35 +273,104 @@ END { print "#STATS",rows,ms,us,order,dup,firstts,last }
 """
 
 
-def _aggregate_archive(record: dict[str, Any]) -> tuple[list[list[str]], dict[str, Any]]:
-    family = str(record["family"])
-    program = (
-        AGG_AWK if "aggTrades" in family else FUNDING_AWK if family == "fundingRate" else KLINE_AWK
-    )
+def _run_aggregation(
+    record: dict[str, Any], program: str, *, sort_aggregate_ids: bool = False
+) -> tuple[list[list[str]], list[str]]:
+    """Stream one archive through mawk, optionally repairing aggregate-ID order."""
     unzip = subprocess.Popen(
         ["unzip", "-p", str(record["path"])], stdout=subprocess.PIPE, stderr=subprocess.PIPE
     )
     assert unzip.stdout is not None
+    sort: subprocess.Popen[bytes] | None = None
+    awk_input = unzip.stdout
+    if sort_aggregate_ids:
+        sort = subprocess.Popen(
+            ["sort", "--stable", "-t,", "-k1,1n"],
+            stdin=unzip.stdout,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            env={"LC_ALL": "C"},
+        )
+        unzip.stdout.close()
+        assert sort.stdout is not None
+        awk_input = sort.stdout
     awk = subprocess.run(
         ["mawk", "-F,", program],
-        stdin=unzip.stdout,
+        stdin=awk_input,
         text=True,
         capture_output=True,
         check=False,
     )
-    unzip.stdout.close()
+    awk_input.close()
+    sort_stderr = sort.stderr.read().decode() if sort and sort.stderr else ""
+    sort_code = sort.wait() if sort else 0
     unzip_stderr = unzip.stderr.read().decode() if unzip.stderr else ""
     unzip_code = unzip.wait()
-    if unzip_code or awk.returncode:
+    if unzip_code or sort_code or awk.returncode:
         raise RuntimeError(
-            f"archive aggregation failed: unzip={unzip_code} {unzip_stderr} awk={awk.stderr}"
+            "archive aggregation failed: "
+            f"unzip={unzip_code} {unzip_stderr} "
+            f"sort={sort_code} {sort_stderr} awk={awk.returncode} {awk.stderr}"
         )
     rows = list(csv.reader(awk.stdout.splitlines()))
     stats_row = rows.pop()
     if not stats_row or stats_row[0] != "#STATS":
         raise RuntimeError("archive aggregation did not emit stats")
+    return rows, stats_row
+
+
+def _aggregate_archive(record: dict[str, Any]) -> tuple[list[list[str]], dict[str, Any]]:
+    family = str(record["family"])
+    program = (
+        AGG_AWK if "aggTrades" in family else FUNDING_AWK if family == "fundingRate" else KLINE_AWK
+    )
+    rows, stats_row = _run_aggregation(record, program)
+    if "aggTrades" in family:
+        agg_keys = (
+            "row_count",
+            "aggregated_unique_rows",
+            "millisecond_rows",
+            "microsecond_rows",
+            "order_errors",
+            "timestamp_order_errors",
+            "duplicate_ids",
+            "duplicate_conflicts",
+            "first_timestamp_ms",
+            "last_timestamp_ms",
+        )
+        stats: dict[str, Any] = {
+            key: int(float(value))
+            for key, value in zip(agg_keys, stats_row[1:], strict=True)
+        }
+        raw_order_errors = stats["order_errors"]
+        raw_timestamp_order_errors = stats["timestamp_order_errors"]
+        raw_consecutive_duplicates = stats["duplicate_ids"]
+        if raw_order_errors or raw_timestamp_order_errors or raw_consecutive_duplicates:
+            rows, stats_row = _run_aggregation(record, program, sort_aggregate_ids=True)
+            stats = {
+                key: int(float(value))
+                for key, value in zip(agg_keys, stats_row[1:], strict=True)
+            }
+            if stats["order_errors"] or stats["timestamp_order_errors"]:
+                raise RuntimeError(
+                    f"aggregate-ID repair did not restore monotonicity: {family} {record['month']}"
+                )
+            if stats["duplicate_conflicts"]:
+                raise RuntimeError(
+                    f"conflicting rows share aggregate IDs: {family} {record['month']}"
+                )
+            stats["repair_method"] = "EXTERNAL_NUMERIC_AGG_ID_SORT_THEN_ADJACENT_DEDUP"
+        else:
+            stats["repair_method"] = "NONE"
+        stats["raw_order_errors"] = raw_order_errors
+        stats["raw_timestamp_order_errors"] = raw_timestamp_order_errors
+        stats["raw_consecutive_duplicate_ids"] = raw_consecutive_duplicates
+        stats["duplicate_ids_removed"] = stats["duplicate_ids"]
+        stats["post_repair_order_errors"] = stats["order_errors"]
+        stats["post_repair_timestamp_order_errors"] = stats["timestamp_order_errors"]
+        return rows, stats
     if "aggTrades" in family or family == "fundingRate":
-        keys = (
+        basic_keys = (
             "row_count",
             "millisecond_rows",
             "microsecond_rows",
@@ -307,7 +380,7 @@ def _aggregate_archive(record: dict[str, Any]) -> tuple[list[list[str]], dict[st
             "last_timestamp_ms",
         )
     else:
-        keys = (
+        basic_keys = (
             "row_count",
             "millisecond_rows",
             "microsecond_rows",
@@ -317,7 +390,10 @@ def _aggregate_archive(record: dict[str, Any]) -> tuple[list[list[str]], dict[st
             "first_timestamp_ms",
             "last_timestamp_ms",
         )
-    stats = {key: int(float(value)) for key, value in zip(keys, stats_row[1:], strict=True)}
+    stats = {
+        key: int(float(value))
+        for key, value in zip(basic_keys, stats_row[1:], strict=True)
+    }
     return rows, stats
 
 
