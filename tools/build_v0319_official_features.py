@@ -39,28 +39,41 @@ def _target(root: Path, family: str, month: str) -> Path:
     return root / "raw" / family / Path(spec.monthly_url(month)).name
 
 
-def _official_checksum(url: str) -> str:
-    result = subprocess.run(
-        [
-            "curl",
-            "--location",
-            "--fail",
-            "--silent",
-            "--show-error",
-            "--retry",
-            "10",
-            "--retry-all-errors",
-            "--max-time",
-            "300",
-            url + ".CHECKSUM",
-        ],
-        text=True,
-        capture_output=True,
-        check=False,
+def _metadata_url(url: str) -> str:
+    return url.replace(
+        "https://data.binance.vision/",
+        "https://s3-ap-northeast-1.amazonaws.com/data.binance.vision/",
+        1,
     )
-    if result.returncode:
-        raise ConnectionError(result.stderr.strip())
-    expected = result.stdout.split()[0]
+
+
+def _official_checksum(url: str, path: Path) -> str:
+    if path.exists():
+        body = path.read_text(encoding="utf-8")
+    else:
+        result = subprocess.run(
+            [
+                "curl",
+                "--location",
+                "--fail",
+                "--silent",
+                "--show-error",
+                "--retry",
+                "10",
+                "--retry-all-errors",
+                "--max-time",
+                "300",
+                _metadata_url(url) + ".CHECKSUM",
+            ],
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+        if result.returncode:
+            raise ConnectionError(result.stderr.strip())
+        body = result.stdout
+        path.write_text(body, encoding="utf-8")
+    expected = body.split()[0]
     if len(expected) != 64 or any(character not in "0123456789abcdef" for character in expected):
         raise ValueError("malformed official checksum")
     return expected
@@ -80,7 +93,7 @@ def _remote_size(url: str) -> int:
             "--retry-all-errors",
             "--max-time",
             "300",
-            url,
+            _metadata_url(url),
         ],
         text=True,
         capture_output=True,
@@ -171,8 +184,9 @@ def _download_one(root: Path, family: str, month: str) -> dict[str, Any]:
     url = spec.monthly_url(month)
     target = _target(root, family, month)
     try:
-        expected = _official_checksum(url)
         target.parent.mkdir(parents=True, exist_ok=True)
+        checksum_path = target.with_suffix(target.suffix + ".CHECKSUM")
+        expected = _official_checksum(url, checksum_path)
         if not target.exists() or _sha256(target) != expected:
             partial = target.with_suffix(target.suffix + ".part")
             _download_resumable(url, partial)
@@ -186,6 +200,7 @@ def _download_one(root: Path, family: str, month: str) -> dict[str, Any]:
             "path": str(target),
             "status": "VERIFIED",
             "expected_sha256": expected,
+            "checksum_path": str(checksum_path),
             "local_sha256": _sha256(target),
             "bytes": target.stat().st_size,
         }
