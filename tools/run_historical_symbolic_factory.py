@@ -26,6 +26,7 @@ from btc_quant_agent.data.binance_market_archive import (
 from btc_quant_agent.symbolic_alpha.dsl import Operator
 from btc_quant_agent.symbolic_alpha.evaluate import (
     EvaluationFirewall,
+    block_hours_to_events,
     evaluate_formula,
     forward_returns,
 )
@@ -244,7 +245,15 @@ def _metrics(metrics: Any) -> dict[str, Any]:
 
 
 def _multiple_testing(
-    formulas: list[Any], features: dict[str, Series], returns: Series, indices: range, seed: int
+    formulas: list[Any],
+    features: dict[str, Series],
+    returns: Series,
+    indices: range,
+    seed: int,
+    *,
+    block_hours: int = 168,
+    sample_step_hours: int = 8,
+    permutations: int = 200,
 ) -> dict[str, Any]:
     rows = list(indices)
     outcomes = np.array([returns[index] or 0.0 for index in rows])
@@ -278,8 +287,8 @@ def _multiple_testing(
     observed_best = float(np.max(observed))
     rng = np.random.default_rng(seed)
     null_best: list[float] = []
-    block = 168 // 8
-    for _ in range(200):
+    block = block_hours_to_events(block_hours, sample_step_hours)
+    for _ in range(permutations):
         shift = int(rng.integers(1, max(2, len(rows) // block))) * block
         permuted = np.roll(outcomes, shift)
         pnl = matrix * permuted
@@ -287,12 +296,13 @@ def _multiple_testing(
         variances = np.maximum(np.sum(pnl * pnl, axis=1) / counts - means**2, 1e-18)
         scores = means / np.sqrt(variances / counts)
         null_best.append(float(np.max(scores)))
-    adjusted_p = (1 + sum(value >= observed_best for value in null_best)) / 201
+    adjusted_p = (1 + sum(value >= observed_best for value in null_best)) / (permutations + 1)
     return {
         "procedure": "EMPIRICAL_BEST_SCORE_CIRCULAR_BLOCK_PERMUTATION",
-        "permutations": 200,
-        "sample_step_hours": 8,
-        "block_hours": 168,
+        "permutations": permutations,
+        "sample_step_hours": sample_step_hours,
+        "block_hours": block_hours,
+        "block_events": block,
         "observed_best_t_stat": observed_best,
         "null_best_t_stat_p95": float(np.quantile(null_best, 0.95)),
         "familywise_adjusted_p_value": adjusted_p,

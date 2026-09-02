@@ -234,6 +234,9 @@ def run(root: Path, data_root: Path, artifact: Path, preregistration_sha: str) -
         returns,
         discovery_indices,
         search_config["seed"],
+        block_hours=protocol["resampling_and_inference"]["bootstrap_block_hours"],
+        sample_step_hours=protocol["scope"]["sample_step_hours"],
+        permutations=protocol["resampling_and_inference"]["permutations"],
     )
     results: list[dict[str, Any]] = []
     for row in frozen:
