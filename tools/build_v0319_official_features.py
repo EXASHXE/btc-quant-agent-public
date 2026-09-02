@@ -221,18 +221,19 @@ def _download_one(root: Path, family: str, month: str) -> dict[str, Any]:
 
 
 KLINE_AWK = r"""
-BEGIN { OFS=","; cur=""; rows=0; ms=0; us=0; order=0; last=-1 }
+BEGIN { OFS=","; OFMT="%.17g"; CONVFMT="%.17g"; cur=""; rows=0; ms=0; us=0; order=0; dup=0; gaps=0; last=-1; firstts=-1 }
 $1 ~ /^[0-9]+$/ {
  raw=$1+0; if(raw>=1000000000000000){ts=int(raw/1000);us++}else{ts=raw;ms++}
- if(last>=0 && ts<=last) order++; last=ts; h=int(ts/3600000)*3600000
- if(cur!="" && h!=cur){print cur,count,close; count=0}
- cur=h; count++; close=$5+0; rows++
+ if(firstts<0) firstts=ts; if(last>=0 && ts<last) order++; if(ts==last) dup++;
+ if(last>=0 && ts-last>60000) gaps+=int((ts-last)/60000)-1; last=ts; h=int(ts/3600000)*3600000
+ if(cur!="" && h!=cur){print cur,count,closing; count=0}
+ cur=h; count++; closing=$5+0; rows++
 }
-END { if(cur!="") print cur,count,close; print "#STATS",rows,ms,us,order,last }
+END { if(cur!="") print cur,count,closing; print "#STATS",rows,ms,us,order,dup,gaps,firstts,last }
 """
 
 AGG_AWK = r"""
-BEGIN { OFS=","; cur=""; rows=0; ms=0; us=0; order=0; dup=0; lastid=-1; firstts=-1 }
+BEGIN { OFS=","; OFMT="%.17g"; CONVFMT="%.17g"; cur=""; rows=0; ms=0; us=0; order=0; dup=0; lastid=-1; firstts=-1 }
 $1 ~ /^[0-9]+$/ {
  id=$1+0; raw=$6+0; if(raw>=1000000000000000){ts=int(raw/1000);us++}else{ts=raw;ms++}
  if(firstts<0) firstts=ts; if(lastid>=0 && id<lastid) order++; if(id==lastid) dup++; lastid=id
@@ -244,10 +245,22 @@ $1 ~ /^[0-9]+$/ {
 END { if(cur!="") print cur,count,buy,sell; print "#STATS",rows,ms,us,order,dup,firstts,lastts }
 """
 
+FUNDING_AWK = r"""
+BEGIN { OFS=","; OFMT="%.17g"; CONVFMT="%.17g"; rows=0; ms=0; us=0; order=0; dup=0; last=-1; firstts=-1 }
+$1 ~ /^[0-9]+$/ {
+ raw=$1+0; if(raw>=1000000000000000){ts=int(raw/1000);us++}else{ts=raw;ms++}
+ if(firstts<0) firstts=ts; if(last>=0 && ts<last) order++; if(ts==last) dup++;
+ last=ts; rows++
+}
+END { print "#STATS",rows,ms,us,order,dup,firstts,last }
+"""
+
 
 def _aggregate_archive(record: dict[str, Any]) -> tuple[list[list[str]], dict[str, Any]]:
     family = str(record["family"])
-    program = AGG_AWK if "aggTrades" in family else KLINE_AWK
+    program = (
+        AGG_AWK if "aggTrades" in family else FUNDING_AWK if family == "fundingRate" else KLINE_AWK
+    )
     unzip = subprocess.Popen(
         ["unzip", "-p", str(record["path"])], stdout=subprocess.PIPE, stderr=subprocess.PIPE
     )
@@ -270,13 +283,13 @@ def _aggregate_archive(record: dict[str, Any]) -> tuple[list[list[str]], dict[st
     stats_row = rows.pop()
     if not stats_row or stats_row[0] != "#STATS":
         raise RuntimeError("archive aggregation did not emit stats")
-    if "aggTrades" in family:
+    if "aggTrades" in family or family == "fundingRate":
         keys = (
             "row_count",
             "millisecond_rows",
             "microsecond_rows",
             "order_errors",
-            "duplicate_ids",
+            "duplicate_ids" if "aggTrades" in family else "duplicate_timestamps",
             "first_timestamp_ms",
             "last_timestamp_ms",
         )
@@ -286,6 +299,9 @@ def _aggregate_archive(record: dict[str, Any]) -> tuple[list[list[str]], dict[st
             "millisecond_rows",
             "microsecond_rows",
             "order_errors",
+            "duplicate_timestamps",
+            "missing_minute_rows",
+            "first_timestamp_ms",
             "last_timestamp_ms",
         )
     stats = {key: int(float(value)) for key, value in zip(keys, stats_row[1:], strict=True)}
@@ -329,10 +345,11 @@ def build(
     aggregates: dict[str, dict[int, tuple[float, ...]]] = {family: {} for family in families}
     for record in verified:
         family = str(record["family"])
-        if family == "fundingRate":
-            continue
         rows, stats = _aggregate_archive(record)
         record["audit"] = stats
+        if family == "fundingRate":
+            print("AUDITED", family, record["month"], stats["row_count"], flush=True)
+            continue
         for row in rows:
             timestamp = int(float(row[0]))
             if family.endswith("Klines_1m"):
