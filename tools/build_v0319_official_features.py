@@ -113,38 +113,41 @@ def _remote_size(url: str) -> int:
 
 def _download_segment(url: str, path: Path, start: int, end: int) -> None:
     expected_size = end - start + 1
-    current_size = path.stat().st_size if path.exists() else 0
-    if current_size > expected_size:
-        raise ValueError(f"oversized partial segment: {path}")
-    if current_size == expected_size:
-        return
-    with path.open("ab") as output:
-        result = subprocess.run(
-            [
-                "curl",
-                "--location",
-                "--fail",
-                "--silent",
-                "--show-error",
-                "--retry",
-                "10",
-                "--retry-all-errors",
-                "--connect-timeout",
-                "60",
-                "--max-time",
-                "3600",
-                "--range",
-                f"{start + current_size}-{end}",
-                url,
-            ],
-            stdout=output,
-            stderr=subprocess.PIPE,
-            check=False,
-        )
-    if result.returncode:
-        raise ConnectionError(result.stderr.decode().strip())
-    if path.stat().st_size != expected_size:
-        raise ValueError(f"official server returned an invalid byte range: {path}")
+    errors: list[str] = []
+    for _ in range(20):
+        current_size = path.stat().st_size if path.exists() else 0
+        if current_size > expected_size:
+            path.unlink()
+            current_size = 0
+        if current_size == expected_size:
+            return
+        with path.open("ab") as output:
+            result = subprocess.run(
+                [
+                    "curl",
+                    "--location",
+                    "--fail",
+                    "--silent",
+                    "--show-error",
+                    "--connect-timeout",
+                    "60",
+                    "--max-time",
+                    "3600",
+                    "--range",
+                    f"{start + current_size}-{end}",
+                    url,
+                ],
+                stdout=output,
+                stderr=subprocess.PIPE,
+                check=False,
+            )
+        if result.returncode:
+            errors.append(result.stderr.decode().strip())
+            continue
+        if path.stat().st_size == expected_size:
+            return
+        errors.append("official server returned a short byte range")
+    raise ConnectionError(f"segment retry budget exhausted: {'; '.join(errors[-3:])}")
 
 
 def _download_resumable(url: str, partial: Path) -> None:
