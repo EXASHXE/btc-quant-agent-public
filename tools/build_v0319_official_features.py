@@ -246,7 +246,7 @@ END { if(cur!="") print cur,count,closing; print "#STATS",rows,ms,us,order,dup,g
 """
 
 AGG_AWK = r"""
-BEGIN { OFS=","; OFMT="%.17g"; CONVFMT="%.17g"; cur=""; rows=0; ms=0; us=0; order=0; dup=0; lastid=-1; firstts=-1 }
+BEGIN { OFS=","; OFMT="%.17g"; CONVFMT="%.17g"; cur=""; rows=0; ms=0; us=0; order=0; dup=0; lastid=-1; firstts=-1; buy=0; sell=0 }
 $1 ~ /^[0-9]+$/ {
  id=$1+0; raw=$6+0; if(raw>=1000000000000000){ts=int(raw/1000);us++}else{ts=raw;ms++}
  if(firstts<0) firstts=ts; if(lastid>=0 && id<lastid) order++; if(id==lastid) dup++; lastid=id
