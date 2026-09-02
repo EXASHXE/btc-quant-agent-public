@@ -135,7 +135,7 @@ def _download_segment(url: str, path: Path, start: int, end: int) -> None:
                     "3600",
                     "--range",
                     f"{start + current_size}-{end}",
-                    url,
+                    _metadata_url(url),
                 ],
                 stdout=output,
                 stderr=subprocess.PIPE,
