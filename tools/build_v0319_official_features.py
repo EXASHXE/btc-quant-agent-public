@@ -196,12 +196,15 @@ def _download_one(root: Path, family: str, month: str) -> dict[str, Any]:
         expected = _official_checksum(url, checksum_path)
         if not target.exists() or _sha256(target) != expected:
             partial = target.with_suffix(target.suffix + ".part")
-            _download_resumable(url, partial)
-            if _sha256(partial) != expected:
+            for attempt in range(2):
+                _download_resumable(url, partial)
+                if _sha256(partial) == expected:
+                    break
                 partial.unlink()
                 for stale in partial.parent.glob(f"{partial.name}.*.segment"):
                     stale.unlink()
-                raise ValueError("official checksum mismatch after resumable transfer")
+                if attempt == 1:
+                    raise ValueError("official checksum mismatch after clean retry")
             partial.replace(target)
         return {
             "family": family,
