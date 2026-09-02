@@ -362,9 +362,16 @@ def build(
             "incomplete_count": len(downloads) - len(verified),
         }
     aggregates: dict[str, dict[int, tuple[float, ...]]] = {family: {} for family in families}
-    for record in verified:
+    with ThreadPoolExecutor(max_workers=min(workers, 8)) as pool:
+        aggregation_futures = {
+            pool.submit(_aggregate_archive, record): record for record in verified
+        }
+        aggregated = [
+            (aggregation_futures[future], *future.result())
+            for future in as_completed(aggregation_futures)
+        ]
+    for record, rows, stats in aggregated:
         family = str(record["family"])
-        rows, stats = _aggregate_archive(record)
         record["audit"] = stats
         if family == "fundingRate":
             print("AUDITED", family, record["month"], stats["row_count"], flush=True)
