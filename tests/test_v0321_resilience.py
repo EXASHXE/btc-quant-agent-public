@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 from btc_quant_agent.evidence_epoch import (
     EvidenceEpochRegistry,
@@ -200,10 +200,43 @@ def test_forward_doctor_network_http_451_fails_closed() -> None:
 
 
 def test_forward_doctor_preregistered_successor_recognized() -> None:
-    doc = forward_doctor()
-    assert doc["status"] == "PREREGISTERED_NOT_STARTED"
-    assert doc["is_healthy"] is True
-    assert doc["parity"]["parity_ok"] is True
-    assert doc["campaigns"]["has_active_derivatives"] is True
-    assert doc["campaigns"]["has_active_opportunity"] is True
-    assert doc["chains"]["storage"]["writable"] is True
+    mock_resp = MagicMock()
+    mock_resp.status = 200
+    mock_resp.read.return_value = b'{"timezone":"UTC","serverTime":1788458400000}'
+    mock_opener = MagicMock()
+    mock_opener.return_value.__enter__.return_value = mock_resp
+
+    with patch(
+        "btc_quant_agent.forward_diagnostics.check_systemd_units",
+        return_value={
+            "btc-quant-forward-derivatives.timer": {"active_state": "active", "exec_start": ""},
+            "btc-quant-opportunity-forward.timer": {"active_state": "active", "exec_start": ""},
+            "btc-quant-opportunity-resolve.timer": {"active_state": "active", "exec_start": ""},
+            "btc-quant-forward-health.timer": {"active_state": "active", "exec_start": ""},
+            "btc-quant-microstructure-forward.service": {"active_state": "active", "exec_start": ""},
+            "btc-quant-opportunity-forward.service": {
+                "active_state": "inactive",
+                "exec_start": "/bin/quantctl opportunity-forward collect-once --registry configs/forward/opportunity_forward_campaigns.json",
+            },
+            "btc-quant-opportunity-resolve.service": {
+                "active_state": "inactive",
+                "exec_start": "/bin/quantctl opportunity-forward resolve --registry configs/forward/opportunity_forward_campaigns.json",
+            },
+        },
+    ), patch(
+        "btc_quant_agent.forward_diagnostics.check_wsl_systemd",
+        return_value={
+            "is_wsl": True,
+            "systemd_running": True,
+            "systemd_state": "running",
+            "user": "root",
+            "linger_enabled": True,
+        },
+    ):
+        doc = forward_doctor(url_opener=mock_opener)
+        assert doc["status"] == "PREREGISTERED_NOT_STARTED"
+        assert doc["is_healthy"] is True
+        assert doc["parity"]["parity_ok"] is True
+        assert doc["campaigns"]["has_active_derivatives"] is True
+        assert doc["campaigns"]["has_active_opportunity"] is True
+        assert doc["chains"]["storage"]["writable"] is True
