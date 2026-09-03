@@ -7,7 +7,7 @@ Wants=network-online.target
 [Service]
 Type=oneshot
 WorkingDirectory=/root/workspace/project/Quant-agent
-ExecStart=/root/workspace/project/Quant-agent/.venv/bin/quantctl derivatives collect-once --store /root/workspace/project/Quant-agent/data/forward/BTCUSDT/derivatives.sqlite3 --symbol BTCUSDT
+ExecStart=/root/workspace/project/Quant-agent/.venv/bin/quantctl derivatives collect-once --store /root/workspace/project/Quant-agent/data/forward/BTCUSDT/derivatives.sqlite3 --symbol BTCUSDT --require-active-epoch --epoch-registry /root/workspace/project/Quant-agent/configs/forward/derivatives_evidence_epochs.json
 Environment=PYTHONUNBUFFERED=1
 Environment=BTC_QUANT_TRIGGER_SOURCE=SCHEDULED
 EnvironmentFile=-%h/.config/btc-quant-agent/network.env

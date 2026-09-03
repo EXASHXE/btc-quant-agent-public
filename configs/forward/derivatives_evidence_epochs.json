@@ -38,11 +38,22 @@
       "epoch_id": "DERIVATIVES_PIT_EPOCH_V0320_001",
       "config_path": "configs/forward/v0.3.20_derivatives_evidence_epoch.json",
       "start_ms": 1788417000000,
-      "status": "ACTIVE_ACCUMULATING",
+      "status": "FAILED_GAP_GATE_TERMINAL",
+      "terminal_reason": "max_consecutive_bad_or_missing_slots=5 first exceeded frozen maximum=4",
+      "terminal_at_ms": 1788420600000,
+      "superseded_by": "DERIVATIVES_PIT_EPOCH_V0321_001",
+      "formal_eligibility_role": "FORMAL_TERMINAL",
+      "immutable_history": true
+    },
+    {
+      "epoch_id": "DERIVATIVES_PIT_EPOCH_V0321_001",
+      "config_path": "configs/forward/v0.3.21_derivatives_evidence_epoch.json",
+      "start_ms": 1788458400000,
+      "status": "PREREGISTERED_PENDING",
       "terminal_reason": null,
       "terminal_at_ms": null,
       "superseded_by": null,
-      "formal_eligibility_role": "FORMAL_ACTIVE",
+      "formal_eligibility_role": "FORMAL_SUCCESSOR_PENDING",
       "immutable_history": true
     }
   ]

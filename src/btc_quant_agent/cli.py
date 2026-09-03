@@ -131,6 +131,11 @@ def build_parser() -> argparse.ArgumentParser:
         if name in {"collect-once", "run"}:
             command.add_argument("--symbol", default="BTCUSDT")
             command.add_argument("--include-order-book", action="store_true")
+            command.add_argument("--require-active-epoch", action="store_true", default=False)
+            command.add_argument(
+                "--epoch-registry",
+                default="configs/forward/derivatives_evidence_epochs.json",
+            )
         if name == "run":
             command.add_argument("--max-samples", type=int)
         if name == "export":
@@ -148,7 +153,16 @@ def build_parser() -> argparse.ArgumentParser:
         )
         command.add_argument(
             "--campaign",
-            default="configs/forward/v0.3.13_opportunity_shadow_campaign.json",
+            default=None,
+        )
+        command.add_argument(
+            "--registry",
+            default="configs/forward/opportunity_forward_campaigns.json",
+        )
+        command.add_argument(
+            "--require-active-campaign",
+            action="store_true",
+            default=False,
         )
 
     forward_evidence = sub.add_parser(
@@ -395,6 +409,35 @@ def main(argv: list[str] | None = None) -> int:
             return 0 if report["overall_status"] == "OK" else 2
         store = ForwardDerivativeStore(args.store)
         if args.derivatives_command == "collect-once":
+            if getattr(args, "require_active_epoch", False):
+                from .evidence_epoch import resolve_active_derivatives_epoch
+
+                active = resolve_active_derivatives_epoch(registry_path=args.epoch_registry)
+                if active is None:
+                    _print(
+                        {
+                            "status": "REFUSED_NO_ACTIVE_EPOCH",
+                            "error": "No eligible active derivatives epoch found in registry. Scheduled collection refused on terminal/inactive epochs.",
+                            "epoch_registry": args.epoch_registry,
+                        }
+                    )
+                    return 0
+                epoch, lifecycle = active
+                now_ms = int(time.time() * 1000)
+                if (
+                    lifecycle.formal_eligibility_role == "FORMAL_SUCCESSOR_PENDING"
+                    and now_ms < epoch.epoch_start_ms
+                ):
+                    _print(
+                        {
+                            "status": "REFUSED_PREREGISTERED_PENDING",
+                            "error": "Successor epoch has not reached its frozen start boundary.",
+                            "epoch_id": epoch.epoch_id,
+                            "epoch_start_ms": epoch.epoch_start_ms,
+                            "starts_in_seconds": round((epoch.epoch_start_ms - now_ms) / 1000, 1),
+                        }
+                    )
+                    return 0
             record = collect_once(
                 BinancePublicClient(service.config.data),
                 store,
@@ -420,6 +463,19 @@ def main(argv: list[str] | None = None) -> int:
             )
             return 0 if successful else 2
         if args.derivatives_command == "run":
+            if getattr(args, "require_active_epoch", False):
+                from .evidence_epoch import resolve_active_derivatives_epoch
+
+                active = resolve_active_derivatives_epoch(registry_path=args.epoch_registry)
+                if active is None:
+                    _print(
+                        {
+                            "status": "REFUSED_NO_ACTIVE_EPOCH",
+                            "error": "No eligible active derivatives epoch found in registry. Runner refused on terminal/inactive epochs.",
+                            "epoch_registry": args.epoch_registry,
+                        }
+                    )
+                    return 0
             if args.max_samples is not None and args.max_samples < 1:
                 _print({"error": "max-samples must be positive"})
                 return 2
@@ -465,9 +521,50 @@ def main(argv: list[str] | None = None) -> int:
         _print(store.export(export_csv, export_manifest))
         return 0
     if args.command == "opportunity-forward":
-        campaign = OpportunityCampaign.load(args.campaign)
+        from .opportunity_forward import (
+            OpportunityCampaign,
+            OpportunityCampaignRegistry,
+            resolve_active_opportunity_campaign,
+        )
+
+        campaign: OpportunityCampaign | None = None
+        if args.campaign:
+            campaign = OpportunityCampaign.load(args.campaign)
+        else:
+            resolved = resolve_active_opportunity_campaign(args.registry)
+            if resolved is not None:
+                campaign = resolved[0]
+            elif (
+                getattr(args, "require_active_campaign", False)
+                or args.opportunity_command in {"collect-once", "resolve"}
+            ):
+                _print(
+                    {
+                        "status": "REFUSED_NO_ACTIVE_CAMPAIGN",
+                        "error": "No eligible active opportunity campaign found in registry. Scheduled action refused on terminal/inactive campaigns.",
+                        "registry": args.registry,
+                    }
+                )
+                return 0
+            else:
+                reg = OpportunityCampaignRegistry.load(args.registry)
+                campaign = reg.archive()[0]
+        assert campaign is not None
         opportunity_store = OpportunityForwardStore(args.store)
         if args.opportunity_command == "collect-once":
+            now_ms = int(time.time() * 1000)
+            slot_ms = (now_ms // 900_000) * 900_000
+            if campaign.has_data_quality_gate and slot_ms < campaign.campaign_start_ms:
+                _print(
+                    {
+                        "status": "REFUSED_PREREGISTERED_PENDING",
+                        "error": "Successor campaign has not reached its frozen start boundary.",
+                        "campaign_id": campaign.campaign_id,
+                        "campaign_start_ms": campaign.campaign_start_ms,
+                        "starts_in_seconds": round((campaign.campaign_start_ms - now_ms) / 1000, 1),
+                    }
+                )
+                return 0
             observation = collect_opportunity_once(service, opportunity_store, campaign)
             _print(asdict(observation))
             return 0 if observation.status == "SUCCESSFUL_SCAN" else 2
@@ -476,6 +573,16 @@ def main(argv: list[str] | None = None) -> int:
             _print(report)
             return 0 if not report["direction_action_columns"] else 2
         if args.opportunity_command == "resolve":
+            now_ms = int(time.time() * 1000)
+            if campaign.has_data_quality_gate and now_ms < campaign.campaign_start_ms:
+                _print(
+                    {
+                        "status": "REFUSED_PREREGISTERED_PENDING",
+                        "error": "Successor campaign has not reached its frozen start boundary.",
+                        "campaign_id": campaign.campaign_id,
+                    }
+                )
+                return 0
             _print(
                 resolve_opportunity_outcomes(
                     BinancePublicClient(service.config.data), opportunity_store, campaign
@@ -497,7 +604,14 @@ def main(argv: list[str] | None = None) -> int:
             from .forward_diagnostics import forward_doctor
             doc = forward_doctor()
             _print(doc)
-            return 0 if doc["status"] == "HEALTHY" else 2
+            return (
+                0
+                if doc.get(
+                    "is_healthy",
+                    doc.get("status") in {"HEALTHY", "HEALTHY_ACCUMULATING", "PREREGISTERED_NOT_STARTED"},
+                )
+                else 2
+            )
         if args.forward_evidence_command == "recover-services":
             from .forward_diagnostics import recover_services
             res = recover_services(dry_run=getattr(args, "dry_run", False))

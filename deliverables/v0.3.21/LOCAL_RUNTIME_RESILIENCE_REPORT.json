@@ -1,0 +1,80 @@
+{
+  "schema_version": "1.0.0",
+  "generated_at_utc": "2026-09-03T17:14:00Z",
+  "generated_at_hkt": "2026-09-04T01:14:00+08:00",
+  "host_environment": {
+    "os": "Windows 11 (Host) / WSL2 Ubuntu 24.04 LTS (Runtime)",
+    "wsl_systemd_enabled": true,
+    "wsl_user_linger_enabled": true,
+    "wsl_user": "root",
+    "power_profile_audit": {
+      "sleep_state": "Modern Standby (S0 Low Power Idle) supported on host hardware",
+      "risk_classification": "ACTIVE_FORWARD_SUSPEND_RISK",
+      "mitigation_status": "Documented in operational runbooks; recover_forward_wsl.ps1 checks power profile and alerts operator; prevent_sleep script available for AC power runs; no unilateral power policy mutation without user approval"
+    }
+  },
+  "recovery_tooling": {
+    "windows_recovery_script": "scripts/windows/recover_forward_wsl.ps1",
+    "script_properties": {
+      "idempotent": true,
+      "no_embedded_credentials": true,
+      "no_execution_path": true,
+      "no_historical_backfill": true,
+      "no_silent_reset_of_terminal_campaigns": true,
+      "does_not_unilaterally_alter_sleep_policy": true
+    },
+    "service_recovery_command": "quantctl forward-evidence recover-services"
+  },
+  "service_architecture_hardening": {
+    "fail_closed_on_terminal_state": {
+      "derivatives": "quantctl derivatives collect-once --require-active-epoch strictly checks registry active_epoch(); exits cleanly with REFUSED_NO_ACTIVE_EPOCH when all epochs are terminal",
+      "opportunity_collector": "quantctl opportunity-forward collect-once strictly resolves active campaign via resolve_active_opportunity_campaign(); exits cleanly with REFUSED_NO_ACTIVE_CAMPAIGN when all campaigns are terminal",
+      "opportunity_resolver": "quantctl opportunity-forward resolve strictly resolves active campaign via resolve_active_opportunity_campaign(); exits cleanly with REFUSED_NO_ACTIVE_CAMPAIGN when all campaigns are terminal",
+      "preregistration_window_handling": "Both collectors refuse execution with REFUSED_PREREGISTERED_PENDING if wall-clock time has not reached frozen start boundary"
+    },
+    "collector_resolver_parity": {
+      "wiring": "btc-quant-opportunity-forward.service and btc-quant-opportunity-resolve.service both target --registry configs/forward/opportunity_forward_campaigns.json",
+      "hardcoded_version_paths_eliminated": true,
+      "parity_check": "Verified via forward_doctor check_collector_resolver_parity()"
+    }
+  },
+  "resource_protection": {
+    "storage": {
+      "filesystem_mount": "/root/workspace/project/Quant-agent",
+      "free_gb": 833.0,
+      "total_gb": 1006.85,
+      "free_space_threshold_gb": 10.0,
+      "critical_free_space_threshold_gb": 2.0,
+      "writable": true,
+      "status": "HEALTHY"
+    },
+    "sqlite_integrity": {
+      "derivatives_store": "ok",
+      "opportunity_shadow_store": "ok",
+      "status": "HEALTHY"
+    },
+    "microstructure_partition_growth": {
+      "root": "data/forward/BTCUSDT/microstructure",
+      "partition_count": 4,
+      "total_size_mb": 5969.4,
+      "latest_heartbeat_age_seconds": 1.95,
+      "max_allowed_heartbeat_staleness_seconds": 300.0,
+      "status": "HEALTHY_STREAMING"
+    }
+  },
+  "egress_and_network_health": {
+    "egress_ip": "150.249.219.212",
+    "egress_location": "Tokyo, Japan",
+    "egress_asn": "AS2527 Sony Network Communications Inc.",
+    "binance_reachability": "OK",
+    "http_451_detected": false,
+    "status": "HEALTHY"
+  },
+  "safety_invariants": {
+    "execution": "DISABLED",
+    "final_holdout": "SEALED",
+    "qualified_direction_engine": "NONE",
+    "strategy": "EXPERIMENTAL",
+    "immutable_evidence_policy": "NO_BACKFILL_OR_HISTORY_REWRITE"
+  }
+}

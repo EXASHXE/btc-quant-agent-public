@@ -1,0 +1,26 @@
+{
+  "schema_version": "1.0.0",
+  "epoch_id": "DERIVATIVES_PIT_EPOCH_V0321_001",
+  "symbol": "BTCUSDT",
+  "created_from_git_sha": "b3ed6f2f84b717601303296370ef31f812fc3586",
+  "epoch_start_utc": "2026-09-03T18:00:00Z",
+  "epoch_start_ms": 1788458400000,
+  "epoch_start_rule": "Fixed 18:00 UTC 15m boundary selected prior to activation after runtime state reconciliation, local resilience hardening, and egress verification; never moved by status or observed results",
+  "cadence_minutes": 15,
+  "post_boundary_delay_seconds": 20,
+  "required_fields": [
+    "funding_rate",
+    "open_interest",
+    "taker_buy_sell_ratio",
+    "basis_rate",
+    "long_short_account_ratio"
+  ],
+  "minimum_days": 30,
+  "minimum_fully_available_snapshots": 2500,
+  "minimum_required_field_availability": 0.95,
+  "maximum_consecutive_failed_or_missing_scheduled_slots": 4,
+  "manual_runs_count_for_eligibility": false,
+  "legacy_runs_count_for_eligibility": false,
+  "backfill_allowed": false,
+  "final_holdout_access": false
+}

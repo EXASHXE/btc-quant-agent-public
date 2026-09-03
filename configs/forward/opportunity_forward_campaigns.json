@@ -26,8 +26,22 @@
       "config_path": "configs/forward/v0.3.20_opportunity_successor_campaign.json",
       "start_ms": 1788417000000,
       "hypothesis_id": "H37_OPPORTUNITY_FORWARD_REPLICATION_RECOVERY",
-      "status": "ACTIVE_ACCUMULATING",
-      "formal_role": "FORMAL_SUCCESSOR_ACTIVE",
+      "status": "DATA_QUALITY_TERMINAL_ARCHIVE",
+      "formal_role": "DATA_QUALITY_TERMINAL_ARCHIVE",
+      "terminal_reason": "max_consecutive_missed_decision_slots=5 first exceeded frozen maximum=4",
+      "terminal_at_ms": 1788420600000,
+      "immutable_history": true,
+      "superseded_by": "OPPORTUNITY_FORWARD_V0321_20260903T180000Z"
+    },
+    {
+      "campaign_id": "OPPORTUNITY_FORWARD_V0321_20260903T180000Z",
+      "config_path": "configs/forward/v0.3.21_opportunity_successor_campaign.json",
+      "start_ms": 1788458400000,
+      "hypothesis_id": "H38_OPPORTUNITY_FORWARD_REPLICATION_LOCAL_RECOVERY",
+      "status": "PREREGISTERED_PENDING",
+      "formal_role": "FORMAL_SUCCESSOR_PENDING",
+      "terminal_reason": null,
+      "terminal_at_ms": null,
       "immutable_history": true,
       "superseded_by": null
     }

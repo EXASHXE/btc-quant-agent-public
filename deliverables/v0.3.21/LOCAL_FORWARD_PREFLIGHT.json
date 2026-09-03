@@ -1,0 +1,240 @@
+{
+  "campaigns": {
+    "derivatives_epochs": {
+      "active_or_preregistered": [
+        {
+          "epoch_id": "DERIVATIVES_PIT_EPOCH_V0321_001",
+          "role": "FORMAL_SUCCESSOR_PENDING",
+          "start_ms": 1788458400000,
+          "starts_in_seconds": 2570.803,
+          "status": "PREREGISTERED_PENDING"
+        }
+      ],
+      "has_active_or_preregistered": true,
+      "terminal_archives": [
+        {
+          "epoch_id": "DERIVATIVES_PIT_EPOCH_V0314_001",
+          "status": "FAILED_GAP_GATE_TERMINAL",
+          "terminal_reason": "max_consecutive_bad_or_missing_slots=5 first exceeded frozen maximum=4"
+        },
+        {
+          "epoch_id": "DERIVATIVES_PIT_EPOCH_V0316_001",
+          "status": "CANCELLED_BEFORE_START",
+          "terminal_reason": "Fast supervisor restart exposed a lease-recovery timing defect before epoch activation; no epoch observations existed and the frozen start was not moved"
+        },
+        {
+          "epoch_id": "DERIVATIVES_PIT_EPOCH_V0316_002",
+          "status": "FAILED_GAP_GATE_TERMINAL",
+          "terminal_reason": "max_consecutive_bad_or_missing_slots=15 first exceeded frozen maximum=4 during host power suspend (Windows Modern Standby)"
+        },
+        {
+          "epoch_id": "DERIVATIVES_PIT_EPOCH_V0320_001",
+          "status": "FAILED_GAP_GATE_TERMINAL",
+          "terminal_reason": "max_consecutive_bad_or_missing_slots=5 first exceeded frozen maximum=4"
+        }
+      ]
+    },
+    "has_active_derivatives": true,
+    "has_active_opportunity": true,
+    "opportunity_campaigns": {
+      "active_or_preregistered": [
+        {
+          "campaign_id": "OPPORTUNITY_FORWARD_V0321_20260903T180000Z",
+          "hypothesis_id": "H38_OPPORTUNITY_FORWARD_REPLICATION_LOCAL_RECOVERY",
+          "role": "FORMAL_SUCCESSOR_PENDING",
+          "start_ms": 1788458400000,
+          "starts_in_seconds": 2570.803,
+          "status": "PREREGISTERED_PENDING"
+        }
+      ],
+      "campaigns": [
+        {
+          "campaign_id": "OPPORTUNITY_FORWARD_V0313_20260831T050656Z",
+          "hypothesis_id": "H35_OPPORTUNITY_FORWARD",
+          "role": "DATA_QUALITY_AT_RISK_ARCHIVE",
+          "start_ms": 1788152816561,
+          "starts_in_seconds": 0.0,
+          "status": "H35_DATA_QUALITY_AT_RISK"
+        },
+        {
+          "campaign_id": "OPPORTUNITY_FORWARD_V0317_20260901T160000Z",
+          "hypothesis_id": "H36_OPPORTUNITY_FORWARD_REPLICATION",
+          "role": "DATA_QUALITY_TERMINAL_ARCHIVE",
+          "start_ms": 1788278400000,
+          "starts_in_seconds": 0.0,
+          "status": "DATA_QUALITY_TERMINAL_ARCHIVE"
+        },
+        {
+          "campaign_id": "OPPORTUNITY_FORWARD_V0320_20260903T063000Z",
+          "hypothesis_id": "H37_OPPORTUNITY_FORWARD_REPLICATION_RECOVERY",
+          "role": "DATA_QUALITY_TERMINAL_ARCHIVE",
+          "start_ms": 1788417000000,
+          "starts_in_seconds": 0.0,
+          "status": "DATA_QUALITY_TERMINAL_ARCHIVE"
+        },
+        {
+          "campaign_id": "OPPORTUNITY_FORWARD_V0321_20260903T180000Z",
+          "hypothesis_id": "H38_OPPORTUNITY_FORWARD_REPLICATION_LOCAL_RECOVERY",
+          "role": "FORMAL_SUCCESSOR_PENDING",
+          "start_ms": 1788458400000,
+          "starts_in_seconds": 2570.803,
+          "status": "PREREGISTERED_PENDING"
+        }
+      ],
+      "has_active_or_preregistered": true,
+      "terminal_archives": [
+        {
+          "campaign_id": "OPPORTUNITY_FORWARD_V0313_20260831T050656Z",
+          "hypothesis_id": "H35_OPPORTUNITY_FORWARD",
+          "role": "DATA_QUALITY_AT_RISK_ARCHIVE",
+          "status": "H35_DATA_QUALITY_AT_RISK",
+          "terminal_reason": null
+        },
+        {
+          "campaign_id": "OPPORTUNITY_FORWARD_V0317_20260901T160000Z",
+          "hypothesis_id": "H36_OPPORTUNITY_FORWARD_REPLICATION",
+          "role": "DATA_QUALITY_TERMINAL_ARCHIVE",
+          "status": "DATA_QUALITY_TERMINAL_ARCHIVE",
+          "terminal_reason": null
+        },
+        {
+          "campaign_id": "OPPORTUNITY_FORWARD_V0320_20260903T063000Z",
+          "hypothesis_id": "H37_OPPORTUNITY_FORWARD_REPLICATION_RECOVERY",
+          "role": "DATA_QUALITY_TERMINAL_ARCHIVE",
+          "status": "DATA_QUALITY_TERMINAL_ARCHIVE",
+          "terminal_reason": "max_consecutive_missed_decision_slots=5 first exceeded frozen maximum=4"
+        }
+      ]
+    }
+  },
+  "chains": {
+    "derivatives": {
+      "latest_slot_ms": 1788454800000,
+      "latest_status": "PARTIAL",
+      "sqlite_integrity": "ok",
+      "store_path": "data/forward/BTCUSDT/derivatives.sqlite3"
+    },
+    "microstructure": {
+      "heartbeat_age_seconds": 2.758,
+      "latest_heartbeat_ms": 1788455826438,
+      "partition_count": 4,
+      "root": "data/forward/BTCUSDT/microstructure",
+      "total_size_mb": 5978.83
+    },
+    "opportunity": {
+      "latest_slot_ms": 1788454800000,
+      "latest_status": "SUCCESSFUL_SCAN",
+      "sqlite_integrity": "ok",
+      "store_path": "data/forward/BTCUSDT/opportunity_shadow.sqlite3"
+    },
+    "storage": {
+      "free_gb": 832.98,
+      "total_gb": 1006.85,
+      "writable": true
+    }
+  },
+  "health_state": "PREREGISTERED_NOT_STARTED",
+  "is_healthy": true,
+  "issues": [],
+  "network": {
+    "all_proxy": null,
+    "binance_detail": "reachable",
+    "binance_reachability": "OK",
+    "http_proxy": "http://127.0.0.1:7897",
+    "https_proxy": "http://127.0.0.1:7897",
+    "proxy_port_7897_open": true
+  },
+  "parity": {
+    "detail": "Collector and resolver use aligned campaign resolution",
+    "parity_ok": true
+  },
+  "safety_invariants": {
+    "execution": "DISABLED",
+    "final_holdout": "SEALED",
+    "immutable_evidence_policy": "NO_BACKFILL_OR_HISTORY_REWRITE",
+    "qualified_direction_engine": "NONE",
+    "strategy": "EXPERIMENTAL"
+  },
+  "status": "PREREGISTERED_NOT_STARTED",
+  "systemd_units": {
+    "btc-quant-forward-derivatives.service": {
+      "active_state": "inactive",
+      "exec_start": "{ path=/root/workspace/project/Quant-agent/.venv/bin/quantctl ; argv[]=/root/workspace/project/Quant-agent/.venv/bin/quantctl derivatives collect-once --store /root/workspace/project/Quant-agent/data/forward/BTCUSDT/derivatives.sqlite3 --symbol BTCUSDT --require-active-epoch --epoch-registry /root/workspace/project/Quant-agent/configs/forward/derivatives_evidence_epochs.json ; ignore_errors=no ; start_time=[Fri 2026-09-04 01:15:20 CST] ; stop_time=[Fri 2026-09-04 01:15:20 CST] ; pid=243453 ; code=exited ; status=0 }",
+      "next_elapse_usec": "",
+      "result": "success",
+      "sub_state": "dead",
+      "unit_file_state": "static"
+    },
+    "btc-quant-forward-derivatives.timer": {
+      "active_state": "active",
+      "exec_start": "",
+      "next_elapse_usec": "Fri 2026-09-04 01:30:20 CST",
+      "result": "success",
+      "sub_state": "waiting",
+      "unit_file_state": "enabled"
+    },
+    "btc-quant-forward-health.service": {
+      "active_state": "inactive",
+      "exec_start": "{ path=/root/workspace/project/Quant-agent/.venv/bin/quantctl ; argv[]=/root/workspace/project/Quant-agent/.venv/bin/quantctl forward-evidence health ; ignore_errors=no ; start_time=[Fri 2026-09-04 01:08:00 CST] ; stop_time=[Fri 2026-09-04 01:08:04 CST] ; pid=228396 ; code=exited ; status=2 }",
+      "next_elapse_usec": "",
+      "result": "success",
+      "sub_state": "dead",
+      "unit_file_state": "static"
+    },
+    "btc-quant-forward-health.timer": {
+      "active_state": "active",
+      "exec_start": "",
+      "next_elapse_usec": "Fri 2026-09-04 01:23:00 CST",
+      "result": "success",
+      "sub_state": "waiting",
+      "unit_file_state": "enabled"
+    },
+    "btc-quant-microstructure-forward.service": {
+      "active_state": "active",
+      "exec_start": "{ path=/root/workspace/project/Quant-agent/.venv/bin/quantctl ; argv[]=/root/workspace/project/Quant-agent/.venv/bin/quantctl microstructure-forward run --root /root/workspace/project/Quant-agent/data/forward/BTCUSDT/microstructure --campaign /root/workspace/project/Quant-agent/configs/forward/v0.3.15_microstructure_capture_campaign.json ; ignore_errors=no ; start_time=[n/a] ; stop_time=[n/a] ; pid=0 ; code=(null) ; status=0/0 }",
+      "next_elapse_usec": "",
+      "result": "success",
+      "sub_state": "running",
+      "unit_file_state": "enabled"
+    },
+    "btc-quant-opportunity-forward.service": {
+      "active_state": "inactive",
+      "exec_start": "{ path=/root/workspace/project/Quant-agent/.venv/bin/quantctl ; argv[]=/root/workspace/project/Quant-agent/.venv/bin/quantctl opportunity-forward collect-once --store /root/workspace/project/Quant-agent/data/forward/BTCUSDT/opportunity_shadow.sqlite3 --registry /root/workspace/project/Quant-agent/configs/forward/opportunity_forward_campaigns.json ; ignore_errors=no ; start_time=[Fri 2026-09-04 01:15:50 CST] ; stop_time=[Fri 2026-09-04 01:15:50 CST] ; pid=244107 ; code=exited ; status=0 }",
+      "next_elapse_usec": "",
+      "result": "success",
+      "sub_state": "dead",
+      "unit_file_state": "static"
+    },
+    "btc-quant-opportunity-forward.timer": {
+      "active_state": "active",
+      "exec_start": "",
+      "next_elapse_usec": "Fri 2026-09-04 01:30:50 CST",
+      "result": "success",
+      "sub_state": "waiting",
+      "unit_file_state": "enabled"
+    },
+    "btc-quant-opportunity-resolve.service": {
+      "active_state": "inactive",
+      "exec_start": "{ path=/root/workspace/project/Quant-agent/.venv/bin/quantctl ; argv[]=/root/workspace/project/Quant-agent/.venv/bin/quantctl opportunity-forward resolve --store /root/workspace/project/Quant-agent/data/forward/BTCUSDT/opportunity_shadow.sqlite3 --registry /root/workspace/project/Quant-agent/configs/forward/opportunity_forward_campaigns.json ; ignore_errors=no ; start_time=[n/a] ; stop_time=[n/a] ; pid=0 ; code=(null) ; status=0/0 }",
+      "next_elapse_usec": "",
+      "result": "success",
+      "sub_state": "dead",
+      "unit_file_state": "static"
+    },
+    "btc-quant-opportunity-resolve.timer": {
+      "active_state": "active",
+      "exec_start": "",
+      "next_elapse_usec": "Fri 2026-09-04 02:07:00 CST",
+      "result": "success",
+      "sub_state": "waiting",
+      "unit_file_state": "enabled"
+    }
+  },
+  "wsl_systemd": {
+    "is_wsl": true,
+    "linger_enabled": true,
+    "systemd_running": true,
+    "systemd_state": "running",
+    "user": "root"
+  }
+}

@@ -121,6 +121,7 @@ class EvidenceEpochRegistry:
             for entry in self.entries
             if entry.formal_eligibility_role in {"FORMAL_ACTIVE", "FORMAL_SUCCESSOR_PENDING"}
             and entry.start_ms <= now_ms
+            and entry.status not in {"FAILED_GAP_GATE_TERMINAL", "CANCELLED_BEFORE_START"}
         ]
         if successor:
             return max(successor, key=lambda entry: entry.start_ms)
@@ -140,6 +141,26 @@ class EvidenceEpochRegistry:
             raise ValueError("evidence epoch registry/config identity mismatch")
         return epoch, lifecycle
 
+    def active_lifecycle(self, now_ms: int | None = None) -> EvidenceEpochLifecycle | None:
+        candidates = [
+            entry
+            for entry in self.entries
+            if entry.formal_eligibility_role in {"FORMAL_ACTIVE", "FORMAL_SUCCESSOR_PENDING"}
+            and entry.status not in {"FAILED_GAP_GATE_TERMINAL", "CANCELLED_BEFORE_START"}
+        ]
+        if not candidates:
+            return None
+        return max(candidates, key=lambda entry: entry.start_ms)
+
+    def active_epoch(self, now_ms: int | None = None) -> tuple[EvidenceEpoch, EvidenceEpochLifecycle] | None:
+        lifecycle = self.active_lifecycle(now_ms)
+        if lifecycle is None:
+            return None
+        epoch = EvidenceEpoch.load(lifecycle.config_path)
+        if epoch.epoch_id != lifecycle.epoch_id or epoch.epoch_start_ms != lifecycle.start_ms:
+            raise ValueError("evidence epoch registry/config identity mismatch")
+        return epoch, lifecycle
+
     def as_dict(self) -> list[dict[str, Any]]:
         return [entry.__dict__.copy() for entry in self.entries]
 
@@ -154,3 +175,14 @@ def resolve_formal_epoch(
     if registry.exists():
         return EvidenceEpochRegistry.load(registry).formal_epoch(now_ms)
     return EvidenceEpoch.load(fallback_epoch_path), None
+
+
+def resolve_active_derivatives_epoch(
+    *,
+    registry_path: str | Path = "configs/forward/derivatives_evidence_epochs.json",
+    now_ms: int | None = None,
+) -> tuple[EvidenceEpoch, EvidenceEpochLifecycle] | None:
+    registry = Path(registry_path)
+    if not registry.exists():
+        return None
+    return EvidenceEpochRegistry.load(registry).active_epoch(now_ms)

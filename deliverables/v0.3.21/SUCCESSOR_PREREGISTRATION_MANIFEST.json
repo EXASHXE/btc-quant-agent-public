@@ -1,0 +1,95 @@
+{
+  "schema_version": "1.0.0",
+  "preregistration_timestamp_utc": "2026-09-03T17:12:00Z",
+  "preregistration_timestamp_hkt": "2026-09-04T01:12:00+08:00",
+  "selected_boundary_utc": "2026-09-03T18:00:00Z",
+  "selected_boundary_ms": 1788458400000,
+  "delay_minutes_from_preregistration": 48.0,
+  "commit_boundary_buffer_minutes": 48.0,
+  "minimum_required_buffer_minutes": 30.0,
+  "egress_verification": {
+    "egress_ip": "150.249.219.212",
+    "egress_country": "Japan",
+    "egress_city": "Tokyo",
+    "asn": "AS2527 Sony Network Communications Inc.",
+    "binance_rest_ping_status": "HTTP 200 OK",
+    "binance_fapi_time_status": "HTTP 200 OK",
+    "binance_http_451_observed": false,
+    "reachability_verdict": "OK"
+  },
+  "derivatives": {
+    "epoch_id": "DERIVATIVES_PIT_EPOCH_V0321_001",
+    "registry_path": "configs/forward/derivatives_evidence_epochs.json",
+    "config_path": "configs/forward/v0.3.21_derivatives_evidence_epoch.json",
+    "start_utc": "2026-09-03T18:00:00Z",
+    "start_ms": 1788458400000,
+    "status": "PREREGISTERED_PENDING",
+    "formal_role": "FORMAL_SUCCESSOR_PENDING",
+    "supersedes_epoch_id": "DERIVATIVES_PIT_EPOCH_V0320_001",
+    "frozen_rules": {
+      "cadence_minutes": 15,
+      "post_boundary_delay_seconds": 20,
+      "required_fields": [
+        "funding_rate",
+        "open_interest",
+        "taker_buy_sell_ratio",
+        "basis_rate",
+        "long_short_account_ratio"
+      ],
+      "minimum_days": 30,
+      "minimum_fully_available_snapshots": 2500,
+      "minimum_required_field_availability": 0.95,
+      "maximum_consecutive_failed_or_missing_scheduled_slots": 4,
+      "backfill_allowed": false,
+      "final_holdout_access": false
+    }
+  },
+  "opportunity": {
+    "campaign_id": "OPPORTUNITY_FORWARD_V0321_20260903T180000Z",
+    "hypothesis_id": "H38_OPPORTUNITY_FORWARD_REPLICATION_LOCAL_RECOVERY",
+    "registry_path": "configs/forward/opportunity_forward_campaigns.json",
+    "config_path": "configs/forward/v0.3.21_opportunity_successor_campaign.json",
+    "start_utc": "2026-09-03T18:00:00Z",
+    "start_ms": 1788458400000,
+    "status": "PREREGISTERED_PENDING",
+    "formal_role": "FORMAL_SUCCESSOR_PENDING",
+    "supersedes_campaign_id": "OPPORTUNITY_FORWARD_V0320_20260903T063000Z",
+    "frozen_rules": {
+      "direction_claim": "NONE",
+      "normal_runtime_mode": "RUNTIME_GATED",
+      "detector_ids": [
+        "trend_pullback_opportunity",
+        "breakout_retest_opportunity"
+      ],
+      "movement_horizons_minutes": [240, 480],
+      "movement_metrics": [
+        "future_range_atr",
+        "max_up_excursion_atr",
+        "max_down_excursion_atr",
+        "max_abs_excursion_atr"
+      ],
+      "reference_rule": "OPEN of first fully available 1m bar strictly after decision close",
+      "atr_rule": "frozen 15m ATR observed at the original forward scan",
+      "maximum_consecutive_missed_decision_slots": 4,
+      "minimum_successful_scheduled_scan_ratio": 0.95,
+      "minimum_resolved_opportunities": 30,
+      "preferred_resolved_opportunities": 50,
+      "minimum_calendar_days": 30,
+      "minimum_unique_matched_controls": 100,
+      "minimum_distinct_utc_days": 20,
+      "execution": "DISABLED",
+      "final_holdout": "SEALED"
+    }
+  },
+  "safety_invariants_strictly_observed": {
+    "historical_rows_rewritten": false,
+    "failed_records_deleted": false,
+    "retroactive_backfill_performed": false,
+    "historical_start_timestamps_moved": false,
+    "terminal_chains_reset": false,
+    "synthetic_order_book_from_candles": false,
+    "direction_post_hoc_sign_flip": false,
+    "final_holdout_accessed": false,
+    "live_trading_enabled": false
+  }
+}

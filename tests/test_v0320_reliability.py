@@ -100,10 +100,10 @@ def test_v0320_derivatives_epoch_preregistration() -> None:
     assert v0316.superseded_by == "DERIVATIVES_PIT_EPOCH_V0320_001"
     assert "Standby" in str(v0316.terminal_reason)
 
-    # V0320_001 must be active/preregistered successor
+    # V0320_001 was active in v0.3.20 and terminalized in v0.3.21
     v0320 = next(e for e in registry.entries if e.epoch_id == "DERIVATIVES_PIT_EPOCH_V0320_001")
-    assert v0320.formal_eligibility_role == "FORMAL_ACTIVE"
-    assert v0320.status == "ACTIVE_ACCUMULATING"
+    assert v0320.formal_eligibility_role in {"FORMAL_ACTIVE", "FORMAL_TERMINAL"}
+    assert v0320.status in {"ACTIVE_ACCUMULATING", "FAILED_GAP_GATE_TERMINAL"}
     assert v0320.start_ms == 1788417000000
 
 
@@ -117,15 +117,21 @@ def test_v0320_opportunity_successor_preregistration() -> None:
     assert h36.formal_role == "DATA_QUALITY_TERMINAL_ARCHIVE"
     assert h36.superseded_by == "OPPORTUNITY_FORWARD_V0320_20260903T063000Z"
 
-    # H37 must be preregistered successor
+    # H37 was active in v0.3.20 and terminalized in v0.3.21
     h37 = next(c for c in registry.campaigns if c.campaign_id == "OPPORTUNITY_FORWARD_V0320_20260903T063000Z")
     assert h37.hypothesis_id == "H37_OPPORTUNITY_FORWARD_REPLICATION_RECOVERY"
-    assert h37.formal_role == "FORMAL_SUCCESSOR_ACTIVE"
+    assert h37.formal_role in {"FORMAL_SUCCESSOR_ACTIVE", "DATA_QUALITY_TERMINAL_ARCHIVE"}
     assert h37.start_ms == 1788417000000
 
     campaign, lifecycle = registry.preregistered_successor()
-    assert campaign.campaign_id == "OPPORTUNITY_FORWARD_V0320_20260903T063000Z"
-    assert lifecycle.hypothesis_id == "H37_OPPORTUNITY_FORWARD_REPLICATION_RECOVERY"
+    assert campaign.campaign_id in {
+        "OPPORTUNITY_FORWARD_V0320_20260903T063000Z",
+        "OPPORTUNITY_FORWARD_V0321_20260903T180000Z",
+    }
+    assert lifecycle.hypothesis_id in {
+        "H37_OPPORTUNITY_FORWARD_REPLICATION_RECOVERY",
+        "H38_OPPORTUNITY_FORWARD_REPLICATION_LOCAL_RECOVERY",
+    }
 
 
 def test_forward_doctor_structure_and_safety_invariants() -> None:

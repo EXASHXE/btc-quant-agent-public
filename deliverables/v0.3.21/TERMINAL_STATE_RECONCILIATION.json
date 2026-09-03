@@ -1,0 +1,71 @@
+{
+  "schema_version": "1.0.0",
+  "reconciliation_timestamp_utc": "2026-09-03T17:05:00Z",
+  "reconciliation_timestamp_hkt": "2026-09-04T01:05:00+08:00",
+  "chains": {
+    "derivatives": {
+      "epoch_id": "DERIVATIVES_PIT_EPOCH_V0320_001",
+      "registry_path": "configs/forward/derivatives_evidence_epochs.json",
+      "config_path": "configs/forward/v0.3.20_derivatives_evidence_epoch.json",
+      "start_utc": "2026-09-03T06:30:00Z",
+      "start_ms": 1788417000000,
+      "reconciled_status": "FAILED_GAP_GATE_TERMINAL",
+      "reconciled_formal_role": "FORMAL_TERMINAL",
+      "terminal": true,
+      "terminal_at_utc": "2026-09-03T07:30:00Z",
+      "terminal_at_ms": 1788420600000,
+      "terminal_reason": "max_consecutive_bad_or_missing_slots=5 first exceeded frozen maximum=4",
+      "evidence_summary": {
+        "expected_slots_since_start": 5,
+        "recorded_runs": 5,
+        "fully_available": 0,
+        "failed_runs": 5,
+        "consecutive_failed_streak": 5,
+        "maximum_allowed_consecutive_gap": 4,
+        "gap_gate_breached": true,
+        "root_cause": "Binance Futures REST API rejected requests with HTTP 451: Unavailable For Legal Reasons due to local proxy US routing."
+      },
+      "superseded_by": null,
+      "immutable_history": true
+    },
+    "opportunity": {
+      "campaign_id": "OPPORTUNITY_FORWARD_V0320_20260903T063000Z",
+      "hypothesis_id": "H37_OPPORTUNITY_FORWARD_REPLICATION_RECOVERY",
+      "registry_path": "configs/forward/opportunity_forward_campaigns.json",
+      "config_path": "configs/forward/v0.3.20_opportunity_successor_campaign.json",
+      "start_utc": "2026-09-03T06:30:00Z",
+      "start_ms": 1788417000000,
+      "reconciled_status": "DATA_QUALITY_TERMINAL_ARCHIVE",
+      "reconciled_formal_role": "DATA_QUALITY_TERMINAL_ARCHIVE",
+      "terminal": true,
+      "terminal_at_utc": "2026-09-03T07:30:00Z",
+      "terminal_at_ms": 1788420600000,
+      "terminal_reason": "max_consecutive_missed_decision_slots=5 first exceeded frozen maximum=4",
+      "evidence_summary": {
+        "expected_scans_since_start": 5,
+        "recorded_scans": 5,
+        "successful_scans": 0,
+        "missed_decision_slots": 5,
+        "consecutive_missed_streak": 5,
+        "maximum_allowed_consecutive_misses": 4,
+        "miss_gate_breached": true,
+        "root_cause": "Market data health UNAVAILABLE due to Binance HTTP 451; scanner recorded MISSED_DECISION_SLOT for all 5 scheduled decision slots."
+      },
+      "superseded_by": null,
+      "immutable_history": true
+    },
+    "microstructure": {
+      "campaign_id": "MICROSTRUCTURE_CAPTURE_V0315_001",
+      "status": "HEALTHY_COLLECTING",
+      "terminal": false,
+      "note": "Microstructure capture remains healthy and independent; not marked terminal."
+    }
+  },
+  "safety_invariants_strictly_observed": {
+    "historical_rows_rewritten": false,
+    "failed_records_deleted": false,
+    "retroactive_backfill_performed": false,
+    "historical_start_timestamps_moved": false,
+    "terminal_chains_reset": false
+  }
+}
