@@ -246,7 +246,7 @@ END { if(cur!="") print cur,count,closing; print "#STATS",rows,ms,us,order,dup,g
 """
 
 AGG_AWK = r"""
-BEGIN { OFS=","; OFMT="%.17g"; CONVFMT="%.17g"; cur=""; source=0; rows=0; ms=0; us=0; order=0; torder=0; dup=0; conflict=0; lastid=-1; lastseen=-1; firstts=-1; lastts=-1; previous=""; buy=0; sell=0 }
+BEGIN { OFS=","; OFMT="%.17g"; CONVFMT="%.17g"; source=0; rows=0; ms=0; us=0; order=0; torder=0; dup=0; conflict=0; lastid=-1; lastseen=-1; firstts=-1; lastts=-1; previous="" }
 $1 ~ /^[0-9]+$/ {
  source++;
  id=$1+0; raw=$6+0; if(raw>=1000000000000000){ts=int(raw/1000);us++}else{ts=raw;ms++}
@@ -255,11 +255,10 @@ $1 ~ /^[0-9]+$/ {
  if(id==lastid){dup++; if($0!=previous) conflict++; next}
  lastid=id; previous=$0
  h=int(ts/3600000)*3600000
- if(cur!="" && h!=cur){print cur,count,buy,sell; count=0;buy=0;sell=0}
- cur=h; notional=($2+0)*($3+0); maker=tolower($7); if(maker=="true")sell+=notional;else buy+=notional
- count++;rows++
+ notional=($2+0)*($3+0); maker=tolower($7); if(maker=="true")sell[h]+=notional;else buy[h]+=notional
+ count[h]++;rows++
 }
-END { if(cur!="") print cur,count,buy,sell; print "#STATS",source,rows,ms,us,order,torder,dup,conflict,firstts,lastts }
+END { for(h in count) print h,count[h],buy[h]+0,sell[h]+0; print "#STATS",source,rows,ms,us,order,torder,dup,conflict,firstts,lastts }
 """
 
 FUNDING_AWK = r"""
@@ -345,15 +344,15 @@ def _aggregate_archive(record: dict[str, Any]) -> tuple[list[list[str]], dict[st
         raw_order_errors = stats["order_errors"]
         raw_timestamp_order_errors = stats["timestamp_order_errors"]
         raw_consecutive_duplicates = stats["duplicate_ids"]
-        if raw_order_errors or raw_timestamp_order_errors or raw_consecutive_duplicates:
+        if raw_order_errors or raw_consecutive_duplicates:
             rows, stats_row = _run_aggregation(record, program, sort_aggregate_ids=True)
             stats = {
                 key: int(float(value))
                 for key, value in zip(agg_keys, stats_row[1:], strict=True)
             }
-            if stats["order_errors"] or stats["timestamp_order_errors"]:
+            if stats["order_errors"]:
                 raise RuntimeError(
-                    f"aggregate-ID repair did not restore monotonicity: {family} {record['month']}"
+                    f"aggregate-ID repair did not restore ID monotonicity: {family} {record['month']}"
                 )
             if stats["duplicate_conflicts"]:
                 raise RuntimeError(
