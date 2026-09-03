@@ -56,11 +56,13 @@ All required artifacts have been compiled and verified under `deliverables/v0.3.
 - **CI Provenance & Python 3.12 Repair**:
   - In initial CI run `33719993032`, Python 3.11 and 3.13 passed while Python 3.12 failed `test_network_proxy_check_detects_http_451` (1 failed, 428 passed) due to module-local `urlopen` symbol binding.
   - Refactored `check_network_proxy` to access `urllib.request.urlopen` dynamically and support explicit `url_opener` dependency injection.
-  - Verified deterministically passing across Python 3.11, 3.12, and 3.13.
-- **Unit & Reliability Test Suite**: `429 passed in 11.4s` (zero failures).
+  - All CI workflows fully green across Python 3.11, 3.12, and 3.13:
+    - Push Workflow: [Run #33729160290](https://github.com/EXASHXE/btc-quant-agent/actions/runs/33729160290) (`quality (3.11)`: ✓, `quality (3.12)`: ✓, `quality (3.13)`: ✓).
+    - Pull Request Workflow: [Run #33729163910](https://github.com/EXASHXE/btc-quant-agent/actions/runs/33729163910) (`quality (3.11)`: ✓, `quality (3.12)`: ✓, `quality (3.13)`: ✓).
+- **Unit & Reliability Test Suite**: `429 passed in 9.82s` (zero failures).
 - **Code Linter**: `ruff check .` passed with zero violations.
 - **Static Type Analysis**: `mypy src` passed with zero type errors across all 73 source files.
-- **Compilation**: `python -m compileall src tests` verified clean bytecode compilation.
+- **Compilation**: `python -m compileall src tests tools` verified clean bytecode compilation.
 - **Successor Empirical Status**:
   - `DERIVATIVES_PIT_EPOCH_V0320_001`: `COMPROMISED_AT_RISK` / `TERMINAL_BREACH` (5 consecutive failed slots due to external HTTP 451 geo-block; $5 > 4$).
   - `OPPORTUNITY_FORWARD_V0320_20260903T063000Z` (H37): `COMPROMISED_AT_RISK` / `TERMINAL_BREACH` (5 consecutive missed scans; $5 > 4$).

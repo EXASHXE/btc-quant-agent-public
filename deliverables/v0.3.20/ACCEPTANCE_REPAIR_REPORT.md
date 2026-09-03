@@ -61,12 +61,24 @@ This acceptance repair round resolves all blockers identified during formal acce
 
 ---
 
-## 3. Verification Summary
+## 3. Verification Summary & CI Provenance
 
-| Gate | Status | Command |
+### Local Quality Gates
+| Gate | Status | Command / Details |
 | :--- | :--- | :--- |
-| **Unit & Reliability Tests** | **PASS** | `pytest -q tests/test_v0320_reliability.py` (8 passed) |
-| **Full Test Suite** | **PASS** | `pytest -q` (429 passed in 11.4s) |
+| **Unit & Reliability Tests** | **PASS** | `pytest -q tests/test_v0320_reliability.py` (8 passed in 1.51s) |
+| **Full Test Suite** | **PASS** | `pytest -q` (429 passed in 9.82s) |
 | **Linter** | **PASS** | `ruff check .` (0 errors) |
 | **Type Check** | **PASS** | `mypy src` (0 issues in 73 files) |
-| **Bytecode Compilation** | **PASS** | `python -m compileall src tests` |
+| **Bytecode Compilation** | **PASS** | `python -m compileall src tests tools` |
+
+### GitHub Actions CI Provenance
+- **Repaired Head SHA**: `04f31a89665675e81f14ecdf5b2ee5f32a7fa93a`
+- **Push Workflow Run**: [Run #33729160290](https://github.com/EXASHXE/btc-quant-agent/actions/runs/33729160290) — **SUCCESS**
+  - Python 3.11: `PASSED` (41s, Job ID 100564917412)
+  - Python 3.12: `PASSED` (40s, Job ID 100564917552)
+  - Python 3.13: `PASSED` (1m14s, Job ID 100564917664)
+- **Pull Request Workflow Run**: [Run #33729163910](https://github.com/EXASHXE/btc-quant-agent/actions/runs/33729163910) — **SUCCESS**
+  - Python 3.11: `PASSED` (1m27s, Job ID 100564928454)
+  - Python 3.12: `PASSED` (41s, Job ID 100564928476)
+  - Python 3.13: `PASSED` (1m37s, Job ID 100564928222)
