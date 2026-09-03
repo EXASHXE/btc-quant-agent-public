@@ -1,0 +1,167 @@
+{
+  "campaigns": {
+    "derivatives_epochs": {
+      "active_or_preregistered": [
+        {
+          "epoch_id": "DERIVATIVES_PIT_EPOCH_V0320_001",
+          "role": "FORMAL_ACTIVE",
+          "start_ms": 1788417000000,
+          "starts_in_seconds": 3004.458,
+          "status": "ACTIVE_ACCUMULATING"
+        }
+      ],
+      "terminal_archives": [
+        {
+          "epoch_id": "DERIVATIVES_PIT_EPOCH_V0314_001",
+          "terminal_reason": "max_consecutive_bad_or_missing_slots=5 first exceeded frozen maximum=4"
+        },
+        {
+          "epoch_id": "DERIVATIVES_PIT_EPOCH_V0316_002",
+          "terminal_reason": "max_consecutive_bad_or_missing_slots=15 first exceeded frozen maximum=4 during host power suspend (Windows Modern Standby)"
+        }
+      ]
+    },
+    "opportunity_campaigns": {
+      "campaigns": [
+        {
+          "campaign_id": "OPPORTUNITY_FORWARD_V0313_20260831T050656Z",
+          "hypothesis_id": "H35_OPPORTUNITY_FORWARD",
+          "role": "DATA_QUALITY_AT_RISK_ARCHIVE",
+          "start_ms": 1788152816561,
+          "starts_in_seconds": 0.0,
+          "status": "H35_DATA_QUALITY_AT_RISK"
+        },
+        {
+          "campaign_id": "OPPORTUNITY_FORWARD_V0317_20260901T160000Z",
+          "hypothesis_id": "H36_OPPORTUNITY_FORWARD_REPLICATION",
+          "role": "DATA_QUALITY_TERMINAL_ARCHIVE",
+          "start_ms": 1788278400000,
+          "starts_in_seconds": 0.0,
+          "status": "DATA_QUALITY_TERMINAL_ARCHIVE"
+        },
+        {
+          "campaign_id": "OPPORTUNITY_FORWARD_V0320_20260903T063000Z",
+          "hypothesis_id": "H37_OPPORTUNITY_FORWARD_REPLICATION_RECOVERY",
+          "role": "FORMAL_SUCCESSOR_ACTIVE",
+          "start_ms": 1788417000000,
+          "starts_in_seconds": 3004.458,
+          "status": "ACTIVE_ACCUMULATING"
+        }
+      ]
+    }
+  },
+  "chains": {
+    "derivatives": {
+      "latest_slot_ms": 1788413400000,
+      "latest_status": "FAILED",
+      "store_path": "data/forward/BTCUSDT/derivatives.sqlite3"
+    },
+    "microstructure": {
+      "heartbeat_age_seconds": 45688.112,
+      "latest_heartbeat_ms": 1788368307430,
+      "root": "data/forward/BTCUSDT/microstructure"
+    },
+    "opportunity": {
+      "latest_slot_ms": 1788413400000,
+      "latest_status": "MISSED_DECISION_SLOT",
+      "store_path": "data/forward/BTCUSDT/opportunity_shadow.sqlite3"
+    },
+    "storage": {
+      "free_gb": 833.44,
+      "total_gb": 1006.85,
+      "writable": true
+    }
+  },
+  "issues": [
+    "WSL user linger is disabled (loginctl enable-linger)",
+    "Binance endpoints blocked by HTTP 451: Proxy is routed through restricted US node"
+  ],
+  "network": {
+    "all_proxy": null,
+    "binance_detail": "Binance rejected request: Service unavailable from restricted location (switch proxy away from US).",
+    "binance_reachability": "HTTP_451_REGION_RESTRICTED",
+    "http_proxy": "http://127.0.0.1:7897",
+    "https_proxy": "http://127.0.0.1:7897",
+    "proxy_port_7897_open": true
+  },
+  "safety_invariants": {
+    "execution": "DISABLED",
+    "final_holdout": "SEALED",
+    "immutable_evidence_policy": "NO_BACKFILL_OR_HISTORY_REWRITE",
+    "qualified_direction_engine": "NONE",
+    "strategy": "EXPERIMENTAL"
+  },
+  "status": "DEGRADED",
+  "systemd_units": {
+    "btc-quant-forward-derivatives.service": {
+      "active_state": "failed",
+      "next_elapse_usec": "",
+      "result": "exit-code",
+      "sub_state": "failed",
+      "unit_file_state": "static"
+    },
+    "btc-quant-forward-derivatives.timer": {
+      "active_state": "active",
+      "next_elapse_usec": "Thu 2026-09-03 13:45:20 HKT",
+      "result": "success",
+      "sub_state": "waiting",
+      "unit_file_state": "enabled"
+    },
+    "btc-quant-forward-health.service": {
+      "active_state": "failed",
+      "next_elapse_usec": "",
+      "result": "exit-code",
+      "sub_state": "failed",
+      "unit_file_state": "static"
+    },
+    "btc-quant-forward-health.timer": {
+      "active_state": "active",
+      "next_elapse_usec": "Thu 2026-09-03 13:53:00 HKT",
+      "result": "success",
+      "sub_state": "waiting",
+      "unit_file_state": "enabled"
+    },
+    "btc-quant-microstructure-forward.service": {
+      "active_state": "active",
+      "next_elapse_usec": "",
+      "result": "success",
+      "sub_state": "running",
+      "unit_file_state": "enabled"
+    },
+    "btc-quant-opportunity-forward.service": {
+      "active_state": "failed",
+      "next_elapse_usec": "",
+      "result": "exit-code",
+      "sub_state": "failed",
+      "unit_file_state": "static"
+    },
+    "btc-quant-opportunity-forward.timer": {
+      "active_state": "active",
+      "next_elapse_usec": "Thu 2026-09-03 13:45:50 HKT",
+      "result": "success",
+      "sub_state": "waiting",
+      "unit_file_state": "enabled"
+    },
+    "btc-quant-opportunity-resolve.service": {
+      "active_state": "inactive",
+      "next_elapse_usec": "",
+      "result": "success",
+      "sub_state": "dead",
+      "unit_file_state": "static"
+    },
+    "btc-quant-opportunity-resolve.timer": {
+      "active_state": "active",
+      "next_elapse_usec": "Thu 2026-09-03 14:07:00 HKT",
+      "result": "success",
+      "sub_state": "waiting",
+      "unit_file_state": "enabled"
+    }
+  },
+  "wsl_systemd": {
+    "is_wsl": true,
+    "linger_enabled": false,
+    "systemd_running": true,
+    "systemd_state": "degraded",
+    "user": "root"
+  }
+}

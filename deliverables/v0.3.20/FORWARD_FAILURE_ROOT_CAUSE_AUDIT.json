@@ -1,0 +1,94 @@
+{
+  "schema_version": "1.0.0",
+  "audit_timestamp_utc": "2026-09-03T05:40:00Z",
+  "audit_scope": "v0.3.20 Forward Infrastructure Incident Forensic Audit",
+  "incident_overview": {
+    "summary": "Forward collection infrastructure suffered dual independent failure modes: a ~5.5 hour host freeze during Windows Modern Standby power suspend causing consecutive missed slots, and local egress routing through a US proxy node causing Binance HTTP 451 geo-restriction blocks. Secondary software crashes in clock alignment and microstructure heartbeat threads were identified and resolved.",
+    "affected_chains": [
+      "DERIVATIVES_PIT_EPOCH_V0316_002",
+      "OPPORTUNITY_FORWARD_V0317_20260901T160000Z (H36)",
+      "MICROSTRUCTURE_CAPTURE_V0315_001"
+    ]
+  },
+  "root_causes": {
+    "RC1_WINDOWS_MODERN_STANDBY": {
+      "category": "HOST_POWER_MANAGEMENT",
+      "severity": "CRITICAL",
+      "evidence_source": "Windows System Event Log (Provider: Microsoft-Windows-Kernel-Power, EventIDs 506, 507)",
+      "suspend_window": {
+        "sleep_enter_hkt": "2026-09-03T03:31:07+08:00",
+        "sleep_enter_utc": "2026-09-02T19:31:07Z",
+        "wake_hkt": "2026-09-03T08:57:25+08:00",
+        "wake_utc": "2026-09-03T00:57:25Z",
+        "duration_seconds": 19578.0
+      },
+      "impact": {
+        "derivatives_missed_streak": 15,
+        "opportunity_missed_streak": 24,
+        "gate_threshold": 4,
+        "gate_breached": true,
+        "status": "TERMINAL_FREEZE_BREACH"
+      },
+      "mechanism": "Modern Standby suspended all WSL CPU execution. Systemd timers could not fire during the suspend interval. Upon resume, systemd missed wall-clock trigger deadlines."
+    },
+    "RC2_BINANCE_HTTP_451_REGION_RESTRICTION": {
+      "category": "NETWORK_EGRESS_ROUTING",
+      "severity": "CRITICAL",
+      "evidence_source": "Binance Public REST API responses (/fapi/v1/premiumIndex, /fapi/v1/ping)",
+      "proxy_state": {
+        "port": 7897,
+        "mode": "GLOBAL",
+        "active_node": "pro-美国06",
+        "egress_ip": "23.148.204.205",
+        "location": "Los Angeles, CA, United States"
+      },
+      "error_received": "HTTP Error 451: Unavailable For Legal Reasons (Service unavailable from a restricted location)",
+      "impact": "All Binance Futures REST endpoints and WebSocket handshakes were rejected due to Binance US compliance geo-fencing."
+    },
+    "RC3_BINANCE_CLOCK_ALIGNMENT_PROCESS_CRASH": {
+      "category": "SOFTWARE_DEFECT",
+      "severity": "HIGH",
+      "location": "src/btc_quant_agent/data/binance.py:408",
+      "faulting_code": "observed_at = max(local_observed_at, *(value for value in source_times.values() if value is not None))",
+      "exception": "TypeError: 'int' object is not iterable",
+      "mechanism": "When all endpoints fail (HTTP 451), source_times has 0 valid timestamps. Unpacking an empty generator yielded a single argument to max(), causing Python to treat the integer timestamp as an iterable.",
+      "resolution": "Changed to max([local_observed_at, *valid_source_times])."
+    },
+    "RC4_MICROSTRUCTURE_HEARTBEAT_THREAD_DEATH": {
+      "category": "CONCURRENCY_DATABASE_LOCK",
+      "severity": "HIGH",
+      "location": "src/btc_quant_agent/microstructure.py:1097 (heartbeat_worker)",
+      "exception": "sqlite3.OperationalError: database is locked",
+      "mechanism": "Concurrent read/write queries during status checks or disk I/O locked SQLite for >5s, causing unhandled OperationalError inside the heartbeat thread. The daemon stayed running but heartbeats ceased, yielding a ~31,715s stale heartbeat age.",
+      "resolution": "Added try/except protection in heartbeat_worker and implemented an async supervisor loop to resurrect the heartbeat thread if terminated."
+    },
+    "RC5_MICROSTRUCTURE_STATUS_QUERY_BOTTLENECK": {
+      "category": "PERFORMANCE_STARVATION",
+      "severity": "HIGH",
+      "location": "src/btc_quant_agent/microstructure.py:831-925 (status)",
+      "mechanism": "MicrostructureStore.status() executed PRAGMA integrity_check and read millions of trade rows from disk across 5.0 GB of SQLite partition files on every 15-minute health check, thrashing CPU for 65+ seconds.",
+      "resolution": "Implemented mtime/size-keyed persistent partition cache and pre-merged interval evaluation, reducing query duration from 65.0s to 2.6s (25x speedup)."
+    },
+    "RC6_WSL_USER_LINGER_DISABLED": {
+      "category": "HOST_CONFIGURATION",
+      "severity": "MEDIUM",
+      "evidence_source": "loginctl show-user root --property=Linger",
+      "state": "Linger=no",
+      "mechanism": "Without linger enabled, closing WSL interactive terminal sessions terminates the user systemd instance and all child timers.",
+      "resolution": "Automated loginctl enable-linger in installer and recovery scripts."
+    }
+  },
+  "remediation_summary": {
+    "codebase_fixes_applied": true,
+    "systemd_hardened": true,
+    "vps_migration_package_created": true,
+    "terminal_chains_archived": true,
+    "clean_successors_preregistered": true,
+    "invariants_strictly_preserved": {
+      "historical_rows_tampered": false,
+      "retroactive_backfill_attempted": false,
+      "execution_firewall_breached": false,
+      "final_holdout_accessed": false
+    }
+  }
+}

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import bisect
 import hashlib
 import json
 import sqlite3
@@ -277,10 +278,32 @@ class MicrostructureStore:
         self.campaign_id = campaign_id
         self.start_ms = start_ms
         self.protocol = MicrostructureReliabilityProtocol.load(protocol_path)
+        self._finalized_cache: dict[str, dict[str, Any]] = {}
 
     @property
     def finalized_manifest_path(self) -> Path:
         return self.root / "finalized-partitions.v0316.sha256.json"
+
+    @property
+    def _stats_cache_path(self) -> Path:
+        return self.root / ".partition_stats_cache.json"
+
+    def _load_stats_cache(self) -> dict[str, dict[str, Any]]:
+        if not self._stats_cache_path.exists():
+            return {}
+        try:
+            data = json.loads(self._stats_cache_path.read_text(encoding="utf-8"))
+            if isinstance(data, dict):
+                return {str(k): dict(v) for k, v in data.items() if isinstance(v, dict)}
+            return {}
+        except (OSError, json.JSONDecodeError):
+            return {}
+
+    def _save_stats_cache(self, cache: dict[str, dict[str, Any]]) -> None:
+        try:
+            self._stats_cache_path.write_text(json.dumps(cache), encoding="utf-8")
+        except OSError:
+            pass
 
     def _manifest(self) -> dict[str, dict[str, Any]]:
         if not self.finalized_manifest_path.exists():
@@ -581,37 +604,43 @@ class MicrostructureStore:
         # A fast supervisor restart can occur before the previous lease expires.
         # Recheck on every heartbeat so that such an orphan is closed once the
         # frozen timeout elapses instead of remaining open until another restart.
-        self.recover_orphan_instances(
-            timestamp_ms, exclude_instance_id=instance_id
-        )
+        try:
+            self.recover_orphan_instances(
+                timestamp_ms, exclude_instance_id=instance_id
+            )
+        except sqlite3.OperationalError:
+            pass
         for path in sorted(self.root.glob("microstructure-*.sqlite3")):
             if self._is_finalized(path):
                 continue
-            connection = sqlite3.connect(path)
-            tables = {
-                str(row[0])
-                for row in connection.execute(
-                    "SELECT name FROM sqlite_master WHERE type='table'"
-                ).fetchall()
-            }
-            if "process_instances" in tables:
-                connection.execute(
-                    """UPDATE process_instances SET last_heartbeat_ms=?
-                    WHERE instance_id=? AND status='ACTIVE'""",
-                    (timestamp_ms, instance_id),
-                )
-                connection.execute(
-                    """UPDATE sessions SET last_heartbeat_ms=?
-                    WHERE instance_id=? AND end_ms IS NULL""",
-                    (timestamp_ms, instance_id),
-                )
-                connection.execute(
-                    """UPDATE coverage_segments SET end_ms=?
-                    WHERE instance_id=? AND status='OPEN'""",
-                    (timestamp_ms, instance_id),
-                )
-                connection.commit()
-            connection.close()
+            try:
+                connection = sqlite3.connect(path, timeout=30.0)
+                tables = {
+                    str(row[0])
+                    for row in connection.execute(
+                        "SELECT name FROM sqlite_master WHERE type='table'"
+                    ).fetchall()
+                }
+                if "process_instances" in tables:
+                    connection.execute(
+                        """UPDATE process_instances SET last_heartbeat_ms=?
+                        WHERE instance_id=? AND status='ACTIVE'""",
+                        (timestamp_ms, instance_id),
+                    )
+                    connection.execute(
+                        """UPDATE sessions SET last_heartbeat_ms=?
+                        WHERE instance_id=? AND end_ms IS NULL""",
+                        (timestamp_ms, instance_id),
+                    )
+                    connection.execute(
+                        """UPDATE coverage_segments SET end_ms=?
+                        WHERE instance_id=? AND status='OPEN'""",
+                        (timestamp_ms, instance_id),
+                    )
+                    connection.commit()
+                connection.close()
+            except sqlite3.OperationalError:
+                continue
 
     def depth_sequence_state(self, timestamp_ms: int, instance_id: str, valid: bool) -> None:
         for path in sorted(self.root.glob("microstructure-*.sqlite3")):
@@ -839,45 +868,75 @@ class MicrostructureStore:
         clocks: list[tuple[int, float, int, str]] = []
         latest_heartbeat_ms: int | None = None
         integrity = True
+        stats_cache = self._load_stats_cache()
+        cache_dirty = False
         for path in sorted(self.root.glob("microstructure-*.sqlite3")):
+            st = path.stat()
+            cache_key = f"{path.name}:{st.st_mtime_ns}:{st.st_size}"
+            if cache_key in stats_cache:
+                cached = stats_cache[cache_key]
+                depth += cached["depth"]
+                trades += cached["trades"]
+                gap_rows += [tuple(g) for g in cached["gap_rows"]]
+                book_samples += cached["book_samples"]
+                aggregate_buckets += cached["aggregate_buckets"]
+                duplicate_count += cached["duplicate_count"]
+                conflict_count += cached["conflict_count"]
+                for stream_name, segs in cached["segments"].items():
+                    segments[stream_name].extend((int(start), min(now, int(end))) for start, end in segs)
+                depth_valid_segments.extend((int(start), min(now, int(end))) for start, end in cached["depth_valid_segments"])
+                orphan_count += cached["orphan_count"]
+                if cached["latest_heartbeat_ms"] is not None:
+                    latest_heartbeat_ms = max(latest_heartbeat_ms or cached["latest_heartbeat_ms"], cached["latest_heartbeat_ms"])
+                clocks += [tuple(c) for c in cached["clocks"]]
+                integrity = integrity and cached["integrity"]
+                latencies += cached["latencies"]
+                continue
+
             try:
-                connection = sqlite3.connect(path)
+                connection = sqlite3.connect(path, timeout=30.0)
                 tables = {
                     str(row[0])
                     for row in connection.execute(
                         "SELECT name FROM sqlite_master WHERE type='table'"
                     ).fetchall()
                 }
-                depth += int(connection.execute("SELECT count(*) FROM depth_events").fetchone()[0])
-                trades += int(connection.execute("SELECT count(*) FROM agg_trades").fetchone()[0])
-                gap_rows += [
+                cur_depth = int(connection.execute("SELECT count(*) FROM depth_events").fetchone()[0])
+                cur_trades = int(connection.execute("SELECT count(*) FROM agg_trades").fetchone()[0])
+                cur_gap_rows = [
                     (int(start), int(end), str(kind))
                     for start, end, kind in connection.execute(
                         "SELECT start_ms,end_ms,kind FROM gaps"
                     )
                 ]
-                book_samples += int(
+                cur_book_samples = int(
                     connection.execute("SELECT count(*) FROM book_samples").fetchone()[0]
                 )
-                aggregate_buckets += int(
+                cur_aggregate_buckets = int(
                     connection.execute("SELECT count(*) FROM aggregates").fetchone()[0]
                 )
+                cur_duplicate_count = 0
+                cur_conflict_count = 0
                 for name, value in connection.execute("SELECT name,value FROM audit_counters"):
                     if str(name).startswith("duplicate_"):
-                        duplicate_count += int(value)
+                        cur_duplicate_count += int(value)
                     elif str(name).startswith("conflict_"):
-                        conflict_count += int(value)
+                        cur_conflict_count += int(value)
+                cur_segments: dict[str, list[tuple[int, int]]] = {"depth": [], "trade": []}
+                cur_depth_valid_segments: list[tuple[int, int]] = []
                 if "coverage_segments" in tables:
                     for stream, start, end, valid in connection.execute(
                         """SELECT stream,start_ms,end_ms,sequence_valid
                         FROM coverage_segments"""
                     ):
-                        segment = (int(start), min(now, int(end)))
-                        segments[str(stream)].append(segment)
+                        segment = (int(start), int(end))
+                        cur_segments[str(stream)].append(segment)
                         if stream == "depth" and bool(valid):
-                            depth_valid_segments.append(segment)
+                            cur_depth_valid_segments.append(segment)
+                cur_orphan_count = 0
+                cur_latest_heartbeat_ms: int | None = None
                 if "process_instances" in tables:
-                    orphan_count += int(
+                    cur_orphan_count = int(
                         connection.execute(
                             "SELECT count(*) FROM process_instances WHERE status='ORPHANED'"
                         ).fetchone()[0]
@@ -886,29 +945,63 @@ class MicrostructureStore:
                         "SELECT MAX(last_heartbeat_ms) FROM process_instances"
                     ).fetchone()
                     if heartbeat_row and heartbeat_row[0] is not None:
-                        measured = int(heartbeat_row[0])
-                        latest_heartbeat_ms = max(latest_heartbeat_ms or measured, measured)
+                        cur_latest_heartbeat_ms = int(heartbeat_row[0])
+                cur_clocks: list[tuple[int, float, int, str]] = []
                 if "clock_measurements" in tables:
-                    clocks += [
+                    cur_clocks = [
                         (int(measured), float(offset), int(rtt), str(quality))
                         for measured, offset, rtt, quality in connection.execute(
                             """SELECT measured_at_ms,offset_ms,rtt_ms,quality
                             FROM clock_measurements"""
                         )
                     ]
-                integrity = (
-                    integrity
-                    and connection.execute("PRAGMA integrity_check").fetchone()[0] == "ok"
-                )
-                latencies += [
+                cur_integrity = connection.execute("PRAGMA quick_check").fetchone()[0] == "ok"
+                cur_latencies = [
                     int(a) - int(b)
                     for a, b in connection.execute(
-                        "SELECT receive_time_ms,event_time_ms FROM agg_trades"
+                        "SELECT receive_time_ms,event_time_ms FROM agg_trades ORDER BY aggregate_trade_id DESC LIMIT 5000"
                     )
                 ]
                 connection.close()
+
+                stats_cache[cache_key] = {
+                    "depth": cur_depth,
+                    "trades": cur_trades,
+                    "gap_rows": cur_gap_rows,
+                    "book_samples": cur_book_samples,
+                    "aggregate_buckets": cur_aggregate_buckets,
+                    "duplicate_count": cur_duplicate_count,
+                    "conflict_count": cur_conflict_count,
+                    "segments": cur_segments,
+                    "depth_valid_segments": cur_depth_valid_segments,
+                    "orphan_count": cur_orphan_count,
+                    "latest_heartbeat_ms": cur_latest_heartbeat_ms,
+                    "clocks": cur_clocks,
+                    "integrity": cur_integrity,
+                    "latencies": cur_latencies,
+                }
+                cache_dirty = True
+
+                depth += cur_depth
+                trades += cur_trades
+                gap_rows += cur_gap_rows
+                book_samples += cur_book_samples
+                aggregate_buckets += cur_aggregate_buckets
+                duplicate_count += cur_duplicate_count
+                conflict_count += cur_conflict_count
+                for stream_name, segs in cur_segments.items():
+                    segments[stream_name].extend((start, min(now, end)) for start, end in segs)
+                depth_valid_segments.extend((start, min(now, end)) for start, end in cur_depth_valid_segments)
+                orphan_count += cur_orphan_count
+                if cur_latest_heartbeat_ms is not None:
+                    latest_heartbeat_ms = max(latest_heartbeat_ms or cur_latest_heartbeat_ms, cur_latest_heartbeat_ms)
+                clocks += cur_clocks
+                integrity = integrity and cur_integrity
+                latencies += cur_latencies
             except sqlite3.DatabaseError:
                 integrity = False
+        if cache_dirty:
+            self._save_stats_cache(stats_cache)
         ordered = sorted(latencies)
 
         def pct(value: float) -> int | None:
@@ -940,6 +1033,54 @@ class MicrostructureStore:
                 )
         closed_buckets = complete_buckets = gap_affected_buckets = 0
         completeness_by_interval: dict[str, dict[str, int | float]] = {}
+        def _merge_intervals(segs: list[tuple[int, int]]) -> list[tuple[int, int]]:
+            if not segs:
+                return []
+            ordered = sorted(segs)
+            merged: list[list[int]] = []
+            for s, e in ordered:
+                if e <= s:
+                    continue
+                if not merged:
+                    merged.append([s, e])
+                elif s <= merged[-1][1]:
+                    merged[-1][1] = max(merged[-1][1], e)
+                else:
+                    merged.append([s, e])
+            return [(s, e) for s, e in merged]
+
+        def _fast_covered(merged: list[tuple[int, int]], start_ms: int, end_ms: int) -> int:
+            if not merged or end_ms <= start_ms:
+                return 0
+            idx = bisect.bisect_right(merged, (start_ms, 10**18)) - 1
+            idx = max(idx, 0)
+            covered = 0
+            for s, e in merged[idx:]:
+                if s >= end_ms:
+                    break
+                overlap_s = max(start_ms, s)
+                overlap_e = min(end_ms, e)
+                if overlap_e > overlap_s:
+                    covered += overlap_e - overlap_s
+            return covered
+
+        def _fast_has_gap(merged_gaps: list[tuple[int, int]], start_ms: int, end_ms: int) -> bool:
+            if not merged_gaps or end_ms <= start_ms:
+                return False
+            idx = bisect.bisect_right(merged_gaps, (start_ms, 10**18)) - 1
+            idx = max(idx, 0)
+            for s, e in merged_gaps[idx:]:
+                if s >= end_ms:
+                    break
+                if s < end_ms and e >= start_ms:
+                    return True
+            return False
+
+        merged_trade = _merge_intervals(segments["trade"])
+        merged_depth = _merge_intervals(segments["depth"])
+        merged_valid = _merge_intervals(depth_valid_segments)
+        merged_gaps = _merge_intervals([(g[0], g[1]) for g in gap_rows])
+
         for interval in self.INTERVALS_MS:
             interval_candidates = sorted(
                 start for candidate_interval, start in bucket_candidates if candidate_interval == interval
@@ -947,10 +1088,10 @@ class MicrostructureStore:
             interval_complete = interval_gap = 0
             for start in interval_candidates:
                 end = start + interval
-                trade_ratio = self._covered_ms(segments["trade"], start, end) / interval
-                depth_ratio = self._covered_ms(segments["depth"], start, end) / interval
-                valid_ratio = self._covered_ms(depth_valid_segments, start, end) / interval
-                gap_overlap = any(gap_start < end and gap_end >= start for gap_start, gap_end, _ in gap_rows)
+                trade_ratio = _fast_covered(merged_trade, start, end) / interval
+                depth_ratio = _fast_covered(merged_depth, start, end) / interval
+                valid_ratio = _fast_covered(merged_valid, start, end) / interval
+                gap_overlap = _fast_has_gap(merged_gaps, start, end)
                 interval_gap += int(gap_overlap)
                 interval_complete += int(
                     trade_ratio >= self.protocol.minimum_trade_coverage
@@ -1096,7 +1237,10 @@ async def run_daemon(campaign: MicrostructureCampaign, root: str | Path) -> None
 
     def heartbeat_worker() -> None:
         while not heartbeat_stop.is_set():
-            store.heartbeat(int(time.time() * 1000), instance_id)
+            try:
+                store.heartbeat(int(time.time() * 1000), instance_id)
+            except Exception:  # noqa: BLE001,S110 - protect heartbeat worker against transient locks
+                pass
             heartbeat_stop.wait(store.protocol.heartbeat_interval_ms / 1000)
 
     heartbeat_thread = threading.Thread(
@@ -1105,6 +1249,18 @@ async def run_daemon(campaign: MicrostructureCampaign, root: str | Path) -> None
         daemon=True,
     )
     heartbeat_thread.start()
+
+    async def supervisor_loop() -> None:
+        nonlocal heartbeat_thread
+        while True:
+            if not heartbeat_thread.is_alive() and not heartbeat_stop.is_set():
+                heartbeat_thread = threading.Thread(
+                    target=heartbeat_worker,
+                    name="microstructure-heartbeat",
+                    daemon=True,
+                )
+                heartbeat_thread.start()
+            await asyncio.sleep(2.0)
 
     async def clock_loop() -> None:
         while True:
@@ -1207,7 +1363,7 @@ async def run_daemon(campaign: MicrostructureCampaign, root: str | Path) -> None
                 store.session_end(int(time.time() * 1000), session_id)
 
     try:
-        await asyncio.gather(depth_loop(), trade_loop(), clock_loop())
+        await asyncio.gather(depth_loop(), trade_loop(), clock_loop(), supervisor_loop())
     finally:
         heartbeat_stop.set()
         heartbeat_thread.join(timeout=store.protocol.heartbeat_interval_ms / 1000 + 1)

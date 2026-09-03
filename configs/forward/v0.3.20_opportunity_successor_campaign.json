@@ -1,0 +1,93 @@
+{
+  "schema_version": "1.0.0",
+  "campaign_id": "OPPORTUNITY_FORWARD_V0320_20260903T063000Z",
+  "campaign_start_utc": "2026-09-03T06:30:00Z",
+  "campaign_start_ms": 1788417000000,
+  "start_rule": "Fixed future fully closed UTC 15m boundary selected prior to activation after forward infrastructure recovery and deployment hardening; never moved by status, misses, opportunities, or outcomes",
+  "start_git_sha": "d70b6d49834f92a5385297aae89b9da739d88c0a",
+  "source_campaign_id": "OPPORTUNITY_FORWARD_V0317_20260901T160000Z",
+  "hypothesis_id": "H37_OPPORTUNITY_FORWARD_REPLICATION_RECOVERY",
+  "registry_version": "v0.3.12",
+  "strategy_version": "0.3.11",
+  "feature_version": "0.3.11",
+  "config_hash": "e19b352002ff3197",
+  "symbol": "BTCUSDT",
+  "normal_runtime_mode": "RUNTIME_GATED",
+  "detector_ids": [
+    "trend_pullback_opportunity",
+    "breakout_retest_opportunity"
+  ],
+  "direction_claim": "NONE",
+  "movement_horizons_minutes": [240, 480],
+  "movement_metrics": [
+    "future_range_atr",
+    "max_up_excursion_atr",
+    "max_down_excursion_atr",
+    "max_abs_excursion_atr"
+  ],
+  "reference_rule": "OPEN of first fully available 1m bar strictly after decision close",
+  "atr_rule": "frozen 15m ATR observed at the original forward scan",
+  "control_matching_rules": {
+    "candidate_population": "successful RUNTIME_GATED scans with TP or BR opportunity",
+    "control_population": "successful RUNTIME_GATED scans without TP or BR opportunity",
+    "same_1h_regime": true,
+    "same_atr_percentile_decile": true,
+    "same_calendar_month_preferred_not_required": true,
+    "minimum_time_separation_hours": 24,
+    "maximum_controls_per_opportunity": 5,
+    "ordering": [
+      "same calendar month first",
+      "absolute timestamp distance",
+      "scheduled slot timestamp"
+    ],
+    "outcome_fields_forbidden": true
+  },
+  "data_quality_gate": {
+    "post_boundary_delay_seconds": 50,
+    "minimum_successful_scheduled_scan_ratio": 0.95,
+    "maximum_consecutive_missed_decision_slots": 4,
+    "successful_scan_definition": [
+      "RUNTIME_GATED scan completed",
+      "market_data_health == OK",
+      "valid closed decision bar exists",
+      "observation durably stored for the frozen slot"
+    ],
+    "missing_wall_clock_slots_count_as_missed": true,
+    "retrospective_retry_or_backfill_allowed": false,
+    "terminal_state_is_irreversible": true,
+    "miss_categories": [
+      "NETWORK_HTTP_451",
+      "NETWORK_TLS",
+      "NETWORK_TIMEOUT",
+      "MARKET_DATA_INSUFFICIENT",
+      "RUNTIME_CONTRACT",
+      "PROCESS_OR_HOST_GAP",
+      "OTHER"
+    ]
+  },
+  "h37": {
+    "hypothesis": "Do the exact frozen TP/BR OPPORTUNITY_ONLY events produce larger future movement than matched non-opportunity market states in clean forward data following infrastructure recovery?",
+    "primary_metric": "candidate-minus-control future_range_atr",
+    "primary_horizons_minutes": [240, 480],
+    "minimum_resolved_opportunities": 30,
+    "preferred_resolved_opportunities": 50,
+    "minimum_calendar_days": 30,
+    "minimum_unique_matched_controls": 100,
+    "minimum_distinct_utc_days": 20,
+    "bootstrap_cluster": "UTC day",
+    "bootstrap_simulations": 2000,
+    "seed": 43,
+    "low_sample_state": "FORWARD_CAMPAIGN_ACCUMULATING"
+  },
+  "immutability": {
+    "campaign_start_movable": false,
+    "feature_or_opportunity_reconstruction": "FORBIDDEN",
+    "outcome_resolution_after_horizon": "ALLOWED_DETERMINISTIC_ONLY",
+    "detector_change_requires_new_campaign_id": true,
+    "legacy_pattern_side_for_direction_or_signed_metrics": "FORBIDDEN",
+    "retrospective_missed_slot_backfill": "FORBIDDEN",
+    "execution": "DISABLED",
+    "candidate_freeze": "NONE",
+    "final_holdout": "SEALED"
+  }
+}

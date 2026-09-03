@@ -1,0 +1,47 @@
+{
+  "schema_version": "1.0.0",
+  "deployment_profile": "PROVIDER_NEUTRAL_LINUX_VPS",
+  "recommended_specs": {
+    "vcpus": 2,
+    "ram_gb": 4,
+    "disk_gb": 50,
+    "disk_type": "NVMe SSD",
+    "network_bandwidth": "100 Mbps unmetered",
+    "os": "Ubuntu 22.04 LTS / 24.04 LTS / Debian 12"
+  },
+  "egress_routing_constraints": {
+    "forbidden_egress_regions": [
+      "United States (US)",
+      "US Outlying Islands"
+    ],
+    "recommended_regions": [
+      "Frankfurt, Germany (Hetzner / OVH / AWS eu-central-1)",
+      "London, United Kingdom (Linode / DigitalOcean)",
+      "Tokyo, Japan (AWS ap-northeast-1 / Linode)",
+      "Singapore (AWS ap-southeast-1 / DigitalOcean)"
+    ],
+    "compliance_rationale": "Binance Futures REST and WebSocket APIs reject US IP addresses with HTTP 451: Unavailable For Legal Reasons."
+  },
+  "system_prerequisites": {
+    "systemd_user_services": true,
+    "user_linger_required": true,
+    "python_version": ">=3.11",
+    "required_packages": [
+      "curl",
+      "git",
+      "python3-venv",
+      "python3-pip",
+      "sqlite3",
+      "ca-certificates",
+      "dbus",
+      "libpam-systemd"
+    ]
+  },
+  "deployment_automation_artifacts": {
+    "bootstrap_script": "deploy/linux-vps/bootstrap.sh",
+    "healthcheck_script": "deploy/linux-vps/healthcheck.sh",
+    "systemd_installer": "deploy/systemd/install-all-forward-services.sh",
+    "network_env_template": "deploy/linux-vps/network.env.example",
+    "migration_runbook": "docs/LINUX_VPS_MIGRATION_RUNBOOK.md"
+  }
+}

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import time
 from dataclasses import asdict
 from datetime import UTC, datetime
@@ -156,7 +157,7 @@ def build_parser() -> argparse.ArgumentParser:
     forward_evidence_sub = forward_evidence.add_subparsers(
         dest="forward_evidence_command", required=True
     )
-    for name in ("status", "audit", "health"):
+    for name in ("status", "audit", "health", "doctor"):
         command = forward_evidence_sub.add_parser(name)
         command.add_argument(
             "--derivatives-store",
@@ -190,6 +191,15 @@ def build_parser() -> argparse.ArgumentParser:
             "--microstructure-campaign",
             default="configs/forward/v0.3.15_microstructure_capture_campaign.json",
         )
+
+    recover_cmd = forward_evidence_sub.add_parser(
+        "recover-services", help="safely restart and recover forward services"
+    )
+    recover_cmd.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="print planned recovery actions without executing them",
+    )
 
     microstructure = sub.add_parser(
         "microstructure-forward", help="data-only PIT depth and aggregate-trade capture"
@@ -483,6 +493,16 @@ def main(argv: list[str] | None = None) -> int:
         _print(report)
         return 0
     if args.command == "forward-evidence":
+        if args.forward_evidence_command == "doctor":
+            from .forward_diagnostics import forward_doctor
+            doc = forward_doctor()
+            _print(doc)
+            return 0 if doc["status"] == "HEALTHY" else 2
+        if args.forward_evidence_command == "recover-services":
+            from .forward_diagnostics import recover_services
+            res = recover_services(dry_run=getattr(args, "dry_run", False))
+            _print(res)
+            return 0
         report = forward_evidence_status(
             derivatives_store_path=args.derivatives_store,
             opportunity_store_path=args.opportunity_store,
@@ -530,6 +550,11 @@ def main(argv: list[str] | None = None) -> int:
         _print(report)
         return 0
     if args.command == "build-official-dataset":
+        if hasattr(os, "nice"):
+            try:
+                os.nice(10)
+            except OSError:
+                pass
         start = datetime.fromisoformat(args.start).replace(tzinfo=UTC)
         end = datetime.fromisoformat(args.end_exclusive).replace(tzinfo=UTC)
         _print(build_official_dataset(args.root, start, end))

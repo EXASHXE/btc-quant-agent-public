@@ -405,10 +405,10 @@ class BinancePublicClient:
             "basis": snapshot.basis_time_ms,
             "order_book": snapshot.order_book_time_ms,
         }
-        observed_at = max(
-            local_observed_at,
-            *(value for value in source_times.values() if value is not None),
-        )
+        valid_source_times = [
+            value for value in source_times.values() if value is not None
+        ]
+        observed_at = max([local_observed_at, *valid_source_times])
         if observed_at - local_observed_at > MAX_SOURCE_CLOCK_EXTENSION_MS:
             raise BinanceDataError(
                 "source clock exceeds conservative observation bound",

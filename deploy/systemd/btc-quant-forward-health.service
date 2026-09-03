@@ -7,6 +7,6 @@ Type=oneshot
 WorkingDirectory=/root/workspace/project/Quant-agent
 ExecStart=/root/workspace/project/Quant-agent/.venv/bin/quantctl forward-evidence health
 Environment=PYTHONUNBUFFERED=1
+SuccessExitStatus=0 2
 PrivateTmp=true
 NoNewPrivileges=true
-

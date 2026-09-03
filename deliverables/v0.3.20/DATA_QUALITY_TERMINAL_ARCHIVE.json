@@ -1,0 +1,48 @@
+{
+  "schema_version": "1.0.0",
+  "archive_policy": "IMMUTABLE_FORWARD_CHAIN_ARCHIVE",
+  "freeze_timestamp_utc": "2026-09-03T05:40:00Z",
+  "terminal_chains": [
+    {
+      "domain": "DERIVATIVES_PIT_SNAPSHOTS",
+      "epoch_id": "DERIVATIVES_PIT_EPOCH_V0316_002",
+      "config_path": "configs/forward/v0.3.16_derivatives_evidence_epoch_002.json",
+      "start_utc": "2026-09-01T09:30:00Z",
+      "start_ms": 1788255000000,
+      "terminal_status": "FAILED_GAP_GATE_TERMINAL",
+      "formal_eligibility_role": "FORMAL_TERMINAL",
+      "terminal_at_utc": "2026-09-03T02:30:21Z",
+      "terminal_at_ms": 1788402621000,
+      "terminal_reason": "max_consecutive_bad_or_missing_slots=15 first exceeded frozen maximum=4 during host power suspend (Windows Modern Standby)",
+      "max_consecutive_gap_observed": 15,
+      "gate_limit": 4,
+      "superseded_by": "DERIVATIVES_PIT_EPOCH_V0320_001",
+      "immutable_history": true,
+      "backfill_attempted": false
+    },
+    {
+      "domain": "DIRECTIONLESS_OPPORTUNITY_FORWARD",
+      "campaign_id": "OPPORTUNITY_FORWARD_V0317_20260901T160000Z",
+      "hypothesis_id": "H36_OPPORTUNITY_FORWARD_REPLICATION",
+      "config_path": "configs/forward/v0.3.17_opportunity_successor_campaign.json",
+      "start_utc": "2026-09-01T16:00:00Z",
+      "start_ms": 1788278400000,
+      "terminal_status": "DATA_QUALITY_TERMINAL_ARCHIVE",
+      "formal_role": "DATA_QUALITY_TERMINAL_ARCHIVE",
+      "terminal_at_utc": "2026-09-03T01:00:00Z",
+      "terminal_at_ms": 1788397200000,
+      "terminal_reason": "max_consecutive_missed_decision_slots=24 first exceeded frozen maximum=4 during host power suspend (Windows Modern Standby)",
+      "max_consecutive_gap_observed": 24,
+      "gate_limit": 4,
+      "superseded_by": "OPPORTUNITY_FORWARD_V0320_20260903T063000Z",
+      "immutable_history": true,
+      "backfill_attempted": false
+    }
+  ],
+  "invariants_preserved": {
+    "historical_rows_altered": false,
+    "rows_deleted": false,
+    "timestamps_rewritten": false,
+    "outcomes_fabricated": false
+  }
+}

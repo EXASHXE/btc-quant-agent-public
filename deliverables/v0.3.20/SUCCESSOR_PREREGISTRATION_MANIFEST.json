@@ -1,0 +1,60 @@
+{
+  "schema_version": "1.0.0",
+  "preregistration_policy": "FROZEN_PRE_REGISTRATION_ON_CLOSED_UTC_BOUNDARY",
+  "registration_timestamp_utc": "2026-09-03T05:40:00Z",
+  "registration_git_branch": "gemini/v0.3.20-forward-infrastructure-recovery-deployment-hardening",
+  "preregistered_successors": [
+    {
+      "domain": "DERIVATIVES_PIT_SNAPSHOTS",
+      "epoch_id": "DERIVATIVES_PIT_EPOCH_V0320_001",
+      "config_path": "configs/forward/v0.3.20_derivatives_evidence_epoch.json",
+      "start_utc": "2026-09-03T06:30:00Z",
+      "start_ms": 1788417000000,
+      "start_rule": "Fixed 06:30 UTC 15m boundary selected prior to activation after forward infrastructure recovery and deployment hardening; never moved by status or observed results",
+      "cadence_minutes": 15,
+      "post_boundary_delay_seconds": 20,
+      "required_fields": [
+        "funding_rate",
+        "open_interest",
+        "taker_buy_sell_ratio",
+        "basis_rate",
+        "long_short_account_ratio"
+      ],
+      "minimum_days": 30,
+      "minimum_fully_available_snapshots": 2500,
+      "minimum_required_field_availability": 0.95,
+      "maximum_consecutive_failed_or_missing_scheduled_slots": 4,
+      "formal_eligibility_role": "FORMAL_ACTIVE",
+      "status": "ACTIVE_ACCUMULATING",
+      "supersedes": "DERIVATIVES_PIT_EPOCH_V0316_002"
+    },
+    {
+      "domain": "DIRECTIONLESS_OPPORTUNITY_FORWARD",
+      "campaign_id": "OPPORTUNITY_FORWARD_V0320_20260903T063000Z",
+      "hypothesis_id": "H37_OPPORTUNITY_FORWARD_REPLICATION_RECOVERY",
+      "config_path": "configs/forward/v0.3.20_opportunity_successor_campaign.json",
+      "start_utc": "2026-09-03T06:30:00Z",
+      "start_ms": 1788417000000,
+      "start_rule": "Fixed future fully closed UTC 15m boundary selected prior to activation after forward infrastructure recovery and deployment hardening; never moved by status, misses, opportunities, or outcomes",
+      "source_campaign_id": "OPPORTUNITY_FORWARD_V0317_20260901T160000Z",
+      "normal_runtime_mode": "RUNTIME_GATED",
+      "detector_ids": [
+        "trend_pullback_opportunity",
+        "breakout_retest_opportunity"
+      ],
+      "direction_claim": "NONE",
+      "movement_horizons_minutes": [240, 480],
+      "minimum_successful_scheduled_scan_ratio": 0.95,
+      "maximum_consecutive_missed_decision_slots": 4,
+      "formal_role": "FORMAL_SUCCESSOR_ACTIVE",
+      "status": "ACTIVE_ACCUMULATING",
+      "supersedes": "OPPORTUNITY_FORWARD_V0317_20260901T160000Z"
+    }
+  ],
+  "verification": {
+    "start_strictly_greater_than_commit": true,
+    "lead_time_seconds": 3000,
+    "holdout_accessed": false,
+    "execution_enabled": false
+  }
+}

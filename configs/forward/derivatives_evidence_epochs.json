@@ -27,6 +27,17 @@
       "epoch_id": "DERIVATIVES_PIT_EPOCH_V0316_002",
       "config_path": "configs/forward/v0.3.16_derivatives_evidence_epoch_002.json",
       "start_ms": 1788255000000,
+      "status": "FAILED_GAP_GATE_TERMINAL",
+      "terminal_reason": "max_consecutive_bad_or_missing_slots=15 first exceeded frozen maximum=4 during host power suspend (Windows Modern Standby)",
+      "terminal_at_ms": 1788402621000,
+      "superseded_by": "DERIVATIVES_PIT_EPOCH_V0320_001",
+      "formal_eligibility_role": "FORMAL_TERMINAL",
+      "immutable_history": true
+    },
+    {
+      "epoch_id": "DERIVATIVES_PIT_EPOCH_V0320_001",
+      "config_path": "configs/forward/v0.3.20_derivatives_evidence_epoch.json",
+      "start_ms": 1788417000000,
       "status": "ACTIVE_ACCUMULATING",
       "terminal_reason": null,
       "terminal_at_ms": null,

@@ -16,6 +16,16 @@
       "config_path": "configs/forward/v0.3.17_opportunity_successor_campaign.json",
       "start_ms": 1788278400000,
       "hypothesis_id": "H36_OPPORTUNITY_FORWARD_REPLICATION",
+      "status": "DATA_QUALITY_TERMINAL_ARCHIVE",
+      "formal_role": "DATA_QUALITY_TERMINAL_ARCHIVE",
+      "immutable_history": true,
+      "superseded_by": "OPPORTUNITY_FORWARD_V0320_20260903T063000Z"
+    },
+    {
+      "campaign_id": "OPPORTUNITY_FORWARD_V0320_20260903T063000Z",
+      "config_path": "configs/forward/v0.3.20_opportunity_successor_campaign.json",
+      "start_ms": 1788417000000,
+      "hypothesis_id": "H37_OPPORTUNITY_FORWARD_REPLICATION_RECOVERY",
       "status": "ACTIVE_ACCUMULATING",
       "formal_role": "FORMAL_SUCCESSOR_ACTIVE",
       "immutable_history": true,

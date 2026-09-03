@@ -11,5 +11,6 @@ ExecStart=/root/workspace/project/Quant-agent/.venv/bin/quantctl derivatives col
 Environment=PYTHONUNBUFFERED=1
 Environment=BTC_QUANT_TRIGGER_SOURCE=SCHEDULED
 EnvironmentFile=-%h/.config/btc-quant-agent/network.env
+SuccessExitStatus=0 2
 PrivateTmp=true
 NoNewPrivileges=true

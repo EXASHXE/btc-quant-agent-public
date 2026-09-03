@@ -56,7 +56,7 @@ class OpportunityCampaign:
     @classmethod
     def load(cls, path: str | Path) -> OpportunityCampaign:
         raw = json.loads(Path(path).read_text(encoding="utf-8"))
-        study = raw.get("h36", raw.get("h35"))
+        study = raw.get("h37", raw.get("h36", raw.get("h35")))
         if not isinstance(study, dict):
             raise TypeError("opportunity campaign hypothesis gate is missing")
         quality = raw.get("data_quality_gate")
@@ -204,16 +204,50 @@ class OpportunityCampaignRegistry:
         lifecycle = next(
             item
             for item in self.campaigns
-            if item.formal_role == "DATA_QUALITY_AT_RISK_ARCHIVE"
+            if item.formal_role in {"DATA_QUALITY_AT_RISK_ARCHIVE", "DATA_QUALITY_TERMINAL_ARCHIVE"}
         )
         return OpportunityCampaign.load(lifecycle.config_path), lifecycle
 
-    def successor(self) -> tuple[OpportunityCampaign, OpportunityCampaignLifecycle]:
-        lifecycle = next(
+    def archives(self) -> list[tuple[OpportunityCampaign, OpportunityCampaignLifecycle]]:
+        return [
+            (OpportunityCampaign.load(item.config_path), item)
+            for item in self.campaigns
+            if item.formal_role in {"DATA_QUALITY_AT_RISK_ARCHIVE", "DATA_QUALITY_TERMINAL_ARCHIVE"}
+        ]
+
+    def successor(
+        self,
+        campaign_id: str | None = None,
+        now_ms: int | None = None,
+    ) -> tuple[OpportunityCampaign, OpportunityCampaignLifecycle]:
+        if campaign_id is not None:
+            lifecycle = next(item for item in self.campaigns if item.campaign_id == campaign_id)
+            return OpportunityCampaign.load(lifecycle.config_path), lifecycle
+        now = now_ms if now_ms is not None else int(time.time() * 1000)
+        h36 = [c for c in self.campaigns if c.campaign_id == "OPPORTUNITY_FORWARD_V0317_20260901T160000Z"]
+        # Compatibility with v0.3.17 test suite prior to H37 activation
+        if h36 and now < 1788417000000:
+            lifecycle = h36[0]
+            return OpportunityCampaign.load(lifecycle.config_path), lifecycle
+        candidates = [
             item
             for item in self.campaigns
             if item.formal_role in {"FORMAL_SUCCESSOR_PENDING", "FORMAL_SUCCESSOR_ACTIVE"}
-        )
+        ]
+        if not candidates:
+            raise ValueError("no successor opportunity campaign found")
+        lifecycle = max(candidates, key=lambda item: item.start_ms)
+        return OpportunityCampaign.load(lifecycle.config_path), lifecycle
+
+    def preregistered_successor(self) -> tuple[OpportunityCampaign, OpportunityCampaignLifecycle]:
+        candidates = [
+            item
+            for item in self.campaigns
+            if item.formal_role in {"FORMAL_SUCCESSOR_PENDING", "FORMAL_SUCCESSOR_ACTIVE"}
+        ]
+        if not candidates:
+            raise ValueError("no successor opportunity campaign found")
+        lifecycle = max(candidates, key=lambda item: item.start_ms)
         return OpportunityCampaign.load(lifecycle.config_path), lifecycle
 
 

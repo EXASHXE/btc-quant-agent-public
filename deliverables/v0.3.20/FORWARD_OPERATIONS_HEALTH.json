@@ -1,0 +1,66 @@
+{
+  "schema_version": "1.0.0",
+  "reported_at_utc": "2026-09-03T05:40:00Z",
+  "state": "DEGRADED",
+  "operational_summary": {
+    "overall_health": "DEGRADED",
+    "primary_blocker": "Proxy is routed through US exit node (HTTP 451 from Binance); terminal chains breached and successors preregistered for clean activation.",
+    "actionable_operator_steps": [
+      "Switch local proxy (port 7897) from US node to non-restricted node (e.g. Germany, Japan, Singapore).",
+      "Ensure user linger is enabled via 'loginctl enable-linger root'.",
+      "Keep Windows awake using scripts/windows/prevent_sleep.ps1 or migrate to Linux VPS."
+    ]
+  },
+  "chains": {
+    "derivatives": {
+      "terminal_epoch_id": "DERIVATIVES_PIT_EPOCH_V0316_002",
+      "terminal_status": "FAILED_GAP_GATE_TERMINAL",
+      "terminal_streak": 15,
+      "successor_epoch_id": "DERIVATIVES_PIT_EPOCH_V0320_001",
+      "successor_start_utc": "2026-09-03T06:30:00Z",
+      "successor_start_ms": 1788417000000,
+      "successor_role": "FORMAL_ACTIVE",
+      "timer_active": true,
+      "next_timer_elapse_hkt": "13:45:20"
+    },
+    "opportunity": {
+      "terminal_campaign_id": "OPPORTUNITY_FORWARD_V0317_20260901T160000Z",
+      "terminal_status": "DATA_QUALITY_TERMINAL_ARCHIVE",
+      "terminal_streak": 24,
+      "successor_campaign_id": "OPPORTUNITY_FORWARD_V0320_20260903T063000Z",
+      "successor_hypothesis_id": "H37_OPPORTUNITY_FORWARD_REPLICATION_RECOVERY",
+      "successor_start_utc": "2026-09-03T06:30:00Z",
+      "successor_start_ms": 1788417000000,
+      "successor_role": "FORMAL_SUCCESSOR_ACTIVE",
+      "timer_active": true,
+      "next_timer_elapse_hkt": "13:45:50"
+    },
+    "microstructure": {
+      "campaign_id": "MICROSTRUCTURE_CAPTURE_V0315_001",
+      "service_active": true,
+      "sub_state": "running",
+      "unit_file_state": "enabled",
+      "restart_protection_active": true,
+      "partition_caching_active": true,
+      "query_speedup_factor": "25x (65s -> 2.6s)"
+    }
+  },
+  "systemd_subsystem": {
+    "systemd_user_running": true,
+    "user_linger_enabled": false,
+    "units": {
+      "btc-quant-forward-derivatives.timer": "active",
+      "btc-quant-opportunity-forward.timer": "active",
+      "btc-quant-opportunity-resolve.timer": "active",
+      "btc-quant-forward-health.timer": "active",
+      "btc-quant-microstructure-forward.service": "active"
+    }
+  },
+  "safety_invariants": {
+    "execution": "DISABLED",
+    "final_holdout": "SEALED",
+    "qualified_direction_engine": "NONE",
+    "strategy": "EXPERIMENTAL",
+    "runtime_maximum": "OPPORTUNITY_ONLY"
+  }
+}
