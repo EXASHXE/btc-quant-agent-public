@@ -6,7 +6,7 @@
           "epoch_id": "DERIVATIVES_PIT_EPOCH_V0320_001",
           "role": "FORMAL_ACTIVE",
           "start_ms": 1788417000000,
-          "starts_in_seconds": 3004.458,
+          "starts_in_seconds": 0.0,
           "status": "ACTIVE_ACCUMULATING"
         }
       ],
@@ -44,7 +44,7 @@
           "hypothesis_id": "H37_OPPORTUNITY_FORWARD_REPLICATION_RECOVERY",
           "role": "FORMAL_SUCCESSOR_ACTIVE",
           "start_ms": 1788417000000,
-          "starts_in_seconds": 3004.458,
+          "starts_in_seconds": 0.0,
           "status": "ACTIVE_ACCUMULATING"
         }
       ]
@@ -52,28 +52,27 @@
   },
   "chains": {
     "derivatives": {
-      "latest_slot_ms": 1788413400000,
+      "latest_slot_ms": 1788420600000,
       "latest_status": "FAILED",
       "store_path": "data/forward/BTCUSDT/derivatives.sqlite3"
     },
     "microstructure": {
-      "heartbeat_age_seconds": 45688.112,
-      "latest_heartbeat_ms": 1788368307430,
+      "heartbeat_age_seconds": 4.366,
+      "latest_heartbeat_ms": 1788420699678,
       "root": "data/forward/BTCUSDT/microstructure"
     },
     "opportunity": {
-      "latest_slot_ms": 1788413400000,
+      "latest_slot_ms": 1788420600000,
       "latest_status": "MISSED_DECISION_SLOT",
       "store_path": "data/forward/BTCUSDT/opportunity_shadow.sqlite3"
     },
     "storage": {
-      "free_gb": 833.44,
+      "free_gb": 833.28,
       "total_gb": 1006.85,
       "writable": true
     }
   },
   "issues": [
-    "WSL user linger is disabled (loginctl enable-linger)",
     "Binance endpoints blocked by HTTP 451: Proxy is routed through restricted US node"
   ],
   "network": {
@@ -94,29 +93,29 @@
   "status": "DEGRADED",
   "systemd_units": {
     "btc-quant-forward-derivatives.service": {
-      "active_state": "failed",
+      "active_state": "inactive",
       "next_elapse_usec": "",
-      "result": "exit-code",
-      "sub_state": "failed",
+      "result": "success",
+      "sub_state": "dead",
       "unit_file_state": "static"
     },
     "btc-quant-forward-derivatives.timer": {
       "active_state": "active",
-      "next_elapse_usec": "Thu 2026-09-03 13:45:20 HKT",
+      "next_elapse_usec": "Thu 2026-09-03 15:45:20 HKT",
       "result": "success",
       "sub_state": "waiting",
       "unit_file_state": "enabled"
     },
     "btc-quant-forward-health.service": {
-      "active_state": "failed",
+      "active_state": "inactive",
       "next_elapse_usec": "",
-      "result": "exit-code",
-      "sub_state": "failed",
+      "result": "success",
+      "sub_state": "dead",
       "unit_file_state": "static"
     },
     "btc-quant-forward-health.timer": {
       "active_state": "active",
-      "next_elapse_usec": "Thu 2026-09-03 13:53:00 HKT",
+      "next_elapse_usec": "Thu 2026-09-03 15:38:00 HKT",
       "result": "success",
       "sub_state": "waiting",
       "unit_file_state": "enabled"
@@ -129,15 +128,15 @@
       "unit_file_state": "enabled"
     },
     "btc-quant-opportunity-forward.service": {
-      "active_state": "failed",
+      "active_state": "inactive",
       "next_elapse_usec": "",
-      "result": "exit-code",
-      "sub_state": "failed",
+      "result": "success",
+      "sub_state": "dead",
       "unit_file_state": "static"
     },
     "btc-quant-opportunity-forward.timer": {
       "active_state": "active",
-      "next_elapse_usec": "Thu 2026-09-03 13:45:50 HKT",
+      "next_elapse_usec": "Thu 2026-09-03 15:45:50 HKT",
       "result": "success",
       "sub_state": "waiting",
       "unit_file_state": "enabled"
@@ -151,7 +150,7 @@
     },
     "btc-quant-opportunity-resolve.timer": {
       "active_state": "active",
-      "next_elapse_usec": "Thu 2026-09-03 14:07:00 HKT",
+      "next_elapse_usec": "Thu 2026-09-03 16:07:00 HKT",
       "result": "success",
       "sub_state": "waiting",
       "unit_file_state": "enabled"
@@ -159,9 +158,9 @@
   },
   "wsl_systemd": {
     "is_wsl": true,
-    "linger_enabled": false,
+    "linger_enabled": true,
     "systemd_running": true,
-    "systemd_state": "degraded",
+    "systemd_state": "running",
     "user": "root"
   }
 }

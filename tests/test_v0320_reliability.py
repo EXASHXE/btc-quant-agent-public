@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import sqlite3
 from pathlib import Path
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 from urllib.error import HTTPError
 
 from btc_quant_agent.config import DataConfig
@@ -164,3 +164,8 @@ def test_network_proxy_check_detects_http_451() -> None:
         net = check_network_proxy()
         assert net["binance_reachability"] == "HTTP_451_REGION_RESTRICTED"
         assert "restricted location" in net["binance_detail"]
+
+    mock_opener = MagicMock(side_effect=mock_err)
+    net_inject = check_network_proxy(url_opener=mock_opener)
+    assert net_inject["binance_reachability"] == "HTTP_451_REGION_RESTRICTED"
+    assert "restricted location" in net_inject["binance_detail"]

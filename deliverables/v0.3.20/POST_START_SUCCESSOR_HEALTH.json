@@ -1,0 +1,87 @@
+{
+  "schema_version": "1.0.0",
+  "audit_timestamp_utc": "2026-09-03T07:31:00Z",
+  "audit_timestamp_hkt": "2026-09-03T15:31:00+08:00",
+  "evaluation_boundary_start_utc": "2026-09-03T06:30:00Z",
+  "evaluation_boundary_start_ms": 1788417000000,
+  "elapsed_post_start_seconds": 3660.0,
+  "elapsed_15m_slots": 5,
+  "chains": {
+    "derivatives": {
+      "epoch_id": "DERIVATIVES_PIT_EPOCH_V0320_001",
+      "config_path": "configs/forward/v0.3.20_derivatives_evidence_epoch.json",
+      "expected_slots_since_start": 5,
+      "recorded_runs": 5,
+      "fully_available_snapshots": 0,
+      "partially_available_snapshots": 0,
+      "failed_runs": 5,
+      "missing_slots": 0,
+      "consecutive_failed_or_missing_streak": 5,
+      "maximum_allowed_consecutive_gap": 4,
+      "gap_gate_breached": true,
+      "required_fields_availability": {
+        "basis_rate": 0.0,
+        "funding_rate": 0.0,
+        "long_short_account_ratio": 0.0,
+        "open_interest": 0.0,
+        "taker_buy_sell_ratio": 0.0
+      },
+      "empirical_status": "COMPROMISED_AT_RISK",
+      "terminal_threshold_reached": true,
+      "failure_root_cause": "Binance public data requests rejected with HTTP Error 451: Unavailable For Legal Reasons due to US egress IP 23.148.204.205 (pro-美国06)."
+    },
+    "opportunity": {
+      "campaign_id": "OPPORTUNITY_FORWARD_V0320_20260903T063000Z",
+      "hypothesis_id": "H37_OPPORTUNITY_FORWARD_REPLICATION_RECOVERY",
+      "config_path": "configs/forward/v0.3.20_opportunity_successor_campaign.json",
+      "expected_scans_since_start": 5,
+      "recorded_scans": 5,
+      "successful_scans": 0,
+      "missed_decision_slots": 5,
+      "success_ratio": 0.0,
+      "consecutive_missed_streak": 5,
+      "maximum_allowed_consecutive_misses": 4,
+      "miss_gate_breached": true,
+      "empirical_status": "COMPROMISED_AT_RISK",
+      "terminal_threshold_reached": true,
+      "failure_root_cause": "Underlying market data unavailable due to Binance HTTP 451 region block; scanner recorded MISSED_DECISION_SLOT for all decision boundaries."
+    },
+    "microstructure": {
+      "campaign_id": "MICROSTRUCTURE_CAPTURE_V0315_001",
+      "service_unit": "btc-quant-microstructure-forward.service",
+      "active_pid": 757224,
+      "service_state": "active (running)",
+      "memory_mb": 22.8,
+      "heartbeat_age_seconds": 1.2,
+      "latest_heartbeat_ms": 1788420699678,
+      "active_partition": "microstructure-2026-09-03.sqlite3",
+      "partition_events": {
+        "trades": 312071,
+        "depth_events": 229027
+      },
+      "daemon_health": "HEALTHY_COLLECTING"
+    }
+  },
+  "host_environment": {
+    "is_wsl": true,
+    "user": "root",
+    "systemd_running": true,
+    "systemd_state": "running",
+    "user_linger_enabled": true,
+    "linger_file_present": true,
+    "linger_file_path": "/var/lib/systemd/linger/root"
+  },
+  "network_proxy_doctor": {
+    "proxy_port_7897_open": true,
+    "binance_reachability": "HTTP_451_REGION_RESTRICTED",
+    "binance_detail": "Binance rejected request: Service unavailable from restricted location (switch proxy away from US).",
+    "required_operator_action": "Switch Clash proxy from node 'pro-美国06' (US) to a supported region (Germany, Japan, Singapore, etc.) in Clash Verge Rev."
+  },
+  "invariants_strictly_preserved": {
+    "start_timestamp_tampered": false,
+    "historical_rows_rewritten": false,
+    "retroactive_backfill_performed": false,
+    "execution_enabled": false,
+    "final_holdout_accessed": false
+  }
+}

@@ -6,10 +6,11 @@ import socket
 import sqlite3
 import subprocess
 import time
+import urllib.request
 from pathlib import Path
 from typing import Any
 from urllib.error import HTTPError
-from urllib.request import Request, urlopen
+from urllib.request import Request
 
 from .evidence_epoch import EvidenceEpochRegistry
 from .opportunity_forward import OpportunityCampaignRegistry
@@ -88,7 +89,7 @@ def check_systemd_units() -> dict[str, dict[str, Any]]:
     return results
 
 
-def check_network_proxy() -> dict[str, Any]:
+def check_network_proxy(*, url_opener: Any = None) -> dict[str, Any]:
     http_proxy = os.environ.get("http_proxy") or os.environ.get("HTTP_PROXY")
     https_proxy = os.environ.get("https_proxy") or os.environ.get("HTTPS_PROXY")
     all_proxy = os.environ.get("all_proxy") or os.environ.get("ALL_PROXY")
@@ -110,15 +111,16 @@ def check_network_proxy() -> dict[str, Any]:
     binance_status = "UNKNOWN"
     binance_detail = ""
     target_url = "https://fapi.binance.com/fapi/v1/ping"
+    opener = url_opener or urllib.request.urlopen
     try:
         req = Request(target_url, headers={"User-Agent": "btc-quant-agent/0.3.20"})
-        with urlopen(req, timeout=5.0) as resp:
+        with opener(req, timeout=5.0) as resp:
             if resp.status == 200:
                 binance_status = "OK"
                 binance_detail = "reachable"
             else:
                 binance_status = f"HTTP_{resp.status}"
-                binance_detail = str(resp.read().decode("utf-8", errors="replace"))
+                binance_detail = f"unexpected HTTP status: {resp.status}"
     except HTTPError as exc:
         if exc.code == 451:
             binance_status = "HTTP_451_REGION_RESTRICTED"
@@ -287,10 +289,10 @@ def check_campaign_states(
     }
 
 
-def forward_doctor() -> dict[str, Any]:
+def forward_doctor(*, url_opener: Any = None) -> dict[str, Any]:
     wsl_info = check_wsl_systemd()
     unit_info = check_systemd_units()
-    net_info = check_network_proxy()
+    net_info = check_network_proxy(url_opener=url_opener)
     chain_info = check_chains_and_storage()
     campaign_info = check_campaign_states()
 

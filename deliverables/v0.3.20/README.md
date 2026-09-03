@@ -35,7 +35,7 @@ All operations strictly maintain existing safety invariants:
 
 ## 3. Key Deliverables & Artifacts
 
-All 10 required artifacts have been compiled and verified under `deliverables/v0.3.20/`:
+All required artifacts have been compiled and verified under `deliverables/v0.3.20/`:
 1. `FORWARD_FAILURE_ROOT_CAUSE_AUDIT.json`: Detailed root cause forensic mapping with Windows Kernel-Power event log timestamps.
 2. `FORWARD_OPERATIONS_HEALTH.json`: Real-time structured operational health status.
 3. `DATA_QUALITY_TERMINAL_ARCHIVE.json`: Immutable archive record of `DERIVATIVES_PIT_EPOCH_V0316_002` and H36.
@@ -45,13 +45,24 @@ All 10 required artifacts have been compiled and verified under `deliverables/v0
 7. `LINUX_VPS_DEPLOYMENT_PROFILE.json`: Cloud deployment specification and sizing guidelines.
 8. `WINDOWS_WSL_LIFECYCLE_GUIDE.md`: Operational runbook for Windows/WSL power management and sleep prevention.
 9. `RESEARCH_DATA_CONCURRENCY_POLICY.md`: Process isolation, `os.nice(10)` prioritization, and database concurrency rules.
-10. `README.md`: This executive release document.
+10. `ACCEPTANCE_REPAIR_REPORT.md`: Detailed audit of acceptance repair fixes, Python 3.12 CI resolution, and post-start empirical data.
+11. `POST_START_SUCCESSOR_HEALTH.json`: Immutable audit of 5 decision slots post-start (06:30 - 07:30 UTC).
+12. `README.md`: This executive release document.
 
 ---
 
 ## 4. Verification & Quality Gates
 
-- **Unit & Reliability Test Suite**: `429 passed in 11.97s` (zero failures).
+- **CI Provenance & Python 3.12 Repair**:
+  - In initial CI run `33719993032`, Python 3.11 and 3.13 passed while Python 3.12 failed `test_network_proxy_check_detects_http_451` (1 failed, 428 passed) due to module-local `urlopen` symbol binding.
+  - Refactored `check_network_proxy` to access `urllib.request.urlopen` dynamically and support explicit `url_opener` dependency injection.
+  - Verified deterministically passing across Python 3.11, 3.12, and 3.13.
+- **Unit & Reliability Test Suite**: `429 passed in 11.4s` (zero failures).
 - **Code Linter**: `ruff check .` passed with zero violations.
 - **Static Type Analysis**: `mypy src` passed with zero type errors across all 73 source files.
-- **Compilation**: `python -m compileall src` verified clean bytecode compilation.
+- **Compilation**: `python -m compileall src tests` verified clean bytecode compilation.
+- **Successor Empirical Status**:
+  - `DERIVATIVES_PIT_EPOCH_V0320_001`: `COMPROMISED_AT_RISK` / `TERMINAL_BREACH` (5 consecutive failed slots due to external HTTP 451 geo-block; $5 > 4$).
+  - `OPPORTUNITY_FORWARD_V0320_20260903T063000Z` (H37): `COMPROMISED_AT_RISK` / `TERMINAL_BREACH` (5 consecutive missed scans; $5 > 4$).
+  - `MICROSTRUCTURE_CAPTURE_V0315_001`: `HEALTHY_COLLECTING` (fresh heartbeats, active streaming on `microstructure-2026-09-03.sqlite3`).
+  - Strict immutability observed: zero backfill, zero history rewrite, zero start time manipulation.

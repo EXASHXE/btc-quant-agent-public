@@ -218,17 +218,13 @@ class OpportunityCampaignRegistry:
     def successor(
         self,
         campaign_id: str | None = None,
-        now_ms: int | None = None,
     ) -> tuple[OpportunityCampaign, OpportunityCampaignLifecycle]:
         if campaign_id is not None:
             lifecycle = next(item for item in self.campaigns if item.campaign_id == campaign_id)
             return OpportunityCampaign.load(lifecycle.config_path), lifecycle
-        now = now_ms if now_ms is not None else int(time.time() * 1000)
         h36 = [c for c in self.campaigns if c.campaign_id == "OPPORTUNITY_FORWARD_V0317_20260901T160000Z"]
-        # Compatibility with v0.3.17 test suite prior to H37 activation
-        if h36 and now < 1788417000000:
-            lifecycle = h36[0]
-            return OpportunityCampaign.load(lifecycle.config_path), lifecycle
+        if h36:
+            return OpportunityCampaign.load(h36[0].config_path), h36[0]
         candidates = [
             item
             for item in self.campaigns
