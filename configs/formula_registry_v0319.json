@@ -1,0 +1,3189 @@
+{
+  "formulas": [
+    {
+      "complexity": 3,
+      "correlation_to_existing_candidates": 1.0,
+      "discovery_window": "[2021-01-01T00:00:00Z, 2024-01-01T00:00:00Z)",
+      "formula_hash": "1fb93089112b7114decbd4bbb14c08b1eced1b4add534be4cfd4347d26195d47",
+      "formula_id": "V0319_RANDOM_001",
+      "formula_tokens_or_ast": [
+        {
+          "kind": "FEATURE",
+          "value": "PERP_AGG_BUY_IMBALANCE_1H"
+        },
+        {
+          "kind": "OPERATOR",
+          "value": "SIGN"
+        },
+        {
+          "kind": "OPERATOR",
+          "parameter": 12,
+          "value": "ROLL_SUM_N"
+        },
+        {
+          "kind": "FEATURE",
+          "value": "SPOT_PERP_FLOW_SPREAD"
+        },
+        {
+          "kind": "OPERATOR",
+          "value": "SUB"
+        }
+      ],
+      "input_data_roles": [
+        "CANONICAL_HISTORICAL",
+        "OFFICIAL_HISTORICAL_TIMESTAMPED"
+      ],
+      "input_feature_ids": [
+        "PERP_AGG_BUY_IMBALANCE_1H",
+        "SPOT_PERP_FLOW_SPREAD"
+      ],
+      "max_lookback": 12,
+      "metrics_by_fold": {
+        "discovery": {
+          "bootstrap_block_events": null,
+          "bootstrap_block_hours": null,
+          "bootstrap_ci_high": null,
+          "bootstrap_ci_low": null,
+          "chronological_fold_means": [
+            0.0015569836397059352,
+            0.0010937437967529402,
+            0.0009779732291593784,
+            0.00041919049741928686
+          ],
+          "event_count": 3239,
+          "gross_mean_return": 0.0010118045256007108,
+          "long_count": 1502,
+          "long_fraction": 0.4637233714109293,
+          "net_mean_return": 0.0010118045256007108,
+          "short_count": 1737,
+          "standard_error": 0.00034528320536485055,
+          "t_stat": 2.9303612509376666,
+          "turnover": 0.3567016676961087,
+          "wait_count": 45
+        },
+        "formula": [
+          {
+            "kind": "FEATURE",
+            "value": "PERP_AGG_BUY_IMBALANCE_1H"
+          },
+          {
+            "kind": "OPERATOR",
+            "value": "SIGN"
+          },
+          {
+            "kind": "OPERATOR",
+            "parameter": 12,
+            "value": "ROLL_SUM_N"
+          },
+          {
+            "kind": "FEATURE",
+            "value": "SPOT_PERP_FLOW_SPREAD"
+          },
+          {
+            "kind": "OPERATOR",
+            "value": "SUB"
+          }
+        ],
+        "formula_hash": "1fb93089112b7114decbd4bbb14c08b1eced1b4add534be4cfd4347d26195d47",
+        "gate_audit": {
+          "consumed_protocol_keys": [
+            "minimum_discovery_events",
+            "minimum_validation_events",
+            "minimum_pseudo_forward_events",
+            "minimum_long_fraction",
+            "maximum_long_fraction",
+            "minimum_discovery_net_mean_return_8h",
+            "minimum_validation_net_mean_return_8h",
+            "minimum_pseudo_forward_net_mean_return_8h",
+            "minimum_validation_bootstrap_ci_low",
+            "minimum_pseudo_forward_bootstrap_ci_low",
+            "chronological_fold_count",
+            "minimum_positive_validation_folds",
+            "minimum_positive_pseudo_forward_folds",
+            "required_multiple_testing_adjusted_pass",
+            "maximum_pairwise_candidate_correlation",
+            "minimum_sandbox_trade_count",
+            "minimum_net_profit_factor",
+            "maximum_drawdown_r",
+            "maximum_losing_streak",
+            "minimum_positive_sandbox_folds",
+            "fees_bps_round_trip",
+            "slippage_bps_round_trip",
+            "funding_included",
+            "cost_stress_multiplier",
+            "minimum_cost_stress_net_r",
+            "candidate_must_pass_all",
+            "sandbox_not_applicable_rule",
+            "unknown_or_unused_key_rule"
+          ],
+          "passed_all": false,
+          "results": [
+            {
+              "key": "minimum_discovery_events",
+              "observed": 3239,
+              "reason": null,
+              "required": 1000,
+              "status": "PASS"
+            },
+            {
+              "key": "minimum_validation_events",
+              "observed": 1004,
+              "reason": null,
+              "required": 500,
+              "status": "PASS"
+            },
+            {
+              "key": "minimum_pseudo_forward_events",
+              "observed": 1094,
+              "reason": null,
+              "required": 500,
+              "status": "PASS"
+            },
+            {
+              "key": "minimum_long_fraction",
+              "observed": 0.40493601462522855,
+              "reason": null,
+              "required": 0.2,
+              "status": "PASS"
+            },
+            {
+              "key": "maximum_long_fraction",
+              "observed": 0.40493601462522855,
+              "reason": null,
+              "required": 0.8,
+              "status": "PASS"
+            },
+            {
+              "key": "minimum_discovery_net_mean_return_8h",
+              "observed": 0.0010118045256007108,
+              "reason": null,
+              "required": 0.00025,
+              "status": "PASS"
+            },
+            {
+              "key": "minimum_validation_net_mean_return_8h",
+              "observed": -0.00039602301554439364,
+              "reason": null,
+              "required": 0.0002,
+              "status": "FAIL"
+            },
+            {
+              "key": "minimum_pseudo_forward_net_mean_return_8h",
+              "observed": -0.0014524086594716857,
+              "reason": null,
+              "required": 0.0002,
+              "status": "FAIL"
+            },
+            {
+              "key": "minimum_validation_bootstrap_ci_low",
+              "observed": -0.0011154167456134177,
+              "reason": null,
+              "required": 0.0,
+              "status": "FAIL"
+            },
+            {
+              "key": "minimum_pseudo_forward_bootstrap_ci_low",
+              "observed": -0.0020865627052009533,
+              "reason": null,
+              "required": 0.0,
+              "status": "FAIL"
+            },
+            {
+              "key": "chronological_fold_count",
+              "observed": 4,
+              "reason": null,
+              "required": ">0",
+              "status": "PASS"
+            },
+            {
+              "key": "minimum_positive_validation_folds",
+              "observed": 2,
+              "reason": null,
+              "required": 3,
+              "status": "FAIL"
+            },
+            {
+              "key": "minimum_positive_pseudo_forward_folds",
+              "observed": 0,
+              "reason": null,
+              "required": 3,
+              "status": "FAIL"
+            },
+            {
+              "key": "required_multiple_testing_adjusted_pass",
+              "observed": false,
+              "reason": null,
+              "required": true,
+              "status": "FAIL"
+            },
+            {
+              "key": "maximum_pairwise_candidate_correlation",
+              "observed": 1.0,
+              "reason": null,
+              "required": 0.8,
+              "status": "FAIL"
+            },
+            {
+              "key": "minimum_sandbox_trade_count",
+              "observed": null,
+              "reason": "UPSTREAM_FORMULA_GATE_FAILED",
+              "required": 50,
+              "status": "NOT_APPLICABLE"
+            },
+            {
+              "key": "minimum_net_profit_factor",
+              "observed": null,
+              "reason": "UPSTREAM_FORMULA_GATE_FAILED",
+              "required": 1.1,
+              "status": "NOT_APPLICABLE"
+            },
+            {
+              "key": "maximum_drawdown_r",
+              "observed": null,
+              "reason": "UPSTREAM_FORMULA_GATE_FAILED",
+              "required": 20.0,
+              "status": "NOT_APPLICABLE"
+            },
+            {
+              "key": "maximum_losing_streak",
+              "observed": null,
+              "reason": "UPSTREAM_FORMULA_GATE_FAILED",
+              "required": 20,
+              "status": "NOT_APPLICABLE"
+            },
+            {
+              "key": "minimum_positive_sandbox_folds",
+              "observed": null,
+              "reason": "UPSTREAM_FORMULA_GATE_FAILED",
+              "required": 3,
+              "status": "NOT_APPLICABLE"
+            },
+            {
+              "key": "fees_bps_round_trip",
+              "observed": null,
+              "reason": "UPSTREAM_FORMULA_GATE_FAILED",
+              "required": 8.0,
+              "status": "NOT_APPLICABLE"
+            },
+            {
+              "key": "slippage_bps_round_trip",
+              "observed": null,
+              "reason": "UPSTREAM_FORMULA_GATE_FAILED",
+              "required": 4.0,
+              "status": "NOT_APPLICABLE"
+            },
+            {
+              "key": "funding_included",
+              "observed": null,
+              "reason": "UPSTREAM_FORMULA_GATE_FAILED",
+              "required": true,
+              "status": "NOT_APPLICABLE"
+            },
+            {
+              "key": "cost_stress_multiplier",
+              "observed": null,
+              "reason": "UPSTREAM_FORMULA_GATE_FAILED",
+              "required": 2.0,
+              "status": "NOT_APPLICABLE"
+            },
+            {
+              "key": "minimum_cost_stress_net_r",
+              "observed": null,
+              "reason": "UPSTREAM_FORMULA_GATE_FAILED",
+              "required": 0.0,
+              "status": "NOT_APPLICABLE"
+            },
+            {
+              "key": "candidate_must_pass_all",
+              "observed": true,
+              "reason": null,
+              "required": true,
+              "status": "PASS"
+            },
+            {
+              "key": "sandbox_not_applicable_rule",
+              "observed": "ONLY_WHEN_AN_UPSTREAM_FORMULA_GATE_FAILED_BEFORE_TRADE_REPLAY; reason=UPSTREAM_FORMULA_GATE_FAILED",
+              "reason": null,
+              "required": "FROZEN",
+              "status": "PASS"
+            },
+            {
+              "key": "unknown_or_unused_key_rule",
+              "observed": "FORMAL_RUN_FAILS_CLOSED",
+              "reason": null,
+              "required": "FORMAL_RUN_FAILS_CLOSED",
+              "status": "PASS"
+            }
+          ]
+        },
+        "maximum_pairwise_candidate_correlation": 1.0,
+        "new_features": [
+          "PERP_AGG_BUY_IMBALANCE_1H"
+        ],
+        "pseudo_forward": {
+          "bootstrap_block_events": 21,
+          "bootstrap_block_hours": 168,
+          "bootstrap_ci_high": -0.000758546378825805,
+          "bootstrap_ci_low": -0.0020865627052009533,
+          "chronological_fold_means": [
+            -0.0006899609196602306,
+            -0.0023685642256326632,
+            -0.0013558318455327116,
+            -0.0013921425209525587
+          ],
+          "event_count": 1094,
+          "gross_mean_return": -0.0002524086594716858,
+          "long_count": 443,
+          "long_fraction": 0.40493601462522855,
+          "net_mean_return": -0.0014524086594716857,
+          "short_count": 651,
+          "standard_error": 0.00038019108604963556,
+          "t_stat": -3.820207029477981,
+          "turnover": 0.37145471180237877,
+          "wait_count": 0
+        },
+        "validation": {
+          "bootstrap_block_events": 21,
+          "bootstrap_block_hours": 168,
+          "bootstrap_ci_high": 0.00030003898351407615,
+          "bootstrap_ci_low": -0.0011154167456134177,
+          "chronological_fold_means": [
+            -0.00048557906702149223,
+            1.3900416691918343e-05,
+            -0.0013078399178533058,
+            0.00019542650600530535
+          ],
+          "event_count": 1004,
+          "gross_mean_return": 0.0008039769844556063,
+          "long_count": 411,
+          "long_fraction": 0.40936254980079684,
+          "net_mean_return": -0.00039602301554439364,
+          "short_count": 593,
+          "standard_error": 0.00048076178355612283,
+          "t_stat": -0.8237406322421694,
+          "turnover": 0.38384845463609174,
+          "wait_count": 0
+        }
+      },
+      "operator_set": [
+        "ROLL_SUM_N",
+        "SIGN",
+        "SUB"
+      ],
+      "proposal_engine": "RANDOM_GRAMMAR_SEARCH_NEW_FEATURE_CONSTRAINED",
+      "pseudo_forward_window": "[2025-02-01T00:00:00Z, 2026-02-01T00:00:00Z)",
+      "research_eligibility": false,
+      "runtime_eligibility": false,
+      "search_budget": 512,
+      "search_run_id": "v0.3.19_official_derivatives_symbolic_20260903T013312Z",
+      "search_seed": 3192026,
+      "status": "FAILED_VALIDATION",
+      "validation_window": "[2024-02-01T00:00:00Z, 2025-01-01T00:00:00Z)"
+    },
+    {
+      "complexity": 3,
+      "correlation_to_existing_candidates": 0.3387782895685101,
+      "discovery_window": "[2021-01-01T00:00:00Z, 2024-01-01T00:00:00Z)",
+      "formula_hash": "6f40c8eba193d2ccbdb1e27d4606e8c2671b7333d670d540bfb3156fe553ce6c",
+      "formula_id": "V0319_RANDOM_002",
+      "formula_tokens_or_ast": [
+        {
+          "kind": "FEATURE",
+          "value": "MARK_INDEX_BASIS_CHANGE_4H"
+        },
+        {
+          "kind": "FEATURE",
+          "value": "TAKER_BUY_IMBALANCE_1H"
+        },
+        {
+          "kind": "OPERATOR",
+          "value": "MUL"
+        },
+        {
+          "kind": "FEATURE",
+          "value": "MARK_INDEX_BASIS_CHANGE_4H"
+        },
+        {
+          "kind": "OPERATOR",
+          "value": "SUB"
+        },
+        {
+          "kind": "OPERATOR",
+          "parameter": 48,
+          "value": "DECAY_N"
+        }
+      ],
+      "input_data_roles": [
+        "CANONICAL_HISTORICAL",
+        "OFFICIAL_HISTORICAL_TIMESTAMPED"
+      ],
+      "input_feature_ids": [
+        "MARK_INDEX_BASIS_CHANGE_4H",
+        "TAKER_BUY_IMBALANCE_1H"
+      ],
+      "max_lookback": 51,
+      "metrics_by_fold": {
+        "discovery": {
+          "bootstrap_block_events": null,
+          "bootstrap_block_hours": null,
+          "bootstrap_ci_high": null,
+          "bootstrap_ci_low": null,
+          "chronological_fold_means": [
+            0.001216884486757916,
+            0.0007180899456934939,
+            0.0012734136218398332,
+            0.000663879415494091
+          ],
+          "event_count": 3157,
+          "gross_mean_return": 0.0009679705141197728,
+          "long_count": 1707,
+          "long_fraction": 0.5407031992397846,
+          "net_mean_return": 0.0009679705141197728,
+          "short_count": 1450,
+          "standard_error": 0.00034765268553032066,
+          "t_stat": 2.7843032843057123,
+          "turnover": 0.39955640050697083,
+          "wait_count": 127
+        },
+        "formula": [
+          {
+            "kind": "FEATURE",
+            "value": "MARK_INDEX_BASIS_CHANGE_4H"
+          },
+          {
+            "kind": "FEATURE",
+            "value": "TAKER_BUY_IMBALANCE_1H"
+          },
+          {
+            "kind": "OPERATOR",
+            "value": "MUL"
+          },
+          {
+            "kind": "FEATURE",
+            "value": "MARK_INDEX_BASIS_CHANGE_4H"
+          },
+          {
+            "kind": "OPERATOR",
+            "value": "SUB"
+          },
+          {
+            "kind": "OPERATOR",
+            "parameter": 48,
+            "value": "DECAY_N"
+          }
+        ],
+        "formula_hash": "6f40c8eba193d2ccbdb1e27d4606e8c2671b7333d670d540bfb3156fe553ce6c",
+        "gate_audit": {
+          "consumed_protocol_keys": [
+            "minimum_discovery_events",
+            "minimum_validation_events",
+            "minimum_pseudo_forward_events",
+            "minimum_long_fraction",
+            "maximum_long_fraction",
+            "minimum_discovery_net_mean_return_8h",
+            "minimum_validation_net_mean_return_8h",
+            "minimum_pseudo_forward_net_mean_return_8h",
+            "minimum_validation_bootstrap_ci_low",
+            "minimum_pseudo_forward_bootstrap_ci_low",
+            "chronological_fold_count",
+            "minimum_positive_validation_folds",
+            "minimum_positive_pseudo_forward_folds",
+            "required_multiple_testing_adjusted_pass",
+            "maximum_pairwise_candidate_correlation",
+            "minimum_sandbox_trade_count",
+            "minimum_net_profit_factor",
+            "maximum_drawdown_r",
+            "maximum_losing_streak",
+            "minimum_positive_sandbox_folds",
+            "fees_bps_round_trip",
+            "slippage_bps_round_trip",
+            "funding_included",
+            "cost_stress_multiplier",
+            "minimum_cost_stress_net_r",
+            "candidate_must_pass_all",
+            "sandbox_not_applicable_rule",
+            "unknown_or_unused_key_rule"
+          ],
+          "passed_all": false,
+          "results": [
+            {
+              "key": "minimum_discovery_events",
+              "observed": 3157,
+              "reason": null,
+              "required": 1000,
+              "status": "PASS"
+            },
+            {
+              "key": "minimum_validation_events",
+              "observed": 992,
+              "reason": null,
+              "required": 500,
+              "status": "PASS"
+            },
+            {
+              "key": "minimum_pseudo_forward_events",
+              "observed": 1094,
+              "reason": null,
+              "required": 500,
+              "status": "PASS"
+            },
+            {
+              "key": "minimum_long_fraction",
+              "observed": 0.5475319926873857,
+              "reason": null,
+              "required": 0.2,
+              "status": "PASS"
+            },
+            {
+              "key": "maximum_long_fraction",
+              "observed": 0.5475319926873857,
+              "reason": null,
+              "required": 0.8,
+              "status": "PASS"
+            },
+            {
+              "key": "minimum_discovery_net_mean_return_8h",
+              "observed": 0.0009679705141197728,
+              "reason": null,
+              "required": 0.00025,
+              "status": "PASS"
+            },
+            {
+              "key": "minimum_validation_net_mean_return_8h",
+              "observed": -0.0007603628911331031,
+              "reason": null,
+              "required": 0.0002,
+              "status": "FAIL"
+            },
+            {
+              "key": "minimum_pseudo_forward_net_mean_return_8h",
+              "observed": -0.0007605334774508904,
+              "reason": null,
+              "required": 0.0002,
+              "status": "FAIL"
+            },
+            {
+              "key": "minimum_validation_bootstrap_ci_low",
+              "observed": -0.0015267131803893134,
+              "reason": null,
+              "required": 0.0,
+              "status": "FAIL"
+            },
+            {
+              "key": "minimum_pseudo_forward_bootstrap_ci_low",
+              "observed": -0.0015202306030993144,
+              "reason": null,
+              "required": 0.0,
+              "status": "FAIL"
+            },
+            {
+              "key": "chronological_fold_count",
+              "observed": 4,
+              "reason": null,
+              "required": ">0",
+              "status": "PASS"
+            },
+            {
+              "key": "minimum_positive_validation_folds",
+              "observed": 0,
+              "reason": null,
+              "required": 3,
+              "status": "FAIL"
+            },
+            {
+              "key": "minimum_positive_pseudo_forward_folds",
+              "observed": 1,
+              "reason": null,
+              "required": 3,
+              "status": "FAIL"
+            },
+            {
+              "key": "required_multiple_testing_adjusted_pass",
+              "observed": false,
+              "reason": null,
+              "required": true,
+              "status": "FAIL"
+            },
+            {
+              "key": "maximum_pairwise_candidate_correlation",
+              "observed": 0.3387782895685101,
+              "reason": null,
+              "required": 0.8,
+              "status": "PASS"
+            },
+            {
+              "key": "minimum_sandbox_trade_count",
+              "observed": null,
+              "reason": "UPSTREAM_FORMULA_GATE_FAILED",
+              "required": 50,
+              "status": "NOT_APPLICABLE"
+            },
+            {
+              "key": "minimum_net_profit_factor",
+              "observed": null,
+              "reason": "UPSTREAM_FORMULA_GATE_FAILED",
+              "required": 1.1,
+              "status": "NOT_APPLICABLE"
+            },
+            {
+              "key": "maximum_drawdown_r",
+              "observed": null,
+              "reason": "UPSTREAM_FORMULA_GATE_FAILED",
+              "required": 20.0,
+              "status": "NOT_APPLICABLE"
+            },
+            {
+              "key": "maximum_losing_streak",
+              "observed": null,
+              "reason": "UPSTREAM_FORMULA_GATE_FAILED",
+              "required": 20,
+              "status": "NOT_APPLICABLE"
+            },
+            {
+              "key": "minimum_positive_sandbox_folds",
+              "observed": null,
+              "reason": "UPSTREAM_FORMULA_GATE_FAILED",
+              "required": 3,
+              "status": "NOT_APPLICABLE"
+            },
+            {
+              "key": "fees_bps_round_trip",
+              "observed": null,
+              "reason": "UPSTREAM_FORMULA_GATE_FAILED",
+              "required": 8.0,
+              "status": "NOT_APPLICABLE"
+            },
+            {
+              "key": "slippage_bps_round_trip",
+              "observed": null,
+              "reason": "UPSTREAM_FORMULA_GATE_FAILED",
+              "required": 4.0,
+              "status": "NOT_APPLICABLE"
+            },
+            {
+              "key": "funding_included",
+              "observed": null,
+              "reason": "UPSTREAM_FORMULA_GATE_FAILED",
+              "required": true,
+              "status": "NOT_APPLICABLE"
+            },
+            {
+              "key": "cost_stress_multiplier",
+              "observed": null,
+              "reason": "UPSTREAM_FORMULA_GATE_FAILED",
+              "required": 2.0,
+              "status": "NOT_APPLICABLE"
+            },
+            {
+              "key": "minimum_cost_stress_net_r",
+              "observed": null,
+              "reason": "UPSTREAM_FORMULA_GATE_FAILED",
+              "required": 0.0,
+              "status": "NOT_APPLICABLE"
+            },
+            {
+              "key": "candidate_must_pass_all",
+              "observed": true,
+              "reason": null,
+              "required": true,
+              "status": "PASS"
+            },
+            {
+              "key": "sandbox_not_applicable_rule",
+              "observed": "ONLY_WHEN_AN_UPSTREAM_FORMULA_GATE_FAILED_BEFORE_TRADE_REPLAY; reason=UPSTREAM_FORMULA_GATE_FAILED",
+              "reason": null,
+              "required": "FROZEN",
+              "status": "PASS"
+            },
+            {
+              "key": "unknown_or_unused_key_rule",
+              "observed": "FORMAL_RUN_FAILS_CLOSED",
+              "reason": null,
+              "required": "FORMAL_RUN_FAILS_CLOSED",
+              "status": "PASS"
+            }
+          ]
+        },
+        "maximum_pairwise_candidate_correlation": 0.3387782895685101,
+        "new_features": [
+          "MARK_INDEX_BASIS_CHANGE_4H"
+        ],
+        "pseudo_forward": {
+          "bootstrap_block_events": 21,
+          "bootstrap_block_hours": 168,
+          "bootstrap_ci_high": 2.0961963529223342e-05,
+          "bootstrap_ci_low": -0.0015202306030993144,
+          "chronological_fold_means": [
+            0.0006291500392840662,
+            -0.000720846068408662,
+            -0.002219601312457262,
+            -0.0007310897956606505
+          ],
+          "event_count": 1094,
+          "gross_mean_return": 0.00043946652254910946,
+          "long_count": 599,
+          "long_fraction": 0.5475319926873857,
+          "net_mean_return": -0.0007605334774508904,
+          "short_count": 495,
+          "standard_error": 0.0003800353315499388,
+          "t_stat": -2.001217819272554,
+          "turnover": 0.4172003659652333,
+          "wait_count": 0
+        },
+        "validation": {
+          "bootstrap_block_events": 21,
+          "bootstrap_block_hours": 168,
+          "bootstrap_ci_high": 1.2342430080798067e-05,
+          "bootstrap_ci_low": -0.0015267131803893134,
+          "chronological_fold_means": [
+            -0.00024136617655278554,
+            -0.0006994518614988144,
+            -0.0005633653433815766,
+            -0.001537268183099236
+          ],
+          "event_count": 992,
+          "gross_mean_return": 0.0004396371088668968,
+          "long_count": 562,
+          "long_fraction": 0.5665322580645161,
+          "net_mean_return": -0.0007603628911331031,
+          "short_count": 430,
+          "standard_error": 0.00048387650172319023,
+          "t_stat": -1.57139866975413,
+          "turnover": 0.37336024217961655,
+          "wait_count": 12
+        }
+      },
+      "operator_set": [
+        "DECAY_N",
+        "MUL",
+        "SUB"
+      ],
+      "proposal_engine": "RANDOM_GRAMMAR_SEARCH_NEW_FEATURE_CONSTRAINED",
+      "pseudo_forward_window": "[2025-02-01T00:00:00Z, 2026-02-01T00:00:00Z)",
+      "research_eligibility": false,
+      "runtime_eligibility": false,
+      "search_budget": 512,
+      "search_run_id": "v0.3.19_official_derivatives_symbolic_20260903T013312Z",
+      "search_seed": 3192026,
+      "status": "FAILED_VALIDATION",
+      "validation_window": "[2024-02-01T00:00:00Z, 2025-01-01T00:00:00Z)"
+    },
+    {
+      "complexity": 6,
+      "correlation_to_existing_candidates": null,
+      "discovery_window": "[2021-01-01T00:00:00Z, 2024-01-01T00:00:00Z)",
+      "formula_hash": "c93d0113d1b1f9100662b2c7bb3ffef9b367cc75a741b84c896aaa1862a4283a",
+      "formula_id": "V0319_RANDOM_003",
+      "formula_tokens_or_ast": [
+        {
+          "kind": "FEATURE",
+          "value": "QUOTE_VOLUME_Z_24H"
+        },
+        {
+          "kind": "OPERATOR",
+          "parameter": 48,
+          "value": "DECAY_N"
+        },
+        {
+          "kind": "OPERATOR",
+          "value": "DELAY_1"
+        },
+        {
+          "kind": "FEATURE",
+          "value": "LOG_RETURN_4H"
+        },
+        {
+          "kind": "OPERATOR",
+          "parameter": 4,
+          "value": "ROLL_STD_N"
+        },
+        {
+          "kind": "FEATURE",
+          "value": "ATR_24H"
+        },
+        {
+          "kind": "FEATURE",
+          "value": "MARK_INDEX_BASIS_1H"
+        },
+        {
+          "kind": "OPERATOR",
+          "value": "DIV"
+        },
+        {
+          "kind": "OPERATOR",
+          "value": "SUB"
+        },
+        {
+          "kind": "OPERATOR",
+          "value": "MUL"
+        }
+      ],
+      "input_data_roles": [
+        "CANONICAL_HISTORICAL",
+        "OFFICIAL_HISTORICAL_TIMESTAMPED"
+      ],
+      "input_feature_ids": [
+        "ATR_24H",
+        "LOG_RETURN_4H",
+        "MARK_INDEX_BASIS_1H",
+        "QUOTE_VOLUME_Z_24H"
+      ],
+      "max_lookback": 72,
+      "metrics_by_fold": {
+        "discovery": {
+          "bootstrap_block_events": null,
+          "bootstrap_block_hours": null,
+          "bootstrap_ci_high": null,
+          "bootstrap_ci_low": null,
+          "chronological_fold_means": [
+            0.0019936685752068796,
+            0.0007901132883750911,
+            0.0004370786629890169,
+            0.000567055069051011
+          ],
+          "event_count": 3224,
+          "gross_mean_return": 0.0009469788989054995,
+          "long_count": 1572,
+          "long_fraction": 0.48759305210918114,
+          "net_mean_return": 0.0009469788989054995,
+          "short_count": 1652,
+          "standard_error": 0.0003429617403472335,
+          "t_stat": 2.7611794188667385,
+          "turnover": 0.30561588582066396,
+          "wait_count": 60
+        }
+      },
+      "operator_set": [
+        "DECAY_N",
+        "DELAY_1",
+        "DIV",
+        "MUL",
+        "ROLL_STD_N",
+        "SUB"
+      ],
+      "proposal_engine": "RANDOM_GRAMMAR_SEARCH_NEW_FEATURE_CONSTRAINED",
+      "pseudo_forward_window": "[2025-02-01T00:00:00Z, 2026-02-01T00:00:00Z)",
+      "research_eligibility": false,
+      "runtime_eligibility": false,
+      "search_budget": 512,
+      "search_run_id": "v0.3.19_official_derivatives_symbolic_20260903T013312Z",
+      "search_seed": 3192026,
+      "status": "FAILED_VALIDATION",
+      "validation_window": "[2024-02-01T00:00:00Z, 2025-01-01T00:00:00Z)"
+    },
+    {
+      "complexity": 4,
+      "correlation_to_existing_candidates": null,
+      "discovery_window": "[2021-01-01T00:00:00Z, 2024-01-01T00:00:00Z)",
+      "formula_hash": "5de62efeae246149b9b4c8c85f9d72e0e3afba6a69cd1a6e6f156265e2dd6b04",
+      "formula_id": "V0319_RANDOM_004",
+      "formula_tokens_or_ast": [
+        {
+          "kind": "FEATURE",
+          "value": "SPOT_PERP_FLOW_SPREAD"
+        },
+        {
+          "kind": "FEATURE",
+          "value": "REALIZED_VOL_24H"
+        },
+        {
+          "kind": "FEATURE",
+          "value": "TAKER_BUY_IMBALANCE_1H"
+        },
+        {
+          "kind": "FEATURE",
+          "value": "LOG_RETURN_4H"
+        },
+        {
+          "kind": "OPERATOR",
+          "value": "GATE"
+        },
+        {
+          "kind": "FEATURE",
+          "value": "PREMIUM_INDEX_Z_24H"
+        },
+        {
+          "kind": "CONSTANT",
+          "value": 1.0
+        },
+        {
+          "kind": "FEATURE",
+          "value": "TRADE_COUNT_Z_24H"
+        },
+        {
+          "kind": "OPERATOR",
+          "value": "GATE"
+        },
+        {
+          "kind": "OPERATOR",
+          "value": "SUB"
+        },
+        {
+          "kind": "OPERATOR",
+          "value": "DIV"
+        }
+      ],
+      "input_data_roles": [
+        "CANONICAL_HISTORICAL",
+        "OFFICIAL_HISTORICAL_TIMESTAMPED"
+      ],
+      "input_feature_ids": [
+        "LOG_RETURN_4H",
+        "PREMIUM_INDEX_Z_24H",
+        "REALIZED_VOL_24H",
+        "SPOT_PERP_FLOW_SPREAD",
+        "TAKER_BUY_IMBALANCE_1H",
+        "TRADE_COUNT_Z_24H"
+      ],
+      "max_lookback": 24,
+      "metrics_by_fold": {
+        "discovery": {
+          "bootstrap_block_events": null,
+          "bootstrap_block_hours": null,
+          "bootstrap_ci_high": null,
+          "bootstrap_ci_low": null,
+          "chronological_fold_means": [
+            0.002349186647813913,
+            0.0001345225309481687,
+            0.0012538935156612059,
+            -0.0004322089884981051
+          ],
+          "event_count": 3238,
+          "gross_mean_return": 0.0008257460845076969,
+          "long_count": 1687,
+          "long_fraction": 0.5210006176652254,
+          "net_mean_return": 0.0008257460845076969,
+          "short_count": 1551,
+          "standard_error": 0.000344197380235078,
+          "t_stat": 2.3990481390175993,
+          "turnover": 0.47945628668520235,
+          "wait_count": 46
+        }
+      },
+      "operator_set": [
+        "DIV",
+        "GATE",
+        "SUB"
+      ],
+      "proposal_engine": "RANDOM_GRAMMAR_SEARCH_NEW_FEATURE_CONSTRAINED",
+      "pseudo_forward_window": "[2025-02-01T00:00:00Z, 2026-02-01T00:00:00Z)",
+      "research_eligibility": false,
+      "runtime_eligibility": false,
+      "search_budget": 512,
+      "search_run_id": "v0.3.19_official_derivatives_symbolic_20260903T013312Z",
+      "search_seed": 3192026,
+      "status": "FAILED_VALIDATION",
+      "validation_window": "[2024-02-01T00:00:00Z, 2025-01-01T00:00:00Z)"
+    },
+    {
+      "complexity": 2,
+      "correlation_to_existing_candidates": null,
+      "discovery_window": "[2021-01-01T00:00:00Z, 2024-01-01T00:00:00Z)",
+      "formula_hash": "a7069defc8fb77a9f1c78cdc48e3815bf3fc61bc951b85e1a15204a2ad556325",
+      "formula_id": "V0319_RANDOM_005",
+      "formula_tokens_or_ast": [
+        {
+          "kind": "FEATURE",
+          "value": "PERP_AGG_BUY_IMBALANCE_1H"
+        },
+        {
+          "kind": "OPERATOR",
+          "value": "DELAY_1"
+        },
+        {
+          "kind": "OPERATOR",
+          "parameter": 24,
+          "value": "EMA_N"
+        }
+      ],
+      "input_data_roles": [
+        "OFFICIAL_HISTORICAL_TIMESTAMPED"
+      ],
+      "input_feature_ids": [
+        "PERP_AGG_BUY_IMBALANCE_1H"
+      ],
+      "max_lookback": 25,
+      "metrics_by_fold": {
+        "discovery": {
+          "bootstrap_block_events": null,
+          "bootstrap_block_hours": null,
+          "bootstrap_ci_high": null,
+          "bootstrap_ci_low": null,
+          "chronological_fold_means": [
+            0.001256433192552511,
+            0.0014268192142728167,
+            0.00036066297145669144,
+            0.00016144130598971313
+          ],
+          "event_count": 3240,
+          "gross_mean_return": 0.000801339171067933,
+          "long_count": 1362,
+          "long_fraction": 0.4203703703703704,
+          "net_mean_return": 0.000801339171067933,
+          "short_count": 1878,
+          "standard_error": 0.0003439304609310319,
+          "t_stat": 2.3299453293514034,
+          "turnover": 0.2682926829268293,
+          "wait_count": 44
+        }
+      },
+      "operator_set": [
+        "DELAY_1",
+        "EMA_N"
+      ],
+      "proposal_engine": "RANDOM_GRAMMAR_SEARCH_NEW_FEATURE_CONSTRAINED",
+      "pseudo_forward_window": "[2025-02-01T00:00:00Z, 2026-02-01T00:00:00Z)",
+      "research_eligibility": false,
+      "runtime_eligibility": false,
+      "search_budget": 512,
+      "search_run_id": "v0.3.19_official_derivatives_symbolic_20260903T013312Z",
+      "search_seed": 3192026,
+      "status": "FAILED_VALIDATION",
+      "validation_window": "[2024-02-01T00:00:00Z, 2025-01-01T00:00:00Z)"
+    },
+    {
+      "complexity": 4,
+      "correlation_to_existing_candidates": 1.0,
+      "discovery_window": "[2021-01-01T00:00:00Z, 2024-01-01T00:00:00Z)",
+      "formula_hash": "d504bb52e54f0d5e81bdc2fff63ab833d4dc86f8d70ad9afd9b70e7c0aa8a5f0",
+      "formula_id": "V0319_RANDOM_006",
+      "formula_tokens_or_ast": [
+        {
+          "kind": "FEATURE",
+          "value": "REALIZED_VOL_24H"
+        },
+        {
+          "kind": "CONSTANT",
+          "value": 0.0
+        },
+        {
+          "kind": "FEATURE",
+          "value": "TRADE_COUNT_Z_24H"
+        },
+        {
+          "kind": "OPERATOR",
+          "value": "CLIP"
+        },
+        {
+          "kind": "FEATURE",
+          "value": "SPOT_AGG_BUY_IMBALANCE_1H"
+        },
+        {
+          "kind": "FEATURE",
+          "value": "QUOTE_VOLUME_Z_24H"
+        },
+        {
+          "kind": "OPERATOR",
+          "parameter": 8,
+          "value": "DELAY_N"
+        },
+        {
+          "kind": "OPERATOR",
+          "value": "GATE"
+        },
+        {
+          "kind": "OPERATOR",
+          "parameter": 12,
+          "value": "ROLL_SUM_N"
+        }
+      ],
+      "input_data_roles": [
+        "CANONICAL_HISTORICAL",
+        "OFFICIAL_HISTORICAL_TIMESTAMPED"
+      ],
+      "input_feature_ids": [
+        "QUOTE_VOLUME_Z_24H",
+        "REALIZED_VOL_24H",
+        "SPOT_AGG_BUY_IMBALANCE_1H",
+        "TRADE_COUNT_Z_24H"
+      ],
+      "max_lookback": 43,
+      "metrics_by_fold": {
+        "discovery": {
+          "bootstrap_block_events": null,
+          "bootstrap_block_hours": null,
+          "bootstrap_ci_high": null,
+          "bootstrap_ci_low": null,
+          "chronological_fold_means": [
+            0.04129515621797607,
+            0.04045344896310201,
+            0.011488407794215625,
+            0.009052305715668922
+          ],
+          "event_count": 8,
+          "gross_mean_return": 0.025572329672740656,
+          "long_count": 4,
+          "long_fraction": 0.5,
+          "net_mean_return": 0.025572329672740656,
+          "short_count": 4,
+          "standard_error": 0.011024450584185098,
+          "t_stat": 2.31960127876349,
+          "turnover": 0.42857142857142855,
+          "wait_count": 3276
+        },
+        "formula": [
+          {
+            "kind": "FEATURE",
+            "value": "REALIZED_VOL_24H"
+          },
+          {
+            "kind": "CONSTANT",
+            "value": 0.0
+          },
+          {
+            "kind": "FEATURE",
+            "value": "TRADE_COUNT_Z_24H"
+          },
+          {
+            "kind": "OPERATOR",
+            "value": "CLIP"
+          },
+          {
+            "kind": "FEATURE",
+            "value": "SPOT_AGG_BUY_IMBALANCE_1H"
+          },
+          {
+            "kind": "FEATURE",
+            "value": "QUOTE_VOLUME_Z_24H"
+          },
+          {
+            "kind": "OPERATOR",
+            "parameter": 8,
+            "value": "DELAY_N"
+          },
+          {
+            "kind": "OPERATOR",
+            "value": "GATE"
+          },
+          {
+            "kind": "OPERATOR",
+            "parameter": 12,
+            "value": "ROLL_SUM_N"
+          }
+        ],
+        "formula_hash": "d504bb52e54f0d5e81bdc2fff63ab833d4dc86f8d70ad9afd9b70e7c0aa8a5f0",
+        "gate_audit": {
+          "consumed_protocol_keys": [
+            "minimum_discovery_events",
+            "minimum_validation_events",
+            "minimum_pseudo_forward_events",
+            "minimum_long_fraction",
+            "maximum_long_fraction",
+            "minimum_discovery_net_mean_return_8h",
+            "minimum_validation_net_mean_return_8h",
+            "minimum_pseudo_forward_net_mean_return_8h",
+            "minimum_validation_bootstrap_ci_low",
+            "minimum_pseudo_forward_bootstrap_ci_low",
+            "chronological_fold_count",
+            "minimum_positive_validation_folds",
+            "minimum_positive_pseudo_forward_folds",
+            "required_multiple_testing_adjusted_pass",
+            "maximum_pairwise_candidate_correlation",
+            "minimum_sandbox_trade_count",
+            "minimum_net_profit_factor",
+            "maximum_drawdown_r",
+            "maximum_losing_streak",
+            "minimum_positive_sandbox_folds",
+            "fees_bps_round_trip",
+            "slippage_bps_round_trip",
+            "funding_included",
+            "cost_stress_multiplier",
+            "minimum_cost_stress_net_r",
+            "candidate_must_pass_all",
+            "sandbox_not_applicable_rule",
+            "unknown_or_unused_key_rule"
+          ],
+          "passed_all": false,
+          "results": [
+            {
+              "key": "minimum_discovery_events",
+              "observed": 8,
+              "reason": null,
+              "required": 1000,
+              "status": "FAIL"
+            },
+            {
+              "key": "minimum_validation_events",
+              "observed": 4,
+              "reason": null,
+              "required": 500,
+              "status": "FAIL"
+            },
+            {
+              "key": "minimum_pseudo_forward_events",
+              "observed": 7,
+              "reason": null,
+              "required": 500,
+              "status": "FAIL"
+            },
+            {
+              "key": "minimum_long_fraction",
+              "observed": 0.14285714285714285,
+              "reason": null,
+              "required": 0.2,
+              "status": "FAIL"
+            },
+            {
+              "key": "maximum_long_fraction",
+              "observed": 0.14285714285714285,
+              "reason": null,
+              "required": 0.8,
+              "status": "PASS"
+            },
+            {
+              "key": "minimum_discovery_net_mean_return_8h",
+              "observed": 0.025572329672740656,
+              "reason": null,
+              "required": 0.00025,
+              "status": "PASS"
+            },
+            {
+              "key": "minimum_validation_net_mean_return_8h",
+              "observed": 0.00829342673792539,
+              "reason": null,
+              "required": 0.0002,
+              "status": "PASS"
+            },
+            {
+              "key": "minimum_pseudo_forward_net_mean_return_8h",
+              "observed": 0.0025494054086043355,
+              "reason": null,
+              "required": 0.0002,
+              "status": "PASS"
+            },
+            {
+              "key": "minimum_validation_bootstrap_ci_low",
+              "observed": 0.00829342673792539,
+              "reason": null,
+              "required": 0.0,
+              "status": "PASS"
+            },
+            {
+              "key": "minimum_pseudo_forward_bootstrap_ci_low",
+              "observed": 0.0025494054086043355,
+              "reason": null,
+              "required": 0.0,
+              "status": "PASS"
+            },
+            {
+              "key": "chronological_fold_count",
+              "observed": 4,
+              "reason": null,
+              "required": ">0",
+              "status": "PASS"
+            },
+            {
+              "key": "minimum_positive_validation_folds",
+              "observed": 2,
+              "reason": null,
+              "required": 3,
+              "status": "FAIL"
+            },
+            {
+              "key": "minimum_positive_pseudo_forward_folds",
+              "observed": 3,
+              "reason": null,
+              "required": 3,
+              "status": "PASS"
+            },
+            {
+              "key": "required_multiple_testing_adjusted_pass",
+              "observed": false,
+              "reason": null,
+              "required": true,
+              "status": "FAIL"
+            },
+            {
+              "key": "maximum_pairwise_candidate_correlation",
+              "observed": 1.0,
+              "reason": null,
+              "required": 0.8,
+              "status": "FAIL"
+            },
+            {
+              "key": "minimum_sandbox_trade_count",
+              "observed": null,
+              "reason": "UPSTREAM_FORMULA_GATE_FAILED",
+              "required": 50,
+              "status": "NOT_APPLICABLE"
+            },
+            {
+              "key": "minimum_net_profit_factor",
+              "observed": null,
+              "reason": "UPSTREAM_FORMULA_GATE_FAILED",
+              "required": 1.1,
+              "status": "NOT_APPLICABLE"
+            },
+            {
+              "key": "maximum_drawdown_r",
+              "observed": null,
+              "reason": "UPSTREAM_FORMULA_GATE_FAILED",
+              "required": 20.0,
+              "status": "NOT_APPLICABLE"
+            },
+            {
+              "key": "maximum_losing_streak",
+              "observed": null,
+              "reason": "UPSTREAM_FORMULA_GATE_FAILED",
+              "required": 20,
+              "status": "NOT_APPLICABLE"
+            },
+            {
+              "key": "minimum_positive_sandbox_folds",
+              "observed": null,
+              "reason": "UPSTREAM_FORMULA_GATE_FAILED",
+              "required": 3,
+              "status": "NOT_APPLICABLE"
+            },
+            {
+              "key": "fees_bps_round_trip",
+              "observed": null,
+              "reason": "UPSTREAM_FORMULA_GATE_FAILED",
+              "required": 8.0,
+              "status": "NOT_APPLICABLE"
+            },
+            {
+              "key": "slippage_bps_round_trip",
+              "observed": null,
+              "reason": "UPSTREAM_FORMULA_GATE_FAILED",
+              "required": 4.0,
+              "status": "NOT_APPLICABLE"
+            },
+            {
+              "key": "funding_included",
+              "observed": null,
+              "reason": "UPSTREAM_FORMULA_GATE_FAILED",
+              "required": true,
+              "status": "NOT_APPLICABLE"
+            },
+            {
+              "key": "cost_stress_multiplier",
+              "observed": null,
+              "reason": "UPSTREAM_FORMULA_GATE_FAILED",
+              "required": 2.0,
+              "status": "NOT_APPLICABLE"
+            },
+            {
+              "key": "minimum_cost_stress_net_r",
+              "observed": null,
+              "reason": "UPSTREAM_FORMULA_GATE_FAILED",
+              "required": 0.0,
+              "status": "NOT_APPLICABLE"
+            },
+            {
+              "key": "candidate_must_pass_all",
+              "observed": true,
+              "reason": null,
+              "required": true,
+              "status": "PASS"
+            },
+            {
+              "key": "sandbox_not_applicable_rule",
+              "observed": "ONLY_WHEN_AN_UPSTREAM_FORMULA_GATE_FAILED_BEFORE_TRADE_REPLAY; reason=UPSTREAM_FORMULA_GATE_FAILED",
+              "reason": null,
+              "required": "FROZEN",
+              "status": "PASS"
+            },
+            {
+              "key": "unknown_or_unused_key_rule",
+              "observed": "FORMAL_RUN_FAILS_CLOSED",
+              "reason": null,
+              "required": "FORMAL_RUN_FAILS_CLOSED",
+              "status": "PASS"
+            }
+          ]
+        },
+        "maximum_pairwise_candidate_correlation": 1.0,
+        "new_features": [
+          "SPOT_AGG_BUY_IMBALANCE_1H"
+        ],
+        "pseudo_forward": {
+          "bootstrap_block_events": 21,
+          "bootstrap_block_hours": 168,
+          "bootstrap_ci_high": 0.0025494054086043355,
+          "bootstrap_ci_low": 0.0025494054086043355,
+          "chronological_fold_means": [
+            0.0073160788401811835,
+            0.011795690336426405,
+            0.004017491763864482,
+            -0.010548302590266304
+          ],
+          "event_count": 7,
+          "gross_mean_return": 0.003749405408604335,
+          "long_count": 1,
+          "long_fraction": 0.14285714285714285,
+          "net_mean_return": 0.0025494054086043355,
+          "short_count": 6,
+          "standard_error": 0.004775621888080908,
+          "t_stat": 0.5338373657611362,
+          "turnover": 0.3333333333333333,
+          "wait_count": 1087
+        },
+        "validation": {
+          "bootstrap_block_events": 21,
+          "bootstrap_block_hours": 168,
+          "bootstrap_ci_high": 0.00829342673792539,
+          "bootstrap_ci_low": 0.00829342673792539,
+          "chronological_fold_means": [
+            0.04058049219269037,
+            -0.005498264172682577,
+            0.0021619812013509033,
+            -0.004070502269657136
+          ],
+          "event_count": 4,
+          "gross_mean_return": 0.00949342673792539,
+          "long_count": 1,
+          "long_fraction": 0.25,
+          "net_mean_return": 0.00829342673792539,
+          "short_count": 3,
+          "standard_error": 0.010890082256831001,
+          "t_stat": 0.7615577680988762,
+          "turnover": 0.6666666666666666,
+          "wait_count": 1000
+        }
+      },
+      "operator_set": [
+        "CLIP",
+        "DELAY_N",
+        "GATE",
+        "ROLL_SUM_N"
+      ],
+      "proposal_engine": "RANDOM_GRAMMAR_SEARCH_NEW_FEATURE_CONSTRAINED",
+      "pseudo_forward_window": "[2025-02-01T00:00:00Z, 2026-02-01T00:00:00Z)",
+      "research_eligibility": false,
+      "runtime_eligibility": false,
+      "search_budget": 512,
+      "search_run_id": "v0.3.19_official_derivatives_symbolic_20260903T013312Z",
+      "search_seed": 3192026,
+      "status": "FAILED_VALIDATION",
+      "validation_window": "[2024-02-01T00:00:00Z, 2025-01-01T00:00:00Z)"
+    },
+    {
+      "complexity": 1,
+      "correlation_to_existing_candidates": null,
+      "discovery_window": "[2021-01-01T00:00:00Z, 2024-01-01T00:00:00Z)",
+      "formula_hash": "b18a12091c488031788b1a80874a6b0e9f78c0969dc45e0abbff59dc48b7bb14",
+      "formula_id": "V0319_RANDOM_007",
+      "formula_tokens_or_ast": [
+        {
+          "kind": "FEATURE",
+          "value": "PREMIUM_INDEX_Z_24H"
+        },
+        {
+          "kind": "OPERATOR",
+          "value": "NEG"
+        }
+      ],
+      "input_data_roles": [
+        "OFFICIAL_HISTORICAL_TIMESTAMPED"
+      ],
+      "input_feature_ids": [
+        "PREMIUM_INDEX_Z_24H"
+      ],
+      "max_lookback": 24,
+      "metrics_by_fold": {
+        "discovery": {
+          "bootstrap_block_events": null,
+          "bootstrap_block_hours": null,
+          "bootstrap_ci_high": null,
+          "bootstrap_ci_low": null,
+          "chronological_fold_means": [
+            0.0008376491213106439,
+            0.0015836502168697576,
+            -0.00032738464645213754,
+            0.0009229053310728049
+          ],
+          "event_count": 3240,
+          "gross_mean_return": 0.0007542050057002673,
+          "long_count": 1596,
+          "long_fraction": 0.4925925925925926,
+          "net_mean_return": 0.0007542050057002673,
+          "short_count": 1644,
+          "standard_error": 0.00034409778049646696,
+          "t_stat": 2.191833392857386,
+          "turnover": 0.4689719049089225,
+          "wait_count": 44
+        }
+      },
+      "operator_set": [
+        "NEG"
+      ],
+      "proposal_engine": "RANDOM_GRAMMAR_SEARCH_NEW_FEATURE_CONSTRAINED",
+      "pseudo_forward_window": "[2025-02-01T00:00:00Z, 2026-02-01T00:00:00Z)",
+      "research_eligibility": false,
+      "runtime_eligibility": false,
+      "search_budget": 512,
+      "search_run_id": "v0.3.19_official_derivatives_symbolic_20260903T013312Z",
+      "search_seed": 3192026,
+      "status": "FAILED_VALIDATION",
+      "validation_window": "[2024-02-01T00:00:00Z, 2025-01-01T00:00:00Z)"
+    },
+    {
+      "complexity": 1,
+      "correlation_to_existing_candidates": null,
+      "discovery_window": "[2021-01-01T00:00:00Z, 2024-01-01T00:00:00Z)",
+      "formula_hash": "1f96fd3b80fe4c5b4a9e2071bdde27d903ffd52613ca1c1f8c36a9c4cfdbf6c0",
+      "formula_id": "V0319_RANDOM_008",
+      "formula_tokens_or_ast": [
+        {
+          "kind": "FEATURE",
+          "value": "PERP_AGG_SIGNED_NOTIONAL_Z_24H"
+        },
+        {
+          "kind": "OPERATOR",
+          "parameter": 48,
+          "value": "EMA_N"
+        }
+      ],
+      "input_data_roles": [
+        "OFFICIAL_HISTORICAL_TIMESTAMPED"
+      ],
+      "input_feature_ids": [
+        "PERP_AGG_SIGNED_NOTIONAL_Z_24H"
+      ],
+      "max_lookback": 71,
+      "metrics_by_fold": {
+        "discovery": {
+          "bootstrap_block_events": null,
+          "bootstrap_block_hours": null,
+          "bootstrap_ci_high": null,
+          "bootstrap_ci_low": null,
+          "chronological_fold_means": [
+            0.002515825127468641,
+            0.0010298701267462728,
+            -0.0006740343374281977,
+            0.00014955635079616196
+          ],
+          "event_count": 3191,
+          "gross_mean_return": 0.0007547526024455243,
+          "long_count": 1625,
+          "long_fraction": 0.5092447508617988,
+          "net_mean_return": 0.0007547526024455243,
+          "short_count": 1566,
+          "standard_error": 0.0003443714377137224,
+          "t_stat": 2.1916817708701894,
+          "turnover": 0.34357366771159875,
+          "wait_count": 93
+        }
+      },
+      "operator_set": [
+        "EMA_N"
+      ],
+      "proposal_engine": "RANDOM_GRAMMAR_SEARCH_NEW_FEATURE_CONSTRAINED",
+      "pseudo_forward_window": "[2025-02-01T00:00:00Z, 2026-02-01T00:00:00Z)",
+      "research_eligibility": false,
+      "runtime_eligibility": false,
+      "search_budget": 512,
+      "search_run_id": "v0.3.19_official_derivatives_symbolic_20260903T013312Z",
+      "search_seed": 3192026,
+      "status": "FAILED_VALIDATION",
+      "validation_window": "[2024-02-01T00:00:00Z, 2025-01-01T00:00:00Z)"
+    },
+    {
+      "complexity": 1,
+      "correlation_to_existing_candidates": null,
+      "discovery_window": "[2021-01-01T00:00:00Z, 2024-01-01T00:00:00Z)",
+      "formula_hash": "21c1a8048ae2acf5a64b233514bf483f7ceeb6f4b6ccdca0b8862b9591b62e12",
+      "formula_id": "V0319_RANDOM_009",
+      "formula_tokens_or_ast": [
+        {
+          "kind": "FEATURE",
+          "value": "MARK_INDEX_BASIS_CHANGE_4H"
+        },
+        {
+          "kind": "FEATURE",
+          "value": "PREMIUM_INDEX_Z_24H"
+        },
+        {
+          "kind": "OPERATOR",
+          "value": "SUB"
+        }
+      ],
+      "input_data_roles": [
+        "OFFICIAL_HISTORICAL_TIMESTAMPED"
+      ],
+      "input_feature_ids": [
+        "MARK_INDEX_BASIS_CHANGE_4H",
+        "PREMIUM_INDEX_Z_24H"
+      ],
+      "max_lookback": 24,
+      "metrics_by_fold": {
+        "discovery": {
+          "bootstrap_block_events": null,
+          "bootstrap_block_hours": null,
+          "bootstrap_ci_high": null,
+          "bootstrap_ci_low": null,
+          "chronological_fold_means": [
+            0.0007812639358534029,
+            0.0015471273119725772,
+            -0.0002863233862930569,
+            0.00095241995959912
+          ],
+          "event_count": 3204,
+          "gross_mean_return": 0.0007486219552830108,
+          "long_count": 1577,
+          "long_fraction": 0.49219725343320847,
+          "net_mean_return": 0.0007486219552830108,
+          "short_count": 1627,
+          "standard_error": 0.00034650720917431775,
+          "t_stat": 2.1604801731741192,
+          "turnover": 0.46737433655947547,
+          "wait_count": 80
+        }
+      },
+      "operator_set": [
+        "SUB"
+      ],
+      "proposal_engine": "RANDOM_GRAMMAR_SEARCH_NEW_FEATURE_CONSTRAINED",
+      "pseudo_forward_window": "[2025-02-01T00:00:00Z, 2026-02-01T00:00:00Z)",
+      "research_eligibility": false,
+      "runtime_eligibility": false,
+      "search_budget": 512,
+      "search_run_id": "v0.3.19_official_derivatives_symbolic_20260903T013312Z",
+      "search_seed": 3192026,
+      "status": "FAILED_VALIDATION",
+      "validation_window": "[2024-02-01T00:00:00Z, 2025-01-01T00:00:00Z)"
+    },
+    {
+      "complexity": 3,
+      "correlation_to_existing_candidates": 0.3387782895685101,
+      "discovery_window": "[2021-01-01T00:00:00Z, 2024-01-01T00:00:00Z)",
+      "formula_hash": "95af96c30eb3dcf0fd5170fc2d816ba1642091e7bd52fde316b05f504f94ec43",
+      "formula_id": "V0319_RANDOM_010",
+      "formula_tokens_or_ast": [
+        {
+          "kind": "FEATURE",
+          "value": "SPOT_AGG_BUY_IMBALANCE_1H"
+        },
+        {
+          "kind": "OPERATOR",
+          "parameter": 24,
+          "value": "ROLL_STD_N"
+        },
+        {
+          "kind": "OPERATOR",
+          "parameter": 4,
+          "value": "DELAY_N"
+        },
+        {
+          "kind": "FEATURE",
+          "value": "PREMIUM_INDEX_Z_24H"
+        },
+        {
+          "kind": "OPERATOR",
+          "value": "SUB"
+        }
+      ],
+      "input_data_roles": [
+        "OFFICIAL_HISTORICAL_TIMESTAMPED"
+      ],
+      "input_feature_ids": [
+        "PREMIUM_INDEX_Z_24H",
+        "SPOT_AGG_BUY_IMBALANCE_1H"
+      ],
+      "max_lookback": 28,
+      "metrics_by_fold": {
+        "discovery": {
+          "bootstrap_block_events": null,
+          "bootstrap_block_hours": null,
+          "bootstrap_ci_high": null,
+          "bootstrap_ci_low": null,
+          "chronological_fold_means": [
+            0.0008831515335273787,
+            0.001377767382777109,
+            -0.00042774027745634064,
+            0.0011511136615079051
+          ],
+          "event_count": 3216,
+          "gross_mean_return": 0.000746073075089013,
+          "long_count": 1672,
+          "long_fraction": 0.5199004975124378,
+          "net_mean_return": 0.000746073075089013,
+          "short_count": 1544,
+          "standard_error": 0.00034539074019127074,
+          "t_stat": 2.160084183715673,
+          "turnover": 0.46905132192846033,
+          "wait_count": 68
+        },
+        "formula": [
+          {
+            "kind": "FEATURE",
+            "value": "SPOT_AGG_BUY_IMBALANCE_1H"
+          },
+          {
+            "kind": "OPERATOR",
+            "parameter": 24,
+            "value": "ROLL_STD_N"
+          },
+          {
+            "kind": "OPERATOR",
+            "parameter": 4,
+            "value": "DELAY_N"
+          },
+          {
+            "kind": "FEATURE",
+            "value": "PREMIUM_INDEX_Z_24H"
+          },
+          {
+            "kind": "OPERATOR",
+            "value": "SUB"
+          }
+        ],
+        "formula_hash": "95af96c30eb3dcf0fd5170fc2d816ba1642091e7bd52fde316b05f504f94ec43",
+        "gate_audit": {
+          "consumed_protocol_keys": [
+            "minimum_discovery_events",
+            "minimum_validation_events",
+            "minimum_pseudo_forward_events",
+            "minimum_long_fraction",
+            "maximum_long_fraction",
+            "minimum_discovery_net_mean_return_8h",
+            "minimum_validation_net_mean_return_8h",
+            "minimum_pseudo_forward_net_mean_return_8h",
+            "minimum_validation_bootstrap_ci_low",
+            "minimum_pseudo_forward_bootstrap_ci_low",
+            "chronological_fold_count",
+            "minimum_positive_validation_folds",
+            "minimum_positive_pseudo_forward_folds",
+            "required_multiple_testing_adjusted_pass",
+            "maximum_pairwise_candidate_correlation",
+            "minimum_sandbox_trade_count",
+            "minimum_net_profit_factor",
+            "maximum_drawdown_r",
+            "maximum_losing_streak",
+            "minimum_positive_sandbox_folds",
+            "fees_bps_round_trip",
+            "slippage_bps_round_trip",
+            "funding_included",
+            "cost_stress_multiplier",
+            "minimum_cost_stress_net_r",
+            "candidate_must_pass_all",
+            "sandbox_not_applicable_rule",
+            "unknown_or_unused_key_rule"
+          ],
+          "passed_all": false,
+          "results": [
+            {
+              "key": "minimum_discovery_events",
+              "observed": 3216,
+              "reason": null,
+              "required": 1000,
+              "status": "PASS"
+            },
+            {
+              "key": "minimum_validation_events",
+              "observed": 1001,
+              "reason": null,
+              "required": 500,
+              "status": "PASS"
+            },
+            {
+              "key": "minimum_pseudo_forward_events",
+              "observed": 1094,
+              "reason": null,
+              "required": 500,
+              "status": "PASS"
+            },
+            {
+              "key": "minimum_long_fraction",
+              "observed": 0.5301645338208409,
+              "reason": null,
+              "required": 0.2,
+              "status": "PASS"
+            },
+            {
+              "key": "maximum_long_fraction",
+              "observed": 0.5301645338208409,
+              "reason": null,
+              "required": 0.8,
+              "status": "PASS"
+            },
+            {
+              "key": "minimum_discovery_net_mean_return_8h",
+              "observed": 0.000746073075089013,
+              "reason": null,
+              "required": 0.00025,
+              "status": "PASS"
+            },
+            {
+              "key": "minimum_validation_net_mean_return_8h",
+              "observed": -0.0008235934188563568,
+              "reason": null,
+              "required": 0.0002,
+              "status": "FAIL"
+            },
+            {
+              "key": "minimum_pseudo_forward_net_mean_return_8h",
+              "observed": -0.000560631909888583,
+              "reason": null,
+              "required": 0.0002,
+              "status": "FAIL"
+            },
+            {
+              "key": "minimum_validation_bootstrap_ci_low",
+              "observed": -0.0018218385900269011,
+              "reason": null,
+              "required": 0.0,
+              "status": "FAIL"
+            },
+            {
+              "key": "minimum_pseudo_forward_bootstrap_ci_low",
+              "observed": -0.001219467620076613,
+              "reason": null,
+              "required": 0.0,
+              "status": "FAIL"
+            },
+            {
+              "key": "chronological_fold_count",
+              "observed": 4,
+              "reason": null,
+              "required": ">0",
+              "status": "PASS"
+            },
+            {
+              "key": "minimum_positive_validation_folds",
+              "observed": 1,
+              "reason": null,
+              "required": 3,
+              "status": "FAIL"
+            },
+            {
+              "key": "minimum_positive_pseudo_forward_folds",
+              "observed": 1,
+              "reason": null,
+              "required": 3,
+              "status": "FAIL"
+            },
+            {
+              "key": "required_multiple_testing_adjusted_pass",
+              "observed": false,
+              "reason": null,
+              "required": true,
+              "status": "FAIL"
+            },
+            {
+              "key": "maximum_pairwise_candidate_correlation",
+              "observed": 0.3387782895685101,
+              "reason": null,
+              "required": 0.8,
+              "status": "PASS"
+            },
+            {
+              "key": "minimum_sandbox_trade_count",
+              "observed": null,
+              "reason": "UPSTREAM_FORMULA_GATE_FAILED",
+              "required": 50,
+              "status": "NOT_APPLICABLE"
+            },
+            {
+              "key": "minimum_net_profit_factor",
+              "observed": null,
+              "reason": "UPSTREAM_FORMULA_GATE_FAILED",
+              "required": 1.1,
+              "status": "NOT_APPLICABLE"
+            },
+            {
+              "key": "maximum_drawdown_r",
+              "observed": null,
+              "reason": "UPSTREAM_FORMULA_GATE_FAILED",
+              "required": 20.0,
+              "status": "NOT_APPLICABLE"
+            },
+            {
+              "key": "maximum_losing_streak",
+              "observed": null,
+              "reason": "UPSTREAM_FORMULA_GATE_FAILED",
+              "required": 20,
+              "status": "NOT_APPLICABLE"
+            },
+            {
+              "key": "minimum_positive_sandbox_folds",
+              "observed": null,
+              "reason": "UPSTREAM_FORMULA_GATE_FAILED",
+              "required": 3,
+              "status": "NOT_APPLICABLE"
+            },
+            {
+              "key": "fees_bps_round_trip",
+              "observed": null,
+              "reason": "UPSTREAM_FORMULA_GATE_FAILED",
+              "required": 8.0,
+              "status": "NOT_APPLICABLE"
+            },
+            {
+              "key": "slippage_bps_round_trip",
+              "observed": null,
+              "reason": "UPSTREAM_FORMULA_GATE_FAILED",
+              "required": 4.0,
+              "status": "NOT_APPLICABLE"
+            },
+            {
+              "key": "funding_included",
+              "observed": null,
+              "reason": "UPSTREAM_FORMULA_GATE_FAILED",
+              "required": true,
+              "status": "NOT_APPLICABLE"
+            },
+            {
+              "key": "cost_stress_multiplier",
+              "observed": null,
+              "reason": "UPSTREAM_FORMULA_GATE_FAILED",
+              "required": 2.0,
+              "status": "NOT_APPLICABLE"
+            },
+            {
+              "key": "minimum_cost_stress_net_r",
+              "observed": null,
+              "reason": "UPSTREAM_FORMULA_GATE_FAILED",
+              "required": 0.0,
+              "status": "NOT_APPLICABLE"
+            },
+            {
+              "key": "candidate_must_pass_all",
+              "observed": true,
+              "reason": null,
+              "required": true,
+              "status": "PASS"
+            },
+            {
+              "key": "sandbox_not_applicable_rule",
+              "observed": "ONLY_WHEN_AN_UPSTREAM_FORMULA_GATE_FAILED_BEFORE_TRADE_REPLAY; reason=UPSTREAM_FORMULA_GATE_FAILED",
+              "reason": null,
+              "required": "FROZEN",
+              "status": "PASS"
+            },
+            {
+              "key": "unknown_or_unused_key_rule",
+              "observed": "FORMAL_RUN_FAILS_CLOSED",
+              "reason": null,
+              "required": "FORMAL_RUN_FAILS_CLOSED",
+              "status": "PASS"
+            }
+          ]
+        },
+        "maximum_pairwise_candidate_correlation": 0.3387782895685101,
+        "new_features": [
+          "PREMIUM_INDEX_Z_24H",
+          "SPOT_AGG_BUY_IMBALANCE_1H"
+        ],
+        "pseudo_forward": {
+          "bootstrap_block_events": 21,
+          "bootstrap_block_hours": 168,
+          "bootstrap_ci_high": 0.00011905394877002276,
+          "bootstrap_ci_low": -0.001219467620076613,
+          "chronological_fold_means": [
+            6.542925151165924e-05,
+            -0.0005677099405930349,
+            -0.0013057969863756616,
+            -0.00043488464991877984
+          ],
+          "event_count": 1094,
+          "gross_mean_return": 0.0006393680901114169,
+          "long_count": 580,
+          "long_fraction": 0.5301645338208409,
+          "net_mean_return": -0.000560631909888583,
+          "short_count": 514,
+          "standard_error": 0.00037977564745867636,
+          "t_stat": -1.4762186929049623,
+          "turnover": 0.5141811527904849,
+          "wait_count": 0
+        },
+        "validation": {
+          "bootstrap_block_events": 21,
+          "bootstrap_block_hours": 168,
+          "bootstrap_ci_high": 0.00015783859807171345,
+          "bootstrap_ci_low": -0.0018218385900269011,
+          "chronological_fold_means": [
+            -0.0007463913995978468,
+            0.0007299403494421648,
+            -0.0022649916482829235,
+            -0.0010121766440859031
+          ],
+          "event_count": 1001,
+          "gross_mean_return": 0.0003764065811436431,
+          "long_count": 528,
+          "long_fraction": 0.5274725274725275,
+          "net_mean_return": -0.0008235934188563568,
+          "short_count": 473,
+          "standard_error": 0.000481367923142871,
+          "t_stat": -1.7109437070070672,
+          "turnover": 0.491,
+          "wait_count": 3
+        }
+      },
+      "operator_set": [
+        "DELAY_N",
+        "ROLL_STD_N",
+        "SUB"
+      ],
+      "proposal_engine": "RANDOM_GRAMMAR_SEARCH_NEW_FEATURE_CONSTRAINED",
+      "pseudo_forward_window": "[2025-02-01T00:00:00Z, 2026-02-01T00:00:00Z)",
+      "research_eligibility": false,
+      "runtime_eligibility": false,
+      "search_budget": 512,
+      "search_run_id": "v0.3.19_official_derivatives_symbolic_20260903T013312Z",
+      "search_seed": 3192026,
+      "status": "FAILED_VALIDATION",
+      "validation_window": "[2024-02-01T00:00:00Z, 2025-01-01T00:00:00Z)"
+    },
+    {
+      "complexity": 4,
+      "correlation_to_existing_candidates": null,
+      "discovery_window": "[2021-01-01T00:00:00Z, 2024-01-01T00:00:00Z)",
+      "formula_hash": "2719d28825b8e3d330cbc5ca10288e65aa1cbc2643f2b2d8b1ff4dbdc9a39f3d",
+      "formula_id": "V0319_RANDOM_011",
+      "formula_tokens_or_ast": [
+        {
+          "kind": "FEATURE",
+          "value": "QUOTE_VOLUME_Z_24H"
+        },
+        {
+          "kind": "OPERATOR",
+          "parameter": 48,
+          "value": "DELAY_N"
+        },
+        {
+          "kind": "FEATURE",
+          "value": "MARK_INDEX_BASIS_CHANGE_4H"
+        },
+        {
+          "kind": "CONSTANT",
+          "value": 0.5
+        },
+        {
+          "kind": "OPERATOR",
+          "parameter": 8,
+          "value": "DELAY_N"
+        },
+        {
+          "kind": "OPERATOR",
+          "value": "DIV"
+        },
+        {
+          "kind": "OPERATOR",
+          "value": "SUB"
+        }
+      ],
+      "input_data_roles": [
+        "CANONICAL_HISTORICAL",
+        "OFFICIAL_HISTORICAL_TIMESTAMPED"
+      ],
+      "input_feature_ids": [
+        "MARK_INDEX_BASIS_CHANGE_4H",
+        "QUOTE_VOLUME_Z_24H"
+      ],
+      "max_lookback": 72,
+      "metrics_by_fold": {
+        "discovery": {
+          "bootstrap_block_events": null,
+          "bootstrap_block_hours": null,
+          "bootstrap_ci_high": null,
+          "bootstrap_ci_low": null,
+          "chronological_fold_means": [
+            0.002484436627298637,
+            0.0007147685627655693,
+            -0.0005231743167692633,
+            0.00019774622538302236
+          ],
+          "event_count": 3214,
+          "gross_mean_return": 0.0007182811216635205,
+          "long_count": 1431,
+          "long_fraction": 0.4452395768512757,
+          "net_mean_return": 0.0007182811216635205,
+          "short_count": 1783,
+          "standard_error": 0.00034414430312390147,
+          "t_stat": 2.087150986209757,
+          "turnover": 0.49268596327419856,
+          "wait_count": 70
+        }
+      },
+      "operator_set": [
+        "DELAY_N",
+        "DIV",
+        "SUB"
+      ],
+      "proposal_engine": "RANDOM_GRAMMAR_SEARCH_NEW_FEATURE_CONSTRAINED",
+      "pseudo_forward_window": "[2025-02-01T00:00:00Z, 2026-02-01T00:00:00Z)",
+      "research_eligibility": false,
+      "runtime_eligibility": false,
+      "search_budget": 512,
+      "search_run_id": "v0.3.19_official_derivatives_symbolic_20260903T013312Z",
+      "search_seed": 3192026,
+      "status": "FAILED_VALIDATION",
+      "validation_window": "[2024-02-01T00:00:00Z, 2025-01-01T00:00:00Z)"
+    },
+    {
+      "complexity": 6,
+      "correlation_to_existing_candidates": null,
+      "discovery_window": "[2021-01-01T00:00:00Z, 2024-01-01T00:00:00Z)",
+      "formula_hash": "eaeecdf53726102226ec4f08d236f38a1dfbc8d855e12937426fb632450e486b",
+      "formula_id": "V0319_RANDOM_012",
+      "formula_tokens_or_ast": [
+        {
+          "kind": "FEATURE",
+          "value": "SPOT_PERP_FLOW_SPREAD"
+        },
+        {
+          "kind": "CONSTANT",
+          "value": -1.0
+        },
+        {
+          "kind": "OPERATOR",
+          "value": "ADD"
+        },
+        {
+          "kind": "OPERATOR",
+          "parameter": 12,
+          "value": "DECAY_N"
+        },
+        {
+          "kind": "FEATURE",
+          "value": "QUOTE_VOLUME_Z_24H"
+        },
+        {
+          "kind": "FEATURE",
+          "value": "PREMIUM_INDEX_Z_24H"
+        },
+        {
+          "kind": "OPERATOR",
+          "value": "DIV"
+        },
+        {
+          "kind": "CONSTANT",
+          "value": -0.5
+        },
+        {
+          "kind": "OPERATOR",
+          "parameter": 8,
+          "value": "DECAY_N"
+        },
+        {
+          "kind": "OPERATOR",
+          "value": "DIV"
+        },
+        {
+          "kind": "OPERATOR",
+          "value": "ADD"
+        }
+      ],
+      "input_data_roles": [
+        "CANONICAL_HISTORICAL",
+        "OFFICIAL_HISTORICAL_TIMESTAMPED"
+      ],
+      "input_feature_ids": [
+        "PREMIUM_INDEX_Z_24H",
+        "QUOTE_VOLUME_Z_24H",
+        "SPOT_PERP_FLOW_SPREAD"
+      ],
+      "max_lookback": 24,
+      "metrics_by_fold": {
+        "discovery": {
+          "bootstrap_block_events": null,
+          "bootstrap_block_hours": null,
+          "bootstrap_ci_high": null,
+          "bootstrap_ci_low": null,
+          "chronological_fold_means": [
+            0.0020339790795883667,
+            0.0008839381925752149,
+            -0.0003324185860841671,
+            0.00027583800762518297
+          ],
+          "event_count": 3229,
+          "gross_mean_return": 0.0007151980643627238,
+          "long_count": 1019,
+          "long_fraction": 0.3155775781975844,
+          "net_mean_return": 0.0007151980643627238,
+          "short_count": 2210,
+          "standard_error": 0.00034455982683186256,
+          "t_stat": 2.0756861614970696,
+          "turnover": 0.4364931846344486,
+          "wait_count": 55
+        }
+      },
+      "operator_set": [
+        "ADD",
+        "DECAY_N",
+        "DIV"
+      ],
+      "proposal_engine": "RANDOM_GRAMMAR_SEARCH_NEW_FEATURE_CONSTRAINED",
+      "pseudo_forward_window": "[2025-02-01T00:00:00Z, 2026-02-01T00:00:00Z)",
+      "research_eligibility": false,
+      "runtime_eligibility": false,
+      "search_budget": 512,
+      "search_run_id": "v0.3.19_official_derivatives_symbolic_20260903T013312Z",
+      "search_seed": 3192026,
+      "status": "FAILED_VALIDATION",
+      "validation_window": "[2024-02-01T00:00:00Z, 2025-01-01T00:00:00Z)"
+    },
+    {
+      "complexity": 3,
+      "correlation_to_existing_candidates": null,
+      "discovery_window": "[2021-01-01T00:00:00Z, 2024-01-01T00:00:00Z)",
+      "formula_hash": "5119b4318e23085e419e6d427447bcf2a70f928992db9f3ae91c1d9e87b62a65",
+      "formula_id": "V0319_RANDOM_013",
+      "formula_tokens_or_ast": [
+        {
+          "kind": "FEATURE",
+          "value": "PREMIUM_INDEX_Z_24H"
+        },
+        {
+          "kind": "FEATURE",
+          "value": "PREMIUM_INDEX_LEVEL_1H"
+        },
+        {
+          "kind": "FEATURE",
+          "value": "MARK_INDEX_BASIS_1H"
+        },
+        {
+          "kind": "OPERATOR",
+          "value": "MUL"
+        },
+        {
+          "kind": "OPERATOR",
+          "value": "MIN"
+        },
+        {
+          "kind": "OPERATOR",
+          "value": "NEG"
+        }
+      ],
+      "input_data_roles": [
+        "OFFICIAL_HISTORICAL_TIMESTAMPED"
+      ],
+      "input_feature_ids": [
+        "MARK_INDEX_BASIS_1H",
+        "PREMIUM_INDEX_LEVEL_1H",
+        "PREMIUM_INDEX_Z_24H"
+      ],
+      "max_lookback": 24,
+      "metrics_by_fold": {
+        "discovery": {
+          "bootstrap_block_events": null,
+          "bootstrap_block_hours": null,
+          "bootstrap_ci_high": null,
+          "bootstrap_ci_low": null,
+          "chronological_fold_means": [
+            0.0008810752978733516,
+            0.0014435239862959702,
+            -0.0004505953271245192,
+            0.0009510107667874191
+          ],
+          "event_count": 3193,
+          "gross_mean_return": 0.0007063303352285939,
+          "long_count": 1632,
+          "long_fraction": 0.5111180707798308,
+          "net_mean_return": 0.0007063303352285939,
+          "short_count": 1561,
+          "standard_error": 0.00034607292848839506,
+          "t_stat": 2.0409869628166524,
+          "turnover": 0.47211779448621555,
+          "wait_count": 91
+        }
+      },
+      "operator_set": [
+        "MIN",
+        "MUL",
+        "NEG"
+      ],
+      "proposal_engine": "RANDOM_GRAMMAR_SEARCH_NEW_FEATURE_CONSTRAINED",
+      "pseudo_forward_window": "[2025-02-01T00:00:00Z, 2026-02-01T00:00:00Z)",
+      "research_eligibility": false,
+      "runtime_eligibility": false,
+      "search_budget": 512,
+      "search_run_id": "v0.3.19_official_derivatives_symbolic_20260903T013312Z",
+      "search_seed": 3192026,
+      "status": "FAILED_VALIDATION",
+      "validation_window": "[2024-02-01T00:00:00Z, 2025-01-01T00:00:00Z)"
+    },
+    {
+      "complexity": 1,
+      "correlation_to_existing_candidates": null,
+      "discovery_window": "[2021-01-01T00:00:00Z, 2024-01-01T00:00:00Z)",
+      "formula_hash": "3b895753caa6ebb5a654e2a2798fbd6176b400cbefc0edae16d76d9027b357c5",
+      "formula_id": "V0319_RANDOM_014",
+      "formula_tokens_or_ast": [
+        {
+          "kind": "FEATURE",
+          "value": "PERP_AGG_BUY_IMBALANCE_1H"
+        },
+        {
+          "kind": "OPERATOR",
+          "parameter": 12,
+          "value": "EMA_N"
+        }
+      ],
+      "input_data_roles": [
+        "OFFICIAL_HISTORICAL_TIMESTAMPED"
+      ],
+      "input_feature_ids": [
+        "PERP_AGG_BUY_IMBALANCE_1H"
+      ],
+      "max_lookback": 12,
+      "metrics_by_fold": {
+        "discovery": {
+          "bootstrap_block_events": null,
+          "bootstrap_block_hours": null,
+          "bootstrap_ci_high": null,
+          "bootstrap_ci_low": null,
+          "chronological_fold_means": [
+            0.0013736309145598766,
+            0.0012260984632022213,
+            8.282502132618723e-05,
+            4.305455000870469e-05
+          ],
+          "event_count": 3241,
+          "gross_mean_return": 0.0006812052771732708,
+          "long_count": 1429,
+          "long_fraction": 0.4409132983647023,
+          "net_mean_return": 0.0006812052771732708,
+          "short_count": 1812,
+          "standard_error": 0.00034538213611669396,
+          "t_stat": 1.9723234236501235,
+          "turnover": 0.35401234567901235,
+          "wait_count": 43
+        }
+      },
+      "operator_set": [
+        "EMA_N"
+      ],
+      "proposal_engine": "RANDOM_GRAMMAR_SEARCH_NEW_FEATURE_CONSTRAINED",
+      "pseudo_forward_window": "[2025-02-01T00:00:00Z, 2026-02-01T00:00:00Z)",
+      "research_eligibility": false,
+      "runtime_eligibility": false,
+      "search_budget": 512,
+      "search_run_id": "v0.3.19_official_derivatives_symbolic_20260903T013312Z",
+      "search_seed": 3192026,
+      "status": "FAILED_VALIDATION",
+      "validation_window": "[2024-02-01T00:00:00Z, 2025-01-01T00:00:00Z)"
+    },
+    {
+      "complexity": 4,
+      "correlation_to_existing_candidates": null,
+      "discovery_window": "[2021-01-01T00:00:00Z, 2024-01-01T00:00:00Z)",
+      "formula_hash": "c3a5fa07cdc2008d16b9c6de38042b619d411c0e898799d1ba253ff09c08a4d5",
+      "formula_id": "V0319_RANDOM_015",
+      "formula_tokens_or_ast": [
+        {
+          "kind": "FEATURE",
+          "value": "PERP_AGG_SIGNED_NOTIONAL_Z_24H"
+        },
+        {
+          "kind": "FEATURE",
+          "value": "LOG_RETURN_4H"
+        },
+        {
+          "kind": "OPERATOR",
+          "value": "DIV"
+        },
+        {
+          "kind": "FEATURE",
+          "value": "LOG_RETURN_4H"
+        },
+        {
+          "kind": "FEATURE",
+          "value": "PREMIUM_INDEX_Z_24H"
+        },
+        {
+          "kind": "OPERATOR",
+          "value": "MAX"
+        },
+        {
+          "kind": "OPERATOR",
+          "value": "MIN"
+        },
+        {
+          "kind": "OPERATOR",
+          "parameter": 48,
+          "value": "DELAY_N"
+        }
+      ],
+      "input_data_roles": [
+        "CANONICAL_HISTORICAL",
+        "OFFICIAL_HISTORICAL_TIMESTAMPED"
+      ],
+      "input_feature_ids": [
+        "LOG_RETURN_4H",
+        "PERP_AGG_SIGNED_NOTIONAL_Z_24H",
+        "PREMIUM_INDEX_Z_24H"
+      ],
+      "max_lookback": 72,
+      "metrics_by_fold": {
+        "discovery": {
+          "bootstrap_block_events": null,
+          "bootstrap_block_hours": null,
+          "bootstrap_ci_high": null,
+          "bootstrap_ci_low": null,
+          "chronological_fold_means": [
+            0.001657072575197525,
+            0.0022519073039421003,
+            -0.0005792689311254227,
+            -0.0006256512609216002
+          ],
+          "event_count": 3185,
+          "gross_mean_return": 0.0006756062353735604,
+          "long_count": 1482,
+          "long_fraction": 0.46530612244897956,
+          "net_mean_return": 0.0006756062353735604,
+          "short_count": 1703,
+          "standard_error": 0.00034515426250742863,
+          "t_stat": 1.9574037141118013,
+          "turnover": 0.5012562814070352,
+          "wait_count": 99
+        }
+      },
+      "operator_set": [
+        "DELAY_N",
+        "DIV",
+        "MAX",
+        "MIN"
+      ],
+      "proposal_engine": "RANDOM_GRAMMAR_SEARCH_NEW_FEATURE_CONSTRAINED",
+      "pseudo_forward_window": "[2025-02-01T00:00:00Z, 2026-02-01T00:00:00Z)",
+      "research_eligibility": false,
+      "runtime_eligibility": false,
+      "search_budget": 512,
+      "search_run_id": "v0.3.19_official_derivatives_symbolic_20260903T013312Z",
+      "search_seed": 3192026,
+      "status": "FAILED_VALIDATION",
+      "validation_window": "[2024-02-01T00:00:00Z, 2025-01-01T00:00:00Z)"
+    },
+    {
+      "complexity": 3,
+      "correlation_to_existing_candidates": null,
+      "discovery_window": "[2021-01-01T00:00:00Z, 2024-01-01T00:00:00Z)",
+      "formula_hash": "fe7ba16d715c1abce2039fb3ad032ccd7cdbdb67c4a38c5cb206f58e540c9172",
+      "formula_id": "V0319_RANDOM_016",
+      "formula_tokens_or_ast": [
+        {
+          "kind": "FEATURE",
+          "value": "PERP_AGG_BUY_IMBALANCE_1H"
+        },
+        {
+          "kind": "OPERATOR",
+          "parameter": 48,
+          "value": "DELAY_N"
+        },
+        {
+          "kind": "OPERATOR",
+          "parameter": 8,
+          "value": "ROLL_MEAN_N"
+        },
+        {
+          "kind": "OPERATOR",
+          "parameter": 24,
+          "value": "DECAY_N"
+        }
+      ],
+      "input_data_roles": [
+        "OFFICIAL_HISTORICAL_TIMESTAMPED"
+      ],
+      "input_feature_ids": [
+        "PERP_AGG_BUY_IMBALANCE_1H"
+      ],
+      "max_lookback": 79,
+      "metrics_by_fold": {
+        "discovery": {
+          "bootstrap_block_events": null,
+          "bootstrap_block_hours": null,
+          "bootstrap_ci_high": null,
+          "bootstrap_ci_low": null,
+          "chronological_fold_means": [
+            0.0011339547691675198,
+            0.0005767619929969275,
+            0.00014569204682944237,
+            0.0007722711970372876
+          ],
+          "event_count": 3220,
+          "gross_mean_return": 0.0006571700015077943,
+          "long_count": 1370,
+          "long_fraction": 0.4254658385093168,
+          "net_mean_return": 0.0006571700015077943,
+          "short_count": 1850,
+          "standard_error": 0.0003437899218523778,
+          "t_stat": 1.911545277321948,
+          "turnover": 0.2280211245728487,
+          "wait_count": 64
+        }
+      },
+      "operator_set": [
+        "DECAY_N",
+        "DELAY_N",
+        "ROLL_MEAN_N"
+      ],
+      "proposal_engine": "RANDOM_GRAMMAR_SEARCH_NEW_FEATURE_CONSTRAINED",
+      "pseudo_forward_window": "[2025-02-01T00:00:00Z, 2026-02-01T00:00:00Z)",
+      "research_eligibility": false,
+      "runtime_eligibility": false,
+      "search_budget": 512,
+      "search_run_id": "v0.3.19_official_derivatives_symbolic_20260903T013312Z",
+      "search_seed": 3192026,
+      "status": "FAILED_VALIDATION",
+      "validation_window": "[2024-02-01T00:00:00Z, 2025-01-01T00:00:00Z)"
+    },
+    {
+      "complexity": 1,
+      "correlation_to_existing_candidates": null,
+      "discovery_window": "[2021-01-01T00:00:00Z, 2024-01-01T00:00:00Z)",
+      "formula_hash": "d81c99b06cc203a0b7adf1510a0998c7f430d757053612b8271125d382047594",
+      "formula_id": "V0319_RANDOM_017",
+      "formula_tokens_or_ast": [
+        {
+          "kind": "FEATURE",
+          "value": "PERP_AGG_BUY_IMBALANCE_1H"
+        },
+        {
+          "kind": "OPERATOR",
+          "parameter": 48,
+          "value": "EMA_N"
+        }
+      ],
+      "input_data_roles": [
+        "OFFICIAL_HISTORICAL_TIMESTAMPED"
+      ],
+      "input_feature_ids": [
+        "PERP_AGG_BUY_IMBALANCE_1H"
+      ],
+      "max_lookback": 48,
+      "metrics_by_fold": {
+        "discovery": {
+          "bootstrap_block_events": null,
+          "bootstrap_block_hours": null,
+          "bootstrap_ci_high": null,
+          "bootstrap_ci_low": null,
+          "chronological_fold_means": [
+            0.0006413484694482563,
+            0.0012815828587021264,
+            0.0005816148109971436,
+            1.8769655887098898e-05
+          ],
+          "event_count": 3212,
+          "gross_mean_return": 0.0006308289487586563,
+          "long_count": 1266,
+          "long_fraction": 0.3941469489414695,
+          "net_mean_return": 0.0006308289487586563,
+          "short_count": 1946,
+          "standard_error": 0.00034467553165194677,
+          "t_stat": 1.8302109979645065,
+          "turnover": 0.17253192151977578,
+          "wait_count": 72
+        }
+      },
+      "operator_set": [
+        "EMA_N"
+      ],
+      "proposal_engine": "RANDOM_GRAMMAR_SEARCH_NEW_FEATURE_CONSTRAINED",
+      "pseudo_forward_window": "[2025-02-01T00:00:00Z, 2026-02-01T00:00:00Z)",
+      "research_eligibility": false,
+      "runtime_eligibility": false,
+      "search_budget": 512,
+      "search_run_id": "v0.3.19_official_derivatives_symbolic_20260903T013312Z",
+      "search_seed": 3192026,
+      "status": "FAILED_VALIDATION",
+      "validation_window": "[2024-02-01T00:00:00Z, 2025-01-01T00:00:00Z)"
+    },
+    {
+      "complexity": 4,
+      "correlation_to_existing_candidates": 0.13072782091902999,
+      "discovery_window": "[2021-01-01T00:00:00Z, 2024-01-01T00:00:00Z)",
+      "formula_hash": "e408964d7a40d8efc691536f342b8da298a5737c61505164e50e9d61b75365a7",
+      "formula_id": "V0319_RANDOM_018",
+      "formula_tokens_or_ast": [
+        {
+          "kind": "FEATURE",
+          "value": "PERP_AGG_BUY_IMBALANCE_1H"
+        },
+        {
+          "kind": "FEATURE",
+          "value": "QUOTE_VOLUME_Z_24H"
+        },
+        {
+          "kind": "FEATURE",
+          "value": "SPOT_AGG_BUY_IMBALANCE_1H"
+        },
+        {
+          "kind": "OPERATOR",
+          "value": "GATE"
+        },
+        {
+          "kind": "FEATURE",
+          "value": "SPOT_PERP_FLOW_SPREAD"
+        },
+        {
+          "kind": "FEATURE",
+          "value": "TRADE_COUNT_Z_24H"
+        },
+        {
+          "kind": "OPERATOR",
+          "parameter": 48,
+          "value": "ROLL_MEAN_N"
+        },
+        {
+          "kind": "OPERATOR",
+          "value": "CLIP"
+        },
+        {
+          "kind": "OPERATOR",
+          "parameter": 12,
+          "value": "ROLL_MEAN_N"
+        }
+      ],
+      "input_data_roles": [
+        "CANONICAL_HISTORICAL",
+        "OFFICIAL_HISTORICAL_TIMESTAMPED"
+      ],
+      "input_feature_ids": [
+        "PERP_AGG_BUY_IMBALANCE_1H",
+        "QUOTE_VOLUME_Z_24H",
+        "SPOT_AGG_BUY_IMBALANCE_1H",
+        "SPOT_PERP_FLOW_SPREAD",
+        "TRADE_COUNT_Z_24H"
+      ],
+      "max_lookback": 82,
+      "metrics_by_fold": {
+        "discovery": {
+          "bootstrap_block_events": null,
+          "bootstrap_block_hours": null,
+          "bootstrap_ci_high": null,
+          "bootstrap_ci_low": null,
+          "chronological_fold_means": [
+            0.002298232685739966,
+            0.002154856164933552,
+            -0.00019875315811138656,
+            0.0017804763310115628
+          ],
+          "event_count": 730,
+          "gross_mean_return": 0.0015099604394333665,
+          "long_count": 490,
+          "long_fraction": 0.6712328767123288,
+          "net_mean_return": 0.0015099604394333665,
+          "short_count": 240,
+          "standard_error": 0.0008226842876359338,
+          "t_stat": 1.8354069259939192,
+          "turnover": 0.35939643347050754,
+          "wait_count": 2554
+        },
+        "formula": [
+          {
+            "kind": "FEATURE",
+            "value": "PERP_AGG_BUY_IMBALANCE_1H"
+          },
+          {
+            "kind": "FEATURE",
+            "value": "QUOTE_VOLUME_Z_24H"
+          },
+          {
+            "kind": "FEATURE",
+            "value": "SPOT_AGG_BUY_IMBALANCE_1H"
+          },
+          {
+            "kind": "OPERATOR",
+            "value": "GATE"
+          },
+          {
+            "kind": "FEATURE",
+            "value": "SPOT_PERP_FLOW_SPREAD"
+          },
+          {
+            "kind": "FEATURE",
+            "value": "TRADE_COUNT_Z_24H"
+          },
+          {
+            "kind": "OPERATOR",
+            "parameter": 48,
+            "value": "ROLL_MEAN_N"
+          },
+          {
+            "kind": "OPERATOR",
+            "value": "CLIP"
+          },
+          {
+            "kind": "OPERATOR",
+            "parameter": 12,
+            "value": "ROLL_MEAN_N"
+          }
+        ],
+        "formula_hash": "e408964d7a40d8efc691536f342b8da298a5737c61505164e50e9d61b75365a7",
+        "gate_audit": {
+          "consumed_protocol_keys": [
+            "minimum_discovery_events",
+            "minimum_validation_events",
+            "minimum_pseudo_forward_events",
+            "minimum_long_fraction",
+            "maximum_long_fraction",
+            "minimum_discovery_net_mean_return_8h",
+            "minimum_validation_net_mean_return_8h",
+            "minimum_pseudo_forward_net_mean_return_8h",
+            "minimum_validation_bootstrap_ci_low",
+            "minimum_pseudo_forward_bootstrap_ci_low",
+            "chronological_fold_count",
+            "minimum_positive_validation_folds",
+            "minimum_positive_pseudo_forward_folds",
+            "required_multiple_testing_adjusted_pass",
+            "maximum_pairwise_candidate_correlation",
+            "minimum_sandbox_trade_count",
+            "minimum_net_profit_factor",
+            "maximum_drawdown_r",
+            "maximum_losing_streak",
+            "minimum_positive_sandbox_folds",
+            "fees_bps_round_trip",
+            "slippage_bps_round_trip",
+            "funding_included",
+            "cost_stress_multiplier",
+            "minimum_cost_stress_net_r",
+            "candidate_must_pass_all",
+            "sandbox_not_applicable_rule",
+            "unknown_or_unused_key_rule"
+          ],
+          "passed_all": false,
+          "results": [
+            {
+              "key": "minimum_discovery_events",
+              "observed": 730,
+              "reason": null,
+              "required": 1000,
+              "status": "FAIL"
+            },
+            {
+              "key": "minimum_validation_events",
+              "observed": 226,
+              "reason": null,
+              "required": 500,
+              "status": "FAIL"
+            },
+            {
+              "key": "minimum_pseudo_forward_events",
+              "observed": 225,
+              "reason": null,
+              "required": 500,
+              "status": "FAIL"
+            },
+            {
+              "key": "minimum_long_fraction",
+              "observed": 0.5733333333333334,
+              "reason": null,
+              "required": 0.2,
+              "status": "PASS"
+            },
+            {
+              "key": "maximum_long_fraction",
+              "observed": 0.5733333333333334,
+              "reason": null,
+              "required": 0.8,
+              "status": "PASS"
+            },
+            {
+              "key": "minimum_discovery_net_mean_return_8h",
+              "observed": 0.0015099604394333665,
+              "reason": null,
+              "required": 0.00025,
+              "status": "PASS"
+            },
+            {
+              "key": "minimum_validation_net_mean_return_8h",
+              "observed": -0.0006490745810121824,
+              "reason": null,
+              "required": 0.0002,
+              "status": "FAIL"
+            },
+            {
+              "key": "minimum_pseudo_forward_net_mean_return_8h",
+              "observed": -0.0011095244568831582,
+              "reason": null,
+              "required": 0.0002,
+              "status": "FAIL"
+            },
+            {
+              "key": "minimum_validation_bootstrap_ci_low",
+              "observed": -0.002615668164962556,
+              "reason": null,
+              "required": 0.0,
+              "status": "FAIL"
+            },
+            {
+              "key": "minimum_pseudo_forward_bootstrap_ci_low",
+              "observed": -0.0039247408965369214,
+              "reason": null,
+              "required": 0.0,
+              "status": "FAIL"
+            },
+            {
+              "key": "chronological_fold_count",
+              "observed": 4,
+              "reason": null,
+              "required": ">0",
+              "status": "PASS"
+            },
+            {
+              "key": "minimum_positive_validation_folds",
+              "observed": 2,
+              "reason": null,
+              "required": 3,
+              "status": "FAIL"
+            },
+            {
+              "key": "minimum_positive_pseudo_forward_folds",
+              "observed": 1,
+              "reason": null,
+              "required": 3,
+              "status": "FAIL"
+            },
+            {
+              "key": "required_multiple_testing_adjusted_pass",
+              "observed": false,
+              "reason": null,
+              "required": true,
+              "status": "FAIL"
+            },
+            {
+              "key": "maximum_pairwise_candidate_correlation",
+              "observed": 0.13072782091902999,
+              "reason": null,
+              "required": 0.8,
+              "status": "PASS"
+            },
+            {
+              "key": "minimum_sandbox_trade_count",
+              "observed": null,
+              "reason": "UPSTREAM_FORMULA_GATE_FAILED",
+              "required": 50,
+              "status": "NOT_APPLICABLE"
+            },
+            {
+              "key": "minimum_net_profit_factor",
+              "observed": null,
+              "reason": "UPSTREAM_FORMULA_GATE_FAILED",
+              "required": 1.1,
+              "status": "NOT_APPLICABLE"
+            },
+            {
+              "key": "maximum_drawdown_r",
+              "observed": null,
+              "reason": "UPSTREAM_FORMULA_GATE_FAILED",
+              "required": 20.0,
+              "status": "NOT_APPLICABLE"
+            },
+            {
+              "key": "maximum_losing_streak",
+              "observed": null,
+              "reason": "UPSTREAM_FORMULA_GATE_FAILED",
+              "required": 20,
+              "status": "NOT_APPLICABLE"
+            },
+            {
+              "key": "minimum_positive_sandbox_folds",
+              "observed": null,
+              "reason": "UPSTREAM_FORMULA_GATE_FAILED",
+              "required": 3,
+              "status": "NOT_APPLICABLE"
+            },
+            {
+              "key": "fees_bps_round_trip",
+              "observed": null,
+              "reason": "UPSTREAM_FORMULA_GATE_FAILED",
+              "required": 8.0,
+              "status": "NOT_APPLICABLE"
+            },
+            {
+              "key": "slippage_bps_round_trip",
+              "observed": null,
+              "reason": "UPSTREAM_FORMULA_GATE_FAILED",
+              "required": 4.0,
+              "status": "NOT_APPLICABLE"
+            },
+            {
+              "key": "funding_included",
+              "observed": null,
+              "reason": "UPSTREAM_FORMULA_GATE_FAILED",
+              "required": true,
+              "status": "NOT_APPLICABLE"
+            },
+            {
+              "key": "cost_stress_multiplier",
+              "observed": null,
+              "reason": "UPSTREAM_FORMULA_GATE_FAILED",
+              "required": 2.0,
+              "status": "NOT_APPLICABLE"
+            },
+            {
+              "key": "minimum_cost_stress_net_r",
+              "observed": null,
+              "reason": "UPSTREAM_FORMULA_GATE_FAILED",
+              "required": 0.0,
+              "status": "NOT_APPLICABLE"
+            },
+            {
+              "key": "candidate_must_pass_all",
+              "observed": true,
+              "reason": null,
+              "required": true,
+              "status": "PASS"
+            },
+            {
+              "key": "sandbox_not_applicable_rule",
+              "observed": "ONLY_WHEN_AN_UPSTREAM_FORMULA_GATE_FAILED_BEFORE_TRADE_REPLAY; reason=UPSTREAM_FORMULA_GATE_FAILED",
+              "reason": null,
+              "required": "FROZEN",
+              "status": "PASS"
+            },
+            {
+              "key": "unknown_or_unused_key_rule",
+              "observed": "FORMAL_RUN_FAILS_CLOSED",
+              "reason": null,
+              "required": "FORMAL_RUN_FAILS_CLOSED",
+              "status": "PASS"
+            }
+          ]
+        },
+        "maximum_pairwise_candidate_correlation": 0.13072782091902999,
+        "new_features": [
+          "PERP_AGG_BUY_IMBALANCE_1H",
+          "SPOT_AGG_BUY_IMBALANCE_1H"
+        ],
+        "pseudo_forward": {
+          "bootstrap_block_events": 21,
+          "bootstrap_block_hours": 168,
+          "bootstrap_ci_high": 0.0016356219111377708,
+          "bootstrap_ci_low": -0.0039247408965369214,
+          "chronological_fold_means": [
+            0.0037434960090720485,
+            -0.0016223594747685041,
+            -0.0035893097247889235,
+            -0.002937286037395252
+          ],
+          "event_count": 225,
+          "gross_mean_return": 9.047554311684167e-05,
+          "long_count": 129,
+          "long_fraction": 0.5733333333333334,
+          "net_mean_return": -0.0011095244568831582,
+          "short_count": 96,
+          "standard_error": 0.0009468257664139791,
+          "t_stat": -1.1718359345937388,
+          "turnover": 0.35267857142857145,
+          "wait_count": 869
+        },
+        "validation": {
+          "bootstrap_block_events": 21,
+          "bootstrap_block_hours": 168,
+          "bootstrap_ci_high": 0.0012983195543454199,
+          "bootstrap_ci_low": -0.002615668164962556,
+          "chronological_fold_means": [
+            -0.0014086327870259294,
+            -0.002900059880684616,
+            0.0012052405785886414,
+            0.0005263600274168079
+          ],
+          "event_count": 226,
+          "gross_mean_return": 0.0005509254189878175,
+          "long_count": 166,
+          "long_fraction": 0.7345132743362832,
+          "net_mean_return": -0.0006490745810121824,
+          "short_count": 60,
+          "standard_error": 0.0011457468286300333,
+          "t_stat": -0.5665078574018654,
+          "turnover": 0.3466666666666667,
+          "wait_count": 778
+        }
+      },
+      "operator_set": [
+        "CLIP",
+        "GATE",
+        "ROLL_MEAN_N"
+      ],
+      "proposal_engine": "RANDOM_GRAMMAR_SEARCH_NEW_FEATURE_CONSTRAINED",
+      "pseudo_forward_window": "[2025-02-01T00:00:00Z, 2026-02-01T00:00:00Z)",
+      "research_eligibility": false,
+      "runtime_eligibility": false,
+      "search_budget": 512,
+      "search_run_id": "v0.3.19_official_derivatives_symbolic_20260903T013312Z",
+      "search_seed": 3192026,
+      "status": "FAILED_VALIDATION",
+      "validation_window": "[2024-02-01T00:00:00Z, 2025-01-01T00:00:00Z)"
+    },
+    {
+      "complexity": 3,
+      "correlation_to_existing_candidates": null,
+      "discovery_window": "[2021-01-01T00:00:00Z, 2024-01-01T00:00:00Z)",
+      "formula_hash": "0c627e526d5de8f37bc70335a0c991f66878d84a445946c78fddff1321ec4d25",
+      "formula_id": "V0319_RANDOM_019",
+      "formula_tokens_or_ast": [
+        {
+          "kind": "FEATURE",
+          "value": "LOG_RETURN_1H"
+        },
+        {
+          "kind": "FEATURE",
+          "value": "QUOTE_VOLUME_Z_24H"
+        },
+        {
+          "kind": "OPERATOR",
+          "parameter": 4,
+          "value": "DELAY_N"
+        },
+        {
+          "kind": "FEATURE",
+          "value": "SPOT_AGG_BUY_IMBALANCE_1H"
+        },
+        {
+          "kind": "OPERATOR",
+          "value": "ADD"
+        },
+        {
+          "kind": "OPERATOR",
+          "value": "SUB"
+        }
+      ],
+      "input_data_roles": [
+        "CANONICAL_HISTORICAL",
+        "OFFICIAL_HISTORICAL_TIMESTAMPED"
+      ],
+      "input_feature_ids": [
+        "LOG_RETURN_1H",
+        "QUOTE_VOLUME_Z_24H",
+        "SPOT_AGG_BUY_IMBALANCE_1H"
+      ],
+      "max_lookback": 28,
+      "metrics_by_fold": {
+        "discovery": {
+          "bootstrap_block_events": null,
+          "bootstrap_block_hours": null,
+          "bootstrap_ci_high": null,
+          "bootstrap_ci_low": null,
+          "chronological_fold_means": [
+            0.0023931205847677146,
+            -0.00020005274784314534,
+            6.347364784063531e-05,
+            0.00018908128382101158
+          ],
+          "event_count": 3279,
+          "gross_mean_return": 0.0006108623207245897,
+          "long_count": 2190,
+          "long_fraction": 0.6678865507776761,
+          "net_mean_return": 0.0006108623207245897,
+          "short_count": 1089,
+          "standard_error": 0.00034256751971342567,
+          "t_stat": 1.7831880886886347,
+          "turnover": 0.46918852959121415,
+          "wait_count": 5
+        }
+      },
+      "operator_set": [
+        "ADD",
+        "DELAY_N",
+        "SUB"
+      ],
+      "proposal_engine": "RANDOM_GRAMMAR_SEARCH_NEW_FEATURE_CONSTRAINED",
+      "pseudo_forward_window": "[2025-02-01T00:00:00Z, 2026-02-01T00:00:00Z)",
+      "research_eligibility": false,
+      "runtime_eligibility": false,
+      "search_budget": 512,
+      "search_run_id": "v0.3.19_official_derivatives_symbolic_20260903T013312Z",
+      "search_seed": 3192026,
+      "status": "FAILED_VALIDATION",
+      "validation_window": "[2024-02-01T00:00:00Z, 2025-01-01T00:00:00Z)"
+    },
+    {
+      "complexity": 5,
+      "correlation_to_existing_candidates": null,
+      "discovery_window": "[2021-01-01T00:00:00Z, 2024-01-01T00:00:00Z)",
+      "formula_hash": "2eccb0ed161132587d8be1eb2168bf3ac785fd83fb1528b3eda33340f6430526",
+      "formula_id": "V0319_RANDOM_020",
+      "formula_tokens_or_ast": [
+        {
+          "kind": "FEATURE",
+          "value": "PERP_AGG_BUY_IMBALANCE_1H"
+        },
+        {
+          "kind": "OPERATOR",
+          "parameter": 12,
+          "value": "DECAY_N"
+        },
+        {
+          "kind": "OPERATOR",
+          "parameter": 12,
+          "value": "DECAY_N"
+        },
+        {
+          "kind": "FEATURE",
+          "value": "SPOT_AGG_BUY_IMBALANCE_1H"
+        },
+        {
+          "kind": "FEATURE",
+          "value": "TAKER_BUY_IMBALANCE_1H"
+        },
+        {
+          "kind": "FEATURE",
+          "value": "MARK_INDEX_BASIS_1H"
+        },
+        {
+          "kind": "OPERATOR",
+          "value": "MIN"
+        },
+        {
+          "kind": "OPERATOR",
+          "value": "SUB"
+        },
+        {
+          "kind": "OPERATOR",
+          "value": "MIN"
+        }
+      ],
+      "input_data_roles": [
+        "CANONICAL_HISTORICAL",
+        "OFFICIAL_HISTORICAL_TIMESTAMPED"
+      ],
+      "input_feature_ids": [
+        "MARK_INDEX_BASIS_1H",
+        "PERP_AGG_BUY_IMBALANCE_1H",
+        "SPOT_AGG_BUY_IMBALANCE_1H",
+        "TAKER_BUY_IMBALANCE_1H"
+      ],
+      "max_lookback": 23,
+      "metrics_by_fold": {
+        "discovery": {
+          "bootstrap_block_events": null,
+          "bootstrap_block_hours": null,
+          "bootstrap_ci_high": null,
+          "bootstrap_ci_low": null,
+          "chronological_fold_means": [
+            0.0003645376011719565,
+            0.0013919385845651414,
+            0.0005483493213980821,
+            8.02125439804819e-05
+          ],
+          "event_count": 3181,
+          "gross_mean_return": 0.0005960972848729745,
+          "long_count": 811,
+          "long_fraction": 0.25495127318453314,
+          "net_mean_return": 0.0005960972848729745,
+          "short_count": 2370,
+          "standard_error": 0.000346706998088556,
+          "t_stat": 1.7193113728864484,
+          "turnover": 0.3113207547169811,
+          "wait_count": 103
+        }
+      },
+      "operator_set": [
+        "DECAY_N",
+        "MIN",
+        "SUB"
+      ],
+      "proposal_engine": "RANDOM_GRAMMAR_SEARCH_NEW_FEATURE_CONSTRAINED",
+      "pseudo_forward_window": "[2025-02-01T00:00:00Z, 2026-02-01T00:00:00Z)",
+      "research_eligibility": false,
+      "runtime_eligibility": false,
+      "search_budget": 512,
+      "search_run_id": "v0.3.19_official_derivatives_symbolic_20260903T013312Z",
+      "search_seed": 3192026,
+      "status": "FAILED_VALIDATION",
+      "validation_window": "[2024-02-01T00:00:00Z, 2025-01-01T00:00:00Z)"
+    }
+  ],
+  "safety": {
+    "execution": "DISABLED",
+    "final_holdout": "SEALED",
+    "qualified_direction_engine": "NONE",
+    "runtime_maximum": "OPPORTUNITY_ONLY",
+    "strategy": "EXPERIMENTAL"
+  },
+  "schema_version": 1
+}

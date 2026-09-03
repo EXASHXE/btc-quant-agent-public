@@ -1,0 +1,44 @@
+{
+  "preregistration_sha": "a2b20f6784e682a73a73fe73787905c4c305921320c",
+  "protocol_sha256": "52d58db8778e55e10e57c7516c6611fb64f337331f4c26d40476f7789d6f1bcd",
+  "accounting": {
+    "attempts": 1237,
+    "valid_unique_formulas": 512,
+    "formula_evaluations": 512,
+    "invalid_formulas": 0,
+    "duplicates_rejected": 166,
+    "over_lookback_rejected": 7,
+    "over_token_limit_rejected": 22,
+    "old_only_rejections": 530,
+    "vm_failures": 0
+  },
+  "formal_multiple_testing_universe": 512,
+  "new_feature_usage_distribution": {
+    "MARK_INDEX_BASIS_1H": 99,
+    "MARK_INDEX_BASIS_CHANGE_4H": 115,
+    "PERP_AGG_BUY_IMBALANCE_1H": 92,
+    "PERP_AGG_SIGNED_NOTIONAL_Z_24H": 92,
+    "PREMIUM_INDEX_LEVEL_1H": 97,
+    "PREMIUM_INDEX_Z_24H": 80,
+    "SPOT_AGG_BUY_IMBALANCE_1H": 105,
+    "SPOT_PERP_AGG_FLOW_SPREAD_1H": 73
+  },
+  "multiple_testing": {
+    "procedure": "EMPIRICAL_BEST_SCORE_CIRCULAR_BLOCK_PERMUTATION",
+    "permutations": 200,
+    "sample_step_hours": 8,
+    "block_hours": 168,
+    "block_events": 21,
+    "observed_best_t_stat": 2.930813711567389,
+    "null_best_t_stat_p95": 8.732651827360788,
+    "familywise_adjusted_p_value": 0.43283582089552236,
+    "passed_0_05": false,
+    "zero_or_single_event_formulas_excluded": 30
+  },
+  "validation_candidates": 20,
+  "frozen_top_k": 5,
+  "pseudo_forward_touches_before_freeze": 0,
+  "candidate_exists": false,
+  "provisional_shadow_started": false,
+  "recommendation": "STOP_OFFICIAL_DERIVATIVES_SYMBOLIC_FAMILY"
+}

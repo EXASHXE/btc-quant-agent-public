@@ -1,0 +1,20 @@
+{
+  "formal_role": "OFFICIAL_HISTORICAL_TIMESTAMPED",
+  "rows": 44568,
+  "synthetic_rows": 0,
+  "missing_intervals_filled": 0,
+  "aggressor_semantics": "buyer_is_maker=true => seller aggression; otherwise buyer aggression; signed quote notional is price times quantity",
+  "decision_semantics": "hour T uses only events and closed 1m observations belonging to the fully closed hour T; rolling features use trailing closed history only",
+  "features": {
+    "MARK_INDEX_BASIS_1H": {"available": 44158, "unavailable": 410},
+    "MARK_INDEX_BASIS_CHANGE_4H": {"available": 44112, "unavailable": 456},
+    "PERP_AGG_BUY_IMBALANCE_1H": {"available": 44352, "unavailable": 216},
+    "PERP_AGG_SIGNED_NOTIONAL_Z_24H": {"available": 44168, "unavailable": 400},
+    "PREMIUM_INDEX_LEVEL_1H": {"available": 44393, "unavailable": 175},
+    "PREMIUM_INDEX_Z_24H": {"available": 44194, "unavailable": 374},
+    "SPOT_AGG_BUY_IMBALANCE_1H": {"available": 44552, "unavailable": 16},
+    "SPOT_PERP_AGG_FLOW_SPREAD_1H": {"available": 44336, "unavailable": 232}
+  },
+  "future_mutation_invariance_tested": true,
+  "every_formal_formula_requires_new_feature": true
+}

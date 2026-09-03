@@ -1,0 +1,51 @@
+{
+  "historical_writes_to_forward_stores": 0,
+  "identities_or_start_times_changed": false,
+  "health_end": {
+    "captured_at_ms": 1788400043791,
+    "state": "UNHEALTHY",
+    "failures": [
+      {"chain": "DERIVATIVES", "reason": "DATA_QUALITY_TERMINAL"},
+      {"chain": "OPPORTUNITY_H36", "reason": "DATA_QUALITY_TERMINAL"},
+      {"chain": "MICROSTRUCTURE", "reason": "STALE_HEARTBEAT"}
+    ]
+  },
+  "derivatives_v0316_end": {
+    "expected_scheduled_slots": 162,
+    "fully_available_scheduled_slots": 126,
+    "partial_slots": 11,
+    "failed_slots": 0,
+    "missing_slots": 25,
+    "max_consecutive_bad_or_missing_slots": 15,
+    "terminal_failure": true,
+    "open_interest_coverage": 0.8395061728395061,
+    "other_required_field_coverage": 0.8271604938271605
+  },
+  "opportunity_h36_end": {
+    "campaign_id": "OPPORTUNITY_FORWARD_V0317_20260901T160000Z",
+    "expected_slots": 136,
+    "missed_slots": 49,
+    "max_miss_streak": 24,
+    "successful_scan_ratio": 0.6397058823529411,
+    "opportunity_count": 0,
+    "resolved_4h": 0,
+    "resolved_8h": 0,
+    "terminal_failure": true
+  },
+  "microstructure_v0315_end": {
+    "campaign_age_seconds": 197222.499,
+    "agg_trade_events": 2562887,
+    "depth_events": 1692796,
+    "book_samples": 1690433,
+    "depth_sequence_continuity_ratio": 0.995732170416972,
+    "gap_count": 90,
+    "heartbeat_age_seconds": 31715.069,
+    "partition_integrity_ok": true,
+    "state": "COLLECTING"
+  },
+  "safety": {
+    "alpha_interpretation": "NONE",
+    "execution": "DISABLED",
+    "final_holdout": "SEALED"
+  }
+}

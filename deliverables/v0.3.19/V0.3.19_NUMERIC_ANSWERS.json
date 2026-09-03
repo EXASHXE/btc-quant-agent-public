@@ -1,0 +1,56 @@
+{
+  "artifact_manifest_sha256": "e06695f6ebcab55acb5f7d83e1d4c23fbbc0c05c63b5c16124e4d2bbae4c64e2",
+  "candidate_exists": false,
+  "formal_implementation_sha": "a26b657379f1b2e0f463c6cd614d4849f1c1b833",
+  "forward_store_historical_writes": 0,
+  "new_feature_count": 8,
+  "official_data": {
+    "archive_requests": 366,
+    "verified_archives": 366,
+    "missing_archives": 0,
+    "hourly_rows": 44568,
+    "final_holdout_rows_loaded": 0,
+    "synthetic_events": 0,
+    "gap_fill": 0,
+    "raw_bytes": 85646216541,
+    "raw_manifest_sha256": "cbeae209c5ded8aae265bdad5155dc34a20dc6c994ddc174aa7d57fb73e302f9",
+    "hourly_input_sha256": "77a8ad63fa0f1ead7c8481197661caa24171c7cf856c9b3326d72e376e0fcaed"
+  },
+  "preregistration_sha": "a2b20f6784e682a73a73fe73787905c4c305921320c",
+  "primary_recommendation": "STOP_OFFICIAL_DERIVATIVES_SYMBOLIC_FAMILY",
+  "protocol_sha256": "52d58db8778e55e10e57c7516c6611fb64f337331f4c26d40476f7789d6f1bcd",
+  "provisional_shadow_started": false,
+  "run_id": "v0.3.19_official_derivatives_symbolic_20260903T013312Z",
+  "search": {
+    "attempts": 1237,
+    "valid_unique_formulas": 512,
+    "formula_evaluations": 512,
+    "old_only_rejections": 530,
+    "duplicates_rejected": 166,
+    "over_lookback_rejected": 7,
+    "over_token_limit_rejected": 22,
+    "vm_failures": 0,
+    "validation_candidates": 20,
+    "frozen_top_k": 5
+  },
+  "multiple_testing": {
+    "procedure": "EMPIRICAL_BEST_SCORE_CIRCULAR_BLOCK_PERMUTATION",
+    "permutations": 200,
+    "sample_step_hours": 8,
+    "block_hours": 168,
+    "block_events": 21,
+    "observed_best_t_stat": 2.930813711567389,
+    "null_best_t_stat_p95": 8.732651827360788,
+    "familywise_adjusted_p_value": 0.43283582089552236,
+    "passed_0_05": false
+  },
+  "tests": {
+    "pytest_passed": 421,
+    "total_coverage_percent": 64,
+    "evaluate_coverage_percent": 97,
+    "registry_coverage_percent": 98,
+    "sandbox_coverage_percent": 94,
+    "search_coverage_percent": 91,
+    "vm_coverage_percent": 88
+  }
+}
