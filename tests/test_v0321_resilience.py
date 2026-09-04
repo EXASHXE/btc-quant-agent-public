@@ -200,13 +200,17 @@ def test_forward_doctor_network_http_451_fails_closed() -> None:
 
 
 def test_forward_doctor_preregistered_successor_recognized() -> None:
+    pre_start_ms = 1788458000000  # Strictly before 1788458400000 (2026-09-03T18:00:00Z)
     mock_resp = MagicMock()
     mock_resp.status = 200
-    mock_resp.read.return_value = b'{"timezone":"UTC","serverTime":1788458400000}'
+    mock_resp.read.return_value = b'{"timezone":"UTC","serverTime":1788458000000}'
     mock_opener = MagicMock()
     mock_opener.return_value.__enter__.return_value = mock_resp
 
     with patch(
+        "btc_quant_agent.forward_diagnostics.time.time",
+        return_value=pre_start_ms / 1000.0,
+    ), patch(
         "btc_quant_agent.forward_diagnostics.check_systemd_units",
         return_value={
             "btc-quant-forward-derivatives.timer": {"active_state": "active", "exec_start": ""},
@@ -233,8 +237,55 @@ def test_forward_doctor_preregistered_successor_recognized() -> None:
             "linger_enabled": True,
         },
     ):
-        doc = forward_doctor(url_opener=mock_opener)
+        doc = forward_doctor(url_opener=mock_opener, now_ms=pre_start_ms)
         assert doc["status"] == "PREREGISTERED_NOT_STARTED"
+        assert doc["is_healthy"] is True
+        assert doc["parity"]["parity_ok"] is True
+        assert doc["campaigns"]["has_active_derivatives"] is True
+        assert doc["campaigns"]["has_active_opportunity"] is True
+        assert doc["chains"]["storage"]["writable"] is True
+
+
+def test_forward_doctor_post_start_healthy_accumulating() -> None:
+    post_start_ms = 1788459000000  # Strictly at/after 1788458400000 (2026-09-03T18:00:00Z)
+    mock_resp = MagicMock()
+    mock_resp.status = 200
+    mock_resp.read.return_value = b'{"timezone":"UTC","serverTime":1788459000000}'
+    mock_opener = MagicMock()
+    mock_opener.return_value.__enter__.return_value = mock_resp
+
+    with patch(
+        "btc_quant_agent.forward_diagnostics.time.time",
+        return_value=post_start_ms / 1000.0,
+    ), patch(
+        "btc_quant_agent.forward_diagnostics.check_systemd_units",
+        return_value={
+            "btc-quant-forward-derivatives.timer": {"active_state": "active", "exec_start": ""},
+            "btc-quant-opportunity-forward.timer": {"active_state": "active", "exec_start": ""},
+            "btc-quant-opportunity-resolve.timer": {"active_state": "active", "exec_start": ""},
+            "btc-quant-forward-health.timer": {"active_state": "active", "exec_start": ""},
+            "btc-quant-microstructure-forward.service": {"active_state": "active", "exec_start": ""},
+            "btc-quant-opportunity-forward.service": {
+                "active_state": "inactive",
+                "exec_start": "/bin/quantctl opportunity-forward collect-once --registry configs/forward/opportunity_forward_campaigns.json",
+            },
+            "btc-quant-opportunity-resolve.service": {
+                "active_state": "inactive",
+                "exec_start": "/bin/quantctl opportunity-forward resolve --registry configs/forward/opportunity_forward_campaigns.json",
+            },
+        },
+    ), patch(
+        "btc_quant_agent.forward_diagnostics.check_wsl_systemd",
+        return_value={
+            "is_wsl": True,
+            "systemd_running": True,
+            "systemd_state": "running",
+            "user": "root",
+            "linger_enabled": True,
+        },
+    ):
+        doc = forward_doctor(url_opener=mock_opener, now_ms=post_start_ms)
+        assert doc["status"] == "HEALTHY_ACCUMULATING"
         assert doc["is_healthy"] is True
         assert doc["parity"]["parity_ok"] is True
         assert doc["campaigns"]["has_active_derivatives"] is True

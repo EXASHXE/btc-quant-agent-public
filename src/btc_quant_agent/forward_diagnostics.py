@@ -182,6 +182,7 @@ def check_chains_and_storage(
     derivatives_store_path: str | Path = "data/forward/BTCUSDT/derivatives.sqlite3",
     opportunity_store_path: str | Path = "data/forward/BTCUSDT/opportunity_shadow.sqlite3",
     microstructure_root: str | Path = "data/forward/BTCUSDT/microstructure",
+    now_ms: int | None = None,
 ) -> dict[str, Any]:
     deriv_path = Path(derivatives_store_path)
     opp_path = Path(opportunity_store_path)
@@ -196,10 +197,10 @@ def check_chains_and_storage(
                 "SELECT scheduled_slot_ms, status FROM collection_runs ORDER BY scheduled_slot_ms DESC LIMIT 1"
             ).fetchone()
             if row:
-                latest_deriv_slot = int(row[0]) if row[0] is not None else None
-                latest_deriv_status = str(row[1])
+                latest_deriv_slot = row[0]
+                latest_deriv_status = row[1]
             chk = conn.execute("PRAGMA quick_check").fetchone()
-            sqlite_integrity["derivatives"] = str(chk[0]) if chk else "ok"
+            sqlite_integrity["derivatives"] = str(chk[0]) if chk else "OK"
             conn.close()
         except Exception as exc:  # noqa: BLE001
             latest_deriv_status = f"ERROR: {exc}"
@@ -216,7 +217,8 @@ def check_chains_and_storage(
                 "SELECT scheduled_slot_ms, status FROM scan_observations ORDER BY scheduled_slot_ms DESC LIMIT 1"
             ).fetchone()
             if row:
-                latest_opp_slot, latest_opp_status = int(row[0]), str(row[1])
+                latest_opp_slot = row[0]
+                latest_opp_status = row[1]
             chk = conn.execute("PRAGMA quick_check").fetchone()
             sqlite_integrity["opportunity"] = str(chk[0]) if chk else "OK"
             conn.close()
@@ -245,9 +247,9 @@ def check_chains_and_storage(
             except Exception:  # noqa: BLE001,S110
                 pass
 
-    now_ms = int(time.time() * 1000)
+    current_ms = int(time.time() * 1000) if now_ms is None else now_ms
     heartbeat_age_sec = (
-        (now_ms - latest_heartbeat_ms) / 1000 if latest_heartbeat_ms is not None else None
+        (current_ms - latest_heartbeat_ms) / 1000 if latest_heartbeat_ms is not None else None
     )
 
     # Disk usage
@@ -289,10 +291,12 @@ def check_campaign_states(
     *,
     epoch_registry_path: str | Path = "configs/forward/derivatives_evidence_epochs.json",
     opportunity_registry_path: str | Path = "configs/forward/opportunity_forward_campaigns.json",
+    now_ms: int | None = None,
 ) -> dict[str, Any]:
     epoch_reg = Path(epoch_registry_path)
     opp_reg = Path(opportunity_registry_path)
-    now_ms = int(time.time() * 1000)
+    if now_ms is None:
+        now_ms = int(time.time() * 1000)
 
     derivatives_info: dict[str, Any] = {}
     has_active_derivatives = False
@@ -385,13 +389,13 @@ def check_campaign_states(
     }
 
 
-def forward_doctor(*, url_opener: Any = None) -> dict[str, Any]:
+def forward_doctor(*, url_opener: Any = None, now_ms: int | None = None) -> dict[str, Any]:
     wsl_info = check_wsl_systemd()
     unit_info = check_systemd_units()
     parity_info = check_collector_resolver_parity(unit_info)
     net_info = check_network_proxy(url_opener=url_opener)
-    chain_info = check_chains_and_storage()
-    campaign_info = check_campaign_states()
+    chain_info = check_chains_and_storage(now_ms=now_ms)
+    campaign_info = check_campaign_states(now_ms=now_ms)
 
     issues: list[str] = []
     health_state = "HEALTHY"

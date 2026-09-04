@@ -1,0 +1,214 @@
+{
+  "schema_version": "1.0.0",
+  "generated_at_utc": "2026-09-04T05:05:58.703000+00:00",
+  "generated_at_ms": 1788498358703,
+  "overall_health_state": "HEALTHY_ACCUMULATING",
+  "pipeline_summary": {
+    "derivatives": "HEALTHY_ACCUMULATING",
+    "opportunity": "HEALTHY_ACCUMULATING",
+    "microstructure": "COLLECTING"
+  },
+  "derivatives_successor": {
+    "epoch_id": "DERIVATIVES_PIT_EPOCH_V0321_001",
+    "start_utc": "2026-09-03T18:00:00+00:00",
+    "start_ms": 1788458400000,
+    "audit_cutoff_utc": "2026-09-04T05:05:58.703000+00:00",
+    "audit_cutoff_ms": 1788498358703,
+    "expected_scheduled_slots": 45,
+    "recorded_slots": 45,
+    "complete_count": 41,
+    "partial_count": 4,
+    "failed_count": 0,
+    "missing_count": 0,
+    "missing_slot_timestamps_ms": [],
+    "maximum_consecutive_failed_or_missing_streak": 0,
+    "required_field_available_count": 401,
+    "required_field_denominator": 405,
+    "required_field_availability_ratio": 0.9901,
+    "frozen_thresholds": {
+      "maximum_consecutive_failed_or_missing_scheduled_slots": 4,
+      "minimum_required_field_availability": 0.95,
+      "minimum_days": 30,
+      "minimum_fully_available_snapshots": 2500
+    },
+    "partial_observations_audit": {
+      "count": 4,
+      "details": [
+        {
+          "scheduled_slot_ms": 1788459300000,
+          "scheduled_slot_utc": "2026-09-03T18:15:00+00:00",
+          "successful_fields": [
+            "funding_rate",
+            "index_price",
+            "long_short_account_ratio",
+            "mark_price",
+            "open_interest",
+            "open_interest_change_pct",
+            "premium_bps",
+            "taker_buy_sell_ratio"
+          ],
+          "attempted_fields": [
+            "mark_price",
+            "index_price",
+            "premium_bps",
+            "funding_rate",
+            "open_interest",
+            "open_interest_change_pct",
+            "taker_buy_sell_ratio",
+            "basis_rate",
+            "long_short_account_ratio"
+          ],
+          "error_summary": "{\"basis\": \"Binance public data request failed [HTTP_4XX_NON_RETRYABLE]: HTTP Error 418: \"}"
+        },
+        {
+          "scheduled_slot_ms": 1788460200000,
+          "scheduled_slot_utc": "2026-09-03T18:30:00+00:00",
+          "successful_fields": [
+            "funding_rate",
+            "index_price",
+            "long_short_account_ratio",
+            "mark_price",
+            "open_interest",
+            "open_interest_change_pct",
+            "premium_bps",
+            "taker_buy_sell_ratio"
+          ],
+          "attempted_fields": [
+            "mark_price",
+            "index_price",
+            "premium_bps",
+            "funding_rate",
+            "open_interest",
+            "open_interest_change_pct",
+            "taker_buy_sell_ratio",
+            "basis_rate",
+            "long_short_account_ratio"
+          ],
+          "error_summary": "{\"basis\": \"SCHEMA_ERROR: required response fields absent\"}"
+        },
+        {
+          "scheduled_slot_ms": 1788474600000,
+          "scheduled_slot_utc": "2026-09-03T22:30:00+00:00",
+          "successful_fields": [
+            "funding_rate",
+            "index_price",
+            "long_short_account_ratio",
+            "mark_price",
+            "open_interest",
+            "open_interest_change_pct",
+            "premium_bps",
+            "taker_buy_sell_ratio"
+          ],
+          "attempted_fields": [
+            "mark_price",
+            "index_price",
+            "premium_bps",
+            "funding_rate",
+            "open_interest",
+            "open_interest_change_pct",
+            "taker_buy_sell_ratio",
+            "basis_rate",
+            "long_short_account_ratio"
+          ],
+          "error_summary": "{\"basis\": \"SCHEMA_ERROR: required response fields absent\"}"
+        },
+        {
+          "scheduled_slot_ms": 1788488100000,
+          "scheduled_slot_utc": "2026-09-04T02:15:00+00:00",
+          "successful_fields": [
+            "funding_rate",
+            "index_price",
+            "long_short_account_ratio",
+            "mark_price",
+            "open_interest",
+            "open_interest_change_pct",
+            "premium_bps",
+            "taker_buy_sell_ratio"
+          ],
+          "attempted_fields": [
+            "mark_price",
+            "index_price",
+            "premium_bps",
+            "funding_rate",
+            "open_interest",
+            "open_interest_change_pct",
+            "taker_buy_sell_ratio",
+            "basis_rate",
+            "long_short_account_ratio"
+          ],
+          "error_summary": "{\"basis\": \"SCHEMA_ERROR: required response fields absent\"}"
+        }
+      ],
+      "root_cause": "Binance basis endpoint returned HTTP 418 or empty payload; required-field availability remains 99.0% vs >=95% gate"
+    },
+    "current_gate_status": "GATE_SATISFIED",
+    "accumulation_state": "HEALTHY_ACCUMULATING"
+  },
+  "opportunity_successor": {
+    "campaign_id": "OPPORTUNITY_FORWARD_V0321_20260903T180000Z",
+    "hypothesis_id": "H38_OPPORTUNITY_FORWARD_REPLICATION_LOCAL_RECOVERY",
+    "start_utc": "2026-09-03T18:00:00Z",
+    "start_ms": 1788458400000,
+    "audit_cutoff_utc": "2026-09-04T05:05:58.703000+00:00",
+    "audit_cutoff_ms": 1788498358703,
+    "expected_decision_slots": 45,
+    "recorded_observations": 45,
+    "successful_scan_count": 44,
+    "missed_decision_slot_count": 1,
+    "missing_count": 0,
+    "missing_slot_timestamps_ms": [],
+    "maximum_consecutive_missed_streak": 1,
+    "successful_scan_ratio": 0.9778,
+    "frozen_thresholds": {
+      "maximum_consecutive_missed_decision_slots": 4,
+      "minimum_successful_scheduled_scan_ratio": 0.95,
+      "minimum_resolved_opportunities": 30,
+      "preferred_resolved_opportunities": 50,
+      "minimum_calendar_days": 30,
+      "minimum_unique_matched_controls": 100,
+      "minimum_distinct_utc_days": 20
+    },
+    "preliminary_event_counts": {
+      "opportunities_detected_so_far": 0,
+      "controls_sampled_so_far": 0,
+      "statistical_qualification_status": "PENDING_ACCUMULATION",
+      "qualification_note": "H38 requires 30 calendar days, >=30 resolved opportunities, and >=100 matched controls; infrastructure is HEALTHY_ACCUMULATING but statistical qualification cannot be evaluated until maturity."
+    },
+    "current_gate_status": "GATE_SATISFIED",
+    "accumulation_state": "HEALTHY_ACCUMULATING"
+  },
+  "microstructure_capture": {
+    "campaign_id": "MICROSTRUCTURE_FORWARD_V0315_20260831T190000Z",
+    "partition_count": 5,
+    "latest_partition": "data/forward/BTCUSDT/microstructure/microstructure-2026-09-04.sqlite3",
+    "latest_heartbeat_ms": 1788498356955,
+    "heartbeat_age_seconds": 1.748,
+    "heartbeat_status": "HEALTHY",
+    "total_depth_events": 2535851,
+    "total_agg_trade_events": 3954181,
+    "total_book_samples": 2283153,
+    "latest_partition_stats": {
+      "depth_events": 180062,
+      "agg_trades": 242651,
+      "gaps_in_latest_partition": 0
+    },
+    "state": "COLLECTING",
+    "gap_status": "ZERO_GAPS_ON_LATEST_PARTITION"
+  },
+  "safety_invariants": {
+    "strategy": "EXPERIMENTAL",
+    "qualified_direction_engine": "NONE",
+    "runtime_maximum": "OPPORTUNITY_ONLY",
+    "execution": "DISABLED",
+    "auto_execute": false,
+    "live_trading": "NOT_AUTHORIZED",
+    "final_holdout": "SEALED"
+  },
+  "provenance_and_immutability": {
+    "forward_rows_deleted": 0,
+    "forward_rows_backfilled_or_reconstructed": 0,
+    "historical_start_timestamps_moved": 0,
+    "terminal_campaigns_revived": 0,
+    "historical_forward_evidence_policy": "STRICTLY_IMMUTABLE"
+  }
+}

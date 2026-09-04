@@ -2,9 +2,11 @@
 
 Version 0.3.21 executes the comprehensive forward runtime recovery following the post-activation HTTP 451 geo-blocking failure observed in v0.3.20. Under strict non-alpha and research governance policies, this release permanently reconciles the compromised v0.3.20 Derivatives and Opportunity chains into terminal archives, hardens systemd services to fail closed against stale or terminal configs, resolves a structural collector/resolver configuration mismatch, provides robust local Windows/WSL power and storage resilience tooling, enhances the Forward Doctor with a typed 10-state health model, and preregisters clean successors on a future UTC boundary after authoritative preflight verification.
 
+Following successor activation at `2026-09-03T18:00:00Z`, 45 continuous 15m slots of empirical forward evidence have accumulated with zero failed derivatives slots and a 97.8% opportunity scan ratio, satisfying all frozen quality gates.
+
 ## Lineage & Traceability
 - **Base Version**: `0.3.20` (`ec08024588e6a766e061ed25ceb62ec24751fa61`)
-- **Review Lineage**: Includes Gemini 3.8 Flash Independent Co-Review (`reviews/v0.3.20/gemini-3.8-flash/REVIEW.md`, `REVIEW.json`)
+- **Review Lineage**: Includes Gemini 3.8 Flash Independent Co-Review (`reviews/v0.3.20/gemini-3.8-flash/REVIEW.md`, `REVIEW.json`) and One-Pass Acceptance Audit (`reviews/v0.3.21/gemini-3.8-flash/REVIEW.md`, `REVIEW.json`)
 - **Execution Target**: `agent/v0.3.21-forward-recovery-cutover` -> `main`
 
 ## Core Changes
@@ -25,15 +27,16 @@ Version 0.3.21 executes the comprehensive forward runtime recovery following the
    - Resource protection verified: 833 GB free disk space, SQLite `quick_check` passing `ok`, microstructure heartbeat age < 2.5s.
 5. **Phase E (Forward Doctor Authoritative Preflight & Typed 10-State Model)**:
    - Implemented 10-state typed health model.
-   - Preflight verified clean passing status `PREREGISTERED_NOT_STARTED` (`is_healthy: true`).
+   - Enhanced doctor with optional deterministic `now_ms` timestamp injection for fully hermetic testing.
 6. **Phase F (Conditional Fresh Successor Preregistration)**:
    - Network egress verified healthy via Tokyo, Japan endpoint (`150.249.219.212`), returning HTTP 200 with zero HTTP 451.
    - Clean successors preregistered for future UTC 15m boundary `2026-09-03T18:00:00Z` (`1788458400000` ms, 48-minute buffer):
      - Derivatives: `DERIVATIVES_PIT_EPOCH_V0321_001`
      - Opportunity: `OPPORTUNITY_FORWARD_V0321_20260903T180000Z` (`H38_OPPORTUNITY_FORWARD_REPLICATION_LOCAL_RECOVERY`)
-7. **Phase G (Verification & Deliverables)**:
-   - Added `tests/test_v0321_resilience.py`.
-   - 434 tests passing across full test suite.
+7. **Phase G & Acceptance Repair (Verification & Deliverables)**:
+   - Added `tests/test_v0321_resilience.py` with 6 deterministic tests covering both pre-start (`PREREGISTERED_NOT_STARTED`) and post-start (`HEALTHY_ACCUMULATING`) states.
+   - Full test suite: 435 tests passing.
+   - Added natural post-start evidence audit: `deliverables/v0.3.21/POST_START_SUCCESSOR_HEALTH.json`.
    - 100% clean ruff, mypy, and compileall.
 
 ## Preserved Safety Invariants
