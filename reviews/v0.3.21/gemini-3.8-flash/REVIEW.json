@@ -1,0 +1,59 @@
+{
+  "schema_version": "1.0.0",
+  "stage": "v0.3.21",
+  "review_role": "Gemini-3.8-Flash One-Pass Independent Audit",
+  "review_date": "2026-09-04",
+  "reviewed_identity": {
+    "branch": "agent/v0.3.21-forward-recovery-cutover",
+    "reviewed_head_sha": "31aa2c366a52793b72bb87a53bbe07ce6b43a23c",
+    "base_sha": "ec08024588e6a766e061ed25ceb62ec24751fa61",
+    "preregistration_sha": "b3d59bb798765af92621229321ddf5033cfc9db9",
+    "implementation_deliverables_sha": "0f3b860362d5db9d2b444df28b49d093ff5f2865",
+    "ci_runs": {
+      "33783892290": "SUCCESS",
+      "33835186219": "FAILURE",
+      "33835210709": "FAILURE"
+    }
+  },
+  "verdict": "REPAIR_REQUIRED",
+  "findings": [
+    {
+      "id": "F-01",
+      "severity": "HIGH",
+      "area": "Test / CI Integrity",
+      "evidence": "tests/test_v0321_resilience.py:237, GitHub Actions Runs #33835186219 & #33835210709",
+      "finding": "test_forward_doctor_preregistered_successor_recognized fails after 2026-09-03T18:00:00Z because time.time() is unmocked in check_campaign_states(). Broken CI across Python 3.11/3.12/3.13.",
+      "required_action": "Mock time.time in tests/test_v0321_resilience.py to return timestamp strictly before 1788458400.0. Add explicit test for HEALTHY_ACCUMULATING when time.time() >= 1788458400.0."
+    },
+    {
+      "id": "F-02",
+      "severity": "LOW",
+      "area": "Forward Evidence",
+      "evidence": "data/forward/BTCUSDT/derivatives.sqlite3 slots 1788459300000, 1788460200000, 1788474600000, 1788488100000",
+      "finding": "4 of 42 slots recorded PARTIAL status due to Binance basis endpoint returning HTTP 418 or empty schema payloads. Field availability is 98.1% (>95% threshold); 0 slots were FAILED.",
+      "required_action": "Advisory monitoring only. Ensure rate limit backoff is maintained. No code change required."
+    },
+    {
+      "id": "F-03",
+      "severity": "LOW",
+      "area": "Systemd Log Noise",
+      "evidence": "journalctl --user -u btc-quant-microstructure-forward.service",
+      "finding": "Microstructure log recorded AttributeError: 'ClientConnection' object has no attribute 'recv_messages' during an asyncio connection reset event. Process remained alive and streaming.",
+      "required_action": "Consider catching/suppressing the attribute error on connection teardown in websockets handler in future maintenance."
+    }
+  ],
+  "safety_invariants": {
+    "execution": "DISABLED",
+    "auto_execute": false,
+    "qualified_direction_engine": "NONE",
+    "runtime_maximum": "OPPORTUNITY_ONLY",
+    "final_holdout": "SEALED",
+    "live_trading": "NOT AUTHORIZED"
+  },
+  "falsification_conditions": [
+    "Test test_forward_doctor_preregistered_successor_recognized passes on clean checkout without patching time.time().",
+    "GitHub Actions CI on commit 31aa2c366a52793b72bb87a53bbe07ce6b43a23c is green.",
+    "The 42 forward slots collected since 18:00 UTC suffered silent corruption, timestamp backfill, or synthetic substitution."
+  ],
+  "next_stage_recommendation": "Implementation agent patches tests/test_v0321_resilience.py and pushes commit to turn CI green. ChatGPT conducts final review and fast-forwards/merges to main."
+}
