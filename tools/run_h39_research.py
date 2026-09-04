@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Run H39 microstructure alpha research evaluation and generate deliverables."""
 from __future__ import annotations
 
