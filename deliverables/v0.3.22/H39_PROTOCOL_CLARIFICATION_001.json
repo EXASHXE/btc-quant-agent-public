@@ -1,0 +1,58 @@
+{
+  "schema_version": "1.0.0",
+  "clarification_id": "H39_PROTOCOL_CLARIFICATION_001",
+  "clarification_title": "H39 Baseline Specification and Reference Entry Timing Clarification",
+  "hypothesis_id": "H39_MICROSTRUCTURE_DIRECTIONAL_INFORMATION",
+  "protocol_version": "v0.3.22",
+  "protocol_freeze_sha": "0eecd8833675c664c42f5e62d89663d7a10ed5fa",
+  "preceding_implementation_review_sha": "24d30c356903b1821cd13bc1f1b77be4755d73be",
+  "audit_lineage": {
+    "gemini_post_implementation_sha": "57b7973e6e2de869c8194b206575060a1744ef04",
+    "repair_prompt_sha": "c0e8eb36af7cdb69818d0251160291c534940016"
+  },
+  "reference_entry_semantics": {
+    "decision_boundary": "Closed UTC 15m boundary (slot_ms)",
+    "decision_close_rule": "decision_close_ms = slot_ms (close timestamp of the 15m decision period)",
+    "reference_entry_rule": "OPEN of first fully available 1m bar strictly after decision close (decision_close_ms + 60_000)",
+    "reference_candle_open_ms": "decision_close_ms + 60_000",
+    "reference_price_rule": "OPEN of 1m candle starting at reference_candle_open_ms",
+    "reference_time_ms": "reference_candle_open_ms",
+    "prohibition": "Reference candle is strictly never the candle beginning at decision_close_ms",
+    "horizon_60m_target": "CLOSE of the 60th 1m candle (open_time_ms = reference_time_ms + 59 * 60_000)",
+    "horizon_240m_target": "CLOSE of the 240th 1m candle (open_time_ms = reference_time_ms + 239 * 60_000)",
+    "return_60m_formula": "(future_close_60m - reference_price) / reference_price",
+    "return_240m_formula": "(future_close_240m - reference_price) / reference_price"
+  },
+  "baseline_specification": {
+    "baseline_model": "Deterministic L2-regularized Logistic Regression / LPM for 60m direction",
+    "binary_target": "1.0 if return_60m > 0.0 else 0.0",
+    "regularization": "Fixed L2 strength equivalent to C=1.0 (lambda = 1.0), intercept unpenalized, no tuning",
+    "formula_definitions": {
+      "trailing_return_15m": "decision_close / close_15m_ago - 1.0",
+      "trailing_return_60m": "decision_close / close_60m_ago - 1.0",
+      "trailing_atr_ratio_15m": "ATR14_15m_known_at_decision / decision_close_price"
+    },
+    "source_fields_and_timeframes": {
+      "decision_close": "Close of 1m candle covering [decision_close_ms - 60_000, decision_close_ms]",
+      "close_15m_ago": "Close of 1m candle closing at decision_close_ms - 15 * 60_000",
+      "close_60m_ago": "Close of 1m candle closing at decision_close_ms - 60 * 60_000",
+      "decision_close_price": "decision_close (dollars)",
+      "ATR14_15m_known_at_decision": "14-period ATR on 15m bars known at decision time <= decision_close_ms"
+    },
+    "causality_rule": "All feature events strictly satisfy event_time_ms <= decision_close_ms and receive_time_ms <= decision_close_ms. All source candles for baseline features strictly have close timestamps <= decision_close_ms."
+  },
+  "incremental_information_testing": {
+    "nested_likelihood_ratio_statistic": "LR = 2 * (log_likelihood_full - log_likelihood_base)",
+    "lr_p_value_formula": "1.0 - math.erf(math.sqrt(max(0.0, LR) / 2.0)) for 1-df chi-square survival function",
+    "microstructure_coefficient_statistic": "z = beta_micro / sqrt(covariance[micro, micro]) where covariance = inv(X'WX + lambda*I)",
+    "one_sided_z_p_value_formula": "1.0 - 0.5 * (1.0 + math.erf(z / math.sqrt(2.0))) under predefined sign +1",
+    "candidate_eligibility_requirement": "Requires passing both primary Holm familywise gate and repaired incremental information test"
+  },
+  "contamination_attestation": {
+    "zero_fresh_60m_validation_outcomes_inspected": true,
+    "statement": "Zero fresh post-start 60m validation outcomes were inspected before this clarification manifest was committed.",
+    "validation_start_ms": 1788520500000,
+    "validation_start_utc": "2026-09-04T11:15:00Z",
+    "fresh_validation_status_at_clarification": "FORWARD_DATA_INSUFFICIENT"
+  }
+}
