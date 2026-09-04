@@ -1,0 +1,201 @@
+{
+  "schema_version": "1.0.0",
+  "hypothesis_id": "H39_MICROSTRUCTURE_DIRECTIONAL_INFORMATION",
+  "protocol_version": "v0.3.22",
+  "governance": {
+    "framework": "MULTI_MODEL_RESEARCH_GOVERNANCE",
+    "pre_freeze_audit_verdict": "ACCEPT_PROTOCOL",
+    "pre_freeze_audit_commit": "3641fbff67a75762d1757e86f4f565289bb88bf3",
+    "pre_freeze_audit_reviewer": "Gemini-3.8-Flash",
+    "post_implementation_reviewer": "ChatGPT",
+    "review_mode": "ONE_PASS_INDEPENDENT_AUDIT"
+  },
+  "temporal_partitioning": {
+    "development_microstructure_cutoff_utc": "2026-09-01T00:00:00Z",
+    "development_microstructure_cutoff_ms": 1788220800000,
+    "development_partition": "microstructure-2026-08-31.sqlite3",
+    "exclusion_buffer": {
+      "buffer_start_utc": "2026-09-01T00:00:00Z",
+      "buffer_start_ms": 1788220800000,
+      "buffer_end_utc": "2026-09-04T11:15:00Z",
+      "buffer_end_ms": 1788520500000,
+      "rule": "Exclude all observations between development cutoff and validation start from formal validation"
+    },
+    "validation_start_utc": "2026-09-04T11:15:00Z",
+    "validation_start_ms": 1788520500000,
+    "validation_start_rule": "First fully closed UTC 15m boundary at least 30 minutes after H39_PROTOCOL_FREEZE_SHA"
+  },
+  "formal_feature_universe": {
+    "family_size": 8,
+    "m6_support_determination": {
+      "status": "M6_SUPPORTED",
+      "derivation_formula": "mid = microprice / [1 + (spread_bps / 20000) * top1_imbalance]",
+      "exact_deviation_formula_bps": "(microprice - mid) / mid * 10000 == (spread_bps / 2) * top1_imbalance",
+      "source_table": "book_samples",
+      "source_fields": ["microprice", "spread_bps", "top1_imbalance"],
+      "causal_guarantee": "Closed-form algebraic identity derived strictly from contemporaneously stored L2 book metrics; no future data or candle interpolation required"
+    },
+    "features": [
+      {
+        "id": "M1_TRADE_NOTIONAL_IMBALANCE_5M",
+        "name": "Trade Notional Imbalance (5m)",
+        "window_minutes": 5,
+        "source": "agg_trades / aggregates",
+        "formula": "(buy_notional - sell_notional) / (buy_notional + sell_notional)",
+        "normalization": "Bounded ratio in [-1.0, 1.0]",
+        "predefined_sign": 1,
+        "hypothesis": "Aggressive buyer-initiated trade flow over 5m predicts positive short-term price movement"
+      },
+      {
+        "id": "M2_TRADE_NOTIONAL_IMBALANCE_15M",
+        "name": "Trade Notional Imbalance (15m)",
+        "window_minutes": 15,
+        "source": "agg_trades / aggregates",
+        "formula": "(buy_notional - sell_notional) / (buy_notional + sell_notional)",
+        "normalization": "Bounded ratio in [-1.0, 1.0]",
+        "predefined_sign": 1,
+        "hypothesis": "Persistent aggressive buyer-initiated trade flow over 15m predicts positive price movement"
+      },
+      {
+        "id": "M3_OFI_5M",
+        "name": "Order Flow Imbalance (5m)",
+        "window_minutes": 5,
+        "source": "book_samples.ofi / aggregates.ofi_sum",
+        "formula": "sum(ofi) over 5m",
+        "normalization": "sum(ofi) / (sum(abs(ofi)) + 1e-6)",
+        "predefined_sign": 1,
+        "hypothesis": "Best-level order flow imbalance over 5m predicts positive price movement"
+      },
+      {
+        "id": "M4_TOP5_DEPTH_IMBALANCE_5M",
+        "name": "Top-5 Book Depth Imbalance (5m)",
+        "window_minutes": 5,
+        "source": "book_samples.top5_imbalance",
+        "formula": "mean(top5_imbalance) over 5m",
+        "normalization": "Bounded ratio in [-1.0, 1.0]",
+        "predefined_sign": 1,
+        "hypothesis": "Resting top-5 order book bid depth exceeding ask depth over 5m predicts positive price movement"
+      },
+      {
+        "id": "M5_TOP20_DEPTH_IMBALANCE_5M",
+        "name": "Top-20 Book Depth Imbalance (5m)",
+        "window_minutes": 5,
+        "source": "book_samples.top20_imbalance",
+        "formula": "mean(top20_imbalance) over 5m",
+        "normalization": "Bounded ratio in [-1.0, 1.0]",
+        "predefined_sign": 1,
+        "hypothesis": "Resting top-20 order book bid depth exceeding ask depth over 5m predicts positive price movement"
+      },
+      {
+        "id": "M6_MICROPRICE_DEVIATION_1M",
+        "name": "Microprice Deviation from Mid (1m)",
+        "window_minutes": 1,
+        "source": "book_samples (microprice, spread_bps, top1_imbalance)",
+        "formula": "mean((microprice - mid) / mid * 10000) over 1m",
+        "normalization": "Basis points deviation",
+        "predefined_sign": 1,
+        "hypothesis": "Microprice resting above mid price over the final 1m predicts positive price movement"
+      },
+      {
+        "id": "M7_PRESSURE_AGREEMENT_SCORE",
+        "name": "Microstructure Pressure Agreement Score",
+        "window_minutes": 5,
+        "source": "M1, M3, M4, M5, M6",
+        "formula": "(sign(M1) + sign(M3) + sign(M4) + sign(M5) + sign(M6)) / 5.0",
+        "normalization": "Bounded score in [-1.0, 1.0]",
+        "predefined_sign": 1,
+        "hypothesis": "Unanimous agreement across trade flow, OFI, depth, and microprice predicts stronger directional momentum"
+      },
+      {
+        "id": "M8_PRESSURE_DIVERGENCE_SCORE",
+        "name": "Trade vs Book Pressure Divergence Score",
+        "window_minutes": 5,
+        "source": "M1, M4, M5",
+        "formula": "M1 - (M4 + M5) / 2.0",
+        "normalization": "Bounded score in [-2.0, 2.0]",
+        "predefined_sign": 1,
+        "hypothesis": "Aggressive trade flow pushing against opposing resting order book depth predicts directional breakthrough"
+      }
+    ]
+  },
+  "causal_execution_and_outcomes": {
+    "decision_boundary": "Closed UTC 15m boundary (HH:00, HH:15, HH:30, HH:45)",
+    "decision_latency_rule": "All feature events must strictly satisfy event_time_ms <= decision_ms and receive_time_ms <= decision_ms",
+    "reference_entry_rule": "OPEN of first fully available 1m bar strictly after decision close (decision_close_ms + 60_000)",
+    "primary_horizon_minutes": 60,
+    "secondary_horizon_minutes": 240,
+    "secondary_horizon_role": "SUPPORTING_ONLY (cannot rescue negative primary horizon result)",
+    "excursion_atr_rule": "ATR(14) on 15m bars frozen at decision time"
+  },
+  "baseline_model": {
+    "type": "Logistic Regression / Linear Probability Model",
+    "features": [
+      "trailing_return_15m",
+      "trailing_return_60m",
+      "trailing_atr_ratio_15m"
+    ],
+    "regularization": "L2 (C=1.0 fixed, no hyperparameter tuning)",
+    "incremental_information_test": "Likelihood ratio test and t-statistic of microstructure coefficient beyond baseline"
+  },
+  "statistical_testing_and_multiple_testing": {
+    "correction_method": "Holm-Bonferroni FWER",
+    "family_alpha": 0.05,
+    "family_size": 8,
+    "hypothesis_test": "One-sided test: H0: signed_effect <= 0 vs H1: signed_effect > 0 under frozen predefined signs",
+    "post_hoc_sign_flip_allowed": false,
+    "confidence_interval_level": 0.95
+  },
+  "data_quality_and_eligibility_gates": {
+    "required_conditions": [
+      "No sequence gap or PU continuity failure in feature window",
+      "No missing book sample interval (> 10s without sample)",
+      "No missing trade interval (> 60s without trade during active market)",
+      "Strictly causal event and receive timestamps",
+      "Database partition integrity check passing"
+    ],
+    "rejection_codes": [
+      "GAP_IN_FEATURE_WINDOW",
+      "MISSING_BOOK_COVERAGE",
+      "MISSING_TRADE_COVERAGE",
+      "TIMESTAMP_OUT_OF_ORDER",
+      "ZERO_TRADE_VOLUME",
+      "PARTITION_CORRUPTED"
+    ]
+  },
+  "sample_maturity_gates": {
+    "development": {
+      "minimum_distinct_utc_days": 5,
+      "minimum_eligible_observations": 250,
+      "insufficient_status": "DEVELOPMENT_DATA_INSUFFICIENT"
+    },
+    "fresh_forward_validation": {
+      "minimum_distinct_utc_days": 14,
+      "minimum_eligible_observations": 750,
+      "minimum_coverage_ratio": 0.90,
+      "insufficient_status": "FORWARD_DATA_INSUFFICIENT"
+    }
+  },
+  "provisional_candidate_gate": {
+    "allowed_label": "PROVISIONAL_MICROSTRUCTURE_CANDIDATE",
+    "requirements": [
+      "Fresh post-freeze validation satisfies all maturity gates",
+      "Holm-adjusted primary p-value < 0.05",
+      "Predefined sign correct",
+      "95% CI strictly excludes zero in correct direction",
+      "Statistically significant incremental value beyond price/context baseline",
+      "No single-day or single-regime dominance"
+    ],
+    "runtime_promotion_allowed": false,
+    "stop_rule": "If no feature passes or effect is negative, status is RESEARCH_FAMILY_STOP (or FORWARD_DATA_INSUFFICIENT if validation immature)"
+  },
+  "safety_invariants": {
+    "strategy": "EXPERIMENTAL",
+    "qualified_direction_engine": "NONE",
+    "runtime_maximum": "OPPORTUNITY_ONLY",
+    "execution": "DISABLED",
+    "auto_execute": false,
+    "live_trading": "NOT_AUTHORIZED",
+    "final_holdout": "SEALED",
+    "final_holdout_prohibition": "Zero rows read, zero bytes accessed"
+  }
+}
