@@ -215,7 +215,9 @@ def test_runtime_registry_unavailable_fails_closed() -> None:
 
 
 def test_legacy_research_mode_is_explicit_only() -> None:
-    transform = lambda candidate, _features: candidate
+    def transform(candidate: object, _features: object) -> object:
+        return candidate
+
     with pytest.raises(ValueError, match="explicit LEGACY_RESEARCH_V022"):
         QuantEngine(AppConfig(), research_candidate_transform=transform)
     assert (

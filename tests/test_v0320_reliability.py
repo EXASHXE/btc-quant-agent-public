@@ -6,7 +6,11 @@ from unittest.mock import MagicMock, patch
 from urllib.error import HTTPError
 
 from btc_quant_agent.config import DataConfig
-from btc_quant_agent.data.binance import BinancePublicClient, DerivativeCollection
+from btc_quant_agent.data.binance import (
+    BinanceDataError,
+    BinancePublicClient,
+    DerivativeCollection,
+)
 from btc_quant_agent.evidence_epoch import EvidenceEpochRegistry
 from btc_quant_agent.forward_diagnostics import (
     check_network_proxy,
@@ -25,9 +29,6 @@ DERIVATIVES_REGISTRY = ROOT / "configs/forward/derivatives_evidence_epochs.json"
 OPPORTUNITY_REGISTRY = ROOT / "configs/forward/opportunity_forward_campaigns.json"
 V0320_EPOCH = ROOT / "configs/forward/v0.3.20_derivatives_evidence_epoch.json"
 V0320_OPPORTUNITY = ROOT / "configs/forward/v0.3.20_opportunity_successor_campaign.json"
-
-
-from btc_quant_agent.data.binance import BinanceDataError
 
 
 def test_binance_collect_derivatives_empty_source_times_no_type_error() -> None:
