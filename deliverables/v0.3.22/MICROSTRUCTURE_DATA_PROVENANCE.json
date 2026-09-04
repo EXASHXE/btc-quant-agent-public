@@ -1,0 +1,96 @@
+{
+  "collector_campaign": "configs/forward/v0.3.15_microstructure_capture_campaign.json",
+  "collector_campaign_id": "MICROSTRUCTURE_CAPTURE_V0315_001",
+  "collector_protocol": "configs/forward/v0.3.15_microstructure_reliability_protocol.json",
+  "data_root": "data/forward/BTCUSDT/microstructure",
+  "generated_at_utc": "2026-09-04T10:46:52.487962+00:00",
+  "partitions": [
+    {
+      "counts": {
+        "agg_trades": 145100,
+        "book_samples": 175172,
+        "depth_events": 175378,
+        "gaps": 2
+      },
+      "filename": "microstructure-2026-08-31.sqlite3",
+      "integrity_check": "ok",
+      "max_event_time_ms": 1788220800502,
+      "max_event_time_utc": "2026-09-01T00:00:00.502000+00:00",
+      "min_event_time_ms": 1788202826956,
+      "min_event_time_utc": "2026-08-31T19:00:26.956000+00:00",
+      "sha256": "46002b27cfd1baa4b079b96c0c6ffbd4f48c1552f35ccf0b52ae7686e1f700ff",
+      "size_bytes": 436211712
+    },
+    {
+      "counts": {
+        "agg_trades": 1313813,
+        "book_samples": 846808,
+        "depth_events": 846830,
+        "gaps": 4
+      },
+      "filename": "microstructure-2026-09-01.sqlite3",
+      "integrity_check": "ok",
+      "max_event_time_ms": 1788307200140,
+      "max_event_time_utc": "2026-09-02T00:00:00.140000+00:00",
+      "min_event_time_ms": 1788220800598,
+      "min_event_time_utc": "2026-09-01T00:00:00.598000+00:00",
+      "sha256": "64c8651367c94ac7f184aceb8551d38b5ee1a1a1babf5322af5e02cac332aa0b",
+      "size_bytes": 2530082816
+    },
+    {
+      "counts": {
+        "agg_trades": 1059193,
+        "book_samples": 641489,
+        "depth_events": 643437,
+        "gaps": 78
+      },
+      "filename": "microstructure-2026-09-02.sqlite3",
+      "integrity_check": "ok",
+      "max_event_time_ms": 1788397049304,
+      "max_event_time_utc": "2026-09-03T00:57:29.304000+00:00",
+      "min_event_time_ms": 1788307200122,
+      "min_event_time_utc": "2026-09-02T00:00:00.122000+00:00",
+      "sha256": "d894c27113ae82eae5c959720849a0e1b0fb280c7981881f032fe7e5fd4bdfca",
+      "size_bytes": 1972334592
+    },
+    {
+      "counts": {
+        "agg_trades": 1193437,
+        "book_samples": 439666,
+        "depth_events": 690188,
+        "gaps": 20600
+      },
+      "filename": "microstructure-2026-09-03.sqlite3",
+      "integrity_check": "ok",
+      "max_event_time_ms": 1788480009286,
+      "max_event_time_utc": "2026-09-04T00:00:09.286000+00:00",
+      "min_event_time_ms": 1788397049304,
+      "min_event_time_utc": "2026-09-03T00:57:29.304000+00:00",
+      "sha256": "f6fc8ba915959d4184134331739707fdd3728516529b1edfc143d0f783ff12a3",
+      "size_bytes": 2095456256
+    },
+    {
+      "counts": {
+        "agg_trades": 532103,
+        "book_samples": 380478,
+        "depth_events": 380478,
+        "gaps": 1
+      },
+      "filename": "microstructure-2026-09-04.sqlite3",
+      "integrity_check": "ok",
+      "max_event_time_ms": 1788518822128,
+      "max_event_time_utc": "2026-09-04T10:47:02.128000+00:00",
+      "min_event_time_ms": 1788480009380,
+      "min_event_time_utc": "2026-09-04T00:00:09.380000+00:00",
+      "sha256": "a5c61b7f1581124aa4fe2fdcd2d704d044531b11773093f3a6af5e53e4a586fa",
+      "size_bytes": 998522880
+    }
+  ],
+  "partitions_count": 5,
+  "read_only_access_contract": {
+    "mode": "sqlite3_uri_ro",
+    "pragma_query_only": true,
+    "write_prohibited": true
+  },
+  "schema_version": "1.0.0"
+}

@@ -1,0 +1,99 @@
+{
+  "family_id": "H39_MICROSTRUCTURE_DIRECTIONAL_INFORMATION",
+  "family_size": 8,
+  "features": [
+    {
+      "causal_timestamp_rule": "event_time_ms <= decision_ms AND receive_time_ms <= decision_ms",
+      "formula": "(buy_notional - sell_notional) / (buy_notional + sell_notional)",
+      "hypothesis": "Aggressive buyer-initiated trade flow over 5m predicts positive short-term price movement",
+      "id": "M1_TRADE_NOTIONAL_IMBALANCE_5M",
+      "name": "Trade Notional Imbalance (5m)",
+      "normalization": "Bounded ratio in [-1.0, 1.0]",
+      "predefined_sign": 1,
+      "source": "agg_trades",
+      "window_minutes": 5
+    },
+    {
+      "causal_timestamp_rule": "event_time_ms <= decision_ms AND receive_time_ms <= decision_ms",
+      "formula": "(buy_notional - sell_notional) / (buy_notional + sell_notional)",
+      "hypothesis": "Persistent aggressive buyer-initiated trade flow over 15m predicts positive price movement",
+      "id": "M2_TRADE_NOTIONAL_IMBALANCE_15M",
+      "name": "Trade Notional Imbalance (15m)",
+      "normalization": "Bounded ratio in [-1.0, 1.0]",
+      "predefined_sign": 1,
+      "source": "agg_trades",
+      "window_minutes": 15
+    },
+    {
+      "causal_timestamp_rule": "event_time_ms <= decision_ms AND receive_time_ms <= decision_ms",
+      "formula": "sum(ofi) / (sum(abs(ofi)) + 1e-6)",
+      "hypothesis": "Best-level order flow imbalance over 5m predicts positive price movement",
+      "id": "M3_OFI_5M",
+      "name": "Order Flow Imbalance (5m)",
+      "normalization": "Bounded score in [-1.0, 1.0]",
+      "predefined_sign": 1,
+      "source": "book_samples.ofi",
+      "window_minutes": 5
+    },
+    {
+      "causal_timestamp_rule": "event_time_ms <= decision_ms AND receive_time_ms <= decision_ms",
+      "formula": "mean(top5_imbalance) over 5m",
+      "hypothesis": "Resting top-5 order book bid depth exceeding ask depth over 5m predicts positive price movement",
+      "id": "M4_TOP5_DEPTH_IMBALANCE_5M",
+      "name": "Top-5 Book Depth Imbalance (5m)",
+      "normalization": "Bounded ratio in [-1.0, 1.0]",
+      "predefined_sign": 1,
+      "source": "book_samples.top5_imbalance",
+      "window_minutes": 5
+    },
+    {
+      "causal_timestamp_rule": "event_time_ms <= decision_ms AND receive_time_ms <= decision_ms",
+      "formula": "mean(top20_imbalance) over 5m",
+      "hypothesis": "Resting top-20 order book bid depth exceeding ask depth over 5m predicts positive price movement",
+      "id": "M5_TOP20_DEPTH_IMBALANCE_5M",
+      "name": "Top-20 Book Depth Imbalance (5m)",
+      "normalization": "Bounded ratio in [-1.0, 1.0]",
+      "predefined_sign": 1,
+      "source": "book_samples.top20_imbalance",
+      "window_minutes": 5
+    },
+    {
+      "causal_timestamp_rule": "event_time_ms <= decision_ms AND receive_time_ms <= decision_ms",
+      "formula": "mean((microprice - mid) / mid * 10000) over 1m",
+      "hypothesis": "Microprice resting above mid price over the final 1m predicts positive price movement",
+      "id": "M6_MICROPRICE_DEVIATION_1M",
+      "m6_support_resolution": {
+        "closed_form_identity": "(microprice - mid) / mid * 10000 == (spread_bps / 2) * top1_imbalance",
+        "status": "M6_SUPPORTED"
+      },
+      "name": "Microprice Deviation from Mid (1m)",
+      "normalization": "Basis points deviation",
+      "predefined_sign": 1,
+      "source": "book_samples (microprice, spread_bps, top1_imbalance)",
+      "window_minutes": 1
+    },
+    {
+      "causal_timestamp_rule": "Composed strictly from contemporaneous causal primitives M1-M6",
+      "formula": "(sign(M1) + sign(M3) + sign(M4) + sign(M5) + sign(M6)) / 5.0",
+      "hypothesis": "Unanimous agreement across trade flow, OFI, depth, and microprice predicts stronger directional momentum",
+      "id": "M7_PRESSURE_AGREEMENT_SCORE",
+      "name": "Microstructure Pressure Agreement Score",
+      "normalization": "Bounded score in [-1.0, 1.0]",
+      "predefined_sign": 1,
+      "source": "M1, M3, M4, M5, M6",
+      "window_minutes": 5
+    },
+    {
+      "causal_timestamp_rule": "Composed strictly from contemporaneous causal primitives M1, M4, M5",
+      "formula": "M1 - (M4 + M5) / 2.0",
+      "hypothesis": "Aggressive trade flow pushing against opposing resting order book depth predicts directional breakthrough",
+      "id": "M8_PRESSURE_DIVERGENCE_SCORE",
+      "name": "Trade vs Book Pressure Divergence Score",
+      "normalization": "Bounded score in [-2.0, 2.0]",
+      "predefined_sign": 1,
+      "source": "M1, M4, M5",
+      "window_minutes": 5
+    }
+  ],
+  "schema_version": "1.0.0"
+}

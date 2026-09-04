@@ -1,0 +1,27 @@
+{
+  "accumulation_progress": {
+    "coverage_ratio_accumulated": 0.0,
+    "coverage_ratio_required": 0.9,
+    "distinct_days_accumulated": 0,
+    "distinct_days_required": 14,
+    "eligible_slots_accumulated": 0,
+    "eligible_slots_required": 750,
+    "maturity_achieved": false
+  },
+  "active_verdict": "FORWARD_DATA_INSUFFICIENT",
+  "candidate_promotion_allowed": false,
+  "engineering_acceptance_blocked": false,
+  "exclusion_buffer": {
+    "end_utc": "2026-09-04T11:15:00Z",
+    "rule": "Strict temporal isolation between development cutoff and validation start",
+    "start_utc": "2026-09-01T00:00:00Z"
+  },
+  "execution": "DISABLED",
+  "fresh_partitions": [],
+  "hypothesis_id": "H39_MICROSTRUCTURE_DIRECTIONAL_INFORMATION",
+  "runtime_maximum": "OPPORTUNITY_ONLY",
+  "stage": "FRESH_FORWARD_VALIDATION",
+  "status": "FORWARD_DATA_INSUFFICIENT",
+  "validation_start_ms": 1788520500000,
+  "validation_start_utc": "2026-09-04T11:15:00Z"
+}

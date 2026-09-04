@@ -227,6 +227,28 @@ def build_parser() -> argparse.ArgumentParser:
             default="configs/forward/v0.3.15_microstructure_capture_campaign.json",
         )
 
+    micro_research = sub.add_parser(
+        "microstructure-research", help="H39 causal microstructure alpha research and diagnostics"
+    )
+    micro_res_sub = micro_research.add_subparsers(
+        dest="microstructure_research_command", required=True
+    )
+    h39_run = micro_res_sub.add_parser(
+        "run-h39", help="run H39 evaluation and generate deliverables"
+    )
+    h39_run.add_argument(
+        "--protocol", default="configs/research/v0.3.22_microstructure_h39_protocol.json"
+    )
+    h39_run.add_argument(
+        "--microstructure-root", default="data/forward/BTCUSDT/microstructure"
+    )
+    h39_run.add_argument(
+        "--opportunity-store", default="data/forward/BTCUSDT/opportunity_shadow.sqlite3"
+    )
+    h39_run.add_argument(
+        "--output-dir", default="deliverables/v0.3.22"
+    )
+
     registry = sub.add_parser("research-registry", help="inspect research eligibility")
     registry.add_argument(
         "--registry", default="configs/research_registry.json", help="registry JSON path"
@@ -663,6 +685,18 @@ def main(argv: list[str] | None = None) -> int:
             }
         _print(report)
         return 0
+    if args.command == "microstructure-research":
+        from .microstructure_research import generate_all_v0322_deliverables
+
+        if args.microstructure_research_command == "run-h39":
+            res = generate_all_v0322_deliverables(
+                output_dir=args.output_dir,
+                microstructure_root=args.microstructure_root,
+                opportunity_store_path=args.opportunity_store,
+            )
+            _print({"status": "SUCCESS", "deliverables": res})
+            return 0
+        return 1
     if args.command == "build-official-dataset":
         if hasattr(os, "nice"):
             try:
