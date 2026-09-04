@@ -992,6 +992,12 @@ def collect_opportunity_once(
     scheduled_slot = (started // CADENCE_MS) * CADENCE_MS
     if campaign.has_data_quality_gate and scheduled_slot < campaign.campaign_start_ms:
         raise ValueError("successor campaign has not reached its frozen start")
+    if campaign.has_data_quality_gate:
+        quality = store.data_quality_metrics(campaign, now_ms=started)
+        if quality["terminal_failure"]:
+            raise ValueError(
+                f"cannot collect for terminal campaign {campaign.campaign_id}: data quality gate breached"
+            )
     registry = ResearchRegistry.load()
     if registry.registry_version != campaign.registry_version:
         raise ValueError("campaign registry version mismatch; start a new campaign")
@@ -1131,6 +1137,12 @@ def resolve_opportunity_outcomes(
     now_ms: int | None = None,
 ) -> dict[str, Any]:
     now = now_ms or int(time.time() * 1_000)
+    if campaign.has_data_quality_gate:
+        quality = store.data_quality_metrics(campaign, now_ms=now)
+        if quality["terminal_failure"]:
+            raise ValueError(
+                f"cannot resolve outcomes for terminal campaign {campaign.campaign_id}: data quality gate breached"
+            )
     resolved = failed = 0
     errors: list[str] = []
     for observation, horizon in store.unresolved(campaign.campaign_id, now):

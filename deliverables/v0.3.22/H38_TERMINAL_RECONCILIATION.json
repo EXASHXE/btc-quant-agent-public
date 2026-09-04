@@ -1,0 +1,54 @@
+{
+  "schema_version": "1.0.0",
+  "reconciliation_id": "H38_TERMINAL_RECONCILIATION_001",
+  "campaign_id": "OPPORTUNITY_FORWARD_V0321_20260903T180000Z",
+  "hypothesis_id": "H38_OPPORTUNITY_FORWARD_REPLICATION_LOCAL_RECOVERY",
+  "protocol_config": "configs/forward/v0.3.21_opportunity_successor_campaign.json",
+  "registry_path": "configs/forward/opportunity_forward_campaigns.json",
+  "data_quality_gate": {
+    "maximum_consecutive_missed_decision_slots": 4,
+    "observed_consecutive_missed_decision_slots": 10,
+    "gate_status": "IRREVERSIBLY_BREACHED",
+    "breach_rule": "The 5th consecutive missed decision slot triggers irreversible terminal failure"
+  },
+  "terminal_transition": {
+    "previous_status": "PREREGISTERED_PENDING",
+    "new_status": "DATA_QUALITY_TERMINAL_ARCHIVE",
+    "formal_role": "DATA_QUALITY_TERMINAL_ARCHIVE",
+    "terminal_reason": "frozen consecutive missed-decision-slot gate breached",
+    "terminal_at_ms": 1788511500000,
+    "terminal_at_utc": "2026-09-04T08:45:00Z",
+    "immutable_history": true,
+    "superseded_by": null
+  },
+  "empirical_evidence": {
+    "database_path": "data/forward/BTCUSDT/opportunity_shadow.sqlite3",
+    "total_scan_rows_in_campaign": 76,
+    "first_missed_slot_ms": 1788507900000,
+    "first_missed_slot_utc": "2026-09-04T07:45:00Z",
+    "fifth_missed_slot_ms": 1788511500000,
+    "fifth_missed_slot_utc": "2026-09-04T08:45:00Z",
+    "streak_end_slot_ms": 1788516000000,
+    "streak_end_utc": "2026-09-04T10:00:00Z",
+    "total_consecutive_missed_slots": 10,
+    "root_cause": "BinanceDataError: Binance public data request failed [CONNECTION_RESET]: <urlopen error [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1000)>",
+    "retrospective_backfill_attempted": false,
+    "historical_rows_deleted_or_rewritten": false
+  },
+  "operational_impact": {
+    "opportunity_scheduler_behavior": "INACTIVE_FAIL_CLOSED",
+    "opportunity_resolver_behavior": "TERMINAL_EXCLUDED",
+    "derivatives_successor_status": "ACTIVE_ACCUMULATING",
+    "microstructure_capture_status": "ACTIVE_ACCUMULATING",
+    "h39_research_validation_status": "ACCUMULATING_INDEPENDENTLY",
+    "new_opportunity_successor_preregistered": false
+  },
+  "safety_invariants": {
+    "strategy": "EXPERIMENTAL",
+    "qualified_direction_engine": "NONE",
+    "runtime_maximum": "OPPORTUNITY_ONLY",
+    "execution": "DISABLED",
+    "auto_execute": false,
+    "final_holdout": "SEALED"
+  }
+}

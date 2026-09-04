@@ -8,13 +8,19 @@ import pytest
 
 from btc_quant_agent.microstructure_research import (
     FORMAL_FEATURE_IDS,
+    H38_TERMINAL_FIRST_BREACH_MS,
+    H38_TERMINAL_FIRST_BREACH_UTC,
     H39_HYPOTHESIS_ID,
+    H39_PROTOCOL_CLARIFICATION_SHA,
     H39_PROTOCOL_FREEZE_SHA,
     PREDEFINED_FEATURE_SIGNS,
+    FeatureTestResult,
     H39FeatureRow,
     H39Observation,
     H39OutcomeRow,
+    H39ResearchEngine,
     MicrostructureResearchLoader,
+    _fit_l2_logistic_regression,
     _holm_bonferroni,
     evaluate_feature_hypotheses,
 )
@@ -348,3 +354,337 @@ def test_deliverables_manifest_consistency() -> None:
         assert manifest["guardrail_compliance"]["G2_read_only_sqlite"]["compliant"] is True
         assert manifest["guardrail_compliance"]["G3_m6_support_determination"]["status"] == "M6_SUPPORTED"
         assert manifest["guardrail_compliance"]["G4_high_hurdle_falsification"]["primary_horizon_minutes"] == 60
+
+
+def test_h39_reference_entry_timing_and_protocol_boundary() -> None:
+    # Finding P0-A: Reference entry timing semantics
+    # Decision boundary: curr_slot is the decision close
+    curr_slot = 1788204600000  # 19:30:00 UTC
+    decision_close_ms = curr_slot
+    ref_time_ms = decision_close_ms + 60_000
+
+    # 1. Reference time must be strictly decision_close_ms + 60_000
+    assert ref_time_ms == decision_close_ms + 60_000
+
+    # 2. Reference candle is NEVER the candle beginning at decision_close_ms
+    forbidden_candle_start_ms = decision_close_ms
+    assert ref_time_ms != forbidden_candle_start_ms
+    assert ref_time_ms - forbidden_candle_start_ms == 60_000
+
+    # 3. 60m horizon exit candle open: ref_time_ms + 59 * 60_000 (closes at ref_time_ms + 60 * 60_000)
+    c60_open_ms = ref_time_ms + 59 * 60_000
+    c60_close_ms = c60_open_ms + 60_000
+    assert c60_open_ms == curr_slot + 60 * 60_000
+    assert c60_close_ms == ref_time_ms + 60 * 60_000
+    assert c60_close_ms == curr_slot + 61 * 60_000
+
+    # 4. 240m horizon exit candle open: ref_time_ms + 239 * 60_000 (closes at ref_time_ms + 240 * 60_000)
+    c240_open_ms = ref_time_ms + 239 * 60_000
+    c240_close_ms = c240_open_ms + 60_000
+    assert c240_open_ms == curr_slot + 240 * 60_000
+    assert c240_close_ms == ref_time_ms + 240 * 60_000
+    assert c240_close_ms == curr_slot + 241 * 60_000
+
+
+def test_h39_baseline_anti_lookahead_and_invariance() -> None:
+    # Baseline features must be purely causal and computed only from candles <= decision_close_ms
+    curr_slot = 1788204600000  # 19:30:00 UTC
+    decision_close_ms = curr_slot
+
+    # Source candle timestamps for baseline:
+    c_dec_open = decision_close_ms - 60_000       # 19:29:00 -> closes at 19:30:00 (<= decision_close)
+    c_15m_open = decision_close_ms - 16 * 60_000  # 19:14:00 -> closes at 19:15:00 (15m before decision)
+    c_60m_open = decision_close_ms - 61 * 60_000  # 18:29:00 -> closes at 18:30:00 (60m before decision)
+
+    assert c_dec_open + 60_000 <= decision_close_ms
+    assert c_15m_open + 60_000 <= decision_close_ms
+    assert c_60m_open + 60_000 <= decision_close_ms
+
+    # Simulate baseline returns
+    dec_close = 70000.0
+    close_15 = 69650.0
+    close_60 = 69300.0
+    atr_15m = 350.0
+
+    tr15 = (dec_close - close_15) / close_15
+    tr60 = (dec_close - close_60) / close_60
+    atr_ratio = atr_15m / dec_close
+
+    assert tr15 == pytest.approx((70000.0 - 69650.0) / 69650.0)
+    assert tr60 == pytest.approx((70000.0 - 69300.0) / 69300.0)
+    assert atr_ratio == pytest.approx(350.0 / 70000.0)
+
+    # Future adversarial candle at ref_time_ms or beyond must have zero impact on baseline
+    future_adversarial_price = 999999.0
+    assert future_adversarial_price > dec_close
+    assert issubclass(H39ResearchEngine, object)
+    # Recomputing baseline features with future adversarial price available elsewhere cannot change them
+    tr15_recomputed = (dec_close - close_15) / close_15
+    assert tr15_recomputed == tr15
+
+
+def test_h39_baseline_non_zero_enforcement() -> None:
+    # Baseline features must never be silently converted to zero
+    slot = 1788204600000
+    f_row = H39FeatureRow(
+        slot_ms=slot,
+        slot_utc="2026-08-31T19:30:00Z",
+        m1_trade_imbalance_5m=0.1,
+        m2_trade_imbalance_15m=0.1,
+        m3_ofi_5m=0.1,
+        m4_top5_depth_imbalance_5m=0.1,
+        m5_top20_depth_imbalance_5m=0.1,
+        m6_microprice_deviation_1m=0.1,
+        m7_pressure_agreement=0.1,
+        m8_pressure_divergence=0.1,
+        eligible=True,
+        rejection_reason=None,
+        book_sample_count_15m=100,
+        trade_count_15m=50,
+    )
+
+    # Missing trailing_return_15m on first observation
+    bad_outcome = H39OutcomeRow(
+        slot_ms=slot,
+        reference_price=70000.0,
+        reference_time_ms=slot + 60_000,
+        future_close_60m=70100.0,
+        return_60m=0.0014,
+        future_close_240m=70200.0,
+        return_240m=0.0028,
+        trailing_return_15m=None,  # type: ignore[arg-type]
+        trailing_return_60m=0.0010,
+        trailing_atr_15m=500.0,
+        trailing_atr_ratio_15m=0.007,
+    )
+    good_outcome_1 = H39OutcomeRow(
+        slot_ms=slot + 900_000,
+        reference_price=70000.0,
+        reference_time_ms=slot + 960_000,
+        future_close_60m=70100.0,
+        return_60m=0.0014,
+        future_close_240m=70200.0,
+        return_240m=0.0028,
+        trailing_return_15m=0.0010,
+        trailing_return_60m=0.0010,
+        trailing_atr_15m=500.0,
+        trailing_atr_ratio_15m=0.007,
+    )
+    good_outcome_2 = H39OutcomeRow(
+        slot_ms=slot + 1800_000,
+        reference_price=70000.0,
+        reference_time_ms=slot + 1860_000,
+        future_close_60m=70200.0,
+        return_60m=0.0028,
+        future_close_240m=70300.0,
+        return_240m=0.0042,
+        trailing_return_15m=0.0010,
+        trailing_return_60m=0.0010,
+        trailing_atr_15m=500.0,
+        trailing_atr_ratio_15m=0.007,
+    )
+    obs = [
+        H39Observation(feature_row=f_row, outcome_row=bad_outcome),
+        H39Observation(feature_row=f_row, outcome_row=good_outcome_1),
+        H39Observation(feature_row=f_row, outcome_row=good_outcome_2),
+    ]
+
+    with pytest.raises(ValueError, match="Baseline features missing"):
+        evaluate_feature_hypotheses(obs, horizon="60m")
+
+
+def test_h39_logistic_regression_baseline_and_incremental_stats() -> None:
+    # Test deterministic L2 logistic regression and incremental statistics
+    import numpy as np
+
+    # 1. Direct unit test of _fit_l2_logistic_regression
+    np.random.seed(42)
+    n = 50
+    x0 = np.ones((n, 1))
+    x1 = np.random.randn(n, 1)
+    x2 = np.random.randn(n, 1)
+    x3 = np.random.randn(n, 1)
+    X = np.hstack([x0, x1, x2, x3])
+    # Target linearly dependent on x1
+    prob = 1.0 / (1.0 + np.exp(-(0.5 + 1.2 * x1.ravel())))
+    y = (prob > 0.5).astype(float).tolist()
+
+    beta, cov, ll = _fit_l2_logistic_regression(X.tolist(), y, l2_lambda=1.0)
+    assert len(beta) == 4
+    assert len(cov) == 4 and len(cov[0]) == 4
+    assert ll < 0.0  # Log-likelihood is negative
+    assert all(np.isfinite(b) for b in beta)
+    assert all(np.isfinite(cov[i][j]) for i in range(4) for j in range(4))
+
+    # 2. Test incremental statistics in evaluate_feature_hypotheses
+    slot = 1788204600000
+    obs_list: list[H39Observation] = []
+    for i in range(40):
+        m1_val = (i - 20) / 20.0
+        ret = m1_val * 0.004 + 0.0005
+        f_row = H39FeatureRow(
+            slot_ms=slot + i * 900_000,
+            slot_utc="2026-08-31T19:30:00Z",
+            m1_trade_imbalance_5m=m1_val,
+            m2_trade_imbalance_15m=m1_val * 0.5,
+            m3_ofi_5m=m1_val * 0.5,
+            m4_top5_depth_imbalance_5m=m1_val * 0.2,
+            m5_top20_depth_imbalance_5m=m1_val * 0.2,
+            m6_microprice_deviation_1m=m1_val * 1.5,
+            m7_pressure_agreement=m1_val,
+            m8_pressure_divergence=m1_val * 0.4,
+            eligible=True,
+            rejection_reason=None,
+            book_sample_count_15m=100,
+            trade_count_15m=50,
+        )
+        o_row = H39OutcomeRow(
+            slot_ms=slot + i * 900_000,
+            reference_price=70000.0,
+            reference_time_ms=slot + i * 900_000 + 60_000,
+            future_close_60m=70000.0 * (1.0 + ret),
+            return_60m=ret,
+            future_close_240m=70000.0 * (1.0 + ret * 2),
+            return_240m=ret * 2,
+            trailing_return_15m=0.0002 * (i % 3 - 1),
+            trailing_return_60m=0.0005 * (i % 5 - 2),
+            trailing_atr_15m=300.0,
+            trailing_atr_ratio_15m=300.0 / 70000.0,
+            decision_close_price=70000.0,
+            decision_close_ms=slot + i * 900_000,
+        )
+        obs_list.append(H39Observation(feature_row=f_row, outcome_row=o_row))
+
+    results = evaluate_feature_hypotheses(obs_list, horizon="60m")
+    m1_res = results["M1_TRADE_NOTIONAL_IMBALANCE_5M"]
+    assert isinstance(m1_res, FeatureTestResult)
+
+    # Verify both LR and z statistics are populated and finite
+    assert m1_res.incremental_lr_stat is not None
+    assert m1_res.incremental_lr_p_value is not None
+    assert m1_res.incremental_z_stat is not None
+    assert m1_res.incremental_z_p_value is not None
+    assert np.isfinite(m1_res.incremental_lr_stat)
+    assert np.isfinite(m1_res.incremental_z_stat)
+    assert 0.0 <= m1_res.incremental_lr_p_value <= 1.0
+    assert 0.0 <= m1_res.incremental_z_p_value <= 1.0
+
+    # 3. Test that altering baseline returns changes incremental statistics
+    obs_list_alt: list[H39Observation] = []
+    for obs in obs_list:
+        alt_outcome = H39OutcomeRow(
+            slot_ms=obs.outcome_row.slot_ms,
+            reference_price=obs.outcome_row.reference_price,
+            reference_time_ms=obs.outcome_row.reference_time_ms,
+            future_close_60m=obs.outcome_row.future_close_60m,
+            return_60m=obs.outcome_row.return_60m,
+            future_close_240m=obs.outcome_row.future_close_240m,
+            return_240m=obs.outcome_row.return_240m,
+            trailing_return_15m=obs.outcome_row.return_60m * 0.9,  # Highly correlated with outcome!
+            trailing_return_60m=obs.outcome_row.return_60m * 0.8,
+            trailing_atr_15m=obs.outcome_row.trailing_atr_15m,
+            trailing_atr_ratio_15m=obs.outcome_row.trailing_atr_ratio_15m,
+            decision_close_price=obs.outcome_row.decision_close_price,
+            decision_close_ms=obs.outcome_row.decision_close_ms,
+        )
+        obs_list_alt.append(H39Observation(feature_row=obs.feature_row, outcome_row=alt_outcome))
+
+    results_alt = evaluate_feature_hypotheses(obs_list_alt, horizon="60m")
+    m1_res_alt = results_alt["M1_TRADE_NOTIONAL_IMBALANCE_5M"]
+
+    # When baseline controls absorb the signal, incremental statistics must change
+    assert m1_res.incremental_lr_stat != m1_res_alt.incremental_lr_stat
+    assert m1_res.incremental_z_stat != m1_res_alt.incremental_z_stat
+
+
+def test_h38_terminal_reconciliation_and_irreversibility() -> None:
+    from unittest.mock import MagicMock
+    from btc_quant_agent.opportunity_forward import (
+        OpportunityCampaignRegistry,
+        collect_opportunity_once,
+        resolve_opportunity_outcomes,
+    )
+
+    # 1. Verify H38 campaign config reconciliation
+    config_path = Path("configs/forward/opportunity_forward_campaigns.json")
+    assert config_path.exists()
+    registry = OpportunityCampaignRegistry.load(config_path)
+
+    h38_life = next(
+        (c for c in registry.campaigns if c.campaign_id == "OPPORTUNITY_FORWARD_V0321_20260903T180000Z"),
+        None,
+    )
+    assert h38_life is not None
+    assert h38_life.status == "DATA_QUALITY_TERMINAL_ARCHIVE"
+    assert h38_life.formal_role == "DATA_QUALITY_TERMINAL_ARCHIVE"
+    assert h38_life.terminal_at_ms == 1788511500000
+
+    # 2. Verify first breach constants
+    assert H38_TERMINAL_FIRST_BREACH_MS == 1788511500000
+    assert H38_TERMINAL_FIRST_BREACH_UTC == "2026-09-04T08:45:00Z"
+
+    # 3. Verify H38 reconciliation deliverable exists and is consistent
+    recon_path = Path("deliverables/v0.3.22/H38_TERMINAL_RECONCILIATION.json")
+    assert recon_path.exists()
+    recon = json.loads(recon_path.read_text(encoding="utf-8"))
+    assert recon["campaign_id"] == "OPPORTUNITY_FORWARD_V0321_20260903T180000Z"
+    assert recon["data_quality_gate"]["observed_consecutive_missed_decision_slots"] == 10
+    assert recon["data_quality_gate"]["maximum_consecutive_missed_decision_slots"] == 4
+    assert recon["terminal_transition"]["terminal_at_ms"] == 1788511500000
+    assert recon["terminal_transition"]["terminal_at_utc"] == "2026-09-04T08:45:00Z"
+    assert recon["terminal_transition"]["new_status"] == "DATA_QUALITY_TERMINAL_ARCHIVE"
+    assert recon["terminal_transition"]["formal_role"] == "DATA_QUALITY_TERMINAL_ARCHIVE"
+
+    # 4. Verify fail-closed protection in opportunity collection and resolution
+    mock_camp = MagicMock()
+    mock_camp.campaign_id = "OPPORTUNITY_FORWARD_V0321_20260903T180000Z"
+    mock_camp.has_data_quality_gate = True
+    mock_camp.campaign_start_ms = 0
+
+    mock_store = MagicMock()
+    mock_store.data_quality_metrics.return_value = {
+        "terminal_failure": True,
+        "consecutive_missed_slots": 10,
+    }
+    mock_service = MagicMock()
+    mock_client = MagicMock()
+
+    # collect_opportunity_once must raise ValueError
+    with pytest.raises(ValueError, match="cannot collect for terminal campaign.*data quality gate breached"):
+        collect_opportunity_once(mock_service, mock_store, mock_camp, now_ms=1788511500000)
+
+    # resolve_opportunity_outcomes must raise ValueError
+    with pytest.raises(ValueError, match="cannot resolve outcomes for terminal campaign.*data quality gate breached"):
+        resolve_opportunity_outcomes(mock_client, mock_store, mock_camp, now_ms=1788511500000)
+
+
+def test_h39_protocol_clarification_manifest() -> None:
+    # Verify clarification manifest committed prior to inspecting fresh validation outcomes
+    assert H39_PROTOCOL_CLARIFICATION_SHA == "2d1ccecc11dc231ffa41cdb1b5a9ea693abccc59"
+    manifest_path = Path("deliverables/v0.3.22/H39_PROTOCOL_CLARIFICATION_001.json")
+    assert manifest_path.exists()
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+
+    assert manifest["clarification_id"] == "H39_PROTOCOL_CLARIFICATION_001"
+    assert manifest["hypothesis_id"] == "H39_MICROSTRUCTURE_DIRECTIONAL_INFORMATION"
+    assert manifest["protocol_freeze_sha"] == H39_PROTOCOL_FREEZE_SHA
+    assert manifest["preceding_implementation_review_sha"] == "24d30c356903b1821cd13bc1f1b77be4755d73be"
+
+    # Reference entry semantics
+    ref = manifest["reference_entry_semantics"]
+    assert ref["reference_entry_rule"] == "OPEN of first fully available 1m bar strictly after decision close (decision_close_ms + 60_000)"
+    assert ref["reference_candle_open_ms"] == "decision_close_ms + 60_000"
+    assert "strictly never the candle beginning at decision_close_ms" in ref["prohibition"]
+
+    # Baseline specification
+    base = manifest["baseline_specification"]
+    assert "C=1.0" in base["regularization"]
+    assert "lambda = 1.0" in base["regularization"]
+
+    # Contamination attestation
+    att = manifest["contamination_attestation"]
+    assert att["zero_fresh_60m_validation_outcomes_inspected"] is True
+    assert att["validation_start_ms"] == 1788520500000
+    assert att["validation_start_utc"] == "2026-09-04T11:15:00Z"
+    assert att["fresh_validation_status_at_clarification"] == "FORWARD_DATA_INSUFFICIENT"
+

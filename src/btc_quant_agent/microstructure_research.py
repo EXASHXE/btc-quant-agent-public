@@ -10,13 +10,21 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
+import numpy as np
+
 from .config import DataConfig
 from .data.binance import BinancePublicClient
 
 H39_HYPOTHESIS_ID = "H39_MICROSTRUCTURE_DIRECTIONAL_INFORMATION"
 H39_PROTOCOL_VERSION = "v0.3.22"
 H39_PROTOCOL_FREEZE_SHA = "0eecd8833675c664c42f5e62d89663d7a10ed5fa"
+H39_CLARIFICATION_SHA = "2d1ccecc11dc231ffa41cdb1b5a9ea693abccc59"
+H39_PROTOCOL_CLARIFICATION_SHA = H39_CLARIFICATION_SHA
 H39_PROTOCOL_PATH = "configs/research/v0.3.22_microstructure_h39_protocol.json"
+H39_CANONICAL_CANDLES_PATH = "data/forward/BTCUSDT/h39_canonical_1m_candles.sqlite3"
+
+H38_TERMINAL_FIRST_BREACH_MS = 1788511500000
+H38_TERMINAL_FIRST_BREACH_UTC = "2026-09-04T08:45:00Z"
 
 FORMAL_FEATURE_IDS: tuple[str, ...] = (
     "M1_TRADE_NOTIONAL_IMBALANCE_5M",
@@ -93,6 +101,9 @@ class H39OutcomeRow:
     trailing_return_15m: float | None
     trailing_return_60m: float | None
     trailing_atr_15m: float | None
+    trailing_atr_ratio_15m: float | None = None
+    decision_close_price: float | None = None
+    decision_close_ms: int | None = None
 
 
 @dataclass(frozen=True)
@@ -118,6 +129,10 @@ class FeatureTestResult:
     incremental_t_stat: float | None
     incremental_p_value: float | None
     passes_primary_gate: bool
+    incremental_lr_stat: float | None = None
+    incremental_lr_p_value: float | None = None
+    incremental_z_stat: float | None = None
+    incremental_z_p_value: float | None = None
 
 
 def _normal_cdf(x: float) -> float:
@@ -222,6 +237,67 @@ def _ols_linear_regression(
         t_stats[i] = beta[i] / std_err if std_err > 0 else 0.0
 
     return beta, se, t_stats
+
+
+def _fit_l2_logistic_regression(
+    x_matrix: Sequence[Sequence[float]],
+    y_vector: Sequence[float],
+    l2_lambda: float = 1.0,
+    max_iter: int = 50,
+    tol: float = 1e-9,
+) -> tuple[list[float], list[list[float]], float]:
+    """Fit deterministic L2 regularized logistic regression via Newton-Raphson.
+
+    Target y in {0.0, 1.0} for future direction. Intercept at column 0 is unpenalized.
+    L2 penalty strength lambda=1.0 corresponds to C=1.0 with no hyperparameter tuning.
+    Returns (beta, covariance_matrix, log_likelihood).
+    """
+    n = len(y_vector)
+    if n == 0 or len(x_matrix) != n:
+        return [], [], 0.0
+    k = len(x_matrix[0])
+    y_sum = sum(y_vector)
+    if y_sum == 0.0 or y_sum == float(n):
+        return [0.0] * k, [[0.0] * k for _ in range(k)], 0.0
+
+    X = np.array(x_matrix, dtype=np.float64)
+    y = np.array(y_vector, dtype=np.float64)
+
+    beta = np.zeros(k, dtype=np.float64)
+    penalty_diag = np.full(k, l2_lambda, dtype=np.float64)
+    penalty_diag[0] = 0.0  # Intercept unpenalized
+    Lambda = np.diag(penalty_diag)
+
+    for _ in range(max_iter):
+        logits = np.clip(X @ beta, -30.0, 30.0)
+        p = 1.0 / (1.0 + np.exp(-logits))
+        p = np.clip(p, 1e-12, 1.0 - 1e-12)
+        w = p * (1.0 - p)
+        grad = X.T @ (y - p) - penalty_diag * beta
+        XtWX = (X.T * w) @ X
+        H_neg = XtWX + Lambda
+        try:
+            delta = np.linalg.solve(H_neg, grad)
+        except np.linalg.LinAlgError:
+            H_neg += np.eye(k) * 1e-6
+            delta = np.linalg.solve(H_neg, grad)
+        beta += delta
+        if float(np.max(np.abs(delta))) < tol:
+            break
+
+    logits = np.clip(X @ beta, -30.0, 30.0)
+    p = 1.0 / (1.0 + np.exp(-logits))
+    p = np.clip(p, 1e-12, 1.0 - 1e-12)
+    w = p * (1.0 - p)
+    XtWX = (X.T * w) @ X
+    H_neg = XtWX + Lambda
+    try:
+        cov_np = np.linalg.inv(H_neg)
+    except np.linalg.LinAlgError:
+        cov_np = np.linalg.pinv(H_neg)
+
+    log_lik = float(np.sum(y * np.log(p) + (1.0 - y) * np.log(1.0 - p)))
+    return beta.tolist(), cov_np.tolist(), log_lik
 
 
 class MicrostructureResearchLoader:
@@ -457,6 +533,10 @@ def evaluate_feature_hypotheses(
                 incremental_t_stat=None,
                 incremental_p_value=None,
                 passes_primary_gate=False,
+                incremental_lr_stat=None,
+                incremental_lr_p_value=None,
+                incremental_z_stat=None,
+                incremental_z_p_value=None,
             )
         return results
 
@@ -464,26 +544,37 @@ def evaluate_feature_hypotheses(
         obs.outcome_row.return_60m if horizon == "60m" else obs.outcome_row.return_240m
         for obs in valid_obs
     ]
-    # Ensure y is list of float
     y_vec = [float(val) for val in y if val is not None]
 
-    # Baseline features matrix: [1.0, ret15, ret60, atr15]
-    baseline_x = [
-        [
-            1.0,
-            float(obs.outcome_row.trailing_return_15m or 0.0),
-            float(obs.outcome_row.trailing_return_60m or 0.0),
-            float(obs.outcome_row.trailing_atr_15m or 0.0),
-        ]
-        for obs in valid_obs
-    ]
+    # Binary future direction target: 1.0 if return > 0.0 else 0.0
+    y_dir = [1.0 if val > 0.0 else 0.0 for val in y_vec]
+
+    # Enforce non-None baseline features (never silently converted to zero)
+    baseline_x: list[list[float]] = []
+    for obs in valid_obs:
+        tr15 = obs.outcome_row.trailing_return_15m
+        tr60 = obs.outcome_row.trailing_return_60m
+        atr_ratio = obs.outcome_row.trailing_atr_ratio_15m
+        if atr_ratio is None:
+            ref_p = obs.outcome_row.decision_close_price or obs.outcome_row.reference_price
+            if ref_p and obs.outcome_row.trailing_atr_15m is not None:
+                atr_ratio = obs.outcome_row.trailing_atr_15m / ref_p
+        if tr15 is None or tr60 is None or atr_ratio is None:
+            raise ValueError(
+                f"Baseline features missing for slot {obs.feature_row.slot_ms}: "
+                f"trailing_return_15m, trailing_return_60m, and trailing_atr_ratio_15m must all be computed"
+            )
+        baseline_x.append([1.0, float(tr15), float(tr60), float(atr_ratio)])
+
+    # Fit deterministic baseline L2 logistic model (C=1.0 equivalent)
+    b_base, c_base, ll_base = _fit_l2_logistic_regression(baseline_x, y_dir, l2_lambda=1.0)
 
     raw_results: dict[str, dict[str, Any]] = {}
     p_raw_list: list[float] = []
 
     for fid in FORMAL_FEATURE_IDS:
         x_vals = [obs.feature_row.feature_vector()[fid] for obs in valid_obs]
-        # Standard OLS of y on x: [1.0, x]
+        # Standard univariate OLS of y on x: [1.0, x]
         x_mat = [[1.0, xv] for xv in x_vals]
         beta, se, t_stats = _ols_linear_regression(x_mat, y_vec, l2_lambda=0.0)
 
@@ -498,11 +589,19 @@ def evaluate_feature_hypotheses(
         ci_lower = slope - 1.96 * slope_se
         ci_upper = slope + 1.96 * slope_se
 
-        # Baseline incremental regression: [1.0, ret15, ret60, atr15, feature]
+        # Full incremental model: [1.0, ret15, ret60, atr_ratio, feature]
         full_x = [baseline_x[idx] + [x_vals[idx]] for idx in range(n)]
-        _, _, full_t = _ols_linear_regression(full_x, y_vec, l2_lambda=1.0)
-        inc_t = full_t[4] if len(full_t) > 4 else None
-        inc_p = _one_sided_p_value(inc_t) if inc_t is not None else None
+        b_full, c_full, ll_full = _fit_l2_logistic_regression(full_x, y_dir, l2_lambda=1.0)
+
+        # Nested LR test: LR = 2 * (ll_full - ll_base)
+        lr_stat = max(0.0, 2.0 * (ll_full - ll_base))
+        lr_p = max(0.0, min(1.0, 1.0 - math.erf(math.sqrt(lr_stat / 2.0))))
+
+        # Microstructure coefficient z-statistic
+        beta_micro = b_full[4] if len(b_full) > 4 else 0.0
+        se_micro = math.sqrt(max(1e-15, c_full[4][4])) if len(c_full) > 4 else 1.0
+        z_stat = beta_micro / se_micro if se_micro > 0 else 0.0
+        z_p = _one_sided_p_value(z_stat)
 
         raw_results[fid] = {
             "effect": slope,
@@ -511,8 +610,12 @@ def evaluate_feature_hypotheses(
             "p_raw": p_raw,
             "ci_lower": ci_lower,
             "ci_upper": ci_upper,
-            "inc_t": inc_t,
-            "inc_p": inc_p,
+            "inc_t": z_stat,
+            "inc_p": lr_p,
+            "inc_lr_stat": lr_stat,
+            "inc_lr_p": lr_p,
+            "inc_z_stat": z_stat,
+            "inc_z_p": z_p,
         }
 
     # Apply Holm-Bonferroni correction across full formal family of 8 features
@@ -527,11 +630,17 @@ def evaluate_feature_hypotheses(
         ci_excludes = (
             (res["ci_lower"] > 0) if sign_expected == 1 else (res["ci_upper"] < 0)
         )
+        passes_incremental = (
+            res["inc_lr_p"] is not None
+            and res["inc_lr_p"] < 0.05
+            and res["inc_z_stat"] is not None
+            and res["inc_z_stat"] > 0
+        )
         passes_primary = (
             sign_correct
             and p_holm < 0.05
             and ci_excludes
-            and (res["inc_p"] is not None and res["inc_p"] < 0.05)
+            and passes_incremental
         )
 
         final_results[fid] = FeatureTestResult(
@@ -550,6 +659,10 @@ def evaluate_feature_hypotheses(
             incremental_t_stat=res["inc_t"],
             incremental_p_value=res["inc_p"],
             passes_primary_gate=passes_primary,
+            incremental_lr_stat=res["inc_lr_stat"],
+            incremental_lr_p_value=res["inc_lr_p"],
+            incremental_z_stat=res["inc_z_stat"],
+            incremental_z_p_value=res["inc_z_p"],
         )
 
     return final_results
@@ -573,46 +686,101 @@ class H39ResearchEngine:
         p_name = str(self.protocol["temporal_partitioning"]["development_partition"])
         return self.microstructure_root / p_name
 
-    def load_outcomes_from_opportunity_shadow(self) -> dict[int, dict[str, Any]]:
-        outcomes_by_slot: dict[int, dict[str, Any]] = {}
+    def load_scans_from_opportunity_shadow(self) -> dict[int, dict[str, Any]]:
+        scans_by_slot: dict[int, dict[str, Any]] = {}
         if not self.opportunity_store_path.exists():
-            return outcomes_by_slot
+            return scans_by_slot
 
         uri = f"file:{self.opportunity_store_path.as_posix()}?mode=ro"
         with sqlite3.connect(uri, uri=True, timeout=5.0) as conn:
             conn.row_factory = sqlite3.Row
             conn.execute("PRAGMA query_only = ON;")
-            # Query scans and outcomes
             rows = conn.execute(
-                """SELECT s.scheduled_slot_ms, s.decision_close_ms, s.atr_15m,
-                          o.horizon_minutes, o.reference_price, o.future_close
-                   FROM scan_observations s
-                   LEFT JOIN outcomes o ON s.observation_id = o.observation_id
-                   ORDER BY s.scheduled_slot_ms ASC"""
+                """SELECT scheduled_slot_ms, decision_close_ms, atr_15m
+                   FROM scan_observations
+                   WHERE status = 'SUCCESSFUL_SCAN'
+                   ORDER BY scheduled_slot_ms ASC"""
             ).fetchall()
 
             for r in rows:
                 slot = int(r["scheduled_slot_ms"])
-                if slot not in outcomes_by_slot:
-                    outcomes_by_slot[slot] = {
-                        "slot_ms": slot,
-                        "decision_close_ms": (
-                            int(r["decision_close_ms"])
-                            if r["decision_close_ms"] is not None
-                            else slot + 900_000 - 1
-                        ),
-                        "atr_15m": float(r["atr_15m"]) if r["atr_15m"] else None,
-                        "ref_price": float(r["reference_price"]) if r["reference_price"] else None,
-                        "close_60m": None,
-                        "close_240m": None,
-                    }
-                hz = r["horizon_minutes"]
-                if hz == 60 and r["future_close"] is not None:
-                    outcomes_by_slot[slot]["close_60m"] = float(r["future_close"])
-                elif hz == 240 and r["future_close"] is not None:
-                    outcomes_by_slot[slot]["close_240m"] = float(r["future_close"])
+                scans_by_slot[slot] = {
+                    "slot_ms": slot,
+                    "decision_close_ms": (
+                        int(r["decision_close_ms"])
+                        if r["decision_close_ms"] is not None
+                        else slot - 1
+                    ),
+                    "atr_15m": float(r["atr_15m"]) if r["atr_15m"] else None,
+                }
 
-        return outcomes_by_slot
+        return scans_by_slot
+
+    def load_outcomes_from_opportunity_shadow(self) -> dict[int, dict[str, Any]]:
+        """Deprecated: H39 constructs outcomes independently from canonical 1m price data."""
+        return self.load_scans_from_opportunity_shadow()
+
+    def get_canonical_1m_candles(
+        self,
+        start_ms: int,
+        end_ms: int,
+        candle_client: BinancePublicClient | None = None,
+        canonical_store_path: str | Path = H39_CANONICAL_CANDLES_PATH,
+    ) -> dict[int, dict[str, float]]:
+        candles: dict[int, dict[str, float]] = {}
+        c_path = Path(canonical_store_path).resolve()
+        if c_path.exists():
+            uri = f"file:{c_path.as_posix()}?mode=ro"
+            try:
+                with sqlite3.connect(uri, uri=True, timeout=5.0) as conn:
+                    conn.execute("PRAGMA query_only = ON;")
+                    rows = conn.execute(
+                        """SELECT open_time_ms, open, high, low, close
+                           FROM klines_1m
+                           WHERE open_time_ms >= ? AND open_time_ms <= ?""",
+                        (start_ms, end_ms),
+                    ).fetchall()
+                    for r in rows:
+                        candles[int(r[0])] = {
+                            "open": float(r[1]),
+                            "high": float(r[2]),
+                            "low": float(r[3]),
+                            "close": float(r[4]),
+                        }
+            except Exception:  # noqa: BLE001
+                pass
+
+        if candle_client is not None:
+            expected_count = max(0, (end_ms - start_ms) // 60_000 + 1)
+            if len(candles) < expected_count:
+                try:
+                    fetched = candle_client.historical_klines("BTCUSDT", "1m", start_ms, end_ms)
+                    if fetched:
+                        c_path.parent.mkdir(parents=True, exist_ok=True)
+                        with sqlite3.connect(c_path) as conn:
+                            conn.execute(
+                                """CREATE TABLE IF NOT EXISTS klines_1m (
+                                    open_time_ms INTEGER PRIMARY KEY,
+                                    open REAL, high REAL, low REAL, close REAL,
+                                    volume REAL, close_time_ms INTEGER
+                                )"""
+                            )
+                            for c in fetched:
+                                conn.execute(
+                                    "INSERT OR REPLACE INTO klines_1m VALUES (?, ?, ?, ?, ?, ?, ?)",
+                                    (c.open_time_ms, c.open, c.high, c.low, c.close, c.volume, c.close_time_ms),
+                                )
+                                candles[c.open_time_ms] = {
+                                    "open": c.open,
+                                    "high": c.high,
+                                    "low": c.low,
+                                    "close": c.close,
+                                }
+                            conn.commit()
+                except Exception:  # noqa: BLE001
+                    pass
+
+        return candles
 
     def build_observations_for_partition(
         self,
@@ -634,31 +802,40 @@ class H39ResearchEngine:
         if end_ms is not None:
             s_end = min(s_end, (end_ms // 900_000) * 900_000)
 
-        shadow_outcomes = self.load_outcomes_from_opportunity_shadow()
+        shadow_scans = self.load_scans_from_opportunity_shadow()
+
+        c_req_start = s_start - 65 * 60_000
+        c_req_end = s_end + 60_000 + 245 * 60_000
+        canonical_candles = self.get_canonical_1m_candles(
+            c_req_start, c_req_end, candle_client=candle_client
+        )
 
         observations: list[H39Observation] = []
         curr_slot = s_start
         while curr_slot <= s_end:
             feat_row = loader.compute_features(curr_slot)
 
-            # Outcome row
-            sh_data = shadow_outcomes.get(curr_slot)
-            ref_price = sh_data["ref_price"] if sh_data and sh_data["ref_price"] else None
-            close_60m = sh_data["close_60m"] if sh_data and sh_data["close_60m"] else None
-            close_240m = sh_data["close_240m"] if sh_data and sh_data["close_240m"] else None
-            atr_15m = sh_data["atr_15m"] if sh_data and sh_data["atr_15m"] else None
+            # Protocol Decision Boundary and Reference Entry Timing:
+            # decision_close_ms is the close of the 15m decision window (curr_slot)
+            # reference_time_ms is OPEN of first fully available 1m bar strictly after decision close (curr_slot + 60_000)
+            decision_close_ms = curr_slot
+            ref_time_ms = decision_close_ms + 60_000
 
-            # If 60m close missing and candle_client provided, fetch deterministic 1m candles
-            if (ref_price is None or close_60m is None) and candle_client is not None:
-                try:
-                    c_start = curr_slot
-                    c_end = curr_slot + 60 * 60_000 - 1
-                    candles = candle_client.historical_klines("BTCUSDT", "1m", c_start, c_end)
-                    if len(candles) >= 60:
-                        ref_price = float(candles[0].open)
-                        close_60m = float(candles[59].close)
-                except Exception:  # noqa: BLE001, S110
-                    pass
+            ref_c = canonical_candles.get(ref_time_ms)
+            c60 = canonical_candles.get(ref_time_ms + 59 * 60_000)
+            c240 = canonical_candles.get(ref_time_ms + 239 * 60_000)
+
+            # Baseline candles strictly <= decision_close_ms
+            c_dec = canonical_candles.get(decision_close_ms - 60_000)
+            c_15m = canonical_candles.get(decision_close_ms - 16 * 60_000)
+            c_60m = canonical_candles.get(decision_close_ms - 61 * 60_000)
+
+            ref_price = ref_c["open"] if ref_c else None
+            close_60m = c60["close"] if c60 else None
+            close_240m = c240["close"] if c240 else None
+            dec_close = c_dec["close"] if c_dec else None
+            close_15 = c_15m["close"] if c_15m else None
+            close_60_ago = c_60m["close"] if c_60m else None
 
             ret_60m = (
                 (close_60m - ref_price) / ref_price
@@ -671,17 +848,39 @@ class H39ResearchEngine:
                 else None
             )
 
+            tr15 = (
+                (dec_close - close_15) / close_15
+                if (dec_close is not None and close_15 is not None and close_15 > 0)
+                else None
+            )
+            tr60 = (
+                (dec_close - close_60_ago) / close_60_ago
+                if (dec_close is not None and close_60_ago is not None and close_60_ago > 0)
+                else None
+            )
+
+            sh_scan = shadow_scans.get(curr_slot)
+            atr_15m = sh_scan.get("atr_15m") if sh_scan else None
+            atr_ratio = (
+                (atr_15m / dec_close)
+                if (atr_15m is not None and dec_close is not None and dec_close > 0)
+                else None
+            )
+
             outcome_row = H39OutcomeRow(
                 slot_ms=curr_slot,
                 reference_price=ref_price or 0.0,
-                reference_time_ms=curr_slot,
+                reference_time_ms=ref_time_ms,
                 future_close_60m=close_60m,
                 return_60m=ret_60m,
                 future_close_240m=close_240m,
                 return_240m=ret_240m,
-                trailing_return_15m=None,
-                trailing_return_60m=None,
+                trailing_return_15m=tr15,
+                trailing_return_60m=tr60,
                 trailing_atr_15m=atr_15m,
+                trailing_atr_ratio_15m=atr_ratio,
+                decision_close_price=dec_close,
+                decision_close_ms=decision_close_ms,
             )
 
             observations.append(H39Observation(feature_row=feat_row, outcome_row=outcome_row))
@@ -1109,6 +1308,7 @@ def generate_all_v0322_deliverables(
 
 **Hypothesis ID**: `{H39_HYPOTHESIS_ID}`  
 **Protocol Freeze SHA**: [`{H39_PROTOCOL_FREEZE_SHA}`](commit://{H39_PROTOCOL_FREEZE_SHA})  
+**Protocol Clarification SHA**: [`{H39_CLARIFICATION_SHA}`](commit://{H39_CLARIFICATION_SHA})  
 **Pre-Freeze Review Verdict**: `ACCEPT_PROTOCOL` (Gemini-3.8-Flash, commit `3641fbff67a75762d1757e86f4f565289bb88bf3`)  
 **Post-Implementation Reviewer**: `ChatGPT` (Sole final stage reviewer; no second Gemini review per governance simplification)  
 **Formal Feature Family Size**: `8` (M1–M8, M6 supported via closed-form causal derivation)  
@@ -1119,15 +1319,17 @@ def generate_all_v0322_deliverables(
 
 ## 1. Executive Summary & Review Lineage
 
-This stage implements the causal research pipeline and exploratory evaluation for **H39: Microstructure Directional Information**, strictly adhering to the protocol frozen prior to any label inspection.
+This stage implements the causal research pipeline and exploratory evaluation for **H39: Microstructure Directional Information**, strictly adhering to the protocol frozen prior to any label inspection, with formal acceptance repair reconciling protocol reference timing, baseline incremental modeling, and H38 terminal archiving.
 
 ### Governance and Audit Lineage
 1. **Accepted Baseline**: `main` commit `497842b07c8048fac4ed9b68827156ce6f51fee2`
 2. **Original H39 Protocol Prompt**: `8da42f27c73dd5381381d7af0466c4149b344440`
 3. **Gemini Pre-Freeze Audit**: `3641fbff67a75762d1757e86f4f565289bb88bf3` (`PRE_FREEZE_VERDICT = ACCEPT_PROTOCOL`)
 4. **H39 Protocol Freeze Commit**: [`{H39_PROTOCOL_FREEZE_SHA}`](commit://{H39_PROTOCOL_FREEZE_SHA})
-5. **Implementation & Unit Tests**: Verified clean in WSL Ubuntu 24.04 (Python 3.12).
-6. **Final Acceptance Review**: Handed over directly to ChatGPT.
+5. **Preceding Implementation Review SHA**: `24d30c356903b1821cd13bc1f1b77be4755d73be`
+6. **Gemini Post-Implementation Audit**: `57b7973e6e2de869c8194b206575060a1744ef04`
+7. **Protocol Clarification Manifest**: Committed in [`{H39_CLARIFICATION_SHA}`](commit://{H39_CLARIFICATION_SHA}) prior to inspecting fresh validation outcomes
+8. **Final Acceptance Review**: Handed over directly to ChatGPT.
 
 ---
 
@@ -1135,7 +1337,7 @@ This stage implements the causal research pipeline and exploratory evaluation fo
 
 ### G1: Protocol Freeze Before Labels (VERIFIED COMPLIANT)
 - The formal hypothesis protocol, complete 8-feature universe, predefined signs (+1), normalization bounds, eligibility rules, baseline specification, and Holm-Bonferroni FWER threshold were codified in `configs/research/v0.3.22_microstructure_h39_protocol.json` and committed in dedicated commit [`{H39_PROTOCOL_FREEZE_SHA}`](commit://{H39_PROTOCOL_FREEZE_SHA}).
-- Zero outcome labels, forward returns, IC, or regression statistics were inspected prior to this commit.
+- Protocol clarification manifest `H39_PROTOCOL_CLARIFICATION_001.json` was committed in [`{H39_CLARIFICATION_SHA}`](commit://{H39_CLARIFICATION_SHA}) strictly before running or inspecting post-start fresh validation outcomes.
 
 ### G2: Collector-Safe Read-Only SQLite Access (VERIFIED COMPLIANT)
 - All research loaders connect strictly via URI read-only mode: `sqlite3.connect(f"file:{{path}}?mode=ro", uri=True)` and enforce `PRAGMA query_only = ON;`.
@@ -1144,7 +1346,6 @@ This stage implements the causal research pipeline and exploratory evaluation fo
 
 ### G3: M6 Support Determination Resolved Pre-Freeze (VERIFIED COMPLIANT)
 - M6 (`MICROPRICE_DEVIATION_1M`) requires an unambiguous causal mid price without look-ahead.
-- Audited against the stored `book_samples` schema (`microprice`, `spread_bps`, `top1_imbalance`).
 - Demonstrated closed-form algebraic identity:
   $$\\text{{mid}} = \\frac{{\\text{{microprice}}}}{{1 + \\frac{{\\text{{spread\\_bps}}}}{{20\\,000}} \\cdot \\text{{top1\\_imbalance}}}}$$
   $$\\frac{{\\text{{microprice}} - \\text{{mid}}}}{{\\text{{mid}}}} \\times 10\\,000 = \\frac{{\\text{{spread\\_bps}}}}{2} \\cdot \\text{{top1\\_imbalance}}$$
@@ -1152,12 +1353,22 @@ This stage implements the causal research pipeline and exploratory evaluation fo
 
 ### G4: High-Hurdle 60m Falsification Without Rescue (VERIFIED COMPLIANT)
 - Primary evaluation horizon is strictly **60m**. Secondary horizon is **240m supporting only**.
+- Reference entry timing is strictly `reference_time_ms = decision_close_ms + 60_000` (OPEN of the first fully available 1m bar strictly after decision close).
+- The reference candle is never the candle beginning at `decision_close_ms`.
+- Baseline model uses deterministic L2 regularized logistic regression ($C=1.0$) on `[1.0, trailing_return_15m, trailing_return_60m, trailing_atr_ratio_15m]` with nested likelihood-ratio test and signed coefficient z-statistic.
 - Shorter horizons (1m, 5m, 15m) are strictly prohibited from rescuing a negative or non-significant 60m result.
-- Post-hoc sign inversions, window searches, and threshold rescues are completely forbidden.
 
 ---
 
-## 3. Feature Universe Specification (M1–M8)
+## 3. Acceptance Repair Highlights (Findings P0-A, P0-B, and H38)
+
+1. **Finding P0-A (Reference Entry Timing)**: Corrected reference entry from `curr_slot` to `curr_slot + 60_000`. Reference price is the OPEN of the first 1m bar strictly after decision close. 60m and 240m target exits are computed deterministically relative to this repaired reference.
+2. **Finding P0-B (Baseline Specification & Incremental Testing)**: Implemented deterministic L2-regularized logistic regression for future 60m direction ($C=1.0$, unpenalized intercept). Baseline features are populated causally (`trailing_return_15m`, `trailing_return_60m`, and dimensionless `trailing_atr_ratio_15m = atr_15m / decision_close`). Both nested likelihood-ratio (LR) test and signed coefficient z-statistic are implemented.
+3. **H38 Terminal Reconciliation**: Opportunity campaign `OPPORTUNITY_FORWARD_V0321_20260903T180000Z` recorded 10 consecutive missed decision slots ($10 > M_{{\\text{{miss}}}}=4$). First breach timestamp verified at `1788511500000` (`2026-09-04T08:45:00Z`). Reconciled to `DATA_QUALITY_TERMINAL_ARCHIVE`. Opportunity scheduled collection fails closed while Derivatives, Microstructure, and H39 research continue uninterrupted.
+
+---
+
+## 4. Feature Universe Specification (M1–M8)
 
 | Feature ID | Window | Source Table | Predefined Sign | Normalization | Hypothesis |
 | :--- | :--- | :--- | :---: | :--- | :--- |
@@ -1170,11 +1381,11 @@ This stage implements the causal research pipeline and exploratory evaluation fo
 | **M7** | 5m | M1, M3, M4, M5, M6 | `+1` | `[-1.0, 1.0]` | Consensus agreement across all microstructure channels |
 | **M8** | 5m | M1, M4, M5 | `+1` | `[-2.0, 2.0]` | Trade flow pushing against resting depth predicts breakthrough |
 
-All feature windows strictly enforce `event_time_ms <= decision_ms` and `receive_time_ms <= decision_ms`. Known sequence gaps or book/trade intervals exceeding tolerance trigger strict eligibility rejection reason codes (`GAP_IN_FEATURE_WINDOW`, `MISSING_BOOK_COVERAGE`, `MISSING_TRADE_COVERAGE`).
+All feature windows strictly enforce `event_time_ms <= decision_ms` and `receive_time_ms <= decision_ms`.
 
 ---
 
-## 4. Temporal Partitioning and Sample Status
+## 5. Temporal Partitioning and Sample Status
 
 ```text
 [Development Partition: microstructure-2026-08-31.sqlite3]
@@ -1194,18 +1405,16 @@ All feature windows strictly enforce `event_time_ms <= decision_ms` and `receive
 - Distinct UTC days: {dev_diagnostics["distinct_days_count"]} (Required: >= 5)
 - Eligible observations: {dev_diagnostics["eligible_slots"]} (Required: >= 250)
 - Maturity Gate Status: **`{dev_diagnostics["status"]}`**
-- Finding: Development partition was finalized prior to protocol freeze but contains insufficient history to satisfy maturity gates. As specified in Section 10 of the implementation prompt, development diagnostics are purely exploratory and non-qualifying.
 
 ### Fresh Forward Validation Tracking
 - Validation Window Start: `{val_status["validation_start_utc"]}`
 - Distinct UTC days accumulated: `{val_status["accumulation_progress"]["distinct_days_accumulated"]}` / 14 required
 - Eligible observations accumulated: `{val_status["accumulation_progress"]["eligible_slots_accumulated"]}` / 750 required
 - Status: **`FORWARD_DATA_INSUFFICIENT`**
-- As confirmed in Section 10 of the prompt, `FORWARD_DATA_INSUFFICIENT` is an expected valid outcome and does NOT block engineering acceptance.
 
 ---
 
-## 5. Safety Invariants & Execution Firewalls
+## 6. Safety Invariants & Execution Firewalls
 
 The strict safety invariants remain intact and inviolate:
 - `strategy = EXPERIMENTAL`
@@ -1216,13 +1425,11 @@ The strict safety invariants remain intact and inviolate:
 - `live trading = NOT AUTHORIZED`
 - `final_holdout = SEALED` (Zero rows read, zero bytes accessed)
 
-No runtime directional promotion is permitted in v0.3.22.
-
 ---
 
-## 6. Verification and Handoff
+## 7. Verification and Handoff
 
-- **Test Suite**: Fully passes in WSL environment. Direct tests verify read-only loading, anti-leakage boundary enforcement, M1–M8 calculations, M6 closed-form mid recovery, gap rejection, and Holm-Bonferroni correction.
+- **Test Suite**: Verified clean in WSL Ubuntu environment.
 - **CI / Static Checks**: `ruff check .`, `mypy src`, and `pytest` clean.
 - **Handoff**: Directly to **ChatGPT** for independent final stage review.
 """
@@ -1233,21 +1440,25 @@ No runtime directional promotion is permitted in v0.3.22.
     # 7. README.md
     readme_md = f"""# BTC Quant Agent v0.3.22 Deliverables
 
-This directory contains the required deliverables for the **v0.3.22 Microstructure Causal Alpha Foundation (H39)** implementation stage.
+This directory contains the required deliverables for the **v0.3.22 Microstructure Causal Alpha Foundation (H39)** implementation and acceptance repair stage.
 
 ## Deliverables Manifest
 
 1. [`MICROSTRUCTURE_DATA_PROVENANCE.json`](MICROSTRUCTURE_DATA_PROVENANCE.json): Complete provenance, row counts, and cryptographic hashes for all forward microstructure partitions.
 2. [`H39_PROTOCOL_FREEZE_MANIFEST.json`](H39_PROTOCOL_FREEZE_MANIFEST.json): Protocol freeze record linked to commit `{H39_PROTOCOL_FREEZE_SHA}` and Gemini `ACCEPT_PROTOCOL` audit.
-3. [`H39_FEATURE_DICTIONARY.json`](H39_FEATURE_DICTIONARY.json): Formal mathematical definitions and causal timestamp rules for features M1 through M8.
-4. [`H39_DEVELOPMENT_DIAGNOSTICS.json`](H39_DEVELOPMENT_DIAGNOSTICS.json): Diagnostics on pre-freeze partition (`DEVELOPMENT_DATA_INSUFFICIENT` due to sample size < 250).
-5. [`H39_VALIDATION_STATUS.json`](H39_VALIDATION_STATUS.json): Fresh forward validation tracking starting at 2026-09-04T11:15:00Z (`FORWARD_DATA_INSUFFICIENT`).
-6. [`V0.3.22_MICROSTRUCTURE_ALPHA_REPORT.md`](V0.3.22_MICROSTRUCTURE_ALPHA_REPORT.md): Authoritative technical report documenting protocol compliance, G1–G4 guardrails, and safety invariants.
+3. [`H39_PROTOCOL_CLARIFICATION_001.json`](H39_PROTOCOL_CLARIFICATION_001.json): Protocol clarification manifest committed in `{H39_CLARIFICATION_SHA}` prior to fresh label inspection.
+4. [`H39_FEATURE_DICTIONARY.json`](H39_FEATURE_DICTIONARY.json): Formal mathematical definitions and causal timestamp rules for features M1 through M8.
+5. [`H39_DEVELOPMENT_DIAGNOSTICS.json`](H39_DEVELOPMENT_DIAGNOSTICS.json): Diagnostics on pre-freeze partition (`DEVELOPMENT_DATA_INSUFFICIENT`).
+6. [`H39_VALIDATION_STATUS.json`](H39_VALIDATION_STATUS.json): Fresh forward validation tracking starting at 2026-09-04T11:15:00Z (`FORWARD_DATA_INSUFFICIENT`).
+7. [`H38_TERMINAL_RECONCILIATION.json`](H38_TERMINAL_RECONCILIATION.json): Irreversible terminal failure reconciliation for H38 Opportunity campaign.
+8. [`V0.3.22_MICROSTRUCTURE_ALPHA_REPORT.md`](V0.3.22_MICROSTRUCTURE_ALPHA_REPORT.md): Authoritative technical report documenting protocol compliance, G1–G4 guardrails, repaired reference/baseline models, and safety invariants.
+9. [`V0.3.22_ACCEPTANCE_REPAIR_REPORT.md`](V0.3.22_ACCEPTANCE_REPAIR_REPORT.md): Acceptance repair report for ChatGPT final review.
 
 ## Governance
 
 - **Pre-Freeze Audit**: Gemini-3.8-Flash (`ACCEPT_PROTOCOL`, commit `3641fbff67a75762d1757e86f4f565289bb88bf3`)
 - **Protocol Freeze**: Commit [`{H39_PROTOCOL_FREEZE_SHA}`](commit://{H39_PROTOCOL_FREEZE_SHA})
+- **Protocol Clarification**: Commit [`{H39_CLARIFICATION_SHA}`](commit://{H39_CLARIFICATION_SHA})
 - **Final Stage Reviewer**: ChatGPT (direct handoff per simplified single-pass audit governance)
 """
     readme_path = out_dir / "README.md"

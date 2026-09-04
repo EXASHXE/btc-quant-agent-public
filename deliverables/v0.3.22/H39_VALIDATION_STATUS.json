@@ -1,10 +1,10 @@
 {
   "accumulation_progress": {
-    "coverage_ratio_accumulated": 0.0,
+    "coverage_ratio_accumulated": 0.3333333333333333,
     "coverage_ratio_required": 0.9,
-    "distinct_days_accumulated": 0,
+    "distinct_days_accumulated": 1,
     "distinct_days_required": 14,
-    "eligible_slots_accumulated": 0,
+    "eligible_slots_accumulated": 3,
     "eligible_slots_required": 750,
     "maturity_achieved": false
   },
@@ -17,7 +17,14 @@
     "start_utc": "2026-09-01T00:00:00Z"
   },
   "execution": "DISABLED",
-  "fresh_partitions": [],
+  "fresh_partitions": [
+    {
+      "fresh_slots_evaluated": 9,
+      "max_ms": 1788528295751,
+      "partition": "microstructure-2026-09-04.sqlite3",
+      "start_ms": 1788480009380
+    }
+  ],
   "hypothesis_id": "H39_MICROSTRUCTURE_DIRECTIONAL_INFORMATION",
   "runtime_maximum": "OPPORTUNITY_ONLY",
   "stage": "FRESH_FORWARD_VALIDATION",

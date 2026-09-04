@@ -5,6 +5,8 @@ from pathlib import Path
 from unittest.mock import MagicMock, patch
 from urllib.error import HTTPError
 
+import pytest
+
 from btc_quant_agent.config import DataConfig
 from btc_quant_agent.data.binance import (
     BinanceDataError,
@@ -124,15 +126,31 @@ def test_v0320_opportunity_successor_preregistration() -> None:
     assert h37.formal_role in {"FORMAL_SUCCESSOR_ACTIVE", "DATA_QUALITY_TERMINAL_ARCHIVE"}
     assert h37.start_ms == 1788417000000
 
-    campaign, lifecycle = registry.preregistered_successor()
-    assert campaign.campaign_id in {
-        "OPPORTUNITY_FORWARD_V0320_20260903T063000Z",
-        "OPPORTUNITY_FORWARD_V0321_20260903T180000Z",
-    }
-    assert lifecycle.hypothesis_id in {
-        "H37_OPPORTUNITY_FORWARD_REPLICATION_RECOVERY",
-        "H38_OPPORTUNITY_FORWARD_REPLICATION_LOCAL_RECOVERY",
-    }
+    # H38 was active in v0.3.21 and terminalized in v0.3.22
+    h38 = next(c for c in registry.campaigns if c.campaign_id == "OPPORTUNITY_FORWARD_V0321_20260903T180000Z")
+    assert h38.hypothesis_id == "H38_OPPORTUNITY_FORWARD_REPLICATION_LOCAL_RECOVERY"
+    assert h38.formal_role in {"FORMAL_SUCCESSOR_PENDING", "FORMAL_SUCCESSOR_ACTIVE", "DATA_QUALITY_TERMINAL_ARCHIVE"}
+    assert h38.start_ms == 1788458400000
+
+    # In v0.3.22, H38 is terminalized and no successor is currently preregistered
+    candidates = [
+        item
+        for item in registry.campaigns
+        if item.formal_role in {"FORMAL_SUCCESSOR_PENDING", "FORMAL_SUCCESSOR_ACTIVE"}
+    ]
+    if candidates:
+        campaign, lifecycle = registry.preregistered_successor()
+        assert campaign.campaign_id in {
+            "OPPORTUNITY_FORWARD_V0320_20260903T063000Z",
+            "OPPORTUNITY_FORWARD_V0321_20260903T180000Z",
+        }
+        assert lifecycle.hypothesis_id in {
+            "H37_OPPORTUNITY_FORWARD_REPLICATION_RECOVERY",
+            "H38_OPPORTUNITY_FORWARD_REPLICATION_LOCAL_RECOVERY",
+        }
+    else:
+        with pytest.raises(ValueError, match="no successor opportunity campaign found"):
+            registry.preregistered_successor()
 
 
 def test_forward_doctor_structure_and_safety_invariants() -> None:
