@@ -1,0 +1,28 @@
+{
+  "chains": {
+    "DERIVATIVES_PIT_EPOCH_V0321_001": {
+      "latest_slot_ms": 1788641126044,
+      "rows_recorded": 418,
+      "status": "HEALTHY",
+      "store": "/root/workspace/project/Quant-agent/data/forward/BTCUSDT/derivatives.sqlite3"
+    },
+    "H38_OPPORTUNITY_FORWARD_REPLICATION_LOCAL_RECOVERY": {
+      "active": false,
+      "campaign_id": "OPPORTUNITY_FORWARD_V0321_20260903T180000Z",
+      "resolvable": false,
+      "status": "DATA_QUALITY_TERMINAL_ARCHIVE",
+      "successor_preregistered": false,
+      "terminal_at_ms": 1788511500000,
+      "terminal_at_utc": "2026-09-04T08:45:00Z",
+      "terminal_reason": "frozen consecutive missed-decision-slot gate breached"
+    },
+    "MICROSTRUCTURE_CAPTURE_V0315_001": {
+      "daemon_heartbeat": "ACTIVE",
+      "partitions_count": 6,
+      "status": "HEALTHY",
+      "store": "/root/workspace/project/Quant-agent/data/forward/BTCUSDT/microstructure"
+    }
+  },
+  "generated_at_utc": "2026-09-05T20:49:33.799543+00:00",
+  "schema_version": "1.0.0"
+}

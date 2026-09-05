@@ -1,0 +1,420 @@
+{
+  "boundary_records": [
+    {
+      "decision_close_ms": 1788520500000,
+      "eligible": true,
+      "rejection_reason": null,
+      "slot_utc": "2026-09-04T11:15:00+00:00",
+      "source_partitions": [
+        "microstructure-2026-09-04.sqlite3"
+      ]
+    },
+    {
+      "decision_close_ms": 1788521400000,
+      "eligible": false,
+      "rejection_reason": "GAP_IN_FEATURE_WINDOW",
+      "slot_utc": "2026-09-04T11:30:00+00:00",
+      "source_partitions": [
+        "microstructure-2026-09-04.sqlite3"
+      ]
+    },
+    {
+      "decision_close_ms": 1788522300000,
+      "eligible": true,
+      "rejection_reason": null,
+      "slot_utc": "2026-09-04T11:45:00+00:00",
+      "source_partitions": [
+        "microstructure-2026-09-04.sqlite3"
+      ]
+    },
+    {
+      "decision_close_ms": 1788523200000,
+      "eligible": false,
+      "rejection_reason": "GAP_IN_FEATURE_WINDOW",
+      "slot_utc": "2026-09-04T12:00:00+00:00",
+      "source_partitions": [
+        "microstructure-2026-09-04.sqlite3"
+      ]
+    },
+    {
+      "decision_close_ms": 1788524100000,
+      "eligible": true,
+      "rejection_reason": null,
+      "slot_utc": "2026-09-04T12:15:00+00:00",
+      "source_partitions": [
+        "microstructure-2026-09-04.sqlite3"
+      ]
+    },
+    {
+      "decision_close_ms": 1788525000000,
+      "eligible": false,
+      "rejection_reason": "GAP_IN_FEATURE_WINDOW",
+      "slot_utc": "2026-09-04T12:30:00+00:00",
+      "source_partitions": [
+        "microstructure-2026-09-04.sqlite3"
+      ]
+    },
+    {
+      "decision_close_ms": 1788525900000,
+      "eligible": false,
+      "rejection_reason": "GAP_IN_FEATURE_WINDOW",
+      "slot_utc": "2026-09-04T12:45:00+00:00",
+      "source_partitions": [
+        "microstructure-2026-09-04.sqlite3"
+      ]
+    },
+    {
+      "decision_close_ms": 1788526800000,
+      "eligible": false,
+      "rejection_reason": "GAP_IN_FEATURE_WINDOW",
+      "slot_utc": "2026-09-04T13:00:00+00:00",
+      "source_partitions": [
+        "microstructure-2026-09-04.sqlite3"
+      ]
+    },
+    {
+      "decision_close_ms": 1788527700000,
+      "eligible": false,
+      "rejection_reason": "GAP_IN_FEATURE_WINDOW",
+      "slot_utc": "2026-09-04T13:15:00+00:00",
+      "source_partitions": [
+        "microstructure-2026-09-04.sqlite3"
+      ]
+    },
+    {
+      "decision_close_ms": 1788528600000,
+      "eligible": true,
+      "rejection_reason": null,
+      "slot_utc": "2026-09-04T13:30:00+00:00",
+      "source_partitions": [
+        "microstructure-2026-09-04.sqlite3"
+      ]
+    },
+    {
+      "decision_close_ms": 1788529500000,
+      "eligible": false,
+      "rejection_reason": "GAP_IN_FEATURE_WINDOW",
+      "slot_utc": "2026-09-04T13:45:00+00:00",
+      "source_partitions": [
+        "microstructure-2026-09-04.sqlite3"
+      ]
+    },
+    {
+      "decision_close_ms": 1788530400000,
+      "eligible": true,
+      "rejection_reason": null,
+      "slot_utc": "2026-09-04T14:00:00+00:00",
+      "source_partitions": [
+        "microstructure-2026-09-04.sqlite3"
+      ]
+    },
+    {
+      "decision_close_ms": 1788531300000,
+      "eligible": false,
+      "rejection_reason": "GAP_IN_FEATURE_WINDOW",
+      "slot_utc": "2026-09-04T14:15:00+00:00",
+      "source_partitions": [
+        "microstructure-2026-09-04.sqlite3"
+      ]
+    },
+    {
+      "decision_close_ms": 1788532200000,
+      "eligible": true,
+      "rejection_reason": null,
+      "slot_utc": "2026-09-04T14:30:00+00:00",
+      "source_partitions": [
+        "microstructure-2026-09-04.sqlite3"
+      ]
+    },
+    {
+      "decision_close_ms": 1788533100000,
+      "eligible": true,
+      "rejection_reason": null,
+      "slot_utc": "2026-09-04T14:45:00+00:00",
+      "source_partitions": [
+        "microstructure-2026-09-04.sqlite3"
+      ]
+    },
+    {
+      "decision_close_ms": 1788534000000,
+      "eligible": false,
+      "rejection_reason": "GAP_IN_FEATURE_WINDOW",
+      "slot_utc": "2026-09-04T15:00:00+00:00",
+      "source_partitions": [
+        "microstructure-2026-09-04.sqlite3"
+      ]
+    },
+    {
+      "decision_close_ms": 1788534900000,
+      "eligible": true,
+      "rejection_reason": null,
+      "slot_utc": "2026-09-04T15:15:00+00:00",
+      "source_partitions": [
+        "microstructure-2026-09-04.sqlite3"
+      ]
+    },
+    {
+      "decision_close_ms": 1788535800000,
+      "eligible": true,
+      "rejection_reason": null,
+      "slot_utc": "2026-09-04T15:30:00+00:00",
+      "source_partitions": [
+        "microstructure-2026-09-04.sqlite3"
+      ]
+    },
+    {
+      "decision_close_ms": 1788536700000,
+      "eligible": true,
+      "rejection_reason": null,
+      "slot_utc": "2026-09-04T15:45:00+00:00",
+      "source_partitions": [
+        "microstructure-2026-09-04.sqlite3"
+      ]
+    },
+    {
+      "decision_close_ms": 1788537600000,
+      "eligible": true,
+      "rejection_reason": null,
+      "slot_utc": "2026-09-04T16:00:00+00:00",
+      "source_partitions": [
+        "microstructure-2026-09-04.sqlite3"
+      ]
+    },
+    {
+      "decision_close_ms": 1788538500000,
+      "eligible": true,
+      "rejection_reason": null,
+      "slot_utc": "2026-09-04T16:15:00+00:00",
+      "source_partitions": [
+        "microstructure-2026-09-04.sqlite3"
+      ]
+    },
+    {
+      "decision_close_ms": 1788539400000,
+      "eligible": true,
+      "rejection_reason": null,
+      "slot_utc": "2026-09-04T16:30:00+00:00",
+      "source_partitions": [
+        "microstructure-2026-09-04.sqlite3"
+      ]
+    },
+    {
+      "decision_close_ms": 1788540300000,
+      "eligible": true,
+      "rejection_reason": null,
+      "slot_utc": "2026-09-04T16:45:00+00:00",
+      "source_partitions": [
+        "microstructure-2026-09-04.sqlite3"
+      ]
+    },
+    {
+      "decision_close_ms": 1788541200000,
+      "eligible": true,
+      "rejection_reason": null,
+      "slot_utc": "2026-09-04T17:00:00+00:00",
+      "source_partitions": [
+        "microstructure-2026-09-04.sqlite3"
+      ]
+    },
+    {
+      "decision_close_ms": 1788542100000,
+      "eligible": true,
+      "rejection_reason": null,
+      "slot_utc": "2026-09-04T17:15:00+00:00",
+      "source_partitions": [
+        "microstructure-2026-09-04.sqlite3"
+      ]
+    },
+    {
+      "decision_close_ms": 1788543000000,
+      "eligible": true,
+      "rejection_reason": null,
+      "slot_utc": "2026-09-04T17:30:00+00:00",
+      "source_partitions": [
+        "microstructure-2026-09-04.sqlite3"
+      ]
+    },
+    {
+      "decision_close_ms": 1788543900000,
+      "eligible": true,
+      "rejection_reason": null,
+      "slot_utc": "2026-09-04T17:45:00+00:00",
+      "source_partitions": [
+        "microstructure-2026-09-04.sqlite3"
+      ]
+    },
+    {
+      "decision_close_ms": 1788544800000,
+      "eligible": false,
+      "rejection_reason": "GAP_IN_FEATURE_WINDOW",
+      "slot_utc": "2026-09-04T18:00:00+00:00",
+      "source_partitions": [
+        "microstructure-2026-09-04.sqlite3"
+      ]
+    },
+    {
+      "decision_close_ms": 1788545700000,
+      "eligible": true,
+      "rejection_reason": null,
+      "slot_utc": "2026-09-04T18:15:00+00:00",
+      "source_partitions": [
+        "microstructure-2026-09-04.sqlite3"
+      ]
+    },
+    {
+      "decision_close_ms": 1788546600000,
+      "eligible": false,
+      "rejection_reason": "GAP_IN_FEATURE_WINDOW",
+      "slot_utc": "2026-09-04T18:30:00+00:00",
+      "source_partitions": [
+        "microstructure-2026-09-04.sqlite3"
+      ]
+    },
+    {
+      "decision_close_ms": 1788547500000,
+      "eligible": false,
+      "rejection_reason": "GAP_IN_FEATURE_WINDOW",
+      "slot_utc": "2026-09-04T18:45:00+00:00",
+      "source_partitions": [
+        "microstructure-2026-09-04.sqlite3"
+      ]
+    },
+    {
+      "decision_close_ms": 1788548400000,
+      "eligible": true,
+      "rejection_reason": null,
+      "slot_utc": "2026-09-04T19:00:00+00:00",
+      "source_partitions": [
+        "microstructure-2026-09-04.sqlite3"
+      ]
+    },
+    {
+      "decision_close_ms": 1788549300000,
+      "eligible": false,
+      "rejection_reason": "GAP_IN_FEATURE_WINDOW",
+      "slot_utc": "2026-09-04T19:15:00+00:00",
+      "source_partitions": [
+        "microstructure-2026-09-04.sqlite3"
+      ]
+    },
+    {
+      "decision_close_ms": 1788550200000,
+      "eligible": false,
+      "rejection_reason": "GAP_IN_FEATURE_WINDOW",
+      "slot_utc": "2026-09-04T19:30:00+00:00",
+      "source_partitions": [
+        "microstructure-2026-09-04.sqlite3"
+      ]
+    },
+    {
+      "decision_close_ms": 1788551100000,
+      "eligible": true,
+      "rejection_reason": null,
+      "slot_utc": "2026-09-04T19:45:00+00:00",
+      "source_partitions": [
+        "microstructure-2026-09-04.sqlite3"
+      ]
+    },
+    {
+      "decision_close_ms": 1788552000000,
+      "eligible": true,
+      "rejection_reason": null,
+      "slot_utc": "2026-09-04T20:00:00+00:00",
+      "source_partitions": [
+        "microstructure-2026-09-04.sqlite3"
+      ]
+    },
+    {
+      "decision_close_ms": 1788636600000,
+      "eligible": false,
+      "rejection_reason": "GAP_IN_FEATURE_WINDOW",
+      "slot_utc": "2026-09-05T19:30:00+00:00",
+      "source_partitions": [
+        "microstructure-2026-09-05.sqlite3"
+      ]
+    },
+    {
+      "decision_close_ms": 1788637500000,
+      "eligible": false,
+      "rejection_reason": "GAP_IN_FEATURE_WINDOW",
+      "slot_utc": "2026-09-05T19:45:00+00:00",
+      "source_partitions": [
+        "microstructure-2026-09-05.sqlite3"
+      ]
+    },
+    {
+      "decision_close_ms": 1788638400000,
+      "eligible": false,
+      "rejection_reason": "GAP_IN_FEATURE_WINDOW",
+      "slot_utc": "2026-09-05T20:00:00+00:00",
+      "source_partitions": [
+        "microstructure-2026-09-05.sqlite3"
+      ]
+    },
+    {
+      "decision_close_ms": 1788639300000,
+      "eligible": false,
+      "rejection_reason": "GAP_IN_FEATURE_WINDOW",
+      "slot_utc": "2026-09-05T20:15:00+00:00",
+      "source_partitions": [
+        "microstructure-2026-09-05.sqlite3"
+      ]
+    },
+    {
+      "decision_close_ms": 1788640200000,
+      "eligible": true,
+      "rejection_reason": null,
+      "slot_utc": "2026-09-05T20:30:00+00:00",
+      "source_partitions": [
+        "microstructure-2026-09-05.sqlite3"
+      ]
+    },
+    {
+      "decision_close_ms": 1788641100000,
+      "eligible": true,
+      "rejection_reason": null,
+      "slot_utc": "2026-09-05T20:45:00+00:00",
+      "source_partitions": [
+        "microstructure-2026-09-05.sqlite3"
+      ]
+    }
+  ],
+  "generated_at_utc": "2026-09-05T20:49:33.796775+00:00",
+  "ledger_path": "/root/workspace/project/Quant-agent/data/research/h39_validation/h39_blind_ledger.sqlite3",
+  "protocol_clarification_sha": "2d1ccecc11dc231ffa41cdb1b5a9ea693abccc59",
+  "protocol_freeze_sha": "0eecd8833675c664c42f5e62d89663d7a10ed5fa",
+  "schema_version": "1.0.0",
+  "summary": {
+    "coverage_gate_passed": false,
+    "coverage_ratio": 0.17777777777777778,
+    "days_gate_passed": false,
+    "distinct_days": [
+      "2026-09-04",
+      "2026-09-05"
+    ],
+    "distinct_days_count": 2,
+    "earliest_slot_ms": 1788520500000,
+    "eligible_boundary_count": 24,
+    "expected_boundary_count": 135,
+    "latest_slot_ms": 1788641100000,
+    "latest_slot_utc": "2026-09-05T20:45:00+00:00",
+    "maturity_achieved": false,
+    "maturity_gates": {
+      "minimum_coverage_ratio": 0.9,
+      "minimum_distinct_days": 14,
+      "minimum_eligible_observations": 750
+    },
+    "observations_gate_passed": false,
+    "observed_boundary_count": 42,
+    "rejection_reason_counts": {
+      "GAP_IN_FEATURE_WINDOW": 18
+    },
+    "state": "FORWARD_DATA_INSUFFICIENT",
+    "terminal_breach_detected": false,
+    "validation_start_ms": 1788520500000,
+    "validation_start_utc": "2026-09-04T11:15:00Z"
+  },
+  "total_slots_recorded": 42,
+  "validation_start_ms": 1788520500000,
+  "validation_start_utc": "2026-09-04T11:15:00Z"
+}

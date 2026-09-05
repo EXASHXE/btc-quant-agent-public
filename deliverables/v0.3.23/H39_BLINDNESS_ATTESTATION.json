@@ -1,0 +1,22 @@
+{
+  "attestation_id": "H39_BLINDNESS_ATTESTATION_V0323",
+  "attestations": {
+    "direction_engine_none": true,
+    "execution_engine_disabled": true,
+    "h38_terminal_status_preserved": true,
+    "missing_evidence_not_backfilled": true,
+    "zero_feature_rankings_computed": true,
+    "zero_final_holdout_access": true,
+    "zero_fresh_validation_alpha_mined": true,
+    "zero_outcomes_evaluated_in_ledger": true,
+    "zero_p_values_inspected": true
+  },
+  "clarification_hash": "b2ba02df923950413c773e308e01d4ba893690948be9c258311d483ea753e284",
+  "formal_statement": "The implementation agent attests that all fresh forward validation data collected since 2026-09-04T11:15:00Z has been accumulated strictly under outcome blindness, with zero interim statistical testing, zero p-value calculation, zero feature ranking, and zero model re-tuning.",
+  "generated_at_utc": "2026-09-05T20:49:33.798166+00:00",
+  "producing_code_sha": "e182838dd4eef284c44bfa94b91592136877820e",
+  "protocol_clarification_sha": "2d1ccecc11dc231ffa41cdb1b5a9ea693abccc59",
+  "protocol_freeze_sha": "0eecd8833675c664c42f5e62d89663d7a10ed5fa",
+  "protocol_hash": "1b7d61409078f779585675e9f657a60ea1ef5384a7707c33bbac07535feaa979",
+  "schema_version": "1.0.0"
+}

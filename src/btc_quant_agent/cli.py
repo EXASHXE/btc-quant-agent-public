@@ -233,21 +233,55 @@ def build_parser() -> argparse.ArgumentParser:
     micro_res_sub = micro_research.add_subparsers(
         dest="microstructure_research_command", required=True
     )
-    h39_run = micro_res_sub.add_parser(
-        "run-h39", help="run H39 evaluation and generate deliverables"
+    # H39 blind validation interface
+    h39_parser = sub.add_parser(
+        "h39", help="H39 blind validation accumulation and operational status"
     )
-    h39_run.add_argument(
-        "--protocol", default="configs/research/v0.3.22_microstructure_h39_protocol.json"
-    )
-    h39_run.add_argument(
-        "--microstructure-root", default="data/forward/BTCUSDT/microstructure"
-    )
-    h39_run.add_argument(
-        "--opportunity-store", default="data/forward/BTCUSDT/opportunity_shadow.sqlite3"
-    )
-    h39_run.add_argument(
-        "--output-dir", default="deliverables/v0.3.22"
-    )
+    h39_sub = h39_parser.add_subparsers(dest="h39_command", required=True)
+
+    for p_sub in (h39_sub, micro_res_sub):
+        h39_accum = p_sub.add_parser(
+            "validation-accumulate", help="accumulate validation evidence into blind ledger"
+        )
+        h39_accum.add_argument(
+            "--microstructure-root", default="data/forward/BTCUSDT/microstructure"
+        )
+        h39_accum.add_argument(
+            "--opportunity-store", default="data/forward/BTCUSDT/opportunity_shadow.sqlite3"
+        )
+        h39_accum.add_argument(
+            "--ledger-path", default="data/research/h39_validation/h39_blind_ledger.sqlite3"
+        )
+
+        h39_status = p_sub.add_parser(
+            "validation-status", help="show blind validation accumulation status and metrics"
+        )
+        h39_status.add_argument(
+            "--ledger-path", default="data/research/h39_validation/h39_blind_ledger.sqlite3"
+        )
+        h39_status.add_argument("--as-of-ms", type=int, default=None)
+
+        h39_ready = p_sub.add_parser(
+            "validation-readiness", help="check readiness for one-shot unblind"
+        )
+        h39_ready.add_argument(
+            "--ledger-path", default="data/research/h39_validation/h39_blind_ledger.sqlite3"
+        )
+        h39_ready.add_argument("--as-of-ms", type=int, default=None)
+
+        h39_deliv = p_sub.add_parser(
+            "generate-deliverables", help="generate v0.3.23 deliverables"
+        )
+        h39_deliv.add_argument("--output-dir", default="deliverables/v0.3.23")
+        h39_deliv.add_argument(
+            "--microstructure-root", default="data/forward/BTCUSDT/microstructure"
+        )
+        h39_deliv.add_argument(
+            "--opportunity-store", default="data/forward/BTCUSDT/opportunity_shadow.sqlite3"
+        )
+        h39_deliv.add_argument(
+            "--ledger-path", default="data/research/h39_validation/h39_blind_ledger.sqlite3"
+        )
 
     registry = sub.add_parser("research-registry", help="inspect research eligibility")
     registry.add_argument(
@@ -685,10 +719,48 @@ def main(argv: list[str] | None = None) -> int:
             }
         _print(report)
         return 0
-    if args.command == "microstructure-research":
-        from .microstructure_research import generate_all_v0322_deliverables
+    if args.command in ("h39", "microstructure-research"):
+        cmd = getattr(args, "h39_command", None) or getattr(
+            args, "microstructure_research_command", None
+        )
+        from .microstructure_research import (
+            H39ResearchEngine,
+            generate_all_v0322_deliverables,
+            generate_all_v0323_deliverables,
+        )
 
-        if args.microstructure_research_command == "run-h39":
+        if cmd == "validation-accumulate":
+            engine = H39ResearchEngine(
+                microstructure_root=args.microstructure_root,
+                opportunity_store_path=args.opportunity_store,
+            )
+            res = engine.accumulate_blind_validation(output_ledger_path=args.ledger_path)
+            _print(res)
+            return 0
+        if cmd == "validation-status":
+            engine = H39ResearchEngine()
+            res = engine.get_blind_validation_status(
+                ledger_path=args.ledger_path, as_of_ms=args.as_of_ms
+            )
+            _print(res)
+            return 0
+        if cmd == "validation-readiness":
+            engine = H39ResearchEngine()
+            res = engine.check_unblind_readiness(
+                ledger_path=args.ledger_path, as_of_ms=args.as_of_ms
+            )
+            _print(res)
+            return 0 if res.get("ready_for_unblind") else 1
+        if cmd == "generate-deliverables":
+            res = generate_all_v0323_deliverables(
+                output_dir=args.output_dir,
+                microstructure_root=args.microstructure_root,
+                opportunity_store_path=args.opportunity_store,
+                ledger_path=args.ledger_path,
+            )
+            _print({"status": "SUCCESS", "deliverables": res})
+            return 0
+        if cmd == "run-h39":
             res = generate_all_v0322_deliverables(
                 output_dir=args.output_dir,
                 microstructure_root=args.microstructure_root,
