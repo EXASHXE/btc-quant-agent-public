@@ -709,7 +709,7 @@ def _get_current_git_sha() -> str:
         sha = res.stdout.strip()
         if len(sha) == 40:
             return sha
-    except Exception:
+    except Exception:  # noqa: BLE001, S110
         pass
     return "f2e3f29dec38f71a2b5d6640d25bc8f2ae8353ba"
 
@@ -1466,7 +1466,7 @@ class H39ResearchEngine:
                     while chunk := f.read(65536):
                         h.update(chunk)
                 p_hash = h.hexdigest()
-            except Exception:
+            except Exception:  # noqa: BLE001
                 p_hash = "UNKNOWN_HASH"
 
             # Determine 15m decision slots in [max(min_t, val_start_ms), max_t]
@@ -2159,14 +2159,14 @@ def generate_all_v0323_deliverables(
                 if r:
                     deriv_rows, deriv_max_t = r[0], r[1]
                     deriv_healthy = deriv_rows > 0
-        except Exception:
+        except Exception:  # noqa: BLE001
             try:
                 with sqlite3.connect(str(deriv_path)) as conn:
                     r = conn.execute("SELECT COUNT(*), MAX(observed_at_ms) FROM derivative_snapshots").fetchone()
                     if r:
                         deriv_rows, deriv_max_t = r[0], r[1]
                         deriv_healthy = deriv_rows > 0
-            except Exception:
+            except Exception:  # noqa: BLE001, S110
                 pass
 
     # 5b. Microstructure
@@ -2183,7 +2183,7 @@ def generate_all_v0323_deliverables(
             for c in c_data.get("campaigns", []):
                 if c.get("campaign_id") == "OPPORTUNITY_FORWARD_V0321_20260903T180000Z":
                     h38_terminal = (c.get("status") == "DATA_QUALITY_TERMINAL_ARCHIVE")
-        except Exception:
+        except Exception:  # noqa: BLE001, S110
             pass
 
     chain_health = {
