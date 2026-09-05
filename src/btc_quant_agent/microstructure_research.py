@@ -567,7 +567,7 @@ def evaluate_feature_hypotheses(
         baseline_x.append([1.0, float(tr15), float(tr60), float(atr_ratio)])
 
     # Fit deterministic baseline L2 logistic model (C=1.0 equivalent)
-    b_base, c_base, ll_base = _fit_l2_logistic_regression(baseline_x, y_dir, l2_lambda=1.0)
+    _b_base, _c_base, ll_base = _fit_l2_logistic_regression(baseline_x, y_dir, l2_lambda=1.0)
 
     raw_results: dict[str, dict[str, Any]] = {}
     p_raw_list: list[float] = []
@@ -747,7 +747,7 @@ class H39ResearchEngine:
                             "low": float(r[3]),
                             "close": float(r[4]),
                         }
-            except Exception:  # noqa: BLE001
+            except Exception:  # noqa: BLE001, S110
                 pass
 
         if candle_client is not None:
@@ -777,7 +777,7 @@ class H39ResearchEngine:
                                     "close": c.close,
                                 }
                             conn.commit()
-                except Exception:  # noqa: BLE001
+                except Exception:  # noqa: BLE001, S110
                     pass
 
         return candles

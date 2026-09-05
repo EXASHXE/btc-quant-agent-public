@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import sqlite3
 from pathlib import Path
+from unittest.mock import MagicMock
 
 import pytest
 
@@ -598,7 +599,6 @@ def test_h39_logistic_regression_baseline_and_incremental_stats() -> None:
 
 
 def test_h38_terminal_reconciliation_and_irreversibility() -> None:
-    from unittest.mock import MagicMock
     from btc_quant_agent.opportunity_forward import (
         OpportunityCampaignRegistry,
         collect_opportunity_once,
