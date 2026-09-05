@@ -20,3 +20,5 @@ This directory contains the required deliverables for the **v0.3.22 Microstructu
 - **Protocol Freeze**: Commit [`0eecd8833675c664c42f5e62d89663d7a10ed5fa`](commit://0eecd8833675c664c42f5e62d89663d7a10ed5fa)
 - **Protocol Clarification**: Commit [`2d1ccecc11dc231ffa41cdb1b5a9ea693abccc59`](commit://2d1ccecc11dc231ffa41cdb1b5a9ea693abccc59)
 - **Final Stage Reviewer**: ChatGPT (direct handoff per simplified single-pass audit governance)
+- **Verified Code SHA**: Commit [`16059ed2c1ff6f89ef67310f85cefd0616b20894`](commit://16059ed2c1ff6f89ef67310f85cefd0616b20894)
+- **CI Provenance**: GitHub Actions [Run #33968381224](https://github.com/EXASHXE/btc-quant-agent/actions/runs/33968381224) (Passed across Python 3.11, 3.12, 3.13)
