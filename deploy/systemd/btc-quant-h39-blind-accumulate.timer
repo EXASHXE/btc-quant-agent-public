@@ -1,0 +1,11 @@
+[Unit]
+Description=Daily scheduled blind accumulation for H39 forward validation at 00:15 UTC
+
+[Timer]
+OnCalendar=*-*-* 00:15:00 UTC
+Persistent=true
+AccuracySec=1s
+Unit=btc-quant-h39-blind-accumulate.service
+
+[Install]
+WantedBy=timers.target

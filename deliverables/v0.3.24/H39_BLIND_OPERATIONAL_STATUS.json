@@ -1,0 +1,43 @@
+{
+  "clock_denominator": {
+    "coverage_ratio": 0.25,
+    "eligible_boundary_count": 37,
+    "eligible_coverage": 0.25,
+    "expected_boundary_count": 148,
+    "observed_boundary_count": 55,
+    "raw_observation_coverage": 0.3716216216216216
+  },
+  "coverage_gate_passed": false,
+  "days_gate_passed": false,
+  "distinct_days": [
+    "2026-09-04",
+    "2026-09-05",
+    "2026-09-06"
+  ],
+  "distinct_days_count": 3,
+  "generated_at_utc": "2026-09-06T08:36:37.435670+00:00",
+  "hypothesis_id": "H39_MICROSTRUCTURE_DIRECTIONAL_INFORMATION",
+  "maturity_achieved": false,
+  "maturity_gates": {
+    "minimum_coverage_ratio": 0.9,
+    "minimum_distinct_days": 14,
+    "minimum_eligible_observations": 750
+  },
+  "observations_gate_passed": false,
+  "rejection_reason_counts": {
+    "GAP_IN_FEATURE_WINDOW": 18
+  },
+  "safety_firewalls": {
+    "auto_execute": false,
+    "execution": "DISABLED",
+    "final_holdout": "SEALED",
+    "qualified_direction_engine": "NONE",
+    "runtime_maximum": "OPPORTUNITY_ONLY",
+    "strategy": "EXPERIMENTAL"
+  },
+  "schema_version": "1.0.0",
+  "stage": "H39_BLIND_ACCUMULATION_OPERATIONS",
+  "state": "FORWARD_DATA_INSUFFICIENT",
+  "validation_start_ms": 1788520500000,
+  "validation_start_utc": "2026-09-04T11:15:00Z"
+}

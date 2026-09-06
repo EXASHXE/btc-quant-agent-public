@@ -252,6 +252,51 @@ def build_parser() -> argparse.ArgumentParser:
         h39_accum.add_argument(
             "--ledger-path", default="data/research/h39_validation/h39_blind_ledger.sqlite3"
         )
+        h39_accum.add_argument(
+            "--only-finalized", action="store_true", default=False, help="only ingest finalized partitions (prior to today UTC)"
+        )
+
+        h39_sched = p_sub.add_parser(
+            "scheduled-accumulate", help="execute scheduled accumulation with disk check, integrity check, and backup"
+        )
+        h39_sched.add_argument(
+            "--microstructure-root", default="data/forward/BTCUSDT/microstructure"
+        )
+        h39_sched.add_argument(
+            "--opportunity-store", default="data/forward/BTCUSDT/opportunity_shadow.sqlite3"
+        )
+        h39_sched.add_argument(
+            "--ledger-path", default="data/research/h39_validation/h39_blind_ledger.sqlite3"
+        )
+        h39_sched.add_argument(
+            "--backup-dir", default="data/research/h39_validation/backups"
+        )
+        h39_sched.add_argument(
+            "--min-free-gb", type=float, default=5.0
+        )
+        h39_sched.add_argument(
+            "--only-finalized", action="store_true", default=True, help="only ingest finalized partitions"
+        )
+        h39_sched.add_argument(
+            "--include-active", action="store_true", default=False, help="include today's active partition as well"
+        )
+
+        h39_integ = p_sub.add_parser(
+            "verify-integrity", help="verify SQLite integrity and source partition hashes"
+        )
+        h39_integ.add_argument(
+            "--ledger-path", default="data/research/h39_validation/h39_blind_ledger.sqlite3"
+        )
+
+        h39_bak = p_sub.add_parser(
+            "backup-ledger", help="create consistent SQLite online backup and manifest"
+        )
+        h39_bak.add_argument(
+            "--ledger-path", default="data/research/h39_validation/h39_blind_ledger.sqlite3"
+        )
+        h39_bak.add_argument(
+            "--backup-dir", default="data/research/h39_validation/backups"
+        )
 
         h39_status = p_sub.add_parser(
             "validation-status", help="show blind validation accumulation status and metrics"
@@ -270,9 +315,9 @@ def build_parser() -> argparse.ArgumentParser:
         h39_ready.add_argument("--as-of-ms", type=int, default=None)
 
         h39_deliv = p_sub.add_parser(
-            "generate-deliverables", help="generate v0.3.23 deliverables"
+            "generate-deliverables", help="generate v0.3.24 deliverables"
         )
-        h39_deliv.add_argument("--output-dir", default="deliverables/v0.3.23")
+        h39_deliv.add_argument("--output-dir", default="deliverables/v0.3.24")
         h39_deliv.add_argument(
             "--microstructure-root", default="data/forward/BTCUSDT/microstructure"
         )
@@ -281,6 +326,9 @@ def build_parser() -> argparse.ArgumentParser:
         )
         h39_deliv.add_argument(
             "--ledger-path", default="data/research/h39_validation/h39_blind_ledger.sqlite3"
+        )
+        h39_deliv.add_argument(
+            "--backup-dir", default="data/research/h39_validation/backups"
         )
 
     registry = sub.add_parser("research-registry", help="inspect research eligibility")
@@ -724,9 +772,11 @@ def main(argv: list[str] | None = None) -> int:
             args, "microstructure_research_command", None
         )
         from .microstructure_research import (
+            H39BlindLedger,
             H39ResearchEngine,
             generate_all_v0322_deliverables,
             generate_all_v0323_deliverables,
+            generate_all_v0324_deliverables,
         )
 
         if cmd == "validation-accumulate":
@@ -734,8 +784,39 @@ def main(argv: list[str] | None = None) -> int:
                 microstructure_root=args.microstructure_root,
                 opportunity_store_path=args.opportunity_store,
             )
-            res = engine.accumulate_blind_validation(output_ledger_path=args.ledger_path)
+            res = engine.accumulate_blind_validation(
+                output_ledger_path=args.ledger_path,
+                only_finalized=getattr(args, "only_finalized", False),
+            )
             _print(res)
+            return 0
+        if cmd == "scheduled-accumulate":
+            engine = H39ResearchEngine(
+                microstructure_root=args.microstructure_root,
+                opportunity_store_path=args.opportunity_store,
+            )
+            only_fin = (
+                not getattr(args, "include_active", False)
+                if getattr(args, "include_active", False)
+                else getattr(args, "only_finalized", True)
+            )
+            res = engine.run_scheduled_accumulation(
+                output_ledger_path=args.ledger_path,
+                backup_dir=args.backup_dir,
+                min_free_gb=args.min_free_gb,
+                only_finalized=only_fin,
+            )
+            _print(res)
+            return 0
+        if cmd == "verify-integrity":
+            ledger = H39BlindLedger(args.ledger_path)
+            res = ledger.verify_integrity()
+            _print(res)
+            return 0 if res.get("status") == "OK" else 1
+        if cmd == "backup-ledger":
+            ledger = H39BlindLedger(args.ledger_path)
+            bak_path = ledger.backup_ledger(args.backup_dir)
+            _print({"status": "SUCCESS", "backup_path": str(bak_path)})
             return 0
         if cmd == "validation-status":
             engine = H39ResearchEngine()
@@ -752,12 +833,21 @@ def main(argv: list[str] | None = None) -> int:
             _print(res)
             return 0 if res.get("ready_for_unblind") else 1
         if cmd == "generate-deliverables":
-            res = generate_all_v0323_deliverables(
-                output_dir=args.output_dir,
-                microstructure_root=args.microstructure_root,
-                opportunity_store_path=args.opportunity_store,
-                ledger_path=args.ledger_path,
-            )
+            if "v0.3.23" in args.output_dir:
+                res = generate_all_v0323_deliverables(
+                    output_dir=args.output_dir,
+                    microstructure_root=args.microstructure_root,
+                    opportunity_store_path=args.opportunity_store,
+                    ledger_path=args.ledger_path,
+                )
+            else:
+                res = generate_all_v0324_deliverables(
+                    output_dir=args.output_dir,
+                    microstructure_root=args.microstructure_root,
+                    opportunity_store_path=args.opportunity_store,
+                    ledger_path=args.ledger_path,
+                    backup_dir=getattr(args, "backup_dir", "data/research/h39_validation/backups"),
+                )
             _print({"status": "SUCCESS", "deliverables": res})
             return 0
         if cmd == "run-h39":

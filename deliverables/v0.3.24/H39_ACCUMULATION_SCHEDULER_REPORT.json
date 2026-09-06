@@ -1,0 +1,32 @@
+{
+  "disk_safety": {
+    "available_gb": 829.26,
+    "min_required_gb": 5.0,
+    "status": "PASSED"
+  },
+  "generated_at_utc": "2026-09-06T08:36:37.436167+00:00",
+  "last_execution": {
+    "backup_file": "/root/workspace/project/Quant-agent/data/research/h39_validation/backups/h39_blind_ledger_backup_20260906_083633.sqlite3",
+    "completed_at_utc": "2026-09-06T08:36:35.461375+00:00",
+    "duplicate_slots_skipped": 55,
+    "elapsed_seconds": 20.641,
+    "new_slots_ingested": 0,
+    "partitions_processed": [
+      "microstructure-2026-09-04.sqlite3",
+      "microstructure-2026-09-05.sqlite3"
+    ],
+    "start_time_utc": "2026-09-06T08:36:14.820740+00:00",
+    "status": "SUCCESS"
+  },
+  "producing_code_sha": "4002e45286e81ddbd5e9dc6977aa667223a0bfda",
+  "resource_limits": {
+    "CPUQuota": "80%",
+    "IOSchedulingClass": "best-effort",
+    "IOSchedulingPriority": 7,
+    "MemoryMax": "2G",
+    "Nice": 15,
+    "TimeoutStartSec": "1800s"
+  },
+  "scheduler_cadence": "DAILY_00_15_UTC",
+  "schema_version": "1.0.0"
+}
