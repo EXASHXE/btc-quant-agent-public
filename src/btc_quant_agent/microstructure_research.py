@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import contextlib
 import hashlib
 import json
 import math
@@ -8,7 +9,7 @@ import shutil
 import sqlite3
 import subprocess
 import time
-from collections.abc import Sequence
+from collections.abc import Generator, Sequence
 from dataclasses import asdict, dataclass
 from datetime import UTC, datetime
 from pathlib import Path
@@ -83,6 +84,16 @@ REJECTION_REASONS = (
     "WINDOW_INCOMPLETE",
     "SOURCE_PARTITION_MUTATION",
 )
+
+
+@contextlib.contextmanager
+def _open_sqlite(path_or_uri: str | Path, **kwargs: Any) -> Generator[sqlite3.Connection, None, None]:
+    """Context manager for SQLite connections that guarantees conn.close() on block exit."""
+    conn = sqlite3.connect(path_or_uri, **kwargs)
+    try:
+        yield conn
+    finally:
+        conn.close()
 
 
 @dataclass(frozen=True)
@@ -332,7 +343,8 @@ class MicrostructureResearchLoader:
         if not self.path.exists():
             raise FileNotFoundError(f"Microstructure partition not found: {self.path}")
 
-    def connect_readonly(self) -> sqlite3.Connection:
+    @contextlib.contextmanager
+    def connect_readonly(self) -> Generator[sqlite3.Connection, None, None]:
         # Strict read-only URI mode and query_only pragma
         path_str = self.path.as_posix()
         try:
@@ -341,7 +353,10 @@ class MicrostructureResearchLoader:
             conn = sqlite3.connect(f"file:{path_str}?mode=ro&nolock=1", uri=True, timeout=10.0)
         conn.row_factory = sqlite3.Row
         conn.execute("PRAGMA query_only = ON;")
-        return conn
+        try:
+            yield conn
+        finally:
+            conn.close()
 
     def check_integrity(self) -> tuple[bool, str]:
         with self.connect_readonly() as conn:
@@ -997,181 +1012,192 @@ class H39BlindLedger:
         manifest_file.write_text(json.dumps(manifest, indent=2, sort_keys=True), encoding="utf-8")
         return backup_file
 
-    def ingest_slot(self, row: dict[str, Any]) -> bool:
-        """Idempotently ingest a single validation decision slot.
+    def ingest_slots(self, rows: Sequence[dict[str, Any]]) -> int:
+        """Idempotently ingest a batch of validation decision slots within a single transaction.
 
-        Returns True if a new row was inserted, False if identical row was skipped.
-        Raises ValueError if slot is pre-start, if protocol/clarification hashes drift,
+        Returns count of newly inserted rows.
+        Raises ValueError if any slot is pre-start, if protocol/clarification hashes drift,
         or if duplicate slot has conflicting evidence.
         Raises RuntimeError if source partition has mutated.
         """
-        slot_ms = int(row["decision_close_ms"])
-        if slot_ms < H39_VALIDATION_START_MS:
-            raise ValueError(
-                f"Ledger accepts post-start validation slots only: slot_ms={slot_ms} < {H39_VALIDATION_START_MS}"
-            )
+        if not rows:
+            return 0
 
-        # Hash pinning checks
-        p_hash = str(row.get("protocol_hash", ""))
-        if p_hash != H39_FROZEN_PROTOCOL_HASH:
-            raise ValueError(
-                f"Protocol hash mismatch: expected {H39_FROZEN_PROTOCOL_HASH}, got {p_hash}"
-            )
-        c_hash = str(row.get("clarification_hash", ""))
-        if c_hash != H39_FROZEN_CLARIFICATION_HASH:
-            raise ValueError(
-                f"Clarification hash mismatch: expected {H39_FROZEN_CLARIFICATION_HASH}, got {c_hash}"
-            )
+        p_hash = H39_FROZEN_PROTOCOL_HASH
+        c_hash = H39_FROZEN_CLARIFICATION_HASH
+        inserted_count = 0
 
-        # Check source partition mutation guard
-        src_hashes_raw = row.get("source_partition_hashes")
-        if src_hashes_raw:
-            try:
-                src_map = (
-                    json.loads(src_hashes_raw)
-                    if isinstance(src_hashes_raw, str)
-                    else dict(src_hashes_raw)
-                )
-                with sqlite3.connect(self.db_path) as conn:
-                    conn.row_factory = sqlite3.Row
-                    for pname, phash in src_map.items():
-                        sp_row = conn.execute(
-                            "SELECT partition_sha256, finalized FROM h39_source_partitions WHERE partition_name = ?",
-                            (pname,),
-                        ).fetchone()
-                        if sp_row is not None and bool(sp_row["finalized"]) and sp_row["partition_sha256"] != phash:
-                            raise RuntimeError(
-                                f"SOURCE_PARTITION_MUTATION: Source partition {pname} hash mutated from {sp_row['partition_sha256']} to {phash}!"
-                            )
-            except RuntimeError:
-                raise
-            except Exception:  # noqa: BLE001, S110
-                pass
-
-        # Timing relation checks
-        ref_time = int(row.get("reference_time_ms", 0))
-        if ref_time != slot_ms + 60_000:
-            raise ValueError(
-                f"Invalid reference timing: reference_time_ms={ref_time} must equal decision_close_ms + 60_000 ({slot_ms + 60_000})"
-            )
-        target_60m = int(row.get("target_60m_ms", 0))
-        if target_60m != ref_time + 59 * 60_000:
-            raise ValueError(
-                f"Invalid 60m target timing: target_60m_ms={target_60m} must equal reference_time_ms + 59*60_000 ({ref_time + 59*60_000})"
-            )
-        target_240m = int(row.get("target_240m_ms", 0))
-        if target_240m != ref_time + 239 * 60_000:
-            raise ValueError(
-                f"Invalid 240m target timing: target_240m_ms={target_240m} must equal reference_time_ms + 239*60_000 ({ref_time + 239*60_000})"
-            )
-
-        with sqlite3.connect(self.db_path) as conn:
+        with _open_sqlite(self.db_path) as conn:
             conn.row_factory = sqlite3.Row
-            existing = conn.execute(
-                "SELECT * FROM h39_blind_validation_ledger WHERE decision_close_ms = ?",
-                (slot_ms,),
-            ).fetchone()
+            for row in rows:
+                slot_ms = int(row["decision_close_ms"])
+                if slot_ms < H39_VALIDATION_START_MS:
+                    raise ValueError(
+                        f"Ledger accepts post-start validation slots only: slot_ms={slot_ms} < {H39_VALIDATION_START_MS}"
+                    )
 
-            if existing is not None:
-                # Check for conflicting evidence
-                def _close_match(v1: Any, v2: Any, tol: float = 1e-7) -> bool:
-                    if v1 is None and v2 is None:
-                        return True
-                    if v1 is None or v2 is None:
-                        return False
+                # Hash pinning checks
+                row_p_hash = str(row.get("protocol_hash", ""))
+                if row_p_hash != p_hash:
+                    raise ValueError(
+                        f"Protocol hash mismatch: expected {p_hash}, got {row_p_hash}"
+                    )
+                row_c_hash = str(row.get("clarification_hash", ""))
+                if row_c_hash != c_hash:
+                    raise ValueError(
+                        f"Clarification hash mismatch: expected {c_hash}, got {row_c_hash}"
+                    )
+
+                # Check source partition mutation guard
+                src_hashes_raw = row.get("source_partition_hashes")
+                if src_hashes_raw:
                     try:
-                        return abs(float(v1) - float(v2)) <= tol
-                    except (ValueError, TypeError):
-                        return str(v1) == str(v2)
-
-                fields_to_check = [
-                    "eligible",
-                    "rejection_reason",
-                    "m1_trade_imbalance_5m",
-                    "m2_trade_imbalance_15m",
-                    "m3_ofi_5m",
-                    "m4_top5_depth_imbalance_5m",
-                    "m5_top20_depth_imbalance_5m",
-                    "m6_microprice_deviation_1m",
-                    "m7_pressure_agreement",
-                    "m8_pressure_divergence",
-                    "trailing_return_15m",
-                    "trailing_return_60m",
-                    "trailing_atr_ratio_15m",
-                ]
-                for f in fields_to_check:
-                    if not _close_match(existing[f], row.get(f)):
-                        raise ValueError(
-                            f"Conflicting duplicate slot evidence for decision_close_ms={slot_ms} in blind ledger: "
-                            f"field '{f}' existing={existing[f]} vs incoming={row.get(f)}"
+                        src_map = (
+                            json.loads(src_hashes_raw)
+                            if isinstance(src_hashes_raw, str)
+                            else dict(src_hashes_raw)
                         )
-                # Exactly matches -> idempotent no-op
-                return False
+                        for pname, phash in src_map.items():
+                            sp_row = conn.execute(
+                                "SELECT partition_sha256, finalized FROM h39_source_partitions WHERE partition_name = ?",
+                                (pname,),
+                            ).fetchone()
+                            if sp_row is not None and bool(sp_row["finalized"]) and sp_row["partition_sha256"] != phash:
+                                raise RuntimeError(
+                                    f"SOURCE_PARTITION_MUTATION: Source partition {pname} hash mutated from {sp_row['partition_sha256']} to {phash}!"
+                                )
+                    except RuntimeError:
+                        raise
+                    except Exception:  # noqa: BLE001, S110
+                        pass
 
-            slot_utc = (
-                row.get("slot_utc")
-                or row.get("decision_close_utc")
-                or datetime.fromtimestamp(slot_ms / 1000, UTC).isoformat()
-            )
-            source_partitions = (
-                row.get("source_partitions")
-                or (json.dumps([row["source_partition"]]) if "source_partition" in row else json.dumps([]))
-            )
-            source_partition_hashes = (
-                row.get("source_partition_hashes")
-                or (json.dumps({row.get("source_partition", "p"): row.get("source_partition_sha256", "")}) if "source_partition_sha256" in row else json.dumps({}))
-            )
-            code_version_sha = (
-                row.get("code_version_sha")
-                or row.get("code_git_sha")
-                or _get_current_git_sha()
-            )
-            ingested_at_utc = row.get("ingested_at_utc") or datetime.now(UTC).isoformat()
-            feat_win_start = int(row.get("feature_window_start_ms", slot_ms - 15 * 60_000))
-            feat_win_end = int(row.get("feature_window_end_ms", slot_ms))
-            is_eligible = int(bool(row.get("eligible", True)))
+                # Timing relation checks
+                ref_time = int(row.get("reference_time_ms", 0))
+                if ref_time != slot_ms + 60_000:
+                    raise ValueError(
+                        f"Invalid reference timing: reference_time_ms={ref_time} must equal decision_close_ms + 60_000 ({slot_ms + 60_000})"
+                    )
+                target_60m = int(row.get("target_60m_ms", 0))
+                if target_60m != ref_time + 59 * 60_000:
+                    raise ValueError(
+                        f"Invalid 60m target timing: target_60m_ms={target_60m} must equal reference_time_ms + 59*60_000 ({ref_time + 59*60_000})"
+                    )
+                target_240m = int(row.get("target_240m_ms", 0))
+                if target_240m != ref_time + 239 * 60_000:
+                    raise ValueError(
+                        f"Invalid 240m target timing: target_240m_ms={target_240m} must equal reference_time_ms + 239*60_000 ({ref_time + 239*60_000})"
+                    )
 
-            cols_map = {
-                "decision_close_ms": slot_ms,
-                "slot_utc": slot_utc,
-                "m1_trade_imbalance_5m": row.get("m1_trade_imbalance_5m"),
-                "m2_trade_imbalance_15m": row.get("m2_trade_imbalance_15m"),
-                "m3_ofi_5m": row.get("m3_ofi_5m"),
-                "m4_top5_depth_imbalance_5m": row.get("m4_top5_depth_imbalance_5m"),
-                "m5_top20_depth_imbalance_5m": row.get("m5_top20_depth_imbalance_5m"),
-                "m6_microprice_deviation_1m": row.get("m6_microprice_deviation_1m"),
-                "m7_pressure_agreement": row.get("m7_pressure_agreement"),
-                "m8_pressure_divergence": row.get("m8_pressure_divergence"),
-                "trailing_return_15m": row.get("trailing_return_15m"),
-                "trailing_return_60m": row.get("trailing_return_60m"),
-                "trailing_atr_ratio_15m": row.get("trailing_atr_ratio_15m"),
-                "trailing_atr_15m": row.get("trailing_atr_15m"),
-                "decision_close_price": row.get("decision_close_price"),
-                "eligible": is_eligible,
-                "rejection_reason": row.get("rejection_reason"),
-                "book_sample_count_15m": row.get("book_sample_count_15m"),
-                "trade_count_15m": row.get("trade_count_15m"),
-                "feature_window_start_ms": feat_win_start,
-                "feature_window_end_ms": feat_win_end,
-                "reference_time_ms": ref_time,
-                "target_60m_ms": target_60m,
-                "target_240m_ms": target_240m,
-                "source_partitions": source_partitions,
-                "source_partition_hashes": source_partition_hashes,
-                "protocol_hash": p_hash,
-                "clarification_hash": c_hash,
-                "code_version_sha": code_version_sha,
-                "ingested_at_utc": ingested_at_utc,
-            }
-            cols = list(cols_map.keys())
-            vals = [cols_map[c] for c in cols]
-            placeholders = ", ".join(["?"] * len(cols))
-            conn.execute(
-                f"INSERT INTO h39_blind_validation_ledger ({', '.join(cols)}) VALUES ({placeholders})",
-                vals,
-            )
+                existing = conn.execute(
+                    "SELECT * FROM h39_blind_validation_ledger WHERE decision_close_ms = ?",
+                    (slot_ms,),
+                ).fetchone()
+
+                if existing is not None:
+                    # Check for conflicting evidence
+                    def _close_match(v1: Any, v2: Any, tol: float = 1e-7) -> bool:
+                        if v1 is None and v2 is None:
+                            return True
+                        if v1 is None or v2 is None:
+                            return False
+                        try:
+                            return abs(float(v1) - float(v2)) <= tol
+                        except (ValueError, TypeError):
+                            return str(v1) == str(v2)
+
+                    fields_to_check = [
+                        "eligible",
+                        "rejection_reason",
+                        "m1_trade_imbalance_5m",
+                        "m2_trade_imbalance_15m",
+                        "m3_ofi_5m",
+                        "m4_top5_depth_imbalance_5m",
+                        "m5_top20_depth_imbalance_5m",
+                        "m6_microprice_deviation_1m",
+                        "m7_pressure_agreement",
+                        "m8_pressure_divergence",
+                        "trailing_return_15m",
+                        "trailing_return_60m",
+                        "trailing_atr_ratio_15m",
+                    ]
+                    for f in fields_to_check:
+                        if not _close_match(existing[f], row.get(f)):
+                            raise ValueError(
+                                f"Conflicting duplicate slot evidence for decision_close_ms={slot_ms} in blind ledger: "
+                                f"field '{f}' existing={existing[f]} vs incoming={row.get(f)}"
+                            )
+                    # Exactly matches -> idempotent no-op
+                    continue
+
+                slot_utc = (
+                    row.get("slot_utc")
+                    or row.get("decision_close_utc")
+                    or datetime.fromtimestamp(slot_ms / 1000, UTC).isoformat()
+                )
+                source_partitions = (
+                    row.get("source_partitions")
+                    or (json.dumps([row["source_partition"]]) if "source_partition" in row else json.dumps([]))
+                )
+                source_partition_hashes = (
+                    row.get("source_partition_hashes")
+                    or (json.dumps({row.get("source_partition", "p"): row.get("source_partition_sha256", "")}) if "source_partition_sha256" in row else json.dumps({}))
+                )
+                code_version_sha = (
+                    row.get("code_version_sha")
+                    or row.get("code_git_sha")
+                    or _get_current_git_sha()
+                )
+                ingested_at_utc = row.get("ingested_at_utc") or datetime.now(UTC).isoformat()
+                feat_win_start = int(row.get("feature_window_start_ms", slot_ms - 15 * 60_000))
+                feat_win_end = int(row.get("feature_window_end_ms", slot_ms))
+                is_eligible = int(bool(row.get("eligible", True)))
+
+                cols_map = {
+                    "decision_close_ms": slot_ms,
+                    "slot_utc": slot_utc,
+                    "m1_trade_imbalance_5m": row.get("m1_trade_imbalance_5m"),
+                    "m2_trade_imbalance_15m": row.get("m2_trade_imbalance_15m"),
+                    "m3_ofi_5m": row.get("m3_ofi_5m"),
+                    "m4_top5_depth_imbalance_5m": row.get("m4_top5_depth_imbalance_5m"),
+                    "m5_top20_depth_imbalance_5m": row.get("m5_top20_depth_imbalance_5m"),
+                    "m6_microprice_deviation_1m": row.get("m6_microprice_deviation_1m"),
+                    "m7_pressure_agreement": row.get("m7_pressure_agreement"),
+                    "m8_pressure_divergence": row.get("m8_pressure_divergence"),
+                    "trailing_return_15m": row.get("trailing_return_15m"),
+                    "trailing_return_60m": row.get("trailing_return_60m"),
+                    "trailing_atr_ratio_15m": row.get("trailing_atr_ratio_15m"),
+                    "trailing_atr_15m": row.get("trailing_atr_15m"),
+                    "decision_close_price": row.get("decision_close_price"),
+                    "eligible": is_eligible,
+                    "rejection_reason": row.get("rejection_reason"),
+                    "book_sample_count_15m": row.get("book_sample_count_15m"),
+                    "trade_count_15m": row.get("trade_count_15m"),
+                    "feature_window_start_ms": feat_win_start,
+                    "feature_window_end_ms": feat_win_end,
+                    "reference_time_ms": ref_time,
+                    "target_60m_ms": target_60m,
+                    "target_240m_ms": target_240m,
+                    "source_partitions": source_partitions,
+                    "source_partition_hashes": source_partition_hashes,
+                    "protocol_hash": p_hash,
+                    "clarification_hash": c_hash,
+                    "code_version_sha": code_version_sha,
+                    "ingested_at_utc": ingested_at_utc,
+                }
+                cols = list(cols_map.keys())
+                vals = [cols_map[c] for c in cols]
+                placeholders = ", ".join(["?"] * len(cols))
+                conn.execute(
+                    f"INSERT INTO h39_blind_validation_ledger ({', '.join(cols)}) VALUES ({placeholders})",
+                    vals,
+                )
+                inserted_count += 1
             conn.commit()
-            return True
+        return inserted_count
+
+    def ingest_slot(self, row: dict[str, Any]) -> bool:
+        """Idempotently ingest a single validation decision slot."""
+        return self.ingest_slots([row]) > 0
 
     def append_slot(self, row: dict[str, Any]) -> str:
         inserted = self.ingest_slot(row)
@@ -3271,7 +3297,7 @@ class H39OneShotExecutionRegistry:
         self._init_db()
 
     def _init_db(self) -> None:
-        with sqlite3.connect(self.db_path) as conn:
+        with _open_sqlite(self.db_path) as conn:
             conn.execute("""
                 CREATE TABLE IF NOT EXISTS h39_one_shot_executions (
                     execution_key TEXT PRIMARY KEY,
@@ -3303,7 +3329,7 @@ class H39OneShotExecutionRegistry:
 
         Refuses with H39_ONE_SHOT_ALREADY_CONSUMED if key already exists in STARTED or COMPLETED.
         """
-        with sqlite3.connect(self.db_path) as conn:
+        with _open_sqlite(self.db_path) as conn:
             conn.row_factory = sqlite3.Row
             row = conn.execute(
                 "SELECT state, started_at_utc, completed_at_utc FROM h39_one_shot_executions WHERE execution_key = ?",
@@ -3342,7 +3368,7 @@ class H39OneShotExecutionRegistry:
     ) -> None:
         """Atomically transition execution key to state='COMPLETED'."""
         completed_at_utc = datetime.now(UTC).isoformat()
-        with sqlite3.connect(self.db_path) as conn:
+        with _open_sqlite(self.db_path) as conn:
             conn.execute(
                 """UPDATE h39_one_shot_executions
                    SET state = 'COMPLETED',
@@ -3354,7 +3380,7 @@ class H39OneShotExecutionRegistry:
             conn.commit()
 
     def get_execution(self, execution_key: str) -> dict[str, Any] | None:
-        with sqlite3.connect(self.db_path) as conn:
+        with _open_sqlite(self.db_path) as conn:
             conn.row_factory = sqlite3.Row
             row = conn.execute(
                 "SELECT * FROM h39_one_shot_executions WHERE execution_key = ?",
@@ -3670,13 +3696,13 @@ class H39OneShotUnblindGatekeeper:
         self.snapshot_dir.mkdir(parents=True, exist_ok=True)
         snapshot_path = self.snapshot_dir / f"H39_ONE_SHOT_LEDGER_SNAPSHOT_{cutoff_ms}.sqlite3"
         with (
-            sqlite3.connect(f"file:{self.ledger_path.as_posix()}?mode=ro", uri=True) as src_conn,
-            sqlite3.connect(snapshot_path) as dst_conn,
+            _open_sqlite(f"file:{self.ledger_path.as_posix()}?mode=ro", uri=True) as src_conn,
+            _open_sqlite(snapshot_path) as dst_conn,
         ):
             src_conn.backup(dst_conn)
 
         # Verify snapshot integrity and count rows
-        with sqlite3.connect(f"file:{snapshot_path.as_posix()}?mode=ro", uri=True) as chk_conn:
+        with _open_sqlite(f"file:{snapshot_path.as_posix()}?mode=ro", uri=True) as chk_conn:
             integ_res = chk_conn.execute("PRAGMA integrity_check;").fetchone()
             if not integ_res or integ_res[0].lower() != "ok":
                 raise RuntimeError(
@@ -3695,7 +3721,7 @@ class H39OneShotUnblindGatekeeper:
 
         # 3. Source partition hashes
         partition_map: dict[str, str] = {}
-        with sqlite3.connect(f"file:{snapshot_path.as_posix()}?mode=ro", uri=True) as conn:
+        with _open_sqlite(f"file:{snapshot_path.as_posix()}?mode=ro", uri=True) as conn:
             conn.row_factory = sqlite3.Row
             rows = conn.execute(
                 "SELECT partition_name, partition_sha256 FROM h39_source_partitions ORDER BY partition_name ASC"
@@ -3831,7 +3857,7 @@ class H39OneShotUnblindGatekeeper:
                 f"FROZEN_SNAPSHOT_TAMPERED: Frozen snapshot SHA-256 on disk ({curr_s_sha}) "
                 f"does not match freeze manifest ({manifest['frozen_ledger_snapshot_sha256']})"
             )
-        with sqlite3.connect(f"file:{s_path.as_posix()}?mode=ro", uri=True) as chk_conn:
+        with _open_sqlite(f"file:{s_path.as_posix()}?mode=ro", uri=True) as chk_conn:
             chk_res = chk_conn.execute("PRAGMA integrity_check;").fetchone()
             if not chk_res or chk_res[0].lower() != "ok":
                 raise RuntimeError(
@@ -3853,7 +3879,7 @@ class H39OneShotUnblindGatekeeper:
             )
 
         # Verify source partitions in snapshot
-        with sqlite3.connect(f"file:{s_path.as_posix()}?mode=ro", uri=True) as conn:
+        with _open_sqlite(f"file:{s_path.as_posix()}?mode=ro", uri=True) as conn:
             conn.row_factory = sqlite3.Row
             rows = conn.execute(
                 "SELECT partition_name, partition_sha256 FROM h39_source_partitions"
@@ -3924,7 +3950,7 @@ class H39OneShotUnblindGatekeeper:
 
         # 4. ONLY AFTER BOTH SUCCEED: Pull validation rows from FROZEN SNAPSHOT (Finding C)
         snapshot_path = Path(manifest["frozen_ledger_snapshot_path"]).resolve()
-        with sqlite3.connect(f"file:{snapshot_path.as_posix()}?mode=ro", uri=True) as conn:
+        with _open_sqlite(f"file:{snapshot_path.as_posix()}?mode=ro", uri=True) as conn:
             conn.row_factory = sqlite3.Row
             all_rows = conn.execute(
                 """SELECT * FROM h39_blind_validation_ledger

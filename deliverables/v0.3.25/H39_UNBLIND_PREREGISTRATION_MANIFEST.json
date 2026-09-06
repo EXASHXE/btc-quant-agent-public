@@ -28,8 +28,8 @@
     "fallback_status": "RESEARCH_FAMILY_STOP",
     "status_name": "PROVISIONAL_MICROSTRUCTURE_CANDIDATE"
   },
-  "code_version_sha": "2e89ce4a32085cc4a993d5b64a226096c2de164c",
-  "created_at_utc": "2026-09-06T16:05:50.207255+00:00",
+  "code_version_sha": "7bb33d7335ca4d7beb427d0d4a260602a49ba129",
+  "created_at_utc": "2026-09-06T16:17:00.885278+00:00",
   "current_stage_state": "FORWARD_DATA_INSUFFICIENT",
   "formal_feature_universe": [
     "M1_TRADE_NOTIONAL_IMBALANCE_5M",

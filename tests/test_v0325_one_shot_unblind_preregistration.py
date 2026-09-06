@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import json
-import sqlite3
 import subprocess
 import warnings
 from datetime import UTC, datetime
@@ -32,6 +31,7 @@ from btc_quant_agent.microstructure_research import (
     H39ResearchEngine,
     _compute_sha256,
     _holm_bonferroni,
+    _open_sqlite,
     evaluate_feature_hypotheses,
     generate_all_v0325_deliverables,
     verify_committed_freeze_package,
@@ -124,9 +124,9 @@ def _create_synthetic_ledger(
     )
 
     base_midnight = 1788480000000  # 2026-09-04T00:00:00Z
-    total_inserted = 0
     total_eligible = 0
     curr_ms = start_ms
+    rows_to_insert = []
 
     for d in range(num_days):
         day_midnight = base_midnight + d * 86_400_000
@@ -149,12 +149,12 @@ def _create_synthetic_ledger(
                 source_partition_sha=p_sha,
                 m_val=0.1 * ((s % 5) + 1),
             )
-            if ledger.ingest_slot(row):
-                total_inserted += 1
-                if is_elig:
-                    total_eligible += 1
+            rows_to_insert.append(row)
+            if is_elig:
+                total_eligible += 1
             curr_ms = max(curr_ms, slot_time)
 
+    ledger.ingest_slots(rows_to_insert)
     return ledger, curr_ms
 
 
@@ -164,7 +164,7 @@ def _populate_canonical_candles(
     base_price: float = 50000.0,
 ) -> None:
     db_path.parent.mkdir(parents=True, exist_ok=True)
-    with sqlite3.connect(db_path) as conn:
+    with _open_sqlite(db_path) as conn:
         conn.execute(
             """CREATE TABLE IF NOT EXISTS klines_1m (
                 open_time_ms INTEGER PRIMARY KEY,
@@ -360,7 +360,7 @@ def test_freeze_cutoff_excludes_later_rows(tmp_path: Path) -> None:
     _commit_in_test_git_repo(repo_dir, freeze_file)
 
     # Setup candles up to latest_ms
-    with sqlite3.connect(db_path) as conn:
+    with _open_sqlite(db_path) as conn:
         slots = [r[0] for r in conn.execute("SELECT decision_close_ms FROM h39_blind_validation_ledger WHERE decision_close_ms <= ?", (latest_ms,)).fetchall()]
     _populate_canonical_candles(candles_path, slots)
 
@@ -460,11 +460,11 @@ def test_240m_cannot_rescue_60m_failure(tmp_path: Path) -> None:
     _commit_in_test_git_repo(repo_dir, freeze_file)
 
     # Create candles where 60m has zero/negative return, but 240m has strongly positive return
-    with sqlite3.connect(db_path) as conn:
+    with _open_sqlite(db_path) as conn:
         slots = [r[0] for r in conn.execute("SELECT decision_close_ms FROM h39_blind_validation_ledger WHERE decision_close_ms <= ?", (latest_ms,)).fetchall()]
 
     db_path.parent.mkdir(parents=True, exist_ok=True)
-    with sqlite3.connect(candles_path) as conn:
+    with _open_sqlite(candles_path) as conn:
         conn.execute("CREATE TABLE IF NOT EXISTS klines_1m (open_time_ms INTEGER PRIMARY KEY, open REAL, high REAL, low REAL, close REAL, volume REAL, close_time_ms INTEGER)")
         base_price = 50000.0
         for s in slots:
@@ -589,7 +589,7 @@ def test_full_mock_unblind_execution_on_synthetic_mature_ledger(tmp_path: Path) 
     _ledger, latest_ms = _create_synthetic_ledger(db_path, num_days=14, slots_per_day=96)
 
     # Populate matching candles
-    with sqlite3.connect(db_path) as conn:
+    with _open_sqlite(db_path) as conn:
         slots = [r[0] for r in conn.execute("SELECT decision_close_ms FROM h39_blind_validation_ledger WHERE decision_close_ms <= ?", (latest_ms,)).fetchall()]
     _populate_canonical_candles(candles_path, slots)
 
@@ -944,7 +944,7 @@ def test_finding_c_wal_safe_snapshot(tmp_path: Path) -> None:
     _ledger, latest_ms = _create_synthetic_ledger(db_path, num_days=14, slots_per_day=96)
 
     # Explicitly enforce WAL mode
-    with sqlite3.connect(db_path) as conn:
+    with _open_sqlite(db_path) as conn:
         conn.execute("PRAGMA journal_mode = WAL;")
 
     freeze_file = repo_dir / "freeze.json"
@@ -961,12 +961,12 @@ def test_finding_c_wal_safe_snapshot(tmp_path: Path) -> None:
     assert manifest["frozen_ledger_snapshot_sha256"] == _compute_sha256(snapshot_path)
 
     # Check snapshot integrity
-    with sqlite3.connect(f"file:{snapshot_path.as_posix()}?mode=ro", uri=True) as conn:
+    with _open_sqlite(f"file:{snapshot_path.as_posix()}?mode=ro", uri=True) as conn:
         chk = conn.execute("PRAGMA integrity_check;").fetchone()[0]
         assert chk.lower() == "ok"
         snap_count = conn.execute("SELECT COUNT(*) FROM h39_blind_validation_ledger;").fetchone()[0]
 
-    with sqlite3.connect(f"file:{db_path.as_posix()}?mode=ro", uri=True) as conn:
+    with _open_sqlite(f"file:{db_path.as_posix()}?mode=ro", uri=True) as conn:
         live_count = conn.execute("SELECT COUNT(*) FROM h39_blind_validation_ledger;").fetchone()[0]
 
     assert snap_count == live_count
@@ -1016,7 +1016,7 @@ def test_finding_f_label_loader_ordering_spy(tmp_path: Path) -> None:
     candles_path = tmp_path / "canonical_candles.sqlite3"
     _ledger, latest_ms = _create_synthetic_ledger(db_path, num_days=14, slots_per_day=96)
 
-    with sqlite3.connect(db_path) as conn:
+    with _open_sqlite(db_path) as conn:
         slots = [r[0] for r in conn.execute("SELECT decision_close_ms FROM h39_blind_validation_ledger WHERE decision_close_ms <= ?", (latest_ms,)).fetchall()]
     _populate_canonical_candles(candles_path, slots)
 
