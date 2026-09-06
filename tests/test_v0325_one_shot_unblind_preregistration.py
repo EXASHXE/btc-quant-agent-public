@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import sqlite3
 import subprocess
 import warnings
 from datetime import UTC, datetime
@@ -14,8 +15,15 @@ import pytest
 from btc_quant_agent.cli import build_parser
 from btc_quant_agent.microstructure_research import (
     FORMAL_FEATURE_IDS,
+    H39_CLARIFICATION_002_SHA,
+    H39_FROZEN_CLARIFICATION_002_HASH,
     H39_FROZEN_CLARIFICATION_HASH,
     H39_FROZEN_PROTOCOL_HASH,
+    H39_HAC_MAX_LAG_60M,
+    H39_HAC_MAX_LAG_240M,
+    H39_LR_BOOTSTRAP_BLOCK_LENGTH,
+    H39_LR_BOOTSTRAP_REPLICATIONS,
+    H39_LR_BOOTSTRAP_SEED,
     H39_ONE_SHOT_ALREADY_CONSUMED,
     H39_STATE_BLOCKED_QUALITY,
     H39_STATE_INSUFFICIENT,
@@ -30,9 +38,14 @@ from btc_quant_agent.microstructure_research import (
     H39OutcomeRow,
     H39ResearchEngine,
     _compute_sha256,
+    _fit_l2_logistic_regression,
     _holm_bonferroni,
+    _l2_logistic_sandwich_cov,
+    _moving_block_bootstrap_lr_p_value,
+    _newey_west_linear_regression,
     _open_sqlite,
     evaluate_feature_hypotheses,
+    evaluate_forward_chain_health,
     generate_all_v0325_deliverables,
     verify_committed_freeze_package,
 )
@@ -311,6 +324,12 @@ def test_clarification_hash_drift_blocks_unblind(tmp_path: Path) -> None:
     gk = H39OneShotUnblindGatekeeper(ledger_path=db_path, clarification_path=bad_clar)
     with pytest.raises(RuntimeError, match="CLARIFICATION_HASH_DRIFT"):
         gk.verify_readiness_preconditions(as_of_ms=latest_ms)
+
+
+def test_clarification_002_hash_and_sha_pinned() -> None:
+    """Clarification 002 commit SHA and file hash are correctly pinned."""
+    assert H39_CLARIFICATION_002_SHA == "6e1259409aa4f1cedf86b7a424666ee7c942a929"
+    assert H39_FROZEN_CLARIFICATION_002_HASH == "94c938b65640252c85a9e320b6f7759729ffa00f793c93e17cca52726e73212e"
 
 
 def test_legacy_evaluate_validation_status_cannot_authorize_unblind() -> None:
@@ -656,7 +675,7 @@ def test_generate_all_v0325_deliverables_immature_state(tmp_path: Path) -> None:
     """Test v0.3.25 deliverables generation under immature state (current live repo state)."""
     deliv_dir = tmp_path / "v0.3.25"
     files = generate_all_v0325_deliverables(output_dir=deliv_dir)
-    assert len(files) == 7
+    assert len(files) == 9
     assert all(Path(p).exists() for p in files.values())
 
     expected_files = [
@@ -667,6 +686,8 @@ def test_generate_all_v0325_deliverables_immature_state(tmp_path: Path) -> None:
         "V0.3.25_H39_ONE_SHOT_UNBLIND_PREREGISTRATION_REPORT.md",
         "V0.3.25_COMMITTED_FREEZE_EXACTLY_ONCE_REPAIR.json",
         "V0.3.25_COMMITTED_FREEZE_EXACTLY_ONCE_REPAIR.md",
+        "V0.3.25_STATISTICAL_DEPENDENCE_HEALTH_REPAIR.json",
+        "V0.3.25_STATISTICAL_DEPENDENCE_HEALTH_REPAIR.md",
     ]
     for ef in expected_files:
         p = deliv_dir / ef
@@ -1073,3 +1094,269 @@ def test_finding_k_no_real_unblind_during_current_repair() -> None:
         ]
         for f in forbidden:
             assert not f.exists(), f"Forbidden real unblind artifact exists in live repo: {f}"
+
+
+def test_hac_linear_regression_fixed_lags() -> None:
+    """Finding A.1: 60m formal inference uses HAC lag 3, 240m uses lag 15."""
+    assert H39_HAC_MAX_LAG_60M == 3
+    assert H39_HAC_MAX_LAG_240M == 15
+
+    n = 100
+    x = [[1.0, float(i)] for i in range(n)]
+    y = [float(i) * 0.1 for i in range(n)]
+    b60, se60, _t60, _, _ = _newey_west_linear_regression(x, y, max_lag=H39_HAC_MAX_LAG_60M)
+    b240, se240, _t240, _, _ = _newey_west_linear_regression(x, y, max_lag=H39_HAC_MAX_LAG_240M)
+    assert len(b60) == 2
+    assert len(b240) == 2
+    assert se60[1] > 0
+    assert se240[1] > 0
+
+
+def test_hac_standard_error_inflation_under_autocorrelation() -> None:
+    """Finding A.2: Positive serial correlation inflates SE versus naive iid in AR(1) case."""
+    import numpy as np
+
+    rng = np.random.default_rng(12345)
+    n = 300
+    x_val = rng.standard_normal(n)
+    # Generate AR(1) autocorrelated errors e_t = 0.8 * e_{t-1} + v_t
+    e = np.zeros(n)
+    v = rng.standard_normal(n)
+    for t in range(1, n):
+        e[t] = 0.8 * e[t - 1] + v[t]
+    y_val = 0.5 * x_val + e
+
+    x_mat = [[1.0, float(xv)] for xv in x_val]
+    y_vec = [float(yv) for yv in y_val]
+
+    _beta, se_hac, t_hac, se_iid, t_iid = _newey_west_linear_regression(
+        x_mat, y_vec, max_lag=3, l2_lambda=0.0
+    )
+    # Positive autocorrelation must inflate the HAC standard error compared to naive iid SE
+    assert se_hac[1] > se_iid[1]
+    # Consequently, t-statistic must be smaller under HAC than naive iid
+    assert abs(t_hac[1]) < abs(t_iid[1])
+
+
+def test_sandwich_hac_logistic_regression() -> None:
+    """Finding A.3: Sandwich HAC covariance produces valid SE and accounts for dependence."""
+    import numpy as np
+
+    rng = np.random.default_rng(54321)
+    n = 200
+    X = np.column_stack([np.ones(n), rng.standard_normal((n, 3)), rng.standard_normal(n)])
+    y = (rng.uniform(0, 1, n) > 0.5).astype(float)
+    b, _c_model, _ = _fit_l2_logistic_regression(X.tolist(), y.tolist(), l2_lambda=1.0)
+
+    cov_sandwich, _cov_m = _l2_logistic_sandwich_cov(X, y, b, max_lag=3, l2_lambda=1.0)
+    assert len(cov_sandwich) == 5
+    assert cov_sandwich[4][4] > 0.0
+
+
+def test_moving_block_bootstrap_lr_calibration_deterministic() -> None:
+    """Finding A.4: Moving-block bootstrap parameters are frozen constants and execution is deterministic."""
+    assert H39_LR_BOOTSTRAP_BLOCK_LENGTH == 4
+    assert H39_LR_BOOTSTRAP_REPLICATIONS == 5000
+    assert H39_LR_BOOTSTRAP_SEED == 390325
+
+    import numpy as np
+
+    rng = np.random.default_rng(9999)
+    n = 100
+    X_base = np.column_stack([np.ones(n), rng.standard_normal((n, 3))]).tolist()
+    y = (rng.uniform(0, 1, n) > 0.5).astype(float).tolist()
+    x_micro = rng.standard_normal(n).tolist()
+
+    # Two identical runs with same seed must yield exact identical p-value
+    p1 = _moving_block_bootstrap_lr_p_value(
+        x_base=X_base,
+        x_micro=x_micro,
+        y_vector=y,
+        ll_base=-60.0,
+        observed_lr=2.5,
+        block_length=4,
+        n_boot=100,  # Fast check
+        seed=390325,
+    )
+    p2 = _moving_block_bootstrap_lr_p_value(
+        x_base=X_base,
+        x_micro=x_micro,
+        y_vector=y,
+        ll_base=-60.0,
+        observed_lr=2.5,
+        block_length=4,
+        n_boot=100,
+        seed=390325,
+    )
+    assert p1 == p2
+    assert 0.0 <= p1 <= 1.0
+
+
+def test_one_shot_results_contain_hac_and_bootstrap(tmp_path: Path) -> None:
+    """Finding A.5: execute_one_shot_unblind records HAC lags, robust p-values, and diagnostics."""
+    repo_dir = tmp_path / "test_repo"
+    _init_test_git_repo(repo_dir)
+
+    db_path = tmp_path / "ledger.sqlite3"
+    candles_path = tmp_path / "candles.sqlite3"
+    _ledger, latest_ms = _create_synthetic_ledger(db_path, num_days=14, slots_per_day=96)
+
+    freeze_file = repo_dir / "freeze.json"
+    registry_path = tmp_path / "reg.sqlite3"
+    gk = H39OneShotUnblindGatekeeper(
+        ledger_path=db_path,
+        canonical_candles_path=candles_path,
+        registry_path=registry_path,
+        snapshot_dir=tmp_path / "snapshots",
+        repo_root=repo_dir,
+    )
+    gk.create_freeze_manifest(output_path=freeze_file, as_of_ms=latest_ms)
+    _commit_in_test_git_repo(repo_dir, freeze_file)
+
+    with _open_sqlite(db_path) as conn:
+        slots = [r[0] for r in conn.execute("SELECT decision_close_ms FROM h39_blind_validation_ledger WHERE decision_close_ms <= ?", (latest_ms,)).fetchall()]
+    _populate_canonical_candles(candles_path, slots)
+
+    res = gk.execute_one_shot_unblind(
+        freeze_manifest_path=freeze_file,
+        output_dir=tmp_path / "results",
+        repo_root=repo_dir,
+    )
+    prim = res["primary_60m_family"]
+    for fid in FORMAL_FEATURE_IDS:
+        f_res = prim[fid]
+        assert f_res["covariance_method"] == "NEWEY_WEST_HAC"
+        assert f_res["hac_max_lag"] == 3
+        assert f_res["lr_calibration_method"] == "CHRONOLOGICAL_MOVING_BLOCK_BOOTSTRAP"
+        assert f_res["lr_bootstrap_block_length"] == 4
+        assert "diagnostics" in f_res
+        assert "iid_standard_error" in f_res["diagnostics"]
+        assert "iid_incremental_lr_p_value" in f_res["diagnostics"]
+
+
+def test_derivatives_health_states(tmp_path: Path) -> None:
+    """Finding B.1: Derivatives chain evaluates all failure and healthy states correctly."""
+    # 1. Missing file -> MISSING, exists=False, db_integrity=NOT_CHECKED, rows=0
+    missing_path = tmp_path / "non_existent.sqlite3"
+    h_missing = evaluate_forward_chain_health(canonical_derivatives_path=missing_path)
+    d_m = h_missing["derivatives_chain"]
+    assert d_m["status"] == "MISSING"
+    assert d_m["exists"] is False
+    assert d_m["db_integrity"] == "NOT_CHECKED"
+    assert d_m["rows_recorded"] == 0
+    assert h_missing["aggregate_status"] == "BLOCKED"
+
+    # 2. Corrupt / non-sqlite file -> READ_ERROR or INTEGRITY_ERROR
+    corrupt_path = tmp_path / "corrupt.sqlite3"
+    corrupt_path.write_bytes(b"NOT_A_SQLITE_DATABASE")
+    h_corrupt = evaluate_forward_chain_health(canonical_derivatives_path=corrupt_path)
+    d_c = h_corrupt["derivatives_chain"]
+    assert d_c["status"] in ("INTEGRITY_ERROR", "READ_ERROR")
+    assert h_corrupt["aggregate_status"] == "BLOCKED"
+
+    # 3. Valid sqlite with wrong schema -> SCHEMA_ERROR
+    bad_schema = tmp_path / "bad_schema.sqlite3"
+    with sqlite3.connect(bad_schema) as conn:
+        conn.execute("CREATE TABLE other_table (id INT)")
+    h_bad_schema = evaluate_forward_chain_health(canonical_derivatives_path=bad_schema)
+    assert h_bad_schema["derivatives_chain"]["status"] == "SCHEMA_ERROR"
+    assert h_bad_schema["aggregate_status"] == "BLOCKED"
+
+    # 4. Valid table but empty -> EMPTY
+    empty_db = tmp_path / "empty.sqlite3"
+    with sqlite3.connect(empty_db) as conn:
+        conn.execute(
+            """CREATE TABLE derivative_snapshots (
+                observed_at_ms INT, funding_rate REAL, open_interest REAL,
+                taker_buy_sell_ratio REAL, basis_rate REAL, long_short_account_ratio REAL
+            )"""
+        )
+    h_empty = evaluate_forward_chain_health(canonical_derivatives_path=empty_db)
+    assert h_empty["derivatives_chain"]["status"] == "EMPTY"
+    assert h_empty["derivatives_chain"]["rows_recorded"] == 0
+    assert h_empty["aggregate_status"] == "BLOCKED"
+
+    # 5. Stale data -> STALE
+    stale_db = tmp_path / "stale.sqlite3"
+    old_t = 1000000000000  # Long ago
+    with sqlite3.connect(stale_db) as conn:
+        conn.execute(
+            """CREATE TABLE derivative_snapshots (
+                observed_at_ms INT, funding_rate REAL, open_interest REAL,
+                taker_buy_sell_ratio REAL, basis_rate REAL, long_short_account_ratio REAL
+            )"""
+        )
+        conn.execute(
+            "INSERT INTO derivative_snapshots VALUES (?, 0.0001, 1000.0, 1.1, 0.0002, 1.2)",
+            (old_t,),
+        )
+    mock_m_root_stale = tmp_path / "micro_stale"
+    mock_m_root_stale.mkdir()
+    p_file_stale = mock_m_root_stale / "microstructure-2026-09-06.sqlite3"
+    with sqlite3.connect(p_file_stale) as conn:
+        conn.execute("CREATE TABLE agg_trades (event_time_ms INT)")
+        conn.execute("CREATE TABLE book_samples (event_time_ms INT)")
+        conn.execute("INSERT INTO agg_trades VALUES (?)", (old_t + 10_000_000 - 30_000,))
+        conn.execute("INSERT INTO book_samples VALUES (?)", (old_t + 10_000_000 - 30_000,))
+
+    h_stale = evaluate_forward_chain_health(
+        canonical_derivatives_path=stale_db,
+        microstructure_root=mock_m_root_stale,
+        now_ms=old_t + 10_000_000,
+    )
+    assert h_stale["derivatives_chain"]["status"] == "STALE"
+    assert h_stale["aggregate_status"] == "DEGRADED"
+
+    # 6. Healthy fresh data -> HEALTHY
+    fresh_db = tmp_path / "fresh.sqlite3"
+    fresh_t = 1788720000000
+    with sqlite3.connect(fresh_db) as conn:
+        conn.execute(
+            """CREATE TABLE derivative_snapshots (
+                observed_at_ms INT, funding_rate REAL, open_interest REAL,
+                taker_buy_sell_ratio REAL, basis_rate REAL, long_short_account_ratio REAL
+            )"""
+        )
+        conn.execute(
+            "INSERT INTO derivative_snapshots VALUES (?, 0.0001, 1000.0, 1.1, 0.0002, 1.2)",
+            (fresh_t,),
+        )
+    mock_m_root = tmp_path / "micro"
+    mock_m_root.mkdir()
+    p_file = mock_m_root / "microstructure-2026-09-06.sqlite3"
+    with sqlite3.connect(p_file) as conn:
+        conn.execute("CREATE TABLE agg_trades (event_time_ms INT)")
+        conn.execute("CREATE TABLE book_samples (event_time_ms INT)")
+        conn.execute("INSERT INTO agg_trades VALUES (?)", (fresh_t,))
+        conn.execute("INSERT INTO book_samples VALUES (?)", (fresh_t,))
+
+    h_fresh = evaluate_forward_chain_health(
+        canonical_derivatives_path=fresh_db,
+        microstructure_root=mock_m_root,
+        now_ms=fresh_t + 60_000,
+    )
+    assert h_fresh["derivatives_chain"]["status"] == "HEALTHY"
+    assert h_fresh["microstructure_chain"]["status"] == "HEALTHY"
+    assert h_fresh["aggregate_status"] == "HEALTHY"
+
+
+def test_microstructure_health_states(tmp_path: Path) -> None:
+    """Finding B.2: Microstructure health evaluates root, partitions, schema, and truthfulness."""
+    # 1. Missing root -> MISSING
+    h_m_missing = evaluate_forward_chain_health(microstructure_root=tmp_path / "no_such_dir")
+    assert h_m_missing["microstructure_chain"]["status"] == "MISSING"
+    assert h_m_missing["microstructure_chain"]["root_exists"] is False
+    assert h_m_missing["aggregate_status"] == "BLOCKED"
+
+    # 2. Empty directory (no partitions) -> MISSING
+    empty_root = tmp_path / "empty_micro"
+    empty_root.mkdir()
+    h_m_empty = evaluate_forward_chain_health(microstructure_root=empty_root)
+    assert h_m_empty["microstructure_chain"]["status"] == "MISSING"
+    assert h_m_empty["microstructure_chain"]["partition_count"] == 0
+
+    # 3. Collector heartbeat is NOT_VERIFIED, never ACTIVE without proof
+    assert h_m_empty["microstructure_chain"]["collector_heartbeat_status"] == "NOT_VERIFIED"
+
+    # 4. H38 Opportunity Shadow is strictly DATA_QUALITY_TERMINAL_ARCHIVE
+    assert h_m_empty["opportunity_shadow_chain"]["status"] == "DATA_QUALITY_TERMINAL_ARCHIVE"

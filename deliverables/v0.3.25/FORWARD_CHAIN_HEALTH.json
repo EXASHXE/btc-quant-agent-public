@@ -1,15 +1,33 @@
 {
+  "aggregate_status": "HEALTHY",
   "derivatives_chain": {
-    "db_integrity": "OK",
+    "db_integrity": "ok",
     "epoch_id": "DERIVATIVES_PIT_EPOCH_V0321_001",
-    "rows_recorded": 0,
-    "status": "HEALTHY"
+    "exists": true,
+    "freshness_seconds": 496.24,
+    "latest_observed_ms": 1788721225415,
+    "latest_observed_utc": "2026-09-06T19:00:25.415000+00:00",
+    "reason": "Store verified: 507 snapshots, integrity OK, freshness 496.2s",
+    "rows_recorded": 507,
+    "schema_valid": true,
+    "status": "HEALTHY",
+    "store_path": "/root/workspace/project/Quant-agent/data/forward/BTCUSDT/derivatives.sqlite3",
+    "table_name": "derivative_snapshots"
   },
-  "generated_at_utc": "2026-09-06T16:17:00.886598+00:00",
+  "generated_at_utc": "2026-09-06T19:08:42.790301+00:00",
   "microstructure_chain": {
-    "active_partition": "microstructure-2026-09-06.sqlite3",
-    "integrity_status": "OK",
+    "collector_heartbeat_status": "NOT_VERIFIED",
+    "freshness_seconds": 0.0,
+    "latest_event_time_ms": 1788721722915,
+    "latest_event_time_utc": "2026-09-06T19:08:42.915000+00:00",
+    "latest_partition": "microstructure-2026-09-06.sqlite3",
+    "latest_partition_exists": true,
+    "latest_partition_integrity": "ok",
+    "latest_partition_schema_valid": true,
     "partition_count": 7,
+    "reason": "Partition microstructure-2026-09-06.sqlite3 verified: integrity OK, freshness 0.0s",
+    "root_exists": true,
+    "root_path": "/root/workspace/project/Quant-agent/data/forward/BTCUSDT/microstructure",
     "status": "HEALTHY",
     "stream_id": "MICROSTRUCTURE_CAPTURE_V0315_001"
   },
@@ -20,6 +38,7 @@
       "resolvable": false,
       "successor_preregistered": false
     },
+    "reason": "H38 breached data-quality boundary on 2026-09-04; terminal archive is frozen.",
     "status": "DATA_QUALITY_TERMINAL_ARCHIVE",
     "terminal_at_ms": 1788511500000,
     "terminal_at_utc": "2026-09-04T08:45:00Z"

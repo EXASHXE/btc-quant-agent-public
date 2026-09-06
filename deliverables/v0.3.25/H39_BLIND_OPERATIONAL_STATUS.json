@@ -1,16 +1,16 @@
 {
-  "clock_ceiling_ms": 1788711420881,
-  "clock_ceiling_utc": "2026-09-06T16:17:00.881000+00:00",
+  "clock_ceiling_ms": 1788721721651,
+  "clock_ceiling_utc": "2026-09-06T19:08:41.651000+00:00",
   "clock_denominator": {
-    "clock_ceiling_ms": 1788711420881,
-    "clock_ceiling_utc": "2026-09-06T16:17:00.881000+00:00",
+    "clock_ceiling_ms": 1788721721651,
+    "clock_ceiling_utc": "2026-09-06T19:08:41.651000+00:00",
     "clock_source": "WALL_CLOCK",
-    "coverage_ratio": 0.17370892018779344,
+    "coverage_ratio": 0.16517857142857142,
     "eligible_boundary_count": 37,
-    "eligible_coverage": 0.17370892018779344,
-    "expected_boundary_count": 213,
+    "eligible_coverage": 0.16517857142857142,
+    "expected_boundary_count": 224,
     "observed_boundary_count": 55,
-    "raw_observation_coverage": 0.25821596244131456
+    "raw_observation_coverage": 0.24553571428571427
   },
   "clock_source": "WALL_CLOCK",
   "coverage_gate_passed": false,
@@ -21,7 +21,7 @@
     "2026-09-06"
   ],
   "distinct_days_count": 3,
-  "generated_at_utc": "2026-09-06T16:17:00.885613+00:00",
+  "generated_at_utc": "2026-09-06T19:08:41.655588+00:00",
   "hypothesis_id": "H39_MICROSTRUCTURE_DIRECTIONAL_INFORMATION",
   "maturity_achieved": false,
   "maturity_gates": {
@@ -31,7 +31,7 @@
   },
   "observations_gate_passed": false,
   "ready_for_unblind": false,
-  "refusal_reason": "REFUSED_VALIDATION_NOT_MATURE: Minimum gates not met (days: 3/14, eligible: 37/750, coverage: 17.37%/90%)",
+  "refusal_reason": "REFUSED_VALIDATION_NOT_MATURE: Minimum gates not met (days: 3/14, eligible: 37/750, coverage: 16.52%/90%)",
   "rejection_reason_counts": {
     "GAP_IN_FEATURE_WINDOW": 18
   },

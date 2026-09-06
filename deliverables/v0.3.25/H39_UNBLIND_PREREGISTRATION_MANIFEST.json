@@ -28,8 +28,10 @@
     "fallback_status": "RESEARCH_FAMILY_STOP",
     "status_name": "PROVISIONAL_MICROSTRUCTURE_CANDIDATE"
   },
-  "code_version_sha": "7bb33d7335ca4d7beb427d0d4a260602a49ba129",
-  "created_at_utc": "2026-09-06T16:17:00.885278+00:00",
+  "clarification_002_commit_sha": "6e1259409aa4f1cedf86b7a424666ee7c942a929",
+  "clarification_002_hash": "94c938b65640252c85a9e320b6f7759729ffa00f793c93e17cca52726e73212e",
+  "code_version_sha": "304fb0d276508ce1ba8ae9bb617c94202f66879c",
+  "created_at_utc": "2026-09-06T19:08:41.655199+00:00",
   "current_stage_state": "FORWARD_DATA_INSUFFICIENT",
   "formal_feature_universe": [
     "M1_TRADE_NOTIONAL_IMBALANCE_5M",
@@ -42,6 +44,11 @@
     "M8_PRESSURE_DIVERGENCE_SCORE"
   ],
   "hypothesis_id": "H39_MICROSTRUCTURE_DIRECTIONAL_INFORMATION",
+  "incremental_dependence_robust": true,
+  "lr_bootstrap_block_length": 4,
+  "lr_bootstrap_replications": 5000,
+  "lr_bootstrap_seed": 390325,
+  "lr_calibration_method": "CHRONOLOGICAL_MOVING_BLOCK_BOOTSTRAP",
   "model_family": "L2_LOGISTIC_REGRESSION_LAMBDA_1_0",
   "one_shot_unblind_command": "quantctl h39 one-shot-unblind --freeze-manifest <path>",
   "predefined_signs": {
@@ -54,16 +61,19 @@
     "M7_PRESSURE_AGREEMENT_SCORE": 1,
     "M8_PRESSURE_DIVERGENCE_SCORE": 1
   },
+  "primary_covariance_method": "NEWEY_WEST_HAC",
   "primary_family": {
     "arms_count": 8,
     "correction_method": "HOLM_BONFERRONI",
     "fwer_alpha": 0.05,
     "horizon": "60m"
   },
+  "primary_hac_max_lag": 3,
   "protocol_clarification_sha": "2d1ccecc11dc231ffa41cdb1b5a9ea693abccc59",
   "protocol_freeze_sha": "0eecd8833675c664c42f5e62d89663d7a10ed5fa",
   "ready_for_unblind": false,
   "schema_version": "1.0.0",
+  "secondary_hac_max_lag": 15,
   "secondary_horizon": {
     "cannot_rescue_60m": true,
     "horizon": "240m",
