@@ -109,7 +109,7 @@ def main() -> int:
             manifest = gatekeeper.verify_freeze_manifest(args.freeze_manifest)
             print(json.dumps({"status": "VERIFIED", "manifest": manifest}, indent=2))
             return 0
-        except Exception as exc:
+        except Exception as exc:  # noqa: BLE001
             print(json.dumps({"status": "VERIFICATION_FAILED", "error": str(exc)}, indent=2))
             return 1
 

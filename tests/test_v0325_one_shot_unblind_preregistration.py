@@ -213,7 +213,7 @@ def test_unblind_refuses_below_90pct_wall_clock_coverage(tmp_path: Path) -> None
     """3. Unblind refuses below 90% wall-clock eligible coverage."""
     db_path = tmp_path / "h39_ledger.sqlite3"
     # 14 days, 750 eligible slots, but clock ceiling is set far ahead so coverage < 90%
-    _ledger, latest_ms = _create_synthetic_ledger(db_path, num_days=14, slots_per_day=54)
+    _ledger, _latest_ms = _create_synthetic_ledger(db_path, num_days=14, slots_per_day=54)
 
     # Move clock forward so expected boundaries = 1000 -> coverage = 756 / 1000 = 75.6%
     as_of_ms = H39_VALIDATION_START_MS + (1000 - 1) * 900_000
@@ -389,7 +389,7 @@ def test_holm_correction_includes_all_8_arms() -> None:
 
 def test_predefined_signs_cannot_be_flipped() -> None:
     """14. Predefined signs are frozen positive (+1) and cannot be flipped."""
-    for fid, sign in PREDEFINED_FEATURE_SIGNS.items():
+    for sign in PREDEFINED_FEATURE_SIGNS.values():
         assert sign == 1
 
 

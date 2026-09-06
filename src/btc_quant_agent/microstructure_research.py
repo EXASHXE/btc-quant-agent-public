@@ -3434,7 +3434,7 @@ class H39OneShotUnblindGatekeeper:
 
         manifest_raw = json.loads(p.read_text(encoding="utf-8"))
         if not isinstance(manifest_raw, dict):
-            raise RuntimeError("FREEZE_MANIFEST_CORRUPT: Root object is not a dict")
+            raise TypeError("FREEZE_MANIFEST_CORRUPT: Root object is not a dict")
         manifest: dict[str, Any] = manifest_raw
 
         required_keys = [
@@ -4256,7 +4256,7 @@ def generate_all_v0325_deliverables(
                 res = conn.execute("PRAGMA integrity_check;").fetchone()[0]
                 deriv_healthy = (res.lower() == "ok")
                 deriv_rows = conn.execute("SELECT COUNT(*) FROM forward_derivatives;").fetchone()[0]
-        except Exception:  # noqa: BLE001, S110
+        except Exception:  # noqa: BLE001
             deriv_healthy = False
 
     m_root = Path(microstructure_root).resolve()
