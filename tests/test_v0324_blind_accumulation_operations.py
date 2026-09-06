@@ -420,7 +420,7 @@ def test_operational_safety_firewalls_and_disk_check(tmp_path: Path) -> None:
     """14. Low disk space triggers refusal without deletion; H38 terminal; execution disabled."""
     engine = H39ResearchEngine(microstructure_root=tmp_path, opportunity_store_path=tmp_path / "none.sqlite3")
 
-    safe, free = engine.check_disk_safety(min_free_gb=1e9)
+    safe, _free = engine.check_disk_safety(min_free_gb=1e9)
     assert safe is False
     with pytest.raises(RuntimeError, match="REFUSED_INSUFFICIENT_DISK_SPACE"):
         engine.run_scheduled_accumulation(

@@ -957,10 +957,9 @@ class H39BlindLedger:
         ts_str = datetime.now(UTC).strftime("%Y%m%d_%H%M%S")
         backup_file = dest_dir / f"h39_blind_ledger_backup_{ts_str}.sqlite3"
 
-        with sqlite3.connect(self.db_path) as src_conn:
-            with sqlite3.connect(backup_file) as dst_conn:
-                src_conn.backup(dst_conn)
-                dst_conn.execute("PRAGMA journal_mode = WAL;")
+        with sqlite3.connect(self.db_path) as src_conn, sqlite3.connect(backup_file) as dst_conn:
+            src_conn.backup(dst_conn)
+            dst_conn.execute("PRAGMA journal_mode = WAL;")
 
         with sqlite3.connect(backup_file) as chk_conn:
             res = chk_conn.execute("PRAGMA integrity_check;").fetchone()[0]
@@ -1039,7 +1038,7 @@ class H39BlindLedger:
                             )
             except RuntimeError:
                 raise
-            except Exception:
+            except Exception:  # noqa: BLE001, S110
                 pass
 
         # Timing relation checks
