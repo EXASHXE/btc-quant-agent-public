@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import inspect
 import json
 import sqlite3
 from pathlib import Path
@@ -8,6 +9,7 @@ from typing import Any
 
 import pytest
 
+from btc_quant_agent.cli import build_parser
 from btc_quant_agent.microstructure_research import (
     FORMAL_FEATURE_IDS,
     H38_TERMINAL_FIRST_BREACH_MS,
@@ -69,6 +71,28 @@ def _make_dummy_valid_row(
         "protocol_hash": H39_FROZEN_PROTOCOL_HASH,
         "clarification_hash": H39_FROZEN_CLARIFICATION_HASH,
     }
+
+
+def _make_dummy_valid_feature_row(
+    slot_ms: int = H39_VALIDATION_START_MS,
+    eligible: bool = True,
+    rejection_reason: str | None = None,
+    m1: float = 0.1,
+) -> H39FeatureRow:
+    return H39FeatureRow(
+        slot_ms=slot_ms,
+        slot_utc="2026-09-04T11:15:00Z",
+        m1_trade_imbalance_5m=m1,
+        m2_trade_imbalance_15m=0.2,
+        m3_ofi_5m=0.3,
+        m4_top5_depth_imbalance_5m=0.4,
+        m5_top20_depth_imbalance_5m=0.5,
+        m6_microprice_deviation_1m=0.6,
+        m7_pressure_agreement=0.7,
+        m8_pressure_divergence=0.8,
+        eligible=eligible,
+        rejection_reason=rejection_reason,
+    )
 
 
 def _create_test_partition(path: Path) -> None:
@@ -362,11 +386,88 @@ def test_fail_closed_real_validation_outcome_refusal() -> None:
     )
     obs = [H39Observation(feature_row=f_row, outcome_row=o_row)]
 
-    # Attempting to evaluate post-start validation without allow_unblind MUST raise RuntimeError
+    # Attempting to evaluate post-start validation MUST unconditionally raise RuntimeError
     with pytest.raises(RuntimeError, match=REFUSED_VALIDATION_NOT_MATURE):
-        evaluate_feature_hypotheses(obs, horizon="60m", allow_unblind=False)
+        evaluate_feature_hypotheses(obs, horizon="60m")
 
-    # Pre-validation data (slot_ms < H39_VALIDATION_START_MS) does NOT trigger refusal
+    # Calling with removed allow_unblind parameter MUST raise TypeError
+    with pytest.raises(TypeError, match="unexpected keyword argument 'allow_unblind'"):
+        evaluate_feature_hypotheses(obs, horizon="60m", allow_unblind=False)  # type: ignore[call-arg]
+
+    with pytest.raises(TypeError, match="unexpected keyword argument 'allow_unblind'"):
+        evaluate_feature_hypotheses(obs, horizon="60m", allow_unblind=True)  # type: ignore[call-arg]
+
+
+def test_unconditional_post_start_validation_refusal() -> None:
+    # Section 6.A: Real/synthetic observation whose slot_ms >= H39_VALIDATION_START_MS
+    # must always raise REFUSED_VALIDATION_NOT_MATURE through evaluate_feature_hypotheses
+    f_post = _make_dummy_valid_feature_row(slot_ms=H39_VALIDATION_START_MS + 900_000)
+    o_post = H39OutcomeRow(
+        slot_ms=H39_VALIDATION_START_MS + 900_000,
+        reference_price=70000.0,
+        reference_time_ms=H39_VALIDATION_START_MS + 960_000,
+        future_close_60m=70100.0,
+        return_60m=0.0014,
+        future_close_240m=70200.0,
+        return_240m=0.0028,
+        trailing_return_15m=0.0005,
+        trailing_return_60m=0.0010,
+        trailing_atr_15m=50.0,
+        trailing_atr_ratio_15m=0.0007,
+        decision_close_price=70000.0,
+        decision_close_ms=H39_VALIDATION_START_MS + 1800_000,
+    )
+    obs_post = [H39Observation(feature_row=f_post, outcome_row=o_post)]
+
+    # 60m horizon refusal
+    with pytest.raises(RuntimeError, match=REFUSED_VALIDATION_NOT_MATURE):
+        evaluate_feature_hypotheses(obs_post, horizon="60m")
+
+    # 240m horizon refusal
+    with pytest.raises(RuntimeError, match=REFUSED_VALIDATION_NOT_MATURE):
+        evaluate_feature_hypotheses(obs_post, horizon="240m")
+
+    # Mixed pre-start and post-start rows must also fail closed
+    f_pre = _make_dummy_valid_feature_row(slot_ms=H39_VALIDATION_START_MS - 900_000)
+    obs_mixed = [
+        H39Observation(feature_row=f_pre, outcome_row=o_post),
+        H39Observation(feature_row=f_post, outcome_row=o_post),
+    ]
+    with pytest.raises(RuntimeError, match=REFUSED_VALIDATION_NOT_MATURE):
+        evaluate_feature_hypotheses(obs_mixed, horizon="60m")
+
+
+def test_allow_unblind_parameter_removed_and_rejected() -> None:
+    # Section 6.B: Old bypass is completely impossible
+    sig = inspect.signature(evaluate_feature_hypotheses)
+    assert "allow_unblind" not in sig.parameters
+
+    f_row = _make_dummy_valid_feature_row(slot_ms=H39_VALIDATION_START_MS)
+    o_row = H39OutcomeRow(
+        slot_ms=H39_VALIDATION_START_MS,
+        reference_price=70000.0,
+        reference_time_ms=H39_VALIDATION_START_MS + 960_000,
+        future_close_60m=70100.0,
+        return_60m=0.0014,
+        future_close_240m=70200.0,
+        return_240m=0.0028,
+        trailing_return_15m=0.0005,
+        trailing_return_60m=0.0010,
+        trailing_atr_15m=50.0,
+        trailing_atr_ratio_15m=0.0007,
+        decision_close_price=70000.0,
+        decision_close_ms=H39_VALIDATION_START_MS + 900_000,
+    )
+    obs = [H39Observation(feature_row=f_row, outcome_row=o_row)]
+
+    # Attempting to use allow_unblind=True as authorization path raises TypeError
+    with pytest.raises(TypeError) as excinfo:
+        evaluate_feature_hypotheses(obs, allow_unblind=True)  # type: ignore[call-arg]
+    assert "allow_unblind" in str(excinfo.value)
+
+
+def test_pre_start_development_evaluation_functional() -> None:
+    # Section 6.C: Pre-validation/development observations remain analyzable
     pre_f = H39FeatureRow(
         slot_ms=H39_VALIDATION_START_MS - 900_000,
         slot_utc="2026-09-04T11:00:00Z",
@@ -381,11 +482,130 @@ def test_fail_closed_real_validation_outcome_refusal() -> None:
         eligible=True,
         rejection_reason=None,
     )
+    o_row = H39OutcomeRow(
+        slot_ms=H39_VALIDATION_START_MS - 900_000,
+        reference_price=70000.0,
+        reference_time_ms=H39_VALIDATION_START_MS - 840_000,
+        future_close_60m=70100.0,
+        return_60m=0.0014,
+        future_close_240m=70200.0,
+        return_240m=0.0028,
+        trailing_return_15m=0.0005,
+        trailing_return_60m=0.0010,
+        trailing_atr_15m=50.0,
+        trailing_atr_ratio_15m=0.0007,
+        decision_close_price=70000.0,
+        decision_close_ms=H39_VALIDATION_START_MS,
+    )
     pre_obs = [H39Observation(feature_row=pre_f, outcome_row=o_row)]
-    # This should evaluate without REFUSED_VALIDATION_NOT_MATURE (returns fallback/results)
-    res = evaluate_feature_hypotheses(pre_obs, horizon="60m", allow_unblind=False)
-    assert isinstance(res, dict)
-    assert len(res) == 8
+
+    # 60m evaluation succeeds
+    res_60m = evaluate_feature_hypotheses(pre_obs, horizon="60m")
+    assert isinstance(res_60m, dict)
+    assert len(res_60m) == len(FORMAL_FEATURE_IDS)
+    for fid in FORMAL_FEATURE_IDS:
+        assert fid in res_60m
+
+    # 240m evaluation succeeds
+    res_240m = evaluate_feature_hypotheses(pre_obs, horizon="240m")
+    assert isinstance(res_240m, dict)
+    assert len(res_240m) == len(FORMAL_FEATURE_IDS)
+
+
+def test_readiness_does_not_execute_statistics(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    # Section 6.D: Both immature and mature-simulated readiness paths must expose
+    # only readiness/maturity metadata and must not call the formal evaluator.
+    engine = H39ResearchEngine()
+    ledger_path = tmp_path / "readiness_stat_guard.sqlite3"
+    ledger = H39BlindLedger(ledger_path)
+
+    # Instrument evaluate_feature_hypotheses to detect any invocation
+    call_count = 0
+
+    def fail_if_called(*args: Any, **kwargs: Any) -> Any:
+        nonlocal call_count
+        call_count += 1
+        raise AssertionError("evaluate_feature_hypotheses was called unexpectedly by readiness check!")
+
+    monkeypatch.setattr(
+        "btc_quant_agent.microstructure_research.evaluate_feature_hypotheses",
+        fail_if_called,
+    )
+
+    # 1. Immature ledger check
+    r_immature = engine.check_unblind_readiness(ledger_path=ledger_path)
+    assert call_count == 0
+    assert r_immature["ready_for_unblind"] is False
+    assert r_immature["status"] == "FORWARD_DATA_INSUFFICIENT"
+
+    st_immature = engine.get_blind_validation_status(ledger_path=ledger_path)
+    assert call_count == 0
+    assert st_immature["state"] == "FORWARD_DATA_INSUFFICIENT"
+
+    # 2. Mature-simulated ledger check
+    # Populate synthetic ledger to meet all gates (14 days, >= 750 eligible, >= 90% coverage)
+    slots_per_day = 54
+    for day in range(14):
+        day_slot_base = H39_VALIDATION_START_MS + day * 86_400_000
+        for s in range(slots_per_day):
+            s_ms = day_slot_base + s * 900_000
+            ledger.ingest_slot(_make_dummy_valid_row(slot_ms=s_ms))
+
+    clock_mature = H39_VALIDATION_START_MS + 799 * 900_000
+    r_mature = engine.check_unblind_readiness(ledger_path=ledger_path, as_of_ms=clock_mature)
+    assert call_count == 0
+    assert r_mature["ready_for_unblind"] is True
+    assert r_mature["status"] == "H39_READY_FOR_ONE_SHOT_UNBLIND"
+
+    # Verify mature payload exposes only metadata and zero performance metrics
+    r_mature_str = json.dumps(r_mature).lower()
+    for forbidden in ["p_value", "p_val", "t_stat", "sharpe", "effect_size", "return_60m", "return_240m", "ranking"]:
+        assert f'"{forbidden}"' not in r_mature_str
+
+
+def test_cli_has_no_unblind_options() -> None:
+    # Section 6.E: Parser/CLI tests must prove no public option/subcommand exists for unblinding
+    parser = build_parser()
+
+    # 1. Reject --allow-unblind and --force-unblind
+    for invalid_arg in ["--allow-unblind", "--force-unblind"]:
+        with pytest.raises(SystemExit):
+            parser.parse_args(["h39", "validation-status", invalid_arg])
+
+        with pytest.raises(SystemExit):
+            parser.parse_args(["h39", "validation-readiness", invalid_arg])
+
+        with pytest.raises(SystemExit):
+            parser.parse_args(["h39", "validation-accumulate", invalid_arg])
+
+    # 2. Reject subcommands validation-unblind and validation-evaluate
+    for invalid_sub in ["validation-unblind", "validation-evaluate"]:
+        with pytest.raises(SystemExit):
+            parser.parse_args(["h39", invalid_sub])
+
+        with pytest.raises(SystemExit):
+            parser.parse_args(["microstructure-research", invalid_sub])
+
+    # 3. Exhaustive check of all actions registered on all subparsers
+    def walk_actions(p: Any) -> list[str]:
+        actions = []
+        for act in p._actions:
+            actions.extend(act.option_strings)
+            if hasattr(act, "choices") and act.choices:
+                if isinstance(act.choices, dict):
+                    for c, sub_p in act.choices.items():
+                        actions.append(str(c))
+                        if hasattr(sub_p, "_actions"):
+                            actions.extend(walk_actions(sub_p))
+                elif isinstance(act.choices, (list, tuple, set)):
+                    for c in act.choices:
+                        actions.append(str(c))
+        return actions
+
+    all_actions = walk_actions(parser)
+    for act in all_actions:
+        assert "unblind" not in act.lower(), f"Forbidden unblind option/command found: {act}"
+        assert act != "validation-evaluate", f"Forbidden validation-evaluate command found: {act}"
 
 
 def test_blind_validation_status_contains_no_p_values_or_rankings(tmp_path: Path) -> None:
@@ -518,6 +738,8 @@ def test_generated_deliverables_integrity() -> None:
         "H39_BLINDNESS_ATTESTATION.json",
         "FORWARD_CHAIN_HEALTH.json",
         "V0.3.23_H39_BLIND_VALIDATION_REPORT.md",
+        "V0.3.23_STRICT_UNBLIND_GATE_REPAIR.json",
+        "V0.3.23_STRICT_UNBLIND_GATE_REPAIR.md",
     ]
     for fn in required_files:
         fpath = deliv_dir / fn
@@ -537,3 +759,15 @@ def test_generated_deliverables_integrity() -> None:
     assert att["attestations"]["zero_feature_rankings_computed"] is True
     assert att["attestations"]["zero_final_holdout_access"] is True
     assert att["attestations"]["execution_engine_disabled"] is True
+
+    # Repair deliverable content check
+    repair_json = json.loads((deliv_dir / "V0.3.23_STRICT_UNBLIND_GATE_REPAIR.json").read_text(encoding="utf-8"))
+    assert repair_json["finding_id"] == "CHATGPT-V0.3.23-HIGH-ALLOW-UNBLIND-BYPASS"
+    assert repair_json["new_fail_closed_behavior"]["unconditional_refusal"] is True
+    assert repair_json["new_fail_closed_behavior"]["allow_unblind_removed"] is True
+    assert repair_json["attestations"]["zero_fresh_outcome_inspection"] is True
+    assert repair_json["attestations"]["zero_protocol_drift"] is True
+    assert repair_json["attestations"]["zero_final_holdout_access"] is True
+    assert repair_json["attestations"]["execution_disabled"] is True
+    assert repair_json["attestations"]["h38_permanently_terminal"] is True
+    assert repair_json["current_blind_maturity_counts_only"]["state"] == "FORWARD_DATA_INSUFFICIENT"

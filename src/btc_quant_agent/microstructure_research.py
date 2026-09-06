@@ -516,18 +516,17 @@ class MicrostructureResearchLoader:
 def evaluate_feature_hypotheses(
     observations: Sequence[H39Observation],
     horizon: str = "60m",
-    allow_unblind: bool = False,
 ) -> dict[str, FeatureTestResult]:
-    # Fail-closed maturity guard on real post-start validation evidence:
+    # Strict fail-closed guard on real post-start validation evidence in v0.3.23:
     # Post-start validation slots (slot_ms >= H39_VALIDATION_START_MS) cannot be formally evaluated
-    # before maturity gate is reached, unless explicitly authorized via allow_unblind.
+    # in v0.3.23 under any circumstances (unconditional fail-closed refusal). No unblind bypass is permitted.
     has_post_start = any(
         obs.feature_row.slot_ms >= H39_VALIDATION_START_MS for obs in observations
     )
-    if has_post_start and not allow_unblind:
+    if has_post_start:
         raise RuntimeError(
             f"{REFUSED_VALIDATION_NOT_MATURE}: Formal evaluation of post-start fresh forward validation outcomes "
-            f"is strictly prohibited before maturity gate is reached."
+            f"is strictly prohibited in v0.3.23. No unblind bypass is permitted."
         )
 
     # Extract eligible observations with valid return for horizon

@@ -1,0 +1,93 @@
+{
+  "schema_version": "1.0.0",
+  "repair_id": "V0.3.23_STRICT_UNBLIND_GATE_REPAIR",
+  "finding_id": "CHATGPT-V0.3.23-HIGH-ALLOW-UNBLIND-BYPASS",
+  "review_verdict_before_repair": "REPAIR_REQUIRED",
+  "pre_repair_review_sha": "7afcd2739d4c8f982c9e96ad7dae65125cf2b084",
+  "gemini_reviewed_impl_sha": "3141be7761ee4492550173b80043b42b0b7194e6",
+  "repair_prompt_freeze_sha": "f8c3fe9988b26700e717ee86d4da87e5e3130f7d",
+  "target_branch": "agent/v0.3.23-h39-blind-forward-validation",
+  "accepted_main_baseline": "f2e3f29dec38f71a2b5d6640d25bc8f2ae8353ba",
+  "finding_description": "In evaluate_feature_hypotheses, an allow_unblind: bool = False parameter was present. Calling evaluate_feature_hypotheses(..., allow_unblind=True) allowed bypassing the REFUSED_VALIDATION_NOT_MATURE fail-closed guard on real post-start H39 validation observations (slot_ms >= 1788520500000) before maturity gates were reached. This violated the strict blindness contract of v0.3.23 where no library/API/CLI path may unblind H39.",
+  "old_bypass_shape": {
+    "file": "src/btc_quant_agent/microstructure_research.py",
+    "signature": "evaluate_feature_hypotheses(observations: Sequence[H39Observation], horizon: str = '60m', allow_unblind: bool = False) -> dict[str, FeatureTestResult]",
+    "guard_logic": "has_post_start = any(obs.feature_row.slot_ms >= H39_VALIDATION_START_MS for obs in observations)\nif has_post_start and not allow_unblind:\n    raise RuntimeError(f'{REFUSED_VALIDATION_NOT_MATURE}: Formal evaluation of post-start fresh forward validation outcomes is strictly prohibited before maturity gate is reached.')",
+    "bypass_vector": "allow_unblind=True bypassed fail-closed refusal on immature fresh validation data."
+  },
+  "new_fail_closed_behavior": {
+    "file": "src/btc_quant_agent/microstructure_research.py",
+    "signature": "evaluate_feature_hypotheses(observations: Sequence[H39Observation], horizon: str = '60m') -> dict[str, FeatureTestResult]",
+    "guard_logic": "has_post_start = any(obs.feature_row.slot_ms >= H39_VALIDATION_START_MS for obs in observations)\nif has_post_start:\n    raise RuntimeError(f'{REFUSED_VALIDATION_NOT_MATURE}: Formal evaluation of post-start fresh forward validation outcomes is strictly prohibited in v0.3.23. No unblind bypass is permitted.')",
+    "unconditional_refusal": true,
+    "allow_unblind_removed": true,
+    "no_bypass_arguments_or_env_vars": true
+  },
+  "regression_tests": [
+    {
+      "test_name": "test_fail_closed_real_validation_outcome_refusal",
+      "target_section": "6.A & 6.B",
+      "description": "Verifies that post-start validation observations unconditionally raise RuntimeError(REFUSED_VALIDATION_NOT_MATURE) and calling with allow_unblind=True/False raises TypeError."
+    },
+    {
+      "test_name": "test_unconditional_post_start_validation_refusal",
+      "target_section": "6.A",
+      "description": "Verifies that any observation with slot_ms >= H39_VALIDATION_START_MS always raises REFUSED_VALIDATION_NOT_MATURE across both 60m and 240m horizons."
+    },
+    {
+      "test_name": "test_allow_unblind_parameter_removed_and_rejected",
+      "target_section": "6.B",
+      "description": "Verifies TypeError when calling evaluate_feature_hypotheses with allow_unblind keyword argument, proving the old bypass cannot be used."
+    },
+    {
+      "test_name": "test_pre_start_development_evaluation_functional",
+      "target_section": "6.C",
+      "description": "Verifies pre-validation/development observations (slot_ms < H39_VALIDATION_START_MS) evaluate properly across 60m and 240m horizons without triggering refusal."
+    },
+    {
+      "test_name": "test_readiness_does_not_execute_statistics",
+      "target_section": "6.D",
+      "description": "Verifies check_unblind_readiness and get_blind_validation_status never execute evaluate_feature_hypotheses and expose strictly metadata without statistical fields."
+    },
+    {
+      "test_name": "test_cli_has_no_unblind_options",
+      "target_section": "6.E",
+      "description": "Verifies CLI parser strictly rejects --allow-unblind, --force-unblind, validation-unblind, and validation-evaluate."
+    },
+    {
+      "test_name": "test_generated_deliverables_integrity",
+      "target_section": "6.F & 7",
+      "description": "Verifies presence and schema of all v0.3.23 deliverables including strict unblind gate repair deliverables."
+    }
+  ],
+  "current_blind_maturity_counts_only": {
+    "expected_boundary_count": 135,
+    "observed_boundary_count": 42,
+    "eligible_boundary_count": 24,
+    "distinct_days_count": 2,
+    "distinct_days": [
+      "2026-09-04",
+      "2026-09-05"
+    ],
+    "coverage_ratio": 0.17777777777777778,
+    "earliest_slot_ms": 1788520500000,
+    "latest_slot_ms": 1788641100000,
+    "rejection_reason_counts": {
+      "GAP_IN_FEATURE_WINDOW": 18
+    },
+    "maturity_gates": {
+      "minimum_coverage_ratio": 0.9,
+      "minimum_distinct_days": 14,
+      "minimum_eligible_observations": 750
+    },
+    "maturity_achieved": false,
+    "state": "FORWARD_DATA_INSUFFICIENT"
+  },
+  "attestations": {
+    "zero_fresh_outcome_inspection": true,
+    "zero_protocol_drift": true,
+    "zero_final_holdout_access": true,
+    "execution_disabled": true,
+    "h38_permanently_terminal": true
+  }
+}
