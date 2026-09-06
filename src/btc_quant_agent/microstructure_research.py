@@ -2039,11 +2039,31 @@ class H39ResearchEngine:
     ) -> dict[str, Any]:
         l_path = Path(ledger_path or H39_BLIND_LEDGER_DEFAULT_PATH).resolve()
         if not l_path.exists():
+            default_summary = {
+                "distinct_days_count": 0,
+                "eligible_boundary_count": 0,
+                "observed_boundary_count": 0,
+                "expected_boundary_count": 0,
+                "coverage_ratio": 0.0,
+                "eligible_coverage": 0.0,
+                "maturity_achieved": False,
+                "safety_firewalls": {
+                    "strategy": "EXPERIMENTAL",
+                    "qualified_direction_engine": "NONE",
+                    "runtime_maximum": "OPPORTUNITY_ONLY",
+                    "execution": "DISABLED",
+                    "auto_execute": False,
+                    "final_holdout": "SEALED",
+                    "live_trading": "UNAUTHORIZED",
+                },
+            }
             return {
                 "status": "FORWARD_DATA_INSUFFICIENT",
                 "ready_for_unblind": False,
                 "refusal_reason": f"{REFUSED_VALIDATION_NOT_MATURE}: Ledger does not exist yet",
                 "ledger_path": str(l_path),
+                "summary": default_summary,
+                "safety_firewalls": default_summary["safety_firewalls"],
             }
         ledger = H39BlindLedger(l_path)
         integrity = ledger.verify_integrity()
@@ -3318,11 +3338,31 @@ class H39OneShotUnblindGatekeeper:
 
         # 2. Blind ledger existence check
         if not self.ledger_path.exists():
+            default_summary = {
+                "distinct_days_count": 0,
+                "eligible_boundary_count": 0,
+                "observed_boundary_count": 0,
+                "expected_boundary_count": 0,
+                "coverage_ratio": 0.0,
+                "eligible_coverage": 0.0,
+                "maturity_achieved": False,
+                "safety_firewalls": {
+                    "strategy": "EXPERIMENTAL",
+                    "qualified_direction_engine": "NONE",
+                    "runtime_maximum": "OPPORTUNITY_ONLY",
+                    "execution": "DISABLED",
+                    "auto_execute": False,
+                    "final_holdout": "SEALED",
+                    "live_trading": "UNAUTHORIZED",
+                },
+            }
             return {
                 "status": H39_STATE_INSUFFICIENT,
                 "ready_for_unblind": False,
                 "refusal_reason": f"{REFUSED_VALIDATION_NOT_MATURE}: Blind ledger does not exist yet at {self.ledger_path}",
                 "ledger_path": str(self.ledger_path),
+                "summary": default_summary,
+                "safety_firewalls": default_summary["safety_firewalls"],
                 "hash_verification": hash_check,
             }
 

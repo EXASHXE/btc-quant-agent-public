@@ -1,9 +1,9 @@
 {
-  "clock_ceiling_ms": 1788701418847,
-  "clock_ceiling_utc": "2026-09-06T13:30:18.847000+00:00",
+  "clock_ceiling_ms": 1788701678484,
+  "clock_ceiling_utc": "2026-09-06T13:34:38.484000+00:00",
   "clock_denominator": {
-    "clock_ceiling_ms": 1788701418847,
-    "clock_ceiling_utc": "2026-09-06T13:30:18.847000+00:00",
+    "clock_ceiling_ms": 1788701678484,
+    "clock_ceiling_utc": "2026-09-06T13:34:38.484000+00:00",
     "clock_source": "WALL_CLOCK",
     "coverage_ratio": 0.18316831683168316,
     "eligible_boundary_count": 37,
@@ -21,7 +21,7 @@
     "2026-09-06"
   ],
   "distinct_days_count": 3,
-  "generated_at_utc": "2026-09-06T13:30:18.853437+00:00",
+  "generated_at_utc": "2026-09-06T13:34:38.488821+00:00",
   "hypothesis_id": "H39_MICROSTRUCTURE_DIRECTIONAL_INFORMATION",
   "maturity_achieved": false,
   "maturity_gates": {

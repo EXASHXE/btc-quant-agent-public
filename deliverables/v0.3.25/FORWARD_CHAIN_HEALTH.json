@@ -5,7 +5,7 @@
     "rows_recorded": 0,
     "status": "HEALTHY"
   },
-  "generated_at_utc": "2026-09-06T13:30:18.854104+00:00",
+  "generated_at_utc": "2026-09-06T13:34:38.489411+00:00",
   "microstructure_chain": {
     "active_partition": "microstructure-2026-09-06.sqlite3",
     "integrity_status": "OK",
