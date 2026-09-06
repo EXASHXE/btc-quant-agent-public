@@ -8,6 +8,8 @@ import sys
 from btc_quant_agent.microstructure_research import (
     H39_BLIND_LEDGER_DEFAULT_PATH,
     H39_CANONICAL_CANDLES_PATH,
+    H39_FROZEN_SNAPSHOT_DEFAULT_DIR,
+    H39_ONE_SHOT_EXECUTION_REGISTRY_DEFAULT_PATH,
     H39_PROTOCOL_PATH,
     H39OneShotUnblindGatekeeper,
     generate_all_v0325_deliverables,
@@ -43,6 +45,26 @@ def main() -> int:
         "--ledger-path",
         default=H39_BLIND_LEDGER_DEFAULT_PATH,
         help="Path to blind validation ledger SQLite database",
+    )
+    parser.add_argument(
+        "--registry-path",
+        default=H39_ONE_SHOT_EXECUTION_REGISTRY_DEFAULT_PATH,
+        help="Path to one-shot execution registry SQLite database",
+    )
+    parser.add_argument(
+        "--snapshot-dir",
+        default=H39_FROZEN_SNAPSHOT_DEFAULT_DIR,
+        help="Directory for frozen ledger snapshots",
+    )
+    parser.add_argument(
+        "--readiness-path",
+        default=None,
+        help="Optional path to write authoritative readiness artifact",
+    )
+    parser.add_argument(
+        "--repo-root",
+        default=None,
+        help="Optional path to git repository root for committed freeze verification",
     )
     parser.add_argument(
         "--protocol-path",
@@ -85,6 +107,9 @@ def main() -> int:
         microstructure_root=args.microstructure_root,
         opportunity_store_path=args.opportunity_store,
         canonical_candles_path=args.canonical_candles,
+        registry_path=args.registry_path,
+        snapshot_dir=args.snapshot_dir,
+        repo_root=args.repo_root,
     )
 
     if args.action == "readiness":
@@ -97,6 +122,7 @@ def main() -> int:
             manifest = gatekeeper.create_freeze_manifest(
                 output_path=args.output_manifest,
                 as_of_ms=args.as_of_ms,
+                readiness_artifact_path=args.readiness_path,
             )
             print(json.dumps({"status": "SUCCESS", "manifest": manifest}, indent=2))
             return 0
@@ -118,6 +144,7 @@ def main() -> int:
             results = gatekeeper.execute_one_shot_unblind(
                 freeze_manifest_path=args.freeze_manifest,
                 output_dir=args.output_dir,
+                repo_root=args.repo_root,
             )
             print(json.dumps({"status": "SUCCESS", "scientific_verdict": results.get("scientific_verdict")}, indent=2))
             return 0

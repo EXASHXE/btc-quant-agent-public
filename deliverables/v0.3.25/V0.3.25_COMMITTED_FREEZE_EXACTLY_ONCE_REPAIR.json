@@ -1,0 +1,50 @@
+{
+  "artifact_name": "V0.3.25_COMMITTED_FREEZE_EXACTLY_ONCE_REPAIR",
+  "code_version_sha": "2e89ce4a32085cc4a993d5b64a226096c2de164c",
+  "findings_resolved": {
+    "finding_a_committed_freeze": {
+      "description": "verify_committed_freeze_package strictly verifies git tracking, clean porcelain status, commit SHA ancestry to HEAD, and exact committed blob byte equality before any labels or candles are loaded.",
+      "status": "RESOLVED"
+    },
+    "finding_b_exactly_once": {
+      "description": "H39OneShotExecutionRegistry enforces atomic STARTED and COMPLETED state transitions with zero retry/reset flags; crash or rerun raises H39_ONE_SHOT_ALREADY_CONSUMED fail-closed.",
+      "status": "RESOLVED"
+    },
+    "finding_c_wal_safe_snapshot": {
+      "description": "create_freeze_manifest executes conn.backup() to create an atomic, durable SQLite backup snapshot H39_ONE_SHOT_LEDGER_SNAPSHOT_<cutoff>.sqlite3, verifies PRAGMA integrity_check, and pins SHA-256 in manifest; unblind reads exclusively from snapshot.",
+      "status": "RESOLVED"
+    },
+    "finding_d_authoritative_readiness": {
+      "description": "create_freeze_manifest serializes authoritative readiness to H39_ONE_SHOT_UNBLIND_READINESS.json, pins its SHA-256 in manifest, and verify_freeze_manifest verifies exact hash match.",
+      "status": "RESOLVED"
+    },
+    "finding_e_execution_receipt": {
+      "description": "execute_one_shot_unblind writes H39_ONE_SHOT_EXECUTION_RECEIPT.json containing execution key, freeze commit SHA, snapshot SHA, readiness SHA, and result artifact hashes, matching registry COMPLETED state.",
+      "status": "RESOLVED"
+    },
+    "finding_f_refactored_test_fixtures": {
+      "description": "Synthetic end-to-end tests refactored to use hermetic Git repository fixtures, proving committed freeze and exactly-once execution semantics without weakening production verification.",
+      "status": "RESOLVED"
+    }
+  },
+  "generated_at_utc": "2026-09-06T16:05:50.208675+00:00",
+  "hypothesis_id": "H39_MICROSTRUCTURE_DIRECTIONAL_INFORMATION",
+  "readiness_status": "FORWARD_DATA_INSUFFICIENT",
+  "ready_for_unblind": false,
+  "real_one_shot_executed": false,
+  "real_validation_labels_loaded": false,
+  "real_validation_performance_artifacts_created": false,
+  "repair_type": "ACCEPTANCE_REPAIR_COMMITTED_FREEZE_EXACTLY_ONCE_SNAPSHOT",
+  "safety_firewalls": {
+    "auto_execute": false,
+    "execution": "DISABLED",
+    "final_holdout": "SEALED",
+    "live_trading": "UNAUTHORIZED",
+    "qualified_direction_engine": "NONE",
+    "runtime_maximum": "OPPORTUNITY_ONLY",
+    "strategy": "EXPERIMENTAL"
+  },
+  "schema_version": "1.0.0",
+  "scientific_state": "FORWARD_DATA_INSUFFICIENT",
+  "stage": "v0.3.25"
+}

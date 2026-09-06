@@ -3,10 +3,12 @@ from __future__ import annotations
 
 import json
 import sqlite3
+import subprocess
 import warnings
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
+from unittest.mock import patch
 
 import pytest
 
@@ -15,6 +17,7 @@ from btc_quant_agent.microstructure_research import (
     FORMAL_FEATURE_IDS,
     H39_FROZEN_CLARIFICATION_HASH,
     H39_FROZEN_PROTOCOL_HASH,
+    H39_ONE_SHOT_ALREADY_CONSUMED,
     H39_STATE_BLOCKED_QUALITY,
     H39_STATE_INSUFFICIENT,
     H39_VALIDATION_START_MS,
@@ -23,6 +26,7 @@ from btc_quant_agent.microstructure_research import (
     H39BlindLedger,
     H39FeatureRow,
     H39Observation,
+    H39OneShotExecutionRegistry,
     H39OneShotUnblindGatekeeper,
     H39OutcomeRow,
     H39ResearchEngine,
@@ -30,7 +34,28 @@ from btc_quant_agent.microstructure_research import (
     _holm_bonferroni,
     evaluate_feature_hypotheses,
     generate_all_v0325_deliverables,
+    verify_committed_freeze_package,
 )
+
+
+def _init_test_git_repo(repo_dir: Path) -> None:
+    repo_dir.mkdir(parents=True, exist_ok=True)
+    subprocess.run(["git", "init"], cwd=str(repo_dir), check=True, capture_output=True)
+    subprocess.run(["git", "config", "user.email", "tester@example.com"], cwd=str(repo_dir), check=True, capture_output=True)
+    subprocess.run(["git", "config", "user.name", "Tester"], cwd=str(repo_dir), check=True, capture_output=True)
+    init_file = repo_dir / ".gitkeep"
+    init_file.write_text("initial", encoding="utf-8")
+    subprocess.run(["git", "add", ".gitkeep"], cwd=str(repo_dir), check=True, capture_output=True)
+    subprocess.run(["git", "commit", "-m", "initial commit"], cwd=str(repo_dir), check=True, capture_output=True)
+
+
+def _commit_in_test_git_repo(repo_dir: Path, rel_or_abs_path: str | Path, commit_msg: str = "commit freeze") -> str:
+    p = Path(rel_or_abs_path).resolve()
+    rel = p.relative_to(repo_dir.resolve()).as_posix()
+    subprocess.run(["git", "add", rel], cwd=str(repo_dir), check=True, capture_output=True)
+    subprocess.run(["git", "commit", "-m", commit_msg], cwd=str(repo_dir), check=True, capture_output=True)
+    res = subprocess.run(["git", "rev-parse", "HEAD"], cwd=str(repo_dir), check=True, capture_output=True, text=True)
+    return res.stdout.strip()
 
 
 def _make_dummy_slot_row(
@@ -305,6 +330,9 @@ def test_legacy_evaluate_validation_status_cannot_authorize_unblind() -> None:
 
 def test_freeze_cutoff_excludes_later_rows(tmp_path: Path) -> None:
     """9. Freeze cutoff excludes later rows during execution."""
+    repo_dir = tmp_path / "repo"
+    _init_test_git_repo(repo_dir)
+
     db_path = tmp_path / "h39_ledger.sqlite3"
     candles_path = tmp_path / "candles.sqlite3"
     _ledger, latest_ms = _create_synthetic_ledger(db_path, num_days=14, slots_per_day=96)
@@ -315,16 +343,32 @@ def test_freeze_cutoff_excludes_later_rows(tmp_path: Path) -> None:
     _ledger.ingest_slot(extra_row)
 
     # Create freeze manifest strictly at latest_ms
-    gk = H39OneShotUnblindGatekeeper(ledger_path=db_path, canonical_candles_path=candles_path)
-    manifest = gk.create_freeze_manifest(output_path=tmp_path / "freeze.json", as_of_ms=latest_ms)
+    freeze_file = repo_dir / "freeze.json"
+    registry_path = tmp_path / "reg.sqlite3"
+    snapshot_dir = tmp_path / "snapshots"
+    gk = H39OneShotUnblindGatekeeper(
+        ledger_path=db_path,
+        canonical_candles_path=candles_path,
+        registry_path=registry_path,
+        snapshot_dir=snapshot_dir,
+        repo_root=repo_dir,
+    )
+    manifest = gk.create_freeze_manifest(output_path=freeze_file, as_of_ms=latest_ms)
     assert manifest["unblind_cutoff_ms"] == latest_ms
+
+    # Commit freeze manifest to git repo
+    _commit_in_test_git_repo(repo_dir, freeze_file)
 
     # Setup candles up to latest_ms
     with sqlite3.connect(db_path) as conn:
         slots = [r[0] for r in conn.execute("SELECT decision_close_ms FROM h39_blind_validation_ledger WHERE decision_close_ms <= ?", (latest_ms,)).fetchall()]
     _populate_canonical_candles(candles_path, slots)
 
-    results = gk.execute_one_shot_unblind(freeze_manifest_path=tmp_path / "freeze.json", output_dir=tmp_path / "results")
+    results = gk.execute_one_shot_unblind(
+        freeze_manifest_path=freeze_file,
+        output_dir=tmp_path / "results",
+        repo_root=repo_dir,
+    )
     assert results["unblind_cutoff_ms"] == latest_ms
     assert results["evaluated_sample_size"] == len(slots)
 
@@ -395,13 +439,25 @@ def test_predefined_signs_cannot_be_flipped() -> None:
 
 def test_240m_cannot_rescue_60m_failure(tmp_path: Path) -> None:
     """15. 240m supporting horizon cannot rescue failure of 60m primary family."""
+    repo_dir = tmp_path / "repo"
+    _init_test_git_repo(repo_dir)
+
     db_path = tmp_path / "h39_ledger.sqlite3"
     candles_path = tmp_path / "candles.sqlite3"
     _ledger, latest_ms = _create_synthetic_ledger(db_path, num_days=14, slots_per_day=96)
 
-    gk = H39OneShotUnblindGatekeeper(ledger_path=db_path, canonical_candles_path=candles_path)
-    freeze_file = tmp_path / "freeze.json"
+    freeze_file = repo_dir / "freeze.json"
+    registry_path = tmp_path / "reg.sqlite3"
+    snapshot_dir = tmp_path / "snapshots"
+    gk = H39OneShotUnblindGatekeeper(
+        ledger_path=db_path,
+        canonical_candles_path=candles_path,
+        registry_path=registry_path,
+        snapshot_dir=snapshot_dir,
+        repo_root=repo_dir,
+    )
     gk.create_freeze_manifest(output_path=freeze_file, as_of_ms=latest_ms)
+    _commit_in_test_git_repo(repo_dir, freeze_file)
 
     # Create candles where 60m has zero/negative return, but 240m has strongly positive return
     with sqlite3.connect(db_path) as conn:
@@ -422,7 +478,11 @@ def test_240m_cannot_rescue_60m_failure(tmp_path: Path) -> None:
             conn.execute("INSERT OR REPLACE INTO klines_1m VALUES (?, ?, ?, ?, ?, ?, ?)", (t240, base_price + 500, base_price + 510, base_price + 490, base_price + 500, 10, t240 + 59999))
         conn.commit()
 
-    results = gk.execute_one_shot_unblind(freeze_manifest_path=freeze_file, output_dir=tmp_path / "results")
+    results = gk.execute_one_shot_unblind(
+        freeze_manifest_path=freeze_file,
+        output_dir=tmp_path / "results",
+        repo_root=repo_dir,
+    )
     assert results["scientific_verdict"] == "RESEARCH_FAMILY_STOP"
     assert len(results["provisional_candidates"]) == 0
 
@@ -514,11 +574,16 @@ def test_deliberate_leakage_bypass_fails_closed() -> None:
 
 
 def test_full_mock_unblind_execution_on_synthetic_mature_ledger(tmp_path: Path) -> None:
-    """22. Full mock unblind test on synthetic mature ledger: executes deterministically, produces all 7 artifacts."""
+    """22. Full mock unblind test on synthetic mature ledger: executes deterministically, produces all 8 artifacts."""
+    repo_dir = tmp_path / "repo"
+    _init_test_git_repo(repo_dir)
+
     db_path = tmp_path / "mature_ledger.sqlite3"
     candles_path = tmp_path / "canonical_candles.sqlite3"
-    output_dir = tmp_path / "deliverables" / "v0.3.25"
-    freeze_path = tmp_path / "H39_ONE_SHOT_UNBLIND_FREEZE.json"
+    output_dir = repo_dir / "deliverables" / "v0.3.25"
+    freeze_path = output_dir / "H39_ONE_SHOT_UNBLIND_FREEZE.json"
+    registry_path = tmp_path / "registry.sqlite3"
+    snapshot_dir = tmp_path / "snapshots"
 
     # 14 days with full slots (51 + 13*96 = 1299 eligible slots > 750)
     _ledger, latest_ms = _create_synthetic_ledger(db_path, num_days=14, slots_per_day=96)
@@ -531,6 +596,9 @@ def test_full_mock_unblind_execution_on_synthetic_mature_ledger(tmp_path: Path) 
     gk = H39OneShotUnblindGatekeeper(
         ledger_path=db_path,
         canonical_candles_path=candles_path,
+        registry_path=registry_path,
+        snapshot_dir=snapshot_dir,
+        repo_root=repo_dir,
     )
 
     # 1. Readiness check passes at cutoff
@@ -542,17 +610,28 @@ def test_full_mock_unblind_execution_on_synthetic_mature_ledger(tmp_path: Path) 
     assert manifest["eligible_boundary_count"] >= 750
     assert manifest["distinct_days_count"] >= 14
     assert manifest["eligible_coverage"] >= 0.90
+    assert manifest["freeze_status"] == "FREEZE_CREATED_AWAITING_GIT_COMMIT"
+    assert Path(manifest["frozen_ledger_snapshot_path"]).exists()
+    assert Path(manifest["readiness_artifact_path"]).exists()
 
-    # 3. Execute one-shot unblind
+    # 3. Commit freeze manifest into Git repository
+    commit_sha = _commit_in_test_git_repo(repo_dir, freeze_path)
+    assert len(commit_sha) == 40
+
+    # 4. Execute one-shot unblind
     results = gk.execute_one_shot_unblind(
         freeze_manifest_path=freeze_path,
         output_dir=output_dir,
+        repo_root=repo_dir,
     )
     assert "scientific_verdict" in results
     assert results["evaluated_sample_size"] == len(slots)
     assert len(results["primary_60m_family"]) == 8
+    assert results["freeze_commit_sha"] == commit_sha
+    assert results["freeze_blob_verified"] is True
+    assert results["freeze_commit_is_ancestor"] is True
 
-    # 4. Verify all 7 required result artifacts exist
+    # 5. Verify all 8 required result artifacts exist
     required_artifacts = [
         "H39_ONE_SHOT_UNBLIND_FREEZE.json",
         "H39_ONE_SHOT_VALIDATION_RESULTS.json",
@@ -561,18 +640,23 @@ def test_full_mock_unblind_execution_on_synthetic_mature_ledger(tmp_path: Path) 
         "H39_BASELINE_INCREMENTAL_RESULTS.json",
         "H39_STABILITY_DIAGNOSTICS.json",
         "H39_FINAL_SCIENTIFIC_VERDICT.json",
+        "H39_ONE_SHOT_EXECUTION_RECEIPT.json",
     ]
     for art in required_artifacts:
         p = output_dir / art
         assert p.exists(), f"Missing required deliverable: {art}"
         assert p.stat().st_size > 0
 
+    receipt = json.loads((output_dir / "H39_ONE_SHOT_EXECUTION_RECEIPT.json").read_text(encoding="utf-8"))
+    assert receipt["freeze_commit_sha"] == commit_sha
+    assert receipt["scientific_verdict"] == results["scientific_verdict"]
+
 
 def test_generate_all_v0325_deliverables_immature_state(tmp_path: Path) -> None:
     """Test v0.3.25 deliverables generation under immature state (current live repo state)."""
     deliv_dir = tmp_path / "v0.3.25"
     files = generate_all_v0325_deliverables(output_dir=deliv_dir)
-    assert len(files) == 5
+    assert len(files) == 7
     assert all(Path(p).exists() for p in files.values())
 
     expected_files = [
@@ -581,6 +665,8 @@ def test_generate_all_v0325_deliverables_immature_state(tmp_path: Path) -> None:
         "H39_BLIND_OPERATIONAL_STATUS.json",
         "FORWARD_CHAIN_HEALTH.json",
         "V0.3.25_H39_ONE_SHOT_UNBLIND_PREREGISTRATION_REPORT.md",
+        "V0.3.25_COMMITTED_FREEZE_EXACTLY_ONCE_REPAIR.json",
+        "V0.3.25_COMMITTED_FREEZE_EXACTLY_ONCE_REPAIR.md",
     ]
     for ef in expected_files:
         p = deliv_dir / ef
@@ -595,6 +681,7 @@ def test_generate_all_v0325_deliverables_immature_state(tmp_path: Path) -> None:
         "H39_BASELINE_INCREMENTAL_RESULTS.json",
         "H39_STABILITY_DIAGNOSTICS.json",
         "H39_FINAL_SCIENTIFIC_VERDICT.json",
+        "H39_ONE_SHOT_EXECUTION_RECEIPT.json",
     ]
     for ff in forbidden_files:
         assert not (deliv_dir / ff).exists(), f"Forbidden performance deliverable created: {ff}"
@@ -602,3 +689,387 @@ def test_generate_all_v0325_deliverables_immature_state(tmp_path: Path) -> None:
     status_data = json.loads((deliv_dir / "H39_BLIND_OPERATIONAL_STATUS.json").read_text(encoding="utf-8"))
     assert status_data["state"] == H39_STATE_INSUFFICIENT
     assert status_data["ready_for_unblind"] is False
+
+    repair_data = json.loads((deliv_dir / "V0.3.25_COMMITTED_FREEZE_EXACTLY_ONCE_REPAIR.json").read_text(encoding="utf-8"))
+    assert repair_data["scientific_state"] == "FORWARD_DATA_INSUFFICIENT"
+    assert repair_data["real_one_shot_executed"] is False
+    assert repair_data["real_validation_labels_loaded"] is False
+    assert repair_data["real_validation_performance_artifacts_created"] is False
+
+
+# =====================================================================
+# ACCEPTANCE REPAIR REGRESSION TESTS (Findings A - F, K)
+# =====================================================================
+
+def test_finding_a_uncommitted_freeze_cannot_unblind(tmp_path: Path) -> None:
+    """Finding A: Uncommitted freeze file is rejected before label loading."""
+    repo_dir = tmp_path / "repo"
+    _init_test_git_repo(repo_dir)
+
+    db_path = tmp_path / "mature_ledger.sqlite3"
+    candles_path = tmp_path / "canonical_candles.sqlite3"
+    _ledger, latest_ms = _create_synthetic_ledger(db_path, num_days=14, slots_per_day=96)
+
+    freeze_file = repo_dir / "freeze.json"
+    gk = H39OneShotUnblindGatekeeper(
+        ledger_path=db_path,
+        canonical_candles_path=candles_path,
+        registry_path=tmp_path / "reg.sqlite3",
+        snapshot_dir=tmp_path / "snapshots",
+        repo_root=repo_dir,
+    )
+    gk.create_freeze_manifest(output_path=freeze_file, as_of_ms=latest_ms)
+    # Deliberately DO NOT git commit freeze_file
+
+    with patch.object(H39ResearchEngine, "get_canonical_1m_candles") as mock_candles:
+        with pytest.raises(RuntimeError, match="COMMITTED_FREEZE_VERIFICATION_FAILED"):
+            gk.execute_one_shot_unblind(
+                freeze_manifest_path=freeze_file,
+                output_dir=tmp_path / "results",
+                repo_root=repo_dir,
+            )
+        assert mock_candles.call_count == 0
+
+
+def test_finding_a_dirty_freeze_cannot_unblind(tmp_path: Path) -> None:
+    """Finding A: Committed freeze file with unstaged local modifications is rejected."""
+    repo_dir = tmp_path / "repo"
+    _init_test_git_repo(repo_dir)
+
+    db_path = tmp_path / "mature_ledger.sqlite3"
+    candles_path = tmp_path / "canonical_candles.sqlite3"
+    _ledger, latest_ms = _create_synthetic_ledger(db_path, num_days=14, slots_per_day=96)
+
+    freeze_file = repo_dir / "freeze.json"
+    gk = H39OneShotUnblindGatekeeper(
+        ledger_path=db_path,
+        canonical_candles_path=candles_path,
+        registry_path=tmp_path / "reg.sqlite3",
+        snapshot_dir=tmp_path / "snapshots",
+        repo_root=repo_dir,
+    )
+    gk.create_freeze_manifest(output_path=freeze_file, as_of_ms=latest_ms)
+    _commit_in_test_git_repo(repo_dir, freeze_file)
+
+    # Mutate file on disk to create dirty unstaged changes
+    freeze_file.write_text(freeze_file.read_text(encoding="utf-8") + "\n", encoding="utf-8")
+
+    with patch.object(H39ResearchEngine, "get_canonical_1m_candles") as mock_candles:
+        with pytest.raises(RuntimeError, match="COMMITTED_FREEZE_VERIFICATION_FAILED"):
+            gk.execute_one_shot_unblind(
+                freeze_manifest_path=freeze_file,
+                output_dir=tmp_path / "results",
+                repo_root=repo_dir,
+            )
+        assert mock_candles.call_count == 0
+
+
+def test_finding_a_exact_committed_blob_is_required(tmp_path: Path) -> None:
+    """Finding A: Exact committed blob verification helper passes on unmodified committed file."""
+    repo_dir = tmp_path / "repo"
+    _init_test_git_repo(repo_dir)
+
+    db_path = tmp_path / "mature_ledger.sqlite3"
+    _ledger, latest_ms = _create_synthetic_ledger(db_path, num_days=14, slots_per_day=96)
+
+    freeze_file = repo_dir / "freeze.json"
+    gk = H39OneShotUnblindGatekeeper(
+        ledger_path=db_path,
+        registry_path=tmp_path / "reg.sqlite3",
+        snapshot_dir=tmp_path / "snapshots",
+        repo_root=repo_dir,
+    )
+    gk.create_freeze_manifest(output_path=freeze_file, as_of_ms=latest_ms)
+    commit_sha = _commit_in_test_git_repo(repo_dir, freeze_file)
+
+    info = verify_committed_freeze_package(freeze_file, repo_root=repo_dir)
+    assert info["freeze_commit_sha"] == commit_sha
+    assert info["freeze_blob_verified"] is True
+    assert info["freeze_commit_is_ancestor"] is True
+
+
+def test_finding_a_freeze_commit_must_be_ancestor(tmp_path: Path) -> None:
+    """Finding A: Freeze commit on diverged/non-ancestor branch is rejected."""
+    repo_dir = tmp_path / "repo"
+    _init_test_git_repo(repo_dir)
+
+    db_path = tmp_path / "mature_ledger.sqlite3"
+    _ledger, latest_ms = _create_synthetic_ledger(db_path, num_days=14, slots_per_day=96)
+
+    freeze_file = repo_dir / "freeze.json"
+    gk = H39OneShotUnblindGatekeeper(
+        ledger_path=db_path,
+        registry_path=tmp_path / "reg.sqlite3",
+        snapshot_dir=tmp_path / "snapshots",
+        repo_root=repo_dir,
+    )
+    gk.create_freeze_manifest(output_path=freeze_file, as_of_ms=latest_ms)
+
+    # Commit freeze on a side branch
+    subprocess.run(["git", "checkout", "-b", "side-branch"], cwd=str(repo_dir), check=True, capture_output=True)
+    _commit_in_test_git_repo(repo_dir, freeze_file)
+
+    # Switch back to default branch where freeze commit is NOT in history
+    default_branch = (
+        "master"
+        if subprocess.run(
+            ["git", "branch", "--list", "master"],
+            cwd=str(repo_dir),
+            capture_output=True,
+            text=True,
+            check=False,
+        ).stdout.strip()
+        else "main"
+    )
+    subprocess.run(["git", "checkout", default_branch], cwd=str(repo_dir), check=True, capture_output=True)
+    # Create diverged commit on HEAD
+    (repo_dir / "diverged.txt").write_text("diverged", encoding="utf-8")
+    _commit_in_test_git_repo(repo_dir, repo_dir / "diverged.txt", commit_msg="diverged commit")
+
+    # Put freeze_file on disk without committing on this branch
+    gk.create_freeze_manifest(output_path=freeze_file, as_of_ms=latest_ms)
+
+    with patch.object(H39ResearchEngine, "get_canonical_1m_candles") as mock_candles:
+        with pytest.raises(RuntimeError, match="COMMITTED_FREEZE_VERIFICATION_FAILED"):
+            gk.execute_one_shot_unblind(
+                freeze_manifest_path=freeze_file,
+                output_dir=tmp_path / "results",
+                repo_root=repo_dir,
+            )
+        assert mock_candles.call_count == 0
+
+
+def test_finding_b_exactly_once_reservation(tmp_path: Path) -> None:
+    """Finding B: Execution key can be reserved exactly once; duplicate reservation raises H39_ONE_SHOT_ALREADY_CONSUMED."""
+    reg_path = tmp_path / "registry.sqlite3"
+    registry = H39OneShotExecutionRegistry(reg_path)
+
+    key = "test_execution_key_001"
+    registry.reserve_execution(
+        execution_key=key,
+        freeze_manifest_sha256="sha_manifest",
+        freeze_commit_sha="sha_commit",
+        unblind_cutoff_ms=1000000,
+        protocol_hash="proto_hash",
+        clarification_hash="clar_hash",
+        executing_git_sha="git_sha",
+    )
+    rec = registry.get_execution(key)
+    assert rec is not None
+    assert rec["state"] == "STARTED"
+
+    # Second reservation attempt with same key must raise H39_ONE_SHOT_ALREADY_CONSUMED
+    with pytest.raises(RuntimeError, match=H39_ONE_SHOT_ALREADY_CONSUMED):
+        registry.reserve_execution(
+            execution_key=key,
+            freeze_manifest_sha256="sha_manifest",
+            freeze_commit_sha="sha_commit",
+            unblind_cutoff_ms=1000000,
+            protocol_hash="proto_hash",
+            clarification_hash="clar_hash",
+            executing_git_sha="git_sha",
+        )
+
+
+def test_finding_b_completed_execution_cannot_rerun(tmp_path: Path) -> None:
+    """Finding B: Completed execution cannot be rerun or overwritten."""
+    reg_path = tmp_path / "registry.sqlite3"
+    registry = H39OneShotExecutionRegistry(reg_path)
+
+    key = "test_completed_key_002"
+    registry.reserve_execution(
+        execution_key=key,
+        freeze_manifest_sha256="sha_manifest",
+        freeze_commit_sha="sha_commit",
+        unblind_cutoff_ms=1000000,
+        protocol_hash="proto_hash",
+        clarification_hash="clar_hash",
+        executing_git_sha="git_sha",
+    )
+    registry.complete_execution(key, result_manifest_sha256="result_sha")
+    rec = registry.get_execution(key)
+    assert rec is not None
+    assert rec["state"] == "COMPLETED"
+
+    with pytest.raises(RuntimeError, match=H39_ONE_SHOT_ALREADY_CONSUMED):
+        registry.reserve_execution(
+            execution_key=key,
+            freeze_manifest_sha256="sha_manifest",
+            freeze_commit_sha="sha_commit",
+            unblind_cutoff_ms=1000000,
+            protocol_hash="proto_hash",
+            clarification_hash="clar_hash",
+            executing_git_sha="git_sha",
+        )
+
+
+def test_finding_b_crash_fail_closed(tmp_path: Path) -> None:
+    """Finding B: Interrupted execution remains STARTED; no auto reset on next run."""
+    reg_path = tmp_path / "registry.sqlite3"
+    registry = H39OneShotExecutionRegistry(reg_path)
+
+    key = "test_crash_key_003"
+    registry.reserve_execution(
+        execution_key=key,
+        freeze_manifest_sha256="sha_manifest",
+        freeze_commit_sha="sha_commit",
+        unblind_cutoff_ms=1000000,
+        protocol_hash="proto_hash",
+        clarification_hash="clar_hash",
+        executing_git_sha="git_sha",
+    )
+
+    # Process "crashes" before completing. Next run refuses:
+    with pytest.raises(RuntimeError, match=H39_ONE_SHOT_ALREADY_CONSUMED):
+        registry.reserve_execution(
+            execution_key=key,
+            freeze_manifest_sha256="sha_manifest",
+            freeze_commit_sha="sha_commit",
+            unblind_cutoff_ms=1000000,
+            protocol_hash="proto_hash",
+            clarification_hash="clar_hash",
+            executing_git_sha="git_sha",
+        )
+    # State is still STARTED
+    assert registry.get_execution(key)["state"] == "STARTED"
+
+
+def test_finding_c_wal_safe_snapshot(tmp_path: Path) -> None:
+    """Finding C: Freeze creates consistent SQLite backup snapshot with verified integrity and pinned SHA."""
+    repo_dir = tmp_path / "repo"
+    _init_test_git_repo(repo_dir)
+
+    db_path = tmp_path / "wal_ledger.sqlite3"
+    snapshot_dir = tmp_path / "snapshots"
+    _ledger, latest_ms = _create_synthetic_ledger(db_path, num_days=14, slots_per_day=96)
+
+    # Explicitly enforce WAL mode
+    with sqlite3.connect(db_path) as conn:
+        conn.execute("PRAGMA journal_mode = WAL;")
+
+    freeze_file = repo_dir / "freeze.json"
+    gk = H39OneShotUnblindGatekeeper(
+        ledger_path=db_path,
+        registry_path=tmp_path / "reg.sqlite3",
+        snapshot_dir=snapshot_dir,
+        repo_root=repo_dir,
+    )
+    manifest = gk.create_freeze_manifest(output_path=freeze_file, as_of_ms=latest_ms)
+
+    snapshot_path = Path(manifest["frozen_ledger_snapshot_path"])
+    assert snapshot_path.exists()
+    assert manifest["frozen_ledger_snapshot_sha256"] == _compute_sha256(snapshot_path)
+
+    # Check snapshot integrity
+    with sqlite3.connect(f"file:{snapshot_path.as_posix()}?mode=ro", uri=True) as conn:
+        chk = conn.execute("PRAGMA integrity_check;").fetchone()[0]
+        assert chk.lower() == "ok"
+        snap_count = conn.execute("SELECT COUNT(*) FROM h39_blind_validation_ledger;").fetchone()[0]
+
+    with sqlite3.connect(f"file:{db_path.as_posix()}?mode=ro", uri=True) as conn:
+        live_count = conn.execute("SELECT COUNT(*) FROM h39_blind_validation_ledger;").fetchone()[0]
+
+    assert snap_count == live_count
+    assert snap_count == manifest["snapshot_total_row_count"]
+
+
+def test_finding_d_readiness_artifact_hash_tampering(tmp_path: Path) -> None:
+    """Finding D: Readiness artifact tampering fails verification before labels are read."""
+    repo_dir = tmp_path / "repo"
+    _init_test_git_repo(repo_dir)
+
+    db_path = tmp_path / "mature_ledger.sqlite3"
+    candles_path = tmp_path / "canonical_candles.sqlite3"
+    _ledger, latest_ms = _create_synthetic_ledger(db_path, num_days=14, slots_per_day=96)
+
+    freeze_file = repo_dir / "freeze.json"
+    gk = H39OneShotUnblindGatekeeper(
+        ledger_path=db_path,
+        canonical_candles_path=candles_path,
+        registry_path=tmp_path / "reg.sqlite3",
+        snapshot_dir=tmp_path / "snapshots",
+        repo_root=repo_dir,
+    )
+    manifest = gk.create_freeze_manifest(output_path=freeze_file, as_of_ms=latest_ms)
+    _commit_in_test_git_repo(repo_dir, freeze_file)
+
+    # Tamper with readiness artifact on disk
+    readiness_path = Path(manifest["readiness_artifact_path"])
+    readiness_path.write_text('{"tampered": true}', encoding="utf-8")
+
+    with patch.object(H39ResearchEngine, "get_canonical_1m_candles") as mock_candles:
+        with pytest.raises(RuntimeError, match="READINESS_ARTIFACT_TAMPERED"):
+            gk.execute_one_shot_unblind(
+                freeze_manifest_path=freeze_file,
+                output_dir=tmp_path / "results",
+                repo_root=repo_dir,
+            )
+        assert mock_candles.call_count == 0
+
+
+def test_finding_f_label_loader_ordering_spy(tmp_path: Path) -> None:
+    """Finding F: Candle and label loader is NEVER called on failed freeze, dirty freeze, or consumed key."""
+    repo_dir = tmp_path / "repo"
+    _init_test_git_repo(repo_dir)
+
+    db_path = tmp_path / "mature_ledger.sqlite3"
+    candles_path = tmp_path / "canonical_candles.sqlite3"
+    _ledger, latest_ms = _create_synthetic_ledger(db_path, num_days=14, slots_per_day=96)
+
+    with sqlite3.connect(db_path) as conn:
+        slots = [r[0] for r in conn.execute("SELECT decision_close_ms FROM h39_blind_validation_ledger WHERE decision_close_ms <= ?", (latest_ms,)).fetchall()]
+    _populate_canonical_candles(candles_path, slots)
+
+    freeze_file = repo_dir / "freeze.json"
+    registry_path = tmp_path / "reg.sqlite3"
+    gk = H39OneShotUnblindGatekeeper(
+        ledger_path=db_path,
+        canonical_candles_path=candles_path,
+        registry_path=registry_path,
+        snapshot_dir=tmp_path / "snapshots",
+        repo_root=repo_dir,
+    )
+    gk.create_freeze_manifest(output_path=freeze_file, as_of_ms=latest_ms)
+    _commit_in_test_git_repo(repo_dir, freeze_file)
+
+    # First run succeeds
+    res = gk.execute_one_shot_unblind(
+        freeze_manifest_path=freeze_file,
+        output_dir=tmp_path / "results",
+        repo_root=repo_dir,
+    )
+    assert res["evaluated_sample_size"] == len(slots)
+
+    # Second run for identical freeze: fails closed with H39_ONE_SHOT_ALREADY_CONSUMED BEFORE candles loaded
+    with patch.object(H39ResearchEngine, "get_canonical_1m_candles") as mock_candles:
+        with pytest.raises(RuntimeError, match=H39_ONE_SHOT_ALREADY_CONSUMED):
+            gk.execute_one_shot_unblind(
+                freeze_manifest_path=freeze_file,
+                output_dir=tmp_path / "results2",
+                repo_root=repo_dir,
+            )
+        assert mock_candles.call_count == 0
+
+
+def test_finding_k_no_real_unblind_during_current_repair() -> None:
+    """Finding K: Real H39 evidence remains immature and zero real validation performance files exist."""
+    deliv_dir = Path("deliverables/v0.3.25")
+    if deliv_dir.exists():
+        status_file = deliv_dir / "H39_BLIND_OPERATIONAL_STATUS.json"
+        if status_file.exists():
+            status = json.loads(status_file.read_text(encoding="utf-8"))
+            assert status["state"] == "FORWARD_DATA_INSUFFICIENT"
+            assert status["ready_for_unblind"] is False
+
+        forbidden = [
+            deliv_dir / "H39_ONE_SHOT_UNBLIND_FREEZE.json",
+            deliv_dir / "H39_ONE_SHOT_VALIDATION_RESULTS.json",
+            deliv_dir / "H39_ONE_SHOT_VALIDATION_REPORT.md",
+            deliv_dir / "H39_FAMILYWISE_HOLM_RESULTS.json",
+            deliv_dir / "H39_BASELINE_INCREMENTAL_RESULTS.json",
+            deliv_dir / "H39_STABILITY_DIAGNOSTICS.json",
+            deliv_dir / "H39_FINAL_SCIENTIFIC_VERDICT.json",
+            deliv_dir / "H39_ONE_SHOT_EXECUTION_RECEIPT.json",
+        ]
+        for f in forbidden:
+            assert not f.exists(), f"Forbidden real unblind artifact exists in live repo: {f}"

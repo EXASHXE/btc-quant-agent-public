@@ -324,6 +324,12 @@ def build_parser() -> argparse.ArgumentParser:
             "--ledger-path", default="data/research/h39_validation/h39_blind_ledger.sqlite3"
         )
         h39_freeze.add_argument("--as-of-ms", type=int, default=None)
+        h39_freeze.add_argument(
+            "--snapshot-dir", default="data/research/h39_validation/frozen"
+        )
+        h39_freeze.add_argument(
+            "--readiness-path", default=None
+        )
 
         h39_unblind = p_sub.add_parser(
             "one-shot-unblind", help="execute one-shot unblind validation strictly using verified freeze manifest"
@@ -336,6 +342,12 @@ def build_parser() -> argparse.ArgumentParser:
         )
         h39_unblind.add_argument(
             "--ledger-path", default="data/research/h39_validation/h39_blind_ledger.sqlite3"
+        )
+        h39_unblind.add_argument(
+            "--registry-path", default="data/research/h39_validation/h39_one_shot_execution_registry.sqlite3"
+        )
+        h39_unblind.add_argument(
+            "--repo-root", default=None
         )
 
         h39_deliv = p_sub.add_parser(
@@ -859,10 +871,15 @@ def main(argv: list[str] | None = None) -> int:
             _print(res)
             return 0 if res.get("ready_for_unblind") else 1
         if cmd == "freeze-cutoff":
-            gatekeeper = H39OneShotUnblindGatekeeper(ledger_path=args.ledger_path)
+            gatekeeper = H39OneShotUnblindGatekeeper(
+                ledger_path=args.ledger_path,
+                snapshot_dir=getattr(args, "snapshot_dir", "data/research/h39_validation/frozen"),
+            )
             try:
                 freeze_manifest = gatekeeper.create_freeze_manifest(
-                    output_path=args.output_path, as_of_ms=args.as_of_ms
+                    output_path=args.output_path,
+                    as_of_ms=args.as_of_ms,
+                    readiness_artifact_path=getattr(args, "readiness_path", None),
                 )
                 _print({"status": "SUCCESS", "manifest": freeze_manifest})
                 return 0
@@ -870,11 +887,16 @@ def main(argv: list[str] | None = None) -> int:
                 _print({"status": "REFUSED", "error": str(exc)})
                 return 1
         if cmd == "one-shot-unblind":
-            gatekeeper = H39OneShotUnblindGatekeeper(ledger_path=args.ledger_path)
+            gatekeeper = H39OneShotUnblindGatekeeper(
+                ledger_path=args.ledger_path,
+                registry_path=getattr(args, "registry_path", "data/research/h39_validation/h39_one_shot_execution_registry.sqlite3"),
+                repo_root=getattr(args, "repo_root", None),
+            )
             try:
                 res = gatekeeper.execute_one_shot_unblind(
                     freeze_manifest_path=args.freeze_manifest,
                     output_dir=args.output_dir,
+                    repo_root=getattr(args, "repo_root", None),
                 )
                 _print({"status": "SUCCESS", "results": res})
                 return 0
