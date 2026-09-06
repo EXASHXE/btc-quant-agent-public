@@ -1,0 +1,51 @@
+{
+  "clock_ceiling_ms": 1788699039842,
+  "clock_ceiling_utc": "2026-09-06T12:50:39.842000+00:00",
+  "clock_denominator": {
+    "clock_ceiling_ms": 1788699039842,
+    "clock_ceiling_utc": "2026-09-06T12:50:39.842000+00:00",
+    "clock_source": "WALL_CLOCK",
+    "coverage_ratio": 0.18592964824120603,
+    "eligible_boundary_count": 37,
+    "eligible_coverage": 0.18592964824120603,
+    "expected_boundary_count": 199,
+    "observed_boundary_count": 55,
+    "raw_observation_coverage": 0.27638190954773867
+  },
+  "clock_source": "WALL_CLOCK",
+  "coverage_gate_passed": false,
+  "days_gate_passed": false,
+  "distinct_days": [
+    "2026-09-04",
+    "2026-09-05",
+    "2026-09-06"
+  ],
+  "distinct_days_count": 3,
+  "generated_at_utc": "2026-09-06T12:50:39.846422+00:00",
+  "hypothesis_id": "H39_MICROSTRUCTURE_DIRECTIONAL_INFORMATION",
+  "maturity_achieved": false,
+  "maturity_gates": {
+    "minimum_coverage_ratio": 0.9,
+    "minimum_distinct_days": 14,
+    "minimum_eligible_observations": 750
+  },
+  "observations_gate_passed": false,
+  "ready_for_unblind": false,
+  "refusal_reason": "REFUSED_VALIDATION_NOT_MATURE: Minimum gates not met (days: 3/14, eligible: 37/750, coverage: 18.59%/90%)",
+  "rejection_reason_counts": {
+    "GAP_IN_FEATURE_WINDOW": 18
+  },
+  "safety_firewalls": {
+    "auto_execute": false,
+    "execution": "DISABLED",
+    "final_holdout": "SEALED",
+    "qualified_direction_engine": "NONE",
+    "runtime_maximum": "OPPORTUNITY_ONLY",
+    "strategy": "EXPERIMENTAL"
+  },
+  "schema_version": "1.0.0",
+  "stage": "H39_ONE_SHOT_UNBLIND_PREREGISTRATION",
+  "state": "FORWARD_DATA_INSUFFICIENT",
+  "validation_start_ms": 1788520500000,
+  "validation_start_utc": "2026-09-04T11:15:00Z"
+}

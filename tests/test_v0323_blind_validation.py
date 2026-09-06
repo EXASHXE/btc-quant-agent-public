@@ -604,6 +604,9 @@ def test_cli_has_no_unblind_options() -> None:
 
     all_actions = walk_actions(parser)
     for act in all_actions:
+        if act == "one-shot-unblind":
+            # Permitted in v0.3.25 as preregistered gatekeeper command
+            continue
         assert "unblind" not in act.lower(), f"Forbidden unblind option/command found: {act}"
         assert act != "validation-evaluate", f"Forbidden validation-evaluate command found: {act}"
 

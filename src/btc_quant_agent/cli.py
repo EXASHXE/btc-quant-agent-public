@@ -314,10 +314,34 @@ def build_parser() -> argparse.ArgumentParser:
         )
         h39_ready.add_argument("--as-of-ms", type=int, default=None)
 
-        h39_deliv = p_sub.add_parser(
-            "generate-deliverables", help="generate v0.3.24 deliverables"
+        h39_freeze = p_sub.add_parser(
+            "freeze-cutoff", help="freeze one-shot unblind cutoff manifest if readiness passes"
         )
-        h39_deliv.add_argument("--output-dir", default="deliverables/v0.3.24")
+        h39_freeze.add_argument(
+            "--output-path", default="deliverables/v0.3.25/H39_ONE_SHOT_UNBLIND_FREEZE.json"
+        )
+        h39_freeze.add_argument(
+            "--ledger-path", default="data/research/h39_validation/h39_blind_ledger.sqlite3"
+        )
+        h39_freeze.add_argument("--as-of-ms", type=int, default=None)
+
+        h39_unblind = p_sub.add_parser(
+            "one-shot-unblind", help="execute one-shot unblind validation strictly using verified freeze manifest"
+        )
+        h39_unblind.add_argument(
+            "--freeze-manifest", required=True, help="path to verified H39_ONE_SHOT_UNBLIND_FREEZE.json"
+        )
+        h39_unblind.add_argument(
+            "--output-dir", default="deliverables/v0.3.25"
+        )
+        h39_unblind.add_argument(
+            "--ledger-path", default="data/research/h39_validation/h39_blind_ledger.sqlite3"
+        )
+
+        h39_deliv = p_sub.add_parser(
+            "generate-deliverables", help="generate deliverables for h39 stage"
+        )
+        h39_deliv.add_argument("--output-dir", default="deliverables/v0.3.25")
         h39_deliv.add_argument(
             "--microstructure-root", default="data/forward/BTCUSDT/microstructure"
         )
@@ -773,10 +797,12 @@ def main(argv: list[str] | None = None) -> int:
         )
         from .microstructure_research import (
             H39BlindLedger,
+            H39OneShotUnblindGatekeeper,
             H39ResearchEngine,
             generate_all_v0322_deliverables,
             generate_all_v0323_deliverables,
             generate_all_v0324_deliverables,
+            generate_all_v0325_deliverables,
         )
 
         if cmd == "validation-accumulate":
@@ -832,9 +858,39 @@ def main(argv: list[str] | None = None) -> int:
             )
             _print(res)
             return 0 if res.get("ready_for_unblind") else 1
+        if cmd == "freeze-cutoff":
+            gatekeeper = H39OneShotUnblindGatekeeper(ledger_path=args.ledger_path)
+            try:
+                freeze_manifest = gatekeeper.create_freeze_manifest(
+                    output_path=args.output_path, as_of_ms=args.as_of_ms
+                )
+                _print({"status": "SUCCESS", "manifest": freeze_manifest})
+                return 0
+            except RuntimeError as exc:
+                _print({"status": "REFUSED", "error": str(exc)})
+                return 1
+        if cmd == "one-shot-unblind":
+            gatekeeper = H39OneShotUnblindGatekeeper(ledger_path=args.ledger_path)
+            try:
+                res = gatekeeper.execute_one_shot_unblind(
+                    freeze_manifest_path=args.freeze_manifest,
+                    output_dir=args.output_dir,
+                )
+                _print({"status": "SUCCESS", "results": res})
+                return 0
+            except RuntimeError as exc:
+                _print({"status": "REFUSED", "error": str(exc)})
+                return 1
         if cmd == "generate-deliverables":
             if "v0.3.23" in args.output_dir:
                 res = generate_all_v0323_deliverables(
+                    output_dir=args.output_dir,
+                    microstructure_root=args.microstructure_root,
+                    opportunity_store_path=args.opportunity_store,
+                    ledger_path=args.ledger_path,
+                )
+            elif "v0.3.25" in args.output_dir:
+                res = generate_all_v0325_deliverables(
                     output_dir=args.output_dir,
                     microstructure_root=args.microstructure_root,
                     opportunity_store_path=args.opportunity_store,

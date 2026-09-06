@@ -1,0 +1,28 @@
+{
+  "derivatives_chain": {
+    "db_integrity": "OK",
+    "epoch_id": "DERIVATIVES_PIT_EPOCH_V0321_001",
+    "rows_recorded": 0,
+    "status": "HEALTHY"
+  },
+  "generated_at_utc": "2026-09-06T12:50:39.847173+00:00",
+  "microstructure_chain": {
+    "active_partition": "microstructure-2026-09-06.sqlite3",
+    "integrity_status": "OK",
+    "partition_count": 7,
+    "status": "HEALTHY",
+    "stream_id": "MICROSTRUCTURE_CAPTURE_V0315_001"
+  },
+  "opportunity_shadow_chain": {
+    "chain_id": "OPPORTUNITY_FORWARD_V0321_20260903T180000Z",
+    "policy": {
+      "active_evaluation_prohibited": true,
+      "resolvable": false,
+      "successor_preregistered": false
+    },
+    "status": "DATA_QUALITY_TERMINAL_ARCHIVE",
+    "terminal_at_ms": 1788511500000,
+    "terminal_at_utc": "2026-09-04T08:45:00Z"
+  },
+  "schema_version": "1.0.0"
+}

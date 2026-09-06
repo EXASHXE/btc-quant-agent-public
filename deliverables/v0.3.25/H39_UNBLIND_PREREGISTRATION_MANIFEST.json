@@ -1,0 +1,88 @@
+{
+  "attestations": {
+    "safety_firewalls_intact": true,
+    "zero_final_holdout_access": true,
+    "zero_prior_validation_performance_inspection": true,
+    "zero_protocol_drift": true
+  },
+  "baseline_incremental_controls": [
+    "trailing_return_15m",
+    "trailing_return_60m",
+    "trailing_atr_ratio_15m"
+  ],
+  "bypass_flags_permitted": false,
+  "candidate_decision_rule": {
+    "all_conditions_required": [
+      "holm_adjusted_p_lt_0_05",
+      "observed_sign_matches_predefined_sign",
+      "ci_95_strictly_excludes_zero_in_correct_direction",
+      "nontrivial_effect_size",
+      "incremental_lr_p_lt_0_05_and_z_gt_0",
+      "distinct_days_gte_14",
+      "eligible_observations_gte_750",
+      "eligible_coverage_gte_0_90",
+      "no_integrity_or_source_breach",
+      "no_single_day_dependence",
+      "no_material_regime_inversion"
+    ],
+    "fallback_status": "RESEARCH_FAMILY_STOP",
+    "status_name": "PROVISIONAL_MICROSTRUCTURE_CANDIDATE"
+  },
+  "code_version_sha": "04d1ea87827e7645bbcb2481f2dbf9fff4473b94",
+  "created_at_utc": "2026-09-06T12:50:39.845991+00:00",
+  "current_stage_state": "FORWARD_DATA_INSUFFICIENT",
+  "formal_feature_universe": [
+    "M1_TRADE_NOTIONAL_IMBALANCE_5M",
+    "M2_TRADE_NOTIONAL_IMBALANCE_15M",
+    "M3_OFI_5M",
+    "M4_TOP5_DEPTH_IMBALANCE_5M",
+    "M5_TOP20_DEPTH_IMBALANCE_5M",
+    "M6_MICROPRICE_DEVIATION_1M",
+    "M7_PRESSURE_AGREEMENT_SCORE",
+    "M8_PRESSURE_DIVERGENCE_SCORE"
+  ],
+  "hypothesis_id": "H39_MICROSTRUCTURE_DIRECTIONAL_INFORMATION",
+  "model_family": "L2_LOGISTIC_REGRESSION_LAMBDA_1_0",
+  "one_shot_unblind_command": "quantctl h39 one-shot-unblind --freeze-manifest <path>",
+  "predefined_signs": {
+    "M1_TRADE_NOTIONAL_IMBALANCE_5M": 1,
+    "M2_TRADE_NOTIONAL_IMBALANCE_15M": 1,
+    "M3_OFI_5M": 1,
+    "M4_TOP5_DEPTH_IMBALANCE_5M": 1,
+    "M5_TOP20_DEPTH_IMBALANCE_5M": 1,
+    "M6_MICROPRICE_DEVIATION_1M": 1,
+    "M7_PRESSURE_AGREEMENT_SCORE": 1,
+    "M8_PRESSURE_DIVERGENCE_SCORE": 1
+  },
+  "primary_family": {
+    "arms_count": 8,
+    "correction_method": "HOLM_BONFERRONI",
+    "fwer_alpha": 0.05,
+    "horizon": "60m"
+  },
+  "protocol_clarification_sha": "2d1ccecc11dc231ffa41cdb1b5a9ea693abccc59",
+  "protocol_freeze_sha": "0eecd8833675c664c42f5e62d89663d7a10ed5fa",
+  "ready_for_unblind": false,
+  "schema_version": "1.0.0",
+  "secondary_horizon": {
+    "cannot_rescue_60m": true,
+    "horizon": "240m",
+    "role": "SUPPORTING_ONLY"
+  },
+  "stability_diagnostics": [
+    "utc_day_jackknife",
+    "rolling_block_breakdown",
+    "volatility_regime_inversion",
+    "1h_trend_regime_inversion"
+  ],
+  "stage": "v0.3.25",
+  "timing_specification": {
+    "decision_close_rule": "closed 15m boundary (slot_ms)",
+    "primary_60m_endpoint": "CLOSE at reference_time_ms + 59*60_000",
+    "reference_entry_rule": "OPEN at slot_ms + 60_000",
+    "secondary_240m_endpoint": "CLOSE at reference_time_ms + 239*60_000"
+  },
+  "title": "H39 One-Shot Unblind Protocol Preregistration & Gatekeeper",
+  "validation_start_ms": 1788520500000,
+  "validation_start_utc": "2026-09-04T11:15:00Z"
+}

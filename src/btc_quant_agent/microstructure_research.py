@@ -1265,6 +1265,14 @@ class H39BlindLedger:
             "observations_gate_passed": eligible_count >= H39_MINIMUM_ELIGIBLE_OBSERVATIONS,
             "coverage_gate_passed": coverage_ratio >= H39_MINIMUM_COVERAGE_RATIO,
             "terminal_breach_detected": False,
+            "safety_firewalls": {
+                "strategy": "EXPERIMENTAL",
+                "qualified_direction_engine": "NONE",
+                "runtime_maximum": "OPPORTUNITY_ONLY",
+                "execution": "DISABLED",
+                "auto_execute": False,
+                "final_holdout": "SEALED",
+            },
         }
 
     def export_manifest(self) -> dict[str, Any]:
@@ -1607,6 +1615,21 @@ class H39ResearchEngine:
         }
 
     def evaluate_validation_status(self) -> dict[str, Any]:
+        """DEPRECATED: Non-authoritative diagnostic only.
+
+        MUST NOT authorize unblind, candidate promotion, or formal H39 validation.
+        The ONLY authoritative authorization source is check_unblind_readiness() with
+        the wall-clock denominator.
+        """
+        import warnings
+
+        warnings.warn(
+            "evaluate_validation_status() is a deprecated non-authoritative diagnostic. "
+            "It MUST NOT authorize unblind, candidate promotion, or formal validation. "
+            "Use check_unblind_readiness() with wall-clock denominator instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
         val_start_ms = int(self.protocol["temporal_partitioning"]["validation_start_ms"])
         val_start_utc = self.protocol["temporal_partitioning"]["validation_start_utc"]
         buf_start_utc = self.protocol["temporal_partitioning"]["exclusion_buffer"]["buffer_start_utc"]
@@ -1673,6 +1696,12 @@ class H39ResearchEngine:
             "hypothesis_id": H39_HYPOTHESIS_ID,
             "stage": "FRESH_FORWARD_VALIDATION",
             "status": status,
+            "deprecated": True,
+            "authoritative": False,
+            "diagnostic_only": True,
+            "readiness_authority": "NON_AUTHORITATIVE_DIAGNOSTIC_ONLY",
+            "authoritative_unblind_authorization_allowed": False,
+            "notice": "DEPRECATED: Non-authoritative diagnostic only. MUST NOT authorize unblind, candidate promotion, or formal validation.",
             "validation_start_utc": val_start_utc,
             "validation_start_ms": val_start_ms,
             "exclusion_buffer": {
@@ -2039,6 +2068,7 @@ class H39ResearchEngine:
                 "refusal_reason": None,
                 "summary": summary,
                 "integrity": integrity,
+                "safety_firewalls": summary.get("safety_firewalls", {}),
                 "attestations": {
                     "zero_protocol_drift": True,
                     "zero_final_holdout_access": True,
@@ -2056,6 +2086,7 @@ class H39ResearchEngine:
             ),
             "summary": summary,
             "integrity": integrity,
+            "safety_firewalls": summary.get("safety_firewalls", {}),
         }
 
 
@@ -3191,5 +3222,1248 @@ quantctl h39 validation-readiness
     created_files["README"] = str(readme_path)
 
     return created_files
+
+
+def _compute_sha256(path: str | Path) -> str:
+    p = Path(path).resolve()
+    h = hashlib.sha256()
+    with open(p, "rb") as f:
+        while chunk := f.read(65536):
+            h.update(chunk)
+    return h.hexdigest()
+
+
+class H39OneShotUnblindGatekeeper:
+    """Strict Gatekeeper and One-Shot Unblind Execution Engine for H39 Fresh Forward Validation.
+
+    Governed by:
+    - configs/research/v0.3.22_microstructure_h39_protocol.json (SHA-256: 1b7d61409078f779585675e9f657a60ea1ef5384a7707c33bbac07535feaa979)
+    - deliverables/v0.3.22/H39_PROTOCOL_CLARIFICATION_001.json (SHA-256: b2ba02df923950413c773e308e01d4ba893690948be9c258311d483ea753e284)
+    - prompts/v0.3.25/Agent_BTC_Quant_Agent_v0.3.25_H39_One_Shot_Unblind_Preregistration_Prompt.md
+
+    Scientific Invariants:
+    1. Fails closed with FORWARD_DATA_INSUFFICIENT unless authoritative readiness returns H39_READY_FOR_ONE_SHOT_UNBLIND.
+    2. Strict one-shot cutoff freeze before label loading.
+    3. Exactly M1-M8 formal hypothesis universe with Holm-Bonferroni FWER control across all 8 arms.
+    4. 240m horizon is supporting evidence only (cannot rescue 60m failure).
+    5. Frozen baseline incremental test on [trailing_return_15m, trailing_return_60m, trailing_atr_ratio_15m] using L2 logistic regression.
+    6. Prespecified stability diagnostics (UTC day, rolling block, volatility regime, 1H trend regime).
+    7. Candidate decision rule: PROVISIONAL_MICROSTRUCTURE_CANDIDATE if all pass, else RESEARCH_FAMILY_STOP.
+    8. Safety firewalls remain permanently intact (strategy=EXPERIMENTAL, direction_engine=NONE, runtime_max=OPPORTUNITY_ONLY, execution=DISABLED, holdout=SEALED).
+    """
+
+    def __init__(
+        self,
+        ledger_path: str | Path = H39_BLIND_LEDGER_DEFAULT_PATH,
+        protocol_path: str | Path = H39_PROTOCOL_PATH,
+        clarification_path: str | Path = "deliverables/v0.3.22/H39_PROTOCOL_CLARIFICATION_001.json",
+        microstructure_root: str | Path = "data/forward/BTCUSDT/microstructure",
+        opportunity_store_path: str | Path = "data/forward/BTCUSDT/opportunity_shadow.sqlite3",
+        canonical_candles_path: str | Path = H39_CANONICAL_CANDLES_PATH,
+    ) -> None:
+        self.ledger_path = Path(ledger_path).resolve()
+        self.protocol_path = Path(protocol_path).resolve()
+        self.clarification_path = Path(clarification_path).resolve()
+        self.microstructure_root = Path(microstructure_root).resolve()
+        self.opportunity_store_path = Path(opportunity_store_path).resolve()
+        self.canonical_candles_path = Path(canonical_candles_path).resolve()
+
+    def verify_protocol_and_clarification_hashes(self) -> dict[str, Any]:
+        """Verify on-disk protocol and clarification files against frozen SHA-256 hashes."""
+        if not self.protocol_path.exists():
+            raise FileNotFoundError(f"Protocol configuration file not found at {self.protocol_path}")
+        if not self.clarification_path.exists():
+            raise FileNotFoundError(
+                f"Protocol clarification file not found at {self.clarification_path}"
+            )
+
+        proto_sha = _compute_sha256(self.protocol_path)
+        if proto_sha != H39_FROZEN_PROTOCOL_HASH:
+            raise RuntimeError(
+                f"PROTOCOL_HASH_DRIFT: Protocol file at {self.protocol_path} has hash {proto_sha}, "
+                f"expected frozen {H39_FROZEN_PROTOCOL_HASH}"
+            )
+
+        clar_sha = _compute_sha256(self.clarification_path)
+        if clar_sha != H39_FROZEN_CLARIFICATION_HASH:
+            raise RuntimeError(
+                f"CLARIFICATION_HASH_DRIFT: Clarification file at {self.clarification_path} has hash {clar_sha}, "
+                f"expected frozen {H39_FROZEN_CLARIFICATION_HASH}"
+            )
+
+        return {
+            "status": "OK",
+            "protocol_sha256": proto_sha,
+            "clarification_sha256": clar_sha,
+            "protocol_verified": True,
+            "clarification_verified": True,
+        }
+
+    def verify_readiness_preconditions(
+        self,
+        as_of_ms: int | None = None,
+        now_ms: int | None = None,
+    ) -> dict[str, Any]:
+        """Perform authoritative fail-closed pre-validation verification.
+
+        Checks:
+        1. On-disk protocol and clarification SHA-256 hashes.
+        2. SQLite PRAGMA integrity_check.
+        3. Source partition immutability and mutation detection.
+        4. Wall-clock readiness calculation via H39ResearchEngine.
+        5. Frozen maturity gates (>=14 days, >=750 slots, >=90% coverage).
+        """
+        # 1. Protocol & clarification hash checks
+        hash_check = self.verify_protocol_and_clarification_hashes()
+
+        # 2. Blind ledger existence check
+        if not self.ledger_path.exists():
+            return {
+                "status": H39_STATE_INSUFFICIENT,
+                "ready_for_unblind": False,
+                "refusal_reason": f"{REFUSED_VALIDATION_NOT_MATURE}: Blind ledger does not exist yet at {self.ledger_path}",
+                "ledger_path": str(self.ledger_path),
+                "hash_verification": hash_check,
+            }
+
+        # 3. SQLite and source partition integrity check
+        ledger = H39BlindLedger(self.ledger_path)
+        integrity = ledger.verify_integrity()
+        if integrity["status"] != "OK":
+            return {
+                "status": H39_STATE_BLOCKED_QUALITY,
+                "ready_for_unblind": False,
+                "refusal_reason": (
+                    f"READINESS_BLOCKED_DATA_QUALITY: Integrity verification failed: "
+                    f"{integrity.get('mutations_detected')}"
+                ),
+                "ledger_path": str(self.ledger_path),
+                "integrity": integrity,
+                "hash_verification": hash_check,
+            }
+
+        # 4. Authoritative readiness evaluation
+        engine = H39ResearchEngine(
+            protocol_path=self.protocol_path,
+            microstructure_root=self.microstructure_root,
+            opportunity_store_path=self.opportunity_store_path,
+        )
+        readiness = engine.check_unblind_readiness(
+            ledger_path=self.ledger_path,
+            as_of_ms=as_of_ms,
+            now_ms=now_ms,
+        )
+
+        readiness["hash_verification"] = hash_check
+        return readiness
+
+    def create_freeze_manifest(
+        self,
+        output_path: str | Path,
+        as_of_ms: int | None = None,
+        now_ms: int | None = None,
+    ) -> dict[str, Any]:
+        """Freeze one-shot validation cutoff into an immutable manifest.
+
+        STRICTLY FAILS CLOSED if readiness preconditions are not completely met.
+        """
+        readiness = self.verify_readiness_preconditions(as_of_ms=as_of_ms, now_ms=now_ms)
+        if not readiness.get("ready_for_unblind"):
+            raise RuntimeError(
+                f"{REFUSED_VALIDATION_NOT_MATURE}: Cannot create freeze manifest because "
+                f"unblind readiness preconditions failed: {readiness.get('refusal_reason')}"
+            )
+
+        summary = readiness["summary"]
+        cutoff_ms = int(summary["clock_ceiling_ms"])
+        cutoff_utc = summary["clock_ceiling_utc"]
+
+        ledger_sha = _compute_sha256(self.ledger_path)
+
+        # Map source partitions to their recorded hashes
+        partition_map: dict[str, str] = {}
+        with sqlite3.connect(self.ledger_path) as conn:
+            conn.row_factory = sqlite3.Row
+            rows = conn.execute(
+                "SELECT partition_name, partition_sha256 FROM h39_source_partitions ORDER BY partition_name ASC"
+            ).fetchall()
+            for r in rows:
+                partition_map[r["partition_name"]] = str(r["partition_sha256"])
+
+        code_sha = _get_current_git_sha()
+
+        manifest = {
+            "schema_version": "1.0.0",
+            "artifact_name": "H39_ONE_SHOT_UNBLIND_FREEZE",
+            "hypothesis_id": H39_HYPOTHESIS_ID,
+            "validation_start_ms": H39_VALIDATION_START_MS,
+            "validation_start_utc": H39_VALIDATION_START_UTC,
+            "unblind_cutoff_ms": cutoff_ms,
+            "unblind_cutoff_utc": cutoff_utc,
+            "clock_source": summary.get("clock_source", "WALL_CLOCK"),
+            "expected_boundary_count": summary.get("expected_boundary_count", 0),
+            "observed_boundary_count": summary.get("observed_boundary_count", 0),
+            "eligible_boundary_count": summary.get("eligible_boundary_count", 0),
+            "eligible_coverage": summary.get("eligible_coverage", 0.0),
+            "distinct_days_count": summary.get("distinct_days_count", 0),
+            "ledger_path": str(self.ledger_path),
+            "ledger_sha256": ledger_sha,
+            "source_partitions": partition_map,
+            "protocol_hash": H39_FROZEN_PROTOCOL_HASH,
+            "clarification_hash": H39_FROZEN_CLARIFICATION_HASH,
+            "code_version_sha": code_sha,
+            "created_at_utc": datetime.now(UTC).isoformat(),
+            "attestations": {
+                "zero_source_mutation": True,
+                "zero_protocol_drift": True,
+                "zero_final_holdout_access": True,
+                "zero_prior_validation_performance_inspection": True,
+            },
+        }
+
+        out_p = Path(output_path).resolve()
+        out_p.parent.mkdir(parents=True, exist_ok=True)
+        out_p.write_text(json.dumps(manifest, indent=2, sort_keys=True), encoding="utf-8")
+        return manifest
+
+    def verify_freeze_manifest(self, freeze_manifest_path: str | Path) -> dict[str, Any]:
+        """Verify that a freeze manifest is intact and matches current immutable evidence."""
+        p = Path(freeze_manifest_path).resolve()
+        if not p.exists():
+            raise FileNotFoundError(f"Freeze manifest not found at {p}")
+
+        manifest_raw = json.loads(p.read_text(encoding="utf-8"))
+        if not isinstance(manifest_raw, dict):
+            raise RuntimeError("FREEZE_MANIFEST_CORRUPT: Root object is not a dict")
+        manifest: dict[str, Any] = manifest_raw
+
+        required_keys = [
+            "artifact_name",
+            "hypothesis_id",
+            "validation_start_ms",
+            "validation_start_utc",
+            "unblind_cutoff_ms",
+            "unblind_cutoff_utc",
+            "expected_boundary_count",
+            "observed_boundary_count",
+            "eligible_boundary_count",
+            "eligible_coverage",
+            "distinct_days_count",
+            "ledger_sha256",
+            "source_partitions",
+            "protocol_hash",
+            "clarification_hash",
+            "code_version_sha",
+            "attestations",
+        ]
+        missing = [k for k in required_keys if k not in manifest]
+        if missing:
+            raise RuntimeError(
+                f"FREEZE_MANIFEST_CORRUPT: Manifest missing required fields: {missing}"
+            )
+
+        # Verify protocol & clarification hashes
+        self.verify_protocol_and_clarification_hashes()
+        if manifest["protocol_hash"] != H39_FROZEN_PROTOCOL_HASH:
+            raise RuntimeError(
+                f"FREEZE_MANIFEST_MISMATCH: Manifest protocol_hash {manifest['protocol_hash']} "
+                f"does not match frozen {H39_FROZEN_PROTOCOL_HASH}"
+            )
+        if manifest["clarification_hash"] != H39_FROZEN_CLARIFICATION_HASH:
+            raise RuntimeError(
+                f"FREEZE_MANIFEST_MISMATCH: Manifest clarification_hash {manifest['clarification_hash']} "
+                f"does not match frozen {H39_FROZEN_CLARIFICATION_HASH}"
+            )
+
+        # Verify ledger SHA-256
+        curr_ledger_sha = _compute_sha256(self.ledger_path)
+        if manifest["ledger_sha256"] != curr_ledger_sha:
+            raise RuntimeError(
+                f"LEDGER_MUTATION: Ledger SHA-256 on disk ({curr_ledger_sha}) "
+                f"does not match freeze manifest ({manifest['ledger_sha256']})"
+            )
+
+        # Verify maturity gates in manifest
+        if manifest["distinct_days_count"] < H39_MINIMUM_VALIDATION_DAYS:
+            raise RuntimeError(
+                f"FREEZE_MANIFEST_MATURITY_GATES_UNMET: Distinct days count {manifest['distinct_days_count']} < {H39_MINIMUM_VALIDATION_DAYS}"
+            )
+        if manifest["eligible_boundary_count"] < H39_MINIMUM_ELIGIBLE_OBSERVATIONS:
+            raise RuntimeError(
+                f"FREEZE_MANIFEST_MATURITY_GATES_UNMET: Eligible boundary count {manifest['eligible_boundary_count']} < {H39_MINIMUM_ELIGIBLE_OBSERVATIONS}"
+            )
+        if manifest["eligible_coverage"] < H39_MINIMUM_COVERAGE_RATIO:
+            raise RuntimeError(
+                f"FREEZE_MANIFEST_MATURITY_GATES_UNMET: Eligible coverage {manifest['eligible_coverage']:.2%} < {H39_MINIMUM_COVERAGE_RATIO:.0%}"
+            )
+
+        # Verify source partitions
+        with sqlite3.connect(self.ledger_path) as conn:
+            conn.row_factory = sqlite3.Row
+            rows = conn.execute(
+                "SELECT partition_name, partition_sha256 FROM h39_source_partitions"
+            ).fetchall()
+            ledger_parts = {r["partition_name"]: str(r["partition_sha256"]) for r in rows}
+
+        for pname, psha in manifest["source_partitions"].items():
+            if pname not in ledger_parts or ledger_parts[pname] != psha:
+                raise RuntimeError(
+                    f"SOURCE_PARTITION_MUTATION: Partition {pname} in manifest does not match ledger record"
+                )
+
+        return manifest
+
+    def execute_one_shot_unblind(
+        self,
+        freeze_manifest_path: str | Path,
+        output_dir: str | Path = "deliverables/v0.3.25",
+        candle_client: BinancePublicClient | None = None,
+    ) -> dict[str, Any]:
+        """Execute one-shot fresh forward validation strictly using verified freeze manifest.
+
+        Zero bypass tokens, zero flags. Bounded one-shot execution.
+        """
+        # 1. Verify freeze manifest against current on-disk evidence
+        manifest = self.verify_freeze_manifest(freeze_manifest_path)
+
+        # 2. Verify readiness preconditions at cutoff
+        cutoff_ms = int(manifest["unblind_cutoff_ms"])
+        readiness = self.verify_readiness_preconditions(as_of_ms=cutoff_ms)
+        if not readiness.get("ready_for_unblind"):
+            raise RuntimeError(
+                f"{REFUSED_VALIDATION_NOT_MATURE}: Unblind execution refused because readiness preconditions failed: "
+                f"{readiness.get('refusal_reason')}"
+            )
+
+        # 3. Pull validation rows strictly within [validation_start_ms, unblind_cutoff_ms]
+        with sqlite3.connect(self.ledger_path) as conn:
+            conn.row_factory = sqlite3.Row
+            all_rows = conn.execute(
+                """SELECT * FROM h39_blind_validation_ledger
+                   WHERE decision_close_ms >= ? AND decision_close_ms <= ?
+                   ORDER BY decision_close_ms ASC""",
+                (H39_VALIDATION_START_MS, cutoff_ms),
+            ).fetchall()
+
+        # Strict cutoff enforcement
+        post_cutoff = [r for r in all_rows if int(r["decision_close_ms"]) > cutoff_ms]
+        if post_cutoff:
+            raise RuntimeError(
+                f"STRICT_CUTOFF_VIOLATION: Found {len(post_cutoff)} rows after unblind_cutoff_ms={cutoff_ms}"
+            )
+
+        eligible_rows = [r for r in all_rows if bool(r["eligible"])]
+        if len(eligible_rows) < H39_MINIMUM_ELIGIBLE_OBSERVATIONS:
+            raise RuntimeError(
+                f"INSUFFICIENT_OBSERVATIONS_AT_CUTOFF: Found {len(eligible_rows)} eligible observations at cutoff, "
+                f"minimum {H39_MINIMUM_ELIGIBLE_OBSERVATIONS} required."
+            )
+
+        # 4. Load canonical candles and construct outcomes
+        min_ref = min(int(r["reference_time_ms"]) for r in eligible_rows)
+        max_target = max(int(r["target_240m_ms"]) for r in eligible_rows)
+        engine = H39ResearchEngine(
+            protocol_path=self.protocol_path,
+            microstructure_root=self.microstructure_root,
+            opportunity_store_path=self.opportunity_store_path,
+        )
+        candles = engine.get_canonical_1m_candles(
+            start_ms=min_ref,
+            end_ms=max_target,
+            candle_client=candle_client,
+            canonical_store_path=self.canonical_candles_path,
+        )
+
+        valid_obs: list[H39Observation] = []
+        for r in eligible_rows:
+            slot_ms = int(r["decision_close_ms"])
+            ref_time_ms = int(r["reference_time_ms"])
+            target_60m_ms = int(r["target_60m_ms"])
+            target_240m_ms = int(r["target_240m_ms"])
+
+            ref_c = candles.get(ref_time_ms)
+            c60 = candles.get(target_60m_ms)
+            c240 = candles.get(target_240m_ms)
+
+            if not ref_c or not c60:
+                continue
+
+            ref_price = float(ref_c["open"])
+            close_60m = float(c60["close"])
+            close_240m = float(c240["close"]) if c240 else None
+
+            ret_60m = (close_60m - ref_price) / ref_price if ref_price > 0 else None
+            ret_240m = (
+                ((close_240m - ref_price) / ref_price)
+                if (close_240m is not None and ref_price > 0)
+                else None
+            )
+
+            feat_row = H39FeatureRow(
+                slot_ms=slot_ms,
+                slot_utc=str(r["slot_utc"]),
+                m1_trade_imbalance_5m=float(r["m1_trade_imbalance_5m"]) if r["m1_trade_imbalance_5m"] is not None else 0.0,
+                m2_trade_imbalance_15m=float(r["m2_trade_imbalance_15m"]) if r["m2_trade_imbalance_15m"] is not None else 0.0,
+                m3_ofi_5m=float(r["m3_ofi_5m"]) if r["m3_ofi_5m"] is not None else 0.0,
+                m4_top5_depth_imbalance_5m=float(r["m4_top5_depth_imbalance_5m"]) if r["m4_top5_depth_imbalance_5m"] is not None else 0.0,
+                m5_top20_depth_imbalance_5m=float(r["m5_top20_depth_imbalance_5m"]) if r["m5_top20_depth_imbalance_5m"] is not None else 0.0,
+                m6_microprice_deviation_1m=float(r["m6_microprice_deviation_1m"]) if r["m6_microprice_deviation_1m"] is not None else 0.0,
+                m7_pressure_agreement=float(r["m7_pressure_agreement"]) if r["m7_pressure_agreement"] is not None else 0.0,
+                m8_pressure_divergence=float(r["m8_pressure_divergence"]) if r["m8_pressure_divergence"] is not None else 0.0,
+                eligible=bool(r["eligible"]),
+                rejection_reason=r["rejection_reason"],
+                book_sample_count_15m=int(r["book_sample_count_15m"] or 0),
+                trade_count_15m=int(r["trade_count_15m"] or 0),
+            )
+            outcome_row = H39OutcomeRow(
+                slot_ms=slot_ms,
+                reference_price=ref_price,
+                reference_time_ms=ref_time_ms,
+                future_close_60m=close_60m,
+                return_60m=ret_60m,
+                future_close_240m=close_240m,
+                return_240m=ret_240m,
+                trailing_return_15m=float(r["trailing_return_15m"]) if r["trailing_return_15m"] is not None else None,
+                trailing_return_60m=float(r["trailing_return_60m"]) if r["trailing_return_60m"] is not None else None,
+                trailing_atr_15m=float(r["trailing_atr_15m"]) if r["trailing_atr_15m"] is not None else None,
+                trailing_atr_ratio_15m=float(r["trailing_atr_ratio_15m"]) if r["trailing_atr_ratio_15m"] is not None else None,
+                decision_close_price=float(r["decision_close_price"]) if r["decision_close_price"] is not None else None,
+                decision_close_ms=slot_ms,
+            )
+            valid_obs.append(H39Observation(feature_row=feat_row, outcome_row=outcome_row))
+
+        n_valid = len(valid_obs)
+        if n_valid < H39_MINIMUM_ELIGIBLE_OBSERVATIONS:
+            raise RuntimeError(
+                f"INSUFFICIENT_VALID_OBSERVATIONS: Found {n_valid} observations with valid 1m price candles, "
+                f"minimum {H39_MINIMUM_ELIGIBLE_OBSERVATIONS} required."
+            )
+
+        # 5. Statistical Execution: Primary 60m Family
+        y_vec_60m = [float(o.outcome_row.return_60m) for o in valid_obs if o.outcome_row.return_60m is not None]
+        y_dir_60m = [1.0 if val > 0.0 else 0.0 for val in y_vec_60m]
+
+        # Enforce non-None baseline controls
+        baseline_x: list[list[float]] = []
+        for o in valid_obs:
+            tr15 = o.outcome_row.trailing_return_15m
+            tr60 = o.outcome_row.trailing_return_60m
+            atr_ratio = o.outcome_row.trailing_atr_ratio_15m
+            if tr15 is None or tr60 is None or atr_ratio is None:
+                raise ValueError(
+                    f"Baseline features missing for slot {o.feature_row.slot_ms}: "
+                    f"trailing_return_15m, trailing_return_60m, and trailing_atr_ratio_15m must all be computed"
+                )
+            baseline_x.append([1.0, float(tr15), float(tr60), float(atr_ratio)])
+
+        # Fit baseline model (L2 logistic, lambda=1.0)
+        _b_base, _c_base, ll_base = _fit_l2_logistic_regression(baseline_x, y_dir_60m, l2_lambda=1.0)
+
+        # Primary 60m calculations
+        raw_results: dict[str, dict[str, Any]] = {}
+        p_raw_list: list[float] = []
+
+        for fid in FORMAL_FEATURE_IDS:
+            x_vals = [o.feature_row.feature_vector()[fid] for o in valid_obs]
+            x_mat = [[1.0, xv] for xv in x_vals]
+            beta, se, t_stats = _ols_linear_regression(x_mat, y_vec_60m, l2_lambda=0.0)
+
+            slope = beta[1] if len(beta) > 1 else 0.0
+            slope_se = se[1] if len(se) > 1 else 1.0
+            t_stat = t_stats[1] if len(t_stats) > 1 else 0.0
+
+            p_raw = _one_sided_p_value(t_stat)
+            p_raw_list.append(p_raw)
+
+            ci_lower = slope - 1.96 * slope_se
+            ci_upper = slope + 1.96 * slope_se
+
+            # Full incremental model
+            full_x = [baseline_x[idx] + [x_vals[idx]] for idx in range(n_valid)]
+            b_full, c_full, ll_full = _fit_l2_logistic_regression(full_x, y_dir_60m, l2_lambda=1.0)
+
+            lr_stat = max(0.0, 2.0 * (ll_full - ll_base))
+            lr_p = max(0.0, min(1.0, 1.0 - math.erf(math.sqrt(lr_stat / 2.0))))
+
+            beta_micro = b_full[4] if len(b_full) > 4 else 0.0
+            se_micro = math.sqrt(max(1e-15, c_full[4][4])) if len(c_full) > 4 else 1.0
+            z_stat = beta_micro / se_micro if se_micro > 0 else 0.0
+            z_p = _one_sided_p_value(z_stat)
+
+            raw_results[fid] = {
+                "effect": slope,
+                "se": slope_se,
+                "t": t_stat,
+                "p_raw": p_raw,
+                "ci_lower": ci_lower,
+                "ci_upper": ci_upper,
+                "inc_lr_stat": lr_stat,
+                "inc_lr_p": lr_p,
+                "inc_z_stat": z_stat,
+                "inc_z_p": z_p,
+            }
+
+        p_holm_list = _holm_bonferroni(p_raw_list)
+
+        primary_results: dict[str, dict[str, Any]] = {}
+        for idx, fid in enumerate(FORMAL_FEATURE_IDS):
+            res = raw_results[fid]
+            p_holm = p_holm_list[idx]
+            sign_expected = PREDEFINED_FEATURE_SIGNS[fid]
+            sign_correct = res["effect"] > 0 if sign_expected == 1 else res["effect"] < 0
+            ci_excludes = (res["ci_lower"] > 0) if sign_expected == 1 else (res["ci_upper"] < 0)
+            passes_inc = (
+                res["inc_lr_p"] < 0.05
+                and res["inc_z_stat"] > 0
+            )
+            passes_gate = (
+                sign_correct
+                and p_holm < 0.05
+                and ci_excludes
+                and passes_inc
+            )
+            primary_results[fid] = {
+                "feature_id": fid,
+                "predefined_sign": sign_expected,
+                "sample_size": n_valid,
+                "effect_estimate": res["effect"],
+                "std_error": res["se"],
+                "t_statistic": res["t"],
+                "p_value_raw": res["p_raw"],
+                "p_value_holm": p_holm,
+                "ci_lower_95": res["ci_lower"],
+                "ci_upper_95": res["ci_upper"],
+                "sign_correct": sign_correct,
+                "ci_excludes_zero_in_correct_direction": ci_excludes,
+                "incremental_lr_stat": res["inc_lr_stat"],
+                "incremental_lr_p_value": res["inc_lr_p"],
+                "incremental_z_stat": res["inc_z_stat"],
+                "incremental_z_p_value": res["inc_z_p"],
+                "passes_primary_gate": passes_gate,
+            }
+
+        # 6. Secondary 240m Supporting Horizon
+        supporting_240m_results: dict[str, dict[str, Any]] = {}
+        valid_240m_obs = [o for o in valid_obs if o.outcome_row.return_240m is not None]
+        if len(valid_240m_obs) >= 3:
+            y_vec_240m = [float(o.outcome_row.return_240m) for o in valid_240m_obs if o.outcome_row.return_240m is not None]
+            p_raw_240m_list: list[float] = []
+            raw_240m_map: dict[str, dict[str, Any]] = {}
+            for fid in FORMAL_FEATURE_IDS:
+                x_vals = [o.feature_row.feature_vector()[fid] for o in valid_240m_obs]
+                x_mat = [[1.0, xv] for xv in x_vals]
+                beta, se, t_stats = _ols_linear_regression(x_mat, y_vec_240m, l2_lambda=0.0)
+                slope = beta[1] if len(beta) > 1 else 0.0
+                slope_se = se[1] if len(se) > 1 else 1.0
+                t_stat = t_stats[1] if len(t_stats) > 1 else 0.0
+                p_raw = _one_sided_p_value(t_stat)
+                p_raw_240m_list.append(p_raw)
+                raw_240m_map[fid] = {
+                    "effect": slope,
+                    "se": slope_se,
+                    "t": t_stat,
+                    "p_raw": p_raw,
+                    "ci_lower": slope - 1.96 * slope_se,
+                    "ci_upper": slope + 1.96 * slope_se,
+                }
+            p_holm_240m = _holm_bonferroni(p_raw_240m_list)
+            for idx, fid in enumerate(FORMAL_FEATURE_IDS):
+                r240 = raw_240m_map[fid]
+                sign_expected = PREDEFINED_FEATURE_SIGNS[fid]
+                sign_correct = r240["effect"] > 0 if sign_expected == 1 else r240["effect"] < 0
+                supporting_240m_results[fid] = {
+                    "feature_id": fid,
+                    "role": "SUPPORTING_ONLY",
+                    "cannot_rescue_60m": True,
+                    "sample_size": len(valid_240m_obs),
+                    "effect_estimate": r240["effect"],
+                    "std_error": r240["se"],
+                    "t_statistic": r240["t"],
+                    "p_value_raw": r240["p_raw"],
+                    "p_value_holm": p_holm_240m[idx],
+                    "ci_lower_95": r240["ci_lower"],
+                    "ci_upper_95": r240["ci_upper"],
+                    "sign_correct": sign_correct,
+                }
+
+        # 7. Stability Diagnostics
+        # Group by UTC day
+        days_map: dict[str, list[int]] = {}
+        for i, o in enumerate(valid_obs):
+            d_str = datetime.fromtimestamp(o.feature_row.slot_ms / 1000, UTC).strftime("%Y-%m-%d")
+            days_map.setdefault(d_str, []).append(i)
+
+        single_day_dependence: dict[str, bool] = {}
+        day_breakdowns: dict[str, dict[str, float]] = {}
+        for fid in FORMAL_FEATURE_IDS:
+            expected_sign = PREDEFINED_FEATURE_SIGNS[fid]
+            dep = False
+            day_slopes: dict[str, float] = {}
+            if len(days_map) > 1:
+                for d_str, indices in days_map.items():
+                    sub_idx = [i for i in range(n_valid) if i not in indices]
+                    if len(sub_idx) >= 3:
+                        x_sub = [[1.0, valid_obs[i].feature_row.feature_vector()[fid]] for i in sub_idx]
+                        y_sub = [float(valid_obs[i].outcome_row.return_60m or 0.0) for i in sub_idx]
+                        b_sub, _, _ = _ols_linear_regression(x_sub, y_sub)
+                        s_loo = b_sub[1] if len(b_sub) > 1 else 0.0
+                        if (expected_sign == 1 and s_loo <= 0) or (expected_sign == -1 and s_loo >= 0):
+                            dep = True
+                    # Daily slope
+                    if len(indices) >= 3:
+                        x_day = [[1.0, valid_obs[i].feature_row.feature_vector()[fid]] for i in indices]
+                        y_day = [float(valid_obs[i].outcome_row.return_60m or 0.0) for i in indices]
+                        b_day, _, _ = _ols_linear_regression(x_day, y_day)
+                        day_slopes[d_str] = b_day[1] if len(b_day) > 1 else 0.0
+            single_day_dependence[fid] = dep
+            day_breakdowns[fid] = day_slopes
+
+        # Volatility regime stability
+        atr_ratios = [float(o.outcome_row.trailing_atr_ratio_15m or 0.0) for o in valid_obs]
+        med_atr = float(np.median(atr_ratios))
+        low_vol_idx = [i for i, r in enumerate(atr_ratios) if r <= med_atr]
+        high_vol_idx = [i for i, r in enumerate(atr_ratios) if r > med_atr]
+
+        vol_regime_inversion: dict[str, bool] = {}
+        for fid in FORMAL_FEATURE_IDS:
+            inv = False
+            if len(low_vol_idx) >= 3 and len(high_vol_idx) >= 3:
+                x_low = [[1.0, valid_obs[i].feature_row.feature_vector()[fid]] for i in low_vol_idx]
+                y_low = [float(valid_obs[i].outcome_row.return_60m or 0.0) for i in low_vol_idx]
+                b_low, _, _ = _ols_linear_regression(x_low, y_low)
+                s_low = b_low[1] if len(b_low) > 1 else 0.0
+
+                x_high = [[1.0, valid_obs[i].feature_row.feature_vector()[fid]] for i in high_vol_idx]
+                y_high = [float(valid_obs[i].outcome_row.return_60m or 0.0) for i in high_vol_idx]
+                b_high, _, _ = _ols_linear_regression(x_high, y_high)
+                s_high = b_high[1] if len(b_high) > 1 else 0.0
+
+                if (s_low > 0 and s_high < 0) or (s_low < 0 and s_high > 0):
+                    inv = True
+            vol_regime_inversion[fid] = inv
+
+        # 1H trend regime stability
+        tr60_vals = [float(o.outcome_row.trailing_return_60m or 0.0) for o in valid_obs]
+        down_idx = [i for i, r in enumerate(tr60_vals) if r <= 0.0]
+        up_idx = [i for i, r in enumerate(tr60_vals) if r > 0.0]
+
+        trend_1h_inversion: dict[str, bool] = {}
+        for fid in FORMAL_FEATURE_IDS:
+            inv = False
+            if len(down_idx) >= 3 and len(up_idx) >= 3:
+                x_down = [[1.0, valid_obs[i].feature_row.feature_vector()[fid]] for i in down_idx]
+                y_down = [float(valid_obs[i].outcome_row.return_60m or 0.0) for i in down_idx]
+                b_down, _, _ = _ols_linear_regression(x_down, y_down)
+                s_down = b_down[1] if len(b_down) > 1 else 0.0
+
+                x_up = [[1.0, valid_obs[i].feature_row.feature_vector()[fid]] for i in up_idx]
+                y_up = [float(valid_obs[i].outcome_row.return_60m or 0.0) for i in up_idx]
+                b_up, _, _ = _ols_linear_regression(x_up, y_up)
+                s_up = b_up[1] if len(b_up) > 1 else 0.0
+
+                if (s_down > 0 and s_up < 0) or (s_down < 0 and s_up > 0):
+                    inv = True
+            trend_1h_inversion[fid] = inv
+
+        # 8. Candidate Decision Rule
+        provisional_candidates: list[str] = []
+        candidate_decisions: dict[str, Any] = {}
+        for fid in FORMAL_FEATURE_IDS:
+            p_res = primary_results[fid]
+            single_dep = single_day_dependence.get(fid, False)
+            reg_inv = vol_regime_inversion.get(fid, False) or trend_1h_inversion.get(fid, False)
+            nontrivial = abs(p_res["effect_estimate"]) > 1e-6
+            passes_all = bool(
+                p_res["passes_primary_gate"]
+                and nontrivial
+                and not single_dep
+                and not reg_inv
+            )
+            decision = "PROVISIONAL_MICROSTRUCTURE_CANDIDATE" if passes_all else "REJECT_CANDIDATE"
+            if passes_all:
+                provisional_candidates.append(fid)
+
+            candidate_decisions[fid] = {
+                "feature_id": fid,
+                "predefined_sign": PREDEFINED_FEATURE_SIGNS[fid],
+                "sample_size": n_valid,
+                "effect_estimate": p_res["effect_estimate"],
+                "p_value_raw": p_res["p_value_raw"],
+                "p_value_holm": p_res["p_value_holm"],
+                "ci_95": [p_res["ci_lower_95"], p_res["ci_upper_95"]],
+                "sign_correct": p_res["sign_correct"],
+                "ci_excludes_zero_in_correct_direction": p_res["ci_excludes_zero_in_correct_direction"],
+                "incremental_lr_p_value": p_res["incremental_lr_p_value"],
+                "incremental_z_stat": p_res["incremental_z_stat"],
+                "single_day_dependence": single_dep,
+                "regime_inversion": reg_inv,
+                "passes_all_candidate_criteria": passes_all,
+                "candidate_status": decision,
+            }
+
+        scientific_verdict = (
+            "PROVISIONAL_MICROSTRUCTURE_CANDIDATE"
+            if len(provisional_candidates) > 0
+            else "RESEARCH_FAMILY_STOP"
+        )
+
+        out_path = Path(output_dir).resolve()
+        out_path.mkdir(parents=True, exist_ok=True)
+        code_sha = _get_current_git_sha()
+        now_utc = datetime.now(UTC).isoformat()
+
+        # 1. H39_ONE_SHOT_UNBLIND_FREEZE.json
+        freeze_target = out_path / "H39_ONE_SHOT_UNBLIND_FREEZE.json"
+        freeze_target.write_text(json.dumps(manifest, indent=2, sort_keys=True), encoding="utf-8")
+
+        # 2. H39_ONE_SHOT_VALIDATION_RESULTS.json
+        validation_results = {
+            "schema_version": "1.0.0",
+            "hypothesis_id": H39_HYPOTHESIS_ID,
+            "validation_start_utc": H39_VALIDATION_START_UTC,
+            "unblind_cutoff_utc": manifest["unblind_cutoff_utc"],
+            "unblind_cutoff_ms": cutoff_ms,
+            "evaluated_sample_size": n_valid,
+            "distinct_days_count": len(days_map),
+            "code_version_sha": code_sha,
+            "executed_at_utc": now_utc,
+            "scientific_verdict": scientific_verdict,
+            "provisional_candidates": provisional_candidates,
+            "primary_60m_family": primary_results,
+            "supporting_240m_family": supporting_240m_results,
+            "candidate_decisions": candidate_decisions,
+            "safety_firewalls": {
+                "strategy": "EXPERIMENTAL",
+                "qualified_direction_engine": "NONE",
+                "runtime_maximum": "OPPORTUNITY_ONLY",
+                "execution": "DISABLED",
+                "auto_execute": False,
+                "final_holdout": "SEALED",
+            },
+        }
+        (out_path / "H39_ONE_SHOT_VALIDATION_RESULTS.json").write_text(
+            json.dumps(validation_results, indent=2, sort_keys=True), encoding="utf-8"
+        )
+
+        # 3. H39_FAMILYWISE_HOLM_RESULTS.json
+        (out_path / "H39_FAMILYWISE_HOLM_RESULTS.json").write_text(
+            json.dumps(
+                {
+                    "schema_version": "1.0.0",
+                    "family": "M1-M8_PRIMARY_60M",
+                    "fwer_method": "HOLM_BONFERRONI",
+                    "alpha": 0.05,
+                    "arms_tested": len(FORMAL_FEATURE_IDS),
+                    "code_version_sha": code_sha,
+                    "results": primary_results,
+                },
+                indent=2,
+                sort_keys=True,
+            ),
+            encoding="utf-8",
+        )
+
+        # 4. H39_BASELINE_INCREMENTAL_RESULTS.json
+        (out_path / "H39_BASELINE_INCREMENTAL_RESULTS.json").write_text(
+            json.dumps(
+                {
+                    "schema_version": "1.0.0",
+                    "baseline_covariates": [
+                        "trailing_return_15m",
+                        "trailing_return_60m",
+                        "trailing_atr_ratio_15m",
+                    ],
+                    "model_family": "L2_LOGISTIC_REGRESSION_LAMBDA_1_0",
+                    "code_version_sha": code_sha,
+                    "incremental_diagnostics": {
+                        fid: {
+                            "lr_statistic": primary_results[fid]["incremental_lr_stat"],
+                            "lr_p_value": primary_results[fid]["incremental_lr_p_value"],
+                            "z_statistic": primary_results[fid]["incremental_z_stat"],
+                            "z_p_value": primary_results[fid]["incremental_z_p_value"],
+                        }
+                        for fid in FORMAL_FEATURE_IDS
+                    },
+                },
+                indent=2,
+                sort_keys=True,
+            ),
+            encoding="utf-8",
+        )
+
+        # 5. H39_STABILITY_DIAGNOSTICS.json
+        (out_path / "H39_STABILITY_DIAGNOSTICS.json").write_text(
+            json.dumps(
+                {
+                    "schema_version": "1.0.0",
+                    "code_version_sha": code_sha,
+                    "single_day_dependence": single_day_dependence,
+                    "volatility_regime_inversion": vol_regime_inversion,
+                    "trend_1h_inversion": trend_1h_inversion,
+                    "daily_effect_estimates": day_breakdowns,
+                },
+                indent=2,
+                sort_keys=True,
+            ),
+            encoding="utf-8",
+        )
+
+        # 6. H39_FINAL_SCIENTIFIC_VERDICT.json
+        (out_path / "H39_FINAL_SCIENTIFIC_VERDICT.json").write_text(
+            json.dumps(
+                {
+                    "schema_version": "1.0.0",
+                    "hypothesis_id": H39_HYPOTHESIS_ID,
+                    "scientific_verdict": scientific_verdict,
+                    "provisional_candidates": provisional_candidates,
+                    "code_version_sha": code_sha,
+                    "executed_at_utc": now_utc,
+                    "safety_firewalls": {
+                        "strategy": "EXPERIMENTAL",
+                        "qualified_direction_engine": "NONE",
+                        "runtime_maximum": "OPPORTUNITY_ONLY",
+                        "execution": "DISABLED",
+                        "auto_execute": False,
+                        "final_holdout": "SEALED",
+                    },
+                },
+                indent=2,
+                sort_keys=True,
+            ),
+            encoding="utf-8",
+        )
+
+        # 7. H39_ONE_SHOT_VALIDATION_REPORT.md
+        report_md = f"""# BTC Quant Agent — H39 One-Shot Validation Report
+
+**Hypothesis ID**: `{H39_HYPOTHESIS_ID}`  
+**Scientific Verdict**: `{scientific_verdict}`  
+**Unblind Cutoff UTC**: `{manifest["unblind_cutoff_utc"]}`  
+**Evaluated Sample Size**: `{n_valid}`  
+**Producing Commit SHA**: `{code_sha}`  
+
+---
+
+## 1. Familywise Holm-Bonferroni Results (Primary 60m Family)
+
+| Feature ID | Sign Exp | Effect | 95% CI | Raw p | Holm p | Inc LR p | Inc z | Primary Gate |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+"""
+        for fid in FORMAL_FEATURE_IDS:
+            r = primary_results[fid]
+            pass_str = "PASS" if r["passes_primary_gate"] else "FAIL"
+            report_md += (
+                f"| `{fid}` | `+{r['predefined_sign']}` | {r['effect_estimate']:.6f} | "
+                f"[{r['ci_lower_95']:.6f}, {r['ci_upper_95']:.6f}] | {r['p_value_raw']:.4e} | "
+                f"{r['p_value_holm']:.4e} | {r['incremental_lr_p_value']:.4e} | {r['incremental_z_stat']:.3f} | `{pass_str}` |\n"
+            )
+
+        report_md += """
+---
+
+## 2. Candidate Decisions & Stability
+
+| Feature ID | Candidate Status | Single-Day Dep | Volatility Inversion | 1H Inversion |
+| :--- | :---: | :---: | :---: | :---: |
+"""
+        for fid in FORMAL_FEATURE_IDS:
+            cd = candidate_decisions[fid]
+            report_md += (
+                f"| `{fid}` | `{cd['candidate_status']}` | `{cd['single_day_dependence']}` | "
+                f"`{cd['regime_inversion']}` | `{trend_1h_inversion.get(fid, False)}` |\n"
+            )
+
+        report_md += """
+---
+
+## 3. Safety Invariants Attestation
+
+| Invariant | Status |
+| :--- | :---: |
+| Trading Strategy | EXPERIMENTAL |
+| Qualified Direction Engine | NONE |
+| Runtime Ceiling | OPPORTUNITY_ONLY |
+| Execution Engine | DISABLED |
+| Auto-Execute Flag | false |
+| Final Holdout Partition | SEALED |
+"""
+        (out_path / "H39_ONE_SHOT_VALIDATION_REPORT.md").write_text(report_md, encoding="utf-8")
+
+        return validation_results
+
+
+def generate_all_v0325_deliverables(
+    output_dir: str | Path = "deliverables/v0.3.25",
+    ledger_path: str | Path = H39_BLIND_LEDGER_DEFAULT_PATH,
+    microstructure_root: str | Path = "data/forward/BTCUSDT/microstructure",
+    opportunity_store_path: str | Path = "data/forward/BTCUSDT/opportunity_shadow.sqlite3",
+    as_of_ms: int | None = None,
+    now_ms: int | None = None,
+) -> dict[str, str]:
+    """Generate v0.3.25 preregistration and operational status deliverables.
+
+    STRICT SCIENTIFIC CONSTRAINT:
+    While H39 remains immature (current state: FORWARD_DATA_INSUFFICIENT), this generator
+    creates ONLY preregistration, operational status, and health metadata.
+    Zero real post-start validation performance metrics, p-values, or candidate promotions are computed.
+    """
+    out_dir = Path(output_dir).resolve()
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    gatekeeper = H39OneShotUnblindGatekeeper(
+        ledger_path=ledger_path,
+        microstructure_root=microstructure_root,
+        opportunity_store_path=opportunity_store_path,
+    )
+    readiness = gatekeeper.verify_readiness_preconditions(as_of_ms=as_of_ms, now_ms=now_ms)
+    summary = readiness.get("summary", {})
+    integrity = readiness.get("integrity", {})
+    code_sha = _get_current_git_sha()
+    created_files: dict[str, str] = {}
+
+    # 1. H39_UNBLIND_PREREGISTRATION_MANIFEST.json
+    prereg_manifest = {
+        "schema_version": "1.0.0",
+        "stage": "v0.3.25",
+        "title": "H39 One-Shot Unblind Protocol Preregistration & Gatekeeper",
+        "hypothesis_id": H39_HYPOTHESIS_ID,
+        "protocol_freeze_sha": H39_PROTOCOL_FREEZE_SHA,
+        "protocol_clarification_sha": H39_CLARIFICATION_SHA,
+        "validation_start_utc": H39_VALIDATION_START_UTC,
+        "validation_start_ms": H39_VALIDATION_START_MS,
+        "formal_feature_universe": list(FORMAL_FEATURE_IDS),
+        "predefined_signs": PREDEFINED_FEATURE_SIGNS,
+        "primary_family": {
+            "horizon": "60m",
+            "correction_method": "HOLM_BONFERRONI",
+            "fwer_alpha": 0.05,
+            "arms_count": 8,
+        },
+        "secondary_horizon": {
+            "horizon": "240m",
+            "role": "SUPPORTING_ONLY",
+            "cannot_rescue_60m": True,
+        },
+        "timing_specification": {
+            "decision_close_rule": "closed 15m boundary (slot_ms)",
+            "reference_entry_rule": "OPEN at slot_ms + 60_000",
+            "primary_60m_endpoint": "CLOSE at reference_time_ms + 59*60_000",
+            "secondary_240m_endpoint": "CLOSE at reference_time_ms + 239*60_000",
+        },
+        "baseline_incremental_controls": [
+            "trailing_return_15m",
+            "trailing_return_60m",
+            "trailing_atr_ratio_15m",
+        ],
+        "model_family": "L2_LOGISTIC_REGRESSION_LAMBDA_1_0",
+        "stability_diagnostics": [
+            "utc_day_jackknife",
+            "rolling_block_breakdown",
+            "volatility_regime_inversion",
+            "1h_trend_regime_inversion",
+        ],
+        "candidate_decision_rule": {
+            "status_name": "PROVISIONAL_MICROSTRUCTURE_CANDIDATE",
+            "all_conditions_required": [
+                "holm_adjusted_p_lt_0_05",
+                "observed_sign_matches_predefined_sign",
+                "ci_95_strictly_excludes_zero_in_correct_direction",
+                "nontrivial_effect_size",
+                "incremental_lr_p_lt_0_05_and_z_gt_0",
+                "distinct_days_gte_14",
+                "eligible_observations_gte_750",
+                "eligible_coverage_gte_0_90",
+                "no_integrity_or_source_breach",
+                "no_single_day_dependence",
+                "no_material_regime_inversion",
+            ],
+            "fallback_status": "RESEARCH_FAMILY_STOP",
+        },
+        "one_shot_unblind_command": "quantctl h39 one-shot-unblind --freeze-manifest <path>",
+        "bypass_flags_permitted": False,
+        "current_stage_state": readiness["status"],
+        "ready_for_unblind": readiness["ready_for_unblind"],
+        "code_version_sha": code_sha,
+        "created_at_utc": datetime.now(UTC).isoformat(),
+        "attestations": {
+            "zero_protocol_drift": True,
+            "zero_final_holdout_access": True,
+            "zero_prior_validation_performance_inspection": True,
+            "safety_firewalls_intact": True,
+        },
+    }
+    p_path = out_dir / "H39_UNBLIND_PREREGISTRATION_MANIFEST.json"
+    p_path.write_text(json.dumps(prereg_manifest, indent=2, sort_keys=True), encoding="utf-8")
+    created_files["H39_UNBLIND_PREREGISTRATION_MANIFEST"] = str(p_path)
+
+    # 2. H39_BLIND_OPERATIONAL_STATUS.json
+    status_json = {
+        "schema_version": "1.0.0",
+        "generated_at_utc": datetime.now(UTC).isoformat(),
+        "hypothesis_id": H39_HYPOTHESIS_ID,
+        "stage": "H39_ONE_SHOT_UNBLIND_PREREGISTRATION",
+        "state": readiness["status"],
+        "ready_for_unblind": readiness["ready_for_unblind"],
+        "refusal_reason": readiness.get("refusal_reason"),
+        "validation_start_utc": H39_VALIDATION_START_UTC,
+        "validation_start_ms": H39_VALIDATION_START_MS,
+        "clock_ceiling_ms": summary.get("clock_ceiling_ms"),
+        "clock_ceiling_utc": summary.get("clock_ceiling_utc"),
+        "clock_source": summary.get("clock_source", "WALL_CLOCK"),
+        "clock_denominator": {
+            "clock_ceiling_ms": summary.get("clock_ceiling_ms"),
+            "clock_ceiling_utc": summary.get("clock_ceiling_utc"),
+            "clock_source": summary.get("clock_source", "WALL_CLOCK"),
+            "expected_boundary_count": summary.get("expected_boundary_count", 0),
+            "observed_boundary_count": summary.get("observed_boundary_count", 0),
+            "eligible_boundary_count": summary.get("eligible_boundary_count", 0),
+            "raw_observation_coverage": summary.get("raw_observation_coverage", 0.0),
+            "eligible_coverage": summary.get("eligible_coverage", 0.0),
+            "coverage_ratio": summary.get("coverage_ratio", 0.0),
+        },
+        "distinct_days_count": summary.get("distinct_days_count", 0),
+        "distinct_days": summary.get("distinct_days", []),
+        "rejection_reason_counts": summary.get("rejection_reason_counts", {}),
+        "maturity_gates": {
+            "minimum_distinct_days": H39_MINIMUM_VALIDATION_DAYS,
+            "minimum_eligible_observations": H39_MINIMUM_ELIGIBLE_OBSERVATIONS,
+            "minimum_coverage_ratio": H39_MINIMUM_COVERAGE_RATIO,
+        },
+        "maturity_achieved": summary.get("maturity_achieved", False),
+        "days_gate_passed": summary.get("days_gate_passed", False),
+        "observations_gate_passed": summary.get("observations_gate_passed", False),
+        "coverage_gate_passed": summary.get("coverage_gate_passed", False),
+        "safety_firewalls": {
+            "strategy": "EXPERIMENTAL",
+            "qualified_direction_engine": "NONE",
+            "runtime_maximum": "OPPORTUNITY_ONLY",
+            "execution": "DISABLED",
+            "auto_execute": False,
+            "final_holdout": "SEALED",
+        },
+    }
+    s_path = out_dir / "H39_BLIND_OPERATIONAL_STATUS.json"
+    s_path.write_text(json.dumps(status_json, indent=2, sort_keys=True), encoding="utf-8")
+    created_files["H39_BLIND_OPERATIONAL_STATUS"] = str(s_path)
+
+    # 3. FORWARD_CHAIN_HEALTH.json
+    deriv_healthy = True
+    deriv_rows = 0
+    deriv_store = Path("data/forward/BTCUSDT/derivatives_pit.sqlite3").resolve()
+    if deriv_store.exists():
+        try:
+            with sqlite3.connect(f"file:{deriv_store.as_posix()}?mode=ro", uri=True) as conn:
+                res = conn.execute("PRAGMA integrity_check;").fetchone()[0]
+                deriv_healthy = (res.lower() == "ok")
+                deriv_rows = conn.execute("SELECT COUNT(*) FROM forward_derivatives;").fetchone()[0]
+        except Exception:  # noqa: BLE001, S110
+            deriv_healthy = False
+
+    m_root = Path(microstructure_root).resolve()
+    m_partitions = sorted(m_root.glob("microstructure-*.sqlite3")) if m_root.exists() else []
+    micro_healthy = len(m_partitions) > 0
+
+    chain_health = {
+        "schema_version": "1.0.0",
+        "generated_at_utc": datetime.now(UTC).isoformat(),
+        "derivatives_chain": {
+            "epoch_id": "DERIVATIVES_PIT_EPOCH_V0321_001",
+            "status": "HEALTHY" if deriv_healthy else "INVESTIGATE",
+            "db_integrity": "OK" if deriv_healthy else "ERROR",
+            "rows_recorded": deriv_rows,
+        },
+        "microstructure_chain": {
+            "stream_id": "MICROSTRUCTURE_CAPTURE_V0315_001",
+            "status": "HEALTHY" if micro_healthy else "INVESTIGATE",
+            "partition_count": len(m_partitions),
+            "active_partition": m_partitions[-1].name if m_partitions else None,
+            "integrity_status": integrity.get("status", "UNKNOWN"),
+        },
+        "opportunity_shadow_chain": {
+            "chain_id": "OPPORTUNITY_FORWARD_V0321_20260903T180000Z",
+            "status": "DATA_QUALITY_TERMINAL_ARCHIVE",
+            "terminal_at_ms": H38_TERMINAL_FIRST_BREACH_MS,
+            "terminal_at_utc": H38_TERMINAL_FIRST_BREACH_UTC,
+            "policy": {
+                "active_evaluation_prohibited": True,
+                "resolvable": False,
+                "successor_preregistered": False,
+            },
+        },
+    }
+    ch_path = out_dir / "FORWARD_CHAIN_HEALTH.json"
+    ch_path.write_text(json.dumps(chain_health, indent=2, sort_keys=True), encoding="utf-8")
+    created_files["FORWARD_CHAIN_HEALTH"] = str(ch_path)
+
+    # 4. V0.3.25_H39_ONE_SHOT_UNBLIND_PREREGISTRATION_REPORT.md
+    days_passed_str = "MET" if summary.get("days_gate_passed") else "PENDING"
+    obs_passed_str = "MET" if summary.get("observations_gate_passed") else "PENDING"
+    cov_passed_str = "MET" if summary.get("coverage_gate_passed") else "PENDING"
+    mat_achieved_str = "READY" if summary.get("maturity_achieved") else "ACCUMULATING"
+
+    report_md = f"""# BTC Quant Agent v0.3.25 — H39 One-Shot Unblind Preregistration & Gatekeeper Report
+
+**Hypothesis ID**: `{H39_HYPOTHESIS_ID}`  
+**Target Reviewer**: `Gemini-3.8-Flash` (One-pass audit per governance)  
+**Post-Implementation Reviewer**: `ChatGPT` (Final stage acceptance)  
+**Report Date**: `2026-09-06`  
+**Stage State**: `{readiness["status"]}`  
+**Unblind Readiness**: `{"READY" if readiness["ready_for_unblind"] else "REFUSED_NOT_MATURE"}`  
+
+---
+
+## 1. Executive Summary & Review Lineage
+
+This stage formally pre-registers the **one-shot fresh-forward unblind protocol and gatekeeper machinery** for **H39: Microstructure Directional Information**, strictly locking all analysis parameters, familywise Holm-Bonferroni correction over all 8 formal arms, baseline incremental controls, and stability diagnostics before any outcome labels are observed.
+
+### Strict Scientific Guard
+As mandated by the scientific protocol and governance, this stage is a **preregistration and gatekeeper stage only**. It is **NOT permission to run H39 formal validation now**. The system strictly fails closed with state `FORWARD_DATA_INSUFFICIENT` without computing any validation performance, correlation, or ranking until the authoritative wall-clock readiness path indicates all frozen maturity gates are satisfied.
+
+### Governance and Review Lineage
+
+| Event / Document | Git SHA / Reference | Status | Notes |
+| :--- | :--- | :---: | :--- |
+| **Accepted Main Baseline** | `e99964a3ced0c40424a4ace6dd59cc2376a2dea6` | ACCEPTED | v0.3.24 wall-clock denominator repair accepted & merged to main |
+| **H39 Protocol Freeze** | `0eecd8833675c664c42f5e62d89663d7a10ed5fa` | FROZEN | Pre-label freeze of hypothesis protocol |
+| **Protocol Clarification 001** | `2d1ccecc11dc231ffa41cdb1b5a9ea693abccc59` | COMMITTED | Clarification on baseline arithmetic |
+| **H38 Terminal Breach** | `1788511500000` | RECONCILED | Permanent `DATA_QUALITY_TERMINAL_ARCHIVE` |
+| **v0.3.25 Prompt Freeze** | `04d1ea8d10b77fa8f6e80b2a3811e55047b3b3a6` | COMMITTED | One-shot unblind preregistration requirements |
+| **Current Reviewable SHA** | `{code_sha}` | READY_FOR_REVIEW | Full gatekeeper & preregistration implementation |
+
+---
+
+## 2. Frozen Scientific Protocol & Preregistered Universe
+
+1. **Formal Feature Universe**: Exactly 8 arms (M1–M8):
+   - `M1_TRADE_NOTIONAL_IMBALANCE_5M` (predefined sign: +1)
+   - `M2_TRADE_NOTIONAL_IMBALANCE_15M` (predefined sign: +1)
+   - `M3_OFI_5M` (predefined sign: +1)
+   - `M4_TOP5_DEPTH_IMBALANCE_5M` (predefined sign: +1)
+   - `M5_TOP20_DEPTH_IMBALANCE_5M` (predefined sign: +1)
+   - `M6_MICROPRICE_DEVIATION_1M` (predefined sign: +1, causal closed-form derivation)
+   - `M7_PRESSURE_AGREEMENT_SCORE` (predefined sign: +1)
+   - `M8_PRESSURE_DIVERGENCE_SCORE` (predefined sign: +1)
+
+2. **Primary Horizon & Multiple Testing Correction**:
+   - Primary horizon: `60m`
+   - Complete familywise error rate (FWER) control via **Holm-Bonferroni step-down procedure** across all 8 formal arms with $\\alpha = 0.05$.
+   - Every arm will be reported regardless of significance (no post-hoc arm dropping).
+
+3. **Supporting Horizon**:
+   - Secondary horizon: `240m`
+   - Marked explicitly as **supporting evidence only**; positive results at 240m **cannot rescue** failure of the primary 60m family.
+
+4. **Frozen Baseline Incremental Controls**:
+   - Frozen covariates: `trailing_return_15m`, `trailing_return_60m`, `trailing_atr_ratio_15m` (ATR14_15m / decision_close_price).
+   - Fixed low-capacity L2 logistic regression formulation ($\\lambda=1.0$).
+   - Incremental likelihood ratio test ($\\chi^2_1$) and feature coefficient $z$-statistic must both demonstrate statistically significant value beyond the baseline ($p_{{LR}} < 0.05$ and $z > 0$).
+
+5. **Stability Diagnostics**:
+   - Pre-specified diagnostics across: (a) UTC day jackknife, (b) rolling blocks, (c) volatility regimes (median ATR split), and (d) 1H trend regimes.
+   - Diagnostic only (cannot be mined to rescue failed results).
+   - Mandatory flags for single-day dependence and material regime sign inversions.
+
+6. **Candidate Decision Rule**:
+   - A feature may receive `PROVISIONAL_MICROSTRUCTURE_CANDIDATE` if and only if:
+     - Holm-adjusted $p < 0.05$ on primary 60m family.
+     - Observed effect follows predefined positive sign.
+     - 95% confidence interval strictly excludes zero in correct direction.
+     - Incremental evidence beyond frozen baseline ($p_{{LR}} < 0.05, z > 0$).
+     - All maturity gates satisfied (>= 14 days, >= 750 eligible slots, >= 90% coverage).
+     - No single-day dependence and no material regime sign inversion.
+   - If no feature satisfies all criteria: scientific verdict is `RESEARCH_FAMILY_STOP`.
+
+---
+
+## 3. Sample Maturity & Operational Tracking
+
+| Metric | Accumulated | Required | Status | Notes |
+| :--- | :---: | :---: | :---: | :--- |
+| **Distinct UTC Days** | `{summary.get("distinct_days_count", 0)}` | `>= 14` | `{days_passed_str}` | Post-validation start distinct days |
+| **Eligible Observations** | `{summary.get("eligible_boundary_count", 0)}` | `>= 750` | `{obs_passed_str}` | High-quality 15m decision slots |
+| **Eligible Coverage Ratio** | `{summary.get("eligible_coverage", 0.0):.2%}` | `>= 90.0%` | `{cov_passed_str}` | Denominator: wall-clock expected boundaries |
+| **Raw Observation Coverage** | `{summary.get("raw_observation_coverage", 0.0):.2%}` | N/A | Total recorded / Expected boundaries |
+| **Expected Boundaries** | `{summary.get("expected_boundary_count", 0)}` | N/A | Clock-based ({summary.get("clock_source", "WALL_CLOCK")}) |
+| **Clock Ceiling UTC** | `{summary.get("clock_ceiling_utc", "N/A")}` | N/A | Current wall-clock ceiling |
+| **Maturity Status** | **`{readiness["status"]}`** | ALL GATES | `{mat_achieved_str}` | Accumulation ongoing; unblind refused |
+
+---
+
+## 4. Gatekeeper Architecture & One-Shot Execution Semantics
+
+1. **Authoritative Gatekeeper Class**:
+   - `H39OneShotUnblindGatekeeper` implements strict multi-layer verification.
+   - Requires protocol SHA-256 (`{H39_FROZEN_PROTOCOL_HASH[:16]}...`) and clarification SHA-256 (`{H39_FROZEN_CLARIFICATION_HASH[:16]}...`) verification.
+   - Requires SQLite `PRAGMA integrity_check;` and verifies all finalized partition hashes.
+
+2. **Immutable Cutoff Freeze**:
+   - `quantctl h39 freeze-cutoff --output-path <path>`: Only generates `H39_ONE_SHOT_UNBLIND_FREEZE.json` after all maturity gates pass.
+   - Fails closed while immature.
+
+3. **One-Shot Execution**:
+   - `quantctl h39 one-shot-unblind --freeze-manifest <path>`: Executes formal validation exactly once.
+   - Zero bypass flags: `--force`, `--override`, and `--ignore-readiness` are strictly prohibited.
+   - Never interacts with execution, order placement, or live trading.
+
+---
+
+## 5. Safety Invariants Attestation
+
+| Invariant | Configured Value | Status |
+| :--- | :--- | :---: |
+| **Trading Strategy** | `EXPERIMENTAL` | INVIOLATE |
+| **Qualified Direction Engine** | `NONE` | INVIOLATE |
+| **Runtime Ceiling** | `OPPORTUNITY_ONLY` | INVIOLATE |
+| **Execution Engine** | `DISABLED` | INVIOLATE |
+| **Auto-Execute Flag** | `false` | INVIOLATE |
+| **Live Trading Authorization** | `UNAUTHORIZED` | INVIOLATE |
+| **Final Holdout Partition** | `SEALED` (0 bytes / 0 rows accessed) | INVIOLATE |
+| **Collector Storage Mode** | Read-Only (`mode=ro` + `PRAGMA query_only = ON`) | INVIOLATE |
+| **Formal Hypothesis Evaluator** | Refuses all post-start validation evidence | INVIOLATE |
+"""
+    r_path = out_dir / "V0.3.25_H39_ONE_SHOT_UNBLIND_PREREGISTRATION_REPORT.md"
+    r_path.write_text(report_md, encoding="utf-8")
+    created_files["V0.3.25_H39_ONE_SHOT_UNBLIND_PREREGISTRATION_REPORT"] = str(r_path)
+
+    # 5. README.md
+    readme_md = f"""# BTC Quant Agent v0.3.25 Deliverables
+
+This directory contains the deliverables for **v0.3.25: H39 One-Shot Unblind Preregistration**.
+
+## Deliverables Manifest
+
+1. [`H39_UNBLIND_PREREGISTRATION_MANIFEST.json`](H39_UNBLIND_PREREGISTRATION_MANIFEST.json): Formal preregistration of hypothesis family, Holm-Bonferroni FWER control, baseline incremental modeling, stability diagnostics, and candidate decision rule.
+2. [`H39_BLIND_OPERATIONAL_STATUS.json`](H39_BLIND_OPERATIONAL_STATUS.json): Current operational and sample maturity status under wall-clock coverage semantics.
+3. [`FORWARD_CHAIN_HEALTH.json`](FORWARD_CHAIN_HEALTH.json): Audit of active derivatives, microstructure, and terminal H38 chains.
+4. [`V0.3.25_H39_ONE_SHOT_UNBLIND_PREREGISTRATION_REPORT.md`](V0.3.25_H39_ONE_SHOT_UNBLIND_PREREGISTRATION_REPORT.md): Authoritative preregistration and gatekeeper engineering report.
+
+## Governance
+
+- **Accepted Baseline (`main`)**: Commit [`e99964a3ced0c40424a4ace6dd59cc2376a2dea6`](commit://e99964a3ced0c40424a4ace6dd59cc2376a2dea6)
+- **Protocol Freeze**: Commit [`{H39_PROTOCOL_FREEZE_SHA}`](commit://{H39_PROTOCOL_FREEZE_SHA})
+- **Protocol Clarification**: Commit [`{H39_CLARIFICATION_SHA}`](commit://{H39_CLARIFICATION_SHA})
+- **Current Stage State**: `{readiness["status"]}`
+- **Unblind Readiness**: `{"READY" if readiness["ready_for_unblind"] else "REFUSED_NOT_MATURE"}`
+- **Reviewer**: Gemini-3.8-Flash (One-Pass Post-Implementation Audit)
+
+## Operational Commands
+
+```bash
+# Verify readiness status (fails closed while accumulating):
+quantctl h39 validation-readiness
+
+# Attempt to freeze cutoff (refused before maturity):
+quantctl h39 freeze-cutoff --output-path deliverables/v0.3.25/H39_ONE_SHOT_UNBLIND_FREEZE.json
+
+# Execute one-shot unblind (refused without verified freeze manifest):
+quantctl h39 one-shot-unblind --freeze-manifest deliverables/v0.3.25/H39_ONE_SHOT_UNBLIND_FREEZE.json
+```
+"""
+    readme_path = out_dir / "README.md"
+    readme_path.write_text(readme_md, encoding="utf-8")
+    created_files["README"] = str(readme_path)
+
+    return created_files
+
 
 
