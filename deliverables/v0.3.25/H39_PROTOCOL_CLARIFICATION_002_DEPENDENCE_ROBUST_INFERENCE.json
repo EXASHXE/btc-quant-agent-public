@@ -1,0 +1,116 @@
+{
+  "schema_version": "1.0.0",
+  "clarification_id": "H39_PROTOCOL_CLARIFICATION_002",
+  "clarification_title": "H39 Overlapping Outcome Serial Dependence and Robust Inference Clarification",
+  "hypothesis_id": "H39_MICROSTRUCTURE_DIRECTIONAL_INFORMATION",
+  "protocol_version": "v0.3.25",
+  "lineage": {
+    "protocol_freeze_sha": "0eecd8833675c664c42f5e62d89663d7a10ed5fa",
+    "protocol_clarification_001_sha": "2d1ccecc11dc231ffa41cdb1b5a9ea693abccc59",
+    "accepted_baseline_sha": "4e22c657c12f9e4a97b3b47bdfb3e8da598cabb2",
+    "repair_prompt_sha": "850bf94551d145675ea655de2796c2672f6881c1"
+  },
+  "frozen_invariants": {
+    "hypothesis": "H39_MICROSTRUCTURE_DIRECTIONAL_INFORMATION",
+    "validation_start_ms": 1788520500000,
+    "validation_start_utc": "2026-09-04T11:15:00Z",
+    "formal_feature_universe": [
+      "M1_TRADE_NOTIONAL_IMBALANCE_5M",
+      "M2_TRADE_NOTIONAL_IMBALANCE_15M",
+      "M3_OFI_5M",
+      "M4_TOP5_DEPTH_IMBALANCE_5M",
+      "M5_TOP20_DEPTH_IMBALANCE_5M",
+      "M6_MICROPRICE_DEVIATION_1M",
+      "M7_PRESSURE_AGREEMENT_SCORE",
+      "M8_PRESSURE_DIVERGENCE_SCORE"
+    ],
+    "predefined_signs": {
+      "M1_TRADE_NOTIONAL_IMBALANCE_5M": 1,
+      "M2_TRADE_NOTIONAL_IMBALANCE_15M": 1,
+      "M3_OFI_5M": 1,
+      "M4_TOP5_DEPTH_IMBALANCE_5M": 1,
+      "M5_TOP20_DEPTH_IMBALANCE_5M": 1,
+      "M6_MICROPRICE_DEVIATION_1M": 1,
+      "M7_PRESSURE_AGREEMENT_SCORE": 1,
+      "M8_PRESSURE_DIVERGENCE_SCORE": 1
+    },
+    "primary_horizon": "60m",
+    "secondary_horizon": "240m supporting only",
+    "holm_familywise_alpha": 0.05,
+    "minimum_distinct_utc_days": 14,
+    "minimum_eligible_observations": 750,
+    "minimum_eligible_coverage": 0.90,
+    "strategy": "EXPERIMENTAL",
+    "qualified_direction_engine": "NONE",
+    "runtime_maximum": "OPPORTUNITY_ONLY",
+    "execution": "DISABLED",
+    "auto_execute": false,
+    "final_holdout": "SEALED"
+  },
+  "rationale_and_mechanism": {
+    "sampling_cadence": "15m decision intervals",
+    "label_horizon_primary": "60m forward return (spans 4 consecutive 15m intervals)",
+    "label_horizon_secondary": "240m forward return (spans 16 consecutive 15m intervals)",
+    "serial_dependence_cause": "Adjacent forward-return intervals overlap mechanically by 3 decision slots for 60m and 15 decision slots for 240m. Ordinary iid standard errors and classical chi-square tests assume independent residuals and understate variance under overlapping sampling.",
+    "scientific_integrity_attestation": "Zero post-start validation performance or outcomes were inspected prior to selecting the estimator. All lag, block, and bootstrap choices are deterministic mathematical functions of sampling cadence and label horizon, never tuned on data."
+  },
+  "primary_60m_linear_inference": {
+    "model": "OLS regression with intercept: y_t = beta_0 + beta_1 * x_t + e_t",
+    "covariance_estimator": "NEWEY_WEST_HAC",
+    "kernel": "Bartlett triangular kernel: w(l, L) = 1 - l / (L + 1)",
+    "fixed_max_lag": 3,
+    "max_lag_formula": "ceil(60 / 15) - 1 = 3",
+    "hac_standard_error_formula": "sqrt(V_HAC[1, 1]) where V_HAC = (X'X)^(-1) S_NW (X'X)^(-1)",
+    "hac_test_statistic": "t_HAC = beta_1 / se_HAC",
+    "one_sided_raw_p_value": "1.0 - Phi(t_HAC) under predefined sign +1",
+    "formal_holm_family_input": "HAC one-sided raw p-values across M1-M8",
+    "candidate_significance_threshold": "Holm-adjusted HAC p-value < 0.05 and 95% HAC CI excludes zero in positive direction",
+    "iid_statistics_status": "Retained strictly as labeled diagnostics; prohibited from candidate gating"
+  },
+  "incremental_baseline_inference": {
+    "baseline_covariates": [
+      "trailing_return_15m",
+      "trailing_return_60m",
+      "trailing_atr_ratio_15m"
+    ],
+    "model_family": "Deterministic L2-regularized logistic regression",
+    "regularization_strength": "lambda = 1.0 (equivalent to C = 1.0, intercept unpenalized, no tuning)",
+    "microstructure_coefficient_uncertainty": {
+      "covariance_method": "SANDWICH_HAC",
+      "kernel": "Bartlett triangular kernel, fixed lag L = 3",
+      "hessian": "H = X' W X + Lambda, where W = diag(p_t * (1 - p_t))",
+      "score_covariance": "S_NW computed on score vectors u_t = (y_t - p_t) * X_t with Bartlett weights up to lag 3",
+      "sandwich_formula": "V_sandwich = H^(-1) S_NW H^(-1)",
+      "microstructure_se": "sqrt(V_sandwich[4, 4])",
+      "microstructure_z": "beta_micro / se_micro",
+      "microstructure_p_value": "1.0 - Phi(microstructure_z) under predefined sign +1"
+    },
+    "nested_likelihood_ratio_calibration": {
+      "lr_statistic": "LR = 2 * (log_likelihood_full - log_likelihood_base)",
+      "calibration_method": "CHRONOLOGICAL_MOVING_BLOCK_BOOTSTRAP",
+      "block_length": 4,
+      "block_length_formula": "ceil(60 / 15) = 4 observations",
+      "bootstrap_replications": 5000,
+      "preregistered_seed": 390325,
+      "resampling_scheme": "Under H0, hold (X_base, y) fixed to preserve baseline joint temporal dependence; draw overlapping blocks of length 4 from x_micro with replacement to form surrogate x_micro*; compute LR* across 5000 replications",
+      "robust_lr_p_value_formula": "mean(LR* >= LR_observed) across 5000 replications",
+      "fail_closed_policy": "If robust LR bootstrap cannot execute with deterministic convergence, fail closed to STATISTICAL_INFERENCE_NOT_READY; do not fall back to classical chi-square iid p-values"
+    },
+    "candidate_incremental_gate": "incremental_lr_p_value_dependence_robust < 0.05 and incremental_coefficient_hac_statistic > 0"
+  },
+  "supporting_240m_linear_inference": {
+    "role": "SUPPORTING_ONLY (cannot rescue 60m candidate rejection)",
+    "covariance_estimator": "NEWEY_WEST_HAC",
+    "kernel": "Bartlett triangular kernel: w(l, L) = 1 - l / (L + 1)",
+    "fixed_max_lag": 15,
+    "max_lag_formula": "ceil(240 / 15) - 1 = 15",
+    "gating_impact": "None (primary candidate decisions strictly use 60m HAC and bootstrap evidence)"
+  },
+  "contamination_attestation": {
+    "zero_fresh_outcomes_inspected": true,
+    "statement": "Zero fresh post-start 60m or 240m validation outcomes were inspected, evaluated, or materialized before this clarification manifest was committed to git.",
+    "validation_start_ms": 1788520500000,
+    "validation_start_utc": "2026-09-04T11:15:00Z",
+    "fresh_validation_status_at_clarification": "FORWARD_DATA_INSUFFICIENT"
+  }
+}
