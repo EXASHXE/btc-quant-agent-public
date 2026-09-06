@@ -1201,9 +1201,18 @@ class H39BlindLedger:
                 reason = str(r["rejection_reason"]) if r["rejection_reason"] else "UNKNOWN"
                 rejection_counts[reason] = rejection_counts.get(reason, 0) + 1
 
-        effective_cutoff = as_of_ms if as_of_ms is not None else now_ms
-        clock_ceiling_ms = effective_cutoff if effective_cutoff is not None else latest_slot_ms
-        if clock_ceiling_ms is not None and clock_ceiling_ms >= H39_VALIDATION_START_MS:
+        if as_of_ms is not None:
+            clock_ceiling_ms = int(as_of_ms)
+            clock_source = "EXPLICIT_AS_OF"
+        elif now_ms is not None:
+            clock_ceiling_ms = int(now_ms)
+            clock_source = "EXPLICIT_AS_OF"
+        else:
+            clock_ceiling_ms = int(datetime.now(UTC).timestamp() * 1000)
+            clock_source = "WALL_CLOCK"
+
+        clock_ceiling_utc = datetime.fromtimestamp(clock_ceiling_ms / 1000, UTC).isoformat()
+        if clock_ceiling_ms >= H39_VALIDATION_START_MS:
             expected_boundaries = (
                 (clock_ceiling_ms - H39_VALIDATION_START_MS) // 900_000
             ) + 1
@@ -1227,6 +1236,9 @@ class H39BlindLedger:
             "state": "FRESH_FORWARD_VALIDATION" if is_mature else "FORWARD_DATA_INSUFFICIENT",
             "validation_start_utc": H39_VALIDATION_START_UTC,
             "validation_start_ms": H39_VALIDATION_START_MS,
+            "clock_ceiling_ms": clock_ceiling_ms,
+            "clock_ceiling_utc": clock_ceiling_utc,
+            "clock_source": clock_source,
             "earliest_slot_ms": earliest_slot_ms,
             "latest_slot_ms": latest_slot_ms,
             "latest_slot_utc": (
@@ -1919,18 +1931,40 @@ class H39ResearchEngine:
         self,
         ledger_path: str | Path | None = None,
         as_of_ms: int | None = None,
+        now_ms: int | None = None,
     ) -> dict[str, Any]:
         l_path = Path(ledger_path or H39_BLIND_LEDGER_DEFAULT_PATH).resolve()
+        effective_cutoff = as_of_ms if as_of_ms is not None else now_ms
         if not l_path.exists():
+            if effective_cutoff is not None:
+                clock_ceiling_ms = int(effective_cutoff)
+                clock_source = "EXPLICIT_AS_OF"
+            else:
+                clock_ceiling_ms = int(datetime.now(UTC).timestamp() * 1000)
+                clock_source = "WALL_CLOCK"
+
+            clock_ceiling_utc = datetime.fromtimestamp(clock_ceiling_ms / 1000, UTC).isoformat()
+            if clock_ceiling_ms >= H39_VALIDATION_START_MS:
+                expected_boundaries = (
+                    (clock_ceiling_ms - H39_VALIDATION_START_MS) // 900_000
+                ) + 1
+            else:
+                expected_boundaries = 0
+
             return {
                 "hypothesis_id": H39_HYPOTHESIS_ID,
                 "stage": "BLIND_FORWARD_VALIDATION_ACCUMULATION",
                 "state": "FORWARD_DATA_INSUFFICIENT",
                 "validation_start_utc": H39_VALIDATION_START_UTC,
                 "validation_start_ms": H39_VALIDATION_START_MS,
-                "expected_boundary_count": 0,
+                "clock_ceiling_ms": clock_ceiling_ms,
+                "clock_ceiling_utc": clock_ceiling_utc,
+                "clock_source": clock_source,
+                "expected_boundary_count": expected_boundaries,
                 "observed_boundary_count": 0,
                 "eligible_boundary_count": 0,
+                "raw_observation_coverage": 0.0,
+                "eligible_coverage": 0.0,
                 "coverage_ratio": 0.0,
                 "distinct_days_count": 0,
                 "distinct_days": [],
@@ -1955,7 +1989,7 @@ class H39ResearchEngine:
                 },
             }
         ledger = H39BlindLedger(l_path)
-        summary = ledger.get_summary(as_of_ms=as_of_ms)
+        summary = ledger.get_summary(as_of_ms=as_of_ms, now_ms=now_ms)
         summary["hypothesis_id"] = H39_HYPOTHESIS_ID
         summary["stage"] = "BLIND_FORWARD_VALIDATION_ACCUMULATION"
         summary["safety_firewalls"] = {
@@ -1972,6 +2006,7 @@ class H39ResearchEngine:
         self,
         ledger_path: str | Path | None = None,
         as_of_ms: int | None = None,
+        now_ms: int | None = None,
     ) -> dict[str, Any]:
         l_path = Path(ledger_path or H39_BLIND_LEDGER_DEFAULT_PATH).resolve()
         if not l_path.exists():
@@ -1995,7 +2030,7 @@ class H39ResearchEngine:
                 "integrity": integrity,
             }
 
-        summary = ledger.get_summary(as_of_ms=as_of_ms)
+        summary = ledger.get_summary(as_of_ms=as_of_ms, now_ms=now_ms)
         is_mature = summary["maturity_achieved"]
         if is_mature:
             return {
@@ -2732,7 +2767,13 @@ def generate_all_v0324_deliverables(
         "state": val_status.get("state", H39_STATE_INSUFFICIENT),
         "validation_start_utc": H39_VALIDATION_START_UTC,
         "validation_start_ms": H39_VALIDATION_START_MS,
+        "clock_ceiling_ms": val_status.get("clock_ceiling_ms"),
+        "clock_ceiling_utc": val_status.get("clock_ceiling_utc"),
+        "clock_source": val_status.get("clock_source"),
         "clock_denominator": {
+            "clock_ceiling_ms": val_status.get("clock_ceiling_ms"),
+            "clock_ceiling_utc": val_status.get("clock_ceiling_utc"),
+            "clock_source": val_status.get("clock_source"),
             "expected_boundary_count": val_status.get("expected_boundary_count", 0),
             "observed_boundary_count": val_status.get("observed_boundary_count", 0),
             "eligible_boundary_count": val_status.get("eligible_boundary_count", 0),
@@ -2764,6 +2805,138 @@ def generate_all_v0324_deliverables(
     s_path = out_dir / "H39_BLIND_OPERATIONAL_STATUS.json"
     s_path.write_text(json.dumps(status_data, indent=2, sort_keys=True), encoding="utf-8")
     created_files["H39_BLIND_OPERATIONAL_STATUS"] = str(s_path)
+
+    # 2b. V0.3.24_WALL_CLOCK_DENOMINATOR_REPAIR.json
+    repair_report_json = {
+        "schema_version": "1.0.0",
+        "stage": "v0.3.24",
+        "repair_title": "Wall-Clock Coverage Denominator Acceptance Repair",
+        "hypothesis_id": H39_HYPOTHESIS_ID,
+        "validation_start_utc": H39_VALIDATION_START_UTC,
+        "validation_start_ms": H39_VALIDATION_START_MS,
+        "clock_ceiling_ms": val_status.get("clock_ceiling_ms"),
+        "clock_ceiling_utc": val_status.get("clock_ceiling_utc"),
+        "clock_source": val_status.get("clock_source", "WALL_CLOCK"),
+        "denominator_semantics": {
+            "canonical_rule": "clock_ceiling_ms = explicit as_of_ms when supplied, otherwise current UTC wall-clock time",
+            "forbidden_defaults": [
+                "latest ledger slot",
+                "latest observed partition timestamp",
+                "latest collector heartbeat",
+                "latest ingested boundary",
+            ],
+            "formula": "floor((clock_ceiling_ms - validation_start_ms) / 900000) + 1",
+        },
+        "clock_denominator": {
+            "clock_ceiling_ms": val_status.get("clock_ceiling_ms"),
+            "clock_ceiling_utc": val_status.get("clock_ceiling_utc"),
+            "clock_source": val_status.get("clock_source", "WALL_CLOCK"),
+            "expected_boundary_count": val_status.get("expected_boundary_count", 0),
+            "observed_boundary_count": val_status.get("observed_boundary_count", 0),
+            "eligible_boundary_count": val_status.get("eligible_boundary_count", 0),
+            "raw_observation_coverage": val_status.get("raw_observation_coverage", 0.0),
+            "eligible_coverage": val_status.get("eligible_coverage", 0.0),
+            "coverage_ratio": val_status.get("coverage_ratio", 0.0),
+        },
+        "distinct_days_count": val_status.get("distinct_days_count", 0),
+        "distinct_days": val_status.get("distinct_days", []),
+        "maturity_gates": {
+            "minimum_distinct_days": H39_MINIMUM_VALIDATION_DAYS,
+            "minimum_eligible_observations": H39_MINIMUM_ELIGIBLE_OBSERVATIONS,
+            "minimum_coverage_ratio": H39_MINIMUM_COVERAGE_RATIO,
+        },
+        "maturity_achieved": val_status.get("maturity_achieved", False),
+        "state": val_status.get("state", H39_STATE_INSUFFICIENT),
+        "stale_ledger_fail_closed_verified": True,
+        "producing_code_sha": code_sha,
+        "safety_invariants": {
+            "strategy": "EXPERIMENTAL",
+            "qualified_direction_engine": "NONE",
+            "runtime_maximum": "OPPORTUNITY_ONLY",
+            "execution": "DISABLED",
+            "auto_execute": False,
+            "final_holdout": "SEALED",
+            "live_trading": "UNAUTHORIZED",
+        },
+    }
+    wcd_path = out_dir / "V0.3.24_WALL_CLOCK_DENOMINATOR_REPAIR.json"
+    wcd_path.write_text(json.dumps(repair_report_json, indent=2, sort_keys=True), encoding="utf-8")
+    created_files["V0.3.24_WALL_CLOCK_DENOMINATOR_REPAIR_JSON"] = str(wcd_path)
+
+    # 2c. V0.3.24_WALL_CLOCK_DENOMINATOR_REPAIR.md
+    repair_md = f"""# BTC Quant Agent v0.3.24 Acceptance Repair Report: Wall-Clock Coverage Denominator
+
+**Hypothesis ID**: `{H39_HYPOTHESIS_ID}`  
+**Repair Stage**: `v0.3.24-acceptance-repair`  
+**Repair Date**: `{datetime.now(UTC).strftime('%Y-%m-%d')}`  
+**State**: `{val_status.get("state", H39_STATE_INSUFFICIENT)}`  
+**Producing Code SHA**: `{code_sha}`  
+
+---
+
+## 1. Problem Addressed & Root Cause Analysis
+
+In initial v0.3.24 implementation, `H39BlindLedger.get_summary()` defaulted `clock_ceiling_ms` to `latest_slot_ms` when `as_of_ms` was omitted:
+```python
+effective_cutoff = as_of_ms if as_of_ms is not None else now_ms
+clock_ceiling_ms = effective_cutoff if effective_cutoff is not None else latest_slot_ms
+```
+If data collection or ingestion halted, `latest_slot_ms` froze, causing `expected_boundary_count` to stop advancing. This artificially masked missing elapsed slots and could maintain or inflate apparent coverage in a stale ledger.
+
+---
+
+## 2. Canonical Denominator Semantics
+
+The canonical wall-clock denominator rule is strictly enforced:
+- `clock_ceiling_ms`: explicit `as_of_ms` when supplied; otherwise actual current UTC wall-clock time (`datetime.now(timezone.utc)`).
+- Never defaults to latest ledger row, latest observed partition timestamp, or collector heartbeat.
+- Formula:
+  $$\\text{{expected\\_boundaries}} = \\left\\lfloor \\frac{{\\text{{clock\\_ceiling\\_ms}} - 1788520500000}}{{900\\,000}} \\right\\rfloor + 1$$
+- Provenance tracking via output metadata:
+  - `clock_ceiling_ms`: `{val_status.get("clock_ceiling_ms")}`
+  - `clock_ceiling_utc`: `{val_status.get("clock_ceiling_utc")}`
+  - `clock_source`: `{val_status.get("clock_source")}`
+
+---
+
+## 3. Operational Status Under Wall Clock
+
+| Metric | Current Value | Required Gate | Status |
+| :--- | :---: | :---: | :---: |
+| **Clock Source** | `{val_status.get("clock_source")}` | WALL_CLOCK | ACTIVE |
+| **Clock Ceiling UTC** | `{val_status.get("clock_ceiling_utc")}` | Current UTC | ACTIVE |
+| **Expected Boundaries** | `{val_status.get("expected_boundary_count", 0)}` | Continuous Wall-Clock | ACCUMULATING |
+| **Observed Boundaries** | `{val_status.get("observed_boundary_count", 0)}` | N/A | RECORDED |
+| **Eligible Boundaries** | `{val_status.get("eligible_boundary_count", 0)}` | `>= 750` | `{"MET" if val_status.get("observations_gate_passed") else "PENDING"}` |
+| **Distinct UTC Days** | `{val_status.get("distinct_days_count", 0)}` | `>= 14` | `{"MET" if val_status.get("days_gate_passed") else "PENDING"}` |
+| **Eligible Coverage Ratio** | `{val_status.get("coverage_ratio", 0.0):.2%}` | `>= 90.0%` | `{"MET" if val_status.get("coverage_gate_passed") else "PENDING"}` |
+| **Raw Observation Coverage** | `{val_status.get("raw_observation_coverage", 0.0):.2%}` | N/A | Observed / Expected |
+| **Scientific State** | **`{val_status.get("state", H39_STATE_INSUFFICIENT)}`** | ALL GATES | `{"READY" if val_status.get("maturity_achieved") else "ACCUMULATING"}` |
+
+---
+
+## 4. Stale-Ledger Fail-Closed Verification
+
+A dedicated regression test verifies that if ingestion stops at $T_1$ while wall clock reaches $T_2 > T_1$:
+1. `expected_boundary_count` advances continuously to $T_2$.
+2. Missing intervals $T_1 \\dots T_2$ are preserved in the denominator.
+3. Coverage falls accordingly, structurally preventing stale ledgers from falsely remaining or becoming mature.
+
+---
+
+## 5. Safety Invariants
+
+All safety firewalls remain strictly inviolate:
+- Strategy: `EXPERIMENTAL`
+- Direction engine: `NONE`
+- Execution: `DISABLED` (`auto_execute: false`)
+- Final holdout: `SEALED`
+- Live trading: `UNAUTHORIZED`
+- Post-start hypothesis evaluation: fail-closed with `REFUSED_VALIDATION_NOT_MATURE`
+"""
+    wcd_md_path = out_dir / "V0.3.24_WALL_CLOCK_DENOMINATOR_REPAIR.md"
+    wcd_md_path.write_text(repair_md, encoding="utf-8")
+    created_files["V0.3.24_WALL_CLOCK_DENOMINATOR_REPAIR_MD"] = str(wcd_md_path)
 
     # 3. H39_BLIND_LEDGER_INTEGRITY.json
     integrity_data = {
@@ -2944,7 +3117,8 @@ This stage operationalizes the accepted v0.3.23 blind ledger to make blind evide
 | **Eligible Observations** | `{val_status["eligible_boundary_count"]}` | `>= 750` | `{obs_passed_str}` |
 | **Eligible Coverage Ratio** | `{val_status.get("eligible_coverage", val_status["coverage_ratio"]):.2%}` | `>= 90.0%` | `{cov_passed_str}` |
 | **Raw Observation Coverage** | `{val_status.get("raw_observation_coverage", 0.0):.2%}` | N/A | Observed slots / Expected boundaries |
-| **Expected Clock Boundaries** | `{val_status["expected_boundary_count"]}` | N/A | Denominator from 2026-09-04T11:15:00Z |
+| **Expected Clock Boundaries** | `{val_status["expected_boundary_count"]}` | N/A | Clock-based ({val_status.get("clock_source", "WALL_CLOCK")}) |
+| **Clock Ceiling UTC** | `{val_status.get("clock_ceiling_utc", "N/A")}` | N/A | Denominator ceiling |
 | **Observed Boundaries** | `{val_status["observed_boundary_count"]}` | N/A | Total recorded slots in ledger |
 | **Maturity Status** | **`{val_status["state"]}`** | ALL GATES | `{mat_achieved_str}` |
 
@@ -2988,6 +3162,8 @@ This directory contains the deliverables for **v0.3.24: H39 Blind Accumulation O
 3. [`H39_ACCUMULATION_SCHEDULER_REPORT.json`](H39_ACCUMULATION_SCHEDULER_REPORT.json): Scheduled accumulation execution audit, resource constraints, and backup confirmation.
 4. [`FORWARD_CHAIN_HEALTH.json`](FORWARD_CHAIN_HEALTH.json): Audit of active derivatives, microstructure, and terminal H38 chains.
 5. [`V0.3.24_H39_BLIND_ACCUMULATION_OPERATIONS_REPORT.md`](V0.3.24_H39_BLIND_ACCUMULATION_OPERATIONS_REPORT.md): Authoritative operational engineering report.
+6. [`V0.3.24_WALL_CLOCK_DENOMINATOR_REPAIR.json`](V0.3.24_WALL_CLOCK_DENOMINATOR_REPAIR.json): Acceptance repair report documenting the wall-clock coverage denominator fix.
+7. [`V0.3.24_WALL_CLOCK_DENOMINATOR_REPAIR.md`](V0.3.24_WALL_CLOCK_DENOMINATOR_REPAIR.md): Detailed explanation and verification of the wall-clock coverage denominator repair.
 
 ## Governance
 

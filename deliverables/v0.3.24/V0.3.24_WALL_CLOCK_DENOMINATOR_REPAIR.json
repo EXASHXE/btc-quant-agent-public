@@ -13,15 +13,22 @@
     "raw_observation_coverage": 0.29411764705882354
   },
   "clock_source": "WALL_CLOCK",
-  "coverage_gate_passed": false,
-  "days_gate_passed": false,
+  "denominator_semantics": {
+    "canonical_rule": "clock_ceiling_ms = explicit as_of_ms when supplied, otherwise current UTC wall-clock time",
+    "forbidden_defaults": [
+      "latest ledger slot",
+      "latest observed partition timestamp",
+      "latest collector heartbeat",
+      "latest ingested boundary"
+    ],
+    "formula": "floor((clock_ceiling_ms - validation_start_ms) / 900000) + 1"
+  },
   "distinct_days": [
     "2026-09-04",
     "2026-09-05",
     "2026-09-06"
   ],
   "distinct_days_count": 3,
-  "generated_at_utc": "2026-09-06T09:50:29.071809+00:00",
   "hypothesis_id": "H39_MICROSTRUCTURE_DIRECTIONAL_INFORMATION",
   "maturity_achieved": false,
   "maturity_gates": {
@@ -29,20 +36,20 @@
     "minimum_distinct_days": 14,
     "minimum_eligible_observations": 750
   },
-  "observations_gate_passed": false,
-  "rejection_reason_counts": {
-    "GAP_IN_FEATURE_WINDOW": 18
-  },
-  "safety_firewalls": {
+  "producing_code_sha": "a9dedc502b73c74b004abe83413b0d307679a2ed",
+  "repair_title": "Wall-Clock Coverage Denominator Acceptance Repair",
+  "safety_invariants": {
     "auto_execute": false,
     "execution": "DISABLED",
     "final_holdout": "SEALED",
+    "live_trading": "UNAUTHORIZED",
     "qualified_direction_engine": "NONE",
     "runtime_maximum": "OPPORTUNITY_ONLY",
     "strategy": "EXPERIMENTAL"
   },
   "schema_version": "1.0.0",
-  "stage": "H39_BLIND_ACCUMULATION_OPERATIONS",
+  "stage": "v0.3.24",
+  "stale_ledger_fail_closed_verified": true,
   "state": "FORWARD_DATA_INSUFFICIENT",
   "validation_start_ms": 1788520500000,
   "validation_start_utc": "2026-09-04T11:15:00Z"

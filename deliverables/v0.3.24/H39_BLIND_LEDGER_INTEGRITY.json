@@ -1,6 +1,6 @@
 {
   "eligible_row_count": 37,
-  "generated_at_utc": "2026-09-06T08:42:47.050860+00:00",
+  "generated_at_utc": "2026-09-06T09:50:29.072820+00:00",
   "integrity_status": "OK",
   "ledger_path": "/root/workspace/project/Quant-agent/data/research/h39_validation/h39_blind_ledger.sqlite3",
   "ledger_row_count": 55,
@@ -21,7 +21,7 @@
     {
       "finalized": false,
       "partition_name": "microstructure-2026-09-06.sqlite3",
-      "sha256": "81e298f918f3ba36d9dc8af232a619dde28ccb4fef1b6ba9850037674d437dbd",
+      "sha256": "5387bf1ad45d7c68e02cc278fcaa0da42fd133edb3271aab822b6a652b6b5868",
       "status": "OK"
     }
   ],

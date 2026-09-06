@@ -86,6 +86,12 @@ def main() -> int:
         action="store_true",
         help="Check readiness for one-shot unblind",
     )
+    parser.add_argument(
+        "--as-of-ms",
+        type=int,
+        default=None,
+        help="Optional explicit timestamp in ms for deterministic audit/testing",
+    )
     args = parser.parse_args()
 
     engine = H39ResearchEngine(
@@ -95,12 +101,16 @@ def main() -> int:
     ledger = H39BlindLedger(args.ledger_path)
 
     if args.status_only:
-        status = engine.get_blind_validation_status(ledger_path=args.ledger_path)
+        status = engine.get_blind_validation_status(
+            ledger_path=args.ledger_path, as_of_ms=args.as_of_ms
+        )
         print(json.dumps(status, indent=2))
         return 0
 
     if args.readiness_only:
-        readiness = engine.check_unblind_readiness(ledger_path=args.ledger_path)
+        readiness = engine.check_unblind_readiness(
+            ledger_path=args.ledger_path, as_of_ms=args.as_of_ms
+        )
         print(json.dumps(readiness, indent=2))
         return 0 if readiness.get("ready_for_unblind") else 1
 

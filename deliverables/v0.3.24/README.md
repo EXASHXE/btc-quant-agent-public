@@ -9,6 +9,8 @@ This directory contains the deliverables for **v0.3.24: H39 Blind Accumulation O
 3. [`H39_ACCUMULATION_SCHEDULER_REPORT.json`](H39_ACCUMULATION_SCHEDULER_REPORT.json): Scheduled accumulation execution audit, resource constraints, and backup confirmation.
 4. [`FORWARD_CHAIN_HEALTH.json`](FORWARD_CHAIN_HEALTH.json): Audit of active derivatives, microstructure, and terminal H38 chains.
 5. [`V0.3.24_H39_BLIND_ACCUMULATION_OPERATIONS_REPORT.md`](V0.3.24_H39_BLIND_ACCUMULATION_OPERATIONS_REPORT.md): Authoritative operational engineering report.
+6. [`V0.3.24_WALL_CLOCK_DENOMINATOR_REPAIR.json`](V0.3.24_WALL_CLOCK_DENOMINATOR_REPAIR.json): Acceptance repair report documenting the wall-clock coverage denominator fix.
+7. [`V0.3.24_WALL_CLOCK_DENOMINATOR_REPAIR.md`](V0.3.24_WALL_CLOCK_DENOMINATOR_REPAIR.md): Detailed explanation and verification of the wall-clock coverage denominator repair.
 
 ## Governance
 

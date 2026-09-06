@@ -1,8 +1,8 @@
 {
   "chains": {
     "DERIVATIVES_PIT_EPOCH_V0321_001": {
-      "latest_slot_ms": 1788683425462,
-      "rows_recorded": 465,
+      "latest_slot_ms": 1788687927291,
+      "rows_recorded": 470,
       "status": "HEALTHY",
       "store": "/root/workspace/project/Quant-agent/data/forward/BTCUSDT/derivatives.sqlite3"
     },
@@ -23,6 +23,6 @@
       "store": "/root/workspace/project/Quant-agent/data/forward/BTCUSDT/microstructure"
     }
   },
-  "generated_at_utc": "2026-09-06T08:42:47.053164+00:00",
+  "generated_at_utc": "2026-09-06T09:50:29.074583+00:00",
   "schema_version": "1.0.0"
 }

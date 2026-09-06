@@ -1,24 +1,24 @@
 {
   "disk_safety": {
-    "available_gb": 829.25,
+    "available_gb": 829.19,
     "min_required_gb": 5.0,
     "status": "PASSED"
   },
-  "generated_at_utc": "2026-09-06T08:42:47.051095+00:00",
+  "generated_at_utc": "2026-09-06T09:50:29.073210+00:00",
   "last_execution": {
-    "backup_file": "/root/workspace/project/Quant-agent/data/research/h39_validation/backups/h39_blind_ledger_backup_20260906_084243.sqlite3",
-    "completed_at_utc": "2026-09-06T08:42:45.203852+00:00",
+    "backup_file": "/root/workspace/project/Quant-agent/data/research/h39_validation/backups/h39_blind_ledger_backup_20260906_095024.sqlite3",
+    "completed_at_utc": "2026-09-06T09:50:26.911846+00:00",
     "duplicate_slots_skipped": 55,
-    "elapsed_seconds": 22.256,
+    "elapsed_seconds": 37.113,
     "new_slots_ingested": 0,
     "partitions_processed": [
       "microstructure-2026-09-04.sqlite3",
       "microstructure-2026-09-05.sqlite3"
     ],
-    "start_time_utc": "2026-09-06T08:42:20.438675+00:00",
+    "start_time_utc": "2026-09-06T09:49:47.532529+00:00",
     "status": "SUCCESS"
   },
-  "producing_code_sha": "4afddc10e705562153bc194714266b84611226da",
+  "producing_code_sha": "a9dedc502b73c74b004abe83413b0d307679a2ed",
   "resource_limits": {
     "CPUQuota": "80%",
     "IOSchedulingClass": "best-effort",

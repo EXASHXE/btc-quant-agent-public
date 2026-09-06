@@ -224,13 +224,25 @@ def test_clock_denominator_calculation(tmp_path: Path) -> None:
         s = H39_VALIDATION_START_MS + i * 900_000
         ledger.ingest_slot(_make_dummy_valid_row(slot_ms=s, eligible=(i == 0)))
 
-    summary = ledger.get_summary()
-    assert summary["expected_boundary_count"] == 4
-    assert summary["observed_boundary_count"] == 4
-    assert summary["eligible_boundary_count"] == 1
-    assert summary["coverage_ratio"] == 0.25
-    assert summary["eligible_coverage"] == 0.25
-    assert summary["raw_observation_coverage"] == 1.0
+    # Explicit as-of cutoff produces exact deterministic expected count
+    cutoff = H39_VALIDATION_START_MS + 3 * 900_000
+    summary_explicit = ledger.get_summary(as_of_ms=cutoff)
+    assert summary_explicit["clock_source"] == "EXPLICIT_AS_OF"
+    assert summary_explicit["clock_ceiling_ms"] == cutoff
+    assert summary_explicit["expected_boundary_count"] == 4
+    assert summary_explicit["observed_boundary_count"] == 4
+    assert summary_explicit["eligible_boundary_count"] == 1
+    assert summary_explicit["coverage_ratio"] == 0.25
+    assert summary_explicit["eligible_coverage"] == 0.25
+    assert summary_explicit["raw_observation_coverage"] == 1.0
+
+    # Default production path uses wall clock, not latest ledger slot
+    summary_wall = ledger.get_summary()
+    assert summary_wall["clock_source"] == "WALL_CLOCK"
+    assert summary_wall["expected_boundary_count"] > 4
+    assert summary_wall["observed_boundary_count"] == 4
+    assert summary_wall["eligible_boundary_count"] == 1
+    assert summary_wall["raw_observation_coverage"] == 4 / summary_wall["expected_boundary_count"]
 
 
 def test_rejected_slot_classification(tmp_path: Path) -> None:
@@ -244,7 +256,9 @@ def test_rejected_slot_classification(tmp_path: Path) -> None:
     ledger.ingest_slot(r1)
     ledger.ingest_slot(r2)
 
-    summary = ledger.get_summary()
+    cutoff = H39_VALIDATION_START_MS + 900_000
+    summary = ledger.get_summary(as_of_ms=cutoff)
+    assert summary["clock_source"] == "EXPLICIT_AS_OF"
     assert summary["observed_boundary_count"] == 2
     assert summary["eligible_boundary_count"] == 1
     assert summary["raw_observation_coverage"] == 1.0
@@ -437,3 +451,77 @@ def test_operational_safety_firewalls_and_disk_check(tmp_path: Path) -> None:
     assert firewalls["execution"] == "DISABLED"
     assert firewalls["auto_execute"] is False
     assert firewalls["final_holdout"] == "SEALED"
+
+
+def test_stale_ledger_fail_closed_regression(tmp_path: Path) -> None:
+    """15. Stale ledger regression: halting ingestion while wall clock advances causes coverage to fall and readiness to fail closed."""
+    ledger_path = tmp_path / "stale_ledger.sqlite3"
+    ledger = H39BlindLedger(ledger_path)
+
+    # Ingest 15 distinct days of eligible slots through T1 (1440 slots)
+    # T0 = validation start (2026-09-04T11:15:00Z)
+    t0 = H39_VALIDATION_START_MS
+    num_slots = 1440
+    for i in range(num_slots):
+        s = t0 + i * 900_000
+        ledger.ingest_slot(_make_dummy_valid_row(slot_ms=s, eligible=True))
+
+    t1 = t0 + (num_slots - 1) * 900_000
+
+    # If evaluated strictly through T1, all gates would pass (100% coverage, 1440 observations, >=14 days)
+    summary_t1 = ledger.get_summary(as_of_ms=t1)
+    assert summary_t1["clock_source"] == "EXPLICIT_AS_OF"
+    assert summary_t1["expected_boundary_count"] == num_slots
+    assert summary_t1["observed_boundary_count"] == num_slots
+    assert summary_t1["eligible_boundary_count"] == num_slots
+    assert summary_t1["coverage_ratio"] == 1.0
+    assert summary_t1["days_gate_passed"] is True
+    assert summary_t1["observations_gate_passed"] is True
+    assert summary_t1["coverage_gate_passed"] is True
+    assert summary_t1["maturity_achieved"] is True
+
+    # Now evaluate under simulated future wall clock T2 = T1 + 20 days (materially later, ingestion halted at T1)
+    t2 = t1 + 20 * 86_400_000
+    summary_t2 = ledger.get_summary(now_ms=t2)
+    assert summary_t2["clock_source"] == "EXPLICIT_AS_OF"
+    expected_t2 = ((t2 - t0) // 900_000) + 1
+    assert summary_t2["expected_boundary_count"] == expected_t2
+    assert expected_t2 > num_slots + 1800
+    assert summary_t2["observed_boundary_count"] == num_slots
+    assert summary_t2["eligible_boundary_count"] == num_slots
+    # Coverage has fallen drastically because the 20 days of missing boundaries remain in denominator!
+    assert summary_t2["eligible_coverage"] < 0.50
+    assert summary_t2["coverage_gate_passed"] is False
+    assert summary_t2["maturity_achieved"] is False
+    assert summary_t2["state"] == H39_STATE_INSUFFICIENT
+
+    # Verify check_unblind_readiness fails closed under T2
+    engine = H39ResearchEngine(microstructure_root=tmp_path, opportunity_store_path=tmp_path / "none.sqlite3")
+    readiness_t2 = engine.check_unblind_readiness(ledger_path=ledger_path, now_ms=t2)
+    assert readiness_t2["ready_for_unblind"] is False
+    assert readiness_t2["status"] == H39_STATE_INSUFFICIENT
+    assert "Minimum gates not met" in str(readiness_t2.get("refusal_reason"))
+
+
+def test_empty_and_missing_ledger_wall_clock_denominator(tmp_path: Path) -> None:
+    """16. Empty and missing ledgers still accumulate expected boundaries from validation start to wall clock."""
+    empty_ledger_path = tmp_path / "empty.sqlite3"
+    ledger = H39BlindLedger(empty_ledger_path)
+
+    # With empty ledger, default get_summary uses wall clock
+    summary_empty = ledger.get_summary()
+    assert summary_empty["clock_source"] == "WALL_CLOCK"
+    assert summary_empty["expected_boundary_count"] > 0
+    assert summary_empty["observed_boundary_count"] == 0
+    assert summary_empty["eligible_boundary_count"] == 0
+    assert summary_empty["raw_observation_coverage"] == 0.0
+    assert summary_empty["eligible_coverage"] == 0.0
+
+    # Non-existent ledger via engine also accumulates expected boundaries
+    missing_path = tmp_path / "does_not_exist.sqlite3"
+    engine = H39ResearchEngine(microstructure_root=tmp_path, opportunity_store_path=tmp_path / "none.sqlite3")
+    status_missing = engine.get_blind_validation_status(ledger_path=missing_path)
+    assert status_missing["clock_source"] == "WALL_CLOCK"
+    assert status_missing["expected_boundary_count"] > 0
+    assert status_missing["observed_boundary_count"] == 0
+    assert status_missing["state"] == H39_STATE_INSUFFICIENT
