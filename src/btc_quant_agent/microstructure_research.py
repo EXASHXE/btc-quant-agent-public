@@ -19,6 +19,16 @@ import numpy as np
 
 from .config import DataConfig
 from .data.binance import BinancePublicClient
+from .h39_baseline import H39_ATR_HISTORY_15M_BARS, causal_wilder_atr_15m
+from .h39_input import (
+    H39_INPUT_CONTRACT_VERSION,
+    check_h39_required_input,
+    summarize_h39_required_inputs,
+)
+from .h39_statistics import (
+    H39_CORRECTED_EVALUATOR_VERSION,
+    conditional_incremental_ols_hac,
+)
 
 H39_HYPOTHESIS_ID = "H39_MICROSTRUCTURE_DIRECTIONAL_INFORMATION"
 H39_PROTOCOL_VERSION = "v0.3.22"
@@ -27,10 +37,21 @@ H39_CLARIFICATION_SHA = "2d1ccecc11dc231ffa41cdb1b5a9ea693abccc59"
 H39_PROTOCOL_CLARIFICATION_SHA = H39_CLARIFICATION_SHA
 H39_CLARIFICATION_002_SHA = "6e1259409aa4f1cedf86b7a424666ee7c942a929"
 H39_PROTOCOL_CLARIFICATION_002_SHA = H39_CLARIFICATION_002_SHA
-H39_CLARIFICATION_002_PATH = "deliverables/v0.3.25/H39_PROTOCOL_CLARIFICATION_002_DEPENDENCE_ROBUST_INFERENCE.json"
+H39_CLARIFICATION_002_PATH = (
+    "deliverables/v0.3.25/H39_PROTOCOL_CLARIFICATION_002_DEPENDENCE_ROBUST_INFERENCE.json"
+)
 H39_CLARIFICATION_003_SHA = "5d055ae17798bdc00e1b0d6388596ecd59358251"
 H39_PROTOCOL_CLARIFICATION_003_SHA = H39_CLARIFICATION_003_SHA
-H39_CLARIFICATION_003_PATH = "deliverables/v0.3.25/H39_PROTOCOL_CLARIFICATION_003_ROBUST_NESTED_NULL.json"
+H39_CLARIFICATION_003_PATH = (
+    "deliverables/v0.3.25/H39_PROTOCOL_CLARIFICATION_003_ROBUST_NESTED_NULL.json"
+)
+H39_PROTOCOL_VERSION_CORRECTED = "v0.3.26"
+H39_CLARIFICATION_004_PATH = (
+    "deliverables/v0.3.26/H39_PROTOCOL_CLARIFICATION_004_CONDITIONAL_INPUT_CONTRACT.json"
+)
+H39_FROZEN_CLARIFICATION_004_HASH = (
+    "a2f5e79a666d973b7fb86d23b92e8763ad341c831e652001304c4840fa91bb07"
+)
 V0323_STRICT_UNBLIND_REPAIR_SHA = "5f4a716f566abb7750e41fdd03d08a68526c1921"
 H39_STATE_INSUFFICIENT = "FORWARD_DATA_INSUFFICIENT"
 H39_STATE_READY = "H39_READY_FOR_ONE_SHOT_UNBLIND"
@@ -54,8 +75,12 @@ H39_MINIMUM_COVERAGE_RATIO = 0.90
 
 H39_FROZEN_PROTOCOL_HASH = "1b7d61409078f779585675e9f657a60ea1ef5384a7707c33bbac07535feaa979"
 H39_FROZEN_CLARIFICATION_HASH = "b2ba02df923950413c773e308e01d4ba893690948be9c258311d483ea753e284"
-H39_FROZEN_CLARIFICATION_002_HASH = "94c938b65640252c85a9e320b6f7759729ffa00f793c93e17cca52726e73212e"
-H39_FROZEN_CLARIFICATION_003_HASH = "035b7528141c714fbe1aef310462d5aa5fd96d3d5fdec67ae8f70082531d7a92"
+H39_FROZEN_CLARIFICATION_002_HASH = (
+    "94c938b65640252c85a9e320b6f7759729ffa00f793c93e17cca52726e73212e"
+)
+H39_FROZEN_CLARIFICATION_003_HASH = (
+    "035b7528141c714fbe1aef310462d5aa5fd96d3d5fdec67ae8f70082531d7a92"
+)
 
 # Fixed dependence-robust statistical parameters
 H39_HAC_MAX_LAG_60M = 3
@@ -67,8 +92,21 @@ H39_FUTURE_SKEW_TOLERANCE_SECONDS = 5.0
 
 MICROSTRUCTURE_REQUIRED_TABLES: frozenset[str] = frozenset({"agg_trades", "book_samples", "gaps"})
 MICROSTRUCTURE_REQUIRED_COLUMNS: dict[str, frozenset[str]] = {
-    "agg_trades": frozenset({"event_time_ms", "receive_time_ms", "price", "quantity", "aggressive_side"}),
-    "book_samples": frozenset({"event_time_ms", "receive_time_ms", "spread_bps", "top1_imbalance", "top5_imbalance", "top20_imbalance", "microprice", "ofi"}),
+    "agg_trades": frozenset(
+        {"event_time_ms", "receive_time_ms", "price", "quantity", "aggressive_side"}
+    ),
+    "book_samples": frozenset(
+        {
+            "event_time_ms",
+            "receive_time_ms",
+            "spread_bps",
+            "top1_imbalance",
+            "top5_imbalance",
+            "top20_imbalance",
+            "microprice",
+            "ofi",
+        }
+    ),
     "gaps": frozenset({"start_ms", "end_ms"}),
 }
 
@@ -110,7 +148,9 @@ REJECTION_REASONS = (
 
 
 @contextlib.contextmanager
-def _open_sqlite(path_or_uri: str | Path, **kwargs: Any) -> Generator[sqlite3.Connection, None, None]:
+def _open_sqlite(
+    path_or_uri: str | Path, **kwargs: Any
+) -> Generator[sqlite3.Connection, None, None]:
     """Context manager for SQLite connections that guarantees conn.close() on block exit."""
     conn = sqlite3.connect(path_or_uri, **kwargs)
     try:
@@ -411,10 +451,10 @@ def _newey_west_linear_regression(
     S = u.T @ u  # Gamma_0
 
     L = max(0, min(max_lag, n - 1))
-    for l in range(1, L + 1):
-        weight = 1.0 - (l / (L + 1.0))
-        u_lead = u[l:]
-        u_lag = u[:-l]
+    for lag in range(1, L + 1):
+        weight = 1.0 - (lag / (L + 1.0))
+        u_lead = u[lag:]
+        u_lag = u[:-lag]
         gamma_l = u_lead.T @ u_lag
         S += weight * (gamma_l + gamma_l.T)
 
@@ -465,10 +505,10 @@ def _l2_logistic_sandwich_cov(
     S = u.T @ u
 
     L = max(0, min(max_lag, n - 1))
-    for l in range(1, L + 1):
-        weight = 1.0 - (l / (L + 1.0))
-        u_lead = u[l:]
-        u_lag = u[:-l]
+    for lag in range(1, L + 1):
+        weight = 1.0 - (lag / (L + 1.0))
+        u_lead = u[lag:]
+        u_lag = u[:-lag]
         gamma_l = u_lead.T @ u_lag
         S += weight * (gamma_l + gamma_l.T)
 
@@ -629,7 +669,7 @@ def _hac_robust_nested_score_test(
     S_adj = float(np.sum(s))
 
     # 4. Long-run variance with Bartlett kernel up to max_lag
-    gamma_0 = float(np.sum(s ** 2))
+    gamma_0 = float(np.sum(s**2))
     gamma_sum = 0.0
     for lag in range(1, max_lag + 1):
         if lag < n:
@@ -709,7 +749,9 @@ def evaluate_forward_chain_health(
                         deriv_evidence["reason"] = "Required table 'derivative_snapshots' not found"
                     else:
                         # Verify required columns
-                        col_rows = conn.execute("PRAGMA table_info(derivative_snapshots)").fetchall()
+                        col_rows = conn.execute(
+                            "PRAGMA table_info(derivative_snapshots)"
+                        ).fetchall()
                         cols = {r[1] for r in col_rows}
                         required_cols = {
                             "observed_at_ms",
@@ -722,7 +764,9 @@ def evaluate_forward_chain_health(
                         missing_cols = required_cols - cols
                         if missing_cols:
                             deriv_evidence["status"] = "SCHEMA_ERROR"
-                            deriv_evidence["reason"] = f"Missing required columns: {sorted(missing_cols)}"
+                            deriv_evidence["reason"] = (
+                                f"Missing required columns: {sorted(missing_cols)}"
+                            )
                         else:
                             deriv_evidence["schema_valid"] = True
                             count_row = conn.execute(
@@ -734,7 +778,9 @@ def evaluate_forward_chain_health(
                             deriv_evidence["latest_observed_ms"] = max_obs
                             if cnt == 0:
                                 deriv_evidence["status"] = "EMPTY"
-                                deriv_evidence["reason"] = "Table 'derivative_snapshots' contains 0 rows"
+                                deriv_evidence["reason"] = (
+                                    "Table 'derivative_snapshots' contains 0 rows"
+                                )
                             else:
                                 if max_obs is not None:
                                     deriv_evidence["latest_observed_utc"] = datetime.fromtimestamp(
@@ -747,7 +793,9 @@ def evaluate_forward_chain_health(
                                             f"Derivatives snapshot timestamp is in the future: "
                                             f"{max_obs} > {ref_ms} (skew: {skew_ms / 1000.0:.3f}s > {H39_FUTURE_SKEW_TOLERANCE_SECONDS}s)"
                                         )
-                                        deriv_evidence["freshness_seconds"] = round((ref_ms - max_obs) / 1000.0, 3)
+                                        deriv_evidence["freshness_seconds"] = round(
+                                            (ref_ms - max_obs) / 1000.0, 3
+                                        )
                                     else:
                                         freshness_s = max(0.0, (ref_ms - max_obs) / 1000.0)
                                         deriv_evidence["freshness_seconds"] = round(freshness_s, 3)
@@ -787,6 +835,13 @@ def evaluate_forward_chain_health(
         "latest_receive_time_utc": None,
         "freshness_basis": None,
         "freshness_seconds": None,
+        "book_status": "UNKNOWN",
+        "trade_status": "UNKNOWN",
+        "book_age_seconds": None,
+        "trade_age_seconds": None,
+        "window_completeness": "NOT_EVALUATED",
+        "baseline_completeness": "NOT_EVALUATED",
+        "overall_research_health": "UNKNOWN",
         "collector_heartbeat_status": "NOT_VERIFIED",
         "status": "UNKNOWN",
         "reason": "",
@@ -816,7 +871,9 @@ def evaluate_forward_chain_health(
                     micro_evidence["latest_partition_integrity"] = msg
                     if not ok:
                         micro_evidence["status"] = "INTEGRITY_ERROR"
-                        micro_evidence["reason"] = f"Partition {latest_p.name} integrity failed: {msg}"
+                        micro_evidence["reason"] = (
+                            f"Partition {latest_p.name} integrity failed: {msg}"
+                        )
                     else:
                         with loader.connect_readonly() as conn:
                             tbls = {
@@ -835,7 +892,9 @@ def evaluate_forward_chain_health(
                             else:
                                 missing_columns: dict[str, list[str]] = {}
                                 for t_name, req_cols in MICROSTRUCTURE_REQUIRED_COLUMNS.items():
-                                    col_rows = conn.execute(f"PRAGMA table_info({t_name})").fetchall()
+                                    col_rows = conn.execute(
+                                        f"PRAGMA table_info({t_name})"
+                                    ).fetchall()
                                     cols = {str(r[1]) for r in col_rows}
                                     m_cols = req_cols - cols
                                     if m_cols:
@@ -853,12 +912,44 @@ def evaluate_forward_chain_health(
                                     row_t = conn.execute(
                                         "SELECT MAX(event_time_ms), MAX(receive_time_ms) FROM agg_trades"
                                     ).fetchone()
-                                    max_event_b, max_recv_b = (row_b[0], row_b[1]) if row_b else (None, None)
-                                    max_event_t, max_recv_t = (row_t[0], row_t[1]) if row_t else (None, None)
-                                    events = [t for t in (max_event_b, max_event_t) if t is not None]
+                                    max_event_b, max_recv_b = (
+                                        (row_b[0], row_b[1]) if row_b else (None, None)
+                                    )
+                                    max_event_t, max_recv_t = (
+                                        (row_t[0], row_t[1]) if row_t else (None, None)
+                                    )
+                                    events = [
+                                        t for t in (max_event_b, max_event_t) if t is not None
+                                    ]
                                     recvs = [t for t in (max_recv_b, max_recv_t) if t is not None]
                                     max_event = max(events) if events else None
                                     max_recv = max(recvs) if recvs else None
+
+                                    def _stream_state(
+                                        event_ms: int | None, receive_ms: int | None
+                                    ) -> tuple[str, float | None, int | None]:
+                                        effective = (
+                                            receive_ms if receive_ms is not None else event_ms
+                                        )
+                                        if effective is None:
+                                            return "MISSING", None, None
+                                        age = (ref_ms - int(effective)) / 1000.0
+                                        if age < -H39_FUTURE_SKEW_TOLERANCE_SECONDS:
+                                            return "TIMESTAMP_ERROR", round(age, 3), int(effective)
+                                        if age > microstructure_stale_threshold_seconds:
+                                            return "STALE", round(max(0.0, age), 3), int(effective)
+                                        return "HEALTHY", round(max(0.0, age), 3), int(effective)
+
+                                    book_status, book_age, _book_effective = _stream_state(
+                                        max_event_b, max_recv_b
+                                    )
+                                    trade_status, trade_age, _trade_effective = _stream_state(
+                                        max_event_t, max_recv_t
+                                    )
+                                    micro_evidence["book_status"] = book_status
+                                    micro_evidence["trade_status"] = trade_status
+                                    micro_evidence["book_age_seconds"] = book_age
+                                    micro_evidence["trade_age_seconds"] = trade_age
 
                                     micro_evidence["latest_event_time_ms"] = max_event
                                     micro_evidence["latest_event_time_utc"] = (
@@ -877,41 +968,62 @@ def evaluate_forward_chain_health(
                                         micro_evidence["freshness_basis"] = "LOCAL_RECEIVE_TIME"
                                         effective_ts = max_recv
                                     elif max_event is not None:
-                                        micro_evidence["freshness_basis"] = "EXCHANGE_EVENT_TIME_FALLBACK"
+                                        micro_evidence["freshness_basis"] = (
+                                            "EXCHANGE_EVENT_TIME_FALLBACK"
+                                        )
                                         effective_ts = max_event
                                     else:
                                         effective_ts = None
 
                                     if effective_ts is None:
                                         micro_evidence["status"] = "EMPTY"
-                                        micro_evidence["reason"] = f"Partition {latest_p.name} contains no events"
+                                        micro_evidence["reason"] = (
+                                            f"Partition {latest_p.name} contains no events"
+                                        )
                                     else:
                                         future_skew_ms = effective_ts - ref_ms
-                                        if future_skew_ms > int(H39_FUTURE_SKEW_TOLERANCE_SECONDS * 1000):
+                                        if future_skew_ms > int(
+                                            H39_FUTURE_SKEW_TOLERANCE_SECONDS * 1000
+                                        ):
                                             micro_evidence["status"] = "TIMESTAMP_ERROR"
                                             micro_evidence["reason"] = (
                                                 f"Partition {latest_p.name} timestamp is in the future: "
                                                 f"{effective_ts} > {ref_ms} (skew: {future_skew_ms / 1000.0:.3f}s > {H39_FUTURE_SKEW_TOLERANCE_SECONDS}s)"
                                             )
-                                            micro_evidence["freshness_seconds"] = round((ref_ms - effective_ts) / 1000.0, 3)
+                                            micro_evidence["freshness_seconds"] = round(
+                                                (ref_ms - effective_ts) / 1000.0, 3
+                                            )
+                                        elif book_status != "HEALTHY" or trade_status != "HEALTHY":
+                                            stream_states = {book_status, trade_status}
+                                            if "TIMESTAMP_ERROR" in stream_states:
+                                                micro_evidence["status"] = "TIMESTAMP_ERROR"
+                                            elif "MISSING" in stream_states:
+                                                micro_evidence["status"] = "MISSING"
+                                            else:
+                                                micro_evidence["status"] = "STALE"
+                                            micro_evidence["reason"] = (
+                                                "H39 requires both streams: "
+                                                f"book={book_status} (age={book_age}), "
+                                                f"trade={trade_status} (age={trade_age})"
+                                            )
                                         else:
                                             freshness_s = max(0.0, (ref_ms - effective_ts) / 1000.0)
-                                            micro_evidence["freshness_seconds"] = round(freshness_s, 3)
-                                            if freshness_s > microstructure_stale_threshold_seconds:
-                                                micro_evidence["status"] = "STALE"
-                                                micro_evidence["reason"] = (
-                                                    f"Latest partition {micro_evidence['freshness_basis']} is {freshness_s:.1f}s old "
-                                                    f"(stale threshold: {microstructure_stale_threshold_seconds}s)"
-                                                )
-                                            else:
-                                                micro_evidence["status"] = "HEALTHY"
-                                                micro_evidence["reason"] = (
-                                                    f"Partition {latest_p.name} verified: full schema OK, integrity OK, "
-                                                    f"freshness {freshness_s:.1f}s ({micro_evidence['freshness_basis']})"
-                                                )
+                                            micro_evidence["freshness_seconds"] = round(
+                                                freshness_s, 3
+                                            )
+                                            micro_evidence["status"] = "HEALTHY"
+                                            micro_evidence["reason"] = (
+                                                f"Partition {latest_p.name} verified: book and trade streams healthy, "
+                                                f"integrity/schema OK (book age={book_age}s, trade age={trade_age}s)"
+                                            )
+                                    micro_evidence["overall_research_health"] = micro_evidence[
+                                        "status"
+                                    ]
                 except Exception as exc:  # noqa: BLE001
                     micro_evidence["status"] = "READ_ERROR"
                     micro_evidence["reason"] = f"Failed to read partition {latest_p.name}: {exc}"
+
+    micro_evidence["overall_research_health"] = micro_evidence["status"]
 
     # 3. Opportunity Shadow Chain (Terminal H38)
     opp_evidence = {
@@ -960,15 +1072,42 @@ def evaluate_forward_chain_health(
 
 
 class MicrostructureResearchLoader:
-    def __init__(self, partition_path: str | Path) -> None:
+    def __init__(
+        self,
+        partition_path: str | Path,
+        adjacent_partition_paths: Sequence[str | Path] = (),
+    ) -> None:
         self.path = Path(partition_path).resolve()
         if not self.path.exists():
             raise FileNotFoundError(f"Microstructure partition not found: {self.path}")
+        self.adjacent_paths = tuple(
+            path
+            for path in (Path(item).resolve() for item in adjacent_partition_paths)
+            if path.exists() and path != self.path
+        )
 
     @contextlib.contextmanager
     def connect_readonly(self) -> Generator[sqlite3.Connection, None, None]:
         # Strict read-only URI mode and query_only pragma
         path_str = self.path.as_posix()
+        if self.adjacent_paths:
+            conn = sqlite3.connect(":memory:", timeout=10.0, uri=True)
+            conn.row_factory = sqlite3.Row
+            sources = (self.path, *self.adjacent_paths)
+            try:
+                for idx, source in enumerate(sources):
+                    uri = f"file:{source.as_posix()}?mode=ro"
+                    conn.execute(f"ATTACH DATABASE ? AS p{idx}", (uri,))
+                for table in ("agg_trades", "book_samples", "gaps"):
+                    union = " UNION ALL ".join(
+                        f"SELECT * FROM p{idx}.{table}" for idx in range(len(sources))
+                    )
+                    conn.execute(f"CREATE TEMP VIEW {table} AS {union}")
+                conn.execute("PRAGMA query_only = ON;")
+                yield conn
+            finally:
+                conn.close()
+            return
         try:
             conn = sqlite3.connect(f"file:{path_str}?mode=ro", uri=True, timeout=10.0)
         except sqlite3.OperationalError:
@@ -987,7 +1126,9 @@ class MicrostructureResearchLoader:
             return status.lower() == "ok", status
 
     def get_time_range(self) -> tuple[int | None, int | None]:
-        with self.connect_readonly() as conn:
+        # Inventory is scoped to the primary partition; adjacent partitions are
+        # consulted only to complete windows that cross the file boundary.
+        with _open_sqlite(f"file:{self.path.as_posix()}?mode=ro", uri=True) as conn:
             row_b = conn.execute(
                 "SELECT MIN(event_time_ms), MAX(event_time_ms) FROM book_samples"
             ).fetchone()
@@ -1032,6 +1173,8 @@ class MicrostructureResearchLoader:
                 if (curr_t - prev_t) > 10_000:
                     return False, "MISSING_BOOK_COVERAGE"
                 prev_t = curr_t
+            if (slot_ms - prev_t) > 10_000:
+                return False, "MISSING_BOOK_COVERAGE"
 
             # 3. Trade count and volume check
             t_rows = conn.execute(
@@ -1050,6 +1193,8 @@ class MicrostructureResearchLoader:
                 if (curr_t - prev_t) > 60_000:
                     return False, "MISSING_TRADE_COVERAGE"
                 prev_t = curr_t
+            if (slot_ms - prev_t) > 60_000:
+                return False, "MISSING_TRADE_COVERAGE"
 
         return True, None
 
@@ -1122,12 +1267,7 @@ class MicrostructureResearchLoader:
                     if top20 is not None:
                         top20_imb_5m.append(float(top20))
 
-                if (
-                    ev_time > t_1m
-                    and micro is not None
-                    and spread is not None
-                    and top1 is not None
-                ):
+                if ev_time > t_1m and micro is not None and spread is not None and top1 is not None:
                     u_micro = float(micro)
                     u_spread = float(spread)
                     u_top1 = float(top1)
@@ -1172,9 +1312,7 @@ def evaluate_feature_hypotheses(
     # Strict fail-closed guard on real post-start validation evidence in v0.3.23:
     # Post-start validation slots (slot_ms >= H39_VALIDATION_START_MS) cannot be formally evaluated
     # in v0.3.23 under any circumstances (unconditional fail-closed refusal). No unblind bypass is permitted.
-    has_post_start = any(
-        obs.feature_row.slot_ms >= H39_VALIDATION_START_MS for obs in observations
-    )
+    has_post_start = any(obs.feature_row.slot_ms >= H39_VALIDATION_START_MS for obs in observations)
     if has_post_start:
         raise RuntimeError(
             f"{REFUSED_VALIDATION_NOT_MATURE}: Formal evaluation of post-start fresh forward validation outcomes "
@@ -1305,21 +1443,14 @@ def evaluate_feature_hypotheses(
         p_holm = p_holm_list[idx]
         sign_expected = PREDEFINED_FEATURE_SIGNS[fid]
         sign_correct = res["effect"] > 0 if sign_expected == 1 else res["effect"] < 0
-        ci_excludes = (
-            (res["ci_lower"] > 0) if sign_expected == 1 else (res["ci_upper"] < 0)
-        )
+        ci_excludes = (res["ci_lower"] > 0) if sign_expected == 1 else (res["ci_upper"] < 0)
         passes_incremental = (
             res["inc_lr_p"] is not None
             and res["inc_lr_p"] < 0.05
             and res["inc_z_stat"] is not None
             and res["inc_z_stat"] > 0
         )
-        passes_primary = (
-            sign_correct
-            and p_holm < 0.05
-            and ci_excludes
-            and passes_incremental
-        )
+        passes_primary = sign_correct and p_holm < 0.05 and ci_excludes and passes_incremental
 
         final_results[fid] = FeatureTestResult(
             feature_id=fid,
@@ -1410,6 +1541,7 @@ class H39BlindLedger:
                     source_partition_hashes TEXT NOT NULL,
                     protocol_hash TEXT NOT NULL,
                     clarification_hash TEXT NOT NULL,
+                    input_contract_version TEXT,
                     code_version_sha TEXT NOT NULL,
                     ingested_at_utc TEXT NOT NULL
                 )"""
@@ -1433,6 +1565,14 @@ class H39BlindLedger:
             conn.execute(
                 "CREATE INDEX IF NOT EXISTS idx_h39_ledger_eligible ON h39_blind_validation_ledger(eligible);"
             )
+            existing_columns = {
+                str(row[1])
+                for row in conn.execute("PRAGMA table_info(h39_blind_validation_ledger)").fetchall()
+            }
+            if "input_contract_version" not in existing_columns:
+                conn.execute(
+                    "ALTER TABLE h39_blind_validation_ledger ADD COLUMN input_contract_version TEXT"
+                )
             conn.commit()
 
     def record_or_verify_source_partition(
@@ -1559,9 +1699,7 @@ class H39BlindLedger:
                     h.update(chunk)
             curr_sha = h.hexdigest()
             if is_finalized and curr_sha != recorded_sha:
-                partitions_mutated.append(
-                    f"{p_name}: recorded={recorded_sha}, current={curr_sha}"
-                )
+                partitions_mutated.append(f"{p_name}: recorded={recorded_sha}, current={curr_sha}")
                 partition_verifications.append(
                     {
                         "partition_name": p_name,
@@ -1661,9 +1799,7 @@ class H39BlindLedger:
                 # Hash pinning checks
                 row_p_hash = str(row.get("protocol_hash", ""))
                 if row_p_hash != p_hash:
-                    raise ValueError(
-                        f"Protocol hash mismatch: expected {p_hash}, got {row_p_hash}"
-                    )
+                    raise ValueError(f"Protocol hash mismatch: expected {p_hash}, got {row_p_hash}")
                 row_c_hash = str(row.get("clarification_hash", ""))
                 if row_c_hash != c_hash:
                     raise ValueError(
@@ -1684,7 +1820,11 @@ class H39BlindLedger:
                                 "SELECT partition_sha256, finalized FROM h39_source_partitions WHERE partition_name = ?",
                                 (pname,),
                             ).fetchone()
-                            if sp_row is not None and bool(sp_row["finalized"]) and sp_row["partition_sha256"] != phash:
+                            if (
+                                sp_row is not None
+                                and bool(sp_row["finalized"])
+                                and sp_row["partition_sha256"] != phash
+                            ):
                                 raise RuntimeError(
                                     f"SOURCE_PARTITION_MUTATION: Source partition {pname} hash mutated from {sp_row['partition_sha256']} to {phash}!"
                                 )
@@ -1702,12 +1842,12 @@ class H39BlindLedger:
                 target_60m = int(row.get("target_60m_ms", 0))
                 if target_60m != ref_time + 59 * 60_000:
                     raise ValueError(
-                        f"Invalid 60m target timing: target_60m_ms={target_60m} must equal reference_time_ms + 59*60_000 ({ref_time + 59*60_000})"
+                        f"Invalid 60m target timing: target_60m_ms={target_60m} must equal reference_time_ms + 59*60_000 ({ref_time + 59 * 60_000})"
                     )
                 target_240m = int(row.get("target_240m_ms", 0))
                 if target_240m != ref_time + 239 * 60_000:
                     raise ValueError(
-                        f"Invalid 240m target timing: target_240m_ms={target_240m} must equal reference_time_ms + 239*60_000 ({ref_time + 239*60_000})"
+                        f"Invalid 240m target timing: target_240m_ms={target_240m} must equal reference_time_ms + 239*60_000 ({ref_time + 239 * 60_000})"
                     )
 
                 existing = conn.execute(
@@ -1741,6 +1881,11 @@ class H39BlindLedger:
                         "trailing_return_15m",
                         "trailing_return_60m",
                         "trailing_atr_ratio_15m",
+                        "trailing_atr_15m",
+                        "decision_close_price",
+                        "book_sample_count_15m",
+                        "trade_count_15m",
+                        "input_contract_version",
                     ]
                     for f in fields_to_check:
                         if not _close_match(existing[f], row.get(f)):
@@ -1756,18 +1901,20 @@ class H39BlindLedger:
                     or row.get("decision_close_utc")
                     or datetime.fromtimestamp(slot_ms / 1000, UTC).isoformat()
                 )
-                source_partitions = (
-                    row.get("source_partitions")
-                    or (json.dumps([row["source_partition"]]) if "source_partition" in row else json.dumps([]))
+                source_partitions = row.get("source_partitions") or (
+                    json.dumps([row["source_partition"]])
+                    if "source_partition" in row
+                    else json.dumps([])
                 )
-                source_partition_hashes = (
-                    row.get("source_partition_hashes")
-                    or (json.dumps({row.get("source_partition", "p"): row.get("source_partition_sha256", "")}) if "source_partition_sha256" in row else json.dumps({}))
+                source_partition_hashes = row.get("source_partition_hashes") or (
+                    json.dumps(
+                        {row.get("source_partition", "p"): row.get("source_partition_sha256", "")}
+                    )
+                    if "source_partition_sha256" in row
+                    else json.dumps({})
                 )
                 code_version_sha = (
-                    row.get("code_version_sha")
-                    or row.get("code_git_sha")
-                    or _get_current_git_sha()
+                    row.get("code_version_sha") or row.get("code_git_sha") or _get_current_git_sha()
                 )
                 ingested_at_utc = row.get("ingested_at_utc") or datetime.now(UTC).isoformat()
                 feat_win_start = int(row.get("feature_window_start_ms", slot_ms - 15 * 60_000))
@@ -1803,6 +1950,7 @@ class H39BlindLedger:
                     "source_partition_hashes": source_partition_hashes,
                     "protocol_hash": p_hash,
                     "clarification_hash": c_hash,
+                    "input_contract_version": row.get("input_contract_version"),
                     "code_version_sha": code_version_sha,
                     "ingested_at_utc": ingested_at_utc,
                 }
@@ -1825,18 +1973,28 @@ class H39BlindLedger:
         inserted = self.ingest_slot(row)
         return "INSERTED" if inserted else "DUPLICATE_IDEMPOTENT"
 
-    def get_summary(
-        self, as_of_ms: int | None = None, now_ms: int | None = None
-    ) -> dict[str, Any]:
+    def get_summary(self, as_of_ms: int | None = None, now_ms: int | None = None) -> dict[str, Any]:
+        if as_of_ms is not None:
+            clock_ceiling_ms = int(as_of_ms)
+            clock_source = "EXPLICIT_AS_OF"
+        elif now_ms is not None:
+            clock_ceiling_ms = int(now_ms)
+            clock_source = "EXPLICIT_AS_OF"
+        else:
+            clock_ceiling_ms = int(datetime.now(UTC).timestamp() * 1000)
+            clock_source = "WALL_CLOCK"
+
         with sqlite3.connect(self.db_path) as conn:
             conn.row_factory = sqlite3.Row
             rows = conn.execute(
-                "SELECT * FROM h39_blind_validation_ledger ORDER BY decision_close_ms ASC"
+                """SELECT * FROM h39_blind_validation_ledger
+                   WHERE decision_close_ms <= ? ORDER BY decision_close_ms ASC""",
+                (clock_ceiling_ms,),
             ).fetchall()
 
         total_observed = len(rows)
         eligible_count = 0
-        distinct_days: set[str] = set()
+        microstructure_distinct_days: set[str] = set()
         rejection_counts: dict[str, int] = {}
         latest_slot_ms: int | None = None
         earliest_slot_ms: int | None = None
@@ -1851,39 +2009,36 @@ class H39BlindLedger:
             if bool(r["eligible"]):
                 eligible_count += 1
                 dt = datetime.fromtimestamp(slot_ms / 1000, UTC)
-                distinct_days.add(dt.strftime("%Y-%m-%d"))
+                microstructure_distinct_days.add(dt.strftime("%Y-%m-%d"))
             else:
                 reason = str(r["rejection_reason"]) if r["rejection_reason"] else "UNKNOWN"
                 rejection_counts[reason] = rejection_counts.get(reason, 0) + 1
 
-        if as_of_ms is not None:
-            clock_ceiling_ms = int(as_of_ms)
-            clock_source = "EXPLICIT_AS_OF"
-        elif now_ms is not None:
-            clock_ceiling_ms = int(now_ms)
-            clock_source = "EXPLICIT_AS_OF"
-        else:
-            clock_ceiling_ms = int(datetime.now(UTC).timestamp() * 1000)
-            clock_source = "WALL_CLOCK"
-
         clock_ceiling_utc = datetime.fromtimestamp(clock_ceiling_ms / 1000, UTC).isoformat()
         if clock_ceiling_ms >= H39_VALIDATION_START_MS:
-            expected_boundaries = (
-                (clock_ceiling_ms - H39_VALIDATION_START_MS) // 900_000
-            ) + 1
+            expected_boundaries = ((clock_ceiling_ms - H39_VALIDATION_START_MS) // 900_000) + 1
         else:
             expected_boundaries = 0
 
-        raw_coverage = (
-            (total_observed / expected_boundaries) if expected_boundaries > 0 else 0.0
-        )
-        eligible_coverage = (
+        raw_coverage = (total_observed / expected_boundaries) if expected_boundaries > 0 else 0.0
+        input_summary = summarize_h39_required_inputs(rows)
+        formal_ready_count = int(input_summary["formal_test_ready_slots"])
+        baseline_complete_count = int(input_summary["baseline_complete_slots"])
+        formal_ready_days = {
+            datetime.fromtimestamp(int(row["decision_close_ms"]) / 1000, UTC).strftime("%Y-%m-%d")
+            for row in rows
+            if check_h39_required_input(row).formal_test_ready
+        }
+        microstructure_coverage = (
             (eligible_count / expected_boundaries) if expected_boundaries > 0 else 0.0
         )
-        coverage_ratio = eligible_coverage
+        formal_ready_coverage = (
+            (formal_ready_count / expected_boundaries) if expected_boundaries > 0 else 0.0
+        )
+        coverage_ratio = formal_ready_coverage
         is_mature = (
-            len(distinct_days) >= H39_MINIMUM_VALIDATION_DAYS
-            and eligible_count >= H39_MINIMUM_ELIGIBLE_OBSERVATIONS
+            len(formal_ready_days) >= H39_MINIMUM_VALIDATION_DAYS
+            and formal_ready_count >= H39_MINIMUM_ELIGIBLE_OBSERVATIONS
             and coverage_ratio >= H39_MINIMUM_COVERAGE_RATIO
         )
 
@@ -1903,21 +2058,30 @@ class H39BlindLedger:
             ),
             "expected_boundary_count": expected_boundaries,
             "observed_boundary_count": total_observed,
-            "eligible_boundary_count": eligible_count,
+            "eligible_boundary_count": formal_ready_count,
+            "microstructure_eligible_boundary_count": eligible_count,
+            "baseline_complete_boundary_count": baseline_complete_count,
+            "formal_test_ready_boundary_count": formal_ready_count,
             "raw_observation_coverage": raw_coverage,
-            "eligible_coverage": eligible_coverage,
+            "eligible_coverage": formal_ready_coverage,
+            "microstructure_eligible_coverage": microstructure_coverage,
+            "formal_test_ready_coverage": formal_ready_coverage,
             "coverage_ratio": coverage_ratio,
-            "distinct_days_count": len(distinct_days),
-            "distinct_days": sorted(distinct_days),
+            "distinct_days_count": len(formal_ready_days),
+            "distinct_days": sorted(formal_ready_days),
+            "microstructure_distinct_days_count": len(microstructure_distinct_days),
             "rejection_reason_counts": rejection_counts,
+            "input_contract_diagnostics": {
+                key: value for key, value in input_summary.items() if key != "checks"
+            },
             "maturity_gates": {
                 "minimum_distinct_days": H39_MINIMUM_VALIDATION_DAYS,
                 "minimum_eligible_observations": H39_MINIMUM_ELIGIBLE_OBSERVATIONS,
                 "minimum_coverage_ratio": H39_MINIMUM_COVERAGE_RATIO,
             },
             "maturity_achieved": is_mature,
-            "days_gate_passed": len(distinct_days) >= H39_MINIMUM_VALIDATION_DAYS,
-            "observations_gate_passed": eligible_count >= H39_MINIMUM_ELIGIBLE_OBSERVATIONS,
+            "days_gate_passed": len(formal_ready_days) >= H39_MINIMUM_VALIDATION_DAYS,
+            "observations_gate_passed": formal_ready_count >= H39_MINIMUM_ELIGIBLE_OBSERVATIONS,
             "coverage_gate_passed": coverage_ratio >= H39_MINIMUM_COVERAGE_RATIO,
             "terminal_breach_detected": False,
             "safety_firewalls": {
@@ -2074,7 +2238,15 @@ class H39ResearchEngine:
                             for c in fetched:
                                 conn.execute(
                                     "INSERT OR REPLACE INTO klines_1m VALUES (?, ?, ?, ?, ?, ?, ?)",
-                                    (c.open_time_ms, c.open, c.high, c.low, c.close, c.volume, c.close_time_ms),
+                                    (
+                                        c.open_time_ms,
+                                        c.open,
+                                        c.high,
+                                        c.low,
+                                        c.close,
+                                        c.volume,
+                                        c.close_time_ms,
+                                    ),
                                 )
                                 candles[c.open_time_ms] = {
                                     "open": c.open,
@@ -2108,9 +2280,7 @@ class H39ResearchEngine:
         if end_ms is not None:
             s_end = min(s_end, (end_ms // 900_000) * 900_000)
 
-        shadow_scans = self.load_scans_from_opportunity_shadow()
-
-        c_req_start = s_start - 65 * 60_000
+        c_req_start = s_start - H39_ATR_HISTORY_15M_BARS * 15 * 60_000
         c_req_end = s_end + 60_000 + 245 * 60_000
         canonical_candles = self.get_canonical_1m_candles(
             c_req_start, c_req_end, candle_client=candle_client
@@ -2165,8 +2335,7 @@ class H39ResearchEngine:
                 else None
             )
 
-            sh_scan = shadow_scans.get(curr_slot)
-            atr_15m = sh_scan.get("atr_15m") if sh_scan else None
+            atr_15m = causal_wilder_atr_15m(canonical_candles, curr_slot)
             atr_ratio = (
                 (atr_15m / dec_close)
                 if (atr_15m is not None and dec_close is not None and dec_close > 0)
@@ -2231,7 +2400,9 @@ class H39ResearchEngine:
             "stage": "DEVELOPMENT",
             "status": status,
             "partition": dev_path.name,
-            "cutoff_utc": self.protocol["temporal_partitioning"]["development_microstructure_cutoff_utc"],
+            "cutoff_utc": self.protocol["temporal_partitioning"][
+                "development_microstructure_cutoff_utc"
+            ],
             "cutoff_ms": dev_cutoff_ms,
             "total_slots": len(obs),
             "eligible_slots": len(eligible_obs),
@@ -2242,12 +2413,8 @@ class H39ResearchEngine:
                 "min_eligible_observations": min_obs,
             },
             "maturity_passed": is_sufficient,
-            "feature_statistics_60m": {
-                fid: asdict(stats_60m[fid]) for fid in FORMAL_FEATURE_IDS
-            },
-            "feature_statistics_240m": {
-                fid: asdict(stats_240m[fid]) for fid in FORMAL_FEATURE_IDS
-            },
+            "feature_statistics_60m": {fid: asdict(stats_60m[fid]) for fid in FORMAL_FEATURE_IDS},
+            "feature_statistics_240m": {fid: asdict(stats_240m[fid]) for fid in FORMAL_FEATURE_IDS},
             "observations_summary": [
                 {
                     "slot_utc": o.feature_row.slot_utc,
@@ -2287,7 +2454,9 @@ class H39ResearchEngine:
         )
         val_start_ms = int(self.protocol["temporal_partitioning"]["validation_start_ms"])
         val_start_utc = self.protocol["temporal_partitioning"]["validation_start_utc"]
-        buf_start_utc = self.protocol["temporal_partitioning"]["exclusion_buffer"]["buffer_start_utc"]
+        buf_start_utc = self.protocol["temporal_partitioning"]["exclusion_buffer"][
+            "buffer_start_utc"
+        ]
         buf_end_utc = self.protocol["temporal_partitioning"]["exclusion_buffer"]["buffer_end_utc"]
 
         min_days = int(
@@ -2398,7 +2567,6 @@ class H39ResearchEngine:
         ledger = H39BlindLedger(l_path)
 
         val_start_ms = H39_VALIDATION_START_MS
-        shadow_scans = self.load_scans_from_opportunity_shadow()
         code_sha = _get_current_git_sha()
 
         partitions = sorted(self.microstructure_root.glob("microstructure-*.sqlite3"))
@@ -2408,7 +2576,7 @@ class H39ResearchEngine:
         partitions_processed = []
         today_utc_str = datetime.now(UTC).strftime("%Y-%m-%d")
 
-        for p in partitions:
+        for partition_index, p in enumerate(partitions):
             m = re.search(r"(\d{4}-\d{2}-\d{2})", p.name)
             p_date = m.group(1) if m else None
             is_finalized = bool(p_date and p_date < today_utc_str)
@@ -2416,12 +2584,27 @@ class H39ResearchEngine:
             if only_finalized and not is_finalized:
                 continue
 
-            loader = MicrostructureResearchLoader(p)
+            previous_partition = partitions[partition_index - 1] if partition_index > 0 else None
+            loader = MicrostructureResearchLoader(
+                p,
+                adjacent_partition_paths=([previous_partition] if previous_partition else ()),
+            )
             min_t, max_t = loader.get_time_range()
             if min_t is None or max_t is None or max_t < val_start_ms:
                 continue
 
             # Record or verify partition before slot processing (detects mutation)
+            if previous_partition is not None:
+                previous_loader = MicrostructureResearchLoader(previous_partition)
+                previous_min, previous_max = previous_loader.get_time_range()
+                previous_date_match = re.search(r"(\d{4}-\d{2}-\d{2})", previous_partition.name)
+                previous_date = previous_date_match.group(1) if previous_date_match else None
+                ledger.record_or_verify_source_partition(
+                    previous_partition,
+                    finalized=bool(previous_date and previous_date < today_utc_str),
+                    min_time_ms=previous_min,
+                    max_time_ms=previous_max,
+                )
             ledger.record_or_verify_source_partition(
                 p, finalized=is_finalized, min_time_ms=min_t, max_time_ms=max_t
             )
@@ -2436,6 +2619,11 @@ class H39ResearchEngine:
                 p_hash = h.hexdigest()
             except Exception:  # noqa: BLE001
                 p_hash = "UNKNOWN_HASH"
+            source_partition_hashes = {p.name: p_hash}
+            if previous_partition is not None:
+                source_partition_hashes[previous_partition.name] = _compute_sha256(
+                    previous_partition
+                )
 
             # Determine 15m decision slots in [max(min_t, val_start_ms), max_t]
             s_start = max(val_start_ms, ((min_t + 900_000 - 1) // 900_000) * 900_000)
@@ -2445,8 +2633,10 @@ class H39ResearchEngine:
                 continue
 
             # Load canonical candles for baseline features
-            c_req_start = s_start - 65 * 60_000
-            c_req_end = s_end + 60_000
+            # Neutral baseline producer: 500 completed 15m bars, matching the
+            # runtime Wilder ATR14 history, with no Opportunity-campaign dependency.
+            c_req_start = s_start - H39_ATR_HISTORY_15M_BARS * 15 * 60_000
+            c_req_end = s_end - 60_000
             canonical_candles = self.get_canonical_1m_candles(
                 c_req_start, c_req_end, candle_client=candle_client
             )
@@ -2487,8 +2677,7 @@ class H39ResearchEngine:
                     if (dec_close and close_60_ago and close_60_ago > 0)
                     else None
                 )
-                sh_scan = shadow_scans.get(curr_slot)
-                atr_15m = sh_scan.get("atr_15m") if sh_scan else None
+                atr_15m = causal_wilder_atr_15m(canonical_candles, curr_slot)
                 atr_ratio = (
                     (atr_15m / dec_close)
                     if (atr_15m is not None and dec_close and dec_close > 0)
@@ -2523,10 +2712,11 @@ class H39ResearchEngine:
                     "reference_time_ms": ref_time_ms,
                     "target_60m_ms": target_60m_ms,
                     "target_240m_ms": target_240m_ms,
-                    "source_partitions": json.dumps([p.name]),
-                    "source_partition_hashes": json.dumps({p.name: p_hash}),
+                    "source_partitions": json.dumps(sorted(source_partition_hashes)),
+                    "source_partition_hashes": json.dumps(source_partition_hashes, sort_keys=True),
                     "protocol_hash": H39_FROZEN_PROTOCOL_HASH,
                     "clarification_hash": H39_FROZEN_CLARIFICATION_HASH,
+                    "input_contract_version": H39_INPUT_CONTRACT_VERSION,
                     "code_version_sha": code_sha,
                     "ingested_at_utc": datetime.now(UTC).isoformat(),
                 }
@@ -2629,9 +2819,7 @@ class H39ResearchEngine:
 
             clock_ceiling_utc = datetime.fromtimestamp(clock_ceiling_ms / 1000, UTC).isoformat()
             if clock_ceiling_ms >= H39_VALIDATION_START_MS:
-                expected_boundaries = (
-                    (clock_ceiling_ms - H39_VALIDATION_START_MS) // 900_000
-                ) + 1
+                expected_boundaries = ((clock_ceiling_ms - H39_VALIDATION_START_MS) // 900_000) + 1
             else:
                 expected_boundaries = 0
 
@@ -2801,15 +2989,11 @@ def generate_all_v0322_deliverables(
                 "integrity_check": check_msg,
                 "min_event_time_ms": min_t,
                 "min_event_time_utc": (
-                    datetime.fromtimestamp(min_t / 1000, UTC).isoformat()
-                    if min_t
-                    else None
+                    datetime.fromtimestamp(min_t / 1000, UTC).isoformat() if min_t else None
                 ),
                 "max_event_time_ms": max_t,
                 "max_event_time_utc": (
-                    datetime.fromtimestamp(max_t / 1000, UTC).isoformat()
-                    if max_t
-                    else None
+                    datetime.fromtimestamp(max_t / 1000, UTC).isoformat() if max_t else None
                 ),
                 "counts": {
                     "depth_events": depth_cnt,
@@ -3252,14 +3436,18 @@ def generate_all_v0323_deliverables(
     if deriv_path.exists():
         try:
             with sqlite3.connect(f"file:{deriv_path.as_posix()}?mode=ro", uri=True) as conn:
-                r = conn.execute("SELECT COUNT(*), MAX(observed_at_ms) FROM derivative_snapshots").fetchone()
+                r = conn.execute(
+                    "SELECT COUNT(*), MAX(observed_at_ms) FROM derivative_snapshots"
+                ).fetchone()
                 if r:
                     deriv_rows, deriv_max_t = r[0], r[1]
                     deriv_healthy = deriv_rows > 0
         except Exception:  # noqa: BLE001
             try:
                 with sqlite3.connect(str(deriv_path)) as conn:
-                    r = conn.execute("SELECT COUNT(*), MAX(observed_at_ms) FROM derivative_snapshots").fetchone()
+                    r = conn.execute(
+                        "SELECT COUNT(*), MAX(observed_at_ms) FROM derivative_snapshots"
+                    ).fetchone()
                     if r:
                         deriv_rows, deriv_max_t = r[0], r[1]
                         deriv_healthy = deriv_rows > 0
@@ -3279,7 +3467,7 @@ def generate_all_v0323_deliverables(
             c_data = json.loads(opp_campaigns_file.read_text(encoding="utf-8"))
             for c in c_data.get("campaigns", []):
                 if c.get("campaign_id") == "OPPORTUNITY_FORWARD_V0321_20260903T180000Z":
-                    h38_terminal = (c.get("status") == "DATA_QUALITY_TERMINAL_ARCHIVE")
+                    h38_terminal = c.get("status") == "DATA_QUALITY_TERMINAL_ARCHIVE"
         except Exception:  # noqa: BLE001, S110
             pass
 
@@ -3574,7 +3762,7 @@ def generate_all_v0324_deliverables(
 
 **Hypothesis ID**: `{H39_HYPOTHESIS_ID}`  
 **Repair Stage**: `v0.3.24-acceptance-repair`  
-**Repair Date**: `{datetime.now(UTC).strftime('%Y-%m-%d')}`  
+**Repair Date**: `{datetime.now(UTC).strftime("%Y-%m-%d")}`
 **State**: `{val_status.get("state", H39_STATE_INSUFFICIENT)}`  
 **Producing Code SHA**: `{code_sha}`  
 
@@ -3685,9 +3873,15 @@ All safety firewalls remain strictly inviolate:
             "start_time_utc": scheduler_result.get("start_time_utc"),
             "completed_at_utc": scheduler_result.get("completed_at_utc"),
             "elapsed_seconds": scheduler_result.get("elapsed_seconds"),
-            "new_slots_ingested": scheduler_result.get("accumulation", {}).get("new_slots_ingested", 0),
-            "duplicate_slots_skipped": scheduler_result.get("accumulation", {}).get("duplicate_slots_skipped", 0),
-            "partitions_processed": scheduler_result.get("accumulation", {}).get("partitions_processed", []),
+            "new_slots_ingested": scheduler_result.get("accumulation", {}).get(
+                "new_slots_ingested", 0
+            ),
+            "duplicate_slots_skipped": scheduler_result.get("accumulation", {}).get(
+                "duplicate_slots_skipped", 0
+            ),
+            "partitions_processed": scheduler_result.get("accumulation", {}).get(
+                "partitions_processed", []
+            ),
             "backup_file": scheduler_result.get("backup_file"),
         },
     }
@@ -3703,7 +3897,9 @@ All safety firewalls remain strictly inviolate:
     if deriv_path.exists():
         try:
             with sqlite3.connect(f"file:{deriv_path.as_posix()}?mode=ro", uri=True) as conn:
-                r = conn.execute("SELECT COUNT(*), MAX(observed_at_ms) FROM derivative_snapshots").fetchone()
+                r = conn.execute(
+                    "SELECT COUNT(*), MAX(observed_at_ms) FROM derivative_snapshots"
+                ).fetchone()
                 if r:
                     deriv_rows, deriv_max_t = r[0], r[1]
                     deriv_healthy = deriv_rows > 0
@@ -3721,7 +3917,7 @@ All safety firewalls remain strictly inviolate:
             c_data = json.loads(opp_campaigns_file.read_text(encoding="utf-8"))
             for c in c_data.get("campaigns", []):
                 if c.get("campaign_id") == "OPPORTUNITY_FORWARD_V0321_20260903T180000Z":
-                    h38_terminal = (c.get("status") == "DATA_QUALITY_TERMINAL_ARCHIVE")
+                    h38_terminal = c.get("status") == "DATA_QUALITY_TERMINAL_ARCHIVE"
         except Exception:  # noqa: BLE001, S110
             pass
 
@@ -3911,9 +4107,7 @@ def _compute_sha256(path: str | Path) -> str:
 class H39OneShotExecutionRegistry:
     """Durable, fail-closed SQLite execution registry for H39 one-shot validation."""
 
-    def __init__(
-        self, db_path: str | Path = H39_ONE_SHOT_EXECUTION_REGISTRY_DEFAULT_PATH
-    ) -> None:
+    def __init__(self, db_path: str | Path = H39_ONE_SHOT_EXECUTION_REGISTRY_DEFAULT_PATH) -> None:
         self.db_path = Path(db_path).resolve()
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
         self._init_db()
@@ -4091,9 +4285,13 @@ def verify_committed_freeze_package(
         capture_output=True,
         check=True,
     )
-    committed_bytes = res_show.stdout.encode("utf-8") if isinstance(res_show.stdout, str) else res_show.stdout
+    committed_bytes = (
+        res_show.stdout.encode("utf-8") if isinstance(res_show.stdout, str) else res_show.stdout
+    )
     disk_bytes = f_path.read_bytes()
-    if committed_bytes != disk_bytes and committed_bytes.replace(b"\r\n", b"\n") != disk_bytes.replace(b"\r\n", b"\n"):
+    if committed_bytes != disk_bytes and committed_bytes.replace(
+        b"\r\n", b"\n"
+    ) != disk_bytes.replace(b"\r\n", b"\n"):
         raise RuntimeError(
             "COMMITTED_FREEZE_VERIFICATION_FAILED: Committed git blob bytes do not equal on-disk bytes"
         )
@@ -4143,7 +4341,8 @@ class H39OneShotUnblindGatekeeper:
     2. Strict one-shot cutoff freeze before label loading.
     3. Exactly M1-M8 formal hypothesis universe with Holm-Bonferroni FWER control across all 8 arms.
     4. 240m horizon is supporting evidence only (cannot rescue 60m failure).
-    5. Frozen baseline incremental test on [trailing_return_15m, trailing_return_60m, trailing_atr_ratio_15m] using L2 logistic regression.
+    5. Corrected future baseline-incremental test uses unpenalized FWL OLS on continuous
+       return with timestamp-aware HAC; L2 logistic is diagnostic only.
     6. Prespecified stability diagnostics (UTC day, rolling block, volatility regime, 1H trend regime).
     7. Candidate decision rule: PROVISIONAL_MICROSTRUCTURE_CANDIDATE if all pass, else RESEARCH_FAMILY_STOP.
     8. Safety firewalls remain permanently intact (strategy=EXPERIMENTAL, direction_engine=NONE, runtime_max=OPPORTUNITY_ONLY, execution=DISABLED, holdout=SEALED).
@@ -4156,6 +4355,7 @@ class H39OneShotUnblindGatekeeper:
         clarification_path: str | Path = "deliverables/v0.3.22/H39_PROTOCOL_CLARIFICATION_001.json",
         clarification_002_path: str | Path = H39_CLARIFICATION_002_PATH,
         clarification_003_path: str | Path = H39_CLARIFICATION_003_PATH,
+        clarification_004_path: str | Path = H39_CLARIFICATION_004_PATH,
         microstructure_root: str | Path = "data/forward/BTCUSDT/microstructure",
         opportunity_store_path: str | Path = "data/forward/BTCUSDT/opportunity_shadow.sqlite3",
         canonical_candles_path: str | Path = H39_CANONICAL_CANDLES_PATH,
@@ -4168,6 +4368,7 @@ class H39OneShotUnblindGatekeeper:
         self.clarification_path = Path(clarification_path).resolve()
         self.clarification_002_path = Path(clarification_002_path).resolve()
         self.clarification_003_path = Path(clarification_003_path).resolve()
+        self.clarification_004_path = Path(clarification_004_path).resolve()
         self.microstructure_root = Path(microstructure_root).resolve()
         self.opportunity_store_path = Path(opportunity_store_path).resolve()
         self.canonical_candles_path = Path(canonical_candles_path).resolve()
@@ -4178,7 +4379,9 @@ class H39OneShotUnblindGatekeeper:
     def verify_protocol_and_clarification_hashes(self) -> dict[str, Any]:
         """Verify on-disk protocol and clarification files against frozen SHA-256 hashes."""
         if not self.protocol_path.exists():
-            raise FileNotFoundError(f"Protocol configuration file not found at {self.protocol_path}")
+            raise FileNotFoundError(
+                f"Protocol configuration file not found at {self.protocol_path}"
+            )
         if not self.clarification_path.exists():
             raise FileNotFoundError(
                 f"Protocol clarification file not found at {self.clarification_path}"
@@ -4200,14 +4403,16 @@ class H39OneShotUnblindGatekeeper:
 
         # Mandatory Clarification 002 verification
         c002_p = self.clarification_002_path
-        if not c002_p.exists() and self.repo_root and (self.repo_root / H39_CLARIFICATION_002_PATH).exists():
+        if (
+            not c002_p.exists()
+            and self.repo_root
+            and (self.repo_root / H39_CLARIFICATION_002_PATH).exists()
+        ):
             c002_p = (self.repo_root / H39_CLARIFICATION_002_PATH).resolve()
             self.clarification_002_path = c002_p
 
         if not c002_p.exists():
-            raise FileNotFoundError(
-                f"Protocol clarification 002 file not found at {c002_p}"
-            )
+            raise FileNotFoundError(f"Protocol clarification 002 file not found at {c002_p}")
         clar_002_sha = _compute_sha256(c002_p)
         if clar_002_sha != H39_FROZEN_CLARIFICATION_002_HASH:
             raise RuntimeError(
@@ -4217,19 +4422,38 @@ class H39OneShotUnblindGatekeeper:
 
         # Mandatory Clarification 003 verification
         c003_p = self.clarification_003_path
-        if not c003_p.exists() and self.repo_root and (self.repo_root / H39_CLARIFICATION_003_PATH).exists():
+        if (
+            not c003_p.exists()
+            and self.repo_root
+            and (self.repo_root / H39_CLARIFICATION_003_PATH).exists()
+        ):
             c003_p = (self.repo_root / H39_CLARIFICATION_003_PATH).resolve()
             self.clarification_003_path = c003_p
 
         if not c003_p.exists():
-            raise FileNotFoundError(
-                f"Protocol clarification 003 file not found at {c003_p}"
-            )
+            raise FileNotFoundError(f"Protocol clarification 003 file not found at {c003_p}")
         clar_003_sha = _compute_sha256(c003_p)
         if clar_003_sha != H39_FROZEN_CLARIFICATION_003_HASH:
             raise RuntimeError(
                 f"CLARIFICATION_003_HASH_DRIFT: Clarification 003 file at {c003_p} has hash {clar_003_sha}, "
                 f"expected frozen {H39_FROZEN_CLARIFICATION_003_HASH}"
+            )
+
+        c004_p = self.clarification_004_path
+        if (
+            not c004_p.exists()
+            and self.repo_root
+            and (self.repo_root / H39_CLARIFICATION_004_PATH).exists()
+        ):
+            c004_p = (self.repo_root / H39_CLARIFICATION_004_PATH).resolve()
+            self.clarification_004_path = c004_p
+        if not c004_p.exists():
+            raise FileNotFoundError(f"Protocol clarification 004 file not found at {c004_p}")
+        clar_004_sha = _compute_sha256(c004_p)
+        if clar_004_sha != H39_FROZEN_CLARIFICATION_004_HASH:
+            raise RuntimeError(
+                f"CLARIFICATION_004_HASH_DRIFT: Clarification 004 file at {c004_p} has hash {clar_004_sha}, "
+                f"expected frozen {H39_FROZEN_CLARIFICATION_004_HASH}"
             )
 
         return {
@@ -4238,10 +4462,12 @@ class H39OneShotUnblindGatekeeper:
             "clarification_sha256": clar_sha,
             "clarification_002_sha256": clar_002_sha,
             "clarification_003_sha256": clar_003_sha,
+            "clarification_004_sha256": clar_004_sha,
             "protocol_verified": True,
             "clarification_verified": True,
             "clarification_002_verified": True,
             "clarification_003_verified": True,
+            "clarification_004_verified": True,
         }
 
     def verify_readiness_preconditions(
@@ -4367,6 +4593,7 @@ class H39OneShotUnblindGatekeeper:
 
         # Verify snapshot integrity and count rows
         with _open_sqlite(f"file:{snapshot_path.as_posix()}?mode=ro", uri=True) as chk_conn:
+            chk_conn.row_factory = sqlite3.Row
             integ_res = chk_conn.execute("PRAGMA integrity_check;").fetchone()
             if not integ_res or integ_res[0].lower() != "ok":
                 raise RuntimeError(
@@ -4375,10 +4602,11 @@ class H39OneShotUnblindGatekeeper:
             total_rows = chk_conn.execute(
                 "SELECT COUNT(*) FROM h39_blind_validation_ledger;"
             ).fetchone()[0]
-            eligible_rows = chk_conn.execute(
-                "SELECT COUNT(*) FROM h39_blind_validation_ledger WHERE eligible = 1 AND decision_close_ms <= ?;",
+            snapshot_rows = chk_conn.execute(
+                "SELECT * FROM h39_blind_validation_ledger WHERE decision_close_ms <= ? ORDER BY decision_close_ms;",
                 (cutoff_ms,),
-            ).fetchone()[0]
+            ).fetchall()
+            eligible_rows = summarize_h39_required_inputs(snapshot_rows)["formal_test_ready_slots"]
 
         snapshot_sha256 = _compute_sha256(snapshot_path)
         live_ledger_sha = _compute_sha256(self.ledger_path)
@@ -4425,12 +4653,16 @@ class H39OneShotUnblindGatekeeper:
             "clarification_hash": H39_FROZEN_CLARIFICATION_HASH,
             "clarification_002_hash": H39_FROZEN_CLARIFICATION_002_HASH,
             "clarification_003_hash": H39_FROZEN_CLARIFICATION_003_HASH,
+            "clarification_004_hash": H39_FROZEN_CLARIFICATION_004_HASH,
+            "corrected_protocol_version": H39_PROTOCOL_VERSION_CORRECTED,
+            "corrected_evaluator_version": H39_CORRECTED_EVALUATOR_VERSION,
+            "input_contract_version": H39_INPUT_CONTRACT_VERSION,
             "code_version_sha": code_sha,
             "primary_covariance_method": "NEWEY_WEST_HAC",
             "primary_hac_max_lag": H39_HAC_MAX_LAG_60M,
             "secondary_hac_max_lag": H39_HAC_MAX_LAG_240M,
             "incremental_dependence_robust": True,
-            "formal_nested_method": "HAC_ROBUST_NUISANCE_ADJUSTED_SCORE_TEST_LAG_3",
+            "formal_nested_method": H39_CORRECTED_EVALUATOR_VERSION,
             "nested_score_test_max_lag": H39_HAC_MAX_LAG_60M,
             "lr_calibration_method": "CHRONOLOGICAL_MOVING_BLOCK_BOOTSTRAP",
             "lr_bootstrap_status": "SUPERSEDED_DIAGNOSTIC_ONLY",
@@ -4479,11 +4711,16 @@ class H39OneShotUnblindGatekeeper:
             "readiness_sha256",
             "frozen_ledger_snapshot_path",
             "frozen_ledger_snapshot_sha256",
+            "snapshot_eligible_row_count",
             "source_partitions",
             "protocol_hash",
             "clarification_hash",
             "clarification_002_hash",
             "clarification_003_hash",
+            "clarification_004_hash",
+            "corrected_protocol_version",
+            "corrected_evaluator_version",
+            "input_contract_version",
             "code_version_sha",
             "attestations",
         ]
@@ -4515,6 +4752,14 @@ class H39OneShotUnblindGatekeeper:
                 f"FREEZE_MANIFEST_MISMATCH: Manifest clarification_003_hash {manifest['clarification_003_hash']} "
                 f"does not match frozen {H39_FROZEN_CLARIFICATION_003_HASH}"
             )
+        if manifest["clarification_004_hash"] != H39_FROZEN_CLARIFICATION_004_HASH:
+            raise RuntimeError("FREEZE_MANIFEST_MISMATCH: Clarification 004 identity mismatch")
+        if manifest["corrected_protocol_version"] != H39_PROTOCOL_VERSION_CORRECTED:
+            raise RuntimeError("FREEZE_MANIFEST_MISMATCH: Corrected protocol version mismatch")
+        if manifest["corrected_evaluator_version"] != H39_CORRECTED_EVALUATOR_VERSION:
+            raise RuntimeError("FREEZE_MANIFEST_MISMATCH: Corrected evaluator identity mismatch")
+        if manifest["input_contract_version"] != H39_INPUT_CONTRACT_VERSION:
+            raise RuntimeError("FREEZE_MANIFEST_MISMATCH: H39 input contract identity mismatch")
 
         # Verify readiness artifact exists and hash matches
         r_path = Path(manifest["readiness_artifact_path"]).resolve()
@@ -4586,7 +4831,7 @@ class H39OneShotUnblindGatekeeper:
     def execute_one_shot_unblind(
         self,
         freeze_manifest_path: str | Path,
-        output_dir: str | Path = "deliverables/v0.3.25",
+        output_dir: str | Path = "deliverables/v0.3.26",
         candle_client: BinancePublicClient | None = None,
         repo_root: str | Path | None = None,
     ) -> dict[str, Any]:
@@ -4614,7 +4859,7 @@ class H39OneShotUnblindGatekeeper:
         freeze_commit_sha = freeze_git_info["freeze_commit_sha"]
         freeze_manifest_sha256 = _compute_sha256(freeze_manifest_path)
 
-        # 3. Form deterministic execution key and reserve atomically in registry (Finding B)
+        # 3. Form deterministic execution key.
         cutoff_ms = int(manifest["unblind_cutoff_ms"])
         key_material = (
             freeze_manifest_sha256
@@ -4624,22 +4869,16 @@ class H39OneShotUnblindGatekeeper:
             + manifest["clarification_hash"]
             + manifest["clarification_002_hash"]
             + manifest["clarification_003_hash"]
+            + manifest["clarification_004_hash"]
+            + manifest["corrected_protocol_version"]
+            + manifest["corrected_evaluator_version"]
+            + manifest["input_contract_version"]
         )
         execution_key = hashlib.sha256(key_material.encode("utf-8")).hexdigest()
         executing_git_sha = _get_current_git_sha()
-        started_at_utc = datetime.now(UTC).isoformat()
 
-        self.registry.reserve_execution(
-            execution_key=execution_key,
-            freeze_manifest_sha256=freeze_manifest_sha256,
-            freeze_commit_sha=freeze_commit_sha,
-            unblind_cutoff_ms=cutoff_ms,
-            protocol_hash=manifest["protocol_hash"],
-            clarification_hash=manifest["clarification_hash"],
-            executing_git_sha=executing_git_sha,
-        )
-
-        # 4. ONLY AFTER BOTH SUCCEED: Pull validation rows from FROZEN SNAPSHOT (Finding C)
+        # 4. BLIND_PRECHECK: inspect only frozen, pre-label fields.  A failure
+        # here must not consume the immutable scientific execution key.
         snapshot_path = Path(manifest["frozen_ledger_snapshot_path"]).resolve()
         with _open_sqlite(f"file:{snapshot_path.as_posix()}?mode=ro", uri=True) as conn:
             conn.row_factory = sqlite3.Row
@@ -4650,21 +4889,39 @@ class H39OneShotUnblindGatekeeper:
                 (H39_VALIDATION_START_MS, cutoff_ms),
             ).fetchall()
 
-        # Strict cutoff enforcement
         post_cutoff = [r for r in all_rows if int(r["decision_close_ms"]) > cutoff_ms]
         if post_cutoff:
             raise RuntimeError(
                 f"STRICT_CUTOFF_VIOLATION: Found {len(post_cutoff)} rows after unblind_cutoff_ms={cutoff_ms}"
             )
-
-        eligible_rows = [r for r in all_rows if bool(r["eligible"])]
+        precheck_summary = summarize_h39_required_inputs(all_rows)
+        eligible_rows = [r for r in all_rows if check_h39_required_input(r).formal_test_ready]
         if len(eligible_rows) < H39_MINIMUM_ELIGIBLE_OBSERVATIONS:
             raise RuntimeError(
-                f"INSUFFICIENT_OBSERVATIONS_AT_CUTOFF: Found {len(eligible_rows)} eligible observations at cutoff, "
-                f"minimum {H39_MINIMUM_ELIGIBLE_OBSERVATIONS} required."
+                "BLIND_PRECHECK_FAILED: "
+                f"Found {len(eligible_rows)} formal-test-ready observations at cutoff, "
+                f"minimum {H39_MINIMUM_ELIGIBLE_OBSERVATIONS}; "
+                f"excluded={precheck_summary['excluded_by_reason']}"
+            )
+        if len(eligible_rows) != int(manifest["snapshot_eligible_row_count"]):
+            raise RuntimeError(
+                "BLIND_PRECHECK_FAILED: frozen snapshot formal-ready count does not match manifest"
             )
 
-        # 5. Load canonical candles and construct outcomes (CAN ONLY HAPPEN HERE)
+        # 5. PRECHECK_OK -> atomically claim.  From this point onward, any
+        # crash/compute failure remains fail-closed and consumes the key.
+        started_at_utc = datetime.now(UTC).isoformat()
+        self.registry.reserve_execution(
+            execution_key=execution_key,
+            freeze_manifest_sha256=freeze_manifest_sha256,
+            freeze_commit_sha=freeze_commit_sha,
+            unblind_cutoff_ms=cutoff_ms,
+            protocol_hash=manifest["protocol_hash"],
+            clarification_hash=manifest["clarification_hash"],
+            executing_git_sha=executing_git_sha,
+        )
+
+        # 6. Load canonical candles/labels only after successful blind precheck and claim.
         min_ref = min(int(r["reference_time_ms"]) for r in eligible_rows)
         max_target = max(int(r["target_240m_ms"]) for r in eligible_rows)
         engine = H39ResearchEngine(
@@ -4707,14 +4964,28 @@ class H39OneShotUnblindGatekeeper:
             feat_row = H39FeatureRow(
                 slot_ms=slot_ms,
                 slot_utc=str(r["slot_utc"]),
-                m1_trade_imbalance_5m=float(r["m1_trade_imbalance_5m"]) if r["m1_trade_imbalance_5m"] is not None else 0.0,
-                m2_trade_imbalance_15m=float(r["m2_trade_imbalance_15m"]) if r["m2_trade_imbalance_15m"] is not None else 0.0,
+                m1_trade_imbalance_5m=float(r["m1_trade_imbalance_5m"])
+                if r["m1_trade_imbalance_5m"] is not None
+                else 0.0,
+                m2_trade_imbalance_15m=float(r["m2_trade_imbalance_15m"])
+                if r["m2_trade_imbalance_15m"] is not None
+                else 0.0,
                 m3_ofi_5m=float(r["m3_ofi_5m"]) if r["m3_ofi_5m"] is not None else 0.0,
-                m4_top5_depth_imbalance_5m=float(r["m4_top5_depth_imbalance_5m"]) if r["m4_top5_depth_imbalance_5m"] is not None else 0.0,
-                m5_top20_depth_imbalance_5m=float(r["m5_top20_depth_imbalance_5m"]) if r["m5_top20_depth_imbalance_5m"] is not None else 0.0,
-                m6_microprice_deviation_1m=float(r["m6_microprice_deviation_1m"]) if r["m6_microprice_deviation_1m"] is not None else 0.0,
-                m7_pressure_agreement=float(r["m7_pressure_agreement"]) if r["m7_pressure_agreement"] is not None else 0.0,
-                m8_pressure_divergence=float(r["m8_pressure_divergence"]) if r["m8_pressure_divergence"] is not None else 0.0,
+                m4_top5_depth_imbalance_5m=float(r["m4_top5_depth_imbalance_5m"])
+                if r["m4_top5_depth_imbalance_5m"] is not None
+                else 0.0,
+                m5_top20_depth_imbalance_5m=float(r["m5_top20_depth_imbalance_5m"])
+                if r["m5_top20_depth_imbalance_5m"] is not None
+                else 0.0,
+                m6_microprice_deviation_1m=float(r["m6_microprice_deviation_1m"])
+                if r["m6_microprice_deviation_1m"] is not None
+                else 0.0,
+                m7_pressure_agreement=float(r["m7_pressure_agreement"])
+                if r["m7_pressure_agreement"] is not None
+                else 0.0,
+                m8_pressure_divergence=float(r["m8_pressure_divergence"])
+                if r["m8_pressure_divergence"] is not None
+                else 0.0,
                 eligible=bool(r["eligible"]),
                 rejection_reason=r["rejection_reason"],
                 book_sample_count_15m=int(r["book_sample_count_15m"] or 0),
@@ -4728,11 +4999,21 @@ class H39OneShotUnblindGatekeeper:
                 return_60m=ret_60m,
                 future_close_240m=close_240m,
                 return_240m=ret_240m,
-                trailing_return_15m=float(r["trailing_return_15m"]) if r["trailing_return_15m"] is not None else None,
-                trailing_return_60m=float(r["trailing_return_60m"]) if r["trailing_return_60m"] is not None else None,
-                trailing_atr_15m=float(r["trailing_atr_15m"]) if r["trailing_atr_15m"] is not None else None,
-                trailing_atr_ratio_15m=float(r["trailing_atr_ratio_15m"]) if r["trailing_atr_ratio_15m"] is not None else None,
-                decision_close_price=float(r["decision_close_price"]) if r["decision_close_price"] is not None else None,
+                trailing_return_15m=float(r["trailing_return_15m"])
+                if r["trailing_return_15m"] is not None
+                else None,
+                trailing_return_60m=float(r["trailing_return_60m"])
+                if r["trailing_return_60m"] is not None
+                else None,
+                trailing_atr_15m=float(r["trailing_atr_15m"])
+                if r["trailing_atr_15m"] is not None
+                else None,
+                trailing_atr_ratio_15m=float(r["trailing_atr_ratio_15m"])
+                if r["trailing_atr_ratio_15m"] is not None
+                else None,
+                decision_close_price=float(r["decision_close_price"])
+                if r["decision_close_price"] is not None
+                else None,
                 decision_close_ms=slot_ms,
             )
             valid_obs.append(H39Observation(feature_row=feat_row, outcome_row=outcome_row))
@@ -4745,7 +5026,11 @@ class H39OneShotUnblindGatekeeper:
             )
 
         # 6. Statistical Execution: Primary 60m Family (Dependence-Robust Newey-West HAC)
-        y_vec_60m = [float(o.outcome_row.return_60m) for o in valid_obs if o.outcome_row.return_60m is not None]
+        y_vec_60m = [
+            float(o.outcome_row.return_60m)
+            for o in valid_obs
+            if o.outcome_row.return_60m is not None
+        ]
         y_dir_60m = [1.0 if val > 0.0 else 0.0 for val in y_vec_60m]
 
         # Enforce non-None baseline controls
@@ -4762,46 +5047,48 @@ class H39OneShotUnblindGatekeeper:
             baseline_x.append([1.0, float(tr15), float(tr60), float(atr_ratio)])
 
         # Fit baseline model (L2 logistic, lambda=1.0)
-        _b_base, _c_base, ll_base = _fit_l2_logistic_regression(baseline_x, y_dir_60m, l2_lambda=1.0)
+        _b_base, _c_base, ll_base = _fit_l2_logistic_regression(
+            baseline_x, y_dir_60m, l2_lambda=1.0
+        )
 
         # Primary 60m calculations
         raw_results: dict[str, dict[str, Any]] = {}
         p_raw_list: list[float] = []
+        timestamps_60m = [o.feature_row.slot_ms for o in valid_obs]
+        baseline_controls = [row[1:] for row in baseline_x]
 
         for fid in FORMAL_FEATURE_IDS:
             x_vals = [o.feature_row.feature_vector()[fid] for o in valid_obs]
+            conditional = conditional_incremental_ols_hac(
+                future_returns=y_vec_60m,
+                baseline_controls=baseline_controls,
+                candidate=x_vals,
+                timestamps_ms=timestamps_60m,
+                expected_sign=PREDEFINED_FEATURE_SIGNS[fid],
+            )
+
+            # Marginal OLS and penalized logistic models are retained only as
+            # historical/predictive diagnostics; neither can pass the formal gate.
             x_mat = [[1.0, xv] for xv in x_vals]
             beta, se_hac, t_hac, se_iid, t_iid = _newey_west_linear_regression(
                 x_mat, y_vec_60m, max_lag=H39_HAC_MAX_LAG_60M, l2_lambda=0.0
             )
 
-            slope = beta[1] if len(beta) > 1 else 0.0
-            slope_se = se_hac[1] if len(se_hac) > 1 else 1.0
-            t_stat = t_hac[1] if len(t_hac) > 1 else 0.0
+            marginal_slope = beta[1] if len(beta) > 1 else 0.0
+            marginal_se = se_hac[1] if len(se_hac) > 1 else 1.0
+            marginal_t = t_hac[1] if len(t_hac) > 1 else 0.0
             slope_se_iid = se_iid[1] if len(se_iid) > 1 else 1.0
             t_stat_iid = t_iid[1] if len(t_iid) > 1 else 0.0
 
-            p_raw_hac = _one_sided_p_value(t_stat)
+            p_raw_hac = conditional.p_value_one_sided
             p_raw_iid = _one_sided_p_value(t_stat_iid)
             p_raw_list.append(p_raw_hac)
 
-            # 1. Primary HAC-robust linear regression
-            ci_lower_hac = slope - 1.96 * slope_se
-            ci_upper_hac = slope + 1.96 * slope_se
-
-            # 2. Formal HAC-robust nuisance-adjusted score test under null baseline model (Clarification 003)
-            z_score_hac, p_score_hac, s_adj, v_hac = _hac_robust_nested_score_test(
-                x_base=baseline_x,
-                y_vector=y_dir_60m,
-                x_micro=x_vals,
-                beta_base=_b_base,
-                max_lag=H39_HAC_MAX_LAG_60M,
-                l2_lambda=1.0,
-            )
-
-            # 3. Full incremental model with sandwich HAC covariance
+            # Penalized direction model: diagnostic only.
             full_x = [baseline_x[idx] + [x_vals[idx]] for idx in range(n_valid)]
-            b_full, c_full_model, ll_full = _fit_l2_logistic_regression(full_x, y_dir_60m, l2_lambda=1.0)
+            b_full, c_full_model, ll_full = _fit_l2_logistic_regression(
+                full_x, y_dir_60m, l2_lambda=1.0
+            )
             c_sandwich, _ = _l2_logistic_sandwich_cov(
                 full_x, y_dir_60m, b_full, max_lag=H39_HAC_MAX_LAG_60M, l2_lambda=1.0
             )
@@ -4826,25 +5113,34 @@ class H39OneShotUnblindGatekeeper:
                 l2_lambda=1.0,
             )
 
-            se_micro_iid = math.sqrt(max(1e-15, c_full_model[4][4])) if len(c_full_model) > 4 else 1.0
+            se_micro_iid = (
+                math.sqrt(max(1e-15, c_full_model[4][4])) if len(c_full_model) > 4 else 1.0
+            )
             z_stat_iid = beta_micro / se_micro_iid if se_micro_iid > 0 else 0.0
             z_p_iid = _one_sided_p_value(z_stat_iid)
 
             raw_results[fid] = {
-                "effect": slope,
-                "se_hac": slope_se,
-                "t_hac": t_stat,
+                "effect": conditional.effect_estimate,
+                "se_hac": conditional.standard_error_hac,
+                "t_hac": conditional.t_statistic_hac,
                 "p_raw_hac": p_raw_hac,
-                "ci_lower_hac": ci_lower_hac,
-                "ci_upper_hac": ci_upper_hac,
+                "ci_lower_hac": conditional.ci_lower_95,
+                "ci_upper_hac": conditional.ci_upper_95,
                 "se_iid": slope_se_iid,
                 "t_iid": t_stat_iid,
                 "p_raw_iid": p_raw_iid,
-                "formal_nested_method": "HAC_ROBUST_NUISANCE_ADJUSTED_SCORE_TEST_LAG_3",
-                "formal_nested_p_value": p_score_hac,
-                "formal_nested_z_stat": z_score_hac,
-                "formal_nested_score_adj": s_adj,
-                "formal_nested_variance_hac": v_hac,
+                "formal_nested_method": H39_CORRECTED_EVALUATOR_VERSION,
+                "formal_nested_p_value": conditional.p_value_one_sided,
+                "formal_nested_z_stat": conditional.t_statistic_hac,
+                "formal_nested_score_adj": None,
+                "formal_nested_variance_hac": (
+                    conditional.standard_error_hac**2 if conditional.testable else None
+                ),
+                "formal_test_status": conditional.status,
+                "formal_test_reason": conditional.reason,
+                "candidate_residual_fraction": conditional.candidate_residual_fraction,
+                "full_design_condition_number": conditional.full_design_condition_number,
+                "timestamp_pair_counts": conditional.timestamp_pair_counts,
                 "inc_lr_stat": lr_stat,
                 "inc_lr_p_iid": lr_p_iid,
                 "inc_lr_p_bootstrap": lr_p_bootstrap,
@@ -4852,6 +5148,9 @@ class H39OneShotUnblindGatekeeper:
                 "inc_z_p_hac": z_p_hac,
                 "inc_z_stat_iid": z_stat_iid,
                 "inc_z_p_iid": z_p_iid,
+                "marginal_effect": marginal_slope,
+                "marginal_se_hac": marginal_se,
+                "marginal_t_hac": marginal_t,
             }
 
         p_holm_list = _holm_bonferroni(p_raw_list)
@@ -4862,17 +5161,15 @@ class H39OneShotUnblindGatekeeper:
             p_holm = p_holm_list[idx]
             sign_expected = PREDEFINED_FEATURE_SIGNS[fid]
             sign_correct = res["effect"] > 0 if sign_expected == 1 else res["effect"] < 0
-            ci_excludes = (res["ci_lower_hac"] > 0) if sign_expected == 1 else (res["ci_upper_hac"] < 0)
+            ci_excludes = (
+                (res["ci_lower_hac"] > 0) if sign_expected == 1 else (res["ci_upper_hac"] < 0)
+            )
             passes_inc = (
-                res["formal_nested_p_value"] < 0.05
-                and res["inc_z_stat_hac"] > 0
+                res["formal_test_status"] == "TESTABLE"
+                and res["formal_nested_p_value"] < 0.05
+                and res["formal_nested_z_stat"] > 0
             )
-            passes_gate = (
-                sign_correct
-                and p_holm < 0.05
-                and ci_excludes
-                and passes_inc
-            )
+            passes_gate = sign_correct and p_holm < 0.05 and ci_excludes and passes_inc
             primary_results[fid] = {
                 "feature_id": fid,
                 "predefined_sign": sign_expected,
@@ -4891,10 +5188,15 @@ class H39OneShotUnblindGatekeeper:
                 "formal_nested_z_stat": res["formal_nested_z_stat"],
                 "formal_nested_score_adj": res["formal_nested_score_adj"],
                 "formal_nested_variance_hac": res["formal_nested_variance_hac"],
+                "formal_test_status": res["formal_test_status"],
+                "formal_test_reason": res["formal_test_reason"],
+                "candidate_residual_fraction": res["candidate_residual_fraction"],
+                "full_design_condition_number": res["full_design_condition_number"],
+                "timestamp_pair_counts": res["timestamp_pair_counts"],
                 "incremental_lr_stat": res["inc_lr_stat"],
                 "incremental_lr_p_value": res["formal_nested_p_value"],
-                "incremental_z_stat": res["inc_z_stat_hac"],
-                "incremental_z_p_value": res["inc_z_p_hac"],
+                "incremental_z_stat": res["formal_nested_z_stat"],
+                "incremental_z_p_value": res["formal_nested_p_value"],
                 "passes_primary_gate": passes_gate,
                 "covariance_method": "NEWEY_WEST_HAC",
                 "hac_max_lag": H39_HAC_MAX_LAG_60M,
@@ -4907,6 +5209,9 @@ class H39OneShotUnblindGatekeeper:
                     "iid_incremental_z_stat": res["inc_z_stat_iid"],
                     "iid_incremental_z_p_value": res["inc_z_p_iid"],
                     "iid_role": "DIAGNOSTIC_ONLY",
+                    "marginal_effect_estimate": res["marginal_effect"],
+                    "marginal_hac_standard_error": res["marginal_se_hac"],
+                    "marginal_hac_t_statistic": res["marginal_t_hac"],
                     "clarification_002_bootstrap_lr_p_value": res["inc_lr_p_bootstrap"],
                     "clarification_002_bootstrap_role": "SUPERSEDED_DIAGNOSTIC_ONLY",
                 },
@@ -4916,7 +5221,11 @@ class H39OneShotUnblindGatekeeper:
         supporting_240m_results: dict[str, dict[str, Any]] = {}
         valid_240m_obs = [o for o in valid_obs if o.outcome_row.return_240m is not None]
         if len(valid_240m_obs) >= 3:
-            y_vec_240m = [float(o.outcome_row.return_240m) for o in valid_240m_obs if o.outcome_row.return_240m is not None]
+            y_vec_240m = [
+                float(o.outcome_row.return_240m)
+                for o in valid_240m_obs
+                if o.outcome_row.return_240m is not None
+            ]
             p_raw_240m_list: list[float] = []
             raw_240m_map: dict[str, dict[str, Any]] = {}
             for fid in FORMAL_FEATURE_IDS:
@@ -4983,15 +5292,21 @@ class H39OneShotUnblindGatekeeper:
                 for d_str, indices in days_map.items():
                     sub_idx = [i for i in range(n_valid) if i not in indices]
                     if len(sub_idx) >= 3:
-                        x_sub = [[1.0, valid_obs[i].feature_row.feature_vector()[fid]] for i in sub_idx]
+                        x_sub = [
+                            [1.0, valid_obs[i].feature_row.feature_vector()[fid]] for i in sub_idx
+                        ]
                         y_sub = [float(valid_obs[i].outcome_row.return_60m or 0.0) for i in sub_idx]
                         b_sub, _, _ = _ols_linear_regression(x_sub, y_sub)
                         s_loo = b_sub[1] if len(b_sub) > 1 else 0.0
-                        if (expected_sign == 1 and s_loo <= 0) or (expected_sign == -1 and s_loo >= 0):
+                        if (expected_sign == 1 and s_loo <= 0) or (
+                            expected_sign == -1 and s_loo >= 0
+                        ):
                             dep = True
                     # Daily slope
                     if len(indices) >= 3:
-                        x_day = [[1.0, valid_obs[i].feature_row.feature_vector()[fid]] for i in indices]
+                        x_day = [
+                            [1.0, valid_obs[i].feature_row.feature_vector()[fid]] for i in indices
+                        ]
                         y_day = [float(valid_obs[i].outcome_row.return_60m or 0.0) for i in indices]
                         b_day, _, _ = _ols_linear_regression(x_day, y_day)
                         day_slopes[d_str] = b_day[1] if len(b_day) > 1 else 0.0
@@ -5013,7 +5328,9 @@ class H39OneShotUnblindGatekeeper:
                 b_low, _, _ = _ols_linear_regression(x_low, y_low)
                 s_low = b_low[1] if len(b_low) > 1 else 0.0
 
-                x_high = [[1.0, valid_obs[i].feature_row.feature_vector()[fid]] for i in high_vol_idx]
+                x_high = [
+                    [1.0, valid_obs[i].feature_row.feature_vector()[fid]] for i in high_vol_idx
+                ]
                 y_high = [float(valid_obs[i].outcome_row.return_60m or 0.0) for i in high_vol_idx]
                 b_high, _, _ = _ols_linear_regression(x_high, y_high)
                 s_high = b_high[1] if len(b_high) > 1 else 0.0
@@ -5054,10 +5371,7 @@ class H39OneShotUnblindGatekeeper:
             reg_inv = vol_regime_inversion.get(fid, False) or trend_1h_inversion.get(fid, False)
             nontrivial = abs(p_res["effect_estimate"]) > 1e-6
             passes_all = bool(
-                p_res["passes_primary_gate"]
-                and nontrivial
-                and not single_dep
-                and not reg_inv
+                p_res["passes_primary_gate"] and nontrivial and not single_dep and not reg_inv
             )
             decision = "PROVISIONAL_MICROSTRUCTURE_CANDIDATE" if passes_all else "REJECT_CANDIDATE"
             if passes_all:
@@ -5072,7 +5386,9 @@ class H39OneShotUnblindGatekeeper:
                 "p_value_holm": p_res["p_value_holm"],
                 "ci_95": [p_res["ci_lower_95"], p_res["ci_upper_95"]],
                 "sign_correct": p_res["sign_correct"],
-                "ci_excludes_zero_in_correct_direction": p_res["ci_excludes_zero_in_correct_direction"],
+                "ci_excludes_zero_in_correct_direction": p_res[
+                    "ci_excludes_zero_in_correct_direction"
+                ],
                 "formal_nested_method": p_res["formal_nested_method"],
                 "formal_nested_p_value": p_res["formal_nested_p_value"],
                 "incremental_lr_p_value": p_res["incremental_lr_p_value"],
@@ -5101,7 +5417,9 @@ class H39OneShotUnblindGatekeeper:
 
         # 1. H39_ONE_SHOT_UNBLIND_FREEZE.json
         freeze_target = out_path / "H39_ONE_SHOT_UNBLIND_FREEZE.json"
-        freeze_target.write_text(json.dumps(verified_manifest, indent=2, sort_keys=True), encoding="utf-8")
+        freeze_target.write_text(
+            json.dumps(verified_manifest, indent=2, sort_keys=True), encoding="utf-8"
+        )
 
         # 2. H39_ONE_SHOT_VALIDATION_RESULTS.json
         validation_results = {
@@ -5117,6 +5435,13 @@ class H39OneShotUnblindGatekeeper:
             "clarification_hash": manifest["clarification_hash"],
             "clarification_002_hash": manifest["clarification_002_hash"],
             "clarification_003_hash": manifest["clarification_003_hash"],
+            "clarification_004_hash": manifest["clarification_004_hash"],
+            "corrected_protocol_version": manifest["corrected_protocol_version"],
+            "corrected_evaluator_version": manifest["corrected_evaluator_version"],
+            "input_contract_version": manifest["input_contract_version"],
+            "blind_precheck": {
+                key: value for key, value in precheck_summary.items() if key != "checks"
+            },
             "freeze_manifest_sha256": freeze_manifest_sha256,
             "freeze_commit_sha": freeze_commit_sha,
             "freeze_blob_verified": True,
@@ -5170,16 +5495,21 @@ class H39OneShotUnblindGatekeeper:
                         "trailing_return_60m",
                         "trailing_atr_ratio_15m",
                     ],
-                    "model_family": "L2_LOGISTIC_REGRESSION_LAMBDA_1_0",
+                    "model_family": "UNPENALIZED_FWL_CONDITIONAL_OLS_CONTINUOUS_RETURN",
+                    "legacy_l2_logistic_role": "DIAGNOSTIC_ONLY",
                     "code_version_sha": code_sha,
-                    "formal_nested_method": "HAC_ROBUST_NUISANCE_ADJUSTED_SCORE_TEST_LAG_3",
+                    "formal_nested_method": H39_CORRECTED_EVALUATOR_VERSION,
                     "nested_score_test_max_lag": H39_HAC_MAX_LAG_60M,
                     "incremental_results": {
                         fid: {
                             "formal_nested_p_value": primary_results[fid]["formal_nested_p_value"],
                             "formal_nested_z_stat": primary_results[fid]["formal_nested_z_stat"],
-                            "formal_nested_score_adj": primary_results[fid]["formal_nested_score_adj"],
-                            "formal_nested_variance_hac": primary_results[fid]["formal_nested_variance_hac"],
+                            "formal_nested_score_adj": primary_results[fid][
+                                "formal_nested_score_adj"
+                            ],
+                            "formal_nested_variance_hac": primary_results[fid][
+                                "formal_nested_variance_hac"
+                            ],
                             "lr_statistic": primary_results[fid]["incremental_lr_stat"],
                             "z_statistic": primary_results[fid]["incremental_z_stat"],
                             "z_p_value": primary_results[fid]["incremental_z_p_value"],
@@ -5314,6 +5644,10 @@ class H39OneShotUnblindGatekeeper:
             "clarification_hash": manifest["clarification_hash"],
             "clarification_002_hash": manifest["clarification_002_hash"],
             "clarification_003_hash": manifest["clarification_003_hash"],
+            "clarification_004_hash": manifest["clarification_004_hash"],
+            "corrected_protocol_version": manifest["corrected_protocol_version"],
+            "corrected_evaluator_version": manifest["corrected_evaluator_version"],
+            "input_contract_version": manifest["input_contract_version"],
             "frozen_ledger_snapshot_sha256": manifest["frozen_ledger_snapshot_sha256"],
             "readiness_sha256": manifest["readiness_sha256"],
             "unblind_cutoff_ms": cutoff_ms,
@@ -5860,7 +6194,9 @@ As mandated by the frozen protocol and governance:
         },
     }
     stat_rep_json_path = out_dir / "V0.3.25_STATISTICAL_DEPENDENCE_HEALTH_REPAIR.json"
-    stat_rep_json_path.write_text(json.dumps(stat_repair_json, indent=2, sort_keys=True), encoding="utf-8")
+    stat_rep_json_path.write_text(
+        json.dumps(stat_repair_json, indent=2, sort_keys=True), encoding="utf-8"
+    )
     created_files["V0.3.25_STATISTICAL_DEPENDENCE_HEALTH_REPAIR_JSON"] = str(stat_rep_json_path)
 
     # 8. V0.3.25_STATISTICAL_DEPENDENCE_HEALTH_REPAIR.md
@@ -6055,8 +6391,12 @@ The forecast errors $e_t = y_{{t+H}} - \\hat{{y}}_{{t+H}}$ exhibit non-zero auto
         },
     }
     rob_json_path = out_dir / "V0.3.25_ROBUST_NULL_PROTOCOL_IDENTITY_HEALTH_SCHEMA_REPAIR.json"
-    rob_json_path.write_text(json.dumps(robust_rep_json, indent=2, sort_keys=True), encoding="utf-8")
-    created_files["V0.3.25_ROBUST_NULL_PROTOCOL_IDENTITY_HEALTH_SCHEMA_REPAIR_JSON"] = str(rob_json_path)
+    rob_json_path.write_text(
+        json.dumps(robust_rep_json, indent=2, sort_keys=True), encoding="utf-8"
+    )
+    created_files["V0.3.25_ROBUST_NULL_PROTOCOL_IDENTITY_HEALTH_SCHEMA_REPAIR_JSON"] = str(
+        rob_json_path
+    )
 
     # 10. V0.3.25_ROBUST_NULL_PROTOCOL_IDENTITY_HEALTH_SCHEMA_REPAIR.md
     rob_md = f"""# BTC Quant Agent v0.3.25 — Acceptance Repair: Robust Nested Null, Protocol Identity & Truthful Health Schema
@@ -6193,7 +6533,9 @@ key_material = (
 """
     rob_md_path = out_dir / "V0.3.25_ROBUST_NULL_PROTOCOL_IDENTITY_HEALTH_SCHEMA_REPAIR.md"
     rob_md_path.write_text(rob_md, encoding="utf-8")
-    created_files["V0.3.25_ROBUST_NULL_PROTOCOL_IDENTITY_HEALTH_SCHEMA_REPAIR_MD"] = str(rob_md_path)
+    created_files["V0.3.25_ROBUST_NULL_PROTOCOL_IDENTITY_HEALTH_SCHEMA_REPAIR_MD"] = str(
+        rob_md_path
+    )
 
     # 11. README.md
     readme_md = f"""# BTC Quant Agent v0.3.25 Deliverables
@@ -6246,6 +6588,3 @@ quantctl h39 one-shot-unblind --freeze-manifest deliverables/v0.3.25/H39_ONE_SHO
     created_files["README"] = str(readme_path)
 
     return created_files
-
-
-

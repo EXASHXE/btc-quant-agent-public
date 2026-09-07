@@ -4,6 +4,7 @@ import hashlib
 import inspect
 import json
 import sqlite3
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -17,6 +18,7 @@ from btc_quant_agent.microstructure_research import (
     H39_FROZEN_CLARIFICATION_HASH,
     H39_FROZEN_PROTOCOL_HASH,
     H39_HYPOTHESIS_ID,
+    H39_INPUT_CONTRACT_VERSION,
     H39_MINIMUM_COVERAGE_RATIO,
     H39_MINIMUM_ELIGIBLE_OBSERVATIONS,
     H39_MINIMUM_VALIDATION_DAYS,
@@ -48,7 +50,7 @@ def _make_dummy_valid_row(
     t240 = ref_time + 239 * 60_000
     return {
         "decision_close_ms": slot_ms,
-        "decision_close_utc": "2026-09-04T11:15:00Z",
+        "decision_close_utc": datetime.fromtimestamp(slot_ms / 1000, UTC).isoformat(),
         "reference_time_ms": ref_time,
         "target_60m_ms": t60,
         "target_240m_ms": t240,
@@ -65,6 +67,11 @@ def _make_dummy_valid_row(
         "trailing_return_15m": 0.001,
         "trailing_return_60m": 0.002,
         "trailing_atr_ratio_15m": 0.0005,
+        "trailing_atr_15m": 25.0,
+        "decision_close_price": 50000.0,
+        "book_sample_count_15m": 180,
+        "trade_count_15m": 30,
+        "input_contract_version": H39_INPUT_CONTRACT_VERSION,
         "source_partition": "microstructure-2026-09-04.sqlite3",
         "source_partition_sha256": "dummy_partition_sha",
         "code_git_sha": "dummy_code_sha",
@@ -544,14 +551,9 @@ def test_readiness_does_not_execute_statistics(tmp_path: Path, monkeypatch: pyte
 
     # 2. Mature-simulated ledger check
     # Populate synthetic ledger to meet all gates (14 days, >= 750 eligible, >= 90% coverage)
-    slots_per_day = 54
-    for day in range(14):
-        day_slot_base = H39_VALIDATION_START_MS + day * 86_400_000
-        for s in range(slots_per_day):
-            s_ms = day_slot_base + s * 900_000
-            ledger.ingest_slot(_make_dummy_valid_row(slot_ms=s_ms))
-
-    clock_mature = H39_VALIDATION_START_MS + 799 * 900_000
+    clock_mature = H39_VALIDATION_START_MS + 13 * 86_400_000 + 53 * 900_000
+    for s_ms in range(H39_VALIDATION_START_MS, clock_mature + 1, 900_000):
+        ledger.ingest_slot(_make_dummy_valid_row(slot_ms=s_ms))
     r_mature = engine.check_unblind_readiness(ledger_path=ledger_path, as_of_ms=clock_mature)
     assert call_count == 0
     assert r_mature["ready_for_unblind"] is True
@@ -648,8 +650,7 @@ def test_maturity_requires_all_gates_simultaneously(tmp_path: Path) -> None:
     assert H39_MINIMUM_COVERAGE_RATIO == 0.90
 
     # Populate synthetic ledger with known quantities
-    # Case A: 14 days and 750 slots, but coverage < 90%
-    # 750 eligible slots, but 1000 expected slots (75% coverage) across 14 days
+    # Case A: 14 days and >=750 rows, but sparse physical-boundary coverage <90%.
     slots_per_day = 54
     for day in range(14):
         day_slot_base = H39_VALIDATION_START_MS + day * 86_400_000
@@ -661,8 +662,9 @@ def test_maturity_requires_all_gates_simultaneously(tmp_path: Path) -> None:
     total_inserted = 14 * slots_per_day  # 756 slots
     assert total_inserted >= 750
 
-    # If clock says 1000 slots have elapsed -> coverage is 756 / 1000 = 75.6% < 90%
-    clock_low_coverage = H39_VALIDATION_START_MS + 999 * 900_000
+    # Use the last observed wall-clock slot. Sparse daily rows cover 14 days but
+    # leave most physical 15m boundaries absent, so coverage remains below 90%.
+    clock_low_coverage = H39_VALIDATION_START_MS + 13 * 86_400_000 + 53 * 900_000
     st_low_cov = ledger.get_status(now_ms=clock_low_coverage)
     assert st_low_cov["days_gate_passed"] is True
     assert st_low_cov["observations_gate_passed"] is True
@@ -670,8 +672,10 @@ def test_maturity_requires_all_gates_simultaneously(tmp_path: Path) -> None:
     assert st_low_cov["maturity_achieved"] is False
     assert st_low_cov["state"] == "FORWARD_DATA_INSUFFICIENT"
 
-    # If clock says only 800 slots elapsed -> coverage is 756 / 800 = 94.5% >= 90%
-    clock_all_met = H39_VALIDATION_START_MS + 799 * 900_000
+    # Repair the missing physical boundaries without moving the clock backward.
+    for s_ms in range(H39_VALIDATION_START_MS, clock_low_coverage + 1, 900_000):
+        ledger.ingest_slot(_make_dummy_valid_row(slot_ms=s_ms))
+    clock_all_met = clock_low_coverage
     st_mature = ledger.get_status(now_ms=clock_all_met)
     assert st_mature["days_gate_passed"] is True
     assert st_mature["observations_gate_passed"] is True

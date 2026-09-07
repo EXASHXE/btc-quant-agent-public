@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3.26 - H39 Conditional-Inference and Blind-Input Repair
+
+- Replaced the future H39 formal incremental gate with scale-invariant, unpenalized FWL OLS on continuous 60m returns and timestamp-aware Bartlett HAC; L2 logistic results are diagnostic only.
+- Added a label-free `H39_REQUIRED_INPUT_V1` contract and changed maturity to count only formal-test-ready rows.
+- Decoupled ATR14 from the terminal Opportunity campaign using 500 causal, completed 15m bars built from canonical 1m candles.
+- Added head/internal/tail and cross-partition window continuity, independent book/trade health, and pre-claim blind one-shot validation.
+- Preserved all historical artifacts and evaluator behavior for reproduction; no H39 labels, Final Holdout, formal one-shot, or trading API were accessed.
+
 ## 0.3.11 - Runtime Alignment, Registry, Forward PIT Foundation
 
 - 将正常 Runtime 默认切换为 Registry-gated 模式；TP/BR 保留为 `OPPORTUNITY_ONLY`，不再生成 actionable `LONG/SHORT`。

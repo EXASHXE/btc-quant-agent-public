@@ -4,6 +4,7 @@ from __future__ import annotations
 import hashlib
 import json
 import sqlite3
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -12,6 +13,7 @@ import pytest
 from btc_quant_agent.microstructure_research import (
     H39_FROZEN_CLARIFICATION_HASH,
     H39_FROZEN_PROTOCOL_HASH,
+    H39_INPUT_CONTRACT_VERSION,
     H39_STATE_BLOCKED_QUALITY,
     H39_STATE_INSUFFICIENT,
     H39_VALIDATION_START_MS,
@@ -39,7 +41,7 @@ def _make_dummy_valid_row(
     t240 = ref_time + 239 * 60_000
     return {
         "decision_close_ms": slot_ms,
-        "decision_close_utc": "2026-09-04T11:15:00Z",
+        "decision_close_utc": datetime.fromtimestamp(slot_ms / 1000, UTC).isoformat(),
         "reference_time_ms": ref_time,
         "target_60m_ms": t60,
         "target_240m_ms": t240,
@@ -56,6 +58,11 @@ def _make_dummy_valid_row(
         "trailing_return_15m": 0.001,
         "trailing_return_60m": 0.002,
         "trailing_atr_ratio_15m": 0.0005,
+        "trailing_atr_15m": 25.0,
+        "decision_close_price": 50000.0,
+        "book_sample_count_15m": 180,
+        "trade_count_15m": 30,
+        "input_contract_version": H39_INPUT_CONTRACT_VERSION,
         "source_partition": source_partition,
         "source_partition_sha256": source_partition_sha,
         "source_partitions": json.dumps([source_partition]),

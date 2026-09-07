@@ -318,7 +318,7 @@ def build_parser() -> argparse.ArgumentParser:
             "freeze-cutoff", help="freeze one-shot unblind cutoff manifest if readiness passes"
         )
         h39_freeze.add_argument(
-            "--output-path", default="deliverables/v0.3.25/H39_ONE_SHOT_UNBLIND_FREEZE.json"
+            "--output-path", default="deliverables/v0.3.26/H39_ONE_SHOT_UNBLIND_FREEZE.json"
         )
         h39_freeze.add_argument(
             "--ledger-path", default="data/research/h39_validation/h39_blind_ledger.sqlite3"
@@ -338,7 +338,7 @@ def build_parser() -> argparse.ArgumentParser:
             "--freeze-manifest", required=True, help="path to verified H39_ONE_SHOT_UNBLIND_FREEZE.json"
         )
         h39_unblind.add_argument(
-            "--output-dir", default="deliverables/v0.3.25"
+            "--output-dir", default="deliverables/v0.3.26"
         )
         h39_unblind.add_argument(
             "--ledger-path", default="data/research/h39_validation/h39_blind_ledger.sqlite3"

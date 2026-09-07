@@ -1,0 +1,61 @@
+{
+  "artifact_name": "H39_PROTOCOL_CLARIFICATION_004_CONDITIONAL_INPUT_CONTRACT",
+  "clarification_id": "H39_PROTOCOL_CLARIFICATION_004",
+  "protocol_version": "v0.3.26",
+  "supersedes_for_future_formal_execution": {
+    "formal_incremental_gate": "HAC_ROBUST_NUISANCE_ADJUSTED_SCORE_TEST_LAG_3_ON_L2_LOGISTIC",
+    "maturity_count": "MICROSTRUCTURE_ELIGIBLE_ROWS"
+  },
+  "historical_artifacts": "IMMUTABLE_AND_REPRODUCIBLE_WITH_THEIR_ORIGINAL_EVALUATOR",
+  "formal_estimand": "Coefficient on the standardized component of a candidate feature outside the unpenalized linear span of the frozen baseline controls, for continuous future 60m return.",
+  "formal_evaluator": {
+    "identity": "H39_CONDITIONAL_OLS_HAC_V1",
+    "normalization": "STANDARDIZE_BASELINE_AND_CANDIDATE_THEN_STANDARDIZE_FWL_CANDIDATE_RESIDUAL",
+    "nuisance_projection": "UNPENALIZED_SVD_LEAST_SQUARES",
+    "collinearity": "EXACT_OR_NEAR_BASELINE_SPAN_FAILS_CLOSED_NOT_TESTABLE",
+    "covariance": "BARTLETT_HAC_USING_EXACT_PHYSICAL_TIMESTAMP_PAIRS",
+    "cadence_ms": 900000,
+    "primary_horizon_ms": 3600000,
+    "primary_hac_lag": 3,
+    "holm_input": "EIGHT_CONDITIONAL_ONE_SIDED_HAC_P_VALUES",
+    "ridge_logistic_role": "DIAGNOSTIC_ONLY"
+  },
+  "required_input_contract": {
+    "identity": "H39_REQUIRED_INPUT_V1",
+    "labels_accessed": false,
+    "requires": [
+      "finite_M1_through_M8",
+      "finite_trailing_return_15m",
+      "finite_trailing_return_60m",
+      "positive_trailing_atr_15m",
+      "positive_decision_close_price",
+      "consistent_trailing_atr_ratio_15m",
+      "book_and_trade_evidence_counts",
+      "exact_feature_reference_and_target_timing",
+      "parseable_slot_utc",
+      "source_partition_hash_provenance",
+      "protocol_and_input_contract_identity"
+    ],
+    "maturity_numerator": "FORMAL_TEST_READY_ROWS"
+  },
+  "baseline_producer": {
+    "dependency": "CANONICAL_1M_MARKET_DATA_ONLY",
+    "strategy_dependency": "NONE",
+    "atr": "WILDER_ATR14_ON_500_CAUSAL_COMPLETED_15M_BARS",
+    "missing_child_policy": "FAIL_CLOSED_NO_BACKFILL"
+  },
+  "one_shot_order": [
+    "VERIFY_FROZEN_EVIDENCE",
+    "BLIND_PRECHECK_WITHOUT_LABEL_VALUES",
+    "ATOMICALLY_CLAIM_EXECUTION_KEY",
+    "LOAD_LABELS",
+    "FORMAL_COMPUTE",
+    "COMMIT_RESULT"
+  ],
+  "blindness_attestation": {
+    "final_holdout_accessed": false,
+    "h39_formal_labels_inspected": false,
+    "h39_one_shot_executed": false,
+    "trading_api_invoked": false
+  }
+}

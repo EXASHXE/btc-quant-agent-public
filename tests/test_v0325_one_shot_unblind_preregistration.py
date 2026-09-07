@@ -17,6 +17,7 @@ from btc_quant_agent.microstructure_research import (
     FORMAL_FEATURE_IDS,
     H39_CLARIFICATION_002_SHA,
     H39_CLARIFICATION_003_SHA,
+    H39_CORRECTED_EVALUATOR_VERSION,
     H39_FROZEN_CLARIFICATION_002_HASH,
     H39_FROZEN_CLARIFICATION_003_HASH,
     H39_FROZEN_CLARIFICATION_HASH,
@@ -24,6 +25,7 @@ from btc_quant_agent.microstructure_research import (
     H39_FUTURE_SKEW_TOLERANCE_SECONDS,
     H39_HAC_MAX_LAG_60M,
     H39_HAC_MAX_LAG_240M,
+    H39_INPUT_CONTRACT_VERSION,
     H39_LR_BOOTSTRAP_BLOCK_LENGTH,
     H39_LR_BOOTSTRAP_REPLICATIONS,
     H39_LR_BOOTSTRAP_SEED,
@@ -167,6 +169,9 @@ def _make_dummy_slot_row(
         "trailing_atr_ratio_15m": 0.0005,
         "trailing_atr_15m": 25.0,
         "decision_close_price": 50000.0,
+        "book_sample_count_15m": 180,
+        "trade_count_15m": 30,
+        "input_contract_version": H39_INPUT_CONTRACT_VERSION,
         "source_partition": source_partition,
         "source_partition_sha256": source_partition_sha,
         "source_partitions": json.dumps([source_partition]),
@@ -1294,7 +1299,7 @@ def test_one_shot_results_contain_hac_and_bootstrap(tmp_path: Path) -> None:
         f_res = prim[fid]
         assert f_res["covariance_method"] == "NEWEY_WEST_HAC"
         assert f_res["hac_max_lag"] == 3
-        assert f_res["formal_nested_method"] == "HAC_ROBUST_NUISANCE_ADJUSTED_SCORE_TEST_LAG_3"
+        assert f_res["formal_nested_method"] == H39_CORRECTED_EVALUATOR_VERSION
         assert "formal_nested_p_value" in f_res
         assert "formal_nested_z_stat" in f_res
         assert "diagnostics" in f_res
