@@ -12,14 +12,18 @@ This directory contains the deliverables for **v0.3.25: H39 One-Shot Unblind Pre
 6. [`V0.3.25_COMMITTED_FREEZE_EXACTLY_ONCE_REPAIR.md`](V0.3.25_COMMITTED_FREEZE_EXACTLY_ONCE_REPAIR.md): Detailed acceptance repair report resolving Findings A through F for committed freeze boundary and snapshotting.
 7. [`H39_PROTOCOL_CLARIFICATION_002_DEPENDENCE_ROBUST_INFERENCE.json`](H39_PROTOCOL_CLARIFICATION_002_DEPENDENCE_ROBUST_INFERENCE.json): Authoritative protocol clarification on serial dependence and robust Newey-West / bootstrap inference.
 8. [`V0.3.25_STATISTICAL_DEPENDENCE_HEALTH_REPAIR.json`](V0.3.25_STATISTICAL_DEPENDENCE_HEALTH_REPAIR.json): Machine-readable audit of statistical dependence and forward health truthfulness repair.
-9. [`V0.3.25_STATISTICAL_DEPENDENCE_HEALTH_REPAIR.md`](V0.3.25_STATISTICAL_DEPENDENCE_HEALTH_REPAIR.md): Detailed acceptance repair report resolving Findings A and B on serial dependence and health states for ChatGPT final acceptance.
+9. [`V0.3.25_STATISTICAL_DEPENDENCE_HEALTH_REPAIR.md`](V0.3.25_STATISTICAL_DEPENDENCE_HEALTH_REPAIR.md): Detailed acceptance repair report resolving Findings A and B on serial dependence and health states.
+10. [`H39_PROTOCOL_CLARIFICATION_003_ROBUST_NESTED_NULL.json`](H39_PROTOCOL_CLARIFICATION_003_ROBUST_NESTED_NULL.json): Authoritative protocol clarification on HAC-robust nuisance-adjusted nested score test under the null baseline model.
+11. [`V0.3.25_ROBUST_NULL_PROTOCOL_IDENTITY_HEALTH_SCHEMA_REPAIR.json`](V0.3.25_ROBUST_NULL_PROTOCOL_IDENTITY_HEALTH_SCHEMA_REPAIR.json): Machine-readable audit of robust nested null score test, mandatory protocol identity, and health schema repair.
+12. [`V0.3.25_ROBUST_NULL_PROTOCOL_IDENTITY_HEALTH_SCHEMA_REPAIR.md`](V0.3.25_ROBUST_NULL_PROTOCOL_IDENTITY_HEALTH_SCHEMA_REPAIR.md): Detailed acceptance repair report resolving Blockers A, B, and C for ChatGPT final acceptance.
 
 ## Governance
 
-- **Accepted Baseline (`main`)**: Commit [`e99964a3ced0c40424a4ace6dd59cc2376a2dea6`](commit://e99964a3ced0c40424a4ace6dd59cc2376a2dea6)
+- **Accepted Baseline (`main`)**: Commit [`4e22c657c12f9e4a97b3b47bdfb3e8da598cabb2`](commit://4e22c657c12f9e4a97b3b47bdfb3e8da598cabb2)
 - **Protocol Freeze**: Commit [`0eecd8833675c664c42f5e62d89663d7a10ed5fa`](commit://0eecd8833675c664c42f5e62d89663d7a10ed5fa)
 - **Protocol Clarification 001**: Commit [`2d1ccecc11dc231ffa41cdb1b5a9ea693abccc59`](commit://2d1ccecc11dc231ffa41cdb1b5a9ea693abccc59)
 - **Protocol Clarification 002**: Commit [`6e1259409aa4f1cedf86b7a424666ee7c942a929`](commit://6e1259409aa4f1cedf86b7a424666ee7c942a929)
+- **Protocol Clarification 003**: Commit [`5d055ae17798bdc00e1b0d6388596ecd59358251`](commit://5d055ae17798bdc00e1b0d6388596ecd59358251)
 - **Current Stage State**: `FORWARD_DATA_INSUFFICIENT`
 - **Unblind Readiness**: `REFUSED_NOT_MATURE`
 - **Reviewers**:

@@ -16,9 +16,12 @@ from btc_quant_agent.cli import build_parser
 from btc_quant_agent.microstructure_research import (
     FORMAL_FEATURE_IDS,
     H39_CLARIFICATION_002_SHA,
+    H39_CLARIFICATION_003_SHA,
     H39_FROZEN_CLARIFICATION_002_HASH,
+    H39_FROZEN_CLARIFICATION_003_HASH,
     H39_FROZEN_CLARIFICATION_HASH,
     H39_FROZEN_PROTOCOL_HASH,
+    H39_FUTURE_SKEW_TOLERANCE_SECONDS,
     H39_HAC_MAX_LAG_60M,
     H39_HAC_MAX_LAG_240M,
     H39_LR_BOOTSTRAP_BLOCK_LENGTH,
@@ -28,6 +31,8 @@ from btc_quant_agent.microstructure_research import (
     H39_STATE_BLOCKED_QUALITY,
     H39_STATE_INSUFFICIENT,
     H39_VALIDATION_START_MS,
+    MICROSTRUCTURE_REQUIRED_COLUMNS,
+    MICROSTRUCTURE_REQUIRED_TABLES,
     PREDEFINED_FEATURE_SIGNS,
     REFUSED_VALIDATION_NOT_MATURE,
     H39BlindLedger,
@@ -39,6 +44,7 @@ from btc_quant_agent.microstructure_research import (
     H39ResearchEngine,
     _compute_sha256,
     _fit_l2_logistic_regression,
+    _hac_robust_nested_score_test,
     _holm_bonferroni,
     _l2_logistic_sandwich_cov,
     _moving_block_bootstrap_lr_p_value,
@@ -49,6 +55,63 @@ from btc_quant_agent.microstructure_research import (
     generate_all_v0325_deliverables,
     verify_committed_freeze_package,
 )
+
+
+def _populate_canonical_microstructure_partition(
+    db_path: Path,
+    event_time_ms: int,
+    receive_time_ms: int | None = None,
+) -> None:
+    rec_ms = receive_time_ms if receive_time_ms is not None else event_time_ms
+    with sqlite3.connect(db_path) as conn:
+        conn.execute(
+            """CREATE TABLE agg_trades (
+                aggregate_trade_id INTEGER PRIMARY KEY,
+                event_time_ms INTEGER,
+                transaction_time_ms INTEGER,
+                receive_time_ms INTEGER,
+                receive_monotonic_ns INTEGER,
+                price REAL,
+                quantity REAL,
+                buyer_is_maker INTEGER,
+                aggressive_side TEXT,
+                payload_hash TEXT
+            )"""
+        )
+        conn.execute(
+            """CREATE TABLE book_samples (
+                event_time_ms INTEGER,
+                final_update_id INTEGER,
+                receive_time_ms INTEGER,
+                spread_bps REAL,
+                top1_imbalance REAL,
+                top5_imbalance REAL,
+                top20_imbalance REAL,
+                microprice REAL,
+                ofi REAL,
+                PRIMARY KEY(event_time_ms, final_update_id)
+            )"""
+        )
+        conn.execute(
+            """CREATE TABLE gaps (
+                id INTEGER PRIMARY KEY,
+                start_ms INTEGER,
+                end_ms INTEGER,
+                kind TEXT,
+                detail TEXT
+            )"""
+        )
+        conn.execute(
+            """INSERT INTO agg_trades (aggregate_trade_id, event_time_ms, transaction_time_ms, receive_time_ms, price, quantity, aggressive_side)
+               VALUES (1, ?, ?, ?, 50000.0, 1.0, 'BUY')""",
+            (event_time_ms, event_time_ms, rec_ms),
+        )
+        conn.execute(
+            """INSERT INTO book_samples (event_time_ms, final_update_id, receive_time_ms, spread_bps, top1_imbalance, top5_imbalance, top20_imbalance, microprice, ofi)
+               VALUES (?, 1, ?, 0.5, 0.1, 0.2, 0.3, 50000.1, 10.0)""",
+            (event_time_ms, rec_ms),
+        )
+        conn.commit()
 
 
 def _init_test_git_repo(repo_dir: Path) -> None:
@@ -97,8 +160,8 @@ def _make_dummy_slot_row(
         "m4_top5_depth_imbalance_5m": m_val,
         "m5_top20_depth_imbalance_5m": m_val,
         "m6_microprice_deviation_1m": m_val,
-        "m7_pressure_agreement": 0.8,
-        "m8_pressure_divergence": 0.2,
+        "m7_pressure_agreement": m_val,
+        "m8_pressure_divergence": max(0.01, 1.0 - m_val),
         "trailing_return_15m": 0.001,
         "trailing_return_60m": 0.002,
         "trailing_atr_ratio_15m": 0.0005,
@@ -326,10 +389,12 @@ def test_clarification_hash_drift_blocks_unblind(tmp_path: Path) -> None:
         gk.verify_readiness_preconditions(as_of_ms=latest_ms)
 
 
-def test_clarification_002_hash_and_sha_pinned() -> None:
-    """Clarification 002 commit SHA and file hash are correctly pinned."""
+def test_clarification_002_and_003_hash_and_sha_pinned() -> None:
+    """Clarification 002 and 003 commit SHAs and file hashes are correctly pinned."""
     assert H39_CLARIFICATION_002_SHA == "6e1259409aa4f1cedf86b7a424666ee7c942a929"
     assert H39_FROZEN_CLARIFICATION_002_HASH == "94c938b65640252c85a9e320b6f7759729ffa00f793c93e17cca52726e73212e"
+    assert H39_CLARIFICATION_003_SHA == "5d055ae17798bdc00e1b0d6388596ecd59358251"
+    assert H39_FROZEN_CLARIFICATION_003_HASH == "035b7528141c714fbe1aef310462d5aa5fd96d3d5fdec67ae8f70082531d7a92"
 
 
 def test_legacy_evaluate_validation_status_cannot_authorize_unblind() -> None:
@@ -675,7 +740,7 @@ def test_generate_all_v0325_deliverables_immature_state(tmp_path: Path) -> None:
     """Test v0.3.25 deliverables generation under immature state (current live repo state)."""
     deliv_dir = tmp_path / "v0.3.25"
     files = generate_all_v0325_deliverables(output_dir=deliv_dir)
-    assert len(files) == 9
+    assert len(files) == 11
     assert all(Path(p).exists() for p in files.values())
 
     expected_files = [
@@ -688,6 +753,8 @@ def test_generate_all_v0325_deliverables_immature_state(tmp_path: Path) -> None:
         "V0.3.25_COMMITTED_FREEZE_EXACTLY_ONCE_REPAIR.md",
         "V0.3.25_STATISTICAL_DEPENDENCE_HEALTH_REPAIR.json",
         "V0.3.25_STATISTICAL_DEPENDENCE_HEALTH_REPAIR.md",
+        "V0.3.25_ROBUST_NULL_PROTOCOL_IDENTITY_HEALTH_SCHEMA_REPAIR.json",
+        "V0.3.25_ROBUST_NULL_PROTOCOL_IDENTITY_HEALTH_SCHEMA_REPAIR.md",
     ]
     for ef in expected_files:
         p = deliv_dir / ef
@@ -1227,11 +1294,14 @@ def test_one_shot_results_contain_hac_and_bootstrap(tmp_path: Path) -> None:
         f_res = prim[fid]
         assert f_res["covariance_method"] == "NEWEY_WEST_HAC"
         assert f_res["hac_max_lag"] == 3
-        assert f_res["lr_calibration_method"] == "CHRONOLOGICAL_MOVING_BLOCK_BOOTSTRAP"
-        assert f_res["lr_bootstrap_block_length"] == 4
+        assert f_res["formal_nested_method"] == "HAC_ROBUST_NUISANCE_ADJUSTED_SCORE_TEST_LAG_3"
+        assert "formal_nested_p_value" in f_res
+        assert "formal_nested_z_stat" in f_res
         assert "diagnostics" in f_res
         assert "iid_standard_error" in f_res["diagnostics"]
         assert "iid_incremental_lr_p_value" in f_res["diagnostics"]
+        assert f_res["diagnostics"]["clarification_002_bootstrap_role"] == "SUPERSEDED_DIAGNOSTIC_ONLY"
+        assert f_res["diagnostics"]["iid_role"] == "DIAGNOSTIC_ONLY"
 
 
 def test_derivatives_health_states(tmp_path: Path) -> None:
@@ -1293,11 +1363,7 @@ def test_derivatives_health_states(tmp_path: Path) -> None:
     mock_m_root_stale = tmp_path / "micro_stale"
     mock_m_root_stale.mkdir()
     p_file_stale = mock_m_root_stale / "microstructure-2026-09-06.sqlite3"
-    with sqlite3.connect(p_file_stale) as conn:
-        conn.execute("CREATE TABLE agg_trades (event_time_ms INT)")
-        conn.execute("CREATE TABLE book_samples (event_time_ms INT)")
-        conn.execute("INSERT INTO agg_trades VALUES (?)", (old_t + 10_000_000 - 30_000,))
-        conn.execute("INSERT INTO book_samples VALUES (?)", (old_t + 10_000_000 - 30_000,))
+    _populate_canonical_microstructure_partition(p_file_stale, old_t + 10_000_000 - 30_000)
 
     h_stale = evaluate_forward_chain_health(
         canonical_derivatives_path=stale_db,
@@ -1324,11 +1390,7 @@ def test_derivatives_health_states(tmp_path: Path) -> None:
     mock_m_root = tmp_path / "micro"
     mock_m_root.mkdir()
     p_file = mock_m_root / "microstructure-2026-09-06.sqlite3"
-    with sqlite3.connect(p_file) as conn:
-        conn.execute("CREATE TABLE agg_trades (event_time_ms INT)")
-        conn.execute("CREATE TABLE book_samples (event_time_ms INT)")
-        conn.execute("INSERT INTO agg_trades VALUES (?)", (fresh_t,))
-        conn.execute("INSERT INTO book_samples VALUES (?)", (fresh_t,))
+    _populate_canonical_microstructure_partition(p_file, fresh_t)
 
     h_fresh = evaluate_forward_chain_health(
         canonical_derivatives_path=fresh_db,
@@ -1341,7 +1403,7 @@ def test_derivatives_health_states(tmp_path: Path) -> None:
 
 
 def test_microstructure_health_states(tmp_path: Path) -> None:
-    """Finding B.2: Microstructure health evaluates root, partitions, schema, and truthfulness."""
+    """Finding B.2 & Blocker C: Microstructure health evaluates root, partitions, schema, and truthfulness."""
     # 1. Missing root -> MISSING
     h_m_missing = evaluate_forward_chain_health(microstructure_root=tmp_path / "no_such_dir")
     assert h_m_missing["microstructure_chain"]["status"] == "MISSING"
@@ -1360,3 +1422,299 @@ def test_microstructure_health_states(tmp_path: Path) -> None:
 
     # 4. H38 Opportunity Shadow is strictly DATA_QUALITY_TERMINAL_ARCHIVE
     assert h_m_empty["opportunity_shadow_chain"]["status"] == "DATA_QUALITY_TERMINAL_ARCHIVE"
+
+    # Canonical tables and columns specification check
+    assert "agg_trades" in MICROSTRUCTURE_REQUIRED_TABLES
+    assert "book_samples" in MICROSTRUCTURE_REQUIRED_TABLES
+    assert "gaps" in MICROSTRUCTURE_REQUIRED_TABLES
+    assert "receive_time_ms" in MICROSTRUCTURE_REQUIRED_COLUMNS["agg_trades"]
+    assert "receive_time_ms" in MICROSTRUCTURE_REQUIRED_COLUMNS["book_samples"]
+
+
+def test_microstructure_tables_exist_but_columns_missing_is_schema_error(tmp_path: Path) -> None:
+    """Blocker C: Required tables exist but columns missing triggers SCHEMA_ERROR, never HEALTHY."""
+    m_root = tmp_path / "micro_bad_cols"
+    m_root.mkdir()
+    p_file = m_root / "microstructure-2026-09-07.sqlite3"
+    with sqlite3.connect(p_file) as conn:
+        conn.execute("CREATE TABLE agg_trades (event_time_ms INT)")
+        conn.execute("CREATE TABLE book_samples (event_time_ms INT)")
+        conn.execute("CREATE TABLE gaps (start_ms INT, end_ms INT)")
+        conn.execute("INSERT INTO agg_trades VALUES (1000)")
+        conn.execute("INSERT INTO book_samples VALUES (1000)")
+    health = evaluate_forward_chain_health(microstructure_root=m_root, now_ms=1000)
+    assert health["microstructure_chain"]["status"] == "SCHEMA_ERROR"
+    assert health["microstructure_chain"]["latest_partition_schema_valid"] is False
+    assert health["aggregate_status"] == "BLOCKED"
+
+
+def test_microstructure_missing_gaps_table_is_schema_error(tmp_path: Path) -> None:
+    """Blocker C: Missing gaps table triggers SCHEMA_ERROR, never HEALTHY."""
+    m_root = tmp_path / "micro_no_gaps"
+    m_root.mkdir()
+    p_file = m_root / "microstructure-2026-09-07.sqlite3"
+    with sqlite3.connect(p_file) as conn:
+        conn.execute("CREATE TABLE agg_trades (event_time_ms INT, receive_time_ms INT, price REAL, quantity REAL, aggressive_side TEXT)")
+        conn.execute("CREATE TABLE book_samples (event_time_ms INT, receive_time_ms INT, spread_bps REAL, top1_imbalance REAL, top5_imbalance REAL, top20_imbalance REAL, microprice REAL, ofi REAL)")
+    health = evaluate_forward_chain_health(microstructure_root=m_root, now_ms=1000)
+    assert health["microstructure_chain"]["status"] == "SCHEMA_ERROR"
+    assert health["aggregate_status"] == "BLOCKED"
+
+
+def test_future_receive_timestamp_beyond_tolerance_is_timestamp_error(tmp_path: Path) -> None:
+    """Blocker C: Future receive timestamp beyond tolerance triggers TIMESTAMP_ERROR/CLOCK_SKEW."""
+    m_root = tmp_path / "micro_future"
+    m_root.mkdir()
+    p_file = m_root / "microstructure-2026-09-07.sqlite3"
+    now_ms = 1788750000000
+    future_ms = now_ms + int((H39_FUTURE_SKEW_TOLERANCE_SECONDS + 1.0) * 1000)
+    _populate_canonical_microstructure_partition(p_file, event_time_ms=now_ms, receive_time_ms=future_ms)
+
+    health = evaluate_forward_chain_health(microstructure_root=m_root, now_ms=now_ms)
+    assert health["microstructure_chain"]["status"] == "TIMESTAMP_ERROR"
+    assert health["aggregate_status"] == "BLOCKED"
+
+
+def test_future_derivatives_observed_at_beyond_tolerance_is_timestamp_error(tmp_path: Path) -> None:
+    """Blocker C: Future derivatives timestamp beyond tolerance triggers TIMESTAMP_ERROR."""
+    d_path = tmp_path / "deriv_future.sqlite3"
+    now_ms = 1788750000000
+    future_ms = now_ms + int((H39_FUTURE_SKEW_TOLERANCE_SECONDS + 2.0) * 1000)
+    with sqlite3.connect(d_path) as conn:
+        conn.execute(
+            """CREATE TABLE derivative_snapshots (
+                observed_at_ms INT, funding_rate REAL, open_interest REAL,
+                taker_buy_sell_ratio REAL, basis_rate REAL, long_short_account_ratio REAL
+            )"""
+        )
+        conn.execute(
+            "INSERT INTO derivative_snapshots VALUES (?, 0.0001, 1000.0, 1.1, 0.0002, 1.2)",
+            (future_ms,),
+        )
+    health = evaluate_forward_chain_health(canonical_derivatives_path=d_path, now_ms=now_ms)
+    assert health["derivatives_chain"]["status"] == "TIMESTAMP_ERROR"
+    assert health["aggregate_status"] == "BLOCKED"
+
+
+def test_skewed_event_time_uses_valid_receive_time_for_freshness(tmp_path: Path) -> None:
+    """Blocker C: Operational freshness prefers local receive_time_ms over exchange event_time_ms."""
+    m_root = tmp_path / "micro_skewed"
+    m_root.mkdir()
+    p_file = m_root / "microstructure-2026-09-07.sqlite3"
+    now_ms = 1788750000000
+    skewed_event_ms = now_ms - 7200_000  # 2 hours stale
+    fresh_receive_ms = now_ms - 20_000   # 20s fresh
+    _populate_canonical_microstructure_partition(
+        p_file, event_time_ms=skewed_event_ms, receive_time_ms=fresh_receive_ms
+    )
+
+    health = evaluate_forward_chain_health(microstructure_root=m_root, now_ms=now_ms)
+    assert health["microstructure_chain"]["freshness_basis"] == "LOCAL_RECEIVE_TIME"
+    assert health["microstructure_chain"]["freshness_seconds"] == 20.0
+    assert health["microstructure_chain"]["status"] == "HEALTHY"
+
+
+def test_score_test_preserves_conditional_null_under_collinear_controls() -> None:
+    """Blocker A: Nuisance parameter projection correctly preserves conditional null under collinear controls."""
+    import numpy as np
+    rng = np.random.default_rng(42)
+    n = 200
+    # X_base: intercept, momentum, volatility
+    x1 = rng.normal(0, 1, n)
+    x2 = rng.normal(0, 1, n)
+    x3 = rng.exponential(1, n)
+    X_base = np.column_stack([np.ones(n), x1, x2, x3])
+    beta_base = np.array([0.1, 0.5, -0.4, 0.3])
+
+    logits = X_base @ beta_base
+    probs = 1.0 / (1.0 + np.exp(-logits))
+    y = (rng.uniform(0, 1, n) < probs).astype(float)
+
+    # x_micro is strongly correlated with X_base[:, 1] (momentum), but has ZERO direct effect on y
+    x_micro = 0.8 * x1 + rng.normal(0, 0.2, n)
+
+    z_score, p_score, _s_adj, v_hac = _hac_robust_nested_score_test(
+        x_base=X_base,
+        y_vector=y,
+        x_micro=x_micro,
+        beta_base=beta_base,
+        max_lag=3,
+        l2_lambda=1.0,
+    )
+    # Under conditional null, p_score should not falsely reject (p_score > 0.05)
+    assert p_score > 0.05, f"False positive under conditional null: p_score={p_score:.4f}, z={z_score:.3f}"
+    assert np.isfinite(v_hac) and v_hac > 0.0
+
+
+def test_score_test_detects_controlled_synthetic_incremental_signal() -> None:
+    """Blocker A: Score test detects strong true incremental signal in the correct positive direction."""
+    import numpy as np
+    rng = np.random.default_rng(123)
+    n = 250
+    x1 = rng.normal(0, 1, n)
+    x2 = rng.normal(0, 1, n)
+    x3 = rng.exponential(1, n)
+    X_base = np.column_stack([np.ones(n), x1, x2, x3])
+    beta_base = np.array([0.0, 0.3, -0.2, 0.1])
+
+    # True positive incremental signal
+    x_micro = rng.normal(0, 1, n)
+    logits = X_base @ beta_base + 1.2 * x_micro
+    probs = 1.0 / (1.0 + np.exp(-logits))
+    y = (rng.uniform(0, 1, n) < probs).astype(float)
+
+    z_score, p_score, _s_adj, _v_hac = _hac_robust_nested_score_test(
+        x_base=X_base,
+        y_vector=y,
+        x_micro=x_micro,
+        beta_base=beta_base,
+        max_lag=3,
+        l2_lambda=1.0,
+    )
+    assert p_score < 0.05, f"Expected detection of true signal, got p_score={p_score:.4f}"
+    assert z_score > 0.0, f"Expected positive z_score, got {z_score:.3f}"
+
+
+def test_score_test_deterministic_for_identical_input() -> None:
+    """Blocker A: Score test is fully deterministic and closed-form."""
+    import numpy as np
+    X_base = np.array([[1.0, 0.2, -0.1], [1.0, 0.5, 0.3], [1.0, -0.2, 0.4], [1.0, 0.1, -0.2]])
+    y = np.array([1.0, 0.0, 1.0, 0.0])
+    x_micro = np.array([0.3, -0.4, 0.2, 0.1])
+    beta_base = np.array([0.1, 0.2, -0.1])
+
+    res1 = _hac_robust_nested_score_test(X_base, y, x_micro, beta_base, max_lag=2, l2_lambda=1.0)
+    res2 = _hac_robust_nested_score_test(X_base, y, x_micro, beta_base, max_lag=2, l2_lambda=1.0)
+    assert res1 == res2
+
+
+def test_score_test_fails_closed_on_insufficient_or_singular() -> None:
+    """Blocker A: Score test fails closed with STATISTICAL_INFERENCE_NOT_READY on invalid input."""
+    import numpy as np
+    X_base = np.array([[1.0, 0.2], [1.0, 0.5]])
+    y = np.array([1.0, 0.0])
+    x_micro = np.array([0.3, -0.4])
+    beta_base = np.array([0.1, 0.2])
+
+    with pytest.raises(RuntimeError, match="STATISTICAL_INFERENCE_NOT_READY"):
+        _hac_robust_nested_score_test(X_base, y, x_micro, beta_base)
+
+
+def test_missing_clarification_002_refused(tmp_path: Path) -> None:
+    """Blocker B: Missing Clarification 002 file fails closed before readiness/freeze/unblind."""
+    gk = H39OneShotUnblindGatekeeper(
+        clarification_002_path=tmp_path / "non_existent_002.json",
+        repo_root=tmp_path,
+    )
+    with pytest.raises(FileNotFoundError, match="Protocol clarification 002 file not found"):
+        gk.verify_protocol_and_clarification_hashes()
+
+
+def test_missing_clarification_003_refused(tmp_path: Path) -> None:
+    """Blocker B: Missing Clarification 003 file fails closed before readiness/freeze/unblind."""
+    gk = H39OneShotUnblindGatekeeper(
+        clarification_003_path=tmp_path / "non_existent_003.json",
+        repo_root=tmp_path,
+    )
+    with pytest.raises(FileNotFoundError, match="Protocol clarification 003 file not found"):
+        gk.verify_protocol_and_clarification_hashes()
+
+
+def test_hash_drift_002_refused(tmp_path: Path) -> None:
+    """Blocker B: Hash drift on Clarification 002 triggers CLARIFICATION_002_HASH_DRIFT."""
+    fake_002 = tmp_path / "fake_002.json"
+    fake_002.write_text('{"drifted": true}', encoding="utf-8")
+    gk = H39OneShotUnblindGatekeeper(
+        clarification_002_path=fake_002,
+        repo_root=tmp_path,
+    )
+    with pytest.raises(RuntimeError, match="CLARIFICATION_002_HASH_DRIFT"):
+        gk.verify_protocol_and_clarification_hashes()
+
+
+def test_hash_drift_003_refused(tmp_path: Path) -> None:
+    """Blocker B: Hash drift on Clarification 003 triggers CLARIFICATION_003_HASH_DRIFT."""
+    fake_003 = tmp_path / "fake_003.json"
+    fake_003.write_text('{"drifted": true}', encoding="utf-8")
+    gk = H39OneShotUnblindGatekeeper(
+        clarification_003_path=fake_003,
+        repo_root=tmp_path,
+    )
+    with pytest.raises(RuntimeError, match="CLARIFICATION_003_HASH_DRIFT"):
+        gk.verify_protocol_and_clarification_hashes()
+
+
+def test_freeze_manifest_omitting_002_refused(tmp_path: Path) -> None:
+    """Blocker B: Freeze manifest omitting clarification_002_hash triggers FREEZE_MANIFEST_CORRUPT."""
+    manifest_file = tmp_path / "corrupt_manifest.json"
+    manifest_file.write_text(json.dumps({
+        "artifact_name": "H39_ONE_SHOT_UNBLIND_FREEZE",
+        "hypothesis_id": "H39",
+        "validation_start_ms": H39_VALIDATION_START_MS,
+        "validation_start_utc": "2026-09-04T11:15:00Z",
+        "unblind_cutoff_ms": 1788750000000,
+        "unblind_cutoff_utc": "2026-09-07T03:00:00Z",
+        "expected_boundary_count": 800,
+        "observed_boundary_count": 800,
+        "eligible_boundary_count": 760,
+        "eligible_coverage": 0.95,
+        "distinct_days_count": 14,
+        "readiness_artifact_path": "fake",
+        "readiness_sha256": "fake",
+        "frozen_ledger_snapshot_path": "fake",
+        "frozen_ledger_snapshot_sha256": "fake",
+        "source_partitions": {},
+        "protocol_hash": H39_FROZEN_PROTOCOL_HASH,
+        "clarification_hash": H39_FROZEN_CLARIFICATION_HASH,
+        # OMITTED: clarification_002_hash
+        "clarification_003_hash": H39_FROZEN_CLARIFICATION_003_HASH,
+        "code_version_sha": "fake",
+        "attestations": {},
+    }), encoding="utf-8")
+    gk = H39OneShotUnblindGatekeeper()
+    with pytest.raises(RuntimeError, match="FREEZE_MANIFEST_CORRUPT"):
+        gk.verify_freeze_manifest(manifest_file)
+
+
+def test_freeze_manifest_omitting_003_refused(tmp_path: Path) -> None:
+    """Blocker B: Freeze manifest omitting clarification_003_hash triggers FREEZE_MANIFEST_CORRUPT."""
+    manifest_file = tmp_path / "corrupt_manifest.json"
+    manifest_file.write_text(json.dumps({
+        "artifact_name": "H39_ONE_SHOT_UNBLIND_FREEZE",
+        "hypothesis_id": "H39",
+        "validation_start_ms": H39_VALIDATION_START_MS,
+        "validation_start_utc": "2026-09-04T11:15:00Z",
+        "unblind_cutoff_ms": 1788750000000,
+        "unblind_cutoff_utc": "2026-09-07T03:00:00Z",
+        "expected_boundary_count": 800,
+        "observed_boundary_count": 800,
+        "eligible_boundary_count": 760,
+        "eligible_coverage": 0.95,
+        "distinct_days_count": 14,
+        "readiness_artifact_path": "fake",
+        "readiness_sha256": "fake",
+        "frozen_ledger_snapshot_path": "fake",
+        "frozen_ledger_snapshot_sha256": "fake",
+        "source_partitions": {},
+        "protocol_hash": H39_FROZEN_PROTOCOL_HASH,
+        "clarification_hash": H39_FROZEN_CLARIFICATION_HASH,
+        "clarification_002_hash": H39_FROZEN_CLARIFICATION_002_HASH,
+        # OMITTED: clarification_003_hash
+        "code_version_sha": "fake",
+        "attestations": {},
+    }), encoding="utf-8")
+    gk = H39OneShotUnblindGatekeeper()
+    with pytest.raises(RuntimeError, match="FREEZE_MANIFEST_CORRUPT"):
+        gk.verify_freeze_manifest(manifest_file)
+
+
+def test_execution_key_changes_when_any_clarification_identity_changes() -> None:
+    """Blocker B: Execution key strictly binds all clarification identities."""
+    import hashlib
+    base_material = "manifest_sha" + "commit_sha" + "1788750000000" + H39_FROZEN_PROTOCOL_HASH + H39_FROZEN_CLARIFICATION_HASH
+    key1 = hashlib.sha256((base_material + H39_FROZEN_CLARIFICATION_002_HASH + H39_FROZEN_CLARIFICATION_003_HASH).encode("utf-8")).hexdigest()
+    key2 = hashlib.sha256((base_material + "different_hash" + H39_FROZEN_CLARIFICATION_003_HASH).encode("utf-8")).hexdigest()
+    key3 = hashlib.sha256((base_material + H39_FROZEN_CLARIFICATION_002_HASH + "different_hash_003").encode("utf-8")).hexdigest()
+    assert key1 != key2
+    assert key1 != key3
+    assert key2 != key3

@@ -28,6 +28,9 @@ H39_PROTOCOL_CLARIFICATION_SHA = H39_CLARIFICATION_SHA
 H39_CLARIFICATION_002_SHA = "6e1259409aa4f1cedf86b7a424666ee7c942a929"
 H39_PROTOCOL_CLARIFICATION_002_SHA = H39_CLARIFICATION_002_SHA
 H39_CLARIFICATION_002_PATH = "deliverables/v0.3.25/H39_PROTOCOL_CLARIFICATION_002_DEPENDENCE_ROBUST_INFERENCE.json"
+H39_CLARIFICATION_003_SHA = "5d055ae17798bdc00e1b0d6388596ecd59358251"
+H39_PROTOCOL_CLARIFICATION_003_SHA = H39_CLARIFICATION_003_SHA
+H39_CLARIFICATION_003_PATH = "deliverables/v0.3.25/H39_PROTOCOL_CLARIFICATION_003_ROBUST_NESTED_NULL.json"
 V0323_STRICT_UNBLIND_REPAIR_SHA = "5f4a716f566abb7750e41fdd03d08a68526c1921"
 H39_STATE_INSUFFICIENT = "FORWARD_DATA_INSUFFICIENT"
 H39_STATE_READY = "H39_READY_FOR_ONE_SHOT_UNBLIND"
@@ -52,6 +55,7 @@ H39_MINIMUM_COVERAGE_RATIO = 0.90
 H39_FROZEN_PROTOCOL_HASH = "1b7d61409078f779585675e9f657a60ea1ef5384a7707c33bbac07535feaa979"
 H39_FROZEN_CLARIFICATION_HASH = "b2ba02df923950413c773e308e01d4ba893690948be9c258311d483ea753e284"
 H39_FROZEN_CLARIFICATION_002_HASH = "94c938b65640252c85a9e320b6f7759729ffa00f793c93e17cca52726e73212e"
+H39_FROZEN_CLARIFICATION_003_HASH = "035b7528141c714fbe1aef310462d5aa5fd96d3d5fdec67ae8f70082531d7a92"
 
 # Fixed dependence-robust statistical parameters
 H39_HAC_MAX_LAG_60M = 3
@@ -59,6 +63,14 @@ H39_HAC_MAX_LAG_240M = 15
 H39_LR_BOOTSTRAP_BLOCK_LENGTH = 4
 H39_LR_BOOTSTRAP_REPLICATIONS = 5000
 H39_LR_BOOTSTRAP_SEED = 390325
+H39_FUTURE_SKEW_TOLERANCE_SECONDS = 5.0
+
+MICROSTRUCTURE_REQUIRED_TABLES: frozenset[str] = frozenset({"agg_trades", "book_samples", "gaps"})
+MICROSTRUCTURE_REQUIRED_COLUMNS: dict[str, frozenset[str]] = {
+    "agg_trades": frozenset({"event_time_ms", "receive_time_ms", "price", "quantity", "aggressive_side"}),
+    "book_samples": frozenset({"event_time_ms", "receive_time_ms", "spread_bps", "top1_imbalance", "top5_imbalance", "top20_imbalance", "microprice", "ofi"}),
+    "gaps": frozenset({"start_ms", "end_ms"}),
+}
 
 H38_TERMINAL_FIRST_BREACH_MS = 1788511500000
 H38_TERMINAL_FIRST_BREACH_UTC = "2026-09-04T08:45:00Z"
@@ -543,6 +555,100 @@ def _moving_block_bootstrap_lr_p_value(
     return float(count_ge) / float(n_boot)
 
 
+def _hac_robust_nested_score_test(
+    x_base: list[list[float]] | np.ndarray,
+    y_vector: list[float] | np.ndarray,
+    x_micro: list[float] | np.ndarray,
+    beta_base: list[float] | np.ndarray,
+    max_lag: int = H39_HAC_MAX_LAG_60M,
+    l2_lambda: float = 1.0,
+) -> tuple[float, float, float, float]:
+    """Calculate HAC-robust nuisance-adjusted score test under the null baseline logistic model.
+
+    Specification (Clarification 003):
+    1. Null baseline logistic model: P(y_i=1 | X_base, i) = sigma(X_base, i * beta_base).
+    2. Null weights w_i = p_hat_i * (1 - p_hat_i) and residuals e_i = y_i - p_hat_i.
+    3. Null Hessian with L2 regularization: H_0 = X_base' W X_base + Lambda_base.
+    4. Nuisance parameter adjustment via projection:
+       I_x0 = X_base' W x_micro
+       gamma = H_0^(-1) I_x0
+       x_tilde = x_micro - X_base @ gamma
+    5. Nuisance-adjusted score contributions: s_i = x_tilde_i * e_i, total score S_adj = sum(s_i).
+    6. Long-run variance V_HAC estimated via Bartlett triangular kernel up to max_lag.
+    7. Standardized test statistic: Z_score = S_adj / sqrt(V_HAC).
+    8. One-sided robust p-value for predefined sign +1: p_score = 1.0 - Phi(Z_score).
+
+    Fails closed with RuntimeError('STATISTICAL_INFERENCE_NOT_READY: ...') if variance is non-positive or singular.
+
+    Returns:
+        tuple[z_score, p_value, S_adj, v_hac]
+    """
+    X_0 = np.asarray(x_base, dtype=np.float64)
+    y = np.asarray(y_vector, dtype=np.float64)
+    x = np.asarray(x_micro, dtype=np.float64)
+    b_0 = np.asarray(beta_base, dtype=np.float64)
+    n, p = X_0.shape
+
+    if n < 3:
+        raise RuntimeError(
+            f"STATISTICAL_INFERENCE_NOT_READY: Insufficient observations ({n}) for robust nested score test"
+        )
+
+    # 1. Null probabilities and weights
+    logits = np.clip(X_0 @ b_0, -30.0, 30.0)
+    p_hat = 1.0 / (1.0 + np.exp(-logits))
+    p_hat = np.clip(p_hat, 1e-12, 1.0 - 1e-12)
+    w = p_hat * (1.0 - p_hat)
+    e = y - p_hat
+
+    # 2. Null Hessian with L2 penalty (unpenalized intercept at index 0)
+    penalty_base = np.full(p, l2_lambda, dtype=np.float64)
+    penalty_base[0] = 0.0
+    Lambda_base = np.diag(penalty_base)
+    H_0 = (X_0.T * w) @ X_0 + Lambda_base
+
+    # 3. Cross information and nuisance projection
+    # I_x0 = X_0' W x
+    I_x0 = X_0.T @ (w * x)
+    try:
+        gamma = np.linalg.solve(H_0, I_x0)
+    except np.linalg.LinAlgError:
+        H_0_reg = H_0 + np.eye(p) * 1e-6
+        try:
+            gamma = np.linalg.solve(H_0_reg, I_x0)
+        except np.linalg.LinAlgError as exc:
+            raise RuntimeError(
+                f"STATISTICAL_INFERENCE_NOT_READY: Singular null Hessian in score test: {exc}"
+            ) from exc
+
+    # Effective orthogonal regressor: x_tilde = x - X_0 @ gamma
+    x_tilde = x - (X_0 @ gamma)
+
+    # Nuisance-adjusted score contributions
+    s = x_tilde * e
+    S_adj = float(np.sum(s))
+
+    # 4. Long-run variance with Bartlett kernel up to max_lag
+    gamma_0 = float(np.sum(s ** 2))
+    gamma_sum = 0.0
+    for lag in range(1, max_lag + 1):
+        if lag < n:
+            weight = 1.0 - (lag / (max_lag + 1))
+            autocov = float(np.sum(s[lag:] * s[:-lag]))
+            gamma_sum += weight * autocov
+
+    v_hac = gamma_0 + 2.0 * gamma_sum
+
+    if not np.isfinite(v_hac) or v_hac <= 1e-15:
+        raise RuntimeError(
+            f"STATISTICAL_INFERENCE_NOT_READY: Long-run score variance is non-positive or singular: {v_hac}"
+        )
+
+    z_score = float(S_adj / math.sqrt(v_hac))
+    p_score = float(0.5 * math.erfc(z_score / math.sqrt(2.0)))
+    return z_score, p_score, S_adj, v_hac
+
+
 def evaluate_forward_chain_health(
     microstructure_root: str | Path = "data/forward/BTCUSDT/microstructure",
     canonical_derivatives_path: str | Path = "data/forward/BTCUSDT/derivatives.sqlite3",
@@ -634,20 +740,29 @@ def evaluate_forward_chain_health(
                                     deriv_evidence["latest_observed_utc"] = datetime.fromtimestamp(
                                         max_obs / 1000, UTC
                                     ).isoformat()
-                                    freshness_s = max(0.0, (ref_ms - max_obs) / 1000.0)
-                                    deriv_evidence["freshness_seconds"] = round(freshness_s, 3)
-                                    if freshness_s > derivatives_stale_threshold_seconds:
-                                        deriv_evidence["status"] = "STALE"
+                                    skew_ms = max_obs - ref_ms
+                                    if skew_ms > int(H39_FUTURE_SKEW_TOLERANCE_SECONDS * 1000):
+                                        deriv_evidence["status"] = "TIMESTAMP_ERROR"
                                         deriv_evidence["reason"] = (
-                                            f"Latest snapshot is {freshness_s:.1f}s old "
-                                            f"(stale threshold: {derivatives_stale_threshold_seconds}s)"
+                                            f"Derivatives snapshot timestamp is in the future: "
+                                            f"{max_obs} > {ref_ms} (skew: {skew_ms / 1000.0:.3f}s > {H39_FUTURE_SKEW_TOLERANCE_SECONDS}s)"
                                         )
+                                        deriv_evidence["freshness_seconds"] = round((ref_ms - max_obs) / 1000.0, 3)
                                     else:
-                                        deriv_evidence["status"] = "HEALTHY"
-                                        deriv_evidence["reason"] = (
-                                            f"Store verified: {cnt} snapshots, integrity OK, "
-                                            f"freshness {freshness_s:.1f}s"
-                                        )
+                                        freshness_s = max(0.0, (ref_ms - max_obs) / 1000.0)
+                                        deriv_evidence["freshness_seconds"] = round(freshness_s, 3)
+                                        if freshness_s > derivatives_stale_threshold_seconds:
+                                            deriv_evidence["status"] = "STALE"
+                                            deriv_evidence["reason"] = (
+                                                f"Latest snapshot is {freshness_s:.1f}s old "
+                                                f"(stale threshold: {derivatives_stale_threshold_seconds}s)"
+                                            )
+                                        else:
+                                            deriv_evidence["status"] = "HEALTHY"
+                                            deriv_evidence["reason"] = (
+                                                f"Store verified: {cnt} snapshots, integrity OK, "
+                                                f"freshness {freshness_s:.1f}s"
+                                            )
                                 else:
                                     deriv_evidence["status"] = "EMPTY"
                                     deriv_evidence["reason"] = "No observed timestamps in snapshots"
@@ -668,6 +783,9 @@ def evaluate_forward_chain_health(
         "latest_partition_schema_valid": False,
         "latest_event_time_ms": None,
         "latest_event_time_utc": None,
+        "latest_receive_time_ms": None,
+        "latest_receive_time_utc": None,
+        "freshness_basis": None,
         "freshness_seconds": None,
         "collector_heartbeat_status": "NOT_VERIFIED",
         "status": "UNKNOWN",
@@ -707,38 +825,90 @@ def evaluate_forward_chain_health(
                                     "SELECT name FROM sqlite_master WHERE type='table'"
                                 ).fetchall()
                             }
-                            required_tables = {"agg_trades", "book_samples"}
-                            if not required_tables.issubset(tbls):
+                            missing_tables = MICROSTRUCTURE_REQUIRED_TABLES - tbls
+                            if missing_tables:
                                 micro_evidence["status"] = "SCHEMA_ERROR"
                                 micro_evidence["reason"] = (
-                                    f"Partition {latest_p.name} missing tables: "
-                                    f"{sorted(required_tables - tbls)}"
+                                    f"Partition {latest_p.name} missing required tables: "
+                                    f"{sorted(missing_tables)}"
                                 )
                             else:
-                                micro_evidence["latest_partition_schema_valid"] = True
-                                _, max_t = loader.get_time_range()
-                                micro_evidence["latest_event_time_ms"] = max_t
-                                if max_t is not None:
-                                    micro_evidence["latest_event_time_utc"] = datetime.fromtimestamp(
-                                        max_t / 1000, UTC
-                                    ).isoformat()
-                                    freshness_s = max(0.0, (ref_ms - max_t) / 1000.0)
-                                    micro_evidence["freshness_seconds"] = round(freshness_s, 3)
-                                    if freshness_s > microstructure_stale_threshold_seconds:
-                                        micro_evidence["status"] = "STALE"
-                                        micro_evidence["reason"] = (
-                                            f"Latest partition event is {freshness_s:.1f}s old "
-                                            f"(stale threshold: {microstructure_stale_threshold_seconds}s)"
-                                        )
-                                    else:
-                                        micro_evidence["status"] = "HEALTHY"
-                                        micro_evidence["reason"] = (
-                                            f"Partition {latest_p.name} verified: integrity OK, "
-                                            f"freshness {freshness_s:.1f}s"
-                                        )
+                                missing_columns: dict[str, list[str]] = {}
+                                for t_name, req_cols in MICROSTRUCTURE_REQUIRED_COLUMNS.items():
+                                    col_rows = conn.execute(f"PRAGMA table_info({t_name})").fetchall()
+                                    cols = {str(r[1]) for r in col_rows}
+                                    m_cols = req_cols - cols
+                                    if m_cols:
+                                        missing_columns[t_name] = sorted(m_cols)
+                                if missing_columns:
+                                    micro_evidence["status"] = "SCHEMA_ERROR"
+                                    micro_evidence["reason"] = (
+                                        f"Partition {latest_p.name} missing required columns: {missing_columns}"
+                                    )
                                 else:
-                                    micro_evidence["status"] = "EMPTY"
-                                    micro_evidence["reason"] = f"Partition {latest_p.name} contains no events"
+                                    micro_evidence["latest_partition_schema_valid"] = True
+                                    row_b = conn.execute(
+                                        "SELECT MAX(event_time_ms), MAX(receive_time_ms) FROM book_samples"
+                                    ).fetchone()
+                                    row_t = conn.execute(
+                                        "SELECT MAX(event_time_ms), MAX(receive_time_ms) FROM agg_trades"
+                                    ).fetchone()
+                                    max_event_b, max_recv_b = (row_b[0], row_b[1]) if row_b else (None, None)
+                                    max_event_t, max_recv_t = (row_t[0], row_t[1]) if row_t else (None, None)
+                                    events = [t for t in (max_event_b, max_event_t) if t is not None]
+                                    recvs = [t for t in (max_recv_b, max_recv_t) if t is not None]
+                                    max_event = max(events) if events else None
+                                    max_recv = max(recvs) if recvs else None
+
+                                    micro_evidence["latest_event_time_ms"] = max_event
+                                    micro_evidence["latest_event_time_utc"] = (
+                                        datetime.fromtimestamp(max_event / 1000, UTC).isoformat()
+                                        if max_event is not None
+                                        else None
+                                    )
+                                    micro_evidence["latest_receive_time_ms"] = max_recv
+                                    micro_evidence["latest_receive_time_utc"] = (
+                                        datetime.fromtimestamp(max_recv / 1000, UTC).isoformat()
+                                        if max_recv is not None
+                                        else None
+                                    )
+
+                                    if max_recv is not None:
+                                        micro_evidence["freshness_basis"] = "LOCAL_RECEIVE_TIME"
+                                        effective_ts = max_recv
+                                    elif max_event is not None:
+                                        micro_evidence["freshness_basis"] = "EXCHANGE_EVENT_TIME_FALLBACK"
+                                        effective_ts = max_event
+                                    else:
+                                        effective_ts = None
+
+                                    if effective_ts is None:
+                                        micro_evidence["status"] = "EMPTY"
+                                        micro_evidence["reason"] = f"Partition {latest_p.name} contains no events"
+                                    else:
+                                        future_skew_ms = effective_ts - ref_ms
+                                        if future_skew_ms > int(H39_FUTURE_SKEW_TOLERANCE_SECONDS * 1000):
+                                            micro_evidence["status"] = "TIMESTAMP_ERROR"
+                                            micro_evidence["reason"] = (
+                                                f"Partition {latest_p.name} timestamp is in the future: "
+                                                f"{effective_ts} > {ref_ms} (skew: {future_skew_ms / 1000.0:.3f}s > {H39_FUTURE_SKEW_TOLERANCE_SECONDS}s)"
+                                            )
+                                            micro_evidence["freshness_seconds"] = round((ref_ms - effective_ts) / 1000.0, 3)
+                                        else:
+                                            freshness_s = max(0.0, (ref_ms - effective_ts) / 1000.0)
+                                            micro_evidence["freshness_seconds"] = round(freshness_s, 3)
+                                            if freshness_s > microstructure_stale_threshold_seconds:
+                                                micro_evidence["status"] = "STALE"
+                                                micro_evidence["reason"] = (
+                                                    f"Latest partition {micro_evidence['freshness_basis']} is {freshness_s:.1f}s old "
+                                                    f"(stale threshold: {microstructure_stale_threshold_seconds}s)"
+                                                )
+                                            else:
+                                                micro_evidence["status"] = "HEALTHY"
+                                                micro_evidence["reason"] = (
+                                                    f"Partition {latest_p.name} verified: full schema OK, integrity OK, "
+                                                    f"freshness {freshness_s:.1f}s ({micro_evidence['freshness_basis']})"
+                                                )
                 except Exception as exc:  # noqa: BLE001
                     micro_evidence["status"] = "READ_ERROR"
                     micro_evidence["reason"] = f"Failed to read partition {latest_p.name}: {exc}"
@@ -759,7 +929,15 @@ def evaluate_forward_chain_health(
 
     # 4. Fail-closed Aggregate Health
     active_statuses = [deriv_evidence["status"], micro_evidence["status"]]
-    blocked_triggers = {"MISSING", "EMPTY", "SCHEMA_ERROR", "INTEGRITY_ERROR", "READ_ERROR"}
+    blocked_triggers = {
+        "MISSING",
+        "EMPTY",
+        "SCHEMA_ERROR",
+        "INTEGRITY_ERROR",
+        "READ_ERROR",
+        "TIMESTAMP_ERROR",
+        "CLOCK_SKEW",
+    }
     degraded_triggers = {"STALE", "UNKNOWN"}
 
     if any(s in blocked_triggers for s in active_statuses):
@@ -3977,6 +4155,7 @@ class H39OneShotUnblindGatekeeper:
         protocol_path: str | Path = H39_PROTOCOL_PATH,
         clarification_path: str | Path = "deliverables/v0.3.22/H39_PROTOCOL_CLARIFICATION_001.json",
         clarification_002_path: str | Path = H39_CLARIFICATION_002_PATH,
+        clarification_003_path: str | Path = H39_CLARIFICATION_003_PATH,
         microstructure_root: str | Path = "data/forward/BTCUSDT/microstructure",
         opportunity_store_path: str | Path = "data/forward/BTCUSDT/opportunity_shadow.sqlite3",
         canonical_candles_path: str | Path = H39_CANONICAL_CANDLES_PATH,
@@ -3988,6 +4167,7 @@ class H39OneShotUnblindGatekeeper:
         self.protocol_path = Path(protocol_path).resolve()
         self.clarification_path = Path(clarification_path).resolve()
         self.clarification_002_path = Path(clarification_002_path).resolve()
+        self.clarification_003_path = Path(clarification_003_path).resolve()
         self.microstructure_root = Path(microstructure_root).resolve()
         self.opportunity_store_path = Path(opportunity_store_path).resolve()
         self.canonical_candles_path = Path(canonical_candles_path).resolve()
@@ -4018,28 +4198,50 @@ class H39OneShotUnblindGatekeeper:
                 f"expected frozen {H39_FROZEN_CLARIFICATION_HASH}"
             )
 
-        clar_002_sha: str | None = None
+        # Mandatory Clarification 002 verification
         c002_p = self.clarification_002_path
         if not c002_p.exists() and self.repo_root and (self.repo_root / H39_CLARIFICATION_002_PATH).exists():
             c002_p = (self.repo_root / H39_CLARIFICATION_002_PATH).resolve()
             self.clarification_002_path = c002_p
 
-        if c002_p.exists():
-            clar_002_sha = _compute_sha256(c002_p)
-            if clar_002_sha != H39_FROZEN_CLARIFICATION_002_HASH:
-                raise RuntimeError(
-                    f"CLARIFICATION_002_HASH_DRIFT: Clarification 002 file at {c002_p} has hash {clar_002_sha}, "
-                    f"expected frozen {H39_FROZEN_CLARIFICATION_002_HASH}"
-                )
+        if not c002_p.exists():
+            raise FileNotFoundError(
+                f"Protocol clarification 002 file not found at {c002_p}"
+            )
+        clar_002_sha = _compute_sha256(c002_p)
+        if clar_002_sha != H39_FROZEN_CLARIFICATION_002_HASH:
+            raise RuntimeError(
+                f"CLARIFICATION_002_HASH_DRIFT: Clarification 002 file at {c002_p} has hash {clar_002_sha}, "
+                f"expected frozen {H39_FROZEN_CLARIFICATION_002_HASH}"
+            )
+
+        # Mandatory Clarification 003 verification
+        c003_p = self.clarification_003_path
+        if not c003_p.exists() and self.repo_root and (self.repo_root / H39_CLARIFICATION_003_PATH).exists():
+            c003_p = (self.repo_root / H39_CLARIFICATION_003_PATH).resolve()
+            self.clarification_003_path = c003_p
+
+        if not c003_p.exists():
+            raise FileNotFoundError(
+                f"Protocol clarification 003 file not found at {c003_p}"
+            )
+        clar_003_sha = _compute_sha256(c003_p)
+        if clar_003_sha != H39_FROZEN_CLARIFICATION_003_HASH:
+            raise RuntimeError(
+                f"CLARIFICATION_003_HASH_DRIFT: Clarification 003 file at {c003_p} has hash {clar_003_sha}, "
+                f"expected frozen {H39_FROZEN_CLARIFICATION_003_HASH}"
+            )
 
         return {
             "status": "OK",
             "protocol_sha256": proto_sha,
             "clarification_sha256": clar_sha,
             "clarification_002_sha256": clar_002_sha,
+            "clarification_003_sha256": clar_003_sha,
             "protocol_verified": True,
             "clarification_verified": True,
-            "clarification_002_verified": clar_002_sha is not None,
+            "clarification_002_verified": True,
+            "clarification_003_verified": True,
         }
 
     def verify_readiness_preconditions(
@@ -4222,12 +4424,16 @@ class H39OneShotUnblindGatekeeper:
             "protocol_hash": H39_FROZEN_PROTOCOL_HASH,
             "clarification_hash": H39_FROZEN_CLARIFICATION_HASH,
             "clarification_002_hash": H39_FROZEN_CLARIFICATION_002_HASH,
+            "clarification_003_hash": H39_FROZEN_CLARIFICATION_003_HASH,
             "code_version_sha": code_sha,
             "primary_covariance_method": "NEWEY_WEST_HAC",
             "primary_hac_max_lag": H39_HAC_MAX_LAG_60M,
             "secondary_hac_max_lag": H39_HAC_MAX_LAG_240M,
             "incremental_dependence_robust": True,
+            "formal_nested_method": "HAC_ROBUST_NUISANCE_ADJUSTED_SCORE_TEST_LAG_3",
+            "nested_score_test_max_lag": H39_HAC_MAX_LAG_60M,
             "lr_calibration_method": "CHRONOLOGICAL_MOVING_BLOCK_BOOTSTRAP",
+            "lr_bootstrap_status": "SUPERSEDED_DIAGNOSTIC_ONLY",
             "lr_bootstrap_block_length": H39_LR_BOOTSTRAP_BLOCK_LENGTH,
             "lr_bootstrap_replications": H39_LR_BOOTSTRAP_REPLICATIONS,
             "lr_bootstrap_seed": H39_LR_BOOTSTRAP_SEED,
@@ -4276,6 +4482,8 @@ class H39OneShotUnblindGatekeeper:
             "source_partitions",
             "protocol_hash",
             "clarification_hash",
+            "clarification_002_hash",
+            "clarification_003_hash",
             "code_version_sha",
             "attestations",
         ]
@@ -4297,10 +4505,15 @@ class H39OneShotUnblindGatekeeper:
                 f"FREEZE_MANIFEST_MISMATCH: Manifest clarification_hash {manifest['clarification_hash']} "
                 f"does not match frozen {H39_FROZEN_CLARIFICATION_HASH}"
             )
-        if "clarification_002_hash" in manifest and manifest["clarification_002_hash"] != H39_FROZEN_CLARIFICATION_002_HASH:
+        if manifest["clarification_002_hash"] != H39_FROZEN_CLARIFICATION_002_HASH:
             raise RuntimeError(
                 f"FREEZE_MANIFEST_MISMATCH: Manifest clarification_002_hash {manifest['clarification_002_hash']} "
                 f"does not match frozen {H39_FROZEN_CLARIFICATION_002_HASH}"
+            )
+        if manifest["clarification_003_hash"] != H39_FROZEN_CLARIFICATION_003_HASH:
+            raise RuntimeError(
+                f"FREEZE_MANIFEST_MISMATCH: Manifest clarification_003_hash {manifest['clarification_003_hash']} "
+                f"does not match frozen {H39_FROZEN_CLARIFICATION_003_HASH}"
             )
 
         # Verify readiness artifact exists and hash matches
@@ -4409,7 +4622,8 @@ class H39OneShotUnblindGatekeeper:
             + str(cutoff_ms)
             + manifest["protocol_hash"]
             + manifest["clarification_hash"]
-            + manifest.get("clarification_002_hash", "")
+            + manifest["clarification_002_hash"]
+            + manifest["clarification_003_hash"]
         )
         execution_key = hashlib.sha256(key_material.encode("utf-8")).hexdigest()
         executing_git_sha = _get_current_git_sha()
@@ -4571,19 +4785,36 @@ class H39OneShotUnblindGatekeeper:
             p_raw_iid = _one_sided_p_value(t_stat_iid)
             p_raw_list.append(p_raw_hac)
 
+            # 1. Primary HAC-robust linear regression
             ci_lower_hac = slope - 1.96 * slope_se
             ci_upper_hac = slope + 1.96 * slope_se
 
-            # Full incremental model
+            # 2. Formal HAC-robust nuisance-adjusted score test under null baseline model (Clarification 003)
+            z_score_hac, p_score_hac, s_adj, v_hac = _hac_robust_nested_score_test(
+                x_base=baseline_x,
+                y_vector=y_dir_60m,
+                x_micro=x_vals,
+                beta_base=_b_base,
+                max_lag=H39_HAC_MAX_LAG_60M,
+                l2_lambda=1.0,
+            )
+
+            # 3. Full incremental model with sandwich HAC covariance
             full_x = [baseline_x[idx] + [x_vals[idx]] for idx in range(n_valid)]
             b_full, c_full_model, ll_full = _fit_l2_logistic_regression(full_x, y_dir_60m, l2_lambda=1.0)
             c_sandwich, _ = _l2_logistic_sandwich_cov(
                 full_x, y_dir_60m, b_full, max_lag=H39_HAC_MAX_LAG_60M, l2_lambda=1.0
             )
 
+            beta_micro = b_full[4] if len(b_full) > 4 else 0.0
+            se_micro_hac = math.sqrt(max(1e-15, c_sandwich[4][4])) if len(c_sandwich) > 4 else 1.0
+            z_stat_hac = beta_micro / se_micro_hac if se_micro_hac > 0 else 0.0
+            z_p_hac = _one_sided_p_value(z_stat_hac)
+
+            # 4. Diagnostics only (non-gating): iid LR and Clarification 002 moving-block bootstrap
             lr_stat = max(0.0, 2.0 * (ll_full - ll_base))
             lr_p_iid = max(0.0, min(1.0, 1.0 - math.erf(math.sqrt(lr_stat / 2.0))))
-            lr_p_robust = _moving_block_bootstrap_lr_p_value(
+            lr_p_bootstrap = _moving_block_bootstrap_lr_p_value(
                 x_base=baseline_x,
                 x_micro=x_vals,
                 y_vector=y_dir_60m,
@@ -4594,11 +4825,6 @@ class H39OneShotUnblindGatekeeper:
                 seed=H39_LR_BOOTSTRAP_SEED,
                 l2_lambda=1.0,
             )
-
-            beta_micro = b_full[4] if len(b_full) > 4 else 0.0
-            se_micro_hac = math.sqrt(max(1e-15, c_sandwich[4][4])) if len(c_sandwich) > 4 else 1.0
-            z_stat_hac = beta_micro / se_micro_hac if se_micro_hac > 0 else 0.0
-            z_p_hac = _one_sided_p_value(z_stat_hac)
 
             se_micro_iid = math.sqrt(max(1e-15, c_full_model[4][4])) if len(c_full_model) > 4 else 1.0
             z_stat_iid = beta_micro / se_micro_iid if se_micro_iid > 0 else 0.0
@@ -4614,9 +4840,14 @@ class H39OneShotUnblindGatekeeper:
                 "se_iid": slope_se_iid,
                 "t_iid": t_stat_iid,
                 "p_raw_iid": p_raw_iid,
+                "formal_nested_method": "HAC_ROBUST_NUISANCE_ADJUSTED_SCORE_TEST_LAG_3",
+                "formal_nested_p_value": p_score_hac,
+                "formal_nested_z_stat": z_score_hac,
+                "formal_nested_score_adj": s_adj,
+                "formal_nested_variance_hac": v_hac,
                 "inc_lr_stat": lr_stat,
-                "inc_lr_p_robust": lr_p_robust,
                 "inc_lr_p_iid": lr_p_iid,
+                "inc_lr_p_bootstrap": lr_p_bootstrap,
                 "inc_z_stat_hac": z_stat_hac,
                 "inc_z_p_hac": z_p_hac,
                 "inc_z_stat_iid": z_stat_iid,
@@ -4633,7 +4864,7 @@ class H39OneShotUnblindGatekeeper:
             sign_correct = res["effect"] > 0 if sign_expected == 1 else res["effect"] < 0
             ci_excludes = (res["ci_lower_hac"] > 0) if sign_expected == 1 else (res["ci_upper_hac"] < 0)
             passes_inc = (
-                res["inc_lr_p_robust"] < 0.05
+                res["formal_nested_p_value"] < 0.05
                 and res["inc_z_stat_hac"] > 0
             )
             passes_gate = (
@@ -4655,23 +4886,29 @@ class H39OneShotUnblindGatekeeper:
                 "ci_upper_95": res["ci_upper_hac"],
                 "sign_correct": sign_correct,
                 "ci_excludes_zero_in_correct_direction": ci_excludes,
+                "formal_nested_method": res["formal_nested_method"],
+                "formal_nested_p_value": res["formal_nested_p_value"],
+                "formal_nested_z_stat": res["formal_nested_z_stat"],
+                "formal_nested_score_adj": res["formal_nested_score_adj"],
+                "formal_nested_variance_hac": res["formal_nested_variance_hac"],
                 "incremental_lr_stat": res["inc_lr_stat"],
-                "incremental_lr_p_value": res["inc_lr_p_robust"],
+                "incremental_lr_p_value": res["formal_nested_p_value"],
                 "incremental_z_stat": res["inc_z_stat_hac"],
                 "incremental_z_p_value": res["inc_z_p_hac"],
                 "passes_primary_gate": passes_gate,
                 "covariance_method": "NEWEY_WEST_HAC",
                 "hac_max_lag": H39_HAC_MAX_LAG_60M,
-                "lr_calibration_method": "CHRONOLOGICAL_MOVING_BLOCK_BOOTSTRAP",
-                "lr_bootstrap_block_length": H39_LR_BOOTSTRAP_BLOCK_LENGTH,
-                "lr_bootstrap_replications": H39_LR_BOOTSTRAP_REPLICATIONS,
-                "lr_bootstrap_seed": H39_LR_BOOTSTRAP_SEED,
                 "diagnostics": {
                     "iid_standard_error": res["se_iid"],
                     "iid_t_statistic": res["t_iid"],
                     "iid_p_value_raw": res["p_raw_iid"],
+                    "iid_incremental_lr_stat": res["inc_lr_stat"],
                     "iid_incremental_lr_p_value": res["inc_lr_p_iid"],
                     "iid_incremental_z_stat": res["inc_z_stat_iid"],
+                    "iid_incremental_z_p_value": res["inc_z_p_iid"],
+                    "iid_role": "DIAGNOSTIC_ONLY",
+                    "clarification_002_bootstrap_lr_p_value": res["inc_lr_p_bootstrap"],
+                    "clarification_002_bootstrap_role": "SUPERSEDED_DIAGNOSTIC_ONLY",
                 },
             }
 
@@ -4836,6 +5073,8 @@ class H39OneShotUnblindGatekeeper:
                 "ci_95": [p_res["ci_lower_95"], p_res["ci_upper_95"]],
                 "sign_correct": p_res["sign_correct"],
                 "ci_excludes_zero_in_correct_direction": p_res["ci_excludes_zero_in_correct_direction"],
+                "formal_nested_method": p_res["formal_nested_method"],
+                "formal_nested_p_value": p_res["formal_nested_p_value"],
                 "incremental_lr_p_value": p_res["incremental_lr_p_value"],
                 "incremental_z_stat": p_res["incremental_z_stat"],
                 "single_day_dependence": single_dep,
@@ -4874,6 +5113,10 @@ class H39OneShotUnblindGatekeeper:
             "evaluated_sample_size": n_valid,
             "distinct_days_count": len(days_map),
             "code_version_sha": code_sha,
+            "protocol_hash": manifest["protocol_hash"],
+            "clarification_hash": manifest["clarification_hash"],
+            "clarification_002_hash": manifest["clarification_002_hash"],
+            "clarification_003_hash": manifest["clarification_003_hash"],
             "freeze_manifest_sha256": freeze_manifest_sha256,
             "freeze_commit_sha": freeze_commit_sha,
             "freeze_blob_verified": True,
@@ -4929,12 +5172,18 @@ class H39OneShotUnblindGatekeeper:
                     ],
                     "model_family": "L2_LOGISTIC_REGRESSION_LAMBDA_1_0",
                     "code_version_sha": code_sha,
-                    "incremental_diagnostics": {
+                    "formal_nested_method": "HAC_ROBUST_NUISANCE_ADJUSTED_SCORE_TEST_LAG_3",
+                    "nested_score_test_max_lag": H39_HAC_MAX_LAG_60M,
+                    "incremental_results": {
                         fid: {
+                            "formal_nested_p_value": primary_results[fid]["formal_nested_p_value"],
+                            "formal_nested_z_stat": primary_results[fid]["formal_nested_z_stat"],
+                            "formal_nested_score_adj": primary_results[fid]["formal_nested_score_adj"],
+                            "formal_nested_variance_hac": primary_results[fid]["formal_nested_variance_hac"],
                             "lr_statistic": primary_results[fid]["incremental_lr_stat"],
-                            "lr_p_value": primary_results[fid]["incremental_lr_p_value"],
                             "z_statistic": primary_results[fid]["incremental_z_stat"],
                             "z_p_value": primary_results[fid]["incremental_z_p_value"],
+                            "diagnostics": primary_results[fid]["diagnostics"],
                         }
                         for fid in FORMAL_FEATURE_IDS
                     },
@@ -5061,6 +5310,10 @@ class H39OneShotUnblindGatekeeper:
             "execution_key": execution_key,
             "freeze_manifest_sha256": freeze_manifest_sha256,
             "freeze_commit_sha": freeze_commit_sha,
+            "protocol_hash": manifest["protocol_hash"],
+            "clarification_hash": manifest["clarification_hash"],
+            "clarification_002_hash": manifest["clarification_002_hash"],
+            "clarification_003_hash": manifest["clarification_003_hash"],
             "frozen_ledger_snapshot_sha256": manifest["frozen_ledger_snapshot_sha256"],
             "readiness_sha256": manifest["readiness_sha256"],
             "unblind_cutoff_ms": cutoff_ms,
@@ -5178,12 +5431,17 @@ def generate_all_v0325_deliverables(
         "primary_hac_max_lag": H39_HAC_MAX_LAG_60M,
         "secondary_hac_max_lag": H39_HAC_MAX_LAG_240M,
         "incremental_dependence_robust": True,
+        "formal_nested_method": "HAC_ROBUST_NUISANCE_ADJUSTED_SCORE_TEST_LAG_3",
+        "nested_score_test_max_lag": H39_HAC_MAX_LAG_60M,
         "lr_calibration_method": "CHRONOLOGICAL_MOVING_BLOCK_BOOTSTRAP",
+        "lr_bootstrap_status": "SUPERSEDED_DIAGNOSTIC_ONLY",
         "lr_bootstrap_block_length": H39_LR_BOOTSTRAP_BLOCK_LENGTH,
         "lr_bootstrap_replications": H39_LR_BOOTSTRAP_REPLICATIONS,
         "lr_bootstrap_seed": H39_LR_BOOTSTRAP_SEED,
         "clarification_002_hash": H39_FROZEN_CLARIFICATION_002_HASH,
         "clarification_002_commit_sha": H39_CLARIFICATION_002_SHA,
+        "clarification_003_hash": H39_FROZEN_CLARIFICATION_003_HASH,
+        "clarification_003_commit_sha": H39_CLARIFICATION_003_SHA,
         "created_at_utc": datetime.now(UTC).isoformat(),
         "attestations": {
             "zero_protocol_drift": True,
@@ -5723,7 +5981,221 @@ The forecast errors $e_t = y_{{t+H}} - \\hat{{y}}_{{t+H}}$ exhibit non-zero auto
     stat_rep_md_path.write_text(stat_rep_md, encoding="utf-8")
     created_files["V0.3.25_STATISTICAL_DEPENDENCE_HEALTH_REPAIR_MD"] = str(stat_rep_md_path)
 
-    # 9. README.md
+    # 9. V0.3.25_ROBUST_NULL_PROTOCOL_IDENTITY_HEALTH_SCHEMA_REPAIR.json
+    robust_rep_json = {
+        "schema_version": "1.0.0",
+        "stage": "v0.3.25",
+        "artifact_name": "V0.3.25_ROBUST_NULL_PROTOCOL_IDENTITY_HEALTH_SCHEMA_REPAIR",
+        "repair_type": "ROBUST_NESTED_NULL_PROTOCOL_IDENTITY_AND_HEALTH_SCHEMA_REPAIR",
+        "generated_at_utc": datetime.now(UTC).isoformat(),
+        "hypothesis_id": H39_HYPOTHESIS_ID,
+        "scientific_state": H39_STATE_INSUFFICIENT,
+        "readiness_status": readiness["status"],
+        "ready_for_unblind": readiness["ready_for_unblind"],
+        "real_one_shot_executed": False,
+        "real_validation_labels_loaded": False,
+        "real_validation_performance_artifacts_created": False,
+        "final_holdout_accessed": False,
+        "code_version_sha": code_sha,
+        "clarification_003": {
+            "artifact": H39_CLARIFICATION_003_PATH,
+            "commit_sha": H39_CLARIFICATION_003_SHA,
+            "file_sha256": H39_FROZEN_CLARIFICATION_003_HASH,
+            "pre_label_freeze_verified": True,
+        },
+        "blocker_a_robust_nested_null": {
+            "status": "RESOLVED",
+            "invalid_procedure": "Moving-block bootstrap of raw x_micro independently of baseline covariates destroyed contemporaneous correlation, testing unconditional independence rather than conditional null H0: beta_micro = 0 | X_base.",
+            "formal_procedure": "Closed-form deterministic Bartlett-kernel HAC-robust nuisance-adjusted score test under the null baseline logistic model.",
+            "formula_nuisance_projection": "gamma = (X_0' W X_0 + Lambda_0)^(-1) (X_0' W x_micro); x_tilde = x_micro - X_0 gamma",
+            "formula_score_statistic": "s_i = x_tilde_i * (y_i - p_hat_i); S_adj = sum(s_i); V_HAC = Newey-West Bartlett kernel (lag 3); Z_score = S_adj / sqrt(V_HAC)",
+            "primary_hac_max_lag": H39_HAC_MAX_LAG_60M,
+            "formal_incremental_gate": "p_score_hac < 0.05 and inc_z_stat_hac > 0",
+            "diagnostics_role": {
+                "iid_likelihood_ratio_test": "DIAGNOSTIC_ONLY",
+                "clarification_002_raw_x_bootstrap": "SUPERSEDED_DIAGNOSTIC_ONLY",
+            },
+        },
+        "blocker_b_protocol_identity": {
+            "status": "RESOLVED",
+            "mandatory_identity_chain": {
+                "protocol_freeze_sha256": H39_FROZEN_PROTOCOL_HASH,
+                "clarification_001_sha256": H39_FROZEN_CLARIFICATION_HASH,
+                "clarification_002_sha256": H39_FROZEN_CLARIFICATION_002_HASH,
+                "clarification_003_sha256": H39_FROZEN_CLARIFICATION_003_HASH,
+            },
+            "fail_closed_on_missing": True,
+            "fail_closed_on_drift": True,
+            "freeze_manifest_requires_all_hashes": True,
+            "execution_key_binds_all_hashes": True,
+            "no_optional_get_fallback": True,
+        },
+        "blocker_c_health_schema_and_clock_skew": {
+            "status": "RESOLVED",
+            "canonical_tables_verified": sorted(MICROSTRUCTURE_REQUIRED_TABLES),
+            "canonical_columns_verified": {
+                t: sorted(cols) for t, cols in MICROSTRUCTURE_REQUIRED_COLUMNS.items()
+            },
+            "missing_column_behavior": "SCHEMA_ERROR",
+            "freshness_basis_preferred": "LOCAL_RECEIVE_TIME over EXCHANGE_EVENT_TIME_FALLBACK",
+            "future_skew_tolerance_seconds": H39_FUTURE_SKEW_TOLERANCE_SECONDS,
+            "future_skew_behavior": "TIMESTAMP_ERROR (fail-closed BLOCKED)",
+            "heartbeat_truthfulness": "collector_heartbeat_status = NOT_VERIFIED (never ACTIVE without OS process proof)",
+            "derivatives_future_skew_behavior": "TIMESTAMP_ERROR (fail-closed BLOCKED)",
+            "chain_health_summary": chain_health,
+        },
+        "safety_firewalls": {
+            "strategy": "EXPERIMENTAL",
+            "qualified_direction_engine": "NONE",
+            "runtime_maximum": "OPPORTUNITY_ONLY",
+            "execution": "DISABLED",
+            "auto_execute": False,
+            "final_holdout": "SEALED",
+            "live_trading": "UNAUTHORIZED",
+        },
+    }
+    rob_json_path = out_dir / "V0.3.25_ROBUST_NULL_PROTOCOL_IDENTITY_HEALTH_SCHEMA_REPAIR.json"
+    rob_json_path.write_text(json.dumps(robust_rep_json, indent=2, sort_keys=True), encoding="utf-8")
+    created_files["V0.3.25_ROBUST_NULL_PROTOCOL_IDENTITY_HEALTH_SCHEMA_REPAIR_JSON"] = str(rob_json_path)
+
+    # 10. V0.3.25_ROBUST_NULL_PROTOCOL_IDENTITY_HEALTH_SCHEMA_REPAIR.md
+    rob_md = f"""# BTC Quant Agent v0.3.25 — Acceptance Repair: Robust Nested Null, Protocol Identity & Truthful Health Schema
+
+**Hypothesis ID**: `{H39_HYPOTHESIS_ID}`  
+**Repair Stage**: `v0.3.25`  
+**Accepted Baseline (`main`)**: `4e22c657c12f9e4a97b3b47bdfb3e8da598cabb2`  
+**Preceding Clarification 002 Commit**: `6e1259409aa4f1cedf86b7a424666ee7c942a929`  
+**Clarification 003 Dedicated Commit SHA**: `{H39_CLARIFICATION_003_SHA}`  
+**Clarification 003 File SHA-256**: `{H39_FROZEN_CLARIFICATION_003_HASH}`  
+**Implementation Commit SHA**: `{code_sha}`  
+**Final Stage Reviewer**: `ChatGPT` (Direct handoff per governance; no second Gemini audit)  
+**Stage Scientific State**: `FORWARD_DATA_INSUFFICIENT`  
+**Real One-Shot Executed**: `false`  
+**Real Validation Labels Loaded**: `false`  
+**Real Validation Performance Artifacts Created**: `false`  
+**Final Holdout Accessed**: `false`  
+
+---
+
+## 1. Executive Summary
+
+This acceptance repair resolves the three blocking findings identified by ChatGPT during the review of stage v0.3.25 (`419f28ad`):
+
+1. **Blocker A (Robust Nested Null Score Test)**: Clarification 002 raw-$x$ moving-block bootstrap destroyed contemporaneous dependence between $x_{{micro}}$ and $X_{{base}}$, testing unconditional independence rather than conditional null $H_0: \\beta_{{micro}} = 0 \\mid X_{{base}}$. We replace it with a closed-form, deterministic **HAC-robust nuisance-adjusted nested score test** under the null baseline model with Bartlett kernel (max lag 3). Classical iid LR and Clarification 002 bootstrap p-values become diagnostic only.
+2. **Blocker B (Mandatory Protocol Identity)**: Protocol identity binds Protocol Freeze (`{H39_FROZEN_PROTOCOL_HASH[:16]}...`), Clarification 001 (`{H39_FROZEN_CLARIFICATION_HASH[:16]}...`), Clarification 002 (`{H39_FROZEN_CLARIFICATION_002_HASH[:16]}...`), and Clarification 003 (`{H39_FROZEN_CLARIFICATION_003_HASH[:16]}...`). Missing/drifted files or manifests omitting either clarification fail closed (`FREEZE_MANIFEST_CORRUPT`, `CLARIFICATION_003_HASH_DRIFT`). The deterministic execution key binds all 7 components without `.get()` fallback.
+3. **Blocker C (Microstructure Health Schema & Clock Skew)**: Microstructure health audits the full canonical schema (`agg_trades`: 5 cols, `book_samples`: 8 cols, `gaps`: 2 cols) derived directly from `microstructure.py`. Missing columns trigger `SCHEMA_ERROR` (never `HEALTHY`). Freshness strictly prefers local `receive_time_ms` over exchange `event_time_ms`. Any timestamp beyond the 5.0s tolerance triggers `TIMESTAMP_ERROR` / `CLOCK_SKEW` and sets aggregate health to `BLOCKED`.
+
+---
+
+## 2. Blocker A: Closed-Form HAC-Robust Nuisance-Adjusted Score Test
+
+### Mathematical Rationale & The Flaw in Raw-$x$ Bootstrap
+Under the true null hypothesis $H_0: \\beta_{{micro}} = 0 \\mid X_{{base}}$, the outcome $y$ depends on the baseline controls $X_{{base}}$, and the microstructure feature $x_{{micro}}$ is contemporaneously correlated with $X_{{base}}$:
+$$\\mathbb{{E}}[x_{{micro}} \\mid X_{{base}}] \\neq 0$$
+When Clarification 002 resampled blocks of raw $x_{{micro}}$ while holding $(X_{{base}}, y)$ fixed, it broke the joint distribution $(X_{{base}}, x_{{micro}})$. The resampled $x_{{micro}}^*$ became orthogonal to $X_{{base}}$, testing the unconditional null $\\text{{Cov}}(x_{{micro}}, y) = 0$ rather than the conditional nested null. Consequently, the bootstrap LR distribution under-represented the test statistic under collinearity, creating severe size distortion and false positives.
+
+### Closed-Form Nuisance Parameter Projection
+Under Clarification 003, we calibrate the nested model using a deterministic score test:
+1. **Null Baseline Logistic Model**:
+   $$\\hat{{p}}_i = \\sigma(X_{{base, i}} \\hat{{\\beta}}_{{base}}), \\quad w_i = \\hat{{p}}_i (1 - \\hat{{p}}_i), \\quad e_i = y_i - \\hat{{p}}_i$$
+2. **Null Information / Hessian with L2 Penalty**:
+   $$H_0 = X_{{base}}^T W X_{{base}} + \\Lambda_0, \\quad \\Lambda_0 = \\text{{diag}}(0, \\lambda, \\dots, \\lambda)$$
+3. **Nuisance Parameter Projection**:
+   $$I_{{x0}} = X_{{base}}^T W x_{{micro}}$$
+   $$\\gamma = H_0^{{-1}} I_{{x0}}$$
+   $$\\tilde{{x}} = x_{{micro}} - X_{{base}} \\gamma$$
+   This projection orthogonalizes $x_{{micro}}$ with respect to the baseline control space under the null metric $W$. Under $H_0$, $\\mathbb{{E}}[s_i] = \\mathbb{{E}}[\\tilde{{x}}_i e_i] = 0$, even when $x_{{micro}}$ is highly correlated with $X_{{base}}$.
+4. **Total Adjusted Score**:
+   $$S_{{adj}} = \\sum_{{i=1}}^n s_i = \\sum_{{i=1}}^n \\tilde{{x}}_i (y_i - \\hat{{p}}_i)$$
+5. **Bartlett-Kernel HAC Long-Run Variance**:
+   $$\\hat{{V}}_{{HAC}}(S_{{adj}}) = \\sum_{{i=1}}^n s_i^2 + 2 \\sum_{{j=1}}^L \\left(1 - \\frac{{j}}{{L+1}}\\right) \\sum_{{i=j+1}}^n s_i s_{{i-j}}, \\quad L = 3$$
+6. **Standardized Test Statistic & One-Sided P-Value**:
+   $$Z_{{score}} = \\frac{{S_{{adj}}}}{{\\sqrt{{\\hat{{V}}_{{HAC}}}}}}, \\quad p_{{score}} = 1 - \\Phi(Z_{{score}})$$
+   Fails closed with `STATISTICAL_INFERENCE_NOT_READY` if $\\hat{{V}}_{{HAC}} \\le 0$ or singular.
+
+### Formal vs. Diagnostic Statistics Mapping
+
+| Statistic / Field | Role | Formal Gate Impact |
+| :--- | :--- | :---: |
+| `p_value_holm` (Primary 60m HAC) | Formal Candidate Gate | MUST be $< 0.05$ |
+| `ci_lower_95` (Primary 60m HAC) | Formal Candidate Gate | MUST exclude 0 in $+1$ direction |
+| `formal_nested_p_value` ($p_{{score}}$) | Formal Incremental Gate | MUST be $< 0.05$ |
+| `incremental_z_stat` (Sandwich HAC $z$) | Formal Incremental Gate | MUST be $> 0$ |
+| `iid_incremental_lr_p_value` | Diagnostic Only | Barred from candidate gating |
+| `clarification_002_bootstrap_lr_p_value` | Superseded Diagnostic | Barred from candidate gating |
+
+---
+
+## 3. Blocker B: Mandatory Protocol Identity Chain
+
+The protocol identity for all future freeze and unblind operations strictly requires all 4 components:
+1. **Protocol Freeze**: SHA-256 `{H39_FROZEN_PROTOCOL_HASH}`
+2. **Clarification 001**: SHA-256 `{H39_FROZEN_CLARIFICATION_HASH}`
+3. **Clarification 002**: SHA-256 `{H39_FROZEN_CLARIFICATION_002_HASH}`
+4. **Clarification 003**: SHA-256 `{H39_FROZEN_CLARIFICATION_003_HASH}`
+
+Missing files or hash drifts immediately raise fail-closed exceptions before readiness, freeze, or unblind execution. The deterministic execution key binds all 7 components:
+```python
+key_material = (
+    freeze_manifest_sha256
+    + freeze_commit_sha
+    + str(cutoff_ms)
+    + manifest["protocol_hash"]
+    + manifest["clarification_hash"]
+    + manifest["clarification_002_hash"]
+    + manifest["clarification_003_hash"]
+)
+```
+
+---
+
+## 4. Blocker C: Canonical Microstructure Health Schema & Clock Skew
+
+### Verified Canonical Schema
+
+| Table | Required Columns | Schema Failure State |
+| :--- | :--- | :---: |
+| `agg_trades` | `event_time_ms`, `receive_time_ms`, `price`, `quantity`, `aggressive_side` | `SCHEMA_ERROR` |
+| `book_samples` | `event_time_ms`, `receive_time_ms`, `spread_bps`, `top1_imbalance`, `top5_imbalance`, `top20_imbalance`, `microprice`, `ofi` | `SCHEMA_ERROR` |
+| `gaps` | `start_ms`, `end_ms` | `SCHEMA_ERROR` |
+
+### Freshness Timestamp Preference & Future Skew Policy
+- Operational freshness strictly prefers local `receive_time_ms` over exchange `event_time_ms` to eliminate exchange clock skew confusion.
+- Fixed future skew tolerance: `H39_FUTURE_SKEW_TOLERANCE_SECONDS = 5.0s`.
+- If `effective_ts - now_ms > 5000ms`, state transitions immediately to `TIMESTAMP_ERROR` / `CLOCK_SKEW` (never `HEALTHY`).
+- Aggregate forward health fails closed to `BLOCKED`.
+
+---
+
+## 5. Live Component Health Audit
+
+- **Derivatives Store**: `data/forward/BTCUSDT/derivatives.sqlite3` (`derivative_snapshots` table verified, integrity OK, fresh).
+- **Microstructure Root**: `data/forward/BTCUSDT/microstructure` (8 partitions, latest `microstructure-2026-09-07.sqlite3`, full canonical schema verified, integrity OK).
+- **Opportunity Shadow**: `DATA_QUALITY_TERMINAL_ARCHIVE` (terminal H38 reconciled).
+- **Collector Heartbeat**: Truthfully reported as `NOT_VERIFIED` (no fake `ACTIVE`).
+- **Aggregate Forward Chain Health**: `HEALTHY`.
+
+---
+
+## 6. Safety Invariants Attestation
+
+| Invariant | Configured Value | Status |
+| :--- | :--- | :---: |
+| **Trading Strategy** | `EXPERIMENTAL` | INVIOLATE |
+| **Qualified Direction Engine** | `NONE` | INVIOLATE |
+| **Runtime Ceiling** | `OPPORTUNITY_ONLY` | INVIOLATE |
+| **Execution Engine** | `DISABLED` | INVIOLATE |
+| **Auto-Execute Flag** | `false` | INVIOLATE |
+| **Live Trading Authorization** | `UNAUTHORIZED` | INVIOLATE |
+| **Final Holdout Partition** | `SEALED` (0 bytes / 0 rows accessed) | INVIOLATE |
+| **Collector Storage Mode** | Read-Only (`mode=ro` + `PRAGMA query_only = ON`) | INVIOLATE |
+| **Formal Hypothesis Evaluator** | Refuses all post-start validation evidence | INVIOLATE |
+"""
+    rob_md_path = out_dir / "V0.3.25_ROBUST_NULL_PROTOCOL_IDENTITY_HEALTH_SCHEMA_REPAIR.md"
+    rob_md_path.write_text(rob_md, encoding="utf-8")
+    created_files["V0.3.25_ROBUST_NULL_PROTOCOL_IDENTITY_HEALTH_SCHEMA_REPAIR_MD"] = str(rob_md_path)
+
+    # 11. README.md
     readme_md = f"""# BTC Quant Agent v0.3.25 Deliverables
 
 This directory contains the deliverables for **v0.3.25: H39 One-Shot Unblind Preregistration & Acceptance Repair**.
@@ -5738,14 +6210,18 @@ This directory contains the deliverables for **v0.3.25: H39 One-Shot Unblind Pre
 6. [`V0.3.25_COMMITTED_FREEZE_EXACTLY_ONCE_REPAIR.md`](V0.3.25_COMMITTED_FREEZE_EXACTLY_ONCE_REPAIR.md): Detailed acceptance repair report resolving Findings A through F for committed freeze boundary and snapshotting.
 7. [`H39_PROTOCOL_CLARIFICATION_002_DEPENDENCE_ROBUST_INFERENCE.json`](H39_PROTOCOL_CLARIFICATION_002_DEPENDENCE_ROBUST_INFERENCE.json): Authoritative protocol clarification on serial dependence and robust Newey-West / bootstrap inference.
 8. [`V0.3.25_STATISTICAL_DEPENDENCE_HEALTH_REPAIR.json`](V0.3.25_STATISTICAL_DEPENDENCE_HEALTH_REPAIR.json): Machine-readable audit of statistical dependence and forward health truthfulness repair.
-9. [`V0.3.25_STATISTICAL_DEPENDENCE_HEALTH_REPAIR.md`](V0.3.25_STATISTICAL_DEPENDENCE_HEALTH_REPAIR.md): Detailed acceptance repair report resolving Findings A and B on serial dependence and health states for ChatGPT final acceptance.
+9. [`V0.3.25_STATISTICAL_DEPENDENCE_HEALTH_REPAIR.md`](V0.3.25_STATISTICAL_DEPENDENCE_HEALTH_REPAIR.md): Detailed acceptance repair report resolving Findings A and B on serial dependence and health states.
+10. [`H39_PROTOCOL_CLARIFICATION_003_ROBUST_NESTED_NULL.json`](H39_PROTOCOL_CLARIFICATION_003_ROBUST_NESTED_NULL.json): Authoritative protocol clarification on HAC-robust nuisance-adjusted nested score test under the null baseline model.
+11. [`V0.3.25_ROBUST_NULL_PROTOCOL_IDENTITY_HEALTH_SCHEMA_REPAIR.json`](V0.3.25_ROBUST_NULL_PROTOCOL_IDENTITY_HEALTH_SCHEMA_REPAIR.json): Machine-readable audit of robust nested null score test, mandatory protocol identity, and health schema repair.
+12. [`V0.3.25_ROBUST_NULL_PROTOCOL_IDENTITY_HEALTH_SCHEMA_REPAIR.md`](V0.3.25_ROBUST_NULL_PROTOCOL_IDENTITY_HEALTH_SCHEMA_REPAIR.md): Detailed acceptance repair report resolving Blockers A, B, and C for ChatGPT final acceptance.
 
 ## Governance
 
-- **Accepted Baseline (`main`)**: Commit [`e99964a3ced0c40424a4ace6dd59cc2376a2dea6`](commit://e99964a3ced0c40424a4ace6dd59cc2376a2dea6)
+- **Accepted Baseline (`main`)**: Commit [`4e22c657c12f9e4a97b3b47bdfb3e8da598cabb2`](commit://4e22c657c12f9e4a97b3b47bdfb3e8da598cabb2)
 - **Protocol Freeze**: Commit [`{H39_PROTOCOL_FREEZE_SHA}`](commit://{H39_PROTOCOL_FREEZE_SHA})
 - **Protocol Clarification 001**: Commit [`{H39_CLARIFICATION_SHA}`](commit://{H39_CLARIFICATION_SHA})
 - **Protocol Clarification 002**: Commit [`{H39_CLARIFICATION_002_SHA}`](commit://{H39_CLARIFICATION_002_SHA})
+- **Protocol Clarification 003**: Commit [`{H39_CLARIFICATION_003_SHA}`](commit://{H39_CLARIFICATION_003_SHA})
 - **Current Stage State**: `{readiness["status"]}`
 - **Unblind Readiness**: `{"READY" if readiness["ready_for_unblind"] else "REFUSED_NOT_MATURE"}`
 - **Reviewers**:

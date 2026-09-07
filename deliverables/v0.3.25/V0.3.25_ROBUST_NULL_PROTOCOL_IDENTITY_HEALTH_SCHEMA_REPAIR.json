@@ -1,0 +1,145 @@
+{
+  "artifact_name": "V0.3.25_ROBUST_NULL_PROTOCOL_IDENTITY_HEALTH_SCHEMA_REPAIR",
+  "blocker_a_robust_nested_null": {
+    "diagnostics_role": {
+      "clarification_002_raw_x_bootstrap": "SUPERSEDED_DIAGNOSTIC_ONLY",
+      "iid_likelihood_ratio_test": "DIAGNOSTIC_ONLY"
+    },
+    "formal_incremental_gate": "p_score_hac < 0.05 and inc_z_stat_hac > 0",
+    "formal_procedure": "Closed-form deterministic Bartlett-kernel HAC-robust nuisance-adjusted score test under the null baseline logistic model.",
+    "formula_nuisance_projection": "gamma = (X_0' W X_0 + Lambda_0)^(-1) (X_0' W x_micro); x_tilde = x_micro - X_0 gamma",
+    "formula_score_statistic": "s_i = x_tilde_i * (y_i - p_hat_i); S_adj = sum(s_i); V_HAC = Newey-West Bartlett kernel (lag 3); Z_score = S_adj / sqrt(V_HAC)",
+    "invalid_procedure": "Moving-block bootstrap of raw x_micro independently of baseline covariates destroyed contemporaneous correlation, testing unconditional independence rather than conditional null H0: beta_micro = 0 | X_base.",
+    "primary_hac_max_lag": 3,
+    "status": "RESOLVED"
+  },
+  "blocker_b_protocol_identity": {
+    "execution_key_binds_all_hashes": true,
+    "fail_closed_on_drift": true,
+    "fail_closed_on_missing": true,
+    "freeze_manifest_requires_all_hashes": true,
+    "mandatory_identity_chain": {
+      "clarification_001_sha256": "b2ba02df923950413c773e308e01d4ba893690948be9c258311d483ea753e284",
+      "clarification_002_sha256": "94c938b65640252c85a9e320b6f7759729ffa00f793c93e17cca52726e73212e",
+      "clarification_003_sha256": "035b7528141c714fbe1aef310462d5aa5fd96d3d5fdec67ae8f70082531d7a92",
+      "protocol_freeze_sha256": "1b7d61409078f779585675e9f657a60ea1ef5384a7707c33bbac07535feaa979"
+    },
+    "no_optional_get_fallback": true,
+    "status": "RESOLVED"
+  },
+  "blocker_c_health_schema_and_clock_skew": {
+    "canonical_columns_verified": {
+      "agg_trades": [
+        "aggressive_side",
+        "event_time_ms",
+        "price",
+        "quantity",
+        "receive_time_ms"
+      ],
+      "book_samples": [
+        "event_time_ms",
+        "microprice",
+        "ofi",
+        "receive_time_ms",
+        "spread_bps",
+        "top1_imbalance",
+        "top20_imbalance",
+        "top5_imbalance"
+      ],
+      "gaps": [
+        "end_ms",
+        "start_ms"
+      ]
+    },
+    "canonical_tables_verified": [
+      "agg_trades",
+      "book_samples",
+      "gaps"
+    ],
+    "chain_health_summary": {
+      "aggregate_status": "HEALTHY",
+      "derivatives_chain": {
+        "db_integrity": "ok",
+        "epoch_id": "DERIVATIVES_PIT_EPOCH_V0321_001",
+        "exists": true,
+        "freshness_seconds": 600.924,
+        "latest_observed_ms": 1788757231310,
+        "latest_observed_utc": "2026-09-07T05:00:31.310000+00:00",
+        "reason": "Store verified: 547 snapshots, integrity OK, freshness 600.9s",
+        "rows_recorded": 547,
+        "schema_valid": true,
+        "status": "HEALTHY",
+        "store_path": "/root/workspace/project/Quant-agent/data/forward/BTCUSDT/derivatives.sqlite3",
+        "table_name": "derivative_snapshots"
+      },
+      "generated_at_utc": "2026-09-07T05:10:32.904109+00:00",
+      "microstructure_chain": {
+        "collector_heartbeat_status": "NOT_VERIFIED",
+        "freshness_basis": "LOCAL_RECEIVE_TIME",
+        "freshness_seconds": 0.0,
+        "latest_event_time_ms": 1788757833692,
+        "latest_event_time_utc": "2026-09-07T05:10:33.692000+00:00",
+        "latest_partition": "microstructure-2026-09-07.sqlite3",
+        "latest_partition_exists": true,
+        "latest_partition_integrity": "ok",
+        "latest_partition_schema_valid": true,
+        "latest_receive_time_ms": 1788757832833,
+        "latest_receive_time_utc": "2026-09-07T05:10:32.833000+00:00",
+        "partition_count": 8,
+        "reason": "Partition microstructure-2026-09-07.sqlite3 verified: full schema OK, integrity OK, freshness 0.0s (LOCAL_RECEIVE_TIME)",
+        "root_exists": true,
+        "root_path": "/root/workspace/project/Quant-agent/data/forward/BTCUSDT/microstructure",
+        "status": "HEALTHY",
+        "stream_id": "MICROSTRUCTURE_CAPTURE_V0315_001"
+      },
+      "opportunity_shadow_chain": {
+        "chain_id": "OPPORTUNITY_FORWARD_V0321_20260903T180000Z",
+        "policy": {
+          "active_evaluation_prohibited": true,
+          "resolvable": false,
+          "successor_preregistered": false
+        },
+        "reason": "H38 breached data-quality boundary on 2026-09-04; terminal archive is frozen.",
+        "status": "DATA_QUALITY_TERMINAL_ARCHIVE",
+        "terminal_at_ms": 1788511500000,
+        "terminal_at_utc": "2026-09-04T08:45:00Z"
+      },
+      "schema_version": "1.0.0"
+    },
+    "derivatives_future_skew_behavior": "TIMESTAMP_ERROR (fail-closed BLOCKED)",
+    "freshness_basis_preferred": "LOCAL_RECEIVE_TIME over EXCHANGE_EVENT_TIME_FALLBACK",
+    "future_skew_behavior": "TIMESTAMP_ERROR (fail-closed BLOCKED)",
+    "future_skew_tolerance_seconds": 5.0,
+    "heartbeat_truthfulness": "collector_heartbeat_status = NOT_VERIFIED (never ACTIVE without OS process proof)",
+    "missing_column_behavior": "SCHEMA_ERROR",
+    "status": "RESOLVED"
+  },
+  "clarification_003": {
+    "artifact": "deliverables/v0.3.25/H39_PROTOCOL_CLARIFICATION_003_ROBUST_NESTED_NULL.json",
+    "commit_sha": "5d055ae17798bdc00e1b0d6388596ecd59358251",
+    "file_sha256": "035b7528141c714fbe1aef310462d5aa5fd96d3d5fdec67ae8f70082531d7a92",
+    "pre_label_freeze_verified": true
+  },
+  "code_version_sha": "5d055ae17798bdc00e1b0d6388596ecd59358251",
+  "final_holdout_accessed": false,
+  "generated_at_utc": "2026-09-07T05:10:32.905847+00:00",
+  "hypothesis_id": "H39_MICROSTRUCTURE_DIRECTIONAL_INFORMATION",
+  "readiness_status": "FORWARD_DATA_INSUFFICIENT",
+  "ready_for_unblind": false,
+  "real_one_shot_executed": false,
+  "real_validation_labels_loaded": false,
+  "real_validation_performance_artifacts_created": false,
+  "repair_type": "ROBUST_NESTED_NULL_PROTOCOL_IDENTITY_AND_HEALTH_SCHEMA_REPAIR",
+  "safety_firewalls": {
+    "auto_execute": false,
+    "execution": "DISABLED",
+    "final_holdout": "SEALED",
+    "live_trading": "UNAUTHORIZED",
+    "qualified_direction_engine": "NONE",
+    "runtime_maximum": "OPPORTUNITY_ONLY",
+    "strategy": "EXPERIMENTAL"
+  },
+  "schema_version": "1.0.0",
+  "scientific_state": "FORWARD_DATA_INSUFFICIENT",
+  "stage": "v0.3.25"
+}

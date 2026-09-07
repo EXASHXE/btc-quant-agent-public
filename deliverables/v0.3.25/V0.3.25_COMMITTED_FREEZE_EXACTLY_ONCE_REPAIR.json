@@ -1,6 +1,6 @@
 {
   "artifact_name": "V0.3.25_COMMITTED_FREEZE_EXACTLY_ONCE_REPAIR",
-  "code_version_sha": "304fb0d276508ce1ba8ae9bb617c94202f66879c",
+  "code_version_sha": "5d055ae17798bdc00e1b0d6388596ecd59358251",
   "findings_resolved": {
     "finding_a_committed_freeze": {
       "description": "verify_committed_freeze_package strictly verifies git tracking, clean porcelain status, commit SHA ancestry to HEAD, and exact committed blob byte equality before any labels or candles are loaded.",
@@ -27,7 +27,7 @@
       "status": "RESOLVED"
     }
   },
-  "generated_at_utc": "2026-09-06T19:08:42.790837+00:00",
+  "generated_at_utc": "2026-09-07T05:10:32.904664+00:00",
   "hypothesis_id": "H39_MICROSTRUCTURE_DIRECTIONAL_INFORMATION",
   "readiness_status": "FORWARD_DATA_INSUFFICIENT",
   "ready_for_unblind": false,
