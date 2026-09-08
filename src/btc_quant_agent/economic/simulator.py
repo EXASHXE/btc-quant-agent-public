@@ -117,6 +117,17 @@ class EconomicSimulationEngine:
         peak_equity = self.initial_cash
         max_dd_usdt = 0.0
         max_dd_pct = 0.0
+        drawdown_halt = False
+
+        def _update_drawdown(current_equity: float) -> None:
+            nonlocal peak_equity, max_dd_usdt, max_dd_pct, drawdown_halt
+            peak_equity = max(peak_equity, current_equity)
+            dd_usdt = peak_equity - current_equity
+            dd_pct = dd_usdt / peak_equity if peak_equity > 0 else 0.0
+            max_dd_usdt = max(max_dd_usdt, dd_usdt)
+            max_dd_pct = max(max_dd_pct, dd_pct)
+            if max_dd_pct >= self.policy.risk_budget.max_drawdown_stop_pct:
+                drawdown_halt = True
 
         active_trade_entry_time: int | None = None
         active_trade_entry_price: float | None = None
@@ -131,6 +142,61 @@ class EconomicSimulationEngine:
 
         # Pending fills queue: future fills that have not yet reached fill_timestamp_ms
         pending_fills: list[dict[str, Any]] = []
+
+        def _apply_pending_fill(pf: dict[str, Any], sym: str) -> bool:
+            """Apply pending fill if within risk constraints, returning True if applied."""
+            nonlocal active_trade_entry_time, active_trade_entry_price
+            nonlocal active_trade_peak_price, active_trade_trough_price
+            nonlocal active_signal_id, trades_completed, winning_trades
+            nonlocal losing_trades, gross_pnl_accum
+
+            is_open = pf["action"] in (TradeAction.OPEN_LONG, TradeAction.OPEN_SHORT)
+            if is_open:
+                if drawdown_halt:
+                    return False
+                active_qty = portfolio.get_position_quantity(sym)
+                active_count = 1 if abs(active_qty) > 1e-12 else 0
+                if active_count + 1 > self.policy.risk_budget.max_open_positions:
+                    return False
+                curr_gross = abs(active_qty) * pf["price"]
+                if curr_gross + (pf["quantity"] * pf["price"]) > self.policy.risk_budget.max_gross_exposure_usdt:
+                    return False
+
+            ev = portfolio.apply_trade(
+                timestamp_ms=pf["fill_timestamp_ms"],
+                action=pf["action"],
+                asset=sym,
+                price=pf["price"],
+                quantity=pf["quantity"],
+                fee_usdt=pf["fee_usdt"],
+                signal_id=pf["signal_id"],
+                trade_id=pf["trade_id"],
+                observation_timestamp_ms=pf["observation_timestamp_ms"],
+                decision_timestamp_ms=pf["decision_timestamp_ms"],
+                order_timestamp_ms=pf["order_timestamp_ms"],
+                settlement_timestamp_ms=pf["settlement_timestamp_ms"],
+            )
+            if is_open:
+                active_trade_entry_time = pf["fill_timestamp_ms"]
+                active_trade_entry_price = pf["price"]
+                active_trade_peak_price = pf["price"]
+                active_trade_trough_price = pf["price"]
+                active_signal_id = pf["signal_id"]
+            else:
+                trades_completed += 1
+                gross_pnl_accum += ev.realized_pnl_usdt
+                if ev.realized_pnl_usdt - ev.fee_usdt > 0:
+                    winning_trades += 1
+                else:
+                    losing_trades += 1
+                active_trade_entry_time = None
+                active_trade_entry_price = None
+                active_trade_peak_price = None
+                active_trade_trough_price = None
+                active_signal_id = ""
+
+            _update_drawdown(portfolio.total_equity({sym: pf["price"]}))
+            return True
 
         for i, bar in enumerate(candles):
             mark_price = bar.close
@@ -156,44 +222,14 @@ class EconomicSimulationEngine:
                         cashflow_usdt=cf,
                         mark_price=fevent.mark_price,
                     )
+                    _update_drawdown(portfolio.total_equity({bar.symbol: fevent.mark_price}))
 
             # 2. Apply pending fills scheduled for <= bar.open_time_ms
             pending_fills.sort(key=lambda x: x["fill_timestamp_ms"])
             rem_fills = []
             for pf in pending_fills:
                 if pf["fill_timestamp_ms"] <= bar.open_time_ms:
-                    ev = portfolio.apply_trade(
-                        timestamp_ms=pf["fill_timestamp_ms"],
-                        action=pf["action"],
-                        asset=bar.symbol,
-                        price=pf["price"],
-                        quantity=pf["quantity"],
-                        fee_usdt=pf["fee_usdt"],
-                        signal_id=pf["signal_id"],
-                        trade_id=pf["trade_id"],
-                        observation_timestamp_ms=pf["observation_timestamp_ms"],
-                        decision_timestamp_ms=pf["decision_timestamp_ms"],
-                        order_timestamp_ms=pf["order_timestamp_ms"],
-                        settlement_timestamp_ms=pf["settlement_timestamp_ms"],
-                    )
-                    if pf["action"] in (TradeAction.OPEN_LONG, TradeAction.OPEN_SHORT):
-                        active_trade_entry_time = pf["fill_timestamp_ms"]
-                        active_trade_entry_price = pf["price"]
-                        active_trade_peak_price = pf["price"]
-                        active_trade_trough_price = pf["price"]
-                        active_signal_id = pf["signal_id"]
-                    else:
-                        trades_completed += 1
-                        gross_pnl_accum += ev.realized_pnl_usdt
-                        if ev.realized_pnl_usdt - ev.fee_usdt > 0:
-                            winning_trades += 1
-                        else:
-                            losing_trades += 1
-                        active_trade_entry_time = None
-                        active_trade_entry_price = None
-                        active_trade_peak_price = None
-                        active_trade_trough_price = None
-                        active_signal_id = ""
+                    _apply_pending_fill(pf, bar.symbol)
                 else:
                     rem_fills.append(pf)
             pending_fills = rem_fills
@@ -208,8 +244,10 @@ class EconomicSimulationEngine:
                     continue
 
                 curr_pos_qty = portfolio.get_position_quantity(bar.symbol)
+                has_active_pos = abs(curr_pos_qty) > 1e-12
+
                 # Signal reversal exit
-                if abs(curr_pos_qty) > 1e-12:
+                if has_active_pos:
                     if self.policy.exit_rule.decay_exit_on_signal_reversal and (
                         (curr_pos_qty > 0 and sig.direction == -1) or (curr_pos_qty < 0 and sig.direction == 1)
                     ):
@@ -239,69 +277,138 @@ class EconomicSimulationEngine:
                         active_trade_peak_price = None
                         active_trade_trough_price = None
                         active_signal_id = ""
+                        _update_drawdown(portfolio.total_equity({bar.symbol: bar.open}))
                     continue
 
-                if pending_fills:
+                # Sticky drawdown halt blocks all new entries
+                if drawdown_halt:
                     continue
 
-                if self.policy.should_enter(sig):
-                    current_eq = portfolio.total_equity({bar.symbol: mark_price})
-                    qty = self.policy.calculate_quantity(current_price=bar.open, portfolio_equity=current_eq)
-                    if qty > 0:
-                        side = 1 if sig.direction == 1 else -1
-                        lim_price: float | None = None
-                        if self.policy.entry_rule.order_type == OrderType.LIMIT:
-                            lim_price = self.policy.entry_rule.calculate_limit_price(
-                                reference_price=bar.open, side=side
-                            )
+                # Risk budget: max open positions check (active + pending)
+                active_open_count = 1 if abs(portfolio.get_position_quantity(bar.symbol)) > 1e-12 else 0
+                pending_open_count = sum(
+                    1 for pf in pending_fills if pf["action"] in (TradeAction.OPEN_LONG, TradeAction.OPEN_SHORT)
+                )
+                if active_open_count + pending_open_count >= self.policy.risk_budget.max_open_positions:
+                    continue
 
-                        exec_res = self.execution_model.simulate_order(
-                            signal_timestamp_ms=sig.timestamp_ms,
-                            side=side,
-                            desired_quantity=qty,
-                            order_type=self.policy.entry_rule.order_type,
-                            future_candles=candles[i:],
-                            limit_price=lim_price,
-                            time_in_force_ms=self.policy.entry_rule.time_in_force_ms,
-                            observation_timestamp_ms=sig.timestamp_ms,
+                # Market state inputs (strictly causal)
+                spread_bps = float(sig.metadata.get("spread_bps", 0.0))
+                if "volume_usdt" in sig.metadata:
+                    vol_usdt = float(sig.metadata["volume_usdt"])
+                elif bar.quote_volume > 0:
+                    vol_usdt = float(bar.quote_volume)
+                elif bar.volume > 0:
+                    vol_usdt = float(bar.volume * bar.open)
+                else:
+                    vol_usdt = 0.0
+
+                regime = sig.metadata.get("regime")
+                regime_str = str(regime) if regime is not None else None
+
+                if not self.policy.should_enter(
+                    signal=sig,
+                    current_spread_bps=spread_bps,
+                    current_volume_usdt=vol_usdt,
+                    current_regime=regime_str,
+                ):
+                    continue
+
+                current_eq = portfolio.total_equity({bar.symbol: mark_price})
+                atr_val = sig.metadata.get("atr")
+                if atr_val is not None:
+                    try:
+                        atr_float = float(atr_val)
+                    except (ValueError, TypeError):
+                        continue
+                else:
+                    atr_float = None
+
+                try:
+                    qty = self.policy.calculate_quantity(
+                        current_price=bar.open,
+                        portfolio_equity=current_eq,
+                        current_atr=atr_float,
+                    )
+                except ValueError:
+                    # Sizing computation failed closed (missing ATR or stop loss)
+                    continue
+
+                if qty <= 0 or not math.isfinite(qty):
+                    continue
+
+                side = 1 if sig.direction == 1 else -1
+                lim_price: float | None = None
+                if self.policy.entry_rule.order_type == OrderType.LIMIT:
+                    lim_price = self.policy.entry_rule.calculate_limit_price(
+                        reference_price=bar.open, side=side
+                    )
+
+                # Pre-order Gross Exposure Check
+                order_ref_price = lim_price if lim_price is not None else bar.open
+                order_gross = qty * order_ref_price
+                active_gross = abs(portfolio.get_position_quantity(bar.symbol)) * bar.open
+                pending_gross = sum(
+                    pf["quantity"] * pf["price"]
+                    for pf in pending_fills
+                    if pf["action"] in (TradeAction.OPEN_LONG, TradeAction.OPEN_SHORT)
+                )
+                if active_gross + pending_gross + order_gross > self.policy.risk_budget.max_gross_exposure_usdt:
+                    continue
+
+                exec_res = self.execution_model.simulate_order(
+                    signal_timestamp_ms=sig.timestamp_ms,
+                    side=side,
+                    desired_quantity=qty,
+                    order_type=self.policy.entry_rule.order_type,
+                    future_candles=candles[i:],
+                    limit_price=lim_price,
+                    time_in_force_ms=self.policy.entry_rule.time_in_force_ms,
+                    observation_timestamp_ms=sig.timestamp_ms,
+                )
+                if exec_res.is_filled:
+                    # Post-fill Exposure Check against actual fill price & quantity
+                    fill_gross = exec_res.filled_quantity * exec_res.fill_price
+                    if active_gross + pending_gross + fill_gross > self.policy.risk_budget.max_gross_exposure_usdt:
+                        continue
+
+                    act = TradeAction.OPEN_LONG if side == 1 else TradeAction.OPEN_SHORT
+                    fill_info = {
+                        "fill_timestamp_ms": exec_res.fill_timestamp_ms,
+                        "action": act,
+                        "asset": bar.symbol,
+                        "price": exec_res.fill_price,
+                        "quantity": exec_res.filled_quantity,
+                        "fee_usdt": exec_res.fee_usdt,
+                        "signal_id": sig.signal_id,
+                        "trade_id": f"ORD_{sig.signal_id}",
+                        "observation_timestamp_ms": exec_res.observation_timestamp_ms,
+                        "decision_timestamp_ms": exec_res.decision_timestamp_ms,
+                        "order_timestamp_ms": exec_res.order_timestamp_ms,
+                        "settlement_timestamp_ms": exec_res.settlement_timestamp_ms,
+                    }
+                    if exec_res.fill_timestamp_ms <= bar.open_time_ms:
+                        portfolio.apply_trade(
+                            timestamp_ms=exec_res.fill_timestamp_ms,
+                            action=act,
+                            asset=bar.symbol,
+                            price=exec_res.fill_price,
+                            quantity=exec_res.filled_quantity,
+                            fee_usdt=exec_res.fee_usdt,
+                            signal_id=sig.signal_id,
+                            observation_timestamp_ms=exec_res.observation_timestamp_ms,
+                            decision_timestamp_ms=exec_res.decision_timestamp_ms,
+                            order_timestamp_ms=exec_res.order_timestamp_ms,
+                            settlement_timestamp_ms=exec_res.settlement_timestamp_ms,
                         )
-                        if exec_res.is_filled:
-                            act = TradeAction.OPEN_LONG if side == 1 else TradeAction.OPEN_SHORT
-                            fill_info = {
-                                "fill_timestamp_ms": exec_res.fill_timestamp_ms,
-                                "action": act,
-                                "asset": bar.symbol,
-                                "price": exec_res.fill_price,
-                                "quantity": exec_res.filled_quantity,
-                                "fee_usdt": exec_res.fee_usdt,
-                                "signal_id": sig.signal_id,
-                                "trade_id": f"ORD_{sig.signal_id}",
-                                "observation_timestamp_ms": exec_res.observation_timestamp_ms,
-                                "decision_timestamp_ms": exec_res.decision_timestamp_ms,
-                                "order_timestamp_ms": exec_res.order_timestamp_ms,
-                                "settlement_timestamp_ms": exec_res.settlement_timestamp_ms,
-                            }
-                            if exec_res.fill_timestamp_ms <= bar.open_time_ms:
-                                portfolio.apply_trade(
-                                    timestamp_ms=exec_res.fill_timestamp_ms,
-                                    action=act,
-                                    asset=bar.symbol,
-                                    price=exec_res.fill_price,
-                                    quantity=exec_res.filled_quantity,
-                                    fee_usdt=exec_res.fee_usdt,
-                                    signal_id=sig.signal_id,
-                                    observation_timestamp_ms=exec_res.observation_timestamp_ms,
-                                    decision_timestamp_ms=exec_res.decision_timestamp_ms,
-                                    order_timestamp_ms=exec_res.order_timestamp_ms,
-                                    settlement_timestamp_ms=exec_res.settlement_timestamp_ms,
-                                )
-                                active_trade_entry_time = exec_res.fill_timestamp_ms
-                                active_trade_entry_price = exec_res.fill_price
-                                active_trade_peak_price = exec_res.fill_price
-                                active_trade_trough_price = exec_res.fill_price
-                                active_signal_id = sig.signal_id
-                            else:
-                                pending_fills.append(fill_info)
+                        active_trade_entry_time = exec_res.fill_timestamp_ms
+                        active_trade_entry_price = exec_res.fill_price
+                        active_trade_peak_price = exec_res.fill_price
+                        active_trade_trough_price = exec_res.fill_price
+                        active_signal_id = sig.signal_id
+                        _update_drawdown(portfolio.total_equity({bar.symbol: exec_res.fill_price}))
+                    else:
+                        pending_fills.append(fill_info)
 
             # 4. Check gap exits at bar.open_time_ms for position open at start
             pos_qty = portfolio.get_position_quantity(bar.symbol)
@@ -349,6 +456,7 @@ class EconomicSimulationEngine:
                     active_trade_peak_price = None
                     active_trade_trough_price = None
                     active_signal_id = ""
+                    _update_drawdown(portfolio.total_equity({bar.symbol: gap_price}))
 
             # -------------------------------------------------------------
             # B. Intra-bar Processing: between open and close
@@ -370,44 +478,14 @@ class EconomicSimulationEngine:
                         cashflow_usdt=cf,
                         mark_price=fevent.mark_price,
                     )
+                    _update_drawdown(portfolio.total_equity({bar.symbol: fevent.mark_price}))
 
             # 2. Intra-bar pending fills (< bar.close_time_ms)
             pending_fills.sort(key=lambda x: x["fill_timestamp_ms"])
             rem_fills = []
             for pf in pending_fills:
                 if pf["fill_timestamp_ms"] < bar.close_time_ms:
-                    ev = portfolio.apply_trade(
-                        timestamp_ms=pf["fill_timestamp_ms"],
-                        action=pf["action"],
-                        asset=bar.symbol,
-                        price=pf["price"],
-                        quantity=pf["quantity"],
-                        fee_usdt=pf["fee_usdt"],
-                        signal_id=pf["signal_id"],
-                        trade_id=pf["trade_id"],
-                        observation_timestamp_ms=pf["observation_timestamp_ms"],
-                        decision_timestamp_ms=pf["decision_timestamp_ms"],
-                        order_timestamp_ms=pf["order_timestamp_ms"],
-                        settlement_timestamp_ms=pf["settlement_timestamp_ms"],
-                    )
-                    if pf["action"] in (TradeAction.OPEN_LONG, TradeAction.OPEN_SHORT):
-                        active_trade_entry_time = pf["fill_timestamp_ms"]
-                        active_trade_entry_price = pf["price"]
-                        active_trade_peak_price = pf["price"]
-                        active_trade_trough_price = pf["price"]
-                        active_signal_id = pf["signal_id"]
-                    else:
-                        trades_completed += 1
-                        gross_pnl_accum += ev.realized_pnl_usdt
-                        if ev.realized_pnl_usdt - ev.fee_usdt > 0:
-                            winning_trades += 1
-                        else:
-                            losing_trades += 1
-                        active_trade_entry_time = None
-                        active_trade_entry_price = None
-                        active_trade_peak_price = None
-                        active_trade_trough_price = None
-                        active_signal_id = ""
+                    _apply_pending_fill(pf, bar.symbol)
                 else:
                     rem_fills.append(pf)
             pending_fills = rem_fills
@@ -548,45 +626,22 @@ class EconomicSimulationEngine:
                     active_trade_peak_price = None
                     active_trade_trough_price = None
                     active_signal_id = ""
+                    _update_drawdown(portfolio.total_equity({bar.symbol: chosen_exit_price}))
 
             # 3. Pending fills at bar.close_time_ms
             pending_fills.sort(key=lambda x: x["fill_timestamp_ms"])
             rem_fills = []
             for pf in pending_fills:
                 if pf["fill_timestamp_ms"] == bar.close_time_ms:
-                    ev = portfolio.apply_trade(
-                        timestamp_ms=pf["fill_timestamp_ms"],
-                        action=pf["action"],
-                        asset=bar.symbol,
-                        price=pf["price"],
-                        quantity=pf["quantity"],
-                        fee_usdt=pf["fee_usdt"],
-                        signal_id=pf["signal_id"],
-                        trade_id=pf["trade_id"],
-                        observation_timestamp_ms=pf["observation_timestamp_ms"],
-                        decision_timestamp_ms=pf["decision_timestamp_ms"],
-                        order_timestamp_ms=pf["order_timestamp_ms"],
-                        settlement_timestamp_ms=pf["settlement_timestamp_ms"],
-                    )
-                    if pf["action"] in (TradeAction.OPEN_LONG, TradeAction.OPEN_SHORT):
-                        active_trade_entry_time = pf["fill_timestamp_ms"]
-                        active_trade_entry_price = pf["price"]
-                        active_trade_peak_price = pf["price"]
-                        active_trade_trough_price = pf["price"]
-                        active_signal_id = pf["signal_id"]
+                    _apply_pending_fill(pf, bar.symbol)
                 else:
                     rem_fills.append(pf)
             pending_fills = rem_fills
 
             # 4. Mark to Market at bar.close_time_ms
             curr_equity = portfolio.total_equity({bar.symbol: mark_price})
+            _update_drawdown(curr_equity)
             equity_curve.append((bar.close_time_ms, curr_equity))
-
-            peak_equity = max(peak_equity, curr_equity)
-            dd_usdt = peak_equity - curr_equity
-            dd_pct = dd_usdt / peak_equity if peak_equity > 0 else 0.0
-            max_dd_usdt = max(max_dd_usdt, dd_usdt)
-            max_dd_pct = max(max_dd_pct, dd_pct)
 
         final_eq = portfolio.total_equity({candles[-1].symbol: candles[-1].close})
         total_fees = sum(ev.fee_usdt for ev in portfolio.trade_history)
