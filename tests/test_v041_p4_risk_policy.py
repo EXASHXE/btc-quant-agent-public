@@ -288,7 +288,7 @@ def test_pending_orders_reserve_risk_preventing_oversubscription() -> None:
 
 
 def test_market_state_filter_min_volume() -> None:
-    """Filter rejects entry when volume is below declared threshold."""
+    """Filter rejects entry when volume is below declared threshold using causal volume evidence."""
     policy = TradePolicy(
         policy_id="test_filter_vol",
         name="Min Volume Filter",
@@ -296,14 +296,20 @@ def test_market_state_filter_min_volume() -> None:
     )
     engine = EconomicSimulationEngine(policy=policy, fee_model=ZERO_FEES)
 
-    # Bar with quote_volume = 5,000 (< 10,000)
+    # Causal volume evidence = 5,000 (< 10,000) -> reject
     bar_low_vol = _create_candle(timestamp_ms=1000, quote_volume=5000.0)
-    summary_low = engine.simulate(candles=[bar_low_vol], signals=[_create_signal(timestamp_ms=1000)])
+    summary_low = engine.simulate(
+        candles=[bar_low_vol],
+        signals=[_create_signal(timestamp_ms=1000, metadata={"volume_usdt": 5000.0})],
+    )
     assert len(summary_low.trade_events) == 0
 
-    # Bar with quote_volume = 15,000 (>= 10,000)
+    # Causal volume evidence = 15,000 (>= 10,000) -> accept
     bar_high_vol = _create_candle(timestamp_ms=2000, quote_volume=15000.0)
-    summary_high = engine.simulate(candles=[bar_high_vol], signals=[_create_signal(timestamp_ms=2000)])
+    summary_high = engine.simulate(
+        candles=[bar_high_vol],
+        signals=[_create_signal(timestamp_ms=2000, metadata={"volume_usdt": 15000.0})],
+    )
     assert len(summary_high.trade_events) == 1
 
 

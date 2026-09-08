@@ -129,16 +129,17 @@ class RiskBudget:
 @dataclass(frozen=True)
 class MarketStateFilter:
     min_volume_usdt_15m: float = 0.0
-    max_spread_bps: float = 15.0
+    max_spread_bps: float | None = None
     allowed_regimes: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
         _finite(self.min_volume_usdt_15m, "min_volume_usdt_15m")
         if self.min_volume_usdt_15m < 0:
             raise ValueError("min_volume_usdt_15m cannot be negative")
-        _finite(self.max_spread_bps, "max_spread_bps")
-        if self.max_spread_bps < 0:
-            raise ValueError("max_spread_bps cannot be negative")
+        if self.max_spread_bps is not None:
+            _finite(self.max_spread_bps, "max_spread_bps")
+            if self.max_spread_bps < 0:
+                raise ValueError("max_spread_bps cannot be negative")
 
 
 @dataclass(frozen=True)
@@ -168,8 +169,8 @@ class TradePolicy:
     def should_enter(
         self,
         signal: InformationSignal,
-        current_spread_bps: float = 0.0,
-        current_volume_usdt: float = 0.0,
+        current_spread_bps: float | None = None,
+        current_volume_usdt: float | None = None,
         current_regime: str | None = None,
     ) -> bool:
         if not signal.is_actionable:
@@ -178,14 +179,30 @@ class TradePolicy:
             return False
         if abs(signal.strength) < self.entry_rule.min_signal_strength:
             return False
-        if not math.isfinite(current_spread_bps) or current_spread_bps < 0:
+
+        # Spread constraint enforcement (AR1)
+        if self.market_filter.max_spread_bps is not None:
+            if current_spread_bps is None or not math.isfinite(current_spread_bps) or current_spread_bps < 0:
+                return False
+            if current_spread_bps > self.market_filter.max_spread_bps:
+                return False
+        elif current_spread_bps is not None:
+            if not math.isfinite(current_spread_bps) or current_spread_bps < 0:
+                return False
+
+        # Volume constraint enforcement (AR2)
+        if self.market_filter.min_volume_usdt_15m > 0:
+            if (
+                current_volume_usdt is None
+                or not math.isfinite(current_volume_usdt)
+                or current_volume_usdt < self.market_filter.min_volume_usdt_15m
+            ):
+                return False
+        elif current_volume_usdt is not None and (
+            not math.isfinite(current_volume_usdt) or current_volume_usdt < 0
+        ):
             return False
-        if not math.isfinite(current_volume_usdt) or current_volume_usdt < 0:
-            return False
-        if self.market_filter.max_spread_bps > 0 and current_spread_bps > self.market_filter.max_spread_bps:
-            return False
-        if self.market_filter.min_volume_usdt_15m > 0 and current_volume_usdt < self.market_filter.min_volume_usdt_15m:
-            return False
+
         return not (
             self.market_filter.allowed_regimes
             and (current_regime is None or current_regime not in self.market_filter.allowed_regimes)

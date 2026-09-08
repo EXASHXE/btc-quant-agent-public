@@ -463,7 +463,7 @@ def test_exit_ambiguous_stop_target_collision_conservative_stop_first_long() -> 
     )
     bars = [
         _bar(1000, o=100.0, c=100.0),
-        _bar(2000, o=100.0, h=110.0, l=90.0, c=100.0),
+        _bar(2000, o=100.0, h=110.0, l=90.0, c=95.0),
         _bar(3000, o=120.0, c=120.0),
     ]
     sig = _sig(1000)
@@ -500,7 +500,7 @@ def test_exit_ambiguous_stop_target_collision_conservative_stop_first_short() ->
     )
     bars = [
         _bar(1000, o=100.0, c=100.0),
-        _bar(2000, o=100.0, h=110.0, l=90.0, c=100.0),
+        _bar(2000, o=100.0, h=110.0, l=90.0, c=105.0),
         _bar(3000, o=80.0, c=80.0),
     ]
     sig = _sig(1000, direction=-1)
@@ -567,7 +567,7 @@ def test_exit_entry_bar_stop_target_evaluated_when_opened_at_open() -> None:
         exit_rule=ExitRule(stop_loss_pct=0.05, take_profit_pct=0.05),
         position_sizing=PositionSizing(sizing_type=SizingType.FIXED_NOTIONAL, target_notional=100.0),
     )
-    bars = [_bar(1000, o=100.0, h=110.0, l=90.0, c=100.0)]
+    bars = [_bar(1000, o=100.0, h=110.0, l=90.0, c=95.0)]
     sig = _sig(1000)
 
     sim = EconomicSimulationEngine(

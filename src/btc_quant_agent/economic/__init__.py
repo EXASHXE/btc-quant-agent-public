@@ -16,10 +16,11 @@ from .policy import (
 )
 from .portfolio import Portfolio, Position
 from .signal import InformationSignal
-from .simulator import EconomicSimulationEngine, SimulationSummary
+from .simulator import AmbiguousExitRejectionError, EconomicSimulationEngine, SimulationSummary
 from .trade_event import TradeAction, TradeEvent
 
 __all__ = [
+    "AmbiguousExitRejectionError",
     "BenchmarkEngine",
     "BenchmarkResult",
     "EconomicSimulationEngine",

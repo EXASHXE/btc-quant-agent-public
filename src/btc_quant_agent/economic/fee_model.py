@@ -19,6 +19,36 @@ class FeeModel:
     slippage_mode: SlippageMode = SlippageMode.FIXED_BPS
     fixed_slippage_bps: float = 1.0  # 1 bp default slippage
     impact_coefficient: float = 0.01  # price impact scale factor per fraction of bar volume
+    max_slippage_bps: float | None = None  # optional upper bound cap on worst-case slippage
+
+    def worst_case_price_bound(
+        self,
+        reference_price: float,
+        side: int,  # +1 = BUY, -1 = SELL
+        current_spread_bps: float = 0.0,
+    ) -> float | None:
+        """Calculate deterministic ex-ante worst-case bound on execution price.
+
+        For BUY (side=+1): returns maximum possible fill price (upper bound for gross calculation).
+        For SELL (side=-1): returns maximum notional evaluation price (upper bound for gross calculation).
+        Returns None if slippage model has no finite deterministic ex-ante bound.
+        """
+        if reference_price <= 0:
+            raise ValueError(f"reference_price must be positive; got {reference_price}")
+        if side not in (-1, 1):
+            raise ValueError(f"side must be -1 or 1; got {side}")
+
+        if self.slippage_mode == SlippageMode.ZERO:
+            return reference_price
+        elif self.slippage_mode == SlippageMode.FIXED_BPS:
+            slippage_factor = self.fixed_slippage_bps / 10_000.0
+            return reference_price * (1.0 + slippage_factor)
+        elif self.slippage_mode == SlippageMode.SPREAD_AND_IMPACT:
+            if self.max_slippage_bps is not None and self.max_slippage_bps >= 0:
+                slippage_factor = self.max_slippage_bps / 10_000.0
+                return reference_price * (1.0 + slippage_factor)
+            return None
+        return None
 
     def calculate_fee(self, notional: float, is_maker: bool = False) -> float:
         rate = self.maker_fee_rate if is_maker else self.taker_fee_rate
