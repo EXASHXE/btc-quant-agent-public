@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import asdict, dataclass, field
 from enum import StrEnum
+import math
 from typing import Any
 
 
@@ -31,14 +32,27 @@ class TradeEvent:
     metadata: dict[str, Any] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
-        if self.timestamp_ms <= 0:
-            raise ValueError(f"timestamp_ms must be positive; got {self.timestamp_ms}")
-        if self.price < 0:
-            raise ValueError(f"price cannot be negative; got {self.price}")
-        if self.quantity < 0:
-            raise ValueError(f"quantity cannot be negative; got {self.quantity}")
-        if self.fee_usdt < 0:
-            raise ValueError(f"fee_usdt cannot be negative; got {self.fee_usdt}")
+        object.__setattr__(self, "action", TradeAction(self.action))
+        if type(self.timestamp_ms) is not int or self.timestamp_ms <= 0:
+            raise ValueError("timestamp_ms must be a positive integer")
+        for name in (
+            "price",
+            "quantity",
+            "fee_usdt",
+            "funding_usdt",
+            "position_after",
+            "cash_after",
+            "realized_pnl_usdt",
+        ):
+            if not math.isfinite(getattr(self, name)):
+                raise ValueError(f"{name} must be finite")
+        if self.price <= 0 or self.quantity < 0 or self.fee_usdt < 0:
+            raise ValueError("Event requires positive price and nonnegative quantity/fee")
+        if self.action == TradeAction.FUNDING_SETTLEMENT:
+            if self.fee_usdt != 0 or self.realized_pnl_usdt != 0:
+                raise ValueError("Funding events cannot contain trading fees or realized PnL")
+        elif self.quantity <= 0 or self.funding_usdt != 0:
+            raise ValueError("Trade events require positive quantity and zero funding")
 
     @property
     def net_cashflow_usdt(self) -> float:
@@ -55,7 +69,7 @@ class TradeEvent:
         act = data["action"]
         action_enum = act if isinstance(act, TradeAction) else TradeAction(act)
         return cls(
-            timestamp_ms=int(data["timestamp_ms"]),
+            timestamp_ms=data["timestamp_ms"],
             action=action_enum,
             price=float(data.get("price", 0.0)),
             quantity=float(data.get("quantity", 0.0)),

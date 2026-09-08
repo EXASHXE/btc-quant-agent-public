@@ -186,7 +186,11 @@ class BenchmarkEngine:
         candles: Sequence[Candle],
         policy: TradePolicy,
     ) -> dict[str, Any]:
-        """Jointly evaluate strategy economic performance against all three benchmarks."""
+        """Diagnostic comparisons only, pending P2-P6 correctness repairs.
+
+        Caller-supplied summaries are not qualification evidence. No performance
+        outcome can enable formal qualification through this legacy interface.
+        """
         cash_bench = self.simulate_cash_benchmark(
             initial_cash=strategy_summary.initial_cash,
             timestamps=[c.close_time_ms for c in candles],
@@ -205,8 +209,6 @@ class BenchmarkEngine:
         beat_random = strategy_summary.net_pnl_usdt > random_bench.net_pnl_usdt
         beat_btc = strategy_summary.net_pnl_usdt > btc_bench.net_pnl_usdt
 
-        qualified = beat_cash and beat_random
-
         return {
             "strategy": strategy_summary.to_dict(),
             "benchmarks": {
@@ -222,6 +224,9 @@ class BenchmarkEngine:
                 "beats_random": beat_random,
                 "beats_passive_btc": beat_btc,
             },
-            "economic_qualification_passed": qualified,
-            "verdict": "ECONOMICALLY_QUALIFIED" if qualified else "ECONOMICALLY_REJECTED",
+            "economic_qualification_passed": False,
+            "qualification_evaluated": False,
+            "diagnostic_only": True,
+            "verdict": "NOT_TESTABLE",
+            "reason": "FORMAL_QUALIFICATION_DISABLED_PENDING_P2_P6_REPAIRS",
         }

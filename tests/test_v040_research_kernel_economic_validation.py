@@ -443,8 +443,10 @@ def test_benchmarks_and_economic_qualification() -> None:
         sharpe_ratio=2.5,
     )
     qual = bench_engine.evaluate_economic_qualification(winning_summary, candles, policy)
-    assert qual["economic_qualification_passed"] is True
-    assert qual["verdict"] == "ECONOMICALLY_QUALIFIED"
+    # P0: legacy comparisons are diagnostic, never qualification evidence.
+    assert qual["economic_qualification_passed"] is False
+    assert qual["qualification_evaluated"] is False
+    assert qual["verdict"] == "NOT_TESTABLE"
 
 
 # =====================================================================
@@ -515,4 +517,3 @@ def test_simulation_multiple_sequential_positions() -> None:
 
     assert summary.total_trades == 3
     assert len(summary.trade_events) == 6  # 3 opens + 3 closes
-

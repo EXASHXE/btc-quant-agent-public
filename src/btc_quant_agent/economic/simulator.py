@@ -69,6 +69,8 @@ class EconomicSimulationEngine:
         funding_model: FundingModel | None = None,
         initial_cash: float = 100_000.0,
     ) -> None:
+        if not math.isfinite(initial_cash) or initial_cash <= 0:
+            raise ValueError("initial_cash must be finite and positive")
         self.policy = policy
         self.fee_model = fee_model or FeeModel()
         self.execution_model = execution_model or ExecutionModel(fee_model=self.fee_model)
