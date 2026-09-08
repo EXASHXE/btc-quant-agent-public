@@ -1,8 +1,8 @@
 from __future__ import annotations
 
+import math
 from dataclasses import asdict, dataclass, field
 from enum import StrEnum
-import math
 from typing import Any
 
 
@@ -29,6 +29,10 @@ class TradeEvent:
     realized_pnl_usdt: float = 0.0
     trade_id: str = ""
     signal_id: str = ""
+    observation_timestamp_ms: int | None = None
+    decision_timestamp_ms: int | None = None
+    order_timestamp_ms: int | None = None
+    settlement_timestamp_ms: int | None = None
     metadata: dict[str, Any] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
@@ -53,6 +57,55 @@ class TradeEvent:
                 raise ValueError("Funding events cannot contain trading fees or realized PnL")
         elif self.quantity <= 0 or self.funding_usdt != 0:
             raise ValueError("Trade events require positive quantity and zero funding")
+
+        # Explicit causal timeline checks
+        for ts_name in (
+            "observation_timestamp_ms",
+            "decision_timestamp_ms",
+            "order_timestamp_ms",
+            "settlement_timestamp_ms",
+        ):
+            ts_val = getattr(self, ts_name)
+            if ts_val is not None and (type(ts_val) is not int or ts_val <= 0):
+                raise ValueError(f"{ts_name} must be a positive integer")
+
+        if (
+            self.observation_timestamp_ms is not None
+            and self.decision_timestamp_ms is not None
+            and self.decision_timestamp_ms < self.observation_timestamp_ms
+        ):
+            raise ValueError(
+                f"decision_timestamp_ms ({self.decision_timestamp_ms}) cannot occur before "
+                f"observation_timestamp_ms ({self.observation_timestamp_ms})"
+            )
+
+        if (
+            self.decision_timestamp_ms is not None
+            and self.order_timestamp_ms is not None
+            and self.order_timestamp_ms < self.decision_timestamp_ms
+        ):
+            raise ValueError(
+                f"order_timestamp_ms ({self.order_timestamp_ms}) cannot occur before "
+                f"decision_timestamp_ms ({self.decision_timestamp_ms})"
+            )
+
+        if (
+            self.order_timestamp_ms is not None
+            and self.timestamp_ms < self.order_timestamp_ms
+        ):
+            raise ValueError(
+                f"fill timestamp_ms ({self.timestamp_ms}) cannot occur before "
+                f"order_timestamp_ms ({self.order_timestamp_ms})"
+            )
+
+        if (
+            self.settlement_timestamp_ms is not None
+            and self.settlement_timestamp_ms < self.timestamp_ms
+        ):
+            raise ValueError(
+                f"settlement_timestamp_ms ({self.settlement_timestamp_ms}) cannot occur before "
+                f"fill timestamp_ms ({self.timestamp_ms})"
+            )
 
     @property
     def net_cashflow_usdt(self) -> float:
@@ -80,5 +133,9 @@ class TradeEvent:
             realized_pnl_usdt=float(data.get("realized_pnl_usdt", 0.0)),
             trade_id=str(data.get("trade_id", "")),
             signal_id=str(data.get("signal_id", "")),
+            observation_timestamp_ms=data.get("observation_timestamp_ms"),
+            decision_timestamp_ms=data.get("decision_timestamp_ms"),
+            order_timestamp_ms=data.get("order_timestamp_ms"),
+            settlement_timestamp_ms=data.get("settlement_timestamp_ms"),
             metadata=dict(data.get("metadata", {})),
         )

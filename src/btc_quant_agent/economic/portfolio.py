@@ -87,6 +87,10 @@ class Portfolio:
         fee_usdt: float,
         signal_id: str = "",
         trade_id: str = "",
+        observation_timestamp_ms: int | None = None,
+        decision_timestamp_ms: int | None = None,
+        order_timestamp_ms: int | None = None,
+        settlement_timestamp_ms: int | None = None,
     ) -> TradeEvent:
         self._validate_event_input(timestamp_ms, asset)
         action = TradeAction(action)
@@ -144,6 +148,10 @@ class Portfolio:
             realized_pnl_usdt=realized,
             trade_id=trade_id,
             signal_id=signal_id,
+            observation_timestamp_ms=observation_timestamp_ms,
+            decision_timestamp_ms=decision_timestamp_ms,
+            order_timestamp_ms=order_timestamp_ms,
+            settlement_timestamp_ms=settlement_timestamp_ms,
             metadata={"asset": asset},
         )
         if new_position is None:
@@ -191,8 +199,8 @@ class Portfolio:
         result = cls(initial_cash=initial_cash)
         for event in events:
             asset = event.metadata.get("asset")
-            if not isinstance(asset, str):
-                raise ValueError("Restored event requires an asset")
+            if not isinstance(asset, str) or not asset.strip():
+                raise TypeError("Restored event requires an asset string")
             if event.action == TradeAction.FUNDING_SETTLEMENT:
                 actual = result.apply_funding(
                     event.timestamp_ms, asset, event.funding_usdt, event.price
@@ -207,6 +215,10 @@ class Portfolio:
                     event.fee_usdt,
                     event.signal_id,
                     event.trade_id,
+                    observation_timestamp_ms=event.observation_timestamp_ms,
+                    decision_timestamp_ms=event.decision_timestamp_ms,
+                    order_timestamp_ms=event.order_timestamp_ms,
+                    settlement_timestamp_ms=event.settlement_timestamp_ms,
                 )
             if actual.to_dict() != event.to_dict():
                 raise ValueError("Restored event disagrees with replayed ledger")

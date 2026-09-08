@@ -26,6 +26,19 @@ class EntryRule:
     time_in_force_ms: int = 60_000  # maximum time limit order remains active
     allowed_directions: tuple[int, ...] = (1, -1)
 
+    def calculate_limit_price(self, reference_price: float, side: int) -> float:
+        """Calculate limit price applying limit_offset_bps (+ = passive, - = aggressive).
+
+        For BUY (side=+1): passive offset reduces buy price: ref * (1 - offset).
+        For SELL (side=-1): passive offset increases sell price: ref * (1 + offset).
+        """
+        offset_fraction = self.limit_offset_bps / 10_000.0
+        if side == 1:
+            return reference_price * (1.0 - offset_fraction)
+        elif side == -1:
+            return reference_price * (1.0 + offset_fraction)
+        raise ValueError(f"side must be 1 or -1; got {side}")
+
 
 @dataclass(frozen=True)
 class ExitRule:
@@ -34,6 +47,7 @@ class ExitRule:
     trailing_stop_pct: float | None = None  # e.g. 0.015 trailing from peak
     decay_exit_on_signal_reversal: bool = True
     max_holding_ms: int = 3_600_000  # e.g. 60m default
+    ambiguous_exit_handling: str = "CONSERVATIVE_STOP_FIRST"  # "CONSERVATIVE_STOP_FIRST" or "REJECT_AMBIGUOUS"
 
 
 @dataclass(frozen=True)

@@ -9,7 +9,7 @@ from ..domain import Candle
 from .execution_model import ExecutionModel
 from .fee_model import FeeModel
 from .funding import FundingModel, FundingSettlement
-from .policy import TradePolicy
+from .policy import OrderType, TradePolicy
 from .portfolio import Portfolio
 from .signal import InformationSignal
 from .trade_event import TradeAction, TradeEvent
@@ -105,7 +105,7 @@ class EconomicSimulationEngine:
         portfolio = Portfolio(initial_cash=self.initial_cash)
         equity_curve: list[tuple[int, float]] = []
 
-        # Sort input signals and funding by timestamp
+        # Sort input signals and funding strictly by timestamp
         sorted_signals = sorted(signals, key=lambda s: s.timestamp_ms)
         sig_idx = 0
         n_signals = len(sorted_signals)
@@ -122,22 +122,31 @@ class EconomicSimulationEngine:
         active_trade_entry_price: float | None = None
         active_trade_peak_price: float | None = None
         active_trade_trough_price: float | None = None
+        active_signal_id: str = ""
 
         trades_completed = 0
         winning_trades = 0
         losing_trades = 0
         gross_pnl_accum = 0.0
 
+        # Pending fills queue: future fills that have not yet reached fill_timestamp_ms
+        pending_fills: list[dict[str, Any]] = []
+
         for i, bar in enumerate(candles):
             mark_price = bar.close
 
-            # 1. Process funding events that occur up to this bar's close
-            while fund_idx < n_funding and sorted_funding[fund_idx].timestamp_ms <= bar.close_time_ms:
+            # -------------------------------------------------------------
+            # A. Open Time Processing: bar.open_time_ms
+            # -------------------------------------------------------------
+            # 1. Funding settlements at or before bar.open_time_ms
+            # (Tie-break rule: Funding settles BEFORE any fill occurring at bar.open_time_ms)
+            while fund_idx < n_funding and sorted_funding[fund_idx].timestamp_ms <= bar.open_time_ms:
                 fevent = sorted_funding[fund_idx]
-                qty = portfolio.get_position_quantity()
-                if abs(qty) > 1e-12:
+                fund_idx += 1
+                pos_qty = portfolio.get_position_quantity(bar.symbol)
+                if abs(pos_qty) > 1e-12:
                     cf = self.funding_model.calculate_cashflow(
-                        position_quantity=qty,
+                        position_quantity=pos_qty,
                         mark_price=fevent.mark_price,
                         funding_rate=fevent.funding_rate,
                     )
@@ -147,83 +156,389 @@ class EconomicSimulationEngine:
                         cashflow_usdt=cf,
                         mark_price=fevent.mark_price,
                     )
-                fund_idx += 1
 
-            # 2. Check position exit conditions if position exists
-            pos_qty = portfolio.get_position_quantity()
+            # 2. Apply pending fills scheduled for <= bar.open_time_ms
+            pending_fills.sort(key=lambda x: x["fill_timestamp_ms"])
+            rem_fills = []
+            for pf in pending_fills:
+                if pf["fill_timestamp_ms"] <= bar.open_time_ms:
+                    ev = portfolio.apply_trade(
+                        timestamp_ms=pf["fill_timestamp_ms"],
+                        action=pf["action"],
+                        asset=bar.symbol,
+                        price=pf["price"],
+                        quantity=pf["quantity"],
+                        fee_usdt=pf["fee_usdt"],
+                        signal_id=pf["signal_id"],
+                        trade_id=pf["trade_id"],
+                        observation_timestamp_ms=pf["observation_timestamp_ms"],
+                        decision_timestamp_ms=pf["decision_timestamp_ms"],
+                        order_timestamp_ms=pf["order_timestamp_ms"],
+                        settlement_timestamp_ms=pf["settlement_timestamp_ms"],
+                    )
+                    if pf["action"] in (TradeAction.OPEN_LONG, TradeAction.OPEN_SHORT):
+                        active_trade_entry_time = pf["fill_timestamp_ms"]
+                        active_trade_entry_price = pf["price"]
+                        active_trade_peak_price = pf["price"]
+                        active_trade_trough_price = pf["price"]
+                        active_signal_id = pf["signal_id"]
+                    else:
+                        trades_completed += 1
+                        gross_pnl_accum += ev.realized_pnl_usdt
+                        if ev.realized_pnl_usdt - ev.fee_usdt > 0:
+                            winning_trades += 1
+                        else:
+                            losing_trades += 1
+                        active_trade_entry_time = None
+                        active_trade_entry_price = None
+                        active_trade_peak_price = None
+                        active_trade_trough_price = None
+                        active_signal_id = ""
+                else:
+                    rem_fills.append(pf)
+            pending_fills = rem_fills
+
+            # 3. Process new signals arriving at or before bar.open_time_ms
+            while sig_idx < n_signals and sorted_signals[sig_idx].timestamp_ms <= bar.open_time_ms:
+                sig = sorted_signals[sig_idx]
+                sig_idx += 1
+
+                # Asset validation
+                if sig.asset != bar.symbol:
+                    continue
+
+                curr_pos_qty = portfolio.get_position_quantity(bar.symbol)
+                # Signal reversal exit
+                if abs(curr_pos_qty) > 1e-12:
+                    if self.policy.exit_rule.decay_exit_on_signal_reversal and (
+                        (curr_pos_qty > 0 and sig.direction == -1) or (curr_pos_qty < 0 and sig.direction == 1)
+                    ):
+                        act = TradeAction.CLOSE_LONG if curr_pos_qty > 0 else TradeAction.CLOSE_SHORT
+                        exit_fee = self.fee_model.calculate_fee(abs(curr_pos_qty) * bar.open, is_maker=False)
+                        ev = portfolio.apply_trade(
+                            timestamp_ms=bar.open_time_ms,
+                            action=act,
+                            asset=bar.symbol,
+                            price=bar.open,
+                            quantity=abs(curr_pos_qty),
+                            fee_usdt=exit_fee,
+                            signal_id=sig.signal_id,
+                            observation_timestamp_ms=sig.timestamp_ms,
+                            decision_timestamp_ms=sig.timestamp_ms,
+                            order_timestamp_ms=sig.timestamp_ms,
+                            settlement_timestamp_ms=bar.open_time_ms,
+                        )
+                        trades_completed += 1
+                        gross_pnl_accum += ev.realized_pnl_usdt
+                        if ev.realized_pnl_usdt - exit_fee > 0:
+                            winning_trades += 1
+                        else:
+                            losing_trades += 1
+                        active_trade_entry_time = None
+                        active_trade_entry_price = None
+                        active_trade_peak_price = None
+                        active_trade_trough_price = None
+                        active_signal_id = ""
+                    continue
+
+                if pending_fills:
+                    continue
+
+                if self.policy.should_enter(sig):
+                    current_eq = portfolio.total_equity({bar.symbol: mark_price})
+                    qty = self.policy.calculate_quantity(current_price=bar.open, portfolio_equity=current_eq)
+                    if qty > 0:
+                        side = 1 if sig.direction == 1 else -1
+                        lim_price: float | None = None
+                        if self.policy.entry_rule.order_type == OrderType.LIMIT:
+                            lim_price = self.policy.entry_rule.calculate_limit_price(
+                                reference_price=bar.open, side=side
+                            )
+
+                        exec_res = self.execution_model.simulate_order(
+                            signal_timestamp_ms=sig.timestamp_ms,
+                            side=side,
+                            desired_quantity=qty,
+                            order_type=self.policy.entry_rule.order_type,
+                            future_candles=candles[i:],
+                            limit_price=lim_price,
+                            time_in_force_ms=self.policy.entry_rule.time_in_force_ms,
+                            observation_timestamp_ms=sig.timestamp_ms,
+                        )
+                        if exec_res.is_filled:
+                            act = TradeAction.OPEN_LONG if side == 1 else TradeAction.OPEN_SHORT
+                            fill_info = {
+                                "fill_timestamp_ms": exec_res.fill_timestamp_ms,
+                                "action": act,
+                                "asset": bar.symbol,
+                                "price": exec_res.fill_price,
+                                "quantity": exec_res.filled_quantity,
+                                "fee_usdt": exec_res.fee_usdt,
+                                "signal_id": sig.signal_id,
+                                "trade_id": f"ORD_{sig.signal_id}",
+                                "observation_timestamp_ms": exec_res.observation_timestamp_ms,
+                                "decision_timestamp_ms": exec_res.decision_timestamp_ms,
+                                "order_timestamp_ms": exec_res.order_timestamp_ms,
+                                "settlement_timestamp_ms": exec_res.settlement_timestamp_ms,
+                            }
+                            if exec_res.fill_timestamp_ms <= bar.open_time_ms:
+                                portfolio.apply_trade(
+                                    timestamp_ms=exec_res.fill_timestamp_ms,
+                                    action=act,
+                                    asset=bar.symbol,
+                                    price=exec_res.fill_price,
+                                    quantity=exec_res.filled_quantity,
+                                    fee_usdt=exec_res.fee_usdt,
+                                    signal_id=sig.signal_id,
+                                    observation_timestamp_ms=exec_res.observation_timestamp_ms,
+                                    decision_timestamp_ms=exec_res.decision_timestamp_ms,
+                                    order_timestamp_ms=exec_res.order_timestamp_ms,
+                                    settlement_timestamp_ms=exec_res.settlement_timestamp_ms,
+                                )
+                                active_trade_entry_time = exec_res.fill_timestamp_ms
+                                active_trade_entry_price = exec_res.fill_price
+                                active_trade_peak_price = exec_res.fill_price
+                                active_trade_trough_price = exec_res.fill_price
+                                active_signal_id = sig.signal_id
+                            else:
+                                pending_fills.append(fill_info)
+
+            # 4. Check gap exits at bar.open_time_ms for position open at start
+            pos_qty = portfolio.get_position_quantity(bar.symbol)
+            if abs(pos_qty) > 1e-12 and active_trade_entry_price is not None:
+                is_long = pos_qty > 0
+                gap_exit = False
+                gap_price = bar.open
+                if self.policy.exit_rule.stop_loss_pct is not None:
+                    sl_pct = self.policy.exit_rule.stop_loss_pct
+                    if is_long:
+                        sl_level = active_trade_entry_price * (1.0 - sl_pct)
+                        if bar.open <= sl_level:
+                            gap_exit = True
+                            gap_price = bar.open
+                    else:
+                        sl_level = active_trade_entry_price * (1.0 + sl_pct)
+                        if bar.open >= sl_level:
+                            gap_exit = True
+                            gap_price = bar.open
+
+                if gap_exit:
+                    exit_act = TradeAction.CLOSE_LONG if is_long else TradeAction.CLOSE_SHORT
+                    exit_fee = self.fee_model.calculate_fee(abs(pos_qty) * gap_price, is_maker=False)
+                    ev = portfolio.apply_trade(
+                        timestamp_ms=bar.open_time_ms,
+                        action=exit_act,
+                        asset=bar.symbol,
+                        price=gap_price,
+                        quantity=abs(pos_qty),
+                        fee_usdt=exit_fee,
+                        signal_id=active_signal_id,
+                        observation_timestamp_ms=bar.open_time_ms,
+                        decision_timestamp_ms=bar.open_time_ms,
+                        order_timestamp_ms=bar.open_time_ms,
+                        settlement_timestamp_ms=bar.open_time_ms,
+                    )
+                    trades_completed += 1
+                    gross_pnl_accum += ev.realized_pnl_usdt
+                    if ev.realized_pnl_usdt - exit_fee > 0:
+                        winning_trades += 1
+                    else:
+                        losing_trades += 1
+                    active_trade_entry_time = None
+                    active_trade_entry_price = None
+                    active_trade_peak_price = None
+                    active_trade_trough_price = None
+                    active_signal_id = ""
+
+            # -------------------------------------------------------------
+            # B. Intra-bar Processing: between open and close
+            # -------------------------------------------------------------
+            # 1. Intra-bar funding settlements (< bar.close_time_ms)
+            while fund_idx < n_funding and sorted_funding[fund_idx].timestamp_ms < bar.close_time_ms:
+                fevent = sorted_funding[fund_idx]
+                fund_idx += 1
+                pos_qty = portfolio.get_position_quantity(bar.symbol)
+                if abs(pos_qty) > 1e-12:
+                    cf = self.funding_model.calculate_cashflow(
+                        position_quantity=pos_qty,
+                        mark_price=fevent.mark_price,
+                        funding_rate=fevent.funding_rate,
+                    )
+                    portfolio.apply_funding(
+                        timestamp_ms=fevent.timestamp_ms,
+                        asset=bar.symbol,
+                        cashflow_usdt=cf,
+                        mark_price=fevent.mark_price,
+                    )
+
+            # 2. Intra-bar pending fills (< bar.close_time_ms)
+            pending_fills.sort(key=lambda x: x["fill_timestamp_ms"])
+            rem_fills = []
+            for pf in pending_fills:
+                if pf["fill_timestamp_ms"] < bar.close_time_ms:
+                    ev = portfolio.apply_trade(
+                        timestamp_ms=pf["fill_timestamp_ms"],
+                        action=pf["action"],
+                        asset=bar.symbol,
+                        price=pf["price"],
+                        quantity=pf["quantity"],
+                        fee_usdt=pf["fee_usdt"],
+                        signal_id=pf["signal_id"],
+                        trade_id=pf["trade_id"],
+                        observation_timestamp_ms=pf["observation_timestamp_ms"],
+                        decision_timestamp_ms=pf["decision_timestamp_ms"],
+                        order_timestamp_ms=pf["order_timestamp_ms"],
+                        settlement_timestamp_ms=pf["settlement_timestamp_ms"],
+                    )
+                    if pf["action"] in (TradeAction.OPEN_LONG, TradeAction.OPEN_SHORT):
+                        active_trade_entry_time = pf["fill_timestamp_ms"]
+                        active_trade_entry_price = pf["price"]
+                        active_trade_peak_price = pf["price"]
+                        active_trade_trough_price = pf["price"]
+                        active_signal_id = pf["signal_id"]
+                    else:
+                        trades_completed += 1
+                        gross_pnl_accum += ev.realized_pnl_usdt
+                        if ev.realized_pnl_usdt - ev.fee_usdt > 0:
+                            winning_trades += 1
+                        else:
+                            losing_trades += 1
+                        active_trade_entry_time = None
+                        active_trade_entry_price = None
+                        active_trade_peak_price = None
+                        active_trade_trough_price = None
+                        active_signal_id = ""
+                else:
+                    rem_fills.append(pf)
+            pending_fills = rem_fills
+
+            # -------------------------------------------------------------
+            # C. Close Time Processing: bar.close_time_ms
+            # -------------------------------------------------------------
+            # 1. Funding settlements at bar.close_time_ms (before exit/fills at close)
+            while fund_idx < n_funding and sorted_funding[fund_idx].timestamp_ms == bar.close_time_ms:
+                fevent = sorted_funding[fund_idx]
+                fund_idx += 1
+                pos_qty = portfolio.get_position_quantity(bar.symbol)
+                if abs(pos_qty) > 1e-12:
+                    cf = self.funding_model.calculate_cashflow(
+                        position_quantity=pos_qty,
+                        mark_price=fevent.mark_price,
+                        funding_rate=fevent.funding_rate,
+                    )
+                    portfolio.apply_funding(
+                        timestamp_ms=fevent.timestamp_ms,
+                        asset=bar.symbol,
+                        cashflow_usdt=cf,
+                        mark_price=fevent.mark_price,
+                    )
+
+            # 2. Check position exits during this bar (Stop Loss / Take Profit / Trailing / Expiry)
+            pos_qty = portfolio.get_position_quantity(bar.symbol)
             if abs(pos_qty) > 1e-12 and active_trade_entry_price is not None and active_trade_entry_time is not None:
                 is_long = pos_qty > 0
                 holding_duration = bar.close_time_ms - active_trade_entry_time
 
-                # Track peak and trough prices
-                if active_trade_peak_price is None or bar.high > active_trade_peak_price:
-                    active_trade_peak_price = bar.high
-                if active_trade_trough_price is None or bar.low < active_trade_trough_price:
-                    active_trade_trough_price = bar.low
+                prior_peak = active_trade_peak_price if active_trade_peak_price is not None else active_trade_entry_price
+                prior_trough = active_trade_trough_price if active_trade_trough_price is not None else active_trade_entry_price
 
-                exit_triggered = False
-                exit_price = mark_price
-                action = TradeAction.CLOSE_LONG if is_long else TradeAction.CLOSE_SHORT
+                sl_triggered = False
+                tp_triggered = False
+                sl_price = 0.0
+                tp_price = 0.0
 
-                # A. Stop Loss
                 if self.policy.exit_rule.stop_loss_pct is not None:
                     sl_pct = self.policy.exit_rule.stop_loss_pct
-                    if is_long and bar.low <= active_trade_entry_price * (1.0 - sl_pct):
-                        exit_triggered = True
-                        exit_price = active_trade_entry_price * (1.0 - sl_pct)
-                    elif not is_long and bar.high >= active_trade_entry_price * (1.0 + sl_pct):
-                        exit_triggered = True
-                        exit_price = active_trade_entry_price * (1.0 + sl_pct)
+                    if is_long:
+                        sl_level = active_trade_entry_price * (1.0 - sl_pct)
+                        if bar.low <= sl_level:
+                            sl_triggered = True
+                            sl_price = min(bar.open, sl_level)
+                    else:
+                        sl_level = active_trade_entry_price * (1.0 + sl_pct)
+                        if bar.high >= sl_level:
+                            sl_triggered = True
+                            sl_price = max(bar.open, sl_level)
 
-                # B. Take Profit
-                if not exit_triggered and self.policy.exit_rule.take_profit_pct is not None:
+                if self.policy.exit_rule.take_profit_pct is not None:
                     tp_pct = self.policy.exit_rule.take_profit_pct
-                    if is_long and bar.high >= active_trade_entry_price * (1.0 + tp_pct):
-                        exit_triggered = True
-                        exit_price = active_trade_entry_price * (1.0 + tp_pct)
-                    elif not is_long and bar.low <= active_trade_entry_price * (1.0 - tp_pct):
-                        exit_triggered = True
-                        exit_price = active_trade_entry_price * (1.0 - tp_pct)
+                    if is_long:
+                        tp_level = active_trade_entry_price * (1.0 + tp_pct)
+                        if bar.high >= tp_level:
+                            tp_triggered = True
+                            tp_price = max(bar.open, tp_level)
+                    else:
+                        tp_level = active_trade_entry_price * (1.0 - tp_pct)
+                        if bar.low <= tp_level:
+                            tp_triggered = True
+                            tp_price = min(bar.open, tp_level)
 
-                # C. Trailing Stop
-                if not exit_triggered and self.policy.exit_rule.trailing_stop_pct is not None:
+                ts_triggered = False
+                ts_price = 0.0
+                if not sl_triggered and not tp_triggered and self.policy.exit_rule.trailing_stop_pct is not None:
                     ts_pct = self.policy.exit_rule.trailing_stop_pct
-                    if is_long and active_trade_peak_price is not None and bar.low <= active_trade_peak_price * (1.0 - ts_pct):
-                        exit_triggered = True
-                        exit_price = active_trade_peak_price * (1.0 - ts_pct)
-                    elif not is_long and active_trade_trough_price is not None and bar.high >= active_trade_trough_price * (1.0 + ts_pct):
-                        exit_triggered = True
-                        exit_price = active_trade_trough_price * (1.0 + ts_pct)
+                    if is_long:
+                        ts_level = prior_peak * (1.0 - ts_pct)
+                        if bar.low <= ts_level:
+                            ts_triggered = True
+                            ts_price = min(bar.open, ts_level)
+                    else:
+                        ts_level = prior_trough * (1.0 + ts_pct)
+                        if bar.high >= ts_level:
+                            ts_triggered = True
+                            ts_price = max(bar.open, ts_level)
 
-                # D. Max Holding Period Time Exit
-                if not exit_triggered and holding_duration >= self.policy.exit_rule.max_holding_ms:
+                time_triggered = False
+                if (
+                    not sl_triggered
+                    and not tp_triggered
+                    and not ts_triggered
+                    and holding_duration >= self.policy.exit_rule.max_holding_ms
+                ):
+                    time_triggered = True
+
+                exit_triggered = False
+                chosen_exit_price = mark_price
+
+                # Conservative adverse collision handling:
+                # If both SL and TP trigger in same candle, Stop Loss is evaluated first
+                if sl_triggered:
                     exit_triggered = True
-                    exit_price = bar.close
+                    chosen_exit_price = sl_price
+                elif tp_triggered:
+                    exit_triggered = True
+                    chosen_exit_price = tp_price
+                elif ts_triggered:
+                    exit_triggered = True
+                    chosen_exit_price = ts_price
+                elif time_triggered:
+                    exit_triggered = True
+                    chosen_exit_price = bar.close
 
-                # Execute Exit
-                if exit_triggered:
-                    side = -1 if is_long else 1
-                    exit_res = self.execution_model.simulate_order(
-                        signal_timestamp_ms=bar.close_time_ms,
-                        side=side,
-                        desired_quantity=abs(pos_qty),
-                        order_type=self.policy.entry_rule.order_type,
-                        future_candles=candles[i : min(len(candles), i + 3)],
+                if not exit_triggered:
+                    active_trade_peak_price = max(prior_peak, bar.high)
+                    active_trade_trough_price = min(prior_trough, bar.low)
+                else:
+                    exit_action = TradeAction.CLOSE_LONG if is_long else TradeAction.CLOSE_SHORT
+                    exit_fee = self.fee_model.calculate_fee(
+                        notional=abs(pos_qty) * chosen_exit_price, is_maker=False
                     )
-                    actual_exit_price = exit_res.fill_price if exit_res.is_filled else exit_price
-                    fee = exit_res.fee_usdt if exit_res.is_filled else self.fee_model.calculate_fee(abs(pos_qty) * actual_exit_price)
                     ev = portfolio.apply_trade(
                         timestamp_ms=bar.close_time_ms,
-                        action=action,
+                        action=exit_action,
                         asset=bar.symbol,
-                        price=actual_exit_price,
+                        price=chosen_exit_price,
                         quantity=abs(pos_qty),
-                        fee_usdt=fee,
+                        fee_usdt=exit_fee,
+                        signal_id=active_signal_id,
+                        observation_timestamp_ms=bar.close_time_ms,
+                        decision_timestamp_ms=bar.close_time_ms,
+                        order_timestamp_ms=bar.close_time_ms,
+                        settlement_timestamp_ms=bar.close_time_ms,
                     )
                     trades_completed += 1
-                    trade_gross = ev.realized_pnl_usdt
-                    gross_pnl_accum += trade_gross
-                    if ev.realized_pnl_usdt - fee > 0:
+                    gross_pnl_accum += ev.realized_pnl_usdt
+                    if ev.realized_pnl_usdt - exit_fee > 0:
                         winning_trades += 1
                     else:
                         losing_trades += 1
@@ -232,71 +547,38 @@ class EconomicSimulationEngine:
                     active_trade_entry_price = None
                     active_trade_peak_price = None
                     active_trade_trough_price = None
+                    active_signal_id = ""
 
-            # 3. Evaluate new signals at this bar
-            while sig_idx < n_signals and sorted_signals[sig_idx].timestamp_ms <= bar.open_time_ms:
-                sig = sorted_signals[sig_idx]
-                sig_idx += 1
+            # 3. Pending fills at bar.close_time_ms
+            pending_fills.sort(key=lambda x: x["fill_timestamp_ms"])
+            rem_fills = []
+            for pf in pending_fills:
+                if pf["fill_timestamp_ms"] == bar.close_time_ms:
+                    ev = portfolio.apply_trade(
+                        timestamp_ms=pf["fill_timestamp_ms"],
+                        action=pf["action"],
+                        asset=bar.symbol,
+                        price=pf["price"],
+                        quantity=pf["quantity"],
+                        fee_usdt=pf["fee_usdt"],
+                        signal_id=pf["signal_id"],
+                        trade_id=pf["trade_id"],
+                        observation_timestamp_ms=pf["observation_timestamp_ms"],
+                        decision_timestamp_ms=pf["decision_timestamp_ms"],
+                        order_timestamp_ms=pf["order_timestamp_ms"],
+                        settlement_timestamp_ms=pf["settlement_timestamp_ms"],
+                    )
+                    if pf["action"] in (TradeAction.OPEN_LONG, TradeAction.OPEN_SHORT):
+                        active_trade_entry_time = pf["fill_timestamp_ms"]
+                        active_trade_entry_price = pf["price"]
+                        active_trade_peak_price = pf["price"]
+                        active_trade_trough_price = pf["price"]
+                        active_signal_id = pf["signal_id"]
+                else:
+                    rem_fills.append(pf)
+            pending_fills = rem_fills
 
-                # Check if portfolio already has max open positions
-                curr_pos_qty = portfolio.get_position_quantity()
-                if abs(curr_pos_qty) > 1e-12:
-                    # Optional signal reversal exit
-                    if self.policy.exit_rule.decay_exit_on_signal_reversal and (
-                        (curr_pos_qty > 0 and sig.direction == -1) or (curr_pos_qty < 0 and sig.direction == 1)
-                    ):
-                            # Signal reversal triggers early close
-                            act = TradeAction.CLOSE_LONG if curr_pos_qty > 0 else TradeAction.CLOSE_SHORT
-                            exit_fee = self.fee_model.calculate_fee(abs(curr_pos_qty) * bar.open)
-                            ev = portfolio.apply_trade(
-                                timestamp_ms=bar.open_time_ms,
-                                action=act,
-                                asset=bar.symbol,
-                                price=bar.open,
-                                quantity=abs(curr_pos_qty),
-                                fee_usdt=exit_fee,
-                            )
-                            trades_completed += 1
-                            gross_pnl_accum += ev.realized_pnl_usdt
-                            if ev.realized_pnl_usdt - exit_fee > 0:
-                                winning_trades += 1
-                            else:
-                                losing_trades += 1
-                            active_trade_entry_time = None
-                            active_trade_entry_price = None
-                    continue
-
-                if self.policy.should_enter(sig):
-                    current_eq = portfolio.total_equity({bar.symbol: mark_price})
-                    qty = self.policy.calculate_quantity(current_price=bar.open, portfolio_equity=current_eq)
-                    if qty > 0:
-                        side = 1 if sig.direction == 1 else -1
-                        exec_res = self.execution_model.simulate_order(
-                            signal_timestamp_ms=sig.timestamp_ms,
-                            side=side,
-                            desired_quantity=qty,
-                            order_type=self.policy.entry_rule.order_type,
-                            future_candles=candles[i:],
-                            limit_price=bar.open if self.policy.entry_rule.order_type.value == "LIMIT" else None,
-                            time_in_force_ms=self.policy.entry_rule.time_in_force_ms,
-                        )
-                        if exec_res.is_filled:
-                            act = TradeAction.OPEN_LONG if side == 1 else TradeAction.OPEN_SHORT
-                            portfolio.apply_trade(
-                                timestamp_ms=exec_res.fill_timestamp_ms,
-                                action=act,
-                                asset=bar.symbol,
-                                price=exec_res.fill_price,
-                                quantity=exec_res.filled_quantity,
-                                fee_usdt=exec_res.fee_usdt,
-                                signal_id=sig.signal_id,
-                            )
-                            active_trade_entry_time = exec_res.fill_timestamp_ms
-                            active_trade_entry_price = exec_res.fill_price
-                            active_trade_peak_price = exec_res.fill_price
-                            active_trade_trough_price = exec_res.fill_price
-
-            # 4. Record snapshot of portfolio equity
+            # 4. Mark to Market at bar.close_time_ms
             curr_equity = portfolio.total_equity({bar.symbol: mark_price})
             equity_curve.append((bar.close_time_ms, curr_equity))
 
@@ -322,7 +604,6 @@ class EconomicSimulationEngine:
                 var_r = sum((r - mean_r) ** 2 for r in pct_returns) / len(pct_returns)
                 std_r = math.sqrt(var_r) if var_r > 0 else 0.0
                 if std_r > 1e-12:
-                    # Annualize roughly assuming 15m cadence: 35040 intervals/year
                     sharpe = (mean_r / std_r) * math.sqrt(35040)
 
         win_rate = winning_trades / trades_completed if trades_completed > 0 else 0.0
