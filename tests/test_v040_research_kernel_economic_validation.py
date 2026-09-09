@@ -23,11 +23,14 @@ from btc_quant_agent.economic.signal import InformationSignal
 from btc_quant_agent.economic.simulator import EconomicSimulationEngine, SimulationSummary
 from btc_quant_agent.economic.trade_event import TradeAction
 from btc_quant_agent.research_contract.models import (
+    P6_PENDING,
     DecisionStatus,
+    EvidenceReference,
     EvaluationMethod,
     ExperimentMetadata,
     FeatureDefinition,
     PredictionTarget,
+    VersionedIdentity,
 )
 from btc_quant_agent.research_contract.registry import ResearchContractRegistry
 
@@ -78,7 +81,10 @@ def _create_synthetic_candles(
 def test_research_contract_metadata_lifecycle(tmp_path: Path) -> None:
     exp = ExperimentMetadata(
         experiment_id="EXP-V04-001",
-        input_contract="H39_REQUIRED_INPUT_V1",
+        name="H39 order-flow experiment",
+        input_contract=VersionedIdentity.from_payload(
+            "H39_REQUIRED_INPUT", "V1", {"contract": "label-free"}
+        ),
         feature_definition=FeatureDefinition(
             feature_id="F_OFI_5M",
             name="Order Flow Imbalance 5m",
@@ -96,27 +102,58 @@ def test_research_contract_metadata_lifecycle(tmp_path: Path) -> None:
             statistical_test="OLS_T_STATISTIC",
             fwer_control="HOLM_BONFERRONI",
         ),
-        economic_policy="POLICY_MOMENTUM_TREND_60M",
-        cost_model="BINANCE_VIP0_PERP",
-        benchmark="BENCHMARK_B_PASSIVE_BTC",
+        economic_policy=VersionedIdentity.from_payload(
+            "POLICY_MOMENTUM_TREND_60M", "V1", {"policy": "momentum"}
+        ),
+        cost_model=VersionedIdentity.from_payload(
+            "BINANCE_VIP0_PERP", "V1", {"fee_bps": 5.0}
+        ),
+        execution_model=VersionedIdentity.from_payload(
+            "CAUSAL_NEXT_OPEN", "V1", {"timing": "next_open"}
+        ),
+        benchmark=P6_PENDING,
+        product_scope=("BTCUSDT-PERP",),
+        code_revision="test-revision",
+        terminal_policy="EXCLUDE_INCOMPLETE_HORIZONS",
     )
-    assert exp.decision_status == DecisionStatus.PROPOSED
+    assert exp.protocol_hash
     reg = ResearchContractRegistry(storage_path=tmp_path / "contracts.json")
     reg.register_experiment(exp)
 
     # Retrieval
-    retrieved = reg.get_experiment("EXP-V04-001")
+    retrieved = reg.get_experiment(exp.experiment_revision_id)
     assert retrieved.experiment_id == "EXP-V04-001"
     assert retrieved.prediction_target.horizon_ms == 3_600_000
+    assert reg.get_status(exp.experiment_revision_id) == DecisionStatus.REGISTERED
 
     # Status progression
-    updated = reg.update_decision_status("EXP-V04-001", DecisionStatus.STATISTICALLY_QUALIFIED)
-    assert updated.decision_status == DecisionStatus.STATISTICALLY_QUALIFIED
+    evidence_path = tmp_path / "statistical-result.json"
+    evidence_path.write_text('{"status":"qualified"}\n', encoding="utf-8")
+    evidence = EvidenceReference.from_file(
+        evidence_path,
+        evidence_type="STATISTICAL_RESULT",
+        logical_id="EXP-V04-001-statistical-result",
+        producing_revision_id=exp.experiment_revision_id,
+        producing_code_revision="test-revision",
+    )
+    updated = reg.update_decision_status(
+        exp.experiment_revision_id,
+        DecisionStatus.STATISTICALLY_QUALIFIED,
+        evidence_references=[evidence],
+        reason="deterministic synthetic qualification fixture",
+        actor="pytest",
+        source="test_v040",
+        statistical_result_id=evidence.evidence_id,
+    )
+    assert updated.new_status == DecisionStatus.STATISTICALLY_QUALIFIED
 
     # Persistence
     reg2 = ResearchContractRegistry(storage_path=tmp_path / "contracts.json")
     assert len(reg2.list_experiments()) == 1
-    assert reg2.get_experiment("EXP-V04-001").decision_status == DecisionStatus.STATISTICALLY_QUALIFIED
+    assert (
+        reg2.get_status(exp.experiment_revision_id)
+        == DecisionStatus.STATISTICALLY_QUALIFIED
+    )
 
 
 def test_research_contract_validation_rejects_empty_fields() -> None:
@@ -127,13 +164,18 @@ def test_research_contract_validation_rejects_empty_fields() -> None:
     with pytest.raises(ValueError, match="experiment_id cannot be empty"):
         ExperimentMetadata(
             experiment_id="",
-            input_contract="c1",
+            name="empty family fixture",
+            input_contract=VersionedIdentity.from_payload("c1", "v1", {}),
             feature_definition=fd,
             prediction_target=pt,
             evaluation_method=em,
-            economic_policy="p1",
-            cost_model="c1",
-            benchmark="b1",
+            economic_policy=VersionedIdentity.from_payload("p1", "v1", {}),
+            cost_model=VersionedIdentity.from_payload("c1", "v1", {}),
+            execution_model=VersionedIdentity.from_payload("e1", "v1", {}),
+            benchmark=P6_PENDING,
+            product_scope=("BTCUSDT-PERP",),
+            code_revision="test-revision",
+            terminal_policy="EXCLUDE_INCOMPLETE_HORIZONS",
         )
 
 
