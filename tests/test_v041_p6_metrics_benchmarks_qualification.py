@@ -51,6 +51,9 @@ from btc_quant_agent.economic import (
     policy_identity,
     summarize_ledger,
 )
+from btc_quant_agent.economic.acceptance_verifier import (
+    validate_persisted_qualification_semantics,
+)
 from btc_quant_agent.economic.portfolio import Portfolio
 from btc_quant_agent.research_contract import (
     P6_PENDING,
@@ -143,6 +146,8 @@ def _dataset_evidence(tmp_path: Path, candles: tuple[Candle, ...]) -> EvidenceRe
         canonical_json(
             [
                 {
+                    "symbol": item.symbol,
+                    "interval": item.interval,
                     "open_time_ms": item.open_time_ms,
                     "close_time_ms": item.close_time_ms,
                     "open": item.open,
@@ -150,6 +155,7 @@ def _dataset_evidence(tmp_path: Path, candles: tuple[Candle, ...]) -> EvidenceRe
                     "low": item.low,
                     "close": item.close,
                     "volume": item.volume,
+                    "quote_volume": item.quote_volume,
                 }
                 for item in candles
             ]
@@ -936,3 +942,99 @@ def test_semantically_identical_runs_and_results_have_identical_hashes(
     )
     assert repeated_result.result_hash == artifacts["qualification"].result_hash
     assert json.loads(canonical_json(repeated_result.semantic_payload()))
+
+
+
+def test_acceptance_repair_rejects_runtime_dataset_substitution(tmp_path: Path) -> None:
+    candles = _candles()
+    engine = _zero_cost_engine()
+    dataset = _dataset_evidence(tmp_path, candles)
+    comparison = _comparison(dataset, candles, engine)
+    protocol = _protocol(comparison, engine)
+    forged = list(candles)
+    forged[3] = replace(
+        forged[3],
+        close=forged[3].close + 0.25,
+        high=forged[3].high + 0.25,
+        volume=forged[3].volume + 1.0,
+    )
+    with pytest.raises(ValueError, match="runtime candle payload"):
+        execute_bound_run(
+            protocol=protocol,
+            comparison=comparison,
+            dataset_evidence=dataset,
+            engine=engine,
+            candles=tuple(forged),
+            signals=(),
+        )
+
+
+def test_acceptance_repair_rejects_runtime_instrument_substitution(tmp_path: Path) -> None:
+    candles = _candles()
+    engine = _zero_cost_engine()
+    dataset = _dataset_evidence(tmp_path, candles)
+    comparison = _comparison(dataset, candles, engine)
+    protocol = _protocol(comparison, engine)
+    forged = tuple(replace(item, symbol="ETHUSDT") for item in candles)
+    with pytest.raises(ValueError, match="instrument"):
+        execute_bound_run(
+            protocol=protocol,
+            comparison=comparison,
+            dataset_evidence=dataset,
+            engine=engine,
+            candles=forged,
+            signals=(),
+        )
+
+
+def test_acceptance_repair_runtime_binding_is_deterministic(tmp_path: Path) -> None:
+    artifacts = _formal_artifacts(tmp_path)
+    first = artifacts["run"]
+    second = execute_bound_run(
+        protocol=artifacts["protocol"],
+        comparison=artifacts["comparison"],
+        dataset_evidence=artifacts["dataset"],
+        engine=artifacts["engine"],
+        candles=artifacts["candles"],
+        signals=(
+            InformationSignal(
+                signal_id="P6_CANDIDATE_ENTRY",
+                experiment_id=artifacts["protocol"].experiment_revision_id,
+                timestamp_ms=artifacts["candles"][0].open_time_ms,
+                direction=1,
+                strength=1.0,
+            ),
+        ),
+    )
+    assert first.result_id == second.result_id
+    assert first.accounting["formal_runtime_market_data_sha256"] == second.accounting[
+        "formal_runtime_market_data_sha256"
+    ]
+
+
+def test_acceptance_repair_rejects_semantically_forged_run_gate_and_random(tmp_path: Path) -> None:
+    artifacts = _formal_artifacts(tmp_path)
+    semantic = json.loads(canonical_json(artifacts["qualification"].semantic_payload()))
+    candidate = semantic["run_result"]["semantic_payload"]["accounting"]
+
+    forged_run = json.loads(canonical_json(semantic))
+    forged_run_candidate = forged_run["run_result"]["semantic_payload"]["accounting"]
+    forged_run_candidate["turnover_usdt"] += 10_000.0
+    with pytest.raises(ValueError, match="replay"):
+        validate_persisted_qualification_semantics(forged_run, artifacts["dataset"])
+
+    forged_gate = json.loads(canonical_json(semantic))
+    forged_gate["gates"][0]["observed_value"] = candidate["net_return_pct"] + 1.0
+    forged_gate["gates"][0]["passed"] = True
+    forged_gate["verdict"] = "QUALIFIED"
+    with pytest.raises(ValueError, match="qualification gates"):
+        validate_persisted_qualification_semantics(forged_gate, artifacts["dataset"])
+
+    forged_random = json.loads(canonical_json(semantic))
+    random_record = forged_random["benchmark_suite"]["random"]
+    assert random_record is not None
+    random_record["trials"][0]["matching_diagnostics"]["trial_entry_count"] += 1
+    random_record["trials"][0]["comparable"] = True
+    random_record["comparable"] = True
+    with pytest.raises(ValueError, match="matching diagnostics"):
+        validate_persisted_qualification_semantics(forged_random, artifacts["dataset"])

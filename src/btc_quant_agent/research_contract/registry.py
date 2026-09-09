@@ -1046,6 +1046,15 @@ class ResearchContractRegistry:
             != data_interval.get("dataset_content_sha256")
         ):
             raise EvidenceValidationError("dataset identity/hash binding mismatch")
+        try:
+            from ..economic.acceptance_verifier import (
+                validate_persisted_qualification_semantics,
+            )
+            validate_persisted_qualification_semantics(semantic, dataset_reference)
+        except (KeyError, TypeError, ValueError) as exc:
+            raise EvidenceValidationError(
+                f"formal P6 semantic replay failed: {exc}"
+            ) from exc
 
     @staticmethod
     def _validate_state(

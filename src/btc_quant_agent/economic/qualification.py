@@ -27,6 +27,11 @@ from ..research_contract.models import (
     VersionedIdentity,
     utc_now,
 )
+from .acceptance_verifier import (
+    bind_runtime_market_data,
+    validate_runtime_dataset_binding,
+    verify_formal_accounting,
+)
 from .execution_model import ExecutionModel, ExecutionResult
 from .fee_model import FeeModel
 from .funding import FundingModel, FundingSettlement
@@ -42,7 +47,7 @@ from .signal import InformationSignal
 from .simulator import EconomicSimulationEngine
 from .trade_event import TradeAction
 
-P6_RESULT_SCHEMA_VERSION = "1.0.0"
+P6_RESULT_SCHEMA_VERSION = "1.1.0"
 P6_RESULT_EVIDENCE_TYPE = "P6_ECONOMIC_QUALIFICATION_RESULT"
 P6_RUN_EVIDENCE_TYPE = "P6_ECONOMIC_RUN"
 P6_BENCHMARK_EVIDENCE_TYPE = "P6_BENCHMARK_SUITE"
@@ -217,8 +222,10 @@ class ComparisonContract:
         if not scope or any(not item.strip() for item in scope):
             raise ValueError("comparison product_scope is required")
         object.__setattr__(self, "product_scope", scope)
-        if not self.benchmark_vehicle.strip():
-            raise ValueError("benchmark_vehicle is required")
+        if len(scope) != 1:
+            raise ValueError("formal P6 comparison supports exactly one product")
+        if self.benchmark_vehicle != f"{scope[0]}_LINEAR_PERPETUAL":
+            raise ValueError("benchmark_vehicle must match the sole product scope")
         if not math.isfinite(self.initial_capital) or self.initial_capital <= 0:
             raise ValueError("initial_capital must be finite and positive")
         if not isinstance(self.terminal_policy, TerminalPolicy):
@@ -958,7 +965,18 @@ def execute_bound_run(
         code_revision=protocol.code_revision,
         completeness=summary.completeness,
     )
-    return EconomicRunResult(identity=identity, accounting=FrozenDict(summary.to_dict()))
+    accounting = bind_runtime_market_data(summary.to_dict(), candles)
+    accounting["formal_run_identity"] = identity.to_dict()
+    verify_formal_accounting(
+        accounting,
+        product=protocol.product_scope[0],
+        initial_cash=comparison.initial_capital,
+        interval_start_ms=comparison.data_interval.start_ms,
+        interval_end_ms=comparison.data_interval.end_ms,
+        terminal_policy=comparison.terminal_policy,
+        metrics_contract=comparison.metrics_contract,
+    )
+    return EconomicRunResult(identity=identity, accounting=FrozenDict(accounting))
 
 
 def build_formal_benchmark_suite(
@@ -1183,6 +1201,9 @@ def _validate_protocol_and_runtime(
     _verify_local_evidence(dataset_evidence)
     if not candles:
         raise ValueError("formal run requires non-empty candles")
+    validate_runtime_dataset_binding(
+        dataset_evidence, candles, protocol.product_scope[0]
+    )
     if len({candle.symbol for candle in candles}) != 1:
         raise ValueError("formal run cannot mix candle instruments")
     if len(candles) != comparison.data_interval.observation_count:
@@ -1281,7 +1302,7 @@ def _cash_benchmark(
     return FormalBenchmarkResult(
         benchmark_kind=BenchmarkKind.CASH,
         vehicle="USDT_CASH_NO_TRADE",
-        accounting=FrozenDict(summary.to_dict()),
+        accounting=FrozenDict(bind_runtime_market_data(summary.to_dict(), candles)),
         comparable=summary.formal_complete,
         matching_diagnostics=FrozenDict(
             {
@@ -1435,7 +1456,7 @@ def _passive_perpetual_benchmark(
     return FormalBenchmarkResult(
         benchmark_kind=BenchmarkKind.PASSIVE_PERPETUAL,
         vehicle=comparison.benchmark_vehicle,
-        accounting=FrozenDict(summary.to_dict()),
+        accounting=FrozenDict(bind_runtime_market_data(summary.to_dict(), candles)),
         comparable=summary.formal_complete,
         matching_diagnostics=FrozenDict(
             {
