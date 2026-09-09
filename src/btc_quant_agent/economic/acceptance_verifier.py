@@ -251,7 +251,13 @@ def _curve_and_notional_from_ledger(
                 matches.append((count, portfolio, equity))
         if not matches:
             raise ValueError("equity curve cannot be reconstructed from ledger and market data")
-        count, portfolio, equity = matches[0]
+        # Multiple same-timestamp prefixes can mark to the same equity (for example,
+        # a zero-cost close filled at the candle close).  The simulator records its
+        # close mark after all close-time ledger effects, so prefer the latest
+        # reconstructable prefix rather than silently treating a completed exit as
+        # still open.  Prefixes that include a next-bar event at the same timestamp
+        # remain excluded when they change the observed close equity.
+        count, portfolio, equity = matches[-1]
         for event_index in range(selected_count, count):
             event = events[event_index]
             if (
