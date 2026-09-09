@@ -1,8 +1,8 @@
 """P0/P1 correctness gates. Synthetic only; P2-P7 remain deferred."""
 
+import math
 from copy import deepcopy
 from dataclasses import replace
-import math
 from unittest.mock import patch
 
 import pytest
@@ -10,10 +10,11 @@ import pytest
 from btc_quant_agent.domain import Candle
 from btc_quant_agent.economic.benchmarks import BenchmarkEngine
 from btc_quant_agent.economic.fee_model import FeeModel, SlippageMode
-from btc_quant_agent.economic.portfolio import Portfolio
 from btc_quant_agent.economic.policy import TradePolicy
+from btc_quant_agent.economic.portfolio import Portfolio
 from btc_quant_agent.economic.simulator import EconomicSimulationEngine
-from btc_quant_agent.economic.trade_event import TradeAction as A, TradeEvent
+from btc_quant_agent.economic.trade_event import TradeAction as A
+from btc_quant_agent.economic.trade_event import TradeEvent
 
 
 def trade(p, action=A.OPEN_LONG, price=100, quantity=1, fee=0, t=1000, asset="BTCUSDT"):
@@ -198,12 +199,11 @@ def test_event_construction_failure_is_atomic(kind):
     before = snapshot(p)
     with patch(
         "btc_quant_agent.economic.portfolio.TradeEvent", side_effect=ValueError("event rejected")
-    ):
-        with pytest.raises(ValueError, match="event rejected"):
-            if kind == "trade":
-                trade(p, A.CLOSE_LONG, price=110, fee=0.5, t=2000)
-            else:
-                p.apply_funding(2000, "BTCUSDT", -1, 100)
+    ), pytest.raises(ValueError, match="event rejected"):
+        if kind == "trade":
+            trade(p, A.CLOSE_LONG, price=110, fee=0.5, t=2000)
+        else:
+            p.apply_funding(2000, "BTCUSDT", -1, 100)
     assert snapshot(p) == before
 
 

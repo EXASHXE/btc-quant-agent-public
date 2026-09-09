@@ -4,9 +4,9 @@ from .models import (
     P6_PENDING,
     DecisionEvent,
     DecisionStatus,
+    EvaluationMethod,
     EvidenceCompleteness,
     EvidenceReference,
-    EvaluationMethod,
     ExperimentMetadata,
     FeatureDefinition,
     PredictionTarget,
@@ -23,14 +23,14 @@ from .registry import (
 )
 
 __all__ = [
-    "P6_PENDING",
     "LEGAL_TRANSITIONS",
+    "P6_PENDING",
     "DecisionEvent",
     "DecisionStatus",
+    "EvaluationMethod",
     "EvidenceCompleteness",
     "EvidenceReference",
     "EvidenceValidationError",
-    "EvaluationMethod",
     "ExperimentMetadata",
     "FeatureDefinition",
     "InvalidTransitionError",

@@ -25,8 +25,8 @@ from btc_quant_agent.economic.trade_event import TradeAction
 from btc_quant_agent.research_contract.models import (
     P6_PENDING,
     DecisionStatus,
-    EvidenceReference,
     EvaluationMethod,
+    EvidenceReference,
     ExperimentMetadata,
     FeatureDefinition,
     PredictionTarget,

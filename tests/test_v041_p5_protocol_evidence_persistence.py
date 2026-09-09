@@ -11,9 +11,9 @@ from btc_quant_agent.research_contract.canonical import FrozenDict, canonical_sh
 from btc_quant_agent.research_contract.models import (
     P6_PENDING,
     DecisionStatus,
+    EvaluationMethod,
     EvidenceCompleteness,
     EvidenceReference,
-    EvaluationMethod,
     ExperimentMetadata,
     FeatureDefinition,
     PredictionTarget,
@@ -28,7 +28,6 @@ from btc_quant_agent.research_contract.registry import (
     StaleRegistryError,
 )
 from btc_quant_agent.research_registry import ResearchRegistry
-
 
 FIXED_TIME = "2026-09-09T01:30:00+00:00"
 

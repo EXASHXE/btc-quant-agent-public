@@ -7,7 +7,6 @@ from enum import Enum
 from types import MappingProxyType
 from typing import Any, TypeAlias
 
-
 JsonScalar: TypeAlias = str | int | float | bool | None
 FrozenJson: TypeAlias = JsonScalar | tuple[Any, ...] | Mapping[str, Any]
 

@@ -5,10 +5,10 @@ import hashlib
 import json
 import os
 import tempfile
-from collections.abc import Callable, Mapping, Sequence
+from collections.abc import Callable, Iterator, Mapping, Sequence
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Any, Iterator
+from typing import Any
 
 from .canonical import canonical_json, canonical_sha256
 from .models import (
@@ -19,7 +19,6 @@ from .models import (
     ExperimentMetadata,
     utc_now,
 )
-
 
 REGISTRY_SCHEMA_VERSION = "1.0.0"
 
@@ -467,9 +466,9 @@ class ResearchContractRegistry:
             evidence_raw = payload["evidence"]
             events_raw = payload["decision_events"]
             if not isinstance(protocols_raw, dict) or not isinstance(evidence_raw, dict):
-                raise ValueError("protocols and evidence must be objects")
+                raise TypeError("protocols and evidence must be objects")
             if not isinstance(events_raw, list):
-                raise ValueError("decision_events must be a list")
+                raise TypeError("decision_events must be a list")
             protocols = {
                 str(key): ExperimentMetadata.from_dict(value)
                 for key, value in protocols_raw.items()

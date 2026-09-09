@@ -69,6 +69,7 @@ ZERO_COST = FeeModel(
     taker_fee_rate=0.0,
     slippage_mode=SlippageMode.ZERO,
 )
+DEFAULT_ENTRY_RULE = EntryRule()
 
 
 def _simulate(
@@ -77,7 +78,7 @@ def _simulate(
     exit_rule: ExitRule,
     direction: int = 1,
     fee_model: FeeModel = ZERO_COST,
-    entry_rule: EntryRule = EntryRule(),
+    entry_rule: EntryRule = DEFAULT_ENTRY_RULE,
     funding: list[FundingSettlement] | None = None,
     signal_metadata: dict[str, float] | None = None,
 ) -> SimulationSummary:

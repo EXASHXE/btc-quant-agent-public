@@ -13,7 +13,6 @@ from urllib.parse import unquote, urlparse
 
 from .canonical import FrozenDict, canonical_json, canonical_sha256, thaw_json
 
-
 SHA256_PATTERN = re.compile(r"^[0-9a-f]{64}$")
 P6_PENDING = "P6_PENDING"
 
@@ -34,7 +33,7 @@ def _require_sha256(value: str, field_name: str) -> None:
 
 def _validate_timestamp(value: str, field_name: str) -> None:
     try:
-        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+        parsed = datetime.fromisoformat(value)
     except ValueError as exc:
         raise ValueError(f"{field_name} must be an ISO-8601 timestamp") from exc
     if parsed.tzinfo is None:
@@ -370,7 +369,7 @@ class ExperimentMetadata:
         semantic = data["semantic_payload"]
         audit = data["audit"]
         if not isinstance(semantic, Mapping) or not isinstance(audit, Mapping):
-            raise ValueError("protocol semantic_payload and audit must be objects")
+            raise TypeError("protocol semantic_payload and audit must be objects")
         expected_semantic = {
             "experiment_family",
             "name",
@@ -424,7 +423,7 @@ class ExperimentMetadata:
     def from_json(cls, json_str: str) -> ExperimentMetadata:
         raw = json.loads(json_str)
         if not isinstance(raw, Mapping):
-            raise ValueError("protocol JSON must contain an object")
+            raise TypeError("protocol JSON must contain an object")
         return cls.from_dict(raw)
 
 

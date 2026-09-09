@@ -5,8 +5,8 @@ Assertions document observed defects, NOT desired regression expectations.
 Registry writes are confined to an automatically cleaned temporary directory.
 """
 
-from dataclasses import replace
 import json
+from dataclasses import replace
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from unittest.mock import patch
@@ -32,6 +32,8 @@ from btc_quant_agent.economic.simulator import EconomicSimulationEngine
 from btc_quant_agent.economic.trade_event import TradeAction as A
 from btc_quant_agent.research_contract.models import (
     DecisionStatus as D,
+)
+from btc_quant_agent.research_contract.models import (
     EvaluationMethod,
     ExperimentMetadata,
     FeatureDefinition,
@@ -50,7 +52,7 @@ def record(name, expected, actual):
     rows.append({"case": name, "expected": expected, "actual": actual})
 
 
-def bar(t=1000, o=100, h=None, l=None, c=100, volume=100, duration=1000):  # noqa: E741
+def bar(t=1000, o=100, h=None, l=None, c=100, volume=100, duration=1000):
     return Candle(
         "BTCUSDT",
         "1s",
@@ -76,17 +78,17 @@ def sim(bars, signals=(), policy=BASE, fees=ZERO, funds=(), initial=100000, exec
 
 def state(p, mark):
     pos = p.positions.get("BTCUSDT")
-    return dict(
-        cash=p.cash,
-        quantity=p.get_position_quantity(),
-        average_entry=pos.average_entry_price if pos else None,
-        realized=sum(e.realized_pnl_usdt for e in p.trade_history),
-        unrealized=pos.unrealized_pnl(mark) if pos else 0,
-        equity=p.total_equity({"BTCUSDT": mark}),
-        fees=sum(e.fee_usdt for e in p.trade_history),
-        funding=sum(e.funding_usdt for e in p.trade_history),
-        net=p.total_equity({"BTCUSDT": mark}) - p.initial_cash,
-    )
+    return {
+        "cash": p.cash,
+        "quantity": p.get_position_quantity(),
+        "average_entry": pos.average_entry_price if pos else None,
+        "realized": sum(e.realized_pnl_usdt for e in p.trade_history),
+        "unrealized": pos.unrealized_pnl(mark) if pos else 0,
+        "equity": p.total_equity({"BTCUSDT": mark}),
+        "fees": sum(e.fee_usdt for e in p.trade_history),
+        "funding": sum(e.funding_usdt for e in p.trade_history),
+        "net": p.total_equity({"BTCUSDT": mark}) - p.initial_cash,
+    }
 
 
 def trade(p, act, price, qty=1, fee=0, t=1000):
