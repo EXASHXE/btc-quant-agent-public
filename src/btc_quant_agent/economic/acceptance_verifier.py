@@ -74,12 +74,12 @@ def validate_runtime_dataset_binding(
     except (OSError, UnicodeError, ValueError) as exc:
         raise ValueError(f"formal dataset evidence is not replayable: {exc}") from exc
     if not isinstance(raw, list):
-        raise ValueError("formal dataset evidence must be a canonical candle array")
+        raise TypeError("formal dataset evidence must be a canonical candle array")
     required = tuple(canonical_runtime_market_data(candles)[0])
     normalized: list[dict[str, Any]] = []
     for index, value in enumerate(raw):
         if not isinstance(value, Mapping):
-            raise ValueError(f"dataset candle {index} must be a JSON object")
+            raise TypeError(f"dataset candle {index} must be a JSON object")
         missing = [field for field in required if field not in value]
         if missing:
             raise ValueError(
@@ -94,19 +94,19 @@ def validate_runtime_dataset_binding(
 
 def _require_mapping(value: Any, label: str) -> Mapping[str, Any]:
     if not isinstance(value, Mapping):
-        raise ValueError(f"{label} must be a JSON object")
+        raise TypeError(f"{label} must be a JSON object")
     return value
 
 
 def _require_list(value: Any, label: str) -> list[Any]:
     if not isinstance(value, list):
-        raise ValueError(f"{label} must be a JSON array")
+        raise TypeError(f"{label} must be a JSON array")
     return value
 
 
 def _finite(value: Any, label: str) -> float:
     if isinstance(value, bool) or not isinstance(value, (int, float)):
-        raise ValueError(f"{label} must be numeric")
+        raise TypeError(f"{label} must be numeric")
     result = float(value)
     if not math.isfinite(result):
         raise ValueError(f"{label} must be finite")
@@ -118,7 +118,7 @@ def _close(observed: Any, expected: Any, label: str) -> None:
         if observed is None and expected is None:
             return
         if isinstance(observed, bool) or not isinstance(observed, (int, float)):
-            raise ValueError(f"{label} must be numeric")
+            raise TypeError(f"{label} must be numeric")
         if not math.isclose(
             float(observed), expected, rel_tol=0.0, abs_tol=_TOLERANCE
         ):
