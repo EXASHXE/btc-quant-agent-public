@@ -26,6 +26,7 @@ from btc_quant_agent.economic import (
     ExitRule,
     FeeModel,
     FundingModel,
+    FundingSettlement,
     GateOperator,
     InformationSignal,
     MetricStatus,
@@ -52,6 +53,7 @@ from btc_quant_agent.economic import (
     summarize_ledger,
 )
 from btc_quant_agent.economic.acceptance_verifier import (
+    build_passive_benchmark_accounting,
     validate_persisted_qualification_semantics,
 )
 from btc_quant_agent.economic.portfolio import Portfolio
@@ -304,6 +306,7 @@ def _formal_artifacts(
     threshold: float = -1.0,
     matching: BenchmarkMatchingRules | None = None,
     incomparable_opportunities: bool = False,
+    funding_events: tuple[FundingSettlement, ...] = (),
 ) -> dict[str, Any]:
     tmp_path.mkdir(parents=True, exist_ok=True)
     candles = _candles()
@@ -340,6 +343,7 @@ def _formal_artifacts(
         engine=engine,
         candles=candles,
         signals=(signal,),
+        funding_events=funding_events,
     )
     run_path = tmp_path / "candidate-run.json"
     run.write(run_path)
@@ -358,6 +362,7 @@ def _formal_artifacts(
         engine=engine,
         candles=candles,
         eligible_opportunities=opportunities,
+        funding_events=funding_events,
     )
     suite_path = tmp_path / "benchmark-suite.json"
     suite.write(suite_path)
@@ -401,6 +406,7 @@ def _formal_artifacts(
         "suite_evidence": suite_evidence,
         "qualification": qualification,
         "result_evidence": result_evidence,
+        "funding_events": funding_events,
     }
 
 
@@ -440,9 +446,10 @@ def test_formal_pipeline_is_replayable_and_can_qualify(tmp_path: Path) -> None:
     assert suite.random is not None
     assert len(suite.random.trials) == artifacts["comparison"].random_trials
     assert suite.random.comparable
-    assert qualification.result_hash == replace(
-        qualification, generated_at_utc="2030-01-01T00:00:00+00:00"
-    ).result_hash
+    assert (
+        qualification.result_hash
+        == replace(qualification, generated_at_utc="2030-01-01T00:00:00+00:00").result_hash
+    )
 
     protocol = artifacts["protocol"]
     registry, _ = _statistically_qualified_registry(tmp_path, protocol)
@@ -463,9 +470,10 @@ def test_formal_pipeline_is_replayable_and_can_qualify(tmp_path: Path) -> None:
     assert registry.get_status(protocol.experiment_revision_id) is (
         DecisionStatus.ECONOMICALLY_QUALIFIED
     )
-    assert ResearchContractRegistry(registry.storage_path).get_status(
-        protocol.experiment_revision_id
-    ) is DecisionStatus.ECONOMICALLY_QUALIFIED
+    assert (
+        ResearchContractRegistry(registry.storage_path).get_status(protocol.experiment_revision_id)
+        is DecisionStatus.ECONOMICALLY_QUALIFIED
+    )
 
 
 def test_accounting_identity_partial_long_and_net_loser_classification() -> None:
@@ -488,9 +496,7 @@ def test_accounting_identity_partial_long_and_net_loser_classification() -> None
     summary.validate_accounting()
     assert summary.realized_gross_pnl_usdt == pytest.approx(0.0)
     assert summary.final_equity - summary.initial_cash == pytest.approx(-5.0)
-    assert [item.net_pnl_usdt for item in summary.round_trips] == pytest.approx(
-        [7.5, -12.5]
-    )
+    assert [item.net_pnl_usdt for item in summary.round_trips] == pytest.approx([7.5, -12.5])
     assert (summary.winning_trades, summary.losing_trades) == (1, 1)
     assert summary.completed_round_trips == 2
 
@@ -631,18 +637,16 @@ def test_slippage_is_in_fill_prices_and_never_deducted_twice() -> None:
     engine = EconomicSimulationEngine(
         policy=replace(_zero_cost_engine().policy),
         fee_model=fee,
-        execution_model=ExecutionModel(
-            fee_model=fee, decision_latency_ms=0, exchange_latency_ms=0
-        ),
+        execution_model=ExecutionModel(fee_model=fee, decision_latency_ms=0, exchange_latency_ms=0),
         initial_cash=10_000.0,
     )
     candles = _candles(count=3, drift=10.0)
-    signal = InformationSignal(
-        "SLIP", "DIAGNOSTIC", candles[0].open_time_ms, direction=1
-    )
+    signal = InformationSignal("SLIP", "DIAGNOSTIC", candles[0].open_time_ms, direction=1)
     summary = engine.simulate(candles, (signal,))
     assert summary.slippage_attribution_usdt is not None
     assert summary.slippage_attribution_usdt > 0.0
+    assert summary.realized_gross_pnl_usdt is not None
+    assert summary.terminal_unrealized_pnl_usdt is not None
     assert summary.net_pnl_usdt == pytest.approx(
         summary.realized_gross_pnl_usdt
         + summary.terminal_unrealized_pnl_usdt
@@ -711,9 +715,10 @@ def test_contract_changes_change_comparison_and_protocol_revision(tmp_path: Path
     )
     for variant in variants:
         assert variant.contract_hash != baseline.contract_hash
-        assert _protocol(variant, engine).experiment_revision_id != _protocol(
-            baseline, engine
-        ).experiment_revision_id
+        assert (
+            _protocol(variant, engine).experiment_revision_id
+            != _protocol(baseline, engine).experiment_revision_id
+        )
     with pytest.raises(FrozenInstanceError):
         baseline.random_seed = 9  # type: ignore[misc]
 
@@ -804,8 +809,7 @@ def test_failed_matching_is_not_testable_and_does_not_change_status(
     assert random_suite is not None
     assert not random_suite.comparable
     assert any(
-        trial.matching_diagnostics["entry_count_match"] is False
-        for trial in random_suite.trials
+        trial.matching_diagnostics["entry_count_match"] is False for trial in random_suite.trials
     )
     qualification = artifacts["qualification"]
     assert qualification.verdict is QualificationVerdict.NOT_TESTABLE
@@ -877,9 +881,7 @@ def test_tampered_result_run_and_dataset_are_atomic_failures(tmp_path: Path) -> 
 
 def test_stale_registry_cannot_partially_commit_economic_decision(tmp_path: Path) -> None:
     artifacts = _formal_artifacts(tmp_path)
-    registry, statistical = _statistically_qualified_registry(
-        tmp_path, artifacts["protocol"]
-    )
+    registry, statistical = _statistically_qualified_registry(tmp_path, artifacts["protocol"])
     stale = ResearchContractRegistry(registry.storage_path)
     extra_path = tmp_path / "extra.json"
     extra_path.write_text("{}\n", encoding="utf-8")
@@ -895,9 +897,7 @@ def test_stale_registry_cannot_partially_commit_economic_decision(tmp_path: Path
     stale_generation = stale.generation
     with pytest.raises(StaleRegistryError):
         stale.record_economic_qualification(
-            artifacts["qualification"].decision_attestation(
-                artifacts["result_evidence"]
-            ),
+            artifacts["qualification"].decision_attestation(artifacts["result_evidence"]),
             evidence_references=(
                 artifacts["dataset"],
                 artifacts["run_evidence"],
@@ -946,7 +946,6 @@ def test_semantically_identical_runs_and_results_have_identical_hashes(
     )
     assert repeated_result.result_hash == artifacts["qualification"].result_hash
     assert json.loads(canonical_json(repeated_result.semantic_payload()))
-
 
 
 def test_acceptance_repair_rejects_runtime_dataset_substitution(tmp_path: Path) -> None:
@@ -1011,9 +1010,10 @@ def test_acceptance_repair_runtime_binding_is_deterministic(tmp_path: Path) -> N
         ),
     )
     assert first.result_id == second.result_id
-    assert first.accounting["formal_runtime_market_data_sha256"] == second.accounting[
-        "formal_runtime_market_data_sha256"
-    ]
+    assert (
+        first.accounting["formal_runtime_market_data_sha256"]
+        == second.accounting["formal_runtime_market_data_sha256"]
+    )
 
 
 def test_acceptance_repair_rejects_semantically_forged_run_gate_and_random(tmp_path: Path) -> None:
@@ -1043,6 +1043,7 @@ def test_acceptance_repair_rejects_semantically_forged_run_gate_and_random(tmp_p
     with pytest.raises(ValueError, match="matching diagnostics"):
         validate_persisted_qualification_semantics(forged_random, artifacts["dataset"])
 
+
 _BENCHMARK_RESULT_PAYLOAD_KEYS = (
     "benchmark_kind",
     "vehicle",
@@ -1061,6 +1062,10 @@ def _refresh_benchmark_record_id(record: dict[str, Any]) -> None:
 
 
 def _refresh_suite_identity(suite: dict[str, Any]) -> None:
+    for key in ("cash", "passive"):
+        record = suite.get(key)
+        if isinstance(record, dict):
+            _refresh_benchmark_record_id(record)
     random_record = suite.get("random")
     if isinstance(random_record, dict):
         trials = random_record["trials"]
@@ -1121,9 +1126,7 @@ def _write_forged_registry_artifacts(
         )
     if suite_changed:
         suite_path = tmp_path / "forged-suite.json"
-        suite_path.write_text(
-            canonical_json(semantic["benchmark_suite"]) + "\n", encoding="utf-8"
-        )
+        suite_path.write_text(canonical_json(semantic["benchmark_suite"]) + "\n", encoding="utf-8")
         suite_evidence = make_artifact_evidence(
             suite_path,
             evidence_type=P6_BENCHMARK_EVIDENCE_TYPE,
@@ -1169,6 +1172,170 @@ def _write_forged_registry_artifacts(
         suite_evidence,
         result_evidence,
     )
+
+
+def _replay_passive_with(
+    artifacts: dict[str, Any],
+    *,
+    fee_model: FeeModel | None = None,
+    execution_model: ExecutionModel | None = None,
+    funding_events: tuple[FundingSettlement, ...] | None = None,
+    terminal_policy: TerminalPolicy | None = None,
+) -> dict[str, Any]:
+    engine = artifacts["engine"]
+    comparison = artifacts["comparison"]
+    selected_fee = fee_model or engine.fee_model
+    selected_execution = execution_model or ExecutionModel(
+        fee_model=selected_fee,
+        decision_latency_ms=engine.execution_model.decision_latency_ms,
+        exchange_latency_ms=engine.execution_model.exchange_latency_ms,
+        limit_fill_prob_on_touch=engine.execution_model.limit_fill_prob_on_touch,
+    )
+    return build_passive_benchmark_accounting(
+        candidate_identity=artifacts["run"].identity.to_dict(),
+        product=comparison.product_scope[0],
+        initial_cash=comparison.initial_capital,
+        candles=artifacts["candles"],
+        fee_model=selected_fee,
+        execution_model=selected_execution,
+        funding_model=engine.funding_model,
+        funding_events=(artifacts["funding_events"] if funding_events is None else funding_events),
+        interval_start_ms=comparison.data_interval.start_ms,
+        interval_end_ms=comparison.data_interval.end_ms,
+        terminal_policy=terminal_policy or comparison.terminal_policy,
+        metrics_contract=comparison.metrics_contract,
+    )
+
+
+def _assert_rehashed_passive_forgery_rejected(
+    tmp_path: Path,
+    artifacts: dict[str, Any],
+    *,
+    forged_accounting: dict[str, Any] | None = None,
+    mutation: Any = None,
+) -> None:
+    artifact = json.loads(canonical_json(artifacts["qualification"].to_dict()))
+    semantic = artifact["semantic_payload"]
+    suite = semantic["benchmark_suite"]
+    passive = suite["passive"]
+    assert passive is not None
+    if forged_accounting is not None:
+        passive["accounting"] = forged_accounting
+    if mutation is not None:
+        mutation(passive)
+    _refresh_suite_identity(suite)
+    semantic["benchmark_suite_id"] = suite["suite_id"]
+    semantic["benchmark_result_ids"] = _suite_result_ids(suite)
+
+    forged_dir = tmp_path / "forged"
+    forged_dir.mkdir()
+    attestation, evidence = _write_forged_registry_artifacts(
+        forged_dir,
+        artifacts,
+        artifact,
+        run_changed=False,
+        suite_changed=True,
+    )
+    registry_dir = tmp_path / "registry"
+    registry_dir.mkdir()
+    registry, _ = _statistically_qualified_registry(registry_dir, artifacts["protocol"])
+    with pytest.raises(EvidenceValidationError, match="semantic replay"):
+        registry.record_economic_qualification(
+            attestation,
+            evidence_references=evidence,
+            reason="rehashed passive benchmark forgery must fail closed",
+            actor="pytest",
+            decided_at_utc=FIXED_TIME,
+        )
+
+
+def test_registry_rejects_rehashed_passive_fee_replay(tmp_path: Path) -> None:
+    artifacts = _formal_artifacts(tmp_path / "base")
+    wrong_fee = replace(artifacts["engine"].fee_model, taker_fee_rate=0.000001)
+    forged = _replay_passive_with(artifacts, fee_model=wrong_fee)
+    original = artifacts["suite"].passive
+    assert original is not None
+    original_events = original.accounting["trade_events"]
+    forged_events = forged["trade_events"]
+    assert forged_events[0]["fee_usdt"] == pytest.approx(original_events[0]["fee_usdt"] + 0.01)
+    _assert_rehashed_passive_forgery_rejected(tmp_path, artifacts, forged_accounting=forged)
+
+
+def test_registry_rejects_rehashed_passive_fill_price_replay(tmp_path: Path) -> None:
+    artifacts = _formal_artifacts(tmp_path / "base")
+    wrong_fee = replace(
+        artifacts["engine"].fee_model,
+        slippage_mode=SlippageMode.FIXED_BPS,
+        fixed_slippage_bps=1.0,
+    )
+    forged = _replay_passive_with(artifacts, fee_model=wrong_fee)
+    original = artifacts["suite"].passive
+    assert original is not None
+    assert forged["trade_events"][0]["price"] != original.accounting["trade_events"][0]["price"]
+    _assert_rehashed_passive_forgery_rejected(tmp_path, artifacts, forged_accounting=forged)
+
+
+def test_registry_rejects_rehashed_passive_entry_timestamp_replay(
+    tmp_path: Path,
+) -> None:
+    artifacts = _formal_artifacts(tmp_path / "base")
+    engine = artifacts["engine"]
+    wrong_execution = ExecutionModel(
+        fee_model=engine.fee_model,
+        decision_latency_ms=1,
+        exchange_latency_ms=0,
+        limit_fill_prob_on_touch=engine.execution_model.limit_fill_prob_on_touch,
+    )
+    forged = _replay_passive_with(artifacts, execution_model=wrong_execution)
+    original = artifacts["suite"].passive
+    assert original is not None
+    assert (
+        forged["trade_events"][0]["timestamp_ms"]
+        != original.accounting["trade_events"][0]["timestamp_ms"]
+    )
+    _assert_rehashed_passive_forgery_rejected(tmp_path, artifacts, forged_accounting=forged)
+
+
+def test_registry_rejects_rehashed_passive_missing_funding_event(
+    tmp_path: Path,
+) -> None:
+    candles = _candles()
+    funding = (
+        FundingSettlement(
+            timestamp_ms=candles[2].open_time_ms,
+            funding_rate=0.001,
+            mark_price=candles[2].open,
+        ),
+    )
+    artifacts = _formal_artifacts(tmp_path / "base", funding_events=funding)
+    forged = _replay_passive_with(artifacts, funding_events=())
+    original = artifacts["suite"].passive
+    assert original is not None
+    assert any(
+        event["action"] == TradeAction.FUNDING_SETTLEMENT.value
+        for event in original.accounting["trade_events"]
+    )
+    assert all(
+        event["action"] != TradeAction.FUNDING_SETTLEMENT.value for event in forged["trade_events"]
+    )
+    _assert_rehashed_passive_forgery_rejected(tmp_path, artifacts, forged_accounting=forged)
+
+
+def test_registry_rejects_rehashed_passive_execution_identity(tmp_path: Path) -> None:
+    artifacts = _formal_artifacts(tmp_path / "base")
+
+    def mutate(passive: dict[str, Any]) -> None:
+        identity = passive["accounting"]["formal_run_identity"]
+        identity["execution_model"]["content_sha256"] = "0" * 64
+
+    _assert_rehashed_passive_forgery_rejected(tmp_path, artifacts, mutation=mutate)
+
+
+def test_registry_rejects_rehashed_passive_terminal_policy(tmp_path: Path) -> None:
+    artifacts = _formal_artifacts(tmp_path / "base")
+    forged = _replay_passive_with(artifacts, terminal_policy=TerminalPolicy.MARK_TO_MARKET_OPEN)
+    assert forged["terminal_policy"] == TerminalPolicy.MARK_TO_MARKET_OPEN.value
+    _assert_rehashed_passive_forgery_rejected(tmp_path, artifacts, forged_accounting=forged)
 
 
 def test_registry_rejects_rehashed_forged_run_accounting(tmp_path: Path) -> None:
@@ -1338,7 +1505,9 @@ def test_registry_rejects_rehashed_forged_random_trial_dataset(tmp_path: Path) -
     registry_dir = tmp_path / "registry"
     registry_dir.mkdir()
     registry, _ = _statistically_qualified_registry(registry_dir, artifacts["protocol"])
-    with pytest.raises(EvidenceValidationError, match="dataset evidence|candle payload|market data"):
+    with pytest.raises(
+        EvidenceValidationError, match="dataset evidence|candle payload|market data"
+    ):
         registry.record_economic_qualification(
             attestation,
             evidence_references=evidence,
@@ -1430,7 +1599,9 @@ def test_registry_rejects_rehashed_forged_random_execution_identity(tmp_path: Pa
     registry_dir = tmp_path / "registry"
     registry_dir.mkdir()
     registry, _ = _statistically_qualified_registry(registry_dir, artifacts["protocol"])
-    with pytest.raises(EvidenceValidationError, match="execution_model|matching diagnostics|identity"):
+    with pytest.raises(
+        EvidenceValidationError, match="execution_model|matching diagnostics|identity"
+    ):
         registry.record_economic_qualification(
             attestation,
             evidence_references=evidence,
@@ -1543,9 +1714,7 @@ def test_validate_formal_run_identity_binding_checks_all_critical_fields(tmp_pat
     base = tmp_path / "base"
     base.mkdir()
     artifacts = _formal_artifacts(base)
-    candidate_id = json.loads(
-        canonical_json(artifacts["run"].identity.to_dict())
-    )
+    candidate_id = json.loads(canonical_json(artifacts["run"].identity.to_dict()))
     trial_id = dict(candidate_id)
 
     # Positive control: identical identities pass

@@ -28,11 +28,13 @@ from ..research_contract.models import (
     utc_now,
 )
 from .acceptance_verifier import (
+    PassiveBenchmarkReplayError,
     bind_runtime_market_data,
+    build_passive_benchmark_accounting,
     validate_runtime_dataset_binding,
     verify_formal_accounting,
 )
-from .execution_model import ExecutionModel, ExecutionResult
+from .execution_model import ExecutionModel
 from .fee_model import FeeModel
 from .funding import FundingModel, FundingSettlement
 from .metrics import (
@@ -41,8 +43,7 @@ from .metrics import (
     TerminalPolicy,
     summarize_ledger,
 )
-from .policy import OrderType, TradePolicy
-from .portfolio import Portfolio
+from .policy import TradePolicy
 from .signal import InformationSignal
 from .simulator import EconomicSimulationEngine
 from .trade_event import TradeAction
@@ -131,7 +132,10 @@ class BenchmarkMatchingRules:
     maximum_average_notional_error_fraction: float | None
 
     def __post_init__(self) -> None:
-        if type(self.match_entry_count) is not bool or type(self.match_direction_counts) is not bool:
+        if (
+            type(self.match_entry_count) is not bool
+            or type(self.match_direction_counts) is not bool
+        ):
             raise TypeError("benchmark count matching flags must be booleans")
         for name in (
             "maximum_mean_holding_error_fraction",
@@ -244,9 +248,7 @@ class ComparisonContract:
             if self.eligible_opportunity_set_sha256 is None or not _valid_sha256(
                 self.eligible_opportunity_set_sha256
             ):
-                raise ValueError(
-                    "random benchmark requires a bound eligible opportunity-set hash"
-                )
+                raise ValueError("random benchmark requires a bound eligible opportunity-set hash")
         elif self.eligible_opportunity_set_sha256 is not None and not _valid_sha256(
             self.eligible_opportunity_set_sha256
         ):
@@ -362,9 +364,7 @@ class EligibleOpportunity:
 def eligible_opportunity_set_sha256(
     opportunities: Sequence[EligibleOpportunity],
 ) -> str:
-    ordered = sorted(
-        opportunities, key=lambda item: (item.timestamp_ms, item.opportunity_id)
-    )
+    ordered = sorted(opportunities, key=lambda item: (item.timestamp_ms, item.opportunity_id))
     return canonical_sha256([item.to_dict() for item in ordered])
 
 
@@ -520,14 +520,10 @@ class FormalBenchmarkResult:
         if not self.vehicle.strip():
             raise ValueError("benchmark vehicle is required")
         object.__setattr__(self, "accounting", FrozenDict(self.accounting))
-        object.__setattr__(
-            self, "matching_diagnostics", FrozenDict(self.matching_diagnostics)
-        )
+        object.__setattr__(self, "matching_diagnostics", FrozenDict(self.matching_diagnostics))
         if type(self.comparable) is not bool:
             raise TypeError("benchmark comparable flag must be boolean")
-        if self.trial_id is not None and (
-            type(self.trial_id) is not int or self.trial_id < 0
-        ):
+        if self.trial_id is not None and (type(self.trial_id) is not int or self.trial_id < 0):
             raise ValueError("benchmark trial_id must be nonnegative")
         if self.seed is not None and type(self.seed) is not int:
             raise TypeError("benchmark seed must be an integer")
@@ -640,8 +636,7 @@ class FormalBenchmarkSuite:
         ):
             raise ValueError("passive benchmark slot contains the wrong benchmark kind")
         if self.random is not None and any(
-            item.benchmark_kind is not BenchmarkKind.RANDOM_MATCHED
-            for item in self.random.trials
+            item.benchmark_kind is not BenchmarkKind.RANDOM_MATCHED for item in self.random.trials
         ):
             raise ValueError("random benchmark slot contains the wrong benchmark kind")
         canonical_json(self.to_dict())
@@ -758,9 +753,7 @@ class EconomicQualificationResult:
             self.comparison_contract_hash
         ):
             raise ValueError("qualification protocol/comparison hashes must be SHA-256")
-        if canonical_sha256(thaw_json(self.comparison_contract)) != (
-            self.comparison_contract_hash
-        ):
+        if canonical_sha256(thaw_json(self.comparison_contract)) != (self.comparison_contract_hash):
             raise ValueError("qualification comparison contract content/hash mismatch")
         if self.run_result.identity.experiment_revision_id != self.experiment_revision_id:
             raise ValueError("qualification run experiment binding mismatch")
@@ -787,9 +780,11 @@ class EconomicQualificationResult:
             and any(gate.passed is False for gate in self.gates)
         ):
             raise ValueError("REJECTED verdict requires a testable failed gate")
-        if self.verdict is QualificationVerdict.NOT_TESTABLE and all(
-            gate.testable for gate in self.gates
-        ) and self.run_result.identity.completeness is ResultCompleteness.COMPLETE:
+        if (
+            self.verdict is QualificationVerdict.NOT_TESTABLE
+            and all(gate.testable for gate in self.gates)
+            and self.run_result.identity.completeness is ResultCompleteness.COMPLETE
+        ):
             selected = {
                 BenchmarkKind.CASH: self.benchmark_suite.cash,
                 BenchmarkKind.PASSIVE_PERPETUAL: self.benchmark_suite.passive,
@@ -896,9 +891,7 @@ def execution_model_identity(
     return VersionedIdentity.from_payload(logical_id, version, payload)
 
 
-def funding_model_identity(
-    model: FundingModel, logical_id: str, version: str
-) -> VersionedIdentity:
+def funding_model_identity(model: FundingModel, logical_id: str, version: str) -> VersionedIdentity:
     return VersionedIdentity.from_payload(logical_id, version, asdict(model))
 
 
@@ -928,7 +921,8 @@ def execute_bound_run(
     ):
         raise ValueError("funding event lies outside the comparison interval")
     signal_payload = [
-        item.to_dict() for item in sorted(signals, key=lambda item: (item.timestamp_ms, item.signal_id))
+        item.to_dict()
+        for item in sorted(signals, key=lambda item: (item.timestamp_ms, item.signal_id))
     ]
     funding_payload = [
         asdict(item) for item in sorted(funding_events, key=lambda item: item.timestamp_ms)
@@ -992,9 +986,11 @@ def build_formal_benchmark_suite(
 ) -> FormalBenchmarkSuite:
     _validate_candidate_run_binding(protocol, comparison, candidate_run)
     opportunity_hash = eligible_opportunity_set_sha256(eligible_opportunities)
-    if BenchmarkKind.RANDOM_MATCHED in set(
-        comparison.required_benchmarks + comparison.descriptive_benchmarks
-    ) and opportunity_hash != comparison.eligible_opportunity_set_sha256:
+    if (
+        BenchmarkKind.RANDOM_MATCHED
+        in set(comparison.required_benchmarks + comparison.descriptive_benchmarks)
+        and opportunity_hash != comparison.eligible_opportunity_set_sha256
+    ):
         raise ValueError("eligible opportunity set does not match comparison contract")
     funding_payload = [
         asdict(item) for item in sorted(funding_events, key=lambda item: item.timestamp_ms)
@@ -1008,7 +1004,7 @@ def build_formal_benchmark_suite(
         else None
     )
     passive = (
-        _passive_perpetual_benchmark(comparison, engine, candles, funding_events)
+        _passive_perpetual_benchmark(comparison, candidate_run, engine, candles, funding_events)
         if BenchmarkKind.PASSIVE_PERPETUAL in selected
         else None
     )
@@ -1030,9 +1026,7 @@ def build_formal_benchmark_suite(
         comparison_contract_id=comparison.contract_id,
         candidate_run_result_id=candidate_run.result_id,
         eligible_opportunity_set_sha256=(
-            opportunity_hash
-            if BenchmarkKind.RANDOM_MATCHED in selected
-            else None
+            opportunity_hash if BenchmarkKind.RANDOM_MATCHED in selected else None
         ),
         cash=cash,
         passive=passive,
@@ -1049,9 +1043,7 @@ def evaluate_formal_economic_qualification(
     required_evidence_ids: Sequence[str],
     generated_at_utc: str | None = None,
 ) -> EconomicQualificationResult:
-    if protocol.benchmark == P6_PENDING or not isinstance(
-        protocol.benchmark, VersionedIdentity
-    ):
+    if protocol.benchmark == P6_PENDING or not isinstance(protocol.benchmark, VersionedIdentity):
         raise ValueError("P6_PENDING protocol cannot enter formal qualification")
     if protocol.benchmark != comparison.versioned_identity:
         raise ValueError("protocol benchmark identity does not match comparison contract")
@@ -1201,9 +1193,7 @@ def _validate_protocol_and_runtime(
     _verify_local_evidence(dataset_evidence)
     if not candles:
         raise ValueError("formal run requires non-empty candles")
-    validate_runtime_dataset_binding(
-        dataset_evidence, candles, protocol.product_scope[0]
-    )
+    validate_runtime_dataset_binding(dataset_evidence, candles, protocol.product_scope[0])
     if len({candle.symbol for candle in candles}) != 1:
         raise ValueError("formal run cannot mix candle instruments")
     if len(candles) != comparison.data_interval.observation_count:
@@ -1315,12 +1305,9 @@ def _cash_benchmark(
     )
 
 
-def _execution_metadata(result: ExecutionResult) -> dict[str, Any]:
-    return {**dict(result.metadata or {}), "slippage_usdt": result.slippage_usdt}
-
-
 def _passive_perpetual_benchmark(
     comparison: ComparisonContract,
+    candidate_run: EconomicRunResult,
     engine: EconomicSimulationEngine,
     candles: Sequence[Candle],
     funding_events: Sequence[FundingSettlement],
@@ -1333,131 +1320,34 @@ def _passive_perpetual_benchmark(
             comparable=False,
             matching_diagnostics=FrozenDict({"reason": "UNSUPPORTED_BENCHMARK_VEHICLE"}),
         )
-    desired_quantity = comparison.initial_capital / candles[0].open
-    entry = engine.execution_model.simulate_order(
-        signal_timestamp_ms=candles[0].open_time_ms,
-        side=1,
-        desired_quantity=desired_quantity,
-        order_type=OrderType.MARKET,
-        future_candles=candles,
-        max_fill_notional=comparison.initial_capital,
-    )
-    if not entry.is_filled:
+    try:
+        accounting = build_passive_benchmark_accounting(
+            candidate_identity=candidate_run.identity.to_dict(),
+            product=candles[0].symbol,
+            initial_cash=comparison.initial_capital,
+            candles=candles,
+            fee_model=engine.fee_model,
+            execution_model=engine.execution_model,
+            funding_model=engine.funding_model,
+            funding_events=funding_events,
+            interval_start_ms=comparison.data_interval.start_ms,
+            interval_end_ms=comparison.data_interval.end_ms,
+            terminal_policy=comparison.terminal_policy,
+            metrics_contract=comparison.metrics_contract,
+        )
+    except PassiveBenchmarkReplayError as exc:
         return FormalBenchmarkResult(
             benchmark_kind=BenchmarkKind.PASSIVE_PERPETUAL,
             vehicle=comparison.benchmark_vehicle,
             accounting=FrozenDict({}),
             comparable=False,
-            matching_diagnostics=FrozenDict({"reason": "PASSIVE_ENTRY_UNFILLED"}),
+            matching_diagnostics=FrozenDict({"reason": exc.reason_code}),
         )
-    exit_result: ExecutionResult | None = None
-    if comparison.terminal_policy is TerminalPolicy.REQUIRE_FLAT:
-        if len(candles) < 2:
-            return FormalBenchmarkResult(
-                benchmark_kind=BenchmarkKind.PASSIVE_PERPETUAL,
-                vehicle=comparison.benchmark_vehicle,
-                accounting=FrozenDict({}),
-                comparable=False,
-                matching_diagnostics=FrozenDict({"reason": "NO_EXECUTABLE_TERMINAL_EXIT"}),
-            )
-        exit_result = engine.execution_model.simulate_order(
-            signal_timestamp_ms=candles[-2].close_time_ms,
-            side=-1,
-            desired_quantity=entry.filled_quantity,
-            order_type=OrderType.MARKET,
-            future_candles=candles[-1:],
-        )
-        if not exit_result.is_filled or exit_result.fill_timestamp_ms > candles[-1].close_time_ms:
-            return FormalBenchmarkResult(
-                benchmark_kind=BenchmarkKind.PASSIVE_PERPETUAL,
-                vehicle=comparison.benchmark_vehicle,
-                accounting=FrozenDict({}),
-                comparable=False,
-                matching_diagnostics=FrozenDict({"reason": "TERMINAL_EXIT_UNFILLED"}),
-            )
-
-    portfolio = Portfolio(comparison.initial_capital)
-    funding = sorted(funding_events, key=lambda item: item.timestamp_ms)
-    funding_index = 0
-    entry_applied = False
-    exit_applied = False
-    equity_curve: list[tuple[int, float]] = []
-    notional_curve: list[tuple[int, float]] = []
-    for bar in candles:
-        scheduled: list[tuple[int, int, str, Any]] = []
-        while funding_index < len(funding) and funding[funding_index].timestamp_ms <= bar.close_time_ms:
-            item = funding[funding_index]
-            funding_index += 1
-            scheduled.append((item.timestamp_ms, 0, "funding", item))
-        if not entry_applied and entry.fill_timestamp_ms <= bar.close_time_ms:
-            scheduled.append((entry.fill_timestamp_ms, 1, "entry", entry))
-        if exit_result is not None and not exit_applied and exit_result.fill_timestamp_ms <= bar.close_time_ms:
-            scheduled.append((exit_result.fill_timestamp_ms, 1, "exit", exit_result))
-        for _, _, kind, item in sorted(scheduled, key=lambda value: (value[0], value[1])):
-            if kind == "funding":
-                settlement = item
-                quantity = portfolio.get_position_quantity(bar.symbol)
-                if quantity != 0.0:
-                    cashflow = engine.funding_model.calculate_cashflow(
-                        quantity, settlement.mark_price, settlement.funding_rate
-                    )
-                    portfolio.apply_funding(
-                        settlement.timestamp_ms, bar.symbol, cashflow, settlement.mark_price
-                    )
-            elif kind == "entry" and not entry_applied:
-                portfolio.apply_trade(
-                    entry.fill_timestamp_ms,
-                    TradeAction.OPEN_LONG,
-                    bar.symbol,
-                    entry.fill_price,
-                    entry.filled_quantity,
-                    entry.fee_usdt,
-                    trade_id="PASSIVE_ENTRY",
-                    observation_timestamp_ms=entry.observation_timestamp_ms,
-                    decision_timestamp_ms=entry.decision_timestamp_ms,
-                    order_timestamp_ms=entry.order_timestamp_ms,
-                    settlement_timestamp_ms=entry.settlement_timestamp_ms,
-                    metadata=_execution_metadata(entry),
-                )
-                entry_applied = True
-            elif kind == "exit" and exit_result is not None and not exit_applied:
-                portfolio.apply_trade(
-                    exit_result.fill_timestamp_ms,
-                    TradeAction.CLOSE_LONG,
-                    bar.symbol,
-                    exit_result.fill_price,
-                    exit_result.filled_quantity,
-                    exit_result.fee_usdt,
-                    trade_id="PASSIVE_EXIT",
-                    observation_timestamp_ms=exit_result.observation_timestamp_ms,
-                    decision_timestamp_ms=exit_result.decision_timestamp_ms,
-                    order_timestamp_ms=exit_result.order_timestamp_ms,
-                    settlement_timestamp_ms=exit_result.settlement_timestamp_ms,
-                    metadata=_execution_metadata(exit_result),
-                )
-                exit_applied = True
-        equity = portfolio.total_equity({bar.symbol: bar.close})
-        equity_curve.append((bar.close_time_ms, equity))
-        notional_curve.append(
-            (bar.close_time_ms, abs(portfolio.get_position_quantity(bar.symbol)) * bar.close)
-        )
-    summary = summarize_ledger(
-        initial_cash=comparison.initial_capital,
-        events=portfolio.trade_history,
-        equity_curve=equity_curve,
-        final_asset=candles[-1].symbol,
-        final_mark_price=candles[-1].close,
-        interval_start_ms=comparison.data_interval.start_ms,
-        interval_end_ms=comparison.data_interval.end_ms,
-        notional_curve=notional_curve,
-        terminal_policy=comparison.terminal_policy,
-        metrics_contract=comparison.metrics_contract,
-    )
     return FormalBenchmarkResult(
         benchmark_kind=BenchmarkKind.PASSIVE_PERPETUAL,
         vehicle=comparison.benchmark_vehicle,
-        accounting=FrozenDict(bind_runtime_market_data(summary.to_dict(), candles)),
-        comparable=summary.formal_complete,
+        accounting=FrozenDict(accounting),
+        comparable=accounting.get("completeness") == ResultCompleteness.COMPLETE.value,
         matching_diagnostics=FrozenDict(
             {
                 "same_interval": True,
@@ -1494,9 +1384,7 @@ def _random_matched_benchmark(
     ordered_opportunities = sorted(
         opportunities, key=lambda item: (item.timestamp_ms, item.opportunity_id)
     )
-    if len({item.opportunity_id for item in ordered_opportunities}) != len(
-        ordered_opportunities
-    ):
+    if len({item.opportunity_id for item in ordered_opportunities}) != len(ordered_opportunities):
         raise ValueError("eligible opportunity ids must be unique")
     if any(
         item.timestamp_ms < comparison.data_interval.start_ms
@@ -1578,17 +1466,11 @@ def _matching_diagnostics(
     candidate_holding = _mean_holding(candidate_accounting.get("round_trips"))
     trial_holding = _mean_holding(trial_accounting.get("round_trips"))
     holding_error = _relative_error(trial_holding, candidate_holding)
-    holding_pass = (
-        rules.maximum_mean_holding_error_fraction is None
-        or (
-            holding_error is not None
-            and holding_error <= rules.maximum_mean_holding_error_fraction
-        )
+    holding_pass = rules.maximum_mean_holding_error_fraction is None or (
+        holding_error is not None and holding_error <= rules.maximum_mean_holding_error_fraction
     )
     exposure_error = abs(
-        _finite_float(
-            trial_accounting.get("time_exposure_fraction"), "trial time exposure"
-        )
+        _finite_float(trial_accounting.get("time_exposure_fraction"), "trial time exposure")
         - _finite_float(
             candidate_accounting.get("time_exposure_fraction"),
             "candidate time exposure",
@@ -1608,12 +1490,9 @@ def _matching_diagnostics(
             "candidate average notional",
         ),
     )
-    notional_pass = (
-        rules.maximum_average_notional_error_fraction is None
-        or (
-            notional_error is not None
-            and notional_error <= rules.maximum_average_notional_error_fraction
-        )
+    notional_pass = rules.maximum_average_notional_error_fraction is None or (
+        notional_error is not None
+        and notional_error <= rules.maximum_average_notional_error_fraction
     )
     complete = trial.identity.completeness is ResultCompleteness.COMPLETE
     same_policy_cost_execution_funding = (
@@ -1627,9 +1506,7 @@ def _matching_diagnostics(
         and trial.identity.interval_end_ms == candidate.identity.interval_end_ms
         and trial.identity.observation_count == candidate.identity.observation_count
     )
-    same_terminal_policy = (
-        trial.identity.terminal_policy == candidate.identity.terminal_policy
-    )
+    same_terminal_policy = trial.identity.terminal_policy == candidate.identity.terminal_policy
     diagnostics = {
         "candidate_entry_count": candidate_count,
         "trial_entry_count": trial_count,
@@ -1683,12 +1560,8 @@ def _relative_error(observed: float, target: float) -> float | None:
 def _candidate_metrics(run: EconomicRunResult) -> dict[str, float | None]:
     accounting = _accounting_copy(run)
     return {
-        "net_return_pct": _finite_float(
-            accounting.get("net_return_pct"), "net_return_pct"
-        ),
-        "max_drawdown_pct": _finite_float(
-            accounting.get("max_drawdown_pct"), "max_drawdown_pct"
-        ),
+        "net_return_pct": _finite_float(accounting.get("net_return_pct"), "net_return_pct"),
+        "max_drawdown_pct": _finite_float(accounting.get("max_drawdown_pct"), "max_drawdown_pct"),
         "profit_factor": (
             _finite_float(accounting.get("profit_factor"), "profit_factor")
             if accounting.get("profit_factor") is not None
@@ -1768,9 +1641,7 @@ def _excess_return(
         return None
     return _finite_float(
         _accounting_copy(candidate).get("net_return_pct"), "candidate net return"
-    ) - _finite_float(
-        _accounting_copy(benchmark).get("net_return_pct"), "benchmark net return"
-    )
+    ) - _finite_float(_accounting_copy(benchmark).get("net_return_pct"), "benchmark net return")
 
 
 def _compare(observed: float, operator: GateOperator, threshold: float) -> bool:
@@ -1797,9 +1668,7 @@ def _atomic_write_json(path: str | Path, payload: Mapping[str, Any]) -> Path:
             handle.flush()
             os.fsync(handle.fileno())
         os.replace(temporary, target)
-        directory_descriptor = os.open(
-            target.parent, os.O_RDONLY | getattr(os, "O_DIRECTORY", 0)
-        )
+        directory_descriptor = os.open(target.parent, os.O_RDONLY | getattr(os, "O_DIRECTORY", 0))
         try:
             os.fsync(directory_descriptor)
         finally:
