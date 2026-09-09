@@ -16,6 +16,11 @@ from btc_quant_agent.economic.benchmarks import BenchmarkEngine
 from btc_quant_agent.economic.execution_model import ExecutionModel
 from btc_quant_agent.economic.fee_model import FeeModel, SlippageMode
 from btc_quant_agent.economic.funding import FundingModel, FundingSettlement
+from btc_quant_agent.economic.metrics import (
+    MetricStatus,
+    ProfitFactorStatus,
+    ReturnMetricsContract,
+)
 from btc_quant_agent.economic.policy import (
     EntryRule,
     ExitRule,
@@ -52,7 +57,7 @@ def record(name, expected, actual):
     rows.append({"case": name, "expected": expected, "actual": actual})
 
 
-def bar(t=1000, o=100, h=None, l=None, c=100, volume=100, duration=1000):
+def bar(t=1000, o=100, h=None, low=None, c=100, volume=100, duration=1000):
     return Candle(
         "BTCUSDT",
         "1s",
@@ -60,7 +65,7 @@ def bar(t=1000, o=100, h=None, l=None, c=100, volume=100, duration=1000):
         t + duration - 1,
         o,
         max(o, c) if h is None else h,
-        min(o, c) if l is None else l,
+        min(o, c) if low is None else low,
         c,
         volume,
     )
@@ -180,24 +185,24 @@ r = ex.simulate_order(1000, 1, 1, OrderType.MARKET, [bar(c=120)])
 assert r.fill_timestamp_ms == 1650 and r.fill_price == 120
 record("future_close_at_earlier_time", "close price unavailable until 1999", r.__dict__)
 r = ex.simulate_order(
-    1700, 1, 1, OrderType.LIMIT, [bar(h=105, l=90, duration=2000)], limit_price=95
+    1700, 1, 1, OrderType.LIMIT, [bar(h=105, low=90, duration=2000)], limit_price=95
 )
 assert r.is_filled and r.fill_timestamp_ms == 2350
 record(
     "limit_extreme_may_precede_arrival", "OHLC cannot establish post-2350 trade-through", r.__dict__
 )
 r = ex.simulate_order(
-    1000, 1, 1, OrderType.LIMIT, [bar(l=90)], limit_price=95, time_in_force_ms=100
+    1000, 1, 1, OrderType.LIMIT, [bar(low=90)], limit_price=95, time_in_force_ms=100
 )
 assert r.is_filled and r.fill_timestamp_ms > r.order_timestamp_ms + 100
 record("fill_after_expiry", "no fill after 1600", r.__dict__)
-r = ex.simulate_order(1000, 1, 1000, OrderType.LIMIT, [bar(l=90, volume=0)], limit_price=95)
+r = ex.simulate_order(1000, 1, 1000, OrderType.LIMIT, [bar(low=90, volume=0)], limit_price=95)
 assert r.is_filled and r.filled_quantity == 1000 and r.is_maker
 record("zero_volume_full_fill", "not testable/reject without liquidity evidence", r.__dict__)
 touch = [
-    ex.simulate_order(1000, 1, 1, OrderType.LIMIT, [bar(l=95)], limit_price=95).is_filled,
+    ex.simulate_order(1000, 1, 1, OrderType.LIMIT, [bar(low=95)], limit_price=95).is_filled,
     ExecutionModel(ZERO, limit_fill_prob_on_touch=0.99)
-    .simulate_order(1000, 1, 1, OrderType.LIMIT, [bar(l=95)], limit_price=95)
+    .simulate_order(1000, 1, 1, OrderType.LIMIT, [bar(low=95)], limit_price=95)
     .is_filled,
 ]
 record("touch_probability", "default and .99 are both deterministic no-fill", touch)
@@ -206,7 +211,11 @@ lp = replace(
     entry_rule=EntryRule(order_type=OrderType.LIMIT, time_in_force_ms=10000),
     exit_rule=ExitRule(take_profit_pct=0.01),
 )
-s = sim([bar(l=100), bar(2000, o=110, l=100, c=110), bar(3000, l=90)], [sig()], lp)
+s = sim(
+    [bar(low=100), bar(2000, o=110, low=100, c=110), bar(3000, low=90)],
+    [sig()],
+    lp,
+)
 assert s.trade_events[0].timestamp_ms == 3000 and s.trade_events[1].timestamp_ms == 2999
 record(
     "future_fill_applied_immediately",
@@ -214,7 +223,11 @@ record(
     [e.to_dict() for e in s.trade_events],
 )
 collision = replace(BASE, exit_rule=ExitRule(stop_loss_pct=0.05, take_profit_pct=0.05))
-s = sim([bar(), bar(2000, h=110, l=90), bar(3000, o=120, c=120)], [sig()], collision)
+s = sim(
+    [bar(), bar(2000, h=110, low=90), bar(3000, o=120, c=120)],
+    [sig()],
+    collision,
+)
 assert s.net_pnl_usdt == 20
 record(
     "stop_target_collision",
@@ -233,7 +246,7 @@ record(
     [e.to_dict() for e in s.trade_events],
 )
 s = sim(
-    [bar(), bar(2000, h=120, l=99, c=115)],
+    [bar(), bar(2000, h=120, low=99, c=115)],
     [sig()],
     replace(BASE, exit_rule=ExitRule(trailing_stop_pct=0.1)),
 )
@@ -243,11 +256,15 @@ record(
     "low-before-high path gives no trailing trigger; ambiguous",
     s.to_dict(),
 )
-s = sim([bar(), bar(2000, h=110, l=90), bar(3000, o=80, c=80)], [sig(direction=-1)], collision)
+s = sim(
+    [bar(), bar(2000, h=110, low=90), bar(3000, o=80, c=80)],
+    [sig(direction=-1)],
+    collision,
+)
 assert s.net_pnl_usdt == 20
 record("short_stop_target_collision", "ambiguous or conservative stop scenario", s.to_dict())
 s = sim(
-    [bar(h=110, l=90)],
+    [bar(h=110, low=90)],
     [sig()],
     collision,
     execution=ExecutionModel(ZERO, decision_latency_ms=0, exchange_latency_ms=0),
@@ -297,7 +314,7 @@ record(
 offset_policy = replace(
     BASE, entry_rule=EntryRule(order_type=OrderType.LIMIT, limit_offset_bps=500)
 )
-s = sim([bar(l=99)], [sig()], offset_policy)
+s = sim([bar(low=99)], [sig()], offset_policy)
 assert s.trade_events[0].price == 100
 record(
     "limit_offset_ignored",
@@ -405,65 +422,64 @@ record(
 # Summary and benchmark counterexamples.
 f = FeeModel(0, 0.0005, SlippageMode.ZERO)
 s = sim([bar(), bar(2000, o=100.075, c=100.075)], [sig(), sig(2000, -1)], fees=f)
-assert s.net_pnl_usdt < 0 and s.win_rate == 1 and s.profit_factor == float("inf")
-record("net_loser_reported_winner", "net=-.0250375, net win rate=0", s.to_dict())
+assert s.net_pnl_usdt < 0 and s.win_rate == 0 and s.losing_trades == 1
+assert s.profit_factor == 0 and s.profit_factor_status is ProfitFactorStatus.FINITE
+record("net_loser_reported_winner", "repaired: net loser and finite PF=0", s.to_dict())
 s = sim([bar(), bar(2000, c=110)], [sig()])
 assert s.gross_pnl_usdt == 0 and s.net_pnl_usdt == 10 and s.total_trades == 0
-record("open_terminal_position", "report realized=0 and unrealized=10 separately", s.to_dict())
+assert s.terminal_unrealized_pnl_usdt == 10 and s.final_equity == s.equity_curve[-1][1]
+record("open_terminal_position", "repaired: realized/unrealized terminal split", s.to_dict())
 bench = BenchmarkEngine(f)
 b = bench.simulate_passive_btc(1000, [bar(), bar(2000)])
-assert b.equity_curve[-1][1] > b.final_equity
+assert b.equity_curve[-1][1] == b.final_equity
 record(
     "passive_terminal_fee_curve",
-    "terminal curve equals final equity; DD includes exit fee",
+    "repaired diagnostic curve: terminal fee is reflected at the last point",
     b.__dict__,
 )
-rs = bench.simulate_random_entry(
-    100000,
-    [bar(t, c=p) for t, p in [(1000, 100), (2000, 102), (3000, 99), (4000, 105), (5000, 95)]],
-    BASE,
-    trade_frequency_pct=1,
-    num_trials=5,
-)
-rs2 = bench.simulate_random_entry(
-    100000,
-    [bar(t, c=p) for t, p in [(1000, 100), (2000, 102), (3000, 99), (4000, 105), (5000, 95)]],
-    BASE,
-    trade_frequency_pct=1,
-    num_trials=5,
-)
-assert rs == rs2
-record(
-    "random_mean_vs_last_curve",
-    "mean terminal equity should not label last trial curve",
-    rs.__dict__,
-)
 prices = [100, 110, 105, 120]
-fast = sim([bar(1000 + i * 1000, o=p, c=p) for i, p in enumerate(prices)], [sig()])
-slow = sim(
+one_second = ReturnMetricsContract("review-1s", "CLOSED_BAR", 1000, 0)
+fifteen_minutes = ReturnMetricsContract("review-15m", "CLOSED_BAR", 900000, 0)
+fast = EconomicSimulationEngine(BASE, fee_model=ZERO).simulate(
+    [bar(1000 + i * 1000, o=p, c=p) for i, p in enumerate(prices)],
+    [sig()],
+    metrics_contract=one_second,
+)
+slow = EconomicSimulationEngine(BASE, fee_model=ZERO).simulate(
     [
         replace(bar(1000 + i * 900000, o=p, c=p, duration=900000), interval="15m")
         for i, p in enumerate(prices)
     ],
     [sig()],
+    metrics_contract=fifteen_minutes,
 )
-assert fast.sharpe_ratio == slow.sharpe_ratio and fast.sharpe_ratio > 0
+invalid_fast = EconomicSimulationEngine(BASE, fee_model=ZERO).simulate(
+    [bar(1000 + i * 1000, o=p, c=p) for i, p in enumerate(prices)],
+    [sig()],
+    metrics_contract=fifteen_minutes,
+)
+assert fast.sharpe_status is MetricStatus.AVAILABLE
+assert slow.sharpe_status is MetricStatus.AVAILABLE
+assert fast.sharpe_ratio != slow.sharpe_ratio
+assert invalid_fast.sharpe_ratio is None
+assert invalid_fast.sharpe_status is MetricStatus.INVALID_CADENCE
 record(
     "sharpe_cadence_ignored",
-    "same returns over 1s and 15m must not share annualized Sharpe",
-    [fast.sharpe_ratio, slow.sharpe_ratio],
+    "repaired: cadence is bound and mismatched timestamps are unavailable",
+    [fast.sharpe_ratio, slow.sharpe_ratio, invalid_fast.sharpe_status],
 )
 empty = sim([], initial=100000)
 fabricated = replace(empty, final_equity=100001, net_pnl_usdt=1, net_return_pct=0.00001)
 qual = BenchmarkEngine(ZERO).evaluate_economic_qualification(fabricated, [bar()], BASE)
-assert qual["economic_qualification_passed"] is True and fabricated.total_trades == 0
-record("unbound_qualification", "unverified/no-trade contradictory summary not qualified", qual)
+assert qual["economic_qualification_passed"] is False
+assert qual["qualification_evaluated"] is False and qual["diagnostic_only"] is True
+record("unbound_qualification", "repaired: manual summary remains diagnostic-only", qual)
 beta = BenchmarkEngine(ZERO).evaluate_economic_qualification(fabricated, [bar(c=110)], BASE)
-assert beta["economic_qualification_passed"] and not beta["comparisons"]["beats_passive_btc"]
+assert beta["economic_qualification_passed"] is False
 record(
     "passive_not_required_for_qualification",
-    "contract must state mandatory versus descriptive benchmarks",
-    beta["comparisons"],
+    "repaired formally by immutable ComparisonContract required/descriptive roles",
+    {"legacy_diagnostic_only": beta["diagnostic_only"]},
 )
 
 

@@ -2,64 +2,27 @@ from __future__ import annotations
 
 import math
 from collections.abc import Sequence
-from dataclasses import dataclass, field
 from typing import Any
 
 from ..domain import Candle
 from .execution_model import ConditionalTriggerTime, ExecutionModel
 from .fee_model import FeeModel
 from .funding import FundingModel, FundingSettlement
+from .metrics import (
+    ResultCompleteness,
+    ReturnMetricsContract,
+    SimulationSummary,
+    TerminalPolicy,
+    summarize_ledger,
+)
 from .policy import OrderType, TradePolicy
 from .portfolio import Portfolio
 from .signal import InformationSignal
-from .trade_event import TradeAction, TradeEvent
+from .trade_event import TradeAction
 
 
 class AmbiguousExitRejectionError(RuntimeError):
     """Raised when OHLC data cannot resolve a material intrabar exit ordering."""
-
-
-@dataclass(frozen=True)
-class SimulationSummary:
-    """Comprehensive performance report resulting from economic simulation replay."""
-
-    initial_cash: float
-    final_equity: float
-    gross_pnl_usdt: float
-    total_fees_usdt: float
-    total_funding_usdt: float
-    net_pnl_usdt: float
-    net_return_pct: float
-    max_drawdown_usdt: float
-    max_drawdown_pct: float
-    total_trades: int
-    winning_trades: int
-    losing_trades: int
-    win_rate: float
-    profit_factor: float
-    sharpe_ratio: float
-    trade_events: list[TradeEvent] = field(default_factory=list)
-    equity_curve: list[tuple[int, float]] = field(default_factory=list)
-
-    def to_dict(self) -> dict[str, Any]:
-        return {
-            "initial_cash": self.initial_cash,
-            "final_equity": self.final_equity,
-            "gross_pnl_usdt": self.gross_pnl_usdt,
-            "total_fees_usdt": self.total_fees_usdt,
-            "total_funding_usdt": self.total_funding_usdt,
-            "net_pnl_usdt": self.net_pnl_usdt,
-            "net_return_pct": self.net_return_pct,
-            "max_drawdown_usdt": self.max_drawdown_usdt,
-            "max_drawdown_pct": self.max_drawdown_pct,
-            "total_trades": self.total_trades,
-            "winning_trades": self.winning_trades,
-            "losing_trades": self.losing_trades,
-            "win_rate": self.win_rate,
-            "profit_factor": self.profit_factor,
-            "sharpe_ratio": self.sharpe_ratio,
-            "trade_event_count": len(self.trade_events),
-        }
 
 
 class EconomicSimulationEngine:
@@ -86,7 +49,11 @@ class EconomicSimulationEngine:
         candles: Sequence[Candle],
         signals: Sequence[InformationSignal] = (),
         funding_events: Sequence[FundingSettlement] = (),
+        *,
+        metrics_contract: ReturnMetricsContract | None = None,
+        terminal_policy: TerminalPolicy = TerminalPolicy.MARK_TO_MARKET_OPEN,
     ) -> SimulationSummary:
+        terminal_policy = TerminalPolicy(terminal_policy)
         if not candles:
             return SimulationSummary(
                 initial_cash=self.initial_cash,
@@ -102,12 +69,15 @@ class EconomicSimulationEngine:
                 winning_trades=0,
                 losing_trades=0,
                 win_rate=0.0,
-                profit_factor=0.0,
-                sharpe_ratio=0.0,
+                profit_factor=None,
+                sharpe_ratio=None,
+                completeness=ResultCompleteness.INCOMPLETE_DATA,
+                terminal_policy=terminal_policy,
             )
 
         portfolio = Portfolio(initial_cash=self.initial_cash)
         equity_curve: list[tuple[int, float]] = []
+        notional_curve: list[tuple[int, float]] = []
 
         # Sort input signals and funding strictly by timestamp
         sorted_signals = sorted(signals, key=lambda s: s.timestamp_ms)
@@ -140,11 +110,6 @@ class EconomicSimulationEngine:
         active_trailing_armed_time: int | None = None
         active_signal_id: str = ""
 
-        trades_completed = 0
-        winning_trades = 0
-        losing_trades = 0
-        gross_pnl_accum = 0.0
-
         # Pending fills queue: future fills that have not yet reached fill_timestamp_ms
         pending_fills: list[dict[str, Any]] = []
 
@@ -153,12 +118,11 @@ class EconomicSimulationEngine:
             nonlocal active_trade_entry_time, active_trade_entry_price
             nonlocal active_trade_peak_price, active_trade_trough_price
             nonlocal active_trailing_armed_time
-            nonlocal active_signal_id, trades_completed, winning_trades
-            nonlocal losing_trades, gross_pnl_accum
+            nonlocal active_signal_id
 
             is_open = pf["action"] in (TradeAction.OPEN_LONG, TradeAction.OPEN_SHORT)
 
-            ev = portfolio.apply_trade(
+            portfolio.apply_trade(
                 timestamp_ms=pf["fill_timestamp_ms"],
                 action=pf["action"],
                 asset=sym,
@@ -181,12 +145,6 @@ class EconomicSimulationEngine:
                 active_trailing_armed_time = pf["fill_timestamp_ms"]
                 active_signal_id = pf["signal_id"]
             else:
-                trades_completed += 1
-                gross_pnl_accum += ev.realized_pnl_usdt
-                if ev.realized_pnl_usdt - ev.fee_usdt > 0:
-                    winning_trades += 1
-                else:
-                    losing_trades += 1
                 active_trade_entry_time = None
                 active_trade_entry_price = None
                 active_trade_peak_price = None
@@ -807,50 +765,24 @@ class EconomicSimulationEngine:
             curr_equity = portfolio.total_equity({bar.symbol: mark_price})
             _update_drawdown(curr_equity)
             equity_curve.append((bar.close_time_ms, curr_equity))
+            notional_curve.append(
+                (
+                    bar.close_time_ms,
+                    abs(portfolio.get_position_quantity(bar.symbol)) * mark_price,
+                )
+            )
 
-        final_eq = portfolio.total_equity({candles[-1].symbol: candles[-1].close})
-        total_fees = sum(ev.fee_usdt for ev in portfolio.trade_history)
-        total_funding = sum(ev.funding_usdt for ev in portfolio.trade_history)
-        net_pnl = final_eq - self.initial_cash
-        net_return_pct = net_pnl / self.initial_cash if self.initial_cash > 0 else 0.0
-
-        # Sharpe calculation from equity curve returns
-        sharpe = 0.0
-        if len(equity_curve) > 2:
-            eq_vals = [e[1] for e in equity_curve]
-            pct_returns = [(eq_vals[k] - eq_vals[k - 1]) / eq_vals[k - 1] for k in range(1, len(eq_vals)) if eq_vals[k - 1] > 0]
-            if pct_returns:
-                mean_r = sum(pct_returns) / len(pct_returns)
-                var_r = sum((r - mean_r) ** 2 for r in pct_returns) / len(pct_returns)
-                std_r = math.sqrt(var_r) if var_r > 0 else 0.0
-                if std_r > 1e-12:
-                    sharpe = (mean_r / std_r) * math.sqrt(35040)
-
-        win_rate = winning_trades / trades_completed if trades_completed > 0 else 0.0
-        profit_factor = 0.0
-        gross_wins = sum(ev.realized_pnl_usdt for ev in portfolio.trade_history if ev.realized_pnl_usdt > 0)
-        gross_losses = abs(sum(ev.realized_pnl_usdt for ev in portfolio.trade_history if ev.realized_pnl_usdt < 0))
-        if gross_losses > 0:
-            profit_factor = gross_wins / gross_losses
-        elif gross_wins > 0:
-            profit_factor = float("inf")
-
-        return SimulationSummary(
+        return summarize_ledger(
             initial_cash=self.initial_cash,
-            final_equity=final_eq,
-            gross_pnl_usdt=gross_pnl_accum,
-            total_fees_usdt=total_fees,
-            total_funding_usdt=total_funding,
-            net_pnl_usdt=net_pnl,
-            net_return_pct=net_return_pct,
-            max_drawdown_usdt=max_dd_usdt,
-            max_drawdown_pct=max_dd_pct,
-            total_trades=trades_completed,
-            winning_trades=winning_trades,
-            losing_trades=losing_trades,
-            win_rate=win_rate,
-            profit_factor=profit_factor,
-            sharpe_ratio=sharpe,
-            trade_events=portfolio.trade_history,
+            events=portfolio.trade_history,
             equity_curve=equity_curve,
+            final_asset=candles[-1].symbol,
+            final_mark_price=candles[-1].close,
+            interval_start_ms=candles[0].open_time_ms,
+            interval_end_ms=candles[-1].close_time_ms,
+            notional_curve=notional_curve,
+            terminal_policy=terminal_policy,
+            metrics_contract=metrics_contract,
+            pending_order_count=len(pending_fills),
+            max_drawdown_override=(max_dd_usdt, max_dd_pct),
         )

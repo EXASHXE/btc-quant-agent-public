@@ -3,6 +3,7 @@ from __future__ import annotations
 import fcntl
 import hashlib
 import json
+import math
 import os
 import tempfile
 from collections.abc import Callable, Iterator, Mapping, Sequence
@@ -14,13 +15,20 @@ from .canonical import canonical_json, canonical_sha256
 from .models import (
     DecisionEvent,
     DecisionStatus,
+    EconomicDecisionAttestation,
     EvidenceCompleteness,
     EvidenceReference,
     ExperimentMetadata,
+    VersionedIdentity,
     utc_now,
 )
 
 REGISTRY_SCHEMA_VERSION = "1.0.0"
+P6_DECISION_SOURCE = "P6_FORMAL_ECONOMIC_QUALIFICATION"
+P6_RESULT_EVIDENCE_TYPE = "P6_ECONOMIC_QUALIFICATION_RESULT"
+P6_RUN_EVIDENCE_TYPE = "P6_ECONOMIC_RUN"
+P6_BENCHMARK_EVIDENCE_TYPE = "P6_BENCHMARK_SUITE"
+P6_RESULT_SCHEMA_VERSION = "1.0.0"
 
 
 def _reject_json_constant(value: str) -> None:
@@ -268,6 +276,95 @@ class ResearchContractRegistry:
         self._commit(dict(self._protocols), evidence, events)
         return event
 
+    def record_economic_qualification(
+        self,
+        attestation: EconomicDecisionAttestation,
+        *,
+        evidence_references: Sequence[EvidenceReference | str],
+        reason: str,
+        actor: str,
+        decided_at_utc: str | None = None,
+    ) -> DecisionEvent | None:
+        """Validate and atomically record one formal P6 economic decision.
+
+        ``NOT_TESTABLE`` artifacts are registered as diagnostic evidence without
+        creating a lifecycle event.  Promotion and economic rejection are only
+        available through this dedicated, artifact-bound path.
+        """
+        if not isinstance(attestation, EconomicDecisionAttestation):
+            raise TypeError("attestation must be EconomicDecisionAttestation")
+        if attestation.experiment_revision_id not in self._protocols:
+            raise KeyError(
+                f"Experiment revision {attestation.experiment_revision_id} not found"
+            )
+        protocol = self._protocols[attestation.experiment_revision_id]
+        current = self.get_status(attestation.experiment_revision_id)
+        if current is not DecisionStatus.STATISTICALLY_QUALIFIED:
+            raise InvalidTransitionError(
+                "economic qualification requires STATISTICALLY_QUALIFIED status"
+            )
+        if not reason.strip() or not actor.strip():
+            raise InvalidTransitionError("economic decision reason and actor are required")
+        if not evidence_references:
+            raise EvidenceValidationError(
+                "economic qualification requires immutable evidence"
+            )
+
+        staged_evidence = dict(self._evidence)
+        event_evidence_ids: list[str] = []
+        for reference in evidence_references:
+            item = (
+                staged_evidence.get(reference)
+                if isinstance(reference, str)
+                else reference
+            )
+            if item is None:
+                raise EvidenceValidationError(f"unknown evidence reference: {reference}")
+            self._validate_evidence(item, verify_local=True, require_complete=True)
+            previous = staged_evidence.get(item.evidence_id)
+            if previous is not None and previous != item:
+                raise RegistryCorruptionError("evidence hash collision")
+            staged_evidence[item.evidence_id] = item
+            event_evidence_ids.append(item.evidence_id)
+        if len(set(event_evidence_ids)) != len(event_evidence_ids):
+            raise EvidenceValidationError("duplicate evidence in economic decision")
+
+        expected_ids = {
+            attestation.result_evidence_id,
+            *attestation.required_evidence_ids,
+        }
+        if not expected_ids.issubset(event_evidence_ids):
+            raise EvidenceValidationError(
+                "economic decision must bind the result and every required evidence id"
+            )
+        self._validate_economic_attestation(attestation, protocol, staged_evidence)
+
+        events = list(self._events)
+        if attestation.verdict == "NOT_TESTABLE":
+            self._commit(dict(self._protocols), staged_evidence, events)
+            return None
+        target = (
+            DecisionStatus.ECONOMICALLY_QUALIFIED
+            if attestation.verdict == "QUALIFIED"
+            else DecisionStatus.REJECTED
+        )
+        event = DecisionEvent(
+            sequence=len(events) + 1,
+            experiment_revision_id=attestation.experiment_revision_id,
+            previous_status=current,
+            new_status=target,
+            decided_at_utc=decided_at_utc or utc_now(),
+            evidence_ids=tuple(event_evidence_ids),
+            reason=reason,
+            actor=actor,
+            source=P6_DECISION_SOURCE,
+            previous_event_hash=events[-1].event_hash if events else None,
+            economic_result_id=attestation.result_evidence_id,
+        )
+        events.append(event)
+        self._commit(dict(self._protocols), staged_evidence, events)
+        return event
+
     transition_decision = update_decision_status
 
     def get_status(self, experiment_revision_id: str) -> DecisionStatus:
@@ -513,6 +610,443 @@ class ResearchContractRegistry:
                 f"local evidence hash mismatch: {evidence.path_or_uri}"
             )
 
+    @classmethod
+    def _validate_economic_attestation(
+        cls,
+        attestation: EconomicDecisionAttestation,
+        protocol: ExperimentMetadata,
+        evidence: Mapping[str, EvidenceReference],
+    ) -> None:
+        """Fail closed on P6 identity, artifact, benchmark, and evidence binding."""
+
+        def require_mapping(value: Any, label: str) -> Mapping[str, Any]:
+            if not isinstance(value, Mapping):
+                raise EvidenceValidationError(f"{label} must be a JSON object")
+            return value
+
+        def require_list(value: Any, label: str) -> list[Any]:
+            if not isinstance(value, list):
+                raise EvidenceValidationError(f"{label} must be a JSON array")
+            return value
+
+        def finite_number(value: Any, label: str) -> float:
+            if isinstance(value, bool) or not isinstance(value, (int, float)):
+                raise EvidenceValidationError(f"{label} must be numeric")
+            converted = float(value)
+            if not math.isfinite(converted):
+                raise EvidenceValidationError(f"{label} must be finite")
+            return converted
+
+        def load_local_artifact(
+            reference: EvidenceReference, label: str
+        ) -> Mapping[str, Any]:
+            cls._validate_evidence(reference, verify_local=True, require_complete=True)
+            path = reference.local_path()
+            if path is None:
+                raise EvidenceValidationError(f"{label} must be local and content-hashed")
+            try:
+                loaded = json.loads(
+                    path.read_text(encoding="utf-8"),
+                    parse_constant=_reject_json_constant,
+                )
+            except (OSError, UnicodeError, ValueError) as exc:
+                raise EvidenceValidationError(f"{label} is unreadable: {exc}") from exc
+            return require_mapping(loaded, label)
+
+        def validate_accounting(value: Any, label: str) -> None:
+            accounting = require_mapping(value, label)
+            initial = finite_number(accounting.get("initial_cash"), f"{label}.initial_cash")
+            final = finite_number(accounting.get("final_equity"), f"{label}.final_equity")
+            realized = finite_number(
+                accounting.get("realized_gross_pnl_usdt"),
+                f"{label}.realized_gross_pnl_usdt",
+            )
+            unrealized = finite_number(
+                accounting.get("terminal_unrealized_pnl_usdt"),
+                f"{label}.terminal_unrealized_pnl_usdt",
+            )
+            fees = finite_number(
+                accounting.get("total_fees_usdt"), f"{label}.total_fees_usdt"
+            )
+            funding = finite_number(
+                accounting.get("total_funding_usdt"),
+                f"{label}.total_funding_usdt",
+            )
+            tolerance = finite_number(
+                accounting.get("accounting_tolerance"),
+                f"{label}.accounting_tolerance",
+            )
+            if initial <= 0 or tolerance <= 0:
+                raise EvidenceValidationError(
+                    f"{label} initial cash and tolerance must be positive"
+                )
+            if not math.isclose(
+                final - initial,
+                realized + unrealized - fees + funding,
+                rel_tol=0.0,
+                abs_tol=tolerance,
+            ):
+                raise EvidenceValidationError(f"{label} accounting identity does not reconcile")
+            net_pnl = finite_number(
+                accounting.get("net_pnl_usdt"), f"{label}.net_pnl_usdt"
+            )
+            net_return = finite_number(
+                accounting.get("net_return_pct"), f"{label}.net_return_pct"
+            )
+            if not math.isclose(net_pnl, final - initial, rel_tol=0.0, abs_tol=tolerance):
+                raise EvidenceValidationError(f"{label} net PnL does not reconcile")
+            if not math.isclose(
+                net_return,
+                net_pnl / initial,
+                rel_tol=0.0,
+                abs_tol=tolerance,
+            ):
+                raise EvidenceValidationError(f"{label} net return does not reconcile")
+            curve = require_list(accounting.get("equity_curve"), f"{label}.equity_curve")
+            if not curve:
+                raise EvidenceValidationError(f"{label} equity curve is empty")
+            last_point = require_list(curve[-1], f"{label}.equity_curve[-1]")
+            if len(last_point) != 2 or not math.isclose(
+                finite_number(last_point[1], f"{label}.equity_curve[-1].equity"),
+                final,
+                rel_tol=0.0,
+                abs_tol=tolerance,
+            ):
+                raise EvidenceValidationError(
+                    f"{label} terminal equity curve point does not reconcile"
+                )
+
+        if attestation.experiment_revision_id != protocol.experiment_revision_id:
+            raise EvidenceValidationError("economic attestation revision mismatch")
+        if attestation.protocol_hash != protocol.protocol_hash:
+            raise EvidenceValidationError("economic attestation protocol hash mismatch")
+        if attestation.code_revision != protocol.code_revision:
+            raise EvidenceValidationError("economic attestation code revision mismatch")
+        if attestation.product_scope != protocol.product_scope:
+            raise EvidenceValidationError("economic attestation product scope mismatch")
+        if attestation.terminal_policy != protocol.terminal_policy:
+            raise EvidenceValidationError("economic attestation terminal policy mismatch")
+        if not isinstance(protocol.benchmark, VersionedIdentity):
+            raise EvidenceValidationError("P6_PENDING protocol cannot qualify economics")
+        if protocol.benchmark.content_sha256 != attestation.comparison_contract_hash:
+            raise EvidenceValidationError("protocol benchmark hash mismatch")
+
+        result_reference = evidence.get(attestation.result_evidence_id)
+        if result_reference is None:
+            raise EvidenceValidationError("economic result evidence is not registered")
+        if result_reference.evidence_type != P6_RESULT_EVIDENCE_TYPE:
+            raise EvidenceValidationError("economic result evidence type mismatch")
+        if result_reference.content_sha256 != attestation.result_artifact_sha256:
+            raise EvidenceValidationError("economic result artifact hash mismatch")
+        if (
+            result_reference.producing_revision_id != protocol.experiment_revision_id
+            or result_reference.producing_code_revision != protocol.code_revision
+        ):
+            raise EvidenceValidationError("economic result provenance mismatch")
+        artifact = load_local_artifact(result_reference, "economic result artifact")
+        if set(artifact) != {
+            "artifact_type",
+            "schema_version",
+            "result_id",
+            "semantic_payload",
+            "audit",
+        }:
+            raise EvidenceValidationError("economic result artifact schema mismatch")
+        if (
+            artifact.get("artifact_type") != P6_RESULT_EVIDENCE_TYPE
+            or artifact.get("schema_version") != P6_RESULT_SCHEMA_VERSION
+        ):
+            raise EvidenceValidationError("economic result type/schema mismatch")
+        semantic = require_mapping(
+            artifact.get("semantic_payload"), "economic result semantic payload"
+        )
+        semantic_hash = canonical_sha256(semantic)
+        if semantic_hash != attestation.result_hash:
+            raise EvidenceValidationError("economic result semantic hash mismatch")
+        if artifact.get("result_id") != attestation.result_id:
+            raise EvidenceValidationError("economic result identity mismatch")
+
+        scalar_expectations: tuple[tuple[str, Any], ...] = (
+            ("experiment_revision_id", attestation.experiment_revision_id),
+            ("protocol_hash", attestation.protocol_hash),
+            ("comparison_contract_id", attestation.comparison_contract_id),
+            ("comparison_contract_hash", attestation.comparison_contract_hash),
+            ("run_result_id", attestation.run_result_id),
+            ("benchmark_suite_id", attestation.benchmark_suite_id),
+            ("verdict", attestation.verdict),
+            ("code_revision", attestation.code_revision),
+            ("terminal_policy", attestation.terminal_policy),
+        )
+        if any(semantic.get(key) != expected for key, expected in scalar_expectations):
+            raise EvidenceValidationError("economic result binding mismatch")
+        if tuple(require_list(semantic.get("product_scope"), "product_scope")) != (
+            attestation.product_scope
+        ):
+            raise EvidenceValidationError("economic result product scope mismatch")
+        if tuple(
+            require_list(semantic.get("required_evidence_ids"), "required_evidence_ids")
+        ) != attestation.required_evidence_ids:
+            raise EvidenceValidationError("economic result required evidence mismatch")
+        if tuple(
+            require_list(semantic.get("benchmark_result_ids"), "benchmark_result_ids")
+        ) != attestation.benchmark_result_ids:
+            raise EvidenceValidationError("economic result benchmark identities mismatch")
+
+        comparison = require_mapping(
+            semantic.get("comparison_contract"), "comparison contract"
+        )
+        if canonical_sha256(comparison) != attestation.comparison_contract_hash:
+            raise EvidenceValidationError("comparison contract content hash mismatch")
+        contract_name = comparison.get("contract_name")
+        contract_version = comparison.get("contract_version")
+        if (
+            not isinstance(contract_name, str)
+            or not isinstance(contract_version, str)
+            or attestation.comparison_contract_id
+            != f"{contract_name}@{attestation.comparison_contract_hash}"
+            or protocol.benchmark.logical_id != contract_name
+            or protocol.benchmark.version != contract_version
+        ):
+            raise EvidenceValidationError("comparison contract identity mismatch")
+        if comparison.get("candidate_policy") != protocol.economic_policy.to_dict():
+            raise EvidenceValidationError("comparison policy identity mismatch")
+        if comparison.get("cost_model") != protocol.cost_model.to_dict():
+            raise EvidenceValidationError("comparison cost identity mismatch")
+        if comparison.get("execution_model") != protocol.execution_model.to_dict():
+            raise EvidenceValidationError("comparison execution identity mismatch")
+        if tuple(require_list(comparison.get("product_scope"), "comparison product_scope")) != (
+            protocol.product_scope
+        ):
+            raise EvidenceValidationError("comparison product scope mismatch")
+        if comparison.get("terminal_policy") != protocol.terminal_policy:
+            raise EvidenceValidationError("comparison terminal policy mismatch")
+        if comparison.get("result_schema_version") != P6_RESULT_SCHEMA_VERSION:
+            raise EvidenceValidationError("comparison result schema mismatch")
+
+        run_artifact = require_mapping(semantic.get("run_result"), "bound run artifact")
+        if run_artifact.get("artifact_type") != P6_RUN_EVIDENCE_TYPE:
+            raise EvidenceValidationError("bound run artifact type mismatch")
+        run_semantic = require_mapping(
+            run_artifact.get("semantic_payload"), "bound run semantic payload"
+        )
+        if (
+            run_artifact.get("result_id") != attestation.run_result_id
+            or attestation.run_result_id
+            != f"economic-run-result@{canonical_sha256(run_semantic)}"
+        ):
+            raise EvidenceValidationError("bound run identity mismatch")
+        run_identity = require_mapping(
+            run_semantic.get("run_identity"), "bound run identity"
+        )
+        for key, expected in (
+            ("experiment_revision_id", protocol.experiment_revision_id),
+            ("protocol_hash", protocol.protocol_hash),
+            ("comparison_contract_id", attestation.comparison_contract_id),
+            ("comparison_contract_hash", attestation.comparison_contract_hash),
+            ("product_scope", list(protocol.product_scope)),
+            ("code_revision", protocol.code_revision),
+            ("terminal_policy", protocol.terminal_policy),
+            ("economic_policy", protocol.economic_policy.to_dict()),
+            ("cost_model", protocol.cost_model.to_dict()),
+            ("execution_model", protocol.execution_model.to_dict()),
+        ):
+            if run_identity.get(key) != expected:
+                raise EvidenceValidationError(f"bound run {key} mismatch")
+        validate_accounting(run_semantic.get("accounting"), "candidate run")
+
+        benchmark_artifact = require_mapping(
+            semantic.get("benchmark_suite"), "benchmark suite artifact"
+        )
+        if benchmark_artifact.get("artifact_type") != P6_BENCHMARK_EVIDENCE_TYPE:
+            raise EvidenceValidationError("benchmark suite artifact type mismatch")
+        suite_payload = {
+            key: benchmark_artifact.get(key)
+            for key in (
+                "comparison_contract_id",
+                "candidate_run_result_id",
+                "eligible_opportunity_set_sha256",
+                "cash",
+                "passive",
+                "random",
+            )
+        }
+        if (
+            benchmark_artifact.get("suite_id") != attestation.benchmark_suite_id
+            or attestation.benchmark_suite_id
+            != f"benchmark-suite@{canonical_sha256(suite_payload)}"
+            or suite_payload["comparison_contract_id"]
+            != attestation.comparison_contract_id
+            or suite_payload["candidate_run_result_id"] != attestation.run_result_id
+            or suite_payload["eligible_opportunity_set_sha256"]
+            != comparison.get("eligible_opportunity_set_sha256")
+        ):
+            raise EvidenceValidationError("benchmark suite identity mismatch")
+
+        benchmark_ids: list[str] = []
+
+        def validate_benchmark_record(value: Any, label: str) -> Mapping[str, Any]:
+            record = require_mapping(value, label)
+            result_id = record.get("result_id")
+            benchmark_payload = {
+                key: record.get(key)
+                for key in (
+                    "benchmark_kind",
+                    "vehicle",
+                    "accounting",
+                    "comparable",
+                    "matching_diagnostics",
+                    "trial_id",
+                    "seed",
+                    "run_result_id",
+                )
+            }
+            if result_id != f"benchmark-result@{canonical_sha256(benchmark_payload)}":
+                raise EvidenceValidationError(f"{label} identity mismatch")
+            if not isinstance(result_id, str):
+                raise EvidenceValidationError(f"{label} result id is missing")
+            benchmark_ids.append(result_id)
+            if record.get("comparable") is True:
+                validate_accounting(record.get("accounting"), label)
+            return record
+
+        for key in ("cash", "passive"):
+            value = benchmark_artifact.get(key)
+            if value is not None:
+                validate_benchmark_record(value, f"{key} benchmark")
+        random_value = benchmark_artifact.get("random")
+        if random_value is not None:
+            random_record = require_mapping(random_value, "random distribution")
+            trials = require_list(random_record.get("trials"), "random trials")
+            random_payload = {"seed": random_record.get("seed"), "trials": trials}
+            distribution_id = random_record.get("distribution_id")
+            if distribution_id != f"random-distribution@{canonical_sha256(random_payload)}":
+                raise EvidenceValidationError("random distribution identity mismatch")
+            if not isinstance(distribution_id, str):
+                raise EvidenceValidationError("random distribution id is missing")
+            benchmark_ids.append(distribution_id)
+            for index, value in enumerate(trials):
+                validate_benchmark_record(value, f"random trial {index}")
+        if tuple(benchmark_ids) != attestation.benchmark_result_ids:
+            raise EvidenceValidationError("benchmark result list does not match suite")
+
+        required_benchmarks = require_list(
+            comparison.get("required_benchmarks"), "required benchmarks"
+        )
+        benchmark_fields = {
+            "CASH": benchmark_artifact.get("cash"),
+            "PASSIVE_PERPETUAL": benchmark_artifact.get("passive"),
+            "RANDOM_MATCHED": benchmark_artifact.get("random"),
+        }
+        required_comparable = True
+        for kind in required_benchmarks:
+            record = benchmark_fields.get(kind)
+            if not isinstance(record, Mapping) or record.get("comparable") is not True:
+                required_comparable = False
+
+        hurdles = require_list(comparison.get("hurdles"), "comparison hurdles")
+        gates = require_list(semantic.get("gates"), "qualification gates")
+        if len(gates) != len(hurdles):
+            raise EvidenceValidationError("qualification gate count mismatch")
+        for index, (hurdle_value, gate_value) in enumerate(zip(hurdles, gates, strict=True)):
+            hurdle = require_mapping(hurdle_value, f"hurdle {index}")
+            gate = require_mapping(gate_value, f"gate {index}")
+            for gate_key, hurdle_key in (
+                ("gate_id", "gate_id"),
+                ("metric", "metric"),
+                ("operator", "operator"),
+                ("hurdle", "threshold"),
+            ):
+                if gate.get(gate_key) != hurdle.get(hurdle_key):
+                    raise EvidenceValidationError(
+                        f"qualification gate {index} does not match preregistration"
+                    )
+        candidate_complete = run_identity.get("completeness") == "COMPLETE"
+        gate_testability = [
+            require_mapping(item, f"gate {index}").get("testable") is True
+            for index, item in enumerate(gates)
+        ]
+        gate_passes = [
+            require_mapping(item, f"gate {index}").get("passed") is True
+            for index, item in enumerate(gates)
+        ]
+        if attestation.verdict == "QUALIFIED" and not (
+            candidate_complete
+            and required_comparable
+            and all(gate_testability)
+            and all(gate_passes)
+        ):
+            raise EvidenceValidationError("QUALIFIED verdict disagrees with bound gates")
+        if attestation.verdict == "REJECTED" and not (
+            candidate_complete
+            and required_comparable
+            and all(gate_testability)
+            and not all(gate_passes)
+        ):
+            raise EvidenceValidationError("REJECTED verdict disagrees with bound gates")
+        if attestation.verdict == "NOT_TESTABLE" and (
+            candidate_complete and required_comparable and all(gate_testability)
+        ):
+            raise EvidenceValidationError("NOT_TESTABLE verdict has no testability failure")
+
+        required_ids = set(attestation.required_evidence_ids)
+        if any(evidence_id not in evidence for evidence_id in required_ids):
+            raise EvidenceValidationError("required economic evidence is not registered")
+        required_references = [evidence[evidence_id] for evidence_id in required_ids]
+        for reference in required_references:
+            cls._validate_evidence(reference, verify_local=True, require_complete=True)
+        evidence_requirements = require_list(
+            comparison.get("evidence_requirements"), "evidence requirements"
+        )
+        present_types = {item.evidence_type for item in required_references}
+        if any(
+            not isinstance(required, str) or required not in present_types
+            for required in evidence_requirements
+        ):
+            raise EvidenceValidationError("comparison evidence requirement is unsatisfied")
+
+        run_references = [
+            item for item in required_references if item.evidence_type == P6_RUN_EVIDENCE_TYPE
+        ]
+        benchmark_references = [
+            item
+            for item in required_references
+            if item.evidence_type == P6_BENCHMARK_EVIDENCE_TYPE
+        ]
+        if len(run_references) != 1 or len(benchmark_references) != 1:
+            raise EvidenceValidationError(
+                "formal qualification requires exactly one run and benchmark artifact"
+            )
+        for reference in (*run_references, *benchmark_references):
+            if (
+                reference.producing_revision_id != protocol.experiment_revision_id
+                or reference.producing_code_revision != protocol.code_revision
+            ):
+                raise EvidenceValidationError("P6 artifact provenance mismatch")
+        if load_local_artifact(run_references[0], "run evidence") != run_artifact:
+            raise EvidenceValidationError("run evidence bytes do not match bound run")
+        if (
+            load_local_artifact(benchmark_references[0], "benchmark evidence")
+            != benchmark_artifact
+        ):
+            raise EvidenceValidationError(
+                "benchmark evidence bytes do not match bound benchmark suite"
+            )
+        dataset_evidence_id = run_identity.get("dataset_evidence_id")
+        if not isinstance(dataset_evidence_id, str) or dataset_evidence_id not in required_ids:
+            raise EvidenceValidationError("bound dataset evidence is not required")
+        dataset_reference = evidence[dataset_evidence_id]
+        data_interval = require_mapping(
+            comparison.get("data_interval"), "comparison data interval"
+        )
+        if (
+            dataset_reference.content_sha256
+            != run_identity.get("dataset_content_sha256")
+            or dataset_evidence_id != data_interval.get("dataset_evidence_id")
+            or dataset_reference.content_sha256
+            != data_interval.get("dataset_content_sha256")
+        ):
+            raise EvidenceValidationError("dataset identity/hash binding mismatch")
+
     @staticmethod
     def _validate_state(
         protocols: Mapping[str, ExperimentMetadata],
@@ -535,9 +1069,25 @@ class ResearchContractRegistry:
             if event.new_status not in LEGAL_TRANSITIONS[current]:
                 raise RegistryCorruptionError("decision event contains an illegal transition")
             if event.new_status is DecisionStatus.ECONOMICALLY_QUALIFIED:
-                raise RegistryCorruptionError(
-                    "P5 registry cannot contain ECONOMICALLY_QUALIFIED state"
-                )
+                if (
+                    event.source != P6_DECISION_SOURCE
+                    or event.previous_status is not DecisionStatus.STATISTICALLY_QUALIFIED
+                    or event.economic_result_id is None
+                ):
+                    raise RegistryCorruptionError(
+                        "economic qualification lacks the dedicated P6 decision binding"
+                    )
+                result_reference = evidence.get(event.economic_result_id)
+                protocol = protocols[event.experiment_revision_id]
+                if (
+                    result_reference is None
+                    or result_reference.evidence_type != P6_RESULT_EVIDENCE_TYPE
+                    or result_reference.completeness is not EvidenceCompleteness.COMPLETE
+                    or not isinstance(protocol.benchmark, VersionedIdentity)
+                ):
+                    raise RegistryCorruptionError(
+                        "economic qualification references invalid P6 evidence"
+                    )
             if event.new_status is DecisionStatus.REGISTERED:
                 if event.evidence_ids:
                     raise RegistryCorruptionError("registration event cannot bind result evidence")

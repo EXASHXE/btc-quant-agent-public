@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import math
 import random
 from collections.abc import Sequence
 from dataclasses import dataclass, field
@@ -8,9 +7,10 @@ from typing import Any
 
 from ..domain import Candle
 from .fee_model import FeeModel
+from .metrics import SimulationSummary
 from .policy import TradePolicy
 from .signal import InformationSignal
-from .simulator import EconomicSimulationEngine, SimulationSummary
+from .simulator import EconomicSimulationEngine
 
 
 @dataclass(frozen=True)
@@ -23,7 +23,7 @@ class BenchmarkResult:
     net_pnl_usdt: float
     net_return_pct: float
     max_drawdown_pct: float
-    sharpe_ratio: float
+    sharpe_ratio: float | None
     equity_curve: list[tuple[int, float]] = field(default_factory=list)
 
     def to_dict(self) -> dict[str, Any]:
@@ -58,7 +58,7 @@ class BenchmarkEngine:
             net_pnl_usdt=0.0,
             net_return_pct=0.0,
             max_drawdown_pct=0.0,
-            sharpe_ratio=0.0,
+            sharpe_ratio=None,
             equity_curve=curve,
         )
 
@@ -96,17 +96,11 @@ class BenchmarkEngine:
         net_pnl = final_equity - initial_cash
         net_return = net_pnl / initial_cash if initial_cash > 0 else 0.0
 
-        # Sharpe ratio of passive holding
-        sharpe = 0.0
-        if len(curve) > 2:
-            eq_vals = [e[1] for e in curve]
-            pct_returns = [(eq_vals[k] - eq_vals[k - 1]) / eq_vals[k - 1] for k in range(1, len(eq_vals)) if eq_vals[k - 1] > 0]
-            if pct_returns:
-                mean_r = sum(pct_returns) / len(pct_returns)
-                var_r = sum((r - mean_r) ** 2 for r in pct_returns) / len(pct_returns)
-                std_r = math.sqrt(var_r) if var_r > 0 else 0.0
-                if std_r > 1e-12:
-                    sharpe = (mean_r / std_r) * math.sqrt(35040)
+        # The legacy API has no declared return-cadence contract.  Do not
+        # fabricate an annualized Sharpe from arbitrary candle timestamps.
+        sharpe = None
+        if curve:
+            curve[-1] = (curve[-1][0], final_equity)
 
         return BenchmarkResult(
             benchmark_name="BENCHMARK_B_PASSIVE_BTC",
@@ -160,8 +154,9 @@ class BenchmarkEngine:
             summary = sim.simulate(candles=candles, signals=random_signals)
             net_pnls.append(summary.net_pnl_usdt)
             max_dds.append(summary.max_drawdown_pct)
-            sharpes.append(summary.sharpe_ratio)
-            last_curve = summary.equity_curve
+            if summary.sharpe_ratio is not None:
+                sharpes.append(summary.sharpe_ratio)
+            last_curve = list(summary.equity_curve)
 
         mean_pnl = sum(net_pnls) / len(net_pnls) if net_pnls else 0.0
         mean_dd = sum(max_dds) / len(max_dds) if max_dds else 0.0

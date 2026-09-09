@@ -540,6 +540,98 @@ class EvidenceReference:
 
 
 @dataclass(frozen=True)
+class EconomicDecisionAttestation:
+    """Generic, immutable boundary between a P6 artifact and the registry.
+
+    The research-contract package deliberately does not import the economic
+    implementation.  This attestation carries only content identities and the
+    lifecycle facts that the registry must independently verify against the
+    content-addressed artifact.
+    """
+
+    experiment_revision_id: str
+    protocol_hash: str
+    result_evidence_id: str
+    result_artifact_sha256: str
+    result_id: str
+    result_hash: str
+    result_schema_version: str
+    verdict: str
+    comparison_contract_id: str
+    comparison_contract_hash: str
+    run_result_id: str
+    benchmark_suite_id: str
+    benchmark_result_ids: tuple[str, ...]
+    required_evidence_ids: tuple[str, ...]
+    code_revision: str
+    product_scope: tuple[str, ...]
+    terminal_policy: str
+
+    def __post_init__(self) -> None:
+        for value, name in (
+            (self.experiment_revision_id, "experiment_revision_id"),
+            (self.result_evidence_id, "result_evidence_id"),
+            (self.result_id, "result_id"),
+            (self.comparison_contract_id, "comparison_contract_id"),
+            (self.run_result_id, "run_result_id"),
+            (self.benchmark_suite_id, "benchmark_suite_id"),
+            (self.code_revision, "code_revision"),
+            (self.terminal_policy, "terminal_policy"),
+        ):
+            _require_text(value, name)
+        for value, name in (
+            (self.protocol_hash, "protocol_hash"),
+            (self.result_artifact_sha256, "result_artifact_sha256"),
+            (self.result_hash, "result_hash"),
+            (self.comparison_contract_hash, "comparison_contract_hash"),
+        ):
+            _require_sha256(value, name)
+        if self.result_id != f"economic-qualification@{self.result_hash}":
+            raise ValueError("economic result id does not match its semantic hash")
+        if not self.comparison_contract_id.endswith(
+            f"@{self.comparison_contract_hash}"
+        ):
+            raise ValueError("comparison contract id does not match its content hash")
+        if self.result_schema_version != "1.0.0":
+            raise ValueError("unsupported economic result schema")
+        if self.verdict not in {"QUALIFIED", "REJECTED", "NOT_TESTABLE"}:
+            raise ValueError("unsupported economic qualification verdict")
+        benchmark_ids = tuple(str(item) for item in self.benchmark_result_ids)
+        evidence_ids = tuple(str(item) for item in self.required_evidence_ids)
+        scope = tuple(str(item) for item in self.product_scope)
+        if len(set(benchmark_ids)) != len(benchmark_ids):
+            raise ValueError("benchmark result identities must be unique")
+        if not evidence_ids or len(set(evidence_ids)) != len(evidence_ids):
+            raise ValueError("required economic evidence identities must be non-empty and unique")
+        if not scope or any(not item.strip() for item in scope):
+            raise ValueError("economic attestation product_scope is required")
+        object.__setattr__(self, "benchmark_result_ids", benchmark_ids)
+        object.__setattr__(self, "required_evidence_ids", evidence_ids)
+        object.__setattr__(self, "product_scope", scope)
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "experiment_revision_id": self.experiment_revision_id,
+            "protocol_hash": self.protocol_hash,
+            "result_evidence_id": self.result_evidence_id,
+            "result_artifact_sha256": self.result_artifact_sha256,
+            "result_id": self.result_id,
+            "result_hash": self.result_hash,
+            "result_schema_version": self.result_schema_version,
+            "verdict": self.verdict,
+            "comparison_contract_id": self.comparison_contract_id,
+            "comparison_contract_hash": self.comparison_contract_hash,
+            "run_result_id": self.run_result_id,
+            "benchmark_suite_id": self.benchmark_suite_id,
+            "benchmark_result_ids": list(self.benchmark_result_ids),
+            "required_evidence_ids": list(self.required_evidence_ids),
+            "code_revision": self.code_revision,
+            "product_scope": list(self.product_scope),
+            "terminal_policy": self.terminal_policy,
+        }
+
+
+@dataclass(frozen=True)
 class DecisionEvent:
     sequence: int
     experiment_revision_id: str
