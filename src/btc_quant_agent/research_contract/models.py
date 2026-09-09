@@ -592,7 +592,7 @@ class EconomicDecisionAttestation:
             f"@{self.comparison_contract_hash}"
         ):
             raise ValueError("comparison contract id does not match its content hash")
-        if self.result_schema_version != "1.0.0":
+        if self.result_schema_version not in {"1.0.0", "1.1.0"}:
             raise ValueError("unsupported economic result schema")
         if self.verdict not in {"QUALIFIED", "REJECTED", "NOT_TESTABLE"}:
             raise ValueError("unsupported economic qualification verdict")
