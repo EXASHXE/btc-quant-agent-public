@@ -1296,3 +1296,287 @@ def test_registry_rejects_rehashed_forged_random_matching_diagnostics(
             decided_at_utc=FIXED_TIME,
         )
 
+
+def test_registry_rejects_rehashed_forged_random_trial_dataset(tmp_path: Path) -> None:
+    base = tmp_path / "base"
+    base.mkdir()
+    artifacts = _formal_artifacts(base)
+    artifact = json.loads(canonical_json(artifacts["qualification"].to_dict()))
+    semantic = artifact["semantic_payload"]
+    suite = semantic["benchmark_suite"]
+    random_record = suite["random"]
+    assert random_record is not None
+    trial = random_record["trials"][0]
+    accounting = trial["accounting"]
+    # Mutate one candle within valid OHLC bounds
+    bar = accounting["formal_runtime_market_data"][0]
+    bar["high"] = max(bar["high"], bar["close"] + 0.5)
+    bar["close"] = bar["close"] + 0.5
+    accounting["formal_runtime_market_data_sha256"] = canonical_sha256(
+        {
+            "schema_version": accounting["formal_runtime_market_data_schema_version"],
+            "candles": accounting["formal_runtime_market_data"],
+        }
+    )
+    identity = accounting["formal_run_identity"]
+    trial["run_result_id"] = "economic-run-result@" + canonical_sha256(
+        {"run_identity": identity, "accounting": accounting}
+    )
+    _refresh_suite_identity(suite)
+    semantic["benchmark_suite_id"] = suite["suite_id"]
+    semantic["benchmark_result_ids"] = _suite_result_ids(suite)
+
+    forged_dir = tmp_path / "forged"
+    forged_dir.mkdir()
+    attestation, evidence = _write_forged_registry_artifacts(
+        forged_dir,
+        artifacts,
+        artifact,
+        run_changed=False,
+        suite_changed=True,
+    )
+    registry_dir = tmp_path / "registry"
+    registry_dir.mkdir()
+    registry, _ = _statistically_qualified_registry(registry_dir, artifacts["protocol"])
+    with pytest.raises(EvidenceValidationError, match="dataset evidence|candle payload|market data"):
+        registry.record_economic_qualification(
+            attestation,
+            evidence_references=evidence,
+            reason="forged random trial dataset must fail closed",
+            actor="pytest",
+            decided_at_utc=FIXED_TIME,
+        )
+
+
+def test_registry_rejects_rehashed_forged_random_cost_identity(tmp_path: Path) -> None:
+    base = tmp_path / "base"
+    base.mkdir()
+    artifacts = _formal_artifacts(base)
+    artifact = json.loads(canonical_json(artifacts["qualification"].to_dict()))
+    semantic = artifact["semantic_payload"]
+    suite = semantic["benchmark_suite"]
+    random_record = suite["random"]
+    assert random_record is not None
+    trial = random_record["trials"][0]
+    accounting = trial["accounting"]
+    # Modify cost_model identity in random trial
+    identity = dict(accounting["formal_run_identity"])
+    cost_model = dict(identity["cost_model"])
+    cost_model["name"] = "FORGED_COST_MODEL"
+    identity["cost_model"] = cost_model
+    accounting["formal_run_identity"] = identity
+    trial["run_result_id"] = "economic-run-result@" + canonical_sha256(
+        {"run_identity": identity, "accounting": accounting}
+    )
+    _refresh_suite_identity(suite)
+    semantic["benchmark_suite_id"] = suite["suite_id"]
+    semantic["benchmark_result_ids"] = _suite_result_ids(suite)
+
+    forged_dir = tmp_path / "forged"
+    forged_dir.mkdir()
+    attestation, evidence = _write_forged_registry_artifacts(
+        forged_dir,
+        artifacts,
+        artifact,
+        run_changed=False,
+        suite_changed=True,
+    )
+    registry_dir = tmp_path / "registry"
+    registry_dir.mkdir()
+    registry, _ = _statistically_qualified_registry(registry_dir, artifacts["protocol"])
+    with pytest.raises(EvidenceValidationError, match="cost_model|matching diagnostics|identity"):
+        registry.record_economic_qualification(
+            attestation,
+            evidence_references=evidence,
+            reason="forged random cost identity must fail closed",
+            actor="pytest",
+            decided_at_utc=FIXED_TIME,
+        )
+
+
+def test_registry_rejects_rehashed_forged_random_execution_identity(tmp_path: Path) -> None:
+    base = tmp_path / "base"
+    base.mkdir()
+    artifacts = _formal_artifacts(base)
+    artifact = json.loads(canonical_json(artifacts["qualification"].to_dict()))
+    semantic = artifact["semantic_payload"]
+    suite = semantic["benchmark_suite"]
+    random_record = suite["random"]
+    assert random_record is not None
+    trial = random_record["trials"][0]
+    accounting = trial["accounting"]
+    # Modify execution_model identity in random trial
+    identity = dict(accounting["formal_run_identity"])
+    exec_model = dict(identity["execution_model"])
+    exec_model["name"] = "FORGED_EXECUTION_MODEL"
+    identity["execution_model"] = exec_model
+    accounting["formal_run_identity"] = identity
+    trial["run_result_id"] = "economic-run-result@" + canonical_sha256(
+        {"run_identity": identity, "accounting": accounting}
+    )
+    _refresh_suite_identity(suite)
+    semantic["benchmark_suite_id"] = suite["suite_id"]
+    semantic["benchmark_result_ids"] = _suite_result_ids(suite)
+
+    forged_dir = tmp_path / "forged"
+    forged_dir.mkdir()
+    attestation, evidence = _write_forged_registry_artifacts(
+        forged_dir,
+        artifacts,
+        artifact,
+        run_changed=False,
+        suite_changed=True,
+    )
+    registry_dir = tmp_path / "registry"
+    registry_dir.mkdir()
+    registry, _ = _statistically_qualified_registry(registry_dir, artifacts["protocol"])
+    with pytest.raises(EvidenceValidationError, match="execution_model|matching diagnostics|identity"):
+        registry.record_economic_qualification(
+            attestation,
+            evidence_references=evidence,
+            reason="forged random execution identity must fail closed",
+            actor="pytest",
+            decided_at_utc=FIXED_TIME,
+        )
+
+
+def test_registry_rejects_rehashed_forged_random_terminal_or_comparison_identity(
+    tmp_path: Path,
+) -> None:
+    base = tmp_path / "base"
+    base.mkdir()
+    artifacts = _formal_artifacts(base)
+    artifact = json.loads(canonical_json(artifacts["qualification"].to_dict()))
+    semantic = artifact["semantic_payload"]
+    suite = semantic["benchmark_suite"]
+    random_record = suite["random"]
+    assert random_record is not None
+    trial = random_record["trials"][0]
+    accounting = trial["accounting"]
+    # Modify comparison_contract_hash in random trial
+    identity = dict(accounting["formal_run_identity"])
+    identity["comparison_contract_hash"] = "0" * 64
+    accounting["formal_run_identity"] = identity
+    trial["run_result_id"] = "economic-run-result@" + canonical_sha256(
+        {"run_identity": identity, "accounting": accounting}
+    )
+    _refresh_suite_identity(suite)
+    semantic["benchmark_suite_id"] = suite["suite_id"]
+    semantic["benchmark_result_ids"] = _suite_result_ids(suite)
+
+    forged_dir = tmp_path / "forged"
+    forged_dir.mkdir()
+    attestation, evidence = _write_forged_registry_artifacts(
+        forged_dir,
+        artifacts,
+        artifact,
+        run_changed=False,
+        suite_changed=True,
+    )
+    registry_dir = tmp_path / "registry"
+    registry_dir.mkdir()
+    registry, _ = _statistically_qualified_registry(registry_dir, artifacts["protocol"])
+    with pytest.raises(EvidenceValidationError, match="comparison_contract_hash|identity"):
+        registry.record_economic_qualification(
+            attestation,
+            evidence_references=evidence,
+            reason="forged comparison identity must fail closed",
+            actor="pytest",
+            decided_at_utc=FIXED_TIME,
+        )
+
+
+def test_registry_rejects_rehashed_forged_same_diagnostics(tmp_path: Path) -> None:
+    base = tmp_path / "base"
+    base.mkdir()
+    artifacts = _formal_artifacts(base)
+    artifact = json.loads(canonical_json(artifacts["qualification"].to_dict()))
+    semantic = artifact["semantic_payload"]
+    suite = semantic["benchmark_suite"]
+    random_record = suite["random"]
+    assert random_record is not None
+    trial = random_record["trials"][0]
+    accounting = trial["accounting"]
+    # Change underlying identity
+    identity = dict(accounting["formal_run_identity"])
+    cost_model = dict(identity["cost_model"])
+    cost_model["name"] = "FORGED_COST_MODEL"
+    identity["cost_model"] = cost_model
+    accounting["formal_run_identity"] = identity
+    trial["run_result_id"] = "economic-run-result@" + canonical_sha256(
+        {"run_identity": identity, "accounting": accounting}
+    )
+    # But forge matching diagnostics to claim True
+    trial["matching_diagnostics"]["same_policy_cost_execution_funding"] = True
+    _refresh_suite_identity(suite)
+    semantic["benchmark_suite_id"] = suite["suite_id"]
+    semantic["benchmark_result_ids"] = _suite_result_ids(suite)
+
+    forged_dir = tmp_path / "forged"
+    forged_dir.mkdir()
+    attestation, evidence = _write_forged_registry_artifacts(
+        forged_dir,
+        artifacts,
+        artifact,
+        run_changed=False,
+        suite_changed=True,
+    )
+    registry_dir = tmp_path / "registry"
+    registry_dir.mkdir()
+    registry, _ = _statistically_qualified_registry(registry_dir, artifacts["protocol"])
+    with pytest.raises(EvidenceValidationError, match="matching diagnostics|cost_model|identity"):
+        registry.record_economic_qualification(
+            attestation,
+            evidence_references=evidence,
+            reason="forged same_* diagnostics must fail closed",
+            actor="pytest",
+            decided_at_utc=FIXED_TIME,
+        )
+
+
+def test_validate_formal_run_identity_binding_checks_all_critical_fields(tmp_path: Path) -> None:
+    from btc_quant_agent.economic.acceptance_verifier import (
+        _CRITICAL_IDENTITY_FIELDS,
+        validate_formal_run_identity_binding,
+    )
+
+    base = tmp_path / "base"
+    base.mkdir()
+    artifacts = _formal_artifacts(base)
+    candidate_id = json.loads(
+        canonical_json(artifacts["run"].identity.to_dict())
+    )
+    trial_id = dict(candidate_id)
+
+    # Positive control: identical identities pass
+    validate_formal_run_identity_binding(candidate_id, trial_id)
+
+    # Negative controls: each critical field discrepancy fails closed
+    for field in _CRITICAL_IDENTITY_FIELDS:
+        corrupted = dict(candidate_id)
+        if field == "initial_capital":
+            corrupted[field] = corrupted[field] + 100.0
+        elif field == "product_scope":
+            corrupted[field] = ("ETHUSDT",)
+        elif field in ("interval_start_ms", "interval_end_ms", "observation_count"):
+            corrupted[field] = corrupted[field] + 1
+        elif isinstance(corrupted[field], dict):
+            corrupted_dict = dict(corrupted[field])
+            corrupted_dict["name"] = "MUTATED"
+            corrupted[field] = corrupted_dict
+        else:
+            corrupted[field] = "MUTATED_FIELD_VALUE"
+        with pytest.raises(ValueError, match=f"random trial identity {field} mismatch"):
+            validate_formal_run_identity_binding(candidate_id, corrupted)
+
+    # Completeness check
+    corrupted_completeness = dict(candidate_id)
+    corrupted_completeness["completeness"] = "PARTIAL"
+    with pytest.raises(ValueError, match="COMPLETE"):
+        validate_formal_run_identity_binding(candidate_id, corrupted_completeness)
+
+    # Funding event set check
+    corrupted_funding = dict(candidate_id)
+    corrupted_funding["funding_event_set_sha256"] = "0" * 64
+    with pytest.raises(ValueError, match="funding event set"):
+        validate_formal_run_identity_binding(candidate_id, corrupted_funding)

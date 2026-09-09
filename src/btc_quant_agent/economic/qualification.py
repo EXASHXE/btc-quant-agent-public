@@ -1616,6 +1616,20 @@ def _matching_diagnostics(
         )
     )
     complete = trial.identity.completeness is ResultCompleteness.COMPLETE
+    same_policy_cost_execution_funding = (
+        trial.identity.economic_policy == candidate.identity.economic_policy
+        and trial.identity.cost_model == candidate.identity.cost_model
+        and trial.identity.execution_model == candidate.identity.execution_model
+        and trial.identity.funding_model == candidate.identity.funding_model
+    )
+    same_interval = (
+        trial.identity.interval_start_ms == candidate.identity.interval_start_ms
+        and trial.identity.interval_end_ms == candidate.identity.interval_end_ms
+        and trial.identity.observation_count == candidate.identity.observation_count
+    )
+    same_terminal_policy = (
+        trial.identity.terminal_policy == candidate.identity.terminal_policy
+    )
     diagnostics = {
         "candidate_entry_count": candidate_count,
         "trial_entry_count": trial_count,
@@ -1633,13 +1647,23 @@ def _matching_diagnostics(
         "time_exposure_match": exposure_pass,
         "average_notional_error_fraction": notional_error,
         "average_notional_match": notional_pass,
-        "same_policy_cost_execution_funding": True,
-        "same_interval": True,
-        "same_terminal_policy": True,
+        "same_policy_cost_execution_funding": same_policy_cost_execution_funding,
+        "same_interval": same_interval,
+        "same_terminal_policy": same_terminal_policy,
         "trial_complete": complete,
     }
     return diagnostics, all(
-        (count_pass, direction_pass, holding_pass, exposure_pass, notional_pass, complete)
+        (
+            count_pass,
+            direction_pass,
+            holding_pass,
+            exposure_pass,
+            notional_pass,
+            same_policy_cost_execution_funding,
+            same_interval,
+            same_terminal_policy,
+            complete,
+        )
     )
 
 

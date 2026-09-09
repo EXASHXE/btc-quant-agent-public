@@ -92,6 +92,73 @@ def validate_runtime_dataset_binding(
         raise ValueError("runtime candle payload differs from content-hashed dataset evidence")
 
 
+_CRITICAL_IDENTITY_FIELDS: tuple[str, ...] = (
+    "experiment_revision_id",
+    "protocol_hash",
+    "input_contract",
+    "dataset_evidence_id",
+    "dataset_content_sha256",
+    "interval_start_ms",
+    "interval_end_ms",
+    "observation_count",
+    "product_scope",
+    "initial_capital",
+    "economic_policy",
+    "cost_model",
+    "execution_model",
+    "funding_model",
+    "comparison_contract_id",
+    "comparison_contract_hash",
+    "terminal_policy",
+    "metrics_contract_id",
+    "metrics_contract_hash",
+    "code_revision",
+)
+
+
+def validate_formal_run_identity_binding(
+    candidate_identity: Mapping[str, Any],
+    trial_identity: Mapping[str, Any],
+) -> None:
+    if not isinstance(trial_identity, Mapping):
+        raise TypeError("formal run identity must be a JSON object")
+    for field in _CRITICAL_IDENTITY_FIELDS:
+        if field not in candidate_identity:
+            raise ValueError(f"candidate identity missing critical field: {field}")
+        if field not in trial_identity:
+            raise ValueError(f"trial identity missing critical field: {field}")
+        expected = candidate_identity[field]
+        observed = trial_identity[field]
+        if field == "product_scope":
+            if tuple(observed) != tuple(expected):
+                raise ValueError(
+                    "random trial identity product_scope mismatch with candidate: "
+                    f"expected {expected!r}, got {observed!r}"
+                )
+        elif field == "initial_capital":
+            if not math.isclose(
+                _finite(observed, "trial initial_capital"),
+                _finite(expected, "candidate initial_capital"),
+                rel_tol=0.0,
+                abs_tol=_TOLERANCE,
+            ):
+                raise ValueError(
+                    "random trial identity initial_capital mismatch with candidate: "
+                    f"expected {expected!r}, got {observed!r}"
+                )
+        elif observed != expected:
+            raise ValueError(
+                f"random trial identity {field} mismatch with candidate: "
+                f"expected {expected!r}, got {observed!r}"
+            )
+    if trial_identity.get("completeness") != "COMPLETE":
+        raise ValueError("random trial run is not COMPLETE")
+    if trial_identity.get("funding_event_set_sha256") != candidate_identity.get(
+        "funding_event_set_sha256"
+    ):
+        raise ValueError("random trial funding event set mismatch with candidate")
+
+
 def _require_mapping(value: Any, label: str) -> Mapping[str, Any]:
     if not isinstance(value, Mapping):
         raise TypeError(f"{label} must be a JSON object")
@@ -394,6 +461,27 @@ def recompute_matching_diagnostics(
         notional_error is not None and notional_error <= float(notional_limit)
     )
     complete = trial.get("completeness") == "COMPLETE"
+    candidate_id = candidate.get("formal_run_identity")
+    trial_id = trial.get("formal_run_identity")
+    if isinstance(candidate_id, Mapping) and isinstance(trial_id, Mapping):
+        same_policy_cost_execution_funding = bool(
+            candidate_id.get("economic_policy") == trial_id.get("economic_policy")
+            and candidate_id.get("cost_model") == trial_id.get("cost_model")
+            and candidate_id.get("execution_model") == trial_id.get("execution_model")
+            and candidate_id.get("funding_model") == trial_id.get("funding_model")
+        )
+        same_interval = bool(
+            candidate_id.get("interval_start_ms") == trial_id.get("interval_start_ms")
+            and candidate_id.get("interval_end_ms") == trial_id.get("interval_end_ms")
+            and candidate_id.get("observation_count") == trial_id.get("observation_count")
+        )
+        same_terminal_policy = bool(
+            candidate_id.get("terminal_policy") == trial_id.get("terminal_policy")
+        )
+    else:
+        same_policy_cost_execution_funding = False
+        same_interval = False
+        same_terminal_policy = False
     diagnostics = {
         "candidate_entry_count": candidate_count,
         "trial_entry_count": trial_count,
@@ -411,13 +499,23 @@ def recompute_matching_diagnostics(
         "time_exposure_match": exposure_pass,
         "average_notional_error_fraction": notional_error,
         "average_notional_match": notional_pass,
-        "same_policy_cost_execution_funding": True,
-        "same_interval": True,
-        "same_terminal_policy": True,
+        "same_policy_cost_execution_funding": same_policy_cost_execution_funding,
+        "same_interval": same_interval,
+        "same_terminal_policy": same_terminal_policy,
         "trial_complete": complete,
     }
     return diagnostics, all(
-        (count_pass, direction_pass, holding_pass, exposure_pass, notional_pass, complete)
+        (
+            count_pass,
+            direction_pass,
+            holding_pass,
+            exposure_pass,
+            notional_pass,
+            same_policy_cost_execution_funding,
+            same_interval,
+            same_terminal_policy,
+            complete,
+        )
     )
 
 
@@ -558,6 +656,8 @@ def validate_persisted_qualification_semantics(
         cash = _require_mapping(cash_value, "cash benchmark")
         cash_accounting = _require_mapping(cash.get("accounting"), "cash accounting")
         verify_formal_accounting(cash_accounting, product=product, initial_cash=initial, interval_start_ms=start, interval_end_ms=end, terminal_policy=terminal, metrics_contract=metrics)
+        cash_candles = _candles_from_accounting(cash_accounting, product)
+        validate_runtime_dataset_binding(dataset_evidence, cash_candles, product)
         cash_comparable = cash.get("vehicle") == "USDT_CASH_NO_TRADE" and cash.get("comparable") is True
         if not cash_comparable:
             raise ValueError("cash benchmark comparability is invalid")
@@ -569,6 +669,8 @@ def validate_persisted_qualification_semantics(
         passive = _require_mapping(passive_value, "passive benchmark")
         passive_accounting = _require_mapping(passive.get("accounting"), "passive accounting")
         verify_formal_accounting(passive_accounting, product=product, initial_cash=initial, interval_start_ms=start, interval_end_ms=end, terminal_policy=terminal, metrics_contract=metrics)
+        passive_candles = _candles_from_accounting(passive_accounting, product)
+        validate_runtime_dataset_binding(dataset_evidence, passive_candles, product)
         passive_comparable = passive.get("vehicle") == comparison.get("benchmark_vehicle") and passive.get("comparable") is True
         if not passive_comparable:
             raise ValueError("passive benchmark comparability is invalid")
@@ -592,6 +694,9 @@ def validate_persisted_qualification_semantics(
                 raise ValueError("random trial vehicle/kind mismatch")
             accounting = _require_mapping(trial.get("accounting"), "random accounting")
             identity = _require_mapping(accounting.get("formal_run_identity"), "random run identity")
+            trial_candles = _candles_from_accounting(accounting, product)
+            validate_runtime_dataset_binding(dataset_evidence, trial_candles, product)
+            validate_formal_run_identity_binding(run_identity, identity)
             verify_formal_accounting(accounting, product=product, initial_cash=initial, interval_start_ms=start, interval_end_ms=end, terminal_policy=terminal, metrics_contract=metrics)
             expected_trial_run_id = "economic-run-result@" + canonical_sha256(
                 {"run_identity": dict(identity), "accounting": dict(accounting)}
