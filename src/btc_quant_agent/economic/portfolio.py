@@ -3,6 +3,7 @@ from __future__ import annotations
 import math
 from collections.abc import Sequence
 from dataclasses import dataclass, field
+from typing import Any
 
 from .trade_event import TradeAction, TradeEvent
 
@@ -91,6 +92,7 @@ class Portfolio:
         decision_timestamp_ms: int | None = None,
         order_timestamp_ms: int | None = None,
         settlement_timestamp_ms: int | None = None,
+        metadata: dict[str, Any] | None = None,
     ) -> TradeEvent:
         self._validate_event_input(timestamp_ms, asset)
         action = TradeAction(action)
@@ -136,6 +138,8 @@ class Portfolio:
             else None
         )
         # Validate the proposed state and event BEFORE committing either.
+        event_metadata = dict(metadata or {})
+        event_metadata["asset"] = asset
         event = TradeEvent(
             timestamp_ms=timestamp_ms,
             action=action,
@@ -152,7 +156,7 @@ class Portfolio:
             decision_timestamp_ms=decision_timestamp_ms,
             order_timestamp_ms=order_timestamp_ms,
             settlement_timestamp_ms=settlement_timestamp_ms,
-            metadata={"asset": asset},
+            metadata=event_metadata,
         )
         if new_position is None:
             self.positions.pop(asset, None)
@@ -219,6 +223,7 @@ class Portfolio:
                     decision_timestamp_ms=event.decision_timestamp_ms,
                     order_timestamp_ms=event.order_timestamp_ms,
                     settlement_timestamp_ms=event.settlement_timestamp_ms,
+                    metadata={k: v for k, v in event.metadata.items() if k != "asset"},
                 )
             if actual.to_dict() != event.to_dict():
                 raise ValueError("Restored event disagrees with replayed ledger")

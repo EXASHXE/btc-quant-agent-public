@@ -3,16 +3,24 @@ from __future__ import annotations
 import math
 from collections.abc import Sequence
 from dataclasses import dataclass
+from enum import StrEnum
 from typing import Any
 
 from ..domain import Candle
-from .fee_model import FeeModel
+from .fee_model import FeeModel, SlippageMode
 from .policy import OrderType
 
 
 def _finite(value: float, name: str) -> None:
     if not math.isfinite(value):
         raise ValueError(f"{name} must be finite")
+
+
+class ConditionalTriggerTime(StrEnum):
+    """The only trigger-time claims supported by the OHLC execution contract."""
+
+    BAR_OPEN_KNOWN = "BAR_OPEN_KNOWN"
+    INTRABAR_UNKNOWN = "INTRABAR_UNKNOWN"
 
 
 @dataclass(frozen=True)
@@ -89,6 +97,147 @@ class ExecutionModel:
         self.exchange_latency_ms = exchange_latency_ms
         self.limit_fill_prob_on_touch = limit_fill_prob_on_touch
 
+    def simulate_conditional_market_fill(
+        self,
+        *,
+        armed_timestamp_ms: int,
+        trigger_observation_timestamp_ms: int,
+        side: int,
+        desired_quantity: float,
+        reference_price: float,
+        trigger_bar: Candle,
+        trigger_time: ConditionalTriggerTime,
+        current_spread_bps: float | None = None,
+    ) -> ExecutionResult:
+        """Fill a standing stop/target without converting it to a close-time order.
+
+        The order/decision timestamp is when the conditional was armed. For an
+        OHLC-only intrabar touch, the exact trigger time is deliberately not
+        reconstructed: the bar close is used as the latest observable fill
+        timestamp while the economic fill reference remains the standing trigger
+        level. A gap trigger has known bar-open time and uses the actual open.
+        """
+        trigger_time = ConditionalTriggerTime(trigger_time)
+        if type(armed_timestamp_ms) is not int or armed_timestamp_ms <= 0:
+            raise ValueError("armed_timestamp_ms must be a positive integer")
+        if (
+            type(trigger_observation_timestamp_ms) is not int
+            or trigger_observation_timestamp_ms <= 0
+        ):
+            raise ValueError("trigger_observation_timestamp_ms must be a positive integer")
+        if armed_timestamp_ms > trigger_bar.open_time_ms:
+            raise ValueError("standing conditional must be armed no later than trigger bar open")
+        if not math.isfinite(reference_price) or reference_price <= 0:
+            raise ValueError("reference_price must be finite and positive")
+        if current_spread_bps is not None and (
+            not math.isfinite(current_spread_bps) or current_spread_bps < 0
+        ):
+            raise ValueError("current_spread_bps must be finite and nonnegative when provided")
+
+        if trigger_time == ConditionalTriggerTime.BAR_OPEN_KNOWN:
+            if trigger_observation_timestamp_ms != trigger_bar.open_time_ms:
+                raise ValueError("BAR_OPEN_KNOWN trigger must be observed at bar open")
+            if not math.isclose(reference_price, trigger_bar.open, rel_tol=0.0, abs_tol=1e-12):
+                raise ValueError("BAR_OPEN_KNOWN trigger must use the actual bar open")
+        elif trigger_observation_timestamp_ms != trigger_bar.close_time_ms:
+            raise ValueError("INTRABAR_UNKNOWN trigger must be observed at bar close")
+
+        fill_timestamp_ms = trigger_observation_timestamp_ms
+        if desired_quantity <= 0 or not math.isfinite(desired_quantity):
+            return ExecutionResult(
+                signal_timestamp_ms=armed_timestamp_ms,
+                order_timestamp_ms=armed_timestamp_ms,
+                fill_timestamp_ms=fill_timestamp_ms,
+                fill_price=0.0,
+                filled_quantity=0.0,
+                is_filled=False,
+                side=side,
+                observation_timestamp_ms=armed_timestamp_ms,
+                decision_timestamp_ms=armed_timestamp_ms,
+                settlement_timestamp_ms=fill_timestamp_ms,
+                rejection_reason="INVALID_QUANTITY",
+            )
+        if side not in (-1, 1):
+            return ExecutionResult(
+                signal_timestamp_ms=armed_timestamp_ms,
+                order_timestamp_ms=armed_timestamp_ms,
+                fill_timestamp_ms=fill_timestamp_ms,
+                fill_price=0.0,
+                filled_quantity=0.0,
+                is_filled=False,
+                side=side,
+                observation_timestamp_ms=armed_timestamp_ms,
+                decision_timestamp_ms=armed_timestamp_ms,
+                settlement_timestamp_ms=fill_timestamp_ms,
+                rejection_reason="INVALID_SIDE",
+            )
+        if not math.isfinite(trigger_bar.volume) or trigger_bar.volume <= 0:
+            return ExecutionResult(
+                signal_timestamp_ms=armed_timestamp_ms,
+                order_timestamp_ms=armed_timestamp_ms,
+                fill_timestamp_ms=fill_timestamp_ms,
+                fill_price=0.0,
+                filled_quantity=0.0,
+                is_filled=False,
+                side=side,
+                observation_timestamp_ms=armed_timestamp_ms,
+                decision_timestamp_ms=armed_timestamp_ms,
+                settlement_timestamp_ms=fill_timestamp_ms,
+                rejection_reason="INSUFFICIENT_LIQUIDITY",
+            )
+
+        execution_spread_bps = current_spread_bps
+        if self.fee_model.slippage_mode == SlippageMode.SPREAD_AND_IMPACT:
+            # Exact trigger-time liquidity/impact is unavailable in OHLC data.
+            # Use the declared all-in adverse scenario rather than allowing the
+            # completed bar's future volume to make a standing fill cheaper.
+            if self.fee_model.max_slippage_bps is None:
+                raise ValueError(
+                    "SPREAD_AND_IMPACT standing conditionals require a declared "
+                    "max_slippage_bps adverse scenario"
+                )
+            execution_spread_bps = None
+
+        fill_price = self.fee_model.effective_fill_price(
+            reference_price=reference_price,
+            quantity=desired_quantity,
+            side=side,
+            is_maker=False,
+            current_spread_bps=execution_spread_bps,
+            bar_volume_base=trigger_bar.volume,
+        )
+        slippage_cost = abs(fill_price - reference_price) * desired_quantity
+        fee_usdt = self.fee_model.calculate_fee(fill_price * desired_quantity, is_maker=False)
+        spread_source = (
+            "DECLARED_MAX_SLIPPAGE_SCENARIO"
+            if self.fee_model.slippage_mode == SlippageMode.SPREAD_AND_IMPACT
+            else "NOT_USED"
+        )
+
+        return ExecutionResult(
+            signal_timestamp_ms=armed_timestamp_ms,
+            order_timestamp_ms=armed_timestamp_ms,
+            fill_timestamp_ms=fill_timestamp_ms,
+            fill_price=fill_price,
+            filled_quantity=desired_quantity,
+            is_filled=True,
+            side=side,
+            observation_timestamp_ms=armed_timestamp_ms,
+            decision_timestamp_ms=armed_timestamp_ms,
+            settlement_timestamp_ms=fill_timestamp_ms,
+            is_maker=False,
+            fee_usdt=fee_usdt,
+            slippage_usdt=slippage_cost,
+            metadata={
+                "ref_price": reference_price,
+                "standing_order_armed_ms": armed_timestamp_ms,
+                "trigger_observation_timestamp_ms": trigger_observation_timestamp_ms,
+                "trigger_time_semantics": trigger_time.value,
+                "spread_evidence": spread_source,
+                "causal_spread_bps": current_spread_bps,
+            },
+        )
+
     def simulate_order(
         self,
         signal_timestamp_ms: int,
@@ -98,14 +247,19 @@ class ExecutionModel:
         future_candles: Sequence[Candle],
         limit_price: float | None = None,
         time_in_force_ms: int = 60_000,
-        current_spread_bps: float = 1.0,
+        current_spread_bps: float | None = None,
         observation_timestamp_ms: int | None = None,
+        max_fill_notional: float | None = None,
     ) -> ExecutionResult:
         obs_ts = observation_timestamp_ms if observation_timestamp_ms is not None else signal_timestamp_ms
         if obs_ts > signal_timestamp_ms:
             raise ValueError(
                 f"observation_timestamp_ms ({obs_ts}) cannot be after signal_timestamp_ms ({signal_timestamp_ms})"
             )
+        if max_fill_notional is not None and (
+            not math.isfinite(max_fill_notional) or max_fill_notional <= 0
+        ):
+            raise ValueError("max_fill_notional must be finite and positive when provided")
 
         order_timestamp_ms = signal_timestamp_ms + self.decision_latency_ms
         dec_ts = order_timestamp_ms
@@ -212,16 +366,36 @@ class ExecutionModel:
                 current_spread_bps=current_spread_bps,
                 bar_volume_base=fill_bar.volume,
             )
-            slippage_cost = abs(fill_price - ref_price) * desired_quantity
-            notional = fill_price * desired_quantity
+            filled_quantity = desired_quantity
+            notional_cap_applied = False
+            if (
+                max_fill_notional is not None
+                and fill_price * filled_quantity > max_fill_notional
+            ):
+                # The economic order is bounded by the notional reserved at
+                # admission. Price movement may reduce filled base quantity,
+                # but can never turn an admitted order into a gross-cap breach.
+                filled_quantity = max_fill_notional / fill_price
+                notional_cap_applied = True
+
+            slippage_cost = abs(fill_price - ref_price) * filled_quantity
+            notional = fill_price * filled_quantity
             fee_usdt = self.fee_model.calculate_fee(notional=notional, is_maker=False)
+            if self.fee_model.slippage_mode == SlippageMode.SPREAD_AND_IMPACT:
+                spread_source = (
+                    "CAUSAL_SPREAD"
+                    if current_spread_bps is not None
+                    else "DECLARED_MAX_SLIPPAGE_SCENARIO"
+                )
+            else:
+                spread_source = "NOT_USED"
 
             return ExecutionResult(
                 signal_timestamp_ms=signal_timestamp_ms,
                 order_timestamp_ms=order_timestamp_ms,
                 fill_timestamp_ms=actual_fill_time_ms,
                 fill_price=fill_price,
-                filled_quantity=desired_quantity,
+                filled_quantity=filled_quantity,
                 is_filled=True,
                 side=side,
                 is_maker=False,
@@ -230,7 +404,14 @@ class ExecutionModel:
                 observation_timestamp_ms=obs_ts,
                 decision_timestamp_ms=dec_ts,
                 settlement_timestamp_ms=actual_fill_time_ms,
-                metadata={"ref_price": ref_price, "candle_open_ms": fill_bar.open_time_ms},
+                metadata={
+                    "ref_price": ref_price,
+                    "candle_open_ms": fill_bar.open_time_ms,
+                    "spread_evidence": spread_source,
+                    "requested_quantity": desired_quantity,
+                    "max_fill_notional": max_fill_notional,
+                    "notional_cap_applied": notional_cap_applied,
+                },
             )
 
         elif order_type == OrderType.LIMIT:

@@ -6,7 +6,7 @@ from dataclasses import dataclass, field
 from typing import Any
 
 from ..domain import Candle
-from .execution_model import ExecutionModel
+from .execution_model import ConditionalTriggerTime, ExecutionModel
 from .fee_model import FeeModel
 from .funding import FundingModel, FundingSettlement
 from .policy import OrderType, TradePolicy
@@ -16,7 +16,7 @@ from .trade_event import TradeAction, TradeEvent
 
 
 class AmbiguousExitRejectionError(RuntimeError):
-    """Raised when an ambiguous intrabar SL/TP collision occurs under REJECT_AMBIGUOUS policy."""
+    """Raised when OHLC data cannot resolve a material intrabar exit ordering."""
 
 
 @dataclass(frozen=True)
@@ -137,6 +137,7 @@ class EconomicSimulationEngine:
         active_trade_entry_price: float | None = None
         active_trade_peak_price: float | None = None
         active_trade_trough_price: float | None = None
+        active_trailing_armed_time: int | None = None
         active_signal_id: str = ""
 
         trades_completed = 0
@@ -151,6 +152,7 @@ class EconomicSimulationEngine:
             """Apply confirmed fill to portfolio ledger unconditionally (AR4)."""
             nonlocal active_trade_entry_time, active_trade_entry_price
             nonlocal active_trade_peak_price, active_trade_trough_price
+            nonlocal active_trailing_armed_time
             nonlocal active_signal_id, trades_completed, winning_trades
             nonlocal losing_trades, gross_pnl_accum
 
@@ -169,12 +171,14 @@ class EconomicSimulationEngine:
                 decision_timestamp_ms=pf["decision_timestamp_ms"],
                 order_timestamp_ms=pf["order_timestamp_ms"],
                 settlement_timestamp_ms=pf["settlement_timestamp_ms"],
+                metadata=pf.get("metadata"),
             )
             if is_open:
                 active_trade_entry_time = pf["fill_timestamp_ms"]
                 active_trade_entry_price = pf["price"]
                 active_trade_peak_price = pf["price"]
                 active_trade_trough_price = pf["price"]
+                active_trailing_armed_time = pf["fill_timestamp_ms"]
                 active_signal_id = pf["signal_id"]
             else:
                 trades_completed += 1
@@ -187,6 +191,7 @@ class EconomicSimulationEngine:
                 active_trade_entry_price = None
                 active_trade_peak_price = None
                 active_trade_trough_price = None
+                active_trailing_armed_time = None
                 active_signal_id = ""
 
             _update_drawdown(portfolio.total_equity({sym: pf["price"]}))
@@ -200,7 +205,7 @@ class EconomicSimulationEngine:
             candle_index: int,
             trade_id: str,
             signal_id: str,
-            current_spread_bps: float = 0.0,
+            current_spread_bps: float | None = None,
         ) -> bool:
             """Unified exit execution adapter routing every economic exit through ExecutionModel (AR6)."""
             exec_res = self.execution_model.simulate_order(
@@ -229,9 +234,61 @@ class EconomicSimulationEngine:
                 "order_timestamp_ms": exec_res.order_timestamp_ms,
                 "settlement_timestamp_ms": exec_res.settlement_timestamp_ms,
                 "reservation_notional": 0.0,
+                "metadata": dict(exec_res.metadata or {}),
             }
             if exec_res.fill_timestamp_ms <= trigger_timestamp_ms:
                 _apply_fill(fill_info, candles[candle_index].symbol)
+            else:
+                pending_fills.append(fill_info)
+            return True
+
+        def _execute_conditional_exit(
+            *,
+            action: TradeAction,
+            side: int,
+            quantity: float,
+            armed_timestamp_ms: int,
+            trigger_observation_timestamp_ms: int,
+            candle_index: int,
+            reference_price: float,
+            trigger_time: ConditionalTriggerTime,
+            trade_id: str,
+            signal_id: str,
+            current_spread_bps: float | None = None,
+        ) -> bool:
+            """Route a pre-armed conditional through the unified execution model."""
+            trigger_bar = candles[candle_index]
+            exec_res = self.execution_model.simulate_conditional_market_fill(
+                armed_timestamp_ms=armed_timestamp_ms,
+                trigger_observation_timestamp_ms=trigger_observation_timestamp_ms,
+                side=side,
+                desired_quantity=quantity,
+                reference_price=reference_price,
+                trigger_bar=trigger_bar,
+                trigger_time=trigger_time,
+                current_spread_bps=current_spread_bps,
+            )
+            if not exec_res.is_filled:
+                return False
+
+            fill_info = {
+                "fill_timestamp_ms": exec_res.fill_timestamp_ms,
+                "action": action,
+                "asset": trigger_bar.symbol,
+                "price": exec_res.fill_price,
+                "quantity": exec_res.filled_quantity,
+                "fee_usdt": exec_res.fee_usdt,
+                "signal_id": signal_id,
+                "trade_id": trade_id,
+                "observation_timestamp_ms": exec_res.observation_timestamp_ms,
+                "decision_timestamp_ms": exec_res.decision_timestamp_ms,
+                "order_timestamp_ms": exec_res.order_timestamp_ms,
+                "settlement_timestamp_ms": exec_res.settlement_timestamp_ms,
+                "reservation_notional": 0.0,
+                "metadata": dict(exec_res.metadata or {}),
+            }
+            if exec_res.fill_timestamp_ms <= trigger_bar.open_time_ms:
+                _apply_fill(fill_info, trigger_bar.symbol)
             else:
                 pending_fills.append(fill_info)
             return True
@@ -297,7 +354,12 @@ class EconomicSimulationEngine:
                     ):
                         act = TradeAction.CLOSE_LONG if curr_pos_qty > 0 else TradeAction.CLOSE_SHORT
                         exit_side = -1 if curr_pos_qty > 0 else 1
-                        rev_spread = float(sig.metadata["spread_bps"]) if "spread_bps" in sig.metadata else 0.0
+                        rev_spread: float | None = None
+                        if "spread_bps" in sig.metadata:
+                            try:
+                                rev_spread = float(sig.metadata["spread_bps"])
+                            except (ValueError, TypeError):
+                                rev_spread = float("nan")
                         _execute_exit(
                             action=act,
                             side=exit_side,
@@ -392,7 +454,7 @@ class EconomicSimulationEngine:
                     ex_ante_price = self.execution_model.fee_model.worst_case_price_bound(
                         reference_price=bar.open,
                         side=side,
-                        current_spread_bps=spread_bps if spread_bps is not None else 0.0,
+                        current_spread_bps=spread_bps,
                     )
 
                 # AR3, AR4: If no finite deterministic ex-ante bound exists, fail closed before submission
@@ -418,8 +480,13 @@ class EconomicSimulationEngine:
                     future_candles=candles[i:],
                     limit_price=lim_price,
                     time_in_force_ms=self.policy.entry_rule.time_in_force_ms,
-                    current_spread_bps=spread_bps if spread_bps is not None else 1.0,
+                    current_spread_bps=spread_bps,
                     observation_timestamp_ms=sig.timestamp_ms,
+                    max_fill_notional=(
+                        order_gross
+                        if self.policy.entry_rule.order_type == OrderType.MARKET
+                        else None
+                    ),
                 )
                 if exec_res.is_filled:
                     act = TradeAction.OPEN_LONG if side == 1 else TradeAction.OPEN_SHORT
@@ -437,40 +504,202 @@ class EconomicSimulationEngine:
                         "order_timestamp_ms": exec_res.order_timestamp_ms,
                         "settlement_timestamp_ms": exec_res.settlement_timestamp_ms,
                         "reservation_notional": order_gross,
+                        "metadata": {
+                            **dict(exec_res.metadata or {}),
+                            "reservation_notional": order_gross,
+                        },
                     }
                     if exec_res.fill_timestamp_ms <= bar.open_time_ms:
                         _apply_fill(fill_info, bar.symbol)
                     else:
                         pending_fills.append(fill_info)
 
-            # 4. Check gap exits at bar.open_time_ms for position open at start (AR6: route through _execute_exit)
+            # 4. Gap conditionals use observable opening-price evidence. The
+            # order was armed before the bar path, so post-signal latency does not apply.
             pos_qty = portfolio.get_position_quantity(bar.symbol)
-            if abs(pos_qty) > 1e-12 and active_trade_entry_price is not None and not _has_pending_exit(bar.symbol):
+            if (
+                abs(pos_qty) > 1e-12
+                and active_trade_entry_price is not None
+                and active_trade_entry_time is not None
+                and not _has_pending_exit(bar.symbol)
+            ):
                 is_long = pos_qty > 0
-                gap_exit = False
+                gap_reason = ""
+                gap_armed_time = active_trade_entry_time
                 if self.policy.exit_rule.stop_loss_pct is not None:
                     sl_pct = self.policy.exit_rule.stop_loss_pct
                     if is_long:
                         sl_level = active_trade_entry_price * (1.0 - sl_pct)
                         if bar.open <= sl_level:
-                            gap_exit = True
+                            gap_reason = "STOP_LOSS"
                     else:
                         sl_level = active_trade_entry_price * (1.0 + sl_pct)
                         if bar.open >= sl_level:
-                            gap_exit = True
+                            gap_reason = "STOP_LOSS"
 
-                if gap_exit:
+                if self.policy.exit_rule.trailing_stop_pct is not None:
+                    prior_peak = active_trade_peak_price or active_trade_entry_price
+                    prior_trough = active_trade_trough_price or active_trade_entry_price
+                    ts_pct = self.policy.exit_rule.trailing_stop_pct
+                    ts_level = (
+                        prior_peak * (1.0 - ts_pct)
+                        if is_long
+                        else prior_trough * (1.0 + ts_pct)
+                    )
+                    trailing_gap = bar.open <= ts_level if is_long else bar.open >= ts_level
+                    if trailing_gap and not gap_reason:
+                        gap_reason = "TRAILING_STOP"
+                        gap_armed_time = active_trailing_armed_time or active_trade_entry_time
+
+                if not gap_reason and self.policy.exit_rule.take_profit_pct is not None:
+                    tp_pct = self.policy.exit_rule.take_profit_pct
+                    tp_level = (
+                        active_trade_entry_price * (1.0 + tp_pct)
+                        if is_long
+                        else active_trade_entry_price * (1.0 - tp_pct)
+                    )
+                    target_gap = bar.open >= tp_level if is_long else bar.open <= tp_level
+                    if target_gap:
+                        gap_reason = "TAKE_PROFIT"
+
+                if gap_reason:
                     exit_act = TradeAction.CLOSE_LONG if is_long else TradeAction.CLOSE_SHORT
                     exit_side = -1 if is_long else 1
-                    _execute_exit(
+                    _execute_conditional_exit(
                         action=exit_act,
                         side=exit_side,
                         quantity=abs(pos_qty),
-                        trigger_timestamp_ms=bar.open_time_ms,
+                        armed_timestamp_ms=gap_armed_time,
+                        trigger_observation_timestamp_ms=bar.open_time_ms,
                         candle_index=i,
-                        trade_id=f"EXIT_GAP_{active_signal_id or bar.open_time_ms}",
+                        reference_price=bar.open,
+                        trigger_time=ConditionalTriggerTime.BAR_OPEN_KNOWN,
+                        trade_id=f"EXIT_GAP_{gap_reason}_{active_signal_id or bar.open_time_ms}",
                         signal_id=active_signal_id,
-                        current_spread_bps=0.0,
+                    )
+
+            # 5. Detect standing-order touches from the full OHLC bar. The
+            # price reference is the pre-armed level, never the later close.
+            standing_triggered = False
+            pos_qty = portfolio.get_position_quantity(bar.symbol)
+            if (
+                abs(pos_qty) > 1e-12
+                and active_trade_entry_price is not None
+                and active_trade_entry_time is not None
+                and active_trade_entry_time <= bar.open_time_ms
+                and not _has_pending_exit(bar.symbol)
+            ):
+                is_long = pos_qty > 0
+                adverse_triggers: list[tuple[str, float, int]] = []
+                tp_trigger: tuple[str, float, int] | None = None
+
+                if self.policy.exit_rule.stop_loss_pct is not None:
+                    sl_pct = self.policy.exit_rule.stop_loss_pct
+                    sl_level = (
+                        active_trade_entry_price * (1.0 - sl_pct)
+                        if is_long
+                        else active_trade_entry_price * (1.0 + sl_pct)
+                    )
+                    if (is_long and bar.low <= sl_level) or (
+                        not is_long and bar.high >= sl_level
+                    ):
+                        adverse_triggers.append(
+                            ("STOP_LOSS", sl_level, active_trade_entry_time)
+                        )
+
+                if self.policy.exit_rule.trailing_stop_pct is not None:
+                    prior_peak = active_trade_peak_price or active_trade_entry_price
+                    prior_trough = active_trade_trough_price or active_trade_entry_price
+                    ts_pct = self.policy.exit_rule.trailing_stop_pct
+                    ts_level = (
+                        prior_peak * (1.0 - ts_pct)
+                        if is_long
+                        else prior_trough * (1.0 + ts_pct)
+                    )
+                    if (is_long and bar.low <= ts_level) or (
+                        not is_long and bar.high >= ts_level
+                    ):
+                        adverse_triggers.append(
+                            (
+                                "TRAILING_STOP",
+                                ts_level,
+                                active_trailing_armed_time or active_trade_entry_time,
+                            )
+                        )
+
+                if self.policy.exit_rule.take_profit_pct is not None:
+                    tp_pct = self.policy.exit_rule.take_profit_pct
+                    tp_level = (
+                        active_trade_entry_price * (1.0 + tp_pct)
+                        if is_long
+                        else active_trade_entry_price * (1.0 - tp_pct)
+                    )
+                    if (is_long and bar.high >= tp_level) or (
+                        not is_long and bar.low <= tp_level
+                    ):
+                        tp_trigger = ("TAKE_PROFIT", tp_level, active_trade_entry_time)
+
+                chosen_trigger: tuple[str, float, int] | None = None
+                if adverse_triggers:
+                    # If multiple adverse stops touched, select the worse price
+                    # symmetrically: lowest for LONG, highest for SHORT.
+                    chosen_trigger = (
+                        min(adverse_triggers, key=lambda item: item[1])
+                        if is_long
+                        else max(adverse_triggers, key=lambda item: item[1])
+                    )
+                    if tp_trigger is not None:
+                        if self.policy.exit_rule.ambiguous_exit_handling == "REJECT_AMBIGUOUS":
+                            raise AmbiguousExitRejectionError(
+                                f"Ambiguous exit collision at bar close_time_ms={bar.close_time_ms}: "
+                                f"both an adverse stop and Take Profit triggered in the same "
+                                f"candle for {bar.symbol}"
+                            )
+                        chosen_trigger = (
+                            f"{chosen_trigger[0]}_COLLISION",
+                            chosen_trigger[1],
+                            chosen_trigger[2],
+                        )
+                elif tp_trigger is not None:
+                    chosen_trigger = tp_trigger
+
+                if chosen_trigger is not None:
+                    standing_triggered = True
+                    ambiguous_funding = next(
+                        (
+                            event
+                            for event in sorted_funding[fund_idx:]
+                            if bar.open_time_ms < event.timestamp_ms <= bar.close_time_ms
+                            and self.funding_model.calculate_cashflow(
+                                position_quantity=pos_qty,
+                                mark_price=event.mark_price,
+                                funding_rate=event.funding_rate,
+                            )
+                            != 0.0
+                        ),
+                        None,
+                    )
+                    if ambiguous_funding is not None:
+                        raise AmbiguousExitRejectionError(
+                            "Ambiguous trigger/funding ordering for standing exit in "
+                            f"{bar.symbol} bar [{bar.open_time_ms}, {bar.close_time_ms}] "
+                            f"with funding at {ambiguous_funding.timestamp_ms}"
+                        )
+
+                    exit_reason, reference_price, armed_time = chosen_trigger
+                    exit_act = TradeAction.CLOSE_LONG if is_long else TradeAction.CLOSE_SHORT
+                    exit_side = -1 if is_long else 1
+                    _execute_conditional_exit(
+                        action=exit_act,
+                        side=exit_side,
+                        quantity=abs(pos_qty),
+                        armed_timestamp_ms=armed_time,
+                        trigger_observation_timestamp_ms=bar.close_time_ms,
+                        candle_index=i,
+                        reference_price=reference_price,
+                        trigger_time=ConditionalTriggerTime.INTRABAR_UNKNOWN,
+                        trade_id=f"EXIT_{exit_reason}_{active_signal_id or bar.close_time_ms}",
+                        signal_id=active_signal_id,
                     )
 
             # -------------------------------------------------------------
@@ -526,7 +755,8 @@ class EconomicSimulationEngine:
                         mark_price=fevent.mark_price,
                     )
 
-            # 2. Check position exits during this bar (Stop Loss / Take Profit / Trailing / Expiry)
+            # 2. Deterministic close-time expiry remains a discretionary market
+            # exit. Conditional touches were already handled as standing orders.
             pos_qty = portfolio.get_position_quantity(bar.symbol)
             if (
                 abs(pos_qty) > 1e-12
@@ -536,87 +766,7 @@ class EconomicSimulationEngine:
             ):
                 is_long = pos_qty > 0
                 holding_duration = bar.close_time_ms - active_trade_entry_time
-
-                prior_peak = active_trade_peak_price if active_trade_peak_price is not None else active_trade_entry_price
-                prior_trough = active_trade_trough_price if active_trade_trough_price is not None else active_trade_entry_price
-
-                sl_triggered = False
-                tp_triggered = False
-
-                if self.policy.exit_rule.stop_loss_pct is not None:
-                    sl_pct = self.policy.exit_rule.stop_loss_pct
-                    if is_long:
-                        sl_level = active_trade_entry_price * (1.0 - sl_pct)
-                        if bar.low <= sl_level:
-                            sl_triggered = True
-                    else:
-                        sl_level = active_trade_entry_price * (1.0 + sl_pct)
-                        if bar.high >= sl_level:
-                            sl_triggered = True
-
-                if self.policy.exit_rule.take_profit_pct is not None:
-                    tp_pct = self.policy.exit_rule.take_profit_pct
-                    if is_long:
-                        tp_level = active_trade_entry_price * (1.0 + tp_pct)
-                        if bar.high >= tp_level:
-                            tp_triggered = True
-                    else:
-                        tp_level = active_trade_entry_price * (1.0 - tp_pct)
-                        if bar.low <= tp_level:
-                            tp_triggered = True
-
-                ts_triggered = False
-                if not sl_triggered and not tp_triggered and self.policy.exit_rule.trailing_stop_pct is not None:
-                    ts_pct = self.policy.exit_rule.trailing_stop_pct
-                    if is_long:
-                        ts_level = prior_peak * (1.0 - ts_pct)
-                        if bar.low <= ts_level:
-                            ts_triggered = True
-                    else:
-                        ts_level = prior_trough * (1.0 + ts_pct)
-                        if bar.high >= ts_level:
-                            ts_triggered = True
-
-                time_triggered = False
-                if (
-                    not sl_triggered
-                    and not tp_triggered
-                    and not ts_triggered
-                    and holding_duration >= self.policy.exit_rule.max_holding_ms
-                ):
-                    time_triggered = True
-
-                # AR5: Ambiguous collision handling
-                if sl_triggered and tp_triggered:
-                    if self.policy.exit_rule.ambiguous_exit_handling == "REJECT_AMBIGUOUS":
-                        raise AmbiguousExitRejectionError(
-                            f"Ambiguous exit collision at bar close_time_ms={bar.close_time_ms}: "
-                            f"both Stop Loss and Take Profit triggered in the same candle for {bar.symbol}"
-                        )
-                    # CONSERVATIVE_STOP_FIRST: stop loss takes precedence
-                    exit_triggered = True
-                    exit_reason = "STOP_LOSS_COLLISION"
-                elif sl_triggered:
-                    exit_triggered = True
-                    exit_reason = "STOP_LOSS"
-                elif tp_triggered:
-                    exit_triggered = True
-                    exit_reason = "TAKE_PROFIT"
-                elif ts_triggered:
-                    exit_triggered = True
-                    exit_reason = "TRAILING_STOP"
-                elif time_triggered:
-                    exit_triggered = True
-                    exit_reason = "MAX_HOLDING"
-                else:
-                    exit_triggered = False
-                    exit_reason = ""
-
-                if not exit_triggered:
-                    active_trade_peak_price = max(prior_peak, bar.high)
-                    active_trade_trough_price = min(prior_trough, bar.low)
-                else:
-                    # AR6: All exits route through ExecutionModel via unified adapter
+                if holding_duration >= self.policy.exit_rule.max_holding_ms:
                     exit_action = TradeAction.CLOSE_LONG if is_long else TradeAction.CLOSE_SHORT
                     exit_side = -1 if is_long else 1
                     _execute_exit(
@@ -625,10 +775,23 @@ class EconomicSimulationEngine:
                         quantity=abs(pos_qty),
                         trigger_timestamp_ms=bar.close_time_ms,
                         candle_index=i,
-                        trade_id=f"EXIT_{exit_reason}_{active_signal_id or bar.close_time_ms}",
+                        trade_id=f"EXIT_MAX_HOLDING_{active_signal_id or bar.close_time_ms}",
                         signal_id=active_signal_id,
-                        current_spread_bps=0.0,
                     )
+
+                if (
+                    not standing_triggered
+                    and active_trade_entry_time is not None
+                    and active_trade_entry_price is not None
+                    and abs(portfolio.get_position_quantity(bar.symbol)) > 1e-12
+                    and active_trade_entry_time <= bar.open_time_ms
+                    and not _has_pending_exit(bar.symbol)
+                ):
+                    prior_peak = active_trade_peak_price or active_trade_entry_price
+                    prior_trough = active_trade_trough_price or active_trade_entry_price
+                    active_trade_peak_price = max(prior_peak, bar.high)
+                    active_trade_trough_price = min(prior_trough, bar.low)
+                    active_trailing_armed_time = bar.close_time_ms
 
             # 3. Pending fills at bar.close_time_ms
             pending_fills.sort(key=lambda x: x["fill_timestamp_ms"])

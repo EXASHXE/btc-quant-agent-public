@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from .benchmarks import BenchmarkEngine, BenchmarkResult
-from .execution_model import ExecutionModel, ExecutionResult
+from .execution_model import ConditionalTriggerTime, ExecutionModel, ExecutionResult
 from .fee_model import FeeModel, SlippageMode
 from .funding import FundingModel, FundingSettlement
 from .policy import (
@@ -21,6 +21,7 @@ from .trade_event import TradeAction, TradeEvent
 
 __all__ = [
     "AmbiguousExitRejectionError",
+    "ConditionalTriggerTime",
     "BenchmarkEngine",
     "BenchmarkResult",
     "EconomicSimulationEngine",

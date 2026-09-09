@@ -26,7 +26,7 @@ def _bar(
     open_time_ms: int = 1000,
     o: float = 100.0,
     h: float | None = None,
-    l: float | None = None,
+    low: float | None = None,
     c: float = 100.0,
     volume: float = 1000.0,
     quote_volume: float = 0.0,
@@ -34,7 +34,7 @@ def _bar(
     symbol: str = "BTCUSDT",
 ) -> Candle:
     high = max(h if h is not None else max(o, c), o, c)
-    low = min(l if l is not None else min(o, c), o, c)
+    low_price = min(low if low is not None else min(o, c), o, c)
     return Candle(
         symbol=symbol,
         interval="1s",
@@ -42,7 +42,7 @@ def _bar(
         close_time_ms=open_time_ms + duration - 1,
         open=o,
         high=high,
-        low=low,
+        low=low_price,
         close=c,
         volume=volume,
         quote_volume=quote_volume,
@@ -356,7 +356,7 @@ def test_ar5_ambiguous_collision_reject_ambiguous_long() -> None:
     engine = EconomicSimulationEngine(policy=policy, execution_model=ZERO_LATENCY, fee_model=ZERO_FEES)
     bars = [
         _bar(1000, o=100.0, c=100.0),
-        _bar(2000, o=100.0, h=110.0, l=90.0, c=95.0),  # both 105 TP and 95 SL touched
+        _bar(2000, o=100.0, h=110.0, low=90.0, c=95.0),  # both 105 TP and 95 SL touched
     ]
     with pytest.raises(AmbiguousExitRejectionError, match="Ambiguous exit collision"):
         engine.simulate(candles=bars, signals=[_sig(1000, direction=1)])
@@ -377,7 +377,7 @@ def test_ar5_ambiguous_collision_reject_ambiguous_short() -> None:
     engine = EconomicSimulationEngine(policy=policy, execution_model=ZERO_LATENCY, fee_model=ZERO_FEES)
     bars = [
         _bar(1000, o=100.0, c=100.0),
-        _bar(2000, o=100.0, h=110.0, l=90.0, c=105.0),  # short: 95 TP and 105 SL touched
+        _bar(2000, o=100.0, h=110.0, low=90.0, c=105.0),  # short: 95 TP and 105 SL touched
     ]
     with pytest.raises(AmbiguousExitRejectionError, match="Ambiguous exit collision"):
         engine.simulate(candles=bars, signals=[_sig(1000, direction=-1)])
@@ -400,7 +400,7 @@ def test_ar5_ambiguous_collision_conservative_stop_first_both_sides() -> None:
     # Long collision: closes as CLOSE_LONG with stop loss
     bars_long = [
         _bar(1000, o=100.0, c=100.0),
-        _bar(2000, o=100.0, h=110.0, l=90.0, c=95.0),
+        _bar(2000, o=100.0, h=110.0, low=90.0, c=95.0),
     ]
     res_long = engine.simulate(candles=bars_long, signals=[_sig(1000, direction=1)])
     assert res_long.total_trades == 1
@@ -410,7 +410,7 @@ def test_ar5_ambiguous_collision_conservative_stop_first_both_sides() -> None:
     # Short collision: closes as CLOSE_SHORT with stop loss
     bars_short = [
         _bar(1000, o=100.0, c=100.0),
-        _bar(2000, o=100.0, h=110.0, l=90.0, c=105.0),
+        _bar(2000, o=100.0, h=110.0, low=90.0, c=105.0),
     ]
     res_short = engine.simulate(candles=bars_short, signals=[_sig(1000, direction=-1)])
     assert res_short.total_trades == 1
@@ -449,7 +449,7 @@ def test_ar6_all_six_exit_types_traverse_execution_adapter() -> None:
     p_sl = TradePolicy(policy_id="EXIT_3", name="SL", exit_rule=ExitRule(stop_loss_pct=0.05))
     eng_sl = EconomicSimulationEngine(policy=p_sl, execution_model=ZERO_LATENCY, fee_model=ZERO_FEES)
     res_sl = eng_sl.simulate(
-        candles=[_bar(1000, o=100.0, c=100.0), _bar(2000, o=100.0, l=90.0, c=95.0)],
+        candles=[_bar(1000, o=100.0, c=100.0), _bar(2000, o=100.0, low=90.0, c=95.0)],
         signals=[_sig(1000)],
     )
     assert len(res_sl.trade_events) == 2
@@ -471,7 +471,7 @@ def test_ar6_all_six_exit_types_traverse_execution_adapter() -> None:
     res_ts = eng_ts.simulate(
         candles=[
             _bar(1000, o=100.0, c=120.0),  # Peak = 120
-            _bar(2000, o=120.0, l=110.0, c=114.0),  # Trailing stop 5% of 120 = 114
+            _bar(2000, o=120.0, low=110.0, c=114.0),  # Trailing stop 5% of 120 = 114
         ],
         signals=[_sig(1000)],
     )
@@ -527,21 +527,24 @@ def test_ar6_exit_slippage_and_fee_applied_through_execution_model() -> None:
     )
     bars = [
         _bar(1000, o=100.0, c=100.0),
-        _bar(2000, o=100.0, l=90.0, c=95.0),
+        _bar(2000, o=100.0, low=90.0, c=95.0),
     ]
     summary = engine.simulate(candles=bars, signals=[_sig(1000)])
 
     assert len(summary.trade_events) == 2
+    entry_event = summary.trade_events[0]
     exit_event = summary.trade_events[1]
-    # LONG exit sells: price suffers downward slippage 95 * (1 - 0.001) = 94.905
-    assert exit_event.price == pytest.approx(94.905, abs=1e-3)
+    # The standing stop is armed from the actual 100.1 entry fill, then the
+    # LONG exit sells at that 95% stop reference with adverse slippage.
+    stop_reference = entry_event.price * 0.95
+    assert exit_event.price == pytest.approx(stop_reference * (1 - 0.001), abs=1e-9)
     # Taker fee is charged on exit notional
     expected_fee = exit_event.price * exit_event.quantity * 0.0005
     assert exit_event.fee_usdt == pytest.approx(expected_fee, abs=1e-4)
 
 
-def test_ar6_exit_latency_shifts_exit_fill_timestamp() -> None:
-    """Exit latency causally shifts the exit fill timestamp to a future candle."""
+def test_ar6_standing_exit_is_not_submitted_after_close_latency() -> None:
+    """A pre-armed stop uses the trigger bar rather than post-close order latency."""
     exec_model = ExecutionModel(
         fee_model=ZERO_FEES,
         decision_latency_ms=500,
@@ -554,12 +557,12 @@ def test_ar6_exit_latency_shifts_exit_fill_timestamp() -> None:
         position_sizing=PositionSizing(target_notional=100.0),
     )
     engine = EconomicSimulationEngine(policy=policy, execution_model=exec_model, fee_model=ZERO_FEES)
-    # Bar 1: t=1000..1999 (entry fills at 1999)
-    # Bar 2: t=2000..2999 (SL triggers at 2999, order timestamp 3499, earliest fill 3649)
-    # Bar 3: t=3000..3999 (candle covers 3649; fills at 3649)
+    # Bar 1: t=1000..1999 (entry fills at 1999 and arms the stop).
+    # Bar 2 proves a stop touch; exact intrabar time is unknown, so the fill is
+    # recorded at the latest observable timestamp (2999), not invented at 3649.
     bars = [
         _bar(open_time_ms=1000, o=100.0, c=100.0),
-        _bar(open_time_ms=2000, o=100.0, l=90.0, c=95.0),
+        _bar(open_time_ms=2000, o=100.0, low=90.0, c=95.0),
         _bar(open_time_ms=3000, o=95.0, c=95.0),
     ]
     summary = engine.simulate(candles=bars, signals=[_sig(1000)])
@@ -568,13 +571,14 @@ def test_ar6_exit_latency_shifts_exit_fill_timestamp() -> None:
     entry_ev = summary.trade_events[0]
     exit_ev = summary.trade_events[1]
     assert entry_ev.timestamp_ms == 1999
-    # Exit was triggered at 2999; with 650 ms latency it filled in bar 3 at or after 3649!
-    assert exit_ev.timestamp_ms >= 3649
+    assert exit_ev.timestamp_ms == 2999
+    assert exit_ev.order_timestamp_ms == entry_ev.timestamp_ms
+    assert exit_ev.metadata["trigger_time_semantics"] == "INTRABAR_UNKNOWN"
     assert exit_ev.timestamp_ms > entry_ev.timestamp_ms
 
 
-def test_ar6_no_exit_trade_event_without_confirmed_execution_result() -> None:
-    """If market data is exhausted when exit triggers, no fabricated TradeEvent is committed."""
+def test_ar6_trigger_bar_is_sufficient_for_prearmed_exit_execution() -> None:
+    """A standing stop needs no later candle after its trigger bar is observed."""
     exec_model = ExecutionModel(
         fee_model=ZERO_FEES,
         decision_latency_ms=500,
@@ -587,13 +591,15 @@ def test_ar6_no_exit_trade_event_without_confirmed_execution_result() -> None:
         position_sizing=PositionSizing(target_notional=100.0),
     )
     engine = EconomicSimulationEngine(policy=policy, execution_model=exec_model, fee_model=ZERO_FEES)
-    # Only 2 bars; exit triggers at 2999 and needs data at 3649, but no bar 3 exists!
+    # Only 2 bars are needed: the stop was already armed at the entry fill and
+    # the second bar contains the trigger and liquidity evidence.
     bars = [
         _bar(open_time_ms=1000, o=100.0, c=100.0),
-        _bar(open_time_ms=2000, o=100.0, l=90.0, c=95.0),
+        _bar(open_time_ms=2000, o=100.0, low=90.0, c=95.0),
     ]
     summary = engine.simulate(candles=bars, signals=[_sig(1000)])
 
-    # Entry occurred at 1999, but exit could not execute due to market data exhaustion
-    assert len(summary.trade_events) == 1
+    assert len(summary.trade_events) == 2
     assert summary.trade_events[0].action == TradeAction.OPEN_LONG
+    assert summary.trade_events[1].action == TradeAction.CLOSE_LONG
+    assert summary.trade_events[1].timestamp_ms == 2999

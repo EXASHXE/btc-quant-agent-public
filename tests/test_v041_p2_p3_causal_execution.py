@@ -4,7 +4,7 @@ import pytest
 
 from btc_quant_agent.domain import Candle
 from btc_quant_agent.economic.execution_model import ExecutionModel, ExecutionResult
-from btc_quant_agent.economic.fee_model import FeeModel
+from btc_quant_agent.economic.fee_model import FeeModel, SlippageMode
 from btc_quant_agent.economic.funding import FundingSettlement
 from btc_quant_agent.economic.order import Order
 from btc_quant_agent.economic.policy import (
@@ -25,7 +25,7 @@ def _bar(
     open_time_ms: int = 1000,
     o: float = 100.0,
     h: float | None = None,
-    l: float | None = None,
+    low: float | None = None,
     c: float = 100.0,
     volume: float = 1000.0,
     duration: int = 1000,
@@ -33,7 +33,7 @@ def _bar(
     interval: str = "15m",
 ) -> Candle:
     high = max(h if h is not None else max(o, c), o, c)
-    low = min(l if l is not None else min(o, c), o, c)
+    low_price = min(low if low is not None else min(o, c), o, c)
     return Candle(
         symbol=symbol,
         interval=interval,
@@ -41,7 +41,7 @@ def _bar(
         close_time_ms=open_time_ms + duration - 1,
         open=o,
         high=high,
-        low=low,
+        low=low_price,
         close=c,
         volume=volume,
     )
@@ -63,8 +63,6 @@ def _sig(
         strength=strength,
     )
 
-
-from btc_quant_agent.economic.fee_model import SlippageMode
 
 ZERO_FEE = FeeModel(maker_fee_rate=0.0, taker_fee_rate=0.0, slippage_mode=SlippageMode.ZERO)
 ZERO_LATENCY_EXEC = ExecutionModel(fee_model=ZERO_FEE, decision_latency_ms=0, exchange_latency_ms=0)
@@ -286,7 +284,7 @@ def test_execution_limit_extreme_cannot_precede_arrival() -> None:
     OHLC cannot prove low occurred after 2350 without intra-bar data.
     """
     ex = ExecutionModel(fee_model=ZERO_FEE, decision_latency_ms=500, exchange_latency_ms=150)
-    bar = _bar(open_time_ms=1000, duration=2000, h=105.0, l=90.0)
+    bar = _bar(open_time_ms=1000, duration=2000, h=105.0, low=90.0)
 
     result = ex.simulate_order(
         signal_timestamp_ms=1700,
@@ -305,7 +303,7 @@ def test_execution_limit_extreme_cannot_precede_arrival() -> None:
 def test_execution_limit_fill_after_expiry_rejected() -> None:
     """Limit order cannot fill after expiration."""
     ex = ExecutionModel(fee_model=ZERO_FEE, decision_latency_ms=500, exchange_latency_ms=150)
-    bar = _bar(open_time_ms=1000, l=90.0)
+    bar = _bar(open_time_ms=1000, low=90.0)
 
     # Order time 1500, time_in_force 100 -> expires at 1600. Earliest fill is 1650.
     result = ex.simulate_order(
@@ -325,7 +323,7 @@ def test_execution_limit_fill_after_expiry_rejected() -> None:
 def test_execution_zero_volume_liquidity_rejection() -> None:
     """Orders cannot fill on zero volume candles without liquidity evidence."""
     ex = ExecutionModel(fee_model=ZERO_FEE, decision_latency_ms=0, exchange_latency_ms=0)
-    zero_vol_bar = _bar(open_time_ms=1000, l=90.0, volume=0.0)
+    zero_vol_bar = _bar(open_time_ms=1000, low=90.0, volume=0.0)
 
     res_limit = ex.simulate_order(
         signal_timestamp_ms=1000,
@@ -355,7 +353,7 @@ def test_execution_touch_probability_deterministic_queue_rule() -> None:
     ex_99 = ExecutionModel(fee_model=ZERO_FEE, decision_latency_ms=0, exchange_latency_ms=0, limit_fill_prob_on_touch=0.99)
     ex_100 = ExecutionModel(fee_model=ZERO_FEE, decision_latency_ms=0, exchange_latency_ms=0, limit_fill_prob_on_touch=1.0)
 
-    touch_bar = _bar(open_time_ms=1000, l=95.0)
+    touch_bar = _bar(open_time_ms=1000, low=95.0)
 
     assert not ex_default.simulate_order(1000, 1, 1.0, OrderType.LIMIT, [touch_bar], limit_price=95.0).is_filled
     assert not ex_99.simulate_order(1000, 1, 1.0, OrderType.LIMIT, [touch_bar], limit_price=95.0).is_filled
@@ -364,7 +362,7 @@ def test_execution_touch_probability_deterministic_queue_rule() -> None:
 
 def test_execution_signal_without_fill_leaves_ledger_unchanged() -> None:
     """Signal that produces no fill leaves portfolio cash and positions unchanged."""
-    bars = [_bar(1000, l=100.0)]
+    bars = [_bar(1000, low=100.0)]
     sig = _sig(1000)
     policy = TradePolicy(
         policy_id="POL_NOFILL",
@@ -388,9 +386,9 @@ def test_execution_pending_fill_does_not_alter_portfolio_prematurely() -> None:
     Order fills at bar 3 (timestamp 3000). At bar 1 and 2, position must remain 0.
     """
     bars = [
-        _bar(1000, l=100.0),
-        _bar(2000, o=110.0, l=100.0, c=110.0),
-        _bar(3000, o=100.0, l=90.0, c=95.0),
+        _bar(1000, low=100.0),
+        _bar(2000, o=110.0, low=100.0, c=110.0),
+        _bar(3000, o=100.0, low=90.0, c=95.0),
     ]
     sig = _sig(1000)
     policy = TradePolicy(
@@ -433,7 +431,7 @@ def test_execution_limit_offset_bps_applied_correctly() -> None:
         position_sizing=PositionSizing(sizing_type=SizingType.FIXED_NOTIONAL, target_notional=100.0),
     )
     # Low is 99, so buy limit at 95 does NOT fill
-    bars = [_bar(1000, o=100.0, l=99.0)]
+    bars = [_bar(1000, o=100.0, low=99.0)]
     sig = _sig(1000)
 
     sim = EconomicSimulationEngine(policy=policy, initial_cash=100_000.0)
@@ -463,7 +461,7 @@ def test_exit_ambiguous_stop_target_collision_conservative_stop_first_long() -> 
     )
     bars = [
         _bar(1000, o=100.0, c=100.0),
-        _bar(2000, o=100.0, h=110.0, l=90.0, c=95.0),
+        _bar(2000, o=100.0, h=110.0, low=90.0, c=95.0),
         _bar(3000, o=120.0, c=120.0),
     ]
     sig = _sig(1000)
@@ -500,7 +498,7 @@ def test_exit_ambiguous_stop_target_collision_conservative_stop_first_short() ->
     )
     bars = [
         _bar(1000, o=100.0, c=100.0),
-        _bar(2000, o=100.0, h=110.0, l=90.0, c=105.0),
+        _bar(2000, o=100.0, h=110.0, low=90.0, c=105.0),
         _bar(3000, o=80.0, c=80.0),
     ]
     sig = _sig(1000, direction=-1)
@@ -535,7 +533,7 @@ def test_exit_gap_stop_executed_at_gap_open_not_fabricated_price() -> None:
     )
     bars = [
         _bar(1000, o=100.0, c=100.0),
-        _bar(2000, o=80.0, h=80.0, l=80.0, c=80.0),
+        _bar(2000, o=80.0, h=80.0, low=80.0, c=80.0),
     ]
     sig = _sig(1000)
 
@@ -558,7 +556,7 @@ def test_exit_gap_stop_executed_at_gap_open_not_fabricated_price() -> None:
 def test_exit_entry_bar_stop_target_evaluated_when_opened_at_open() -> None:
     """Entry at bar open exposes the position to stop/target on the SAME entry bar.
 
-    Zero latency entry at 1000 open (100). Same bar has h=110, l=90.
+    Zero latency entry at 1000 open (100). Same bar has high=110, low=90.
     Position MUST be evaluated and stopped out on this bar.
     """
     collision_policy = TradePolicy(
@@ -567,7 +565,7 @@ def test_exit_entry_bar_stop_target_evaluated_when_opened_at_open() -> None:
         exit_rule=ExitRule(stop_loss_pct=0.05, take_profit_pct=0.05),
         position_sizing=PositionSizing(sizing_type=SizingType.FIXED_NOTIONAL, target_notional=100.0),
     )
-    bars = [_bar(1000, o=100.0, h=110.0, l=90.0, c=95.0)]
+    bars = [_bar(1000, o=100.0, h=110.0, low=90.0, c=95.0)]
     sig = _sig(1000)
 
     sim = EconomicSimulationEngine(
