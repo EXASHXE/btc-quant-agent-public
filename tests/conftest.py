@@ -29,21 +29,27 @@ class ForbiddenTestAccess(BaseException):
     """A test crossed an operational, network, execution, or outcome boundary."""
 
 
+def _canonical_path(path: str | os.PathLike[str]) -> Path:
+    """Resolve symlinks without recursing through monkeypatched ``Path.stat``."""
+    resolved = os.path.realpath(os.fspath(path))
+    return Path(os.fsdecode(resolved) if isinstance(resolved, bytes) else resolved)
+
+
 class HermeticAccessGuard:
     """Resolved-path denylist used by the repository-wide pytest fixture."""
 
     def __init__(self) -> None:
         self._forbidden_roots = {
-            (REPOSITORY_ROOT / "data/forward").resolve(),
-            (REPOSITORY_ROOT / "data/research/h39_validation").resolve(),
+            _canonical_path(REPOSITORY_ROOT / "data/forward"),
+            _canonical_path(REPOSITORY_ROOT / "data/research/h39_validation"),
         }
-        self._forbidden_files = {(REPOSITORY_ROOT / "var/quant.db").resolve()}
+        self._forbidden_files = {_canonical_path(REPOSITORY_ROOT / "var/quant.db")}
 
     def forbid_root(self, path: str | os.PathLike[str]) -> None:
-        self._forbidden_roots.add(Path(path).resolve())
+        self._forbidden_roots.add(_canonical_path(path))
 
     def forbid_file(self, path: str | os.PathLike[str]) -> None:
-        self._forbidden_files.add(Path(path).resolve())
+        self._forbidden_files.add(_canonical_path(path))
 
     @staticmethod
     def _is_final_holdout(path: Path) -> bool:
@@ -64,7 +70,7 @@ class HermeticAccessGuard:
             raw_path = os.fsdecode(raw_path)
         if raw_path in {"", ":memory:"}:
             return
-        resolved = Path(raw_path).resolve()
+        resolved = _canonical_path(raw_path)
         if self._is_final_holdout(resolved):
             raise ForbiddenTestAccess(
                 f"FORBIDDEN_FINAL_HOLDOUT_ACCESS: {operation} attempted {resolved}"
