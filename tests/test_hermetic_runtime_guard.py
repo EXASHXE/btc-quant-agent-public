@@ -82,6 +82,7 @@ def test_metadata_only_outcome_spy_fails_loudly(
     engine = H39ResearchEngine(
         microstructure_root=tmp_path / "microstructure",
         opportunity_store_path=tmp_path / "opportunity.sqlite3",
+        canonical_candles_path=tmp_path / "canonical_candles.sqlite3",
     )
     with pytest.raises(BaseException, match="FORBIDDEN_H39_OUTCOME_ACCESS"):
         engine.get_canonical_1m_candles(0, 60_000)
