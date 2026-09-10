@@ -1,0 +1,292 @@
+{
+  "schema_version": "1.0.0",
+  "semantic_contract": "BTC_QUANT_AGENT_V042_A04",
+  "generated_from_git_sha": "3aad7b1e055fdca978ab35a67c534664f67978b8",
+  "numeric_policy": {
+    "representation": "base-10 strings for semantic quantities",
+    "production_float_comparison_absolute_tolerance": "0.00000001"
+  },
+  "event_order_contract": {
+    "ordered_boundaries": [
+      "market_observation_availability",
+      "signal_observation_timestamp",
+      "decision_timestamp",
+      "order_timestamp",
+      "funding_timestamp",
+      "fill_timestamp",
+      "terminal_timestamp"
+    ],
+    "required_relations": [
+      "market_observation_availability <= signal_observation_timestamp",
+      "signal_observation_timestamp <= decision_timestamp",
+      "decision_timestamp <= order_timestamp",
+      "order_timestamp <= fill_timestamp",
+      "funding_timestamp <= fill_timestamp when timestamps tie because FUNDING_BEFORE_FILL"
+    ],
+    "unresolved_rule": "OHLC extrema do not establish intrabar ordering; material same-bar ambiguity is AMBIGUOUS_NOT_TESTABLE"
+  },
+  "consumer_map": {
+    "B01": ["D-B2-LIMIT-TOUCH-UNRESOLVED", "G09-CAUSAL-EVENT-ORDER", "G10-MARKETABLE-LIMIT-AT-OPEN"],
+    "B02": ["D-H3-FUTURE-VOLUME-INVARIANCE"],
+    "B03": ["D-H4-CLOSED-FALSE-NOT-COMPLETE", "PIT-01-CLOSED-POSITIVE", "PIT-02-PRODUCT-MISMATCH", "PIT-03-INTERVAL-MISMATCH", "PIT-04-OVERLAP", "PIT-05-GAP", "PIT-06-NONFINITE", "PIT-07-NOT-YET-AVAILABLE"],
+    "B04": ["D-B1-FORGED-CANDIDATE-REPLAY", "D-H1-CLONED-RANDOM-TRIALS"],
+    "B05": ["D-B1-FORGED-CANDIDATE-REPLAY", "G01-LONG-ACCOUNTING", "G02-SHORT-ACCOUNTING", "G03-PARTIAL-WEIGHTED-ROUNDTRIP", "G04-FUNDING-SIGN-TIE", "G05-TERMINAL-POLICIES"],
+    "B06": ["D-H1-CLONED-RANDOM-TRIALS", "G08-DETERMINISTIC-RANDOM-PRIMITIVE"],
+    "B07": ["D-H2-TRADED-CASH", "G06-CASH-NO-TRADE"]
+  },
+  "cases": [
+    {
+      "case_id": "G01-LONG-ACCOUNTING",
+      "domain": "ACCOUNTING",
+      "status": "VALID_GOLDEN",
+      "rationale": "A linear-perpetual long realizes quantity times exit-minus-entry and charges each fee once.",
+      "inputs": {"initial_cash": "10000", "side": "LONG", "open_price": "100", "quantity": "2", "close_price": "110", "entry_fee": "0.20", "exit_fee": "0.22", "funding": "0"},
+      "expected": {"realized_pnl": "20", "net_cash_change": "19.58", "final_cash": "10019.58", "final_equity": "10019.58", "remaining_position": "0"},
+      "independent_derivation": "2*(110-100)=20; 10000+20-0.20-0.22=10019.58.",
+      "future_task_owner": "B05"
+    },
+    {
+      "case_id": "G02-SHORT-ACCOUNTING",
+      "domain": "ACCOUNTING",
+      "status": "VALID_GOLDEN",
+      "rationale": "A linear-perpetual short realizes quantity times entry-minus-exit and charges each fee once.",
+      "inputs": {"initial_cash": "10000", "side": "SHORT", "open_price": "100", "quantity": "3", "close_price": "90", "entry_fee": "0.30", "exit_fee": "0.27", "funding": "0"},
+      "expected": {"realized_pnl": "30", "net_cash_change": "29.43", "final_cash": "10029.43", "final_equity": "10029.43", "remaining_position": "0"},
+      "independent_derivation": "3*(100-90)=30; 10000+30-0.30-0.27=10029.43.",
+      "future_task_owner": "B05"
+    },
+    {
+      "case_id": "G03-PARTIAL-WEIGHTED-ROUNDTRIP",
+      "domain": "ACCOUNTING",
+      "status": "VALID_GOLDEN",
+      "rationale": "Weighted entry, a partial close, remaining mark-to-market, and the completed round trip are tabulated independently.",
+      "inputs": {
+        "initial_cash": "1000",
+        "events": [
+          {"action": "OPEN_LONG", "price": "100", "quantity": "1", "fee": "0.10"},
+          {"action": "OPEN_LONG", "price": "110", "quantity": "2", "fee": "0.22"},
+          {"action": "CLOSE_LONG", "price": "120", "quantity": "1.5", "fee": "0.18"},
+          {"action": "CLOSE_LONG", "price": "90", "quantity": "1.5", "fee": "0.135"}
+        ],
+        "intermediate_mark_price": "115"
+      },
+      "expected": {
+        "weighted_entry_price": "106.6666666666666666666666667",
+        "after_partial_close": {"realized_pnl": "20", "cash": "1019.50", "remaining_quantity": "1.5", "unrealized_pnl": "12.5", "equity": "1032.00"},
+        "completed_round_trip": {"second_close_realized_pnl": "-25", "gross_realized_pnl": "-5", "total_fees": "0.635", "final_cash": "994.365", "final_equity": "994.365", "remaining_quantity": "0"}
+      },
+      "independent_derivation": "Weighted entry=(1*100+2*110)/3=320/3. Partial realized=1.5*(120-320/3)=20; remaining unrealized=1.5*(115-320/3)=12.5. Final realized adds 1.5*(90-320/3)=-25; total=-5 and final cash=1000-5-0.635=994.365.",
+      "future_task_owner": "B05"
+    },
+    {
+      "case_id": "G04-FUNDING-SIGN-TIE",
+      "domain": "FUNDING",
+      "status": "VALID_GOLDEN",
+      "rationale": "Positive funding is paid by longs, received by shorts, zero for no position, and settles before an equal-time fill.",
+      "inputs": {"mark_price": "100", "funding_rate": "0.01", "long_quantity": "2", "short_quantity": "-2", "tie_timestamp_ms": 2000},
+      "expected": {"long_cashflow": "-2", "short_cashflow": "2", "flat_cashflow": "0", "tie_order": ["FUNDING_SETTLEMENT", "CLOSE_LONG"], "position_charged_at_tie": "pre-fill position"},
+      "independent_derivation": "Funding cashflow=-signed_quantity*mark_price*rate: long=-2*100*0.01=-2; short=-(-2)*100*0.01=2; flat=0.",
+      "future_task_owner": "B05"
+    },
+    {
+      "case_id": "G05-TERMINAL-POLICIES",
+      "domain": "TERMINAL",
+      "status": "VALID_GOLDEN",
+      "rationale": "The formal kernel distinguishes an explicitly marked open terminal position from a required-flat result.",
+      "inputs": {"initial_cash": "1000", "open_price": "100", "quantity": "2", "entry_fee": "0.20", "terminal_mark": "110", "flat_exit_fee": "0.22"},
+      "expected": {
+        "MARK_TO_MARKET_OPEN": {"final_cash": "999.80", "terminal_unrealized_pnl": "20", "final_equity": "1019.80", "terminal_position_quantity": "2", "terminal_position_notional": "220", "completeness": "COMPLETE"},
+        "REQUIRE_FLAT": {"final_cash": "1019.58", "terminal_unrealized_pnl": "0", "final_equity": "1019.58", "terminal_position_quantity": "0", "terminal_position_notional": "0", "completeness": "COMPLETE"},
+        "REQUIRE_FLAT_WITH_OPEN_POSITION": {"completeness": "UNSUPPORTED_TERMINAL_STATE"}
+      },
+      "independent_derivation": "Open mode: cash=1000-0.20 and unrealized=2*(110-100)=20. Flat mode: realized=20 and cash=1000+20-0.20-0.22.",
+      "future_task_owner": "B05"
+    },
+    {
+      "case_id": "G06-CASH-NO-TRADE",
+      "domain": "CASH",
+      "status": "VALID_GOLDEN",
+      "rationale": "A true CASH benchmark is capital preservation with no economic events or exposure.",
+      "inputs": {"initial_equity": "1000", "mark_timestamps_ms": [1000, 2000, 3000], "benchmark_kind": "CASH", "vehicle": "USD_CASH_NO_TRADE"},
+      "expected": {"equity_curve": [[1000, "1000"], [2000, "1000"], [3000, "1000"]], "trade_events": [], "trade_count": 0, "fill_count": 0, "fees": "0", "funding": "0", "turnover": "0", "time_exposure": "0", "notional_exposure": "0", "realized_pnl": "0", "unrealized_pnl": "0", "position_quantity": "0", "final_equity": "1000"},
+      "independent_derivation": "With no events and no position, every cashflow and exposure sum is empty/zero and equity remains the initial 1000 at every mark.",
+      "future_task_owner": "B07"
+    },
+    {
+      "case_id": "G07-PASSIVE-SIMPLE-ZERO-COST",
+      "domain": "ACCOUNTING",
+      "status": "VALID_GOLDEN",
+      "rationale": "A tiny passive entry/hold/exit path has a hand-computable zero-cost result.",
+      "inputs": {"initial_cash": "1000", "entry_price": "100", "terminal_price": "110", "fee_rate": "0", "slippage_bps": "0"},
+      "expected": {"quantity": "10", "entry_notional": "1000", "exit_notional": "1100", "gross_pnl": "100", "fees": "0", "final_equity": "1100", "net_return": "0.10"},
+      "independent_derivation": "Quantity=1000/100=10; terminal proceeds=10*110=1100; PnL=100 and return=100/1000=0.10.",
+      "future_task_owner": "B05"
+    },
+    {
+      "case_id": "G08-DETERMINISTIC-RANDOM-PRIMITIVE",
+      "domain": "RANDOM_MATCHED",
+      "status": "VALID_GOLDEN",
+      "rationale": "The preregistered P6 primitive derives each trial seed from a master stdlib PRNG, samples the ordered opportunity set, sorts selected opportunities by time, then shuffles the candidate direction template.",
+      "inputs": {"python_primitive": "random.Random using CPython stdlib semantics", "master_seed": 20260910, "trial_count": 3, "sample_count": 2, "direction_template": [1, -1], "ordered_opportunities": [{"timestamp_ms": 1000, "opportunity_id": "opp-a"}, {"timestamp_ms": 2000, "opportunity_id": "opp-b"}, {"timestamp_ms": 3000, "opportunity_id": "opp-c"}, {"timestamp_ms": 4000, "opportunity_id": "opp-d"}]},
+      "expected": {"trials": [{"trial_id": 0, "trial_seed": 2184067624869720810, "selected_opportunity_ids": ["opp-a", "opp-c"], "directions": [1, -1]}, {"trial_id": 1, "trial_seed": 1436862081396992726, "selected_opportunity_ids": ["opp-a", "opp-b"], "directions": [-1, 1]}, {"trial_id": 2, "trial_seed": 6748627551851916913, "selected_opportunity_ids": ["opp-a", "opp-b"], "directions": [1, -1]}]},
+      "independent_derivation": "A test-only direct stdlib transcription performs master.randrange(0,2**63), Random(trial_seed).sample, timestamp sort, and shuffle without importing the production benchmark generator.",
+      "future_task_owner": "B06"
+    },
+    {
+      "case_id": "G09-CAUSAL-EVENT-ORDER",
+      "domain": "LIMIT_CAUSALITY",
+      "status": "VALID_GOLDEN",
+      "rationale": "Observable event boundaries are ordered without inventing tick ordering unavailable from OHLC.",
+      "inputs": {"market_available_ms": 1000, "signal_observation_ms": 1000, "decision_ms": 1001, "order_ms": 1002, "funding_ms": 2000, "fill_ms": 2000, "terminal_ms": 3000},
+      "expected": {"ordered_events": ["MARKET_AVAILABLE", "SIGNAL_OBSERVED", "DECISION", "ORDER", "FUNDING_SETTLEMENT", "FILL", "TERMINAL"], "tie_break": "FUNDING_BEFORE_FILL", "unresolved_intrabar_order": "AMBIGUOUS_NOT_TESTABLE"},
+      "independent_derivation": "The explicit timestamps are monotonic; the accepted equal-time contract puts funding before fill. No order is assigned to unknown intrabar extrema.",
+      "future_task_owner": "B01"
+    },
+    {
+      "case_id": "G10-MARKETABLE-LIMIT-AT-OPEN",
+      "domain": "LIMIT_CAUSALITY",
+      "status": "VALID_GOLDEN",
+      "rationale": "A buy limit at or above an observable opening ask/open marketability condition can fill at open when that declared input exists.",
+      "inputs": {"side": "BUY", "limit_price": "101", "observable_open_ask": "100.25", "bar_open": "100", "submit_time_ms": 1000, "declared_model": "OPEN_MARKETABLE_AT_OBSERVED_ASK"},
+      "expected": {"outcome": "FILL_AT_OPEN_ALLOWED", "latest_permitted_price": "100.25", "required_evidence": "opening ask observed no later than order evaluation"},
+      "independent_derivation": "101 >= 100.25 makes the order marketable against the contemporaneously observed ask; no later OHLC extreme is used.",
+      "future_task_owner": "B01"
+    },
+    {
+      "case_id": "D-B1-FORGED-CANDIDATE-REPLAY",
+      "domain": "CANDIDATE_REPLAY",
+      "status": "KNOWN_DEFECT_EXPECT_REJECTION",
+      "rationale": "Internally coherent accounting and hashes do not prove that an event stream came from the verified strategy/dataset/model preimages.",
+      "inputs": {"initial_cash": "1000", "candle": {"open_time_ms": 1000, "close_time_ms": 60999, "open": "100", "high": "100.5", "low": "99.5", "close": "100.1"}, "forged_events": [{"timestamp_ms": 1000, "action": "OPEN_LONG", "price": "1.0", "quantity": "100", "fee": "0", "realized_pnl": "0", "position_after": "100", "cash_after": "1000"}, {"timestamp_ms": 60999, "action": "CLOSE_LONG", "price": "100.1", "quantity": "100", "fee": "0", "realized_pnl": "9910", "position_after": "0", "cash_after": "10910"}], "forged_equity_curve": [[1000, "1000"], [60999, "10910"]], "attacker_recomputes": ["TradeEvents", "cash_after", "equity_curve", "accounting summaries", "hashes"], "variants": ["altered_fee", "altered_funding", "altered_quantity_or_risk_cap", "altered_signal_direction_or_time", "altered_terminal_event"]},
+      "expected": {"correct_behavior": "REJECT_OR_NOT_TESTABLE_AT_ACCEPTANCE", "reason": "EVENT_STREAM_NOT_REPRODUCIBLE_FROM_VERIFIED_PREIMAGES", "variant_behavior": "REJECT_EACH_VARIANT_IF_REPLAY_DIFFERS"},
+      "independent_derivation": "Price 1.0 is outside [99.5,100.5]. Recomputed downstream arithmetic can be coherent but cannot make that fill reachable from the candle and declared execution model.",
+      "current_characterization": {"observed": "P7 demonstrated that coherent forged candidate economics can cross a hurdle because full candidate replay provenance is not enforced.", "verified_at_sha": "3aad7b1e055fdca978ab35a67c534664f67978b8", "historical_artifacts": "READ_ONLY"},
+      "future_task_owner": "B04/B05"
+    },
+    {
+      "case_id": "D-B2-LIMIT-TOUCH-UNRESOLVED",
+      "domain": "LIMIT_CAUSALITY",
+      "status": "KNOWN_DEFECT_EXPECT_REJECTION",
+      "rationale": "A completed 15-minute low proves eventual touch but cannot prove touch within a one-millisecond TIF.",
+      "inputs": {"bar_interval": "15m", "bar_open_time_ms": 1000, "bar": {"open": "100", "high": "110", "low": "90", "close": "100"}, "order": {"side": "BUY", "type": "LIMIT", "limit_price": "95", "submit_time_ms": 1000, "expiry_time_ms": 1001}},
+      "expected": {"correct_behavior": "AMBIGUOUS_NOT_TESTABLE", "must_not": ["backdate fill to bar open from full-bar low", "infer funding entitlement before an unresolved touch"], "resolvable_with": "lower-resolution timestamped evidence spanning submit through expiry"},
+      "independent_derivation": "Both touch-before-expiry and touch-after-expiry tick paths produce identical OHLC; the fill ordering is therefore not identifiable.",
+      "current_characterization": {"observed": "P7 identified observable-time/expiry ambiguity requiring B01 repair.", "verified_at_sha": "3aad7b1e055fdca978ab35a67c534664f67978b8"},
+      "future_task_owner": "B01"
+    },
+    {
+      "case_id": "D-H3-FUTURE-VOLUME-INVARIANCE",
+      "domain": "LIQUIDITY_CAUSALITY",
+      "status": "KNOWN_DEFECT_EXPECT_REJECTION",
+      "rationale": "An opening fill cannot depend on volume accumulated after that fill time.",
+      "inputs": {"common_prior_state": {"open": "100", "order_time_ms": 1000, "prior_timestamped_liquidity": "500"}, "run_a_future_suffix_volume": "1000", "run_b_future_suffix_volume": "100000"},
+      "expected": {"correct_behavior": "OPENING_FILL_PRICE_AND_COST_IDENTICAL", "permitted_difference": "fill may differ only if liquidity observed by order time differs"},
+      "independent_derivation": "The information sets at the opening decision/fill boundary are identical, so a causal deterministic model must return identical fills.",
+      "current_characterization": {"observed": "P7 showed completed-bar volume can influence an opening fill.", "verified_at_sha": "3aad7b1e055fdca978ab35a67c534664f67978b8"},
+      "future_task_owner": "B02"
+    },
+    {
+      "case_id": "D-H4-CLOSED-FALSE-NOT-COMPLETE",
+      "domain": "PIT_DATA",
+      "status": "KNOWN_DEFECT_EXPECT_REJECTION",
+      "rationale": "OHLCV equality does not make an unavailable or open observation valid completed-bar evidence.",
+      "inputs": {"decision_time_ms": 2000, "candles": [{"symbol": "BTCUSDT", "interval": "1m", "open_time_ms": 1000, "close_time_ms": 1999, "open": "100", "high": "101", "low": "99", "close": "100", "volume": "10", "quote_volume": "1000", "closed": false}], "old_schema_variant": "closed field absent"},
+      "expected": {"correct_behavior": "REJECT_OR_NOT_TESTABLE", "serialization_requirement": "preserve and verify closed/availability state", "old_schema_behavior": "must not silently default missing closed to true"},
+      "independent_derivation": "Formal completed-bar replay requires proof that the observation was closed and available by the original decision boundary; equal OHLCV values do not supply that proof.",
+      "current_characterization": {"observed": "Persisted formal runtime candle serialization omits closed/availability and reconstructs Candle with its closed=True default.", "verified_at_sha": "3aad7b1e055fdca978ab35a67c534664f67978b8"},
+      "future_task_owner": "B03"
+    },
+    {
+      "case_id": "D-H1-CLONED-RANDOM-TRIALS",
+      "domain": "RANDOM_MATCHED",
+      "status": "KNOWN_DEFECT_EXPECT_REJECTION",
+      "rationale": "Correct trial IDs, seeds, hashes, and matching diagnostics do not prove that candidate-cloned ledgers were randomly sampled.",
+      "inputs": {"master_seed": 20260910, "declared_trial_ids": [0, 1, 2], "attack": "replace every random trial ledger with the candidate path and recompute coherent metadata"},
+      "expected": {"correct_behavior": "REJECT_RANDOM_COMPARABILITY_AND_ACCEPTANCE", "required_replay": ["ordered eligible-opportunity preimage", "draw rule", "master/trial seeds", "selected opportunities", "directions/signals", "resulting trial event streams"]},
+      "independent_derivation": "A deterministic random draw is defined by its preimage and transformation, not by matching aggregate diagnostics or declared seeds alone.",
+      "current_characterization": {"observed": "P7 cloned-candidate random trials can retain accepted-looking diagnostics without full draw replay.", "verified_at_sha": "3aad7b1e055fdca978ab35a67c534664f67978b8"},
+      "future_task_owner": "B06"
+    },
+    {
+      "case_id": "D-H2-TRADED-CASH",
+      "domain": "CASH",
+      "status": "KNOWN_DEFECT_EXPECT_REJECTION",
+      "rationale": "A CASH label cannot legitimize an internally coherent traded or exposed ledger.",
+      "inputs": {"benchmark_kind": "CASH", "initial_cash": "1000", "attack": {"trade_events": [{"timestamp_ms": 1000, "action": "OPEN_LONG", "price": "100", "quantity": "1", "fee": "0", "funding": "0", "realized_pnl": "0", "position_after": "1", "cash_after": "1000"}, {"timestamp_ms": 2000, "action": "CLOSE_LONG", "price": "100", "quantity": "1", "fee": "0", "funding": "0", "realized_pnl": "0", "position_after": "0", "cash_after": "1000"}], "equity_curve": [[1000, "1000"], [2000, "1000"]], "summary": {"final_equity": "1000", "net_pnl": "0", "fees": "0", "funding": "0", "fill_count": 2, "turnover": "200", "time_exposure_ms": 1000}, "recomputed_accounting_and_hashes": true}, "variants": ["funding_only_event", "nonzero_position_or_exposure", "nonzero_turnover", "timestamp_tampering"]},
+      "expected": {"correct_behavior": "REJECT_AS_CASH", "required_invariants": ["zero events", "zero fills", "zero fees", "zero funding", "zero turnover", "zero exposure", "zero PnL", "zero position", "constant initial equity"]},
+      "independent_derivation": "CASH is the exact no-trade policy defined by G06; any economic event or exposure contradicts the benchmark identity even when arithmetic is coherent.",
+      "current_characterization": {"observed": "P7 demonstrated that a recomputed traded CASH artifact is not fully rejected by persisted acceptance verification.", "verified_at_sha": "3aad7b1e055fdca978ab35a67c534664f67978b8"},
+      "future_task_owner": "B07"
+    },
+    {
+      "case_id": "PIT-01-CLOSED-POSITIVE",
+      "domain": "PIT_DATA",
+      "status": "VALID_GOLDEN",
+      "rationale": "Monotonic non-overlapping closed candles available by decision time are a positive control.",
+      "inputs": {"decision_time_ms": 121000, "candles": [{"symbol": "BTCUSDT", "interval": "1m", "open_time_ms": 1000, "close_time_ms": 60999, "open": "100", "high": "101", "low": "99", "close": "100", "volume": "10", "quote_volume": "1000", "closed": true, "available_at_ms": 61000}, {"symbol": "BTCUSDT", "interval": "1m", "open_time_ms": 61000, "close_time_ms": 120999, "open": "100", "high": "102", "low": "100", "close": "101", "volume": "12", "quote_volume": "1212", "closed": true, "available_at_ms": 121000}]},
+      "expected": {"correct_behavior": "ACCEPT_COMPLETE", "event_time": "open_time_ms", "close_time": "close_time_ms", "availability_time": "available_at_ms", "decision_boundary": "decision_time_ms"},
+      "independent_derivation": "Each candle is closed, the next open follows exactly 60000 ms, intervals do not overlap, and availability_at_ms <= decision_time_ms.",
+      "future_task_owner": "B03"
+    },
+    {
+      "case_id": "PIT-02-PRODUCT-MISMATCH",
+      "domain": "PIT_DATA",
+      "status": "KNOWN_DEFECT_EXPECT_REJECTION",
+      "rationale": "A formal BTCUSDT replay cannot consume an otherwise valid ETHUSDT observation.",
+      "inputs": {"declared_product": "BTCUSDT", "observed_product": "ETHUSDT"},
+      "expected": {"correct_behavior": "REJECT_PRODUCT_MISMATCH"},
+      "independent_derivation": "Instrument identity is part of the data preimage and ETHUSDT is not BTCUSDT.",
+      "future_task_owner": "B03"
+    },
+    {
+      "case_id": "PIT-03-INTERVAL-MISMATCH",
+      "domain": "PIT_DATA",
+      "status": "KNOWN_DEFECT_EXPECT_REJECTION",
+      "rationale": "A declared 1m replay cannot silently consume a 5m candle.",
+      "inputs": {"declared_interval": "1m", "observed_interval": "5m"},
+      "expected": {"correct_behavior": "REJECT_INTERVAL_MISMATCH"},
+      "independent_derivation": "The observed interval is not the declared sampling interval.",
+      "future_task_owner": "B03"
+    },
+    {
+      "case_id": "PIT-04-OVERLAP",
+      "domain": "PIT_DATA",
+      "status": "KNOWN_DEFECT_EXPECT_REJECTION",
+      "rationale": "Overlapping formal candles do not define a unique interval partition.",
+      "inputs": {"first": {"open_time_ms": 1000, "close_time_ms": 60999}, "second": {"open_time_ms": 60000, "close_time_ms": 119999}},
+      "expected": {"correct_behavior": "REJECT_OVERLAPPING_TIMESTAMPS"},
+      "independent_derivation": "The second candle opens 999 ms before the first closes.",
+      "future_task_owner": "B03"
+    },
+    {
+      "case_id": "PIT-05-GAP",
+      "domain": "PIT_DATA",
+      "status": "KNOWN_DEFECT_EXPECT_REJECTION",
+      "rationale": "A continuity-required 1m replay cannot skip a bar.",
+      "inputs": {"expected_interval_ms": 60000, "open_times_ms": [1000, 121000]},
+      "expected": {"correct_behavior": "REJECT_GAP_WHEN_CONTINUITY_REQUIRED", "observed_delta_ms": 120000},
+      "independent_derivation": "121000-1000=120000, which is two declared intervals rather than one.",
+      "future_task_owner": "B03"
+    },
+    {
+      "case_id": "PIT-06-NONFINITE",
+      "domain": "PIT_DATA",
+      "status": "KNOWN_DEFECT_EXPECT_REJECTION",
+      "rationale": "NaN or infinite OHLCV/quote volume cannot enter formal arithmetic or canonical evidence.",
+      "inputs": {"invalid_fields": ["open=NaN", "high=Infinity", "low=-Infinity", "close=NaN", "volume=Infinity", "quote_volume=NaN"]},
+      "expected": {"correct_behavior": "REJECT_EACH_NONFINITE_FIELD"},
+      "independent_derivation": "Nonfinite values are outside the real-valued price/volume domain and make arithmetic/hash semantics unsafe.",
+      "future_task_owner": "B03"
+    },
+    {
+      "case_id": "PIT-07-NOT-YET-AVAILABLE",
+      "domain": "PIT_DATA",
+      "status": "KNOWN_DEFECT_EXPECT_REJECTION",
+      "rationale": "An observation received after the original decision cannot be used merely because replay occurs later.",
+      "inputs": {"event_time_ms": 1000, "close_time_ms": 60999, "available_at_ms": 62000, "decision_time_ms": 61000, "later_wall_clock_ms": 9999999999},
+      "expected": {"correct_behavior": "REJECT_OR_NOT_TESTABLE_AT_ORIGINAL_DECISION", "wall_clock_rule": "later replay wall clock does not cure original unavailability"},
+      "independent_derivation": "62000 > 61000, so the datum was absent from the decision-time information set regardless of the later replay date.",
+      "future_task_owner": "B03"
+    }
+  ]
+}
