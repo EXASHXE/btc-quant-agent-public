@@ -800,3 +800,131 @@ def test_generated_deliverables_integrity() -> None:
     assert repair_json["attestations"]["execution_disabled"] is True
     assert repair_json["attestations"]["h38_permanently_terminal"] is True
     assert repair_json["current_blind_maturity_counts_only"]["state"] == "FORWARD_DATA_INSUFFICIENT"
+
+
+def test_metadata_only_diagnostic_never_reaches_outcome_loaders(
+    tmp_path: Path, h39_outcome_access_spy: list[str]
+) -> None:
+    """Test A: evaluate_validation_status never calls outcome loaders."""
+    engine = _research_engine(tmp_path)
+    val_status = engine.evaluate_validation_status()
+
+    assert val_status["deprecated"] is True
+    assert val_status["authoritative"] is False
+    assert val_status["diagnostic_only"] is True
+    assert val_status["readiness_authority"] == "NON_AUTHORITATIVE_DIAGNOSTIC_ONLY"
+    assert val_status["authoritative_unblind_authorization_allowed"] is False
+    assert val_status["candidate_promotion_allowed"] is False
+    assert val_status["execution"] == "DISABLED"
+    assert h39_outcome_access_spy == []
+
+
+def test_post_start_partition_does_not_trigger_observation_building(
+    tmp_path: Path, h39_outcome_access_spy: list[str]
+) -> None:
+    """Test B: post-start partition does not trigger observation/outcome building."""
+    micro_dir = tmp_path / "microstructure"
+    micro_dir.mkdir(parents=True)
+    part_file = micro_dir / "microstructure-2026-09-04.sqlite3"
+
+    conn = sqlite3.connect(part_file)
+    conn.executescript(
+        """
+        CREATE TABLE book_samples(event_time_ms INTEGER, final_update_id INTEGER,
+          receive_time_ms INTEGER, spread_bps REAL, top1_imbalance REAL, top5_imbalance REAL,
+          top20_imbalance REAL, microprice REAL, ofi REAL,
+          PRIMARY KEY(event_time_ms, final_update_id));
+        CREATE TABLE agg_trades(aggregate_trade_id INTEGER PRIMARY KEY,
+          event_time_ms INTEGER, transaction_time_ms INTEGER, receive_time_ms INTEGER,
+          receive_monotonic_ns INTEGER, price REAL, quantity REAL, buyer_is_maker INTEGER,
+          aggressive_side TEXT, payload_hash TEXT);
+        """
+    )
+    t_start = H39_VALIDATION_START_MS
+    t_end = H39_VALIDATION_START_MS + 3600_000
+    conn.execute(
+        "INSERT INTO book_samples (event_time_ms, final_update_id, receive_time_ms, spread_bps, "
+        "top1_imbalance, top5_imbalance, top20_imbalance, microprice, ofi) "
+        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        (t_start, 1, t_start, 1.0, 0.1, 0.1, 0.1, 60000.0, 0.0),
+    )
+    conn.execute(
+        "INSERT INTO book_samples (event_time_ms, final_update_id, receive_time_ms, spread_bps, "
+        "top1_imbalance, top5_imbalance, top20_imbalance, microprice, ofi) "
+        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        (t_end, 2, t_end, 1.0, 0.1, 0.1, 0.1, 60000.0, 0.0),
+    )
+    conn.commit()
+    conn.close()
+
+    engine = _research_engine(tmp_path)
+    val_status = engine.evaluate_validation_status()
+
+    # Outcome spy must remain completely uncalled
+    assert h39_outcome_access_spy == []
+
+    # Partition metadata appears in diagnostic
+    assert len(val_status["fresh_partitions"]) == 1
+    p_meta = val_status["fresh_partitions"][0]
+    assert p_meta["partition"] == "microstructure-2026-09-04.sqlite3"
+    assert p_meta["start_ms"] == t_start
+    assert p_meta["max_ms"] == t_end
+
+    # Output serialized to JSON contains zero future return keys
+    val_str = json.dumps(val_status).lower()
+    for forbidden in ["future_close_60m", "future_close_240m", "return_60m", "return_240m"]:
+        assert forbidden not in val_str
+
+
+def test_absence_of_canonical_candles_does_not_break_diagnostic(
+    tmp_path: Path, h39_outcome_access_spy: list[str]
+) -> None:
+    """Test C: absence of canonical candle store does not break metadata diagnostic."""
+    non_existent_candles = tmp_path / "does_not_exist_candles.sqlite3"
+    engine = H39ResearchEngine(
+        microstructure_root=tmp_path / "microstructure",
+        opportunity_store_path=tmp_path / "opportunity.sqlite3",
+        canonical_candles_path=non_existent_candles,
+    )
+    val_status = engine.evaluate_validation_status()
+    assert val_status["status"] == "FORWARD_DATA_INSUFFICIENT"
+    assert h39_outcome_access_spy == []
+
+
+def test_diagnostic_payload_has_no_performance_leakage(
+    tmp_path: Path, h39_outcome_access_spy: list[str]
+) -> None:
+    """Test D: diagnostic payload never exposes formal performance or outcome metrics."""
+    engine = _research_engine(tmp_path)
+    val_status = engine.evaluate_validation_status()
+
+    val_json_str = json.dumps(val_status).lower()
+    forbidden_keys = [
+        "p_value",
+        "sharpe",
+        "return_60m",
+        "return_240m",
+        "future_close_60m",
+        "future_close_240m",
+        "ranking",
+    ]
+    for key in forbidden_keys:
+        assert f'"{key}"' not in val_json_str
+        assert f": {key}" not in val_json_str
+
+
+def test_deprecated_diagnostic_cannot_grant_authorization(
+    tmp_path: Path, h39_outcome_access_spy: list[str]
+) -> None:
+    """Test E: evaluate_validation_status cannot grant authorization or promote candidates."""
+    engine = _research_engine(tmp_path)
+    val_status = engine.evaluate_validation_status()
+
+    assert val_status["authoritative_unblind_authorization_allowed"] is False
+    assert val_status["candidate_promotion_allowed"] is False
+    assert val_status["execution"] == "DISABLED"
+    assert val_status["runtime_maximum"] == "OPPORTUNITY_ONLY"
+    assert val_status["readiness_authority"] == "NON_AUTHORITATIVE_DIAGNOSTIC_ONLY"
+    assert val_status["authoritative"] is False
+    assert val_status["accumulation_progress"]["maturity_achieved"] is False
+    assert val_status["accumulation_progress"]["authoritative"] is False

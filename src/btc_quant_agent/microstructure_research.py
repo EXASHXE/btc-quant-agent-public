@@ -2477,11 +2477,8 @@ class H39ResearchEngine:
             ]
         )
 
-        # Inventory fresh partitions
+        # Inventory fresh partitions (metadata-only)
         fresh_partitions: list[dict[str, Any]] = []
-        total_fresh_slots = 0
-        eligible_fresh_slots = 0
-        distinct_days: set[str] = set()
 
         for p in sorted(self.microstructure_root.glob("microstructure-*.sqlite3")):
             loader = MicrostructureResearchLoader(p)
@@ -2489,34 +2486,16 @@ class H39ResearchEngine:
             if min_t is None or max_t is None or max_t < val_start_ms:
                 continue
 
-            # This partition overlaps with post-validation-start period
-            obs = self.build_observations_for_partition(p, start_ms=val_start_ms)
-            for o in obs:
-                total_fresh_slots += 1
-                if o.feature_row.eligible:
-                    eligible_fresh_slots += 1
-                    dt = datetime.fromtimestamp(o.feature_row.slot_ms / 1000, UTC)
-                    distinct_days.add(dt.strftime("%Y-%m-%d"))
-
             fresh_partitions.append(
                 {
                     "partition": p.name,
                     "start_ms": min_t,
                     "max_ms": max_t,
-                    "fresh_slots_evaluated": len(obs),
+                    "fresh_slots_evaluated": 0,
                 }
             )
 
-        coverage_ratio = (
-            (eligible_fresh_slots / total_fresh_slots) if total_fresh_slots > 0 else 0.0
-        )
-        is_mature = (
-            len(distinct_days) >= min_days
-            and eligible_fresh_slots >= min_obs
-            and coverage_ratio >= min_cov
-        )
-
-        status = "FRESH_FORWARD_VALIDATION" if is_mature else "FORWARD_DATA_INSUFFICIENT"
+        status = "FORWARD_DATA_INSUFFICIENT"
 
         return {
             "hypothesis_id": H39_HYPOTHESIS_ID,
@@ -2527,7 +2506,10 @@ class H39ResearchEngine:
             "diagnostic_only": True,
             "readiness_authority": "NON_AUTHORITATIVE_DIAGNOSTIC_ONLY",
             "authoritative_unblind_authorization_allowed": False,
-            "notice": "DEPRECATED: Non-authoritative diagnostic only. MUST NOT authorize unblind, candidate promotion, or formal validation.",
+            "notice": (
+                "DEPRECATED: Non-authoritative diagnostic only. "
+                "MUST NOT authorize unblind, candidate promotion, or formal validation."
+            ),
             "validation_start_utc": val_start_utc,
             "validation_start_ms": val_start_ms,
             "exclusion_buffer": {
@@ -2536,13 +2518,15 @@ class H39ResearchEngine:
                 "rule": "Strict temporal isolation between development cutoff and validation start",
             },
             "accumulation_progress": {
-                "distinct_days_accumulated": len(distinct_days),
+                "source": "METADATA_ONLY_DIAGNOSTIC",
+                "distinct_days_accumulated": None,
                 "distinct_days_required": min_days,
-                "eligible_slots_accumulated": eligible_fresh_slots,
+                "eligible_slots_accumulated": None,
                 "eligible_slots_required": min_obs,
-                "coverage_ratio_accumulated": coverage_ratio,
+                "coverage_ratio_accumulated": None,
                 "coverage_ratio_required": min_cov,
-                "maturity_achieved": is_mature,
+                "maturity_achieved": False,
+                "authoritative": False,
             },
             "fresh_partitions": fresh_partitions,
             "active_verdict": status,
