@@ -140,6 +140,7 @@ def test_scheduler_invocation_and_outcome_blindness(tmp_path: Path) -> None:
     engine = H39ResearchEngine(
         microstructure_root=micro_dir,
         opportunity_store_path=opp_file,
+        canonical_candles_path=tmp_path / "canonical_candles.sqlite3",
     )
 
     sched_res = engine.run_scheduled_accumulation(
@@ -183,7 +184,11 @@ def test_read_only_input_firewalls(tmp_path: Path) -> None:
     _populate_test_partition(p_file, H39_VALIDATION_START_MS - 30 * 60_000, H39_VALIDATION_START_MS + 60 * 60_000)
 
     h_before = hashlib.sha256(p_file.read_bytes()).hexdigest()
-    engine = H39ResearchEngine(microstructure_root=micro_dir, opportunity_store_path=tmp_path / "none.sqlite3")
+    engine = H39ResearchEngine(
+        microstructure_root=micro_dir,
+        opportunity_store_path=tmp_path / "none.sqlite3",
+        canonical_candles_path=tmp_path / "canonical_candles.sqlite3",
+    )
     engine.accumulate_blind_validation(output_ledger_path=tmp_path / "ledger.sqlite3", only_finalized=False)
 
     h_after = hashlib.sha256(p_file.read_bytes()).hexdigest()
@@ -197,7 +202,11 @@ def test_finalized_historical_ingestion(tmp_path: Path) -> None:
     p_file = micro_dir / "microstructure-2026-09-04.sqlite3"
     _populate_test_partition(p_file, H39_VALIDATION_START_MS - 30 * 60_000, H39_VALIDATION_START_MS + 60 * 60_000)
 
-    engine = H39ResearchEngine(microstructure_root=micro_dir, opportunity_store_path=tmp_path / "none.sqlite3")
+    engine = H39ResearchEngine(
+        microstructure_root=micro_dir,
+        opportunity_store_path=tmp_path / "none.sqlite3",
+        canonical_candles_path=tmp_path / "canonical_candles.sqlite3",
+    )
     res = engine.accumulate_blind_validation(output_ledger_path=tmp_path / "ledger.sqlite3", only_finalized=True)
     assert "microstructure-2026-09-04.sqlite3" in res["partitions_processed"]
     assert res["new_slots_ingested"] > 0
@@ -215,7 +224,7 @@ def test_missing_evidence_invariant(tmp_path: Path) -> None:
         m1=0.0,
     )
     ledger.ingest_slot(gap_row)
-    summary = ledger.get_summary()
+    summary = ledger.get_summary(now_ms=H39_VALIDATION_START_MS)
 
     assert summary["observed_boundary_count"] == 1
     assert summary["eligible_boundary_count"] == 0
@@ -243,9 +252,11 @@ def test_clock_denominator_calculation(tmp_path: Path) -> None:
     assert summary_explicit["eligible_coverage"] == 0.25
     assert summary_explicit["raw_observation_coverage"] == 1.0
 
-    # Default production path uses wall clock, not latest ledger slot
-    summary_wall = ledger.get_summary()
-    assert summary_wall["clock_source"] == "WALL_CLOCK"
+    # A later injected wall-clock snapshot expands the denominator independently
+    # of the latest ledger slot.
+    later_clock = cutoff + 10 * 900_000
+    summary_wall = ledger.get_summary(now_ms=later_clock)
+    assert summary_wall["clock_source"] == "EXPLICIT_AS_OF"
     assert summary_wall["expected_boundary_count"] > 4
     assert summary_wall["observed_boundary_count"] == 4
     assert summary_wall["eligible_boundary_count"] == 1
@@ -293,7 +304,11 @@ def test_source_partition_mutation_guard(tmp_path: Path) -> None:
     assert integ["status"] == "DATA_QUALITY_BREACH"
     assert len(integ["mutations_detected"]) > 0
 
-    engine = H39ResearchEngine(microstructure_root=tmp_path, opportunity_store_path=tmp_path / "none.sqlite3")
+    engine = H39ResearchEngine(
+        microstructure_root=tmp_path,
+        opportunity_store_path=tmp_path / "none.sqlite3",
+        canonical_candles_path=tmp_path / "canonical_candles.sqlite3",
+    )
     readiness = engine.check_unblind_readiness(ledger_path=ledger_path)
     assert readiness["status"] == H39_STATE_BLOCKED_QUALITY
     assert readiness["ready_for_unblind"] is False
@@ -326,7 +341,11 @@ def test_readiness_state_machine_and_metadata_isolation(tmp_path: Path) -> None:
     """10. Readiness state machine adheres to FORWARD_DATA_INSUFFICIENT, READY, BLOCKED_QUALITY; metadata only."""
     ledger_path = tmp_path / "ready_ledger.sqlite3"
     ledger = H39BlindLedger(ledger_path)
-    engine = H39ResearchEngine(microstructure_root=tmp_path, opportunity_store_path=tmp_path / "none.sqlite3")
+    engine = H39ResearchEngine(
+        microstructure_root=tmp_path,
+        opportunity_store_path=tmp_path / "none.sqlite3",
+        canonical_candles_path=tmp_path / "canonical_candles.sqlite3",
+    )
 
     r1 = engine.check_unblind_readiness(ledger_path=ledger_path)
     assert r1["status"] == H39_STATE_INSUFFICIENT
@@ -439,7 +458,11 @@ def test_durability_and_online_backup(tmp_path: Path) -> None:
 
 def test_operational_safety_firewalls_and_disk_check(tmp_path: Path) -> None:
     """14. Low disk space triggers refusal without deletion; H38 terminal; execution disabled."""
-    engine = H39ResearchEngine(microstructure_root=tmp_path, opportunity_store_path=tmp_path / "none.sqlite3")
+    engine = H39ResearchEngine(
+        microstructure_root=tmp_path,
+        opportunity_store_path=tmp_path / "none.sqlite3",
+        canonical_candles_path=tmp_path / "canonical_candles.sqlite3",
+    )
 
     safe, _free = engine.check_disk_safety(min_free_gb=1e9)
     assert safe is False
@@ -450,7 +473,10 @@ def test_operational_safety_firewalls_and_disk_check(tmp_path: Path) -> None:
             min_free_gb=1e9,
         )
 
-    status = engine.get_blind_validation_status()
+    status = engine.get_blind_validation_status(
+        ledger_path=tmp_path / "missing_safety_ledger.sqlite3",
+        now_ms=H39_VALIDATION_START_MS,
+    )
     firewalls = status["safety_firewalls"]
     assert firewalls["strategy"] == "EXPERIMENTAL"
     assert firewalls["qualified_direction_engine"] == "NONE"
@@ -503,22 +529,26 @@ def test_stale_ledger_fail_closed_regression(tmp_path: Path) -> None:
     assert summary_t2["state"] == H39_STATE_INSUFFICIENT
 
     # Verify check_unblind_readiness fails closed under T2
-    engine = H39ResearchEngine(microstructure_root=tmp_path, opportunity_store_path=tmp_path / "none.sqlite3")
+    engine = H39ResearchEngine(
+        microstructure_root=tmp_path,
+        opportunity_store_path=tmp_path / "none.sqlite3",
+        canonical_candles_path=tmp_path / "canonical_candles.sqlite3",
+    )
     readiness_t2 = engine.check_unblind_readiness(ledger_path=ledger_path, now_ms=t2)
     assert readiness_t2["ready_for_unblind"] is False
     assert readiness_t2["status"] == H39_STATE_INSUFFICIENT
     assert "Minimum gates not met" in str(readiness_t2.get("refusal_reason"))
 
 
-def test_empty_and_missing_ledger_wall_clock_denominator(tmp_path: Path) -> None:
-    """16. Empty and missing ledgers still accumulate expected boundaries from validation start to wall clock."""
+def test_empty_and_missing_ledger_explicit_clock_denominator(tmp_path: Path) -> None:
+    """16. Empty and missing ledgers use the injected deterministic clock ceiling."""
     empty_ledger_path = tmp_path / "empty.sqlite3"
     ledger = H39BlindLedger(empty_ledger_path)
+    clock_ms = H39_VALIDATION_START_MS + 9 * 900_000
 
-    # With empty ledger, default get_summary uses wall clock
-    summary_empty = ledger.get_summary()
-    assert summary_empty["clock_source"] == "WALL_CLOCK"
-    assert summary_empty["expected_boundary_count"] > 0
+    summary_empty = ledger.get_summary(now_ms=clock_ms)
+    assert summary_empty["clock_source"] == "EXPLICIT_AS_OF"
+    assert summary_empty["expected_boundary_count"] == 10
     assert summary_empty["observed_boundary_count"] == 0
     assert summary_empty["eligible_boundary_count"] == 0
     assert summary_empty["raw_observation_coverage"] == 0.0
@@ -526,9 +556,15 @@ def test_empty_and_missing_ledger_wall_clock_denominator(tmp_path: Path) -> None
 
     # Non-existent ledger via engine also accumulates expected boundaries
     missing_path = tmp_path / "does_not_exist.sqlite3"
-    engine = H39ResearchEngine(microstructure_root=tmp_path, opportunity_store_path=tmp_path / "none.sqlite3")
-    status_missing = engine.get_blind_validation_status(ledger_path=missing_path)
-    assert status_missing["clock_source"] == "WALL_CLOCK"
-    assert status_missing["expected_boundary_count"] > 0
+    engine = H39ResearchEngine(
+        microstructure_root=tmp_path,
+        opportunity_store_path=tmp_path / "none.sqlite3",
+        canonical_candles_path=tmp_path / "canonical_candles.sqlite3",
+    )
+    status_missing = engine.get_blind_validation_status(
+        ledger_path=missing_path, now_ms=clock_ms
+    )
+    assert status_missing["clock_source"] == "EXPLICIT_AS_OF"
+    assert status_missing["expected_boundary_count"] == 10
     assert status_missing["observed_boundary_count"] == 0
     assert status_missing["state"] == H39_STATE_INSUFFICIENT

@@ -18,6 +18,14 @@ from btc_quant_agent.opportunity_forward import (
 )
 
 
+def _forward_roots(tmp_path: Path) -> dict[str, Path]:
+    return {
+        "derivatives_store_path": tmp_path / "derivatives.sqlite3",
+        "opportunity_store_path": tmp_path / "opportunity.sqlite3",
+        "microstructure_root": tmp_path / "microstructure",
+    }
+
+
 def test_derivatives_terminal_epoch_cannot_resolve_as_active(tmp_path: Path) -> None:
     config_file = tmp_path / "epoch.json"
     config_file.write_text(
@@ -181,7 +189,7 @@ def test_collector_resolver_parity_checker() -> None:
     assert "Collector targets" in result_mismatch["detail"]
 
 
-def test_forward_doctor_network_http_451_fails_closed() -> None:
+def test_forward_doctor_network_http_451_fails_closed(tmp_path: Path) -> None:
     from urllib.error import HTTPError
 
     mock_opener = MagicMock()
@@ -193,13 +201,13 @@ def test_forward_doctor_network_http_451_fails_closed() -> None:
         fp=MagicMock(read=lambda: b"Service unavailable from restricted location"),
     )
 
-    doc = forward_doctor(url_opener=mock_opener)
+    doc = forward_doctor(url_opener=mock_opener, **_forward_roots(tmp_path))
     assert doc["status"] == "NETWORK_INELIGIBLE"
     assert doc["is_healthy"] is False
     assert any("451" in issue for issue in doc["issues"])
 
 
-def test_forward_doctor_preregistered_successor_recognized() -> None:
+def test_forward_doctor_preregistered_successor_recognized(tmp_path: Path) -> None:
     pre_start_ms = 1788458000000  # Strictly before 1788458400000 (2026-09-03T18:00:00Z)
     mock_resp = MagicMock()
     mock_resp.status = 200
@@ -237,7 +245,11 @@ def test_forward_doctor_preregistered_successor_recognized() -> None:
             "linger_enabled": True,
         },
     ):
-        doc = forward_doctor(url_opener=mock_opener, now_ms=pre_start_ms)
+        doc = forward_doctor(
+            url_opener=mock_opener,
+            now_ms=pre_start_ms,
+            **_forward_roots(tmp_path),
+        )
         assert doc["status"] == "PREREGISTERED_NOT_STARTED"
         assert doc["is_healthy"] is True
         assert doc["parity"]["parity_ok"] is True
@@ -246,7 +258,7 @@ def test_forward_doctor_preregistered_successor_recognized() -> None:
         assert doc["chains"]["storage"]["writable"] is True
 
 
-def test_forward_doctor_post_start_healthy_accumulating() -> None:
+def test_forward_doctor_post_start_healthy_accumulating(tmp_path: Path) -> None:
     post_start_ms = 1788459000000  # Strictly at/after 1788458400000 (2026-09-03T18:00:00Z)
     mock_resp = MagicMock()
     mock_resp.status = 200
@@ -284,7 +296,11 @@ def test_forward_doctor_post_start_healthy_accumulating() -> None:
             "linger_enabled": True,
         },
     ):
-        doc = forward_doctor(url_opener=mock_opener, now_ms=post_start_ms)
+        doc = forward_doctor(
+            url_opener=mock_opener,
+            now_ms=post_start_ms,
+            **_forward_roots(tmp_path),
+        )
         assert doc["status"] == "HEALTHY_ACCUMULATING"
         assert doc["is_healthy"] is True
         assert doc["parity"]["parity_ok"] is True

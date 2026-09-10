@@ -2144,10 +2144,12 @@ class H39ResearchEngine:
         protocol_path: str | Path = H39_PROTOCOL_PATH,
         microstructure_root: str | Path = "data/forward/BTCUSDT/microstructure",
         opportunity_store_path: str | Path = "data/forward/BTCUSDT/opportunity_shadow.sqlite3",
+        canonical_candles_path: str | Path = H39_CANONICAL_CANDLES_PATH,
     ) -> None:
         self.protocol_path = Path(protocol_path).resolve()
         self.microstructure_root = Path(microstructure_root).resolve()
         self.opportunity_store_path = Path(opportunity_store_path).resolve()
+        self.canonical_candles_path = Path(canonical_candles_path).resolve()
         if not self.protocol_path.exists():
             raise FileNotFoundError(f"Protocol not found: {self.protocol_path}")
         self.protocol = json.loads(self.protocol_path.read_text(encoding="utf-8"))
@@ -2195,10 +2197,10 @@ class H39ResearchEngine:
         start_ms: int,
         end_ms: int,
         candle_client: BinancePublicClient | None = None,
-        canonical_store_path: str | Path = H39_CANONICAL_CANDLES_PATH,
+        canonical_store_path: str | Path | None = None,
     ) -> dict[int, dict[str, float]]:
         candles: dict[int, dict[str, float]] = {}
-        c_path = Path(canonical_store_path).resolve()
+        c_path = Path(canonical_store_path or self.canonical_candles_path).resolve()
         if c_path.exists():
             uri = f"file:{c_path.as_posix()}?mode=ro"
             try:
@@ -4538,6 +4540,7 @@ class H39OneShotUnblindGatekeeper:
             protocol_path=self.protocol_path,
             microstructure_root=self.microstructure_root,
             opportunity_store_path=self.opportunity_store_path,
+            canonical_candles_path=self.canonical_candles_path,
         )
         readiness = engine.check_unblind_readiness(
             ledger_path=self.ledger_path,
@@ -4928,6 +4931,7 @@ class H39OneShotUnblindGatekeeper:
             protocol_path=self.protocol_path,
             microstructure_root=self.microstructure_root,
             opportunity_store_path=self.opportunity_store_path,
+            canonical_candles_path=self.canonical_candles_path,
         )
         candles = engine.get_canonical_1m_candles(
             start_ms=min_ref,
@@ -5677,6 +5681,10 @@ def generate_all_v0325_deliverables(
     opportunity_store_path: str | Path = "data/forward/BTCUSDT/opportunity_shadow.sqlite3",
     as_of_ms: int | None = None,
     now_ms: int | None = None,
+    canonical_derivatives_path: str | Path = "data/forward/BTCUSDT/derivatives.sqlite3",
+    canonical_candles_path: str | Path = H39_CANONICAL_CANDLES_PATH,
+    registry_path: str | Path = H39_ONE_SHOT_EXECUTION_REGISTRY_DEFAULT_PATH,
+    snapshot_dir: str | Path = H39_FROZEN_SNAPSHOT_DEFAULT_DIR,
 ) -> dict[str, str]:
     """Generate v0.3.25 preregistration and operational status deliverables.
 
@@ -5692,6 +5700,9 @@ def generate_all_v0325_deliverables(
         ledger_path=ledger_path,
         microstructure_root=microstructure_root,
         opportunity_store_path=opportunity_store_path,
+        canonical_candles_path=canonical_candles_path,
+        registry_path=registry_path,
+        snapshot_dir=snapshot_dir,
     )
     readiness = gatekeeper.verify_readiness_preconditions(as_of_ms=as_of_ms, now_ms=now_ms)
     summary = readiness.get("summary", {})
@@ -5841,8 +5852,9 @@ def generate_all_v0325_deliverables(
     # 3. FORWARD_CHAIN_HEALTH.json
     chain_health = evaluate_forward_chain_health(
         microstructure_root=microstructure_root,
-        canonical_derivatives_path="data/forward/BTCUSDT/derivatives.sqlite3",
-        opportunity_store_path="data/forward/BTCUSDT/opportunity_shadow.sqlite3",
+        canonical_derivatives_path=canonical_derivatives_path,
+        opportunity_store_path=opportunity_store_path,
+        now_ms=now_ms,
     )
     ch_path = out_dir / "FORWARD_CHAIN_HEALTH.json"
     ch_path.write_text(json.dumps(chain_health, indent=2, sort_keys=True), encoding="utf-8")

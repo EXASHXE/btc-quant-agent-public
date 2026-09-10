@@ -58,6 +58,17 @@ def _test(baseline: np.ndarray, candidate: np.ndarray, y: np.ndarray, ts: np.nda
     )
 
 
+def _gatekeeper(tmp_path: Path) -> H39OneShotUnblindGatekeeper:
+    return H39OneShotUnblindGatekeeper(
+        ledger_path=tmp_path / "h39_ledger.sqlite3",
+        microstructure_root=tmp_path / "microstructure",
+        opportunity_store_path=tmp_path / "opportunity.sqlite3",
+        canonical_candles_path=tmp_path / "canonical_candles.sqlite3",
+        registry_path=tmp_path / "registry.sqlite3",
+        snapshot_dir=tmp_path / "frozen_snapshots",
+    )
+
+
 # 1-10: formal conditional-incremental statistical invariants.
 def test_01_exact_duplicate_baseline_not_testable() -> None:
     b, _, _, noise = _dgp()
@@ -355,7 +366,11 @@ def test_22_to_26_dual_stream_health(
         None if trade_delta is None else now - trade_delta,
     )
     health = evaluate_forward_chain_health(
-        microstructure_root=root, now_ms=now, microstructure_stale_threshold_seconds=3600
+        microstructure_root=root,
+        canonical_derivatives_path=tmp_path / "derivatives.sqlite3",
+        opportunity_store_path=tmp_path / "opportunity.sqlite3",
+        now_ms=now,
+        microstructure_stale_threshold_seconds=3600,
     )
     assert health["microstructure_chain"]["status"] == expected
     if expected != "HEALTHY":
@@ -399,7 +414,7 @@ def test_27_precheck_failure_does_not_consume_key(
 
     monkeypatch.setattr(module, "H39_MINIMUM_ELIGIBLE_OBSERVATIONS", 1)
     freeze, manifest = _snapshot(tmp_path, valid=False)
-    gate = H39OneShotUnblindGatekeeper(registry_path=tmp_path / "registry.sqlite3")
+    gate = _gatekeeper(tmp_path)
     with (
         patch.object(gate, "verify_freeze_manifest", return_value=manifest),
         patch.object(
@@ -477,7 +492,7 @@ def test_30_label_loader_never_runs_before_blind_precheck(
 
     monkeypatch.setattr(module, "H39_MINIMUM_ELIGIBLE_OBSERVATIONS", 1)
     freeze, manifest = _snapshot(tmp_path, valid=False)
-    gate = H39OneShotUnblindGatekeeper(registry_path=tmp_path / "registry.sqlite3")
+    gate = _gatekeeper(tmp_path)
     with (
         patch.object(gate, "verify_freeze_manifest", return_value=manifest),
         patch.object(

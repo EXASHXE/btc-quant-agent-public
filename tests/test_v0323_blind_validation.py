@@ -39,6 +39,14 @@ from btc_quant_agent.microstructure_research import (
 )
 
 
+def _research_engine(tmp_path: Path) -> H39ResearchEngine:
+    return H39ResearchEngine(
+        microstructure_root=tmp_path / "microstructure",
+        opportunity_store_path=tmp_path / "opportunity.sqlite3",
+        canonical_candles_path=tmp_path / "canonical_candles.sqlite3",
+    )
+
+
 def _make_dummy_valid_row(
     slot_ms: int = H39_VALIDATION_START_MS,
     eligible: bool = True,
@@ -519,10 +527,14 @@ def test_pre_start_development_evaluation_functional() -> None:
     assert len(res_240m) == len(FORMAL_FEATURE_IDS)
 
 
-def test_readiness_does_not_execute_statistics(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_readiness_does_not_execute_statistics(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    h39_outcome_access_spy: list[str],
+) -> None:
     # Section 6.D: Both immature and mature-simulated readiness paths must expose
     # only readiness/maturity metadata and must not call the formal evaluator.
-    engine = H39ResearchEngine()
+    engine = _research_engine(tmp_path)
     ledger_path = tmp_path / "readiness_stat_guard.sqlite3"
     ledger = H39BlindLedger(ledger_path)
 
@@ -540,12 +552,16 @@ def test_readiness_does_not_execute_statistics(tmp_path: Path, monkeypatch: pyte
     )
 
     # 1. Immature ledger check
-    r_immature = engine.check_unblind_readiness(ledger_path=ledger_path)
+    r_immature = engine.check_unblind_readiness(
+        ledger_path=ledger_path, now_ms=H39_VALIDATION_START_MS
+    )
     assert call_count == 0
     assert r_immature["ready_for_unblind"] is False
     assert r_immature["status"] == "FORWARD_DATA_INSUFFICIENT"
 
-    st_immature = engine.get_blind_validation_status(ledger_path=ledger_path)
+    st_immature = engine.get_blind_validation_status(
+        ledger_path=ledger_path, now_ms=H39_VALIDATION_START_MS
+    )
     assert call_count == 0
     assert st_immature["state"] == "FORWARD_DATA_INSUFFICIENT"
 
@@ -558,6 +574,7 @@ def test_readiness_does_not_execute_statistics(tmp_path: Path, monkeypatch: pyte
     assert call_count == 0
     assert r_mature["ready_for_unblind"] is True
     assert r_mature["status"] == "H39_READY_FOR_ONE_SHOT_UNBLIND"
+    assert h39_outcome_access_spy == []
 
     # Verify mature payload exposes only metadata and zero performance metrics
     r_mature_str = json.dumps(r_mature).lower()
@@ -685,12 +702,14 @@ def test_maturity_requires_all_gates_simultaneously(tmp_path: Path) -> None:
 
 
 def test_ready_state_schema_and_no_performance_leak(tmp_path: Path) -> None:
-    engine = H39ResearchEngine()
+    engine = _research_engine(tmp_path)
     ledger_path = tmp_path / "readiness_test.sqlite3"
     H39BlindLedger(ledger_path)
 
     # When immature:
-    r_immature = engine.check_unblind_readiness(ledger_path=ledger_path)
+    r_immature = engine.check_unblind_readiness(
+        ledger_path=ledger_path, now_ms=H39_VALIDATION_START_MS
+    )
     assert r_immature["ready_for_unblind"] is False
     assert "summary" in r_immature
     assert r_immature["status"] == "FORWARD_DATA_INSUFFICIENT"
@@ -701,13 +720,16 @@ def test_ready_state_schema_and_no_performance_leak(tmp_path: Path) -> None:
         assert f'"{forbidden}"' not in r_str
 
 
-def test_final_holdout_sealed_and_execution_disabled() -> None:
-    engine = H39ResearchEngine()
+def test_final_holdout_sealed_and_execution_disabled(
+    tmp_path: Path, h39_outcome_access_spy: list[str]
+) -> None:
+    engine = _research_engine(tmp_path)
     val_status = engine.evaluate_validation_status()
 
     assert val_status["execution"] == "DISABLED"
     assert val_status["runtime_maximum"] == "OPPORTUNITY_ONLY"
     assert val_status["candidate_promotion_allowed"] is False
+    assert h39_outcome_access_spy == []
 
     # Check configs/safety
     opp_config_path = Path("configs/forward/opportunity_forward_campaigns.json")

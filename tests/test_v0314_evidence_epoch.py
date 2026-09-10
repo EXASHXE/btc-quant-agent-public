@@ -301,6 +301,7 @@ def test_unified_forward_watchdog_separates_epoch_and_archive(
         opportunity_store_path=tmp_path / "opportunity.sqlite3",
         epoch_path=EPOCH_PATH,
         campaign_path=CAMPAIGN_PATH,
+        microstructure_root=tmp_path / "microstructure",
         now_ms=EvidenceEpoch.load(EPOCH_PATH).epoch_start_ms - 1,
     )
     assert report["derivatives"]["active_epoch"]["eligibility_state"] == "INITIALIZING"

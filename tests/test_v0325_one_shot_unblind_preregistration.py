@@ -276,6 +276,38 @@ def _populate_canonical_candles(
         conn.commit()
 
 
+def _gatekeeper(tmp_path: Path, **overrides: Any) -> H39OneShotUnblindGatekeeper:
+    paths: dict[str, str | Path] = {
+        "ledger_path": tmp_path / "h39_ledger.sqlite3",
+        "microstructure_root": tmp_path / "microstructure",
+        "opportunity_store_path": tmp_path / "opportunity.sqlite3",
+        "canonical_candles_path": tmp_path / "canonical_candles.sqlite3",
+        "registry_path": tmp_path / "one_shot_registry.sqlite3",
+        "snapshot_dir": tmp_path / "frozen_snapshots",
+    }
+    paths.update(overrides)
+    return H39OneShotUnblindGatekeeper(**paths)
+
+
+def _research_engine(tmp_path: Path) -> H39ResearchEngine:
+    return H39ResearchEngine(
+        microstructure_root=tmp_path / "microstructure",
+        opportunity_store_path=tmp_path / "opportunity.sqlite3",
+        canonical_candles_path=tmp_path / "canonical_candles.sqlite3",
+    )
+
+
+def _forward_health(tmp_path: Path, **overrides: Any) -> dict[str, Any]:
+    paths: dict[str, Any] = {
+        "microstructure_root": tmp_path / "microstructure",
+        "canonical_derivatives_path": tmp_path / "derivatives.sqlite3",
+        "opportunity_store_path": tmp_path / "opportunity.sqlite3",
+        "now_ms": H39_VALIDATION_START_MS,
+    }
+    paths.update(overrides)
+    return evaluate_forward_chain_health(**paths)
+
+
 # =====================================================================
 # SECTION 13 REQUIREMENT TESTS
 # =====================================================================
@@ -286,7 +318,7 @@ def test_unblind_refuses_before_14_days(tmp_path: Path) -> None:
     # 13 distinct days with full slots (51 + 12*96 = 1203 eligible slots, 100% coverage at latest_ms)
     _ledger, latest_ms = _create_synthetic_ledger(db_path, num_days=13, slots_per_day=96)
 
-    gk = H39OneShotUnblindGatekeeper(ledger_path=db_path)
+    gk = _gatekeeper(tmp_path, ledger_path=db_path)
     res = gk.verify_readiness_preconditions(as_of_ms=latest_ms)
     assert not res["ready_for_unblind"]
     assert res["status"] == H39_STATE_INSUFFICIENT
@@ -304,7 +336,7 @@ def test_unblind_refuses_before_750_eligible_observations(tmp_path: Path) -> Non
     # 14 distinct days, exactly 742 eligible slots
     _ledger, latest_ms = _create_synthetic_ledger(db_path, num_days=14, slots_per_day=96, max_eligible=742)
 
-    gk = H39OneShotUnblindGatekeeper(ledger_path=db_path)
+    gk = _gatekeeper(tmp_path, ledger_path=db_path)
     res = gk.verify_readiness_preconditions(as_of_ms=latest_ms)
     assert not res["ready_for_unblind"]
     assert res["status"] == H39_STATE_INSUFFICIENT
@@ -323,7 +355,7 @@ def test_unblind_refuses_below_90pct_wall_clock_coverage(tmp_path: Path) -> None
 
     # Move clock forward so expected boundaries = 1000 -> coverage = 756 / 1000 = 75.6%
     as_of_ms = H39_VALIDATION_START_MS + (1000 - 1) * 900_000
-    gk = H39OneShotUnblindGatekeeper(ledger_path=db_path)
+    gk = _gatekeeper(tmp_path, ledger_path=db_path)
     res = gk.verify_readiness_preconditions(as_of_ms=as_of_ms)
     assert not res["ready_for_unblind"]
     assert res["status"] == H39_STATE_INSUFFICIENT
@@ -339,7 +371,7 @@ def test_stale_ledger_cannot_authorize_unblind(tmp_path: Path) -> None:
     db_path = tmp_path / "h39_ledger.sqlite3"
     _ledger, latest_ms = _create_synthetic_ledger(db_path, num_days=14, slots_per_day=54)
 
-    gk = H39OneShotUnblindGatekeeper(ledger_path=db_path)
+    gk = _gatekeeper(tmp_path, ledger_path=db_path)
     # Stale ledger evaluated 5 days later without new slots
     future_wall_clock = latest_ms + 5 * 86_400_000
     res = gk.verify_readiness_preconditions(as_of_ms=future_wall_clock)
@@ -360,7 +392,7 @@ def test_source_partition_mutation_blocks_unblind(tmp_path: Path) -> None:
     # Mutate source partition
     part_file.write_bytes(b"tampered_mutated_content")
 
-    gk = H39OneShotUnblindGatekeeper(ledger_path=db_path)
+    gk = _gatekeeper(tmp_path, ledger_path=db_path)
     res = gk.verify_readiness_preconditions(as_of_ms=latest_ms)
     assert not res["ready_for_unblind"]
     assert res["status"] == H39_STATE_BLOCKED_QUALITY
@@ -376,7 +408,7 @@ def test_protocol_hash_drift_blocks_unblind(tmp_path: Path) -> None:
     bad_proto = tmp_path / "bad_protocol.json"
     bad_proto.write_text('{"tampered": true}', encoding="utf-8")
 
-    gk = H39OneShotUnblindGatekeeper(ledger_path=db_path, protocol_path=bad_proto)
+    gk = _gatekeeper(tmp_path, ledger_path=db_path, protocol_path=bad_proto)
     with pytest.raises(RuntimeError, match="PROTOCOL_HASH_DRIFT"):
         gk.verify_readiness_preconditions(as_of_ms=latest_ms)
 
@@ -389,7 +421,7 @@ def test_clarification_hash_drift_blocks_unblind(tmp_path: Path) -> None:
     bad_clar = tmp_path / "bad_clarification.json"
     bad_clar.write_text('{"tampered": true}', encoding="utf-8")
 
-    gk = H39OneShotUnblindGatekeeper(ledger_path=db_path, clarification_path=bad_clar)
+    gk = _gatekeeper(tmp_path, ledger_path=db_path, clarification_path=bad_clar)
     with pytest.raises(RuntimeError, match="CLARIFICATION_HASH_DRIFT"):
         gk.verify_readiness_preconditions(as_of_ms=latest_ms)
 
@@ -402,9 +434,11 @@ def test_clarification_002_and_003_hash_and_sha_pinned() -> None:
     assert H39_FROZEN_CLARIFICATION_003_HASH == "035b7528141c714fbe1aef310462d5aa5fd96d3d5fdec67ae8f70082531d7a92"
 
 
-def test_legacy_evaluate_validation_status_cannot_authorize_unblind() -> None:
+def test_legacy_evaluate_validation_status_cannot_authorize_unblind(
+    tmp_path: Path, h39_outcome_access_spy: list[str]
+) -> None:
     """8. Legacy evaluate_validation_status cannot authorize unblind."""
-    engine = H39ResearchEngine()
+    engine = _research_engine(tmp_path)
     with warnings.catch_warnings(record=True) as w:
         warnings.simplefilter("always")
         diag = engine.evaluate_validation_status()
@@ -415,6 +449,7 @@ def test_legacy_evaluate_validation_status_cannot_authorize_unblind() -> None:
     assert diag["diagnostic_only"] is True
     assert diag["readiness_authority"] == "NON_AUTHORITATIVE_DIAGNOSTIC_ONLY"
     assert diag["authoritative_unblind_authorization_allowed"] is False
+    assert h39_outcome_access_spy == []
 
 
 def test_freeze_cutoff_excludes_later_rows(tmp_path: Path) -> None:
@@ -435,7 +470,8 @@ def test_freeze_cutoff_excludes_later_rows(tmp_path: Path) -> None:
     freeze_file = repo_dir / "freeze.json"
     registry_path = tmp_path / "reg.sqlite3"
     snapshot_dir = tmp_path / "snapshots"
-    gk = H39OneShotUnblindGatekeeper(
+    gk = _gatekeeper(
+        tmp_path,
         ledger_path=db_path,
         canonical_candles_path=candles_path,
         registry_path=registry_path,
@@ -538,7 +574,8 @@ def test_240m_cannot_rescue_60m_failure(tmp_path: Path) -> None:
     freeze_file = repo_dir / "freeze.json"
     registry_path = tmp_path / "reg.sqlite3"
     snapshot_dir = tmp_path / "snapshots"
-    gk = H39OneShotUnblindGatekeeper(
+    gk = _gatekeeper(
+        tmp_path,
         ledger_path=db_path,
         canonical_candles_path=candles_path,
         registry_path=registry_path,
@@ -576,9 +613,9 @@ def test_240m_cannot_rescue_60m_failure(tmp_path: Path) -> None:
     assert len(results["provisional_candidates"]) == 0
 
 
-def test_baseline_fields_exactly_frozen_trio() -> None:
+def test_baseline_fields_exactly_frozen_trio(tmp_path: Path) -> None:
     """16. Baseline fields are exactly trailing_return_15m, trailing_return_60m, trailing_atr_ratio_15m."""
-    gatekeeper = H39OneShotUnblindGatekeeper()
+    gatekeeper = _gatekeeper(tmp_path)
     assert gatekeeper is not None
 
 
@@ -589,26 +626,29 @@ def test_no_hyperparameter_or_model_search() -> None:
         assert manifest["model_family"] == "L2_LOGISTIC_REGRESSION_LAMBDA_1_0"
 
 
-def test_no_final_holdout_access() -> None:
+def test_no_final_holdout_access(
+    tmp_path: Path, h39_outcome_access_spy: list[str]
+) -> None:
     """18. Final holdout remains sealed and unread."""
-    gk = H39OneShotUnblindGatekeeper()
-    readiness = gk.verify_readiness_preconditions()
+    gk = _gatekeeper(tmp_path)
+    readiness = gk.verify_readiness_preconditions(now_ms=H39_VALIDATION_START_MS)
     assert readiness["summary"]["safety_firewalls"]["final_holdout"] == "SEALED"
+    assert h39_outcome_access_spy == []
 
 
-def test_no_runtime_direction_integration() -> None:
+def test_no_runtime_direction_integration(tmp_path: Path) -> None:
     """19. Direction engine remains NONE, runtime ceiling remains OPPORTUNITY_ONLY."""
-    gk = H39OneShotUnblindGatekeeper()
-    readiness = gk.verify_readiness_preconditions()
+    gk = _gatekeeper(tmp_path)
+    readiness = gk.verify_readiness_preconditions(now_ms=H39_VALIDATION_START_MS)
     fw = readiness["summary"]["safety_firewalls"]
     assert fw["qualified_direction_engine"] == "NONE"
     assert fw["runtime_maximum"] == "OPPORTUNITY_ONLY"
 
 
-def test_execution_remains_disabled() -> None:
+def test_execution_remains_disabled(tmp_path: Path) -> None:
     """20. Execution engine remains DISABLED and auto_execute false."""
-    gk = H39OneShotUnblindGatekeeper()
-    readiness = gk.verify_readiness_preconditions()
+    gk = _gatekeeper(tmp_path)
+    readiness = gk.verify_readiness_preconditions(now_ms=H39_VALIDATION_START_MS)
     fw = readiness["summary"]["safety_firewalls"]
     assert fw["execution"] == "DISABLED"
     assert fw["auto_execute"] is False
@@ -682,7 +722,8 @@ def test_full_mock_unblind_execution_on_synthetic_mature_ledger(tmp_path: Path) 
         slots = [r[0] for r in conn.execute("SELECT decision_close_ms FROM h39_blind_validation_ledger WHERE decision_close_ms <= ?", (latest_ms,)).fetchall()]
     _populate_canonical_candles(candles_path, slots)
 
-    gk = H39OneShotUnblindGatekeeper(
+    gk = _gatekeeper(
+        tmp_path,
         ledger_path=db_path,
         canonical_candles_path=candles_path,
         registry_path=registry_path,
@@ -744,7 +785,18 @@ def test_full_mock_unblind_execution_on_synthetic_mature_ledger(tmp_path: Path) 
 def test_generate_all_v0325_deliverables_immature_state(tmp_path: Path) -> None:
     """Test v0.3.25 deliverables generation under immature state (current live repo state)."""
     deliv_dir = tmp_path / "v0.3.25"
-    files = generate_all_v0325_deliverables(output_dir=deliv_dir)
+    files = generate_all_v0325_deliverables(
+        output_dir=deliv_dir,
+        ledger_path=tmp_path / "h39_ledger.sqlite3",
+        microstructure_root=tmp_path / "microstructure",
+        opportunity_store_path=tmp_path / "opportunity.sqlite3",
+        canonical_derivatives_path=tmp_path / "derivatives.sqlite3",
+        canonical_candles_path=tmp_path / "canonical_candles.sqlite3",
+        registry_path=tmp_path / "one_shot_registry.sqlite3",
+        snapshot_dir=tmp_path / "frozen_snapshots",
+        as_of_ms=H39_VALIDATION_START_MS,
+        now_ms=H39_VALIDATION_START_MS,
+    )
     assert len(files) == 11
     assert all(Path(p).exists() for p in files.values())
 
@@ -804,7 +856,8 @@ def test_finding_a_uncommitted_freeze_cannot_unblind(tmp_path: Path) -> None:
     _ledger, latest_ms = _create_synthetic_ledger(db_path, num_days=14, slots_per_day=96)
 
     freeze_file = repo_dir / "freeze.json"
-    gk = H39OneShotUnblindGatekeeper(
+    gk = _gatekeeper(
+        tmp_path,
         ledger_path=db_path,
         canonical_candles_path=candles_path,
         registry_path=tmp_path / "reg.sqlite3",
@@ -834,7 +887,8 @@ def test_finding_a_dirty_freeze_cannot_unblind(tmp_path: Path) -> None:
     _ledger, latest_ms = _create_synthetic_ledger(db_path, num_days=14, slots_per_day=96)
 
     freeze_file = repo_dir / "freeze.json"
-    gk = H39OneShotUnblindGatekeeper(
+    gk = _gatekeeper(
+        tmp_path,
         ledger_path=db_path,
         canonical_candles_path=candles_path,
         registry_path=tmp_path / "reg.sqlite3",
@@ -866,7 +920,8 @@ def test_finding_a_exact_committed_blob_is_required(tmp_path: Path) -> None:
     _ledger, latest_ms = _create_synthetic_ledger(db_path, num_days=14, slots_per_day=96)
 
     freeze_file = repo_dir / "freeze.json"
-    gk = H39OneShotUnblindGatekeeper(
+    gk = _gatekeeper(
+        tmp_path,
         ledger_path=db_path,
         registry_path=tmp_path / "reg.sqlite3",
         snapshot_dir=tmp_path / "snapshots",
@@ -890,7 +945,8 @@ def test_finding_a_freeze_commit_must_be_ancestor(tmp_path: Path) -> None:
     _ledger, latest_ms = _create_synthetic_ledger(db_path, num_days=14, slots_per_day=96)
 
     freeze_file = repo_dir / "freeze.json"
-    gk = H39OneShotUnblindGatekeeper(
+    gk = _gatekeeper(
+        tmp_path,
         ledger_path=db_path,
         registry_path=tmp_path / "reg.sqlite3",
         snapshot_dir=tmp_path / "snapshots",
@@ -1041,7 +1097,8 @@ def test_finding_c_wal_safe_snapshot(tmp_path: Path) -> None:
         conn.execute("PRAGMA journal_mode = WAL;")
 
     freeze_file = repo_dir / "freeze.json"
-    gk = H39OneShotUnblindGatekeeper(
+    gk = _gatekeeper(
+        tmp_path,
         ledger_path=db_path,
         registry_path=tmp_path / "reg.sqlite3",
         snapshot_dir=snapshot_dir,
@@ -1076,7 +1133,8 @@ def test_finding_d_readiness_artifact_hash_tampering(tmp_path: Path) -> None:
     _ledger, latest_ms = _create_synthetic_ledger(db_path, num_days=14, slots_per_day=96)
 
     freeze_file = repo_dir / "freeze.json"
-    gk = H39OneShotUnblindGatekeeper(
+    gk = _gatekeeper(
+        tmp_path,
         ledger_path=db_path,
         canonical_candles_path=candles_path,
         registry_path=tmp_path / "reg.sqlite3",
@@ -1115,7 +1173,8 @@ def test_finding_f_label_loader_ordering_spy(tmp_path: Path) -> None:
 
     freeze_file = repo_dir / "freeze.json"
     registry_path = tmp_path / "reg.sqlite3"
-    gk = H39OneShotUnblindGatekeeper(
+    gk = _gatekeeper(
+        tmp_path,
         ledger_path=db_path,
         canonical_candles_path=candles_path,
         registry_path=registry_path,
@@ -1275,7 +1334,8 @@ def test_one_shot_results_contain_hac_and_bootstrap(tmp_path: Path) -> None:
 
     freeze_file = repo_dir / "freeze.json"
     registry_path = tmp_path / "reg.sqlite3"
-    gk = H39OneShotUnblindGatekeeper(
+    gk = _gatekeeper(
+        tmp_path,
         ledger_path=db_path,
         canonical_candles_path=candles_path,
         registry_path=registry_path,
@@ -1313,7 +1373,7 @@ def test_derivatives_health_states(tmp_path: Path) -> None:
     """Finding B.1: Derivatives chain evaluates all failure and healthy states correctly."""
     # 1. Missing file -> MISSING, exists=False, db_integrity=NOT_CHECKED, rows=0
     missing_path = tmp_path / "non_existent.sqlite3"
-    h_missing = evaluate_forward_chain_health(canonical_derivatives_path=missing_path)
+    h_missing = _forward_health(tmp_path, canonical_derivatives_path=missing_path)
     d_m = h_missing["derivatives_chain"]
     assert d_m["status"] == "MISSING"
     assert d_m["exists"] is False
@@ -1324,7 +1384,7 @@ def test_derivatives_health_states(tmp_path: Path) -> None:
     # 2. Corrupt / non-sqlite file -> READ_ERROR or INTEGRITY_ERROR
     corrupt_path = tmp_path / "corrupt.sqlite3"
     corrupt_path.write_bytes(b"NOT_A_SQLITE_DATABASE")
-    h_corrupt = evaluate_forward_chain_health(canonical_derivatives_path=corrupt_path)
+    h_corrupt = _forward_health(tmp_path, canonical_derivatives_path=corrupt_path)
     d_c = h_corrupt["derivatives_chain"]
     assert d_c["status"] in ("INTEGRITY_ERROR", "READ_ERROR")
     assert h_corrupt["aggregate_status"] == "BLOCKED"
@@ -1333,7 +1393,7 @@ def test_derivatives_health_states(tmp_path: Path) -> None:
     bad_schema = tmp_path / "bad_schema.sqlite3"
     with sqlite3.connect(bad_schema) as conn:
         conn.execute("CREATE TABLE other_table (id INT)")
-    h_bad_schema = evaluate_forward_chain_health(canonical_derivatives_path=bad_schema)
+    h_bad_schema = _forward_health(tmp_path, canonical_derivatives_path=bad_schema)
     assert h_bad_schema["derivatives_chain"]["status"] == "SCHEMA_ERROR"
     assert h_bad_schema["aggregate_status"] == "BLOCKED"
 
@@ -1346,7 +1406,7 @@ def test_derivatives_health_states(tmp_path: Path) -> None:
                 taker_buy_sell_ratio REAL, basis_rate REAL, long_short_account_ratio REAL
             )"""
         )
-    h_empty = evaluate_forward_chain_health(canonical_derivatives_path=empty_db)
+    h_empty = _forward_health(tmp_path, canonical_derivatives_path=empty_db)
     assert h_empty["derivatives_chain"]["status"] == "EMPTY"
     assert h_empty["derivatives_chain"]["rows_recorded"] == 0
     assert h_empty["aggregate_status"] == "BLOCKED"
@@ -1370,7 +1430,8 @@ def test_derivatives_health_states(tmp_path: Path) -> None:
     p_file_stale = mock_m_root_stale / "microstructure-2026-09-06.sqlite3"
     _populate_canonical_microstructure_partition(p_file_stale, old_t + 10_000_000 - 30_000)
 
-    h_stale = evaluate_forward_chain_health(
+    h_stale = _forward_health(
+        tmp_path,
         canonical_derivatives_path=stale_db,
         microstructure_root=mock_m_root_stale,
         now_ms=old_t + 10_000_000,
@@ -1397,7 +1458,8 @@ def test_derivatives_health_states(tmp_path: Path) -> None:
     p_file = mock_m_root / "microstructure-2026-09-06.sqlite3"
     _populate_canonical_microstructure_partition(p_file, fresh_t)
 
-    h_fresh = evaluate_forward_chain_health(
+    h_fresh = _forward_health(
+        tmp_path,
         canonical_derivatives_path=fresh_db,
         microstructure_root=mock_m_root,
         now_ms=fresh_t + 60_000,
@@ -1410,7 +1472,9 @@ def test_derivatives_health_states(tmp_path: Path) -> None:
 def test_microstructure_health_states(tmp_path: Path) -> None:
     """Finding B.2 & Blocker C: Microstructure health evaluates root, partitions, schema, and truthfulness."""
     # 1. Missing root -> MISSING
-    h_m_missing = evaluate_forward_chain_health(microstructure_root=tmp_path / "no_such_dir")
+    h_m_missing = _forward_health(
+        tmp_path, microstructure_root=tmp_path / "no_such_dir"
+    )
     assert h_m_missing["microstructure_chain"]["status"] == "MISSING"
     assert h_m_missing["microstructure_chain"]["root_exists"] is False
     assert h_m_missing["aggregate_status"] == "BLOCKED"
@@ -1418,7 +1482,7 @@ def test_microstructure_health_states(tmp_path: Path) -> None:
     # 2. Empty directory (no partitions) -> MISSING
     empty_root = tmp_path / "empty_micro"
     empty_root.mkdir()
-    h_m_empty = evaluate_forward_chain_health(microstructure_root=empty_root)
+    h_m_empty = _forward_health(tmp_path, microstructure_root=empty_root)
     assert h_m_empty["microstructure_chain"]["status"] == "MISSING"
     assert h_m_empty["microstructure_chain"]["partition_count"] == 0
 
@@ -1447,7 +1511,7 @@ def test_microstructure_tables_exist_but_columns_missing_is_schema_error(tmp_pat
         conn.execute("CREATE TABLE gaps (start_ms INT, end_ms INT)")
         conn.execute("INSERT INTO agg_trades VALUES (1000)")
         conn.execute("INSERT INTO book_samples VALUES (1000)")
-    health = evaluate_forward_chain_health(microstructure_root=m_root, now_ms=1000)
+    health = _forward_health(tmp_path, microstructure_root=m_root, now_ms=1000)
     assert health["microstructure_chain"]["status"] == "SCHEMA_ERROR"
     assert health["microstructure_chain"]["latest_partition_schema_valid"] is False
     assert health["aggregate_status"] == "BLOCKED"
@@ -1461,7 +1525,7 @@ def test_microstructure_missing_gaps_table_is_schema_error(tmp_path: Path) -> No
     with sqlite3.connect(p_file) as conn:
         conn.execute("CREATE TABLE agg_trades (event_time_ms INT, receive_time_ms INT, price REAL, quantity REAL, aggressive_side TEXT)")
         conn.execute("CREATE TABLE book_samples (event_time_ms INT, receive_time_ms INT, spread_bps REAL, top1_imbalance REAL, top5_imbalance REAL, top20_imbalance REAL, microprice REAL, ofi REAL)")
-    health = evaluate_forward_chain_health(microstructure_root=m_root, now_ms=1000)
+    health = _forward_health(tmp_path, microstructure_root=m_root, now_ms=1000)
     assert health["microstructure_chain"]["status"] == "SCHEMA_ERROR"
     assert health["aggregate_status"] == "BLOCKED"
 
@@ -1475,7 +1539,7 @@ def test_future_receive_timestamp_beyond_tolerance_is_timestamp_error(tmp_path: 
     future_ms = now_ms + int((H39_FUTURE_SKEW_TOLERANCE_SECONDS + 1.0) * 1000)
     _populate_canonical_microstructure_partition(p_file, event_time_ms=now_ms, receive_time_ms=future_ms)
 
-    health = evaluate_forward_chain_health(microstructure_root=m_root, now_ms=now_ms)
+    health = _forward_health(tmp_path, microstructure_root=m_root, now_ms=now_ms)
     assert health["microstructure_chain"]["status"] == "TIMESTAMP_ERROR"
     assert health["aggregate_status"] == "BLOCKED"
 
@@ -1496,7 +1560,7 @@ def test_future_derivatives_observed_at_beyond_tolerance_is_timestamp_error(tmp_
             "INSERT INTO derivative_snapshots VALUES (?, 0.0001, 1000.0, 1.1, 0.0002, 1.2)",
             (future_ms,),
         )
-    health = evaluate_forward_chain_health(canonical_derivatives_path=d_path, now_ms=now_ms)
+    health = _forward_health(tmp_path, canonical_derivatives_path=d_path, now_ms=now_ms)
     assert health["derivatives_chain"]["status"] == "TIMESTAMP_ERROR"
     assert health["aggregate_status"] == "BLOCKED"
 
@@ -1513,7 +1577,7 @@ def test_skewed_event_time_uses_valid_receive_time_for_freshness(tmp_path: Path)
         p_file, event_time_ms=skewed_event_ms, receive_time_ms=fresh_receive_ms
     )
 
-    health = evaluate_forward_chain_health(microstructure_root=m_root, now_ms=now_ms)
+    health = _forward_health(tmp_path, microstructure_root=m_root, now_ms=now_ms)
     assert health["microstructure_chain"]["freshness_basis"] == "LOCAL_RECEIVE_TIME"
     assert health["microstructure_chain"]["freshness_seconds"] == 20.0
     assert health["microstructure_chain"]["status"] == "HEALTHY"
@@ -1607,7 +1671,8 @@ def test_score_test_fails_closed_on_insufficient_or_singular() -> None:
 
 def test_missing_clarification_002_refused(tmp_path: Path) -> None:
     """Blocker B: Missing Clarification 002 file fails closed before readiness/freeze/unblind."""
-    gk = H39OneShotUnblindGatekeeper(
+    gk = _gatekeeper(
+        tmp_path,
         clarification_002_path=tmp_path / "non_existent_002.json",
         repo_root=tmp_path,
     )
@@ -1617,7 +1682,8 @@ def test_missing_clarification_002_refused(tmp_path: Path) -> None:
 
 def test_missing_clarification_003_refused(tmp_path: Path) -> None:
     """Blocker B: Missing Clarification 003 file fails closed before readiness/freeze/unblind."""
-    gk = H39OneShotUnblindGatekeeper(
+    gk = _gatekeeper(
+        tmp_path,
         clarification_003_path=tmp_path / "non_existent_003.json",
         repo_root=tmp_path,
     )
@@ -1629,7 +1695,8 @@ def test_hash_drift_002_refused(tmp_path: Path) -> None:
     """Blocker B: Hash drift on Clarification 002 triggers CLARIFICATION_002_HASH_DRIFT."""
     fake_002 = tmp_path / "fake_002.json"
     fake_002.write_text('{"drifted": true}', encoding="utf-8")
-    gk = H39OneShotUnblindGatekeeper(
+    gk = _gatekeeper(
+        tmp_path,
         clarification_002_path=fake_002,
         repo_root=tmp_path,
     )
@@ -1641,7 +1708,8 @@ def test_hash_drift_003_refused(tmp_path: Path) -> None:
     """Blocker B: Hash drift on Clarification 003 triggers CLARIFICATION_003_HASH_DRIFT."""
     fake_003 = tmp_path / "fake_003.json"
     fake_003.write_text('{"drifted": true}', encoding="utf-8")
-    gk = H39OneShotUnblindGatekeeper(
+    gk = _gatekeeper(
+        tmp_path,
         clarification_003_path=fake_003,
         repo_root=tmp_path,
     )
@@ -1676,7 +1744,7 @@ def test_freeze_manifest_omitting_002_refused(tmp_path: Path) -> None:
         "code_version_sha": "fake",
         "attestations": {},
     }), encoding="utf-8")
-    gk = H39OneShotUnblindGatekeeper()
+    gk = _gatekeeper(tmp_path)
     with pytest.raises(RuntimeError, match="FREEZE_MANIFEST_CORRUPT"):
         gk.verify_freeze_manifest(manifest_file)
 
@@ -1708,7 +1776,7 @@ def test_freeze_manifest_omitting_003_refused(tmp_path: Path) -> None:
         "code_version_sha": "fake",
         "attestations": {},
     }), encoding="utf-8")
-    gk = H39OneShotUnblindGatekeeper()
+    gk = _gatekeeper(tmp_path)
     with pytest.raises(RuntimeError, match="FREEZE_MANIFEST_CORRUPT"):
         gk.verify_freeze_manifest(manifest_file)
 

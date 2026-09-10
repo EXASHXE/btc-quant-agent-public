@@ -33,6 +33,14 @@ V0320_EPOCH = ROOT / "configs/forward/v0.3.20_derivatives_evidence_epoch.json"
 V0320_OPPORTUNITY = ROOT / "configs/forward/v0.3.20_opportunity_successor_campaign.json"
 
 
+def _forward_roots(tmp_path: Path) -> dict[str, Path]:
+    return {
+        "derivatives_store_path": tmp_path / "derivatives.sqlite3",
+        "opportunity_store_path": tmp_path / "opportunity.sqlite3",
+        "microstructure_root": tmp_path / "microstructure",
+    }
+
+
 def test_binance_collect_derivatives_empty_source_times_no_type_error() -> None:
     client = BinancePublicClient(DataConfig())
     # Mock all HTTP calls to raise BinanceDataError as _get does on HTTP 451
@@ -153,8 +161,13 @@ def test_v0320_opportunity_successor_preregistration() -> None:
             registry.preregistered_successor()
 
 
-def test_forward_doctor_structure_and_safety_invariants() -> None:
-    doc = forward_doctor()
+def test_forward_doctor_structure_and_safety_invariants(tmp_path: Path) -> None:
+    network_refusal = HTTPError(
+        "https://fapi.binance.com/fapi/v1/time", 451, "Unavailable", {}, None
+    )
+    doc = forward_doctor(
+        url_opener=MagicMock(side_effect=network_refusal), **_forward_roots(tmp_path)
+    )
     assert "status" in doc
     assert "issues" in doc
     assert "wsl_systemd" in doc

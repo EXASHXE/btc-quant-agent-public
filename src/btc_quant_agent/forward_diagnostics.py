@@ -389,12 +389,24 @@ def check_campaign_states(
     }
 
 
-def forward_doctor(*, url_opener: Any = None, now_ms: int | None = None) -> dict[str, Any]:
+def forward_doctor(
+    *,
+    url_opener: Any = None,
+    now_ms: int | None = None,
+    derivatives_store_path: str | Path = "data/forward/BTCUSDT/derivatives.sqlite3",
+    opportunity_store_path: str | Path = "data/forward/BTCUSDT/opportunity_shadow.sqlite3",
+    microstructure_root: str | Path = "data/forward/BTCUSDT/microstructure",
+) -> dict[str, Any]:
     wsl_info = check_wsl_systemd()
     unit_info = check_systemd_units()
     parity_info = check_collector_resolver_parity(unit_info)
     net_info = check_network_proxy(url_opener=url_opener)
-    chain_info = check_chains_and_storage(now_ms=now_ms)
+    chain_info = check_chains_and_storage(
+        derivatives_store_path=derivatives_store_path,
+        opportunity_store_path=opportunity_store_path,
+        microstructure_root=microstructure_root,
+        now_ms=now_ms,
+    )
     campaign_info = check_campaign_states(now_ms=now_ms)
 
     issues: list[str] = []
