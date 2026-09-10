@@ -150,7 +150,7 @@ def hermetic_guard(monkeypatch: pytest.MonkeyPatch) -> Iterator[HermeticAccessGu
         params: dict[str, Any] | None = None,
     ) -> dict[str, Any] | list[dict[str, Any]]:
         hostname = (urllib.parse.urlsplit(client.base_url).hostname or "").lower()
-        if hostname.endswith("binance.com") or hostname.endswith("binancefuture.com"):
+        if hostname.endswith(("binance.com", "binancefuture.com")):
             raise ForbiddenTestAccess(
                 "FORBIDDEN_EXECUTION_TRANSPORT: signed Binance order/testnet/live request blocked"
             )
