@@ -52,6 +52,7 @@ def preregistered_random_draws(
     sample_count: int,
     direction_template: Sequence[int],
     trial_count: int,
+    post_sample_tie_break_by_id: bool = False,
 ) -> list[dict[str, Any]]:
     """Independent transcription of the documented P6 stdlib draw primitive."""
     master = random.Random(master_seed)
@@ -64,7 +65,12 @@ def preregistered_random_draws(
         trial_seed = master.randrange(0, 2**63)
         trial = random.Random(trial_seed)
         selected = trial.sample(opportunities, sample_count)
-        selected.sort(key=lambda item: int(item["timestamp_ms"]))
+        if post_sample_tie_break_by_id:
+            selected.sort(
+                key=lambda item: (int(item["timestamp_ms"]), str(item["opportunity_id"]))
+            )
+        else:
+            selected.sort(key=lambda item: int(item["timestamp_ms"]))
         directions = list(direction_template)
         trial.shuffle(directions)
         result.append(

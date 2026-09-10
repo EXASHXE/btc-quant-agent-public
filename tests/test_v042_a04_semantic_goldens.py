@@ -56,7 +56,13 @@ def test_golden_schema_is_unique_complete_and_versioned() -> None:
     cases = document["cases"]
     case_ids = [case["case_id"] for case in cases]
     assert len(case_ids) == len(set(case_ids))
-    assert len(cases) == 23
+    assert len(cases) == 24
+    valid_goldens = [c for c in cases if c["status"] == "VALID_GOLDEN"]
+    known_defects = [c for c in cases if c["status"] == "KNOWN_DEFECT_EXPECT_REJECTION"]
+    characterization = [c for c in cases if c["status"] == "CHARACTERIZATION_ONLY"]
+    assert len(valid_goldens) == 11
+    assert len(known_defects) == 12
+    assert len(characterization) == 1
     required = {
         "case_id",
         "domain",
@@ -296,6 +302,9 @@ def test_g05_terminal_modes_match_independent_mark_and_flat_arithmetic() -> None
 
 def test_g06_cash_is_exact_no_trade_and_current_diagnostic_control_agrees() -> None:
     case = case_by_id(load_goldens(), "G06-CASH-NO-TRADE")
+    assert case["inputs"]["vehicle"] == "USDT_CASH_NO_TRADE"
+    assert case["inputs"]["vehicle"] != "USD_CASH_NO_TRADE"
+    assert "USD_CASH_NO_TRADE" not in str(case["inputs"])
     expected = case["expected"]
     assert expected["trade_events"] == []
     for key in (
@@ -363,11 +372,44 @@ def test_g08_random_seed_and_draws_are_independently_replayed() -> None:
 def test_causal_order_and_limit_contrast_do_not_invent_intrabar_order() -> None:
     document = load_goldens()
     order_case = case_by_id(document, "G09-CAUSAL-EVENT-ORDER")
+
+    # Case B: Equal-time funding and fill (preserving FUNDING_BEFORE_FILL tie-break)
     times = order_case["inputs"]
     assert times["market_available_ms"] <= times["signal_observation_ms"]
     assert times["signal_observation_ms"] <= times["decision_ms"] <= times["order_ms"]
     assert times["order_ms"] <= times["funding_ms"] == times["fill_ms"]
     assert order_case["expected"]["tie_break"] == "FUNDING_BEFORE_FILL"
+    assert order_case["expected"]["ordered_events"] == [
+        "MARKET_AVAILABLE",
+        "SIGNAL_OBSERVED",
+        "DECISION",
+        "ORDER",
+        "FUNDING_SETTLEMENT",
+        "FILL",
+        "TERMINAL",
+    ]
+
+    # Case A: Fill with no funding event (positive control without synthetic funding)
+    no_funding = times["no_funding_lifecycle"]
+    assert no_funding["market_available_ms"] <= no_funding["signal_observation_ms"]
+    assert no_funding["signal_observation_ms"] <= no_funding["decision_ms"] <= no_funding["order_ms"]
+    assert no_funding["order_ms"] <= no_funding["fill_ms"] <= no_funding["terminal_ms"]
+    assert "funding_ms" not in no_funding
+    assert order_case["expected"]["ordered_events_without_funding"] == [
+        "MARKET_AVAILABLE",
+        "SIGNAL_OBSERVED",
+        "DECISION",
+        "ORDER",
+        "FILL",
+        "TERMINAL",
+    ]
+
+    # Event-order contract does not require funding event to exist between order and fill
+    contract = document["event_order_contract"]
+    assert "order_timestamp <= fill_timestamp" in contract["required_relations"]
+    assert not any("order <= funding <= fill" in rel for rel in contract["required_relations"])
+    assert "FUNDING_BEFORE_FILL" in contract["funding_relationship"]
+
     ambiguous = case_by_id(document, "D-B2-LIMIT-TOUCH-UNRESOLVED")
     assert ambiguous["expected"]["correct_behavior"] == "AMBIGUOUS_NOT_TESTABLE"
     marketable = case_by_id(document, "G10-MARKETABLE-LIMIT-AT-OPEN")
@@ -375,6 +417,56 @@ def test_causal_order_and_limit_contrast_do_not_invent_intrabar_order() -> None:
         marketable["inputs"]["observable_open_ask"]
     )
     assert marketable["expected"]["outcome"] == "FILL_AT_OPEN_ALLOWED"
+
+
+def test_g08b_random_equal_timestamp_hardening_and_ambiguity_characterization() -> None:
+    document = load_goldens()
+    case = case_by_id(document, "G08B-RANDOM-EQUAL-TIMESTAMPS-AMBIGUITY")
+    assert case["status"] == "CHARACTERIZATION_ONLY"
+    assert case["future_task_owner"] == "B06"
+    inputs = case["inputs"]
+    opps = inputs["ordered_opportunities"]
+
+    # 1. Opportunity universe has equal timestamps with distinct opportunity_ids
+    timestamps = [item["timestamp_ms"] for item in opps]
+    assert len(timestamps) > len(set(timestamps))
+    assert len({item["opportunity_id"] for item in opps}) == len(opps)
+
+    # 2. Pre-sample preimage ordering strictly follows (timestamp_ms, opportunity_id)
+    sorted_opps = sorted(
+        opps,
+        key=lambda item: (int(item["timestamp_ms"]), str(item["opportunity_id"])),
+    )
+    assert sorted_opps == case["expected"]["pre_sample_ordered_preimage"]
+
+    # 3. Independent oracle reproduces current CPython stdlib sampling without production calls
+    observed_curr = preregistered_random_draws(
+        master_seed=inputs["master_seed"],
+        ordered_opportunities=opps,
+        sample_count=inputs["sample_count"],
+        direction_template=inputs["direction_template"],
+        trial_count=inputs["trial_count"],
+        post_sample_tie_break_by_id=False,
+    )
+    assert observed_curr == case["expected"]["current_characterization_trials"]
+    # In trial 2, both opp-a1 and opp-a2 are sampled; current sort on timestamp_ms keeps sample order
+    assert observed_curr[2]["selected_opportunity_ids"] == ["opp-a2", "opp-a1"]
+
+    # 4. Independent oracle with deterministic tie break by opportunity_id
+    observed_det = preregistered_random_draws(
+        master_seed=inputs["master_seed"],
+        ordered_opportunities=opps,
+        sample_count=inputs["sample_count"],
+        direction_template=inputs["direction_template"],
+        trial_count=inputs["trial_count"],
+        post_sample_tie_break_by_id=True,
+    )
+    assert observed_det == case["expected"]["deterministic_tie_break_trials"]
+    assert observed_det[2]["selected_opportunity_ids"] == ["opp-a1", "opp-a2"]
+
+    # 5. Verify ambiguity note explicitly documents the exact semantic gap for B06
+    assert "B06" in case["expected"]["ambiguity_note"]
+    assert "opp-a2" in case["expected"]["ambiguity_note"]
 
 
 def test_p7_defects_are_rejection_specs_not_blessed_outputs() -> None:
@@ -449,6 +541,47 @@ def test_pit_contract_distinguishes_event_close_availability_and_decision_time()
 def test_b01_b07_consumer_map_references_existing_exact_cases() -> None:
     document = load_goldens()
     case_ids = {case["case_id"] for case in document["cases"]}
+    expected_mapping = {
+        "B01": [
+            "D-B2-LIMIT-TOUCH-UNRESOLVED",
+            "G09-CAUSAL-EVENT-ORDER",
+            "G10-MARKETABLE-LIMIT-AT-OPEN",
+        ],
+        "B02": ["D-H3-FUTURE-VOLUME-INVARIANCE"],
+        "B03": [
+            "D-H4-CLOSED-FALSE-NOT-COMPLETE",
+            "PIT-01-CLOSED-POSITIVE",
+            "PIT-02-PRODUCT-MISMATCH",
+            "PIT-03-INTERVAL-MISMATCH",
+            "PIT-04-OVERLAP",
+            "PIT-05-GAP",
+            "PIT-06-NONFINITE",
+            "PIT-07-NOT-YET-AVAILABLE",
+        ],
+        "B04": [
+            "D-B1-FORGED-CANDIDATE-REPLAY",
+            "D-H1-CLONED-RANDOM-TRIALS",
+        ],
+        "B05": [
+            "D-B1-FORGED-CANDIDATE-REPLAY",
+            "G01-LONG-ACCOUNTING",
+            "G02-SHORT-ACCOUNTING",
+            "G03-PARTIAL-WEIGHTED-ROUNDTRIP",
+            "G04-FUNDING-SIGN-TIE",
+            "G05-TERMINAL-POLICIES",
+            "G07-PASSIVE-SIMPLE-ZERO-COST",
+        ],
+        "B06": [
+            "D-H1-CLONED-RANDOM-TRIALS",
+            "G08-DETERMINISTIC-RANDOM-PRIMITIVE",
+        ],
+        "B07": [
+            "D-H2-TRADED-CASH",
+            "G06-CASH-NO-TRADE",
+        ],
+    }
+    assert document["consumer_map"] == expected_mapping
+    assert "G07-PASSIVE-SIMPLE-ZERO-COST" in document["consumer_map"]["B05"]
     assert set(document["consumer_map"]) == {f"B0{index}" for index in range(1, 8)}
     for task, consumed in document["consumer_map"].items():
         assert consumed, task

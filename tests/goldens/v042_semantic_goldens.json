@@ -7,21 +7,21 @@
     "production_float_comparison_absolute_tolerance": "0.00000001"
   },
   "event_order_contract": {
-    "ordered_boundaries": [
+    "lifecycle_boundaries": [
       "market_observation_availability",
       "signal_observation_timestamp",
       "decision_timestamp",
       "order_timestamp",
-      "funding_timestamp",
       "fill_timestamp",
       "terminal_timestamp"
     ],
+    "funding_relationship": "Explicit funding events are ordered by timestamp when present; if funding_timestamp == fill_timestamp, use FUNDING_BEFORE_FILL. No synthetic funding event is inserted when no funding occurs.",
     "required_relations": [
       "market_observation_availability <= signal_observation_timestamp",
       "signal_observation_timestamp <= decision_timestamp",
       "decision_timestamp <= order_timestamp",
       "order_timestamp <= fill_timestamp",
-      "funding_timestamp <= fill_timestamp when timestamps tie because FUNDING_BEFORE_FILL"
+      "for any funding event that exists: order/fill/funding follows explicit timestamps; if funding_timestamp == fill_timestamp, use FUNDING_BEFORE_FILL; no synthetic funding position is implied when no funding event exists"
     ],
     "unresolved_rule": "OHLC extrema do not establish intrabar ordering; material same-bar ambiguity is AMBIGUOUS_NOT_TESTABLE"
   },
@@ -30,7 +30,7 @@
     "B02": ["D-H3-FUTURE-VOLUME-INVARIANCE"],
     "B03": ["D-H4-CLOSED-FALSE-NOT-COMPLETE", "PIT-01-CLOSED-POSITIVE", "PIT-02-PRODUCT-MISMATCH", "PIT-03-INTERVAL-MISMATCH", "PIT-04-OVERLAP", "PIT-05-GAP", "PIT-06-NONFINITE", "PIT-07-NOT-YET-AVAILABLE"],
     "B04": ["D-B1-FORGED-CANDIDATE-REPLAY", "D-H1-CLONED-RANDOM-TRIALS"],
-    "B05": ["D-B1-FORGED-CANDIDATE-REPLAY", "G01-LONG-ACCOUNTING", "G02-SHORT-ACCOUNTING", "G03-PARTIAL-WEIGHTED-ROUNDTRIP", "G04-FUNDING-SIGN-TIE", "G05-TERMINAL-POLICIES"],
+    "B05": ["D-B1-FORGED-CANDIDATE-REPLAY", "G01-LONG-ACCOUNTING", "G02-SHORT-ACCOUNTING", "G03-PARTIAL-WEIGHTED-ROUNDTRIP", "G04-FUNDING-SIGN-TIE", "G05-TERMINAL-POLICIES", "G07-PASSIVE-SIMPLE-ZERO-COST"],
     "B06": ["D-H1-CLONED-RANDOM-TRIALS", "G08-DETERMINISTIC-RANDOM-PRIMITIVE"],
     "B07": ["D-H2-TRADED-CASH", "G06-CASH-NO-TRADE"]
   },
@@ -107,7 +107,7 @@
       "domain": "CASH",
       "status": "VALID_GOLDEN",
       "rationale": "A true CASH benchmark is capital preservation with no economic events or exposure.",
-      "inputs": {"initial_equity": "1000", "mark_timestamps_ms": [1000, 2000, 3000], "benchmark_kind": "CASH", "vehicle": "USD_CASH_NO_TRADE"},
+      "inputs": {"initial_equity": "1000", "mark_timestamps_ms": [1000, 2000, 3000], "benchmark_kind": "CASH", "vehicle": "USDT_CASH_NO_TRADE"},
       "expected": {"equity_curve": [[1000, "1000"], [2000, "1000"], [3000, "1000"]], "trade_events": [], "trade_count": 0, "fill_count": 0, "fees": "0", "funding": "0", "turnover": "0", "time_exposure": "0", "notional_exposure": "0", "realized_pnl": "0", "unrealized_pnl": "0", "position_quantity": "0", "final_equity": "1000"},
       "independent_derivation": "With no events and no position, every cashflow and exposure sum is empty/zero and equity remains the initial 1000 at every mark.",
       "future_task_owner": "B07"
@@ -133,13 +133,74 @@
       "future_task_owner": "B06"
     },
     {
+      "case_id": "G08B-RANDOM-EQUAL-TIMESTAMPS-AMBIGUITY",
+      "domain": "RANDOM_MATCHED",
+      "status": "CHARACTERIZATION_ONLY",
+      "rationale": "CPython stdlib random.sample followed by stable sort only on timestamp_ms leaves equal-timestamp opportunities in incidental draw selection order rather than breaking ties deterministically by opportunity_id. B06 must formally define and enforce post-sample tie breaking.",
+      "inputs": {
+        "python_primitive": "random.Random using CPython stdlib semantics",
+        "master_seed": 20260910,
+        "trial_count": 3,
+        "sample_count": 2,
+        "direction_template": [1, -1],
+        "ordered_opportunities": [
+          {"timestamp_ms": 1000, "opportunity_id": "opp-a1"},
+          {"timestamp_ms": 1000, "opportunity_id": "opp-a2"},
+          {"timestamp_ms": 2000, "opportunity_id": "opp-b"},
+          {"timestamp_ms": 3000, "opportunity_id": "opp-c"}
+        ]
+      },
+      "expected": {
+        "pre_sample_ordered_preimage": [
+          {"timestamp_ms": 1000, "opportunity_id": "opp-a1"},
+          {"timestamp_ms": 1000, "opportunity_id": "opp-a2"},
+          {"timestamp_ms": 2000, "opportunity_id": "opp-b"},
+          {"timestamp_ms": 3000, "opportunity_id": "opp-c"}
+        ],
+        "current_characterization_trials": [
+          {"trial_id": 0, "trial_seed": 2184067624869720810, "selected_opportunity_ids": ["opp-a1", "opp-b"], "directions": [1, -1]},
+          {"trial_id": 1, "trial_seed": 1436862081396992726, "selected_opportunity_ids": ["opp-a1", "opp-a2"], "directions": [-1, 1]},
+          {"trial_id": 2, "trial_seed": 6748627551851916913, "selected_opportunity_ids": ["opp-a2", "opp-a1"], "directions": [1, -1]}
+        ],
+        "deterministic_tie_break_trials": [
+          {"trial_id": 0, "trial_seed": 2184067624869720810, "selected_opportunity_ids": ["opp-a1", "opp-b"], "directions": [1, -1]},
+          {"trial_id": 1, "trial_seed": 1436862081396992726, "selected_opportunity_ids": ["opp-a1", "opp-a2"], "directions": [-1, 1]},
+          {"trial_id": 2, "trial_seed": 6748627551851916913, "selected_opportunity_ids": ["opp-a1", "opp-a2"], "directions": [1, -1]}
+        ],
+        "ambiguity_note": "In trial 2, current production selected.sort(key=lambda item: item.timestamp_ms) yields ['opp-a2', 'opp-a1'] because random.sample drew opp-a2 first. Deterministic post-sample sorting by (timestamp_ms, opportunity_id) yields ['opp-a1', 'opp-a2']. B06 must specify and freeze the post-sample tie-break rule."
+      },
+      "independent_derivation": "Input opportunities are stably sorted by (timestamp_ms, opportunity_id). Master PRNG produces deterministic trial seeds. Trial 2 samples both equal-timestamp items (opp-a1, opp-a2 at 1000ms); without post-sample opportunity_id tie-breaking, stable sort preserves sample draw order.",
+      "future_task_owner": "B06"
+    },
+    {
       "case_id": "G09-CAUSAL-EVENT-ORDER",
       "domain": "LIMIT_CAUSALITY",
       "status": "VALID_GOLDEN",
-      "rationale": "Observable event boundaries are ordered without inventing tick ordering unavailable from OHLC.",
-      "inputs": {"market_available_ms": 1000, "signal_observation_ms": 1000, "decision_ms": 1001, "order_ms": 1002, "funding_ms": 2000, "fill_ms": 2000, "terminal_ms": 3000},
-      "expected": {"ordered_events": ["MARKET_AVAILABLE", "SIGNAL_OBSERVED", "DECISION", "ORDER", "FUNDING_SETTLEMENT", "FILL", "TERMINAL"], "tie_break": "FUNDING_BEFORE_FILL", "unresolved_intrabar_order": "AMBIGUOUS_NOT_TESTABLE"},
-      "independent_derivation": "The explicit timestamps are monotonic; the accepted equal-time contract puts funding before fill. No order is assigned to unknown intrabar extrema.",
+      "rationale": "Observable event boundaries are ordered by explicit timestamp without inventing tick ordering unavailable from OHLC. Funding events follow explicit timestamps when present; if funding ties with fill, FUNDING_BEFORE_FILL applies. No synthetic funding event is inserted when absent.",
+      "inputs": {
+        "market_available_ms": 1000,
+        "signal_observation_ms": 1000,
+        "decision_ms": 1001,
+        "order_ms": 1002,
+        "funding_ms": 2000,
+        "fill_ms": 2000,
+        "terminal_ms": 3000,
+        "no_funding_lifecycle": {
+          "market_available_ms": 1000,
+          "signal_observation_ms": 1000,
+          "decision_ms": 1001,
+          "order_ms": 1002,
+          "fill_ms": 2000,
+          "terminal_ms": 3000
+        }
+      },
+      "expected": {
+        "ordered_events": ["MARKET_AVAILABLE", "SIGNAL_OBSERVED", "DECISION", "ORDER", "FUNDING_SETTLEMENT", "FILL", "TERMINAL"],
+        "ordered_events_without_funding": ["MARKET_AVAILABLE", "SIGNAL_OBSERVED", "DECISION", "ORDER", "FILL", "TERMINAL"],
+        "tie_break": "FUNDING_BEFORE_FILL",
+        "unresolved_intrabar_order": "AMBIGUOUS_NOT_TESTABLE"
+      },
+      "independent_derivation": "Explicit timestamps are monotonic; equal-time funding and fill applies funding first to pre-fill inventory. A lifecycle without funding consists of MARKET_AVAILABLE <= SIGNAL_OBSERVED <= DECISION <= ORDER <= FILL <= TERMINAL with no funding event inserted.",
       "future_task_owner": "B01"
     },
     {
