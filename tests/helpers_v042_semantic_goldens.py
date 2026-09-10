@@ -26,7 +26,7 @@ def case_by_id(document: dict[str, Any], case_id: str) -> dict[str, Any]:
     return matches[0]
 
 
-def decimal(value: str | int | float) -> Decimal:
+def decimal(value: str | float) -> Decimal:
     """Convert through text so the oracle never inherits binary-float arithmetic."""
     return Decimal(str(value))
 

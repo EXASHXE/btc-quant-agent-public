@@ -5,14 +5,6 @@ from __future__ import annotations
 from decimal import Decimal
 
 import pytest
-
-from btc_quant_agent.data.quality import validate_candles
-from btc_quant_agent.domain import Candle
-from btc_quant_agent.economic.benchmarks import BenchmarkEngine
-from btc_quant_agent.economic.fee_model import FeeModel, SlippageMode
-from btc_quant_agent.economic.metrics import ResultCompleteness, TerminalPolicy, summarize_ledger
-from btc_quant_agent.economic.portfolio import Portfolio
-from btc_quant_agent.economic.trade_event import TradeAction
 from helpers_v042_semantic_goldens import (
     case_by_id,
     decimal,
@@ -21,6 +13,14 @@ from helpers_v042_semantic_goldens import (
     load_goldens,
     preregistered_random_draws,
 )
+
+from btc_quant_agent.data.quality import validate_candles
+from btc_quant_agent.domain import Candle
+from btc_quant_agent.economic.benchmarks import BenchmarkEngine
+from btc_quant_agent.economic.fee_model import FeeModel, SlippageMode
+from btc_quant_agent.economic.metrics import ResultCompleteness, TerminalPolicy, summarize_ledger
+from btc_quant_agent.economic.portfolio import Portfolio
+from btc_quant_agent.economic.trade_event import TradeAction
 
 ABS_TOL = 1e-8
 ASSET = "BTCUSDT"
