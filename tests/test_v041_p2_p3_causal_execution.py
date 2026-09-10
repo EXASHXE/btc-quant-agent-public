@@ -3,7 +3,11 @@ from __future__ import annotations
 import pytest
 
 from btc_quant_agent.domain import Candle
-from btc_quant_agent.economic.execution_model import ExecutionModel, ExecutionResult
+from btc_quant_agent.economic.execution_model import (
+    LIMIT_INTRABAR_TOUCH_AMBIGUOUS,
+    ExecutionModel,
+    ExecutionResult,
+)
 from btc_quant_agent.economic.fee_model import FeeModel, SlippageMode
 from btc_quant_agent.economic.funding import FundingSettlement
 from btc_quant_agent.economic.order import Order
@@ -348,7 +352,7 @@ def test_execution_zero_volume_liquidity_rejection() -> None:
 
 
 def test_execution_touch_probability_deterministic_queue_rule() -> None:
-    """Mere touch requires limit_fill_prob_on_touch >= 1.0 for certainty."""
+    """A certain queue touch still cannot invent the intrabar touch timestamp."""
     ex_default = ExecutionModel(fee_model=ZERO_FEE, decision_latency_ms=0, exchange_latency_ms=0, limit_fill_prob_on_touch=0.20)
     ex_99 = ExecutionModel(fee_model=ZERO_FEE, decision_latency_ms=0, exchange_latency_ms=0, limit_fill_prob_on_touch=0.99)
     ex_100 = ExecutionModel(fee_model=ZERO_FEE, decision_latency_ms=0, exchange_latency_ms=0, limit_fill_prob_on_touch=1.0)
@@ -357,7 +361,11 @@ def test_execution_touch_probability_deterministic_queue_rule() -> None:
 
     assert not ex_default.simulate_order(1000, 1, 1.0, OrderType.LIMIT, [touch_bar], limit_price=95.0).is_filled
     assert not ex_99.simulate_order(1000, 1, 1.0, OrderType.LIMIT, [touch_bar], limit_price=95.0).is_filled
-    assert ex_100.simulate_order(1000, 1, 1.0, OrderType.LIMIT, [touch_bar], limit_price=95.0).is_filled
+    certain = ex_100.simulate_order(
+        1000, 1, 1.0, OrderType.LIMIT, [touch_bar], limit_price=95.0
+    )
+    assert not certain.is_filled
+    assert certain.rejection_reason == LIMIT_INTRABAR_TOUCH_AMBIGUOUS
 
 
 def test_execution_signal_without_fill_leaves_ledger_unchanged() -> None:
@@ -380,11 +388,8 @@ def test_execution_signal_without_fill_leaves_ledger_unchanged() -> None:
     assert res.net_pnl_usdt == 0.0
 
 
-def test_execution_pending_fill_does_not_alter_portfolio_prematurely() -> None:
-    """Future fill remains pending and does not alter portfolio before fill_timestamp_ms.
-
-    Order fills at bar 3 (timestamp 3000). At bar 1 and 2, position must remain 0.
-    """
+def test_execution_future_marketable_open_fill_remains_pending_until_timestamp() -> None:
+    """A later observable marketable open may schedule a causal future fill."""
     bars = [
         _bar(1000, low=100.0),
         _bar(2000, o=110.0, low=100.0, c=110.0),
@@ -402,10 +407,11 @@ def test_execution_pending_fill_does_not_alter_portfolio_prematurely() -> None:
     sim = EconomicSimulationEngine(policy=policy, fee_model=ZERO_FEE, initial_cash=100_000.0)
     res = sim.simulate(candles=bars, signals=[sig])
 
-    # Fill occurred at bar 3 (timestamp 3000)
     assert len(res.trade_events) >= 1
     assert res.trade_events[0].timestamp_ms == 3000
-    # In equity curve, bar 1 (close 1999) and bar 2 (close 2999) equity must equal initial_cash
+    assert res.trade_events[0].metadata["execution_time_semantics"] == (
+        "BAR_OPEN_MARKETABLE"
+    )
     assert res.equity_curve[0][1] == 100_000.0
     assert res.equity_curve[1][1] == 100_000.0
 

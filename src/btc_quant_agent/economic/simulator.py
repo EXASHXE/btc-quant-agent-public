@@ -5,7 +5,11 @@ from collections.abc import Sequence
 from typing import Any
 
 from ..domain import Candle
-from .execution_model import ConditionalTriggerTime, ExecutionModel
+from .execution_model import (
+    LIMIT_INTRABAR_TOUCH_AMBIGUOUS,
+    ConditionalTriggerTime,
+    ExecutionModel,
+)
 from .fee_model import FeeModel
 from .funding import FundingModel, FundingSettlement
 from .metrics import (
@@ -21,7 +25,15 @@ from .signal import InformationSignal
 from .trade_event import TradeAction
 
 
-class AmbiguousExitRejectionError(RuntimeError):
+class AmbiguousExecutionRejectionError(RuntimeError):
+    """Raised when OHLC data cannot resolve a material execution ordering."""
+
+
+class AmbiguousEntryRejectionError(AmbiguousExecutionRejectionError):
+    """Raised when an entry fill time is not identifiable from OHLC data."""
+
+
+class AmbiguousExitRejectionError(AmbiguousExecutionRejectionError):
     """Raised when OHLC data cannot resolve a material intrabar exit ordering."""
 
 
@@ -440,12 +452,17 @@ class EconomicSimulationEngine:
                     time_in_force_ms=self.policy.entry_rule.time_in_force_ms,
                     current_spread_bps=spread_bps,
                     observation_timestamp_ms=sig.timestamp_ms,
-                    max_fill_notional=(
-                        order_gross
-                        if self.policy.entry_rule.order_type == OrderType.MARKET
-                        else None
-                    ),
+                    max_fill_notional=order_gross,
                 )
+                if exec_res.rejection_reason == LIMIT_INTRABAR_TOUCH_AMBIGUOUS:
+                    metadata = exec_res.metadata or {}
+                    raise AmbiguousEntryRejectionError(
+                        "Ambiguous LIMIT entry touch ordering for "
+                        f"{bar.symbol} bar "
+                        f"[{metadata.get('ambiguity_window_open_ms')}, "
+                        f"{metadata.get('ambiguity_window_close_ms')}]; "
+                        "OHLC extrema cannot timestamp the fill"
+                    )
                 if exec_res.is_filled:
                     act = TradeAction.OPEN_LONG if side == 1 else TradeAction.OPEN_SHORT
                     fill_info = {

@@ -57,7 +57,12 @@ from .qualification import (
     policy_identity,
 )
 from .signal import InformationSignal
-from .simulator import AmbiguousExitRejectionError, EconomicSimulationEngine
+from .simulator import (
+    AmbiguousEntryRejectionError,
+    AmbiguousExecutionRejectionError,
+    AmbiguousExitRejectionError,
+    EconomicSimulationEngine,
+)
 from .trade_event import TradeAction, TradeEvent
 
 __all__ = [
@@ -66,6 +71,8 @@ __all__ = [
     "P6_RESULT_SCHEMA_VERSION",
     "P6_RUN_EVIDENCE_TYPE",
     "AmbiguousExitRejectionError",
+    "AmbiguousEntryRejectionError",
+    "AmbiguousExecutionRejectionError",
     "BenchmarkEngine",
     "BenchmarkKind",
     "BenchmarkMatchingRules",

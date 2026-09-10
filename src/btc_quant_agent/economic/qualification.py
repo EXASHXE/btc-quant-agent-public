@@ -888,6 +888,8 @@ def execution_model_identity(
         "limit_fill_prob_on_touch": model.limit_fill_prob_on_touch,
         "fee_model_sha256": canonical_sha256(asdict(model.fee_model)),
     }
+    if model.order_submission_latency_ms != 0:
+        payload["order_submission_latency_ms"] = model.order_submission_latency_ms
     return VersionedIdentity.from_payload(logical_id, version, payload)
 
 

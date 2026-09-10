@@ -23,6 +23,9 @@ class ConditionalTriggerTime(StrEnum):
     INTRABAR_UNKNOWN = "INTRABAR_UNKNOWN"
 
 
+LIMIT_INTRABAR_TOUCH_AMBIGUOUS = "LIMIT_INTRABAR_TOUCH_AMBIGUOUS_NOT_TESTABLE"
+
+
 @dataclass(frozen=True)
 class ExecutionResult:
     """Disaggregated execution outcome replacing naive price-touch-equals-fill assumptions."""
@@ -91,11 +94,18 @@ class ExecutionModel:
         decision_latency_ms: int = 500,
         exchange_latency_ms: int = 150,
         limit_fill_prob_on_touch: float = 0.20,  # on mere touch, queue fill probability (requires 1.0 for certainty)
+        order_submission_latency_ms: int = 0,
     ) -> None:
         self.fee_model = fee_model or FeeModel()
         self.decision_latency_ms = decision_latency_ms
         self.exchange_latency_ms = exchange_latency_ms
         self.limit_fill_prob_on_touch = limit_fill_prob_on_touch
+        if (
+            type(order_submission_latency_ms) is not int
+            or order_submission_latency_ms < 0
+        ):
+            raise ValueError("order_submission_latency_ms must be a nonnegative integer")
+        self.order_submission_latency_ms = order_submission_latency_ms
 
     def simulate_conditional_market_fill(
         self,
@@ -250,6 +260,8 @@ class ExecutionModel:
         current_spread_bps: float | None = None,
         observation_timestamp_ms: int | None = None,
         max_fill_notional: float | None = None,
+        observable_open_executable_price: float | None = None,
+        observable_open_executable_timestamp_ms: int | None = None,
     ) -> ExecutionResult:
         obs_ts = observation_timestamp_ms if observation_timestamp_ms is not None else signal_timestamp_ms
         if obs_ts > signal_timestamp_ms:
@@ -261,8 +273,25 @@ class ExecutionModel:
         ):
             raise ValueError("max_fill_notional must be finite and positive when provided")
 
-        order_timestamp_ms = signal_timestamp_ms + self.decision_latency_ms
-        dec_ts = order_timestamp_ms
+        if (observable_open_executable_price is None) != (
+            observable_open_executable_timestamp_ms is None
+        ):
+            raise ValueError(
+                "observable opening executable price and timestamp must be provided together"
+            )
+        if observable_open_executable_price is not None and (
+            not math.isfinite(observable_open_executable_price)
+            or observable_open_executable_price <= 0
+        ):
+            raise ValueError("observable opening executable price must be finite and positive")
+        if observable_open_executable_timestamp_ms is not None and (
+            type(observable_open_executable_timestamp_ms) is not int
+            or observable_open_executable_timestamp_ms <= 0
+        ):
+            raise ValueError("observable opening executable timestamp must be a positive integer")
+
+        dec_ts = signal_timestamp_ms + self.decision_latency_ms
+        order_timestamp_ms = dec_ts + self.order_submission_latency_ms
         earliest_fill_ms = order_timestamp_ms + self.exchange_latency_ms
         expiration_ms = order_timestamp_ms + time_in_force_ms
 
@@ -461,100 +490,107 @@ class ExecutionModel:
                 if bar.volume <= 0:
                     continue
 
-                if side == 1:  # BUY LIMIT
-                    # Trades strictly through limit price (low < limit_price)
-                    if bar.low < limit_price - 1e-8:
-                        fill_time = max(earliest_fill_ms, bar.open_time_ms)
-                        if fill_time > expiration_ms:
-                            break
-                        notional = limit_price * desired_quantity
-                        fee_usdt = self.fee_model.calculate_fee(notional=notional, is_maker=True)
-                        return ExecutionResult(
-                            signal_timestamp_ms=signal_timestamp_ms,
-                            order_timestamp_ms=order_timestamp_ms,
-                            fill_timestamp_ms=fill_time,
-                            fill_price=limit_price,
-                            filled_quantity=desired_quantity,
-                            is_filled=True,
-                            side=side,
-                            is_maker=True,
-                            fee_usdt=fee_usdt,
-                            slippage_usdt=0.0,
-                            observation_timestamp_ms=obs_ts,
-                            decision_timestamp_ms=dec_ts,
-                            settlement_timestamp_ms=fill_time,
-                            metadata={"traded_through": True, "bar_low": bar.low},
-                        )
-                    # Touching exact price (bar.low == limit_price): requires certain queue fill
-                    elif abs(bar.low - limit_price) <= 1e-8 and self.limit_fill_prob_on_touch >= 1.0:
-                        fill_time = max(earliest_fill_ms, bar.open_time_ms)
-                        if fill_time > expiration_ms:
-                            break
-                        notional = limit_price * desired_quantity
-                        fee_usdt = self.fee_model.calculate_fee(notional=notional, is_maker=True)
-                        return ExecutionResult(
-                            signal_timestamp_ms=signal_timestamp_ms,
-                            order_timestamp_ms=order_timestamp_ms,
-                            fill_timestamp_ms=fill_time,
-                            fill_price=limit_price,
-                            filled_quantity=desired_quantity,
-                            is_filled=True,
-                            side=side,
-                            is_maker=True,
-                            fee_usdt=fee_usdt,
-                            slippage_usdt=0.0,
-                            observation_timestamp_ms=obs_ts,
-                            decision_timestamp_ms=dec_ts,
-                            settlement_timestamp_ms=fill_time,
-                            metadata={"traded_touch": True},
-                        )
+                # A bar open is the only price in this OHLC contract whose
+                # timestamp is known exactly.  If the order was executable at
+                # that instant, marketability is observable without consulting
+                # the completed bar's later high/low.  Expiry is inclusive:
+                # fill_time == expiration_ms is valid, while a later fill is not.
+                opening_executable_price = bar.open
+                opening_price_evidence = "OHLC_OPEN"
+                if observable_open_executable_timestamp_ms == bar.open_time_ms:
+                    assert observable_open_executable_price is not None
+                    opening_executable_price = observable_open_executable_price
+                    opening_price_evidence = "TIMESTAMPED_EXECUTABLE_QUOTE"
 
-                else:  # SELL LIMIT
-                    # Trades strictly through limit price (high > limit_price)
-                    if bar.high > limit_price + 1e-8:
-                        fill_time = max(earliest_fill_ms, bar.open_time_ms)
-                        if fill_time > expiration_ms:
-                            break
-                        notional = limit_price * desired_quantity
-                        fee_usdt = self.fee_model.calculate_fee(notional=notional, is_maker=True)
-                        return ExecutionResult(
-                            signal_timestamp_ms=signal_timestamp_ms,
-                            order_timestamp_ms=order_timestamp_ms,
-                            fill_timestamp_ms=fill_time,
-                            fill_price=limit_price,
-                            filled_quantity=desired_quantity,
-                            is_filled=True,
-                            side=side,
-                            is_maker=True,
-                            fee_usdt=fee_usdt,
-                            slippage_usdt=0.0,
-                            observation_timestamp_ms=obs_ts,
-                            decision_timestamp_ms=dec_ts,
-                            settlement_timestamp_ms=fill_time,
-                            metadata={"traded_through": True, "bar_high": bar.high},
-                        )
-                    elif abs(bar.high - limit_price) <= 1e-8 and self.limit_fill_prob_on_touch >= 1.0:
-                        fill_time = max(earliest_fill_ms, bar.open_time_ms)
-                        if fill_time > expiration_ms:
-                            break
-                        notional = limit_price * desired_quantity
-                        fee_usdt = self.fee_model.calculate_fee(notional=notional, is_maker=True)
-                        return ExecutionResult(
-                            signal_timestamp_ms=signal_timestamp_ms,
-                            order_timestamp_ms=order_timestamp_ms,
-                            fill_timestamp_ms=fill_time,
-                            fill_price=limit_price,
-                            filled_quantity=desired_quantity,
-                            is_filled=True,
-                            side=side,
-                            is_maker=True,
-                            fee_usdt=fee_usdt,
-                            slippage_usdt=0.0,
-                            observation_timestamp_ms=obs_ts,
-                            decision_timestamp_ms=dec_ts,
-                            settlement_timestamp_ms=fill_time,
-                            metadata={"traded_touch": True},
-                        )
+                open_marketable = (
+                    side == 1 and opening_executable_price <= limit_price + 1e-8
+                ) or (
+                    side == -1 and opening_executable_price >= limit_price - 1e-8
+                )
+                if open_marketable:
+                    fill_time = bar.open_time_ms
+                    if fill_time > expiration_ms:
+                        break
+                    fill_price = opening_executable_price
+                    filled_quantity = desired_quantity
+                    notional_cap_applied = False
+                    if (
+                        max_fill_notional is not None
+                        and fill_price * filled_quantity > max_fill_notional
+                    ):
+                        filled_quantity = max_fill_notional / fill_price
+                        notional_cap_applied = True
+                    notional = fill_price * filled_quantity
+                    fee_usdt = self.fee_model.calculate_fee(
+                        notional=notional, is_maker=False
+                    )
+                    return ExecutionResult(
+                        signal_timestamp_ms=signal_timestamp_ms,
+                        order_timestamp_ms=order_timestamp_ms,
+                        fill_timestamp_ms=fill_time,
+                        fill_price=fill_price,
+                        filled_quantity=filled_quantity,
+                        is_filled=True,
+                        side=side,
+                        is_maker=False,
+                        fee_usdt=fee_usdt,
+                        slippage_usdt=0.0,
+                        observation_timestamp_ms=obs_ts,
+                        decision_timestamp_ms=dec_ts,
+                        settlement_timestamp_ms=fill_time,
+                        metadata={
+                            "limit_price": limit_price,
+                            "observable_open": bar.open,
+                            "opening_executable_price": opening_executable_price,
+                            "opening_executable_timestamp_ms": bar.open_time_ms,
+                            "opening_price_evidence": opening_price_evidence,
+                            "execution_time_semantics": "BAR_OPEN_MARKETABLE",
+                            "requested_quantity": desired_quantity,
+                            "max_fill_notional": max_fill_notional,
+                            "notional_cap_applied": notional_cap_applied,
+                        },
+                    )
+
+                if side == 1:
+                    traded_through = bar.low < limit_price - 1e-8
+                    exact_touch = abs(bar.low - limit_price) <= 1e-8
+                    observed_extreme = bar.low
+                else:
+                    traded_through = bar.high > limit_price + 1e-8
+                    exact_touch = abs(bar.high - limit_price) <= 1e-8
+                    observed_extreme = bar.high
+
+                # A completed-bar extremum proves only that a touch occurred
+                # somewhere in [open, close].  It cannot timestamp that touch
+                # relative to expiry, funding, or another material event.  A
+                # deterministic exact-touch fill remains eligible only when the
+                # declared queue rule is certain; otherwise the historical
+                # no-fill queue behavior is preserved.
+                deterministic_touch = exact_touch and self.limit_fill_prob_on_touch >= 1.0
+                if traded_through or deterministic_touch:
+                    outcome_time = min(expiration_ms, bar.close_time_ms)
+                    return ExecutionResult(
+                        signal_timestamp_ms=signal_timestamp_ms,
+                        order_timestamp_ms=order_timestamp_ms,
+                        fill_timestamp_ms=outcome_time,
+                        fill_price=0.0,
+                        filled_quantity=0.0,
+                        is_filled=False,
+                        side=side,
+                        observation_timestamp_ms=obs_ts,
+                        decision_timestamp_ms=dec_ts,
+                        settlement_timestamp_ms=outcome_time,
+                        rejection_reason=LIMIT_INTRABAR_TOUCH_AMBIGUOUS,
+                        metadata={
+                            "limit_price": limit_price,
+                            "observed_extreme": observed_extreme,
+                            "ambiguity_window_open_ms": bar.open_time_ms,
+                            "ambiguity_window_close_ms": bar.close_time_ms,
+                            "expiration_ms": expiration_ms,
+                            "touch_kind": "THROUGH" if traded_through else "EXACT_TOUCH",
+                            "execution_time_semantics": "INTRABAR_UNKNOWN",
+                        },
+                    )
 
             return ExecutionResult(
                 signal_timestamp_ms=signal_timestamp_ms,

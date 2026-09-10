@@ -415,12 +415,15 @@ class PassiveBenchmarkReplayError(ValueError):
 
 
 def _execution_model_payload(model: ExecutionModel) -> dict[str, Any]:
-    return {
+    payload = {
         "decision_latency_ms": model.decision_latency_ms,
         "exchange_latency_ms": model.exchange_latency_ms,
         "limit_fill_prob_on_touch": model.limit_fill_prob_on_touch,
         "fee_model_sha256": canonical_sha256(asdict(model.fee_model)),
     }
+    if model.order_submission_latency_ms != 0:
+        payload["order_submission_latency_ms"] = model.order_submission_latency_ms
+    return payload
 
 
 def _passive_policy_payload(
@@ -750,6 +753,8 @@ def validate_passive_benchmark_provenance(
         "limit_fill_prob_on_touch",
         "fee_model_sha256",
     }
+    if "order_submission_latency_ms" in execution_payload:
+        expected_execution_keys.add("order_submission_latency_ms")
     if set(execution_payload) != expected_execution_keys:
         raise ValueError("passive execution-model schema mismatch")
     if execution_payload.get("fee_model_sha256") != cost_hash:
@@ -763,6 +768,7 @@ def validate_passive_benchmark_provenance(
         decision_latency_ms=execution_payload["decision_latency_ms"],
         exchange_latency_ms=execution_payload["exchange_latency_ms"],
         limit_fill_prob_on_touch=execution_payload["limit_fill_prob_on_touch"],
+        order_submission_latency_ms=execution_payload.get("order_submission_latency_ms", 0),
     )
 
     funding_payload = dict(_require_mapping(provenance.get("funding_model"), "funding model"))
