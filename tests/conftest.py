@@ -44,12 +44,40 @@ class HermeticAccessGuard:
             _canonical_path(REPOSITORY_ROOT / "data/research/h39_validation"),
         }
         self._forbidden_files = {_canonical_path(REPOSITORY_ROOT / "var/quant.db")}
+        self._read_bytes_handler: Callable[[Path], bytes] | None = None
+        self._write_bytes_handler: Callable[[Path, bytes], None] | None = None
+        self._exists_handler: Callable[[Path], bool] | None = None
 
     def forbid_root(self, path: str | os.PathLike[str]) -> None:
         self._forbidden_roots.add(_canonical_path(path))
 
+    def allow_root(self, path: str | os.PathLike[str]) -> None:
+        self._forbidden_roots.discard(_canonical_path(path))
+
     def forbid_file(self, path: str | os.PathLike[str]) -> None:
         self._forbidden_files.add(_canonical_path(path))
+
+    def allow_file(self, path: str | os.PathLike[str]) -> None:
+        self._forbidden_files.discard(_canonical_path(path))
+
+    def read_bytes_unguarded(self, path: Path) -> bytes:
+        """Allow test assertions to verify unmutated sentinel bytes without tripping the guard."""
+        if self._read_bytes_handler is not None:
+            return self._read_bytes_handler(path)
+        return path.read_bytes()
+
+    def write_bytes_unguarded(self, path: Path, data: bytes) -> None:
+        """Allow test setup to write sentinel bytes to protected paths without tripping the guard."""
+        if self._write_bytes_handler is not None:
+            self._write_bytes_handler(path, data)
+        else:
+            path.write_bytes(data)
+
+    def exists_unguarded(self, path: Path) -> bool:
+        """Allow test assertions to verify path existence without tripping the guard."""
+        if self._exists_handler is not None:
+            return self._exists_handler(path)
+        return path.exists()
 
     @staticmethod
     def _is_final_holdout(path: Path) -> bool:
@@ -90,10 +118,22 @@ class HermeticAccessGuard:
 def _sqlite_candidate(database: object) -> object:
     if not isinstance(database, str) or not database.startswith("file:"):
         return database
-    uri_path = database[5:].split("?", maxsplit=1)[0]
-    if uri_path in {"", ":memory:"}:
-        return ":memory:"
-    return urllib.parse.unquote(uri_path)
+    parsed = urllib.parse.urlsplit(database)
+    hostname = (parsed.netloc or "").lower()
+    if hostname in {"", "localhost"}:
+        decoded_path = urllib.parse.unquote(parsed.path)
+        if decoded_path in {"", ":memory:"}:
+            return ":memory:"
+        if (
+            os.name == "nt"
+            and len(decoded_path) >= 3
+            and decoded_path[0] == "/"
+            and decoded_path[1].isalpha()
+            and decoded_path[2] == ":"
+        ):
+            decoded_path = decoded_path[1:]
+        return decoded_path
+    return urllib.parse.unquote(parsed.path)
 
 
 @pytest.fixture(autouse=True)
@@ -113,8 +153,16 @@ def hermetic_guard(monkeypatch: pytest.MonkeyPatch) -> Iterator[HermeticAccessGu
     original_mkdir = Path.mkdir
     original_touch = Path.touch
     original_unlink = Path.unlink
+    original_os_replace = os.replace
+    original_os_rename = os.rename
+    original_path_replace = Path.replace
+    original_path_rename = Path.rename
     original_sqlite_connect = sqlite3.connect
     original_signed_request = BinanceSignedClient._signed_request
+
+    guard._read_bytes_handler = lambda p: original_path_open(p, "rb").read()
+    guard._write_bytes_handler = lambda p, d: original_path_open(p, "wb").write(d)
+    guard._exists_handler = lambda p: os.path.exists(os.fspath(p))
 
     def guarded_open(file: object, *args: Any, **kwargs: Any) -> Any:
         guard.check_path(file, "open")
@@ -132,6 +180,30 @@ def hermetic_guard(monkeypatch: pytest.MonkeyPatch) -> Iterator[HermeticAccessGu
             return original(path, *args, **kwargs)
 
         return guarded
+
+    def guarded_os_replace(src: object, dst: object, *args: Any, **kwargs: Any) -> Any:
+        guard.check_path(src, "os.replace:source")
+        guard.check_path(dst, "os.replace:destination")
+        return original_os_replace(src, dst, *args, **kwargs)
+
+    def guarded_os_rename(src: object, dst: object, *args: Any, **kwargs: Any) -> Any:
+        guard.check_path(src, "os.rename:source")
+        guard.check_path(dst, "os.rename:destination")
+        return original_os_rename(src, dst, *args, **kwargs)
+
+    def guarded_path_replace(
+        path: Path, target: object, *args: Any, **kwargs: Any
+    ) -> Path:
+        guard.check_path(path, "Path.replace:source")
+        guard.check_path(target, "Path.replace:destination")
+        return original_path_replace(path, target, *args, **kwargs)
+
+    def guarded_path_rename(
+        path: Path, target: object, *args: Any, **kwargs: Any
+    ) -> Path:
+        guard.check_path(path, "Path.rename:source")
+        guard.check_path(target, "Path.rename:destination")
+        return original_path_rename(path, target, *args, **kwargs)
 
     def guarded_sqlite_connect(database: object, *args: Any, **kwargs: Any) -> Any:
         guard.check_path(_sqlite_candidate(database), "sqlite3.connect")
@@ -174,6 +246,10 @@ def hermetic_guard(monkeypatch: pytest.MonkeyPatch) -> Iterator[HermeticAccessGu
     monkeypatch.setattr(Path, "mkdir", wrap_path_method("Path.mkdir", original_mkdir))
     monkeypatch.setattr(Path, "touch", wrap_path_method("Path.touch", original_touch))
     monkeypatch.setattr(Path, "unlink", wrap_path_method("Path.unlink", original_unlink))
+    monkeypatch.setattr(os, "replace", guarded_os_replace)
+    monkeypatch.setattr(os, "rename", guarded_os_rename)
+    monkeypatch.setattr(Path, "replace", guarded_path_replace)
+    monkeypatch.setattr(Path, "rename", guarded_path_rename)
     monkeypatch.setattr(sqlite3, "connect", guarded_sqlite_connect)
     monkeypatch.setattr(urllib.request, "urlopen", forbidden_urlopen)
     monkeypatch.setattr(socket, "getaddrinfo", forbidden_dns)
