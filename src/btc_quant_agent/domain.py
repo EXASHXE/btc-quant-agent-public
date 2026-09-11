@@ -1,8 +1,8 @@
 from __future__ import annotations
 
+import math
 from dataclasses import asdict, dataclass, field
 from enum import StrEnum
-import math
 from typing import Any
 
 
@@ -83,7 +83,6 @@ class Candle:
             raise ValueError("invalid OHLC bounds")
         if (
             self.low > self.high
-            or min(self.open, self.high, self.low, self.close) <= 0
             or min(self.volume, self.quote_volume, self.taker_buy_base_volume) < 0
         ):
             raise ValueError("invalid candle")

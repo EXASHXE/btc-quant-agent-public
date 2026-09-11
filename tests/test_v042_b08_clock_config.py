@@ -155,7 +155,7 @@ def test_explicit_missing_and_environment_missing_config_paths_fail(
 def test_malformed_unknown_and_unsafe_config_fail_closed(tmp_path: Path) -> None:
     malformed = tmp_path / "malformed.toml"
     malformed.write_text("[execution\nmode = 'live'\n", encoding="utf-8")
-    with pytest.raises(Exception):
+    with pytest.raises(ValueError):
         load_config(malformed)
 
     unknown = tmp_path / "unknown.toml"

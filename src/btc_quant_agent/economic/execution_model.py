@@ -458,6 +458,21 @@ class ExecutionModel:
                 actual_fill_time_ms = max(earliest_fill_ms, fill_bar.close_time_ms)
                 completed_volume_base = fill_bar.volume
 
+            if completed_volume_base is not None and completed_volume_base <= 0:
+                return ExecutionResult(
+                    signal_timestamp_ms=signal_timestamp_ms,
+                    order_timestamp_ms=order_timestamp_ms,
+                    fill_timestamp_ms=actual_fill_time_ms,
+                    fill_price=0.0,
+                    filled_quantity=0.0,
+                    is_filled=False,
+                    side=side,
+                    observation_timestamp_ms=obs_ts,
+                    decision_timestamp_ms=dec_ts,
+                    settlement_timestamp_ms=actual_fill_time_ms,
+                    rejection_reason="INSUFFICIENT_LIQUIDITY",
+                )
+
             fill_price, liquidity_source, liquidity_rejection = self._taker_fill_price(
                 reference_price=ref_price,
                 quantity=desired_quantity,
@@ -690,6 +705,12 @@ class ExecutionModel:
                             "notional_cap_applied": notional_cap_applied,
                         },
                     )
+
+                # Zero completed volume cannot prove that an unresolved
+                # intrabar high/low touch was tradeable. This check is after
+                # the opening branch so suffix volume never gates an open fill.
+                if bar.volume <= 0:
+                    continue
 
                 if side == 1:
                     traded_through = bar.low < limit_price - 1e-8

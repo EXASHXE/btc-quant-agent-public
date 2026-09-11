@@ -324,8 +324,8 @@ def test_execution_limit_fill_after_expiry_rejected() -> None:
     assert result.rejection_reason == "LIMIT_EXPIRED_UNFILLED"
 
 
-def test_execution_zero_volume_liquidity_rejection() -> None:
-    """Orders cannot fill on zero volume candles without liquidity evidence."""
+def test_execution_zero_suffix_volume_does_not_gate_open_but_rejects_close_fill() -> None:
+    """Future zero volume is unavailable at open; completed zero volume rejects at close."""
     ex = ExecutionModel(fee_model=ZERO_FEE, decision_latency_ms=0, exchange_latency_ms=0)
     zero_vol_bar = _bar(open_time_ms=1000, low=90.0, volume=0.0)
 
@@ -347,8 +347,17 @@ def test_execution_zero_volume_liquidity_rejection() -> None:
         order_type=OrderType.MARKET,
         future_candles=[zero_vol_bar],
     )
-    assert not res_market.is_filled
-    assert res_market.rejection_reason == "INSUFFICIENT_LIQUIDITY"
+    assert res_market.is_filled
+
+    res_market_at_close = ex.simulate_order(
+        signal_timestamp_ms=1001,
+        side=1,
+        desired_quantity=10.0,
+        order_type=OrderType.MARKET,
+        future_candles=[zero_vol_bar],
+    )
+    assert not res_market_at_close.is_filled
+    assert res_market_at_close.rejection_reason == "INSUFFICIENT_LIQUIDITY"
 
 
 def test_execution_touch_probability_deterministic_queue_rule() -> None:
