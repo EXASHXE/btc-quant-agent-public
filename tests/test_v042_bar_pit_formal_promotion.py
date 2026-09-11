@@ -9,8 +9,8 @@ from pathlib import Path
 from typing import Any
 
 import pytest
-from helpers_v042_semantic_goldens import case_by_id, load_goldens
 import test_v041_p6_metrics_benchmarks_qualification as p6
+from helpers_v042_semantic_goldens import case_by_id, load_goldens
 
 from btc_quant_agent.domain import Candle
 from btc_quant_agent.economic import BenchmarkKind, InformationSignal, execute_bound_run
