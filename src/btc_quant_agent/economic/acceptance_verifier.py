@@ -16,6 +16,10 @@ from .funding import FundingModel, FundingSettlement
 from .metrics import ReturnMetricsContract, TerminalPolicy, summarize_ledger
 from .policy import OrderType
 from .portfolio import Portfolio
+from .replay_bundle import (
+    FORMAL_REPLAY_INPUT_BUNDLE_SCHEMA_VERSION,
+    validate_formal_replay_input_bundle,
+)
 from .signal import InformationSignal
 from .trade_event import TradeAction, TradeEvent
 
@@ -341,6 +345,25 @@ def validate_persisted_decision_input_bindings(
         expected_binding_set_sha256=str(proof_hash),
     )
 
+    bundle = accounting.get("formal_replay_input_bundle")
+    if bundle is not None:
+        if accounting.get("formal_replay_input_bundle_schema_version") != (
+            FORMAL_REPLAY_INPUT_BUNDLE_SCHEMA_VERSION
+        ):
+            raise ValueError("formal replay input bundle schema version mismatch")
+        bundle_hash = accounting.get("formal_replay_input_bundle_sha256")
+        if bundle_hash != bundle.get("bundle_sha256"):
+            raise ValueError("replay input bundle accounting/identity binding mismatch")
+        validate_formal_replay_input_bundle(
+            bundle,
+            candles=candles,
+            expected_bundle_sha256=str(bundle_hash),
+        )
+    elif run_identity.get("completeness") == "COMPLETE" and bindings:
+        raise ValueError(
+            "persisted candidate claims COMPLETE but lacks verified ReplayInputBundle"
+        )
+
 
 _CRITICAL_IDENTITY_FIELDS: tuple[str, ...] = (
     "experiment_revision_id",
@@ -427,9 +450,9 @@ def _require_mapping(value: Any, label: str) -> Mapping[str, Any]:
 
 
 def _require_list(value: Any, label: str) -> list[Any]:
-    if not isinstance(value, list):
+    if not isinstance(value, (list, tuple)):
         raise TypeError(f"{label} must be a JSON array")
-    return value
+    return list(value)
 
 
 def _finite(value: Any, label: str) -> float:

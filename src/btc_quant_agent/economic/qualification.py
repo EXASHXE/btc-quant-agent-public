@@ -31,9 +31,7 @@ from .acceptance_verifier import (
     FORMAL_DECISION_INPUT_SCHEMA_VERSION,
     PassiveBenchmarkReplayError,
     bind_runtime_market_data,
-    build_formal_decision_input_binding,
     build_passive_benchmark_accounting,
-    validate_formal_decision_input_bindings,
     validate_persisted_decision_input_bindings,
     validate_runtime_dataset_binding,
     verify_formal_accounting,
@@ -48,7 +46,14 @@ from .metrics import (
     summarize_ledger,
 )
 from .policy import TradePolicy
+from .replay_bundle import (
+    FORMAL_REPLAY_INPUT_BUNDLE_SCHEMA_VERSION,
+    ReplayInputBundle,
+    build_formal_replay_input_bundle,
+    validate_formal_replay_input_bundle,
+)
 from .signal import InformationSignal
+from .signal_producer import _runtime_candle_payload
 from .simulator import EconomicSimulationEngine
 from .trade_event import TradeAction
 
@@ -912,6 +917,7 @@ def execute_bound_run(
     engine: EconomicSimulationEngine,
     candles: Sequence[Candle],
     signals: Sequence[InformationSignal],
+    replay_input_bundle: ReplayInputBundle | Mapping[str, Any] | None = None,
     decision_input_bindings: Sequence[Mapping[str, Any]] = (),
     funding_events: Sequence[FundingSettlement] = (),
 ) -> EconomicRunResult:
@@ -934,20 +940,45 @@ def execute_bound_run(
         item.to_dict()
         for item in sorted(signals, key=lambda item: (item.timestamp_ms, item.signal_id))
     ]
-    normalized_decision_inputs = validate_formal_decision_input_bindings(
-        decision_input_bindings,
-        candles=candles,
-        dataset_evidence_id=dataset_evidence.evidence_id,
-        dataset_content_sha256=dataset_evidence.content_sha256,
-        expected_input_contract=protocol.input_contract.to_dict(),
-        expected_signals=signals,
-    )
-    decision_input_set_sha256 = canonical_sha256(
-        {
-            "schema_version": FORMAL_DECISION_INPUT_SCHEMA_VERSION,
-            "bindings": normalized_decision_inputs,
-        }
-    )
+
+    validated_bundle: dict[str, Any] | None = None
+    if signals:
+        if replay_input_bundle is not None:
+            bundle_dict = (
+                replay_input_bundle.to_dict()
+                if isinstance(replay_input_bundle, ReplayInputBundle)
+                else dict(replay_input_bundle)
+            )
+            validated_bundle = validate_formal_replay_input_bundle(
+                bundle_dict,
+                candles=candles,
+                expected_protocol=protocol,
+                expected_dataset_evidence=dataset_evidence,
+                expected_signals=signals,
+            )
+            normalized_decision_inputs = ReplayInputBundle(**validated_bundle).legacy_decision_bindings()
+            decision_input_set_sha256 = canonical_sha256(
+                {
+                    "schema_version": FORMAL_DECISION_INPUT_SCHEMA_VERSION,
+                    "bindings": normalized_decision_inputs,
+                }
+            )
+        elif decision_input_bindings:
+            # Legacy decision bindings provided without verified replay bundle (T4 attack)
+            raise ValueError(
+                "formal run requires a verified ReplayInputBundle; legacy decision-input bindings alone cannot authorize formal economic qualification"
+            )
+        else:
+            # Missing replay bundle completely (T3)
+            raise ValueError(
+                "formal run with signals requires a verified ReplayInputBundle; proofs do not exactly cover signals"
+            )
+    else:
+        decision_input_set_sha256 = canonical_sha256(
+            {"schema_version": FORMAL_REPLAY_INPUT_BUNDLE_SCHEMA_VERSION, "empty": True}
+        )
+        normalized_decision_inputs = []
+
     funding_payload = [
         asdict(item) for item in sorted(funding_events, key=lambda item: item.timestamp_ms)
     ]
@@ -958,6 +989,30 @@ def execute_bound_run(
         metrics_contract=comparison.metrics_contract,
         terminal_policy=comparison.terminal_policy,
     )
+
+    causal_execution_inputs = []
+    for event in summary.trade_events:
+        evidence = event.metadata.get("liquidity_evidence")
+        if evidence:
+            causal_execution_inputs.append(
+                {
+                    "trade_id": event.trade_id,
+                    "timestamp_ms": event.timestamp_ms,
+                    "action": event.action.value,
+                    "quantity": event.quantity,
+                    "price": event.price,
+                    "liquidity_evidence": evidence,
+                    "causal_liquidity_volume_base": event.metadata.get("causal_liquidity_volume_base"),
+                    "causal_liquidity_available_at_ms": event.metadata.get(
+                        "causal_liquidity_available_at_ms"
+                    ),
+                    "completed_liquidity_volume_base": event.metadata.get(
+                        "completed_liquidity_volume_base"
+                    ),
+                    "declared_max_slippage_bps": event.metadata.get("declared_max_slippage_bps"),
+                }
+            )
+
     identity = EconomicRunIdentity(
         experiment_revision_id=protocol.experiment_revision_id,
         protocol_hash=protocol.protocol_hash,
@@ -990,6 +1045,28 @@ def execute_bound_run(
     )
     accounting["formal_decision_input_bindings"] = normalized_decision_inputs
     accounting["formal_decision_input_set_sha256"] = decision_input_set_sha256
+    if validated_bundle is not None:
+        bundle_payload = dict(validated_bundle)
+        if causal_execution_inputs and not bundle_payload.get("causal_execution_inputs"):
+            bundle_payload["causal_execution_inputs"] = tuple(causal_execution_inputs)
+            recomputed = ReplayInputBundle(
+                schema_version=bundle_payload["schema_version"],
+                experiment_revision_id=bundle_payload["experiment_revision_id"],
+                protocol_hash=bundle_payload["protocol_hash"],
+                dataset_evidence_id=bundle_payload["dataset_evidence_id"],
+                dataset_content_sha256=bundle_payload["dataset_content_sha256"],
+                input_contract_identity=bundle_payload["input_contract_identity"],
+                signal_set_sha256=bundle_payload["signal_set_sha256"],
+                decision_inputs=tuple(bundle_payload["decision_inputs"]),
+                causal_execution_inputs=tuple(bundle_payload["causal_execution_inputs"]),
+                funding_input_identity=bundle_payload["funding_input_identity"],
+            )
+            bundle_payload = recomputed.to_dict()
+        accounting["formal_replay_input_bundle_schema_version"] = (
+            FORMAL_REPLAY_INPUT_BUNDLE_SCHEMA_VERSION
+        )
+        accounting["formal_replay_input_bundle"] = bundle_payload
+        accounting["formal_replay_input_bundle_sha256"] = bundle_payload["bundle_sha256"]
     accounting["formal_run_identity"] = identity.to_dict()
     verify_formal_accounting(
         accounting,
@@ -1449,22 +1526,43 @@ def _random_matched_benchmark(
             )
             for item, direction in zip(selected, directions, strict=True)
         ]
-        decision_input_bindings = []
+        decision_inputs = []
+        candles_by_open = {c.open_time_ms: c for c in candles}
         for signal, opportunity in zip(signals, selected, strict=True):
             open_times = opportunity.metadata.get("decision_input_open_times_ms")
             if not isinstance(open_times, tuple) or not open_times:
                 raise ValueError(
                     "formal random opportunity lacks exact decision-input provenance"
                 )
-            decision_input_bindings.append(
-                build_formal_decision_input_binding(
-                    signal,
-                    dataset_evidence=dataset_evidence,
-                    input_contract=protocol.input_contract.to_dict(),
-                    candles=candles,
-                    material_input_open_times_ms=open_times,
-                )
+            ref_candles = [candles_by_open[ot] for ot in open_times]
+            preimage_hash = canonical_sha256([_runtime_candle_payload(c) for c in ref_candles])
+            decision_inputs.append(
+                {
+                    "signal_id": signal.signal_id,
+                    "signal_timestamp_ms": signal.timestamp_ms,
+                    "signal_payload": signal.to_dict(),
+                    "producer_identity": "RANDOM_BENCHMARK_PRODUCER",
+                    "producer_version": "1.0.0",
+                    "observation_open_times_ms": list(open_times),
+                    "generation_contract": {
+                        "rule": "RANDOM_MATCHED_OPPORTUNITY",
+                        "direction": signal.direction,
+                        "strength": signal.strength,
+                        "horizon_ms": signal.horizon_ms,
+                        "asset": signal.asset,
+                        "material_input_open_times_ms": list(open_times),
+                        "expected_preimage_sha256": preimage_hash,
+                    },
+                }
             )
+        trial_bundle = build_formal_replay_input_bundle(
+            protocol=protocol,
+            dataset_evidence=dataset_evidence,
+            candles=candles,
+            signals=signals,
+            decision_inputs=decision_inputs,
+            funding_events=funding_events,
+        )
         run = execute_bound_run(
             protocol=protocol,
             comparison=comparison,
@@ -1472,7 +1570,7 @@ def _random_matched_benchmark(
             engine=engine,
             candles=candles,
             signals=signals,
-            decision_input_bindings=decision_input_bindings,
+            replay_input_bundle=trial_bundle,
             funding_events=funding_events,
         )
         diagnostics, is_comparable = _matching_diagnostics(
