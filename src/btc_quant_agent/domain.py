@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import asdict, dataclass, field
 from enum import StrEnum
+import math
 from typing import Any
 
 
@@ -60,14 +61,36 @@ class Candle:
     taker_buy_base_volume: float = 0.0
     trades: int = 0
     closed: bool = True
+    available_at_ms: int | None = None
 
     def __post_init__(self) -> None:
+        if type(self.closed) is not bool:
+            raise TypeError("closed must be a boolean")
         if self.close_time_ms <= self.open_time_ms:
             raise ValueError("close_time_ms must be after open_time_ms")
+        for name in (
+            "open",
+            "high",
+            "low",
+            "close",
+            "volume",
+            "quote_volume",
+            "taker_buy_base_volume",
+        ):
+            if not math.isfinite(getattr(self, name)):
+                raise ValueError(f"{name} must be finite")
         if self.low > min(self.open, self.close) or self.high < max(self.open, self.close):
             raise ValueError("invalid OHLC bounds")
-        if self.low > self.high or self.volume < 0:
+        if (
+            self.low > self.high
+            or min(self.open, self.high, self.low, self.close) <= 0
+            or min(self.volume, self.quote_volume, self.taker_buy_base_volume) < 0
+        ):
             raise ValueError("invalid candle")
+        if self.available_at_ms is not None and (
+            type(self.available_at_ms) is not int or self.available_at_ms <= 0
+        ):
+            raise ValueError("available_at_ms must be a positive integer when provided")
 
 
 @dataclass(frozen=True)

@@ -18,13 +18,72 @@ from .policy import OrderType
 from .portfolio import Portfolio
 from .trade_event import TradeAction, TradeEvent
 
-RUNTIME_MARKET_DATA_SCHEMA_VERSION = "1.0.0"
+RUNTIME_MARKET_DATA_SCHEMA_VERSION = "2.0.0"
+LEGACY_RUNTIME_MARKET_DATA_SCHEMA_VERSION = "1.0.0"
 PASSIVE_BENCHMARK_PROVENANCE_SCHEMA_VERSION = "1.0.0"
 _TOLERANCE = 1e-8
+_INTERVAL_MS = {
+    "1m": 60_000,
+    "5m": 300_000,
+    "15m": 900_000,
+    "1h": 3_600_000,
+    "4h": 14_400_000,
+}
+
+
+def validate_formal_candle_sequence(
+    candles: Sequence[Candle],
+    *,
+    expected_product: str,
+    expected_interval: str | None = None,
+    decision_time_ms: int | None = None,
+) -> None:
+    """Validate the canonical formal candle information boundary."""
+    if not candles:
+        raise ValueError("formal runtime market data is empty")
+    interval = expected_interval or candles[0].interval
+    interval_ms = _INTERVAL_MS.get(interval)
+    if interval_ms is None:
+        raise ValueError(f"unsupported formal candle interval: {interval}")
+    if decision_time_ms is not None and (
+        type(decision_time_ms) is not int or decision_time_ms <= 0
+    ):
+        raise ValueError("decision_time_ms must be a positive integer")
+
+    previous: Candle | None = None
+    for candle in candles:
+        if candle.symbol != expected_product:
+            raise ValueError("runtime candle instrument differs from preregistered product")
+        if candle.interval != interval:
+            raise ValueError("formal runtime candle interval mismatch")
+        if candle.closed is not True:
+            raise ValueError("formal runtime candle is not explicitly closed")
+        if candle.available_at_ms is None:
+            raise ValueError("formal runtime candle lacks availability proof")
+        duration_ms = candle.close_time_ms - candle.open_time_ms
+        if duration_ms not in {interval_ms - 1, interval_ms}:
+            raise ValueError("formal runtime candle duration differs from declared interval")
+        if candle.available_at_ms < candle.close_time_ms:
+            raise ValueError("formal runtime candle availability precedes close")
+        if decision_time_ms is not None and candle.available_at_ms > decision_time_ms:
+            raise ValueError("formal runtime candle was not available by decision time")
+        if previous is not None:
+            if candle.open_time_ms < previous.close_time_ms:
+                raise ValueError("formal runtime candles overlap")
+            if candle.open_time_ms - previous.open_time_ms != interval_ms:
+                raise ValueError("formal runtime candle sequence has a gap")
+        previous = candle
 
 
 def canonical_runtime_market_data(candles: Sequence[Candle]) -> list[dict[str, Any]]:
     """Return the versioned economic candle payload consumed by formal P6."""
+    if not candles:
+        return []
+    validate_formal_candle_sequence(
+        candles,
+        expected_product=candles[0].symbol,
+        expected_interval=candles[0].interval,
+    )
     return [
         {
             "symbol": item.symbol,
@@ -37,6 +96,8 @@ def canonical_runtime_market_data(candles: Sequence[Candle]) -> list[dict[str, A
             "close": item.close,
             "volume": item.volume,
             "quote_volume": item.quote_volume,
+            "closed": item.closed,
+            "available_at_ms": item.available_at_ms,
         }
         for item in candles
     ]
@@ -66,10 +127,7 @@ def validate_runtime_dataset_binding(
     candles: Sequence[Candle],
     expected_product: str,
 ) -> None:
-    if not candles:
-        raise ValueError("formal runtime market data is empty")
-    if any(item.symbol != expected_product for item in candles):
-        raise ValueError("runtime candle instrument differs from preregistered product")
+    validate_formal_candle_sequence(candles, expected_product=expected_product)
     path = dataset_evidence.local_path()
     if path is None:
         raise ValueError("formal dataset evidence must be local and replayable")
@@ -218,6 +276,10 @@ def _candles_from_accounting(
     if accounting.get("formal_runtime_market_data_schema_version") != (
         RUNTIME_MARKET_DATA_SCHEMA_VERSION
     ):
+        if accounting.get("formal_runtime_market_data_schema_version") == (
+            LEGACY_RUNTIME_MARKET_DATA_SCHEMA_VERSION
+        ):
+            raise ValueError("legacy runtime market data lacks formal availability proof")
         raise ValueError("formal runtime market-data schema is missing or unsupported")
     values = _require_list(
         accounting.get("formal_runtime_market_data"), "formal_runtime_market_data"
@@ -234,6 +296,8 @@ def _candles_from_accounting(
         "close",
         "volume",
         "quote_volume",
+        "closed",
+        "available_at_ms",
     }
     for index, value in enumerate(values):
         item = _require_mapping(value, f"formal_runtime_market_data[{index}]")
@@ -250,17 +314,27 @@ def _candles_from_accounting(
             close=_finite(item["close"], "close"),
             volume=_finite(item["volume"], "volume"),
             quote_volume=_finite(item["quote_volume"], "quote_volume"),
+            closed=item["closed"],
+            available_at_ms=item["available_at_ms"],
         )
         if candle.symbol != expected_product:
             raise ValueError("persisted runtime instrument differs from product scope")
         candles.append(candle)
     if not candles:
         raise ValueError("persisted runtime candle payload is empty")
+    validate_formal_candle_sequence(candles, expected_product=expected_product)
     observed_hash = accounting.get("formal_runtime_market_data_sha256")
     expected_hash = runtime_market_data_sha256(candles)
     if observed_hash != expected_hash:
         raise ValueError("persisted runtime market-data hash mismatch")
     return tuple(candles)
+
+
+def decode_runtime_market_data(
+    accounting: Mapping[str, Any], expected_product: str
+) -> tuple[Candle, ...]:
+    """Decode only the current proof-bearing formal candle schema."""
+    return _candles_from_accounting(accounting, expected_product)
 
 
 def _events_from_accounting(accounting: Mapping[str, Any], product: str) -> tuple[TradeEvent, ...]:

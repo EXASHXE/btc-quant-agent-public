@@ -134,6 +134,7 @@ class BinancePublicClient:
                     trades=int(row[8]),
                     taker_buy_base_volume=float(row[9]),
                     closed=True,
+                    available_at_ms=latest_close_ms,
                 )
             )
         return candles

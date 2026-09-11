@@ -101,6 +101,7 @@ def _candles(count: int = 8, *, drift: float = 1.0) -> tuple[Candle, ...]:
                 close=close_price,
                 volume=10_000.0,
                 quote_volume=1_000_000.0,
+                available_at_ms=start + (index + 1) * CADENCE_MS,
             )
         )
     return tuple(result)
@@ -162,6 +163,8 @@ def _dataset_evidence(tmp_path: Path, candles: tuple[Candle, ...]) -> EvidenceRe
                     "close": item.close,
                     "volume": item.volume,
                     "quote_volume": item.quote_volume,
+                    "closed": item.closed,
+                    "available_at_ms": item.available_at_ms,
                 }
                 for item in candles
             ]
