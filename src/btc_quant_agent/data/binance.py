@@ -12,6 +12,7 @@ from typing import Any
 
 from ..config import DataConfig
 from ..domain import Candle, DerivativesSnapshot
+from ..time_boundary import ClockBoundaryError, monotonic_elapsed_ms
 
 INTERVAL_MS = {
     "1m": 60_000,
@@ -181,6 +182,7 @@ class BinancePublicClient:
     ) -> DerivativeCollection:
         symbol = symbol.upper()
         started = int(time.time() * 1000)
+        monotonic_started = time.monotonic()
         errors: dict[str, str] = {}
         telemetry: dict[str, Any] = {}
 
@@ -338,6 +340,19 @@ class BinancePublicClient:
         mark_price = float(premium["markPrice"]) if "markPrice" in premium else None
         index_price = float(premium["indexPrice"]) if "indexPrice" in premium else None
         local_observed_at = int(time.time() * 1000)
+        try:
+            collection_elapsed_ms = monotonic_elapsed_ms(monotonic_started, time.monotonic())
+        except ClockBoundaryError as exc:
+            raise BinanceDataError(str(exc), "MONOTONIC_CLOCK_ERROR", False) from exc
+        wall_elapsed_ms = local_observed_at - started
+        if wall_elapsed_ms < 0 or abs(wall_elapsed_ms - collection_elapsed_ms) > (
+            MAX_SOURCE_CLOCK_EXTENSION_MS
+        ):
+            raise BinanceDataError(
+                "local wall clock jumped during derivative collection",
+                "LOCAL_CLOCK_DISCONTINUITY",
+                False,
+            )
         snapshot = DerivativesSnapshot(
             observed_at_ms=local_observed_at,
             mark_price=mark_price,
@@ -425,6 +440,7 @@ class BinancePublicClient:
             "local_assembly_time_ms": local_observed_at,
             "effective_observed_at_ms": observed_at,
             "conservative_clock_extension_ms": observed_at - local_observed_at,
+            "collection_elapsed_monotonic_ms": round(collection_elapsed_ms, 3),
         }
         for name, source_timestamp in source_times.items():
             if name in telemetry:

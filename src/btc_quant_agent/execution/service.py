@@ -119,7 +119,7 @@ class ExecutionService:
             raise KeyError(f"unknown signal: {signal_id}")
         if signal.data_health != "OK":
             raise ExecutionBlocked("signal data_health is not OK")
-        current = now_ms or self.public_client.server_time_ms()
+        current = now_ms if now_ms is not None else self.public_client.server_time_ms()
         if current > signal.expires_at_ms:
             self.repository.update_signal_status(signal_id, SignalStatus.EXPIRED)
             raise ExecutionBlocked("signal TTL expired during execution revalidation")
@@ -158,7 +158,7 @@ class ExecutionService:
 
     def build_entry_plan(self, signal_id: str, now_ms: int | None = None) -> ExecutionPlan:
         self._assert_signal_registry_actionable(signal_id)
-        current = now_ms or int(time.time() * 1000)
+        current = now_ms if now_ms is not None else int(time.time() * 1000)
         signal = self.refresh_signal_state(signal_id, current)
         filters = self.public_client.symbol_filters(signal.symbol)
         tick = filters["tick_size"]
@@ -254,7 +254,7 @@ class ExecutionService:
         if raw_plan["status"] != "PREPARED":
             raise ExecutionBlocked(f"entry plan is already {raw_plan['status']}")
         plan = ExecutionPlan.from_dict(raw_plan["payload"])
-        current = now_ms or int(time.time() * 1000)
+        current = now_ms if now_ms is not None else int(time.time() * 1000)
         self.refresh_signal_state(plan.signal_id, current)
         mode = ExecutionMode(self.config.execution.mode)
         open_positions = 0
@@ -434,7 +434,7 @@ class ExecutionService:
         if position is None:
             raise ExecutionBlocked("no open position")
         amount = float(position["positionAmt"])
-        created = now_ms or int(time.time() * 1000)
+        created = now_ms if now_ms is not None else int(time.time() * 1000)
         plan_id = hashlib.sha256(f"close:{symbol}:{created}".encode()).hexdigest()[:20]
         unsigned = ClosePlan(
             plan_id,
@@ -459,7 +459,8 @@ class ExecutionService:
         if raw_plan["status"] != "PREPARED":
             raise ExecutionBlocked(f"close plan is already {raw_plan['status']}")
         plan = ClosePlan.from_dict(raw_plan["payload"])
-        self.guard.validate_close(plan, confirmation_hash, now_ms or int(time.time() * 1000))
+        current = now_ms if now_ms is not None else int(time.time() * 1000)
+        self.guard.validate_close(plan, confirmation_hash, current)
         raw = self._signed_client().place_order(
             symbol=plan.symbol,
             side=plan.side,

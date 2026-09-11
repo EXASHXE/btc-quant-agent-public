@@ -2,11 +2,24 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
 import os
 import tomllib
-from dataclasses import asdict, dataclass, field
+from dataclasses import asdict, dataclass, field, fields
 from pathlib import Path
 from typing import Any
+
+
+def _require_positive_int(value: Any, name: str) -> None:
+    if type(value) is not int or value <= 0:
+        raise ValueError(f"{name} must be a positive integer")
+
+
+def _require_nonnegative_real(value: Any, name: str) -> None:
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        raise TypeError(f"{name} must be numeric")
+    if not math.isfinite(float(value)) or value < 0:
+        raise ValueError(f"{name} must be finite and nonnegative")
 
 
 @dataclass(frozen=True)
@@ -30,8 +43,8 @@ class RuntimeConfig:
             raise ValueError("unsupported validation_status")
         if self.decision_interval != "15m":
             raise ValueError("v0.2.2 supports a 15m decision interval only")
-        if min(self.ttl_minutes, self.cooldown_minutes, self.max_data_age_seconds) <= 0:
-            raise ValueError("runtime TTL, cooldown, and max data age must be positive")
+        for name in ("ttl_minutes", "cooldown_minutes", "max_data_age_seconds"):
+            _require_positive_int(getattr(self, name), f"runtime.{name}")
 
 
 @dataclass(frozen=True)
@@ -75,6 +88,17 @@ class StrategyConfig:
     enable_volatility_liquidity_score: bool = True
     enable_order_book_factor: bool = False
 
+    def __post_init__(self) -> None:
+        for item in fields(self):
+            value = getattr(self, item.name)
+            if item.name.startswith("enable_"):
+                if type(value) is not bool:
+                    raise TypeError(f"strategy.{item.name} must be a boolean")
+            elif isinstance(value, bool) or not isinstance(value, (int, float)):
+                raise TypeError(f"strategy.{item.name} must be numeric")
+            elif not math.isfinite(float(value)):
+                raise ValueError(f"strategy.{item.name} must be finite")
+
 
 @dataclass(frozen=True)
 class RiskConfig:
@@ -90,6 +114,12 @@ class RiskConfig:
     max_expected_funding_events: int = 2
 
     def __post_init__(self) -> None:
+        for item in fields(self):
+            value = getattr(self, item.name)
+            if isinstance(value, bool) or not isinstance(value, (int, float)):
+                raise TypeError(f"risk.{item.name} must be numeric")
+            if not math.isfinite(float(value)):
+                raise ValueError(f"risk.{item.name} must be finite")
         if self.account_equity_usdt <= 0 or not 0 < self.risk_per_trade <= 0.05:
             raise ValueError("risk equity must be positive and risk_per_trade must be in (0, 0.05]")
         if not 0 < self.min_notional_usdt <= self.max_notional_usdt:
@@ -112,6 +142,26 @@ class DataConfig:
     oi_stale_seconds: int = 900
     funding_stale_seconds: int = 900
     derivatives_stale_seconds: int = 900
+    max_clock_skew_ms: int = 5_000
+
+    def __post_init__(self) -> None:
+        if not isinstance(self.rest_base_url, str) or not self.rest_base_url.startswith(
+            ("http://", "https://")
+        ):
+            raise ValueError("data.rest_base_url must be an HTTP(S) URL")
+        _require_nonnegative_real(self.request_timeout_seconds, "data.request_timeout_seconds")
+        if self.request_timeout_seconds <= 0:
+            raise ValueError("data.request_timeout_seconds must be positive")
+        for name in (
+            "history_limit_15m",
+            "history_limit_1h",
+            "history_limit_4h",
+            "oi_stale_seconds",
+            "funding_stale_seconds",
+            "derivatives_stale_seconds",
+            "max_clock_skew_ms",
+        ):
+            _require_positive_int(getattr(self, name), f"data.{name}")
 
 
 @dataclass(frozen=True)
@@ -120,14 +170,14 @@ class BacktestConfig:
     breakout_retest_holding_minutes: int = 480
 
     def __post_init__(self) -> None:
-        if (
-            min(
-                self.trend_pullback_holding_minutes,
-                self.breakout_retest_holding_minutes,
-            )
-            <= 0
-        ):
-            raise ValueError("backtest holding periods must be positive")
+        _require_positive_int(
+            self.trend_pullback_holding_minutes,
+            "backtest.trend_pullback_holding_minutes",
+        )
+        _require_positive_int(
+            self.breakout_retest_holding_minutes,
+            "backtest.breakout_retest_holding_minutes",
+        )
 
 
 @dataclass(frozen=True)
@@ -148,17 +198,24 @@ class ExecutionConfig:
     testnet_base_url: str = "https://testnet.binancefuture.com"
 
     def __post_init__(self) -> None:
+        for name in ("auto_execute", "allow_live", "require_protective_orders"):
+            if type(getattr(self, name)) is not bool:
+                raise TypeError(f"execution.{name} must be a boolean")
         if self.mode not in {"disabled", "paper", "testnet", "live"}:
             raise ValueError("execution.mode must be disabled, paper, testnet, or live")
         if self.position_mode != "ONE_WAY":
             raise ValueError("phase two execution supports ONE_WAY position mode only")
-        if not 1 <= self.max_leverage <= 20:
+        if type(self.max_leverage) is not int or not 1 <= self.max_leverage <= 20:
             raise ValueError("execution.max_leverage must be between 1 and 20")
         if self.entry_order_type.upper() not in {"LIMIT", "MARKET"}:
             raise ValueError("execution.entry_order_type must be LIMIT or MARKET")
+        for name in ("max_notional_usdt", "max_daily_loss_usdt"):
+            _require_nonnegative_real(getattr(self, name), f"execution.{name}")
         if self.max_notional_usdt <= 0 or self.max_daily_loss_usdt <= 0:
             raise ValueError("execution notional and daily loss limits must be positive")
-        if self.max_open_positions < 1 or self.plan_ttl_seconds < 15:
+        for name in ("max_open_positions", "plan_ttl_seconds", "recv_window_ms"):
+            _require_positive_int(getattr(self, name), f"execution.{name}")
+        if self.plan_ttl_seconds < 15:
             raise ValueError("execution position limit and plan TTL are invalid")
 
 
@@ -166,10 +223,18 @@ class ExecutionConfig:
 class StorageConfig:
     sqlite_path: str = "./var/quant.db"
 
+    def __post_init__(self) -> None:
+        if not isinstance(self.sqlite_path, str) or not self.sqlite_path.strip():
+            raise ValueError("storage.sqlite_path must be nonempty text")
+
 
 @dataclass(frozen=True)
 class NotifyConfig:
     feishu_enabled: bool = False
+
+    def __post_init__(self) -> None:
+        if type(self.feishu_enabled) is not bool:
+            raise TypeError("notify.feishu_enabled must be a boolean")
 
 
 @dataclass(frozen=True)
@@ -190,16 +255,41 @@ class AppConfig:
 
 
 def _build(section: type[Any], raw: dict[str, Any] | None) -> Any:
-    return section(**(raw or {}))
+    values = raw or {}
+    if not isinstance(values, dict):
+        raise TypeError(f"{section.__name__} configuration must be a table")
+    allowed = {item.name for item in fields(section)}
+    unknown = sorted(set(values) - allowed)
+    if unknown:
+        raise ValueError(
+            f"unknown {section.__name__} configuration keys: {','.join(unknown)}"
+        )
+    return section(**values)
 
 
 def load_config(path: str | Path | None = None) -> AppConfig:
-    candidate_value = path or os.getenv("BTC_QUANT_CONFIG") or "configs/default.toml"
+    """Load config with precedence: explicit path, BTC_QUANT_CONFIG, repository default."""
+    env_candidate = os.getenv("BTC_QUANT_CONFIG")
+    candidate_value = path if path is not None else env_candidate or "configs/default.toml"
     candidate = Path(candidate_value)
-    raw: dict[str, Any] = {}
-    if candidate.exists():
-        with candidate.open("rb") as handle:
-            raw = tomllib.load(handle)
+    if not candidate.is_file():
+        source = "explicit" if path is not None else "BTC_QUANT_CONFIG" if env_candidate else "default"
+        raise FileNotFoundError(f"{source} configuration file is unavailable: {candidate}")
+    with candidate.open("rb") as handle:
+        raw = tomllib.load(handle)
+    allowed_sections = {
+        "runtime",
+        "strategy",
+        "risk",
+        "data",
+        "backtest",
+        "execution",
+        "storage",
+        "notify",
+    }
+    unknown_sections = sorted(set(raw) - allowed_sections)
+    if unknown_sections:
+        raise ValueError(f"unknown top-level configuration sections: {','.join(unknown_sections)}")
     config = AppConfig(
         runtime=_build(RuntimeConfig, raw.get("runtime")),
         strategy=_build(StrategyConfig, raw.get("strategy")),

@@ -9,14 +9,23 @@ from typing import Any
 
 from ..config import DataConfig
 from ..domain import DerivativesSnapshot
+from ..time_boundary import ClockBoundaryError, validate_availability
 
 DERIVATIVE_FIELDS = [field.name for field in fields(DerivativesSnapshot)]
 
 
 def _available(timestamp_ms: int | None, decision_time_ms: int, max_age_seconds: int) -> bool:
-    if timestamp_ms is None or timestamp_ms > decision_time_ms:
+    if timestamp_ms is None:
         return False
-    return decision_time_ms - timestamp_ms <= max_age_seconds * 1000
+    try:
+        validate_availability(
+            available_at_ms=timestamp_ms,
+            decision_time_ms=decision_time_ms,
+            max_age_ms=max_age_seconds * 1000,
+        )
+    except ClockBoundaryError:
+        return False
+    return True
 
 
 def sanitize_derivatives(

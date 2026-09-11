@@ -12,6 +12,7 @@ from .execution.service import ExecutionService
 from .notify.feishu import send_invalidation, send_signal
 from .shadow import update_shadow
 from .storage import Repository
+from .time_boundary import validate_clock_skew
 
 
 @dataclass
@@ -38,7 +39,14 @@ class QuantService:
         derivatives = self.client.derivatives(
             symbol, include_order_book=self.config.strategy.enable_order_book_factor
         )
-        now_ms = max(now_ms, derivatives.observed_at_ms)
+        validate_clock_skew(
+            exchange_time_ms=now_ms,
+            receipt_time_ms=derivatives.observed_at_ms,
+            max_abs_skew_ms=self.config.data.max_clock_skew_ms,
+        )
+        # Runtime decisions use the explicit receipt/availability clock. Source
+        # event timestamps remain exchange timestamps and are sanitized as-of it.
+        now_ms = derivatives.observed_at_ms
         engine = QuantEngine(self.config, mode=EngineMode.RUNTIME_GATED)
         self.repository.expire_signals(now_ms)
         webhook = os.getenv("FEISHU_WEBHOOK_URL")
