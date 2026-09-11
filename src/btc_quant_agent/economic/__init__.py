@@ -56,7 +56,19 @@ from .qualification import (
     make_artifact_evidence,
     policy_identity,
 )
+from .replay_bundle import (
+    FORMAL_REPLAY_INPUT_BUNDLE_SCHEMA_VERSION,
+    ReplayInputBundle,
+    build_formal_replay_input_bundle,
+    validate_formal_replay_input_bundle,
+)
 from .signal import InformationSignal
+from .signal_producer import (
+    CanonicalRuleSignalProducer,
+    RandomBenchmarkSignalProducer,
+    SignalProducer,
+    SignalProducerRegistry,
+)
 from .simulator import (
     AmbiguousEntryRejectionError,
     AmbiguousExecutionRejectionError,
@@ -67,6 +79,7 @@ from .simulator import (
 from .trade_event import TradeAction, TradeEvent
 
 __all__ = [
+    "FORMAL_REPLAY_INPUT_BUNDLE_SCHEMA_VERSION",
     "P6_BENCHMARK_EVIDENCE_TYPE",
     "P6_RESULT_EVIDENCE_TYPE",
     "P6_RESULT_SCHEMA_VERSION",
@@ -78,6 +91,7 @@ __all__ = [
     "BenchmarkKind",
     "BenchmarkMatchingRules",
     "BenchmarkResult",
+    "CanonicalRuleSignalProducer",
     "CausalLiquidityRejectionError",
     "ComparisonContract",
     "ConditionalTriggerTime",
@@ -109,10 +123,14 @@ __all__ = [
     "QualificationGateResult",
     "QualificationVerdict",
     "RandomBenchmarkDistribution",
+    "RandomBenchmarkSignalProducer",
+    "ReplayInputBundle",
     "ResultCompleteness",
     "ReturnMetricsContract",
     "RiskBudget",
     "RoundTripAttribution",
+    "SignalProducer",
+    "SignalProducerRegistry",
     "SimulationSummary",
     "SizingType",
     "SlippageMode",
@@ -122,6 +140,7 @@ __all__ = [
     "TradePolicy",
     "attribute_round_trips",
     "build_formal_benchmark_suite",
+    "build_formal_replay_input_bundle",
     "eligible_opportunity_set_sha256",
     "evaluate_formal_economic_qualification",
     "execute_bound_run",
@@ -131,4 +150,5 @@ __all__ = [
     "make_artifact_evidence",
     "policy_identity",
     "summarize_ledger",
+    "validate_formal_replay_input_bundle",
 ]
