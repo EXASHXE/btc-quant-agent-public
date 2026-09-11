@@ -28,9 +28,13 @@ from ..research_contract.models import (
     utc_now,
 )
 from .acceptance_verifier import (
+    FORMAL_DECISION_INPUT_SCHEMA_VERSION,
     PassiveBenchmarkReplayError,
     bind_runtime_market_data,
+    build_formal_decision_input_binding,
     build_passive_benchmark_accounting,
+    validate_formal_decision_input_bindings,
+    validate_persisted_decision_input_bindings,
     validate_runtime_dataset_binding,
     verify_formal_accounting,
 )
@@ -379,6 +383,7 @@ class EconomicRunIdentity:
     interval_end_ms: int
     observation_count: int
     signal_set_sha256: str
+    decision_input_set_sha256: str
     funding_event_set_sha256: str
     product_scope: tuple[str, ...]
     initial_capital: float
@@ -404,6 +409,7 @@ class EconomicRunIdentity:
             (self.protocol_hash, "protocol_hash"),
             (self.dataset_content_sha256, "dataset_content_sha256"),
             (self.signal_set_sha256, "signal_set_sha256"),
+            (self.decision_input_set_sha256, "decision_input_set_sha256"),
             (self.funding_event_set_sha256, "funding_event_set_sha256"),
             (self.comparison_contract_hash, "comparison_contract_hash"),
             (self.metrics_contract_hash, "metrics_contract_hash"),
@@ -445,6 +451,7 @@ class EconomicRunIdentity:
             "interval_end_ms": self.interval_end_ms,
             "observation_count": self.observation_count,
             "signal_set_sha256": self.signal_set_sha256,
+            "decision_input_set_sha256": self.decision_input_set_sha256,
             "funding_event_set_sha256": self.funding_event_set_sha256,
             "product_scope": list(self.product_scope),
             "initial_capital": self.initial_capital,
@@ -905,6 +912,7 @@ def execute_bound_run(
     engine: EconomicSimulationEngine,
     candles: Sequence[Candle],
     signals: Sequence[InformationSignal],
+    decision_input_bindings: Sequence[Mapping[str, Any]] = (),
     funding_events: Sequence[FundingSettlement] = (),
 ) -> EconomicRunResult:
     _validate_protocol_and_runtime(protocol, comparison, dataset_evidence, engine, candles)
@@ -926,6 +934,20 @@ def execute_bound_run(
         item.to_dict()
         for item in sorted(signals, key=lambda item: (item.timestamp_ms, item.signal_id))
     ]
+    normalized_decision_inputs = validate_formal_decision_input_bindings(
+        decision_input_bindings,
+        candles=candles,
+        dataset_evidence_id=dataset_evidence.evidence_id,
+        dataset_content_sha256=dataset_evidence.content_sha256,
+        expected_input_contract=protocol.input_contract.to_dict(),
+        expected_signals=signals,
+    )
+    decision_input_set_sha256 = canonical_sha256(
+        {
+            "schema_version": FORMAL_DECISION_INPUT_SCHEMA_VERSION,
+            "bindings": normalized_decision_inputs,
+        }
+    )
     funding_payload = [
         asdict(item) for item in sorted(funding_events, key=lambda item: item.timestamp_ms)
     ]
@@ -946,6 +968,7 @@ def execute_bound_run(
         interval_end_ms=comparison.data_interval.end_ms,
         observation_count=len(candles),
         signal_set_sha256=canonical_sha256(signal_payload),
+        decision_input_set_sha256=decision_input_set_sha256,
         funding_event_set_sha256=canonical_sha256(funding_payload),
         product_scope=protocol.product_scope,
         initial_capital=engine.initial_cash,
@@ -962,6 +985,11 @@ def execute_bound_run(
         completeness=summary.completeness,
     )
     accounting = bind_runtime_market_data(summary.to_dict(), candles)
+    accounting["formal_decision_input_schema_version"] = (
+        FORMAL_DECISION_INPUT_SCHEMA_VERSION
+    )
+    accounting["formal_decision_input_bindings"] = normalized_decision_inputs
+    accounting["formal_decision_input_set_sha256"] = decision_input_set_sha256
     accounting["formal_run_identity"] = identity.to_dict()
     verify_formal_accounting(
         accounting,
@@ -987,6 +1015,11 @@ def build_formal_benchmark_suite(
     funding_events: Sequence[FundingSettlement] = (),
 ) -> FormalBenchmarkSuite:
     _validate_candidate_run_binding(protocol, comparison, candidate_run)
+    validate_persisted_decision_input_bindings(
+        _accounting_copy(candidate_run),
+        candles=candles,
+        run_identity=candidate_run.identity.to_dict(),
+    )
     opportunity_hash = eligible_opportunity_set_sha256(eligible_opportunities)
     if (
         BenchmarkKind.RANDOM_MATCHED
@@ -1416,6 +1449,22 @@ def _random_matched_benchmark(
             )
             for item, direction in zip(selected, directions, strict=True)
         ]
+        decision_input_bindings = []
+        for signal, opportunity in zip(signals, selected, strict=True):
+            open_times = opportunity.metadata.get("decision_input_open_times_ms")
+            if not isinstance(open_times, tuple) or not open_times:
+                raise ValueError(
+                    "formal random opportunity lacks exact decision-input provenance"
+                )
+            decision_input_bindings.append(
+                build_formal_decision_input_binding(
+                    signal,
+                    dataset_evidence=dataset_evidence,
+                    input_contract=protocol.input_contract.to_dict(),
+                    candles=candles,
+                    material_input_open_times_ms=open_times,
+                )
+            )
         run = execute_bound_run(
             protocol=protocol,
             comparison=comparison,
@@ -1423,6 +1472,7 @@ def _random_matched_benchmark(
             engine=engine,
             candles=candles,
             signals=signals,
+            decision_input_bindings=decision_input_bindings,
             funding_events=funding_events,
         )
         diagnostics, is_comparable = _matching_diagnostics(

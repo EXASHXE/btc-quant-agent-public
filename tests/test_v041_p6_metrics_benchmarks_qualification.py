@@ -53,6 +53,7 @@ from btc_quant_agent.economic import (
     summarize_ledger,
 )
 from btc_quant_agent.economic.acceptance_verifier import (
+    build_formal_decision_input_binding,
     build_passive_benchmark_accounting,
     validate_persisted_qualification_semantics,
 )
@@ -184,8 +185,33 @@ def _dataset_evidence(tmp_path: Path, candles: tuple[Candle, ...]) -> EvidenceRe
 
 def _opportunities(candles: tuple[Candle, ...]) -> tuple[EligibleOpportunity, ...]:
     return tuple(
-        EligibleOpportunity(f"OPP-{index}", candle.open_time_ms)
-        for index, candle in enumerate(candles[:-1])
+        EligibleOpportunity(
+            f"OPP-{index}",
+            candle.open_time_ms,
+            FrozenDict(
+                {
+                    "decision_input_open_times_ms": (
+                        candles[index - 1].open_time_ms,
+                    )
+                }
+            ),
+        )
+        for index, candle in enumerate(candles[1:-1], start=1)
+    )
+
+
+def _decision_input_binding(
+    signal: InformationSignal,
+    dataset: EvidenceReference,
+    candles: tuple[Candle, ...],
+    protocol: ExperimentMetadata,
+) -> FrozenDict:
+    return build_formal_decision_input_binding(
+        signal,
+        dataset_evidence=dataset,
+        input_contract=protocol.input_contract.to_dict(),
+        candles=candles,
+        material_input_open_times_ms=(candles[0].open_time_ms,),
     )
 
 
@@ -317,7 +343,10 @@ def _formal_artifacts(
     dataset = _dataset_evidence(tmp_path, candles)
     opportunities = (
         tuple(
-            replace(item, metadata=FrozenDict({"spread_bps": -1.0}))
+            replace(
+                item,
+                metadata=FrozenDict({**dict(item.metadata), "spread_bps": -1.0}),
+            )
             for item in _opportunities(candles)
         )
         if incomparable_opportunities
@@ -335,7 +364,7 @@ def _formal_artifacts(
     signal = InformationSignal(
         signal_id="P6_CANDIDATE_ENTRY",
         experiment_id=protocol.experiment_revision_id,
-        timestamp_ms=candles[0].open_time_ms,
+        timestamp_ms=candles[1].open_time_ms,
         direction=1,
         strength=1.0,
     )
@@ -346,6 +375,9 @@ def _formal_artifacts(
         engine=engine,
         candles=candles,
         signals=(signal,),
+        decision_input_bindings=(
+            _decision_input_binding(signal, dataset, candles, protocol),
+        ),
         funding_events=funding_events,
     )
     run_path = tmp_path / "candidate-run.json"
@@ -926,7 +958,7 @@ def test_semantically_identical_runs_and_results_have_identical_hashes(
     signal = InformationSignal(
         "P6_CANDIDATE_ENTRY",
         protocol.experiment_revision_id,
-        artifacts["candles"][0].open_time_ms,
+        artifacts["candles"][1].open_time_ms,
         direction=1,
     )
     repeated = execute_bound_run(
@@ -936,6 +968,14 @@ def test_semantically_identical_runs_and_results_have_identical_hashes(
         engine=artifacts["engine"],
         candles=artifacts["candles"],
         signals=(signal,),
+        decision_input_bindings=(
+            _decision_input_binding(
+                signal,
+                artifacts["dataset"],
+                artifacts["candles"],
+                protocol,
+            ),
+        ),
     )
     assert repeated.result_id == artifacts["run"].result_id
     assert repeated.to_dict() == artifacts["run"].to_dict()
@@ -996,19 +1036,26 @@ def test_acceptance_repair_rejects_runtime_instrument_substitution(tmp_path: Pat
 def test_acceptance_repair_runtime_binding_is_deterministic(tmp_path: Path) -> None:
     artifacts = _formal_artifacts(tmp_path)
     first = artifacts["run"]
+    signal = InformationSignal(
+        signal_id="P6_CANDIDATE_ENTRY",
+        experiment_id=artifacts["protocol"].experiment_revision_id,
+        timestamp_ms=artifacts["candles"][1].open_time_ms,
+        direction=1,
+        strength=1.0,
+    )
     second = execute_bound_run(
         protocol=artifacts["protocol"],
         comparison=artifacts["comparison"],
         dataset_evidence=artifacts["dataset"],
         engine=artifacts["engine"],
         candles=artifacts["candles"],
-        signals=(
-            InformationSignal(
-                signal_id="P6_CANDIDATE_ENTRY",
-                experiment_id=artifacts["protocol"].experiment_revision_id,
-                timestamp_ms=artifacts["candles"][0].open_time_ms,
-                direction=1,
-                strength=1.0,
+        signals=(signal,),
+        decision_input_bindings=(
+            _decision_input_binding(
+                signal,
+                artifacts["dataset"],
+                artifacts["candles"],
+                artifacts["protocol"],
             ),
         ),
     )

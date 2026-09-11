@@ -9,18 +9,20 @@ from pathlib import Path
 from typing import Any
 
 from ..domain import Candle
-from ..research_contract.canonical import canonical_sha256
+from ..research_contract.canonical import FrozenDict, canonical_sha256, thaw_json
 from .execution_model import ExecutionModel, ExecutionResult
 from .fee_model import FeeModel
 from .funding import FundingModel, FundingSettlement
 from .metrics import ReturnMetricsContract, TerminalPolicy, summarize_ledger
 from .policy import OrderType
 from .portfolio import Portfolio
+from .signal import InformationSignal
 from .trade_event import TradeAction, TradeEvent
 
 RUNTIME_MARKET_DATA_SCHEMA_VERSION = "2.0.0"
 LEGACY_RUNTIME_MARKET_DATA_SCHEMA_VERSION = "1.0.0"
 PASSIVE_BENCHMARK_PROVENANCE_SCHEMA_VERSION = "1.0.0"
+FORMAL_DECISION_INPUT_SCHEMA_VERSION = "1.0.0"
 _TOLERANCE = 1e-8
 _INTERVAL_MS = {
     "1m": 60_000,
@@ -75,6 +77,23 @@ def validate_formal_candle_sequence(
         previous = candle
 
 
+def _runtime_candle_payload(item: Candle) -> dict[str, Any]:
+    return {
+        "symbol": item.symbol,
+        "interval": item.interval,
+        "open_time_ms": item.open_time_ms,
+        "close_time_ms": item.close_time_ms,
+        "open": item.open,
+        "high": item.high,
+        "low": item.low,
+        "close": item.close,
+        "volume": item.volume,
+        "quote_volume": item.quote_volume,
+        "closed": item.closed,
+        "available_at_ms": item.available_at_ms,
+    }
+
+
 def canonical_runtime_market_data(candles: Sequence[Candle]) -> list[dict[str, Any]]:
     """Return the versioned economic candle payload consumed by formal P6."""
     if not candles:
@@ -84,23 +103,7 @@ def canonical_runtime_market_data(candles: Sequence[Candle]) -> list[dict[str, A
         expected_product=candles[0].symbol,
         expected_interval=candles[0].interval,
     )
-    return [
-        {
-            "symbol": item.symbol,
-            "interval": item.interval,
-            "open_time_ms": item.open_time_ms,
-            "close_time_ms": item.close_time_ms,
-            "open": item.open,
-            "high": item.high,
-            "low": item.low,
-            "close": item.close,
-            "volume": item.volume,
-            "quote_volume": item.quote_volume,
-            "closed": item.closed,
-            "available_at_ms": item.available_at_ms,
-        }
-        for item in candles
-    ]
+    return [_runtime_candle_payload(item) for item in candles]
 
 
 def runtime_market_data_sha256(candles: Sequence[Candle]) -> str:
@@ -153,6 +156,192 @@ def validate_runtime_dataset_binding(
         raise ValueError("runtime candle payload differs from content-hashed dataset evidence")
 
 
+def build_formal_decision_input_binding(
+    signal: InformationSignal,
+    *,
+    dataset_evidence: Any,
+    input_contract: Mapping[str, Any],
+    candles: Sequence[Candle],
+    material_input_open_times_ms: Sequence[int],
+) -> FrozenDict:
+    """Bind a producer-declared exact input set to hash-verified candle rows.
+
+    Availability is deliberately absent from the caller-owned fields: formal
+    verification always derives it from the referenced canonical candle rows.
+    """
+    open_times = list(material_input_open_times_ms)
+    by_open = {item.open_time_ms: item for item in candles}
+    if not open_times:
+        raise ValueError("formal decision input proof requires material observations")
+    if any(type(value) is not int or value <= 0 for value in open_times):
+        raise ValueError("formal decision input references must be positive integers")
+    if open_times != sorted(set(open_times)):
+        raise ValueError("formal decision input references must be unique and ordered")
+    try:
+        material = [by_open[value] for value in open_times]
+    except KeyError as exc:
+        raise ValueError("formal decision input references an unknown candle") from exc
+    payload = {
+        "schema_version": FORMAL_DECISION_INPUT_SCHEMA_VERSION,
+        "dataset_evidence_id": getattr(dataset_evidence, "evidence_id", None),
+        "dataset_content_sha256": getattr(dataset_evidence, "content_sha256", None),
+        "input_contract": dict(input_contract),
+        "material_input_scope": "EXACT_COMPLETE_SET",
+        "signal": signal.to_dict(),
+        "decision_boundary_ms": signal.timestamp_ms,
+        "observation_open_times_ms": open_times,
+        "material_input_set_sha256": canonical_sha256(
+            [_runtime_candle_payload(item) for item in material]
+        ),
+    }
+    return FrozenDict(payload)
+
+
+def validate_formal_decision_input_bindings(
+    bindings: Sequence[Mapping[str, Any]],
+    *,
+    candles: Sequence[Candle],
+    dataset_evidence_id: str,
+    dataset_content_sha256: str,
+    expected_input_contract: Mapping[str, Any] | None = None,
+    expected_signals: Sequence[InformationSignal] | None = None,
+    expected_signal_set_sha256: str | None = None,
+    expected_binding_set_sha256: str | None = None,
+) -> list[dict[str, Any]]:
+    """Validate exact per-signal material inputs without inspecting future suffix data."""
+    if isinstance(bindings, (str, bytes)):
+        raise TypeError("formal decision input bindings must be a sequence")
+    expected_keys = {
+        "schema_version",
+        "dataset_evidence_id",
+        "dataset_content_sha256",
+        "input_contract",
+        "material_input_scope",
+        "signal",
+        "decision_boundary_ms",
+        "observation_open_times_ms",
+        "material_input_set_sha256",
+    }
+    candle_by_open = {item.open_time_ms: item for item in candles}
+    normalized: list[dict[str, Any]] = []
+    seen_signal_ids: set[str] = set()
+    for index, raw in enumerate(bindings):
+        if not isinstance(raw, Mapping):
+            raise TypeError(f"formal decision input binding {index} must be an object")
+        binding = thaw_json(raw)
+        if not isinstance(binding, dict) or set(binding) != expected_keys:
+            raise ValueError("formal decision input binding schema mismatch")
+        if binding["schema_version"] != FORMAL_DECISION_INPUT_SCHEMA_VERSION:
+            raise ValueError("unsupported formal decision input schema")
+        if binding["dataset_evidence_id"] != dataset_evidence_id or binding[
+            "dataset_content_sha256"
+        ] != dataset_content_sha256:
+            raise ValueError("formal decision input dataset binding mismatch")
+        if binding["material_input_scope"] != "EXACT_COMPLETE_SET":
+            raise ValueError("formal decision input set is not attested as complete")
+        if expected_input_contract is not None and binding["input_contract"] != dict(
+            expected_input_contract
+        ):
+            raise ValueError("formal decision input contract binding mismatch")
+        signal_payload = binding["signal"]
+        if not isinstance(signal_payload, dict):
+            raise TypeError("formal decision input signal must be an object")
+        signal = InformationSignal.from_dict(signal_payload)
+        if signal.signal_id in seen_signal_ids:
+            raise ValueError("duplicate formal decision input proof for signal")
+        seen_signal_ids.add(signal.signal_id)
+        if binding["decision_boundary_ms"] != signal.timestamp_ms:
+            raise ValueError("formal decision input boundary differs from signal timestamp")
+        open_times = binding["observation_open_times_ms"]
+        if not isinstance(open_times, list) or not open_times:
+            raise ValueError("formal decision input proof requires material observations")
+        if any(type(value) is not int or value <= 0 for value in open_times):
+            raise ValueError("formal decision input references must be positive integers")
+        if open_times != sorted(set(open_times)):
+            raise ValueError("formal decision input references must be unique and ordered")
+        try:
+            material = [candle_by_open[value] for value in open_times]
+        except KeyError as exc:
+            raise ValueError("formal decision input references an unknown candle") from exc
+        if any(
+            item.available_at_ms is None
+            or item.available_at_ms > signal.timestamp_ms
+            for item in material
+        ):
+            raise ValueError("formal decision input was not available by signal timestamp")
+        material_hash = canonical_sha256(
+            [_runtime_candle_payload(item) for item in material]
+        )
+        if binding["material_input_set_sha256"] != material_hash:
+            raise ValueError("formal decision input content binding mismatch")
+        normalized.append(binding)
+
+    normalized.sort(
+        key=lambda item: (
+            int(item["signal"]["timestamp_ms"]),
+            str(item["signal"]["signal_id"]),
+        )
+    )
+    signal_payload = [item["signal"] for item in normalized]
+    if expected_signals is not None:
+        expected_payload_value = thaw_json([
+            item.to_dict()
+            for item in sorted(
+                expected_signals, key=lambda value: (value.timestamp_ms, value.signal_id)
+            )
+        ])
+        if not isinstance(expected_payload_value, list):
+            raise TypeError("formal signal payload must be a JSON array")
+        expected_payload = expected_payload_value
+        if signal_payload != expected_payload:
+            raise ValueError("formal decision input proofs do not exactly cover signals")
+    if expected_signal_set_sha256 is not None and canonical_sha256(signal_payload) != (
+        expected_signal_set_sha256
+    ):
+        raise ValueError("formal decision input proofs disagree with signal-set identity")
+    binding_hash = canonical_sha256(
+        {
+            "schema_version": FORMAL_DECISION_INPUT_SCHEMA_VERSION,
+            "bindings": normalized,
+        }
+    )
+    if expected_binding_set_sha256 is not None and binding_hash != (
+        expected_binding_set_sha256
+    ):
+        raise ValueError("formal decision input proof-set identity mismatch")
+    return normalized
+
+
+def validate_persisted_decision_input_bindings(
+    accounting: Mapping[str, Any],
+    *,
+    candles: Sequence[Candle],
+    run_identity: Mapping[str, Any],
+) -> None:
+    if accounting.get("formal_decision_input_schema_version") != (
+        FORMAL_DECISION_INPUT_SCHEMA_VERSION
+    ):
+        raise ValueError("formal decision input proof is missing or unsupported")
+    bindings = _require_list(
+        accounting.get("formal_decision_input_bindings"),
+        "formal decision input bindings",
+    )
+    proof_hash = accounting.get("formal_decision_input_set_sha256")
+    if proof_hash != run_identity.get("decision_input_set_sha256"):
+        raise ValueError("formal decision input accounting/identity binding mismatch")
+    validate_formal_decision_input_bindings(
+        bindings,
+        candles=candles,
+        dataset_evidence_id=str(run_identity.get("dataset_evidence_id")),
+        dataset_content_sha256=str(run_identity.get("dataset_content_sha256")),
+        expected_input_contract=_require_mapping(
+            run_identity.get("input_contract"), "formal input contract"
+        ),
+        expected_signal_set_sha256=str(run_identity.get("signal_set_sha256")),
+        expected_binding_set_sha256=str(proof_hash),
+    )
+
+
 _CRITICAL_IDENTITY_FIELDS: tuple[str, ...] = (
     "experiment_revision_id",
     "protocol_hash",
@@ -183,6 +372,17 @@ def validate_formal_run_identity_binding(
 ) -> None:
     if not isinstance(trial_identity, Mapping):
         raise TypeError("formal run identity must be a JSON object")
+    for label, identity in (
+        ("candidate", candidate_identity),
+        ("trial", trial_identity),
+    ):
+        proof_hash = identity.get("decision_input_set_sha256")
+        if (
+            not isinstance(proof_hash, str)
+            or len(proof_hash) != 64
+            or any(character not in "0123456789abcdef" for character in proof_hash)
+        ):
+            raise ValueError(f"{label} decision-input identity is missing or invalid")
     for field in _CRITICAL_IDENTITY_FIELDS:
         if field not in candidate_identity:
             raise ValueError(f"candidate identity missing critical field: {field}")
@@ -1143,6 +1343,11 @@ def validate_persisted_qualification_semantics(
         raise ValueError("candidate accounting/run identity binding mismatch")
     candles = _candles_from_accounting(candidate, product)
     validate_runtime_dataset_binding(dataset_evidence, candles, product)
+    validate_persisted_decision_input_bindings(
+        candidate,
+        candles=candles,
+        run_identity=run_identity,
+    )
     verify_formal_accounting(
         candidate,
         product=product,
@@ -1240,6 +1445,11 @@ def validate_persisted_qualification_semantics(
             trial_candles = _candles_from_accounting(accounting, product)
             validate_runtime_dataset_binding(dataset_evidence, trial_candles, product)
             validate_formal_run_identity_binding(run_identity, identity)
+            validate_persisted_decision_input_bindings(
+                accounting,
+                candles=trial_candles,
+                run_identity=identity,
+            )
             verify_formal_accounting(
                 accounting,
                 product=product,
