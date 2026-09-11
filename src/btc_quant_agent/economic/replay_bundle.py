@@ -10,7 +10,7 @@ from ..research_contract.canonical import (
     thaw_json,
 )
 from ..research_contract.models import EvidenceReference, ExperimentMetadata
-from .signal import InformationSignal
+from .signal import InformationSignal, canonical_signal_semantic_payload
 from .signal_producer import SignalProducerRegistry, _runtime_candle_payload
 
 FORMAL_REPLAY_INPUT_BUNDLE_SCHEMA_VERSION = "1.0.0"
@@ -49,6 +49,8 @@ class DecisionInputEntry:
     signal_payload_sha256: str
     producer_identity: str
     producer_version: str
+    producer_contract_id: str
+    producer_contract_hash: str
     input_references: tuple[dict[str, Any], ...]
     input_set_sha256: str
     generation_contract: dict[str, Any]
@@ -62,6 +64,8 @@ class DecisionInputEntry:
             "signal_payload_sha256": self.signal_payload_sha256,
             "producer_identity": self.producer_identity,
             "producer_version": self.producer_version,
+            "producer_contract_id": self.producer_contract_id,
+            "producer_contract_hash": self.producer_contract_hash,
             "input_references": list(self.input_references),
             "input_set_sha256": self.input_set_sha256,
             "generation_contract": dict(self.generation_contract),
@@ -174,9 +178,80 @@ def build_formal_replay_input_bundle(
             raise ValueError(f"duplicate decision input entry for signal {signal_id}")
         seen_signal_ids.add(signal_id)
 
-        producer_identity = str(item.get("producer_identity", "CANONICAL_RULE_SIGNAL_PRODUCER"))
-        producer_version = str(item.get("producer_version", "1.0.0"))
         generation_contract = dict(item.get("generation_contract", {}))
+
+        # Resolve authoritative producer contract (R1)
+        contract_id = (
+            item.get("producer_contract_id")
+            or generation_contract.get("producer_contract_id")
+            or item.get("contract_id")
+        )
+        declared_producer = item.get("producer_identity")
+        rule = generation_contract.get("rule")
+
+        # Strict prohibition: FIXED_DIRECTION forbidden for CanonicalRuleSignalProducer
+        if declared_producer == "CANONICAL_RULE_SIGNAL_PRODUCER" and rule == "FIXED_DIRECTION":
+            raise ValueError(
+                "FIXED_DIRECTION is strictly prohibited for CanonicalRuleSignalProducer "
+                "and candidate market-derived signals"
+            )
+
+        if contract_id is None:
+            if declared_producer == "CANONICAL_RULE_SIGNAL_PRODUCER":
+                if rule == "RETURN_SIGN":
+                    contract_id = "CANONICAL_RETURN_SIGN_V1"
+                elif rule == "MOMENTUM_THRESHOLD":
+                    contract_id = "CANONICAL_MOMENTUM_THRESHOLD_V1"
+                elif rule == "PRICE_BREAKOUT":
+                    contract_id = "CANONICAL_PRICE_BREAKOUT_V1"
+                elif rule == "RANDOM_MATCHED_OPPORTUNITY":
+                    contract_id = "CANONICAL_RANDOM_BENCHMARK_V1"
+                else:
+                    raise ValueError(
+                        f"decision input entry for {signal_id} lacks authoritative producer contract; "
+                        "unverified fallback to FIXED_DIRECTION is strictly prohibited"
+                    )
+            elif declared_producer == "SYNTHETIC_FIXED_SIGNAL_PRODUCER":
+                contract_id = "SYNTHETIC_FIXED_DIRECTION_V1"
+            else:
+                proto_feat = getattr(protocol, "feature_definition", None)
+                feat_id = getattr(proto_feat, "feature_id", "") if proto_feat else ""
+                if feat_id in ("P6_SYNTHETIC_SIGNAL", "SYNTHETIC_FIXED_SIGNAL"):
+                    contract_id = "SYNTHETIC_FIXED_DIRECTION_V1"
+                else:
+                    if rule == "RETURN_SIGN":
+                        contract_id = "CANONICAL_RETURN_SIGN_V1"
+                    elif rule == "MOMENTUM_THRESHOLD":
+                        contract_id = "CANONICAL_MOMENTUM_THRESHOLD_V1"
+                    elif rule == "PRICE_BREAKOUT":
+                        contract_id = "CANONICAL_PRICE_BREAKOUT_V1"
+                    elif rule == "RANDOM_MATCHED_OPPORTUNITY":
+                        contract_id = "CANONICAL_RANDOM_BENCHMARK_V1"
+                    elif rule == "FIXED_DIRECTION":
+                        raise ValueError(
+                            "FIXED_DIRECTION is strictly prohibited for CanonicalRuleSignalProducer "
+                            "and candidate market-derived signals"
+                        )
+                    else:
+                        raise ValueError(
+                            f"decision input entry for {signal_id} lacks authoritative producer contract; "
+                            "unverified fallback to FIXED_DIRECTION is strictly prohibited"
+                        )
+
+        contract = SignalProducerRegistry.get_contract(str(contract_id))
+        if contract is None:
+            raise ValueError(f"unregistered or unknown producer contract: {contract_id}")
+
+        if declared_producer and declared_producer != contract.producer_identity:
+            raise ValueError(
+                f"producer contract identity mismatch for {signal_id}: "
+                f"entry declared {declared_producer}, contract specifies {contract.producer_identity}"
+            )
+
+        producer_identity = contract.producer_identity
+        producer_version = contract.producer_version
+        producer_contract_id = contract.contract_id
+        producer_contract_hash = contract.contract_hash
 
         # Build / normalize input references
         raw_refs = item.get("input_references")
@@ -207,21 +282,31 @@ def build_formal_replay_input_bundle(
         input_set_sha256 = canonical_sha256(input_refs)
         signal_payload_sha256 = canonical_sha256(signal_payload)
 
-        # Default generation contract if empty
-        if not generation_contract:
-            open_times = [r["open_time_ms"] for r in input_refs]
-            ref_candles = [candles_by_open[r["open_time_ms"]] for r in input_refs]
-            preimage_hash = canonical_sha256([_runtime_candle_payload(c) for c in ref_candles])
-            generation_contract = {
-                "rule": "FIXED_DIRECTION",
-                "direction": int(signal_payload.get("direction", 1)),
-                "strength": float(signal_payload.get("strength", 1.0)),
-                "horizon_ms": int(signal_payload.get("horizon_ms", 3_600_000)),
-                "asset": str(signal_payload.get("asset", "BTCUSDT")),
-                "min_lookback_bars": len(open_times),
-                "material_input_open_times_ms": open_times,
-                "expected_preimage_sha256": preimage_hash,
-            }
+        # Populate generation_contract with authoritative parameters
+        open_times = [r["open_time_ms"] for r in input_refs]
+        ref_candles = [candles_by_open[r["open_time_ms"]] for r in input_refs]
+        preimage_hash = canonical_sha256([_runtime_candle_payload(c) for c in ref_candles])
+
+        generation_contract["rule"] = contract.rule
+        generation_contract["producer_contract_id"] = contract.contract_id
+        generation_contract["producer_contract_hash"] = contract.contract_hash
+        generation_contract["material_input_open_times_ms"] = open_times
+        generation_contract["expected_preimage_sha256"] = preimage_hash
+        if "min_lookback_bars" not in generation_contract:
+            generation_contract["min_lookback_bars"] = len(open_times)
+
+        if "asset" not in generation_contract:
+            generation_contract["asset"] = str(signal_payload.get("asset", ref_candles[-1].symbol))
+        if "strength" not in generation_contract:
+            generation_contract["strength"] = float(signal_payload.get("strength", 1.0))
+        if "horizon_ms" not in generation_contract:
+            generation_contract["horizon_ms"] = int(signal_payload.get("horizon_ms", 3_600_000))
+        if contract.rule in ("FIXED_DIRECTION", "RANDOM_MATCHED_OPPORTUNITY") and "direction" not in generation_contract:
+            generation_contract["direction"] = int(signal_payload.get("direction", 1))
+        if "confidence_interval" not in generation_contract and signal_payload.get("confidence_interval") is not None:
+            generation_contract["confidence_interval"] = signal_payload["confidence_interval"]
+        if "metadata" not in generation_contract and signal_payload.get("metadata"):
+            generation_contract["metadata"] = dict(signal_payload["metadata"])
 
         entry = DecisionInputEntry(
             signal_id=signal_id,
@@ -230,6 +315,8 @@ def build_formal_replay_input_bundle(
             signal_payload_sha256=signal_payload_sha256,
             producer_identity=producer_identity,
             producer_version=producer_version,
+            producer_contract_id=producer_contract_id,
+            producer_contract_hash=producer_contract_hash,
             input_references=tuple(input_refs),
             input_set_sha256=input_set_sha256,
             generation_contract=generation_contract,
@@ -391,18 +478,51 @@ def validate_formal_replay_input_bundle(
                 raise ValueError(f"candle row content sha256 mismatch at {open_time}")
             ref_candles.append(candle)
 
-        # Producer lookup and deterministic replay verification
         producer_identity = str(entry["producer_identity"])
         producer_version = str(entry["producer_version"])
-        producer = SignalProducerRegistry.get(producer_identity, producer_version)
+
+        # Producer lookup
+        producer = SignalProducerRegistry.get_producer(producer_identity, producer_version)
         if producer is None:
             raise ValueError(
                 f"unregistered or non-replayable signal producer: {producer_identity} {producer_version} (Mode B: NOT_TESTABLE)"
             )
 
+        # R1: Authoritative Producer Contract lookup and verification
+        producer_contract_id = entry.get("producer_contract_id")
+        producer_contract_hash = entry.get("producer_contract_hash")
+        if not producer_contract_id or not producer_contract_hash:
+            raise ValueError(f"decision input entry for {signal_id} lacks authoritative producer contract binding")
+
+        contract = SignalProducerRegistry.get_contract(str(producer_contract_id))
+        if contract is None:
+            raise ValueError(
+                f"unregistered or non-authoritative signal producer contract: {producer_contract_id}"
+            )
+        if contract.contract_hash != str(producer_contract_hash):
+            raise ValueError(
+                f"producer contract hash mismatch for {producer_contract_id}: declared {producer_contract_hash}, expected {contract.contract_hash}"
+            )
+
+        if (producer_identity != contract.producer_identity) or (producer_version != contract.producer_version):
+            raise ValueError(
+                f"producer contract identity mismatch for {signal_id}: contract specifies {contract.producer_identity} {contract.producer_version}, entry declared {producer_identity} {producer_version}"
+            )
+
         generation_contract = entry["generation_contract"]
         if not isinstance(generation_contract, dict):
             raise TypeError(f"generation contract for {signal_id} must be a dictionary")
+
+        if generation_contract.get("rule") != contract.rule:
+            raise ValueError(
+                f"generation contract rule mismatch for {signal_id}: contract specifies {contract.rule}, entry declared {generation_contract.get('rule')}"
+            )
+
+        # Strict prohibition: FIXED_DIRECTION forbidden for CanonicalRuleSignalProducer
+        if producer_identity == "CANONICAL_RULE_SIGNAL_PRODUCER" and contract.rule == "FIXED_DIRECTION":
+            raise ValueError(
+                "FIXED_DIRECTION is forbidden for CanonicalRuleSignalProducer and candidate signals"
+            )
 
         replayed_signal = producer.replay_signal(
             signal_id=signal_id,
@@ -410,9 +530,10 @@ def validate_formal_replay_input_bundle(
             experiment_id=formal_signal.experiment_id,
             input_candles=ref_candles,
             generation_contract=generation_contract,
+            authoritative_contract=contract,
         )
 
-        # Verify exact match between replayed signal and formal signal payload
+        # Explicit attribute checks matching existing contract
         if replayed_signal.direction != formal_signal.direction:
             raise ValueError(
                 f"replayed signal direction mismatch for {signal_id}: replayed {replayed_signal.direction} != formal {formal_signal.direction}"
@@ -434,12 +555,25 @@ def validate_formal_replay_input_bundle(
                 f"replayed signal horizon mismatch for {signal_id}: replayed {replayed_signal.horizon_ms} != formal {formal_signal.horizon_ms}"
             )
 
+        # R2: Verify exact semantic equality covering all economic fields and metadata
+        replayed_payload = canonical_signal_semantic_payload(replayed_signal)
+        formal_payload = canonical_signal_semantic_payload(formal_signal)
+        if replayed_payload != formal_payload:
+            diffs = [
+                f"{k}: replayed={replayed_payload.get(k)!r} != formal={formal_payload.get(k)!r}"
+                for k in sorted(formal_payload)
+                if replayed_payload.get(k) != formal_payload.get(k)
+            ]
+            raise ValueError(
+                f"replayed signal semantic payload mismatch for {signal_id}: {', '.join(diffs)}"
+            )
+
         verified_signals.append(formal_signal)
 
     # If expected signals provided, verify 1:1 coverage and signal_set_sha256
     if expected_signals is not None:
         sorted_expected = sorted(expected_signals, key=lambda s: (s.timestamp_ms, s.signal_id))
-        expected_payloads = [s.to_dict() for s in sorted_expected]
+        expected_payloads = thaw_json([s.to_dict() for s in sorted_expected])
         expected_signal_set_hash = canonical_sha256(expected_payloads)
         if bundle["signal_set_sha256"] != expected_signal_set_hash:
             raise ValueError("replay input bundle signal_set_sha256 mismatch")

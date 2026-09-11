@@ -18,6 +18,7 @@ from .policy import OrderType
 from .portfolio import Portfolio
 from .replay_bundle import (
     FORMAL_REPLAY_INPUT_BUNDLE_SCHEMA_VERSION,
+    ReplayInputBundle,
     validate_formal_replay_input_bundle,
 )
 from .signal import InformationSignal
@@ -322,46 +323,124 @@ def validate_persisted_decision_input_bindings(
     candles: Sequence[Candle],
     run_identity: Mapping[str, Any],
 ) -> None:
-    if accounting.get("formal_decision_input_schema_version") != (
-        FORMAL_DECISION_INPUT_SCHEMA_VERSION
-    ):
-        raise ValueError("formal decision input proof is missing or unsupported")
-    bindings = _require_list(
-        accounting.get("formal_decision_input_bindings"),
-        "formal decision input bindings",
-    )
-    proof_hash = accounting.get("formal_decision_input_set_sha256")
-    if proof_hash != run_identity.get("decision_input_set_sha256"):
-        raise ValueError("formal decision input accounting/identity binding mismatch")
-    validate_formal_decision_input_bindings(
-        bindings,
-        candles=candles,
-        dataset_evidence_id=str(run_identity.get("dataset_evidence_id")),
-        dataset_content_sha256=str(run_identity.get("dataset_content_sha256")),
-        expected_input_contract=_require_mapping(
-            run_identity.get("input_contract"), "formal input contract"
-        ),
-        expected_signal_set_sha256=str(run_identity.get("signal_set_sha256")),
-        expected_binding_set_sha256=str(proof_hash),
-    )
+    bundle_raw = accounting.get("formal_replay_input_bundle")
+    identity_bundle_hash = run_identity.get("replay_input_bundle_sha256")
+    has_legacy = "formal_decision_input_bindings" in accounting
 
-    bundle = accounting.get("formal_replay_input_bundle")
-    if bundle is not None:
+    # Check completeness requirement for runs with signals/inputs
+    if run_identity.get("completeness") == "COMPLETE":
+        if has_legacy or bundle_raw is not None or identity_bundle_hash is not None:
+            if bundle_raw is None:
+                raise ValueError(
+                    "persisted candidate claims COMPLETE but lacks verified ReplayInputBundle"
+                )
+            if identity_bundle_hash is None:
+                raise ValueError(
+                    "persisted candidate claims COMPLETE but lacks replay_input_bundle_sha256 in run_identity"
+                )
+
+    if bundle_raw is not None:
+        bundle = thaw_json(bundle_raw)
+        if not isinstance(bundle, dict):
+            raise TypeError("formal replay input bundle must be a dictionary")
+
         if accounting.get("formal_replay_input_bundle_schema_version") != (
             FORMAL_REPLAY_INPUT_BUNDLE_SCHEMA_VERSION
         ):
             raise ValueError("formal replay input bundle schema version mismatch")
-        bundle_hash = accounting.get("formal_replay_input_bundle_sha256")
-        if bundle_hash != bundle.get("bundle_sha256"):
-            raise ValueError("replay input bundle accounting/identity binding mismatch")
+
+        accounting_bundle_hash = accounting.get("formal_replay_input_bundle_sha256")
+        if accounting_bundle_hash != bundle.get("bundle_sha256"):
+            raise ValueError("replay input bundle accounting/bundle hash mismatch")
+
+        if identity_bundle_hash is not None and identity_bundle_hash != bundle.get("bundle_sha256"):
+            raise ValueError(
+                f"replay input bundle hash mismatch between run_identity ({identity_bundle_hash}) and bundle ({bundle.get('bundle_sha256')})"
+            )
+
+        # Authoritative top-down verification: run_identity -> ReplayInputBundle
+        if bundle.get("experiment_revision_id") != run_identity.get("experiment_revision_id"):
+            raise ValueError("replay input bundle experiment_revision_id mismatch with run_identity")
+        if bundle.get("protocol_hash") != run_identity.get("protocol_hash"):
+            raise ValueError("replay input bundle protocol_hash mismatch with run_identity")
+        if bundle.get("dataset_evidence_id") != run_identity.get("dataset_evidence_id"):
+            raise ValueError("replay input bundle dataset_evidence_id mismatch with run_identity")
+        if bundle.get("dataset_content_sha256") != run_identity.get("dataset_content_sha256"):
+            raise ValueError("replay input bundle dataset_content_sha256 mismatch with run_identity")
+
+        input_contract = run_identity.get("input_contract")
+        if input_contract is not None:
+            expected_contract = thaw_json(input_contract)
+            if bundle.get("input_contract_identity") != expected_contract:
+                raise ValueError("replay input bundle input_contract mismatch with run_identity")
+
+        if bundle.get("signal_set_sha256") != run_identity.get("signal_set_sha256"):
+            raise ValueError("replay input bundle signal_set_sha256 mismatch with run_identity")
+
+        # Full deterministic replay verification
         validate_formal_replay_input_bundle(
             bundle,
             candles=candles,
-            expected_bundle_sha256=str(bundle_hash),
+            expected_bundle_sha256=bundle.get("bundle_sha256"),
         )
-    elif run_identity.get("completeness") == "COMPLETE" and bindings:
+
+        # Derive legacy projection from authoritative bundle
+        bundle_obj = ReplayInputBundle(**bundle)
+        expected_legacy_bindings = bundle_obj.legacy_decision_bindings()
+        expected_decision_set_sha256 = canonical_sha256(
+            {
+                "schema_version": FORMAL_DECISION_INPUT_SCHEMA_VERSION,
+                "bindings": expected_legacy_bindings,
+            }
+        )
+
+        # Validate legacy projection consistency: legacy view must be a faithful projection
+        if has_legacy:
+            if accounting.get("formal_decision_input_schema_version") != FORMAL_DECISION_INPUT_SCHEMA_VERSION:
+                raise ValueError("formal decision input proof schema version is unsupported")
+            actual_legacy = thaw_json(accounting.get("formal_decision_input_bindings"))
+            validate_formal_decision_input_bindings(
+                actual_legacy,
+                candles=candles,
+                dataset_evidence_id=str(run_identity.get("dataset_evidence_id")),
+                dataset_content_sha256=str(run_identity.get("dataset_content_sha256")),
+                expected_input_contract=_require_mapping(
+                    run_identity.get("input_contract"), "formal input contract"
+                ),
+                expected_signal_set_sha256=str(run_identity.get("signal_set_sha256")),
+                expected_binding_set_sha256=str(accounting.get("formal_decision_input_set_sha256")),
+            )
+            if actual_legacy != expected_legacy_bindings:
+                raise ValueError(
+                    "persisted legacy formal_decision_input_bindings disagrees with authoritative ReplayInputBundle projection"
+                )
+            if accounting.get("formal_decision_input_set_sha256") != expected_decision_set_sha256:
+                raise ValueError(
+                    "persisted formal_decision_input_set_sha256 disagrees with ReplayInputBundle projection"
+                )
+
+        if run_identity.get("decision_input_set_sha256") != expected_decision_set_sha256:
+            raise ValueError(
+                "run_identity decision_input_set_sha256 disagrees with ReplayInputBundle projection"
+            )
+
+        # Validate formal decision input bindings using existing function to ensure material row checks
+        validate_formal_decision_input_bindings(
+            expected_legacy_bindings,
+            candles=candles,
+            dataset_evidence_id=str(run_identity.get("dataset_evidence_id")),
+            dataset_content_sha256=str(run_identity.get("dataset_content_sha256")),
+            expected_input_contract=_require_mapping(
+                run_identity.get("input_contract"), "formal input contract"
+            ),
+            expected_signal_set_sha256=str(run_identity.get("signal_set_sha256")),
+            expected_binding_set_sha256=expected_decision_set_sha256,
+        )
+
+    elif has_legacy:
         raise ValueError(
-            "persisted candidate claims COMPLETE but lacks verified ReplayInputBundle"
+            "formal run requires a verified ReplayInputBundle; "
+            "legacy decision-input bindings alone cannot authorize formal economic qualification"
         )
 
 

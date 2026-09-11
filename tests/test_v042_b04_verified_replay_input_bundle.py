@@ -84,18 +84,25 @@ def _build_bundle(
     rule: str = "FIXED_DIRECTION",
     direction: int = 1,
     strength: float = 1.0,
-    producer_identity: str = "CANONICAL_RULE_SIGNAL_PRODUCER",
+    producer_identity: str = "SYNTHETIC_FIXED_SIGNAL_PRODUCER",
     producer_version: str = "1.0.0",
+    producer_contract_id: str | None = None,
     min_lookback: int = 1,
 ) -> ReplayInputBundle:
     target_signal = signal or context["signal"]
     inputs = input_candles or (context["candles"][0],)
     open_times = [c.open_time_ms for c in inputs]
     preimage_hash = canonical_sha256([_runtime_candle_payload(c) for c in inputs])
+    contract_id = producer_contract_id or (
+        "SYNTHETIC_FIXED_DIRECTION_V1"
+        if rule == "FIXED_DIRECTION"
+        else f"CANONICAL_{rule}_V1"
+    )
     contract: dict[str, Any] = {
         "rule": rule,
         "direction": direction,
         "strength": strength,
+        "producer_contract_id": contract_id,
         "min_lookback_bars": min_lookback,
         "material_input_open_times_ms": open_times,
         "expected_preimage_sha256": preimage_hash,
@@ -109,6 +116,7 @@ def _build_bundle(
             "signal_payload": target_signal.to_dict(),
             "producer_identity": producer_identity,
             "producer_version": producer_version,
+            "producer_contract_id": contract_id,
             "observation_open_times_ms": open_times,
             "generation_contract": contract,
         }
@@ -389,12 +397,14 @@ def test_b04_t12_multiple_signals_exact_coverage(tmp_path: Path) -> None:
         "signal_id": sig1.signal_id,
         "signal_timestamp_ms": sig1.timestamp_ms,
         "signal_payload": sig1.to_dict(),
-        "producer_identity": "CANONICAL_RULE_SIGNAL_PRODUCER",
+        "producer_identity": "SYNTHETIC_FIXED_SIGNAL_PRODUCER",
         "producer_version": "1.0.0",
+        "producer_contract_id": "SYNTHETIC_FIXED_DIRECTION_V1",
         "observation_open_times_ms": open1,
         "generation_contract": {
             "rule": "FIXED_DIRECTION",
             "direction": 1,
+            "producer_contract_id": "SYNTHETIC_FIXED_DIRECTION_V1",
             "material_input_open_times_ms": open1,
             "expected_preimage_sha256": canonical_sha256([_runtime_candle_payload(c) for c in in1]),
         },
@@ -403,12 +413,14 @@ def test_b04_t12_multiple_signals_exact_coverage(tmp_path: Path) -> None:
         "signal_id": sig2.signal_id,
         "signal_timestamp_ms": sig2.timestamp_ms,
         "signal_payload": sig2.to_dict(),
-        "producer_identity": "CANONICAL_RULE_SIGNAL_PRODUCER",
+        "producer_identity": "SYNTHETIC_FIXED_SIGNAL_PRODUCER",
         "producer_version": "1.0.0",
+        "producer_contract_id": "SYNTHETIC_FIXED_DIRECTION_V1",
         "observation_open_times_ms": open2,
         "generation_contract": {
             "rule": "FIXED_DIRECTION",
             "direction": 1,
+            "producer_contract_id": "SYNTHETIC_FIXED_DIRECTION_V1",
             "material_input_open_times_ms": open2,
             "expected_preimage_sha256": canonical_sha256([_runtime_candle_payload(c) for c in in2]),
         },
@@ -448,12 +460,14 @@ def test_b04_t12_multiple_signals_exact_coverage(tmp_path: Path) -> None:
         "signal_id": sig3.signal_id,
         "signal_timestamp_ms": sig3.timestamp_ms,
         "signal_payload": sig3.to_dict(),
-        "producer_identity": "CANONICAL_RULE_SIGNAL_PRODUCER",
+        "producer_identity": "SYNTHETIC_FIXED_SIGNAL_PRODUCER",
         "producer_version": "1.0.0",
+        "producer_contract_id": "SYNTHETIC_FIXED_DIRECTION_V1",
         "observation_open_times_ms": open3,
         "generation_contract": {
             "rule": "FIXED_DIRECTION",
             "direction": 1,
+            "producer_contract_id": "SYNTHETIC_FIXED_DIRECTION_V1",
             "material_input_open_times_ms": open3,
             "expected_preimage_sha256": canonical_sha256([_runtime_candle_payload(c) for c in in3]),
         },
@@ -613,12 +627,14 @@ def test_b04_p4_multiple_valid_signals_complete(tmp_path: Path) -> None:
         "signal_id": sig1.signal_id,
         "signal_timestamp_ms": sig1.timestamp_ms,
         "signal_payload": sig1.to_dict(),
-        "producer_identity": "CANONICAL_RULE_SIGNAL_PRODUCER",
+        "producer_identity": "SYNTHETIC_FIXED_SIGNAL_PRODUCER",
         "producer_version": "1.0.0",
+        "producer_contract_id": "SYNTHETIC_FIXED_DIRECTION_V1",
         "observation_open_times_ms": open1,
         "generation_contract": {
             "rule": "FIXED_DIRECTION",
             "direction": 1,
+            "producer_contract_id": "SYNTHETIC_FIXED_DIRECTION_V1",
             "material_input_open_times_ms": open1,
             "expected_preimage_sha256": canonical_sha256([_runtime_candle_payload(c) for c in in1]),
         },
@@ -627,12 +643,14 @@ def test_b04_p4_multiple_valid_signals_complete(tmp_path: Path) -> None:
         "signal_id": sig2.signal_id,
         "signal_timestamp_ms": sig2.timestamp_ms,
         "signal_payload": sig2.to_dict(),
-        "producer_identity": "CANONICAL_RULE_SIGNAL_PRODUCER",
+        "producer_identity": "SYNTHETIC_FIXED_SIGNAL_PRODUCER",
         "producer_version": "1.0.0",
+        "producer_contract_id": "SYNTHETIC_FIXED_DIRECTION_V1",
         "observation_open_times_ms": open2,
         "generation_contract": {
             "rule": "FIXED_DIRECTION",
             "direction": 1,
+            "producer_contract_id": "SYNTHETIC_FIXED_DIRECTION_V1",
             "material_input_open_times_ms": open2,
             "expected_preimage_sha256": canonical_sha256([_runtime_candle_payload(c) for c in in2]),
         },

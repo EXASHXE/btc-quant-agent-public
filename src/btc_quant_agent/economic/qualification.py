@@ -403,6 +403,7 @@ class EconomicRunIdentity:
     metrics_contract_hash: str
     code_revision: str
     completeness: ResultCompleteness
+    replay_input_bundle_sha256: str | None = None
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "product_scope", tuple(self.product_scope))
@@ -421,6 +422,9 @@ class EconomicRunIdentity:
         ):
             if not _valid_sha256(value):
                 raise ValueError(f"{label} must be SHA-256")
+        if self.replay_input_bundle_sha256 is not None:
+            if not _valid_sha256(self.replay_input_bundle_sha256):
+                raise ValueError("replay_input_bundle_sha256 must be SHA-256")
         for value, label in (
             (self.experiment_revision_id, "experiment_revision_id"),
             (self.dataset_evidence_id, "dataset_evidence_id"),
@@ -471,6 +475,7 @@ class EconomicRunIdentity:
             "metrics_contract_hash": self.metrics_contract_hash,
             "code_revision": self.code_revision,
             "completeness": self.completeness.value,
+            "replay_input_bundle_sha256": self.replay_input_bundle_sha256,
         }
 
     @property
@@ -1013,6 +1018,27 @@ def execute_bound_run(
                 }
             )
 
+    bundle_payload: dict[str, Any] | None = None
+    replay_input_bundle_sha256: str | None = None
+    if validated_bundle is not None:
+        bundle_payload = dict(validated_bundle)
+        if causal_execution_inputs and not bundle_payload.get("causal_execution_inputs"):
+            bundle_payload["causal_execution_inputs"] = tuple(causal_execution_inputs)
+            recomputed = ReplayInputBundle(
+                schema_version=bundle_payload["schema_version"],
+                experiment_revision_id=bundle_payload["experiment_revision_id"],
+                protocol_hash=bundle_payload["protocol_hash"],
+                dataset_evidence_id=bundle_payload["dataset_evidence_id"],
+                dataset_content_sha256=bundle_payload["dataset_content_sha256"],
+                input_contract_identity=bundle_payload["input_contract_identity"],
+                signal_set_sha256=bundle_payload["signal_set_sha256"],
+                decision_inputs=tuple(bundle_payload["decision_inputs"]),
+                causal_execution_inputs=tuple(bundle_payload["causal_execution_inputs"]),
+                funding_input_identity=bundle_payload["funding_input_identity"],
+            )
+            bundle_payload = recomputed.to_dict()
+        replay_input_bundle_sha256 = bundle_payload["bundle_sha256"]
+
     identity = EconomicRunIdentity(
         experiment_revision_id=protocol.experiment_revision_id,
         protocol_hash=protocol.protocol_hash,
@@ -1038,6 +1064,7 @@ def execute_bound_run(
         metrics_contract_hash=comparison.metrics_contract.contract_hash,
         code_revision=protocol.code_revision,
         completeness=summary.completeness,
+        replay_input_bundle_sha256=replay_input_bundle_sha256,
     )
     accounting = bind_runtime_market_data(summary.to_dict(), candles)
     accounting["formal_decision_input_schema_version"] = (
@@ -1045,23 +1072,7 @@ def execute_bound_run(
     )
     accounting["formal_decision_input_bindings"] = normalized_decision_inputs
     accounting["formal_decision_input_set_sha256"] = decision_input_set_sha256
-    if validated_bundle is not None:
-        bundle_payload = dict(validated_bundle)
-        if causal_execution_inputs and not bundle_payload.get("causal_execution_inputs"):
-            bundle_payload["causal_execution_inputs"] = tuple(causal_execution_inputs)
-            recomputed = ReplayInputBundle(
-                schema_version=bundle_payload["schema_version"],
-                experiment_revision_id=bundle_payload["experiment_revision_id"],
-                protocol_hash=bundle_payload["protocol_hash"],
-                dataset_evidence_id=bundle_payload["dataset_evidence_id"],
-                dataset_content_sha256=bundle_payload["dataset_content_sha256"],
-                input_contract_identity=bundle_payload["input_contract_identity"],
-                signal_set_sha256=bundle_payload["signal_set_sha256"],
-                decision_inputs=tuple(bundle_payload["decision_inputs"]),
-                causal_execution_inputs=tuple(bundle_payload["causal_execution_inputs"]),
-                funding_input_identity=bundle_payload["funding_input_identity"],
-            )
-            bundle_payload = recomputed.to_dict()
+    if bundle_payload is not None:
         accounting["formal_replay_input_bundle_schema_version"] = (
             FORMAL_REPLAY_INPUT_BUNDLE_SCHEMA_VERSION
         )
@@ -1543,13 +1554,21 @@ def _random_matched_benchmark(
                     "signal_payload": signal.to_dict(),
                     "producer_identity": "RANDOM_BENCHMARK_PRODUCER",
                     "producer_version": "1.0.0",
+                    "producer_contract_id": "CANONICAL_RANDOM_BENCHMARK_V1",
                     "observation_open_times_ms": list(open_times),
                     "generation_contract": {
                         "rule": "RANDOM_MATCHED_OPPORTUNITY",
+                        "producer_contract_id": "CANONICAL_RANDOM_BENCHMARK_V1",
                         "direction": signal.direction,
                         "strength": signal.strength,
                         "horizon_ms": signal.horizon_ms,
                         "asset": signal.asset,
+                        "confidence_interval": (
+                            list(signal.confidence_interval)
+                            if signal.confidence_interval is not None
+                            else None
+                        ),
+                        "metadata": dict(signal.metadata),
                         "material_input_open_times_ms": list(open_times),
                         "expected_preimage_sha256": preimage_hash,
                     },
