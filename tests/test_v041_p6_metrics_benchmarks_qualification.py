@@ -42,6 +42,7 @@ from btc_quant_agent.economic import (
     TradeAction,
     TradePolicy,
     build_formal_benchmark_suite,
+    build_formal_replay_input_bundle,
     eligible_opportunity_set_sha256,
     evaluate_formal_economic_qualification,
     execute_bound_run,
@@ -368,6 +369,15 @@ def _formal_artifacts(
         direction=1,
         strength=1.0,
     )
+    bundle = build_formal_replay_input_bundle(
+        protocol=protocol,
+        dataset_evidence=dataset,
+        candles=candles,
+        signals=(signal,),
+        decision_inputs=(
+            _decision_input_binding(signal, dataset, candles, protocol),
+        ),
+    )
     run = execute_bound_run(
         protocol=protocol,
         comparison=comparison,
@@ -375,9 +385,7 @@ def _formal_artifacts(
         engine=engine,
         candles=candles,
         signals=(signal,),
-        decision_input_bindings=(
-            _decision_input_binding(signal, dataset, candles, protocol),
-        ),
+        replay_input_bundle=bundle,
         funding_events=funding_events,
     )
     run_path = tmp_path / "candidate-run.json"
@@ -961,14 +969,12 @@ def test_semantically_identical_runs_and_results_have_identical_hashes(
         artifacts["candles"][1].open_time_ms,
         direction=1,
     )
-    repeated = execute_bound_run(
+    repeated_bundle = build_formal_replay_input_bundle(
         protocol=protocol,
-        comparison=artifacts["comparison"],
         dataset_evidence=artifacts["dataset"],
-        engine=artifacts["engine"],
         candles=artifacts["candles"],
         signals=(signal,),
-        decision_input_bindings=(
+        decision_inputs=(
             _decision_input_binding(
                 signal,
                 artifacts["dataset"],
@@ -976,6 +982,15 @@ def test_semantically_identical_runs_and_results_have_identical_hashes(
                 protocol,
             ),
         ),
+    )
+    repeated = execute_bound_run(
+        protocol=protocol,
+        comparison=artifacts["comparison"],
+        dataset_evidence=artifacts["dataset"],
+        engine=artifacts["engine"],
+        candles=artifacts["candles"],
+        signals=(signal,),
+        replay_input_bundle=repeated_bundle,
     )
     assert repeated.result_id == artifacts["run"].result_id
     assert repeated.to_dict() == artifacts["run"].to_dict()
@@ -1043,14 +1058,12 @@ def test_acceptance_repair_runtime_binding_is_deterministic(tmp_path: Path) -> N
         direction=1,
         strength=1.0,
     )
-    second = execute_bound_run(
+    second_bundle = build_formal_replay_input_bundle(
         protocol=artifacts["protocol"],
-        comparison=artifacts["comparison"],
         dataset_evidence=artifacts["dataset"],
-        engine=artifacts["engine"],
         candles=artifacts["candles"],
         signals=(signal,),
-        decision_input_bindings=(
+        decision_inputs=(
             _decision_input_binding(
                 signal,
                 artifacts["dataset"],
@@ -1058,6 +1071,15 @@ def test_acceptance_repair_runtime_binding_is_deterministic(tmp_path: Path) -> N
                 artifacts["protocol"],
             ),
         ),
+    )
+    second = execute_bound_run(
+        protocol=artifacts["protocol"],
+        comparison=artifacts["comparison"],
+        dataset_evidence=artifacts["dataset"],
+        engine=artifacts["engine"],
+        candles=artifacts["candles"],
+        signals=(signal,),
+        replay_input_bundle=second_bundle,
     )
     assert first.result_id == second.result_id
     assert (

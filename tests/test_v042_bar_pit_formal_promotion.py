@@ -13,7 +13,13 @@ import test_v041_p6_metrics_benchmarks_qualification as p6
 from helpers_v042_semantic_goldens import case_by_id, load_goldens
 
 from btc_quant_agent.domain import Candle
-from btc_quant_agent.economic import BenchmarkKind, InformationSignal, execute_bound_run
+from btc_quant_agent.economic import (
+    BenchmarkKind,
+    EconomicRunResult,
+    InformationSignal,
+    build_formal_replay_input_bundle,
+    execute_bound_run,
+)
 from btc_quant_agent.economic.acceptance_verifier import (
     build_formal_decision_input_binding,
     validate_persisted_qualification_semantics,
@@ -79,7 +85,22 @@ def _formal_context(
     }
 
 
-def _execute(context: dict[str, Any], *, proof: Any | None = None):
+def _execute(
+    context: dict[str, Any],
+    *,
+    proof: Any | None = None,
+    bundle: Any | None = None,
+) -> EconomicRunResult:
+    chosen_proof = context["proof"] if proof is None else proof
+    replay_bundle = bundle
+    if replay_bundle is None:
+        replay_bundle = build_formal_replay_input_bundle(
+            protocol=context["protocol"],
+            dataset_evidence=context["dataset"],
+            candles=context["candles"],
+            signals=(context["signal"],),
+            decision_inputs=(chosen_proof,),
+        )
     return execute_bound_run(
         protocol=context["protocol"],
         comparison=context["comparison"],
@@ -87,7 +108,7 @@ def _execute(context: dict[str, Any], *, proof: Any | None = None):
         engine=context["engine"],
         candles=context["candles"],
         signals=(context["signal"],),
-        decision_input_bindings=(context["proof"] if proof is None else proof,),
+        replay_input_bundle=replay_bundle,
     )
 
 
