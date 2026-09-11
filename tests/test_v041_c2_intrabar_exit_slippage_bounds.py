@@ -82,6 +82,12 @@ def _simulate(
     funding: list[FundingSettlement] | None = None,
     signal_metadata: dict[str, float] | None = None,
 ) -> SimulationSummary:
+    entry_metadata = {
+        "spread_bps": 0.0,
+        "liquidity_volume_base": 1e30,
+        "liquidity_available_at_ms": bars[0].open_time_ms,
+        **(signal_metadata or {}),
+    }
     policy = TradePolicy(
         policy_id="C2_POLICY",
         name="C2 policy",
@@ -103,7 +109,7 @@ def _simulate(
         initial_cash=10_000.0,
     ).simulate(
         candles=bars,
-        signals=[_signal(direction=direction, metadata=signal_metadata)],
+        signals=[_signal(direction=direction, metadata=entry_metadata)],
         funding_events=funding or [],
     )
 
@@ -357,7 +363,7 @@ def test_spread_sensitive_conditional_exit_without_evidence_fails_closed(
         slippage_mode=SlippageMode.SPREAD_AND_IMPACT,
         max_slippage_bps=None,
     )
-    entry_rule = EntryRule(order_type=OrderType.LIMIT)
+    entry_rule = EntryRule(order_type=OrderType.LIMIT, limit_offset_bps=-100.0)
     with pytest.raises(ValueError, match="standing conditionals require"):
         _simulate(
             bars=[
@@ -380,7 +386,7 @@ def test_spread_sensitive_reversal_without_evidence_fails_closed() -> None:
     policy = TradePolicy(
         policy_id="C2_REVERSAL",
         name="C2 reversal",
-        entry_rule=EntryRule(order_type=OrderType.LIMIT),
+        entry_rule=EntryRule(order_type=OrderType.LIMIT, limit_offset_bps=-100.0),
         position_sizing=PositionSizing(target_notional=100.0),
         risk_budget=RiskBudget(max_gross_exposure_usdt=1_000.0),
     )
@@ -398,7 +404,16 @@ def test_spread_sensitive_reversal_without_evidence_fails_closed() -> None:
     with pytest.raises(ValueError, match="requires causal current_spread_bps"):
         engine.simulate(
             candles=[_bar(1_000, low=99.0), _bar(2_000)],
-            signals=[_signal(), _signal(direction=-1, timestamp_ms=2_000)],
+            signals=[
+                _signal(
+                    metadata={
+                        "spread_bps": 0.0,
+                        "liquidity_volume_base": 1_000.0,
+                        "liquidity_available_at_ms": 1_000,
+                    }
+                ),
+                _signal(direction=-1, timestamp_ms=2_000),
+            ],
         )
 
 
@@ -413,7 +428,7 @@ def test_reversal_uses_causal_signal_spread_when_available() -> None:
     policy = TradePolicy(
         policy_id="C2_REVERSAL_SPREAD",
         name="C2 reversal spread",
-        entry_rule=EntryRule(order_type=OrderType.LIMIT),
+        entry_rule=EntryRule(order_type=OrderType.LIMIT, limit_offset_bps=-100.0),
         position_sizing=PositionSizing(target_notional=100.0),
         risk_budget=RiskBudget(max_gross_exposure_usdt=1_000.0),
     )
@@ -431,7 +446,13 @@ def test_reversal_uses_causal_signal_spread_when_available() -> None:
     result = engine.simulate(
         candles=[_bar(1_000, low=99.0), _bar(2_000)],
         signals=[
-            _signal(),
+            _signal(
+                metadata={
+                    "spread_bps": 0.0,
+                    "liquidity_volume_base": 1_000.0,
+                    "liquidity_available_at_ms": 1_000,
+                }
+            ),
             _signal(direction=-1, timestamp_ms=2_000, metadata={"spread_bps": 20.0}),
         ],
     )
@@ -455,7 +476,7 @@ def test_declared_cap_is_used_as_explicit_missing_spread_adverse_scenario() -> N
         ],
         exit_rule=ExitRule(stop_loss_pct=0.05),
         fee_model=fees,
-        entry_rule=EntryRule(order_type=OrderType.LIMIT),
+        entry_rule=EntryRule(order_type=OrderType.LIMIT, limit_offset_bps=-100.0),
     )
     exit_event = result.trade_events[-1]
     assert exit_event.price == pytest.approx(95.0 * (1.0 - 0.005))

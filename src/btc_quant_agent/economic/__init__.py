@@ -61,6 +61,7 @@ from .simulator import (
     AmbiguousEntryRejectionError,
     AmbiguousExecutionRejectionError,
     AmbiguousExitRejectionError,
+    CausalLiquidityRejectionError,
     EconomicSimulationEngine,
 )
 from .trade_event import TradeAction, TradeEvent
@@ -77,6 +78,7 @@ __all__ = [
     "BenchmarkKind",
     "BenchmarkMatchingRules",
     "BenchmarkResult",
+    "CausalLiquidityRejectionError",
     "ComparisonContract",
     "ConditionalTriggerTime",
     "DataIntervalIdentity",

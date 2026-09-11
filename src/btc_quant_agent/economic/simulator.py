@@ -6,6 +6,8 @@ from typing import Any
 
 from ..domain import Candle
 from .execution_model import (
+    CAUSAL_LIQUIDITY_NOT_YET_AVAILABLE,
+    CAUSAL_LIQUIDITY_UNAVAILABLE,
     LIMIT_INTRABAR_TOUCH_AMBIGUOUS,
     ConditionalTriggerTime,
     ExecutionModel,
@@ -35,6 +37,10 @@ class AmbiguousEntryRejectionError(AmbiguousExecutionRejectionError):
 
 class AmbiguousExitRejectionError(AmbiguousExecutionRejectionError):
     """Raised when OHLC data cannot resolve a material intrabar exit ordering."""
+
+
+class CausalLiquidityRejectionError(ValueError):
+    """Raised when a fill lacks liquidity observable by its fill boundary."""
 
 
 class EconomicSimulationEngine:
@@ -125,6 +131,16 @@ class EconomicSimulationEngine:
         # Pending fills queue: future fills that have not yet reached fill_timestamp_ms
         pending_fills: list[dict[str, Any]] = []
 
+        def _raise_on_causal_liquidity_rejection(result: Any) -> None:
+            if result.rejection_reason in {
+                CAUSAL_LIQUIDITY_UNAVAILABLE,
+                CAUSAL_LIQUIDITY_NOT_YET_AVAILABLE,
+            }:
+                raise CausalLiquidityRejectionError(
+                    "SPREAD_AND_IMPACT requires causal current_spread_bps and "
+                    "timestamped liquidity available by fill, or a declared adverse scenario"
+                )
+
         def _apply_fill(pf: dict[str, Any], sym: str) -> bool:
             """Apply confirmed fill to portfolio ledger unconditionally (AR4)."""
             nonlocal active_trade_entry_time, active_trade_entry_price
@@ -187,6 +203,7 @@ class EconomicSimulationEngine:
                 current_spread_bps=current_spread_bps,
                 observation_timestamp_ms=trigger_timestamp_ms,
             )
+            _raise_on_causal_liquidity_rejection(exec_res)
             if not exec_res.is_filled:
                 return False
 
@@ -363,6 +380,18 @@ class EconomicSimulationEngine:
                     except (ValueError, TypeError):
                         spread_bps = float("nan")
 
+                liquidity_volume_base: float | None = None
+                liquidity_available_at_ms: int | None = None
+                if "liquidity_volume_base" in sig.metadata:
+                    try:
+                        liquidity_volume_base = float(sig.metadata["liquidity_volume_base"])
+                    except (ValueError, TypeError):
+                        liquidity_volume_base = float("nan")
+                if "liquidity_available_at_ms" in sig.metadata:
+                    value = sig.metadata["liquidity_available_at_ms"]
+                    if type(value) is int:
+                        liquidity_available_at_ms = value
+
                 # AR2: Causal volume sourcing at bar open; do not use current bar's future volume
                 vol_usdt: float | None = None
                 if "volume_usdt" in sig.metadata:
@@ -453,7 +482,10 @@ class EconomicSimulationEngine:
                     current_spread_bps=spread_bps,
                     observation_timestamp_ms=sig.timestamp_ms,
                     max_fill_notional=order_gross,
+                    causal_liquidity_volume_base=liquidity_volume_base,
+                    causal_liquidity_available_at_ms=liquidity_available_at_ms,
                 )
+                _raise_on_causal_liquidity_rejection(exec_res)
                 if exec_res.rejection_reason == LIMIT_INTRABAR_TOUCH_AMBIGUOUS:
                     metadata = exec_res.metadata or {}
                     raise AmbiguousEntryRejectionError(

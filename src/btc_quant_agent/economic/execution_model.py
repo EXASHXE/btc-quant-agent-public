@@ -24,6 +24,8 @@ class ConditionalTriggerTime(StrEnum):
 
 
 LIMIT_INTRABAR_TOUCH_AMBIGUOUS = "LIMIT_INTRABAR_TOUCH_AMBIGUOUS_NOT_TESTABLE"
+CAUSAL_LIQUIDITY_UNAVAILABLE = "CAUSAL_LIQUIDITY_UNAVAILABLE"
+CAUSAL_LIQUIDITY_NOT_YET_AVAILABLE = "CAUSAL_LIQUIDITY_NOT_YET_AVAILABLE"
 
 
 @dataclass(frozen=True)
@@ -106,6 +108,73 @@ class ExecutionModel:
         ):
             raise ValueError("order_submission_latency_ms must be a nonnegative integer")
         self.order_submission_latency_ms = order_submission_latency_ms
+
+    def _taker_fill_price(
+        self,
+        *,
+        reference_price: float,
+        quantity: float,
+        side: int,
+        fill_timestamp_ms: int,
+        current_spread_bps: float | None,
+        causal_liquidity_volume_base: float | None,
+        causal_liquidity_available_at_ms: int | None,
+        completed_volume_base: float | None = None,
+    ) -> tuple[float | None, str, str | None]:
+        """Price a taker fill from information available at the fill boundary."""
+        if self.fee_model.slippage_mode != SlippageMode.SPREAD_AND_IMPACT:
+            price = self.fee_model.effective_fill_price(
+                reference_price=reference_price,
+                quantity=quantity,
+                side=side,
+                is_maker=False,
+                current_spread_bps=current_spread_bps,
+            )
+            return price, "NOT_USED", None
+        if self.fee_model.impact_coefficient == 0:
+            price = self.fee_model.effective_fill_price(
+                reference_price=reference_price,
+                quantity=quantity,
+                side=side,
+                is_maker=False,
+                current_spread_bps=current_spread_bps,
+            )
+            return price, "NOT_REQUIRED_ZERO_IMPACT", None
+
+        liquidity = causal_liquidity_volume_base
+        liquidity_source = "TIMESTAMPED_CAUSAL_LIQUIDITY"
+        if liquidity is not None:
+            assert causal_liquidity_available_at_ms is not None
+            if causal_liquidity_available_at_ms > fill_timestamp_ms:
+                return None, "FUTURE_LIQUIDITY_REJECTED", CAUSAL_LIQUIDITY_NOT_YET_AVAILABLE
+        elif completed_volume_base is not None:
+            if completed_volume_base <= 0:
+                return None, "COMPLETED_AT_FILL", "INSUFFICIENT_LIQUIDITY"
+            liquidity = completed_volume_base
+            liquidity_source = "COMPLETED_AT_FILL"
+        elif self.fee_model.max_slippage_bps is not None:
+            # With no causal participation denominator, force the already-bound
+            # adverse cap instead of silently treating impact as zero.
+            price = self.fee_model.effective_fill_price(
+                reference_price=reference_price,
+                quantity=quantity,
+                side=side,
+                is_maker=False,
+                current_spread_bps=None,
+            )
+            return price, "DECLARED_MAX_SLIPPAGE_SCENARIO", None
+        else:
+            return None, "MISSING", CAUSAL_LIQUIDITY_UNAVAILABLE
+
+        price = self.fee_model.effective_fill_price(
+            reference_price=reference_price,
+            quantity=quantity,
+            side=side,
+            is_maker=False,
+            current_spread_bps=current_spread_bps,
+            bar_volume_base=liquidity,
+        )
+        return price, liquidity_source, None
 
     def simulate_conditional_market_fill(
         self,
@@ -262,6 +331,8 @@ class ExecutionModel:
         max_fill_notional: float | None = None,
         observable_open_executable_price: float | None = None,
         observable_open_executable_timestamp_ms: int | None = None,
+        causal_liquidity_volume_base: float | None = None,
+        causal_liquidity_available_at_ms: int | None = None,
     ) -> ExecutionResult:
         obs_ts = observation_timestamp_ms if observation_timestamp_ms is not None else signal_timestamp_ms
         if obs_ts > signal_timestamp_ms:
@@ -289,6 +360,20 @@ class ExecutionModel:
             or observable_open_executable_timestamp_ms <= 0
         ):
             raise ValueError("observable opening executable timestamp must be a positive integer")
+        if (causal_liquidity_volume_base is None) != (
+            causal_liquidity_available_at_ms is None
+        ):
+            raise ValueError("causal liquidity value and availability timestamp are required together")
+        if causal_liquidity_volume_base is not None and (
+            not math.isfinite(causal_liquidity_volume_base)
+            or causal_liquidity_volume_base <= 0
+        ):
+            raise ValueError("causal liquidity volume must be finite and positive")
+        if causal_liquidity_available_at_ms is not None and (
+            type(causal_liquidity_available_at_ms) is not int
+            or causal_liquidity_available_at_ms <= 0
+        ):
+            raise ValueError("causal liquidity availability timestamp must be a positive integer")
 
         dec_ts = signal_timestamp_ms + self.decision_latency_ms
         order_timestamp_ms = dec_ts + self.order_submission_latency_ms
@@ -362,39 +447,43 @@ class ExecutionModel:
                     rejection_reason="MARKET_DATA_EXHAUSTED",
                 )
 
-            # Liquidity check
-            if fill_bar.volume <= 0:
+            # Causal execution: if arrived before/at open, fill at open price at bar.open_time_ms
+            # If arrived intra-bar, close price cannot be used until bar.close_time_ms!
+            if fill_bar.open_time_ms >= earliest_fill_ms:
+                ref_price = fill_bar.open
+                actual_fill_time_ms = max(earliest_fill_ms, fill_bar.open_time_ms)
+                completed_volume_base = None
+            else:
+                ref_price = fill_bar.close
+                actual_fill_time_ms = max(earliest_fill_ms, fill_bar.close_time_ms)
+                completed_volume_base = fill_bar.volume
+
+            fill_price, liquidity_source, liquidity_rejection = self._taker_fill_price(
+                reference_price=ref_price,
+                quantity=desired_quantity,
+                side=side,
+                fill_timestamp_ms=actual_fill_time_ms,
+                current_spread_bps=current_spread_bps,
+                causal_liquidity_volume_base=causal_liquidity_volume_base,
+                causal_liquidity_available_at_ms=causal_liquidity_available_at_ms,
+                completed_volume_base=completed_volume_base,
+            )
+            if liquidity_rejection is not None:
                 return ExecutionResult(
                     signal_timestamp_ms=signal_timestamp_ms,
                     order_timestamp_ms=order_timestamp_ms,
-                    fill_timestamp_ms=earliest_fill_ms,
+                    fill_timestamp_ms=actual_fill_time_ms,
                     fill_price=0.0,
                     filled_quantity=0.0,
                     is_filled=False,
                     side=side,
                     observation_timestamp_ms=obs_ts,
                     decision_timestamp_ms=dec_ts,
-                    settlement_timestamp_ms=earliest_fill_ms,
-                    rejection_reason="INSUFFICIENT_LIQUIDITY",
+                    settlement_timestamp_ms=actual_fill_time_ms,
+                    rejection_reason=liquidity_rejection,
+                    metadata={"liquidity_evidence": liquidity_source},
                 )
-
-            # Causal execution: if arrived before/at open, fill at open price at bar.open_time_ms
-            # If arrived intra-bar, close price cannot be used until bar.close_time_ms!
-            if fill_bar.open_time_ms >= earliest_fill_ms:
-                ref_price = fill_bar.open
-                actual_fill_time_ms = max(earliest_fill_ms, fill_bar.open_time_ms)
-            else:
-                ref_price = fill_bar.close
-                actual_fill_time_ms = max(earliest_fill_ms, fill_bar.close_time_ms)
-
-            fill_price = self.fee_model.effective_fill_price(
-                reference_price=ref_price,
-                quantity=desired_quantity,
-                side=side,
-                is_maker=False,
-                current_spread_bps=current_spread_bps,
-                bar_volume_base=fill_bar.volume,
-            )
+            assert fill_price is not None
             filled_quantity = desired_quantity
             notional_cap_applied = False
             if (
@@ -412,9 +501,13 @@ class ExecutionModel:
             fee_usdt = self.fee_model.calculate_fee(notional=notional, is_maker=False)
             if self.fee_model.slippage_mode == SlippageMode.SPREAD_AND_IMPACT:
                 spread_source = (
-                    "CAUSAL_SPREAD"
-                    if current_spread_bps is not None
-                    else "DECLARED_MAX_SLIPPAGE_SCENARIO"
+                    "DECLARED_MAX_SLIPPAGE_SCENARIO"
+                    if liquidity_source == "DECLARED_MAX_SLIPPAGE_SCENARIO"
+                    else (
+                        "CAUSAL_SPREAD"
+                        if current_spread_bps is not None
+                        else "DECLARED_MAX_SLIPPAGE_SCENARIO"
+                    )
                 )
             else:
                 spread_source = "NOT_USED"
@@ -437,6 +530,8 @@ class ExecutionModel:
                     "ref_price": ref_price,
                     "candle_open_ms": fill_bar.open_time_ms,
                     "spread_evidence": spread_source,
+                    "liquidity_evidence": liquidity_source,
+                    "causal_liquidity_available_at_ms": causal_liquidity_available_at_ms,
                     "requested_quantity": desired_quantity,
                     "max_fill_notional": max_fill_notional,
                     "notional_cap_applied": notional_cap_applied,
@@ -486,10 +581,6 @@ class ExecutionModel:
                 if bar.open_time_ms < earliest_fill_ms:
                     continue
 
-                # Liquidity check
-                if bar.volume <= 0:
-                    continue
-
                 # A bar open is the only price in this OHLC contract whose
                 # timestamp is known exactly.  If the order was executable at
                 # that instant, marketability is observable without consulting
@@ -511,7 +602,53 @@ class ExecutionModel:
                     fill_time = bar.open_time_ms
                     if fill_time > expiration_ms:
                         break
-                    fill_price = opening_executable_price
+                    fill_price, liquidity_source, liquidity_rejection = (
+                        self._taker_fill_price(
+                            reference_price=opening_executable_price,
+                            quantity=desired_quantity,
+                            side=side,
+                            fill_timestamp_ms=fill_time,
+                            current_spread_bps=current_spread_bps,
+                            causal_liquidity_volume_base=causal_liquidity_volume_base,
+                            causal_liquidity_available_at_ms=(
+                                causal_liquidity_available_at_ms
+                            ),
+                        )
+                    )
+                    if liquidity_rejection is not None:
+                        return ExecutionResult(
+                            signal_timestamp_ms=signal_timestamp_ms,
+                            order_timestamp_ms=order_timestamp_ms,
+                            fill_timestamp_ms=fill_time,
+                            fill_price=0.0,
+                            filled_quantity=0.0,
+                            is_filled=False,
+                            side=side,
+                            observation_timestamp_ms=obs_ts,
+                            decision_timestamp_ms=dec_ts,
+                            settlement_timestamp_ms=fill_time,
+                            rejection_reason=liquidity_rejection,
+                            metadata={"liquidity_evidence": liquidity_source},
+                        )
+                    assert fill_price is not None
+                    limit_respected = (side == 1 and fill_price <= limit_price + 1e-8) or (
+                        side == -1 and fill_price >= limit_price - 1e-8
+                    )
+                    if not limit_respected:
+                        return ExecutionResult(
+                            signal_timestamp_ms=signal_timestamp_ms,
+                            order_timestamp_ms=order_timestamp_ms,
+                            fill_timestamp_ms=fill_time,
+                            fill_price=0.0,
+                            filled_quantity=0.0,
+                            is_filled=False,
+                            side=side,
+                            observation_timestamp_ms=obs_ts,
+                            decision_timestamp_ms=dec_ts,
+                            settlement_timestamp_ms=fill_time,
+                            rejection_reason="MARKETABLE_LIMIT_LIQUIDITY_INSUFFICIENT",
+                            metadata={"liquidity_evidence": liquidity_source},
+                        )
                     filled_quantity = desired_quantity
                     notional_cap_applied = False
                     if (
@@ -521,9 +658,8 @@ class ExecutionModel:
                         filled_quantity = max_fill_notional / fill_price
                         notional_cap_applied = True
                     notional = fill_price * filled_quantity
-                    fee_usdt = self.fee_model.calculate_fee(
-                        notional=notional, is_maker=False
-                    )
+                    fee_usdt = self.fee_model.calculate_fee(notional=notional, is_maker=False)
+                    slippage_cost = abs(fill_price - opening_executable_price) * filled_quantity
                     return ExecutionResult(
                         signal_timestamp_ms=signal_timestamp_ms,
                         order_timestamp_ms=order_timestamp_ms,
@@ -534,7 +670,7 @@ class ExecutionModel:
                         side=side,
                         is_maker=False,
                         fee_usdt=fee_usdt,
-                        slippage_usdt=0.0,
+                        slippage_usdt=slippage_cost,
                         observation_timestamp_ms=obs_ts,
                         decision_timestamp_ms=dec_ts,
                         settlement_timestamp_ms=fill_time,
@@ -544,6 +680,10 @@ class ExecutionModel:
                             "opening_executable_price": opening_executable_price,
                             "opening_executable_timestamp_ms": bar.open_time_ms,
                             "opening_price_evidence": opening_price_evidence,
+                            "liquidity_evidence": liquidity_source,
+                            "causal_liquidity_available_at_ms": (
+                                causal_liquidity_available_at_ms
+                            ),
                             "execution_time_semantics": "BAR_OPEN_MARKETABLE",
                             "requested_quantity": desired_quantity,
                             "max_fill_notional": max_fill_notional,
