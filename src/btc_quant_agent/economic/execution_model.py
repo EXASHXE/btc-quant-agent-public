@@ -176,6 +176,26 @@ class ExecutionModel:
         )
         return price, liquidity_source, None
 
+    def _liquidity_cost_metadata(
+        self,
+        *,
+        liquidity_source: str,
+        causal_liquidity_volume_base: float | None,
+        causal_liquidity_available_at_ms: int | None,
+        completed_volume_base: float | None = None,
+    ) -> dict[str, Any]:
+        result: dict[str, Any] = {"liquidity_evidence": liquidity_source}
+        if liquidity_source == "TIMESTAMPED_CAUSAL_LIQUIDITY":
+            result["causal_liquidity_volume_base"] = causal_liquidity_volume_base
+            result["causal_liquidity_available_at_ms"] = (
+                causal_liquidity_available_at_ms
+            )
+        elif liquidity_source == "COMPLETED_AT_FILL":
+            result["completed_liquidity_volume_base"] = completed_volume_base
+        elif liquidity_source == "DECLARED_MAX_SLIPPAGE_SCENARIO":
+            result["declared_max_slippage_bps"] = self.fee_model.max_slippage_bps
+        return result
+
     def simulate_conditional_market_fill(
         self,
         *,
@@ -484,6 +504,12 @@ class ExecutionModel:
                 completed_volume_base=completed_volume_base,
             )
             if liquidity_rejection is not None:
+                liquidity_metadata = self._liquidity_cost_metadata(
+                    liquidity_source=liquidity_source,
+                    causal_liquidity_volume_base=causal_liquidity_volume_base,
+                    causal_liquidity_available_at_ms=causal_liquidity_available_at_ms,
+                    completed_volume_base=completed_volume_base,
+                )
                 return ExecutionResult(
                     signal_timestamp_ms=signal_timestamp_ms,
                     order_timestamp_ms=order_timestamp_ms,
@@ -496,7 +522,7 @@ class ExecutionModel:
                     decision_timestamp_ms=dec_ts,
                     settlement_timestamp_ms=actual_fill_time_ms,
                     rejection_reason=liquidity_rejection,
-                    metadata={"liquidity_evidence": liquidity_source},
+                    metadata=liquidity_metadata,
                 )
             assert fill_price is not None
             filled_quantity = desired_quantity
@@ -527,6 +553,12 @@ class ExecutionModel:
             else:
                 spread_source = "NOT_USED"
 
+            liquidity_metadata = self._liquidity_cost_metadata(
+                liquidity_source=liquidity_source,
+                causal_liquidity_volume_base=causal_liquidity_volume_base,
+                causal_liquidity_available_at_ms=causal_liquidity_available_at_ms,
+                completed_volume_base=completed_volume_base,
+            )
             return ExecutionResult(
                 signal_timestamp_ms=signal_timestamp_ms,
                 order_timestamp_ms=order_timestamp_ms,
@@ -545,8 +577,7 @@ class ExecutionModel:
                     "ref_price": ref_price,
                     "candle_open_ms": fill_bar.open_time_ms,
                     "spread_evidence": spread_source,
-                    "liquidity_evidence": liquidity_source,
-                    "causal_liquidity_available_at_ms": causal_liquidity_available_at_ms,
+                    **liquidity_metadata,
                     "requested_quantity": desired_quantity,
                     "max_fill_notional": max_fill_notional,
                     "notional_cap_applied": notional_cap_applied,
@@ -631,6 +662,13 @@ class ExecutionModel:
                         )
                     )
                     if liquidity_rejection is not None:
+                        liquidity_metadata = self._liquidity_cost_metadata(
+                            liquidity_source=liquidity_source,
+                            causal_liquidity_volume_base=causal_liquidity_volume_base,
+                            causal_liquidity_available_at_ms=(
+                                causal_liquidity_available_at_ms
+                            ),
+                        )
                         return ExecutionResult(
                             signal_timestamp_ms=signal_timestamp_ms,
                             order_timestamp_ms=order_timestamp_ms,
@@ -643,13 +681,20 @@ class ExecutionModel:
                             decision_timestamp_ms=dec_ts,
                             settlement_timestamp_ms=fill_time,
                             rejection_reason=liquidity_rejection,
-                            metadata={"liquidity_evidence": liquidity_source},
+                            metadata=liquidity_metadata,
                         )
                     assert fill_price is not None
                     limit_respected = (side == 1 and fill_price <= limit_price + 1e-8) or (
                         side == -1 and fill_price >= limit_price - 1e-8
                     )
                     if not limit_respected:
+                        liquidity_metadata = self._liquidity_cost_metadata(
+                            liquidity_source=liquidity_source,
+                            causal_liquidity_volume_base=causal_liquidity_volume_base,
+                            causal_liquidity_available_at_ms=(
+                                causal_liquidity_available_at_ms
+                            ),
+                        )
                         return ExecutionResult(
                             signal_timestamp_ms=signal_timestamp_ms,
                             order_timestamp_ms=order_timestamp_ms,
@@ -662,7 +707,7 @@ class ExecutionModel:
                             decision_timestamp_ms=dec_ts,
                             settlement_timestamp_ms=fill_time,
                             rejection_reason="MARKETABLE_LIMIT_LIQUIDITY_INSUFFICIENT",
-                            metadata={"liquidity_evidence": liquidity_source},
+                            metadata=liquidity_metadata,
                         )
                     filled_quantity = desired_quantity
                     notional_cap_applied = False
@@ -675,6 +720,13 @@ class ExecutionModel:
                     notional = fill_price * filled_quantity
                     fee_usdt = self.fee_model.calculate_fee(notional=notional, is_maker=False)
                     slippage_cost = abs(fill_price - opening_executable_price) * filled_quantity
+                    liquidity_metadata = self._liquidity_cost_metadata(
+                        liquidity_source=liquidity_source,
+                        causal_liquidity_volume_base=causal_liquidity_volume_base,
+                        causal_liquidity_available_at_ms=(
+                            causal_liquidity_available_at_ms
+                        ),
+                    )
                     return ExecutionResult(
                         signal_timestamp_ms=signal_timestamp_ms,
                         order_timestamp_ms=order_timestamp_ms,
@@ -695,10 +747,7 @@ class ExecutionModel:
                             "opening_executable_price": opening_executable_price,
                             "opening_executable_timestamp_ms": bar.open_time_ms,
                             "opening_price_evidence": opening_price_evidence,
-                            "liquidity_evidence": liquidity_source,
-                            "causal_liquidity_available_at_ms": (
-                                causal_liquidity_available_at_ms
-                            ),
+                            **liquidity_metadata,
                             "execution_time_semantics": "BAR_OPEN_MARKETABLE",
                             "requested_quantity": desired_quantity,
                             "max_fill_notional": max_fill_notional,

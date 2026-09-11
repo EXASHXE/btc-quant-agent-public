@@ -84,3 +84,43 @@ def test_unclosed_input_cannot_cross_formal_binding_even_if_economics_complete()
     assert summary.formal_complete
     with pytest.raises(ValueError, match="not explicitly closed"):
         bind_runtime_market_data(summary.to_dict(), [candle])
+
+
+def test_consumed_causal_liquidity_is_persisted_on_trade_event() -> None:
+    fee = FeeModel(
+        maker_fee_rate=0.0,
+        taker_fee_rate=0.0,
+        slippage_mode=SlippageMode.SPREAD_AND_IMPACT,
+        impact_coefficient=0.01,
+        max_slippage_bps=100.0,
+    )
+    engine = EconomicSimulationEngine(
+        policy=TradePolicy(
+            policy_id="BAR-LIQUIDITY-PREIMAGE",
+            name="B-AR liquidity preimage",
+            entry_rule=EntryRule(min_signal_strength=0.0),
+            position_sizing=PositionSizing(target_notional=100.0),
+        ),
+        fee_model=fee,
+        execution_model=ExecutionModel(
+            fee_model=fee,
+            decision_latency_ms=0,
+            exchange_latency_ms=0,
+        ),
+    )
+    signal = InformationSignal(
+        "BAR-LIQUIDITY",
+        "B-AR",
+        _bar().open_time_ms,
+        metadata={
+            "spread_bps": 2.0,
+            "liquidity_volume_base": 500.0,
+            "liquidity_available_at_ms": _bar().open_time_ms,
+        },
+    )
+    summary = engine.simulate((_bar(),), (signal,))
+    assert len(summary.trade_events) == 1
+    metadata = summary.trade_events[0].metadata
+    assert metadata["liquidity_evidence"] == "TIMESTAMPED_CAUSAL_LIQUIDITY"
+    assert metadata["causal_liquidity_volume_base"] == 500.0
+    assert metadata["causal_liquidity_available_at_ms"] == _bar().open_time_ms

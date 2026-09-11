@@ -99,6 +99,12 @@ def test_d_h3_market_suffix_volume_is_invariant(side: int) -> None:
         large.fee_usdt,
     )
     assert small.metadata["liquidity_evidence"] == "TIMESTAMPED_CAUSAL_LIQUIDITY"
+    assert small.metadata["causal_liquidity_volume_base"] == float(
+        common["prior_timestamped_liquidity"]
+    )
+    assert small.metadata["causal_liquidity_available_at_ms"] == int(
+        common["order_time_ms"]
+    )
 
 
 @pytest.mark.parametrize("side", [1, -1])
@@ -193,6 +199,7 @@ def test_missing_liquidity_uses_bound_adverse_scenario_not_future_volume(side: i
     assert small.fill_price == large.fill_price == pytest.approx(100.0 * (1 + side * 0.01))
     assert small.metadata["liquidity_evidence"] == "DECLARED_MAX_SLIPPAGE_SCENARIO"
     assert small.metadata["spread_evidence"] == "DECLARED_MAX_SLIPPAGE_SCENARIO"
+    assert small.metadata["declared_max_slippage_bps"] == 100.0
 
 
 def test_missing_liquidity_without_adverse_scenario_is_typed_refusal() -> None:
