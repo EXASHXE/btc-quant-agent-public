@@ -56,3 +56,37 @@ class InformationSignal:
             horizon_ms=int(data.get("horizon_ms", 3_600_000)),
             metadata=dict(data.get("metadata", {})),
         )
+
+
+_ECONOMIC_SIGNAL_METADATA_KEYS: tuple[str, ...] = (
+    "spread_bps",
+    "liquidity_volume_base",
+    "liquidity_available_at_ms",
+    "volume_usdt",
+    "regime",
+    "atr",
+)
+
+
+def canonical_signal_semantic_payload(signal: InformationSignal) -> dict[str, Any]:
+    """Extract canonical semantic payload covering all economic-relevant fields."""
+    economic_meta = {}
+    for k in sorted(signal.metadata):
+        val = signal.metadata[k]
+        if val is not None:
+            economic_meta[k] = val
+    return {
+        "signal_id": signal.signal_id,
+        "experiment_id": signal.experiment_id,
+        "timestamp_ms": signal.timestamp_ms,
+        "asset": signal.asset,
+        "direction": signal.direction,
+        "strength": signal.strength,
+        "horizon_ms": signal.horizon_ms,
+        "confidence_interval": (
+            list(signal.confidence_interval)
+            if signal.confidence_interval is not None
+            else None
+        ),
+        "economic_metadata": economic_meta,
+    }
