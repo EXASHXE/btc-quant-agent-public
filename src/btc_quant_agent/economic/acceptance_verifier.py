@@ -328,16 +328,17 @@ def validate_persisted_decision_input_bindings(
     has_legacy = "formal_decision_input_bindings" in accounting
 
     # Check completeness requirement for runs with signals/inputs
-    if run_identity.get("completeness") == "COMPLETE":
-        if has_legacy or bundle_raw is not None or identity_bundle_hash is not None:
-            if bundle_raw is None:
-                raise ValueError(
-                    "persisted candidate claims COMPLETE but lacks verified ReplayInputBundle"
-                )
-            if identity_bundle_hash is None:
-                raise ValueError(
-                    "persisted candidate claims COMPLETE but lacks replay_input_bundle_sha256 in run_identity"
-                )
+    if run_identity.get("completeness") == "COMPLETE" and (
+        has_legacy or bundle_raw is not None or identity_bundle_hash is not None
+    ):
+        if bundle_raw is None:
+            raise ValueError(
+                "persisted candidate claims COMPLETE but lacks verified ReplayInputBundle"
+            )
+        if identity_bundle_hash is None:
+            raise ValueError(
+                "persisted candidate claims COMPLETE but lacks replay_input_bundle_sha256 in run_identity"
+            )
 
     if bundle_raw is not None:
         bundle = thaw_json(bundle_raw)

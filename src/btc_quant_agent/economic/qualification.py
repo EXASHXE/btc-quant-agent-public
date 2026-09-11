@@ -422,9 +422,10 @@ class EconomicRunIdentity:
         ):
             if not _valid_sha256(value):
                 raise ValueError(f"{label} must be SHA-256")
-        if self.replay_input_bundle_sha256 is not None:
-            if not _valid_sha256(self.replay_input_bundle_sha256):
-                raise ValueError("replay_input_bundle_sha256 must be SHA-256")
+        if self.replay_input_bundle_sha256 is not None and not _valid_sha256(
+            self.replay_input_bundle_sha256
+        ):
+            raise ValueError("replay_input_bundle_sha256 must be SHA-256")
         for value, label in (
             (self.experiment_revision_id, "experiment_revision_id"),
             (self.dataset_evidence_id, "dataset_evidence_id"),
