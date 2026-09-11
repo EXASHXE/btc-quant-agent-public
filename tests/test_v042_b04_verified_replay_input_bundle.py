@@ -1,12 +1,13 @@
 from __future__ import annotations
 
 import datetime
+import time
 from dataclasses import replace
 from pathlib import Path
-import time
 from typing import Any
 
 import pytest
+import test_v041_p6_metrics_benchmarks_qualification as p6
 
 from btc_quant_agent.domain import Candle
 from btc_quant_agent.economic import (
@@ -25,7 +26,6 @@ from btc_quant_agent.economic.signal_producer import (
     _runtime_candle_payload,
 )
 from btc_quant_agent.research_contract.canonical import canonical_sha256
-import test_v041_p6_metrics_benchmarks_qualification as p6
 
 
 def _b04_context(
