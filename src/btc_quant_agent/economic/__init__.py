@@ -62,12 +62,14 @@ from .replay_bundle import (
     build_formal_replay_input_bundle,
     validate_formal_replay_input_bundle,
 )
-from .signal import InformationSignal
+from .signal import InformationSignal, canonical_signal_semantic_payload
 from .signal_producer import (
     CanonicalRuleSignalProducer,
     RandomBenchmarkSignalProducer,
     SignalProducer,
+    SignalProducerContract,
     SignalProducerRegistry,
+    SyntheticFixedSignalProducer,
 )
 from .simulator import (
     AmbiguousEntryRejectionError,
@@ -130,10 +132,12 @@ __all__ = [
     "RiskBudget",
     "RoundTripAttribution",
     "SignalProducer",
+    "SignalProducerContract",
     "SignalProducerRegistry",
     "SimulationSummary",
     "SizingType",
     "SlippageMode",
+    "SyntheticFixedSignalProducer",
     "TerminalPolicy",
     "TradeAction",
     "TradeEvent",
@@ -141,6 +145,7 @@ __all__ = [
     "attribute_round_trips",
     "build_formal_benchmark_suite",
     "build_formal_replay_input_bundle",
+    "canonical_signal_semantic_payload",
     "eligible_opportunity_set_sha256",
     "evaluate_formal_economic_qualification",
     "execute_bound_run",
