@@ -287,13 +287,14 @@ class ExperimentMetadata:
             raise TypeError("execution_model must be a VersionedIdentity")
         if not isinstance(self.benchmark, VersionedIdentity) and self.benchmark != P6_PENDING:
             raise ValueError(f"benchmark must be a VersionedIdentity or {P6_PENDING}")
-        if self.signal_producer_contract is not None:
-            if not isinstance(self.signal_producer_contract, VersionedIdentity) and not hasattr(
-                self.signal_producer_contract, "to_dict"
-            ):
-                raise TypeError(
-                    "signal_producer_contract must be a VersionedIdentity or SignalProducerContract"
-                )
+        if (
+            self.signal_producer_contract is not None
+            and not isinstance(self.signal_producer_contract, VersionedIdentity)
+            and not hasattr(self.signal_producer_contract, "to_dict")
+        ):
+            raise TypeError(
+                "signal_producer_contract must be a VersionedIdentity or SignalProducerContract"
+            )
         scope = tuple(str(item) for item in self.product_scope)
         if not scope or any(not item.strip() for item in scope):
             raise ValueError("product_scope must contain non-empty instruments")
