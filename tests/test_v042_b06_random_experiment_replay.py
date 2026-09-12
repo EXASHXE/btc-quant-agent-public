@@ -10,14 +10,25 @@ import test_v041_p6_metrics_benchmarks_qualification as p6
 from helpers_v042_economic_replay import assert_registry_rejects_atomic, coherent_forgery, context
 
 from btc_quant_agent.economic import (
-    EconomicRunRole, EligibleOpportunity, InformationSignal, SignalProducerRegistry,
-    build_formal_replay_input_bundle, execute_bound_run,
+    EconomicRunRole,
+    EligibleOpportunity,
+    InformationSignal,
+    SignalProducerRegistry,
+    build_formal_replay_input_bundle,
+    execute_bound_run,
 )
 from btc_quant_agent.economic.execution_replay import verify_benchmark_replay
 from btc_quant_agent.economic.qualification import (
-    EconomicRunResult, _matching_diagnostics, _random_matched_benchmark,
+    EconomicRunResult,
+    _matching_diagnostics,
+    _random_matched_benchmark,
 )
-from btc_quant_agent.research_contract.canonical import FrozenDict, canonical_json, canonical_sha256, thaw_json
+from btc_quant_agent.research_contract.canonical import (
+    FrozenDict,
+    canonical_json,
+    canonical_sha256,
+    thaw_json,
+)
 
 
 def _verify(ctx, suite):
@@ -46,8 +57,10 @@ def _replace_trial(ctx, suite, run):
     trial.update(accounting=thaw_json(run.accounting), run_result_id=run.result_id,
                  matching_diagnostics=diagnostics, comparable=comparable)
     returns = [item["accounting"]["net_return_pct"] for item in suite["random"]["trials"]]
-    suite["random"]["aggregate"] = dict(mean_net_return_pct=sum(returns) / len(returns),
-                                       minimum_net_return_pct=min(returns), maximum_net_return_pct=max(returns))
+    suite["random"]["aggregate"] = {
+        "mean_net_return_pct": sum(returns) / len(returns),
+        "minimum_net_return_pct": min(returns), "maximum_net_return_pct": max(returns),
+    }
     suite["random"]["comparable"] = all(item["comparable"] for item in suite["random"]["trials"])
     p6._refresh_suite_identity(suite)
 

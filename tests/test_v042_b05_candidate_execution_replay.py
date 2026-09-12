@@ -15,7 +15,12 @@ from btc_quant_agent.economic import EconomicRunRole, execute_bound_run
 from btc_quant_agent.economic.acceptance_verifier import validate_persisted_qualification_semantics
 from btc_quant_agent.economic.execution_replay import verify_execution_replay
 from btc_quant_agent.economic.qualification import _validate_candidate_run_binding
-from btc_quant_agent.research_contract.canonical import FrozenDict, canonical_json, canonical_sha256, thaw_json
+from btc_quant_agent.research_contract.canonical import (
+    FrozenDict,
+    canonical_json,
+    canonical_sha256,
+    thaw_json,
+)
 from btc_quant_agent.research_contract.registry import EvidenceValidationError
 
 

@@ -8,7 +8,10 @@ from typing import Any
 
 from ..research_contract.canonical import canonical_sha256, thaw_json
 from ..research_contract.models import EvidenceReference, ExperimentMetadata
-from .acceptance_verifier import decode_runtime_market_data, validate_persisted_decision_input_bindings
+from .acceptance_verifier import (
+    decode_runtime_market_data,
+    validate_persisted_decision_input_bindings,
+)
 from .execution_model import ExecutionModel
 from .fee_model import FeeModel
 from .funding import FundingModel, FundingSettlement
@@ -120,7 +123,9 @@ def verify_benchmark_replay(
     dataset_evidence: EvidenceReference | None = None,
 ) -> None:
     from .qualification import (
-        EligibleOpportunity, _cash_benchmark, _random_matched_benchmark,
+        EligibleOpportunity,
+        _cash_benchmark,
+        _random_matched_benchmark,
         eligible_opportunity_set_sha256,
     )
 

@@ -6,13 +6,22 @@ from pathlib import Path
 import test_v041_p6_metrics_benchmarks_qualification as p6
 
 from btc_quant_agent.economic import (
-    BenchmarkKind, EconomicSimulationEngine, ExecutionModel, FeeModel, FundingSettlement,
-    InformationSignal, SlippageMode, build_formal_benchmark_suite,
-    build_formal_replay_input_bundle, execute_bound_run, evaluate_formal_economic_qualification,
+    BenchmarkKind,
+    EconomicSimulationEngine,
+    ExecutionModel,
+    FeeModel,
+    FundingSettlement,
+    InformationSignal,
+    SlippageMode,
+    build_formal_benchmark_suite,
+    build_formal_replay_input_bundle,
+    evaluate_formal_economic_qualification,
+    execute_bound_run,
     make_artifact_evidence,
 )
 from btc_quant_agent.economic.acceptance_verifier import (
-    _curve_and_notional_from_ledger, verify_formal_accounting,
+    _curve_and_notional_from_ledger,
+    verify_formal_accounting,
 )
 from btc_quant_agent.economic.metrics import summarize_ledger
 from btc_quant_agent.economic.portfolio import Portfolio
@@ -63,8 +72,8 @@ def context(tmp_path: Path, *, count=8, trials=4, nonzero=True, opportunities=No
         protocol=protocol, comparison=comparison, dataset_evidence=dataset, candidate_run=run,
         engine=engine, candles=candles, eligible_opportunities=opportunities, funding_events=funding,
     )
-    return dict(protocol=protocol, comparison=comparison, dataset=dataset, candles=candles,
-                engine=engine, run=run, suite=suite, funding=funding, signals=signals)
+    return {"protocol": protocol, "comparison": comparison, "dataset": dataset, "candles": candles,
+            "engine": engine, "run": run, "suite": suite, "funding": funding, "signals": signals}
 
 
 def assert_accounting(ctx, accounting):
@@ -119,9 +128,9 @@ def assert_registry_rejects_atomic(tmp_path, artifacts, artifact, match):
     registry_dir.mkdir()
     registry, _ = p6._statistically_qualified_registry(registry_dir, artifacts["protocol"])
     before, generation = registry.storage_path.read_bytes(), registry.generation
-    from btc_quant_agent.research_contract.registry import EvidenceValidationError
-
     import pytest
+
+    from btc_quant_agent.research_contract.registry import EvidenceValidationError
     with pytest.raises(EvidenceValidationError, match=match):
         registry.record_economic_qualification(
             attestation, evidence_references=evidence, reason="rehashed semantic attack", actor="pytest",
