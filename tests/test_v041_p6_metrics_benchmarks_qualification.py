@@ -51,6 +51,7 @@ from btc_quant_agent.economic import (
     funding_model_identity,
     make_artifact_evidence,
     policy_identity,
+    SignalProducerRegistry,
     summarize_ledger,
 )
 from btc_quant_agent.economic.acceptance_verifier import (
@@ -251,6 +252,9 @@ def _protocol(
         product_scope=("BTCUSDT",),
         code_revision="p6-test-code-revision",
         terminal_policy=comparison.terminal_policy.value,
+        signal_producer_contract=SignalProducerRegistry.get_contract(
+            "SYNTHETIC_FIXED_DIRECTION_V1"
+        ),
         created_at_utc=FIXED_TIME,
     )
 

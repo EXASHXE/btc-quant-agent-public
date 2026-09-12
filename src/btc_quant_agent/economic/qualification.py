@@ -953,6 +953,11 @@ def execute_bound_run(
 
     validated_bundle: dict[str, Any] | None = None
     if signals:
+        if protocol.signal_producer_contract is None:
+            raise ValueError(
+                "formal run with signals requires protocol.signal_producer_contract; "
+                "missing protocol contract cannot authorize formal economic qualification"
+            )
         if replay_input_bundle is not None:
             bundle_dict = (
                 replay_input_bundle.to_dict()

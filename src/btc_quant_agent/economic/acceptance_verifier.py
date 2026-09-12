@@ -341,6 +341,10 @@ def validate_persisted_decision_input_bindings(
             raise ValueError(
                 "persisted candidate claims COMPLETE with signals but lacks replay_input_bundle_sha256 in run_identity"
             )
+        if run_identity.get("signal_producer_contract") is None:
+            raise ValueError(
+                "persisted candidate claims COMPLETE with signals but lacks signal_producer_contract in run_identity"
+            )
     elif run_identity.get("completeness") == "COMPLETE" and (
         has_legacy or bundle_raw is not None or identity_bundle_hash is not None
     ):
@@ -404,6 +408,10 @@ def validate_persisted_decision_input_bindings(
                     raise ValueError(
                         "replay input bundle producer contract hash mismatch with run_identity"
                     )
+        elif has_signals:
+            raise ValueError(
+                "persisted candidate claims COMPLETE with signals but lacks signal_producer_contract in run_identity"
+            )
 
         if bundle.get("signal_set_sha256") != run_identity.get("signal_set_sha256"):
             raise ValueError("replay input bundle signal_set_sha256 mismatch with run_identity")

@@ -18,6 +18,7 @@ from btc_quant_agent.economic import (
     CanonicalRuleSignalProducer,
     InformationSignal,
     ReplayInputBundle,
+    SignalProducerRegistry,
     build_formal_replay_input_bundle,
     canonical_signal_semantic_payload,
     execute_bound_run,
@@ -31,7 +32,7 @@ from btc_quant_agent.economic.signal_producer import _runtime_candle_payload
 from btc_quant_agent.research_contract.canonical import canonical_sha256, thaw_json
 
 
-def _b04r_context(tmp_path: Path) -> dict[str, Any]:
+def _b04r_context(tmp_path: Path, producer_contract: Any = None) -> dict[str, Any]:
     tmp_path.mkdir(parents=True, exist_ok=True)
     candles = list(p6._candles())
     frozen_candles: tuple[Candle, ...] = tuple(candles)
@@ -44,7 +45,8 @@ def _b04r_context(tmp_path: Path) -> dict[str, Any]:
         required=(BenchmarkKind.CASH,),
         descriptive=(),
     )
-    protocol = p6._protocol(comparison, engine)
+    contract = producer_contract or SignalProducerRegistry.get_contract("SYNTHETIC_FIXED_DIRECTION_V1")
+    protocol = replace(p6._protocol(comparison, engine), signal_producer_contract=contract)
     signal_time = candles[2].open_time_ms
     signal = InformationSignal(
         signal_id="B04R-SIGNAL-1",
@@ -142,8 +144,15 @@ def _build_b04r_bundle(
         }
     ]
 
+    target_protocol = ctx["protocol"]
+    if contract_id:
+        reg_c = SignalProducerRegistry.get_contract(contract_id)
+        if reg_c is not None:
+            target_protocol = replace(target_protocol, signal_producer_contract=reg_c)
+            ctx["protocol"] = target_protocol
+
     return build_formal_replay_input_bundle(
-        protocol=ctx["protocol"],
+        protocol=target_protocol,
         dataset_evidence=ctx["dataset"],
         candles=ctx["candles"],
         signals=(target_signal,),
@@ -260,9 +269,10 @@ def test_b04r_fixed_direction_prohibited_for_canonical_rule_producer(tmp_path: P
 def test_b04r_unverified_fallback_to_fixed_direction_prohibited(tmp_path: Path) -> None:
     """R1.6: Empty/unspecified generation contract cannot fall back to unverified FIXED_DIRECTION."""
     ctx = _b04r_context(tmp_path)
+    proto_without_contract = replace(ctx["protocol"], signal_producer_contract=None)
     with pytest.raises(ValueError, match="lacks authoritative producer contract; unverified fallback to FIXED_DIRECTION is strictly prohibited"):
         build_formal_replay_input_bundle(
-            protocol=ctx["protocol"],
+            protocol=proto_without_contract,
             dataset_evidence=ctx["dataset"],
             candles=ctx["candles"],
             signals=(ctx["signal"],),
@@ -517,7 +527,8 @@ def test_b04r_legacy_bindings_alone_cannot_authorize_qualification(tmp_path: Pat
 
 def test_b04r_canonical_return_sign_positive_control(tmp_path: Path) -> None:
     """Positive Control 1: Market-derived RETURN_SIGN rule succeeds end-to-end."""
-    ctx = _b04r_context(tmp_path)
+    contract = SignalProducerRegistry.get_contract("CANONICAL_RETURN_SIGN_V1")
+    ctx = _b04r_context(tmp_path, producer_contract=contract)
     # Determine natural return sign from candle 1: close > open -> +1, else -1
     c1 = ctx["candles"][1]
     expected_direction = 1 if c1.close > c1.open else (-1 if c1.close < c1.open else 0)
