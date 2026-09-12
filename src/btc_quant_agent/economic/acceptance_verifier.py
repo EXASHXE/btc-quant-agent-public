@@ -392,26 +392,38 @@ def validate_persisted_decision_input_bindings(
             if bundle.get("input_contract_identity") != expected_contract:
                 raise ValueError("replay input bundle input_contract mismatch with run_identity")
 
-        identity_spc = run_identity.get("signal_producer_contract")
-        if identity_spc is not None:
-            expected_cid = identity_spc.get("contract_id") or identity_spc.get("logical_id")
-            expected_chash = identity_spc.get("contract_hash") or identity_spc.get("content_sha256")
+        # B04R4: Role-based authoritative producer contract verification
+        run_role_raw = run_identity.get("run_role", "CANDIDATE")
+        run_role = str(getattr(run_role_raw, "value", run_role_raw))
+        if run_role not in ("CANDIDATE", "RANDOM_BENCHMARK"):
+            raise ValueError(f"unsupported run_role in persisted run_identity: {run_role_raw}")
+
+        if run_role == "RANDOM_BENCHMARK":
             for entry in bundle.get("decision_inputs", []):
-                if entry.get("producer_contract_id") == "CANONICAL_RANDOM_BENCHMARK_V1":
-                    continue
-                if entry.get("producer_contract_id") != expected_cid:
+                if entry.get("producer_contract_id") != "CANONICAL_RANDOM_BENCHMARK_V1":
                     raise ValueError(
-                        f"replay input bundle producer contract {entry.get('producer_contract_id')} "
-                        f"mismatch with run_identity signal_producer_contract {expected_cid}"
+                        f"persisted random benchmark run requires CANONICAL_RANDOM_BENCHMARK_V1; "
+                        f"received {entry.get('producer_contract_id')}"
                     )
-                if expected_chash and entry.get("producer_contract_hash") != expected_chash:
-                    raise ValueError(
-                        "replay input bundle producer contract hash mismatch with run_identity"
-                    )
-        elif has_signals:
-            raise ValueError(
-                "persisted candidate claims COMPLETE with signals but lacks signal_producer_contract in run_identity"
-            )
+        elif run_role == "CANDIDATE":
+            identity_spc = run_identity.get("signal_producer_contract")
+            if identity_spc is not None:
+                expected_cid = identity_spc.get("contract_id") or identity_spc.get("logical_id")
+                expected_chash = identity_spc.get("contract_hash") or identity_spc.get("content_sha256")
+                for entry in bundle.get("decision_inputs", []):
+                    if entry.get("producer_contract_id") != expected_cid:
+                        raise ValueError(
+                            f"replay input bundle producer contract {entry.get('producer_contract_id')} "
+                            f"mismatch with run_identity signal_producer_contract {expected_cid}"
+                        )
+                    if expected_chash and entry.get("producer_contract_hash") != expected_chash:
+                        raise ValueError(
+                            "replay input bundle producer contract hash mismatch with run_identity"
+                        )
+            elif has_signals:
+                raise ValueError(
+                    "persisted candidate claims COMPLETE with signals but lacks signal_producer_contract in run_identity"
+                )
 
         if bundle.get("signal_set_sha256") != run_identity.get("signal_set_sha256"):
             raise ValueError("replay input bundle signal_set_sha256 mismatch with run_identity")
@@ -421,6 +433,7 @@ def validate_persisted_decision_input_bindings(
             bundle,
             candles=candles,
             expected_bundle_sha256=bundle.get("bundle_sha256"),
+            expected_role=run_role,
         )
 
         # Derive legacy projection from authoritative bundle

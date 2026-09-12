@@ -177,15 +177,20 @@ def build_formal_replay_input_bundle(
     decision_inputs: Sequence[Mapping[str, Any]],
     funding_events: Sequence[Any] = (),
     causal_execution_inputs: Sequence[Mapping[str, Any]] = (),
+    authority_role: Any = "CANDIDATE",
 ) -> ReplayInputBundle:
     """Construct and verify a canonical ReplayInputBundle from concrete inputs."""
+    clean_role = str(getattr(authority_role, "value", authority_role))
+    if clean_role not in ("CANDIDATE", "RANDOM_BENCHMARK"):
+        raise ValueError(f"unsupported authority role: {authority_role}")
+
     candles_by_open = {c.open_time_ms: c for c in candles}
     sorted_signals = sorted(signals, key=lambda s: (s.timestamp_ms, s.signal_id))
     signal_payloads = [s.to_dict() for s in sorted_signals]
     signal_set_sha256 = canonical_sha256(signal_payloads)
 
     authoritative_contract = _resolve_protocol_producer_contract(protocol)
-    if signals and authoritative_contract is None and not decision_inputs:
+    if clean_role == "CANDIDATE" and signals and authoritative_contract is None and not decision_inputs:
         raise ValueError(
             "formal replay input bundle for non-empty signals requires protocol.signal_producer_contract"
         )
@@ -232,9 +237,14 @@ def build_formal_replay_input_bundle(
             if reg_contract is None:
                 raise ValueError(f"unregistered or unknown producer contract: {declared_contract_id}")
 
-        if declared_contract_id == "CANONICAL_RANDOM_BENCHMARK_V1":
+        if clean_role == "RANDOM_BENCHMARK":
+            if declared_contract_id and declared_contract_id != "CANONICAL_RANDOM_BENCHMARK_V1":
+                raise ValueError(
+                    f"benchmark role requires CANONICAL_RANDOM_BENCHMARK_V1; received {declared_contract_id}"
+                )
             contract = SignalProducerRegistry.get_contract("CANONICAL_RANDOM_BENCHMARK_V1")
-            assert contract is not None
+            if contract is None:
+                raise ValueError("CANONICAL_RANDOM_BENCHMARK_V1 contract is not registered")
         elif authoritative_contract is not None:
             if declared_contract_id and declared_contract_id != authoritative_contract.contract_id:
                 raise ValueError(
@@ -258,8 +268,8 @@ def build_formal_replay_input_bundle(
         else:
             if declared_contract_id is not None:
                 raise ValueError(
-                    f"bundle producer contract {declared_contract_id} cannot be authorized by candidate: "
-                    "protocol.signal_producer_contract is required for formal signal runs"
+                    f"bundle producer contract {declared_contract_id} cannot be authorized by candidate; "
+                    "protocol.signal_producer_contract is strictly required for formal signal runs"
                 )
             if declared_producer == "CANONICAL_RULE_SIGNAL_PRODUCER":
                 raise ValueError(
@@ -397,6 +407,7 @@ def build_formal_replay_input_bundle(
         expected_protocol=protocol,
         expected_dataset_evidence=dataset_evidence,
         expected_signals=signals,
+        expected_role=clean_role,
     )
     return bundle
 
@@ -409,8 +420,13 @@ def validate_formal_replay_input_bundle(
     expected_dataset_evidence: EvidenceReference | None = None,
     expected_signals: Sequence[InformationSignal] | None = None,
     expected_bundle_sha256: str | None = None,
+    expected_role: Any = "CANDIDATE",
 ) -> dict[str, Any]:
     """Strictly validate a ReplayInputBundle with deterministic signal replay."""
+    clean_role = str(getattr(expected_role, "value", expected_role))
+    if clean_role not in ("CANDIDATE", "RANDOM_BENCHMARK"):
+        raise ValueError(f"unsupported expected role: {expected_role}")
+
     bundle = thaw_json(bundle_dict)
     if not isinstance(bundle, dict):
         raise TypeError("formal replay input bundle must be a dictionary")
@@ -549,24 +565,31 @@ def validate_formal_replay_input_bundle(
                 f"producer contract hash mismatch for {producer_contract_id}: declared {producer_contract_hash}, expected {contract.contract_hash}"
             )
 
-        # A1/B04R3: Enforce protocol-bound authoritative contract if expected_protocol is provided
-        if expected_protocol is not None and contract.contract_id != "CANONICAL_RANDOM_BENCHMARK_V1":
-            proto_contract = _resolve_protocol_producer_contract(expected_protocol)
-            if proto_contract is None:
+        # B04R4: Role-based authoritative producer contract enforcement
+        if clean_role == "RANDOM_BENCHMARK":
+            if contract.contract_id != "CANONICAL_RANDOM_BENCHMARK_V1":
                 raise ValueError(
-                    f"expected protocol {getattr(expected_protocol, 'experiment_id', 'unknown')} "
-                    f"lacks required signal_producer_contract for non-empty decision inputs"
+                    f"benchmark role requires CANONICAL_RANDOM_BENCHMARK_V1 producer contract; "
+                    f"received {contract.contract_id}"
                 )
-            if contract.contract_id != proto_contract.contract_id:
-                raise ValueError(
-                    f"bundle producer contract {contract.contract_id} does not match "
-                    f"protocol-bound authoritative contract {proto_contract.contract_id}"
-                )
-            if contract.contract_hash != proto_contract.contract_hash:
-                raise ValueError(
-                    f"bundle producer contract hash {contract.contract_hash} does not match "
-                    f"protocol-bound authoritative contract hash {proto_contract.contract_hash}"
-                )
+        elif clean_role == "CANDIDATE":
+            if expected_protocol is not None:
+                proto_contract = _resolve_protocol_producer_contract(expected_protocol)
+                if proto_contract is None:
+                    raise ValueError(
+                        f"expected protocol {getattr(expected_protocol, 'experiment_id', 'unknown')} "
+                        f"lacks required signal_producer_contract for non-empty decision inputs"
+                    )
+                if contract.contract_id != proto_contract.contract_id:
+                    raise ValueError(
+                        f"bundle producer contract {contract.contract_id} does not match "
+                        f"protocol-bound authoritative contract {proto_contract.contract_id}"
+                    )
+                if contract.contract_hash != proto_contract.contract_hash:
+                    raise ValueError(
+                        f"bundle producer contract hash {contract.contract_hash} does not match "
+                        f"protocol-bound authoritative contract hash {proto_contract.contract_hash}"
+                    )
 
         if (producer_identity != contract.producer_identity) or (producer_version != contract.producer_version):
             raise ValueError(

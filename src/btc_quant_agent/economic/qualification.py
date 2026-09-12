@@ -53,7 +53,7 @@ from .replay_bundle import (
     validate_formal_replay_input_bundle,
 )
 from .signal import InformationSignal
-from .signal_producer import _runtime_candle_payload
+from .signal_producer import SignalProducerRegistry, _runtime_candle_payload
 from .simulator import EconomicSimulationEngine
 from .trade_event import TradeAction
 
@@ -67,6 +67,11 @@ class BenchmarkKind(StrEnum):
     CASH = "CASH"
     PASSIVE_PERPETUAL = "PASSIVE_PERPETUAL"
     RANDOM_MATCHED = "RANDOM_MATCHED"
+
+
+class EconomicRunRole(StrEnum):
+    CANDIDATE = "CANDIDATE"
+    RANDOM_BENCHMARK = "RANDOM_BENCHMARK"
 
 
 class QualificationVerdict(StrEnum):
@@ -405,6 +410,7 @@ class EconomicRunIdentity:
     completeness: ResultCompleteness
     replay_input_bundle_sha256: str | None = None
     signal_producer_contract: VersionedIdentity | None = None
+    run_role: EconomicRunRole | str = EconomicRunRole.CANDIDATE
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "product_scope", tuple(self.product_scope))
@@ -412,6 +418,11 @@ class EconomicRunIdentity:
             object.__setattr__(self, "terminal_policy", TerminalPolicy(self.terminal_policy))
         if not isinstance(self.completeness, ResultCompleteness):
             object.__setattr__(self, "completeness", ResultCompleteness(self.completeness))
+        if not isinstance(self.run_role, EconomicRunRole):
+            try:
+                object.__setattr__(self, "run_role", EconomicRunRole(self.run_role))
+            except ValueError as exc:
+                raise ValueError(f"unsupported economic run role: {self.run_role}") from exc
         for value, label in (
             (self.protocol_hash, "protocol_hash"),
             (self.dataset_content_sha256, "dataset_content_sha256"),
@@ -478,6 +489,7 @@ class EconomicRunIdentity:
             "code_revision": self.code_revision,
             "completeness": self.completeness.value,
             "replay_input_bundle_sha256": self.replay_input_bundle_sha256,
+            "run_role": EconomicRunRole(self.run_role).value,
         }
         if self.signal_producer_contract is not None:
             payload["signal_producer_contract"] = self.signal_producer_contract.to_dict()
@@ -930,8 +942,17 @@ def execute_bound_run(
     replay_input_bundle: ReplayInputBundle | Mapping[str, Any] | None = None,
     decision_input_bindings: Sequence[Mapping[str, Any]] = (),
     funding_events: Sequence[FundingSettlement] = (),
+    run_role: EconomicRunRole | str = EconomicRunRole.CANDIDATE,
 ) -> EconomicRunResult:
     _validate_protocol_and_runtime(protocol, comparison, dataset_evidence, engine, candles)
+    if not isinstance(run_role, EconomicRunRole):
+        try:
+            effective_role = EconomicRunRole(run_role)
+        except ValueError as exc:
+            raise ValueError(f"unsupported economic run role: {run_role}") from exc
+    else:
+        effective_role = run_role
+
     if any(signal.experiment_id != protocol.experiment_revision_id for signal in signals):
         raise ValueError("formal signals must bind the exact experiment revision")
     if any(
@@ -953,11 +974,12 @@ def execute_bound_run(
 
     validated_bundle: dict[str, Any] | None = None
     if signals:
-        if protocol.signal_producer_contract is None:
-            raise ValueError(
-                "formal run with signals requires protocol.signal_producer_contract; "
-                "missing protocol contract cannot authorize formal economic qualification"
-            )
+        if effective_role == EconomicRunRole.CANDIDATE:
+            if protocol.signal_producer_contract is None:
+                raise ValueError(
+                    "formal run with signals requires protocol.signal_producer_contract; "
+                    "missing protocol contract cannot authorize formal economic qualification"
+                )
         if replay_input_bundle is not None:
             bundle_dict = (
                 replay_input_bundle.to_dict()
@@ -970,6 +992,7 @@ def execute_bound_run(
                 expected_protocol=protocol,
                 expected_dataset_evidence=dataset_evidence,
                 expected_signals=signals,
+                expected_role=effective_role,
             )
             normalized_decision_inputs = ReplayInputBundle(**validated_bundle).legacy_decision_bindings()
             decision_input_set_sha256 = canonical_sha256(
@@ -1056,13 +1079,19 @@ def execute_bound_run(
                 bundle_payload = recomputed.to_dict()
         replay_input_bundle_sha256 = bundle_payload["bundle_sha256"]
 
-    spc = protocol.signal_producer_contract
-    spc_identity: VersionedIdentity | None = None
-    if spc is not None:
-        if isinstance(spc, VersionedIdentity):
-            spc_identity = spc
-        elif hasattr(spc, "to_versioned_identity"):
-            spc_identity = spc.to_versioned_identity()
+    if effective_role == EconomicRunRole.RANDOM_BENCHMARK:
+        random_contract = SignalProducerRegistry.get_contract("CANONICAL_RANDOM_BENCHMARK_V1")
+        if random_contract is None:
+            raise ValueError("CANONICAL_RANDOM_BENCHMARK_V1 contract not found in registry")
+        spc_identity = random_contract.to_versioned_identity()
+    else:
+        spc = protocol.signal_producer_contract
+        spc_identity = None
+        if spc is not None:
+            if isinstance(spc, VersionedIdentity):
+                spc_identity = spc
+            elif hasattr(spc, "to_versioned_identity"):
+                spc_identity = spc.to_versioned_identity()
 
     identity = EconomicRunIdentity(
         experiment_revision_id=protocol.experiment_revision_id,
@@ -1091,6 +1120,7 @@ def execute_bound_run(
         completeness=summary.completeness,
         replay_input_bundle_sha256=replay_input_bundle_sha256,
         signal_producer_contract=spc_identity,
+        run_role=effective_role,
     )
     accounting = bind_runtime_market_data(summary.to_dict(), candles)
     accounting["formal_decision_input_schema_version"] = (
@@ -1365,6 +1395,13 @@ def _validate_candidate_run_binding(
     candidate_run: EconomicRunResult,
 ) -> None:
     identity = candidate_run.identity
+    candidate_role = getattr(identity, "run_role", None)
+    role_str = str(getattr(candidate_role, "value", candidate_role)) if candidate_role else "CANDIDATE"
+    if role_str != EconomicRunRole.CANDIDATE.value:
+        raise ValueError(
+            f"candidate run cannot have role {role_str}; "
+            "benchmark trial cannot authorize candidate economic qualification"
+        )
     expected = {
         "experiment_revision_id": protocol.experiment_revision_id,
         "protocol_hash": protocol.protocol_hash,
@@ -1607,6 +1644,7 @@ def _random_matched_benchmark(
             signals=signals,
             decision_inputs=decision_inputs,
             funding_events=funding_events,
+            authority_role=EconomicRunRole.RANDOM_BENCHMARK,
         )
         run = execute_bound_run(
             protocol=protocol,
@@ -1617,6 +1655,7 @@ def _random_matched_benchmark(
             signals=signals,
             replay_input_bundle=trial_bundle,
             funding_events=funding_events,
+            run_role=EconomicRunRole.RANDOM_BENCHMARK,
         )
         diagnostics, is_comparable = _matching_diagnostics(
             candidate_run, run, comparison.matching_rules
