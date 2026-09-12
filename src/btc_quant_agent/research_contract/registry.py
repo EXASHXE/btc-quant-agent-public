@@ -1,16 +1,14 @@
 from __future__ import annotations
 
-import fcntl
 import hashlib
 import json
 import math
-import os
-import tempfile
 from collections.abc import Callable, Iterator, Mapping, Sequence
 from contextlib import contextmanager
 from pathlib import Path
 from typing import Any
 
+from ..publication import PublicationUncertain, fsync_directory, publication_lock, publish_bytes
 from .canonical import canonical_json, canonical_sha256
 from .models import (
     DecisionEvent,
@@ -440,7 +438,12 @@ class ResearchContractRegistry:
                         f"stale registry generation {self._generation}; "
                         f"committed generation is {actual_generation}"
                     )
-                self._atomic_replace(encoded)
+                try:
+                    self._atomic_replace(encoded)
+                except PublicationUncertain:
+                    # Cutover happened: reconcile authoritative state before surfacing uncertainty.
+                    self.load()
+                    raise
 
         self._protocols = protocols
         self._evidence = evidence
@@ -453,45 +456,17 @@ class ResearchContractRegistry:
         if self.storage_path is None:
             yield
             return
-        lock_path = self.storage_path.with_name(f".{self.storage_path.name}.lock")
-        descriptor = os.open(lock_path, os.O_RDWR | os.O_CREAT, 0o600)
-        try:
-            fcntl.flock(descriptor, fcntl.LOCK_EX)
+        with publication_lock(self.storage_path):
             yield
-        finally:
-            fcntl.flock(descriptor, fcntl.LOCK_UN)
-            os.close(descriptor)
 
     def _atomic_replace(self, encoded: bytes) -> None:
         if self.storage_path is None:
             return
-        descriptor, temp_name = tempfile.mkstemp(
-            prefix=f".{self.storage_path.name}.",
-            suffix=".tmp",
-            dir=self.storage_path.parent,
-        )
-        temp_path = Path(temp_name)
-        try:
-            with os.fdopen(descriptor, "wb") as handle:
-                handle.write(encoded)
-                handle.flush()
-                os.fsync(handle.fileno())
-            if self._before_replace is not None:
-                self._before_replace(temp_path)
-            os.replace(temp_path, self.storage_path)
-            self._fsync_directory(self.storage_path.parent)
-        except BaseException:
-            temp_path.unlink(missing_ok=True)
-            raise
+        publish_bytes(self.storage_path, encoded, before_replace=self._before_replace)
 
     @staticmethod
     def _fsync_directory(directory: Path) -> None:
-        flags = os.O_RDONLY | getattr(os, "O_DIRECTORY", 0)
-        descriptor = os.open(directory, flags)
-        try:
-            os.fsync(descriptor)
-        finally:
-            os.close(descriptor)
+        fsync_directory(directory)
 
     @staticmethod
     def _payload(

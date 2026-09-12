@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import csv
 import hashlib
+import io
 import json
 import os
 import sqlite3
@@ -16,6 +17,14 @@ from typing import Any
 
 from ..domain import DerivativesSnapshot
 from ..evidence_epoch import EvidenceEpoch, resolve_formal_epoch
+from ..publication import publication_lock, publish_bytes
+from ..sqlite_schema import (
+    FORWARD_TABLES,
+    finish_schema,
+    prepare_schema,
+    projection,
+    require_columns,
+)
 from .binance import BinancePublicClient, DerivativeCollection
 from .derivatives import DERIVATIVE_FIELDS
 
@@ -122,7 +131,9 @@ class ForwardDerivativeStore:
     def __init__(self, path: str | Path) -> None:
         self.path = Path(path)
         self.path.parent.mkdir(parents=True, exist_ok=True)
+        self._ready = False
         self._initialize()
+        self._ready = True
 
     @contextmanager
     def _connect(self) -> Iterator[sqlite3.Connection]:
@@ -130,6 +141,8 @@ class ForwardDerivativeStore:
         connection.row_factory = sqlite3.Row
         connection.execute("PRAGMA busy_timeout=10000")
         try:
+            if self._ready:
+                require_columns(connection, FORWARD_TABLES)
             yield connection
             connection.commit()
         except Exception:
@@ -140,6 +153,7 @@ class ForwardDerivativeStore:
 
     def _initialize(self) -> None:
         with self._connect() as connection:
+            prepare_schema(connection, FORWARD_TABLES, legacy_optional=("trigger_source", "scheduled_slot_ms", "endpoint_telemetry_json", "evidence_epoch_id"))
             connection.executescript(
                 """
                 PRAGMA journal_mode=WAL;
@@ -208,6 +222,7 @@ class ForwardDerivativeStore:
                 connection.execute(
                     "ALTER TABLE collection_runs ADD COLUMN evidence_epoch_id TEXT"
                 )
+            finish_schema(connection, FORWARD_TABLES)
 
     def append(self, record: ForwardDerivativeRecord) -> bool:
         snapshot = record.snapshot
@@ -228,7 +243,7 @@ class ForwardDerivativeStore:
             else:
                 values = asdict(snapshot)
                 connection.execute(
-                    "INSERT INTO derivative_snapshots VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                    f"INSERT INTO derivative_snapshots ({projection('derivative_snapshots')}) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
                     (
                         record.symbol,
                         record.collection_id,
@@ -307,7 +322,7 @@ class ForwardDerivativeStore:
         )
         with self._connect() as connection:
             rows = connection.execute(
-                "SELECT * FROM collection_runs WHERE evidence_epoch_id=? "
+                f"SELECT {projection('collection_runs')} FROM collection_runs WHERE evidence_epoch_id=? "
                 "AND trigger_source='SCHEDULED' ORDER BY scheduled_slot_ms,finished_at_ms,run_id",
                 (epoch.epoch_id,),
             ).fetchall()
@@ -422,7 +437,7 @@ class ForwardDerivativeStore:
     def _run_rows(self) -> list[sqlite3.Row]:
         with self._connect() as connection:
             return connection.execute(
-                "SELECT * FROM collection_runs ORDER BY finished_at_ms, run_id"
+                f"SELECT {projection('collection_runs')} FROM collection_runs ORDER BY finished_at_ms, run_id"
             ).fetchall()
 
     @staticmethod
@@ -538,7 +553,7 @@ class ForwardDerivativeStore:
     def _rows(self) -> list[sqlite3.Row]:
         with self._connect() as connection:
             return connection.execute(
-                "SELECT * FROM derivative_snapshots ORDER BY observed_at_ms"
+                f"SELECT {projection('derivative_snapshots')} FROM derivative_snapshots ORDER BY observed_at_ms"
             ).fetchall()
 
     def audit(self) -> dict[str, Any]:
@@ -713,15 +728,26 @@ class ForwardDerivativeStore:
         }
 
     def export(self, csv_path: str | Path, manifest_path: str | Path) -> dict[str, Any]:
+        csv_target, manifest_target = Path(csv_path).resolve(), Path(manifest_path).resolve()
+        if csv_target == manifest_target:
+            raise ForwardStoreConflict("CSV and manifest targets must be distinct")
+        first, second = sorted((csv_target, manifest_target))
+        with publication_lock(first), publication_lock(second):
+            return self._export_owned(csv_path, manifest_path)
+
+    def _export_owned(self, csv_path: str | Path, manifest_path: str | Path) -> dict[str, Any]:
         target = Path(csv_path)
         target.parent.mkdir(parents=True, exist_ok=True)
         rows = self._rows()
-        with target.open("w", encoding="utf-8", newline="") as handle:
-            writer = csv.DictWriter(handle, fieldnames=DERIVATIVE_FIELDS)
-            writer.writeheader()
-            for row in rows:
-                writer.writerow({field: row[field] for field in DERIVATIVE_FIELDS})
-        checksum = hashlib.sha256(target.read_bytes()).hexdigest()
+        handle = io.StringIO(newline="")
+        writer = csv.DictWriter(handle, fieldnames=DERIVATIVE_FIELDS)
+        writer.writeheader()
+        for row in rows:
+            writer.writerow({field: row[field] for field in DERIVATIVE_FIELDS})
+        encoded = handle.getvalue().encode("utf-8")
+        checksum = hashlib.sha256(encoded).hexdigest()
+        if target.exists() and target.read_bytes() != encoded:
+            raise ForwardStoreConflict("export CSV is immutable; use a new artifact path")
         manifest = {
             "schema_version": "1.0.0",
             "source": str(self.path),
@@ -732,9 +758,16 @@ class ForwardDerivativeStore:
             "last_observed_at_ms": int(rows[-1]["observed_at_ms"]) if rows else None,
             "backfilled_rows": 0,
         }
-        Path(manifest_path).write_text(
-            json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8"
-        )
+        if Path(manifest_path).exists():
+            try:
+                committed = json.loads(Path(manifest_path).read_bytes())
+            except (ValueError, UnicodeError) as exc:
+                raise ForwardStoreConflict("invalid committed export manifest") from exc
+            if committed != manifest or not target.exists() or target.read_bytes() != encoded:
+                raise ForwardStoreConflict("committed export is immutable; use a new artifact path")
+            return manifest
+        publish_bytes(target, encoded)
+        publish_bytes(manifest_path, (json.dumps(manifest, indent=2, sort_keys=True) + "\n").encode("utf-8"))
         return manifest
 
 

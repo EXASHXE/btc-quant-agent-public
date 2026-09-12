@@ -10,15 +10,58 @@ import threading
 import time
 import uuid
 from collections import Counter
-from collections.abc import Iterable, Iterator
+from collections.abc import Callable, Iterable, Iterator
 from contextlib import contextmanager
 from dataclasses import asdict, dataclass
 from datetime import UTC, datetime
+from functools import wraps
 from pathlib import Path
-from typing import Any
+from typing import Any, TypeVar
 
 from .config import DataConfig
 from .data.binance import BinancePublicClient
+from .publication import (
+    PublicationConflict,
+    PublicationUncertain,
+    file_digest,
+    publication_lock,
+    publish_bytes,
+)
+from .sqlite_schema import MICROSTRUCTURE_TABLES, finish_schema, prepare_schema, projection
+
+_T = TypeVar("_T")
+
+
+def _owned_mutation(method: Callable[..., _T]) -> Callable[..., _T]:
+    @wraps(method)
+    def owned(self: MicrostructureStore, *args: Any, **kwargs: Any) -> _T:
+        with publication_lock(self.finalized_manifest_path):
+            if file_digest(self.finalized_manifest_path) != self._manifest_digest:
+                raise PublicationConflict("stale microstructure manifest owner")
+            # Validate every mutable partition before any cross-partition write
+            # or checkpoint. Sealed partitions are never migrated by a writer.
+            for path in self.root.glob("microstructure-*.sqlite3"):
+                if self._is_finalized(path):
+                    continue
+                try:
+                    connection = sqlite3.connect(f"file:{path.resolve().as_posix()}?mode=ro", uri=True)
+                except sqlite3.OperationalError:
+                    # Heartbeats are advisory and historically skip locked DBs;
+                    # unavailable is not a schema success or a committed write.
+                    if method.__name__ != "heartbeat":
+                        raise
+                    continue
+                try:
+                    prepare_schema(connection, MICROSTRUCTURE_TABLES,
+                                   legacy_optional=("instance_id", "last_heartbeat_ms"))
+                finally:
+                    connection.close()
+            try:
+                return method(self, *args, **kwargs)
+            except PublicationUncertain:
+                self._manifest_digest = file_digest(self.finalized_manifest_path)
+                raise
+    return owned
 
 
 def microstructure_service_status() -> dict[str, Any]:
@@ -279,6 +322,7 @@ class MicrostructureStore:
         self.start_ms = start_ms
         self.protocol = MicrostructureReliabilityProtocol.load(protocol_path)
         self._finalized_cache: dict[str, dict[str, Any]] = {}
+        self._manifest_digest = file_digest(self.finalized_manifest_path)
 
     @property
     def finalized_manifest_path(self) -> Path:
@@ -301,15 +345,25 @@ class MicrostructureStore:
 
     def _save_stats_cache(self, cache: dict[str, dict[str, Any]]) -> None:
         try:
-            self._stats_cache_path.write_text(json.dumps(cache), encoding="utf-8")
-        except OSError:
+            publish_bytes(self._stats_cache_path, json.dumps(cache).encode("utf-8"))
+        except (OSError, PublicationConflict):
             pass
 
     def _manifest(self) -> dict[str, dict[str, Any]]:
         if not self.finalized_manifest_path.exists():
             return {}
         raw = json.loads(self.finalized_manifest_path.read_text(encoding="utf-8"))
-        return {str(key): dict(value) for key, value in raw.get("partitions", {}).items()}
+        if (not isinstance(raw, dict) or raw.get("schema_version") != "1.0.0"
+                or raw.get("protocol_id") != self.protocol.protocol_id
+                or not isinstance(raw.get("partitions"), dict)):
+            raise ValueError("unsupported/corrupt finalized manifest")
+        for name, metadata in raw["partitions"].items():
+            if (Path(name).name != name or not isinstance(metadata, dict)
+                    or metadata.get("immutable") is not True
+                    or not isinstance(metadata.get("sha256"), str)
+                    or len(metadata["sha256"]) != 64):
+                raise ValueError("invalid finalized partition metadata")
+        return {str(key): dict(value) for key, value in raw["partitions"].items()}
 
     def _is_finalized(self, path: Path) -> bool:
         return path.name in self._manifest()
@@ -320,10 +374,23 @@ class MicrostructureStore:
 
     @contextmanager
     def _connect(self, timestamp_ms: int) -> Iterator[sqlite3.Connection]:
+        with publication_lock(self.finalized_manifest_path):
+            if file_digest(self.finalized_manifest_path) != self._manifest_digest:
+                raise PublicationConflict("stale microstructure manifest owner")
+            with self._connect_owned(timestamp_ms) as connection:
+                yield connection
+
+    @contextmanager
+    def _connect_owned(self, timestamp_ms: int) -> Iterator[sqlite3.Connection]:
         path = self._path(timestamp_ms)
         if self._is_finalized(path):
             raise RuntimeError(f"finalized partition is immutable: {path.name}")
         connection = sqlite3.connect(path, timeout=10)
+        try:
+            prepare_schema(connection, MICROSTRUCTURE_TABLES, legacy_optional=("instance_id", "last_heartbeat_ms"))
+        except BaseException:
+            connection.close()
+            raise
         connection.execute("PRAGMA journal_mode=WAL")
         connection.executescript(
             """
@@ -369,6 +436,7 @@ class MicrostructureStore:
         if "last_heartbeat_ms" not in session_columns:
             connection.execute("ALTER TABLE sessions ADD COLUMN last_heartbeat_ms INTEGER")
         try:
+            finish_schema(connection, MICROSTRUCTURE_TABLES)
             yield connection
             connection.commit()
         finally:
@@ -379,7 +447,7 @@ class MicrostructureStore:
         digest = hashlib.sha256(payload.encode()).hexdigest()
         with self._connect(event.receive_time_ms) as connection:
             cursor = connection.execute(
-                "INSERT OR IGNORE INTO depth_events VALUES(?,?,?,?,?,?)",
+                f"INSERT OR IGNORE INTO depth_events ({projection('depth_events')}) VALUES(?,?,?,?,?,?)",
                 (
                     event.event_time_ms,
                     event.final_update_id,
@@ -403,7 +471,7 @@ class MicrostructureStore:
     @staticmethod
     def _increment(connection: sqlite3.Connection, name: str) -> None:
         connection.execute(
-            """INSERT INTO audit_counters VALUES(?,1)
+            """INSERT INTO audit_counters(name,value) VALUES(?,1)
             ON CONFLICT(name) DO UPDATE SET value=value+1""",
             (name,),
         )
@@ -412,7 +480,7 @@ class MicrostructureStore:
         digest = hashlib.sha256(json.dumps(asdict(trade), sort_keys=True).encode()).hexdigest()
         with self._connect(trade.receive_time_ms) as connection:
             cursor = connection.execute(
-                "INSERT OR IGNORE INTO agg_trades VALUES(?,?,?,?,?,?,?,?,?,?)",
+                f"INSERT OR IGNORE INTO agg_trades ({projection('agg_trades')}) VALUES(?,?,?,?,?,?,?,?,?,?)",
                 (
                     trade.aggregate_trade_id,
                     trade.event_time_ms,
@@ -460,7 +528,7 @@ class MicrostructureStore:
     ) -> bool:
         with self._connect(event.receive_time_ms) as connection:
             cursor = connection.execute(
-                "INSERT OR IGNORE INTO book_samples VALUES(?,?,?,?,?,?,?,?,?)",
+                f"INSERT OR IGNORE INTO book_samples ({projection('book_samples')}) VALUES(?,?,?,?,?,?,?,?,?)",
                 (
                     event.event_time_ms,
                     event.final_update_id,
@@ -508,7 +576,7 @@ class MicrostructureStore:
         gap_end = max(timestamp_ms, end_ms if end_ms is not None else timestamp_ms)
         with self._connect(timestamp_ms) as connection:
             connection.execute(
-                "INSERT INTO gaps VALUES(?,?,?,?,?)",
+                f"INSERT INTO gaps ({projection('gaps')}) VALUES(?,?,?,?,?)",
                 (identity, timestamp_ms, gap_end, kind, detail),
             )
             for interval in self.INTERVALS_MS:
@@ -522,6 +590,7 @@ class MicrostructureStore:
                         (interval, bucket),
                     )
 
+    @_owned_mutation
     def recover_orphan_instances(
         self, now_ms: int, *, exclude_instance_id: str | None = None
     ) -> int:
@@ -575,12 +644,13 @@ class MicrostructureStore:
             )
         return len(recovered)
 
+    @_owned_mutation
     def instance_start(self, timestamp_ms: int, instance_id: str | None = None) -> str:
         self.recover_orphan_instances(timestamp_ms)
         identity = instance_id or uuid.uuid4().hex
         with self._connect(timestamp_ms) as connection:
             connection.execute(
-                "INSERT INTO process_instances VALUES(?,?,?,NULL,'ACTIVE')",
+                f"INSERT INTO process_instances ({projection('process_instances')}) VALUES(?,?,?,NULL,'ACTIVE')",
                 (identity, timestamp_ms, timestamp_ms),
             )
         return identity
@@ -600,6 +670,7 @@ class MicrostructureStore:
             )
         return session_id
 
+    @_owned_mutation
     def heartbeat(self, timestamp_ms: int, instance_id: str) -> None:
         # A fast supervisor restart can occur before the previous lease expires.
         # Recheck on every heartbeat so that such an orphan is closed once the
@@ -642,6 +713,7 @@ class MicrostructureStore:
             except sqlite3.OperationalError:
                 continue
 
+    @_owned_mutation
     def depth_sequence_state(self, timestamp_ms: int, instance_id: str, valid: bool) -> None:
         for path in sorted(self.root.glob("microstructure-*.sqlite3")):
             if self._is_finalized(path):
@@ -668,6 +740,7 @@ class MicrostructureStore:
                 (instance_id, timestamp_ms, timestamp_ms, int(valid)),
             )
 
+    @_owned_mutation
     def session_end(self, timestamp_ms: int, session_id: str) -> None:
         for path in sorted(self.root.glob("microstructure-*.sqlite3")):
             if self._is_finalized(path):
@@ -697,6 +770,7 @@ class MicrostructureStore:
             if cursor.rowcount:
                 return
 
+    @_owned_mutation
     def instance_end(self, timestamp_ms: int, instance_id: str) -> None:
         self.heartbeat(timestamp_ms, instance_id)
         for path in sorted(self.root.glob("microstructure-*.sqlite3")):
@@ -741,7 +815,7 @@ class MicrostructureStore:
         quality = "OK" if rtt <= self.protocol.maximum_clock_rtt_ms else "DEGRADED_RTT"
         with self._connect(response_receive_ms) as connection:
             connection.execute(
-                "INSERT OR REPLACE INTO clock_measurements VALUES(?,?,?,?,?,?,?)",
+                f"INSERT OR REPLACE INTO clock_measurements ({projection('clock_measurements')}) VALUES(?,?,?,?,?,?,?)",
                 (
                     response_receive_ms,
                     request_send_ms,
@@ -771,6 +845,7 @@ class MicrostructureStore:
             "integrity_ok": not drift and not missing,
         }
 
+    @_owned_mutation
     def finalize_partitions(self, now_ms: int | None = None) -> dict[str, dict[str, Any]]:
         now = now_ms or int(time.time() * 1000)
         manifest = self._manifest()
@@ -803,7 +878,10 @@ class MicrostructureStore:
                 if open_count:
                     connection.close()
                     continue
-            connection.execute("PRAGMA wal_checkpoint(TRUNCATE)")
+            checkpoint = connection.execute("PRAGMA wal_checkpoint(TRUNCATE)").fetchone()
+            if checkpoint is None or checkpoint[0] != 0:
+                connection.close()
+                raise RuntimeError("partition WAL checkpoint busy; finalization refused")
             connection.close()
             manifest[path.name] = {
                 "sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
@@ -818,9 +896,10 @@ class MicrostructureStore:
                 "protocol_id": self.protocol.protocol_id,
                 "partitions": dict(sorted(manifest.items())),
             }
-            self.finalized_manifest_path.write_text(
-                json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8"
-            )
+            publish_bytes(self.finalized_manifest_path,
+                          (json.dumps(payload, indent=2, sort_keys=True) + "\n").encode("utf-8"),
+                          expected_sha256=self._manifest_digest)
+            self._manifest_digest = file_digest(self.finalized_manifest_path)
         return manifest
 
     def closed_partition_manifest(self, now_ms: int | None = None) -> dict[str, str]:

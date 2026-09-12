@@ -29,6 +29,16 @@ from .h39_statistics import (
     H39_CORRECTED_EVALUATOR_VERSION,
     conditional_incremental_ols_hac,
 )
+from .publication import publish_bytes
+from .sqlite_schema import (
+    COLUMNS,
+    SQLiteSchemaError,
+    finish_schema,
+    prepare_schema,
+    projection,
+    require_columns,
+    schema_version,
+)
 
 H39_HYPOTHESIS_ID = "H39_MICROSTRUCTURE_DIRECTIONAL_INFORMATION"
 H39_PROTOCOL_VERSION = "v0.3.22"
@@ -154,6 +164,7 @@ def _open_sqlite(
     """Context manager for SQLite connections that guarantees conn.close() on block exit."""
     conn = sqlite3.connect(path_or_uri, **kwargs)
     try:
+        schema_version(conn)
         yield conn
     finally:
         conn.close()
@@ -1019,6 +1030,9 @@ def evaluate_forward_chain_health(
                                     micro_evidence["overall_research_health"] = micro_evidence[
                                         "status"
                                     ]
+                except SQLiteSchemaError as exc:
+                    micro_evidence["status"] = "SCHEMA_ERROR"
+                    micro_evidence["reason"] = str(exc)
                 except Exception as exc:  # noqa: BLE001
                     micro_evidence["status"] = "READ_ERROR"
                     micro_evidence["reason"] = f"Failed to read partition {latest_p.name}: {exc}"
@@ -1099,8 +1113,13 @@ class MicrostructureResearchLoader:
                     uri = f"file:{source.as_posix()}?mode=ro"
                     conn.execute(f"ATTACH DATABASE ? AS p{idx}", (uri,))
                 for table in ("agg_trades", "book_samples", "gaps"):
+                    for idx in range(len(sources)):
+                        version = conn.execute(f"PRAGMA p{idx}.user_version").fetchone()[0]
+                        actual = {str(row[1]) for row in conn.execute(f"PRAGMA p{idx}.table_info({table})")}
+                        if version not in (0, 1) or set(COLUMNS[table]) - actual:
+                            raise SQLiteSchemaError(f"unsupported partition schema p{idx}.{table}")
                     union = " UNION ALL ".join(
-                        f"SELECT * FROM p{idx}.{table}" for idx in range(len(sources))
+                        f"SELECT {projection(table)} FROM p{idx}.{table}" for idx in range(len(sources))
                     )
                     conn.execute(f"CREATE TEMP VIEW {table} AS {union}")
                 conn.execute("PRAGMA query_only = ON;")
@@ -1115,6 +1134,7 @@ class MicrostructureResearchLoader:
         conn.row_factory = sqlite3.Row
         conn.execute("PRAGMA query_only = ON;")
         try:
+            require_columns(conn, ("agg_trades", "book_samples", "gaps"))
             yield conn
         finally:
             conn.close()
@@ -1506,10 +1526,20 @@ class H39BlindLedger:
     def __init__(self, db_path: str | Path = H39_BLIND_LEDGER_DEFAULT_PATH) -> None:
         self.db_path = Path(db_path).resolve()
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
+        self._ready = False
         self._init_db()
+        self._ready = True
+
+    @contextlib.contextmanager
+    def _connect(self) -> Generator[sqlite3.Connection, None, None]:
+        with _open_sqlite(self.db_path) as conn, conn:
+            if self._ready:
+                require_columns(conn, ("h39_blind_validation_ledger", "h39_source_partitions"))
+            yield conn
 
     def _init_db(self) -> None:
-        with sqlite3.connect(self.db_path) as conn:
+        with self._connect() as conn:
+            prepare_schema(conn, ("h39_blind_validation_ledger", "h39_source_partitions"), legacy_optional=("input_contract_version",))
             conn.execute("PRAGMA journal_mode = WAL;")
             conn.execute(
                 """CREATE TABLE IF NOT EXISTS h39_blind_validation_ledger (
@@ -1573,6 +1603,7 @@ class H39BlindLedger:
                 conn.execute(
                     "ALTER TABLE h39_blind_validation_ledger ADD COLUMN input_contract_version TEXT"
                 )
+            finish_schema(conn, ("h39_blind_validation_ledger", "h39_source_partitions"))
             conn.commit()
 
     def record_or_verify_source_partition(
@@ -1596,16 +1627,19 @@ class H39BlindLedger:
         current_sha = h.hexdigest()
         now_utc = datetime.now(UTC).isoformat()
 
-        with sqlite3.connect(self.db_path) as conn:
+        with self._connect() as conn:
+            conn.execute("BEGIN IMMEDIATE")
             conn.row_factory = sqlite3.Row
             row = conn.execute(
-                "SELECT * FROM h39_source_partitions WHERE partition_name = ?",
+                f"SELECT {projection('h39_source_partitions')} FROM h39_source_partitions WHERE partition_name = ?",
                 (p_name,),
             ).fetchone()
 
             if row is not None:
                 recorded_sha = str(row["partition_sha256"])
                 is_finalized = bool(row["finalized"])
+                if is_finalized and finalized is not None and not finalized:
+                    raise RuntimeError("SOURCE_PARTITION_FINALIZED: cannot downgrade sealed source")
                 if is_finalized and current_sha != recorded_sha:
                     raise RuntimeError(
                         f"SOURCE_PARTITION_MUTATION: Source partition {p_name} hash mutated from {recorded_sha} to {current_sha}!"
@@ -1653,7 +1687,7 @@ class H39BlindLedger:
 
     def verify_integrity(self) -> dict[str, Any]:
         """Perform SQLite PRAGMA integrity_check and verify source partition immutability."""
-        with sqlite3.connect(self.db_path) as conn:
+        with self._connect() as conn:
             conn.row_factory = sqlite3.Row
             integrity_rows = conn.execute("PRAGMA integrity_check;").fetchall()
             integrity_results = [r[0] for r in integrity_rows]
@@ -1670,7 +1704,7 @@ class H39BlindLedger:
             ).fetchone()[0]
 
             partition_rows = conn.execute(
-                "SELECT * FROM h39_source_partitions ORDER BY partition_name ASC;"
+                f"SELECT {projection('h39_source_partitions')} FROM h39_source_partitions ORDER BY partition_name ASC;"
             ).fetchall()
 
         partition_verifications = []
@@ -1769,7 +1803,7 @@ class H39BlindLedger:
             "integrity_check": "OK",
         }
         manifest_file = dest_dir / f"h39_blind_ledger_backup_{ts_str}_manifest.json"
-        manifest_file.write_text(json.dumps(manifest, indent=2, sort_keys=True), encoding="utf-8")
+        publish_bytes(manifest_file, json.dumps(manifest, indent=2, sort_keys=True).encode("utf-8"))
         return backup_file
 
     def ingest_slots(self, rows: Sequence[dict[str, Any]]) -> int:
@@ -1787,7 +1821,8 @@ class H39BlindLedger:
         c_hash = H39_FROZEN_CLARIFICATION_HASH
         inserted_count = 0
 
-        with _open_sqlite(self.db_path) as conn:
+        with self._connect() as conn:
+            conn.execute("BEGIN IMMEDIATE")
             conn.row_factory = sqlite3.Row
             for row in rows:
                 slot_ms = int(row["decision_close_ms"])
@@ -1851,7 +1886,7 @@ class H39BlindLedger:
                     )
 
                 existing = conn.execute(
-                    "SELECT * FROM h39_blind_validation_ledger WHERE decision_close_ms = ?",
+                    f"SELECT {projection('h39_blind_validation_ledger')} FROM h39_blind_validation_ledger WHERE decision_close_ms = ?",
                     (slot_ms,),
                 ).fetchone()
 
@@ -1984,10 +2019,10 @@ class H39BlindLedger:
             clock_ceiling_ms = int(datetime.now(UTC).timestamp() * 1000)
             clock_source = "WALL_CLOCK"
 
-        with sqlite3.connect(self.db_path) as conn:
+        with self._connect() as conn:
             conn.row_factory = sqlite3.Row
             rows = conn.execute(
-                """SELECT * FROM h39_blind_validation_ledger
+                f"""SELECT {projection('h39_blind_validation_ledger')} FROM h39_blind_validation_ledger
                    WHERE decision_close_ms <= ? ORDER BY decision_close_ms ASC""",
                 (clock_ceiling_ms,),
             ).fetchall()
@@ -2096,7 +2131,7 @@ class H39BlindLedger:
 
     def export_manifest(self) -> dict[str, Any]:
         summary = self.get_summary()
-        with sqlite3.connect(self.db_path) as conn:
+        with self._connect() as conn:
             conn.row_factory = sqlite3.Row
             rows = conn.execute(
                 "SELECT decision_close_ms, slot_utc, eligible, rejection_reason, source_partitions FROM h39_blind_validation_ledger ORDER BY decision_close_ms ASC"
@@ -2130,10 +2165,10 @@ class H39BlindLedger:
     get_manifest = export_manifest
 
     def get_all_rows(self) -> list[dict[str, Any]]:
-        with sqlite3.connect(self.db_path) as conn:
+        with self._connect() as conn:
             conn.row_factory = sqlite3.Row
             rows = conn.execute(
-                "SELECT * FROM h39_blind_validation_ledger ORDER BY decision_close_ms ASC"
+                f"SELECT {projection('h39_blind_validation_ledger')} FROM h39_blind_validation_ledger ORDER BY decision_close_ms ASC"
             ).fetchall()
             return [dict(r) for r in rows]
 
@@ -2239,7 +2274,7 @@ class H39ResearchEngine:
                             )
                             for c in fetched:
                                 conn.execute(
-                                    "INSERT OR REPLACE INTO klines_1m VALUES (?, ?, ?, ?, ?, ?, ?)",
+                                    "INSERT OR REPLACE INTO klines_1m (open_time_ms,open,high,low,close,volume,close_time_ms) VALUES (?, ?, ?, ?, ?, ?, ?)",
                                     (
                                         c.open_time_ms,
                                         c.open,
@@ -4185,7 +4220,7 @@ class H39OneShotExecutionRegistry:
         with _open_sqlite(self.db_path) as conn:
             conn.row_factory = sqlite3.Row
             row = conn.execute(
-                "SELECT * FROM h39_one_shot_executions WHERE execution_key = ?",
+                f"SELECT {projection('h39_one_shot_executions')} FROM h39_one_shot_executions WHERE execution_key = ?",
                 (execution_key,),
             ).fetchone()
             if row is None:
@@ -4590,7 +4625,7 @@ class H39OneShotUnblindGatekeeper:
                 "SELECT COUNT(*) FROM h39_blind_validation_ledger;"
             ).fetchone()[0]
             snapshot_rows = chk_conn.execute(
-                "SELECT * FROM h39_blind_validation_ledger WHERE decision_close_ms <= ? ORDER BY decision_close_ms;",
+                f"SELECT {projection('h39_blind_validation_ledger')} FROM h39_blind_validation_ledger WHERE decision_close_ms <= ? ORDER BY decision_close_ms;",
                 (cutoff_ms,),
             ).fetchall()
             eligible_rows = summarize_h39_required_inputs(snapshot_rows)["formal_test_ready_slots"]
@@ -4870,7 +4905,7 @@ class H39OneShotUnblindGatekeeper:
         with _open_sqlite(f"file:{snapshot_path.as_posix()}?mode=ro", uri=True) as conn:
             conn.row_factory = sqlite3.Row
             all_rows = conn.execute(
-                """SELECT * FROM h39_blind_validation_ledger
+                f"""SELECT {projection('h39_blind_validation_ledger')} FROM h39_blind_validation_ledger
                    WHERE decision_close_ms >= ? AND decision_close_ms <= ?
                    ORDER BY decision_close_ms ASC""",
                 (H39_VALIDATION_START_MS, cutoff_ms),

@@ -9,6 +9,8 @@ from itertools import pairwise
 from pathlib import Path
 from typing import Any
 
+from ..publication import publish_bytes
+
 
 @dataclass(frozen=True)
 class DataManifest:
@@ -77,9 +79,4 @@ def build_manifest(
 
 
 def write_manifest(path: str | Path, manifest: DataManifest) -> None:
-    target = Path(path)
-    target.parent.mkdir(parents=True, exist_ok=True)
-    target.write_text(
-        json.dumps(manifest.as_dict(), ensure_ascii=False, indent=2, sort_keys=True) + "\n",
-        encoding="utf-8",
-    )
+    publish_bytes(path, (json.dumps(manifest.as_dict(), ensure_ascii=False, indent=2, sort_keys=True) + "\n").encode("utf-8"))

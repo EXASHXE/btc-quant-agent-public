@@ -2,9 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import math
-import os
 import random
-import tempfile
 from collections.abc import Mapping, Sequence
 from dataclasses import asdict, dataclass, field
 from enum import StrEnum
@@ -12,6 +10,7 @@ from pathlib import Path
 from typing import Any
 
 from ..domain import Candle
+from ..publication import publish_bytes
 from ..research_contract.canonical import (
     FrozenDict,
     canonical_json,
@@ -1945,25 +1944,5 @@ def _compare(observed: float, operator: GateOperator, threshold: float) -> bool:
 
 
 def _atomic_write_json(path: str | Path, payload: Mapping[str, Any]) -> Path:
-    target = Path(path)
-    target.parent.mkdir(parents=True, exist_ok=True)
     encoded = (canonical_json(payload) + "\n").encode("utf-8")
-    descriptor, temp_name = tempfile.mkstemp(
-        prefix=f".{target.name}.", suffix=".tmp", dir=target.parent
-    )
-    temporary = Path(temp_name)
-    try:
-        with os.fdopen(descriptor, "wb") as handle:
-            handle.write(encoded)
-            handle.flush()
-            os.fsync(handle.fileno())
-        os.replace(temporary, target)
-        directory_descriptor = os.open(target.parent, os.O_RDONLY | getattr(os, "O_DIRECTORY", 0))
-        try:
-            os.fsync(directory_descriptor)
-        finally:
-            os.close(directory_descriptor)
-    except BaseException:
-        temporary.unlink(missing_ok=True)
-        raise
-    return target
+    return publish_bytes(path, encoded)

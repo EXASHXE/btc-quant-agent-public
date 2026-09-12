@@ -9,19 +9,30 @@ from pathlib import Path
 from typing import Any
 
 from .domain import OpportunityEvidence, Signal, SignalStatus, UserDecision
+from .sqlite_schema import (
+    REPOSITORY_TABLES,
+    finish_schema,
+    prepare_schema,
+    projection,
+    require_columns,
+)
 
 
 class Repository:
     def __init__(self, path: str):
         self.path = path
         Path(path).parent.mkdir(parents=True, exist_ok=True)
+        self._ready = False
         self._initialize()
+        self._ready = True
 
     @contextmanager
     def _connect(self) -> Iterator[sqlite3.Connection]:
         connection = sqlite3.connect(self.path)
         connection.row_factory = sqlite3.Row
         try:
+            if self._ready:
+                require_columns(connection, REPOSITORY_TABLES)
             yield connection
             connection.commit()
         except Exception:
@@ -32,6 +43,7 @@ class Repository:
 
     def _initialize(self) -> None:
         with self._connect() as connection:
+            prepare_schema(connection, REPOSITORY_TABLES)
             connection.executescript(
                 """
                 PRAGMA journal_mode=WAL;
@@ -101,6 +113,7 @@ class Repository:
                 ON execution_orders(plan_id, role, created_at_ms DESC);
                 """
             )
+            finish_schema(connection, REPOSITORY_TABLES)
 
     def save_signal(self, signal: Signal, cooldown_minutes: int) -> bool:
         cutoff = signal.created_at_ms - cooldown_minutes * 60_000
@@ -112,7 +125,7 @@ class Repository:
             if duplicate:
                 return False
             connection.execute(
-                "INSERT INTO signals VALUES (?, ?, ?, ?, ?, ?)",
+                f"INSERT INTO signals ({projection('signals')}) VALUES (?, ?, ?, ?, ?, ?)",
                 (
                     signal.signal_id,
                     signal.fingerprint,
@@ -140,7 +153,7 @@ class Repository:
                     raise ValueError("conflicting immutable opportunity")
                 return False
             connection.execute(
-                "INSERT INTO opportunities VALUES (?, ?, ?, ?, ?)",
+                f"INSERT INTO opportunities ({projection('opportunities')}) VALUES (?, ?, ?, ?, ?)",
                 (
                     opportunity.opportunity_id,
                     opportunity.detector_id,
@@ -252,7 +265,7 @@ class Repository:
     def save_shadow(self, signal_id: str, outcome: dict[str, Any]) -> None:
         with self._connect() as connection:
             connection.execute(
-                "INSERT OR REPLACE INTO shadow_trades VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                f"INSERT OR REPLACE INTO shadow_trades ({projection('shadow_trades')}) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
                 (
                     signal_id,
                     outcome["outcome"],
@@ -293,7 +306,7 @@ class Repository:
     def save_execution_plan(self, kind: str, payload: dict[str, Any]) -> None:
         with self._connect() as connection:
             connection.execute(
-                "INSERT INTO execution_plans VALUES (?, ?, ?, ?, ?, ?)",
+                f"INSERT INTO execution_plans ({projection('execution_plans')}) VALUES (?, ?, ?, ?, ?, ?)",
                 (
                     payload["plan_id"],
                     kind,

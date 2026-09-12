@@ -19,6 +19,13 @@ from .data.binance import BinancePublicClient
 from .domain import RuntimeStage, ScanResult
 from .research_registry import ResearchRegistry
 from .service import QuantService
+from .sqlite_schema import (
+    OPPORTUNITY_TABLES,
+    finish_schema,
+    prepare_schema,
+    projection,
+    require_columns,
+)
 
 CADENCE_MS = 15 * 60_000
 DAY_MS = 24 * 60 * 60_000
@@ -404,6 +411,8 @@ class OpportunityForwardStore:
         connection.row_factory = sqlite3.Row
         connection.execute("PRAGMA busy_timeout=10000")
         try:
+            if getattr(self, "_ready", False):
+                require_columns(connection, OPPORTUNITY_TABLES)
             yield connection
             connection.commit()
         except Exception:
@@ -414,6 +423,7 @@ class OpportunityForwardStore:
 
     def _initialize(self) -> None:
         with self._connect() as connection:
+            prepare_schema(connection, OPPORTUNITY_TABLES, legacy_optional=("trigger_source",))
             connection.executescript(
                 """
                 PRAGMA journal_mode=WAL;
@@ -478,6 +488,8 @@ class OpportunityForwardStore:
                     "ALTER TABLE scan_observations ADD COLUMN trigger_source TEXT "
                     "NOT NULL DEFAULT 'LEGACY_UNKNOWN'"
                 )
+            finish_schema(connection, OPPORTUNITY_TABLES)
+        self._ready = True
 
     def append_observation(
         self,
@@ -563,7 +575,7 @@ class OpportunityForwardStore:
                     raise OpportunityForwardConflict("resolved outcome conflict; original preserved")
                 return False
             connection.execute(
-                "INSERT INTO outcomes VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                f"INSERT INTO outcomes ({projection('outcomes')}) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
                 tuple(
                     values[key]
                     for key in (
@@ -589,14 +601,14 @@ class OpportunityForwardStore:
     def observations(self, campaign_id: str) -> list[sqlite3.Row]:
         with self._connect() as connection:
             return connection.execute(
-                "SELECT * FROM scan_observations WHERE campaign_id=? ORDER BY scheduled_slot_ms",
+                f"SELECT {projection('scan_observations')} FROM scan_observations WHERE campaign_id=? ORDER BY scheduled_slot_ms",
                 (campaign_id,),
             ).fetchall()
 
     def outcomes(self) -> list[sqlite3.Row]:
         with self._connect() as connection:
             return connection.execute(
-                "SELECT * FROM outcomes ORDER BY observation_id,horizon_minutes"
+                f"SELECT {projection('outcomes')} FROM outcomes ORDER BY observation_id,horizon_minutes"
             ).fetchall()
 
     def unresolved(self, campaign_id: str, now_ms: int) -> list[tuple[sqlite3.Row, int]]:
