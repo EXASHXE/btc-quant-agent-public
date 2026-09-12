@@ -509,6 +509,8 @@ class EconomicRunResult:
         if not isinstance(self.identity, EconomicRunIdentity):
             raise TypeError("identity must be EconomicRunIdentity")
         object.__setattr__(self, "accounting", FrozenDict(self.accounting))
+        if thaw_json(self.accounting.get("formal_run_identity")) != self.identity.to_dict():
+            raise ValueError("economic run outer identity differs from embedded formal_run_identity")
         canonical_json(self.semantic_payload())
 
     def semantic_payload(self) -> dict[str, Any]:
@@ -1404,6 +1406,19 @@ def _validate_candidate_run_binding(
             f"candidate run cannot have role {role_str}; "
             "benchmark trial cannot authorize candidate economic qualification"
         )
+    producer = identity.signal_producer_contract
+    if producer is not None and producer.logical_id == "CANONICAL_RANDOM_BENCHMARK_V1":
+        raise ValueError("random benchmark producer cannot authorize a candidate run")
+    if identity.signal_set_sha256 != canonical_sha256([]):
+        authority = protocol.signal_producer_contract
+        if authority is None or producer is None:
+            raise ValueError("candidate signals require protocol and identity producer contracts")
+        authority_identity = (
+            authority if isinstance(authority, VersionedIdentity)
+            else authority.to_versioned_identity()
+        )
+        if producer != authority_identity:
+            raise ValueError("candidate signal producer contract differs from protocol authority")
     expected = {
         "experiment_revision_id": protocol.experiment_revision_id,
         "protocol_hash": protocol.protocol_hash,
