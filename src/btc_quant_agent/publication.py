@@ -32,7 +32,9 @@ def file_digest(path: Path) -> str | None:
 
 @contextmanager
 def publication_lock(path: Path) -> Iterator[None]:
-    path = path.resolve()
+    # pathlib.resolve probes the final target with Path.stat on Python <3.13.
+    # Normalize aliases without adding a target read before the write boundary.
+    path = Path(os.path.realpath(path))
     path.parent.mkdir(parents=True, exist_ok=True)
     held = getattr(_owners, "held", None)
     if held is None:
@@ -65,7 +67,7 @@ def publish_bytes(
     path: str | Path, encoded: bytes, *, expected_sha256: str | None | object = _UNSET,
     before_replace: Callable[[Path], None] | None = None,
 ) -> Path:
-    target = Path(path).resolve()
+    target = Path(os.path.realpath(path))
     with publication_lock(target):
         if expected_sha256 is not _UNSET and file_digest(target) != expected_sha256:
             raise PublicationConflict("stale publication content; target preserved")

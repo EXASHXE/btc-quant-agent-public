@@ -127,3 +127,18 @@ def test_truncated_registry_not_authority_and_orphan_not_committed(tmp_path):
     target.write_bytes(b'{"generation":1')
     with pytest.raises(RegistryCorruptionError):
         ResearchContractRegistry(target)
+
+
+def test_normalization_does_not_probe_committed_target(tmp_path, monkeypatch):
+    target = tmp_path / "committed.json"
+    target.write_bytes(b"old")
+    original = Path.stat
+
+    def stat(path, *args, **kwargs):
+        if path == target:
+            raise AssertionError("unexpected target metadata probe")
+        return original(path, *args, **kwargs)
+
+    monkeypatch.setattr(Path, "stat", stat)
+    pub.publish_bytes(target, b"{}\n")
+    assert target.read_bytes() == b"{}\n"
