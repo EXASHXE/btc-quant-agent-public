@@ -572,24 +572,23 @@ def validate_formal_replay_input_bundle(
                     f"benchmark role requires CANONICAL_RANDOM_BENCHMARK_V1 producer contract; "
                     f"received {contract.contract_id}"
                 )
-        elif clean_role == "CANDIDATE":
-            if expected_protocol is not None:
-                proto_contract = _resolve_protocol_producer_contract(expected_protocol)
-                if proto_contract is None:
-                    raise ValueError(
-                        f"expected protocol {getattr(expected_protocol, 'experiment_id', 'unknown')} "
-                        f"lacks required signal_producer_contract for non-empty decision inputs"
-                    )
-                if contract.contract_id != proto_contract.contract_id:
-                    raise ValueError(
-                        f"bundle producer contract {contract.contract_id} does not match "
-                        f"protocol-bound authoritative contract {proto_contract.contract_id}"
-                    )
-                if contract.contract_hash != proto_contract.contract_hash:
-                    raise ValueError(
-                        f"bundle producer contract hash {contract.contract_hash} does not match "
-                        f"protocol-bound authoritative contract hash {proto_contract.contract_hash}"
-                    )
+        elif clean_role == "CANDIDATE" and expected_protocol is not None:
+            proto_contract = _resolve_protocol_producer_contract(expected_protocol)
+            if proto_contract is None:
+                raise ValueError(
+                    f"expected protocol {getattr(expected_protocol, 'experiment_id', 'unknown')} "
+                    f"lacks required signal_producer_contract for non-empty decision inputs"
+                )
+            if contract.contract_id != proto_contract.contract_id:
+                raise ValueError(
+                    f"bundle producer contract {contract.contract_id} does not match "
+                    f"protocol-bound authoritative contract {proto_contract.contract_id}"
+                )
+            if contract.contract_hash != proto_contract.contract_hash:
+                raise ValueError(
+                    f"bundle producer contract hash {contract.contract_hash} does not match "
+                    f"protocol-bound authoritative contract hash {proto_contract.contract_hash}"
+                )
 
         if (producer_identity != contract.producer_identity) or (producer_version != contract.producer_version):
             raise ValueError(
