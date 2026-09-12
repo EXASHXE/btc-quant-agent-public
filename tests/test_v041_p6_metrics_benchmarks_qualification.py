@@ -36,6 +36,7 @@ from btc_quant_agent.economic import (
     ResultCompleteness,
     ReturnMetricsContract,
     RiskBudget,
+    SignalProducerRegistry,
     SimulationSummary,
     SlippageMode,
     TerminalPolicy,
@@ -51,7 +52,6 @@ from btc_quant_agent.economic import (
     funding_model_identity,
     make_artifact_evidence,
     policy_identity,
-    SignalProducerRegistry,
     summarize_ledger,
 )
 from btc_quant_agent.economic.acceptance_verifier import (
