@@ -270,6 +270,7 @@ class ExperimentMetadata:
     product_scope: tuple[str, ...]
     code_revision: str
     terminal_policy: str
+    signal_producer_contract: VersionedIdentity | Any | None = None
     created_at_utc: str = field(default_factory=utc_now)
     metadata: FrozenDict = field(default_factory=FrozenDict)
 
@@ -286,6 +287,13 @@ class ExperimentMetadata:
             raise TypeError("execution_model must be a VersionedIdentity")
         if not isinstance(self.benchmark, VersionedIdentity) and self.benchmark != P6_PENDING:
             raise ValueError(f"benchmark must be a VersionedIdentity or {P6_PENDING}")
+        if self.signal_producer_contract is not None:
+            if not isinstance(self.signal_producer_contract, VersionedIdentity) and not hasattr(
+                self.signal_producer_contract, "to_dict"
+            ):
+                raise TypeError(
+                    "signal_producer_contract must be a VersionedIdentity or SignalProducerContract"
+                )
         scope = tuple(str(item) for item in self.product_scope)
         if not scope or any(not item.strip() for item in scope):
             raise ValueError("product_scope must contain non-empty instruments")
@@ -310,7 +318,7 @@ class ExperimentMetadata:
             if isinstance(self.benchmark, VersionedIdentity)
             else self.benchmark
         )
-        return {
+        payload = {
             "experiment_family": self.experiment_id,
             "name": self.name,
             "input_contract": self.input_contract.to_dict(),
@@ -325,6 +333,9 @@ class ExperimentMetadata:
             "code_revision": self.code_revision,
             "terminal_policy": self.terminal_policy,
         }
+        if self.signal_producer_contract is not None:
+            payload["signal_producer_contract"] = self.signal_producer_contract.to_dict()
+        return payload
 
     @property
     def canonical_semantic_json(self) -> str:
@@ -385,7 +396,21 @@ class ExperimentMetadata:
             "code_revision",
             "terminal_policy",
         }
-        if set(semantic) != expected_semantic or set(audit) != {
+        semantic_keys = set(semantic)
+        signal_producer_contract: Any = None
+        if "signal_producer_contract" in semantic_keys:
+            semantic_keys.remove("signal_producer_contract")
+            spc_raw = semantic["signal_producer_contract"]
+            if spc_raw is not None:
+                if not isinstance(spc_raw, Mapping):
+                    raise TypeError("signal_producer_contract must be an object")
+                if "contract_id" in spc_raw:
+                    from ..economic.signal_producer import SignalProducerContract
+
+                    signal_producer_contract = SignalProducerContract.from_dict(spc_raw)
+                else:
+                    signal_producer_contract = VersionedIdentity.from_dict(spc_raw)
+        if semantic_keys != expected_semantic or set(audit) != {
             "created_at_utc",
             "metadata",
         }:
@@ -410,6 +435,7 @@ class ExperimentMetadata:
             product_scope=tuple(str(item) for item in semantic["product_scope"]),
             code_revision=str(semantic["code_revision"]),
             terminal_policy=str(semantic["terminal_policy"]),
+            signal_producer_contract=signal_producer_contract,
             created_at_utc=str(audit["created_at_utc"]),
             metadata=FrozenDict(audit.get("metadata", {})),
         )

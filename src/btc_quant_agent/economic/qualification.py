@@ -404,6 +404,7 @@ class EconomicRunIdentity:
     code_revision: str
     completeness: ResultCompleteness
     replay_input_bundle_sha256: str | None = None
+    signal_producer_contract: VersionedIdentity | None = None
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "product_scope", tuple(self.product_scope))
@@ -451,7 +452,7 @@ class EconomicRunIdentity:
         canonical_json(self.to_dict())
 
     def to_dict(self) -> dict[str, Any]:
-        return {
+        payload: dict[str, Any] = {
             "experiment_revision_id": self.experiment_revision_id,
             "protocol_hash": self.protocol_hash,
             "input_contract": self.input_contract.to_dict(),
@@ -478,6 +479,9 @@ class EconomicRunIdentity:
             "completeness": self.completeness.value,
             "replay_input_bundle_sha256": self.replay_input_bundle_sha256,
         }
+        if self.signal_producer_contract is not None:
+            payload["signal_producer_contract"] = self.signal_producer_contract.to_dict()
+        return payload
 
     @property
     def run_id(self) -> str:
@@ -1023,22 +1027,37 @@ def execute_bound_run(
     replay_input_bundle_sha256: str | None = None
     if validated_bundle is not None:
         bundle_payload = dict(validated_bundle)
-        if causal_execution_inputs and not bundle_payload.get("causal_execution_inputs"):
-            bundle_payload["causal_execution_inputs"] = tuple(causal_execution_inputs)
-            recomputed = ReplayInputBundle(
-                schema_version=bundle_payload["schema_version"],
-                experiment_revision_id=bundle_payload["experiment_revision_id"],
-                protocol_hash=bundle_payload["protocol_hash"],
-                dataset_evidence_id=bundle_payload["dataset_evidence_id"],
-                dataset_content_sha256=bundle_payload["dataset_content_sha256"],
-                input_contract_identity=bundle_payload["input_contract_identity"],
-                signal_set_sha256=bundle_payload["signal_set_sha256"],
-                decision_inputs=tuple(bundle_payload["decision_inputs"]),
-                causal_execution_inputs=tuple(bundle_payload["causal_execution_inputs"]),
-                funding_input_identity=bundle_payload["funding_input_identity"],
-            )
-            bundle_payload = recomputed.to_dict()
+        if causal_execution_inputs:
+            declared_exec_inputs = bundle_payload.get("causal_execution_inputs")
+            if declared_exec_inputs:
+                if list(declared_exec_inputs) != list(causal_execution_inputs):
+                    raise ValueError(
+                        "bundle causal_execution_inputs mismatch with actual simulation execution observations"
+                    )
+            else:
+                bundle_payload["causal_execution_inputs"] = tuple(causal_execution_inputs)
+                recomputed = ReplayInputBundle(
+                    schema_version=bundle_payload["schema_version"],
+                    experiment_revision_id=bundle_payload["experiment_revision_id"],
+                    protocol_hash=bundle_payload["protocol_hash"],
+                    dataset_evidence_id=bundle_payload["dataset_evidence_id"],
+                    dataset_content_sha256=bundle_payload["dataset_content_sha256"],
+                    input_contract_identity=bundle_payload["input_contract_identity"],
+                    signal_set_sha256=bundle_payload["signal_set_sha256"],
+                    decision_inputs=tuple(bundle_payload["decision_inputs"]),
+                    causal_execution_inputs=tuple(bundle_payload["causal_execution_inputs"]),
+                    funding_input_identity=bundle_payload["funding_input_identity"],
+                )
+                bundle_payload = recomputed.to_dict()
         replay_input_bundle_sha256 = bundle_payload["bundle_sha256"]
+
+    spc = protocol.signal_producer_contract
+    spc_identity: VersionedIdentity | None = None
+    if spc is not None:
+        if isinstance(spc, VersionedIdentity):
+            spc_identity = spc
+        elif hasattr(spc, "to_versioned_identity"):
+            spc_identity = spc.to_versioned_identity()
 
     identity = EconomicRunIdentity(
         experiment_revision_id=protocol.experiment_revision_id,
@@ -1066,6 +1085,7 @@ def execute_bound_run(
         code_revision=protocol.code_revision,
         completeness=summary.completeness,
         replay_input_bundle_sha256=replay_input_bundle_sha256,
+        signal_producer_contract=spc_identity,
     )
     accounting = bind_runtime_market_data(summary.to_dict(), candles)
     accounting["formal_decision_input_schema_version"] = (

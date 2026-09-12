@@ -62,6 +62,27 @@ class SignalProducerContract:
         payload["contract_hash"] = self.contract_hash
         return payload
 
+    def to_versioned_identity(self) -> Any:
+        from ..research_contract.models import VersionedIdentity
+
+        return VersionedIdentity(
+            logical_id=self.contract_id,
+            version=self.version,
+            content_sha256=self.contract_hash,
+        )
+
+    @classmethod
+    def from_dict(cls, data: Mapping[str, Any]) -> SignalProducerContract:
+        return cls(
+            contract_id=str(data["contract_id"]),
+            version=str(data["version"]),
+            producer_identity=str(data["producer_identity"]),
+            producer_version=str(data["producer_version"]),
+            rule=str(data["rule"]),
+            parameters=dict(data.get("parameters", {})),
+            contract_hash=str(data.get("contract_hash", "")),
+        )
+
 
 @runtime_checkable
 class SignalProducer(Protocol):
@@ -113,8 +134,15 @@ class SignalProducerRegistry:
         cls._contracts[contract.contract_id] = contract
 
     @classmethod
-    def get_contract(cls, contract_id: str) -> SignalProducerContract | None:
-        return cls._contracts.get(contract_id)
+    def get_contract(
+        cls, contract_id: str, contract_hash: str | None = None
+    ) -> SignalProducerContract | None:
+        contract = cls._contracts.get(contract_id)
+        if contract is None:
+            return None
+        if contract_hash is not None and contract.contract_hash != contract_hash:
+            return None
+        return contract
 
     @classmethod
     def clear(cls) -> None:
@@ -201,9 +229,37 @@ class CanonicalRuleSignalProducer:
         generation_contract: Mapping[str, Any],
         authoritative_contract: SignalProducerContract | None = None,
     ) -> InformationSignal:
+        rule = (
+            authoritative_contract.rule
+            if authoritative_contract is not None
+            else str(generation_contract.get("rule", ""))
+        )
+        if rule == "FIXED_DIRECTION":
+            raise ValueError(
+                "FIXED_DIRECTION is forbidden in CanonicalRuleSignalProducer; "
+                "canonical candidate signals must derive direction from market inputs. "
+                "Use SyntheticFixedSignalProducer for synthetic testing only."
+            )
+        if authoritative_contract is None:
+            raise ValueError(
+                "authoritative_contract is strictly required for CanonicalRuleSignalProducer replay"
+            )
+
+        rule = authoritative_contract.rule
+        params = authoritative_contract.parameters
+        if "rule" in generation_contract and generation_contract["rule"] != rule:
+            raise ValueError(
+                f"generation_contract rule mismatch: contract specifies {rule}, entry declared {generation_contract['rule']}"
+            )
+
+        min_lookback = int(params.get("min_lookback_bars", params.get("lookback_bars", 1)))
+        if "min_lookback_bars" in generation_contract and int(generation_contract["min_lookback_bars"]) != min_lookback:
+            raise ValueError(
+                f"generation_contract min_lookback_bars mismatch: contract specifies {min_lookback}, entry declared {generation_contract['min_lookback_bars']}"
+            )
+
         if not input_candles:
             raise ValueError("signal replay requires non-empty material inputs")
-        min_lookback = int(generation_contract.get("min_lookback_bars", 1))
         if len(input_candles) < min_lookback:
             raise ValueError(
                 f"insufficient lookback for signal replay: required {min_lookback}, got {len(input_candles)}"
@@ -232,7 +288,6 @@ class CanonicalRuleSignalProducer:
             if actual_preimage != expected_preimage:
                 raise ValueError("input preimage hash mismatch during signal replay")
 
-        rule = str(generation_contract.get("rule", ""))
         if rule == "FIXED_DIRECTION":
             raise ValueError(
                 "FIXED_DIRECTION is forbidden in CanonicalRuleSignalProducer; "
@@ -240,11 +295,13 @@ class CanonicalRuleSignalProducer:
                 "Use SyntheticFixedSignalProducer for synthetic testing only."
             )
         elif rule == "MOMENTUM_THRESHOLD":
-            threshold = float(generation_contract.get("threshold_return_bps", 0.0)) / 10_000.0
+            threshold = float(params.get("threshold_return_bps", 0.0)) / 10_000.0
             ret = (input_candles[-1].close - input_candles[0].open) / input_candles[0].open
             direction = 1 if ret > threshold else (-1 if ret < -threshold else 0)
         elif rule == "PRICE_BREAKOUT":
-            breakout_level = float(generation_contract["breakout_level"])
+            if "breakout_level" not in params:
+                raise ValueError("PRICE_BREAKOUT requires breakout_level in authoritative contract parameters")
+            breakout_level = float(params["breakout_level"])
             direction = (
                 1
                 if input_candles[-1].close > breakout_level
@@ -257,18 +314,18 @@ class CanonicalRuleSignalProducer:
                 else (-1 if input_candles[-1].close < input_candles[-1].open else 0)
             )
         else:
-            raise ValueError(f"unsupported rule in generation contract: {rule}")
+            raise ValueError(f"unsupported rule in authoritative contract: {rule}")
 
-        strength = float(generation_contract.get("strength", 1.0))
-        horizon_ms = int(generation_contract.get("horizon_ms", 3_600_000))
-        asset = str(generation_contract.get("asset", input_candles[-1].symbol))
-        ci_raw = generation_contract.get("confidence_interval")
+        strength = float(params.get("strength", 1.0))
+        horizon_ms = int(params.get("horizon_ms", 3_600_000))
+        asset = str(params.get("asset", input_candles[-1].symbol))
+        ci_raw = params.get("confidence_interval")
         confidence_interval = (
             tuple(ci_raw)
             if isinstance(ci_raw, (list, tuple)) and len(ci_raw) == 2
             else None
         )
-        metadata = dict(generation_contract.get("metadata", {}))
+        metadata = dict(params.get("metadata", {}))
 
         return InformationSignal(
             signal_id=signal_id,

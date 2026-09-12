@@ -521,7 +521,12 @@ def test_b04r_canonical_return_sign_positive_control(tmp_path: Path) -> None:
     # Determine natural return sign from candle 1: close > open -> +1, else -1
     c1 = ctx["candles"][1]
     expected_direction = 1 if c1.close > c1.open else (-1 if c1.close < c1.open else 0)
-    sig = replace(ctx["signal"], direction=expected_direction)
+    sig = replace(
+        ctx["signal"],
+        direction=expected_direction,
+        confidence_interval=None,
+        metadata={},
+    )
 
     bundle = _build_b04r_bundle(ctx, signal=sig, rule="RETURN_SIGN")
     assert bundle.bundle_sha256 is not None

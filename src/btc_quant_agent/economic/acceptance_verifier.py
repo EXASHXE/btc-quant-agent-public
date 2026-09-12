@@ -325,10 +325,23 @@ def validate_persisted_decision_input_bindings(
 ) -> None:
     bundle_raw = accounting.get("formal_replay_input_bundle")
     identity_bundle_hash = run_identity.get("replay_input_bundle_sha256")
-    has_legacy = "formal_decision_input_bindings" in accounting
+    has_legacy = bool(accounting.get("formal_decision_input_bindings"))
 
-    # Check completeness requirement for runs with signals/inputs
-    if run_identity.get("completeness") == "COMPLETE" and (
+    # A3 repair: completeness requirement derives from run semantics, not evidence presence
+    empty_signal_hash = canonical_sha256([])
+    signal_set_hash = run_identity.get("signal_set_sha256")
+    has_signals = signal_set_hash is not None and signal_set_hash != empty_signal_hash
+
+    if run_identity.get("completeness") == "COMPLETE" and has_signals:
+        if bundle_raw is None:
+            raise ValueError(
+                "persisted candidate claims COMPLETE but lacks verified ReplayInputBundle"
+            )
+        if identity_bundle_hash is None:
+            raise ValueError(
+                "persisted candidate claims COMPLETE with signals but lacks replay_input_bundle_sha256 in run_identity"
+            )
+    elif run_identity.get("completeness") == "COMPLETE" and (
         has_legacy or bundle_raw is not None or identity_bundle_hash is not None
     ):
         if bundle_raw is None:
@@ -374,6 +387,23 @@ def validate_persisted_decision_input_bindings(
             expected_contract = thaw_json(input_contract)
             if bundle.get("input_contract_identity") != expected_contract:
                 raise ValueError("replay input bundle input_contract mismatch with run_identity")
+
+        identity_spc = run_identity.get("signal_producer_contract")
+        if identity_spc is not None:
+            expected_cid = identity_spc.get("contract_id") or identity_spc.get("logical_id")
+            expected_chash = identity_spc.get("contract_hash") or identity_spc.get("content_sha256")
+            for entry in bundle.get("decision_inputs", []):
+                if entry.get("producer_contract_id") == "CANONICAL_RANDOM_BENCHMARK_V1":
+                    continue
+                if entry.get("producer_contract_id") != expected_cid:
+                    raise ValueError(
+                        f"replay input bundle producer contract {entry.get('producer_contract_id')} "
+                        f"mismatch with run_identity signal_producer_contract {expected_cid}"
+                    )
+                if expected_chash and entry.get("producer_contract_hash") != expected_chash:
+                    raise ValueError(
+                        "replay input bundle producer contract hash mismatch with run_identity"
+                    )
 
         if bundle.get("signal_set_sha256") != run_identity.get("signal_set_sha256"):
             raise ValueError("replay input bundle signal_set_sha256 mismatch with run_identity")
