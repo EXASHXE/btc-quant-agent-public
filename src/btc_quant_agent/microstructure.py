@@ -53,7 +53,7 @@ def _owned_mutation(method: Callable[..., _T]) -> Callable[..., _T]:
                     continue
                 try:
                     prepare_schema(connection, MICROSTRUCTURE_TABLES,
-                                   legacy_optional=("instance_id", "last_heartbeat_ms"))
+                                   legacy_optional=("sessions.instance_id", "sessions.last_heartbeat_ms"))
                 finally:
                     connection.close()
             try:
@@ -387,7 +387,7 @@ class MicrostructureStore:
             raise RuntimeError(f"finalized partition is immutable: {path.name}")
         connection = sqlite3.connect(path, timeout=10)
         try:
-            prepare_schema(connection, MICROSTRUCTURE_TABLES, legacy_optional=("instance_id", "last_heartbeat_ms"))
+            prepare_schema(connection, MICROSTRUCTURE_TABLES, legacy_optional=("sessions.instance_id", "sessions.last_heartbeat_ms"))
         except BaseException:
             connection.close()
             raise

@@ -112,12 +112,14 @@ def test_cross_partition_projection_survives_reordered_source(tmp_path):
         assert rows[1]["aggressive_side"] == "BUY"
 
 
-def test_cross_partition_mutator_rejects_missing_schema_before_write(tmp_path):
+@pytest.mark.parametrize("table,column,marker", [("agg_trades", "price", 1), ("coverage_segments", "instance_id", 0), ("process_instances", "last_heartbeat_ms", 0)])
+def test_cross_partition_mutator_rejects_missing_schema_before_write(tmp_path, table, column, marker):
     owner = store(tmp_path)
     owner.append_trade(trade())
     path = tmp_path / "microstructure-1970-01-01.sqlite3"
     with sqlite3.connect(path) as conn:
-        conn.execute("ALTER TABLE agg_trades DROP COLUMN price")
+        conn.execute(f"ALTER TABLE {table} DROP COLUMN {column}")
+        conn.execute(f"PRAGMA user_version={marker}")
     with pytest.raises(SQLiteSchemaError, match="NOT_TESTABLE"):
         owner.heartbeat(200, "synthetic")
     assert not owner.finalized_manifest_path.exists()

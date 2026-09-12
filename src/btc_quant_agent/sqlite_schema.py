@@ -58,7 +58,8 @@ def require_columns(connection: sqlite3.Connection, tables: Iterable[str], *, le
     optional = set(legacy_optional) if schema_version(connection) == 0 else set()
     for table in tables:
         actual = {str(row[1]) for row in connection.execute(f"PRAGMA table_info({table})")}
-        missing = set(COLUMNS[table]) - optional - actual
+        adapted = {name for name in COLUMNS[table] if name in optional or f"{table}.{name}" in optional}
+        missing = set(COLUMNS[table]) - adapted - actual
         if missing:
             raise SQLiteSchemaError(f"SQLite schema {table} missing {sorted(missing)}: NOT_TESTABLE")
 
