@@ -10,6 +10,9 @@ import urllib.parse
 import urllib.request
 from typing import Any
 
+from .binance import classify_public_error
+from .rest import BoundedRequester, RequestPolicy, shared_coordinator
+
 ENDPOINTS: tuple[tuple[str, str, dict[str, str]], ...] = (
     ("ping", "/fapi/v1/ping", {}),
     ("premium_index", "/fapi/v1/premiumIndex", {"symbol": "BTCUSDT"}),
@@ -87,12 +90,15 @@ def diagnose_binance_network(
     *, base_url: str = "https://fapi.binance.com", timeout: float = 10.0
 ) -> dict[str, Any]:
     started = int(time.time() * 1_000)
-    host = urllib.parse.urlsplit(base_url).hostname or "fapi.binance.com"
+    origin = urllib.parse.urlsplit(base_url)
+    host = origin.hostname or "fapi.binance.com"
+    requester = BoundedRequester(RequestPolicy(timeout, timeout, 1, 0, 0, 0.05),
+                                 shared_coordinator(f"{origin.scheme.lower()}://{origin.netloc.lower()}"))
     try:
-        addresses = sorted({row[4][0] for row in socket.getaddrinfo(host, 443)})
+        addresses = requester.run(lambda: sorted({row[4][0] for row in socket.getaddrinfo(host, 443)}), retryable=lambda _: False)
         dns = {"status": "OK", "address_count": len(addresses)}
-    except socket.gaierror as exc:
-        dns = {"status": "DNS_ERROR", "error_type": type(exc).__name__}
+    except (socket.gaierror, TimeoutError) as exc:
+        dns = {"status": _classify(exc), "error_type": type(exc).__name__}
     endpoints: dict[str, Any] = {}
     for name, path, params in ENDPOINTS:
         query = urllib.parse.urlencode(params)
@@ -102,14 +108,16 @@ def diagnose_binance_network(
             request = urllib.request.Request(
                 url, headers={"User-Agent": "btc-quant-agent-network-diagnostic/0.3.13"}
             )
-            with urllib.request.urlopen(request, timeout=timeout) as response:
-                payload = response.read()
-                json.loads(payload.decode("utf-8"))
-                endpoints[name] = {
-                    "status": "OK",
-                    "http_status": int(response.status),
-                    "latency_ms": round((time.perf_counter() - endpoint_started) * 1_000, 3),
-                }
+            def fetch(request: urllib.request.Request = request) -> int:
+                with urllib.request.urlopen(request, timeout=requester.transport_timeout) as response:
+                    payload = response.read(2 * 1024 * 1024 + 1)
+                    if len(payload) > 2 * 1024 * 1024:
+                        raise ValueError("REST response exceeds size bound")
+                    json.loads(payload.decode("utf-8"))
+                    return int(response.status)
+            status = requester.run(fetch, retryable=lambda exc: classify_public_error(exc)[1])
+            endpoints[name] = {"status": "OK", "http_status": status,
+                               "latency_ms": round((time.perf_counter() - endpoint_started) * 1_000, 3)}
         except Exception as exc:  # noqa: BLE001 - diagnostic maps every transport failure
             endpoints[name] = {
                 "status": _classify(exc),

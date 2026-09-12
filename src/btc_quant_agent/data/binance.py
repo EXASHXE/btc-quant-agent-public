@@ -7,12 +7,14 @@ import time
 import urllib.error
 import urllib.parse
 import urllib.request
-from dataclasses import dataclass, replace
+from collections.abc import Callable
+from dataclasses import dataclass, field, replace
 from typing import Any
 
 from ..config import DataConfig
 from ..domain import Candle, DerivativesSnapshot
 from ..time_boundary import ClockBoundaryError, monotonic_elapsed_ms
+from .rest import BoundedRequester, RequestPolicy, shared_coordinator
 
 INTERVAL_MS = {
     "1m": 60_000,
@@ -41,6 +43,8 @@ def classify_public_error(exc: BaseException) -> tuple[str, bool]:
         return "HTTP_4XX_NON_RETRYABLE", False
     if isinstance(reason, socket.gaierror):
         return "DNS_ERROR", True
+    if isinstance(reason, ssl.SSLCertVerificationError):
+        return "TLS_CERTIFICATE_ERROR", False
     if isinstance(reason, ssl.SSLError):
         text = str(reason).lower()
         return (
@@ -55,7 +59,7 @@ def classify_public_error(exc: BaseException) -> tuple[str, bool]:
             "TLS_HANDSHAKE_TIMEOUT" if "handshake" in text else "CONNECT_TIMEOUT",
             True,
         )
-    if isinstance(reason, (ConnectionResetError, BrokenPipeError)):
+    if isinstance(reason, (ConnectionResetError, ConnectionRefusedError, BrokenPipeError)):
         return "CONNECTION_RESET", True
     if isinstance(exc, (json.JSONDecodeError, UnicodeDecodeError, ValueError)):
         return "SCHEMA_ERROR", False
@@ -76,6 +80,35 @@ class DerivativeCollection:
 @dataclass
 class BinancePublicClient:
     config: DataConfig
+    _requester: BoundedRequester = field(init=False, repr=False)
+
+    def __post_init__(self) -> None:
+        origin = urllib.parse.urlsplit(self.config.rest_base_url)
+        self._requester = BoundedRequester(
+            RequestPolicy.for_timeout(self.config.request_timeout_seconds),
+            shared_coordinator(f"{origin.scheme.lower()}://{origin.netloc.lower()}"),
+        )
+
+    def _request(
+        self, path: str, params: dict[str, Any] | None = None, *,
+        validate: Callable[[Any], bool] | None = None, attempts: list[dict[str, Any]] | None = None,
+    ) -> Any:
+        records = attempts if attempts is not None else []
+
+        def operation() -> Any:
+            started = time.perf_counter()
+            number = len(records) + 1
+            try:
+                payload = self._get(path, params)
+                if validate is not None and not validate(payload):
+                    raise BinanceDataError("SCHEMA_ERROR: required response fields absent", "SCHEMA_ERROR")
+                records.append({"attempt": number, "status": "SUCCESS", "latency_ms": round((time.perf_counter() - started) * 1000, 3), "error_class": None})
+                return payload
+            except BinanceDataError as exc:
+                records.append({"attempt": number, "status": "FAILED", "latency_ms": round((time.perf_counter() - started) * 1000, 3), "error_class": exc.error_class})
+                raise
+
+        return self._requester.run(operation, retryable=lambda exc: isinstance(exc, BinanceDataError) and exc.retryable)
 
     def _get(self, path: str, params: dict[str, Any] | None = None) -> Any:
         query = urllib.parse.urlencode(params or {})
@@ -85,9 +118,12 @@ class BinancePublicClient:
         request = urllib.request.Request(url, headers={"User-Agent": "btc-quant-agent/0.2.1"})
         try:
             with urllib.request.urlopen(
-                request, timeout=self.config.request_timeout_seconds
+                request, timeout=self._requester.transport_timeout
             ) as response:
-                return json.loads(response.read().decode("utf-8"))
+                encoded = response.read(2 * 1024 * 1024 + 1)
+                if len(encoded) > 2 * 1024 * 1024:
+                    raise BinanceDataError("REST response exceeds size bound", "SCHEMA_ERROR")
+                return json.loads(encoded.decode("utf-8"))
         except (
             urllib.error.URLError,
             TimeoutError,
@@ -96,18 +132,18 @@ class BinancePublicClient:
         ) as exc:
             error_class, retryable = classify_public_error(exc)
             raise BinanceDataError(
-                f"Binance public data request failed [{error_class}]: {exc}",
+                f"Binance public data request failed [{error_class}]",
                 error_class,
                 retryable,
             ) from exc
 
     def server_time_ms(self) -> int:
-        payload = self._get("/fapi/v1/time")
+        payload = self._request("/fapi/v1/time")
         return int(payload["serverTime"])
 
     def klines(self, symbol: str, interval: str, limit: int = 500) -> list[Candle]:
         now_ms = self.server_time_ms()
-        rows = self._get(
+        rows = self._request(
             "/fapi/v1/klines", {"symbol": symbol.upper(), "interval": interval, "limit": limit}
         )
         return self._parse_klines(rows, symbol, interval, now_ms)
@@ -150,7 +186,7 @@ class BinancePublicClient:
         cursor = start_time_ms
         rows: list[list[Any]] = []
         while cursor <= end_time_ms:
-            page = self._get(
+            page = self._request(
                 "/fapi/v1/klines",
                 {
                     "symbol": symbol.upper(),
@@ -216,67 +252,16 @@ class BinancePublicClient:
 
         def attempt(name: str, path: str, params: dict[str, Any]) -> Any:
             attempts: list[dict[str, Any]] = []
-            for number in range(1, 4):
-                attempt_started = time.perf_counter()
-                try:
-                    payload = self._get(path, params)
-                    if not valid_payload(name, payload):
-                        latency = round((time.perf_counter() - attempt_started) * 1_000, 3)
-                        attempts.append(
-                            {
-                                "attempt": number,
-                                "status": "FAILED",
-                                "latency_ms": latency,
-                                "error_class": "SCHEMA_ERROR",
-                            }
-                        )
-                        errors[name] = "SCHEMA_ERROR: required response fields absent"
-                        telemetry[name] = {
-                            "attempt_count": number,
-                            "success": False,
-                            "final_error_class": "SCHEMA_ERROR",
-                            "attempts": attempts,
-                        }
-                        return None
-                    attempts.append(
-                        {
-                            "attempt": number,
-                            "status": "SUCCESS",
-                            "latency_ms": round(
-                                (time.perf_counter() - attempt_started) * 1_000, 3
-                            ),
-                            "error_class": None,
-                        }
-                    )
-                    telemetry[name] = {
-                        "attempt_count": number,
-                        "success": True,
-                        "final_error_class": None,
-                        "attempts": attempts,
-                    }
-                    return payload
-                except BinanceDataError as exc:
-                    attempts.append(
-                        {
-                            "attempt": number,
-                            "status": "FAILED",
-                            "latency_ms": round(
-                                (time.perf_counter() - attempt_started) * 1_000, 3
-                            ),
-                            "error_class": exc.error_class,
-                        }
-                    )
-                    if not exc.retryable or number == 3:
-                        errors[name] = str(exc)
-                        telemetry[name] = {
-                            "attempt_count": number,
-                            "success": False,
-                            "final_error_class": exc.error_class,
-                            "attempts": attempts,
-                        }
-                        return None
-                    time.sleep(0.1 * number)
-            raise AssertionError("bounded retry loop exhausted unexpectedly")
+            try:
+                payload = self._request(path, params, validate=lambda value: valid_payload(name, value), attempts=attempts)
+            except BinanceDataError as exc:
+                errors[name] = str(exc)
+                telemetry[name] = {"attempt_count": len(attempts), "success": False,
+                                   "final_error_class": exc.error_class, "attempts": attempts}
+                return None
+            telemetry[name] = {"attempt_count": len(attempts), "success": True,
+                               "final_error_class": None, "attempts": attempts}
+            return payload
 
         premium = attempt("funding_mark_index", "/fapi/v1/premiumIndex", {"symbol": symbol}) or {}
         oi = attempt("open_interest", "/fapi/v1/openInterest", {"symbol": symbol}) or {}

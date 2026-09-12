@@ -13,6 +13,8 @@ from typing import Any
 from urllib.error import HTTPError, URLError
 from urllib.request import Request
 
+from .data.binance import classify_public_error
+from .data.rest import BoundedRequester, RequestPolicy, shared_coordinator
 from .evidence_epoch import EvidenceEpochRegistry
 from .opportunity_forward import OpportunityCampaignRegistry
 
@@ -143,14 +145,18 @@ def check_network_proxy(*, url_opener: Any = None) -> dict[str, Any]:
             headers={"User-Agent": "btc-quant-agent/0.3.21"},
         )
         opener = url_opener or urllib.request.urlopen
-        with opener(req, timeout=5.0) as resp:
-            code = getattr(resp, "status", getattr(resp, "code", 200))
-            if code == 200:
-                binance_status = "OK"
-                binance_detail = "reachable"
-            else:
-                binance_status = f"HTTP_{code}"
-                binance_detail = f"unexpected HTTP status {code}"
+        requester = BoundedRequester(RequestPolicy(5.0, 5.0, 1, 0, 0, 0.05),
+                                     shared_coordinator("https://fapi.binance.com"))
+        def fetch_status() -> int:
+            with opener(req, timeout=requester.transport_timeout) as resp:
+                return int(getattr(resp, "status", getattr(resp, "code", 200)))
+        code = requester.run(fetch_status, retryable=lambda exc: classify_public_error(exc)[1])
+        if code == 200:
+            binance_status = "OK"
+            binance_detail = "reachable"
+        else:
+            binance_status = f"HTTP_{code}"
+            binance_detail = f"unexpected HTTP status {code}"
     except HTTPError as exc:
         if exc.code == 451:
             binance_status = "HTTP_451_REGION_RESTRICTED"
