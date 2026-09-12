@@ -918,6 +918,8 @@ class ResearchContractRegistry:
             random_record = require_mapping(random_value, "random distribution")
             trials = require_list(random_record.get("trials"), "random trials")
             random_payload = {"seed": random_record.get("seed"), "trials": trials}
+            if "provenance" in random_record:
+                random_payload["provenance"] = random_record["provenance"]
             distribution_id = random_record.get("distribution_id")
             if distribution_id != f"random-distribution@{canonical_sha256(random_payload)}":
                 raise EvidenceValidationError("random distribution identity mismatch")
@@ -1050,7 +1052,7 @@ class ResearchContractRegistry:
             from ..economic.acceptance_verifier import (
                 validate_persisted_qualification_semantics,
             )
-            validate_persisted_qualification_semantics(semantic, dataset_reference)
+            validate_persisted_qualification_semantics(semantic, dataset_reference, protocol=protocol)
         except (KeyError, TypeError, ValueError) as exc:
             raise EvidenceValidationError(
                 f"formal P6 semantic replay failed: {exc}"

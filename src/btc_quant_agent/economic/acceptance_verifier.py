@@ -1478,7 +1478,7 @@ def _gate_payload(
 
 
 def validate_persisted_qualification_semantics(
-    semantic: Mapping[str, Any], dataset_evidence: Any
+    semantic: Mapping[str, Any], dataset_evidence: Any, *, protocol: Any = None,
 ) -> None:
     comparison = _require_mapping(semantic.get("comparison_contract"), "comparison contract")
     scope = _require_list(comparison.get("product_scope"), "product_scope")
@@ -1516,6 +1516,15 @@ def validate_persisted_qualification_semantics(
     )
     if run_artifact.get("result_id") != expected_run_id:
         raise ValueError("candidate run result id is not replayable")
+
+    from .execution_replay import verify_execution_replay
+    from .qualification import ComparisonContract
+
+    comparison_contract = ComparisonContract.from_payload(comparison)
+    verify_execution_replay(
+        run_semantic, protocol=protocol, comparison=comparison_contract,
+        dataset_evidence=dataset_evidence,
+    )
 
     suite = _require_mapping(semantic.get("benchmark_suite"), "benchmark suite")
     rules = _require_mapping(comparison.get("matching_rules"), "matching rules")
@@ -1639,6 +1648,12 @@ def validate_persisted_qualification_semantics(
         }
         _close(distribution.get("aggregate"), expected_aggregate, "random aggregate")
 
+    from .execution_replay import verify_benchmark_replay
+
+    verify_benchmark_replay(
+        run_semantic, suite, protocol=protocol, comparison=comparison_contract,
+        dataset_evidence=dataset_evidence,
+    )
     required = _require_list(comparison.get("required_benchmarks"), "required benchmarks")
     availability = {
         "CASH": cash_accounting is not None,

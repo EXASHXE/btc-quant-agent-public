@@ -341,6 +341,17 @@ class ComparisonContract:
             "evidence_requirements": list(self.evidence_requirements),
         }
 
+    @classmethod
+    def from_payload(cls, raw: Mapping[str, Any]) -> ComparisonContract:
+        payload = dict(raw)
+        for name in ("candidate_policy", "cost_model", "execution_model", "funding_model"):
+            payload[name] = VersionedIdentity.from_dict(payload[name])
+        payload["data_interval"] = DataIntervalIdentity(**payload["data_interval"])
+        payload["metrics_contract"] = ReturnMetricsContract(**payload["metrics_contract"])
+        payload["matching_rules"] = BenchmarkMatchingRules(**payload["matching_rules"])
+        payload["hurdles"] = tuple(EconomicHurdle(**item) for item in payload["hurdles"])
+        return cls(**payload)
+
     @property
     def contract_hash(self) -> str:
         return canonical_sha256(self.semantic_payload())
@@ -589,6 +600,7 @@ class FormalBenchmarkResult:
 class RandomBenchmarkDistribution:
     seed: int
     trials: tuple[FormalBenchmarkResult, ...]
+    provenance: FrozenDict = field(default_factory=FrozenDict)
 
     def __post_init__(self) -> None:
         if type(self.seed) is not int:
@@ -599,6 +611,7 @@ class RandomBenchmarkDistribution:
         if any(item.trial_id != index for index, item in enumerate(values)):
             raise ValueError("random trial ids must be contiguous from zero")
         object.__setattr__(self, "trials", values)
+        object.__setattr__(self, "provenance", FrozenDict(self.provenance))
         canonical_json(self.to_dict())
 
     @property
@@ -629,6 +642,7 @@ class RandomBenchmarkDistribution:
         return {
             "distribution_id": self.distribution_id,
             "seed": self.seed,
+            "provenance": thaw_json(self.provenance),
             "trial_count": len(self.trials),
             "comparable": self.comparable,
             "aggregate": {
@@ -643,6 +657,7 @@ class RandomBenchmarkDistribution:
     def distribution_id(self) -> str:
         payload = {
             "seed": self.seed,
+            "provenance": thaw_json(self.provenance),
             "trials": [item.to_dict() for item in self.trials],
         }
         return f"random-distribution@{canonical_sha256(payload)}"
@@ -1139,6 +1154,11 @@ def execute_bound_run(
         accounting["formal_replay_input_bundle"] = bundle_payload
         accounting["formal_replay_input_bundle_sha256"] = bundle_payload["bundle_sha256"]
     accounting["formal_run_identity"] = identity.to_dict()
+    from .execution_replay import execution_replay_inputs
+
+    accounting["formal_execution_replay_inputs"] = execution_replay_inputs(
+        protocol, dataset_evidence, engine, funding_events
+    )
     verify_formal_accounting(
         accounting,
         product=protocol.product_scope[0],
@@ -1182,7 +1202,7 @@ def build_formal_benchmark_suite(
         raise ValueError("benchmark funding-event set differs from candidate run")
     selected = set(comparison.required_benchmarks + comparison.descriptive_benchmarks)
     cash = (
-        _cash_benchmark(comparison, candidate_run, candles)
+        _cash_benchmark(comparison, candles)
         if BenchmarkKind.CASH in selected
         else None
     )
@@ -1241,6 +1261,13 @@ def evaluate_formal_economic_qualification(
         comparison.eligible_opportunity_set_sha256
     ):
         raise ValueError("benchmark suite opportunity set differs from comparison")
+
+    from .execution_replay import verify_benchmark_replay
+
+    verify_benchmark_replay(
+        candidate_run.semantic_payload(), benchmarks.to_dict(), protocol=protocol,
+        comparison=comparison,
+    )
 
     reasons: list[str] = []
     if candidate_run.identity.completeness is not ResultCompleteness.COMPLETE:
@@ -1455,6 +1482,11 @@ def _validate_candidate_run_binding(
         comparison.initial_capital
     ):
         raise ValueError("candidate accounting initial capital mismatch")
+    from .execution_replay import verify_execution_replay
+
+    verify_execution_replay(
+        candidate_run.semantic_payload(), protocol=protocol, comparison=comparison,
+    )
 
 
 def _verify_local_evidence(evidence: EvidenceReference) -> None:
@@ -1471,14 +1503,9 @@ def _verify_local_evidence(evidence: EvidenceReference) -> None:
 
 def _cash_benchmark(
     comparison: ComparisonContract,
-    candidate_run: EconomicRunResult,
     candles: Sequence[Candle],
 ) -> FormalBenchmarkResult:
-    accounting = _accounting_copy(candidate_run)
-    curve_value = accounting.get("equity_curve")
-    if not isinstance(curve_value, list):
-        raise TypeError("candidate equity_curve must be a JSON array")
-    timestamps = [int(point[0]) for point in curve_value]
+    timestamps = [candle.close_time_ms for candle in candles]
     curve = [(timestamp, comparison.initial_capital) for timestamp in timestamps]
     summary = summarize_ledger(
         initial_cash=comparison.initial_capital,
@@ -1595,15 +1622,25 @@ def _random_matched_benchmark(
         for item in ordered_opportunities
     ):
         raise ValueError("eligible opportunity lies outside the comparison interval")
+    provenance = FrozenDict({
+        "schema_version": "1.0.0",
+        "algorithm": "PYTHON_MT19937_RANDRANGE63_SAMPLE_SHUFFLE_TIMESTAMP_ID_V1",
+        "randomization_unit": comparison.randomization_unit,
+        "opportunities": [item.to_dict() for item in ordered_opportunities],
+        "opportunity_set_sha256": eligible_opportunity_set_sha256(ordered_opportunities),
+        "direction_template": direction_template,
+        "candidate_run_result_id": candidate_run.result_id,
+        "sample_size": len(opens),
+    })
     if len(ordered_opportunities) < len(opens):
-        return RandomBenchmarkDistribution(seed=comparison.random_seed, trials=())
+        return RandomBenchmarkDistribution(seed=comparison.random_seed, trials=(), provenance=provenance)
     master = random.Random(comparison.random_seed)
     trials: list[FormalBenchmarkResult] = []
     for trial_id in range(comparison.random_trials):
         trial_seed = master.randrange(0, 2**63)
         rng = random.Random(trial_seed)
         selected = rng.sample(ordered_opportunities, len(opens))
-        selected.sort(key=lambda item: item.timestamp_ms)
+        selected.sort(key=lambda item: (item.timestamp_ms, item.opportunity_id))
         directions = list(direction_template)
         rng.shuffle(directions)
         signals = [
@@ -1689,7 +1726,9 @@ def _random_matched_benchmark(
                 run_result_id=run.result_id,
             )
         )
-    return RandomBenchmarkDistribution(seed=comparison.random_seed, trials=tuple(trials))
+    return RandomBenchmarkDistribution(
+        seed=comparison.random_seed, trials=tuple(trials), provenance=provenance,
+    )
 
 
 def _matching_diagnostics(

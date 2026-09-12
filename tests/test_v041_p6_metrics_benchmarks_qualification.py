@@ -381,6 +381,7 @@ def _formal_artifacts(
         decision_inputs=(
             _decision_input_binding(signal, dataset, candles, protocol),
         ),
+        funding_events=funding_events,
     )
     run = execute_bound_run(
         protocol=protocol,
@@ -1148,7 +1149,7 @@ def _refresh_suite_identity(suite: dict[str, Any]) -> None:
         for trial in trials:
             _refresh_benchmark_record_id(trial)
         random_record["distribution_id"] = "random-distribution@" + canonical_sha256(
-            {"seed": random_record["seed"], "trials": trials}
+            {"seed": random_record["seed"], "provenance": random_record["provenance"], "trials": trials}
         )
     suite_payload = {
         key: suite.get(key)
