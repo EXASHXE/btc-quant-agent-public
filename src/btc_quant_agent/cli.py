@@ -27,6 +27,7 @@ from .data.manifest import build_manifest, write_manifest
 from .data.network_diagnostic import diagnose_binance_network
 from .engine import EngineMode, QuantEngine
 from .explain import explain_signal
+from .formal_research import run_formal_job_file
 from .forward_evidence import forward_evidence_status, forward_operations_health
 from .microstructure import MicrostructureCampaign, MicrostructureStore, run_daemon
 from .opportunity_forward import (
@@ -39,6 +40,7 @@ from .opportunity_forward import (
 from .research import replay_decisions, run_full_suite, write_research_artifacts
 from .research_registry import RegistryError, ResearchRegistry
 from .service import QuantService
+from .shadow import read_legacy_shadow_performance
 
 
 def _print(payload: Any) -> None:
@@ -76,7 +78,7 @@ def build_parser() -> argparse.ArgumentParser:
     decision.add_argument("decision", choices=["accept", "ignore"])
     decision.add_argument("--entry", type=float)
 
-    performance = sub.add_parser("performance", help="shadow performance")
+    performance = sub.add_parser("performance", help="read legacy diagnostic R shadow performance")
     performance.add_argument("--days", type=int, default=30)
 
     sub.add_parser("health", help="health and execution-capability check")
@@ -106,7 +108,14 @@ def build_parser() -> argparse.ArgumentParser:
     download.add_argument("--end-ms", type=int, required=True)
     download.add_argument("--interval", choices=["1m", "5m", "15m", "1h", "4h"], default="1m")
 
-    backtest = sub.add_parser("backtest", help="replay a canonical 1m CSV")
+    for name in ("backtest", "research", "replay"):
+        formal = sub.add_parser(name, help="current formal P5/P6 workflow; explicit job required")
+        formal.add_argument("--job", required=True, help="versioned formal job JSON and protocol")
+        formal.add_argument("--output", required=True, help="new immutable formal artifact root")
+        formal.add_argument("--registry", help="existing authoritative P5 registry")
+        formal.add_argument("--record-decision", action="store_true", help="explicit P5 decision")
+
+    backtest = sub.add_parser("legacy-backtest", help="legacy v0.2.2 R diagnostics; cannot promote")
     backtest.add_argument("path")
     backtest.add_argument(
         "--derivatives", help="historical derivatives CSV for backward as-of replay"
@@ -377,13 +386,13 @@ def build_parser() -> argparse.ArgumentParser:
     registry_show = registry_sub.add_parser("show")
     registry_show.add_argument("component_id")
 
-    replay = sub.add_parser("replay", help="emit every causal 15m decision and rejection")
+    replay = sub.add_parser("legacy-replay", help="legacy v0.2.2 decision diagnostics; cannot promote")
     replay.add_argument("path")
     replay.add_argument("--derivatives")
     replay.add_argument("--start-ms", type=int)
     replay.add_argument("--end-ms", type=int)
 
-    research = sub.add_parser("research", help="run the frozen validation suite")
+    research = sub.add_parser("legacy-research", help="legacy v0.3 frozen suite; cannot promote")
     research.add_argument("path")
     research.add_argument("--data-manifest", required=True)
     research.add_argument("--derivatives")
@@ -412,6 +421,20 @@ def build_parser() -> argparse.ArgumentParser:
 
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
+    if args.command in {"backtest", "research", "replay"}:
+        # Formal commands never construct the runtime service or its default DB.
+        if args.config is not None:
+            load_config(args.config)  # retain explicit-config failure semantics
+        try:
+            result = run_formal_job_file(
+                args.job, output_directory=args.output, registry_path=args.registry,
+                record_decision=args.record_decision,
+            )
+        except (OSError, ValueError, TypeError, KeyError, RuntimeError) as exc:
+            _print({"classification": "NOT_TESTABLE_FOR_NEW_PROMOTION", "error": str(exc)})
+            return 2
+        _print(result.status())
+        return 0
     if args.command == "research-registry":
         try:
             registry = ResearchRegistry.load(args.registry)
@@ -467,7 +490,7 @@ def main(argv: list[str] | None = None) -> int:
         return 0
     if args.command == "performance":
         since = int(time.time() * 1000) - args.days * 86_400_000
-        _print(service.repository.performance(since))
+        _print(read_legacy_shadow_performance(service.repository, since))
         return 0
     if args.command == "health":
         _print(service.health())
@@ -952,7 +975,7 @@ def main(argv: list[str] | None = None) -> int:
         report = audit_official_timeframes(args.root, months)
         _print(report)
         return 0 if report["price_time_passed"] else 2
-    if args.command == "replay":
+    if args.command == "legacy-replay":
         historical_config = _historical_config(args.config)
         bars = read_candles(args.path)
         if args.start_ms is not None:
@@ -962,15 +985,16 @@ def main(argv: list[str] | None = None) -> int:
         derivative_store = (
             HistoricalDerivativeStore.from_csv(args.derivatives) if args.derivatives else None
         )
-        _print(
-            replay_decisions(
+        _print({
+            "classification": "LEGACY_DIAGNOSTIC_ONLY", "can_promote": False,
+            "diagnostics": replay_decisions(
                 bars,
                 QuantEngine(historical_config, mode=EngineMode.LEGACY_RESEARCH_V022),
                 derivative_store,
-            )
-        )
+            ),
+        })
         return 0
-    if args.command == "research":
+    if args.command == "legacy-research":
         historical_config = _historical_config(args.config)
         bars = read_candles(args.path)
         if not bars or any(bar.interval != "1m" for bar in bars):
@@ -1001,9 +1025,10 @@ def main(argv: list[str] | None = None) -> int:
         except RuntimeError as exc:
             _print({"error": str(exc)})
             return 2
-        _print({"status": "written", "output": output})
+        _print({"status": "written", "output": output,
+                "classification": "LEGACY_DIAGNOSTIC_ONLY", "can_promote": False})
         return 0
-    if args.command == "backtest":
+    if args.command == "legacy-backtest":
         historical_config = _historical_config(args.config)
         bars = read_candles(args.path)
         if not bars or any(bar.interval != "1m" for bar in bars):
@@ -1026,6 +1051,7 @@ def main(argv: list[str] | None = None) -> int:
             return 2
         _print(
             {
+                "classification": "LEGACY_DIAGNOSTIC_ONLY", "can_promote": False,
                 "validation_status": historical_config.runtime.validation_status,
                 "metrics": metrics(outcomes),
                 "monte_carlo": monte_carlo(outcomes, args.monte_carlo),

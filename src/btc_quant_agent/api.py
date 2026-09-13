@@ -106,7 +106,9 @@ def create_app() -> FastAPI:
         if days < 1 or days > 3650:
             raise HTTPException(422, "days must be between 1 and 3650")
         since_ms = int(time.time() * 1000) - days * 86_400_000
-        return service.repository.performance(since_ms)
+        from .shadow import read_legacy_shadow_performance
+
+        return read_legacy_shadow_performance(service.repository, since_ms)
 
     @app.get("/execution/status")
     def execution_status() -> dict[str, object]:

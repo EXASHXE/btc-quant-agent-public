@@ -9,8 +9,9 @@ from .data.binance import BinancePublicClient
 from .domain import ScanResult, UserDecision
 from .engine import EngineMode, QuantEngine
 from .execution.service import ExecutionService
+from .formal_research import FormalResearchJobSpec
 from .notify.feishu import send_invalidation, send_signal
-from .shadow import update_shadow
+from .shadow import update_formal_shadow
 from .storage import Repository
 from .time_boundary import validate_clock_skew
 
@@ -96,10 +97,16 @@ class QuantService:
                 )
         return result
 
-    def update_shadow(self) -> list[dict[str, object]]:
-        now_ms = self.client.server_time_ms()
-        bars = self.client.klines(self.config.runtime.symbol, "1m", 500)
-        return update_shadow(self.repository, bars, now_ms, self.config.backtest)
+    def update_shadow(
+        self, spec: FormalResearchJobSpec | None = None, *, output_directory: str | None = None,
+    ) -> list[dict[str, object]]:
+        if spec is None:
+            return [{
+                "classification": "NOT_TESTABLE_FOR_NEW_PROMOTION", "execution": "DISABLED",
+                "reason": "formal shadow requires an explicit protocol/PIT-evidence job; "
+                          "legacy runtime signals are not converted to formal evidence",
+            }]
+        return update_formal_shadow(spec, output_directory=output_directory)
 
     def mark_decision(
         self, signal_id: str, decision: str, actual_entry: float | None = None

@@ -1,3 +1,9 @@
+"""Historical frozen v0.3 suite: LEGACY_DIAGNOSTIC_ONLY, not current qualification.
+
+Retained for historical readers/runners; new clients use formal_research.
+P5/P6 promotion requires canonical replay/provenance, not these R summaries.
+"""
+
 from __future__ import annotations
 
 import csv
