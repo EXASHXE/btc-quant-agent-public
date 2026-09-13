@@ -1,3 +1,8 @@
+"""Legacy R-based diagnostics and compatibility imports, never P5/P6 authority.
+
+New economic consumers must use btc_quant_agent.formal_research.
+"""
+
 from __future__ import annotations
 
 import math
@@ -5,25 +10,20 @@ import random
 from collections import deque
 from collections.abc import Sequence
 from dataclasses import asdict, dataclass
-from itertools import pairwise
 from typing import Any
 
 from .config import BacktestConfig
 from .data.derivatives import HistoricalDerivativeStore
+from .data.funding import FundingEvent
 from .data.quality import validate_candles
+from .data.resample import INTERVAL_MS, resample
 from .domain import Candle, Direction, Signal
 from .engine import QuantEngine
 
-INTERVAL_MS = {"1m": 60_000, "15m": 900_000, "1h": 3_600_000, "4h": 14_400_000}
-
-
-@dataclass(frozen=True)
-class FundingEvent:
-    """A point-in-time funding settlement, not a forward-filled rate estimate."""
-
-    timestamp_ms: int
-    funding_rate: float
-    mark_price: float | None = None
+__all__ = [
+    "INTERVAL_MS", "BacktestEngine", "EventDrivenBacktestEngine", "FundingEvent", "TradeOutcome", "bootstrap",
+    "metrics", "monte_carlo", "resample", "resolve_signal",
+]
 
 
 @dataclass(frozen=True)
@@ -60,43 +60,6 @@ class TradeOutcome:
         payload = asdict(self)
         payload["net_r"] = self.net_r
         return payload
-
-
-def resample(candles: Sequence[Candle], interval: str) -> list[Candle]:
-    bucket_ms = INTERVAL_MS[interval]
-    buckets: dict[int, list[Candle]] = {}
-    for bar in candles:
-        bucket = (bar.open_time_ms // bucket_ms) * bucket_ms
-        buckets.setdefault(bucket, []).append(bar)
-    output: list[Candle] = []
-    expected_children = bucket_ms // INTERVAL_MS[candles[0].interval] if candles else 0
-    for bucket, children in sorted(buckets.items()):
-        if len(children) != expected_children:
-            continue
-        children = sorted(children, key=lambda item: item.open_time_ms)
-        if any(
-            current.open_time_ms - previous.open_time_ms != INTERVAL_MS[candles[0].interval]
-            for previous, current in pairwise(children)
-        ):
-            continue
-        output.append(
-            Candle(
-                symbol=children[0].symbol,
-                interval=interval,
-                open_time_ms=bucket,
-                close_time_ms=bucket + bucket_ms - 1,
-                open=children[0].open,
-                high=max(item.high for item in children),
-                low=min(item.low for item in children),
-                close=children[-1].close,
-                volume=sum(item.volume for item in children),
-                quote_volume=sum(item.quote_volume for item in children),
-                taker_buy_base_volume=sum(item.taker_buy_base_volume for item in children),
-                trades=sum(item.trades for item in children),
-                closed=True,
-            )
-        )
-    return output
 
 
 def _funding_cashflow(

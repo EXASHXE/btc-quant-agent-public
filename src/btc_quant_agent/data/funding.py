@@ -1,9 +1,17 @@
 from __future__ import annotations
 
 import csv
+from dataclasses import dataclass
 from pathlib import Path
 
-from ..backtest import FundingEvent
+
+@dataclass(frozen=True)
+class FundingEvent:
+    """Historical CSV settlement representation, not the formal funding model."""
+
+    timestamp_ms: int
+    funding_rate: float
+    mark_price: float | None = None
 
 
 def read_funding_events_csv(path: str | Path) -> list[FundingEvent]:

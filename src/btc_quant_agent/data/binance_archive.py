@@ -349,7 +349,7 @@ def audit_official_timeframes(
     intervals: tuple[str, ...] = ("15m", "1h", "4h"),
 ) -> dict[str, Any]:
     """Compare local 1m resampling with checksum-verified official archives."""
-    from ..backtest import INTERVAL_MS, resample
+    from .resample import INTERVAL_MS, resample
 
     target = Path(root)
     comparisons: list[dict[str, Any]] = []
