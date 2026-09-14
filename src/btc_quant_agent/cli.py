@@ -9,23 +9,19 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
-from .backtest import BacktestEngine, bootstrap, metrics, monte_carlo
-from .config import AppConfig, load_config
+from .config import load_config
 from .data.binance import BinancePublicClient
 from .data.binance_archive import audit_official_timeframes, build_official_dataset
 from .data.collector import collect_derivative_snapshot
-from .data.csvio import read_candles, write_candles
-from .data.derivatives import HistoricalDerivativeStore
+from .data.csvio import write_candles
 from .data.forward_store import (
     ForwardDerivativeStore,
     collect_once,
     next_collection_time_ms,
     scheduler_status,
 )
-from .data.funding import read_funding_events_csv
 from .data.manifest import build_manifest, write_manifest
 from .data.network_diagnostic import diagnose_binance_network
-from .engine import EngineMode, QuantEngine
 from .explain import explain_signal
 from .formal_research import run_formal_job_file
 from .forward_evidence import forward_evidence_status, forward_operations_health
@@ -37,7 +33,6 @@ from .opportunity_forward import (
     opportunity_scheduler_status,
     resolve_opportunity_outcomes,
 )
-from .research import replay_decisions, run_full_suite, write_research_artifacts
 from .research_registry import RegistryError, ResearchRegistry
 from .service import QuantService
 from .shadow import read_legacy_shadow_performance
@@ -49,10 +44,6 @@ def _print(payload: Any) -> None:
 
 def _service(config_path: str | None) -> QuantService:
     return QuantService.create(load_config(config_path))
-
-
-def _historical_config(config_path: str | None) -> AppConfig:
-    return load_config(config_path or "configs/frozen/v0.2.2.toml")
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -114,14 +105,6 @@ def build_parser() -> argparse.ArgumentParser:
         formal.add_argument("--output", required=True, help="new immutable formal artifact root")
         formal.add_argument("--registry", help="existing authoritative P5 registry")
         formal.add_argument("--record-decision", action="store_true", help="explicit P5 decision")
-
-    backtest = sub.add_parser("legacy-backtest", help="legacy v0.2.2 R diagnostics; cannot promote")
-    backtest.add_argument("path")
-    backtest.add_argument(
-        "--derivatives", help="historical derivatives CSV for backward as-of replay"
-    )
-    backtest.add_argument("--monte-carlo", type=int, default=2000)
-    backtest.add_argument("--funding-events", help="point-in-time funding settlement CSV")
 
     collector = sub.add_parser(
         "collect-derivatives", help="append a point-in-time public derivatives snapshot"
@@ -385,20 +368,6 @@ def build_parser() -> argparse.ArgumentParser:
     registry_sub.add_parser("status")
     registry_show = registry_sub.add_parser("show")
     registry_show.add_argument("component_id")
-
-    replay = sub.add_parser("legacy-replay", help="legacy v0.2.2 decision diagnostics; cannot promote")
-    replay.add_argument("path")
-    replay.add_argument("--derivatives")
-    replay.add_argument("--start-ms", type=int)
-    replay.add_argument("--end-ms", type=int)
-
-    research = sub.add_parser("legacy-research", help="legacy v0.3 frozen suite; cannot promote")
-    research.add_argument("path")
-    research.add_argument("--data-manifest", required=True)
-    research.add_argument("--derivatives")
-    research.add_argument("--funding-events")
-    research.add_argument("--output")
-    research.add_argument("--seed", type=int, default=7)
 
     dataset = sub.add_parser("build-official-dataset", help="build verified Binance monthly data")
     dataset.add_argument("--root", default="./data/research/BTCUSDT")
@@ -975,94 +944,6 @@ def main(argv: list[str] | None = None) -> int:
         report = audit_official_timeframes(args.root, months)
         _print(report)
         return 0 if report["price_time_passed"] else 2
-    if args.command == "legacy-replay":
-        historical_config = _historical_config(args.config)
-        bars = read_candles(args.path)
-        if args.start_ms is not None:
-            bars = [bar for bar in bars if bar.open_time_ms >= args.start_ms]
-        if args.end_ms is not None:
-            bars = [bar for bar in bars if bar.close_time_ms <= args.end_ms]
-        derivative_store = (
-            HistoricalDerivativeStore.from_csv(args.derivatives) if args.derivatives else None
-        )
-        _print({
-            "classification": "LEGACY_DIAGNOSTIC_ONLY", "can_promote": False,
-            "diagnostics": replay_decisions(
-                bars,
-                QuantEngine(historical_config, mode=EngineMode.LEGACY_RESEARCH_V022),
-                derivative_store,
-            ),
-        })
-        return 0
-    if args.command == "legacy-research":
-        historical_config = _historical_config(args.config)
-        bars = read_candles(args.path)
-        if not bars or any(bar.interval != "1m" for bar in bars):
-            _print({"error": "research requires a non-empty canonical 1m CSV"})
-            return 2
-        derivative_store = (
-            HistoricalDerivativeStore.from_csv(args.derivatives) if args.derivatives else None
-        )
-        funding_events = read_funding_events_csv(args.funding_events) if args.funding_events else []
-        suite = run_full_suite(
-            bars,
-            historical_config,
-            derivative_store,
-            funding_events,
-            seed=args.seed,
-        )
-        output = args.output or (
-            "artifacts/research/" + time.strftime("%Y%m%dT%H%M%SZ", time.gmtime())
-        )
-        try:
-            write_research_artifacts(
-                output,
-                suite,
-                historical_config,
-                data_manifest_path=args.data_manifest,
-                seed=args.seed,
-            )
-        except RuntimeError as exc:
-            _print({"error": str(exc)})
-            return 2
-        _print({"status": "written", "output": output,
-                "classification": "LEGACY_DIAGNOSTIC_ONLY", "can_promote": False})
-        return 0
-    if args.command == "legacy-backtest":
-        historical_config = _historical_config(args.config)
-        bars = read_candles(args.path)
-        if not bars or any(bar.interval != "1m" for bar in bars):
-            _print({"error": "backtest requires a non-empty canonical 1m CSV"})
-            return 2
-        try:
-            derivative_store = (
-                HistoricalDerivativeStore.from_csv(args.derivatives) if args.derivatives else None
-            )
-            funding_events = (
-                read_funding_events_csv(args.funding_events) if args.funding_events else []
-            )
-            outcomes = BacktestEngine(
-                QuantEngine(historical_config, mode=EngineMode.LEGACY_RESEARCH_V022),
-                derivative_store,
-                funding_events,
-            ).run(bars)
-        except ValueError as exc:
-            _print({"error": str(exc)})
-            return 2
-        _print(
-            {
-                "classification": "LEGACY_DIAGNOSTIC_ONLY", "can_promote": False,
-                "validation_status": historical_config.runtime.validation_status,
-                "metrics": metrics(outcomes),
-                "monte_carlo": monte_carlo(outcomes, args.monte_carlo),
-                "bootstrap": bootstrap(outcomes, args.monte_carlo),
-                "block_bootstrap": bootstrap(
-                    outcomes, args.monte_carlo, block_size=max(1, round(len(outcomes) ** 0.5))
-                ),
-                "outcomes": [item.as_dict() for item in outcomes],
-            }
-        )
-        return 0
     if args.command == "daemon":
         while True:
             try:

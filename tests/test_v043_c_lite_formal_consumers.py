@@ -102,8 +102,9 @@ def test_t1_t2_generic_commands_use_formal_without_service_or_legacy(tmp_path, m
     job, _ = _job(tmp_path, ctx)
     forbidden = Mock(side_effect=AssertionError("legacy/runtime consumer called"))
     monkeypatch.setattr(cli, "_service", forbidden)
-    monkeypatch.setattr(cli, "run_full_suite", forbidden)
-    monkeypatch.setattr(cli.BacktestEngine, "run", forbidden)
+    assert not hasattr(cli, "run_full_suite")
+    assert not hasattr(cli, "BacktestEngine")
+    monkeypatch.setattr("btc_quant_agent.backtest.BacktestEngine.run", forbidden)
     assert cli.main([command, "--job", str(job), "--output", str(tmp_path / "output")]) == 0
     status = json.loads(capsys.readouterr().out)
     assert status["classification"] == "FORMAL_CURRENT"
