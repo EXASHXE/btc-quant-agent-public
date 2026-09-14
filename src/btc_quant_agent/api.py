@@ -51,7 +51,6 @@ def create_app() -> FastAPI:
 
     @app.get("/signals/latest")
     def latest() -> dict[str, object]:
-        service.repository.expire_signals(int(time.time() * 1000))
         signal = service.repository.latest_signal()
         if signal is None:
             raise HTTPException(404, "signal not found")
@@ -59,7 +58,6 @@ def create_app() -> FastAPI:
 
     @app.get("/signals/{signal_id}")
     def get_signal(signal_id: str) -> dict[str, object]:
-        service.repository.expire_signals(int(time.time() * 1000))
         signal = service.repository.get_signal(signal_id)
         if signal is None:
             raise HTTPException(404, "signal not found")

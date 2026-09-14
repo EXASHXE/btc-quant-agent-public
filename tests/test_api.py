@@ -35,7 +35,7 @@ class ApiCorrectnessTests(unittest.TestCase):
             if getattr(route, "path", None) == path and method in getattr(route, "methods", set())
         )
 
-    def test_signal_routes_expire_before_returning(self) -> None:
+    def test_signal_routes_do_not_mutate_or_expire_signals(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             path = str(Path(directory) / "api.db")
             config = AppConfig(storage=StorageConfig(sqlite_path=path))
@@ -46,8 +46,11 @@ class ApiCorrectnessTests(unittest.TestCase):
                 app = api.create_app()
             latest = self._endpoint(app, "/signals/latest", "GET")()
             shown = self._endpoint(app, "/signals/{signal_id}", "GET")(item.signal_id)
-            self.assertEqual(latest["status"], SignalStatus.EXPIRED.value)
-            self.assertEqual(shown["status"], SignalStatus.EXPIRED.value)
+            self.assertEqual(latest["status"], SignalStatus.ACTIVE.value)
+            self.assertEqual(shown["status"], SignalStatus.ACTIVE.value)
+            persisted = repo.get_signal(item.signal_id)
+            assert persisted is not None
+            self.assertEqual(persisted.status, SignalStatus.ACTIVE)
 
     def test_performance_days_query_is_applied(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
