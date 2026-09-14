@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from .benchmarks import BenchmarkEngine, BenchmarkResult
 from .execution_model import ConditionalTriggerTime, ExecutionModel, ExecutionResult
 from .fee_model import FeeModel, SlippageMode
 from .funding import FundingModel, FundingSettlement
@@ -90,10 +89,8 @@ __all__ = [
     "AmbiguousEntryRejectionError",
     "AmbiguousExecutionRejectionError",
     "AmbiguousExitRejectionError",
-    "BenchmarkEngine",
     "BenchmarkKind",
     "BenchmarkMatchingRules",
-    "BenchmarkResult",
     "CanonicalRuleSignalProducer",
     "CausalLiquidityRejectionError",
     "ComparisonContract",
