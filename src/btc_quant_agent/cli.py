@@ -12,7 +12,6 @@ from typing import Any
 from .config import load_config
 from .data.binance import BinancePublicClient
 from .data.binance_archive import audit_official_timeframes, build_official_dataset
-from .data.collector import collect_derivative_snapshot
 from .data.csvio import write_candles
 from .data.forward_store import (
     ForwardDerivativeStore,
@@ -21,7 +20,6 @@ from .data.forward_store import (
     scheduler_status,
 )
 from .data.manifest import build_manifest, write_manifest
-from .data.network_diagnostic import diagnose_binance_network
 from .explain import explain_signal
 from .formal_research import run_formal_job_file
 from .forward_evidence import forward_evidence_status, forward_operations_health
@@ -106,18 +104,10 @@ def build_parser() -> argparse.ArgumentParser:
         formal.add_argument("--registry", help="existing authoritative P5 registry")
         formal.add_argument("--record-decision", action="store_true", help="explicit P5 decision")
 
-    collector = sub.add_parser(
-        "collect-derivatives", help="append a point-in-time public derivatives snapshot"
-    )
-    collector.add_argument("--path", default="./data/BTCUSDT-derivatives.csv")
-    collector.add_argument("--manifest")
-    collector.add_argument("--samples", type=int, default=1)
-    collector.add_argument("--interval-seconds", type=int, default=900)
-    collector.add_argument("--include-order-book", action="store_true")
 
     derivatives = sub.add_parser("derivatives", help="append-safe forward PIT derivatives")
     derivatives_sub = derivatives.add_subparsers(dest="derivatives_command", required=True)
-    for name in ("collect-once", "run", "status", "audit", "export", "diagnose-network"):
+    for name in ("collect-once", "run", "status", "audit", "export"):
         command = derivatives_sub.add_parser(name)
         command.add_argument("--store", default="./data/forward/BTCUSDT/derivatives.sqlite3")
         if name in {"collect-once", "run"}:
@@ -219,19 +209,13 @@ def build_parser() -> argparse.ArgumentParser:
             default="configs/forward/v0.3.15_microstructure_capture_campaign.json",
         )
 
-    micro_research = sub.add_parser(
-        "microstructure-research", help="H39 causal microstructure alpha research and diagnostics"
-    )
-    micro_res_sub = micro_research.add_subparsers(
-        dest="microstructure_research_command", required=True
-    )
     # H39 blind validation interface
     h39_parser = sub.add_parser(
         "h39", help="H39 blind validation accumulation and operational status"
     )
     h39_sub = h39_parser.add_subparsers(dest="h39_command", required=True)
 
-    for p_sub in (h39_sub, micro_res_sub):
+    for p_sub in (h39_sub,):
         h39_accum = p_sub.add_parser(
             "validation-accumulate", help="accumulate validation evidence into blind ledger"
         )
@@ -429,11 +413,20 @@ def main(argv: list[str] | None = None) -> int:
             return 2
         return 0
 
-    service = _service(args.config)
+    _cached_service: QuantService | None = None
+
+    def _get_service() -> QuantService:
+        nonlocal _cached_service
+        if _cached_service is None:
+            _cached_service = _service(args.config)
+        return _cached_service
+
     if args.command == "scan":
+        service = _get_service()
         _print(service.scan(args.symbol, not args.no_notify).as_dict())
         return 0
     if args.command == "signal":
+        service = _get_service()
         service.repository.expire_signals(int(time.time() * 1000))
         signal = (
             service.repository.latest_signal()
@@ -443,6 +436,7 @@ def main(argv: list[str] | None = None) -> int:
         _print(signal.as_dict() if signal else {"error": "signal not found"})
         return 0 if signal else 2
     if args.command == "explain":
+        service = _get_service()
         signal = service.repository.get_signal(args.signal_id)
         if signal is None:
             _print({"error": "signal not found"})
@@ -450,6 +444,7 @@ def main(argv: list[str] | None = None) -> int:
         _print(explain_signal(signal))
         return 0
     if args.command == "decision":
+        service = _get_service()
         try:
             service.mark_decision(args.signal_id, args.decision, args.entry)
         except KeyError as exc:
@@ -458,13 +453,16 @@ def main(argv: list[str] | None = None) -> int:
         _print({"status": "recorded", "signal_id": args.signal_id})
         return 0
     if args.command == "performance":
+        service = _get_service()
         since = int(time.time() * 1000) - args.days * 86_400_000
         _print(read_legacy_shadow_performance(service.repository, since))
         return 0
     if args.command == "health":
+        service = _get_service()
         _print(service.health())
         return 0
     if args.command == "execution":
+        service = _get_service()
         try:
             if args.execution_command == "status":
                 payload = service.execution.status()
@@ -486,7 +484,7 @@ def main(argv: list[str] | None = None) -> int:
         _print(payload)
         return 0
     if args.command == "download":
-        client = BinancePublicClient(service.config.data)
+        client = BinancePublicClient(load_config(args.config).data)
         bars = client.historical_klines("BTCUSDT", args.interval, args.start_ms, args.end_ms)
         write_candles(args.path, bars)
         manifest = build_manifest(
@@ -513,32 +511,7 @@ def main(argv: list[str] | None = None) -> int:
             }
         )
         return 0
-    if args.command == "collect-derivatives":
-        if args.samples < 1 or args.interval_seconds < 1:
-            _print({"error": "samples and interval-seconds must be positive"})
-            return 2
-        client = BinancePublicClient(service.config.data)
-        collected_manifest = None
-        for index in range(args.samples):
-            collected_manifest = collect_derivative_snapshot(
-                client,
-                args.path,
-                include_order_book=args.include_order_book,
-                manifest_path=args.manifest,
-            )
-            if index + 1 < args.samples:
-                time.sleep(args.interval_seconds)
-        assert collected_manifest is not None
-        _print({"status": "collected", "manifest": collected_manifest.as_dict()})
-        return 0
     if args.command == "derivatives":
-        if args.derivatives_command == "diagnose-network":
-            report = diagnose_binance_network(
-                base_url=service.config.data.rest_base_url,
-                timeout=service.config.data.request_timeout_seconds,
-            )
-            _print(report)
-            return 0 if report["overall_status"] == "OK" else 2
         store = ForwardDerivativeStore(args.store)
         if args.derivatives_command == "collect-once":
             if getattr(args, "require_active_epoch", False):
@@ -571,7 +544,7 @@ def main(argv: list[str] | None = None) -> int:
                     )
                     return 0
             record = collect_once(
-                BinancePublicClient(service.config.data),
+                BinancePublicClient(load_config(args.config).data),
                 store,
                 symbol=args.symbol,
                 include_order_book=args.include_order_book,
@@ -611,7 +584,7 @@ def main(argv: list[str] | None = None) -> int:
             if args.max_samples is not None and args.max_samples < 1:
                 _print({"error": "max-samples must be positive"})
                 return 2
-            client = BinancePublicClient(service.config.data)
+            client = BinancePublicClient(load_config(args.config).data)
             collected = 0
             while args.max_samples is None or collected < args.max_samples:
                 now_ms = int(time.time() * 1000)
@@ -684,6 +657,7 @@ def main(argv: list[str] | None = None) -> int:
         assert campaign is not None
         opportunity_store = OpportunityForwardStore(args.store)
         if args.opportunity_command == "collect-once":
+            service = _get_service()
             now_ms = int(time.time() * 1000)
             slot_ms = (now_ms // 900_000) * 900_000
             if campaign.has_data_quality_gate and slot_ms < campaign.campaign_start_ms:
@@ -717,7 +691,7 @@ def main(argv: list[str] | None = None) -> int:
                 return 0
             _print(
                 resolve_opportunity_outcomes(
-                    BinancePublicClient(service.config.data), opportunity_store, campaign
+                    BinancePublicClient(load_config(args.config).data), opportunity_store, campaign
                 )
             )
             return 0
@@ -795,10 +769,8 @@ def main(argv: list[str] | None = None) -> int:
             }
         _print(report)
         return 0
-    if args.command in ("h39", "microstructure-research"):
-        cmd = getattr(args, "h39_command", None) or getattr(
-            args, "microstructure_research_command", None
-        )
+    if args.command == "h39":
+        cmd = args.h39_command
         from .microstructure_research import (
             H39BlindLedger,
             H39OneShotUnblindGatekeeper,
@@ -945,6 +917,7 @@ def main(argv: list[str] | None = None) -> int:
         _print(report)
         return 0 if report["price_time_passed"] else 2
     if args.command == "daemon":
+        service = _get_service()
         while True:
             try:
                 shadow = service.update_shadow()
