@@ -1,0 +1,279 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "schema_version": "1.0.0",
+  "identity": {
+    "round": "v0.5.0_R02",
+    "title": "Runtime and Entry-Surface Convergence",
+    "starting_code_sha": "f0a00a86157e71dad8e93fee06d89a728c1d64e9",
+    "final_code_sha": "6fe04536f79c95b3ba6cbb9522f39cf53d10ec48",
+    "prompt_branch": "v0.5-refactor-docs",
+    "prompt_path": "prompts/v0.5/implementation/v0.5.0_R02_runtime_orchestration_convergence.md",
+    "prompt_commit": "3a233f58df86deab7955a182e470537a13b2aca8"
+  },
+  "metrics_comparison": {
+    "tracked_files": {
+      "before": 367,
+      "after": 368,
+      "delta": "+1 (guard test file)"
+    },
+    "src_python_files": {
+      "before": 85,
+      "after": 85,
+      "delta": 0
+    },
+    "src_loc": {
+      "before": 32715,
+      "after": 32607,
+      "delta": -108
+    },
+    "tools_python_files": {
+      "before": 7,
+      "after": 7,
+      "delta": 0
+    },
+    "tools_loc": {
+      "before": 773,
+      "after": 773,
+      "delta": 0
+    },
+    "test_python_files": {
+      "before": 81,
+      "after": 82,
+      "delta": "+1"
+    },
+    "test_loc": {
+      "before": 23296,
+      "after": 23497,
+      "delta": "+201"
+    },
+    "non_test_loc": {
+      "before": 33669,
+      "after": 33561,
+      "delta": -108
+    },
+    "cli_top_level_commands": {
+      "before": 22,
+      "after": 20,
+      "delta": -2
+    },
+    "cli_leaf_commands": {
+      "before": 62,
+      "after": 51,
+      "delta": -11,
+      "reduction_pct": "-17.7%"
+    },
+    "api_routes_total": {
+      "before": 14,
+      "after": 6,
+      "delta": -8,
+      "reduction_pct": "-57.1%"
+    },
+    "api_routes_read_only": {
+      "before": 6,
+      "after": 6,
+      "delta": 0
+    },
+    "api_routes_mutating": {
+      "before": 8,
+      "after": 0,
+      "delta": -8,
+      "reduction_pct": "-100.0%"
+    },
+    "runtime_service_eager_callsites": {
+      "before": 1,
+      "after": 0,
+      "delta": -1,
+      "status": "lazy on-demand only"
+    },
+    "internal_module_edges": {
+      "before": 654,
+      "after": 651,
+      "delta": -3
+    },
+    "pytest_test_count": {
+      "before": 976,
+      "after": 998,
+      "delta": "+22"
+    }
+  },
+  "cli_surface": {
+    "retained_top_level_count": 20,
+    "retained_leaf_count": 51,
+    "removed_surfaces": [
+      {
+        "command": "microstructure-research validation-accumulate",
+        "canonical_replacement": "h39 validation-accumulate",
+        "rationale": "Exact alias duplicate; h39 is the canonical blind validation entrypoint",
+        "negative_test": "test_removed_cli_commands_fail_at_parser_level"
+      },
+      {
+        "command": "microstructure-research scheduled-accumulate",
+        "canonical_replacement": "h39 scheduled-accumulate",
+        "rationale": "Exact alias duplicate",
+        "negative_test": "test_removed_cli_commands_fail_at_parser_level"
+      },
+      {
+        "command": "microstructure-research validation-status",
+        "canonical_replacement": "h39 validation-status",
+        "rationale": "Exact alias duplicate",
+        "negative_test": "test_removed_cli_commands_fail_at_parser_level"
+      },
+      {
+        "command": "microstructure-research validation-readiness",
+        "canonical_replacement": "h39 validation-readiness",
+        "rationale": "Exact alias duplicate",
+        "negative_test": "test_removed_cli_commands_fail_at_parser_level"
+      },
+      {
+        "command": "microstructure-research freeze-cutoff",
+        "canonical_replacement": "h39 freeze-cutoff",
+        "rationale": "Exact alias duplicate",
+        "negative_test": "test_removed_cli_commands_fail_at_parser_level"
+      },
+      {
+        "command": "microstructure-research one-shot-unblind",
+        "canonical_replacement": "h39 one-shot-unblind",
+        "rationale": "Exact alias duplicate",
+        "negative_test": "test_removed_cli_commands_fail_at_parser_level"
+      },
+      {
+        "command": "microstructure-research verify-integrity",
+        "canonical_replacement": "h39 verify-integrity",
+        "rationale": "Exact alias duplicate",
+        "negative_test": "test_removed_cli_commands_fail_at_parser_level"
+      },
+      {
+        "command": "microstructure-research generate-deliverables",
+        "canonical_replacement": "h39 generate-deliverables",
+        "rationale": "Exact alias duplicate",
+        "negative_test": "test_removed_cli_commands_fail_at_parser_level"
+      },
+      {
+        "command": "microstructure-research backup-ledger",
+        "canonical_replacement": "h39 backup-ledger",
+        "rationale": "Exact alias duplicate",
+        "negative_test": "test_removed_cli_commands_fail_at_parser_level"
+      },
+      {
+        "command": "collect-derivatives",
+        "canonical_replacement": "derivatives collect-once",
+        "rationale": "Legacy flat CSV snapshot collector; superseded by append-safe SQLite forward store",
+        "negative_test": "test_removed_cli_commands_fail_at_parser_level"
+      },
+      {
+        "command": "derivatives diagnose-network",
+        "canonical_replacement": "forward-evidence doctor",
+        "rationale": "Redundant network ping diagnostic; forward-evidence doctor is canonical diagnostic suite",
+        "negative_test": "test_removed_cli_commands_fail_at_parser_level"
+      }
+    ]
+  },
+  "api_surface": {
+    "retained_routes_count": 6,
+    "retained_routes": [
+      {
+        "method": "GET",
+        "path": "/health",
+        "purpose": "System health and store connectivity check"
+      },
+      {
+        "method": "GET",
+        "path": "/signals/latest",
+        "purpose": "Inspect latest generated signal"
+      },
+      {
+        "method": "GET",
+        "path": "/signals/{signal_id}",
+        "purpose": "Inspect specific signal by ID"
+      },
+      {
+        "method": "GET",
+        "path": "/signals/{signal_id}/explanation",
+        "purpose": "Signal breakdown and attribution"
+      },
+      {
+        "method": "GET",
+        "path": "/performance",
+        "purpose": "Historical shadow performance metrics"
+      },
+      {
+        "method": "GET",
+        "path": "/execution/status",
+        "purpose": "Execution subsystem disabled status verification"
+      }
+    ],
+    "removed_routes_count": 8,
+    "removed_routes": [
+      {
+        "method": "POST",
+        "path": "/scan",
+        "rationale": "Mutating scan trigger removed from API; CLI `scan` remains canonical operator tool"
+      },
+      {
+        "method": "POST",
+        "path": "/signals/{signal_id}/decision",
+        "rationale": "Signal acceptance/rejection mutation removed from API; CLI `decision` is operator tool"
+      },
+      {
+        "method": "POST",
+        "path": "/execution/plans/entry/{signal_id}",
+        "rationale": "Execution mutation endpoint removed while live execution is disabled"
+      },
+      {
+        "method": "POST",
+        "path": "/execution/plans/{plan_id}/submit",
+        "rationale": "Execution mutation endpoint removed while live execution is disabled"
+      },
+      {
+        "method": "POST",
+        "path": "/execution/plans/{plan_id}/reconcile",
+        "rationale": "Execution mutation endpoint removed while live execution is disabled"
+      },
+      {
+        "method": "POST",
+        "path": "/execution/close/preview",
+        "rationale": "Execution mutation endpoint removed while live execution is disabled"
+      },
+      {
+        "method": "POST",
+        "path": "/execution/close/{plan_id}/submit",
+        "rationale": "Execution mutation endpoint removed while live execution is disabled"
+      },
+      {
+        "method": "POST",
+        "path": "/execution/plans/{plan_id}/cancel",
+        "rationale": "Execution mutation endpoint removed while live execution is disabled"
+      }
+    ]
+  },
+  "service_construction": {
+    "policy": "Strict lazy construction on demand via _get_service()",
+    "offline_commands_isolated": [
+      "backtest",
+      "research",
+      "replay",
+      "h39 *",
+      "forward-evidence *",
+      "microstructure-forward *",
+      "build-official-dataset",
+      "audit-official-timeframes",
+      "download",
+      "derivatives (collect-once, run, status, audit, export)",
+      "research-registry *"
+    ]
+  },
+  "negative_guards": {
+    "guard_test_file": "tests/test_v050_r02_orchestration_guards.py",
+    "test_count": 22,
+    "covered_invariants": [
+      "Formal research facade exclusive routing (backtest, research, replay)",
+      "Formal dispatch occurs before QuantService construction",
+      "Removed CLI commands fail at parser level (11 commands tested)",
+      "Surface catalog confirms removed commands and routes are absent",
+      "Offline commands do not construct QuantService or touch DB",
+      "Removed mutating API routes return 404 and are not registered in FastAPI routing table",
+      "Retained API routes are non-mutating (GET only)",
+      "Execution safety defaults remain enabled=False across all configurations"
+    ]
+  }
+}
