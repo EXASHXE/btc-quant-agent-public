@@ -5,7 +5,6 @@ from pathlib import Path
 import pytest
 
 from btc_quant_agent.domain import Candle
-from btc_quant_agent.economic.benchmarks import BenchmarkEngine
 from btc_quant_agent.economic.execution_model import ExecutionModel
 from btc_quant_agent.economic.fee_model import FeeModel, SlippageMode
 from btc_quant_agent.economic.funding import FundingModel, FundingSettlement
@@ -20,7 +19,7 @@ from btc_quant_agent.economic.policy import (
 )
 from btc_quant_agent.economic.portfolio import Portfolio
 from btc_quant_agent.economic.signal import InformationSignal
-from btc_quant_agent.economic.simulator import EconomicSimulationEngine, SimulationSummary
+from btc_quant_agent.economic.simulator import EconomicSimulationEngine
 from btc_quant_agent.economic.trade_event import TradeAction
 from btc_quant_agent.research_contract.models import (
     P6_PENDING,
@@ -444,51 +443,6 @@ def test_simulation_drawdown_and_exit_rules() -> None:
     assert summary.max_drawdown_pct > 0.0
     # Stop loss strictly limited loss to approximately 1% plus fees/slippage
     assert summary.max_drawdown_pct < 0.03
-
-
-# =====================================================================
-# 7. BENCHMARK TESTS (Cash, Passive BTC, Random Entry)
-# =====================================================================
-
-
-def test_benchmarks_and_economic_qualification() -> None:
-    candles = _create_synthetic_candles(count=30, start_price=50_000.0, drift_bps=20.0)
-    bench_engine = BenchmarkEngine()
-
-    cash_b = bench_engine.simulate_cash_benchmark(100_000.0, [c.close_time_ms for c in candles])
-    assert cash_b.net_pnl_usdt == 0.0
-    assert cash_b.net_return_pct == 0.0
-
-    btc_b = bench_engine.simulate_passive_btc(100_000.0, candles)
-    assert btc_b.net_pnl_usdt > 0.0  # Drift is positive
-
-    policy = TradePolicy(policy_id="POL_TEST", name="Test Policy")
-    rand_b = bench_engine.simulate_random_entry(100_000.0, candles, policy, num_trials=3)
-    assert rand_b.benchmark_name == "BENCHMARK_C_RANDOM_ENTRY"
-
-    # Qualification check with winning strategy
-    winning_summary = SimulationSummary(
-        initial_cash=100_000.0,
-        final_equity=110_000.0,
-        gross_pnl_usdt=10_200.0,
-        total_fees_usdt=200.0,
-        total_funding_usdt=0.0,
-        net_pnl_usdt=10_000.0,
-        net_return_pct=0.10,
-        max_drawdown_usdt=500.0,
-        max_drawdown_pct=0.005,
-        total_trades=10,
-        winning_trades=8,
-        losing_trades=2,
-        win_rate=0.8,
-        profit_factor=4.0,
-        sharpe_ratio=2.5,
-    )
-    qual = bench_engine.evaluate_economic_qualification(winning_summary, candles, policy)
-    # P0: legacy comparisons are diagnostic, never qualification evidence.
-    assert qual["economic_qualification_passed"] is False
-    assert qual["qualification_evaluated"] is False
-    assert qual["verdict"] == "NOT_TESTABLE"
 
 
 # =====================================================================

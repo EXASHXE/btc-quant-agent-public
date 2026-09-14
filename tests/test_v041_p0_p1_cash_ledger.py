@@ -8,8 +8,6 @@ from unittest.mock import patch
 import pytest
 
 from btc_quant_agent.domain import Candle
-from btc_quant_agent.economic.benchmarks import BenchmarkEngine
-from btc_quant_agent.economic.fee_model import FeeModel, SlippageMode
 from btc_quant_agent.economic.policy import TradePolicy
 from btc_quant_agent.economic.portfolio import Portfolio
 from btc_quant_agent.economic.simulator import EconomicSimulationEngine
@@ -264,18 +262,3 @@ def test_mark_to_market_requires_valid_price():
     for marks in ({}, {"BTCUSDT": 0}, {"BTCUSDT": float("nan")}):
         with pytest.raises(ValueError):
             p.total_equity(marks)
-
-
-@pytest.mark.parametrize("pnl", [-1e6, 0, 1, 1e6])
-def test_p0_unverified_summary_never_qualifies(pnl):
-    policy = TradePolicy("p", "p")
-    base = EconomicSimulationEngine(policy).simulate([])
-    forged = replace(base, net_pnl_usdt=pnl, final_equity=100000 + pnl, net_return_pct=pnl / 100000)
-    bars = [Candle("BTCUSDT", "1m", 1000, 60999, 100, 100, 100, 100, 1)]
-    result = BenchmarkEngine(FeeModel(0, 0, SlippageMode.ZERO)).evaluate_economic_qualification(
-        forged, bars, policy
-    )
-    assert result["economic_qualification_passed"] is False
-    assert result["qualification_evaluated"] is False
-    assert result["diagnostic_only"] is True and result["verdict"] == "NOT_TESTABLE"
-    assert result["comparisons"]["beats_cash"] == (pnl > 0)

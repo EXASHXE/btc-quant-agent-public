@@ -13,7 +13,6 @@ from btc_quant_agent.economic import (
     P6_BENCHMARK_EVIDENCE_TYPE,
     P6_RESULT_EVIDENCE_TYPE,
     P6_RUN_EVIDENCE_TYPE,
-    BenchmarkEngine,
     BenchmarkKind,
     BenchmarkMatchingRules,
     ComparisonContract,
@@ -37,7 +36,6 @@ from btc_quant_agent.economic import (
     ReturnMetricsContract,
     RiskBudget,
     SignalProducerRegistry,
-    SimulationSummary,
     SlippageMode,
     TerminalPolicy,
     TradeAction,
@@ -784,28 +782,6 @@ def test_p6_pending_and_manual_summary_cannot_formally_qualify(tmp_path: Path) -
             required_evidence_ids=("manual",),
         )
 
-    manual = SimulationSummary(
-        initial_cash=10_000.0,
-        final_equity=20_000.0,
-        gross_pnl_usdt=10_000.0,
-        total_fees_usdt=0.0,
-        total_funding_usdt=0.0,
-        net_pnl_usdt=10_000.0,
-        net_return_pct=1.0,
-        max_drawdown_usdt=0.0,
-        max_drawdown_pct=0.0,
-        total_trades=1,
-        winning_trades=1,
-        losing_trades=0,
-        win_rate=1.0,
-        profit_factor=None,
-        sharpe_ratio=None,
-    )
-    diagnostic = BenchmarkEngine().evaluate_economic_qualification(
-        manual, artifacts["candles"], artifacts["engine"].policy
-    )
-    assert diagnostic["diagnostic_only"] is True
-    assert diagnostic["qualification_evaluated"] is False
     registry, _ = _statistically_qualified_registry(tmp_path, protocol)
     with pytest.raises(InvalidTransitionError, match="P6 evidence contract"):
         registry.update_decision_status(

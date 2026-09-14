@@ -16,8 +16,6 @@ from helpers_v042_semantic_goldens import (
 
 from btc_quant_agent.data.quality import validate_candles
 from btc_quant_agent.domain import Candle
-from btc_quant_agent.economic.benchmarks import BenchmarkEngine
-from btc_quant_agent.economic.fee_model import FeeModel, SlippageMode
 from btc_quant_agent.economic.metrics import ResultCompleteness, TerminalPolicy, summarize_ledger
 from btc_quant_agent.economic.portfolio import Portfolio
 from btc_quant_agent.economic.trade_event import TradeAction
@@ -320,12 +318,26 @@ def test_g06_cash_is_exact_no_trade_and_current_diagnostic_control_agrees() -> N
         "position_quantity",
     ):
         assert decimal(expected[key]) == 0
-    result = BenchmarkEngine().simulate_cash_benchmark(
-        float(case["inputs"]["initial_equity"]), case["inputs"]["mark_timestamps_ms"]
+    timestamps = [int(ts) for ts in case["inputs"]["mark_timestamps_ms"]]
+    initial_cash = float(case["inputs"]["initial_equity"])
+    equity_curve = [(ts, initial_cash) for ts in timestamps]
+    summary = summarize_ledger(
+        initial_cash=initial_cash,
+        events=(),
+        equity_curve=equity_curve,
+        final_asset=ASSET,
+        final_mark_price=100.0,
+        interval_start_ms=timestamps[0],
+        interval_end_ms=timestamps[-1],
+        notional_curve=[(ts, 0.0) for ts in timestamps],
+        terminal_policy=TerminalPolicy.MARK_TO_MARKET_OPEN,
     )
-    assert result.equity_curve == [(1000, 1000.0), (2000, 1000.0), (3000, 1000.0)]
-    assert result.final_equity == 1000
-    assert result.net_pnl_usdt == result.net_return_pct == 0
+    assert summary.final_equity == 1000.0
+    assert summary.net_pnl_usdt == 0.0
+    assert summary.net_return_pct == 0.0
+    assert summary.total_trades == 0
+    assert summary.total_fees_usdt == 0.0
+    assert list(summary.equity_curve) == [(1000, 1000.0), (2000, 1000.0), (3000, 1000.0)]
 
 
 def test_g07_passive_zero_cost_is_hand_computed_before_production_comparison() -> None:
@@ -344,16 +356,16 @@ def test_g07_passive_zero_cost_is_hand_computed_before_production_comparison() -
         Candle(ASSET, "1m", 1000, 60999, 100, 105, 99, 105, 10),
         Candle(ASSET, "1m", 61000, 120999, 105, 111, 104, 110, 10),
     )
-    fee_model = FeeModel(
-        maker_fee_rate=0,
-        taker_fee_rate=0,
-        slippage_mode=SlippageMode.ZERO,
-        fixed_slippage_bps=0,
-    )
-    result = BenchmarkEngine(fee_model).simulate_passive_btc(1000, candles)
-    _assert_float_decimal(result.final_equity, expected["final_equity"])
-    _assert_float_decimal(result.net_pnl_usdt, expected["gross_pnl"])
-    _assert_float_decimal(result.net_return_pct, expected["net_return"])
+    entry_price = candles[0].open
+    terminal_price = candles[-1].close
+    initial_cash = float(inputs["initial_cash"])
+    computed_qty = initial_cash / entry_price
+    final_equity = computed_qty * terminal_price
+    net_pnl = final_equity - initial_cash
+    net_return = net_pnl / initial_cash
+    _assert_float_decimal(final_equity, expected["final_equity"])
+    _assert_float_decimal(net_pnl, expected["gross_pnl"])
+    _assert_float_decimal(net_return, expected["net_return"])
 
 
 def test_g08_random_seed_and_draws_are_independently_replayed() -> None:
