@@ -1,0 +1,3727 @@
+{
+  "schema_version": "1.0.0",
+  "starting_code_sha": "23e9a2798b15b45313d778d7520262c848089138",
+  "prompt_commit": "ff8eb501270d1ff704b7ac769ed08f74e5926366",
+  "summary": {
+    "KEEP_CURRENT": 217,
+    "DELETE_R01": 157,
+    "DEFER_PROTECTED": 78,
+    "DEFER_UNCERTAIN": 72
+  },
+  "surfaces": [
+    {
+      "path": ".env.example",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": ".github/workflows/ci.yml",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": ".gitignore",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": ".opencode/agents/architect.md",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": ".opencode/agents/implementer.md",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": ".opencode/agents/reviewer.md",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": ".opencode/agents/tester.md",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": ".opencode/opencode.json",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "CHANGELOG.md",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "Dockerfile",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "README.md",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "artifacts/research/run0-dev-frozen-v022-seed7-20260825/artifact_manifest.json",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "artifacts/research/run0-dev-frozen-v022-seed7-20260825/config.toml",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "artifacts/research/run0-dev-frozen-v022-seed7-20260825/data_manifest.json",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "artifacts/research/run0-dev-frozen-v022-seed7-20260825/decision_samples.json",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "artifacts/research/run0-dev-frozen-v022-seed7-20260825/equity_curve.csv",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "artifacts/research/run0-dev-frozen-v022-seed7-20260825/research_report.json",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "artifacts/research/run0-dev-frozen-v022-seed7-20260825/research_report.md",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "artifacts/research/run0-dev-frozen-v022-seed7-20260825/trades.parquet",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "configs/default.toml",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "configs/formula_registry.json",
+      "classification": "DELETE_R01",
+      "reason": "Historical symbolic registry snapshots; exclusively symbolic consumers removed. P5 and runtime research registries retained.",
+      "baseline_importers": []
+    },
+    {
+      "path": "configs/formula_registry_v0319.json",
+      "classification": "DELETE_R01",
+      "reason": "Historical symbolic registry snapshots; exclusively symbolic consumers removed. P5 and runtime research registries retained.",
+      "baseline_importers": []
+    },
+    {
+      "path": "configs/forward/derivatives_evidence_epochs.json",
+      "classification": "DEFER_PROTECTED",
+      "reason": "Machine-read frozen scientific/runtime/holdout guard authority and forward lineage retained.",
+      "baseline_importers": []
+    },
+    {
+      "path": "configs/forward/opportunity_forward_campaigns.json",
+      "classification": "DEFER_PROTECTED",
+      "reason": "Machine-read frozen scientific/runtime/holdout guard authority and forward lineage retained.",
+      "baseline_importers": []
+    },
+    {
+      "path": "configs/forward/v0.3.13_opportunity_shadow_campaign.json",
+      "classification": "DEFER_PROTECTED",
+      "reason": "Machine-read frozen scientific/runtime/holdout guard authority and forward lineage retained.",
+      "baseline_importers": []
+    },
+    {
+      "path": "configs/forward/v0.3.14_derivatives_evidence_epoch.json",
+      "classification": "DEFER_PROTECTED",
+      "reason": "Machine-read frozen scientific/runtime/holdout guard authority and forward lineage retained.",
+      "baseline_importers": []
+    },
+    {
+      "path": "configs/forward/v0.3.15_microstructure_capture_campaign.json",
+      "classification": "DEFER_PROTECTED",
+      "reason": "Machine-read frozen scientific/runtime/holdout guard authority and forward lineage retained.",
+      "baseline_importers": []
+    },
+    {
+      "path": "configs/forward/v0.3.16_derivatives_evidence_epoch.json",
+      "classification": "DEFER_PROTECTED",
+      "reason": "Machine-read frozen scientific/runtime/holdout guard authority and forward lineage retained.",
+      "baseline_importers": []
+    },
+    {
+      "path": "configs/forward/v0.3.16_derivatives_evidence_epoch_002.json",
+      "classification": "DEFER_PROTECTED",
+      "reason": "Machine-read frozen scientific/runtime/holdout guard authority and forward lineage retained.",
+      "baseline_importers": []
+    },
+    {
+      "path": "configs/forward/v0.3.16_microstructure_reliability_protocol.json",
+      "classification": "DEFER_PROTECTED",
+      "reason": "Machine-read frozen scientific/runtime/holdout guard authority and forward lineage retained.",
+      "baseline_importers": []
+    },
+    {
+      "path": "configs/forward/v0.3.17_opportunity_successor_campaign.json",
+      "classification": "DEFER_PROTECTED",
+      "reason": "Machine-read frozen scientific/runtime/holdout guard authority and forward lineage retained.",
+      "baseline_importers": []
+    },
+    {
+      "path": "configs/forward/v0.3.20_derivatives_evidence_epoch.json",
+      "classification": "DEFER_PROTECTED",
+      "reason": "Machine-read frozen scientific/runtime/holdout guard authority and forward lineage retained.",
+      "baseline_importers": []
+    },
+    {
+      "path": "configs/forward/v0.3.20_opportunity_successor_campaign.json",
+      "classification": "DEFER_PROTECTED",
+      "reason": "Machine-read frozen scientific/runtime/holdout guard authority and forward lineage retained.",
+      "baseline_importers": []
+    },
+    {
+      "path": "configs/forward/v0.3.21_derivatives_evidence_epoch.json",
+      "classification": "DEFER_PROTECTED",
+      "reason": "Machine-read frozen scientific/runtime/holdout guard authority and forward lineage retained.",
+      "baseline_importers": []
+    },
+    {
+      "path": "configs/forward/v0.3.21_opportunity_successor_campaign.json",
+      "classification": "DEFER_PROTECTED",
+      "reason": "Machine-read frozen scientific/runtime/holdout guard authority and forward lineage retained.",
+      "baseline_importers": []
+    },
+    {
+      "path": "configs/frozen/v0.2.2.toml",
+      "classification": "DEFER_PROTECTED",
+      "reason": "Machine-read frozen scientific/runtime/holdout guard authority and forward lineage retained.",
+      "baseline_importers": []
+    },
+    {
+      "path": "configs/research/parameter_grid_v1.json",
+      "classification": "DELETE_R01",
+      "reason": "Read only by deleted historical owners/runners/tests (parameter grid never used); catalog metadata refreshed. Not current protocol/registry/evidence authority.",
+      "baseline_importers": []
+    },
+    {
+      "path": "configs/research/v0.3.10_range_mean_reversion_protocol.json",
+      "classification": "DELETE_R01",
+      "reason": "Read only by deleted historical owners/runners/tests (parameter grid never used); catalog metadata refreshed. Not current protocol/registry/evidence authority.",
+      "baseline_importers": []
+    },
+    {
+      "path": "configs/research/v0.3.12_spot_perp_flow_protocol.json",
+      "classification": "DELETE_R01",
+      "reason": "Read only by deleted historical owners/runners/tests (parameter grid never used); catalog metadata refreshed. Not current protocol/registry/evidence authority.",
+      "baseline_importers": []
+    },
+    {
+      "path": "configs/research/v0.3.18_historical_symbolic_protocol.json",
+      "classification": "DELETE_R01",
+      "reason": "Read only by deleted historical owners/runners/tests (parameter grid never used); catalog metadata refreshed. Not current protocol/registry/evidence authority.",
+      "baseline_importers": []
+    },
+    {
+      "path": "configs/research/v0.3.19_official_derivatives_symbolic_protocol.json",
+      "classification": "DELETE_R01",
+      "reason": "Read only by deleted historical owners/runners/tests (parameter grid never used); catalog metadata refreshed. Not current protocol/registry/evidence authority.",
+      "baseline_importers": []
+    },
+    {
+      "path": "configs/research/v0.3.1_funnel_protocol.json",
+      "classification": "DELETE_R01",
+      "reason": "Read only by deleted historical owners/runners/tests (parameter grid never used); catalog metadata refreshed. Not current protocol/registry/evidence authority.",
+      "baseline_importers": []
+    },
+    {
+      "path": "configs/research/v0.3.22_microstructure_h39_protocol.json",
+      "classification": "DEFER_PROTECTED",
+      "reason": "Machine-read frozen scientific/runtime/holdout guard authority and forward lineage retained.",
+      "baseline_importers": []
+    },
+    {
+      "path": "configs/research/v0.3.2_mechanism_protocol.json",
+      "classification": "DEFER_PROTECTED",
+      "reason": "Machine-read frozen scientific/runtime/holdout guard authority and forward lineage retained.",
+      "baseline_importers": []
+    },
+    {
+      "path": "configs/research/v0.3.3_geometry_protocol.json",
+      "classification": "DELETE_R01",
+      "reason": "Read only by deleted historical owners/runners/tests (parameter grid never used); catalog metadata refreshed. Not current protocol/registry/evidence authority.",
+      "baseline_importers": []
+    },
+    {
+      "path": "configs/research/v0.3.4_causal_entry_protocol.json",
+      "classification": "DELETE_R01",
+      "reason": "Read only by deleted historical owners/runners/tests (parameter grid never used); catalog metadata refreshed. Not current protocol/registry/evidence authority.",
+      "baseline_importers": []
+    },
+    {
+      "path": "configs/research/v0.3.5_breakout_edge_protocol.json",
+      "classification": "DELETE_R01",
+      "reason": "Read only by deleted historical owners/runners/tests (parameter grid never used); catalog metadata refreshed. Not current protocol/registry/evidence authority.",
+      "baseline_importers": []
+    },
+    {
+      "path": "configs/research/v0.3.6_directional_architecture_protocol.json",
+      "classification": "DELETE_R01",
+      "reason": "Read only by deleted historical owners/runners/tests (parameter grid never used); catalog metadata refreshed. Not current protocol/registry/evidence authority.",
+      "baseline_importers": []
+    },
+    {
+      "path": "configs/research/v0.3.7_funding_crowding_protocol.json",
+      "classification": "DELETE_R01",
+      "reason": "Read only by deleted historical owners/runners/tests (parameter grid never used); catalog metadata refreshed. Not current protocol/registry/evidence authority.",
+      "baseline_importers": []
+    },
+    {
+      "path": "configs/research/v0.3.8_funding_stability_protocol.json",
+      "classification": "DELETE_R01",
+      "reason": "Read only by deleted historical owners/runners/tests (parameter grid never used); catalog metadata refreshed. Not current protocol/registry/evidence authority.",
+      "baseline_importers": []
+    },
+    {
+      "path": "configs/research/v0.3.9_cross_asset_breadth_protocol.json",
+      "classification": "DELETE_R01",
+      "reason": "Read only by deleted historical owners/runners/tests (parameter grid never used); catalog metadata refreshed. Not current protocol/registry/evidence authority.",
+      "baseline_importers": []
+    },
+    {
+      "path": "configs/research_registry.json",
+      "classification": "DEFER_PROTECTED",
+      "reason": "Machine-read frozen scientific/runtime/holdout guard authority and forward lineage retained.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.0/DERIVATIVES_FORWARD_COLLECTION.md",
+      "classification": "DELETE_R01",
+      "reason": "Historical narrative/output, not retained machine-read evidence authority; corresponding experiment/symbolic owners removed. No H39/freeze/holdout material in target group.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.0/README.md",
+      "classification": "DELETE_R01",
+      "reason": "Historical narrative/output, not retained machine-read evidence authority; corresponding experiment/symbolic owners removed. No H39/freeze/holdout material in target group.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.0/V0.3.0_DATA_AUDIT.md",
+      "classification": "DELETE_R01",
+      "reason": "Historical narrative/output, not retained machine-read evidence authority; corresponding experiment/symbolic owners removed. No H39/freeze/holdout material in target group.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.0/V0.3.0_REPLAY_AUDIT.md",
+      "classification": "DELETE_R01",
+      "reason": "Historical narrative/output, not retained machine-read evidence authority; corresponding experiment/symbolic owners removed. No H39/freeze/holdout material in target group.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.0/V0.3.0_RESEARCH_REPORT.md",
+      "classification": "DELETE_R01",
+      "reason": "Historical narrative/output, not retained machine-read evidence authority; corresponding experiment/symbolic owners removed. No H39/freeze/holdout material in target group.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.1/DERIVATIVES_FORWARD_COLLECTION.md",
+      "classification": "DELETE_R01",
+      "reason": "Historical narrative/output, not retained machine-read evidence authority; corresponding experiment/symbolic owners removed. No H39/freeze/holdout material in target group.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.1/README.md",
+      "classification": "DELETE_R01",
+      "reason": "Historical narrative/output, not retained machine-read evidence authority; corresponding experiment/symbolic owners removed. No H39/freeze/holdout material in target group.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.1/V0.3.1_FACTOR_REDUNDANCY_AUDIT.md",
+      "classification": "DELETE_R01",
+      "reason": "Historical narrative/output, not retained machine-read evidence authority; corresponding experiment/symbolic owners removed. No H39/freeze/holdout material in target group.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.1/V0.3.1_FUNNEL_DIAGNOSTIC_REPORT.md",
+      "classification": "DELETE_R01",
+      "reason": "Historical narrative/output, not retained machine-read evidence authority; corresponding experiment/symbolic owners removed. No H39/freeze/holdout material in target group.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.1/V0.3.1_STRATEGY_HYPOTHESES.md",
+      "classification": "DELETE_R01",
+      "reason": "Historical narrative/output, not retained machine-read evidence authority; corresponding experiment/symbolic owners removed. No H39/freeze/holdout material in target group.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.1/V0.3.1_ZERO_TRADE_YEARS.md",
+      "classification": "DELETE_R01",
+      "reason": "Historical narrative/output, not retained machine-read evidence authority; corresponding experiment/symbolic owners removed. No H39/freeze/holdout material in target group.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.10/README.md",
+      "classification": "DELETE_R01",
+      "reason": "Historical narrative/output, not retained machine-read evidence authority; corresponding experiment/symbolic owners removed. No H39/freeze/holdout material in target group.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.10/V0.3.10_NUMERIC_ANSWERS.json",
+      "classification": "DELETE_R01",
+      "reason": "Historical narrative/output, not retained machine-read evidence authority; corresponding experiment/symbolic owners removed. No H39/freeze/holdout material in target group.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.10/V0.3.10_RANGE_MEAN_REVERSION_REPORT.md",
+      "classification": "DEFER_PROTECTED",
+      "reason": "Machine-read evidence_paths in unchanged runtime ResearchRegistry; existence required by validator and rejected-family safety gates.",
+      "baseline_importers": [
+        "configs/research_registry.json",
+        "src/btc_quant_agent/research_registry.py"
+      ]
+    },
+    {
+      "path": "deliverables/v0.3.10/V0.3.10_RECOMMENDATION.md",
+      "classification": "DEFER_PROTECTED",
+      "reason": "Machine-read evidence_paths in unchanged runtime ResearchRegistry; existence required by validator and rejected-family safety gates.",
+      "baseline_importers": [
+        "configs/research_registry.json",
+        "src/btc_quant_agent/research_registry.py"
+      ]
+    },
+    {
+      "path": "deliverables/v0.3.11/FORWARD_DERIVATIVES_OPERATIONS.md",
+      "classification": "DELETE_R01",
+      "reason": "Historical narrative/output, not retained machine-read evidence authority; corresponding experiment/symbolic owners removed. No H39/freeze/holdout material in target group.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.11/README.md",
+      "classification": "DELETE_R01",
+      "reason": "Historical narrative/output, not retained machine-read evidence authority; corresponding experiment/symbolic owners removed. No H39/freeze/holdout material in target group.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.11/RESEARCH_REGISTRY.md",
+      "classification": "DELETE_R01",
+      "reason": "Historical narrative/output, not retained machine-read evidence authority; corresponding experiment/symbolic owners removed. No H39/freeze/holdout material in target group.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.11/V0.3.11_NUMERIC_ANSWERS.json",
+      "classification": "DELETE_R01",
+      "reason": "Historical narrative/output, not retained machine-read evidence authority; corresponding experiment/symbolic owners removed. No H39/freeze/holdout material in target group.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.11/V0.3.11_RECOMMENDATION.md",
+      "classification": "DELETE_R01",
+      "reason": "Historical narrative/output, not retained machine-read evidence authority; corresponding experiment/symbolic owners removed. No H39/freeze/holdout material in target group.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.11/V0.3.11_RUNTIME_ALIGNMENT_FORWARD_DATA_REPORT.md",
+      "classification": "DELETE_R01",
+      "reason": "Historical narrative/output, not retained machine-read evidence authority; corresponding experiment/symbolic owners removed. No H39/freeze/holdout material in target group.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.12/FORWARD_COLLECTION_STATUS.json",
+      "classification": "DELETE_R01",
+      "reason": "Historical narrative/output, not retained machine-read evidence authority; corresponding experiment/symbolic owners removed. No H39/freeze/holdout material in target group.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.12/README.md",
+      "classification": "DELETE_R01",
+      "reason": "Historical narrative/output, not retained machine-read evidence authority; corresponding experiment/symbolic owners removed. No H39/freeze/holdout material in target group.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.12/RESEARCH_REGISTRY_UPDATE.md",
+      "classification": "DELETE_R01",
+      "reason": "Historical narrative/output, not retained machine-read evidence authority; corresponding experiment/symbolic owners removed. No H39/freeze/holdout material in target group.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.12/SPOT_DATA_AUDIT.json",
+      "classification": "DELETE_R01",
+      "reason": "Historical narrative/output, not retained machine-read evidence authority; corresponding experiment/symbolic owners removed. No H39/freeze/holdout material in target group.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.12/V0.3.12_NUMERIC_ANSWERS.json",
+      "classification": "DELETE_R01",
+      "reason": "Historical narrative/output, not retained machine-read evidence authority; corresponding experiment/symbolic owners removed. No H39/freeze/holdout material in target group.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.12/V0.3.12_RECOMMENDATION.md",
+      "classification": "DEFER_PROTECTED",
+      "reason": "Machine-read evidence_paths in unchanged runtime ResearchRegistry; existence required by validator and rejected-family safety gates.",
+      "baseline_importers": [
+        "configs/research_registry.json",
+        "src/btc_quant_agent/research_registry.py"
+      ]
+    },
+    {
+      "path": "deliverables/v0.3.12/V0.3.12_SPOT_PERP_FLOW_QUALIFICATION_REPORT.md",
+      "classification": "DEFER_PROTECTED",
+      "reason": "Machine-read evidence_paths in unchanged runtime ResearchRegistry; existence required by validator and rejected-family safety gates.",
+      "baseline_importers": [
+        "configs/research_registry.json",
+        "src/btc_quant_agent/research_registry.py"
+      ]
+    },
+    {
+      "path": "deliverables/v0.3.13/FORWARD_DERIVATIVES_RELIABILITY_AUDIT.json",
+      "classification": "DEFER_UNCERTAIN",
+      "reason": "Forward evidence lineage/operational context; no scientific evidence pruning without explicit authority split.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.13/NETWORK_DIAGNOSTIC_SUMMARY.json",
+      "classification": "DEFER_UNCERTAIN",
+      "reason": "Forward evidence lineage/operational context; no scientific evidence pruning without explicit authority split.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.13/OPPORTUNITY_FORWARD_CAMPAIGN_STATUS.json",
+      "classification": "DEFER_UNCERTAIN",
+      "reason": "Forward evidence lineage/operational context; no scientific evidence pruning without explicit authority split.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.13/OPPORTUNITY_FORWARD_OPERATIONS.md",
+      "classification": "DEFER_UNCERTAIN",
+      "reason": "Forward evidence lineage/operational context; no scientific evidence pruning without explicit authority split.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.13/README.md",
+      "classification": "DEFER_UNCERTAIN",
+      "reason": "Forward evidence lineage/operational context; no scientific evidence pruning without explicit authority split.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.13/RESEARCH_REGISTRY_UPDATE.md",
+      "classification": "DEFER_UNCERTAIN",
+      "reason": "Forward evidence lineage/operational context; no scientific evidence pruning without explicit authority split.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.13/V0.3.13_NUMERIC_ANSWERS.json",
+      "classification": "DEFER_UNCERTAIN",
+      "reason": "Forward evidence lineage/operational context; no scientific evidence pruning without explicit authority split.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.13/V0.3.13_OPPORTUNITY_FORWARD_SHADOW_REPORT.md",
+      "classification": "DEFER_UNCERTAIN",
+      "reason": "Forward evidence lineage/operational context; no scientific evidence pruning without explicit authority split.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.13/V0.3.13_RECOMMENDATION.md",
+      "classification": "DEFER_UNCERTAIN",
+      "reason": "Forward evidence lineage/operational context; no scientific evidence pruning without explicit authority split.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.14/DERIVATIVES_COLLECTOR_RELIABILITY_STATUS.json",
+      "classification": "DEFER_UNCERTAIN",
+      "reason": "Forward evidence lineage/operational context; no scientific evidence pruning without explicit authority split.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.14/DERIVATIVES_EVIDENCE_EPOCH_STATUS.json",
+      "classification": "DEFER_UNCERTAIN",
+      "reason": "Forward evidence lineage/operational context; no scientific evidence pruning without explicit authority split.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.14/FORWARD_EVIDENCE_OPERATIONS.md",
+      "classification": "DEFER_UNCERTAIN",
+      "reason": "Forward evidence lineage/operational context; no scientific evidence pruning without explicit authority split.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.14/OPPORTUNITY_FORWARD_CAMPAIGN_STATUS.json",
+      "classification": "DEFER_UNCERTAIN",
+      "reason": "Forward evidence lineage/operational context; no scientific evidence pruning without explicit authority split.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.14/OUTCOME_RESOLVER_STATUS.json",
+      "classification": "DEFER_UNCERTAIN",
+      "reason": "Forward evidence lineage/operational context; no scientific evidence pruning without explicit authority split.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.14/README.md",
+      "classification": "DEFER_UNCERTAIN",
+      "reason": "Forward evidence lineage/operational context; no scientific evidence pruning without explicit authority split.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.14/V0.3.14_FORWARD_EVIDENCE_GATE_REPAIR_REPORT.md",
+      "classification": "DEFER_UNCERTAIN",
+      "reason": "Forward evidence lineage/operational context; no scientific evidence pruning without explicit authority split.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.14/V0.3.14_NUMERIC_ANSWERS.json",
+      "classification": "DEFER_UNCERTAIN",
+      "reason": "Forward evidence lineage/operational context; no scientific evidence pruning without explicit authority split.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.14/V0.3.14_RECOMMENDATION.md",
+      "classification": "DEFER_UNCERTAIN",
+      "reason": "Forward evidence lineage/operational context; no scientific evidence pruning without explicit authority split.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.15/ELIGIBILITY_SOURCE_OF_TRUTH_AUDIT.json",
+      "classification": "DEFER_UNCERTAIN",
+      "reason": "Forward evidence lineage/operational context; no scientific evidence pruning without explicit authority split.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.15/FORWARD_EVIDENCE_COMBINED_STATUS.json",
+      "classification": "DEFER_UNCERTAIN",
+      "reason": "Forward evidence lineage/operational context; no scientific evidence pruning without explicit authority split.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.15/MICROSTRUCTURE_CAMPAIGN_STATUS.json",
+      "classification": "DEFER_UNCERTAIN",
+      "reason": "Forward evidence lineage/operational context; no scientific evidence pruning without explicit authority split.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.15/MICROSTRUCTURE_OPERATIONS.md",
+      "classification": "DEFER_UNCERTAIN",
+      "reason": "Forward evidence lineage/operational context; no scientific evidence pruning without explicit authority split.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.15/MICROSTRUCTURE_SCHEMA.md",
+      "classification": "DEFER_UNCERTAIN",
+      "reason": "Forward evidence lineage/operational context; no scientific evidence pruning without explicit authority split.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.15/ORDERBOOK_SEQUENCE_AUDIT.json",
+      "classification": "DEFER_UNCERTAIN",
+      "reason": "Forward evidence lineage/operational context; no scientific evidence pruning without explicit authority split.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.15/README.md",
+      "classification": "DEFER_UNCERTAIN",
+      "reason": "Forward evidence lineage/operational context; no scientific evidence pruning without explicit authority split.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.15/V0.3.15_MICROSTRUCTURE_FORWARD_DATA_FOUNDATION_REPORT.md",
+      "classification": "DEFER_UNCERTAIN",
+      "reason": "Forward evidence lineage/operational context; no scientific evidence pruning without explicit authority split.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.15/V0.3.15_NUMERIC_ANSWERS.json",
+      "classification": "DEFER_UNCERTAIN",
+      "reason": "Forward evidence lineage/operational context; no scientific evidence pruning without explicit authority split.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.15/V0.3.15_RECOMMENDATION.md",
+      "classification": "DEFER_UNCERTAIN",
+      "reason": "Forward evidence lineage/operational context; no scientific evidence pruning without explicit authority split.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.16/DERIVATIVES_FAILURE_ROOT_CAUSE_AUDIT.json",
+      "classification": "DEFER_UNCERTAIN",
+      "reason": "Forward evidence lineage/operational context; no scientific evidence pruning without explicit authority split.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.16/DERIVATIVES_SUCCESSOR_EPOCH_STATUS.json",
+      "classification": "DEFER_UNCERTAIN",
+      "reason": "Forward evidence lineage/operational context; no scientific evidence pruning without explicit authority split.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.16/DERIVATIVES_V0314_TERMINAL_EPOCH_AUDIT.json",
+      "classification": "DEFER_UNCERTAIN",
+      "reason": "Forward evidence lineage/operational context; no scientific evidence pruning without explicit authority split.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.16/FORWARD_EVIDENCE_COMBINED_STATUS.json",
+      "classification": "DEFER_UNCERTAIN",
+      "reason": "Forward evidence lineage/operational context; no scientific evidence pruning without explicit authority split.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.16/MICROSTRUCTURE_CLOCK_AUDIT.json",
+      "classification": "DEFER_UNCERTAIN",
+      "reason": "Forward evidence lineage/operational context; no scientific evidence pruning without explicit authority split.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.16/MICROSTRUCTURE_PARTITION_INTEGRITY_AUDIT.json",
+      "classification": "DEFER_UNCERTAIN",
+      "reason": "Forward evidence lineage/operational context; no scientific evidence pruning without explicit authority split.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.16/MICROSTRUCTURE_SESSION_COVERAGE_AUDIT.json",
+      "classification": "DEFER_UNCERTAIN",
+      "reason": "Forward evidence lineage/operational context; no scientific evidence pruning without explicit authority split.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.16/OPPORTUNITY_MISSED_SLOT_AUDIT.json",
+      "classification": "DEFER_UNCERTAIN",
+      "reason": "Forward evidence lineage/operational context; no scientific evidence pruning without explicit authority split.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.16/README.md",
+      "classification": "DEFER_UNCERTAIN",
+      "reason": "Forward evidence lineage/operational context; no scientific evidence pruning without explicit authority split.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.16/V0.3.16_FORWARD_EVIDENCE_RECOVERY_REPORT.md",
+      "classification": "DEFER_UNCERTAIN",
+      "reason": "Forward evidence lineage/operational context; no scientific evidence pruning without explicit authority split.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.16/V0.3.16_NUMERIC_ANSWERS.json",
+      "classification": "DEFER_UNCERTAIN",
+      "reason": "Forward evidence lineage/operational context; no scientific evidence pruning without explicit authority split.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.16/V0.3.16_RECOMMENDATION.md",
+      "classification": "DEFER_UNCERTAIN",
+      "reason": "Forward evidence lineage/operational context; no scientific evidence pruning without explicit authority split.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.17/DERIVATIVES_V0316_SUCCESSOR_STATUS.json",
+      "classification": "DEFER_UNCERTAIN",
+      "reason": "Forward evidence lineage/operational context; no scientific evidence pruning without explicit authority split.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.17/FORWARD_EVIDENCE_COMBINED_STATUS.json",
+      "classification": "DEFER_UNCERTAIN",
+      "reason": "Forward evidence lineage/operational context; no scientific evidence pruning without explicit authority split.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.17/FORWARD_OPERATIONS_HEALTH.json",
+      "classification": "DEFER_UNCERTAIN",
+      "reason": "Forward evidence lineage/operational context; no scientific evidence pruning without explicit authority split.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.17/MICROSTRUCTURE_LONG_RUN_STATUS.json",
+      "classification": "DEFER_UNCERTAIN",
+      "reason": "Forward evidence lineage/operational context; no scientific evidence pruning without explicit authority split.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.17/OPPORTUNITY_H35_ARCHIVE_AUDIT.json",
+      "classification": "DEFER_UNCERTAIN",
+      "reason": "Forward evidence lineage/operational context; no scientific evidence pruning without explicit authority split.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.17/OPPORTUNITY_H36_SUCCESSOR_STATUS.json",
+      "classification": "DEFER_UNCERTAIN",
+      "reason": "Forward evidence lineage/operational context; no scientific evidence pruning without explicit authority split.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.17/README.md",
+      "classification": "DEFER_UNCERTAIN",
+      "reason": "Forward evidence lineage/operational context; no scientific evidence pruning without explicit authority split.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.17/V0.3.17_NUMERIC_ANSWERS.json",
+      "classification": "DEFER_UNCERTAIN",
+      "reason": "Forward evidence lineage/operational context; no scientific evidence pruning without explicit authority split.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.17/V0.3.17_OPPORTUNITY_SUCCESSOR_FORWARD_STABILIZATION_REPORT.md",
+      "classification": "DEFER_UNCERTAIN",
+      "reason": "Forward evidence lineage/operational context; no scientific evidence pruning without explicit authority split.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.17/V0.3.17_RECOMMENDATION.md",
+      "classification": "DEFER_UNCERTAIN",
+      "reason": "Forward evidence lineage/operational context; no scientific evidence pruning without explicit authority split.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.18/ALPHAGPT_REFERENCE_ADAPTATION.md",
+      "classification": "DELETE_R01",
+      "reason": "Historical narrative/output, not retained machine-read evidence authority; corresponding experiment/symbolic owners removed. No H39/freeze/holdout material in target group.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.18/BINANCE_OFFICIAL_ARCHIVE_AUDIT.json",
+      "classification": "DELETE_R01",
+      "reason": "Historical narrative/output, not retained machine-read evidence authority; corresponding experiment/symbolic owners removed. No H39/freeze/holdout material in target group.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.18/FORMULA_DSL_AND_VM_AUDIT.md",
+      "classification": "DELETE_R01",
+      "reason": "Historical narrative/output, not retained machine-read evidence authority; corresponding experiment/symbolic owners removed. No H39/freeze/holdout material in target group.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.18/FORMULA_REGISTRY_SNAPSHOT.json",
+      "classification": "DELETE_R01",
+      "reason": "Historical narrative/output, not retained machine-read evidence authority; corresponding experiment/symbolic owners removed. No H39/freeze/holdout material in target group.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.18/FORWARD_CAMPAIGNS_STATUS.json",
+      "classification": "DELETE_R01",
+      "reason": "Historical narrative/output, not retained machine-read evidence authority; corresponding experiment/symbolic owners removed. No H39/freeze/holdout material in target group.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.18/HISTORICAL_DATA_PROVENANCE_AUDIT.json",
+      "classification": "DELETE_R01",
+      "reason": "Historical narrative/output, not retained machine-read evidence authority; corresponding experiment/symbolic owners removed. No H39/freeze/holdout material in target group.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.18/README.md",
+      "classification": "DELETE_R01",
+      "reason": "Historical narrative/output, not retained machine-read evidence authority; corresponding experiment/symbolic owners removed. No H39/freeze/holdout material in target group.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.18/SYMBOLIC_SEARCH_AUDIT.json",
+      "classification": "DELETE_R01",
+      "reason": "Historical narrative/output, not retained machine-read evidence authority; corresponding experiment/symbolic owners removed. No H39/freeze/holdout material in target group.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.18/V0.3.18_HISTORICAL_PROXY_SYMBOLIC_ALPHA_REPORT.md",
+      "classification": "DELETE_R01",
+      "reason": "Historical narrative/output, not retained machine-read evidence authority; corresponding experiment/symbolic owners removed. No H39/freeze/holdout material in target group.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.18/V0.3.18_NUMERIC_ANSWERS.json",
+      "classification": "DELETE_R01",
+      "reason": "Historical narrative/output, not retained machine-read evidence authority; corresponding experiment/symbolic owners removed. No H39/freeze/holdout material in target group.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.18/V0.3.18_RECOMMENDATION.md",
+      "classification": "DELETE_R01",
+      "reason": "Historical narrative/output, not retained machine-read evidence authority; corresponding experiment/symbolic owners removed. No H39/freeze/holdout material in target group.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.18/VENDOR_HISTORICAL_DATA_OPTIONS.md",
+      "classification": "DELETE_R01",
+      "reason": "Historical narrative/output, not retained machine-read evidence authority; corresponding experiment/symbolic owners removed. No H39/freeze/holdout material in target group.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.19/CANDIDATE_GATE_CORRECTNESS_AUDIT.md",
+      "classification": "DELETE_R01",
+      "reason": "Historical narrative/output, not retained machine-read evidence authority; corresponding experiment/symbolic owners removed. No H39/freeze/holdout material in target group.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.19/FORMULA_REGISTRY_UPDATE.json",
+      "classification": "DELETE_R01",
+      "reason": "Historical narrative/output, not retained machine-read evidence authority; corresponding experiment/symbolic owners removed. No H39/freeze/holdout material in target group.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.19/FORWARD_CAMPAIGNS_STATUS.json",
+      "classification": "DELETE_R01",
+      "reason": "Historical narrative/output, not retained machine-read evidence authority; corresponding experiment/symbolic owners removed. No H39/freeze/holdout material in target group.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.19/NEW_FEATURE_FAMILY_AUDIT.json",
+      "classification": "DELETE_R01",
+      "reason": "Historical narrative/output, not retained machine-read evidence authority; corresponding experiment/symbolic owners removed. No H39/freeze/holdout material in target group.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.19/OFFICIAL_DERIVATIVES_DATA_AUDIT.json",
+      "classification": "DELETE_R01",
+      "reason": "Historical narrative/output, not retained machine-read evidence authority; corresponding experiment/symbolic owners removed. No H39/freeze/holdout material in target group.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.19/README.md",
+      "classification": "DELETE_R01",
+      "reason": "Historical narrative/output, not retained machine-read evidence authority; corresponding experiment/symbolic owners removed. No H39/freeze/holdout material in target group.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.19/SYMBOLIC_SEARCH_AUDIT.json",
+      "classification": "DELETE_R01",
+      "reason": "Historical narrative/output, not retained machine-read evidence authority; corresponding experiment/symbolic owners removed. No H39/freeze/holdout material in target group.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.19/V0.3.19_NUMERIC_ANSWERS.json",
+      "classification": "DELETE_R01",
+      "reason": "Historical narrative/output, not retained machine-read evidence authority; corresponding experiment/symbolic owners removed. No H39/freeze/holdout material in target group.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.19/V0.3.19_OFFICIAL_DERIVATIVES_SYMBOLIC_REPORT.md",
+      "classification": "DELETE_R01",
+      "reason": "Historical narrative/output, not retained machine-read evidence authority; corresponding experiment/symbolic owners removed. No H39/freeze/holdout material in target group.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.19/V0.3.19_RECOMMENDATION.md",
+      "classification": "DELETE_R01",
+      "reason": "Historical narrative/output, not retained machine-read evidence authority; corresponding experiment/symbolic owners removed. No H39/freeze/holdout material in target group.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.2/README.md",
+      "classification": "DELETE_R01",
+      "reason": "Historical narrative/output, not retained machine-read evidence authority; corresponding experiment/symbolic owners removed. No H39/freeze/holdout material in target group.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.2/V0.3.2_CANDIDATE_RECOMMENDATION.md",
+      "classification": "DELETE_R01",
+      "reason": "Historical narrative/output, not retained machine-read evidence authority; corresponding experiment/symbolic owners removed. No H39/freeze/holdout material in target group.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.2/V0.3.2_MECHANISM_EXPERIMENT_REPORT.md",
+      "classification": "DELETE_R01",
+      "reason": "Historical narrative/output, not retained machine-read evidence authority; corresponding experiment/symbolic owners removed. No H39/freeze/holdout material in target group.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.20/ACCEPTANCE_REPAIR_REPORT.md",
+      "classification": "DEFER_UNCERTAIN",
+      "reason": "Forward evidence lineage/operational context; no scientific evidence pruning without explicit authority split.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.20/DATA_QUALITY_TERMINAL_ARCHIVE.json",
+      "classification": "DEFER_UNCERTAIN",
+      "reason": "Forward evidence lineage/operational context; no scientific evidence pruning without explicit authority split.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.20/FORWARD_DOCTOR_REPORT.json",
+      "classification": "DEFER_UNCERTAIN",
+      "reason": "Forward evidence lineage/operational context; no scientific evidence pruning without explicit authority split.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.20/FORWARD_FAILURE_ROOT_CAUSE_AUDIT.json",
+      "classification": "DEFER_UNCERTAIN",
+      "reason": "Forward evidence lineage/operational context; no scientific evidence pruning without explicit authority split.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.20/FORWARD_OPERATIONS_HEALTH.json",
+      "classification": "DEFER_UNCERTAIN",
+      "reason": "Forward evidence lineage/operational context; no scientific evidence pruning without explicit authority split.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.20/LINUX_VPS_DEPLOYMENT_PROFILE.json",
+      "classification": "DEFER_UNCERTAIN",
+      "reason": "Forward evidence lineage/operational context; no scientific evidence pruning without explicit authority split.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.20/POST_START_SUCCESSOR_HEALTH.json",
+      "classification": "DEFER_UNCERTAIN",
+      "reason": "Forward evidence lineage/operational context; no scientific evidence pruning without explicit authority split.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.20/README.md",
+      "classification": "DEFER_UNCERTAIN",
+      "reason": "Forward evidence lineage/operational context; no scientific evidence pruning without explicit authority split.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.20/RESEARCH_DATA_CONCURRENCY_POLICY.md",
+      "classification": "DEFER_UNCERTAIN",
+      "reason": "Forward evidence lineage/operational context; no scientific evidence pruning without explicit authority split.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.20/SUCCESSOR_PREREGISTRATION_MANIFEST.json",
+      "classification": "DEFER_UNCERTAIN",
+      "reason": "Forward evidence lineage/operational context; no scientific evidence pruning without explicit authority split.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.20/SYSTEMD_HARDENING_REPORT.md",
+      "classification": "DEFER_UNCERTAIN",
+      "reason": "Forward evidence lineage/operational context; no scientific evidence pruning without explicit authority split.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.20/WINDOWS_WSL_LIFECYCLE_GUIDE.md",
+      "classification": "DEFER_UNCERTAIN",
+      "reason": "Forward evidence lineage/operational context; no scientific evidence pruning without explicit authority split.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.21/LOCAL_FORWARD_PREFLIGHT.json",
+      "classification": "DEFER_UNCERTAIN",
+      "reason": "Forward evidence lineage/operational context; no scientific evidence pruning without explicit authority split.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.21/LOCAL_RUNTIME_RESILIENCE_REPORT.json",
+      "classification": "DEFER_UNCERTAIN",
+      "reason": "Forward evidence lineage/operational context; no scientific evidence pruning without explicit authority split.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.21/POST_START_SUCCESSOR_HEALTH.json",
+      "classification": "DEFER_UNCERTAIN",
+      "reason": "Forward evidence lineage/operational context; no scientific evidence pruning without explicit authority split.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.21/PR_BODY.md",
+      "classification": "DEFER_UNCERTAIN",
+      "reason": "Forward evidence lineage/operational context; no scientific evidence pruning without explicit authority split.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.21/README.md",
+      "classification": "DEFER_UNCERTAIN",
+      "reason": "Forward evidence lineage/operational context; no scientific evidence pruning without explicit authority split.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.21/SUCCESSOR_PREREGISTRATION_MANIFEST.json",
+      "classification": "DEFER_UNCERTAIN",
+      "reason": "Forward evidence lineage/operational context; no scientific evidence pruning without explicit authority split.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.21/TERMINAL_STATE_RECONCILIATION.json",
+      "classification": "DEFER_UNCERTAIN",
+      "reason": "Forward evidence lineage/operational context; no scientific evidence pruning without explicit authority split.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.21/V0.3.21_FORWARD_LOCAL_RECOVERY_REPORT.md",
+      "classification": "DEFER_UNCERTAIN",
+      "reason": "Forward evidence lineage/operational context; no scientific evidence pruning without explicit authority split.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.22/H38_TERMINAL_RECONCILIATION.json",
+      "classification": "DEFER_PROTECTED",
+      "reason": "H39 frozen/blind/preregistration evidence and supporting context preserved byte-for-byte.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.22/H39_DEVELOPMENT_DIAGNOSTICS.json",
+      "classification": "DEFER_PROTECTED",
+      "reason": "H39 frozen/blind/preregistration evidence and supporting context preserved byte-for-byte.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.22/H39_FEATURE_DICTIONARY.json",
+      "classification": "DEFER_PROTECTED",
+      "reason": "H39 frozen/blind/preregistration evidence and supporting context preserved byte-for-byte.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.22/H39_PROTOCOL_CLARIFICATION_001.json",
+      "classification": "DEFER_PROTECTED",
+      "reason": "H39 frozen/blind/preregistration evidence and supporting context preserved byte-for-byte.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.22/H39_PROTOCOL_FREEZE_MANIFEST.json",
+      "classification": "DEFER_PROTECTED",
+      "reason": "H39 frozen/blind/preregistration evidence and supporting context preserved byte-for-byte.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.22/H39_VALIDATION_STATUS.json",
+      "classification": "DEFER_PROTECTED",
+      "reason": "H39 frozen/blind/preregistration evidence and supporting context preserved byte-for-byte.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.22/MICROSTRUCTURE_DATA_PROVENANCE.json",
+      "classification": "DEFER_PROTECTED",
+      "reason": "H39 frozen/blind/preregistration evidence and supporting context preserved byte-for-byte.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.22/README.md",
+      "classification": "DEFER_PROTECTED",
+      "reason": "H39 frozen/blind/preregistration evidence and supporting context preserved byte-for-byte.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.22/V0.3.22_ACCEPTANCE_REPAIR_REPORT.md",
+      "classification": "DEFER_PROTECTED",
+      "reason": "H39 frozen/blind/preregistration evidence and supporting context preserved byte-for-byte.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.22/V0.3.22_MICROSTRUCTURE_ALPHA_REPORT.md",
+      "classification": "DEFER_PROTECTED",
+      "reason": "H39 frozen/blind/preregistration evidence and supporting context preserved byte-for-byte.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.23/FORWARD_CHAIN_HEALTH.json",
+      "classification": "DEFER_PROTECTED",
+      "reason": "H39 frozen/blind/preregistration evidence and supporting context preserved byte-for-byte.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.23/H39_BLINDNESS_ATTESTATION.json",
+      "classification": "DEFER_PROTECTED",
+      "reason": "H39 frozen/blind/preregistration evidence and supporting context preserved byte-for-byte.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.23/H39_BLIND_VALIDATION_LEDGER_MANIFEST.json",
+      "classification": "DEFER_PROTECTED",
+      "reason": "H39 frozen/blind/preregistration evidence and supporting context preserved byte-for-byte.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.23/H39_BLIND_VALIDATION_STATUS.json",
+      "classification": "DEFER_PROTECTED",
+      "reason": "H39 frozen/blind/preregistration evidence and supporting context preserved byte-for-byte.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.23/README.md",
+      "classification": "DEFER_PROTECTED",
+      "reason": "H39 frozen/blind/preregistration evidence and supporting context preserved byte-for-byte.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.23/V0.3.23_H39_BLIND_VALIDATION_REPORT.md",
+      "classification": "DEFER_PROTECTED",
+      "reason": "H39 frozen/blind/preregistration evidence and supporting context preserved byte-for-byte.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.23/V0.3.23_STRICT_UNBLIND_GATE_REPAIR.json",
+      "classification": "DEFER_PROTECTED",
+      "reason": "H39 frozen/blind/preregistration evidence and supporting context preserved byte-for-byte.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.23/V0.3.23_STRICT_UNBLIND_GATE_REPAIR.md",
+      "classification": "DEFER_PROTECTED",
+      "reason": "H39 frozen/blind/preregistration evidence and supporting context preserved byte-for-byte.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.24/FORWARD_CHAIN_HEALTH.json",
+      "classification": "DEFER_PROTECTED",
+      "reason": "H39 frozen/blind/preregistration evidence and supporting context preserved byte-for-byte.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.24/H39_ACCUMULATION_SCHEDULER_REPORT.json",
+      "classification": "DEFER_PROTECTED",
+      "reason": "H39 frozen/blind/preregistration evidence and supporting context preserved byte-for-byte.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.24/H39_BLIND_LEDGER_INTEGRITY.json",
+      "classification": "DEFER_PROTECTED",
+      "reason": "H39 frozen/blind/preregistration evidence and supporting context preserved byte-for-byte.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.24/H39_BLIND_OPERATIONAL_STATUS.json",
+      "classification": "DEFER_PROTECTED",
+      "reason": "H39 frozen/blind/preregistration evidence and supporting context preserved byte-for-byte.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.24/README.md",
+      "classification": "DEFER_PROTECTED",
+      "reason": "H39 frozen/blind/preregistration evidence and supporting context preserved byte-for-byte.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.24/V0.3.24_H39_BLIND_ACCUMULATION_OPERATIONS_REPORT.md",
+      "classification": "DEFER_PROTECTED",
+      "reason": "H39 frozen/blind/preregistration evidence and supporting context preserved byte-for-byte.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.24/V0.3.24_WALL_CLOCK_DENOMINATOR_REPAIR.json",
+      "classification": "DEFER_PROTECTED",
+      "reason": "H39 frozen/blind/preregistration evidence and supporting context preserved byte-for-byte.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.24/V0.3.24_WALL_CLOCK_DENOMINATOR_REPAIR.md",
+      "classification": "DEFER_PROTECTED",
+      "reason": "H39 frozen/blind/preregistration evidence and supporting context preserved byte-for-byte.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.25/FORWARD_CHAIN_HEALTH.json",
+      "classification": "DEFER_PROTECTED",
+      "reason": "H39 frozen/blind/preregistration evidence and supporting context preserved byte-for-byte.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.25/H39_BLIND_OPERATIONAL_STATUS.json",
+      "classification": "DEFER_PROTECTED",
+      "reason": "H39 frozen/blind/preregistration evidence and supporting context preserved byte-for-byte.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.25/H39_PROTOCOL_CLARIFICATION_002_DEPENDENCE_ROBUST_INFERENCE.json",
+      "classification": "DEFER_PROTECTED",
+      "reason": "H39 frozen/blind/preregistration evidence and supporting context preserved byte-for-byte.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.25/H39_PROTOCOL_CLARIFICATION_003_ROBUST_NESTED_NULL.json",
+      "classification": "DEFER_PROTECTED",
+      "reason": "H39 frozen/blind/preregistration evidence and supporting context preserved byte-for-byte.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.25/H39_UNBLIND_PREREGISTRATION_MANIFEST.json",
+      "classification": "DEFER_PROTECTED",
+      "reason": "H39 frozen/blind/preregistration evidence and supporting context preserved byte-for-byte.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.25/README.md",
+      "classification": "DEFER_PROTECTED",
+      "reason": "H39 frozen/blind/preregistration evidence and supporting context preserved byte-for-byte.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.25/V0.3.25_COMMITTED_FREEZE_EXACTLY_ONCE_REPAIR.json",
+      "classification": "DEFER_PROTECTED",
+      "reason": "H39 frozen/blind/preregistration evidence and supporting context preserved byte-for-byte.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.25/V0.3.25_COMMITTED_FREEZE_EXACTLY_ONCE_REPAIR.md",
+      "classification": "DEFER_PROTECTED",
+      "reason": "H39 frozen/blind/preregistration evidence and supporting context preserved byte-for-byte.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.25/V0.3.25_H39_ONE_SHOT_UNBLIND_PREREGISTRATION_REPORT.md",
+      "classification": "DEFER_PROTECTED",
+      "reason": "H39 frozen/blind/preregistration evidence and supporting context preserved byte-for-byte.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.25/V0.3.25_ROBUST_NULL_PROTOCOL_IDENTITY_HEALTH_SCHEMA_REPAIR.json",
+      "classification": "DEFER_PROTECTED",
+      "reason": "H39 frozen/blind/preregistration evidence and supporting context preserved byte-for-byte.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.25/V0.3.25_ROBUST_NULL_PROTOCOL_IDENTITY_HEALTH_SCHEMA_REPAIR.md",
+      "classification": "DEFER_PROTECTED",
+      "reason": "H39 frozen/blind/preregistration evidence and supporting context preserved byte-for-byte.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.25/V0.3.25_STATISTICAL_DEPENDENCE_HEALTH_REPAIR.json",
+      "classification": "DEFER_PROTECTED",
+      "reason": "H39 frozen/blind/preregistration evidence and supporting context preserved byte-for-byte.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.25/V0.3.25_STATISTICAL_DEPENDENCE_HEALTH_REPAIR.md",
+      "classification": "DEFER_PROTECTED",
+      "reason": "H39 frozen/blind/preregistration evidence and supporting context preserved byte-for-byte.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.26/H39_PROTOCOL_CLARIFICATION_004_CONDITIONAL_INPUT_CONTRACT.json",
+      "classification": "DEFER_PROTECTED",
+      "reason": "H39 frozen/blind/preregistration evidence and supporting context preserved byte-for-byte.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.26/README.md",
+      "classification": "DEFER_PROTECTED",
+      "reason": "H39 frozen/blind/preregistration evidence and supporting context preserved byte-for-byte.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.3/README.md",
+      "classification": "DELETE_R01",
+      "reason": "Historical narrative/output, not retained machine-read evidence authority; corresponding experiment/symbolic owners removed. No H39/freeze/holdout material in target group.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.3/V0.3.3_GEOMETRY_EXCURSION_REPORT.md",
+      "classification": "DEFER_PROTECTED",
+      "reason": "Machine-read evidence_paths in unchanged runtime ResearchRegistry; existence required by validator and rejected-family safety gates.",
+      "baseline_importers": [
+        "configs/research_registry.json",
+        "src/btc_quant_agent/research_registry.py"
+      ]
+    },
+    {
+      "path": "deliverables/v0.3.3/V0.3.3_NUMERIC_ANSWERS.json",
+      "classification": "DELETE_R01",
+      "reason": "Historical narrative/output, not retained machine-read evidence authority; corresponding experiment/symbolic owners removed. No H39/freeze/holdout material in target group.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.4/README.md",
+      "classification": "DELETE_R01",
+      "reason": "Historical narrative/output, not retained machine-read evidence authority; corresponding experiment/symbolic owners removed. No H39/freeze/holdout material in target group.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.4/V0.3.4_CANDIDATE_RECOMMENDATION.md",
+      "classification": "DELETE_R01",
+      "reason": "Historical narrative/output, not retained machine-read evidence authority; corresponding experiment/symbolic owners removed. No H39/freeze/holdout material in target group.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.4/V0.3.4_CAUSAL_ENTRY_DIRECTIONALITY_REPORT.md",
+      "classification": "DELETE_R01",
+      "reason": "Historical narrative/output, not retained machine-read evidence authority; corresponding experiment/symbolic owners removed. No H39/freeze/holdout material in target group.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.4/V0.3.4_NUMERIC_ANSWERS.json",
+      "classification": "DELETE_R01",
+      "reason": "Historical narrative/output, not retained machine-read evidence authority; corresponding experiment/symbolic owners removed. No H39/freeze/holdout material in target group.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.5/README.md",
+      "classification": "DELETE_R01",
+      "reason": "Historical narrative/output, not retained machine-read evidence authority; corresponding experiment/symbolic owners removed. No H39/freeze/holdout material in target group.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.5/V0.3.5_BREAKOUT_EDGE_QUALIFICATION_REPORT.md",
+      "classification": "DEFER_PROTECTED",
+      "reason": "Machine-read evidence_paths in unchanged runtime ResearchRegistry; existence required by validator and rejected-family safety gates.",
+      "baseline_importers": [
+        "configs/research_registry.json",
+        "src/btc_quant_agent/research_registry.py"
+      ]
+    },
+    {
+      "path": "deliverables/v0.3.5/V0.3.5_NUMERIC_ANSWERS.json",
+      "classification": "DELETE_R01",
+      "reason": "Historical narrative/output, not retained machine-read evidence authority; corresponding experiment/symbolic owners removed. No H39/freeze/holdout material in target group.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.5/V0.3.5_RECOMMENDATION.md",
+      "classification": "DELETE_R01",
+      "reason": "Historical narrative/output, not retained machine-read evidence authority; corresponding experiment/symbolic owners removed. No H39/freeze/holdout material in target group.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.6/README.md",
+      "classification": "DELETE_R01",
+      "reason": "Historical narrative/output, not retained machine-read evidence authority; corresponding experiment/symbolic owners removed. No H39/freeze/holdout material in target group.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.6/V0.3.6_DIRECTIONAL_ARCHITECTURE_RESET_REPORT.md",
+      "classification": "DEFER_PROTECTED",
+      "reason": "Machine-read evidence_paths in unchanged runtime ResearchRegistry; existence required by validator and rejected-family safety gates.",
+      "baseline_importers": [
+        "configs/research_registry.json",
+        "src/btc_quant_agent/research_registry.py"
+      ]
+    },
+    {
+      "path": "deliverables/v0.3.6/V0.3.6_NUMERIC_ANSWERS.json",
+      "classification": "DELETE_R01",
+      "reason": "Historical narrative/output, not retained machine-read evidence authority; corresponding experiment/symbolic owners removed. No H39/freeze/holdout material in target group.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.6/V0.3.6_RECOMMENDATION.md",
+      "classification": "DELETE_R01",
+      "reason": "Historical narrative/output, not retained machine-read evidence authority; corresponding experiment/symbolic owners removed. No H39/freeze/holdout material in target group.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.7/README.md",
+      "classification": "DELETE_R01",
+      "reason": "Historical narrative/output, not retained machine-read evidence authority; corresponding experiment/symbolic owners removed. No H39/freeze/holdout material in target group.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.7/V0.3.7_FUNDING_CROWDING_FEATURE_QUALIFICATION_REPORT.md",
+      "classification": "DELETE_R01",
+      "reason": "Historical narrative/output, not retained machine-read evidence authority; corresponding experiment/symbolic owners removed. No H39/freeze/holdout material in target group.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.7/V0.3.7_NUMERIC_ANSWERS.json",
+      "classification": "DELETE_R01",
+      "reason": "Historical narrative/output, not retained machine-read evidence authority; corresponding experiment/symbolic owners removed. No H39/freeze/holdout material in target group.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.7/V0.3.7_RECOMMENDATION.md",
+      "classification": "DELETE_R01",
+      "reason": "Historical narrative/output, not retained machine-read evidence authority; corresponding experiment/symbolic owners removed. No H39/freeze/holdout material in target group.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.8/README.md",
+      "classification": "DELETE_R01",
+      "reason": "Historical narrative/output, not retained machine-read evidence authority; corresponding experiment/symbolic owners removed. No H39/freeze/holdout material in target group.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.8/V0.3.8_FUNDING_STABILITY_SERIAL_DEPENDENCE_REPORT.md",
+      "classification": "DEFER_PROTECTED",
+      "reason": "Machine-read evidence_paths in unchanged runtime ResearchRegistry; existence required by validator and rejected-family safety gates.",
+      "baseline_importers": [
+        "configs/research_registry.json",
+        "src/btc_quant_agent/research_registry.py"
+      ]
+    },
+    {
+      "path": "deliverables/v0.3.8/V0.3.8_NUMERIC_ANSWERS.json",
+      "classification": "DELETE_R01",
+      "reason": "Historical narrative/output, not retained machine-read evidence authority; corresponding experiment/symbolic owners removed. No H39/freeze/holdout material in target group.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.8/V0.3.8_RECOMMENDATION.md",
+      "classification": "DELETE_R01",
+      "reason": "Historical narrative/output, not retained machine-read evidence authority; corresponding experiment/symbolic owners removed. No H39/freeze/holdout material in target group.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.9/README.md",
+      "classification": "DELETE_R01",
+      "reason": "Historical narrative/output, not retained machine-read evidence authority; corresponding experiment/symbolic owners removed. No H39/freeze/holdout material in target group.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.9/REFERENCE_STRATEGY_BACKLOG.md",
+      "classification": "DELETE_R01",
+      "reason": "Historical narrative/output, not retained machine-read evidence authority; corresponding experiment/symbolic owners removed. No H39/freeze/holdout material in target group.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.9/V0.3.9_CROSS_ASSET_BREADTH_QUALIFICATION_REPORT.md",
+      "classification": "DEFER_PROTECTED",
+      "reason": "Machine-read evidence_paths in unchanged runtime ResearchRegistry; existence required by validator and rejected-family safety gates.",
+      "baseline_importers": [
+        "configs/research_registry.json",
+        "src/btc_quant_agent/research_registry.py"
+      ]
+    },
+    {
+      "path": "deliverables/v0.3.9/V0.3.9_NUMERIC_ANSWERS.json",
+      "classification": "DELETE_R01",
+      "reason": "Historical narrative/output, not retained machine-read evidence authority; corresponding experiment/symbolic owners removed. No H39/freeze/holdout material in target group.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deliverables/v0.3.9/V0.3.9_RECOMMENDATION.md",
+      "classification": "DELETE_R01",
+      "reason": "Historical narrative/output, not retained machine-read evidence authority; corresponding experiment/symbolic owners removed. No H39/freeze/holdout material in target group.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deploy/linux-vps/bootstrap.sh",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deploy/linux-vps/healthcheck.sh",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deploy/linux-vps/network.env.example",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deploy/systemd/btc-quant-forward-derivatives.service",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deploy/systemd/btc-quant-forward-derivatives.timer",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deploy/systemd/btc-quant-forward-health.service",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deploy/systemd/btc-quant-forward-health.timer",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deploy/systemd/btc-quant-h39-blind-accumulate.service",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deploy/systemd/btc-quant-h39-blind-accumulate.timer",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deploy/systemd/btc-quant-microstructure-forward.service",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deploy/systemd/btc-quant-opportunity-forward.service",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deploy/systemd/btc-quant-opportunity-forward.timer",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deploy/systemd/btc-quant-opportunity-resolve.service",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deploy/systemd/btc-quant-opportunity-resolve.timer",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deploy/systemd/install-all-forward-services.sh",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deploy/systemd/install-user-forward-derivatives.sh",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deploy/systemd/install-user-forward-health.sh",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deploy/systemd/install-user-h39-blind-accumulate.sh",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deploy/systemd/install-user-microstructure-forward.sh",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deploy/systemd/install-user-opportunity-forward.sh",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "deploy/systemd/network.env.example",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "docker-compose.yml",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "docs/DERIVATIVES_FORWARD_COLLECTION.md",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "docs/FORWARD_DERIVATIVES_OPERATIONS.md",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "docs/LINUX_VPS_MIGRATION_RUNBOOK.md",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "docs/MULTI_MODEL_RESEARCH_GOVERNANCE.md",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "docs/NEXT_IMPLEMENTATION_REPORT.md",
+      "classification": "DELETE_R01",
+      "reason": "Duplicate historical report/handoff narrative; no source/test/CI machine reader. README references replaced by current architecture.",
+      "baseline_importers": []
+    },
+    {
+      "path": "docs/OPTIMIZED_DESIGN.md",
+      "classification": "DEFER_UNCERTAIN",
+      "reason": "Independent design/operational maintenance surface outside proven dead-research closure.",
+      "baseline_importers": []
+    },
+    {
+      "path": "docs/PROJECT_CONTEXT_HANDOFF.md",
+      "classification": "DELETE_R01",
+      "reason": "Duplicate historical report/handoff narrative; no source/test/CI machine reader. README references replaced by current architecture.",
+      "baseline_importers": []
+    },
+    {
+      "path": "docs/RESEARCH_REGISTRY.md",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "docs/V0.2.1_IMPLEMENTATION_REPORT.md",
+      "classification": "DELETE_R01",
+      "reason": "Duplicate historical report/handoff narrative; no source/test/CI machine reader. README references replaced by current architecture.",
+      "baseline_importers": []
+    },
+    {
+      "path": "docs/V0.3.0_DATA_AUDIT.md",
+      "classification": "DELETE_R01",
+      "reason": "Duplicate historical report/handoff narrative; no source/test/CI machine reader. README references replaced by current architecture.",
+      "baseline_importers": []
+    },
+    {
+      "path": "docs/V0.3.0_REPLAY_AUDIT.md",
+      "classification": "DELETE_R01",
+      "reason": "Duplicate historical report/handoff narrative; no source/test/CI machine reader. README references replaced by current architecture.",
+      "baseline_importers": []
+    },
+    {
+      "path": "docs/V0.3.0_RESEARCH_REPORT.md",
+      "classification": "DELETE_R01",
+      "reason": "Duplicate historical report/handoff narrative; no source/test/CI machine reader. README references replaced by current architecture.",
+      "baseline_importers": []
+    },
+    {
+      "path": "docs/V0.3.10_RANGE_MEAN_REVERSION_REPORT.md",
+      "classification": "DELETE_R01",
+      "reason": "Duplicate historical report/handoff narrative; no source/test/CI machine reader. README references replaced by current architecture.",
+      "baseline_importers": []
+    },
+    {
+      "path": "docs/V0.3.11_RUNTIME_ALIGNMENT_FORWARD_DATA_REPORT.md",
+      "classification": "DELETE_R01",
+      "reason": "Duplicate historical report/handoff narrative; no source/test/CI machine reader. README references replaced by current architecture.",
+      "baseline_importers": []
+    },
+    {
+      "path": "docs/V0.3.12_SPOT_PERP_FLOW_QUALIFICATION_REPORT.md",
+      "classification": "DELETE_R01",
+      "reason": "Duplicate historical report/handoff narrative; no source/test/CI machine reader. README references replaced by current architecture.",
+      "baseline_importers": []
+    },
+    {
+      "path": "docs/V0.3.1_FACTOR_REDUNDANCY_AUDIT.md",
+      "classification": "DELETE_R01",
+      "reason": "Duplicate historical report/handoff narrative; no source/test/CI machine reader. README references replaced by current architecture.",
+      "baseline_importers": []
+    },
+    {
+      "path": "docs/V0.3.1_FUNNEL_DIAGNOSTIC_REPORT.md",
+      "classification": "DELETE_R01",
+      "reason": "Duplicate historical report/handoff narrative; no source/test/CI machine reader. README references replaced by current architecture.",
+      "baseline_importers": []
+    },
+    {
+      "path": "docs/V0.3.1_STRATEGY_HYPOTHESES.md",
+      "classification": "DELETE_R01",
+      "reason": "Duplicate historical report/handoff narrative; no source/test/CI machine reader. README references replaced by current architecture.",
+      "baseline_importers": []
+    },
+    {
+      "path": "docs/V0.3.1_ZERO_TRADE_YEARS.md",
+      "classification": "DELETE_R01",
+      "reason": "Duplicate historical report/handoff narrative; no source/test/CI machine reader. README references replaced by current architecture.",
+      "baseline_importers": []
+    },
+    {
+      "path": "docs/V0.3.2_CANDIDATE_RECOMMENDATION.md",
+      "classification": "DELETE_R01",
+      "reason": "Duplicate historical report/handoff narrative; no source/test/CI machine reader. README references replaced by current architecture.",
+      "baseline_importers": []
+    },
+    {
+      "path": "docs/V0.3.2_MECHANISM_EXPERIMENT_REPORT.md",
+      "classification": "DELETE_R01",
+      "reason": "Duplicate historical report/handoff narrative; no source/test/CI machine reader. README references replaced by current architecture.",
+      "baseline_importers": []
+    },
+    {
+      "path": "docs/V0.3.3_GEOMETRY_EXCURSION_REPORT.md",
+      "classification": "DELETE_R01",
+      "reason": "Duplicate historical report/handoff narrative; no source/test/CI machine reader. README references replaced by current architecture.",
+      "baseline_importers": []
+    },
+    {
+      "path": "docs/V0.3.4_CAUSAL_ENTRY_DIRECTIONALITY_REPORT.md",
+      "classification": "DELETE_R01",
+      "reason": "Duplicate historical report/handoff narrative; no source/test/CI machine reader. README references replaced by current architecture.",
+      "baseline_importers": []
+    },
+    {
+      "path": "docs/V0.3.5_BREAKOUT_EDGE_QUALIFICATION_REPORT.md",
+      "classification": "DELETE_R01",
+      "reason": "Duplicate historical report/handoff narrative; no source/test/CI machine reader. README references replaced by current architecture.",
+      "baseline_importers": []
+    },
+    {
+      "path": "docs/V0.3.6_DIRECTIONAL_ARCHITECTURE_RESET_REPORT.md",
+      "classification": "DELETE_R01",
+      "reason": "Duplicate historical report/handoff narrative; no source/test/CI machine reader. README references replaced by current architecture.",
+      "baseline_importers": []
+    },
+    {
+      "path": "docs/V0.3.7_FUNDING_CROWDING_FEATURE_QUALIFICATION_REPORT.md",
+      "classification": "DELETE_R01",
+      "reason": "Duplicate historical report/handoff narrative; no source/test/CI machine reader. README references replaced by current architecture.",
+      "baseline_importers": []
+    },
+    {
+      "path": "docs/V0.3.8_FUNDING_STABILITY_SERIAL_DEPENDENCE_REPORT.md",
+      "classification": "DELETE_R01",
+      "reason": "Duplicate historical report/handoff narrative; no source/test/CI machine reader. README references replaced by current architecture.",
+      "baseline_importers": []
+    },
+    {
+      "path": "docs/V0.3.9_CROSS_ASSET_BREADTH_QUALIFICATION_REPORT.md",
+      "classification": "DELETE_R01",
+      "reason": "Duplicate historical report/handoff narrative; no source/test/CI machine reader. README references replaced by current architecture.",
+      "baseline_importers": []
+    },
+    {
+      "path": "pyproject.toml",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "scripts/maintenance/cleanup_remote_branches.sh",
+      "classification": "DEFER_UNCERTAIN",
+      "reason": "Independent design/operational maintenance surface outside proven dead-research closure.",
+      "baseline_importers": []
+    },
+    {
+      "path": "scripts/windows/check_wsl_health.ps1",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "scripts/windows/prevent_sleep.ps1",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "scripts/windows/recover_forward_wsl.ps1",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "skill-template/SKILL.md",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "skill-template/scripts/quant_tool.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "src/btc_quant_agent/__init__.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "src/btc_quant_agent/__main__.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "src/btc_quant_agent/api.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "src/btc_quant_agent/backtest.py",
+      "classification": "DEFER_PROTECTED",
+      "reason": "H39 frozen experiment or compatibility/holdout primitives required by retained guards; semantic split deliberately deferred.",
+      "baseline_importers": []
+    },
+    {
+      "path": "src/btc_quant_agent/breakout_edge_research.py",
+      "classification": "DELETE_R01",
+      "reason": "Historical research/symbolic authority; all importers are deleted members/runners/exclusive tests or removed legacy CLI wiring. No formal/H39/package/CI dependency.",
+      "baseline_importers": [
+        "src/btc_quant_agent/funding_crowding_research.py",
+        "tests/test_breakout_edge_research.py",
+        "tools/run_breakout_edge_qualification.py"
+      ]
+    },
+    {
+      "path": "src/btc_quant_agent/causal_entry_research.py",
+      "classification": "DELETE_R01",
+      "reason": "Historical research/symbolic authority; all importers are deleted members/runners/exclusive tests or removed legacy CLI wiring. No formal/H39/package/CI dependency.",
+      "baseline_importers": [
+        "src/btc_quant_agent/breakout_edge_research.py",
+        "src/btc_quant_agent/cross_asset_breadth_research.py",
+        "src/btc_quant_agent/directional_architecture_research.py",
+        "src/btc_quant_agent/funding_crowding_research.py",
+        "src/btc_quant_agent/funding_stability_research.py",
+        "tests/test_breakout_edge_research.py",
+        "tests/test_causal_entry_research.py",
+        "tests/test_directional_architecture_research.py",
+        "tools/run_causal_entry_validation.py"
+      ]
+    },
+    {
+      "path": "src/btc_quant_agent/cli.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "src/btc_quant_agent/config.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "src/btc_quant_agent/cross_asset_breadth_research.py",
+      "classification": "DELETE_R01",
+      "reason": "Historical research/symbolic authority; all importers are deleted members/runners/exclusive tests or removed legacy CLI wiring. No formal/H39/package/CI dependency.",
+      "baseline_importers": [
+        "tests/test_cross_asset_breadth_research.py",
+        "tools/run_cross_asset_breadth_qualification.py"
+      ]
+    },
+    {
+      "path": "src/btc_quant_agent/data/__init__.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "src/btc_quant_agent/data/binance.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "src/btc_quant_agent/data/binance_archive.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "src/btc_quant_agent/data/binance_market_archive.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "src/btc_quant_agent/data/binance_spot_archive.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "src/btc_quant_agent/data/collector.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "src/btc_quant_agent/data/csvio.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "src/btc_quant_agent/data/derivatives.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "src/btc_quant_agent/data/forward_store.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "src/btc_quant_agent/data/funding.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "src/btc_quant_agent/data/historical_provenance.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "src/btc_quant_agent/data/manifest.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "src/btc_quant_agent/data/network_diagnostic.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "src/btc_quant_agent/data/official_derivatives_features.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "src/btc_quant_agent/data/quality.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "src/btc_quant_agent/data/resample.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "src/btc_quant_agent/data/rest.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "src/btc_quant_agent/data/vendor_contract.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "src/btc_quant_agent/directional_architecture_research.py",
+      "classification": "DELETE_R01",
+      "reason": "Historical research/symbolic authority; all importers are deleted members/runners/exclusive tests or removed legacy CLI wiring. No formal/H39/package/CI dependency.",
+      "baseline_importers": [
+        "src/btc_quant_agent/funding_crowding_research.py",
+        "tests/test_directional_architecture_research.py",
+        "tools/run_directional_architecture_reset.py"
+      ]
+    },
+    {
+      "path": "src/btc_quant_agent/directional_episode.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "src/btc_quant_agent/domain.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "src/btc_quant_agent/economic/__init__.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "src/btc_quant_agent/economic/acceptance_verifier.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "src/btc_quant_agent/economic/benchmarks.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "src/btc_quant_agent/economic/execution_model.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "src/btc_quant_agent/economic/execution_replay.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "src/btc_quant_agent/economic/fee_model.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "src/btc_quant_agent/economic/funding.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "src/btc_quant_agent/economic/metrics.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "src/btc_quant_agent/economic/order.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "src/btc_quant_agent/economic/policy.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "src/btc_quant_agent/economic/portfolio.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "src/btc_quant_agent/economic/qualification.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "src/btc_quant_agent/economic/replay_bundle.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "src/btc_quant_agent/economic/signal.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "src/btc_quant_agent/economic/signal_producer.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "src/btc_quant_agent/economic/simulator.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "src/btc_quant_agent/economic/trade_event.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "src/btc_quant_agent/engine.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "src/btc_quant_agent/evidence_epoch.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "src/btc_quant_agent/execution/__init__.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "src/btc_quant_agent/execution/binance_signed.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "src/btc_quant_agent/execution/guard.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "src/btc_quant_agent/execution/models.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "src/btc_quant_agent/execution/service.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "src/btc_quant_agent/explain.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "src/btc_quant_agent/features.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "src/btc_quant_agent/formal_research.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "src/btc_quant_agent/forward_diagnostics.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "src/btc_quant_agent/forward_evidence.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "src/btc_quant_agent/funding_crowding_research.py",
+      "classification": "DELETE_R01",
+      "reason": "Historical research/symbolic authority; all importers are deleted members/runners/exclusive tests or removed legacy CLI wiring. No formal/H39/package/CI dependency.",
+      "baseline_importers": [
+        "src/btc_quant_agent/cross_asset_breadth_research.py",
+        "src/btc_quant_agent/funding_stability_research.py",
+        "src/btc_quant_agent/spot_perp_flow_research.py",
+        "tests/test_cross_asset_breadth_research.py",
+        "tests/test_funding_crowding_research.py",
+        "tests/test_funding_stability_research.py",
+        "tests/test_spot_perp_flow_research.py",
+        "tools/run_funding_crowding_qualification.py",
+        "tools/run_funding_stability_diagnostic.py"
+      ]
+    },
+    {
+      "path": "src/btc_quant_agent/funding_stability_research.py",
+      "classification": "DELETE_R01",
+      "reason": "Historical research/symbolic authority; all importers are deleted members/runners/exclusive tests or removed legacy CLI wiring. No formal/H39/package/CI dependency.",
+      "baseline_importers": [
+        "src/btc_quant_agent/cross_asset_breadth_research.py",
+        "tests/test_funding_stability_research.py",
+        "tools/run_funding_stability_diagnostic.py"
+      ]
+    },
+    {
+      "path": "src/btc_quant_agent/funnel.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "src/btc_quant_agent/funnel_research.py",
+      "classification": "DELETE_R01",
+      "reason": "Historical research/symbolic authority; all importers are deleted members/runners/exclusive tests or removed legacy CLI wiring. No formal/H39/package/CI dependency.",
+      "baseline_importers": [
+        "tests/test_funnel_research.py"
+      ]
+    },
+    {
+      "path": "src/btc_quant_agent/geometry_research.py",
+      "classification": "DELETE_R01",
+      "reason": "Historical research/symbolic authority; all importers are deleted members/runners/exclusive tests or removed legacy CLI wiring. No formal/H39/package/CI dependency.",
+      "baseline_importers": [
+        "src/btc_quant_agent/breakout_edge_research.py",
+        "src/btc_quant_agent/causal_entry_research.py",
+        "src/btc_quant_agent/cross_asset_breadth_research.py",
+        "src/btc_quant_agent/directional_architecture_research.py",
+        "src/btc_quant_agent/funding_crowding_research.py",
+        "src/btc_quant_agent/funding_stability_research.py",
+        "src/btc_quant_agent/spot_perp_flow_research.py",
+        "tests/test_breakout_edge_research.py",
+        "tests/test_geometry_research.py",
+        "tools/run_geometry_audit.py"
+      ]
+    },
+    {
+      "path": "src/btc_quant_agent/h39_baseline.py",
+      "classification": "DEFER_PROTECTED",
+      "reason": "H39 frozen experiment or compatibility/holdout primitives required by retained guards; semantic split deliberately deferred.",
+      "baseline_importers": []
+    },
+    {
+      "path": "src/btc_quant_agent/h39_input.py",
+      "classification": "DEFER_PROTECTED",
+      "reason": "H39 frozen experiment or compatibility/holdout primitives required by retained guards; semantic split deliberately deferred.",
+      "baseline_importers": []
+    },
+    {
+      "path": "src/btc_quant_agent/h39_statistics.py",
+      "classification": "DEFER_PROTECTED",
+      "reason": "H39 frozen experiment or compatibility/holdout primitives required by retained guards; semantic split deliberately deferred.",
+      "baseline_importers": []
+    },
+    {
+      "path": "src/btc_quant_agent/indicators.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "src/btc_quant_agent/mechanism.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "src/btc_quant_agent/mechanism_research.py",
+      "classification": "DEFER_PROTECTED",
+      "reason": "H39 frozen experiment or compatibility/holdout primitives required by retained guards; semantic split deliberately deferred.",
+      "baseline_importers": []
+    },
+    {
+      "path": "src/btc_quant_agent/microstructure.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "src/btc_quant_agent/microstructure_research.py",
+      "classification": "DEFER_PROTECTED",
+      "reason": "H39 frozen experiment or compatibility/holdout primitives required by retained guards; semantic split deliberately deferred.",
+      "baseline_importers": []
+    },
+    {
+      "path": "src/btc_quant_agent/multifactor.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "src/btc_quant_agent/notify/__init__.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "src/btc_quant_agent/notify/feishu.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "src/btc_quant_agent/opportunity_forward.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "src/btc_quant_agent/publication.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "src/btc_quant_agent/range_mean_reversion_research.py",
+      "classification": "DELETE_R01",
+      "reason": "Historical research/symbolic authority; all importers are deleted members/runners/exclusive tests or removed legacy CLI wiring. No formal/H39/package/CI dependency.",
+      "baseline_importers": [
+        "tests/test_range_mean_reversion_research.py",
+        "tools/run_range_mean_reversion_qualification.py"
+      ]
+    },
+    {
+      "path": "src/btc_quant_agent/regime.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "src/btc_quant_agent/research.py",
+      "classification": "DEFER_PROTECTED",
+      "reason": "H39 frozen experiment or compatibility/holdout primitives required by retained guards; semantic split deliberately deferred.",
+      "baseline_importers": []
+    },
+    {
+      "path": "src/btc_quant_agent/research_contract/__init__.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "src/btc_quant_agent/research_contract/canonical.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "src/btc_quant_agent/research_contract/models.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "src/btc_quant_agent/research_contract/registry.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "src/btc_quant_agent/research_protocol.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "src/btc_quant_agent/research_registry.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "src/btc_quant_agent/risk.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "src/btc_quant_agent/service.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "src/btc_quant_agent/shadow.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "src/btc_quant_agent/spot_perp_flow_research.py",
+      "classification": "DELETE_R01",
+      "reason": "Historical research/symbolic authority; all importers are deleted members/runners/exclusive tests or removed legacy CLI wiring. No formal/H39/package/CI dependency.",
+      "baseline_importers": [
+        "tests/test_spot_perp_flow_research.py",
+        "tools/run_spot_perp_flow_qualification.py"
+      ]
+    },
+    {
+      "path": "src/btc_quant_agent/sqlite_schema.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "src/btc_quant_agent/storage.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "src/btc_quant_agent/strategies.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "src/btc_quant_agent/structure.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "src/btc_quant_agent/symbolic_alpha/__init__.py",
+      "classification": "DELETE_R01",
+      "reason": "Historical research/symbolic authority; all importers are deleted members/runners/exclusive tests or removed legacy CLI wiring. No formal/H39/package/CI dependency.",
+      "baseline_importers": []
+    },
+    {
+      "path": "src/btc_quant_agent/symbolic_alpha/dsl.py",
+      "classification": "DELETE_R01",
+      "reason": "Historical research/symbolic authority; all importers are deleted members/runners/exclusive tests or removed legacy CLI wiring. No formal/H39/package/CI dependency.",
+      "baseline_importers": [
+        "src/btc_quant_agent/symbolic_alpha/__init__.py",
+        "src/btc_quant_agent/symbolic_alpha/evaluate.py",
+        "src/btc_quant_agent/symbolic_alpha/proposal.py",
+        "src/btc_quant_agent/symbolic_alpha/registry.py",
+        "src/btc_quant_agent/symbolic_alpha/search.py",
+        "src/btc_quant_agent/symbolic_alpha/vm.py",
+        "tests/test_v0318_historical_symbolic.py",
+        "tests/test_v0319_symbolic_correctness.py",
+        "tools/run_historical_symbolic_factory.py",
+        "tools/run_v0319_official_derivatives_symbolic.py"
+      ]
+    },
+    {
+      "path": "src/btc_quant_agent/symbolic_alpha/evaluate.py",
+      "classification": "DELETE_R01",
+      "reason": "Historical research/symbolic authority; all importers are deleted members/runners/exclusive tests or removed legacy CLI wiring. No formal/H39/package/CI dependency.",
+      "baseline_importers": [
+        "src/btc_quant_agent/symbolic_alpha/search.py",
+        "tests/test_v0318_historical_symbolic.py",
+        "tests/test_v0319_symbolic_correctness.py",
+        "tools/run_historical_symbolic_factory.py",
+        "tools/run_v0319_official_derivatives_symbolic.py"
+      ]
+    },
+    {
+      "path": "src/btc_quant_agent/symbolic_alpha/gates.py",
+      "classification": "DELETE_R01",
+      "reason": "Historical research/symbolic authority; all importers are deleted members/runners/exclusive tests or removed legacy CLI wiring. No formal/H39/package/CI dependency.",
+      "baseline_importers": [
+        "tests/test_v0319_symbolic_correctness.py",
+        "tools/run_v0319_official_derivatives_symbolic.py"
+      ]
+    },
+    {
+      "path": "src/btc_quant_agent/symbolic_alpha/proposal.py",
+      "classification": "DELETE_R01",
+      "reason": "Historical research/symbolic authority; all importers are deleted members/runners/exclusive tests or removed legacy CLI wiring. No formal/H39/package/CI dependency.",
+      "baseline_importers": [
+        "src/btc_quant_agent/symbolic_alpha/search.py",
+        "tests/test_v0318_historical_symbolic.py",
+        "tests/test_v0319_symbolic_correctness.py",
+        "tools/run_historical_symbolic_factory.py",
+        "tools/run_v0319_official_derivatives_symbolic.py"
+      ]
+    },
+    {
+      "path": "src/btc_quant_agent/symbolic_alpha/registry.py",
+      "classification": "DELETE_R01",
+      "reason": "Historical research/symbolic authority; all importers are deleted members/runners/exclusive tests or removed legacy CLI wiring. No formal/H39/package/CI dependency.",
+      "baseline_importers": [
+        "tests/test_v0319_symbolic_correctness.py",
+        "tools/run_historical_symbolic_factory.py",
+        "tools/run_v0319_official_derivatives_symbolic.py"
+      ]
+    },
+    {
+      "path": "src/btc_quant_agent/symbolic_alpha/sandbox.py",
+      "classification": "DELETE_R01",
+      "reason": "Historical research/symbolic authority; all importers are deleted members/runners/exclusive tests or removed legacy CLI wiring. No formal/H39/package/CI dependency.",
+      "baseline_importers": [
+        "tests/test_v0318_historical_symbolic.py",
+        "tests/test_v0319_symbolic_correctness.py"
+      ]
+    },
+    {
+      "path": "src/btc_quant_agent/symbolic_alpha/search.py",
+      "classification": "DELETE_R01",
+      "reason": "Historical research/symbolic authority; all importers are deleted members/runners/exclusive tests or removed legacy CLI wiring. No formal/H39/package/CI dependency.",
+      "baseline_importers": [
+        "tests/test_v0319_symbolic_correctness.py",
+        "tools/run_historical_symbolic_factory.py",
+        "tools/run_v0319_official_derivatives_symbolic.py"
+      ]
+    },
+    {
+      "path": "src/btc_quant_agent/symbolic_alpha/vm.py",
+      "classification": "DELETE_R01",
+      "reason": "Historical research/symbolic authority; all importers are deleted members/runners/exclusive tests or removed legacy CLI wiring. No formal/H39/package/CI dependency.",
+      "baseline_importers": [
+        "src/btc_quant_agent/symbolic_alpha/__init__.py",
+        "src/btc_quant_agent/symbolic_alpha/evaluate.py",
+        "src/btc_quant_agent/symbolic_alpha/search.py",
+        "tests/test_v0318_historical_symbolic.py",
+        "tests/test_v0319_symbolic_correctness.py",
+        "tools/run_historical_symbolic_factory.py",
+        "tools/run_v0319_official_derivatives_symbolic.py"
+      ]
+    },
+    {
+      "path": "src/btc_quant_agent/time_boundary.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tests/conftest.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tests/goldens/v042_semantic_goldens.json",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tests/helpers.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tests/helpers_v042_economic_replay.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tests/helpers_v042_semantic_goldens.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tests/probe_v043_c_lite_differential.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tests/test_api.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tests/test_backtest.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tests/test_binance_archive.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tests/test_binance_signed.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tests/test_binance_spot_archive.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tests/test_breakout_edge_research.py",
+      "classification": "DELETE_R01",
+      "reason": "Historical test file removed with deleted research/symbolic owner. Mixed retained-owner tests migrated unchanged to test_v050_r01_retained_owner_guards.py; all shared economic/runtime/H39/holdout guards retained.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tests/test_causal_entry_research.py",
+      "classification": "DELETE_R01",
+      "reason": "Historical test file removed with deleted research/symbolic owner. Mixed retained-owner tests migrated unchanged to test_v050_r01_retained_owner_guards.py; all shared economic/runtime/H39/holdout guards retained.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tests/test_config.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tests/test_cross_asset_breadth_research.py",
+      "classification": "DELETE_R01",
+      "reason": "Historical test file removed with deleted research/symbolic owner. Mixed retained-owner tests migrated unchanged to test_v050_r01_retained_owner_guards.py; all shared economic/runtime/H39/holdout guards retained.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tests/test_csvio.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tests/test_data_manifest.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tests/test_derivatives.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tests/test_directional_architecture_research.py",
+      "classification": "DELETE_R01",
+      "reason": "Historical test file removed with deleted research/symbolic owner. Mixed retained-owner tests migrated unchanged to test_v050_r01_retained_owner_guards.py; all shared economic/runtime/H39/holdout guards retained.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tests/test_engine.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tests/test_engine_correctness.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tests/test_event_backtest.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tests/test_execution.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tests/test_execution_guard.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tests/test_explain.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tests/test_features.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tests/test_forward_derivatives.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tests/test_funding_crowding_research.py",
+      "classification": "DELETE_R01",
+      "reason": "Historical test file removed with deleted research/symbolic owner. Mixed retained-owner tests migrated unchanged to test_v050_r01_retained_owner_guards.py; all shared economic/runtime/H39/holdout guards retained.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tests/test_funding_stability_research.py",
+      "classification": "DELETE_R01",
+      "reason": "Historical test file removed with deleted research/symbolic owner. Mixed retained-owner tests migrated unchanged to test_v050_r01_retained_owner_guards.py; all shared economic/runtime/H39/holdout guards retained.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tests/test_funnel.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tests/test_funnel_research.py",
+      "classification": "DELETE_R01",
+      "reason": "Historical test file removed with deleted research/symbolic owner. Mixed retained-owner tests migrated unchanged to test_v050_r01_retained_owner_guards.py; all shared economic/runtime/H39/holdout guards retained.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tests/test_geometry_research.py",
+      "classification": "DELETE_R01",
+      "reason": "Historical test file removed with deleted research/symbolic owner. Mixed retained-owner tests migrated unchanged to test_v050_r01_retained_owner_guards.py; all shared economic/runtime/H39/holdout guards retained.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tests/test_hermetic_runtime_guard.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tests/test_mechanism.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tests/test_multifactor.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tests/test_notify.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tests/test_quality.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tests/test_range_mean_reversion_research.py",
+      "classification": "DELETE_R01",
+      "reason": "Historical test file removed with deleted research/symbolic owner. Mixed retained-owner tests migrated unchanged to test_v050_r01_retained_owner_guards.py; all shared economic/runtime/H39/holdout guards retained.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tests/test_regime.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tests/test_research.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tests/test_research_protocol.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tests/test_risk.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tests/test_service_correctness.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tests/test_shadow.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tests/test_spot_perp_flow_research.py",
+      "classification": "DELETE_R01",
+      "reason": "Historical test file removed with deleted research/symbolic owner. Mixed retained-owner tests migrated unchanged to test_v050_r01_retained_owner_guards.py; all shared economic/runtime/H39/holdout guards retained.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tests/test_storage.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tests/test_strategies.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tests/test_structure.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tests/test_v0311_runtime_registry.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tests/test_v0313_forward_reliability.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tests/test_v0314_evidence_epoch.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tests/test_v0315_microstructure.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tests/test_v0316_reliability.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tests/test_v0317_opportunity_successor.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tests/test_v0318_historical_symbolic.py",
+      "classification": "DELETE_R01",
+      "reason": "Historical test file removed with deleted research/symbolic owner. Mixed retained-owner tests migrated unchanged to test_v050_r01_retained_owner_guards.py; all shared economic/runtime/H39/holdout guards retained.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tests/test_v0319_symbolic_correctness.py",
+      "classification": "DELETE_R01",
+      "reason": "Historical test file removed with deleted research/symbolic owner. Mixed retained-owner tests migrated unchanged to test_v050_r01_retained_owner_guards.py; all shared economic/runtime/H39/holdout guards retained.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tests/test_v0320_reliability.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tests/test_v0321_resilience.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tests/test_v0322_microstructure_research.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tests/test_v0323_blind_validation.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tests/test_v0324_blind_accumulation_operations.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tests/test_v0325_one_shot_unblind_preregistration.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tests/test_v0326_h39_blocker_repairs.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tests/test_v040_research_kernel_economic_validation.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tests/test_v041_acceptance_repair_causal_risk.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tests/test_v041_c2_intrabar_exit_slippage_bounds.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tests/test_v041_p0_p1_cash_ledger.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tests/test_v041_p2_p3_causal_execution.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tests/test_v041_p4_risk_policy.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tests/test_v041_p5_protocol_evidence_persistence.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tests/test_v041_p6_metrics_benchmarks_qualification.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tests/test_v042_a04_semantic_goldens.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tests/test_v042_b01_limit_causality.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tests/test_v042_b02_causal_liquidity.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tests/test_v042_b03_formal_pit_boundary.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tests/test_v042_b04_verified_replay_input_bundle.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tests/test_v042_b04r2_authority_acceptance_repair.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tests/test_v042_b04r3_protocol_producer_contract_fail_closed.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tests/test_v042_b04r4_random_benchmark_authority_boundary.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tests/test_v042_b04r5_candidate_identity_relabel_fail_closed.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tests/test_v042_b04r_replay_bundle_acceptance_repair.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tests/test_v042_b05_candidate_execution_replay.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tests/test_v042_b06_random_experiment_replay.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tests/test_v042_b07_cash_reconstruction.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tests/test_v042_b08_clock_config.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tests/test_v042_b09_durable_publication.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tests/test_v042_b10_writer_finalization.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tests/test_v042_b11_sqlite_compatibility.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tests/test_v042_b12_bounded_rest_requester.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tests/test_v042_ba_information_set_integration.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tests/test_v042_bar_pit_formal_promotion.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tests/test_v043_c_lite_formal_consumers.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tools/benchmark_research.py",
+      "classification": "DELETE_R01",
+      "reason": "Historical qualification/symbolic/data-materialization/geometry-smoke runner; no retained source/test/package/CI invocation. Shared data producers retained.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tools/build_cross_asset_hourly_dataset.py",
+      "classification": "DELETE_R01",
+      "reason": "Historical qualification/symbolic/data-materialization/geometry-smoke runner; no retained source/test/package/CI invocation. Shared data producers retained.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tools/build_spot_market_flow_dataset.py",
+      "classification": "DELETE_R01",
+      "reason": "Historical qualification/symbolic/data-materialization/geometry-smoke runner; no retained source/test/package/CI invocation. Shared data producers retained.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tools/build_v0319_official_features.py",
+      "classification": "DELETE_R01",
+      "reason": "Historical qualification/symbolic/data-materialization/geometry-smoke runner; no retained source/test/package/CI invocation. Shared data producers retained.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tools/catalog_surfaces.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tools/inspect_post_start.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tools/package_v0318_deliverables.py",
+      "classification": "DELETE_R01",
+      "reason": "Historical qualification/symbolic/data-materialization/geometry-smoke runner; no retained source/test/package/CI invocation. Shared data producers retained.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tools/run_breakout_edge_qualification.py",
+      "classification": "DELETE_R01",
+      "reason": "Historical qualification/symbolic/data-materialization/geometry-smoke runner; no retained source/test/package/CI invocation. Shared data producers retained.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tools/run_causal_entry_validation.py",
+      "classification": "DELETE_R01",
+      "reason": "Historical qualification/symbolic/data-materialization/geometry-smoke runner; no retained source/test/package/CI invocation. Shared data producers retained.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tools/run_cross_asset_breadth_qualification.py",
+      "classification": "DELETE_R01",
+      "reason": "Historical qualification/symbolic/data-materialization/geometry-smoke runner; no retained source/test/package/CI invocation. Shared data producers retained.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tools/run_directional_architecture_reset.py",
+      "classification": "DELETE_R01",
+      "reason": "Historical qualification/symbolic/data-materialization/geometry-smoke runner; no retained source/test/package/CI invocation. Shared data producers retained.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tools/run_formal_research.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Retained current package, test, packaging, or repository support; not proven dead.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tools/run_funding_crowding_qualification.py",
+      "classification": "DELETE_R01",
+      "reason": "Historical qualification/symbolic/data-materialization/geometry-smoke runner; no retained source/test/package/CI invocation. Shared data producers retained.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tools/run_funding_stability_diagnostic.py",
+      "classification": "DELETE_R01",
+      "reason": "Historical qualification/symbolic/data-materialization/geometry-smoke runner; no retained source/test/package/CI invocation. Shared data producers retained.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tools/run_geometry_audit.py",
+      "classification": "DELETE_R01",
+      "reason": "Historical qualification/symbolic/data-materialization/geometry-smoke runner; no retained source/test/package/CI invocation. Shared data producers retained.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tools/run_h39_blind_operations.py",
+      "classification": "DEFER_PROTECTED",
+      "reason": "H39 frozen experiment or compatibility/holdout primitives required by retained guards; semantic split deliberately deferred.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tools/run_h39_blind_validation.py",
+      "classification": "DEFER_PROTECTED",
+      "reason": "H39 frozen experiment or compatibility/holdout primitives required by retained guards; semantic split deliberately deferred.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tools/run_h39_one_shot_unblind.py",
+      "classification": "DEFER_PROTECTED",
+      "reason": "H39 frozen experiment or compatibility/holdout primitives required by retained guards; semantic split deliberately deferred.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tools/run_h39_research.py",
+      "classification": "DEFER_PROTECTED",
+      "reason": "H39 frozen experiment or compatibility/holdout primitives required by retained guards; semantic split deliberately deferred.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tools/run_historical_symbolic_factory.py",
+      "classification": "DELETE_R01",
+      "reason": "Historical qualification/symbolic/data-materialization/geometry-smoke runner; no retained source/test/package/CI invocation. Shared data producers retained.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tools/run_range_mean_reversion_qualification.py",
+      "classification": "DELETE_R01",
+      "reason": "Historical qualification/symbolic/data-materialization/geometry-smoke runner; no retained source/test/package/CI invocation. Shared data producers retained.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tools/run_spot_perp_flow_qualification.py",
+      "classification": "DELETE_R01",
+      "reason": "Historical qualification/symbolic/data-materialization/geometry-smoke runner; no retained source/test/package/CI invocation. Shared data producers retained.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tools/run_v0319_official_derivatives_symbolic.py",
+      "classification": "DELETE_R01",
+      "reason": "Historical qualification/symbolic/data-materialization/geometry-smoke runner; no retained source/test/package/CI invocation. Shared data producers retained.",
+      "baseline_importers": []
+    },
+    {
+      "path": "tools/smoke_excursion_clamp.py",
+      "classification": "DELETE_R01",
+      "reason": "Historical qualification/symbolic/data-materialization/geometry-smoke runner; no retained source/test/package/CI invocation. Shared data producers retained.",
+      "baseline_importers": []
+    },
+    {
+      "path": "docs/CURRENT_ARCHITECTURE.md",
+      "classification": "KEEP_CURRENT",
+      "reason": "Concise current formal authority, scientific and operational boundaries.",
+      "introduced_by_r01": true,
+      "baseline_importers": []
+    },
+    {
+      "path": "tests/test_v050_r01_surface_reduction.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Focused deletion, routing, registry evidence, packaging and safety guards.",
+      "introduced_by_r01": true,
+      "baseline_importers": []
+    },
+    {
+      "path": "tests/test_v050_r01_retained_owner_guards.py",
+      "classification": "KEEP_CURRENT",
+      "reason": "Unchanged assertions migrated from mixed-owner historical test files.",
+      "introduced_by_r01": true,
+      "baseline_importers": []
+    }
+  ],
+  "protected_sha256_before": {
+    "configs/forward/derivatives_evidence_epochs.json": "9b1c02302cc776d94194a928f5377ae8d00ffec804c495a599a9e60be1cdaff6",
+    "configs/forward/opportunity_forward_campaigns.json": "893df45a3d23dd8a90466dcc0de80bd735e14d59cb4716a471cbf163b523491a",
+    "configs/forward/v0.3.13_opportunity_shadow_campaign.json": "9093aef0b12f646b972ea662515bedf11b5256df580e949da049e1f7847882f6",
+    "configs/forward/v0.3.14_derivatives_evidence_epoch.json": "ec716a771e1f077cfc02e9f159ddba578cb7b2ae75dd1f990a329bd60629a1dd",
+    "configs/forward/v0.3.15_microstructure_capture_campaign.json": "49c782a1ab3a1eabb7bf92491c20a2a63cd3ea05151d824dba0b92aa3f76f331",
+    "configs/forward/v0.3.16_derivatives_evidence_epoch.json": "69a385c1331d0b424e57140321ec3b8b6697f91a7fd662cac980c454665583f4",
+    "configs/forward/v0.3.16_derivatives_evidence_epoch_002.json": "b3c27d3cc6e9b72388f86df84ba311c87e00e22dc3bf25aa96e59fc7c83db72a",
+    "configs/forward/v0.3.16_microstructure_reliability_protocol.json": "6c4c0811662261554b27c52cfede8f5b7a3bfff92474edc3ffe550a95192aa96",
+    "configs/forward/v0.3.17_opportunity_successor_campaign.json": "83fd80826e4b02921656232c588213020b01279ab0cf9e0bcc1c1b994b4a0531",
+    "configs/forward/v0.3.20_derivatives_evidence_epoch.json": "eb954a42046e765059eb4d207c6887cc42e79127b5d4981e8bdc4d349a8f3068",
+    "configs/forward/v0.3.20_opportunity_successor_campaign.json": "464d53fe3925f29c486714738f6d034cfa42caa79961c3938db88a5ab98f15c6",
+    "configs/forward/v0.3.21_derivatives_evidence_epoch.json": "aee62903ced13fce478a82d9183453625a520bd5a81ad987f524baf5a400090e",
+    "configs/forward/v0.3.21_opportunity_successor_campaign.json": "13b56802339277a56dd0f8a791a91b9576262fb373fb6ae63bcbf2d28e65b08d",
+    "configs/frozen/v0.2.2.toml": "8051f0419e4f5039181447a915fc9d09a0833dd4d1a3b69386e1bfc03a642823",
+    "configs/research/v0.3.22_microstructure_h39_protocol.json": "1b7d61409078f779585675e9f657a60ea1ef5384a7707c33bbac07535feaa979",
+    "configs/research/v0.3.2_mechanism_protocol.json": "bc78058df1972e1271ef5feab614d96cff332384135a0fdbef932908f2e31de3",
+    "configs/research_registry.json": "018c46a34cc960dc53d53e96768d11ede39e5d973fd25175cbdaee240d170334",
+    "deliverables/v0.3.10/V0.3.10_RANGE_MEAN_REVERSION_REPORT.md": "076794108320c54b5f22cee197456e83da7ec5c033344f6086824211cfaaa892",
+    "deliverables/v0.3.10/V0.3.10_RECOMMENDATION.md": "adf4ccdb12d33f1196cf07d89525246823735fec4bb0359ba5774ff7fc6ae700",
+    "deliverables/v0.3.12/V0.3.12_RECOMMENDATION.md": "7ccefb89b7d1d29d7b1e4c90d08003ce09a118e6950af173417b9403821d0bd5",
+    "deliverables/v0.3.12/V0.3.12_SPOT_PERP_FLOW_QUALIFICATION_REPORT.md": "3fa90404c6b85c67052e044da2ffcdee2f1f48052705038632b75dd7e351a5df",
+    "deliverables/v0.3.22/H38_TERMINAL_RECONCILIATION.json": "822195aeef76fbbb5d266fbde9cefb61d602867dc3cfe789e0f38425e678ad4e",
+    "deliverables/v0.3.22/H39_DEVELOPMENT_DIAGNOSTICS.json": "bacd6e35409bb3defce856d4e12c47cc98dd777053856a3939152d829400a413",
+    "deliverables/v0.3.22/H39_FEATURE_DICTIONARY.json": "1c723981e9ad6d9cc3190f086b364053642c2def23d537a40c8271c14e84a394",
+    "deliverables/v0.3.22/H39_PROTOCOL_CLARIFICATION_001.json": "b2ba02df923950413c773e308e01d4ba893690948be9c258311d483ea753e284",
+    "deliverables/v0.3.22/H39_PROTOCOL_FREEZE_MANIFEST.json": "ecfd8bbb13779dec39ac274a90b55bd9181194e0466bd390f644118ec36d740f",
+    "deliverables/v0.3.22/H39_VALIDATION_STATUS.json": "0b856d97b998e8a249eb046e49cce6c3e57fc72d49b5caeeba475fa57e1285f3",
+    "deliverables/v0.3.22/MICROSTRUCTURE_DATA_PROVENANCE.json": "af5e2af09b98833299a72a22686f126a95932f401e9c7193b91b2ae9d8176ea0",
+    "deliverables/v0.3.22/README.md": "01259698453c3be4be7863dbcdb49ff527135fc3e65f5e028a176e655e51ca98",
+    "deliverables/v0.3.22/V0.3.22_ACCEPTANCE_REPAIR_REPORT.md": "6c4e3a7d2d09fa284265350c680a3061421a74cc155d8dfb4ea6873fad5a45df",
+    "deliverables/v0.3.22/V0.3.22_MICROSTRUCTURE_ALPHA_REPORT.md": "eab01d0af36178e1506be5fe3098717f494dbcc56662af341f660d47b1f7cbb7",
+    "deliverables/v0.3.23/FORWARD_CHAIN_HEALTH.json": "a565dee7534c156ecb877da1a28b00f06d29fec0b6c1c9839a3b152628cef87b",
+    "deliverables/v0.3.23/H39_BLINDNESS_ATTESTATION.json": "663ff37c849853dd9ecda812ee3cd156d8df027d02734be5c2861ec98888c78d",
+    "deliverables/v0.3.23/H39_BLIND_VALIDATION_LEDGER_MANIFEST.json": "ccb62584ea80a60120de65e9211a2ab1ab23fbb271535c14e6d6dd9a3e339143",
+    "deliverables/v0.3.23/H39_BLIND_VALIDATION_STATUS.json": "9346e3a35879e6e43e0b54338b53210a8c40dd18276382409fd557005dace1a8",
+    "deliverables/v0.3.23/README.md": "6b3d1ae99f09f1b82116ac811aeb04313bb8adbeaba628d6d9e7c54463b18d19",
+    "deliverables/v0.3.23/V0.3.23_H39_BLIND_VALIDATION_REPORT.md": "22e3235edce7a9b4b38fd871fc0968c6d548c0ad827a4c21c529934dcf6faaee",
+    "deliverables/v0.3.23/V0.3.23_STRICT_UNBLIND_GATE_REPAIR.json": "1d9cd75b658ccc67a391db6fa05b10fa8976091a8bb8dc3c13788d34a932e001",
+    "deliverables/v0.3.23/V0.3.23_STRICT_UNBLIND_GATE_REPAIR.md": "250c1cbc0c96d67e88b0af720ca359db3daf7a25c14065e5cb7fd1d09ca22e43",
+    "deliverables/v0.3.24/FORWARD_CHAIN_HEALTH.json": "d68a3024b707a3b753f846bfb2deff9dc0e5b5e05e11f9285a6b682297bab088",
+    "deliverables/v0.3.24/H39_ACCUMULATION_SCHEDULER_REPORT.json": "994fe856cd76acf285798d92fad97ce123e6130b1a02545f610130669bf68ae3",
+    "deliverables/v0.3.24/H39_BLIND_LEDGER_INTEGRITY.json": "7a42c57f772fb0e707e367c886c63299a244e3dd0dcf35e90b7d97bd0e1db5bc",
+    "deliverables/v0.3.24/H39_BLIND_OPERATIONAL_STATUS.json": "bfe8ae32612243458a9d4e3d32c8fb3a759642579924b81887a74a53dfb7400a",
+    "deliverables/v0.3.24/README.md": "0fc93a84ed290b267a6ad631ed8d13f84a496a8053f922550ddcf65768b35f01",
+    "deliverables/v0.3.24/V0.3.24_H39_BLIND_ACCUMULATION_OPERATIONS_REPORT.md": "af8054cf9df85470d5453031b4583601463933c76252cfc64e44fc6c81d247b2",
+    "deliverables/v0.3.24/V0.3.24_WALL_CLOCK_DENOMINATOR_REPAIR.json": "8d6a841d1d6f33f658fe7a786abb378acc2c91ef433e31a3059fd1fc7cef101e",
+    "deliverables/v0.3.24/V0.3.24_WALL_CLOCK_DENOMINATOR_REPAIR.md": "0c3c6717cb567e8e9ac54e61edb9290ef6b7e2387b533711a47f99cc299673df",
+    "deliverables/v0.3.25/FORWARD_CHAIN_HEALTH.json": "1e55e5accfa2d72d4c36d0b66b53f2fc2196e401de6714c93cdb6284f3540b99",
+    "deliverables/v0.3.25/H39_BLIND_OPERATIONAL_STATUS.json": "23a8f70dc8c0fe0b7939d383d6e85756a22f1036b45a3ee52eeae601db29989a",
+    "deliverables/v0.3.25/H39_PROTOCOL_CLARIFICATION_002_DEPENDENCE_ROBUST_INFERENCE.json": "94c938b65640252c85a9e320b6f7759729ffa00f793c93e17cca52726e73212e",
+    "deliverables/v0.3.25/H39_PROTOCOL_CLARIFICATION_003_ROBUST_NESTED_NULL.json": "035b7528141c714fbe1aef310462d5aa5fd96d3d5fdec67ae8f70082531d7a92",
+    "deliverables/v0.3.25/H39_UNBLIND_PREREGISTRATION_MANIFEST.json": "477528fb31a5ca66c3d0b71155f6fdf6de8c9bf72b5f3b7fc9ba0d824550ccb1",
+    "deliverables/v0.3.25/README.md": "4e3169311216da8a67d4c07e062bb2b57e116195e39b764b9dd522a161165a9e",
+    "deliverables/v0.3.25/V0.3.25_COMMITTED_FREEZE_EXACTLY_ONCE_REPAIR.json": "d68901c6f9542af2ad01a91053c4d86841776248ecf76fa95c0c433fb4203fb7",
+    "deliverables/v0.3.25/V0.3.25_COMMITTED_FREEZE_EXACTLY_ONCE_REPAIR.md": "afacb8b30332bdaf36c634ca34aefabd39e2872d3488114d6febefef66f36fe6",
+    "deliverables/v0.3.25/V0.3.25_H39_ONE_SHOT_UNBLIND_PREREGISTRATION_REPORT.md": "483cdecb90f7b39e07d39e3ec36d55ec1ce7eaa9ca8e0000fc1a9aec465e2e30",
+    "deliverables/v0.3.25/V0.3.25_ROBUST_NULL_PROTOCOL_IDENTITY_HEALTH_SCHEMA_REPAIR.json": "54dac8aa2727b79feb8ee2f8a399825e32221d5e12f655be7b845af440d1ffb0",
+    "deliverables/v0.3.25/V0.3.25_ROBUST_NULL_PROTOCOL_IDENTITY_HEALTH_SCHEMA_REPAIR.md": "2b8b51ecd402bbf044a9ed8b10d9f41c5b5de2a717fd334202fd1f0f1cb3e453",
+    "deliverables/v0.3.25/V0.3.25_STATISTICAL_DEPENDENCE_HEALTH_REPAIR.json": "3a1092125b4edbfe994a97deadf6cb1a764275768a172f2f291a0933bc3623ac",
+    "deliverables/v0.3.25/V0.3.25_STATISTICAL_DEPENDENCE_HEALTH_REPAIR.md": "e89200640666a082b96084a83bd868af42ad17207f3de84328e415142805b834",
+    "deliverables/v0.3.26/H39_PROTOCOL_CLARIFICATION_004_CONDITIONAL_INPUT_CONTRACT.json": "a2f5e79a666d973b7fb86d23b92e8763ad341c831e652001304c4840fa91bb07",
+    "deliverables/v0.3.26/README.md": "62cc076a3a48a14b05e80b2c0ef19cad8753b81b6aa75a30a8b2a5737ee72fe6",
+    "deliverables/v0.3.3/V0.3.3_GEOMETRY_EXCURSION_REPORT.md": "9fc007016a963e03f8fa368c6c84b003b84e32682b8cc8baa57155c863b3f5a2",
+    "deliverables/v0.3.5/V0.3.5_BREAKOUT_EDGE_QUALIFICATION_REPORT.md": "8ff0a872b3b8c978f348ebe7741a855c4fb0aca2ce26adc5451801c00d23bff1",
+    "deliverables/v0.3.6/V0.3.6_DIRECTIONAL_ARCHITECTURE_RESET_REPORT.md": "4e6d7ac19755fb83c75f822ae0d5384aa5e1dccb76567ad807d115f490cbafb3",
+    "deliverables/v0.3.8/V0.3.8_FUNDING_STABILITY_SERIAL_DEPENDENCE_REPORT.md": "bdebf106782ef076072793be021b135c235c11b4dada4c9abc8d0d43d7c4edc2",
+    "deliverables/v0.3.9/V0.3.9_CROSS_ASSET_BREADTH_QUALIFICATION_REPORT.md": "9d960c6a8f203c3b47fe85b8e1e15dd56ddfb146152ba4a9d88dcfed4cb61f29",
+    "src/btc_quant_agent/backtest.py": "2f341de1e6a514db07d3a84358a63c50d500068a01e17baf72434b1bea7a8f0d",
+    "src/btc_quant_agent/data/rest.py": "4979fe6a028c986eb1d01a9de8d3489061141d8561ec416e75a2cd86abcdbd9b",
+    "src/btc_quant_agent/economic/__init__.py": "472cdc1a093f73fb37b4fb1c064edb4eef8b96772931f319eaa4340c2d08e3d2",
+    "src/btc_quant_agent/economic/acceptance_verifier.py": "1d96cc99966d2df4bc503c1d61ff495682b2ae8c7e0458e6ec286d5a83cafadd",
+    "src/btc_quant_agent/economic/benchmarks.py": "260aa99c4e6fcbe56c42e91ea54b4aba18d5b30fd020ce158272fae8667fd08a",
+    "src/btc_quant_agent/economic/execution_model.py": "11966a7afd1de801fd8a54692ddd94afa7d0023a4616f3dcd908dc90717c1c73",
+    "src/btc_quant_agent/economic/execution_replay.py": "9ed0eef7498323f2873dbc67c0266168d1478088835b43abfbc2ef8d35ab4833",
+    "src/btc_quant_agent/economic/fee_model.py": "96492c718042f33d7c9219af795284303a2f0c2a24c38aad87b621a123c64afc",
+    "src/btc_quant_agent/economic/funding.py": "d785dc7536ad658ee89d3b9df86589271efdde034e7f37d6d8c7c48e6412ad0f",
+    "src/btc_quant_agent/economic/metrics.py": "a62c4bfb5ffd239037d4f1e148d84fbc9e79058ec3a72fdcda859bc4c64178dd",
+    "src/btc_quant_agent/economic/order.py": "20f7a19d6b82aa3e4d49b7082dad71390db63addc7d59f51bf1be004e49d5156",
+    "src/btc_quant_agent/economic/policy.py": "2e558ce25178a33b70310f43609acfb976d29a3a6531c58c18fb66badbba578c",
+    "src/btc_quant_agent/economic/portfolio.py": "a8cc6704af83f3854be1b265ea79276f112291186113ac48778b396fb0da7169",
+    "src/btc_quant_agent/economic/qualification.py": "c9a9ac770ae4a46f356e14bb4ee20c45a4458d27332f752a49e115eaa147324d",
+    "src/btc_quant_agent/economic/replay_bundle.py": "e469ee2415f2d1730b77ce549891147faab44bdab9df134083acc147c4c65352",
+    "src/btc_quant_agent/economic/signal.py": "b975db1ab65330684064b66c938faf86ed7b62f04e4c4965717d96feba035fd1",
+    "src/btc_quant_agent/economic/signal_producer.py": "96d98abb28f329c2c0f465237d245c353fe054b73b0c5a83816d7726c0306e00",
+    "src/btc_quant_agent/economic/simulator.py": "7d02cb12b00daf617764675e2bca005cb328402a31ea98a7b105f292a01dc076",
+    "src/btc_quant_agent/economic/trade_event.py": "f7ab79736c6405b2c5052306d68e5f5a24a542d95751e60908ea6794b0c873ba",
+    "src/btc_quant_agent/formal_research.py": "2a907d5f86e4d8d5fb8f9ffb40a52ca53eaaa89ff319e0c5dffd7ad241b91382",
+    "src/btc_quant_agent/h39_baseline.py": "e4e5e4aefb8b1355eb9a5c6ff17d9d80407d75405477b604006e887cf5a14808",
+    "src/btc_quant_agent/h39_input.py": "0aea2d2b603634f73e27c3fabfca687333462370b8290f92ea3ff6db18d4556a",
+    "src/btc_quant_agent/h39_statistics.py": "b16b18d2879710a26ab4b61ef65f984192f61699ceb63b26e9ef35e813f52a60",
+    "src/btc_quant_agent/mechanism_research.py": "09b6b3eaf3f2882d02e89d1b4ee70c4875c45db8dd95eab1572f3265b9022296",
+    "src/btc_quant_agent/microstructure_research.py": "907624a5acac4f949ee6e8c77912806b4083d483c3160bbc95300aaf939bc6bd",
+    "src/btc_quant_agent/publication.py": "79bfdb7ab5adc1fd506d80745bdb400cb02a4df5685469172ca66b9fdead56ba",
+    "src/btc_quant_agent/research.py": "7187581d7ef340cd2571e9cf8b66b47090acac8d53068ade983aee3bf2dd78c7",
+    "src/btc_quant_agent/research_contract/__init__.py": "0246588a7cfeea034e7fb1ebc9c054f6699ad5de0fd85627ab7416685860bdca",
+    "src/btc_quant_agent/research_contract/canonical.py": "4646ad812cb04124b763ac64273b9052af1a5132751ee643003ebbd11c0adb20",
+    "src/btc_quant_agent/research_contract/models.py": "ab1ed8619831b0aeee5827c678adfe3cf8ad3d9950f1b53f2d0400f7b765f6b0",
+    "src/btc_quant_agent/research_contract/registry.py": "b64316ee68d0837f638b764f368a2181b1ab20acc209ed5f332bfecfabdb7a7f",
+    "src/btc_quant_agent/sqlite_schema.py": "95be4e778768b69aca0cf0492ed1edb9b52167f9b4ee0ae7938f48f321a916e1",
+    "tools/run_h39_blind_operations.py": "a0375a616e2066bc9f6fa717edab8f51c41a283e75bf89fdd907f3cc43ee64f8",
+    "tools/run_h39_blind_validation.py": "68c2d5e2fc240721cd5454ab154c7e3bdeb1b1d57304cce29e9725100a380a71",
+    "tools/run_h39_one_shot_unblind.py": "305f9caee26407cb8ad3c13253c79729198db5487180b7f3272b883a947a58ce",
+    "tools/run_h39_research.py": "e90fed97ce9b522a39fe7bfa908c1fb7f65b476f75a71732a39be23da597239b"
+  },
+  "baseline_metrics": {
+    "tracked_files": 521,
+    "src/": {
+      "files": 104,
+      "python_files": 104,
+      "python_loc": 43787,
+      "bytes": 1861067
+    },
+    "tools/": {
+      "files": 24,
+      "python_files": 24,
+      "python_loc": 4396,
+      "bytes": 180621
+    },
+    "tests/": {
+      "files": 92,
+      "python_files": 91,
+      "python_loc": 26021,
+      "bytes": 1046996
+    },
+    "docs/": {
+      "files": 28,
+      "python_files": 0,
+      "python_loc": 0,
+      "bytes": 172068
+    },
+    "deliverables/": {
+      "files": 192,
+      "python_files": 0,
+      "python_loc": 0,
+      "bytes": 718066
+    },
+    "configs/": {
+      "files": 33,
+      "python_files": 0,
+      "python_loc": 0,
+      "bytes": 305129
+    }
+  },
+  "baseline_summary": {
+    "KEEP_CURRENT": 214,
+    "DELETE_R01": 157,
+    "DEFER_PROTECTED": 78,
+    "DEFER_UNCERTAIN": 72
+  },
+  "final_code_sha": "a7de890891a400c6d150c5105cc211485d50f93d",
+  "implementation_commits": [
+    "440b08e22d357c61a83f9bf05ae38cdc93dcdb93",
+    "a7de890891a400c6d150c5105cc211485d50f93d"
+  ],
+  "final_metrics": {
+    "tracked_files": 367,
+    "src/": {
+      "files": 85,
+      "python_files": 85,
+      "python_loc": 32715,
+      "bytes": 1421385
+    },
+    "tools/": {
+      "files": 7,
+      "python_files": 7,
+      "python_loc": 773,
+      "bytes": 30161
+    },
+    "tests/": {
+      "files": 82,
+      "python_files": 81,
+      "python_loc": 23296,
+      "bytes": 950690
+    },
+    "docs/": {
+      "files": 7,
+      "python_files": 0,
+      "python_loc": 0,
+      "bytes": 43032
+    },
+    "deliverables/": {
+      "files": 120,
+      "python_files": 0,
+      "python_loc": 0,
+      "bytes": 422709
+    },
+    "configs/": {
+      "files": 18,
+      "python_files": 0,
+      "python_loc": 0,
+      "bytes": 52853
+    }
+  },
+  "protected_sha256_after": {
+    "configs/forward/derivatives_evidence_epochs.json": "9b1c02302cc776d94194a928f5377ae8d00ffec804c495a599a9e60be1cdaff6",
+    "configs/forward/opportunity_forward_campaigns.json": "893df45a3d23dd8a90466dcc0de80bd735e14d59cb4716a471cbf163b523491a",
+    "configs/forward/v0.3.13_opportunity_shadow_campaign.json": "9093aef0b12f646b972ea662515bedf11b5256df580e949da049e1f7847882f6",
+    "configs/forward/v0.3.14_derivatives_evidence_epoch.json": "ec716a771e1f077cfc02e9f159ddba578cb7b2ae75dd1f990a329bd60629a1dd",
+    "configs/forward/v0.3.15_microstructure_capture_campaign.json": "49c782a1ab3a1eabb7bf92491c20a2a63cd3ea05151d824dba0b92aa3f76f331",
+    "configs/forward/v0.3.16_derivatives_evidence_epoch.json": "69a385c1331d0b424e57140321ec3b8b6697f91a7fd662cac980c454665583f4",
+    "configs/forward/v0.3.16_derivatives_evidence_epoch_002.json": "b3c27d3cc6e9b72388f86df84ba311c87e00e22dc3bf25aa96e59fc7c83db72a",
+    "configs/forward/v0.3.16_microstructure_reliability_protocol.json": "6c4c0811662261554b27c52cfede8f5b7a3bfff92474edc3ffe550a95192aa96",
+    "configs/forward/v0.3.17_opportunity_successor_campaign.json": "83fd80826e4b02921656232c588213020b01279ab0cf9e0bcc1c1b994b4a0531",
+    "configs/forward/v0.3.20_derivatives_evidence_epoch.json": "eb954a42046e765059eb4d207c6887cc42e79127b5d4981e8bdc4d349a8f3068",
+    "configs/forward/v0.3.20_opportunity_successor_campaign.json": "464d53fe3925f29c486714738f6d034cfa42caa79961c3938db88a5ab98f15c6",
+    "configs/forward/v0.3.21_derivatives_evidence_epoch.json": "aee62903ced13fce478a82d9183453625a520bd5a81ad987f524baf5a400090e",
+    "configs/forward/v0.3.21_opportunity_successor_campaign.json": "13b56802339277a56dd0f8a791a91b9576262fb373fb6ae63bcbf2d28e65b08d",
+    "configs/frozen/v0.2.2.toml": "8051f0419e4f5039181447a915fc9d09a0833dd4d1a3b69386e1bfc03a642823",
+    "configs/research/v0.3.22_microstructure_h39_protocol.json": "1b7d61409078f779585675e9f657a60ea1ef5384a7707c33bbac07535feaa979",
+    "configs/research/v0.3.2_mechanism_protocol.json": "bc78058df1972e1271ef5feab614d96cff332384135a0fdbef932908f2e31de3",
+    "configs/research_registry.json": "018c46a34cc960dc53d53e96768d11ede39e5d973fd25175cbdaee240d170334",
+    "deliverables/v0.3.10/V0.3.10_RANGE_MEAN_REVERSION_REPORT.md": "076794108320c54b5f22cee197456e83da7ec5c033344f6086824211cfaaa892",
+    "deliverables/v0.3.10/V0.3.10_RECOMMENDATION.md": "adf4ccdb12d33f1196cf07d89525246823735fec4bb0359ba5774ff7fc6ae700",
+    "deliverables/v0.3.12/V0.3.12_RECOMMENDATION.md": "7ccefb89b7d1d29d7b1e4c90d08003ce09a118e6950af173417b9403821d0bd5",
+    "deliverables/v0.3.12/V0.3.12_SPOT_PERP_FLOW_QUALIFICATION_REPORT.md": "3fa90404c6b85c67052e044da2ffcdee2f1f48052705038632b75dd7e351a5df",
+    "deliverables/v0.3.22/H38_TERMINAL_RECONCILIATION.json": "822195aeef76fbbb5d266fbde9cefb61d602867dc3cfe789e0f38425e678ad4e",
+    "deliverables/v0.3.22/H39_DEVELOPMENT_DIAGNOSTICS.json": "bacd6e35409bb3defce856d4e12c47cc98dd777053856a3939152d829400a413",
+    "deliverables/v0.3.22/H39_FEATURE_DICTIONARY.json": "1c723981e9ad6d9cc3190f086b364053642c2def23d537a40c8271c14e84a394",
+    "deliverables/v0.3.22/H39_PROTOCOL_CLARIFICATION_001.json": "b2ba02df923950413c773e308e01d4ba893690948be9c258311d483ea753e284",
+    "deliverables/v0.3.22/H39_PROTOCOL_FREEZE_MANIFEST.json": "ecfd8bbb13779dec39ac274a90b55bd9181194e0466bd390f644118ec36d740f",
+    "deliverables/v0.3.22/H39_VALIDATION_STATUS.json": "0b856d97b998e8a249eb046e49cce6c3e57fc72d49b5caeeba475fa57e1285f3",
+    "deliverables/v0.3.22/MICROSTRUCTURE_DATA_PROVENANCE.json": "af5e2af09b98833299a72a22686f126a95932f401e9c7193b91b2ae9d8176ea0",
+    "deliverables/v0.3.22/README.md": "01259698453c3be4be7863dbcdb49ff527135fc3e65f5e028a176e655e51ca98",
+    "deliverables/v0.3.22/V0.3.22_ACCEPTANCE_REPAIR_REPORT.md": "6c4e3a7d2d09fa284265350c680a3061421a74cc155d8dfb4ea6873fad5a45df",
+    "deliverables/v0.3.22/V0.3.22_MICROSTRUCTURE_ALPHA_REPORT.md": "eab01d0af36178e1506be5fe3098717f494dbcc56662af341f660d47b1f7cbb7",
+    "deliverables/v0.3.23/FORWARD_CHAIN_HEALTH.json": "a565dee7534c156ecb877da1a28b00f06d29fec0b6c1c9839a3b152628cef87b",
+    "deliverables/v0.3.23/H39_BLINDNESS_ATTESTATION.json": "663ff37c849853dd9ecda812ee3cd156d8df027d02734be5c2861ec98888c78d",
+    "deliverables/v0.3.23/H39_BLIND_VALIDATION_LEDGER_MANIFEST.json": "ccb62584ea80a60120de65e9211a2ab1ab23fbb271535c14e6d6dd9a3e339143",
+    "deliverables/v0.3.23/H39_BLIND_VALIDATION_STATUS.json": "9346e3a35879e6e43e0b54338b53210a8c40dd18276382409fd557005dace1a8",
+    "deliverables/v0.3.23/README.md": "6b3d1ae99f09f1b82116ac811aeb04313bb8adbeaba628d6d9e7c54463b18d19",
+    "deliverables/v0.3.23/V0.3.23_H39_BLIND_VALIDATION_REPORT.md": "22e3235edce7a9b4b38fd871fc0968c6d548c0ad827a4c21c529934dcf6faaee",
+    "deliverables/v0.3.23/V0.3.23_STRICT_UNBLIND_GATE_REPAIR.json": "1d9cd75b658ccc67a391db6fa05b10fa8976091a8bb8dc3c13788d34a932e001",
+    "deliverables/v0.3.23/V0.3.23_STRICT_UNBLIND_GATE_REPAIR.md": "250c1cbc0c96d67e88b0af720ca359db3daf7a25c14065e5cb7fd1d09ca22e43",
+    "deliverables/v0.3.24/FORWARD_CHAIN_HEALTH.json": "d68a3024b707a3b753f846bfb2deff9dc0e5b5e05e11f9285a6b682297bab088",
+    "deliverables/v0.3.24/H39_ACCUMULATION_SCHEDULER_REPORT.json": "994fe856cd76acf285798d92fad97ce123e6130b1a02545f610130669bf68ae3",
+    "deliverables/v0.3.24/H39_BLIND_LEDGER_INTEGRITY.json": "7a42c57f772fb0e707e367c886c63299a244e3dd0dcf35e90b7d97bd0e1db5bc",
+    "deliverables/v0.3.24/H39_BLIND_OPERATIONAL_STATUS.json": "bfe8ae32612243458a9d4e3d32c8fb3a759642579924b81887a74a53dfb7400a",
+    "deliverables/v0.3.24/README.md": "0fc93a84ed290b267a6ad631ed8d13f84a496a8053f922550ddcf65768b35f01",
+    "deliverables/v0.3.24/V0.3.24_H39_BLIND_ACCUMULATION_OPERATIONS_REPORT.md": "af8054cf9df85470d5453031b4583601463933c76252cfc64e44fc6c81d247b2",
+    "deliverables/v0.3.24/V0.3.24_WALL_CLOCK_DENOMINATOR_REPAIR.json": "8d6a841d1d6f33f658fe7a786abb378acc2c91ef433e31a3059fd1fc7cef101e",
+    "deliverables/v0.3.24/V0.3.24_WALL_CLOCK_DENOMINATOR_REPAIR.md": "0c3c6717cb567e8e9ac54e61edb9290ef6b7e2387b533711a47f99cc299673df",
+    "deliverables/v0.3.25/FORWARD_CHAIN_HEALTH.json": "1e55e5accfa2d72d4c36d0b66b53f2fc2196e401de6714c93cdb6284f3540b99",
+    "deliverables/v0.3.25/H39_BLIND_OPERATIONAL_STATUS.json": "23a8f70dc8c0fe0b7939d383d6e85756a22f1036b45a3ee52eeae601db29989a",
+    "deliverables/v0.3.25/H39_PROTOCOL_CLARIFICATION_002_DEPENDENCE_ROBUST_INFERENCE.json": "94c938b65640252c85a9e320b6f7759729ffa00f793c93e17cca52726e73212e",
+    "deliverables/v0.3.25/H39_PROTOCOL_CLARIFICATION_003_ROBUST_NESTED_NULL.json": "035b7528141c714fbe1aef310462d5aa5fd96d3d5fdec67ae8f70082531d7a92",
+    "deliverables/v0.3.25/H39_UNBLIND_PREREGISTRATION_MANIFEST.json": "477528fb31a5ca66c3d0b71155f6fdf6de8c9bf72b5f3b7fc9ba0d824550ccb1",
+    "deliverables/v0.3.25/README.md": "4e3169311216da8a67d4c07e062bb2b57e116195e39b764b9dd522a161165a9e",
+    "deliverables/v0.3.25/V0.3.25_COMMITTED_FREEZE_EXACTLY_ONCE_REPAIR.json": "d68901c6f9542af2ad01a91053c4d86841776248ecf76fa95c0c433fb4203fb7",
+    "deliverables/v0.3.25/V0.3.25_COMMITTED_FREEZE_EXACTLY_ONCE_REPAIR.md": "afacb8b30332bdaf36c634ca34aefabd39e2872d3488114d6febefef66f36fe6",
+    "deliverables/v0.3.25/V0.3.25_H39_ONE_SHOT_UNBLIND_PREREGISTRATION_REPORT.md": "483cdecb90f7b39e07d39e3ec36d55ec1ce7eaa9ca8e0000fc1a9aec465e2e30",
+    "deliverables/v0.3.25/V0.3.25_ROBUST_NULL_PROTOCOL_IDENTITY_HEALTH_SCHEMA_REPAIR.json": "54dac8aa2727b79feb8ee2f8a399825e32221d5e12f655be7b845af440d1ffb0",
+    "deliverables/v0.3.25/V0.3.25_ROBUST_NULL_PROTOCOL_IDENTITY_HEALTH_SCHEMA_REPAIR.md": "2b8b51ecd402bbf044a9ed8b10d9f41c5b5de2a717fd334202fd1f0f1cb3e453",
+    "deliverables/v0.3.25/V0.3.25_STATISTICAL_DEPENDENCE_HEALTH_REPAIR.json": "3a1092125b4edbfe994a97deadf6cb1a764275768a172f2f291a0933bc3623ac",
+    "deliverables/v0.3.25/V0.3.25_STATISTICAL_DEPENDENCE_HEALTH_REPAIR.md": "e89200640666a082b96084a83bd868af42ad17207f3de84328e415142805b834",
+    "deliverables/v0.3.26/H39_PROTOCOL_CLARIFICATION_004_CONDITIONAL_INPUT_CONTRACT.json": "a2f5e79a666d973b7fb86d23b92e8763ad341c831e652001304c4840fa91bb07",
+    "deliverables/v0.3.26/README.md": "62cc076a3a48a14b05e80b2c0ef19cad8753b81b6aa75a30a8b2a5737ee72fe6",
+    "deliverables/v0.3.3/V0.3.3_GEOMETRY_EXCURSION_REPORT.md": "9fc007016a963e03f8fa368c6c84b003b84e32682b8cc8baa57155c863b3f5a2",
+    "deliverables/v0.3.5/V0.3.5_BREAKOUT_EDGE_QUALIFICATION_REPORT.md": "8ff0a872b3b8c978f348ebe7741a855c4fb0aca2ce26adc5451801c00d23bff1",
+    "deliverables/v0.3.6/V0.3.6_DIRECTIONAL_ARCHITECTURE_RESET_REPORT.md": "4e6d7ac19755fb83c75f822ae0d5384aa5e1dccb76567ad807d115f490cbafb3",
+    "deliverables/v0.3.8/V0.3.8_FUNDING_STABILITY_SERIAL_DEPENDENCE_REPORT.md": "bdebf106782ef076072793be021b135c235c11b4dada4c9abc8d0d43d7c4edc2",
+    "deliverables/v0.3.9/V0.3.9_CROSS_ASSET_BREADTH_QUALIFICATION_REPORT.md": "9d960c6a8f203c3b47fe85b8e1e15dd56ddfb146152ba4a9d88dcfed4cb61f29",
+    "src/btc_quant_agent/backtest.py": "2f341de1e6a514db07d3a84358a63c50d500068a01e17baf72434b1bea7a8f0d",
+    "src/btc_quant_agent/data/rest.py": "4979fe6a028c986eb1d01a9de8d3489061141d8561ec416e75a2cd86abcdbd9b",
+    "src/btc_quant_agent/economic/__init__.py": "472cdc1a093f73fb37b4fb1c064edb4eef8b96772931f319eaa4340c2d08e3d2",
+    "src/btc_quant_agent/economic/acceptance_verifier.py": "1d96cc99966d2df4bc503c1d61ff495682b2ae8c7e0458e6ec286d5a83cafadd",
+    "src/btc_quant_agent/economic/benchmarks.py": "260aa99c4e6fcbe56c42e91ea54b4aba18d5b30fd020ce158272fae8667fd08a",
+    "src/btc_quant_agent/economic/execution_model.py": "11966a7afd1de801fd8a54692ddd94afa7d0023a4616f3dcd908dc90717c1c73",
+    "src/btc_quant_agent/economic/execution_replay.py": "9ed0eef7498323f2873dbc67c0266168d1478088835b43abfbc2ef8d35ab4833",
+    "src/btc_quant_agent/economic/fee_model.py": "96492c718042f33d7c9219af795284303a2f0c2a24c38aad87b621a123c64afc",
+    "src/btc_quant_agent/economic/funding.py": "d785dc7536ad658ee89d3b9df86589271efdde034e7f37d6d8c7c48e6412ad0f",
+    "src/btc_quant_agent/economic/metrics.py": "a62c4bfb5ffd239037d4f1e148d84fbc9e79058ec3a72fdcda859bc4c64178dd",
+    "src/btc_quant_agent/economic/order.py": "20f7a19d6b82aa3e4d49b7082dad71390db63addc7d59f51bf1be004e49d5156",
+    "src/btc_quant_agent/economic/policy.py": "2e558ce25178a33b70310f43609acfb976d29a3a6531c58c18fb66badbba578c",
+    "src/btc_quant_agent/economic/portfolio.py": "a8cc6704af83f3854be1b265ea79276f112291186113ac48778b396fb0da7169",
+    "src/btc_quant_agent/economic/qualification.py": "c9a9ac770ae4a46f356e14bb4ee20c45a4458d27332f752a49e115eaa147324d",
+    "src/btc_quant_agent/economic/replay_bundle.py": "e469ee2415f2d1730b77ce549891147faab44bdab9df134083acc147c4c65352",
+    "src/btc_quant_agent/economic/signal.py": "b975db1ab65330684064b66c938faf86ed7b62f04e4c4965717d96feba035fd1",
+    "src/btc_quant_agent/economic/signal_producer.py": "96d98abb28f329c2c0f465237d245c353fe054b73b0c5a83816d7726c0306e00",
+    "src/btc_quant_agent/economic/simulator.py": "7d02cb12b00daf617764675e2bca005cb328402a31ea98a7b105f292a01dc076",
+    "src/btc_quant_agent/economic/trade_event.py": "f7ab79736c6405b2c5052306d68e5f5a24a542d95751e60908ea6794b0c873ba",
+    "src/btc_quant_agent/formal_research.py": "2a907d5f86e4d8d5fb8f9ffb40a52ca53eaaa89ff319e0c5dffd7ad241b91382",
+    "src/btc_quant_agent/h39_baseline.py": "e4e5e4aefb8b1355eb9a5c6ff17d9d80407d75405477b604006e887cf5a14808",
+    "src/btc_quant_agent/h39_input.py": "0aea2d2b603634f73e27c3fabfca687333462370b8290f92ea3ff6db18d4556a",
+    "src/btc_quant_agent/h39_statistics.py": "b16b18d2879710a26ab4b61ef65f984192f61699ceb63b26e9ef35e813f52a60",
+    "src/btc_quant_agent/mechanism_research.py": "09b6b3eaf3f2882d02e89d1b4ee70c4875c45db8dd95eab1572f3265b9022296",
+    "src/btc_quant_agent/microstructure_research.py": "907624a5acac4f949ee6e8c77912806b4083d483c3160bbc95300aaf939bc6bd",
+    "src/btc_quant_agent/publication.py": "79bfdb7ab5adc1fd506d80745bdb400cb02a4df5685469172ca66b9fdead56ba",
+    "src/btc_quant_agent/research.py": "7187581d7ef340cd2571e9cf8b66b47090acac8d53068ade983aee3bf2dd78c7",
+    "src/btc_quant_agent/research_contract/__init__.py": "0246588a7cfeea034e7fb1ebc9c054f6699ad5de0fd85627ab7416685860bdca",
+    "src/btc_quant_agent/research_contract/canonical.py": "4646ad812cb04124b763ac64273b9052af1a5132751ee643003ebbd11c0adb20",
+    "src/btc_quant_agent/research_contract/models.py": "ab1ed8619831b0aeee5827c678adfe3cf8ad3d9950f1b53f2d0400f7b765f6b0",
+    "src/btc_quant_agent/research_contract/registry.py": "b64316ee68d0837f638b764f368a2181b1ab20acc209ed5f332bfecfabdb7a7f",
+    "src/btc_quant_agent/sqlite_schema.py": "95be4e778768b69aca0cf0492ed1edb9b52167f9b4ee0ae7938f48f321a916e1",
+    "tools/run_h39_blind_operations.py": "a0375a616e2066bc9f6fa717edab8f51c41a283e75bf89fdd907f3cc43ee64f8",
+    "tools/run_h39_blind_validation.py": "68c2d5e2fc240721cd5454ab154c7e3bdeb1b1d57304cce29e9725100a380a71",
+    "tools/run_h39_one_shot_unblind.py": "305f9caee26407cb8ad3c13253c79729198db5487180b7f3272b883a947a58ce",
+    "tools/run_h39_research.py": "e90fed97ce9b522a39fe7bfa908c1fb7f65b476f75a71732a39be23da597239b"
+  },
+  "protected_unchanged_count": 103,
+  "semantic_differential": {
+    "baseline_code_sha": "31521b620292064997384261e90cd09a2e806f98",
+    "probe": "tests/probe_v043_c_lite_differential.py",
+    "fixtures": 2,
+    "complete_snapshot_sha256": "098e3d24c52e0302ff1139dab56f614a1b8e5d589bfb819973f7d4e5c80f139f",
+    "byte_identical": true,
+    "fixture_authority_ids": {
+      "False": {
+        "run": "economic-run-result@31b75dac0ff189b48c38165dc8ad18ea01db029ac03059b5b5d1c75b297eaad0",
+        "suite": "benchmark-suite@5d1eba3d70ef759fa89a0782dd4c1f85f7ecbce31adce2478475e01587c5abcc",
+        "qualification": "economic-qualification@affb9fc6883313b745db5fe4ad1cc2452c54cc8163d0be3a97a05864d7418e97"
+      },
+      "True": {
+        "run": "economic-run-result@2f2557f17ca31504580679e86b89a176f7e99aae754c6a284b077021fa6ee5e9",
+        "suite": "benchmark-suite@7880591ccda8f7afc177d043f0854598037e954761e31528558566b24bd4d15b",
+        "qualification": "economic-qualification@bc172188bd6677438079fbca92e2827c16ddb66867b913f6af93c5dc0161c7b9"
+      }
+    }
+  },
+  "static_reference_proof": {
+    "retained_baseline_active_readers": 221,
+    "deleted_paths_checked": 157,
+    "dangling_exact_path_references": [],
+    "dangling_explicit_internal_from_imports": [],
+    "before_unique_module_edges": 873,
+    "after_unique_module_edges": 654,
+    "eliminated_unique_module_edges": 233,
+    "introduced_unique_module_edges": 14
+  },
+  "cli_counts": {
+    "before_top_level": 25,
+    "after_top_level": 22,
+    "before_leaves": 65,
+    "after_leaves": 62,
+    "includes_h39_alias": true
+  },
+  "deleted_test_owners": [
+    {
+      "test_file": "tests/test_breakout_edge_research.py",
+      "deleted_production_owner": "src/btc_quant_agent/breakout_edge_research.py",
+      "baseline_nodes": 18,
+      "retained_owner_nodes_migrated": 0
+    },
+    {
+      "test_file": "tests/test_causal_entry_research.py",
+      "deleted_production_owner": "src/btc_quant_agent/causal_entry_research.py",
+      "baseline_nodes": 16,
+      "retained_owner_nodes_migrated": 0
+    },
+    {
+      "test_file": "tests/test_cross_asset_breadth_research.py",
+      "deleted_production_owner": "src/btc_quant_agent/cross_asset_breadth_research.py",
+      "baseline_nodes": 19,
+      "retained_owner_nodes_migrated": 0
+    },
+    {
+      "test_file": "tests/test_directional_architecture_research.py",
+      "deleted_production_owner": "src/btc_quant_agent/directional_architecture_research.py",
+      "baseline_nodes": 15,
+      "retained_owner_nodes_migrated": 4
+    },
+    {
+      "test_file": "tests/test_funding_crowding_research.py",
+      "deleted_production_owner": "src/btc_quant_agent/funding_crowding_research.py",
+      "baseline_nodes": 19,
+      "retained_owner_nodes_migrated": 0
+    },
+    {
+      "test_file": "tests/test_funding_stability_research.py",
+      "deleted_production_owner": "src/btc_quant_agent/funding_stability_research.py",
+      "baseline_nodes": 15,
+      "retained_owner_nodes_migrated": 0
+    },
+    {
+      "test_file": "tests/test_funnel_research.py",
+      "deleted_production_owner": "src/btc_quant_agent/funnel_research.py",
+      "baseline_nodes": 4,
+      "retained_owner_nodes_migrated": 0
+    },
+    {
+      "test_file": "tests/test_geometry_research.py",
+      "deleted_production_owner": "src/btc_quant_agent/geometry_research.py",
+      "baseline_nodes": 24,
+      "retained_owner_nodes_migrated": 0
+    },
+    {
+      "test_file": "tests/test_range_mean_reversion_research.py",
+      "deleted_production_owner": "src/btc_quant_agent/range_mean_reversion_research.py",
+      "baseline_nodes": 19,
+      "retained_owner_nodes_migrated": 0
+    },
+    {
+      "test_file": "tests/test_spot_perp_flow_research.py",
+      "deleted_production_owner": "src/btc_quant_agent/spot_perp_flow_research.py",
+      "baseline_nodes": 12,
+      "retained_owner_nodes_migrated": 0
+    },
+    {
+      "test_file": "tests/test_v0318_historical_symbolic.py",
+      "deleted_production_owner": "src/btc_quant_agent/symbolic_alpha/",
+      "baseline_nodes": 16,
+      "retained_owner_nodes_migrated": 4
+    },
+    {
+      "test_file": "tests/test_v0319_symbolic_correctness.py",
+      "deleted_production_owner": "src/btc_quant_agent/symbolic_alpha/",
+      "baseline_nodes": 11,
+      "retained_owner_nodes_migrated": 1
+    }
+  ],
+  "test_count_reconciliation": {
+    "baseline": 1142,
+    "removed_file_nodes": 188,
+    "retained_owner_migrated": 9,
+    "new_r01": 13,
+    "final": 976
+  },
+  "migrated_function_ast_sha256_unchanged": {
+    "test_archive_paths_and_timestamp_units": "5973c8e27f4c3e5ccb0d67eee293907de0435601d201c0054f9ab9c54aa5043a",
+    "test_aggtrade_aggressor_mapping_and_no_gap_fill": "6e9ac2e653749b3076315235905ada376e25647894418ea2990f313609a672f7",
+    "test_historical_provenance_and_vendor_cannot_be_forward": "a24b9683c13ab72c0ef5f372509a5681b18b45834597c30516cd0fa62909e156",
+    "test_new_official_feature_family_is_causal_and_missing_stays_unavailable": "fb0fa1913b64b4f907721dab7ed05c6eb074b48a10015915250515ffb6aa30f4",
+    "_snapshot": "121d6d9e43ec49804b208f9fce408f82d6086efb9b7ccc9188c443c0ab4f2b33",
+    "test_regime_episode_construction_is_causal": "929bb8775439a1131f224147869cab0c4dd7d870ecf2473bbdeee746a07a8d84",
+    "test_continuation_semantics_do_not_count_onset_as_continuation": "5f01c862cc25bdfb1662fb67e889e69e593e1e8e6cf77a0db3824aec3d354972",
+    "test_episode_has_no_future_feature_access": "7c47a175c74251debc0a75fb64a90fdc161c10a8b2b02199ef65f9d05e2b9ce5",
+    "test_episode_cluster_ids_are_stable": "e86e9f4f29f3f87521a8f860b4448e99ec5a3c64fbf5fb862d14d6825cc33680"
+  },
+  "standalone_execution_guard": "Original config/plan/calculated hash/provisional rejection block retained; deleted symbolic-only assertions removed.",
+  "implementation_ci": {
+    "run_id": 34803958438,
+    "url": "https://github.com/EXASHXE/btc-quant-agent/actions/runs/34803958438",
+    "head_sha": "a7de890891a400c6d150c5105cc211485d50f93d",
+    "status": "completed",
+    "conclusion": "success",
+    "jobs": {
+      "quality (3.11)": "success",
+      "quality (3.12)": "success",
+      "quality (3.13)": "success"
+    }
+  }
+}
