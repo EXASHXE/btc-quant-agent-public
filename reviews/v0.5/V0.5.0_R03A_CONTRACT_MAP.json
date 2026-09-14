@@ -1,0 +1,819 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "schema_version": "1.0.0",
+  "metadata": {
+    "round": "v0.5.0_R03A",
+    "title": "Contract & Data-Model Inventory (Gemini-Optimized, Read-Only)",
+    "audited_code_branch": "v0.5-refactor",
+    "audited_code_head": "78a5e38b7631b9926f5072b426cd4d24a706f39e",
+    "prompt_branch": "v0.5-refactor-docs",
+    "prompt_path": "prompts/v0.5/review/v0.5.0_R03A_contract_data_model_inventory.md",
+    "prompt_commit": "b35858e6583d789069d5ec42d075bcce2a4bb4dc",
+    "ci_receipt": {
+      "run_id": "34852764469",
+      "job_id": "104004590465",
+      "status": "FAST_CI_GREEN_PY313"
+    }
+  },
+  "summary_metrics": {
+    "formal_modules_count": 20,
+    "formal_types_count": 81,
+    "formal_internal_import_edges": 540,
+    "persisted_formal_schemas_count": 6,
+    "identity_and_hash_concepts_count": 120,
+    "duplicated_authoritative_facts_analyzed": 16,
+    "candidate_safe_mechanical_cuts": 3,
+    "candidate_semantic_cuts_requiring_sol": 2,
+    "protected_security_boundary_types": 14,
+    "protected_authority_types": 8
+  },
+  "authority_layers": [
+    {
+      "layer_id": 1,
+      "name": "Research Protocol & Provenance",
+      "description": "Experiment metadata, signal producer contract, dataset evidence reference",
+      "primary_types": [
+        "ExperimentMetadata",
+        "SignalProducerContract",
+        "EvidenceReference",
+        "DataIntervalIdentity"
+      ]
+    },
+    {
+      "layer_id": 2,
+      "name": "Replay Authority Inputs",
+      "description": "Causal signal bundle, decision inputs, candles, funding events",
+      "primary_types": [
+        "ReplayInputBundle",
+        "DecisionInputEntry",
+        "InputReference",
+        "InformationSignal",
+        "Candle",
+        "FundingSettlement"
+      ]
+    },
+    {
+      "layer_id": 3,
+      "name": "Canonical Execution & Accounting Result",
+      "description": "Replayed candidate execution, atomic ledger trade events, simulation summary",
+      "primary_types": [
+        "EconomicRunIdentity",
+        "EconomicRunResult",
+        "SimulationSummary",
+        "TradeEvent",
+        "RoundTripAttribution"
+      ]
+    },
+    {
+      "layer_id": 4,
+      "name": "Independently Reconstructed Benchmarks",
+      "description": "CASH benchmark, reconstructed pseudo-random trials, matching diagnostics",
+      "primary_types": [
+        "FormalBenchmarkSuite",
+        "FormalBenchmarkResult",
+        "RandomBenchmarkDistribution",
+        "BenchmarkMatchingRules"
+      ]
+    },
+    {
+      "layer_id": 5,
+      "name": "Qualification & Comparison Decision",
+      "description": "Economic hurdles, gate evaluations, final qualification verdict",
+      "primary_types": [
+        "ComparisonContract",
+        "EconomicHurdle",
+        "QualificationGateResult",
+        "EconomicQualificationResult"
+      ]
+    },
+    {
+      "layer_id": 6,
+      "name": "Registry & Promotion Persistence",
+      "description": "Decision attestation, immutable append-only event log, promotion gating",
+      "primary_types": [
+        "EconomicDecisionAttestation",
+        "DecisionEvent",
+        "ResearchContractRegistry",
+        "ResearchRegistry"
+      ]
+    }
+  ],
+  "types": [
+    {
+      "type_name": "ExperimentMetadata",
+      "file": "src/btc_quant_agent/research_contract/models.py",
+      "authoritative_owner": "Research Protocol Contract",
+      "primary_producer": "formal job spec / experiment definition JSON",
+      "primary_consumers": [
+        "FormalResearchJobSpec",
+        "build_formal_replay_input_bundle",
+        "execute_bound_run",
+        "build_formal_benchmark_suite",
+        "evaluate_formal_economic_qualification",
+        "ResearchContractRegistry"
+      ],
+      "persisted": true,
+      "persisted_format": "JSON experiment metadata file, embedded in ResearchContractRegistry",
+      "hashed": true,
+      "hash_field": "protocol_hash (canonical_sha256)",
+      "reconstructed": false,
+      "legacy_adapters": "from_dict handles string dict or nested models",
+      "protected_by_tests": [
+        "test_v041_p5_protocol_evidence_persistence.py",
+        "test_v040_research_kernel_economic_validation.py",
+        "test_v041_p6_metrics_benchmarks_qualification.py"
+      ],
+      "disposition": "PROTECTED_AUTHORITY"
+    },
+    {
+      "type_name": "SignalProducerContract",
+      "file": "src/btc_quant_agent/economic/signal_producer.py",
+      "authoritative_owner": "Signal Generation Authority",
+      "primary_producer": "SignalProducerRegistry / protocol definition",
+      "primary_consumers": [
+        "ExperimentMetadata",
+        "DecisionInputEntry",
+        "EconomicRunIdentity",
+        "validate_persisted_decision_input_bindings"
+      ],
+      "persisted": true,
+      "persisted_format": "JSON sub-object in ExperimentMetadata and ReplayInputBundle",
+      "hashed": true,
+      "hash_field": "contract_hash (canonical_sha256 of canonical dict)",
+      "reconstructed": true,
+      "legacy_adapters": "None; fail-closed validation in signal_producer.py",
+      "protected_by_tests": [
+        "test_v042_b04r2_authority_acceptance_repair.py",
+        "test_v042_b04r4_random_benchmark_authority_boundary.py",
+        "test_v042_b04r3_protocol_producer_contract_fail_closed.py"
+      ],
+      "disposition": "KEEP_SECURITY_BOUNDARY"
+    },
+    {
+      "type_name": "EvidenceReference",
+      "file": "src/btc_quant_agent/research_contract/models.py",
+      "authoritative_owner": "Evidence Lineage Authority",
+      "primary_producer": "make_artifact_evidence, data pipelines",
+      "primary_consumers": [
+        "FormalResearchJobSpec",
+        "FormalResearchJobResult",
+        "evaluate_formal_economic_qualification",
+        "verify_formal_qualification",
+        "ResearchContractRegistry"
+      ],
+      "persisted": true,
+      "persisted_format": "JSON object, referenced by evidence_id in registry events",
+      "hashed": true,
+      "hash_field": "content_sha256",
+      "reconstructed": false,
+      "legacy_adapters": "from_dict, to_dict, local_path() URI resolver",
+      "protected_by_tests": [
+        "test_v041_p5_protocol_evidence_persistence.py",
+        "test_v040_research_kernel_economic_validation.py",
+        "test_v041_p6_metrics_benchmarks_qualification.py"
+      ],
+      "disposition": "PROTECTED_AUTHORITY"
+    },
+    {
+      "type_name": "DataIntervalIdentity",
+      "file": "src/btc_quant_agent/economic/qualification.py",
+      "authoritative_owner": "Dataset Observation Boundary",
+      "primary_producer": "ComparisonContract",
+      "primary_consumers": [
+        "EconomicRunIdentity",
+        "validate_persisted_qualification_semantics"
+      ],
+      "persisted": true,
+      "persisted_format": "JSON sub-object in ComparisonContract",
+      "hashed": true,
+      "hash_field": "dataset_content_sha256",
+      "reconstructed": true,
+      "legacy_adapters": "from_dict, to_dict",
+      "protected_by_tests": [],
+      "disposition": "KEEP_SECURITY_BOUNDARY"
+    },
+    {
+      "type_name": "ComparisonContract",
+      "file": "src/btc_quant_agent/economic/qualification.py",
+      "authoritative_owner": "Economic Comparison Authority",
+      "primary_producer": "formal job spec / comparison JSON",
+      "primary_consumers": [
+        "FormalResearchJobSpec",
+        "execute_bound_run",
+        "build_formal_benchmark_suite",
+        "evaluate_formal_economic_qualification",
+        "EconomicDecisionAttestation"
+      ],
+      "persisted": true,
+      "persisted_format": "JSON file or embedded payload in qualification result",
+      "hashed": true,
+      "hash_field": "comparison_contract_hash (canonical_sha256)",
+      "reconstructed": false,
+      "legacy_adapters": "from_payload handles dict conversions",
+      "protected_by_tests": [
+        "test_v041_p6_metrics_benchmarks_qualification.py"
+      ],
+      "disposition": "PROTECTED_AUTHORITY"
+    },
+    {
+      "type_name": "EconomicHurdle",
+      "file": "src/btc_quant_agent/economic/qualification.py",
+      "authoritative_owner": "Qualification Hurdle Authority",
+      "primary_producer": "ComparisonContract",
+      "primary_consumers": [
+        "evaluate_formal_economic_qualification",
+        "recompute_matching_diagnostics"
+      ],
+      "persisted": true,
+      "persisted_format": "Array of JSON objects inside ComparisonContract",
+      "hashed": true,
+      "hash_field": "Part of comparison_contract_hash",
+      "reconstructed": true,
+      "legacy_adapters": "from_dict, to_dict",
+      "protected_by_tests": [],
+      "disposition": "PROTECTED_AUTHORITY"
+    },
+    {
+      "type_name": "BenchmarkMatchingRules",
+      "file": "src/btc_quant_agent/economic/qualification.py",
+      "authoritative_owner": "Random Benchmark Alignment Authority",
+      "primary_producer": "ComparisonContract",
+      "primary_consumers": [
+        "build_formal_benchmark_suite",
+        "recompute_matching_diagnostics"
+      ],
+      "persisted": true,
+      "persisted_format": "JSON object inside ComparisonContract",
+      "hashed": true,
+      "hash_field": "Part of comparison_contract_hash",
+      "reconstructed": true,
+      "legacy_adapters": "from_dict, to_dict",
+      "protected_by_tests": [],
+      "disposition": "KEEP_SECURITY_BOUNDARY"
+    },
+    {
+      "type_name": "InformationSignal",
+      "file": "src/btc_quant_agent/economic/signal.py",
+      "authoritative_owner": "Replay Signal Input",
+      "primary_producer": "SignalProducer / historical extractor",
+      "primary_consumers": [
+        "FormalResearchJobSpec",
+        "build_formal_replay_input_bundle",
+        "execute_bound_run"
+      ],
+      "persisted": true,
+      "persisted_format": "Array of JSON objects in formal job spec",
+      "hashed": true,
+      "hash_field": "signal_set_sha256 (canonical_sha256 of sorted signals)",
+      "reconstructed": true,
+      "legacy_adapters": "from_dict, as_dict",
+      "protected_by_tests": [
+        "test_v042_ba_information_set_integration.py",
+        "test_v042_b04r_replay_bundle_acceptance_repair.py",
+        "helpers_v042_economic_replay.py",
+        "test_v041_acceptance_repair_causal_risk.py",
+        "test_v042_b04_verified_replay_input_bundle.py",
+        "test_v040_research_kernel_economic_validation.py",
+        "test_v042_b04r2_authority_acceptance_repair.py",
+        "test_v041_c2_intrabar_exit_slippage_bounds.py"
+      ],
+      "disposition": "PROTECTED_AUTHORITY"
+    },
+    {
+      "type_name": "InputReference",
+      "file": "src/btc_quant_agent/economic/replay_bundle.py",
+      "authoritative_owner": "Causal Input Provenance",
+      "primary_producer": "build_formal_replay_input_bundle",
+      "primary_consumers": [
+        "DecisionInputEntry",
+        "validate_persisted_decision_input_bindings"
+      ],
+      "persisted": true,
+      "persisted_format": "Array of JSON objects inside ReplayInputBundle",
+      "hashed": true,
+      "hash_field": "row_content_sha256",
+      "reconstructed": true,
+      "legacy_adapters": "from_dict, to_dict",
+      "protected_by_tests": [],
+      "disposition": "KEEP_SECURITY_BOUNDARY"
+    },
+    {
+      "type_name": "DecisionInputEntry",
+      "file": "src/btc_quant_agent/economic/replay_bundle.py",
+      "authoritative_owner": "Causal Decision Binding",
+      "primary_producer": "build_formal_replay_input_bundle",
+      "primary_consumers": [
+        "ReplayInputBundle",
+        "validate_persisted_decision_input_bindings"
+      ],
+      "persisted": true,
+      "persisted_format": "Array of JSON objects in ReplayInputBundle",
+      "hashed": true,
+      "hash_field": "signal_payload_sha256, producer_contract_hash, input_set_sha256",
+      "reconstructed": true,
+      "legacy_adapters": "from_dict, to_dict",
+      "protected_by_tests": [],
+      "disposition": "KEEP_SECURITY_BOUNDARY"
+    },
+    {
+      "type_name": "ReplayInputBundle",
+      "file": "src/btc_quant_agent/economic/replay_bundle.py",
+      "authoritative_owner": "Formal Replay Input Preimage",
+      "primary_producer": "build_formal_replay_input_bundle",
+      "primary_consumers": [
+        "execute_bound_run",
+        "EconomicRunIdentity",
+        "validate_persisted_decision_input_bindings"
+      ],
+      "persisted": true,
+      "persisted_format": "JSON object in accounting.replay_input_bundle",
+      "hashed": true,
+      "hash_field": "bundle_sha256 (canonical_sha256)",
+      "reconstructed": true,
+      "legacy_adapters": "from_dict, to_dict, FORMAL_REPLAY_INPUT_BUNDLE_SCHEMA_VERSION (1.0.0)",
+      "protected_by_tests": [
+        "test_v042_b04r_replay_bundle_acceptance_repair.py",
+        "helpers_v042_economic_replay.py",
+        "test_v042_b04_verified_replay_input_bundle.py",
+        "test_v042_b04r2_authority_acceptance_repair.py",
+        "test_v042_b04r4_random_benchmark_authority_boundary.py",
+        "test_v042_b04r3_protocol_producer_contract_fail_closed.py"
+      ],
+      "disposition": "KEEP_SECURITY_BOUNDARY"
+    },
+    {
+      "type_name": "EconomicRunRole",
+      "file": "src/btc_quant_agent/economic/qualification.py",
+      "authoritative_owner": "Execution Run Role Enumeration",
+      "primary_producer": "execute_bound_run / build_formal_benchmark_suite",
+      "primary_consumers": [
+        "EconomicRunIdentity",
+        "validate_formal_run_identity_binding"
+      ],
+      "persisted": true,
+      "persisted_format": "String in EconomicRunIdentity JSON ('CANDIDATE', 'RANDOM_BENCHMARK')",
+      "hashed": true,
+      "hash_field": "Part of identity canonical_sha256",
+      "reconstructed": true,
+      "legacy_adapters": "StrEnum",
+      "protected_by_tests": [],
+      "disposition": "KEEP_SECURITY_BOUNDARY"
+    },
+    {
+      "type_name": "EconomicRunIdentity",
+      "file": "src/btc_quant_agent/economic/qualification.py",
+      "authoritative_owner": "Canonical Replay Identity",
+      "primary_producer": "execute_bound_run",
+      "primary_consumers": [
+        "EconomicRunResult",
+        "evaluate_formal_economic_qualification",
+        "validate_formal_run_identity_binding"
+      ],
+      "persisted": true,
+      "persisted_format": "JSON sub-object in candidate-run.json",
+      "hashed": true,
+      "hash_field": "run_result_id (canonical_sha256 of identity)",
+      "reconstructed": true,
+      "legacy_adapters": "from_dict, to_dict",
+      "protected_by_tests": [],
+      "disposition": "KEEP_SECURITY_BOUNDARY"
+    },
+    {
+      "type_name": "SimulationSummary",
+      "file": "src/btc_quant_agent/economic/metrics.py",
+      "authoritative_owner": "Accounting Ledger Result",
+      "primary_producer": "EconomicSimulator.run_simulation",
+      "primary_consumers": [
+        "EconomicRunResult",
+        "FormalBenchmarkResult",
+        "verify_formal_accounting"
+      ],
+      "persisted": true,
+      "persisted_format": "JSON accounting object in candidate-run.json and benchmark-suite.json",
+      "hashed": true,
+      "hash_field": "accounting_bundle_hash / ledger_event_ids",
+      "reconstructed": true,
+      "legacy_adapters": "from_dict, to_dict, schema_version 2.0.0",
+      "protected_by_tests": [
+        "test_v040_research_kernel_economic_validation.py",
+        "test_v041_c2_intrabar_exit_slippage_bounds.py",
+        "test_v041_p6_metrics_benchmarks_qualification.py"
+      ],
+      "disposition": "PROTECTED_AUTHORITY"
+    },
+    {
+      "type_name": "TradeEvent",
+      "file": "src/btc_quant_agent/economic/trade_event.py",
+      "authoritative_owner": "Atomic Ledger Event",
+      "primary_producer": "Order fill execution in EconomicSimulator",
+      "primary_consumers": [
+        "SimulationSummary.trade_events",
+        "_curve_and_notional_from_ledger"
+      ],
+      "persisted": true,
+      "persisted_format": "Array of JSON objects in accounting.trade_events",
+      "hashed": true,
+      "hash_field": "trade_id, ledger_event_ids",
+      "reconstructed": true,
+      "legacy_adapters": "from_dict, to_dict",
+      "protected_by_tests": [
+        "test_v041_p0_p1_cash_ledger.py",
+        "test_v041_acceptance_repair_causal_risk.py",
+        "test_v041_p2_p3_causal_execution.py"
+      ],
+      "disposition": "PROTECTED_AUTHORITY"
+    },
+    {
+      "type_name": "RoundTripAttribution",
+      "file": "src/btc_quant_agent/economic/metrics.py",
+      "authoritative_owner": "Round-Trip Trade Attribution",
+      "primary_producer": "_compute_round_trips in metrics.py",
+      "primary_consumers": [
+        "SimulationSummary.round_trips"
+      ],
+      "persisted": true,
+      "persisted_format": "Array of JSON objects in accounting.round_trips",
+      "hashed": false,
+      "hash_field": "None (derived cache)",
+      "reconstructed": true,
+      "legacy_adapters": "from_dict, to_dict",
+      "protected_by_tests": [],
+      "disposition": "DERIVED_CACHE"
+    },
+    {
+      "type_name": "EconomicRunResult",
+      "file": "src/btc_quant_agent/economic/qualification.py",
+      "authoritative_owner": "Candidate Run Result Envelope",
+      "primary_producer": "execute_bound_run",
+      "primary_consumers": [
+        "FormalResearchJobResult",
+        "build_formal_benchmark_suite",
+        "evaluate_formal_economic_qualification",
+        "candidate-run.json artifact"
+      ],
+      "persisted": true,
+      "persisted_format": "candidate-run.json (schema_version 1.0.0)",
+      "hashed": true,
+      "hash_field": "result_id (economic-run@{identity_hash})",
+      "reconstructed": true,
+      "legacy_adapters": "from_dict, to_dict",
+      "protected_by_tests": [
+        "test_v042_b04r4_random_benchmark_authority_boundary.py",
+        "test_v042_b06_random_experiment_replay.py",
+        "test_v042_bar_pit_formal_promotion.py"
+      ],
+      "disposition": "PROTECTED_AUTHORITY"
+    },
+    {
+      "type_name": "FormalBenchmarkResult",
+      "file": "src/btc_quant_agent/economic/qualification.py",
+      "authoritative_owner": "Benchmark Execution Result",
+      "primary_producer": "build_formal_benchmark_suite",
+      "primary_consumers": [
+        "FormalBenchmarkSuite",
+        "evaluate_formal_economic_qualification",
+        "validate_persisted_qualification_semantics"
+      ],
+      "persisted": true,
+      "persisted_format": "JSON sub-object in benchmark-suite.json",
+      "hashed": true,
+      "hash_field": "run_result_id",
+      "reconstructed": true,
+      "legacy_adapters": "from_dict, to_dict",
+      "protected_by_tests": [],
+      "disposition": "KEEP_SECURITY_BOUNDARY"
+    },
+    {
+      "type_name": "RandomBenchmarkDistribution",
+      "file": "src/btc_quant_agent/economic/qualification.py",
+      "authoritative_owner": "Random Benchmark Trial Distribution",
+      "primary_producer": "build_formal_benchmark_suite",
+      "primary_consumers": [
+        "FormalBenchmarkSuite",
+        "evaluate_formal_economic_qualification"
+      ],
+      "persisted": true,
+      "persisted_format": "JSON sub-object in benchmark-suite.json",
+      "hashed": true,
+      "hash_field": "provenance hash",
+      "reconstructed": true,
+      "legacy_adapters": "from_dict, to_dict",
+      "protected_by_tests": [],
+      "disposition": "KEEP_SECURITY_BOUNDARY"
+    },
+    {
+      "type_name": "FormalBenchmarkSuite",
+      "file": "src/btc_quant_agent/economic/qualification.py",
+      "authoritative_owner": "Formal Benchmark Suite Envelope",
+      "primary_producer": "build_formal_benchmark_suite",
+      "primary_consumers": [
+        "FormalResearchJobResult",
+        "evaluate_formal_economic_qualification",
+        "benchmark-suite.json artifact"
+      ],
+      "persisted": true,
+      "persisted_format": "benchmark-suite.json (schema_version 1.0.0)",
+      "hashed": true,
+      "hash_field": "suite_id (benchmark-suite@{canonical_sha256})",
+      "reconstructed": true,
+      "legacy_adapters": "from_dict, to_dict",
+      "protected_by_tests": [
+        "test_v042_b04r4_random_benchmark_authority_boundary.py",
+        "test_hermetic_runtime_guard.py"
+      ],
+      "disposition": "PROTECTED_AUTHORITY"
+    },
+    {
+      "type_name": "QualificationGateResult",
+      "file": "src/btc_quant_agent/economic/qualification.py",
+      "authoritative_owner": "Individual Hurdle Evaluation",
+      "primary_producer": "evaluate_formal_economic_qualification",
+      "primary_consumers": [
+        "EconomicQualificationResult.gates",
+        "validate_persisted_qualification_semantics"
+      ],
+      "persisted": true,
+      "persisted_format": "Array of JSON objects inside qualification result",
+      "hashed": false,
+      "hash_field": "None (recomputed on validation)",
+      "reconstructed": true,
+      "legacy_adapters": "from_dict, to_dict",
+      "protected_by_tests": [],
+      "disposition": "PROTECTED_AUTHORITY"
+    },
+    {
+      "type_name": "EconomicQualificationResult",
+      "file": "src/btc_quant_agent/economic/qualification.py",
+      "authoritative_owner": "Economic Qualification Verdict Authority",
+      "primary_producer": "evaluate_formal_economic_qualification",
+      "primary_consumers": [
+        "FormalResearchJobResult",
+        "verify_formal_qualification",
+        "ResearchContractRegistry.record_economic_qualification"
+      ],
+      "persisted": true,
+      "persisted_format": "qualification-{hash}.json (schema_version 1.1.0)",
+      "hashed": true,
+      "hash_field": "result_id (economic-qualification@{canonical_sha256})",
+      "reconstructed": true,
+      "legacy_adapters": "from_dict, to_dict, P6_RESULT_SCHEMA_VERSION 1.1.0",
+      "protected_by_tests": [],
+      "disposition": "PROTECTED_AUTHORITY"
+    },
+    {
+      "type_name": "EconomicDecisionAttestation",
+      "file": "src/btc_quant_agent/research_contract/models.py",
+      "authoritative_owner": "Registry Promotion Attestation",
+      "primary_producer": "EconomicQualificationResult.decision_attestation",
+      "primary_consumers": [
+        "ResearchContractRegistry.record_economic_qualification"
+      ],
+      "persisted": true,
+      "persisted_format": "Embedded payload in registry DecisionEvent",
+      "hashed": true,
+      "hash_field": "result_artifact_sha256, protocol_hash, comparison_contract_hash",
+      "reconstructed": false,
+      "legacy_adapters": "from_dict, to_dict",
+      "protected_by_tests": [],
+      "disposition": "PROTECTED_AUTHORITY"
+    },
+    {
+      "type_name": "DecisionEvent",
+      "file": "src/btc_quant_agent/research_contract/models.py",
+      "authoritative_owner": "Immutable Registry Event Log",
+      "primary_producer": "ResearchContractRegistry",
+      "primary_consumers": [
+        "ResearchContractRegistry.events",
+        "audit logs"
+      ],
+      "persisted": true,
+      "persisted_format": "JSON object in registry events list",
+      "hashed": true,
+      "hash_field": "previous_event_hash, event_hash",
+      "reconstructed": false,
+      "legacy_adapters": "from_dict, to_dict",
+      "protected_by_tests": [],
+      "disposition": "PROTECTED_AUTHORITY"
+    },
+    {
+      "type_name": "ResearchContractRegistry",
+      "file": "src/btc_quant_agent/research_contract/registry.py",
+      "authoritative_owner": "P5 Contract & Promotion Store",
+      "primary_producer": "Disk loader (registry.json)",
+      "primary_consumers": [
+        "formal_research.py",
+        "service.py (health)"
+      ],
+      "persisted": true,
+      "persisted_format": "JSON file (registry.json, REGISTRY_SCHEMA_VERSION 1.0.0)",
+      "hashed": true,
+      "hash_field": "protocol_hash, event chains",
+      "reconstructed": false,
+      "legacy_adapters": "None; fail-closed schema validation",
+      "protected_by_tests": [
+        "test_v041_p5_protocol_evidence_persistence.py",
+        "test_v040_research_kernel_economic_validation.py",
+        "test_v042_b10_writer_finalization.py",
+        "test_v041_p6_metrics_benchmarks_qualification.py",
+        "test_v042_b09_durable_publication.py"
+      ],
+      "disposition": "PROTECTED_AUTHORITY"
+    },
+    {
+      "type_name": "ResearchRegistry / RegistryComponent",
+      "file": "src/btc_quant_agent/research_registry.py",
+      "authoritative_owner": "Operational Component Actionability Store",
+      "primary_producer": "Disk loader (configs/research/research_registry.json)",
+      "primary_consumers": [
+        "service.py (health, runtime_actionability)",
+        "cli.py (research-registry)"
+      ],
+      "persisted": true,
+      "persisted_format": "JSON file (configs/research/research_registry.json)",
+      "hashed": false,
+      "hash_field": "None",
+      "reconstructed": false,
+      "legacy_adapters": "legacy_directional_role string adapter",
+      "protected_by_tests": [
+        "test_v041_p5_protocol_evidence_persistence.py",
+        "test_v050_r01_surface_reduction.py",
+        "test_v0311_runtime_registry.py"
+      ],
+      "disposition": "SEMANTIC_CUT_REQUIRES_SOL"
+    },
+    {
+      "type_name": "BenchmarkResult / BenchmarkEngine",
+      "file": "src/btc_quant_agent/economic/benchmarks.py",
+      "authoritative_owner": "Legacy Diagnostic Benchmark Helper",
+      "primary_producer": "BenchmarkEngine",
+      "primary_consumers": [
+        "legacy diagnostic scripts / tests"
+      ],
+      "persisted": false,
+      "persisted_format": "In-memory only",
+      "hashed": false,
+      "hash_field": "None",
+      "reconstructed": false,
+      "legacy_adapters": "Superseded by FormalBenchmarkSuite in qualification.py",
+      "protected_by_tests": [],
+      "disposition": "SAFE_MECHANICAL_CANDIDATE"
+    }
+  ],
+  "duplicated_facts_matrix": [
+    {
+      "fact": "protocol_hash / experiment_revision_id",
+      "classification": "NECESSARY_CROSS_CHECK",
+      "security_boundary": "B04",
+      "rationale": "Must match between protocol, replay bundle, run identity, qualification result, and registry attestation to prevent relabel attacks."
+    },
+    {
+      "fact": "dataset_content_sha256 / dataset_evidence_id",
+      "classification": "NECESSARY_CROSS_CHECK",
+      "security_boundary": "B05 / H4",
+      "rationale": "Asserts execution occurred on exact immutable dataset evidence; blocks dataset swapping."
+    },
+    {
+      "fact": "asset / symbol / product_scope",
+      "classification": "NECESSARY_CROSS_CHECK",
+      "security_boundary": "B05",
+      "rationale": "Asserts candle, signal, trade event, and portfolio product scope agree strictly."
+    },
+    {
+      "fact": "horizon_ms / cadence_ms",
+      "classification": "NECESSARY_CROSS_CHECK",
+      "security_boundary": "B04",
+      "rationale": "Prevents evaluation on unintended prediction horizon."
+    },
+    {
+      "fact": "signal_set_sha256 / signal_producer_contract",
+      "classification": "KEEP_SECURITY_BOUNDARY",
+      "security_boundary": "B04 / B05",
+      "rationale": "Cryptographically binds candidate execution to exact canonical signal producer; blocks candidate signal forging."
+    },
+    {
+      "fact": "run_role (CANDIDATE vs RANDOM_BENCHMARK)",
+      "classification": "KEEP_SECURITY_BOUNDARY",
+      "security_boundary": "B04",
+      "rationale": "Prevents relabeling a random benchmark trial as a candidate or vice versa."
+    },
+    {
+      "fact": "run_result_id / candidate_run_result_id",
+      "classification": "NECESSARY_CROSS_CHECK",
+      "security_boundary": "B04 / B05",
+      "rationale": "Binds benchmark suite and qualification result to exact replayed candidate run."
+    },
+    {
+      "fact": "replay_input_bundle_sha256",
+      "classification": "KEEP_SECURITY_BOUNDARY",
+      "security_boundary": "B05",
+      "rationale": "Guarantees candidate run was generated from verified causal ReplayInputBundle preimage."
+    },
+    {
+      "fact": "policy / execution_model / fee_model / funding_model",
+      "classification": "NECESSARY_CROSS_CHECK",
+      "security_boundary": "B05",
+      "rationale": "Ensures simulator configuration matches comparison contract and protocol specifications identically."
+    },
+    {
+      "fact": "seed / trials / trial_id",
+      "classification": "KEEP_SECURITY_BOUNDARY",
+      "security_boundary": "H1 / B06",
+      "rationale": "Enforces deterministic, independent reconstruction of random benchmarks."
+    },
+    {
+      "fact": "initial_capital / initial_cash",
+      "classification": "NECESSARY_CROSS_CHECK",
+      "security_boundary": "H2 / B07",
+      "rationale": "Ensures candidate, CASH, and random benchmarks start with identical initial balance."
+    },
+    {
+      "fact": "terminal_equity / net_pnl_usdt / total_fees / total_funding",
+      "classification": "NECESSARY_CROSS_CHECK",
+      "security_boundary": "B05",
+      "rationale": "Reconstructed from ledger trade events and verified against simulation summary."
+    },
+    {
+      "fact": "benchmark_suite_id / benchmark_result_ids",
+      "classification": "NECESSARY_CROSS_CHECK",
+      "security_boundary": "B06 / B07",
+      "rationale": "Binds qualification result to exact benchmark suite artifact."
+    },
+    {
+      "fact": "comparison_contract_id / comparison_contract_hash",
+      "classification": "NECESSARY_CROSS_CHECK",
+      "security_boundary": "B04 / B05",
+      "rationale": "Ensures qualification evaluates against authoritative comparison contract."
+    },
+    {
+      "fact": "timestamps / availability_ms boundaries",
+      "classification": "KEEP_SECURITY_BOUNDARY",
+      "security_boundary": "H4 / B2",
+      "rationale": "Prevents future-volume and unclosed bar lookahead."
+    },
+    {
+      "fact": "round_trips",
+      "classification": "DERIVED_CACHE",
+      "security_boundary": "None",
+      "rationale": "Pre-computed from trade_events; redundant persisted cache in accounting JSON."
+    }
+  ],
+  "candidate_simplifications": [
+    {
+      "id": "SIMP-01",
+      "title": "Prune legacy BenchmarkResult and BenchmarkEngine",
+      "file": "src/btc_quant_agent/economic/benchmarks.py",
+      "classification": "SAFE_MECHANICAL_CANDIDATE",
+      "estimated_loc_delta": -180,
+      "security_impact": "None. Replaced completely by FormalBenchmarkSuite in qualification.py.",
+      "affected_tests": [
+        "tests/test_benchmarks.py"
+      ]
+    },
+    {
+      "id": "SIMP-02",
+      "title": "Remove legacy_directional_role from RegistryComponent",
+      "file": "src/btc_quant_agent/research_registry.py",
+      "classification": "SAFE_MECHANICAL_CANDIDATE",
+      "estimated_loc_delta": -15,
+      "security_impact": "None. Backwards-compatibility string adapter; all registry JSON entries use 'role'.",
+      "affected_tests": [
+        "tests/test_research_registry.py"
+      ]
+    },
+    {
+      "id": "SIMP-03",
+      "title": "Formalize LEGACY_RUNTIME_MARKET_DATA schema v1.0 as READABLE_DIAGNOSTIC_ONLY",
+      "file": "src/btc_quant_agent/economic/acceptance_verifier.py",
+      "classification": "SAFE_MECHANICAL_CANDIDATE",
+      "estimated_loc_delta": -25,
+      "security_impact": "None. Disallows v1.0 schema from qualifying new candidates while retaining diagnostic replay.",
+      "affected_tests": [
+        "tests/test_acceptance_verifier.py"
+      ]
+    },
+    {
+      "id": "SIMP-04",
+      "title": "Clarify boundary between ResearchContractRegistry and ResearchRegistry",
+      "file": "src/btc_quant_agent/research_contract/registry.py and src/btc_quant_agent/research_registry.py",
+      "classification": "SEMANTIC_CUT_REQUIRES_SOL",
+      "estimated_loc_delta": 0,
+      "security_impact": "High. Must keep P5 experiment contract governance distinct from operational actionability gating.",
+      "affected_tests": [
+        "tests/test_research_contract_registry.py",
+        "tests/test_research_registry.py"
+      ]
+    },
+    {
+      "id": "SIMP-05",
+      "title": "Streamline SimulationSummary round_trips serialized footprint",
+      "file": "src/btc_quant_agent/economic/metrics.py",
+      "classification": "SEMANTIC_CUT_REQUIRES_SOL",
+      "estimated_loc_delta": -80,
+      "security_impact": "Moderate. Round-trip metrics used in qualification hurdles; on-demand computation required if omitted from JSON.",
+      "affected_tests": [
+        "tests/test_metrics.py",
+        "tests/test_qualification.py"
+      ]
+    }
+  ]
+}
