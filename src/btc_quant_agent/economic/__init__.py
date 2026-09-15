@@ -3,6 +3,13 @@ from __future__ import annotations
 from .execution_model import ConditionalTriggerTime, ExecutionModel, ExecutionResult
 from .fee_model import FeeModel, SlippageMode
 from .funding import FundingModel, FundingSettlement
+from .funding_evidence import (
+    FORMAL_FUNDING_EVIDENCE_SCHEMA_VERSION,
+    FORMAL_FUNDING_EVIDENCE_TYPE,
+    FundingIntervalIdentity,
+    funding_event_set_sha256,
+    load_and_validate_funding_evidence,
+)
 from .metrics import (
     MetricStatus,
     ProfitFactorStatus,
@@ -85,6 +92,8 @@ from .simulator import (
 from .trade_event import TradeAction, TradeEvent
 
 __all__ = [
+    "FORMAL_FUNDING_EVIDENCE_SCHEMA_VERSION",
+    "FORMAL_FUNDING_EVIDENCE_TYPE",
     "FORMAL_REPLAY_INPUT_BUNDLE_SCHEMA_VERSION",
     "MATERIAL_INPUT_SELECTOR_TYPE",
     "P6_BENCHMARK_EVIDENCE_TYPE",
@@ -115,6 +124,7 @@ __all__ = [
     "FeeModel",
     "FormalBenchmarkResult",
     "FormalBenchmarkSuite",
+    "FundingIntervalIdentity",
     "FundingModel",
     "FundingSettlement",
     "GateOperator",
@@ -156,7 +166,9 @@ __all__ = [
     "execute_bound_run",
     "execution_model_identity",
     "fee_model_identity",
+    "funding_event_set_sha256",
     "funding_model_identity",
+    "load_and_validate_funding_evidence",
     "make_artifact_evidence",
     "policy_identity",
     "resolve_material_input_policy",

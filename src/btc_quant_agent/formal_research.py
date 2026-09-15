@@ -20,6 +20,7 @@ from .economic.acceptance_verifier import validate_persisted_qualification_seman
 from .economic.execution_model import ExecutionModel
 from .economic.fee_model import FeeModel
 from .economic.funding import FundingModel, FundingSettlement
+from .economic.funding_evidence import load_and_validate_funding_evidence
 from .economic.policy import (
     EntryRule,
     ExitRule,
@@ -52,7 +53,7 @@ from .research_contract.registry import (
     ResearchContractRegistry,
 )
 
-FORMAL_JOB_SCHEMA_VERSION = "1.0.0"
+FORMAL_JOB_SCHEMA_VERSION = "1.1.0"
 
 
 def _research_path(path: str | Path) -> Path:
@@ -96,11 +97,13 @@ class FormalResearchJobSpec:
     protocol: ExperimentMetadata
     comparison: ComparisonContract
     dataset_evidence: EvidenceReference
+    funding_evidence: EvidenceReference
     engine: EconomicSimulationEngine
     candles: tuple[Candle, ...]
     signals: tuple[InformationSignal, ...]
     decision_inputs: tuple[Mapping[str, Any], ...]
     eligible_opportunities: tuple[EligibleOpportunity, ...]
+    # Optional compatibility assertion only; the authority is funding_evidence.
     funding_events: tuple[FundingSettlement, ...]
     observed_at_utc: str
 
@@ -115,6 +118,10 @@ class FormalResearchJobSpec:
         if source is None:
             raise ValueError("formal jobs require explicit local dataset evidence")
         _research_path(source)
+        funding_source = self.funding_evidence.local_path()
+        if funding_source is None:
+            raise ValueError("formal jobs require explicit local funding evidence")
+        _research_path(funding_source)
 
     @classmethod
     def load(cls, path: str | Path) -> FormalResearchJobSpec:
@@ -127,9 +134,9 @@ class FormalResearchJobSpec:
         source = _research_path(path)
         raw = _load_object(source)
         if set(raw) != {
-            "schema_version", "protocol_path", "comparison", "dataset_evidence", "engine",
-            "candles", "signals", "decision_inputs", "eligible_opportunities",
-            "funding_events", "observed_at_utc",
+            "schema_version", "protocol_path", "comparison", "dataset_evidence",
+            "funding_evidence", "engine", "candles", "signals", "decision_inputs",
+            "eligible_opportunities", "funding_events", "observed_at_utc",
         } or raw["schema_version"] != FORMAL_JOB_SCHEMA_VERSION:
             raise ValueError("unsupported formal job schema; legacy inputs are diagnostic only")
         protocol = ExperimentMetadata.from_dict(_load_object(source.parent / raw["protocol_path"]))
@@ -156,7 +163,9 @@ class FormalResearchJobSpec:
             raise ValueError("formal candles require explicit closed/availability proof")
         return cls(
             protocol=protocol, comparison=comparison,
-            dataset_evidence=EvidenceReference.from_dict(raw["dataset_evidence"]), engine=engine,
+            dataset_evidence=EvidenceReference.from_dict(raw["dataset_evidence"]),
+            funding_evidence=EvidenceReference.from_dict(raw["funding_evidence"]),
+            engine=engine,
             candles=tuple(Candle(**row) for row in raw["candles"]),
             signals=tuple(InformationSignal.from_dict(row) for row in raw["signals"]),
             decision_inputs=tuple(raw["decision_inputs"]),
@@ -244,22 +253,34 @@ def run_formal_job(
         authority = registry.get_experiment(spec.protocol.experiment_revision_id)
         if authority.protocol_hash != spec.protocol.protocol_hash:
             raise ValueError("job protocol differs from registry authority")
+    # Authoritative funding events are derived from preregistered funding
+    # evidence before any candidate/benchmark execution (AG-01 repair).
+    authoritative_funding = load_and_validate_funding_evidence(
+        spec.funding_evidence,
+        expected_product=spec.protocol.product_scope[0],
+        expected_start_ms=spec.comparison.data_interval.start_ms,
+        expected_end_ms=spec.comparison.data_interval.end_ms,
+        expected_identity=spec.comparison.funding_interval,
+    )
     bundle = build_formal_replay_input_bundle(
         protocol=spec.protocol, dataset_evidence=spec.dataset_evidence, candles=spec.candles,
-        signals=spec.signals, decision_inputs=spec.decision_inputs, funding_events=spec.funding_events,
+        signals=spec.signals, decision_inputs=spec.decision_inputs,
+        funding_events=authoritative_funding,
     ) if spec.signals or spec.decision_inputs else None
     run = execute_bound_run(
         protocol=spec.protocol, comparison=spec.comparison, dataset_evidence=spec.dataset_evidence,
         engine=spec.engine, candles=spec.candles, signals=spec.signals,
-        replay_input_bundle=bundle, funding_events=spec.funding_events,
+        replay_input_bundle=bundle, funding_evidence=spec.funding_evidence,
+        funding_events=spec.funding_events or None,
     )
     benchmarks = build_formal_benchmark_suite(
         protocol=spec.protocol, comparison=spec.comparison, dataset_evidence=spec.dataset_evidence,
         candidate_run=run, engine=spec.engine, candles=spec.candles,
-        eligible_opportunities=spec.eligible_opportunities, funding_events=spec.funding_events,
+        eligible_opportunities=spec.eligible_opportunities,
+        funding_evidence=spec.funding_evidence, funding_events=authoritative_funding,
     )
     directory = output / run.result_hash
-    references = [spec.dataset_evidence]
+    references = [spec.dataset_evidence, spec.funding_evidence]
     for name, artifact, kind in (
         ("candidate-run", run.to_dict(), P6_RUN_EVIDENCE_TYPE),
         ("benchmark-suite", benchmarks.to_dict(), P6_BENCHMARK_EVIDENCE_TYPE),

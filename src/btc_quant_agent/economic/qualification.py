@@ -38,6 +38,10 @@ from .acceptance_verifier import (
 from .execution_model import ExecutionModel
 from .fee_model import FeeModel
 from .funding import FundingModel, FundingSettlement
+from .funding_evidence import (
+    FundingIntervalIdentity,
+    load_and_validate_funding_evidence,
+)
 from .metrics import (
     ResultCompleteness,
     ReturnMetricsContract,
@@ -230,6 +234,7 @@ class ComparisonContract:
     matching_rules: BenchmarkMatchingRules
     hurdles: tuple[EconomicHurdle, ...]
     evidence_requirements: tuple[str, ...]
+    funding_interval: FundingIntervalIdentity
     result_schema_version: str = P6_RESULT_SCHEMA_VERSION
 
     def __post_init__(self) -> None:
@@ -282,6 +287,8 @@ class ComparisonContract:
         object.__setattr__(self, "hurdles", hurdles)
         if not isinstance(self.data_interval, DataIntervalIdentity):
             raise TypeError("data_interval must be DataIntervalIdentity")
+        if not isinstance(self.funding_interval, FundingIntervalIdentity):
+            raise TypeError("funding_interval must be FundingIntervalIdentity")
         for name in (
             "candidate_policy",
             "cost_model",
@@ -323,6 +330,7 @@ class ComparisonContract:
             "benchmark_vehicle": self.benchmark_vehicle,
             "initial_capital": self.initial_capital,
             "data_interval": self.data_interval.to_dict(),
+            "funding_interval": self.funding_interval.to_dict(),
             "candidate_policy": self.candidate_policy.to_dict(),
             "cost_model": self.cost_model.to_dict(),
             "execution_model": self.execution_model.to_dict(),
@@ -346,6 +354,11 @@ class ComparisonContract:
         for name in ("candidate_policy", "cost_model", "execution_model", "funding_model"):
             payload[name] = VersionedIdentity.from_dict(payload[name])
         payload["data_interval"] = DataIntervalIdentity(**payload["data_interval"])
+        if "funding_interval" not in payload:
+            raise ValueError(
+                "legacy comparison lacks preregistered funding authority: NOT_TESTABLE"
+            )
+        payload["funding_interval"] = FundingIntervalIdentity(**payload["funding_interval"])
         payload["metrics_contract"] = ReturnMetricsContract(**payload["metrics_contract"])
         payload["matching_rules"] = BenchmarkMatchingRules(**payload["matching_rules"])
         payload["hurdles"] = tuple(EconomicHurdle(**item) for item in payload["hurdles"])
@@ -418,6 +431,8 @@ class EconomicRunIdentity:
     metrics_contract_hash: str
     code_revision: str
     completeness: ResultCompleteness
+    funding_evidence_id: str
+    funding_evidence_content_sha256: str
     replay_input_bundle_sha256: str | None = None
     signal_producer_contract: VersionedIdentity | None = None
     run_role: EconomicRunRole | str = EconomicRunRole.CANDIDATE
@@ -439,6 +454,7 @@ class EconomicRunIdentity:
             (self.signal_set_sha256, "signal_set_sha256"),
             (self.decision_input_set_sha256, "decision_input_set_sha256"),
             (self.funding_event_set_sha256, "funding_event_set_sha256"),
+            (self.funding_evidence_content_sha256, "funding_evidence_content_sha256"),
             (self.comparison_contract_hash, "comparison_contract_hash"),
             (self.metrics_contract_hash, "metrics_contract_hash"),
         ):
@@ -451,6 +467,7 @@ class EconomicRunIdentity:
         for value, label in (
             (self.experiment_revision_id, "experiment_revision_id"),
             (self.dataset_evidence_id, "dataset_evidence_id"),
+            (self.funding_evidence_id, "funding_evidence_id"),
             (self.comparison_contract_id, "comparison_contract_id"),
             (self.metrics_contract_id, "metrics_contract_id"),
             (self.code_revision, "code_revision"),
@@ -498,6 +515,8 @@ class EconomicRunIdentity:
             "metrics_contract_hash": self.metrics_contract_hash,
             "code_revision": self.code_revision,
             "completeness": self.completeness.value,
+            "funding_evidence_id": self.funding_evidence_id,
+            "funding_evidence_content_sha256": self.funding_evidence_content_sha256,
             "replay_input_bundle_sha256": self.replay_input_bundle_sha256,
             "run_role": EconomicRunRole(self.run_role).value,
         }
@@ -957,10 +976,23 @@ def execute_bound_run(
     signals: Sequence[InformationSignal],
     replay_input_bundle: ReplayInputBundle | Mapping[str, Any] | None = None,
     decision_input_bindings: Sequence[Mapping[str, Any]] = (),
-    funding_events: Sequence[FundingSettlement] = (),
+    funding_evidence: EvidenceReference | None = None,
+    funding_events: Sequence[FundingSettlement] | None = None,
     run_role: EconomicRunRole | str = EconomicRunRole.CANDIDATE,
 ) -> EconomicRunResult:
     _validate_protocol_and_runtime(protocol, comparison, dataset_evidence, engine, candles)
+    if funding_evidence is None:
+        raise ValueError(
+            "formal run requires preregistered funding evidence; "
+            "caller funding events cannot authorize funding settlements"
+        )
+    authoritative_funding = load_and_validate_funding_evidence(
+        funding_evidence,
+        expected_product=protocol.product_scope[0],
+        expected_start_ms=comparison.data_interval.start_ms,
+        expected_end_ms=comparison.data_interval.end_ms,
+        expected_identity=comparison.funding_interval,
+    )
     if not isinstance(run_role, EconomicRunRole):
         try:
             effective_role = EconomicRunRole(run_role)
@@ -977,12 +1009,19 @@ def execute_bound_run(
         for signal in signals
     ):
         raise ValueError("formal signal lies outside the comparison interval")
-    if any(
-        event.timestamp_ms < comparison.data_interval.start_ms
-        or event.timestamp_ms > comparison.data_interval.end_ms
-        for event in funding_events
-    ):
-        raise ValueError("funding event lies outside the comparison interval")
+    if funding_events is not None:
+        # Optional compatibility assertion only: it must exactly equal the
+        # events independently reconstructed from preregistered funding evidence.
+        submitted_funding_payload = [
+            asdict(item) for item in sorted(funding_events, key=lambda item: item.timestamp_ms)
+        ]
+        authoritative_funding_payload = [
+            asdict(item) for item in sorted(authoritative_funding, key=lambda item: item.timestamp_ms)
+        ]
+        if canonical_sha256(submitted_funding_payload) != canonical_sha256(
+            authoritative_funding_payload
+        ):
+            raise ValueError("submitted funding events differ from preregistered funding evidence")
     signal_payload = [
         item.to_dict()
         for item in sorted(signals, key=lambda item: (item.timestamp_ms, item.signal_id))
@@ -1036,12 +1075,12 @@ def execute_bound_run(
         normalized_decision_inputs = []
 
     funding_payload = [
-        asdict(item) for item in sorted(funding_events, key=lambda item: item.timestamp_ms)
+        asdict(item) for item in sorted(authoritative_funding, key=lambda item: item.timestamp_ms)
     ]
     summary = engine.simulate(
         candles,
         signals,
-        funding_events,
+        authoritative_funding,
         metrics_contract=comparison.metrics_contract,
         terminal_policy=comparison.terminal_policy,
     )
@@ -1117,6 +1156,8 @@ def execute_bound_run(
         input_contract=protocol.input_contract,
         dataset_evidence_id=dataset_evidence.evidence_id,
         dataset_content_sha256=dataset_evidence.content_sha256,
+        funding_evidence_id=funding_evidence.evidence_id,
+        funding_evidence_content_sha256=funding_evidence.content_sha256,
         interval_start_ms=comparison.data_interval.start_ms,
         interval_end_ms=comparison.data_interval.end_ms,
         observation_count=len(candles),
@@ -1156,7 +1197,7 @@ def execute_bound_run(
     from .execution_replay import execution_replay_inputs
 
     accounting["formal_execution_replay_inputs"] = execution_replay_inputs(
-        protocol, dataset_evidence, engine, funding_events
+        protocol, dataset_evidence, engine, funding_evidence, authoritative_funding
     )
     verify_formal_accounting(
         accounting,
@@ -1179,14 +1220,25 @@ def build_formal_benchmark_suite(
     engine: EconomicSimulationEngine,
     candles: Sequence[Candle],
     eligible_opportunities: Sequence[EligibleOpportunity],
-    funding_events: Sequence[FundingSettlement] = (),
+    funding_evidence: EvidenceReference | None = None,
+    funding_events: Sequence[FundingSettlement] | None = None,
 ) -> FormalBenchmarkSuite:
+    if funding_evidence is None:
+        raise ValueError(
+            "formal benchmark suite requires preregistered funding evidence; "
+            "caller funding events cannot authorize funding settlements"
+        )
     _validate_candidate_run_binding(protocol, comparison, candidate_run)
     validate_persisted_decision_input_bindings(
         _accounting_copy(candidate_run),
         candles=candles,
         run_identity=candidate_run.identity.to_dict(),
     )
+    if (
+        candidate_run.identity.funding_evidence_id != funding_evidence.evidence_id
+        or candidate_run.identity.funding_evidence_content_sha256 != funding_evidence.content_sha256
+    ):
+        raise ValueError("candidate run is not bound to the preregistered funding evidence")
     opportunity_hash = eligible_opportunity_set_sha256(eligible_opportunities)
     if (
         BenchmarkKind.RANDOM_MATCHED
@@ -1194,8 +1246,26 @@ def build_formal_benchmark_suite(
         and opportunity_hash != comparison.eligible_opportunity_set_sha256
     ):
         raise ValueError("eligible opportunity set does not match comparison contract")
+    authoritative_funding = load_and_validate_funding_evidence(
+        funding_evidence,
+        expected_product=protocol.product_scope[0],
+        expected_start_ms=comparison.data_interval.start_ms,
+        expected_end_ms=comparison.data_interval.end_ms,
+        expected_identity=comparison.funding_interval,
+    )
+    if funding_events is not None:
+        submitted_funding_payload = [
+            asdict(item) for item in sorted(funding_events, key=lambda item: item.timestamp_ms)
+        ]
+        authoritative_funding_payload = [
+            asdict(item) for item in sorted(authoritative_funding, key=lambda item: item.timestamp_ms)
+        ]
+        if canonical_sha256(submitted_funding_payload) != canonical_sha256(
+            authoritative_funding_payload
+        ):
+            raise ValueError("submitted funding events differ from preregistered funding evidence")
     funding_payload = [
-        asdict(item) for item in sorted(funding_events, key=lambda item: item.timestamp_ms)
+        asdict(item) for item in sorted(authoritative_funding, key=lambda item: item.timestamp_ms)
     ]
     if canonical_sha256(funding_payload) != candidate_run.identity.funding_event_set_sha256:
         raise ValueError("benchmark funding-event set differs from candidate run")
@@ -1206,7 +1276,9 @@ def build_formal_benchmark_suite(
         else None
     )
     passive = (
-        _passive_perpetual_benchmark(comparison, candidate_run, engine, candles, funding_events)
+        _passive_perpetual_benchmark(
+            comparison, candidate_run, engine, candles, authoritative_funding
+        )
         if BenchmarkKind.PASSIVE_PERPETUAL in selected
         else None
     )
@@ -1217,9 +1289,10 @@ def build_formal_benchmark_suite(
             dataset_evidence,
             candidate_run,
             engine,
+            funding_evidence,
             candles,
             eligible_opportunities,
-            funding_events,
+            authoritative_funding,
         )
         if BenchmarkKind.RANDOM_MATCHED in selected
         else None
@@ -1595,6 +1668,7 @@ def _random_matched_benchmark(
     dataset_evidence: EvidenceReference,
     candidate_run: EconomicRunResult,
     engine: EconomicSimulationEngine,
+    funding_evidence: EvidenceReference,
     candles: Sequence[Candle],
     opportunities: Sequence[EligibleOpportunity],
     funding_events: Sequence[FundingSettlement],
@@ -1707,6 +1781,7 @@ def _random_matched_benchmark(
             candles=candles,
             signals=signals,
             replay_input_bundle=trial_bundle,
+            funding_evidence=funding_evidence,
             funding_events=funding_events,
             run_role=EconomicRunRole.RANDOM_BENCHMARK,
         )

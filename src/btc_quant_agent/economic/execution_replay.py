@@ -15,16 +15,18 @@ from .acceptance_verifier import (
 from .execution_model import ExecutionModel
 from .fee_model import FeeModel
 from .funding import FundingModel, FundingSettlement
+from .funding_evidence import load_and_validate_funding_evidence
 from .policy import EntryRule, ExitRule, MarketStateFilter, PositionSizing, RiskBudget, TradePolicy
 from .signal import InformationSignal
 from .simulator import EconomicSimulationEngine
 
-EXECUTION_REPLAY_SCHEMA_VERSION = "1.0.0"
+EXECUTION_REPLAY_SCHEMA_VERSION = "1.1.0"
 
 
 def execution_replay_inputs(
     protocol: ExperimentMetadata, dataset: EvidenceReference,
-    engine: EconomicSimulationEngine, funding: Sequence[FundingSettlement],
+    engine: EconomicSimulationEngine, funding_evidence: EvidenceReference,
+    funding: Sequence[FundingSettlement],
 ) -> dict[str, Any]:
     record = protocol.to_dict()
     # Audit creation time is not an economic input or a replay identity.
@@ -33,6 +35,7 @@ def execution_replay_inputs(
         "schema_version": EXECUTION_REPLAY_SCHEMA_VERSION,
         "protocol": record,
         "dataset_evidence": dataset.to_dict(),
+        "funding_evidence": funding_evidence.to_dict(),
         "policy": engine.policy.to_dict(),
         "fee_model": asdict(engine.fee_model),
         "execution_fee_model": asdict(engine.execution_model.fee_model),
@@ -68,8 +71,9 @@ def verify_execution_replay(
     if not isinstance(raw, dict) or raw.get("schema_version") != EXECUTION_REPLAY_SCHEMA_VERSION:
         raise ValueError("execution replay inputs missing/unsupported: NOT_TESTABLE")
     if set(raw) != {
-        "schema_version", "protocol", "dataset_evidence", "policy", "fee_model",
-        "execution_fee_model", "execution_model", "funding_model", "funding_events",
+        "schema_version", "protocol", "dataset_evidence", "funding_evidence", "policy",
+        "fee_model", "execution_fee_model", "execution_model", "funding_model",
+        "funding_events",
     }:
         raise ValueError("execution replay input schema mismatch")
     recorded_protocol = ExperimentMetadata.from_dict(raw["protocol"])
@@ -94,8 +98,28 @@ def verify_execution_replay(
         ),
         funding_model=FundingModel(**raw["funding_model"]), initial_cash=comparison.initial_capital,
     )
-    funding = tuple(FundingSettlement(**item) for item in raw["funding_events"])
+    recorded_funding_evidence = EvidenceReference.from_dict(raw["funding_evidence"])
+    if (
+        identity.get("funding_evidence_id") != recorded_funding_evidence.evidence_id
+        or identity.get("funding_evidence_content_sha256")
+        != recorded_funding_evidence.content_sha256
+    ):
+        raise ValueError("execution replay funding evidence differs from run identity")
+    # Independent authoritative reload: the persisted funding_evidence reference
+    # is validated against the preregistered comparison authority and its bytes
+    # are parsed fresh; a persisted event list is only a compatibility assertion
+    # and can never replace the evidence file as the source of truth.
+    funding = load_and_validate_funding_evidence(
+        recorded_funding_evidence,
+        expected_product=protocol.product_scope[0],
+        expected_start_ms=comparison.data_interval.start_ms,
+        expected_end_ms=comparison.data_interval.end_ms,
+        expected_identity=comparison.funding_interval,
+    )
     funding_hash = canonical_sha256([asdict(item) for item in funding])
+    persisted_funding = tuple(FundingSettlement(**item) for item in raw["funding_events"])
+    if canonical_sha256([asdict(item) for item in persisted_funding]) != funding_hash:
+        raise ValueError("persisted funding events differ from preregistered funding evidence")
     if funding_hash != identity["funding_event_set_sha256"]:
         raise ValueError("execution replay funding input identity mismatch")
     candles = decode_runtime_market_data(accounting, protocol.product_scope[0])
@@ -111,7 +135,8 @@ def verify_execution_replay(
     result = execute_bound_run(
         protocol=recorded_protocol, comparison=comparison, dataset_evidence=dataset,
         engine=engine, candles=candles, signals=signals, replay_input_bundle=bundle,
-        funding_events=funding, run_role=expected_role,
+        funding_evidence=recorded_funding_evidence, funding_events=funding,
+        run_role=expected_role,
     )
     require_replay_equality(semantic, result.semantic_payload(), "economic execution")
     return result, engine, candles, dataset, funding
@@ -146,7 +171,11 @@ def verify_benchmark_replay(
         if eligible_opportunity_set_sha256(opportunities) != comparison.eligible_opportunity_set_sha256:
             raise ValueError("random opportunity preimage differs from frozen comparison")
         expected = _random_matched_benchmark(
-            protocol, comparison, dataset, run, engine, candles, opportunities, funding,
+            protocol, comparison, dataset, run, engine,
+            EvidenceReference.from_dict(
+                thaw_json(run.accounting["formal_execution_replay_inputs"])["funding_evidence"]
+            ),
+            candles, opportunities, funding,
         )
         # Same canonical execution/equality mechanism as B05, not a second PRNG or engine.
         require_replay_equality(distribution, expected.to_dict(), "random experiment")
