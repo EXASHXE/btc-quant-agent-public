@@ -5,7 +5,7 @@ from dataclasses import dataclass, field
 from typing import Any, ClassVar, Protocol, runtime_checkable
 
 from ..domain import Candle
-from ..research_contract.canonical import canonical_sha256
+from ..research_contract.canonical import canonical_sha256, freeze_json, thaw_json
 from .signal import InformationSignal
 
 
@@ -35,10 +35,14 @@ class SignalProducerContract:
     producer_identity: str
     producer_version: str
     rule: str
-    parameters: dict[str, Any] = field(default_factory=dict)
+    parameters: Mapping[str, Any] = field(default_factory=dict)
     contract_hash: str = ""
 
     def __post_init__(self) -> None:
+        frozen = freeze_json(self.parameters)
+        if not isinstance(frozen, Mapping):
+            raise TypeError("producer contract parameters must be a JSON object")
+        object.__setattr__(self, "parameters", frozen)
         computed = canonical_sha256(self.semantic_payload())
         if not self.contract_hash:
             object.__setattr__(self, "contract_hash", computed)
@@ -54,7 +58,7 @@ class SignalProducerContract:
             "producer_identity": self.producer_identity,
             "producer_version": self.producer_version,
             "rule": self.rule,
-            "parameters": dict(self.parameters),
+            "parameters": thaw_json(self.parameters),
         }
 
     def to_dict(self) -> dict[str, Any]:
@@ -131,6 +135,20 @@ class SignalProducerRegistry:
 
     @classmethod
     def register_contract(cls, contract: SignalProducerContract) -> None:
+        recomputed = canonical_sha256(contract.semantic_payload())
+        if recomputed != contract.contract_hash:
+            raise ValueError(
+                f"producer contract hash mismatch for {contract.contract_id}: "
+                f"declared {contract.contract_hash}, computed {recomputed}"
+            )
+        existing = cls._contracts.get(contract.contract_id)
+        if existing is not None:
+            if canonical_sha256(existing.semantic_payload()) != recomputed:
+                raise ValueError(
+                    f"conflicting producer contract for existing id {contract.contract_id}: "
+                    "authority under an existing id is never replaced"
+                )
+            return
         cls._contracts[contract.contract_id] = contract
 
     @classmethod
@@ -140,6 +158,12 @@ class SignalProducerRegistry:
         contract = cls._contracts.get(contract_id)
         if contract is None:
             return None
+        recomputed = canonical_sha256(contract.semantic_payload())
+        if recomputed != contract.contract_hash:
+            raise ValueError(
+                f"stored producer contract {contract_id} content does not match its "
+                "cached contract_hash; failing closed"
+            )
         if contract_hash is not None and contract.contract_hash != contract_hash:
             return None
         return contract
@@ -325,7 +349,7 @@ class CanonicalRuleSignalProducer:
             if isinstance(ci_raw, (list, tuple)) and len(ci_raw) == 2
             else None
         )
-        metadata = dict(params.get("metadata", {}))
+        metadata = thaw_json(params.get("metadata", {}))
 
         return InformationSignal(
             signal_id=signal_id,
