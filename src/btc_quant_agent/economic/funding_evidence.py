@@ -48,7 +48,7 @@ def _unique_object(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
 
 def _finite_number(value: Any, label: str, *, positive: bool = False) -> float:
     if isinstance(value, bool) or not isinstance(value, (int, float)):
-        raise ValueError(f"{label} must be numeric")
+        raise TypeError(f"{label} must be numeric")
     converted = float(value)
     if not math.isfinite(converted):
         raise ValueError(f"{label} must be finite")
@@ -159,7 +159,7 @@ def load_and_validate_funding_evidence(
         raise ValueError("funding evidence coverage differs from the comparison interval")
     raw_events = document["events"]
     if not isinstance(raw_events, list):
-        raise ValueError("funding evidence events must be a list")
+        raise TypeError("funding evidence events must be a list")
     events: list[FundingSettlement] = []
     previous_timestamp: int | None = None
     for item in raw_events:

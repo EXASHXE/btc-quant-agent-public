@@ -10,11 +10,11 @@ import pytest
 
 from btc_quant_agent.domain import Candle
 from btc_quant_agent.economic import (
+    FORMAL_FUNDING_EVIDENCE_SCHEMA_VERSION,
+    FORMAL_FUNDING_EVIDENCE_TYPE,
     P6_BENCHMARK_EVIDENCE_TYPE,
     P6_RESULT_EVIDENCE_TYPE,
     P6_RUN_EVIDENCE_TYPE,
-    FORMAL_FUNDING_EVIDENCE_SCHEMA_VERSION,
-    FORMAL_FUNDING_EVIDENCE_TYPE,
     BenchmarkKind,
     BenchmarkMatchingRules,
     ComparisonContract,
