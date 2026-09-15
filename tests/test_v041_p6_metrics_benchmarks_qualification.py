@@ -13,6 +13,8 @@ from btc_quant_agent.economic import (
     P6_BENCHMARK_EVIDENCE_TYPE,
     P6_RESULT_EVIDENCE_TYPE,
     P6_RUN_EVIDENCE_TYPE,
+    FORMAL_FUNDING_EVIDENCE_SCHEMA_VERSION,
+    FORMAL_FUNDING_EVIDENCE_TYPE,
     BenchmarkKind,
     BenchmarkMatchingRules,
     ComparisonContract,
@@ -24,6 +26,7 @@ from btc_quant_agent.economic import (
     ExecutionModel,
     ExitRule,
     FeeModel,
+    FundingIntervalIdentity,
     FundingModel,
     FundingSettlement,
     GateOperator,
@@ -47,6 +50,7 @@ from btc_quant_agent.economic import (
     execute_bound_run,
     execution_model_identity,
     fee_model_identity,
+    funding_event_set_sha256,
     funding_model_identity,
     make_artifact_evidence,
     policy_identity,
@@ -183,6 +187,72 @@ def _dataset_evidence(tmp_path: Path, candles: tuple[Candle, ...]) -> EvidenceRe
     )
 
 
+def _funding_evidence(
+    parent: Path,
+    candles: tuple[Candle, ...],
+    events: tuple[FundingSettlement, ...] = (),
+) -> EvidenceReference:
+    """Deterministic preregistered funding evidence artifact (AG-01 repair).
+
+    Same parent, candles and events rebuild the identical evidence reference:
+    content hash, fixed logical id and FIXED_TIME make evidence_id stable.
+    """
+    path = Path(parent) / "funding.json"
+    path.write_text(
+        canonical_json(
+            {
+                "schema_version": FORMAL_FUNDING_EVIDENCE_SCHEMA_VERSION,
+                "product": "BTCUSDT",
+                "coverage_start_ms": candles[0].open_time_ms,
+                "coverage_end_ms": candles[-1].close_time_ms,
+                "events": [
+                    {
+                        "timestamp_ms": item.timestamp_ms,
+                        "funding_rate": item.funding_rate,
+                        "mark_price": item.mark_price,
+                    }
+                    for item in sorted(events, key=lambda item: item.timestamp_ms)
+                ],
+            }
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    return EvidenceReference.from_file(
+        path,
+        evidence_type=FORMAL_FUNDING_EVIDENCE_TYPE,
+        logical_id="p6-funding-dataset",
+        producing_revision_id="DATASET-PIPELINE@v1",
+        producing_code_revision="dataset-code-v1",
+        observed_at_utc=FIXED_TIME,
+    )
+
+
+def _funding_interval(
+    evidence: EvidenceReference,
+    candles: tuple[Candle, ...],
+    events: tuple[FundingSettlement, ...] = (),
+) -> FundingIntervalIdentity:
+    return FundingIntervalIdentity(
+        evidence_id=evidence.evidence_id,
+        content_sha256=evidence.content_sha256,
+        coverage_start_ms=candles[0].open_time_ms,
+        coverage_end_ms=candles[-1].close_time_ms,
+        event_count=len(events),
+        event_set_sha256=funding_event_set_sha256(events),
+    )
+
+
+def _default_funding_evidence(
+    dataset: EvidenceReference,
+    candles: tuple[Candle, ...],
+    events: tuple[FundingSettlement, ...] = (),
+) -> EvidenceReference:
+    """Rebuild the funding evidence a _comparison call derives internally (AG-01)."""
+    base = dataset.local_path()
+    return _funding_evidence(base.parent if base is not None else Path("."), candles, events)
+
+
 def _opportunities(candles: tuple[Candle, ...]) -> tuple[EligibleOpportunity, ...]:
     return tuple(
         EligibleOpportunity(
@@ -283,6 +353,8 @@ def _comparison(
     seed: int = 1234,
     trials: int = 4,
     opportunities: tuple[EligibleOpportunity, ...] | None = None,
+    funding_events: tuple[FundingSettlement, ...] = (),
+    funding_interval: FundingIntervalIdentity | None = None,
 ) -> ComparisonContract:
     metrics = ReturnMetricsContract(
         contract_name="P6_15M_CLOSE_RETURNS",
@@ -290,6 +362,16 @@ def _comparison(
         cadence_ms=CADENCE_MS,
         spacing_tolerance_ms=0,
     )
+    if funding_interval is None:
+        # AG-01: funding evidence becomes part of the preregistered comparison
+        # identity; the default zero-event artifact lives next to the candles.
+        base = dataset.local_path()
+        funding_parent = base.parent if base is not None else Path(".")
+        funding_interval = _funding_interval(
+            _funding_evidence(funding_parent, candles, funding_events),
+            candles,
+            funding_events,
+        )
     return ComparisonContract(
         contract_name="P6_SYNTHETIC_COMPARISON",
         contract_version="v1",
@@ -303,6 +385,7 @@ def _comparison(
             end_ms=candles[-1].close_time_ms,
             observation_count=len(candles),
         ),
+        funding_interval=funding_interval,
         candidate_policy=policy_identity(engine.policy, "v1"),
         cost_model=fee_model_identity(engine.fee_model, "P6_ZERO_COST", "v1"),
         execution_model=execution_model_identity(
@@ -355,6 +438,7 @@ def _formal_artifacts(
     candles = _candles()
     engine = _zero_cost_engine()
     dataset = _dataset_evidence(tmp_path, candles)
+    funding_evidence = _funding_evidence(tmp_path, candles, funding_events)
     opportunities = (
         tuple(
             replace(
@@ -373,6 +457,7 @@ def _formal_artifacts(
         threshold=threshold,
         matching=matching,
         opportunities=opportunities,
+        funding_events=funding_events,
     )
     protocol = _protocol(comparison, engine)
     signal = InformationSignal(
@@ -400,6 +485,7 @@ def _formal_artifacts(
         candles=candles,
         signals=(signal,),
         replay_input_bundle=bundle,
+        funding_evidence=funding_evidence,
         funding_events=funding_events,
     )
     run_path = tmp_path / "candidate-run.json"
@@ -419,6 +505,7 @@ def _formal_artifacts(
         engine=engine,
         candles=candles,
         eligible_opportunities=opportunities,
+        funding_evidence=funding_evidence,
         funding_events=funding_events,
     )
     suite_path = tmp_path / "benchmark-suite.json"
@@ -437,6 +524,7 @@ def _formal_artifacts(
         benchmarks=suite,
         required_evidence_ids=(
             dataset.evidence_id,
+            funding_evidence.evidence_id,
             run_evidence.evidence_id,
             suite_evidence.evidence_id,
         ),
@@ -455,6 +543,7 @@ def _formal_artifacts(
         "candles": candles,
         "engine": engine,
         "dataset": dataset,
+        "funding_evidence": funding_evidence,
         "comparison": comparison,
         "protocol": protocol,
         "run": run,
@@ -514,6 +603,7 @@ def test_formal_pipeline_is_replayable_and_can_qualify(tmp_path: Path) -> None:
         qualification.decision_attestation(artifacts["result_evidence"]),
         evidence_references=(
             artifacts["dataset"],
+            artifacts["funding_evidence"],
             artifacts["run_evidence"],
             artifacts["suite_evidence"],
             artifacts["result_evidence"],
@@ -737,6 +827,8 @@ def test_random_trials_are_preserved_deterministic_and_not_a_mean_curve(
         engine=first["engine"],
         candles=first["candles"],
         eligible_opportunities=opportunities,
+        funding_evidence=first["funding_evidence"],
+        funding_events=first["funding_events"],
     )
     first_random = first["suite"].random
     second_random = second_suite.random
@@ -983,6 +1075,8 @@ def test_semantically_identical_runs_and_results_have_identical_hashes(
         candles=artifacts["candles"],
         signals=(signal,),
         replay_input_bundle=repeated_bundle,
+        funding_evidence=artifacts["funding_evidence"],
+        funding_events=artifacts["funding_events"],
     )
     assert repeated.result_id == artifacts["run"].result_id
     assert repeated.to_dict() == artifacts["run"].to_dict()
@@ -1072,6 +1166,8 @@ def test_acceptance_repair_runtime_binding_is_deterministic(tmp_path: Path) -> N
         candles=artifacts["candles"],
         signals=(signal,),
         replay_input_bundle=second_bundle,
+        funding_evidence=artifacts["funding_evidence"],
+        funding_events=artifacts["funding_events"],
     )
     assert first.result_id == second.result_id
     assert (

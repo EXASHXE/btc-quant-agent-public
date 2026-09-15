@@ -30,6 +30,7 @@ def _run(tmp_path: Path, *, random: bool = False, empty: bool = False):
         dataset_evidence=ctx["dataset"], engine=ctx["engine"],
         candles=ctx["candles"], signals=() if empty else (ctx["signal"],),
         replay_input_bundle=bundle,
+        funding_evidence=ctx["funding_evidence"],
         run_role=EconomicRunRole.RANDOM_BENCHMARK if random else EconomicRunRole.CANDIDATE,
     )
     return ctx, run
@@ -128,6 +129,7 @@ def test_t9_zero_signal_candidate_without_contract(tmp_path: Path) -> None:
     run = execute_bound_run(
         protocol=protocol, comparison=ctx["comparison"], dataset_evidence=ctx["dataset"],
         engine=ctx["engine"], candles=ctx["candles"], signals=(),
+        funding_evidence=ctx["funding_evidence"],
     )
     _validate_candidate_run_binding(protocol, ctx["comparison"], run)
     assert run.identity.completeness == ResultCompleteness.COMPLETE

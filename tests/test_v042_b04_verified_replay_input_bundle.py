@@ -51,6 +51,7 @@ def _b04_context(
     frozen_candles: tuple[Candle, ...] = tuple(candles)
     engine = p6._zero_cost_engine()
     dataset = p6._dataset_evidence(tmp_path, frozen_candles)
+    funding_evidence = p6._default_funding_evidence(dataset, frozen_candles)
     comparison = p6._comparison(
         dataset,
         frozen_candles,
@@ -70,6 +71,7 @@ def _b04_context(
         "candles": frozen_candles,
         "engine": engine,
         "dataset": dataset,
+        "funding_evidence": funding_evidence,
         "comparison": comparison,
         "protocol": protocol,
         "signal": signal,
@@ -208,6 +210,7 @@ def test_b04_t3_missing_replay_bundle_fails_closed(tmp_path: Path) -> None:
             candles=ctx["candles"],
             signals=(ctx["signal"],),
             replay_input_bundle=None,
+            funding_evidence=ctx["funding_evidence"],
         )
 
 
@@ -236,6 +239,7 @@ def test_b04_t4_legacy_decision_binding_only_attack_cannot_become_complete(
             signals=(ctx["signal"],),
             decision_input_bindings=(legacy_binding,),
             replay_input_bundle=None,
+            funding_evidence=ctx["funding_evidence"],
         )
 
     # Furthermore, persisted verifier rejects candidate claiming COMPLETE without bundle
@@ -547,6 +551,7 @@ def test_b04_t15_historical_wall_clock_independence(
         candles=ctx["candles"],
         signals=(ctx["signal"],),
         replay_input_bundle=bundle,
+        funding_evidence=ctx["funding_evidence"],
     )
     assert run.identity.completeness.value == "COMPLETE"
 
@@ -584,6 +589,7 @@ def test_b04_p1_valid_deterministic_candidate_allowed(tmp_path: Path) -> None:
         candles=ctx["candles"],
         signals=(ctx["signal"],),
         replay_input_bundle=bundle,
+        funding_evidence=ctx["funding_evidence"],
     )
     assert run.identity.completeness.value == "COMPLETE"
     assert run.accounting["formal_replay_input_bundle_schema_version"] == "1.0.0"
@@ -612,6 +618,7 @@ def test_b04_p2_exact_availability_boundary_allowed(tmp_path: Path) -> None:
         candles=ctx["candles"],
         signals=(ctx["signal"],),
         replay_input_bundle=bundle,
+        funding_evidence=ctx["funding_evidence"],
     )
     assert run.identity.completeness.value == "COMPLETE"
 
@@ -631,6 +638,7 @@ def test_b04_p3_future_outcome_candles_allowed(tmp_path: Path) -> None:
         candles=ctx["candles"],
         signals=(ctx["signal"],),
         replay_input_bundle=bundle,
+        funding_evidence=ctx["funding_evidence"],
     )
     assert run.identity.completeness.value == "COMPLETE"
 
@@ -702,6 +710,7 @@ def test_b04_p4_multiple_valid_signals_complete(tmp_path: Path) -> None:
         candles=ctx["candles"],
         signals=(sig1, sig2),
         replay_input_bundle=bundle,
+        funding_evidence=ctx["funding_evidence"],
     )
     assert run.identity.completeness.value == "COMPLETE"
     assert len(run.accounting["formal_decision_input_bindings"]) == 2

@@ -39,6 +39,7 @@ from btc_quant_agent.storage import Repository
 def _spec(ctx):
     return FormalResearchJobSpec(
         protocol=ctx["protocol"], comparison=ctx["comparison"], dataset_evidence=ctx["dataset"],
+        funding_evidence=ctx["funding_evidence"],
         engine=ctx["engine"], candles=ctx["candles"], signals=ctx["signals"],
         decision_inputs=tuple(p6._decision_input_binding(
             signal, ctx["dataset"], ctx["candles"], ctx["protocol"],
@@ -52,8 +53,10 @@ def _job(tmp_path, ctx):
     protocol_path = tmp_path / "protocol.json"
     protocol_path.write_text(canonical_json(spec.protocol.to_dict()), encoding="utf-8")
     payload = {
-        "schema_version": "1.0.0", "protocol_path": protocol_path.name,
-        "comparison": spec.comparison.semantic_payload(), "dataset_evidence": spec.dataset_evidence.to_dict(),
+        "schema_version": "1.1.0", "protocol_path": protocol_path.name,
+        "comparison": spec.comparison.semantic_payload(),
+        "dataset_evidence": spec.dataset_evidence.to_dict(),
+        "funding_evidence": spec.funding_evidence.to_dict(),
         "engine": {
             "policy": asdict(spec.engine.policy), "fee_model": asdict(spec.engine.fee_model),
             "execution_model": {
@@ -199,7 +202,8 @@ def test_t7_fully_rehashed_attacks_rejected_by_consumer_acceptance(tmp_path, att
                 empty = execute_bound_run(
                     protocol=ctx["protocol"], comparison=ctx["comparison"],
                     dataset_evidence=ctx["dataset"], engine=ctx["engine"], candles=ctx["candles"],
-                    signals=(), funding_events=ctx["funding"],
+                    signals=(), funding_evidence=ctx["funding_evidence"],
+                    funding_events=ctx["funding"],
                 )
                 accounting = {k: v for k, v in accounting.items() if not k.startswith("formal_")}
                 accounting.update({k: thaw_json(v) for k, v in empty.accounting.items()

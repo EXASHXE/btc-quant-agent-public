@@ -53,6 +53,7 @@ def _b04r2_context(
     frozen_candles: tuple[Candle, ...] = tuple(candles)
     engine = p6._zero_cost_engine()
     dataset = p6._dataset_evidence(tmp_path, frozen_candles)
+    funding_evidence = p6._default_funding_evidence(dataset, frozen_candles)
     comparison = p6._comparison(
         dataset,
         frozen_candles,
@@ -82,6 +83,7 @@ def _b04r2_context(
         "candles": frozen_candles,
         "engine": engine,
         "dataset": dataset,
+        "funding_evidence": funding_evidence,
         "comparison": comparison,
         "protocol": protocol,
         "signal": signal,
@@ -298,6 +300,7 @@ def test_a4_synchronized_spread_rewrite_rejected(tmp_path: Path) -> None:
         candles=ctx["candles"],
         signals=(ctx["signal"],),
         replay_input_bundle=valid_bundle,
+        funding_evidence=ctx["funding_evidence"],
     )
     assert run.identity.completeness.value == "COMPLETE"
 
@@ -347,6 +350,7 @@ def test_a7_complete_evidence_stripping_rejected(tmp_path: Path) -> None:
         candles=ctx["candles"],
         signals=(ctx["signal"],),
         replay_input_bundle=bundle,
+        funding_evidence=ctx["funding_evidence"],
     )
     assert run.identity.completeness.value == "COMPLETE"
 
@@ -382,6 +386,7 @@ def test_a8_partial_evidence_stripping_variants_fail_closed(tmp_path: Path) -> N
         candles=ctx["candles"],
         signals=(ctx["signal"],),
         replay_input_bundle=bundle,
+        funding_evidence=ctx["funding_evidence"],
     )
 
     # A8.1: Delete bundle from accounting
@@ -440,6 +445,7 @@ def test_a9_no_signal_cash_control_allowed_without_bundle(tmp_path: Path) -> Non
         candles=ctx["candles"],
         signals=(),
         replay_input_bundle=None,
+        funding_evidence=ctx["funding_evidence"],
     )
     assert run.identity.completeness.value == "COMPLETE"
     assert run.identity.signal_set_sha256 == canonical_sha256([])
@@ -468,6 +474,7 @@ def test_p1_protocol_frozen_canonical_return_sign_positive_control(tmp_path: Pat
         candles=ctx["candles"],
         signals=(ctx["signal"],),
         replay_input_bundle=bundle,
+        funding_evidence=ctx["funding_evidence"],
     )
     assert run.identity.completeness.value == "COMPLETE"
     assert run.identity.signal_producer_contract is not None
@@ -515,6 +522,7 @@ def test_p2_protocol_frozen_momentum_threshold_positive_control(tmp_path: Path) 
         candles=ctx["candles"],
         signals=(sig,),
         replay_input_bundle=bundle,
+        funding_evidence=ctx["funding_evidence"],
     )
     assert run.identity.completeness.value == "COMPLETE"
     validate_persisted_decision_input_bindings(
@@ -551,6 +559,7 @@ def test_p4_persisted_candidate_artifact_roundtrip(tmp_path: Path) -> None:
         candles=ctx["candles"],
         signals=(ctx["signal"],),
         replay_input_bundle=bundle,
+        funding_evidence=ctx["funding_evidence"],
     )
     artifact_path = tmp_path / "candidate_run.json"
     run.write(artifact_path)

@@ -47,7 +47,8 @@ def _random_run(ctx, signals):
     return execute_bound_run(
         protocol=ctx["protocol"], comparison=ctx["comparison"], dataset_evidence=ctx["dataset"],
         engine=ctx["engine"], candles=ctx["candles"], signals=signals, replay_input_bundle=bundle,
-        funding_events=ctx["funding"], run_role=EconomicRunRole.RANDOM_BENCHMARK,
+        funding_events=ctx["funding"], funding_evidence=ctx["funding_evidence"],
+        run_role=EconomicRunRole.RANDOM_BENCHMARK,
     )
 
 
@@ -126,7 +127,7 @@ def test_b06_t6_equal_timestamp_insertion_order_is_semantically_stable(tmp_path:
     expected = ctx["suite"].random.to_dict()
     actual = _random_matched_benchmark(
         ctx["protocol"], ctx["comparison"], ctx["dataset"], ctx["run"], ctx["engine"],
-        ctx["candles"], tuple(reversed(opportunities)), ctx["funding"],
+        ctx["funding_evidence"], ctx["candles"], tuple(reversed(opportunities)), ctx["funding"],
     )
     assert actual.to_dict() == expected
     _verify(ctx, ctx["suite"].to_dict())
@@ -156,7 +157,7 @@ def test_b06_t8_t9_fixed_and_larger_positive_replay(tmp_path: Path, count: int, 
     _verify(ctx, ctx["suite"].to_dict())
     again = _random_matched_benchmark(
         ctx["protocol"], ctx["comparison"], ctx["dataset"], ctx["run"], ctx["engine"],
-        ctx["candles"], p6._opportunities(ctx["candles"]), ctx["funding"],
+        ctx["funding_evidence"], ctx["candles"], p6._opportunities(ctx["candles"]), ctx["funding"],
     )
     assert again.to_dict() == ctx["suite"].random.to_dict()
 

@@ -71,6 +71,7 @@ def test_b05_t8_empty_signal_evidence_stripping_cannot_retain_trades(tmp_path: P
     empty = execute_bound_run(
         protocol=ctx["protocol"], comparison=ctx["comparison"], dataset_evidence=ctx["dataset"],
         engine=ctx["engine"], candles=ctx["candles"], signals=(), funding_events=ctx["funding"],
+        funding_evidence=ctx["funding_evidence"],
     )
     accounting = thaw_json(ctx["run"].accounting)
     for key in list(accounting):
@@ -88,6 +89,7 @@ def test_b05_t9_synchronized_random_role_identity_rewrite_rejected(tmp_path: Pat
         protocol=ctx["protocol"], comparison=ctx["comparison"], dataset_evidence=ctx["dataset"],
         engine=ctx["engine"], candles=ctx["candles"], signals=(ctx["signal"],),
         replay_input_bundle=r4._build_random_benchmark_bundle(ctx), run_role=EconomicRunRole.RANDOM_BENCHMARK,
+        funding_evidence=ctx["funding_evidence"],
     )
     identity = replace(random.identity, run_role=EconomicRunRole.CANDIDATE,
                        signal_producer_contract=ctx["contract"].to_versioned_identity())

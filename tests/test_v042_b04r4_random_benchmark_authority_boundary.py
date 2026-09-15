@@ -62,6 +62,7 @@ def _b04r4_context(
     frozen_candles: tuple[Candle, ...] = tuple(candles)
     engine = p6._zero_cost_engine()
     dataset = p6._dataset_evidence(tmp_path, frozen_candles)
+    funding_evidence = p6._default_funding_evidence(dataset, frozen_candles)
     comparison = p6._comparison(
         dataset,
         frozen_candles,
@@ -90,6 +91,7 @@ def _b04r4_context(
         "candles": frozen_candles,
         "engine": engine,
         "dataset": dataset,
+        "funding_evidence": funding_evidence,
         "comparison": comparison,
         "protocol": protocol,
         "signal": signal,
@@ -291,6 +293,7 @@ def test_t3_execute_bound_run_candidate_with_random_bundle_rejected(tmp_path: Pa
             candles=ctx["candles"],
             signals=(ctx["signal"],),
             replay_input_bundle=random_bundle,
+            funding_evidence=ctx["funding_evidence"],
             run_role=EconomicRunRole.CANDIDATE,
         )
 
@@ -315,6 +318,7 @@ def test_t4_persisted_candidate_random_bundle_mismatch_rejected(tmp_path: Path) 
         candles=ctx["candles"],
         signals=(ctx["signal"],),
         replay_input_bundle=valid_candidate_bundle,
+        funding_evidence=ctx["funding_evidence"],
         run_role=EconomicRunRole.CANDIDATE,
     )
     assert run.identity.completeness == ResultCompleteness.COMPLETE
@@ -363,6 +367,7 @@ def test_t5_benchmark_role_artifact_cannot_be_reused_as_candidate(tmp_path: Path
         candles=ctx["candles"],
         signals=(ctx["signal"],),
         replay_input_bundle=random_bundle,
+        funding_evidence=ctx["funding_evidence"],
         run_role=EconomicRunRole.RANDOM_BENCHMARK,
     )
     assert benchmark_run.identity.run_role == EconomicRunRole.RANDOM_BENCHMARK
@@ -412,6 +417,7 @@ def test_t5_benchmark_role_artifact_cannot_be_reused_as_candidate(tmp_path: Path
             engine=ctx["engine"],
             candles=ctx["candles"],
             eligible_opportunities=(),
+            funding_evidence=ctx["funding_evidence"],
         )
 
 
@@ -435,6 +441,7 @@ def test_t6_random_benchmark_positive_control(tmp_path: Path) -> None:
         candles=ctx["candles"],
         signals=(ctx["signal"],),
         replay_input_bundle=candidate_bundle,
+        funding_evidence=ctx["funding_evidence"],
         run_role=EconomicRunRole.CANDIDATE,
     )
 
@@ -453,6 +460,7 @@ def test_t6_random_benchmark_positive_control(tmp_path: Path) -> None:
         dataset_evidence=ctx["dataset"],
         candidate_run=candidate_run,
         engine=ctx["engine"],
+        funding_evidence=ctx["funding_evidence"],
         candles=ctx["candles"],
         opportunities=(opportunity,),
         funding_events=(),
@@ -566,6 +574,7 @@ def test_t8_normal_candidate_positive_control(tmp_path: Path) -> None:
         candles=ctx["candles"],
         signals=(ctx["signal"],),
         replay_input_bundle=candidate_bundle,
+        funding_evidence=ctx["funding_evidence"],
         run_role=EconomicRunRole.CANDIDATE,
     )
 
@@ -600,6 +609,7 @@ def test_t9_zero_signal_cash_unchanged(tmp_path: Path) -> None:
         candles=ctx["candles"],
         signals=(),
         replay_input_bundle=None,
+        funding_evidence=ctx["funding_evidence"],
         run_role=EconomicRunRole.CANDIDATE,
     )
 

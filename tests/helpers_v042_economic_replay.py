@@ -45,9 +45,11 @@ def context(tmp_path: Path, *, count=8, trials=4, nonzero=True, opportunities=No
     )
     dataset = p6._dataset_evidence(tmp_path, candles)
     opportunities = opportunities if opportunities is not None else p6._opportunities(candles)
+    funding = (FundingSettlement(candles[1].open_time_ms + 1000, 0.001, 101.0),) if nonzero else ()
+    funding_evidence = p6._funding_evidence(tmp_path, candles, funding)
     comparison = p6._comparison(
         dataset, candles, engine, required=(BenchmarkKind.CASH, BenchmarkKind.RANDOM_MATCHED),
-        descriptive=(), trials=trials, opportunities=opportunities,
+        descriptive=(), trials=trials, opportunities=opportunities, funding_events=funding,
     )
     protocol = p6._protocol(comparison, engine)
     signals = tuple(InformationSignal(
@@ -58,7 +60,6 @@ def context(tmp_path: Path, *, count=8, trials=4, nonzero=True, opportunities=No
             "liquidity_available_at_ms": candles[index - 1].close_time_ms,
         } if nonzero else {},
     ) for index, direction in ((1, 1), (4, -1)))
-    funding = (FundingSettlement(candles[1].open_time_ms + 1000, 0.001, 101.0),) if nonzero else ()
     bundle = build_formal_replay_input_bundle(
         protocol=protocol, dataset_evidence=dataset, candles=candles, signals=signals,
         decision_inputs=tuple(p6._decision_input_binding(signal, dataset, candles, protocol) for signal in signals),
@@ -66,14 +67,17 @@ def context(tmp_path: Path, *, count=8, trials=4, nonzero=True, opportunities=No
     )
     run = execute_bound_run(
         protocol=protocol, comparison=comparison, dataset_evidence=dataset, candles=candles,
-        engine=engine, signals=signals, replay_input_bundle=bundle, funding_events=funding,
+        engine=engine, signals=signals, replay_input_bundle=bundle,
+        funding_evidence=funding_evidence, funding_events=funding,
     )
     suite = build_formal_benchmark_suite(
         protocol=protocol, comparison=comparison, dataset_evidence=dataset, candidate_run=run,
-        engine=engine, candles=candles, eligible_opportunities=opportunities, funding_events=funding,
+        engine=engine, candles=candles, eligible_opportunities=opportunities,
+        funding_evidence=funding_evidence, funding_events=funding,
     )
     return {"protocol": protocol, "comparison": comparison, "dataset": dataset, "candles": candles,
-            "engine": engine, "run": run, "suite": suite, "funding": funding, "signals": signals}
+            "engine": engine, "run": run, "suite": suite, "funding": funding,
+            "funding_evidence": funding_evidence, "signals": signals}
 
 
 def assert_accounting(ctx, accounting):

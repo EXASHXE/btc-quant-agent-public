@@ -52,6 +52,7 @@ def _formal_context(
     frozen_candles: tuple[Candle, ...] = tuple(candles)
     engine = p6._zero_cost_engine()
     dataset = p6._dataset_evidence(tmp_path, frozen_candles)
+    funding_evidence = p6._default_funding_evidence(dataset, frozen_candles)
     comparison = p6._comparison(
         dataset,
         frozen_candles,
@@ -78,6 +79,7 @@ def _formal_context(
         "candles": frozen_candles,
         "engine": engine,
         "dataset": dataset,
+        "funding_evidence": funding_evidence,
         "comparison": comparison,
         "protocol": protocol,
         "signal": signal,
@@ -109,6 +111,7 @@ def _execute(
         candles=context["candles"],
         signals=(context["signal"],),
         replay_input_bundle=replay_bundle,
+        funding_evidence=context["funding_evidence"],
     )
 
 
@@ -176,6 +179,7 @@ def test_ar_t4_missing_decision_input_proof_fails_closed(tmp_path: Path) -> None
             engine=context["engine"],
             candles=context["candles"],
             signals=(context["signal"],),
+            funding_evidence=context["funding_evidence"],
         )
 
 

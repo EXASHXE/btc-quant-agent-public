@@ -42,6 +42,7 @@ def main():
 
             spec = FormalResearchJobSpec(
                 protocol=ctx["protocol"], comparison=ctx["comparison"], dataset_evidence=ctx["dataset"],
+                funding_evidence=ctx["funding_evidence"],
                 engine=ctx["engine"], candles=ctx["candles"], signals=ctx["signals"],
                 decision_inputs=tuple(p6._decision_input_binding(
                     signal, ctx["dataset"], ctx["candles"], ctx["protocol"],
