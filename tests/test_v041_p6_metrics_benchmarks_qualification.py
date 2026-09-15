@@ -906,6 +906,7 @@ def test_failed_hurdle_records_rejected(tmp_path: Path) -> None:
         qualification.decision_attestation(artifacts["result_evidence"]),
         evidence_references=(
             artifacts["dataset"],
+            artifacts["funding_evidence"],
             artifacts["run_evidence"],
             artifacts["suite_evidence"],
             artifacts["result_evidence"],
@@ -955,6 +956,7 @@ def test_not_testable_artifact_registers_evidence_without_lifecycle_event(
         qualification.decision_attestation(result_evidence),
         evidence_references=(
             artifacts["dataset"],
+            artifacts["funding_evidence"],
             artifacts["run_evidence"],
             artifacts["suite_evidence"],
             result_evidence,
@@ -1027,6 +1029,7 @@ def test_stale_registry_cannot_partially_commit_economic_decision(tmp_path: Path
             artifacts["qualification"].decision_attestation(artifacts["result_evidence"]),
             evidence_references=(
                 artifacts["dataset"],
+                artifacts["funding_evidence"],
                 artifacts["run_evidence"],
                 artifacts["suite_evidence"],
                 artifacts["result_evidence"],
