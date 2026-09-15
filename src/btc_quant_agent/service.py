@@ -134,8 +134,8 @@ class QuantService:
                 "runtime_actionability": "NO_OPPORTUNITY",
                 "error": str(exc),
             }
-        forward = ForwardDerivativeStore("data/forward/BTCUSDT/derivatives.sqlite3").status(
-            scheduler=scheduler_status()
+        forward = ForwardDerivativeStore.read_status(
+            "data/forward/BTCUSDT/derivatives.sqlite3", scheduler=scheduler_status()
         )
         report: dict[str, object] = {
             "status": "OK",

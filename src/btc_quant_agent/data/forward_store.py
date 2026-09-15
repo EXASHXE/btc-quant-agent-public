@@ -132,11 +132,56 @@ class ForwardDerivativeStore:
         self.path = Path(path)
         self.path.parent.mkdir(parents=True, exist_ok=True)
         self._ready = False
+        self._read_only = False
         self._initialize()
         self._ready = True
 
+    @classmethod
+    def open_read_only(cls, path: str | Path) -> ForwardDerivativeStore:
+        """Read-only inspection instance: never creates, initializes or migrates the store.
+
+        The returned instance bypasses writer ``__init__`` entirely; every query
+        flows through a sidecar-free ``mode=ro``/``immutable=1`` SQLite URI
+        connection with ``PRAGMA query_only=ON``.
+        """
+        instance = cls.__new__(cls)
+        instance.path = Path(path)
+        instance._ready = False
+        instance._read_only = True
+        return instance
+
     @contextmanager
     def _connect(self) -> Iterator[sqlite3.Connection]:
+        if self._read_only:
+            if not self.path.is_file():
+                raise FileNotFoundError(
+                    f"forward store is unavailable for read-only inspection: {self.path}"
+                )
+            # Sidecar-free read-only URI selection. This store has a single
+            # writer (scheduled/manual collector): SQLite checkpoints the WAL
+            # and removes the -wal/-shm sidecars on the writer's last close, so
+            # whenever no non-empty -wal sidecar remains the main database file
+            # is fully checkpointed and self-consistent, and ``immutable=1``
+            # reads it exactly while creating no side files. An in-flight
+            # writer instead leaves a non-empty -wal; then ``mode=ro`` joins
+            # the writer's existing -shm (creating no new files) and reads a
+            # consistent WAL snapshot. A crashed writer (non-empty -wal, no
+            # live -shm) cannot be recovered by a read-only connection and
+            # fails closed into the degraded response of ``read_status``.
+            wal_path = self.path.with_name(self.path.name + "-wal")
+            active_wal = wal_path.exists() and wal_path.stat().st_size > 0
+            suffix = "?mode=ro" if active_wal else "?immutable=1"
+            connection = sqlite3.connect(
+                self.path.resolve().as_uri() + suffix, uri=True, timeout=10.0
+            )
+            connection.row_factory = sqlite3.Row
+            connection.execute("PRAGMA busy_timeout=10000")
+            connection.execute("PRAGMA query_only=ON")
+            try:
+                yield connection
+            finally:
+                connection.close()
+            return
         connection = sqlite3.connect(self.path, timeout=10.0)
         connection.row_factory = sqlite3.Row
         connection.execute("PRAGMA busy_timeout=10000")
@@ -150,6 +195,51 @@ class ForwardDerivativeStore:
             raise
         finally:
             connection.close()
+
+    @classmethod
+    def read_status(
+        cls,
+        path: str | Path,
+        *,
+        scheduler: dict[str, Any] | None = None,
+        now_ms: int | None = None,
+    ) -> dict[str, Any]:
+        """Read-only forward-store status for observational consumers (GET /health).
+
+        Missing stores return an explicit degraded response; unreadable or
+        incompatible stores degrade with a stable error classification. This
+        entrypoint never creates directories, database files or schema, and
+        never raises into the caller.
+        """
+        store_path = Path(path)
+        scheduler_detected = bool((scheduler or {}).get("detected", False))
+        scheduler_active = bool((scheduler or {}).get("active", False))
+        if not store_path.is_file():
+            return {
+                "store_path": str(store_path),
+                "store_exists": False,
+                "health": "DEGRADED",
+                "sample_count": 0,
+                "scheduler_detected": scheduler_detected,
+                "scheduler_active": scheduler_active,
+                "collection_status": "NOT_COLLECTING",
+                "latest_collection_run": None,
+            }
+        try:
+            return cls.open_read_only(store_path).status(
+                scheduler=scheduler, now_ms=now_ms
+            )
+        except Exception as exc:  # noqa: BLE001 - inspection must degrade, never raise
+            return {
+                "store_path": str(store_path),
+                "store_exists": True,
+                "health": "DEGRADED",
+                "sample_count": 0,
+                "scheduler_detected": scheduler_detected,
+                "scheduler_active": scheduler_active,
+                "collection_status": "NOT_COLLECTING",
+                "error": f"{type(exc).__name__}: {exc}",
+            }
 
     def _initialize(self) -> None:
         with self._connect() as connection:
