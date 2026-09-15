@@ -52,9 +52,9 @@ import test_v050_r05a_ag03_producer_contract_immutability as r05a
 
 from btc_quant_agent.domain import Candle
 from btc_quant_agent.economic import (
+    MATERIAL_INPUT_SELECTOR_TYPE,
     BenchmarkKind,
     InformationSignal,
-    MATERIAL_INPUT_SELECTOR_TYPE,
     ReplayInputBundle,
     SignalProducerContract,
     SignalProducerRegistry,
@@ -822,32 +822,42 @@ def test_t13_builder_overwrites_forged_generation_contract_fields(
         (
             "material_input_required_bars",
             5,
-            "generation_contract material_input_required_bars"
-            " for R05B-SIGNAL-1 must equal",
+            (
+                "generation_contract material_input_required_bars"
+                " for R05B-SIGNAL-1 must equal"
+            ),
         ),
         (
             "material_input_selector_type",
             "CALLER_CHOICE",
-            "generation_contract material_input_selector_type"
-            " for R05B-SIGNAL-1 must equal",
+            (
+                "generation_contract material_input_selector_type"
+                " for R05B-SIGNAL-1 must equal"
+            ),
         ),
         (
             "material_input_selector_sha256",
             "f" * 64,
-            "generation_contract material_input_selector_sha256"
-            " for R05B-SIGNAL-1 does not equal",
+            (
+                "generation_contract material_input_selector_sha256"
+                " for R05B-SIGNAL-1 does not equal"
+            ),
         ),
         (
             "expected_preimage_sha256",
             "0" * 64,
-            "generation_contract expected_preimage_sha256"
-            " for R05B-SIGNAL-1 does not equal",
+            (
+                "generation_contract expected_preimage_sha256"
+                " for R05B-SIGNAL-1 does not equal"
+            ),
         ),
         (
             "material_input_open_times_ms",
             [START_MS, START_MS + CADENCE_MS],
-            "generation_contract material_input_open_times_ms"
-            " for R05B-SIGNAL-1 does not equal",
+            (
+                "generation_contract material_input_open_times_ms"
+                " for R05B-SIGNAL-1 does not equal"
+            ),
         ),
     ],
 )

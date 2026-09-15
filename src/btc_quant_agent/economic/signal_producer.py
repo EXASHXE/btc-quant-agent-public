@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
+from itertools import pairwise
 from typing import Any, ClassVar, Protocol, runtime_checkable
 
 from ..domain import Candle
@@ -489,7 +490,7 @@ class CanonicalRuleSignalProducer:
         if len({c.symbol for c in input_candles}) != 1 or len({c.interval for c in input_candles}) != 1:
             raise ValueError("input candles must share one symbol and one interval")
         if policy.required_bars > 1:
-            for previous, candle in zip(input_candles, input_candles[1:]):
+            for previous, candle in pairwise(input_candles):
                 if candle.open_time_ms != previous.close_time_ms + 1:
                     raise ValueError(
                         "input candles must be contiguous required material rows"

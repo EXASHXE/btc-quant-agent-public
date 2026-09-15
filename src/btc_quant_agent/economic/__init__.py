@@ -86,6 +86,7 @@ from .trade_event import TradeAction, TradeEvent
 
 __all__ = [
     "FORMAL_REPLAY_INPUT_BUNDLE_SCHEMA_VERSION",
+    "MATERIAL_INPUT_SELECTOR_TYPE",
     "P6_BENCHMARK_EVIDENCE_TYPE",
     "P6_RESULT_EVIDENCE_TYPE",
     "P6_RESULT_SCHEMA_VERSION",
@@ -119,7 +120,6 @@ __all__ = [
     "GateOperator",
     "InformationSignal",
     "MarketStateFilter",
-    "MATERIAL_INPUT_SELECTOR_TYPE",
     "MaterialInputSelectorPolicy",
     "MetricStatus",
     "OrderType",
