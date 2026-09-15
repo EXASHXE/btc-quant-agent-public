@@ -19,7 +19,6 @@ from btc_quant_agent.research import (
 from btc_quant_agent.research_contract.registry import ResearchContractRegistry
 from btc_quant_agent.research_registry import ResearchRegistry
 
-
 ROOT = Path(__file__).resolve().parents[1]
 MARKER = {
     "classification": "LEGACY_DIAGNOSTIC_ONLY",
