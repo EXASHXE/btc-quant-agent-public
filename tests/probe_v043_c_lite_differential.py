@@ -58,7 +58,7 @@ def main():
             run, suite = ctx["run"], ctx["suite"]
             directory = root / "output" / run.result_hash
             directory.mkdir(parents=True, exist_ok=True)
-            references = [ctx["dataset"]]
+            references = [ctx["dataset"], ctx["funding_evidence"]]
             for name, artifact, kind in (
                 ("candidate-run", run, p6.P6_RUN_EVIDENCE_TYPE),
                 ("benchmark-suite", suite, p6.P6_BENCHMARK_EVIDENCE_TYPE),

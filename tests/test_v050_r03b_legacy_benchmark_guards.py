@@ -146,7 +146,12 @@ def test_t5_qualification_binding_unchanged(tmp_path: Path) -> None:
         comparison=ctx["comparison"],
         candidate_run=ctx["run"],
         benchmarks=suite,
-        required_evidence_ids=("dataset", "run", "benchmark-suite"),
+        required_evidence_ids=(
+            "dataset",
+            "run",
+            "benchmark-suite",
+            ctx["run"].identity.funding_evidence_id,
+        ),
     )
     assert isinstance(qual.verdict, QualificationVerdict)
     assert qual.comparison_contract_id == ctx["comparison"].contract_id
