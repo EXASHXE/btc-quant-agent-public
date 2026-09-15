@@ -29,8 +29,8 @@ import json
 import os
 import subprocess
 import sys
-from enum import Enum
 from collections.abc import Iterator
+from enum import Enum
 from pathlib import Path
 from types import SimpleNamespace
 from typing import Any
@@ -639,6 +639,7 @@ def test_t11b_fresh_process_registry_smoke_matches_baseline() -> None:
         timeout=180,
         env=env,
         cwd=str(package_root),
+        check=False,
     )
     assert completed.returncode == 0, completed.stderr
     receipt = json.loads(completed.stdout.strip().splitlines()[-1])
