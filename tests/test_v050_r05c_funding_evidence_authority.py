@@ -47,6 +47,10 @@ from btc_quant_agent.formal_research import (
     FormalResearchJobSpec,
     run_formal_job,
 )
+from btc_quant_agent.research_contract import (
+    DecisionStatus,
+    EvidenceValidationError,
+)
 from btc_quant_agent.research_contract.canonical import (
     canonical_json,
     canonical_sha256,
@@ -503,3 +507,305 @@ def test_t20_cold_job_replay(tmp_path, monkeypatch) -> None:
     assert again.run.to_dict() == result.run.to_dict()
     assert again.benchmarks.to_dict() == result.benchmarks.to_dict()
     assert again.qualification.to_dict() == result.qualification.to_dict()
+
+
+# ---------------------------------------------------------------------------
+# T21-T29: R05CR funding evidence-chain closure and coverage identity tests
+# ---------------------------------------------------------------------------
+
+
+def test_t21_evaluator_omission_rejection(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    ctx = _context(tmp_path, monkeypatch, nonzero=False)
+    suite = build_formal_benchmark_suite(
+        protocol=ctx["protocol"],
+        comparison=ctx["comparison"],
+        dataset_evidence=ctx["dataset"],
+        candidate_run=ctx["run"],
+        engine=ctx["engine"],
+        candles=ctx["candles"],
+        eligible_opportunities=p6._opportunities(ctx["candles"]),
+        funding_evidence=ctx["funding_evidence"],
+    )
+    with pytest.raises(
+        ValueError, match="qualification required evidence omits bound funding evidence"
+    ):
+        evaluate_formal_economic_qualification(
+            protocol=ctx["protocol"],
+            comparison=ctx["comparison"],
+            candidate_run=ctx["run"],
+            benchmarks=suite,
+            required_evidence_ids=(ctx["dataset"].evidence_id,),
+            generated_at_utc=p6.FIXED_TIME,
+        )
+
+    qualification = evaluate_formal_economic_qualification(
+        protocol=ctx["protocol"],
+        comparison=ctx["comparison"],
+        candidate_run=ctx["run"],
+        benchmarks=suite,
+        required_evidence_ids=(ctx["dataset"].evidence_id, ctx["funding_evidence"].evidence_id),
+        generated_at_utc=p6.FIXED_TIME,
+    )
+    assert qualification.verdict is not None
+
+
+def test_t22_direct_result_construction_omission_rejection(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    ctx = _context(tmp_path, monkeypatch, nonzero=False)
+    suite = build_formal_benchmark_suite(
+        protocol=ctx["protocol"],
+        comparison=ctx["comparison"],
+        dataset_evidence=ctx["dataset"],
+        candidate_run=ctx["run"],
+        engine=ctx["engine"],
+        candles=ctx["candles"],
+        eligible_opportunities=p6._opportunities(ctx["candles"]),
+        funding_evidence=ctx["funding_evidence"],
+    )
+    qualification = evaluate_formal_economic_qualification(
+        protocol=ctx["protocol"],
+        comparison=ctx["comparison"],
+        candidate_run=ctx["run"],
+        benchmarks=suite,
+        required_evidence_ids=(ctx["dataset"].evidence_id, ctx["funding_evidence"].evidence_id),
+        generated_at_utc=p6.FIXED_TIME,
+    )
+    with pytest.raises(
+        ValueError, match="qualification required evidence omits bound funding evidence"
+    ):
+        replace(qualification, required_evidence_ids=(ctx["dataset"].evidence_id,))
+
+
+def test_t23_persisted_qualification_full_rehash_omission_attack(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    ctx = _context(tmp_path, monkeypatch, nonzero=False)
+    suite = build_formal_benchmark_suite(
+        protocol=ctx["protocol"],
+        comparison=ctx["comparison"],
+        dataset_evidence=ctx["dataset"],
+        candidate_run=ctx["run"],
+        engine=ctx["engine"],
+        candles=ctx["candles"],
+        eligible_opportunities=p6._opportunities(ctx["candles"]),
+        funding_evidence=ctx["funding_evidence"],
+    )
+    qualification = evaluate_formal_economic_qualification(
+        protocol=ctx["protocol"],
+        comparison=ctx["comparison"],
+        candidate_run=ctx["run"],
+        benchmarks=suite,
+        required_evidence_ids=(ctx["dataset"].evidence_id, ctx["funding_evidence"].evidence_id),
+        generated_at_utc=p6.FIXED_TIME,
+    )
+    payload = qualification.semantic_payload()
+    assert ctx["funding_evidence"].evidence_id in payload["required_evidence_ids"]
+    payload["required_evidence_ids"] = [
+        eid
+        for eid in payload["required_evidence_ids"]
+        if eid != ctx["funding_evidence"].evidence_id
+    ]
+    attack_semantic = json.loads(canonical_json(payload))
+    with pytest.raises(
+        ValueError, match="qualification required evidence omits bound funding evidence"
+    ):
+        validate_persisted_qualification_semantics(
+            attack_semantic, ctx["dataset"], protocol=ctx["protocol"]
+        )
+
+
+def test_t24_registry_atomic_omission_rejection(tmp_path: Path) -> None:
+    artifacts = p6._formal_artifacts(tmp_path)
+    qualification = artifacts["qualification"]
+    protocol = artifacts["protocol"]
+    registry, _ = p6._statistically_qualified_registry(tmp_path, protocol)
+
+    initial_generation = registry.generation
+    initial_status = registry.get_status(protocol.experiment_revision_id)
+    initial_events_count = len(registry.decision_events())
+    initial_bytes = registry.storage_path.read_bytes() if registry.storage_path else b""
+
+    attestation = qualification.decision_attestation(artifacts["result_evidence"])
+    with pytest.raises(EvidenceValidationError):
+        registry.record_economic_qualification(
+            attestation,
+            evidence_references=(
+                artifacts["dataset"],
+                artifacts["run_evidence"],
+                artifacts["suite_evidence"],
+                artifacts["result_evidence"],
+            ),
+            reason="omitting funding evidence must fail atomically",
+            actor="pytest",
+            decided_at_utc=p6.FIXED_TIME,
+        )
+
+    assert registry.generation == initial_generation
+    assert registry.get_status(protocol.experiment_revision_id) == initial_status
+    assert len(registry.decision_events()) == initial_events_count
+    assert (registry.storage_path.read_bytes() if registry.storage_path else b"") == initial_bytes
+
+
+def test_t25_unrelated_complete_evidence_replacement(tmp_path: Path) -> None:
+    artifacts = p6._formal_artifacts(tmp_path)
+    qualification = artifacts["qualification"]
+    protocol = artifacts["protocol"]
+    registry, _ = p6._statistically_qualified_registry(tmp_path, protocol)
+
+    initial_generation = registry.generation
+    initial_status = registry.get_status(protocol.experiment_revision_id)
+    initial_events_count = len(registry.decision_events())
+    initial_bytes = registry.storage_path.read_bytes() if registry.storage_path else b""
+
+    unrelated_file = tmp_path / "unrelated_complete_evidence.json"
+    unrelated_file.write_text('{"unrelated": true}\n', encoding="utf-8")
+    unrelated_evidence = EvidenceReference.from_file(
+        unrelated_file,
+        evidence_type="UNRELATED_EVIDENCE_TYPE",
+        logical_id="unrelated-evidence",
+        producing_revision_id=protocol.experiment_revision_id,
+        producing_code_revision=protocol.code_revision,
+        observed_at_utc=p6.FIXED_TIME,
+    )
+
+    attestation = qualification.decision_attestation(artifacts["result_evidence"])
+    with pytest.raises(EvidenceValidationError):
+        registry.record_economic_qualification(
+            attestation,
+            evidence_references=(
+                artifacts["dataset"],
+                unrelated_evidence,
+                artifacts["run_evidence"],
+                artifacts["suite_evidence"],
+                artifacts["result_evidence"],
+            ),
+            reason="unrelated evidence replacement must fail atomically",
+            actor="pytest",
+            decided_at_utc=p6.FIXED_TIME,
+        )
+
+    assert registry.generation == initial_generation
+    assert registry.get_status(protocol.experiment_revision_id) == initial_status
+    assert len(registry.decision_events()) == initial_events_count
+    assert (registry.storage_path.read_bytes() if registry.storage_path else b"") == initial_bytes
+
+
+def test_t26_valid_chain_positive_control(tmp_path: Path) -> None:
+    artifacts = p6._formal_artifacts(tmp_path)
+    qualification = artifacts["qualification"]
+    protocol = artifacts["protocol"]
+    registry, _ = p6._statistically_qualified_registry(tmp_path, protocol)
+
+    event = registry.record_economic_qualification(
+        qualification.decision_attestation(artifacts["result_evidence"]),
+        evidence_references=(
+            artifacts["dataset"],
+            artifacts["funding_evidence"],
+            artifacts["run_evidence"],
+            artifacts["suite_evidence"],
+            artifacts["result_evidence"],
+        ),
+        reason="normal formal workflow positive control",
+        actor="pytest",
+        decided_at_utc=p6.FIXED_TIME,
+    )
+    assert event is not None
+    assert event.new_status is DecisionStatus.ECONOMICALLY_QUALIFIED
+    assert (
+        registry.get_status(protocol.experiment_revision_id)
+        is DecisionStatus.ECONOMICALLY_QUALIFIED
+    )
+
+
+def test_t27_comparison_coverage_identity_mismatch(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    ctx = _context(tmp_path, monkeypatch, nonzero=False)
+    valid_comparison = ctx["comparison"]
+    data_interval = valid_comparison.data_interval
+    funding_interval = valid_comparison.funding_interval
+
+    bad_start_funding = replace(
+        funding_interval,
+        coverage_start_ms=data_interval.start_ms + 1000,
+    )
+    with pytest.raises(
+        ValueError, match="funding_interval coverage must equal data_interval"
+    ):
+        replace(valid_comparison, funding_interval=bad_start_funding)
+
+    bad_end_funding = replace(
+        funding_interval,
+        coverage_end_ms=data_interval.end_ms + 1000,
+    )
+    with pytest.raises(
+        ValueError, match="funding_interval coverage must equal data_interval"
+    ):
+        replace(valid_comparison, funding_interval=bad_end_funding)
+
+
+def test_t28_loader_expected_identity_coverage_mismatch(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    ctx = _context(tmp_path, monkeypatch, nonzero=False)
+    comparison = ctx["comparison"]
+    funding_evidence = ctx["funding_evidence"]
+    product = comparison.product_scope[0]
+    start_ms = comparison.data_interval.start_ms
+    end_ms = comparison.data_interval.end_ms
+    valid_identity = comparison.funding_interval
+
+    bad_identity_start = replace(valid_identity, coverage_start_ms=start_ms + 1000)
+    with pytest.raises(
+        ValueError,
+        match="funding interval identity coverage differs from the expected interval",
+    ):
+        load_and_validate_funding_evidence(
+            funding_evidence,
+            expected_product=product,
+            expected_start_ms=start_ms,
+            expected_end_ms=end_ms,
+            expected_identity=bad_identity_start,
+        )
+
+    bad_identity_end = replace(valid_identity, coverage_end_ms=end_ms + 1000)
+    with pytest.raises(
+        ValueError,
+        match="funding interval identity coverage differs from the expected interval",
+    ):
+        load_and_validate_funding_evidence(
+            funding_evidence,
+            expected_product=product,
+            expected_start_ms=start_ms,
+            expected_end_ms=end_ms,
+            expected_identity=bad_identity_end,
+        )
+
+
+def test_t29_exact_positive_coverage_control(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    nonzero_dir = tmp_path / "nonzero"
+    nonzero_dir.mkdir()
+    ctx_nonzero = _context(nonzero_dir, monkeypatch, nonzero=True)
+    events_nonzero = load_and_validate_funding_evidence(
+        ctx_nonzero["funding_evidence"],
+        expected_product=ctx_nonzero["comparison"].product_scope[0],
+        expected_start_ms=ctx_nonzero["comparison"].data_interval.start_ms,
+        expected_end_ms=ctx_nonzero["comparison"].data_interval.end_ms,
+        expected_identity=ctx_nonzero["comparison"].funding_interval,
+    )
+    assert len(events_nonzero) > 0
+
+    zero_dir = tmp_path / "zero"
+    zero_dir.mkdir()
+    ctx_zero = _context(zero_dir, monkeypatch, nonzero=False)
+    events_zero = load_and_validate_funding_evidence(
+        ctx_zero["funding_evidence"],
+        expected_product=ctx_zero["comparison"].product_scope[0],
+        expected_start_ms=ctx_zero["comparison"].data_interval.start_ms,
+        expected_end_ms=ctx_zero["comparison"].data_interval.end_ms,
+        expected_identity=ctx_zero["comparison"].funding_interval,
+    )
+    assert events_zero == ()

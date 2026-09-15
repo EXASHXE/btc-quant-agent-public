@@ -126,7 +126,7 @@ def test_nonzero_cost_funding_candidate_can_be_promoted(tmp_path: Path) -> None:
     registry.record_economic_qualification(
         artifacts["qualification"].decision_attestation(artifacts["result_evidence"]),
         evidence_references=tuple(artifacts[name] for name in (
-            "dataset", "run_evidence", "suite_evidence", "result_evidence",
+            "dataset", "funding_evidence", "run_evidence", "suite_evidence", "result_evidence",
         )), reason="canonical nonzero fee and funding replay", actor="pytest",
         decided_at_utc=p6.FIXED_TIME,
     )

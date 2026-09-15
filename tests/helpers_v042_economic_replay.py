@@ -104,7 +104,7 @@ def persisted_qualification(ctx, directory):
     qualification = evaluate_formal_economic_qualification(
         protocol=ctx["protocol"], comparison=ctx["comparison"], candidate_run=ctx["run"],
         benchmarks=ctx["suite"], required_evidence_ids=tuple(
-            item.evidence_id for item in (ctx["dataset"], *evidence)
+            item.evidence_id for item in (ctx["dataset"], ctx["funding_evidence"], *evidence)
         ), generated_at_utc=p6.FIXED_TIME,
     )
     path = directory / "qualification.json"

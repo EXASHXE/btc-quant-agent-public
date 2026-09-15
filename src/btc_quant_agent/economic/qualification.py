@@ -289,6 +289,11 @@ class ComparisonContract:
             raise TypeError("data_interval must be DataIntervalIdentity")
         if not isinstance(self.funding_interval, FundingIntervalIdentity):
             raise TypeError("funding_interval must be FundingIntervalIdentity")
+        if (
+            self.funding_interval.coverage_start_ms != self.data_interval.start_ms
+            or self.funding_interval.coverage_end_ms != self.data_interval.end_ms
+        ):
+            raise ValueError("funding_interval coverage must equal data_interval")
         for name in (
             "candidate_policy",
             "cost_model",
@@ -840,6 +845,8 @@ class EconomicQualificationResult:
             self.required_evidence_ids
         ):
             raise ValueError("qualification required evidence ids must be non-empty and unique")
+        if self.run_result.identity.funding_evidence_id not in self.required_evidence_ids:
+            raise ValueError("qualification required evidence omits bound funding evidence")
         if self.verdict is QualificationVerdict.QUALIFIED and not all(
             gate.testable and gate.passed is True for gate in self.gates
         ):
@@ -1383,6 +1390,9 @@ def evaluate_formal_economic_qualification(
     evidence_ids = tuple(str(item) for item in required_evidence_ids)
     if not evidence_ids or len(set(evidence_ids)) != len(evidence_ids):
         raise ValueError("required evidence ids must be non-empty and unique")
+    funding_id = candidate_run.identity.funding_evidence_id
+    if funding_id not in evidence_ids:
+        raise ValueError("qualification required evidence omits bound funding evidence")
     return EconomicQualificationResult(
         experiment_revision_id=protocol.experiment_revision_id,
         protocol_hash=protocol.protocol_hash,

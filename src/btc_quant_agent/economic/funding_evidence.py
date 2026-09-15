@@ -116,6 +116,11 @@ def load_and_validate_funding_evidence(
     invokes this independently against the comparison's preregistered funding
     authority; no persisted event list is ever trusted as the source of truth.
     """
+    if (
+        expected_identity.coverage_start_ms != expected_start_ms
+        or expected_identity.coverage_end_ms != expected_end_ms
+    ):
+        raise ValueError("funding interval identity coverage differs from the expected interval")
     if evidence.evidence_type != FORMAL_FUNDING_EVIDENCE_TYPE:
         raise ValueError("funding evidence must be FORMAL_FUNDING_SETTLEMENT_DATASET")
     if evidence.completeness is not EvidenceCompleteness.COMPLETE:

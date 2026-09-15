@@ -992,6 +992,7 @@ def test_tampered_result_run_and_dataset_are_atomic_failures(tmp_path: Path) -> 
                 case["qualification"].decision_attestation(case["result_evidence"]),
                 evidence_references=(
                     case["dataset"],
+                    case["funding_evidence"],
                     case["run_evidence"],
                     case["suite_evidence"],
                     case["result_evidence"],
@@ -1300,6 +1301,7 @@ def _write_forged_registry_artifacts(
 
     semantic["required_evidence_ids"] = [
         artifacts["dataset"].evidence_id,
+        artifacts["funding_evidence"].evidence_id,
         run_evidence.evidence_id,
         suite_evidence.evidence_id,
     ]
@@ -1331,6 +1333,7 @@ def _write_forged_registry_artifacts(
     )
     return attestation, (
         artifacts["dataset"],
+        artifacts["funding_evidence"],
         run_evidence,
         suite_evidence,
         result_evidence,

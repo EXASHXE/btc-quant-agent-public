@@ -1495,6 +1495,14 @@ def validate_persisted_qualification_semantics(
     candidate = _require_mapping(run_semantic.get("accounting"), "candidate accounting")
     if candidate.get("formal_run_identity") != run_identity:
         raise ValueError("candidate accounting/run identity binding mismatch")
+    funding_evidence_id = run_identity.get("funding_evidence_id")
+    if not isinstance(funding_evidence_id, str) or not funding_evidence_id.strip():
+        raise ValueError("persisted run identity funding_evidence_id is required")
+    required_evidence_ids = _require_list(
+        semantic.get("required_evidence_ids"), "required evidence ids"
+    )
+    if funding_evidence_id not in required_evidence_ids:
+        raise ValueError("qualification required evidence omits bound funding evidence")
     candles = _candles_from_accounting(candidate, product)
     validate_runtime_dataset_binding(dataset_evidence, candles, product)
     validate_persisted_decision_input_bindings(
