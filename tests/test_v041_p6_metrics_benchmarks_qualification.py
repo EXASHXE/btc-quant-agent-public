@@ -206,12 +206,23 @@ def _decision_input_binding(
     candles: tuple[Candle, ...],
     protocol: ExperimentMetadata,
 ) -> FrozenDict:
+    # R05B: the authoritative required window is the latest eligible row by
+    # the decision timestamp; assert exactly that instead of a fixed row.
+    eligible = [
+        candle
+        for candle in candles
+        if candle.closed
+        and candle.available_at_ms is not None
+        and candle.available_at_ms <= signal.timestamp_ms
+        and candle.close_time_ms <= signal.timestamp_ms
+    ]
+    latest = max(eligible, key=lambda item: item.open_time_ms)
     return build_formal_decision_input_binding(
         signal,
         dataset_evidence=dataset,
         input_contract=protocol.input_contract.to_dict(),
         candles=candles,
-        material_input_open_times_ms=(candles[0].open_time_ms,),
+        material_input_open_times_ms=(latest.open_time_ms,),
     )
 
 

@@ -12,9 +12,13 @@ from ..research_contract.canonical import (
 from ..research_contract.models import EvidenceReference, ExperimentMetadata
 from .signal import InformationSignal, canonical_signal_semantic_payload
 from .signal_producer import (
+    MATERIAL_INPUT_SELECTOR_TYPE,
+    MaterialInputSelectorPolicy,
     SignalProducerContract,
     SignalProducerRegistry,
     _runtime_candle_payload,
+    resolve_material_input_policy,
+    select_required_material_candles,
 )
 
 FORMAL_REPLAY_INPUT_BUNDLE_SCHEMA_VERSION = "1.0.0"
@@ -168,6 +172,37 @@ def _resolve_protocol_producer_contract(
     return None
 
 
+def _expected_input_refs(
+    expected_candles: Sequence[Candle],
+    dataset_evidence_id: str,
+) -> list[dict[str, Any]]:
+    """Canonical InputReference dicts for an independently reconstructed window.
+
+    Shared by bundle construction and the cold verifier so both compare
+    against byte-identical expected references.
+    """
+    refs: list[dict[str, Any]] = []
+    for candle in expected_candles:
+        if candle.available_at_ms is None:
+            raise ValueError(
+                f"reconstructed required candle at {candle.open_time_ms} "
+                "lacks availability"
+            )
+        refs.append(
+            InputReference(
+                source_type="CANONICAL_CANDLE",
+                dataset_evidence_id=dataset_evidence_id,
+                open_time_ms=candle.open_time_ms,
+                close_time_ms=candle.close_time_ms,
+                available_at_ms=candle.available_at_ms,
+                row_content_sha256=canonical_sha256(
+                    _runtime_candle_payload(candle)
+                ),
+            ).to_dict()
+        )
+    return refs
+
+
 def build_formal_replay_input_bundle(
     *,
     protocol: ExperimentMetadata,
@@ -303,31 +338,77 @@ def build_formal_replay_input_bundle(
         producer_contract_id = contract.contract_id
         producer_contract_hash = contract.contract_hash
 
+        # R05B: the verifier reconstructs the authoritative required material
+        # window from the full frozen dataset, the signal decision timestamp,
+        # and the already-authoritative contract semantics. Caller-selected
+        # references/open times are assertions, not authority.
+        policy: MaterialInputSelectorPolicy | None = None
+        expected_refs: list[dict[str, Any]] | None = None
+        expected_open_times: list[int] = []
+        if clean_role == "CANDIDATE":
+            policy = resolve_material_input_policy(contract)
+            expected_candles = select_required_material_candles(
+                contract, candles, signal_timestamp_ms
+            )
+            expected_refs = _expected_input_refs(
+                expected_candles, dataset_evidence.evidence_id
+            )
+            expected_open_times = [ref["open_time_ms"] for ref in expected_refs]
+
         # Build / normalize input references
         raw_refs = item.get("input_references")
         if raw_refs is None:
             open_times = item.get("observation_open_times_ms") or item.get("material_input_open_times_ms")
             if not open_times:
-                raise ValueError(f"decision input entry for {signal_id} lacks input references")
-            input_refs = []
-            for ot in open_times:
-                if ot not in candles_by_open:
-                    raise ValueError(f"referenced candle open_time_ms {ot} not found in dataset")
-                c = candles_by_open[ot]
-                if c.available_at_ms is None or c.available_at_ms > signal_timestamp_ms:
-                    raise ValueError(f"input candle at {ot} was not available by signal timestamp")
-                row_hash = canonical_sha256(_runtime_candle_payload(c))
-                ref = InputReference(
-                    source_type="CANONICAL_CANDLE",
-                    dataset_evidence_id=dataset_evidence.evidence_id,
-                    open_time_ms=c.open_time_ms,
-                    close_time_ms=c.close_time_ms,
-                    available_at_ms=c.available_at_ms,
-                    row_content_sha256=row_hash,
-                )
-                input_refs.append(ref.to_dict())
+                if clean_role == "CANDIDATE":
+                    # Auto-construction: populate from the reconstructed authority.
+                    assert expected_refs is not None
+                    input_refs = [dict(ref) for ref in expected_refs]
+                else:
+                    raise ValueError(f"decision input entry for {signal_id} lacks input references")
+            elif clean_role == "CANDIDATE":
+                assert expected_refs is not None
+                if list(open_times) != expected_open_times:
+                    # Preserve the most specific legacy rejection for malformed
+                    # assertions before the exact-window requirement.
+                    for ot in open_times:
+                        if ot not in candles_by_open:
+                            raise ValueError(f"referenced candle open_time_ms {ot} not found in dataset")
+                        c = candles_by_open[ot]
+                        if c.available_at_ms is None or c.available_at_ms > signal_timestamp_ms:
+                            raise ValueError(f"input candle at {ot} was not available by signal timestamp")
+                    raise ValueError(
+                        f"caller-selected material window for {signal_id} does not equal the "
+                        f"authoritative required input window {expected_open_times}"
+                    )
+                input_refs = [dict(ref) for ref in expected_refs]
+            else:
+                input_refs = []
+                for ot in open_times:
+                    if ot not in candles_by_open:
+                        raise ValueError(f"referenced candle open_time_ms {ot} not found in dataset")
+                    c = candles_by_open[ot]
+                    if c.available_at_ms is None or c.available_at_ms > signal_timestamp_ms:
+                        raise ValueError(f"input candle at {ot} was not available by signal timestamp")
+                    row_hash = canonical_sha256(_runtime_candle_payload(c))
+                    ref = InputReference(
+                        source_type="CANONICAL_CANDLE",
+                        dataset_evidence_id=dataset_evidence.evidence_id,
+                        open_time_ms=c.open_time_ms,
+                        close_time_ms=c.close_time_ms,
+                        available_at_ms=c.available_at_ms,
+                        row_content_sha256=row_hash,
+                    )
+                    input_refs.append(ref.to_dict())
         else:
             input_refs = [dict(r) for r in raw_refs]
+            if clean_role == "CANDIDATE":
+                assert expected_refs is not None
+                if input_refs != expected_refs:
+                    raise ValueError(
+                        f"caller-provided input_references for {signal_id} do not exactly equal "
+                        "the authoritative required input set"
+                    )
 
         input_set_sha256 = canonical_sha256(input_refs)
         signal_payload_sha256 = canonical_sha256(signal_payload)
@@ -342,7 +423,14 @@ def build_formal_replay_input_bundle(
         generation_contract["producer_contract_hash"] = contract.contract_hash
         generation_contract["material_input_open_times_ms"] = open_times
         generation_contract["expected_preimage_sha256"] = preimage_hash
-        if "min_lookback_bars" not in generation_contract:
+        if clean_role == "CANDIDATE" and policy is not None:
+            # R05B: generation-contract material-input fields are derived from
+            # the reconstructed set, never from caller choice.
+            generation_contract["min_lookback_bars"] = policy.required_bars
+            generation_contract["material_input_selector_type"] = policy.selector_type
+            generation_contract["material_input_required_bars"] = policy.required_bars
+            generation_contract["material_input_selector_sha256"] = policy.selector_sha256
+        elif "min_lookback_bars" not in generation_contract:
             generation_contract["min_lookback_bars"] = len(open_times)
 
         # Allow pass-through ONLY for synthetic test-only producer or random benchmark
@@ -609,6 +697,63 @@ def validate_formal_replay_input_bundle(
             raise ValueError(
                 "FIXED_DIRECTION is forbidden for CanonicalRuleSignalProducer and candidate signals"
             )
+
+        # R05B cold verification: independently reconstruct the authoritative
+        # required material window from the frozen dataset, the decision
+        # timestamp, and the registered producer contract. A candidate can
+        # rehash every outer artifact; the reconstruction still fails the
+        # submission when the persisted references are not exactly the
+        # preregistered required rows.
+        if clean_role == "CANDIDATE":
+            policy = resolve_material_input_policy(contract)
+            expected_candles = select_required_material_candles(
+                contract, candles, signal_timestamp_ms
+            )
+            expected_refs = _expected_input_refs(
+                expected_candles, str(bundle["dataset_evidence_id"])
+            )
+            if [dict(ref) for ref in input_refs] != expected_refs:
+                raise ValueError(
+                    f"persisted input references for {signal_id} do not exactly equal the "
+                    "independently reconstructed authoritative required input set"
+                )
+            expected_open_times = [ref["open_time_ms"] for ref in expected_refs]
+            declared_open_times = generation_contract.get("material_input_open_times_ms")
+            if not isinstance(declared_open_times, list) or list(declared_open_times) != expected_open_times:
+                raise ValueError(
+                    f"generation_contract material_input_open_times_ms for {signal_id} does not "
+                    "equal the independently reconstructed required window"
+                )
+            expected_preimage = canonical_sha256(
+                [_runtime_candle_payload(candle) for candle in expected_candles]
+            )
+            if generation_contract.get("expected_preimage_sha256") != expected_preimage:
+                raise ValueError(
+                    f"generation_contract expected_preimage_sha256 for {signal_id} does not equal "
+                    "the independently reconstructed required window preimage"
+                )
+            declared_min_lookback = generation_contract.get("min_lookback_bars")
+            if declared_min_lookback is None or int(declared_min_lookback) != policy.required_bars:
+                raise ValueError(
+                    f"generation_contract min_lookback_bars for {signal_id} must equal the "
+                    f"exact required selector count {policy.required_bars}"
+                )
+            if generation_contract.get("material_input_selector_type") != MATERIAL_INPUT_SELECTOR_TYPE:
+                raise ValueError(
+                    f"generation_contract material_input_selector_type for {signal_id} must equal "
+                    f"{MATERIAL_INPUT_SELECTOR_TYPE}"
+                )
+            declared_required_bars = generation_contract.get("material_input_required_bars")
+            if declared_required_bars is None or int(declared_required_bars) != policy.required_bars:
+                raise ValueError(
+                    f"generation_contract material_input_required_bars for {signal_id} must equal "
+                    f"the exact required selector count {policy.required_bars}"
+                )
+            if generation_contract.get("material_input_selector_sha256") != policy.selector_sha256:
+                raise ValueError(
+                    f"generation_contract material_input_selector_sha256 for {signal_id} does not "
+                    "equal the independently reconstructed selector policy"
+                )
 
         replayed_signal = producer.replay_signal(
             signal_id=signal_id,

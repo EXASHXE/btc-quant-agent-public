@@ -64,12 +64,16 @@ from .replay_bundle import (
 )
 from .signal import InformationSignal, canonical_signal_semantic_payload
 from .signal_producer import (
+    MATERIAL_INPUT_SELECTOR_TYPE,
     CanonicalRuleSignalProducer,
+    MaterialInputSelectorPolicy,
     RandomBenchmarkSignalProducer,
     SignalProducer,
     SignalProducerContract,
     SignalProducerRegistry,
     SyntheticFixedSignalProducer,
+    resolve_material_input_policy,
+    select_required_material_candles,
 )
 from .simulator import (
     AmbiguousEntryRejectionError,
@@ -115,6 +119,8 @@ __all__ = [
     "GateOperator",
     "InformationSignal",
     "MarketStateFilter",
+    "MATERIAL_INPUT_SELECTOR_TYPE",
+    "MaterialInputSelectorPolicy",
     "MetricStatus",
     "OrderType",
     "Portfolio",
@@ -153,6 +159,8 @@ __all__ = [
     "funding_model_identity",
     "make_artifact_evidence",
     "policy_identity",
+    "resolve_material_input_policy",
+    "select_required_material_candles",
     "summarize_ledger",
     "validate_formal_replay_input_bundle",
 ]

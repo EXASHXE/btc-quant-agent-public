@@ -459,7 +459,10 @@ def test_t9_astra_long_to_no_trade_attack_closed(
     SignalProducerRegistry.register_contract(contract)
     registered_contract_ids.append(contract_id)
     original_hash = contract.contract_hash
-    candles = _long_trend_candles()
+    # R05B: the canonical replay now enforces the exact required material
+    # window (latest 1 eligible row for this N=1 momentum contract), so the
+    # attack transcript replays with a single-candle window.
+    candles = _long_trend_candles()[:1]
 
     def _replay(target: SignalProducerContract, label: str) -> Any:
         return producer.replay_signal(

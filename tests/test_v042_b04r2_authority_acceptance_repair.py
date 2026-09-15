@@ -215,7 +215,9 @@ def test_a2_registered_contract_parameter_rewrite_rejected(tmp_path: Path) -> No
         producer_identity="CANONICAL_RULE_SIGNAL_PRODUCER",
         producer_version="1.0.0",
         rule="MOMENTUM_THRESHOLD",
-        parameters={"threshold_return_bps": 100.0, "min_lookback_bars": 1},
+        # R05B: min_lookback_bars alone is an ambiguous floor; the selector
+        # requires the exact lookback_bars declaration.
+        parameters={"threshold_return_bps": 100.0, "lookback_bars": 1},
     )
     SignalProducerRegistry.register_contract(mt_contract_100bps)
 
@@ -486,7 +488,9 @@ def test_p2_protocol_frozen_momentum_threshold_positive_control(tmp_path: Path) 
         producer_identity="CANONICAL_RULE_SIGNAL_PRODUCER",
         producer_version="1.0.0",
         rule="MOMENTUM_THRESHOLD",
-        parameters={"threshold_return_bps": 0.0, "min_lookback_bars": 1},
+        # R05B: min_lookback_bars alone is an ambiguous floor; the selector
+        # requires the exact lookback_bars declaration.
+        parameters={"threshold_return_bps": 0.0, "lookback_bars": 1},
     )
     SignalProducerRegistry.register_contract(mt_contract)
     ctx = _b04r2_context(tmp_path, producer_contract=mt_contract)

@@ -125,7 +125,10 @@ def test_ar_t1_end_to_end_formal_run_rejects_unavailable_material_input(
     assert golden["expected"]["correct_behavior"] == (
         "REJECT_OR_NOT_TESTABLE_AT_ORIGINAL_DECISION"
     )
-    with pytest.raises(ValueError, match="not available by signal timestamp"):
+    # R05B tightening: the late row is no longer eligible, so the selector
+    # rejects the required window as insufficient before any row-level
+    # availability check runs.
+    with pytest.raises(ValueError, match="insufficient eligible material candles"):
         _execute(context)
 
 

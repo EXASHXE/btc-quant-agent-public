@@ -88,6 +88,169 @@ class SignalProducerContract:
         )
 
 
+MATERIAL_INPUT_SELECTOR_TYPE = "LATEST_N_CONTIGUOUS_AVAILABLE_CLOSED"
+
+
+@dataclass(frozen=True)
+class MaterialInputSelectorPolicy:
+    """Effective material-input selector resolved from an authoritative contract.
+
+    The selector is the single owner of material-window authority: it is
+    derived deterministically from the already-hashed rule/lookback semantics
+    of the contract, never from caller-selected references or open times.
+    """
+
+    rule: str
+    required_bars: int
+    selector_type: str = MATERIAL_INPUT_SELECTOR_TYPE
+    selector_sha256: str = ""
+
+    def __post_init__(self) -> None:
+        computed = canonical_sha256(
+            {
+                "rule": self.rule,
+                "selector_type": self.selector_type,
+                "required_bars": self.required_bars,
+            }
+        )
+        if not self.selector_sha256:
+            object.__setattr__(self, "selector_sha256", computed)
+        elif self.selector_sha256 != computed:
+            raise ValueError(
+                f"selector_sha256 mismatch: declared {self.selector_sha256}, computed {computed}"
+            )
+
+
+def resolve_material_input_policy(
+    contract: SignalProducerContract,
+) -> MaterialInputSelectorPolicy:
+    """Resolve the exact material-input selector from an authoritative contract.
+
+    Fail-closed interpretation of the already-hashed rule/lookback semantics:
+
+    - ``MOMENTUM_THRESHOLD`` uses exact ``lookback_bars`` when declared
+      (``>= 1``); ``min_lookback_bars`` alone is an ambiguous floor and fails
+      closed; when both are declared they must agree.
+    - ``RETURN_SIGN`` / ``PRICE_BREAKOUT`` use exactly the latest 1 eligible
+      candle; any declared lookback parameter must equal 1.
+    - ``FIXED_DIRECTION`` stays a synthetic test-only positive control using
+      exactly the latest 1 eligible candle.
+    """
+    rule = contract.rule
+    params = contract.parameters
+    lookback_raw = params.get("lookback_bars")
+    min_lookback_raw = params.get("min_lookback_bars")
+
+    def _int_parameter(name: str, raw: Any) -> int:
+        try:
+            return int(raw)
+        except (TypeError, ValueError) as exc:
+            raise ValueError(
+                f"contract {contract.contract_id} parameter {name}={raw!r} is not an integer"
+            ) from exc
+
+    if rule == "MOMENTUM_THRESHOLD":
+        if lookback_raw is not None:
+            required_bars = _int_parameter("lookback_bars", lookback_raw)
+            if (
+                min_lookback_raw is not None
+                and _int_parameter("min_lookback_bars", min_lookback_raw) != required_bars
+            ):
+                raise ValueError(
+                    f"contract {contract.contract_id} lookback semantics disagree: "
+                    f"lookback_bars={required_bars}, min_lookback_bars={min_lookback_raw}"
+                )
+        elif min_lookback_raw is not None:
+            raise ValueError(
+                f"ambiguous material-input selector for {contract.contract_id}: "
+                "min_lookback_bars alone is a floor, not a complete selector; "
+                "declare exact lookback_bars"
+            )
+        else:
+            required_bars = 1
+    elif rule in ("RETURN_SIGN", "PRICE_BREAKOUT", "FIXED_DIRECTION"):
+        required_bars = 1
+        for name, raw in (
+            ("lookback_bars", lookback_raw),
+            ("min_lookback_bars", min_lookback_raw),
+        ):
+            if raw is not None and _int_parameter(name, raw) != required_bars:
+                raise ValueError(
+                    f"contract {contract.contract_id} declares {name}={raw}; "
+                    f"{rule} requires exactly {required_bars} latest eligible candle(s)"
+                )
+    else:
+        raise ValueError(
+            f"unsupported material-input selector rule for {contract.contract_id}: {rule}"
+        )
+
+    if required_bars < 1:
+        raise ValueError(
+            f"material-input selector for {contract.contract_id} requires at least 1 bar; "
+            f"declared {required_bars}"
+        )
+    return MaterialInputSelectorPolicy(rule=rule, required_bars=required_bars)
+
+
+def select_required_material_candles(
+    contract: SignalProducerContract,
+    candles: Sequence[Candle],
+    signal_timestamp_ms: int,
+) -> tuple[Candle, ...]:
+    """Reconstruct the authoritative required material window from the frozen dataset.
+
+    A candle is eligible at ``signal_timestamp_ms`` only when it is explicitly
+    closed, carries an availability timestamp, and both its availability and
+    close times precede the decision timestamp. The required set is exactly the
+    latest ``N`` eligible contiguous rows under the resolved selector policy;
+    a cadence gap, duplicate open times, or symbol/interval mixing inside the
+    window fails closed instead of stepping backward around missing rows.
+    Rows after the decision timestamp are simply ineligible.
+    """
+    policy = resolve_material_input_policy(contract)
+    eligible = sorted(
+        (
+            candle
+            for candle in candles
+            if candle.closed is True
+            and candle.available_at_ms is not None
+            and candle.available_at_ms <= signal_timestamp_ms
+            and candle.close_time_ms <= signal_timestamp_ms
+        ),
+        key=lambda candle: candle.open_time_ms,
+    )
+    if len(eligible) < policy.required_bars:
+        raise ValueError(
+            f"insufficient eligible material candles for {contract.contract_id}: "
+            f"required the latest {policy.required_bars} eligible rows, found {len(eligible)}"
+        )
+    window = tuple(eligible[-policy.required_bars :])
+    previous: Candle | None = None
+    for candle in window:
+        if previous is not None:
+            if candle.open_time_ms <= previous.open_time_ms:
+                raise ValueError(
+                    f"required material window for {contract.contract_id} contains duplicate "
+                    f"or non-increasing open times at {candle.open_time_ms}"
+                )
+            if candle.open_time_ms != previous.close_time_ms + 1:
+                raise ValueError(
+                    f"required material window for {contract.contract_id} has a cadence gap "
+                    f"before {candle.open_time_ms}; the selector must not step backward "
+                    "around missing material rows"
+                )
+        previous = candle
+    if len({candle.symbol for candle in window}) != 1:
+        raise ValueError(
+            f"required material window for {contract.contract_id} crosses symbol boundaries"
+        )
+    if len({candle.interval for candle in window}) != 1:
+        raise ValueError(
+            f"required material window for {contract.contract_id} crosses interval boundaries"
+        )
+    return window
+
+
 @runtime_checkable
 class SignalProducer(Protocol):
     """Protocol for deterministic signal replay verification."""
@@ -276,23 +439,61 @@ class CanonicalRuleSignalProducer:
                 f"generation_contract rule mismatch: contract specifies {rule}, entry declared {generation_contract['rule']}"
             )
 
-        min_lookback = int(params.get("min_lookback_bars", params.get("lookback_bars", 1)))
-        if "min_lookback_bars" in generation_contract and int(generation_contract["min_lookback_bars"]) != min_lookback:
+        # Defense in depth: the producer cannot prove latestness (it does not
+        # possess the full dataset), but every locally available completeness
+        # property of the required material window is enforced here.
+        policy = resolve_material_input_policy(authoritative_contract)
+        declared_min_lookback = generation_contract.get("min_lookback_bars")
+        if declared_min_lookback is not None and int(declared_min_lookback) != policy.required_bars:
             raise ValueError(
-                f"generation_contract min_lookback_bars mismatch: contract specifies {min_lookback}, entry declared {generation_contract['min_lookback_bars']}"
+                f"generation_contract min_lookback_bars mismatch: selector requires "
+                f"{policy.required_bars}, entry declared {declared_min_lookback}"
+            )
+        declared_selector_type = generation_contract.get("material_input_selector_type")
+        if (
+            declared_selector_type is not None
+            and declared_selector_type != MATERIAL_INPUT_SELECTOR_TYPE
+        ):
+            raise ValueError(
+                f"generation_contract material_input_selector_type mismatch: selector requires "
+                f"{MATERIAL_INPUT_SELECTOR_TYPE}, entry declared {declared_selector_type}"
+            )
+        declared_required_bars = generation_contract.get("material_input_required_bars")
+        if declared_required_bars is not None and int(declared_required_bars) != policy.required_bars:
+            raise ValueError(
+                f"generation_contract material_input_required_bars mismatch: selector requires "
+                f"{policy.required_bars}, entry declared {declared_required_bars}"
+            )
+        declared_selector_sha256 = generation_contract.get("material_input_selector_sha256")
+        if (
+            declared_selector_sha256 is not None
+            and declared_selector_sha256 != policy.selector_sha256
+        ):
+            raise ValueError(
+                "generation_contract material_input_selector_sha256 mismatch: entry declared a "
+                "selector policy that disagrees with the authoritative contract"
             )
 
         if not input_candles:
             raise ValueError("signal replay requires non-empty material inputs")
-        if len(input_candles) < min_lookback:
+        if len(input_candles) != policy.required_bars:
             raise ValueError(
-                f"insufficient lookback for signal replay: required {min_lookback}, got {len(input_candles)}"
+                f"signal replay requires the exact required material window: "
+                f"required {policy.required_bars}, got {len(input_candles)}"
             )
 
         # Validate order and integrity of input candles
         open_times = [c.open_time_ms for c in input_candles]
         if open_times != sorted(set(open_times)):
             raise ValueError("input candles must be ordered and non-overlapping")
+        if len({c.symbol for c in input_candles}) != 1 or len({c.interval for c in input_candles}) != 1:
+            raise ValueError("input candles must share one symbol and one interval")
+        if policy.required_bars > 1:
+            for previous, candle in zip(input_candles, input_candles[1:]):
+                if candle.open_time_ms != previous.close_time_ms + 1:
+                    raise ValueError(
+                        "input candles must be contiguous required material rows"
+                    )
 
         for candle in input_candles:
             if candle.closed is not True:

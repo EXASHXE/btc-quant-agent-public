@@ -90,7 +90,9 @@ def _build_bundle(
     min_lookback: int = 1,
 ) -> ReplayInputBundle:
     target_signal = signal or context["signal"]
-    inputs = input_candles or (context["candles"][0],)
+    # R05B: the authoritative required window for the fixture's signal
+    # timestamp is candles[1] (latest eligible row); default to it.
+    inputs = input_candles or (context["candles"][1],)
     open_times = [c.open_time_ms for c in inputs]
     preimage_hash = canonical_sha256([_runtime_candle_payload(c) for c in inputs])
     contract_id = producer_contract_id or (
@@ -168,7 +170,10 @@ def test_b04_t1_unrelated_valid_input_substitution_rejected(tmp_path: Path) -> N
         {k: v for k, v in tampered.items() if k != "bundle_sha256"}
     )
 
-    with pytest.raises(ValueError, match="input open times do not match generation contract|input preimage hash mismatch"):
+    with pytest.raises(
+        ValueError,
+        match="input open times do not match generation contract|input preimage hash mismatch|persisted input references",
+    ):
         validate_formal_replay_input_bundle(
             tampered,
             candles=ctx["candles"],
@@ -185,8 +190,10 @@ def test_b04_t2_hidden_future_input_rejected(tmp_path: Path) -> None:
     """
     signal_time = p6._candles()[2].open_time_ms
     ctx = _b04_context(tmp_path, first_input_available_at_ms=signal_time + 60_000)
+    # R05B: explicitly assert the stale candle 0 window so the availability
+    # rejection (not the exact-window rejection) is exercised.
     with pytest.raises(ValueError, match="was not available by signal timestamp"):
-        _build_bundle(ctx)
+        _build_bundle(ctx, input_candles=(ctx["candles"][0],))
 
 
 def test_b04_t3_missing_replay_bundle_fails_closed(tmp_path: Path) -> None:
@@ -277,8 +284,10 @@ def test_b04_t6_row_content_tamper_rejected(tmp_path: Path) -> None:
     bundle = _build_bundle(ctx)
 
     # Modify underlying candle content (volume changed, OHLC bounds still valid)
+    # R05B: candle 1 is the authoritative required row for this fixture, so
+    # tamper that row to exercise the row-content hash check.
     tampered_candles = list(ctx["candles"])
-    tampered_candles[0] = replace(tampered_candles[0], volume=tampered_candles[0].volume + 1000.0)
+    tampered_candles[1] = replace(tampered_candles[1], volume=tampered_candles[1].volume + 1000.0)
 
     with pytest.raises(ValueError, match="candle row content sha256 mismatch"):
         validate_formal_replay_input_bundle(
@@ -388,8 +397,10 @@ def test_b04_t12_multiple_signals_exact_coverage(tmp_path: Path) -> None:
         strength=1.0,
     )
 
-    in1 = (ctx["candles"][0],)
-    in2 = (ctx["candles"][1],)
+    # R05B: each signal's authoritative required window is its latest
+    # eligible row (candles[1] for sig1, candles[2] for sig2).
+    in1 = (ctx["candles"][1],)
+    in2 = (ctx["candles"][2],)
     open1 = [c.open_time_ms for c in in1]
     open2 = [c.open_time_ms for c in in2]
 
@@ -454,7 +465,7 @@ def test_b04_t12_multiple_signals_exact_coverage(tmp_path: Path) -> None:
         direction=1,
         strength=1.0,
     )
-    in3 = (ctx["candles"][2],)
+    in3 = (ctx["candles"][3],)
     open3 = [c.open_time_ms for c in in3]
     entry3 = {
         "signal_id": sig3.signal_id,
@@ -483,18 +494,36 @@ def test_b04_t12_multiple_signals_exact_coverage(tmp_path: Path) -> None:
 
 
 def test_b04_t13_incomplete_lookback_rejected(tmp_path: Path) -> None:
-    """T13: Producer contract requires 3 lookback bars; bundle only supplies 2; rejected."""
+    """T13: Producer contract requires 3 lookback bars; bundle only supplies 2; rejected.
+
+    R05B tightening: caller lookback assertions are no longer authority; the
+    registered contract's selector requires exactly the latest 1 eligible
+    row, so a 2-row caller window is rejected as a non-authoritative window
+    before lookback accounting is even consulted.
+    """
     ctx = _b04_context(tmp_path)
     inputs_2 = (ctx["candles"][0], ctx["candles"][1])
-    with pytest.raises(ValueError, match="insufficient lookback for signal replay: required 3, got 2"):
+    with pytest.raises(
+        ValueError,
+        match="caller-selected material window for B04-SIGNAL-1 does not equal the authoritative required input window",
+    ):
         _build_bundle(ctx, input_candles=inputs_2, min_lookback=3)
 
 
 def test_b04_t14_reordered_input_references_rejected(tmp_path: Path) -> None:
-    """T14: Input references not in strictly increasing chronological order; rejected."""
+    """T14: Input references not in strictly increasing chronological order; rejected.
+
+    R05B tightening: a reordered caller window is rejected as a
+    non-authoritative required window — the selector always yields the
+    strictly increasing latest-eligible window, so the assertion can never
+    legitimately disagree with it.
+    """
     ctx = _b04_context(tmp_path)
     inputs = (ctx["candles"][1], ctx["candles"][0])  # descending order
-    with pytest.raises(ValueError, match="input references for B04-SIGNAL-1 must be strictly increasing"):
+    with pytest.raises(
+        ValueError,
+        match="caller-selected material window for B04-SIGNAL-1 does not equal the authoritative required input window",
+    ):
         _build_bundle(ctx, input_candles=inputs)
 
 
@@ -618,8 +647,10 @@ def test_b04_p4_multiple_valid_signals_complete(tmp_path: Path) -> None:
         strength=1.0,
     )
 
-    in1 = (ctx["candles"][0],)
-    in2 = (ctx["candles"][1],)
+    # R05B: each signal's authoritative required window is its latest
+    # eligible row (candles[1] for sig1, candles[2] for sig2).
+    in1 = (ctx["candles"][1],)
+    in2 = (ctx["candles"][2],)
     open1 = [c.open_time_ms for c in in1]
     open2 = [c.open_time_ms for c in in2]
 
