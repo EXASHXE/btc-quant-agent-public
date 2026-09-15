@@ -31,7 +31,7 @@ from .mechanism import (
 )
 from .multifactor import FactorAssessment
 from .regime import classify_regime
-from .research import DEV_END_MS, DEV_START_MS, research_summary
+from .research import DEV_END_MS, DEV_START_MS, mark_legacy_diagnostic, research_summary
 from .risk import build_position_plan
 from .structure import confirmed_pivots
 
@@ -412,7 +412,7 @@ def run_v032_experiments(
             "rank_score_pearson": _pearson(control_values, arm_values),
             "outcomes": research_summary(arm_outcomes[arm]),
         }
-    return {
+    return mark_legacy_diagnostic({
         "scope": {"development_only": True, "holdout_accessed": False, "start_ms": DEV_START_MS, "end_ms_exclusive": DEV_END_MS},
         "denominator_correctness": {
             "trend_up": denominator["TREND_UP"], "trend_down": denominator["TREND_DOWN"],
@@ -458,7 +458,7 @@ def run_v032_experiments(
             "total_runtime_seconds": time.perf_counter() - started,
             "peak_rss_mib": resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024,
         },
-    }
+    })
 
 
 def write_v032_artifacts(
@@ -492,7 +492,7 @@ def write_v032_artifacts(
         "random_seed": seed,
         "validation_status": config.runtime.validation_status,
     }
-    payload = {"provenance": provenance, **result}
+    payload = mark_legacy_diagnostic({"provenance": provenance, **result})
     outputs = {
         "control_summary.json": result["control_summary"],
         "rr_component_summary.json": result["rr_component_summary"],
@@ -508,7 +508,16 @@ def write_v032_artifacts(
         "experiment_summary.json": payload,
     }
     for name, value in outputs.items():
-        (target / name).write_text(json.dumps(value, ensure_ascii=False, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+        (target / name).write_text(
+            json.dumps(
+                mark_legacy_diagnostic(dict(value)),
+                ensure_ascii=False,
+                indent=2,
+                sort_keys=True,
+            )
+            + "\n",
+            encoding="utf-8",
+        )
     pa = importlib.import_module("pyarrow")
     pq = importlib.import_module("pyarrow.parquet")
     pq.write_table(pa.Table.from_pylist(rr_rows), target / "rr_component_decomposition.parquet")

@@ -37,6 +37,16 @@ DEV_START_MS = int(datetime(2021, 1, 1, tzinfo=UTC).timestamp() * 1000)
 DEV_END_MS = int(datetime(2026, 2, 1, tzinfo=UTC).timestamp() * 1000)
 
 
+def mark_legacy_diagnostic(payload: dict[str, Any]) -> dict[str, Any]:
+    """Label historical research output so it cannot masquerade as P5/P6 authority."""
+    return {
+        **payload,
+        "classification": "LEGACY_DIAGNOSTIC_ONLY",
+        "promotion_eligibility": "NOT_TESTABLE_FOR_NEW_PROMOTION",
+        "can_promote": False,
+    }
+
+
 def _add_months(timestamp_ms: int, months: int) -> int:
     value = datetime.fromtimestamp(timestamp_ms / 1000, UTC)
     month_index = value.year * 12 + value.month - 1 + months
@@ -59,13 +69,13 @@ def research_summary(outcomes: Sequence[TradeOutcome]) -> dict[str, Any]:
         if timestamp is not None:
             year = str(datetime.fromtimestamp(timestamp / 1000, tz=UTC).year)
             by_year.setdefault(year, []).append(item)
-    return {
+    return mark_legacy_diagnostic({
         "overall": metrics(outcomes),
         "by_year": {year: metrics(items) for year, items in sorted(by_year.items())},
         "by_direction": _segment(outcomes, "direction"),
         "by_setup": _segment(outcomes, "setup"),
         "by_regime": _segment(outcomes, "regime"),
-    }
+    })
 
 
 def walk_forward_report(
@@ -323,7 +333,7 @@ def run_full_suite(
         for multiplier in (1.0, 1.5, 2.0)
     }
     start_ms, end_ms = candles[0].open_time_ms, candles[-1].close_time_ms + 1
-    return {
+    return mark_legacy_diagnostic({
         "protocol": {
             "scope": "DEVELOPMENT_ONLY",
             "development_start_ms": DEV_START_MS,
@@ -350,7 +360,7 @@ def run_full_suite(
         "block_bootstrap": bootstrap(baseline, seed=seed, block_size=max(1, round(len(baseline) ** 0.5))),
         "decisions": baseline_decisions,
         "outcomes": baseline,
-    }
+    })
 
 
 def write_research_artifacts(
@@ -394,7 +404,7 @@ def write_research_artifacts(
         "random_seed": seed,
         "validation_status": config.runtime.validation_status,
     }
-    report = {"provenance": provenance, **suite}
+    report = mark_legacy_diagnostic({"provenance": provenance, **suite})
     (target / "research_report.json").write_text(
         json.dumps(report, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
         encoding="utf-8",
@@ -402,6 +412,8 @@ def write_research_artifacts(
     overall = report["baseline"]["overall"]
     (target / "research_report.md").write_text(
         "# Research Report\n\n"
+        "Authority: `LEGACY_DIAGNOSTIC_ONLY` / `NOT_TESTABLE_FOR_NEW_PROMOTION`  \n"
+        "Can promote: `false`\n\n"
         f"Strategy status: `{config.runtime.validation_status}`\n\n"
         f"Trades: {overall['trades']}  \nExpectancy R: {overall['expectancy_r']}  \n"
         f"Profit factor: {overall['profit_factor']}  \nMax drawdown R: {overall['max_drawdown_r']}\n",
