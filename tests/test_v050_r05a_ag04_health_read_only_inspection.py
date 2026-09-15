@@ -33,6 +33,16 @@ Test map:
   inspection connection (``PRAGMA query_only``); bytes unchanged.
 - T7: control — explicit writer construction still initializes the schema and
   accepts writes (the repair did not globally disable the store).
+- T8 (R05AR): crash-leftover WAL without SHM — health fails closed with the
+  ``FORWARD_STORE_WAL_RECOVERY_REQUIRED`` classification; no ``-shm`` is
+  materialized; DB/WAL bytes and directory membership are unchanged.
+- T9 (R05AR): pre-existing WAL + SHM — conservative degrade (production never
+  opens a store carrying a non-empty WAL); no new files; existing sidecars,
+  DB bytes, and rows untouched.
+- T10 (R05AR): negative guards — across the missing, checkpointed, and
+  crash-leftover WAL states the real health path never invokes writer
+  initialization, schema DDL helpers, or a writer-mode constructor
+  (supplemental spies; the storage proofs of T1-T4/T8/T9 stay primary).
 """
 from __future__ import annotations
 
@@ -189,6 +199,49 @@ class R05AHealthReadOnlyInspectionTests(unittest.TestCase):
         # The writer's contextmanager connections are closed per operation, so
         # the WAL was checkpointed and the sidecars removed on the last close.
         self.assertEqual(self._sqlite_sidecars(store_path), [])
+
+    def _capture_and_restore_wal_image(self, *, preserve_shm: bool) -> tuple[Path, Path, Path]:
+        """Reproduce the crash/recovery filesystem state on a populated store.
+
+        Commits one extra row through a raw connection so a genuine non-empty
+        WAL image (real WAL-mode committed frames, not a fake empty file)
+        exists while the connection is open, captures it together with the
+        matching ``-shm``, closes the connection (which checkpoints and
+        removes the sidecars), then restores the WAL image — and the SHM when
+        ``preserve_shm`` — so no SQLite connection is left open. Returns
+        ``(store, wal, shm)`` paths.
+        """
+        store_path = self._temp / FORWARD_STORE_RELATIVE
+        wal_path = store_path.parent / (store_path.name + "-wal")
+        shm_path = store_path.parent / (store_path.name + "-shm")
+        connection = sqlite3.connect(str(store_path))
+        try:
+            connection.execute("PRAGMA busy_timeout=10000")
+            connection.execute(
+                "INSERT INTO derivative_snapshots (symbol, collection_id, "
+                "collection_started_at_ms, observed_at_ms, collector_version, "
+                "field_availability_json, endpoint_errors_json, payload_hash) "
+                "VALUES ('BTCUSDT', 'run-wal-crash', 1, 1, '0.3.14', '{}', '{}', 'wal')"
+            )
+            connection.commit()
+            wal_image = wal_path.read_bytes()
+            shm_image = shm_path.read_bytes() if shm_path.exists() else None
+        finally:
+            connection.close()
+        # The last close checkpointed the WAL and removed both sidecars.
+        self.assertFalse(wal_path.exists())
+        self.assertFalse(shm_path.exists())
+        # Restore the genuine WAL image: DB exists, non-empty -wal, and the
+        # -shm absent (crash-leftover state) or restored (live-WAL state).
+        wal_path.write_bytes(wal_image)
+        if preserve_shm:
+            self.assertIsNotNone(shm_image)
+            shm_path.write_bytes(shm_image)
+            self.assertTrue(shm_path.exists())
+        else:
+            self.assertFalse(shm_path.exists())
+        self.assertGreater(wal_path.stat().st_size, 0)
+        return store_path, wal_path, shm_path
 
     def _assert_missing_store_degradation(self, forward: dict[str, Any]) -> None:
         """The explicit degraded response designed for a missing store."""
@@ -405,6 +458,156 @@ class R05AHealthReadOnlyInspectionTests(unittest.TestCase):
             connection.close()
         self.assertIn("derivative_snapshots", tables)
         self.assertIn("collection_runs", tables)
+
+    # -- A04-T8 (R05AR) ---------------------------------------------------
+
+    def test_a04_t8_crash_leftover_wal_without_shm_fails_closed(self) -> None:
+        """Crash-leftover WAL without SHM: fail closed before SQLite recovers.
+
+        The restored state is DB + non-empty -wal + absent -shm, built from
+        genuine WAL-mode committed content. The real GET must degrade with the
+        stable classification BEFORE any SQLite open, leaving the -shm absent
+        and every captured byte and directory member unchanged.
+        """
+        self._populate_forward_store()
+        store_path, wal_path, shm_path = self._capture_and_restore_wal_image(
+            preserve_shm=False
+        )
+        health_fn = self._create_app()
+        before_files = self._forward_tree_files()
+        before_db_sha256 = self._sha256(store_path)
+        before_wal_sha256 = self._sha256(wal_path)
+        # Invoke the real /health endpoint.
+        report = self._invoke_health(health_fn)
+        forward = report["forward_derivatives"]
+        # Deterministic fail-closed degradation with the stable classification.
+        self.assertIs(forward["store_exists"], True)
+        self.assertEqual(forward["health"], "DEGRADED")
+        self.assertEqual(forward["sample_count"], 0)
+        self.assertEqual(forward["collection_status"], "NOT_COLLECTING")
+        self.assertIn("FORWARD_STORE_WAL_RECOVERY_REQUIRED", forward["error"])
+        # No -shm was created; WAL, DB, and directory membership are unchanged.
+        self.assertFalse(shm_path.exists())
+        self.assertEqual(self._sha256(store_path), before_db_sha256)
+        self.assertEqual(self._sha256(wal_path), before_wal_sha256)
+        self.assertEqual(self._forward_tree_files(), before_files)
+        self.assertEqual(self._sqlite_sidecars(store_path), [wal_path.name])
+
+    # -- A04-T9 (R05AR) ---------------------------------------------------
+
+    def test_a04_t9_preexisting_wal_and_shm_degrade_without_new_files(self) -> None:
+        """WAL + SHM pre-existing: conservative degrade, nothing new, rows intact.
+
+        Production refuses to open any store carrying a non-empty WAL, so both
+        sidecars are preserved untouched — no new filesystem member, no schema
+        or application write, and no reader bookkeeping on the SHM (byte
+        equality is provable precisely because SQLite is never opened).
+        """
+        self._populate_forward_store()
+        store_path, wal_path, shm_path = self._capture_and_restore_wal_image(
+            preserve_shm=True
+        )
+        health_fn = self._create_app()
+        before_files = self._forward_tree_files()
+        before_db_sha256 = self._sha256(store_path)
+        before_wal_sha256 = self._sha256(wal_path)
+        before_shm_sha256 = self._sha256(shm_path)
+        # Invoke the real /health endpoint.
+        report = self._invoke_health(health_fn)
+        forward = report["forward_derivatives"]
+        # Deterministic fail-closed degradation with the stable classification.
+        self.assertIs(forward["store_exists"], True)
+        self.assertEqual(forward["health"], "DEGRADED")
+        self.assertEqual(forward["sample_count"], 0)
+        self.assertIn("FORWARD_STORE_WAL_RECOVERY_REQUIRED", forward["error"])
+        # Existing sidecars preserved byte-for-byte; no new files; rows intact.
+        self.assertEqual(self._sha256(store_path), before_db_sha256)
+        self.assertEqual(self._sha256(wal_path), before_wal_sha256)
+        self.assertEqual(self._sha256(shm_path), before_shm_sha256)
+        self.assertEqual(self._forward_tree_files(), before_files)
+        self.assertEqual(
+            self._sqlite_sidecars(store_path), sorted([wal_path.name, shm_path.name])
+        )
+
+    # -- A04-T10 (R05AR) --------------------------------------------------
+
+    def test_a04_t10_health_never_invokes_writer_init_ddl_or_writer_constructor(
+        self,
+    ) -> None:
+        """Negative guards: the health path never initializes, migrates, or writes.
+
+        Supplemental to the storage proofs of T1-T4/T8/T9 (which stay primary):
+        across the missing, checkpointed, and crash-leftover WAL states, the
+        real /health path never invokes ``_initialize``/``prepare_schema``/
+        ``finish_schema`` (the only DDL carriers of CREATE/ALTER TABLE) or a
+        writer-mode ``ForwardDerivativeStore`` constructor. The spies fail the
+        test if the health path ever touches them.
+        """
+        health_fn = self._create_app()
+        failure = AssertionError(
+            "health invoked writer initialization, schema DDL, or a "
+            "writer-mode forward store constructor"
+        )
+        with (
+            patch.object(ForwardDerivativeStore, "__init__", side_effect=failure),
+            patch.object(ForwardDerivativeStore, "_initialize", side_effect=failure),
+            patch(
+                "btc_quant_agent.data.forward_store.prepare_schema",
+                side_effect=failure,
+            ),
+            patch(
+                "btc_quant_agent.data.forward_store.finish_schema",
+                side_effect=failure,
+            ),
+        ):
+            # 1. Missing store: degrade without creating/initializing anything.
+            missing = self._invoke_health(health_fn)
+            self._assert_missing_store_degradation(missing["forward_derivatives"])
+            self.assertFalse((self._temp / FORWARD_STORE_RELATIVE).exists())
+        # Build the checkpointed state through the writer workflow (spies
+        # inactive: this construction is writer-owned).
+        self._populate_forward_store()
+        with (
+            patch.object(ForwardDerivativeStore, "__init__", side_effect=failure),
+            patch.object(ForwardDerivativeStore, "_initialize", side_effect=failure),
+            patch(
+                "btc_quant_agent.data.forward_store.prepare_schema",
+                side_effect=failure,
+            ),
+            patch(
+                "btc_quant_agent.data.forward_store.finish_schema",
+                side_effect=failure,
+            ),
+        ):
+            # 2. Checkpointed store: read through status(), never writer init.
+            checkpointed = self._invoke_health(health_fn)
+            self.assertEqual(checkpointed["forward_derivatives"]["sample_count"], 1)
+            self.assertNotIn("error", checkpointed["forward_derivatives"])
+        # Then reproduce the crash-leftover WAL state (writer-owned build).
+        store_path, wal_path, _shm_path = self._capture_and_restore_wal_image(
+            preserve_shm=False
+        )
+        with (
+            patch.object(ForwardDerivativeStore, "__init__", side_effect=failure),
+            patch.object(ForwardDerivativeStore, "_initialize", side_effect=failure),
+            patch(
+                "btc_quant_agent.data.forward_store.prepare_schema",
+                side_effect=failure,
+            ),
+            patch(
+                "btc_quant_agent.data.forward_store.finish_schema",
+                side_effect=failure,
+            ),
+        ):
+            # 3. Crash-leftover WAL: fail closed, never writer init.
+            wal_state = self._invoke_health(health_fn)
+            self.assertIn(
+                "FORWARD_STORE_WAL_RECOVERY_REQUIRED",
+                wal_state["forward_derivatives"]["error"],
+            )
+        # The spy-gated invocations created no -shm and left the WAL untouched.
+        self.assertFalse((store_path.parent / (store_path.name + "-shm")).exists())
+        self.assertTrue(wal_path.exists())
 
 
 if __name__ == "__main__":

@@ -47,6 +47,19 @@ class ForwardStoreConflict(RuntimeError):
     pass
 
 
+class ForwardStoreWalRecoveryRequired(RuntimeError):
+    """Read-only inspection refusal for a store carrying a non-empty WAL.
+
+    Raised by the read-only inspection connection before any SQLite open: a
+    non-empty ``-wal`` (an in-flight writer or a crash leftover) requires
+    recovery sidecars, and a read-only connection may materialize a missing
+    ``-shm`` or, with ``immutable=1``, silently expose stale checkpointed
+    state. Inspection fails closed instead; ``ForwardDerivativeStore
+    .read_status`` degrades into a deterministic response carrying the
+    ``FORWARD_STORE_WAL_RECOVERY_REQUIRED`` classification.
+    """
+
+
 @dataclass(frozen=True)
 class ForwardDerivativeRecord:
     symbol: str
@@ -141,8 +154,11 @@ class ForwardDerivativeStore:
         """Read-only inspection instance: never creates, initializes or migrates the store.
 
         The returned instance bypasses writer ``__init__`` entirely; every query
-        flows through a sidecar-free ``mode=ro``/``immutable=1`` SQLite URI
-        connection with ``PRAGMA query_only=ON``.
+        flows through a sidecar-free ``immutable=1`` SQLite URI connection with
+        ``PRAGMA query_only=ON``. A store carrying a non-empty ``-wal`` sidecar
+        is never opened: inspection raises ``ForwardStoreWalRecoveryRequired``
+        and observational consumers degrade instead of materializing recovery
+        state or exposing stale checkpointed data.
         """
         instance = cls.__new__(cls)
         instance.path = Path(path)
@@ -162,17 +178,22 @@ class ForwardDerivativeStore:
             # and removes the -wal/-shm sidecars on the writer's last close, so
             # whenever no non-empty -wal sidecar remains the main database file
             # is fully checkpointed and self-consistent, and ``immutable=1``
-            # reads it exactly while creating no side files. An in-flight
-            # writer instead leaves a non-empty -wal; then ``mode=ro`` joins
-            # the writer's existing -shm (creating no new files) and reads a
-            # consistent WAL snapshot. A crashed writer (non-empty -wal, no
-            # live -shm) cannot be recovered by a read-only connection and
-            # fails closed into the degraded response of ``read_status``.
+            # reads it exactly while creating no side files. A non-empty -wal
+            # (an in-flight writer or a crash leftover) is never opened: a
+            # ``mode=ro`` connection may materialize a missing -shm recovery
+            # sidecar, and ``immutable=1`` may ignore WAL content and expose
+            # stale checkpointed state. Inspection therefore fails closed into
+            # the deterministic degraded response of ``read_status`` instead of
+            # manufacturing recovery state; the WAL itself is left untouched.
             wal_path = self.path.with_name(self.path.name + "-wal")
-            active_wal = wal_path.exists() and wal_path.stat().st_size > 0
-            suffix = "?mode=ro" if active_wal else "?immutable=1"
+            if wal_path.exists() and wal_path.stat().st_size > 0:
+                raise ForwardStoreWalRecoveryRequired(
+                    "FORWARD_STORE_WAL_RECOVERY_REQUIRED: non-empty -wal sidecar "
+                    "requires recovery state that read-only inspection refuses to "
+                    f"materialize: {self.path}"
+                )
             connection = sqlite3.connect(
-                self.path.resolve().as_uri() + suffix, uri=True, timeout=10.0
+                self.path.resolve().as_uri() + "?immutable=1", uri=True, timeout=10.0
             )
             connection.row_factory = sqlite3.Row
             connection.execute("PRAGMA busy_timeout=10000")
