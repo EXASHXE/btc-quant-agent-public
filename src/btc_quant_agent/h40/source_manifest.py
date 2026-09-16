@@ -494,15 +494,15 @@ def assert_canonical_source_record(
             f"Source '{record.source_id}' production authority is {spec.production_authority_state.value}: "
             f"canonical 1h production artifact lineage is not yet established by protocol authority.",
         )
-    if spec.archive_set_sha256 is not None and record.archive_set_sha256 != spec.archive_set_sha256:
+    if spec.archive_set_sha256 is not None and (
+        not record.archive_set_sha256 or record.archive_set_sha256 != spec.archive_set_sha256
+    ):
         raise H40GuardError(
             H40ReasonCode.SOURCE_HASH_MISMATCH,
             f"Source '{record.source_id}' archive set SHA mismatch: expected '{spec.archive_set_sha256}', got '{record.archive_set_sha256}'.",
         )
-    if (
-        spec.reference_file_sha256 is not None
-        and record.file_sha256 is not None
-        and record.file_sha256 != spec.reference_file_sha256
+    if spec.reference_file_sha256 is not None and (
+        not record.file_sha256 or record.file_sha256 != spec.reference_file_sha256
     ):
         raise H40GuardError(
             H40ReasonCode.SOURCE_HASH_MISMATCH,

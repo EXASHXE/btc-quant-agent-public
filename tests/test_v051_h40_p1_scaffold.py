@@ -2148,6 +2148,34 @@ def test_tampered_archive_checksum_fails_canonical_spec() -> None:
         assert_canonical_source_record(eth_tampered_file_sha, proto.protocol_hash)
     assert exc_b.value.reason_code == H40ReasonCode.SOURCE_HASH_MISMATCH
 
+    # Omitted (None) file SHA for ETH must fail closed
+    eth_omitted_file_sha = H40SourceRecord(
+        source_id="ETHUSDT_USD_M_1H",
+        status=H40SourceStatus.UNVERIFIED,
+        locator="data/research/cross_asset_1h/ETHUSDT.parquet",
+        product="ETHUSDT",
+        cadence="1h",
+        archive_set_sha256=eth_spec.archive_set_sha256,
+        file_sha256=None,
+    )
+    with pytest.raises(H40GuardError) as exc_c:
+        assert_canonical_source_record(eth_omitted_file_sha, proto.protocol_hash)
+    assert exc_c.value.reason_code == H40ReasonCode.SOURCE_HASH_MISMATCH
+
+    # Empty string file SHA for ETH must fail closed
+    eth_empty_file_sha = H40SourceRecord(
+        source_id="ETHUSDT_USD_M_1H",
+        status=H40SourceStatus.UNVERIFIED,
+        locator="data/research/cross_asset_1h/ETHUSDT.parquet",
+        product="ETHUSDT",
+        cadence="1h",
+        archive_set_sha256=eth_spec.archive_set_sha256,
+        file_sha256="",
+    )
+    with pytest.raises(H40GuardError) as exc_d:
+        assert_canonical_source_record(eth_empty_file_sha, proto.protocol_hash)
+    assert exc_d.value.reason_code == H40ReasonCode.SOURCE_HASH_MISMATCH
+
 
 def test_caller_replacement_reference_cannot_redefine_production_authority(tmp_path: Path) -> None:
     """7. Caller-provided replacement reference manifest cannot redefine canonical production H40 authority."""
@@ -2579,6 +2607,9 @@ def test_mandatory_5_eth_canonical_checks_remain_enforced() -> None:
         status=H40SourceStatus.VERIFIED,
     )
 
+    canonical_archive_sha = "1efde37a765de90e33fd509bd1bcb729351beafa79314f684b3558665b19226c"
+    canonical_file_sha = "563a1a4d927ec2a007481783be9bd76896e1be57198af80c4b2a30608e124608"
+
     # Wrong archive set SHA
     bad_eth_archive = H40SourceRecord(
         source_id="ETHUSDT_USD_M_1H",
@@ -2587,26 +2618,131 @@ def test_mandatory_5_eth_canonical_checks_remain_enforced() -> None:
         product="ETHUSDT",
         cadence="1h",
         archive_set_sha256="wrong_archive_sha",
+        file_sha256=canonical_file_sha,
         receipt=mock_receipt,
     )
     with pytest.raises(H40GuardError) as exc_archive:
         assert_canonical_source_record(bad_eth_archive, proto.protocol_hash)
     assert exc_archive.value.reason_code == H40ReasonCode.SOURCE_HASH_MISMATCH
 
-    # Wrong reference file SHA
+    # None archive set SHA
+    bad_eth_archive_none = H40SourceRecord(
+        source_id="ETHUSDT_USD_M_1H",
+        status=H40SourceStatus.VERIFIED,
+        locator="data/research/cross_asset_1h/ETHUSDT.parquet",
+        product="ETHUSDT",
+        cadence="1h",
+        archive_set_sha256=None,
+        file_sha256=canonical_file_sha,
+        receipt=mock_receipt,
+    )
+    with pytest.raises(H40GuardError) as exc_archive_none:
+        assert_canonical_source_record(bad_eth_archive_none, proto.protocol_hash)
+    assert exc_archive_none.value.reason_code == H40ReasonCode.SOURCE_HASH_MISMATCH
+
+    # Empty archive set SHA
+    bad_eth_archive_empty = H40SourceRecord(
+        source_id="ETHUSDT_USD_M_1H",
+        status=H40SourceStatus.VERIFIED,
+        locator="data/research/cross_asset_1h/ETHUSDT.parquet",
+        product="ETHUSDT",
+        cadence="1h",
+        archive_set_sha256="",
+        file_sha256=canonical_file_sha,
+        receipt=mock_receipt,
+    )
+    with pytest.raises(H40GuardError) as exc_archive_empty:
+        assert_canonical_source_record(bad_eth_archive_empty, proto.protocol_hash)
+    assert exc_archive_empty.value.reason_code == H40ReasonCode.SOURCE_HASH_MISMATCH
+
+    # P1R5-F1: file_sha256=None must fail closed
+    bad_eth_file_none = H40SourceRecord(
+        source_id="ETHUSDT_USD_M_1H",
+        status=H40SourceStatus.VERIFIED,
+        locator="data/research/cross_asset_1h/ETHUSDT.parquet",
+        product="ETHUSDT",
+        cadence="1h",
+        archive_set_sha256=canonical_archive_sha,
+        file_sha256=None,
+        receipt=mock_receipt,
+    )
+    with pytest.raises(H40GuardError) as exc_file_none:
+        assert_canonical_source_record(bad_eth_file_none, proto.protocol_hash)
+    assert exc_file_none.value.reason_code == H40ReasonCode.SOURCE_HASH_MISMATCH
+
+    # P1R5-F1: file_sha256="" must fail closed
+    bad_eth_file_empty = H40SourceRecord(
+        source_id="ETHUSDT_USD_M_1H",
+        status=H40SourceStatus.VERIFIED,
+        locator="data/research/cross_asset_1h/ETHUSDT.parquet",
+        product="ETHUSDT",
+        cadence="1h",
+        archive_set_sha256=canonical_archive_sha,
+        file_sha256="",
+        receipt=mock_receipt,
+    )
+    with pytest.raises(H40GuardError) as exc_file_empty:
+        assert_canonical_source_record(bad_eth_file_empty, proto.protocol_hash)
+    assert exc_file_empty.value.reason_code == H40ReasonCode.SOURCE_HASH_MISMATCH
+
+    # P1R5-F1: file_sha256 with whitespace must fail closed
+    bad_eth_file_ws = H40SourceRecord(
+        source_id="ETHUSDT_USD_M_1H",
+        status=H40SourceStatus.VERIFIED,
+        locator="data/research/cross_asset_1h/ETHUSDT.parquet",
+        product="ETHUSDT",
+        cadence="1h",
+        archive_set_sha256=canonical_archive_sha,
+        file_sha256="   ",
+        receipt=mock_receipt,
+    )
+    with pytest.raises(H40GuardError) as exc_file_ws:
+        assert_canonical_source_record(bad_eth_file_ws, proto.protocol_hash)
+    assert exc_file_ws.value.reason_code == H40ReasonCode.SOURCE_HASH_MISMATCH
+
+    # P1R5-F1: file_sha256 malformed non-64-hex value must fail closed
+    bad_eth_file_malformed = H40SourceRecord(
+        source_id="ETHUSDT_USD_M_1H",
+        status=H40SourceStatus.VERIFIED,
+        locator="data/research/cross_asset_1h/ETHUSDT.parquet",
+        product="ETHUSDT",
+        cadence="1h",
+        archive_set_sha256=canonical_archive_sha,
+        file_sha256="not_a_valid_64_hex_sha256_hash",
+        receipt=mock_receipt,
+    )
+    with pytest.raises(H40GuardError) as exc_file_malformed:
+        assert_canonical_source_record(bad_eth_file_malformed, proto.protocol_hash)
+    assert exc_file_malformed.value.reason_code == H40ReasonCode.SOURCE_HASH_MISMATCH
+
+    # Wrong reference file SHA (64-hex mismatch)
     bad_eth_file = H40SourceRecord(
         source_id="ETHUSDT_USD_M_1H",
         status=H40SourceStatus.VERIFIED,
         locator="data/research/cross_asset_1h/ETHUSDT.parquet",
         product="ETHUSDT",
         cadence="1h",
-        archive_set_sha256="1efde37a765de90e33fd509bd1bcb729351beafa79314f684b3558665b19226c",
+        archive_set_sha256=canonical_archive_sha,
         file_sha256="0" * 64,
         receipt=mock_receipt,
     )
     with pytest.raises(H40GuardError) as exc_file:
         assert_canonical_source_record(bad_eth_file, proto.protocol_hash)
     assert exc_file.value.reason_code == H40ReasonCode.SOURCE_HASH_MISMATCH
+
+    # Exact matching canonical ETH record passes assert_canonical_source_record
+    good_eth = H40SourceRecord(
+        source_id="ETHUSDT_USD_M_1H",
+        status=H40SourceStatus.VERIFIED,
+        locator="data/research/cross_asset_1h/ETHUSDT.parquet",
+        product="ETHUSDT",
+        cadence="1h",
+        archive_set_sha256=canonical_archive_sha,
+        file_sha256=canonical_file_sha,
+        receipt=mock_receipt,
+    )
+    # Must succeed without raising any exception
+    assert_canonical_source_record(good_eth, proto.protocol_hash)
 
 
 def test_mandatory_10_synthetic_validator_output_remains_strictly_non_authoritative(tmp_path: Path) -> None:
