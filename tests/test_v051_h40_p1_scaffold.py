@@ -311,18 +311,31 @@ def test_materialize_verified_manifest_on_real_local_artifacts() -> None:
     proto = H40ProtocolIdentity.default()
     manifest = materialize_verified_manifest(Path("."), proto.protocol_hash)
 
-    # ETHUSDT.parquet and official derivatives hourly_inputs.parquet exist locally and are verified
+    eth_path = Path("data/research/cross_asset_1h/ETHUSDT.parquet")
     eth = manifest.get_source("ETHUSDT_USD_M_1H")
-    assert eth.status == H40SourceStatus.VERIFIED
-    assert eth.row_count == 44568
-    assert eth.receipt is not None
-    assert eth.receipt.status == H40SourceStatus.VERIFIED
+    if eth_path.exists():
+        assert eth.status == H40SourceStatus.VERIFIED
+        assert eth.row_count == 44568
+        assert eth.receipt is not None
+        assert eth.receipt.status == H40SourceStatus.VERIFIED
+    else:
+        assert eth.status == H40SourceStatus.NOT_TESTABLE
+        assert eth.receipt is not None
+        assert eth.receipt.status == H40SourceStatus.NOT_TESTABLE
+        assert eth.receipt.reason_code == H40ReasonCode.SOURCE_MISSING
 
+    deriv_path = Path("data/research/v0.3.19_official_derivatives/hourly_inputs.parquet")
     deriv = manifest.get_source("BTCUSDT_OFFICIAL_DERIVATIVES")
-    assert deriv.status == H40SourceStatus.VERIFIED
-    assert deriv.row_count == 44568
-    assert deriv.receipt is not None
-    assert deriv.receipt.status == H40SourceStatus.VERIFIED
+    if deriv_path.exists():
+        assert deriv.status == H40SourceStatus.VERIFIED
+        assert deriv.row_count == 44568
+        assert deriv.receipt is not None
+        assert deriv.receipt.status == H40SourceStatus.VERIFIED
+    else:
+        assert deriv.status == H40SourceStatus.NOT_TESTABLE
+        assert deriv.receipt is not None
+        assert deriv.receipt.status == H40SourceStatus.NOT_TESTABLE
+        assert deriv.receipt.reason_code == H40ReasonCode.SOURCE_MISSING
 
 
 # ==============================================================================
