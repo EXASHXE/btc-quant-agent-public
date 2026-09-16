@@ -413,17 +413,19 @@ class H40SplitManifest:
 
     def assert_authoritative(
         self,
-        source_manifest: H40SourceManifest | None = None,
-        repo_root: Path | str | None = None,
+        source_manifest: H40SourceManifest,
+        repo_root: Path | str,
     ) -> None:
-        """Verifies split authority against verified source manifest and optional cold artifact check.
+        """Verifies split authority against verified source manifest and mandatory cold artifact check.
 
         Fails closed if:
         - Manifest is not marked authoritative (is_authoritative=False)
         - Attestation is missing or invalid
         - Source manifest is not supplied or manifest hash mismatches
+        - repo_root is not supplied or invalid
         - Source manifest does not contain verified BTC and ETH receipts matching attestation
         - Cold validation against repo_root fails or produces differing bytes/timestamps
+        - Cold partition reconstruction from artifact timestamps does not match persisted partitions
         """
         if not self.is_authoritative:
             raise H40GuardError(
@@ -440,6 +442,12 @@ class H40SplitManifest:
                 H40ReasonCode.SOURCE_UNVERIFIED,
                 "Split authority cannot be verified without source manifest authority; "
                 "supply a verified H40SourceManifest.",
+            )
+        if repo_root is None or str(repo_root).strip() == "":
+            raise H40GuardError(
+                H40ReasonCode.SOURCE_UNVERIFIED,
+                "Split authority cannot be verified without a cold artifact repository root; "
+                "supply a valid repo_root.",
             )
 
         # 1. Attestation self-consistency
@@ -544,51 +552,121 @@ class H40SplitManifest:
                 "ETH receipt timestamp count does not match attestation.",
             )
 
-        # 4. Cold verification against disk if repo_root is provided
-        if repo_root is not None:
-            btc_cold = validate_source_artifact(
-                repo_root,
-                btc_rec,
-                expected_product="BTCUSDT",
-                expected_cadence="1h",
+        # 4. Mandatory cold verification of BTC and ETH artifacts on disk
+        btc_cold = validate_source_artifact(
+            repo_root,
+            btc_rec,
+            expected_product="BTCUSDT",
+            expected_cadence="1h",
+        )
+        if btc_cold.status != H40SourceStatus.VERIFIED:
+            raise H40GuardError(
+                btc_cold.reason_code or H40ReasonCode.NOT_TESTABLE,
+                f"BTC artifact cold validation failed: {btc_cold.notes}",
             )
-            if btc_cold.status != H40SourceStatus.VERIFIED:
-                raise H40GuardError(
-                    btc_cold.reason_code or H40ReasonCode.NOT_TESTABLE,
-                    f"BTC artifact cold validation failed: {btc_cold.notes}",
-                )
-            if btc_cold.file_sha256 != self.attestation.btc_file_sha256:
-                raise H40GuardError(
-                    H40ReasonCode.SOURCE_HASH_MISMATCH,
-                    "BTC artifact on disk does not match attestation file SHA-256.",
-                )
-            if btc_cold.timestamp_membership_hash != self.attestation.btc_membership_sha256:
-                raise H40GuardError(
-                    H40ReasonCode.SOURCE_HASH_MISMATCH,
-                    "BTC artifact on disk does not match attestation timestamp membership hash.",
-                )
+        if btc_cold.file_sha256 != self.attestation.btc_file_sha256:
+            raise H40GuardError(
+                H40ReasonCode.SOURCE_HASH_MISMATCH,
+                "BTC artifact on disk does not match attestation file SHA-256.",
+            )
+        if btc_cold.timestamp_membership_hash != self.attestation.btc_membership_sha256:
+            raise H40GuardError(
+                H40ReasonCode.SOURCE_HASH_MISMATCH,
+                "BTC artifact on disk does not match attestation timestamp membership hash.",
+            )
+        if btc_cold.timestamp_count != self.attestation.btc_timestamp_count:
+            raise H40GuardError(
+                H40ReasonCode.INTERVAL_MISMATCH,
+                "BTC artifact on disk does not match attestation timestamp count.",
+            )
 
-            eth_cold = validate_source_artifact(
-                repo_root,
-                eth_rec,
-                expected_product="ETHUSDT",
-                expected_cadence="1h",
+        eth_cold = validate_source_artifact(
+            repo_root,
+            eth_rec,
+            expected_product="ETHUSDT",
+            expected_cadence="1h",
+        )
+        if eth_cold.status != H40SourceStatus.VERIFIED:
+            raise H40GuardError(
+                eth_cold.reason_code or H40ReasonCode.NOT_TESTABLE,
+                f"ETH artifact cold validation failed: {eth_cold.notes}",
             )
-            if eth_cold.status != H40SourceStatus.VERIFIED:
-                raise H40GuardError(
-                    eth_cold.reason_code or H40ReasonCode.NOT_TESTABLE,
-                    f"ETH artifact cold validation failed: {eth_cold.notes}",
-                )
-            if eth_cold.file_sha256 != self.attestation.eth_file_sha256:
-                raise H40GuardError(
-                    H40ReasonCode.SOURCE_HASH_MISMATCH,
-                    "ETH artifact on disk does not match attestation file SHA-256.",
-                )
-            if eth_cold.timestamp_membership_hash != self.attestation.eth_membership_sha256:
-                raise H40GuardError(
-                    H40ReasonCode.SOURCE_HASH_MISMATCH,
-                    "ETH artifact on disk does not match attestation timestamp membership hash.",
-                )
+        if eth_cold.file_sha256 != self.attestation.eth_file_sha256:
+            raise H40GuardError(
+                H40ReasonCode.SOURCE_HASH_MISMATCH,
+                "ETH artifact on disk does not match attestation file SHA-256.",
+            )
+        if eth_cold.timestamp_membership_hash != self.attestation.eth_membership_sha256:
+            raise H40GuardError(
+                H40ReasonCode.SOURCE_HASH_MISMATCH,
+                "ETH artifact on disk does not match attestation timestamp membership hash.",
+            )
+        if eth_cold.timestamp_count != self.attestation.eth_timestamp_count:
+            raise H40GuardError(
+                H40ReasonCode.INTERVAL_MISMATCH,
+                "ETH artifact on disk does not match attestation timestamp count.",
+            )
+
+        # 5. Extract verified source timestamps from artifacts and cold-reconstruct split
+        btc_timestamps = extract_verified_source_timestamps(
+            repo_root=repo_root,
+            record=btc_rec,
+            expected_product="BTCUSDT",
+            expected_cadence="1h",
+        )
+        eth_timestamps = extract_verified_source_timestamps(
+            repo_root=repo_root,
+            record=eth_rec,
+            expected_product="ETHUSDT",
+            expected_cadence="1h",
+        )
+
+        common_set = set(btc_timestamps).intersection(set(eth_timestamps))
+        if not common_set:
+            raise H40GuardError(
+                H40ReasonCode.SOURCE_UNVERIFIED,
+                "No overlapping timestamps found between cold BTC and ETH sources.",
+            )
+        common_timestamps = sorted(common_set)
+
+        reconstructed_partitions, reconstructed_base_count, reconstructed_exclusions = (
+            _compute_partitions_from_timestamps(common_timestamps)
+        )
+
+        if reconstructed_base_count != self.base_eligible_count:
+            raise H40GuardError(
+                H40ReasonCode.INTERVAL_MISMATCH,
+                f"Reconstructed base eligible count {reconstructed_base_count} does not match "
+                f"persisted count {self.base_eligible_count}.",
+            )
+        if reconstructed_exclusions != self.exclusion_counts:
+            raise H40GuardError(
+                H40ReasonCode.INTERVAL_MISMATCH,
+                "Reconstructed exclusion counts do not match persisted exclusion counts.",
+            )
+        if reconstructed_partitions != self.partitions:
+            raise H40GuardError(
+                H40ReasonCode.SOURCE_HASH_MISMATCH,
+                "Reconstructed partitions from cold artifacts do not match persisted partitions.",
+            )
+
+        reconstructed_manifest = H40SplitManifest(
+            protocol_identity_hash=self.protocol_identity_hash,
+            source_manifest_hash=self.source_manifest_hash,
+            base_eligible_start_utc=self.base_eligible_start_utc,
+            base_eligible_end_utc=self.base_eligible_end_utc,
+            base_eligible_count=reconstructed_base_count,
+            partitions=reconstructed_partitions,
+            exclusion_counts=reconstructed_exclusions,
+            is_authoritative=True,
+            attestation=None,
+        )
+        if reconstructed_manifest.split_hash != self.split_hash:
+            raise H40GuardError(
+                H40ReasonCode.SOURCE_HASH_MISMATCH,
+                f"Reconstructed split hash '{reconstructed_manifest.split_hash}' does not match "
+                f"persisted split hash '{self.split_hash}'.",
+            )
 
     @classmethod
     def get_base_eligible_timestamps(cls) -> list[str]:
