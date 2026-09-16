@@ -39,7 +39,6 @@ from .protocol import (
     H40ProtocolIdentity,
 )
 from .source_manifest import (
-    H40AuthorityPolicy,
     H40CanonicalSourceSpec,
     H40SourceManifest,
     H40SourceRecord,
@@ -84,7 +83,6 @@ __all__ = [
     "SCHEMA_NAME",
     "SEARCH_BUDGET",
     "SOL_ACCEPTANCE_COMMIT",
-    "H40AuthorityPolicy",
     "H40CanonicalSourceSpec",
     "H40ConfigurationLedger",
     "H40ConfigurationSlot",

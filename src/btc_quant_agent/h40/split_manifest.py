@@ -17,7 +17,6 @@ from typing import Any
 from ..research_contract.canonical import canonical_json, canonical_sha256
 from .guards import H40GuardError, H40ReasonCode
 from .source_manifest import (
-    H40AuthorityPolicy,
     H40SourceManifest,
     H40SourceStatus,
     assert_canonical_source_record,
@@ -424,16 +423,15 @@ class H40SplitManifest:
         self,
         source_manifest: H40SourceManifest,
         repo_root: Path | str,
-        authority_policy: H40AuthorityPolicy | None = None,
     ) -> None:
         """Verifies split authority against verified source manifest and mandatory cold artifact check.
 
         Fails closed if:
         - Manifest is not marked authoritative (is_authoritative=False)
-        - Attestation is missing or invalid
+        - Attestation is missing, invalid, or not production canonical
         - Source manifest is not supplied or manifest hash mismatches
         - repo_root is not supplied or invalid
-        - Policy is production and attestation or source records violate canonical specification
+        - Attestation or source records violate canonical specification
         - Source manifest does not contain verified BTC and ETH receipts matching attestation
         - Cold validation against repo_root fails or produces differing bytes/timestamps
         - Cold partition reconstruction from artifact timestamps does not match persisted partitions
@@ -461,8 +459,7 @@ class H40SplitManifest:
                 "supply a valid repo_root.",
             )
 
-        policy = authority_policy or H40AuthorityPolicy.production_canonical()
-        if policy.is_production and not getattr(self.attestation, "is_production_canonical", True):
+        if not getattr(self.attestation, "is_production_canonical", True):
             raise H40GuardError(
                 H40ReasonCode.SOURCE_UNVERIFIED,
                 "Split attestation is TEST_ONLY and cannot obtain production H40 split authority.",
@@ -517,8 +514,7 @@ class H40SplitManifest:
                 H40ReasonCode.SOURCE_UNVERIFIED,
                 "BTC source record in source manifest is not VERIFIED.",
             )
-        if policy.is_production:
-            assert_canonical_source_record(btc_rec, self.protocol_identity_hash)
+        assert_canonical_source_record(btc_rec, self.protocol_identity_hash)
         if btc_rec.locator != self.attestation.btc_locator:
             raise H40GuardError(
                 H40ReasonCode.SOURCE_UNVERIFIED,
@@ -551,8 +547,7 @@ class H40SplitManifest:
                 H40ReasonCode.SOURCE_UNVERIFIED,
                 "ETH source record in source manifest is not VERIFIED.",
             )
-        if policy.is_production:
-            assert_canonical_source_record(eth_rec, self.protocol_identity_hash)
+        assert_canonical_source_record(eth_rec, self.protocol_identity_hash)
         if eth_rec.locator != self.attestation.eth_locator:
             raise H40GuardError(
                 H40ReasonCode.SOURCE_UNVERIFIED,
@@ -690,6 +685,265 @@ class H40SplitManifest:
                 f"persisted split hash '{self.split_hash}'.",
             )
 
+    def assert_synthetic_validator_split(
+        self,
+        source_manifest: H40SourceManifest,
+        repo_root: Path | str,
+    ) -> None:
+        """Verifies synthetic validator split integrity and cold disk reconstruction.
+
+        Strictly test-only: used for testing partition logic, gap handling, 1-byte disk tampering,
+        and cold reconstruction on synthetic test fixtures.
+
+        Fails closed if:
+        - Manifest is marked authoritative (self.is_authoritative is True)
+        - Attestation is missing or has is_production_canonical=True
+        - Source manifest hash mismatches
+        - Cold validation against repo_root fails or produces differing bytes/timestamps
+        - Cold partition reconstruction does not match persisted partitions
+        """
+        if self.is_authoritative:
+            raise H40GuardError(
+                H40ReasonCode.SOURCE_UNVERIFIED,
+                "Synthetic validator split cannot be marked authoritative.",
+            )
+        if self.attestation is None:
+            raise H40GuardError(
+                H40ReasonCode.SOURCE_UNVERIFIED,
+                "Synthetic validator split lacks required split attestation.",
+            )
+        if getattr(self.attestation, "is_production_canonical", False):
+            raise H40GuardError(
+                H40ReasonCode.SOURCE_UNVERIFIED,
+                "Synthetic validator assertion rejects production canonical attestations.",
+            )
+        if source_manifest is None:
+            raise H40GuardError(
+                H40ReasonCode.SOURCE_UNVERIFIED,
+                "Split authority cannot be verified without source manifest; supply an H40SourceManifest.",
+            )
+        if repo_root is None or str(repo_root).strip() == "":
+            raise H40GuardError(
+                H40ReasonCode.SOURCE_UNVERIFIED,
+                "Split verification requires a valid repo_root.",
+            )
+
+        # 1. Attestation self-consistency
+        if self.attestation.protocol_identity_hash != self.protocol_identity_hash:
+            raise H40GuardError(
+                H40ReasonCode.SOURCE_UNVERIFIED,
+                "Attestation protocol identity hash mismatch.",
+            )
+        if self.attestation.source_manifest_hash != self.source_manifest_hash:
+            raise H40GuardError(
+                H40ReasonCode.SOURCE_UNVERIFIED,
+                "Attestation source manifest hash mismatch.",
+            )
+        if self.attestation.split_hash != self.split_hash:
+            raise H40GuardError(
+                H40ReasonCode.SOURCE_UNVERIFIED,
+                "Attestation split hash mismatch with partitions.",
+            )
+
+        # 2. Check attestation self-hash
+        expected_att_hash = self.attestation.compute_attestation_hash()
+        if self.attestation.attestation_hash != expected_att_hash:
+            raise H40GuardError(
+                H40ReasonCode.SOURCE_HASH_MISMATCH,
+                "Attestation self-hash is invalid or tampered.",
+            )
+
+        # 3. Verify against source_manifest
+        if source_manifest.manifest_hash != self.source_manifest_hash:
+            raise H40GuardError(
+                H40ReasonCode.SOURCE_UNVERIFIED,
+                f"Split source_manifest_hash '{self.source_manifest_hash}' does not match "
+                f"supplied source manifest hash '{source_manifest.manifest_hash}'.",
+            )
+        if source_manifest.protocol_identity_hash != self.protocol_identity_hash:
+            raise H40GuardError(
+                H40ReasonCode.SOURCE_UNVERIFIED,
+                "Source manifest protocol identity hash does not match split protocol identity hash.",
+            )
+
+        btc_rec = source_manifest.get_source(self.attestation.btc_source_id)
+        if (
+            btc_rec.status != H40SourceStatus.VERIFIED
+            or btc_rec.receipt is None
+            or btc_rec.receipt.status != H40SourceStatus.VERIFIED
+        ):
+            raise H40GuardError(
+                H40ReasonCode.SOURCE_UNVERIFIED,
+                "BTC source record in source manifest is not VERIFIED.",
+            )
+        if btc_rec.locator != self.attestation.btc_locator:
+            raise H40GuardError(
+                H40ReasonCode.SOURCE_UNVERIFIED,
+                f"BTC locator mismatch: record has '{btc_rec.locator}', attestation has '{self.attestation.btc_locator}'.",
+            )
+        if btc_rec.receipt.file_sha256 != self.attestation.btc_file_sha256:
+            raise H40GuardError(
+                H40ReasonCode.SOURCE_HASH_MISMATCH,
+                "BTC receipt file SHA-256 does not match attestation.",
+            )
+        if btc_rec.receipt.timestamp_membership_hash != self.attestation.btc_membership_sha256:
+            raise H40GuardError(
+                H40ReasonCode.SOURCE_HASH_MISMATCH,
+                "BTC receipt timestamp membership hash does not match attestation.",
+            )
+        if btc_rec.receipt.timestamp_count != self.attestation.btc_timestamp_count:
+            raise H40GuardError(
+                H40ReasonCode.INTERVAL_MISMATCH,
+                "BTC receipt timestamp count does not match attestation.",
+            )
+
+        eth_rec = source_manifest.get_source(self.attestation.eth_source_id)
+        if (
+            eth_rec.status != H40SourceStatus.VERIFIED
+            or eth_rec.receipt is None
+            or eth_rec.receipt.status != H40SourceStatus.VERIFIED
+        ):
+            raise H40GuardError(
+                H40ReasonCode.SOURCE_UNVERIFIED,
+                "ETH source record in source manifest is not VERIFIED.",
+            )
+        if eth_rec.locator != self.attestation.eth_locator:
+            raise H40GuardError(
+                H40ReasonCode.SOURCE_UNVERIFIED,
+                f"ETH locator mismatch: record has '{eth_rec.locator}', attestation has '{self.attestation.eth_locator}'.",
+            )
+        if eth_rec.receipt.file_sha256 != self.attestation.eth_file_sha256:
+            raise H40GuardError(
+                H40ReasonCode.SOURCE_HASH_MISMATCH,
+                "ETH receipt file SHA-256 does not match attestation.",
+            )
+        if eth_rec.receipt.timestamp_membership_hash != self.attestation.eth_membership_sha256:
+            raise H40GuardError(
+                H40ReasonCode.SOURCE_HASH_MISMATCH,
+                "ETH receipt timestamp membership hash does not match attestation.",
+            )
+        if eth_rec.receipt.timestamp_count != self.attestation.eth_timestamp_count:
+            raise H40GuardError(
+                H40ReasonCode.INTERVAL_MISMATCH,
+                "ETH receipt timestamp count does not match attestation.",
+            )
+
+        # 4. Mandatory cold verification of BTC and ETH artifacts on disk
+        btc_cold = validate_source_artifact(
+            repo_root,
+            btc_rec,
+            expected_product=btc_rec.product,
+            expected_cadence=btc_rec.cadence,
+        )
+        if btc_cold.status != H40SourceStatus.VERIFIED:
+            raise H40GuardError(
+                btc_cold.reason_code or H40ReasonCode.NOT_TESTABLE,
+                f"BTC artifact cold validation failed: {btc_cold.notes}",
+            )
+        if btc_cold.file_sha256 != self.attestation.btc_file_sha256:
+            raise H40GuardError(
+                H40ReasonCode.SOURCE_HASH_MISMATCH,
+                "BTC artifact on disk does not match attestation file SHA-256.",
+            )
+        if btc_cold.timestamp_membership_hash != self.attestation.btc_membership_sha256:
+            raise H40GuardError(
+                H40ReasonCode.SOURCE_HASH_MISMATCH,
+                "BTC artifact on disk does not match attestation timestamp membership hash.",
+            )
+        if btc_cold.timestamp_count != self.attestation.btc_timestamp_count:
+            raise H40GuardError(
+                H40ReasonCode.INTERVAL_MISMATCH,
+                "BTC artifact on disk does not match attestation timestamp count.",
+            )
+
+        eth_cold = validate_source_artifact(
+            repo_root,
+            eth_rec,
+            expected_product=eth_rec.product,
+            expected_cadence=eth_rec.cadence,
+        )
+        if eth_cold.status != H40SourceStatus.VERIFIED:
+            raise H40GuardError(
+                eth_cold.reason_code or H40ReasonCode.NOT_TESTABLE,
+                f"ETH artifact cold validation failed: {eth_cold.notes}",
+            )
+        if eth_cold.file_sha256 != self.attestation.eth_file_sha256:
+            raise H40GuardError(
+                H40ReasonCode.SOURCE_HASH_MISMATCH,
+                "ETH artifact on disk does not match attestation file SHA-256.",
+            )
+        if eth_cold.timestamp_membership_hash != self.attestation.eth_membership_sha256:
+            raise H40GuardError(
+                H40ReasonCode.SOURCE_HASH_MISMATCH,
+                "ETH artifact on disk does not match attestation timestamp membership hash.",
+            )
+        if eth_cold.timestamp_count != self.attestation.eth_timestamp_count:
+            raise H40GuardError(
+                H40ReasonCode.INTERVAL_MISMATCH,
+                "ETH artifact on disk does not match attestation timestamp count.",
+            )
+
+        # 5. Extract verified source timestamps from artifacts and cold-reconstruct split
+        btc_timestamps = extract_verified_source_timestamps(
+            repo_root=repo_root,
+            record=btc_rec,
+            expected_product=btc_rec.product,
+            expected_cadence=btc_rec.cadence,
+        )
+        eth_timestamps = extract_verified_source_timestamps(
+            repo_root=repo_root,
+            record=eth_rec,
+            expected_product=eth_rec.product,
+            expected_cadence=eth_rec.cadence,
+        )
+
+        common_set = set(btc_timestamps).intersection(set(eth_timestamps))
+        if not common_set:
+            raise H40GuardError(
+                H40ReasonCode.SOURCE_UNVERIFIED,
+                "No overlapping timestamps found between cold BTC and ETH sources.",
+            )
+        common_timestamps = sorted(common_set)
+
+        reconstructed_partitions, reconstructed_base_count, reconstructed_exclusions = (
+            _compute_partitions_from_timestamps(common_timestamps)
+        )
+
+        if reconstructed_base_count != self.base_eligible_count:
+            raise H40GuardError(
+                H40ReasonCode.INTERVAL_MISMATCH,
+                f"Reconstructed base eligible count {reconstructed_base_count} does not match "
+                f"persisted count {self.base_eligible_count}.",
+            )
+        if reconstructed_exclusions != self.exclusion_counts:
+            raise H40GuardError(
+                H40ReasonCode.INTERVAL_MISMATCH,
+                "Reconstructed exclusion counts do not match persisted exclusion counts.",
+            )
+        if reconstructed_partitions != self.partitions:
+            raise H40GuardError(
+                H40ReasonCode.SOURCE_HASH_MISMATCH,
+                "Reconstructed partitions from cold artifacts do not match persisted partitions.",
+            )
+
+        reconstructed_manifest = H40SplitManifest(
+            protocol_identity_hash=self.protocol_identity_hash,
+            source_manifest_hash=self.source_manifest_hash,
+            base_eligible_start_utc=self.base_eligible_start_utc,
+            base_eligible_end_utc=self.base_eligible_end_utc,
+            base_eligible_count=reconstructed_base_count,
+            partitions=reconstructed_partitions,
+            exclusion_counts=reconstructed_exclusions,
+            is_authoritative=False,
+            attestation=None,
+        )
+        if reconstructed_manifest.split_hash != self.split_hash:
+            raise H40GuardError(
+                H40ReasonCode.SOURCE_HASH_MISMATCH,
+                f"Reconstructed split hash '{reconstructed_manifest.split_hash}' does not match "
+                f"persisted split hash '{self.split_hash}'.",
+            )
+
     @classmethod
     def get_base_eligible_timestamps(cls) -> list[str]:
         """Returns the full list of 43,825 base-eligible hourly timestamps."""
@@ -773,11 +1027,12 @@ class H40SplitManifest:
         repo_root: Path | str,
         btc_source_id: str = "BTCUSDT_USD_M_1H",
         eth_source_id: str = "ETHUSDT_USD_M_1H",
-        authority_policy: H40AuthorityPolicy | None = None,
     ) -> H40SplitManifest:
-        """Authoritative split builder: materializes split partitions from verified source authority on disk."""
-        policy = authority_policy or H40AuthorityPolicy.production_canonical()
+        """Authoritative split builder: materializes split partitions from verified source authority on disk.
 
+        CRITICAL: Always enforces production canonical source specifications for BTC and ETH.
+        No policy or bypass parameter is accepted.
+        """
         if source_manifest.protocol_identity_hash != protocol_identity_hash:
             raise H40GuardError(
                 H40ReasonCode.SOURCE_UNVERIFIED,
@@ -806,9 +1061,8 @@ class H40SplitManifest:
                 f"Source record '{eth_source_id}' is not verified or lacks verified receipt.",
             )
 
-        if policy.is_production:
-            assert_canonical_source_record(btc_rec, protocol_identity_hash)
-            assert_canonical_source_record(eth_rec, protocol_identity_hash)
+        assert_canonical_source_record(btc_rec, protocol_identity_hash)
+        assert_canonical_source_record(eth_rec, protocol_identity_hash)
 
         btc_ts = extract_verified_source_timestamps(
             repo_root=repo_root,
@@ -823,9 +1077,7 @@ class H40SplitManifest:
             expected_cadence="1h",
         )
 
-        btc_set = set(btc_ts)
-        eth_set = set(eth_ts)
-        common_set = btc_set.intersection(eth_set)
+        common_set = set(btc_ts).intersection(set(eth_ts))
         if not common_set:
             raise H40GuardError(
                 H40ReasonCode.SOURCE_UNVERIFIED,
@@ -864,7 +1116,7 @@ class H40SplitManifest:
             eth_file_sha256=eth_rec.receipt.file_sha256,
             eth_membership_sha256=eth_rec.receipt.timestamp_membership_hash,
             eth_timestamp_count=eth_rec.receipt.timestamp_count,
-            is_production_canonical=policy.is_production,
+            is_production_canonical=True,
         )
 
         return cls(
@@ -876,6 +1128,117 @@ class H40SplitManifest:
             partitions=partitions,
             exclusion_counts=exclusion_counts,
             is_authoritative=True,
+            attestation=attestation,
+        )
+
+    @classmethod
+    def materialize_synthetic_validator_split(
+        cls,
+        protocol_identity_hash: str,
+        source_manifest: H40SourceManifest,
+        repo_root: Path | str,
+        btc_source_id: str = "BTCUSDT_USD_M_1H",
+        eth_source_id: str = "ETHUSDT_USD_M_1H",
+    ) -> H40SplitManifest:
+        """Test-only helper for verifying split partition & validator mechanics on synthetic fixtures.
+
+        CRITICAL INVARIANTS:
+        - Output has is_authoritative = False
+        - Attestation has is_production_canonical = False
+        - Strictly rejected by assert_authoritative(...)
+        - Validated exclusively via assert_synthetic_validator_split(...)
+        """
+        if source_manifest.protocol_identity_hash != protocol_identity_hash:
+            raise H40GuardError(
+                H40ReasonCode.SOURCE_UNVERIFIED,
+                "Source manifest protocol identity hash does not match requested protocol identity hash.",
+            )
+
+        btc_rec = source_manifest.get_source(btc_source_id)
+        if (
+            btc_rec.status != H40SourceStatus.VERIFIED
+            or btc_rec.receipt is None
+            or btc_rec.receipt.status != H40SourceStatus.VERIFIED
+        ):
+            raise H40GuardError(
+                H40ReasonCode.SOURCE_UNVERIFIED,
+                f"Source record '{btc_source_id}' is not verified or lacks verified receipt.",
+            )
+
+        eth_rec = source_manifest.get_source(eth_source_id)
+        if (
+            eth_rec.status != H40SourceStatus.VERIFIED
+            or eth_rec.receipt is None
+            or eth_rec.receipt.status != H40SourceStatus.VERIFIED
+        ):
+            raise H40GuardError(
+                H40ReasonCode.SOURCE_UNVERIFIED,
+                f"Source record '{eth_source_id}' is not verified or lacks verified receipt.",
+            )
+
+        btc_ts = extract_verified_source_timestamps(
+            repo_root=repo_root,
+            record=btc_rec,
+            expected_product=btc_rec.product,
+            expected_cadence=btc_rec.cadence,
+        )
+        eth_ts = extract_verified_source_timestamps(
+            repo_root=repo_root,
+            record=eth_rec,
+            expected_product=eth_rec.product,
+            expected_cadence=eth_rec.cadence,
+        )
+
+        common_set = set(btc_ts).intersection(set(eth_ts))
+        if not common_set:
+            raise H40GuardError(
+                H40ReasonCode.SOURCE_UNVERIFIED,
+                "No overlapping timestamps found between BTC and ETH sources.",
+            )
+        common_timestamps = sorted(common_set)
+
+        partitions, base_count, exclusion_counts = _compute_partitions_from_timestamps(common_timestamps)
+
+        candidate_manifest = cls(
+            protocol_identity_hash=protocol_identity_hash,
+            source_manifest_hash=source_manifest.manifest_hash,
+            base_eligible_start_utc=BASE_ELIGIBLE_START_UTC,
+            base_eligible_end_utc=BASE_ELIGIBLE_END_UTC,
+            base_eligible_count=base_count,
+            partitions=partitions,
+            exclusion_counts=exclusion_counts,
+            is_authoritative=False,
+            attestation=None,
+        )
+        split_hash = candidate_manifest.split_hash
+
+        assert btc_rec.receipt is not None and eth_rec.receipt is not None
+        attestation = H40SplitAttestation.create(
+            protocol_identity_hash=protocol_identity_hash,
+            source_manifest_hash=source_manifest.manifest_hash,
+            split_hash=split_hash,
+            btc_source_id=btc_rec.source_id,
+            btc_locator=btc_rec.locator,
+            btc_file_sha256=btc_rec.receipt.file_sha256,
+            btc_membership_sha256=btc_rec.receipt.timestamp_membership_hash,
+            btc_timestamp_count=btc_rec.receipt.timestamp_count,
+            eth_source_id=eth_rec.source_id,
+            eth_locator=eth_rec.locator,
+            eth_file_sha256=eth_rec.receipt.file_sha256,
+            eth_membership_sha256=eth_rec.receipt.timestamp_membership_hash,
+            eth_timestamp_count=eth_rec.receipt.timestamp_count,
+            is_production_canonical=False,
+        )
+
+        return cls(
+            protocol_identity_hash=protocol_identity_hash,
+            source_manifest_hash=source_manifest.manifest_hash,
+            base_eligible_start_utc=BASE_ELIGIBLE_START_UTC,
+            base_eligible_end_utc=BASE_ELIGIBLE_END_UTC,
+            base_eligible_count=base_count,
+            partitions=partitions,
+            exclusion_counts=exclusion_counts,
+            is_authoritative=False,
             attestation=attestation,
         )
 

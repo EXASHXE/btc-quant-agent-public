@@ -409,28 +409,10 @@ class H40CanonicalSourceSpec:
     locator: str
     allowed_role: str
     origin_provenance: str
+    production_authority_state: H40SourceStatus = H40SourceStatus.NOT_TESTABLE
     reference_file_sha256: str | None = None
     archive_set_sha256: str | None = None
     protocol_identity_hash: str | None = None
-
-
-@dataclass(frozen=True)
-class H40AuthorityPolicy:
-    """Policy governing source canonicality checks during split materialization and assertion."""
-
-    is_production: bool = True
-    allow_synthetic_test_sources: bool = False
-    notes: str = ""
-
-    @classmethod
-    def production_canonical(cls) -> H40AuthorityPolicy:
-        """Production policy: strictly enforces canonical H40 source specification."""
-        return cls(is_production=True, allow_synthetic_test_sources=False, notes="Production canonical H40 authority.")
-
-    @classmethod
-    def test_synthetic(cls, reason: str = "Validator mechanics testing") -> H40AuthorityPolicy:
-        """Test-only policy: permits synthetic locators for testing validator mechanics."""
-        return cls(is_production=False, allow_synthetic_test_sources=True, notes=f"TEST_ONLY: {reason}")
 
 
 def get_canonical_source_spec(
@@ -447,12 +429,19 @@ def get_canonical_source_spec(
             f"Source '{source_id}' is not an authorized canonical H40 source.",
         ) from None
 
-    role = (
-        "PRIMARY_SPLIT_INPUT"
-        if source_id in ("BTCUSDT_USD_M_1H", "ETHUSDT_USD_M_1H")
-        else "DIAGNOSTIC_OR_AUXILIARY"
-    )
-    provenance = record.notes or "H40 Preregistered Source Authority"
+    if source_id == "BTCUSDT_USD_M_1H":
+        role = "PRIMARY_SPLIT_INPUT"
+        provenance = record.notes or "BTCUSDT USD-M 1h klines reference"
+        authority_state = H40SourceStatus.NOT_TESTABLE
+    elif source_id == "ETHUSDT_USD_M_1H":
+        role = "PRIMARY_SPLIT_INPUT"
+        provenance = record.notes or "ETHUSDT USD-M 1h klines reference"
+        authority_state = H40SourceStatus.VERIFIED
+    else:
+        role = "DIAGNOSTIC_OR_AUXILIARY"
+        provenance = record.notes or "H40 Auxiliary Source"
+        authority_state = H40SourceStatus.NOT_TESTABLE
+
     return H40CanonicalSourceSpec(
         source_id=record.source_id,
         product=record.product,
@@ -460,6 +449,7 @@ def get_canonical_source_spec(
         locator=record.locator,
         allowed_role=role,
         origin_provenance=provenance,
+        production_authority_state=authority_state,
         reference_file_sha256=record.file_sha256,
         archive_set_sha256=record.archive_set_sha256,
         protocol_identity_hash=protocol_identity_hash,
@@ -479,6 +469,7 @@ def assert_canonical_source_record(
     - locator
     - archive_set_sha256
     - reference_file_sha256 where frozen by protocol
+    - production authority state when not established
     """
     spec = get_canonical_source_spec(protocol_identity_hash, record.source_id)
     if record.product != spec.product:
@@ -497,14 +488,19 @@ def assert_canonical_source_record(
             f"Source '{record.source_id}' locator mismatch: expected canonical '{spec.locator}', got '{record.locator}'. "
             "Caller cannot substitute non-canonical locators for production H40 authority.",
         )
+    if spec.production_authority_state != H40SourceStatus.VERIFIED:
+        raise H40GuardError(
+            H40ReasonCode.SOURCE_UNVERIFIED,
+            f"Source '{record.source_id}' production authority is {spec.production_authority_state.value}: "
+            f"canonical 1h production artifact lineage is not yet established by protocol authority.",
+        )
     if spec.archive_set_sha256 is not None and record.archive_set_sha256 != spec.archive_set_sha256:
         raise H40GuardError(
             H40ReasonCode.SOURCE_HASH_MISMATCH,
             f"Source '{record.source_id}' archive set SHA mismatch: expected '{spec.archive_set_sha256}', got '{record.archive_set_sha256}'.",
         )
     if (
-        record.source_id == "ETHUSDT_USD_M_1H"
-        and spec.reference_file_sha256 is not None
+        spec.reference_file_sha256 is not None
         and record.file_sha256 is not None
         and record.file_sha256 != spec.reference_file_sha256
     ):
