@@ -39,11 +39,15 @@ from .protocol import (
     H40ProtocolIdentity,
 )
 from .source_manifest import (
+    H40AuthorityPolicy,
+    H40CanonicalSourceSpec,
     H40SourceManifest,
     H40SourceRecord,
     H40SourceStatus,
     H40SourceValidationReceipt,
+    assert_canonical_source_record,
     extract_verified_source_timestamps,
+    get_canonical_source_spec,
     materialize_verified_manifest,
     validate_source_artifact,
 )
@@ -80,6 +84,8 @@ __all__ = [
     "SCHEMA_NAME",
     "SEARCH_BUDGET",
     "SOL_ACCEPTANCE_COMMIT",
+    "H40AuthorityPolicy",
+    "H40CanonicalSourceSpec",
     "H40ConfigurationLedger",
     "H40ConfigurationSlot",
     "H40ConfirmationGuard",
@@ -99,7 +105,9 @@ __all__ = [
     "H40SourceValidationReceipt",
     "H40SplitAttestation",
     "H40SplitManifest",
+    "assert_canonical_source_record",
     "extract_verified_source_timestamps",
+    "get_canonical_source_spec",
     "materialize_verified_manifest",
     "validate_source_artifact",
 ]

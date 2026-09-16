@@ -17,8 +17,10 @@ from typing import Any
 from ..research_contract.canonical import canonical_json, canonical_sha256
 from .guards import H40GuardError, H40ReasonCode
 from .source_manifest import (
+    H40AuthorityPolicy,
     H40SourceManifest,
     H40SourceStatus,
+    assert_canonical_source_record,
     extract_verified_source_timestamps,
     validate_source_artifact,
 )
@@ -163,6 +165,7 @@ class H40SplitAttestation:
     eth_membership_sha256: str
     eth_timestamp_count: int
     attestation_hash: str
+    is_production_canonical: bool = True
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -179,6 +182,7 @@ class H40SplitAttestation:
             "eth_file_sha256": self.eth_file_sha256,
             "eth_membership_sha256": self.eth_membership_sha256,
             "eth_timestamp_count": self.eth_timestamp_count,
+            "is_production_canonical": self.is_production_canonical,
             "attestation_hash": self.attestation_hash,
         }
 
@@ -198,6 +202,7 @@ class H40SplitAttestation:
             eth_file_sha256=str(data["eth_file_sha256"]),
             eth_membership_sha256=str(data["eth_membership_sha256"]),
             eth_timestamp_count=int(data["eth_timestamp_count"]),
+            is_production_canonical=bool(data.get("is_production_canonical", True)),
             attestation_hash=str(data["attestation_hash"]),
         )
 
@@ -216,6 +221,7 @@ class H40SplitAttestation:
             "eth_file_sha256": self.eth_file_sha256,
             "eth_membership_sha256": self.eth_membership_sha256,
             "eth_timestamp_count": self.eth_timestamp_count,
+            "is_production_canonical": self.is_production_canonical,
         }
         return canonical_sha256(d)
 
@@ -235,6 +241,7 @@ class H40SplitAttestation:
         eth_file_sha256: str,
         eth_membership_sha256: str,
         eth_timestamp_count: int,
+        is_production_canonical: bool = True,
     ) -> H40SplitAttestation:
         preimage = {
             "protocol_identity_hash": protocol_identity_hash,
@@ -250,6 +257,7 @@ class H40SplitAttestation:
             "eth_file_sha256": eth_file_sha256,
             "eth_membership_sha256": eth_membership_sha256,
             "eth_timestamp_count": eth_timestamp_count,
+            "is_production_canonical": is_production_canonical,
         }
         att_hash = canonical_sha256(preimage)
         return cls(
@@ -266,6 +274,7 @@ class H40SplitAttestation:
             eth_file_sha256=eth_file_sha256,
             eth_membership_sha256=eth_membership_sha256,
             eth_timestamp_count=eth_timestamp_count,
+            is_production_canonical=is_production_canonical,
             attestation_hash=att_hash,
         )
 
@@ -415,6 +424,7 @@ class H40SplitManifest:
         self,
         source_manifest: H40SourceManifest,
         repo_root: Path | str,
+        authority_policy: H40AuthorityPolicy | None = None,
     ) -> None:
         """Verifies split authority against verified source manifest and mandatory cold artifact check.
 
@@ -423,6 +433,7 @@ class H40SplitManifest:
         - Attestation is missing or invalid
         - Source manifest is not supplied or manifest hash mismatches
         - repo_root is not supplied or invalid
+        - Policy is production and attestation or source records violate canonical specification
         - Source manifest does not contain verified BTC and ETH receipts matching attestation
         - Cold validation against repo_root fails or produces differing bytes/timestamps
         - Cold partition reconstruction from artifact timestamps does not match persisted partitions
@@ -448,6 +459,13 @@ class H40SplitManifest:
                 H40ReasonCode.SOURCE_UNVERIFIED,
                 "Split authority cannot be verified without a cold artifact repository root; "
                 "supply a valid repo_root.",
+            )
+
+        policy = authority_policy or H40AuthorityPolicy.production_canonical()
+        if policy.is_production and not getattr(self.attestation, "is_production_canonical", True):
+            raise H40GuardError(
+                H40ReasonCode.SOURCE_UNVERIFIED,
+                "Split attestation is TEST_ONLY and cannot obtain production H40 split authority.",
             )
 
         # 1. Attestation self-consistency
@@ -499,6 +517,8 @@ class H40SplitManifest:
                 H40ReasonCode.SOURCE_UNVERIFIED,
                 "BTC source record in source manifest is not VERIFIED.",
             )
+        if policy.is_production:
+            assert_canonical_source_record(btc_rec, self.protocol_identity_hash)
         if btc_rec.locator != self.attestation.btc_locator:
             raise H40GuardError(
                 H40ReasonCode.SOURCE_UNVERIFIED,
@@ -531,6 +551,8 @@ class H40SplitManifest:
                 H40ReasonCode.SOURCE_UNVERIFIED,
                 "ETH source record in source manifest is not VERIFIED.",
             )
+        if policy.is_production:
+            assert_canonical_source_record(eth_rec, self.protocol_identity_hash)
         if eth_rec.locator != self.attestation.eth_locator:
             raise H40GuardError(
                 H40ReasonCode.SOURCE_UNVERIFIED,
@@ -751,8 +773,11 @@ class H40SplitManifest:
         repo_root: Path | str,
         btc_source_id: str = "BTCUSDT_USD_M_1H",
         eth_source_id: str = "ETHUSDT_USD_M_1H",
+        authority_policy: H40AuthorityPolicy | None = None,
     ) -> H40SplitManifest:
         """Authoritative split builder: materializes split partitions from verified source authority on disk."""
+        policy = authority_policy or H40AuthorityPolicy.production_canonical()
+
         if source_manifest.protocol_identity_hash != protocol_identity_hash:
             raise H40GuardError(
                 H40ReasonCode.SOURCE_UNVERIFIED,
@@ -780,6 +805,10 @@ class H40SplitManifest:
                 H40ReasonCode.SOURCE_UNVERIFIED,
                 f"Source record '{eth_source_id}' is not verified or lacks verified receipt.",
             )
+
+        if policy.is_production:
+            assert_canonical_source_record(btc_rec, protocol_identity_hash)
+            assert_canonical_source_record(eth_rec, protocol_identity_hash)
 
         btc_ts = extract_verified_source_timestamps(
             repo_root=repo_root,
@@ -820,23 +849,8 @@ class H40SplitManifest:
         )
         split_hash = candidate_manifest.split_hash
 
-        att_dict = {
-            "protocol_identity_hash": protocol_identity_hash,
-            "source_manifest_hash": source_manifest.manifest_hash,
-            "split_hash": split_hash,
-            "btc_source_id": btc_rec.source_id,
-            "btc_locator": btc_rec.locator,
-            "btc_file_sha256": btc_rec.receipt.file_sha256,
-            "btc_membership_sha256": btc_rec.receipt.timestamp_membership_hash,
-            "btc_timestamp_count": btc_rec.receipt.timestamp_count,
-            "eth_source_id": eth_rec.source_id,
-            "eth_locator": eth_rec.locator,
-            "eth_file_sha256": eth_rec.receipt.file_sha256,
-            "eth_membership_sha256": eth_rec.receipt.timestamp_membership_hash,
-            "eth_timestamp_count": eth_rec.receipt.timestamp_count,
-        }
-        att_hash = canonical_sha256(att_dict)
-        attestation = H40SplitAttestation(
+        assert btc_rec.receipt is not None and eth_rec.receipt is not None
+        attestation = H40SplitAttestation.create(
             protocol_identity_hash=protocol_identity_hash,
             source_manifest_hash=source_manifest.manifest_hash,
             split_hash=split_hash,
@@ -850,7 +864,7 @@ class H40SplitManifest:
             eth_file_sha256=eth_rec.receipt.file_sha256,
             eth_membership_sha256=eth_rec.receipt.timestamp_membership_hash,
             eth_timestamp_count=eth_rec.receipt.timestamp_count,
-            attestation_hash=att_hash,
+            is_production_canonical=policy.is_production,
         )
 
         return cls(

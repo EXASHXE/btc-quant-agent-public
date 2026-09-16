@@ -19,6 +19,8 @@ from btc_quant_agent.h40 import (
     BASE_ELIGIBLE_END_UTC,
     BASE_ELIGIBLE_START_UTC,
     MAX_CONFIGURATION_SLOTS,
+    H40AuthorityPolicy,
+    H40CanonicalSourceSpec,
     H40ConfigurationLedger,
     H40ConfigurationSlot,
     H40ConfirmationGuard,
@@ -37,6 +39,8 @@ from btc_quant_agent.h40 import (
     H40SourceValidationReceipt,
     H40SplitAttestation,
     H40SplitManifest,
+    assert_canonical_source_record,
+    get_canonical_source_spec,
     materialize_verified_manifest,
     validate_source_artifact,
 )
@@ -587,6 +591,7 @@ def test_authoritative_materialization_fails_forged_receipt_wrong_file_sha(tmp_p
             protocol_identity_hash=proto.protocol_hash,
             source_manifest=tampered_manifest,
             repo_root=tmp_path,
+            authority_policy=H40AuthorityPolicy.test_synthetic(),
         )
     assert exc_info.value.reason_code == H40ReasonCode.SOURCE_HASH_MISMATCH
 
@@ -621,6 +626,7 @@ def test_authoritative_materialization_fails_forged_receipt_wrong_membership_has
             protocol_identity_hash=proto.protocol_hash,
             source_manifest=tampered_manifest,
             repo_root=tmp_path,
+            authority_policy=H40AuthorityPolicy.test_synthetic(),
         )
     assert exc_info.value.reason_code == H40ReasonCode.SOURCE_HASH_MISMATCH
 
@@ -655,6 +661,7 @@ def test_authoritative_materialization_fails_receipt_metadata_mismatch(tmp_path:
             protocol_identity_hash=proto.protocol_hash,
             source_manifest=tampered_manifest,
             repo_root=tmp_path,
+            authority_policy=H40AuthorityPolicy.test_synthetic(),
         )
     assert exc_info.value.reason_code == H40ReasonCode.PRODUCT_MISMATCH
 
@@ -669,6 +676,7 @@ def test_authoritative_split_rejects_substituted_source_manifest_hash(tmp_path: 
         protocol_identity_hash=proto.protocol_hash,
         source_manifest=src_manifest_1,
         repo_root=tmp_path,
+        authority_policy=H40AuthorityPolicy.test_synthetic(),
     )
 
     src_manifest_2 = H40SourceManifest(
@@ -677,7 +685,11 @@ def test_authoritative_split_rejects_substituted_source_manifest_hash(tmp_path: 
     )
 
     with pytest.raises(H40GuardError) as exc_info:
-        split.assert_authoritative(source_manifest=src_manifest_2, repo_root=tmp_path)
+        split.assert_authoritative(
+            source_manifest=src_manifest_2,
+            repo_root=tmp_path,
+            authority_policy=H40AuthorityPolicy.test_synthetic(),
+        )
     assert exc_info.value.reason_code == H40ReasonCode.SOURCE_UNVERIFIED
 
 
@@ -714,13 +726,18 @@ def test_serialized_manifest_with_authoritative_true_fails_verification(tmp_path
         protocol_identity_hash=proto.protocol_hash,
         source_manifest=src_manifest,
         repo_root=tmp_path,
+        authority_policy=H40AuthorityPolicy.test_synthetic(),
     )
     data = split.to_dict()
     data["attestation"] = None
 
     tampered_split = H40SplitManifest.from_dict(data)
     with pytest.raises(H40GuardError) as exc_info:
-        tampered_split.assert_authoritative(source_manifest=src_manifest, repo_root=tmp_path)
+        tampered_split.assert_authoritative(
+            source_manifest=src_manifest,
+            repo_root=tmp_path,
+            authority_policy=H40AuthorityPolicy.test_synthetic(),
+        )
     assert exc_info.value.reason_code == H40ReasonCode.SOURCE_UNVERIFIED
 
 
@@ -734,6 +751,7 @@ def test_mutating_source_timestamp_rejects_split_authority(tmp_path: Path) -> No
         protocol_identity_hash=proto.protocol_hash,
         source_manifest=src_manifest,
         repo_root=tmp_path,
+        authority_policy=H40AuthorityPolicy.test_synthetic(),
     )
     assert split.attestation is not None
 
@@ -753,7 +771,11 @@ def test_mutating_source_timestamp_rejects_split_authority(tmp_path: Path) -> No
         attestation=tampered_att,
     )
     with pytest.raises(H40GuardError) as exc_info:
-        tampered_split.assert_authoritative(source_manifest=src_manifest, repo_root=tmp_path)
+        tampered_split.assert_authoritative(
+            source_manifest=src_manifest,
+            repo_root=tmp_path,
+            authority_policy=H40AuthorityPolicy.test_synthetic(),
+        )
     assert exc_info.value.reason_code == H40ReasonCode.SOURCE_HASH_MISMATCH
 
     # Case B: Tampering btc_timestamp_count in attestation
@@ -772,6 +794,7 @@ def test_mutating_source_timestamp_rejects_split_authority(tmp_path: Path) -> No
         eth_file_sha256=tampered_att_data2["eth_file_sha256"],
         eth_membership_sha256=tampered_att_data2["eth_membership_sha256"],
         eth_timestamp_count=tampered_att_data2["eth_timestamp_count"],
+        is_production_canonical=False,
     )
     tampered_split2 = H40SplitManifest(
         protocol_identity_hash=split.protocol_identity_hash,
@@ -785,7 +808,11 @@ def test_mutating_source_timestamp_rejects_split_authority(tmp_path: Path) -> No
         attestation=tampered_att2,
     )
     with pytest.raises(H40GuardError) as exc_info2:
-        tampered_split2.assert_authoritative(source_manifest=src_manifest, repo_root=tmp_path)
+        tampered_split2.assert_authoritative(
+            source_manifest=src_manifest,
+            repo_root=tmp_path,
+            authority_policy=H40AuthorityPolicy.test_synthetic(),
+        )
     assert exc_info2.value.reason_code == H40ReasonCode.INTERVAL_MISMATCH
 
 
@@ -801,6 +828,7 @@ def test_source_gap_persists_in_membership_without_boundary_shifts(tmp_path: Pat
         protocol_identity_hash=proto.protocol_hash,
         source_manifest=src_manifest,
         repo_root=tmp_path,
+        authority_policy=H40AuthorityPolicy.test_synthetic(),
     )
 
     wf1 = split.get_partition("WF1_TRAIN")
@@ -809,7 +837,11 @@ def test_source_gap_persists_in_membership_without_boundary_shifts(tmp_path: Pat
     assert wf1.count == 15312 - 5
     assert split.exclusion_counts[H40ReasonCode.SOURCE_GAP.value] == 5
 
-    split.assert_authoritative(source_manifest=src_manifest, repo_root=tmp_path)
+    split.assert_authoritative(
+        source_manifest=src_manifest,
+        repo_root=tmp_path,
+        authority_policy=H40AuthorityPolicy.test_synthetic(),
+    )
 
 
 def test_missing_local_artifact_fails_closed_not_testable(tmp_path: Path) -> None:
@@ -822,12 +854,17 @@ def test_missing_local_artifact_fails_closed_not_testable(tmp_path: Path) -> Non
         protocol_identity_hash=proto.protocol_hash,
         source_manifest=src_manifest,
         repo_root=tmp_path,
+        authority_policy=H40AuthorityPolicy.test_synthetic(),
     )
 
     (tmp_path / "btc_1h.parquet").unlink()
 
     with pytest.raises(H40GuardError) as exc_info:
-        split.assert_authoritative(source_manifest=src_manifest, repo_root=tmp_path)
+        split.assert_authoritative(
+            source_manifest=src_manifest,
+            repo_root=tmp_path,
+            authority_policy=H40AuthorityPolicy.test_synthetic(),
+        )
     assert exc_info.value.reason_code == H40ReasonCode.SOURCE_MISSING
 
 
@@ -841,11 +878,13 @@ def test_positive_synthetic_chain_succeeds_and_passes_verification(tmp_path: Pat
         protocol_identity_hash=proto.protocol_hash,
         source_manifest=src_manifest,
         repo_root=tmp_path,
+        authority_policy=H40AuthorityPolicy.test_synthetic(),
     )
 
     assert split.is_authoritative
     assert split.attestation is not None
     assert split.attestation.attestation_hash == split.attestation.compute_attestation_hash()
+    assert not split.attestation.is_production_canonical
     assert split.base_eligible_count == BASE_ELIGIBLE_COUNT
     assert split.get_partition("WF1_TRAIN").count == 15312
     assert split.get_partition("CONFIRMATION_HOLDOUT").count == 8737
@@ -854,7 +893,11 @@ def test_positive_synthetic_chain_succeeds_and_passes_verification(tmp_path: Pat
     assert split.exclusion_counts[H40ReasonCode.PURGE_BOUNDARY.value] == 216
     assert split.exclusion_counts[H40ReasonCode.SOURCE_GAP.value] == 0
 
-    split.assert_authoritative(source_manifest=src_manifest, repo_root=tmp_path)
+    split.assert_authoritative(
+        source_manifest=src_manifest,
+        repo_root=tmp_path,
+        authority_policy=H40AuthorityPolicy.test_synthetic(),
+    )
 
 
 def test_positive_split_round_trip_and_cold_verification(tmp_path: Path) -> None:
@@ -867,6 +910,7 @@ def test_positive_split_round_trip_and_cold_verification(tmp_path: Path) -> None
         protocol_identity_hash=proto.protocol_hash,
         source_manifest=src_manifest,
         repo_root=tmp_path,
+        authority_policy=H40AuthorityPolicy.test_synthetic(),
     )
 
     json_str = split.canonical_json()
@@ -877,7 +921,11 @@ def test_positive_split_round_trip_and_cold_verification(tmp_path: Path) -> None
     assert roundtrip_split.split_hash == split.split_hash
     assert roundtrip_split.canonical_json() == json_str
 
-    roundtrip_split.assert_authoritative(source_manifest=src_manifest, repo_root=tmp_path)
+    roundtrip_split.assert_authoritative(
+        source_manifest=src_manifest,
+        repo_root=tmp_path,
+        authority_policy=H40AuthorityPolicy.test_synthetic(),
+    )
 
 
 def test_assert_authoritative_without_cold_data_root_fails(tmp_path: Path) -> None:
@@ -890,16 +938,25 @@ def test_assert_authoritative_without_cold_data_root_fails(tmp_path: Path) -> No
         protocol_identity_hash=proto.protocol_hash,
         source_manifest=src_manifest,
         repo_root=tmp_path,
+        authority_policy=H40AuthorityPolicy.test_synthetic(),
     )
 
     # 1. Calling with repo_root=None explicitly fails closed with SOURCE_UNVERIFIED
     with pytest.raises(H40GuardError) as exc_info:
-        split.assert_authoritative(source_manifest=src_manifest, repo_root=None)  # type: ignore[arg-type]
+        split.assert_authoritative(
+            source_manifest=src_manifest,
+            repo_root=None,
+            authority_policy=H40AuthorityPolicy.test_synthetic(),
+        )  # type: ignore[arg-type]
     assert exc_info.value.reason_code == H40ReasonCode.SOURCE_UNVERIFIED
 
     # 2. Calling with empty string repo_root fails closed with SOURCE_UNVERIFIED
     with pytest.raises(H40GuardError) as exc_info_empty:
-        split.assert_authoritative(source_manifest=src_manifest, repo_root="")
+        split.assert_authoritative(
+            source_manifest=src_manifest,
+            repo_root="",
+            authority_policy=H40AuthorityPolicy.test_synthetic(),
+        )
     assert exc_info_empty.value.reason_code == H40ReasonCode.SOURCE_UNVERIFIED
 
     # 3. Calling without repo_root parameter is impossible at call time (TypeError)
@@ -1127,7 +1184,11 @@ def test_forged_receipts_plus_unrelated_artifact_bytes_fails(tmp_path: Path) -> 
     )
 
     with pytest.raises(H40GuardError) as exc_info:
-        forged_split.assert_authoritative(source_manifest=forged_src, repo_root=tmp_path)
+        forged_split.assert_authoritative(
+            source_manifest=forged_src,
+            repo_root=tmp_path,
+            authority_policy=H40AuthorityPolicy.test_synthetic(),
+        )
     assert exc_info.value.reason_code == H40ReasonCode.SOURCE_HASH_MISMATCH
 
 
@@ -1141,6 +1202,7 @@ def test_persisted_partition_tampering_with_recomputed_attestation_fails_cold_re
         protocol_identity_hash=proto.protocol_hash,
         source_manifest=src_manifest,
         repo_root=tmp_path,
+        authority_policy=H40AuthorityPolicy.test_synthetic(),
     )
 
     # Attacker tampers with WF1_TRAIN count in partitions
@@ -1188,6 +1250,7 @@ def test_persisted_partition_tampering_with_recomputed_attestation_fails_cold_re
         eth_file_sha256=eth_rec.receipt.file_sha256,
         eth_membership_sha256=eth_rec.receipt.timestamp_membership_hash,
         eth_timestamp_count=eth_rec.receipt.timestamp_count,
+        is_production_canonical=False,
     )
 
     tampered_split = H40SplitManifest(
@@ -1205,7 +1268,11 @@ def test_persisted_partition_tampering_with_recomputed_attestation_fails_cold_re
     # In an offline check, tampered_split has matching split_hash, valid attestation, matching source receipts.
     # But assert_authoritative cold-reconstructs the true partitions from disk and fails closed!
     with pytest.raises(H40GuardError) as exc_info:
-        tampered_split.assert_authoritative(source_manifest=src_manifest, repo_root=tmp_path)
+        tampered_split.assert_authoritative(
+            source_manifest=src_manifest,
+            repo_root=tmp_path,
+            authority_policy=H40AuthorityPolicy.test_synthetic(),
+        )
     assert exc_info.value.reason_code == H40ReasonCode.SOURCE_HASH_MISMATCH
 
 
@@ -1219,12 +1286,17 @@ def test_mutate_one_artifact_byte_after_serialization_fails_cold_assertion(tmp_p
         protocol_identity_hash=proto.protocol_hash,
         source_manifest=src_manifest,
         repo_root=tmp_path,
+        authority_policy=H40AuthorityPolicy.test_synthetic(),
     )
     json_str = split.canonical_json()
     roundtrip = H40SplitManifest.from_dict(json.loads(json_str))
 
     # Before mutation: passes
-    roundtrip.assert_authoritative(source_manifest=src_manifest, repo_root=tmp_path)
+    roundtrip.assert_authoritative(
+        source_manifest=src_manifest,
+        repo_root=tmp_path,
+        authority_policy=H40AuthorityPolicy.test_synthetic(),
+    )
 
     # Mutate 1 byte of btc artifact on disk
     btc_path = tmp_path / "btc_1h.parquet"
@@ -1234,7 +1306,11 @@ def test_mutate_one_artifact_byte_after_serialization_fails_cold_assertion(tmp_p
 
     # After mutation: cold verification detects hash tampering
     with pytest.raises(H40GuardError) as exc_info:
-        roundtrip.assert_authoritative(source_manifest=src_manifest, repo_root=tmp_path)
+        roundtrip.assert_authoritative(
+            source_manifest=src_manifest,
+            repo_root=tmp_path,
+            authority_policy=H40AuthorityPolicy.test_synthetic(),
+        )
     assert exc_info.value.reason_code == H40ReasonCode.SOURCE_HASH_MISMATCH
 
 
@@ -1248,6 +1324,7 @@ def test_mutate_one_source_timestamp_after_serialization_fails_cold_assertion(tm
         protocol_identity_hash=proto.protocol_hash,
         source_manifest=src_manifest,
         repo_root=tmp_path,
+        authority_policy=H40AuthorityPolicy.test_synthetic(),
     )
     json_str = split.canonical_json()
     roundtrip = H40SplitManifest.from_dict(json.loads(json_str))
@@ -1258,7 +1335,11 @@ def test_mutate_one_source_timestamp_after_serialization_fails_cold_assertion(tm
     _create_synthetic_parquet(tmp_path / "eth_1h.parquet", "ETHUSDT", mutated_ts)
 
     with pytest.raises(H40GuardError) as exc_info:
-        roundtrip.assert_authoritative(source_manifest=src_manifest, repo_root=tmp_path)
+        roundtrip.assert_authoritative(
+            source_manifest=src_manifest,
+            repo_root=tmp_path,
+            authority_policy=H40AuthorityPolicy.test_synthetic(),
+        )
     assert exc_info.value.reason_code in {H40ReasonCode.SOURCE_HASH_MISMATCH, H40ReasonCode.DUPLICATE_TIMESTAMP}
 
 
@@ -1868,3 +1949,632 @@ def test_adversarial_serialized_manifest_tampering() -> None:
     )
     assert reconstructed_manifest.manifest_hash == tampered_hash
     assert reconstructed_manifest.manifest_hash != original_hash
+
+
+# ==============================================================================
+# 13. Canonical Source Root Binding Adversarial Tests (P1R4)
+# ==============================================================================
+
+def test_noncanonical_locator_cannot_obtain_production_authority(tmp_path: Path) -> None:
+    """1. Non-canonical locators cannot obtain production authority even if file is valid/verified."""
+    proto = H40ProtocolIdentity.default()
+    full_ts = generate_hourly_range("2021-01-01T00:00:00Z", "2026-01-31T23:00:00Z", inclusive_end=True)
+    src_manifest, _, _ = _setup_synthetic_source_manifest(tmp_path, proto.protocol_hash, full_ts, full_ts)
+
+    # Calling materialize_authoritative with default authority policy (production) MUST fail
+    # because synthetic locators (btc_1h.parquet) do not match canonical spec
+    with pytest.raises(H40GuardError) as exc_info:
+        H40SplitManifest.materialize_authoritative(
+            protocol_identity_hash=proto.protocol_hash,
+            source_manifest=src_manifest,
+            repo_root=tmp_path,
+        )
+    assert exc_info.value.reason_code == H40ReasonCode.SOURCE_UNVERIFIED
+    assert "locator mismatch" in str(exc_info.value)
+
+
+def test_caller_manifest_cannot_redefine_canonical_btc_locator(tmp_path: Path) -> None:
+    """2. Caller custom manifest pointing BTC to arbitrary path cannot obtain production split authority."""
+    proto = H40ProtocolIdentity.default()
+    full_ts = generate_hourly_range("2021-01-01T00:00:00Z", "2026-01-31T23:00:00Z", inclusive_end=True)
+    _create_synthetic_parquet(tmp_path / "data/research/custom_btc.parquet", "BTCUSDT", full_ts)
+    _create_synthetic_parquet(tmp_path / "data/research/cross_asset_1h/ETHUSDT.parquet", "ETHUSDT", full_ts)
+
+    custom_btc = H40SourceRecord(
+        source_id="BTCUSDT_USD_M_1H",
+        status=H40SourceStatus.UNVERIFIED,
+        locator="data/research/custom_btc.parquet",
+        product="BTCUSDT",
+        cadence="1h",
+    )
+    custom_eth = H40SourceRecord(
+        source_id="ETHUSDT_USD_M_1H",
+        status=H40SourceStatus.UNVERIFIED,
+        locator="data/research/cross_asset_1h/ETHUSDT.parquet",
+        product="ETHUSDT",
+        cadence="1h",
+    )
+    btc_receipt = validate_source_artifact(tmp_path, custom_btc, expected_product="BTCUSDT", expected_cadence="1h")
+    eth_receipt = validate_source_artifact(tmp_path, custom_eth, expected_product="ETHUSDT", expected_cadence="1h")
+    assert btc_receipt.status == H40SourceStatus.VERIFIED
+    assert eth_receipt.status == H40SourceStatus.VERIFIED
+
+    custom_src = H40SourceManifest(
+        protocol_identity_hash=proto.protocol_hash,
+        sources=(
+            H40SourceRecord(
+                source_id="BTCUSDT_USD_M_1H",
+                status=H40SourceStatus.VERIFIED,
+                locator=custom_btc.locator,
+                product=custom_btc.product,
+                cadence=custom_btc.cadence,
+                receipt=btc_receipt,
+            ),
+            H40SourceRecord(
+                source_id="ETHUSDT_USD_M_1H",
+                status=H40SourceStatus.VERIFIED,
+                locator=custom_eth.locator,
+                product=custom_eth.product,
+                cadence=custom_eth.cadence,
+                receipt=eth_receipt,
+            ),
+        ),
+    )
+
+    with pytest.raises(H40GuardError) as exc_info:
+        H40SplitManifest.materialize_authoritative(
+            protocol_identity_hash=proto.protocol_hash,
+            source_manifest=custom_src,
+            repo_root=tmp_path,
+        )
+    assert exc_info.value.reason_code == H40ReasonCode.SOURCE_UNVERIFIED
+    assert "locator mismatch" in str(exc_info.value)
+
+
+def test_caller_manifest_cannot_redefine_canonical_eth_locator(tmp_path: Path) -> None:
+    """3. Caller custom manifest pointing ETH to arbitrary path cannot obtain production split authority."""
+    proto = H40ProtocolIdentity.default()
+    full_ts = generate_hourly_range("2021-01-01T00:00:00Z", "2026-01-31T23:00:00Z", inclusive_end=True)
+    _create_synthetic_parquet(tmp_path / "data/research/custom_eth.parquet", "ETHUSDT", full_ts)
+
+    custom_eth = H40SourceRecord(
+        source_id="ETHUSDT_USD_M_1H",
+        status=H40SourceStatus.UNVERIFIED,
+        locator="data/research/custom_eth.parquet",
+        product="ETHUSDT",
+        cadence="1h",
+    )
+    eth_receipt = validate_source_artifact(tmp_path, custom_eth, expected_product="ETHUSDT", expected_cadence="1h")
+    assert eth_receipt.status == H40SourceStatus.VERIFIED
+
+    verified_eth = H40SourceRecord(
+        source_id="ETHUSDT_USD_M_1H",
+        status=H40SourceStatus.VERIFIED,
+        locator=custom_eth.locator,
+        product=custom_eth.product,
+        cadence=custom_eth.cadence,
+        receipt=eth_receipt,
+    )
+
+    with pytest.raises(H40GuardError) as exc_info:
+        assert_canonical_source_record(verified_eth, proto.protocol_hash)
+    assert exc_info.value.reason_code == H40ReasonCode.SOURCE_UNVERIFIED
+    assert "locator mismatch" in str(exc_info.value)
+
+
+def test_wrong_product_or_cadence_rejected_in_canonical_spec() -> None:
+    """4. Records with mismatched product or cadence fail canonical source specification check."""
+    proto = H40ProtocolIdentity.default()
+
+    # Case A: Wrong BTC product
+    btc_wrong_product = H40SourceRecord(
+        source_id="BTCUSDT_USD_M_1H",
+        status=H40SourceStatus.UNVERIFIED,
+        locator="data/research/BTCUSDT/data_manifest.json",
+        product="BTCUSDC",
+        cadence="1h",
+    )
+    with pytest.raises(H40GuardError) as exc_a:
+        assert_canonical_source_record(btc_wrong_product, proto.protocol_hash)
+    assert exc_a.value.reason_code == H40ReasonCode.PRODUCT_MISMATCH
+
+    # Case B: Wrong BTC cadence
+    btc_wrong_cadence = H40SourceRecord(
+        source_id="BTCUSDT_USD_M_1H",
+        status=H40SourceStatus.UNVERIFIED,
+        locator="data/research/BTCUSDT/data_manifest.json",
+        product="BTCUSDT",
+        cadence="1m",
+    )
+    with pytest.raises(H40GuardError) as exc_b:
+        assert_canonical_source_record(btc_wrong_cadence, proto.protocol_hash)
+    assert exc_b.value.reason_code == H40ReasonCode.INTERVAL_MISMATCH
+
+    # Case C: Wrong ETH product
+    eth_wrong_product = H40SourceRecord(
+        source_id="ETHUSDT_USD_M_1H",
+        status=H40SourceStatus.UNVERIFIED,
+        locator="data/research/cross_asset_1h/ETHUSDT.parquet",
+        product="ETHBTC",
+        cadence="1h",
+    )
+    with pytest.raises(H40GuardError) as exc_c:
+        assert_canonical_source_record(eth_wrong_product, proto.protocol_hash)
+    assert exc_c.value.reason_code == H40ReasonCode.PRODUCT_MISMATCH
+
+    # Case D: Wrong ETH cadence
+    eth_wrong_cadence = H40SourceRecord(
+        source_id="ETHUSDT_USD_M_1H",
+        status=H40SourceStatus.UNVERIFIED,
+        locator="data/research/cross_asset_1h/ETHUSDT.parquet",
+        product="ETHUSDT",
+        cadence="1d",
+    )
+    with pytest.raises(H40GuardError) as exc_d:
+        assert_canonical_source_record(eth_wrong_cadence, proto.protocol_hash)
+    assert exc_d.value.reason_code == H40ReasonCode.INTERVAL_MISMATCH
+
+
+def test_unauthorized_source_id_fails_canonical_spec() -> None:
+    """5. Unknown or non-canonical source_id fails canonical source spec lookup and assertion."""
+    proto = H40ProtocolIdentity.default()
+
+    with pytest.raises(H40GuardError) as exc_info:
+        get_canonical_source_spec(proto.protocol_hash, "SOLUSDT_USD_M_1H")
+    assert exc_info.value.reason_code == H40ReasonCode.SOURCE_UNVERIFIED
+
+    unauthorized_record = H40SourceRecord(
+        source_id="SOLUSDT_USD_M_1H",
+        status=H40SourceStatus.UNVERIFIED,
+        locator="data/research/SOLUSDT.parquet",
+        product="SOLUSDT",
+        cadence="1h",
+    )
+    with pytest.raises(H40GuardError) as exc_rec:
+        assert_canonical_source_record(unauthorized_record, proto.protocol_hash)
+    assert exc_rec.value.reason_code == H40ReasonCode.SOURCE_UNVERIFIED
+
+
+def test_tampered_archive_checksum_fails_canonical_spec() -> None:
+    """6. Records with mismatched archive_set_sha256 or frozen reference file SHA fail closed."""
+    proto = H40ProtocolIdentity.default()
+    eth_spec = get_canonical_source_spec(proto.protocol_hash, "ETHUSDT_USD_M_1H")
+    assert isinstance(eth_spec, H40CanonicalSourceSpec)
+    assert eth_spec.archive_set_sha256 is not None
+
+    # Tampered archive set SHA
+    eth_tampered_archive = H40SourceRecord(
+        source_id="ETHUSDT_USD_M_1H",
+        status=H40SourceStatus.UNVERIFIED,
+        locator="data/research/cross_asset_1h/ETHUSDT.parquet",
+        product="ETHUSDT",
+        cadence="1h",
+        archive_set_sha256="0" * 64,
+    )
+    with pytest.raises(H40GuardError) as exc_a:
+        assert_canonical_source_record(eth_tampered_archive, proto.protocol_hash)
+    assert exc_a.value.reason_code == H40ReasonCode.SOURCE_HASH_MISMATCH
+
+    # Tampered file SHA for ETH
+    assert eth_spec.reference_file_sha256 is not None
+    eth_tampered_file_sha = H40SourceRecord(
+        source_id="ETHUSDT_USD_M_1H",
+        status=H40SourceStatus.UNVERIFIED,
+        locator="data/research/cross_asset_1h/ETHUSDT.parquet",
+        product="ETHUSDT",
+        cadence="1h",
+        archive_set_sha256=eth_spec.archive_set_sha256,
+        file_sha256="1" * 64,
+    )
+    with pytest.raises(H40GuardError) as exc_b:
+        assert_canonical_source_record(eth_tampered_file_sha, proto.protocol_hash)
+    assert exc_b.value.reason_code == H40ReasonCode.SOURCE_HASH_MISMATCH
+
+
+def test_caller_replacement_reference_cannot_redefine_production_authority(tmp_path: Path) -> None:
+    """7. Caller-provided replacement reference manifest cannot redefine canonical production H40 authority."""
+    proto = H40ProtocolIdentity.default()
+    full_ts = generate_hourly_range("2021-01-01T00:00:00Z", "2026-01-31T23:00:00Z", inclusive_end=True)
+
+    # Caller creates an alternative reference manifest pointing to custom files
+    _create_synthetic_parquet(tmp_path / "custom_btc.parquet", "BTCUSDT", full_ts)
+    _create_synthetic_parquet(tmp_path / "custom_eth.parquet", "ETHUSDT", full_ts)
+
+    custom_ref = H40SourceManifest(
+        protocol_identity_hash=proto.protocol_hash,
+        sources=(
+            H40SourceRecord(
+                source_id="BTCUSDT_USD_M_1H",
+                status=H40SourceStatus.UNVERIFIED,
+                locator="custom_btc.parquet",
+                product="BTCUSDT",
+                cadence="1h",
+            ),
+            H40SourceRecord(
+                source_id="ETHUSDT_USD_M_1H",
+                status=H40SourceStatus.UNVERIFIED,
+                locator="custom_eth.parquet",
+                product="ETHUSDT",
+                cadence="1h",
+            ),
+        ),
+    )
+
+    caller_manifest = materialize_verified_manifest(
+        repo_root=tmp_path,
+        protocol_identity_hash=proto.protocol_hash,
+        reference_manifest=custom_ref,
+    )
+
+    # When trying to obtain production split authority with this manifest:
+    with pytest.raises(H40GuardError) as exc_info:
+        H40SplitManifest.materialize_authoritative(
+            protocol_identity_hash=proto.protocol_hash,
+            source_manifest=caller_manifest,
+            repo_root=tmp_path,
+            authority_policy=H40AuthorityPolicy.production_canonical(),
+        )
+    assert exc_info.value.reason_code == H40ReasonCode.SOURCE_UNVERIFIED
+    assert "locator mismatch" in str(exc_info.value)
+
+
+def test_real_repo_btc_artifact_yields_not_testable_and_fails_closed() -> None:
+    """8. Real repository BTC manifest evaluated under 1h cadence yields NOT_TESTABLE and fails closed."""
+    proto = H40ProtocolIdentity.default()
+    ref = H40SourceManifest.build_preregistered_reference(proto.protocol_hash)
+    btc_ref = ref.get_source("BTCUSDT_USD_M_1H")
+
+    # Evaluate real repo artifact at data/research/BTCUSDT/data_manifest.json
+    receipt = validate_source_artifact(
+        repo_root=Path("."),
+        record=btc_ref,
+        expected_product="BTCUSDT",
+        expected_cadence="1h",
+    )
+    assert receipt.status == H40SourceStatus.NOT_TESTABLE
+    assert receipt.reason_code == H40ReasonCode.INTERVAL_MISMATCH
+    assert "1m" in receipt.notes
+
+    # Materializing on real repo results in NOT_TESTABLE for BTC
+    real_manifest = materialize_verified_manifest(
+        repo_root=Path("."),
+        protocol_identity_hash=proto.protocol_hash,
+    )
+    btc_real = real_manifest.get_source("BTCUSDT_USD_M_1H")
+    assert btc_real.status == H40SourceStatus.NOT_TESTABLE
+
+    # Production authoritative split materialization must fail closed
+    with pytest.raises(H40GuardError) as exc_info:
+        H40SplitManifest.materialize_authoritative(
+            protocol_identity_hash=proto.protocol_hash,
+            source_manifest=real_manifest,
+            repo_root=Path("."),
+        )
+    assert exc_info.value.reason_code == H40ReasonCode.SOURCE_UNVERIFIED
+
+
+def test_protected_h39_final_holdout_substitution_denied_before_read() -> None:
+    """9. Attempting to use an H39 or final holdout path as a source root fails closed before disk read."""
+    protected_locators = [
+        "artifacts/final_holdout/data.csv",
+        "data/research/h39_validation/raw.parquet",
+        "data/v0323_h39/labels.json",
+        "artifacts/v0.3.23_holdout/data.parquet",
+        "data/research/h39_protected/signals.parquet",
+    ]
+    for loc in protected_locators:
+        with pytest.raises(H40GuardError) as exc_info:
+            H40SourceRecord(
+                source_id="BTCUSDT_USD_M_1H",
+                status=H40SourceStatus.UNVERIFIED,
+                locator=loc,
+                product="BTCUSDT",
+                cadence="1h",
+            )
+        assert exc_info.value.reason_code == H40ReasonCode.PROTECTED_SURFACE_DENIED
+
+    # Attempting to use forbidden source_id fails closed before read
+    forbidden_source_ids = ["H39_PRIMARY", "FINAL_HOLDOUT_BTC"]
+    for sid in forbidden_source_ids:
+        with pytest.raises(H40GuardError) as exc_id:
+            H40SourceRecord(
+                source_id=sid,
+                status=H40SourceStatus.UNVERIFIED,
+                locator="data/research/BTCUSDT/data_manifest.json",
+                product="BTCUSDT",
+                cadence="1h",
+            )
+        assert exc_id.value.reason_code == H40ReasonCode.PROTECTED_SURFACE_DENIED
+
+
+def test_offline_forgery_attacks_remain_closed(tmp_path: Path) -> None:
+    """10. Offline forgery attacks claiming production authority are rejected by cold verification."""
+    proto = H40ProtocolIdentity.default()
+    full_ts = generate_hourly_range("2021-01-01T00:00:00Z", "2026-01-31T23:00:00Z", inclusive_end=True)
+
+    fake_file_sha = "e" * 64
+    fake_mem_sha = hashlib.sha256(",".join(full_ts).encode("utf-8")).hexdigest()
+
+    btc_rec = H40SourceRecord(
+        source_id="BTCUSDT_USD_M_1H",
+        status=H40SourceStatus.VERIFIED,
+        locator="data/research/BTCUSDT/data_manifest.json",
+        product="BTCUSDT",
+        cadence="1h",
+        row_count=len(full_ts),
+        file_sha256=fake_file_sha,
+        receipt=H40SourceValidationReceipt(
+            source_id="BTCUSDT_USD_M_1H",
+            locator="data/research/BTCUSDT/data_manifest.json",
+            file_sha256=fake_file_sha,
+            product="BTCUSDT",
+            cadence="1h",
+            timestamp_field="open_time_ms",
+            timestamp_count=len(full_ts),
+            first_timestamp_utc=full_ts[0],
+            last_timestamp_utc=full_ts[-1],
+            duplicate_count=0,
+            gap_count=0,
+            gaps=(),
+            timestamp_membership_hash=fake_mem_sha,
+            status=H40SourceStatus.VERIFIED,
+        ),
+    )
+    eth_rec = H40SourceRecord(
+        source_id="ETHUSDT_USD_M_1H",
+        status=H40SourceStatus.VERIFIED,
+        locator="data/research/cross_asset_1h/ETHUSDT.parquet",
+        product="ETHUSDT",
+        cadence="1h",
+        row_count=len(full_ts),
+        file_sha256=fake_file_sha,
+        receipt=H40SourceValidationReceipt(
+            source_id="ETHUSDT_USD_M_1H",
+            locator="data/research/cross_asset_1h/ETHUSDT.parquet",
+            file_sha256=fake_file_sha,
+            product="ETHUSDT",
+            cadence="1h",
+            timestamp_field="open_time_ms",
+            timestamp_count=len(full_ts),
+            first_timestamp_utc=full_ts[0],
+            last_timestamp_utc=full_ts[-1],
+            duplicate_count=0,
+            gap_count=0,
+            gaps=(),
+            timestamp_membership_hash=fake_mem_sha,
+            status=H40SourceStatus.VERIFIED,
+        ),
+    )
+    forged_manifest = H40SourceManifest(
+        protocol_identity_hash=proto.protocol_hash,
+        sources=(btc_rec, eth_rec),
+    )
+
+    split_ref = H40SplitManifest.build_preregistered_schedule(proto.protocol_hash, forged_manifest.manifest_hash)
+    candidate_split = H40SplitManifest(
+        protocol_identity_hash=proto.protocol_hash,
+        source_manifest_hash=forged_manifest.manifest_hash,
+        base_eligible_start_utc=split_ref.base_eligible_start_utc,
+        base_eligible_end_utc=split_ref.base_eligible_end_utc,
+        base_eligible_count=split_ref.base_eligible_count,
+        partitions=split_ref.partitions,
+        exclusion_counts=split_ref.exclusion_counts,
+        is_authoritative=True,
+        attestation=None,
+    )
+    forged_att = H40SplitAttestation.create(
+        protocol_identity_hash=proto.protocol_hash,
+        source_manifest_hash=forged_manifest.manifest_hash,
+        split_hash=candidate_split.split_hash,
+        btc_source_id=btc_rec.source_id,
+        btc_locator=btc_rec.locator,
+        btc_file_sha256=fake_file_sha,
+        btc_membership_sha256=fake_mem_sha,
+        btc_timestamp_count=len(full_ts),
+        eth_source_id=eth_rec.source_id,
+        eth_locator=eth_rec.locator,
+        eth_file_sha256=fake_file_sha,
+        eth_membership_sha256=fake_mem_sha,
+        eth_timestamp_count=len(full_ts),
+        is_production_canonical=True,
+    )
+    forged_split = H40SplitManifest(
+        protocol_identity_hash=proto.protocol_hash,
+        source_manifest_hash=forged_manifest.manifest_hash,
+        base_eligible_start_utc=split_ref.base_eligible_start_utc,
+        base_eligible_end_utc=split_ref.base_eligible_end_utc,
+        base_eligible_count=split_ref.base_eligible_count,
+        partitions=split_ref.partitions,
+        exclusion_counts=split_ref.exclusion_counts,
+        is_authoritative=True,
+        attestation=forged_att,
+    )
+
+    with pytest.raises(H40GuardError) as exc_info:
+        forged_split.assert_authoritative(
+            source_manifest=forged_manifest,
+            repo_root=tmp_path,
+            authority_policy=H40AuthorityPolicy.production_canonical(),
+        )
+    assert exc_info.value.reason_code in {H40ReasonCode.SOURCE_MISSING, H40ReasonCode.SOURCE_HASH_MISMATCH, H40ReasonCode.NOT_TESTABLE}
+
+
+def test_persisted_split_rehash_attack_remains_closed(tmp_path: Path) -> None:
+    """11. Persisted split partition tampering with rehashed attestation fails cold partition reconstruction."""
+    proto = H40ProtocolIdentity.default()
+    full_ts = generate_hourly_range("2021-01-01T00:00:00Z", "2026-01-31T23:00:00Z", inclusive_end=True)
+    src_manifest, btc_rec, eth_rec = _setup_synthetic_source_manifest(tmp_path, proto.protocol_hash, full_ts, full_ts)
+
+    valid_split = H40SplitManifest.materialize_authoritative(
+        protocol_identity_hash=proto.protocol_hash,
+        source_manifest=src_manifest,
+        repo_root=tmp_path,
+        authority_policy=H40AuthorityPolicy.test_synthetic(),
+    )
+
+    # Tamper with partition count
+    tampered_parts = list(valid_split.partitions)
+    p0 = tampered_parts[0]
+    tampered_parts[0] = H40Partition(
+        partition_id=p0.partition_id,
+        fold=p0.fold,
+        partition_type=p0.partition_type,
+        start_utc=p0.start_utc,
+        end_utc=p0.end_utc,
+        count=p0.count - 100,
+        first_timestamp_utc=p0.first_timestamp_utc,
+        last_timestamp_utc=p0.last_timestamp_utc,
+        timestamps_sha256="rehashed_part_sha",
+    )
+    tampered_split_cand = H40SplitManifest(
+        protocol_identity_hash=valid_split.protocol_identity_hash,
+        source_manifest_hash=valid_split.source_manifest_hash,
+        base_eligible_start_utc=valid_split.base_eligible_start_utc,
+        base_eligible_end_utc=valid_split.base_eligible_end_utc,
+        base_eligible_count=valid_split.base_eligible_count,
+        partitions=tuple(tampered_parts),
+        exclusion_counts=valid_split.exclusion_counts,
+        is_authoritative=True,
+        attestation=None,
+    )
+    assert btc_rec.receipt is not None and eth_rec.receipt is not None
+    tampered_att = H40SplitAttestation.create(
+        protocol_identity_hash=proto.protocol_hash,
+        source_manifest_hash=src_manifest.manifest_hash,
+        split_hash=tampered_split_cand.split_hash,
+        btc_source_id=btc_rec.source_id,
+        btc_locator=btc_rec.locator,
+        btc_file_sha256=btc_rec.receipt.file_sha256,
+        btc_membership_sha256=btc_rec.receipt.timestamp_membership_hash,
+        btc_timestamp_count=btc_rec.receipt.timestamp_count,
+        eth_source_id=eth_rec.source_id,
+        eth_locator=eth_rec.locator,
+        eth_file_sha256=eth_rec.receipt.file_sha256,
+        eth_membership_sha256=eth_rec.receipt.timestamp_membership_hash,
+        eth_timestamp_count=eth_rec.receipt.timestamp_count,
+        is_production_canonical=False,
+    )
+    tampered_split = H40SplitManifest(
+        protocol_identity_hash=valid_split.protocol_identity_hash,
+        source_manifest_hash=valid_split.source_manifest_hash,
+        base_eligible_start_utc=valid_split.base_eligible_start_utc,
+        base_eligible_end_utc=valid_split.base_eligible_end_utc,
+        base_eligible_count=valid_split.base_eligible_count,
+        partitions=tuple(tampered_parts),
+        exclusion_counts=valid_split.exclusion_counts,
+        is_authoritative=True,
+        attestation=tampered_att,
+    )
+
+    with pytest.raises(H40GuardError) as exc_info:
+        tampered_split.assert_authoritative(
+            source_manifest=src_manifest,
+            repo_root=tmp_path,
+            authority_policy=H40AuthorityPolicy.test_synthetic(),
+        )
+    assert exc_info.value.reason_code == H40ReasonCode.SOURCE_HASH_MISMATCH
+
+
+def test_positive_canonical_path_succeeds_only_with_canonical_spec(tmp_path: Path) -> None:
+    """12. Positive canonical path succeeds and produces production canonical attestation when satisfying canonical spec."""
+    import shutil
+
+    import pyarrow.parquet as pq
+
+    from btc_quant_agent.h40.source_manifest import _ms_to_iso
+
+    proto = H40ProtocolIdentity.default()
+
+    # 1. Populate canonical ETH parquet by copying real repo ETHUSDT.parquet (matches canonical SHA & archive_set_sha)
+    eth_dest = tmp_path / "data/research/cross_asset_1h/ETHUSDT.parquet"
+    eth_dest.parent.mkdir(parents=True, exist_ok=True)
+    real_eth = Path("data/research/cross_asset_1h/ETHUSDT.parquet")
+    shutil.copy(real_eth, eth_dest)
+
+    # Extract timestamps from ETH to create perfectly synchronized BTC JSON artifact
+    tab = pq.read_table(eth_dest, columns=["open_time_ms"])
+    eth_timestamps = [_ms_to_iso(int(t)) for t in tab["open_time_ms"].to_pylist()]
+
+    # 2. Populate canonical BTC JSON artifact at data/research/BTCUSDT/data_manifest.json
+    btc_dest = tmp_path / "data/research/BTCUSDT/data_manifest.json"
+    btc_dest.parent.mkdir(parents=True, exist_ok=True)
+    btc_dest.write_text(json.dumps({
+        "symbol": "BTCUSDT",
+        "timeframe": "1h",
+        "timestamps": eth_timestamps,
+    }), encoding="utf-8")
+
+    # Validate ETH conforming to canonical spec
+    eth_cand = H40SourceRecord(
+        source_id="ETHUSDT_USD_M_1H",
+        status=H40SourceStatus.UNVERIFIED,
+        locator="data/research/cross_asset_1h/ETHUSDT.parquet",
+        cadence="1h",
+        product="ETHUSDT",
+        archive_set_sha256="1efde37a765de90e33fd509bd1bcb729351beafa79314f684b3558665b19226c",
+        file_sha256="563a1a4d927ec2a007481783be9bd76896e1be57198af80c4b2a30608e124608",
+    )
+    eth_receipt = validate_source_artifact(tmp_path, eth_cand, expected_product="ETHUSDT", expected_cadence="1h")
+    assert eth_receipt.status == H40SourceStatus.VERIFIED
+
+    # Validate BTC conforming to canonical spec
+    btc_cand = H40SourceRecord(
+        source_id="BTCUSDT_USD_M_1H",
+        status=H40SourceStatus.UNVERIFIED,
+        locator="data/research/BTCUSDT/data_manifest.json",
+        cadence="1h",
+        product="BTCUSDT",
+    )
+    btc_receipt = validate_source_artifact(tmp_path, btc_cand, expected_product="BTCUSDT", expected_cadence="1h")
+    assert btc_receipt.status == H40SourceStatus.VERIFIED
+
+    btc_record = H40SourceRecord(
+        source_id="BTCUSDT_USD_M_1H",
+        status=H40SourceStatus.VERIFIED,
+        locator="data/research/BTCUSDT/data_manifest.json",
+        cadence="1h",
+        product="BTCUSDT",
+        row_count=btc_receipt.timestamp_count,
+        start_utc=btc_receipt.first_timestamp_utc,
+        end_utc=btc_receipt.last_timestamp_utc,
+        file_sha256=btc_receipt.file_sha256,
+        gap_count=0,
+        receipt=btc_receipt,
+    )
+    eth_record = H40SourceRecord(
+        source_id="ETHUSDT_USD_M_1H",
+        status=H40SourceStatus.VERIFIED,
+        locator="data/research/cross_asset_1h/ETHUSDT.parquet",
+        cadence="1h",
+        product="ETHUSDT",
+        row_count=eth_receipt.timestamp_count,
+        start_utc=eth_receipt.first_timestamp_utc,
+        end_utc=eth_receipt.last_timestamp_utc,
+        file_sha256=eth_receipt.file_sha256,
+        archive_set_sha256="1efde37a765de90e33fd509bd1bcb729351beafa79314f684b3558665b19226c",
+        gap_count=0,
+        receipt=eth_receipt,
+    )
+
+    canonical_src_manifest = H40SourceManifest(
+        protocol_identity_hash=proto.protocol_hash,
+        sources=(btc_record, eth_record),
+    )
+
+    # Default policy (production canonical) succeeds on canonical spec conforming inputs!
+    split = H40SplitManifest.materialize_authoritative(
+        protocol_identity_hash=proto.protocol_hash,
+        source_manifest=canonical_src_manifest,
+        repo_root=tmp_path,
+        authority_policy=H40AuthorityPolicy.production_canonical(),
+    )
+    assert split.is_authoritative
+    assert split.attestation is not None
+    assert split.attestation.is_production_canonical is True
+
+    # Cold assertion under production policy succeeds!
+    split.assert_authoritative(
+        source_manifest=canonical_src_manifest,
+        repo_root=tmp_path,
+        authority_policy=H40AuthorityPolicy.production_canonical(),
+    )

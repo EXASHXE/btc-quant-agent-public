@@ -399,6 +399,123 @@ class H40SourceManifest:
         return cls.build_preregistered_reference(protocol_identity_hash)
 
 
+@dataclass(frozen=True)
+class H40CanonicalSourceSpec:
+    """Immutable canonical specification for an authorized H40 data source."""
+
+    source_id: str
+    product: str
+    cadence: str
+    locator: str
+    allowed_role: str
+    origin_provenance: str
+    reference_file_sha256: str | None = None
+    archive_set_sha256: str | None = None
+    protocol_identity_hash: str | None = None
+
+
+@dataclass(frozen=True)
+class H40AuthorityPolicy:
+    """Policy governing source canonicality checks during split materialization and assertion."""
+
+    is_production: bool = True
+    allow_synthetic_test_sources: bool = False
+    notes: str = ""
+
+    @classmethod
+    def production_canonical(cls) -> H40AuthorityPolicy:
+        """Production policy: strictly enforces canonical H40 source specification."""
+        return cls(is_production=True, allow_synthetic_test_sources=False, notes="Production canonical H40 authority.")
+
+    @classmethod
+    def test_synthetic(cls, reason: str = "Validator mechanics testing") -> H40AuthorityPolicy:
+        """Test-only policy: permits synthetic locators for testing validator mechanics."""
+        return cls(is_production=False, allow_synthetic_test_sources=True, notes=f"TEST_ONLY: {reason}")
+
+
+def get_canonical_source_spec(
+    protocol_identity_hash: str,
+    source_id: str,
+) -> H40CanonicalSourceSpec:
+    """Retrieves immutable canonical source specification for a protocol-authorized source ID."""
+    canonical_ref = H40SourceManifest.build_preregistered_reference(protocol_identity_hash)
+    try:
+        record = canonical_ref.get_source(source_id)
+    except KeyError:
+        raise H40GuardError(
+            H40ReasonCode.SOURCE_UNVERIFIED,
+            f"Source '{source_id}' is not an authorized canonical H40 source.",
+        ) from None
+
+    role = (
+        "PRIMARY_SPLIT_INPUT"
+        if source_id in ("BTCUSDT_USD_M_1H", "ETHUSDT_USD_M_1H")
+        else "DIAGNOSTIC_OR_AUXILIARY"
+    )
+    provenance = record.notes or "H40 Preregistered Source Authority"
+    return H40CanonicalSourceSpec(
+        source_id=record.source_id,
+        product=record.product,
+        cadence=record.cadence,
+        locator=record.locator,
+        allowed_role=role,
+        origin_provenance=provenance,
+        reference_file_sha256=record.file_sha256,
+        archive_set_sha256=record.archive_set_sha256,
+        protocol_identity_hash=protocol_identity_hash,
+    )
+
+
+def assert_canonical_source_record(
+    record: H40SourceRecord,
+    protocol_identity_hash: str,
+) -> None:
+    """Asserts that a source record corresponds strictly to canonical H40 specification.
+
+    Fails closed if caller attempts to redefine:
+    - source_id / role
+    - product
+    - cadence
+    - locator
+    - archive_set_sha256
+    - reference_file_sha256 where frozen by protocol
+    """
+    spec = get_canonical_source_spec(protocol_identity_hash, record.source_id)
+    if record.product != spec.product:
+        raise H40GuardError(
+            H40ReasonCode.PRODUCT_MISMATCH,
+            f"Source '{record.source_id}' product mismatch: expected canonical '{spec.product}', got '{record.product}'.",
+        )
+    if record.cadence != spec.cadence:
+        raise H40GuardError(
+            H40ReasonCode.INTERVAL_MISMATCH,
+            f"Source '{record.source_id}' cadence mismatch: expected canonical '{spec.cadence}', got '{record.cadence}'.",
+        )
+    if record.locator != spec.locator:
+        raise H40GuardError(
+            H40ReasonCode.SOURCE_UNVERIFIED,
+            f"Source '{record.source_id}' locator mismatch: expected canonical '{spec.locator}', got '{record.locator}'. "
+            "Caller cannot substitute non-canonical locators for production H40 authority.",
+        )
+    if spec.archive_set_sha256 is not None and record.archive_set_sha256 != spec.archive_set_sha256:
+        raise H40GuardError(
+            H40ReasonCode.SOURCE_HASH_MISMATCH,
+            f"Source '{record.source_id}' archive set SHA mismatch: expected '{spec.archive_set_sha256}', got '{record.archive_set_sha256}'.",
+        )
+    if (
+        record.source_id == "ETHUSDT_USD_M_1H"
+        and spec.reference_file_sha256 is not None
+        and record.file_sha256 is not None
+        and record.file_sha256 != spec.reference_file_sha256
+    ):
+        raise H40GuardError(
+            H40ReasonCode.SOURCE_HASH_MISMATCH,
+            f"Source '{record.source_id}' file SHA mismatch with frozen reference: "
+            f"expected '{spec.reference_file_sha256}', got '{record.file_sha256}'.",
+        )
+
+
+
 def validate_source_artifact(
     repo_root: Path | str,
     record: H40SourceRecord,
