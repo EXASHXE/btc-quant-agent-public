@@ -1,0 +1,96 @@
+"""H40 pre-outcome data, split, and protocol-identity scaffold."""
+
+from .configuration_ledger import (
+    ALLOWED_ACTION_THRESHOLDS,
+    ALLOWED_DEPTH_TWO_PAIRS,
+    ALLOWED_PRIMARY_HORIZONS,
+    MAX_CONFIGURATION_SLOTS,
+    H40ConfigurationLedger,
+    H40ConfigurationSlot,
+    H40Family,
+)
+from .guards import (
+    H40ConfirmationGuard,
+    H40ExecutionGuard,
+    H40GuardError,
+    H40ProtectedSurfaceGuard,
+    H40ReasonCode,
+)
+from .lifecycle import (
+    H40LifecycleState,
+    H40LifecycleStateMachine,
+)
+from .protocol import (
+    ACTION_SPACE,
+    AMENDMENT_R1_COMMIT,
+    AMENDMENT_R2_COMMIT,
+    BASE_PREREG_COMMIT,
+    CADENCE,
+    CONFIRMATION_INTERVAL,
+    COST_PROXY_BPS,
+    DEFAULT_ACTION,
+    DIAGNOSTIC_HORIZONS,
+    FROZEN_KERNEL_SHA,
+    PRIMARY_HORIZONS,
+    PRODUCTS,
+    SCHEMA_NAME,
+    SEARCH_BUDGET,
+    SOL_ACCEPTANCE_COMMIT,
+    H40ProtocolIdentity,
+)
+from .source_manifest import (
+    H40SourceManifest,
+    H40SourceRecord,
+    H40SourceStatus,
+)
+from .split_manifest import (
+    BASE_ELIGIBLE_COUNT,
+    BASE_ELIGIBLE_END_UTC,
+    BASE_ELIGIBLE_START_UTC,
+    H40Partition,
+    H40PartitionType,
+    H40SplitManifest,
+)
+
+__all__ = [
+    "ACTION_SPACE",
+    "ALLOWED_ACTION_THRESHOLDS",
+    "ALLOWED_DEPTH_TWO_PAIRS",
+    "ALLOWED_PRIMARY_HORIZONS",
+    "AMENDMENT_R1_COMMIT",
+    "AMENDMENT_R2_COMMIT",
+    "BASE_ELIGIBLE_COUNT",
+    "BASE_ELIGIBLE_END_UTC",
+    "BASE_ELIGIBLE_START_UTC",
+    "BASE_PREREG_COMMIT",
+    "CADENCE",
+    "CONFIRMATION_INTERVAL",
+    "COST_PROXY_BPS",
+    "DEFAULT_ACTION",
+    "DIAGNOSTIC_HORIZONS",
+    "FROZEN_KERNEL_SHA",
+    "MAX_CONFIGURATION_SLOTS",
+    "PRIMARY_HORIZONS",
+    "PRODUCTS",
+    "SCHEMA_NAME",
+    "SEARCH_BUDGET",
+    "SOL_ACCEPTANCE_COMMIT",
+    "H40ConfigurationLedger",
+    "H40ConfigurationSlot",
+    "H40ConfirmationGuard",
+    "H40ExecutionGuard",
+    "H40Family",
+    "H40GuardError",
+    "H40LifecycleState",
+    "H40LifecycleStateMachine",
+    "H40Partition",
+    "H40PartitionType",
+    "H40ProtectedSurfaceGuard",
+    "H40ProtocolIdentity",
+    "H40ReasonCode",
+    "H40SourceManifest",
+    "H40SourceRecord",
+    "H40SourceStatus",
+    "H40SplitManifest",
+]
+
