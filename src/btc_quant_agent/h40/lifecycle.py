@@ -63,7 +63,26 @@ class H40LifecycleStateMachine:
         H40LifecycleState.NOT_TESTABLE: frozenset(),
     }
 
+    ALLOWED_INITIAL_STATES: ClassVar[frozenset[H40LifecycleState]] = frozenset({
+        H40LifecycleState.H40_PREREGISTERED,
+        H40LifecycleState.H40_P1_SCAFFOLDED,
+    })
+
     def __init__(self, initial_state: H40LifecycleState = H40LifecycleState.H40_P1_SCAFFOLDED) -> None:
+        if initial_state not in self.ALLOWED_INITIAL_STATES:
+            if initial_state in {
+                H40LifecycleState.H40_CONFIRMATION_READY,
+                H40LifecycleState.H40_CONFIRMATION_EVALUATED_ONCE,
+            }:
+                raise H40GuardError(
+                    H40ReasonCode.CONFIRMATION_NOT_READY,
+                    f"Cannot initialize lifecycle directly at confirmation state '{initial_state.value}'.",
+                )
+            raise H40GuardError(
+                H40ReasonCode.NOT_TESTABLE,
+                f"Cannot initialize lifecycle directly at post-scaffold state '{initial_state.value}'. "
+                f"Must start at H40_PREREGISTERED or H40_P1_SCAFFOLDED.",
+            )
         self._current_state = initial_state
 
     @property

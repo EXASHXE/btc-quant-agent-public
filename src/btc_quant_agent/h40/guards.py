@@ -7,7 +7,9 @@ and default-deny execution policies.
 
 from __future__ import annotations
 
+import os
 from enum import Enum
+from pathlib import Path
 
 
 class H40ReasonCode(str, Enum):
@@ -54,16 +56,15 @@ class H40ConfirmationGuard:
 
     Allows inspecting confirmation metadata (e.g., timestamps, partition bounds,
     row counts, partition hash) but strictly denies access to future price series,
-    returns, labels, or candidate evaluation before lifecycle state reaches
-    `H40_CONFIRMATION_READY`.
+    returns, labels, or candidate evaluation during P1/P1R.
     """
 
-    def __init__(self, is_confirmation_ready: bool = False) -> None:
-        self._is_confirmation_ready = is_confirmation_ready
+    def __init__(self) -> None:
+        pass
 
     @property
     def is_ready(self) -> bool:
-        return self._is_confirmation_ready
+        return False
 
     def assert_metadata_accessible(self) -> None:
         """Partition metadata, bounds, and timestamp indices are always accessible."""
@@ -71,12 +72,11 @@ class H40ConfirmationGuard:
 
     def assert_outcomes_accessible(self) -> None:
         """Denies access to confirmation future returns, prices, or evaluation metrics."""
-        if not self._is_confirmation_ready:
-            raise H40GuardError(
-                H40ReasonCode.CONFIRMATION_NOT_READY,
-                "Confirmation partition outcomes, returns, and evaluation are sealed "
-                "until explicit H40_CONFIRMATION_READY authority is granted.",
-            )
+        raise H40GuardError(
+            H40ReasonCode.CONFIRMATION_NOT_READY,
+            "Confirmation partition outcomes, returns, and evaluation are permanently sealed "
+            "during P1/P1R. No caller-controlled unlock exists.",
+        )
 
 
 class H40ProtectedSurfaceGuard:
@@ -91,16 +91,64 @@ class H40ProtectedSurfaceGuard:
         "v0.3.23_holdout",
     )
 
+    FORBIDDEN_SOURCE_IDS: tuple[str, ...] = (
+        "h39",
+        "final_holdout",
+    )
+
     @classmethod
-    def assert_surface_allowed(cls, locator: str) -> None:
-        """Checks if a locator or path touches protected surfaces and fails closed."""
-        lower = locator.lower().replace("\\", "/")
+    def assert_path_allowed(
+        cls,
+        locator: str | Path,
+        source_id: str | None = None,
+        repo_root: Path | str | None = None,
+    ) -> None:
+        """Checks if a locator, path, or source_id touches protected surfaces and fails closed."""
+        # 1. Check source_id if supplied
+        if source_id is not None:
+            s_lower = str(source_id).lower()
+            for marker in cls.FORBIDDEN_SOURCE_IDS:
+                if marker in s_lower:
+                    raise H40GuardError(
+                        H40ReasonCode.PROTECTED_SURFACE_DENIED,
+                        f"Source ID '{source_id}' is a protected surface and permanently denied.",
+                    )
+
+        # 2. Check raw locator string
+        raw_str = str(locator).lower().replace("\\", "/")
         for pattern in cls.FORBIDDEN_LOCATORS:
-            if pattern in lower:
+            if pattern in raw_str:
                 raise H40GuardError(
                     H40ReasonCode.PROTECTED_SURFACE_DENIED,
                     f"Access to protected surface matching '{pattern}' is permanently denied: {locator}",
                 )
+
+        # 3. Check normalized path string (guards against ../ traversal)
+        norm_str = os.path.normpath(str(locator)).lower().replace("\\", "/")
+        for pattern in cls.FORBIDDEN_LOCATORS:
+            if pattern in norm_str:
+                raise H40GuardError(
+                    H40ReasonCode.PROTECTED_SURFACE_DENIED,
+                    f"Normalized path touches protected surface matching '{pattern}': {locator} -> {norm_str}",
+                )
+
+        # 4. If repo_root is provided or locator is absolute/resolvable, safely check resolved path
+        try:
+            candidate = Path(repo_root) / locator if repo_root else Path(locator)
+            resolved_str = str(candidate.resolve()).lower().replace("\\", "/")
+            for pattern in cls.FORBIDDEN_LOCATORS:
+                if pattern in resolved_str:
+                    raise H40GuardError(
+                        H40ReasonCode.PROTECTED_SURFACE_DENIED,
+                        f"Resolved path touches protected surface matching '{pattern}': {candidate} -> {resolved_str}",
+                    )
+        except OSError:
+            pass
+
+    @classmethod
+    def assert_surface_allowed(cls, locator: str) -> None:
+        """Checks if a locator or path touches protected surfaces and fails closed."""
+        cls.assert_path_allowed(locator)
 
 
 class H40ExecutionGuard:

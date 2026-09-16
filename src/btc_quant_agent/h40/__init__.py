@@ -42,6 +42,9 @@ from .source_manifest import (
     H40SourceManifest,
     H40SourceRecord,
     H40SourceStatus,
+    H40SourceValidationReceipt,
+    materialize_verified_manifest,
+    validate_source_artifact,
 )
 from .split_manifest import (
     BASE_ELIGIBLE_COUNT,
@@ -91,6 +94,9 @@ __all__ = [
     "H40SourceManifest",
     "H40SourceRecord",
     "H40SourceStatus",
+    "H40SourceValidationReceipt",
     "H40SplitManifest",
+    "materialize_verified_manifest",
+    "validate_source_artifact",
 ]
 

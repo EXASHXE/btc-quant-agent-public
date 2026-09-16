@@ -33,8 +33,12 @@ from btc_quant_agent.h40 import (
     H40SourceManifest,
     H40SourceRecord,
     H40SourceStatus,
+    H40SourceValidationReceipt,
     H40SplitManifest,
+    materialize_verified_manifest,
+    validate_source_artifact,
 )
+from btc_quant_agent.h40.split_manifest import generate_hourly_range
 from btc_quant_agent.research_contract.canonical import canonical_json, canonical_sha256
 
 # ==============================================================================
@@ -100,19 +104,19 @@ def test_protocol_identity_changes_on_parameter_divergence() -> None:
 
 
 # ==============================================================================
-# 2. Unprotected Source-Authority Manifest Tests
+# 2. Unprotected Source-Authority Manifest & Receipt Tests (Repair B & C)
 # ==============================================================================
 
 def test_source_manifest_default_inventory() -> None:
-    """Default manifest inventories verified, unverified, diagnostic, and forbidden sources."""
+    """Default manifest inventories unverified reference, not_testable, diagnostic, and forbidden sources."""
     proto = H40ProtocolIdentity.default()
     manifest = H40SourceManifest.build_default(proto.protocol_hash)
 
-    # Check verified sources
+    # In preregistered reference, candidate sources are UNVERIFIED pending local validation receipt
     btc_kline = manifest.get_source("BTCUSDT_USD_M_1H")
-    assert btc_kline.status == H40SourceStatus.VERIFIED
+    assert btc_kline.status == H40SourceStatus.UNVERIFIED
     eth_kline = manifest.get_source("ETHUSDT_USD_M_1H")
-    assert eth_kline.status == H40SourceStatus.VERIFIED
+    assert eth_kline.status == H40SourceStatus.UNVERIFIED
     assert eth_kline.row_count == 44568
 
     # Check unverified / NOT_TESTABLE
@@ -156,62 +160,182 @@ def test_source_manifest_denies_forbidden_and_unverified_discovery() -> None:
     assert exc_info.value.reason_code == H40ReasonCode.SOURCE_UNVERIFIED
 
 
-def test_source_manifest_detects_hash_tampering(tmp_path: Path) -> None:
-    """Tampering with source file content raises SOURCE_HASH_MISMATCH."""
-    proto = H40ProtocolIdentity.default()
-    test_file = tmp_path / "test_kline.parquet"
-    test_file.write_bytes(b"original data")
-    orig_hash = hashlib.sha256(b"original data").hexdigest()
+def test_verified_source_record_requires_valid_receipt() -> None:
+    """A source record cannot claim VERIFIED status without an explicit valid receipt."""
+    with pytest.raises(H40GuardError) as exc_info:
+        H40SourceRecord(
+            source_id="UNBACKED_SOURCE",
+            status=H40SourceStatus.VERIFIED,
+            locator="data/research/some_file.parquet",
+            receipt=None,
+        )
+    assert exc_info.value.reason_code == H40ReasonCode.SOURCE_UNVERIFIED
 
+
+def test_source_validation_receipt_detects_hash_tampering(tmp_path: Path) -> None:
+    """Tampering with source file content causes validation receipt to record SOURCE_HASH_MISMATCH."""
+    import pyarrow as pa
+    import pyarrow.parquet as pq
+
+    test_file = tmp_path / "test_kline.parquet"
+    timestamps = [1609459200000 + i * 3600000 for i in range(10)]
+    tab = pa.Table.from_arrays([pa.array(timestamps)], names=["open_time_ms"])
+    pq.write_table(tab, test_file)
+
+    orig_hash = hashlib.sha256(test_file.read_bytes()).hexdigest()
     rec = H40SourceRecord(
         source_id="CUSTOM_SOURCE",
-        status=H40SourceStatus.VERIFIED,
+        status=H40SourceStatus.UNVERIFIED,
         locator="test_kline.parquet",
+        product="BTCUSDT",
+        cadence="1h",
         file_sha256=orig_hash,
     )
-    manifest = H40SourceManifest(
-        protocol_identity_hash=proto.protocol_hash,
-        sources=(rec,),
-    )
 
-    # Initial check passes
-    manifest.verify_file_integrity(tmp_path, "CUSTOM_SOURCE")
+    # Initial validation succeeds
+    receipt = validate_source_artifact(tmp_path, rec, expected_product="BTCUSDT", expected_cadence="1h")
+    assert isinstance(receipt, H40SourceValidationReceipt)
+    assert receipt.status == H40SourceStatus.VERIFIED
+    assert receipt.timestamp_count == 10
 
     # Tamper with file
-    test_file.write_bytes(b"tampered data")
-    with pytest.raises(H40GuardError) as exc_info:
-        manifest.verify_file_integrity(tmp_path, "CUSTOM_SOURCE")
-    assert exc_info.value.reason_code == H40ReasonCode.SOURCE_HASH_MISMATCH
+    test_file.write_bytes(b"tampered content not matching original hash")
+    receipt_tampered = validate_source_artifact(tmp_path, rec, expected_product="BTCUSDT", expected_cadence="1h")
+    assert receipt_tampered.status == H40SourceStatus.NOT_TESTABLE
+    assert receipt_tampered.reason_code == H40ReasonCode.SOURCE_HASH_MISMATCH
 
 
-def test_source_manifest_detects_missing_file(tmp_path: Path) -> None:
-    """Missing source file raises SOURCE_MISSING."""
-    proto = H40ProtocolIdentity.default()
+def test_source_validation_receipt_detects_missing_file(tmp_path: Path) -> None:
+    """Missing source file records SOURCE_MISSING in validation receipt."""
     rec = H40SourceRecord(
         source_id="MISSING_SOURCE",
-        status=H40SourceStatus.VERIFIED,
+        status=H40SourceStatus.UNVERIFIED,
         locator="non_existent.parquet",
         file_sha256="abc",
     )
-    manifest = H40SourceManifest(
-        protocol_identity_hash=proto.protocol_hash,
-        sources=(rec,),
+    receipt = validate_source_artifact(tmp_path, rec)
+    assert receipt.status == H40SourceStatus.NOT_TESTABLE
+    assert receipt.reason_code == H40ReasonCode.SOURCE_MISSING
+
+
+def test_source_validation_receipt_detects_wrong_product(tmp_path: Path) -> None:
+    """Validating a source with a mismatched product fails closed."""
+    import pyarrow as pa
+    import pyarrow.parquet as pq
+
+    test_file = tmp_path / "eth_kline.parquet"
+    timestamps = [1609459200000 + i * 3600000 for i in range(5)]
+    products = ["ETHUSDT"] * 5
+    tab = pa.Table.from_arrays([pa.array(timestamps), pa.array(products)], names=["open_time_ms", "product"])
+    pq.write_table(tab, test_file)
+
+    rec = H40SourceRecord(
+        source_id="ETH_AS_BTC",
+        status=H40SourceStatus.UNVERIFIED,
+        locator="eth_kline.parquet",
+        product="ETHUSDT",
     )
-    with pytest.raises(H40GuardError) as exc_info:
-        manifest.verify_file_integrity(tmp_path, "MISSING_SOURCE")
-    assert exc_info.value.reason_code == H40ReasonCode.SOURCE_MISSING
+    # Expected product is BTCUSDT, but file/record is ETHUSDT
+    receipt = validate_source_artifact(tmp_path, rec, expected_product="BTCUSDT")
+    assert receipt.status == H40SourceStatus.NOT_TESTABLE
+    assert receipt.reason_code == H40ReasonCode.PRODUCT_MISMATCH
+
+
+def test_source_validation_receipt_detects_wrong_cadence(tmp_path: Path) -> None:
+    """Validating a source with 15m cadence when 1h is expected fails closed."""
+    import pyarrow as pa
+    import pyarrow.parquet as pq
+
+    test_file = tmp_path / "kline_15m.parquet"
+    # 15m intervals (900_000 ms)
+    timestamps = [1609459200000 + i * 900000 for i in range(10)]
+    tab = pa.Table.from_arrays([pa.array(timestamps)], names=["open_time_ms"])
+    pq.write_table(tab, test_file)
+
+    rec = H40SourceRecord(
+        source_id="SOURCE_15M",
+        status=H40SourceStatus.UNVERIFIED,
+        locator="kline_15m.parquet",
+        cadence="15m",
+    )
+    receipt = validate_source_artifact(tmp_path, rec, expected_cadence="1h")
+    assert receipt.status == H40SourceStatus.NOT_TESTABLE
+    assert receipt.reason_code == H40ReasonCode.INTERVAL_MISMATCH
+
+
+def test_source_validation_receipt_detects_duplicate_timestamps(tmp_path: Path) -> None:
+    """Duplicate timestamps in an artifact are detected and fail closed."""
+    import pyarrow as pa
+    import pyarrow.parquet as pq
+
+    test_file = tmp_path / "dup_kline.parquet"
+    # Duplicate timestamp at index 1 and 2
+    timestamps = [1609459200000, 1609462800000, 1609462800000, 1609466400000]
+    tab = pa.Table.from_arrays([pa.array(timestamps)], names=["open_time_ms"])
+    pq.write_table(tab, test_file)
+
+    rec = H40SourceRecord(
+        source_id="DUP_SOURCE",
+        status=H40SourceStatus.UNVERIFIED,
+        locator="dup_kline.parquet",
+    )
+    receipt = validate_source_artifact(tmp_path, rec, expected_cadence="1h")
+    assert receipt.status == H40SourceStatus.NOT_TESTABLE
+    assert receipt.reason_code == H40ReasonCode.DUPLICATE_TIMESTAMP
+    assert receipt.duplicate_count == 1
+
+
+def test_source_validation_receipt_persists_gaps(tmp_path: Path) -> None:
+    """A missing hour between timestamps is detected and recorded as an explicit gap."""
+    import pyarrow as pa
+    import pyarrow.parquet as pq
+
+    test_file = tmp_path / "gap_kline.parquet"
+    # Skip hour 1609462800000 (missing 1 hour)
+    timestamps = [1609459200000, 1609466400000]
+    tab = pa.Table.from_arrays([pa.array(timestamps)], names=["open_time_ms"])
+    pq.write_table(tab, test_file)
+
+    rec = H40SourceRecord(
+        source_id="GAP_SOURCE",
+        status=H40SourceStatus.UNVERIFIED,
+        locator="gap_kline.parquet",
+    )
+    receipt = validate_source_artifact(tmp_path, rec, expected_cadence="1h")
+    assert receipt.gap_count == 1
+    assert receipt.gaps[0]["missing_hours"] == 1
+
+
+def test_materialize_verified_manifest_on_real_local_artifacts() -> None:
+    """Materializes verified manifest from actual repository artifacts without reading OHLC."""
+    proto = H40ProtocolIdentity.default()
+    manifest = materialize_verified_manifest(Path("."), proto.protocol_hash)
+
+    # ETHUSDT.parquet and official derivatives hourly_inputs.parquet exist locally and are verified
+    eth = manifest.get_source("ETHUSDT_USD_M_1H")
+    assert eth.status == H40SourceStatus.VERIFIED
+    assert eth.row_count == 44568
+    assert eth.receipt is not None
+    assert eth.receipt.status == H40SourceStatus.VERIFIED
+
+    deriv = manifest.get_source("BTCUSDT_OFFICIAL_DERIVATIVES")
+    assert deriv.status == H40SourceStatus.VERIFIED
+    assert deriv.row_count == 44568
+    assert deriv.receipt is not None
+    assert deriv.receipt.status == H40SourceStatus.VERIFIED
 
 
 # ==============================================================================
-# 3. Split Manifest Tests
+# 3. Split Manifest & Materialized Authority Tests (Repair C)
 # ==============================================================================
 
-def test_split_manifest_counts_and_boundaries() -> None:
-    """Split manifest calculates exact 43,825 timestamps and verifies half-open partition counts."""
+def test_split_manifest_preregistered_schedule_is_not_authoritative() -> None:
+    """Preregistered schedule is reference only (is_authoritative=False) and fails assert_authoritative."""
     proto = H40ProtocolIdentity.default()
     src_manifest = H40SourceManifest.build_default(proto.protocol_hash)
-    split_manifest = H40SplitManifest.build_default(proto.protocol_hash, src_manifest.manifest_hash)
+    split_manifest = H40SplitManifest.build_preregistered_schedule(proto.protocol_hash, src_manifest.manifest_hash)
 
+    assert not split_manifest.is_authoritative
     assert split_manifest.base_eligible_count == BASE_ELIGIBLE_COUNT
     assert split_manifest.base_eligible_start_utc == BASE_ELIGIBLE_START_UTC
     assert split_manifest.base_eligible_end_utc == BASE_ELIGIBLE_END_UTC
@@ -240,13 +364,162 @@ def test_split_manifest_counts_and_boundaries() -> None:
     assert split_manifest.exclusion_counts[H40ReasonCode.LOOKBACK_RESERVED.value] == 720
     assert split_manifest.exclusion_counts[H40ReasonCode.HORIZON_TRUNCATED.value] == 23
     assert split_manifest.exclusion_counts[H40ReasonCode.PURGE_BOUNDARY.value] == 216
+    assert split_manifest.exclusion_counts[H40ReasonCode.SOURCE_GAP.value] == 0
+
+    with pytest.raises(H40GuardError) as exc_info:
+        split_manifest.assert_authoritative()
+    assert exc_info.value.reason_code == H40ReasonCode.SOURCE_UNVERIFIED
+
+
+def test_materialized_split_authoritative_with_full_timestamps() -> None:
+    """Authoritative split materialized from verified continuous timestamps matches exact partition counts."""
+    proto = H40ProtocolIdentity.default()
+    src_manifest = H40SourceManifest.build_default(proto.protocol_hash)
+
+    # Generate full 44,568 hours from 2021-01-01T00:00:00Z to 2026-01-31T23:00:00Z
+    full_ts = generate_hourly_range("2021-01-01T00:00:00Z", "2026-01-31T23:00:00Z", inclusive_end=True)
+    assert len(full_ts) == 44568
+
+    split = H40SplitManifest.build_materialized(
+        protocol_identity_hash=proto.protocol_hash,
+        source_manifest_hash=src_manifest.manifest_hash,
+        btc_timestamps=full_ts,
+        eth_timestamps=full_ts,
+    )
+
+    assert split.is_authoritative
+    split.assert_authoritative()
+
+    assert split.base_eligible_count == BASE_ELIGIBLE_COUNT
+    assert split.get_partition("WF1_TRAIN").count == 15312
+    assert split.get_partition("CONFIRMATION_HOLDOUT").count == 8737
+    assert split.exclusion_counts[H40ReasonCode.LOOKBACK_RESERVED.value] == 720
+    assert split.exclusion_counts[H40ReasonCode.HORIZON_TRUNCATED.value] == 23
+    assert split.exclusion_counts[H40ReasonCode.PURGE_BOUNDARY.value] == 216
+    assert split.exclusion_counts[H40ReasonCode.SOURCE_GAP.value] == 0
+
+
+def test_pooled_btc_eth_intersection_drops_missing_timestamps() -> None:
+    """Timestamps present in BTC but missing in ETH (or vice versa) are dropped from the common base set."""
+    proto = H40ProtocolIdentity.default()
+    src_manifest = H40SourceManifest.build_default(proto.protocol_hash)
+
+    full_ts = generate_hourly_range("2021-01-01T00:00:00Z", "2026-01-31T23:00:00Z", inclusive_end=True)
+    # Remove one timestamp from ETH
+    missing_eth_ts = "2021-06-15T12:00:00Z"
+    eth_ts = [t for t in full_ts if t != missing_eth_ts]
+
+    split = H40SplitManifest.build_materialized(
+        protocol_identity_hash=proto.protocol_hash,
+        source_manifest_hash=src_manifest.manifest_hash,
+        btc_timestamps=full_ts,
+        eth_timestamps=eth_ts,
+    )
+
+    # Missing hour in ETH drops from the pooled intersection
+    wf1_train = split.get_partition("WF1_TRAIN")
+    assert wf1_train.count == 15311  # was 15312
+    assert split.exclusion_counts[H40ReasonCode.SOURCE_GAP.value] == 1
+
+
+def test_split_count_and_hash_changes_when_timestamp_removed() -> None:
+    """Removing even one valid timestamp changes partition counts and changes the split manifest hash."""
+    proto = H40ProtocolIdentity.default()
+    src_manifest = H40SourceManifest.build_default(proto.protocol_hash)
+
+    full_ts = generate_hourly_range("2021-01-01T00:00:00Z", "2026-01-31T23:00:00Z", inclusive_end=True)
+    split_full = H40SplitManifest.build_materialized(
+        protocol_identity_hash=proto.protocol_hash,
+        source_manifest_hash=src_manifest.manifest_hash,
+        btc_timestamps=full_ts,
+        eth_timestamps=full_ts,
+    )
+
+    # Drop one hour in WF2_CALIBRATION (e.g. 2023-06-01T10:00:00Z)
+    dropped_hour = "2023-06-01T10:00:00Z"
+    pruned_ts = [t for t in full_ts if t != dropped_hour]
+
+    split_pruned = H40SplitManifest.build_materialized(
+        protocol_identity_hash=proto.protocol_hash,
+        source_manifest_hash=src_manifest.manifest_hash,
+        btc_timestamps=pruned_ts,
+        eth_timestamps=pruned_ts,
+    )
+
+    assert split_pruned.split_hash != split_full.split_hash
+    assert split_pruned.get_partition("WF2_CALIBRATION").count == split_full.get_partition("WF2_CALIBRATION").count - 1
+    assert split_pruned.exclusion_counts[H40ReasonCode.SOURCE_GAP.value] == 1
+
+
+def test_confirmation_endpoint_constraint_removes_uncovered_timestamps() -> None:
+    """Confirmation endpoint constraint drops timestamps lacking 24h future coverage and records HORIZON_TRUNCATED."""
+    proto = H40ProtocolIdentity.default()
+    src_manifest = H40SourceManifest.build_default(proto.protocol_hash)
+
+    full_ts = generate_hourly_range("2021-01-01T00:00:00Z", "2026-01-31T23:00:00Z", inclusive_end=True)
+    split = H40SplitManifest.build_materialized(
+        protocol_identity_hash=proto.protocol_hash,
+        source_manifest_hash=src_manifest.manifest_hash,
+        btc_timestamps=full_ts,
+        eth_timestamps=full_ts,
+    )
+
+    # 23 timestamps from 2026-01-31T01:00:00Z to 2026-01-31T23:00:00Z lack 24h future coverage
+    assert split.exclusion_counts[H40ReasonCode.HORIZON_TRUNCATED.value] == 23
+    conf_holdout = split.get_partition("CONFIRMATION_HOLDOUT")
+    assert conf_holdout.count == 8737
+
+
+def test_no_boundary_shifts_occur_after_gaps() -> None:
+    """Gaps decrease partition counts but partition boundaries remain strictly fixed."""
+    proto = H40ProtocolIdentity.default()
+    src_manifest = H40SourceManifest.build_default(proto.protocol_hash)
+
+    full_ts = generate_hourly_range("2021-01-01T00:00:00Z", "2026-01-31T23:00:00Z", inclusive_end=True)
+    # Remove 5 hours inside WF1_TRAIN
+    gapped_ts = [t for t in full_ts if not ("2021-03-01T10:00:00Z" <= t <= "2021-03-01T14:00:00Z")]
+
+    split = H40SplitManifest.build_materialized(
+        protocol_identity_hash=proto.protocol_hash,
+        source_manifest_hash=src_manifest.manifest_hash,
+        btc_timestamps=gapped_ts,
+        eth_timestamps=gapped_ts,
+    )
+
+    wf1 = split.get_partition("WF1_TRAIN")
+    assert wf1.start_utc == "2021-01-31T00:00:00Z"
+    assert wf1.end_utc == "2022-10-31T00:00:00Z"
+    assert wf1.count == 15312 - 5
+    assert split.exclusion_counts[H40ReasonCode.SOURCE_GAP.value] == 5
+
+
+def test_builder_cannot_return_authoritative_split_from_constants_alone() -> None:
+    """Default or preregistered schedule builder cannot claim authoritative verified split status."""
+    proto = H40ProtocolIdentity.default()
+    src_manifest = H40SourceManifest.build_default(proto.protocol_hash)
+    split_default = H40SplitManifest.build_default(proto.protocol_hash, src_manifest.manifest_hash)
+
+    assert not split_default.is_authoritative
+    with pytest.raises(H40GuardError) as exc_info:
+        split_default.assert_authoritative()
+    assert exc_info.value.reason_code == H40ReasonCode.SOURCE_UNVERIFIED
+
+    # build_materialized without timestamp inputs fails closed
+    with pytest.raises(H40GuardError) as exc_info:
+        H40SplitManifest.build_materialized(
+            protocol_identity_hash=proto.protocol_hash,
+            source_manifest_hash=src_manifest.manifest_hash,
+            btc_timestamps=[],
+            eth_timestamps=[],
+        )
+    assert exc_info.value.reason_code == H40ReasonCode.SOURCE_UNVERIFIED
 
 
 def test_confirmation_timestamps_strictly_isolated() -> None:
     """Confirmation holdout timestamps do not overlap with any training or calibration partition."""
     proto = H40ProtocolIdentity.default()
     src_manifest = H40SourceManifest.build_default(proto.protocol_hash)
-    split_manifest = H40SplitManifest.build_default(proto.protocol_hash, src_manifest.manifest_hash)
+    split_manifest = H40SplitManifest.build_preregistered_schedule(proto.protocol_hash, src_manifest.manifest_hash)
 
     conf_holdout = split_manifest.get_partition("CONFIRMATION_HOLDOUT")
     conf_train = split_manifest.get_partition("CONFIRMATION_TRAIN")
@@ -265,7 +538,7 @@ def test_split_manifest_hash_changes_on_membership_tampering() -> None:
     """Altering partition timestamp count or range alters the split manifest hash."""
     proto = H40ProtocolIdentity.default()
     src_manifest = H40SourceManifest.build_default(proto.protocol_hash)
-    split_manifest = H40SplitManifest.build_default(proto.protocol_hash, src_manifest.manifest_hash)
+    split_manifest = H40SplitManifest.build_preregistered_schedule(proto.protocol_hash, src_manifest.manifest_hash)
     base_hash = split_manifest.split_hash
 
     # Craft altered partitions tuple
@@ -292,6 +565,7 @@ def test_split_manifest_hash_changes_on_membership_tampering() -> None:
         base_eligible_count=split_manifest.base_eligible_count,
         partitions=tuple(parts),
         exclusion_counts=split_manifest.exclusion_counts,
+        is_authoritative=False,
     )
     assert tampered_split.split_hash != base_hash
 
@@ -498,12 +772,12 @@ def test_ledger_config_identity_conflict_detection() -> None:
 
 
 # ==============================================================================
-# 5. Access Guards & Lifecycle Tests
+# 5. Access Guards & Lifecycle Tests (Repair A & B)
 # ==============================================================================
 
 def test_confirmation_guard_metadata_vs_outcomes() -> None:
     """Confirmation guard permits metadata inspection but strictly blocks outcome values."""
-    guard = H40ConfirmationGuard(is_confirmation_ready=False)
+    guard = H40ConfirmationGuard()
     # Metadata access succeeds
     guard.assert_metadata_accessible()
 
@@ -513,7 +787,55 @@ def test_confirmation_guard_metadata_vs_outcomes() -> None:
     assert exc_info.value.reason_code == H40ReasonCode.CONFIRMATION_NOT_READY
 
 
-def test_protected_surface_guard_blocks_h39_and_final_holdout() -> None:
+def test_confirmation_guard_unlocked_construction_impossible() -> None:
+    """Confirmation guard has no parameters to enable outcome access; construction is always locked."""
+    guard = H40ConfirmationGuard()
+    assert not guard.is_ready
+    with pytest.raises(H40GuardError) as exc_info:
+        guard.assert_outcomes_accessible()
+    assert exc_info.value.reason_code == H40ReasonCode.CONFIRMATION_NOT_READY
+
+
+def test_confirmation_guard_forging_readiness_fails() -> None:
+    """Attempting to forge readiness on confirmation guard fails to unlock outcomes."""
+    guard = H40ConfirmationGuard()
+    # Attempt to monkeypatch or attribute assign fails
+    with pytest.raises((AttributeError, TypeError)):
+        guard.is_ready = True  # type: ignore[misc]
+    # Guard method assert_outcomes_accessible must still fail closed
+    with pytest.raises(H40GuardError) as exc_info:
+        guard.assert_outcomes_accessible()
+    assert exc_info.value.reason_code == H40ReasonCode.CONFIRMATION_NOT_READY
+
+
+def test_lifecycle_cannot_construct_at_confirmation_ready() -> None:
+    """Initializing lifecycle state machine directly at H40_CONFIRMATION_READY fails closed."""
+    with pytest.raises(H40GuardError) as exc_info:
+        H40LifecycleStateMachine(initial_state=H40LifecycleState.H40_CONFIRMATION_READY)
+    assert exc_info.value.reason_code == H40ReasonCode.CONFIRMATION_NOT_READY
+
+
+def test_lifecycle_cannot_construct_at_confirmation_evaluated_once() -> None:
+    """Initializing lifecycle state machine directly at H40_CONFIRMATION_EVALUATED_ONCE fails closed."""
+    with pytest.raises(H40GuardError) as exc_info:
+        H40LifecycleStateMachine(initial_state=H40LifecycleState.H40_CONFIRMATION_EVALUATED_ONCE)
+    assert exc_info.value.reason_code == H40ReasonCode.CONFIRMATION_NOT_READY
+
+
+def test_lifecycle_cannot_construct_at_post_scaffold_states() -> None:
+    """Initializing lifecycle state machine directly at post-scaffold states fails closed."""
+    for state in [
+        H40LifecycleState.H40_DISCOVERY,
+        H40LifecycleState.H40_CANDIDATE_LOCKED,
+        H40LifecycleState.H40_WALK_FORWARD_VALIDATED,
+        H40LifecycleState.H40_NO_GO,
+    ]:
+        with pytest.raises(H40GuardError) as exc_info:
+            H40LifecycleStateMachine(initial_state=state)
+        assert exc_info.value.reason_code == H40ReasonCode.NOT_TESTABLE
+
+
+def test_protected_source_guard_blocks_h39_and_final_holdout() -> None:
     """Protected surface guard fails closed on any path referencing H39 or Final Holdout."""
     for forbidden_path in [
         "data/research/h39_validation/results.parquet",
@@ -551,21 +873,131 @@ def test_lifecycle_state_machine_p1_boundary() -> None:
 
 
 # ==============================================================================
-# 6. Adversarial Serialization & Re-Hashing Tests
+# 6. Adversarial Security & Relabel Attack Tests (Repair B)
 # ==============================================================================
 
+def test_protected_source_relabel_attack_fails_before_read() -> None:
+    """A caller relabelling an H39 protected source as VERIFIED fails before any read occurs."""
+    with pytest.raises(H40GuardError) as exc_info:
+        H40SourceRecord(
+            source_id="H39_ATTACK",
+            status=H40SourceStatus.VERIFIED,
+            locator="data/research/h39_validation/results.parquet",
+        )
+    assert exc_info.value.reason_code == H40ReasonCode.PROTECTED_SURFACE_DENIED
+
+    with pytest.raises(H40GuardError) as exc_info:
+        H40SourceRecord(
+            source_id="H39_ATTACK",
+            status=H40SourceStatus.UNVERIFIED,
+            locator="data/research/h39_validation/results.parquet",
+        )
+    assert exc_info.value.reason_code == H40ReasonCode.PROTECTED_SURFACE_DENIED
+
+    # Validation also fails closed before read
+    rec = H40SourceRecord(
+        source_id="ALLOWED_SOURCE",
+        status=H40SourceStatus.UNVERIFIED,
+        locator="some_safe_file.parquet",
+    )
+    object.__setattr__(rec, "locator", "data/research/h39_validation/results.parquet")
+    with pytest.raises(H40GuardError) as exc_info:
+        validate_source_artifact(Path("."), rec)
+    assert exc_info.value.reason_code == H40ReasonCode.PROTECTED_SURFACE_DENIED
+
+
+def test_final_holdout_relabel_attack_fails_before_read() -> None:
+    """A caller relabelling a Final Holdout source as VERIFIED fails before any read occurs."""
+    with pytest.raises(H40GuardError) as exc_info:
+        H40SourceRecord(
+            source_id="FINAL_HOLDOUT_ATTACK",
+            status=H40SourceStatus.VERIFIED,
+            locator="artifacts/final_holdout/data.parquet",
+        )
+    assert exc_info.value.reason_code == H40ReasonCode.PROTECTED_SURFACE_DENIED
+
+    with pytest.raises(H40GuardError) as exc_info:
+        H40SourceRecord(
+            source_id="FINAL_HOLDOUT_ATTACK",
+            status=H40SourceStatus.UNVERIFIED,
+            locator="artifacts/final_holdout/data.parquet",
+        )
+    assert exc_info.value.reason_code == H40ReasonCode.PROTECTED_SURFACE_DENIED
+
+    rec = H40SourceRecord(
+        source_id="ALLOWED_SOURCE",
+        status=H40SourceStatus.UNVERIFIED,
+        locator="some_safe_file.parquet",
+    )
+    object.__setattr__(rec, "locator", "artifacts/final_holdout/data.parquet")
+    with pytest.raises(H40GuardError) as exc_info:
+        validate_source_artifact(Path("."), rec)
+    assert exc_info.value.reason_code == H40ReasonCode.PROTECTED_SURFACE_DENIED
+
+
+def test_serialized_manifest_relabel_forbidden_to_verified_fails() -> None:
+    """Tampering with serialized manifest to change FORBIDDEN source to VERIFIED fails upon deserialization."""
+    proto = H40ProtocolIdentity.default()
+    src_manifest = H40SourceManifest.build_default(proto.protocol_hash)
+    d = src_manifest.to_dict()
+
+    for s in d["sources"]:
+        if s["source_id"] == "H39_PROTECTED":
+            s["status"] = "VERIFIED"
+
+    with pytest.raises(H40GuardError) as exc_info:
+        tuple(H40SourceRecord.from_dict(s) for s in d["sources"])
+    assert exc_info.value.reason_code == H40ReasonCode.PROTECTED_SURFACE_DENIED
+
+
+def test_protected_surface_normalized_and_relative_path_attack() -> None:
+    """Relative path traversal and non-canonical paths to protected surfaces fail closed."""
+    traversal_paths = [
+        "data/research/../research/h39_validation/file.parquet",
+        "./artifacts/final_holdout/data.csv",
+        "data/research/cross_asset_1h/../../research/h39_validation/x.parquet",
+        "data/v0323_h39/../v0323_h39/labels.json",
+    ]
+    for p in traversal_paths:
+        with pytest.raises(H40GuardError) as exc_info:
+            H40ProtectedSurfaceGuard.assert_path_allowed(p)
+        assert exc_info.value.reason_code == H40ReasonCode.PROTECTED_SURFACE_DENIED
+
+
+def test_protected_surface_symlink_attack_synthetic_temp_path(tmp_path: Path) -> None:
+    """Symlink pointing to a protected substring is resolved and blocked before access."""
+    fake_protected_dir = tmp_path / "h39_validation"
+    fake_protected_dir.mkdir()
+    fake_file = fake_protected_dir / "secret.parquet"
+    fake_file.write_bytes(b"forbidden_data")
+
+    benign_dir = tmp_path / "benign"
+    benign_dir.mkdir()
+    symlink_file = benign_dir / "harmless.parquet"
+
+    try:
+        symlink_file.symlink_to(fake_file)
+    except (OSError, NotImplementedError):
+        pytest.skip("Filesystem does not support symlinks in this environment")
+
+    # Raw name is harmless.parquet, but resolved path points to h39_validation
+    with pytest.raises(H40GuardError) as exc_info:
+        H40ProtectedSurfaceGuard.assert_path_allowed(symlink_file)
+    assert exc_info.value.reason_code == H40ReasonCode.PROTECTED_SURFACE_DENIED
+
+
 def test_adversarial_serialized_manifest_tampering() -> None:
-    """Crafting or tampering with a serialized JSON manifest and attempting to verify causes mismatch."""
+    """Crafting or tampering with an allowed source in serialized JSON manifest alters its hash."""
     proto = H40ProtocolIdentity.default()
     src_manifest = H40SourceManifest.build_default(proto.protocol_hash)
     original_dict = src_manifest.to_dict()
     original_hash = src_manifest.manifest_hash
 
-    # Attacker modifies JSON serialized payload to forge status of FORBIDDEN source
+    # Attacker modifies JSON serialized payload for an allowed unverified source
     tampered_dict = copy.deepcopy(original_dict)
     for src in tampered_dict["sources"]:
-        if src["source_id"] == "H39_PROTECTED":
-            src["status"] = "VERIFIED"  # Attempt to forge forbidden source to verified
+        if src["source_id"] == "ETHUSDT_DERIVATIVES_FLOW":
+            src["locator"] = "data/research/cross_asset_1h/tampered.parquet"
 
     tampered_canonical_json = canonical_json(tampered_dict)
     assert tampered_canonical_json
@@ -574,7 +1006,6 @@ def test_adversarial_serialized_manifest_tampering() -> None:
     # Hashes cannot match
     assert tampered_hash != original_hash
 
-    # Reconstructed manifest will carry the new hash and fail any verification against preregistered identity
     reconstructed_sources = tuple(H40SourceRecord.from_dict(s) for s in tampered_dict["sources"])
     reconstructed_manifest = H40SourceManifest(
         protocol_identity_hash=tampered_dict["protocol_identity_hash"],
