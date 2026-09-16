@@ -43,6 +43,7 @@ from .source_manifest import (
     H40SourceRecord,
     H40SourceStatus,
     H40SourceValidationReceipt,
+    extract_verified_source_timestamps,
     materialize_verified_manifest,
     validate_source_artifact,
 )
@@ -52,6 +53,7 @@ from .split_manifest import (
     BASE_ELIGIBLE_START_UTC,
     H40Partition,
     H40PartitionType,
+    H40SplitAttestation,
     H40SplitManifest,
 )
 
@@ -95,7 +97,9 @@ __all__ = [
     "H40SourceRecord",
     "H40SourceStatus",
     "H40SourceValidationReceipt",
+    "H40SplitAttestation",
     "H40SplitManifest",
+    "extract_verified_source_timestamps",
     "materialize_verified_manifest",
     "validate_source_artifact",
 ]

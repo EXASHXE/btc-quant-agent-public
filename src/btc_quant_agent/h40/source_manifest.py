@@ -761,3 +761,82 @@ def materialize_verified_manifest(
         protocol_identity_hash=protocol_identity_hash,
         sources=tuple(materialized_sources),
     )
+
+
+def extract_verified_source_timestamps(
+    repo_root: Path | str,
+    record: H40SourceRecord,
+    expected_product: str | None = None,
+    expected_cadence: str = "1h",
+) -> list[str]:
+    """Cold-validates source artifact and extracts verified ISO-8601 timestamps list.
+
+    Enforces that:
+    1. Protected surface guard checks pass before filesystem access.
+    2. Local artifact exists and passes validation into a VERIFIED receipt.
+    3. If the source record already has a receipt, the cold validation receipt matches
+       the record's receipt (file SHA-256, timestamp count, and membership SHA-256).
+    4. Exact timestamps extracted from the artifact produce the exact membership SHA-256.
+    """
+    cold_receipt = validate_source_artifact(
+        repo_root=repo_root,
+        record=record,
+        expected_product=expected_product,
+        expected_cadence=expected_cadence,
+    )
+    if cold_receipt.status != H40SourceStatus.VERIFIED:
+        raise H40GuardError(
+            cold_receipt.reason_code or H40ReasonCode.SOURCE_UNVERIFIED,
+            f"Source artifact '{record.locator}' failed cold verification: {cold_receipt.notes}",
+        )
+
+    # If record has an attached receipt, ensure cold receipt matches
+    if record.receipt is not None:
+        if record.receipt.status != H40SourceStatus.VERIFIED:
+            raise H40GuardError(
+                record.receipt.reason_code or H40ReasonCode.SOURCE_UNVERIFIED,
+                f"Source record '{record.source_id}' has non-VERIFIED receipt.",
+            )
+        if record.receipt.file_sha256 != cold_receipt.file_sha256:
+            raise H40GuardError(
+                H40ReasonCode.SOURCE_HASH_MISMATCH,
+                f"Source record '{record.source_id}' receipt file hash {record.receipt.file_sha256} "
+                f"mismatches cold artifact hash {cold_receipt.file_sha256}.",
+            )
+        if record.receipt.timestamp_membership_hash != cold_receipt.timestamp_membership_hash:
+            raise H40GuardError(
+                H40ReasonCode.SOURCE_HASH_MISMATCH,
+                f"Source record '{record.source_id}' timestamp membership hash mismatches cold artifact.",
+            )
+        if record.receipt.timestamp_count != cold_receipt.timestamp_count:
+            raise H40GuardError(
+                H40ReasonCode.INTERVAL_MISMATCH,
+                f"Source record '{record.source_id}' timestamp count mismatches cold artifact.",
+            )
+
+    # Read timestamps from artifact file
+    file_path = Path(repo_root) / record.locator
+    suffix = file_path.suffix.lower()
+    if suffix == ".parquet":
+        pq = importlib.import_module("pyarrow.parquet")
+        tab = pq.read_table(file_path, columns=[cold_receipt.timestamp_field])
+        raw_vals = tab[cold_receipt.timestamp_field].to_pylist()
+        unique_ms = sorted({int(v) for v in raw_vals})
+        iso_list = [_ms_to_iso(t) for t in unique_ms]
+    elif suffix == ".json":
+        with open(file_path, "r", encoding="utf-8") as f:
+            jdata = json.load(f)
+        raw_ts = jdata.get("timestamps", [])
+        unique_ms = sorted({_iso_to_ms(t) if isinstance(t, str) else int(t) for t in raw_ts})
+        iso_list = [_ms_to_iso(t) for t in unique_ms]
+    else:
+        raise H40GuardError(H40ReasonCode.NOT_TESTABLE, f"Unsupported artifact suffix '{suffix}'.")
+
+    # Verify membership hash matches cold receipt
+    actual_hash = hashlib.sha256(",".join(iso_list).encode("utf-8")).hexdigest()
+    if actual_hash != cold_receipt.timestamp_membership_hash:
+        raise H40GuardError(
+            H40ReasonCode.SOURCE_HASH_MISMATCH,
+            f"Extracted timestamp membership hash {actual_hash} mismatches receipt {cold_receipt.timestamp_membership_hash}.",
+        )
+    return iso_list
