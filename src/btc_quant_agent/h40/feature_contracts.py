@@ -131,12 +131,13 @@ class H40FeatureContract:
             )
 
         # TP/BR magnitude rule: TP/BR is strictly opportunity evidence, NEVER direction
-        if "TPBR" in self.owner_family or "TPBR" in self.feature_id:
-            if "D" in self.owner_family and ("D1" in self.owner_family or "D2" in self.owner_family or "D3" in self.owner_family or "D4" in self.owner_family or "D5" in self.owner_family):
-                raise H40GuardError(
-                    H40ReasonCode.UNAUTHORIZED_FAMILY,
-                    "TP/BR remains magnitude/opportunity evidence only; directional side is discarded.",
-                )
+        is_tpbr = "TPBR" in self.owner_family or "TPBR" in self.feature_id
+        is_directional = any(d in self.owner_family for d in ("D1", "D2", "D3", "D4", "D5"))
+        if is_tpbr and is_directional:
+            raise H40GuardError(
+                H40ReasonCode.UNAUTHORIZED_FAMILY,
+                "TP/BR remains magnitude/opportunity evidence only; directional side is discarded.",
+            )
 
         # Check transform parameters for outcome metrics
         for k in self.transform_parameters:
