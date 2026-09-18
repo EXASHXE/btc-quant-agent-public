@@ -30,9 +30,7 @@ from btc_quant_agent.h40 import (
     materialize_h40_search_space_production,
     materialize_h40_search_space_synthetic,
 )
-from btc_quant_agent.h40.protocol_authority import (
-    build_hash_receipt,
-)
+from btc_quant_agent.h40.protocol_authority import build_hash_receipt
 
 
 # ---------------------------------------------------------------------------
