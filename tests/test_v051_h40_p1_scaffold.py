@@ -1559,12 +1559,18 @@ def test_ledger_rejects_unauthorized_families_and_pairs() -> None:
     """Only D1..D5 and the 4 authorized depth-two combinations are accepted."""
     # Authorized depth 1
     for fam in H40Family:
+        # D5 requires an explicit base directional owner (R3R3 Section 2.3:
+        # no implicit/default base owner is allowed).
+        feature_params = None
+        if fam == H40Family.D5_FUNDING_DIRECTION_INTERACTION:
+            feature_params = {"base_directional_owner": "D1_TREND_CONTINUATION"}
         slot = H40ConfigurationSlot.create(
             slot_index=0,
             family_combination=[fam],
             asset_scope=["BTCUSDT"],
             primary_horizon="4h",
             action_threshold=0.55,
+            feature_params=feature_params,
         )
         assert slot.family_combination == (fam,)
 
