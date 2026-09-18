@@ -2,7 +2,7 @@
 
 Materializes and freezes the complete H40 pre-outcome research search space
 before any H40 label metric, performance metric, feature ranking, candidate ranking,
-backtest, or confirmation outcome is computed under H40_PROTOCOL_V1_R2.
+backtest, or confirmation outcome is computed under H40_PROTOCOL_V1_R3.
 
 Exact 168-slot budget breakdown:
 - 5 direction families x 2 variants each x 12 complete configs = 120 slots (0..119)
@@ -23,6 +23,11 @@ from .configuration_ledger import (
     H40Family,
 )
 from .guards import H40ReasonCode
+from .protocol_authority import (
+    RuntimeAuthoritySnapshot,
+    current_p1_authority_snapshot,
+    project_required_sources,
+)
 
 TOTAL_SEARCH_BUDGET: int = 168
 SINGLE_FAMILY_CONFIG_COUNT: int = 120
@@ -91,7 +96,7 @@ DIRECTION_VARIANT_SPECS: tuple[dict[str, Any], ...] = (
         "params": {"metric": "failed_break_and_close_back_reversal", "range_hours": 72},
         "requires_funding": False,
     },
-    # D4: D4_BTC_ETH_CONFIRM_DIVERGE
+    # D4: D4_BTC_ETH_CONFIRM_DIVERGE (always cross-asset: requires synchronized BTC + ETH)
     {
         "family": H40Family.D4_BTC_ETH_CONFIRM_DIVERGE,
         "variant_id": "D4_V1_CONFIRMATION_4H",
@@ -100,6 +105,7 @@ DIRECTION_VARIANT_SPECS: tuple[dict[str, Any], ...] = (
         "feature_ids": ("D4_V1_CONFIRMATION_4H", "R_VOL_RANGE_V1_24H", "O_RANGE_EXPANSION_V1_24H"),
         "params": {"metric": "cross_asset_synchronized_agreement", "state_window_hours": 4},
         "requires_funding": False,
+        "requires_cross_asset": True,
     },
     {
         "family": H40Family.D4_BTC_ETH_CONFIRM_DIVERGE,
@@ -109,6 +115,7 @@ DIRECTION_VARIANT_SPECS: tuple[dict[str, Any], ...] = (
         "feature_ids": ("D4_V2_DIVERGENCE_8H", "R_VOL_RANGE_V1_24H", "O_RANGE_EXPANSION_V1_24H"),
         "params": {"metric": "cross_asset_relative_divergence", "state_window_hours": 8},
         "requires_funding": False,
+        "requires_cross_asset": True,
     },
     # D5: D5_FUNDING_DIRECTION_INTERACTION (requires base D1/D2/D3 directional owner)
     {
@@ -126,14 +133,14 @@ DIRECTION_VARIANT_SPECS: tuple[dict[str, Any], ...] = (
     },
     {
         "family": H40Family.D5_FUNDING_DIRECTION_INTERACTION,
-        "variant_id": "D5_V2_CROWDING_Q20_D1",
-        "contract_id": "D5_V2_CROWDING_Q20_D1",
+        "variant_id": "D5_V2_CROWDING_Q20_D2",
+        "contract_id": "D5_V2_CROWDING_Q20_D2",
         "lookback_hours": 8,
-        "feature_ids": ("D5_V2_CROWDING_Q20_D1", "R_VOL_RANGE_V1_24H", "O_RANGE_EXPANSION_V1_24H"),
+        "feature_ids": ("D5_V2_CROWDING_Q20_D2", "R_VOL_RANGE_V1_24H", "O_RANGE_EXPANSION_V1_24H"),
         "params": {
             "metric": "crowding_quantile_interaction",
             "quantile": 0.20,
-            "base_directional_owner": "D1_TREND_CONTINUATION",
+            "base_directional_owner": "D2_BREAKOUT_CONTINUATION",
         },
         "requires_funding": True,
     },
@@ -141,7 +148,7 @@ DIRECTION_VARIANT_SPECS: tuple[dict[str, Any], ...] = (
 
 # Authorized depth-two pairs specifications (4 pairs x 12 configs = 48 configs)
 DEPTH_TWO_PAIR_SPECS: tuple[dict[str, Any], ...] = (
-    # Pair 1: D1 + D4
+    # Pair 1: D1 + D4 (cross-asset via D4)
     {
         "families": (H40Family.D1_TREND_CONTINUATION, H40Family.D4_BTC_ETH_CONFIRM_DIVERGE),
         "variant_id": "PAIR_D1_D4_V1",
@@ -150,6 +157,7 @@ DEPTH_TWO_PAIR_SPECS: tuple[dict[str, Any], ...] = (
         "feature_ids": ("D1_V1_RETURN_4H", "D4_V1_CONFIRMATION_4H", "R_VOL_RANGE_V1_24H", "O_RANGE_EXPANSION_V1_24H"),
         "params": {"combination": "conjunction", "base_direction": "D1_TREND_CONTINUATION", "filter": "D4_BTC_ETH_CONFIRM_DIVERGE"},
         "requires_funding": False,
+        "requires_cross_asset": True,
     },
     # Pair 2: D1 + D5
     {
@@ -161,7 +169,7 @@ DEPTH_TWO_PAIR_SPECS: tuple[dict[str, Any], ...] = (
         "params": {"combination": "interaction", "base_direction": "D1_TREND_CONTINUATION", "filter": "D5_FUNDING_DIRECTION_INTERACTION", "base_directional_owner": "D1_TREND_CONTINUATION"},
         "requires_funding": True,
     },
-    # Pair 3: D2 + D4
+    # Pair 3: D2 + D4 (cross-asset via D4)
     {
         "families": (H40Family.D2_BREAKOUT_CONTINUATION, H40Family.D4_BTC_ETH_CONFIRM_DIVERGE),
         "variant_id": "PAIR_D2_D4_V1",
@@ -170,39 +178,91 @@ DEPTH_TWO_PAIR_SPECS: tuple[dict[str, Any], ...] = (
         "feature_ids": ("D2_V1_BREAKOUT_24H", "D4_V1_CONFIRMATION_4H", "R_VOL_RANGE_V1_24H", "O_RANGE_EXPANSION_V1_24H"),
         "params": {"combination": "conjunction", "base_direction": "D2_BREAKOUT_CONTINUATION", "filter": "D4_BTC_ETH_CONFIRM_DIVERGE"},
         "requires_funding": False,
+        "requires_cross_asset": True,
     },
-    # Pair 4: D3 + D5
+    # Pair 4: D3 + D5 (pair-scoped D5 component bound to D3)
     {
         "families": (H40Family.D3_FAILED_MOVE_REVERSAL, H40Family.D5_FUNDING_DIRECTION_INTERACTION),
         "variant_id": "PAIR_D3_D5_V1",
         "contract_id": "PAIR_D3_D5_V1",
         "lookback_hours": 24,
-        "feature_ids": ("D3_V1_FAILED_BREAK_24H", "D5_V1_CROWDING_Q10_D1", "R_VOL_RANGE_V1_24H", "O_RANGE_EXPANSION_V1_24H"),
+        "feature_ids": ("D3_V1_FAILED_BREAK_24H", "D5_PAIR_CROWDING_Q10_D3", "R_VOL_RANGE_V1_24H", "O_RANGE_EXPANSION_V1_24H"),
         "params": {"combination": "interaction", "base_direction": "D3_FAILED_MOVE_REVERSAL", "filter": "D5_FUNDING_DIRECTION_INTERACTION", "base_directional_owner": "D3_FAILED_MOVE_REVERSAL"},
         "requires_funding": True,
     },
 )
 
-# 12-configuration parameter template: covers all 3 horizons, all 3 scopes, and all 3 thresholds
+# 12-configuration parameter template (accepted R3R2 Section 8.2):
+# 9-cell base grid (3 horizons x 3 scopes at threshold 0.55/Platt)
+# + 3 pooled-scope threshold/calibration refinements
 TWELVE_CONFIG_TEMPLATE: tuple[dict[str, Any], ...] = (
-    # Horizon 4h (4 configurations)
-    {"horizon": "4h", "scope": "BTC_ONLY", "threshold": 0.55, "calibration": "CALIBRATION_LOGISTIC_V1", "assets": ("BTCUSDT",)},
-    {"horizon": "4h", "scope": "ETH_ONLY", "threshold": 0.55, "calibration": "CALIBRATION_LOGISTIC_V1", "assets": ("ETHUSDT",)},
-    {"horizon": "4h", "scope": "POOLED_BTC_ETH", "threshold": 0.55, "calibration": "CALIBRATION_LOGISTIC_V1", "assets": ("BTCUSDT", "ETHUSDT")},
-    {"horizon": "4h", "scope": "POOLED_BTC_ETH", "threshold": 0.60, "calibration": "CALIBRATION_LOGISTIC_V1", "assets": ("BTCUSDT", "ETHUSDT")},
+    # Base grid: 3 horizons x 3 scopes, threshold 0.55, Platt logistic
+    {"horizon": "4h", "scope": "BTC_ONLY", "threshold": 0.55, "calibration": "CALIBRATION_PLATT_LOGISTIC_V1", "assets": ("BTCUSDT",)},
+    {"horizon": "4h", "scope": "ETH_ONLY", "threshold": 0.55, "calibration": "CALIBRATION_PLATT_LOGISTIC_V1", "assets": ("ETHUSDT",)},
+    {"horizon": "4h", "scope": "POOLED_BTC_ETH", "threshold": 0.55, "calibration": "CALIBRATION_PLATT_LOGISTIC_V1", "assets": ("BTCUSDT", "ETHUSDT")},
 
-    # Horizon 8h (4 configurations)
-    {"horizon": "8h", "scope": "BTC_ONLY", "threshold": 0.55, "calibration": "CALIBRATION_LOGISTIC_V1", "assets": ("BTCUSDT",)},
-    {"horizon": "8h", "scope": "ETH_ONLY", "threshold": 0.55, "calibration": "CALIBRATION_LOGISTIC_V1", "assets": ("ETHUSDT",)},
-    {"horizon": "8h", "scope": "POOLED_BTC_ETH", "threshold": 0.55, "calibration": "CALIBRATION_LOGISTIC_V1", "assets": ("BTCUSDT", "ETHUSDT")},
-    {"horizon": "8h", "scope": "POOLED_BTC_ETH", "threshold": 0.65, "calibration": "CALIBRATION_ISOTONIC_V1", "assets": ("BTCUSDT", "ETHUSDT")},
+    {"horizon": "8h", "scope": "BTC_ONLY", "threshold": 0.55, "calibration": "CALIBRATION_PLATT_LOGISTIC_V1", "assets": ("BTCUSDT",)},
+    {"horizon": "8h", "scope": "ETH_ONLY", "threshold": 0.55, "calibration": "CALIBRATION_PLATT_LOGISTIC_V1", "assets": ("ETHUSDT",)},
+    {"horizon": "8h", "scope": "POOLED_BTC_ETH", "threshold": 0.55, "calibration": "CALIBRATION_PLATT_LOGISTIC_V1", "assets": ("BTCUSDT", "ETHUSDT")},
 
-    # Horizon 12h (4 configurations)
-    {"horizon": "12h", "scope": "BTC_ONLY", "threshold": 0.55, "calibration": "CALIBRATION_LOGISTIC_V1", "assets": ("BTCUSDT",)},
-    {"horizon": "12h", "scope": "ETH_ONLY", "threshold": 0.55, "calibration": "CALIBRATION_LOGISTIC_V1", "assets": ("ETHUSDT",)},
-    {"horizon": "12h", "scope": "POOLED_BTC_ETH", "threshold": 0.55, "calibration": "CALIBRATION_LOGISTIC_V1", "assets": ("BTCUSDT", "ETHUSDT")},
-    {"horizon": "12h", "scope": "POOLED_BTC_ETH", "threshold": 0.60, "calibration": "CALIBRATION_ISOTONIC_V1", "assets": ("BTCUSDT", "ETHUSDT")},
+    {"horizon": "12h", "scope": "BTC_ONLY", "threshold": 0.55, "calibration": "CALIBRATION_PLATT_LOGISTIC_V1", "assets": ("BTCUSDT",)},
+    {"horizon": "12h", "scope": "ETH_ONLY", "threshold": 0.55, "calibration": "CALIBRATION_PLATT_LOGISTIC_V1", "assets": ("ETHUSDT",)},
+    {"horizon": "12h", "scope": "POOLED_BTC_ETH", "threshold": 0.55, "calibration": "CALIBRATION_PLATT_LOGISTIC_V1", "assets": ("BTCUSDT", "ETHUSDT")},
+
+    # Pooled-scope refinements: threshold/calibration diversity
+    {"horizon": "4h", "scope": "POOLED_BTC_ETH", "threshold": 0.60, "calibration": "CALIBRATION_ISOTONIC_IF_ELIGIBLE_V1", "assets": ("BTCUSDT", "ETHUSDT")},
+    {"horizon": "8h", "scope": "POOLED_BTC_ETH", "threshold": 0.65, "calibration": "CALIBRATION_PLATT_LOGISTIC_V1", "assets": ("BTCUSDT", "ETHUSDT")},
+    {"horizon": "12h", "scope": "POOLED_BTC_ETH", "threshold": 0.60, "calibration": "CALIBRATION_ISOTONIC_IF_ELIGIBLE_V1", "assets": ("BTCUSDT", "ETHUSDT")},
 )
+
+
+def _derive_slot_status(
+    scope: str,
+    requires_funding: bool,
+    requires_cross_asset: bool,
+    snapshot: RuntimeAuthoritySnapshot,
+) -> tuple[str, H40ReasonCode | None, str]:
+    """Derive (status, reason_code, notes) from the projected source set + P1 authority.
+
+    REGISTERED iff every required source is production VERIFIED;
+    NOT_TESTABLE otherwise.  No hard-coded per-slot exception may upgrade a
+    NOT_TESTABLE source.
+    """
+    required = project_required_sources(
+        scope=scope,
+        requires_cross_asset=requires_cross_asset,
+        requires_funding=requires_funding,
+    )
+    status, reason_code = snapshot.derive_slot_status(required)
+    if status == "NOT_TESTABLE":
+        unverified = [s for s in required if snapshot.per_source_states.get(s, "NOT_TESTABLE") != "VERIFIED"]
+        notes = f"unverified source(s): {', '.join(sorted(unverified))} (P1 authority snapshot)"
+    else:
+        notes = ""
+    return status, reason_code, notes
+
+
+def materialize_h40_search_space_production() -> H40ConfigurationLedger:
+    """Production materialization of the exact 168-slot search space.
+
+    Derives protocol authority hash, semantic root hash, and structural ledger
+    identity from the canonical accepted authority chain.  No caller-supplied
+    identity strings are accepted.  Runtime testability is derived mechanically
+    from the accepted P1 source-authority snapshot.
+
+    Strictly pre-outcome: zero labels, returns, MFE/MAE, or candidate outcomes.
+    """
+    return _materialize_search_space(production=True)
+
+
+def materialize_h40_search_space_synthetic() -> H40ConfigurationLedger:
+    """Synthetic/test-only materialization of the exact 168-slot search space.
+
+    Explicitly non-authoritative: for tests only.  Cannot be confused with
+    production materialization.  Runtime testability is still derived mechanically
+    from the accepted P1 source-authority snapshot.
+    """
+    return _materialize_search_space(production=False)
 
 
 def materialize_h40_search_space(
@@ -212,11 +272,24 @@ def materialize_h40_search_space(
 ) -> H40ConfigurationLedger:
     """Materializes and validates the exact 168-slot search space into an immutable ledger.
 
+    .. deprecated::
+        Use ``materialize_h40_search_space_production`` or
+        ``materialize_h40_search_space_synthetic`` instead.  This function
+        delegates to the synthetic builder; caller-supplied hashes are ignored
+        in production paths.
+
     Strict pre-outcome operation: zero labels, returns, MFE/MAE, or candidate outcomes are computed.
     """
-    p_hash = protocol_hash or DEFAULT_PROTOCOL_HASH
-    src_hash = source_manifest_hash or DEFAULT_SOURCE_MANIFEST_HASH
-    split_hash = split_manifest_hash or DEFAULT_SPLIT_MANIFEST_HASH
+    return _materialize_search_space(production=False)
+
+
+def _materialize_search_space(*, production: bool) -> H40ConfigurationLedger:
+    """Internal materialization shared by production and synthetic builders."""
+    p_hash = DEFAULT_PROTOCOL_HASH
+    src_hash = DEFAULT_SOURCE_MANIFEST_HASH
+    split_hash = DEFAULT_SPLIT_MANIFEST_HASH
+
+    snapshot = current_p1_authority_snapshot()
 
     ledger = H40ConfigurationLedger()
     current_slot_index = 0
@@ -230,6 +303,7 @@ def materialize_h40_search_space(
         fids = var_spec["feature_ids"]
         params = var_spec["params"]
         requires_funding = var_spec["requires_funding"]
+        requires_cross_asset = var_spec.get("requires_cross_asset", False)
 
         for cfg_template in TWELVE_CONFIG_TEMPLATE:
             horizon = cfg_template["horizon"]
@@ -238,17 +312,10 @@ def materialize_h40_search_space(
             calib_id = cfg_template["calibration"]
             assets = cfg_template["assets"]
 
-            # Source authority check: if funding is required and scope involves ETH,
-            # ETHUSDT_DERIVATIVES_FLOW is unverified under BASE Section 4.1.
-            # Mark NOT_TESTABLE fail-closed without silent replacement.
-            status = "REGISTERED"
-            reason_code = None
-            notes = ""
-
-            if requires_funding and ("ETHUSDT" in assets or scope in {"ETH_ONLY", "POOLED_BTC_ETH"}):
-                status = "NOT_TESTABLE"
-                reason_code = H40ReasonCode.NOT_TESTABLE
-                notes = "ETH derivatives source unverified (BASE Section 4.1)"
+            # Mechanical source testability derivation (replaces hardcoded gate)
+            status, reason_code, notes = _derive_slot_status(
+                scope, requires_funding, requires_cross_asset, snapshot,
+            )
 
             slot = H40ConfigurationSlot.create(
                 slot_index=current_slot_index,
@@ -292,6 +359,7 @@ def materialize_h40_search_space(
         fids = pair_spec["feature_ids"]
         params = pair_spec["params"]
         requires_funding = pair_spec["requires_funding"]
+        requires_cross_asset = pair_spec.get("requires_cross_asset", False)
 
         for cfg_template in TWELVE_CONFIG_TEMPLATE:
             horizon = cfg_template["horizon"]
@@ -300,14 +368,9 @@ def materialize_h40_search_space(
             calib_id = cfg_template["calibration"]
             assets = cfg_template["assets"]
 
-            status = "REGISTERED"
-            reason_code = None
-            notes = ""
-
-            if requires_funding and ("ETHUSDT" in assets or scope in {"ETH_ONLY", "POOLED_BTC_ETH"}):
-                status = "NOT_TESTABLE"
-                reason_code = H40ReasonCode.NOT_TESTABLE
-                notes = "ETH derivatives source unverified (BASE Section 4.1)"
+            status, reason_code, notes = _derive_slot_status(
+                scope, requires_funding, requires_cross_asset, snapshot,
+            )
 
             slot = H40ConfigurationSlot.create(
                 slot_index=current_slot_index,

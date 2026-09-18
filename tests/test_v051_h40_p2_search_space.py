@@ -605,7 +605,8 @@ def test_p2_15_unverified_sources_cannot_become_production_authority() -> None:
         assert slot.reason_code == H40ReasonCode.NOT_TESTABLE
         assert "unverified" in slot.notes.lower()
 
-    # D5 configs with BTC_ONLY use verified BTCUSDT_OFFICIAL_DERIVATIVES, remain REGISTERED
+    # D5 configs with BTC_ONLY require BTCUSDT_OFFICIAL_DERIVATIVES, which is NOT_TESTABLE
+    # under current P1 authority. Must also be marked NOT_TESTABLE.
     d5_btc_slots = [
         s for s in ledger.slots
         if s.family_combination == (H40Family.D5_FUNDING_DIRECTION_INTERACTION,)
@@ -613,8 +614,9 @@ def test_p2_15_unverified_sources_cannot_become_production_authority() -> None:
     ]
     assert len(d5_btc_slots) > 0
     for slot in d5_btc_slots:
-        assert slot.status == "REGISTERED"
-        assert slot.reason_code is None
+        assert slot.status == "NOT_TESTABLE"
+        assert slot.reason_code == H40ReasonCode.NOT_TESTABLE
+        assert "unverified" in slot.notes.lower()
 
 
 # ---------------------------------------------------------------------------

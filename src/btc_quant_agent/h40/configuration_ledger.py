@@ -1,7 +1,7 @@
 """168-slot configuration ledger for H40.
 
 Enforces strict D1–D5 family authority, depth-two pair restrictions,
-and an append-only, content-addressed 168-slot budget cap under H40_PROTOCOL_V1_R2.
+and an append-only, content-addressed 168-slot budget cap under H40_PROTOCOL_V1_R3.
 Binds protocol hash, source manifest hash, split manifest hash, and frozen kernel SHA.
 """
 
@@ -23,6 +23,12 @@ from .protocol import (
     DEFAULT_ACTION,
     FROZEN_KERNEL_SHA,
     H40ProtocolIdentity,
+)
+from .protocol_authority import (
+    compute_protocol_authority_hash as _compute_protocol_authority_hash,
+    compute_semantic_root_hash as _compute_semantic_root_hash,
+    compute_slot_hash as _compute_slot_hash,
+    compute_structural_configuration_hash as _compute_structural_configuration_hash,
 )
 
 MAX_CONFIGURATION_SLOTS: int = 168
@@ -101,7 +107,7 @@ class H40ConfigurationSlot:
     opportunity_contract_id: str = "O_RANGE_EXPANSION_V1_24H"
     direction_contract_id: str = ""
     geometry_contract_id: str = "GEOMETRY_ESTIMATOR_WF1_CELL_MEDIAN_V1"
-    calibration_contract_id: str = "CALIBRATION_LOGISTIC_V1"
+    calibration_contract_id: str = "CALIBRATION_PLATT_LOGISTIC_V1"
     abstention_policy: str = DEFAULT_ACTION
     required_feature_ids: tuple[str, ...] = ()
     feature_params: FrozenDict = field(default_factory=FrozenDict)
@@ -171,13 +177,17 @@ class H40ConfigurationSlot:
                         "D5 requires a base directional family in {D1, D2, D3}; funding alone is strictly non-directional.",
                     )
             elif depth == 2:
-                # Pair must include D1 or D3
+                # Pair must include D1, D2, or D3 as the base directional owner
                 other_fams = {f for f in self.family_combination if f != H40Family.D5_FUNDING_DIRECTION_INTERACTION}
-                allowed_bases = {H40Family.D1_TREND_CONTINUATION, H40Family.D3_FAILED_MOVE_REVERSAL}
+                allowed_bases = {
+                    H40Family.D1_TREND_CONTINUATION,
+                    H40Family.D2_BREAKOUT_CONTINUATION,
+                    H40Family.D3_FAILED_MOVE_REVERSAL,
+                }
                 if not (other_fams & allowed_bases):
                     raise H40GuardError(
                         H40ReasonCode.UNAUTHORIZED_FAMILY,
-                        "D5 pair requires a base directional family in {D1, D3}.",
+                        "D5 pair requires a base directional family in {D1, D2, D3}.",
                     )
 
         # Validate primary horizon
@@ -272,6 +282,30 @@ class H40ConfigurationSlot:
         }
         return canonical_sha256(semantic_payload)
 
+    @property
+    def structural_configuration_hash(self) -> str:
+        """Structural configuration hash binding protocol authority + semantic root + row fields.
+
+        Excludes ``slot_index``, ``status``, ``reason_code``, ``notes`` (runtime, not structural).
+        Binds ``protocol_authority_hash`` + ``semantic_root_hash`` + row semantic fields.
+        A source promotion changes runtime status but must not mutate this hash.
+        """
+        return _compute_structural_configuration_hash(
+            protocol_authority_hash=_compute_protocol_authority_hash(),
+            semantic_root_hash=_compute_semantic_root_hash(),
+            family_combination=[self.direction_variant],
+            primary_horizon=self.primary_horizon,
+            scope=self.scope,
+            action_threshold=self.action_threshold,
+            calibration_contract_id=self.calibration_contract_id,
+            abstention_policy=self.abstention_policy,
+        )
+
+    @property
+    def slot_hash(self) -> str:
+        """Slot hash includes ``slot_index``; configuration hash excludes it."""
+        return _compute_slot_hash(self.slot_index, self.structural_configuration_hash)
+
     def to_dict(self) -> dict[str, Any]:
         """Serializes slot to dictionary."""
         return {
@@ -329,7 +363,7 @@ class H40ConfigurationSlot:
             opportunity_contract_id=str(data.get("opportunity_contract_id", "O_RANGE_EXPANSION_V1_24H")),
             direction_contract_id=str(data.get("direction_contract_id", "")),
             geometry_contract_id=str(data.get("geometry_contract_id", "GEOMETRY_ESTIMATOR_WF1_CELL_MEDIAN_V1")),
-            calibration_contract_id=str(data.get("calibration_contract_id", "CALIBRATION_LOGISTIC_V1")),
+            calibration_contract_id=str(data.get("calibration_contract_id", "CALIBRATION_PLATT_LOGISTIC_V1")),
             abstention_policy=str(data.get("abstention_policy", DEFAULT_ACTION)),
             required_feature_ids=tuple(str(fid) for fid in data.get("required_feature_ids", ())),
             feature_params=FrozenDict(data.get("feature_params", {})),
@@ -363,7 +397,7 @@ class H40ConfigurationSlot:
         opportunity_contract_id: str = "O_RANGE_EXPANSION_V1_24H",
         direction_contract_id: str = "",
         geometry_contract_id: str = "GEOMETRY_ESTIMATOR_WF1_CELL_MEDIAN_V1",
-        calibration_contract_id: str = "CALIBRATION_LOGISTIC_V1",
+        calibration_contract_id: str = "CALIBRATION_PLATT_LOGISTIC_V1",
         abstention_policy: str = DEFAULT_ACTION,
         required_feature_ids: tuple[str, ...] | list[str] = (),
         feature_params: Mapping[str, Any] | None = None,
@@ -404,8 +438,9 @@ class H40ConfigurationSlot:
             direction_contract_id = fams[0].value
 
         params_dict = dict(feature_params) if feature_params is not None else {}
-        if H40Family.D5_FUNDING_DIRECTION_INTERACTION in fams and "base_directional_owner" not in params_dict:
-            params_dict["base_directional_owner"] = "D1_TREND_CONTINUATION"
+        # No implicit D5 base-owner injection — R3R3 Section 2.3:
+        # a D5 row missing or mismatching any explicit base identity must fail
+        # closed with UNAUTHORIZED_FAMILY.  No factory/default inference is authorized.
 
         return cls(
             slot_index=slot_index,
@@ -574,3 +609,15 @@ class H40ConfigurationLedger:
     def ledger_hash(self) -> str:
         """Returns SHA-256 hash over canonical ledger content."""
         return canonical_sha256(self.to_dict())
+
+    @property
+    def structural_ledger_hash(self) -> str:
+        """Structural ledger hash over the ordered 168 slot hashes.
+
+        Binds ``protocol_authority_hash`` + ``semantic_root_hash`` transitively
+        via each slot's ``structural_configuration_hash``.  Excludes runtime
+        ``status``/``reason_code``/``notes`` — a source promotion changes runtime
+        status but must not mutate this hash.
+        """
+        from .protocol_authority import compute_structural_ledger_hash
+        return compute_structural_ledger_hash([s.slot_hash for s in self._slots])

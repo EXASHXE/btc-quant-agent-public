@@ -1,6 +1,6 @@
 """H40 Protocol Identity definition and canonical hashing.
 
-Binds immutable preregistration metadata under schema H40_PROTOCOL_V1_R2.
+Binds immutable preregistration metadata under schema H40_PROTOCOL_V1_R3.
 """
 
 from __future__ import annotations
@@ -16,12 +16,20 @@ from ..research_contract.canonical import (
     thaw_json,
 )
 
-SCHEMA_NAME: str = "H40_PROTOCOL_V1_R2"
+SCHEMA_NAME: str = "H40_PROTOCOL_V1_R3"
 FROZEN_KERNEL_SHA: str = "6838e9db8d5c369b5da87354821d9c8e79c2a879"
 BASE_PREREG_COMMIT: str = "8b36cfde2ac14a37ed4eb244a8b5ae88882765b4"
 AMENDMENT_R1_COMMIT: str = "59e9fe0ba361557c5df56f0d8f8afaa781cf0071"
 AMENDMENT_R2_COMMIT: str = "4bdeb1a0102b3cb374e8ec7d01b41a79dcc8b021"
 SOL_ACCEPTANCE_COMMIT: str = "b9c8531e719fd4f10cf27301719c9e066b95be13"
+P1_CODE_BASELINE_COMMIT: str = "3fc89541ed0965fc0e2972af310e34ae1b838168"
+P1_FINAL_ACCEPTANCE_COMMIT: str = "95ab819d5300312b4d493b9585b4b369621504b6"
+R3_AMENDMENT_COMMIT: str = "e45899bb0118b14127bc765f49315109cfd94ff0"
+R3R1_AMENDMENT_COMMIT: str = "3f1bf28dc810ca4fd1bfd2bef566033cd15550fa"
+R3R2_AMENDMENT_COMMIT: str = "77601342ac9055b5c0bb47639d4c8ef7d83da154"
+R3R3_AMENDMENT_COMMIT: str = "f01062b4b1a20d12f93ee1351bfda67e19401f25"
+R3R4_AMENDMENT_COMMIT: str = "7520a62d0516ee097c276451b9f8df5924c6408f"
+R3R4_ACCEPTANCE_COMMIT: str = "cf69d5295e2b0227920e265d9afe7dcf831af44e"
 
 PRODUCTS: tuple[str, ...] = ("BTCUSDT", "ETHUSDT")
 CADENCE: str = "1h"
