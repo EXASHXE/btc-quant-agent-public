@@ -17,14 +17,14 @@ import json
 import pytest
 
 from btc_quant_agent.h40 import (
+    EXPECTED_PROTOCOL_AUTHORITY_HASH,
+    EXPECTED_SEMANTIC_ROOT_HASH,
+    EXPECTED_STRUCTURAL_LEDGER_HASH,
     H40ConfigurationLedger,
     H40ConfigurationSlot,
     H40Family,
     H40GuardError,
     H40ReasonCode,
-    EXPECTED_PROTOCOL_AUTHORITY_HASH,
-    EXPECTED_SEMANTIC_ROOT_HASH,
-    EXPECTED_STRUCTURAL_LEDGER_HASH,
     compute_protocol_authority_hash,
     compute_semantic_root_hash,
     materialize_h40_search_space_production,
@@ -465,7 +465,7 @@ def test_27_side_specific_neff_uses_side_subsets() -> None:
     pooled = long_trades + short_trades
 
     def occupied_days(trades):
-        return len(set(t // 24 for t in trades))
+        return len({t // 24 for t in trades})
 
     long_days = occupied_days(long_trades)
     short_days = occupied_days(short_trades)

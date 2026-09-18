@@ -249,7 +249,7 @@ _RESERVED_FAMILY_VOCABULARY: tuple[str, ...] = (
 
 
 def _reserved_family_vocabulary_hash() -> str:
-    return canonical_sha256(sorted(list(_RESERVED_FAMILY_VOCABULARY)))
+    return canonical_sha256(sorted(_RESERVED_FAMILY_VOCABULARY))
 
 
 # --- R3R4 statistical-decision contracts (8 content hashes) --------------

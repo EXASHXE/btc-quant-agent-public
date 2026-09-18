@@ -25,10 +25,10 @@ from .protocol import (
     H40ProtocolIdentity,
 )
 from .protocol_authority import (
-    compute_protocol_authority_hash as _compute_protocol_authority_hash,
-    compute_semantic_root_hash as _compute_semantic_root_hash,
-    compute_slot_hash as _compute_slot_hash,
-    compute_structural_configuration_hash as _compute_structural_configuration_hash,
+    compute_protocol_authority_hash,
+    compute_semantic_root_hash,
+    compute_slot_hash,
+    compute_structural_configuration_hash,
 )
 
 MAX_CONFIGURATION_SLOTS: int = 168
@@ -290,9 +290,9 @@ class H40ConfigurationSlot:
         Binds ``protocol_authority_hash`` + ``semantic_root_hash`` + row semantic fields.
         A source promotion changes runtime status but must not mutate this hash.
         """
-        return _compute_structural_configuration_hash(
-            protocol_authority_hash=_compute_protocol_authority_hash(),
-            semantic_root_hash=_compute_semantic_root_hash(),
+        return compute_structural_configuration_hash(
+            protocol_authority_hash=compute_protocol_authority_hash(),
+            semantic_root_hash=compute_semantic_root_hash(),
             family_combination=[self.direction_variant],
             primary_horizon=self.primary_horizon,
             scope=self.scope,
@@ -304,7 +304,7 @@ class H40ConfigurationSlot:
     @property
     def slot_hash(self) -> str:
         """Slot hash includes ``slot_index``; configuration hash excludes it."""
-        return _compute_slot_hash(self.slot_index, self.structural_configuration_hash)
+        return compute_slot_hash(self.slot_index, self.structural_configuration_hash)
 
     def to_dict(self) -> dict[str, Any]:
         """Serializes slot to dictionary."""
