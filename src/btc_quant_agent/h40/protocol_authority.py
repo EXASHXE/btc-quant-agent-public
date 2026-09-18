@@ -14,7 +14,10 @@ Strictly pre-outcome: no labels, forward returns, MFE/MAE, metrics, or outcomes.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from .guards import H40ReasonCode
 
 from ..research_contract.canonical import (
     FrozenDict,
@@ -411,11 +414,13 @@ class RuntimeAuthoritySnapshot:
             }
         )
 
-    def derive_slot_status(self, required_source_ids: tuple[str, ...]) -> tuple[str, str | None]:
+    def derive_slot_status(
+        self, required_source_ids: tuple[str, ...]
+    ) -> tuple[str, H40ReasonCode | None]:
         """Derive (status, reason_code) for a slot from its required source set.
 
         Returns ``("REGISTERED", None)`` iff every required source is production
-        VERIFIED; ``("NOT_TESTABLE", "NOT_TESTABLE")`` otherwise.
+        VERIFIED; ``("NOT_TESTABLE", H40ReasonCode.NOT_TESTABLE)`` otherwise.
         """
         from .guards import H40ReasonCode
 
