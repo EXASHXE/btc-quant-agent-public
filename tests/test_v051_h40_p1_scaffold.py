@@ -1787,9 +1787,11 @@ def test_lifecycle_state_machine_p1_boundary() -> None:
         sm.transition_to(H40LifecycleState.H40_CONFIRMATION_READY)
     assert exc_info.value.reason_code == H40ReasonCode.CONFIRMATION_NOT_READY
 
-    # Legal transition to DISCOVERY
-    sm.transition_to(H40LifecycleState.H40_DISCOVERY)
-    assert sm.current_state == H40LifecycleState.H40_DISCOVERY
+    # Adjacency alone no longer authorizes Discovery under accepted F01.
+    with pytest.raises(H40GuardError) as exc_info:
+        sm.transition_to(H40LifecycleState.H40_DISCOVERY)
+    assert exc_info.value.reason_code == H40ReasonCode.NOT_TESTABLE
+    assert sm.current_state == H40LifecycleState.H40_P1_SCAFFOLDED
 
 
 # ==============================================================================
