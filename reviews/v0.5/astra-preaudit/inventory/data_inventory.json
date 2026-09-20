@@ -1,0 +1,873 @@
+{
+  "schema_version": "1.0.0",
+  "generated_at": "2026-09-20T09:45:54.450374",
+  "total_data_disk_usage_bytes": 124853685452,
+  "datasets": [
+    {
+      "dataset_id": "BTCUSDT_CANONICAL_1M_PARQUET",
+      "path": "data/research/BTCUSDT/1m",
+      "format": "PARQUET",
+      "tracked": false,
+      "file_count": 67,
+      "total_rows": 2934720,
+      "years": [
+        "year=2021",
+        "year=2022",
+        "year=2023",
+        "year=2024",
+        "year=2025",
+        "year=2026"
+      ],
+      "columns": [
+        {
+          "name": "open_time_ms",
+          "type": "int64"
+        },
+        {
+          "name": "open",
+          "type": "double"
+        },
+        {
+          "name": "high",
+          "type": "double"
+        },
+        {
+          "name": "low",
+          "type": "double"
+        },
+        {
+          "name": "close",
+          "type": "double"
+        },
+        {
+          "name": "volume",
+          "type": "double"
+        },
+        {
+          "name": "close_time_ms",
+          "type": "int64"
+        },
+        {
+          "name": "quote_volume",
+          "type": "double"
+        },
+        {
+          "name": "trades",
+          "type": "int64"
+        },
+        {
+          "name": "taker_buy_base_volume",
+          "type": "double"
+        }
+      ],
+      "source": "Binance Futures (USDT-M) via official archive script",
+      "pit_status": "PIT_SAFE_CLOSED_BARS",
+      "authority_status": "ACCEPTED_P1_SOURCE",
+      "writer": "tools/build_official_dataset.py / src/btc_quant_agent/data/binance_archive.py",
+      "reader": "src/btc_quant_agent/h40/source_manifest.py, research loaders",
+      "protected": false
+    },
+    {
+      "dataset_id": "BTCUSDT_SPOT_1M_PARQUET",
+      "path": "data/research/BTCUSDT_SPOT/1m",
+      "format": "PARQUET",
+      "tracked": false,
+      "file_count": 61,
+      "total_rows": 2673007,
+      "years": [
+        "year=2021",
+        "year=2022",
+        "year=2023",
+        "year=2024",
+        "year=2025",
+        "year=2026"
+      ],
+      "columns": [
+        {
+          "name": "open_time_ms",
+          "type": "int64"
+        },
+        {
+          "name": "close_time_ms",
+          "type": "int64"
+        },
+        {
+          "name": "volume",
+          "type": "double"
+        },
+        {
+          "name": "taker_buy_base_volume",
+          "type": "double"
+        }
+      ],
+      "source": "Binance Spot Archive",
+      "pit_status": "PIT_SAFE_CLOSED_BARS",
+      "authority_status": "SECONDARY_RESEARCH_SOURCE",
+      "writer": "tools/build_spot_market_flow_dataset.py",
+      "reader": "spot_perp_flow_research.py (historical), feature loaders",
+      "protected": false
+    },
+    {
+      "dataset_id": "CROSS_ASSET_1H_PARQUET",
+      "path": "data/research/cross_asset_1h",
+      "format": "PARQUET",
+      "tracked": false,
+      "file_count": 5,
+      "symbols": [
+        "ADAUSDT",
+        "BNBUSDT",
+        "ETHUSDT",
+        "LTCUSDT",
+        "XRPUSDT"
+      ],
+      "frequency": "1h",
+      "source": "Binance Public Spot/Futures Archive",
+      "pit_status": "PIT_SAFE_HOURLY",
+      "authority_status": "P1_CONFIRMATORY_SOURCE_ETH",
+      "writer": "tools/build_cross_asset_hourly_dataset.py",
+      "reader": "src/btc_quant_agent/h40/source_manifest.py (ETHUSDT for D4)",
+      "protected": false
+    },
+    {
+      "dataset_id": "BINANCE_OFFICIAL_DERIVATIVES_RAW_ARCHIVE",
+      "path": "data/research/v0.3.19_official_derivatives/raw",
+      "format": "CSV_GZ",
+      "tracked": false,
+      "file_count": 732,
+      "size_bytes": 85650117000,
+      "categories": [
+        "premiumIndexKlines_1m",
+        "perp_aggTrades",
+        "spot_aggTrades",
+        "indexPriceKlines_1m",
+        "fundingRate",
+        "markPriceKlines_1m"
+      ],
+      "source": "data.binance.vision (Binance Official Public Archive)",
+      "pit_status": "PIT_SAFE_HISTORICAL_TICK_AND_KLINES",
+      "authority_status": "RESEARCH_FEATURE_SUBSTRATE",
+      "writer": "External downloader / curl script",
+      "reader": "tools/build_v0319_official_features.py, data/official_derivatives_features.py",
+      "protected": false
+    },
+    {
+      "dataset_id": "FORWARD_MICROSTRUCTURE_STORE",
+      "path": "data/forward/BTCUSDT/microstructure",
+      "format": "SQLITE3_WAL",
+      "tracked": false,
+      "total_partitions": 21,
+      "first_partition": "microstructure-2026-08-31.sqlite3",
+      "latest_partition": "microstructure-2026-09-20.sqlite3",
+      "size_bytes": 38577797120,
+      "tables": [
+        "depth_events",
+        "agg_trades",
+        "gaps",
+        "book_samples",
+        "aggregates",
+        "sessions",
+        "audit_counters"
+      ],
+      "source": "Live Binance Futures WebSocket streams (wss://fstream.binance.com)",
+      "pit_status": "PIT_FORWARD_CAUSAL",
+      "authority_status": "OPERATIONAL_FORWARD_EVIDENCE",
+      "writer": "quantctl microstructure-forward run (active systemd daemon PID 286)",
+      "reader": "quantctl forward-evidence health / status / research qualification",
+      "protected": false
+    },
+    {
+      "dataset_id": "FORWARD_DERIVATIVES_STORE",
+      "path": "data/forward/BTCUSDT/derivatives.sqlite3",
+      "format": "SQLITE3",
+      "tracked": false,
+      "size_bytes": 6008832,
+      "tables": {
+        "derivative_snapshots": {
+          "columns": [
+            {
+              "cid": 0,
+              "name": "symbol",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 1
+            },
+            {
+              "cid": 1,
+              "name": "collection_id",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 2,
+              "name": "collection_started_at_ms",
+              "type": "INTEGER",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 3,
+              "name": "observed_at_ms",
+              "type": "INTEGER",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 2
+            },
+            {
+              "cid": 4,
+              "name": "collector_version",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 5,
+              "name": "mark_price",
+              "type": "REAL",
+              "notnull": 0,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 6,
+              "name": "index_price",
+              "type": "REAL",
+              "notnull": 0,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 7,
+              "name": "premium_bps",
+              "type": "REAL",
+              "notnull": 0,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 8,
+              "name": "funding_rate",
+              "type": "REAL",
+              "notnull": 0,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 9,
+              "name": "funding_time_ms",
+              "type": "INTEGER",
+              "notnull": 0,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 10,
+              "name": "open_interest",
+              "type": "REAL",
+              "notnull": 0,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 11,
+              "name": "open_interest_time_ms",
+              "type": "INTEGER",
+              "notnull": 0,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 12,
+              "name": "open_interest_change_pct",
+              "type": "REAL",
+              "notnull": 0,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 13,
+              "name": "taker_buy_sell_ratio",
+              "type": "REAL",
+              "notnull": 0,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 14,
+              "name": "taker_time_ms",
+              "type": "INTEGER",
+              "notnull": 0,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 15,
+              "name": "basis_rate",
+              "type": "REAL",
+              "notnull": 0,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 16,
+              "name": "basis_time_ms",
+              "type": "INTEGER",
+              "notnull": 0,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 17,
+              "name": "long_short_account_ratio",
+              "type": "REAL",
+              "notnull": 0,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 18,
+              "name": "long_short_time_ms",
+              "type": "INTEGER",
+              "notnull": 0,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 19,
+              "name": "order_book_imbalance",
+              "type": "REAL",
+              "notnull": 0,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 20,
+              "name": "spread_bps",
+              "type": "REAL",
+              "notnull": 0,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 21,
+              "name": "order_book_time_ms",
+              "type": "INTEGER",
+              "notnull": 0,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 22,
+              "name": "field_availability_json",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 23,
+              "name": "endpoint_errors_json",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 24,
+              "name": "payload_hash",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            }
+          ],
+          "row_count": 1611
+        },
+        "collection_runs": {
+          "columns": [
+            {
+              "cid": 0,
+              "name": "run_id",
+              "type": "TEXT",
+              "notnull": 0,
+              "dflt_value": null,
+              "pk": 1
+            },
+            {
+              "cid": 1,
+              "name": "started_at_ms",
+              "type": "INTEGER",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 2,
+              "name": "finished_at_ms",
+              "type": "INTEGER",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 3,
+              "name": "status",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 4,
+              "name": "attempted_fields",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 5,
+              "name": "successful_fields",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 6,
+              "name": "error_summary",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 7,
+              "name": "trigger_source",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": "'LEGACY_UNKNOWN'",
+              "pk": 0
+            },
+            {
+              "cid": 8,
+              "name": "scheduled_slot_ms",
+              "type": "INTEGER",
+              "notnull": 0,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 9,
+              "name": "endpoint_telemetry_json",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": "'{}'",
+              "pk": 0
+            },
+            {
+              "cid": 10,
+              "name": "evidence_epoch_id",
+              "type": "TEXT",
+              "notnull": 0,
+              "dflt_value": null,
+              "pk": 0
+            }
+          ],
+          "row_count": 1896
+        }
+      },
+      "source": "Live Binance Futures REST snapshots (15m interval)",
+      "pit_status": "PIT_FORWARD_CAUSAL",
+      "authority_status": "OPERATIONAL_FORWARD_EVIDENCE",
+      "writer": "quantctl derivatives collect-once (systemd timer)",
+      "reader": "src/btc_quant_agent/forward_evidence.py",
+      "protected": false
+    },
+    {
+      "dataset_id": "FORWARD_OPPORTUNITY_SHADOW_STORE",
+      "path": "data/forward/BTCUSDT/opportunity_shadow.sqlite3",
+      "format": "SQLITE3",
+      "tracked": false,
+      "size_bytes": 344064,
+      "tables": {
+        "scan_observations": {
+          "columns": [
+            {
+              "cid": 0,
+              "name": "observation_id",
+              "type": "TEXT",
+              "notnull": 0,
+              "dflt_value": null,
+              "pk": 1
+            },
+            {
+              "cid": 1,
+              "name": "campaign_id",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 2,
+              "name": "scheduled_slot_ms",
+              "type": "INTEGER",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 3,
+              "name": "collection_started_at_ms",
+              "type": "INTEGER",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 4,
+              "name": "observed_at_ms",
+              "type": "INTEGER",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 5,
+              "name": "status",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 6,
+              "name": "market_data_health",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 7,
+              "name": "decision_close_ms",
+              "type": "INTEGER",
+              "notnull": 0,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 8,
+              "name": "regime",
+              "type": "TEXT",
+              "notnull": 0,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 9,
+              "name": "atr_15m",
+              "type": "REAL",
+              "notnull": 0,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 10,
+              "name": "atr_percentile_decile",
+              "type": "INTEGER",
+              "notnull": 0,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 11,
+              "name": "opportunity_present",
+              "type": "INTEGER",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 12,
+              "name": "opportunity_id",
+              "type": "TEXT",
+              "notnull": 0,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 13,
+              "name": "detector_id",
+              "type": "TEXT",
+              "notnull": 0,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 14,
+              "name": "setup",
+              "type": "TEXT",
+              "notnull": 0,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 15,
+              "name": "registry_version",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 16,
+              "name": "git_sha",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 17,
+              "name": "config_hash",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 18,
+              "name": "network_data_errors_json",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 19,
+              "name": "payload_hash",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 20,
+              "name": "trigger_source",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": "'LEGACY_UNKNOWN'",
+              "pk": 0
+            }
+          ],
+          "row_count": 377
+        },
+        "outcomes": {
+          "columns": [
+            {
+              "cid": 0,
+              "name": "observation_id",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 1
+            },
+            {
+              "cid": 1,
+              "name": "horizon_minutes",
+              "type": "INTEGER",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 2
+            },
+            {
+              "cid": 2,
+              "name": "reference_time_ms",
+              "type": "INTEGER",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 3,
+              "name": "reference_price",
+              "type": "REAL",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 4,
+              "name": "future_high",
+              "type": "REAL",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 5,
+              "name": "future_low",
+              "type": "REAL",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 6,
+              "name": "future_close",
+              "type": "REAL",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 7,
+              "name": "future_range_atr",
+              "type": "REAL",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 8,
+              "name": "max_up_excursion_atr",
+              "type": "REAL",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 9,
+              "name": "max_down_excursion_atr",
+              "type": "REAL",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 10,
+              "name": "max_abs_excursion_atr",
+              "type": "REAL",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 11,
+              "name": "resolved_at_ms",
+              "type": "INTEGER",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 12,
+              "name": "resolution_source",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 13,
+              "name": "payload_hash",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            }
+          ],
+          "row_count": 459
+        },
+        "integrity_events": {
+          "columns": [
+            {
+              "cid": 0,
+              "name": "event_id",
+              "type": "INTEGER",
+              "notnull": 0,
+              "dflt_value": null,
+              "pk": 1
+            },
+            {
+              "cid": 1,
+              "name": "occurred_at_ms",
+              "type": "INTEGER",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 2,
+              "name": "kind",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 3,
+              "name": "observation_id",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            }
+          ],
+          "row_count": 0
+        },
+        "sqlite_sequence": {
+          "columns": [
+            {
+              "cid": 0,
+              "name": "name",
+              "type": "",
+              "notnull": 0,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 1,
+              "name": "seq",
+              "type": "",
+              "notnull": 0,
+              "dflt_value": null,
+              "pk": 0
+            }
+          ],
+          "row_count": 0
+        }
+      },
+      "source": "Forward opportunity scanner shadow evaluation",
+      "pit_status": "PIT_FORWARD_CAUSAL",
+      "authority_status": "DIAGNOSTIC_SHADOW_EVIDENCE",
+      "writer": "quantctl opportunity-forward collect-once / resolve (systemd timers)",
+      "reader": "quantctl opportunity-forward report / status",
+      "protected": false
+    },
+    {
+      "dataset_id": "H39_VALIDATION_LEDGER_PROTECTED",
+      "path": "data/research/h39_validation",
+      "format": "SQLITE3_ENCRYPTED_OR_SEALED",
+      "tracked": false,
+      "size_bytes": 351000,
+      "files": [
+        "h39_blind_ledger.sqlite3",
+        "h39_one_shot_execution_registry.sqlite3",
+        "backups/ (10 files)"
+      ],
+      "source": "H39 Forward Blind Validation Protocol",
+      "pit_status": "PROTECTED_OUTCOME_BOUNDARY",
+      "authority_status": "SEALED_PREREGISTERED_VALIDATION",
+      "writer": "H39 accumulation daemon (frozen/stopped)",
+      "reader": "FORBIDDEN TO OPEN (Guarded by src/btc_quant_agent/h40/guards.py)",
+      "protected": true
+    }
+  ]
+}

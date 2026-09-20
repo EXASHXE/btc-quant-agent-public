@@ -1,0 +1,1540 @@
+{
+  "schema_version": "1.0.0",
+  "generated_at": "2026-09-20T09:45:54.440549",
+  "analyzed_commit": "cfefdbabfeef8ab004e43bbda24038e4d5e3fca0",
+  "cycles_count": 0,
+  "cycles": [],
+  "top_fan_in": [
+    {
+      "module": "src/btc_quant_agent/domain.py",
+      "fan_in": 34,
+      "callers": [
+        "src/btc_quant_agent/data/derivatives.py",
+        "src/btc_quant_agent/formal_research.py",
+        "src/btc_quant_agent/data/csvio.py",
+        "src/btc_quant_agent/engine.py",
+        "src/btc_quant_agent/structure.py",
+        "src/btc_quant_agent/execution/service.py",
+        "src/btc_quant_agent/data/resample.py",
+        "src/btc_quant_agent/notify/feishu.py",
+        "src/btc_quant_agent/mechanism.py",
+        "src/btc_quant_agent/shadow.py",
+        "src/btc_quant_agent/economic/signal_producer.py",
+        "src/btc_quant_agent/economic/acceptance_verifier.py",
+        "src/btc_quant_agent/data/quality.py",
+        "src/btc_quant_agent/economic/qualification.py",
+        "src/btc_quant_agent/explain.py",
+        "src/btc_quant_agent/mechanism_research.py",
+        "src/btc_quant_agent/opportunity_forward.py",
+        "src/btc_quant_agent/storage.py",
+        "src/btc_quant_agent/data/binance.py",
+        "src/btc_quant_agent/execution/models.py",
+        "src/btc_quant_agent/economic/simulator.py",
+        "src/btc_quant_agent/data/forward_store.py",
+        "src/btc_quant_agent/service.py",
+        "src/btc_quant_agent/economic/replay_bundle.py",
+        "src/btc_quant_agent/economic/execution_model.py",
+        "src/btc_quant_agent/data/binance_archive.py",
+        "src/btc_quant_agent/research.py",
+        "src/btc_quant_agent/multifactor.py",
+        "src/btc_quant_agent/regime.py",
+        "src/btc_quant_agent/risk.py",
+        "src/btc_quant_agent/funnel.py",
+        "src/btc_quant_agent/backtest.py",
+        "src/btc_quant_agent/strategies.py",
+        "src/btc_quant_agent/features.py"
+      ]
+    },
+    {
+      "module": "src/btc_quant_agent/config.py",
+      "fan_in": 23,
+      "callers": [
+        "src/btc_quant_agent/research_protocol.py",
+        "src/btc_quant_agent/data/derivatives.py",
+        "src/btc_quant_agent/microstructure_research.py",
+        "src/btc_quant_agent/engine.py",
+        "src/btc_quant_agent/execution/guard.py",
+        "src/btc_quant_agent/execution/service.py",
+        "src/btc_quant_agent/mechanism.py",
+        "src/btc_quant_agent/shadow.py",
+        "src/btc_quant_agent/microstructure.py",
+        "src/btc_quant_agent/mechanism_research.py",
+        "src/btc_quant_agent/opportunity_forward.py",
+        "src/btc_quant_agent/data/binance.py",
+        "src/btc_quant_agent/service.py",
+        "src/btc_quant_agent/api.py",
+        "src/btc_quant_agent/research.py",
+        "src/btc_quant_agent/multifactor.py",
+        "src/btc_quant_agent/regime.py",
+        "src/btc_quant_agent/risk.py",
+        "src/btc_quant_agent/funnel.py",
+        "src/btc_quant_agent/cli.py",
+        "src/btc_quant_agent/backtest.py",
+        "src/btc_quant_agent/strategies.py",
+        "src/btc_quant_agent/features.py"
+      ]
+    },
+    {
+      "module": "src/btc_quant_agent/research_contract/canonical.py",
+      "fan_in": 16,
+      "callers": [
+        "src/btc_quant_agent/h40/source_manifest.py",
+        "src/btc_quant_agent/formal_research.py",
+        "src/btc_quant_agent/h40/protocol_authority.py",
+        "src/btc_quant_agent/economic/replay_bundle.py",
+        "src/btc_quant_agent/research_contract/registry.py",
+        "src/btc_quant_agent/h40/configuration_ledger.py",
+        "src/btc_quant_agent/economic/execution_replay.py",
+        "src/btc_quant_agent/economic/funding_evidence.py",
+        "src/btc_quant_agent/economic/signal_producer.py",
+        "src/btc_quant_agent/economic/metrics.py",
+        "src/btc_quant_agent/economic/acceptance_verifier.py",
+        "src/btc_quant_agent/h40/protocol.py",
+        "src/btc_quant_agent/economic/qualification.py",
+        "src/btc_quant_agent/h40/feature_contracts.py",
+        "src/btc_quant_agent/h40/split_manifest.py",
+        "src/btc_quant_agent/research_contract/models.py"
+      ]
+    },
+    {
+      "module": "src/btc_quant_agent/data/binance.py",
+      "fan_in": 10,
+      "callers": [
+        "src/btc_quant_agent/data/forward_store.py",
+        "src/btc_quant_agent/service.py",
+        "src/btc_quant_agent/microstructure_research.py",
+        "src/btc_quant_agent/data/collector.py",
+        "src/btc_quant_agent/opportunity_forward.py",
+        "src/btc_quant_agent/cli.py",
+        "src/btc_quant_agent/data/network_diagnostic.py",
+        "src/btc_quant_agent/forward_diagnostics.py",
+        "src/btc_quant_agent/microstructure.py",
+        "src/btc_quant_agent/execution/service.py"
+      ]
+    },
+    {
+      "module": "src/btc_quant_agent/economic/signal.py",
+      "fan_in": 9,
+      "callers": [
+        "src/btc_quant_agent/economic/simulator.py",
+        "src/btc_quant_agent/formal_research.py",
+        "src/btc_quant_agent/economic/__init__.py",
+        "src/btc_quant_agent/economic/replay_bundle.py",
+        "src/btc_quant_agent/economic/execution_replay.py",
+        "src/btc_quant_agent/economic/policy.py",
+        "src/btc_quant_agent/economic/signal_producer.py",
+        "src/btc_quant_agent/economic/acceptance_verifier.py",
+        "src/btc_quant_agent/economic/qualification.py"
+      ]
+    },
+    {
+      "module": "src/btc_quant_agent/economic/policy.py",
+      "fan_in": 8,
+      "callers": [
+        "src/btc_quant_agent/economic/order.py",
+        "src/btc_quant_agent/economic/simulator.py",
+        "src/btc_quant_agent/formal_research.py",
+        "src/btc_quant_agent/economic/__init__.py",
+        "src/btc_quant_agent/economic/execution_replay.py",
+        "src/btc_quant_agent/economic/execution_model.py",
+        "src/btc_quant_agent/economic/acceptance_verifier.py",
+        "src/btc_quant_agent/economic/qualification.py"
+      ]
+    },
+    {
+      "module": "src/btc_quant_agent/economic/fee_model.py",
+      "fan_in": 7,
+      "callers": [
+        "src/btc_quant_agent/economic/simulator.py",
+        "src/btc_quant_agent/formal_research.py",
+        "src/btc_quant_agent/economic/__init__.py",
+        "src/btc_quant_agent/economic/execution_replay.py",
+        "src/btc_quant_agent/economic/execution_model.py",
+        "src/btc_quant_agent/economic/acceptance_verifier.py",
+        "src/btc_quant_agent/economic/qualification.py"
+      ]
+    },
+    {
+      "module": "src/btc_quant_agent/economic/funding.py",
+      "fan_in": 7,
+      "callers": [
+        "src/btc_quant_agent/economic/simulator.py",
+        "src/btc_quant_agent/formal_research.py",
+        "src/btc_quant_agent/economic/__init__.py",
+        "src/btc_quant_agent/economic/execution_replay.py",
+        "src/btc_quant_agent/economic/funding_evidence.py",
+        "src/btc_quant_agent/economic/acceptance_verifier.py",
+        "src/btc_quant_agent/economic/qualification.py"
+      ]
+    },
+    {
+      "module": "src/btc_quant_agent/h40/guards.py",
+      "fan_in": 7,
+      "callers": [
+        "src/btc_quant_agent/h40/search_space.py",
+        "src/btc_quant_agent/h40/source_manifest.py",
+        "src/btc_quant_agent/h40/lifecycle.py",
+        "src/btc_quant_agent/h40/configuration_ledger.py",
+        "src/btc_quant_agent/h40/__init__.py",
+        "src/btc_quant_agent/h40/feature_contracts.py",
+        "src/btc_quant_agent/h40/split_manifest.py"
+      ]
+    },
+    {
+      "module": "src/btc_quant_agent/publication.py",
+      "fan_in": 7,
+      "callers": [
+        "src/btc_quant_agent/formal_research.py",
+        "src/btc_quant_agent/data/forward_store.py",
+        "src/btc_quant_agent/research_contract/registry.py",
+        "src/btc_quant_agent/data/manifest.py",
+        "src/btc_quant_agent/microstructure_research.py",
+        "src/btc_quant_agent/microstructure.py",
+        "src/btc_quant_agent/economic/qualification.py"
+      ]
+    },
+    {
+      "module": "src/btc_quant_agent/research_contract/models.py",
+      "fan_in": 7,
+      "callers": [
+        "src/btc_quant_agent/formal_research.py",
+        "src/btc_quant_agent/economic/replay_bundle.py",
+        "src/btc_quant_agent/research_contract/registry.py",
+        "src/btc_quant_agent/economic/execution_replay.py",
+        "src/btc_quant_agent/economic/funding_evidence.py",
+        "src/btc_quant_agent/research_contract/__init__.py",
+        "src/btc_quant_agent/economic/qualification.py"
+      ]
+    },
+    {
+      "module": "src/btc_quant_agent/economic/execution_model.py",
+      "fan_in": 6,
+      "callers": [
+        "src/btc_quant_agent/economic/simulator.py",
+        "src/btc_quant_agent/formal_research.py",
+        "src/btc_quant_agent/economic/__init__.py",
+        "src/btc_quant_agent/economic/execution_replay.py",
+        "src/btc_quant_agent/economic/acceptance_verifier.py",
+        "src/btc_quant_agent/economic/qualification.py"
+      ]
+    },
+    {
+      "module": "src/btc_quant_agent/economic/trade_event.py",
+      "fan_in": 6,
+      "callers": [
+        "src/btc_quant_agent/economic/simulator.py",
+        "src/btc_quant_agent/economic/portfolio.py",
+        "src/btc_quant_agent/economic/__init__.py",
+        "src/btc_quant_agent/economic/metrics.py",
+        "src/btc_quant_agent/economic/acceptance_verifier.py",
+        "src/btc_quant_agent/economic/qualification.py"
+      ]
+    },
+    {
+      "module": "src/btc_quant_agent/structure.py",
+      "fan_in": 6,
+      "callers": [
+        "src/btc_quant_agent/research.py",
+        "src/btc_quant_agent/engine.py",
+        "src/btc_quant_agent/funnel.py",
+        "src/btc_quant_agent/mechanism_research.py",
+        "src/btc_quant_agent/strategies.py",
+        "src/btc_quant_agent/features.py"
+      ]
+    },
+    {
+      "module": "src/btc_quant_agent/data/derivatives.py",
+      "fan_in": 5,
+      "callers": [
+        "src/btc_quant_agent/research.py",
+        "src/btc_quant_agent/data/forward_store.py",
+        "src/btc_quant_agent/engine.py",
+        "src/btc_quant_agent/data/collector.py",
+        "src/btc_quant_agent/backtest.py"
+      ]
+    },
+    {
+      "module": "src/btc_quant_agent/engine.py",
+      "fan_in": 5,
+      "callers": [
+        "src/btc_quant_agent/research.py",
+        "src/btc_quant_agent/service.py",
+        "src/btc_quant_agent/backtest.py",
+        "src/btc_quant_agent/mechanism_research.py",
+        "src/btc_quant_agent/execution/service.py"
+      ]
+    },
+    {
+      "module": "src/btc_quant_agent/sqlite_schema.py",
+      "fan_in": 5,
+      "callers": [
+        "src/btc_quant_agent/data/forward_store.py",
+        "src/btc_quant_agent/microstructure_research.py",
+        "src/btc_quant_agent/microstructure.py",
+        "src/btc_quant_agent/storage.py",
+        "src/btc_quant_agent/opportunity_forward.py"
+      ]
+    },
+    {
+      "module": "src/btc_quant_agent/backtest.py",
+      "fan_in": 4,
+      "callers": [
+        "src/btc_quant_agent/research.py",
+        "src/btc_quant_agent/shadow.py",
+        "src/btc_quant_agent/mechanism_research.py",
+        "src/btc_quant_agent/mechanism.py"
+      ]
+    },
+    {
+      "module": "src/btc_quant_agent/economic/funding_evidence.py",
+      "fan_in": 4,
+      "callers": [
+        "src/btc_quant_agent/economic/qualification.py",
+        "src/btc_quant_agent/formal_research.py",
+        "src/btc_quant_agent/economic/execution_replay.py",
+        "src/btc_quant_agent/economic/__init__.py"
+      ]
+    },
+    {
+      "module": "src/btc_quant_agent/economic/metrics.py",
+      "fan_in": 4,
+      "callers": [
+        "src/btc_quant_agent/economic/acceptance_verifier.py",
+        "src/btc_quant_agent/economic/simulator.py",
+        "src/btc_quant_agent/economic/qualification.py",
+        "src/btc_quant_agent/economic/__init__.py"
+      ]
+    }
+  ],
+  "top_fan_out": [
+    {
+      "module": "src/btc_quant_agent/economic/qualification.py",
+      "fan_out": 16,
+      "dependencies": [
+        "src/btc_quant_agent/domain.py",
+        "src/btc_quant_agent/economic/simulator.py",
+        "src/btc_quant_agent/economic/trade_event.py",
+        "src/btc_quant_agent/economic/signal.py",
+        "src/btc_quant_agent/economic/replay_bundle.py",
+        "src/btc_quant_agent/economic/fee_model.py",
+        "src/btc_quant_agent/economic/funding_evidence.py",
+        "src/btc_quant_agent/economic/policy.py",
+        "src/btc_quant_agent/economic/signal_producer.py",
+        "src/btc_quant_agent/economic/execution_model.py",
+        "src/btc_quant_agent/research_contract/canonical.py",
+        "src/btc_quant_agent/economic/funding.py",
+        "src/btc_quant_agent/economic/metrics.py",
+        "src/btc_quant_agent/publication.py",
+        "src/btc_quant_agent/economic/acceptance_verifier.py",
+        "src/btc_quant_agent/research_contract/models.py"
+      ]
+    },
+    {
+      "module": "src/btc_quant_agent/formal_research.py",
+      "fan_out": 15,
+      "dependencies": [
+        "src/btc_quant_agent/domain.py",
+        "src/btc_quant_agent/economic/simulator.py",
+        "src/btc_quant_agent/economic/signal.py",
+        "src/btc_quant_agent/economic/replay_bundle.py",
+        "src/btc_quant_agent/research_contract/registry.py",
+        "src/btc_quant_agent/economic/fee_model.py",
+        "src/btc_quant_agent/economic/funding_evidence.py",
+        "src/btc_quant_agent/economic/policy.py",
+        "src/btc_quant_agent/economic/funding.py",
+        "src/btc_quant_agent/economic/execution_model.py",
+        "src/btc_quant_agent/research_contract/canonical.py",
+        "src/btc_quant_agent/publication.py",
+        "src/btc_quant_agent/economic/acceptance_verifier.py",
+        "src/btc_quant_agent/economic/qualification.py",
+        "src/btc_quant_agent/research_contract/models.py"
+      ]
+    },
+    {
+      "module": "src/btc_quant_agent/cli.py",
+      "fan_out": 14,
+      "dependencies": [
+        "src/btc_quant_agent/forward_evidence.py",
+        "src/btc_quant_agent/data/binance.py",
+        "src/btc_quant_agent/config.py",
+        "src/btc_quant_agent/formal_research.py",
+        "src/btc_quant_agent/data/csvio.py",
+        "src/btc_quant_agent/data/forward_store.py",
+        "src/btc_quant_agent/service.py",
+        "src/btc_quant_agent/data/manifest.py",
+        "src/btc_quant_agent/shadow.py",
+        "src/btc_quant_agent/data/binance_archive.py",
+        "src/btc_quant_agent/research_registry.py",
+        "src/btc_quant_agent/microstructure.py",
+        "src/btc_quant_agent/explain.py",
+        "src/btc_quant_agent/opportunity_forward.py"
+      ]
+    },
+    {
+      "module": "src/btc_quant_agent/economic/__init__.py",
+      "fan_out": 13,
+      "dependencies": [
+        "src/btc_quant_agent/economic/simulator.py",
+        "src/btc_quant_agent/economic/portfolio.py",
+        "src/btc_quant_agent/economic/trade_event.py",
+        "src/btc_quant_agent/economic/signal.py",
+        "src/btc_quant_agent/economic/replay_bundle.py",
+        "src/btc_quant_agent/economic/fee_model.py",
+        "src/btc_quant_agent/economic/funding_evidence.py",
+        "src/btc_quant_agent/economic/policy.py",
+        "src/btc_quant_agent/economic/funding.py",
+        "src/btc_quant_agent/economic/execution_model.py",
+        "src/btc_quant_agent/economic/metrics.py",
+        "src/btc_quant_agent/economic/signal_producer.py",
+        "src/btc_quant_agent/economic/qualification.py"
+      ]
+    },
+    {
+      "module": "src/btc_quant_agent/economic/acceptance_verifier.py",
+      "fan_out": 11,
+      "dependencies": [
+        "src/btc_quant_agent/domain.py",
+        "src/btc_quant_agent/economic/portfolio.py",
+        "src/btc_quant_agent/economic/trade_event.py",
+        "src/btc_quant_agent/economic/signal.py",
+        "src/btc_quant_agent/economic/replay_bundle.py",
+        "src/btc_quant_agent/economic/fee_model.py",
+        "src/btc_quant_agent/economic/policy.py",
+        "src/btc_quant_agent/economic/funding.py",
+        "src/btc_quant_agent/economic/execution_model.py",
+        "src/btc_quant_agent/research_contract/canonical.py",
+        "src/btc_quant_agent/economic/metrics.py"
+      ]
+    },
+    {
+      "module": "src/btc_quant_agent/engine.py",
+      "fan_out": 11,
+      "dependencies": [
+        "src/btc_quant_agent/structure.py",
+        "src/btc_quant_agent/config.py",
+        "src/btc_quant_agent/domain.py",
+        "src/btc_quant_agent/data/derivatives.py",
+        "src/btc_quant_agent/multifactor.py",
+        "src/btc_quant_agent/regime.py",
+        "src/btc_quant_agent/risk.py",
+        "src/btc_quant_agent/research_registry.py",
+        "src/btc_quant_agent/data/quality.py",
+        "src/btc_quant_agent/strategies.py",
+        "src/btc_quant_agent/features.py"
+      ]
+    },
+    {
+      "module": "src/btc_quant_agent/mechanism_research.py",
+      "fan_out": 11,
+      "dependencies": [
+        "src/btc_quant_agent/research.py",
+        "src/btc_quant_agent/config.py",
+        "src/btc_quant_agent/domain.py",
+        "src/btc_quant_agent/multifactor.py",
+        "src/btc_quant_agent/regime.py",
+        "src/btc_quant_agent/risk.py",
+        "src/btc_quant_agent/mechanism.py",
+        "src/btc_quant_agent/funnel.py",
+        "src/btc_quant_agent/engine.py",
+        "src/btc_quant_agent/backtest.py",
+        "src/btc_quant_agent/structure.py"
+      ]
+    },
+    {
+      "module": "src/btc_quant_agent/economic/execution_replay.py",
+      "fan_out": 10,
+      "dependencies": [
+        "src/btc_quant_agent/economic/simulator.py",
+        "src/btc_quant_agent/economic/signal.py",
+        "src/btc_quant_agent/economic/fee_model.py",
+        "src/btc_quant_agent/economic/funding_evidence.py",
+        "src/btc_quant_agent/economic/policy.py",
+        "src/btc_quant_agent/economic/funding.py",
+        "src/btc_quant_agent/research_contract/canonical.py",
+        "src/btc_quant_agent/economic/execution_model.py",
+        "src/btc_quant_agent/economic/acceptance_verifier.py",
+        "src/btc_quant_agent/research_contract/models.py"
+      ]
+    },
+    {
+      "module": "src/btc_quant_agent/service.py",
+      "fan_out": 10,
+      "dependencies": [
+        "src/btc_quant_agent/data/binance.py",
+        "src/btc_quant_agent/domain.py",
+        "src/btc_quant_agent/formal_research.py",
+        "src/btc_quant_agent/config.py",
+        "src/btc_quant_agent/notify/feishu.py",
+        "src/btc_quant_agent/time_boundary.py",
+        "src/btc_quant_agent/shadow.py",
+        "src/btc_quant_agent/engine.py",
+        "src/btc_quant_agent/storage.py",
+        "src/btc_quant_agent/execution/service.py"
+      ]
+    },
+    {
+      "module": "src/btc_quant_agent/economic/simulator.py",
+      "fan_out": 9,
+      "dependencies": [
+        "src/btc_quant_agent/domain.py",
+        "src/btc_quant_agent/economic/portfolio.py",
+        "src/btc_quant_agent/economic/trade_event.py",
+        "src/btc_quant_agent/economic/signal.py",
+        "src/btc_quant_agent/economic/fee_model.py",
+        "src/btc_quant_agent/economic/policy.py",
+        "src/btc_quant_agent/economic/funding.py",
+        "src/btc_quant_agent/economic/execution_model.py",
+        "src/btc_quant_agent/economic/metrics.py"
+      ]
+    },
+    {
+      "module": "src/btc_quant_agent/execution/service.py",
+      "fan_out": 9,
+      "dependencies": [
+        "src/btc_quant_agent/execution/models.py",
+        "src/btc_quant_agent/domain.py",
+        "src/btc_quant_agent/config.py",
+        "src/btc_quant_agent/data/binance.py",
+        "src/btc_quant_agent/engine.py",
+        "src/btc_quant_agent/execution/binance_signed.py",
+        "src/btc_quant_agent/execution/guard.py",
+        "src/btc_quant_agent/research_registry.py",
+        "src/btc_quant_agent/storage.py"
+      ]
+    },
+    {
+      "module": "src/btc_quant_agent/h40/__init__.py",
+      "fan_out": 9,
+      "dependencies": [
+        "src/btc_quant_agent/h40/search_space.py",
+        "src/btc_quant_agent/h40/source_manifest.py",
+        "src/btc_quant_agent/h40/guards.py",
+        "src/btc_quant_agent/h40/lifecycle.py",
+        "src/btc_quant_agent/h40/protocol_authority.py",
+        "src/btc_quant_agent/h40/configuration_ledger.py",
+        "src/btc_quant_agent/h40/protocol.py",
+        "src/btc_quant_agent/h40/feature_contracts.py",
+        "src/btc_quant_agent/h40/split_manifest.py"
+      ]
+    },
+    {
+      "module": "src/btc_quant_agent/backtest.py",
+      "fan_out": 7,
+      "dependencies": [
+        "src/btc_quant_agent/config.py",
+        "src/btc_quant_agent/domain.py",
+        "src/btc_quant_agent/data/funding.py",
+        "src/btc_quant_agent/data/derivatives.py",
+        "src/btc_quant_agent/data/resample.py",
+        "src/btc_quant_agent/engine.py",
+        "src/btc_quant_agent/data/quality.py"
+      ]
+    },
+    {
+      "module": "src/btc_quant_agent/funnel.py",
+      "fan_out": 7,
+      "dependencies": [
+        "src/btc_quant_agent/config.py",
+        "src/btc_quant_agent/domain.py",
+        "src/btc_quant_agent/multifactor.py",
+        "src/btc_quant_agent/regime.py",
+        "src/btc_quant_agent/risk.py",
+        "src/btc_quant_agent/structure.py",
+        "src/btc_quant_agent/strategies.py"
+      ]
+    },
+    {
+      "module": "src/btc_quant_agent/microstructure_research.py",
+      "fan_out": 7,
+      "dependencies": [
+        "src/btc_quant_agent/data/binance.py",
+        "src/btc_quant_agent/config.py",
+        "src/btc_quant_agent/h39_baseline.py",
+        "src/btc_quant_agent/publication.py",
+        "src/btc_quant_agent/h39_input.py",
+        "src/btc_quant_agent/h39_statistics.py",
+        "src/btc_quant_agent/sqlite_schema.py"
+      ]
+    },
+    {
+      "module": "src/btc_quant_agent/data/forward_store.py",
+      "fan_out": 6,
+      "dependencies": [
+        "src/btc_quant_agent/data/binance.py",
+        "src/btc_quant_agent/domain.py",
+        "src/btc_quant_agent/data/derivatives.py",
+        "src/btc_quant_agent/evidence_epoch.py",
+        "src/btc_quant_agent/publication.py",
+        "src/btc_quant_agent/sqlite_schema.py"
+      ]
+    },
+    {
+      "module": "src/btc_quant_agent/opportunity_forward.py",
+      "fan_out": 6,
+      "dependencies": [
+        "src/btc_quant_agent/data/binance.py",
+        "src/btc_quant_agent/domain.py",
+        "src/btc_quant_agent/config.py",
+        "src/btc_quant_agent/service.py",
+        "src/btc_quant_agent/research_registry.py",
+        "src/btc_quant_agent/sqlite_schema.py"
+      ]
+    },
+    {
+      "module": "src/btc_quant_agent/research.py",
+      "fan_out": 6,
+      "dependencies": [
+        "src/btc_quant_agent/config.py",
+        "src/btc_quant_agent/domain.py",
+        "src/btc_quant_agent/data/derivatives.py",
+        "src/btc_quant_agent/engine.py",
+        "src/btc_quant_agent/backtest.py",
+        "src/btc_quant_agent/structure.py"
+      ]
+    },
+    {
+      "module": "src/btc_quant_agent/economic/replay_bundle.py",
+      "fan_out": 5,
+      "dependencies": [
+        "src/btc_quant_agent/domain.py",
+        "src/btc_quant_agent/economic/signal.py",
+        "src/btc_quant_agent/economic/signal_producer.py",
+        "src/btc_quant_agent/research_contract/canonical.py",
+        "src/btc_quant_agent/research_contract/models.py"
+      ]
+    },
+    {
+      "module": "src/btc_quant_agent/mechanism.py",
+      "fan_out": 5,
+      "dependencies": [
+        "src/btc_quant_agent/config.py",
+        "src/btc_quant_agent/domain.py",
+        "src/btc_quant_agent/multifactor.py",
+        "src/btc_quant_agent/risk.py",
+        "src/btc_quant_agent/backtest.py"
+      ]
+    }
+  ],
+  "complete_graph": {
+    "fan_in": {
+      "src/btc_quant_agent/__init__.py": [
+        "src/btc_quant_agent/api.py"
+      ],
+      "src/btc_quant_agent/__main__.py": [],
+      "src/btc_quant_agent/api.py": [],
+      "src/btc_quant_agent/backtest.py": [
+        "src/btc_quant_agent/research.py",
+        "src/btc_quant_agent/shadow.py",
+        "src/btc_quant_agent/mechanism_research.py",
+        "src/btc_quant_agent/mechanism.py"
+      ],
+      "src/btc_quant_agent/cli.py": [
+        "src/btc_quant_agent/__main__.py"
+      ],
+      "src/btc_quant_agent/config.py": [
+        "src/btc_quant_agent/research_protocol.py",
+        "src/btc_quant_agent/data/derivatives.py",
+        "src/btc_quant_agent/microstructure_research.py",
+        "src/btc_quant_agent/engine.py",
+        "src/btc_quant_agent/execution/guard.py",
+        "src/btc_quant_agent/execution/service.py",
+        "src/btc_quant_agent/mechanism.py",
+        "src/btc_quant_agent/shadow.py",
+        "src/btc_quant_agent/microstructure.py",
+        "src/btc_quant_agent/mechanism_research.py",
+        "src/btc_quant_agent/opportunity_forward.py",
+        "src/btc_quant_agent/data/binance.py",
+        "src/btc_quant_agent/service.py",
+        "src/btc_quant_agent/api.py",
+        "src/btc_quant_agent/research.py",
+        "src/btc_quant_agent/multifactor.py",
+        "src/btc_quant_agent/regime.py",
+        "src/btc_quant_agent/risk.py",
+        "src/btc_quant_agent/funnel.py",
+        "src/btc_quant_agent/cli.py",
+        "src/btc_quant_agent/backtest.py",
+        "src/btc_quant_agent/strategies.py",
+        "src/btc_quant_agent/features.py"
+      ],
+      "src/btc_quant_agent/data/__init__.py": [],
+      "src/btc_quant_agent/data/binance.py": [
+        "src/btc_quant_agent/data/forward_store.py",
+        "src/btc_quant_agent/service.py",
+        "src/btc_quant_agent/microstructure_research.py",
+        "src/btc_quant_agent/data/collector.py",
+        "src/btc_quant_agent/opportunity_forward.py",
+        "src/btc_quant_agent/cli.py",
+        "src/btc_quant_agent/data/network_diagnostic.py",
+        "src/btc_quant_agent/forward_diagnostics.py",
+        "src/btc_quant_agent/microstructure.py",
+        "src/btc_quant_agent/execution/service.py"
+      ],
+      "src/btc_quant_agent/data/binance_archive.py": [
+        "src/btc_quant_agent/cli.py",
+        "src/btc_quant_agent/data/binance_spot_archive.py",
+        "src/btc_quant_agent/data/binance_market_archive.py"
+      ],
+      "src/btc_quant_agent/data/binance_market_archive.py": [],
+      "src/btc_quant_agent/data/binance_spot_archive.py": [],
+      "src/btc_quant_agent/data/collector.py": [],
+      "src/btc_quant_agent/data/csvio.py": [
+        "src/btc_quant_agent/cli.py"
+      ],
+      "src/btc_quant_agent/data/derivatives.py": [
+        "src/btc_quant_agent/research.py",
+        "src/btc_quant_agent/data/forward_store.py",
+        "src/btc_quant_agent/engine.py",
+        "src/btc_quant_agent/data/collector.py",
+        "src/btc_quant_agent/backtest.py"
+      ],
+      "src/btc_quant_agent/data/forward_store.py": [
+        "src/btc_quant_agent/cli.py",
+        "src/btc_quant_agent/forward_evidence.py"
+      ],
+      "src/btc_quant_agent/data/funding.py": [
+        "src/btc_quant_agent/backtest.py"
+      ],
+      "src/btc_quant_agent/data/historical_provenance.py": [
+        "src/btc_quant_agent/data/vendor_contract.py"
+      ],
+      "src/btc_quant_agent/data/manifest.py": [
+        "src/btc_quant_agent/cli.py",
+        "src/btc_quant_agent/data/collector.py"
+      ],
+      "src/btc_quant_agent/data/network_diagnostic.py": [],
+      "src/btc_quant_agent/data/official_derivatives_features.py": [],
+      "src/btc_quant_agent/data/quality.py": [
+        "src/btc_quant_agent/backtest.py",
+        "src/btc_quant_agent/engine.py"
+      ],
+      "src/btc_quant_agent/data/resample.py": [
+        "src/btc_quant_agent/backtest.py"
+      ],
+      "src/btc_quant_agent/data/rest.py": [
+        "src/btc_quant_agent/data/binance.py",
+        "src/btc_quant_agent/forward_diagnostics.py",
+        "src/btc_quant_agent/data/network_diagnostic.py"
+      ],
+      "src/btc_quant_agent/data/vendor_contract.py": [],
+      "src/btc_quant_agent/directional_episode.py": [],
+      "src/btc_quant_agent/domain.py": [
+        "src/btc_quant_agent/data/derivatives.py",
+        "src/btc_quant_agent/formal_research.py",
+        "src/btc_quant_agent/data/csvio.py",
+        "src/btc_quant_agent/engine.py",
+        "src/btc_quant_agent/structure.py",
+        "src/btc_quant_agent/execution/service.py",
+        "src/btc_quant_agent/data/resample.py",
+        "src/btc_quant_agent/notify/feishu.py",
+        "src/btc_quant_agent/mechanism.py",
+        "src/btc_quant_agent/shadow.py",
+        "src/btc_quant_agent/economic/signal_producer.py",
+        "src/btc_quant_agent/economic/acceptance_verifier.py",
+        "src/btc_quant_agent/data/quality.py",
+        "src/btc_quant_agent/economic/qualification.py",
+        "src/btc_quant_agent/explain.py",
+        "src/btc_quant_agent/mechanism_research.py",
+        "src/btc_quant_agent/opportunity_forward.py",
+        "src/btc_quant_agent/storage.py",
+        "src/btc_quant_agent/data/binance.py",
+        "src/btc_quant_agent/execution/models.py",
+        "src/btc_quant_agent/economic/simulator.py",
+        "src/btc_quant_agent/data/forward_store.py",
+        "src/btc_quant_agent/service.py",
+        "src/btc_quant_agent/economic/replay_bundle.py",
+        "src/btc_quant_agent/economic/execution_model.py",
+        "src/btc_quant_agent/data/binance_archive.py",
+        "src/btc_quant_agent/research.py",
+        "src/btc_quant_agent/multifactor.py",
+        "src/btc_quant_agent/regime.py",
+        "src/btc_quant_agent/risk.py",
+        "src/btc_quant_agent/funnel.py",
+        "src/btc_quant_agent/backtest.py",
+        "src/btc_quant_agent/strategies.py",
+        "src/btc_quant_agent/features.py"
+      ],
+      "src/btc_quant_agent/economic/__init__.py": [],
+      "src/btc_quant_agent/economic/acceptance_verifier.py": [
+        "src/btc_quant_agent/formal_research.py",
+        "src/btc_quant_agent/economic/qualification.py",
+        "src/btc_quant_agent/economic/execution_replay.py"
+      ],
+      "src/btc_quant_agent/economic/execution_model.py": [
+        "src/btc_quant_agent/economic/simulator.py",
+        "src/btc_quant_agent/formal_research.py",
+        "src/btc_quant_agent/economic/__init__.py",
+        "src/btc_quant_agent/economic/execution_replay.py",
+        "src/btc_quant_agent/economic/acceptance_verifier.py",
+        "src/btc_quant_agent/economic/qualification.py"
+      ],
+      "src/btc_quant_agent/economic/execution_replay.py": [],
+      "src/btc_quant_agent/economic/fee_model.py": [
+        "src/btc_quant_agent/economic/simulator.py",
+        "src/btc_quant_agent/formal_research.py",
+        "src/btc_quant_agent/economic/__init__.py",
+        "src/btc_quant_agent/economic/execution_replay.py",
+        "src/btc_quant_agent/economic/execution_model.py",
+        "src/btc_quant_agent/economic/acceptance_verifier.py",
+        "src/btc_quant_agent/economic/qualification.py"
+      ],
+      "src/btc_quant_agent/economic/funding.py": [
+        "src/btc_quant_agent/economic/simulator.py",
+        "src/btc_quant_agent/formal_research.py",
+        "src/btc_quant_agent/economic/__init__.py",
+        "src/btc_quant_agent/economic/execution_replay.py",
+        "src/btc_quant_agent/economic/funding_evidence.py",
+        "src/btc_quant_agent/economic/acceptance_verifier.py",
+        "src/btc_quant_agent/economic/qualification.py"
+      ],
+      "src/btc_quant_agent/economic/funding_evidence.py": [
+        "src/btc_quant_agent/economic/qualification.py",
+        "src/btc_quant_agent/formal_research.py",
+        "src/btc_quant_agent/economic/execution_replay.py",
+        "src/btc_quant_agent/economic/__init__.py"
+      ],
+      "src/btc_quant_agent/economic/metrics.py": [
+        "src/btc_quant_agent/economic/acceptance_verifier.py",
+        "src/btc_quant_agent/economic/simulator.py",
+        "src/btc_quant_agent/economic/qualification.py",
+        "src/btc_quant_agent/economic/__init__.py"
+      ],
+      "src/btc_quant_agent/economic/order.py": [],
+      "src/btc_quant_agent/economic/policy.py": [
+        "src/btc_quant_agent/economic/order.py",
+        "src/btc_quant_agent/economic/simulator.py",
+        "src/btc_quant_agent/formal_research.py",
+        "src/btc_quant_agent/economic/__init__.py",
+        "src/btc_quant_agent/economic/execution_replay.py",
+        "src/btc_quant_agent/economic/execution_model.py",
+        "src/btc_quant_agent/economic/acceptance_verifier.py",
+        "src/btc_quant_agent/economic/qualification.py"
+      ],
+      "src/btc_quant_agent/economic/portfolio.py": [
+        "src/btc_quant_agent/economic/acceptance_verifier.py",
+        "src/btc_quant_agent/economic/simulator.py",
+        "src/btc_quant_agent/economic/metrics.py",
+        "src/btc_quant_agent/economic/__init__.py"
+      ],
+      "src/btc_quant_agent/economic/qualification.py": [
+        "src/btc_quant_agent/formal_research.py",
+        "src/btc_quant_agent/economic/__init__.py"
+      ],
+      "src/btc_quant_agent/economic/replay_bundle.py": [
+        "src/btc_quant_agent/economic/acceptance_verifier.py",
+        "src/btc_quant_agent/formal_research.py",
+        "src/btc_quant_agent/economic/qualification.py",
+        "src/btc_quant_agent/economic/__init__.py"
+      ],
+      "src/btc_quant_agent/economic/signal.py": [
+        "src/btc_quant_agent/economic/simulator.py",
+        "src/btc_quant_agent/formal_research.py",
+        "src/btc_quant_agent/economic/__init__.py",
+        "src/btc_quant_agent/economic/replay_bundle.py",
+        "src/btc_quant_agent/economic/execution_replay.py",
+        "src/btc_quant_agent/economic/policy.py",
+        "src/btc_quant_agent/economic/signal_producer.py",
+        "src/btc_quant_agent/economic/acceptance_verifier.py",
+        "src/btc_quant_agent/economic/qualification.py"
+      ],
+      "src/btc_quant_agent/economic/signal_producer.py": [
+        "src/btc_quant_agent/economic/replay_bundle.py",
+        "src/btc_quant_agent/economic/qualification.py",
+        "src/btc_quant_agent/economic/__init__.py"
+      ],
+      "src/btc_quant_agent/economic/simulator.py": [
+        "src/btc_quant_agent/economic/qualification.py",
+        "src/btc_quant_agent/formal_research.py",
+        "src/btc_quant_agent/economic/execution_replay.py",
+        "src/btc_quant_agent/economic/__init__.py"
+      ],
+      "src/btc_quant_agent/economic/trade_event.py": [
+        "src/btc_quant_agent/economic/simulator.py",
+        "src/btc_quant_agent/economic/portfolio.py",
+        "src/btc_quant_agent/economic/__init__.py",
+        "src/btc_quant_agent/economic/metrics.py",
+        "src/btc_quant_agent/economic/acceptance_verifier.py",
+        "src/btc_quant_agent/economic/qualification.py"
+      ],
+      "src/btc_quant_agent/engine.py": [
+        "src/btc_quant_agent/research.py",
+        "src/btc_quant_agent/service.py",
+        "src/btc_quant_agent/backtest.py",
+        "src/btc_quant_agent/mechanism_research.py",
+        "src/btc_quant_agent/execution/service.py"
+      ],
+      "src/btc_quant_agent/evidence_epoch.py": [
+        "src/btc_quant_agent/forward_evidence.py",
+        "src/btc_quant_agent/forward_diagnostics.py",
+        "src/btc_quant_agent/data/forward_store.py"
+      ],
+      "src/btc_quant_agent/execution/__init__.py": [],
+      "src/btc_quant_agent/execution/binance_signed.py": [
+        "src/btc_quant_agent/execution/service.py"
+      ],
+      "src/btc_quant_agent/execution/guard.py": [
+        "src/btc_quant_agent/execution/service.py"
+      ],
+      "src/btc_quant_agent/execution/models.py": [
+        "src/btc_quant_agent/execution/service.py",
+        "src/btc_quant_agent/execution/__init__.py",
+        "src/btc_quant_agent/execution/guard.py"
+      ],
+      "src/btc_quant_agent/execution/service.py": [
+        "src/btc_quant_agent/service.py"
+      ],
+      "src/btc_quant_agent/explain.py": [
+        "src/btc_quant_agent/cli.py",
+        "src/btc_quant_agent/api.py"
+      ],
+      "src/btc_quant_agent/features.py": [
+        "src/btc_quant_agent/engine.py"
+      ],
+      "src/btc_quant_agent/formal_research.py": [
+        "src/btc_quant_agent/cli.py",
+        "src/btc_quant_agent/shadow.py",
+        "src/btc_quant_agent/service.py"
+      ],
+      "src/btc_quant_agent/forward_diagnostics.py": [],
+      "src/btc_quant_agent/forward_evidence.py": [
+        "src/btc_quant_agent/cli.py"
+      ],
+      "src/btc_quant_agent/funnel.py": [
+        "src/btc_quant_agent/mechanism_research.py"
+      ],
+      "src/btc_quant_agent/h39_baseline.py": [
+        "src/btc_quant_agent/microstructure_research.py"
+      ],
+      "src/btc_quant_agent/h39_input.py": [
+        "src/btc_quant_agent/microstructure_research.py"
+      ],
+      "src/btc_quant_agent/h39_statistics.py": [
+        "src/btc_quant_agent/microstructure_research.py"
+      ],
+      "src/btc_quant_agent/h40/__init__.py": [],
+      "src/btc_quant_agent/h40/configuration_ledger.py": [
+        "src/btc_quant_agent/h40/search_space.py",
+        "src/btc_quant_agent/h40/__init__.py"
+      ],
+      "src/btc_quant_agent/h40/feature_contracts.py": [
+        "src/btc_quant_agent/h40/__init__.py"
+      ],
+      "src/btc_quant_agent/h40/guards.py": [
+        "src/btc_quant_agent/h40/search_space.py",
+        "src/btc_quant_agent/h40/source_manifest.py",
+        "src/btc_quant_agent/h40/lifecycle.py",
+        "src/btc_quant_agent/h40/configuration_ledger.py",
+        "src/btc_quant_agent/h40/__init__.py",
+        "src/btc_quant_agent/h40/feature_contracts.py",
+        "src/btc_quant_agent/h40/split_manifest.py"
+      ],
+      "src/btc_quant_agent/h40/lifecycle.py": [
+        "src/btc_quant_agent/h40/__init__.py"
+      ],
+      "src/btc_quant_agent/h40/protocol.py": [
+        "src/btc_quant_agent/h40/configuration_ledger.py",
+        "src/btc_quant_agent/h40/__init__.py"
+      ],
+      "src/btc_quant_agent/h40/protocol_authority.py": [
+        "src/btc_quant_agent/h40/search_space.py",
+        "src/btc_quant_agent/h40/configuration_ledger.py",
+        "src/btc_quant_agent/h40/__init__.py"
+      ],
+      "src/btc_quant_agent/h40/search_space.py": [
+        "src/btc_quant_agent/h40/__init__.py"
+      ],
+      "src/btc_quant_agent/h40/source_manifest.py": [
+        "src/btc_quant_agent/h40/__init__.py",
+        "src/btc_quant_agent/h40/split_manifest.py"
+      ],
+      "src/btc_quant_agent/h40/split_manifest.py": [
+        "src/btc_quant_agent/h40/__init__.py"
+      ],
+      "src/btc_quant_agent/indicators.py": [
+        "src/btc_quant_agent/h39_baseline.py",
+        "src/btc_quant_agent/features.py"
+      ],
+      "src/btc_quant_agent/mechanism.py": [
+        "src/btc_quant_agent/mechanism_research.py"
+      ],
+      "src/btc_quant_agent/mechanism_research.py": [],
+      "src/btc_quant_agent/microstructure.py": [
+        "src/btc_quant_agent/cli.py",
+        "src/btc_quant_agent/forward_evidence.py"
+      ],
+      "src/btc_quant_agent/microstructure_research.py": [],
+      "src/btc_quant_agent/multifactor.py": [
+        "src/btc_quant_agent/engine.py",
+        "src/btc_quant_agent/mechanism_research.py",
+        "src/btc_quant_agent/mechanism.py",
+        "src/btc_quant_agent/funnel.py"
+      ],
+      "src/btc_quant_agent/notify/__init__.py": [],
+      "src/btc_quant_agent/notify/feishu.py": [
+        "src/btc_quant_agent/service.py"
+      ],
+      "src/btc_quant_agent/opportunity_forward.py": [
+        "src/btc_quant_agent/cli.py",
+        "src/btc_quant_agent/forward_diagnostics.py",
+        "src/btc_quant_agent/forward_evidence.py"
+      ],
+      "src/btc_quant_agent/publication.py": [
+        "src/btc_quant_agent/formal_research.py",
+        "src/btc_quant_agent/data/forward_store.py",
+        "src/btc_quant_agent/research_contract/registry.py",
+        "src/btc_quant_agent/data/manifest.py",
+        "src/btc_quant_agent/microstructure_research.py",
+        "src/btc_quant_agent/microstructure.py",
+        "src/btc_quant_agent/economic/qualification.py"
+      ],
+      "src/btc_quant_agent/regime.py": [
+        "src/btc_quant_agent/engine.py",
+        "src/btc_quant_agent/mechanism_research.py",
+        "src/btc_quant_agent/funnel.py"
+      ],
+      "src/btc_quant_agent/research.py": [
+        "src/btc_quant_agent/mechanism_research.py"
+      ],
+      "src/btc_quant_agent/research_contract/__init__.py": [],
+      "src/btc_quant_agent/research_contract/canonical.py": [
+        "src/btc_quant_agent/h40/source_manifest.py",
+        "src/btc_quant_agent/formal_research.py",
+        "src/btc_quant_agent/h40/protocol_authority.py",
+        "src/btc_quant_agent/economic/replay_bundle.py",
+        "src/btc_quant_agent/research_contract/registry.py",
+        "src/btc_quant_agent/h40/configuration_ledger.py",
+        "src/btc_quant_agent/economic/execution_replay.py",
+        "src/btc_quant_agent/economic/funding_evidence.py",
+        "src/btc_quant_agent/economic/signal_producer.py",
+        "src/btc_quant_agent/economic/metrics.py",
+        "src/btc_quant_agent/economic/acceptance_verifier.py",
+        "src/btc_quant_agent/h40/protocol.py",
+        "src/btc_quant_agent/economic/qualification.py",
+        "src/btc_quant_agent/h40/feature_contracts.py",
+        "src/btc_quant_agent/h40/split_manifest.py",
+        "src/btc_quant_agent/research_contract/models.py"
+      ],
+      "src/btc_quant_agent/research_contract/models.py": [
+        "src/btc_quant_agent/formal_research.py",
+        "src/btc_quant_agent/economic/replay_bundle.py",
+        "src/btc_quant_agent/research_contract/registry.py",
+        "src/btc_quant_agent/economic/execution_replay.py",
+        "src/btc_quant_agent/economic/funding_evidence.py",
+        "src/btc_quant_agent/research_contract/__init__.py",
+        "src/btc_quant_agent/economic/qualification.py"
+      ],
+      "src/btc_quant_agent/research_contract/registry.py": [
+        "src/btc_quant_agent/research_contract/__init__.py",
+        "src/btc_quant_agent/formal_research.py"
+      ],
+      "src/btc_quant_agent/research_protocol.py": [],
+      "src/btc_quant_agent/research_registry.py": [
+        "src/btc_quant_agent/cli.py",
+        "src/btc_quant_agent/engine.py",
+        "src/btc_quant_agent/opportunity_forward.py",
+        "src/btc_quant_agent/execution/service.py"
+      ],
+      "src/btc_quant_agent/risk.py": [
+        "src/btc_quant_agent/engine.py",
+        "src/btc_quant_agent/mechanism_research.py",
+        "src/btc_quant_agent/mechanism.py",
+        "src/btc_quant_agent/funnel.py"
+      ],
+      "src/btc_quant_agent/service.py": [
+        "src/btc_quant_agent/cli.py",
+        "src/btc_quant_agent/opportunity_forward.py",
+        "src/btc_quant_agent/api.py"
+      ],
+      "src/btc_quant_agent/shadow.py": [
+        "src/btc_quant_agent/cli.py",
+        "src/btc_quant_agent/service.py"
+      ],
+      "src/btc_quant_agent/sqlite_schema.py": [
+        "src/btc_quant_agent/data/forward_store.py",
+        "src/btc_quant_agent/microstructure_research.py",
+        "src/btc_quant_agent/microstructure.py",
+        "src/btc_quant_agent/storage.py",
+        "src/btc_quant_agent/opportunity_forward.py"
+      ],
+      "src/btc_quant_agent/storage.py": [
+        "src/btc_quant_agent/service.py",
+        "src/btc_quant_agent/shadow.py",
+        "src/btc_quant_agent/execution/service.py"
+      ],
+      "src/btc_quant_agent/strategies.py": [
+        "src/btc_quant_agent/engine.py",
+        "src/btc_quant_agent/funnel.py"
+      ],
+      "src/btc_quant_agent/structure.py": [
+        "src/btc_quant_agent/research.py",
+        "src/btc_quant_agent/engine.py",
+        "src/btc_quant_agent/funnel.py",
+        "src/btc_quant_agent/mechanism_research.py",
+        "src/btc_quant_agent/strategies.py",
+        "src/btc_quant_agent/features.py"
+      ],
+      "src/btc_quant_agent/time_boundary.py": [
+        "src/btc_quant_agent/service.py",
+        "src/btc_quant_agent/data/binance.py",
+        "src/btc_quant_agent/data/derivatives.py"
+      ]
+    },
+    "fan_out": {
+      "src/btc_quant_agent/__init__.py": [],
+      "src/btc_quant_agent/__main__.py": [
+        "src/btc_quant_agent/cli.py"
+      ],
+      "src/btc_quant_agent/api.py": [
+        "src/btc_quant_agent/service.py",
+        "src/btc_quant_agent/config.py",
+        "src/btc_quant_agent/__init__.py",
+        "src/btc_quant_agent/explain.py"
+      ],
+      "src/btc_quant_agent/backtest.py": [
+        "src/btc_quant_agent/config.py",
+        "src/btc_quant_agent/domain.py",
+        "src/btc_quant_agent/data/funding.py",
+        "src/btc_quant_agent/data/derivatives.py",
+        "src/btc_quant_agent/data/resample.py",
+        "src/btc_quant_agent/engine.py",
+        "src/btc_quant_agent/data/quality.py"
+      ],
+      "src/btc_quant_agent/cli.py": [
+        "src/btc_quant_agent/forward_evidence.py",
+        "src/btc_quant_agent/data/binance.py",
+        "src/btc_quant_agent/config.py",
+        "src/btc_quant_agent/formal_research.py",
+        "src/btc_quant_agent/data/csvio.py",
+        "src/btc_quant_agent/data/forward_store.py",
+        "src/btc_quant_agent/service.py",
+        "src/btc_quant_agent/data/manifest.py",
+        "src/btc_quant_agent/shadow.py",
+        "src/btc_quant_agent/data/binance_archive.py",
+        "src/btc_quant_agent/research_registry.py",
+        "src/btc_quant_agent/microstructure.py",
+        "src/btc_quant_agent/explain.py",
+        "src/btc_quant_agent/opportunity_forward.py"
+      ],
+      "src/btc_quant_agent/config.py": [],
+      "src/btc_quant_agent/data/__init__.py": [],
+      "src/btc_quant_agent/data/binance.py": [
+        "src/btc_quant_agent/time_boundary.py",
+        "src/btc_quant_agent/config.py",
+        "src/btc_quant_agent/domain.py",
+        "src/btc_quant_agent/data/rest.py"
+      ],
+      "src/btc_quant_agent/data/binance_archive.py": [
+        "src/btc_quant_agent/domain.py"
+      ],
+      "src/btc_quant_agent/data/binance_market_archive.py": [
+        "src/btc_quant_agent/data/binance_archive.py"
+      ],
+      "src/btc_quant_agent/data/binance_spot_archive.py": [
+        "src/btc_quant_agent/data/binance_archive.py"
+      ],
+      "src/btc_quant_agent/data/collector.py": [
+        "src/btc_quant_agent/data/binance.py",
+        "src/btc_quant_agent/data/derivatives.py",
+        "src/btc_quant_agent/data/manifest.py"
+      ],
+      "src/btc_quant_agent/data/csvio.py": [
+        "src/btc_quant_agent/domain.py"
+      ],
+      "src/btc_quant_agent/data/derivatives.py": [
+        "src/btc_quant_agent/time_boundary.py",
+        "src/btc_quant_agent/config.py",
+        "src/btc_quant_agent/domain.py"
+      ],
+      "src/btc_quant_agent/data/forward_store.py": [
+        "src/btc_quant_agent/data/binance.py",
+        "src/btc_quant_agent/domain.py",
+        "src/btc_quant_agent/data/derivatives.py",
+        "src/btc_quant_agent/evidence_epoch.py",
+        "src/btc_quant_agent/publication.py",
+        "src/btc_quant_agent/sqlite_schema.py"
+      ],
+      "src/btc_quant_agent/data/funding.py": [],
+      "src/btc_quant_agent/data/historical_provenance.py": [],
+      "src/btc_quant_agent/data/manifest.py": [
+        "src/btc_quant_agent/publication.py"
+      ],
+      "src/btc_quant_agent/data/network_diagnostic.py": [
+        "src/btc_quant_agent/data/binance.py",
+        "src/btc_quant_agent/data/rest.py"
+      ],
+      "src/btc_quant_agent/data/official_derivatives_features.py": [],
+      "src/btc_quant_agent/data/quality.py": [
+        "src/btc_quant_agent/domain.py"
+      ],
+      "src/btc_quant_agent/data/resample.py": [
+        "src/btc_quant_agent/domain.py"
+      ],
+      "src/btc_quant_agent/data/rest.py": [],
+      "src/btc_quant_agent/data/vendor_contract.py": [
+        "src/btc_quant_agent/data/historical_provenance.py"
+      ],
+      "src/btc_quant_agent/directional_episode.py": [],
+      "src/btc_quant_agent/domain.py": [],
+      "src/btc_quant_agent/economic/__init__.py": [
+        "src/btc_quant_agent/economic/simulator.py",
+        "src/btc_quant_agent/economic/portfolio.py",
+        "src/btc_quant_agent/economic/trade_event.py",
+        "src/btc_quant_agent/economic/signal.py",
+        "src/btc_quant_agent/economic/replay_bundle.py",
+        "src/btc_quant_agent/economic/fee_model.py",
+        "src/btc_quant_agent/economic/funding_evidence.py",
+        "src/btc_quant_agent/economic/policy.py",
+        "src/btc_quant_agent/economic/funding.py",
+        "src/btc_quant_agent/economic/execution_model.py",
+        "src/btc_quant_agent/economic/metrics.py",
+        "src/btc_quant_agent/economic/signal_producer.py",
+        "src/btc_quant_agent/economic/qualification.py"
+      ],
+      "src/btc_quant_agent/economic/acceptance_verifier.py": [
+        "src/btc_quant_agent/domain.py",
+        "src/btc_quant_agent/economic/portfolio.py",
+        "src/btc_quant_agent/economic/trade_event.py",
+        "src/btc_quant_agent/economic/signal.py",
+        "src/btc_quant_agent/economic/replay_bundle.py",
+        "src/btc_quant_agent/economic/fee_model.py",
+        "src/btc_quant_agent/economic/policy.py",
+        "src/btc_quant_agent/economic/funding.py",
+        "src/btc_quant_agent/economic/execution_model.py",
+        "src/btc_quant_agent/research_contract/canonical.py",
+        "src/btc_quant_agent/economic/metrics.py"
+      ],
+      "src/btc_quant_agent/economic/execution_model.py": [
+        "src/btc_quant_agent/economic/policy.py",
+        "src/btc_quant_agent/domain.py",
+        "src/btc_quant_agent/economic/fee_model.py"
+      ],
+      "src/btc_quant_agent/economic/execution_replay.py": [
+        "src/btc_quant_agent/economic/simulator.py",
+        "src/btc_quant_agent/economic/signal.py",
+        "src/btc_quant_agent/economic/fee_model.py",
+        "src/btc_quant_agent/economic/funding_evidence.py",
+        "src/btc_quant_agent/economic/policy.py",
+        "src/btc_quant_agent/economic/funding.py",
+        "src/btc_quant_agent/research_contract/canonical.py",
+        "src/btc_quant_agent/economic/execution_model.py",
+        "src/btc_quant_agent/economic/acceptance_verifier.py",
+        "src/btc_quant_agent/research_contract/models.py"
+      ],
+      "src/btc_quant_agent/economic/fee_model.py": [],
+      "src/btc_quant_agent/economic/funding.py": [],
+      "src/btc_quant_agent/economic/funding_evidence.py": [
+        "src/btc_quant_agent/economic/funding.py",
+        "src/btc_quant_agent/research_contract/canonical.py",
+        "src/btc_quant_agent/research_contract/models.py"
+      ],
+      "src/btc_quant_agent/economic/metrics.py": [
+        "src/btc_quant_agent/research_contract/canonical.py",
+        "src/btc_quant_agent/economic/portfolio.py",
+        "src/btc_quant_agent/economic/trade_event.py"
+      ],
+      "src/btc_quant_agent/economic/order.py": [
+        "src/btc_quant_agent/economic/policy.py"
+      ],
+      "src/btc_quant_agent/economic/policy.py": [
+        "src/btc_quant_agent/economic/signal.py"
+      ],
+      "src/btc_quant_agent/economic/portfolio.py": [
+        "src/btc_quant_agent/economic/trade_event.py"
+      ],
+      "src/btc_quant_agent/economic/qualification.py": [
+        "src/btc_quant_agent/domain.py",
+        "src/btc_quant_agent/economic/simulator.py",
+        "src/btc_quant_agent/economic/trade_event.py",
+        "src/btc_quant_agent/economic/signal.py",
+        "src/btc_quant_agent/economic/replay_bundle.py",
+        "src/btc_quant_agent/economic/fee_model.py",
+        "src/btc_quant_agent/economic/funding_evidence.py",
+        "src/btc_quant_agent/economic/policy.py",
+        "src/btc_quant_agent/economic/signal_producer.py",
+        "src/btc_quant_agent/economic/execution_model.py",
+        "src/btc_quant_agent/research_contract/canonical.py",
+        "src/btc_quant_agent/economic/funding.py",
+        "src/btc_quant_agent/economic/metrics.py",
+        "src/btc_quant_agent/publication.py",
+        "src/btc_quant_agent/economic/acceptance_verifier.py",
+        "src/btc_quant_agent/research_contract/models.py"
+      ],
+      "src/btc_quant_agent/economic/replay_bundle.py": [
+        "src/btc_quant_agent/domain.py",
+        "src/btc_quant_agent/economic/signal.py",
+        "src/btc_quant_agent/economic/signal_producer.py",
+        "src/btc_quant_agent/research_contract/canonical.py",
+        "src/btc_quant_agent/research_contract/models.py"
+      ],
+      "src/btc_quant_agent/economic/signal.py": [],
+      "src/btc_quant_agent/economic/signal_producer.py": [
+        "src/btc_quant_agent/economic/signal.py",
+        "src/btc_quant_agent/domain.py",
+        "src/btc_quant_agent/research_contract/canonical.py"
+      ],
+      "src/btc_quant_agent/economic/simulator.py": [
+        "src/btc_quant_agent/domain.py",
+        "src/btc_quant_agent/economic/portfolio.py",
+        "src/btc_quant_agent/economic/trade_event.py",
+        "src/btc_quant_agent/economic/signal.py",
+        "src/btc_quant_agent/economic/fee_model.py",
+        "src/btc_quant_agent/economic/policy.py",
+        "src/btc_quant_agent/economic/funding.py",
+        "src/btc_quant_agent/economic/execution_model.py",
+        "src/btc_quant_agent/economic/metrics.py"
+      ],
+      "src/btc_quant_agent/economic/trade_event.py": [],
+      "src/btc_quant_agent/engine.py": [
+        "src/btc_quant_agent/structure.py",
+        "src/btc_quant_agent/config.py",
+        "src/btc_quant_agent/domain.py",
+        "src/btc_quant_agent/data/derivatives.py",
+        "src/btc_quant_agent/multifactor.py",
+        "src/btc_quant_agent/regime.py",
+        "src/btc_quant_agent/risk.py",
+        "src/btc_quant_agent/research_registry.py",
+        "src/btc_quant_agent/data/quality.py",
+        "src/btc_quant_agent/strategies.py",
+        "src/btc_quant_agent/features.py"
+      ],
+      "src/btc_quant_agent/evidence_epoch.py": [],
+      "src/btc_quant_agent/execution/__init__.py": [
+        "src/btc_quant_agent/execution/models.py"
+      ],
+      "src/btc_quant_agent/execution/binance_signed.py": [],
+      "src/btc_quant_agent/execution/guard.py": [
+        "src/btc_quant_agent/execution/models.py",
+        "src/btc_quant_agent/config.py"
+      ],
+      "src/btc_quant_agent/execution/models.py": [
+        "src/btc_quant_agent/domain.py"
+      ],
+      "src/btc_quant_agent/execution/service.py": [
+        "src/btc_quant_agent/execution/models.py",
+        "src/btc_quant_agent/domain.py",
+        "src/btc_quant_agent/config.py",
+        "src/btc_quant_agent/data/binance.py",
+        "src/btc_quant_agent/engine.py",
+        "src/btc_quant_agent/execution/binance_signed.py",
+        "src/btc_quant_agent/execution/guard.py",
+        "src/btc_quant_agent/research_registry.py",
+        "src/btc_quant_agent/storage.py"
+      ],
+      "src/btc_quant_agent/explain.py": [
+        "src/btc_quant_agent/domain.py"
+      ],
+      "src/btc_quant_agent/features.py": [
+        "src/btc_quant_agent/indicators.py",
+        "src/btc_quant_agent/config.py",
+        "src/btc_quant_agent/domain.py",
+        "src/btc_quant_agent/structure.py"
+      ],
+      "src/btc_quant_agent/formal_research.py": [
+        "src/btc_quant_agent/domain.py",
+        "src/btc_quant_agent/economic/simulator.py",
+        "src/btc_quant_agent/economic/signal.py",
+        "src/btc_quant_agent/economic/replay_bundle.py",
+        "src/btc_quant_agent/research_contract/registry.py",
+        "src/btc_quant_agent/economic/fee_model.py",
+        "src/btc_quant_agent/economic/funding_evidence.py",
+        "src/btc_quant_agent/economic/policy.py",
+        "src/btc_quant_agent/economic/funding.py",
+        "src/btc_quant_agent/economic/execution_model.py",
+        "src/btc_quant_agent/research_contract/canonical.py",
+        "src/btc_quant_agent/publication.py",
+        "src/btc_quant_agent/economic/acceptance_verifier.py",
+        "src/btc_quant_agent/economic/qualification.py",
+        "src/btc_quant_agent/research_contract/models.py"
+      ],
+      "src/btc_quant_agent/forward_diagnostics.py": [
+        "src/btc_quant_agent/data/binance.py",
+        "src/btc_quant_agent/evidence_epoch.py",
+        "src/btc_quant_agent/data/rest.py",
+        "src/btc_quant_agent/opportunity_forward.py"
+      ],
+      "src/btc_quant_agent/forward_evidence.py": [
+        "src/btc_quant_agent/microstructure.py",
+        "src/btc_quant_agent/evidence_epoch.py",
+        "src/btc_quant_agent/data/forward_store.py",
+        "src/btc_quant_agent/opportunity_forward.py"
+      ],
+      "src/btc_quant_agent/funnel.py": [
+        "src/btc_quant_agent/config.py",
+        "src/btc_quant_agent/domain.py",
+        "src/btc_quant_agent/multifactor.py",
+        "src/btc_quant_agent/regime.py",
+        "src/btc_quant_agent/risk.py",
+        "src/btc_quant_agent/structure.py",
+        "src/btc_quant_agent/strategies.py"
+      ],
+      "src/btc_quant_agent/h39_baseline.py": [
+        "src/btc_quant_agent/indicators.py"
+      ],
+      "src/btc_quant_agent/h39_input.py": [],
+      "src/btc_quant_agent/h39_statistics.py": [],
+      "src/btc_quant_agent/h40/__init__.py": [
+        "src/btc_quant_agent/h40/search_space.py",
+        "src/btc_quant_agent/h40/source_manifest.py",
+        "src/btc_quant_agent/h40/guards.py",
+        "src/btc_quant_agent/h40/lifecycle.py",
+        "src/btc_quant_agent/h40/protocol_authority.py",
+        "src/btc_quant_agent/h40/configuration_ledger.py",
+        "src/btc_quant_agent/h40/protocol.py",
+        "src/btc_quant_agent/h40/feature_contracts.py",
+        "src/btc_quant_agent/h40/split_manifest.py"
+      ],
+      "src/btc_quant_agent/h40/configuration_ledger.py": [
+        "src/btc_quant_agent/h40/protocol.py",
+        "src/btc_quant_agent/h40/protocol_authority.py",
+        "src/btc_quant_agent/research_contract/canonical.py",
+        "src/btc_quant_agent/h40/guards.py"
+      ],
+      "src/btc_quant_agent/h40/feature_contracts.py": [
+        "src/btc_quant_agent/research_contract/canonical.py",
+        "src/btc_quant_agent/h40/guards.py"
+      ],
+      "src/btc_quant_agent/h40/guards.py": [],
+      "src/btc_quant_agent/h40/lifecycle.py": [
+        "src/btc_quant_agent/h40/guards.py"
+      ],
+      "src/btc_quant_agent/h40/protocol.py": [
+        "src/btc_quant_agent/research_contract/canonical.py"
+      ],
+      "src/btc_quant_agent/h40/protocol_authority.py": [
+        "src/btc_quant_agent/research_contract/canonical.py"
+      ],
+      "src/btc_quant_agent/h40/search_space.py": [
+        "src/btc_quant_agent/h40/protocol_authority.py",
+        "src/btc_quant_agent/h40/configuration_ledger.py",
+        "src/btc_quant_agent/h40/guards.py"
+      ],
+      "src/btc_quant_agent/h40/source_manifest.py": [
+        "src/btc_quant_agent/research_contract/canonical.py",
+        "src/btc_quant_agent/h40/guards.py"
+      ],
+      "src/btc_quant_agent/h40/split_manifest.py": [
+        "src/btc_quant_agent/h40/source_manifest.py",
+        "src/btc_quant_agent/research_contract/canonical.py",
+        "src/btc_quant_agent/h40/guards.py"
+      ],
+      "src/btc_quant_agent/indicators.py": [],
+      "src/btc_quant_agent/mechanism.py": [
+        "src/btc_quant_agent/config.py",
+        "src/btc_quant_agent/domain.py",
+        "src/btc_quant_agent/multifactor.py",
+        "src/btc_quant_agent/risk.py",
+        "src/btc_quant_agent/backtest.py"
+      ],
+      "src/btc_quant_agent/mechanism_research.py": [
+        "src/btc_quant_agent/research.py",
+        "src/btc_quant_agent/config.py",
+        "src/btc_quant_agent/domain.py",
+        "src/btc_quant_agent/multifactor.py",
+        "src/btc_quant_agent/regime.py",
+        "src/btc_quant_agent/risk.py",
+        "src/btc_quant_agent/mechanism.py",
+        "src/btc_quant_agent/funnel.py",
+        "src/btc_quant_agent/engine.py",
+        "src/btc_quant_agent/backtest.py",
+        "src/btc_quant_agent/structure.py"
+      ],
+      "src/btc_quant_agent/microstructure.py": [
+        "src/btc_quant_agent/publication.py",
+        "src/btc_quant_agent/config.py",
+        "src/btc_quant_agent/data/binance.py",
+        "src/btc_quant_agent/sqlite_schema.py"
+      ],
+      "src/btc_quant_agent/microstructure_research.py": [
+        "src/btc_quant_agent/data/binance.py",
+        "src/btc_quant_agent/config.py",
+        "src/btc_quant_agent/h39_baseline.py",
+        "src/btc_quant_agent/publication.py",
+        "src/btc_quant_agent/h39_input.py",
+        "src/btc_quant_agent/h39_statistics.py",
+        "src/btc_quant_agent/sqlite_schema.py"
+      ],
+      "src/btc_quant_agent/multifactor.py": [
+        "src/btc_quant_agent/config.py",
+        "src/btc_quant_agent/domain.py"
+      ],
+      "src/btc_quant_agent/notify/__init__.py": [],
+      "src/btc_quant_agent/notify/feishu.py": [
+        "src/btc_quant_agent/domain.py"
+      ],
+      "src/btc_quant_agent/opportunity_forward.py": [
+        "src/btc_quant_agent/data/binance.py",
+        "src/btc_quant_agent/domain.py",
+        "src/btc_quant_agent/config.py",
+        "src/btc_quant_agent/service.py",
+        "src/btc_quant_agent/research_registry.py",
+        "src/btc_quant_agent/sqlite_schema.py"
+      ],
+      "src/btc_quant_agent/publication.py": [],
+      "src/btc_quant_agent/regime.py": [
+        "src/btc_quant_agent/config.py",
+        "src/btc_quant_agent/domain.py"
+      ],
+      "src/btc_quant_agent/research.py": [
+        "src/btc_quant_agent/config.py",
+        "src/btc_quant_agent/domain.py",
+        "src/btc_quant_agent/data/derivatives.py",
+        "src/btc_quant_agent/engine.py",
+        "src/btc_quant_agent/backtest.py",
+        "src/btc_quant_agent/structure.py"
+      ],
+      "src/btc_quant_agent/research_contract/__init__.py": [
+        "src/btc_quant_agent/research_contract/registry.py",
+        "src/btc_quant_agent/research_contract/models.py"
+      ],
+      "src/btc_quant_agent/research_contract/canonical.py": [],
+      "src/btc_quant_agent/research_contract/models.py": [
+        "src/btc_quant_agent/research_contract/canonical.py"
+      ],
+      "src/btc_quant_agent/research_contract/registry.py": [
+        "src/btc_quant_agent/publication.py",
+        "src/btc_quant_agent/research_contract/canonical.py",
+        "src/btc_quant_agent/research_contract/models.py"
+      ],
+      "src/btc_quant_agent/research_protocol.py": [
+        "src/btc_quant_agent/config.py"
+      ],
+      "src/btc_quant_agent/research_registry.py": [],
+      "src/btc_quant_agent/risk.py": [
+        "src/btc_quant_agent/config.py",
+        "src/btc_quant_agent/domain.py"
+      ],
+      "src/btc_quant_agent/service.py": [
+        "src/btc_quant_agent/data/binance.py",
+        "src/btc_quant_agent/domain.py",
+        "src/btc_quant_agent/formal_research.py",
+        "src/btc_quant_agent/config.py",
+        "src/btc_quant_agent/notify/feishu.py",
+        "src/btc_quant_agent/time_boundary.py",
+        "src/btc_quant_agent/shadow.py",
+        "src/btc_quant_agent/engine.py",
+        "src/btc_quant_agent/storage.py",
+        "src/btc_quant_agent/execution/service.py"
+      ],
+      "src/btc_quant_agent/shadow.py": [
+        "src/btc_quant_agent/config.py",
+        "src/btc_quant_agent/domain.py",
+        "src/btc_quant_agent/formal_research.py",
+        "src/btc_quant_agent/backtest.py",
+        "src/btc_quant_agent/storage.py"
+      ],
+      "src/btc_quant_agent/sqlite_schema.py": [],
+      "src/btc_quant_agent/storage.py": [
+        "src/btc_quant_agent/domain.py",
+        "src/btc_quant_agent/sqlite_schema.py"
+      ],
+      "src/btc_quant_agent/strategies.py": [
+        "src/btc_quant_agent/config.py",
+        "src/btc_quant_agent/domain.py",
+        "src/btc_quant_agent/structure.py"
+      ],
+      "src/btc_quant_agent/structure.py": [
+        "src/btc_quant_agent/domain.py"
+      ],
+      "src/btc_quant_agent/time_boundary.py": []
+    }
+  }
+}

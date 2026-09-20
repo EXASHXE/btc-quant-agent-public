@@ -1,0 +1,57 @@
+{
+  "schema_version": "1.0.0",
+  "generated_at": "2026-09-20T09:45:54.451979",
+  "protocol_version": "H40_PROTOCOL_V1_R3R4",
+  "accepted_scientific_hashes": {
+    "protocol_authority_hash": {
+      "hash": "a83f8fc7a5ca7109fb8cd7fed114d87c3b2c968b5145c11cada203aa5111d1ce",
+      "accepted_commit": "5f1618ed73a91c954c1443f62f77152682b33ef4",
+      "artifact": "reviews/v0.5/V0.5.1_H40_P2_FINAL_INDEPENDENT_ACCEPTANCE.md",
+      "scope": "Source manifest, split manifest, protocol identity, and preregistration contract"
+    },
+    "semantic_root_hash": {
+      "hash": "71889a35f227ed734272b712851174a69bf9dbb12ea3f87cd84c26e7c66f6af1",
+      "accepted_commit": "5f1618ed73a91c954c1443f62f77152682b33ef4",
+      "artifact": "reviews/v0.5/V0.5.1_H40_P2_FINAL_INDEPENDENT_ACCEPTANCE.md",
+      "scope": "Scientific semantics root: 168-slot configuration ledger, feature definitions, statistical decisions"
+    },
+    "structural_ledger_hash": {
+      "hash": "483f68502b57972deae071c7bd4587ca3e57ccaa72bd99fb0de07b4f0ab8c85f",
+      "accepted_commit": "5f1618ed73a91c954c1443f62f77152682b33ef4",
+      "artifact": "reviews/v0.5/V0.5.1_H40_P2_FINAL_INDEPENDENT_ACCEPTANCE.md",
+      "scope": "Exact 168 slots in canonical order"
+    }
+  },
+  "accepted_lifecycle_hashes": {
+    "lifecycle_semantic_root_hash": {
+      "hash": "d8c24b878b18426666ce46390e7363a0a2a5d7d3eb4d7636cc5cb2ecfaf4e9f5",
+      "accepted_commit": "9a6811cbf4957a85ce5c4da38e8fe14fc8000c33",
+      "artifact": "reviews/v0.5/V0.5.1_H40_P3R0R1_SOL_CUMULATIVE_ACCEPTANCE.md",
+      "scope": "Root of 9 canonical lifecycle child contracts"
+    },
+    "lifecycle_governance_authority_hash": {
+      "hash": "ee619e16bb665ba377baa2a50f92ea1c36ee207282e3f7757b54a0a1adf7b828",
+      "accepted_commit": "9a6811cbf4957a85ce5c4da38e8fe14fc8000c33",
+      "artifact": "reviews/v0.5/V0.5.1_H40_P3R0R1_SOL_CUMULATIVE_ACCEPTANCE.md",
+      "scope": "Governance binding: P2 acceptance, P3R0R1 amendment, protocol_authority, semantic_root, structural_ledger"
+    }
+  },
+  "child_lifecycle_contracts": {
+    "discovery_authorization_receipt_contract_hash": "8889aaec90e6b25efa9f269ccd38af13be32c665a72248342d01dc145c860b65",
+    "candidate_lock_receipt_contract_hash": "96756dfebab636baa1abb33364e307d99d90a61572b813c6a60504283d3d42df",
+    "wf_validation_receipt_contract_hash": "bb5698a85daec1a5b9dcd169bde3d575befe8c0a1d73c2e87136cf35afb4001b",
+    "confirmation_ready_receipt_contract_hash": "7ab0ae0c8acb17340eccaa2bb737a5300e679b8de7497a539bdc44e93d3109be",
+    "termination_receipt_contract_hash": "b45c7021db1c63a447ddb22a1f9cb787ce71a5048c824ce38d40f19f755ecb48",
+    "transition_matrix_contract_hash": "58c8eefe64afd130c6244e40e3bc9ce3a6ef25f418bc7be18dced5defa56e1d3",
+    "persistence_replay_contract_hash": "ae6582d64d3f0bdb9b7c8773ce758d011670ea7b7bbf433585806345aa239c26",
+    "runtime_snapshot_seal_contract_hash": "0c44b6f306d7d562338bdaf901543e09ccd4ea8cf1d4fbb79fb4edbff7bc2f35",
+    "f02_boundary_contract_hash": "5678d8bd6b83bb69e1a1ad2cf78af8ddbaece625a5a34b7018b0a5e6368756f4"
+  },
+  "discovery_selection_correction_contract_hash": "f84c97050c7db813263e5ffda6b1c556af0b7b0e2876bb8616640d2c9d67084b",
+  "implementation_authority": {
+    "status": "F01_IMPLEMENTATION_PENDING_INDEPENDENT_REVIEW",
+    "code_commit": "d3dae91f0351879364ca41ff88ddb3730630cab1",
+    "branch": "h40-f01-lifecycle-authority (pushed to origin/v0.5-refactor)",
+    "accepted_implementation_hash": null
+  }
+}
