@@ -13,15 +13,16 @@ import json
 import os
 import re
 from collections.abc import Callable, Mapping, Sequence
-from dataclasses import dataclass, field
-from datetime import datetime
+from dataclasses import InitVar, dataclass, field
+from datetime import UTC, datetime
 from decimal import Decimal, InvalidOperation
 from pathlib import Path
 from types import MappingProxyType
-from typing import Any, ClassVar, cast
+from typing import Any, ClassVar, Protocol, cast, runtime_checkable
 
 from ..research_contract.canonical import canonical_json, canonical_sha256
 from .guards import H40GuardError, H40ReasonCode
+from .protocol import H40ProtocolIdentity
 from .protocol_authority import (
     EXPECTED_PROTOCOL_AUTHORITY_HASH,
     EXPECTED_SEMANTIC_ROOT_HASH,
@@ -31,6 +32,8 @@ from .protocol_authority import (
     compute_semantic_root_hash,
     current_p1_authority_snapshot,
 )
+from .source_manifest import H40SourceManifest
+from .split_manifest import H40SplitManifest
 
 EXPECTED_LIFECYCLE_SEMANTIC_ROOT_HASH = (
     "d8c24b878b18426666ce46390e7363a0a2a5d7d3eb4d7636cc5cb2ecfaf4e9f5"
@@ -96,7 +99,7 @@ def normalize_audit_timestamp(value: str) -> str:
     if not isinstance(value, str) or len(value) != 20 or _TIMESTAMP_RE.fullmatch(value) is None:
         raise ValueError("timestamp must use exact YYYY-MM-DDTHH:MM:SSZ form")
     try:
-        parsed = datetime.strptime(value, "%Y-%m-%dT%H:%M:%SZ")
+        parsed = datetime.strptime(value, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=UTC)
     except ValueError as exc:
         raise ValueError("timestamp must be a calendar-valid UTC second without leap second") from exc
     if parsed.strftime("%Y-%m-%dT%H:%M:%SZ") != value:
@@ -366,6 +369,45 @@ def _slot_family_id(families: Sequence[Any]) -> str:
     return "+".join(str(getattr(item, "value", item)) for item in families)
 
 
+_PRODUCTION_SEAL_TOKEN = object()
+_SYNTHETIC_SEAL_TOKEN = object()
+
+
+def _accepted_production_roster() -> tuple[
+    tuple[H40RuntimeRosterEntry, ...],
+    int,
+    int,
+    str,
+]:
+    from .search_space import materialize_h40_search_space_production
+
+    ledger = materialize_h40_search_space_production()
+    if ledger.structural_ledger_hash != EXPECTED_STRUCTURAL_LEDGER_HASH:
+        raise H40GuardError(H40ReasonCode.CONFIG_IDENTITY_CONFLICT, "structural ledger hash mismatch")
+    if ledger.slot_count != 168:
+        raise H40GuardError(
+            H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+            "accepted production search space must contain exactly 168 slots",
+        )
+    roster = tuple(
+        sorted(
+            (
+                H40RuntimeRosterEntry(
+                    family_id=_slot_family_id(slot.family_combination),
+                    slot_hash=slot.slot_hash,
+                    slot_index=slot.slot_index,
+                    structural_configuration_hash=slot.structural_configuration_hash,
+                )
+                for slot in ledger.slots
+                if slot.status == "REGISTERED"
+            ),
+            key=lambda item: item.structural_configuration_hash,
+        )
+    )
+    snapshot_hash = current_p1_authority_snapshot().runtime_authority_snapshot_hash
+    return roster, len(roster), ledger.slot_count - len(roster), snapshot_hash
+
+
 @dataclass(frozen=True)
 class H40RuntimeSnapshotSeal:
     runtime_authority_snapshot_hash: str
@@ -376,9 +418,16 @@ class H40RuntimeSnapshotSeal:
     registered_slot_count: int
     not_testable_slot_count: int
     total_slot_count: int = 168
-    synthetic_only: bool = field(default=False, compare=False, repr=False)
+    synthetic_only: bool = field(init=False, compare=False, repr=False)
+    _construction_token: InitVar[object | None] = None
 
-    def __post_init__(self) -> None:
+    def __post_init__(self, _construction_token: object | None) -> None:
+        if _construction_token not in {_PRODUCTION_SEAL_TOKEN, _SYNTHETIC_SEAL_TOKEN}:
+            raise TypeError(
+                "runtime snapshot seals must be issued by from_verified_authority() "
+                "or synthetic_for_tests()"
+            )
+        object.__setattr__(self, "synthetic_only", _construction_token is _SYNTHETIC_SEAL_TOKEN)
         roster = tuple(self.roster)
         if not all(isinstance(item, H40RuntimeRosterEntry) for item in roster):
             raise TypeError("roster entries must use H40RuntimeRosterEntry")
@@ -421,6 +470,14 @@ class H40RuntimeSnapshotSeal:
             runtime_authority_snapshot_hash=self.runtime_authority_snapshot_hash,
         ).materialized_run_authority_hash
 
+    @property
+    def authority_context_hash(self) -> str:
+        return canonical_sha256({
+            "authority_kind": "SYNTHETIC_TEST_ONLY" if self.synthetic_only else "PRODUCTION_VERIFIED",
+            "schema_id": "H40_RUNTIME_SNAPSHOT_SEAL_CONTEXT_V1",
+            **self.to_dict(),
+        })
+
     def to_dict(self) -> dict[str, Any]:
         return {
             "runtime_authority_snapshot_hash": self.runtime_authority_snapshot_hash,
@@ -434,61 +491,70 @@ class H40RuntimeSnapshotSeal:
         }
 
     def verify_against_accepted_ledger(self) -> None:
-        from .search_space import materialize_h40_search_space_production
-
-        ledger = materialize_h40_search_space_production()
-        if ledger.structural_ledger_hash != EXPECTED_STRUCTURAL_LEDGER_HASH:
-            raise H40GuardError(H40ReasonCode.CONFIG_IDENTITY_CONFLICT, "structural ledger hash mismatch")
-        by_index = {slot.slot_index: slot for slot in ledger.slots}
-        for entry in self.roster:
-            slot = by_index.get(entry.slot_index)
-            if (
-                slot is None
-                or slot.status != "REGISTERED"
-                or slot.slot_hash != entry.slot_hash
-                or slot.structural_configuration_hash != entry.structural_configuration_hash
-                or _slot_family_id(slot.family_combination) != entry.family_id
-            ):
-                raise H40GuardError(
-                    H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
-                    f"roster entry {entry.slot_index} does not match accepted REGISTERED slot",
-                )
+        expected, registered_count, not_testable_count, snapshot_hash = (
+            _accepted_production_roster()
+        )
+        if self.runtime_authority_snapshot_hash != snapshot_hash:
+            raise H40GuardError(
+                H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                "runtime authority snapshot is not the accepted production snapshot",
+            )
+        if self.roster != expected:
+            raise H40GuardError(
+                H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                "sealed roster is not the exact complete accepted REGISTERED universe",
+            )
+        if (
+            self.registered_slot_count != registered_count
+            or self.not_testable_slot_count != not_testable_count
+        ):
+            raise H40GuardError(
+                H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                "production roster counts are not the accepted derived counts",
+            )
 
     @classmethod
-    def from_current_production_authority(
+    def from_verified_authority(
         cls,
         *,
-        source_manifest_hash: str,
-        split_manifest_hash: str,
-        split_attestation_hash: str,
+        source_manifest: H40SourceManifest,
+        split_manifest: H40SplitManifest,
+        repo_root: Path | str,
     ) -> H40RuntimeSnapshotSeal:
-        from .search_space import materialize_h40_search_space_production
-
-        ledger = materialize_h40_search_space_production()
-        snapshot = current_p1_authority_snapshot()
-        registered = tuple(
-            sorted(
-                (
-                    H40RuntimeRosterEntry(
-                        family_id=_slot_family_id(slot.family_combination),
-                        slot_hash=slot.slot_hash,
-                        slot_index=slot.slot_index,
-                        structural_configuration_hash=slot.structural_configuration_hash,
-                    )
-                    for slot in ledger.slots
-                    if slot.status == "REGISTERED"
-                ),
-                key=lambda item: item.structural_configuration_hash,
+        if not isinstance(source_manifest, H40SourceManifest):
+            raise TypeError("production seal requires H40SourceManifest")
+        if not isinstance(split_manifest, H40SplitManifest):
+            raise TypeError("production seal requires H40SplitManifest")
+        if not isinstance(repo_root, (Path, str)) or str(repo_root).strip() == "":
+            raise ValueError("production seal requires a non-empty repo_root")
+        accepted_protocol_identity = H40ProtocolIdentity.default().protocol_hash
+        if (
+            source_manifest.protocol_identity_hash != accepted_protocol_identity
+            or split_manifest.protocol_identity_hash != accepted_protocol_identity
+        ):
+            raise H40GuardError(
+                H40ReasonCode.SOURCE_UNVERIFIED,
+                "source/split authority is not bound to the accepted H40 protocol identity",
             )
+        split_manifest.assert_authoritative(source_manifest, repo_root)
+        attestation = split_manifest.attestation
+        if attestation is None or not attestation.is_production_canonical:
+            raise H40GuardError(
+                H40ReasonCode.SOURCE_UNVERIFIED,
+                "production seal requires a production-canonical split attestation",
+            )
+        registered, registered_count, not_testable_count, snapshot_hash = (
+            _accepted_production_roster()
         )
         seal = cls(
-            runtime_authority_snapshot_hash=snapshot.runtime_authority_snapshot_hash,
-            source_manifest_hash=source_manifest_hash,
-            split_manifest_hash=split_manifest_hash,
-            split_attestation_hash=split_attestation_hash,
+            runtime_authority_snapshot_hash=snapshot_hash,
+            source_manifest_hash=source_manifest.manifest_hash,
+            split_manifest_hash=split_manifest.split_hash,
+            split_attestation_hash=attestation.attestation_hash,
             roster=registered,
-            registered_slot_count=len(registered),
-            not_testable_slot_count=ledger.slot_count - len(registered),
+            registered_slot_count=registered_count,
+            not_testable_slot_count=not_testable_count,
+            _construction_token=_PRODUCTION_SEAL_TOKEN,
         )
         seal.verify_against_accepted_ledger()
         return seal
@@ -513,7 +579,7 @@ class H40RuntimeSnapshotSeal:
             roster=ordered,
             registered_slot_count=len(ordered),
             not_testable_slot_count=not_testable_slot_count,
-            synthetic_only=True,
+            _construction_token=_SYNTHETIC_SEAL_TOKEN,
         )
 
 
@@ -990,6 +1056,24 @@ class H40ExpectedWFFold:
             "split_definition_hash": self.split_definition_hash,
         })
 
+    def to_dict(self) -> dict[str, str]:
+        return {
+            "fold_id": self.fold_id,
+            "partition_id": self.partition_id,
+            "split_definition_hash": self.split_definition_hash,
+        }
+
+    @classmethod
+    def from_dict(cls, data: Mapping[str, Any]) -> H40ExpectedWFFold:
+        keys = frozenset({"fold_id", "partition_id", "split_definition_hash"})
+        _require_exact_keys(data, keys, cls.__name__)
+        _require_string_fields(data, keys, cls.__name__)
+        return cls(
+            fold_id=str(data["fold_id"]),
+            partition_id=str(data["partition_id"]),
+            split_definition_hash=str(data["split_definition_hash"]),
+        )
+
 
 @dataclass(frozen=True)
 class H40ExpectedSplitAuthority:
@@ -1020,6 +1104,48 @@ class H40ExpectedSplitAuthority:
         )
         if not self.accepted_validation_contract_hashes:
             raise ValueError("accepted validation contract set cannot be empty")
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "accepted_validation_contract_hashes": dict(
+                self.accepted_validation_contract_hashes
+            ),
+            "folds": [fold.to_dict() for fold in self.folds],
+            "schema_id": "H40_EXPECTED_SPLIT_AUTHORITY_CONTEXT_V1",
+            "split_attestation_hash": self.split_attestation_hash,
+            "split_manifest_hash": self.split_manifest_hash,
+        }
+
+    @property
+    def authority_context_hash(self) -> str:
+        return canonical_sha256(self.to_dict())
+
+    @classmethod
+    def from_dict(cls, data: Mapping[str, Any]) -> H40ExpectedSplitAuthority:
+        keys = frozenset({
+            "accepted_validation_contract_hashes",
+            "folds",
+            "schema_id",
+            "split_attestation_hash",
+            "split_manifest_hash",
+        })
+        _require_exact_keys(data, keys, cls.__name__)
+        if data["schema_id"] != "H40_EXPECTED_SPLIT_AUTHORITY_CONTEXT_V1":
+            raise ValueError("expected split authority context schema mismatch")
+        folds = data["folds"]
+        contracts = data["accepted_validation_contract_hashes"]
+        if not isinstance(folds, list) or not all(isinstance(item, Mapping) for item in folds):
+            raise TypeError("folds must be an array of objects")
+        if not isinstance(contracts, Mapping):
+            raise TypeError("accepted_validation_contract_hashes must be an object")
+        return cls(
+            split_manifest_hash=str(data["split_manifest_hash"]),
+            split_attestation_hash=str(data["split_attestation_hash"]),
+            folds=tuple(H40ExpectedWFFold.from_dict(item) for item in folds),
+            accepted_validation_contract_hashes={
+                str(key): str(value) for key, value in contracts.items()
+            },
+        )
 
 
 @dataclass(frozen=True)
@@ -1337,10 +1463,39 @@ class H40TerminationReceipt:
 
 
 @dataclass(frozen=True)
-class _CandidateScore:
+class H40CandidateVerification:
     hard_gates_passed: bool
     adjusted_lcb_net_expectancy: Decimal
     adjusted_lcb_precision: Decimal
+
+
+@runtime_checkable
+class H40LifecycleEvidenceVerifier(Protocol):
+    """Typed seam for a separately accepted lifecycle scientific verifier."""
+
+    @property
+    def synthetic_only(self) -> bool: ...
+
+    def verify_discovery_manifest(
+        self,
+        evidence: H40DiscoveryResultEvidence,
+        entries: Sequence[H40CandidateResultEntry],
+    ) -> None: ...
+
+    def verify_candidate(
+        self,
+        entry: H40CandidateResultEntry,
+        *,
+        run_authority_id: str,
+        correction_manifest_hash: str,
+    ) -> H40CandidateVerification: ...
+
+    def verify_wf_fold(
+        self,
+        entry: H40WFFoldResultEntry,
+        *,
+        evidence: H40WFValidationResultEvidence,
+    ) -> bool: ...
 
 
 class H40SyntheticEvidenceVerifier:
@@ -1351,6 +1506,8 @@ class H40SyntheticEvidenceVerifier:
     authority is published.
     """
 
+    synthetic_only = True
+
     def __init__(self, payloads: Mapping[str, Mapping[str, Any]]) -> None:
         copied: dict[str, Mapping[str, Any]] = {}
         for digest, payload in payloads.items():
@@ -1360,6 +1517,17 @@ class H40SyntheticEvidenceVerifier:
                 raise ValueError("synthetic evidence key does not match canonical content hash")
             copied[digest] = MappingProxyType(detached)
         self._payloads: dict[str, Mapping[str, Any]] = copied
+        self._verification_count = 0
+
+    @property
+    def verification_count(self) -> int:
+        return self._verification_count
+
+    def export_payloads_for_tests(self) -> dict[str, dict[str, Any]]:
+        return {
+            digest: cast(dict[str, Any], json.loads(canonical_json(payload)))
+            for digest, payload in self._payloads.items()
+        }
 
     def add_payload_for_tests(self, payload: Mapping[str, Any]) -> str:
         """Add immutable synthetic evidence; never available to production authority."""
@@ -1398,6 +1566,7 @@ class H40SyntheticEvidenceVerifier:
         evidence: H40DiscoveryResultEvidence,
         entries: Sequence[H40CandidateResultEntry],
     ) -> None:
+        self._verification_count += 1
         payload = self._load(evidence.correction_input_evidence_manifest_hash)
         expected = frozenset({
             "candidate_structural_configuration_hashes", "discovery_selection_correction_contract_hash",
@@ -1422,7 +1591,8 @@ class H40SyntheticEvidenceVerifier:
         *,
         run_authority_id: str,
         correction_manifest_hash: str,
-    ) -> _CandidateScore:
+    ) -> H40CandidateVerification:
+        self._verification_count += 1
         gate_results: list[bool] = []
         for gate_id, digest in entry.hard_gate_input_evidence_hashes.items():
             payload = self._load(digest)
@@ -1481,7 +1651,7 @@ class H40SyntheticEvidenceVerifier:
             or result["precision_input_evidence_hash"] != entry.precision_input_evidence_hash
         ):
             raise H40GuardError(H40ReasonCode.CONFIG_IDENTITY_CONFLICT, "candidate result input binding mismatch")
-        return _CandidateScore(
+        return H40CandidateVerification(
             hard_gates_passed=all(gate_results),
             adjusted_lcb_net_expectancy=metrics["NET_EXPECTANCY"],
             adjusted_lcb_precision=metrics["PRECISION"],
@@ -1493,6 +1663,7 @@ class H40SyntheticEvidenceVerifier:
         *,
         evidence: H40WFValidationResultEvidence,
     ) -> bool:
+        self._verification_count += 1
         gate_results: list[bool] = []
         for gate_id, digest in entry.accepted_gate_input_evidence_hashes.items():
             payload = self._load(digest)
@@ -1678,7 +1849,7 @@ class H40LifecycleAuthorityService:
         *,
         implementation_authority: H40LifecycleImplementationAuthority | None,
         accepted_implementation_authority_hash: str | None,
-        evidence_verifier: H40SyntheticEvidenceVerifier | None,
+        evidence_verifier: H40LifecycleEvidenceVerifier | None,
         synthetic_test_mode: bool,
         _construction_token: object,
     ) -> None:
@@ -1693,11 +1864,21 @@ class H40LifecycleAuthorityService:
             computed = implementation_authority.lifecycle_implementation_authority_hash
             if computed != accepted_implementation_authority_hash:
                 raise ValueError("implementation authority object/hash mismatch")
+        if evidence_verifier is not None and not isinstance(
+            evidence_verifier,
+            H40LifecycleEvidenceVerifier,
+        ):
+            raise TypeError("evidence_verifier must implement H40LifecycleEvidenceVerifier")
         if synthetic_test_mode:
-            if implementation_authority is None or evidence_verifier is None:
-                raise ValueError("synthetic test service requires authority and evidence verifier")
-        elif evidence_verifier is not None:
-            raise ValueError("production service cannot use synthetic evidence verifier")
+            if implementation_authority is None or not isinstance(
+                evidence_verifier,
+                H40SyntheticEvidenceVerifier,
+            ):
+                raise ValueError(
+                    "synthetic test service requires authority and H40SyntheticEvidenceVerifier"
+                )
+        elif evidence_verifier is not None and evidence_verifier.synthetic_only:
+            raise ValueError("production service cannot use a synthetic/test-only verifier")
         self._implementation_authority = implementation_authority
         self._accepted_implementation_authority_hash = accepted_implementation_authority_hash
         self._evidence_verifier = evidence_verifier
@@ -1708,14 +1889,34 @@ class H40LifecycleAuthorityService:
     def production(
         cls,
         implementation_authority: H40LifecycleImplementationAuthority | None = None,
+        evidence_verifier: H40LifecycleEvidenceVerifier | None = None,
     ) -> H40LifecycleAuthorityService:
         return cls(
             implementation_authority=implementation_authority,
             accepted_implementation_authority_hash=ACCEPTED_LIFECYCLE_IMPLEMENTATION_AUTHORITY_HASH,
-            evidence_verifier=None,
+            evidence_verifier=evidence_verifier,
             synthetic_test_mode=False,
             _construction_token=_VERIFIED_AUTHORITY_TOKEN,
         )
+
+    @property
+    def synthetic_test_mode(self) -> bool:
+        return self._synthetic_test_mode
+
+    @staticmethod
+    def _inherited_authority_context(
+        prior: VerifiedLifecycleAuthorization,
+    ) -> dict[str, Any]:
+        return {
+            key: prior.context[key]
+            for key in (
+                "implementation_authority",
+                "run_authority",
+                "seal",
+                "split_authority",
+            )
+            if key in prior.context
+        }
 
     @classmethod
     def synthetic_for_tests(
@@ -1834,7 +2035,11 @@ class H40LifecycleAuthorityService:
             source_state="H40_P1_SCAFFOLDED",
             target_state="H40_DISCOVERY",
             upstream_receipt_hash=None,
-            context={"run_authority": run_authority, "seal": seal},
+            context={
+                "implementation_authority": implementation_authority,
+                "run_authority": run_authority,
+                "seal": seal,
+            },
         )
 
     def authorize_candidate_lock(
@@ -1895,7 +2100,7 @@ class H40LifecycleAuthorityService:
                 "candidate evidence is not the complete sealed REGISTERED roster",
             )
         verifier.verify_discovery_manifest(evidence, evidence.candidate_result_entries)
-        scored: list[tuple[H40CandidateResultEntry, _CandidateScore]] = []
+        scored: list[tuple[H40CandidateResultEntry, H40CandidateVerification]] = []
         for entry in evidence.candidate_result_entries:
             result = verifier.verify_candidate(
                 entry,
@@ -1933,9 +2138,9 @@ class H40LifecycleAuthorityService:
             target_state="H40_CANDIDATE_LOCKED",
             upstream_receipt_hash=discovery_authority.receipt_hash,
             context={
+                **self._inherited_authority_context(discovery_authority),
                 "discovery_authority": discovery_authority,
                 "evidence": evidence,
-                "seal": seal,
                 "selected_entry": selected,
             },
         )
@@ -2022,6 +2227,7 @@ class H40LifecycleAuthorityService:
             target_state="H40_WALK_FORWARD_VALIDATED",
             upstream_receipt_hash=candidate_authority.receipt_hash,
             context={
+                **self._inherited_authority_context(candidate_authority),
                 "candidate_authority": candidate_authority,
                 "evidence": evidence,
                 "split_authority": split_authority,
@@ -2061,7 +2267,10 @@ class H40LifecycleAuthorityService:
             source_state="H40_WALK_FORWARD_VALIDATED",
             target_state="H40_CONFIRMATION_READY",
             upstream_receipt_hash=wf_authority.receipt_hash,
-            context={"wf_authority": wf_authority},
+            context={
+                **self._inherited_authority_context(wf_authority),
+                "wf_authority": wf_authority,
+            },
         )
 
     def authorize_termination(
@@ -2135,6 +2344,7 @@ class H40LifecycleAuthorityService:
             target_state=target_state,
             upstream_receipt_hash=prior_authority.receipt_hash,
             context={
+                **self._inherited_authority_context(prior_authority),
                 "failure_evidence": failure_evidence,
                 "prior_authority": prior_authority,
             },
@@ -2242,6 +2452,194 @@ _RECEIPT_PARSERS: Mapping[str, Callable[[Mapping[str, Any]], _Receipt]] = Mappin
 })
 
 
+@dataclass(frozen=True)
+class H40LifecyclePersistenceContext:
+    implementation_authority_hash: str
+    predecessor_receipt_hash: str | None
+    run_authority_id: str
+    runtime_seal_hash: str
+    split_authority_hash: str | None
+    schema_id: str = "H40_LIFECYCLE_PERSISTENCE_CONTEXT_V1"
+
+    _KEYS: ClassVar[frozenset[str]] = frozenset({
+        "implementation_authority_hash",
+        "predecessor_receipt_hash",
+        "run_authority_id",
+        "runtime_seal_hash",
+        "schema_id",
+        "split_authority_hash",
+    })
+
+    def __post_init__(self) -> None:
+        if self.schema_id != "H40_LIFECYCLE_PERSISTENCE_CONTEXT_V1":
+            raise ValueError("lifecycle persistence context schema mismatch")
+        for name in (
+            "implementation_authority_hash",
+            "run_authority_id",
+            "runtime_seal_hash",
+        ):
+            _require_sha256(getattr(self, name), name)
+        for name in ("predecessor_receipt_hash", "split_authority_hash"):
+            value = getattr(self, name)
+            if value is not None:
+                _require_sha256(value, name)
+
+    def to_dict(self) -> dict[str, Any]:
+        return {name: getattr(self, name) for name in self._KEYS}
+
+    @classmethod
+    def from_dict(cls, data: Mapping[str, Any]) -> H40LifecyclePersistenceContext:
+        _require_exact_keys(data, cls._KEYS, cls.__name__)
+        _require_string_fields(
+            data,
+            cls._KEYS - {"predecessor_receipt_hash", "split_authority_hash"},
+            cls.__name__,
+        )
+        for name in ("predecessor_receipt_hash", "split_authority_hash"):
+            if data[name] is not None and not isinstance(data[name], str):
+                raise TypeError(f"{cls.__name__}.{name} must be a string or null")
+        return cls(
+            implementation_authority_hash=str(data["implementation_authority_hash"]),
+            predecessor_receipt_hash=(
+                None
+                if data["predecessor_receipt_hash"] is None
+                else str(data["predecessor_receipt_hash"])
+            ),
+            run_authority_id=str(data["run_authority_id"]),
+            runtime_seal_hash=str(data["runtime_seal_hash"]),
+            schema_id=str(data["schema_id"]),
+            split_authority_hash=(
+                None
+                if data["split_authority_hash"] is None
+                else str(data["split_authority_hash"])
+            ),
+        )
+
+
+@runtime_checkable
+class H40LifecycleAuthorityResolver(Protocol):
+    """Typed resolver seam backed by accepted immutable authority stores."""
+
+    @property
+    def synthetic_only(self) -> bool: ...
+
+    def resolve_implementation_authority(
+        self,
+        authority_hash: str,
+    ) -> H40LifecycleImplementationAuthority: ...
+
+    def resolve_run_authority(self, run_authority_id: str) -> H40RunAuthority: ...
+
+    def resolve_runtime_seal(self, seal_hash: str) -> H40RuntimeSnapshotSeal: ...
+
+    def resolve_split_authority(
+        self,
+        split_authority_hash: str,
+    ) -> H40ExpectedSplitAuthority: ...
+
+
+_SYNTHETIC_RESOLVER_TOKEN = object()
+
+
+class H40SyntheticAuthorityResolver:
+    """Immutable in-memory resolver for synthetic/governance tests only."""
+
+    synthetic_only = True
+
+    def __init__(
+        self,
+        *,
+        implementation_authorities: Sequence[H40LifecycleImplementationAuthority],
+        run_authorities: Sequence[H40RunAuthority],
+        runtime_seals: Sequence[H40RuntimeSnapshotSeal],
+        split_authorities: Sequence[H40ExpectedSplitAuthority],
+        _construction_token: object,
+    ) -> None:
+        if _construction_token is not _SYNTHETIC_RESOLVER_TOKEN:
+            raise TypeError("use H40SyntheticAuthorityResolver.for_tests()")
+        if any(not seal.synthetic_only for seal in runtime_seals):
+            raise ValueError("synthetic resolver accepts only synthetic runtime seals")
+        self._implementation_authorities = MappingProxyType({
+            item.lifecycle_implementation_authority_hash: item
+            for item in implementation_authorities
+        })
+        self._run_authorities = MappingProxyType({
+            item.run_authority_id: item for item in run_authorities
+        })
+        self._runtime_seals = MappingProxyType({
+            item.authority_context_hash: item for item in runtime_seals
+        })
+        self._split_authorities = MappingProxyType({
+            item.authority_context_hash: item for item in split_authorities
+        })
+
+    @classmethod
+    def for_tests(
+        cls,
+        *,
+        implementation_authorities: Sequence[H40LifecycleImplementationAuthority],
+        run_authorities: Sequence[H40RunAuthority],
+        runtime_seals: Sequence[H40RuntimeSnapshotSeal],
+        split_authorities: Sequence[H40ExpectedSplitAuthority] = (),
+    ) -> H40SyntheticAuthorityResolver:
+        return cls(
+            implementation_authorities=implementation_authorities,
+            run_authorities=run_authorities,
+            runtime_seals=runtime_seals,
+            split_authorities=split_authorities,
+            _construction_token=_SYNTHETIC_RESOLVER_TOKEN,
+        )
+
+    @staticmethod
+    def _resolve(values: Mapping[str, Any], identity: str, name: str) -> Any:
+        _require_sha256(identity, name)
+        resolved = values.get(identity)
+        if resolved is None:
+            raise H40GuardError(
+                H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                f"authoritative resolver has no {name} {identity}",
+            )
+        return resolved
+
+    def resolve_implementation_authority(
+        self,
+        authority_hash: str,
+    ) -> H40LifecycleImplementationAuthority:
+        return cast(
+            H40LifecycleImplementationAuthority,
+            self._resolve(
+                self._implementation_authorities,
+                authority_hash,
+                "implementation authority",
+            ),
+        )
+
+    def resolve_run_authority(self, run_authority_id: str) -> H40RunAuthority:
+        return cast(
+            H40RunAuthority,
+            self._resolve(self._run_authorities, run_authority_id, "run authority"),
+        )
+
+    def resolve_runtime_seal(self, seal_hash: str) -> H40RuntimeSnapshotSeal:
+        return cast(
+            H40RuntimeSnapshotSeal,
+            self._resolve(self._runtime_seals, seal_hash, "runtime seal"),
+        )
+
+    def resolve_split_authority(
+        self,
+        split_authority_hash: str,
+    ) -> H40ExpectedSplitAuthority:
+        return cast(
+            H40ExpectedSplitAuthority,
+            self._resolve(
+                self._split_authorities,
+                split_authority_hash,
+                "split authority",
+            ),
+        )
+
+
 class H40LifecycleArtifactStore:
     """Minimal canonical, write-once lifecycle governance persistence."""
 
@@ -2274,10 +2672,50 @@ class H40LifecycleArtifactStore:
             return failure_evidence
         return None
 
+    @staticmethod
+    def _persistence_context(
+        authorization: VerifiedLifecycleAuthorization,
+    ) -> H40LifecyclePersistenceContext:
+        implementation = authorization.context.get("implementation_authority")
+        run_authority = authorization.context.get("run_authority")
+        seal = authorization.context.get("seal")
+        split_authority = authorization.context.get("split_authority")
+        if (
+            not isinstance(implementation, H40LifecycleImplementationAuthority)
+            or not isinstance(run_authority, H40RunAuthority)
+            or not isinstance(seal, H40RuntimeSnapshotSeal)
+        ):
+            raise H40GuardError(
+                H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                "verified authorization lacks canonical persistence authority context",
+            )
+        if split_authority is not None and not isinstance(
+            split_authority,
+            H40ExpectedSplitAuthority,
+        ):
+            raise H40GuardError(
+                H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                "verified authorization has an invalid split authority context",
+            )
+        return H40LifecyclePersistenceContext(
+            implementation_authority_hash=(
+                implementation.lifecycle_implementation_authority_hash
+            ),
+            predecessor_receipt_hash=authorization.upstream_receipt_hash,
+            run_authority_id=run_authority.run_authority_id,
+            runtime_seal_hash=seal.authority_context_hash,
+            split_authority_hash=(
+                None
+                if split_authority is None
+                else split_authority.authority_context_hash
+            ),
+        )
+
     @classmethod
     def _envelope(cls, authorization: VerifiedLifecycleAuthorization) -> dict[str, Any]:
         evidence = cls._bound_evidence(authorization)
         return {
+            "authority_context": cls._persistence_context(authorization).to_dict(),
             "bound_evidence": None if evidence is None else evidence.to_dict(),
             "bound_evidence_sha256": None if evidence is None else evidence.evidence_sha256,
             "receipt": authorization.receipt.to_dict(),
@@ -2378,7 +2816,11 @@ class H40LifecycleArtifactStore:
         self,
         run_authority_id: str,
         transition_key: str,
-    ) -> tuple[_Receipt, _ResultEvidence | None]:
+    ) -> tuple[
+        _Receipt,
+        _ResultEvidence | None,
+        H40LifecyclePersistenceContext,
+    ]:
         path = self._path(run_authority_id, transition_key)
         try:
             raw = json.loads(path.read_text(encoding="utf-8"))
@@ -2389,6 +2831,7 @@ class H40LifecycleArtifactStore:
         _require_exact_keys(
             raw,
             frozenset({
+                "authority_context",
                 "bound_evidence",
                 "bound_evidence_sha256",
                 "receipt",
@@ -2396,6 +2839,18 @@ class H40LifecycleArtifactStore:
             }),
             "lifecycle envelope",
         )
+        raw_context = raw["authority_context"]
+        if not isinstance(raw_context, Mapping):
+            raise H40GuardError(
+                H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                "lifecycle authority context must be an object",
+            )
+        context = H40LifecyclePersistenceContext.from_dict(raw_context)
+        if context.run_authority_id != run_authority_id:
+            raise H40GuardError(
+                H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                "persistence context run authority does not match storage boundary",
+            )
         payload = raw["receipt"]
         digest = raw["receipt_sha256"]
         if not isinstance(payload, Mapping) or not isinstance(digest, str):
@@ -2409,38 +2864,248 @@ class H40LifecycleArtifactStore:
         receipt = parser(payload)
         if receipt.receipt_sha256 != digest or receipt.run_authority_id != run_authority_id:
             raise H40GuardError(H40ReasonCode.CONFIG_IDENTITY_CONFLICT, "restored receipt authority mismatch")
+        if context.predecessor_receipt_hash != receipt.upstream_receipt_hash:
+            raise H40GuardError(
+                H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                "persistence predecessor context does not match receipt lineage",
+            )
         evidence = self._parse_bound_evidence(
             raw["bound_evidence"],
             raw["bound_evidence_sha256"],
             receipt,
         )
-        return receipt, evidence
+        return receipt, evidence, context
 
     def restore_receipt(self, run_authority_id: str, transition_key: str) -> _Receipt:
-        receipt, _ = self._restore(run_authority_id, transition_key)
+        receipt, _, _ = self._restore(run_authority_id, transition_key)
         return receipt
+
+    def _find_transition_key_by_receipt_hash(
+        self,
+        run_authority_id: str,
+        receipt_hash: str,
+    ) -> str:
+        _require_sha256(receipt_hash, "predecessor receipt hash")
+        matches: list[str] = []
+        for path in sorted(self._run_dir(run_authority_id).glob("*.json")):
+            if self._KEY_RE.fullmatch(path.stem) is None:
+                continue
+            try:
+                raw = json.loads(path.read_text(encoding="utf-8"))
+            except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+                raise H40GuardError(
+                    H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                    "invalid lifecycle predecessor artifact",
+                ) from exc
+            if not isinstance(raw, Mapping):
+                raise H40GuardError(
+                    H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                    "lifecycle predecessor envelope must be an object",
+                )
+            if raw.get("receipt_sha256") == receipt_hash:
+                payload = raw.get("receipt")
+                if not isinstance(payload, Mapping) or canonical_sha256(payload) != receipt_hash:
+                    raise H40GuardError(
+                        H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                        "predecessor receipt content hash mismatch",
+                    )
+                matches.append(path.stem)
+        if len(matches) != 1:
+            raise H40GuardError(
+                H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                "predecessor receipt must resolve to exactly one persisted artifact",
+            )
+        return matches[0]
+
+    @staticmethod
+    def _resolve_authority_context(
+        context: H40LifecyclePersistenceContext,
+        resolver: H40LifecycleAuthorityResolver,
+    ) -> tuple[
+        H40LifecycleImplementationAuthority,
+        H40RunAuthority,
+        H40RuntimeSnapshotSeal,
+        H40ExpectedSplitAuthority | None,
+    ]:
+        implementation = resolver.resolve_implementation_authority(
+            context.implementation_authority_hash
+        )
+        run_authority = resolver.resolve_run_authority(context.run_authority_id)
+        seal = resolver.resolve_runtime_seal(context.runtime_seal_hash)
+        if (
+            implementation.lifecycle_implementation_authority_hash
+            != context.implementation_authority_hash
+            or run_authority.run_authority_id != context.run_authority_id
+            or seal.authority_context_hash != context.runtime_seal_hash
+        ):
+            raise H40GuardError(
+                H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                "resolved authority object does not match its content address",
+            )
+        expected_run = H40RunAuthority.from_seal(
+            seal,
+            implementation.lifecycle_implementation_authority_hash,
+        )
+        if run_authority != expected_run:
+            raise H40GuardError(
+                H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                "resolved run authority does not match implementation/runtime seal",
+            )
+        split_authority = (
+            None
+            if context.split_authority_hash is None
+            else resolver.resolve_split_authority(context.split_authority_hash)
+        )
+        if split_authority is not None and (
+            split_authority.authority_context_hash != context.split_authority_hash
+            or split_authority.split_manifest_hash != seal.split_manifest_hash
+            or split_authority.split_attestation_hash != seal.split_attestation_hash
+        ):
+            raise H40GuardError(
+                H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                "resolved split authority does not match runtime seal",
+            )
+        return implementation, run_authority, seal, split_authority
+
+    def _cold_restore_authorization(
+        self,
+        run_authority_id: str,
+        transition_key: str,
+        *,
+        service: H40LifecycleAuthorityService,
+        resolver: H40LifecycleAuthorityResolver,
+        visited_receipts: frozenset[str],
+    ) -> VerifiedLifecycleAuthorization:
+        receipt, evidence, context = self._restore(run_authority_id, transition_key)
+        if receipt.receipt_sha256 in visited_receipts:
+            raise H40GuardError(
+                H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                "cyclic lifecycle predecessor lineage",
+            )
+        implementation, run_authority, seal, split_authority = (
+            self._resolve_authority_context(context, resolver)
+        )
+        prior: VerifiedLifecycleAuthorization | None = None
+        if receipt.upstream_receipt_hash is not None:
+            predecessor_key = self._find_transition_key_by_receipt_hash(
+                run_authority_id,
+                receipt.upstream_receipt_hash,
+            )
+            prior = self._cold_restore_authorization(
+                run_authority_id,
+                predecessor_key,
+                service=service,
+                resolver=resolver,
+                visited_receipts=visited_receipts | {receipt.receipt_sha256},
+            )
+            if prior.receipt_hash != receipt.upstream_receipt_hash:
+                raise H40GuardError(
+                    H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                    "cold-restored predecessor receipt substitution",
+                )
+
+        if isinstance(receipt, H40DiscoveryAuthorizationReceipt):
+            if prior is not None or evidence is not None:
+                raise H40GuardError(
+                    H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                    "discovery restore has unexpected predecessor or result evidence",
+                )
+            reconstructed = service.authorize_discovery(
+                implementation_authority=implementation,
+                run_authority=run_authority,
+                seal=seal,
+                authorized_at_utc=receipt.authorized_at_utc,
+            )
+        elif isinstance(receipt, H40CandidateLockReceipt):
+            if prior is None or not isinstance(evidence, H40DiscoveryResultEvidence):
+                raise H40GuardError(
+                    H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                    "candidate restore lacks predecessor/result evidence",
+                )
+            reconstructed = service.authorize_candidate_lock(
+                discovery_authority=prior,
+                evidence=evidence,
+                locked_at_utc=receipt.locked_at_utc,
+                verified_at_utc=receipt.verified_at_utc,
+            )
+        elif isinstance(receipt, H40WFValidationReceipt):
+            if (
+                prior is None
+                or not isinstance(evidence, H40WFValidationResultEvidence)
+                or split_authority is None
+            ):
+                raise H40GuardError(
+                    H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                    "WF restore lacks predecessor/result/split authority",
+                )
+            reconstructed = service.authorize_wf_validation(
+                candidate_authority=prior,
+                evidence=evidence,
+                split_authority=split_authority,
+                validated_at_utc=receipt.validated_at_utc,
+                verified_at_utc=receipt.verified_at_utc,
+            )
+        elif isinstance(receipt, H40ConfirmationReadyReceipt):
+            if prior is None or evidence is not None:
+                raise H40GuardError(
+                    H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                    "confirmation-ready restore has invalid context",
+                )
+            reconstructed = service.authorize_confirmation_ready(
+                wf_authority=prior,
+                prepared_at_utc=receipt.prepared_at_utc,
+            )
+        elif isinstance(receipt, H40TerminationReceipt):
+            if prior is None:
+                raise H40GuardError(
+                    H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                    "termination restore lacks predecessor authority",
+                )
+            reconstructed = service.authorize_termination(
+                prior_authority=prior,
+                target_state=receipt.target_state,
+                reason_code=receipt.reason_code,
+                detail_message=receipt.detail_message,
+                terminated_at_utc=receipt.terminated_at_utc,
+                failure_evidence_hash=receipt.failure_evidence_hash,
+                failure_evidence=evidence,
+            )
+        else:
+            raise TypeError("unknown lifecycle receipt type")
+        if (
+            reconstructed.receipt_hash != receipt.receipt_sha256
+            or reconstructed.receipt.to_dict() != receipt.to_dict()
+            or reconstructed.run_authority_id != run_authority_id
+        ):
+            raise H40GuardError(
+                H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                "cold-restored verifier result does not match persisted authorization",
+            )
+        return reconstructed
 
     def restore_authorization(
         self,
         run_authority_id: str,
         transition_key: str,
         *,
-        expected_authorization: VerifiedLifecycleAuthorization,
         service: H40LifecycleAuthorityService,
+        resolver: H40LifecycleAuthorityResolver,
     ) -> VerifiedLifecycleAuthorization:
-        receipt, evidence = self._restore(run_authority_id, transition_key)
-        if receipt.to_dict() != expected_authorization.receipt.to_dict():
-            raise H40GuardError(H40ReasonCode.CONFIG_IDENTITY_CONFLICT, "restored receipt substitution")
-        expected_evidence = self._bound_evidence(expected_authorization)
-        if (
-            (evidence is None) != (expected_evidence is None)
-            or evidence is not None
-            and expected_evidence is not None
-            and evidence.to_dict() != expected_evidence.to_dict()
-        ):
-            raise H40GuardError(H40ReasonCode.CONFIG_IDENTITY_CONFLICT, "restored evidence substitution")
-        service.revalidate_authorization(expected_authorization)
-        return expected_authorization
+        """Cold-restore and reissue authority without a process-local prior object."""
+        if not isinstance(resolver, H40LifecycleAuthorityResolver):
+            raise TypeError("resolver must implement H40LifecycleAuthorityResolver")
+        if resolver.synthetic_only != service.synthetic_test_mode:
+            raise H40GuardError(
+                H40ReasonCode.NOT_TESTABLE,
+                "resolver authority mode does not match lifecycle service mode",
+            )
+        return self._cold_restore_authorization(
+            run_authority_id,
+            transition_key,
+            service=service,
+            resolver=resolver,
+            visited_receipts=frozenset(),
+        )
 
 
 __all__ = [
@@ -2451,18 +3116,23 @@ __all__ = [
     "EXPECTED_LIFECYCLE_SEMANTIC_ROOT_HASH",
     "H40CandidateLockReceipt",
     "H40CandidateResultEntry",
+    "H40CandidateVerification",
     "H40ConfirmationReadyReceipt",
     "H40DiscoveryAuthorizationReceipt",
     "H40DiscoveryResultEvidence",
     "H40ExpectedSplitAuthority",
     "H40ExpectedWFFold",
     "H40LifecycleArtifactStore",
+    "H40LifecycleAuthorityResolver",
     "H40LifecycleAuthorityService",
+    "H40LifecycleEvidenceVerifier",
     "H40LifecycleImplementationAuthority",
+    "H40LifecyclePersistenceContext",
     "H40RequiredTestCIEvidenceIdentity",
     "H40RunAuthority",
     "H40RuntimeRosterEntry",
     "H40RuntimeSnapshotSeal",
+    "H40SyntheticAuthorityResolver",
     "H40SyntheticEvidenceVerifier",
     "H40TerminationReceipt",
     "H40WFFoldResultEntry",
