@@ -9,6 +9,7 @@ confirmation outcomes, or execution.
 
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import re
@@ -21,6 +22,7 @@ from types import MappingProxyType
 from typing import Any, ClassVar, Protocol, cast, runtime_checkable
 
 from ..research_contract.canonical import canonical_json, canonical_sha256
+from .configuration_ledger import DEFAULT_SOURCE_MANIFEST_HASH, DEFAULT_SPLIT_MANIFEST_HASH
 from .guards import H40GuardError, H40ReasonCode
 from .protocol import H40ProtocolIdentity
 from .protocol_authority import (
@@ -32,14 +34,20 @@ from .protocol_authority import (
     compute_semantic_root_hash,
     current_p1_authority_snapshot,
 )
-from .source_manifest import H40SourceManifest
+from .source_manifest import (
+    H40SourceManifest,
+    H40SourceStatus,
+    assert_canonical_source_identity,
+    extract_verified_source_timestamps,
+    validate_source_artifact,
+)
 from .split_manifest import H40SplitManifest
 
 EXPECTED_LIFECYCLE_SEMANTIC_ROOT_HASH = (
-    "d8c24b878b18426666ce46390e7363a0a2a5d7d3eb4d7636cc5cb2ecfaf4e9f5"
+    "fad50703c12da9af35366ceb8a774794b4ff2f3163a1adb6b624d3b69316e406"
 )
 EXPECTED_LIFECYCLE_GOVERNANCE_AUTHORITY_HASH = (
-    "ee619e16bb665ba377baa2a50f92ea1c36ee207282e3f7757b54a0a1adf7b828"
+    "7edce39c421ad6c487580483d2fa674b1f199e21640c33b1c08f85dddc6f64fc"
 )
 DISCOVERY_SELECTION_CORRECTION_CONTRACT_HASH = (
     "f84c97050c7db813263e5ffda6b1c556af0b7b0e2876bb8616640d2c9d67084b"
@@ -142,7 +150,7 @@ _LIFECYCLE_CONTRACTS_JSON = r'''
   "termination_receipt_contract":{"accepted_reason_codes":["CONFIG_IDENTITY_CONFLICT","CONFIRMATION_HOLD_LOCKED","CONFIRMATION_NOT_READY","DUPLICATE_TIMESTAMP","EXECUTION_DISABLED","FAMILY_PAIR_RESTRICTED","HORIZON_TRUNCATED","INTERVAL_MISMATCH","LOOKBACK_RESERVED","NOT_TESTABLE","OUTSIDE_PREREGISTERED_SPLIT","PIT_UNAVAILABLE","PRODUCT_MISMATCH","PROTECTED_SURFACE_DENIED","PURGE_BOUNDARY","SEARCH_BUDGET_EXHAUSTED","SOURCE_GAP","SOURCE_HASH_MISMATCH","SOURCE_MISSING","SOURCE_UNVERIFIED","THRESHOLD_UNMET","UNAUTHORIZED_FAMILY"],"authority_rules":["termination_receipt_never_authorizes_forward_progress","H40_NO_GO_and_NOT_TESTABLE_are_absorbing","reason_code_must_belong_to_the_accepted_H40ReasonCode_vocabulary","failure_evidence_when_present_must_be_loaded_and_content_hash_verified","source_state_and_upstream_receipt_must_match_current_verified_chain"],"receipt_field_contract":{"detail_message":"audit_string","failure_evidence_hash":"sha256_or_null","reason_code":"accepted_H40ReasonCode","receipt_schema_id":"constant:H40_RECEIPT_TERMINATION_V2","run_authority_id":"sha256","source_state":"current_lifecycle_state","target_state":"enum:H40_NO_GO_or_NOT_TESTABLE","terminated_at_utc":"audit_timestamp_utc","upstream_receipt_hash":"current_verified_receipt_sha256_or_null"},"receipt_hash_rule":"canonical_sha256(exact_receipt_field_contract_keys_only)","schema_id":"H40_LIFECYCLE_CHILD_TERMINATION_V1","terminal_states":["H40_NO_GO","NOT_TESTABLE"]},
   "transition_matrix_contract":{"global_rules":["state_adjacency_is_necessary_never_sufficient","current_executable_HEAD_is_never_required_to_equal_historical_P1_commit","P1_scaffold_transition_verifies_historical_acceptance_artifact_integrity_and_frozen_scientific_identity","executable_authority_for_discovery_is_the_accepted_lifecycle_implementation_authority","all_unlisted_transitions_are_forbidden","terminal_states_are_absorbing"],"historical_scaffold_lineage":{"p1_accepted_code_baseline_commit_sha":"3fc89541ed0965fc0e2972af310e34ae1b838168","p1_final_acceptance_commit_sha":"95ab819d5300312b4d493b9585b4b369621504b6","p2_acceptance_record_commit_sha":"8c4e486752feadf8810ba853f27eaad5cb0b88a9","p2_accepted_code_baseline_commit_sha":"cfefdbabfeef8ab004e43bbda24038e4d5e3fca0","p2_final_acceptance_commit_sha":"5f1618ed73a91c954c1443f62f77152682b33ef4","p2r1_implementation_commit_sha":"255148c49754b70365816106d97dc21fcd1955ce","rule":"verify_historical_lineage_and_artifact_integrity_only_never_current_executable_HEAD_equality"},"rows":[{"authority":"P1_LINEAGE_VERIFIER_V1","source":"H40_PREREGISTERED","target":"H40_P1_SCAFFOLDED"},{"authority":"H40_RECEIPT_DISCOVERY_AUTH_V2","source":"H40_P1_SCAFFOLDED","target":"H40_DISCOVERY"},{"authority":"H40_RECEIPT_TERMINATION_V2","source":"H40_P1_SCAFFOLDED","target":"H40_NO_GO"},{"authority":"H40_RECEIPT_TERMINATION_V2","source":"H40_P1_SCAFFOLDED","target":"NOT_TESTABLE"},{"authority":"H40_RECEIPT_CANDIDATE_LOCK_V2_AFTER_RESULT_RECOMPUTATION","source":"H40_DISCOVERY","target":"H40_CANDIDATE_LOCKED"},{"authority":"H40_RECEIPT_TERMINATION_V2","source":"H40_DISCOVERY","target":"H40_NO_GO"},{"authority":"H40_RECEIPT_TERMINATION_V2","source":"H40_DISCOVERY","target":"NOT_TESTABLE"},{"authority":"H40_RECEIPT_WF_VALIDATION_V2_AFTER_RESULT_RECOMPUTATION","source":"H40_CANDIDATE_LOCKED","target":"H40_WALK_FORWARD_VALIDATED"},{"authority":"H40_RECEIPT_TERMINATION_V2_NO_RUNNER_UP","source":"H40_CANDIDATE_LOCKED","target":"H40_NO_GO"},{"authority":"H40_RECEIPT_CONFIRMATION_READY_V2","source":"H40_WALK_FORWARD_VALIDATED","target":"H40_CONFIRMATION_READY"},{"authority":"H40_RECEIPT_TERMINATION_V2","source":"H40_WALK_FORWARD_VALIDATED","target":"H40_NO_GO"},{"authority":"PROHIBITED_BY_H40_FSA_F02","source":"H40_CONFIRMATION_READY","target":"H40_CONFIRMATION_EVALUATED_ONCE"},{"authority":"H40_RECEIPT_TERMINATION_V2","source":"H40_CONFIRMATION_READY","target":"H40_NO_GO"}],"schema_id":"H40_LIFECYCLE_CHILD_TRANSITION_MATRIX_V1"},
   "persistence_replay_contract":{"authorization_receipt_issuance":"only_the_accepted_implementation_verifier_may_atomically_construct_and_persist_authorization_after_recomputation_external_caller_receipts_are_inputs_for_reverification_not_trusted_claims","canonical_storage_key":"artifacts/h40/lifecycle/runs/<run_authority_id>","cross_boundary_checks":["run_authority_id_equal_at_every_chain_link","candidate_identity_equal_from_lock_through_confirmation_ready","split_manifest_and_attestation_equal_from_discovery_through_confirmation_ready","upstream_hash_equal_recomputed_predecessor_hash","lifecycle_governance_and_implementation_authorities_equal_accepted_values"],"failure_semantics":"any_missing_extra_malformed_hash_mismatch_lineage_mismatch_cross_run_cross_candidate_or_cross_split_condition_fails_closed_with_no_state_advance","persistence_rules":["write_canonical_JSON_with_atomic_create_if_absent","different_bytes_at_existing_transition_key_are_rejected","identical_bytes_are_idempotent_only_after_full_reverification","restore_recomputes_every_content_hash_and_every_authoritative_verifier_result","directory_filename_and_caller_label_have_no_authority","authorization_receipts_and_bound_result_evidence_are_write_once"],"run_authority_field_contract":{"discovery_selection_correction_contract_hash":"constant:f84c97050c7db813263e5ffda6b1c556af0b7b0e2876bb8616640d2c9d67084b","lifecycle_governance_authority_hash":"accepted_sha256","lifecycle_implementation_authority_hash":"accepted_sha256","materialized_run_authority_hash":"sha256","protocol_authority_hash":"constant:a83f8fc7a5ca7109fb8cd7fed114d87c3b2c968b5145c11cada203aa5111d1ce","schema_id":"constant:H40_RUN_AUTHORITY_V1","sealed_registered_roster_hash":"sha256","semantic_root_hash":"constant:71889a35f227ed734272b712851174a69bf9dbb12ea3f87cd84c26e7c66f6af1","source_manifest_hash":"sha256","split_attestation_hash":"sha256","split_manifest_hash":"sha256","structural_ledger_hash":"constant:483f68502b57972deae071c7bd4587ca3e57ccaa72bd99fb0de07b4f0ab8c85f"},"run_authority_rule":"run_authority_id_equals_canonical_sha256_of_exact_run_authority_field_contract_keys_only","run_instance_nonce":"none","schema_id":"H40_LIFECYCLE_CHILD_PERSISTENCE_REPLAY_V1","timestamp_rule":"exact_YYYY-MM-DDTHH:MM:SSZ_calendar_valid_UTC_hash_bound_audit_only_never_authorization_critical_no_clock_tolerance"},
-  "runtime_snapshot_seal_contract":{"materialized_run_authority_binding":["runtime_authority_snapshot_hash","source_manifest_hash","split_manifest_hash","split_attestation_hash","sealed_registered_roster_hash","registered_slot_count","not_testable_slot_count","total_slot_count"],"roster_entry_field_contract":{"family_id":"accepted_family_id","slot_hash":"sha256","slot_index":"integer_0_through_167","structural_configuration_hash":"sha256"},"roster_hash_rule":"canonical_sha256(array_of_exact_roster_entries_sorted_by_structural_configuration_hash_ascending)","schema_id":"H40_LIFECYCLE_CHILD_RUNTIME_SNAPSHOT_SEAL_V1","seal_rules":["seal_before_any_discovery_label_return_metric_or_candidate_result_access","REGISTERED_and_NOT_TESTABLE_are_derived_from_the_sealed_materialized_authority","counts_must_sum_to_total_slot_count_and_roster_length_must_equal_registered_slot_count","roster_entries_must_match_the_accepted_168_row_structural_ledger","post_seal_source_state_change_cannot_mutate_or_expand_the_active_roster","a_different_snapshot_or_materialized_authority_produces_a_different_run_authority_id","runtime_source_state_changes_never_change_protocol_semantic_or_structural_ledger_hashes"]},
+  "runtime_snapshot_seal_contract":{"materialized_run_authority_binding":["runtime_authority_snapshot_hash","source_manifest_hash","split_manifest_hash","split_attestation_hash","sealed_registered_roster_hash","registered_slot_count","not_testable_slot_count","total_slot_count"],"roster_entry_field_contract":{"family_id":"accepted_family_id","slot_hash":"sha256","slot_index":"integer_0_through_167","structural_configuration_hash":"sha256"},"roster_hash_rule":"canonical_sha256(array_of_exact_roster_entries_sorted_by_structural_configuration_hash_ascending)","runtime_source_split_attestation_contract":{"active_source_evidence_entry_field_contract":{"file_sha256":"sha256_equal_source_record_receipt_and_cold_validation_receipt","source_id":"accepted_source_id_required_by_at_least_one_sealed_REGISTERED_slot","source_record_hash":"canonical_sha256(exact_runtime_source_record)","source_validation_receipt_hash":"canonical_sha256(exact_cold_validation_receipt)","timestamp_count":"integer_gt_0_equal_source_record_receipt_and_cold_validation_receipt","timestamp_membership_hash":"sha256_equal_source_record_receipt_and_cold_validation_receipt"},"attestation_field_contract":{"accepted_reference_source_manifest_hash":"constant:af7fe2c187dcd503ba27a3f24ba6347cb3c619a63662106e85c6343eda90a74c","accepted_reference_split_manifest_hash":"constant:6e3ed51b4139c7822343752e29b6d8b2e94f9fadf0def38f2101a444b1da62e9","active_required_source_ids":"array_of_unique_source_ids_sorted_ascending_derived_as_union_of_project_required_sources_for_exact_sealed_REGISTERED_roster","active_source_evidence":"array_of_exact_active_source_evidence_entries_sorted_by_source_id","not_testable_slot_count":"integer_derived_from_sealed_runtime_projection","not_testable_source_ids":"array_of_source_ids_sorted_ascending_whose_accepted_runtime_state_is_NOT_TESTABLE","protocol_identity_hash":"constant:6533e880ced04214262f84c21fee98c478ef5c09fa7d0b9f55d650e673a1f971","registered_slot_count":"integer_derived_from_sealed_runtime_projection","runtime_authority_snapshot_hash":"sha256_of_exact_runtime_authority_snapshot_preimage","runtime_authority_snapshot_id":"accepted_nonempty_snapshot_id_bound_into_runtime_authority_snapshot_hash","schema_id":"constant:H40_RUNTIME_SOURCE_SPLIT_ATTESTATION_V1","sealed_registered_roster_hash":"sha256_equal_runtime_seal","source_authority_state_entries":"array_of_exact_source_authority_state_entries_sorted_by_source_id","source_manifest_hash":"sha256_of_exact_runtime_source_manifest","split_manifest_hash":"sha256_of_exact_runtime_scoped_authoritative_split_manifest","structural_ledger_hash":"constant:483f68502b57972deae071c7bd4587ca3e57ccaa72bd99fb0de07b4f0ab8c85f","total_slot_count":"constant:168"},"attestation_hash_rule":"canonical_sha256(exact_attestation_field_contract_keys_with_exact_nested_entry_fields)","source_authority_state_entry_field_contract":{"production_authority_state":"enum:VERIFIED_or_NOT_TESTABLE_equal_accepted_runtime_authority_snapshot","source_id":"accepted_runtime_source_id"},"verifier_rules":["require_typed_runtime_source_manifest_typed_runtime_split_manifest_and_exact_H40_RUNTIME_SOURCE_SPLIT_ATTESTATION_V1","recompute_source_manifest_split_manifest_attestation_and_runtime_snapshot_hashes_from_exact_canonical_objects","require_source_authority_state_entries_to_equal_the_complete_accepted_runtime_snapshot_preimage_without_inferring_authority_from_local_file_presence","derive_active_required_source_ids_as_the_exact_union_of_project_required_sources_over_the_complete_sealed_REGISTERED_roster","require_every_active_required_source_to_be_VERIFIED_in_the_accepted_runtime_snapshot_and_every_REGISTERED_slot_to_have_no_other_source_dependency","identity_validate_every_runtime_source_record_against_the_accepted_reference_source_manifest_without_promoting_NOT_TESTABLE_sources","cold_validate_only_every_active_required_source_and_bind_its_exact_record_receipt_file_and_timestamp_membership_hashes","require_not_testable_source_ids_to_equal_the_accepted_NOT_TESTABLE_snapshot_entries_and_forbid_active_source_evidence_for_them","verify_the_static_partition_calendar_against_the_accepted_reference_split_manifest_independently_of_source_availability","reconstruct_the_runtime_split_partitions_counts_exclusions_and_timestamp_hashes_from_the_intersection_of_exactly_the_cold_verified_active_required_sources","require_runtime_split_manifest_is_authoritative_true_under_this_attestation_and_never_treat_that_flag_as_sufficient_authority","require_runtime_split_protocol_source_manifest_and_attestation_lineage_to_match_exactly","reject_legacy_BTC_and_ETH_pair_attestation_synthetic_attestation_preregistered_schedule_only_and_hash_self_consistency_without_evidence_truth","bind_the_same_source_manifest_split_manifest_and_runtime_source_split_attestation_hashes_through_Discovery_WF_restore_and_replay"]},"schema_id":"H40_LIFECYCLE_CHILD_RUNTIME_SNAPSHOT_SEAL_V2","seal_rules":["seal_before_any_discovery_label_return_metric_or_candidate_result_access","REGISTERED_and_NOT_TESTABLE_are_derived_from_the_sealed_materialized_authority","counts_must_sum_to_total_slot_count_and_roster_length_must_equal_registered_slot_count","roster_entries_must_match_the_accepted_168_row_structural_ledger","post_seal_source_state_change_cannot_mutate_or_expand_the_active_roster","a_different_snapshot_or_materialized_authority_produces_a_different_run_authority_id","runtime_source_state_changes_never_change_protocol_semantic_or_structural_ledger_hashes"]},
   "f02_boundary_contract":{"allowed_scope":"define_H40ConfirmationReadyReceipt_and_verified_lineage_only","confirmation_state":"sealed_waiting_state_only","forbidden_capabilities":["confirmation_nonce","confirmation_unlock_key","one_shot_evaluation_authority","confirmation_outcome_access","confirmation_evaluation_execution"],"guard_result":"H40GuardError_with_CONFIRMATION_NOT_READY","prohibited_transition":["H40_CONFIRMATION_READY","H40_CONFIRMATION_EVALUATED_ONCE"],"schema_id":"H40_LIFECYCLE_CHILD_F02_BOUNDARY_V1","status":"H40_FSA_F02_OPEN_SEALED"}
 }
 '''
@@ -157,7 +165,7 @@ EXPECTED_LIFECYCLE_CHILD_HASHES: Mapping[str, str] = MappingProxyType({
     "termination_receipt_contract": "b45c7021db1c63a447ddb22a1f9cb787ce71a5048c824ce38d40f19f755ecb48",
     "transition_matrix_contract": "58c8eefe64afd130c6244e40e3bc9ce3a6ef25f418bc7be18dced5defa56e1d3",
     "persistence_replay_contract": "ae6582d64d3f0bdb9b7c8773ce758d011670ea7b7bbf433585806345aa239c26",
-    "runtime_snapshot_seal_contract": "0c44b6f306d7d562338bdaf901543e09ccd4ea8cf1d4fbb79fb4edbff7bc2f35",
+    "runtime_snapshot_seal_contract": "76a0732742707c78f65da26263076bed7b586ea67d4f5ddd2dac33761e37e612",
     "f02_boundary_contract": "5678d8bd6b83bb69e1a1ad2cf78af8ddbaece625a5a34b7018b0a5e6368756f4",
 })
 
@@ -193,15 +201,24 @@ def compute_lifecycle_semantic_root_hash(
 
 def lifecycle_governance_authority_object() -> dict[str, Any]:
     return {
+        "f01r2_amendment_identity": {
+            "artifact_path": "reviews/v0.5/V0.5.1_H40_F01R2_SOURCE_SPLIT_RUNTIME_AUTHORITY_COMPATIBILITY_CLOSURE.md",
+            "commit_sha": "e1263f4babc067bb56623081ee27769ac61b7e00",
+        },
         "lifecycle_semantic_root_hash": compute_lifecycle_semantic_root_hash(),
         "p2_final_acceptance_identity": {
             "artifact_path": "reviews/v0.5/V0.5.1_H40_P2_FINAL_INDEPENDENT_ACCEPTANCE.md",
             "commit_sha": "5f1618ed73a91c954c1443f62f77152682b33ef4",
         },
-        "p3r0r1_amendment_artifact_path": "reviews/v0.5/V0.5.1_H40_P3R0R1_LIFECYCLE_EVIDENCE_AUTHORITY_REPAIR.md",
-        "p3r0r1_amendment_commit_sha": "89b014389b371ae1256d9b31ded86f10dd3b4783",
+        "p3r0r1_amendment_identity": {
+            "artifact_path": "reviews/v0.5/V0.5.1_H40_P3R0R1_LIFECYCLE_EVIDENCE_AUTHORITY_REPAIR.md",
+            "commit_sha": "89b014389b371ae1256d9b31ded86f10dd3b4783",
+        },
+        "prior_lifecycle_governance_authority_hash": (
+            "ee619e16bb665ba377baa2a50f92ea1c36ee207282e3f7757b54a0a1adf7b828"
+        ),
         "protocol_authority_hash": compute_protocol_authority_hash(),
-        "schema_id": "H40_LIFECYCLE_GOVERNANCE_AUTHORITY_V2",
+        "schema_id": "H40_LIFECYCLE_GOVERNANCE_AUTHORITY_V3",
         "semantic_root_hash": compute_semantic_root_hash(),
         "structural_ledger_hash": EXPECTED_STRUCTURAL_LEDGER_HASH,
     }
@@ -365,6 +382,251 @@ class H40RuntimeRosterEntry:
         )
 
 
+@dataclass(frozen=True)
+class H40SourceAuthorityStateEntry:
+    """One complete accepted runtime source-state projection entry."""
+
+    source_id: str
+    production_authority_state: str
+
+    _KEYS: ClassVar[frozenset[str]] = frozenset({
+        "production_authority_state",
+        "source_id",
+    })
+
+    def __post_init__(self) -> None:
+        _require_text(self.source_id, "source_id")
+        if self.production_authority_state not in {"VERIFIED", "NOT_TESTABLE"}:
+            raise ValueError("production_authority_state must be VERIFIED or NOT_TESTABLE")
+
+    def to_dict(self) -> dict[str, str]:
+        return {
+            "production_authority_state": self.production_authority_state,
+            "source_id": self.source_id,
+        }
+
+    @classmethod
+    def from_dict(cls, data: Mapping[str, Any]) -> H40SourceAuthorityStateEntry:
+        _require_exact_keys(data, cls._KEYS, cls.__name__)
+        _require_string_fields(data, cls._KEYS, cls.__name__)
+        return cls(
+            source_id=str(data["source_id"]),
+            production_authority_state=str(data["production_authority_state"]),
+        )
+
+
+@dataclass(frozen=True)
+class H40ActiveSourceEvidenceEntry:
+    """Content-addressed cold evidence for one and only one active source."""
+
+    source_id: str
+    source_record_hash: str
+    source_validation_receipt_hash: str
+    file_sha256: str
+    timestamp_membership_hash: str
+    timestamp_count: int
+
+    _KEYS: ClassVar[frozenset[str]] = frozenset({
+        "file_sha256",
+        "source_id",
+        "source_record_hash",
+        "source_validation_receipt_hash",
+        "timestamp_count",
+        "timestamp_membership_hash",
+    })
+
+    def __post_init__(self) -> None:
+        _require_text(self.source_id, "source_id")
+        for name in (
+            "source_record_hash",
+            "source_validation_receipt_hash",
+            "file_sha256",
+            "timestamp_membership_hash",
+        ):
+            _require_sha256(getattr(self, name), name)
+        if (
+            isinstance(self.timestamp_count, bool)
+            or not isinstance(self.timestamp_count, int)
+            or self.timestamp_count <= 0
+        ):
+            raise ValueError("timestamp_count must be a positive integer")
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "file_sha256": self.file_sha256,
+            "source_id": self.source_id,
+            "source_record_hash": self.source_record_hash,
+            "source_validation_receipt_hash": self.source_validation_receipt_hash,
+            "timestamp_count": self.timestamp_count,
+            "timestamp_membership_hash": self.timestamp_membership_hash,
+        }
+
+    @classmethod
+    def from_dict(cls, data: Mapping[str, Any]) -> H40ActiveSourceEvidenceEntry:
+        _require_exact_keys(data, cls._KEYS, cls.__name__)
+        _require_string_fields(data, cls._KEYS - {"timestamp_count"}, cls.__name__)
+        count = data["timestamp_count"]
+        if isinstance(count, bool) or not isinstance(count, int):
+            raise TypeError("timestamp_count must be an integer")
+        return cls(
+            source_id=str(data["source_id"]),
+            source_record_hash=str(data["source_record_hash"]),
+            source_validation_receipt_hash=str(data["source_validation_receipt_hash"]),
+            file_sha256=str(data["file_sha256"]),
+            timestamp_membership_hash=str(data["timestamp_membership_hash"]),
+            timestamp_count=count,
+        )
+
+
+@dataclass(frozen=True)
+class H40RuntimeSourceSplitAttestation:
+    """Canonical F01R2 evidence authority for runtime sources and split."""
+
+    accepted_reference_source_manifest_hash: str
+    accepted_reference_split_manifest_hash: str
+    protocol_identity_hash: str
+    runtime_authority_snapshot_id: str
+    runtime_authority_snapshot_hash: str
+    source_authority_state_entries: tuple[H40SourceAuthorityStateEntry, ...]
+    source_manifest_hash: str
+    structural_ledger_hash: str
+    sealed_registered_roster_hash: str
+    registered_slot_count: int
+    not_testable_slot_count: int
+    total_slot_count: int
+    active_required_source_ids: tuple[str, ...]
+    not_testable_source_ids: tuple[str, ...]
+    active_source_evidence: tuple[H40ActiveSourceEvidenceEntry, ...]
+    split_manifest_hash: str
+    schema_id: str = "H40_RUNTIME_SOURCE_SPLIT_ATTESTATION_V1"
+
+    _KEYS: ClassVar[frozenset[str]] = frozenset({
+        "accepted_reference_source_manifest_hash",
+        "accepted_reference_split_manifest_hash",
+        "active_required_source_ids",
+        "active_source_evidence",
+        "not_testable_slot_count",
+        "not_testable_source_ids",
+        "protocol_identity_hash",
+        "registered_slot_count",
+        "runtime_authority_snapshot_hash",
+        "runtime_authority_snapshot_id",
+        "schema_id",
+        "sealed_registered_roster_hash",
+        "source_authority_state_entries",
+        "source_manifest_hash",
+        "split_manifest_hash",
+        "structural_ledger_hash",
+        "total_slot_count",
+    })
+
+    def __post_init__(self) -> None:
+        if self.schema_id != "H40_RUNTIME_SOURCE_SPLIT_ATTESTATION_V1":
+            raise ValueError("runtime source/split attestation schema mismatch")
+        _require_text(self.runtime_authority_snapshot_id, "runtime_authority_snapshot_id")
+        for name in (
+            "accepted_reference_source_manifest_hash",
+            "accepted_reference_split_manifest_hash",
+            "protocol_identity_hash",
+            "runtime_authority_snapshot_hash",
+            "source_manifest_hash",
+            "structural_ledger_hash",
+            "sealed_registered_roster_hash",
+            "split_manifest_hash",
+        ):
+            _require_sha256(getattr(self, name), name)
+        states = tuple(self.source_authority_state_entries)
+        evidence = tuple(self.active_source_evidence)
+        active_ids = tuple(self.active_required_source_ids)
+        not_testable_ids = tuple(self.not_testable_source_ids)
+        if not all(isinstance(item, H40SourceAuthorityStateEntry) for item in states):
+            raise TypeError("source authority states must use the typed schema")
+        if not all(isinstance(item, H40ActiveSourceEvidenceEntry) for item in evidence):
+            raise TypeError("active source evidence must use the typed schema")
+        if states != tuple(sorted(states, key=lambda item: item.source_id)):
+            raise ValueError("source authority state entries must be sorted by source_id")
+        if evidence != tuple(sorted(evidence, key=lambda item: item.source_id)):
+            raise ValueError("active source evidence must be sorted by source_id")
+        if active_ids != tuple(sorted(set(active_ids))) or not active_ids:
+            raise ValueError("active_required_source_ids must be non-empty, unique, and sorted")
+        if not_testable_ids != tuple(sorted(set(not_testable_ids))):
+            raise ValueError("not_testable_source_ids must be unique and sorted")
+        state_ids = tuple(item.source_id for item in states)
+        evidence_ids = tuple(item.source_id for item in evidence)
+        if len(state_ids) != len(set(state_ids)):
+            raise ValueError("duplicate source authority state entry")
+        if evidence_ids != active_ids:
+            raise ValueError("active source evidence must exactly cover active required sources")
+        state_map = {item.source_id: item.production_authority_state for item in states}
+        if any(state_map.get(source_id) != "VERIFIED" for source_id in active_ids):
+            raise ValueError("every active required source must be VERIFIED")
+        if tuple(sorted(k for k, value in state_map.items() if value == "NOT_TESTABLE")) != not_testable_ids:
+            raise ValueError("not_testable_source_ids must exactly match source authority states")
+        if set(active_ids) & set(not_testable_ids):
+            raise ValueError("NOT_TESTABLE sources cannot provide active evidence")
+        for name in ("registered_slot_count", "not_testable_slot_count", "total_slot_count"):
+            value = getattr(self, name)
+            if isinstance(value, bool) or not isinstance(value, int):
+                raise TypeError(f"{name} must be an integer")
+        if self.total_slot_count != 168:
+            raise ValueError("accepted H40 V1 total_slot_count must equal 168")
+        if self.registered_slot_count + self.not_testable_slot_count != self.total_slot_count:
+            raise ValueError("runtime attestation slot counts must sum to total")
+        object.__setattr__(self, "source_authority_state_entries", states)
+        object.__setattr__(self, "active_source_evidence", evidence)
+        object.__setattr__(self, "active_required_source_ids", active_ids)
+        object.__setattr__(self, "not_testable_source_ids", not_testable_ids)
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "accepted_reference_source_manifest_hash": self.accepted_reference_source_manifest_hash,
+            "accepted_reference_split_manifest_hash": self.accepted_reference_split_manifest_hash,
+            "active_required_source_ids": list(self.active_required_source_ids),
+            "active_source_evidence": [item.to_dict() for item in self.active_source_evidence],
+            "not_testable_slot_count": self.not_testable_slot_count,
+            "not_testable_source_ids": list(self.not_testable_source_ids),
+            "protocol_identity_hash": self.protocol_identity_hash,
+            "registered_slot_count": self.registered_slot_count,
+            "runtime_authority_snapshot_hash": self.runtime_authority_snapshot_hash,
+            "runtime_authority_snapshot_id": self.runtime_authority_snapshot_id,
+            "schema_id": self.schema_id,
+            "sealed_registered_roster_hash": self.sealed_registered_roster_hash,
+            "source_authority_state_entries": [item.to_dict() for item in self.source_authority_state_entries],
+            "source_manifest_hash": self.source_manifest_hash,
+            "split_manifest_hash": self.split_manifest_hash,
+            "structural_ledger_hash": self.structural_ledger_hash,
+            "total_slot_count": self.total_slot_count,
+        }
+
+    @property
+    def attestation_hash(self) -> str:
+        return canonical_sha256(self.to_dict())
+
+    @classmethod
+    def from_dict(cls, data: Mapping[str, Any]) -> H40RuntimeSourceSplitAttestation:
+        _require_exact_keys(data, cls._KEYS, cls.__name__)
+        for name in ("active_required_source_ids", "not_testable_source_ids"):
+            value = data[name]
+            if not isinstance(value, list) or not all(isinstance(item, str) for item in value):
+                raise TypeError(f"{name} must be an array of strings")
+        states = data["source_authority_state_entries"]
+        evidence = data["active_source_evidence"]
+        if not isinstance(states, list) or not all(isinstance(item, Mapping) for item in states):
+            raise TypeError("source_authority_state_entries must be an array of objects")
+        if not isinstance(evidence, list) or not all(isinstance(item, Mapping) for item in evidence):
+            raise TypeError("active_source_evidence must be an array of objects")
+        kwargs = dict(data)
+        kwargs["source_authority_state_entries"] = tuple(
+            H40SourceAuthorityStateEntry.from_dict(item) for item in states
+        )
+        kwargs["active_source_evidence"] = tuple(
+            H40ActiveSourceEvidenceEntry.from_dict(item) for item in evidence
+        )
+        kwargs["active_required_source_ids"] = tuple(data["active_required_source_ids"])
+        kwargs["not_testable_source_ids"] = tuple(data["not_testable_source_ids"])
+        return cls(**kwargs)
+
+
 def _slot_family_id(families: Sequence[Any]) -> str:
     return "+".join(str(getattr(item, "value", item)) for item in families)
 
@@ -408,6 +670,236 @@ def _accepted_production_roster() -> tuple[
     return roster, len(roster), ledger.slot_count - len(roster), snapshot_hash
 
 
+def _runtime_authority_components() -> tuple[
+    tuple[H40RuntimeRosterEntry, ...],
+    int,
+    int,
+    tuple[str, ...],
+    tuple[H40SourceAuthorityStateEntry, ...],
+    tuple[str, ...],
+]:
+    from .search_space import (
+        derive_required_sources_for_slot,
+        materialize_h40_search_space_production,
+    )
+
+    ledger = materialize_h40_search_space_production()
+    roster, registered_count, not_testable_count, _ = _accepted_production_roster()
+    registered_slots = tuple(slot for slot in ledger.slots if slot.status == "REGISTERED")
+    active_source_ids = tuple(sorted({
+        source_id
+        for slot in registered_slots
+        for source_id in derive_required_sources_for_slot(slot)
+    }))
+    snapshot = current_p1_authority_snapshot()
+    state_entries_list: list[H40SourceAuthorityStateEntry] = []
+    for source_id, state in sorted(snapshot.per_source_states.items()):
+        if not isinstance(state, str):
+            raise H40GuardError(
+                H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                "runtime authority source state must be a string",
+            )
+        state_entries_list.append(H40SourceAuthorityStateEntry(
+            source_id=source_id,
+            production_authority_state=state,
+        ))
+    state_entries = tuple(state_entries_list)
+    state_map = {item.source_id: item.production_authority_state for item in state_entries}
+    if any(state_map.get(source_id) != "VERIFIED" for source_id in active_source_ids):
+        raise H40GuardError(
+            H40ReasonCode.SOURCE_UNVERIFIED,
+            "a REGISTERED slot depends on a source not VERIFIED by accepted runtime authority",
+        )
+    for slot in registered_slots:
+        required = derive_required_sources_for_slot(slot)
+        if not required or any(source_id not in active_source_ids for source_id in required):
+            raise H40GuardError(
+                H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                "REGISTERED slot source projection is incomplete",
+            )
+    not_testable_source_ids = tuple(
+        item.source_id
+        for item in state_entries
+        if item.production_authority_state == "NOT_TESTABLE"
+    )
+    return (
+        roster,
+        registered_count,
+        not_testable_count,
+        active_source_ids,
+        state_entries,
+        not_testable_source_ids,
+    )
+
+
+def _assert_runtime_manifest_inventory(
+    source_manifest: H40SourceManifest,
+    protocol_identity_hash: str,
+) -> None:
+    reference = H40SourceManifest.build_preregistered_reference(protocol_identity_hash)
+    if source_manifest.protocol_identity_hash != protocol_identity_hash:
+        raise H40GuardError(
+            H40ReasonCode.SOURCE_UNVERIFIED,
+            "runtime source manifest protocol identity mismatch",
+        )
+    reference_ids = tuple(item.source_id for item in reference.sources)
+    runtime_ids = tuple(item.source_id for item in source_manifest.sources)
+    if runtime_ids != reference_ids or len(runtime_ids) != len(set(runtime_ids)):
+        raise H40GuardError(
+            H40ReasonCode.SOURCE_UNVERIFIED,
+            "runtime source manifest must retain the exact ordered reference inventory",
+        )
+    for record in source_manifest.sources:
+        assert_canonical_source_identity(record, protocol_identity_hash)
+    snapshot = current_p1_authority_snapshot()
+    for source_id, state in snapshot.per_source_states.items():
+        record = source_manifest.get_source(source_id)
+        if record.status.value != state:
+            raise H40GuardError(
+                H40ReasonCode.SOURCE_UNVERIFIED,
+                f"runtime source '{source_id}' status does not equal accepted snapshot state",
+            )
+
+
+def materialize_runtime_source_split_authority(
+    *,
+    source_manifest: H40SourceManifest,
+    repo_root: Path | str,
+) -> tuple[H40SplitManifest, H40RuntimeSourceSplitAttestation]:
+    """Cold-materialize the accepted F01R2 runtime source/split authority."""
+    if not isinstance(source_manifest, H40SourceManifest):
+        raise TypeError("runtime authority requires H40SourceManifest")
+    if not isinstance(repo_root, (Path, str)) or not str(repo_root).strip():
+        raise ValueError("runtime authority requires a non-empty repo_root")
+    protocol_identity_hash = H40ProtocolIdentity.default().protocol_hash
+    _assert_runtime_manifest_inventory(source_manifest, protocol_identity_hash)
+    (
+        roster,
+        registered_count,
+        not_testable_count,
+        active_source_ids,
+        state_entries,
+        not_testable_source_ids,
+    ) = _runtime_authority_components()
+    roster_hash = canonical_sha256([item.to_dict() for item in roster])
+    active_evidence: list[H40ActiveSourceEvidenceEntry] = []
+    active_timestamps: dict[str, Sequence[str]] = {}
+    for source_id in active_source_ids:
+        record = source_manifest.get_source(source_id)
+        if (
+            record.status != H40SourceStatus.VERIFIED
+            or record.receipt is None
+            or record.receipt.status != H40SourceStatus.VERIFIED
+        ):
+            raise H40GuardError(
+                H40ReasonCode.SOURCE_UNVERIFIED,
+                f"active source '{source_id}' requires a typed VERIFIED record and receipt",
+            )
+        cold_receipt = validate_source_artifact(
+            repo_root,
+            record,
+            expected_product=record.product,
+            expected_cadence=record.cadence,
+        )
+        if cold_receipt.status != H40SourceStatus.VERIFIED:
+            raise H40GuardError(
+                cold_receipt.reason_code or H40ReasonCode.SOURCE_UNVERIFIED,
+                f"active source '{source_id}' failed cold validation",
+            )
+        if cold_receipt.to_dict() != record.receipt.to_dict():
+            raise H40GuardError(
+                H40ReasonCode.SOURCE_HASH_MISMATCH,
+                f"active source '{source_id}' receipt does not equal cold validation receipt",
+            )
+        timestamps = extract_verified_source_timestamps(
+            repo_root,
+            record,
+            expected_product=record.product,
+            expected_cadence=record.cadence,
+        )
+        if timestamps != sorted(set(timestamps)):
+            raise H40GuardError(
+                H40ReasonCode.INTERVAL_MISMATCH,
+                f"active source '{source_id}' timestamps are not unique canonical order",
+            )
+        membership_hash = hashlib.sha256(",".join(timestamps).encode("utf-8")).hexdigest()
+        if (
+            len(timestamps) != cold_receipt.timestamp_count
+            or membership_hash != cold_receipt.timestamp_membership_hash
+        ):
+            raise H40GuardError(
+                H40ReasonCode.SOURCE_HASH_MISMATCH,
+                f"active source '{source_id}' extracted timestamp membership mismatch",
+            )
+        active_timestamps[source_id] = timestamps
+        active_evidence.append(H40ActiveSourceEvidenceEntry(
+            source_id=source_id,
+            source_record_hash=canonical_sha256(record.to_dict()),
+            source_validation_receipt_hash=canonical_sha256(cold_receipt.to_dict()),
+            file_sha256=cold_receipt.file_sha256,
+            timestamp_membership_hash=cold_receipt.timestamp_membership_hash,
+            timestamp_count=cold_receipt.timestamp_count,
+        ))
+    split_manifest = H40SplitManifest.build_runtime_authoritative(
+        protocol_identity_hash=protocol_identity_hash,
+        source_manifest_hash=source_manifest.manifest_hash,
+        active_source_timestamps=active_timestamps,
+    )
+    reference_split = H40SplitManifest.build_preregistered_schedule(
+        protocol_identity_hash,
+        DEFAULT_SOURCE_MANIFEST_HASH,
+    )
+    split_manifest.assert_static_calendar_matches(reference_split)
+    snapshot = current_p1_authority_snapshot()
+    attestation = H40RuntimeSourceSplitAttestation(
+        accepted_reference_source_manifest_hash=DEFAULT_SOURCE_MANIFEST_HASH,
+        accepted_reference_split_manifest_hash=DEFAULT_SPLIT_MANIFEST_HASH,
+        protocol_identity_hash=protocol_identity_hash,
+        runtime_authority_snapshot_id=snapshot.snapshot_id,
+        runtime_authority_snapshot_hash=snapshot.runtime_authority_snapshot_hash,
+        source_authority_state_entries=state_entries,
+        source_manifest_hash=source_manifest.manifest_hash,
+        structural_ledger_hash=EXPECTED_STRUCTURAL_LEDGER_HASH,
+        sealed_registered_roster_hash=roster_hash,
+        registered_slot_count=registered_count,
+        not_testable_slot_count=not_testable_count,
+        total_slot_count=168,
+        active_required_source_ids=active_source_ids,
+        not_testable_source_ids=not_testable_source_ids,
+        active_source_evidence=tuple(active_evidence),
+        split_manifest_hash=split_manifest.split_hash,
+    )
+    return split_manifest, attestation
+
+
+def verify_runtime_source_split_authority(
+    *,
+    source_manifest: H40SourceManifest,
+    split_manifest: H40SplitManifest,
+    runtime_attestation: H40RuntimeSourceSplitAttestation,
+    repo_root: Path | str,
+) -> None:
+    """Recompute every F01R2 runtime authority input and require exact equality."""
+    if not isinstance(split_manifest, H40SplitManifest):
+        raise TypeError("runtime authority requires H40SplitManifest")
+    if not isinstance(runtime_attestation, H40RuntimeSourceSplitAttestation):
+        raise TypeError("runtime authority requires H40RuntimeSourceSplitAttestation")
+    expected_split, expected_attestation = materialize_runtime_source_split_authority(
+        source_manifest=source_manifest,
+        repo_root=repo_root,
+    )
+    if split_manifest != expected_split:
+        raise H40GuardError(
+            H40ReasonCode.SOURCE_HASH_MISMATCH,
+            "runtime split does not equal cold-reconstructed active-source split",
+        )
+    if runtime_attestation != expected_attestation:
+        raise H40GuardError(
+            H40ReasonCode.SOURCE_HASH_MISMATCH,
+            "runtime source/split attestation does not equal recomputed authority",
+        )
+
+
 @dataclass(frozen=True)
 class H40RuntimeSnapshotSeal:
     runtime_authority_snapshot_hash: str
@@ -420,14 +912,60 @@ class H40RuntimeSnapshotSeal:
     total_slot_count: int = 168
     synthetic_only: bool = field(init=False, compare=False, repr=False)
     _construction_token: InitVar[object | None] = None
+    source_manifest_context: InitVar[H40SourceManifest | None] = None
+    split_manifest_context: InitVar[H40SplitManifest | None] = None
+    runtime_attestation_context: InitVar[H40RuntimeSourceSplitAttestation | None] = None
+    repo_root_context: InitVar[Path | str | None] = None
+    _source_manifest_context: H40SourceManifest | None = field(
+        init=False, compare=False, repr=False
+    )
+    _split_manifest_context: H40SplitManifest | None = field(
+        init=False, compare=False, repr=False
+    )
+    _runtime_attestation_context: H40RuntimeSourceSplitAttestation | None = field(
+        init=False, compare=False, repr=False
+    )
+    _repo_root_context: Path | None = field(init=False, compare=False, repr=False)
 
-    def __post_init__(self, _construction_token: object | None) -> None:
+    def __post_init__(
+        self,
+        _construction_token: object | None,
+        source_manifest_context: H40SourceManifest | None,
+        split_manifest_context: H40SplitManifest | None,
+        runtime_attestation_context: H40RuntimeSourceSplitAttestation | None,
+        repo_root_context: Path | str | None,
+    ) -> None:
         if _construction_token not in {_PRODUCTION_SEAL_TOKEN, _SYNTHETIC_SEAL_TOKEN}:
             raise TypeError(
                 "runtime snapshot seals must be issued by from_verified_authority() "
                 "or synthetic_for_tests()"
             )
         object.__setattr__(self, "synthetic_only", _construction_token is _SYNTHETIC_SEAL_TOKEN)
+        if _construction_token is _PRODUCTION_SEAL_TOKEN:
+            if (
+                not isinstance(source_manifest_context, H40SourceManifest)
+                or not isinstance(split_manifest_context, H40SplitManifest)
+                or not isinstance(runtime_attestation_context, H40RuntimeSourceSplitAttestation)
+                or not isinstance(repo_root_context, (Path, str))
+                or not str(repo_root_context).strip()
+            ):
+                raise TypeError("production seal requires complete typed runtime authority context")
+            object.__setattr__(self, "_source_manifest_context", source_manifest_context)
+            object.__setattr__(self, "_split_manifest_context", split_manifest_context)
+            object.__setattr__(self, "_runtime_attestation_context", runtime_attestation_context)
+            object.__setattr__(self, "_repo_root_context", Path(repo_root_context))
+        else:
+            if any(item is not None for item in (
+                source_manifest_context,
+                split_manifest_context,
+                runtime_attestation_context,
+                repo_root_context,
+            )):
+                raise TypeError("synthetic seal cannot carry production authority context")
+            object.__setattr__(self, "_source_manifest_context", None)
+            object.__setattr__(self, "_split_manifest_context", None)
+            object.__setattr__(self, "_runtime_attestation_context", None)
+            object.__setattr__(self, "_repo_root_context", None)
         roster = tuple(self.roster)
         if not all(isinstance(item, H40RuntimeRosterEntry) for item in roster):
             raise TypeError("roster entries must use H40RuntimeRosterEntry")
@@ -512,6 +1050,33 @@ class H40RuntimeSnapshotSeal:
                 H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
                 "production roster counts are not the accepted derived counts",
             )
+        if not self.synthetic_only:
+            if (
+                self._source_manifest_context is None
+                or self._split_manifest_context is None
+                or self._runtime_attestation_context is None
+                or self._repo_root_context is None
+            ):
+                raise H40GuardError(
+                    H40ReasonCode.SOURCE_UNVERIFIED,
+                    "production seal lost its runtime source/split verification context",
+                )
+            verify_runtime_source_split_authority(
+                source_manifest=self._source_manifest_context,
+                split_manifest=self._split_manifest_context,
+                runtime_attestation=self._runtime_attestation_context,
+                repo_root=self._repo_root_context,
+            )
+            if (
+                self.source_manifest_hash != self._source_manifest_context.manifest_hash
+                or self.split_manifest_hash != self._split_manifest_context.split_hash
+                or self.split_attestation_hash
+                != self._runtime_attestation_context.attestation_hash
+            ):
+                raise H40GuardError(
+                    H40ReasonCode.SOURCE_HASH_MISMATCH,
+                    "production seal runtime source/split lineage mismatch",
+                )
 
     @classmethod
     def from_verified_authority(
@@ -519,6 +1084,7 @@ class H40RuntimeSnapshotSeal:
         *,
         source_manifest: H40SourceManifest,
         split_manifest: H40SplitManifest,
+        runtime_attestation: H40RuntimeSourceSplitAttestation,
         repo_root: Path | str,
     ) -> H40RuntimeSnapshotSeal:
         if not isinstance(source_manifest, H40SourceManifest):
@@ -527,22 +1093,14 @@ class H40RuntimeSnapshotSeal:
             raise TypeError("production seal requires H40SplitManifest")
         if not isinstance(repo_root, (Path, str)) or str(repo_root).strip() == "":
             raise ValueError("production seal requires a non-empty repo_root")
-        accepted_protocol_identity = H40ProtocolIdentity.default().protocol_hash
-        if (
-            source_manifest.protocol_identity_hash != accepted_protocol_identity
-            or split_manifest.protocol_identity_hash != accepted_protocol_identity
-        ):
-            raise H40GuardError(
-                H40ReasonCode.SOURCE_UNVERIFIED,
-                "source/split authority is not bound to the accepted H40 protocol identity",
-            )
-        split_manifest.assert_authoritative(source_manifest, repo_root)
-        attestation = split_manifest.attestation
-        if attestation is None or not attestation.is_production_canonical:
-            raise H40GuardError(
-                H40ReasonCode.SOURCE_UNVERIFIED,
-                "production seal requires a production-canonical split attestation",
-            )
+        if not isinstance(runtime_attestation, H40RuntimeSourceSplitAttestation):
+            raise TypeError("production seal requires H40RuntimeSourceSplitAttestation")
+        verify_runtime_source_split_authority(
+            source_manifest=source_manifest,
+            split_manifest=split_manifest,
+            runtime_attestation=runtime_attestation,
+            repo_root=repo_root,
+        )
         registered, registered_count, not_testable_count, snapshot_hash = (
             _accepted_production_roster()
         )
@@ -550,11 +1108,15 @@ class H40RuntimeSnapshotSeal:
             runtime_authority_snapshot_hash=snapshot_hash,
             source_manifest_hash=source_manifest.manifest_hash,
             split_manifest_hash=split_manifest.split_hash,
-            split_attestation_hash=attestation.attestation_hash,
+            split_attestation_hash=runtime_attestation.attestation_hash,
             roster=registered,
             registered_slot_count=registered_count,
             not_testable_slot_count=not_testable_count,
             _construction_token=_PRODUCTION_SEAL_TOKEN,
+            source_manifest_context=source_manifest,
+            split_manifest_context=split_manifest,
+            runtime_attestation_context=runtime_attestation,
+            repo_root_context=repo_root,
         )
         seal.verify_against_accepted_ledger()
         return seal
@@ -2557,8 +3119,6 @@ class H40SyntheticAuthorityResolver:
     ) -> None:
         if _construction_token is not _SYNTHETIC_RESOLVER_TOKEN:
             raise TypeError("use H40SyntheticAuthorityResolver.for_tests()")
-        if any(not seal.synthetic_only for seal in runtime_seals):
-            raise ValueError("synthetic resolver accepts only synthetic runtime seals")
         self._implementation_authorities = MappingProxyType({
             item.lifecycle_implementation_authority_hash: item
             for item in implementation_authorities
@@ -2932,6 +3492,7 @@ class H40LifecycleArtifactStore:
         )
         run_authority = resolver.resolve_run_authority(context.run_authority_id)
         seal = resolver.resolve_runtime_seal(context.runtime_seal_hash)
+        seal.verify_against_accepted_ledger()
         if (
             implementation.lifecycle_implementation_authority_hash
             != context.implementation_authority_hash
@@ -3114,6 +3675,7 @@ __all__ = [
     "EXPECTED_LIFECYCLE_CHILD_HASHES",
     "EXPECTED_LIFECYCLE_GOVERNANCE_AUTHORITY_HASH",
     "EXPECTED_LIFECYCLE_SEMANTIC_ROOT_HASH",
+    "H40ActiveSourceEvidenceEntry",
     "H40CandidateLockReceipt",
     "H40CandidateResultEntry",
     "H40CandidateVerification",
@@ -3132,6 +3694,8 @@ __all__ = [
     "H40RunAuthority",
     "H40RuntimeRosterEntry",
     "H40RuntimeSnapshotSeal",
+    "H40RuntimeSourceSplitAttestation",
+    "H40SourceAuthorityStateEntry",
     "H40SyntheticAuthorityResolver",
     "H40SyntheticEvidenceVerifier",
     "H40TerminationReceipt",
@@ -3145,5 +3709,7 @@ __all__ = [
     "lifecycle_governance_authority_object",
     "lifecycle_semantic_contracts",
     "lifecycle_semantic_root_preimage",
+    "materialize_runtime_source_split_authority",
     "normalize_audit_timestamp",
+    "verify_runtime_source_split_authority",
 ]

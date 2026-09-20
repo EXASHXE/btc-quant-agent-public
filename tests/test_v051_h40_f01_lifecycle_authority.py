@@ -12,6 +12,7 @@ from pathlib import Path
 
 import pytest
 
+import btc_quant_agent.h40.lifecycle_authority as lifecycle_authority_module
 from btc_quant_agent.h40 import (
     ACCEPTED_LIFECYCLE_IMPLEMENTATION_AUTHORITY_HASH,
     DISCOVERY_SELECTION_CORRECTION_CONTRACT_HASH,
@@ -42,7 +43,11 @@ from btc_quant_agent.h40 import (
     H40RunAuthority,
     H40RuntimeRosterEntry,
     H40RuntimeSnapshotSeal,
+    H40RuntimeSourceSplitAttestation,
     H40SourceManifest,
+    H40SourceRecord,
+    H40SourceStatus,
+    H40SourceValidationReceipt,
     H40SplitAttestation,
     H40SplitManifest,
     H40SyntheticAuthorityResolver,
@@ -50,17 +55,21 @@ from btc_quant_agent.h40 import (
     H40WFFoldResultEntry,
     H40WFValidationResultEvidence,
     VerifiedLifecycleAuthorization,
+    assert_canonical_source_identity,
     compute_lifecycle_child_hashes,
     compute_lifecycle_governance_authority_hash,
     compute_lifecycle_semantic_root_hash,
     compute_protocol_authority_hash,
     compute_semantic_root_hash,
     current_p1_authority_snapshot,
+    derive_required_sources_for_slot,
     lifecycle_governance_authority_object,
     lifecycle_semantic_contracts,
     materialize_h40_search_space_production,
+    materialize_runtime_source_split_authority,
     normalize_audit_timestamp,
 )
+from btc_quant_agent.h40.split_manifest import generate_hourly_range
 from btc_quant_agent.research_contract.canonical import canonical_json, canonical_sha256
 
 TS = "2026-09-20T00:00:00Z"
@@ -326,31 +335,112 @@ def _build_wf_chain(
     return _WFChain(active, split, evidence, wf)
 
 
-def _typed_production_authority_fixture() -> tuple[H40SourceManifest, H40SplitManifest]:
+def _typed_production_authority_fixture(
+    monkeypatch: pytest.MonkeyPatch,
+) -> tuple[
+    H40SourceManifest,
+    H40SplitManifest,
+    H40RuntimeSourceSplitAttestation,
+    dict[str, bool],
+]:
     protocol_hash = H40ProtocolIdentity.default().protocol_hash
-    source_manifest = H40SourceManifest.build_default(protocol_hash)
-    reference = H40SplitManifest.build_preregistered_schedule(
-        protocol_hash,
-        source_manifest.manifest_hash,
+    reference = H40SourceManifest.build_default(protocol_hash)
+    timestamps = generate_hourly_range(
+        "2021-01-01T00:00:00Z",
+        "2026-02-01T00:00:00Z",
     )
-    candidate = replace(reference, is_authoritative=True)
-    attestation = H40SplitAttestation.create(
+    membership_hash = hashlib.sha256(",".join(timestamps).encode()).hexdigest()
+    eth_reference = reference.get_source("ETHUSDT_USD_M_1H")
+    assert eth_reference.file_sha256 is not None
+    receipt = H40SourceValidationReceipt(
+        source_id=eth_reference.source_id,
+        locator=eth_reference.locator,
+        file_sha256=eth_reference.file_sha256,
+        product=eth_reference.product,
+        cadence=eth_reference.cadence,
+        timestamp_field="open_time",
+        timestamp_count=len(timestamps),
+        first_timestamp_utc=timestamps[0],
+        last_timestamp_utc=timestamps[-1],
+        duplicate_count=0,
+        gap_count=0,
+        gaps=(),
+        timestamp_membership_hash=membership_hash,
+        status=H40SourceStatus.VERIFIED,
+        archive_set_sha256=eth_reference.archive_set_sha256,
+        notes="synthetic governance timestamp evidence",
+    )
+    runtime_sources: list[H40SourceRecord] = []
+    snapshot = current_p1_authority_snapshot()
+    for record in reference.sources:
+        state = snapshot.per_source_states.get(record.source_id)
+        if state == "VERIFIED":
+            runtime_sources.append(replace(
+                record,
+                status=H40SourceStatus.VERIFIED,
+                row_count=receipt.timestamp_count,
+                start_utc=receipt.first_timestamp_utc,
+                end_utc=receipt.last_timestamp_utc,
+                gap_count=0,
+                gaps=(),
+                reason_code=None,
+                notes=receipt.notes,
+                receipt=receipt,
+            ))
+        elif state == "NOT_TESTABLE":
+            runtime_sources.append(replace(
+                record,
+                status=H40SourceStatus.NOT_TESTABLE,
+                reason_code=H40ReasonCode.NOT_TESTABLE,
+                receipt=None,
+            ))
+        else:
+            runtime_sources.append(record)
+    source_manifest = H40SourceManifest(
         protocol_identity_hash=protocol_hash,
-        source_manifest_hash=source_manifest.manifest_hash,
-        split_hash=candidate.split_hash,
-        btc_source_id="BTCUSDT_USD_M_1H",
-        btc_locator="synthetic/btc.parquet",
-        btc_file_sha256=_hash("btc file"),
-        btc_membership_sha256=_hash("btc membership"),
-        btc_timestamp_count=1,
-        eth_source_id="ETHUSDT_USD_M_1H",
-        eth_locator="synthetic/eth.parquet",
-        eth_file_sha256=_hash("eth file"),
-        eth_membership_sha256=_hash("eth membership"),
-        eth_timestamp_count=1,
-        is_production_canonical=True,
+        sources=tuple(runtime_sources),
     )
-    return source_manifest, replace(candidate, attestation=attestation)
+    cold_state = {"available": True}
+
+    def cold_validate(
+        repo_root: Path | str,
+        record: H40SourceRecord,
+        expected_product: str | None = None,
+        expected_cadence: str = "1h",
+    ) -> H40SourceValidationReceipt:
+        del repo_root, expected_product, expected_cadence
+        assert record.source_id == "ETHUSDT_USD_M_1H"
+        if not cold_state["available"]:
+            return replace(
+                receipt,
+                status=H40SourceStatus.NOT_TESTABLE,
+                reason_code=H40ReasonCode.SOURCE_MISSING,
+            )
+        return receipt
+
+    def cold_timestamps(
+        repo_root: Path | str,
+        record: H40SourceRecord,
+        expected_product: str | None = None,
+        expected_cadence: str = "1h",
+    ) -> list[str]:
+        del repo_root, expected_product, expected_cadence
+        assert record.source_id == "ETHUSDT_USD_M_1H"
+        if not cold_state["available"]:
+            raise H40GuardError(H40ReasonCode.SOURCE_MISSING, "synthetic source disappeared")
+        return list(timestamps)
+
+    monkeypatch.setattr(lifecycle_authority_module, "validate_source_artifact", cold_validate)
+    monkeypatch.setattr(
+        lifecycle_authority_module,
+        "extract_verified_source_timestamps",
+        cold_timestamps,
+    )
+    split_manifest, runtime_attestation = materialize_runtime_source_split_authority(
+        source_manifest=source_manifest,
+        repo_root=Path("synthetic-repository"),
+    )
+    return source_manifest, split_manifest, runtime_attestation, cold_state
 
 
 def _persist_candidate_chain(
@@ -417,7 +507,7 @@ def test_t03_scientific_hashes_unchanged() -> None:
 
 
 def test_t04_governance_authority() -> None:
-    assert lifecycle_governance_authority_object()["schema_id"] == "H40_LIFECYCLE_GOVERNANCE_AUTHORITY_V2"
+    assert lifecycle_governance_authority_object()["schema_id"] == "H40_LIFECYCLE_GOVERNANCE_AUTHORITY_V3"
     assert compute_lifecycle_governance_authority_hash() == EXPECTED_LIFECYCLE_GOVERNANCE_AUTHORITY_HASH
 
 
@@ -849,29 +939,20 @@ def test_a00_production_seal_derives_typed_verified_authority(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
 ) -> None:
-    source_manifest, split_manifest = _typed_production_authority_fixture()
-    calls: list[tuple[H40SourceManifest, Path | str]] = []
-
-    def assert_verified(
-        self: H40SplitManifest,
-        source: H40SourceManifest,
-        repo_root: Path | str,
-    ) -> None:
-        assert self is split_manifest
-        calls.append((source, repo_root))
-
-    monkeypatch.setattr(H40SplitManifest, "assert_authoritative", assert_verified)
+    source_manifest, split_manifest, runtime_attestation, _ = (
+        _typed_production_authority_fixture(monkeypatch)
+    )
     seal = H40RuntimeSnapshotSeal.from_verified_authority(
         source_manifest=source_manifest,
         split_manifest=split_manifest,
+        runtime_attestation=runtime_attestation,
         repo_root=tmp_path,
     )
-    assert calls == [(source_manifest, tmp_path)]
     assert not seal.synthetic_only
     assert seal.source_manifest_hash == source_manifest.manifest_hash
     assert seal.split_manifest_hash == split_manifest.split_hash
-    assert split_manifest.attestation is not None
-    assert seal.split_attestation_hash == split_manifest.attestation.attestation_hash
+    assert split_manifest.attestation is None
+    assert seal.split_attestation_hash == runtime_attestation.attestation_hash
     seal.verify_against_accepted_ledger()
 
 
@@ -900,37 +981,31 @@ def test_a04_unverified_typed_source_split_cannot_create_production_seal(
         protocol_hash,
         source_manifest.manifest_hash,
     )
-    with pytest.raises(H40GuardError) as exc_info:
+    with pytest.raises(TypeError, match="RuntimeSourceSplitAttestation"):
         H40RuntimeSnapshotSeal.from_verified_authority(
             source_manifest=source_manifest,
             split_manifest=split_manifest,
+            runtime_attestation=None,  # type: ignore[arg-type]
             repo_root=tmp_path,
         )
-    assert exc_info.value.reason_code == H40ReasonCode.SOURCE_UNVERIFIED
 
 
 def test_a05_split_assert_authoritative_failure_propagates(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
 ) -> None:
-    source_manifest, split_manifest = _typed_production_authority_fixture()
-
-    def reject(
-        self: H40SplitManifest,
-        source: H40SourceManifest,
-        repo_root: Path | str,
-    ) -> None:
-        del self, source, repo_root
-        raise H40GuardError(H40ReasonCode.SOURCE_HASH_MISMATCH, "cold authority rejected")
-
-    monkeypatch.setattr(H40SplitManifest, "assert_authoritative", reject)
-    with pytest.raises(H40GuardError, match="cold authority rejected") as exc_info:
+    source_manifest, split_manifest, runtime_attestation, cold_state = (
+        _typed_production_authority_fixture(monkeypatch)
+    )
+    cold_state["available"] = False
+    with pytest.raises(H40GuardError, match="failed cold validation") as exc_info:
         H40RuntimeSnapshotSeal.from_verified_authority(
             source_manifest=source_manifest,
             split_manifest=split_manifest,
+            runtime_attestation=runtime_attestation,
             repo_root=tmp_path,
         )
-    assert exc_info.value.reason_code == H40ReasonCode.SOURCE_HASH_MISMATCH
+    assert exc_info.value.reason_code == H40ReasonCode.SOURCE_MISSING
 
 
 def test_a06_incomplete_registered_roster_fails() -> None:
@@ -1241,3 +1316,358 @@ def test_a27_h39_and_final_holdout_remain_protected() -> None:
         with pytest.raises(H40GuardError) as exc_info:
             H40ProtectedSurfaceGuard.assert_surface_allowed(path)
         assert exc_info.value.reason_code == H40ReasonCode.PROTECTED_SURFACE_DENIED
+
+
+# F01R2 acceptance matrix.  The R labels correspond one-for-one to the task's
+# mandatory adversarial list; closely related mutations share a parametrized test.
+
+
+def test_r01_r04_amended_authority_hashes_and_science_are_exact() -> None:
+    assert (
+        compute_lifecycle_child_hashes()["runtime_snapshot_seal_contract"]
+        == "76a0732742707c78f65da26263076bed7b586ea67d4f5ddd2dac33761e37e612"
+    )
+    assert compute_lifecycle_semantic_root_hash() == (
+        "fad50703c12da9af35366ceb8a774794b4ff2f3163a1adb6b624d3b69316e406"
+    )
+    assert compute_lifecycle_governance_authority_hash() == (
+        "7edce39c421ad6c487580483d2fa674b1f199e21640c33b1c08f85dddc6f64fc"
+    )
+    assert compute_protocol_authority_hash() == EXPECTED_PROTOCOL_AUTHORITY_HASH
+    assert compute_semantic_root_hash() == EXPECTED_SEMANTIC_ROOT_HASH
+    assert materialize_h40_search_space_production().structural_ledger_hash == (
+        EXPECTED_STRUCTURAL_LEDGER_HASH
+    )
+
+
+def test_r05_r07_runtime_projection_and_active_union_are_derived() -> None:
+    ledger = materialize_h40_search_space_production()
+    registered = tuple(slot for slot in ledger.slots if slot.status == "REGISTERED")
+    assert len(registered) == 18
+    assert len(ledger.slots) - len(registered) == 150
+    active = sorted({
+        source_id
+        for slot in registered
+        for source_id in derive_required_sources_for_slot(slot)
+    })
+    assert active == ["ETHUSDT_USD_M_1H"]
+    source = inspect.getsource(materialize_runtime_source_split_authority)
+    assert "ETHUSDT_USD_M_1H" not in source
+
+
+def test_r08_r10_btc_identity_does_not_grant_runtime_availability(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    source_manifest, _, _, _ = _typed_production_authority_fixture(monkeypatch)
+    btc = source_manifest.get_source("BTCUSDT_USD_M_1H")
+    assert_canonical_source_identity(btc, source_manifest.protocol_identity_hash)
+    assert btc.status == H40SourceStatus.NOT_TESTABLE
+    assert current_p1_authority_snapshot().per_source_states[btc.source_id] == "NOT_TESTABLE"
+    eth_receipt = source_manifest.get_source("ETHUSDT_USD_M_1H").receipt
+    assert eth_receipt is not None
+    promoted = replace(btc, status=H40SourceStatus.VERIFIED, receipt=eth_receipt)
+    forged_manifest = replace(
+        source_manifest,
+        sources=tuple(promoted if item.source_id == btc.source_id else item for item in source_manifest.sources),
+    )
+    with pytest.raises(H40GuardError, match="accepted snapshot state"):
+        materialize_runtime_source_split_authority(
+            source_manifest=forged_manifest,
+            repo_root=Path("synthetic-repository"),
+        )
+
+
+def test_r11_r16_runtime_snapshot_and_state_schema_fail_closed(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    _, _, attestation, _ = _typed_production_authority_fixture(monkeypatch)
+    raw = attestation.to_dict()
+    mutations: list[dict[str, object]] = []
+    missing = json.loads(json.dumps(raw))
+    missing["source_authority_state_entries"] = missing["source_authority_state_entries"][1:]
+    mutations.append(missing)
+    extra = json.loads(json.dumps(raw))
+    extra["source_authority_state_entries"].append({
+        "source_id": "EXTRA",
+        "production_authority_state": "NOT_TESTABLE",
+    })
+    mutations.append(extra)
+    duplicate = json.loads(json.dumps(raw))
+    duplicate["source_authority_state_entries"].append(
+        duplicate["source_authority_state_entries"][0]
+    )
+    mutations.append(duplicate)
+    reordered = json.loads(json.dumps(raw))
+    reordered["source_authority_state_entries"] = list(
+        reversed(reordered["source_authority_state_entries"])
+    )
+    mutations.append(reordered)
+    wrong_not_testable = json.loads(json.dumps(raw))
+    wrong_not_testable["not_testable_source_ids"] = []
+    mutations.append(wrong_not_testable)
+    foreign_snapshot = json.loads(json.dumps(raw))
+    foreign_snapshot["runtime_authority_snapshot_hash"] = _hash("foreign snapshot")
+    parsed_foreign = H40RuntimeSourceSplitAttestation.from_dict(foreign_snapshot)
+    assert parsed_foreign != attestation
+    for mutation in mutations:
+        with pytest.raises((TypeError, ValueError)):
+            H40RuntimeSourceSplitAttestation.from_dict(mutation)
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        pytest.param("source_record_hash", "0" * 64, id="R19-record-hash"),
+        pytest.param("source_validation_receipt_hash", "1" * 64, id="R20-receipt-hash"),
+        pytest.param("file_sha256", "2" * 64, id="R21-file-hash"),
+        pytest.param("timestamp_membership_hash", "3" * 64, id="R22-membership-hash"),
+        pytest.param("timestamp_count", 1, id="R23-timestamp-count"),
+    ],
+)
+def test_r17_r23_active_evidence_exactness_and_tamper_rejection(
+    monkeypatch: pytest.MonkeyPatch,
+    field: str,
+    value: object,
+) -> None:
+    source_manifest, split_manifest, attestation, _ = (
+        _typed_production_authority_fixture(monkeypatch)
+    )
+    raw = attestation.to_dict()
+    missing = json.loads(json.dumps(raw))
+    missing["active_source_evidence"] = []
+    with pytest.raises(ValueError):
+        H40RuntimeSourceSplitAttestation.from_dict(missing)
+    extra = json.loads(json.dumps(raw))
+    extra["active_source_evidence"].append({
+        **extra["active_source_evidence"][0],
+        "source_id": "BTCUSDT_USD_M_1H",
+    })
+    with pytest.raises(ValueError):
+        H40RuntimeSourceSplitAttestation.from_dict(extra)
+    tampered = json.loads(json.dumps(raw))
+    tampered["active_source_evidence"][0][field] = value
+    typed = H40RuntimeSourceSplitAttestation.from_dict(tampered)
+    with pytest.raises(H40GuardError, match="attestation"):
+        lifecycle_authority_module.verify_runtime_source_split_authority(
+            source_manifest=source_manifest,
+            split_manifest=split_manifest,
+            runtime_attestation=typed,
+            repo_root=Path("synthetic-repository"),
+        )
+
+
+def test_r24_r26_legacy_synthetic_and_schedule_only_authority_rejected(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    source_manifest, split_manifest, attestation, _ = (
+        _typed_production_authority_fixture(monkeypatch)
+    )
+    legacy = H40SplitAttestation.create(
+        protocol_identity_hash=source_manifest.protocol_identity_hash,
+        source_manifest_hash=source_manifest.manifest_hash,
+        split_hash=split_manifest.split_hash,
+        btc_source_id="BTCUSDT_USD_M_1H",
+        btc_locator="synthetic/btc",
+        btc_file_sha256=_hash("btc"),
+        btc_membership_sha256=_hash("btc membership"),
+        btc_timestamp_count=1,
+        eth_source_id="ETHUSDT_USD_M_1H",
+        eth_locator="synthetic/eth",
+        eth_file_sha256=_hash("eth"),
+        eth_membership_sha256=_hash("eth membership"),
+        eth_timestamp_count=1,
+    )
+    with pytest.raises(TypeError):
+        H40RuntimeSnapshotSeal.from_verified_authority(
+            source_manifest=source_manifest,
+            split_manifest=split_manifest,
+            runtime_attestation=legacy,  # type: ignore[arg-type]
+            repo_root=tmp_path,
+        )
+    synthetic = replace(attestation, source_manifest_hash=_hash("synthetic"))
+    with pytest.raises(H40GuardError):
+        lifecycle_authority_module.verify_runtime_source_split_authority(
+            source_manifest=source_manifest,
+            split_manifest=split_manifest,
+            runtime_attestation=synthetic,
+            repo_root=tmp_path,
+        )
+    schedule = H40SplitManifest.build_preregistered_schedule(
+        source_manifest.protocol_identity_hash,
+        source_manifest.manifest_hash,
+    )
+    with pytest.raises(H40GuardError):
+        lifecycle_authority_module.verify_runtime_source_split_authority(
+            source_manifest=source_manifest,
+            split_manifest=schedule,
+            runtime_attestation=attestation,
+            repo_root=tmp_path,
+        )
+
+
+@pytest.mark.parametrize(
+    "mutation",
+    [
+        pytest.param("boundary", id="R27-boundary"),
+        pytest.param("fold", id="R28-fold"),
+        pytest.param("count", id="R29-count"),
+        pytest.param("membership", id="R30-membership"),
+    ],
+)
+def test_r27_r30_runtime_split_mutations_rejected(
+    monkeypatch: pytest.MonkeyPatch,
+    mutation: str,
+) -> None:
+    source_manifest, split_manifest, attestation, _ = (
+        _typed_production_authority_fixture(monkeypatch)
+    )
+    part = split_manifest.partitions[0]
+    if mutation == "boundary":
+        changed = replace(part, start_utc="2021-02-01T00:00:00Z")
+    elif mutation == "fold":
+        changed = replace(part, fold="FOREIGN")
+    elif mutation == "count":
+        changed = replace(part, count=part.count + 1)
+    else:
+        changed = replace(part, timestamps_sha256=_hash("foreign membership"))
+    tampered = replace(split_manifest, partitions=(changed, *split_manifest.partitions[1:]))
+    with pytest.raises(H40GuardError, match="runtime split"):
+        lifecycle_authority_module.verify_runtime_source_split_authority(
+            source_manifest=source_manifest,
+            split_manifest=tampered,
+            runtime_attestation=attestation,
+            repo_root=Path("synthetic-repository"),
+        )
+
+
+def test_r31_r33_cross_source_split_attestation_and_roster_pairs_rejected(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    source_manifest, split_manifest, attestation, _ = (
+        _typed_production_authority_fixture(monkeypatch)
+    )
+    mutations = (
+        replace(attestation, source_manifest_hash=_hash("foreign source manifest")),
+        replace(attestation, split_manifest_hash=_hash("foreign split manifest")),
+        replace(attestation, sealed_registered_roster_hash=_hash("foreign roster")),
+    )
+    for mutation in mutations:
+        with pytest.raises(H40GuardError):
+            lifecycle_authority_module.verify_runtime_source_split_authority(
+                source_manifest=source_manifest,
+                split_manifest=split_manifest,
+                runtime_attestation=mutation,
+                repo_root=Path("synthetic-repository"),
+            )
+
+
+def test_r34_r36_seal_is_fixed_and_new_snapshot_changes_run_not_science() -> None:
+    first = _complete_synthetic_seal()
+    later = _complete_synthetic_seal("later-accepted-snapshot")
+    authority_hash = _implementation_authority().lifecycle_implementation_authority_hash
+    assert H40RunAuthority.from_seal(first, authority_hash).run_authority_id != (
+        H40RunAuthority.from_seal(later, authority_hash).run_authority_id
+    )
+    assert first.roster == tuple(first.roster)
+    assert first.registered_slot_count == 18
+    assert compute_protocol_authority_hash() == EXPECTED_PROTOCOL_AUTHORITY_HASH
+    assert compute_semantic_root_hash() == EXPECTED_SEMANTIC_ROOT_HASH
+
+
+def test_r35_r37_r38_production_cold_restore_and_active_source_change_detection(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    source_manifest, split_manifest, attestation, cold_state = (
+        _typed_production_authority_fixture(monkeypatch)
+    )
+    seal = H40RuntimeSnapshotSeal.from_verified_authority(
+        source_manifest=source_manifest,
+        split_manifest=split_manifest,
+        runtime_attestation=attestation,
+        repo_root=tmp_path,
+    )
+    authority = _implementation_authority()
+    verifier = H40SyntheticEvidenceVerifier({})
+    service = H40LifecycleAuthorityService.synthetic_for_tests(authority, verifier)
+    run = H40RunAuthority.from_seal(seal, authority.lifecycle_implementation_authority_hash)
+    discovery = service.authorize_discovery(
+        implementation_authority=authority,
+        run_authority=run,
+        seal=seal,
+        authorized_at_utc=TS,
+    )
+    store = H40LifecycleArtifactStore(tmp_path)
+    store.persist_authorization(
+        "01_discovery_authorization",
+        discovery,
+        revalidate=service.revalidate_authorization,
+    )
+    fresh_service = H40LifecycleAuthorityService.synthetic_for_tests(
+        authority,
+        H40SyntheticEvidenceVerifier({}),
+    )
+    resolver = H40SyntheticAuthorityResolver.for_tests(
+        implementation_authorities=(authority,),
+        run_authorities=(run,),
+        runtime_seals=(seal,),
+    )
+    restored = store.restore_authorization(
+        run.run_authority_id,
+        "01_discovery_authorization",
+        service=fresh_service,
+        resolver=resolver,
+    )
+    assert restored.receipt_hash == discovery.receipt_hash
+    cold_state["available"] = False
+    with pytest.raises(H40GuardError, match="failed cold validation"):
+        store.restore_authorization(
+            run.run_authority_id,
+            "01_discovery_authorization",
+            service=fresh_service,
+            resolver=resolver,
+        )
+
+
+def test_r39_r43_substitution_replay_and_constructor_boundaries(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    source_manifest, split_manifest, attestation, _ = (
+        _typed_production_authority_fixture(monkeypatch)
+    )
+    seal = H40RuntimeSnapshotSeal.from_verified_authority(
+        source_manifest=source_manifest,
+        split_manifest=split_manifest,
+        runtime_attestation=attestation,
+        repo_root=tmp_path,
+    )
+    assert not seal.synthetic_only
+    assert inspect.signature(H40RuntimeSnapshotSeal.from_verified_authority).parameters[
+        "runtime_attestation"
+    ]
+    with pytest.raises(TypeError, match="must be issued"):
+        H40RuntimeSnapshotSeal(
+            runtime_authority_snapshot_hash=seal.runtime_authority_snapshot_hash,
+            source_manifest_hash=seal.source_manifest_hash,
+            split_manifest_hash=seal.split_manifest_hash,
+            split_attestation_hash=seal.split_attestation_hash,
+            roster=seal.roster,
+            registered_slot_count=seal.registered_slot_count,
+            not_testable_slot_count=seal.not_testable_slot_count,
+        )
+    assert _complete_synthetic_seal().synthetic_only
+
+
+def test_r44_r46_f02_h39_and_final_holdout_remain_sealed() -> None:
+    assert H40LifecycleState.H40_CONFIRMATION_EVALUATED_ONCE not in (
+        H40LifecycleStateMachine.VALID_TRANSITIONS[
+            H40LifecycleState.H40_CONFIRMATION_READY
+        ]
+    )
+    with pytest.raises(H40GuardError):
+        H40ConfirmationGuard().assert_outcomes_accessible()
+    for path in ("artifacts/h39_protected/result", "artifacts/final_holdout/result"):
+        with pytest.raises(H40GuardError):
+            H40ProtectedSurfaceGuard.assert_surface_allowed(path)

@@ -22,7 +22,7 @@ from .configuration_ledger import (
     H40ConfigurationSlot,
     H40Family,
 )
-from .guards import H40ReasonCode
+from .guards import H40GuardError, H40ReasonCode
 from .protocol_authority import (
     RuntimeAuthoritySnapshot,
     current_p1_authority_snapshot,
@@ -240,6 +240,28 @@ def _derive_slot_status(
     else:
         notes = ""
     return status, reason_code, notes
+
+
+def derive_required_sources_for_slot(
+    slot: H40ConfigurationSlot,
+) -> tuple[str, ...]:
+    """Derive one materialized slot's source set from accepted variant semantics."""
+    matching_specs = [
+        spec
+        for spec in (*DIRECTION_VARIANT_SPECS, *DEPTH_TWO_PAIR_SPECS)
+        if spec["variant_id"] == slot.direction_variant
+    ]
+    if len(matching_specs) != 1:
+        raise H40GuardError(
+            H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+            f"slot {slot.slot_index} has unknown or ambiguous direction variant",
+        )
+    spec = matching_specs[0]
+    return project_required_sources(
+        scope=slot.scope,
+        requires_cross_asset=bool(spec.get("requires_cross_asset", False)),
+        requires_funding=bool(spec["requires_funding"]),
+    )
 
 
 def materialize_h40_search_space_production() -> H40ConfigurationLedger:

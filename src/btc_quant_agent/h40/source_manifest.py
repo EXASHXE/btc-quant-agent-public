@@ -19,6 +19,7 @@ from typing import Any
 
 from ..research_contract.canonical import canonical_json, canonical_sha256
 from .guards import H40GuardError, H40ProtectedSurfaceGuard, H40ReasonCode
+from .protocol import H40ProtocolIdentity
 
 
 def _iso_to_ms(iso_str: str) -> int:
@@ -456,21 +457,17 @@ def get_canonical_source_spec(
     )
 
 
-def assert_canonical_source_record(
+def _assert_canonical_source_identity(
     record: H40SourceRecord,
     protocol_identity_hash: str,
+    *,
+    require_production_verified: bool,
 ) -> None:
-    """Asserts that a source record corresponds strictly to canonical H40 specification.
-
-    Fails closed if caller attempts to redefine:
-    - source_id / role
-    - product
-    - cadence
-    - locator
-    - archive_set_sha256
-    - reference_file_sha256 where frozen by protocol
-    - production authority state when not established
-    """
+    if protocol_identity_hash != H40ProtocolIdentity.default().protocol_hash:
+        raise H40GuardError(
+            H40ReasonCode.SOURCE_UNVERIFIED,
+            "source identity is not bound to the accepted H40 protocol identity",
+        )
     spec = get_canonical_source_spec(protocol_identity_hash, record.source_id)
     if record.product != spec.product:
         raise H40GuardError(
@@ -488,7 +485,10 @@ def assert_canonical_source_record(
             f"Source '{record.source_id}' locator mismatch: expected canonical '{spec.locator}', got '{record.locator}'. "
             "Caller cannot substitute non-canonical locators for production H40 authority.",
         )
-    if spec.production_authority_state != H40SourceStatus.VERIFIED:
+    if (
+        require_production_verified
+        and spec.production_authority_state != H40SourceStatus.VERIFIED
+    ):
         raise H40GuardError(
             H40ReasonCode.SOURCE_UNVERIFIED,
             f"Source '{record.source_id}' production authority is {spec.production_authority_state.value}: "
@@ -509,6 +509,35 @@ def assert_canonical_source_record(
             f"Source '{record.source_id}' file SHA mismatch with frozen reference: "
             f"expected '{spec.reference_file_sha256}', got '{record.file_sha256}'.",
         )
+
+
+def assert_canonical_source_identity(
+    record: H40SourceRecord,
+    protocol_identity_hash: str,
+) -> None:
+    """Verify frozen source identity without granting production availability.
+
+    A locally valid artifact may satisfy these identity checks while its accepted
+    ``RuntimeAuthoritySnapshot`` state remains ``NOT_TESTABLE``.  Callers must
+    resolve production availability from that snapshot separately.
+    """
+    _assert_canonical_source_identity(
+        record,
+        protocol_identity_hash,
+        require_production_verified=False,
+    )
+
+
+def assert_canonical_source_record(
+    record: H40SourceRecord,
+    protocol_identity_hash: str,
+) -> None:
+    """Verify frozen source identity and accepted production-VERIFIED authority."""
+    _assert_canonical_source_identity(
+        record,
+        protocol_identity_hash,
+        require_production_verified=True,
+    )
 
 
 

@@ -1020,6 +1020,96 @@ class H40SplitManifest:
         return cls.build_preregistered_schedule(protocol_identity_hash, source_manifest_hash)
 
     @classmethod
+    def build_runtime_authoritative(
+        cls,
+        *,
+        protocol_identity_hash: str,
+        source_manifest_hash: str,
+        active_source_timestamps: Mapping[str, Sequence[str]],
+    ) -> H40SplitManifest:
+        """Build a runtime split from exactly the roster-required verified sources.
+
+        This pure constructor grants no authority by itself.  Production authority
+        additionally requires the F01R2 runtime source/split attestation verifier.
+        """
+        if not active_source_timestamps:
+            raise H40GuardError(
+                H40ReasonCode.SOURCE_UNVERIFIED,
+                "runtime split requires at least one active verified source",
+            )
+        source_sets: list[set[str]] = []
+        for source_id in sorted(active_source_timestamps):
+            timestamps = active_source_timestamps[source_id]
+            if not timestamps:
+                raise H40GuardError(
+                    H40ReasonCode.SOURCE_UNVERIFIED,
+                    f"active source '{source_id}' has no verified timestamps",
+                )
+            source_sets.append(set(timestamps))
+        common_timestamps = sorted(set.intersection(*source_sets))
+        if not common_timestamps:
+            raise H40GuardError(
+                H40ReasonCode.SOURCE_UNVERIFIED,
+                "active runtime sources have no overlapping timestamps",
+            )
+        partitions, base_count, exclusion_counts = _compute_partitions_from_timestamps(
+            common_timestamps
+        )
+        return cls(
+            protocol_identity_hash=protocol_identity_hash,
+            source_manifest_hash=source_manifest_hash,
+            base_eligible_start_utc=BASE_ELIGIBLE_START_UTC,
+            base_eligible_end_utc=BASE_ELIGIBLE_END_UTC,
+            base_eligible_count=base_count,
+            partitions=partitions,
+            exclusion_counts=exclusion_counts,
+            is_authoritative=True,
+            attestation=None,
+        )
+
+    def assert_static_calendar_matches(self, reference: H40SplitManifest) -> None:
+        """Verify immutable partition calendar semantics independently of availability."""
+        if not isinstance(reference, H40SplitManifest) or reference.is_authoritative:
+            raise H40GuardError(
+                H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                "static calendar reference must be the preregistered non-authoritative split",
+            )
+        if (
+            self.protocol_identity_hash != reference.protocol_identity_hash
+            or self.base_eligible_start_utc != reference.base_eligible_start_utc
+            or self.base_eligible_end_utc != reference.base_eligible_end_utc
+        ):
+            raise H40GuardError(
+                H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                "runtime split protocol/base calendar mismatch",
+            )
+        runtime_calendar = tuple(
+            (
+                part.partition_id,
+                part.fold,
+                part.partition_type,
+                part.start_utc,
+                part.end_utc,
+            )
+            for part in self.partitions
+        )
+        reference_calendar = tuple(
+            (
+                part.partition_id,
+                part.fold,
+                part.partition_type,
+                part.start_utc,
+                part.end_utc,
+            )
+            for part in reference.partitions
+        )
+        if runtime_calendar != reference_calendar:
+            raise H40GuardError(
+                H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                "runtime split static partition calendar mismatch",
+            )
+
+    @classmethod
     def materialize_authoritative(
         cls,
         protocol_identity_hash: str,
