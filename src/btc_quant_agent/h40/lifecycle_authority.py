@@ -1245,18 +1245,34 @@ class H40RunAuthority:
         return cls(**{name: str(data[name]) for name in cls._KEYS})
 
 
-def _fsync_dir(path: Path) -> None:
+def _fsync_dir(path: Path, *, fail_closed: bool = False) -> None:
     try:
         fd = os.open(str(path), os.O_RDONLY | getattr(os, "O_DIRECTORY", 0))
         try:
             os.fsync(fd)
         finally:
             os.close(fd)
-    except OSError:
-        pass
+    except OSError as err:
+        if fail_closed:
+            raise H40GuardError(
+                H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                f"authoritative directory fsync failed for '{path}': {err}",
+            ) from err
 
 
 _TERMINAL_STATES: frozenset[str] = frozenset({"H40_NO_GO", "NOT_TESTABLE"})
+_ACCEPTED_LIFECYCLE_STATES: frozenset[str] = frozenset({
+    "H40_PREREGISTERED",
+    "H40_P1_SCAFFOLDED",
+    "H40_DISCOVERY",
+    "H40_CANDIDATE_LOCKED",
+    "H40_WALK_FORWARD_VALIDATED",
+    "H40_CONFIRMATION_READY",
+    "H40_CONFIRMATION_EVALUATED_ONCE",
+    "H40_NO_GO",
+    "NOT_TESTABLE",
+})
+ACCEPTED_LIFECYCLE_STATES = _ACCEPTED_LIFECYCLE_STATES
 
 
 @dataclass(frozen=True)
@@ -3185,6 +3201,7 @@ class H40LifecycleAuthorityService:
     ) -> VerifiedLifecycleAuthorization:
         if not isinstance(prior_authority, VerifiedLifecycleAuthorization) or prior_authority._issuer_id is not self._issuer_id:
             raise H40GuardError(H40ReasonCode.CONFIG_IDENTITY_CONFLICT, "foreign termination lineage")
+        self._reverify_root_source_truth(prior_authority)
         if (failure_evidence_hash is None) != (failure_evidence is None):
             raise H40GuardError(
                 H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
@@ -3292,16 +3309,34 @@ class H40LifecycleAuthorityService:
             if (
                 not isinstance(prior, VerifiedLifecycleAuthorization)
                 or not isinstance(evidence, H40WFValidationResultEvidence)
-                or not isinstance(split, H40ExpectedSplitAuthority)
             ):
                 raise H40GuardError(H40ReasonCode.CONFIG_IDENTITY_CONFLICT, "WF context missing")
-            reconstructed = self.authorize_wf_validation(
-                candidate_authority=prior,
-                evidence=evidence,
-                split_authority=split,
-                validated_at_utc=receipt.validated_at_utc,
-                verified_at_utc=receipt.verified_at_utc,
-            )
+
+            is_production = not self._synthetic_test_mode and not prior.synthetic_only
+            if is_production:
+                expected_split = derive_expected_wf_authority(prior)
+                if split is not None and split != expected_split:
+                    raise H40GuardError(
+                        H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                        "persisted WF split authority does not match derived production authority",
+                    )
+                reconstructed = self.authorize_wf_validation(
+                    candidate_authority=prior,
+                    evidence=evidence,
+                    split_authority=None,
+                    validated_at_utc=receipt.validated_at_utc,
+                    verified_at_utc=receipt.verified_at_utc,
+                )
+            else:
+                if not isinstance(split, H40ExpectedSplitAuthority):
+                    raise H40GuardError(H40ReasonCode.CONFIG_IDENTITY_CONFLICT, "WF context missing")
+                reconstructed = self.authorize_wf_validation(
+                    candidate_authority=prior,
+                    evidence=evidence,
+                    split_authority=split,
+                    validated_at_utc=receipt.validated_at_utc,
+                    verified_at_utc=receipt.verified_at_utc,
+                )
         elif isinstance(receipt, H40ConfirmationReadyReceipt):
             prior = authorization.context.get("wf_authority")
             if not isinstance(prior, VerifiedLifecycleAuthorization):
@@ -3564,24 +3599,98 @@ class H40LifecycleArtifactStore:
                 head_predecessor_receipt_hash TEXT,
                 transition_sequence INTEGER NOT NULL,
                 terminal INTEGER NOT NULL,
+                head_hash TEXT NOT NULL,
                 head_json TEXT NOT NULL
             )
             """
         )
+        cursor = conn.execute("PRAGMA table_info(h40_lifecycle_run_heads)")
+        columns = {row[1] for row in cursor.fetchall()}
+        if "head_hash" not in columns:
+            conn.execute("ALTER TABLE h40_lifecycle_run_heads ADD COLUMN head_hash TEXT NOT NULL DEFAULT ''")
         return conn
+
+    def _validate_and_parse_head_row(
+        self,
+        *,
+        row: tuple[Any, ...],
+        expected_run_authority_id: str,
+    ) -> H40DurableRunHead:
+        curr_receipt, curr_state, curr_pred, curr_seq, curr_term, curr_head_hash, curr_json = row
+        try:
+            head_data = json.loads(curr_json)
+            head = H40DurableRunHead.from_dict(head_data)
+        except Exception as exc:
+            raise H40GuardError(
+                H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                f"durable head_json parsing failure: {exc}",
+            ) from exc
+
+        if head.run_authority_id != expected_run_authority_id:
+            raise H40GuardError(
+                H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                f"durable head run_authority_id '{head.run_authority_id}' does not match expected '{expected_run_authority_id}'",
+            )
+        if head.head_receipt_hash != curr_receipt:
+            raise H40GuardError(
+                H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                f"durable head receipt_hash '{head.head_receipt_hash}' does not match scalar column '{curr_receipt}'",
+            )
+        if head.head_state != curr_state:
+            raise H40GuardError(
+                H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                f"durable head state '{head.head_state}' does not match scalar column '{curr_state}'",
+            )
+        if head.head_predecessor_receipt_hash != curr_pred:
+            raise H40GuardError(
+                H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                f"durable head predecessor '{head.head_predecessor_receipt_hash}' does not match scalar column '{curr_pred}'",
+            )
+        if head.transition_sequence != curr_seq:
+            raise H40GuardError(
+                H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                f"durable head sequence '{head.transition_sequence}' does not match scalar column '{curr_seq}'",
+            )
+        if head.terminal != bool(curr_term):
+            raise H40GuardError(
+                H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                f"durable head terminal '{head.terminal}' does not match scalar column '{bool(curr_term)}'",
+            )
+        if head.head_state not in _ACCEPTED_LIFECYCLE_STATES:
+            raise H40GuardError(
+                H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                f"durable head state '{head.head_state}' is not in accepted lifecycle vocabulary",
+            )
+        expected_terminal = head.head_state in _TERMINAL_STATES
+        if head.terminal != expected_terminal:
+            raise H40GuardError(
+                H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                f"durable head terminal flag '{head.terminal}' inconsistent with state '{head.head_state}' (expected {expected_terminal})",
+            )
+        if curr_head_hash and curr_head_hash != head.head_hash:
+            raise H40GuardError(
+                H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                f"durable head_hash '{curr_head_hash}' does not match canonical head hash '{head.head_hash}'",
+            )
+        return head
 
     def get_committed_run_head(self, run_authority_id: str) -> H40DurableRunHead | None:
         _require_sha256(run_authority_id, "run_authority_id")
         conn = self._get_sqlite_conn()
         try:
             cursor = conn.execute(
-                "SELECT head_json FROM h40_lifecycle_run_heads WHERE run_authority_id = ?",
+                "SELECT head_receipt_hash, head_state, head_predecessor_receipt_hash, "
+                "transition_sequence, terminal, head_hash, head_json "
+                "FROM h40_lifecycle_run_heads WHERE run_authority_id = ?",
                 (run_authority_id,),
             )
             row = cursor.fetchone()
             if row is None:
                 return None
-            return H40DurableRunHead.from_dict(json.loads(row[0]))
+            return self._validate_and_parse_head_row(
+                row=row,
+                expected_run_authority_id=run_authority_id,
+            )
         finally:
             conn.close()
 
@@ -3592,6 +3701,7 @@ class H40LifecycleArtifactStore:
         receipt_hash: str,
         target_state: str,
         predecessor_receipt_hash: str | None,
+        authorization: VerifiedLifecycleAuthorization | None = None,
     ) -> H40DurableRunHead:
         _require_sha256(run_authority_id, "run_authority_id")
         _require_sha256(receipt_hash, "receipt_hash")
@@ -3599,21 +3709,174 @@ class H40LifecycleArtifactStore:
         if predecessor_receipt_hash is not None:
             _require_sha256(predecessor_receipt_hash, "predecessor_receipt_hash")
 
+        if target_state not in _ACCEPTED_LIFECYCLE_STATES:
+            raise H40GuardError(
+                H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                f"unrecognized target state '{target_state}'",
+            )
+
+        if target_state in {
+            "H40_CANDIDATE_LOCKED",
+            "H40_WALK_FORWARD_VALIDATED",
+            "H40_CONFIRMATION_READY",
+            "H40_CONFIRMATION_EVALUATED_ONCE",
+        } and predecessor_receipt_hash is None:
+            raise H40GuardError(
+                H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                f"state '{target_state}' cannot be genesis / sequence zero",
+            )
+
+        receipt_path = self._receipts_dir(run_authority_id) / f"{receipt_hash}.json"
+        if not receipt_path.is_file():
+            raise H40GuardError(
+                H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                f"published receipt '{receipt_hash}.json' does not exist on disk",
+            )
+
+        try:
+            envelope_raw = json.loads(receipt_path.read_text(encoding="utf-8"))
+        except Exception as exc:
+            raise H40GuardError(
+                H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                f"published receipt '{receipt_hash}.json' envelope failed JSON parsing: {exc}",
+            ) from exc
+
+        if not isinstance(envelope_raw, Mapping):
+            raise H40GuardError(
+                H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                "lifecycle receipt envelope must be an object",
+            )
+
+        _require_exact_keys(
+            envelope_raw,
+            frozenset({
+                "authority_context",
+                "bound_evidence",
+                "bound_evidence_sha256",
+                "receipt",
+                "receipt_sha256",
+            }),
+            "lifecycle receipt envelope",
+        )
+
+        if envelope_raw["receipt_sha256"] != receipt_hash:
+            raise H40GuardError(
+                H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                f"envelope receipt_sha256 '{envelope_raw['receipt_sha256']}' does not match '{receipt_hash}'",
+            )
+
+        raw_receipt = envelope_raw["receipt"]
+        if not isinstance(raw_receipt, Mapping):
+            raise H40GuardError(
+                H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                "receipt in envelope must be an object",
+            )
+
+        if canonical_sha256(raw_receipt) != receipt_hash:
+            raise H40GuardError(
+                H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                "envelope receipt canonical hash does not match receipt_sha256",
+            )
+
+        schema_id = raw_receipt.get("receipt_schema_id")
+        parser = _RECEIPT_PARSERS.get(str(schema_id))
+        if parser is None:
+            raise H40GuardError(
+                H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                f"unknown receipt schema_id '{schema_id}'",
+            )
+        try:
+            typed_receipt = parser(raw_receipt)
+        except Exception as exc:
+            raise H40GuardError(
+                H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                f"failed to parse typed receipt from envelope: {exc}",
+            ) from exc
+
+        if typed_receipt.run_authority_id != run_authority_id:
+            raise H40GuardError(
+                H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                f"receipt run_authority_id '{typed_receipt.run_authority_id}' does not match requested '{run_authority_id}'",
+            )
+
+        if isinstance(typed_receipt, H40DiscoveryAuthorizationReceipt):
+            receipt_target_state = "H40_DISCOVERY"
+        elif isinstance(typed_receipt, H40CandidateLockReceipt):
+            receipt_target_state = "H40_CANDIDATE_LOCKED"
+        elif isinstance(typed_receipt, H40WFValidationReceipt):
+            receipt_target_state = "H40_WALK_FORWARD_VALIDATED"
+        elif isinstance(typed_receipt, H40ConfirmationReadyReceipt):
+            receipt_target_state = "H40_CONFIRMATION_READY"
+        elif isinstance(typed_receipt, H40TerminationReceipt):
+            receipt_target_state = typed_receipt.target_state
+        else:
+            raise H40GuardError(
+                H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                f"unexpected receipt type '{type(typed_receipt).__name__}'",
+            )
+
+        if receipt_target_state != target_state:
+            raise H40GuardError(
+                H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                f"receipt target state '{receipt_target_state}' does not match requested target state '{target_state}'",
+            )
+
+        if typed_receipt.upstream_receipt_hash != predecessor_receipt_hash:
+            raise H40GuardError(
+                H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                f"receipt upstream_receipt_hash '{typed_receipt.upstream_receipt_hash}' does not match predecessor '{predecessor_receipt_hash}'",
+            )
+
+        if authorization is not None:
+            if not isinstance(authorization, VerifiedLifecycleAuthorization):
+                raise TypeError("authorization must be VerifiedLifecycleAuthorization")
+            if authorization.receipt_hash != receipt_hash:
+                raise H40GuardError(
+                    H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                    "authorization receipt_hash mismatch against receipt_hash",
+                )
+            if authorization.receipt != typed_receipt:
+                raise H40GuardError(
+                    H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                    "authorization receipt does not equal published typed receipt",
+                )
+            if authorization.target_state != target_state:
+                raise H40GuardError(
+                    H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                    "authorization target_state mismatch against requested target_state",
+                )
+            if authorization.upstream_receipt_hash != predecessor_receipt_hash:
+                raise H40GuardError(
+                    H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                    "authorization upstream mismatch against requested predecessor",
+                )
+            if authorization.run_authority_id != run_authority_id:
+                raise H40GuardError(
+                    H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                    "authorization run_authority_id mismatch against requested run_authority_id",
+                )
+
         conn = self._get_sqlite_conn()
         try:
             conn.execute("BEGIN IMMEDIATE")
             cursor = conn.execute(
                 "SELECT head_receipt_hash, head_state, head_predecessor_receipt_hash, "
-                "transition_sequence, terminal, head_json FROM h40_lifecycle_run_heads "
+                "transition_sequence, terminal, head_hash, head_json FROM h40_lifecycle_run_heads "
                 "WHERE run_authority_id = ?",
                 (run_authority_id,),
             )
             row = cursor.fetchone()
             if row is None:
+                if predecessor_receipt_hash is not None:
+                    conn.execute("ROLLBACK")
+                    raise H40GuardError(
+                        H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                        "non-null predecessor cannot commit as sequence zero genesis",
+                    )
                 sequence = 0
                 terminal = target_state in _TERMINAL_STATES
                 head = H40DurableRunHead(
-                    head_predecessor_receipt_hash=predecessor_receipt_hash,
+                    head_predecessor_receipt_hash=None,
                     head_receipt_hash=receipt_hash,
                     head_state=target_state,
                     run_authority_id=run_authority_id,
@@ -3621,40 +3884,53 @@ class H40LifecycleArtifactStore:
                     transition_sequence=sequence,
                 )
                 head_json = canonical_json(head.to_dict())
+                head_hash = head.head_hash
                 conn.execute(
                     "INSERT INTO h40_lifecycle_run_heads "
                     "(run_authority_id, head_receipt_hash, head_state, "
-                    "head_predecessor_receipt_hash, transition_sequence, terminal, head_json) "
-                    "VALUES (?, ?, ?, ?, ?, ?, ?)",
-                    (run_authority_id, receipt_hash, target_state, predecessor_receipt_hash, sequence, int(terminal), head_json),
+                    "head_predecessor_receipt_hash, transition_sequence, terminal, head_hash, head_json) "
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                    (
+                        run_authority_id,
+                        receipt_hash,
+                        target_state,
+                        predecessor_receipt_hash,
+                        sequence,
+                        int(terminal),
+                        head_hash,
+                        head_json,
+                    ),
                 )
                 conn.execute("COMMIT")
             else:
-                curr_receipt, curr_state, curr_pred, curr_seq, curr_term, curr_json = row
-                if curr_receipt == receipt_hash:
+                current_head = self._validate_and_parse_head_row(
+                    row=row,
+                    expected_run_authority_id=run_authority_id,
+                )
+                if current_head.head_receipt_hash == receipt_hash:
                     # Idempotent retry
                     conn.execute("COMMIT")
-                    return H40DurableRunHead.from_dict(json.loads(curr_json))
+                    return current_head
 
-                if bool(curr_term):
+                if current_head.terminal:
                     conn.execute("ROLLBACK")
                     raise H40GuardError(
                         H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
-                        f"run '{run_authority_id}' is in terminal state '{curr_state}'; no forward commits allowed",
+                        f"run '{run_authority_id}' is in terminal state '{current_head.head_state}'; no forward commits allowed",
                     )
 
-                if predecessor_receipt_hash != curr_receipt:
+                if predecessor_receipt_hash != current_head.head_receipt_hash:
                     conn.execute("ROLLBACK")
                     raise H40GuardError(
                         H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
-                        f"predecessor receipt hash mismatch: expected current head '{curr_receipt}', "
+                        f"predecessor receipt hash mismatch: expected current head '{current_head.head_receipt_hash}', "
                         f"got '{predecessor_receipt_hash}'",
                     )
 
-                next_seq = curr_seq + 1
+                next_seq = current_head.transition_sequence + 1
                 terminal = target_state in _TERMINAL_STATES
                 head = H40DurableRunHead(
-                    head_predecessor_receipt_hash=curr_receipt,
+                    head_predecessor_receipt_hash=current_head.head_receipt_hash,
                     head_receipt_hash=receipt_hash,
                     head_state=target_state,
                     run_authority_id=run_authority_id,
@@ -3662,12 +3938,22 @@ class H40LifecycleArtifactStore:
                     transition_sequence=next_seq,
                 )
                 head_json = canonical_json(head.to_dict())
+                head_hash = head.head_hash
                 conn.execute(
                     "UPDATE h40_lifecycle_run_heads SET "
                     "head_receipt_hash = ?, head_state = ?, head_predecessor_receipt_hash = ?, "
-                    "transition_sequence = ?, terminal = ?, head_json = ? "
+                    "transition_sequence = ?, terminal = ?, head_hash = ?, head_json = ? "
                     "WHERE run_authority_id = ?",
-                    (receipt_hash, target_state, curr_receipt, next_seq, int(terminal), head_json, run_authority_id),
+                    (
+                        receipt_hash,
+                        target_state,
+                        current_head.head_receipt_hash,
+                        next_seq,
+                        int(terminal),
+                        head_hash,
+                        head_json,
+                        run_authority_id,
+                    ),
                 )
                 conn.execute("COMMIT")
         except Exception:
@@ -3894,31 +4180,26 @@ class H40LifecycleArtifactStore:
                     os.fsync(handle.fileno())
                 try:
                     os.link(temp_path, final_receipt_path)
-                    temp_path.unlink(missing_ok=True)
                 except FileExistsError:
-                    temp_path.unlink(missing_ok=True)
                     if final_receipt_path.read_bytes() != encoded:
                         raise H40GuardError(
                             H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
                             "write-once immutable lifecycle receipt already exists with different bytes",
                         )
-                except OSError:
-                    if final_receipt_path.exists():
-                        temp_path.unlink(missing_ok=True)
-                        if final_receipt_path.read_bytes() != encoded:
-                            raise H40GuardError(
-                                H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
-                                "write-once immutable lifecycle receipt already exists with different bytes",
-                            )
-                    else:
-                        os.replace(temp_path, final_receipt_path)
+                except OSError as err:
+                    raise H40GuardError(
+                        H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                        f"authoritative immutable receipt link failed: {err}",
+                    ) from err
+                finally:
+                    temp_path.unlink(missing_ok=True)
             except Exception:
                 try:
                     temp_path.unlink(missing_ok=True)
                 except Exception:
                     pass
                 raise
-            _fsync_dir(receipts_dir)
+            _fsync_dir(receipts_dir, fail_closed=True)
 
         legacy_path: Path | None = None
         if transition_key != receipt_hash and self._KEY_RE.fullmatch(transition_key):
@@ -3935,13 +4216,14 @@ class H40LifecycleArtifactStore:
                 legacy_tmp = run_dir / f"legacy.{os.getpid()}_{uuid.uuid4().hex}.tmp"
                 legacy_tmp.write_bytes(encoded)
                 os.replace(legacy_tmp, legacy_path)
-                _fsync_dir(run_dir)
+                _fsync_dir(run_dir, fail_closed=False)
 
         self.advance_run_head(
             run_authority_id=run_authority_id,
             receipt_hash=receipt_hash,
             target_state=authorization.target_state,
             predecessor_receipt_hash=authorization.upstream_receipt_hash,
+            authorization=authorization,
         )
 
         return legacy_path if legacy_path is not None else final_receipt_path
@@ -4177,19 +4459,39 @@ class H40LifecycleArtifactStore:
             if (
                 prior is None
                 or not isinstance(evidence, H40WFValidationResultEvidence)
-                or split_authority is None
             ):
                 raise H40GuardError(
                     H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
-                    "WF restore lacks predecessor/result/split authority",
+                    "WF restore lacks predecessor/result evidence",
                 )
-            reconstructed = service.authorize_wf_validation(
-                candidate_authority=prior,
-                evidence=evidence,
-                split_authority=split_authority,
-                validated_at_utc=receipt.validated_at_utc,
-                verified_at_utc=receipt.verified_at_utc,
-            )
+            is_production = not service.synthetic_test_mode and not prior.synthetic_only
+            if is_production:
+                expected_split = derive_expected_wf_authority(prior)
+                if split_authority is not None and split_authority != expected_split:
+                    raise H40GuardError(
+                        H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                        "persisted WF split authority does not match derived production authority",
+                    )
+                reconstructed = service.authorize_wf_validation(
+                    candidate_authority=prior,
+                    evidence=evidence,
+                    split_authority=None,
+                    validated_at_utc=receipt.validated_at_utc,
+                    verified_at_utc=receipt.verified_at_utc,
+                )
+            else:
+                if split_authority is None:
+                    raise H40GuardError(
+                        H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                        "WF restore lacks predecessor/result/split authority",
+                    )
+                reconstructed = service.authorize_wf_validation(
+                    candidate_authority=prior,
+                    evidence=evidence,
+                    split_authority=split_authority,
+                    validated_at_utc=receipt.validated_at_utc,
+                    verified_at_utc=receipt.verified_at_utc,
+                )
         elif isinstance(receipt, H40ConfirmationReadyReceipt):
             if prior is None or evidence is not None:
                 raise H40GuardError(

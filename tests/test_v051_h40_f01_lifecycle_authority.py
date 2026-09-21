@@ -9,6 +9,7 @@ from collections.abc import Sequence
 from dataclasses import dataclass, replace
 from decimal import Decimal
 from pathlib import Path
+from typing import Any
 
 import pytest
 
@@ -26,6 +27,7 @@ from btc_quant_agent.h40 import (
     H40CandidateResultEntry,
     H40CandidateVerification,
     H40ConfirmationGuard,
+    H40DiscoveryAuthorizationReceipt,
     H40DiscoveryResultEvidence,
     H40DurableRunHead,
     H40ExecutionGuard,
@@ -54,7 +56,9 @@ from btc_quant_agent.h40 import (
     H40SplitManifest,
     H40SyntheticAuthorityResolver,
     H40SyntheticEvidenceVerifier,
+    H40TerminationReceipt,
     H40WFFoldResultEntry,
+    H40WFValidationReceipt,
     H40WFValidationResultEvidence,
     VerifiedLifecycleAuthorization,
     assert_canonical_source_identity,
@@ -245,6 +249,113 @@ def _build_discovery_chain(
         discovery=discovery,
         evidence=evidence,
         candidate=candidate,
+    )
+
+
+def _publish_mock_envelope(
+    store: H40LifecycleArtifactStore,
+    receipt: Any,
+) -> str:
+    h = receipt.receipt_sha256
+    envelope = {
+        "authority_context": {},
+        "bound_evidence": None,
+        "bound_evidence_sha256": None,
+        "receipt": receipt.to_dict(),
+        "receipt_sha256": h,
+    }
+    p = store._receipts_dir(receipt.run_authority_id) / f"{h}.json"
+    p.parent.mkdir(parents=True, exist_ok=True)
+    p.write_text(canonical_json(envelope) + "\n", encoding="utf-8")
+    return h
+
+
+def _make_mock_discovery_receipt(
+    run_id: str,
+    *,
+    authorized_at_utc: str = TS,
+) -> H40DiscoveryAuthorizationReceipt:
+    return H40DiscoveryAuthorizationReceipt(
+        authorized_at_utc=authorized_at_utc,
+        discovery_selection_correction_contract_hash=_hash("correction"),
+        execution_disabled=True,
+        lifecycle_governance_authority_hash=_hash("gov"),
+        lifecycle_implementation_authority_hash=_hash("impl"),
+        materialized_run_authority_hash=_hash("run_auth"),
+        not_testable_slot_count=150,
+        protocol_authority_hash=_hash("proto"),
+        registered_slot_count=18,
+        run_authority_id=run_id,
+        sealed_registered_roster_hash=_hash("roster"),
+        semantic_root_hash=_hash("semantic"),
+        source_manifest_hash=_hash("source"),
+        split_attestation_hash=_hash("attest"),
+        split_manifest_hash=_hash("split"),
+        structural_ledger_hash=_hash("structural"),
+        total_slot_count=168,
+        upstream_receipt_hash=None,
+    )
+
+
+def _make_mock_candidate_receipt(
+    run_id: str,
+    upstream_receipt_hash: str,
+    *,
+    slot_index: int = 0,
+    locked_at_utc: str = TS,
+) -> H40CandidateLockReceipt:
+    return H40CandidateLockReceipt(
+        discovery_authorization_receipt_hash=upstream_receipt_hash,
+        discovery_result_evidence_hash=_hash(f"evidence-{slot_index}"),
+        locked_at_utc=locked_at_utc,
+        materialized_run_authority_hash=_hash("run_auth"),
+        run_authority_id=run_id,
+        selected_slot_hash=_hash(f"slot-{slot_index}"),
+        selected_slot_index=slot_index,
+        selected_structural_configuration_hash=_hash(f"struct-{slot_index}"),
+        upstream_receipt_hash=upstream_receipt_hash,
+        verified_at_utc=locked_at_utc,
+    )
+
+
+def _make_mock_wf_receipt(
+    run_id: str,
+    upstream_receipt_hash: str,
+    *,
+    slot_index: int = 0,
+    validated_at_utc: str = TS,
+) -> H40WFValidationReceipt:
+    return H40WFValidationReceipt(
+        candidate_lock_receipt_hash=upstream_receipt_hash,
+        locked_slot_hash=_hash(f"slot-{slot_index}"),
+        locked_slot_index=slot_index,
+        locked_structural_configuration_hash=_hash(f"struct-{slot_index}"),
+        run_authority_id=run_id,
+        upstream_receipt_hash=upstream_receipt_hash,
+        validated_at_utc=validated_at_utc,
+        verified_at_utc=validated_at_utc,
+        wf_validation_result_evidence_hash=_hash("wf_evidence"),
+    )
+
+
+def _make_mock_termination_receipt(
+    run_id: str,
+    upstream_receipt_hash: str | None,
+    *,
+    source_state: str = "H40_DISCOVERY",
+    target_state: str = "H40_NO_GO",
+    reason_code: H40ReasonCode = H40ReasonCode.THRESHOLD_UNMET,
+    terminated_at_utc: str = TS,
+) -> H40TerminationReceipt:
+    return H40TerminationReceipt(
+        detail_message="mock termination",
+        failure_evidence_hash=None,
+        reason_code=reason_code,
+        run_authority_id=run_id,
+        source_state=source_state,
+        target_state=target_state,
+        terminated_at_utc=terminated_at_utc,
+        upstream_receipt_hash=upstream_receipt_hash,
     )
 
 
@@ -820,6 +931,11 @@ def test_t23_failed_wf_gate_terminates() -> None:
 def test_t24_persistence_tamper(tmp_path: Path, tamper_target: str) -> None:
     chain = _build_discovery_chain()
     store = H40LifecycleArtifactStore(tmp_path)
+    store.persist_authorization(
+        "01_discovery_authorization",
+        chain.discovery,
+        revalidate=chain.service.revalidate_authorization,
+    )
     path = store.persist_authorization(
         "02_candidate_lock",
         chain.candidate,
@@ -1821,9 +1937,9 @@ def test_a01_through_a07_derived_wf_authority() -> None:
 def test_a08_through_a14_durable_single_run_head(tmp_path: Path) -> None:
     store = H40LifecycleArtifactStore(tmp_path)
     run_id = _hash("run-a08")
-    r0 = _hash("receipt-0")
-    r1_a = _hash("receipt-1-a")
-    r1_b = _hash("receipt-1-b")
+    r0 = _publish_mock_envelope(store, _make_mock_discovery_receipt(run_id))
+    r1_a = _publish_mock_envelope(store, _make_mock_candidate_receipt(run_id, r0, slot_index=1))
+    r1_b = _publish_mock_envelope(store, _make_mock_candidate_receipt(run_id, r0, slot_index=2))
 
     # Sequence 0 commit
     head0 = store.advance_run_head(
@@ -1858,8 +1974,11 @@ def test_a08_through_a14_durable_single_run_head(tmp_path: Path) -> None:
     assert store.get_committed_run_head(run_id).head_receipt_hash == r1_a
 
     # A09: WF success vs NO_GO from same candidate -> exactly one committed successor
-    r2_wf = _hash("receipt-2-wf")
-    r2_nogo = _hash("receipt-2-nogo")
+    r2_wf = _publish_mock_envelope(store, _make_mock_wf_receipt(run_id, r1_a, slot_index=1))
+    r2_nogo = _publish_mock_envelope(
+        store,
+        _make_mock_termination_receipt(run_id, r1_a, source_state="H40_CANDIDATE_LOCKED", target_state="H40_NO_GO"),
+    )
     head2 = store.advance_run_head(
         run_authority_id=run_id,
         receipt_hash=r2_wf,
@@ -1877,7 +1996,10 @@ def test_a08_through_a14_durable_single_run_head(tmp_path: Path) -> None:
 
     # A10: terminal then stale success rejected
     terminal_run_id = _hash("run-a10-terminal")
-    t0 = _hash("term-receipt-0")
+    t0 = _publish_mock_envelope(
+        store,
+        _make_mock_termination_receipt(terminal_run_id, None, source_state="H40_PREREGISTERED", target_state="H40_NO_GO"),
+    )
     store.advance_run_head(
         run_authority_id=terminal_run_id,
         receipt_hash=t0,
@@ -1885,19 +2007,24 @@ def test_a08_through_a14_durable_single_run_head(tmp_path: Path) -> None:
         predecessor_receipt_hash=None,
     )
     assert store.get_committed_run_head(terminal_run_id).terminal
+    stale_succ = _publish_mock_envelope(store, _make_mock_wf_receipt(terminal_run_id, t0, slot_index=1))
     with pytest.raises(H40GuardError, match="terminal state"):
         store.advance_run_head(
             run_authority_id=terminal_run_id,
-            receipt_hash=_hash("stale-succ"),
+            receipt_hash=stale_succ,
             target_state="H40_WALK_FORWARD_VALIDATED",
             predecessor_receipt_hash=t0,
         )
 
     # A11: success then stale terminal sibling rejected
+    stale_term = _publish_mock_envelope(
+        store,
+        _make_mock_termination_receipt(run_id, r1_a, source_state="H40_CANDIDATE_LOCKED", target_state="H40_NO_GO"),
+    )
     with pytest.raises(H40GuardError, match="predecessor receipt hash mismatch"):
         store.advance_run_head(
             run_authority_id=run_id,
-            receipt_hash=_hash("stale-term-from-r1"),
+            receipt_hash=stale_term,
             target_state="H40_NO_GO",
             predecessor_receipt_hash=r1_a,
         )
@@ -1906,15 +2033,15 @@ def test_a08_through_a14_durable_single_run_head(tmp_path: Path) -> None:
     import concurrent.futures
 
     concurrent_run_id = _hash("run-a12-concurrent")
-    c0 = _hash("c0-receipt")
+    c0 = _publish_mock_envelope(store, _make_mock_discovery_receipt(concurrent_run_id))
     store.advance_run_head(
         run_authority_id=concurrent_run_id,
         receipt_hash=c0,
         target_state="H40_DISCOVERY",
         predecessor_receipt_hash=None,
     )
-    cand_x = _hash("cand-x")
-    cand_y = _hash("cand-y")
+    cand_x = _publish_mock_envelope(store, _make_mock_candidate_receipt(concurrent_run_id, c0, slot_index=10))
+    cand_y = _publish_mock_envelope(store, _make_mock_candidate_receipt(concurrent_run_id, c0, slot_index=20))
     results: list[tuple[str, bool, str]] = []
 
     def try_advance(cand_hash: str) -> tuple[str, bool, str]:
@@ -2086,10 +2213,16 @@ def test_a15_through_a20_receipt_publication_and_crash_protocol(tmp_path: Path) 
     assert head_after_retry.transition_sequence == 0
 
     # A19: conflicting retry rejected
+    conflicting_receipt = _make_mock_candidate_receipt(
+        chain.run.run_authority_id,
+        _hash("other-pred"),
+        slot_index=99,
+    )
+    conflicting_hash = _publish_mock_envelope(store, conflicting_receipt)
     with pytest.raises(H40GuardError, match="predecessor receipt hash mismatch"):
         store.advance_run_head(
             run_authority_id=chain.run.run_authority_id,
-            receipt_hash=_hash("conflicting-receipt"),
+            receipt_hash=conflicting_hash,
             target_state="H40_CANDIDATE_LOCKED",
             predecessor_receipt_hash=_hash("other-pred"),
         )
