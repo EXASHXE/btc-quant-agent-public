@@ -60,6 +60,7 @@ from btc_quant_agent.h40 import (
     H40WFFoldResultEntry,
     H40WFValidationReceipt,
     H40WFValidationResultEvidence,
+    TEST_COMMIT_TOKEN,
     VerifiedLifecycleAuthorization,
     assert_canonical_source_identity,
     compute_lifecycle_child_hashes,
@@ -565,12 +566,12 @@ def _persist_candidate_chain(
     store.persist_authorization(
         "01_discovery_authorization",
         chain.discovery,
-        revalidate=chain.service.revalidate_authorization,
+        service=chain.service,
     )
     store.persist_authorization(
         "02_candidate_lock",
         chain.candidate,
-        revalidate=chain.service.revalidate_authorization,
+        service=chain.service,
     )
     return store
 
@@ -934,12 +935,12 @@ def test_t24_persistence_tamper(tmp_path: Path, tamper_target: str) -> None:
     store.persist_authorization(
         "01_discovery_authorization",
         chain.discovery,
-        revalidate=chain.service.revalidate_authorization,
+        service=chain.service,
     )
     path = store.persist_authorization(
         "02_candidate_lock",
         chain.candidate,
-        revalidate=chain.service.revalidate_authorization,
+        service=chain.service,
     )
     raw = json.loads(path.read_text(encoding="utf-8"))
     if tamper_target == "receipt":
@@ -965,23 +966,27 @@ def test_t26_idempotent_persistence_revalidates(tmp_path: Path) -> None:
     store = H40LifecycleArtifactStore(tmp_path)
     calls = 0
 
-    def revalidate(authority: VerifiedLifecycleAuthorization) -> None:
+    orig_revalidate = chain.service.revalidate_authorization
+
+    def spy_revalidate(authority: VerifiedLifecycleAuthorization) -> None:
         nonlocal calls
         calls += 1
-        chain.service.revalidate_authorization(authority)
+        orig_revalidate(authority)
+
+    chain.service.revalidate_authorization = spy_revalidate
 
     first = store.persist_authorization(
         "01_discovery_authorization",
         chain.discovery,
-        revalidate=revalidate,
+        service=chain.service,
     )
     second = store.persist_authorization(
         "01_discovery_authorization",
         chain.discovery,
-        revalidate=revalidate,
+        service=chain.service,
     )
     assert first == second
-    assert calls == 3
+    assert calls == 2
     fresh_service = H40LifecycleAuthorityService.synthetic_for_tests(
         chain.authority,
         H40SyntheticEvidenceVerifier(chain.verifier.export_payloads_for_tests()),
@@ -1313,7 +1318,7 @@ def test_a18_cold_restore_detects_split_authority_substitution(tmp_path: Path) -
     path = store.persist_authorization(
         "03_wf_validation",
         wf.wf,
-        revalidate=wf.discovery_chain.service.revalidate_authorization,
+        service=wf.discovery_chain.service,
     )
     service, resolver, _ = _fresh_synthetic_restore_authority(
         wf.discovery_chain,
@@ -1721,7 +1726,7 @@ def test_r35_r37_r38_production_cold_restore_and_active_source_change_detection(
     store.persist_authorization(
         "01_discovery_authorization",
         discovery,
-        revalidate=service.revalidate_authorization,
+        service=service,
     )
     fresh_service = H40LifecycleAuthorityService.synthetic_for_tests(
         authority,
@@ -1947,6 +1952,7 @@ def test_a08_through_a14_durable_single_run_head(tmp_path: Path) -> None:
         receipt_hash=r0,
         target_state="H40_DISCOVERY",
         predecessor_receipt_hash=None,
+        _test_token=TEST_COMMIT_TOKEN,
     )
     assert isinstance(head0, H40DurableRunHead)
     assert head0.transition_sequence == 0
@@ -1959,6 +1965,7 @@ def test_a08_through_a14_durable_single_run_head(tmp_path: Path) -> None:
         receipt_hash=r1_a,
         target_state="H40_CANDIDATE_LOCKED",
         predecessor_receipt_hash=r0,
+        _test_token=TEST_COMMIT_TOKEN,
     )
     assert head1_a.transition_sequence == 1
     assert head1_a.head_receipt_hash == r1_a
@@ -1970,6 +1977,7 @@ def test_a08_through_a14_durable_single_run_head(tmp_path: Path) -> None:
             receipt_hash=r1_b,
             target_state="H40_CANDIDATE_LOCKED",
             predecessor_receipt_hash=r0,
+            _test_token=TEST_COMMIT_TOKEN,
         )
     assert store.get_committed_run_head(run_id).head_receipt_hash == r1_a
 
@@ -1984,6 +1992,7 @@ def test_a08_through_a14_durable_single_run_head(tmp_path: Path) -> None:
         receipt_hash=r2_wf,
         target_state="H40_WALK_FORWARD_VALIDATED",
         predecessor_receipt_hash=r1_a,
+        _test_token=TEST_COMMIT_TOKEN,
     )
     assert head2.head_receipt_hash == r2_wf
     with pytest.raises(H40GuardError, match="predecessor receipt hash mismatch"):
@@ -1992,28 +2001,39 @@ def test_a08_through_a14_durable_single_run_head(tmp_path: Path) -> None:
             receipt_hash=r2_nogo,
             target_state="H40_NO_GO",
             predecessor_receipt_hash=r1_a,
+            _test_token=TEST_COMMIT_TOKEN,
         )
 
     # A10: terminal then stale success rejected
     terminal_run_id = _hash("run-a10-terminal")
+    d0 = _publish_mock_envelope(store, _make_mock_discovery_receipt(terminal_run_id))
+    store.advance_run_head(
+        run_authority_id=terminal_run_id,
+        receipt_hash=d0,
+        target_state="H40_DISCOVERY",
+        predecessor_receipt_hash=None,
+        _test_token=TEST_COMMIT_TOKEN,
+    )
     t0 = _publish_mock_envelope(
         store,
-        _make_mock_termination_receipt(terminal_run_id, None, source_state="H40_PREREGISTERED", target_state="H40_NO_GO"),
+        _make_mock_termination_receipt(terminal_run_id, d0, source_state="H40_DISCOVERY", target_state="H40_NO_GO"),
     )
     store.advance_run_head(
         run_authority_id=terminal_run_id,
         receipt_hash=t0,
         target_state="H40_NO_GO",
-        predecessor_receipt_hash=None,
+        predecessor_receipt_hash=d0,
+        _test_token=TEST_COMMIT_TOKEN,
     )
     assert store.get_committed_run_head(terminal_run_id).terminal
-    stale_succ = _publish_mock_envelope(store, _make_mock_wf_receipt(terminal_run_id, t0, slot_index=1))
+    stale_succ = _publish_mock_envelope(store, _make_mock_candidate_receipt(terminal_run_id, d0, slot_index=1))
     with pytest.raises(H40GuardError, match="terminal state"):
         store.advance_run_head(
             run_authority_id=terminal_run_id,
             receipt_hash=stale_succ,
-            target_state="H40_WALK_FORWARD_VALIDATED",
-            predecessor_receipt_hash=t0,
+            target_state="H40_CANDIDATE_LOCKED",
+            predecessor_receipt_hash=d0,
+            _test_token=TEST_COMMIT_TOKEN,
         )
 
     # A11: success then stale terminal sibling rejected
@@ -2027,6 +2047,7 @@ def test_a08_through_a14_durable_single_run_head(tmp_path: Path) -> None:
             receipt_hash=stale_term,
             target_state="H40_NO_GO",
             predecessor_receipt_hash=r1_a,
+            _test_token=TEST_COMMIT_TOKEN,
         )
 
     # A12: two concurrent processes/transactions -> one winner
@@ -2039,6 +2060,7 @@ def test_a08_through_a14_durable_single_run_head(tmp_path: Path) -> None:
         receipt_hash=c0,
         target_state="H40_DISCOVERY",
         predecessor_receipt_hash=None,
+        _test_token=TEST_COMMIT_TOKEN,
     )
     cand_x = _publish_mock_envelope(store, _make_mock_candidate_receipt(concurrent_run_id, c0, slot_index=10))
     cand_y = _publish_mock_envelope(store, _make_mock_candidate_receipt(concurrent_run_id, c0, slot_index=20))
@@ -2052,6 +2074,7 @@ def test_a08_through_a14_durable_single_run_head(tmp_path: Path) -> None:
                 receipt_hash=cand_hash,
                 target_state="H40_CANDIDATE_LOCKED",
                 predecessor_receipt_hash=c0,
+                _test_token=TEST_COMMIT_TOKEN,
             )
             return (cand_hash, True, "")
         except H40GuardError as exc:
@@ -2076,12 +2099,12 @@ def test_a08_through_a14_durable_single_run_head(tmp_path: Path) -> None:
     store.persist_authorization(
         "01_discovery_authorization",
         chain.discovery,
-        revalidate=chain.service.revalidate_authorization,
+        service=chain.service,
     )
     store.persist_authorization(
         "02_candidate_lock",
         chain.candidate,
-        revalidate=chain.service.revalidate_authorization,
+        service=chain.service,
     )
     orphan_envelope = {
         "authority_context": {
@@ -2163,7 +2186,7 @@ def test_a15_through_a20_receipt_publication_and_crash_protocol(tmp_path: Path) 
     store.persist_authorization(
         "01_discovery_authorization",
         chain.discovery,
-        revalidate=chain.service.revalidate_authorization,
+        service=chain.service,
     )
     head_after_disc = store.get_committed_run_head(chain.run.run_authority_id)
     assert head_after_disc is not None
@@ -2191,6 +2214,7 @@ def test_a15_through_a20_receipt_publication_and_crash_protocol(tmp_path: Path) 
             receipt_hash=_hash("failing-receipt"),
             target_state="H40_CANDIDATE_LOCKED",
             predecessor_receipt_hash=_hash("wrong-predecessor"),
+            _test_token=TEST_COMMIT_TOKEN,
         )
     after_abort_head = store.get_committed_run_head(chain.run.run_authority_id)
     assert after_abort_head is not None
@@ -2200,12 +2224,12 @@ def test_a15_through_a20_receipt_publication_and_crash_protocol(tmp_path: Path) 
     p1 = store.persist_authorization(
         "01_discovery_authorization",
         chain.discovery,
-        revalidate=chain.service.revalidate_authorization,
+        service=chain.service,
     )
     p2 = store.persist_authorization(
         "01_discovery_authorization",
         chain.discovery,
-        revalidate=chain.service.revalidate_authorization,
+        service=chain.service,
     )
     assert p1 == p2
     head_after_retry = store.get_committed_run_head(chain.run.run_authority_id)
@@ -2225,6 +2249,7 @@ def test_a15_through_a20_receipt_publication_and_crash_protocol(tmp_path: Path) 
             receipt_hash=conflicting_hash,
             target_state="H40_CANDIDATE_LOCKED",
             predecessor_receipt_hash=_hash("other-pred"),
+            _test_token=TEST_COMMIT_TOKEN,
         )
 
     # A20: immutable receipt different-byte overwrite rejected
@@ -2234,7 +2259,7 @@ def test_a15_through_a20_receipt_publication_and_crash_protocol(tmp_path: Path) 
         store.persist_authorization(
             "02_candidate_lock",
             chain.candidate,
-            revalidate=chain.service.revalidate_authorization,
+            service=chain.service,
         )
 
 
@@ -2363,9 +2388,9 @@ def test_a21_through_a29_model_a_capability_lifetime(
     test_service = test_disc_chain.service
     derived_split = test_wf_chain.split
 
-    store.persist_authorization("01_discovery_authorization", test_disc_chain.discovery, revalidate=test_service.revalidate_authorization)
-    store.persist_authorization("02_candidate_lock", test_disc_chain.candidate, revalidate=test_service.revalidate_authorization)
-    store.persist_authorization("03_wf_validation", wf, revalidate=test_service.revalidate_authorization)
+    store.persist_authorization("01_discovery_authorization", test_disc_chain.discovery, service=test_service)
+    store.persist_authorization("02_candidate_lock", test_disc_chain.candidate, service=test_service)
+    store.persist_authorization("03_wf_validation", wf, service=test_service)
 
     # A25: cached WF after invalidation cannot reach Confirmation Ready
     cold_state["available"] = False
