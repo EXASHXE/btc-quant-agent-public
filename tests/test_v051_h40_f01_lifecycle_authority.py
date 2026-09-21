@@ -27,6 +27,8 @@ from btc_quant_agent.h40 import (
     H40CandidateVerification,
     H40ConfirmationGuard,
     H40DiscoveryResultEvidence,
+    H40DurableRunHead,
+    H40ExecutionGuard,
     H40ExpectedSplitAuthority,
     H40ExpectedWFFold,
     H40GuardError,
@@ -62,6 +64,7 @@ from btc_quant_agent.h40 import (
     compute_protocol_authority_hash,
     compute_semantic_root_hash,
     current_p1_authority_snapshot,
+    derive_expected_wf_authority,
     derive_required_sources_for_slot,
     lifecycle_governance_authority_object,
     lifecycle_semantic_contracts,
@@ -507,7 +510,7 @@ def test_t03_scientific_hashes_unchanged() -> None:
 
 
 def test_t04_governance_authority() -> None:
-    assert lifecycle_governance_authority_object()["schema_id"] == "H40_LIFECYCLE_GOVERNANCE_AUTHORITY_V3"
+    assert lifecycle_governance_authority_object()["schema_id"] == "H40_LIFECYCLE_GOVERNANCE_AUTHORITY_V4"
     assert compute_lifecycle_governance_authority_hash() == EXPECTED_LIFECYCLE_GOVERNANCE_AUTHORITY_HASH
 
 
@@ -1328,10 +1331,10 @@ def test_r01_r04_amended_authority_hashes_and_science_are_exact() -> None:
         == "76a0732742707c78f65da26263076bed7b586ea67d4f5ddd2dac33761e37e612"
     )
     assert compute_lifecycle_semantic_root_hash() == (
-        "fad50703c12da9af35366ceb8a774794b4ff2f3163a1adb6b624d3b69316e406"
+        "f0aa35eb91055a76129eae5c00be38174fcc13ae9fe08521d9202e93dc5d43d4"
     )
     assert compute_lifecycle_governance_authority_hash() == (
-        "7edce39c421ad6c487580483d2fa674b1f199e21640c33b1c08f85dddc6f64fc"
+        "72924dd22b3c9283964cdf368f7a754bd6f703a110989187620b36076a25a511"
     )
     assert compute_protocol_authority_hash() == EXPECTED_PROTOCOL_AUTHORITY_HASH
     assert compute_semantic_root_hash() == EXPECTED_SEMANTIC_ROOT_HASH
@@ -1671,3 +1674,722 @@ def test_r44_r46_f02_h39_and_final_holdout_remain_sealed() -> None:
     for path in ("artifacts/h39_protected/result", "artifacts/final_holdout/result"):
         with pytest.raises(H40GuardError):
             H40ProtectedSurfaceGuard.assert_surface_allowed(path)
+
+
+# =============================================================================
+# F01R3 Mandatory Adversarial Tests (A01 - A45)
+# =============================================================================
+
+
+class _ProductionEvidenceVerifier:
+    synthetic_only = False
+
+    def verify_discovery_manifest(
+        self,
+        evidence: H40DiscoveryResultEvidence,
+        entries: Sequence[H40CandidateResultEntry],
+    ) -> None:
+        del evidence, entries
+
+    def verify_candidate(
+        self,
+        entry: H40CandidateResultEntry,
+        *,
+        run_authority_id: str,
+        correction_manifest_hash: str,
+    ) -> H40CandidateVerification:
+        del entry, run_authority_id, correction_manifest_hash
+        return H40CandidateVerification(True, Decimal(0), Decimal(0))
+
+    def verify_wf_fold(
+        self,
+        entry: H40WFFoldResultEntry,
+        *,
+        evidence: H40WFValidationResultEvidence,
+    ) -> bool:
+        del entry, evidence
+        return True
+
+
+def test_a01_through_a07_derived_wf_authority() -> None:
+    # A04: exact derived WF universe == WF1..WF4 validation only
+    chain = _build_discovery_chain()
+    derived = derive_expected_wf_authority(seal=chain.seal)
+    assert derived.fold_names == ("WF1", "WF2", "WF3", "WF4")
+    assert derived.validation_partition_names == (
+        "WF1_VALIDATION",
+        "WF2_VALIDATION",
+        "WF3_VALIDATION",
+        "WF4_VALIDATION",
+    )
+    assert derived.split_manifest_hash == chain.seal.split_manifest_hash
+    assert derived.split_attestation_hash == chain.seal.split_attestation_hash
+
+    # A01: paired fold shrink + evidence shrink rejected
+    folds_3 = tuple(
+        H40ExpectedWFFold(
+            fold_id=f"WF{i}",
+            partition_id=f"WF{i}_VALIDATION",
+            split_definition_hash=_hash(f"fold-{i}"),
+        )
+        for i in range(1, 4)
+    )
+    with pytest.raises(ValueError, match="must contain exactly 4 WF validation folds"):
+        H40ExpectedSplitAuthority(
+            split_manifest_hash=chain.seal.split_manifest_hash,
+            split_attestation_hash=chain.seal.split_attestation_hash,
+            folds=folds_3,
+            accepted_validation_contract_hashes={"WF_GATE_SET_V1": _hash("wf-gate-set")},
+        )
+
+    # A02: paired validation-contract shrink + evidence shrink rejected
+    folds_4 = tuple(
+        H40ExpectedWFFold(
+            fold_id=f"WF{i}",
+            partition_id=f"WF{i}_VALIDATION",
+            split_definition_hash=_hash(f"fold-{i}"),
+        )
+        for i in range(1, 5)
+    )
+    with pytest.raises(ValueError, match="accepted_validation_contract_hashes"):
+        H40ExpectedSplitAuthority(
+            split_manifest_hash=chain.seal.split_manifest_hash,
+            split_attestation_hash=chain.seal.split_attestation_hash,
+            folds=folds_4,
+            accepted_validation_contract_hashes={},
+        )
+
+    # A03: extra fabricated fold + matching evidence rejected
+    folds_5 = tuple(
+        H40ExpectedWFFold(
+            fold_id=f"WF{i}",
+            partition_id=f"WF{i}_VALIDATION",
+            split_definition_hash=_hash(f"fold-{i}"),
+        )
+        for i in range(1, 6)
+    )
+    with pytest.raises(ValueError, match="must contain exactly 4 WF validation folds"):
+        H40ExpectedSplitAuthority(
+            split_manifest_hash=chain.seal.split_manifest_hash,
+            split_attestation_hash=chain.seal.split_attestation_hash,
+            folds=folds_5,
+            accepted_validation_contract_hashes={"WF_GATE_SET_V1": _hash("wf-gate-set")},
+        )
+
+    # A05: Confirmation partition cannot enter WF universe
+    assert "CONFIRMATION" not in " ".join(derived.validation_partition_names)
+    with pytest.raises(ValueError, match="fold_id"):
+        H40ExpectedWFFold(
+            fold_id="CONFIRMATION",
+            partition_id="CONFIRMATION_EVALUATION",
+            split_definition_hash=_hash("conf"),
+        )
+
+    # A06: missing WF2 or reordered WF3/WF4 rejected
+    reordered_folds = (
+        folds_4[0],
+        folds_4[1],
+        folds_4[3],
+        folds_4[2],
+    )
+    with pytest.raises(ValueError, match="must be strictly sorted"):
+        H40ExpectedSplitAuthority(
+            split_manifest_hash=chain.seal.split_manifest_hash,
+            split_attestation_hash=chain.seal.split_attestation_hash,
+            folds=reordered_folds,
+            accepted_validation_contract_hashes={"WF_GATE_SET_V1": _hash("wf-gate-set")},
+        )
+
+    # A07: caller-supplied expected authority cannot replace production derivation
+    prod_service = H40LifecycleAuthorityService(
+        implementation_authority=chain.authority,
+        accepted_implementation_authority_hash=chain.authority.lifecycle_implementation_authority_hash,
+        evidence_verifier=_ProductionEvidenceVerifier(),
+        synthetic_test_mode=False,
+        _construction_token=lifecycle_authority_module._VERIFIED_AUTHORITY_TOKEN,
+    )
+    with pytest.raises(H40GuardError, match="caller-supplied split authority cannot override"):
+        prod_service.authorize_wf_validation(
+            candidate_authority=chain.candidate,
+            evidence=None,  # type: ignore[arg-type]
+            split_authority=derived,
+            validated_at_utc=TS,
+            verified_at_utc=TS,
+        )
+
+
+def test_a08_through_a14_durable_single_run_head(tmp_path: Path) -> None:
+    store = H40LifecycleArtifactStore(tmp_path)
+    run_id = _hash("run-a08")
+    r0 = _hash("receipt-0")
+    r1_a = _hash("receipt-1-a")
+    r1_b = _hash("receipt-1-b")
+
+    # Sequence 0 commit
+    head0 = store.advance_run_head(
+        run_authority_id=run_id,
+        receipt_hash=r0,
+        target_state="H40_DISCOVERY",
+        predecessor_receipt_hash=None,
+    )
+    assert isinstance(head0, H40DurableRunHead)
+    assert head0.transition_sequence == 0
+    assert head0.head_receipt_hash == r0
+    assert not head0.terminal
+
+    # A08: two candidate-lock writers from same Discovery -> exactly one committed successor
+    head1_a = store.advance_run_head(
+        run_authority_id=run_id,
+        receipt_hash=r1_a,
+        target_state="H40_CANDIDATE_LOCKED",
+        predecessor_receipt_hash=r0,
+    )
+    assert head1_a.transition_sequence == 1
+    assert head1_a.head_receipt_hash == r1_a
+
+    # Writer B attempts to advance from r0
+    with pytest.raises(H40GuardError, match="predecessor receipt hash mismatch"):
+        store.advance_run_head(
+            run_authority_id=run_id,
+            receipt_hash=r1_b,
+            target_state="H40_CANDIDATE_LOCKED",
+            predecessor_receipt_hash=r0,
+        )
+    assert store.get_committed_run_head(run_id).head_receipt_hash == r1_a
+
+    # A09: WF success vs NO_GO from same candidate -> exactly one committed successor
+    r2_wf = _hash("receipt-2-wf")
+    r2_nogo = _hash("receipt-2-nogo")
+    head2 = store.advance_run_head(
+        run_authority_id=run_id,
+        receipt_hash=r2_wf,
+        target_state="H40_WALK_FORWARD_VALIDATED",
+        predecessor_receipt_hash=r1_a,
+    )
+    assert head2.head_receipt_hash == r2_wf
+    with pytest.raises(H40GuardError, match="predecessor receipt hash mismatch"):
+        store.advance_run_head(
+            run_authority_id=run_id,
+            receipt_hash=r2_nogo,
+            target_state="H40_NO_GO",
+            predecessor_receipt_hash=r1_a,
+        )
+
+    # A10: terminal then stale success rejected
+    terminal_run_id = _hash("run-a10-terminal")
+    t0 = _hash("term-receipt-0")
+    store.advance_run_head(
+        run_authority_id=terminal_run_id,
+        receipt_hash=t0,
+        target_state="H40_NO_GO",
+        predecessor_receipt_hash=None,
+    )
+    assert store.get_committed_run_head(terminal_run_id).terminal
+    with pytest.raises(H40GuardError, match="terminal state"):
+        store.advance_run_head(
+            run_authority_id=terminal_run_id,
+            receipt_hash=_hash("stale-succ"),
+            target_state="H40_WALK_FORWARD_VALIDATED",
+            predecessor_receipt_hash=t0,
+        )
+
+    # A11: success then stale terminal sibling rejected
+    with pytest.raises(H40GuardError, match="predecessor receipt hash mismatch"):
+        store.advance_run_head(
+            run_authority_id=run_id,
+            receipt_hash=_hash("stale-term-from-r1"),
+            target_state="H40_NO_GO",
+            predecessor_receipt_hash=r1_a,
+        )
+
+    # A12: two concurrent processes/transactions -> one winner
+    import concurrent.futures
+
+    concurrent_run_id = _hash("run-a12-concurrent")
+    c0 = _hash("c0-receipt")
+    store.advance_run_head(
+        run_authority_id=concurrent_run_id,
+        receipt_hash=c0,
+        target_state="H40_DISCOVERY",
+        predecessor_receipt_hash=None,
+    )
+    cand_x = _hash("cand-x")
+    cand_y = _hash("cand-y")
+    results: list[tuple[str, bool, str]] = []
+
+    def try_advance(cand_hash: str) -> tuple[str, bool, str]:
+        s = H40LifecycleArtifactStore(tmp_path)
+        try:
+            s.advance_run_head(
+                run_authority_id=concurrent_run_id,
+                receipt_hash=cand_hash,
+                target_state="H40_CANDIDATE_LOCKED",
+                predecessor_receipt_hash=c0,
+            )
+            return (cand_hash, True, "")
+        except H40GuardError as exc:
+            return (cand_hash, False, str(exc))
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
+        f1 = executor.submit(try_advance, cand_x)
+        f2 = executor.submit(try_advance, cand_y)
+        results = [f1.result(), f2.result()]
+
+    successes = [r for r in results if r[1]]
+    failures = [r for r in results if not r[1]]
+    assert len(successes) == 1
+    assert len(failures) == 1
+    assert "predecessor receipt hash mismatch" in failures[0][2]
+    committed = store.get_committed_run_head(concurrent_run_id)
+    assert committed is not None
+    assert committed.head_receipt_hash == successes[0][0]
+
+    # A13 & A14: restore non-head sibling rejected, arbitrary filename/key confers no authority
+    chain = _build_discovery_chain()
+    store.persist_authorization(
+        "01_discovery_authorization",
+        chain.discovery,
+        revalidate=chain.service.revalidate_authorization,
+    )
+    store.persist_authorization(
+        "02_candidate_lock",
+        chain.candidate,
+        revalidate=chain.service.revalidate_authorization,
+    )
+    orphan_envelope = {
+        "authority_context": {
+            "implementation_authority_hash": chain.authority.lifecycle_implementation_authority_hash,
+            "predecessor_receipt_hash": chain.discovery.receipt_hash,
+            "run_authority_id": chain.run.run_authority_id,
+            "runtime_seal_hash": chain.seal.authority_context_hash,
+            "split_authority_hash": None,
+        },
+        "bound_evidence": None,
+        "bound_evidence_sha256": None,
+        "receipt": {
+            "authorized_at_utc": TS,
+            "discovery_result_evidence_hash": _hash("other-ev"),
+            "locked_at_utc": TS,
+            "receipt_schema_id": "H40_CANDIDATE_LOCK_RECEIPT_V1",
+            "run_authority_id": chain.run.run_authority_id,
+            "selected_slot_hash": _hash("other-slot"),
+            "selected_slot_index": 2,
+            "selected_structural_configuration_hash": _hash("other-cfg"),
+            "target_state": "H40_CANDIDATE_LOCKED",
+            "upstream_receipt_hash": chain.discovery.receipt_hash,
+            "verified_at_utc": TS,
+        },
+    }
+    orphan_envelope["receipt_sha256"] = canonical_sha256(orphan_envelope["receipt"])
+    orphan_path = store._receipts_dir(chain.run.run_authority_id) / f"{orphan_envelope['receipt_sha256']}.json"
+    orphan_path.write_text(canonical_json(orphan_envelope) + "\n", encoding="utf-8")
+
+    resolver = H40SyntheticAuthorityResolver.for_tests(
+        implementation_authorities=(chain.authority,),
+        run_authorities=(chain.run,),
+        runtime_seals=(chain.seal,),
+    )
+    # A13: restore non-head sibling rejected
+    with pytest.raises(H40GuardError, match="not in committed run head lineage"):
+        store.restore_authorization(
+            chain.run.run_authority_id,
+            str(orphan_envelope["receipt_sha256"]),
+            service=chain.service,
+            resolver=resolver,
+        )
+
+    # A14: arbitrary filename/key confers no authority
+    fake_legacy_path = store._run_dir(chain.run.run_authority_id) / "99_fabricated.json"
+    fake_legacy_path.write_text(canonical_json(orphan_envelope) + "\n", encoding="utf-8")
+    with pytest.raises(H40GuardError, match="not in committed run head lineage"):
+        store.restore_authorization(
+            chain.run.run_authority_id,
+            "99_fabricated",
+            service=chain.service,
+            resolver=resolver,
+        )
+
+
+def test_a15_through_a20_receipt_publication_and_crash_protocol(tmp_path: Path) -> None:
+    chain = _build_discovery_chain()
+    store = H40LifecycleArtifactStore(tmp_path)
+    resolver = H40SyntheticAuthorityResolver.for_tests(
+        implementation_authorities=(chain.authority,),
+        run_authorities=(chain.run,),
+        runtime_seals=(chain.seal,),
+    )
+
+    # A15: partial temp receipt confers no authority
+    receipts_dir = store._receipts_dir(chain.run.run_authority_id)
+    receipts_dir.mkdir(parents=True, exist_ok=True)
+    temp_receipt = receipts_dir / "receipt.12345.tmp"
+    temp_receipt.write_text("partial content", encoding="utf-8")
+    with pytest.raises(H40GuardError):
+        store.restore_authorization(
+            chain.run.run_authority_id,
+            "receipt.12345.tmp",
+            service=chain.service,
+            resolver=resolver,
+        )
+
+    # Persist discovery
+    store.persist_authorization(
+        "01_discovery_authorization",
+        chain.discovery,
+        revalidate=chain.service.revalidate_authorization,
+    )
+    head_after_disc = store.get_committed_run_head(chain.run.run_authority_id)
+    assert head_after_disc is not None
+    assert head_after_disc.transition_sequence == 0
+
+    # A16: complete orphan receipt with old head confers no authority (crash C3: receipt published, head not advanced)
+    orphan_envelope = store._envelope(chain.candidate)
+    orphan_path = receipts_dir / f"{chain.candidate.receipt_hash}.json"
+    orphan_path.write_text(canonical_json(orphan_envelope) + "\n", encoding="utf-8")
+    current_head = store.get_committed_run_head(chain.run.run_authority_id)
+    assert current_head is not None
+    assert current_head.head_receipt_hash == chain.discovery.receipt_hash
+    with pytest.raises(H40GuardError, match="not in committed run head lineage"):
+        store.restore_authorization(
+            chain.run.run_authority_id,
+            chain.candidate.receipt_hash,
+            service=chain.service,
+            resolver=resolver,
+        )
+
+    # A17: head transaction abort keeps old head
+    with pytest.raises(H40GuardError):
+        store.advance_run_head(
+            run_authority_id=chain.run.run_authority_id,
+            receipt_hash=_hash("failing-receipt"),
+            target_state="H40_CANDIDATE_LOCKED",
+            predecessor_receipt_hash=_hash("wrong-predecessor"),
+        )
+    after_abort_head = store.get_committed_run_head(chain.run.run_authority_id)
+    assert after_abort_head is not None
+    assert after_abort_head.head_receipt_hash == chain.discovery.receipt_hash
+
+    # A18: exact retry idempotent after full reverification
+    p1 = store.persist_authorization(
+        "01_discovery_authorization",
+        chain.discovery,
+        revalidate=chain.service.revalidate_authorization,
+    )
+    p2 = store.persist_authorization(
+        "01_discovery_authorization",
+        chain.discovery,
+        revalidate=chain.service.revalidate_authorization,
+    )
+    assert p1 == p2
+    head_after_retry = store.get_committed_run_head(chain.run.run_authority_id)
+    assert head_after_retry is not None
+    assert head_after_retry.transition_sequence == 0
+
+    # A19: conflicting retry rejected
+    with pytest.raises(H40GuardError, match="predecessor receipt hash mismatch"):
+        store.advance_run_head(
+            run_authority_id=chain.run.run_authority_id,
+            receipt_hash=_hash("conflicting-receipt"),
+            target_state="H40_CANDIDATE_LOCKED",
+            predecessor_receipt_hash=_hash("other-pred"),
+        )
+
+    # A20: immutable receipt different-byte overwrite rejected
+    tampered_bytes = b'{"receipt": "tampered"}\n'
+    orphan_path.write_bytes(tampered_bytes)
+    with pytest.raises(H40GuardError, match="write-once immutable lifecycle receipt already exists with different bytes"):
+        store.persist_authorization(
+            "02_candidate_lock",
+            chain.candidate,
+            revalidate=chain.service.revalidate_authorization,
+        )
+
+
+
+
+def test_a21_through_a29_model_a_capability_lifetime(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    source_manifest, split_manifest, attestation, cold_state = (
+        _typed_production_authority_fixture(monkeypatch)
+    )
+    seal = H40RuntimeSnapshotSeal.from_verified_authority(
+        source_manifest=source_manifest,
+        split_manifest=split_manifest,
+        runtime_attestation=attestation,
+        repo_root=tmp_path,
+    )
+    assert not seal.synthetic_only
+    authority = _implementation_authority()
+    monkeypatch.setattr(
+        lifecycle_authority_module,
+        "ACCEPTED_LIFECYCLE_IMPLEMENTATION_AUTHORITY_HASH",
+        authority.lifecycle_implementation_authority_hash,
+    )
+    run = H40RunAuthority.from_seal(seal, authority.lifecycle_implementation_authority_hash)
+    store = H40LifecycleArtifactStore(tmp_path)
+    verifier = _ProductionEvidenceVerifier()
+    prod_service = H40LifecycleAuthorityService.production(
+        implementation_authority=authority,
+        evidence_verifier=verifier,
+    )
+
+    discovery = prod_service.authorize_discovery(
+        implementation_authority=authority,
+        run_authority=run,
+        seal=seal,
+        authorized_at_utc=TS,
+    )
+    assert discovery.receipt_hash
+
+    # A28: root seal reverified on production transition consumption
+    machine = H40LifecycleStateMachine()
+    machine.transition_with_verified_authority(discovery)
+    assert machine.current_state == H40LifecycleState.H40_DISCOVERY
+
+    # A21: source disappears after Discovery; cached Candidate transition rejected
+    cold_state["available"] = False
+    with pytest.raises(H40GuardError, match="failed cold validation"):
+        prod_service.authorize_candidate_lock(
+            discovery_authority=discovery,
+            evidence=None,  # type: ignore[arg-type]
+            locked_at_utc=TS,
+            verified_at_utc=TS,
+        )
+
+    # Restore cold_state
+    cold_state["available"] = True
+    sorted_roster = sorted(seal.roster, key=lambda r: r.structural_configuration_hash)
+    entries: list[H40CandidateResultEntry] = []
+    for pos, item in enumerate(sorted_roster):
+        entries.append(H40CandidateResultEntry(
+            candidate_result_input_evidence_hash=_hash(f"res-{pos}"),
+            complexity=len(item.family_id.split("+")),
+            family_id=item.family_id,
+            hard_gate_input_evidence_hashes={"ALL_ACCEPTED_HARD_GATES": _hash(f"gate-{pos}")},
+            net_expectancy_input_evidence_hash=_hash(f"net-{pos}"),
+            precision_input_evidence_hash=_hash(f"prec-{pos}"),
+            slot_hash=item.slot_hash,
+            slot_index=item.slot_index,
+            structural_configuration_hash=item.structural_configuration_hash,
+        ))
+    disc_evidence = H40DiscoveryResultEvidence(
+        candidate_result_entries=tuple(entries),
+        correction_input_evidence_manifest_hash=_hash("manifest"),
+        created_at_utc=TS,
+        discovery_authorization_receipt_hash=discovery.receipt_hash,
+        materialized_run_authority_hash=seal.materialized_run_authority_hash,
+        run_authority_id=run.run_authority_id,
+        sealed_registered_roster_hash=seal.sealed_registered_roster_hash,
+    )
+    candidate = prod_service.authorize_candidate_lock(
+        discovery_authority=discovery,
+        evidence=disc_evidence,
+        locked_at_utc=TS,
+        verified_at_utc=TS,
+    )
+
+    # A22: source disappears after Candidate Lock; WF transition rejected
+    cold_state["available"] = False
+    with pytest.raises(H40GuardError, match="failed cold validation"):
+        prod_service.authorize_wf_validation(
+            candidate_authority=candidate,
+            evidence=None,  # type: ignore[arg-type]
+            validated_at_utc=TS,
+            verified_at_utc=TS,
+        )
+
+    # Also check A28 with candidate on machine
+    with pytest.raises(H40GuardError, match="failed cold validation"):
+        machine.transition_with_verified_authority(candidate)
+
+    # A23: source mutates after Candidate Lock; WF transition rejected
+    cold_state["available"] = True
+    orig_validate = lifecycle_authority_module.validate_source_artifact
+
+    def mutated_validate(repo_root: Path | str, record: H40SourceRecord, expected_product: str | None = None, expected_cadence: str = "1h") -> H40SourceValidationReceipt:
+        r = orig_validate(repo_root, record, expected_product, expected_cadence)
+        return replace(r, file_sha256=_hash("mutated-source-bytes"))
+
+    monkeypatch.setattr(lifecycle_authority_module, "validate_source_artifact", mutated_validate)
+    with pytest.raises(H40GuardError, match="active source 'ETHUSDT_USD_M_1H' receipt does not equal cold validation receipt"):
+        prod_service.authorize_wf_validation(
+            candidate_authority=candidate,
+            evidence=None,  # type: ignore[arg-type]
+            validated_at_utc=TS,
+            verified_at_utc=TS,
+        )
+
+    # Restore validation function
+    monkeypatch.setattr(lifecycle_authority_module, "validate_source_artifact", orig_validate)
+
+    test_disc_chain = _build_discovery_chain(seal=seal)
+    test_wf_chain = _build_wf_chain(test_disc_chain)
+    wf = test_wf_chain.wf
+    test_service = test_disc_chain.service
+    derived_split = test_wf_chain.split
+
+    store.persist_authorization("01_discovery_authorization", test_disc_chain.discovery, revalidate=test_service.revalidate_authorization)
+    store.persist_authorization("02_candidate_lock", test_disc_chain.candidate, revalidate=test_service.revalidate_authorization)
+    store.persist_authorization("03_wf_validation", wf, revalidate=test_service.revalidate_authorization)
+
+    # A25: cached WF after invalidation cannot reach Confirmation Ready
+    cold_state["available"] = False
+    with pytest.raises(H40GuardError, match="failed cold validation"):
+        test_service.authorize_confirmation_ready(
+            wf_authority=wf,
+            prepared_at_utc=TS,
+        )
+
+    # A26: cold-restored WF after invalidation also rejected
+    resolver = H40SyntheticAuthorityResolver.for_tests(
+        implementation_authorities=(authority,),
+        run_authorities=(test_disc_chain.run,),
+        runtime_seals=(seal,),
+        split_authorities=(derived_split,),
+    )
+    with pytest.raises(H40GuardError, match="failed cold validation"):
+        store.restore_authorization(
+            test_disc_chain.run.run_authority_id,
+            wf.receipt_hash,
+            service=test_service,
+            resolver=resolver,
+        )
+
+    # A27: cached/cold result equivalence
+    cold_state["available"] = True
+    restored = store.restore_authorization(
+        test_disc_chain.run.run_authority_id,
+        wf.receipt_hash,
+        service=test_service,
+        resolver=resolver,
+    )
+    assert restored.receipt_hash == wf.receipt_hash
+    assert restored.receipt.to_dict() == wf.receipt.to_dict()
+    assert restored.target_state == wf.target_state
+
+    # A24: runtime source state changes after seal; cached transition rejected
+    cold_state["available"] = False
+    with pytest.raises(H40GuardError, match="failed cold validation"):
+        test_service.revalidate_authorization(wf)
+
+    # A29: synthetic authority remains isolated from production root verifier
+    synth_chain = _build_discovery_chain()
+    assert synth_chain.discovery.synthetic_only
+    synth_chain.service.revalidate_authorization(synth_chain.discovery)
+    with pytest.raises(H40GuardError, match="synthetic runtime seal is non-authoritative"):
+        prod_service.authorize_discovery(
+            implementation_authority=authority,
+            run_authority=synth_chain.run,
+            seal=synth_chain.seal,
+            authorized_at_utc=TS,
+        )
+
+
+def test_a30_through_a41_frozen_identities_and_invariants() -> None:
+    # A30: persistence child V2 hash exact
+    child_hashes = compute_lifecycle_child_hashes()
+    assert child_hashes["persistence_replay_contract"] == "5f014b867be17019c2be91ff48f8e23a43ed29678fc5589430ba174046fceaae"
+
+    # A31: lifecycle root V3 exact
+    assert compute_lifecycle_semantic_root_hash() == "f0aa35eb91055a76129eae5c00be38174fcc13ae9fe08521d9202e93dc5d43d4"
+
+    # A32: governance V4 exact
+    assert compute_lifecycle_governance_authority_hash() == "72924dd22b3c9283964cdf368f7a754bd6f703a110989187620b36076a25a511"
+
+    # A33: all other eight lifecycle child hashes unchanged
+    for name, expected in EXPECTED_LIFECYCLE_CHILD_HASHES.items():
+        assert child_hashes[name] == expected, f"child hash mismatch for {name}"
+
+    # A34: three scientific hashes unchanged
+    assert compute_protocol_authority_hash() == EXPECTED_PROTOCOL_AUTHORITY_HASH
+    assert compute_semantic_root_hash() == EXPECTED_SEMANTIC_ROOT_HASH
+    assert materialize_h40_search_space_production().structural_ledger_hash == EXPECTED_STRUCTURAL_LEDGER_HASH
+
+    # A35: 168/18/150 unchanged
+    ledger = materialize_h40_search_space_production()
+    assert len(ledger.slots) == 168
+    registered = [s for s in ledger.slots if s.status == "REGISTERED"]
+    assert len(registered) == 18
+    assert len(ledger.slots) - len(registered) == 150
+
+    # A36: BTC remains NOT_TESTABLE
+    btc_slots = [s for s in ledger.slots if any("BTC" in asset for asset in s.asset_scope)]
+    assert len(btc_slots) > 0
+    for s in btc_slots:
+        assert s.status != "REGISTERED"
+
+    # A37: active source union remains derived ETH-only
+    active_sources = sorted({src for slot in registered for src in derive_required_sources_for_slot(slot)})
+    assert active_sources == ["ETHUSDT_USD_M_1H"]
+
+    # A38: F02 remains sealed
+    assert H40LifecycleState.H40_CONFIRMATION_EVALUATED_ONCE not in H40LifecycleStateMachine.VALID_TRANSITIONS[H40LifecycleState.H40_CONFIRMATION_READY]
+
+    # A39: H39 protected
+    with pytest.raises(H40GuardError):
+        H40ProtectedSurfaceGuard.assert_surface_allowed("artifacts/h39_protected/result")
+
+    # A40: Final Holdout sealed
+    with pytest.raises(H40GuardError):
+        H40ProtectedSurfaceGuard.assert_surface_allowed("artifacts/final_holdout/result")
+
+    # A41: EXECUTION_DISABLED unaffected
+    with pytest.raises(H40GuardError):
+        H40ExecutionGuard.assert_execution_disabled()
+
+
+def test_a42_through_a45_generic_source_descriptor_equality(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    source_manifest, split_manifest, attestation, _ = (
+        _typed_production_authority_fixture(monkeypatch)
+    )
+    eth_record = source_manifest.get_source("ETHUSDT_USD_M_1H")
+    assert eth_record.receipt is not None
+
+    # A42: active row_count contradiction rejected
+    tampered_row_sources = tuple(
+        replace(s, row_count=s.row_count + 1) if s.source_id == "ETHUSDT_USD_M_1H" else s
+        for s in source_manifest.sources
+    )
+    tampered_row_manifest = replace(source_manifest, sources=tampered_row_sources)
+    with pytest.raises(H40GuardError, match="record row count"):
+        materialize_runtime_source_split_authority(
+            source_manifest=tampered_row_manifest,
+            repo_root=tmp_path,
+        )
+
+    # A43: active gap_count contradiction rejected
+    tampered_gap_sources = tuple(
+        replace(s, gap_count=1) if s.source_id == "ETHUSDT_USD_M_1H" else s
+        for s in source_manifest.sources
+    )
+    tampered_gap_manifest = replace(source_manifest, sources=tampered_gap_sources)
+    with pytest.raises(H40GuardError, match="record gap count"):
+        materialize_runtime_source_split_authority(
+            source_manifest=tampered_gap_manifest,
+            repo_root=tmp_path,
+        )
+
+    # A44: active start/end contradiction rejected
+    tampered_start_sources = tuple(
+        replace(s, start_utc="2020-01-01T00:00:00Z") if s.source_id == "ETHUSDT_USD_M_1H" else s
+        for s in source_manifest.sources
+    )
+    tampered_start_manifest = replace(source_manifest, sources=tampered_start_sources)
+    with pytest.raises(H40GuardError, match="record start timestamp"):
+        materialize_runtime_source_split_authority(
+            source_manifest=tampered_start_manifest,
+            repo_root=tmp_path,
+        )
+
+    # A45: NOT_TESTABLE descriptive data cannot grant authority
+    assert "BTCUSDT_USD_M_1H" not in attestation.active_required_source_ids
+    assert "BTCUSDT_USD_M_1H" in attestation.not_testable_source_ids
+    assert not any(e.source_id == "BTCUSDT_USD_M_1H" for e in attestation.active_source_evidence)
+    btc_record = source_manifest.get_source("BTCUSDT_USD_M_1H")
+    assert btc_record.status == H40SourceStatus.NOT_TESTABLE
+    assert btc_record.receipt is None

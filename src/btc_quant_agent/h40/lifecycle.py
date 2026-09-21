@@ -6,7 +6,7 @@ from enum import Enum
 from typing import ClassVar
 
 from .guards import H40GuardError, H40ReasonCode
-from .lifecycle_authority import VerifiedLifecycleAuthorization
+from .lifecycle_authority import H40RuntimeSnapshotSeal, VerifiedLifecycleAuthorization
 
 
 class H40LifecycleState(str, Enum):
@@ -133,6 +133,14 @@ class H40LifecycleStateMachine:
                 H40ReasonCode.NOT_TESTABLE,
                 "Synthetic lifecycle authority cannot advance a production state machine.",
             )
+        seal = authorization.context.get("seal")
+        if seal is not None and not getattr(seal, "synthetic_only", False):
+            if not isinstance(seal, H40RuntimeSnapshotSeal):
+                raise H40GuardError(
+                    H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                    "production authorization lacks runtime snapshot seal",
+                )
+            seal.verify_against_accepted_ledger()
         try:
             new_state = H40LifecycleState(authorization.target_state)
         except ValueError as exc:

@@ -13,6 +13,8 @@ import hashlib
 import json
 import os
 import re
+import sqlite3
+import uuid
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import InitVar, dataclass, field
 from datetime import UTC, datetime
@@ -41,13 +43,13 @@ from .source_manifest import (
     extract_verified_source_timestamps,
     validate_source_artifact,
 )
-from .split_manifest import H40SplitManifest
+from .split_manifest import H40PartitionType, H40SplitManifest
 
 EXPECTED_LIFECYCLE_SEMANTIC_ROOT_HASH = (
-    "fad50703c12da9af35366ceb8a774794b4ff2f3163a1adb6b624d3b69316e406"
+    "f0aa35eb91055a76129eae5c00be38174fcc13ae9fe08521d9202e93dc5d43d4"
 )
 EXPECTED_LIFECYCLE_GOVERNANCE_AUTHORITY_HASH = (
-    "7edce39c421ad6c487580483d2fa674b1f199e21640c33b1c08f85dddc6f64fc"
+    "72924dd22b3c9283964cdf368f7a754bd6f703a110989187620b36076a25a511"
 )
 DISCOVERY_SELECTION_CORRECTION_CONTRACT_HASH = (
     "f84c97050c7db813263e5ffda6b1c556af0b7b0e2876bb8616640d2c9d67084b"
@@ -149,7 +151,7 @@ _LIFECYCLE_CONTRACTS_JSON = r'''
   "confirmation_ready_receipt_contract":{"authority_rules":["wf_authorization_receipt_must_be_reverified","candidate_run_and_split_lineage_must_match_exactly","receipt_grants_waiting_state_only","receipt_grants_no_confirmation_data_or_outcome_access","f02_status_must_equal_OPEN_SEALED"],"authorized_transition":["H40_WALK_FORWARD_VALIDATED","H40_CONFIRMATION_READY"],"receipt_field_contract":{"confirmation_partition_end_utc":"constant:2026-02-01T00:00:00Z","confirmation_partition_name":"constant:CONFIRMATION_HOLDOUT","confirmation_partition_start_utc":"constant:2025-02-01T00:00:00Z","f02_blocker_status":"constant:OPEN_SEALED","locked_slot_hash":"sha256_equal_wf_authorization","locked_slot_index":"integer_equal_wf_authorization","locked_structural_configuration_hash":"sha256_equal_wf_authorization","prepared_at_utc":"audit_timestamp_utc","receipt_schema_id":"constant:H40_RECEIPT_CONFIRMATION_READY_V2","run_authority_id":"sha256_equal_wf_authorization","split_attestation_hash":"sha256_equal_verified_wf_evidence","split_manifest_hash":"sha256_equal_verified_wf_evidence","upstream_receipt_hash":"sha256_of_wf_validation_authorization_receipt","wf_validation_receipt_hash":"sha256_equal_upstream_receipt_hash"},"receipt_hash_rule":"canonical_sha256(exact_receipt_field_contract_keys_only)","schema_id":"H40_LIFECYCLE_CHILD_CONFIRMATION_READY_V1"},
   "termination_receipt_contract":{"accepted_reason_codes":["CONFIG_IDENTITY_CONFLICT","CONFIRMATION_HOLD_LOCKED","CONFIRMATION_NOT_READY","DUPLICATE_TIMESTAMP","EXECUTION_DISABLED","FAMILY_PAIR_RESTRICTED","HORIZON_TRUNCATED","INTERVAL_MISMATCH","LOOKBACK_RESERVED","NOT_TESTABLE","OUTSIDE_PREREGISTERED_SPLIT","PIT_UNAVAILABLE","PRODUCT_MISMATCH","PROTECTED_SURFACE_DENIED","PURGE_BOUNDARY","SEARCH_BUDGET_EXHAUSTED","SOURCE_GAP","SOURCE_HASH_MISMATCH","SOURCE_MISSING","SOURCE_UNVERIFIED","THRESHOLD_UNMET","UNAUTHORIZED_FAMILY"],"authority_rules":["termination_receipt_never_authorizes_forward_progress","H40_NO_GO_and_NOT_TESTABLE_are_absorbing","reason_code_must_belong_to_the_accepted_H40ReasonCode_vocabulary","failure_evidence_when_present_must_be_loaded_and_content_hash_verified","source_state_and_upstream_receipt_must_match_current_verified_chain"],"receipt_field_contract":{"detail_message":"audit_string","failure_evidence_hash":"sha256_or_null","reason_code":"accepted_H40ReasonCode","receipt_schema_id":"constant:H40_RECEIPT_TERMINATION_V2","run_authority_id":"sha256","source_state":"current_lifecycle_state","target_state":"enum:H40_NO_GO_or_NOT_TESTABLE","terminated_at_utc":"audit_timestamp_utc","upstream_receipt_hash":"current_verified_receipt_sha256_or_null"},"receipt_hash_rule":"canonical_sha256(exact_receipt_field_contract_keys_only)","schema_id":"H40_LIFECYCLE_CHILD_TERMINATION_V1","terminal_states":["H40_NO_GO","NOT_TESTABLE"]},
   "transition_matrix_contract":{"global_rules":["state_adjacency_is_necessary_never_sufficient","current_executable_HEAD_is_never_required_to_equal_historical_P1_commit","P1_scaffold_transition_verifies_historical_acceptance_artifact_integrity_and_frozen_scientific_identity","executable_authority_for_discovery_is_the_accepted_lifecycle_implementation_authority","all_unlisted_transitions_are_forbidden","terminal_states_are_absorbing"],"historical_scaffold_lineage":{"p1_accepted_code_baseline_commit_sha":"3fc89541ed0965fc0e2972af310e34ae1b838168","p1_final_acceptance_commit_sha":"95ab819d5300312b4d493b9585b4b369621504b6","p2_acceptance_record_commit_sha":"8c4e486752feadf8810ba853f27eaad5cb0b88a9","p2_accepted_code_baseline_commit_sha":"cfefdbabfeef8ab004e43bbda24038e4d5e3fca0","p2_final_acceptance_commit_sha":"5f1618ed73a91c954c1443f62f77152682b33ef4","p2r1_implementation_commit_sha":"255148c49754b70365816106d97dc21fcd1955ce","rule":"verify_historical_lineage_and_artifact_integrity_only_never_current_executable_HEAD_equality"},"rows":[{"authority":"P1_LINEAGE_VERIFIER_V1","source":"H40_PREREGISTERED","target":"H40_P1_SCAFFOLDED"},{"authority":"H40_RECEIPT_DISCOVERY_AUTH_V2","source":"H40_P1_SCAFFOLDED","target":"H40_DISCOVERY"},{"authority":"H40_RECEIPT_TERMINATION_V2","source":"H40_P1_SCAFFOLDED","target":"H40_NO_GO"},{"authority":"H40_RECEIPT_TERMINATION_V2","source":"H40_P1_SCAFFOLDED","target":"NOT_TESTABLE"},{"authority":"H40_RECEIPT_CANDIDATE_LOCK_V2_AFTER_RESULT_RECOMPUTATION","source":"H40_DISCOVERY","target":"H40_CANDIDATE_LOCKED"},{"authority":"H40_RECEIPT_TERMINATION_V2","source":"H40_DISCOVERY","target":"H40_NO_GO"},{"authority":"H40_RECEIPT_TERMINATION_V2","source":"H40_DISCOVERY","target":"NOT_TESTABLE"},{"authority":"H40_RECEIPT_WF_VALIDATION_V2_AFTER_RESULT_RECOMPUTATION","source":"H40_CANDIDATE_LOCKED","target":"H40_WALK_FORWARD_VALIDATED"},{"authority":"H40_RECEIPT_TERMINATION_V2_NO_RUNNER_UP","source":"H40_CANDIDATE_LOCKED","target":"H40_NO_GO"},{"authority":"H40_RECEIPT_CONFIRMATION_READY_V2","source":"H40_WALK_FORWARD_VALIDATED","target":"H40_CONFIRMATION_READY"},{"authority":"H40_RECEIPT_TERMINATION_V2","source":"H40_WALK_FORWARD_VALIDATED","target":"H40_NO_GO"},{"authority":"PROHIBITED_BY_H40_FSA_F02","source":"H40_CONFIRMATION_READY","target":"H40_CONFIRMATION_EVALUATED_ONCE"},{"authority":"H40_RECEIPT_TERMINATION_V2","source":"H40_CONFIRMATION_READY","target":"H40_NO_GO"}],"schema_id":"H40_LIFECYCLE_CHILD_TRANSITION_MATRIX_V1"},
-  "persistence_replay_contract":{"authorization_receipt_issuance":"only_the_accepted_implementation_verifier_may_atomically_construct_and_persist_authorization_after_recomputation_external_caller_receipts_are_inputs_for_reverification_not_trusted_claims","canonical_storage_key":"artifacts/h40/lifecycle/runs/<run_authority_id>","cross_boundary_checks":["run_authority_id_equal_at_every_chain_link","candidate_identity_equal_from_lock_through_confirmation_ready","split_manifest_and_attestation_equal_from_discovery_through_confirmation_ready","upstream_hash_equal_recomputed_predecessor_hash","lifecycle_governance_and_implementation_authorities_equal_accepted_values"],"failure_semantics":"any_missing_extra_malformed_hash_mismatch_lineage_mismatch_cross_run_cross_candidate_or_cross_split_condition_fails_closed_with_no_state_advance","persistence_rules":["write_canonical_JSON_with_atomic_create_if_absent","different_bytes_at_existing_transition_key_are_rejected","identical_bytes_are_idempotent_only_after_full_reverification","restore_recomputes_every_content_hash_and_every_authoritative_verifier_result","directory_filename_and_caller_label_have_no_authority","authorization_receipts_and_bound_result_evidence_are_write_once"],"run_authority_field_contract":{"discovery_selection_correction_contract_hash":"constant:f84c97050c7db813263e5ffda6b1c556af0b7b0e2876bb8616640d2c9d67084b","lifecycle_governance_authority_hash":"accepted_sha256","lifecycle_implementation_authority_hash":"accepted_sha256","materialized_run_authority_hash":"sha256","protocol_authority_hash":"constant:a83f8fc7a5ca7109fb8cd7fed114d87c3b2c968b5145c11cada203aa5111d1ce","schema_id":"constant:H40_RUN_AUTHORITY_V1","sealed_registered_roster_hash":"sha256","semantic_root_hash":"constant:71889a35f227ed734272b712851174a69bf9dbb12ea3f87cd84c26e7c66f6af1","source_manifest_hash":"sha256","split_attestation_hash":"sha256","split_manifest_hash":"sha256","structural_ledger_hash":"constant:483f68502b57972deae071c7bd4587ca3e57ccaa72bd99fb0de07b4f0ab8c85f"},"run_authority_rule":"run_authority_id_equals_canonical_sha256_of_exact_run_authority_field_contract_keys_only","run_instance_nonce":"none","schema_id":"H40_LIFECYCLE_CHILD_PERSISTENCE_REPLAY_V1","timestamp_rule":"exact_YYYY-MM-DDTHH:MM:SSZ_calendar_valid_UTC_hash_bound_audit_only_never_authorization_critical_no_clock_tolerance"},
+  "persistence_replay_contract":{"authorization_receipt_issuance":"only_the_accepted_implementation_verifier_may_atomically_construct_and_persist_authorization_after_recomputation_external_caller_receipts_are_inputs_for_reverification_not_trusted_claims","canonical_storage_key":"artifacts/h40/lifecycle/runs/<run_authority_id>","capability_lifetime_rule":"every_production_transition_issue_revalidation_and_consumption_must_recursively_reverify_the_root_runtime_snapshot_seal_and_current_active_source_truth_before_authority_is_used_cached_and_cold_restored_authority_must_apply_the_same_root_truth_checks","cross_boundary_checks":["run_authority_id_equal_at_every_chain_link","candidate_identity_equal_from_lock_through_confirmation_ready","split_manifest_and_attestation_equal_from_discovery_through_confirmation_ready","upstream_hash_equal_recomputed_predecessor_hash","lifecycle_governance_and_implementation_authorities_equal_accepted_values"],"durable_run_head_contract":{"concurrency_rule":"head_commit_must_be_a_linearizable_transactional_compare_and_advance_single_winner_stale_or_conflicting_writers_fail_closed","field_contract":{"head_predecessor_receipt_hash":"sha256_or_null","head_receipt_hash":"sha256","head_state":"accepted_lifecycle_state_equal_head_receipt_target_state","run_authority_id":"sha256_equal_current_run","schema_id":"constant:H40_DURABLE_RUN_HEAD_V1","terminal":"boolean_derived_from_accepted_terminal_states","transition_sequence":"integer_gte_0_monotonic_by_exactly_one"},"head_hash_rule":"canonical_sha256(exact_field_contract_keys_only)","ownership_rule":"exactly_one_committed_authoritative_head_per_run_authority_id","restore_rule":"only_receipts_reachable_from_the_current_committed_head_lineage_may_be_restored_as_authority","terminal_rule":"committed_terminal_head_is_absorbing_across_process_restart_and_all_later_consumers","transition_rule":"successor_commit_requires_expected_predecessor_receipt_hash_equal_current_committed_head_receipt_hash_expected_sequence_equal_current_sequence_plus_one_and_current_head_not_terminal"},"failure_semantics":"any_missing_extra_malformed_hash_mismatch_lineage_mismatch_cross_run_cross_candidate_cross_split_stale_head_conflicting_successor_or_terminal_successor_condition_fails_closed_with_no_committed_state_advance","persistence_rules":["receipt_and_bound_evidence_bytes_are_fully_materialized_and_fsynced_before_final_publication","immutable_receipts_are_content_addressed_and_atomically_published_without_overwriting_different_existing_bytes","unreferenced_fully_published_receipts_are_uncommitted_orphans_and_confer_no_lifecycle_authority","temporary_or_partial_artifacts_never_confer_authority","the_durable_run_head_is_the_only_commit_point_for_run_history","durable_run_head_advance_uses_linearizable_transactional_compare_and_advance_against_expected_predecessor_and_sequence","different_successor_for_the_same_committed_predecessor_is_rejected","identical_transition_retry_is_idempotent_only_after_full_reverification_and_exact_committed_successor_match","restore_recomputes_every_content_hash_every_authoritative_verifier_result_and_root_runtime_source_truth","restore_accepts_only_the_current_committed_head_or_receipts_on_its_unique_ancestor_lineage","directory_filename_and_caller_label_have_no_authority","authorization_receipts_and_bound_result_evidence_are_write_once"],"run_authority_field_contract":{"discovery_selection_correction_contract_hash":"constant:f84c97050c7db813263e5ffda6b1c556af0b7b0e2876bb8616640d2c9d67084b","lifecycle_governance_authority_hash":"accepted_sha256","lifecycle_implementation_authority_hash":"accepted_sha256","materialized_run_authority_hash":"sha256","protocol_authority_hash":"constant:a83f8fc7a5ca7109fb8cd7fed114d87c3b2c968b5145c11cada203aa5111d1ce","schema_id":"constant:H40_RUN_AUTHORITY_V1","sealed_registered_roster_hash":"sha256","semantic_root_hash":"constant:71889a35f227ed734272b712851174a69bf9dbb12ea3f87cd84c26e7c66f6af1","source_manifest_hash":"sha256","split_attestation_hash":"sha256","split_manifest_hash":"sha256","structural_ledger_hash":"constant:483f68502b57972deae071c7bd4587ca3e57ccaa72bd99fb0de07b4f0ab8c85f"},"run_authority_rule":"run_authority_id_equals_canonical_sha256_of_exact_run_authority_field_contract_keys_only","run_instance_nonce":"none","schema_id":"H40_LIFECYCLE_CHILD_PERSISTENCE_REPLAY_V2","timestamp_rule":"exact_YYYY-MM-DDTHH:MM:SSZ_calendar_valid_UTC_hash_bound_audit_only_never_authorization_critical_no_clock_tolerance"},
   "runtime_snapshot_seal_contract":{"materialized_run_authority_binding":["runtime_authority_snapshot_hash","source_manifest_hash","split_manifest_hash","split_attestation_hash","sealed_registered_roster_hash","registered_slot_count","not_testable_slot_count","total_slot_count"],"roster_entry_field_contract":{"family_id":"accepted_family_id","slot_hash":"sha256","slot_index":"integer_0_through_167","structural_configuration_hash":"sha256"},"roster_hash_rule":"canonical_sha256(array_of_exact_roster_entries_sorted_by_structural_configuration_hash_ascending)","runtime_source_split_attestation_contract":{"active_source_evidence_entry_field_contract":{"file_sha256":"sha256_equal_source_record_receipt_and_cold_validation_receipt","source_id":"accepted_source_id_required_by_at_least_one_sealed_REGISTERED_slot","source_record_hash":"canonical_sha256(exact_runtime_source_record)","source_validation_receipt_hash":"canonical_sha256(exact_cold_validation_receipt)","timestamp_count":"integer_gt_0_equal_source_record_receipt_and_cold_validation_receipt","timestamp_membership_hash":"sha256_equal_source_record_receipt_and_cold_validation_receipt"},"attestation_field_contract":{"accepted_reference_source_manifest_hash":"constant:af7fe2c187dcd503ba27a3f24ba6347cb3c619a63662106e85c6343eda90a74c","accepted_reference_split_manifest_hash":"constant:6e3ed51b4139c7822343752e29b6d8b2e94f9fadf0def38f2101a444b1da62e9","active_required_source_ids":"array_of_unique_source_ids_sorted_ascending_derived_as_union_of_project_required_sources_for_exact_sealed_REGISTERED_roster","active_source_evidence":"array_of_exact_active_source_evidence_entries_sorted_by_source_id","not_testable_slot_count":"integer_derived_from_sealed_runtime_projection","not_testable_source_ids":"array_of_source_ids_sorted_ascending_whose_accepted_runtime_state_is_NOT_TESTABLE","protocol_identity_hash":"constant:6533e880ced04214262f84c21fee98c478ef5c09fa7d0b9f55d650e673a1f971","registered_slot_count":"integer_derived_from_sealed_runtime_projection","runtime_authority_snapshot_hash":"sha256_of_exact_runtime_authority_snapshot_preimage","runtime_authority_snapshot_id":"accepted_nonempty_snapshot_id_bound_into_runtime_authority_snapshot_hash","schema_id":"constant:H40_RUNTIME_SOURCE_SPLIT_ATTESTATION_V1","sealed_registered_roster_hash":"sha256_equal_runtime_seal","source_authority_state_entries":"array_of_exact_source_authority_state_entries_sorted_by_source_id","source_manifest_hash":"sha256_of_exact_runtime_source_manifest","split_manifest_hash":"sha256_of_exact_runtime_scoped_authoritative_split_manifest","structural_ledger_hash":"constant:483f68502b57972deae071c7bd4587ca3e57ccaa72bd99fb0de07b4f0ab8c85f","total_slot_count":"constant:168"},"attestation_hash_rule":"canonical_sha256(exact_attestation_field_contract_keys_with_exact_nested_entry_fields)","source_authority_state_entry_field_contract":{"production_authority_state":"enum:VERIFIED_or_NOT_TESTABLE_equal_accepted_runtime_authority_snapshot","source_id":"accepted_runtime_source_id"},"verifier_rules":["require_typed_runtime_source_manifest_typed_runtime_split_manifest_and_exact_H40_RUNTIME_SOURCE_SPLIT_ATTESTATION_V1","recompute_source_manifest_split_manifest_attestation_and_runtime_snapshot_hashes_from_exact_canonical_objects","require_source_authority_state_entries_to_equal_the_complete_accepted_runtime_snapshot_preimage_without_inferring_authority_from_local_file_presence","derive_active_required_source_ids_as_the_exact_union_of_project_required_sources_over_the_complete_sealed_REGISTERED_roster","require_every_active_required_source_to_be_VERIFIED_in_the_accepted_runtime_snapshot_and_every_REGISTERED_slot_to_have_no_other_source_dependency","identity_validate_every_runtime_source_record_against_the_accepted_reference_source_manifest_without_promoting_NOT_TESTABLE_sources","cold_validate_only_every_active_required_source_and_bind_its_exact_record_receipt_file_and_timestamp_membership_hashes","require_not_testable_source_ids_to_equal_the_accepted_NOT_TESTABLE_snapshot_entries_and_forbid_active_source_evidence_for_them","verify_the_static_partition_calendar_against_the_accepted_reference_split_manifest_independently_of_source_availability","reconstruct_the_runtime_split_partitions_counts_exclusions_and_timestamp_hashes_from_the_intersection_of_exactly_the_cold_verified_active_required_sources","require_runtime_split_manifest_is_authoritative_true_under_this_attestation_and_never_treat_that_flag_as_sufficient_authority","require_runtime_split_protocol_source_manifest_and_attestation_lineage_to_match_exactly","reject_legacy_BTC_and_ETH_pair_attestation_synthetic_attestation_preregistered_schedule_only_and_hash_self_consistency_without_evidence_truth","bind_the_same_source_manifest_split_manifest_and_runtime_source_split_attestation_hashes_through_Discovery_WF_restore_and_replay"]},"schema_id":"H40_LIFECYCLE_CHILD_RUNTIME_SNAPSHOT_SEAL_V2","seal_rules":["seal_before_any_discovery_label_return_metric_or_candidate_result_access","REGISTERED_and_NOT_TESTABLE_are_derived_from_the_sealed_materialized_authority","counts_must_sum_to_total_slot_count_and_roster_length_must_equal_registered_slot_count","roster_entries_must_match_the_accepted_168_row_structural_ledger","post_seal_source_state_change_cannot_mutate_or_expand_the_active_roster","a_different_snapshot_or_materialized_authority_produces_a_different_run_authority_id","runtime_source_state_changes_never_change_protocol_semantic_or_structural_ledger_hashes"]},
   "f02_boundary_contract":{"allowed_scope":"define_H40ConfirmationReadyReceipt_and_verified_lineage_only","confirmation_state":"sealed_waiting_state_only","forbidden_capabilities":["confirmation_nonce","confirmation_unlock_key","one_shot_evaluation_authority","confirmation_outcome_access","confirmation_evaluation_execution"],"guard_result":"H40GuardError_with_CONFIRMATION_NOT_READY","prohibited_transition":["H40_CONFIRMATION_READY","H40_CONFIRMATION_EVALUATED_ONCE"],"schema_id":"H40_LIFECYCLE_CHILD_F02_BOUNDARY_V1","status":"H40_FSA_F02_OPEN_SEALED"}
 }
@@ -164,7 +166,7 @@ EXPECTED_LIFECYCLE_CHILD_HASHES: Mapping[str, str] = MappingProxyType({
     "confirmation_ready_receipt_contract": "7ab0ae0c8acb17340eccaa2bb737a5300e679b8de7497a539bdc44e93d3109be",
     "termination_receipt_contract": "b45c7021db1c63a447ddb22a1f9cb787ce71a5048c824ce38d40f19f755ecb48",
     "transition_matrix_contract": "58c8eefe64afd130c6244e40e3bc9ce3a6ef25f418bc7be18dced5defa56e1d3",
-    "persistence_replay_contract": "ae6582d64d3f0bdb9b7c8773ce758d011670ea7b7bbf433585806345aa239c26",
+    "persistence_replay_contract": "5f014b867be17019c2be91ff48f8e23a43ed29678fc5589430ba174046fceaae",
     "runtime_snapshot_seal_contract": "76a0732742707c78f65da26263076bed7b586ea67d4f5ddd2dac33761e37e612",
     "f02_boundary_contract": "5678d8bd6b83bb69e1a1ad2cf78af8ddbaece625a5a34b7018b0a5e6368756f4",
 })
@@ -205,6 +207,10 @@ def lifecycle_governance_authority_object() -> dict[str, Any]:
             "artifact_path": "reviews/v0.5/V0.5.1_H40_F01R2_SOURCE_SPLIT_RUNTIME_AUTHORITY_COMPATIBILITY_CLOSURE.md",
             "commit_sha": "e1263f4babc067bb56623081ee27769ac61b7e00",
         },
+        "f01r3_amendment_identity": {
+            "artifact_path": "reviews/v0.5/V0.5.1_H40_F01R3_SOL_ADJUDICATION_AND_CANONICAL_AMENDMENT.md",
+            "commit_sha": "ba41e186128e61e8162a7da6e2b2a0de03e4ba44",
+        },
         "lifecycle_semantic_root_hash": compute_lifecycle_semantic_root_hash(),
         "p2_final_acceptance_identity": {
             "artifact_path": "reviews/v0.5/V0.5.1_H40_P2_FINAL_INDEPENDENT_ACCEPTANCE.md",
@@ -215,10 +221,10 @@ def lifecycle_governance_authority_object() -> dict[str, Any]:
             "commit_sha": "89b014389b371ae1256d9b31ded86f10dd3b4783",
         },
         "prior_lifecycle_governance_authority_hash": (
-            "ee619e16bb665ba377baa2a50f92ea1c36ee207282e3f7757b54a0a1adf7b828"
+            "7edce39c421ad6c487580483d2fa674b1f199e21640c33b1c08f85dddc6f64fc"
         ),
         "protocol_authority_hash": compute_protocol_authority_hash(),
-        "schema_id": "H40_LIFECYCLE_GOVERNANCE_AUTHORITY_V3",
+        "schema_id": "H40_LIFECYCLE_GOVERNANCE_AUTHORITY_V4",
         "semantic_root_hash": compute_semantic_root_hash(),
         "structural_ledger_hash": EXPECTED_STRUCTURAL_LEDGER_HASH,
     }
@@ -811,6 +817,30 @@ def materialize_runtime_source_split_authority(
                 H40ReasonCode.SOURCE_HASH_MISMATCH,
                 f"active source '{source_id}' receipt does not equal cold validation receipt",
             )
+        if record.row_count != cold_receipt.timestamp_count:
+            raise H40GuardError(
+                H40ReasonCode.SOURCE_HASH_MISMATCH,
+                f"active source '{source_id}' record row count ({record.row_count}) "
+                f"does not equal cold receipt timestamp count ({cold_receipt.timestamp_count})",
+            )
+        if record.gap_count != cold_receipt.gap_count:
+            raise H40GuardError(
+                H40ReasonCode.SOURCE_HASH_MISMATCH,
+                f"active source '{source_id}' record gap count ({record.gap_count}) "
+                f"does not equal cold receipt gap count ({cold_receipt.gap_count})",
+            )
+        if record.start_utc != cold_receipt.first_timestamp_utc:
+            raise H40GuardError(
+                H40ReasonCode.SOURCE_HASH_MISMATCH,
+                f"active source '{source_id}' record start timestamp UTC ({record.start_utc}) "
+                f"does not equal cold receipt first timestamp ({cold_receipt.first_timestamp_utc})",
+            )
+        if record.end_utc != cold_receipt.last_timestamp_utc:
+            raise H40GuardError(
+                H40ReasonCode.SOURCE_HASH_MISMATCH,
+                f"active source '{source_id}' record end timestamp UTC ({record.end_utc}) "
+                f"does not equal cold receipt last timestamp ({cold_receipt.last_timestamp_utc})",
+            )
         timestamps = extract_verified_source_timestamps(
             repo_root,
             record,
@@ -1215,6 +1245,93 @@ class H40RunAuthority:
         return cls(**{name: str(data[name]) for name in cls._KEYS})
 
 
+def _fsync_dir(path: Path) -> None:
+    try:
+        fd = os.open(str(path), os.O_RDONLY | getattr(os, "O_DIRECTORY", 0))
+        try:
+            os.fsync(fd)
+        finally:
+            os.close(fd)
+    except OSError:
+        pass
+
+
+_TERMINAL_STATES: frozenset[str] = frozenset({"H40_NO_GO", "NOT_TESTABLE"})
+
+
+@dataclass(frozen=True)
+class H40DurableRunHead:
+    """Committed durable single run head under H40 F01R3 (ASTRA-B-02/H-01)."""
+
+    head_predecessor_receipt_hash: str | None
+    head_receipt_hash: str
+    head_state: str
+    run_authority_id: str
+    terminal: bool
+    transition_sequence: int
+    schema_id: str = "H40_DURABLE_RUN_HEAD_V1"
+
+    _KEYS: ClassVar[frozenset[str]] = frozenset({
+        "head_predecessor_receipt_hash",
+        "head_receipt_hash",
+        "head_state",
+        "run_authority_id",
+        "schema_id",
+        "terminal",
+        "transition_sequence",
+    })
+
+    def __post_init__(self) -> None:
+        if self.schema_id != "H40_DURABLE_RUN_HEAD_V1":
+            raise ValueError("durable run head schema mismatch")
+        _require_sha256(self.run_authority_id, "run_authority_id")
+        _require_sha256(self.head_receipt_hash, "head_receipt_hash")
+        _require_text(self.head_state, "head_state")
+        if self.head_predecessor_receipt_hash is not None:
+            _require_sha256(self.head_predecessor_receipt_hash, "head_predecessor_receipt_hash")
+        if not isinstance(self.transition_sequence, int) or isinstance(self.transition_sequence, bool):
+            raise TypeError("transition_sequence must be an integer")
+        if self.transition_sequence < 0:
+            raise ValueError("transition_sequence must be non-negative")
+        if not isinstance(self.terminal, bool):
+            raise TypeError("terminal must be a boolean")
+
+    @property
+    def head_hash(self) -> str:
+        return canonical_sha256(self.to_dict())
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "head_predecessor_receipt_hash": self.head_predecessor_receipt_hash,
+            "head_receipt_hash": self.head_receipt_hash,
+            "head_state": self.head_state,
+            "run_authority_id": self.run_authority_id,
+            "schema_id": self.schema_id,
+            "terminal": self.terminal,
+            "transition_sequence": self.transition_sequence,
+        }
+
+    @classmethod
+    def from_dict(cls, data: Mapping[str, Any]) -> H40DurableRunHead:
+        _require_exact_keys(data, cls._KEYS, cls.__name__)
+        pred = data["head_predecessor_receipt_hash"]
+        term = data["terminal"]
+        if not isinstance(term, bool):
+            raise TypeError("terminal must be a boolean")
+        seq = data["transition_sequence"]
+        if not isinstance(seq, int) or isinstance(seq, bool):
+            raise TypeError("transition_sequence must be an integer")
+        return cls(
+            head_predecessor_receipt_hash=str(pred) if pred is not None else None,
+            head_receipt_hash=str(data["head_receipt_hash"]),
+            head_state=str(data["head_state"]),
+            run_authority_id=str(data["run_authority_id"]),
+            schema_id=str(data["schema_id"]),
+            terminal=term,
+            transition_sequence=seq,
+        )
+
+
 @dataclass(frozen=True)
 class H40DiscoveryAuthorizationReceipt:
     authorized_at_utc: str
@@ -1609,6 +1726,10 @@ class H40ExpectedWFFold:
         _require_text(self.fold_id, "fold_id")
         _require_text(self.partition_id, "partition_id")
         _require_sha256(self.split_definition_hash, "split_definition_hash")
+        if "CONFIRMATION" in self.fold_id or not self.fold_id.startswith("WF"):
+            raise ValueError(f"invalid fold_id '{self.fold_id}': cannot enter WF universe")
+        if "CONFIRMATION" in self.partition_id:
+            raise ValueError(f"invalid partition_id '{self.partition_id}': cannot enter WF universe")
 
     @property
     def fold_identity_hash(self) -> str:
@@ -1651,8 +1772,19 @@ class H40ExpectedSplitAuthority:
         object.__setattr__(self, "folds", folds)
         _require_sha256(self.split_manifest_hash, "split_manifest_hash")
         _require_sha256(self.split_attestation_hash, "split_attestation_hash")
-        if not self.folds:
-            raise ValueError("authoritative WF fold set cannot be empty")
+        if len(self.folds) != 4:
+            raise ValueError("must contain exactly 4 WF validation folds")
+        expected_folds = ("WF1", "WF2", "WF3", "WF4")
+        expected_partitions = (
+            "WF1_VALIDATION",
+            "WF2_VALIDATION",
+            "WF3_VALIDATION",
+            "WF4_VALIDATION",
+        )
+        if tuple(fold.fold_id for fold in self.folds) != expected_folds:
+            raise ValueError("must be strictly sorted and contain exactly WF1..WF4")
+        if tuple(fold.partition_id for fold in self.folds) != expected_partitions:
+            raise ValueError("must be strictly sorted and contain exactly WF1_VALIDATION..WF4_VALIDATION")
         identities = [fold.fold_identity_hash for fold in self.folds]
         if len(identities) != len(set(identities)):
             raise ValueError("authoritative WF fold identities must be unique")
@@ -1665,7 +1797,15 @@ class H40ExpectedSplitAuthority:
             ),
         )
         if not self.accepted_validation_contract_hashes:
-            raise ValueError("accepted validation contract set cannot be empty")
+            raise ValueError("accepted_validation_contract_hashes cannot be empty")
+
+    @property
+    def fold_names(self) -> tuple[str, ...]:
+        return tuple(fold.fold_id for fold in self.folds)
+
+    @property
+    def validation_partition_names(self) -> tuple[str, ...]:
+        return tuple(fold.partition_id for fold in self.folds)
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -1708,6 +1848,172 @@ class H40ExpectedSplitAuthority:
                 str(key): str(value) for key, value in contracts.items()
             },
         )
+
+
+def derive_expected_wf_authority(
+    candidate_authority: VerifiedLifecycleAuthorization | None = None,
+    *,
+    seal: H40RuntimeSnapshotSeal | None = None,
+    split_manifest: H40SplitManifest | None = None,
+    accepted_validation_contract_hashes: Mapping[str, str] | None = None,
+) -> H40ExpectedSplitAuthority:
+    """Deterministically derive the expected production WF authority.
+
+    Under H40 F01R3 (ASTRA-B-01), production expected WF authority must be
+    internally derived from the exact seal-bound runtime split manifest.
+    The authoritative universe contains exactly four folds: WF1..WF4,
+    mapped to WF1_VALIDATION..WF4_VALIDATION.  Confirmation partitions must
+    never enter the WF fold universe.
+    """
+    if candidate_authority is not None:
+        if not isinstance(candidate_authority, VerifiedLifecycleAuthorization):
+            raise TypeError("candidate_authority must be VerifiedLifecycleAuthorization")
+        if candidate_authority.target_state != "H40_CANDIDATE_LOCKED":
+            raise H40GuardError(
+                H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                "expected WF authority can only be derived from a locked candidate",
+            )
+        candidate_seal = candidate_authority.context.get("seal")
+        if not isinstance(candidate_seal, H40RuntimeSnapshotSeal):
+            raise H40GuardError(
+                H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                "candidate authority lacks bound runtime snapshot seal",
+            )
+        if seal is not None and seal != candidate_seal:
+            raise H40GuardError(
+                H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                "supplied seal does not match candidate authority seal",
+            )
+        seal = candidate_seal
+    elif seal is None:
+        raise TypeError("either candidate_authority or seal must be provided")
+
+    if not isinstance(seal, H40RuntimeSnapshotSeal):
+        raise TypeError("seal must be H40RuntimeSnapshotSeal")
+
+    is_synthetic = seal.synthetic_only or (
+        candidate_authority is not None and candidate_authority.synthetic_only
+    )
+
+    if not is_synthetic:
+        # Production mode
+        if split_manifest is not None and split_manifest != seal._split_manifest_context:
+            raise H40GuardError(
+                H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                "cannot override production seal split manifest",
+            )
+        resolved_split_manifest = seal._split_manifest_context
+        if resolved_split_manifest is None:
+            raise H40GuardError(
+                H40ReasonCode.SOURCE_UNVERIFIED,
+                "production seal missing bound runtime split manifest context",
+            )
+        if accepted_validation_contract_hashes is not None:
+            raise H40GuardError(
+                H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                "cannot inject caller validation contracts into production WF derivation",
+            )
+        # Production P3 statistical validation contracts are not yet materialized
+        raise H40GuardError(
+            H40ReasonCode.NOT_TESTABLE,
+            "accepted P3 validation contracts are not yet materialized in production",
+        )
+    else:
+        # Synthetic test mode
+        resolved_split_manifest = (
+            split_manifest
+            or seal._split_manifest_context
+            or (candidate_authority.context.get("split_manifest") if candidate_authority else None)
+        )
+        contracts = (
+            accepted_validation_contract_hashes
+            or (
+                candidate_authority.context.get("accepted_validation_contract_hashes")
+                if candidate_authority
+                else None
+            )
+            or {"WF_GATE_SET_V1": hashlib.sha256(b"wf-gate-set").hexdigest()}
+        )
+
+    if resolved_split_manifest is None:
+        derived_folds = tuple(
+            H40ExpectedWFFold(
+                fold_id=f"WF{i}",
+                partition_id=f"WF{i}_VALIDATION",
+                split_definition_hash=hashlib.sha256(f"fold-{i}".encode("utf-8")).hexdigest(),
+            )
+            for i in range(1, 5)
+        )
+        return H40ExpectedSplitAuthority(
+            split_manifest_hash=seal.split_manifest_hash,
+            split_attestation_hash=seal.split_attestation_hash,
+            folds=derived_folds,
+            accepted_validation_contract_hashes=contracts,
+        )
+
+    if resolved_split_manifest.split_hash != seal.split_manifest_hash:
+        raise H40GuardError(
+            H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+            "split manifest hash mismatch against sealed runtime authority",
+        )
+
+    # Filter strictly for partition_type == VALIDATION
+    wf_partitions = [
+        p
+        for p in resolved_split_manifest.partitions
+        if p.partition_type == H40PartitionType.VALIDATION
+    ]
+
+    # Explicitly reject confirmation partitions
+    for p in resolved_split_manifest.partitions:
+        if (
+            p.fold == "CONFIRMATION"
+            or "CONFIRMATION" in p.partition_id
+            or p.partition_type.value.startswith("CONFIRMATION")
+        ) and p in wf_partitions:
+            raise H40GuardError(
+                H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                "Confirmation partition cannot enter WF fold universe",
+            )
+
+    if len(wf_partitions) != 4:
+        raise H40GuardError(
+            H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+            f"exact WF fold universe must contain 4 validation folds, got {len(wf_partitions)}",
+        )
+
+    expected_folds = ("WF1", "WF2", "WF3", "WF4")
+    expected_partitions = (
+        "WF1_VALIDATION",
+        "WF2_VALIDATION",
+        "WF3_VALIDATION",
+        "WF4_VALIDATION",
+    )
+    if tuple(p.fold for p in wf_partitions) != expected_folds:
+        raise H40GuardError(
+            H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+            "exact WF folds must be WF1, WF2, WF3, WF4 in authoritative split order",
+        )
+    if tuple(p.partition_id for p in wf_partitions) != expected_partitions:
+        raise H40GuardError(
+            H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+            "exact WF partitions must be WF1_VALIDATION..WF4_VALIDATION in order",
+        )
+
+    derived_folds = tuple(
+        H40ExpectedWFFold(
+            fold_id=p.fold,
+            partition_id=p.partition_id,
+            split_definition_hash=canonical_sha256(p.to_dict()),
+        )
+        for p in wf_partitions
+    )
+    return H40ExpectedSplitAuthority(
+        split_manifest_hash=seal.split_manifest_hash,
+        split_attestation_hash=seal.split_attestation_hash,
+        folds=derived_folds,
+        accepted_validation_contract_hashes=contracts,
+    )
 
 
 @dataclass(frozen=True)
@@ -2517,6 +2823,21 @@ class H40LifecycleAuthorityService:
             token=_VERIFIED_AUTHORITY_TOKEN,
         )
 
+    def _reverify_root_source_truth(
+        self,
+        authorization: VerifiedLifecycleAuthorization,
+    ) -> None:
+        """Capability lifetime Model A: reverify root truth at every production transition use."""
+        seal = authorization.context.get("seal")
+        if seal is None or getattr(seal, "synthetic_only", False):
+            return
+        if not isinstance(seal, H40RuntimeSnapshotSeal):
+            raise H40GuardError(
+                H40ReasonCode.SOURCE_UNVERIFIED,
+                "production authorization missing bound production runtime seal",
+            )
+        seal.verify_against_accepted_ledger()
+
     def _require_prior(
         self,
         prior: VerifiedLifecycleAuthorization,
@@ -2530,6 +2851,7 @@ class H40LifecycleAuthorityService:
             raise H40GuardError(H40ReasonCode.CONFIG_IDENTITY_CONFLICT, "prior transition authority mismatch")
         if prior.receipt.receipt_sha256 != prior.receipt_hash:
             raise H40GuardError(H40ReasonCode.CONFIG_IDENTITY_CONFLICT, "prior receipt content mismatch")
+        self._reverify_root_source_truth(prior)
 
     def authorize_discovery(
         self,
@@ -2612,13 +2934,13 @@ class H40LifecycleAuthorityService:
         locked_at_utc: str,
         verified_at_utc: str,
     ) -> VerifiedLifecycleAuthorization:
-        if not isinstance(evidence, H40DiscoveryResultEvidence):
-            raise TypeError("candidate lock requires H40DiscoveryResultEvidence")
         self._require_prior(
             discovery_authority,
             source_state="H40_P1_SCAFFOLDED",
             target_state="H40_DISCOVERY",
         )
+        if not isinstance(evidence, H40DiscoveryResultEvidence):
+            raise TypeError("candidate lock requires H40DiscoveryResultEvidence")
         verifier = self._evidence_verifier
         if verifier is None:
             raise H40GuardError(H40ReasonCode.NOT_TESTABLE, "no accepted scientific evidence verifier")
@@ -2712,19 +3034,34 @@ class H40LifecycleAuthorityService:
         *,
         candidate_authority: VerifiedLifecycleAuthorization,
         evidence: H40WFValidationResultEvidence,
-        split_authority: H40ExpectedSplitAuthority,
+        split_authority: H40ExpectedSplitAuthority | None = None,
         validated_at_utc: str,
         verified_at_utc: str,
     ) -> VerifiedLifecycleAuthorization:
-        if not isinstance(evidence, H40WFValidationResultEvidence):
-            raise TypeError("WF validation requires H40WFValidationResultEvidence")
-        if not isinstance(split_authority, H40ExpectedSplitAuthority):
-            raise TypeError("WF validation requires H40ExpectedSplitAuthority")
+        if not self._synthetic_test_mode and split_authority is not None:
+            raise H40GuardError(
+                H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                "caller-supplied split authority cannot override production derivation",
+            )
         self._require_prior(
             candidate_authority,
             source_state="H40_DISCOVERY",
             target_state="H40_CANDIDATE_LOCKED",
         )
+        if not isinstance(evidence, H40WFValidationResultEvidence):
+            raise TypeError("WF validation requires H40WFValidationResultEvidence")
+        active_split: H40ExpectedSplitAuthority
+        if not self._synthetic_test_mode and not candidate_authority.synthetic_only:
+            expected_split = derive_expected_wf_authority(candidate_authority)
+            active_split = expected_split
+        else:
+            if split_authority is None:
+                active_split = derive_expected_wf_authority(candidate_authority)
+            else:
+                if not isinstance(split_authority, H40ExpectedSplitAuthority):
+                    raise TypeError("WF validation requires H40ExpectedSplitAuthority")
+                active_split = split_authority
+
         verifier = self._evidence_verifier
         if verifier is None:
             raise H40GuardError(H40ReasonCode.NOT_TESTABLE, "no accepted WF evidence verifier")
@@ -2738,10 +3075,10 @@ class H40LifecycleAuthorityService:
             or evidence.locked_slot_index != receipt.selected_slot_index
             or evidence.locked_structural_configuration_hash
             != receipt.selected_structural_configuration_hash
-            or evidence.split_manifest_hash != split_authority.split_manifest_hash
-            or evidence.split_attestation_hash != split_authority.split_attestation_hash
+            or evidence.split_manifest_hash != active_split.split_manifest_hash
+            or evidence.split_attestation_hash != active_split.split_attestation_hash
             or dict(evidence.accepted_validation_contract_hashes)
-            != dict(split_authority.accepted_validation_contract_hashes)
+            != dict(active_split.accepted_validation_contract_hashes)
         ):
             raise H40GuardError(H40ReasonCode.CONFIG_IDENTITY_CONFLICT, "WF result lineage mismatch")
         actual_folds = [
@@ -2750,7 +3087,7 @@ class H40LifecycleAuthorityService:
         ]
         expected_folds = [
             (item.fold_id, item.partition_id, item.split_definition_hash, item.fold_identity_hash)
-            for item in split_authority.folds
+            for item in active_split.folds
         ]
         if actual_folds != expected_folds:
             raise H40GuardError(
@@ -2792,7 +3129,7 @@ class H40LifecycleAuthorityService:
                 **self._inherited_authority_context(candidate_authority),
                 "candidate_authority": candidate_authority,
                 "evidence": evidence,
-                "split_authority": split_authority,
+                "split_authority": active_split,
             },
         )
 
@@ -2916,6 +3253,7 @@ class H40LifecycleAuthorityService:
         """Recompute a previously issued authorization and all bound synthetic evidence."""
         if not isinstance(authorization, VerifiedLifecycleAuthorization) or authorization._issuer_id is not self._issuer_id:
             raise H40GuardError(H40ReasonCode.CONFIG_IDENTITY_CONFLICT, "foreign verifier authority")
+        self._reverify_root_source_truth(authorization)
         receipt = authorization.receipt
         reconstructed: VerifiedLifecycleAuthorization
         if isinstance(receipt, H40DiscoveryAuthorizationReceipt):
@@ -3208,14 +3546,193 @@ class H40LifecycleArtifactStore:
     def __init__(self, base_path: str | Path) -> None:
         self._base_path = Path(base_path)
 
+    @property
+    def sqlite_path(self) -> Path:
+        return self._base_path / "artifacts" / "h40" / "lifecycle" / "lifecycle_heads.sqlite3"
+
+    def _get_sqlite_conn(self) -> sqlite3.Connection:
+        self.sqlite_path.parent.mkdir(parents=True, exist_ok=True)
+        conn = sqlite3.connect(str(self.sqlite_path), timeout=60.0, isolation_level=None)
+        conn.execute("PRAGMA journal_mode=WAL")
+        conn.execute("PRAGMA synchronous=FULL")
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS h40_lifecycle_run_heads (
+                run_authority_id TEXT PRIMARY KEY,
+                head_receipt_hash TEXT NOT NULL,
+                head_state TEXT NOT NULL,
+                head_predecessor_receipt_hash TEXT,
+                transition_sequence INTEGER NOT NULL,
+                terminal INTEGER NOT NULL,
+                head_json TEXT NOT NULL
+            )
+            """
+        )
+        return conn
+
+    def get_committed_run_head(self, run_authority_id: str) -> H40DurableRunHead | None:
+        _require_sha256(run_authority_id, "run_authority_id")
+        conn = self._get_sqlite_conn()
+        try:
+            cursor = conn.execute(
+                "SELECT head_json FROM h40_lifecycle_run_heads WHERE run_authority_id = ?",
+                (run_authority_id,),
+            )
+            row = cursor.fetchone()
+            if row is None:
+                return None
+            return H40DurableRunHead.from_dict(json.loads(row[0]))
+        finally:
+            conn.close()
+
+    def advance_run_head(
+        self,
+        *,
+        run_authority_id: str,
+        receipt_hash: str,
+        target_state: str,
+        predecessor_receipt_hash: str | None,
+    ) -> H40DurableRunHead:
+        _require_sha256(run_authority_id, "run_authority_id")
+        _require_sha256(receipt_hash, "receipt_hash")
+        _require_text(target_state, "target_state")
+        if predecessor_receipt_hash is not None:
+            _require_sha256(predecessor_receipt_hash, "predecessor_receipt_hash")
+
+        conn = self._get_sqlite_conn()
+        try:
+            conn.execute("BEGIN IMMEDIATE")
+            cursor = conn.execute(
+                "SELECT head_receipt_hash, head_state, head_predecessor_receipt_hash, "
+                "transition_sequence, terminal, head_json FROM h40_lifecycle_run_heads "
+                "WHERE run_authority_id = ?",
+                (run_authority_id,),
+            )
+            row = cursor.fetchone()
+            if row is None:
+                sequence = 0
+                terminal = target_state in _TERMINAL_STATES
+                head = H40DurableRunHead(
+                    head_predecessor_receipt_hash=predecessor_receipt_hash,
+                    head_receipt_hash=receipt_hash,
+                    head_state=target_state,
+                    run_authority_id=run_authority_id,
+                    terminal=terminal,
+                    transition_sequence=sequence,
+                )
+                head_json = canonical_json(head.to_dict())
+                conn.execute(
+                    "INSERT INTO h40_lifecycle_run_heads "
+                    "(run_authority_id, head_receipt_hash, head_state, "
+                    "head_predecessor_receipt_hash, transition_sequence, terminal, head_json) "
+                    "VALUES (?, ?, ?, ?, ?, ?, ?)",
+                    (run_authority_id, receipt_hash, target_state, predecessor_receipt_hash, sequence, int(terminal), head_json),
+                )
+                conn.execute("COMMIT")
+            else:
+                curr_receipt, curr_state, curr_pred, curr_seq, curr_term, curr_json = row
+                if curr_receipt == receipt_hash:
+                    # Idempotent retry
+                    conn.execute("COMMIT")
+                    return H40DurableRunHead.from_dict(json.loads(curr_json))
+
+                if bool(curr_term):
+                    conn.execute("ROLLBACK")
+                    raise H40GuardError(
+                        H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                        f"run '{run_authority_id}' is in terminal state '{curr_state}'; no forward commits allowed",
+                    )
+
+                if predecessor_receipt_hash != curr_receipt:
+                    conn.execute("ROLLBACK")
+                    raise H40GuardError(
+                        H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                        f"predecessor receipt hash mismatch: expected current head '{curr_receipt}', "
+                        f"got '{predecessor_receipt_hash}'",
+                    )
+
+                next_seq = curr_seq + 1
+                terminal = target_state in _TERMINAL_STATES
+                head = H40DurableRunHead(
+                    head_predecessor_receipt_hash=curr_receipt,
+                    head_receipt_hash=receipt_hash,
+                    head_state=target_state,
+                    run_authority_id=run_authority_id,
+                    terminal=terminal,
+                    transition_sequence=next_seq,
+                )
+                head_json = canonical_json(head.to_dict())
+                conn.execute(
+                    "UPDATE h40_lifecycle_run_heads SET "
+                    "head_receipt_hash = ?, head_state = ?, head_predecessor_receipt_hash = ?, "
+                    "transition_sequence = ?, terminal = ?, head_json = ? "
+                    "WHERE run_authority_id = ?",
+                    (receipt_hash, target_state, curr_receipt, next_seq, int(terminal), head_json, run_authority_id),
+                )
+                conn.execute("COMMIT")
+        except Exception:
+            try:
+                conn.execute("ROLLBACK")
+            except Exception:
+                pass
+            raise
+        finally:
+            conn.close()
+
+        # Mirror head.json
+        run_dir = self._run_dir(run_authority_id)
+        run_dir.mkdir(parents=True, exist_ok=True)
+        head_path = run_dir / "head.json"
+        head_tmp = run_dir / f"head.tmp.{os.getpid()}_{uuid.uuid4().hex}"
+        head_tmp.write_text(canonical_json(head.to_dict()) + "\n", encoding="utf-8")
+        os.replace(head_tmp, head_path)
+        _fsync_dir(run_dir)
+        return head
+
     def _run_dir(self, run_authority_id: str) -> Path:
         _require_sha256(run_authority_id, "run_authority_id")
         return self._base_path / "artifacts" / "h40" / "lifecycle" / "runs" / run_authority_id
 
+    def _receipts_dir(self, run_authority_id: str) -> Path:
+        return self._run_dir(run_authority_id) / "receipts"
+
     def _path(self, run_authority_id: str, transition_key: str) -> Path:
+        if _SHA256_RE.fullmatch(transition_key):
+            return self._receipts_dir(run_authority_id) / f"{transition_key}.json"
         if self._KEY_RE.fullmatch(transition_key) is None:
-            raise ValueError("transition_key must match NN_lowercase_name")
+            raise ValueError("transition_key must match NN_lowercase_name or sha256 hex")
         return self._run_dir(run_authority_id) / f"{transition_key}.json"
+
+    def _find_receipt_path(self, run_authority_id: str, key_or_hash: str) -> Path:
+        if _SHA256_RE.fullmatch(key_or_hash):
+            p = self._receipts_dir(run_authority_id) / f"{key_or_hash}.json"
+            if p.exists():
+                return p
+        if self._KEY_RE.fullmatch(key_or_hash):
+            p = self._run_dir(run_authority_id) / f"{key_or_hash}.json"
+            if p.exists():
+                return p
+        receipts_dir = self._receipts_dir(run_authority_id)
+        if receipts_dir.exists():
+            for p in sorted(receipts_dir.glob("*.json")):
+                if p.stem == key_or_hash:
+                    return p
+        run_dir = self._run_dir(run_authority_id)
+        if run_dir.exists():
+            for p in sorted(run_dir.glob("*.json")):
+                if self._KEY_RE.fullmatch(p.stem):
+                    if p.stem == key_or_hash:
+                        return p
+                    try:
+                        raw = json.loads(p.read_text(encoding="utf-8"))
+                        if isinstance(raw, Mapping) and raw.get("receipt_sha256") == key_or_hash:
+                            return p
+                    except Exception:
+                        pass
+        raise H40GuardError(
+            H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+            f"cannot find lifecycle artifact for key/hash '{key_or_hash}'",
+        )
 
     @staticmethod
     def _bound_evidence(
@@ -3349,28 +3866,85 @@ class H40LifecycleArtifactStore:
         if not isinstance(authorization, VerifiedLifecycleAuthorization):
             raise TypeError("only verified lifecycle authorization can be persisted")
         revalidate(authorization)
-        path = self._path(authorization.run_authority_id, transition_key)
-        encoded = (canonical_json(self._envelope(authorization)) + "\n").encode("utf-8")
-        path.parent.mkdir(parents=True, exist_ok=True)
-        try:
-            descriptor = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
-        except FileExistsError:
-            existing = path.read_bytes()
+
+        run_authority_id = authorization.run_authority_id
+        receipt_hash = authorization.receipt_hash
+        receipts_dir = self._receipts_dir(run_authority_id)
+        receipts_dir.mkdir(parents=True, exist_ok=True)
+        final_receipt_path = receipts_dir / f"{receipt_hash}.json"
+
+        envelope = self._envelope(authorization)
+        encoded = (canonical_json(envelope) + "\n").encode("utf-8")
+
+        if final_receipt_path.exists():
+            existing = final_receipt_path.read_bytes()
             if existing != encoded:
                 raise H40GuardError(
                     H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
-                    "write-once lifecycle artifact already exists with different bytes",
+                    "write-once immutable lifecycle receipt already exists with different bytes",
                 )
-            restored = self.restore_receipt(authorization.run_authority_id, transition_key)
-            if restored.receipt_sha256 != authorization.receipt_hash:
-                raise H40GuardError(H40ReasonCode.CONFIG_IDENTITY_CONFLICT, "idempotent receipt mismatch")
             revalidate(authorization)
-            return path
-        with os.fdopen(descriptor, "wb") as handle:
-            handle.write(encoded)
-            handle.flush()
-            os.fsync(handle.fileno())
-        return path
+        else:
+            temp_path = receipts_dir / f"receipt.{os.getpid()}_{uuid.uuid4().hex}.tmp"
+            descriptor = os.open(temp_path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+            try:
+                with os.fdopen(descriptor, "wb") as handle:
+                    handle.write(encoded)
+                    handle.flush()
+                    os.fsync(handle.fileno())
+                try:
+                    os.link(temp_path, final_receipt_path)
+                    temp_path.unlink(missing_ok=True)
+                except FileExistsError:
+                    temp_path.unlink(missing_ok=True)
+                    if final_receipt_path.read_bytes() != encoded:
+                        raise H40GuardError(
+                            H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                            "write-once immutable lifecycle receipt already exists with different bytes",
+                        )
+                except OSError:
+                    if final_receipt_path.exists():
+                        temp_path.unlink(missing_ok=True)
+                        if final_receipt_path.read_bytes() != encoded:
+                            raise H40GuardError(
+                                H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                                "write-once immutable lifecycle receipt already exists with different bytes",
+                            )
+                    else:
+                        os.replace(temp_path, final_receipt_path)
+            except Exception:
+                try:
+                    temp_path.unlink(missing_ok=True)
+                except Exception:
+                    pass
+                raise
+            _fsync_dir(receipts_dir)
+
+        legacy_path: Path | None = None
+        if transition_key != receipt_hash and self._KEY_RE.fullmatch(transition_key):
+            run_dir = self._run_dir(run_authority_id)
+            run_dir.mkdir(parents=True, exist_ok=True)
+            legacy_path = run_dir / f"{transition_key}.json"
+            if legacy_path.exists():
+                if legacy_path.read_bytes() != encoded:
+                    raise H40GuardError(
+                        H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                        "write-once lifecycle legacy artifact already exists with different bytes",
+                    )
+            else:
+                legacy_tmp = run_dir / f"legacy.{os.getpid()}_{uuid.uuid4().hex}.tmp"
+                legacy_tmp.write_bytes(encoded)
+                os.replace(legacy_tmp, legacy_path)
+                _fsync_dir(run_dir)
+
+        self.advance_run_head(
+            run_authority_id=run_authority_id,
+            receipt_hash=receipt_hash,
+            target_state=authorization.target_state,
+            predecessor_receipt_hash=authorization.upstream_receipt_hash,
+        )
+
+        return legacy_path if legacy_path is not None else final_receipt_path
 
     def _restore(
         self,
@@ -3381,7 +3955,7 @@ class H40LifecycleArtifactStore:
         _ResultEvidence | None,
         H40LifecyclePersistenceContext,
     ]:
-        path = self._path(run_authority_id, transition_key)
+        path = self._find_receipt_path(run_authority_id, transition_key)
         try:
             raw = json.loads(path.read_text(encoding="utf-8"))
         except (OSError, UnicodeError, json.JSONDecodeError) as exc:
@@ -3446,36 +4020,46 @@ class H40LifecycleArtifactStore:
         receipt_hash: str,
     ) -> str:
         _require_sha256(receipt_hash, "predecessor receipt hash")
+        receipt_path = self._receipts_dir(run_authority_id) / f"{receipt_hash}.json"
+        if receipt_path.exists():
+            return receipt_hash
         matches: list[str] = []
-        for path in sorted(self._run_dir(run_authority_id).glob("*.json")):
-            if self._KEY_RE.fullmatch(path.stem) is None:
-                continue
-            try:
-                raw = json.loads(path.read_text(encoding="utf-8"))
-            except (OSError, UnicodeError, json.JSONDecodeError) as exc:
-                raise H40GuardError(
-                    H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
-                    "invalid lifecycle predecessor artifact",
-                ) from exc
-            if not isinstance(raw, Mapping):
-                raise H40GuardError(
-                    H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
-                    "lifecycle predecessor envelope must be an object",
-                )
-            if raw.get("receipt_sha256") == receipt_hash:
-                payload = raw.get("receipt")
-                if not isinstance(payload, Mapping) or canonical_sha256(payload) != receipt_hash:
+        run_dir = self._run_dir(run_authority_id)
+        if run_dir.exists():
+            for path in sorted(run_dir.glob("*.json")):
+                if self._KEY_RE.fullmatch(path.stem) is None:
+                    continue
+                try:
+                    raw = json.loads(path.read_text(encoding="utf-8"))
+                except (OSError, UnicodeError, json.JSONDecodeError) as exc:
                     raise H40GuardError(
                         H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
-                        "predecessor receipt content hash mismatch",
+                        "invalid lifecycle predecessor artifact",
+                    ) from exc
+                if not isinstance(raw, Mapping):
+                    raise H40GuardError(
+                        H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                        "lifecycle predecessor envelope must be an object",
                     )
-                matches.append(path.stem)
-        if len(matches) != 1:
+                if raw.get("receipt_sha256") == receipt_hash:
+                    payload = raw.get("receipt")
+                    if not isinstance(payload, Mapping) or canonical_sha256(payload) != receipt_hash:
+                        raise H40GuardError(
+                            H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                            "predecessor receipt content hash mismatch",
+                        )
+                    matches.append(path.stem)
+        if len(matches) == 1:
+            return matches[0]
+        if len(matches) > 1:
             raise H40GuardError(
                 H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
                 "predecessor receipt must resolve to exactly one persisted artifact",
             )
-        return matches[0]
+        raise H40GuardError(
+            H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+            f"predecessor receipt '{receipt_hash}' not found",
+        )
 
     @staticmethod
     def _resolve_authority_context(
@@ -3644,6 +4228,49 @@ class H40LifecycleArtifactStore:
             )
         return reconstructed
 
+    def _get_committed_lineage(
+        self,
+        run_authority_id: str,
+        committed_head: H40DurableRunHead,
+    ) -> list[str]:
+        curr_hash: str | None = committed_head.head_receipt_hash
+        lineage: list[str] = []
+        visited: set[str] = set()
+        while curr_hash is not None:
+            if curr_hash in visited:
+                raise H40GuardError(
+                    H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                    "cyclic committed lineage detected in durable store",
+                )
+            visited.add(curr_hash)
+            lineage.append(curr_hash)
+            path = self._find_receipt_path(run_authority_id, curr_hash)
+            try:
+                raw = json.loads(path.read_text(encoding="utf-8"))
+            except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+                raise H40GuardError(
+                    H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                    f"failed to read lineage receipt '{curr_hash}'",
+                ) from exc
+            if not isinstance(raw, Mapping):
+                raise H40GuardError(
+                    H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                    f"receipt in lineage '{curr_hash}' has invalid payload",
+                )
+            receipt_payload = raw.get("receipt")
+            if not isinstance(receipt_payload, Mapping):
+                raise H40GuardError(
+                    H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                    f"receipt in lineage '{curr_hash}' has invalid receipt object",
+                )
+            curr_hash = receipt_payload.get("upstream_receipt_hash")
+            if curr_hash is not None and not isinstance(curr_hash, str):
+                raise H40GuardError(
+                    H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                    f"upstream receipt hash in lineage '{curr_hash}' is invalid",
+                )
+        return lineage
+
     def restore_authorization(
         self,
         run_authority_id: str,
@@ -3659,6 +4286,32 @@ class H40LifecycleArtifactStore:
             raise H40GuardError(
                 H40ReasonCode.NOT_TESTABLE,
                 "resolver authority mode does not match lifecycle service mode",
+            )
+        head = self.get_committed_run_head(run_authority_id)
+        if head is None:
+            raise H40GuardError(
+                H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                f"no committed durable run head found for run '{run_authority_id}'",
+            )
+        lineage = self._get_committed_lineage(run_authority_id, head)
+        target_path = self._find_receipt_path(run_authority_id, transition_key)
+        try:
+            raw_target = json.loads(target_path.read_text(encoding="utf-8"))
+        except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+            raise H40GuardError(
+                H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                "invalid lifecycle artifact",
+            ) from exc
+        if not isinstance(raw_target, Mapping):
+            raise H40GuardError(
+                H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                "lifecycle envelope must be an object",
+            )
+        target_hash = raw_target.get("receipt_sha256")
+        if not isinstance(target_hash, str) or target_hash not in lineage:
+            raise H40GuardError(
+                H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                f"target receipt '{target_hash}' is not in committed run head lineage",
             )
         return self._cold_restore_authorization(
             run_authority_id,
@@ -3682,6 +4335,7 @@ __all__ = [
     "H40ConfirmationReadyReceipt",
     "H40DiscoveryAuthorizationReceipt",
     "H40DiscoveryResultEvidence",
+    "H40DurableRunHead",
     "H40ExpectedSplitAuthority",
     "H40ExpectedWFFold",
     "H40LifecycleArtifactStore",
@@ -3706,6 +4360,7 @@ __all__ = [
     "compute_lifecycle_child_hashes",
     "compute_lifecycle_governance_authority_hash",
     "compute_lifecycle_semantic_root_hash",
+    "derive_expected_wf_authority",
     "lifecycle_governance_authority_object",
     "lifecycle_semantic_contracts",
     "lifecycle_semantic_root_preimage",
