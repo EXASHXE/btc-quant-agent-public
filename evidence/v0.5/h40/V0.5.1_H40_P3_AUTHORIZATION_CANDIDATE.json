@@ -1,0 +1,57 @@
+{
+  "authorization_status": "PENDING_PUBLICATION_VALIDATION",
+  "discovery_selection_correction_contract_hash": "f84c97050c7db813263e5ffda6b1c556af0b7b0e2876bb8616640d2c9d67084b",
+  "execution_policy": {
+    "accepted_execution_write_authority": null,
+    "execution_disabled": true,
+    "policy_id": "RESEARCH_DISABLED_V1"
+  },
+  "implementation_authority_publication_commit_sha": "0131a9775912e868a4f66d0593e4ed425c699d9e",
+  "lifecycle_governance_authority_hash": "7e9433aa2ee706dda61871c6ad2b1a1aee4cf7a8f9b6365351942096b5347c84",
+  "lifecycle_implementation_authority_hash": "6d61054a6a8d9bdaaf7e7d648cb941bbb893b67a1fb6a0ed0742a0cdd40697e5",
+  "lifecycle_semantic_root_hash": "846591f8eac0e1abbedaeeff4c2b0bb7648fe51bdaf981e3309c6f6c440aba8e",
+  "protocol_authority_hash": "a83f8fc7a5ca7109fb8cd7fed114d87c3b2c968b5145c11cada203aa5111d1ce",
+  "protected_surface_attestation": {
+    "confirmation_accessed": false,
+    "final_holdout_accessed": false,
+    "h39_accessed": false,
+    "real_h40_outcomes_accessed": false,
+    "signed_network_requests": 0
+  },
+  "publication_validation_status": {
+    "blocking_for_final_p3_authorization": true,
+    "local_publication_validation": "DEFERRED_BY_USER",
+    "remote_ci_review": "DEFERRED_BY_USER",
+    "static_review_artifact_path": "reviews/v0.5/V0.5.1_H40_IMPLEMENTATION_AUTHORITY_PUBLICATION_STATIC_SOL_REVIEW.md",
+    "static_review_commit_sha": "c6e6219169f99a48af6c73f96fb19656198daa11",
+    "static_review_status": "PUBLICATION_CODE_DIFF_ACCEPTED"
+  },
+  "reference_manifest_identities": {
+    "source_manifest_hash": "af7fe2c187dcd503ba27a3f24ba6347cb3c619a63662106e85c6343eda90a74c",
+    "split_manifest_hash": "6e3ed51b4139c7822343752e29b6d8b2e94f9fadf0def38f2101a444b1da62e9"
+  },
+  "runtime_materialization_status": "REQUIRES_RUNTIME_MATERIALIZATION",
+  "schema_id": "H40_P3_AUTHORIZATION_CANDIDATE_V1",
+  "search_space_projection": {
+    "not_testable_slot_count": 150,
+    "registered_slot_count": 18,
+    "sealed_registered_roster_hash": "78af704fff5210beddd7427a1624cae4c1fbc1415da1fdbc6fcfa8a3228179da",
+    "total_slot_count": 168
+  },
+  "semantic_root_hash": "71889a35f227ed734272b712851174a69bf9dbb12ea3f87cd84c26e7c66f6af1",
+  "source_authority_projection": {
+    "active_required_source_ids": [
+      "ETHUSDT_USD_M_1H"
+    ],
+    "runtime_authority_snapshot_hash": "733b57a347259794e552a2bc47ecf80712d0e6b54b2d3e2b90c7d52d7a0883d2",
+    "runtime_authority_snapshot_id": "P1_ACCEPTED_3fc89541",
+    "source_states": {
+      "BTCUSDT_OFFICIAL_DERIVATIVES": "NOT_TESTABLE",
+      "BTCUSDT_SPOT_FLOW": "NOT_TESTABLE",
+      "BTCUSDT_USD_M_1H": "NOT_TESTABLE",
+      "ETHUSDT_DERIVATIVES_FLOW": "NOT_TESTABLE",
+      "ETHUSDT_USD_M_1H": "VERIFIED"
+    }
+  },
+  "structural_ledger_hash": "483f68502b57972deae071c7bd4587ca3e57ccaa72bd99fb0de07b4f0ab8c85f"
+}
