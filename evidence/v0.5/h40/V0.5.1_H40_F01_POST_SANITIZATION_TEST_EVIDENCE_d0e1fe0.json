@@ -1,0 +1,89 @@
+{
+  "environment": {
+    "git_version": "git version 2.43.0",
+    "mypy_version": "mypy 1.20.2 (compiled: yes)",
+    "platform_machine": "x86_64",
+    "platform_release": "6.6.87.2-microsoft-standard-WSL2",
+    "platform_system": "Linux",
+    "pytest_version": "pytest 8.4.2",
+    "python_executable": "/root/workspace/project/Quant-agent-sanitized/.venv/bin/python",
+    "python_version": "Python 3.12.3",
+    "ruff_version": "ruff 0.16.6"
+  },
+  "implementation_acceptance_artifact_path": "reviews/v0.5/V0.5.1_REPOSITORY_HISTORY_EMAIL_SANITIZATION_AUTHORITY_REMAP.md",
+  "implementation_acceptance_commit_sha": "48eafbdc938ff3e42fd8b526876fd8d8ebb180ea",
+  "local_gates": [
+    {
+      "command": "pytest -q tests/test_v051_h40_f01_lifecycle_authority.py tests/test_v051_h40_f01r3r1_durable_authority.py tests/test_v051_h40_f01r3r2_commit_authority.py tests/test_v051_h40_f01r3r3_api_seal.py tests/test_v051_h40_f01r3r4_lineage_durability.py",
+      "duration_seconds": 322.43,
+      "exit_code": 0,
+      "failed": 0,
+      "gate_id": "focused_lifecycle_authority",
+      "passed": 173,
+      "skipped": 0,
+      "status": "PASS",
+      "summary": "173 passed in 308.48s (0:05:08)"
+    },
+    {
+      "command": "pytest -q tests/test_execution.py tests/test_execution_environment_authority.py",
+      "duration_seconds": 4.44,
+      "exit_code": 0,
+      "failed": 0,
+      "gate_id": "execution_b04_environment_authority",
+      "passed": 41,
+      "skipped": 0,
+      "status": "PASS",
+      "summary": "41 passed in 3.45s"
+    },
+    {
+      "command": "pytest -q",
+      "duration_seconds": 619.01,
+      "exit_code": 0,
+      "failed": 0,
+      "gate_id": "full_pytest_suite",
+      "passed": 1425,
+      "skipped": 0,
+      "status": "PASS",
+      "summary": "1425 passed, 8 warnings in 596.26s (0:09:56)",
+      "warnings": 8
+    },
+    {
+      "command": "ruff check .",
+      "exit_code": 0,
+      "gate_id": "static_quality_ruff",
+      "status": "PASS",
+      "summary": "All checks passed!"
+    },
+    {
+      "command": "mypy",
+      "exit_code": 0,
+      "gate_id": "static_quality_mypy",
+      "status": "PASS",
+      "summary": "Success: no issues found in 97 source files"
+    },
+    {
+      "command": "python -m compileall -q src skill-template/scripts",
+      "exit_code": 0,
+      "gate_id": "static_quality_compileall",
+      "status": "PASS",
+      "summary": "clean"
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0,
+      "gate_id": "static_quality_git_diff_check",
+      "status": "PASS",
+      "summary": "clean"
+    }
+  ],
+  "overall_local_evidence_status": "PASS",
+  "protected_surface_attestation": {
+    "final_holdout_accessed": false,
+    "h39_accessed": false,
+    "real_h40_outcomes_accessed": false,
+    "signed_network_requests": 0
+  },
+  "schema_id": "H40_F01_POST_SANITIZATION_TEST_EVIDENCE_MANIFEST_V1",
+  "tested_commit_sha": "d0e1fe0d87d4595640edc4d7ecfa5f287640f0aa",
+  "working_tree_clean_before_tests": true
+}

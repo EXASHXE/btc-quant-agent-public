@@ -1,0 +1,250 @@
+{
+  "branch": "v0.5-refactor",
+  "protected_surface_attestation": {
+    "final_holdout_accessed": false,
+    "h39_accessed": false,
+    "real_h40_outcomes_accessed": false,
+    "signed_network_requests": 0
+  },
+  "remote_ci_evidence_status": "REMOTE_CI_POSITIVE_VALID_EVIDENCE",
+  "remote_repository": "EXASHXE/btc-quant-agent-public",
+  "run_observation": {
+    "conclusion": "success",
+    "created_at": "2026-09-22T15:03:09Z",
+    "event": "workflow_dispatch",
+    "head_branch": "v0.5-refactor",
+    "head_sha": "d0e1fe0d87d4595640edc4d7ecfa5f287640f0aa",
+    "jobs": [
+      {
+        "completed_at": "2026-09-22T15:09:45Z",
+        "conclusion": "success",
+        "database_id": 106802859399,
+        "duration_seconds": 391,
+        "name": "compatibility (3.11)",
+        "started_at": "2026-09-22T15:03:14Z",
+        "status": "completed",
+        "steps": [
+          {
+            "conclusion": "success",
+            "name": "Set up job",
+            "number": 1,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run actions/checkout@v4",
+            "number": 2,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run actions/setup-python@v5",
+            "number": 3,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run python -m pip install -e '.[dev,research]'",
+            "number": 4,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run pytest -q",
+            "number": 5,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run python -m compileall -q src skill-template/scripts",
+            "number": 6,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Post Run actions/setup-python@v5",
+            "number": 11,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Post Run actions/checkout@v4",
+            "number": 12,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Complete job",
+            "number": 13,
+            "status": "completed"
+          }
+        ],
+        "url": "https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/35744612505/job/106802859399"
+      },
+      {
+        "completed_at": "2026-09-22T15:12:37Z",
+        "conclusion": "success",
+        "database_id": 106802859557,
+        "duration_seconds": 563,
+        "name": "compatibility (3.12)",
+        "started_at": "2026-09-22T15:03:14Z",
+        "status": "completed",
+        "steps": [
+          {
+            "conclusion": "success",
+            "name": "Set up job",
+            "number": 1,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run actions/checkout@v4",
+            "number": 2,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run actions/setup-python@v5",
+            "number": 3,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run python -m pip install -e '.[dev,research]'",
+            "number": 4,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run pytest -q",
+            "number": 5,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run python -m compileall -q src skill-template/scripts",
+            "number": 6,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Post Run actions/setup-python@v5",
+            "number": 11,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Post Run actions/checkout@v4",
+            "number": 12,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Complete job",
+            "number": 13,
+            "status": "completed"
+          }
+        ],
+        "url": "https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/35744612505/job/106802859557"
+      },
+      {
+        "completed_at": "2026-09-22T15:16:58Z",
+        "conclusion": "success",
+        "database_id": 106802859620,
+        "duration_seconds": 824,
+        "name": "quality (3.13)",
+        "started_at": "2026-09-22T15:03:14Z",
+        "status": "completed",
+        "steps": [
+          {
+            "conclusion": "success",
+            "name": "Set up job",
+            "number": 1,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run actions/checkout@v4",
+            "number": 2,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run actions/setup-python@v5",
+            "number": 3,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run python -m pip install -e '.[dev,research]'",
+            "number": 4,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run ruff check .",
+            "number": 5,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run mypy",
+            "number": 6,
+            "status": "completed"
+          },
+          {
+            "conclusion": "skipped",
+            "name": "Full test suite",
+            "number": 7,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Full test suite with coverage",
+            "number": 8,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run python -m compileall -q src skill-template/scripts",
+            "number": 9,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Post Run actions/setup-python@v5",
+            "number": 17,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Post Run actions/checkout@v4",
+            "number": 18,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Complete job",
+            "number": 19,
+            "status": "completed"
+          }
+        ],
+        "url": "https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/35744612505/job/106802859620"
+      }
+    ],
+    "run_id": "35744612505",
+    "status": "completed",
+    "updated_at": "2026-09-22T15:16:59Z",
+    "url": "https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/35744612505",
+    "workflow_database_id": 364338839,
+    "workflow_file": ".github/workflows/ci.yml",
+    "workflow_name": "CI"
+  },
+  "schema_id": "H40_F01_POST_SANITIZATION_PUBLIC_CI_EVIDENCE_V1",
+  "tested_commit_sha": "d0e1fe0d87d4595640edc4d7ecfa5f287640f0aa",
+  "workflow_dispatch_attestation": {
+    "manual_poll_abused": false,
+    "rerun_count": 0,
+    "single_dispatch_policy_respected": true
+  }
+}
