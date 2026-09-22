@@ -129,12 +129,9 @@ class ExecutionTests(unittest.TestCase):
             },
         ):
             plan = service.build_entry_plan("sig-1", now_ms=1_100_000)
-            service.submit_entry(plan.plan_id, plan.plan_hash, now_ms=1_100_001)
-            with self.assertRaisesRegex(ExecutionBlocked, "already"):
-                service.submit_entry(plan.plan_id, plan.plan_hash, now_ms=1_100_002)
-            reconciled = service.reconcile(plan.plan_id)
-        self.assertEqual(reconciled["status"], "PROTECTED")
-        self.assertEqual(len(signed.protective), 2)
+            with self.assertRaisesRegex(ExecutionBlocked, "RESEARCH_DISABLED_V1"):
+                service.submit_entry(plan.plan_id, plan.plan_hash, now_ms=1_100_001)
+        self.assertEqual(len(signed.protective), 0)
 
     def test_degraded_signal_cannot_prepare(self) -> None:
         degraded = replace(

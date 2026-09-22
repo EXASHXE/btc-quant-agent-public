@@ -14,6 +14,13 @@ from ..engine import QuantEngine
 from ..research_registry import RegistryError, load_registry
 from ..storage import Repository
 from .binance_signed import BinanceSignedClient
+from .environment import (
+    ACCEPTED_EXECUTION_WRITE_AUTHORITY,
+    CURRENT_EXECUTION_POLICY,
+    ActionClassification,
+    ExecutionEnvironmentAuthority,
+    validate_execution_environment_preflight,
+)
 from .guard import ExecutionBlocked, ExecutionGuard
 from .models import ClosePlan, ExecutionMode, ExecutionPlan, OrderReceipt
 
@@ -57,6 +64,7 @@ class ExecutionService:
             mode in {ExecutionMode.TESTNET, ExecutionMode.LIVE}
             and credentials_present
             and live_armed
+            and CURRENT_EXECUTION_POLICY != "RESEARCH_DISABLED_V1"
         )
         try:
             registry = load_registry()
@@ -79,9 +87,13 @@ class ExecutionService:
             "research_registry_gate": registry_gate,
             "qualified_direction_engine": "NONE",
             "qualified_direction_engine_count": qualified,
-            "runtime_actionability": "OPPORTUNITY_ONLY"
-            if registry_gate != "FAIL_CLOSED"
-            else "NO_OPPORTUNITY",
+            "runtime_actionability": (
+                "OPPORTUNITY_ONLY" if registry_gate != "FAIL_CLOSED" else "NO_OPPORTUNITY"
+            ),
+            "execution_policy": CURRENT_EXECUTION_POLICY,
+            "execution_write_authority": (
+                "NONE" if ACCEPTED_EXECUTION_WRITE_AUTHORITY is None else "ACCEPTED"
+            ),
         }
 
     def _assert_signal_registry_actionable(self, _signal_id: str) -> None:
@@ -94,6 +106,13 @@ class ExecutionService:
             raise ExecutionBlocked("RESEARCH_REGISTRY_NOT_ACTIONABLE")
 
     def _signed_client(self) -> BinanceSignedClient:
+        if (
+            CURRENT_EXECUTION_POLICY == "RESEARCH_DISABLED_V1"
+            and ACCEPTED_EXECUTION_WRITE_AUTHORITY is None
+        ):
+            raise ExecutionBlocked(
+                "RESEARCH_DISABLED_V1: signed Binance client is not authorized"
+            )
         if self._injected_signed_client:
             return self._injected_signed_client
         key_name, secret_name = self.guard.credential_names()
@@ -213,6 +232,7 @@ class ExecutionService:
             raise ExecutionBlocked("rounded plan RR is below strategy minimum")
         created = current
         plan_id = hashlib.sha256(f"entry:{signal.signal_id}:{created}".encode()).hexdigest()[:20]
+        authority = ExecutionEnvironmentAuthority.from_config(self.config.execution)
         unsigned = ExecutionPlan(
             plan_id=plan_id,
             signal_id=signal.signal_id,
@@ -236,6 +256,9 @@ class ExecutionService:
             rounded_rr_net=rounded_rr_net,
             estimated_max_loss_usdt=estimated_max_loss,
             plan_hash="",
+            execution_environment_id=authority.environment_id,
+            credential_namespace_id=authority.credential_namespace_id,
+            account_authority_id=authority.account_authority_id,
         )
         plan = replace(unsigned, plan_hash=unsigned.calculated_hash())
         self.repository.save_execution_plan("ENTRY", plan.as_dict())
@@ -255,10 +278,20 @@ class ExecutionService:
             raise ExecutionBlocked(f"entry plan is already {raw_plan['status']}")
         plan = ExecutionPlan.from_dict(raw_plan["payload"])
         current = now_ms if now_ms is not None else int(time.time() * 1000)
+
+        # Shared offline preflight (P01-P16)
+        authority = validate_execution_environment_preflight(
+            plan=plan,
+            config=self.config,
+            action=ActionClassification.ENTRY_SUBMIT,
+            now_ms=current,
+        )
+
         self.refresh_signal_state(plan.signal_id, current)
         mode = ExecutionMode(self.config.execution.mode)
         open_positions = 0
         daily_loss = self.repository.daily_realized_loss_usdt(current)
+
         if mode in {ExecutionMode.TESTNET, ExecutionMode.LIVE}:
             client = self._signed_client()
             dual_side = client.position_mode().get("dualSidePosition")
@@ -270,6 +303,7 @@ class ExecutionService:
             day_start = current - current % 86_400_000
             exchange_pnl = client.realized_pnl(day_start)
             daily_loss = max(daily_loss, abs(min(exchange_pnl, 0.0)))
+
         self.guard.validate_entry(
             plan,
             confirmation_hash,
@@ -278,6 +312,7 @@ class ExecutionService:
             daily_loss,
             automatic,
         )
+
         if plan.order_type == "MARKET":
             signal = self.repository.get_signal(plan.signal_id)
             if signal is None:
@@ -285,6 +320,7 @@ class ExecutionService:
             current_mark = self.public_client.mark_price(plan.symbol)
             if not signal.entry_low <= current_mark <= signal.entry_high:
                 raise ExecutionBlocked("MARKET entry is outside the immutable signal entry range")
+
         if mode == ExecutionMode.PAPER:
             raw = {
                 "orderId": f"paper-{plan.plan_id}",
@@ -310,28 +346,52 @@ class ExecutionService:
             if plan.order_type == "LIMIT":
                 params.update({"price": plan.entry_price, "timeInForce": "GTC"})
             raw = client.place_order(**params)
+
         receipt = OrderReceipt(
-            plan.plan_id,
-            "ENTRY",
-            str(raw.get("orderId", raw.get("clientOrderId", "unknown"))),
-            str(raw.get("status", "NEW")),
-            raw,
+            plan_id=plan.plan_id,
+            role="ENTRY",
+            order_id=str(raw.get("orderId", raw.get("clientOrderId", "unknown"))),
+            status=str(raw.get("status", "NEW")),
+            raw=raw,
+            plan_hash=plan.plan_hash,
+            mode=mode,
+            execution_environment_id=authority.environment_id,
+            credential_namespace_id=authority.credential_namespace_id,
+            account_authority_id=authority.account_authority_id,
+            symbol=plan.symbol,
+            submitted_at_ms=current,
+            client_order_id=str(raw.get("clientOrderId", f"bqa-{plan.plan_id}")),
         )
         self.repository.save_execution_order(receipt.as_dict())
         self.repository.update_execution_plan_status(plan.plan_id, "SUBMITTED")
         return receipt
 
-    def reconcile(self, plan_id: str) -> dict[str, Any]:
+    def reconcile(self, plan_id: str, now_ms: int | None = None) -> dict[str, Any]:
         raw_plan = self.repository.get_execution_plan(plan_id)
         if raw_plan is None or raw_plan["kind"] != "ENTRY":
             raise KeyError(f"unknown entry plan: {plan_id}")
         plan = ExecutionPlan.from_dict(raw_plan["payload"])
+        current = now_ms if now_ms is not None else int(time.time() * 1000)
+
         entry = self.repository.latest_execution_order(plan_id, "ENTRY")
+        receipt_payload = entry["payload"] if entry is not None else None
+
+        # Preflight validates plan, receipt, and capability (ASTRA-B-04 direct closure)
+        authority = validate_execution_environment_preflight(
+            plan=plan,
+            config=self.config,
+            receipt=receipt_payload,
+            action=ActionClassification.RECONCILE,
+            now_ms=current,
+        )
+
         if entry is None:
             raise ExecutionBlocked("entry has not been submitted")
+
         mode = ExecutionMode(self.config.execution.mode)
         if mode == ExecutionMode.DISABLED:
             raise ExecutionBlocked("execution.mode=disabled")
+
         if mode == ExecutionMode.PAPER:
             paper_receipts: list[dict[str, Any]] = []
             for role, trigger in (
@@ -339,19 +399,28 @@ class ExecutionService:
                 ("TAKE_PROFIT", plan.take_profit_price),
             ):
                 paper_receipt = OrderReceipt(
-                    plan.plan_id,
-                    role,
-                    f"paper-{role.lower()}-{plan.plan_id}",
-                    "NEW",
-                    {"paper": True, "triggerPrice": trigger},
+                    plan_id=plan.plan_id,
+                    role=role,
+                    order_id=f"paper-{role.lower()}-{plan.plan_id}",
+                    status="NEW",
+                    raw={"paper": True, "triggerPrice": trigger},
+                    plan_hash=plan.plan_hash,
+                    mode=mode,
+                    execution_environment_id=authority.environment_id,
+                    credential_namespace_id=authority.credential_namespace_id,
+                    account_authority_id=authority.account_authority_id,
+                    symbol=plan.symbol,
+                    submitted_at_ms=current,
+                    client_order_id=f"paper-{role.lower()}-{plan.plan_id}",
                 )
                 self.repository.save_execution_order(paper_receipt.as_dict())
                 paper_receipts.append(paper_receipt.as_dict())
             self.repository.update_execution_plan_status(plan.plan_id, "PROTECTED")
             return {"status": "PROTECTED", "plan_id": plan_id, "orders": paper_receipts}
+
         client = self._signed_client()
-        current = client.query_order(plan.symbol, entry["order_id"])
-        order_status = str(current.get("status", "UNKNOWN"))
+        current_order = client.query_order(plan.symbol, entry["order_id"])
+        order_status = str(current_order.get("status", "UNKNOWN"))
         if (
             order_status in {"NEW", "PENDING_NEW"}
             and int(time.time() * 1000) > plan.signal_expires_at_ms
@@ -360,7 +429,7 @@ class ExecutionService:
             self.repository.update_execution_plan_status(plan.plan_id, "CANCELLED_EXPIRED")
             return {"status": "CANCELLED_EXPIRED", "plan_id": plan_id, "order": cancelled}
         if order_status not in {"FILLED", "PARTIALLY_FILLED"}:
-            return {"status": current.get("status", "UNKNOWN"), "plan_id": plan_id}
+            return {"status": current_order.get("status", "UNKNOWN"), "plan_id": plan_id}
         if order_status == "PARTIALLY_FILLED":
             client.cancel_order(plan.symbol, entry["order_id"])
         existing_stop = self.repository.latest_execution_order(plan_id, "STOP")
@@ -386,11 +455,19 @@ class ExecutionService:
                     continue
                 raw = client.place_protective_order(**common, type=order_type, triggerPrice=trigger)
                 protective_receipt = OrderReceipt(
-                    plan.plan_id,
-                    role,
-                    str(raw.get("algoId", raw.get("orderId", "unknown"))),
-                    str(raw.get("algoStatus", raw.get("status", "NEW"))),
-                    raw,
+                    plan_id=plan.plan_id,
+                    role=role,
+                    order_id=str(raw.get("algoId", raw.get("orderId", "unknown"))),
+                    status=str(raw.get("algoStatus", raw.get("status", "NEW"))),
+                    raw=raw,
+                    plan_hash=plan.plan_hash,
+                    mode=mode,
+                    execution_environment_id=authority.environment_id,
+                    credential_namespace_id=authority.credential_namespace_id,
+                    account_authority_id=authority.account_authority_id,
+                    symbol=plan.symbol,
+                    submitted_at_ms=current,
+                    client_order_id=str(raw.get("clientOrderId", "")),
                 )
                 self.repository.save_execution_order(protective_receipt.as_dict())
                 receipts.append(protective_receipt.as_dict())
@@ -423,6 +500,10 @@ class ExecutionService:
 
     def prepare_close(self, symbol: str, now_ms: int | None = None) -> ClosePlan:
         mode = ExecutionMode(self.config.execution.mode)
+        if mode != ExecutionMode.PAPER and CURRENT_EXECUTION_POLICY == "RESEARCH_DISABLED_V1":
+            raise ExecutionBlocked(
+                "RESEARCH_DISABLED_V1: signed position query for close preparation is not authorized"
+            )
         self.guard.risk_reducing_gate(mode)
         if mode == ExecutionMode.PAPER:
             raise ExecutionBlocked("paper close requires a simulated fill and is not inferred")
@@ -435,16 +516,20 @@ class ExecutionService:
             raise ExecutionBlocked("no open position")
         amount = float(position["positionAmt"])
         created = now_ms if now_ms is not None else int(time.time() * 1000)
+        authority = ExecutionEnvironmentAuthority.from_config(self.config.execution)
         plan_id = hashlib.sha256(f"close:{symbol}:{created}".encode()).hexdigest()[:20]
         unsigned = ClosePlan(
-            plan_id,
-            symbol.upper(),
-            mode,
-            "SELL" if amount > 0 else "BUY",
-            abs(amount),
-            created,
-            created + self.config.execution.plan_ttl_seconds * 1000,
-            "",
+            plan_id=plan_id,
+            symbol=symbol.upper(),
+            mode=mode,
+            side="SELL" if amount > 0 else "BUY",
+            quantity=abs(amount),
+            created_at_ms=created,
+            expires_at_ms=created + self.config.execution.plan_ttl_seconds * 1000,
+            plan_hash="",
+            execution_environment_id=authority.environment_id,
+            credential_namespace_id=authority.credential_namespace_id,
+            account_authority_id=authority.account_authority_id,
         )
         plan = replace(unsigned, plan_hash=unsigned.calculated_hash())
         self.repository.save_execution_plan("CLOSE", plan.as_dict())
@@ -460,6 +545,14 @@ class ExecutionService:
             raise ExecutionBlocked(f"close plan is already {raw_plan['status']}")
         plan = ClosePlan.from_dict(raw_plan["payload"])
         current = now_ms if now_ms is not None else int(time.time() * 1000)
+
+        authority = validate_execution_environment_preflight(
+            plan=plan,
+            config=self.config,
+            action=ActionClassification.SUBMIT_CLOSE,
+            now_ms=current,
+        )
+
         self.guard.validate_close(plan, confirmation_hash, current)
         raw = self._signed_client().place_order(
             symbol=plan.symbol,
@@ -470,25 +563,47 @@ class ExecutionService:
             newClientOrderId=f"bqa-close-{plan.plan_id}",
         )
         receipt = OrderReceipt(
-            plan.plan_id,
-            "CLOSE",
-            str(raw.get("orderId", "unknown")),
-            str(raw.get("status", "NEW")),
-            raw,
+            plan_id=plan.plan_id,
+            role="CLOSE",
+            order_id=str(raw.get("orderId", "unknown")),
+            status=str(raw.get("status", "NEW")),
+            raw=raw,
+            plan_hash=plan.plan_hash,
+            mode=plan.mode,
+            execution_environment_id=authority.environment_id,
+            credential_namespace_id=authority.credential_namespace_id,
+            account_authority_id=authority.account_authority_id,
+            symbol=plan.symbol,
+            submitted_at_ms=current,
+            client_order_id=f"bqa-close-{plan.plan_id}",
         )
         self.repository.save_execution_order(receipt.as_dict())
         self.repository.update_execution_plan_status(plan.plan_id, "SUBMITTED")
         return receipt
 
-    def cancel_entry(self, plan_id: str, confirmation_hash: str) -> dict[str, Any]:
+    def cancel_entry(
+        self, plan_id: str, confirmation_hash: str, now_ms: int | None = None
+    ) -> dict[str, Any]:
         raw_plan = self.repository.get_execution_plan(plan_id)
         if raw_plan is None or raw_plan["kind"] != "ENTRY":
             raise KeyError(f"unknown entry plan: {plan_id}")
         plan = ExecutionPlan.from_dict(raw_plan["payload"])
-        self.guard.validate_cancel(plan, confirmation_hash)
         entry = self.repository.latest_execution_order(plan_id, "ENTRY")
         if entry is None:
             raise ExecutionBlocked("entry has not been submitted")
+
+        current = now_ms if now_ms is not None else int(time.time() * 1000)
+
+        # Preflight validates plan, receipt, and capability
+        validate_execution_environment_preflight(
+            plan=plan,
+            config=self.config,
+            receipt=entry["payload"],
+            action=ActionClassification.CANCEL_ENTRY,
+            now_ms=current,
+        )
+
+        self.guard.validate_cancel(plan, confirmation_hash)
         if plan.mode == ExecutionMode.PAPER:
             self.repository.update_execution_plan_status(plan.plan_id, "CANCELLED")
             return {"orderId": entry["order_id"], "status": "CANCELED", "paper": True}
@@ -499,8 +614,22 @@ class ExecutionService:
         return self.submit_entry(plan.plan_id, plan.plan_hash, automatic=True)
 
     def reconcile_open_plans(self) -> list[dict[str, Any]]:
-        if ExecutionMode(self.config.execution.mode) == ExecutionMode.DISABLED:
+        mode = ExecutionMode(self.config.execution.mode)
+        if mode == ExecutionMode.DISABLED:
             return []
+        if mode != ExecutionMode.PAPER and CURRENT_EXECUTION_POLICY == "RESEARCH_DISABLED_V1":
+            # Under research-disabled authority, do not fan out into repeated signed attempts.
+            # Return an explicit blocked/no-op operational result with zero signed client calls.
+            # Do not silently label blocked reconciliation as success.
+            open_ids = self.repository.open_entry_plan_ids()
+            return [
+                {
+                    "plan_id": pid,
+                    "status": "BLOCKED",
+                    "error": "RESEARCH_DISABLED_V1: signed reconciliation is not authorized",
+                }
+                for pid in open_ids
+            ]
         output: list[dict[str, Any]] = []
         for plan_id in self.repository.open_entry_plan_ids():
             try:
