@@ -55,9 +55,10 @@ DISCOVERY_SELECTION_CORRECTION_CONTRACT_HASH = (
     "f84c97050c7db813263e5ffda6b1c556af0b7b0e2876bb8616640d2c9d67084b"
 )
 
-# No implementation authority is accepted during F01 implementation.  A later
-# independently accepted publication must materialize this boundary.
-ACCEPTED_LIFECYCLE_IMPLEMENTATION_AUTHORITY_HASH: str | None = None
+# Independently accepted V1 lifecycle implementation authority is now published.
+ACCEPTED_LIFECYCLE_IMPLEMENTATION_AUTHORITY_HASH: str | None = (
+    "6d61054a6a8d9bdaaf7e7d648cb941bbb893b67a1fb6a0ed0742a0cdd40697e5"
+)
 
 _SHA256_RE = re.compile(r"[0-9a-f]{64}\Z")
 _COMMIT_RE = re.compile(r"[0-9a-f]{40}\Z")
