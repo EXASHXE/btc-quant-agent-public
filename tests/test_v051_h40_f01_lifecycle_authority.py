@@ -60,7 +60,6 @@ from btc_quant_agent.h40 import (
     H40WFFoldResultEntry,
     H40WFValidationReceipt,
     H40WFValidationResultEvidence,
-    TEST_COMMIT_TOKEN,
     VerifiedLifecycleAuthorization,
     assert_canonical_source_identity,
     compute_lifecycle_child_hashes,
@@ -1941,177 +1940,182 @@ def test_a01_through_a07_derived_wf_authority() -> None:
 
 def test_a08_through_a14_durable_single_run_head(tmp_path: Path) -> None:
     store = H40LifecycleArtifactStore(tmp_path)
-    run_id = _hash("run-a08")
-    r0 = _publish_mock_envelope(store, _make_mock_discovery_receipt(run_id))
-    r1_a = _publish_mock_envelope(store, _make_mock_candidate_receipt(run_id, r0, slot_index=1))
-    r1_b = _publish_mock_envelope(store, _make_mock_candidate_receipt(run_id, r0, slot_index=2))
-
-    # Sequence 0 commit
-    head0 = store.advance_run_head(
-        run_authority_id=run_id,
-        receipt_hash=r0,
-        target_state="H40_DISCOVERY",
-        predecessor_receipt_hash=None,
-        _test_token=TEST_COMMIT_TOKEN,
-    )
-    assert isinstance(head0, H40DurableRunHead)
-    assert head0.transition_sequence == 0
-    assert head0.head_receipt_hash == r0
-    assert not head0.terminal
-
-    # A08: two candidate-lock writers from same Discovery -> exactly one committed successor
-    head1_a = store.advance_run_head(
-        run_authority_id=run_id,
-        receipt_hash=r1_a,
-        target_state="H40_CANDIDATE_LOCKED",
-        predecessor_receipt_hash=r0,
-        _test_token=TEST_COMMIT_TOKEN,
-    )
-    assert head1_a.transition_sequence == 1
-    assert head1_a.head_receipt_hash == r1_a
-
-    # Writer B attempts to advance from r0
-    with pytest.raises(H40GuardError, match="predecessor receipt hash mismatch"):
-        store.advance_run_head(
-            run_authority_id=run_id,
-            receipt_hash=r1_b,
-            target_state="H40_CANDIDATE_LOCKED",
-            predecessor_receipt_hash=r0,
-            _test_token=TEST_COMMIT_TOKEN,
-        )
-    assert store.get_committed_run_head(run_id).head_receipt_hash == r1_a
-
-    # A09: WF success vs NO_GO from same candidate -> exactly one committed successor
-    r2_wf = _publish_mock_envelope(store, _make_mock_wf_receipt(run_id, r1_a, slot_index=1))
-    r2_nogo = _publish_mock_envelope(
-        store,
-        _make_mock_termination_receipt(run_id, r1_a, source_state="H40_CANDIDATE_LOCKED", target_state="H40_NO_GO"),
-    )
-    head2 = store.advance_run_head(
-        run_authority_id=run_id,
-        receipt_hash=r2_wf,
-        target_state="H40_WALK_FORWARD_VALIDATED",
-        predecessor_receipt_hash=r1_a,
-        _test_token=TEST_COMMIT_TOKEN,
-    )
-    assert head2.head_receipt_hash == r2_wf
-    with pytest.raises(H40GuardError, match="predecessor receipt hash mismatch"):
-        store.advance_run_head(
-            run_authority_id=run_id,
-            receipt_hash=r2_nogo,
-            target_state="H40_NO_GO",
-            predecessor_receipt_hash=r1_a,
-            _test_token=TEST_COMMIT_TOKEN,
-        )
-
-    # A10: terminal then stale success rejected
-    terminal_run_id = _hash("run-a10-terminal")
-    d0 = _publish_mock_envelope(store, _make_mock_discovery_receipt(terminal_run_id))
-    store.advance_run_head(
-        run_authority_id=terminal_run_id,
-        receipt_hash=d0,
-        target_state="H40_DISCOVERY",
-        predecessor_receipt_hash=None,
-        _test_token=TEST_COMMIT_TOKEN,
-    )
-    t0 = _publish_mock_envelope(
-        store,
-        _make_mock_termination_receipt(terminal_run_id, d0, source_state="H40_DISCOVERY", target_state="H40_NO_GO"),
-    )
-    store.advance_run_head(
-        run_authority_id=terminal_run_id,
-        receipt_hash=t0,
-        target_state="H40_NO_GO",
-        predecessor_receipt_hash=d0,
-        _test_token=TEST_COMMIT_TOKEN,
-    )
-    assert store.get_committed_run_head(terminal_run_id).terminal
-    stale_succ = _publish_mock_envelope(store, _make_mock_candidate_receipt(terminal_run_id, d0, slot_index=1))
-    with pytest.raises(H40GuardError, match="terminal state"):
-        store.advance_run_head(
-            run_authority_id=terminal_run_id,
-            receipt_hash=stale_succ,
-            target_state="H40_CANDIDATE_LOCKED",
-            predecessor_receipt_hash=d0,
-            _test_token=TEST_COMMIT_TOKEN,
-        )
-
-    # A11: success then stale terminal sibling rejected
-    stale_term = _publish_mock_envelope(
-        store,
-        _make_mock_termination_receipt(run_id, r1_a, source_state="H40_CANDIDATE_LOCKED", target_state="H40_NO_GO"),
-    )
-    with pytest.raises(H40GuardError, match="predecessor receipt hash mismatch"):
-        store.advance_run_head(
-            run_authority_id=run_id,
-            receipt_hash=stale_term,
-            target_state="H40_NO_GO",
-            predecessor_receipt_hash=r1_a,
-            _test_token=TEST_COMMIT_TOKEN,
-        )
-
-    # A12: two concurrent processes/transactions -> one winner
-    import concurrent.futures
-
-    concurrent_run_id = _hash("run-a12-concurrent")
-    c0 = _publish_mock_envelope(store, _make_mock_discovery_receipt(concurrent_run_id))
-    store.advance_run_head(
-        run_authority_id=concurrent_run_id,
-        receipt_hash=c0,
-        target_state="H40_DISCOVERY",
-        predecessor_receipt_hash=None,
-        _test_token=TEST_COMMIT_TOKEN,
-    )
-    cand_x = _publish_mock_envelope(store, _make_mock_candidate_receipt(concurrent_run_id, c0, slot_index=10))
-    cand_y = _publish_mock_envelope(store, _make_mock_candidate_receipt(concurrent_run_id, c0, slot_index=20))
-    results: list[tuple[str, bool, str]] = []
-
-    def try_advance(cand_hash: str) -> tuple[str, bool, str]:
-        s = H40LifecycleArtifactStore(tmp_path)
-        try:
-            s.advance_run_head(
-                run_authority_id=concurrent_run_id,
-                receipt_hash=cand_hash,
-                target_state="H40_CANDIDATE_LOCKED",
-                predecessor_receipt_hash=c0,
-                _test_token=TEST_COMMIT_TOKEN,
-            )
-            return (cand_hash, True, "")
-        except H40GuardError as exc:
-            return (cand_hash, False, str(exc))
-
-    with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
-        f1 = executor.submit(try_advance, cand_x)
-        f2 = executor.submit(try_advance, cand_y)
-        results = [f1.result(), f2.result()]
-
-    successes = [r for r in results if r[1]]
-    failures = [r for r in results if not r[1]]
-    assert len(successes) == 1
-    assert len(failures) == 1
-    assert "predecessor receipt hash mismatch" in failures[0][2]
-    committed = store.get_committed_run_head(concurrent_run_id)
-    assert committed is not None
-    assert committed.head_receipt_hash == successes[0][0]
-
-    # A13 & A14: restore non-head sibling rejected, arbitrary filename/key confers no authority
     chain = _build_discovery_chain()
+    run_id = chain.run.run_authority_id
+
+    # Sequence 0 commit via persist_authorization with exact issuing service
     store.persist_authorization(
         "01_discovery_authorization",
         chain.discovery,
         service=chain.service,
+    )
+    head0 = store.get_committed_run_head(run_id)
+    assert isinstance(head0, H40DurableRunHead)
+    assert head0.transition_sequence == 0
+    assert head0.head_receipt_hash == chain.discovery.receipt_hash
+    assert not head0.terminal
+
+    # A08: two candidate-lock writers from same Discovery -> exactly one committed successor
+    # Sibling 1: candidate lock
+    # Sibling 2: sibling termination from discovery
+    cand_term = chain.service.authorize_termination(
+        prior_authority=chain.discovery,
+        target_state="H40_NO_GO",
+        reason_code=H40ReasonCode.THRESHOLD_UNMET,
+        detail_message="sibling termination",
+        terminated_at_utc=TS,
     )
     store.persist_authorization(
         "02_candidate_lock",
         chain.candidate,
         service=chain.service,
     )
+    head1 = store.get_committed_run_head(run_id)
+    assert head1 is not None
+    assert head1.transition_sequence == 1
+    assert head1.head_receipt_hash == chain.candidate.receipt_hash
+
+    # Writer B attempts to advance from stale discovery receipt
+    with pytest.raises(H40GuardError, match="predecessor receipt hash mismatch"):
+        store.persist_authorization(
+            "02_termination",
+            cand_term,
+            service=chain.service,
+        )
+    assert store.get_committed_run_head(run_id).head_receipt_hash == chain.candidate.receipt_hash
+
+    # A09: WF success vs NO_GO from same candidate -> exactly one committed successor
+    chain_wf = _build_wf_chain()
+    store_wf = H40LifecycleArtifactStore(tmp_path / "wf_run")
+    store_wf.persist_authorization(
+        "01_discovery_authorization",
+        chain_wf.discovery_chain.discovery,
+        service=chain_wf.discovery_chain.service,
+    )
+    store_wf.persist_authorization(
+        "02_candidate_lock",
+        chain_wf.discovery_chain.candidate,
+        service=chain_wf.discovery_chain.service,
+    )
+    wf_term = chain_wf.discovery_chain.service.authorize_termination(
+        prior_authority=chain_wf.discovery_chain.candidate,
+        target_state="H40_NO_GO",
+        reason_code=H40ReasonCode.THRESHOLD_UNMET,
+        detail_message="wf rejected termination",
+        terminated_at_utc=TS,
+    )
+    store_wf.persist_authorization(
+        "03_wf_validation",
+        chain_wf.wf,
+        service=chain_wf.discovery_chain.service,
+    )
+    head2 = store_wf.get_committed_run_head(chain_wf.discovery_chain.run.run_authority_id)
+    assert head2 is not None
+    assert head2.head_receipt_hash == chain_wf.wf.receipt_hash
+    with pytest.raises(H40GuardError, match="predecessor receipt hash mismatch"):
+        store_wf.persist_authorization(
+            "03_termination",
+            wf_term,
+            service=chain_wf.discovery_chain.service,
+        )
+
+    # A10: terminal then stale success rejected
+    chain_term = _build_discovery_chain()
+    term_run_id = chain_term.run.run_authority_id
+    store_term = H40LifecycleArtifactStore(tmp_path / "term_run")
+    store_term.persist_authorization(
+        "01_discovery_authorization",
+        chain_term.discovery,
+        service=chain_term.service,
+    )
+    t0_auth = chain_term.service.authorize_termination(
+        prior_authority=chain_term.discovery,
+        target_state="H40_NO_GO",
+        reason_code=H40ReasonCode.THRESHOLD_UNMET,
+        detail_message="terminal run termination",
+        terminated_at_utc=TS,
+    )
+    store_term.persist_authorization(
+        "02_termination",
+        t0_auth,
+        service=chain_term.service,
+    )
+    assert store_term.get_committed_run_head(term_run_id).terminal
+    with pytest.raises(H40GuardError, match="terminal state .* no forward commits allowed"):
+        store_term.persist_authorization(
+            "02_candidate_lock",
+            chain_term.candidate,
+            service=chain_term.service,
+        )
+
+    # A11: success then stale terminal sibling rejected
+    # In store_wf: candidate -> WF already succeeded; attempting to persist candidate terminal sibling failed in A09.
+
+    # A12: two concurrent processes/transactions -> one winner
+    import concurrent.futures
+
+    concurrent_chain = _build_discovery_chain()
+    concurrent_run_id = concurrent_chain.run.run_authority_id
+    store_conc = H40LifecycleArtifactStore(tmp_path / "conc_run")
+    store_conc.persist_authorization(
+        "01_discovery_authorization",
+        concurrent_chain.discovery,
+        service=concurrent_chain.service,
+    )
+    c_cand = concurrent_chain.candidate
+    c_term = concurrent_chain.service.authorize_termination(
+        prior_authority=concurrent_chain.discovery,
+        target_state="H40_NO_GO",
+        reason_code=H40ReasonCode.THRESHOLD_UNMET,
+        detail_message="concurrent sibling termination",
+        terminated_at_utc=TS,
+    )
+
+    def try_persist(auth: VerifiedLifecycleAuthorization, key: str) -> tuple[str, bool, str]:
+        s = H40LifecycleArtifactStore(tmp_path / "conc_run")
+        try:
+            s.persist_authorization(key, auth, service=concurrent_chain.service)
+            return (auth.receipt_hash, True, "")
+        except H40GuardError as exc:
+            return (auth.receipt_hash, False, str(exc))
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
+        f1 = executor.submit(try_persist, c_cand, "02_candidate_lock")
+        f2 = executor.submit(try_persist, c_term, "02_termination")
+        results = [f1.result(), f2.result()]
+
+    successes = [r for r in results if r[1]]
+    failures = [r for r in results if not r[1]]
+    assert len(successes) == 1
+    assert len(failures) == 1
+    assert (
+        "predecessor receipt hash mismatch" in failures[0][2]
+        or "does not match current durable head state" in failures[0][2]
+        or "terminal state" in failures[0][2]
+    )
+    committed = store_conc.get_committed_run_head(concurrent_run_id)
+    assert committed is not None
+    assert committed.head_receipt_hash == successes[0][0]
+
+    # A13 & A14: restore non-head sibling rejected, arbitrary filename/key confers no authority
+    chain_a13 = _build_discovery_chain()
+    store_a13 = H40LifecycleArtifactStore(tmp_path / "a13_run")
+    store_a13.persist_authorization(
+        "01_discovery_authorization",
+        chain_a13.discovery,
+        service=chain_a13.service,
+    )
+    store_a13.persist_authorization(
+        "02_candidate_lock",
+        chain_a13.candidate,
+        service=chain_a13.service,
+    )
     orphan_envelope = {
         "authority_context": {
-            "implementation_authority_hash": chain.authority.lifecycle_implementation_authority_hash,
-            "predecessor_receipt_hash": chain.discovery.receipt_hash,
-            "run_authority_id": chain.run.run_authority_id,
-            "runtime_seal_hash": chain.seal.authority_context_hash,
+            "implementation_authority_hash": chain_a13.authority.lifecycle_implementation_authority_hash,
+            "predecessor_receipt_hash": chain_a13.discovery.receipt_hash,
+            "run_authority_id": chain_a13.run.run_authority_id,
+            "runtime_seal_hash": chain_a13.seal.authority_context_hash,
             "split_authority_hash": None,
         },
         "bound_evidence": None,
@@ -2121,41 +2125,41 @@ def test_a08_through_a14_durable_single_run_head(tmp_path: Path) -> None:
             "discovery_result_evidence_hash": _hash("other-ev"),
             "locked_at_utc": TS,
             "receipt_schema_id": "H40_CANDIDATE_LOCK_RECEIPT_V1",
-            "run_authority_id": chain.run.run_authority_id,
+            "run_authority_id": chain_a13.run.run_authority_id,
             "selected_slot_hash": _hash("other-slot"),
             "selected_slot_index": 2,
             "selected_structural_configuration_hash": _hash("other-cfg"),
             "target_state": "H40_CANDIDATE_LOCKED",
-            "upstream_receipt_hash": chain.discovery.receipt_hash,
+            "upstream_receipt_hash": chain_a13.discovery.receipt_hash,
             "verified_at_utc": TS,
         },
     }
     orphan_envelope["receipt_sha256"] = canonical_sha256(orphan_envelope["receipt"])
-    orphan_path = store._receipts_dir(chain.run.run_authority_id) / f"{orphan_envelope['receipt_sha256']}.json"
+    orphan_path = store_a13._receipts_dir(chain_a13.run.run_authority_id) / f"{orphan_envelope['receipt_sha256']}.json"
     orphan_path.write_text(canonical_json(orphan_envelope) + "\n", encoding="utf-8")
 
     resolver = H40SyntheticAuthorityResolver.for_tests(
-        implementation_authorities=(chain.authority,),
-        run_authorities=(chain.run,),
-        runtime_seals=(chain.seal,),
+        implementation_authorities=(chain_a13.authority,),
+        run_authorities=(chain_a13.run,),
+        runtime_seals=(chain_a13.seal,),
     )
     # A13: restore non-head sibling rejected
     with pytest.raises(H40GuardError, match="not in committed run head lineage"):
-        store.restore_authorization(
-            chain.run.run_authority_id,
+        store_a13.restore_authorization(
+            chain_a13.run.run_authority_id,
             str(orphan_envelope["receipt_sha256"]),
-            service=chain.service,
+            service=chain_a13.service,
             resolver=resolver,
         )
 
     # A14: arbitrary filename/key confers no authority
-    fake_legacy_path = store._run_dir(chain.run.run_authority_id) / "99_fabricated.json"
+    fake_legacy_path = store_a13._run_dir(chain_a13.run.run_authority_id) / "99_fabricated.json"
     fake_legacy_path.write_text(canonical_json(orphan_envelope) + "\n", encoding="utf-8")
     with pytest.raises(H40GuardError, match="not in committed run head lineage"):
-        store.restore_authorization(
-            chain.run.run_authority_id,
+        store_a13.restore_authorization(
+            chain_a13.run.run_authority_id,
             "99_fabricated",
-            service=chain.service,
+            service=chain_a13.service,
             resolver=resolver,
         )
 
@@ -2208,14 +2212,12 @@ def test_a15_through_a20_receipt_publication_and_crash_protocol(tmp_path: Path) 
         )
 
     # A17: head transaction abort keeps old head
+    forged_auth = object.__new__(VerifiedLifecycleAuthorization)
+    object.__setattr__(forged_auth, "_receipt_hash", _hash("failing-receipt"))
+    object.__setattr__(forged_auth, "_run_authority_id", chain.run.run_authority_id)
+    object.__setattr__(forged_auth, "_issuer_id", object())
     with pytest.raises(H40GuardError):
-        store.advance_run_head(
-            run_authority_id=chain.run.run_authority_id,
-            receipt_hash=_hash("failing-receipt"),
-            target_state="H40_CANDIDATE_LOCKED",
-            predecessor_receipt_hash=_hash("wrong-predecessor"),
-            _test_token=TEST_COMMIT_TOKEN,
-        )
+        store.persist_authorization("02_invalid", forged_auth, service=chain.service)
     after_abort_head = store.get_committed_run_head(chain.run.run_authority_id)
     assert after_abort_head is not None
     assert after_abort_head.head_receipt_hash == chain.discovery.receipt_hash
@@ -2237,19 +2239,12 @@ def test_a15_through_a20_receipt_publication_and_crash_protocol(tmp_path: Path) 
     assert head_after_retry.transition_sequence == 0
 
     # A19: conflicting retry rejected
-    conflicting_receipt = _make_mock_candidate_receipt(
-        chain.run.run_authority_id,
-        _hash("other-pred"),
-        slot_index=99,
-    )
-    conflicting_hash = _publish_mock_envelope(store, conflicting_receipt)
+    chain_wf = _build_wf_chain()
     with pytest.raises(H40GuardError, match="predecessor receipt hash mismatch"):
-        store.advance_run_head(
-            run_authority_id=chain.run.run_authority_id,
-            receipt_hash=conflicting_hash,
-            target_state="H40_CANDIDATE_LOCKED",
-            predecessor_receipt_hash=_hash("other-pred"),
-            _test_token=TEST_COMMIT_TOKEN,
+        store.persist_authorization(
+            "03_wf_validation",
+            chain_wf.wf,
+            service=chain_wf.discovery_chain.service,
         )
 
     # A20: immutable receipt different-byte overwrite rejected
@@ -2502,7 +2497,7 @@ def test_a42_through_a45_generic_source_descriptor_equality(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
 ) -> None:
-    source_manifest, split_manifest, attestation, _ = (
+    source_manifest, _split_manifest, attestation, _ = (
         _typed_production_authority_fixture(monkeypatch)
     )
     eth_record = source_manifest.get_source("ETHUSDT_USD_M_1H")

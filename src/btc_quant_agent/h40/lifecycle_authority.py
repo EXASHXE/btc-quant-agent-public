@@ -1956,7 +1956,7 @@ def derive_expected_wf_authority(
             H40ExpectedWFFold(
                 fold_id=f"WF{i}",
                 partition_id=f"WF{i}_VALIDATION",
-                split_definition_hash=hashlib.sha256(f"fold-{i}".encode("utf-8")).hexdigest(),
+                split_definition_hash=hashlib.sha256(f"fold-{i}".encode()).hexdigest(),
             )
             for i in range(1, 5)
         )
@@ -3386,9 +3386,6 @@ _RECEIPT_PARSERS: Mapping[str, Callable[[Mapping[str, Any]], _Receipt]] = Mappin
     "H40_RECEIPT_TERMINATION_V2": H40TerminationReceipt.from_dict,
 })
 
-_TEST_COMMIT_TOKEN = object()
-TEST_COMMIT_TOKEN = _TEST_COMMIT_TOKEN
-
 _ACCEPTED_TRANSITIONS: frozenset[tuple[str, str]] = frozenset({
     # Genesis / root
     ("H40_P1_SCAFFOLDED", "H40_DISCOVERY"),
@@ -3732,54 +3729,22 @@ class H40LifecycleArtifactStore:
         *,
         authorization: VerifiedLifecycleAuthorization,
     ) -> H40DurableRunHead:
-        if not isinstance(authorization, VerifiedLifecycleAuthorization):
-            raise TypeError("authorization must be VerifiedLifecycleAuthorization")
-        return self._commit_run_head(
-            authorization=authorization,
-            run_authority_id=authorization.run_authority_id,
-            receipt_hash=authorization.receipt_hash,
-            target_state=authorization.target_state,
-            predecessor_receipt_hash=authorization.upstream_receipt_hash,
-        )
-
-    def advance_run_head(
-        self,
-        *,
-        run_authority_id: str,
-        receipt_hash: str,
-        target_state: str,
-        predecessor_receipt_hash: str | None,
-        authorization: VerifiedLifecycleAuthorization | None = None,
-        _test_token: object = None,
-    ) -> H40DurableRunHead:
-        """Advance run head.
-
-        Raw commit without VerifiedLifecycleAuthorization is test-only and requires _TEST_COMMIT_TOKEN.
-        """
-        if authorization is None and _test_token is not _TEST_COMMIT_TOKEN:
-            raise H40GuardError(
-                H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
-                "raw durable-head advance without VerifiedLifecycleAuthorization is prohibited in production",
-            )
-        return self._commit_run_head(
-            authorization=authorization,
-            run_authority_id=run_authority_id,
-            receipt_hash=receipt_hash,
-            target_state=target_state,
-            predecessor_receipt_hash=predecessor_receipt_hash,
-            _test_token=_test_token,
-        )
+        return self._commit_run_head(authorization=authorization)
 
     def _commit_run_head(
         self,
         *,
-        authorization: VerifiedLifecycleAuthorization | None = None,
-        run_authority_id: str,
-        receipt_hash: str,
-        target_state: str,
-        predecessor_receipt_hash: str | None,
-        _test_token: object = None,
+        authorization: VerifiedLifecycleAuthorization,
     ) -> H40DurableRunHead:
+        if not isinstance(authorization, VerifiedLifecycleAuthorization):
+            raise TypeError("authorization must be VerifiedLifecycleAuthorization")
+
+        run_authority_id = authorization.run_authority_id
+        receipt_hash = authorization.receipt_hash
+        target_state = authorization.target_state
+        predecessor_receipt_hash = authorization.upstream_receipt_hash
+        source_state = authorization.source_state
+
         _require_sha256(run_authority_id, "run_authority_id")
         _require_sha256(receipt_hash, "receipt_hash")
         _require_text(target_state, "target_state")
@@ -3910,37 +3875,31 @@ class H40LifecycleArtifactStore:
                 f"receipt upstream_receipt_hash '{typed_receipt.upstream_receipt_hash}' does not match predecessor '{predecessor_receipt_hash}'",
             )
 
-        if authorization is not None:
-            if not isinstance(authorization, VerifiedLifecycleAuthorization):
-                raise TypeError("authorization must be VerifiedLifecycleAuthorization")
-            if authorization.receipt_hash != receipt_hash:
-                raise H40GuardError(
-                    H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
-                    "authorization receipt_hash mismatch against receipt_hash",
-                )
-            if authorization.receipt != typed_receipt:
-                raise H40GuardError(
-                    H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
-                    "authorization receipt does not equal published typed receipt",
-                )
-            if authorization.target_state != target_state:
-                raise H40GuardError(
-                    H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
-                    "authorization target_state mismatch against requested target_state",
-                )
-            if authorization.upstream_receipt_hash != predecessor_receipt_hash:
-                raise H40GuardError(
-                    H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
-                    "authorization upstream mismatch against requested predecessor",
-                )
-            if authorization.run_authority_id != run_authority_id:
-                raise H40GuardError(
-                    H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
-                    "authorization run_authority_id mismatch against requested run_authority_id",
-                )
-            source_state = authorization.source_state
-        else:
-            source_state = receipt_source_state
+        if authorization.receipt_hash != receipt_hash:
+            raise H40GuardError(
+                H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                "authorization receipt_hash mismatch against receipt_hash",
+            )
+        if authorization.receipt != typed_receipt:
+            raise H40GuardError(
+                H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                "authorization receipt does not equal published typed receipt",
+            )
+        if authorization.target_state != target_state:
+            raise H40GuardError(
+                H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                "authorization target_state mismatch against requested target_state",
+            )
+        if authorization.upstream_receipt_hash != predecessor_receipt_hash:
+            raise H40GuardError(
+                H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                "authorization upstream mismatch against requested predecessor",
+            )
+        if authorization.run_authority_id != run_authority_id:
+            raise H40GuardError(
+                H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                "authorization run_authority_id mismatch against requested run_authority_id",
+            )
 
         if source_state != receipt_source_state:
             raise H40GuardError(
@@ -4070,7 +4029,7 @@ class H40LifecycleArtifactStore:
         except Exception:
             try:
                 conn.execute("ROLLBACK")
-            except Exception:
+            except (sqlite3.Error, OSError):
                 pass
             raise
         finally:
@@ -4124,7 +4083,7 @@ class H40LifecycleArtifactStore:
                         raw = json.loads(p.read_text(encoding="utf-8"))
                         if isinstance(raw, Mapping) and raw.get("receipt_sha256") == key_or_hash:
                             return p
-                    except Exception:
+                    except (OSError, UnicodeError, json.JSONDecodeError):
                         pass
         raise H40GuardError(
             H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
@@ -4308,7 +4267,7 @@ class H40LifecycleArtifactStore:
             except Exception:
                 try:
                     temp_path.unlink(missing_ok=True)
-                except Exception:
+                except OSError:
                     pass
                 raise
             _fsync_dir(receipts_dir, fail_closed=True)
@@ -4330,7 +4289,7 @@ class H40LifecycleArtifactStore:
                 os.replace(legacy_tmp, legacy_path)
                 _fsync_dir(run_dir, fail_closed=False)
 
-        self._advance_verified_run_head(authorization=authorization)
+        self._commit_run_head(authorization=authorization)
 
         return legacy_path if legacy_path is not None else final_receipt_path
 
@@ -4764,7 +4723,6 @@ __all__ = [
     "H40WFFoldResultEntry",
     "H40WFValidationReceipt",
     "H40WFValidationResultEvidence",
-    "TEST_COMMIT_TOKEN",
     "VerifiedLifecycleAuthorization",
     "compute_lifecycle_child_hashes",
     "compute_lifecycle_governance_authority_hash",

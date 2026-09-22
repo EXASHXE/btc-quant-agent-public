@@ -23,6 +23,7 @@ from __future__ import annotations
 
 import concurrent.futures
 import inspect
+import sys
 from pathlib import Path
 
 import pytest
@@ -38,7 +39,6 @@ from btc_quant_agent.h40 import (
     H40ReasonCode,
     H40RunAuthority,
     H40RuntimeSnapshotSeal,
-    TEST_COMMIT_TOKEN,
     VerifiedLifecycleAuthorization,
     compute_lifecycle_child_hashes,
     compute_lifecycle_governance_authority_hash,
@@ -48,15 +48,12 @@ from btc_quant_agent.h40 import (
     materialize_h40_search_space_production,
 )
 
-import sys
-
 _TESTS_DIR = str(Path(__file__).resolve().parent)
 if _TESTS_DIR not in sys.path:
     sys.path.insert(0, _TESTS_DIR)
 
-from test_v051_h40_f01_lifecycle_authority import (  # noqa: E402
+from test_v051_h40_f01_lifecycle_authority import (
     TS,
-    _ProductionEvidenceVerifier,
     _build_discovery_chain,
     _build_wf_chain,
     _hash,
@@ -64,6 +61,7 @@ from test_v051_h40_f01_lifecycle_authority import (  # noqa: E402
     _make_mock_discovery_receipt,
     _make_mock_termination_receipt,
     _make_mock_wf_receipt,
+    _ProductionEvidenceVerifier,
     _publish_mock_envelope,
     _typed_production_authority_fixture,
 )
@@ -72,21 +70,13 @@ from test_v051_h40_f01_lifecycle_authority import (  # noqa: E402
 def test_r30_raw_commit_without_verified_authorization_rejected(tmp_path: Path) -> None:
     """R30: Raw commit without VerifiedLifecycleAuthorization is rejected fail-closed."""
     store = H40LifecycleArtifactStore(tmp_path)
-    run_id = _hash("run-r30")
-    disc = _make_mock_discovery_receipt(run_id)
-    h = _publish_mock_envelope(store, disc)
 
-    # Calling advance_run_head without _test_token fails closed
-    with pytest.raises(
-        H40GuardError,
-        match="raw durable-head advance without VerifiedLifecycleAuthorization is prohibited in production",
-    ):
-        store.advance_run_head(
-            run_authority_id=run_id,
-            receipt_hash=h,
-            target_state="H40_DISCOVERY",
-            predecessor_receipt_hash=None,
-        )
+    # Public advance_run_head surface is completely removed
+    assert not hasattr(store, "advance_run_head")
+
+    # Calling private _commit_run_head without VerifiedLifecycleAuthorization fails type check
+    with pytest.raises(TypeError, match="authorization must be VerifiedLifecycleAuthorization"):
+        store._commit_run_head(authorization="not-an-auth-object")  # type: ignore[arg-type]
 
     # Calling private _advance_verified_run_head without VerifiedLifecycleAuthorization fails type check
     with pytest.raises(TypeError, match="authorization must be VerifiedLifecycleAuthorization"):
@@ -145,17 +135,19 @@ def test_r32_forged_typed_wf_receipt_cannot_jump_discovery_to_wf(tmp_path: Path)
     wf_receipt = _make_mock_wf_receipt(run_id, r0, slot_index=1)
     wf_hash = _publish_mock_envelope(store, wf_receipt)
 
+    auth = object.__new__(VerifiedLifecycleAuthorization)
+    object.__setattr__(auth, "_receipt", wf_receipt)
+    object.__setattr__(auth, "_receipt_hash", wf_hash)
+    object.__setattr__(auth, "_run_authority_id", run_id)
+    object.__setattr__(auth, "_source_state", "H40_CANDIDATE_LOCKED")
+    object.__setattr__(auth, "_target_state", "H40_WALK_FORWARD_VALIDATED")
+    object.__setattr__(auth, "_upstream_receipt_hash", r0)
+
     with pytest.raises(
         H40GuardError,
         match="transition source state 'H40_CANDIDATE_LOCKED' does not match current durable head state 'H40_DISCOVERY'",
     ):
-        store.advance_run_head(
-            run_authority_id=run_id,
-            receipt_hash=wf_hash,
-            target_state="H40_WALK_FORWARD_VALIDATED",
-            predecessor_receipt_hash=r0,
-            _test_token=TEST_COMMIT_TOKEN,
-        )
+        store._commit_run_head(authorization=auth)
 
 
 def test_r33_forged_termination_source_state_mismatch_cannot_commit(tmp_path: Path) -> None:
@@ -175,17 +167,19 @@ def test_r33_forged_termination_source_state_mismatch_cannot_commit(tmp_path: Pa
     )
     t_hash = _publish_mock_envelope(store, term_receipt)
 
+    auth = object.__new__(VerifiedLifecycleAuthorization)
+    object.__setattr__(auth, "_receipt", term_receipt)
+    object.__setattr__(auth, "_receipt_hash", t_hash)
+    object.__setattr__(auth, "_run_authority_id", run_id)
+    object.__setattr__(auth, "_source_state", "H40_CANDIDATE_LOCKED")
+    object.__setattr__(auth, "_target_state", "H40_NO_GO")
+    object.__setattr__(auth, "_upstream_receipt_hash", r0)
+
     with pytest.raises(
         H40GuardError,
         match="transition source state 'H40_CANDIDATE_LOCKED' does not match current durable head state 'H40_DISCOVERY'",
     ):
-        store.advance_run_head(
-            run_authority_id=run_id,
-            receipt_hash=t_hash,
-            target_state="H40_NO_GO",
-            predecessor_receipt_hash=r0,
-            _test_token=TEST_COMMIT_TOKEN,
-        )
+        store._commit_run_head(authorization=auth)
 
 
 def test_r34_persist_authorization_rejects_arbitrary_revalidate_callable(tmp_path: Path) -> None:
@@ -298,14 +292,16 @@ def test_r38_f02_target_cannot_commit_at_storage_boundary(tmp_path: Path) -> Non
     store = H40LifecycleArtifactStore(tmp_path)
     run_id = chain.run.run_authority_id
 
+    # An authorization claiming F02 target cannot commit
+    f02_auth = object.__new__(VerifiedLifecycleAuthorization)
+    object.__setattr__(f02_auth, "_run_authority_id", run_id)
+    object.__setattr__(f02_auth, "_receipt_hash", _hash("dummy-hash"))
+    object.__setattr__(f02_auth, "_target_state", "H40_CONFIRMATION_EVALUATED_ONCE")
+    object.__setattr__(f02_auth, "_upstream_receipt_hash", None)
+    object.__setattr__(f02_auth, "_source_state", "H40_WALK_FORWARD_VALIDATED")
+
     with pytest.raises(H40GuardError, match="F02 confirmation evaluated once is sealed and prohibited"):
-        store.advance_run_head(
-            run_authority_id=run_id,
-            receipt_hash=_hash("dummy-hash"),
-            target_state="H40_CONFIRMATION_EVALUATED_ONCE",
-            predecessor_receipt_hash=None,
-            _test_token=TEST_COMMIT_TOKEN,
-        )
+        store._commit_run_head(authorization=f02_auth)
 
 
 def test_r39_empty_legacy_head_hash_fails_closed(tmp_path: Path) -> None:

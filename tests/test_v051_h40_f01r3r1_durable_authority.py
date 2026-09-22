@@ -14,6 +14,7 @@ from __future__ import annotations
 import concurrent.futures
 import errno
 import os
+import sys
 from dataclasses import replace
 from pathlib import Path
 from typing import Any
@@ -36,30 +37,22 @@ from btc_quant_agent.h40 import (
     H40RuntimeSnapshotSeal,
     H40WFFoldResultEntry,
     H40WFValidationResultEvidence,
-    TEST_COMMIT_TOKEN,
     VerifiedLifecycleAuthorization,
     derive_expected_wf_authority,
 )
 from btc_quant_agent.research_contract.canonical import canonical_json
 
-import sys
-
 _TESTS_DIR = str(Path(__file__).resolve().parent)
 if _TESTS_DIR not in sys.path:
     sys.path.insert(0, _TESTS_DIR)
 
-from test_v051_h40_f01_lifecycle_authority import (  # noqa: E402
+from test_v051_h40_f01_lifecycle_authority import (
     TS,
-    _ProductionEvidenceVerifier,
     _build_discovery_chain,
     _build_wf_chain,
     _hash,
     _implementation_authority,
-    _make_mock_candidate_receipt,
-    _make_mock_discovery_receipt,
-    _make_mock_termination_receipt,
-    _make_mock_wf_receipt,
-    _publish_mock_envelope,
+    _ProductionEvidenceVerifier,
     _typed_production_authority_fixture,
 )
 
@@ -374,7 +367,7 @@ def test_r04_persisted_split_mismatch_fails_closed(
         run_authority_id=wf_auth.run_authority_id,
         upstream_receipt_hash=wf_auth.upstream_receipt_hash,
         context={**wf_auth.context, "split_authority": tampered_split},
-        issuer_id=getattr(wf_auth, "_issuer_id"),
+        issuer_id=wf_auth._issuer_id,
         synthetic_only=wf_auth.synthetic_only,
         token=lifecycle_authority_module._VERIFIED_AUTHORITY_TOKEN,
     )
@@ -437,139 +430,116 @@ def test_r06_current_production_remains_not_testable_until_p3_materialization(
 
 
 def test_r07_arbitrary_target_rejected(tmp_path: Path) -> None:
-    """R07: advance_run_head rejects arbitrary unknown target state."""
+    """R07: durable commit primitive rejects arbitrary unknown target state."""
     store = H40LifecycleArtifactStore(tmp_path)
     run_id = _hash("run-r07")
+    auth = object.__new__(VerifiedLifecycleAuthorization)
+    object.__setattr__(auth, "_run_authority_id", run_id)
+    object.__setattr__(auth, "_receipt_hash", _hash("some-receipt"))
+    object.__setattr__(auth, "_target_state", "ARBITRARY_TARGET_STATE")
+    object.__setattr__(auth, "_upstream_receipt_hash", None)
+    object.__setattr__(auth, "_source_state", "H40_P1_SCAFFOLDED")
     with pytest.raises(H40GuardError, match="unrecognized target state"):
-        store.advance_run_head(
-            run_authority_id=run_id,
-            receipt_hash=_hash("some-receipt"),
-            target_state="ARBITRARY_TARGET_STATE",
-            predecessor_receipt_hash=None,
-            _test_token=TEST_COMMIT_TOKEN,
-        )
+        store._commit_run_head(authorization=auth)
 
 
 def test_r08_random_hash_without_published_receipt_rejected(tmp_path: Path) -> None:
-    """R08: advance_run_head rejects a receipt hash when no receipt file exists on disk."""
+    """R08: durable commit rejects a receipt hash when no receipt file exists on disk."""
+    chain = _build_discovery_chain()
     store = H40LifecycleArtifactStore(tmp_path)
-    run_id = _hash("run-r08")
     with pytest.raises(H40GuardError, match="does not exist on disk"):
-        store.advance_run_head(
-            run_authority_id=run_id,
-            receipt_hash=_hash("nonexistent-receipt"),
-            target_state="H40_DISCOVERY",
-            predecessor_receipt_hash=None,
-            _test_token=TEST_COMMIT_TOKEN,
-        )
+        store._commit_run_head(authorization=chain.discovery)
 
 
 def test_r09_wrong_run_id_receipt_rejected(tmp_path: Path) -> None:
-    """R09: advance_run_head rejects receipt whose envelope binds a different run_authority_id."""
+    """R09: durable commit rejects receipt whose envelope binds a different run_authority_id."""
+    chain = _build_discovery_chain()
     store = H40LifecycleArtifactStore(tmp_path)
-    run_1 = _hash("run-1")
+    run_1 = chain.run.run_authority_id
     run_2 = _hash("run-2")
-    receipt = _make_mock_discovery_receipt(run_1)
-    h = _publish_mock_envelope(store, receipt)
+
+    store.persist_authorization("01_discovery", chain.discovery, service=chain.service)
+    h = chain.discovery.receipt_hash
+
     run2_dir = store._receipts_dir(run_2)
     run2_dir.mkdir(parents=True, exist_ok=True)
     (run2_dir / f"{h}.json").write_bytes(
         (store._receipts_dir(run_1) / f"{h}.json").read_bytes()
     )
 
+    auth2 = object.__new__(VerifiedLifecycleAuthorization)
+    object.__setattr__(auth2, "_run_authority_id", run_2)
+    object.__setattr__(auth2, "_receipt_hash", h)
+    object.__setattr__(auth2, "_target_state", "H40_DISCOVERY")
+    object.__setattr__(auth2, "_upstream_receipt_hash", None)
+    object.__setattr__(auth2, "_source_state", "H40_P1_SCAFFOLDED")
+
     with pytest.raises(H40GuardError, match="receipt run_authority_id .* does not match requested"):
-        store.advance_run_head(
-            run_authority_id=run_2,
-            receipt_hash=h,
-            target_state="H40_DISCOVERY",
-            predecessor_receipt_hash=None,
-            _test_token=TEST_COMMIT_TOKEN,
-        )
+        store._commit_run_head(authorization=auth2)
 
 
 def test_r10_wrong_target_rejected(tmp_path: Path) -> None:
-    """R10: advance_run_head rejects target state that does not match published receipt target."""
+    """R10: durable commit rejects target state that does not match published receipt target."""
+    chain = _build_discovery_chain()
     store = H40LifecycleArtifactStore(tmp_path)
-    run_id = _hash("run-r10")
-    disc_receipt = _make_mock_discovery_receipt(run_id)
-    h = _publish_mock_envelope(store, disc_receipt)
+    store.persist_authorization("01_discovery", chain.discovery, service=chain.service)
+    h = chain.discovery.receipt_hash
+
+    auth_mismatch = object.__new__(VerifiedLifecycleAuthorization)
+    object.__setattr__(auth_mismatch, "_run_authority_id", chain.run.run_authority_id)
+    object.__setattr__(auth_mismatch, "_receipt_hash", h)
+    object.__setattr__(auth_mismatch, "_target_state", "H40_NO_GO")
+    object.__setattr__(auth_mismatch, "_upstream_receipt_hash", None)
+    object.__setattr__(auth_mismatch, "_source_state", "H40_DISCOVERY")
 
     with pytest.raises(H40GuardError, match="receipt target state 'H40_DISCOVERY' does not match requested target state 'H40_NO_GO'"):
-        store.advance_run_head(
-            run_authority_id=run_id,
-            receipt_hash=h,
-            target_state="H40_NO_GO",
-            predecessor_receipt_hash=None,
-            _test_token=TEST_COMMIT_TOKEN,
-        )
+        store._commit_run_head(authorization=auth_mismatch)
 
 
 def test_r11_wrong_upstream_rejected(tmp_path: Path) -> None:
-    """R11: advance_run_head rejects predecessor that does not match published receipt upstream."""
+    """R11: durable commit rejects predecessor that does not match published receipt upstream."""
+    chain = _build_discovery_chain()
     store = H40LifecycleArtifactStore(tmp_path)
-    run_id = _hash("run-r11")
-    cand_receipt = _make_mock_candidate_receipt(run_id, _hash("pred-actual"), slot_index=1)
-    h = _publish_mock_envelope(store, cand_receipt)
+    store.persist_authorization("01_discovery", chain.discovery, service=chain.service)
+    cand_h = chain.candidate.receipt_hash
+
+    envelope = store._envelope(chain.candidate)
+    cand_path = store._receipts_dir(chain.run.run_authority_id) / f"{cand_h}.json"
+    cand_path.write_text(canonical_json(envelope) + "\n", encoding="utf-8")
+
+    auth_mismatch = object.__new__(VerifiedLifecycleAuthorization)
+    object.__setattr__(auth_mismatch, "_run_authority_id", chain.run.run_authority_id)
+    object.__setattr__(auth_mismatch, "_receipt_hash", cand_h)
+    object.__setattr__(auth_mismatch, "_target_state", "H40_CANDIDATE_LOCKED")
+    object.__setattr__(auth_mismatch, "_upstream_receipt_hash", _hash("pred-different"))
+    object.__setattr__(auth_mismatch, "_source_state", "H40_DISCOVERY")
 
     with pytest.raises(H40GuardError, match="receipt upstream_receipt_hash .* does not match predecessor"):
-        store.advance_run_head(
-            run_authority_id=run_id,
-            receipt_hash=h,
-            target_state="H40_CANDIDATE_LOCKED",
-            predecessor_receipt_hash=_hash("pred-different"),
-            _test_token=TEST_COMMIT_TOKEN,
-        )
+        store._commit_run_head(authorization=auth_mismatch)
 
 
 def test_r12_candidate_lock_cannot_be_genesis(tmp_path: Path) -> None:
     """R12: Candidate Lock transition cannot be sequence zero / genesis."""
+    chain = _build_discovery_chain()
     store = H40LifecycleArtifactStore(tmp_path)
-    run_id = _hash("run-r12")
-    cand_receipt = _make_mock_candidate_receipt(run_id, _hash("dummy"), slot_index=1)
-    h = _publish_mock_envelope(store, cand_receipt)
-
-    with pytest.raises(H40GuardError, match="cannot be genesis / sequence zero"):
-        store.advance_run_head(
-            run_authority_id=run_id,
-            receipt_hash=h,
-            target_state="H40_CANDIDATE_LOCKED",
-            predecessor_receipt_hash=None,
-            _test_token=TEST_COMMIT_TOKEN,
-        )
+    with pytest.raises(H40GuardError, match="non-null predecessor cannot commit as sequence zero genesis|cannot be genesis"):
+        store.persist_authorization("02_candidate_lock", chain.candidate, service=chain.service)
 
 
 def test_r13_wf_cannot_be_genesis(tmp_path: Path) -> None:
     """R13: WF validation transition cannot be sequence zero / genesis."""
+    chain_wf = _build_wf_chain()
     store = H40LifecycleArtifactStore(tmp_path)
-    run_id = _hash("run-r13")
-    wf_receipt = _make_mock_wf_receipt(run_id, _hash("dummy"), slot_index=1)
-    h = _publish_mock_envelope(store, wf_receipt)
-
-    with pytest.raises(H40GuardError, match="cannot be genesis / sequence zero"):
-        store.advance_run_head(
-            run_authority_id=run_id,
-            receipt_hash=h,
-            target_state="H40_WALK_FORWARD_VALIDATED",
-            predecessor_receipt_hash=None,
-            _test_token=TEST_COMMIT_TOKEN,
-        )
+    with pytest.raises(H40GuardError, match="non-null predecessor cannot commit as sequence zero genesis|cannot be genesis"):
+        store.persist_authorization("03_wf_validation", chain_wf.wf, service=chain_wf.discovery_chain.service)
 
 
 def test_r14_non_null_predecessor_cannot_be_genesis(tmp_path: Path) -> None:
     """R14: Non-null predecessor cannot commit at sequence zero (genesis requires null predecessor)."""
+    chain = _build_discovery_chain()
     store = H40LifecycleArtifactStore(tmp_path)
-    run_id = _hash("run-r14")
-    cand_receipt = _make_mock_candidate_receipt(run_id, _hash("upstream-pred"), slot_index=1)
-    h = _publish_mock_envelope(store, cand_receipt)
-
     with pytest.raises(H40GuardError, match="non-null predecessor cannot commit as sequence zero genesis"):
-        store.advance_run_head(
-            run_authority_id=run_id,
-            receipt_hash=h,
-            target_state="H40_CANDIDATE_LOCKED",
-            predecessor_receipt_hash=_hash("upstream-pred"),
-            _test_token=TEST_COMMIT_TOKEN,
-        )
+        store.persist_authorization("02_candidate_lock", chain.candidate, service=chain.service)
 
 
 def test_r15_valid_root_null_upstream_receipt_can_commit(tmp_path: Path) -> None:
@@ -591,73 +561,72 @@ def test_r15_valid_root_null_upstream_receipt_can_commit(tmp_path: Path) -> None
 
 def test_r16_two_verified_siblings_race_and_exactly_one_wins(tmp_path: Path) -> None:
     """R16: Two verified sibling receipts race from sequence 0; exactly one wins."""
+    chain = _build_discovery_chain()
+    run_id = chain.run.run_authority_id
     store = H40LifecycleArtifactStore(tmp_path)
-    run_id = _hash("run-r16")
-    disc_receipt = _make_mock_discovery_receipt(run_id)
-    r0 = _publish_mock_envelope(store, disc_receipt)
-    store.advance_run_head(
-        run_authority_id=run_id,
-        receipt_hash=r0,
-        target_state="H40_DISCOVERY",
-        predecessor_receipt_hash=None,
-        _test_token=TEST_COMMIT_TOKEN,
+    store.persist_authorization(
+        "01_discovery_authorization",
+        chain.discovery,
+        service=chain.service,
     )
 
-    cand_a = _publish_mock_envelope(store, _make_mock_candidate_receipt(run_id, r0, slot_index=10))
-    cand_b = _publish_mock_envelope(store, _make_mock_candidate_receipt(run_id, r0, slot_index=20))
+    c_cand = chain.candidate
+    c_term = chain.service.authorize_termination(
+        prior_authority=chain.discovery,
+        target_state="H40_NO_GO",
+        reason_code=H40ReasonCode.THRESHOLD_UNMET,
+        detail_message="sibling termination",
+        terminated_at_utc=TS,
+    )
 
-    def try_advance(cand_hash: str) -> tuple[str, bool, str]:
+    def try_persist(auth: VerifiedLifecycleAuthorization, key: str) -> tuple[str, bool, str]:
         s = H40LifecycleArtifactStore(tmp_path)
         try:
-            s.advance_run_head(
-                run_authority_id=run_id,
-                receipt_hash=cand_hash,
-                target_state="H40_CANDIDATE_LOCKED",
-                predecessor_receipt_hash=r0,
-                _test_token=TEST_COMMIT_TOKEN,
-            )
-            return (cand_hash, True, "")
+            s.persist_authorization(key, auth, service=chain.service)
+            return (auth.receipt_hash, True, "")
         except H40GuardError as exc:
-            return (cand_hash, False, str(exc))
+            return (auth.receipt_hash, False, str(exc))
 
     with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
-        f1 = executor.submit(try_advance, cand_a)
-        f2 = executor.submit(try_advance, cand_b)
+        f1 = executor.submit(try_persist, c_cand, "02_candidate_lock")
+        f2 = executor.submit(try_persist, c_term, "02_termination")
         results = [f1.result(), f2.result()]
 
     successes = [r for r in results if r[1]]
     failures = [r for r in results if not r[1]]
     assert len(successes) == 1
     assert len(failures) == 1
-    assert "predecessor receipt hash mismatch" in failures[0][2]
+    assert (
+        "predecessor receipt hash mismatch" in failures[0][2]
+        or "does not match current durable head state" in failures[0][2]
+        or "terminal state" in failures[0][2]
+    )
+    committed = store.get_committed_run_head(run_id)
+    assert committed is not None
+    assert committed.head_receipt_hash == successes[0][0]
 
 
 def test_r17_committed_terminal_remains_absorbing_across_fresh_store(tmp_path: Path) -> None:
     """R17: Committed terminal state remains absorbing even across fresh store instances."""
+    chain = _build_discovery_chain()
+    run_id = chain.run.run_authority_id
     store = H40LifecycleArtifactStore(tmp_path)
-    run_id = _hash("run-r17")
-    disc_receipt = _make_mock_discovery_receipt(run_id)
-    r0 = _publish_mock_envelope(store, disc_receipt)
-    store.advance_run_head(
-        run_authority_id=run_id,
-        receipt_hash=r0,
-        target_state="H40_DISCOVERY",
-        predecessor_receipt_hash=None,
-        _test_token=TEST_COMMIT_TOKEN,
+    store.persist_authorization(
+        "01_discovery_authorization",
+        chain.discovery,
+        service=chain.service,
     )
-    term_receipt = _make_mock_termination_receipt(
-        run_id,
-        r0,
-        source_state="H40_DISCOVERY",
+    t0_auth = chain.service.authorize_termination(
+        prior_authority=chain.discovery,
         target_state="H40_NO_GO",
+        reason_code=H40ReasonCode.THRESHOLD_UNMET,
+        detail_message="terminal absorption test",
+        terminated_at_utc=TS,
     )
-    t0 = _publish_mock_envelope(store, term_receipt)
-    store.advance_run_head(
-        run_authority_id=run_id,
-        receipt_hash=t0,
-        target_state="H40_NO_GO",
-        predecessor_receipt_hash=r0,
-        _test_token=TEST_COMMIT_TOKEN,
+    store.persist_authorization(
+        "02_termination",
+        t0_auth,
+        service=chain.service,
     )
 
     fresh_store = H40LifecycleArtifactStore(tmp_path)
@@ -666,14 +635,11 @@ def test_r17_committed_terminal_remains_absorbing_across_fresh_store(tmp_path: P
     assert committed.terminal
     assert committed.head_state == "H40_NO_GO"
 
-    stale_cand = _publish_mock_envelope(store, _make_mock_candidate_receipt(run_id, t0, slot_index=1))
     with pytest.raises(H40GuardError, match="terminal state .* no forward commits allowed"):
-        fresh_store.advance_run_head(
-            run_authority_id=run_id,
-            receipt_hash=stale_cand,
-            target_state="H40_CANDIDATE_LOCKED",
-            predecessor_receipt_hash=t0,
-            _test_token=TEST_COMMIT_TOKEN,
+        fresh_store.persist_authorization(
+            "02_candidate_lock",
+            chain.candidate,
+            service=chain.service,
         )
 
 
@@ -852,7 +818,7 @@ def test_r24_termination_source_mutates_fails_closed(
     tmp_path: Path,
 ) -> None:
     """R24: authorize_termination fails closed if production runtime source mutates."""
-    service, discovery, _, seal, _, _, _ = _make_production_chain(monkeypatch, tmp_path)
+    service, discovery, _, _seal, _, _, _ = _make_production_chain(monkeypatch, tmp_path)
 
     # Mutate verify_against_accepted_ledger to simulate source mutation
     def fail_verify(self: Any) -> None:
@@ -877,17 +843,10 @@ def test_r24_termination_source_mutates_fails_closed(
 
 def test_r25_corrupt_head_json_only_fails_closed(tmp_path: Path) -> None:
     """R25: Corrupt head_json in SQLite fails closed on read."""
+    chain = _build_discovery_chain()
     store = H40LifecycleArtifactStore(tmp_path)
-    run_id = _hash("run-r25")
-    disc_receipt = _make_mock_discovery_receipt(run_id)
-    h = _publish_mock_envelope(store, disc_receipt)
-    store.advance_run_head(
-        run_authority_id=run_id,
-        receipt_hash=h,
-        target_state="H40_DISCOVERY",
-        predecessor_receipt_hash=None,
-        _test_token=TEST_COMMIT_TOKEN,
-    )
+    store.persist_authorization("01_discovery_authorization", chain.discovery, service=chain.service)
+    run_id = chain.run.run_authority_id
 
     # Tamper with head_json directly
     conn = store._get_sqlite_conn()
@@ -903,17 +862,10 @@ def test_r25_corrupt_head_json_only_fails_closed(tmp_path: Path) -> None:
 
 def test_r26_corrupt_scalar_column_only_fails_closed(tmp_path: Path) -> None:
     """R26: Corrupt relational scalar column in SQLite fails closed on read."""
+    chain = _build_discovery_chain()
     store = H40LifecycleArtifactStore(tmp_path)
-    run_id = _hash("run-r26")
-    disc_receipt = _make_mock_discovery_receipt(run_id)
-    h = _publish_mock_envelope(store, disc_receipt)
-    store.advance_run_head(
-        run_authority_id=run_id,
-        receipt_hash=h,
-        target_state="H40_DISCOVERY",
-        predecessor_receipt_hash=None,
-        _test_token=TEST_COMMIT_TOKEN,
-    )
+    store.persist_authorization("01_discovery_authorization", chain.discovery, service=chain.service)
+    run_id = chain.run.run_authority_id
 
     # Tamper with scalar head_state
     conn = store._get_sqlite_conn()
@@ -929,17 +881,10 @@ def test_r26_corrupt_scalar_column_only_fails_closed(tmp_path: Path) -> None:
 
 def test_r27_terminal_state_mismatch_fails_closed(tmp_path: Path) -> None:
     """R27: Mismatch between terminal flag and head_state fails closed on read."""
+    chain = _build_discovery_chain()
     store = H40LifecycleArtifactStore(tmp_path)
-    run_id = _hash("run-r27")
-    disc_receipt = _make_mock_discovery_receipt(run_id)
-    h = _publish_mock_envelope(store, disc_receipt)
-    store.advance_run_head(
-        run_authority_id=run_id,
-        receipt_hash=h,
-        target_state="H40_DISCOVERY",
-        predecessor_receipt_hash=None,
-        _test_token=TEST_COMMIT_TOKEN,
-    )
+    store.persist_authorization("01_discovery_authorization", chain.discovery, service=chain.service)
+    run_id = chain.run.run_authority_id
 
     # Set terminal=1 for H40_DISCOVERY in both scalar and json
     head = store.get_committed_run_head(run_id)
@@ -960,17 +905,10 @@ def test_r27_terminal_state_mismatch_fails_closed(tmp_path: Path) -> None:
 
 def test_r28_unknown_head_state_fails_closed(tmp_path: Path) -> None:
     """R28: Unknown head_state outside accepted vocabulary fails closed on read."""
+    chain = _build_discovery_chain()
     store = H40LifecycleArtifactStore(tmp_path)
-    run_id = _hash("run-r28")
-    disc_receipt = _make_mock_discovery_receipt(run_id)
-    h = _publish_mock_envelope(store, disc_receipt)
-    store.advance_run_head(
-        run_authority_id=run_id,
-        receipt_hash=h,
-        target_state="H40_DISCOVERY",
-        predecessor_receipt_hash=None,
-        _test_token=TEST_COMMIT_TOKEN,
-    )
+    store.persist_authorization("01_discovery_authorization", chain.discovery, service=chain.service)
+    run_id = chain.run.run_authority_id
 
     head = store.get_committed_run_head(run_id)
     assert head is not None
@@ -990,17 +928,10 @@ def test_r28_unknown_head_state_fails_closed(tmp_path: Path) -> None:
 
 def test_r29_head_hash_mismatch_fails_closed(tmp_path: Path) -> None:
     """R29: Tampered head_hash storage integrity column fails closed on read."""
+    chain = _build_discovery_chain()
     store = H40LifecycleArtifactStore(tmp_path)
-    run_id = _hash("run-r29")
-    disc_receipt = _make_mock_discovery_receipt(run_id)
-    h = _publish_mock_envelope(store, disc_receipt)
-    store.advance_run_head(
-        run_authority_id=run_id,
-        receipt_hash=h,
-        target_state="H40_DISCOVERY",
-        predecessor_receipt_hash=None,
-        _test_token=TEST_COMMIT_TOKEN,
-    )
+    store.persist_authorization("01_discovery_authorization", chain.discovery, service=chain.service)
+    run_id = chain.run.run_authority_id
 
     # Tamper with head_hash in SQLite
     conn = store._get_sqlite_conn()
