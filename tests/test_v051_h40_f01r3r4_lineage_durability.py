@@ -491,3 +491,153 @@ def test_r62_sibling_cas_terminal_and_sequence_invariants_unchanged(tmp_path: Pa
     )
     with pytest.raises(H40GuardError, match="is in terminal state"):
         store.persist_authorization("04_post_terminal", post_term, service=chain.service)
+
+
+# =============================================================================
+# R3R4R1: Content-Addressed Lineage Final Seal (R63 - R65)
+# =============================================================================
+
+
+def test_r63_missing_authoritative_head_receipt_fails_closed_without_legacy_fallback(
+    tmp_path: Path,
+) -> None:
+    """R63: Deleting authoritative content-addressed head receipt fails closed without falling back to legacy mirror."""
+    chain = _build_discovery_chain()
+    store = H40LifecycleArtifactStore(tmp_path)
+    run_id = chain.run.run_authority_id
+
+    # Persist Discovery using legacy transition key
+    legacy_key = "01_discovery_authorization"
+    store.persist_authorization(legacy_key, chain.discovery, service=chain.service)
+
+    receipt_path = store._receipts_dir(run_id) / f"{chain.discovery.receipt_hash}.json"
+    legacy_path = store._run_dir(run_id) / f"{legacy_key}.json"
+
+    # Both paths exist initially
+    assert receipt_path.is_file()
+    assert legacy_path.is_file()
+
+    # Delete ONLY the authoritative content-addressed receipt file
+    receipt_path.unlink()
+    assert not receipt_path.exists()
+    assert legacy_path.is_file()
+
+    fresh_service, resolver = _make_resolvers(chain)
+
+    # Restoration must fail closed and NOT fall back to legacy mirror
+    with pytest.raises(H40GuardError, match="not found in receipts directory"):
+        store.restore_authorization(
+            run_id,
+            legacy_key,
+            service=fresh_service,
+            resolver=resolver,
+        )
+
+
+def test_r64_missing_authoritative_non_head_receipt_fails_closed(tmp_path: Path) -> None:
+    """R64: Deleting content-addressed non-head receipt fails closed during full committed-lineage verification."""
+    wf_chain = _build_wf_chain()
+    disc_chain = wf_chain.discovery_chain
+    store = H40LifecycleArtifactStore(tmp_path)
+    run_id = disc_chain.run.run_authority_id
+
+    # Commit 3 levels using legacy keys: D -> C -> W
+    store.persist_authorization("01_discovery", disc_chain.discovery, service=disc_chain.service)
+    store.persist_authorization("02_candidate_lock", disc_chain.candidate, service=disc_chain.service)
+    store.persist_authorization("03_wf_validation", wf_chain.wf, service=disc_chain.service)
+
+    cand_receipt_path = store._receipts_dir(run_id) / f"{disc_chain.candidate.receipt_hash}.json"
+    cand_legacy_path = store._run_dir(run_id) / "02_candidate_lock.json"
+
+    assert cand_receipt_path.is_file()
+    assert cand_legacy_path.is_file()
+
+    # Delete ONLY the content-addressed Candidate receipt; keep legacy mirror intact
+    cand_receipt_path.unlink()
+    assert not cand_receipt_path.exists()
+    assert cand_legacy_path.is_file()
+
+    fresh_service = H40LifecycleAuthorityService.synthetic_for_tests(
+        disc_chain.authority,
+        H40SyntheticEvidenceVerifier(disc_chain.verifier.export_payloads_for_tests()),
+    )
+    resolver = H40SyntheticAuthorityResolver.for_tests(
+        implementation_authorities=(disc_chain.authority,),
+        run_authorities=(disc_chain.run,),
+        runtime_seals=(disc_chain.seal,),
+        split_authorities=(wf_chain.split,),
+    )
+
+    # Restoring legitimate genesis D must fail closed
+    with pytest.raises(H40GuardError, match="not found in receipts directory"):
+        store.restore_authorization(
+            run_id,
+            disc_chain.discovery.receipt_hash,
+            service=fresh_service,
+            resolver=resolver,
+        )
+
+    # Restoring head W itself must also fail closed
+    with pytest.raises(H40GuardError, match="not found in receipts directory"):
+        store.restore_authorization(
+            run_id,
+            wf_chain.wf.receipt_hash,
+            service=fresh_service,
+            resolver=resolver,
+        )
+
+
+def test_r65_intact_authoritative_receipts_restore_successfully(tmp_path: Path) -> None:
+    """R65: Intact content-addressed receipt chain restores head and legitimate ancestors successfully."""
+    wf_chain = _build_wf_chain()
+    disc_chain = wf_chain.discovery_chain
+    store = H40LifecycleArtifactStore(tmp_path)
+    run_id = disc_chain.run.run_authority_id
+
+    # Commit 3 levels: D -> C -> W
+    store.persist_authorization("01_discovery", disc_chain.discovery, service=disc_chain.service)
+    store.persist_authorization("02_candidate_lock", disc_chain.candidate, service=disc_chain.service)
+    store.persist_authorization("03_wf_validation", wf_chain.wf, service=disc_chain.service)
+
+    # Verify content-addressed files are present
+    assert (store._receipts_dir(run_id) / f"{disc_chain.discovery.receipt_hash}.json").is_file()
+    assert (store._receipts_dir(run_id) / f"{disc_chain.candidate.receipt_hash}.json").is_file()
+    assert (store._receipts_dir(run_id) / f"{wf_chain.wf.receipt_hash}.json").is_file()
+
+    fresh_service = H40LifecycleAuthorityService.synthetic_for_tests(
+        disc_chain.authority,
+        H40SyntheticEvidenceVerifier(disc_chain.verifier.export_payloads_for_tests()),
+    )
+    resolver = H40SyntheticAuthorityResolver.for_tests(
+        implementation_authorities=(disc_chain.authority,),
+        run_authorities=(disc_chain.run,),
+        runtime_seals=(disc_chain.seal,),
+        split_authorities=(wf_chain.split,),
+    )
+
+    # Restore head W
+    r_w = store.restore_authorization(
+        run_id,
+        wf_chain.wf.receipt_hash,
+        service=fresh_service,
+        resolver=resolver,
+    )
+    assert r_w.receipt_hash == wf_chain.wf.receipt_hash
+
+    # Restore ancestor C
+    r_c = store.restore_authorization(
+        run_id,
+        disc_chain.candidate.receipt_hash,
+        service=fresh_service,
+        resolver=resolver,
+    )
+    assert r_c.receipt_hash == disc_chain.candidate.receipt_hash
+
+    # Restore ancestor D
+    r_d = store.restore_authorization(
+        run_id,
+        disc_chain.discovery.receipt_hash,
+        service=fresh_service,
+        resolver=resolver,
+    )
+    assert r_d.receipt_hash == disc_chain.discovery.receipt_hash

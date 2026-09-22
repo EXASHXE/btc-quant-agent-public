@@ -4637,13 +4637,10 @@ class H40LifecycleArtifactStore:
 
             receipt_path = self._receipts_dir(run_authority_id) / f"{curr_hash}.json"
             if not receipt_path.is_file():
-                try:
-                    receipt_path = self._find_receipt_path(run_authority_id, curr_hash)
-                except H40GuardError as exc:
-                    raise H40GuardError(
-                        H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
-                        f"lineage receipt '{curr_hash}' not found on disk",
-                    ) from exc
+                raise H40GuardError(
+                    H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                    f"authoritative lineage receipt '{curr_hash}.json' not found in receipts directory",
+                )
 
             try:
                 raw_envelope = json.loads(receipt_path.read_text(encoding="utf-8"))
