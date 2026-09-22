@@ -4270,7 +4270,10 @@ class H40LifecycleArtifactStore:
                 except OSError:
                     pass
                 raise
-            _fsync_dir(receipts_dir, fail_closed=True)
+
+        # RG-H01-01: Every path that may advance durable head MUST establish
+        # authoritative receipt-directory durability before head commit.
+        _fsync_dir(receipts_dir, fail_closed=True)
 
         legacy_path: Path | None = None
         if transition_key != receipt_hash and self._KEY_RE.fullmatch(transition_key):
@@ -4600,9 +4603,25 @@ class H40LifecycleArtifactStore:
         run_authority_id: str,
         committed_head: H40DurableRunHead,
     ) -> list[str]:
+        _require_sha256(run_authority_id, "run_authority_id")
+        if not isinstance(committed_head, H40DurableRunHead):
+            raise H40GuardError(
+                H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                "committed_head must be H40DurableRunHead",
+            )
+        _require_sha256(committed_head.head_receipt_hash, "head_receipt_hash")
+        if committed_head.head_predecessor_receipt_hash is not None:
+            _require_sha256(
+                committed_head.head_predecessor_receipt_hash,
+                "head_predecessor_receipt_hash",
+            )
+
         curr_hash: str | None = committed_head.head_receipt_hash
         lineage: list[str] = []
         visited: set[str] = set()
+        prev_source_state: str | None = None
+        is_head = True
+
         while curr_hash is not None:
             if curr_hash in visited:
                 raise H40GuardError(
@@ -4610,32 +4629,184 @@ class H40LifecycleArtifactStore:
                     "cyclic committed lineage detected in durable store",
                 )
             visited.add(curr_hash)
-            lineage.append(curr_hash)
-            path = self._find_receipt_path(run_authority_id, curr_hash)
+            if _SHA256_RE.fullmatch(curr_hash) is None:
+                raise H40GuardError(
+                    H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                    f"invalid receipt hash format in lineage: '{curr_hash}'",
+                )
+
+            receipt_path = self._receipts_dir(run_authority_id) / f"{curr_hash}.json"
+            if not receipt_path.is_file():
+                try:
+                    receipt_path = self._find_receipt_path(run_authority_id, curr_hash)
+                except H40GuardError as exc:
+                    raise H40GuardError(
+                        H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                        f"lineage receipt '{curr_hash}' not found on disk",
+                    ) from exc
+
             try:
-                raw = json.loads(path.read_text(encoding="utf-8"))
+                raw_envelope = json.loads(receipt_path.read_text(encoding="utf-8"))
             except (OSError, UnicodeError, json.JSONDecodeError) as exc:
                 raise H40GuardError(
                     H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
                     f"failed to read lineage receipt '{curr_hash}'",
                 ) from exc
-            if not isinstance(raw, Mapping):
+
+            if not isinstance(raw_envelope, Mapping):
                 raise H40GuardError(
                     H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
-                    f"receipt in lineage '{curr_hash}' has invalid payload",
+                    f"receipt in lineage '{curr_hash}' envelope must be a mapping",
                 )
-            receipt_payload = raw.get("receipt")
+
+            _require_exact_keys(
+                raw_envelope,
+                frozenset({
+                    "authority_context",
+                    "bound_evidence",
+                    "bound_evidence_sha256",
+                    "receipt",
+                    "receipt_sha256",
+                }),
+                "lifecycle envelope",
+            )
+
+            envelope_digest = raw_envelope.get("receipt_sha256")
+            if envelope_digest != curr_hash:
+                raise H40GuardError(
+                    H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                    f"envelope receipt_sha256 '{envelope_digest}' does not match expected '{curr_hash}'",
+                )
+
+            receipt_payload = raw_envelope.get("receipt")
             if not isinstance(receipt_payload, Mapping):
                 raise H40GuardError(
                     H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
                     f"receipt in lineage '{curr_hash}' has invalid receipt object",
                 )
-            curr_hash = receipt_payload.get("upstream_receipt_hash")
-            if curr_hash is not None and not isinstance(curr_hash, str):
+
+            if canonical_sha256(receipt_payload) != curr_hash:
                 raise H40GuardError(
                     H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
-                    f"upstream receipt hash in lineage '{curr_hash}' is invalid",
+                    f"receipt in lineage '{curr_hash}' content hash mismatch",
                 )
+
+            schema_id = receipt_payload.get("receipt_schema_id")
+            parser = _RECEIPT_PARSERS.get(str(schema_id))
+            if parser is None:
+                raise H40GuardError(
+                    H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                    f"unknown receipt schema '{schema_id}' in lineage '{curr_hash}'",
+                )
+
+            try:
+                typed_receipt = parser(receipt_payload)
+            except Exception as exc:
+                raise H40GuardError(
+                    H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                    f"failed to parse typed receipt in lineage '{curr_hash}': {exc}",
+                ) from exc
+
+            if typed_receipt.receipt_sha256 != curr_hash:
+                raise H40GuardError(
+                    H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                    f"recomputed typed receipt hash in lineage '{curr_hash}' mismatch",
+                )
+
+            if typed_receipt.run_authority_id != run_authority_id:
+                raise H40GuardError(
+                    H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                    f"receipt in lineage '{curr_hash}' run_authority_id mismatch: "
+                    f"'{typed_receipt.run_authority_id}' != '{run_authority_id}'",
+                )
+
+            # Determine receipt source and target states
+            if isinstance(typed_receipt, H40DiscoveryAuthorizationReceipt):
+                node_target_state = "H40_DISCOVERY"
+                node_source_state = "H40_P1_SCAFFOLDED"
+            elif isinstance(typed_receipt, H40CandidateLockReceipt):
+                node_target_state = "H40_CANDIDATE_LOCKED"
+                node_source_state = "H40_DISCOVERY"
+            elif isinstance(typed_receipt, H40WFValidationReceipt):
+                node_target_state = "H40_WALK_FORWARD_VALIDATED"
+                node_source_state = "H40_CANDIDATE_LOCKED"
+            elif isinstance(typed_receipt, H40ConfirmationReadyReceipt):
+                node_target_state = "H40_CONFIRMATION_READY"
+                node_source_state = "H40_WALK_FORWARD_VALIDATED"
+            elif isinstance(typed_receipt, H40TerminationReceipt):
+                node_target_state = typed_receipt.target_state
+                node_source_state = typed_receipt.source_state
+            else:
+                raise H40GuardError(
+                    H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                    f"unexpected receipt type '{type(typed_receipt).__name__}' in lineage",
+                )
+
+            if (node_source_state, node_target_state) not in _ACCEPTED_TRANSITIONS:
+                raise H40GuardError(
+                    H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                    f"transition '{node_source_state}' -> '{node_target_state}' in lineage is not accepted",
+                )
+
+            # Adjacency checks
+            if is_head:
+                if node_target_state != committed_head.head_state:
+                    raise H40GuardError(
+                        H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                        f"head receipt target state '{node_target_state}' does not match "
+                        f"durable head state '{committed_head.head_state}'",
+                    )
+                if typed_receipt.upstream_receipt_hash != committed_head.head_predecessor_receipt_hash:
+                    raise H40GuardError(
+                        H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                        f"head receipt upstream hash '{typed_receipt.upstream_receipt_hash}' does not match "
+                        f"durable head predecessor '{committed_head.head_predecessor_receipt_hash}'",
+                    )
+                is_head = False
+            else:
+                if node_target_state != prev_source_state:
+                    raise H40GuardError(
+                        H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                        f"lineage transition adjacency broken: predecessor target state '{node_target_state}' "
+                        f"does not match successor source state '{prev_source_state}'",
+                    )
+
+            upstream = typed_receipt.upstream_receipt_hash
+            if isinstance(typed_receipt, H40DiscoveryAuthorizationReceipt):
+                if upstream is not None:
+                    raise H40GuardError(
+                        H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                        f"discovery genesis receipt '{curr_hash}' must have null upstream hash",
+                    )
+            else:
+                if upstream is None:
+                    raise H40GuardError(
+                        H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                        f"non-genesis receipt '{curr_hash}' cannot have null upstream hash",
+                    )
+                if not isinstance(upstream, str) or _SHA256_RE.fullmatch(upstream) is None:
+                    raise H40GuardError(
+                        H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                        f"upstream receipt hash in lineage '{curr_hash}' is invalid: '{upstream}'",
+                    )
+
+            lineage.append(curr_hash)
+            prev_source_state = node_source_state
+            curr_hash = upstream
+
+        if prev_source_state != "H40_P1_SCAFFOLDED":
+            raise H40GuardError(
+                H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                "committed lineage does not terminate at genesis state",
+            )
+
+        if committed_head.transition_sequence != len(lineage) - 1:
+            raise H40GuardError(
+                H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                f"committed lineage depth {len(lineage) - 1} does not match "
+                f"durable head transition_sequence {committed_head.transition_sequence}",
+            )
+
         return lineage
 
     def restore_authorization(
@@ -4675,7 +4846,13 @@ class H40LifecycleArtifactStore:
                 "lifecycle envelope must be an object",
             )
         target_hash = raw_target.get("receipt_sha256")
-        if not isinstance(target_hash, str) or target_hash not in lineage:
+        target_payload = raw_target.get("receipt")
+        if (
+            not isinstance(target_hash, str)
+            or not isinstance(target_payload, Mapping)
+            or canonical_sha256(target_payload) != target_hash
+            or target_hash not in lineage
+        ):
             raise H40GuardError(
                 H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
                 f"target receipt '{target_hash}' is not in committed run head lineage",
