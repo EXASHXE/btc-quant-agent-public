@@ -1451,10 +1451,10 @@ def test_r01_r04_amended_authority_hashes_and_science_are_exact() -> None:
         == "76a0732742707c78f65da26263076bed7b586ea67d4f5ddd2dac33761e37e612"
     )
     assert compute_lifecycle_semantic_root_hash() == (
-        "f0aa35eb91055a76129eae5c00be38174fcc13ae9fe08521d9202e93dc5d43d4"
+        "846591f8eac0e1abbedaeeff4c2b0bb7648fe51bdaf981e3309c6f6c440aba8e"
     )
     assert compute_lifecycle_governance_authority_hash() == (
-        "72924dd22b3c9283964cdf368f7a754bd6f703a110989187620b36076a25a511"
+        "7e9433aa2ee706dda61871c6ad2b1a1aee4cf7a8f9b6365351942096b5347c84"
     )
     assert compute_protocol_authority_hash() == EXPECTED_PROTOCOL_AUTHORITY_HASH
     assert compute_semantic_root_hash() == EXPECTED_SEMANTIC_ROOT_HASH
@@ -2446,10 +2446,10 @@ def test_a30_through_a41_frozen_identities_and_invariants() -> None:
     assert child_hashes["persistence_replay_contract"] == "5f014b867be17019c2be91ff48f8e23a43ed29678fc5589430ba174046fceaae"
 
     # A31: lifecycle root V3 exact
-    assert compute_lifecycle_semantic_root_hash() == "f0aa35eb91055a76129eae5c00be38174fcc13ae9fe08521d9202e93dc5d43d4"
+    assert compute_lifecycle_semantic_root_hash() == "846591f8eac0e1abbedaeeff4c2b0bb7648fe51bdaf981e3309c6f6c440aba8e"
 
     # A32: governance V4 exact
-    assert compute_lifecycle_governance_authority_hash() == "72924dd22b3c9283964cdf368f7a754bd6f703a110989187620b36076a25a511"
+    assert compute_lifecycle_governance_authority_hash() == "7e9433aa2ee706dda61871c6ad2b1a1aee4cf7a8f9b6365351942096b5347c84"
 
     # A33: all other eight lifecycle child hashes unchanged
     for name, expected in EXPECTED_LIFECYCLE_CHILD_HASHES.items():

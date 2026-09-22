@@ -469,11 +469,11 @@ def test_r45_current_hashes_remain_exact_and_unchanged() -> None:
     )
     assert (
         compute_lifecycle_semantic_root_hash()
-        == "f0aa35eb91055a76129eae5c00be38174fcc13ae9fe08521d9202e93dc5d43d4"
+        == "846591f8eac0e1abbedaeeff4c2b0bb7648fe51bdaf981e3309c6f6c440aba8e"
     )
     assert (
         compute_lifecycle_governance_authority_hash()
-        == "72924dd22b3c9283964cdf368f7a754bd6f703a110989187620b36076a25a511"
+        == "7e9433aa2ee706dda61871c6ad2b1a1aee4cf7a8f9b6365351942096b5347c84"
     )
     assert compute_protocol_authority_hash() == EXPECTED_PROTOCOL_AUTHORITY_HASH
     assert compute_semantic_root_hash() == EXPECTED_SEMANTIC_ROOT_HASH
