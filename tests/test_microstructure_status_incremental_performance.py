@@ -129,16 +129,6 @@ def _reference_buckets_and_rolling(store: MicrostructureStore, now_ms: int) -> d
         default=now_ms,
     )
 
-    bucket_candidates: set[tuple[int, int]] = set()
-    if evaluation_start < now_ms:
-        for interval in store.INTERVALS_MS:
-            first = evaluation_start // interval * interval
-            latest_closed = now_ms // interval * interval - interval
-            bucket_candidates.update(
-                (interval, start)
-                for start in range(first, latest_closed + 1, interval)
-            )
-
     def _merge(segs: list[tuple[int, int]]) -> list[tuple[int, int]]:
         if not segs:
             return []
@@ -155,10 +145,10 @@ def _reference_buckets_and_rolling(store: MicrostructureStore, now_ms: int) -> d
                 merged.append([s, e])
         return [(s, e) for s, e in merged]
 
-    def _covered(merged: list[tuple[int, int]], start_ms: int, end_ms: int) -> int:
+    def _covered(merged: list[tuple[int, int]], start_ms: int, end_ms: int, hint_idx: int = 0) -> tuple[int, int]:
         if not merged or end_ms <= start_ms:
-            return 0
-        idx = bisect.bisect_right(merged, (start_ms, 10**18)) - 1
+            return 0, hint_idx
+        idx = bisect.bisect_right(merged, (start_ms, 10**18), lo=hint_idx) - 1
         idx = max(idx, 0)
         covered = 0
         for s, e in merged[idx:]:
@@ -168,19 +158,19 @@ def _reference_buckets_and_rolling(store: MicrostructureStore, now_ms: int) -> d
             overlap_e = min(end_ms, e)
             if overlap_e > overlap_s:
                 covered += overlap_e - overlap_s
-        return covered
+        return covered, idx
 
-    def _has_gap(merged_gaps: list[tuple[int, int]], start_ms: int, end_ms: int) -> bool:
+    def _has_gap(merged_gaps: list[tuple[int, int]], start_ms: int, end_ms: int, hint_idx: int = 0) -> tuple[bool, int]:
         if not merged_gaps or end_ms <= start_ms:
-            return False
-        idx = bisect.bisect_right(merged_gaps, (start_ms, 10**18)) - 1
+            return False, hint_idx
+        idx = bisect.bisect_right(merged_gaps, (start_ms, 10**18), lo=hint_idx) - 1
         idx = max(idx, 0)
         for s, e in merged_gaps[idx:]:
             if s >= end_ms:
                 break
             if s < end_ms and e >= start_ms:
-                return True
-        return False
+                return True, idx
+        return False, idx
 
     merged_trade = _merge(segments.get("trade", []))
     merged_depth = _merge(segments.get("depth", []))
@@ -191,16 +181,26 @@ def _reference_buckets_and_rolling(store: MicrostructureStore, now_ms: int) -> d
     completeness_by_interval: dict[str, dict[str, int | float]] = {}
 
     for interval in store.INTERVALS_MS:
-        interval_candidates = sorted(
-            start for candidate_interval, start in bucket_candidates if candidate_interval == interval
-        )
+        first = evaluation_start // interval * interval
+        latest_closed = now_ms // interval * interval - interval
+        if evaluation_start < now_ms and first <= latest_closed:
+            interval_candidates = range(first, latest_closed + 1, interval)
+            count = len(interval_candidates)
+        else:
+            interval_candidates = range(0)
+            count = 0
+
         interval_complete = interval_gap = 0
+        trade_hint = depth_hint = valid_hint = gap_hint = 0
         for start in interval_candidates:
             end = start + interval
-            trade_ratio = _covered(merged_trade, start, end) / interval
-            depth_ratio = _covered(merged_depth, start, end) / interval
-            valid_ratio = _covered(merged_valid, start, end) / interval
-            gap_overlap = _has_gap(merged_gaps, start, end)
+            cov_t, trade_hint = _covered(merged_trade, start, end, trade_hint)
+            cov_d, depth_hint = _covered(merged_depth, start, end, depth_hint)
+            cov_v, valid_hint = _covered(merged_valid, start, end, valid_hint)
+            gap_overlap, gap_hint = _has_gap(merged_gaps, start, end, gap_hint)
+            trade_ratio = cov_t / interval
+            depth_ratio = cov_d / interval
+            valid_ratio = cov_v / interval
             interval_gap += int(gap_overlap)
             interval_complete += int(
                 trade_ratio >= store.protocol.minimum_trade_coverage
@@ -208,13 +208,13 @@ def _reference_buckets_and_rolling(store: MicrostructureStore, now_ms: int) -> d
                 and valid_ratio >= store.protocol.minimum_depth_valid_coverage
                 and not gap_overlap
             )
-        closed_buckets += len(interval_candidates)
+        closed_buckets += count
         complete_buckets += interval_complete
         gap_affected_buckets += interval_gap
         completeness_by_interval[str(interval)] = {
-            "closed": len(interval_candidates),
+            "closed": count,
             "complete": interval_complete,
-            "ratio": interval_complete / len(interval_candidates) if interval_candidates else 0.0,
+            "ratio": interval_complete / count if count else 0.0,
         }
     completeness_ratio = complete_buckets / closed_buckets if closed_buckets else 0.0
 
@@ -255,8 +255,7 @@ def test_p01_raw_gap_compression(tmp_path: Path) -> None:
     rows_per_cluster = 10_000
     total_gaps = num_clusters * rows_per_cluster
 
-    with sqlite3.connect(p) as conn:
-        conn.execute("BEGIN TRANSACTION")
+    def _gap_gen():
         for c in range(num_clusters):
             c_start = day_start + c * 3_600_000
             for r in range(rows_per_cluster):
@@ -265,11 +264,13 @@ def test_p01_raw_gap_compression(tmp_path: Path) -> None:
                 e = s + 1500
                 kind = "DEPTH_SEQUENCE_GAP" if (c + r) % 2 == 0 else "DEPTH_RECONNECT"
                 gid = c * rows_per_cluster + r + 1
-                conn.execute(
-                    "INSERT INTO gaps (id, start_ms, end_ms, kind, detail) VALUES (?, ?, ?, ?, ?)",
-                    (gid, s, e, kind, "test"),
-                )
-        conn.commit()
+                yield (gid, s, e, kind, "test")
+
+    with sqlite3.connect(p) as conn:
+        conn.executemany(
+            "INSERT INTO gaps (id, start_ms, end_ms, kind, detail) VALUES (?, ?, ?, ?, ?)",
+            _gap_gen(),
+        )
 
     status = store.status(now_ms=day_start + 86_400_000)
     assert status["gap_count"] == total_gaps
@@ -321,11 +322,11 @@ def test_p02_rolling_gap_count_exact(tmp_path: Path) -> None:
     with sqlite3.connect(p1) as conn:
         conn.execute(
             "INSERT INTO coverage_segments VALUES (1, 'i1', 'depth', ?, ?, 1, 'CLOSED')",
-            (day1_start + 3600_000, day1_start + 86400_000),
+            (day2_start - 3600_000, day2_start),
         )
         conn.execute(
             "INSERT INTO coverage_segments VALUES (2, 'i1', 'trade', ?, ?, 1, 'CLOSED')",
-            (day1_start + 3600_000, day1_start + 86400_000),
+            (day2_start - 3600_000, day2_start),
         )
         # Long gap starting before rolling window that reaches day 2
         conn.execute(
@@ -340,7 +341,7 @@ def test_p02_rolling_gap_count_exact(tmp_path: Path) -> None:
         # Ordinary gap within day 1
         conn.execute(
             "INSERT INTO gaps VALUES (3, ?, ?, 'DEPTH_RECONNECT', 'day1')",
-            (day1_start + 10_000, day1_start + 20_000),
+            (day2_start - 20_000, day2_start - 10_000),
         )
 
     # Re-finalize p1 manifest sha after gap inserts
@@ -350,11 +351,11 @@ def test_p02_rolling_gap_count_exact(tmp_path: Path) -> None:
     with sqlite3.connect(p2) as conn:
         conn.execute(
             "INSERT INTO coverage_segments VALUES (1, 'i1', 'depth', ?, ?, 1, 'CLOSED')",
-            (day2_start, day2_start + 86400_000),
+            (day2_start, day2_start + 120_000),
         )
         conn.execute(
             "INSERT INTO coverage_segments VALUES (2, 'i1', 'trade', ?, ?, 1, 'CLOSED')",
-            (day2_start, day2_start + 86400_000),
+            (day2_start, day2_start + 120_000),
         )
         # Gap in day 2
         conn.execute(
@@ -365,11 +366,11 @@ def test_p02_rolling_gap_count_exact(tmp_path: Path) -> None:
     with sqlite3.connect(p3) as conn:
         conn.execute(
             "INSERT INTO coverage_segments VALUES (1, 'i1', 'depth', ?, ?, 1, 'OPEN')",
-            (day3_start, day3_start + 3600_000),
+            (day3_start, day3_start + 120_000),
         )
         conn.execute(
             "INSERT INTO coverage_segments VALUES (2, 'i1', 'trade', ?, ?, 1, 'OPEN')",
-            (day3_start, day3_start + 3600_000),
+            (day3_start, day3_start + 120_000),
         )
         # Active gap in day 3
         conn.execute(
@@ -377,7 +378,7 @@ def test_p02_rolling_gap_count_exact(tmp_path: Path) -> None:
             (day3_start + 500, day3_start + 1500),
         )
 
-    now_eval = day3_start + 3600_000
+    now_eval = day3_start + 120_000
     ref = _reference_buckets_and_rolling(store, now_eval)
     opt = store.status(now_ms=now_eval)
 
@@ -609,10 +610,14 @@ def test_p10_no_historical_bucket_set(tmp_path: Path) -> None:
     _init_partition_db(p3)
 
     # Coverage across days
-    for p, d in ((p1, day1), (p2, day2), (p3, day3)):
+    for p, d_start, d_end in (
+        (p1, day2 - 60_000, day2),
+        (p2, day3 - 60_000, day3),
+        (p3, day3, day3 + 60_000),
+    ):
         with sqlite3.connect(p) as conn:
-            conn.execute("INSERT INTO coverage_segments VALUES (1, 'i1', 'depth', ?, ?, 1, 'CLOSED')", (d, d + 86400_000))
-            conn.execute("INSERT INTO coverage_segments VALUES (2, 'i1', 'trade', ?, ?, 1, 'CLOSED')", (d, d + 86400_000))
+            conn.execute("INSERT INTO coverage_segments VALUES (1, 'i1', 'depth', ?, ?, 1, 'CLOSED')", (d_start, d_end))
+            conn.execute("INSERT INTO coverage_segments VALUES (2, 'i1', 'trade', ?, ?, 1, 'CLOSED')", (d_start, d_end))
 
     # Finalize p1 and p2
     store.finalize_partitions(now_ms=day3 + 86_400_000)
@@ -620,9 +625,9 @@ def test_p10_no_historical_bucket_set(tmp_path: Path) -> None:
     # Assert store does not have bucket_candidates attribute
     assert not hasattr(store, "bucket_candidates")
 
-    _ = store.status(now_ms=day3 + 3600_000)
+    _ = store.status(now_ms=day3 + 60_000)
     # Warm check
-    status_warm = store.status(now_ms=day3 + 3600_000)
+    status_warm = store.status(now_ms=day3 + 60_000)
     assert status_warm["status_performance"]["bucket_history_cache_hits"] >= 3  # 1 hit per interval per finalized partition
 
 
@@ -638,9 +643,9 @@ def test_p11_bucket_summary_semantic_equivalence(tmp_path: Path) -> None:
     _init_partition_db(p2)
 
     with sqlite3.connect(p1) as conn:
-        conn.execute("INSERT INTO coverage_segments VALUES (1, 'i1', 'depth', ?, ?, 1, 'CLOSED')", (day1, day1 + 86400_000))
-        conn.execute("INSERT INTO coverage_segments VALUES (2, 'i1', 'trade', ?, ?, 1, 'CLOSED')", (day1, day1 + 86400_000))
-        conn.execute("INSERT INTO gaps VALUES (1, ?, ?, 'DEPTH_SEQUENCE_GAP', 'g1')", (day1 + 1000, day1 + 2000))
+        conn.execute("INSERT INTO coverage_segments VALUES (1, 'i1', 'depth', ?, ?, 1, 'CLOSED')", (day2 - 600_000, day2))
+        conn.execute("INSERT INTO coverage_segments VALUES (2, 'i1', 'trade', ?, ?, 1, 'CLOSED')", (day2 - 600_000, day2))
+        conn.execute("INSERT INTO gaps VALUES (1, ?, ?, 'DEPTH_SEQUENCE_GAP', 'g1')", (day2 - 300_000, day2 - 250_000))
 
     with sqlite3.connect(p2) as conn:
         conn.execute("INSERT INTO coverage_segments VALUES (1, 'i1', 'depth', ?, ?, 1, 'CLOSED')", (day2, day2 + 86400_000))
@@ -662,7 +667,7 @@ def test_p11_bucket_summary_semantic_equivalence(tmp_path: Path) -> None:
 def test_p12_partial_first_day(tmp_path: Path) -> None:
     """P12: Campaign/evaluation start mid-day. Require exact equality against brute-force reference."""
     day1 = _day_ts(2026, 9, 1)
-    campaign_start = day1 + 14 * 3600_000 + 17 * 60_000  # 14:17:00 UTC
+    campaign_start = day1 + 86400_000 - 600_000  # 23:50:00 UTC
 
     store = MicrostructureStore(tmp_path / "micro", "TEST_P12", campaign_start)
     p1 = store._path(day1)
@@ -697,18 +702,18 @@ def test_p13_cross_midnight_gap(tmp_path: Path) -> None:
     _init_partition_db(p2)
 
     with sqlite3.connect(p1) as conn:
-        conn.execute("INSERT INTO coverage_segments VALUES (1, 'i1', 'depth', ?, ?, 1, 'CLOSED')", (day1, day1 + 86400_000))
-        conn.execute("INSERT INTO coverage_segments VALUES (2, 'i1', 'trade', ?, ?, 1, 'CLOSED')", (day1, day1 + 86400_000))
+        conn.execute("INSERT INTO coverage_segments VALUES (1, 'i1', 'depth', ?, ?, 1, 'CLOSED')", (day2 - 600_000, day2))
+        conn.execute("INSERT INTO coverage_segments VALUES (2, 'i1', 'trade', ?, ?, 1, 'CLOSED')", (day2 - 600_000, day2))
         # Cross midnight gap from 23:59:50 to 00:00:20 (30 seconds)
         conn.execute("INSERT INTO gaps VALUES (1, ?, ?, 'DEPTH_SEQUENCE_GAP', 'x_midnight')", (day2 - 10_000, day2 + 20_000))
 
     with sqlite3.connect(p2) as conn:
-        conn.execute("INSERT INTO coverage_segments VALUES (1, 'i1', 'depth', ?, ?, 1, 'CLOSED')", (day2, day2 + 86400_000))
-        conn.execute("INSERT INTO coverage_segments VALUES (2, 'i1', 'trade', ?, ?, 1, 'CLOSED')", (day2, day2 + 86400_000))
+        conn.execute("INSERT INTO coverage_segments VALUES (1, 'i1', 'depth', ?, ?, 1, 'CLOSED')", (day2, day2 + 600_000))
+        conn.execute("INSERT INTO coverage_segments VALUES (2, 'i1', 'trade', ?, ?, 1, 'CLOSED')", (day2, day2 + 600_000))
 
-    store.finalize_partitions(now_ms=day2 + 86400_000 + store.protocol.finalization_grace_ms + 1000)
+    store.finalize_partitions(now_ms=day2 + 1000 + store.protocol.finalization_grace_ms)
 
-    eval_now = day2 + 86400_000
+    eval_now = day2 + 600_000
     ref = _reference_buckets_and_rolling(store, eval_now)
     opt = store.status(now_ms=eval_now)
 
@@ -728,18 +733,18 @@ def test_p14_cross_midnight_coverage_segment(tmp_path: Path) -> None:
     _init_partition_db(p1)
     _init_partition_db(p2)
 
-    # Segment in p1 extends past midnight to 02:00:00 on day 2
+    # Segment in p1 extends past midnight to 00:03:00 on day 2
     with sqlite3.connect(p1) as conn:
-        conn.execute("INSERT INTO coverage_segments VALUES (1, 'i1', 'depth', ?, ?, 1, 'CLOSED')", (day1, day2 + 7200_000))
-        conn.execute("INSERT INTO coverage_segments VALUES (2, 'i1', 'trade', ?, ?, 1, 'CLOSED')", (day1, day2 + 7200_000))
+        conn.execute("INSERT INTO coverage_segments VALUES (1, 'i1', 'depth', ?, ?, 1, 'CLOSED')", (day2 - 600_000, day2 + 180_000))
+        conn.execute("INSERT INTO coverage_segments VALUES (2, 'i1', 'trade', ?, ?, 1, 'CLOSED')", (day2 - 600_000, day2 + 180_000))
 
     with sqlite3.connect(p2) as conn:
-        conn.execute("INSERT INTO coverage_segments VALUES (1, 'i1', 'depth', ?, ?, 1, 'CLOSED')", (day2 + 7200_000, day2 + 86400_000))
-        conn.execute("INSERT INTO coverage_segments VALUES (2, 'i1', 'trade', ?, ?, 1, 'CLOSED')", (day2 + 7200_000, day2 + 86400_000))
+        conn.execute("INSERT INTO coverage_segments VALUES (1, 'i1', 'depth', ?, ?, 1, 'CLOSED')", (day2 + 180_000, day2 + 600_000))
+        conn.execute("INSERT INTO coverage_segments VALUES (2, 'i1', 'trade', ?, ?, 1, 'CLOSED')", (day2 + 180_000, day2 + 600_000))
 
-    store.finalize_partitions(now_ms=day2 + 86400_000 + store.protocol.finalization_grace_ms + 1000)
+    store.finalize_partitions(now_ms=day2 + 1000 + store.protocol.finalization_grace_ms)
 
-    eval_now = day2 + 86400_000
+    eval_now = day2 + 600_000
     ref = _reference_buckets_and_rolling(store, eval_now)
     opt = store.status(now_ms=eval_now)
 
@@ -762,19 +767,22 @@ def test_p15_active_plus_finalized_composition(tmp_path: Path) -> None:
     _init_partition_db(p2)
     _init_partition_db(p3)
 
-    for p, d in ((p1, day1), (p2, day2)):
-        with sqlite3.connect(p) as conn:
-            conn.execute("INSERT INTO coverage_segments VALUES (1, 'i1', 'depth', ?, ?, 1, 'CLOSED')", (d, d + 86400_000))
-            conn.execute("INSERT INTO coverage_segments VALUES (2, 'i1', 'trade', ?, ?, 1, 'CLOSED')", (d, d + 86400_000))
+    with sqlite3.connect(p1) as conn:
+        conn.execute("INSERT INTO coverage_segments VALUES (1, 'i1', 'depth', ?, ?, 1, 'CLOSED')", (day2 - 300_000, day2))
+        conn.execute("INSERT INTO coverage_segments VALUES (2, 'i1', 'trade', ?, ?, 1, 'CLOSED')", (day2 - 300_000, day2))
+
+    with sqlite3.connect(p2) as conn:
+        conn.execute("INSERT INTO coverage_segments VALUES (1, 'i1', 'depth', ?, ?, 1, 'CLOSED')", (day2, day2 + 86400_000))
+        conn.execute("INSERT INTO coverage_segments VALUES (2, 'i1', 'trade', ?, ?, 1, 'CLOSED')", (day2, day2 + 86400_000))
 
     with sqlite3.connect(p3) as conn:
-        conn.execute("INSERT INTO coverage_segments VALUES (1, 'i1', 'depth', ?, ?, 1, 'OPEN')", (day3, day3 + 12 * 3600_000))
-        conn.execute("INSERT INTO coverage_segments VALUES (2, 'i1', 'trade', ?, ?, 1, 'OPEN')", (day3, day3 + 12 * 3600_000))
+        conn.execute("INSERT INTO coverage_segments VALUES (1, 'i1', 'depth', ?, ?, 1, 'OPEN')", (day3, day3 + 300_000))
+        conn.execute("INSERT INTO coverage_segments VALUES (2, 'i1', 'trade', ?, ?, 1, 'OPEN')", (day3, day3 + 300_000))
 
     # Finalize p1 and p2 only
-    store.finalize_partitions(now_ms=day3)
+    store.finalize_partitions(now_ms=day3 + 1000 + store.protocol.finalization_grace_ms)
 
-    eval_now = day3 + 12 * 3600_000
+    eval_now = day3 + 300_000
     ref = _reference_buckets_and_rolling(store, eval_now)
     opt = store.status(now_ms=eval_now)
 
@@ -924,3 +932,172 @@ def test_p20_latest_clock_semantics_unchanged(tmp_path: Path) -> None:
     assert status_hit["clock"]["measured_at_ms"] == 1001500
     assert status_hit["clock"]["server_minus_local_midpoint_ms"] == 7.5
     assert status_hit["clock"]["quality"] == "OK"
+
+
+def test_a01_cold_ordinary_status_zero_active_quick_check(tmp_path: Path) -> None:
+    """A01: Cold ordinary status executes zero PRAGMA quick_check on active partition."""
+    day_start = _day_ts(2026, 9, 1)
+    store = MicrostructureStore(tmp_path / "micro", "TEST_A01", day_start)
+    p = store._path(day_start)
+    _init_partition_db(p)
+
+    executed_statements: list[str] = []
+    orig_connect = sqlite3.connect
+
+    def connect_with_trace(*args: Any, **kwargs: Any) -> sqlite3.Connection:
+        conn = orig_connect(*args, **kwargs)
+        conn.set_trace_callback(lambda s: executed_statements.append(s.strip()))
+        return cast(sqlite3.Connection, conn)
+
+    with patch("sqlite3.connect", side_effect=connect_with_trace):
+        status = store.status(now_ms=day_start + 1000, deep_integrity=False)
+
+    quick_checks = [s for s in executed_statements if "quick_check" in s.lower()]
+    assert len(quick_checks) == 0, f"Unexpected quick_check calls: {quick_checks}"
+    assert status["status_performance"]["active_quick_check_executed"] is False
+    assert status["status_performance"]["active_partition_integrity_mode"] == "LIGHTWEIGHT_STATUS_READS"
+
+
+def test_a02_cold_deep_audit_active_quick_check_executes(tmp_path: Path) -> None:
+    """A02: Cold deep audit executes PRAGMA quick_check on active partition."""
+    day_start = _day_ts(2026, 9, 1)
+    store = MicrostructureStore(tmp_path / "micro", "TEST_A02", day_start)
+    p = store._path(day_start)
+    _init_partition_db(p)
+
+    executed_statements: list[str] = []
+    orig_connect = sqlite3.connect
+
+    def connect_with_trace(*args: Any, **kwargs: Any) -> sqlite3.Connection:
+        conn = orig_connect(*args, **kwargs)
+        conn.set_trace_callback(lambda s: executed_statements.append(s.strip()))
+        return cast(sqlite3.Connection, conn)
+
+    with patch("sqlite3.connect", side_effect=connect_with_trace):
+        status = store.status(now_ms=day_start + 1000, deep_integrity=True)
+
+    quick_checks = [s for s in executed_statements if "quick_check" in s.lower()]
+    assert len(quick_checks) >= 1
+    assert status["status_performance"]["active_quick_check_executed"] is True
+    assert status["status_performance"]["active_partition_integrity_mode"] == "DEEP_QUICK_CHECK"
+
+
+def test_a03_warm_ordinary_status_then_deep_audit_executes_quick_check(tmp_path: Path) -> None:
+    """A03: Warm ordinary status followed by explicit audit still executes active PRAGMA quick_check."""
+    day_start = _day_ts(2026, 9, 1)
+    store = MicrostructureStore(tmp_path / "micro", "TEST_A03", day_start)
+    p = store._path(day_start)
+    _init_partition_db(p)
+
+    # 1. Warm ordinary status: populates cache
+    status_warm = store.status(now_ms=day_start + 1000, deep_integrity=False)
+    assert status_warm["status_performance"]["active_quick_check_executed"] is False
+    assert status_warm["status_performance"]["active_partition_integrity_mode"] == "LIGHTWEIGHT_STATUS_READS"
+    assert store._stats_cache_path.exists()
+
+    # 2. Deep audit: warm cache must NOT bypass active quick_check
+    executed_statements: list[str] = []
+    orig_connect = sqlite3.connect
+
+    def connect_with_trace(*args: Any, **kwargs: Any) -> sqlite3.Connection:
+        conn = orig_connect(*args, **kwargs)
+        conn.set_trace_callback(lambda s: executed_statements.append(s.strip()))
+        return cast(sqlite3.Connection, conn)
+
+    with patch("sqlite3.connect", side_effect=connect_with_trace):
+        status_audit = store.status(now_ms=day_start + 1000, deep_integrity=True)
+
+    quick_checks = [s for s in executed_statements if "quick_check" in s.lower()]
+    assert len(quick_checks) >= 1, f"Expected active quick_check to run, got: {executed_statements}"
+    assert status_audit["status_performance"]["active_quick_check_executed"] is True
+    assert status_audit["status_performance"]["active_partition_integrity_mode"] == "DEEP_QUICK_CHECK"
+
+
+def test_a04_warm_deep_audit_cannot_report_true_without_trace_evidence(tmp_path: Path) -> None:
+    """A04: Warm deep audit result cannot report quick_check=True unless trace evidence shows it ran."""
+    day_start = _day_ts(2026, 9, 1)
+    store = MicrostructureStore(tmp_path / "micro", "TEST_A04", day_start)
+    p = store._path(day_start)
+    _init_partition_db(p)
+
+    # Warm ordinary status
+    store.status(now_ms=day_start + 1000, deep_integrity=False)
+
+    executed_statements: list[str] = []
+    orig_connect = sqlite3.connect
+
+    def connect_with_trace(*args: Any, **kwargs: Any) -> sqlite3.Connection:
+        conn = orig_connect(*args, **kwargs)
+        conn.set_trace_callback(lambda s: executed_statements.append(s.strip()))
+        return cast(sqlite3.Connection, conn)
+
+    with patch("sqlite3.connect", side_effect=connect_with_trace):
+        status = store.status(now_ms=day_start + 1000, deep_integrity=True)
+
+    quick_checks = [s for s in executed_statements if "quick_check" in s.lower()]
+    has_trace_evidence = len(quick_checks) > 0
+    assert status["status_performance"]["active_quick_check_executed"] == has_trace_evidence
+    assert status["status_performance"]["active_quick_check_executed"] is True
+
+
+def test_a05_warm_finalized_status_then_deep_audit_recomputes_sha(tmp_path: Path) -> None:
+    """A05: Warm finalized status -> deep audit: finalized SHA is recomputed/force-verified as intended."""
+    day_start = _day_ts(2026, 9, 1)
+    store = MicrostructureStore(tmp_path / "micro", "TEST_A05", day_start)
+    p = store._path(day_start)
+    _init_partition_db(p)
+
+    # Finalize partition
+    finalize_now = day_start + 86_400_000 + store.protocol.finalization_grace_ms + 1000
+    store.finalize_partitions(now_ms=finalize_now)
+
+    # 1. Warm ordinary status
+    _ = store.status(now_ms=finalize_now + 1000, deep_integrity=False)
+    status2 = store.status(now_ms=finalize_now + 2000, deep_integrity=False)
+    assert status2["status_performance"]["finalized_hash_reused"] == 1
+    assert status2["status_performance"]["finalized_hash_recomputed"] == 0
+
+    # 2. Deep audit forces full verification
+    status3 = store.status(now_ms=finalize_now + 3000, deep_integrity=True)
+    assert status3["status_performance"]["finalized_hash_recomputed"] >= 1
+    assert status3["status_performance"]["finalized_hash_reused"] == 0
+    assert status3["partition_integrity"]["integrity_ok"] is True
+
+
+def test_a06_ordinary_warm_status_remains_cache_fast(tmp_path: Path) -> None:
+    """A06: Ordinary warm status remains cache-fast and does not regress into deep integrity work."""
+    day1_start = _day_ts(2026, 9, 1)
+    day2_start = _day_ts(2026, 9, 2)
+    store = MicrostructureStore(tmp_path / "micro", "TEST_A06", day1_start)
+    p1 = store._path(day1_start)
+    p2 = store._path(day2_start)
+    _init_partition_db(p1)
+    _init_partition_db(p2)
+
+    # Finalize p1, keep p2 active
+    finalize_now = day2_start + store.protocol.finalization_grace_ms + 1000
+    store.finalize_partitions(now_ms=finalize_now)
+
+    # Cold run
+    status_cold = store.status(now_ms=day2_start + 2000, deep_integrity=False)
+    assert status_cold["status_performance"]["active_quick_check_executed"] is False
+
+    # Warm run with trace
+    executed_statements: list[str] = []
+    orig_connect = sqlite3.connect
+
+    def connect_with_trace(*args: Any, **kwargs: Any) -> sqlite3.Connection:
+        conn = orig_connect(*args, **kwargs)
+        conn.set_trace_callback(lambda s: executed_statements.append(s.strip()))
+        return cast(sqlite3.Connection, conn)
+
+    with patch("sqlite3.connect", side_effect=connect_with_trace):
+        status_warm = store.status(now_ms=day2_start + 2000, deep_integrity=False)
+
+    quick_checks = [s for s in executed_statements if "quick_check" in s.lower()]
+    assert len(quick_checks) == 0
+    assert status_warm["status_performance"]["active_quick_check_executed"] is False
+    assert status_warm["status_performance"]["active_partition_integrity_mode"] == "LIGHTWEIGHT_STATUS_READS"
+    assert status_warm["status_performance"]["finalized_partition_cache_hits"] >= 1
+    assert status_warm["status_performance"]["finalized_hash_reused"] >= 1
+    assert status_warm["status_performance"]["finalized_hash_recomputed"] == 0

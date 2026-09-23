@@ -1137,18 +1137,29 @@ class MicrostructureStore:
         current_names = {p.name for p in current_files}
         cache_dirty = bool(set(stats_cache.keys()) - current_names)
 
+        active_quick_checks_executed = 0
+
         for path in current_files:
             st = path.stat()
             is_finalized = path.name in finalized_names
             day_start_ms, day_end_ms = self._partition_day_bounds(path)
             cached_entry = stats_cache.get(path.name)
             is_hit = False
+            cache_eligible = (
+                (not is_finalized and not deep_integrity)
+                or (
+                    is_finalized
+                    and isinstance(cached_entry, dict)
+                    and isinstance(cached_entry.get("stats"), dict)
+                    and cached_entry["stats"].get("integrity") is True
+                )
+            )
             if (
                 isinstance(cached_entry, dict)
                 and cached_entry.get("mtime_ns") == st.st_mtime_ns
                 and cached_entry.get("size") == st.st_size
                 and self._is_valid_partition_stats(cached_entry.get("stats"))
-                and (not deep_integrity or not is_finalized or cached_entry["stats"].get("integrity") is True)
+                and cache_eligible
             ):
                 try:
                     cached = cached_entry["stats"]
@@ -1310,6 +1321,8 @@ class MicrostructureStore:
 
                 if deep_integrity:
                     cur_integrity = connection.execute("PRAGMA quick_check").fetchone()[0] == "ok"
+                    if not is_finalized:
+                        active_quick_checks_executed += 1
                 else:
                     cur_integrity = True
 
@@ -1471,10 +1484,12 @@ class MicrostructureStore:
                     merged.append([s, e])
             return [(s, e) for s, e in merged]
 
-        def _fast_covered(merged: list[tuple[int, int]], start_ms: int, end_ms: int) -> int:
+        def _fast_covered(
+            merged: list[tuple[int, int]], start_ms: int, end_ms: int, hint_idx: int = 0
+        ) -> tuple[int, int]:
             if not merged or end_ms <= start_ms:
-                return 0
-            idx = bisect.bisect_right(merged, (start_ms, 10**18)) - 1
+                return 0, hint_idx
+            idx = bisect.bisect_right(merged, (start_ms, 10**18), lo=hint_idx) - 1
             idx = max(idx, 0)
             covered = 0
             for s, e in merged[idx:]:
@@ -1484,19 +1499,21 @@ class MicrostructureStore:
                 overlap_e = min(end_ms, e)
                 if overlap_e > overlap_s:
                     covered += overlap_e - overlap_s
-            return covered
+            return covered, idx
 
-        def _fast_has_gap(merged_gaps: list[tuple[int, int]], start_ms: int, end_ms: int) -> bool:
+        def _fast_has_gap(
+            merged_gaps: list[tuple[int, int]], start_ms: int, end_ms: int, hint_idx: int = 0
+        ) -> tuple[bool, int]:
             if not merged_gaps or end_ms <= start_ms:
-                return False
-            idx = bisect.bisect_right(merged_gaps, (start_ms, 10**18)) - 1
+                return False, hint_idx
+            idx = bisect.bisect_right(merged_gaps, (start_ms, 10**18), lo=hint_idx) - 1
             idx = max(idx, 0)
             for s, e in merged_gaps[idx:]:
                 if s >= end_ms:
                     break
                 if s < end_ms and e >= start_ms:
-                    return True
-            return False
+                    return True, idx
+            return False, idx
 
         merged_trade = _merge_intervals(segments.get("trade", []))
         merged_depth = _merge_intervals(segments.get("depth", []))
@@ -1559,16 +1576,20 @@ class MicrostructureStore:
                     for interval in self.INTERVALS_MS:
                         first = max(p_day_start, evaluation_start // interval * interval)
                         p_closed = p_complete = p_gap = 0
+                        trade_hint = depth_hint = valid_hint = gap_hint = 0
                         if first < p_day_end:
                             for start in range(first, p_day_end, interval):
                                 end = start + interval
                                 p_closed += 1
-                                gap_overlap = _fast_has_gap(merged_gaps, start, end)
+                                gap_overlap, gap_hint = _fast_has_gap(merged_gaps, start, end, gap_hint)
                                 if gap_overlap:
                                     p_gap += 1
-                                trade_ratio = _fast_covered(merged_trade, start, end) / interval
-                                depth_ratio = _fast_covered(merged_depth, start, end) / interval
-                                valid_ratio = _fast_covered(merged_valid, start, end) / interval
+                                cov_t, trade_hint = _fast_covered(merged_trade, start, end, trade_hint)
+                                cov_d, depth_hint = _fast_covered(merged_depth, start, end, depth_hint)
+                                cov_v, valid_hint = _fast_covered(merged_valid, start, end, valid_hint)
+                                trade_ratio = cov_t / interval
+                                depth_ratio = cov_d / interval
+                                valid_ratio = cov_v / interval
                                 if (
                                     trade_ratio >= self.protocol.minimum_trade_coverage
                                     and depth_ratio >= self.protocol.minimum_depth_coverage
@@ -1598,18 +1619,22 @@ class MicrostructureStore:
                     first = max(p_day_start, evaluation_start // interval * interval)
                     partition_end = min(p_day_end, now)
                     latest_closed = partition_end // interval * interval - interval
+                    trade_hint = depth_hint = valid_hint = gap_hint = 0
                     if first <= latest_closed:
                         for start in range(first, latest_closed + 1, interval):
                             bucket_active_candidates_evaluated += 1
                             end = start + interval
                             completeness_by_interval[str(interval)]["closed"] = int(completeness_by_interval[str(interval)]["closed"]) + 1
                             closed_buckets += 1
-                            gap_overlap = _fast_has_gap(merged_gaps, start, end)
+                            gap_overlap, gap_hint = _fast_has_gap(merged_gaps, start, end, gap_hint)
                             if gap_overlap:
                                 gap_affected_buckets += 1
-                            trade_ratio = _fast_covered(merged_trade, start, end) / interval
-                            depth_ratio = _fast_covered(merged_depth, start, end) / interval
-                            valid_ratio = _fast_covered(merged_valid, start, end) / interval
+                            cov_t, trade_hint = _fast_covered(merged_trade, start, end, trade_hint)
+                            cov_d, depth_hint = _fast_covered(merged_depth, start, end, depth_hint)
+                            cov_v, valid_hint = _fast_covered(merged_valid, start, end, valid_hint)
+                            trade_ratio = cov_t / interval
+                            depth_ratio = cov_d / interval
+                            valid_ratio = cov_v / interval
                             if (
                                 trade_ratio >= self.protocol.minimum_trade_coverage
                                 and depth_ratio >= self.protocol.minimum_depth_coverage
@@ -1711,12 +1736,12 @@ class MicrostructureStore:
             "finalized_partition_cache_misses": finalized_cache_misses,
             "finalized_hash_reused": partition_audit.get("attestation_reused", 0),
             "finalized_hash_recomputed": partition_audit.get("attestation_recomputed", 0),
-            "active_quick_check_executed": deep_integrity,
+            "active_quick_check_executed": active_quick_checks_executed > 0,
             "bucket_history_cache_hits": bucket_history_cache_hits,
             "bucket_active_candidates_evaluated": bucket_active_candidates_evaluated,
             "raw_gap_rows_materialized": 0,
             "active_partition_integrity_mode": (
-                "DEEP_QUICK_CHECK" if deep_integrity else "LIGHTWEIGHT_STATUS_READS"
+                "DEEP_QUICK_CHECK" if active_quick_checks_executed > 0 else "LIGHTWEIGHT_STATUS_READS"
             ),
         }
 
