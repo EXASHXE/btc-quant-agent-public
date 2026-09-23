@@ -2350,8 +2350,9 @@ class H40TerminationReceipt:
 @dataclass(frozen=True)
 class H40CandidateVerification:
     hard_gates_passed: bool
-    adjusted_lcb_net_expectancy: Decimal
-    adjusted_lcb_precision: Decimal
+    adjusted_lcb_net_expectancy: Decimal | None
+    adjusted_lcb_precision: Decimal | None
+    scientific_unavailable: bool = False
 
 
 @runtime_checkable
@@ -3002,20 +3003,31 @@ class H40LifecycleAuthorityService:
             )
         verifier.verify_discovery_manifest(evidence, evidence.candidate_result_entries)
         scored: list[tuple[H40CandidateResultEntry, H40CandidateVerification]] = []
+        scientific_unavailable = False
         for entry in evidence.candidate_result_entries:
             result = verifier.verify_candidate(
                 entry,
                 run_authority_id=evidence.run_authority_id,
                 correction_manifest_hash=evidence.correction_input_evidence_manifest_hash,
             )
+            scientific_unavailable = scientific_unavailable or result.scientific_unavailable
             if result.hard_gates_passed:
+                if (
+                    result.adjusted_lcb_net_expectancy is None
+                    or result.adjusted_lcb_precision is None
+                ):
+                    raise H40GuardError(
+                        H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                        "passed candidate has undefined scientific lower bound",
+                    )
                 scored.append((entry, result))
         if not scored:
-            raise H40GuardError(H40ReasonCode.THRESHOLD_UNMET, "no candidate passed every accepted hard gate")
+            reason = H40ReasonCode.NOT_TESTABLE if scientific_unavailable else H40ReasonCode.THRESHOLD_UNMET
+            raise H40GuardError(reason, "no candidate passed every accepted hard gate")
         scored.sort(
             key=lambda item: (
-                -item[1].adjusted_lcb_net_expectancy,
-                -item[1].adjusted_lcb_precision,
+                -cast(Decimal, item[1].adjusted_lcb_net_expectancy),
+                -cast(Decimal, item[1].adjusted_lcb_precision),
                 item[0].complexity,
                 item[0].structural_configuration_hash,
             )

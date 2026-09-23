@@ -22,6 +22,10 @@ from .feature_contracts import (
     RegimeFamily,
     build_canonical_feature_registry,
 )
+from .discovery_evidence import (
+    H40DiscoveryEvidenceResolver,
+    H40ProductionDiscoveryEvidenceVerifier,
+)
 from .guards import (
     H40ConfirmationGuard,
     H40ExecutionGuard,
@@ -216,6 +220,7 @@ __all__ = [
     "H40ConfirmationGuard",
     "H40ConfirmationReadyReceipt",
     "H40DiscoveryAuthorizationReceipt",
+    "H40DiscoveryEvidenceResolver",
     "H40DiscoveryResultEvidence",
     "H40DurableRunHead",
     "H40ExecutionGuard",
@@ -236,6 +241,7 @@ __all__ = [
     "H40Partition",
     "H40PartitionType",
     "H40ProtectedSurfaceGuard",
+    "H40ProductionDiscoveryEvidenceVerifier",
     "H40ProtocolIdentity",
     "H40ReasonCode",
     "H40RefitPolicyContract",
