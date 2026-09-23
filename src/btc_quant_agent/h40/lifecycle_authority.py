@@ -2962,6 +2962,16 @@ class H40LifecycleAuthorityService:
         verifier = self._evidence_verifier
         if verifier is None:
             raise H40GuardError(H40ReasonCode.NOT_TESTABLE, "no accepted scientific evidence verifier")
+        if not self._synthetic_test_mode:
+            # The Protocol describes behavior, not production implementation authority.
+            # Import here so discovery_evidence can continue importing this module.
+            from .discovery_evidence import H40ProductionDiscoveryEvidenceVerifier
+
+            if type(verifier) is not H40ProductionDiscoveryEvidenceVerifier:
+                raise H40GuardError(
+                    H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                    "unaccepted production Discovery verifier implementation",
+                )
         seal = discovery_authority.context.get("seal")
         if not isinstance(seal, H40RuntimeSnapshotSeal):
             raise H40GuardError(H40ReasonCode.CONFIG_IDENTITY_CONFLICT, "missing verified runtime seal")

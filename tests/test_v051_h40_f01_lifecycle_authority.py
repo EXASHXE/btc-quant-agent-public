@@ -41,6 +41,7 @@ from btc_quant_agent.h40 import (
     H40LifecycleState,
     H40LifecycleStateMachine,
     H40ProtectedSurfaceGuard,
+    H40ProductionDiscoveryEvidenceVerifier,
     H40ProtocolIdentity,
     H40ReasonCode,
     H40RequiredTestCIEvidenceIdentity,
@@ -1804,34 +1805,17 @@ def test_r44_r46_f02_h39_and_final_holdout_remain_sealed() -> None:
 # =============================================================================
 
 
-class _ProductionEvidenceVerifier:
-    synthetic_only = False
-
-    def verify_discovery_manifest(
-        self,
-        evidence: H40DiscoveryResultEvidence,
-        entries: Sequence[H40CandidateResultEntry],
-    ) -> None:
-        del evidence, entries
-
-    def verify_candidate(
-        self,
-        entry: H40CandidateResultEntry,
-        *,
-        run_authority_id: str,
-        correction_manifest_hash: str,
-    ) -> H40CandidateVerification:
-        del entry, run_authority_id, correction_manifest_hash
-        return H40CandidateVerification(True, Decimal(0), Decimal(0))
-
-    def verify_wf_fold(
-        self,
-        entry: H40WFFoldResultEntry,
-        *,
-        evidence: H40WFValidationResultEvidence,
-    ) -> bool:
-        del entry, evidence
-        return True
+def _ProductionEvidenceVerifier() -> H40ProductionDiscoveryEvidenceVerifier:
+    """Exact-type lifecycle fixture; science is covered by the P3B evidence suite."""
+    verifier = object.__new__(H40ProductionDiscoveryEvidenceVerifier)
+    setattr(verifier, "verify_discovery_manifest", lambda evidence, entries: None)
+    setattr(
+        verifier, "verify_candidate",
+        lambda entry, *, run_authority_id, correction_manifest_hash:
+        H40CandidateVerification(True, Decimal(0), Decimal(0)),
+    )
+    setattr(verifier, "verify_wf_fold", lambda entry, *, evidence: True)
+    return verifier
 
 
 def test_a01_through_a07_derived_wf_authority() -> None:
