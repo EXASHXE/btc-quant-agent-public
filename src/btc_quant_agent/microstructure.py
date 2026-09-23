@@ -305,8 +305,14 @@ def event_ofi(
     return bid + ask
 
 
+MAX_PARTITION_STATS_CACHE_BYTES = 128 * 1024 * 1024  # 128 MiB
+STATS_CACHE_SCHEMA_VERSION = "2.0.0"
+
+
 class MicrostructureStore:
     INTERVALS_MS = (1_000, 60_000, 900_000)
+    MAX_PARTITION_STATS_CACHE_BYTES = MAX_PARTITION_STATS_CACHE_BYTES
+    STATS_CACHE_SCHEMA_VERSION = STATS_CACHE_SCHEMA_VERSION
 
     def __init__(
         self,
@@ -336,18 +342,94 @@ class MicrostructureStore:
         if not self._stats_cache_path.exists():
             return {}
         try:
+            st = self._stats_cache_path.stat()
+            if st.st_size > self.MAX_PARTITION_STATS_CACHE_BYTES:
+                try:
+                    self._stats_cache_path.unlink(missing_ok=True)
+                except OSError:
+                    pass
+                return {}
             data = json.loads(self._stats_cache_path.read_text(encoding="utf-8"))
-            if isinstance(data, dict):
-                return {str(k): dict(v) for k, v in data.items() if isinstance(v, dict)}
-            return {}
-        except (OSError, json.JSONDecodeError):
+            if not isinstance(data, dict) or data.get("schema_version") != self.STATS_CACHE_SCHEMA_VERSION:
+                return {}
+            partitions = data.get("partitions")
+            if not isinstance(partitions, dict):
+                return {}
+            valid: dict[str, dict[str, Any]] = {}
+            for name, entry in partitions.items():
+                if (
+                    isinstance(name, str)
+                    and isinstance(entry, dict)
+                    and isinstance(entry.get("mtime_ns"), int)
+                    and isinstance(entry.get("size"), int)
+                    and isinstance(entry.get("stats"), dict)
+                    and self._is_valid_partition_stats(entry["stats"])
+                ):
+                    valid[name] = {
+                        "mtime_ns": int(entry["mtime_ns"]),
+                        "size": int(entry["size"]),
+                        "stats": dict(entry["stats"]),
+                    }
+            return valid
+        except (OSError, json.JSONDecodeError, UnicodeDecodeError):
             return {}
 
-    def _save_stats_cache(self, cache: dict[str, dict[str, Any]]) -> None:
+    def _save_stats_cache(self, partitions: dict[str, dict[str, Any]]) -> None:
+        current_names = {p.name for p in self.root.glob("microstructure-*.sqlite3")}
+        pruned = {
+            name: entry
+            for name, entry in partitions.items()
+            if name in current_names and isinstance(entry, dict) and "stats" in entry
+        }
+        payload = {
+            "schema_version": self.STATS_CACHE_SCHEMA_VERSION,
+            "partitions": dict(sorted(pruned.items())),
+        }
         try:
-            publish_bytes(self._stats_cache_path, json.dumps(cache).encode("utf-8"))
+            publish_bytes(
+                self._stats_cache_path,
+                json.dumps(payload, sort_keys=True, separators=(",", ":")).encode("utf-8"),
+            )
         except (OSError, PublicationConflict):
             pass
+
+    @staticmethod
+    def _is_valid_partition_stats(stats: Any) -> bool:
+        if not isinstance(stats, dict):
+            return False
+        required_int_fields = (
+            "depth",
+            "trades",
+            "book_samples",
+            "aggregate_buckets",
+            "duplicate_count",
+            "conflict_count",
+            "orphan_count",
+        )
+        for field in required_int_fields:
+            val = stats.get(field)
+            if not isinstance(val, int) or isinstance(val, bool):
+                return False
+        if not isinstance(stats.get("gap_rows"), list):
+            return False
+        if not isinstance(stats.get("latencies"), list):
+            return False
+        if not isinstance(stats.get("segments"), dict):
+            return False
+        if not isinstance(stats.get("depth_valid_segments"), list):
+            return False
+        if not isinstance(stats.get("integrity"), bool):
+            return False
+        hb = stats.get("latest_heartbeat_ms")
+        if hb is not None and (not isinstance(hb, int) or isinstance(hb, bool)):
+            return False
+        latest_clock = stats.get("latest_clock")
+        if latest_clock is not None:
+            if not (isinstance(latest_clock, (list, tuple)) and len(latest_clock) == 4):
+                return False
+        elif "clocks" in stats and not isinstance(stats.get("clocks"), list):
+            return False
+        return True
 
     def _manifest(self) -> dict[str, dict[str, Any]]:
         if not self.finalized_manifest_path.exists():
@@ -944,32 +1026,85 @@ class MicrostructureStore:
         segments: dict[str, list[tuple[int, int]]] = {"depth": [], "trade": []}
         depth_valid_segments: list[tuple[int, int]] = []
         gap_rows: list[tuple[int, int, str]] = []
-        clocks: list[tuple[int, float, int, str]] = []
+        latest_clocks: list[tuple[int, float, int, str]] = []
         latest_heartbeat_ms: int | None = None
         integrity = True
         stats_cache = self._load_stats_cache()
-        cache_dirty = False
-        for path in sorted(self.root.glob("microstructure-*.sqlite3")):
+        current_files = sorted(self.root.glob("microstructure-*.sqlite3"))
+        current_names = {p.name for p in current_files}
+        cache_dirty = bool(set(stats_cache.keys()) - current_names)
+        for path in current_files:
             st = path.stat()
-            cache_key = f"{path.name}:{st.st_mtime_ns}:{st.st_size}"
-            if cache_key in stats_cache:
-                cached = stats_cache[cache_key]
-                depth += cached["depth"]
-                trades += cached["trades"]
-                gap_rows += [tuple(g) for g in cached["gap_rows"]]
-                book_samples += cached["book_samples"]
-                aggregate_buckets += cached["aggregate_buckets"]
-                duplicate_count += cached["duplicate_count"]
-                conflict_count += cached["conflict_count"]
-                for stream_name, segs in cached["segments"].items():
-                    segments[stream_name].extend((int(start), min(now, int(end))) for start, end in segs)
-                depth_valid_segments.extend((int(start), min(now, int(end))) for start, end in cached["depth_valid_segments"])
-                orphan_count += cached["orphan_count"]
-                if cached["latest_heartbeat_ms"] is not None:
-                    latest_heartbeat_ms = max(latest_heartbeat_ms or cached["latest_heartbeat_ms"], cached["latest_heartbeat_ms"])
-                clocks += [tuple(c) for c in cached["clocks"]]
-                integrity = integrity and cached["integrity"]
-                latencies += cached["latencies"]
+            cached_entry = stats_cache.get(path.name)
+            is_hit = False
+            if (
+                isinstance(cached_entry, dict)
+                and cached_entry.get("mtime_ns") == st.st_mtime_ns
+                and cached_entry.get("size") == st.st_size
+                and self._is_valid_partition_stats(cached_entry.get("stats"))
+            ):
+                try:
+                    cached = cached_entry["stats"]
+                    cached_depth = int(cached["depth"])
+                    cached_trades = int(cached["trades"])
+                    cached_gap_rows = [(int(g[0]), int(g[1]), str(g[2])) for g in cached["gap_rows"]]
+                    cached_book_samples = int(cached["book_samples"])
+                    cached_aggregate_buckets = int(cached["aggregate_buckets"])
+                    cached_duplicate_count = int(cached["duplicate_count"])
+                    cached_conflict_count = int(cached["conflict_count"])
+                    cached_segments: dict[str, list[tuple[int, int]]] = {
+                        str(k): [(int(start), min(now, int(end))) for start, end in segs]
+                        for k, segs in cached["segments"].items()
+                    }
+                    cached_valid_segments = [
+                        (int(start), min(now, int(end))) for start, end in cached["depth_valid_segments"]
+                    ]
+                    cached_orphan_count = int(cached["orphan_count"])
+                    cached_latest_hb = (
+                        int(cached["latest_heartbeat_ms"]) if cached["latest_heartbeat_ms"] is not None else None
+                    )
+                    cached_latencies = [int(lat) for lat in cached["latencies"]]
+                    cached_clock_tuple: tuple[int, float, int, str] | None = None
+                    if cached_clock := cached.get("latest_clock"):
+                        cached_clock_tuple = (
+                            int(cached_clock[0]),
+                            float(cached_clock[1]),
+                            int(cached_clock[2]),
+                            str(cached_clock[3]),
+                        )
+                    elif cached_clocks := cached.get("clocks"):
+                        valid_c = [
+                            (int(c[0]), float(c[1]), int(c[2]), str(c[3]))
+                            for c in cached_clocks
+                        ]
+                        if valid_c:
+                            cached_clock_tuple = max(valid_c, key=lambda value: value[0])
+                    cached_integrity = bool(cached["integrity"])
+
+                    depth += cached_depth
+                    trades += cached_trades
+                    gap_rows += cached_gap_rows
+                    book_samples += cached_book_samples
+                    aggregate_buckets += cached_aggregate_buckets
+                    duplicate_count += cached_duplicate_count
+                    conflict_count += cached_conflict_count
+                    for stream_name, segs in cached_segments.items():
+                        if stream_name not in segments:
+                            segments[stream_name] = []
+                        segments[stream_name].extend(segs)
+                    depth_valid_segments.extend(cached_valid_segments)
+                    orphan_count += cached_orphan_count
+                    if cached_latest_hb is not None:
+                        latest_heartbeat_ms = max(latest_heartbeat_ms or cached_latest_hb, cached_latest_hb)
+                    if cached_clock_tuple is not None:
+                        latest_clocks.append(cached_clock_tuple)
+                    integrity = integrity and cached_integrity
+                    latencies += cached_latencies
+                    is_hit = True
+                except (TypeError, IndexError, ValueError, KeyError):
+                    is_hit = False
+
+            if is_hit:
                 continue
 
             try:
@@ -1025,15 +1160,21 @@ class MicrostructureStore:
                     ).fetchone()
                     if heartbeat_row and heartbeat_row[0] is not None:
                         cur_latest_heartbeat_ms = int(heartbeat_row[0])
-                cur_clocks: list[tuple[int, float, int, str]] = []
+                cur_latest_clock: tuple[int, float, int, str] | None = None
                 if "clock_measurements" in tables:
-                    cur_clocks = [
-                        (int(measured), float(offset), int(rtt), str(quality))
-                        for measured, offset, rtt, quality in connection.execute(
-                            """SELECT measured_at_ms,offset_ms,rtt_ms,quality
-                            FROM clock_measurements"""
+                    clock_row = connection.execute(
+                        """SELECT measured_at_ms,offset_ms,rtt_ms,quality
+                        FROM clock_measurements
+                        ORDER BY measured_at_ms DESC
+                        LIMIT 1"""
+                    ).fetchone()
+                    if clock_row is not None:
+                        cur_latest_clock = (
+                            int(clock_row[0]),
+                            float(clock_row[1]),
+                            int(clock_row[2]),
+                            str(clock_row[3]),
                         )
-                    ]
                 cur_integrity = connection.execute("PRAGMA quick_check").fetchone()[0] == "ok"
                 cur_latencies = [
                     int(a) - int(b)
@@ -1043,21 +1184,25 @@ class MicrostructureStore:
                 ]
                 connection.close()
 
-                stats_cache[cache_key] = {
-                    "depth": cur_depth,
-                    "trades": cur_trades,
-                    "gap_rows": cur_gap_rows,
-                    "book_samples": cur_book_samples,
-                    "aggregate_buckets": cur_aggregate_buckets,
-                    "duplicate_count": cur_duplicate_count,
-                    "conflict_count": cur_conflict_count,
-                    "segments": cur_segments,
-                    "depth_valid_segments": cur_depth_valid_segments,
-                    "orphan_count": cur_orphan_count,
-                    "latest_heartbeat_ms": cur_latest_heartbeat_ms,
-                    "clocks": cur_clocks,
-                    "integrity": cur_integrity,
-                    "latencies": cur_latencies,
+                stats_cache[path.name] = {
+                    "mtime_ns": st.st_mtime_ns,
+                    "size": st.st_size,
+                    "stats": {
+                        "depth": cur_depth,
+                        "trades": cur_trades,
+                        "gap_rows": cur_gap_rows,
+                        "book_samples": cur_book_samples,
+                        "aggregate_buckets": cur_aggregate_buckets,
+                        "duplicate_count": cur_duplicate_count,
+                        "conflict_count": cur_conflict_count,
+                        "segments": cur_segments,
+                        "depth_valid_segments": cur_depth_valid_segments,
+                        "orphan_count": cur_orphan_count,
+                        "latest_heartbeat_ms": cur_latest_heartbeat_ms,
+                        "latest_clock": list(cur_latest_clock) if cur_latest_clock is not None else None,
+                        "integrity": cur_integrity,
+                        "latencies": cur_latencies,
+                    },
                 }
                 cache_dirty = True
 
@@ -1074,7 +1219,8 @@ class MicrostructureStore:
                 orphan_count += cur_orphan_count
                 if cur_latest_heartbeat_ms is not None:
                     latest_heartbeat_ms = max(latest_heartbeat_ms or cur_latest_heartbeat_ms, cur_latest_heartbeat_ms)
-                clocks += cur_clocks
+                if cur_latest_clock is not None:
+                    latest_clocks.append(cur_latest_clock)
                 integrity = integrity and cur_integrity
                 latencies += cur_latencies
             except sqlite3.DatabaseError:
@@ -1198,7 +1344,7 @@ class MicrostructureStore:
             "DEPTH_GAP_RESYNC",
         }
         resync_count = sum(count for kind, count in gap_types.items() if kind in resync_types)
-        latest_clock = max(clocks, default=None, key=lambda value: value[0])
+        latest_clock = max(latest_clocks, default=None, key=lambda value: value[0])
         offset = latest_clock[1] if latest_clock is not None else None
         adjusted = sorted(value + offset for value in latencies) if offset is not None else []
 
