@@ -758,8 +758,9 @@ def main(argv: list[str] | None = None) -> int:
                 asyncio.run(run_daemon(micro_campaign, args.root))
             except KeyboardInterrupt:
                 return 0
-            return 0
-        report = micro_store.status()
+        report = micro_store.status(
+            deep_integrity=(args.microstructure_command == "audit")
+        )
         if args.microstructure_command == "audit":
             report["audit"] = {
                 "retrospective_backfill": False,

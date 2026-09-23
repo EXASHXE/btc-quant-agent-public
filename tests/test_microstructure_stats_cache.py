@@ -1,4 +1,4 @@
-"""Tests for MicrostructureStore partition statistics cache-v2.
+"""Tests for MicrostructureStore partition statistics cache-v3.
 
 Covers requirements C01 through C12 for partition stats cache bloat repair:
 - C01: one key per partition

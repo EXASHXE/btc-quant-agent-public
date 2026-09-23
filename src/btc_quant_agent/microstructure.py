@@ -305,8 +305,16 @@ def event_ofi(
     return bid + ask
 
 
+def _streaming_sha256(path: Path | str, chunk_size: int = 2 * 1024 * 1024) -> str:
+    hasher = hashlib.sha256()
+    with open(path, "rb") as f:
+        while chunk := f.read(chunk_size):
+            hasher.update(chunk)
+    return hasher.hexdigest()
+
+
 MAX_PARTITION_STATS_CACHE_BYTES = 128 * 1024 * 1024  # 128 MiB
-STATS_CACHE_SCHEMA_VERSION = "2.0.0"
+STATS_CACHE_SCHEMA_VERSION = "3.0.0"
 
 
 class MicrostructureStore:
@@ -338,6 +346,17 @@ class MicrostructureStore:
     def _stats_cache_path(self) -> Path:
         return self.root / ".partition_stats_cache.json"
 
+    @staticmethod
+    def _partition_day_bounds(path: Path) -> tuple[int, int]:
+        try:
+            day_str = path.stem.removeprefix("microstructure-")
+            day_dt = datetime.strptime(day_str, "%Y-%m-%d").replace(tzinfo=UTC)
+            day_start_ms = int(day_dt.timestamp() * 1000)
+            day_end_ms = day_start_ms + 86_400_000
+            return day_start_ms, day_end_ms
+        except ValueError:
+            return 0, 0
+
     def _load_stats_cache(self) -> dict[str, dict[str, Any]]:
         if not self._stats_cache_path.exists():
             return {}
@@ -362,14 +381,19 @@ class MicrostructureStore:
                     and isinstance(entry, dict)
                     and isinstance(entry.get("mtime_ns"), int)
                     and isinstance(entry.get("size"), int)
-                    and isinstance(entry.get("stats"), dict)
-                    and self._is_valid_partition_stats(entry["stats"])
                 ):
-                    valid[name] = {
-                        "mtime_ns": int(entry["mtime_ns"]),
-                        "size": int(entry["size"]),
-                        "stats": dict(entry["stats"]),
-                    }
+                    has_stats = isinstance(entry.get("stats"), dict) and self._is_valid_partition_stats(entry["stats"])
+                    has_att = isinstance(entry.get("attestation"), dict)
+                    if has_stats or has_att:
+                        record: dict[str, Any] = {
+                            "mtime_ns": int(entry["mtime_ns"]),
+                            "size": int(entry["size"]),
+                        }
+                        if has_stats:
+                            record["stats"] = dict(entry["stats"])
+                        if has_att:
+                            record["attestation"] = dict(entry["attestation"])
+                        valid[name] = record
             return valid
         except (OSError, json.JSONDecodeError, UnicodeDecodeError):
             return {}
@@ -379,7 +403,7 @@ class MicrostructureStore:
         pruned = {
             name: entry
             for name, entry in partitions.items()
-            if name in current_names and isinstance(entry, dict) and "stats" in entry
+            if name in current_names and isinstance(entry, dict) and ("stats" in entry or "attestation" in entry)
         }
         payload = {
             "schema_version": self.STATS_CACHE_SCHEMA_VERSION,
@@ -405,12 +429,17 @@ class MicrostructureStore:
             "duplicate_count",
             "conflict_count",
             "orphan_count",
+            "gap_count",
         )
         for field in required_int_fields:
             val = stats.get(field)
             if not isinstance(val, int) or isinstance(val, bool):
                 return False
-        if not isinstance(stats.get("gap_rows"), list):
+        if not isinstance(stats.get("gap_type_counts"), dict):
+            return False
+        if not isinstance(stats.get("gap_merged_intervals"), list):
+            return False
+        if not isinstance(stats.get("spill_gaps"), list):
             return False
         if not isinstance(stats.get("latencies"), list):
             return False
@@ -428,6 +457,15 @@ class MicrostructureStore:
             if not (isinstance(latest_clock, (list, tuple)) and len(latest_clock) == 4):
                 return False
         elif "clocks" in stats and not isinstance(stats.get("clocks"), list):
+            return False
+        min_start = stats.get("gap_min_start_ms")
+        if min_start is not None and (not isinstance(min_start, int) or isinstance(min_start, bool)):
+            return False
+        max_end = stats.get("gap_max_end_ms")
+        if max_end is not None and (not isinstance(max_end, int) or isinstance(max_end, bool)):
+            return False
+        summary = stats.get("bucket_summary")
+        if summary is not None and not isinstance(summary, dict):
             return False
         return True
 
@@ -909,22 +947,73 @@ class MicrostructureStore:
                 ),
             )
 
-    def partition_integrity_audit(self) -> dict[str, Any]:
+    def partition_integrity_audit(
+        self,
+        force_full: bool = False,
+        stats_cache: dict[str, dict[str, Any]] | None = None,
+    ) -> dict[str, Any]:
         manifest = self._manifest()
         drift: list[str] = []
         missing: list[str] = []
+        reused = 0
+        recomputed = 0
+        cache = self._load_stats_cache() if stats_cache is None else stats_cache
+        cache_dirty = False
         for name, metadata in manifest.items():
             path = self.root / name
             if not path.exists():
                 missing.append(name)
-            elif hashlib.sha256(path.read_bytes()).hexdigest() != metadata["sha256"]:
-                drift.append(name)
+                continue
+            st = path.stat()
+            entry = cache.get(name)
+            attestation = entry.get("attestation") if isinstance(entry, dict) else None
+            is_valid_attestation = (
+                not force_full
+                and isinstance(attestation, dict)
+                and attestation.get("st_dev") == st.st_dev
+                and attestation.get("st_ino") == st.st_ino
+                and attestation.get("st_size") == st.st_size
+                and attestation.get("st_mtime_ns") == st.st_mtime_ns
+                and attestation.get("st_ctime_ns") == st.st_ctime_ns
+                and attestation.get("manifest_sha256") == metadata["sha256"]
+                and attestation.get("verified") is True
+            )
+            if is_valid_attestation:
+                reused += 1
+            else:
+                digest = _streaming_sha256(path)
+                recomputed += 1
+                if digest != metadata["sha256"]:
+                    drift.append(name)
+                else:
+                    new_attestation = {
+                        "st_dev": st.st_dev,
+                        "st_ino": st.st_ino,
+                        "st_size": st.st_size,
+                        "st_mtime_ns": st.st_mtime_ns,
+                        "st_ctime_ns": st.st_ctime_ns,
+                        "manifest_sha256": metadata["sha256"],
+                        "verified": True,
+                    }
+                    if isinstance(entry, dict):
+                        entry["attestation"] = new_attestation
+                    else:
+                        cache[name] = {
+                            "mtime_ns": st.st_mtime_ns,
+                            "size": st.st_size,
+                            "attestation": new_attestation,
+                        }
+                    cache_dirty = True
+        if cache_dirty and stats_cache is None:
+            self._save_stats_cache(cache)
         return {
             "manifest_path": str(self.finalized_manifest_path),
             "finalized_partition_count": len(manifest),
             "checksum_drift": drift,
             "missing_partitions": missing,
             "integrity_ok": not drift and not missing,
+            "attestation_reused": reused,
+            "attestation_recomputed": recomputed,
         }
 
     @_owned_mutation
@@ -964,9 +1053,13 @@ class MicrostructureStore:
             if checkpoint is None or checkpoint[0] != 0:
                 connection.close()
                 raise RuntimeError("partition WAL checkpoint busy; finalization refused")
+            quick_check = connection.execute("PRAGMA quick_check").fetchone()
+            if quick_check is None or quick_check[0] != "ok":
+                connection.close()
+                raise RuntimeError(f"partition quick_check failed: {quick_check}")
             connection.close()
             manifest[path.name] = {
-                "sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
+                "sha256": _streaming_sha256(path),
                 "finalized_at_ms": now,
                 "eligible_at_ms": eligible_at,
                 "immutable": True,
@@ -1018,23 +1111,36 @@ class MicrostructureStore:
             covered += cursor_end - cursor_start
         return covered
 
-    def status(self, now_ms: int | None = None) -> dict[str, Any]:
+    def status(
+        self, now_ms: int | None = None, deep_integrity: bool = False
+    ) -> dict[str, Any]:
         now = now_ms or int(time.time() * 1000)
         depth = trades = book_samples = aggregate_buckets = 0
         duplicate_count = conflict_count = orphan_count = 0
         latencies: list[int] = []
         segments: dict[str, list[tuple[int, int]]] = {"depth": [], "trade": []}
         depth_valid_segments: list[tuple[int, int]] = []
-        gap_rows: list[tuple[int, int, str]] = []
         latest_clocks: list[tuple[int, float, int, str]] = []
         latest_heartbeat_ms: int | None = None
         integrity = True
+        gap_count = 0
+        gap_type_counts: Counter[str] = Counter()
+        partition_records: list[dict[str, Any]] = []
+        finalized_cache_hits = 0
+        finalized_cache_misses = 0
+
+        manifest = self._manifest()
+        finalized_names = set(manifest.keys())
+
         stats_cache = self._load_stats_cache()
         current_files = sorted(self.root.glob("microstructure-*.sqlite3"))
         current_names = {p.name for p in current_files}
         cache_dirty = bool(set(stats_cache.keys()) - current_names)
+
         for path in current_files:
             st = path.stat()
+            is_finalized = path.name in finalized_names
+            day_start_ms, day_end_ms = self._partition_day_bounds(path)
             cached_entry = stats_cache.get(path.name)
             is_hit = False
             if (
@@ -1042,12 +1148,12 @@ class MicrostructureStore:
                 and cached_entry.get("mtime_ns") == st.st_mtime_ns
                 and cached_entry.get("size") == st.st_size
                 and self._is_valid_partition_stats(cached_entry.get("stats"))
+                and (not deep_integrity or not is_finalized or cached_entry["stats"].get("integrity") is True)
             ):
                 try:
                     cached = cached_entry["stats"]
                     cached_depth = int(cached["depth"])
                     cached_trades = int(cached["trades"])
-                    cached_gap_rows = [(int(g[0]), int(g[1]), str(g[2])) for g in cached["gap_rows"]]
                     cached_book_samples = int(cached["book_samples"])
                     cached_aggregate_buckets = int(cached["aggregate_buckets"])
                     cached_duplicate_count = int(cached["duplicate_count"])
@@ -1081,13 +1187,24 @@ class MicrostructureStore:
                             cached_clock_tuple = max(valid_c, key=lambda value: value[0])
                     cached_integrity = bool(cached["integrity"])
 
+                    p_gap_count = int(cached["gap_count"])
+                    p_gap_type_counts = {str(k): int(v) for k, v in cached["gap_type_counts"].items()}
+                    p_gap_merged = [(int(s), int(e)) for s, e in cached["gap_merged_intervals"]]
+                    p_gap_min_start = int(cached["gap_min_start_ms"]) if cached.get("gap_min_start_ms") is not None else None
+                    p_gap_max_end = int(cached["gap_max_end_ms"]) if cached.get("gap_max_end_ms") is not None else None
+                    p_spill_gaps = [(int(s), int(e)) for s, e in cached.get("spill_gaps", [])]
+                    p_bucket_summary = dict(cached["bucket_summary"]) if isinstance(cached.get("bucket_summary"), dict) else None
+
                     depth += cached_depth
                     trades += cached_trades
-                    gap_rows += cached_gap_rows
                     book_samples += cached_book_samples
                     aggregate_buckets += cached_aggregate_buckets
                     duplicate_count += cached_duplicate_count
                     conflict_count += cached_conflict_count
+                    gap_count += p_gap_count
+                    for k, v in p_gap_type_counts.items():
+                        gap_type_counts[k] += v
+
                     for stream_name, segs in cached_segments.items():
                         if stream_name not in segments:
                             segments[stream_name] = []
@@ -1100,12 +1217,33 @@ class MicrostructureStore:
                         latest_clocks.append(cached_clock_tuple)
                     integrity = integrity and cached_integrity
                     latencies += cached_latencies
+
+                    partition_records.append({
+                        "path": path,
+                        "is_finalized": is_finalized,
+                        "day_start_ms": day_start_ms,
+                        "day_end_ms": day_end_ms,
+                        "gap_count": p_gap_count,
+                        "gap_type_counts": p_gap_type_counts,
+                        "gap_merged_intervals": p_gap_merged,
+                        "gap_min_start_ms": p_gap_min_start,
+                        "gap_max_end_ms": p_gap_max_end,
+                        "spill_gaps": p_spill_gaps,
+                        "bucket_summary": p_bucket_summary,
+                        "active_gaps": None,
+                    })
+
+                    if is_finalized:
+                        finalized_cache_hits += 1
                     is_hit = True
                 except (TypeError, IndexError, ValueError, KeyError):
                     is_hit = False
 
             if is_hit:
                 continue
+
+            if is_finalized:
+                finalized_cache_misses += 1
 
             try:
                 connection = sqlite3.connect(path, timeout=30.0)
@@ -1115,38 +1253,31 @@ class MicrostructureStore:
                         "SELECT name FROM sqlite_master WHERE type='table'"
                     ).fetchall()
                 }
-                cur_depth = int(connection.execute("SELECT count(*) FROM depth_events").fetchone()[0])
-                cur_trades = int(connection.execute("SELECT count(*) FROM agg_trades").fetchone()[0])
-                cur_gap_rows = [
-                    (int(start), int(end), str(kind))
-                    for start, end, kind in connection.execute(
-                        "SELECT start_ms,end_ms,kind FROM gaps"
-                    )
-                ]
-                cur_book_samples = int(
-                    connection.execute("SELECT count(*) FROM book_samples").fetchone()[0]
-                )
-                cur_aggregate_buckets = int(
-                    connection.execute("SELECT count(*) FROM aggregates").fetchone()[0]
-                )
+                cur_depth = int(connection.execute("SELECT count(*) FROM depth_events").fetchone()[0]) if "depth_events" in tables else 0
+                cur_trades = int(connection.execute("SELECT count(*) FROM agg_trades").fetchone()[0]) if "agg_trades" in tables else 0
+                cur_book_samples = int(connection.execute("SELECT count(*) FROM book_samples").fetchone()[0]) if "book_samples" in tables else 0
+                cur_aggregate_buckets = int(connection.execute("SELECT count(*) FROM aggregates").fetchone()[0]) if "aggregates" in tables else 0
+
                 cur_duplicate_count = 0
                 cur_conflict_count = 0
-                for name, value in connection.execute("SELECT name,value FROM audit_counters"):
-                    if str(name).startswith("duplicate_"):
-                        cur_duplicate_count += int(value)
-                    elif str(name).startswith("conflict_"):
-                        cur_conflict_count += int(value)
+                if "audit_counters" in tables:
+                    for name, value in connection.execute("SELECT name,value FROM audit_counters"):
+                        if str(name).startswith("duplicate_"):
+                            cur_duplicate_count += int(value)
+                        elif str(name).startswith("conflict_"):
+                            cur_conflict_count += int(value)
+
                 cur_segments: dict[str, list[tuple[int, int]]] = {"depth": [], "trade": []}
                 cur_depth_valid_segments: list[tuple[int, int]] = []
                 if "coverage_segments" in tables:
                     for stream, start, end, valid in connection.execute(
-                        """SELECT stream,start_ms,end_ms,sequence_valid
-                        FROM coverage_segments"""
+                        "SELECT stream,start_ms,end_ms,sequence_valid FROM coverage_segments"
                     ):
                         segment = (int(start), int(end))
                         cur_segments[str(stream)].append(segment)
                         if stream == "depth" and bool(valid):
                             cur_depth_valid_segments.append(segment)
+
                 cur_orphan_count = 0
                 cur_latest_heartbeat_ms: int | None = None
                 if "process_instances" in tables:
@@ -1160,6 +1291,7 @@ class MicrostructureStore:
                     ).fetchone()
                     if heartbeat_row and heartbeat_row[0] is not None:
                         cur_latest_heartbeat_ms = int(heartbeat_row[0])
+
                 cur_latest_clock: tuple[int, float, int, str] | None = None
                 if "clock_measurements" in tables:
                     clock_row = connection.execute(
@@ -1175,22 +1307,68 @@ class MicrostructureStore:
                             int(clock_row[2]),
                             str(clock_row[3]),
                         )
-                cur_integrity = connection.execute("PRAGMA quick_check").fetchone()[0] == "ok"
-                cur_latencies = [
-                    int(a) - int(b)
-                    for a, b in connection.execute(
-                        "SELECT receive_time_ms,event_time_ms FROM agg_trades ORDER BY aggregate_trade_id DESC LIMIT 5000"
+
+                if deep_integrity:
+                    cur_integrity = connection.execute("PRAGMA quick_check").fetchone()[0] == "ok"
+                else:
+                    cur_integrity = True
+
+                cur_latencies = []
+                if "agg_trades" in tables:
+                    cur_latencies = [
+                        int(a) - int(b)
+                        for a, b in connection.execute(
+                            "SELECT receive_time_ms,event_time_ms FROM agg_trades ORDER BY aggregate_trade_id DESC LIMIT 5000"
+                        )
+                    ]
+
+                cur_gap_count = 0
+                cur_gap_type_counts: dict[str, int] = {}
+                cur_merged_gaps: list[list[int]] = []
+                cur_gap_min_start_ms: int | None = None
+                cur_gap_max_end_ms: int | None = None
+                cur_spill_gaps: list[list[int]] = []
+                active_gaps: list[tuple[int, int]] | None = [] if not is_finalized else None
+
+                if "gaps" in tables:
+                    cursor = connection.execute(
+                        "SELECT start_ms, end_ms, kind FROM gaps ORDER BY start_ms, end_ms"
                     )
-                ]
+                    for start_ms_raw, end_ms_raw, kind_raw in cursor:
+                        s = int(start_ms_raw)
+                        e = int(end_ms_raw)
+                        k = str(kind_raw)
+                        cur_gap_count += 1
+                        cur_gap_type_counts[k] = cur_gap_type_counts.get(k, 0) + 1
+                        if cur_gap_min_start_ms is None or s < cur_gap_min_start_ms:
+                            cur_gap_min_start_ms = s
+                        if cur_gap_max_end_ms is None or e > cur_gap_max_end_ms:
+                            cur_gap_max_end_ms = e
+                        if e >= day_end_ms:
+                            cur_spill_gaps.append([s, e])
+                        if active_gaps is not None:
+                            active_gaps.append((s, e))
+                        if e <= s:
+                            continue
+                        if not cur_merged_gaps:
+                            cur_merged_gaps.append([s, e])
+                        elif s <= cur_merged_gaps[-1][1]:
+                            cur_merged_gaps[-1][1] = max(cur_merged_gaps[-1][1], e)
+                        else:
+                            cur_merged_gaps.append([s, e])
+
                 connection.close()
 
-                stats_cache[path.name] = {
+                existing_attestation = None
+                if isinstance(cached_entry, dict) and isinstance(cached_entry.get("attestation"), dict):
+                    existing_attestation = cached_entry["attestation"]
+
+                stats_entry: dict[str, Any] = {
                     "mtime_ns": st.st_mtime_ns,
                     "size": st.st_size,
                     "stats": {
                         "depth": cur_depth,
                         "trades": cur_trades,
-                        "gap_rows": cur_gap_rows,
                         "book_samples": cur_book_samples,
                         "aggregate_buckets": cur_aggregate_buckets,
                         "duplicate_count": cur_duplicate_count,
@@ -1202,18 +1380,34 @@ class MicrostructureStore:
                         "latest_clock": list(cur_latest_clock) if cur_latest_clock is not None else None,
                         "integrity": cur_integrity,
                         "latencies": cur_latencies,
+                        "gap_count": cur_gap_count,
+                        "gap_type_counts": cur_gap_type_counts,
+                        "gap_merged_intervals": cur_merged_gaps,
+                        "gap_min_start_ms": cur_gap_min_start_ms,
+                        "gap_max_end_ms": cur_gap_max_end_ms,
+                        "spill_gaps": cur_spill_gaps,
+                        "bucket_summary": None,
                     },
                 }
+                if existing_attestation is not None:
+                    stats_entry["attestation"] = existing_attestation
+
+                stats_cache[path.name] = stats_entry
                 cache_dirty = True
 
                 depth += cur_depth
                 trades += cur_trades
-                gap_rows += cur_gap_rows
                 book_samples += cur_book_samples
                 aggregate_buckets += cur_aggregate_buckets
                 duplicate_count += cur_duplicate_count
                 conflict_count += cur_conflict_count
+                gap_count += cur_gap_count
+                for k, v in cur_gap_type_counts.items():
+                    gap_type_counts[k] += v
+
                 for stream_name, segs in cur_segments.items():
+                    if stream_name not in segments:
+                        segments[stream_name] = []
                     segments[stream_name].extend((start, min(now, end)) for start, end in segs)
                 depth_valid_segments.extend((start, min(now, end)) for start, end in cur_depth_valid_segments)
                 orphan_count += cur_orphan_count
@@ -1223,10 +1417,24 @@ class MicrostructureStore:
                     latest_clocks.append(cur_latest_clock)
                 integrity = integrity and cur_integrity
                 latencies += cur_latencies
+
+                partition_records.append({
+                    "path": path,
+                    "is_finalized": is_finalized,
+                    "day_start_ms": day_start_ms,
+                    "day_end_ms": day_end_ms,
+                    "gap_count": cur_gap_count,
+                    "gap_type_counts": cur_gap_type_counts,
+                    "gap_merged_intervals": [(s, e) for s, e in cur_merged_gaps],
+                    "gap_min_start_ms": cur_gap_min_start_ms,
+                    "gap_max_end_ms": cur_gap_max_end_ms,
+                    "spill_gaps": [(s, e) for s, e in cur_spill_gaps],
+                    "bucket_summary": None,
+                    "active_gaps": active_gaps,
+                })
             except sqlite3.DatabaseError:
                 integrity = False
-        if cache_dirty:
-            self._save_stats_cache(stats_cache)
+
         ordered = sorted(latencies)
 
         def pct(value: float) -> int | None:
@@ -1241,29 +1449,18 @@ class MicrostructureStore:
             stream: self._covered_ms(values, evaluation_start, now)
             for stream, values in segments.items()
         }
-        connected_ms = min(connected_ms_by_stream.values())
+        connected_ms = min(connected_ms_by_stream.values()) if connected_ms_by_stream else 0
         uptime_ratio = min(1.0, connected_ms / expected_ms) if expected_ms else 0.0
         depth_valid_ms = self._covered_ms(depth_valid_segments, evaluation_start, now)
-        depth_connected_ms = connected_ms_by_stream["depth"]
+        depth_connected_ms = connected_ms_by_stream.get("depth", 0)
         continuity_ratio = depth_valid_ms / depth_connected_ms if depth_connected_ms else 0.0
 
-        bucket_candidates: set[tuple[int, int]] = set()
-        if evaluation_start < now:
-            for interval in self.INTERVALS_MS:
-                first = evaluation_start // interval * interval
-                latest_closed = now // interval * interval - interval
-                bucket_candidates.update(
-                    (interval, start)
-                    for start in range(first, latest_closed + 1, interval)
-                )
-        closed_buckets = complete_buckets = gap_affected_buckets = 0
-        completeness_by_interval: dict[str, dict[str, int | float]] = {}
         def _merge_intervals(segs: list[tuple[int, int]]) -> list[tuple[int, int]]:
             if not segs:
                 return []
-            ordered = sorted(segs)
+            ordered_segs = sorted(segs)
             merged: list[list[int]] = []
-            for s, e in ordered:
+            for s, e in ordered_segs:
                 if e <= s:
                     continue
                 if not merged:
@@ -1301,65 +1498,182 @@ class MicrostructureStore:
                     return True
             return False
 
-        merged_trade = _merge_intervals(segments["trade"])
-        merged_depth = _merge_intervals(segments["depth"])
+        merged_trade = _merge_intervals(segments.get("trade", []))
+        merged_depth = _merge_intervals(segments.get("depth", []))
         merged_valid = _merge_intervals(depth_valid_segments)
-        merged_gaps = _merge_intervals([(g[0], g[1]) for g in gap_rows])
+        all_partition_gaps: list[tuple[int, int]] = []
+        for p_rec in partition_records:
+            all_partition_gaps.extend(p_rec["gap_merged_intervals"])
+        merged_gaps = _merge_intervals(all_partition_gaps)
+
+        closed_buckets = complete_buckets = gap_affected_buckets = 0
+        completeness_by_interval: dict[str, dict[str, int | float]] = {
+            str(interval): {"closed": 0, "complete": 0, "ratio": 0.0}
+            for interval in self.INTERVALS_MS
+        }
+        bucket_history_cache_hits = 0
+        bucket_active_candidates_evaluated = 0
+
+        for p_rec in partition_records:
+            p_is_finalized = p_rec["is_finalized"]
+            p_day_start = p_rec["day_start_ms"]
+            p_day_end = p_rec["day_end_ms"]
+            p_path = p_rec["path"]
+            p_summary = p_rec["bucket_summary"]
+
+            if p_is_finalized:
+                summary_valid = (
+                    isinstance(p_summary, dict)
+                    and (
+                        p_summary.get("evaluation_start_ms") == evaluation_start
+                        or (
+                            isinstance(p_summary.get("evaluation_start_ms"), int)
+                            and p_summary["evaluation_start_ms"] <= p_day_start
+                            and evaluation_start <= p_day_start
+                        )
+                    )
+                    and isinstance(p_summary.get("intervals"), dict)
+                    and all(
+                        str(interval) in p_summary["intervals"]
+                        and isinstance(p_summary["intervals"][str(interval)].get("closed"), int)
+                        and isinstance(p_summary["intervals"][str(interval)].get("complete"), int)
+                        and isinstance(p_summary["intervals"][str(interval)].get("gap_affected"), int)
+                        for interval in self.INTERVALS_MS
+                    )
+                )
+                if summary_valid:
+                    assert p_summary is not None
+                    for interval in self.INTERVALS_MS:
+                        i_data = p_summary["intervals"][str(interval)]
+                        c = int(i_data["closed"])
+                        comp = int(i_data["complete"])
+                        g = int(i_data["gap_affected"])
+                        completeness_by_interval[str(interval)]["closed"] = int(completeness_by_interval[str(interval)]["closed"]) + c
+                        completeness_by_interval[str(interval)]["complete"] = int(completeness_by_interval[str(interval)]["complete"]) + comp
+                        closed_buckets += c
+                        complete_buckets += comp
+                        gap_affected_buckets += g
+                        bucket_history_cache_hits += 1
+                else:
+                    new_intervals: dict[str, dict[str, int]] = {}
+                    for interval in self.INTERVALS_MS:
+                        first = max(p_day_start, evaluation_start // interval * interval)
+                        p_closed = p_complete = p_gap = 0
+                        if first < p_day_end:
+                            for start in range(first, p_day_end, interval):
+                                end = start + interval
+                                p_closed += 1
+                                gap_overlap = _fast_has_gap(merged_gaps, start, end)
+                                if gap_overlap:
+                                    p_gap += 1
+                                trade_ratio = _fast_covered(merged_trade, start, end) / interval
+                                depth_ratio = _fast_covered(merged_depth, start, end) / interval
+                                valid_ratio = _fast_covered(merged_valid, start, end) / interval
+                                if (
+                                    trade_ratio >= self.protocol.minimum_trade_coverage
+                                    and depth_ratio >= self.protocol.minimum_depth_coverage
+                                    and valid_ratio >= self.protocol.minimum_depth_valid_coverage
+                                    and not gap_overlap
+                                ):
+                                    p_complete += 1
+                        new_intervals[str(interval)] = {
+                            "closed": p_closed,
+                            "complete": p_complete,
+                            "gap_affected": p_gap,
+                        }
+                        completeness_by_interval[str(interval)]["closed"] = int(completeness_by_interval[str(interval)]["closed"]) + p_closed
+                        completeness_by_interval[str(interval)]["complete"] = int(completeness_by_interval[str(interval)]["complete"]) + p_complete
+                        closed_buckets += p_closed
+                        complete_buckets += p_complete
+                        gap_affected_buckets += p_gap
+                    new_summary = {
+                        "evaluation_start_ms": evaluation_start,
+                        "intervals": new_intervals,
+                    }
+                    if p_path.name in stats_cache and isinstance(stats_cache[p_path.name].get("stats"), dict):
+                        stats_cache[p_path.name]["stats"]["bucket_summary"] = new_summary
+                        cache_dirty = True
+            else:
+                for interval in self.INTERVALS_MS:
+                    first = max(p_day_start, evaluation_start // interval * interval)
+                    partition_end = min(p_day_end, now)
+                    latest_closed = partition_end // interval * interval - interval
+                    if first <= latest_closed:
+                        for start in range(first, latest_closed + 1, interval):
+                            bucket_active_candidates_evaluated += 1
+                            end = start + interval
+                            completeness_by_interval[str(interval)]["closed"] = int(completeness_by_interval[str(interval)]["closed"]) + 1
+                            closed_buckets += 1
+                            gap_overlap = _fast_has_gap(merged_gaps, start, end)
+                            if gap_overlap:
+                                gap_affected_buckets += 1
+                            trade_ratio = _fast_covered(merged_trade, start, end) / interval
+                            depth_ratio = _fast_covered(merged_depth, start, end) / interval
+                            valid_ratio = _fast_covered(merged_valid, start, end) / interval
+                            if (
+                                trade_ratio >= self.protocol.minimum_trade_coverage
+                                and depth_ratio >= self.protocol.minimum_depth_coverage
+                                and valid_ratio >= self.protocol.minimum_depth_valid_coverage
+                                and not gap_overlap
+                            ):
+                                completeness_by_interval[str(interval)]["complete"] = int(completeness_by_interval[str(interval)]["complete"]) + 1
+                                complete_buckets += 1
 
         for interval in self.INTERVALS_MS:
-            interval_candidates = sorted(
-                start for candidate_interval, start in bucket_candidates if candidate_interval == interval
-            )
-            interval_complete = interval_gap = 0
-            for start in interval_candidates:
-                end = start + interval
-                trade_ratio = _fast_covered(merged_trade, start, end) / interval
-                depth_ratio = _fast_covered(merged_depth, start, end) / interval
-                valid_ratio = _fast_covered(merged_valid, start, end) / interval
-                gap_overlap = _fast_has_gap(merged_gaps, start, end)
-                interval_gap += int(gap_overlap)
-                interval_complete += int(
-                    trade_ratio >= self.protocol.minimum_trade_coverage
-                    and depth_ratio >= self.protocol.minimum_depth_coverage
-                    and valid_ratio >= self.protocol.minimum_depth_valid_coverage
-                    and not gap_overlap
-                )
-            closed_buckets += len(interval_candidates)
-            complete_buckets += interval_complete
-            gap_affected_buckets += interval_gap
-            completeness_by_interval[str(interval)] = {
-                "closed": len(interval_candidates),
-                "complete": interval_complete,
-                "ratio": interval_complete / len(interval_candidates)
-                if interval_candidates
-                else 0.0,
-            }
+            c = int(completeness_by_interval[str(interval)]["closed"])
+            comp = int(completeness_by_interval[str(interval)]["complete"])
+            completeness_by_interval[str(interval)]["ratio"] = comp / c if c else 0.0
         completeness_ratio = complete_buckets / closed_buckets if closed_buckets else 0.0
-        gap_types = Counter(kind for _, _, kind in gap_rows)
-        resync_types = {
-            "DEPTH_SEQUENCE_GAP",
-            "DEPTH_BOOTSTRAP_FAILURE",
-            "DEPTH_RECONNECT",
-            "REST_BOOTSTRAP_FAILURE",
-            "DEPTH_GAP_RESYNC",
-        }
-        resync_count = sum(count for kind, count in gap_types.items() if kind in resync_types)
-        latest_clock = max(latest_clocks, default=None, key=lambda value: value[0])
-        offset = latest_clock[1] if latest_clock is not None else None
-        adjusted = sorted(value + offset for value in latencies) if offset is not None else []
 
-        def adjusted_pct(value: float) -> float | None:
-            return adjusted[min(len(adjusted) - 1, int(value * len(adjusted)))] if adjusted else None
-
-        partition_audit = self.partition_integrity_audit()
+        partition_audit = self.partition_integrity_audit(force_full=deep_integrity, stats_cache=stats_cache)
+        if cache_dirty:
+            self._save_stats_cache(stats_cache)
 
         rolling_reliability: dict[str, dict[str, Any]] = {}
         for label, window_ms in (("24h", 86_400_000), ("7d", 7 * 86_400_000)):
             window_start = max(evaluation_start, now - window_ms)
             window_expected = max(0, now - window_start)
-            trade_covered = self._covered_ms(segments["trade"], window_start, now)
-            depth_covered = self._covered_ms(segments["depth"], window_start, now)
+            trade_covered = self._covered_ms(segments.get("trade", []), window_start, now)
+            depth_covered = self._covered_ms(segments.get("depth", []), window_start, now)
             valid_covered = self._covered_ms(depth_valid_segments, window_start, now)
+
+            window_gap_count = 0
+            for p_rec in partition_records:
+                p_day_start = p_rec["day_start_ms"]
+                p_day_end = p_rec["day_end_ms"]
+                p_path = p_rec["path"]
+                p_is_finalized = p_rec["is_finalized"]
+
+                if not p_is_finalized:
+                    active_gaps = p_rec.get("active_gaps")
+                    if active_gaps is not None:
+                        window_gap_count += sum(1 for s, e in active_gaps if s < now and e >= window_start)
+                    else:
+                        with sqlite3.connect(f"file:{p_path.resolve().as_posix()}?mode=ro", uri=True) as conn:
+                            window_gap_count += int(conn.execute(
+                                "SELECT count(*) FROM gaps WHERE start_ms < ? AND end_ms >= ?",
+                                (now, window_start),
+                            ).fetchone()[0])
+                else:
+                    if p_day_start >= window_start and p_day_end <= now:
+                        window_gap_count += p_rec["gap_count"]
+                    elif p_day_end <= window_start:
+                        spill = p_rec.get("spill_gaps", [])
+                        window_gap_count += sum(1 for s, e in spill if s < now and e >= window_start)
+                    elif p_day_start <= window_start < p_day_end or p_day_start < now < p_day_end:
+                        g_min = p_rec.get("gap_min_start_ms")
+                        g_max = p_rec.get("gap_max_end_ms")
+                        if p_rec["gap_count"] == 0 or (g_max is not None and g_max < window_start):
+                            pass
+                        elif g_min is not None and g_min >= window_start and p_day_end <= now:
+                            window_gap_count += p_rec["gap_count"]
+                        else:
+                            with sqlite3.connect(f"file:{p_path.resolve().as_posix()}?mode=ro", uri=True) as conn:
+                                window_gap_count += int(conn.execute(
+                                    "SELECT count(*) FROM gaps WHERE start_ms < ? AND end_ms >= ?",
+                                    (now, window_start),
+                                ).fetchone()[0])
+
             rolling_reliability[label] = {
                 "window_start_ms": window_start,
                 "observed_seconds": window_expected / 1000,
@@ -1372,11 +1686,39 @@ class MicrostructureStore:
                 "sequence_valid_coverage_ratio": (
                     valid_covered / window_expected if window_expected else 0.0
                 ),
-                "gap_count": sum(
-                    gap_start < now and gap_end >= window_start
-                    for gap_start, gap_end, _ in gap_rows
-                ),
+                "gap_count": window_gap_count,
             }
+
+        resync_types = {
+            "DEPTH_SEQUENCE_GAP",
+            "DEPTH_BOOTSTRAP_FAILURE",
+            "DEPTH_RECONNECT",
+            "REST_BOOTSTRAP_FAILURE",
+            "DEPTH_GAP_RESYNC",
+        }
+        resync_count = sum(count for kind, count in gap_type_counts.items() if kind in resync_types)
+
+        latest_clock = max(latest_clocks, default=None, key=lambda value: value[0])
+        offset = latest_clock[1] if latest_clock is not None else None
+        adjusted = sorted(value + offset for value in latencies) if offset is not None else []
+
+        def adjusted_pct(value: float) -> float | None:
+            return adjusted[min(len(adjusted) - 1, int(value * len(adjusted)))] if adjusted else None
+
+        status_performance = {
+            "stats_cache_schema": self.STATS_CACHE_SCHEMA_VERSION,
+            "finalized_partition_cache_hits": finalized_cache_hits,
+            "finalized_partition_cache_misses": finalized_cache_misses,
+            "finalized_hash_reused": partition_audit.get("attestation_reused", 0),
+            "finalized_hash_recomputed": partition_audit.get("attestation_recomputed", 0),
+            "active_quick_check_executed": deep_integrity,
+            "bucket_history_cache_hits": bucket_history_cache_hits,
+            "bucket_active_candidates_evaluated": bucket_active_candidates_evaluated,
+            "raw_gap_rows_materialized": 0,
+            "active_partition_integrity_mode": (
+                "DEEP_QUICK_CHECK" if deep_integrity else "LIGHTWEIGHT_STATUS_READS"
+            ),
+        }
 
         return {
             "campaign_id": self.campaign_id,
@@ -1392,8 +1734,8 @@ class MicrostructureStore:
             "aggregate_completeness_by_interval_ms": completeness_by_interval,
             "completeness_semantics": "COVERAGE_LIVENESS_SEQUENCE_VALIDITY_NO_GAP",
             "aggregation_intervals_ms": list(self.INTERVALS_MS),
-            "gap_count": len(gap_rows),
-            "gap_type_counts": dict(sorted(gap_types.items())),
+            "gap_count": gap_count,
+            "gap_type_counts": dict(sorted(gap_type_counts.items())),
             "resync_count": resync_count,
             "connected_seconds": connected_ms / 1000,
             "connected_seconds_by_stream": {
@@ -1445,6 +1787,7 @@ class MicrostructureStore:
             "state": "COLLECTING" if depth or trades else "INITIALIZING",
             "direction_claim": "NONE",
             "alpha_claim": "NONE",
+            "status_performance": status_performance,
         }
 
 
