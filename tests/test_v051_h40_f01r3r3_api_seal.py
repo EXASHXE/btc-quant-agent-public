@@ -48,7 +48,7 @@ _TESTS_DIR = str(Path(__file__).resolve().parent)
 if _TESTS_DIR not in sys.path:
     sys.path.insert(0, _TESTS_DIR)
 
-from test_v051_h40_f01_lifecycle_authority import (  # noqa: E402
+from test_v051_h40_f01_lifecycle_authority import (
     TS,
     _build_discovery_chain,
     _implementation_authority,
@@ -134,7 +134,7 @@ def test_r48_stale_cached_production_authorization_cannot_directly_commit(
     )
     run = H40RunAuthority.from_seal(seal, authority.lifecycle_implementation_authority_hash)
     store = H40LifecycleArtifactStore(tmp_path)
-    verifier = _ProductionEvidenceVerifier()
+    verifier = _ProductionEvidenceVerifier(tmp_path / "verifier")
     service = H40LifecycleAuthorityService.production(
         implementation_authority=authority,
         evidence_verifier=verifier,

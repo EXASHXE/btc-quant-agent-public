@@ -24,8 +24,6 @@ import pytest
 import btc_quant_agent.h40.lifecycle_authority as lifecycle_authority_module
 from btc_quant_agent.h40 import (
     H40CandidateLockReceipt,
-    H40CandidateResultEntry,
-    H40DiscoveryResultEvidence,
     H40ExpectedSplitAuthority,
     H40ExpectedWFFold,
     H40GuardError,
@@ -35,6 +33,8 @@ from btc_quant_agent.h40 import (
     H40ReasonCode,
     H40RunAuthority,
     H40RuntimeSnapshotSeal,
+    H40SyntheticAuthorityResolver,
+    H40SyntheticEvidenceVerifier,
     H40WFFoldResultEntry,
     H40WFValidationResultEvidence,
     VerifiedLifecycleAuthorization,
@@ -46,7 +46,7 @@ _TESTS_DIR = str(Path(__file__).resolve().parent)
 if _TESTS_DIR not in sys.path:
     sys.path.insert(0, _TESTS_DIR)
 
-from test_v051_h40_f01_lifecycle_authority import (  # noqa: E402
+from test_v051_h40_f01_lifecycle_authority import (
     TS,
     _build_discovery_chain,
     _build_wf_chain,
@@ -103,7 +103,7 @@ class _ProductionAuthorityResolver:
 # =============================================================================
 
 
-def _make_production_chain(
+def _make_synthetic_chain_with_production_seal(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
 ) -> tuple[
@@ -131,76 +131,60 @@ def _make_production_chain(
         "ACCEPTED_LIFECYCLE_IMPLEMENTATION_AUTHORITY_HASH",
         authority.lifecycle_implementation_authority_hash,
     )
-    run = H40RunAuthority.from_seal(seal, authority.lifecycle_implementation_authority_hash)
-    verifier = _ProductionEvidenceVerifier()
-    prod_service = H40LifecycleAuthorityService.production(
-        implementation_authority=authority,
-        evidence_verifier=verifier,
+    # These durability cases exercise lifecycle governance with a real cold
+    # source/split seal. Their candidate evidence is explicitly synthetic.
+    chain = _build_discovery_chain(seal=seal)
+    return (
+        chain.service, chain.discovery, chain.candidate, seal, chain.run,
+        authority, cold_state,
     )
-
-    discovery = prod_service.authorize_discovery(
-        implementation_authority=authority,
-        run_authority=run,
-        seal=seal,
-        authorized_at_utc=TS,
-    )
-
-    sorted_roster = sorted(seal.roster, key=lambda r: r.structural_configuration_hash)
-    entries: list[H40CandidateResultEntry] = []
-    for pos, item in enumerate(sorted_roster):
-        entries.append(
-            H40CandidateResultEntry(
-                candidate_result_input_evidence_hash=_hash(f"res-{pos}"),
-                complexity=len(item.family_id.split("+")),
-                family_id=item.family_id,
-                hard_gate_input_evidence_hashes={"ALL_ACCEPTED_HARD_GATES": _hash(f"gate-{pos}")},
-                net_expectancy_input_evidence_hash=_hash(f"net-{pos}"),
-                precision_input_evidence_hash=_hash(f"prec-{pos}"),
-                slot_hash=item.slot_hash,
-                slot_index=item.slot_index,
-                structural_configuration_hash=item.structural_configuration_hash,
-            )
-        )
-    disc_evidence = H40DiscoveryResultEvidence(
-        candidate_result_entries=tuple(entries),
-        correction_input_evidence_manifest_hash=_hash("manifest"),
-        created_at_utc=TS,
-        discovery_authorization_receipt_hash=discovery.receipt_hash,
-        materialized_run_authority_hash=seal.materialized_run_authority_hash,
-        run_authority_id=run.run_authority_id,
-        sealed_registered_roster_hash=seal.sealed_registered_roster_hash,
-    )
-    candidate = prod_service.authorize_candidate_lock(
-        discovery_authority=discovery,
-        evidence=disc_evidence,
-        locked_at_utc=TS,
-        verified_at_utc=TS,
-    )
-    return prod_service, discovery, candidate, seal, run, authority, cold_state
 
 
 def _make_simulated_wf_evidence(
     candidate: VerifiedLifecycleAuthorization,
     split_authority: H40ExpectedSplitAuthority,
+    service: H40LifecycleAuthorityService,
 ) -> H40WFValidationResultEvidence:
     candidate_receipt = candidate.receipt
     assert isinstance(candidate_receipt, H40CandidateLockReceipt)
-    fold_entries = tuple(
-        H40WFFoldResultEntry(
-            accepted_gate_input_evidence_hashes={"ALL_ACCEPTED_WF_GATES": _hash(f"gate-{fold.fold_id}")},
-            evaluation_input_evidence_hash=_hash(f"eval-{fold.fold_id}"),
+    verifier = service._evidence_verifier
+    assert isinstance(verifier, H40SyntheticEvidenceVerifier)
+    fold_entries = []
+    for fold in split_authority.folds:
+        gate_id = "ALL_ACCEPTED_WF_GATES"
+        gate_hash = verifier.add_payload_for_tests({
+            "fold_identity_hash": fold.fold_identity_hash,
+            "gate_id": gate_id,
+            "locked_structural_configuration_hash": candidate_receipt.selected_structural_configuration_hash,
+            "passed": True,
+            "run_authority_id": candidate.run_authority_id,
+            "schema_id": "H40_SYNTHETIC_WF_GATE_EVIDENCE_V1",
+            "split_attestation_hash": split_authority.split_attestation_hash,
+            "split_manifest_hash": split_authority.split_manifest_hash,
+        })
+        gate_hashes = {gate_id: gate_hash}
+        evaluation_hash = verifier.add_payload_for_tests({
+            "accepted_gate_input_evidence_hashes": gate_hashes,
+            "fold_identity_hash": fold.fold_identity_hash,
+            "locked_structural_configuration_hash": candidate_receipt.selected_structural_configuration_hash,
+            "run_authority_id": candidate.run_authority_id,
+            "schema_id": "H40_SYNTHETIC_WF_EVALUATION_INPUT_V1",
+            "split_attestation_hash": split_authority.split_attestation_hash,
+            "split_manifest_hash": split_authority.split_manifest_hash,
+        })
+        fold_entries.append(H40WFFoldResultEntry(
+            accepted_gate_input_evidence_hashes=gate_hashes,
+            evaluation_input_evidence_hash=evaluation_hash,
             fold_identity_hash=fold.fold_identity_hash,
             fold_id=fold.fold_id,
             partition_id=fold.partition_id,
             split_definition_hash=fold.split_definition_hash,
-        )
-        for fold in split_authority.folds
-    )
+        ))
     return H40WFValidationResultEvidence(
         accepted_validation_contract_hashes=dict(split_authority.accepted_validation_contract_hashes),
         candidate_lock_receipt_hash=candidate.receipt_hash,
         created_at_utc=TS,
-        fold_result_entries=fold_entries,
+        fold_result_entries=tuple(fold_entries),
         locked_slot_hash=candidate_receipt.selected_slot_hash,
         locked_slot_index=candidate_receipt.selected_slot_index,
         locked_structural_configuration_hash=candidate_receipt.selected_structural_configuration_hash,
@@ -232,19 +216,19 @@ def _make_simulated_split_authority(seal: H40RuntimeSnapshotSeal) -> H40Expected
 # =============================================================================
 
 
-def test_r01_production_initial_wf_uses_internally_derived_authority(
+def test_r01_synthetic_initial_wf_uses_internally_derived_authority(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
 ) -> None:
-    """R01: In production mode, initial WF validation derives expected split internally."""
-    service, _, candidate, seal, _, _, _ = _make_production_chain(monkeypatch, tmp_path)
+    """R01: Synthetic lifecycle exercises a real source seal and derived split."""
+    service, _, candidate, seal, _, _, _ = _make_synthetic_chain_with_production_seal(monkeypatch, tmp_path)
     simulated_split = _make_simulated_split_authority(seal)
     monkeypatch.setattr(
         lifecycle_authority_module,
         "derive_expected_wf_authority",
         lambda *args, **kwargs: simulated_split,
     )
-    evidence = _make_simulated_wf_evidence(candidate, simulated_split)
+    evidence = _make_simulated_wf_evidence(candidate, simulated_split, service)
 
     wf_auth = service.authorize_wf_validation(
         candidate_authority=candidate,
@@ -257,19 +241,19 @@ def test_r01_production_initial_wf_uses_internally_derived_authority(
     assert wf_auth.context.get("split_authority") == simulated_split
 
 
-def test_r02_production_wf_revalidation_avoids_caller_override_path(
+def test_r02_synthetic_wf_revalidation_avoids_caller_override_path(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
 ) -> None:
-    """R02: Production WF revalidation derives internally and avoids caller-override rejection."""
-    service, _, candidate, seal, _, _, _ = _make_production_chain(monkeypatch, tmp_path)
+    """R02: Synthetic WF revalidation derives internally and replays evidence."""
+    service, _, candidate, seal, _, _, _ = _make_synthetic_chain_with_production_seal(monkeypatch, tmp_path)
     simulated_split = _make_simulated_split_authority(seal)
     monkeypatch.setattr(
         lifecycle_authority_module,
         "derive_expected_wf_authority",
         lambda *args, **kwargs: simulated_split,
     )
-    evidence = _make_simulated_wf_evidence(candidate, simulated_split)
+    evidence = _make_simulated_wf_evidence(candidate, simulated_split, service)
     wf_auth = service.authorize_wf_validation(
         candidate_authority=candidate,
         evidence=evidence,
@@ -282,19 +266,19 @@ def test_r02_production_wf_revalidation_avoids_caller_override_path(
     service.revalidate_authorization(wf_auth)
 
 
-def test_r03_production_wf_cold_restore_avoids_caller_override_path(
+def test_r03_synthetic_wf_cold_restore_avoids_caller_override_path(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
 ) -> None:
-    """R03: Production WF cold restore derives internally and reconstructs cleanly."""
-    service, discovery, candidate, seal, run, authority, _ = _make_production_chain(monkeypatch, tmp_path)
+    """R03: Synthetic WF cold restore reconstructs a production source seal."""
+    service, discovery, candidate, seal, run, authority, _ = _make_synthetic_chain_with_production_seal(monkeypatch, tmp_path)
     simulated_split = _make_simulated_split_authority(seal)
     monkeypatch.setattr(
         lifecycle_authority_module,
         "derive_expected_wf_authority",
         lambda *args, **kwargs: simulated_split,
     )
-    evidence = _make_simulated_wf_evidence(candidate, simulated_split)
+    evidence = _make_simulated_wf_evidence(candidate, simulated_split, service)
     wf_auth = service.authorize_wf_validation(
         candidate_authority=candidate,
         evidence=evidence,
@@ -308,15 +292,14 @@ def test_r03_production_wf_cold_restore_avoids_caller_override_path(
     store.persist_authorization("02_candidate_lock", candidate, service=service)
     store.persist_authorization("03_wf_validation", wf_auth, service=service)
 
-    fresh_service = H40LifecycleAuthorityService.production(
-        implementation_authority=authority,
-        evidence_verifier=_ProductionEvidenceVerifier(),
+    verifier = service._evidence_verifier
+    assert isinstance(verifier, H40SyntheticEvidenceVerifier)
+    fresh_service = H40LifecycleAuthorityService.synthetic_for_tests(
+        authority, H40SyntheticEvidenceVerifier(verifier.export_payloads_for_tests()),
     )
-    resolver = _ProductionAuthorityResolver(
-        authority=authority,
-        run=run,
-        seal=seal,
-        split=simulated_split,
+    resolver = H40SyntheticAuthorityResolver.for_tests(
+        implementation_authorities=(authority,), run_authorities=(run,),
+        runtime_seals=(seal,), split_authorities=(simulated_split,),
     )
 
     restored = store.restore_authorization(
@@ -333,15 +316,15 @@ def test_r04_persisted_split_mismatch_fails_closed(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
 ) -> None:
-    """R04: Persisted split context mismatch against derived production split fails closed."""
-    service, _, candidate, seal, _, _, _ = _make_production_chain(monkeypatch, tmp_path)
+    """R04: Persisted synthetic split context mismatch fails closed."""
+    service, _, candidate, seal, _, _, _ = _make_synthetic_chain_with_production_seal(monkeypatch, tmp_path)
     simulated_split = _make_simulated_split_authority(seal)
     monkeypatch.setattr(
         lifecycle_authority_module,
         "derive_expected_wf_authority",
         lambda *args, **kwargs: simulated_split,
     )
-    evidence = _make_simulated_wf_evidence(candidate, simulated_split)
+    evidence = _make_simulated_wf_evidence(candidate, simulated_split, service)
     wf_auth = service.authorize_wf_validation(
         candidate_authority=candidate,
         evidence=evidence,
@@ -372,7 +355,7 @@ def test_r04_persisted_split_mismatch_fails_closed(
         token=lifecycle_authority_module._VERIFIED_AUTHORITY_TOKEN,
     )
 
-    with pytest.raises(H40GuardError, match="persisted WF split authority does not match"):
+    with pytest.raises(H40GuardError, match="WF fold set is missing"):
         service.revalidate_authorization(tampered_auth)
 
 
@@ -381,12 +364,15 @@ def test_r05_synthetic_split_injection_remains_test_only(
     tmp_path: Path,
 ) -> None:
     """R05: Caller split injection succeeds in synthetic mode but is rejected in production."""
-    service, _, candidate, seal, _, _, _ = _make_production_chain(monkeypatch, tmp_path)
+    _, _, candidate, seal, _, _, _ = _make_synthetic_chain_with_production_seal(monkeypatch, tmp_path)
     simulated_split = _make_simulated_split_authority(seal)
 
     # In production mode, caller injection raises
+    production_service = H40LifecycleAuthorityService.production(
+        evidence_verifier=_ProductionEvidenceVerifier(tmp_path / "verifier"),
+    )
     with pytest.raises(H40GuardError, match="caller-supplied split authority cannot override"):
-        service.authorize_wf_validation(
+        production_service.authorize_wf_validation(
             candidate_authority=candidate,
             evidence=None,  # type: ignore[arg-type]
             split_authority=simulated_split,
@@ -405,18 +391,32 @@ def test_r06_current_production_remains_not_testable_until_p3_materialization(
     tmp_path: Path,
 ) -> None:
     """R06: Current production derive_expected_wf_authority raises NOT_TESTABLE."""
-    service, _, candidate, seal, _, _, _ = _make_production_chain(monkeypatch, tmp_path)
+    service, _, candidate, seal, _, authority, _ = _make_synthetic_chain_with_production_seal(monkeypatch, tmp_path)
+
+    # Probe the production WF guard with a candidate-shaped projection. It is
+    # never persisted or treated as a scientific candidate authorization.
+    production_service = H40LifecycleAuthorityService.production(
+        implementation_authority=authority,
+        evidence_verifier=_ProductionEvidenceVerifier(tmp_path / "verifier"),
+    )
+    production_candidate = production_service._wrap(
+        candidate.receipt,
+        source_state=candidate.source_state,
+        target_state=candidate.target_state,
+        upstream_receipt_hash=candidate.upstream_receipt_hash,
+        context=candidate.context,
+    )
 
     # Without mocking derive_expected_wf_authority, production derivation fails closed
     with pytest.raises(H40GuardError, match="accepted P3 validation contracts are not yet materialized"):
-        derive_expected_wf_authority(candidate)
+        derive_expected_wf_authority(production_candidate)
 
     # And production authorize_wf_validation directly fails closed
     simulated_split = _make_simulated_split_authority(seal)
-    evidence = _make_simulated_wf_evidence(candidate, simulated_split)
+    evidence = _make_simulated_wf_evidence(candidate, simulated_split, service)
     with pytest.raises(H40GuardError, match="accepted P3 validation contracts are not yet materialized"):
-        service.authorize_wf_validation(
-            candidate_authority=candidate,
+        production_service.authorize_wf_validation(
+            candidate_authority=production_candidate,
             evidence=evidence,
             split_authority=None,
             validated_at_utc=TS,
@@ -798,7 +798,7 @@ def test_r23_termination_source_disappears_fails_closed(
     tmp_path: Path,
 ) -> None:
     """R23: authorize_termination fails closed if production runtime source disappears."""
-    service, discovery, _, _, _, _, cold_state = _make_production_chain(monkeypatch, tmp_path)
+    service, discovery, _, _, _, _, cold_state = _make_synthetic_chain_with_production_seal(monkeypatch, tmp_path)
 
     # Source ledger disappears
     cold_state["available"] = False
@@ -818,7 +818,7 @@ def test_r24_termination_source_mutates_fails_closed(
     tmp_path: Path,
 ) -> None:
     """R24: authorize_termination fails closed if production runtime source mutates."""
-    service, discovery, _, _seal, _, _, _ = _make_production_chain(monkeypatch, tmp_path)
+    service, discovery, _, _seal, _, _, _ = _make_synthetic_chain_with_production_seal(monkeypatch, tmp_path)
 
     # Mutate verify_against_accepted_ledger to simulate source mutation
     def fail_verify(self: Any) -> None:

@@ -17,7 +17,9 @@ from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from pathlib import Path
+from types import MappingProxyType
 from typing import Any, NoReturn, cast
+from weakref import WeakKeyDictionary
 
 import numpy as np
 
@@ -120,6 +122,13 @@ def _policies(value: object) -> None:
 class H40DiscoveryEvidenceResolver:
     """Read a SHA-addressed canonical JSON object from one approved root."""
 
+    __slots__ = ("_root",)
+
+    def __setattr__(self, name: str, value: object) -> None:
+        if name == "_root" and hasattr(self, "_root"):
+            raise AttributeError("approved evidence root is write-once")
+        object.__setattr__(self, name, value)
+
     def __init__(self, root: Path | str) -> None:
         path = Path(root)
         H40ProtectedSurfaceGuard.assert_path_allowed(path)
@@ -164,6 +173,22 @@ class H40DiscoveryEvidenceResolver:
         ):
             _fail("evidence schema or canonical content hash mismatch")
         return result
+
+
+def _seal_context_binding(seal: H40RuntimeSnapshotSeal) -> tuple[Any, ...]:
+    """Capture the mutable objects behind a runtime seal as well as its public hash."""
+    contexts = (
+        seal._source_manifest_context,
+        seal._split_manifest_context,
+        seal._runtime_attestation_context,
+    )
+    return (
+        *(
+            (id(context), canonical_sha256(context.to_dict()) if context is not None else None)
+            for context in contexts
+        ),
+        seal._repo_root_context,
+    )
 
 
 def h40_proxy_net_return(action: str, p0: str, ch: str) -> tuple[float, float]:
@@ -1023,7 +1048,25 @@ def _candidate_science(
 class H40ProductionDiscoveryEvidenceVerifier:
     """Production Discovery verifier behind the accepted lifecycle Protocol."""
 
+    __slots__ = (
+        "__weakref__",
+        "_dependencies",
+        "_entries_by_id",
+        "_evidence_hash",
+        "_manifest_hash",
+        "_receipt",
+        "_resolver",
+        "_seal",
+        "_split",
+        "_verified",
+    )
+
     synthetic_only = False
+
+    def __setattr__(self, name: str, value: object) -> None:
+        if name in {"_resolver", "_seal", "_receipt", "_split"} and hasattr(self, name):
+            raise AttributeError(f"{name} is write-once production authority")
+        object.__setattr__(self, name, value)
 
     def __init__(
         self,
@@ -1050,16 +1093,96 @@ class H40ProductionDiscoveryEvidenceVerifier:
         self._verified: dict[str, H40CandidateVerification] = {}
         self._dependencies: list[tuple[str, str, set[str]]] = []
         self._entries_by_id: dict[str, H40CandidateResultEntry] = {}
+        _VERIFIER_BINDINGS[self] = (
+            self._resolver, self._resolver._root, self._seal,
+            self._seal.authority_context_hash, _seal_context_binding(self._seal),
+            self._receipt,
+            self._receipt.receipt_sha256, self._split,
+            canonical_sha256(self._split.to_dict()),
+        )
+
+    def assert_runtime_integrity(
+        self,
+        *,
+        seal: H40RuntimeSnapshotSeal | None = None,
+        receipt: H40DiscoveryAuthorizationReceipt | None = None,
+    ) -> None:
+        binding = _VERIFIER_BINDINGS.get(self)
+        if binding is None or type(self) is not H40ProductionDiscoveryEvidenceVerifier:
+            _fail("production verifier constructor integrity failed")
+        try:
+            (
+                resolver, root, bound_seal, seal_hash, seal_context,
+                bound_receipt, receipt_hash, split, split_hash,
+            ) = binding
+            intact = (
+                self._resolver is resolver
+                and type(resolver) is H40DiscoveryEvidenceResolver
+                and resolver._root == root
+                and self._seal is bound_seal
+                and self._seal.authority_context_hash == seal_hash
+                and _seal_context_binding(self._seal) == seal_context
+                and self._receipt is bound_receipt
+                and self._receipt.receipt_sha256 == receipt_hash
+                and self._split is split
+                and canonical_sha256(self._split.to_dict()) == split_hash
+                and self._split.split_hash == self._seal.split_manifest_hash
+                and (seal is None or seal.authority_context_hash == seal_hash)
+                and (receipt is None or receipt.receipt_sha256 == receipt_hash)
+                and all(
+                    getattr(H40ProductionDiscoveryEvidenceVerifier, name) is method
+                    for name, method in _VERIFIER_METHODS.items()
+                )
+                and all(
+                    getattr(H40DiscoveryEvidenceResolver, name) is method
+                    for name, method in _RESOLVER_METHODS.items()
+                )
+            )
+        except (AttributeError, TypeError, ValueError):
+            intact = False
+        if not intact:
+            _fail("production verifier runtime authority or behavior changed")
 
     def _load(self, digest: str, schema_id: str, keys: set[str]) -> Mapping[str, Any]:
         self._dependencies.append((digest, schema_id, keys))
         return self._resolver.load(digest, schema_id, keys)
+
+    def _result_binding(self) -> str:
+        return canonical_sha256({
+            "manifest_hash": self._manifest_hash,
+            "evidence_hash": self._evidence_hash,
+            "verified": {
+                candidate_id: {
+                    "hard_gates_passed": result.hard_gates_passed,
+                    "adjusted_lcb_net_expectancy": (
+                        None if result.adjusted_lcb_net_expectancy is None
+                        else str(result.adjusted_lcb_net_expectancy)
+                    ),
+                    "adjusted_lcb_precision": (
+                        None if result.adjusted_lcb_precision is None
+                        else str(result.adjusted_lcb_precision)
+                    ),
+                    "scientific_unavailable": result.scientific_unavailable,
+                }
+                for candidate_id, result in self._verified.items()
+            },
+            "entries": {
+                candidate_id: entry.to_dict()
+                for candidate_id, entry in self._entries_by_id.items()
+            },
+            "dependencies": [
+                [digest, schema_id, sorted(keys)]
+                for digest, schema_id, keys in self._dependencies
+            ],
+        })
 
     def verify_discovery_manifest(
         self,
         evidence: H40DiscoveryResultEvidence,
         entries: Sequence[H40CandidateResultEntry],
     ) -> None:
+        H40ProductionDiscoveryEvidenceVerifier.assert_runtime_integrity(self)
+        _VERIFIER_RESULTS.pop(self, None)
         self._manifest_hash = None
         self._evidence_hash = None
         self._verified.clear()
@@ -1234,6 +1357,7 @@ class H40ProductionDiscoveryEvidenceVerifier:
         }
         self._manifest_hash = manifest_hash
         self._evidence_hash = evidence.evidence_sha256
+        _VERIFIER_RESULTS[self] = self._result_binding()
 
     def _metric_starts(
         self, candidate: _LoadedCandidate, metric_id: str, manifest_hash: str,
@@ -1416,6 +1540,13 @@ class H40ProductionDiscoveryEvidenceVerifier:
         run_authority_id: str,
         correction_manifest_hash: str,
     ) -> H40CandidateVerification:
+        H40ProductionDiscoveryEvidenceVerifier.assert_runtime_integrity(self)
+        try:
+            results_intact = _VERIFIER_RESULTS.get(self) == self._result_binding()
+        except (AttributeError, TypeError, ValueError):
+            results_intact = False
+        if not results_intact:
+            _fail("production verifier scientific results changed after verification")
         if (
             self._manifest_hash is None or self._evidence_hash is None
             or correction_manifest_hash != self._manifest_hash
@@ -1434,4 +1565,23 @@ class H40ProductionDiscoveryEvidenceVerifier:
         *,
         evidence: H40WFValidationResultEvidence,
     ) -> bool:
+        H40ProductionDiscoveryEvidenceVerifier.assert_runtime_integrity(self)
         _fail("production WF scientific verification is not authorized", H40ReasonCode.NOT_TESTABLE)
+
+
+_VERIFIER_BINDINGS: WeakKeyDictionary[
+    H40ProductionDiscoveryEvidenceVerifier, tuple[Any, ...]
+] = WeakKeyDictionary()
+_VERIFIER_RESULTS: WeakKeyDictionary[H40ProductionDiscoveryEvidenceVerifier, str] = (
+    WeakKeyDictionary()
+)
+_VERIFIER_METHODS: Mapping[str, Any] = MappingProxyType({
+    name: method
+    for name, method in vars(H40ProductionDiscoveryEvidenceVerifier).items()
+    if callable(method)
+})
+_RESOLVER_METHODS: Mapping[str, Any] = MappingProxyType({
+    name: method
+    for name, method in vars(H40DiscoveryEvidenceResolver).items()
+    if callable(method)
+})

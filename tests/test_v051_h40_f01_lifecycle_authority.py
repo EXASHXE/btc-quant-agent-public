@@ -40,8 +40,8 @@ from btc_quant_agent.h40 import (
     H40LifecycleImplementationAuthority,
     H40LifecycleState,
     H40LifecycleStateMachine,
-    H40ProtectedSurfaceGuard,
     H40ProductionDiscoveryEvidenceVerifier,
+    H40ProtectedSurfaceGuard,
     H40ProtocolIdentity,
     H40ReasonCode,
     H40RequiredTestCIEvidenceIdentity,
@@ -1805,20 +1805,14 @@ def test_r44_r46_f02_h39_and_final_holdout_remain_sealed() -> None:
 # =============================================================================
 
 
-def _ProductionEvidenceVerifier() -> H40ProductionDiscoveryEvidenceVerifier:
-    """Exact-type lifecycle fixture; science is covered by the P3B evidence suite."""
-    verifier = object.__new__(H40ProductionDiscoveryEvidenceVerifier)
-    setattr(verifier, "verify_discovery_manifest", lambda evidence, entries: None)
-    setattr(
-        verifier, "verify_candidate",
-        lambda entry, *, run_authority_id, correction_manifest_hash:
-        H40CandidateVerification(True, Decimal(0), Decimal(0)),
-    )
-    setattr(verifier, "verify_wf_fold", lambda entry, *, evidence: True)
-    return verifier
+def _ProductionEvidenceVerifier(root: Path) -> H40ProductionDiscoveryEvidenceVerifier:
+    """Real constructor fixture for governance tests that stop before P3B science."""
+    from test_v051_h40_p3b_production_discovery_verifier import _invalid_fixture
+
+    return _invalid_fixture(root).verifier
 
 
-def test_a01_through_a07_derived_wf_authority() -> None:
+def test_a01_through_a07_derived_wf_authority(tmp_path: Path) -> None:
     # A04: exact derived WF universe == WF1..WF4 validation only
     chain = _build_discovery_chain()
     derived = derive_expected_wf_authority(seal=chain.seal)
@@ -1911,7 +1905,7 @@ def test_a01_through_a07_derived_wf_authority() -> None:
     prod_service = H40LifecycleAuthorityService(
         implementation_authority=chain.authority,
         accepted_implementation_authority_hash=chain.authority.lifecycle_implementation_authority_hash,
-        evidence_verifier=_ProductionEvidenceVerifier(),
+        evidence_verifier=_ProductionEvidenceVerifier(tmp_path / "verifier"),
         synthetic_test_mode=False,
         _construction_token=lifecycle_authority_module._VERIFIED_AUTHORITY_TOKEN,
     )
@@ -2269,7 +2263,7 @@ def test_a21_through_a29_model_a_capability_lifetime(
     )
     run = H40RunAuthority.from_seal(seal, authority.lifecycle_implementation_authority_hash)
     store = H40LifecycleArtifactStore(tmp_path)
-    verifier = _ProductionEvidenceVerifier()
+    verifier = _ProductionEvidenceVerifier(tmp_path / "verifier")
     prod_service = H40LifecycleAuthorityService.production(
         implementation_authority=authority,
         evidence_verifier=verifier,
@@ -2284,7 +2278,7 @@ def test_a21_through_a29_model_a_capability_lifetime(
     assert discovery.receipt_hash
 
     # A28: root seal reverified on production transition consumption
-    machine = H40LifecycleStateMachine()
+    machine = H40LifecycleStateMachine.synthetic_for_tests()
     machine.transition_with_verified_authority(discovery)
     assert machine.current_state == H40LifecycleState.H40_DISCOVERY
 
@@ -2300,40 +2294,14 @@ def test_a21_through_a29_model_a_capability_lifetime(
 
     # Restore cold_state
     cold_state["available"] = True
-    sorted_roster = sorted(seal.roster, key=lambda r: r.structural_configuration_hash)
-    entries: list[H40CandidateResultEntry] = []
-    for pos, item in enumerate(sorted_roster):
-        entries.append(H40CandidateResultEntry(
-            candidate_result_input_evidence_hash=_hash(f"res-{pos}"),
-            complexity=len(item.family_id.split("+")),
-            family_id=item.family_id,
-            hard_gate_input_evidence_hashes={"ALL_ACCEPTED_HARD_GATES": _hash(f"gate-{pos}")},
-            net_expectancy_input_evidence_hash=_hash(f"net-{pos}"),
-            precision_input_evidence_hash=_hash(f"prec-{pos}"),
-            slot_hash=item.slot_hash,
-            slot_index=item.slot_index,
-            structural_configuration_hash=item.structural_configuration_hash,
-        ))
-    disc_evidence = H40DiscoveryResultEvidence(
-        candidate_result_entries=tuple(entries),
-        correction_input_evidence_manifest_hash=_hash("manifest"),
-        created_at_utc=TS,
-        discovery_authorization_receipt_hash=discovery.receipt_hash,
-        materialized_run_authority_hash=seal.materialized_run_authority_hash,
-        run_authority_id=run.run_authority_id,
-        sealed_registered_roster_hash=seal.sealed_registered_roster_hash,
-    )
-    candidate = prod_service.authorize_candidate_lock(
-        discovery_authority=discovery,
-        evidence=disc_evidence,
-        locked_at_utc=TS,
-        verified_at_utc=TS,
-    )
+    candidate_chain = _build_discovery_chain(seal=seal)
+    candidate = candidate_chain.candidate
+    candidate_service = candidate_chain.service
 
     # A22: source disappears after Candidate Lock; WF transition rejected
     cold_state["available"] = False
     with pytest.raises(H40GuardError, match="failed cold validation"):
-        prod_service.authorize_wf_validation(
+        candidate_service.authorize_wf_validation(
             candidate_authority=candidate,
             evidence=None,  # type: ignore[arg-type]
             validated_at_utc=TS,
@@ -2354,7 +2322,7 @@ def test_a21_through_a29_model_a_capability_lifetime(
 
     monkeypatch.setattr(lifecycle_authority_module, "validate_source_artifact", mutated_validate)
     with pytest.raises(H40GuardError, match="active source 'ETHUSDT_USD_M_1H' receipt does not equal cold validation receipt"):
-        prod_service.authorize_wf_validation(
+        candidate_service.authorize_wf_validation(
             candidate_authority=candidate,
             evidence=None,  # type: ignore[arg-type]
             validated_at_utc=TS,

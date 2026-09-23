@@ -8,6 +8,12 @@ from types import SimpleNamespace
 from typing import Any
 
 import pytest
+from test_v051_h40_f01_lifecycle_authority import _build_discovery_chain
+from test_v051_h40_f01r3r1_durable_authority import (
+    _make_synthetic_chain_with_production_seal,
+    _ProductionAuthorityResolver,
+)
+from test_v051_h40_p3b_production_discovery_verifier import _invalid_fixture
 
 from btc_quant_agent.h40 import (
     H40CandidateVerification,
@@ -19,12 +25,6 @@ from btc_quant_agent.h40 import (
     H40SyntheticEvidenceVerifier,
 )
 from btc_quant_agent.h40.guards import H40GuardError
-from test_v051_h40_f01_lifecycle_authority import _build_discovery_chain
-from test_v051_h40_f01r3r1_durable_authority import (
-    _ProductionAuthorityResolver,
-    _make_production_chain,
-)
-from test_v051_h40_p3b_production_discovery_verifier import _invalid_fixture
 
 
 class RogueVerifier:
@@ -40,7 +40,7 @@ class RogueVerifier:
     def verify_candidate(self, entry: Any, *, run_authority_id: str,
                          correction_manifest_hash: str) -> H40CandidateVerification:
         self.candidate_calls += 1
-        return H40CandidateVerification(True, Decimal("999"), Decimal("999"))
+        return H40CandidateVerification(True, Decimal(999), Decimal(999))
 
     def verify_wf_fold(self, entry: Any, *, evidence: Any) -> bool:
         return True
@@ -159,7 +159,7 @@ def test_a08_no_verifier_is_not_testable(
 def test_a09_foreign_verifier_cannot_cold_restore_candidate_lock(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    service, discovery, candidate, seal, run, authority, _ = _make_production_chain(
+    service, discovery, candidate, seal, run, authority, _ = _make_synthetic_chain_with_production_seal(
         monkeypatch, tmp_path,
     )
     store = H40LifecycleArtifactStore(tmp_path)
@@ -181,6 +181,6 @@ def test_a09_foreign_verifier_cannot_cold_restore_candidate_lock(
 def test_a10_receipt_verifier_id_unchanged_on_exact_type_path(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    service, _, candidate, _, _, _, _ = _make_production_chain(monkeypatch, tmp_path)
-    assert type(service._evidence_verifier) is H40ProductionDiscoveryEvidenceVerifier
+    _, _, candidate, _, _, _, _ = _make_synthetic_chain_with_production_seal(monkeypatch, tmp_path)
+    assert type(_invalid_fixture(tmp_path / "verifier").verifier) is H40ProductionDiscoveryEvidenceVerifier
     assert candidate.receipt.selection_verifier_id == "H40_DISCOVERY_SELECTION_VERIFIER_V1"

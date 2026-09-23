@@ -2965,7 +2965,10 @@ class H40LifecycleAuthorityService:
         if not self._synthetic_test_mode:
             # The Protocol describes behavior, not production implementation authority.
             # Import here so discovery_evidence can continue importing this module.
-            from .discovery_evidence import H40ProductionDiscoveryEvidenceVerifier
+            from .discovery_evidence import (
+                _VERIFIER_METHODS,
+                H40ProductionDiscoveryEvidenceVerifier,
+            )
 
             if type(verifier) is not H40ProductionDiscoveryEvidenceVerifier:
                 raise H40GuardError(
@@ -2985,6 +2988,11 @@ class H40LifecycleAuthorityService:
             or evidence.sealed_registered_roster_hash != seal.sealed_registered_roster_hash
         ):
             raise H40GuardError(H40ReasonCode.CONFIG_IDENTITY_CONFLICT, "discovery result lineage mismatch")
+        if not self._synthetic_test_mode:
+            _VERIFIER_METHODS["assert_runtime_integrity"](
+                cast(H40ProductionDiscoveryEvidenceVerifier, verifier),
+                seal=seal, receipt=discovery_receipt,
+            )
 
         expected_roster = [
             (
@@ -3011,15 +3019,28 @@ class H40LifecycleAuthorityService:
                 H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
                 "candidate evidence is not the complete sealed REGISTERED roster",
             )
-        verifier.verify_discovery_manifest(evidence, evidence.candidate_result_entries)
+        if self._synthetic_test_mode:
+            verifier.verify_discovery_manifest(evidence, evidence.candidate_result_entries)
+        else:
+            _VERIFIER_METHODS["verify_discovery_manifest"](
+                cast(H40ProductionDiscoveryEvidenceVerifier, verifier),
+                evidence, evidence.candidate_result_entries,
+            )
         scored: list[tuple[H40CandidateResultEntry, H40CandidateVerification]] = []
         scientific_unavailable = False
         for entry in evidence.candidate_result_entries:
-            result = verifier.verify_candidate(
-                entry,
-                run_authority_id=evidence.run_authority_id,
-                correction_manifest_hash=evidence.correction_input_evidence_manifest_hash,
-            )
+            if self._synthetic_test_mode:
+                result = verifier.verify_candidate(
+                    entry,
+                    run_authority_id=evidence.run_authority_id,
+                    correction_manifest_hash=evidence.correction_input_evidence_manifest_hash,
+                )
+            else:
+                result = _VERIFIER_METHODS["verify_candidate"](
+                    cast(H40ProductionDiscoveryEvidenceVerifier, verifier), entry,
+                    run_authority_id=evidence.run_authority_id,
+                    correction_manifest_hash=evidence.correction_input_evidence_manifest_hash,
+                )
             scientific_unavailable = scientific_unavailable or result.scientific_unavailable
             if result.hard_gates_passed:
                 if (

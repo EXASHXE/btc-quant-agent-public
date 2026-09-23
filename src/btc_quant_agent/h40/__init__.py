@@ -12,6 +12,10 @@ from .configuration_ledger import (
     H40ConfigurationSlot,
     H40Family,
 )
+from .discovery_evidence import (
+    H40DiscoveryEvidenceResolver,
+    H40ProductionDiscoveryEvidenceVerifier,
+)
 from .feature_contracts import (
     CalibrationMethod,
     H40CalibrationContract,
@@ -21,10 +25,6 @@ from .feature_contracts import (
     OpportunityFamily,
     RegimeFamily,
     build_canonical_feature_registry,
-)
-from .discovery_evidence import (
-    H40DiscoveryEvidenceResolver,
-    H40ProductionDiscoveryEvidenceVerifier,
 )
 from .guards import (
     H40ConfirmationGuard,
@@ -240,8 +240,8 @@ __all__ = [
     "H40LifecycleStateMachine",
     "H40Partition",
     "H40PartitionType",
-    "H40ProtectedSurfaceGuard",
     "H40ProductionDiscoveryEvidenceVerifier",
+    "H40ProtectedSurfaceGuard",
     "H40ProtocolIdentity",
     "H40ReasonCode",
     "H40RefitPolicyContract",

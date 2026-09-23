@@ -18,8 +18,8 @@ from btc_quant_agent.h40 import (
     ACCEPTED_LIFECYCLE_IMPLEMENTATION_AUTHORITY_HASH,
     DISCOVERY_SELECTION_CORRECTION_CONTRACT_HASH,
     H40CandidateResultEntry,
-    H40DiscoveryEvidenceResolver,
     H40DiscoveryAuthorizationReceipt,
+    H40DiscoveryEvidenceResolver,
     H40DiscoveryResultEvidence,
     H40LifecycleEvidenceVerifier,
     H40ProductionDiscoveryEvidenceVerifier,
@@ -260,8 +260,8 @@ def _invalid_fixture(
             complete_family and item.family_id == "D1_TREND_CONTINUATION"
             and not (poison_one_d1 and item.structural_configuration_hash == first_d1)
         )
-        def label_and_score(index: int) -> tuple[float, float]:
-            horizon = int(slot.primary_horizon.rstrip("h"))
+        def label_and_score(index: int, *, _slot: Any = slot) -> tuple[float, float]:
+            horizon = int(_slot.primary_horizon.rstrip("h"))
             p0 = 100.0 * (1.0 + 0.02 * math.sin(index * 1.1))
             ch = 100.0 * (1.0 + 0.02 * math.sin((index + horizon - 1) * 1.1))
             r_h = math.log(ch / p0)
@@ -282,19 +282,27 @@ def _invalid_fixture(
             from btc_quant_agent.h40.discovery_evidence import h40_fit_calibrator
             fit = h40_fit_calibrator(slot.calibration_contract_id, pairs)
 
-        def row(timestamp: str, *, train: bool, index: int = 0) -> dict[str, Any]:
-            horizon = int(slot.primary_horizon.rstrip("h"))
+        def row(
+            timestamp: str,
+            *,
+            train: bool,
+            index: int = 0,
+            _slot: Any = slot,
+            _family_complete: bool = family_complete,
+            _fit: Any = fit,
+        ) -> dict[str, Any]:
+            horizon = int(_slot.primary_horizon.rstrip("h"))
             if not train and complete_family:
                 r_h, calculated_score = label_and_score(index)
-                score = calculated_score if family_complete else 1.0
+                score = calculated_score if _family_complete else 1.0
             else:
                 ch = 100.0 if horizon < 12 else 101.0
                 r_h = math.log(ch / 100.0)
                 score = 1.0
             p_up = None
-            if fit is not None and not train:
+            if _fit is not None and not train:
                 from btc_quant_agent.h40.discovery_evidence import h40_predict_calibrated
-                p_up = str(h40_predict_calibrated(fit, score))
+                p_up = str(h40_predict_calibrated(_fit, score))
             return {
                 "timestamp": timestamp, "product": "ETHUSDT",
                 "regime_state": "REGIME_VOL_MID", "opportunity_state": "O_ELIGIBLE",
@@ -1051,8 +1059,18 @@ def _synthetic_correction_results(
     monkeypatch: pytest.MonkeyPatch,
     overrides: dict[str, tuple[bool, float, float, float, float]],
 ) -> dict[str, Any]:
-    """Exercise production correction/selection using synthetic metric vectors."""
+    """Exercise correction in an isolated subclass with synthetic metric vectors."""
     import btc_quant_agent.h40.discovery_evidence as module
+
+    class CorrectionHarness(H40ProductionDiscoveryEvidenceVerifier):
+        pass
+
+    fixture.verifier = CorrectionHarness(
+        approved_evidence_root=fixture.root,
+        seal=fixture.verifier._seal,
+        authorization_receipt=fixture.verifier._receipt,
+        split_manifest=fixture.verifier._split,
+    )
 
     slots = {
         slot.structural_configuration_hash: slot
