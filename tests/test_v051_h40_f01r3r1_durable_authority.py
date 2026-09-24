@@ -46,7 +46,7 @@ _TESTS_DIR = str(Path(__file__).resolve().parent)
 if _TESTS_DIR not in sys.path:
     sys.path.insert(0, _TESTS_DIR)
 
-from test_v051_h40_f01_lifecycle_authority import (
+from test_v051_h40_f01_lifecycle_authority import (  # noqa: E402
     TS,
     _build_discovery_chain,
     _build_wf_chain,
