@@ -1,0 +1,10 @@
+command: python /tmp/h40_host_state.py
+cwd: /tmp/h40-p3b-baseline
+tested SHA: 6bd63db96e5b54b9cec27a74cd2f728e19fc5b7d
+UTC timestamp: 2026-09-24T05:58:42.469808+00:00
+exit code: 0
+wall clock seconds: 0.053
+
+process_count: 4
+collector_process_count: 0
+loadavg: 1.54 1.55 1.47 2/379 10

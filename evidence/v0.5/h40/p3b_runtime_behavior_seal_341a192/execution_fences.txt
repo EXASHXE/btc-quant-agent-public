@@ -1,0 +1,8 @@
+command: .venv/bin/python -m pytest -q tests/test_execution.py tests/test_execution_environment_authority.py
+cwd: /root/workspace/project/Quant-agent-sanitized
+tested SHA: 341a19287a90405aab6a196d68b17720ae1cfff3
+UTC timestamp: 2026-09-24T05:13:47.345966+00:00
+exit code: 0
+
+.........................................                                [100%]
+41 passed in 1.83s

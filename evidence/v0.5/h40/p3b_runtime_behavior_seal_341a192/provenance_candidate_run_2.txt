@@ -1,0 +1,11 @@
+command: .venv/bin/python -c 'import sys, pathlib, btc_quant_agent, pytest; print(sys.executable); print(btc_quant_agent.__file__); print(sys.version); print(pytest.__version__); assert pathlib.Path(btc_quant_agent.__file__).resolve().is_relative_to(pathlib.Path.cwd())'
+cwd: /root/workspace/project/Quant-agent-sanitized
+tested SHA: 341a19287a90405aab6a196d68b17720ae1cfff3
+UTC timestamp: 2026-09-24T05:25:59.600758+00:00
+exit code: 0
+wall clock seconds: 0.205
+
+/root/workspace/project/Quant-agent-sanitized/.venv/bin/python
+/root/workspace/project/Quant-agent-sanitized/src/btc_quant_agent/__init__.py
+3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]
+8.4.2

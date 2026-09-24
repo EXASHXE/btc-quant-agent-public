@@ -1,0 +1,10 @@
+command: python /tmp/h40_host_state.py
+cwd: /root/workspace/project/Quant-agent-sanitized
+tested SHA: 341a19287a90405aab6a196d68b17720ae1cfff3
+UTC timestamp: 2026-09-24T06:01:26.210991+00:00
+exit code: 0
+wall clock seconds: 0.053
+
+process_count: 4
+collector_process_count: 0
+loadavg: 1.81 1.60 1.50 2/385 4

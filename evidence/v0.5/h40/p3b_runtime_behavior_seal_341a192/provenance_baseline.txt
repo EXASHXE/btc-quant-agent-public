@@ -1,0 +1,11 @@
+command: PYTHONPATH=/tmp/h40-p3b-baseline/src .venv/bin/python -c 'import sys, pathlib, btc_quant_agent, pytest; print(sys.executable); print(btc_quant_agent.__file__); print(sys.version); print(pytest.__version__); assert pathlib.Path(btc_quant_agent.__file__).resolve().is_relative_to(pathlib.Path.cwd())'
+cwd: /tmp/h40-p3b-baseline
+tested SHA: 6bd63db96e5b54b9cec27a74cd2f728e19fc5b7d
+UTC timestamp: 2026-09-24T05:35:58.137590+00:00
+exit code: 0
+wall clock seconds: 0.267
+
+/tmp/h40-p3b-baseline/.venv/bin/python
+/tmp/h40-p3b-baseline/src/btc_quant_agent/__init__.py
+3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]
+8.4.2
