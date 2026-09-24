@@ -201,5 +201,5 @@ def test_b18_frozen_identities_exact() -> None:
         "7e9433aa2ee706dda61871c6ad2b1a1aee4cf7a8f9b6365351942096b5347c84"
     )
     assert ACCEPTED_LIFECYCLE_IMPLEMENTATION_AUTHORITY_HASH == (
-        "6d61054a6a8d9bdaaf7e7d648cb941bbb893b67a1fb6a0ed0742a0cdd40697e5"
+        "d3a304ddc6bcb7b7fc398ccf45a751a0afa3f91634a09ddff8e199af1970e440"
     )

@@ -45,21 +45,36 @@ from btc_quant_agent.h40.protocol_authority import (
 from btc_quant_agent.h40.search_space import materialize_h40_search_space_production
 
 EXACT_ACCEPTED_HASH = (
-    "6d61054a6a8d9bdaaf7e7d648cb941bbb893b67a1fb6a0ed0742a0cdd40697e5"
+    "d3a304ddc6bcb7b7fc398ccf45a751a0afa3f91634a09ddff8e199af1970e440"
 )
-EXACT_IMPLEMENTATION_COMMIT = "d0e1fe0d87d4595640edc4d7ecfa5f287640f0aa"
-EXACT_ACCEPTANCE_COMMIT = "5deb937bcb84c18165de8f1938d0cac65300f1e4"
+EXACT_IMPLEMENTATION_COMMIT = "d73e8984446f933059b978e36c4cabd55de517aa"
+EXACT_ACCEPTANCE_COMMIT = "0cbb20a7806f2336864e430910bf6a4ff4a99df9"
 EXACT_ACCEPTANCE_PATH = (
-    "reviews/v0.5/V0.5.1_POST_SANITIZATION_SOL_INDEPENDENT_ACCEPTANCE.md"
+    "reviews/v0.5/V0.5.1_H40_FINAL_EXACT_SHA_REACCEPTANCE_CONTROLLER_ACCEPTANCE.md"
 )
 EXACT_EVIDENCE_MANIFEST_PATH = (
-    "evidence/v0.5/h40/V0.5.1_H40_F01_POST_SANITIZATION_AGGREGATE_IMPLEMENTATION_EVIDENCE.json"
+    "evidence/v0.5/h40/V0.5.1_H40_FINAL_REACCEPTANCE_EVIDENCE_d73e898.json"
 )
 EXACT_EVIDENCE_MANIFEST_SHA256 = (
-    "8b839f6b8ddbe433be6df069928f28f0c07a6a3b966c159af26d04b561e7da24"
+    "5cd591ef7f3f43c7897711ab4e75cb158ac048d328e1f8b0dac28a0a6bcb6540"
 )
 EXACT_GOVERNANCE_HASH = (
     "7e9433aa2ee706dda61871c6ad2b1a1aee4cf7a8f9b6365351942096b5347c84"
+)
+
+HISTORICAL_ACCEPTED_HASH = (
+    "6d61054a6a8d9bdaaf7e7d648cb941bbb893b67a1fb6a0ed0742a0cdd40697e5"
+)
+HISTORICAL_IMPLEMENTATION_COMMIT = "d0e1fe0d87d4595640edc4d7ecfa5f287640f0aa"
+HISTORICAL_ACCEPTANCE_COMMIT = "5deb937bcb84c18165de8f1938d0cac65300f1e4"
+HISTORICAL_ACCEPTANCE_PATH = (
+    "reviews/v0.5/V0.5.1_POST_SANITIZATION_SOL_INDEPENDENT_ACCEPTANCE.md"
+)
+HISTORICAL_EVIDENCE_MANIFEST_PATH = (
+    "evidence/v0.5/h40/V0.5.1_H40_F01_POST_SANITIZATION_AGGREGATE_IMPLEMENTATION_EVIDENCE.json"
+)
+HISTORICAL_EVIDENCE_MANIFEST_SHA256 = (
+    "8b839f6b8ddbe433be6df069928f28f0c07a6a3b966c159af26d04b561e7da24"
 )
 
 
@@ -219,3 +234,36 @@ def test_p10_scientific_and_lifecycle_identities_unchanged() -> None:
     assert EXPECTED_LIFECYCLE_CHILD_HASHES["transition_matrix_contract"] == (
         "a4df11b3a0f3fabef1fa2b28e0a9f38500dcd6bb9111c4afdd9000bb238d0ddc"
     )
+
+
+def test_p11_previous_authority_fails_closed() -> None:
+    """P11: Verify previous published authority object/hash is rejected by production service."""
+    historical_evidence_id = H40RequiredTestCIEvidenceIdentity(
+        evidence_manifest_artifact_path=HISTORICAL_EVIDENCE_MANIFEST_PATH,
+        evidence_manifest_sha256=HISTORICAL_EVIDENCE_MANIFEST_SHA256,
+        tested_commit_sha=HISTORICAL_IMPLEMENTATION_COMMIT,
+    )
+    historical_authority = H40LifecycleImplementationAuthority(
+        accepted_lifecycle_governance_authority_hash=EXACT_GOVERNANCE_HASH,
+        f01_implementation_acceptance_artifact_path=HISTORICAL_ACCEPTANCE_PATH,
+        f01_implementation_acceptance_commit_sha=HISTORICAL_ACCEPTANCE_COMMIT,
+        f01_implementation_commit_sha=HISTORICAL_IMPLEMENTATION_COMMIT,
+        required_test_ci_evidence_identity=historical_evidence_id,
+        schema_id="H40_LIFECYCLE_IMPLEMENTATION_AUTHORITY_V1",
+    )
+    assert (
+        historical_authority.lifecycle_implementation_authority_hash
+        == HISTORICAL_ACCEPTED_HASH
+    )
+    assert (
+        historical_authority.lifecycle_implementation_authority_hash
+        != ACCEPTED_LIFECYCLE_IMPLEMENTATION_AUTHORITY_HASH
+    )
+
+    with pytest.raises(
+        ValueError, match="implementation authority object/hash mismatch"
+    ):
+        H40LifecycleAuthorityService.production(
+            implementation_authority=historical_authority,
+        )
+

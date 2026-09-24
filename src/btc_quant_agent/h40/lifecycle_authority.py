@@ -57,7 +57,7 @@ DISCOVERY_SELECTION_CORRECTION_CONTRACT_HASH = (
 
 # Independently accepted V1 lifecycle implementation authority is now published.
 ACCEPTED_LIFECYCLE_IMPLEMENTATION_AUTHORITY_HASH: str | None = (
-    "6d61054a6a8d9bdaaf7e7d648cb941bbb893b67a1fb6a0ed0742a0cdd40697e5"
+    "d3a304ddc6bcb7b7fc398ccf45a751a0afa3f91634a09ddff8e199af1970e440"
 )
 
 _SHA256_RE = re.compile(r"[0-9a-f]{64}\Z")
