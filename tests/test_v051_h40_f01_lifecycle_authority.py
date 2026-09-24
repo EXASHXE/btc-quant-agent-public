@@ -8,12 +8,15 @@ import json
 from collections.abc import Sequence
 from dataclasses import dataclass, replace
 from decimal import Decimal
+from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
 import pytest
 
 import btc_quant_agent.h40.lifecycle_authority as lifecycle_authority_module
+import btc_quant_agent.h40.search_space as search_space_module
+import btc_quant_agent.h40.split_manifest as split_manifest_module
 from btc_quant_agent.h40 import (
     ACCEPTED_LIFECYCLE_IMPLEMENTATION_AUTHORITY_HASH,
     DISCOVERY_SELECTION_CORRECTION_CONTRACT_HASH,
@@ -78,6 +81,7 @@ from btc_quant_agent.h40 import (
     normalize_audit_timestamp,
 )
 from btc_quant_agent.h40.split_manifest import generate_hourly_range
+from btc_quant_agent.h40.configuration_ledger import H40ConfigurationLedger
 from btc_quant_agent.research_contract.canonical import canonical_json, canonical_sha256
 
 TS = "2026-09-20T00:00:00Z"
@@ -452,12 +456,24 @@ def _build_wf_chain(
 
 def _typed_production_authority_fixture(
     monkeypatch: pytest.MonkeyPatch,
+    *,
+    cached_calendar: bool = True,
 ) -> tuple[
     H40SourceManifest,
     H40SplitManifest,
     H40RuntimeSourceSplitAttestation,
     dict[str, bool],
 ]:
+    if cached_calendar:
+        # The source/split algorithm still runs on every cold verification.
+        # Only fixed, pure calendar and search-space inputs reuse templates.
+        monkeypatch.setattr(split_manifest_module, "generate_hourly_range", _fresh_calendar_copy)
+        monkeypatch.setattr(
+            search_space_module, "materialize_h40_search_space_production", _fresh_ledger_copy,
+        )
+        monkeypatch.setattr(
+            lifecycle_authority_module, "_accepted_production_roster", _immutable_roster_template,
+        )
     protocol_hash = H40ProtocolIdentity.default().protocol_hash
     reference = H40SourceManifest.build_default(protocol_hash)
     timestamps = generate_hourly_range(
@@ -556,6 +572,106 @@ def _typed_production_authority_fixture(
         repo_root=Path("synthetic-repository"),
     )
     return source_manifest, split_manifest, runtime_attestation, cold_state
+
+
+_ORIGINAL_GENERATE_HOURLY_RANGE = generate_hourly_range
+_ORIGINAL_MATERIALIZE_SEARCH_SPACE = search_space_module.materialize_h40_search_space_production
+_ORIGINAL_ACCEPTED_ROSTER = lifecycle_authority_module._accepted_production_roster
+
+
+@lru_cache(maxsize=None)
+def _immutable_calendar_template(
+    start_utc: str, end_utc: str, inclusive_end: bool,
+) -> tuple[str, ...]:
+    return tuple(_ORIGINAL_GENERATE_HOURLY_RANGE(start_utc, end_utc, inclusive_end))
+
+
+def _fresh_calendar_copy(
+    start_utc: str, end_utc: str, inclusive_end: bool = False,
+) -> list[str]:
+    return list(_immutable_calendar_template(start_utc, end_utc, inclusive_end))
+
+
+@lru_cache(maxsize=1)
+def _immutable_ledger_template() -> str:
+    return canonical_json(_ORIGINAL_MATERIALIZE_SEARCH_SPACE().to_dict())
+
+
+def _fresh_ledger_copy() -> H40ConfigurationLedger:
+    return H40ConfigurationLedger.from_dict(json.loads(_immutable_ledger_template()))
+
+
+@lru_cache(maxsize=1)
+def _immutable_roster_template() -> tuple[tuple[H40RuntimeRosterEntry, ...], int, int, str]:
+    return _ORIGINAL_ACCEPTED_ROSTER()
+
+
+def test_cached_calendar_preserves_full_cold_authority_and_state_isolation(
+    tmp_path: Path,
+) -> None:
+    def build(*, cached_calendar: bool) -> tuple[
+        H40SourceManifest, H40SplitManifest, H40RuntimeSourceSplitAttestation,
+        H40RuntimeSnapshotSeal, dict[str, bool], str,
+    ]:
+        with pytest.MonkeyPatch.context() as patch:
+            source, split, attestation, cold_state = _typed_production_authority_fixture(
+                patch, cached_calendar=cached_calendar,
+            )
+            seal = H40RuntimeSnapshotSeal.from_verified_authority(
+                source_manifest=source,
+                split_manifest=split,
+                runtime_attestation=attestation,
+                repo_root=tmp_path,
+            )
+            seal.verify_against_accepted_ledger()
+            if cached_calendar:
+                cold_state["available"] = False
+                with pytest.raises(H40GuardError, match="failed cold validation"):
+                    seal.verify_against_accepted_ledger()
+                cold_state["available"] = True
+                seal.verify_against_accepted_ledger()
+            discovery_hash = _build_discovery_chain(seal=seal).discovery.receipt_hash
+            return source, split, attestation, seal, cold_state, discovery_hash
+
+    full_source, full_split, full_attestation, full_seal, full_state, full_discovery_hash = build(
+        cached_calendar=False,
+    )
+    cached_source, cached_split, cached_attestation, cached_seal, cached_state, cached_discovery_hash = build(
+        cached_calendar=True,
+    )
+    assert full_source is not cached_source
+    assert full_split is not cached_split
+    assert full_attestation is not cached_attestation
+    assert full_seal is not cached_seal
+    assert full_state is not cached_state
+    assert full_source.manifest_hash == cached_source.manifest_hash
+    assert full_split.split_hash == cached_split.split_hash
+    assert full_attestation.attestation_hash == cached_attestation.attestation_hash
+    assert full_seal.runtime_authority_snapshot_hash == cached_seal.runtime_authority_snapshot_hash
+    assert full_seal.roster == cached_seal.roster
+    assert full_seal.sealed_registered_roster_hash == cached_seal.sealed_registered_roster_hash
+    assert full_seal.registered_slot_count == cached_seal.registered_slot_count
+    assert full_seal.not_testable_slot_count == cached_seal.not_testable_slot_count
+    authority_hash = _implementation_authority().lifecycle_implementation_authority_hash
+    assert H40RunAuthority.from_seal(full_seal, authority_hash).run_authority_id == (
+        H40RunAuthority.from_seal(cached_seal, authority_hash).run_authority_id
+    )
+    assert full_discovery_hash == cached_discovery_hash
+    first = _fresh_calendar_copy("2021-01-01T00:00:00Z", "2021-01-01T02:00:00Z")
+    second = _fresh_calendar_copy("2021-01-01T00:00:00Z", "2021-01-01T02:00:00Z")
+    assert first == second
+    assert first is not second
+    first.clear()
+    assert len(second) == 2
+    first_ledger = _fresh_ledger_copy()
+    second_ledger = _fresh_ledger_copy()
+    assert first_ledger is not second_ledger
+    assert first_ledger.structural_ledger_hash == second_ledger.structural_ledger_hash
+    assert first_ledger.slots[0] is not second_ledger.slots[0]
+    original_slot_status = second_ledger.slots[0].status
+    first_ledger.drop_slot(0, H40ReasonCode.CONFIG_IDENTITY_CONFLICT)
+    assert second_ledger.slots[0].status == original_slot_status
+    assert _immutable_roster_template() == _ORIGINAL_ACCEPTED_ROSTER()
 
 
 def _persist_candidate_chain(
@@ -1067,7 +1183,7 @@ def test_a00_production_seal_derives_typed_verified_authority(
     tmp_path: Path,
 ) -> None:
     source_manifest, split_manifest, runtime_attestation, _ = (
-        _typed_production_authority_fixture(monkeypatch)
+        _typed_production_authority_fixture(monkeypatch, cached_calendar=False)
     )
     seal = H40RuntimeSnapshotSeal.from_verified_authority(
         source_manifest=source_manifest,
@@ -1122,7 +1238,7 @@ def test_a05_split_assert_authoritative_failure_propagates(
     tmp_path: Path,
 ) -> None:
     source_manifest, split_manifest, runtime_attestation, cold_state = (
-        _typed_production_authority_fixture(monkeypatch)
+        _typed_production_authority_fixture(monkeypatch, cached_calendar=False)
     )
     cold_state["available"] = False
     with pytest.raises(H40GuardError, match="failed cold validation") as exc_info:
@@ -1810,6 +1926,27 @@ def _ProductionEvidenceVerifier(root: Path) -> H40ProductionDiscoveryEvidenceVer
     from test_v051_h40_p3b_production_discovery_verifier import _invalid_fixture
 
     return _invalid_fixture(root).verifier
+
+
+def test_production_verifier_fixture_keeps_evidence_and_resolver_per_test(
+    tmp_path: Path,
+) -> None:
+    first_root = tmp_path / "first"
+    second_root = tmp_path / "second"
+    first = _ProductionEvidenceVerifier(first_root)
+    second = _ProductionEvidenceVerifier(second_root)
+    assert first is not second
+    assert first._resolver is not second._resolver
+    assert first._resolver._root == first_root.resolve()
+    assert second._resolver._root == second_root.resolve()
+    first.assert_runtime_integrity()
+    second.assert_runtime_integrity()
+    first_file = next(first_root.rglob("*.json"))
+    second_file = second_root / first_file.relative_to(first_root)
+    original_bytes = second_file.read_bytes()
+    assert first_file.read_bytes() == original_bytes
+    first_file.write_bytes(b"per-test mutation")
+    assert second_file.read_bytes() == original_bytes
 
 
 def test_a01_through_a07_derived_wf_authority(tmp_path: Path) -> None:
