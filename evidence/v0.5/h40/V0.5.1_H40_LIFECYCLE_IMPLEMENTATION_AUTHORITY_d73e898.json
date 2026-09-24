@@ -1,0 +1,14 @@
+{
+  "accepted_lifecycle_governance_authority_hash": "7e9433aa2ee706dda61871c6ad2b1a1aee4cf7a8f9b6365351942096b5347c84",
+  "f01_implementation_acceptance_artifact_path": "reviews/v0.5/V0.5.1_H40_FINAL_EXACT_SHA_REACCEPTANCE_CONTROLLER_ACCEPTANCE.md",
+  "f01_implementation_acceptance_commit_sha": "0cbb20a7806f2336864e430910bf6a4ff4a99df9",
+  "f01_implementation_commit_sha": "d73e8984446f933059b978e36c4cabd55de517aa",
+  "lifecycle_implementation_authority_hash": "d3a304ddc6bcb7b7fc398ccf45a751a0afa3f91634a09ddff8e199af1970e440",
+  "publication_commit_sha": "d63c1fbb471405e6b08eecdf544d39c7e4a1a9b6",
+  "required_test_ci_evidence_identity": {
+    "evidence_manifest_artifact_path": "evidence/v0.5/h40/V0.5.1_H40_FINAL_REACCEPTANCE_EVIDENCE_d73e898.json",
+    "evidence_manifest_sha256": "5cd591ef7f3f43c7897711ab4e75cb158ac048d328e1f8b0dac28a0a6bcb6540",
+    "tested_commit_sha": "d73e8984446f933059b978e36c4cabd55de517aa"
+  },
+  "schema_id": "H40_LIFECYCLE_IMPLEMENTATION_AUTHORITY_V1"
+}
