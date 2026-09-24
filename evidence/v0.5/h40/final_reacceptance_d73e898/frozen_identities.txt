@@ -1,0 +1,17 @@
+command: .venv/bin/python /tmp/h40_identities.py
+cwd: /root/workspace/project/Quant-agent-sanitized
+tested SHA: d73e8984446f933059b978e36c4cabd55de517aa
+UTC timestamp: 2026-09-24T09:44:13.489597+00:00
+exit code: 0
+wall clock seconds: 0.440
+
+{
+  "ACCEPTED_EXECUTION_WRITE_AUTHORITY": null,
+  "CURRENT_EXECUTION_POLICY": "RESEARCH_DISABLED_V1",
+  "accepted_lifecycle_implementation_authority": "6d61054a6a8d9bdaaf7e7d648cb941bbb893b67a1fb6a0ed0742a0cdd40697e5",
+  "lifecycle_governance_authority": "7e9433aa2ee706dda61871c6ad2b1a1aee4cf7a8f9b6365351942096b5347c84",
+  "lifecycle_semantic_root": "846591f8eac0e1abbedaeeff4c2b0bb7648fe51bdaf981e3309c6f6c440aba8e",
+  "protocol_authority_hash": "a83f8fc7a5ca7109fb8cd7fed114d87c3b2c968b5145c11cada203aa5111d1ce",
+  "scientific_semantic_root": "71889a35f227ed734272b712851174a69bf9dbb12ea3f87cd84c26e7c66f6af1",
+  "structural_ledger_hash": "483f68502b57972deae071c7bd4587ca3e57ccaa72bd99fb0de07b4f0ab8c85f"
+}

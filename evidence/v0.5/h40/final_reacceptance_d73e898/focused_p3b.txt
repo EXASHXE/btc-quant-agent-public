@@ -1,0 +1,10 @@
+command: .venv/bin/python -m pytest -q tests/test_v051_h40_p3b_production_verifier_behavior_seal.py tests/test_v051_h40_p3b_production_verifier_identity_seal.py tests/test_v051_h40_p3b_production_discovery_verifier.py
+cwd: /root/workspace/project/Quant-agent-sanitized
+tested SHA: d73e8984446f933059b978e36c4cabd55de517aa
+UTC timestamp: 2026-09-24T09:38:55.179568+00:00
+exit code: 0
+wall clock seconds: 97.864
+
+........................................................................ [ 64%]
+........................................                                 [100%]
+112 passed in 82.69s (0:01:22)

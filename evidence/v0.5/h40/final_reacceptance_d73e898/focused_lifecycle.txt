@@ -1,0 +1,11 @@
+command: .venv/bin/python -m pytest -q tests/test_v051_h40_f01_lifecycle_authority.py tests/test_v051_h40_f01r3r1_durable_authority.py tests/test_v051_h40_f01r3r2_commit_authority.py tests/test_v051_h40_f01r3r3_api_seal.py tests/test_v051_h40_f01r3r4_lineage_durability.py tests/test_v051_h40_implementation_authority_publication.py
+cwd: /root/workspace/project/Quant-agent-sanitized
+tested SHA: d73e8984446f933059b978e36c4cabd55de517aa
+UTC timestamp: 2026-09-24T09:40:49.162255+00:00
+exit code: 0
+wall clock seconds: 104.494
+
+........................................................................ [ 38%]
+........................................................................ [ 77%]
+.........................................                                [100%]
+185 passed in 88.31s (0:01:28)

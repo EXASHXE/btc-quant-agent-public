@@ -1,0 +1,763 @@
+{
+  "behavior_seal_commit_sha": "a858835ac3239f919bb2dcdc87f74db894f899cf",
+  "e402_repair_sha": "341a19287a90405aab6a196d68b17720ae1cfff3",
+  "execution_fence_result": {
+    "command": ".venv/bin/python -m pytest -q tests/test_execution.py tests/test_execution_environment_authority.py",
+    "exit_code": 0,
+    "log": "evidence/v0.5/h40/final_reacceptance_d73e898/execution_fences.txt",
+    "passed_count": 41,
+    "policy": "RESEARCH_DISABLED_V1",
+    "pytest_seconds": 2.18,
+    "summary": "41 passed in 2.18s",
+    "wall_clock_seconds": 2.945,
+    "write_authority": null
+  },
+  "focused_results": {
+    "lifecycle": {
+      "command": ".venv/bin/python -m pytest -q tests/test_v051_h40_f01_lifecycle_authority.py tests/test_v051_h40_f01r3r1_durable_authority.py tests/test_v051_h40_f01r3r2_commit_authority.py tests/test_v051_h40_f01r3r3_api_seal.py tests/test_v051_h40_f01r3r4_lineage_durability.py tests/test_v051_h40_implementation_authority_publication.py",
+      "exit_code": 0,
+      "log": "evidence/v0.5/h40/final_reacceptance_d73e898/focused_lifecycle.txt",
+      "passed_count": 185,
+      "pytest_seconds": 88.31,
+      "summary": "185 passed in 88.31s (0:01:28)",
+      "wall_clock_seconds": 104.494
+    },
+    "p3b": {
+      "command": ".venv/bin/python -m pytest -q tests/test_v051_h40_p3b_production_verifier_behavior_seal.py tests/test_v051_h40_p3b_production_verifier_identity_seal.py tests/test_v051_h40_p3b_production_discovery_verifier.py",
+      "exit_code": 0,
+      "log": "evidence/v0.5/h40/final_reacceptance_d73e898/focused_p3b.txt",
+      "passed_count": 112,
+      "pytest_seconds": 82.69,
+      "summary": "112 passed in 82.69s (0:01:22)",
+      "wall_clock_seconds": 97.864
+    }
+  },
+  "frozen_identities": {
+    "ACCEPTED_EXECUTION_WRITE_AUTHORITY": null,
+    "CURRENT_EXECUTION_POLICY": "RESEARCH_DISABLED_V1",
+    "accepted_lifecycle_implementation_authority": "6d61054a6a8d9bdaaf7e7d648cb941bbb893b67a1fb6a0ed0742a0cdd40697e5",
+    "lifecycle_governance_authority": "7e9433aa2ee706dda61871c6ad2b1a1aee4cf7a8f9b6365351942096b5347c84",
+    "lifecycle_semantic_root": "846591f8eac0e1abbedaeeff4c2b0bb7648fe51bdaf981e3309c6f6c440aba8e",
+    "protocol_authority_hash": "a83f8fc7a5ca7109fb8cd7fed114d87c3b2c968b5145c11cada203aa5111d1ce",
+    "scientific_semantic_root": "71889a35f227ed734272b712851174a69bf9dbb12ea3f87cd84c26e7c66f6af1",
+    "structural_ledger_hash": "483f68502b57972deae071c7bd4587ca3e57ccaa72bd99fb0de07b4f0ab8c85f"
+  },
+  "full_path_preservation": [
+    {
+      "coverage_aspect": "Full cold authority and cache isolation equivalence",
+      "status": "PASS",
+      "test": "tests/test_v051_h40_f01_lifecycle_authority.py::test_cached_calendar_preserves_full_cold_authority_and_state_isolation"
+    },
+    {
+      "coverage_aspect": "Evidence and resolver per-test fixture isolation",
+      "status": "PASS",
+      "test": "tests/test_v051_h40_f01_lifecycle_authority.py::test_production_verifier_fixture_keeps_evidence_and_resolver_per_test"
+    },
+    {
+      "coverage_aspect": "Production source/split authority cold materialization",
+      "status": "PASS",
+      "test": "tests/test_v051_h40_f01_lifecycle_authority.py::test_a00_production_seal_derives_typed_verified_authority"
+    },
+    {
+      "coverage_aspect": "Split assert authoritative failure propagation",
+      "status": "PASS",
+      "test": "tests/test_v051_h40_f01_lifecycle_authority.py::test_a05_split_assert_authoritative_failure_propagates"
+    },
+    {
+      "coverage_aspect": "Production cold restore and active source change detection",
+      "status": "PASS",
+      "test": "tests/test_v051_h40_f01_lifecycle_authority.py::test_r35_r37_r38_production_cold_restore_and_active_source_change_detection"
+    },
+    {
+      "coverage_aspect": "Termination source mutation fail-closed invariant",
+      "status": "PASS",
+      "test": "tests/test_v051_h40_f01r3r1_durable_authority.py::test_r24_termination_source_mutates_fails_closed"
+    },
+    {
+      "coverage_aspect": "Cold restore rejects tampered exact verifier",
+      "status": "PASS",
+      "test": "tests/test_v051_h40_p3b_production_verifier_behavior_seal.py::test_b15_cold_restore_rejects_tampered_exact_verifier"
+    }
+  ],
+  "full_pytest_runs": [
+    {
+      "command": "/usr/bin/time -v .venv/bin/python -m pytest -q --durations=50 --durations-min=0.25",
+      "cpu_percent": 91,
+      "durations": [
+        {
+          "nodeid": "tests/test_v051_h40_f01_lifecycle_authority.py::test_cached_calendar_preserves_full_cold_authority_and_state_isolation",
+          "phase": "call",
+          "seconds": 13.73
+        },
+        {
+          "nodeid": "tests/test_v0324_blind_accumulation_operations.py::test_stale_ledger_fail_closed_regression",
+          "phase": "call",
+          "seconds": 9.15
+        },
+        {
+          "nodeid": "tests/test_v0323_blind_validation.py::test_maturity_requires_all_gates_simultaneously",
+          "phase": "call",
+          "seconds": 8.54
+        },
+        {
+          "nodeid": "tests/test_v051_h40_p3b_production_discovery_verifier.py::test_v26_valid_family_continues_after_other_families_fit_invalid",
+          "phase": "call",
+          "seconds": 8.46
+        },
+        {
+          "nodeid": "tests/test_v0323_blind_validation.py::test_readiness_does_not_execute_statistics",
+          "phase": "call",
+          "seconds": 8.05
+        },
+        {
+          "nodeid": "tests/test_v051_h40_f01_lifecycle_authority.py::test_a00_production_seal_derives_typed_verified_authority",
+          "phase": "call",
+          "seconds": 7.06
+        },
+        {
+          "nodeid": "tests/test_v051_h40_f01_lifecycle_authority.py::test_a21_through_a29_model_a_capability_lifetime",
+          "phase": "call",
+          "seconds": 6.71
+        },
+        {
+          "nodeid": "tests/test_v051_h40_p3b_production_discovery_verifier.py::test_v20_deterministic_manifest_replay",
+          "phase": "call",
+          "seconds": 6.28
+        },
+        {
+          "nodeid": "tests/test_v050_r03b_legacy_benchmark_guards.py::test_t6_c_lite_formal_differential_remains_stable",
+          "phase": "call",
+          "seconds": 4.98
+        },
+        {
+          "nodeid": "tests/test_v043_c_lite_formal_consumers.py::test_t6_facade_has_exact_kernel_outputs_and_cold_idempotence[True]",
+          "phase": "call",
+          "seconds": 4.9
+        },
+        {
+          "nodeid": "tests/test_v051_h40_p3b_production_discovery_verifier.py::test_v26_v27_one_invalid_registered_member_poisons_full_family",
+          "phase": "call",
+          "seconds": 4.74
+        },
+        {
+          "nodeid": "tests/test_v043_c_lite_formal_consumers.py::test_t6_facade_has_exact_kernel_outputs_and_cold_idempotence[False]",
+          "phase": "call",
+          "seconds": 4.65
+        },
+        {
+          "nodeid": "tests/test_v051_h40_p3b_production_verifier_identity_seal.py::test_a01_real_concrete_verifier_reaches_scientific_path",
+          "phase": "call",
+          "seconds": 4.42
+        },
+        {
+          "nodeid": "tests/test_v051_h40_p3b_production_discovery_verifier.py::test_v01_protocol_and_fit_invalid_family",
+          "phase": "call",
+          "seconds": 4.37
+        },
+        {
+          "nodeid": "tests/test_v051_h40_f01r3r1_durable_authority.py::test_r03_synthetic_wf_cold_restore_avoids_caller_override_path",
+          "phase": "call",
+          "seconds": 4.1
+        },
+        {
+          "nodeid": "tests/test_v050_r05c_funding_evidence_authority.py::test_t20_cold_job_replay",
+          "phase": "call",
+          "seconds": 3.88
+        },
+        {
+          "nodeid": "tests/test_v041_p6_metrics_benchmarks_qualification.py::test_tampered_result_run_and_dataset_are_atomic_failures",
+          "phase": "call",
+          "seconds": 3.82
+        },
+        {
+          "nodeid": "tests/test_v051_h40_p3b_production_discovery_verifier.py::test_cov01_cov04_calibration_final_actions_define_coverage_population",
+          "phase": "call",
+          "seconds": 3.8
+        },
+        {
+          "nodeid": "tests/test_v051_h40_p1_scaffold.py::test_mutate_one_artifact_byte_after_serialization_fails_cold_assertion",
+          "phase": "call",
+          "seconds": 3.75
+        },
+        {
+          "nodeid": "tests/test_v051_h40_p1_scaffold.py::test_mandatory_10_synthetic_validator_output_remains_strictly_non_authoritative",
+          "phase": "call",
+          "seconds": 3.71
+        },
+        {
+          "nodeid": "tests/test_v051_h40_p1_scaffold.py::test_positive_split_round_trip_and_cold_verification",
+          "phase": "call",
+          "seconds": 3.68
+        },
+        {
+          "nodeid": "tests/test_v051_h40_p1_scaffold.py::test_source_gap_persists_in_membership_without_boundary_shifts",
+          "phase": "call",
+          "seconds": 3.67
+        },
+        {
+          "nodeid": "tests/test_v051_h40_p1_scaffold.py::test_persisted_split_rehash_attack_remains_closed",
+          "phase": "call",
+          "seconds": 3.56
+        },
+        {
+          "nodeid": "tests/test_v051_h40_p1_scaffold.py::test_positive_synthetic_chain_succeeds_and_passes_verification",
+          "phase": "call",
+          "seconds": 3.54
+        },
+        {
+          "nodeid": "tests/test_v051_h40_p1_scaffold.py::test_persisted_partition_tampering_with_recomputed_attestation_fails_cold_reconstruction",
+          "phase": "call",
+          "seconds": 3.51
+        },
+        {
+          "nodeid": "tests/test_v051_h40_p1_scaffold.py::test_mandatory_11_hermetic_scaffold_passes_without_repo_artifacts",
+          "phase": "call",
+          "seconds": 3.41
+        },
+        {
+          "nodeid": "tests/test_v051_h40_p3b_production_verifier_identity_seal.py::test_a09_foreign_verifier_cannot_cold_restore_candidate_lock",
+          "phase": "call",
+          "seconds": 2.98
+        },
+        {
+          "nodeid": "tests/test_v051_h40_p3b_production_verifier_behavior_seal.py::test_b15_cold_restore_rejects_tampered_exact_verifier",
+          "phase": "call",
+          "seconds": 2.96
+        },
+        {
+          "nodeid": "tests/test_v051_h40_p3b_production_discovery_verifier.py::test_cov_audit_persists_exact_components_and_rejects_tamper",
+          "phase": "call",
+          "seconds": 2.77
+        },
+        {
+          "nodeid": "tests/test_v051_h40_f01r3r4_lineage_durability.py::test_r56_intact_committed_head_and_legitimate_ancestors_succeed",
+          "phase": "call",
+          "seconds": 2.45
+        },
+        {
+          "nodeid": "tests/test_v043_c_lite_formal_consumers.py::test_t10_explicit_registry_commit_uses_existing_p5_owner[True]",
+          "phase": "call",
+          "seconds": 2.43
+        },
+        {
+          "nodeid": "tests/test_v043_c_lite_formal_consumers.py::test_t7_fully_rehashed_attacks_rejected_by_consumer_acceptance[traded_cash]",
+          "phase": "call",
+          "seconds": 2.31
+        },
+        {
+          "nodeid": "tests/test_v043_c_lite_formal_consumers.py::test_t7_fully_rehashed_attacks_rejected_by_consumer_acceptance[random_clone]",
+          "phase": "call",
+          "seconds": 2.3
+        },
+        {
+          "nodeid": "tests/test_v042_b06_random_experiment_replay.py::test_b06_t8_t9_fixed_and_larger_positive_replay[32-12]",
+          "phase": "call",
+          "seconds": 2.27
+        },
+        {
+          "nodeid": "tests/test_v043_c_lite_formal_consumers.py::test_t10_explicit_registry_commit_uses_existing_p5_owner[False]",
+          "phase": "call",
+          "seconds": 2.27
+        },
+        {
+          "nodeid": "tests/test_v051_h40_p3b_production_discovery_verifier.py::test_s01_s10_samp08_samp09_metric_audit_rejects_foreign_identity[start_matrix_hash-0000000000000000000000000000000000000000000000000000000000000000]",
+          "phase": "call",
+          "seconds": 2.24
+        },
+        {
+          "nodeid": "tests/test_v043_c_lite_formal_consumers.py::test_t7_fully_rehashed_attacks_rejected_by_consumer_acceptance[future_liquidity]",
+          "phase": "call",
+          "seconds": 2.22
+        },
+        {
+          "nodeid": "tests/test_v043_c_lite_formal_consumers.py::test_t7_fully_rehashed_attacks_rejected_by_consumer_acceptance[empty_signals]",
+          "phase": "call",
+          "seconds": 2.17
+        },
+        {
+          "nodeid": "tests/test_v043_c_lite_formal_consumers.py::test_t3_tool_import_and_dispatch_only_formal",
+          "phase": "call",
+          "seconds": 2.14
+        },
+        {
+          "nodeid": "tests/test_v043_c_lite_formal_consumers.py::test_t7_fully_rehashed_attacks_rejected_by_consumer_acceptance[seed_swap]",
+          "phase": "call",
+          "seconds": 2.11
+        },
+        {
+          "nodeid": "tests/test_v043_c_lite_formal_consumers.py::test_t7_fully_rehashed_attacks_rejected_by_consumer_acceptance[impossible_fill]",
+          "phase": "call",
+          "seconds": 2.11
+        },
+        {
+          "nodeid": "tests/test_v043_c_lite_formal_consumers.py::test_t11_formal_job_does_not_enable_execution",
+          "phase": "call",
+          "seconds": 2.07
+        },
+        {
+          "nodeid": "tests/test_v051_h40_p3b_production_discovery_verifier.py::test_s01_s10_samp08_samp09_metric_audit_rejects_foreign_identity[metric_id-precision]",
+          "phase": "call",
+          "seconds": 2.06
+        },
+        {
+          "nodeid": "tests/test_v051_h40_p3b_production_discovery_verifier.py::test_s01_s10_samp08_samp09_metric_audit_rejects_foreign_identity[bit_generator-MT19937]",
+          "phase": "call",
+          "seconds": 2.05
+        },
+        {
+          "nodeid": "tests/test_v051_h40_p1_scaffold.py::test_mutate_one_source_timestamp_after_serialization_fails_cold_assertion",
+          "phase": "call",
+          "seconds": 2.05
+        },
+        {
+          "nodeid": "tests/test_v043_c_lite_formal_consumers.py::test_t1_t2_generic_commands_use_formal_without_service_or_legacy[backtest]",
+          "phase": "call",
+          "seconds": 2.05
+        },
+        {
+          "nodeid": "tests/test_v043_c_lite_formal_consumers.py::test_publication_does_not_overwrite_frozen_artifacts",
+          "phase": "call",
+          "seconds": 2.04
+        },
+        {
+          "nodeid": "tests/test_v043_c_lite_formal_consumers.py::test_t1_t2_generic_commands_use_formal_without_service_or_legacy[replay]",
+          "phase": "call",
+          "seconds": 2.02
+        },
+        {
+          "nodeid": "tests/test_v043_c_lite_formal_consumers.py::test_t4_shadow_is_canonical_and_default_service_is_refusal",
+          "phase": "call",
+          "seconds": 2.01
+        },
+        {
+          "nodeid": "tests/test_v051_h40_f01_lifecycle_authority.py::test_r35_r37_r38_production_cold_restore_and_active_source_change_detection",
+          "phase": "call",
+          "seconds": 2.01
+        }
+      ],
+      "exit_code": 0,
+      "log": "evidence/v0.5/h40/final_reacceptance_d73e898/full_1.txt",
+      "max_rss_kbytes": 248256,
+      "passed_count": 1587,
+      "pytest_seconds": 418.92,
+      "run_number": 1,
+      "summary": "1587 passed, 8 warnings in 418.92s (0:06:58)",
+      "system_cpu_seconds": 28.53,
+      "user_cpu_seconds": 400.43,
+      "wall_clock_seconds": 470.81
+    },
+    {
+      "command": "/usr/bin/time -v .venv/bin/python -m pytest -q --durations=50 --durations-min=0.25",
+      "cpu_percent": 91,
+      "durations": [
+        {
+          "nodeid": "tests/test_v051_h40_f01_lifecycle_authority.py::test_cached_calendar_preserves_full_cold_authority_and_state_isolation",
+          "phase": "call",
+          "seconds": 13.53
+        },
+        {
+          "nodeid": "tests/test_v051_h40_p3b_production_discovery_verifier.py::test_v26_valid_family_continues_after_other_families_fit_invalid",
+          "phase": "call",
+          "seconds": 9.59
+        },
+        {
+          "nodeid": "tests/test_v0324_blind_accumulation_operations.py::test_stale_ledger_fail_closed_regression",
+          "phase": "call",
+          "seconds": 8.86
+        },
+        {
+          "nodeid": "tests/test_v0323_blind_validation.py::test_maturity_requires_all_gates_simultaneously",
+          "phase": "call",
+          "seconds": 8.61
+        },
+        {
+          "nodeid": "tests/test_v0323_blind_validation.py::test_readiness_does_not_execute_statistics",
+          "phase": "call",
+          "seconds": 8.6
+        },
+        {
+          "nodeid": "tests/test_v051_h40_f01_lifecycle_authority.py::test_a00_production_seal_derives_typed_verified_authority",
+          "phase": "call",
+          "seconds": 6.86
+        },
+        {
+          "nodeid": "tests/test_v051_h40_p3b_production_discovery_verifier.py::test_v20_deterministic_manifest_replay",
+          "phase": "call",
+          "seconds": 6.48
+        },
+        {
+          "nodeid": "tests/test_v051_h40_f01_lifecycle_authority.py::test_a21_through_a29_model_a_capability_lifetime",
+          "phase": "call",
+          "seconds": 6.43
+        },
+        {
+          "nodeid": "tests/test_v051_h40_p3b_production_discovery_verifier.py::test_v01_protocol_and_fit_invalid_family",
+          "phase": "call",
+          "seconds": 5.59
+        },
+        {
+          "nodeid": "tests/test_v051_h40_p3b_production_discovery_verifier.py::test_v26_v27_one_invalid_registered_member_poisons_full_family",
+          "phase": "call",
+          "seconds": 5.26
+        },
+        {
+          "nodeid": "tests/test_v043_c_lite_formal_consumers.py::test_t6_facade_has_exact_kernel_outputs_and_cold_idempotence[True]",
+          "phase": "call",
+          "seconds": 5.04
+        },
+        {
+          "nodeid": "tests/test_v050_r03b_legacy_benchmark_guards.py::test_t6_c_lite_formal_differential_remains_stable",
+          "phase": "call",
+          "seconds": 4.78
+        },
+        {
+          "nodeid": "tests/test_v043_c_lite_formal_consumers.py::test_t6_facade_has_exact_kernel_outputs_and_cold_idempotence[False]",
+          "phase": "call",
+          "seconds": 4.68
+        },
+        {
+          "nodeid": "tests/test_v051_h40_p3b_production_verifier_identity_seal.py::test_a01_real_concrete_verifier_reaches_scientific_path",
+          "phase": "call",
+          "seconds": 4.63
+        },
+        {
+          "nodeid": "tests/test_v051_h40_f01r3r1_durable_authority.py::test_r03_synthetic_wf_cold_restore_avoids_caller_override_path",
+          "phase": "call",
+          "seconds": 4.21
+        },
+        {
+          "nodeid": "tests/test_v051_h40_p1_scaffold.py::test_mandatory_10_synthetic_validator_output_remains_strictly_non_authoritative",
+          "phase": "call",
+          "seconds": 4.21
+        },
+        {
+          "nodeid": "tests/test_v051_h40_p1_scaffold.py::test_mandatory_11_hermetic_scaffold_passes_without_repo_artifacts",
+          "phase": "call",
+          "seconds": 4.1
+        },
+        {
+          "nodeid": "tests/test_v051_h40_p3b_production_discovery_verifier.py::test_cov01_cov04_calibration_final_actions_define_coverage_population",
+          "phase": "call",
+          "seconds": 3.93
+        },
+        {
+          "nodeid": "tests/test_v041_p6_metrics_benchmarks_qualification.py::test_tampered_result_run_and_dataset_are_atomic_failures",
+          "phase": "call",
+          "seconds": 3.83
+        },
+        {
+          "nodeid": "tests/test_v050_r05c_funding_evidence_authority.py::test_t20_cold_job_replay",
+          "phase": "call",
+          "seconds": 3.78
+        },
+        {
+          "nodeid": "tests/test_v051_h40_p1_scaffold.py::test_mutate_one_artifact_byte_after_serialization_fails_cold_assertion",
+          "phase": "call",
+          "seconds": 3.76
+        },
+        {
+          "nodeid": "tests/test_v051_h40_p1_scaffold.py::test_persisted_split_rehash_attack_remains_closed",
+          "phase": "call",
+          "seconds": 3.71
+        },
+        {
+          "nodeid": "tests/test_v051_h40_p1_scaffold.py::test_source_gap_persists_in_membership_without_boundary_shifts",
+          "phase": "call",
+          "seconds": 3.5
+        },
+        {
+          "nodeid": "tests/test_v051_h40_p1_scaffold.py::test_positive_split_round_trip_and_cold_verification",
+          "phase": "call",
+          "seconds": 3.49
+        },
+        {
+          "nodeid": "tests/test_v051_h40_p1_scaffold.py::test_persisted_partition_tampering_with_recomputed_attestation_fails_cold_reconstruction",
+          "phase": "call",
+          "seconds": 3.48
+        },
+        {
+          "nodeid": "tests/test_v051_h40_p1_scaffold.py::test_positive_synthetic_chain_succeeds_and_passes_verification",
+          "phase": "call",
+          "seconds": 3.47
+        },
+        {
+          "nodeid": "tests/test_v051_h40_p3b_production_verifier_identity_seal.py::test_a09_foreign_verifier_cannot_cold_restore_candidate_lock",
+          "phase": "call",
+          "seconds": 3.37
+        },
+        {
+          "nodeid": "tests/test_v051_h40_p3b_production_verifier_behavior_seal.py::test_b15_cold_restore_rejects_tampered_exact_verifier",
+          "phase": "call",
+          "seconds": 3.24
+        },
+        {
+          "nodeid": "tests/test_v051_h40_p3b_production_discovery_verifier.py::test_cov_audit_persists_exact_components_and_rejects_tamper",
+          "phase": "call",
+          "seconds": 2.79
+        },
+        {
+          "nodeid": "tests/test_v051_h40_f01r3r4_lineage_durability.py::test_r56_intact_committed_head_and_legitimate_ancestors_succeed",
+          "phase": "call",
+          "seconds": 2.56
+        },
+        {
+          "nodeid": "tests/test_v043_c_lite_formal_consumers.py::test_t10_explicit_registry_commit_uses_existing_p5_owner[True]",
+          "phase": "call",
+          "seconds": 2.41
+        },
+        {
+          "nodeid": "tests/test_v043_c_lite_formal_consumers.py::test_t7_fully_rehashed_attacks_rejected_by_consumer_acceptance[random_clone]",
+          "phase": "call",
+          "seconds": 2.35
+        },
+        {
+          "nodeid": "tests/test_v042_b06_random_experiment_replay.py::test_b06_t8_t9_fixed_and_larger_positive_replay[32-12]",
+          "phase": "call",
+          "seconds": 2.35
+        },
+        {
+          "nodeid": "tests/test_v043_c_lite_formal_consumers.py::test_t10_explicit_registry_commit_uses_existing_p5_owner[False]",
+          "phase": "call",
+          "seconds": 2.29
+        },
+        {
+          "nodeid": "tests/test_v051_h40_p3b_production_discovery_verifier.py::test_s01_s10_samp08_samp09_metric_audit_rejects_foreign_identity[seed-0]",
+          "phase": "call",
+          "seconds": 2.23
+        },
+        {
+          "nodeid": "tests/test_v051_h40_p3b_production_discovery_verifier.py::test_s01_s10_samp08_samp09_metric_audit_rejects_foreign_identity[metric_id-precision]",
+          "phase": "call",
+          "seconds": 2.17
+        },
+        {
+          "nodeid": "tests/test_v043_c_lite_formal_consumers.py::test_t7_fully_rehashed_attacks_rejected_by_consumer_acceptance[seed_swap]",
+          "phase": "call",
+          "seconds": 2.16
+        },
+        {
+          "nodeid": "tests/test_v051_h40_p3b_production_discovery_verifier.py::test_s01_s10_samp08_samp09_metric_audit_rejects_foreign_identity[start_matrix_hash-0000000000000000000000000000000000000000000000000000000000000000]",
+          "phase": "call",
+          "seconds": 2.11
+        },
+        {
+          "nodeid": "tests/test_v043_c_lite_formal_consumers.py::test_t7_fully_rehashed_attacks_rejected_by_consumer_acceptance[empty_signals]",
+          "phase": "call",
+          "seconds": 2.11
+        },
+        {
+          "nodeid": "tests/test_v043_c_lite_formal_consumers.py::test_t7_fully_rehashed_attacks_rejected_by_consumer_acceptance[traded_cash]",
+          "phase": "call",
+          "seconds": 2.1
+        },
+        {
+          "nodeid": "tests/test_v043_c_lite_formal_consumers.py::test_t7_fully_rehashed_attacks_rejected_by_consumer_acceptance[future_liquidity]",
+          "phase": "call",
+          "seconds": 2.1
+        },
+        {
+          "nodeid": "tests/test_v043_c_lite_formal_consumers.py::test_t7_fully_rehashed_attacks_rejected_by_consumer_acceptance[impossible_fill]",
+          "phase": "call",
+          "seconds": 2.07
+        },
+        {
+          "nodeid": "tests/test_v051_h40_p3b_production_discovery_verifier.py::test_s01_s10_samp08_samp09_metric_audit_rejects_foreign_identity[bit_generator-MT19937]",
+          "phase": "call",
+          "seconds": 2.07
+        },
+        {
+          "nodeid": "tests/test_v043_c_lite_formal_consumers.py::test_publication_does_not_overwrite_frozen_artifacts",
+          "phase": "call",
+          "seconds": 2.04
+        },
+        {
+          "nodeid": "tests/test_v043_c_lite_formal_consumers.py::test_t1_t2_generic_commands_use_formal_without_service_or_legacy[replay]",
+          "phase": "call",
+          "seconds": 2.03
+        },
+        {
+          "nodeid": "tests/test_v051_h40_f01_lifecycle_authority.py::test_r35_r37_r38_production_cold_restore_and_active_source_change_detection",
+          "phase": "call",
+          "seconds": 2.02
+        },
+        {
+          "nodeid": "tests/test_v051_h40_p3b_production_discovery_verifier.py::test_s01_s10_samp08_samp09_metric_audit_rejects_foreign_identity[protocol_id-6533000000000000000000000000000000000000000000000000000000000000]",
+          "phase": "call",
+          "seconds": 2.01
+        },
+        {
+          "nodeid": "tests/test_v051_h40_f01r3r1_durable_authority.py::test_r04_persisted_split_mismatch_fails_closed",
+          "phase": "call",
+          "seconds": 2.0
+        },
+        {
+          "nodeid": "tests/test_v051_h40_p1_scaffold.py::test_mutate_one_source_timestamp_after_serialization_fails_cold_assertion",
+          "phase": "call",
+          "seconds": 2.0
+        },
+        {
+          "nodeid": "tests/test_v043_c_lite_formal_consumers.py::test_t4_legacy_shadow_reader_remains_legacy_and_unchanged",
+          "phase": "call",
+          "seconds": 1.99
+        }
+      ],
+      "exit_code": 0,
+      "log": "evidence/v0.5/h40/final_reacceptance_d73e898/full_2.txt",
+      "max_rss_kbytes": 255464,
+      "passed_count": 1587,
+      "pytest_seconds": 422.84,
+      "run_number": 2,
+      "summary": "1587 passed, 8 warnings in 422.84s (0:07:02)",
+      "system_cpu_seconds": 26.91,
+      "user_cpu_seconds": 396.47,
+      "wall_clock_seconds": 464.13
+    }
+  ],
+  "generated_at_utc": "2026-09-24T10:03:42.069211+00:00",
+  "import_provenance": {
+    "module_file": "/root/workspace/project/Quant-agent-sanitized/src/btc_quant_agent/__init__.py",
+    "python_executable": "/root/workspace/project/Quant-agent-sanitized/.venv/bin/python",
+    "relative_to_cwd": true
+  },
+  "mapped_top5_comparison": {
+    "baseline_combined_seconds": 121.58,
+    "candidate_combined_seconds": 25.51,
+    "log": "evidence/v0.5/h40/final_reacceptance_d73e898/mapped_top5.txt",
+    "reduction_percent": 79.02,
+    "reduction_seconds": 96.07,
+    "rows": [
+      {
+        "baseline_call_seconds": 39.58,
+        "baseline_test": "tests/test_v051_h40_f01_lifecycle_authority.py::test_a21_through_a29_model_a_capability_lifetime",
+        "candidate_call_seconds": 8.03,
+        "candidate_replacement_tests": [
+          "tests/test_v051_h40_f01_lifecycle_authority.py::test_a21_through_a29_model_a_capability_lifetime",
+          "tests/test_v051_h40_p3b_production_verifier_behavior_seal.py::test_b01_b10_normal_science_and_mutable_caches"
+        ],
+        "delta_percent": -79.71,
+        "reduction_percent": 79.71,
+        "semantic_coverage_mapping": "A21 source/capability lifetime and cold validation remain; B01/B10 exercises real constructor-produced verifier science and mutable caches."
+      },
+      {
+        "baseline_call_seconds": 31.07,
+        "baseline_test": "tests/test_v051_h40_f01r3r1_durable_authority.py::test_r03_production_wf_cold_restore_avoids_caller_override_path",
+        "candidate_call_seconds": 7.19,
+        "candidate_replacement_tests": [
+          "tests/test_v051_h40_f01r3r1_durable_authority.py::test_r03_synthetic_wf_cold_restore_avoids_caller_override_path",
+          "tests/test_v051_h40_p3b_production_verifier_behavior_seal.py::test_b15_cold_restore_rejects_tampered_exact_verifier"
+        ],
+        "delta_percent": -76.86,
+        "reduction_percent": 76.86,
+        "semantic_coverage_mapping": "Synthetic R03 retains WF cold-restore governance and internal split derivation; B15 adds production cold-restore rejection of a tampered exact-type verifier."
+      },
+      {
+        "baseline_call_seconds": 22.56,
+        "baseline_test": "tests/test_v051_h40_p3b_production_verifier_identity_seal.py::test_a09_foreign_verifier_cannot_cold_restore_candidate_lock",
+        "candidate_call_seconds": 2.91,
+        "candidate_replacement_tests": [
+          "tests/test_v051_h40_p3b_production_verifier_identity_seal.py::test_a09_foreign_verifier_cannot_cold_restore_candidate_lock"
+        ],
+        "delta_percent": -87.1,
+        "reduction_percent": 87.1,
+        "semantic_coverage_mapping": "Production cold-restore foreign-verifier rejection remains unchanged."
+      },
+      {
+        "baseline_call_seconds": 14.36,
+        "baseline_test": "tests/test_v051_h40_f01_lifecycle_authority.py::test_r35_r37_r38_production_cold_restore_and_active_source_change_detection",
+        "candidate_call_seconds": 1.95,
+        "candidate_replacement_tests": [
+          "tests/test_v051_h40_f01_lifecycle_authority.py::test_r35_r37_r38_production_cold_restore_and_active_source_change_detection"
+        ],
+        "delta_percent": -86.42,
+        "reduction_percent": 86.42,
+        "semantic_coverage_mapping": "Production source/split cold validation and active-source mutation rejection remains unchanged."
+      },
+      {
+        "baseline_call_seconds": 14.01,
+        "baseline_test": "tests/test_v051_h40_f01r3r1_durable_authority.py::test_r02_production_wf_revalidation_avoids_caller_override_path",
+        "candidate_call_seconds": 5.43,
+        "candidate_replacement_tests": [
+          "tests/test_v051_h40_f01r3r1_durable_authority.py::test_r02_synthetic_wf_revalidation_avoids_caller_override_path",
+          "tests/test_v051_h40_f01r3r1_durable_authority.py::test_r05_synthetic_split_injection_remains_test_only",
+          "tests/test_v051_h40_f01r3r1_durable_authority.py::test_r06_current_production_remains_not_testable_until_p3_materialization"
+        ],
+        "delta_percent": -61.24,
+        "reduction_percent": 61.24,
+        "semantic_coverage_mapping": "Synthetic R02 retains internal WF revalidation; R05 rejects caller split injection in production; R06 preserves production WF NOT_TESTABLE fence."
+      }
+    ],
+    "target_max_seconds": 72.95,
+    "target_met": true,
+    "target_min_reduction_percent": 40.0
+  },
+  "performance_baseline_sha": "6bd63db96e5b54b9cec27a74cd2f728e19fc5b7d",
+  "performance_comparison": {
+    "baseline_median_wall_seconds": 657.69,
+    "baseline_sha": "6bd63db96e5b54b9cec27a74cd2f728e19fc5b7d",
+    "candidate_mean_wall_seconds": 467.47,
+    "candidate_median_wall_seconds": 467.47,
+    "primary_target_max_seconds": 480.0,
+    "primary_target_met": true,
+    "primary_target_min_reduction_percent": 25.0,
+    "reduction_percent": 28.92,
+    "reduction_seconds": 190.22,
+    "run_1_wall_seconds": 470.81,
+    "run_2_wall_seconds": 464.13,
+    "status": "FULL_PYTEST_PERFORMANCE_ACCEPTED"
+  },
+  "performance_optimization_sha": "d73e8984446f933059b978e36c4cabd55de517aa",
+  "protected_surface_attestation": {
+    "confirmation_accessed": false,
+    "final_holdout_accessed": false,
+    "h39_accessed": false,
+    "real_h40_outcomes_accessed": false,
+    "signed_network_requests": 0,
+    "wf1_calibration_outcomes_accessed": false
+  },
+  "pytest_version": "8.4.2",
+  "python_version": "3.12.3",
+  "raw_log_sha256": {
+    "evidence/v0.5/h40/final_reacceptance_d73e898/compileall.txt": "6fcd8ae9a7ca29a667a063c162543d2663e197bebcd42cf1179df974ecde75a0",
+    "evidence/v0.5/h40/final_reacceptance_d73e898/diff_check.txt": "30972bddb8a22e0df179518af6c70f175a6603d4fa7478277964f29faad17fb1",
+    "evidence/v0.5/h40/final_reacceptance_d73e898/execution_fences.txt": "dac05e6950de956ae1d67a46d3ce506f48a508ce97675917ca747b9e11f41fb8",
+    "evidence/v0.5/h40/final_reacceptance_d73e898/focused_lifecycle.txt": "cc07f6c24fe47c4fc2ae8b2b6400155884d7a130bfa33b24840b396be574106b",
+    "evidence/v0.5/h40/final_reacceptance_d73e898/focused_p3b.txt": "79200f7d4b85a0a87fe80c7a5e59edc68b42975f416a485d37737106989c43d4",
+    "evidence/v0.5/h40/final_reacceptance_d73e898/frozen_identities.txt": "3d187a38b51d76e485f255cec7b2df5188fd83e4a397480ae7b26740bfce5da1",
+    "evidence/v0.5/h40/final_reacceptance_d73e898/full_1.txt": "a39cefe9f13d5da634e435cc6c24359f7571036b3f7e7117c261fd720723be7a",
+    "evidence/v0.5/h40/final_reacceptance_d73e898/full_2.txt": "63681b20ff18b5eb81fd94e88197682ce8a1322b8b15fd526870ceea68000ea0",
+    "evidence/v0.5/h40/final_reacceptance_d73e898/mapped_top5.txt": "fba3411b4f98995f39e80f16397be4490640adebf138cfa478184bf96220113b",
+    "evidence/v0.5/h40/final_reacceptance_d73e898/mypy.txt": "d6535e97ea922e64849df5139b193e3309905aee21a350718b3aaf81173bfc87",
+    "evidence/v0.5/h40/final_reacceptance_d73e898/provenance_focused.txt": "b9ee230c3c10a30432c8eae5f11f74e3063635eea67c3ec479d384f5659ca483",
+    "evidence/v0.5/h40/final_reacceptance_d73e898/provenance_full_1.txt": "6e14bd6b0ae9f0f96e0cac2a2f386b93db023d79caae7f1b8c6eb99b8dda4055",
+    "evidence/v0.5/h40/final_reacceptance_d73e898/provenance_full_2.txt": "176ea1b1e846a93dfceb9b36c41ab08d4d40681d32c817f17203b0fed246c4af",
+    "evidence/v0.5/h40/final_reacceptance_d73e898/ruff_all.txt": "0fc3dcb1092c112880bf35d1fec47663e7ced04740db12ec3831a5fb020e1e43"
+  },
+  "schema_id": "V0.5.1_H40_FINAL_REACCEPTANCE_EVIDENCE_V1",
+  "static_gate_results": {
+    "compileall": {
+      "command": "python -m compileall -q src skill-template/scripts",
+      "exit_code": 0,
+      "log": "evidence/v0.5/h40/final_reacceptance_d73e898/compileall.txt",
+      "wall_clock_seconds": 0.073
+    },
+    "diff_check": {
+      "command": "git diff --check",
+      "exit_code": 0,
+      "log": "evidence/v0.5/h40/final_reacceptance_d73e898/diff_check.txt",
+      "wall_clock_seconds": 0.018
+    },
+    "mypy": {
+      "command": "mypy",
+      "exit_code": 0,
+      "log": "evidence/v0.5/h40/final_reacceptance_d73e898/mypy.txt",
+      "wall_clock_seconds": 0.74
+    },
+    "ruff": {
+      "command": "ruff check .",
+      "exit_code": 0,
+      "log": "evidence/v0.5/h40/final_reacceptance_d73e898/ruff_all.txt",
+      "wall_clock_seconds": 0.083
+    }
+  },
+  "tested_commit_sha": "d73e8984446f933059b978e36c4cabd55de517aa"
+}

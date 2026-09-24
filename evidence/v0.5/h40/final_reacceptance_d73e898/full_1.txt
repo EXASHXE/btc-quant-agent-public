@@ -1,0 +1,139 @@
+command: /usr/bin/time -v .venv/bin/python -m pytest -q --durations=50 --durations-min=0.25
+cwd: /root/workspace/project/Quant-agent-sanitized
+tested SHA: d73e8984446f933059b978e36c4cabd55de517aa
+UTC timestamp: 2026-09-24T09:46:00.164768+00:00
+exit code: 0
+wall clock seconds: 470.856
+
+........................................................................ [  4%]
+........................................................................ [  9%]
+........................................................................ [ 13%]
+........................................................................ [ 18%]
+........................................................................ [ 22%]
+........................................................................ [ 27%]
+........................................................................ [ 31%]
+........................................................................ [ 36%]
+........................................................................ [ 40%]
+........................................................................ [ 45%]
+........................................................................ [ 49%]
+........................................................................ [ 54%]
+........................................................................ [ 58%]
+........................................................................ [ 63%]
+........................................................................ [ 68%]
+........................................................................ [ 72%]
+........................................................................ [ 77%]
+........................................................................ [ 81%]
+........................................................................ [ 86%]
+........................................................................ [ 90%]
+........................................................................ [ 95%]
+........................................................................ [ 99%]
+...                                                                      [100%]
+=============================== warnings summary ===============================
+tests/test_shadow.py::ShadowTests::test_unfilled_signal_stays_pending_until_expiry
+  /root/workspace/project/Quant-agent-sanitized/tests/test_shadow.py:19: DeprecationWarning: shadow.update_shadow(repository, bars, now) is LEGACY_DIAGNOSTIC_ONLY; use update_formal_shadow with an explicit protocol/evidence job for current economics
+    self.assertEqual(update_shadow(repo, [bar], 120_000), [])
+
+tests/test_shadow.py::ShadowTests::test_unfilled_signal_stays_pending_until_expiry
+  /root/workspace/project/Quant-agent-sanitized/tests/test_shadow.py:23: DeprecationWarning: shadow.update_shadow(repository, bars, now) is LEGACY_DIAGNOSTIC_ONLY; use update_formal_shadow with an explicit protocol/evidence job for current economics
+    resolved = update_shadow(repo, [bar], item.expires_at_ms + 1)
+
+tests/test_v0323_blind_validation.py::test_final_holdout_sealed_and_execution_disabled
+  /root/workspace/project/Quant-agent-sanitized/tests/test_v0323_blind_validation.py:727: DeprecationWarning: evaluate_validation_status() is a deprecated non-authoritative diagnostic. It MUST NOT authorize unblind, candidate promotion, or formal validation. Use check_unblind_readiness() with wall-clock denominator instead.
+    val_status = engine.evaluate_validation_status()
+
+tests/test_v0323_blind_validation.py::test_metadata_only_diagnostic_never_reaches_outcome_loaders
+  /root/workspace/project/Quant-agent-sanitized/tests/test_v0323_blind_validation.py:810: DeprecationWarning: evaluate_validation_status() is a deprecated non-authoritative diagnostic. It MUST NOT authorize unblind, candidate promotion, or formal validation. Use check_unblind_readiness() with wall-clock denominator instead.
+    val_status = engine.evaluate_validation_status()
+
+tests/test_v0323_blind_validation.py::test_post_start_partition_does_not_trigger_observation_building
+  /root/workspace/project/Quant-agent-sanitized/tests/test_v0323_blind_validation.py:861: DeprecationWarning: evaluate_validation_status() is a deprecated non-authoritative diagnostic. It MUST NOT authorize unblind, candidate promotion, or formal validation. Use check_unblind_readiness() with wall-clock denominator instead.
+    val_status = engine.evaluate_validation_status()
+
+tests/test_v0323_blind_validation.py::test_absence_of_canonical_candles_does_not_break_diagnostic
+  /root/workspace/project/Quant-agent-sanitized/tests/test_v0323_blind_validation.py:889: DeprecationWarning: evaluate_validation_status() is a deprecated non-authoritative diagnostic. It MUST NOT authorize unblind, candidate promotion, or formal validation. Use check_unblind_readiness() with wall-clock denominator instead.
+    val_status = engine.evaluate_validation_status()
+
+tests/test_v0323_blind_validation.py::test_diagnostic_payload_has_no_performance_leakage
+  /root/workspace/project/Quant-agent-sanitized/tests/test_v0323_blind_validation.py:899: DeprecationWarning: evaluate_validation_status() is a deprecated non-authoritative diagnostic. It MUST NOT authorize unblind, candidate promotion, or formal validation. Use check_unblind_readiness() with wall-clock denominator instead.
+    val_status = engine.evaluate_validation_status()
+
+tests/test_v0323_blind_validation.py::test_deprecated_diagnostic_cannot_grant_authorization
+  /root/workspace/project/Quant-agent-sanitized/tests/test_v0323_blind_validation.py:921: DeprecationWarning: evaluate_validation_status() is a deprecated non-authoritative diagnostic. It MUST NOT authorize unblind, candidate promotion, or formal validation. Use check_unblind_readiness() with wall-clock denominator instead.
+    val_status = engine.evaluate_validation_status()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+============================= slowest 50 durations =============================
+13.73s call     tests/test_v051_h40_f01_lifecycle_authority.py::test_cached_calendar_preserves_full_cold_authority_and_state_isolation
+9.15s call     tests/test_v0324_blind_accumulation_operations.py::test_stale_ledger_fail_closed_regression
+8.54s call     tests/test_v0323_blind_validation.py::test_maturity_requires_all_gates_simultaneously
+8.46s call     tests/test_v051_h40_p3b_production_discovery_verifier.py::test_v26_valid_family_continues_after_other_families_fit_invalid
+8.05s call     tests/test_v0323_blind_validation.py::test_readiness_does_not_execute_statistics
+7.06s call     tests/test_v051_h40_f01_lifecycle_authority.py::test_a00_production_seal_derives_typed_verified_authority
+6.71s call     tests/test_v051_h40_f01_lifecycle_authority.py::test_a21_through_a29_model_a_capability_lifetime
+6.28s call     tests/test_v051_h40_p3b_production_discovery_verifier.py::test_v20_deterministic_manifest_replay
+4.98s call     tests/test_v050_r03b_legacy_benchmark_guards.py::test_t6_c_lite_formal_differential_remains_stable
+4.90s call     tests/test_v043_c_lite_formal_consumers.py::test_t6_facade_has_exact_kernel_outputs_and_cold_idempotence[True]
+4.74s call     tests/test_v051_h40_p3b_production_discovery_verifier.py::test_v26_v27_one_invalid_registered_member_poisons_full_family
+4.65s call     tests/test_v043_c_lite_formal_consumers.py::test_t6_facade_has_exact_kernel_outputs_and_cold_idempotence[False]
+4.42s call     tests/test_v051_h40_p3b_production_verifier_identity_seal.py::test_a01_real_concrete_verifier_reaches_scientific_path
+4.37s call     tests/test_v051_h40_p3b_production_discovery_verifier.py::test_v01_protocol_and_fit_invalid_family
+4.10s call     tests/test_v051_h40_f01r3r1_durable_authority.py::test_r03_synthetic_wf_cold_restore_avoids_caller_override_path
+3.88s call     tests/test_v050_r05c_funding_evidence_authority.py::test_t20_cold_job_replay
+3.82s call     tests/test_v041_p6_metrics_benchmarks_qualification.py::test_tampered_result_run_and_dataset_are_atomic_failures
+3.80s call     tests/test_v051_h40_p3b_production_discovery_verifier.py::test_cov01_cov04_calibration_final_actions_define_coverage_population
+3.75s call     tests/test_v051_h40_p1_scaffold.py::test_mutate_one_artifact_byte_after_serialization_fails_cold_assertion
+3.71s call     tests/test_v051_h40_p1_scaffold.py::test_mandatory_10_synthetic_validator_output_remains_strictly_non_authoritative
+3.68s call     tests/test_v051_h40_p1_scaffold.py::test_positive_split_round_trip_and_cold_verification
+3.67s call     tests/test_v051_h40_p1_scaffold.py::test_source_gap_persists_in_membership_without_boundary_shifts
+3.56s call     tests/test_v051_h40_p1_scaffold.py::test_persisted_split_rehash_attack_remains_closed
+3.54s call     tests/test_v051_h40_p1_scaffold.py::test_positive_synthetic_chain_succeeds_and_passes_verification
+3.51s call     tests/test_v051_h40_p1_scaffold.py::test_persisted_partition_tampering_with_recomputed_attestation_fails_cold_reconstruction
+3.41s call     tests/test_v051_h40_p1_scaffold.py::test_mandatory_11_hermetic_scaffold_passes_without_repo_artifacts
+2.98s call     tests/test_v051_h40_p3b_production_verifier_identity_seal.py::test_a09_foreign_verifier_cannot_cold_restore_candidate_lock
+2.96s call     tests/test_v051_h40_p3b_production_verifier_behavior_seal.py::test_b15_cold_restore_rejects_tampered_exact_verifier
+2.77s call     tests/test_v051_h40_p3b_production_discovery_verifier.py::test_cov_audit_persists_exact_components_and_rejects_tamper
+2.45s call     tests/test_v051_h40_f01r3r4_lineage_durability.py::test_r56_intact_committed_head_and_legitimate_ancestors_succeed
+2.43s call     tests/test_v043_c_lite_formal_consumers.py::test_t10_explicit_registry_commit_uses_existing_p5_owner[True]
+2.31s call     tests/test_v043_c_lite_formal_consumers.py::test_t7_fully_rehashed_attacks_rejected_by_consumer_acceptance[traded_cash]
+2.30s call     tests/test_v043_c_lite_formal_consumers.py::test_t7_fully_rehashed_attacks_rejected_by_consumer_acceptance[random_clone]
+2.27s call     tests/test_v042_b06_random_experiment_replay.py::test_b06_t8_t9_fixed_and_larger_positive_replay[32-12]
+2.27s call     tests/test_v043_c_lite_formal_consumers.py::test_t10_explicit_registry_commit_uses_existing_p5_owner[False]
+2.24s call     tests/test_v051_h40_p3b_production_discovery_verifier.py::test_s01_s10_samp08_samp09_metric_audit_rejects_foreign_identity[start_matrix_hash-0000000000000000000000000000000000000000000000000000000000000000]
+2.22s call     tests/test_v043_c_lite_formal_consumers.py::test_t7_fully_rehashed_attacks_rejected_by_consumer_acceptance[future_liquidity]
+2.17s call     tests/test_v043_c_lite_formal_consumers.py::test_t7_fully_rehashed_attacks_rejected_by_consumer_acceptance[empty_signals]
+2.14s call     tests/test_v043_c_lite_formal_consumers.py::test_t3_tool_import_and_dispatch_only_formal
+2.11s call     tests/test_v043_c_lite_formal_consumers.py::test_t7_fully_rehashed_attacks_rejected_by_consumer_acceptance[seed_swap]
+2.11s call     tests/test_v043_c_lite_formal_consumers.py::test_t7_fully_rehashed_attacks_rejected_by_consumer_acceptance[impossible_fill]
+2.07s call     tests/test_v043_c_lite_formal_consumers.py::test_t11_formal_job_does_not_enable_execution
+2.06s call     tests/test_v051_h40_p3b_production_discovery_verifier.py::test_s01_s10_samp08_samp09_metric_audit_rejects_foreign_identity[metric_id-precision]
+2.05s call     tests/test_v051_h40_p3b_production_discovery_verifier.py::test_s01_s10_samp08_samp09_metric_audit_rejects_foreign_identity[bit_generator-MT19937]
+2.05s call     tests/test_v051_h40_p1_scaffold.py::test_mutate_one_source_timestamp_after_serialization_fails_cold_assertion
+2.05s call     tests/test_v043_c_lite_formal_consumers.py::test_t1_t2_generic_commands_use_formal_without_service_or_legacy[backtest]
+2.04s call     tests/test_v043_c_lite_formal_consumers.py::test_publication_does_not_overwrite_frozen_artifacts
+2.02s call     tests/test_v043_c_lite_formal_consumers.py::test_t1_t2_generic_commands_use_formal_without_service_or_legacy[replay]
+2.01s call     tests/test_v043_c_lite_formal_consumers.py::test_t4_shadow_is_canonical_and_default_service_is_refusal
+2.01s call     tests/test_v051_h40_f01_lifecycle_authority.py::test_r35_r37_r38_production_cold_restore_and_active_source_change_detection
+1587 passed, 8 warnings in 418.92s (0:06:58)
+	Command being timed: ".venv/bin/python -m pytest -q --durations=50 --durations-min=0.25"
+	User time (seconds): 400.43
+	System time (seconds): 28.53
+	Percent of CPU this job got: 91%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 7:50.81
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 248256
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 1147
+	Minor (reclaiming a frame) page faults: 200918
+	Voluntary context switches: 81715
+	Involuntary context switches: 2215
+	Swaps: 0
+	File system inputs: 362776
+	File system outputs: 1166744
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0
