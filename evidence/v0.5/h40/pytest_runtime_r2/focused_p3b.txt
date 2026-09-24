@@ -1,0 +1,31 @@
+command: .venv/bin/python -m pytest -q tests/test_v051_h40_p3b_production_verifier_behavior_seal.py tests/test_v051_h40_p3b_production_verifier_identity_seal.py tests/test_v051_h40_p3b_production_discovery_verifier.py --durations=20
+cwd: /root/workspace/project/Quant-agent-sanitized
+tested SHA: 341a19287a90405aab6a196d68b17720ae1cfff3
+UTC timestamp: 2026-09-24T07:56:54.565323+00:00
+exit code: 0
+wall clock seconds: 96.214
+
+........................................................................ [ 64%]
+........................................                                 [100%]
+============================= slowest 20 durations =============================
+8.72s call     tests/test_v051_h40_p3b_production_verifier_behavior_seal.py::test_b15_cold_restore_rejects_tampered_exact_verifier
+8.29s call     tests/test_v051_h40_p3b_production_verifier_identity_seal.py::test_a09_foreign_verifier_cannot_cold_restore_candidate_lock
+7.96s call     tests/test_v051_h40_p3b_production_discovery_verifier.py::test_v26_valid_family_continues_after_other_families_fit_invalid
+5.94s call     tests/test_v051_h40_p3b_production_discovery_verifier.py::test_v20_deterministic_manifest_replay
+4.65s call     tests/test_v051_h40_p3b_production_verifier_identity_seal.py::test_a01_real_concrete_verifier_reaches_scientific_path
+4.56s call     tests/test_v051_h40_p3b_production_discovery_verifier.py::test_v26_v27_one_invalid_registered_member_poisons_full_family
+4.51s call     tests/test_v051_h40_p3b_production_discovery_verifier.py::test_v01_protocol_and_fit_invalid_family
+3.48s call     tests/test_v051_h40_p3b_production_verifier_identity_seal.py::test_a10_receipt_verifier_id_unchanged_on_exact_type_path
+3.45s call     tests/test_v051_h40_p3b_production_discovery_verifier.py::test_cov01_cov04_calibration_final_actions_define_coverage_population
+2.33s call     tests/test_v051_h40_p3b_production_discovery_verifier.py::test_cov_audit_persists_exact_components_and_rejects_tamper
+1.97s call     tests/test_v051_h40_p3b_production_discovery_verifier.py::test_s01_s10_samp08_samp09_metric_audit_rejects_foreign_identity[bit_generator-MT19937]
+1.91s call     tests/test_v051_h40_p3b_production_discovery_verifier.py::test_s01_s10_samp08_samp09_metric_audit_rejects_foreign_identity[start_matrix_hash-0000000000000000000000000000000000000000000000000000000000000000]
+1.88s call     tests/test_v051_h40_p3b_production_discovery_verifier.py::test_s01_s10_samp08_samp09_metric_audit_rejects_foreign_identity[metric_id-precision]
+1.79s call     tests/test_v051_h40_p3b_production_discovery_verifier.py::test_s01_s10_samp08_samp09_metric_audit_rejects_foreign_identity[protocol_id-6533000000000000000000000000000000000000000000000000000000000000]
+1.78s call     tests/test_v051_h40_p3b_production_discovery_verifier.py::test_s01_s10_samp08_samp09_metric_audit_rejects_foreign_identity[seed-0]
+1.78s call     tests/test_v051_h40_p3b_production_discovery_verifier.py::test_s01_s10_samp08_samp09_metric_audit_rejects_foreign_identity[candidate_id-0000000000000000000000000000000000000000000000000000000000000000]
+1.75s call     tests/test_v051_h40_p3b_production_discovery_verifier.py::test_s01_s10_samp08_samp09_metric_audit_rejects_foreign_identity[numpy_version-0.0.0-foreign]
+1.75s call     tests/test_v051_h40_p3b_production_discovery_verifier.py::test_s01_s10_samp08_samp09_metric_audit_rejects_foreign_identity[partition_id-WF1_CALIB]
+1.23s call     tests/test_v051_h40_p3b_production_verifier_behavior_seal.py::test_b01_b10_normal_science_and_mutable_caches
+0.86s call     tests/test_v051_h40_p3b_production_verifier_behavior_seal.py::test_mutated_scientific_result_cache_cannot_select_candidate
+112 passed in 94.98s (0:01:34)

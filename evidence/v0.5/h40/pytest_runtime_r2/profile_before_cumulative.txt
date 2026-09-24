@@ -1,0 +1,53 @@
+Thu Sep 24 15:47:13 2026    /tmp/h40_runtime_r2_before.pstats
+
+         360209600 function calls (340381451 primitive calls) in 232.946 seconds
+
+   Ordered by: cumulative time
+   List reduced from 3882 to 45 due to restriction <45>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+   1139/1    0.090    0.000  233.370  233.370 {built-in method builtins.exec}
+        1    0.000    0.000  233.370  233.370 <string>:1(<module>)
+        1    0.000    0.000  233.370  233.370 <frozen runpy>:201(run_module)
+        1    0.000    0.000  233.109  233.109 <frozen runpy>:65(_run_code)
+        1    0.000    0.000  233.109  233.109 __main__.py:1(<module>)
+        1    0.000    0.000  233.109  233.109 __init__.py:194(console_main)
+        1    0.000    0.000  233.109  233.109 __init__.py:139(main)
+  1144/69    0.001    0.000  233.076    3.378 _manager.py:111(_hookexec)
+  1144/69    0.005    0.000  233.076    3.378 _callers.py:76(_multicall)
+    854/2    0.002    0.000  233.073  116.536 _hooks.py:497(__call__)
+        1    0.000    0.000  232.545  232.545 main.py:335(pytest_cmdline_main)
+        1    0.000    0.000  232.545  232.545 main.py:276(wrap_session)
+        1    0.000    0.000  232.439  232.439 main.py:339(_main)
+    22/16    0.000    0.000  232.429   14.527 runner.py:323(from_call)
+        1    0.000    0.000  232.213  232.213 main.py:356(pytest_runtestloop)
+        5    0.000    0.000  232.212   46.442 runner.py:114(pytest_runtest_protocol)
+        5    0.000    0.000  232.209   46.442 runner.py:122(runtestprotocol)
+       15    0.000    0.000  232.209   15.481 runner.py:230(call_and_report)
+       15    0.000    0.000  232.205   15.480 runner.py:246(<lambda>)
+        5    0.000    0.000  232.170   46.434 runner.py:167(pytest_runtest_call)
+        5    0.000    0.000  232.170   46.434 python.py:1669(runtest)
+        5    0.001    0.000  232.170   46.434 python.py:150(pytest_pyfunc_call)
+       71    0.014    0.000  201.613    2.840 lifecycle_authority.py:1062(verify_against_accepted_ledger)
+       81    0.394    0.005  185.399    2.289 lifecycle_authority.py:771(materialize_runtime_source_split_authority)
+       76    0.019    0.000  173.227    2.279 lifecycle_authority.py:906(verify_runtime_source_split_authority)
+       40    0.000    0.000  106.317    2.658 lifecycle_authority.py:2844(_reverify_root_source_truth)
+     3557    6.053    0.002  103.524    0.029 split_manifest.py:88(generate_hourly_range)
+ 30049132   12.255    0.000   97.445    0.000 split_manifest.py:82(ms_to_iso)
+      157    0.003    0.000   89.688    0.571 lifecycle_authority.py:645(_accepted_production_roster)
+        1    0.001    0.001   74.869   74.869 test_v051_h40_f01_lifecycle_authority.py:2244(test_a21_through_a29_model_a_capability_lifetime)
+       27    0.000    0.000   71.663    2.654 lifecycle_authority.py:2859(_require_prior)
+ 30049348   70.612    0.000   70.612    0.000 {method 'strftime' of 'datetime.date' objects}
+       13    0.000    0.000   68.795    5.292 lifecycle_authority.py:3313(revalidate_authorization)
+       81    0.017    0.000   64.881    0.801 lifecycle_authority.py:680(_runtime_authority_components)
+       74    0.389    0.005   62.477    0.844 split_manifest.py:1022(build_runtime_authoritative)
+       10    0.001    0.000   62.050    6.205 lifecycle_authority.py:4259(persist_authorization)
+        5    0.000    0.000   61.844   12.369 lifecycle_authority.py:4853(restore_authorization)
+     11/5    0.000    0.000   61.779   12.356 lifecycle_authority.py:4509(_cold_restore_authorization)
+  1624761    1.755    0.000   61.469    0.000 canonical.py:74(canonical_sha256)
+       74    3.916    0.053   61.239    0.828 split_manifest.py:281(_compute_partitions_from_timestamps)
+        4    0.000    0.000   58.311   14.578 test_v051_h40_f01r3r1_durable_authority.py:106(_make_synthetic_chain_with_production_seal)
+        1    0.000    0.000   58.008   58.008 test_v051_h40_f01r3r1_durable_authority.py:269(test_r03_synthetic_wf_cold_restore_avoids_caller_override_path)
+  1625689    2.092    0.000   57.289    0.000 canonical.py:63(canonical_json)
+      240    0.001    0.000   54.618    0.228 search_space.py:267(materialize_h40_search_space_production)
+      240    0.343    0.001   54.617    0.228 search_space.py:308(_materialize_search_space)

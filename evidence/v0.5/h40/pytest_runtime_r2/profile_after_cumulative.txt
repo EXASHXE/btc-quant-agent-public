@@ -1,0 +1,82 @@
+Thu Sep 24 15:56:31 2026    /tmp/h40_runtime_r2_after.pstats
+
+         271315425 function calls (251487249 primitive calls) in 125.653 seconds
+
+   Ordered by: cumulative time
+   List reduced from 3884 to 45 due to restriction <45>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+   1139/1    0.098    0.000  126.075  126.075 {built-in method builtins.exec}
+        1    0.000    0.000  126.075  126.075 <string>:1(<module>)
+        1    0.000    0.000  126.075  126.075 <frozen runpy>:201(run_module)
+        1    0.000    0.000  125.915  125.915 <frozen runpy>:65(_run_code)
+        1    0.000    0.000  125.915  125.915 __main__.py:1(<module>)
+        1    0.000    0.000  125.915  125.915 __init__.py:194(console_main)
+        1    0.000    0.000  125.915  125.915 __init__.py:139(main)
+  1153/69    0.001    0.000  125.882    1.824 _manager.py:111(_hookexec)
+  1153/69    0.005    0.000  125.882    1.824 _callers.py:76(_multicall)
+    861/2    0.002    0.000  125.879   62.939 _hooks.py:497(__call__)
+        1    0.000    0.000  125.463  125.463 main.py:335(pytest_cmdline_main)
+        1    0.000    0.000  125.463  125.463 main.py:276(wrap_session)
+        1    0.000    0.000  125.342  125.342 main.py:339(_main)
+    22/16    0.000    0.000  125.335    7.833 runner.py:323(from_call)
+        1    0.000    0.000  125.071  125.071 main.py:356(pytest_runtestloop)
+        5    0.000    0.000  125.070   25.014 runner.py:114(pytest_runtest_protocol)
+        5    0.000    0.000  125.068   25.014 runner.py:122(runtestprotocol)
+       15    0.000    0.000  125.068    8.338 runner.py:230(call_and_report)
+       15    0.000    0.000  125.066    8.338 runner.py:246(<lambda>)
+        5    0.000    0.000  125.040   25.008 runner.py:167(pytest_runtest_call)
+        5    0.000    0.000  125.040   25.008 python.py:1669(runtest)
+        5    0.001    0.000  125.040   25.008 python.py:150(pytest_pyfunc_call)
+       71    0.013    0.000  108.670    1.531 lifecycle_authority.py:1062(verify_against_accepted_ledger)
+      157    0.003    0.000   89.545    0.570 lifecycle_authority.py:645(_accepted_production_roster)
+       81    0.261    0.003   78.257    0.966 lifecycle_authority.py:771(materialize_runtime_source_split_authority)
+       76    0.017    0.000   72.733    0.957 lifecycle_authority.py:906(verify_runtime_source_split_authority)
+       81    0.017    0.000   64.587    0.797 lifecycle_authority.py:680(_runtime_authority_components)
+  1624761    1.764    0.000   61.435    0.000 canonical.py:74(canonical_sha256)
+       40    0.000    0.000   58.497    1.462 lifecycle_authority.py:2844(_reverify_root_source_truth)
+  1625689    2.071    0.000   57.264    0.000 canonical.py:63(canonical_json)
+      240    0.001    0.000   54.246    0.226 search_space.py:267(materialize_h40_search_space_production)
+      240    0.326    0.001   54.245    0.226 search_space.py:308(_materialize_search_space)
+    32118    0.098    0.000   53.136    0.002 configuration_ledger.py:285(structural_configuration_hash)
+    29238    0.026    0.000   49.276    0.002 configuration_ledger.py:304(slot_hash)
+    32270    0.300    0.000   48.798    0.002 protocol_authority.py:299(compute_semantic_root_hash)
+        1    0.000    0.000   45.702   45.702 test_v051_h40_f01_lifecycle_authority.py:2347(test_a21_through_a29_model_a_capability_lifetime)
+   126692    0.939    0.000   44.843    0.000 guards.py:99(assert_path_allowed)
+      157    0.015    0.000   44.506    0.283 configuration_ledger.py:613(structural_ledger_hash)
+    40320    0.303    0.000   43.894    0.001 configuration_ledger.py:385(create)
+   126707    0.381    0.000   42.933    0.000 pathlib.py:1230(resolve)
+    40320    0.444    0.000   42.750    0.001 configuration_ledger.py:128(__post_init__)
+       27    0.000    0.000   40.010    1.482 lifecycle_authority.py:2859(_require_prior)
+  1323070    0.655    0.000   39.251    0.000 protocol_authority.py:94(_contract_hash)
+127350/127040    0.268    0.000   37.465    0.000 conftest.py:178(guarded)
+   127665    0.732    0.000   36.227    0.000 conftest.py:90(check_path)
+
+
+
+_typed_production_authority_fixture
+      5    6.372s    0.002s test_v051_h40_f01_lifecycle_authority.py:455:_typed_production_authority_fixture
+
+_make_synthetic_chain_with_production_seal
+      4   29.180s    0.000s test_v051_h40_f01r3r1_durable_authority.py:106:_make_synthetic_chain_with_production_seal
+
+_ProductionEvidenceVerifier
+      1    0.822s    0.000s test_v051_h40_f01_lifecycle_authority.py:1890:_ProductionEvidenceVerifier
+
+_invalid_fixture
+      1    0.822s    0.002s test_v051_h40_p3b_production_discovery_verifier.py:146:_invalid_fixture
+
+materialize_runtime_source_split_authority
+     81   78.257s    0.261s lifecycle_authority.py:771:materialize_runtime_source_split_authority
+
+from_verified_authority
+      5   15.298s    0.001s lifecycle_authority.py:1112:from_verified_authority
+
+generate_hourly_range
+     29    1.485s    0.086s split_manifest.py:88:generate_hourly_range
+
+_fresh_calendar_copy
+   3552    0.824s    0.126s test_v051_h40_f01_lifecycle_authority.py:579:_fresh_calendar_copy
+
+_immutable_calendar_template
+     24    0.699s    0.001s test_v051_h40_f01_lifecycle_authority.py:572:_immutable_calendar_template

@@ -1,0 +1,21 @@
+command: .venv/bin/python -m pytest -q tests/test_v051_h40_f01_lifecycle_authority.py::test_a21_through_a29_model_a_capability_lifetime tests/test_v051_h40_p3b_production_verifier_behavior_seal.py::test_b01_b10_normal_science_and_mutable_caches tests/test_v051_h40_f01r3r1_durable_authority.py::test_r03_synthetic_wf_cold_restore_avoids_caller_override_path tests/test_v051_h40_p3b_production_verifier_behavior_seal.py::test_b15_cold_restore_rejects_tampered_exact_verifier tests/test_v051_h40_p3b_production_verifier_identity_seal.py::test_a09_foreign_verifier_cannot_cold_restore_candidate_lock tests/test_v051_h40_f01_lifecycle_authority.py::test_r35_r37_r38_production_cold_restore_and_active_source_change_detection tests/test_v051_h40_f01r3r1_durable_authority.py::test_r02_synthetic_wf_revalidation_avoids_caller_override_path tests/test_v051_h40_f01r3r1_durable_authority.py::test_r05_synthetic_split_injection_remains_test_only tests/test_v051_h40_f01r3r1_durable_authority.py::test_r06_current_production_remains_not_testable_until_p3_materialization --durations=0
+cwd: /root/workspace/project/Quant-agent-sanitized
+tested SHA: 341a19287a90405aab6a196d68b17720ae1cfff3
+UTC timestamp: 2026-09-24T08:18:48.141705+00:00
+exit code: 0
+wall clock seconds: 66.796
+
+.........                                                                [100%]
+============================== slowest durations ===============================
+18.58s call     tests/test_v051_h40_f01_lifecycle_authority.py::test_a21_through_a29_model_a_capability_lifetime
+11.42s call     tests/test_v051_h40_f01r3r1_durable_authority.py::test_r03_synthetic_wf_cold_restore_avoids_caller_override_path
+8.14s call     tests/test_v051_h40_p3b_production_verifier_identity_seal.py::test_a09_foreign_verifier_cannot_cold_restore_candidate_lock
+8.06s call     tests/test_v051_h40_p3b_production_verifier_behavior_seal.py::test_b15_cold_restore_rejects_tampered_exact_verifier
+5.63s call     tests/test_v051_h40_f01_lifecycle_authority.py::test_r35_r37_r38_production_cold_restore_and_active_source_change_detection
+4.98s call     tests/test_v051_h40_f01r3r1_durable_authority.py::test_r02_synthetic_wf_revalidation_avoids_caller_override_path
+4.11s call     tests/test_v051_h40_f01r3r1_durable_authority.py::test_r06_current_production_remains_not_testable_until_p3_materialization
+3.62s call     tests/test_v051_h40_f01r3r1_durable_authority.py::test_r05_synthetic_split_injection_remains_test_only
+1.20s call     tests/test_v051_h40_p3b_production_verifier_behavior_seal.py::test_b01_b10_normal_science_and_mutable_caches
+
+(18 durations < 0.005s hidden.  Use -vv to show these durations.)
+9 passed in 65.94s (0:01:05)

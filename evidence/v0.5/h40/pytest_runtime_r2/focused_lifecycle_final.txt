@@ -1,0 +1,42 @@
+command: .venv/bin/python -m pytest -q tests/test_v051_h40_f01_lifecycle_authority.py tests/test_v051_h40_f01r3r1_durable_authority.py tests/test_v051_h40_f01r3r2_commit_authority.py tests/test_v051_h40_f01r3r3_api_seal.py tests/test_v051_h40_f01r3r4_lineage_durability.py tests/test_v051_h40_implementation_authority_publication.py --durations=30
+cwd: /root/workspace/project/Quant-agent-sanitized
+tested SHA: 341a19287a90405aab6a196d68b17720ae1cfff3
+UTC timestamp: 2026-09-24T08:26:23.389982+00:00
+exit code: 0
+wall clock seconds: 88.658
+
+........................................................................ [ 38%]
+........................................................................ [ 77%]
+.........................................                                [100%]
+============================= slowest 30 durations =============================
+14.30s call     tests/test_v051_h40_f01_lifecycle_authority.py::test_cached_calendar_preserves_full_cold_authority_and_state_isolation
+7.12s call     tests/test_v051_h40_f01_lifecycle_authority.py::test_a00_production_seal_derives_typed_verified_authority
+6.42s call     tests/test_v051_h40_f01_lifecycle_authority.py::test_a21_through_a29_model_a_capability_lifetime
+4.17s call     tests/test_v051_h40_f01r3r1_durable_authority.py::test_r03_synthetic_wf_cold_restore_avoids_caller_override_path
+2.34s call     tests/test_v051_h40_f01r3r4_lineage_durability.py::test_r56_intact_committed_head_and_legitimate_ancestors_succeed
+2.13s call     tests/test_v051_h40_f01_lifecycle_authority.py::test_r35_r37_r38_production_cold_restore_and_active_source_change_detection
+1.96s call     tests/test_v051_h40_f01_lifecycle_authority.py::test_a05_split_assert_authoritative_failure_propagates
+1.88s call     tests/test_v051_h40_f01r3r1_durable_authority.py::test_r02_synthetic_wf_revalidation_avoids_caller_override_path
+1.83s call     tests/test_v051_h40_f01r3r1_durable_authority.py::test_r04_persisted_split_mismatch_fails_closed
+1.77s call     tests/test_v051_h40_f01r3r1_durable_authority.py::test_r06_current_production_remains_not_testable_until_p3_materialization
+1.62s call     tests/test_v051_h40_f01r3r1_durable_authority.py::test_r05_synthetic_split_injection_remains_test_only
+1.55s call     tests/test_v051_h40_f01r3r2_commit_authority.py::test_r36_stale_cached_production_authorization_fails_after_invalidation
+1.55s call     tests/test_v051_h40_f01r3r3_api_seal.py::test_r48_stale_cached_production_authorization_cannot_directly_commit
+1.49s call     tests/test_v051_h40_f01r3r4_lineage_durability.py::test_r65_intact_authoritative_receipts_restore_successfully
+1.37s call     tests/test_v051_h40_f01r3r1_durable_authority.py::test_r01_synthetic_initial_wf_uses_internally_derived_authority
+1.26s call     tests/test_v051_h40_f01r3r1_durable_authority.py::test_r23_termination_source_disappears_fails_closed
+1.12s call     tests/test_v051_h40_f01r3r1_durable_authority.py::test_r24_termination_source_mutates_fails_closed
+1.06s call     tests/test_v051_h40_f01_lifecycle_authority.py::test_a08_through_a14_durable_single_run_head
+1.00s call     tests/test_v051_h40_f01_lifecycle_authority.py::test_r31_r33_cross_source_split_attestation_and_roster_pairs_rejected
+0.90s call     tests/test_v051_h40_f01_lifecycle_authority.py::test_r39_r43_substitution_replay_and_constructor_boundaries
+0.81s call     tests/test_v051_h40_f01_lifecycle_authority.py::test_r24_r26_legacy_synthetic_and_schedule_only_authority_rejected
+0.76s call     tests/test_v051_h40_f01_lifecycle_authority.py::test_production_verifier_fixture_keeps_evidence_and_resolver_per_test
+0.68s call     tests/test_v051_h40_f01_lifecycle_authority.py::test_a42_through_a45_generic_source_descriptor_equality
+0.65s call     tests/test_v051_h40_f01_lifecycle_authority.py::test_a14_cold_restore_without_original_authorization_object
+0.65s call     tests/test_v051_h40_f01_lifecycle_authority.py::test_a19_cold_restore_reruns_verifier_result
+0.62s call     tests/test_v051_h40_f01_lifecycle_authority.py::test_r17_r23_active_evidence_exactness_and_tamper_rejection[R22-membership-hash]
+0.62s call     tests/test_v051_h40_f01_lifecycle_authority.py::test_r27_r30_runtime_split_mutations_rejected[R29-count]
+0.61s call     tests/test_v051_h40_f01_lifecycle_authority.py::test_r17_r23_active_evidence_exactness_and_tamper_rejection[R19-record-hash]
+0.60s call     tests/test_v051_h40_f01_lifecycle_authority.py::test_r27_r30_runtime_split_mutations_rejected[R28-fold]
+0.59s call     tests/test_v051_h40_f01_lifecycle_authority.py::test_r17_r23_active_evidence_exactness_and_tamper_rejection[R20-receipt-hash]
+185 passed in 87.49s (0:01:27)
