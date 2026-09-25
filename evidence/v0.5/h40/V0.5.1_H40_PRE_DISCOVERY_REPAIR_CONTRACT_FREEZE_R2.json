@@ -1,0 +1,319 @@
+{
+  "audit_source": {
+    "astra_audit_commit": "4f5786a25a5e25db32505a99445a3a42c62f7446",
+    "blocking_findings": [
+      "R2-F01",
+      "R2-F02",
+      "R2-F03",
+      "R2-F04"
+    ],
+    "controller_triage_commit": "6f65db5fa7816a2fdbf340192b6a2a34847ae037",
+    "implementation_sha": "d63c1fbb471405e6b08eecdf544d39c7e4a1a9b6"
+  },
+  "authorization_state": [
+    "H40_P3_NOT_AUTHORIZED",
+    "H40_DISCOVERY_NOT_AUTHORIZED"
+  ],
+  "canonical_hash_algorithm": "sort_keys=true, separators=(',', ':'), ensure_ascii=false, allow_nan=false, utf-8 encoding, sha256 hex digest",
+  "controller_authorization_contract": {
+    "accepted_hash_constant": "ACCEPTED_H40_P3_CONTROLLER_AUTHORITY_HASH",
+    "accepted_hash_pre_authorization_value": null,
+    "discovery_receipt_upgrade": {
+      "added_fields": [
+        "controller_authority_hash",
+        "discovery_run_grant_hash"
+      ],
+      "new_schema": "H40_RECEIPT_DISCOVERY_AUTH_V3",
+      "old_schema": "H40_RECEIPT_DISCOVERY_AUTH_V2"
+    },
+    "persistence_context_upgrade": {
+      "added_fields": [
+        "controller_authority_hash",
+        "discovery_run_grant_hash"
+      ],
+      "new_schema": "H40_LIFECYCLE_PERSISTENCE_CONTEXT_V2",
+      "old_schema": "H40_LIFECYCLE_PERSISTENCE_CONTEXT_V1"
+    },
+    "run_grant_schema": {
+      "exact_fields": [
+        "authorized_at_utc",
+        "controller_authority_hash",
+        "discovery_provenance_contract_hash",
+        "execution_disabled",
+        "lifecycle_governance_authority_hash",
+        "lifecycle_implementation_authority_hash",
+        "materialized_run_authority_hash",
+        "permitted_partitions",
+        "protocol_authority_hash",
+        "run_authority_id",
+        "runtime_authority_snapshot_hash",
+        "schema_id",
+        "scientific_semantic_root_hash",
+        "sealed_registered_roster_hash",
+        "source_manifest_hash",
+        "split_attestation_hash",
+        "split_manifest_hash",
+        "structural_ledger_hash"
+      ],
+      "schema_id": "H40_DISCOVERY_RUN_GRANT_V1"
+    },
+    "static_authority_schema": {
+      "exact_fields": [
+        "authorization_scope",
+        "controller_acceptance_artifact_path",
+        "controller_acceptance_commit_sha",
+        "discovery_provenance_contract_hash",
+        "discovery_selection_correction_contract_hash",
+        "execution_disabled",
+        "lifecycle_governance_authority_hash",
+        "lifecycle_implementation_authority_hash",
+        "lifecycle_semantic_root_hash",
+        "permitted_partitions",
+        "protocol_authority_hash",
+        "schema_id",
+        "scientific_semantic_root_hash",
+        "structural_ledger_hash",
+        "transition_source_state",
+        "transition_target_state"
+      ],
+      "schema_id": "H40_P3_CONTROLLER_AUTHORITY_V1"
+    }
+  },
+  "controller_blocker_artifact_path": "reviews/v0.5/V0.5.1_H40_PRE_DISCOVERY_REPAIR_CONTRACT_CONTROLLER_BLOCKER.md",
+  "controller_blocker_commit_sha": "72c944d4e9d2a8655f384b5d9ffd17e9996a7bd9",
+  "current_lifecycle_governance_replay_check": {
+    "computed_hash": "7e9433aa2ee706dda61871c6ad2b1a1aee4cf7a8f9b6365351942096b5347c84",
+    "expected_hash": "7e9433aa2ee706dda61871c6ad2b1a1aee4cf7a8f9b6365351942096b5347c84",
+    "match": true
+  },
+  "current_lifecycle_root_replay_check": {
+    "computed_hash": "846591f8eac0e1abbedaeeff4c2b0bb7648fe51bdaf981e3309c6f6c440aba8e",
+    "expected_hash": "846591f8eac0e1abbedaeeff4c2b0bb7648fe51bdaf981e3309c6f6c440aba8e",
+    "match": true
+  },
+  "discovery_provenance_contract_hash": "31fc3930e44149e6b3af54ddd3b11c630f95cbbd3f152b3d0d5e614690dcf7ae",
+  "discovery_provenance_contract_preimage": {
+    "prefit_reconstruction_contract": {
+      "cache_authority": "DERIVATIVE_ONLY",
+      "causality_rule": "close_time < decision_t",
+      "contract_id": "H40_CAUSAL_PREFIT_RECONSTRUCTION_V1",
+      "decision_evidence_schema_id": "H40_P3B_RAW_DECISIONS_V2",
+      "prefit_outputs": [
+        "regime_state",
+        "opportunity_state",
+        "raw_score",
+        "secondary_filter_state"
+      ],
+      "retrospective_calibration_preserved": true,
+      "transported_prefit_values_are_authority": false
+    },
+    "schema_id": "H40_DISCOVERY_PROVENANCE_CONTRACT_V1",
+    "source_value_extraction_contract": {
+      "active_source_policy": "EXACT_RUNTIME_SEAL_ACTIVE_REQUIRED_SOURCES",
+      "canonical_numeric_rule": "FINITE_IEEE754_BINARY64_CANONICAL_REPR_DECIMAL",
+      "contract_id": "H40_SOURCE_VALUE_EXTRACTION_V1",
+      "economic_fields": [
+        "open",
+        "high",
+        "low",
+        "close"
+      ],
+      "missing_adapter_behavior": "NOT_TESTABLE",
+      "source_evidence_schema_id": "H40_P3B_SOURCE_DERIVATION_V2",
+      "source_support_end_utc_exclusive": "2023-02-01T00:00:00Z",
+      "source_support_start_utc": "2021-01-01T00:00:00Z",
+      "timestamp_rule": "VERIFIED_RECEIPT_TIMESTAMP_FIELD; 1H UTC UNIQUE SORTED",
+      "verification_rule": "VERIFIER_REEXTRACTS_FROM_SEALED_SOURCE_BYTES"
+    }
+  },
+  "final_status": "REPAIR_CONTRACT_FREEZE_R2_READY_FOR_CONTROLLER_REVIEW",
+  "finding_contracts": {
+    "R2-F01": {
+      "repair": "typed controller authority + exact run grant",
+      "status": "CONTRACT_FROZEN"
+    },
+    "R2-F02": {
+      "repair": "verifier independently reextracts economic values from sealed source bytes",
+      "status": "CONTRACT_FROZEN"
+    },
+    "R2-F03": {
+      "repair": "verifier recomputes causal prefit state/raw_score from accepted source history",
+      "science_reference_commit": "77601342ac9055b5c0bb47639d4c8ef7d83da154",
+      "status": "CONTRACT_FROZEN"
+    },
+    "R2-F04": {
+      "repair": "write-once service authority configuration + current-anchor revalidation",
+      "status": "CONTRACT_FROZEN"
+    }
+  },
+  "frozen_protocol_authority_hash": "a83f8fc7a5ca7109fb8cd7fed114d87c3b2c968b5145c11cada203aa5111d1ce",
+  "frozen_science": {
+    "changed": false,
+    "protocol_authority_hash": "a83f8fc7a5ca7109fb8cd7fed114d87c3b2c968b5145c11cada203aa5111d1ce",
+    "scientific_semantic_root": "71889a35f227ed734272b712851174a69bf9dbb12ea3f87cd84c26e7c66f6af1",
+    "structural_ledger_hash": "483f68502b57972deae071c7bd4587ca3e57ccaa72bd99fb0de07b4f0ab8c85f"
+  },
+  "frozen_scientific_semantic_root_hash": "71889a35f227ed734272b712851174a69bf9dbb12ea3f87cd84c26e7c66f6af1",
+  "frozen_structural_ledger_hash": "483f68502b57972deae071c7bd4587ca3e57ccaa72bd99fb0de07b4f0ab8c85f",
+  "identity_impact_matrix": {
+    "controller_p3_authority": "NEW_SEPARATE_IDENTITY_PENDING_STAGE_A_B_AND_CONTROLLER_ACCEPTANCE",
+    "discovery_provenance_contract": "RE-MATERIALIZED_CANDIDATE_31fc3930e44149e6b3af54ddd3b11c630f95cbbd3f152b3d0d5e614690dcf7ae_MUST_BE_EXPLICITLY_ACCEPTED_LATER",
+    "discovery_receipt": "MUST_CHANGE_TO_V3",
+    "discovery_run_grant": "NEW_SEPARATE_IDENTITY_PER_RUN",
+    "lifecycle_child_contract_hashes": "NOT_MATERIALIZED_IN_THIS_TASK",
+    "lifecycle_governance_authority": "NOT_MATERIALIZED_IN_THIS_TASK",
+    "lifecycle_implementation_authority": "NOT_PUBLISHED",
+    "lifecycle_semantic_root": "NOT_MATERIALIZED_IN_THIS_TASK",
+    "protocol_authority_hash": "UNCHANGED",
+    "raw_decision_evidence": "MUST_CHANGE_TO_RAW_DECISIONS_V2",
+    "run_authority_id": "MUST_CHANGE",
+    "run_authority_schema": "UNCHANGED",
+    "runtime_seal_identity": "UNCHANGED",
+    "scientific_semantic_root": "UNCHANGED",
+    "source_evidence": "MUST_CHANGE_TO_SOURCE_DERIVATION_V2",
+    "source_manifest_identity": "UNCHANGED",
+    "split_identity": "UNCHANGED",
+    "structural_ledger_hash": "UNCHANGED"
+  },
+  "implementation_baseline_sha": "d63c1fbb471405e6b08eecdf544d39c7e4a1a9b6",
+  "implementation_staging": {
+    "implementation_authority_republication": "DEFER_UNTIL_STAGE_A_AND_STAGE_B_AND_EXACT_SHA_EVIDENCE_PASS",
+    "recommendation": "TWO_STAGES",
+    "stage_A": "R2-F01+R2-F04 authority/lifecycle repair; both accepted production authority constants remain None",
+    "stage_B": "R2-F02+R2-F03 source-value and causal-prefit provenance repair using accepted R3R2 science"
+  },
+  "lifecycle_governance_versioning": {
+    "current_schema": "H40_LIFECYCLE_GOVERNANCE_AUTHORITY_V4",
+    "exact_new_hash": "TO_BE_COMPUTED_AFTER_CONTROLLER_CONTRACT_ACCEPTANCE_COMMIT_EXISTS",
+    "new_identity_field": "pre_discovery_repair_contract_acceptance_identity",
+    "prior_hash": "7e9433aa2ee706dda61871c6ad2b1a1aee4cf7a8f9b6365351942096b5347c84",
+    "required_schema": "H40_LIFECYCLE_GOVERNANCE_AUTHORITY_V5",
+    "status": "NOT_MATERIALIZED_IN_THIS_TASK"
+  },
+  "migration_policy": {
+    "historical_docs_and_evidence": "RETAIN_AUDITABLE_NO_SILENT_UPGRADE",
+    "historical_r1_contract": "HISTORICAL_SUPERSEDED_FOR_FUTURE_REPAIR_CONTRACT_AUTHORITY",
+    "old_discovery_receipt_v2": "INVALID_FOR_PRODUCTION",
+    "old_lifecycle_implementation_authority": "SUPERSEDED_AND_REJECTED",
+    "old_p3b_raw_decisions_v1": "INVALID_FOR_PRODUCTION_BUT_MAY_REMAIN_SYNTHETIC",
+    "old_p3b_source_hours_v1": "INVALID_FOR_PRODUCTION_BUT_MAY_REMAIN_SYNTHETIC",
+    "old_persistence_context_v1": "INVALID_FOR_PRODUCTION",
+    "old_run_authority": "INVALID_AFTER_NEW_GOVERNANCE_IMPLEMENTATION_IDENTITY",
+    "r2_contract_status": "CURRENT_CONTRACT_CANDIDATE_PENDING_CONTROLLER_ACCEPTANCE",
+    "source_manifest_split_runtime_seal": "REPLAYABLE_AFTER_COLD_REVALIDATION"
+  },
+  "protected_surface_attestation": {
+    "confirmation_accessed": false,
+    "execution_authority_changed": false,
+    "execution_policy": "RESEARCH_DISABLED_V1",
+    "final_holdout_accessed": false,
+    "h39_outcome_accessed": false,
+    "h40_discovery_authorized": false,
+    "h40_p3_authorized": false,
+    "implementation_branch_modified": false,
+    "protected_outcome_accessed": false,
+    "real_candidate_ranking_performed": false,
+    "real_h40_outcome_computed": false,
+    "real_wf1_calibration_computed": false,
+    "signed_exchange_network_execution": false
+  },
+  "provenance_replay_check": {
+    "computed_hash": "31fc3930e44149e6b3af54ddd3b11c630f95cbbd3f152b3d0d5e614690dcf7ae",
+    "expected_hash": "31fc3930e44149e6b3af54ddd3b11c630f95cbbd3f152b3d0d5e614690dcf7ae",
+    "match": true
+  },
+  "r1_contract_docs_sha": "6dedefbd0776b36891cfaa553f3a27f23c604648",
+  "raw_decisions_v2_schema": {
+    "exact_row_fields": [
+      "final_action",
+      "p_up",
+      "product",
+      "r_h",
+      "r_net",
+      "timestamp"
+    ],
+    "exact_top_level_fields": [
+      "partition_id",
+      "policies",
+      "provenance_contract_hash",
+      "rows",
+      "run_authority_id",
+      "schema_id",
+      "sealed_registered_roster_hash",
+      "source_evidence_hash",
+      "source_manifest_hash",
+      "split_manifest_hash",
+      "structural_configuration_hash"
+    ],
+    "removed_authoritative_prefit_fields": [
+      "regime_state",
+      "opportunity_state",
+      "raw_score",
+      "secondary_filter_state"
+    ],
+    "schema_id": "H40_P3B_RAW_DECISIONS_V2"
+  },
+  "regression_plan": {
+    "F01": [
+      "no controller authority refuses Discovery",
+      "bound authority/grant limits run/source/split/partitions",
+      "cold restore rechecks grant"
+    ],
+    "F02": [
+      "sealed bytes reproduce economic identity",
+      "non-derived economic identity refused",
+      "cold replay reproduces identity",
+      "missing adapter NOT_TESTABLE"
+    ],
+    "F03": [
+      "D1/D2/D3/R_VOL/O_RANGE match R3R2",
+      "later observations do not alter earlier prefit rows",
+      "close_time equality unavailable",
+      "lookback reserve support only",
+      "retrospective calibration unchanged"
+    ],
+    "F04": [
+      "fresh/current authority accepted",
+      "historical authority refused at authoritative boundaries",
+      "persist/restore cannot revive stale authority"
+    ]
+  },
+  "schema_id": "V0.5.1_H40_PRE_DISCOVERY_REPAIR_CONTRACT_FREEZE_R2_V1",
+  "semantic_change_summary": {
+    "f01_controller_authorization": "PRESERVED_EXACT",
+    "f02_source_value_extraction": "PRESERVED_EXACT",
+    "f03_causal_prefit_reconstruction": "PRESERVED_EXACT",
+    "f04_service_authority_lifetime": "PRESERVED_EXACT",
+    "provenance_identity_repair": "EXPLICIT_CANONICAL_PREIMAGE_FROZEN_SELF_REPORTED_HASH_REMOVED_FROM_PREIMAGE",
+    "scientific_formulas": "UNCHANGED"
+  },
+  "source_derivation_v2_schema": {
+    "active_source_entry_fields": [
+      "cadence",
+      "economic_row_count",
+      "economic_rows_sha256",
+      "locator",
+      "product",
+      "source_file_sha256",
+      "source_id",
+      "source_validation_receipt_sha256",
+      "timestamp_field"
+    ],
+    "exact_top_level_fields": [
+      "active_source_derivations",
+      "base_eligible_membership",
+      "policies",
+      "provenance_contract_hash",
+      "run_authority_id",
+      "schema_id",
+      "source_manifest_hash",
+      "source_support",
+      "split_attestation_hash",
+      "split_manifest_hash"
+    ],
+    "schema_id": "H40_P3B_SOURCE_DERIVATION_V2",
+    "transported_bar_values": false
+  },
+  "supersedes_contract": "V0.5.1_H40_PRE_DISCOVERY_REPAIR_CONTRACT_FREEZE_R1",
+  "unresolved_questions": []
+}
