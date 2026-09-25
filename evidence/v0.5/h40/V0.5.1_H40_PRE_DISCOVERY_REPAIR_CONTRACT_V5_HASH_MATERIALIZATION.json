@@ -1,0 +1,437 @@
+{
+  "schema_id": "V0.5.1_H40_PRE_DISCOVERY_REPAIR_CONTRACT_V5_HASH_MATERIALIZATION_V1",
+  "reviewed_contract_docs_sha": "cf7b1c9b9547f3e9e6dfab964d7d2c6d1bb35de3",
+  "reviewed_contract_artifacts": [
+    "reviews/v0.5/V0.5.1_H40_PRE_DISCOVERY_REPAIR_CONTRACT_FREEZE_R2.md",
+    "evidence/v0.5/h40/V0.5.1_H40_PRE_DISCOVERY_REPAIR_CONTRACT_FREEZE_R2.json"
+  ],
+  "acceptance_artifact_path": "reviews/v0.5/V0.5.1_H40_PRE_DISCOVERY_REPAIR_CONTRACT_CONTROLLER_ACCEPTANCE.md",
+  "acceptance_commit_sha": "2229d44c5cc9b88ba515d0b2931d20f05936c7e8",
+  "implementation_baseline_sha": "d63c1fbb471405e6b08eecdf544d39c7e4a1a9b6",
+  "canonical_hash_algorithm": "sort_keys=true, separators=(',', ':'), ensure_ascii=false, allow_nan=false, utf-8 encoding, sha256 hex digest",
+  "prior_lifecycle_child_hashes": {
+    "discovery_authorization_receipt_contract": "8889aaec90e6b25efa9f269ccd38af13be32c665a72248342d01dc145c860b65",
+    "candidate_lock_receipt_contract": "96756dfebab636baa1abb33364e307d99d90a61572b813c6a60504283d3d42df",
+    "wf_validation_receipt_contract": "bb5698a85daec1a5b9dcd169bde3d575befe8c0a1d73c2e87136cf35afb4001b",
+    "confirmation_ready_receipt_contract": "7ab0ae0c8acb17340eccaa2bb737a5300e679b8de7497a539bdc44e93d3109be",
+    "termination_receipt_contract": "b45c7021db1c63a447ddb22a1f9cb787ce71a5048c824ce38d40f19f755ecb48",
+    "transition_matrix_contract": "a4df11b3a0f3fabef1fa2b28e0a9f38500dcd6bb9111c4afdd9000bb238d0ddc",
+    "persistence_replay_contract": "5f014b867be17019c2be91ff48f8e23a43ed29678fc5589430ba174046fceaae",
+    "runtime_snapshot_seal_contract": "76a0732742707c78f65da26263076bed7b586ea67d4f5ddd2dac33761e37e612",
+    "f02_boundary_contract": "5678d8bd6b83bb69e1a1ad2cf78af8ddbaece625a5a34b7018b0a5e6368756f4"
+  },
+  "new_lifecycle_child_hashes": {
+    "discovery_authorization_receipt_contract": "3dd91827d4a26441bd5218dc299f196841c471eb60f20e03881d2ad56ce36898",
+    "candidate_lock_receipt_contract": "96756dfebab636baa1abb33364e307d99d90a61572b813c6a60504283d3d42df",
+    "wf_validation_receipt_contract": "bb5698a85daec1a5b9dcd169bde3d575befe8c0a1d73c2e87136cf35afb4001b",
+    "confirmation_ready_receipt_contract": "7ab0ae0c8acb17340eccaa2bb737a5300e679b8de7497a539bdc44e93d3109be",
+    "termination_receipt_contract": "b45c7021db1c63a447ddb22a1f9cb787ce71a5048c824ce38d40f19f755ecb48",
+    "transition_matrix_contract": "bea7b0593251204bbc9138c325f1c9f10ccf7a9b8df60f10bf991377e0ced42d",
+    "persistence_replay_contract": "51e4fe6155d388c076dd1788a100265eb17b232300481a3fbcf00150f1432de1",
+    "runtime_snapshot_seal_contract": "76a0732742707c78f65da26263076bed7b586ea67d4f5ddd2dac33761e37e612",
+    "f02_boundary_contract": "5678d8bd6b83bb69e1a1ad2cf78af8ddbaece625a5a34b7018b0a5e6368756f4"
+  },
+  "changed_child_names": [
+    "discovery_authorization_receipt_contract",
+    "transition_matrix_contract",
+    "persistence_replay_contract"
+  ],
+  "unchanged_child_names": [
+    "candidate_lock_receipt_contract",
+    "wf_validation_receipt_contract",
+    "confirmation_ready_receipt_contract",
+    "termination_receipt_contract",
+    "runtime_snapshot_seal_contract",
+    "f02_boundary_contract"
+  ],
+  "changed_child_contracts": {
+    "discovery_authorization_receipt_contract": {
+      "authority_rules": [
+        "transition_api_constructs_receipt_only_after_recomputing_all_bound_authorities",
+        "caller_object_path_boolean_or_label_is_not_authority",
+        "upstream_receipt_hash_must_be_null",
+        "run_authority_id_must_recompute_under_H40_RUN_AUTHORITY_V1",
+        "lifecycle_implementation_authority_hash_must_be_independently_accepted",
+        "sealed_registered_roster_hash_and_counts_must_match_materialized_run_authority",
+        "execution_disabled_must_be_true",
+        "controller_authority_hash_must_equal_current_in_process_ACCEPTED_H40_P3_CONTROLLER_AUTHORITY_HASH",
+        "discovery_run_grant_hash_must_recompute_under_H40_DISCOVERY_RUN_GRANT_V1_and_bind_current_controller_run_runtime_source_split_roster_and_execution_disabled",
+        "production_discovery_receipt_v2_is_invalid_under_lifecycle_v5",
+        "every_production_authoritative_boundary_rechecks_current_in_process_lifecycle_implementation_and_controller_authority_anchors",
+        "superseded_long_lived_production_service_authority_fails_closed",
+        "hot_authority_republication_requires_new_process_or_service_identity"
+      ],
+      "authorized_transition": [
+        "H40_P1_SCAFFOLDED",
+        "H40_DISCOVERY"
+      ],
+      "implementation_authority_object": {
+        "canonical_field_names": [
+          "accepted_lifecycle_governance_authority_hash",
+          "f01_implementation_acceptance_artifact_path",
+          "f01_implementation_acceptance_commit_sha",
+          "f01_implementation_commit_sha",
+          "required_test_ci_evidence_identity",
+          "schema_id"
+        ],
+        "required_test_ci_evidence_identity_fields": [
+          "evidence_manifest_artifact_path",
+          "evidence_manifest_sha256",
+          "tested_commit_sha"
+        ],
+        "schema_id": "H40_LIFECYCLE_IMPLEMENTATION_AUTHORITY_V1"
+      },
+      "receipt_field_contract": {
+        "authorized_at_utc": "audit_timestamp_utc",
+        "discovery_selection_correction_contract_hash": "constant:f84c97050c7db813263e5ffda6b1c556af0b7b0e2876bb8616640d2c9d67084b",
+        "execution_disabled": "constant:true",
+        "lifecycle_governance_authority_hash": "accepted_sha256",
+        "lifecycle_implementation_authority_hash": "accepted_sha256",
+        "materialized_run_authority_hash": "sha256",
+        "not_testable_slot_count": "integer_gte_0",
+        "protocol_authority_hash": "constant:a83f8fc7a5ca7109fb8cd7fed114d87c3b2c968b5145c11cada203aa5111d1ce",
+        "receipt_schema_id": "constant:H40_RECEIPT_DISCOVERY_AUTH_V3",
+        "registered_slot_count": "integer_gte_0",
+        "run_authority_id": "sha256",
+        "sealed_registered_roster_hash": "sha256",
+        "semantic_root_hash": "constant:71889a35f227ed734272b712851174a69bf9dbb12ea3f87cd84c26e7c66f6af1",
+        "source_manifest_hash": "sha256",
+        "split_attestation_hash": "sha256",
+        "split_manifest_hash": "sha256",
+        "structural_ledger_hash": "constant:483f68502b57972deae071c7bd4587ca3e57ccaa72bd99fb0de07b4f0ab8c85f",
+        "total_slot_count": "integer_gt_0",
+        "upstream_receipt_hash": "constant:null",
+        "controller_authority_hash": "sha256_equal_current_in_process_ACCEPTED_H40_P3_CONTROLLER_AUTHORITY_HASH",
+        "discovery_run_grant_hash": "sha256_of_exact_current_H40_DISCOVERY_RUN_GRANT_V1"
+      },
+      "receipt_hash_rule": "canonical_sha256(exact_receipt_field_contract_keys_only)",
+      "receipt_schema_id": "H40_RECEIPT_DISCOVERY_AUTH_V3",
+      "schema_id": "H40_LIFECYCLE_CHILD_DISCOVERY_AUTHORIZATION_V1",
+      "controller_authority_object": {
+        "accepted_hash_constant": "ACCEPTED_H40_P3_CONTROLLER_AUTHORITY_HASH",
+        "accepted_hash_pre_authorization_value": null,
+        "canonical_field_names": [
+          "authorization_scope",
+          "controller_acceptance_artifact_path",
+          "controller_acceptance_commit_sha",
+          "discovery_provenance_contract_hash",
+          "discovery_selection_correction_contract_hash",
+          "execution_disabled",
+          "lifecycle_governance_authority_hash",
+          "lifecycle_implementation_authority_hash",
+          "lifecycle_semantic_root_hash",
+          "permitted_partitions",
+          "protocol_authority_hash",
+          "schema_id",
+          "scientific_semantic_root_hash",
+          "structural_ledger_hash",
+          "transition_source_state",
+          "transition_target_state"
+        ],
+        "fixed_policy": {
+          "authorization_scope": "H40_P3_DISCOVERY_V1",
+          "execution_disabled": true,
+          "permitted_partitions": [
+            "WF1_TRAIN",
+            "WF1_CALIBRATION"
+          ],
+          "transition_source_state": "H40_P1_SCAFFOLDED",
+          "transition_target_state": "H40_DISCOVERY"
+        },
+        "schema_id": "H40_P3_CONTROLLER_AUTHORITY_V1"
+      },
+      "discovery_run_grant_object": {
+        "canonical_field_names": [
+          "authorized_at_utc",
+          "controller_authority_hash",
+          "discovery_provenance_contract_hash",
+          "execution_disabled",
+          "lifecycle_governance_authority_hash",
+          "lifecycle_implementation_authority_hash",
+          "materialized_run_authority_hash",
+          "permitted_partitions",
+          "protocol_authority_hash",
+          "run_authority_id",
+          "runtime_authority_snapshot_hash",
+          "schema_id",
+          "scientific_semantic_root_hash",
+          "sealed_registered_roster_hash",
+          "source_manifest_hash",
+          "split_attestation_hash",
+          "split_manifest_hash",
+          "structural_ledger_hash"
+        ],
+        "derivation_rule": "derived_from_currently_accepted_controller_authority_plus_exact_verified_run_authority_and_runtime_snapshot_seal",
+        "execution_disabled": true,
+        "permitted_partitions": [
+          "WF1_TRAIN",
+          "WF1_CALIBRATION"
+        ],
+        "schema_id": "H40_DISCOVERY_RUN_GRANT_V1"
+      }
+    },
+    "transition_matrix_contract": {
+      "global_rules": [
+        "state_adjacency_is_necessary_never_sufficient",
+        "current_executable_HEAD_is_never_required_to_equal_historical_P1_commit",
+        "P1_scaffold_transition_verifies_historical_acceptance_artifact_integrity_and_frozen_scientific_identity",
+        "executable_authority_for_discovery_is_the_accepted_lifecycle_implementation_authority",
+        "all_unlisted_transitions_are_forbidden",
+        "terminal_states_are_absorbing",
+        "H40_P1_SCAFFOLDED_to_H40_DISCOVERY_requires_current_accepted_controller_authority_and_matching_exact_run_grant",
+        "every_production_transition_authorization_rechecks_current_in_process_lifecycle_implementation_and_controller_authority_anchors",
+        "superseded_long_lived_production_service_authority_fails_closed",
+        "hot_authority_republication_requires_new_process_or_service_identity"
+      ],
+      "historical_scaffold_lineage": {
+        "p1_accepted_code_baseline_commit_sha": "1ddb8eea3259791cf213be03f09557396a03160f",
+        "p1_final_acceptance_commit_sha": "1141baec371d53978c5d9751607979fee21464b3",
+        "p2_acceptance_record_commit_sha": "52ca0cdb53e5c2dd579ddf4a884d671825f970df",
+        "p2_accepted_code_baseline_commit_sha": "ac5e3a1d6c1423f7fe9639e2f5f78095df27d400",
+        "p2_final_acceptance_commit_sha": "3208ca92525ed88d31635a6ac9ce9cd4ac6ec725",
+        "p2r1_implementation_commit_sha": "81dc2f9bb9a203cb4c72dc6a646aafab1f1985d0",
+        "rule": "verify_historical_lineage_and_artifact_integrity_only_never_current_executable_HEAD_equality"
+      },
+      "rows": [
+        {
+          "authority": "P1_LINEAGE_VERIFIER_V1",
+          "source": "H40_PREREGISTERED",
+          "target": "H40_P1_SCAFFOLDED"
+        },
+        {
+          "authority": "H40_RECEIPT_DISCOVERY_AUTH_V3",
+          "source": "H40_P1_SCAFFOLDED",
+          "target": "H40_DISCOVERY"
+        },
+        {
+          "authority": "H40_RECEIPT_TERMINATION_V2",
+          "source": "H40_P1_SCAFFOLDED",
+          "target": "H40_NO_GO"
+        },
+        {
+          "authority": "H40_RECEIPT_TERMINATION_V2",
+          "source": "H40_P1_SCAFFOLDED",
+          "target": "NOT_TESTABLE"
+        },
+        {
+          "authority": "H40_RECEIPT_CANDIDATE_LOCK_V2_AFTER_RESULT_RECOMPUTATION",
+          "source": "H40_DISCOVERY",
+          "target": "H40_CANDIDATE_LOCKED"
+        },
+        {
+          "authority": "H40_RECEIPT_TERMINATION_V2",
+          "source": "H40_DISCOVERY",
+          "target": "H40_NO_GO"
+        },
+        {
+          "authority": "H40_RECEIPT_TERMINATION_V2",
+          "source": "H40_DISCOVERY",
+          "target": "NOT_TESTABLE"
+        },
+        {
+          "authority": "H40_RECEIPT_WF_VALIDATION_V2_AFTER_RESULT_RECOMPUTATION",
+          "source": "H40_CANDIDATE_LOCKED",
+          "target": "H40_WALK_FORWARD_VALIDATED"
+        },
+        {
+          "authority": "H40_RECEIPT_TERMINATION_V2_NO_RUNNER_UP",
+          "source": "H40_CANDIDATE_LOCKED",
+          "target": "H40_NO_GO"
+        },
+        {
+          "authority": "H40_RECEIPT_CONFIRMATION_READY_V2",
+          "source": "H40_WALK_FORWARD_VALIDATED",
+          "target": "H40_CONFIRMATION_READY"
+        },
+        {
+          "authority": "H40_RECEIPT_TERMINATION_V2",
+          "source": "H40_WALK_FORWARD_VALIDATED",
+          "target": "H40_NO_GO"
+        },
+        {
+          "authority": "PROHIBITED_BY_H40_FSA_F02",
+          "source": "H40_CONFIRMATION_READY",
+          "target": "H40_CONFIRMATION_EVALUATED_ONCE"
+        },
+        {
+          "authority": "H40_RECEIPT_TERMINATION_V2",
+          "source": "H40_CONFIRMATION_READY",
+          "target": "H40_NO_GO"
+        }
+      ],
+      "schema_id": "H40_LIFECYCLE_CHILD_TRANSITION_MATRIX_V1",
+      "production_discovery_preconditions": {
+        "controller_authority_hash_rule": "must_equal_current_in_process_ACCEPTED_H40_P3_CONTROLLER_AUTHORITY_HASH",
+        "controller_authority_schema_id": "H40_P3_CONTROLLER_AUTHORITY_V1",
+        "discovery_run_grant_hash_rule": "must_recompute_and_match_exact_current_H40_DISCOVERY_RUN_GRANT_V1",
+        "discovery_run_grant_schema_id": "H40_DISCOVERY_RUN_GRANT_V1",
+        "execution_disabled": "constant:true",
+        "legacy_discovery_receipt_policy": "H40_RECEIPT_DISCOVERY_AUTH_V2_INVALID_FOR_PRODUCTION",
+        "receipt_schema_id": "H40_RECEIPT_DISCOVERY_AUTH_V3"
+      }
+    },
+    "persistence_replay_contract": {
+      "authorization_receipt_issuance": "only_the_accepted_implementation_verifier_may_atomically_construct_and_persist_authorization_after_recomputation_external_caller_receipts_are_inputs_for_reverification_not_trusted_claims",
+      "canonical_storage_key": "artifacts/h40/lifecycle/runs/<run_authority_id>",
+      "capability_lifetime_rule": "every_production_transition_issue_revalidation_consumption_persistence_and_cold_restore_must_recursively_reverify_root_runtime_snapshot_seal_current_active_source_truth_and_current_in_process_lifecycle_implementation_and_controller_authority_anchors; cached_or_restored_authority_must_apply_the_same_checks; superseded_service_authority_fails_closed",
+      "cross_boundary_checks": [
+        "run_authority_id_equal_at_every_chain_link",
+        "candidate_identity_equal_from_lock_through_confirmation_ready",
+        "split_manifest_and_attestation_equal_from_discovery_through_confirmation_ready",
+        "upstream_hash_equal_recomputed_predecessor_hash",
+        "lifecycle_governance_and_implementation_authorities_equal_accepted_values",
+        "controller_authority_hash_equal_current_in_process_ACCEPTED_H40_P3_CONTROLLER_AUTHORITY_HASH",
+        "discovery_run_grant_hash_recomputed_and_equal_bound_H40_DISCOVERY_RUN_GRANT_V1",
+        "production_persistence_context_is_H40_LIFECYCLE_PERSISTENCE_CONTEXT_V2",
+        "production_discovery_lineage_uses_H40_RECEIPT_DISCOVERY_AUTH_V3"
+      ],
+      "durable_run_head_contract": {
+        "concurrency_rule": "head_commit_must_be_a_linearizable_transactional_compare_and_advance_single_winner_stale_or_conflicting_writers_fail_closed",
+        "field_contract": {
+          "head_predecessor_receipt_hash": "sha256_or_null",
+          "head_receipt_hash": "sha256",
+          "head_state": "accepted_lifecycle_state_equal_head_receipt_target_state",
+          "run_authority_id": "sha256_equal_current_run",
+          "schema_id": "constant:H40_DURABLE_RUN_HEAD_V1",
+          "terminal": "boolean_derived_from_accepted_terminal_states",
+          "transition_sequence": "integer_gte_0_monotonic_by_exactly_one"
+        },
+        "head_hash_rule": "canonical_sha256(exact_field_contract_keys_only)",
+        "ownership_rule": "exactly_one_committed_authoritative_head_per_run_authority_id",
+        "restore_rule": "only_receipts_reachable_from_the_current_committed_head_lineage_may_be_restored_as_authority",
+        "terminal_rule": "committed_terminal_head_is_absorbing_across_process_restart_and_all_later_consumers",
+        "transition_rule": "successor_commit_requires_expected_predecessor_receipt_hash_equal_current_committed_head_receipt_hash_expected_sequence_equal_current_sequence_plus_one_and_current_head_not_terminal"
+      },
+      "failure_semantics": "any_missing_extra_malformed_hash_mismatch_lineage_mismatch_cross_run_cross_candidate_cross_split_stale_head_conflicting_successor_or_terminal_successor_condition_fails_closed_with_no_committed_state_advance",
+      "persistence_rules": [
+        "receipt_and_bound_evidence_bytes_are_fully_materialized_and_fsynced_before_final_publication",
+        "immutable_receipts_are_content_addressed_and_atomically_published_without_overwriting_different_existing_bytes",
+        "unreferenced_fully_published_receipts_are_uncommitted_orphans_and_confer_no_lifecycle_authority",
+        "temporary_or_partial_artifacts_never_confer_authority",
+        "the_durable_run_head_is_the_only_commit_point_for_run_history",
+        "durable_run_head_advance_uses_linearizable_transactional_compare_and_advance_against_expected_predecessor_and_sequence",
+        "different_successor_for_the_same_committed_predecessor_is_rejected",
+        "identical_transition_retry_is_idempotent_only_after_full_reverification_and_exact_committed_successor_match",
+        "restore_recomputes_every_content_hash_every_authoritative_verifier_result_and_root_runtime_source_truth",
+        "restore_accepts_only_the_current_committed_head_or_receipts_on_its_unique_ancestor_lineage",
+        "directory_filename_and_caller_label_have_no_authority",
+        "authorization_receipts_and_bound_result_evidence_are_write_once",
+        "production_persistence_requires_H40_LIFECYCLE_PERSISTENCE_CONTEXT_V2_with_controller_authority_hash_and_discovery_run_grant_hash",
+        "production_cold_restore_rejects_H40_LIFECYCLE_PERSISTENCE_CONTEXT_V1_and_H40_RECEIPT_DISCOVERY_AUTH_V2",
+        "production_persistence_and_restore_revalidate_current_in_process_lifecycle_implementation_and_controller_authority_anchors_and_exact_bound_run_grant",
+        "hot_authority_republication_requires_new_process_or_service_identity_before_new_authoritative_operations"
+      ],
+      "run_authority_field_contract": {
+        "discovery_selection_correction_contract_hash": "constant:f84c97050c7db813263e5ffda6b1c556af0b7b0e2876bb8616640d2c9d67084b",
+        "lifecycle_governance_authority_hash": "accepted_sha256",
+        "lifecycle_implementation_authority_hash": "accepted_sha256",
+        "materialized_run_authority_hash": "sha256",
+        "protocol_authority_hash": "constant:a83f8fc7a5ca7109fb8cd7fed114d87c3b2c968b5145c11cada203aa5111d1ce",
+        "schema_id": "constant:H40_RUN_AUTHORITY_V1",
+        "sealed_registered_roster_hash": "sha256",
+        "semantic_root_hash": "constant:71889a35f227ed734272b712851174a69bf9dbb12ea3f87cd84c26e7c66f6af1",
+        "source_manifest_hash": "sha256",
+        "split_attestation_hash": "sha256",
+        "split_manifest_hash": "sha256",
+        "structural_ledger_hash": "constant:483f68502b57972deae071c7bd4587ca3e57ccaa72bd99fb0de07b4f0ab8c85f"
+      },
+      "run_authority_rule": "run_authority_id_equals_canonical_sha256_of_exact_run_authority_field_contract_keys_only",
+      "run_instance_nonce": "none",
+      "schema_id": "H40_LIFECYCLE_CHILD_PERSISTENCE_REPLAY_V2",
+      "timestamp_rule": "exact_YYYY-MM-DDTHH:MM:SSZ_calendar_valid_UTC_hash_bound_audit_only_never_authorization_critical_no_clock_tolerance",
+      "persistence_context_contract": {
+        "context_hash_rule": "canonical_sha256(exact_field_contract_keys_only)",
+        "field_contract": {
+          "controller_authority_hash": "sha256_equal_current_in_process_ACCEPTED_H40_P3_CONTROLLER_AUTHORITY_HASH",
+          "discovery_run_grant_hash": "sha256_equal_bound_H40_DISCOVERY_RUN_GRANT_V1",
+          "implementation_authority_hash": "sha256_equal_current_in_process_ACCEPTED_LIFECYCLE_IMPLEMENTATION_AUTHORITY_HASH",
+          "predecessor_receipt_hash": "sha256_or_null",
+          "run_authority_id": "sha256_equal_current_run",
+          "runtime_seal_hash": "sha256_equal_current_runtime_snapshot_seal",
+          "schema_id": "constant:H40_LIFECYCLE_PERSISTENCE_CONTEXT_V2",
+          "split_authority_hash": "sha256_or_null"
+        },
+        "legacy_policy": "H40_LIFECYCLE_PERSISTENCE_CONTEXT_V1_INVALID_FOR_PRODUCTION",
+        "schema_id": "H40_LIFECYCLE_PERSISTENCE_CONTEXT_V2"
+      }
+    }
+  },
+  "unchanged_child_authority": {
+    "implementation_baseline_sha": "d63c1fbb471405e6b08eecdf544d39c7e4a1a9b6",
+    "rule": "exact child objects are inherited byte-semantically from the accepted nine-child baseline and hashes must match prior_lifecycle_child_hashes"
+  },
+  "lifecycle_semantic_root_preimage": {
+    "schema_id": "H40_LIFECYCLE_SEMANTIC_ROOT_V1",
+    "discovery_authorization_receipt_contract_hash": "3dd91827d4a26441bd5218dc299f196841c471eb60f20e03881d2ad56ce36898",
+    "candidate_lock_receipt_contract_hash": "96756dfebab636baa1abb33364e307d99d90a61572b813c6a60504283d3d42df",
+    "wf_validation_receipt_contract_hash": "bb5698a85daec1a5b9dcd169bde3d575befe8c0a1d73c2e87136cf35afb4001b",
+    "confirmation_ready_receipt_contract_hash": "7ab0ae0c8acb17340eccaa2bb737a5300e679b8de7497a539bdc44e93d3109be",
+    "termination_receipt_contract_hash": "b45c7021db1c63a447ddb22a1f9cb787ce71a5048c824ce38d40f19f755ecb48",
+    "transition_matrix_contract_hash": "bea7b0593251204bbc9138c325f1c9f10ccf7a9b8df60f10bf991377e0ced42d",
+    "persistence_replay_contract_hash": "51e4fe6155d388c076dd1788a100265eb17b232300481a3fbcf00150f1432de1",
+    "runtime_snapshot_seal_contract_hash": "76a0732742707c78f65da26263076bed7b586ea67d4f5ddd2dac33761e37e612",
+    "f02_boundary_contract_hash": "5678d8bd6b83bb69e1a1ad2cf78af8ddbaece625a5a34b7018b0a5e6368756f4"
+  },
+  "new_lifecycle_semantic_root_hash": "36cbda530352cffaa475bd835b3b629df47351ca284e09bdf31a8fc884d48b4b",
+  "prior_lifecycle_semantic_root_hash": "846591f8eac0e1abbedaeeff4c2b0bb7648fe51bdaf981e3309c6f6c440aba8e",
+  "prior_lifecycle_governance_authority_hash": "7e9433aa2ee706dda61871c6ad2b1a1aee4cf7a8f9b6365351942096b5347c84",
+  "lifecycle_governance_authority_v5_object": {
+    "f01r2_amendment_identity": {
+      "artifact_path": "reviews/v0.5/V0.5.1_H40_F01R2_SOURCE_SPLIT_RUNTIME_AUTHORITY_COMPATIBILITY_CLOSURE.md",
+      "commit_sha": "342953fcb80b1eec905805acb226ddef591861bf"
+    },
+    "f01r3_amendment_identity": {
+      "artifact_path": "reviews/v0.5/V0.5.1_H40_F01R3_SOL_ADJUDICATION_AND_CANONICAL_AMENDMENT.md",
+      "commit_sha": "b4a1603671b11f051080f2b178b3a7fa8b089b33"
+    },
+    "lifecycle_semantic_root_hash": "36cbda530352cffaa475bd835b3b629df47351ca284e09bdf31a8fc884d48b4b",
+    "p2_final_acceptance_identity": {
+      "artifact_path": "reviews/v0.5/V0.5.1_H40_P2_FINAL_INDEPENDENT_ACCEPTANCE.md",
+      "commit_sha": "3208ca92525ed88d31635a6ac9ce9cd4ac6ec725"
+    },
+    "p3r0r1_amendment_identity": {
+      "artifact_path": "reviews/v0.5/V0.5.1_H40_P3R0R1_LIFECYCLE_EVIDENCE_AUTHORITY_REPAIR.md",
+      "commit_sha": "010d1462b33a6f133dd590086baae19cb0a0e0cb"
+    },
+    "pre_discovery_repair_contract_acceptance_identity": {
+      "artifact_path": "reviews/v0.5/V0.5.1_H40_PRE_DISCOVERY_REPAIR_CONTRACT_CONTROLLER_ACCEPTANCE.md",
+      "commit_sha": "2229d44c5cc9b88ba515d0b2931d20f05936c7e8"
+    },
+    "prior_lifecycle_governance_authority_hash": "7e9433aa2ee706dda61871c6ad2b1a1aee4cf7a8f9b6365351942096b5347c84",
+    "protocol_authority_hash": "a83f8fc7a5ca7109fb8cd7fed114d87c3b2c968b5145c11cada203aa5111d1ce",
+    "schema_id": "H40_LIFECYCLE_GOVERNANCE_AUTHORITY_V5",
+    "semantic_root_hash": "71889a35f227ed734272b712851174a69bf9dbb12ea3f87cd84c26e7c66f6af1",
+    "structural_ledger_hash": "483f68502b57972deae071c7bd4587ca3e57ccaa72bd99fb0de07b4f0ab8c85f"
+  },
+  "new_lifecycle_governance_authority_hash": "bb367f2af726be105bddf42636c97652402014c8a671d43ab81b1964c258e5cf",
+  "discovery_provenance_contract_hash": "31fc3930e44149e6b3af54ddd3b11c630f95cbbd3f152b3d0d5e614690dcf7ae",
+  "frozen_protocol_authority_hash": "a83f8fc7a5ca7109fb8cd7fed114d87c3b2c968b5145c11cada203aa5111d1ce",
+  "frozen_scientific_semantic_root_hash": "71889a35f227ed734272b712851174a69bf9dbb12ea3f87cd84c26e7c66f6af1",
+  "frozen_structural_ledger_hash": "483f68502b57972deae071c7bd4587ca3e57ccaa72bd99fb0de07b4f0ab8c85f",
+  "authorization_state": [
+    "H40_P3_NOT_AUTHORIZED",
+    "H40_DISCOVERY_NOT_AUTHORIZED"
+  ],
+  "implementation_state": "UNCHANGED",
+  "repair_implementation_state": "NOT_YET_STARTED",
+  "protected_surface_attestation": {
+    "confirmation_accessed": false,
+    "h39_outcome_accessed": false,
+    "final_holdout_accessed": false,
+    "protected_outcome_accessed": false,
+    "real_h40_outcome_computed": false,
+    "real_wf1_calibration_computed": false,
+    "real_candidate_ranking_performed": false,
+    "signed_exchange_network_execution": false,
+    "execution_policy": "RESEARCH_DISABLED_V1"
+  },
+  "replay_checks": {
+    "sha256_abc": "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad",
+    "new_lifecycle_semantic_root_recomputed": "36cbda530352cffaa475bd835b3b629df47351ca284e09bdf31a8fc884d48b4b",
+    "new_lifecycle_semantic_root_match": true,
+    "new_governance_v5_recomputed": "bb367f2af726be105bddf42636c97652402014c8a671d43ab81b1964c258e5cf",
+    "new_governance_v5_match": true
+  },
+  "final_status": "H40_LIFECYCLE_V5_HASHES_MATERIALIZED",
+  "next_stage": "REPAIR_A_F01_F04_IMPLEMENTATION_PROMPT"
+}
