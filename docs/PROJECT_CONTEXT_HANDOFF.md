@@ -1,8 +1,14 @@
 # BTC Quant Agent — Canonical Project Context Handoff
 
-Last updated: 2026-09-03
+Last updated: 2026-09-25
 
-This document is the canonical compact context for starting a new ChatGPT/Gemini conversation without replaying the full historical chat. When this file conflicts with older prompts or prose, prefer the latest committed protocol/deliverable for the relevant version and preserve immutable historical evidence.
+> **Current v0.5.1 controller state:** for exact branch heads, H40 authority state, Astra R2 blockers, Repair Contract Freeze R1, the active next-stage prompt, remaining stage plan, and mandatory ChatGPT/controller operating rules, read:
+>
+> `docs/handover/V0.5.1_QUANT_AGENT_PHASE_HANDOVER_2026-09-25.md`
+>
+> That dated phase handover supersedes this file for current-stage controller decisions. The material below remains compact historical/project background unless a newer accepted artifact supersedes it.
+
+This document is the canonical compact context for starting a new ChatGPT/Gemini conversation without replaying the full historical chat. When this file conflicts with the current dated phase handover, accepted prompts/reviews/evidence, or exact repository state, prefer the latest content-addressed artifact and preserve immutable historical evidence.
 
 ## 1. Project purpose
 
