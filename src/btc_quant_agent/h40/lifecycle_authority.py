@@ -3871,14 +3871,6 @@ class H40LifecycleAuthorityService:
         discovery_run_grant: H40DiscoveryRunGrant | None = None,
         evidence_verifier: H40LifecycleEvidenceVerifier | None = None,
     ) -> H40LifecycleAuthorityService:
-        if (
-            controller_authority is None
-            and ACCEPTED_H40_P3_CONTROLLER_AUTHORITY_HASH is not None
-            and ACCEPTED_H40_P3_CONTROLLER_AUTHORITY_HASH in _SYNTHETIC_CONTROLLER_REGISTRY
-        ):
-            controller_authority = _SYNTHETIC_CONTROLLER_REGISTRY[
-                ACCEPTED_H40_P3_CONTROLLER_AUTHORITY_HASH
-            ]
         return cls(
             implementation_authority=implementation_authority,
             accepted_implementation_authority_hash=ACCEPTED_LIFECYCLE_IMPLEMENTATION_AUTHORITY_HASH,

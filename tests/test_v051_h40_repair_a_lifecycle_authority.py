@@ -1097,3 +1097,71 @@ def test_47_f02_transitions_remain_strictly_sealed() -> None:
 def test_48_execution_policy_remains_research_disabled_v1() -> None:
     assert CURRENT_EXECUTION_POLICY == "RESEARCH_DISABLED_V1"
     assert ACCEPTED_EXECUTION_WRITE_AUTHORITY is None
+
+
+def test_49_synthetic_authority_domain_cannot_leak_into_production(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    # 1. construct an implementation authority and controller suitable for synthetic/governance testing
+    impl = _make_dummy_impl_authority()
+    ctrl = _make_dummy_controller_authority(impl)
+    seal = _make_dummy_seal()
+    run = H40RunAuthority.from_seal(seal, impl.lifecycle_implementation_authority_hash)
+    grant = _make_dummy_run_grant(ctrl, run, seal)
+    verifier = H40SyntheticEvidenceVerifier({})
+
+    # 2. call the explicit synthetic path so the synthetic controller is present in _SYNTHETIC_CONTROLLER_REGISTRY
+    synth_service = H40LifecycleAuthorityService.synthetic_for_tests(
+        implementation_authority=impl,
+        evidence_verifier=verifier,
+        controller_authority=ctrl,
+        discovery_run_grant=grant,
+    )
+    assert ctrl.controller_authority_hash in lifecycle_authority_module._SYNTHETIC_CONTROLLER_REGISTRY
+
+    # 3. test-locally monkeypatch the accepted implementation/controller constants to matching hashes
+    monkeypatch.setattr(
+        lifecycle_authority_module,
+        "ACCEPTED_LIFECYCLE_IMPLEMENTATION_AUTHORITY_HASH",
+        impl.lifecycle_implementation_authority_hash,
+    )
+    monkeypatch.setattr(
+        lifecycle_authority_module,
+        "ACCEPTED_H40_P3_CONTROLLER_AUTHORITY_HASH",
+        ctrl.controller_authority_hash,
+    )
+
+    # 4. call production constructor without explicitly passing controller
+    prod_service = H40LifecycleAuthorityService.production(
+        implementation_authority=impl,
+        controller_authority=None,
+        discovery_run_grant=None,
+    )
+
+    # 5. assert the production service did NOT import the controller from the synthetic registry
+    assert prod_service.controller_authority is None
+    assert prod_service._controller_authority is None
+
+    # 6 & 7. attempt production Discovery without explicitly supplying/currently binding the controller; assert fail-closed
+    with pytest.raises(H40GuardError) as exc_info:
+        prod_service.authorize_discovery(
+            implementation_authority=impl,
+            run_authority=run,
+            seal=seal,
+            authorized_at_utc=TS,
+            controller_authority=None,
+            discovery_run_grant=None,
+        )
+    assert exc_info.value.reason_code == H40ReasonCode.NOT_TESTABLE
+    assert "no independently accepted H40 P3 controller authority exists" in str(exc_info.value)
+
+    # 8. separately show the synthetic service can still use the synthetic controller in its synthetic domain
+    synth_auth = synth_service.authorize_discovery(
+        implementation_authority=impl,
+        run_authority=run,
+        seal=seal,
+        authorized_at_utc=TS,
+    )
+    assert synth_auth.synthetic_only is True
+    assert isinstance(synth_auth.receipt, H40DiscoveryAuthorizationReceipt)
+    assert synth_auth.receipt.controller_authority_hash == ctrl.controller_authority_hash
