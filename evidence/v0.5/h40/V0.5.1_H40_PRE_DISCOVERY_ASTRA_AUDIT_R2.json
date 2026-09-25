@@ -1,0 +1,521 @@
+{
+  "audit_json_path": "evidence/v0.5/h40/V0.5.1_H40_PRE_DISCOVERY_ASTRA_AUDIT_R2.json",
+  "audit_report_path": "reviews/v0.5/V0.5.1_H40_PRE_DISCOVERY_ASTRA_CUMULATIVE_AUDIT_R2.md",
+  "audit_schema_id": "V0.5.1_H40_PRE_DISCOVERY_ASTRA_CUMULATIVE_AUDIT_R2_V1",
+  "audited_docs_min_commit": "99df7f134395a45391ce922d6b8f2dce267e26a0",
+  "audited_implementation_branch": "v0.5-refactor",
+  "audited_implementation_sha": "d63c1fbb471405e6b08eecdf544d39c7e4a1a9b6",
+  "authorization_state": [
+    "H40_P3_NOT_AUTHORIZED",
+    "H40_DISCOVERY_NOT_AUTHORIZED"
+  ],
+  "blocking_finding_ids": [
+    "R2-F01",
+    "R2-F02",
+    "R2-F03",
+    "R2-F04"
+  ],
+  "docs_lineage": {
+    "pre_audit_docs_tip": "75365c09e9b3b067ded75013b4bc4bf4a06babb4",
+    "required_commits": [
+      "99df7f134395a45391ce922d6b8f2dce267e26a0",
+      "0a45886a07335aef3df83bf2223ffa00b03ffb8b"
+    ],
+    "status": "VERIFIED_ANCESTORS"
+  },
+  "evidence_chain": {
+    "accepted_tested_baseline": "d73e8984446f933059b978e36c4cabd55de517aa",
+    "baseline_recorded_full_suite_results": [
+      "1587 passed, 8 warnings in 418.92s",
+      "1587 passed, 8 warnings in 422.84s"
+    ],
+    "final_evidence_docs_commit": "80c4ffdf9ad1f9c70751381c683a69cb190b1270",
+    "implementation_acceptance_commit": "0cbb20a7806f2336864e430910bf6a4ff4a99df9",
+    "implementation_acceptance_path": "reviews/v0.5/V0.5.1_H40_FINAL_EXACT_SHA_REACCEPTANCE_CONTROLLER_ACCEPTANCE.md",
+    "independent_sorted_json_sha256_matches": true,
+    "manifest_bytes_verified_at_original_docs_commit_and_accepted_lineage": true,
+    "manifest_path": "evidence/v0.5/h40/V0.5.1_H40_FINAL_REACCEPTANCE_EVIDENCE_d73e898.json",
+    "manifest_sha256": "5cd591ef7f3f43c7897711ab4e75cb158ac048d328e1f8b0dac28a0a6bcb6540",
+    "non_self_reference_scope": "The typed authority binds the earlier tested baseline. Publication provenance is checked separately; this validates the observed constant-only diff, not arbitrary later implementation changes.",
+    "post_publication_evidence_packaging": "ACCEPTABLE_PACKAGING",
+    "publication_commit": "d63c1fbb471405e6b08eecdf544d39c7e4a1a9b6",
+    "publication_controller_acceptance_commit": "0a45886a07335aef3df83bf2223ffa00b03ffb8b",
+    "publication_controller_acceptance_path": "reviews/v0.5/V0.5.1_H40_LIFECYCLE_IMPLEMENTATION_AUTHORITY_REPUBLICATION_CONTROLLER_ACCEPTANCE.md",
+    "publication_docs_commit": "fb0852882f2333ccf718a56f8d627b059fa9e3f9",
+    "publication_parent_equals_tested_baseline": true,
+    "publication_production_diff": "Only ACCEPTED_LIFECYCLE_IMPLEMENTATION_AUTHORITY_HASH changes; three test files also change.",
+    "referenced_raw_logs_total": 14,
+    "referenced_raw_logs_verified": 14,
+    "status": "VERIFIED_NON_CIRCULAR",
+    "typed_implementation_authority_hash": "d3a304ddc6bcb7b7fc398ccf45a751a0afa3f91634a09ddff8e199af1970e440"
+  },
+  "evidence_resolver": {
+    "limitations": [
+      "No independent controller/producer authority check: R2-F01/F02/F03.",
+      "JSON is parsed before canonical hash comparison; duplicates, non-finite values and noncanonical bytes are rejected.",
+      "No R2 filesystem race experiments were performed; no proof of race-free filesystem authorization is claimed."
+    ],
+    "status": "CANONICAL_CONTENT_AND_STATIC_ROOT_CONTAINMENT_CHECKS_PRESENT"
+  },
+  "execution_separation": {
+    "ACCEPTED_EXECUTION_WRITE_AUTHORITY": null,
+    "CURRENT_EXECUTION_POLICY": "RESEARCH_DISABLED_V1",
+    "existing_tests_passed": 41,
+    "h40_receipt_confers_execution_authority": false,
+    "status": "ENFORCED"
+  },
+  "final_verdict": "PRE_DISCOVERY_ASTRA_AUDIT_FAIL",
+  "finding_counts": {
+    "CRITICAL": 0,
+    "HIGH": 4,
+    "INFO": 1,
+    "LOW": 1,
+    "MEDIUM": 0
+  },
+  "findings": [
+    {
+      "affected_files_functions": [
+        "src/btc_quant_agent/h40/lifecycle_authority.py:2775 production",
+        "src/btc_quant_agent/h40/lifecycle_authority.py:2874 authorize_discovery",
+        "src/btc_quant_agent/h40/lifecycle_authority.py:3330 revalidate_authorization",
+        "src/btc_quant_agent/h40/lifecycle_authority.py:4552 _cold_restore_authorization",
+        "src/btc_quant_agent/h40/lifecycle.py:124 transition_with_verified_authority",
+        "src/btc_quant_agent/h40/discovery_evidence.py:132 H40DiscoveryEvidenceResolver.__init__/load",
+        "src/btc_quant_agent/h40/discovery_evidence.py:1071 H40ProductionDiscoveryEvidenceVerifier.__init__",
+        "src/btc_quant_agent/h40/discovery_evidence.py:1179 verify_discovery_manifest"
+      ],
+      "disposition": "NOT_ENFORCED",
+      "evidence_limit": "Source inspection establishes the missing prerequisite; R2 makes no claim of actual protected-data exposure.",
+      "existing_test_evidence": [
+        "tests/test_v051_h40_implementation_authority_publication.py:test_p03_production_service_accepts_exact_authority",
+        "tests/test_v051_h40_f01_lifecycle_authority.py:test_t07_implementation_authority_required",
+        "tests/test_v051_h40_f01_lifecycle_authority.py:test_t05_adjacency_alone_denied"
+      ],
+      "finding_id": "R2-F01",
+      "invariant_expected": "An independently published controller P3 and Discovery grant must precede production Discovery authorization and outcome consumption. Implementation acceptance alone is insufficient.",
+      "minimum_repair_scope": "Add or integrate a distinct controller-issued authorization capability checked before production Discovery receipt creation and before outcome evidence reads. Bind it to the intended implementation, scientific roots, run/source/split and permitted partitions, and recheck it during restore. Keep source metadata validation and synthetic test paths separate. Publish this boundary only through a separately authorized repair and controller acceptance.",
+      "required_regression_test_concept": "With the exact accepted implementation and valid source/split metadata but no controller grant, every public production Discovery authorization and outcome-read entrypoint refuses before reading outcome content. Independently accepted matching grants permit only the intended partitions; expired, foreign, or absent grants fail on restore.",
+      "scientific_identities_need_to_change": "No scientific rule change is required. A new controller capability/receipt or lifecycle contract may need a new governance/schema identity; controller adjudication and implementation reacceptance are required, rather than assuming frozen hashes may be edited.",
+      "severity": "HIGH",
+      "status": "OPEN",
+      "title": "Controller P3/Discovery grant is not a checked runtime prerequisite",
+      "what_code_currently_enforces": "production() selects the accepted implementation hash. authorize_discovery() checks that implementation against service state, cold-validates the seal, derives the run, checks frozen roots, then constructs the Discovery receipt. The state machine checks receipt/run/predecessor/adjacency. These are substantive runtime checks.",
+      "what_is_missing": "No controller grant is an input to authorize_discovery, its receipt, the state machine, the verifier constructor, or the evidence resolver. No equivalent guaranteed gate before the public outcome-consuming verifier/resolver is present in the inspected production call graph. The module assumes an independently authorized producer, but does not enforce that producer or a grant. Absence of a CLI Discovery command or an implemented producer is not an authorization check."
+    },
+    {
+      "affected_files_functions": [
+        "src/btc_quant_agent/h40/source_manifest.py:544 validate_source_artifact",
+        "src/btc_quant_agent/h40/lifecycle_authority.py:771 materialize_runtime_source_split_authority",
+        "src/btc_quant_agent/h40/discovery_evidence.py:139 H40DiscoveryEvidenceResolver.load",
+        "src/btc_quant_agent/h40/discovery_evidence.py:554 _SOURCE_KEYS",
+        "src/btc_quant_agent/h40/discovery_evidence.py:658 _load_source_bars",
+        "src/btc_quant_agent/h40/discovery_evidence.py:791 _load_decisions outcome derivation",
+        "src/btc_quant_agent/h40/discovery_evidence.py:1283 verify_discovery_manifest source load"
+      ],
+      "disposition": "INSUFFICIENT_BINDING",
+      "evidence_limit": "Both source bytes and derived evidence are content addressed today. The finding is the absent verified relationship between them, not an absence of all content hashing.",
+      "existing_test_evidence": [
+        "tests/test_v051_h40_p3b_production_discovery_verifier.py:synthetic source/decision fixtures and source/return consistency tests",
+        "tests/test_v051_h40_f01_lifecycle_authority.py:test_r35_r37_r38_production_cold_restore_and_active_source_change_detection"
+      ],
+      "finding_id": "R2-F02",
+      "invariant_expected": "Every price/value used for formal outcomes and features must be derived reproducibly from the exact source bytes accepted by the runtime authority.",
+      "minimum_repair_scope": "Bind source-hour extraction to the exact cold-validated source records and file bytes. Independently reproduce the extraction, or require an accepted producer authority that enforces that derivation and binds the resulting content hash. Validate economic values as well as membership; merely repeating the source-manifest hash is insufficient.",
+      "required_regression_test_concept": "An ordinary synthetic canonical source artifact and its deterministic extraction produce identical accepted values. Evidence with correct manifest labels but values not derived from that artifact is rejected; cold replay uses the same derivation and rejects a stale source/extraction pair.",
+      "scientific_identities_need_to_change": "No change to the accepted return formula, partition, or selection rules is needed. Extraction/evidence identities and the repaired implementation require acceptance; any change to a frozen schema must be separately adjudicated.",
+      "severity": "HIGH",
+      "status": "OPEN",
+      "title": "Scientific market values are not authenticated to the sealed source artifact",
+      "what_code_currently_enforces": "validate_source_artifact hashes the source file; cold validation compares the full receipt and timestamp membership. The resolver separately checks canonical derived JSON and its digest. _load_source_bars checks run/source/split labels, OHLC geometry, order, products and timestamp membership.",
+      "what_is_missing": "The verifier never checks that the OHLC in H40_P3B_SOURCE_HOURS_V1 is the deterministic extraction of the sealed file. The derived object names source_manifest_hash but neither reconstructs the values from that source nor presents an independently accepted extraction/producer attestation. Two valid hashes establish identities of two objects, not the derivation between them."
+    },
+    {
+      "affected_files_functions": [
+        "src/btc_quant_agent/h40/feature_contracts.py:126 H40FeatureContract.__post_init__",
+        "src/btc_quant_agent/h40/feature_contracts.py:508 canonical D1/D2/D3 feature contracts",
+        "src/btc_quant_agent/h40/discovery_evidence.py:550 _ROW_KEYS",
+        "src/btc_quant_agent/h40/discovery_evidence.py:683 source evidence lower time bound",
+        "src/btc_quant_agent/h40/discovery_evidence.py:739 _load_decisions",
+        "src/btc_quant_agent/h40/discovery_evidence.py:902 _geometry_rows",
+        "src/btc_quant_agent/h40/discovery_evidence.py:951 _candidate_science"
+      ],
+      "disposition": "NOT_EXPLICITLY_PROVEN",
+      "evidence_limit": "WF1_CALIBRATION calibration is intentionally retrospective and uses that partition's labels. This finding concerns unproven prefit inputs; it does not reinterpret accepted calibration as an unintended implementation deviation.",
+      "existing_test_evidence": [
+        "tests/test_v051_h40_p3b_production_discovery_verifier.py:raw-decision synthetic fixtures and probability/action/coverage consistency tests",
+        "reviews/v0.5/V0.5.1_H40_P3B_PRODUCTION_DISCOVERY_VERIFIER_IMPLEMENTATION_REPORT.md:59 explicitly scoped lower-level decision inputs"
+      ],
+      "finding_id": "R2-F03",
+      "invariant_expected": "Raw feature states, scores and eligibility inputs must satisfy the frozen closed-bar availability rule and be reproducible from accepted source data without future outcomes influencing their construction.",
+      "minimum_repair_scope": "Implement or integrate and independently accept the causal feature/score producer for the existing frozen contracts. Bind its inputs, lookback windows, availability cutoffs, candidate/source/split identity and derived caches. Make production evidence acceptance depend on that verifiable derivation, while preserving the accepted retrospective calibration semantics.",
+      "required_regression_test_concept": "For each active feature family, a truncated-at-decision source gives the same score/state as the authorized batch producer; later observations do not alter earlier prefit inputs. Lookback-boundary, availability, partition and cache-lineage fixtures are checked. Calibration and future outcomes remain in their explicitly permitted retrospective consumers.",
+      "scientific_identities_need_to_change": "The existing causal rule can be implemented without redefining science. Producer/evidence acceptance and implementation republication are needed. Do not change the frozen in-sample calibration design as an incidental repair.",
+      "severity": "HIGH",
+      "status": "OPEN",
+      "title": "Decision-time feature and score derivation is not established by the evidence chain",
+      "what_code_currently_enforces": "Feature contracts declare close_time < decision_t. Decision loading checks lineage, partition membership, finite raw_score and allowed state values. The verifier recalculates horizon/net returns, calibration, probabilities, final actions, hard gates and metrics from the supplied lower-level rows.",
+      "what_is_missing": "No accepted causal feature producer or feature recomputation connects those contracts to raw_score, regime_state, opportunity_state and secondary_filter_state. Decision evidence has no enforced feature-input windows, availability proof, producer identity or cache lineage. The source-hours object also excludes pre-training lookback hours needed to reconstruct the earliest features. Downstream reproducibility cannot prove that upstream scores/states avoided future information."
+    },
+    {
+      "affected_files_functions": [
+        "src/btc_quant_agent/h40/lifecycle_authority.py:2733 H40LifecycleAuthorityService.__init__",
+        "src/btc_quant_agent/h40/lifecycle_authority.py:2768 service authority fields",
+        "src/btc_quant_agent/h40/lifecycle_authority.py:2775 production",
+        "src/btc_quant_agent/h40/lifecycle_authority.py:2883 authorize_discovery authority check",
+        "src/btc_quant_agent/h40/lifecycle_authority.py:3313 revalidate_authorization",
+        "src/btc_quant_agent/h40/lifecycle_authority.py:4259 persist_authorization",
+        "src/btc_quant_agent/h40/lifecycle_authority.py:4458 _resolve_authority_context",
+        "src/btc_quant_agent/h40/lifecycle_authority.py:4509 _cold_restore_authorization"
+      ],
+      "disposition": "INSUFFICIENTLY_ENFORCED",
+      "evidence_limit": "Fresh ordinary construction is correct and the historical-authority negative test passes. R2 records the missing lifetime invariant from source; no runtime field modification demonstration is part of this review.",
+      "existing_test_evidence": [
+        "tests/test_v051_h40_implementation_authority_publication.py:test_p11_previous_authority_fails_closed",
+        "tests/test_v051_h40_f01r3r4_lineage_durability.py:committed lineage and restore checks",
+        "tests/test_v051_h40_p3b_production_verifier_behavior_seal.py:verifier bindings are checked, but do not bind service authority fields"
+      ],
+      "finding_id": "R2-F04",
+      "invariant_expected": "Every production transition, persistence and restore must use the currently published implementation authority, even over the lifetime of a service instance; historical authority is never sufficient.",
+      "minimum_repair_scope": "Seal production service authority and mode at construction, and verify its authority against the currently published acceptance anchor at authoritative use and restore. Preserve explicit synthetic isolation. Content-address agreement must not substitute for current acceptance.",
+      "required_regression_test_concept": "Fresh and long-lived production services, persisted authority reconstruction and cold restore all require the currently published identity. Historical identities are rejected at each authoritative boundary. Test immutable configuration and authority consistency through supported service lifecycle operations.",
+      "scientific_identities_need_to_change": "No scientific identity change is required; this enforces existing implementation acceptance semantics. The repair needs implementation validation and republication, with governance review if a frozen authority contract is amended.",
+      "severity": "HIGH",
+      "status": "OPEN",
+      "title": "Current implementation authority is anchored at construction but not independently revalidated throughout service use",
+      "what_code_currently_enforces": "production() passes the published constant to __init__, which rejects mismatched authority objects. The existing publication regression rejects the historical authority at fresh production construction. Revalidation reconstructs receipts and restore resolves content-addressed authority objects, run identities and seals.",
+      "what_is_missing": "Service authority/hash/mode fields are ordinary mutable instance attributes. authorize_discovery compares the supplied implementation with those instance fields rather than independently checking the published anchor again. revalidate_authorization delegates to that check. _resolve_authority_context checks persisted/resolved content-address agreement, not current acceptance; cold restore then trusts the supplied service. Constructor validity is therefore the only independent published-authority anchor for service lifetime."
+    },
+    {
+      "affected_files_functions": [
+        "src/btc_quant_agent/h40/feature_contracts.py:607 build_canonical_feature_registry",
+        "src/btc_quant_agent/h40/search_space.py:135 _SINGLE_VARIANTS"
+      ],
+      "evidence_limit": "No current first-Discovery result depends on D5, so this is nonblocking for the audited active roster.",
+      "finding_id": "R2-L01",
+      "invariant_expected": "Feature registry identifiers and directional owners should agree with the corresponding search-space contract.",
+      "minimum_repair_scope": "Reconcile the unused registry entry with accepted authority during a separately scoped future producer integration, before D5 can become active.",
+      "required_regression_test_concept": "Every activated ledger feature identifier resolves to the correct canonical registry contract and owner.",
+      "scientific_identities_need_to_change": "No current-roster scientific change is indicated. Determine the canonical owner from accepted science; never silently change frozen rules.",
+      "severity": "LOW",
+      "status": "OPEN_NONBLOCKING",
+      "title": "Inactive D5 V2 registry naming differs from the frozen search space",
+      "what_code_currently_enforces": "The current registered roster is exactly 18 ETH_ONLY D1/D2/D3 slots. All D5 slots are NOT_TESTABLE.",
+      "what_is_missing": "feature_contracts.py names D5_V2_CROWDING_Q20_D1 with D1 ownership while search_space.py names D5_V2_CROWDING_Q20_D2 with D2 ownership."
+    },
+    {
+      "details": "The accepted baseline manifest and all 14 raw-log hashes verify. The publication is its direct child and changes only the production authority constant plus three test files. The committed republication report and controller acceptance record publication-SHA test results. This audit independently reran required focused tests. No new raw-log standard is necessary to evaluate that publication; the substantive findings are independent of packaging.",
+      "disposition": "ACCEPTABLE_PACKAGING",
+      "finding_id": "R2-I01",
+      "severity": "INFO",
+      "status": "ACCEPTED_LIMITATION",
+      "title": "Post-publication validation is reported without a second raw-log manifest"
+    }
+  ],
+  "frozen_identities": {
+    "accepted_lifecycle_implementation_authority": "d3a304ddc6bcb7b7fc398ccf45a751a0afa3f91634a09ddff8e199af1970e440",
+    "lifecycle_governance_authority": "7e9433aa2ee706dda61871c6ad2b1a1aee4cf7a8f9b6365351942096b5347c84",
+    "lifecycle_semantic_root": "846591f8eac0e1abbedaeeff4c2b0bb7648fe51bdaf981e3309c6f6c440aba8e",
+    "protocol_authority_hash": "a83f8fc7a5ca7109fb8cd7fed114d87c3b2c968b5145c11cada203aa5111d1ce",
+    "scientific_semantic_root": "71889a35f227ed734272b712851174a69bf9dbb12ea3f87cd84c26e7c66f6af1",
+    "structural_ledger_hash": "483f68502b57972deae071c7bd4587ca3e57ccaa72bd99fb0de07b4f0ab8c85f"
+  },
+  "frozen_identity_reconstruction": "ALL_EXACT_MATCH",
+  "implementation_authority_reconstruction": "EXACT_MATCH_TYPED_AND_INDEPENDENT_CANONICAL_JSON",
+  "lifecycle_persistence": {
+    "focused_existing_tests_passed": 17,
+    "status": "LINEAGE_AND_COLD_SOURCE_CHECKS_PASS; PUBLISHED_AUTHORITY_LIFETIME_INCOMPLETE_R2_F04"
+  },
+  "old_authority_rejection": {
+    "fresh_production_constructor": "PASS_EXISTING_TEST_P11",
+    "historical_hash": "6d61054a6a8d9bdaaf7e7d648cb941bbb893b67a1fb6a0ed0742a0cdd40697e5",
+    "lifetime_and_restore_invariant": "INSUFFICIENTLY_ENFORCED_R2_F04"
+  },
+  "pit_dataflow": [
+    {
+      "code": "source_manifest.py:544,908; lifecycle_authority.py:771",
+      "enforcement": "Raw byte hash, canonical source record, cold receipt equality and deterministic timestamp membership",
+      "identity": "source file SHA, source manifest, runtime source/split attestation",
+      "information_class": "Metadata/byte integrity at authority construction",
+      "partition": "Active source inventory; schedule spans development and reserved partitions",
+      "stage": "Source artifact and membership",
+      "status": "ENFORCED_FOR_SOURCE_AUTHORITY",
+      "timestamp_semantics": "Canonical source observation hours; file validated at read time"
+    },
+    {
+      "code": "discovery_evidence.py:658",
+      "enforcement": "Canonical JSON hash, UTC order, allowed products/range, OHLC geometry, membership",
+      "identity": "Derived source evidence SHA plus asserted source/split/run identities",
+      "information_class": "Mix of entry observation and later outcome information",
+      "partition": "WF1_TRAIN and WF1_CALIBRATION with horizon support, [2021-01-31,2023-02-01)",
+      "stage": "Source-hour economic values",
+      "status": "INSUFFICIENT_BINDING_R2_F02",
+      "timestamp_semantics": "Bar open at t; final OHLC is available after the bar completes"
+    },
+    {
+      "code": "feature_contracts.py:126,508; discovery_evidence.py:550,784",
+      "enforcement": "Contract declaration, score finiteness, enum membership; no accepted causal derivation",
+      "identity": "Candidate/row evidence SHA; no verified feature producer or cache lineage",
+      "information_class": "Must be decision-time information",
+      "partition": "Training/calibration decision rows in active scope",
+      "stage": "Feature states and raw score",
+      "status": "NOT_EXPLICITLY_PROVEN_R2_F03",
+      "timestamp_semantics": "Frozen close_time < decision_t; concrete lookback input availability not evidenced"
+    },
+    {
+      "code": "discovery_evidence.py:574,902,965",
+      "enforcement": "Complete source-local path, training ownership and deterministic aggregation",
+      "identity": "Training and source evidence hashes, candidate contract",
+      "information_class": "Outcome-time model/geometry estimation",
+      "partition": "WF1_TRAIN decisions [2021-01-31,2022-10-31), support before 2022-11-01",
+      "stage": "Training geometry and sample gates",
+      "status": "RECOMPUTED_CONDITIONAL_ON_R2_F02_F03",
+      "timestamp_semantics": "Training outcomes mature before calibration begins"
+    },
+    {
+      "code": "discovery_evidence.py:951",
+      "enforcement": "Frozen calibrator method and deterministic fit on supplied scores/labels",
+      "identity": "Candidate contract, policy and calibration evidence hashes",
+      "information_class": "Explicit retrospective Discovery analysis",
+      "partition": "WF1_CALIBRATION decisions [2022-11-01,2023-01-31), support before 2023-02-01",
+      "stage": "Calibration",
+      "status": "MATCHES_FROZEN_RETROSPECTIVE_DESIGN",
+      "timestamp_semantics": "Batch fit after outcomes are known; uses eligible non-neutral calibration labels"
+    },
+    {
+      "code": "discovery_evidence.py:972",
+      "enforcement": "Supplied probability/action must equal deterministic fit, geometry and side-preserving funnel",
+      "identity": "Candidate contract and dependencies",
+      "information_class": "Retrospective Discovery output; not contemporaneous execution authority",
+      "partition": "WF1_CALIBRATION",
+      "stage": "p_up and final action",
+      "status": "RECOMPUTED_CONDITIONAL_ON_R2_F03",
+      "timestamp_semantics": "Associated with decision t but recomputed after retrospective calibration fit"
+    },
+    {
+      "code": "discovery_evidence.py:630,791,814",
+      "enforcement": "Complete consecutive local bars, strict support-end bound; recompute log return, label, signed simple return and one fee",
+      "identity": "Source evidence and candidate horizon",
+      "information_class": "Future outcome relative to decision t",
+      "partition": "Training/calibration; local horizon t through t+h-1",
+      "stage": "r_h, label and r_net",
+      "status": "RECOMPUTED_CONDITIONAL_ON_R2_F02",
+      "timestamp_semantics": "Outcome available at the close of the last horizon bar, approximately t+h hours"
+    },
+    {
+      "code": "discovery_evidence.py:990,1020,1362",
+      "enforcement": "Complete decision universe, integer coverage gates, frozen sample floors/diagnostics, deterministic source-hour bootstrap",
+      "identity": "Gate/metric dependency hashes, closure hashes, seed and NumPy replay identity",
+      "information_class": "Outcome-time candidate evaluation",
+      "partition": "Full permitted training/calibration populations",
+      "stage": "Coverage, hard gates and bootstrap",
+      "status": "MATCH_CONDITIONAL_ON_INPUT_PROVENANCE",
+      "timestamp_semantics": "After required outcomes mature"
+    },
+    {
+      "code": "discovery_evidence.py:1430; lifecycle_authority.py:2947",
+      "enforcement": "Fixed universe, fit-invalid rule, fixed-six Holm, independent verification and deterministic selection",
+      "identity": "Correction manifest, candidate evidence, run/seal and predecessor receipt",
+      "information_class": "Formal research result and lifecycle transition",
+      "partition": "Complete sealed 18 registered candidates, six family correction slots",
+      "stage": "Family correction and candidate lock",
+      "status": "DOWNSTREAM_CHECKS_PRESENT_UPSTREAM_FINDINGS_OPEN",
+      "timestamp_semantics": "After complete Discovery verification"
+    },
+    {
+      "code": "discovery_evidence.py:1562; lifecycle.py:154",
+      "enforcement": "verify_wf_fold raises NOT_TESTABLE; Confirmation evaluation remains forbidden",
+      "identity": "Separate fold and lifecycle authority required",
+      "information_class": "Future outcome evaluation",
+      "partition": "Later WF folds; Confirmation separately sealed",
+      "stage": "WF validation and later partitions",
+      "status": "CURRENT_PRODUCTION_CLOSED",
+      "timestamp_semantics": "Later out-of-sample evaluation boundary"
+    }
+  ],
+  "pit_scientific_status": "FAIL_R2_F02_R2_F03",
+  "production_discovery_verifier": {
+    "required_existing_tests": "PASS",
+    "status": "IDENTITY_BEHAVIOR_AND_DEPENDENCY_CHECKS_PRESENT; CUMULATIVE_INPUT_AUTHORITY_INCOMPLETE",
+    "wf_science": "NOT_TESTABLE"
+  },
+  "protected_data_status": {
+    "confirmation": "OUTCOME_ACCESS_DENIED_AND_F02_SEALED",
+    "execution": "RESEARCH_DISABLED_V1_NO_WRITE_AUTHORITY",
+    "final_holdout": "H40_PATH_SOURCE_AND_PARTITION_GUARDS_PRESENT",
+    "h39": "SEPARATE_GUARDS_AND_UNBLIND_DOMAIN_PRESENT",
+    "implementation_publication_alone_safe_outcome_read_boundary": "NOT_PROVEN; missing checked controller prerequisite is HIGH R2-F01",
+    "production_wf_validation": "NOT_TESTABLE",
+    "real_h40_outcomes": "PRE_CONTROLLER_READ_BOUNDARY_NOT_ESTABLISHED_R2_F01",
+    "real_protected_outcomes_accessed_by_audit": false,
+    "real_wf1_calibration_outcomes_accessed_by_audit": false,
+    "signed_exchange_requests_by_audit": 0,
+    "wf1_calibration": "PRE_CONTROLLER_READ_BOUNDARY_NOT_ESTABLISHED_R2_F01"
+  },
+  "protocol_document_identity": "6533e880ced04214262f84c21fee98c478ef5c09fa7d0b9f55d650e673a1f971",
+  "provenance": {
+    "audit_checkout": "/tmp/h40-pre-discovery-impl",
+    "clean_exact_implementation_checkout": true,
+    "implementation_files_modified": false,
+    "original_workspace_untracked_agent_configuration_preserved": true,
+    "repository": "EXASHXE/btc-quant-agent-public",
+    "test_files_modified": false
+  },
+  "publication": {
+    "commit_and_remote_sha_recorded_in_final_response": true,
+    "reason": "The artifact does not recursively embed its own commit SHA.",
+    "target_branch": "v0.5-refactor-docs"
+  },
+  "published_implementation_authority_hash": "d3a304ddc6bcb7b7fc398ccf45a751a0afa3f91634a09ddff8e199af1970e440",
+  "r2_dispositions": {
+    "R2-F01": "NOT_ENFORCED",
+    "R2-F02": "INSUFFICIENT_BINDING",
+    "R2-F03": "NOT_EXPLICITLY_PROVEN",
+    "R2-F04": "INSUFFICIENTLY_ENFORCED"
+  },
+  "repair_required": true,
+  "repair_scope": [
+    {
+      "finding_id": "R2-F01",
+      "scope": "Add or integrate a distinct controller-issued authorization capability checked before production Discovery receipt creation and before outcome evidence reads. Bind it to the intended implementation, scientific roots, run/source/split and permitted partitions, and recheck it during restore. Keep source metadata validation and synthetic test paths separate. Publish this boundary only through a separately authorized repair and controller acceptance."
+    },
+    {
+      "finding_id": "R2-F02",
+      "scope": "Bind source-hour extraction to the exact cold-validated source records and file bytes. Independently reproduce the extraction, or require an accepted producer authority that enforces that derivation and binds the resulting content hash. Validate economic values as well as membership; merely repeating the source-manifest hash is insufficient."
+    },
+    {
+      "finding_id": "R2-F03",
+      "scope": "Implement or integrate and independently accept the causal feature/score producer for the existing frozen contracts. Bind its inputs, lookback windows, availability cutoffs, candidate/source/split identity and derived caches. Make production evidence acceptance depend on that verifiable derivation, while preserving the accepted retrospective calibration semantics."
+    },
+    {
+      "finding_id": "R2-F04",
+      "scope": "Seal production service authority and mode at construction, and verify its authority against the currently published acceptance anchor at authoritative use and restore. Preserve explicit synthetic isolation. Content-address agreement must not substitute for current acceptance."
+    }
+  ],
+  "review_method": {
+    "classification": "DEFENSIVE_RESEARCH_CORRECTNESS_AND_SOFTWARE_ASSURANCE",
+    "new_R2_runtime_mutation_experiments": false,
+    "prior_demonstrations_excluded_from_R2_evidence": true,
+    "r2_methods": [
+      "source inspection",
+      "existing tests",
+      "committed evidence",
+      "read-only repository commands",
+      "deterministic hash reconstruction"
+    ],
+    "retained_prior_existing_test_results": true
+  },
+  "six_p3b_closures": {
+    "block_boundary": {
+      "authority_hash": "0958dfa8bd61571983b2019b770edb29397da10e1df3f30c09b00362117320b6",
+      "canonical_closure_object_recomputed": true,
+      "code": "discovery_evidence.py:370,791",
+      "semantics": "Sample source-hour bundles with original complete horizon outcomes; no endpoint from another sampled block, retain multiplicity and trim final synthetic calendar length.",
+      "status": "MATCH",
+      "tests": "tests/test_v051_h40_p3b_production_discovery_verifier.py:899-1020"
+    },
+    "coverage_population": {
+      "authority_hash": "a9f4d5a0576f499fc4ee8433d170c33c13d80cbf2c0a179115f91172fa6e30c0",
+      "canonical_closure_object_recomputed": true,
+      "code": "discovery_evidence.py:230,825,990",
+      "semantics": "All active-scope calibration decision rows form N_base; only final LONG/SHORT form N_accept; 400*N_accept >= N_base and 10*N_accept <= N_base.",
+      "status": "MATCH",
+      "tests": "tests/test_v051_h40_p3b_production_discovery_verifier.py:512-524; 628-671; 749-765"
+    },
+    "fit_invalid": {
+      "authority_hash": "7de7c7060c150518805562a473b154d3e91ba5fbc13b5488342ad358744d728a",
+      "canonical_closure_object_recomputed": true,
+      "code": "discovery_evidence.py:1362,1430,1498",
+      "semantics": "Any fit-invalid REGISTERED member removes the whole family representative for both metrics; all six family slots remain in Holm, with p=1 for no representative.",
+      "status": "MATCH",
+      "tests": "tests/test_v051_h40_p3b_production_discovery_verifier.py:434-509; 1035-1040"
+    },
+    "proxy_net_return": {
+      "authority_hash": "8a016bcff8e439090044e3003cb127bec3ed0e9c7f09fe8fd8307a2066ed76ba",
+      "canonical_closure_object_recomputed": true,
+      "code": "discovery_evidence.py:194,800,814",
+      "semantics": "gross = action_sign * expm1(log(C_h/P0)); r_net = gross - 0.0012, once per accepted trade.",
+      "status": "MATCH",
+      "tests": "tests/test_v051_h40_p3b_production_discovery_verifier.py:600-625; 740-746; 1023-1032"
+    },
+    "seed_identity": {
+      "authority_hash": "7b2af0e0e7bde22ba10e81a7b356b6489614d42e6dc3a14a4b8d901423868d2c",
+      "canonical_closure_object_recomputed": true,
+      "code": "discovery_evidence.py:266",
+      "semantics": "Canonical ordered list [protocol authority, structural configuration, WF1_CALIBRATION, metric]; SHA-256 first eight bytes, big endian, modulo 2**63-1.",
+      "status": "MATCH",
+      "tests": "tests/test_v051_h40_p3b_production_discovery_verifier.py:768-797"
+    },
+    "start_sampler": {
+      "authority_hash": "25d1af1277d45059d9cf474cacf0b59399b9f4af87ad3363a6dda570550ce8eb",
+      "canonical_closure_object_recomputed": true,
+      "code": "discovery_evidence.py:278,1386",
+      "semantics": "Fresh PCG64, one integers call, explicit int64 and (10000,B) shape, L=168, matrix digest and exact producer/verifier NumPy version comparison.",
+      "status": "MATCH",
+      "tests": "tests/test_v051_h40_p3b_production_discovery_verifier.py:837-896"
+    }
+  },
+  "source_split_runtime_authority": {
+    "not_testable_slots": 150,
+    "registered_families": {
+      "D1_TREND_CONTINUATION": 6,
+      "D2_BREAKOUT_CONTINUATION": 6,
+      "D3_FAILED_MOVE_REVERSAL": 6
+    },
+    "registered_scope": "ETH_ONLY",
+    "registered_slots": 18,
+    "status": "METADATA_SOURCE_BYTE_AND_SPLIT_INVARIANTS_PRESENT; SCIENTIFIC_EXTRACTION_GAP_R2_F02",
+    "test_cache_isolation": "PASS; cached immutable templates are test-local, callers receive fresh copies and cold source validation remains active",
+    "total_slots": 168
+  },
+  "targeted_tests_total_passed": 191,
+  "test_environment": {
+    "PYTHONPATH": "src",
+    "cwd": "/tmp/h40-pre-discovery-impl",
+    "note": "Shared existing interpreter, audited source imported from the clean clone; full suite not rerun under the explicit focused-audit instruction.",
+    "python": "/root/workspace/project/Quant-agent-sanitized/.venv/bin/python"
+  },
+  "tests": [
+    {
+      "command": "PYTHONPATH=src /root/workspace/project/Quant-agent-sanitized/.venv/bin/python -m pytest -q tests/test_v051_h40_implementation_authority_publication.py tests/test_v051_h40_p3b_production_verifier_behavior_seal.py tests/test_v051_h40_p3b_production_verifier_identity_seal.py",
+      "exit_code": 0,
+      "passed": 37,
+      "phase": "retained_from_initial_audit",
+      "seconds": 15.43,
+      "test_id": "T01"
+    },
+    {
+      "command": "PYTHONPATH=src /root/workspace/project/Quant-agent-sanitized/.venv/bin/python -m pytest -q tests/test_execution.py tests/test_execution_environment_authority.py",
+      "exit_code": 0,
+      "passed": 41,
+      "phase": "retained_from_initial_audit",
+      "seconds": 1.99,
+      "test_id": "T02"
+    },
+    {
+      "command": "PYTHONPATH=src /root/workspace/project/Quant-agent-sanitized/.venv/bin/python -m pytest -q tests/test_v051_h40_p1_scaffold.py -k 'confirmation_guard_forging or protected_source_guard or relabel_attack or protected_surface_normalized or protected_surface_symlink or protected_h39_final' tests/test_v0325_one_shot_unblind_preregistration.py -k 'confirmation_guard_forging or protected_source_guard or relabel_attack or protected_surface_normalized or protected_surface_symlink or protected_h39_final or legacy_evaluate_validation_status_cannot_authorize_unblind or no_final_holdout_access or no_force_override_unblind_path'",
+      "deselected": 130,
+      "exit_code": 0,
+      "note": "Pytest uses the final -k expression, which contains all intended selections.",
+      "passed": 10,
+      "phase": "retained_from_initial_audit",
+      "seconds": 0.55,
+      "test_id": "T03"
+    },
+    {
+      "command": "PYTHONPATH=src /root/workspace/project/Quant-agent-sanitized/.venv/bin/python -m pytest -q tests/test_v051_h40_p3b_production_discovery_verifier.py",
+      "exit_code": 0,
+      "passed": 86,
+      "phase": "retained_from_independent_scientific_review",
+      "seconds": 43.26,
+      "test_id": "T04"
+    },
+    {
+      "command": "PYTHONPATH=src /root/workspace/project/Quant-agent-sanitized/.venv/bin/python -m pytest -q tests/test_v051_h40_f01_lifecycle_authority.py::test_cached_calendar_preserves_full_cold_authority_and_state_isolation tests/test_v051_h40_f01_lifecycle_authority.py::test_r35_r37_r38_production_cold_restore_and_active_source_change_detection tests/test_v051_h40_f01r3r4_lineage_durability.py tests/test_v051_h40_f01r3r1_durable_authority.py::test_r05_synthetic_split_injection_remains_test_only tests/test_v051_h40_f01r3r1_durable_authority.py::test_r06_current_production_remains_not_testable_until_p3_materialization",
+      "exit_code": 0,
+      "passed": 17,
+      "phase": "R2_existing_tests",
+      "seconds": 17.5,
+      "test_id": "T05"
+    }
+  ]
+}
