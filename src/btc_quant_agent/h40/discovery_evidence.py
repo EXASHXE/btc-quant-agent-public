@@ -26,6 +26,7 @@ import numpy as np
 from ..research_contract.canonical import canonical_json, canonical_sha256
 from .guards import H40GuardError, H40ProtectedSurfaceGuard, H40ReasonCode
 from .lifecycle_authority import (
+    DISCOVERY_PROVENANCE_CONTRACT_HASH,
     DISCOVERY_SELECTION_CORRECTION_CONTRACT_HASH,
     H40CandidateResultEntry,
     H40CandidateVerification,
@@ -37,6 +38,7 @@ from .lifecycle_authority import (
 )
 from .protocol_authority import compute_protocol_authority_hash
 from .search_space import materialize_h40_search_space_production
+from .source_manifest import H40SourceStatus
 from .split_manifest import H40SplitManifest
 
 _SHA = re.compile(r"[0-9a-f]{64}\Z")
@@ -547,19 +549,82 @@ def h40_calibration_gates(
 
 
 _BAR_KEYS = {"timestamp", "product", "open", "high", "low", "close"}
-_ROW_KEYS = {
+_ROW_V1_KEYS = {
     "timestamp", "product", "regime_state", "opportunity_state", "raw_score",
     "secondary_filter_state", "p_up", "final_action", "r_h", "r_net",
 }
-_SOURCE_KEYS = {
+_SOURCE_V1_KEYS = {
     "schema_id", "run_authority_id", "source_manifest_hash", "split_manifest_hash",
     "policies", "bars", "base_eligible_rows",
 }
-_DECISION_KEYS = {
+_DECISION_V1_KEYS = {
     "schema_id", "run_authority_id", "sealed_registered_roster_hash",
     "structural_configuration_hash", "source_manifest_hash", "split_manifest_hash",
     "source_evidence_hash", "partition_id", "policies", "rows",
 }
+
+_SOURCE_V2_KEYS = frozenset({
+    "active_source_derivations",
+    "base_eligible_membership",
+    "policies",
+    "provenance_contract_hash",
+    "run_authority_id",
+    "schema_id",
+    "source_manifest_hash",
+    "source_support",
+    "split_attestation_hash",
+    "split_manifest_hash",
+})
+
+_ACTIVE_SOURCE_DERIVATION_KEYS = frozenset({
+    "cadence",
+    "economic_row_count",
+    "economic_rows_sha256",
+    "locator",
+    "product",
+    "source_file_sha256",
+    "source_id",
+    "source_validation_receipt_sha256",
+    "timestamp_field",
+})
+
+_DECISION_V2_KEYS = frozenset({
+    "partition_id",
+    "policies",
+    "provenance_contract_hash",
+    "rows",
+    "run_authority_id",
+    "schema_id",
+    "sealed_registered_roster_hash",
+    "source_evidence_hash",
+    "source_manifest_hash",
+    "split_manifest_hash",
+    "structural_configuration_hash",
+})
+
+_ROW_V2_KEYS = frozenset({
+    "final_action",
+    "p_up",
+    "product",
+    "r_h",
+    "r_net",
+    "timestamp",
+})
+
+_FORBIDDEN_PREFIT_FIELDS = frozenset({
+    "regime_state",
+    "opportunity_state",
+    "raw_score",
+    "secondary_filter_state",
+})
+
+_SOURCE_KEYS = _SOURCE_V2_KEYS
+_DECISION_KEYS = _DECISION_V2_KEYS
+_ROW_KEYS = _ROW_V2_KEYS
+
+SUPPORT_START_UTC = datetime(2021, 1, 1, tzinfo=UTC)
+SUPPORT_END_UTC_EXCLUSIVE = datetime(2023, 2, 1, tzinfo=UTC)
+LOOKBACK_RESERVE_END_UTC = datetime(2021, 1, 31, tzinfo=UTC)
 
 
 def _timestamp(value: object, name: str) -> datetime:
@@ -595,6 +660,13 @@ class _Bar:
     high: float
     low: float
     close: float
+    close_time: datetime | None = None
+
+    @property
+    def effective_close_time(self) -> datetime:
+        if self.close_time is not None:
+            return self.close_time
+        return self.timestamp + timedelta(hours=1) - timedelta(milliseconds=1)
 
 
 @dataclass(frozen=True)
@@ -655,6 +727,382 @@ class _Decision:
         )
 
 
+def _extract_economic_rows(
+    file_path: Path,
+    raw_bytes: bytes,
+    expected_product: str,
+    expected_cadence: str,
+    timestamp_field: str,
+) -> tuple[list[_Bar], list[dict[str, str]]]:
+    suffix = file_path.suffix.lower()
+    if suffix not in (".parquet", ".json"):
+        _fail("active source without accepted adapter", H40ReasonCode.NOT_TESTABLE)
+    if expected_cadence != "1h":
+        _fail("H40 economic adapter requires 1h cadence", H40ReasonCode.INTERVAL_MISMATCH)
+
+    ts_vals: list[Any] = []
+    open_vals: list[Any] = []
+    high_vals: list[Any] = []
+    low_vals: list[Any] = []
+    close_vals: list[Any] = []
+
+    if suffix == ".parquet":
+        import pyarrow.parquet as pq  # type: ignore[import-untyped]
+        try:
+            table = pq.read_table(file_path)
+        except Exception as exc:
+            raise H40GuardError(H40ReasonCode.NOT_TESTABLE, f"failed to read parquet: {exc}") from exc
+        if timestamp_field not in table.column_names:
+            _fail(f"timestamp field '{timestamp_field}' missing from parquet", H40ReasonCode.NOT_TESTABLE)
+        for col in ("open", "high", "low", "close"):
+            if col not in table.column_names:
+                _fail(f"OHLC column '{col}' missing from parquet", H40ReasonCode.NOT_TESTABLE)
+        ts_vals = table[timestamp_field].to_pylist()
+        open_vals = table["open"].to_pylist()
+        high_vals = table["high"].to_pylist()
+        low_vals = table["low"].to_pylist()
+        close_vals = table["close"].to_pylist()
+    elif suffix == ".json":
+        try:
+            data = json.loads(raw_bytes.decode("utf-8"))
+        except Exception as exc:
+            raise H40GuardError(H40ReasonCode.NOT_TESTABLE, f"failed to parse json: {exc}") from exc
+        if isinstance(data, dict):
+            if "bars" in data and isinstance(data["bars"], list):
+                for b in data["bars"]:
+                    if not isinstance(b, dict):
+                        _fail("json bar is not an object", H40ReasonCode.NOT_TESTABLE)
+                    if timestamp_field not in b:
+                        _fail(f"timestamp field '{timestamp_field}' not in json bar", H40ReasonCode.NOT_TESTABLE)
+                    for col in ("open", "high", "low", "close"):
+                        if col not in b:
+                            _fail(f"OHLC column '{col}' missing from json bar", H40ReasonCode.NOT_TESTABLE)
+                    ts_vals.append(b[timestamp_field])
+                    open_vals.append(b["open"])
+                    high_vals.append(b["high"])
+                    low_vals.append(b["low"])
+                    close_vals.append(b["close"])
+            elif timestamp_field in data:
+                ts_vals = data[timestamp_field]
+                for col in ("open", "high", "low", "close"):
+                    if col not in data:
+                        _fail(f"OHLC column '{col}' missing from json", H40ReasonCode.NOT_TESTABLE)
+                open_vals = data["open"]
+                high_vals = data["high"]
+                low_vals = data["low"]
+                close_vals = data["close"]
+            else:
+                _fail("unsupported JSON structure", H40ReasonCode.NOT_TESTABLE)
+        elif isinstance(data, list):
+            for b in data:
+                if not isinstance(b, dict):
+                    _fail("json bar is not an object", H40ReasonCode.NOT_TESTABLE)
+                if timestamp_field not in b:
+                    _fail(f"timestamp field '{timestamp_field}' not in json bar", H40ReasonCode.NOT_TESTABLE)
+                for col in ("open", "high", "low", "close"):
+                    if col not in b:
+                        _fail(f"OHLC column '{col}' missing from json bar", H40ReasonCode.NOT_TESTABLE)
+                ts_vals.append(b[timestamp_field])
+                open_vals.append(b["open"])
+                high_vals.append(b["high"])
+                low_vals.append(b["low"])
+                close_vals.append(b["close"])
+        else:
+            _fail("unsupported JSON structure", H40ReasonCode.NOT_TESTABLE)
+
+    n_rows = len(ts_vals)
+    if not (len(open_vals) == len(high_vals) == len(low_vals) == len(close_vals) == n_rows):
+        _fail("mismatched OHLC column lengths in source")
+
+    extracted_bars: list[_Bar] = []
+    canonical_rows: list[dict[str, str]] = []
+    prev_dt: datetime | None = None
+
+    for i in range(n_rows):
+        raw_ts = ts_vals[i]
+        if isinstance(raw_ts, bool):
+            _fail("invalid boolean timestamp")
+        elif isinstance(raw_ts, (int, float)):
+            if raw_ts > 1e11:
+                dt = datetime.fromtimestamp(raw_ts / 1000.0, tz=UTC)
+            else:
+                dt = datetime.fromtimestamp(raw_ts, tz=UTC)
+        elif isinstance(raw_ts, str):
+            dt = _timestamp(raw_ts, "source economic timestamp")
+        else:
+            _fail("invalid timestamp type")
+
+        if dt.tzinfo != UTC or dt.minute != 0 or dt.second != 0 or dt.microsecond != 0:
+            _fail("timestamp is not UTC hourly aligned")
+
+        if not (SUPPORT_START_UTC <= dt < SUPPORT_END_UTC_EXCLUSIVE):
+            _fail(f"source timestamp {dt.isoformat()} outside support interval [2021-01-01, 2023-02-01)")
+
+        if prev_dt is not None and dt <= prev_dt:
+            _fail("source economic timestamps must be strictly sorted and unique")
+        prev_dt = dt
+
+        try:
+            o = float(open_vals[i])
+            h = float(high_vals[i])
+            l = float(low_vals[i])
+            c = float(close_vals[i])
+        except (ValueError, TypeError):
+            _fail("non-numeric OHLC in source")
+
+        for name, val in (("open", o), ("high", h), ("low", l), ("close", c)):
+            if not math.isfinite(val):
+                _fail(f"non-finite source {name}")
+            if val <= 0:
+                _fail(f"non-positive source {name}")
+
+        if l > min(o, c) or h < max(o, c) or l > h:
+            _fail("source OHLC geometry is malformed")
+
+        canonical_rows.append({
+            "timestamp": dt.strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "open": repr(o),
+            "high": repr(h),
+            "low": repr(l),
+            "close": repr(c),
+        })
+        extracted_bars.append(_Bar(dt, expected_product, o, h, l, c))
+
+    return extracted_bars, canonical_rows
+
+
+def _compute_d1(bars: Mapping[tuple[datetime, str], _Bar], t: datetime, product: str, lookback_hours: int) -> float:
+    b_last = bars.get((t - timedelta(hours=1), product))
+    b_prev = bars.get((t - timedelta(hours=lookback_hours), product))
+    if b_last is None or b_prev is None:
+        return 0.0
+    if b_last.effective_close_time >= t or b_prev.effective_close_time >= t:
+        return 0.0
+    return math.log(b_last.close / b_prev.close)
+
+
+def _compute_d2(bars: Mapping[tuple[datetime, str], _Bar], t: datetime, product: str, range_hours: int) -> float:
+    test_bar = bars.get((t - timedelta(hours=1), product))
+    if test_bar is None or test_bar.effective_close_time >= t:
+        return 0.0
+    ref_bars: list[_Bar] = []
+    for k in range(2, range_hours + 1):
+        b = bars.get((t - timedelta(hours=k), product))
+        if b is None or b.effective_close_time >= t:
+            break
+        ref_bars.append(b)
+    min_required = int((range_hours / 24) * 6)
+    if len(ref_bars) < min_required or not ref_bars:
+        return 0.0
+    u = max(b.high for b in ref_bars)
+    l = min(b.low for b in ref_bars)
+    if l == u:
+        return 0.0
+    c = test_bar.close
+    if c > u:
+        return 1.0
+    elif c < l:
+        return -1.0
+    return 0.0
+
+
+def _compute_d3(bars: Mapping[tuple[datetime, str], _Bar], t: datetime, product: str, range_hours: int) -> float:
+    b2 = bars.get((t - timedelta(hours=1), product))
+    b1 = bars.get((t - timedelta(hours=2), product))
+    if b2 is None or b1 is None or b2.effective_close_time >= t or b1.effective_close_time >= t:
+        return 0.0
+    ref_bars: list[_Bar] = []
+    for k in range(3, range_hours + 3):
+        b = bars.get((t - timedelta(hours=k), product))
+        if b is None or b.effective_close_time >= t:
+            break
+        ref_bars.append(b)
+    min_required = int((range_hours / 24) * 6)
+    if len(ref_bars) < min_required or not ref_bars:
+        return 0.0
+    u = max(b.high for b in ref_bars)
+    l = min(b.low for b in ref_bars)
+    if l == u:
+        return 0.0
+    c1 = b1.close
+    c2 = b2.close
+    if c1 > u and c2 < u:
+        return -1.0
+    elif c1 < l and c2 > l:
+        return 1.0
+    return 0.0
+
+
+def _compute_r_vol_scalar(bars: Mapping[tuple[datetime, str], _Bar], t: datetime, product: str) -> float | None:
+    closes: list[float] = []
+    for k in range(24, 0, -1):
+        b = bars.get((t - timedelta(hours=k), product))
+        if b is None or b.effective_close_time >= t:
+            return None
+        closes.append(b.close)
+    returns = [math.log(closes[i + 1] / closes[i]) for i in range(23)]
+    mean_r = sum(returns) / 23.0
+    var_r = sum((r - mean_r) ** 2 for r in returns) / 22.0
+    if var_r < 0:
+        return None
+    rv = math.sqrt(var_r)
+    return rv if math.isfinite(rv) else None
+
+
+def _compute_o_range_scalar(bars: Mapping[tuple[datetime, str], _Bar], t: datetime, product: str) -> float | None:
+    seq_bars: list[_Bar] = []
+    for k in range(25, 0, -1):
+        b = bars.get((t - timedelta(hours=k), product))
+        if b is None or b.effective_close_time >= t:
+            return None
+        seq_bars.append(b)
+    prior = bars.get((t - timedelta(hours=26), product))
+    prior_close = prior.close if prior is not None and prior.effective_close_time < t else None
+    tr_values: list[float] = []
+    for i in range(25):
+        curr = seq_bars[i]
+        prev_close = seq_bars[i - 1].close if i > 0 else prior_close
+        if prev_close is not None:
+            tr = max(curr.high - curr.low, abs(curr.high - prev_close), abs(curr.low - prev_close))
+        else:
+            tr = curr.high - curr.low
+        tr_values.append(tr)
+    tr_ref = tr_values[:24]
+    tr_last = tr_values[24]
+    mean_tr = sum(tr_ref) / 24.0
+    if mean_tr <= 0:
+        return None
+    ratio = tr_last / mean_tr
+    return ratio if math.isfinite(ratio) else None
+
+
+def _empirical_percentile(sample: Sequence[float], x: float) -> float:
+    n = len(sample)
+    if n == 0:
+        return 0.0
+    less_count = sum(1 for s in sample if s < x)
+    has_equal = any(s == x for s in sample)
+    rank = less_count / n
+    tie = 0.5 / n if has_equal else 0.0
+    return rank + tie
+
+
+_PREFIT_CACHE: dict[tuple[str, str, str, str, str, str, str], tuple[float, str, str, str]] = {}
+_TRAINING_REFS: dict[tuple[str, str], dict[str, list[tuple[datetime, float]]]] = {}
+
+
+def clear_prefit_caches() -> None:
+    _PREFIT_CACHE.clear()
+    _TRAINING_REFS.clear()
+
+
+def _get_training_refs(
+    source_evidence_hash: str,
+    product: str,
+    bars: Mapping[tuple[datetime, str], _Bar],
+) -> dict[str, list[tuple[datetime, float]]]:
+    cache_key = (source_evidence_hash, product)
+    if cache_key in _TRAINING_REFS:
+        return _TRAINING_REFS[cache_key]
+
+    rv_list: list[tuple[datetime, float]] = []
+    exp_list: list[tuple[datetime, float]] = []
+    product_times = sorted([t for t, p in bars if p == product])
+    train_end = datetime(2022, 10, 31, tzinfo=UTC)
+
+    for dt in product_times:
+        if dt >= train_end:
+            break
+        rv = _compute_r_vol_scalar(bars, dt, product)
+        if rv is not None and math.isfinite(rv):
+            rv_list.append((dt, rv))
+        exp = _compute_o_range_scalar(bars, dt, product)
+        if exp is not None and math.isfinite(exp):
+            exp_list.append((dt, exp))
+
+    refs = {"R_VOL": rv_list, "O_RANGE": exp_list}
+    _TRAINING_REFS[cache_key] = refs
+    return refs
+
+
+def _reconstruct_prefit_cached(
+    *,
+    candidate_id: str,
+    slot: Any | None,
+    partition_id: str,
+    t: datetime,
+    product: str,
+    bars: Mapping[tuple[datetime, str], _Bar],
+    source_evidence_hash: str,
+) -> tuple[float, str, str, str]:
+    cache_key = (
+        compute_protocol_authority_hash(),
+        DISCOVERY_PROVENANCE_CONTRACT_HASH,
+        source_evidence_hash,
+        candidate_id,
+        partition_id,
+        t.strftime("%Y-%m-%dT%H:%M:%SZ"),
+        product,
+    )
+    if cache_key in _PREFIT_CACHE:
+        return _PREFIT_CACHE[cache_key]
+
+    dir_contract = str(getattr(slot, "direction_contract_id", None) or getattr(slot, "direction_variant", "D1_V1_RETURN_4H"))
+    if "D1_V1" in dir_contract or dir_contract == "D1_V1_RETURN_4H":
+        score = _compute_d1(bars, t, product, 4)
+    elif "D1_V2" in dir_contract or dir_contract == "D1_V2_RETURN_12H":
+        score = _compute_d1(bars, t, product, 12)
+    elif "D2_V1" in dir_contract or dir_contract == "D2_V1_BREAKOUT_24H":
+        score = _compute_d2(bars, t, product, 24)
+    elif "D2_V2" in dir_contract or dir_contract == "D2_V2_BREAKOUT_72H":
+        score = _compute_d2(bars, t, product, 72)
+    elif "D3_V1" in dir_contract or dir_contract == "D3_V1_FAILED_BREAK_24H":
+        score = _compute_d3(bars, t, product, 24)
+    elif "D3_V2" in dir_contract or dir_contract == "D3_V2_FAILED_BREAK_72H":
+        score = _compute_d3(bars, t, product, 72)
+    else:
+        score = _compute_d1(bars, t, product, 4)
+
+    training_refs = _get_training_refs(source_evidence_hash, product, bars)
+    rv_series = training_refs["R_VOL"]
+    exp_series = training_refs["O_RANGE"]
+
+    if partition_id == "WF1_TRAIN":
+        rv_sample = [v for dt, v in rv_series if dt < t]
+        exp_sample = [v for dt, v in exp_series if dt < t]
+    else:
+        rv_sample = [v for _, v in rv_series]
+        exp_sample = [v for _, v in exp_series]
+
+    rv_val = _compute_r_vol_scalar(bars, t, product)
+    if rv_val is None or len(rv_sample) < 60:
+        regime_state = "REGIME_REJECT"
+    else:
+        p_vol = _empirical_percentile(rv_sample, rv_val)
+        if 0.40 <= p_vol < 0.60:
+            regime_state = "REGIME_VOL_MID"
+        else:
+            regime_state = "REGIME_REJECT"
+
+    exp_val = _compute_o_range_scalar(bars, t, product)
+    if exp_val is None or len(exp_sample) < 60:
+        opportunity_state = "O_NONE"
+    else:
+        p_opp = _empirical_percentile(exp_sample, exp_val)
+        if p_opp < 0.60:
+            opportunity_state = "O_NONE"
+        elif p_opp < 0.80:
+            opportunity_state = "O_WATCH"
+        else:
+            opportunity_state = "O_ELIGIBLE"
+
+    secondary_filter_state = "PASS"
+
+    result = (score, regime_state, opportunity_state, secondary_filter_state)
+    _PREFIT_CACHE[cache_key] = result
+    return result
+
+
 def _load_source_bars(
     resolver: H40DiscoveryEvidenceResolver,
     digest: str,
@@ -663,41 +1111,113 @@ def _load_source_bars(
     source_manifest_hash: str,
     split_manifest_hash: str,
     split_manifest: H40SplitManifest,
+    split_attestation_hash: str | None = None,
+    seal: H40RuntimeSnapshotSeal | None = None,
 ) -> tuple[dict[tuple[datetime, str], _Bar], dict[str, frozenset[tuple[datetime, str]]]]:
-    payload = resolver.load(digest, "H40_P3B_SOURCE_HOURS_V1", _SOURCE_KEYS)
+    payload = resolver.load(digest, "H40_P3B_SOURCE_DERIVATION_V2", set(_SOURCE_V2_KEYS))
     _policies(payload["policies"])
     if (
         payload["run_authority_id"] != run_authority_id
         or payload["source_manifest_hash"] != source_manifest_hash
         or payload["split_manifest_hash"] != split_manifest_hash
+        or (split_attestation_hash is not None and payload["split_attestation_hash"] != split_attestation_hash)
+        or payload["provenance_contract_hash"] != DISCOVERY_PROVENANCE_CONTRACT_HASH
     ):
-        _fail("source-hour lineage mismatch")
-    raw_bars = payload["bars"]
-    if not isinstance(raw_bars, list):
-        _fail("source bars must be an array")
+        _fail("source derivation lineage mismatch")
+
+    support = _keys(payload["source_support"], {"start_utc", "end_utc_exclusive"}, "source support")
+    if (
+        support["start_utc"] != "2021-01-01T00:00:00Z"
+        or support["end_utc_exclusive"] != "2023-02-01T00:00:00Z"
+    ):
+        _fail("source support interval mismatch")
+
+    active_derivations = payload["active_source_derivations"]
+    if not isinstance(active_derivations, list) or not active_derivations:
+        _fail("active_source_derivations must be a non-empty array")
+
+    if seal is not None and not seal.synthetic_only:
+        if seal._runtime_attestation_context is None or seal._source_manifest_context is None:
+            _fail("production seal missing source/attestation context")
+        active_ids = set(seal._runtime_attestation_context.active_required_source_ids)
+        derivation_ids = {d.get("source_id") for d in active_derivations if isinstance(d, dict)}
+        if derivation_ids != active_ids:
+            _fail("active-source derivations do not cover sealed active required sources")
+
     bars: dict[tuple[datetime, str], _Bar] = {}
-    previous: tuple[datetime, str] | None = None
-    for item in raw_bars:
-        bar = _keys(item, _BAR_KEYS, "source hour")
-        timestamp = _timestamp(bar["timestamp"], "source hour")
-        if not (datetime(2021, 1, 31, tzinfo=UTC) <= timestamp < datetime(2023, 2, 1, tzinfo=UTC)):
-            _fail("source evidence contains protected or unauthorized time")
-        product = bar["product"]
-        if product not in ("BTCUSDT", "ETHUSDT"):
-            _fail("source bar product mismatch")
-        key = (timestamp, product)
-        if previous is not None and key <= previous:
-            _fail("source bars must be unique and sorted")
-        previous = key
-        opening = _number(bar["open"], "source open", positive=True)
-        high = _number(bar["high"], "source high", positive=True)
-        low = _number(bar["low"], "source low", positive=True)
-        close = _number(bar["close"], "source close", positive=True)
-        if low > min(opening, close) or high < max(opening, close) or low > high:
-            _fail("source OHLC geometry is malformed")
-        bars[key] = _Bar(timestamp, product, opening, high, low, close)
+
+    for raw in active_derivations:
+        entry = _keys(raw, set(_ACTIVE_SOURCE_DERIVATION_KEYS), "active source derivation")
+        source_id = entry["source_id"]
+        product = entry["product"]
+        cadence = entry["cadence"]
+        if cadence != "1h":
+            _fail("non-1h cadence rejected for H40 economic adapter")
+        locator = entry["locator"]
+
+        suffix = Path(locator).suffix.lower()
+        if suffix not in (".parquet", ".json"):
+            _fail("active source without accepted adapter", H40ReasonCode.NOT_TESTABLE)
+
+        if seal is not None and not seal.synthetic_only:
+            repo_root = seal._repo_root_context
+            assert repo_root is not None
+            assert seal._source_manifest_context is not None
+            assert seal._runtime_attestation_context is not None
+            source_record = seal._source_manifest_context.get_source(source_id)
+            evidence_entry = next(
+                (e for e in seal._runtime_attestation_context.active_source_evidence if e.source_id == source_id),
+                None,
+            )
+            if evidence_entry is None:
+                _fail("source evidence entry missing from attestation")
+            if source_record.receipt is None or source_record.receipt.status != H40SourceStatus.VERIFIED:
+                _fail("source validation receipt missing or unverified")
+            if canonical_sha256(source_record.to_dict()) != evidence_entry.source_record_hash:
+                _fail("source record hash mismatch")
+            if canonical_sha256(source_record.receipt.to_dict()) != evidence_entry.source_validation_receipt_hash:
+                _fail("source validation receipt hash mismatch")
+            if entry["source_validation_receipt_sha256"] != evidence_entry.source_validation_receipt_hash:
+                _fail("source derivation receipt hash mismatch")
+            if entry["source_file_sha256"] != source_record.file_sha256 or entry["source_file_sha256"] != evidence_entry.file_sha256:
+                _fail("source file hash mismatch")
+            if entry["locator"] != source_record.locator:
+                _fail("source locator mismatch")
+            if entry["product"] != source_record.product:
+                _fail("source product mismatch")
+            if entry["timestamp_field"] != source_record.receipt.timestamp_field:
+                _fail("timestamp field mismatch")
+            file_path = (repo_root / locator).resolve()
+        else:
+            repo_root = (getattr(seal, "_repo_root_context", None) if seal else None) or resolver._root
+            file_path = (repo_root / locator)
+            if not file_path.exists():
+                file_path = resolver._root / locator
+
+        H40ProtectedSurfaceGuard.assert_path_allowed(file_path, source_id=source_id)
+        if not file_path.is_file():
+            _fail("source file missing", H40ReasonCode.NOT_TESTABLE)
+
+        raw_bytes = file_path.read_bytes()
+        actual_hash = hashlib.sha256(raw_bytes).hexdigest()
+        if actual_hash != entry["source_file_sha256"]:
+            _fail("source file SHA-256 mismatch")
+
+        extracted_bars, canonical_rows = _extract_economic_rows(
+            file_path, raw_bytes, product, cadence, entry["timestamp_field"],
+        )
+        computed_count = len(canonical_rows)
+        computed_digest = canonical_sha256(canonical_rows)
+        if entry["economic_row_count"] != computed_count:
+            _fail("economic row count mismatch")
+        if entry["economic_rows_sha256"] != computed_digest:
+            _fail("economic rows SHA-256 mismatch")
+
+        for b in extracted_bars:
+            bars[(b.timestamp, b.product)] = b
+
     raw_universe = _keys(
-        payload["base_eligible_rows"], {"WF1_TRAIN", "WF1_CALIBRATION"},
+        payload["base_eligible_membership"], {"WF1_TRAIN", "WF1_CALIBRATION"},
         "source-bound base universe",
     )
     universes: dict[str, frozenset[tuple[datetime, str]]] = {}
@@ -707,11 +1227,13 @@ def _load_source_bars(
             _fail("base universe must be an array")
         partition_start, partition_end, _ = _partition_bounds(partition_id)
         ordered_keys: list[tuple[datetime, str]] = []
-        for raw in listed:
-            item = _keys(raw, {"timestamp", "product"}, "base-universe row")
+        for raw_item in listed:
+            item = _keys(raw_item, {"timestamp", "product"}, "base-universe row")
             timestamp = _timestamp(item["timestamp"], "base-universe timestamp")
             product = item["product"]
-            if not partition_start <= timestamp < partition_end or product not in ("BTCUSDT", "ETHUSDT"):
+            if timestamp < LOOKBACK_RESERVE_END_UTC:
+                _fail("lookback reserve hour cannot enter base-universe membership")
+            if not (partition_start <= timestamp < partition_end) or product not in ("BTCUSDT", "ETHUSDT"):
                 _fail("base-universe row outside accepted split/product")
             key = (timestamp, product)
             if ordered_keys and key <= ordered_keys[-1]:
@@ -751,8 +1273,10 @@ def _load_decisions(
     horizon: int,
     bars: Mapping[tuple[datetime, str], _Bar],
     base_universe: frozenset[tuple[datetime, str]],
+    slot: Any | None = None,
+    seal: H40RuntimeSnapshotSeal | None = None,
 ) -> tuple[_Decision, ...]:
-    payload = resolver.load(digest, "H40_P3B_RAW_DECISIONS_V1", _DECISION_KEYS)
+    payload = resolver.load(digest, "H40_P3B_RAW_DECISIONS_V2", set(_DECISION_V2_KEYS))
     _policies(payload["policies"])
     if (
         payload["run_authority_id"] != run_authority_id
@@ -762,8 +1286,13 @@ def _load_decisions(
         or payload["split_manifest_hash"] != split_manifest_hash
         or payload["source_evidence_hash"] != source_evidence_hash
         or payload["partition_id"] != partition_id
+        or payload["provenance_contract_hash"] != DISCOVERY_PROVENANCE_CONTRACT_HASH
     ):
         _fail("decision population lineage mismatch")
+    if slot is None:
+        space = materialize_h40_search_space_production()
+        slots_by_config = {s.structural_configuration_hash: s for s in space.slots}
+        slot = slots_by_config.get(candidate_id)
     rows = payload["rows"]
     if not isinstance(rows, list):
         _fail("decision rows must be an array")
@@ -771,7 +1300,9 @@ def _load_decisions(
     result: list[_Decision] = []
     previous: tuple[datetime, str] | None = None
     for raw in rows:
-        item = _keys(raw, _ROW_KEYS, "source-bound decision")
+        if any(k in raw for k in _FORBIDDEN_PREFIT_FIELDS):
+            _fail("forbidden transported prefit fields in V2 decision row")
+        item = _keys(raw, set(_ROW_V2_KEYS), "source-bound decision")
         timestamp = _timestamp(item["timestamp"], "decision timestamp")
         product = item["product"]
         key = (timestamp, product)
@@ -781,13 +1312,17 @@ def _load_decisions(
         ):
             _fail("decision is outside sorted active-scope partition")
         previous = key
-        score = _number(item["raw_score"], "raw score")
-        if item["regime_state"] not in ("REGIME_VOL_MID", "REGIME_REJECT"):
-            _fail("regime state mismatch")
-        if item["opportunity_state"] not in ("O_ELIGIBLE", "O_WATCH", "O_NONE"):
-            _fail("opportunity state mismatch")
-        if item["secondary_filter_state"] not in ("PASS", "VETO"):
-            _fail("secondary filter state mismatch")
+
+        score, regime_state, opportunity_state, secondary_filter_state = _reconstruct_prefit_cached(
+            candidate_id=candidate_id,
+            slot=slot,
+            partition_id=partition_id,
+            t=timestamp,
+            product=product,
+            bars=bars,
+            source_evidence_hash=source_evidence_hash,
+        )
+
         first = bars.get(key)
         exit_time = timestamp + timedelta(hours=horizon - 1)
         if first is None or exit_time >= support_end:
@@ -818,8 +1353,8 @@ def _load_decisions(
         elif supplied_net is not None:
             _fail("abstaining row cannot supply trade return")
         result.append(_Decision(
-            timestamp, product, item["regime_state"], item["opportunity_state"],
-            score, item["secondary_filter_state"], supplied_p_up, action,
+            timestamp, product, regime_state, opportunity_state,
+            score, secondary_filter_state, supplied_p_up, action,
             computed_r_h, supplied_net, first.open, last.close, complete_path,
         ))
     expected_keys = frozenset(key for key in base_universe if key[1] in products)
@@ -1286,6 +1821,8 @@ class H40ProductionDiscoveryEvidenceVerifier:
                 source_manifest_hash=self._seal.source_manifest_hash,
                 split_manifest_hash=self._seal.split_manifest_hash,
                 split_manifest=self._split,
+                split_attestation_hash=self._seal.split_attestation_hash,
+                seal=self._seal,
             )
             active_slot = cast(Any, slot)
             products = tuple(active_slot.asset_scope)
@@ -1300,6 +1837,8 @@ class H40ProductionDiscoveryEvidenceVerifier:
                 source_evidence_hash=source_digest,
                 partition_id="WF1_TRAIN", products=products, horizon=horizon,
                 bars=bars, base_universe=universes_by_partition["WF1_TRAIN"],
+                slot=slot,
+                seal=self._seal,
             )
             calibration = _load_decisions(
                 self._resolver, calibration_digest,
@@ -1311,6 +1850,8 @@ class H40ProductionDiscoveryEvidenceVerifier:
                 source_evidence_hash=source_digest,
                 partition_id="WF1_CALIBRATION", products=products, horizon=horizon,
                 bars=bars, base_universe=universes_by_partition["WF1_CALIBRATION"],
+                slot=slot,
+                seal=self._seal,
             )
             if set(entry.hard_gate_input_evidence_hashes) != _HARD_GATES:
                 _fail("candidate hard-gate input universe mismatch")
@@ -1345,9 +1886,9 @@ class H40ProductionDiscoveryEvidenceVerifier:
                 coverage_audit,
             )
             self._dependencies.extend([
-                (source_digest, "H40_P3B_SOURCE_HOURS_V1", _SOURCE_KEYS),
-                (training_digest, "H40_P3B_RAW_DECISIONS_V1", _DECISION_KEYS),
-                (calibration_digest, "H40_P3B_RAW_DECISIONS_V1", _DECISION_KEYS),
+                (source_digest, "H40_P3B_SOURCE_DERIVATION_V2", set(_SOURCE_V2_KEYS)),
+                (training_digest, "H40_P3B_RAW_DECISIONS_V2", set(_DECISION_V2_KEYS)),
+                (calibration_digest, "H40_P3B_RAW_DECISIONS_V2", set(_DECISION_V2_KEYS)),
             ])
         if len(source_digests) != 1:
             _fail("Discovery candidates must share one sealed source-hour evidence object")

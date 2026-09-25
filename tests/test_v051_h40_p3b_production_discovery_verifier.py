@@ -17,6 +17,7 @@ import pytest
 from btc_quant_agent.h40 import (
     ACCEPTED_H40_P3_CONTROLLER_AUTHORITY_HASH,
     ACCEPTED_LIFECYCLE_IMPLEMENTATION_AUTHORITY_HASH,
+    DISCOVERY_PROVENANCE_CONTRACT_HASH,
     DISCOVERY_SELECTION_CORRECTION_CONTRACT_HASH,
     H40CandidateResultEntry,
     H40DiscoveryAuthorizationReceipt,
@@ -233,13 +234,52 @@ def _invalid_fixture(
                 "product": "ETHUSDT", "open": str(price), "high": str(price),
                 "low": str(price), "close": str(price),
             })
+    source_dir = root / "sources"
+    source_dir.mkdir(parents=True, exist_ok=True)
+    source_file = source_dir / "ETHUSDT.json"
+    source_file.write_text(json.dumps(bars), encoding="utf-8")
+    raw_bytes = source_file.read_bytes()
+    file_sha256 = hashlib.sha256(raw_bytes).hexdigest()
+
+    canonical_rows = [
+        {
+            "timestamp": b["timestamp"],
+            "open": repr(float(b["open"])),
+            "high": repr(float(b["high"])),
+            "low": repr(float(b["low"])),
+            "close": repr(float(b["close"])),
+        }
+        for b in bars
+    ]
+    economic_rows_sha256 = canonical_sha256(canonical_rows)
+    economic_row_count = len(canonical_rows)
+
     source_hash = _store(root, {
-        "schema_id": "H40_P3B_SOURCE_HOURS_V1", "run_authority_id": run.run_authority_id,
+        "schema_id": "H40_P3B_SOURCE_DERIVATION_V2",
+        "run_authority_id": run.run_authority_id,
         "source_manifest_hash": seal.source_manifest_hash,
         "split_manifest_hash": seal.split_manifest_hash,
+        "split_attestation_hash": seal.split_attestation_hash,
+        "provenance_contract_hash": DISCOVERY_PROVENANCE_CONTRACT_HASH,
         "policies": policies,
-        "bars": bars,
-        "base_eligible_rows": {
+        "source_support": {
+            "start_utc": "2021-01-01T00:00:00Z",
+            "end_utc_exclusive": "2023-02-01T00:00:00Z",
+        },
+        "active_source_derivations": [
+            {
+                "cadence": "1h",
+                "economic_row_count": economic_row_count,
+                "economic_rows_sha256": economic_rows_sha256,
+                "locator": "sources/ETHUSDT.json",
+                "product": "ETHUSDT",
+                "source_file_sha256": file_sha256,
+                "source_id": "SRC_ETHUSDT",
+                "source_validation_receipt_sha256": _hash("receipt-eth"),
+                "timestamp_field": "timestamp",
+            },
+        ],
+        "base_eligible_membership": {
             "WF1_TRAIN": [{"timestamp": train_t, "product": "ETHUSDT"}],
             "WF1_CALIBRATION": [
                 {"timestamp": timestamp, "product": "ETHUSDT"}
@@ -303,6 +343,7 @@ def _invalid_fixture(
             _slot: Any = slot,
             _family_complete: bool = family_complete,
             _fit: Any = fit,
+            _item: Any = item,
         ) -> dict[str, Any]:
             horizon = int(_slot.primary_horizon.rstrip("h"))
             if not train and complete_family:
@@ -316,10 +357,21 @@ def _invalid_fixture(
             if _fit is not None and not train:
                 from btc_quant_agent.h40.discovery_evidence import h40_predict_calibrated
                 p_up = str(h40_predict_calibrated(_fit, score))
+            from btc_quant_agent.h40.discovery_evidence import _PREFIT_CACHE
+            from btc_quant_agent.h40.protocol_authority import compute_protocol_authority_hash
+            cache_key = (
+                compute_protocol_authority_hash(),
+                DISCOVERY_PROVENANCE_CONTRACT_HASH,
+                source_hash,
+                _item.structural_configuration_hash,
+                "WF1_TRAIN" if train else "WF1_CALIBRATION",
+                timestamp,
+                "ETHUSDT",
+            )
+            _PREFIT_CACHE[cache_key] = (score, "REGIME_VOL_MID", "O_ELIGIBLE", "PASS")
             return {
                 "timestamp": timestamp, "product": "ETHUSDT",
-                "regime_state": "REGIME_VOL_MID", "opportunity_state": "O_ELIGIBLE",
-                "raw_score": str(score), "secondary_filter_state": "PASS", "p_up": p_up,
+                "p_up": p_up,
                 "final_action": None if train else "NO_TRADE",
                 "r_h": str(r_h), "r_net": None,
             }
@@ -328,14 +380,16 @@ def _invalid_fixture(
             ("WF1_TRAIN", train_t, True), ("WF1_CALIBRATION", calib_t, False),
         ):
             decision_hashes[partition] = _store(root, {
-                "schema_id": "H40_P3B_RAW_DECISIONS_V1",
+                "schema_id": "H40_P3B_RAW_DECISIONS_V2",
                 "run_authority_id": run.run_authority_id,
                 "sealed_registered_roster_hash": seal.sealed_registered_roster_hash,
                 "structural_configuration_hash": item.structural_configuration_hash,
                 "source_manifest_hash": seal.source_manifest_hash,
                 "split_manifest_hash": seal.split_manifest_hash,
                 "source_evidence_hash": source_hash,
-                "partition_id": partition, "policies": policies,
+                "partition_id": partition,
+                "provenance_contract_hash": DISCOVERY_PROVENANCE_CONTRACT_HASH,
+                "policies": policies,
                 "rows": (
                     [row(train_t, train=True)] if train else
                     [row(t, train=False, index=index) for index, t in enumerate(calib_times)]
@@ -528,7 +582,7 @@ def test_cov01_cov04_calibration_final_actions_define_coverage_population(tmp_pa
     result = _read(fixture.root, entry.candidate_result_input_evidence_hash)
     training = _read(fixture.root, result["training_evidence_hash"])["rows"]
     calibration = _read(fixture.root, result["calibration_evidence_hash"])["rows"]
-    assert len(training) == 1 and training[0]["raw_score"] == "1.0"
+    assert len(training) == 1 and training[0]["timestamp"] == "2022-01-01T00:00:00Z"
     assert len(calibration) == 40
     assert all(row["final_action"] == "NO_TRADE" for row in calibration)
     coverage = _read(fixture.root, entry.hard_gate_input_evidence_hashes["COVERAGE"])["audit"]
@@ -921,17 +975,16 @@ def test_b04_missing_source_halo_endpoint_fails_closed(tmp_path: Path) -> None:
         if slot_by_id[item.structural_configuration_hash].primary_horizon == "12h"
     )
     result = _read(tmp_path, entry.candidate_result_input_evidence_hash)
-    source = _read(tmp_path, result["source_evidence_hash"])
-    bars = {}
-    for raw in source["bars"]:
-        timestamp = datetime.strptime(raw["timestamp"], "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=UTC)
-        if raw["timestamp"] == "2022-12-01T11:00:00Z":
-            continue
-        bars[(timestamp, raw["product"])] = module._Bar(
-            timestamp, raw["product"],
-            float(raw["open"]), float(raw["high"]),
-            float(raw["low"]), float(raw["close"]),
-        )
+    bars, _ = module._load_source_bars(
+        H40DiscoveryEvidenceResolver(tmp_path), result["source_evidence_hash"],
+        run_authority_id=fixture.run_id,
+        source_manifest_hash=result["source_manifest_hash"],
+        split_manifest_hash=result["split_manifest_hash"],
+        split_manifest=fixture.verifier._split,
+        split_attestation_hash=fixture.verifier._seal.split_attestation_hash,
+        seal=fixture.verifier._seal,
+    )
+    del bars[(datetime(2022, 12, 1, 11, tzinfo=UTC), "ETHUSDT")]
     t = datetime(2022, 12, 1, tzinfo=UTC)
     with pytest.raises(H40GuardError, match="missing source-local outcome-support"):
         module._load_decisions(
@@ -944,6 +997,8 @@ def test_b04_missing_source_halo_endpoint_fails_closed(tmp_path: Path) -> None:
             source_evidence_hash=result["source_evidence_hash"],
             partition_id="WF1_CALIBRATION", products=("ETHUSDT",), horizon=12,
             bars=bars, base_universe=frozenset({(t, "ETHUSDT")}),
+            slot=slot_by_id[entry.structural_configuration_hash],
+            seal=fixture.verifier._seal,
         )
 
 
