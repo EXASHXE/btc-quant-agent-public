@@ -26,6 +26,7 @@ from btc_quant_agent.h40 import (
     EXPECTED_PROTOCOL_AUTHORITY_HASH,
     EXPECTED_SEMANTIC_ROOT_HASH,
     EXPECTED_STRUCTURAL_LEDGER_HASH,
+    H40DiscoveryRunGrant,
     H40GuardError,
     H40LifecycleArtifactStore,
     H40LifecycleAuthorityService,
@@ -48,7 +49,7 @@ _TESTS_DIR = str(Path(__file__).resolve().parent)
 if _TESTS_DIR not in sys.path:
     sys.path.insert(0, _TESTS_DIR)
 
-from test_v051_h40_f01_lifecycle_authority import (  # noqa: E402
+from test_v051_h40_f01_lifecycle_authority import (
     TS,
     _build_discovery_chain,
     _implementation_authority,
@@ -132,11 +133,25 @@ def test_r48_stale_cached_production_authorization_cannot_directly_commit(
         "ACCEPTED_LIFECYCLE_IMPLEMENTATION_AUTHORITY_HASH",
         authority.lifecycle_implementation_authority_hash,
     )
+    ctrl = lifecycle_authority_module._synthesize_controller_authority(authority)
+    monkeypatch.setattr(
+        lifecycle_authority_module,
+        "ACCEPTED_H40_P3_CONTROLLER_AUTHORITY_HASH",
+        ctrl.controller_authority_hash,
+    )
     run = H40RunAuthority.from_seal(seal, authority.lifecycle_implementation_authority_hash)
+    grant = H40DiscoveryRunGrant.from_controller_and_run(
+        controller_authority=ctrl,
+        run_authority=run,
+        seal=seal,
+        authorized_at_utc=TS,
+    )
     store = H40LifecycleArtifactStore(tmp_path)
     verifier = _ProductionEvidenceVerifier(tmp_path / "verifier")
     service = H40LifecycleAuthorityService.production(
         implementation_authority=authority,
+        controller_authority=ctrl,
+        discovery_run_grant=grant,
         evidence_verifier=verifier,
     )
 
@@ -146,6 +161,8 @@ def test_r48_stale_cached_production_authorization_cannot_directly_commit(
         run_authority=run,
         seal=seal,
         authorized_at_utc=TS,
+        controller_authority=ctrl,
+        discovery_run_grant=grant,
     )
     assert isinstance(auth, VerifiedLifecycleAuthorization)
 
@@ -413,15 +430,15 @@ def test_frozen_hashes_exact_and_unchanged() -> None:
     child_hashes = compute_lifecycle_child_hashes()
     assert (
         child_hashes["persistence_replay_contract"]
-        == "5f014b867be17019c2be91ff48f8e23a43ed29678fc5589430ba174046fceaae"
+        == "51e4fe6155d388c076dd1788a100265eb17b232300481a3fbcf00150f1432de1"
     )
     assert (
         compute_lifecycle_semantic_root_hash()
-        == "846591f8eac0e1abbedaeeff4c2b0bb7648fe51bdaf981e3309c6f6c440aba8e"
+        == "36cbda530352cffaa475bd835b3b629df47351ca284e09bdf31a8fc884d48b4b"
     )
     assert (
         compute_lifecycle_governance_authority_hash()
-        == "7e9433aa2ee706dda61871c6ad2b1a1aee4cf7a8f9b6365351942096b5347c84"
+        == "bb367f2af726be105bddf42636c97652402014c8a671d43ab81b1964c258e5cf"
     )
     assert compute_protocol_authority_hash() == EXPECTED_PROTOCOL_AUTHORITY_HASH
     assert compute_semantic_root_hash() == EXPECTED_SEMANTIC_ROOT_HASH

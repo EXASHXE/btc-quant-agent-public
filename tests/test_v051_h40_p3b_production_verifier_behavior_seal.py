@@ -14,6 +14,7 @@ from test_v051_h40_p3b_production_discovery_verifier import _invalid_fixture
 from test_v051_h40_p3b_production_verifier_identity_seal import _candidate_lock_attempt
 
 from btc_quant_agent.h40 import (
+    ACCEPTED_H40_P3_CONTROLLER_AUTHORITY_HASH,
     ACCEPTED_LIFECYCLE_IMPLEMENTATION_AUTHORITY_HASH,
     H40CandidateVerification,
     H40LifecycleArtifactStore,
@@ -195,11 +196,10 @@ def test_b18_frozen_identities_exact() -> None:
         "483f68502b57972deae071c7bd4587ca3e57ccaa72bd99fb0de07b4f0ab8c85f"
     )
     assert compute_lifecycle_semantic_root_hash() == (
-        "846591f8eac0e1abbedaeeff4c2b0bb7648fe51bdaf981e3309c6f6c440aba8e"
+        "36cbda530352cffaa475bd835b3b629df47351ca284e09bdf31a8fc884d48b4b"
     )
     assert compute_lifecycle_governance_authority_hash() == (
-        "7e9433aa2ee706dda61871c6ad2b1a1aee4cf7a8f9b6365351942096b5347c84"
+        "bb367f2af726be105bddf42636c97652402014c8a671d43ab81b1964c258e5cf"
     )
-    assert ACCEPTED_LIFECYCLE_IMPLEMENTATION_AUTHORITY_HASH == (
-        "d3a304ddc6bcb7b7fc398ccf45a751a0afa3f91634a09ddff8e199af1970e440"
-    )
+    assert ACCEPTED_LIFECYCLE_IMPLEMENTATION_AUTHORITY_HASH is None
+    assert ACCEPTED_H40_P3_CONTROLLER_AUTHORITY_HASH is None

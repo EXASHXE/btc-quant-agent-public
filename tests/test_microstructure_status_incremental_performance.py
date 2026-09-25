@@ -31,7 +31,7 @@ import sqlite3
 import time
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, cast
+from typing import Any, Self, cast
 from unittest.mock import patch
 
 import pytest
@@ -448,10 +448,10 @@ def test_p04_finalization_quick_check_mandatory(tmp_path: Path) -> None:
         def close(self) -> None:
             self._real.close()
 
-        def __enter__(self) -> "FakeConn":
+        def __enter__(self) -> Self:
             return self
 
-        def __exit__(self, *args: Any) -> None:
+        def __exit__(self, *args: object) -> None:
             self._real.close()
 
         def __getattr__(self, name: str) -> Any:
@@ -462,9 +462,11 @@ def test_p04_finalization_quick_check_mandatory(tmp_path: Path) -> None:
 
     manifest_before = store.finalized_manifest_path.read_text(encoding="utf-8")
     finalize_day2_now = day2_start + 86_400_000 + store.protocol.finalization_grace_ms + 1000
-    with patch("sqlite3.connect", side_effect=fake_connect):
-        with pytest.raises(RuntimeError, match="quick_check failed"):
-            store.finalize_partitions(now_ms=finalize_day2_now)
+    with (
+        patch("sqlite3.connect", side_effect=fake_connect),
+        pytest.raises(RuntimeError, match="quick_check failed"),
+    ):
+        store.finalize_partitions(now_ms=finalize_day2_now)
 
     manifest_after = store.finalized_manifest_path.read_text(encoding="utf-8")
     assert manifest_before == manifest_after

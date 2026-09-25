@@ -15,6 +15,7 @@ import numpy as np
 import pytest
 
 from btc_quant_agent.h40 import (
+    ACCEPTED_H40_P3_CONTROLLER_AUTHORITY_HASH,
     ACCEPTED_LIFECYCLE_IMPLEMENTATION_AUTHORITY_HASH,
     DISCOVERY_SELECTION_CORRECTION_CONTRACT_HASH,
     H40CandidateResultEntry,
@@ -183,10 +184,22 @@ def _invalid_fixture(
         roster=roster,
         not_testable_slot_count=150,
     )
-    assert ACCEPTED_LIFECYCLE_IMPLEMENTATION_AUTHORITY_HASH is not None
-    run = H40RunAuthority.from_seal(seal, ACCEPTED_LIFECYCLE_IMPLEMENTATION_AUTHORITY_HASH)
+    impl_hash = (
+        ACCEPTED_LIFECYCLE_IMPLEMENTATION_AUTHORITY_HASH
+        if ACCEPTED_LIFECYCLE_IMPLEMENTATION_AUTHORITY_HASH is not None
+        else "d3a304ddc6bcb7b7fc398ccf45a751a0afa3f91634a09ddff8e199af1970e440"
+    )
+    ctrl_hash = (
+        ACCEPTED_H40_P3_CONTROLLER_AUTHORITY_HASH
+        if ACCEPTED_H40_P3_CONTROLLER_AUTHORITY_HASH is not None
+        else _hash("test-controller-authority")
+    )
+    grant_hash = _hash("test-run-grant")
+    run = H40RunAuthority.from_seal(seal, impl_hash)
     receipt = H40DiscoveryAuthorizationReceipt(
         authorized_at_utc="2026-09-23T00:00:00Z",
+        controller_authority_hash=ctrl_hash,
+        discovery_run_grant_hash=grant_hash,
         discovery_selection_correction_contract_hash=DISCOVERY_SELECTION_CORRECTION_CONTRACT_HASH,
         execution_disabled=True,
         lifecycle_governance_authority_hash=run.lifecycle_governance_authority_hash,

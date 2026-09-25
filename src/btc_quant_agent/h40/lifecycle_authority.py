@@ -9,6 +9,7 @@ confirmation outcomes, or execution.
 
 from __future__ import annotations
 
+import contextlib
 import hashlib
 import json
 import os
@@ -46,19 +47,21 @@ from .source_manifest import (
 from .split_manifest import H40PartitionType, H40SplitManifest
 
 EXPECTED_LIFECYCLE_SEMANTIC_ROOT_HASH = (
-    "846591f8eac0e1abbedaeeff4c2b0bb7648fe51bdaf981e3309c6f6c440aba8e"
+    "36cbda530352cffaa475bd835b3b629df47351ca284e09bdf31a8fc884d48b4b"
 )
 EXPECTED_LIFECYCLE_GOVERNANCE_AUTHORITY_HASH = (
-    "7e9433aa2ee706dda61871c6ad2b1a1aee4cf7a8f9b6365351942096b5347c84"
+    "bb367f2af726be105bddf42636c97652402014c8a671d43ab81b1964c258e5cf"
 )
 DISCOVERY_SELECTION_CORRECTION_CONTRACT_HASH = (
     "f84c97050c7db813263e5ffda6b1c556af0b7b0e2876bb8616640d2c9d67084b"
 )
-
-# Independently accepted V1 lifecycle implementation authority is now published.
-ACCEPTED_LIFECYCLE_IMPLEMENTATION_AUTHORITY_HASH: str | None = (
-    "d3a304ddc6bcb7b7fc398ccf45a751a0afa3f91634a09ddff8e199af1970e440"
+DISCOVERY_PROVENANCE_CONTRACT_HASH = (
+    "31fc3930e44149e6b3af54ddd3b11c630f95cbbd3f152b3d0d5e614690dcf7ae"
 )
+
+# Non-negotiable staged authority state: both accepted constants remain None
+ACCEPTED_LIFECYCLE_IMPLEMENTATION_AUTHORITY_HASH: str | None = None
+ACCEPTED_H40_P3_CONTROLLER_AUTHORITY_HASH: str | None = None
 
 _SHA256_RE = re.compile(r"[0-9a-f]{64}\Z")
 _COMMIT_RE = re.compile(r"[0-9a-f]{40}\Z")
@@ -123,51 +126,644 @@ def normalize_audit_timestamp(value: str) -> str:
 _LIFECYCLE_CONTRACTS_JSON = r'''
 {
   "discovery_authorization_receipt_contract": {
-    "authority_rules": ["transition_api_constructs_receipt_only_after_recomputing_all_bound_authorities","caller_object_path_boolean_or_label_is_not_authority","upstream_receipt_hash_must_be_null","run_authority_id_must_recompute_under_H40_RUN_AUTHORITY_V1","lifecycle_implementation_authority_hash_must_be_independently_accepted","sealed_registered_roster_hash_and_counts_must_match_materialized_run_authority","execution_disabled_must_be_true"],
-    "authorized_transition": ["H40_P1_SCAFFOLDED","H40_DISCOVERY"],
-    "implementation_authority_object": {"canonical_field_names":["accepted_lifecycle_governance_authority_hash","f01_implementation_acceptance_artifact_path","f01_implementation_acceptance_commit_sha","f01_implementation_commit_sha","required_test_ci_evidence_identity","schema_id"],"required_test_ci_evidence_identity_fields":["evidence_manifest_artifact_path","evidence_manifest_sha256","tested_commit_sha"],"schema_id":"H40_LIFECYCLE_IMPLEMENTATION_AUTHORITY_V1"},
-    "receipt_field_contract": {"authorized_at_utc":"audit_timestamp_utc","discovery_selection_correction_contract_hash":"constant:f84c97050c7db813263e5ffda6b1c556af0b7b0e2876bb8616640d2c9d67084b","execution_disabled":"constant:true","lifecycle_governance_authority_hash":"accepted_sha256","lifecycle_implementation_authority_hash":"accepted_sha256","materialized_run_authority_hash":"sha256","not_testable_slot_count":"integer_gte_0","protocol_authority_hash":"constant:a83f8fc7a5ca7109fb8cd7fed114d87c3b2c968b5145c11cada203aa5111d1ce","receipt_schema_id":"constant:H40_RECEIPT_DISCOVERY_AUTH_V2","registered_slot_count":"integer_gte_0","run_authority_id":"sha256","sealed_registered_roster_hash":"sha256","semantic_root_hash":"constant:71889a35f227ed734272b712851174a69bf9dbb12ea3f87cd84c26e7c66f6af1","source_manifest_hash":"sha256","split_attestation_hash":"sha256","split_manifest_hash":"sha256","structural_ledger_hash":"constant:483f68502b57972deae071c7bd4587ca3e57ccaa72bd99fb0de07b4f0ab8c85f","total_slot_count":"integer_gt_0","upstream_receipt_hash":"constant:null"},
-    "receipt_hash_rule":"canonical_sha256(exact_receipt_field_contract_keys_only)","receipt_schema_id":"H40_RECEIPT_DISCOVERY_AUTH_V2","schema_id":"H40_LIFECYCLE_CHILD_DISCOVERY_AUTHORIZATION_V1"
+    "authority_rules": [
+      "transition_api_constructs_receipt_only_after_recomputing_all_bound_authorities",
+      "caller_object_path_boolean_or_label_is_not_authority",
+      "upstream_receipt_hash_must_be_null",
+      "run_authority_id_must_recompute_under_H40_RUN_AUTHORITY_V1",
+      "lifecycle_implementation_authority_hash_must_be_independently_accepted",
+      "sealed_registered_roster_hash_and_counts_must_match_materialized_run_authority",
+      "execution_disabled_must_be_true",
+      "controller_authority_hash_must_equal_current_in_process_ACCEPTED_H40_P3_CONTROLLER_AUTHORITY_HASH",
+      "discovery_run_grant_hash_must_recompute_under_H40_DISCOVERY_RUN_GRANT_V1_and_bind_current_controller_run_runtime_source_split_roster_and_execution_disabled",
+      "production_discovery_receipt_v2_is_invalid_under_lifecycle_v5",
+      "every_production_authoritative_boundary_rechecks_current_in_process_lifecycle_implementation_and_controller_authority_anchors",
+      "superseded_long_lived_production_service_authority_fails_closed",
+      "hot_authority_republication_requires_new_process_or_service_identity"
+    ],
+    "authorized_transition": [
+      "H40_P1_SCAFFOLDED",
+      "H40_DISCOVERY"
+    ],
+    "implementation_authority_object": {
+      "canonical_field_names": [
+        "accepted_lifecycle_governance_authority_hash",
+        "f01_implementation_acceptance_artifact_path",
+        "f01_implementation_acceptance_commit_sha",
+        "f01_implementation_commit_sha",
+        "required_test_ci_evidence_identity",
+        "schema_id"
+      ],
+      "required_test_ci_evidence_identity_fields": [
+        "evidence_manifest_artifact_path",
+        "evidence_manifest_sha256",
+        "tested_commit_sha"
+      ],
+      "schema_id": "H40_LIFECYCLE_IMPLEMENTATION_AUTHORITY_V1"
+    },
+    "receipt_field_contract": {
+      "authorized_at_utc": "audit_timestamp_utc",
+      "discovery_selection_correction_contract_hash": "constant:f84c97050c7db813263e5ffda6b1c556af0b7b0e2876bb8616640d2c9d67084b",
+      "execution_disabled": "constant:true",
+      "lifecycle_governance_authority_hash": "accepted_sha256",
+      "lifecycle_implementation_authority_hash": "accepted_sha256",
+      "materialized_run_authority_hash": "sha256",
+      "not_testable_slot_count": "integer_gte_0",
+      "protocol_authority_hash": "constant:a83f8fc7a5ca7109fb8cd7fed114d87c3b2c968b5145c11cada203aa5111d1ce",
+      "receipt_schema_id": "constant:H40_RECEIPT_DISCOVERY_AUTH_V3",
+      "registered_slot_count": "integer_gte_0",
+      "run_authority_id": "sha256",
+      "sealed_registered_roster_hash": "sha256",
+      "semantic_root_hash": "constant:71889a35f227ed734272b712851174a69bf9dbb12ea3f87cd84c26e7c66f6af1",
+      "source_manifest_hash": "sha256",
+      "split_attestation_hash": "sha256",
+      "split_manifest_hash": "sha256",
+      "structural_ledger_hash": "constant:483f68502b57972deae071c7bd4587ca3e57ccaa72bd99fb0de07b4f0ab8c85f",
+      "total_slot_count": "integer_gt_0",
+      "upstream_receipt_hash": "constant:null",
+      "controller_authority_hash": "sha256_equal_current_in_process_ACCEPTED_H40_P3_CONTROLLER_AUTHORITY_HASH",
+      "discovery_run_grant_hash": "sha256_of_exact_current_H40_DISCOVERY_RUN_GRANT_V1"
+    },
+    "receipt_hash_rule": "canonical_sha256(exact_receipt_field_contract_keys_only)",
+    "receipt_schema_id": "H40_RECEIPT_DISCOVERY_AUTH_V3",
+    "schema_id": "H40_LIFECYCLE_CHILD_DISCOVERY_AUTHORIZATION_V1",
+    "controller_authority_object": {
+      "accepted_hash_constant": "ACCEPTED_H40_P3_CONTROLLER_AUTHORITY_HASH",
+      "accepted_hash_pre_authorization_value": null,
+      "canonical_field_names": [
+        "authorization_scope",
+        "controller_acceptance_artifact_path",
+        "controller_acceptance_commit_sha",
+        "discovery_provenance_contract_hash",
+        "discovery_selection_correction_contract_hash",
+        "execution_disabled",
+        "lifecycle_governance_authority_hash",
+        "lifecycle_implementation_authority_hash",
+        "lifecycle_semantic_root_hash",
+        "permitted_partitions",
+        "protocol_authority_hash",
+        "schema_id",
+        "scientific_semantic_root_hash",
+        "structural_ledger_hash",
+        "transition_source_state",
+        "transition_target_state"
+      ],
+      "fixed_policy": {
+        "authorization_scope": "H40_P3_DISCOVERY_V1",
+        "execution_disabled": true,
+        "permitted_partitions": [
+          "WF1_TRAIN",
+          "WF1_CALIBRATION"
+        ],
+        "transition_source_state": "H40_P1_SCAFFOLDED",
+        "transition_target_state": "H40_DISCOVERY"
+      },
+      "schema_id": "H40_P3_CONTROLLER_AUTHORITY_V1"
+    },
+    "discovery_run_grant_object": {
+      "canonical_field_names": [
+        "authorized_at_utc",
+        "controller_authority_hash",
+        "discovery_provenance_contract_hash",
+        "execution_disabled",
+        "lifecycle_governance_authority_hash",
+        "lifecycle_implementation_authority_hash",
+        "materialized_run_authority_hash",
+        "permitted_partitions",
+        "protocol_authority_hash",
+        "run_authority_id",
+        "runtime_authority_snapshot_hash",
+        "schema_id",
+        "scientific_semantic_root_hash",
+        "sealed_registered_roster_hash",
+        "source_manifest_hash",
+        "split_attestation_hash",
+        "split_manifest_hash",
+        "structural_ledger_hash"
+      ],
+      "derivation_rule": "derived_from_currently_accepted_controller_authority_plus_exact_verified_run_authority_and_runtime_snapshot_seal",
+      "execution_disabled": true,
+      "permitted_partitions": [
+        "WF1_TRAIN",
+        "WF1_CALIBRATION"
+      ],
+      "schema_id": "H40_DISCOVERY_RUN_GRANT_V1"
+    }
   },
   "candidate_lock_receipt_contract": {
-    "authorization_receipt_field_contract":{"discovery_authorization_receipt_hash":"sha256_equal_upstream_receipt_hash","discovery_result_evidence_hash":"verified_evidence_sha256","discovery_selection_correction_contract_hash":"constant:f84c97050c7db813263e5ffda6b1c556af0b7b0e2876bb8616640d2c9d67084b","locked_at_utc":"audit_timestamp_utc","materialized_run_authority_hash":"sha256_equal_discovery_authorization","receipt_schema_id":"constant:H40_RECEIPT_CANDIDATE_LOCK_V2","run_authority_id":"sha256_equal_discovery_authorization","selected_slot_hash":"sha256_derived_by_verifier","selected_slot_index":"integer_derived_by_verifier","selected_structural_configuration_hash":"sha256_derived_by_verifier","selection_verifier_id":"constant:H40_DISCOVERY_SELECTION_VERIFIER_V1","upstream_receipt_hash":"sha256_of_discovery_authorization_receipt","verified_at_utc":"audit_timestamp_utc"},
-    "authorized_transition":["H40_DISCOVERY","H40_CANDIDATE_LOCKED"],
-    "candidate_result_entry_field_contract":{"candidate_result_input_evidence_hash":"sha256_of_complete_canonical_scientific_result_inputs_bound_to_run_authority_candidate_source_split_and_accepted_contracts","complexity":"integer_derived_from_accepted_configuration","family_id":"string_derived_from_accepted_configuration","hard_gate_input_evidence_hashes":"complete_object_sorted_by_accepted_gate_id_to_run_and_candidate_bound_sha256","net_expectancy_input_evidence_hash":"run_and_candidate_bound_sha256","precision_input_evidence_hash":"run_and_candidate_bound_sha256","slot_hash":"sha256","slot_index":"integer_0_through_167","structural_configuration_hash":"sha256"},
-    "discovery_result_evidence_field_contract":{"candidate_result_entries":"array_sorted_by_structural_configuration_hash_ascending","correction_input_evidence_manifest_hash":"sha256_of_complete_run_roster_metric_specific_and_cross_family_inputs","created_at_utc":"audit_timestamp_utc","discovery_authorization_receipt_hash":"sha256","discovery_partition":"constant:WF1_CALIBRATION","discovery_selection_contract_id":"constant:DISCOVERY_SELECTION_V1","discovery_selection_correction_contract_hash":"constant:f84c97050c7db813263e5ffda6b1c556af0b7b0e2876bb8616640d2c9d67084b","evidence_schema_id":"constant:H40_DISCOVERY_RESULT_EVIDENCE_V1","materialized_run_authority_hash":"sha256","run_authority_id":"sha256","sealed_registered_roster_hash":"sha256"},
-    "evidence_completeness_rule":"candidate_result_entries_must_equal_the_complete_sealed_REGISTERED_roster_with_no_missing_duplicate_or_extra_configuration",
-    "forbidden_authority":["caller_supplied_selection_rank","summary_locator_or_hash_without_canonical_result_evidence","global_M_equals_18_FWER","ascending_slot_index_as_final_tie","runner_up_promotion"],
-    "receipt_hash_rule":"canonical_sha256(exact_authorization_receipt_field_contract_keys_only)","result_evidence_hash_rule":"canonical_sha256(exact_discovery_result_evidence_fields_with_exact_candidate_result_entry_fields)","schema_id":"H40_LIFECYCLE_CHILD_CANDIDATE_LOCK_V1",
-    "selection_authority":{"contract_id":"DISCOVERY_SELECTION_V1","content_hash":"f84c97050c7db813263e5ffda6b1c556af0b7b0e2876bb8616640d2c9d67084b","cross_family_rule":"Holm_applies_to_family_representatives","final_selection_order":["pass_every_accepted_hard_gate","highest_adjusted_LCB_net_expectancy","highest_adjusted_LCB_precision","lower_complexity","ascending_canonical_structural_configuration_hash_or_configuration_ID"],"metric_correction_rule":"PRECISION_and_NET_EXPECTANCY_within_family_max_statistic_corrections_are_separate","no_runner_up_promotion":true,"within_family_universe":"REGISTERED_rows_of_that_family_in_the_sealed_snapshot"},
-    "verifier_obligations":["load_every_evidence_object_by_content_hash_validate_exact_schema_and_verify_run_candidate_source_split_and_contract_lineage","recompute_candidate_identity_and_membership_against_the_sealed_roster","recompute_all_hard_gates_and_all_correction_and_selection_outputs_under_the_accepted_content_hash","derive_exactly_one_winner_or_emit_no_authorization_receipt","persist_authorization_receipt_only_after_successful_recomputation","reverify_result_evidence_and_selection_on_restore_before_transition_use"]
+    "authorization_receipt_field_contract": {
+      "discovery_authorization_receipt_hash": "sha256_equal_upstream_receipt_hash",
+      "discovery_result_evidence_hash": "verified_evidence_sha256",
+      "discovery_selection_correction_contract_hash": "constant:f84c97050c7db813263e5ffda6b1c556af0b7b0e2876bb8616640d2c9d67084b",
+      "locked_at_utc": "audit_timestamp_utc",
+      "materialized_run_authority_hash": "sha256_equal_discovery_authorization",
+      "receipt_schema_id": "constant:H40_RECEIPT_CANDIDATE_LOCK_V2",
+      "run_authority_id": "sha256_equal_discovery_authorization",
+      "selected_slot_hash": "sha256_derived_by_verifier",
+      "selected_slot_index": "integer_derived_by_verifier",
+      "selected_structural_configuration_hash": "sha256_derived_by_verifier",
+      "selection_verifier_id": "constant:H40_DISCOVERY_SELECTION_VERIFIER_V1",
+      "upstream_receipt_hash": "sha256_of_discovery_authorization_receipt",
+      "verified_at_utc": "audit_timestamp_utc"
+    },
+    "authorized_transition": [
+      "H40_DISCOVERY",
+      "H40_CANDIDATE_LOCKED"
+    ],
+    "candidate_result_entry_field_contract": {
+      "candidate_result_input_evidence_hash": "sha256_of_complete_canonical_scientific_result_inputs_bound_to_run_authority_candidate_source_split_and_accepted_contracts",
+      "complexity": "integer_derived_from_accepted_configuration",
+      "family_id": "string_derived_from_accepted_configuration",
+      "hard_gate_input_evidence_hashes": "complete_object_sorted_by_accepted_gate_id_to_run_and_candidate_bound_sha256",
+      "net_expectancy_input_evidence_hash": "run_and_candidate_bound_sha256",
+      "precision_input_evidence_hash": "run_and_candidate_bound_sha256",
+      "slot_hash": "sha256",
+      "slot_index": "integer_0_through_167",
+      "structural_configuration_hash": "sha256"
+    },
+    "discovery_result_evidence_field_contract": {
+      "candidate_result_entries": "array_sorted_by_structural_configuration_hash_ascending",
+      "correction_input_evidence_manifest_hash": "sha256_of_complete_run_roster_metric_specific_and_cross_family_inputs",
+      "created_at_utc": "audit_timestamp_utc",
+      "discovery_authorization_receipt_hash": "sha256",
+      "discovery_partition": "constant:WF1_CALIBRATION",
+      "discovery_selection_contract_id": "constant:DISCOVERY_SELECTION_V1",
+      "discovery_selection_correction_contract_hash": "constant:f84c97050c7db813263e5ffda6b1c556af0b7b0e2876bb8616640d2c9d67084b",
+      "evidence_schema_id": "constant:H40_DISCOVERY_RESULT_EVIDENCE_V1",
+      "materialized_run_authority_hash": "sha256",
+      "run_authority_id": "sha256",
+      "sealed_registered_roster_hash": "sha256"
+    },
+    "evidence_completeness_rule": "candidate_result_entries_must_equal_the_complete_sealed_REGISTERED_roster_with_no_missing_duplicate_or_extra_configuration",
+    "forbidden_authority": [
+      "caller_supplied_selection_rank",
+      "summary_locator_or_hash_without_canonical_result_evidence",
+      "global_M_equals_18_FWER",
+      "ascending_slot_index_as_final_tie",
+      "runner_up_promotion"
+    ],
+    "receipt_hash_rule": "canonical_sha256(exact_authorization_receipt_field_contract_keys_only)",
+    "result_evidence_hash_rule": "canonical_sha256(exact_discovery_result_evidence_fields_with_exact_candidate_result_entry_fields)",
+    "schema_id": "H40_LIFECYCLE_CHILD_CANDIDATE_LOCK_V1",
+    "selection_authority": {
+      "contract_id": "DISCOVERY_SELECTION_V1",
+      "content_hash": "f84c97050c7db813263e5ffda6b1c556af0b7b0e2876bb8616640d2c9d67084b",
+      "cross_family_rule": "Holm_applies_to_family_representatives",
+      "final_selection_order": [
+        "pass_every_accepted_hard_gate",
+        "highest_adjusted_LCB_net_expectancy",
+        "highest_adjusted_LCB_precision",
+        "lower_complexity",
+        "ascending_canonical_structural_configuration_hash_or_configuration_ID"
+      ],
+      "metric_correction_rule": "PRECISION_and_NET_EXPECTANCY_within_family_max_statistic_corrections_are_separate",
+      "no_runner_up_promotion": true,
+      "within_family_universe": "REGISTERED_rows_of_that_family_in_the_sealed_snapshot"
+    },
+    "verifier_obligations": [
+      "load_every_evidence_object_by_content_hash_validate_exact_schema_and_verify_run_candidate_source_split_and_contract_lineage",
+      "recompute_candidate_identity_and_membership_against_the_sealed_roster",
+      "recompute_all_hard_gates_and_all_correction_and_selection_outputs_under_the_accepted_content_hash",
+      "derive_exactly_one_winner_or_emit_no_authorization_receipt",
+      "persist_authorization_receipt_only_after_successful_recomputation",
+      "reverify_result_evidence_and_selection_on_restore_before_transition_use"
+    ]
   },
   "wf_validation_receipt_contract": {
-    "authorization_receipt_field_contract":{"candidate_lock_receipt_hash":"sha256_equal_upstream_receipt_hash","locked_slot_hash":"sha256_equal_candidate_lock","locked_slot_index":"integer_equal_candidate_lock","locked_structural_configuration_hash":"sha256_equal_candidate_lock","receipt_schema_id":"constant:H40_RECEIPT_WF_VALIDATION_V2","run_authority_id":"sha256_equal_candidate_lock","upstream_receipt_hash":"sha256_of_candidate_lock_receipt","validated_at_utc":"audit_timestamp_utc","validation_verifier_id":"constant:H40_WF_VALIDATION_VERIFIER_V1","verified_at_utc":"audit_timestamp_utc","wf_validation_result_evidence_hash":"verified_evidence_sha256"},
-    "authorized_transition":["H40_CANDIDATE_LOCKED","H40_WALK_FORWARD_VALIDATED"],
-    "fold_result_entry_field_contract":{"accepted_gate_input_evidence_hashes":"complete_object_sorted_by_accepted_gate_id_to_run_candidate_split_fold_and_contract_bound_sha256","evaluation_input_evidence_hash":"sha256_of_complete_canonical_inputs_bound_to_run_candidate_split_fold_and_accepted_contracts","fold_identity_hash":"sha256_derived_from_split_authority","fold_id":"string_derived_from_split_authority","partition_id":"string_derived_from_split_authority","split_definition_hash":"sha256_derived_from_split_manifest"},
-    "forbidden_authority":["caller_supplied_all_wf_gates_passed_boolean","summary_locator_or_hash_without_canonical_fold_evidence","foreign_candidate_evidence","foreign_or_modified_split_evidence"],
-    "receipt_hash_rule":"canonical_sha256(exact_authorization_receipt_field_contract_keys_only)","result_evidence_hash_rule":"canonical_sha256(exact_wf_validation_result_evidence_fields_with_exact_fold_result_entry_fields)","schema_id":"H40_LIFECYCLE_CHILD_WF_VALIDATION_V1",
-    "verifier_obligations":["load_every_fold_evidence_object_by_content_hash_validate_exact_schema_and_verify_run_candidate_split_fold_and_contract_lineage","derive_the_complete_ordered_fold_set_from_split_manifest_and_split_attestation","reject_missing_duplicate_extra_or_reordered_fold_identity","recompute_candidate_identity_split_identity_every_accepted_validation_gate_and_aggregate_pass_status","emit_authorization_receipt_only_when_every_accepted_gate_passes","emit_termination_not_validation_authority_when_any_gate_fails","reverify_result_evidence_and_all_gate_results_on_restore_before_transition_use"],
-    "wf_validation_result_evidence_field_contract":{"accepted_validation_contract_hashes":"complete_object_sorted_by_contract_id_to_hash_resolved_from_accepted_P2_semantic_authority_no_subset_or_extra","candidate_lock_receipt_hash":"sha256","created_at_utc":"audit_timestamp_utc","evidence_schema_id":"constant:H40_WF_VALIDATION_RESULT_EVIDENCE_V1","fold_result_entries":"array_in_authoritative_split_order","locked_slot_hash":"sha256","locked_slot_index":"integer_0_through_167","locked_structural_configuration_hash":"sha256","run_authority_id":"sha256","split_attestation_hash":"sha256","split_manifest_hash":"sha256","validation_protocol_id":"constant:H40_PROTOCOL_V1_R3"}
+    "authorization_receipt_field_contract": {
+      "candidate_lock_receipt_hash": "sha256_equal_upstream_receipt_hash",
+      "locked_slot_hash": "sha256_equal_candidate_lock",
+      "locked_slot_index": "integer_equal_candidate_lock",
+      "locked_structural_configuration_hash": "sha256_equal_candidate_lock",
+      "receipt_schema_id": "constant:H40_RECEIPT_WF_VALIDATION_V2",
+      "run_authority_id": "sha256_equal_candidate_lock",
+      "upstream_receipt_hash": "sha256_of_candidate_lock_receipt",
+      "validated_at_utc": "audit_timestamp_utc",
+      "validation_verifier_id": "constant:H40_WF_VALIDATION_VERIFIER_V1",
+      "verified_at_utc": "audit_timestamp_utc",
+      "wf_validation_result_evidence_hash": "verified_evidence_sha256"
+    },
+    "authorized_transition": [
+      "H40_CANDIDATE_LOCKED",
+      "H40_WALK_FORWARD_VALIDATED"
+    ],
+    "fold_result_entry_field_contract": {
+      "accepted_gate_input_evidence_hashes": "complete_object_sorted_by_accepted_gate_id_to_run_candidate_split_fold_and_contract_bound_sha256",
+      "evaluation_input_evidence_hash": "sha256_of_complete_canonical_inputs_bound_to_run_candidate_split_fold_and_accepted_contracts",
+      "fold_identity_hash": "sha256_derived_from_split_authority",
+      "fold_id": "string_derived_from_split_authority",
+      "partition_id": "string_derived_from_split_authority",
+      "split_definition_hash": "sha256_derived_from_split_manifest"
+    },
+    "forbidden_authority": [
+      "caller_supplied_all_wf_gates_passed_boolean",
+      "summary_locator_or_hash_without_canonical_fold_evidence",
+      "foreign_candidate_evidence",
+      "foreign_or_modified_split_evidence"
+    ],
+    "receipt_hash_rule": "canonical_sha256(exact_authorization_receipt_field_contract_keys_only)",
+    "result_evidence_hash_rule": "canonical_sha256(exact_wf_validation_result_evidence_fields_with_exact_fold_result_entry_fields)",
+    "schema_id": "H40_LIFECYCLE_CHILD_WF_VALIDATION_V1",
+    "verifier_obligations": [
+      "load_every_fold_evidence_object_by_content_hash_validate_exact_schema_and_verify_run_candidate_split_fold_and_contract_lineage",
+      "derive_the_complete_ordered_fold_set_from_split_manifest_and_split_attestation",
+      "reject_missing_duplicate_extra_or_reordered_fold_identity",
+      "recompute_candidate_identity_split_identity_every_accepted_validation_gate_and_aggregate_pass_status",
+      "emit_authorization_receipt_only_when_every_accepted_gate_passes",
+      "emit_termination_not_validation_authority_when_any_gate_fails",
+      "reverify_result_evidence_and_all_gate_results_on_restore_before_transition_use"
+    ],
+    "wf_validation_result_evidence_field_contract": {
+      "accepted_validation_contract_hashes": "complete_object_sorted_by_contract_id_to_hash_resolved_from_accepted_P2_semantic_authority_no_subset_or_extra",
+      "candidate_lock_receipt_hash": "sha256",
+      "created_at_utc": "audit_timestamp_utc",
+      "evidence_schema_id": "constant:H40_WF_VALIDATION_RESULT_EVIDENCE_V1",
+      "fold_result_entries": "array_in_authoritative_split_order",
+      "locked_slot_hash": "sha256",
+      "locked_slot_index": "integer_0_through_167",
+      "locked_structural_configuration_hash": "sha256",
+      "run_authority_id": "sha256",
+      "split_attestation_hash": "sha256",
+      "split_manifest_hash": "sha256",
+      "validation_protocol_id": "constant:H40_PROTOCOL_V1_R3"
+    }
   },
-  "confirmation_ready_receipt_contract":{"authority_rules":["wf_authorization_receipt_must_be_reverified","candidate_run_and_split_lineage_must_match_exactly","receipt_grants_waiting_state_only","receipt_grants_no_confirmation_data_or_outcome_access","f02_status_must_equal_OPEN_SEALED"],"authorized_transition":["H40_WALK_FORWARD_VALIDATED","H40_CONFIRMATION_READY"],"receipt_field_contract":{"confirmation_partition_end_utc":"constant:2026-02-01T00:00:00Z","confirmation_partition_name":"constant:CONFIRMATION_HOLDOUT","confirmation_partition_start_utc":"constant:2025-02-01T00:00:00Z","f02_blocker_status":"constant:OPEN_SEALED","locked_slot_hash":"sha256_equal_wf_authorization","locked_slot_index":"integer_equal_wf_authorization","locked_structural_configuration_hash":"sha256_equal_wf_authorization","prepared_at_utc":"audit_timestamp_utc","receipt_schema_id":"constant:H40_RECEIPT_CONFIRMATION_READY_V2","run_authority_id":"sha256_equal_wf_authorization","split_attestation_hash":"sha256_equal_verified_wf_evidence","split_manifest_hash":"sha256_equal_verified_wf_evidence","upstream_receipt_hash":"sha256_of_wf_validation_authorization_receipt","wf_validation_receipt_hash":"sha256_equal_upstream_receipt_hash"},"receipt_hash_rule":"canonical_sha256(exact_receipt_field_contract_keys_only)","schema_id":"H40_LIFECYCLE_CHILD_CONFIRMATION_READY_V1"},
-  "termination_receipt_contract":{"accepted_reason_codes":["CONFIG_IDENTITY_CONFLICT","CONFIRMATION_HOLD_LOCKED","CONFIRMATION_NOT_READY","DUPLICATE_TIMESTAMP","EXECUTION_DISABLED","FAMILY_PAIR_RESTRICTED","HORIZON_TRUNCATED","INTERVAL_MISMATCH","LOOKBACK_RESERVED","NOT_TESTABLE","OUTSIDE_PREREGISTERED_SPLIT","PIT_UNAVAILABLE","PRODUCT_MISMATCH","PROTECTED_SURFACE_DENIED","PURGE_BOUNDARY","SEARCH_BUDGET_EXHAUSTED","SOURCE_GAP","SOURCE_HASH_MISMATCH","SOURCE_MISSING","SOURCE_UNVERIFIED","THRESHOLD_UNMET","UNAUTHORIZED_FAMILY"],"authority_rules":["termination_receipt_never_authorizes_forward_progress","H40_NO_GO_and_NOT_TESTABLE_are_absorbing","reason_code_must_belong_to_the_accepted_H40ReasonCode_vocabulary","failure_evidence_when_present_must_be_loaded_and_content_hash_verified","source_state_and_upstream_receipt_must_match_current_verified_chain"],"receipt_field_contract":{"detail_message":"audit_string","failure_evidence_hash":"sha256_or_null","reason_code":"accepted_H40ReasonCode","receipt_schema_id":"constant:H40_RECEIPT_TERMINATION_V2","run_authority_id":"sha256","source_state":"current_lifecycle_state","target_state":"enum:H40_NO_GO_or_NOT_TESTABLE","terminated_at_utc":"audit_timestamp_utc","upstream_receipt_hash":"current_verified_receipt_sha256_or_null"},"receipt_hash_rule":"canonical_sha256(exact_receipt_field_contract_keys_only)","schema_id":"H40_LIFECYCLE_CHILD_TERMINATION_V1","terminal_states":["H40_NO_GO","NOT_TESTABLE"]},
-  "transition_matrix_contract":{"global_rules":["state_adjacency_is_necessary_never_sufficient","current_executable_HEAD_is_never_required_to_equal_historical_P1_commit","P1_scaffold_transition_verifies_historical_acceptance_artifact_integrity_and_frozen_scientific_identity","executable_authority_for_discovery_is_the_accepted_lifecycle_implementation_authority","all_unlisted_transitions_are_forbidden","terminal_states_are_absorbing"],"historical_scaffold_lineage":{"p1_accepted_code_baseline_commit_sha":"1ddb8eea3259791cf213be03f09557396a03160f","p1_final_acceptance_commit_sha":"1141baec371d53978c5d9751607979fee21464b3","p2_acceptance_record_commit_sha":"52ca0cdb53e5c2dd579ddf4a884d671825f970df","p2_accepted_code_baseline_commit_sha":"ac5e3a1d6c1423f7fe9639e2f5f78095df27d400","p2_final_acceptance_commit_sha":"3208ca92525ed88d31635a6ac9ce9cd4ac6ec725","p2r1_implementation_commit_sha":"81dc2f9bb9a203cb4c72dc6a646aafab1f1985d0","rule":"verify_historical_lineage_and_artifact_integrity_only_never_current_executable_HEAD_equality"},"rows":[{"authority":"P1_LINEAGE_VERIFIER_V1","source":"H40_PREREGISTERED","target":"H40_P1_SCAFFOLDED"},{"authority":"H40_RECEIPT_DISCOVERY_AUTH_V2","source":"H40_P1_SCAFFOLDED","target":"H40_DISCOVERY"},{"authority":"H40_RECEIPT_TERMINATION_V2","source":"H40_P1_SCAFFOLDED","target":"H40_NO_GO"},{"authority":"H40_RECEIPT_TERMINATION_V2","source":"H40_P1_SCAFFOLDED","target":"NOT_TESTABLE"},{"authority":"H40_RECEIPT_CANDIDATE_LOCK_V2_AFTER_RESULT_RECOMPUTATION","source":"H40_DISCOVERY","target":"H40_CANDIDATE_LOCKED"},{"authority":"H40_RECEIPT_TERMINATION_V2","source":"H40_DISCOVERY","target":"H40_NO_GO"},{"authority":"H40_RECEIPT_TERMINATION_V2","source":"H40_DISCOVERY","target":"NOT_TESTABLE"},{"authority":"H40_RECEIPT_WF_VALIDATION_V2_AFTER_RESULT_RECOMPUTATION","source":"H40_CANDIDATE_LOCKED","target":"H40_WALK_FORWARD_VALIDATED"},{"authority":"H40_RECEIPT_TERMINATION_V2_NO_RUNNER_UP","source":"H40_CANDIDATE_LOCKED","target":"H40_NO_GO"},{"authority":"H40_RECEIPT_CONFIRMATION_READY_V2","source":"H40_WALK_FORWARD_VALIDATED","target":"H40_CONFIRMATION_READY"},{"authority":"H40_RECEIPT_TERMINATION_V2","source":"H40_WALK_FORWARD_VALIDATED","target":"H40_NO_GO"},{"authority":"PROHIBITED_BY_H40_FSA_F02","source":"H40_CONFIRMATION_READY","target":"H40_CONFIRMATION_EVALUATED_ONCE"},{"authority":"H40_RECEIPT_TERMINATION_V2","source":"H40_CONFIRMATION_READY","target":"H40_NO_GO"}],"schema_id":"H40_LIFECYCLE_CHILD_TRANSITION_MATRIX_V1"},
-  "persistence_replay_contract":{"authorization_receipt_issuance":"only_the_accepted_implementation_verifier_may_atomically_construct_and_persist_authorization_after_recomputation_external_caller_receipts_are_inputs_for_reverification_not_trusted_claims","canonical_storage_key":"artifacts/h40/lifecycle/runs/<run_authority_id>","capability_lifetime_rule":"every_production_transition_issue_revalidation_and_consumption_must_recursively_reverify_the_root_runtime_snapshot_seal_and_current_active_source_truth_before_authority_is_used_cached_and_cold_restored_authority_must_apply_the_same_root_truth_checks","cross_boundary_checks":["run_authority_id_equal_at_every_chain_link","candidate_identity_equal_from_lock_through_confirmation_ready","split_manifest_and_attestation_equal_from_discovery_through_confirmation_ready","upstream_hash_equal_recomputed_predecessor_hash","lifecycle_governance_and_implementation_authorities_equal_accepted_values"],"durable_run_head_contract":{"concurrency_rule":"head_commit_must_be_a_linearizable_transactional_compare_and_advance_single_winner_stale_or_conflicting_writers_fail_closed","field_contract":{"head_predecessor_receipt_hash":"sha256_or_null","head_receipt_hash":"sha256","head_state":"accepted_lifecycle_state_equal_head_receipt_target_state","run_authority_id":"sha256_equal_current_run","schema_id":"constant:H40_DURABLE_RUN_HEAD_V1","terminal":"boolean_derived_from_accepted_terminal_states","transition_sequence":"integer_gte_0_monotonic_by_exactly_one"},"head_hash_rule":"canonical_sha256(exact_field_contract_keys_only)","ownership_rule":"exactly_one_committed_authoritative_head_per_run_authority_id","restore_rule":"only_receipts_reachable_from_the_current_committed_head_lineage_may_be_restored_as_authority","terminal_rule":"committed_terminal_head_is_absorbing_across_process_restart_and_all_later_consumers","transition_rule":"successor_commit_requires_expected_predecessor_receipt_hash_equal_current_committed_head_receipt_hash_expected_sequence_equal_current_sequence_plus_one_and_current_head_not_terminal"},"failure_semantics":"any_missing_extra_malformed_hash_mismatch_lineage_mismatch_cross_run_cross_candidate_cross_split_stale_head_conflicting_successor_or_terminal_successor_condition_fails_closed_with_no_committed_state_advance","persistence_rules":["receipt_and_bound_evidence_bytes_are_fully_materialized_and_fsynced_before_final_publication","immutable_receipts_are_content_addressed_and_atomically_published_without_overwriting_different_existing_bytes","unreferenced_fully_published_receipts_are_uncommitted_orphans_and_confer_no_lifecycle_authority","temporary_or_partial_artifacts_never_confer_authority","the_durable_run_head_is_the_only_commit_point_for_run_history","durable_run_head_advance_uses_linearizable_transactional_compare_and_advance_against_expected_predecessor_and_sequence","different_successor_for_the_same_committed_predecessor_is_rejected","identical_transition_retry_is_idempotent_only_after_full_reverification_and_exact_committed_successor_match","restore_recomputes_every_content_hash_every_authoritative_verifier_result_and_root_runtime_source_truth","restore_accepts_only_the_current_committed_head_or_receipts_on_its_unique_ancestor_lineage","directory_filename_and_caller_label_have_no_authority","authorization_receipts_and_bound_result_evidence_are_write_once"],"run_authority_field_contract":{"discovery_selection_correction_contract_hash":"constant:f84c97050c7db813263e5ffda6b1c556af0b7b0e2876bb8616640d2c9d67084b","lifecycle_governance_authority_hash":"accepted_sha256","lifecycle_implementation_authority_hash":"accepted_sha256","materialized_run_authority_hash":"sha256","protocol_authority_hash":"constant:a83f8fc7a5ca7109fb8cd7fed114d87c3b2c968b5145c11cada203aa5111d1ce","schema_id":"constant:H40_RUN_AUTHORITY_V1","sealed_registered_roster_hash":"sha256","semantic_root_hash":"constant:71889a35f227ed734272b712851174a69bf9dbb12ea3f87cd84c26e7c66f6af1","source_manifest_hash":"sha256","split_attestation_hash":"sha256","split_manifest_hash":"sha256","structural_ledger_hash":"constant:483f68502b57972deae071c7bd4587ca3e57ccaa72bd99fb0de07b4f0ab8c85f"},"run_authority_rule":"run_authority_id_equals_canonical_sha256_of_exact_run_authority_field_contract_keys_only","run_instance_nonce":"none","schema_id":"H40_LIFECYCLE_CHILD_PERSISTENCE_REPLAY_V2","timestamp_rule":"exact_YYYY-MM-DDTHH:MM:SSZ_calendar_valid_UTC_hash_bound_audit_only_never_authorization_critical_no_clock_tolerance"},
-  "runtime_snapshot_seal_contract":{"materialized_run_authority_binding":["runtime_authority_snapshot_hash","source_manifest_hash","split_manifest_hash","split_attestation_hash","sealed_registered_roster_hash","registered_slot_count","not_testable_slot_count","total_slot_count"],"roster_entry_field_contract":{"family_id":"accepted_family_id","slot_hash":"sha256","slot_index":"integer_0_through_167","structural_configuration_hash":"sha256"},"roster_hash_rule":"canonical_sha256(array_of_exact_roster_entries_sorted_by_structural_configuration_hash_ascending)","runtime_source_split_attestation_contract":{"active_source_evidence_entry_field_contract":{"file_sha256":"sha256_equal_source_record_receipt_and_cold_validation_receipt","source_id":"accepted_source_id_required_by_at_least_one_sealed_REGISTERED_slot","source_record_hash":"canonical_sha256(exact_runtime_source_record)","source_validation_receipt_hash":"canonical_sha256(exact_cold_validation_receipt)","timestamp_count":"integer_gt_0_equal_source_record_receipt_and_cold_validation_receipt","timestamp_membership_hash":"sha256_equal_source_record_receipt_and_cold_validation_receipt"},"attestation_field_contract":{"accepted_reference_source_manifest_hash":"constant:af7fe2c187dcd503ba27a3f24ba6347cb3c619a63662106e85c6343eda90a74c","accepted_reference_split_manifest_hash":"constant:6e3ed51b4139c7822343752e29b6d8b2e94f9fadf0def38f2101a444b1da62e9","active_required_source_ids":"array_of_unique_source_ids_sorted_ascending_derived_as_union_of_project_required_sources_for_exact_sealed_REGISTERED_roster","active_source_evidence":"array_of_exact_active_source_evidence_entries_sorted_by_source_id","not_testable_slot_count":"integer_derived_from_sealed_runtime_projection","not_testable_source_ids":"array_of_source_ids_sorted_ascending_whose_accepted_runtime_state_is_NOT_TESTABLE","protocol_identity_hash":"constant:6533e880ced04214262f84c21fee98c478ef5c09fa7d0b9f55d650e673a1f971","registered_slot_count":"integer_derived_from_sealed_runtime_projection","runtime_authority_snapshot_hash":"sha256_of_exact_runtime_authority_snapshot_preimage","runtime_authority_snapshot_id":"accepted_nonempty_snapshot_id_bound_into_runtime_authority_snapshot_hash","schema_id":"constant:H40_RUNTIME_SOURCE_SPLIT_ATTESTATION_V1","sealed_registered_roster_hash":"sha256_equal_runtime_seal","source_authority_state_entries":"array_of_exact_source_authority_state_entries_sorted_by_source_id","source_manifest_hash":"sha256_of_exact_runtime_source_manifest","split_manifest_hash":"sha256_of_exact_runtime_scoped_authoritative_split_manifest","structural_ledger_hash":"constant:483f68502b57972deae071c7bd4587ca3e57ccaa72bd99fb0de07b4f0ab8c85f","total_slot_count":"constant:168"},"attestation_hash_rule":"canonical_sha256(exact_attestation_field_contract_keys_with_exact_nested_entry_fields)","source_authority_state_entry_field_contract":{"production_authority_state":"enum:VERIFIED_or_NOT_TESTABLE_equal_accepted_runtime_authority_snapshot","source_id":"accepted_runtime_source_id"},"verifier_rules":["require_typed_runtime_source_manifest_typed_runtime_split_manifest_and_exact_H40_RUNTIME_SOURCE_SPLIT_ATTESTATION_V1","recompute_source_manifest_split_manifest_attestation_and_runtime_snapshot_hashes_from_exact_canonical_objects","require_source_authority_state_entries_to_equal_the_complete_accepted_runtime_snapshot_preimage_without_inferring_authority_from_local_file_presence","derive_active_required_source_ids_as_the_exact_union_of_project_required_sources_over_the_complete_sealed_REGISTERED_roster","require_every_active_required_source_to_be_VERIFIED_in_the_accepted_runtime_snapshot_and_every_REGISTERED_slot_to_have_no_other_source_dependency","identity_validate_every_runtime_source_record_against_the_accepted_reference_source_manifest_without_promoting_NOT_TESTABLE_sources","cold_validate_only_every_active_required_source_and_bind_its_exact_record_receipt_file_and_timestamp_membership_hashes","require_not_testable_source_ids_to_equal_the_accepted_NOT_TESTABLE_snapshot_entries_and_forbid_active_source_evidence_for_them","verify_the_static_partition_calendar_against_the_accepted_reference_split_manifest_independently_of_source_availability","reconstruct_the_runtime_split_partitions_counts_exclusions_and_timestamp_hashes_from_the_intersection_of_exactly_the_cold_verified_active_required_sources","require_runtime_split_manifest_is_authoritative_true_under_this_attestation_and_never_treat_that_flag_as_sufficient_authority","require_runtime_split_protocol_source_manifest_and_attestation_lineage_to_match_exactly","reject_legacy_BTC_and_ETH_pair_attestation_synthetic_attestation_preregistered_schedule_only_and_hash_self_consistency_without_evidence_truth","bind_the_same_source_manifest_split_manifest_and_runtime_source_split_attestation_hashes_through_Discovery_WF_restore_and_replay"]},"schema_id":"H40_LIFECYCLE_CHILD_RUNTIME_SNAPSHOT_SEAL_V2","seal_rules":["seal_before_any_discovery_label_return_metric_or_candidate_result_access","REGISTERED_and_NOT_TESTABLE_are_derived_from_the_sealed_materialized_authority","counts_must_sum_to_total_slot_count_and_roster_length_must_equal_registered_slot_count","roster_entries_must_match_the_accepted_168_row_structural_ledger","post_seal_source_state_change_cannot_mutate_or_expand_the_active_roster","a_different_snapshot_or_materialized_authority_produces_a_different_run_authority_id","runtime_source_state_changes_never_change_protocol_semantic_or_structural_ledger_hashes"]},
-  "f02_boundary_contract":{"allowed_scope":"define_H40ConfirmationReadyReceipt_and_verified_lineage_only","confirmation_state":"sealed_waiting_state_only","forbidden_capabilities":["confirmation_nonce","confirmation_unlock_key","one_shot_evaluation_authority","confirmation_outcome_access","confirmation_evaluation_execution"],"guard_result":"H40GuardError_with_CONFIRMATION_NOT_READY","prohibited_transition":["H40_CONFIRMATION_READY","H40_CONFIRMATION_EVALUATED_ONCE"],"schema_id":"H40_LIFECYCLE_CHILD_F02_BOUNDARY_V1","status":"H40_FSA_F02_OPEN_SEALED"}
+  "confirmation_ready_receipt_contract": {
+    "authority_rules": [
+      "wf_authorization_receipt_must_be_reverified",
+      "candidate_run_and_split_lineage_must_match_exactly",
+      "receipt_grants_waiting_state_only",
+      "receipt_grants_no_confirmation_data_or_outcome_access",
+      "f02_status_must_equal_OPEN_SEALED"
+    ],
+    "authorized_transition": [
+      "H40_WALK_FORWARD_VALIDATED",
+      "H40_CONFIRMATION_READY"
+    ],
+    "receipt_field_contract": {
+      "confirmation_partition_end_utc": "constant:2026-02-01T00:00:00Z",
+      "confirmation_partition_name": "constant:CONFIRMATION_HOLDOUT",
+      "confirmation_partition_start_utc": "constant:2025-02-01T00:00:00Z",
+      "f02_blocker_status": "constant:OPEN_SEALED",
+      "locked_slot_hash": "sha256_equal_wf_authorization",
+      "locked_slot_index": "integer_equal_wf_authorization",
+      "locked_structural_configuration_hash": "sha256_equal_wf_authorization",
+      "prepared_at_utc": "audit_timestamp_utc",
+      "receipt_schema_id": "constant:H40_RECEIPT_CONFIRMATION_READY_V2",
+      "run_authority_id": "sha256_equal_wf_authorization",
+      "split_attestation_hash": "sha256_equal_verified_wf_evidence",
+      "split_manifest_hash": "sha256_equal_verified_wf_evidence",
+      "upstream_receipt_hash": "sha256_of_wf_validation_authorization_receipt",
+      "wf_validation_receipt_hash": "sha256_equal_upstream_receipt_hash"
+    },
+    "receipt_hash_rule": "canonical_sha256(exact_receipt_field_contract_keys_only)",
+    "schema_id": "H40_LIFECYCLE_CHILD_CONFIRMATION_READY_V1"
+  },
+  "termination_receipt_contract": {
+    "accepted_reason_codes": [
+      "CONFIG_IDENTITY_CONFLICT",
+      "CONFIRMATION_HOLD_LOCKED",
+      "CONFIRMATION_NOT_READY",
+      "DUPLICATE_TIMESTAMP",
+      "EXECUTION_DISABLED",
+      "FAMILY_PAIR_RESTRICTED",
+      "HORIZON_TRUNCATED",
+      "INTERVAL_MISMATCH",
+      "LOOKBACK_RESERVED",
+      "NOT_TESTABLE",
+      "OUTSIDE_PREREGISTERED_SPLIT",
+      "PIT_UNAVAILABLE",
+      "PRODUCT_MISMATCH",
+      "PROTECTED_SURFACE_DENIED",
+      "PURGE_BOUNDARY",
+      "SEARCH_BUDGET_EXHAUSTED",
+      "SOURCE_GAP",
+      "SOURCE_HASH_MISMATCH",
+      "SOURCE_MISSING",
+      "SOURCE_UNVERIFIED",
+      "THRESHOLD_UNMET",
+      "UNAUTHORIZED_FAMILY"
+    ],
+    "authority_rules": [
+      "termination_receipt_never_authorizes_forward_progress",
+      "H40_NO_GO_and_NOT_TESTABLE_are_absorbing",
+      "reason_code_must_belong_to_the_accepted_H40ReasonCode_vocabulary",
+      "failure_evidence_when_present_must_be_loaded_and_content_hash_verified",
+      "source_state_and_upstream_receipt_must_match_current_verified_chain"
+    ],
+    "receipt_field_contract": {
+      "detail_message": "audit_string",
+      "failure_evidence_hash": "sha256_or_null",
+      "reason_code": "accepted_H40ReasonCode",
+      "receipt_schema_id": "constant:H40_RECEIPT_TERMINATION_V2",
+      "run_authority_id": "sha256",
+      "source_state": "current_lifecycle_state",
+      "target_state": "enum:H40_NO_GO_or_NOT_TESTABLE",
+      "terminated_at_utc": "audit_timestamp_utc",
+      "upstream_receipt_hash": "current_verified_receipt_sha256_or_null"
+    },
+    "receipt_hash_rule": "canonical_sha256(exact_receipt_field_contract_keys_only)",
+    "schema_id": "H40_LIFECYCLE_CHILD_TERMINATION_V1",
+    "terminal_states": [
+      "H40_NO_GO",
+      "NOT_TESTABLE"
+    ]
+  },
+  "transition_matrix_contract": {
+    "global_rules": [
+      "state_adjacency_is_necessary_never_sufficient",
+      "current_executable_HEAD_is_never_required_to_equal_historical_P1_commit",
+      "P1_scaffold_transition_verifies_historical_acceptance_artifact_integrity_and_frozen_scientific_identity",
+      "executable_authority_for_discovery_is_the_accepted_lifecycle_implementation_authority",
+      "all_unlisted_transitions_are_forbidden",
+      "terminal_states_are_absorbing",
+      "H40_P1_SCAFFOLDED_to_H40_DISCOVERY_requires_current_accepted_controller_authority_and_matching_exact_run_grant",
+      "every_production_transition_authorization_rechecks_current_in_process_lifecycle_implementation_and_controller_authority_anchors",
+      "superseded_long_lived_production_service_authority_fails_closed",
+      "hot_authority_republication_requires_new_process_or_service_identity"
+    ],
+    "historical_scaffold_lineage": {
+      "p1_accepted_code_baseline_commit_sha": "1ddb8eea3259791cf213be03f09557396a03160f",
+      "p1_final_acceptance_commit_sha": "1141baec371d53978c5d9751607979fee21464b3",
+      "p2_acceptance_record_commit_sha": "52ca0cdb53e5c2dd579ddf4a884d671825f970df",
+      "p2_accepted_code_baseline_commit_sha": "ac5e3a1d6c1423f7fe9639e2f5f78095df27d400",
+      "p2_final_acceptance_commit_sha": "3208ca92525ed88d31635a6ac9ce9cd4ac6ec725",
+      "p2r1_implementation_commit_sha": "81dc2f9bb9a203cb4c72dc6a646aafab1f1985d0",
+      "rule": "verify_historical_lineage_and_artifact_integrity_only_never_current_executable_HEAD_equality"
+    },
+    "rows": [
+      {
+        "authority": "P1_LINEAGE_VERIFIER_V1",
+        "source": "H40_PREREGISTERED",
+        "target": "H40_P1_SCAFFOLDED"
+      },
+      {
+        "authority": "H40_RECEIPT_DISCOVERY_AUTH_V3",
+        "source": "H40_P1_SCAFFOLDED",
+        "target": "H40_DISCOVERY"
+      },
+      {
+        "authority": "H40_RECEIPT_TERMINATION_V2",
+        "source": "H40_P1_SCAFFOLDED",
+        "target": "H40_NO_GO"
+      },
+      {
+        "authority": "H40_RECEIPT_TERMINATION_V2",
+        "source": "H40_P1_SCAFFOLDED",
+        "target": "NOT_TESTABLE"
+      },
+      {
+        "authority": "H40_RECEIPT_CANDIDATE_LOCK_V2_AFTER_RESULT_RECOMPUTATION",
+        "source": "H40_DISCOVERY",
+        "target": "H40_CANDIDATE_LOCKED"
+      },
+      {
+        "authority": "H40_RECEIPT_TERMINATION_V2",
+        "source": "H40_DISCOVERY",
+        "target": "H40_NO_GO"
+      },
+      {
+        "authority": "H40_RECEIPT_TERMINATION_V2",
+        "source": "H40_DISCOVERY",
+        "target": "NOT_TESTABLE"
+      },
+      {
+        "authority": "H40_RECEIPT_WF_VALIDATION_V2_AFTER_RESULT_RECOMPUTATION",
+        "source": "H40_CANDIDATE_LOCKED",
+        "target": "H40_WALK_FORWARD_VALIDATED"
+      },
+      {
+        "authority": "H40_RECEIPT_TERMINATION_V2_NO_RUNNER_UP",
+        "source": "H40_CANDIDATE_LOCKED",
+        "target": "H40_NO_GO"
+      },
+      {
+        "authority": "H40_RECEIPT_CONFIRMATION_READY_V2",
+        "source": "H40_WALK_FORWARD_VALIDATED",
+        "target": "H40_CONFIRMATION_READY"
+      },
+      {
+        "authority": "H40_RECEIPT_TERMINATION_V2",
+        "source": "H40_WALK_FORWARD_VALIDATED",
+        "target": "H40_NO_GO"
+      },
+      {
+        "authority": "PROHIBITED_BY_H40_FSA_F02",
+        "source": "H40_CONFIRMATION_READY",
+        "target": "H40_CONFIRMATION_EVALUATED_ONCE"
+      },
+      {
+        "authority": "H40_RECEIPT_TERMINATION_V2",
+        "source": "H40_CONFIRMATION_READY",
+        "target": "H40_NO_GO"
+      }
+    ],
+    "schema_id": "H40_LIFECYCLE_CHILD_TRANSITION_MATRIX_V1",
+    "production_discovery_preconditions": {
+      "controller_authority_hash_rule": "must_equal_current_in_process_ACCEPTED_H40_P3_CONTROLLER_AUTHORITY_HASH",
+      "controller_authority_schema_id": "H40_P3_CONTROLLER_AUTHORITY_V1",
+      "discovery_run_grant_hash_rule": "must_recompute_and_match_exact_current_H40_DISCOVERY_RUN_GRANT_V1",
+      "discovery_run_grant_schema_id": "H40_DISCOVERY_RUN_GRANT_V1",
+      "execution_disabled": "constant:true",
+      "legacy_discovery_receipt_policy": "H40_RECEIPT_DISCOVERY_AUTH_V2_INVALID_FOR_PRODUCTION",
+      "receipt_schema_id": "H40_RECEIPT_DISCOVERY_AUTH_V3"
+    }
+  },
+  "persistence_replay_contract": {
+    "authorization_receipt_issuance": "only_the_accepted_implementation_verifier_may_atomically_construct_and_persist_authorization_after_recomputation_external_caller_receipts_are_inputs_for_reverification_not_trusted_claims",
+    "canonical_storage_key": "artifacts/h40/lifecycle/runs/<run_authority_id>",
+    "capability_lifetime_rule": "every_production_transition_issue_revalidation_consumption_persistence_and_cold_restore_must_recursively_reverify_root_runtime_snapshot_seal_current_active_source_truth_and_current_in_process_lifecycle_implementation_and_controller_authority_anchors; cached_or_restored_authority_must_apply_the_same_checks; superseded_service_authority_fails_closed",
+    "cross_boundary_checks": [
+      "run_authority_id_equal_at_every_chain_link",
+      "candidate_identity_equal_from_lock_through_confirmation_ready",
+      "split_manifest_and_attestation_equal_from_discovery_through_confirmation_ready",
+      "upstream_hash_equal_recomputed_predecessor_hash",
+      "lifecycle_governance_and_implementation_authorities_equal_accepted_values",
+      "controller_authority_hash_equal_current_in_process_ACCEPTED_H40_P3_CONTROLLER_AUTHORITY_HASH",
+      "discovery_run_grant_hash_recomputed_and_equal_bound_H40_DISCOVERY_RUN_GRANT_V1",
+      "production_persistence_context_is_H40_LIFECYCLE_PERSISTENCE_CONTEXT_V2",
+      "production_discovery_lineage_uses_H40_RECEIPT_DISCOVERY_AUTH_V3"
+    ],
+    "durable_run_head_contract": {
+      "concurrency_rule": "head_commit_must_be_a_linearizable_transactional_compare_and_advance_single_winner_stale_or_conflicting_writers_fail_closed",
+      "field_contract": {
+        "head_predecessor_receipt_hash": "sha256_or_null",
+        "head_receipt_hash": "sha256",
+        "head_state": "accepted_lifecycle_state_equal_head_receipt_target_state",
+        "run_authority_id": "sha256_equal_current_run",
+        "schema_id": "constant:H40_DURABLE_RUN_HEAD_V1",
+        "terminal": "boolean_derived_from_accepted_terminal_states",
+        "transition_sequence": "integer_gte_0_monotonic_by_exactly_one"
+      },
+      "head_hash_rule": "canonical_sha256(exact_field_contract_keys_only)",
+      "ownership_rule": "exactly_one_committed_authoritative_head_per_run_authority_id",
+      "restore_rule": "only_receipts_reachable_from_the_current_committed_head_lineage_may_be_restored_as_authority",
+      "terminal_rule": "committed_terminal_head_is_absorbing_across_process_restart_and_all_later_consumers",
+      "transition_rule": "successor_commit_requires_expected_predecessor_receipt_hash_equal_current_committed_head_receipt_hash_expected_sequence_equal_current_sequence_plus_one_and_current_head_not_terminal"
+    },
+    "failure_semantics": "any_missing_extra_malformed_hash_mismatch_lineage_mismatch_cross_run_cross_candidate_cross_split_stale_head_conflicting_successor_or_terminal_successor_condition_fails_closed_with_no_committed_state_advance",
+    "persistence_rules": [
+      "receipt_and_bound_evidence_bytes_are_fully_materialized_and_fsynced_before_final_publication",
+      "immutable_receipts_are_content_addressed_and_atomically_published_without_overwriting_different_existing_bytes",
+      "unreferenced_fully_published_receipts_are_uncommitted_orphans_and_confer_no_lifecycle_authority",
+      "temporary_or_partial_artifacts_never_confer_authority",
+      "the_durable_run_head_is_the_only_commit_point_for_run_history",
+      "durable_run_head_advance_uses_linearizable_transactional_compare_and_advance_against_expected_predecessor_and_sequence",
+      "different_successor_for_the_same_committed_predecessor_is_rejected",
+      "identical_transition_retry_is_idempotent_only_after_full_reverification_and_exact_committed_successor_match",
+      "restore_recomputes_every_content_hash_every_authoritative_verifier_result_and_root_runtime_source_truth",
+      "restore_accepts_only_the_current_committed_head_or_receipts_on_its_unique_ancestor_lineage",
+      "directory_filename_and_caller_label_have_no_authority",
+      "authorization_receipts_and_bound_result_evidence_are_write_once",
+      "production_persistence_requires_H40_LIFECYCLE_PERSISTENCE_CONTEXT_V2_with_controller_authority_hash_and_discovery_run_grant_hash",
+      "production_cold_restore_rejects_H40_LIFECYCLE_PERSISTENCE_CONTEXT_V1_and_H40_RECEIPT_DISCOVERY_AUTH_V2",
+      "production_persistence_and_restore_revalidate_current_in_process_lifecycle_implementation_and_controller_authority_anchors_and_exact_bound_run_grant",
+      "hot_authority_republication_requires_new_process_or_service_identity_before_new_authoritative_operations"
+    ],
+    "run_authority_field_contract": {
+      "discovery_selection_correction_contract_hash": "constant:f84c97050c7db813263e5ffda6b1c556af0b7b0e2876bb8616640d2c9d67084b",
+      "lifecycle_governance_authority_hash": "accepted_sha256",
+      "lifecycle_implementation_authority_hash": "accepted_sha256",
+      "materialized_run_authority_hash": "sha256",
+      "protocol_authority_hash": "constant:a83f8fc7a5ca7109fb8cd7fed114d87c3b2c968b5145c11cada203aa5111d1ce",
+      "schema_id": "constant:H40_RUN_AUTHORITY_V1",
+      "sealed_registered_roster_hash": "sha256",
+      "semantic_root_hash": "constant:71889a35f227ed734272b712851174a69bf9dbb12ea3f87cd84c26e7c66f6af1",
+      "source_manifest_hash": "sha256",
+      "split_attestation_hash": "sha256",
+      "split_manifest_hash": "sha256",
+      "structural_ledger_hash": "constant:483f68502b57972deae071c7bd4587ca3e57ccaa72bd99fb0de07b4f0ab8c85f"
+    },
+    "run_authority_rule": "run_authority_id_equals_canonical_sha256_of_exact_run_authority_field_contract_keys_only",
+    "run_instance_nonce": "none",
+    "schema_id": "H40_LIFECYCLE_CHILD_PERSISTENCE_REPLAY_V2",
+    "timestamp_rule": "exact_YYYY-MM-DDTHH:MM:SSZ_calendar_valid_UTC_hash_bound_audit_only_never_authorization_critical_no_clock_tolerance",
+    "persistence_context_contract": {
+      "context_hash_rule": "canonical_sha256(exact_field_contract_keys_only)",
+      "field_contract": {
+        "controller_authority_hash": "sha256_equal_current_in_process_ACCEPTED_H40_P3_CONTROLLER_AUTHORITY_HASH",
+        "discovery_run_grant_hash": "sha256_equal_bound_H40_DISCOVERY_RUN_GRANT_V1",
+        "implementation_authority_hash": "sha256_equal_current_in_process_ACCEPTED_LIFECYCLE_IMPLEMENTATION_AUTHORITY_HASH",
+        "predecessor_receipt_hash": "sha256_or_null",
+        "run_authority_id": "sha256_equal_current_run",
+        "runtime_seal_hash": "sha256_equal_current_runtime_snapshot_seal",
+        "schema_id": "constant:H40_LIFECYCLE_PERSISTENCE_CONTEXT_V2",
+        "split_authority_hash": "sha256_or_null"
+      },
+      "legacy_policy": "H40_LIFECYCLE_PERSISTENCE_CONTEXT_V1_INVALID_FOR_PRODUCTION",
+      "schema_id": "H40_LIFECYCLE_PERSISTENCE_CONTEXT_V2"
+    }
+  },
+  "runtime_snapshot_seal_contract": {
+    "materialized_run_authority_binding": [
+      "runtime_authority_snapshot_hash",
+      "source_manifest_hash",
+      "split_manifest_hash",
+      "split_attestation_hash",
+      "sealed_registered_roster_hash",
+      "registered_slot_count",
+      "not_testable_slot_count",
+      "total_slot_count"
+    ],
+    "roster_entry_field_contract": {
+      "family_id": "accepted_family_id",
+      "slot_hash": "sha256",
+      "slot_index": "integer_0_through_167",
+      "structural_configuration_hash": "sha256"
+    },
+    "roster_hash_rule": "canonical_sha256(array_of_exact_roster_entries_sorted_by_structural_configuration_hash_ascending)",
+    "runtime_source_split_attestation_contract": {
+      "active_source_evidence_entry_field_contract": {
+        "file_sha256": "sha256_equal_source_record_receipt_and_cold_validation_receipt",
+        "source_id": "accepted_source_id_required_by_at_least_one_sealed_REGISTERED_slot",
+        "source_record_hash": "canonical_sha256(exact_runtime_source_record)",
+        "source_validation_receipt_hash": "canonical_sha256(exact_cold_validation_receipt)",
+        "timestamp_count": "integer_gt_0_equal_source_record_receipt_and_cold_validation_receipt",
+        "timestamp_membership_hash": "sha256_equal_source_record_receipt_and_cold_validation_receipt"
+      },
+      "attestation_field_contract": {
+        "accepted_reference_source_manifest_hash": "constant:af7fe2c187dcd503ba27a3f24ba6347cb3c619a63662106e85c6343eda90a74c",
+        "accepted_reference_split_manifest_hash": "constant:6e3ed51b4139c7822343752e29b6d8b2e94f9fadf0def38f2101a444b1da62e9",
+        "active_required_source_ids": "array_of_unique_source_ids_sorted_ascending_derived_as_union_of_project_required_sources_for_exact_sealed_REGISTERED_roster",
+        "active_source_evidence": "array_of_exact_active_source_evidence_entries_sorted_by_source_id",
+        "not_testable_slot_count": "integer_derived_from_sealed_runtime_projection",
+        "not_testable_source_ids": "array_of_source_ids_sorted_ascending_whose_accepted_runtime_state_is_NOT_TESTABLE",
+        "protocol_identity_hash": "constant:6533e880ced04214262f84c21fee98c478ef5c09fa7d0b9f55d650e673a1f971",
+        "registered_slot_count": "integer_derived_from_sealed_runtime_projection",
+        "runtime_authority_snapshot_hash": "sha256_of_exact_runtime_authority_snapshot_preimage",
+        "runtime_authority_snapshot_id": "accepted_nonempty_snapshot_id_bound_into_runtime_authority_snapshot_hash",
+        "schema_id": "constant:H40_RUNTIME_SOURCE_SPLIT_ATTESTATION_V1",
+        "sealed_registered_roster_hash": "sha256_equal_runtime_seal",
+        "source_authority_state_entries": "array_of_exact_source_authority_state_entries_sorted_by_source_id",
+        "source_manifest_hash": "sha256_of_exact_runtime_source_manifest",
+        "split_manifest_hash": "sha256_of_exact_runtime_scoped_authoritative_split_manifest",
+        "structural_ledger_hash": "constant:483f68502b57972deae071c7bd4587ca3e57ccaa72bd99fb0de07b4f0ab8c85f",
+        "total_slot_count": "constant:168"
+      },
+      "attestation_hash_rule": "canonical_sha256(exact_attestation_field_contract_keys_with_exact_nested_entry_fields)",
+      "source_authority_state_entry_field_contract": {
+        "production_authority_state": "enum:VERIFIED_or_NOT_TESTABLE_equal_accepted_runtime_authority_snapshot",
+        "source_id": "accepted_runtime_source_id"
+      },
+      "verifier_rules": [
+        "require_typed_runtime_source_manifest_typed_runtime_split_manifest_and_exact_H40_RUNTIME_SOURCE_SPLIT_ATTESTATION_V1",
+        "recompute_source_manifest_split_manifest_attestation_and_runtime_snapshot_hashes_from_exact_canonical_objects",
+        "require_source_authority_state_entries_to_equal_the_complete_accepted_runtime_snapshot_preimage_without_inferring_authority_from_local_file_presence",
+        "derive_active_required_source_ids_as_the_exact_union_of_project_required_sources_over_the_complete_sealed_REGISTERED_roster",
+        "require_every_active_required_source_to_be_VERIFIED_in_the_accepted_runtime_snapshot_and_every_REGISTERED_slot_to_have_no_other_source_dependency",
+        "identity_validate_every_runtime_source_record_against_the_accepted_reference_source_manifest_without_promoting_NOT_TESTABLE_sources",
+        "cold_validate_only_every_active_required_source_and_bind_its_exact_record_receipt_file_and_timestamp_membership_hashes",
+        "require_not_testable_source_ids_to_equal_the_accepted_NOT_TESTABLE_snapshot_entries_and_forbid_active_source_evidence_for_them",
+        "verify_the_static_partition_calendar_against_the_accepted_reference_split_manifest_independently_of_source_availability",
+        "reconstruct_the_runtime_split_partitions_counts_exclusions_and_timestamp_hashes_from_the_intersection_of_exactly_the_cold_verified_active_required_sources",
+        "require_runtime_split_manifest_is_authoritative_true_under_this_attestation_and_never_treat_that_flag_as_sufficient_authority",
+        "require_runtime_split_protocol_source_manifest_and_attestation_lineage_to_match_exactly",
+        "reject_legacy_BTC_and_ETH_pair_attestation_synthetic_attestation_preregistered_schedule_only_and_hash_self_consistency_without_evidence_truth",
+        "bind_the_same_source_manifest_split_manifest_and_runtime_source_split_attestation_hashes_through_Discovery_WF_restore_and_replay"
+      ]
+    },
+    "schema_id": "H40_LIFECYCLE_CHILD_RUNTIME_SNAPSHOT_SEAL_V2",
+    "seal_rules": [
+      "seal_before_any_discovery_label_return_metric_or_candidate_result_access",
+      "REGISTERED_and_NOT_TESTABLE_are_derived_from_the_sealed_materialized_authority",
+      "counts_must_sum_to_total_slot_count_and_roster_length_must_equal_registered_slot_count",
+      "roster_entries_must_match_the_accepted_168_row_structural_ledger",
+      "post_seal_source_state_change_cannot_mutate_or_expand_the_active_roster",
+      "a_different_snapshot_or_materialized_authority_produces_a_different_run_authority_id",
+      "runtime_source_state_changes_never_change_protocol_semantic_or_structural_ledger_hashes"
+    ]
+  },
+  "f02_boundary_contract": {
+    "allowed_scope": "define_H40ConfirmationReadyReceipt_and_verified_lineage_only",
+    "confirmation_state": "sealed_waiting_state_only",
+    "forbidden_capabilities": [
+      "confirmation_nonce",
+      "confirmation_unlock_key",
+      "one_shot_evaluation_authority",
+      "confirmation_outcome_access",
+      "confirmation_evaluation_execution"
+    ],
+    "guard_result": "H40GuardError_with_CONFIRMATION_NOT_READY",
+    "prohibited_transition": [
+      "H40_CONFIRMATION_READY",
+      "H40_CONFIRMATION_EVALUATED_ONCE"
+    ],
+    "schema_id": "H40_LIFECYCLE_CHILD_F02_BOUNDARY_V1",
+    "status": "H40_FSA_F02_OPEN_SEALED"
+  }
 }
 '''
 
 _LIFECYCLE_CONTRACTS: dict[str, Any] = json.loads(_LIFECYCLE_CONTRACTS_JSON)
 
 EXPECTED_LIFECYCLE_CHILD_HASHES: Mapping[str, str] = MappingProxyType({
-    "discovery_authorization_receipt_contract": "8889aaec90e6b25efa9f269ccd38af13be32c665a72248342d01dc145c860b65",
+    "discovery_authorization_receipt_contract": "3dd91827d4a26441bd5218dc299f196841c471eb60f20e03881d2ad56ce36898",
     "candidate_lock_receipt_contract": "96756dfebab636baa1abb33364e307d99d90a61572b813c6a60504283d3d42df",
     "wf_validation_receipt_contract": "bb5698a85daec1a5b9dcd169bde3d575befe8c0a1d73c2e87136cf35afb4001b",
     "confirmation_ready_receipt_contract": "7ab0ae0c8acb17340eccaa2bb737a5300e679b8de7497a539bdc44e93d3109be",
     "termination_receipt_contract": "b45c7021db1c63a447ddb22a1f9cb787ce71a5048c824ce38d40f19f755ecb48",
-    "transition_matrix_contract": "a4df11b3a0f3fabef1fa2b28e0a9f38500dcd6bb9111c4afdd9000bb238d0ddc",
-    "persistence_replay_contract": "5f014b867be17019c2be91ff48f8e23a43ed29678fc5589430ba174046fceaae",
+    "transition_matrix_contract": "bea7b0593251204bbc9138c325f1c9f10ccf7a9b8df60f10bf991377e0ced42d",
+    "persistence_replay_contract": "51e4fe6155d388c076dd1788a100265eb17b232300481a3fbcf00150f1432de1",
     "runtime_snapshot_seal_contract": "76a0732742707c78f65da26263076bed7b586ea67d4f5ddd2dac33761e37e612",
     "f02_boundary_contract": "5678d8bd6b83bb69e1a1ad2cf78af8ddbaece625a5a34b7018b0a5e6368756f4",
 })
@@ -221,11 +817,15 @@ def lifecycle_governance_authority_object() -> dict[str, Any]:
             "artifact_path": "reviews/v0.5/V0.5.1_H40_P3R0R1_LIFECYCLE_EVIDENCE_AUTHORITY_REPAIR.md",
             "commit_sha": "010d1462b33a6f133dd590086baae19cb0a0e0cb",
         },
+        "pre_discovery_repair_contract_acceptance_identity": {
+            "artifact_path": "reviews/v0.5/V0.5.1_H40_PRE_DISCOVERY_REPAIR_CONTRACT_CONTROLLER_ACCEPTANCE.md",
+            "commit_sha": "2229d44c5cc9b88ba515d0b2931d20f05936c7e8",
+        },
         "prior_lifecycle_governance_authority_hash": (
-            "7edce39c421ad6c487580483d2fa674b1f199e21640c33b1c08f85dddc6f64fc"
+            "7e9433aa2ee706dda61871c6ad2b1a1aee4cf7a8f9b6365351942096b5347c84"
         ),
         "protocol_authority_hash": compute_protocol_authority_hash(),
-        "schema_id": "H40_LIFECYCLE_GOVERNANCE_AUTHORITY_V4",
+        "schema_id": "H40_LIFECYCLE_GOVERNANCE_AUTHORITY_V5",
         "semantic_root_hash": compute_semantic_root_hash(),
         "structural_ledger_hash": EXPECTED_STRUCTURAL_LEDGER_HASH,
     }
@@ -1350,7 +1950,374 @@ class H40DurableRunHead:
 
 
 @dataclass(frozen=True)
-class H40DiscoveryAuthorizationReceipt:
+class H40P3ControllerAuthority:
+    schema_id: str = "H40_P3_CONTROLLER_AUTHORITY_V1"
+    authorization_scope: str = "H40_P3_DISCOVERY_V1"
+    controller_acceptance_artifact_path: str = (
+        "reviews/v0.5/V0.5.1_H40_PRE_DISCOVERY_REPAIR_CONTRACT_CONTROLLER_ACCEPTANCE.md"
+    )
+    controller_acceptance_commit_sha: str = "2229d44c5cc9b88ba515d0b2931d20f05936c7e8"
+    protocol_authority_hash: str = EXPECTED_PROTOCOL_AUTHORITY_HASH
+    scientific_semantic_root_hash: str = EXPECTED_SEMANTIC_ROOT_HASH
+    structural_ledger_hash: str = EXPECTED_STRUCTURAL_LEDGER_HASH
+    lifecycle_semantic_root_hash: str = EXPECTED_LIFECYCLE_SEMANTIC_ROOT_HASH
+    lifecycle_governance_authority_hash: str = EXPECTED_LIFECYCLE_GOVERNANCE_AUTHORITY_HASH
+    lifecycle_implementation_authority_hash: str = ""
+    discovery_provenance_contract_hash: str = DISCOVERY_PROVENANCE_CONTRACT_HASH
+    discovery_selection_correction_contract_hash: str = (
+        DISCOVERY_SELECTION_CORRECTION_CONTRACT_HASH
+    )
+    permitted_partitions: tuple[str, ...] = ("WF1_TRAIN", "WF1_CALIBRATION")
+    transition_source_state: str = "H40_P1_SCAFFOLDED"
+    transition_target_state: str = "H40_DISCOVERY"
+    execution_disabled: bool = True
+
+    _KEYS: ClassVar[frozenset[str]] = frozenset({
+        "schema_id",
+        "authorization_scope",
+        "controller_acceptance_artifact_path",
+        "controller_acceptance_commit_sha",
+        "protocol_authority_hash",
+        "scientific_semantic_root_hash",
+        "structural_ledger_hash",
+        "lifecycle_semantic_root_hash",
+        "lifecycle_governance_authority_hash",
+        "lifecycle_implementation_authority_hash",
+        "discovery_provenance_contract_hash",
+        "discovery_selection_correction_contract_hash",
+        "permitted_partitions",
+        "transition_source_state",
+        "transition_target_state",
+        "execution_disabled",
+    })
+
+    def __post_init__(self) -> None:
+        if self.schema_id != "H40_P3_CONTROLLER_AUTHORITY_V1":
+            raise ValueError("controller authority schema mismatch")
+        if self.authorization_scope != "H40_P3_DISCOVERY_V1":
+            raise ValueError("controller authority authorization_scope mismatch")
+        _require_text(
+            self.controller_acceptance_artifact_path,
+            "controller_acceptance_artifact_path",
+        )
+        _require_commit(
+            self.controller_acceptance_commit_sha,
+            "controller_acceptance_commit_sha",
+        )
+        _require_sha256(self.protocol_authority_hash, "protocol_authority_hash")
+        _require_sha256(self.scientific_semantic_root_hash, "scientific_semantic_root_hash")
+        _require_sha256(self.structural_ledger_hash, "structural_ledger_hash")
+        _require_sha256(self.lifecycle_semantic_root_hash, "lifecycle_semantic_root_hash")
+        _require_sha256(self.lifecycle_governance_authority_hash, "lifecycle_governance_authority_hash")
+        _require_sha256(self.lifecycle_implementation_authority_hash, "lifecycle_implementation_authority_hash")
+        _require_sha256(self.discovery_provenance_contract_hash, "discovery_provenance_contract_hash")
+        _require_sha256(self.discovery_selection_correction_contract_hash, "discovery_selection_correction_contract_hash")
+
+        if self.protocol_authority_hash != EXPECTED_PROTOCOL_AUTHORITY_HASH:
+            raise ValueError("controller authority protocol_authority_hash mismatch")
+        if self.scientific_semantic_root_hash != EXPECTED_SEMANTIC_ROOT_HASH:
+            raise ValueError("controller authority scientific_semantic_root_hash mismatch")
+        if self.structural_ledger_hash != EXPECTED_STRUCTURAL_LEDGER_HASH:
+            raise ValueError("controller authority structural_ledger_hash mismatch")
+        if self.lifecycle_semantic_root_hash != EXPECTED_LIFECYCLE_SEMANTIC_ROOT_HASH:
+            raise ValueError("controller authority lifecycle_semantic_root_hash mismatch")
+        if self.lifecycle_governance_authority_hash != EXPECTED_LIFECYCLE_GOVERNANCE_AUTHORITY_HASH:
+            raise ValueError("controller authority lifecycle_governance_authority_hash mismatch")
+        if self.discovery_provenance_contract_hash != DISCOVERY_PROVENANCE_CONTRACT_HASH:
+            raise ValueError("controller authority discovery_provenance_contract_hash mismatch")
+        if self.discovery_selection_correction_contract_hash != DISCOVERY_SELECTION_CORRECTION_CONTRACT_HASH:
+            raise ValueError("controller authority discovery_selection_correction_contract_hash mismatch")
+
+        partitions = tuple(self.permitted_partitions)
+        if partitions != ("WF1_TRAIN", "WF1_CALIBRATION"):
+            raise ValueError("controller authority permitted_partitions mismatch")
+        object.__setattr__(self, "permitted_partitions", partitions)
+
+        if self.transition_source_state != "H40_P1_SCAFFOLDED":
+            raise ValueError("controller authority transition_source_state mismatch")
+        if self.transition_target_state != "H40_DISCOVERY":
+            raise ValueError("controller authority transition_target_state mismatch")
+        if self.execution_disabled is not True or type(self.execution_disabled) is not bool:
+            raise ValueError("controller authority execution_disabled must be boolean true")
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "schema_id": self.schema_id,
+            "authorization_scope": self.authorization_scope,
+            "controller_acceptance_artifact_path": self.controller_acceptance_artifact_path,
+            "controller_acceptance_commit_sha": self.controller_acceptance_commit_sha,
+            "protocol_authority_hash": self.protocol_authority_hash,
+            "scientific_semantic_root_hash": self.scientific_semantic_root_hash,
+            "structural_ledger_hash": self.structural_ledger_hash,
+            "lifecycle_semantic_root_hash": self.lifecycle_semantic_root_hash,
+            "lifecycle_governance_authority_hash": self.lifecycle_governance_authority_hash,
+            "lifecycle_implementation_authority_hash": self.lifecycle_implementation_authority_hash,
+            "discovery_provenance_contract_hash": self.discovery_provenance_contract_hash,
+            "discovery_selection_correction_contract_hash": self.discovery_selection_correction_contract_hash,
+            "permitted_partitions": list(self.permitted_partitions),
+            "transition_source_state": self.transition_source_state,
+            "transition_target_state": self.transition_target_state,
+            "execution_disabled": self.execution_disabled,
+        }
+
+    @property
+    def controller_authority_hash(self) -> str:
+        return canonical_sha256(self.to_dict())
+
+    @classmethod
+    def from_dict(cls, data: Mapping[str, Any]) -> H40P3ControllerAuthority:
+        _require_exact_keys(data, cls._KEYS, cls.__name__)
+        _require_string_fields(
+            data,
+            cls._KEYS - {"permitted_partitions", "execution_disabled"},
+            cls.__name__,
+        )
+        if not isinstance(data["permitted_partitions"], (list, tuple)):
+            raise TypeError(f"{cls.__name__}.permitted_partitions must be a sequence")
+        if not all(isinstance(p, str) for p in data["permitted_partitions"]):
+            raise TypeError(f"{cls.__name__}.permitted_partitions items must be strings")
+        if not isinstance(data["execution_disabled"], bool):
+            raise TypeError(f"{cls.__name__}.execution_disabled must be boolean")
+        kwargs = dict(data)
+        kwargs["permitted_partitions"] = tuple(data["permitted_partitions"])
+        return cls(**kwargs)
+
+
+def _synthesize_controller_authority(
+    implementation_authority: H40LifecycleImplementationAuthority,
+    *,
+    artifact_path: str = "reviews/v0.5/V0.5.1_H40_PRE_DISCOVERY_REPAIR_CONTRACT_CONTROLLER_ACCEPTANCE.md",
+    commit_sha: str = "2229d44c5cc9b88ba515d0b2931d20f05936c7e8",
+) -> H40P3ControllerAuthority:
+    return H40P3ControllerAuthority(
+        schema_id="H40_P3_CONTROLLER_AUTHORITY_V1",
+        authorization_scope="H40_P3_DISCOVERY_V1",
+        controller_acceptance_artifact_path=artifact_path,
+        controller_acceptance_commit_sha=commit_sha,
+        protocol_authority_hash=EXPECTED_PROTOCOL_AUTHORITY_HASH,
+        scientific_semantic_root_hash=EXPECTED_SEMANTIC_ROOT_HASH,
+        structural_ledger_hash=EXPECTED_STRUCTURAL_LEDGER_HASH,
+        lifecycle_semantic_root_hash=EXPECTED_LIFECYCLE_SEMANTIC_ROOT_HASH,
+        lifecycle_governance_authority_hash=EXPECTED_LIFECYCLE_GOVERNANCE_AUTHORITY_HASH,
+        lifecycle_implementation_authority_hash=implementation_authority.lifecycle_implementation_authority_hash,
+        discovery_provenance_contract_hash=DISCOVERY_PROVENANCE_CONTRACT_HASH,
+        discovery_selection_correction_contract_hash=DISCOVERY_SELECTION_CORRECTION_CONTRACT_HASH,
+        permitted_partitions=("WF1_TRAIN", "WF1_CALIBRATION"),
+        transition_source_state="H40_P1_SCAFFOLDED",
+        transition_target_state="H40_DISCOVERY",
+        execution_disabled=True,
+    )
+
+
+@dataclass(frozen=True)
+class H40DiscoveryRunGrant:
+    schema_id: str
+    authorized_at_utc: str
+    controller_authority_hash: str
+    protocol_authority_hash: str
+    scientific_semantic_root_hash: str
+    structural_ledger_hash: str
+    lifecycle_governance_authority_hash: str
+    lifecycle_implementation_authority_hash: str
+    discovery_provenance_contract_hash: str
+    run_authority_id: str
+    materialized_run_authority_hash: str
+    runtime_authority_snapshot_hash: str
+    source_manifest_hash: str
+    split_manifest_hash: str
+    split_attestation_hash: str
+    sealed_registered_roster_hash: str
+    permitted_partitions: tuple[str, ...] = ("WF1_TRAIN", "WF1_CALIBRATION")
+    execution_disabled: bool = True
+
+    _KEYS: ClassVar[frozenset[str]] = frozenset({
+        "schema_id",
+        "authorized_at_utc",
+        "controller_authority_hash",
+        "protocol_authority_hash",
+        "scientific_semantic_root_hash",
+        "structural_ledger_hash",
+        "lifecycle_governance_authority_hash",
+        "lifecycle_implementation_authority_hash",
+        "discovery_provenance_contract_hash",
+        "run_authority_id",
+        "materialized_run_authority_hash",
+        "runtime_authority_snapshot_hash",
+        "source_manifest_hash",
+        "split_manifest_hash",
+        "split_attestation_hash",
+        "sealed_registered_roster_hash",
+        "permitted_partitions",
+        "execution_disabled",
+    })
+
+    def __post_init__(self) -> None:
+        if self.schema_id != "H40_DISCOVERY_RUN_GRANT_V1":
+            raise ValueError("discovery run grant schema mismatch")
+        normalize_audit_timestamp(self.authorized_at_utc)
+        for name in (
+            "controller_authority_hash",
+            "protocol_authority_hash",
+            "scientific_semantic_root_hash",
+            "structural_ledger_hash",
+            "lifecycle_governance_authority_hash",
+            "lifecycle_implementation_authority_hash",
+            "discovery_provenance_contract_hash",
+            "run_authority_id",
+            "materialized_run_authority_hash",
+            "runtime_authority_snapshot_hash",
+            "source_manifest_hash",
+            "split_manifest_hash",
+            "split_attestation_hash",
+            "sealed_registered_roster_hash",
+        ):
+            _require_sha256(getattr(self, name), name)
+
+        if self.protocol_authority_hash != EXPECTED_PROTOCOL_AUTHORITY_HASH:
+            raise ValueError("run grant protocol_authority_hash mismatch")
+        if self.scientific_semantic_root_hash != EXPECTED_SEMANTIC_ROOT_HASH:
+            raise ValueError("run grant scientific_semantic_root_hash mismatch")
+        if self.structural_ledger_hash != EXPECTED_STRUCTURAL_LEDGER_HASH:
+            raise ValueError("run grant structural_ledger_hash mismatch")
+        if self.lifecycle_governance_authority_hash != EXPECTED_LIFECYCLE_GOVERNANCE_AUTHORITY_HASH:
+            raise ValueError("run grant lifecycle_governance_authority_hash mismatch")
+        if self.discovery_provenance_contract_hash != DISCOVERY_PROVENANCE_CONTRACT_HASH:
+            raise ValueError("run grant discovery_provenance_contract_hash mismatch")
+
+        partitions = tuple(self.permitted_partitions)
+        if partitions != ("WF1_TRAIN", "WF1_CALIBRATION"):
+            raise ValueError("run grant permitted_partitions mismatch")
+        object.__setattr__(self, "permitted_partitions", partitions)
+
+        if self.execution_disabled is not True or type(self.execution_disabled) is not bool:
+            raise ValueError("run grant execution_disabled must be boolean true")
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "schema_id": self.schema_id,
+            "authorized_at_utc": self.authorized_at_utc,
+            "controller_authority_hash": self.controller_authority_hash,
+            "protocol_authority_hash": self.protocol_authority_hash,
+            "scientific_semantic_root_hash": self.scientific_semantic_root_hash,
+            "structural_ledger_hash": self.structural_ledger_hash,
+            "lifecycle_governance_authority_hash": self.lifecycle_governance_authority_hash,
+            "lifecycle_implementation_authority_hash": self.lifecycle_implementation_authority_hash,
+            "discovery_provenance_contract_hash": self.discovery_provenance_contract_hash,
+            "run_authority_id": self.run_authority_id,
+            "materialized_run_authority_hash": self.materialized_run_authority_hash,
+            "runtime_authority_snapshot_hash": self.runtime_authority_snapshot_hash,
+            "source_manifest_hash": self.source_manifest_hash,
+            "split_manifest_hash": self.split_manifest_hash,
+            "split_attestation_hash": self.split_attestation_hash,
+            "sealed_registered_roster_hash": self.sealed_registered_roster_hash,
+            "permitted_partitions": list(self.permitted_partitions),
+            "execution_disabled": self.execution_disabled,
+        }
+
+    @property
+    def discovery_run_grant_hash(self) -> str:
+        return canonical_sha256(self.to_dict())
+
+    @classmethod
+    def from_dict(cls, data: Mapping[str, Any]) -> H40DiscoveryRunGrant:
+        _require_exact_keys(data, cls._KEYS, cls.__name__)
+        _require_string_fields(
+            data,
+            cls._KEYS - {"permitted_partitions", "execution_disabled"},
+            cls.__name__,
+        )
+        if not isinstance(data["permitted_partitions"], (list, tuple)):
+            raise TypeError(f"{cls.__name__}.permitted_partitions must be a sequence")
+        if not all(isinstance(p, str) for p in data["permitted_partitions"]):
+            raise TypeError(f"{cls.__name__}.permitted_partitions items must be strings")
+        if not isinstance(data["execution_disabled"], bool):
+            raise TypeError(f"{cls.__name__}.execution_disabled must be boolean")
+        kwargs = dict(data)
+        kwargs["permitted_partitions"] = tuple(data["permitted_partitions"])
+        return cls(**kwargs)
+
+    @classmethod
+    def from_controller_and_run(
+        cls,
+        *,
+        controller_authority: H40P3ControllerAuthority,
+        run_authority: H40RunAuthority,
+        seal: H40RuntimeSnapshotSeal,
+        authorized_at_utc: str,
+    ) -> H40DiscoveryRunGrant:
+        if not isinstance(controller_authority, H40P3ControllerAuthority):
+            raise TypeError("controller_authority must be H40P3ControllerAuthority")
+        if not isinstance(run_authority, H40RunAuthority):
+            raise TypeError("run_authority must be H40RunAuthority")
+        if not isinstance(seal, H40RuntimeSnapshotSeal):
+            raise TypeError("seal must be H40RuntimeSnapshotSeal")
+
+        if (
+            controller_authority.lifecycle_implementation_authority_hash
+            != run_authority.lifecycle_implementation_authority_hash
+        ):
+            raise H40GuardError(
+                H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                "controller authority implementation hash mismatch against run authority",
+            )
+        expected_run = H40RunAuthority.from_seal(
+            seal,
+            controller_authority.lifecycle_implementation_authority_hash,
+        )
+        if run_authority != expected_run:
+            raise H40GuardError(
+                H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                "run authority does not match seal and controller implementation hash",
+            )
+        if run_authority.source_manifest_hash != seal.source_manifest_hash:
+            raise H40GuardError(
+                H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                "source manifest hash mismatch between run authority and seal",
+            )
+        if run_authority.split_manifest_hash != seal.split_manifest_hash:
+            raise H40GuardError(
+                H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                "split manifest hash mismatch between run authority and seal",
+            )
+        if run_authority.split_attestation_hash != seal.split_attestation_hash:
+            raise H40GuardError(
+                H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                "split attestation hash mismatch between run authority and seal",
+            )
+        if run_authority.sealed_registered_roster_hash != seal.sealed_registered_roster_hash:
+            raise H40GuardError(
+                H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                "roster hash mismatch between run authority and seal",
+            )
+
+        return cls(
+            schema_id="H40_DISCOVERY_RUN_GRANT_V1",
+            authorized_at_utc=normalize_audit_timestamp(authorized_at_utc),
+            controller_authority_hash=controller_authority.controller_authority_hash,
+            protocol_authority_hash=controller_authority.protocol_authority_hash,
+            scientific_semantic_root_hash=controller_authority.scientific_semantic_root_hash,
+            structural_ledger_hash=controller_authority.structural_ledger_hash,
+            lifecycle_governance_authority_hash=controller_authority.lifecycle_governance_authority_hash,
+            lifecycle_implementation_authority_hash=controller_authority.lifecycle_implementation_authority_hash,
+            discovery_provenance_contract_hash=controller_authority.discovery_provenance_contract_hash,
+            run_authority_id=run_authority.run_authority_id,
+            materialized_run_authority_hash=run_authority.materialized_run_authority_hash,
+            runtime_authority_snapshot_hash=seal.runtime_authority_snapshot_hash,
+            source_manifest_hash=run_authority.source_manifest_hash,
+            split_manifest_hash=run_authority.split_manifest_hash,
+            split_attestation_hash=run_authority.split_attestation_hash,
+            sealed_registered_roster_hash=run_authority.sealed_registered_roster_hash,
+            permitted_partitions=("WF1_TRAIN", "WF1_CALIBRATION"),
+            execution_disabled=True,
+        )
+
+
+_SYNTHETIC_CONTROLLER_REGISTRY: dict[str, H40P3ControllerAuthority] = {}
+_SYNTHETIC_GRANT_REGISTRY: dict[str, H40DiscoveryRunGrant] = {}
+
+
+@dataclass(frozen=True)
+class H40DiscoveryAuthorizationReceiptV2:
     authorized_at_utc: str
     discovery_selection_correction_contract_hash: str
     execution_disabled: bool
@@ -1413,13 +2380,120 @@ class H40DiscoveryAuthorizationReceipt:
         return canonical_sha256(self.to_dict())
 
     @classmethod
-    def from_dict(cls, data: Mapping[str, Any]) -> H40DiscoveryAuthorizationReceipt:
+    def from_dict(cls, data: Mapping[str, Any]) -> H40DiscoveryAuthorizationReceiptV2:
         _require_exact_keys(data, cls._KEYS, cls.__name__)
         _require_string_fields(
             data,
             cls._KEYS - {
                 "execution_disabled", "not_testable_slot_count", "registered_slot_count",
                 "total_slot_count", "upstream_receipt_hash",
+            },
+            cls.__name__,
+        )
+        for name in ("not_testable_slot_count", "registered_slot_count", "total_slot_count"):
+            if isinstance(data[name], bool) or not isinstance(data[name], int):
+                raise TypeError(f"{name} must be an integer")
+        if not isinstance(data["execution_disabled"], bool):
+            raise TypeError("execution_disabled must be boolean")
+        if data["upstream_receipt_hash"] is not None:
+            raise ValueError("discovery upstream_receipt_hash must be null")
+        kwargs = dict(data)
+        return cls(**kwargs)
+
+
+@dataclass(frozen=True)
+class H40DiscoveryAuthorizationReceipt:
+    authorized_at_utc: str
+    controller_authority_hash: str
+    discovery_run_grant_hash: str
+    discovery_selection_correction_contract_hash: str
+    execution_disabled: bool
+    lifecycle_governance_authority_hash: str
+    lifecycle_implementation_authority_hash: str
+    materialized_run_authority_hash: str
+    not_testable_slot_count: int
+    protocol_authority_hash: str
+    registered_slot_count: int
+    run_authority_id: str
+    sealed_registered_roster_hash: str
+    semantic_root_hash: str
+    source_manifest_hash: str
+    split_attestation_hash: str
+    split_manifest_hash: str
+    structural_ledger_hash: str
+    total_slot_count: int
+    upstream_receipt_hash: None = None
+    receipt_schema_id: str = "H40_RECEIPT_DISCOVERY_AUTH_V3"
+
+    _KEYS: ClassVar[frozenset[str]] = frozenset({
+        "authorized_at_utc",
+        "controller_authority_hash",
+        "discovery_run_grant_hash",
+        "discovery_selection_correction_contract_hash",
+        "execution_disabled",
+        "lifecycle_governance_authority_hash",
+        "lifecycle_implementation_authority_hash",
+        "materialized_run_authority_hash",
+        "not_testable_slot_count",
+        "protocol_authority_hash",
+        "receipt_schema_id",
+        "registered_slot_count",
+        "run_authority_id",
+        "sealed_registered_roster_hash",
+        "semantic_root_hash",
+        "source_manifest_hash",
+        "split_attestation_hash",
+        "split_manifest_hash",
+        "structural_ledger_hash",
+        "total_slot_count",
+        "upstream_receipt_hash",
+    })
+
+    def __post_init__(self) -> None:
+        if self.receipt_schema_id != "H40_RECEIPT_DISCOVERY_AUTH_V3":
+            raise ValueError("discovery receipt schema mismatch")
+        normalize_audit_timestamp(self.authorized_at_utc)
+        if self.execution_disabled is not True or self.upstream_receipt_hash is not None:
+            raise ValueError("discovery receipt must bind execution_disabled=true and null upstream")
+        for name in self._KEYS - {
+            "authorized_at_utc",
+            "execution_disabled",
+            "not_testable_slot_count",
+            "receipt_schema_id",
+            "registered_slot_count",
+            "total_slot_count",
+            "upstream_receipt_hash",
+        }:
+            _require_sha256(getattr(self, name), name)
+        for name in ("registered_slot_count", "not_testable_slot_count", "total_slot_count"):
+            value = getattr(self, name)
+            if isinstance(value, bool) or not isinstance(value, int):
+                raise TypeError(f"{name} must be an integer")
+        if self.registered_slot_count < 0 or self.not_testable_slot_count < 0:
+            raise ValueError("discovery slot counts must be non-negative")
+        if self.total_slot_count != 168:
+            raise ValueError("accepted H40 V1 total_slot_count must equal 168")
+        if self.registered_slot_count + self.not_testable_slot_count != self.total_slot_count:
+            raise ValueError("discovery receipt slot counts must sum to total")
+
+    def to_dict(self) -> dict[str, Any]:
+        return {name: getattr(self, name) for name in self._KEYS}
+
+    @property
+    def receipt_sha256(self) -> str:
+        return canonical_sha256(self.to_dict())
+
+    @classmethod
+    def from_dict(cls, data: Mapping[str, Any]) -> H40DiscoveryAuthorizationReceipt:
+        _require_exact_keys(data, cls._KEYS, cls.__name__)
+        _require_string_fields(
+            data,
+            cls._KEYS - {
+                "execution_disabled",
+                "not_testable_slot_count",
+                "registered_slot_count",
+                "total_slot_count",
+                "upstream_receipt_hash",
             },
             cls.__name__,
         )
@@ -2596,6 +3670,7 @@ class H40SyntheticEvidenceVerifier:
 
 _Receipt = (
     H40DiscoveryAuthorizationReceipt
+    | H40DiscoveryAuthorizationReceiptV2
     | H40CandidateLockReceipt
     | H40WFValidationReceipt
     | H40ConfirmationReadyReceipt
@@ -2706,6 +3781,7 @@ class VerifiedLifecycleAuthorization:
             raise H40GuardError(H40ReasonCode.CONFIG_IDENTITY_CONFLICT, "receipt run authority mismatch")
         receipt_transition = {
             H40DiscoveryAuthorizationReceipt: ("H40_P1_SCAFFOLDED", "H40_DISCOVERY"),
+            H40DiscoveryAuthorizationReceiptV2: ("H40_P1_SCAFFOLDED", "H40_DISCOVERY"),
             H40CandidateLockReceipt: ("H40_DISCOVERY", "H40_CANDIDATE_LOCKED"),
             H40WFValidationReceipt: ("H40_CANDIDATE_LOCKED", "H40_WALK_FORWARD_VALIDATED"),
             H40ConfirmationReadyReceipt: (
@@ -2735,9 +3811,12 @@ class H40LifecycleAuthorityService:
         *,
         implementation_authority: H40LifecycleImplementationAuthority | None,
         accepted_implementation_authority_hash: str | None,
-        evidence_verifier: H40LifecycleEvidenceVerifier | None,
-        synthetic_test_mode: bool,
-        _construction_token: object,
+        controller_authority: H40P3ControllerAuthority | None = None,
+        accepted_controller_authority_hash: str | None = None,
+        discovery_run_grant: H40DiscoveryRunGrant | None = None,
+        evidence_verifier: H40LifecycleEvidenceVerifier | None = None,
+        synthetic_test_mode: bool = False,
+        _construction_token: object = None,
     ) -> None:
         if _construction_token is not _VERIFIED_AUTHORITY_TOKEN:
             raise TypeError("use production() or synthetic_for_tests()")
@@ -2750,6 +3829,15 @@ class H40LifecycleAuthorityService:
             computed = implementation_authority.lifecycle_implementation_authority_hash
             if computed != accepted_implementation_authority_hash:
                 raise ValueError("implementation authority object/hash mismatch")
+        if accepted_controller_authority_hash is not None:
+            _require_sha256(
+                accepted_controller_authority_hash,
+                "accepted_controller_authority_hash",
+            )
+        if controller_authority is not None:
+            computed_ctrl = controller_authority.controller_authority_hash
+            if computed_ctrl != accepted_controller_authority_hash:
+                raise ValueError("controller authority object/hash mismatch")
         if evidence_verifier is not None and not isinstance(
             evidence_verifier,
             H40LifecycleEvidenceVerifier,
@@ -2765,8 +3853,12 @@ class H40LifecycleAuthorityService:
                 )
         elif evidence_verifier is not None and evidence_verifier.synthetic_only:
             raise ValueError("production service cannot use a synthetic/test-only verifier")
+
         self._implementation_authority = implementation_authority
         self._accepted_implementation_authority_hash = accepted_implementation_authority_hash
+        self._controller_authority = controller_authority
+        self._accepted_controller_authority_hash = accepted_controller_authority_hash
+        self._discovery_run_grant = discovery_run_grant
         self._evidence_verifier = evidence_verifier
         self._synthetic_test_mode = synthetic_test_mode
         self._issuer_id = object()
@@ -2775,11 +3867,24 @@ class H40LifecycleAuthorityService:
     def production(
         cls,
         implementation_authority: H40LifecycleImplementationAuthority | None = None,
+        controller_authority: H40P3ControllerAuthority | None = None,
+        discovery_run_grant: H40DiscoveryRunGrant | None = None,
         evidence_verifier: H40LifecycleEvidenceVerifier | None = None,
     ) -> H40LifecycleAuthorityService:
+        if (
+            controller_authority is None
+            and ACCEPTED_H40_P3_CONTROLLER_AUTHORITY_HASH is not None
+            and ACCEPTED_H40_P3_CONTROLLER_AUTHORITY_HASH in _SYNTHETIC_CONTROLLER_REGISTRY
+        ):
+            controller_authority = _SYNTHETIC_CONTROLLER_REGISTRY[
+                ACCEPTED_H40_P3_CONTROLLER_AUTHORITY_HASH
+            ]
         return cls(
             implementation_authority=implementation_authority,
             accepted_implementation_authority_hash=ACCEPTED_LIFECYCLE_IMPLEMENTATION_AUTHORITY_HASH,
+            controller_authority=controller_authority,
+            accepted_controller_authority_hash=ACCEPTED_H40_P3_CONTROLLER_AUTHORITY_HASH,
+            discovery_run_grant=discovery_run_grant,
             evidence_verifier=evidence_verifier,
             synthetic_test_mode=False,
             _construction_token=_VERIFIED_AUTHORITY_TOKEN,
@@ -2789,6 +3894,79 @@ class H40LifecycleAuthorityService:
     def synthetic_test_mode(self) -> bool:
         return self._synthetic_test_mode
 
+    @property
+    def implementation_authority(self) -> H40LifecycleImplementationAuthority | None:
+        return self._implementation_authority
+
+    @property
+    def controller_authority(self) -> H40P3ControllerAuthority | None:
+        return self._controller_authority
+
+    @property
+    def accepted_implementation_authority_hash(self) -> str | None:
+        return self._accepted_implementation_authority_hash
+
+    @property
+    def accepted_controller_authority_hash(self) -> str | None:
+        return self._accepted_controller_authority_hash
+
+    @property
+    def current_implementation_authority_hash(self) -> str | None:
+        return self._accepted_implementation_authority_hash
+
+    @property
+    def current_controller_authority_hash(self) -> str | None:
+        return self._accepted_controller_authority_hash
+
+    def _assert_current_anchors(self, *, require_controller: bool = False) -> None:
+        if self._synthetic_test_mode:
+            return
+        if ACCEPTED_LIFECYCLE_IMPLEMENTATION_AUTHORITY_HASH is None:
+            raise H40GuardError(
+                H40ReasonCode.NOT_TESTABLE,
+                "no independently accepted lifecycle implementation authority exists",
+            )
+        if (
+            self._accepted_implementation_authority_hash
+            != ACCEPTED_LIFECYCLE_IMPLEMENTATION_AUTHORITY_HASH
+        ):
+            raise H40GuardError(
+                H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                "service implementation authority anchor has been superseded",
+            )
+        if (
+            self._implementation_authority is not None
+            and self._implementation_authority.lifecycle_implementation_authority_hash
+            != ACCEPTED_LIFECYCLE_IMPLEMENTATION_AUTHORITY_HASH
+        ):
+            raise H40GuardError(
+                H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                "service implementation authority mismatch against accepted constant",
+            )
+        if require_controller:
+            if ACCEPTED_H40_P3_CONTROLLER_AUTHORITY_HASH is None:
+                raise H40GuardError(
+                    H40ReasonCode.NOT_TESTABLE,
+                    "no independently accepted H40 P3 controller authority exists",
+                )
+            if (
+                self._accepted_controller_authority_hash
+                != ACCEPTED_H40_P3_CONTROLLER_AUTHORITY_HASH
+            ):
+                raise H40GuardError(
+                    H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                    "service controller authority anchor has been superseded",
+                )
+            if (
+                self._controller_authority is not None
+                and self._controller_authority.controller_authority_hash
+                != ACCEPTED_H40_P3_CONTROLLER_AUTHORITY_HASH
+            ):
+                raise H40GuardError(
+                    H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                    "service controller authority mismatch against accepted constant",
+                )
+
     @staticmethod
     def _inherited_authority_context(
         prior: VerifiedLifecycleAuthorization,
@@ -2797,6 +3975,8 @@ class H40LifecycleAuthorityService:
             key: prior.context[key]
             for key in (
                 "implementation_authority",
+                "controller_authority",
+                "discovery_run_grant",
                 "run_authority",
                 "seal",
                 "split_authority",
@@ -2809,12 +3989,28 @@ class H40LifecycleAuthorityService:
         cls,
         implementation_authority: H40LifecycleImplementationAuthority,
         evidence_verifier: H40SyntheticEvidenceVerifier,
+        controller_authority: H40P3ControllerAuthority | None = None,
+        discovery_run_grant: H40DiscoveryRunGrant | None = None,
     ) -> H40LifecycleAuthorityService:
+        if controller_authority is None:
+            controller_authority = _synthesize_controller_authority(implementation_authority)
+        _SYNTHETIC_CONTROLLER_REGISTRY.setdefault(
+            controller_authority.controller_authority_hash, controller_authority
+        )
+        if discovery_run_grant is not None:
+            _SYNTHETIC_GRANT_REGISTRY.setdefault(
+                discovery_run_grant.discovery_run_grant_hash, discovery_run_grant
+            )
         return cls(
             implementation_authority=implementation_authority,
             accepted_implementation_authority_hash=(
                 implementation_authority.lifecycle_implementation_authority_hash
             ),
+            controller_authority=controller_authority,
+            accepted_controller_authority_hash=(
+                controller_authority.controller_authority_hash
+            ),
+            discovery_run_grant=discovery_run_grant,
             evidence_verifier=evidence_verifier,
             synthetic_test_mode=True,
             _construction_token=_VERIFIED_AUTHORITY_TOKEN,
@@ -2863,6 +4059,7 @@ class H40LifecycleAuthorityService:
         source_state: str,
         target_state: str,
     ) -> None:
+        self._assert_current_anchors(require_controller=True)
         if not isinstance(prior, VerifiedLifecycleAuthorization) or prior._issuer_id is not self._issuer_id:
             raise H40GuardError(H40ReasonCode.CONFIG_IDENTITY_CONFLICT, "foreign verifier authority")
         if prior.source_state != source_state or prior.target_state != target_state:
@@ -2878,8 +4075,11 @@ class H40LifecycleAuthorityService:
         run_authority: H40RunAuthority,
         seal: H40RuntimeSnapshotSeal,
         authorized_at_utc: str,
+        controller_authority: H40P3ControllerAuthority | None = None,
+        discovery_run_grant: H40DiscoveryRunGrant | None = None,
     ) -> VerifiedLifecycleAuthorization:
         normalize_audit_timestamp(authorized_at_utc)
+        self._assert_current_anchors(require_controller=True)
         if (
             self._implementation_authority is None
             or self._accepted_implementation_authority_hash is None
@@ -2891,16 +4091,73 @@ class H40LifecycleAuthorityService:
                 H40ReasonCode.NOT_TESTABLE,
                 "no independently accepted lifecycle implementation authority exists",
             )
+
+        active_controller: H40P3ControllerAuthority
+        if not self._synthetic_test_mode:
+            ctrl = controller_authority or self._controller_authority
+            if (
+                ctrl is None
+                or self._accepted_controller_authority_hash is None
+                or ctrl.controller_authority_hash != self._accepted_controller_authority_hash
+                or ctrl.lifecycle_implementation_authority_hash
+                != implementation_authority.lifecycle_implementation_authority_hash
+            ):
+                raise H40GuardError(
+                    H40ReasonCode.NOT_TESTABLE,
+                    "no independently accepted H40 P3 controller authority exists",
+                )
+            active_controller = ctrl
+        else:
+            active_controller = (
+                controller_authority
+                or self._controller_authority
+                or _synthesize_controller_authority(implementation_authority)
+            )
+            _SYNTHETIC_CONTROLLER_REGISTRY.setdefault(
+                active_controller.controller_authority_hash, active_controller
+            )
+
         if not self._synthetic_test_mode and seal.synthetic_only:
             raise H40GuardError(H40ReasonCode.NOT_TESTABLE, "synthetic runtime seal is non-authoritative")
         if not seal.synthetic_only:
             seal.verify_against_accepted_ledger()
+
         expected_run = H40RunAuthority.from_seal(
             seal,
             implementation_authority.lifecycle_implementation_authority_hash,
         )
         if run_authority != expected_run:
             raise H40GuardError(H40ReasonCode.CONFIG_IDENTITY_CONFLICT, "run authority preimage mismatch")
+
+        expected_grant = H40DiscoveryRunGrant.from_controller_and_run(
+            controller_authority=active_controller,
+            run_authority=run_authority,
+            seal=seal,
+            authorized_at_utc=authorized_at_utc,
+        )
+        active_grant: H40DiscoveryRunGrant
+        if discovery_run_grant is not None:
+            if discovery_run_grant != expected_grant:
+                raise H40GuardError(
+                    H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                    "discovery run grant mismatch against active controller and run authority",
+                )
+            active_grant = discovery_run_grant
+        elif self._discovery_run_grant is not None:
+            if self._discovery_run_grant != expected_grant:
+                raise H40GuardError(
+                    H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                    "service discovery run grant mismatch against active controller and run authority",
+                )
+            active_grant = self._discovery_run_grant
+        else:
+            active_grant = expected_grant
+
+        if self._synthetic_test_mode:
+            _SYNTHETIC_GRANT_REGISTRY.setdefault(
+                active_grant.discovery_run_grant_hash, active_grant
+            )
+
         if (
             compute_lifecycle_semantic_root_hash() != EXPECTED_LIFECYCLE_SEMANTIC_ROOT_HASH
             or compute_lifecycle_governance_authority_hash()
@@ -2909,8 +4166,11 @@ class H40LifecycleAuthorityService:
             or compute_semantic_root_hash() != EXPECTED_SEMANTIC_ROOT_HASH
         ):
             raise H40GuardError(H40ReasonCode.CONFIG_IDENTITY_CONFLICT, "accepted authority identity mismatch")
+
         receipt = H40DiscoveryAuthorizationReceipt(
             authorized_at_utc=authorized_at_utc,
+            controller_authority_hash=active_controller.controller_authority_hash,
+            discovery_run_grant_hash=active_grant.discovery_run_grant_hash,
             discovery_selection_correction_contract_hash=(
                 DISCOVERY_SELECTION_CORRECTION_CONTRACT_HASH
             ),
@@ -2939,6 +4199,8 @@ class H40LifecycleAuthorityService:
             upstream_receipt_hash=None,
             context={
                 "implementation_authority": implementation_authority,
+                "controller_authority": active_controller,
+                "discovery_run_grant": active_grant,
                 "run_authority": run_authority,
                 "seal": seal,
             },
@@ -3312,15 +4574,24 @@ class H40LifecycleAuthorityService:
 
     def revalidate_authorization(self, authorization: VerifiedLifecycleAuthorization) -> None:
         """Recompute a previously issued authorization and all bound synthetic evidence."""
+        self._assert_current_anchors(require_controller=True)
         if not isinstance(authorization, VerifiedLifecycleAuthorization) or authorization._issuer_id is not self._issuer_id:
             raise H40GuardError(H40ReasonCode.CONFIG_IDENTITY_CONFLICT, "foreign verifier authority")
         self._reverify_root_source_truth(authorization)
         receipt = authorization.receipt
         reconstructed: VerifiedLifecycleAuthorization
-        if isinstance(receipt, H40DiscoveryAuthorizationReceipt):
+        if isinstance(receipt, (H40DiscoveryAuthorizationReceipt, H40DiscoveryAuthorizationReceiptV2)):
             run_authority = authorization.context.get("run_authority")
             seal = authorization.context.get("seal")
             implementation = self._implementation_authority
+            controller = (
+                authorization.context.get("controller_authority")
+                or self._controller_authority
+            )
+            grant = (
+                authorization.context.get("discovery_run_grant")
+                or self._discovery_run_grant
+            )
             if (
                 not isinstance(run_authority, H40RunAuthority)
                 or not isinstance(seal, H40RuntimeSnapshotSeal)
@@ -3332,6 +4603,8 @@ class H40LifecycleAuthorityService:
                 run_authority=run_authority,
                 seal=seal,
                 authorized_at_utc=receipt.authorized_at_utc,
+                controller_authority=controller,
+                discovery_run_grant=grant,
             )
         elif isinstance(receipt, H40CandidateLockReceipt):
             prior = authorization.context.get("discovery_authority")
@@ -3423,7 +4696,8 @@ class H40LifecycleAuthorityService:
 
 
 _RECEIPT_PARSERS: Mapping[str, Callable[[Mapping[str, Any]], _Receipt]] = MappingProxyType({
-    "H40_RECEIPT_DISCOVERY_AUTH_V2": H40DiscoveryAuthorizationReceipt.from_dict,
+    "H40_RECEIPT_DISCOVERY_AUTH_V2": H40DiscoveryAuthorizationReceiptV2.from_dict,
+    "H40_RECEIPT_DISCOVERY_AUTH_V3": H40DiscoveryAuthorizationReceipt.from_dict,
     "H40_RECEIPT_CANDIDATE_LOCK_V2": H40CandidateLockReceipt.from_dict,
     "H40_RECEIPT_WF_VALIDATION_V2": H40WFValidationReceipt.from_dict,
     "H40_RECEIPT_CONFIRMATION_READY_V2": H40ConfirmationReadyReceipt.from_dict,
@@ -3449,6 +4723,7 @@ _ACCEPTED_TRANSITIONS: frozenset[tuple[str, str]] = frozenset({
 
 _RECEIPT_TYPE_TRANSITIONS: Mapping[type[_Receipt], tuple[str, str]] = MappingProxyType({
     H40DiscoveryAuthorizationReceipt: ("H40_P1_SCAFFOLDED", "H40_DISCOVERY"),
+    H40DiscoveryAuthorizationReceiptV2: ("H40_P1_SCAFFOLDED", "H40_DISCOVERY"),
     H40CandidateLockReceipt: ("H40_DISCOVERY", "H40_CANDIDATE_LOCKED"),
     H40WFValidationReceipt: ("H40_CANDIDATE_LOCKED", "H40_WALK_FORWARD_VALIDATED"),
     H40ConfirmationReadyReceipt: ("H40_WALK_FORWARD_VALIDATED", "H40_CONFIRMATION_READY"),
@@ -3457,12 +4732,12 @@ _RECEIPT_TYPE_TRANSITIONS: Mapping[type[_Receipt], tuple[str, str]] = MappingPro
 
 
 @dataclass(frozen=True)
-class H40LifecyclePersistenceContext:
+class H40LifecyclePersistenceContextV1:
     implementation_authority_hash: str
-    predecessor_receipt_hash: str | None
     run_authority_id: str
     runtime_seal_hash: str
-    split_authority_hash: str | None
+    predecessor_receipt_hash: str | None = None
+    split_authority_hash: str | None = None
     schema_id: str = "H40_LIFECYCLE_PERSISTENCE_CONTEXT_V1"
 
     _KEYS: ClassVar[frozenset[str]] = frozenset({
@@ -3491,6 +4766,84 @@ class H40LifecyclePersistenceContext:
     def to_dict(self) -> dict[str, Any]:
         return {name: getattr(self, name) for name in self._KEYS}
 
+    @property
+    def context_hash(self) -> str:
+        return canonical_sha256(self.to_dict())
+
+    @classmethod
+    def from_dict(cls, data: Mapping[str, Any]) -> H40LifecyclePersistenceContextV1:
+        _require_exact_keys(data, cls._KEYS, cls.__name__)
+        _require_string_fields(
+            data,
+            cls._KEYS - {"predecessor_receipt_hash", "split_authority_hash"},
+            cls.__name__,
+        )
+        for name in ("predecessor_receipt_hash", "split_authority_hash"):
+            if data[name] is not None and not isinstance(data[name], str):
+                raise TypeError(f"{cls.__name__}.{name} must be a string or null")
+        return cls(
+            implementation_authority_hash=str(data["implementation_authority_hash"]),
+            run_authority_id=str(data["run_authority_id"]),
+            runtime_seal_hash=str(data["runtime_seal_hash"]),
+            predecessor_receipt_hash=(
+                None
+                if data["predecessor_receipt_hash"] is None
+                else str(data["predecessor_receipt_hash"])
+            ),
+            split_authority_hash=(
+                None
+                if data["split_authority_hash"] is None
+                else str(data["split_authority_hash"])
+            ),
+            schema_id=str(data["schema_id"]),
+        )
+
+
+@dataclass(frozen=True)
+class H40LifecyclePersistenceContext:
+    controller_authority_hash: str
+    discovery_run_grant_hash: str
+    implementation_authority_hash: str
+    run_authority_id: str
+    runtime_seal_hash: str
+    predecessor_receipt_hash: str | None = None
+    split_authority_hash: str | None = None
+    schema_id: str = "H40_LIFECYCLE_PERSISTENCE_CONTEXT_V2"
+
+    _KEYS: ClassVar[frozenset[str]] = frozenset({
+        "controller_authority_hash",
+        "discovery_run_grant_hash",
+        "implementation_authority_hash",
+        "predecessor_receipt_hash",
+        "run_authority_id",
+        "runtime_seal_hash",
+        "schema_id",
+        "split_authority_hash",
+    })
+
+    def __post_init__(self) -> None:
+        if self.schema_id != "H40_LIFECYCLE_PERSISTENCE_CONTEXT_V2":
+            raise ValueError("lifecycle persistence context schema mismatch")
+        for name in (
+            "controller_authority_hash",
+            "discovery_run_grant_hash",
+            "implementation_authority_hash",
+            "run_authority_id",
+            "runtime_seal_hash",
+        ):
+            _require_sha256(getattr(self, name), name)
+        for name in ("predecessor_receipt_hash", "split_authority_hash"):
+            value = getattr(self, name)
+            if value is not None:
+                _require_sha256(value, name)
+
+    def to_dict(self) -> dict[str, Any]:
+        return {name: getattr(self, name) for name in self._KEYS}
+
+    @property
+    def context_hash(self) -> str:
+        return canonical_sha256(self.to_dict())
+
     @classmethod
     def from_dict(cls, data: Mapping[str, Any]) -> H40LifecyclePersistenceContext:
         _require_exact_keys(data, cls._KEYS, cls.__name__)
@@ -3503,20 +4856,22 @@ class H40LifecyclePersistenceContext:
             if data[name] is not None and not isinstance(data[name], str):
                 raise TypeError(f"{cls.__name__}.{name} must be a string or null")
         return cls(
+            controller_authority_hash=str(data["controller_authority_hash"]),
+            discovery_run_grant_hash=str(data["discovery_run_grant_hash"]),
             implementation_authority_hash=str(data["implementation_authority_hash"]),
+            run_authority_id=str(data["run_authority_id"]),
+            runtime_seal_hash=str(data["runtime_seal_hash"]),
             predecessor_receipt_hash=(
                 None
                 if data["predecessor_receipt_hash"] is None
                 else str(data["predecessor_receipt_hash"])
             ),
-            run_authority_id=str(data["run_authority_id"]),
-            runtime_seal_hash=str(data["runtime_seal_hash"]),
-            schema_id=str(data["schema_id"]),
             split_authority_hash=(
                 None
                 if data["split_authority_hash"] is None
                 else str(data["split_authority_hash"])
             ),
+            schema_id=str(data["schema_id"]),
         )
 
 
@@ -3541,6 +4896,16 @@ class H40LifecycleAuthorityResolver(Protocol):
         split_authority_hash: str,
     ) -> H40ExpectedSplitAuthority: ...
 
+    def resolve_controller_authority(
+        self,
+        controller_authority_hash: str,
+    ) -> H40P3ControllerAuthority: ...
+
+    def resolve_discovery_run_grant(
+        self,
+        grant_hash: str,
+    ) -> H40DiscoveryRunGrant: ...
+
 
 _SYNTHETIC_RESOLVER_TOKEN = object()
 
@@ -3557,6 +4922,8 @@ class H40SyntheticAuthorityResolver:
         run_authorities: Sequence[H40RunAuthority],
         runtime_seals: Sequence[H40RuntimeSnapshotSeal],
         split_authorities: Sequence[H40ExpectedSplitAuthority],
+        controller_authorities: Sequence[H40P3ControllerAuthority] = (),
+        discovery_run_grants: Sequence[H40DiscoveryRunGrant] = (),
         _construction_token: object,
     ) -> None:
         if _construction_token is not _SYNTHETIC_RESOLVER_TOKEN:
@@ -3575,6 +4942,37 @@ class H40SyntheticAuthorityResolver:
             item.authority_context_hash: item for item in split_authorities
         })
 
+        ctrl_map: dict[str, H40P3ControllerAuthority] = {
+            item.controller_authority_hash: item for item in controller_authorities
+        }
+        grant_map: dict[str, H40DiscoveryRunGrant] = {
+            item.discovery_run_grant_hash: item for item in discovery_run_grants
+        }
+
+        # Auto-synthesize default controller authorities and grants for each implementation + seal/run if not provided
+        if not controller_authorities:
+            for impl in implementation_authorities:
+                synth_ctrl = _synthesize_controller_authority(impl)
+                ctrl_map.setdefault(synth_ctrl.controller_authority_hash, synth_ctrl)
+
+        if not discovery_run_grants:
+            for impl in implementation_authorities:
+                synth_ctrl = _synthesize_controller_authority(impl)
+                for seal in runtime_seals:
+                    with contextlib.suppress(ValueError, KeyError, H40GuardError, TypeError):
+                        expected_run = H40RunAuthority.from_seal(seal, impl.lifecycle_implementation_authority_hash)
+                        if expected_run.run_authority_id in self._run_authorities:
+                            synth_grant = H40DiscoveryRunGrant.from_controller_and_run(
+                                controller_authority=synth_ctrl,
+                                run_authority=expected_run,
+                                seal=seal,
+                                authorized_at_utc="2026-09-23T00:00:00Z",
+                            )
+                            grant_map.setdefault(synth_grant.discovery_run_grant_hash, synth_grant)
+
+        self._controller_authorities = MappingProxyType(ctrl_map)
+        self._discovery_run_grants = MappingProxyType(grant_map)
+
     @classmethod
     def for_tests(
         cls,
@@ -3583,12 +4981,16 @@ class H40SyntheticAuthorityResolver:
         run_authorities: Sequence[H40RunAuthority],
         runtime_seals: Sequence[H40RuntimeSnapshotSeal],
         split_authorities: Sequence[H40ExpectedSplitAuthority] = (),
+        controller_authorities: Sequence[H40P3ControllerAuthority] = (),
+        discovery_run_grants: Sequence[H40DiscoveryRunGrant] = (),
     ) -> H40SyntheticAuthorityResolver:
         return cls(
             implementation_authorities=implementation_authorities,
             run_authorities=run_authorities,
             runtime_seals=runtime_seals,
             split_authorities=split_authorities,
+            controller_authorities=controller_authorities,
+            discovery_run_grants=discovery_run_grants,
             _construction_token=_SYNTHETIC_RESOLVER_TOKEN,
         )
 
@@ -3640,6 +5042,36 @@ class H40SyntheticAuthorityResolver:
                 "split authority",
             ),
         )
+
+    def resolve_controller_authority(
+        self,
+        controller_authority_hash: str,
+    ) -> H40P3ControllerAuthority:
+        _require_sha256(controller_authority_hash, "controller authority")
+        resolved = self._controller_authorities.get(controller_authority_hash)
+        if resolved is None:
+            resolved = _SYNTHETIC_CONTROLLER_REGISTRY.get(controller_authority_hash)
+        if resolved is None:
+            raise H40GuardError(
+                H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                f"authoritative resolver has no controller authority {controller_authority_hash}",
+            )
+        return resolved
+
+    def resolve_discovery_run_grant(
+        self,
+        grant_hash: str,
+    ) -> H40DiscoveryRunGrant:
+        _require_sha256(grant_hash, "discovery run grant")
+        resolved = self._discovery_run_grants.get(grant_hash)
+        if resolved is None:
+            resolved = _SYNTHETIC_GRANT_REGISTRY.get(grant_hash)
+        if resolved is None:
+            raise H40GuardError(
+                H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                f"authoritative resolver has no discovery run grant {grant_hash}",
+            )
+        return resolved
 
 
 class H40LifecycleArtifactStore:
@@ -4157,10 +5589,14 @@ class H40LifecycleArtifactStore:
         run_authority = authorization.context.get("run_authority")
         seal = authorization.context.get("seal")
         split_authority = authorization.context.get("split_authority")
+        controller = authorization.context.get("controller_authority")
+        grant = authorization.context.get("discovery_run_grant")
         if (
             not isinstance(implementation, H40LifecycleImplementationAuthority)
             or not isinstance(run_authority, H40RunAuthority)
             or not isinstance(seal, H40RuntimeSnapshotSeal)
+            or not isinstance(controller, H40P3ControllerAuthority)
+            or not isinstance(grant, H40DiscoveryRunGrant)
         ):
             raise H40GuardError(
                 H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
@@ -4175,6 +5611,8 @@ class H40LifecycleArtifactStore:
                 "verified authorization has an invalid split authority context",
             )
         return H40LifecyclePersistenceContext(
+            controller_authority_hash=controller.controller_authority_hash,
+            discovery_run_grant_hash=grant.discovery_run_grant_hash,
             implementation_authority_hash=(
                 implementation.lifecycle_implementation_authority_hash
             ),
@@ -4267,6 +5705,7 @@ class H40LifecycleArtifactStore:
             raise TypeError("only verified lifecycle authorization can be persisted")
         if not isinstance(service, H40LifecycleAuthorityService):
             raise TypeError("service must be H40LifecycleAuthorityService")
+        service._assert_current_anchors(require_controller=True)
         service.revalidate_authorization(authorization)
 
         run_authority_id = authorization.run_authority_id
@@ -4347,7 +5786,7 @@ class H40LifecycleArtifactStore:
     ) -> tuple[
         _Receipt,
         _ResultEvidence | None,
-        H40LifecyclePersistenceContext,
+        H40LifecyclePersistenceContext | H40LifecyclePersistenceContextV1,
     ]:
         path = self._find_receipt_path(run_authority_id, transition_key)
         try:
@@ -4373,7 +5812,17 @@ class H40LifecycleArtifactStore:
                 H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
                 "lifecycle authority context must be an object",
             )
-        context = H40LifecyclePersistenceContext.from_dict(raw_context)
+        schema = raw_context.get("schema_id")
+        context: H40LifecyclePersistenceContext | H40LifecyclePersistenceContextV1
+        if schema == "H40_LIFECYCLE_PERSISTENCE_CONTEXT_V1":
+            context = H40LifecyclePersistenceContextV1.from_dict(raw_context)
+        elif schema == "H40_LIFECYCLE_PERSISTENCE_CONTEXT_V2":
+            context = H40LifecyclePersistenceContext.from_dict(raw_context)
+        else:
+            raise H40GuardError(
+                H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                f"unknown lifecycle persistence context schema '{schema}'",
+            )
         if context.run_authority_id != run_authority_id:
             raise H40GuardError(
                 H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
@@ -4385,8 +5834,8 @@ class H40LifecycleArtifactStore:
             raise H40GuardError(H40ReasonCode.CONFIG_IDENTITY_CONFLICT, "invalid lifecycle envelope fields")
         if canonical_sha256(payload) != digest:
             raise H40GuardError(H40ReasonCode.CONFIG_IDENTITY_CONFLICT, "lifecycle receipt content hash mismatch")
-        schema = payload.get("receipt_schema_id")
-        parser = _RECEIPT_PARSERS.get(str(schema))
+        schema_id = payload.get("receipt_schema_id")
+        parser = _RECEIPT_PARSERS.get(str(schema_id))
         if parser is None:
             raise H40GuardError(H40ReasonCode.CONFIG_IDENTITY_CONFLICT, "unknown lifecycle receipt schema")
         receipt = parser(payload)
@@ -4457,13 +5906,15 @@ class H40LifecycleArtifactStore:
 
     @staticmethod
     def _resolve_authority_context(
-        context: H40LifecyclePersistenceContext,
+        context: H40LifecyclePersistenceContext | H40LifecyclePersistenceContextV1,
         resolver: H40LifecycleAuthorityResolver,
     ) -> tuple[
         H40LifecycleImplementationAuthority,
         H40RunAuthority,
         H40RuntimeSnapshotSeal,
         H40ExpectedSplitAuthority | None,
+        H40P3ControllerAuthority | None,
+        H40DiscoveryRunGrant | None,
     ]:
         implementation = resolver.resolve_implementation_authority(
             context.implementation_authority_hash
@@ -4504,7 +5955,61 @@ class H40LifecycleArtifactStore:
                 H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
                 "resolved split authority does not match runtime seal",
             )
-        return implementation, run_authority, seal, split_authority
+
+        controller_authority: H40P3ControllerAuthority | None = None
+        discovery_run_grant: H40DiscoveryRunGrant | None = None
+        if isinstance(context, H40LifecyclePersistenceContext):
+            controller_authority = resolver.resolve_controller_authority(
+                context.controller_authority_hash
+            )
+            discovery_run_grant = resolver.resolve_discovery_run_grant(
+                context.discovery_run_grant_hash
+            )
+            if controller_authority.controller_authority_hash != context.controller_authority_hash:
+                raise H40GuardError(
+                    H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                    "resolved controller authority hash mismatch against context",
+                )
+            if discovery_run_grant.discovery_run_grant_hash != context.discovery_run_grant_hash:
+                raise H40GuardError(
+                    H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                    "resolved discovery run grant hash mismatch against context",
+                )
+            if discovery_run_grant.controller_authority_hash != controller_authority.controller_authority_hash:
+                raise H40GuardError(
+                    H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                    "resolved discovery run grant controller authority mismatch",
+                )
+            if discovery_run_grant.run_authority_id != run_authority.run_authority_id:
+                raise H40GuardError(
+                    H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                    "resolved discovery run grant run_authority_id mismatch",
+                )
+            if discovery_run_grant.materialized_run_authority_hash != seal.materialized_run_authority_hash:
+                raise H40GuardError(
+                    H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                    "resolved discovery run grant materialized run authority mismatch",
+                )
+            expected_grant = H40DiscoveryRunGrant.from_controller_and_run(
+                controller_authority=controller_authority,
+                run_authority=run_authority,
+                seal=seal,
+                authorized_at_utc=discovery_run_grant.authorized_at_utc,
+            )
+            if discovery_run_grant != expected_grant:
+                raise H40GuardError(
+                    H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                    "resolved discovery run grant does not match exact recomputation",
+                )
+
+        return (
+            implementation,
+            run_authority,
+            seal,
+            split_authority,
+            controller_authority,
+            discovery_run_grant,
+        )
 
     def _cold_restore_authorization(
         self,
@@ -4521,9 +6026,51 @@ class H40LifecycleArtifactStore:
                 H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
                 "cyclic lifecycle predecessor lineage",
             )
-        implementation, run_authority, seal, split_authority = (
-            self._resolve_authority_context(context, resolver)
-        )
+        if not service.synthetic_test_mode:
+            service._assert_current_anchors(require_controller=False)
+            if isinstance(context, H40LifecyclePersistenceContextV1):
+                raise H40GuardError(
+                    H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                    "production cold restore rejects H40_LIFECYCLE_PERSISTENCE_CONTEXT_V1",
+                )
+            if isinstance(receipt, H40DiscoveryAuthorizationReceiptV2):
+                raise H40GuardError(
+                    H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                    "production cold restore rejects H40_RECEIPT_DISCOVERY_AUTH_V2",
+                )
+            if isinstance(context, H40LifecyclePersistenceContext):
+                if context.implementation_authority_hash != ACCEPTED_LIFECYCLE_IMPLEMENTATION_AUTHORITY_HASH:
+                    raise H40GuardError(
+                        H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                        "persisted context implementation authority hash does not match current accepted anchor",
+                    )
+                if isinstance(receipt, H40DiscoveryAuthorizationReceipt):
+                    if context.controller_authority_hash != receipt.controller_authority_hash:
+                        raise H40GuardError(
+                            H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                            "persisted context controller authority hash does not match receipt",
+                        )
+                    if context.discovery_run_grant_hash != receipt.discovery_run_grant_hash:
+                        raise H40GuardError(
+                            H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                            "persisted context run grant hash does not match receipt",
+                        )
+                if (
+                    service.current_controller_authority_hash is not None
+                    and context.controller_authority_hash != service.current_controller_authority_hash
+                ):
+                    raise H40GuardError(
+                        H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                        "persisted context controller authority hash does not match service anchor",
+                    )
+        (
+            implementation,
+            run_authority,
+            seal,
+            split_authority,
+            controller_authority,
+            discovery_run_grant,
+        ) = self._resolve_authority_context(context, resolver)
         prior: VerifiedLifecycleAuthorization | None = None
         if receipt.upstream_receipt_hash is not None:
             predecessor_key = self._find_transition_key_by_receipt_hash(
@@ -4543,17 +6090,35 @@ class H40LifecycleArtifactStore:
                     "cold-restored predecessor receipt substitution",
                 )
 
-        if isinstance(receipt, H40DiscoveryAuthorizationReceipt):
+        if isinstance(receipt, (H40DiscoveryAuthorizationReceipt, H40DiscoveryAuthorizationReceiptV2)):
             if prior is not None or evidence is not None:
                 raise H40GuardError(
                     H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
                     "discovery restore has unexpected predecessor or result evidence",
                 )
+            if isinstance(receipt, H40DiscoveryAuthorizationReceipt):
+                if controller_authority is None or discovery_run_grant is None:
+                    raise H40GuardError(
+                        H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                        "discovery V3 restore requires controller authority and run grant",
+                    )
+                if receipt.controller_authority_hash != controller_authority.controller_authority_hash:
+                    raise H40GuardError(
+                        H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                        "receipt controller authority hash mismatch against resolved controller authority",
+                    )
+                if receipt.discovery_run_grant_hash != discovery_run_grant.discovery_run_grant_hash:
+                    raise H40GuardError(
+                        H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+                        "receipt discovery run grant hash mismatch against resolved run grant",
+                    )
             reconstructed = service.authorize_discovery(
                 implementation_authority=implementation,
                 run_authority=run_authority,
                 seal=seal,
                 authorized_at_utc=receipt.authorized_at_utc,
+                controller_authority=controller_authority,
+                discovery_run_grant=discovery_run_grant,
             )
         elif isinstance(receipt, H40CandidateLockReceipt):
             if prior is None or not isinstance(evidence, H40DiscoveryResultEvidence):
@@ -4866,6 +6431,7 @@ class H40LifecycleArtifactStore:
                 H40ReasonCode.NOT_TESTABLE,
                 "resolver authority mode does not match lifecycle service mode",
             )
+        service._assert_current_anchors(require_controller=False)
         head = self.get_committed_run_head(run_authority_id)
         if head is None:
             raise H40GuardError(
@@ -4908,7 +6474,9 @@ class H40LifecycleArtifactStore:
 
 
 __all__ = [
+    "ACCEPTED_H40_P3_CONTROLLER_AUTHORITY_HASH",
     "ACCEPTED_LIFECYCLE_IMPLEMENTATION_AUTHORITY_HASH",
+    "DISCOVERY_PROVENANCE_CONTRACT_HASH",
     "DISCOVERY_SELECTION_CORRECTION_CONTRACT_HASH",
     "EXPECTED_LIFECYCLE_CHILD_HASHES",
     "EXPECTED_LIFECYCLE_GOVERNANCE_AUTHORITY_HASH",
@@ -4919,7 +6487,9 @@ __all__ = [
     "H40CandidateVerification",
     "H40ConfirmationReadyReceipt",
     "H40DiscoveryAuthorizationReceipt",
+    "H40DiscoveryAuthorizationReceiptV2",
     "H40DiscoveryResultEvidence",
+    "H40DiscoveryRunGrant",
     "H40DurableRunHead",
     "H40ExpectedSplitAuthority",
     "H40ExpectedWFFold",
@@ -4929,6 +6499,8 @@ __all__ = [
     "H40LifecycleEvidenceVerifier",
     "H40LifecycleImplementationAuthority",
     "H40LifecyclePersistenceContext",
+    "H40LifecyclePersistenceContextV1",
+    "H40P3ControllerAuthority",
     "H40RequiredTestCIEvidenceIdentity",
     "H40RunAuthority",
     "H40RuntimeRosterEntry",

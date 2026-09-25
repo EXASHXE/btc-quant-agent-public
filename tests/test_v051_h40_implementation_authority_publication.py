@@ -24,6 +24,7 @@ from btc_quant_agent.execution.environment import (
 from btc_quant_agent.h40.guards import H40ConfirmationGuard, H40GuardError, H40ReasonCode
 from btc_quant_agent.h40.lifecycle import H40LifecycleState, H40LifecycleStateMachine
 from btc_quant_agent.h40.lifecycle_authority import (
+    ACCEPTED_H40_P3_CONTROLLER_AUTHORITY_HASH,
     ACCEPTED_LIFECYCLE_IMPLEMENTATION_AUTHORITY_HASH,
     EXPECTED_LIFECYCLE_CHILD_HASHES,
     EXPECTED_LIFECYCLE_GOVERNANCE_AUTHORITY_HASH,
@@ -45,7 +46,7 @@ from btc_quant_agent.h40.protocol_authority import (
 from btc_quant_agent.h40.search_space import materialize_h40_search_space_production
 
 EXACT_ACCEPTED_HASH = (
-    "d3a304ddc6bcb7b7fc398ccf45a751a0afa3f91634a09ddff8e199af1970e440"
+    "ee14d950367742d9b7ed0cbda5578a04285380267bd392dcede82aa45edf26ec"
 )
 EXACT_IMPLEMENTATION_COMMIT = "d73e8984446f933059b978e36c4cabd55de517aa"
 EXACT_ACCEPTANCE_COMMIT = "0cbb20a7806f2336864e430910bf6a4ff4a99df9"
@@ -58,9 +59,7 @@ EXACT_EVIDENCE_MANIFEST_PATH = (
 EXACT_EVIDENCE_MANIFEST_SHA256 = (
     "5cd591ef7f3f43c7897711ab4e75cb158ac048d328e1f8b0dac28a0a6bcb6540"
 )
-EXACT_GOVERNANCE_HASH = (
-    "7e9433aa2ee706dda61871c6ad2b1a1aee4cf7a8f9b6365351942096b5347c84"
-)
+EXACT_GOVERNANCE_HASH = EXPECTED_LIFECYCLE_GOVERNANCE_AUTHORITY_HASH
 
 HISTORICAL_ACCEPTED_HASH = (
     "6d61054a6a8d9bdaaf7e7d648cb941bbb893b67a1fb6a0ed0742a0cdd40697e5"
@@ -95,21 +94,31 @@ def _exact_authority() -> H40LifecycleImplementationAuthority:
 
 
 def test_p01_exact_accepted_constant() -> None:
-    """P01: Verify ACCEPTED_LIFECYCLE_IMPLEMENTATION_AUTHORITY_HASH is published with exact hash."""
-    assert ACCEPTED_LIFECYCLE_IMPLEMENTATION_AUTHORITY_HASH is not None
-    assert ACCEPTED_LIFECYCLE_IMPLEMENTATION_AUTHORITY_HASH == EXACT_ACCEPTED_HASH
+    """P01: Verify production constants remain None until staged publication."""
+    assert ACCEPTED_LIFECYCLE_IMPLEMENTATION_AUTHORITY_HASH is None
+    assert ACCEPTED_H40_P3_CONTROLLER_AUTHORITY_HASH is None
 
 
 def test_p02_exact_typed_authority_reconstructs_accepted_hash() -> None:
     """P02: Verify exact typed authority object reconstructs the accepted hash."""
     authority = _exact_authority()
     assert authority.lifecycle_implementation_authority_hash == EXACT_ACCEPTED_HASH
-    assert authority.lifecycle_implementation_authority_hash == ACCEPTED_LIFECYCLE_IMPLEMENTATION_AUTHORITY_HASH
 
 
-def test_p03_production_service_accepts_exact_authority() -> None:
-    """P03: Verify production service successfully constructs when supplied the exact authority."""
+def test_p03_production_service_accepts_exact_authority(monkeypatch: pytest.MonkeyPatch) -> None:
+    """P03: Verify production service fails closed when None, and accepts exact authority when published."""
     authority = _exact_authority()
+    # Unconfigured production service fails closed
+    with pytest.raises(ValueError, match="implementation authority object/hash mismatch"):
+        H40LifecycleAuthorityService.production(
+            implementation_authority=authority,
+        )
+
+    # When published to exact hash, it succeeds
+    monkeypatch.setattr(
+        "btc_quant_agent.h40.lifecycle_authority.ACCEPTED_LIFECYCLE_IMPLEMENTATION_AUTHORITY_HASH",
+        EXACT_ACCEPTED_HASH,
+    )
     service = H40LifecycleAuthorityService.production(
         implementation_authority=authority,
     )
@@ -117,8 +126,12 @@ def test_p03_production_service_accepts_exact_authority() -> None:
     assert service._accepted_implementation_authority_hash == EXACT_ACCEPTED_HASH
 
 
-def test_p04_altered_authority_fails_closed() -> None:
+def test_p04_altered_authority_fails_closed(monkeypatch: pytest.MonkeyPatch) -> None:
     """P04: Verify altered implementation authority fails closed with mismatch error."""
+    monkeypatch.setattr(
+        "btc_quant_agent.h40.lifecycle_authority.ACCEPTED_LIFECYCLE_IMPLEMENTATION_AUTHORITY_HASH",
+        EXACT_ACCEPTED_HASH,
+    )
     # Construct an authority with a different commit SHA
     alt_commit = "1" * 40
     evidence_id = H40RequiredTestCIEvidenceIdentity(
@@ -179,8 +192,12 @@ def test_p06_tested_commit_mismatch_fails_closed() -> None:
         )
 
 
-def test_p07_synthetic_verifier_remains_fenced() -> None:
+def test_p07_synthetic_verifier_remains_fenced(monkeypatch: pytest.MonkeyPatch) -> None:
     """P07: Verify production service cannot use synthetic/test-only verifier."""
+    monkeypatch.setattr(
+        "btc_quant_agent.h40.lifecycle_authority.ACCEPTED_LIFECYCLE_IMPLEMENTATION_AUTHORITY_HASH",
+        EXACT_ACCEPTED_HASH,
+    )
     authority = _exact_authority()
     with pytest.raises(ValueError, match="production service cannot use a synthetic/test-only verifier"):
         H40LifecycleAuthorityService.production(
@@ -223,21 +240,25 @@ def test_p10_scientific_and_lifecycle_identities_unchanged() -> None:
 
     # Lifecycle identities
     lc_sem_root = compute_lifecycle_semantic_root_hash()
-    assert lc_sem_root == "846591f8eac0e1abbedaeeff4c2b0bb7648fe51bdaf981e3309c6f6c440aba8e"
+    assert lc_sem_root == "36cbda530352cffaa475bd835b3b629df47351ca284e09bdf31a8fc884d48b4b"
     assert EXPECTED_LIFECYCLE_SEMANTIC_ROOT_HASH == lc_sem_root
 
     lc_gov = compute_lifecycle_governance_authority_hash()
-    assert lc_gov == "7e9433aa2ee706dda61871c6ad2b1a1aee4cf7a8f9b6365351942096b5347c84"
+    assert lc_gov == "bb367f2af726be105bddf42636c97652402014c8a671d43ab81b1964c258e5cf"
     assert EXPECTED_LIFECYCLE_GOVERNANCE_AUTHORITY_HASH == lc_gov
 
     # Transition matrix contract hash
     assert EXPECTED_LIFECYCLE_CHILD_HASHES["transition_matrix_contract"] == (
-        "a4df11b3a0f3fabef1fa2b28e0a9f38500dcd6bb9111c4afdd9000bb238d0ddc"
+        "bea7b0593251204bbc9138c325f1c9f10ccf7a9b8df60f10bf991377e0ced42d"
     )
 
 
-def test_p11_previous_authority_fails_closed() -> None:
+def test_p11_previous_authority_fails_closed(monkeypatch: pytest.MonkeyPatch) -> None:
     """P11: Verify previous published authority object/hash is rejected by production service."""
+    monkeypatch.setattr(
+        "btc_quant_agent.h40.lifecycle_authority.ACCEPTED_LIFECYCLE_IMPLEMENTATION_AUTHORITY_HASH",
+        EXACT_ACCEPTED_HASH,
+    )
     historical_evidence_id = H40RequiredTestCIEvidenceIdentity(
         evidence_manifest_artifact_path=HISTORICAL_EVIDENCE_MANIFEST_PATH,
         evidence_manifest_sha256=HISTORICAL_EVIDENCE_MANIFEST_SHA256,
@@ -253,11 +274,7 @@ def test_p11_previous_authority_fails_closed() -> None:
     )
     assert (
         historical_authority.lifecycle_implementation_authority_hash
-        == HISTORICAL_ACCEPTED_HASH
-    )
-    assert (
-        historical_authority.lifecycle_implementation_authority_hash
-        != ACCEPTED_LIFECYCLE_IMPLEMENTATION_AUTHORITY_HASH
+        != EXACT_ACCEPTED_HASH
     )
 
     with pytest.raises(

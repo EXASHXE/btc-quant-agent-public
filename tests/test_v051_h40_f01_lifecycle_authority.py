@@ -8,7 +8,7 @@ import json
 from collections.abc import Sequence
 from dataclasses import dataclass, replace
 from decimal import Decimal
-from functools import lru_cache
+from functools import cache, lru_cache
 from pathlib import Path
 from typing import Any
 
@@ -18,6 +18,7 @@ import btc_quant_agent.h40.lifecycle_authority as lifecycle_authority_module
 import btc_quant_agent.h40.search_space as search_space_module
 import btc_quant_agent.h40.split_manifest as split_manifest_module
 from btc_quant_agent.h40 import (
+    ACCEPTED_H40_P3_CONTROLLER_AUTHORITY_HASH,
     ACCEPTED_LIFECYCLE_IMPLEMENTATION_AUTHORITY_HASH,
     DISCOVERY_SELECTION_CORRECTION_CONTRACT_HASH,
     EXPECTED_LIFECYCLE_CHILD_HASHES,
@@ -32,6 +33,7 @@ from btc_quant_agent.h40 import (
     H40ConfirmationGuard,
     H40DiscoveryAuthorizationReceipt,
     H40DiscoveryResultEvidence,
+    H40DiscoveryRunGrant,
     H40DurableRunHead,
     H40ExecutionGuard,
     H40ExpectedSplitAuthority,
@@ -80,8 +82,8 @@ from btc_quant_agent.h40 import (
     materialize_runtime_source_split_authority,
     normalize_audit_timestamp,
 )
-from btc_quant_agent.h40.split_manifest import generate_hourly_range
 from btc_quant_agent.h40.configuration_ledger import H40ConfigurationLedger
+from btc_quant_agent.h40.split_manifest import generate_hourly_range
 from btc_quant_agent.research_contract.canonical import canonical_json, canonical_sha256
 
 TS = "2026-09-20T00:00:00Z"
@@ -282,6 +284,8 @@ def _make_mock_discovery_receipt(
 ) -> H40DiscoveryAuthorizationReceipt:
     return H40DiscoveryAuthorizationReceipt(
         authorized_at_utc=authorized_at_utc,
+        controller_authority_hash=_hash("ctrl"),
+        discovery_run_grant_hash=_hash("grant"),
         discovery_selection_correction_contract_hash=_hash("correction"),
         execution_disabled=True,
         lifecycle_governance_authority_hash=_hash("gov"),
@@ -579,7 +583,7 @@ _ORIGINAL_MATERIALIZE_SEARCH_SPACE = search_space_module.materialize_h40_search_
 _ORIGINAL_ACCEPTED_ROSTER = lifecycle_authority_module._accepted_production_roster
 
 
-@lru_cache(maxsize=None)
+@cache
 def _immutable_calendar_template(
     start_utc: str, end_utc: str, inclusive_end: bool,
 ) -> tuple[str, ...]:
@@ -738,7 +742,7 @@ def test_t03_scientific_hashes_unchanged() -> None:
 
 
 def test_t04_governance_authority() -> None:
-    assert lifecycle_governance_authority_object()["schema_id"] == "H40_LIFECYCLE_GOVERNANCE_AUTHORITY_V4"
+    assert lifecycle_governance_authority_object()["schema_id"] == "H40_LIFECYCLE_GOVERNANCE_AUTHORITY_V5"
     assert compute_lifecycle_governance_authority_hash() == EXPECTED_LIFECYCLE_GOVERNANCE_AUTHORITY_HASH
 
 
@@ -757,10 +761,8 @@ def test_t06_primitive_dict_path_denied(forged: object) -> None:
 
 
 def test_t07_implementation_authority_required() -> None:
-    assert (
-        ACCEPTED_LIFECYCLE_IMPLEMENTATION_AUTHORITY_HASH
-        == "d3a304ddc6bcb7b7fc398ccf45a751a0afa3f91634a09ddff8e199af1970e440"
-    )
+    assert ACCEPTED_LIFECYCLE_IMPLEMENTATION_AUTHORITY_HASH is None
+    assert ACCEPTED_H40_P3_CONTROLLER_AUTHORITY_HASH is None
     service = H40LifecycleAuthorityService.production()
     authority = _implementation_authority()
     seal = _complete_synthetic_seal()
@@ -1571,10 +1573,10 @@ def test_r01_r04_amended_authority_hashes_and_science_are_exact() -> None:
         == "76a0732742707c78f65da26263076bed7b586ea67d4f5ddd2dac33761e37e612"
     )
     assert compute_lifecycle_semantic_root_hash() == (
-        "846591f8eac0e1abbedaeeff4c2b0bb7648fe51bdaf981e3309c6f6c440aba8e"
+        "36cbda530352cffaa475bd835b3b629df47351ca284e09bdf31a8fc884d48b4b"
     )
     assert compute_lifecycle_governance_authority_hash() == (
-        "7e9433aa2ee706dda61871c6ad2b1a1aee4cf7a8f9b6365351942096b5347c84"
+        "bb367f2af726be105bddf42636c97652402014c8a671d43ab81b1964c258e5cf"
     )
     assert compute_protocol_authority_hash() == EXPECTED_PROTOCOL_AUTHORITY_HASH
     assert compute_semantic_root_hash() == EXPECTED_SEMANTIC_ROOT_HASH
@@ -2398,11 +2400,25 @@ def test_a21_through_a29_model_a_capability_lifetime(
         "ACCEPTED_LIFECYCLE_IMPLEMENTATION_AUTHORITY_HASH",
         authority.lifecycle_implementation_authority_hash,
     )
+    ctrl = lifecycle_authority_module._synthesize_controller_authority(authority)
+    monkeypatch.setattr(
+        lifecycle_authority_module,
+        "ACCEPTED_H40_P3_CONTROLLER_AUTHORITY_HASH",
+        ctrl.controller_authority_hash,
+    )
     run = H40RunAuthority.from_seal(seal, authority.lifecycle_implementation_authority_hash)
+    grant = H40DiscoveryRunGrant.from_controller_and_run(
+        controller_authority=ctrl,
+        run_authority=run,
+        seal=seal,
+        authorized_at_utc=TS,
+    )
     store = H40LifecycleArtifactStore(tmp_path)
     verifier = _ProductionEvidenceVerifier(tmp_path / "verifier")
     prod_service = H40LifecycleAuthorityService.production(
         implementation_authority=authority,
+        controller_authority=ctrl,
+        discovery_run_grant=grant,
         evidence_verifier=verifier,
     )
 
@@ -2411,6 +2427,8 @@ def test_a21_through_a29_model_a_capability_lifetime(
         run_authority=run,
         seal=seal,
         authorized_at_utc=TS,
+        controller_authority=ctrl,
+        discovery_run_grant=grant,
     )
     assert discovery.receipt_hash
 
@@ -2535,13 +2553,22 @@ def test_a21_through_a29_model_a_capability_lifetime(
 def test_a30_through_a41_frozen_identities_and_invariants() -> None:
     # A30: persistence child V2 hash exact
     child_hashes = compute_lifecycle_child_hashes()
-    assert child_hashes["persistence_replay_contract"] == "5f014b867be17019c2be91ff48f8e23a43ed29678fc5589430ba174046fceaae"
+    assert (
+        child_hashes["persistence_replay_contract"]
+        == "51e4fe6155d388c076dd1788a100265eb17b232300481a3fbcf00150f1432de1"
+    )
 
-    # A31: lifecycle root V3 exact
-    assert compute_lifecycle_semantic_root_hash() == "846591f8eac0e1abbedaeeff4c2b0bb7648fe51bdaf981e3309c6f6c440aba8e"
+    # A31: lifecycle root V5 exact
+    assert (
+        compute_lifecycle_semantic_root_hash()
+        == "36cbda530352cffaa475bd835b3b629df47351ca284e09bdf31a8fc884d48b4b"
+    )
 
-    # A32: governance V4 exact
-    assert compute_lifecycle_governance_authority_hash() == "7e9433aa2ee706dda61871c6ad2b1a1aee4cf7a8f9b6365351942096b5347c84"
+    # A32: governance V5 exact
+    assert (
+        compute_lifecycle_governance_authority_hash()
+        == "bb367f2af726be105bddf42636c97652402014c8a671d43ab81b1964c258e5cf"
+    )
 
     # A33: all other eight lifecycle child hashes unchanged
     for name, expected in EXPECTED_LIFECYCLE_CHILD_HASHES.items():

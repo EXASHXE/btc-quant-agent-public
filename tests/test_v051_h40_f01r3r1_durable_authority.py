@@ -24,12 +24,14 @@ import pytest
 import btc_quant_agent.h40.lifecycle_authority as lifecycle_authority_module
 from btc_quant_agent.h40 import (
     H40CandidateLockReceipt,
+    H40DiscoveryRunGrant,
     H40ExpectedSplitAuthority,
     H40ExpectedWFFold,
     H40GuardError,
     H40LifecycleArtifactStore,
     H40LifecycleAuthorityService,
     H40LifecycleImplementationAuthority,
+    H40P3ControllerAuthority,
     H40ReasonCode,
     H40RunAuthority,
     H40RuntimeSnapshotSeal,
@@ -46,7 +48,7 @@ _TESTS_DIR = str(Path(__file__).resolve().parent)
 if _TESTS_DIR not in sys.path:
     sys.path.insert(0, _TESTS_DIR)
 
-from test_v051_h40_f01_lifecycle_authority import (  # noqa: E402
+from test_v051_h40_f01_lifecycle_authority import (
     TS,
     _build_discovery_chain,
     _build_wf_chain,
@@ -67,11 +69,15 @@ class _ProductionAuthorityResolver:
         run: H40RunAuthority,
         seal: H40RuntimeSnapshotSeal,
         split: H40ExpectedSplitAuthority | None = None,
+        controller: H40P3ControllerAuthority | None = None,
+        grant: H40DiscoveryRunGrant | None = None,
     ) -> None:
         self._authority = authority
         self._run = run
         self._seal = seal
         self._split = split
+        self._controller = controller
+        self._grant = grant
 
     def resolve_implementation_authority(
         self,
@@ -94,6 +100,32 @@ class _ProductionAuthorityResolver:
         raise H40GuardError(
             H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
             f"split authority {split_authority_hash} not found",
+        )
+
+    def resolve_controller_authority(
+        self,
+        controller_authority_hash: str,
+    ) -> H40P3ControllerAuthority:
+        if self._controller is not None:
+            return self._controller
+        if controller_authority_hash in lifecycle_authority_module._SYNTHETIC_CONTROLLER_REGISTRY:
+            return lifecycle_authority_module._SYNTHETIC_CONTROLLER_REGISTRY[controller_authority_hash]
+        raise H40GuardError(
+            H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+            f"controller authority {controller_authority_hash} not found",
+        )
+
+    def resolve_discovery_run_grant(
+        self,
+        grant_hash: str,
+    ) -> H40DiscoveryRunGrant:
+        if self._grant is not None:
+            return self._grant
+        if grant_hash in lifecycle_authority_module._SYNTHETIC_GRANT_REGISTRY:
+            return lifecycle_authority_module._SYNTHETIC_GRANT_REGISTRY[grant_hash]
+        raise H40GuardError(
+            H40ReasonCode.CONFIG_IDENTITY_CONFLICT,
+            f"run grant {grant_hash} not found",
         )
 
 
@@ -130,6 +162,12 @@ def _make_synthetic_chain_with_production_seal(
         lifecycle_authority_module,
         "ACCEPTED_LIFECYCLE_IMPLEMENTATION_AUTHORITY_HASH",
         authority.lifecycle_implementation_authority_hash,
+    )
+    ctrl = lifecycle_authority_module._synthesize_controller_authority(authority)
+    monkeypatch.setattr(
+        lifecycle_authority_module,
+        "ACCEPTED_H40_P3_CONTROLLER_AUTHORITY_HASH",
+        ctrl.controller_authority_hash,
     )
     # These durability cases exercise lifecycle governance with a real cold
     # source/split seal. Their candidate evidence is explicitly synthetic.

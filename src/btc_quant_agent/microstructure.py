@@ -465,9 +465,7 @@ class MicrostructureStore:
         if max_end is not None and (not isinstance(max_end, int) or isinstance(max_end, bool)):
             return False
         summary = stats.get("bucket_summary")
-        if summary is not None and not isinstance(summary, dict):
-            return False
-        return True
+        return not (summary is not None and not isinstance(summary, dict))
 
     def _manifest(self) -> dict[str, dict[str, Any]]:
         if not self.finalized_manifest_path.exists():
