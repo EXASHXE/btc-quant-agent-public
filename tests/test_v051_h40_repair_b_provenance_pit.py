@@ -33,9 +33,11 @@ from btc_quant_agent.h40 import (
     EXPECTED_LIFECYCLE_SEMANTIC_ROOT_HASH,
     H40ActiveSourceEvidenceEntry,
     H40ConfirmationGuard,
+    H40DiscoveryAuthorizationReceipt,
     H40DiscoveryAuthorizationReceiptV2,
     H40DiscoveryEvidenceResolver,
     H40GuardError,
+    H40LifecycleArtifactStore,
     H40LifecycleAuthorityService,
     H40LifecycleImplementationAuthority,
     H40LifecyclePersistenceContextV1,
@@ -53,11 +55,13 @@ from btc_quant_agent.h40 import (
     compute_lifecycle_governance_authority_hash,
     compute_lifecycle_semantic_root_hash,
     compute_protocol_authority_hash,
+    materialize_h40_search_space_production,
 )
 from btc_quant_agent.h40.discovery_evidence import (
     _POLICIES,
     _PREFIT_CACHE,
     _Bar,
+    _Decision,
     _compute_d1,
     _compute_d2,
     _compute_d3,
@@ -424,6 +428,45 @@ def test_f02_05_source_validation_receipt_hash_mismatch_rejected(tmp_path: Path)
         base_eligible_count=0, partitions=(), exclusion_counts={},
     )
     with pytest.raises(H40GuardError, match="source derivation receipt hash mismatch"):
+        _load_source_bars(
+            resolver, digest, run_authority_id="RUN_1",
+            source_manifest_hash=manifest.manifest_hash,
+            split_manifest_hash=_hash("split"),
+            split_manifest=split, seal=seal,
+        )
+
+
+def test_f02_10b_wrong_locator_rejected(tmp_path: Path) -> None:
+    start = datetime(2021, 5, 1, 0, tzinfo=UTC)
+    bars = _make_dummy_bars(start, 5)
+    seal, manifest, attestation, _record, receipt, file_sha, exp_digest, exp_count = (
+        _make_production_test_seal_and_context(tmp_path, bars)
+    )
+    resolver = H40DiscoveryEvidenceResolver(tmp_path)
+    derivation = {
+        "schema_id": "H40_P3B_SOURCE_DERIVATION_V2", "run_authority_id": "RUN_1",
+        "source_manifest_hash": manifest.manifest_hash,
+        "split_manifest_hash": _hash("split"),
+        "split_attestation_hash": attestation.attestation_hash,
+        "provenance_contract_hash": DISCOVERY_PROVENANCE_CONTRACT_HASH,
+        "policies": _policy_stack(),
+        "source_support": {"start_utc": "2021-01-01T00:00:00Z", "end_utc_exclusive": "2023-02-01T00:00:00Z"},
+        "active_source_derivations": [{
+            "cadence": "1h", "economic_row_count": exp_count, "economic_rows_sha256": exp_digest,
+            "locator": "WRONG_LOCATOR.json", "product": "ETHUSDT", "source_file_sha256": file_sha,
+            "source_id": "SRC_ETH",
+            "source_validation_receipt_sha256": canonical_sha256(receipt.to_dict()),
+            "timestamp_field": "timestamp",
+        }],
+        "base_eligible_membership": {"WF1_TRAIN": [], "WF1_CALIBRATION": []},
+    }
+    digest = _store(tmp_path, derivation)
+    split = H40SplitManifest(
+        protocol_identity_hash=_hash("p"), source_manifest_hash=manifest.manifest_hash,
+        base_eligible_start_utc="2021-01-31T00:00:00Z", base_eligible_end_utc="2023-01-31T00:00:00Z",
+        base_eligible_count=0, partitions=(), exclusion_counts={},
+    )
+    with pytest.raises(H40GuardError, match="source locator mismatch"):
         _load_source_bars(
             resolver, digest, run_authority_id="RUN_1",
             source_manifest_hash=manifest.manifest_hash,
@@ -1149,6 +1192,15 @@ def test_f03_24_verifier_derived_r_vol_matches_r3r2() -> None:
     rv = _compute_r_vol_scalar(bars, t, "ETHUSDT")
     assert rv is not None and rv > 0.0
 
+    # Verify R_VOL ddof=1 sample standard deviation on 24 log returns:
+    # 24 bars strictly before t sorted chronological: k=24..1
+    chrono_bars = [bars[(t - timedelta(hours=k), "ETHUSDT")] for k in range(24, 0, -1)]
+    log_returns = [math.log(chrono_bars[i].close / chrono_bars[i - 1].close) for i in range(1, 24)]
+    # Note: 24 bars yield 23 log returns between adjacent closes
+    mean_r = sum(log_returns) / len(log_returns)
+    expected_s = math.sqrt(sum((r - mean_r) ** 2 for r in log_returns) / (len(log_returns) - 1))
+    assert rv == pytest.approx(expected_s)
+
     # Boundary sentinels:
     # Mutating bar at t - 25h (outside 24h window) has NO effect
     bars_sentinel = dict(bars)
@@ -1171,22 +1223,122 @@ def test_f03_24_verifier_derived_r_vol_matches_r3r2() -> None:
     )
     assert _compute_r_vol_scalar(bars_mut_right, t, "ETHUSDT") != rv
 
-    # If any bar is missing, returns None
+    # If any bar is missing inside 24h window, returns None
     bars_missing = dict(bars)
     del bars_missing[(t - timedelta(hours=10), "ETHUSDT")]
     assert _compute_r_vol_scalar(bars_missing, t, "ETHUSDT") is None
 
-    # Percentile mapping
-    sample = [0.01 * i for i in range(1, 101)]
-    p45 = sample[45]
-    pct = _empirical_percentile(sample, p45)
-    assert 0.40 <= pct < 0.60
+
+def test_f03_24b_regime_state_exact_r3r2_identities_and_boundaries() -> None:
+    """Normative R3R2 Section 2.5: exact regime states, boundaries, and eligibility."""
+    # Empirical percentile tie mid-rank verification: (count_less + 0.5 * (1 if has_equal else 0)) / N
+    tie_sample = [1.0, 2.0, 3.0]
+    assert _empirical_percentile(tie_sample, 2.0) == 0.50
+    tie_sample2 = [1.0, 2.0, 2.0, 3.0]
+    assert _empirical_percentile(tie_sample2, 2.0) == 0.375
+
+    # Reference sample of 100 evenly spaced values: 1.0, 2.0, ..., 100.0
+    sample = [float(i) for i in range(1, 101)]
+
+    # Exact boundary tests:
+    # 1. p < 0.40 -> REGIME_VOL_LOW
+    val_low = 39.5  # count_less = 39, count_equal = 0 -> p = 0.39 < 0.40
+    p_low = _empirical_percentile(sample, val_low)
+    assert p_low < 0.40
+    regime_low = (
+        "REGIME_VOL_LOW" if p_low < 0.40 else "REGIME_VOL_MID" if p_low < 0.60 else "REGIME_VOL_HIGH"
+    )
+    assert regime_low == "REGIME_VOL_LOW"
+
+    # 2. p == 0.40 -> REGIME_VOL_MID (lower-bound owns equality)
+    # With count_less=40, count_equal=0: p = 40 / 100 = 0.40
+    val_mid_boundary = 40.5
+    p_mid_boundary = _empirical_percentile(sample, val_mid_boundary)
+    assert p_mid_boundary == 0.40
+    regime_mid_b = (
+        "REGIME_VOL_LOW" if p_mid_boundary < 0.40 else "REGIME_VOL_MID" if p_mid_boundary < 0.60 else "REGIME_VOL_HIGH"
+    )
+    assert regime_mid_b == "REGIME_VOL_MID"
+
+    # 3. 0.40 < p < 0.60 -> REGIME_VOL_MID
+    val_mid_interior = 50.5  # p = 50 / 100 = 0.50
+    p_mid_interior = _empirical_percentile(sample, val_mid_interior)
+    assert 0.40 < p_mid_interior < 0.60
+    regime_mid_i = (
+        "REGIME_VOL_LOW" if p_mid_interior < 0.40 else "REGIME_VOL_MID" if p_mid_interior < 0.60 else "REGIME_VOL_HIGH"
+    )
+    assert regime_mid_i == "REGIME_VOL_MID"
+
+    # 4. p == 0.60 -> REGIME_VOL_HIGH (lower-bound owns equality)
+    val_high_boundary = 60.5  # p = 60 / 100 = 0.60
+    p_high_boundary = _empirical_percentile(sample, val_high_boundary)
+    assert p_high_boundary == 0.60
+    regime_high_b = (
+        "REGIME_VOL_LOW" if p_high_boundary < 0.40 else "REGIME_VOL_MID" if p_high_boundary < 0.60 else "REGIME_VOL_HIGH"
+    )
+    assert regime_high_b == "REGIME_VOL_HIGH"
+
+    # 5. p > 0.60 -> REGIME_VOL_HIGH
+    val_high_interior = 75.5  # p = 75 / 100 = 0.75
+    p_high_interior = _empirical_percentile(sample, val_high_interior)
+    assert p_high_interior > 0.60
+    regime_high_i = (
+        "REGIME_VOL_LOW" if p_high_interior < 0.40 else "REGIME_VOL_MID" if p_high_interior < 0.60 else "REGIME_VOL_HIGH"
+    )
+    assert regime_high_i == "REGIME_VOL_HIGH"
+
+    # Verify prefit_eligible for each state
+    now = datetime(2022, 6, 1, 12, tzinfo=UTC)
+    dummy_bar = _Bar(now, "ETHUSDT", 100.0, 101.0, 99.0, 100.0)
+
+    # LOW => prefit_eligible False
+    dec_low = _Decision(
+        now, "ETHUSDT", "REGIME_VOL_LOW", "O_ELIGIBLE", 1.0, "PASS",
+        None, "NO_TRADE", 0.01, None, 100.0, 101.0, (dummy_bar,),
+    )
+    assert dec_low.prefit_eligible is False
+
+    # MID => prefit_eligible True (when opp=O_ELIGIBLE, raw_score!=0, sec=PASS)
+    dec_mid = _Decision(
+        now, "ETHUSDT", "REGIME_VOL_MID", "O_ELIGIBLE", 1.0, "PASS",
+        None, "LONG", 0.01, None, 100.0, 101.0, (dummy_bar,),
+    )
+    assert dec_mid.prefit_eligible is True
+
+    # HIGH => prefit_eligible False
+    dec_high = _Decision(
+        now, "ETHUSDT", "REGIME_VOL_HIGH", "O_ELIGIBLE", 1.0, "PASS",
+        None, "NO_TRADE", 0.01, None, 100.0, 101.0, (dummy_bar,),
+    )
+    assert dec_high.prefit_eligible is False
+
+    # Undefined computation (N < 60 or rv_val is None):
+    # Returns REGIME_UNAVAILABLE and prefit_eligible False
+    clear_prefit_caches()
+    bars: dict[tuple[datetime, str], _Bar] = {}
+    for k in range(1, 10):  # only 9 bars, well below N >= 60 and < 24 bars
+        dt = now - timedelta(hours=k)
+        bars[(dt, "ETHUSDT")] = _Bar(dt, "ETHUSDT", 100.0, 102.0, 98.0, 100.0)
+
+    _score, reg_state, _opp, _sec = _reconstruct_prefit_cached(
+        candidate_id="cand_1", slot=None, partition_id="WF1_CALIBRATION",
+        t=now, product="ETHUSDT", bars=bars, source_evidence_hash="source_1",
+    )
+    assert reg_state == "REGIME_UNAVAILABLE"
+    assert reg_state not in ("REGIME_VOL_LOW", "REGIME_VOL_MID", "REGIME_VOL_HIGH")
+    dec_unavail = _Decision(
+        now, "ETHUSDT", reg_state, "O_ELIGIBLE", 1.0, "PASS",
+        None, "NO_TRADE", 0.01, None, 100.0, 101.0, (dummy_bar,),
+    )
+    assert dec_unavail.prefit_eligible is False
 
 
 def test_f03_25_verifier_derived_o_range_matches_r3r2() -> None:
+    """Normative R3R2 Section 2.6: exact standard True Range, no fallback, and mandatory tests."""
     t = datetime(2022, 6, 1, 12, tzinfo=UTC)
-    # Exactly 25 bars: 24 reference bars (k = 2..25) + 1 last bar (k = 1)
-    # plus prior bar k = 26 for C_{k-1}
+
+    # 1. 25 TR-bearing bars + valid preceding close -> exact expected O_RANGE
+    # k=1 is last bar; k=2..25 are 24 reference bars; k=26 is preceding close for k=25
     bars: dict[tuple[datetime, str], _Bar] = {}
     for k in range(1, 27):
         dt = t - timedelta(hours=k)
@@ -1194,32 +1346,110 @@ def test_f03_25_verifier_derived_o_range_matches_r3r2() -> None:
 
     ratio = _compute_o_range_scalar(bars, t, "ETHUSDT")
     assert ratio is not None
+    # All bars have H=102, L=98, prev_close=100. TR = max(4, |102-100|, |98-100|) = 4.0
+    # Last TR = 4.0. Mean of 24 ref TRs = 4.0. Ratio = 4.0 / 4.0 = 1.0
     assert ratio == pytest.approx(1.0)
 
-    # Sentinel at t - 27h (outside 26h window) has NO effect
+    # 2. All 25 TR-bearing bars exist but preceding close missing -> undefined (None)
+    bars_missing_prior = dict(bars)
+    del bars_missing_prior[(t - timedelta(hours=26), "ETHUSDT")]
+    assert _compute_o_range_scalar(bars_missing_prior, t, "ETHUSDT") is None
+
+    # 3. Preceding close present but PIT-invalid (effective_close_time >= t) -> undefined (None)
+    bars_pit_invalid = dict(bars)
+    bars_pit_invalid[(t - timedelta(hours=26), "ETHUSDT")] = _Bar(
+        t - timedelta(hours=26), "ETHUSDT", 100.0, 102.0, 98.0, 100.0,
+        close_time=t,  # equals decision t, violating strict PIT
+    )
+    assert _compute_o_range_scalar(bars_pit_invalid, t, "ETHUSDT") is None
+
+    # 4. Large gap between earliest reference bar (t-25h) and preceding close (t-26h)
+    # materially changes the earliest reference TR according to the standard formula.
+    # Earliest reference bar has H=102, L=98. Prior close is 150.
+    # Standard TR = max(102-98=4, |102-150|=48, |98-150|=52) = 52.0.
+    # If forbidden fallback H-L were used, TR would be 4.0.
+    bars_large_gap = dict(bars)
+    bars_large_gap[(t - timedelta(hours=26), "ETHUSDT")] = _Bar(
+        t - timedelta(hours=26), "ETHUSDT", 150.0, 150.0, 150.0, 150.0,
+    )
+    # Expected: 23 ref bars with TR=4.0 + 1 ref bar with TR=52.0. Mean = (23*4 + 52) / 24 = 6.0
+    # Last bar TR = 4.0. Expected ratio = 4.0 / 6.0 = 2/3
+    ratio_gap = _compute_o_range_scalar(bars_large_gap, t, "ETHUSDT")
+    assert ratio_gap is not None
+    assert ratio_gap == pytest.approx(4.0 / 6.0)
+
+    # 5. Sentinel before the required preceding close (at t-27h) does not affect result
     bars_sentinel = dict(bars)
     bars_sentinel[(t - timedelta(hours=27), "ETHUSDT")] = _Bar(
         t - timedelta(hours=27), "ETHUSDT", 999.0, 9999.0, 1.0, 999.0,
     )
     assert _compute_o_range_scalar(bars_sentinel, t, "ETHUSDT") == pytest.approx(1.0)
 
-    # Mutating bar at t - 25h DOES change ratio
-    bars_mut = dict(bars)
-    bars_mut[(t - timedelta(hours=25), "ETHUSDT")] = _Bar(
-        t - timedelta(hours=25), "ETHUSDT", 100.0, 110.0, 90.0, 100.0,
-    )
-    assert _compute_o_range_scalar(bars_mut, t, "ETHUSDT") != pytest.approx(1.0)
-
-    # Mutating test bar at t - 1h DOES change ratio
+    # 6. Last-bar TR remains the numerator and is excluded from the 24-reference mean
+    # Mutating last bar (t-1h) changes numerator: H=110, L=90 -> TR=20.0 (prev close=100)
     bars_mut_last = dict(bars)
     bars_mut_last[(t - timedelta(hours=1), "ETHUSDT")] = _Bar(
         t - timedelta(hours=1), "ETHUSDT", 100.0, 110.0, 90.0, 100.0,
     )
-    assert _compute_o_range_scalar(bars_mut_last, t, "ETHUSDT") != pytest.approx(1.0)
+    ratio_mut_last = _compute_o_range_scalar(bars_mut_last, t, "ETHUSDT")
+    assert ratio_mut_last is not None
+    # Numerator is 20.0, denominator is still 4.0. Ratio = 20.0 / 4.0 = 5.0
+    assert ratio_mut_last == pytest.approx(5.0)
 
-    # If fewer than 25 bars present, returns None
+    # 7. Denominator == 0 -> undefined (None)
+    # All 25 bars flat H=L=C=100. Reference TRs all 0.0 -> mean TR = 0.0 -> denominator == 0
+    bars_zero = {}
+    for k in range(1, 27):
+        dt = t - timedelta(hours=k)
+        bars_zero[(dt, "ETHUSDT")] = _Bar(dt, "ETHUSDT", 100.0, 100.0, 100.0, 100.0)
+    assert _compute_o_range_scalar(bars_zero, t, "ETHUSDT") is None
+
+    # 8. Fewer than 25 TR-bearing bars -> undefined (None)
     bars_fewer = {k: v for k, v in bars.items() if k[0] >= t - timedelta(hours=20)}
     assert _compute_o_range_scalar(bars_fewer, t, "ETHUSDT") is None
+
+    # Opportunity state exact boundaries:
+    # Sample of 100 values from 1.0 to 100.0
+    sample = [float(i) for i in range(1, 101)]
+    # p < 0.60 -> O_NONE
+    val_none = 59.5  # p = 0.595 < 0.60
+    assert _empirical_percentile(sample, val_none) < 0.60
+
+    # p == 0.60 -> O_WATCH (lower-bound owns equality)
+    val_watch_b = 60.5  # p = 0.60
+    assert _empirical_percentile(sample, val_watch_b) == 0.60
+
+    # 0.60 < p < 0.80 -> O_WATCH
+    val_watch_i = 70.5  # p = 0.70
+    assert 0.60 < _empirical_percentile(sample, val_watch_i) < 0.80
+
+    # p == 0.80 -> O_ELIGIBLE (lower-bound owns equality)
+    val_elig_b = 80.5  # p = 0.80
+    assert _empirical_percentile(sample, val_elig_b) == 0.80
+
+    # p > 0.80 -> O_ELIGIBLE
+    val_elig_i = 90.5  # p = 0.90
+    assert _empirical_percentile(sample, val_elig_i) > 0.80
+
+    # Verify prefit_eligible for opportunity states
+    dummy_bar = _Bar(t, "ETHUSDT", 100.0, 101.0, 99.0, 100.0)
+    dec_none = _Decision(
+        t, "ETHUSDT", "REGIME_VOL_MID", "O_NONE", 1.0, "PASS",
+        None, "NO_TRADE", 0.01, None, 100.0, 101.0, (dummy_bar,),
+    )
+    assert dec_none.prefit_eligible is False
+
+    dec_watch = _Decision(
+        t, "ETHUSDT", "REGIME_VOL_MID", "O_WATCH", 1.0, "PASS",
+        None, "NO_TRADE", 0.01, None, 100.0, 101.0, (dummy_bar,),
+    )
+    assert dec_watch.prefit_eligible is False
+
+    dec_elig = _Decision(
+        t, "ETHUSDT", "REGIME_VOL_MID", "O_ELIGIBLE", 1.0, "PASS",
+        None, "LONG", 0.01, None, 100.0, 101.0, (dummy_bar,),
+    )
+    assert dec_elig.prefit_eligible is True
 
 
 def test_f03_26_secondary_filter_matches_r3r2() -> None:
@@ -1236,6 +1466,20 @@ def test_f03_26_secondary_filter_matches_r3r2() -> None:
         t=t, product="ETHUSDT", bars=bars, source_evidence_hash="test_src",
     )
     assert secondary == "PASS"
+
+    # Unsupported secondary filter contract fails closed
+    unsupported_slot = SimpleNamespace(
+        direction_contract_id="D1_V1_RETURN_4H",
+        secondary_filter_contract_id="UNSUPPORTED_FILTER_V1",
+    )
+    with pytest.raises(H40GuardError) as exc:
+        _reconstruct_prefit_cached(
+            candidate_id="test_cand_bad_filter", slot=unsupported_slot,
+            partition_id="WF1_CALIBRATION", t=t, product="ETHUSDT", bars=bars,
+            source_evidence_hash="test_src",
+        )
+    assert exc.value.reason_code == H40ReasonCode.NOT_TESTABLE
+    assert "unsupported secondary filter contract" in str(exc.value)
 
 
 def test_f03_27_adding_later_observations_cannot_alter_earlier_prefit() -> None:
@@ -1496,6 +1740,51 @@ def test_f03_37_full_base_universe_coverage_remains_required(tmp_path: Path) -> 
         )
 
 
+def test_f03_43_unknown_direction_contract_fails_closed() -> None:
+    clear_prefit_caches()
+    t = datetime(2022, 6, 1, 12, tzinfo=UTC)
+    bars: dict[tuple[datetime, str], _Bar] = {}
+    for k in range(1, 30):
+        dt = t - timedelta(hours=k)
+        bars[(dt, "ETHUSDT")] = _Bar(dt, "ETHUSDT", 100.0, 102.0, 98.0, 100.0)
+
+    slot_unknown = SimpleNamespace(
+        direction_contract_id="UNKNOWN_DIRECTION_CONTRACT_V99",
+        secondary_filter_contract_id="NONE",
+    )
+    with pytest.raises(H40GuardError) as exc:
+        _reconstruct_prefit_cached(
+            candidate_id="cand_bad_dir", slot=slot_unknown,
+            partition_id="WF1_CALIBRATION", t=t, product="ETHUSDT", bars=bars,
+            source_evidence_hash="test_src",
+        )
+    assert exc.value.reason_code == H40ReasonCode.NOT_TESTABLE
+    assert "unsupported direction contract" in str(exc.value)
+
+
+def test_f03_44_registered_roster_supported_contracts_only() -> None:
+    ledger = materialize_h40_search_space_production()
+    assert len(ledger.slots) == 168
+    registered_slots = [s for s in ledger.slots if str(s.status) == "REGISTERED"]
+    assert len(registered_slots) == 18
+
+    allowed_directions = {
+        "D1_V1_RETURN_4H",
+        "D1_V2_RETURN_12H",
+        "D2_V1_BREAKOUT_24H",
+        "D2_V2_BREAKOUT_72H",
+        "D3_V1_FAILED_BREAK_24H",
+        "D3_V2_FAILED_BREAK_72H",
+    }
+    for s in registered_slots:
+        assert s.scope == "ETH_ONLY"
+        assert s.asset_scope == ("ETHUSDT",)
+        assert s.direction_contract_id in allowed_directions
+        assert s.regime_contract_id == "R_VOL_RANGE_V1_24H"
+        assert s.opportunity_contract_id == "O_RANGE_EXPANSION_V1_24H"
+        assert getattr(s, "secondary_filter_contract_id", "NONE") in ("NONE", "", None)
+
+
 # ==============================================================================
 # PRESERVATION MATRIX (Items 38 - 47)
 # ==============================================================================
@@ -1620,3 +1909,68 @@ def test_preservation_46_research_disabled_v1_active() -> None:
 def test_preservation_47_prior_p3b_suites_intact(tmp_path: Path) -> None:
     resolver = H40DiscoveryEvidenceResolver(tmp_path)
     assert resolver._root == tmp_path.resolve()
+
+
+def test_preservation_55_v1_persistence_context_rejected_in_production(tmp_path: Path) -> None:
+    store = H40LifecycleArtifactStore(tmp_path)
+    run_id = "0" * 64
+    receipt_obj = H40DiscoveryAuthorizationReceipt(
+        authorized_at_utc="2026-09-26T00:00:00Z",
+        controller_authority_hash="a" * 64,
+        discovery_run_grant_hash="b" * 64,
+        discovery_selection_correction_contract_hash=DISCOVERY_SELECTION_CORRECTION_CONTRACT_HASH,
+        execution_disabled=True,
+        lifecycle_governance_authority_hash="c" * 64,
+        lifecycle_implementation_authority_hash="d" * 64,
+        materialized_run_authority_hash="e" * 64,
+        not_testable_slot_count=150,
+        protocol_authority_hash="f" * 64,
+        registered_slot_count=18,
+        run_authority_id=run_id,
+        sealed_registered_roster_hash="1" * 64,
+        semantic_root_hash="2" * 64,
+        source_manifest_hash="3" * 64,
+        split_attestation_hash="4" * 64,
+        split_manifest_hash="5" * 64,
+        structural_ledger_hash="6" * 64,
+        total_slot_count=168,
+        upstream_receipt_hash=None,
+    )
+    receipt_hash = receipt_obj.receipt_sha256
+    v1_ctx = H40LifecyclePersistenceContextV1(
+        implementation_authority_hash="c" * 64,
+        run_authority_id=run_id,
+        runtime_seal_hash="e" * 64,
+    ).to_dict()
+    envelope = {
+        "authority_context": v1_ctx,
+        "bound_evidence": None,
+        "bound_evidence_sha256": None,
+        "receipt": receipt_obj.to_dict(),
+        "receipt_sha256": receipt_hash,
+    }
+    receipts_dir = store._receipts_dir(run_id)
+    receipts_dir.mkdir(parents=True, exist_ok=True)
+    (receipts_dir / f"{receipt_hash}.json").write_text(canonical_json(envelope), encoding="utf-8")
+
+    # In production mode (synthetic_test_mode=False), cold restore rejects H40_LIFECYCLE_PERSISTENCE_CONTEXT_V1
+    prod_service = H40LifecycleAuthorityService.production()
+    object.__setattr__(prod_service, "_assert_current_anchors", lambda require_controller: None)
+    with pytest.raises(H40GuardError) as exc:
+        store._cold_restore_authorization(
+            run_id, receipt_hash, service=prod_service,
+            resolver=None,  # type: ignore[arg-type]
+            visited_receipts=frozenset(),
+        )
+    assert exc.value.reason_code == H40ReasonCode.CONFIG_IDENTITY_CONFLICT
+    assert "production cold restore rejects H40_LIFECYCLE_PERSISTENCE_CONTEXT_V1" in str(exc.value)
+
+
+def test_preservation_56_stale_authority_service_fails_closed() -> None:
+    prod_service = H40LifecycleAuthorityService.production()
+    # Stale/unanchored production service has no accepted implementation authority
+    with pytest.raises(H40GuardError) as exc:
+        prod_service._assert_current_anchors(require_controller=False)
+    assert exc.value.reason_code == H40ReasonCode.NOT_TESTABLE
+    assert "no independently accepted lifecycle implementation authority exists" in str(exc.value)
+

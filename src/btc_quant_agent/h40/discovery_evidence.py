@@ -982,15 +982,16 @@ def _compute_o_range_scalar(bars: Mapping[tuple[datetime, str], _Bar], t: dateti
             return None
         seq_bars.append(b)
     prior = bars.get((t - timedelta(hours=26), product))
-    prior_close = prior.close if prior is not None and prior.effective_close_time < t else None
+    if prior is None or prior.effective_close_time >= t:
+        return None
+    prior_close = prior.close
+    if not math.isfinite(prior_close) or prior_close <= 0:
+        return None
     tr_values: list[float] = []
     for i in range(25):
         curr = seq_bars[i]
         prev_close = seq_bars[i - 1].close if i > 0 else prior_close
-        if prev_close is not None:
-            tr = max(curr.high - curr.low, abs(curr.high - prev_close), abs(curr.low - prev_close))
-        else:
-            tr = curr.high - curr.low
+        tr = max(curr.high - curr.low, abs(curr.high - prev_close), abs(curr.low - prev_close))
         tr_values.append(tr)
     tr_ref = tr_values[:24]
     tr_last = tr_values[24]
@@ -1086,7 +1087,7 @@ def _reconstruct_prefit_cached(
     elif "D3_V2" in dir_contract or dir_contract == "D3_V2_FAILED_BREAK_72H":
         score = _compute_d3(bars, t, product, 72)
     else:
-        score = _compute_d1(bars, t, product, 4)
+        _fail(f"unsupported direction contract '{dir_contract}'", H40ReasonCode.NOT_TESTABLE)
 
     training_refs = _get_training_refs(source_evidence_hash, product, bars)
     rv_series = training_refs["R_VOL"]
@@ -1101,13 +1102,15 @@ def _reconstruct_prefit_cached(
 
     rv_val = _compute_r_vol_scalar(bars, t, product)
     if rv_val is None or len(rv_sample) < 60:
-        regime_state = "REGIME_REJECT"
+        regime_state = "REGIME_UNAVAILABLE"
     else:
         p_vol = _empirical_percentile(rv_sample, rv_val)
-        if 0.40 <= p_vol < 0.60:
+        if p_vol < 0.40:
+            regime_state = "REGIME_VOL_LOW"
+        elif p_vol < 0.60:
             regime_state = "REGIME_VOL_MID"
         else:
-            regime_state = "REGIME_REJECT"
+            regime_state = "REGIME_VOL_HIGH"
 
     exp_val = _compute_o_range_scalar(bars, t, product)
     if exp_val is None or len(exp_sample) < 60:
@@ -1121,6 +1124,9 @@ def _reconstruct_prefit_cached(
         else:
             opportunity_state = "O_ELIGIBLE"
 
+    sec_filter = str(getattr(slot, "secondary_filter_contract_id", "NONE") or "NONE")
+    if sec_filter not in ("NONE", ""):
+        _fail(f"unsupported secondary filter contract '{sec_filter}'", H40ReasonCode.NOT_TESTABLE)
     secondary_filter_state = "PASS"
 
     result = (score, regime_state, opportunity_state, secondary_filter_state)
