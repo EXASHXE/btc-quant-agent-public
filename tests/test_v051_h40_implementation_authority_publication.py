@@ -94,41 +94,37 @@ def _exact_authority() -> H40LifecycleImplementationAuthority:
 
 
 def test_p01_exact_accepted_constant() -> None:
-    """P01: Verify production implementation constant is published while P3 controller remains None."""
-    assert (
-        ACCEPTED_LIFECYCLE_IMPLEMENTATION_AUTHORITY_HASH
-        == EXACT_ACCEPTED_HASH
-    )
+    """P01: Verify production implementation constant is temporarily revoked (None) while P3 controller remains None."""
+    assert ACCEPTED_LIFECYCLE_IMPLEMENTATION_AUTHORITY_HASH is None
     assert ACCEPTED_H40_P3_CONTROLLER_AUTHORITY_HASH is None
 
 
 def test_p02_exact_typed_authority_reconstructs_accepted_hash() -> None:
-    """P02: Verify exact typed authority object reconstructs the accepted hash."""
+    """P02: Verify historical typed authority object reconstructs the accepted hash."""
     authority = _exact_authority()
     assert authority.lifecycle_implementation_authority_hash == EXACT_ACCEPTED_HASH
 
 
 def test_p03_production_service_accepts_exact_authority(monkeypatch: pytest.MonkeyPatch) -> None:
-    """P03: Verify production service accepts exact authority directly without monkeypatching, and fails closed when unconfigured."""
+    """P03: Verify production service rejects historical authority when constant is None, and accepts only when configured."""
     authority = _exact_authority()
-    # A production service supplied with the exact typed implementation authority
-    # must be accepted without monkeypatching the implementation accepted hash.
-    service = H40LifecycleAuthorityService.production(
-        implementation_authority=authority,
-    )
-    assert service._implementation_authority == authority
-    assert service._accepted_implementation_authority_hash == EXACT_ACCEPTED_HASH
+    # When unconfigured/revoked (None), production service fails closed
+    with pytest.raises(ValueError, match="implementation authority object/hash mismatch"):
+        H40LifecycleAuthorityService.production(
+            implementation_authority=authority,
+        )
 
-    # When unconfigured (None), production service fails closed
+    # When configured with matching historical constant, production service accepts
     with monkeypatch.context() as m:
         m.setattr(
             "btc_quant_agent.h40.lifecycle_authority.ACCEPTED_LIFECYCLE_IMPLEMENTATION_AUTHORITY_HASH",
-            None,
+            EXACT_ACCEPTED_HASH,
         )
-        with pytest.raises(ValueError, match="implementation authority object/hash mismatch"):
-            H40LifecycleAuthorityService.production(
-                implementation_authority=authority,
-            )
+        service = H40LifecycleAuthorityService.production(
+            implementation_authority=authority,
+        )
+        assert service._implementation_authority == authority
+        assert service._accepted_implementation_authority_hash == EXACT_ACCEPTED_HASH
 
 
 def test_p04_altered_authority_fails_closed() -> None:
@@ -193,14 +189,19 @@ def test_p06_tested_commit_mismatch_fails_closed() -> None:
         )
 
 
-def test_p07_synthetic_verifier_remains_fenced() -> None:
-    """P07: Verify production service cannot use synthetic/test-only verifier."""
+def test_p07_synthetic_verifier_remains_fenced(monkeypatch: pytest.MonkeyPatch) -> None:
+    """P07: Verify production service cannot use synthetic/test-only verifier even when authority is configured."""
     authority = _exact_authority()
-    with pytest.raises(ValueError, match="production service cannot use a synthetic/test-only verifier"):
-        H40LifecycleAuthorityService.production(
-            implementation_authority=authority,
-            evidence_verifier=H40SyntheticEvidenceVerifier({}),
+    with monkeypatch.context() as m:
+        m.setattr(
+            "btc_quant_agent.h40.lifecycle_authority.ACCEPTED_LIFECYCLE_IMPLEMENTATION_AUTHORITY_HASH",
+            EXACT_ACCEPTED_HASH,
         )
+        with pytest.raises(ValueError, match="production service cannot use a synthetic/test-only verifier"):
+            H40LifecycleAuthorityService.production(
+                implementation_authority=authority,
+                evidence_verifier=H40SyntheticEvidenceVerifier({}),
+            )
 
 
 def test_p08_f02_remains_sealed() -> None:
@@ -278,10 +279,10 @@ def test_p11_previous_authority_fails_closed() -> None:
         )
 
 
-def test_p12_critical_negative_paths() -> None:
-    """P12: Prove critical negative paths after publication:
-    - implementation authority published = YES
-    - P3 controller authority published = NO
+def test_p12_critical_negative_paths(monkeypatch: pytest.MonkeyPatch) -> None:
+    """P12: Prove critical negative paths after revocation:
+    - implementation authority published = NO (None)
+    - P3 controller authority published = NO (None)
     - Discovery authorization without controller = fail-closed / NOT_TESTABLE
     - synthetic authority cannot satisfy production controller requirement
     - stale/foreign implementation authority rejected
@@ -292,18 +293,104 @@ def test_p12_critical_negative_paths() -> None:
         _synthesize_controller_authority,
     )
 
-    # 1. Implementation authority published = YES
-    assert ACCEPTED_LIFECYCLE_IMPLEMENTATION_AUTHORITY_HASH == EXACT_ACCEPTED_HASH
+    # 1. Implementation authority published = NO (temporarily revoked)
+    assert ACCEPTED_LIFECYCLE_IMPLEMENTATION_AUTHORITY_HASH is None
 
     # 2. P3 controller authority published = NO
     assert ACCEPTED_H40_P3_CONTROLLER_AUTHORITY_HASH is None
 
+    # 3. Old a23ceec... typed authority cannot become current without matching constant
     authority = _exact_authority()
-    service = H40LifecycleAuthorityService.production(
-        implementation_authority=authority,
+    with pytest.raises(ValueError, match="implementation authority object/hash mismatch"):
+        H40LifecycleAuthorityService.production(
+            implementation_authority=authority,
+        )
+
+    # 4. With historical constant configured via monkeypatch:
+    with monkeypatch.context() as m:
+        m.setattr(
+            "btc_quant_agent.h40.lifecycle_authority.ACCEPTED_LIFECYCLE_IMPLEMENTATION_AUTHORITY_HASH",
+            EXACT_ACCEPTED_HASH,
+        )
+        service = H40LifecycleAuthorityService.production(
+            implementation_authority=authority,
+        )
+
+        # Discovery authorization without controller = fail-closed / NOT_TESTABLE
+        seal = H40RuntimeSnapshotSeal.synthetic_for_tests(
+            runtime_authority_snapshot_hash="0" * 64,
+            source_manifest_hash="1" * 64,
+            split_manifest_hash="2" * 64,
+            split_attestation_hash="3" * 64,
+            roster=(),
+            not_testable_slot_count=168,
+        )
+        run = H40RunAuthority.from_seal(seal, authority.lifecycle_implementation_authority_hash)
+        with pytest.raises(H40GuardError) as exc_info:
+            service.authorize_discovery(
+                implementation_authority=authority,
+                run_authority=run,
+                seal=seal,
+                authorized_at_utc="2026-09-26T20:00:00Z",
+            )
+        assert exc_info.value.reason_code == H40ReasonCode.NOT_TESTABLE
+
+        # Synthetic authority cannot satisfy production controller requirement
+        synthetic_ctrl = _synthesize_controller_authority(authority)
+        with pytest.raises(ValueError, match="controller authority object/hash mismatch"):
+            H40LifecycleAuthorityService.production(
+                implementation_authority=authority,
+                controller_authority=synthetic_ctrl,
+            )
+
+        # Stale / foreign implementation authority rejected
+        foreign_evidence = H40RequiredTestCIEvidenceIdentity(
+            evidence_manifest_artifact_path=EXACT_EVIDENCE_MANIFEST_PATH,
+            evidence_manifest_sha256=EXACT_EVIDENCE_MANIFEST_SHA256,
+            tested_commit_sha="f" * 40,
+        )
+        foreign_authority = H40LifecycleImplementationAuthority(
+            accepted_lifecycle_governance_authority_hash=EXACT_GOVERNANCE_HASH,
+            f01_implementation_acceptance_artifact_path=EXACT_ACCEPTANCE_PATH,
+            f01_implementation_acceptance_commit_sha=EXACT_ACCEPTANCE_COMMIT,
+            f01_implementation_commit_sha="f" * 40,
+            required_test_ci_evidence_identity=foreign_evidence,
+            schema_id="H40_LIFECYCLE_IMPLEMENTATION_AUTHORITY_V1",
+        )
+        with pytest.raises(ValueError, match="implementation authority object/hash mismatch"):
+            H40LifecycleAuthorityService.production(
+                implementation_authority=foreign_authority,
+            )
+
+
+def test_p13_mandatory_revocation_fail_closed() -> None:
+    """Mandatory fail-closed test proving:
+    - after repair-stage revocation: production implementation authority = None
+    - P3 controller authority = None
+    - production Discovery authorization remains NOT_TESTABLE
+    - old a23ceec... typed authority cannot become current merely because its historical object is valid
+    """
+    from btc_quant_agent.h40.lifecycle_authority import (
+        H40RunAuthority,
+        H40RuntimeSnapshotSeal,
     )
 
-    # 3. Discovery authorization without controller = fail-closed / NOT_TESTABLE
+    # 1. production implementation authority = None
+    assert ACCEPTED_LIFECYCLE_IMPLEMENTATION_AUTHORITY_HASH is None
+
+    # 2. P3 controller authority = None
+    assert ACCEPTED_H40_P3_CONTROLLER_AUTHORITY_HASH is None
+
+    # 3. old a23ceec... typed authority cannot become current merely because its historical object is valid
+    hist_authority = _exact_authority()
+    assert hist_authority.lifecycle_implementation_authority_hash == EXACT_ACCEPTED_HASH
+    with pytest.raises(ValueError, match="implementation authority object/hash mismatch"):
+        H40LifecycleAuthorityService.production(
+            implementation_authority=hist_authority,
+        )
+
+    # 4. production Discovery authorization remains NOT_TESTABLE
+    prod_service = H40LifecycleAuthorityService.production()
     seal = H40RuntimeSnapshotSeal.synthetic_for_tests(
         runtime_authority_snapshot_hash="0" * 64,
         source_manifest_hash="1" * 64,
@@ -312,40 +399,14 @@ def test_p12_critical_negative_paths() -> None:
         roster=(),
         not_testable_slot_count=168,
     )
-    run = H40RunAuthority.from_seal(seal, authority.lifecycle_implementation_authority_hash)
+    run = H40RunAuthority.from_seal(seal, hist_authority.lifecycle_implementation_authority_hash)
     with pytest.raises(H40GuardError) as exc_info:
-        service.authorize_discovery(
-            implementation_authority=authority,
+        prod_service.authorize_discovery(
+            implementation_authority=hist_authority,
             run_authority=run,
             seal=seal,
             authorized_at_utc="2026-09-26T20:00:00Z",
         )
     assert exc_info.value.reason_code == H40ReasonCode.NOT_TESTABLE
-
-    # 4. Synthetic authority cannot satisfy production controller requirement
-    synthetic_ctrl = _synthesize_controller_authority(authority)
-    with pytest.raises(ValueError, match="controller authority object/hash mismatch"):
-        H40LifecycleAuthorityService.production(
-            implementation_authority=authority,
-            controller_authority=synthetic_ctrl,
-        )
-
-    # 5. Stale / foreign implementation authority rejected
-    foreign_evidence = H40RequiredTestCIEvidenceIdentity(
-        evidence_manifest_artifact_path=EXACT_EVIDENCE_MANIFEST_PATH,
-        evidence_manifest_sha256=EXACT_EVIDENCE_MANIFEST_SHA256,
-        tested_commit_sha="f" * 40,
-    )
-    foreign_authority = H40LifecycleImplementationAuthority(
-        accepted_lifecycle_governance_authority_hash=EXACT_GOVERNANCE_HASH,
-        f01_implementation_acceptance_artifact_path=EXACT_ACCEPTANCE_PATH,
-        f01_implementation_acceptance_commit_sha=EXACT_ACCEPTANCE_COMMIT,
-        f01_implementation_commit_sha="f" * 40,
-        required_test_ci_evidence_identity=foreign_evidence,
-        schema_id="H40_LIFECYCLE_IMPLEMENTATION_AUTHORITY_V1",
-    )
-    with pytest.raises(ValueError, match="implementation authority object/hash mismatch"):
-        H40LifecycleAuthorityService.production(
-            implementation_authority=foreign_authority,
-        )
+    assert "no independently accepted lifecycle implementation authority exists" in str(exc_info.value)
 

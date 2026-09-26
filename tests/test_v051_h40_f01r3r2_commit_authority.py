@@ -23,10 +23,22 @@ from __future__ import annotations
 
 import concurrent.futures
 import inspect
-import sys
 from pathlib import Path
 
 import pytest
+from test_v051_h40_f01_lifecycle_authority import (
+    TS,
+    _build_discovery_chain,
+    _build_wf_chain,
+    _hash,
+    _implementation_authority,
+    _make_mock_discovery_receipt,
+    _make_mock_termination_receipt,
+    _make_mock_wf_receipt,
+    _ProductionEvidenceVerifier,
+    _publish_mock_envelope,
+    _typed_production_authority_fixture,
+)
 
 import btc_quant_agent.h40.lifecycle_authority as lifecycle_authority_module
 from btc_quant_agent.h40 import (
@@ -47,24 +59,6 @@ from btc_quant_agent.h40 import (
     compute_protocol_authority_hash,
     compute_semantic_root_hash,
     materialize_h40_search_space_production,
-)
-
-_TESTS_DIR = str(Path(__file__).resolve().parent)
-if _TESTS_DIR not in sys.path:
-    sys.path.insert(0, _TESTS_DIR)
-
-from test_v051_h40_f01_lifecycle_authority import (  # noqa: E402
-    TS,
-    _build_discovery_chain,
-    _build_wf_chain,
-    _hash,
-    _implementation_authority,
-    _make_mock_discovery_receipt,
-    _make_mock_termination_receipt,
-    _make_mock_wf_receipt,
-    _ProductionEvidenceVerifier,
-    _publish_mock_envelope,
-    _typed_production_authority_fixture,
 )
 
 

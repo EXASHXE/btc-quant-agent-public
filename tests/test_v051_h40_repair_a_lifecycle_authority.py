@@ -946,9 +946,7 @@ def test_39_write_once_fields_cannot_be_mutated_after_construction(monkeypatch: 
 
 
 def test_40_production_service_fails_closed_for_dummy_authority() -> None:
-    assert ACCEPTED_LIFECYCLE_IMPLEMENTATION_AUTHORITY_HASH == (
-        "a23ceec50ff5703f4dff703a7b44e715501164a48ec9be48ae096f8bd4d51fca"
-    )
+    assert ACCEPTED_LIFECYCLE_IMPLEMENTATION_AUTHORITY_HASH is None
     assert ACCEPTED_H40_P3_CONTROLLER_AUTHORITY_HASH is None
     impl = _make_dummy_impl_authority()
     with pytest.raises(ValueError, match="implementation authority object/hash mismatch"):

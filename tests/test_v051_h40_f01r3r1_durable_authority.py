@@ -14,12 +14,20 @@ from __future__ import annotations
 import concurrent.futures
 import errno
 import os
-import sys
 from dataclasses import replace
 from pathlib import Path
 from typing import Any
 
 import pytest
+from test_v051_h40_f01_lifecycle_authority import (
+    TS,
+    _build_discovery_chain,
+    _build_wf_chain,
+    _hash,
+    _implementation_authority,
+    _ProductionEvidenceVerifier,
+    _typed_production_authority_fixture,
+)
 
 import btc_quant_agent.h40.lifecycle_authority as lifecycle_authority_module
 from btc_quant_agent.h40 import (
@@ -43,20 +51,6 @@ from btc_quant_agent.h40 import (
     derive_expected_wf_authority,
 )
 from btc_quant_agent.research_contract.canonical import canonical_json
-
-_TESTS_DIR = str(Path(__file__).resolve().parent)
-if _TESTS_DIR not in sys.path:
-    sys.path.insert(0, _TESTS_DIR)
-
-from test_v051_h40_f01_lifecycle_authority import (  # noqa: E402
-    TS,
-    _build_discovery_chain,
-    _build_wf_chain,
-    _hash,
-    _implementation_authority,
-    _ProductionEvidenceVerifier,
-    _typed_production_authority_fixture,
-)
 
 
 class _ProductionAuthorityResolver:

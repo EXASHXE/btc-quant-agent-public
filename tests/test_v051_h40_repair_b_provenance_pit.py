@@ -61,14 +61,15 @@ from btc_quant_agent.h40.discovery_evidence import (
     _POLICIES,
     _PREFIT_CACHE,
     _Bar,
-    _Decision,
     _compute_d1,
     _compute_d2,
     _compute_d3,
     _compute_o_range_scalar,
     _compute_r_vol_scalar,
+    _Decision,
     _empirical_percentile,
     _extract_economic_rows,
+    _get_training_refs,
     _load_decisions,
     _load_source_bars,
     _reconstruct_prefit_cached,
@@ -151,7 +152,7 @@ def _write_json_source(
             "close": repr(float(b["close"])),
         }
         for b in bars
-        if support_start <= datetime.fromisoformat(b["timestamp"].replace("Z", "+00:00")) < support_end
+        if support_start <= datetime.fromisoformat(b["timestamp"]) < support_end
     ]
     economic_digest = canonical_sha256(canonical_rows)
     economic_count = len(canonical_rows)
@@ -547,7 +548,7 @@ def test_f02_12_source_support_projection_and_whole_file_authority(tmp_path: Pat
     all_bars = bars_pre + bars_inside + bars_post
 
     source_file = tmp_path / "ETHUSDT.json"
-    raw_bytes, file_sha, canon_rows, exp_digest, exp_count = _write_json_source(source_file, all_bars)
+    raw_bytes, file_sha, _canon_rows, exp_digest, exp_count = _write_json_source(source_file, all_bars)
 
     # 1. Whole-file SHA includes all bytes (pre, inside, post)
     assert file_sha == hashlib.sha256(raw_bytes).hexdigest()
@@ -565,13 +566,13 @@ def test_f02_12_source_support_projection_and_whole_file_authority(tmp_path: Pat
     for b in extracted_bars:
         assert datetime(2021, 1, 1, tzinfo=UTC) <= b.timestamp < datetime(2023, 2, 1, tzinfo=UTC)
     for r in canon:
-        dt = datetime.fromisoformat(r["timestamp"].replace("Z", "+00:00"))
+        dt = datetime.fromisoformat(r["timestamp"])
         assert datetime(2021, 1, 1, tzinfo=UTC) <= dt < datetime(2023, 2, 1, tzinfo=UTC)
 
     # 4. Support-projected digest is deterministic
     computed_digest = canonical_sha256(canon)
     assert computed_digest == exp_digest
-    repeat_bars, repeat_canon = _extract_economic_rows(
+    _repeat_bars, repeat_canon = _extract_economic_rows(
         source_file, raw_bytes, "ETHUSDT", "1h", "timestamp",
     )
     assert canonical_sha256(repeat_canon) == computed_digest
@@ -769,7 +770,7 @@ def test_f02_18_canonical_full_sealed_source_with_post_support_in_load_source_ba
     bars_post = _make_dummy_bars(datetime(2023, 5, 1, 0, tzinfo=UTC), 5)
     all_bars = bars_inside + bars_post
 
-    seal, manifest, attestation, record, receipt, file_sha, exp_digest, exp_count = (
+    seal, manifest, attestation, _record, receipt, file_sha, exp_digest, exp_count = (
         _make_production_test_seal_and_context(tmp_path, all_bars)
     )
 
@@ -847,7 +848,7 @@ def test_f02_18_canonical_full_sealed_source_with_post_support_in_load_source_ba
     )
     assert len(bars_map) == 10
     for b_post in bars_post:
-        dt_post = datetime.fromisoformat(b_post["timestamp"].replace("Z", "+00:00"))
+        dt_post = datetime.fromisoformat(b_post["timestamp"])
         assert (dt_post, "ETHUSDT") not in bars_map
     assert len(universes["WF1_TRAIN"]) == 10
 
@@ -1840,9 +1841,7 @@ def test_preservation_42_stage_a_synthetic_domain_isolation_closed() -> None:
 
 
 def test_preservation_43_production_accepted_constants() -> None:
-    assert ACCEPTED_LIFECYCLE_IMPLEMENTATION_AUTHORITY_HASH == (
-        "a23ceec50ff5703f4dff703a7b44e715501164a48ec9be48ae096f8bd4d51fca"
-    )
+    assert ACCEPTED_LIFECYCLE_IMPLEMENTATION_AUTHORITY_HASH is None
     assert ACCEPTED_H40_P3_CONTROLLER_AUTHORITY_HASH is None
 
 
@@ -1971,19 +1970,291 @@ def test_preservation_55_v1_persistence_context_rejected_in_production(tmp_path:
 def test_preservation_56_stale_authority_service_fails_closed(monkeypatch: pytest.MonkeyPatch) -> None:
     prod_service = H40LifecycleAuthorityService.production()
     # Unanchored production service with no accepted implementation authority fails closed
+    with pytest.raises(H40GuardError) as exc:
+        prod_service._assert_current_anchors(require_controller=False)
+    assert exc.value.reason_code == H40ReasonCode.NOT_TESTABLE
+    assert "no independently accepted lifecycle implementation authority exists" in str(exc.value)
+
+    # When implementation authority is configured, missing P3 controller authority fails closed
+    dummy_impl_hash = "a" * 64
     with monkeypatch.context() as m:
         m.setattr(
             "btc_quant_agent.h40.lifecycle_authority.ACCEPTED_LIFECYCLE_IMPLEMENTATION_AUTHORITY_HASH",
-            None,
+            dummy_impl_hash,
         )
-        with pytest.raises(H40GuardError) as exc:
-            prod_service._assert_current_anchors(require_controller=False)
-        assert exc.value.reason_code == H40ReasonCode.NOT_TESTABLE
-        assert "no independently accepted lifecycle implementation authority exists" in str(exc.value)
+        service_with_impl = H40LifecycleAuthorityService.production()
+        with pytest.raises(H40GuardError) as exc_ctrl:
+            service_with_impl._assert_current_anchors(require_controller=True)
+        assert exc_ctrl.value.reason_code == H40ReasonCode.NOT_TESTABLE
+        assert "no independently accepted H40 P3 controller authority exists" in str(exc_ctrl.value)
 
-    # Staged production service has no accepted P3 controller authority
-    with pytest.raises(H40GuardError) as exc_ctrl:
-        prod_service._assert_current_anchors(require_controller=True)
-    assert exc_ctrl.value.reason_code == H40ReasonCode.NOT_TESTABLE
-    assert "no independently accepted H40 P3 controller authority exists" in str(exc_ctrl.value)
+
+# ==============================================================================
+# MED-01 & MED-02 REGRESSION SUITE
+# ==============================================================================
+
+
+def test_med_01_parquet_in_memory_parsing_adversarial(tmp_path: Path) -> None:
+    """MED-01: Parquet parser reads in-memory raw_bytes without reopening file_path."""
+    import pyarrow as pa
+    import pyarrow.parquet as pq
+
+    # 1. Create a valid Parquet source file with support-interval timestamps
+    dt0 = datetime(2021, 1, 1, 0, tzinfo=UTC)
+    timestamps = [(dt0 + timedelta(hours=i)).strftime("%Y-%m-%dT%H:%M:%SZ") for i in range(5)]
+    table = pa.Table.from_arrays(
+        [
+            pa.array(timestamps),
+            pa.array([100.0, 101.0, 102.0, 103.0, 104.0]),
+            pa.array([105.0, 106.0, 107.0, 108.0, 109.0]),
+            pa.array([95.0, 96.0, 97.0, 98.0, 99.0]),
+            pa.array([101.0, 102.0, 103.0, 104.0, 105.0]),
+        ],
+        names=["timestamp", "open", "high", "low", "close"],
+    )
+    source_file = tmp_path / "ETHUSDT.parquet"
+    pq.write_table(table, source_file)
+
+    # 1. Capture valid Parquet raw_bytes and verify whole-file SHA
+    raw_bytes = source_file.read_bytes()
+    file_sha = hashlib.sha256(raw_bytes).hexdigest()
+    assert len(raw_bytes) > 0
+
+    # 2. Adversarial case A: Delete source file from filesystem after byte capture
+    source_file.unlink()
+    assert not source_file.exists()
+
+    # 3. Call economic extraction with original raw_bytes and deleted path
+    bars_del, canon_del = _extract_economic_rows(
+        source_file, raw_bytes, "ETHUSDT", "1h", "timestamp",
+    )
+    # 4. Extracted economic rows match original raw_bytes exactly
+    assert len(bars_del) == 5
+    assert len(canon_del) == 5
+    assert canon_del[0]["close"] == repr(101.0)
+    assert canon_del[4]["close"] == repr(105.0)
+
+    # 2. Adversarial case B: Recreate source file on disk with completely different/adversarial values
+    adversarial_table = pa.Table.from_arrays(
+        [
+            pa.array(timestamps),
+            pa.array([9999.0] * 5),
+            pa.array([9999.0] * 5),
+            pa.array([9999.0] * 5),
+            pa.array([9999.0] * 5),
+        ],
+        names=["timestamp", "open", "high", "low", "close"],
+    )
+    pq.write_table(adversarial_table, source_file)
+    assert source_file.exists()
+
+    # 3. Call economic extraction with original raw_bytes
+    _bars_adv, canon_adv = _extract_economic_rows(
+        source_file, raw_bytes, "ETHUSDT", "1h", "timestamp",
+    )
+    # 5. Proves no filesystem reopen controls extracted values: adversarial disk file ignored
+    assert canon_adv == canon_del
+    assert canon_adv[0]["close"] == repr(101.0)
+
+    # 2. Adversarial case C: Mutate source file with corrupt non-Parquet bytes
+    source_file.write_bytes(b"CORRUPTED_NON_PARQUET_DATA")
+    _bars_corrupt, canon_corrupt = _extract_economic_rows(
+        source_file, raw_bytes, "ETHUSDT", "1h", "timestamp",
+    )
+    assert canon_corrupt == canon_del
+
+    # Invariant: Whole-file SHA is over the exact raw_bytes
+    assert hashlib.sha256(raw_bytes).hexdigest() == file_sha
+    # Invariant: economic_rows_sha256 is deterministically computed from canonical support rows
+    computed_digest = canonical_sha256(canon_del)
+    assert len(computed_digest) == 64
+
+    # Invariant: JSON adapter behavior remains unchanged
+    json_bars = _make_dummy_bars(dt0, 5)
+    json_file = tmp_path / "ETHUSDT.json"
+    json_bytes, _json_sha, _json_canon, json_digest, json_cnt = _write_json_source(json_file, json_bars)
+    json_file.unlink()
+    j_bars, j_canon = _extract_economic_rows(json_file, json_bytes, "ETHUSDT", "1h", "timestamp")
+    assert len(j_bars) == 5
+    assert canonical_sha256(j_canon) == json_digest
+    assert json_cnt == 5
+
+    # Invariant: Unsupported adapter fails closed -> NOT_TESTABLE
+    csv_file = tmp_path / "ETHUSDT.csv"
+    with pytest.raises(H40GuardError) as exc_unsupported:
+        _extract_economic_rows(csv_file, b"timestamp,open\n", "ETHUSDT", "1h", "timestamp")
+    assert exc_unsupported.value.reason_code == H40ReasonCode.NOT_TESTABLE
+    assert "active source without accepted adapter" in str(exc_unsupported.value)
+
+
+def test_med_02_lookback_reserve_interpretation_a_regressions() -> None:
+    """MED-02: Controller-ratified Interpretation A locks lookback reserve behavior."""
+    from btc_quant_agent.h40.discovery_evidence import LOOKBACK_RESERVE_END_UTC
+    from btc_quant_agent.h40.split_manifest import (
+        BASE_ELIGIBLE_START_UTC,
+        RAW_PARTITION_SPECS,
+        _compute_partitions_from_timestamps,
+        generate_hourly_range,
+    )
+
+    clear_prefit_caches()
+
+    # 1. Reserve timestamps [2021-01-01, 2021-01-31) cannot enter base-universe membership
+    reserve_hours = generate_hourly_range(
+        "2021-01-01T00:00:00Z",
+        "2021-01-31T00:00:00Z",
+        inclusive_end=False,
+    )
+    assert len(reserve_hours) == 720  # 30 days * 24 hours
+    assert BASE_ELIGIBLE_START_UTC == "2021-01-31T00:00:00Z"
+    assert LOOKBACK_RESERVE_END_UTC == datetime(2021, 1, 31, tzinfo=UTC)
+    for rh in reserve_hours:
+        assert rh < BASE_ELIGIBLE_START_UTC
+
+    # Generate full timestamps covering reserve and eligible train
+    eligible_hours = generate_hourly_range(
+        BASE_ELIGIBLE_START_UTC,
+        "2021-03-01T00:00:00Z",
+        inclusive_end=False,
+    )
+    all_ts = reserve_hours + eligible_hours
+    partitions, base_count, exclusions = _compute_partitions_from_timestamps(all_ts)
+    assert exclusions["LOOKBACK_RESERVED"] == 720
+    assert base_count == len(eligible_hours) == 696
+
+    # Verify no partition includes any reserve timestamp
+    for p in partitions:
+        assert p.start_utc >= BASE_ELIGIBLE_START_UTC
+        if p.first_timestamp_utc is not None:
+            assert p.first_timestamp_utc >= BASE_ELIGIBLE_START_UTC
+
+    # 2. Reserve feature scalars can be present in WF1 expanding percentile reference
+    # Construct bars starting in the reserve window (2021-01-01)
+    bars: dict[tuple[datetime, str], _Bar] = {}
+    base_price = 1000.0
+    for i, t_str in enumerate(all_ts):
+        dt = datetime.fromisoformat(t_str)
+        # Predictable varying price for non-degenerate vol and range
+        price = base_price + 10.0 * math.sin(i * 0.1)
+        bars[(dt, "ETHUSDT")] = _Bar(
+            timestamp=dt,
+            product="ETHUSDT",
+            open=price,
+            high=price + 2.0,
+            low=price - 2.0,
+            close=price + 0.5,
+        )
+
+    src_hash = _hash("test_src_med02")
+    training_refs = _get_training_refs(src_hash, "ETHUSDT", bars)
+    rv_series = training_refs["R_VOL"]
+    exp_series = training_refs["O_RANGE"]
+
+    # Verify reserve feature scalars are present in training_refs
+    reserve_rv = [dt for dt, _ in rv_series if dt < datetime(2021, 1, 31, 0, tzinfo=UTC)]
+    assert len(reserve_rv) > 60  # Over 60 valid causal feature scalars from reserve window
+    reserve_exp = [dt for dt, _ in exp_series if dt < datetime(2021, 1, 31, 0, tzinfo=UTC)]
+    assert len(reserve_exp) > 60
+
+    # 3. Only scalars with dt < decision_t are included in WF1 expanding sample
+    decision_t = datetime(2021, 1, 31, 0, tzinfo=UTC)  # Very first hour of WF1_TRAIN
+    slot = SimpleNamespace(direction_contract_id="D1_V1_RETURN_4H")
+    _score, regime_1, opp_1, _ = _reconstruct_prefit_cached(
+        candidate_id="cand_med02",
+        slot=slot,
+        partition_id="WF1_TRAIN",
+        t=decision_t,
+        product="ETHUSDT",
+        bars=bars,
+        source_evidence_hash=src_hash,
+    )
+    # 5. N >= 60 is satisfied using causal reserve observations:
+    # First row is NOT REGIME_UNAVAILABLE or O_UNAVAILABLE
+    assert regime_1 != "REGIME_UNAVAILABLE"
+    assert opp_1 != "O_UNAVAILABLE"
+
+    # Verify sample at decision_t contains only dt < decision_t
+    rv_sample_t = [v for dt, v in rv_series if dt < decision_t]
+    assert len(rv_sample_t) >= 60
+    for dt, _ in rv_series:
+        if dt >= decision_t:
+            assert dt not in [t for t, _ in rv_series if t < decision_t]
+
+    # 4. Strict close_time < observation_time required by underlying feature reconstruction
+    # At decision_t, bars at decision_t and later are not used to compute backward features
+    # For instance, D1 4h return uses bars at t - 1h, t - 2h, t - 3h, t - 4h
+    d1_val = _compute_d1(bars, decision_t, "ETHUSDT", 4)
+    # Modifying bar at decision_t itself cannot alter D1 or R_VOL at decision_t
+    bars_tampered = dict(bars)
+    bars_tampered[(decision_t, "ETHUSDT")] = _Bar(
+        decision_t, "ETHUSDT", 99999.0, 99999.0, 99999.0, 99999.0,
+    )
+    d1_tampered = _compute_d1(bars_tampered, decision_t, "ETHUSDT", 4)
+    assert d1_tampered == d1_val
+
+    # 6. No reserve timestamp becomes a decision or evaluation row
+    # In split manifest, WF1_TRAIN timestamps strictly start at BASE_ELIGIBLE_START_UTC
+    train_part = next(p for p in partitions if p.partition_id == "WF1_TRAIN")
+    assert train_part.start_utc == BASE_ELIGIBLE_START_UTC
+    assert train_part.first_timestamp_utc is not None and train_part.first_timestamp_utc >= BASE_ELIGIBLE_START_UTC
+
+    # 7. Future/equal-time observations cannot affect earlier percentile state
+    clear_prefit_caches()
+    _score_a, regime_a, opp_a, _ = _reconstruct_prefit_cached(
+        candidate_id="cand_med02",
+        slot=slot,
+        partition_id="WF1_TRAIN",
+        t=decision_t,
+        product="ETHUSDT",
+        bars=bars,
+        source_evidence_hash=src_hash,
+    )
+    # Add a massive spike in the future (decision_t + 10 hours)
+    future_t = decision_t + timedelta(hours=10)
+    bars_future_spike = dict(bars)
+    bars_future_spike[(future_t, "ETHUSDT")] = _Bar(
+        future_t, "ETHUSDT", 50000.0, 60000.0, 40000.0, 55000.0,
+    )
+    clear_prefit_caches()
+    _score_b, regime_b, opp_b, _ = _reconstruct_prefit_cached(
+        candidate_id="cand_med02",
+        slot=slot,
+        partition_id="WF1_TRAIN",
+        t=decision_t,
+        product="ETHUSDT",
+        bars=bars_future_spike,
+        source_evidence_hash=src_hash + "_spike",
+    )
+    assert regime_b == regime_a
+    assert opp_b == opp_a
+
+    # 8. Calibration behavior remains frozen-training-reference semantics
+    # In calibration, sample includes all training_refs without dt < t filter
+    cal_t = datetime(2022, 11, 1, 0, tzinfo=UTC)
+    for k in range(30):
+        t_k = cal_t - timedelta(hours=k)
+        bars[(t_k, "ETHUSDT")] = _Bar(
+            timestamp=t_k,
+            product="ETHUSDT",
+            open=1000.0,
+            high=1002.0,
+            low=998.0,
+            close=1000.0 + (k % 5) * 0.5,
+        )
+    clear_prefit_caches()
+    _sc_cal, reg_cal, _opp_cal, _ = _reconstruct_prefit_cached(
+        candidate_id="cand_med02",
+        slot=slot,
+        partition_id="WF1_CALIBRATION",
+        t=cal_t,
+        product="ETHUSDT",
+        bars=bars,
+        source_evidence_hash=src_hash,
+    )
+    assert reg_cal != "REGIME_UNAVAILABLE"
+
+    # 9. Verify later WF refits remain unchanged R3R2 rule
+    # Later folds use their chronologically past training partition
+    wf2_train = next(s for s in RAW_PARTITION_SPECS if s[0] == "WF2_TRAIN")
+    assert wf2_train[3] == "2021-01-31T00:00:00Z"  # WF2_TRAIN starts at base eligible start
 

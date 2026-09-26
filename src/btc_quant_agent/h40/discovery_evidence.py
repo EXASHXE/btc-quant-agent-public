@@ -747,9 +747,10 @@ def _extract_economic_rows(
     close_vals: list[Any] = []
 
     if suffix == ".parquet":
+        import pyarrow as pa  # type: ignore[import-untyped]
         import pyarrow.parquet as pq  # type: ignore[import-untyped]
         try:
-            table = pq.read_table(file_path)
+            table = pq.read_table(pa.BufferReader(raw_bytes))
         except Exception as exc:
             raise H40GuardError(H40ReasonCode.NOT_TESTABLE, f"failed to read parquet: {exc}") from exc
         if timestamp_field not in table.column_names:

@@ -15,10 +15,16 @@ from __future__ import annotations
 import concurrent.futures
 import inspect
 import sqlite3
-import sys
 from pathlib import Path
 
 import pytest
+from test_v051_h40_f01_lifecycle_authority import (
+    TS,
+    _build_discovery_chain,
+    _implementation_authority,
+    _ProductionEvidenceVerifier,
+    _typed_production_authority_fixture,
+)
 
 import btc_quant_agent.h40 as h40_module
 import btc_quant_agent.h40.lifecycle_authority as lifecycle_authority_module
@@ -44,18 +50,6 @@ from btc_quant_agent.h40 import (
     materialize_h40_search_space_production,
 )
 from btc_quant_agent.research_contract.canonical import canonical_json
-
-_TESTS_DIR = str(Path(__file__).resolve().parent)
-if _TESTS_DIR not in sys.path:
-    sys.path.insert(0, _TESTS_DIR)
-
-from test_v051_h40_f01_lifecycle_authority import (  # noqa: E402
-    TS,
-    _build_discovery_chain,
-    _implementation_authority,
-    _ProductionEvidenceVerifier,
-    _typed_production_authority_fixture,
-)
 
 
 def test_r46_test_commit_token_cannot_be_imported_or_exported() -> None:
