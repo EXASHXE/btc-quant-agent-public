@@ -59,8 +59,10 @@ DISCOVERY_PROVENANCE_CONTRACT_HASH = (
     "31fc3930e44149e6b3af54ddd3b11c630f95cbbd3f152b3d0d5e614690dcf7ae"
 )
 
-# Staged authority state: implementation authority temporarily revoked pending exact-SHA reacceptance; P3 controller remains unpublished
-ACCEPTED_LIFECYCLE_IMPLEMENTATION_AUTHORITY_HASH: str | None = None
+# Staged authority state: implementation authority published bound to accepted f3678676 SHA; P3 controller remains unpublished
+ACCEPTED_LIFECYCLE_IMPLEMENTATION_AUTHORITY_HASH: str | None = (
+    "088b1210c17171141e232219345fa890e182282445fd9b2a70804b177d808b96"
+)
 ACCEPTED_H40_P3_CONTROLLER_AUTHORITY_HASH: str | None = None
 
 _SHA256_RE = re.compile(r"[0-9a-f]{64}\Z")

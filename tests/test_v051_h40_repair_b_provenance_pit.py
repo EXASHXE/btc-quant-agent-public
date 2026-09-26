@@ -1841,7 +1841,9 @@ def test_preservation_42_stage_a_synthetic_domain_isolation_closed() -> None:
 
 
 def test_preservation_43_production_accepted_constants() -> None:
-    assert ACCEPTED_LIFECYCLE_IMPLEMENTATION_AUTHORITY_HASH is None
+    assert ACCEPTED_LIFECYCLE_IMPLEMENTATION_AUTHORITY_HASH == (
+        "088b1210c17171141e232219345fa890e182282445fd9b2a70804b177d808b96"
+    )
     assert ACCEPTED_H40_P3_CONTROLLER_AUTHORITY_HASH is None
 
 
@@ -1969,24 +1971,26 @@ def test_preservation_55_v1_persistence_context_rejected_in_production(tmp_path:
 
 def test_preservation_56_stale_authority_service_fails_closed(monkeypatch: pytest.MonkeyPatch) -> None:
     prod_service = H40LifecycleAuthorityService.production()
-    # Unanchored production service with no accepted implementation authority fails closed
-    with pytest.raises(H40GuardError) as exc:
-        prod_service._assert_current_anchors(require_controller=False)
-    assert exc.value.reason_code == H40ReasonCode.NOT_TESTABLE
-    assert "no independently accepted lifecycle implementation authority exists" in str(exc.value)
+    # With implementation authority published, require_controller=False succeeds
+    prod_service._assert_current_anchors(require_controller=False)
 
-    # When implementation authority is configured, missing P3 controller authority fails closed
-    dummy_impl_hash = "a" * 64
+    # Missing P3 controller authority fails closed in production without monkeypatch
+    with pytest.raises(H40GuardError) as exc_ctrl:
+        prod_service._assert_current_anchors(require_controller=True)
+    assert exc_ctrl.value.reason_code == H40ReasonCode.NOT_TESTABLE
+    assert "no independently accepted H40 P3 controller authority exists" in str(exc_ctrl.value)
+
+    # If implementation authority is unconfigured (None), require_controller=False fails closed
     with monkeypatch.context() as m:
         m.setattr(
             "btc_quant_agent.h40.lifecycle_authority.ACCEPTED_LIFECYCLE_IMPLEMENTATION_AUTHORITY_HASH",
-            dummy_impl_hash,
+            None,
         )
-        service_with_impl = H40LifecycleAuthorityService.production()
-        with pytest.raises(H40GuardError) as exc_ctrl:
-            service_with_impl._assert_current_anchors(require_controller=True)
-        assert exc_ctrl.value.reason_code == H40ReasonCode.NOT_TESTABLE
-        assert "no independently accepted H40 P3 controller authority exists" in str(exc_ctrl.value)
+        service_unanchored = H40LifecycleAuthorityService.production()
+        with pytest.raises(H40GuardError) as exc:
+            service_unanchored._assert_current_anchors(require_controller=False)
+        assert exc.value.reason_code == H40ReasonCode.NOT_TESTABLE
+        assert "no independently accepted lifecycle implementation authority exists" in str(exc.value)
 
 
 # ==============================================================================
