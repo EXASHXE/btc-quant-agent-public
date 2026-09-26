@@ -832,11 +832,11 @@ def _extract_economic_rows(
         else:
             _fail("invalid timestamp type")
 
+        if not (SUPPORT_START_UTC <= dt < SUPPORT_END_UTC_EXCLUSIVE):
+            continue
+
         if dt.tzinfo != UTC or dt.minute != 0 or dt.second != 0 or dt.microsecond != 0:
             _fail("timestamp is not UTC hourly aligned")
-
-        if not (SUPPORT_START_UTC <= dt < SUPPORT_END_UTC_EXCLUSIVE):
-            _fail(f"source timestamp {dt.isoformat()} outside support interval [2021-01-01, 2023-02-01)")
 
         if prev_dt is not None and dt <= prev_dt:
             _fail("source economic timestamps must be strictly sorted and unique")
@@ -845,28 +845,28 @@ def _extract_economic_rows(
         try:
             o = float(open_vals[i])
             h = float(high_vals[i])
-            l = float(low_vals[i])
+            low_val = float(low_vals[i])
             c = float(close_vals[i])
         except (ValueError, TypeError):
             _fail("non-numeric OHLC in source")
 
-        for name, val in (("open", o), ("high", h), ("low", l), ("close", c)):
+        for name, val in (("open", o), ("high", h), ("low", low_val), ("close", c)):
             if not math.isfinite(val):
                 _fail(f"non-finite source {name}")
             if val <= 0:
                 _fail(f"non-positive source {name}")
 
-        if l > min(o, c) or h < max(o, c) or l > h:
+        if low_val > min(o, c) or h < max(o, c) or low_val > h:
             _fail("source OHLC geometry is malformed")
 
         canonical_rows.append({
             "timestamp": dt.strftime("%Y-%m-%dT%H:%M:%SZ"),
             "open": repr(o),
             "high": repr(h),
-            "low": repr(l),
+            "low": repr(low_val),
             "close": repr(c),
         })
-        extracted_bars.append(_Bar(dt, expected_product, o, h, l, c))
+        extracted_bars.append(_Bar(dt, expected_product, o, h, low_val, c))
 
     return extracted_bars, canonical_rows
 
@@ -886,22 +886,32 @@ def _compute_d2(bars: Mapping[tuple[datetime, str], _Bar], t: datetime, product:
     if test_bar is None or test_bar.effective_close_time >= t:
         return 0.0
     ref_bars: list[_Bar] = []
-    for k in range(2, range_hours + 1):
+    # Normative R3R2 Section 2.2:
+    # Reference bars: the set of complete hourly bars with close_time_ms < t and
+    #                 open_time in (t - W, t). [the last closed signal bar is EXCLUDED]
+    # For hourly aligned data, accepted reference set satisfies all of:
+    #   open_time > t - W
+    #   open_time < t
+    #   close_time < t
+    #   bar != last closed signal bar (test_bar at t - 1h)
+    cutoff = t - timedelta(hours=range_hours)
+    for k in range(2, range_hours):
         b = bars.get((t - timedelta(hours=k), product))
         if b is None or b.effective_close_time >= t:
-            break
-        ref_bars.append(b)
+            continue
+        if b.timestamp > cutoff and b.timestamp < t and b.effective_close_time < t and b.timestamp != test_bar.timestamp:
+            ref_bars.append(b)
     min_required = int((range_hours / 24) * 6)
     if len(ref_bars) < min_required or not ref_bars:
         return 0.0
     u = max(b.high for b in ref_bars)
-    l = min(b.low for b in ref_bars)
-    if l == u:
+    l_bound = min(b.low for b in ref_bars)
+    if l_bound == u:
         return 0.0
     c = test_bar.close
     if c > u:
         return 1.0
-    elif c < l:
+    elif c < l_bound:
         return -1.0
     return 0.0
 
@@ -912,23 +922,38 @@ def _compute_d3(bars: Mapping[tuple[datetime, str], _Bar], t: datetime, product:
     if b2 is None or b1 is None or b2.effective_close_time >= t or b1.effective_close_time >= t:
         return 0.0
     ref_bars: list[_Bar] = []
-    for k in range(3, range_hours + 3):
+    # Normative R3R2 Section 2.3:
+    # Prior range window W in {24h, 72h} of closed bars strictly before the break bar b1.
+    # U(t) / L(t) as in Section 2.2 over that window.
+    # Evaluated at b1 close time t_b1 = t - timedelta(hours=1):
+    # Reference bars: complete hourly bars with close_time_ms < t_b1 and open_time in (t_b1 - W, t_b1).
+    # b1 is the test bar and is excluded.
+    # Therefore:
+    #   open_time > t_b1 - W = t - 1h - W
+    #   open_time < t_b1 = t - 1h
+    #   close_time < t_b1
+    #   bar != b1 (open_time != t - 2h)
+    # For hourly aligned data, candidate open times are t - timedelta(hours=k) for k in range(3, range_hours + 1).
+    t_b1 = t - timedelta(hours=1)
+    cutoff = t_b1 - timedelta(hours=range_hours)
+    for k in range(3, range_hours + 1):
         b = bars.get((t - timedelta(hours=k), product))
-        if b is None or b.effective_close_time >= t:
-            break
-        ref_bars.append(b)
+        if b is None or b.effective_close_time >= t_b1:
+            continue
+        if b.timestamp > cutoff and b.timestamp < t_b1 and b.effective_close_time < t_b1 and b.timestamp != b1.timestamp:
+            ref_bars.append(b)
     min_required = int((range_hours / 24) * 6)
     if len(ref_bars) < min_required or not ref_bars:
         return 0.0
     u = max(b.high for b in ref_bars)
-    l = min(b.low for b in ref_bars)
-    if l == u:
+    l_bound = min(b.low for b in ref_bars)
+    if l_bound == u:
         return 0.0
     c1 = b1.close
     c2 = b2.close
     if c1 > u and c2 < u:
         return -1.0
-    elif c1 < l and c2 > l:
+    elif c1 < l_bound and c2 > l_bound:
         return 1.0
     return 0.0
 

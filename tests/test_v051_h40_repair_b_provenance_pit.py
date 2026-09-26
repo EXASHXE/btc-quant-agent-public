@@ -8,6 +8,7 @@ Covers all 47 acceptance criteria:
 
 from __future__ import annotations
 
+import copy
 import hashlib
 import json
 import math
@@ -135,6 +136,8 @@ def _write_json_source(
     raw_bytes = path.read_bytes()
     file_sha256 = hashlib.sha256(raw_bytes).hexdigest()
 
+    support_start = datetime(2021, 1, 1, tzinfo=UTC)
+    support_end = datetime(2023, 2, 1, tzinfo=UTC)
     canonical_rows = [
         {
             "timestamp": b["timestamp"],
@@ -144,6 +147,7 @@ def _write_json_source(
             "close": repr(float(b["close"])),
         }
         for b in bars
+        if support_start <= datetime.fromisoformat(b["timestamp"].replace("Z", "+00:00")) < support_end
     ]
     economic_digest = canonical_sha256(canonical_rows)
     economic_count = len(canonical_rows)
@@ -279,7 +283,7 @@ def _make_production_test_seal_and_context(tmp_path: Path, bars: list[dict[str, 
         cadence="1h",
         status=H40SourceStatus.VERIFIED,
         timestamp_field="timestamp",
-        timestamp_count=exp_count,
+        timestamp_count=len(bars),
         first_timestamp_utc=bars[0]["timestamp"],
         last_timestamp_utc=bars[-1]["timestamp"],
         duplicate_count=0,
@@ -491,15 +495,89 @@ def test_f02_11_malformed_ohlc_geometry_rejected(tmp_path: Path) -> None:
         _extract_economic_rows(source_file, source_file.read_bytes(), "ETHUSDT", "1h", "timestamp")
 
 
-def test_f02_12_source_timestamp_outside_support_interval_rejected(tmp_path: Path) -> None:
-    # 2020-12-31 is outside [2021-01-01, 2023-02-01)
-    early = datetime(2020, 12, 31, 23, tzinfo=UTC)
-    bars = _make_dummy_bars(early, 1)
-    source_file = tmp_path / "ETHUSDT.json"
-    source_file.write_text(json.dumps(bars), encoding="utf-8")
+def test_f02_12_source_support_projection_and_whole_file_authority(tmp_path: Path) -> None:
+    # Fixture contains rows before support (2020-12-31), inside support (2021-01-01 -> 2021-01-02),
+    # and valid rows after support endpoint (2023-02-01, 2024-01-01, 2026-01-31).
+    bars_pre = _make_dummy_bars(datetime(2020, 12, 31, 22, tzinfo=UTC), 2)
+    bars_inside = _make_dummy_bars(datetime(2021, 1, 1, 0, tzinfo=UTC), 20)
+    bars_post = _make_dummy_bars(datetime(2023, 2, 1, 0, tzinfo=UTC), 10)
+    all_bars = bars_pre + bars_inside + bars_post
 
-    with pytest.raises(H40GuardError, match="outside support interval"):
-        _extract_economic_rows(source_file, source_file.read_bytes(), "ETHUSDT", "1h", "timestamp")
+    source_file = tmp_path / "ETHUSDT.json"
+    raw_bytes, file_sha, canon_rows, exp_digest, exp_count = _write_json_source(source_file, all_bars)
+
+    # 1. Whole-file SHA includes all bytes (pre, inside, post)
+    assert file_sha == hashlib.sha256(raw_bytes).hexdigest()
+    assert len(all_bars) == 32
+
+    # 2. Post-support rows are accepted as part of the sealed artifact (extraction does not fail)
+    extracted_bars, canon = _extract_economic_rows(
+        source_file, raw_bytes, "ETHUSDT", "1h", "timestamp",
+    )
+
+    # 3. Post-support and pre-support rows are excluded from the H40 economic digest and count
+    assert len(extracted_bars) == 20
+    assert len(canon) == 20
+    assert exp_count == 20
+    for b in extracted_bars:
+        assert datetime(2021, 1, 1, tzinfo=UTC) <= b.timestamp < datetime(2023, 2, 1, tzinfo=UTC)
+    for r in canon:
+        dt = datetime.fromisoformat(r["timestamp"].replace("Z", "+00:00"))
+        assert datetime(2021, 1, 1, tzinfo=UTC) <= dt < datetime(2023, 2, 1, tzinfo=UTC)
+
+    # 4. Support-projected digest is deterministic
+    computed_digest = canonical_sha256(canon)
+    assert computed_digest == exp_digest
+    repeat_bars, repeat_canon = _extract_economic_rows(
+        source_file, raw_bytes, "ETHUSDT", "1h", "timestamp",
+    )
+    assert canonical_sha256(repeat_canon) == computed_digest
+
+    # 5. Tampering a post-support row changes the whole-file SHA-256
+    tampered_bars = copy.deepcopy(all_bars)
+    tampered_bars[-1]["close"] = float(tampered_bars[-1]["close"]) + 10.0
+    tampered_bytes = json.dumps(tampered_bars).encode("utf-8")
+    assert hashlib.sha256(tampered_bytes).hexdigest() != file_sha
+
+    # 6. An unsupported timestamp claimed in base-universe membership is rejected
+    resolver = H40DiscoveryEvidenceResolver(tmp_path)
+    derivation_payload = {
+        "schema_id": "H40_P3B_SOURCE_DERIVATION_V2",
+        "run_authority_id": "RUN_1",
+        "source_manifest_hash": _hash("s"),
+        "split_manifest_hash": _hash("sp"),
+        "split_attestation_hash": _hash("att"),
+        "provenance_contract_hash": DISCOVERY_PROVENANCE_CONTRACT_HASH,
+        "policies": _policy_stack(),
+        "source_support": {"start_utc": "2021-01-01T00:00:00Z", "end_utc_exclusive": "2023-02-01T00:00:00Z"},
+        "active_source_derivations": [{
+            "cadence": "1h",
+            "economic_row_count": exp_count,
+            "economic_rows_sha256": exp_digest,
+            "locator": "ETHUSDT.json",
+            "product": "ETHUSDT",
+            "source_file_sha256": file_sha,
+            "source_id": "SRC_ETH",
+            "source_validation_receipt_sha256": _hash("receipt"),
+            "timestamp_field": "timestamp",
+        }],
+        "base_eligible_membership": {
+            "WF1_TRAIN": [{"timestamp": "2020-12-31T23:00:00Z", "product": "ETHUSDT"}],
+            "WF1_CALIBRATION": [],
+        },
+    }
+    d_digest = _store(tmp_path, derivation_payload)
+    split = H40SplitManifest(
+        protocol_identity_hash=_hash("p"), source_manifest_hash=_hash("s"),
+        base_eligible_start_utc="2021-01-31T00:00:00Z", base_eligible_end_utc="2023-01-31T00:00:00Z",
+        base_eligible_count=0, partitions=(), exclusion_counts={},
+    )
+    with pytest.raises(H40GuardError, match="lookback reserve hour|outside accepted split"):
+        _load_source_bars(
+            resolver, d_digest, run_authority_id="RUN_1",
+            source_manifest_hash=_hash("s"), split_manifest_hash=_hash("sp"),
+            split_manifest=split,
+        )
 
 
 def test_f02_13_active_source_without_accepted_adapter_fails_closed(tmp_path: Path) -> None:
@@ -641,6 +719,96 @@ def test_f02_17_lookback_reserve_excluded_from_base_eligible_membership(tmp_path
         )
 
 
+def test_f02_18_canonical_full_sealed_source_with_post_support_in_load_source_bars(tmp_path: Path) -> None:
+    # Source file contains rows inside support [2021-01-01, 2023-02-01) plus valid rows after 2023-02-01
+    start_train = datetime(2021, 2, 1, 0, tzinfo=UTC)
+    bars_inside = _make_dummy_bars(start_train, 10)
+    bars_post = _make_dummy_bars(datetime(2023, 5, 1, 0, tzinfo=UTC), 5)
+    all_bars = bars_inside + bars_post
+
+    seal, manifest, attestation, record, receipt, file_sha, exp_digest, exp_count = (
+        _make_production_test_seal_and_context(tmp_path, all_bars)
+    )
+
+    resolver = H40DiscoveryEvidenceResolver(tmp_path)
+    train_ts = [b["timestamp"] for b in bars_inside]
+    membership_hash = hashlib.sha256(",".join(sorted(train_ts)).encode("utf-8")).hexdigest()
+
+    derivation = {
+        "schema_id": "H40_P3B_SOURCE_DERIVATION_V2",
+        "run_authority_id": "RUN_1",
+        "source_manifest_hash": manifest.manifest_hash,
+        "split_manifest_hash": _hash("split"),
+        "split_attestation_hash": attestation.attestation_hash,
+        "provenance_contract_hash": DISCOVERY_PROVENANCE_CONTRACT_HASH,
+        "policies": _policy_stack(),
+        "source_support": {"start_utc": "2021-01-01T00:00:00Z", "end_utc_exclusive": "2023-02-01T00:00:00Z"},
+        "active_source_derivations": [{
+            "cadence": "1h",
+            "economic_row_count": exp_count,  # 10 rows inside support
+            "economic_rows_sha256": exp_digest,
+            "locator": "ETHUSDT.json",
+            "product": "ETHUSDT",
+            "source_file_sha256": file_sha,  # binds all 15 bars
+            "source_id": "SRC_ETH",
+            "source_validation_receipt_sha256": canonical_sha256(receipt.to_dict()),
+            "timestamp_field": "timestamp",
+        }],
+        "base_eligible_membership": {
+            "WF1_TRAIN": [{"timestamp": ts, "product": "ETHUSDT"} for ts in train_ts],
+            "WF1_CALIBRATION": [],
+        },
+    }
+    digest = _store(tmp_path, derivation)
+    split = H40SplitManifest(
+        protocol_identity_hash=_hash("p"),
+        source_manifest_hash=manifest.manifest_hash,
+        base_eligible_start_utc="2021-01-31T00:00:00Z",
+        base_eligible_end_utc="2023-01-31T00:00:00Z",
+        base_eligible_count=len(train_ts),
+        partitions=(
+            H40Partition(
+                partition_id="WF1_TRAIN",
+                fold="WF1",
+                partition_type=H40PartitionType.TRAIN,
+                start_utc="2021-01-31T00:00:00Z",
+                end_utc="2022-10-31T00:00:00Z",
+                count=len(train_ts),
+                first_timestamp_utc=train_ts[0],
+                last_timestamp_utc=train_ts[-1],
+                timestamps_sha256=membership_hash,
+            ),
+            H40Partition(
+                partition_id="WF1_CALIBRATION",
+                fold="WF1",
+                partition_type=H40PartitionType.CALIBRATION,
+                start_utc="2022-11-01T00:00:00Z",
+                end_utc="2023-01-31T00:00:00Z",
+                count=0,
+                first_timestamp_utc=None,
+                last_timestamp_utc=None,
+                timestamps_sha256=hashlib.sha256(b"").hexdigest(),
+            ),
+        ),
+        exclusion_counts={},
+    )
+
+    bars_map, universes = _load_source_bars(
+        resolver,
+        digest,
+        run_authority_id="RUN_1",
+        source_manifest_hash=manifest.manifest_hash,
+        split_manifest_hash=_hash("split"),
+        split_manifest=split,
+        seal=seal,
+    )
+    assert len(bars_map) == 10
+    for b_post in bars_post:
+        dt_post = datetime.fromisoformat(b_post["timestamp"].replace("Z", "+00:00"))
+        assert (dt_post, "ETHUSDT") not in bars_map
+    assert len(universes["WF1_TRAIN"]) == 10
+
+
 # ==============================================================================
 # F03 MATRIX (Items 18 - 37)
 # ==============================================================================
@@ -755,51 +923,223 @@ def test_f03_20_exact_v2_row_schema_required(tmp_path: Path) -> None:
 
 def test_f03_21_verifier_derived_d1_matches_r3r2() -> None:
     t = datetime(2022, 6, 1, 12, tzinfo=UTC)
-    bars = {
+    # Endpoints: b_last at t - 1h, b_prev at t - 4h (for lookback 4) or t - 12h (for lookback 12)
+    bars: dict[tuple[datetime, str], _Bar] = {
         (t - timedelta(hours=4), "ETHUSDT"): _Bar(t - timedelta(hours=4), "ETHUSDT", 100.0, 101.0, 99.0, 100.0),
         (t - timedelta(hours=1), "ETHUSDT"): _Bar(t - timedelta(hours=1), "ETHUSDT", 104.0, 106.0, 103.0, 105.0),
+        # Adversarial sentinels at non-endpoint hours
+        (t - timedelta(hours=5), "ETHUSDT"): _Bar(t - timedelta(hours=5), "ETHUSDT", 50.0, 500.0, 10.0, 50.0),
+        (t - timedelta(hours=3), "ETHUSDT"): _Bar(t - timedelta(hours=3), "ETHUSDT", 200.0, 250.0, 150.0, 200.0),
+        (t - timedelta(hours=2), "ETHUSDT"): _Bar(t - timedelta(hours=2), "ETHUSDT", 300.0, 350.0, 250.0, 300.0),
     }
     score_4h = _compute_d1(bars, t, "ETHUSDT", 4)
     expected = math.log(105.0 / 100.0)
     assert score_4h == pytest.approx(expected)
 
+    # Changing sentinels at t-5h, t-3h, t-2h does not affect D1 4h
+    bars[(t - timedelta(hours=5), "ETHUSDT")] = _Bar(t - timedelta(hours=5), "ETHUSDT", 999.0, 9999.0, 1.0, 999.0)
+    bars[(t - timedelta(hours=3), "ETHUSDT")] = _Bar(t - timedelta(hours=3), "ETHUSDT", 1.0, 2.0, 0.5, 1.0)
+    bars[(t - timedelta(hours=2), "ETHUSDT")] = _Bar(t - timedelta(hours=2), "ETHUSDT", 10.0, 20.0, 5.0, 10.0)
+    assert _compute_d1(bars, t, "ETHUSDT", 4) == pytest.approx(expected)
+
+    # Changing endpoint t-4h DOES affect return
+    bars[(t - timedelta(hours=4), "ETHUSDT")] = _Bar(t - timedelta(hours=4), "ETHUSDT", 100.0, 101.0, 99.0, 102.0)
+    assert _compute_d1(bars, t, "ETHUSDT", 4) == pytest.approx(math.log(105.0 / 102.0))
+
+    # Changing endpoint t-1h DOES affect return
+    bars[(t - timedelta(hours=1), "ETHUSDT")] = _Bar(t - timedelta(hours=1), "ETHUSDT", 100.0, 101.0, 99.0, 102.0)
+    # Equality: C(t-1) == C(t-4) -> score == 0.0 -> NO_TRADE
+    assert _compute_d1(bars, t, "ETHUSDT", 4) == 0.0
+
+    # D1 12H test
+    bars[(t - timedelta(hours=12), "ETHUSDT")] = _Bar(t - timedelta(hours=12), "ETHUSDT", 90.0, 95.0, 85.0, 90.0)
+    bars[(t - timedelta(hours=13), "ETHUSDT")] = _Bar(t - timedelta(hours=13), "ETHUSDT", 999.0, 999.0, 999.0, 999.0)
+    score_12h = _compute_d1(bars, t, "ETHUSDT", 12)
+    assert score_12h == pytest.approx(math.log(102.0 / 90.0))
+
+    # Missing endpoint bar -> returns 0.0
+    bars_missing = dict(bars)
+    del bars_missing[(t - timedelta(hours=1), "ETHUSDT")]
+    assert _compute_d1(bars_missing, t, "ETHUSDT", 4) == 0.0
+
 
 def test_f03_22_verifier_derived_d2_matches_r3r2() -> None:
     t = datetime(2022, 6, 1, 12, tzinfo=UTC)
-    # 24h Donchian: reference bars t-2h through t-24h
+    # Normative R3R2 Section 2.2:
+    # Reference bars: complete hourly bars with close_time_ms < t and open_time in (t - W, t).
+    # The last closed signal bar (test_bar at t - 1h) is EXCLUDED.
+    # For W = 24: candidate open times are t - 2h through t - 23h (22 bars).
+    # Open time == t - 24h is strictly excluded (open_time > t - W required).
     bars: dict[tuple[datetime, str], _Bar] = {}
-    for k in range(2, 25):
+    for k in range(2, 24):
         dt = t - timedelta(hours=k)
         bars[(dt, "ETHUSDT")] = _Bar(dt, "ETHUSDT", 100.0, 105.0, 95.0, 100.0)
-    # Test bar at t-1h: close > 105 -> LONG (+1)
+
+    # Test bar at t - 1h
     bars[(t - timedelta(hours=1), "ETHUSDT")] = _Bar(t - timedelta(hours=1), "ETHUSDT", 104.0, 107.0, 103.0, 106.0)
+
+    # 1. Base breakout: close (106) > U (105) -> LONG (+1.0)
     assert _compute_d2(bars, t, "ETHUSDT", 24) == 1.0
 
-    # Test bar close < 95 -> SHORT (-1)
+    # 2. Mandatory boundary regression: sentinel at exactly t - W (t - 24h)
+    # Placing an extreme high/low at open_time == t - 24h MUST NOT change D2 output
+    bars[(t - timedelta(hours=24), "ETHUSDT")] = _Bar(
+        t - timedelta(hours=24), "ETHUSDT", 100.0, 999999.0, 0.001, 100.0,
+    )
+    assert _compute_d2(bars, t, "ETHUSDT", 24) == 1.0
+
+    # Mutating only that sentinel at t - 24h does not alter output
+    bars[(t - timedelta(hours=24), "ETHUSDT")] = _Bar(
+        t - timedelta(hours=24), "ETHUSDT", 50.0, 50.0, 50.0, 50.0,
+    )
+    assert _compute_d2(bars, t, "ETHUSDT", 24) == 1.0
+
+    # Also sentinel at t - 25h (t - W - 1h) must not change output
+    bars[(t - timedelta(hours=25), "ETHUSDT")] = _Bar(
+        t - timedelta(hours=25), "ETHUSDT", 100.0, 999999.0, 0.001, 100.0,
+    )
+    assert _compute_d2(bars, t, "ETHUSDT", 24) == 1.0
+
+    # 3. Nearest inside left-boundary bar at t - 23h (t - W + 1h):
+    # Setting an extreme high on t - 23h DOES enter reference set, inflating U and suppressing breakout
+    bars_mutated = dict(bars)
+    bars_mutated[(t - timedelta(hours=23), "ETHUSDT")] = _Bar(
+        t - timedelta(hours=23), "ETHUSDT", 100.0, 999999.0, 95.0, 100.0,
+    )
+    assert _compute_d2(bars_mutated, t, "ETHUSDT", 24) == 0.0
+
+    # 4. Test bar at t - 1h is excluded from reference bounds:
+    # Extreme high/low on test_bar does not alter U or L
+    bars[(t - timedelta(hours=1), "ETHUSDT")] = _Bar(
+        t - timedelta(hours=1), "ETHUSDT", 104.0, 999999.0, 0.001, 106.0,
+    )
+    assert _compute_d2(bars, t, "ETHUSDT", 24) == 1.0
+
+    # 5. Downward breakout: close < L -> SHORT (-1.0)
     bars[(t - timedelta(hours=1), "ETHUSDT")] = _Bar(t - timedelta(hours=1), "ETHUSDT", 96.0, 97.0, 93.0, 94.0)
     assert _compute_d2(bars, t, "ETHUSDT", 24) == -1.0
 
-    # Inside boundary -> 0
+    # 6. Inside boundary -> 0.0
     bars[(t - timedelta(hours=1), "ETHUSDT")] = _Bar(t - timedelta(hours=1), "ETHUSDT", 100.0, 102.0, 98.0, 100.0)
     assert _compute_d2(bars, t, "ETHUSDT", 24) == 0.0
+
+    # 7. Exact equality: C == U or C == L -> 0.0 (neutral)
+    bars[(t - timedelta(hours=1), "ETHUSDT")] = _Bar(t - timedelta(hours=1), "ETHUSDT", 100.0, 106.0, 99.0, 105.0)
+    assert _compute_d2(bars, t, "ETHUSDT", 24) == 0.0
+    bars[(t - timedelta(hours=1), "ETHUSDT")] = _Bar(t - timedelta(hours=1), "ETHUSDT", 96.0, 97.0, 94.0, 95.0)
+    assert _compute_d2(bars, t, "ETHUSDT", 24) == 0.0
+
+    # 8. Dual-touch / flat bounds: U == L -> 0.0
+    flat_bars = {
+        (t - timedelta(hours=k), "ETHUSDT"): _Bar(t - timedelta(hours=k), "ETHUSDT", 100.0, 100.0, 100.0, 100.0)
+        for k in range(1, 24)
+    }
+    assert _compute_d2(flat_bars, t, "ETHUSDT", 24) == 0.0
+
+    # 9. Minimum complete bars requirement: (W / 24) * 6
+    # For W = 24: min 6 bars required
+    gapped_bars: dict[tuple[datetime, str], _Bar] = {
+        (t - timedelta(hours=1), "ETHUSDT"): _Bar(t - timedelta(hours=1), "ETHUSDT", 104.0, 107.0, 103.0, 106.0),
+    }
+    for k in range(2, 7):  # only 5 ref bars
+        dt = t - timedelta(hours=k)
+        gapped_bars[(dt, "ETHUSDT")] = _Bar(dt, "ETHUSDT", 100.0, 105.0, 95.0, 100.0)
+    assert _compute_d2(gapped_bars, t, "ETHUSDT", 24) == 0.0  # 5 bars < 6 -> NO_TRADE
+    # Add 6th bar -> meets minimum 6 complete bars
+    gapped_bars[(t - timedelta(hours=7), "ETHUSDT")] = _Bar(
+        t - timedelta(hours=7), "ETHUSDT", 100.0, 105.0, 95.0, 100.0,
+    )
+    assert _compute_d2(gapped_bars, t, "ETHUSDT", 24) == 1.0
+
+    # 10. D2 72H window: reference bars k = 2..71. t - 72h is excluded.
+    bars_72: dict[tuple[datetime, str], _Bar] = {
+        (t - timedelta(hours=1), "ETHUSDT"): _Bar(t - timedelta(hours=1), "ETHUSDT", 104.0, 107.0, 103.0, 106.0),
+    }
+    for k in range(2, 72):
+        dt = t - timedelta(hours=k)
+        bars_72[(dt, "ETHUSDT")] = _Bar(dt, "ETHUSDT", 100.0, 105.0, 95.0, 100.0)
+    # Sentinel at t - 72h
+    bars_72[(t - timedelta(hours=72), "ETHUSDT")] = _Bar(
+        t - timedelta(hours=72), "ETHUSDT", 100.0, 999999.0, 0.001, 100.0,
+    )
+    assert _compute_d2(bars_72, t, "ETHUSDT", 72) == 1.0
+    # Sentinel at t - 71h (inside boundary) alters U
+    bars_72_mut = dict(bars_72)
+    bars_72_mut[(t - timedelta(hours=71), "ETHUSDT")] = _Bar(
+        t - timedelta(hours=71), "ETHUSDT", 100.0, 999999.0, 95.0, 100.0,
+    )
+    assert _compute_d2(bars_72_mut, t, "ETHUSDT", 72) == 0.0
 
 
 def test_f03_23_verifier_derived_d3_matches_r3r2() -> None:
     t = datetime(2022, 6, 1, 12, tzinfo=UTC)
-    # Range window: max high = 105, min low = 95
+    # Normative R3R2 Section 2.3:
+    # Evaluated at b1 close time t_b1 = t - timedelta(hours=1):
+    # b2 (close-back bar) at t - 1h, b1 (break bar) at t - 2h.
+    # Prior range window W of closed bars strictly before the break bar b1:
+    # open_time in (t_b1 - W, t_b1), b1 is EXCLUDED.
+    # For W = 24: candidate open times are t - 3h through t - 24h (22 bars).
+    # Open time == t - 25h is strictly excluded.
     bars: dict[tuple[datetime, str], _Bar] = {}
-    for k in range(3, 27):
+    for k in range(3, 25):
         dt = t - timedelta(hours=k)
         bars[(dt, "ETHUSDT")] = _Bar(dt, "ETHUSDT", 100.0, 105.0, 95.0, 100.0)
 
-    # Upward break at b1 (t-2h), close back inside at b2 (t-1h) -> SHORT (-1.0)
+    # 1. Upward break at b1 (t-2h), close back inside at b2 (t-1h) -> SHORT (-1.0)
     bars[(t - timedelta(hours=2), "ETHUSDT")] = _Bar(t - timedelta(hours=2), "ETHUSDT", 104.0, 108.0, 103.0, 106.0)
     bars[(t - timedelta(hours=1), "ETHUSDT")] = _Bar(t - timedelta(hours=1), "ETHUSDT", 105.0, 105.0, 103.0, 104.0)
     assert _compute_d3(bars, t, "ETHUSDT", 24) == -1.0
 
+    # 2. Sentinel at exactly t_b1 - W (t - 25h):
+    # Placing an extreme high/low at open_time == t - 25h MUST NOT change D3 output
+    bars[(t - timedelta(hours=25), "ETHUSDT")] = _Bar(
+        t - timedelta(hours=25), "ETHUSDT", 100.0, 999999.0, 0.001, 100.0,
+    )
+    assert _compute_d3(bars, t, "ETHUSDT", 24) == -1.0
+
+    # Sentinel at t - 26h (t_b1 - W - 1h): must not change output
+    bars[(t - timedelta(hours=26), "ETHUSDT")] = _Bar(
+        t - timedelta(hours=26), "ETHUSDT", 100.0, 999999.0, 0.001, 100.0,
+    )
+    assert _compute_d3(bars, t, "ETHUSDT", 24) == -1.0
+
+    # 3. Nearest inside left-boundary bar at t - 24h (t_b1 - W + 1h):
+    # Setting extreme high on t - 24h DOES alter U, preventing break on b1
+    bars_mut = dict(bars)
+    bars_mut[(t - timedelta(hours=24), "ETHUSDT")] = _Bar(
+        t - timedelta(hours=24), "ETHUSDT", 100.0, 999999.0, 95.0, 100.0,
+    )
+    assert _compute_d3(bars_mut, t, "ETHUSDT", 24) == 0.0
+
+    # 4. Downward break at b1, close back inside at b2 -> LONG (+1.0)
+    bars[(t - timedelta(hours=2), "ETHUSDT")] = _Bar(t - timedelta(hours=2), "ETHUSDT", 96.0, 97.0, 92.0, 93.0)
+    bars[(t - timedelta(hours=1), "ETHUSDT")] = _Bar(t - timedelta(hours=1), "ETHUSDT", 94.0, 98.0, 93.0, 96.0)
+    assert _compute_d3(bars, t, "ETHUSDT", 24) == 1.0
+
+    # 5. Strict re-entry: C(b2) == U or C(b2) == L is NOT a close-back
+    # Upward break (C1 = 106 > U=105), but C2 == U (105.0) -> NOT a close-back -> 0.0
+    bars[(t - timedelta(hours=2), "ETHUSDT")] = _Bar(t - timedelta(hours=2), "ETHUSDT", 104.0, 108.0, 103.0, 106.0)
+    bars[(t - timedelta(hours=1), "ETHUSDT")] = _Bar(t - timedelta(hours=1), "ETHUSDT", 105.0, 106.0, 104.0, 105.0)
+    assert _compute_d3(bars, t, "ETHUSDT", 24) == 0.0
+
+    # 6. D3 72H window: reference bars k = 3..72. Sentinel at t - 73h is ignored.
+    bars_72: dict[tuple[datetime, str], _Bar] = {
+        (t - timedelta(hours=2), "ETHUSDT"): _Bar(t - timedelta(hours=2), "ETHUSDT", 104.0, 108.0, 103.0, 106.0),
+        (t - timedelta(hours=1), "ETHUSDT"): _Bar(t - timedelta(hours=1), "ETHUSDT", 105.0, 105.0, 103.0, 104.0),
+    }
+    for k in range(3, 73):
+        dt = t - timedelta(hours=k)
+        bars_72[(dt, "ETHUSDT")] = _Bar(dt, "ETHUSDT", 100.0, 105.0, 95.0, 100.0)
+    # Sentinel at t - 73h (t_b1 - 72h)
+    bars_72[(t - timedelta(hours=73), "ETHUSDT")] = _Bar(
+        t - timedelta(hours=73), "ETHUSDT", 100.0, 999999.0, 0.001, 100.0,
+    )
+    assert _compute_d3(bars_72, t, "ETHUSDT", 72) == -1.0
+
 
 def test_f03_24_verifier_derived_r_vol_matches_r3r2() -> None:
     t = datetime(2022, 6, 1, 12, tzinfo=UTC)
+    # Exactly 24 complete hourly bars strictly before t: k = 1..24
     bars: dict[tuple[datetime, str], _Bar] = {}
     for k in range(1, 25):
         dt = t - timedelta(hours=k)
@@ -809,9 +1149,35 @@ def test_f03_24_verifier_derived_r_vol_matches_r3r2() -> None:
     rv = _compute_r_vol_scalar(bars, t, "ETHUSDT")
     assert rv is not None and rv > 0.0
 
+    # Boundary sentinels:
+    # Mutating bar at t - 25h (outside 24h window) has NO effect
+    bars_sentinel = dict(bars)
+    bars_sentinel[(t - timedelta(hours=25), "ETHUSDT")] = _Bar(
+        t - timedelta(hours=25), "ETHUSDT", 999.0, 9999.0, 1.0, 999.0,
+    )
+    assert _compute_r_vol_scalar(bars_sentinel, t, "ETHUSDT") == rv
+
+    # Mutating bar at t - 24h (included left boundary) DOES alter rv
+    bars_mut_left = dict(bars)
+    bars_mut_left[(t - timedelta(hours=24), "ETHUSDT")] = _Bar(
+        t - timedelta(hours=24), "ETHUSDT", 200.0, 205.0, 195.0, 200.0,
+    )
+    assert _compute_r_vol_scalar(bars_mut_left, t, "ETHUSDT") != rv
+
+    # Mutating bar at t - 1h (included right boundary) DOES alter rv
+    bars_mut_right = dict(bars)
+    bars_mut_right[(t - timedelta(hours=1), "ETHUSDT")] = _Bar(
+        t - timedelta(hours=1), "ETHUSDT", 200.0, 205.0, 195.0, 200.0,
+    )
+    assert _compute_r_vol_scalar(bars_mut_right, t, "ETHUSDT") != rv
+
+    # If any bar is missing, returns None
+    bars_missing = dict(bars)
+    del bars_missing[(t - timedelta(hours=10), "ETHUSDT")]
+    assert _compute_r_vol_scalar(bars_missing, t, "ETHUSDT") is None
+
     # Percentile mapping
     sample = [0.01 * i for i in range(1, 101)]
-    # rv in 40th to 60th percentile -> REGIME_VOL_MID
     p45 = sample[45]
     pct = _empirical_percentile(sample, p45)
     assert 0.40 <= pct < 0.60
@@ -819,14 +1185,41 @@ def test_f03_24_verifier_derived_r_vol_matches_r3r2() -> None:
 
 def test_f03_25_verifier_derived_o_range_matches_r3r2() -> None:
     t = datetime(2022, 6, 1, 12, tzinfo=UTC)
+    # Exactly 25 bars: 24 reference bars (k = 2..25) + 1 last bar (k = 1)
+    # plus prior bar k = 26 for C_{k-1}
     bars: dict[tuple[datetime, str], _Bar] = {}
-    for k in range(1, 26):
+    for k in range(1, 27):
         dt = t - timedelta(hours=k)
         bars[(dt, "ETHUSDT")] = _Bar(dt, "ETHUSDT", 100.0, 102.0, 98.0, 100.0)
 
     ratio = _compute_o_range_scalar(bars, t, "ETHUSDT")
     assert ratio is not None
     assert ratio == pytest.approx(1.0)
+
+    # Sentinel at t - 27h (outside 26h window) has NO effect
+    bars_sentinel = dict(bars)
+    bars_sentinel[(t - timedelta(hours=27), "ETHUSDT")] = _Bar(
+        t - timedelta(hours=27), "ETHUSDT", 999.0, 9999.0, 1.0, 999.0,
+    )
+    assert _compute_o_range_scalar(bars_sentinel, t, "ETHUSDT") == pytest.approx(1.0)
+
+    # Mutating bar at t - 25h DOES change ratio
+    bars_mut = dict(bars)
+    bars_mut[(t - timedelta(hours=25), "ETHUSDT")] = _Bar(
+        t - timedelta(hours=25), "ETHUSDT", 100.0, 110.0, 90.0, 100.0,
+    )
+    assert _compute_o_range_scalar(bars_mut, t, "ETHUSDT") != pytest.approx(1.0)
+
+    # Mutating test bar at t - 1h DOES change ratio
+    bars_mut_last = dict(bars)
+    bars_mut_last[(t - timedelta(hours=1), "ETHUSDT")] = _Bar(
+        t - timedelta(hours=1), "ETHUSDT", 100.0, 110.0, 90.0, 100.0,
+    )
+    assert _compute_o_range_scalar(bars_mut_last, t, "ETHUSDT") != pytest.approx(1.0)
+
+    # If fewer than 25 bars present, returns None
+    bars_fewer = {k: v for k, v in bars.items() if k[0] >= t - timedelta(hours=20)}
+    assert _compute_o_range_scalar(bars_fewer, t, "ETHUSDT") is None
 
 
 def test_f03_26_secondary_filter_matches_r3r2() -> None:
