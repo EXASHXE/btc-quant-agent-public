@@ -1,0 +1,21 @@
+=== Tool Executable Provenance ===
+command -v python: /root/miniconda3/bin/python
+Python 3.13.13
+command -v pytest: /root/miniconda3/bin/pytest
+pytest 8.4.2
+command -v ruff: /root/.gemini/antigravity-cli/brain/ddcd507e-c92c-4c98-b74b-7fceda57e105/scratch/ruff_bin/ruff
+ruff 0.16.6
+command -v mypy: /root/miniconda3/bin/mypy
+mypy 1.20.2 (compiled: yes)
+=== Worktree Provenance ===
+worktree_path: /root/workspace/project/Quant-agent-sanitized
+git_head_sha: f3678676265ba53e1d874e27bc0c922c7783acaa
+=== Python Import Provenance ===
+python_executable: /root/miniconda3/bin/python3
+btc_quant_agent: /root/workspace/project/Quant-agent-sanitized/src/btc_quant_agent/__init__.py
+btc_quant_agent_relative_to_cwd: True
+pyarrow_version: 23.0.1
+pyarrow_location: /root/miniconda3/lib/python3.13/site-packages/pyarrow/__init__.py
+pytest_version: 8.4.2
+pytest_location: /root/miniconda3/lib/python3.13/site-packages/pytest/__init__.py
+exit_code: 0

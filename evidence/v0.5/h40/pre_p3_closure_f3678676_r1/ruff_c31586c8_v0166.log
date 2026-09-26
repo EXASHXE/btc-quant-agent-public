@@ -1,0 +1,228 @@
+git rev-parse HEAD:
+c31586c80130693c118c150a4e06c9573ff0053d
+git status --short:
+command -v ruff:
+/root/.gemini/antigravity-cli/brain/ddcd507e-c92c-4c98-b74b-7fceda57e105/scratch/ruff_bin/ruff
+ruff --version:
+ruff 0.16.6
+sha256 of pyproject.toml:
+78c40cae6799d61e95ccf91b3c27df94ee7c1925a370f827d8e32a731245fb70  pyproject.toml
+ruff check . output:
+RUF100 [*] Unused `noqa` directive (non-enabled: `E402`)
+  --> tests/test_v051_h40_f01r3r1_durable_authority.py:51:54
+   |
+49 |     sys.path.insert(0, _TESTS_DIR)
+50 |
+51 | from test_v051_h40_f01_lifecycle_authority import (  # noqa: E402
+   |                                                      ^^^^^^^^^^^^
+52 |     TS,
+53 |     _build_discovery_chain,
+   |
+help: Remove unused `noqa` directive
+   |
+50 |
+   - from test_v051_h40_f01_lifecycle_authority import (  # noqa: E402
+51 + from test_v051_h40_f01_lifecycle_authority import (
+52 |     TS,
+   |
+
+RUF100 [*] Unused `noqa` directive (non-enabled: `E402`)
+  --> tests/test_v051_h40_f01r3r2_commit_authority.py:56:54
+   |
+54 |     sys.path.insert(0, _TESTS_DIR)
+55 |
+56 | from test_v051_h40_f01_lifecycle_authority import (  # noqa: E402
+   |                                                      ^^^^^^^^^^^^
+57 |     TS,
+58 |     _build_discovery_chain,
+   |
+help: Remove unused `noqa` directive
+   |
+55 |
+   - from test_v051_h40_f01_lifecycle_authority import (  # noqa: E402
+56 + from test_v051_h40_f01_lifecycle_authority import (
+57 |     TS,
+   |
+
+RUF100 [*] Unused `noqa` directive (non-enabled: `E402`)
+  --> tests/test_v051_h40_f01r3r3_api_seal.py:52:54
+   |
+50 |     sys.path.insert(0, _TESTS_DIR)
+51 |
+52 | from test_v051_h40_f01_lifecycle_authority import (  # noqa: E402
+   |                                                      ^^^^^^^^^^^^
+53 |     TS,
+54 |     _build_discovery_chain,
+   |
+help: Remove unused `noqa` directive
+   |
+51 |
+   - from test_v051_h40_f01_lifecycle_authority import (  # noqa: E402
+52 + from test_v051_h40_f01_lifecycle_authority import (
+53 |     TS,
+   |
+
+I001 [*] Import block is un-sorted or un-formatted
+  --> tests/test_v051_h40_repair_b_provenance_pit.py:9:1
+   |
+ 7 |   """
+ 8 |
+ 9 | / from __future__ import annotations
+10 | |
+11 | | import copy
+12 | | import hashlib
+13 | | import json
+14 | | import math
+15 | | from datetime import UTC, datetime, timedelta
+16 | | from pathlib import Path
+17 | | from types import SimpleNamespace
+18 | | from typing import Any
+19 | |
+20 | | import pytest
+21 | |
+22 | | from btc_quant_agent.execution.environment import (
+23 | |     ACCEPTED_EXECUTION_WRITE_AUTHORITY,
+24 | |     CURRENT_EXECUTION_POLICY,
+25 | | )
+26 | | from btc_quant_agent.h40 import (
+27 | |     ACCEPTED_H40_P3_CONTROLLER_AUTHORITY_HASH,
+28 | |     ACCEPTED_LIFECYCLE_IMPLEMENTATION_AUTHORITY_HASH,
+29 | |     DISCOVERY_PROVENANCE_CONTRACT_HASH,
+30 | |     DISCOVERY_SELECTION_CORRECTION_CONTRACT_HASH,
+31 | |     EXPECTED_LIFECYCLE_CHILD_HASHES,
+32 | |     EXPECTED_LIFECYCLE_GOVERNANCE_AUTHORITY_HASH,
+33 | |     EXPECTED_LIFECYCLE_SEMANTIC_ROOT_HASH,
+34 | |     H40ActiveSourceEvidenceEntry,
+35 | |     H40ConfirmationGuard,
+36 | |     H40DiscoveryAuthorizationReceipt,
+37 | |     H40DiscoveryAuthorizationReceiptV2,
+38 | |     H40DiscoveryEvidenceResolver,
+39 | |     H40GuardError,
+40 | |     H40LifecycleArtifactStore,
+41 | |     H40LifecycleAuthorityService,
+42 | |     H40LifecycleImplementationAuthority,
+43 | |     H40LifecyclePersistenceContextV1,
+44 | |     H40ProductionDiscoveryEvidenceVerifier,
+45 | |     H40ProtectedSurfaceGuard,
+46 | |     H40ReasonCode,
+47 | |     H40RequiredTestCIEvidenceIdentity,
+48 | |     H40RuntimeSnapshotSeal,
+49 | |     H40SourceManifest,
+50 | |     H40SourceRecord,
+51 | |     H40SourceStatus,
+52 | |     H40SourceValidationReceipt,
+53 | |     H40SplitManifest,
+54 | |     compute_lifecycle_child_hashes,
+55 | |     compute_lifecycle_governance_authority_hash,
+56 | |     compute_lifecycle_semantic_root_hash,
+57 | |     compute_protocol_authority_hash,
+58 | |     materialize_h40_search_space_production,
+59 | | )
+60 | | from btc_quant_agent.h40.discovery_evidence import (
+61 | |     _POLICIES,
+62 | |     _PREFIT_CACHE,
+63 | |     _Bar,
+64 | |     _Decision,
+65 | |     _compute_d1,
+66 | |     _compute_d2,
+67 | |     _compute_d3,
+68 | |     _compute_o_range_scalar,
+69 | |     _compute_r_vol_scalar,
+70 | |     _empirical_percentile,
+71 | |     _extract_economic_rows,
+72 | |     _load_decisions,
+73 | |     _load_source_bars,
+74 | |     _reconstruct_prefit_cached,
+75 | |     clear_prefit_caches,
+76 | |     h40_fit_calibrator,
+77 | |     h40_predict_calibrated,
+78 | |     h40_proxy_net_return,
+79 | |     h40_side_preserving_action,
+80 | | )
+81 | | from btc_quant_agent.h40.split_manifest import H40Partition, H40PartitionType
+82 | | from btc_quant_agent.research_contract.canonical import canonical_json, canonical_sha256
+   | |________________________________________________________________________________________^
+help: Organize imports
+   |
+63 |     _Bar,
+   -     _Decision,
+64 |     _compute_d1,
+--------------------------------------------------------------------------------
+68 |     _compute_r_vol_scalar,
+69 +     _Decision,
+70 |     _empirical_percentile,
+   |
+
+FURB162 Unnecessary timezone replacement with zero offset
+   --> tests/test_v051_h40_repair_b_provenance_pit.py:154:52
+    |
+152 |         }
+153 |         for b in bars
+154 |         if support_start <= datetime.fromisoformat(b["timestamp"].replace("Z", "+00:00")) < support_end
+    |                                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+155 |     ]
+156 |     economic_digest = canonical_sha256(canonical_rows)
+    |
+help: Remove `.replace()` call
+
+RUF059 Unpacked variable `canon_rows` is never used
+   --> tests/test_v051_h40_repair_b_provenance_pit.py:550:26
+    |
+549 |     source_file = tmp_path / "ETHUSDT.json"
+550 |     raw_bytes, file_sha, canon_rows, exp_digest, exp_count = _write_json_source(source_file, all_bars)
+    |                          ^^^^^^^^^^
+551 |
+552 |     # 1. Whole-file SHA includes all bytes (pre, inside, post)
+    |
+help: Prefix it with an underscore or any other dummy variable pattern
+
+FURB162 Unnecessary timezone replacement with zero offset
+   --> tests/test_v051_h40_repair_b_provenance_pit.py:568:37
+    |
+566 |         assert datetime(2021, 1, 1, tzinfo=UTC) <= b.timestamp < datetime(2023, 2, 1, tzinfo=UTC)
+567 |     for r in canon:
+568 |         dt = datetime.fromisoformat(r["timestamp"].replace("Z", "+00:00"))
+    |                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+569 |         assert datetime(2021, 1, 1, tzinfo=UTC) <= dt < datetime(2023, 2, 1, tzinfo=UTC)
+    |
+help: Remove `.replace()` call
+
+RUF059 Unpacked variable `repeat_bars` is never used
+   --> tests/test_v051_h40_repair_b_provenance_pit.py:574:5
+    |
+572 |     computed_digest = canonical_sha256(canon)
+573 |     assert computed_digest == exp_digest
+574 |     repeat_bars, repeat_canon = _extract_economic_rows(
+    |     ^^^^^^^^^^^
+575 |         source_file, raw_bytes, "ETHUSDT", "1h", "timestamp",
+576 |     )
+    |
+help: Prefix it with an underscore or any other dummy variable pattern
+
+RUF059 Unpacked variable `record` is never used
+   --> tests/test_v051_h40_repair_b_provenance_pit.py:772:34
+    |
+770 |     all_bars = bars_inside + bars_post
+771 |
+772 |     seal, manifest, attestation, record, receipt, file_sha, exp_digest, exp_count = (
+    |                                  ^^^^^^
+773 |         _make_production_test_seal_and_context(tmp_path, all_bars)
+774 |     )
+    |
+help: Prefix it with an underscore or any other dummy variable pattern
+
+FURB162 Unnecessary timezone replacement with zero offset
+   --> tests/test_v051_h40_repair_b_provenance_pit.py:850:42
+    |
+848 |     assert len(bars_map) == 10
+849 |     for b_post in bars_post:
+850 |         dt_post = datetime.fromisoformat(b_post["timestamp"].replace("Z", "+00:00"))
+    |                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+851 |         assert (dt_post, "ETHUSDT") not in bars_map
+852 |     assert len(universes["WF1_TRAIN"]) == 10
+    |
+help: Remove `.replace()` call
+
+Found 10 errors.
+[*] 4 fixable with the `--fix` option (6 hidden fixes can be enabled with the `--unsafe-fixes` option).
+exit_code: 1

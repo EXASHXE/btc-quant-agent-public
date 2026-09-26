@@ -1,0 +1,30 @@
+=== Identity Replay Independent Execution Run 2 ===
+execution_timestamp_utc: 2026-09-26T17:57:45.773438+00:00
+python_executable: /root/miniconda3/bin/python3
+{
+  "accepted_execution_write_authority": null,
+  "accepted_h40_p3_controller_authority_hash": null,
+  "accepted_lifecycle_implementation_authority_hash": null,
+  "current_execution_policy": "RESEARCH_DISABLED_V1",
+  "discovery_provenance_contract_hash": "31fc3930e44149e6b3af54ddd3b11c630f95cbbd3f152b3d0d5e614690dcf7ae",
+  "lifecycle_child_hashes_9_of_9": {
+    "candidate_lock_receipt_contract": "96756dfebab636baa1abb33364e307d99d90a61572b813c6a60504283d3d42df",
+    "confirmation_ready_receipt_contract": "7ab0ae0c8acb17340eccaa2bb737a5300e679b8de7497a539bdc44e93d3109be",
+    "discovery_authorization_receipt_contract": "3dd91827d4a26441bd5218dc299f196841c471eb60f20e03881d2ad56ce36898",
+    "f02_boundary_contract": "5678d8bd6b83bb69e1a1ad2cf78af8ddbaece625a5a34b7018b0a5e6368756f4",
+    "persistence_replay_contract": "51e4fe6155d388c076dd1788a100265eb17b232300481a3fbcf00150f1432de1",
+    "runtime_snapshot_seal_contract": "76a0732742707c78f65da26263076bed7b586ea67d4f5ddd2dac33761e37e612",
+    "termination_receipt_contract": "b45c7021db1c63a447ddb22a1f9cb787ce71a5048c824ce38d40f19f755ecb48",
+    "transition_matrix_contract": "bea7b0593251204bbc9138c325f1c9f10ccf7a9b8df60f10bf991377e0ced42d",
+    "wf_validation_receipt_contract": "bb5698a85daec1a5b9dcd169bde3d575befe8c0a1d73c2e87136cf35afb4001b"
+  },
+  "lifecycle_governance_authority_v5": "bb367f2af726be105bddf42636c97652402014c8a671d43ab81b1964c258e5cf",
+  "lifecycle_semantic_root_v5": "36cbda530352cffaa475bd835b3b629df47351ca284e09bdf31a8fc884d48b4b",
+  "protocol_authority_hash": "a83f8fc7a5ca7109fb8cd7fed114d87c3b2c968b5145c11cada203aa5111d1ce",
+  "scientific_semantic_root": "71889a35f227ed734272b712851174a69bf9dbb12ea3f87cd84c26e7c66f6af1",
+  "search_space_registered_slots": 18,
+  "search_space_total_slots": 168,
+  "structural_ledger_hash": "483f68502b57972deae071c7bd4587ca3e57ccaa72bd99fb0de07b4f0ab8c85f"
+}
+REPLAY_AND_IDENTITIES_MATCH: PASS
+exit_code: 0

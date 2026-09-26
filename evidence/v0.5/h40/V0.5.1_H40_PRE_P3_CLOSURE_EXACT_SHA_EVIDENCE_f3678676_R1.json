@@ -1,0 +1,367 @@
+{
+  "schema_id": "H40_PRE_P3_CLOSURE_EXACT_SHA_EVIDENCE_V2",
+  "generated_at_utc": "2026-09-26T18:01:20Z",
+  "supersedes_rejected_evidence_commit": "0920ab1b21a94c3e10e4028212335896b2fe5fcf",
+  "controller_blocker_commit": "33058e9368a82fdc52fd88e6ea407a7c3aaaa596",
+  "tested_commit_sha": "f3678676265ba53e1d874e27bc0c922c7783acaa",
+  "implementation_remote_branch_sha": "f3678676265ba53e1d874e27bc0c922c7783acaa",
+  "decision_path": "PATH_A",
+  "tool_provenance": {
+    "status": "PASS",
+    "python_executable": "/root/miniconda3/bin/python",
+    "python_version": "3.13.13",
+    "pytest_executable": "/root/miniconda3/bin/pytest",
+    "pytest_version": "8.4.2",
+    "ruff_executable": "/root/.gemini/antigravity-cli/brain/ddcd507e-c92c-4c98-b74b-7fceda57e105/scratch/ruff_bin/ruff",
+    "ruff_version": "0.16.6",
+    "mypy_executable": "/root/miniconda3/bin/mypy",
+    "mypy_version": "1.20.2",
+    "pyproject_sha256": "78c40cae6799d61e95ccf91b3c27df94ee7c1925a370f827d8e32a731245fb70",
+    "btc_quant_agent_location": "/root/workspace/project/Quant-agent-sanitized/src/btc_quant_agent/__init__.py",
+    "btc_quant_agent_relative_to_cwd": true,
+    "pyarrow_location": "/root/miniconda3/lib/python3.13/site-packages/pyarrow/__init__.py",
+    "pyarrow_version": "23.0.1",
+    "pytest_location": "/root/miniconda3/lib/python3.13/site-packages/pytest/__init__.py",
+    "raw_log": "import_provenance.log",
+    "raw_log_sha256": "68cf24c77e17094387703c49a3f1a8e1937ccf613b0e49bab8050f93972fbae8"
+  },
+  "ruff_reconciliation": {
+    "path_taken": "PATH_A",
+    "ruff_executable": "/root/.gemini/antigravity-cli/brain/ddcd507e-c92c-4c98-b74b-7fceda57e105/scratch/ruff_bin/ruff",
+    "ruff_version": "0.16.6",
+    "pyproject_sha256": "78c40cae6799d61e95ccf91b3c27df94ee7c1925a370f827d8e32a731245fb70",
+    "baseline_commit_c31586c8": {
+      "status": "RECORDED_BASELINE_DIAGNOSTICS_10",
+      "diagnostics_count": 10,
+      "raw_log": "ruff_c31586c8_v0166.log",
+      "raw_log_sha256": "32fc2a37873b6e571b7872c50f674684254d4fa9f75c7bf88b8863ec8b62482f"
+    },
+    "target_commit_f3678676": {
+      "status": "PASS",
+      "diagnostics_count": 0,
+      "raw_log": "ruff_f3678676_v0166.log",
+      "raw_log_sha256": "62a1c27655de12fc22994e17ca248db7fa5400899f3fc3f5068cad3582edb95d"
+    },
+    "reconciliation_explanation": "Empirical execution of pinned Ruff 0.16.6 on clean worktree c31586c8 reproduces exactly 10 diagnostics across 4 files: RUF100 in test_v051_h40_f01r3r1_durable_authority.py:51, test_v051_h40_f01r3r2_commit_authority.py:56, and test_v051_h40_f01r3r3_api_seal.py:52; and 7 diagnostics in test_v051_h40_repair_b_provenance_pit.py (I001 at line 9, FURB162 at lines 154, 568, 850, and RUF059 at lines 550, 574, 772). The prior deep audit narrative had misattributed these 10 diagnostics to test_v0320, test_v0323, and test_v0324. The implementation commit f3678676 modified precisely these 4 test files to resolve all 10 diagnostics (reorganizing imports to top of file, sorting imports, removing redundant timezone replacements, and prefixing unused unpacked tuple variables with underscores), achieving 0 diagnostics under Ruff 0.16.6.",
+    "disappearing_diagnostics_accounting": [
+      {
+        "rule": "RUF100",
+        "file": "tests/test_v051_h40_f01r3r1_durable_authority.py",
+        "line": 51,
+        "remediation": "Relocated imports to module header, eliminating sys.path.insert and unused noqa: E402 directive"
+      },
+      {
+        "rule": "RUF100",
+        "file": "tests/test_v051_h40_f01r3r2_commit_authority.py",
+        "line": 56,
+        "remediation": "Relocated imports to module header, eliminating sys.path.insert and unused noqa: E402 directive"
+      },
+      {
+        "rule": "RUF100",
+        "file": "tests/test_v051_h40_f01r3r3_api_seal.py",
+        "line": 52,
+        "remediation": "Relocated imports to module header, eliminating sys.path.insert and unused noqa: E402 directive"
+      },
+      {
+        "rule": "I001",
+        "file": "tests/test_v051_h40_repair_b_provenance_pit.py",
+        "line": 9,
+        "remediation": "Sorted import block for btc_quant_agent.h40.discovery_evidence symbols"
+      },
+      {
+        "rule": "FURB162",
+        "file": "tests/test_v051_h40_repair_b_provenance_pit.py",
+        "line": 154,
+        "remediation": "Removed unnecessary .replace('Z', '+00:00') on ISO string"
+      },
+      {
+        "rule": "RUF059",
+        "file": "tests/test_v051_h40_repair_b_provenance_pit.py",
+        "line": 550,
+        "remediation": "Prefixed unused unpacked tuple variable with underscore (_canon_rows)"
+      },
+      {
+        "rule": "FURB162",
+        "file": "tests/test_v051_h40_repair_b_provenance_pit.py",
+        "line": 568,
+        "remediation": "Removed unnecessary .replace('Z', '+00:00') on ISO string"
+      },
+      {
+        "rule": "RUF059",
+        "file": "tests/test_v051_h40_repair_b_provenance_pit.py",
+        "line": 574,
+        "remediation": "Prefixed unused unpacked tuple variable with underscore (_repeat_bars)"
+      },
+      {
+        "rule": "RUF059",
+        "file": "tests/test_v051_h40_repair_b_provenance_pit.py",
+        "line": 772,
+        "remediation": "Prefixed unused unpacked tuple variable with underscore (_record)"
+      },
+      {
+        "rule": "FURB162",
+        "file": "tests/test_v051_h40_repair_b_provenance_pit.py",
+        "line": 850,
+        "remediation": "Removed unnecessary .replace('Z', '+00:00') on ISO string"
+      }
+    ]
+  },
+  "changed_files": [
+    "src/btc_quant_agent/h40/discovery_evidence.py",
+    "src/btc_quant_agent/h40/lifecycle_authority.py",
+    "tests/test_v051_h40_f01_lifecycle_authority.py",
+    "tests/test_v051_h40_f01r3r1_durable_authority.py",
+    "tests/test_v051_h40_f01r3r2_commit_authority.py",
+    "tests/test_v051_h40_f01r3r3_api_seal.py",
+    "tests/test_v051_h40_implementation_authority_publication.py",
+    "tests/test_v051_h40_p3b_production_verifier_behavior_seal.py",
+    "tests/test_v051_h40_repair_a_lifecycle_authority.py",
+    "tests/test_v051_h40_repair_b_provenance_pit.py"
+  ],
+  "med_01_closure": {
+    "status": "CLOSED",
+    "description": "In src/btc_quant_agent/h40/discovery_evidence.py, the Parquet branch of _extract_economic_rows parses raw_bytes in memory via pyarrow.parquet.read_table(pa.BufferReader(raw_bytes)) without reopening file_path",
+    "regressions": [
+      "tests/test_v051_h40_repair_b_provenance_pit.py::test_med_01_parquet_in_memory_parsing_adversarial"
+    ]
+  },
+  "med_02_ratification_regression": {
+    "status": "RATIFIED_INTERPRETATION_A_LOCKED_BY_REGRESSION",
+    "interpretation": "H40_WF1_LOOKBACK_REFERENCE_INTERPRETATION_A",
+    "description": "Controller-ratified Interpretation A: 720h pre-train lookback reserve observations [2021-01-01, 2021-01-31) contribute causally to the expanding WF1_TRAIN percentile reference if observation_time < decision_t, but never enter base-eligible membership or evaluation rows",
+    "regressions": [
+      "tests/test_v051_h40_repair_b_provenance_pit.py::test_med_02_lookback_reserve_interpretation_a_regressions"
+    ]
+  },
+  "authority_stage_state": {
+    "status": "PASS",
+    "accepted_lifecycle_implementation_authority_hash": null,
+    "accepted_h40_p3_controller_authority_hash": null,
+    "current_execution_policy": "RESEARCH_DISABLED_V1",
+    "accepted_execution_write_authority": null,
+    "h40_discovery_not_authorized": true,
+    "h40_p3_not_authorized": true,
+    "fail_closed_status": "LIFECYCLE_IMPLEMENTATION_AUTHORITY_REVOKED_PENDING_CONTROLLER_EXACT_SHA_ACCEPTANCE",
+    "raw_log": "authority_stage_state.log",
+    "raw_log_sha256": "2eb3cb08736562ee1773848fc6c789c6f76e34d0015665101ad972a2f5b79617"
+  },
+  "static_gate_results": {
+    "git_diff_check": {
+      "status": "PASS",
+      "exit_code": 0,
+      "raw_log": "static_git_diff.log",
+      "raw_log_sha256": "849b5308ba7bcccd173022e0041ad23d29f0c18d9443404c8beff30520eed937"
+    },
+    "compileall": {
+      "status": "PASS",
+      "exit_code": 0,
+      "raw_log": "static_compileall.log",
+      "raw_log_sha256": "849b5308ba7bcccd173022e0041ad23d29f0c18d9443404c8beff30520eed937"
+    },
+    "ruff": {
+      "status": "PASS",
+      "exit_code": 0,
+      "raw_log": "static_ruff.log",
+      "raw_log_sha256": "d733ecc74d4ab2d642a3c6f49a5aad6e00089d00f05cd1b431708f2b8f5c4e2c"
+    },
+    "mypy": {
+      "status": "PASS",
+      "exit_code": 0,
+      "raw_log": "static_mypy.log",
+      "raw_log_sha256": "4432d5230e8602d6d8111f717ac5614553447bdf350099abc612f92836b0d423"
+    }
+  },
+  "focused_results": {
+    "status": "PASS",
+    "exit_code": 0,
+    "passed_count": 408,
+    "failed_count": 0,
+    "raw_log": "focused_tests.log",
+    "raw_log_sha256": "77211f7f15bd3397bbcf7aa7e341d6d04603e27b014377d96fb8397461f5f7c3"
+  },
+  "full_pytest_runs": {
+    "run_1": {
+      "status": "PASS",
+      "exit_code": 0,
+      "passed_count": 1698,
+      "failed_count": 0,
+      "warnings_count": 9,
+      "raw_log": "full_suite_run_1.log",
+      "raw_log_sha256": "3c29a77a8ffa0ad235da6570cc97e5a93168d216a490afe9128bba20f058908b"
+    },
+    "run_2": {
+      "status": "PASS",
+      "exit_code": 0,
+      "passed_count": 1698,
+      "failed_count": 0,
+      "warnings_count": 9,
+      "raw_log": "full_suite_run_2.log",
+      "raw_log_sha256": "0cfdbbc8656ff7bbe33488a5a59af32e4b962eeebd9837cb42c2c9c11329e09c"
+    }
+  },
+  "identity_replay_run_1": {
+    "status": "PASS",
+    "protocol_authority_hash": "a83f8fc7a5ca7109fb8cd7fed114d87c3b2c968b5145c11cada203aa5111d1ce",
+    "scientific_semantic_root": "71889a35f227ed734272b712851174a69bf9dbb12ea3f87cd84c26e7c66f6af1",
+    "structural_ledger_hash": "483f68502b57972deae071c7bd4587ca3e57ccaa72bd99fb0de07b4f0ab8c85f",
+    "discovery_provenance_contract_hash": "31fc3930e44149e6b3af54ddd3b11c630f95cbbd3f152b3d0d5e614690dcf7ae",
+    "lifecycle_semantic_root_v5": "36cbda530352cffaa475bd835b3b629df47351ca284e09bdf31a8fc884d48b4b",
+    "lifecycle_governance_authority_v5": "bb367f2af726be105bddf42636c97652402014c8a671d43ab81b1964c258e5cf",
+    "lifecycle_child_hashes_9_of_9": {
+      "discovery_authorization_receipt_contract": "3dd91827d4a26441bd5218dc299f196841c471eb60f20e03881d2ad56ce36898",
+      "candidate_lock_receipt_contract": "96756dfebab636baa1abb33364e307d99d90a61572b813c6a60504283d3d42df",
+      "wf_validation_receipt_contract": "bb5698a85daec1a5b9dcd169bde3d575befe8c0a1d73c2e87136cf35afb4001b",
+      "confirmation_ready_receipt_contract": "7ab0ae0c8acb17340eccaa2bb737a5300e679b8de7497a539bdc44e93d3109be",
+      "termination_receipt_contract": "b45c7021db1c63a447ddb22a1f9cb787ce71a5048c824ce38d40f19f755ecb48",
+      "transition_matrix_contract": "bea7b0593251204bbc9138c325f1c9f10ccf7a9b8df60f10bf991377e0ced42d",
+      "persistence_replay_contract": "51e4fe6155d388c076dd1788a100265eb17b232300481a3fbcf00150f1432de1",
+      "runtime_snapshot_seal_contract": "76a0732742707c78f65da26263076bed7b586ea67d4f5ddd2dac33761e37e612",
+      "f02_boundary_contract": "5678d8bd6b83bb69e1a1ad2cf78af8ddbaece625a5a34b7018b0a5e6368756f4"
+    },
+    "search_space_total_slots": 168,
+    "search_space_registered_slots": 18,
+    "raw_log": "identity_replay_run_1.log",
+    "raw_log_sha256": "9c4ca441b2045e40733469765217521e19b8e8078206e3a55c3c48f18b19e5d5"
+  },
+  "identity_replay_run_2": {
+    "status": "PASS",
+    "protocol_authority_hash": "a83f8fc7a5ca7109fb8cd7fed114d87c3b2c968b5145c11cada203aa5111d1ce",
+    "scientific_semantic_root": "71889a35f227ed734272b712851174a69bf9dbb12ea3f87cd84c26e7c66f6af1",
+    "structural_ledger_hash": "483f68502b57972deae071c7bd4587ca3e57ccaa72bd99fb0de07b4f0ab8c85f",
+    "discovery_provenance_contract_hash": "31fc3930e44149e6b3af54ddd3b11c630f95cbbd3f152b3d0d5e614690dcf7ae",
+    "lifecycle_semantic_root_v5": "36cbda530352cffaa475bd835b3b629df47351ca284e09bdf31a8fc884d48b4b",
+    "lifecycle_governance_authority_v5": "bb367f2af726be105bddf42636c97652402014c8a671d43ab81b1964c258e5cf",
+    "lifecycle_child_hashes_9_of_9": {
+      "discovery_authorization_receipt_contract": "3dd91827d4a26441bd5218dc299f196841c471eb60f20e03881d2ad56ce36898",
+      "candidate_lock_receipt_contract": "96756dfebab636baa1abb33364e307d99d90a61572b813c6a60504283d3d42df",
+      "wf_validation_receipt_contract": "bb5698a85daec1a5b9dcd169bde3d575befe8c0a1d73c2e87136cf35afb4001b",
+      "confirmation_ready_receipt_contract": "7ab0ae0c8acb17340eccaa2bb737a5300e679b8de7497a539bdc44e93d3109be",
+      "termination_receipt_contract": "b45c7021db1c63a447ddb22a1f9cb787ce71a5048c824ce38d40f19f755ecb48",
+      "transition_matrix_contract": "bea7b0593251204bbc9138c325f1c9f10ccf7a9b8df60f10bf991377e0ced42d",
+      "persistence_replay_contract": "51e4fe6155d388c076dd1788a100265eb17b232300481a3fbcf00150f1432de1",
+      "runtime_snapshot_seal_contract": "76a0732742707c78f65da26263076bed7b586ea67d4f5ddd2dac33761e37e612",
+      "f02_boundary_contract": "5678d8bd6b83bb69e1a1ad2cf78af8ddbaece625a5a34b7018b0a5e6368756f4"
+    },
+    "search_space_total_slots": 168,
+    "search_space_registered_slots": 18,
+    "raw_log": "identity_replay_run_2.log",
+    "raw_log_sha256": "db8866d2fee68cf85cb7da74d506d1ab02c1994d96f3007842839077e1a0a52a"
+  },
+  "protected_surface_attestation": {
+    "real_h40_outcomes_accessed": false,
+    "wf1_calibration_outcomes_accessed_for_authoring_or_selection": false,
+    "confirmation_accessed": false,
+    "h39_accessed": false,
+    "final_holdout_accessed": false,
+    "execution_credentials_or_order_interfaces_accessed": false,
+    "signed_network_requests": 0
+  },
+  "raw_log_integrity_table": [
+    {
+      "log_path": "authority_stage_state.log",
+      "sha256": "2eb3cb08736562ee1773848fc6c789c6f76e34d0015665101ad972a2f5b79617",
+      "exit_code": 0,
+      "manifest_status": "PASS",
+      "consistent": true
+    },
+    {
+      "log_path": "focused_tests.log",
+      "sha256": "77211f7f15bd3397bbcf7aa7e341d6d04603e27b014377d96fb8397461f5f7c3",
+      "exit_code": 0,
+      "manifest_status": "PASS",
+      "consistent": true
+    },
+    {
+      "log_path": "full_suite_run_1.log",
+      "sha256": "3c29a77a8ffa0ad235da6570cc97e5a93168d216a490afe9128bba20f058908b",
+      "exit_code": 0,
+      "manifest_status": "PASS",
+      "consistent": true
+    },
+    {
+      "log_path": "full_suite_run_2.log",
+      "sha256": "0cfdbbc8656ff7bbe33488a5a59af32e4b962eeebd9837cb42c2c9c11329e09c",
+      "exit_code": 0,
+      "manifest_status": "PASS",
+      "consistent": true
+    },
+    {
+      "log_path": "identity_replay_run_1.log",
+      "sha256": "9c4ca441b2045e40733469765217521e19b8e8078206e3a55c3c48f18b19e5d5",
+      "exit_code": 0,
+      "manifest_status": "PASS",
+      "consistent": true
+    },
+    {
+      "log_path": "identity_replay_run_2.log",
+      "sha256": "db8866d2fee68cf85cb7da74d506d1ab02c1994d96f3007842839077e1a0a52a",
+      "exit_code": 0,
+      "manifest_status": "PASS",
+      "consistent": true
+    },
+    {
+      "log_path": "import_provenance.log",
+      "sha256": "68cf24c77e17094387703c49a3f1a8e1937ccf613b0e49bab8050f93972fbae8",
+      "exit_code": 0,
+      "manifest_status": "PASS",
+      "consistent": true
+    },
+    {
+      "log_path": "ruff_c31586c8_v0166.log",
+      "sha256": "32fc2a37873b6e571b7872c50f674684254d4fa9f75c7bf88b8863ec8b62482f",
+      "exit_code": 1,
+      "manifest_status": "RECORDED_BASELINE_DIAGNOSTICS_10",
+      "consistent": true
+    },
+    {
+      "log_path": "ruff_f3678676_v0166.log",
+      "sha256": "62a1c27655de12fc22994e17ca248db7fa5400899f3fc3f5068cad3582edb95d",
+      "exit_code": 0,
+      "manifest_status": "PASS",
+      "consistent": true
+    },
+    {
+      "log_path": "static_compileall.log",
+      "sha256": "849b5308ba7bcccd173022e0041ad23d29f0c18d9443404c8beff30520eed937",
+      "exit_code": 0,
+      "manifest_status": "PASS",
+      "consistent": true
+    },
+    {
+      "log_path": "static_git_diff.log",
+      "sha256": "849b5308ba7bcccd173022e0041ad23d29f0c18d9443404c8beff30520eed937",
+      "exit_code": 0,
+      "manifest_status": "PASS",
+      "consistent": true
+    },
+    {
+      "log_path": "static_mypy.log",
+      "sha256": "4432d5230e8602d6d8111f717ac5614553447bdf350099abc612f92836b0d423",
+      "exit_code": 0,
+      "manifest_status": "PASS",
+      "consistent": true
+    },
+    {
+      "log_path": "static_ruff.log",
+      "sha256": "d733ecc74d4ab2d642a3c6f49a5aad6e00089d00f05cd1b431708f2b8f5c4e2c",
+      "exit_code": 0,
+      "manifest_status": "PASS",
+      "consistent": true
+    }
+  ],
+  "raw_log_sha256": {
+    "authority_stage_state.log": "2eb3cb08736562ee1773848fc6c789c6f76e34d0015665101ad972a2f5b79617",
+    "focused_tests.log": "77211f7f15bd3397bbcf7aa7e341d6d04603e27b014377d96fb8397461f5f7c3",
+    "full_suite_run_1.log": "3c29a77a8ffa0ad235da6570cc97e5a93168d216a490afe9128bba20f058908b",
+    "full_suite_run_2.log": "0cfdbbc8656ff7bbe33488a5a59af32e4b962eeebd9837cb42c2c9c11329e09c",
+    "identity_replay_run_1.log": "9c4ca441b2045e40733469765217521e19b8e8078206e3a55c3c48f18b19e5d5",
+    "identity_replay_run_2.log": "db8866d2fee68cf85cb7da74d506d1ab02c1994d96f3007842839077e1a0a52a",
+    "import_provenance.log": "68cf24c77e17094387703c49a3f1a8e1937ccf613b0e49bab8050f93972fbae8",
+    "ruff_c31586c8_v0166.log": "32fc2a37873b6e571b7872c50f674684254d4fa9f75c7bf88b8863ec8b62482f",
+    "ruff_f3678676_v0166.log": "62a1c27655de12fc22994e17ca248db7fa5400899f3fc3f5068cad3582edb95d",
+    "static_compileall.log": "849b5308ba7bcccd173022e0041ad23d29f0c18d9443404c8beff30520eed937",
+    "static_git_diff.log": "849b5308ba7bcccd173022e0041ad23d29f0c18d9443404c8beff30520eed937",
+    "static_mypy.log": "4432d5230e8602d6d8111f717ac5614553447bdf350099abc612f92836b0d423",
+    "static_ruff.log": "d733ecc74d4ab2d642a3c6f49a5aad6e00089d00f05cd1b431708f2b8f5c4e2c"
+  }
+}

@@ -1,0 +1,12 @@
+git rev-parse HEAD:
+f3678676265ba53e1d874e27bc0c922c7783acaa
+git status --short:
+command -v ruff:
+/root/.gemini/antigravity-cli/brain/ddcd507e-c92c-4c98-b74b-7fceda57e105/scratch/ruff_bin/ruff
+ruff --version:
+ruff 0.16.6
+sha256 of pyproject.toml:
+78c40cae6799d61e95ccf91b3c27df94ee7c1925a370f827d8e32a731245fb70  pyproject.toml
+ruff check . output:
+All checks passed!
+exit_code: 0
