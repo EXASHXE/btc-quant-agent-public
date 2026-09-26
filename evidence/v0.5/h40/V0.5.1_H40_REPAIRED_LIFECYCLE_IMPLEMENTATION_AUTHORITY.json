@@ -1,0 +1,20 @@
+{
+  "authority_hash": "a23ceec50ff5703f4dff703a7b44e715501164a48ec9be48ae096f8bd4d51fca",
+  "authority_object": {
+    "accepted_lifecycle_governance_authority_hash": "bb367f2af726be105bddf42636c97652402014c8a671d43ab81b1964c258e5cf",
+    "f01_implementation_acceptance_artifact_path": "reviews/v0.5/V0.5.1_H40_AB_CUMULATIVE_EXACT_SHA_CONTROLLER_ACCEPTANCE.md",
+    "f01_implementation_acceptance_commit_sha": "32421f6f25fdff6e2b8d9373e5440e286833014e",
+    "f01_implementation_commit_sha": "7413c96301067c59b9663d8eeaeddf975facb976",
+    "required_test_ci_evidence_identity": {
+      "evidence_manifest_artifact_path": "evidence/v0.5/h40/V0.5.1_H40_AB_CUMULATIVE_EXACT_SHA_EVIDENCE_7413c963.json",
+      "evidence_manifest_sha256": "46bce0d3406103f1ee05baef31b3bf006b38d5e46c38842802a798b57b58718f",
+      "tested_commit_sha": "7413c96301067c59b9663d8eeaeddf975facb976"
+    },
+    "schema_id": "H40_LIFECYCLE_IMPLEMENTATION_AUTHORITY_V1"
+  },
+  "materialization_status": "CONTROLLER_MATERIALIZED_PENDING_IMPLEMENTATION_PUBLICATION",
+  "p3_controller_authority_hash": null,
+  "h40_p3_authorized": false,
+  "h40_discovery_authorized": false,
+  "execution_policy": "RESEARCH_DISABLED_V1"
+}
