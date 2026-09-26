@@ -1,0 +1,10 @@
+Python executable: /root/miniconda3/bin/python3
+Python version: 3.13.13 | packaged by Anaconda, Inc. | (main, Apr 14 2026, 06:19:41) [GCC 14.3.0]
+Python prefix: /root/miniconda3
+btc_quant_agent location: /root/workspace/project/Quant-agent-sanitized/src/btc_quant_agent/__init__.py
+pyarrow version: 23.0.1 location: /root/miniconda3/lib/python3.13/site-packages/pyarrow/__init__.py
+pytest version: 8.4.2 location: /root/miniconda3/lib/python3.13/site-packages/pytest/__init__.py
+Traceback (most recent call last):
+  File "<stdin>", line 15, in <module>
+AttributeError: module 'ruff' has no attribute '__version__'
+exit_code: 1
