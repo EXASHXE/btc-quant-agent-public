@@ -1,0 +1,27 @@
+=== REPAIR CONTRACT R2 PROGRAMMATIC COMPARISON EVIDENCE ===
+R2 Contract Commit: cf7b1c9b9547f3e9e6dfab964d7d2c6d1bb35de3
+R2 Schema ID: V0.5.1_H40_PRE_DISCOVERY_REPAIR_CONTRACT_FREEZE_R2_V1
+
+--- SOURCE DERIVATION V2 SCHEMA ---
+R2 exact_top_level_fields: ['active_source_derivations', 'base_eligible_membership', 'policies', 'provenance_contract_hash', 'run_authority_id', 'schema_id', 'source_manifest_hash', 'source_support', 'split_attestation_hash', 'split_manifest_hash']
+Code _SOURCE_V2_KEYS:      ['active_source_derivations', 'base_eligible_membership', 'policies', 'provenance_contract_hash', 'run_authority_id', 'schema_id', 'source_manifest_hash', 'source_support', 'split_attestation_hash', 'split_manifest_hash']
+Match: True
+
+--- RAW DECISIONS V2 SCHEMA ---
+R2 exact_top_level_fields: ['partition_id', 'policies', 'provenance_contract_hash', 'rows', 'run_authority_id', 'schema_id', 'sealed_registered_roster_hash', 'source_evidence_hash', 'source_manifest_hash', 'split_manifest_hash', 'structural_configuration_hash']
+Code _DECISION_V2_KEYS:    ['partition_id', 'policies', 'provenance_contract_hash', 'rows', 'run_authority_id', 'schema_id', 'sealed_registered_roster_hash', 'source_evidence_hash', 'source_manifest_hash', 'split_manifest_hash', 'structural_configuration_hash']
+Match: True
+R2 exact_row_fields:       ['final_action', 'p_up', 'product', 'r_h', 'r_net', 'timestamp']
+Code _ROW_V2_KEYS:         ['final_action', 'p_up', 'product', 'r_h', 'r_net', 'timestamp']
+Match: True
+R2 removed_prefit_fields:  ['opportunity_state', 'raw_score', 'regime_state', 'secondary_filter_state']
+Code _FORBIDDEN_FIELDS:    ['opportunity_state', 'raw_score', 'regime_state', 'secondary_filter_state']
+Match: True
+
+--- DISCOVERY PROVENANCE CONTRACT PREIMAGE ---
+R2 Frozen Hash:      31fc3930e44149e6b3af54ddd3b11c630f95cbbd3f152b3d0d5e614690dcf7ae
+Computed From Image: 31fc3930e44149e6b3af54ddd3b11c630f95cbbd3f152b3d0d5e614690dcf7ae
+Code Constant Hash:  31fc3930e44149e6b3af54ddd3b11c630f95cbbd3f152b3d0d5e614690dcf7ae
+Exact Equality: True
+
+OVERALL_R2_CONTRACT_ALIGNMENT: EXACT_MATCH_VERIFIED

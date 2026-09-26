@@ -1,0 +1,8 @@
+=== COMMAND: pytest -q tests/test_v051_h40_repair_b_provenance_pit.py tests/test_v051_h40_p3b_production_discovery_verifier.py tests/test_v051_h40_p3b_production_verifier_behavior_seal.py tests/test_v051_h40_p3b_production_verifier_identity_seal.py tests/test_v051_h40_p2r1_contract_materialization.py tests/test_v051_h40_p2_search_space.py ===
+exit_code: 0
+--- stdout ---
+........................................................................ [ 33%]
+........................................................................ [ 66%]
+........................................................................ [ 99%]
+..                                                                       [100%]
+218 passed in 67.17s (0:01:07)

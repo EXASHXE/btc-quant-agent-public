@@ -1,0 +1,12 @@
+=== COMMAND: pytest -q tests/test_execution.py tests/test_execution_guard.py tests/test_execution_environment_authority.py ===
+exit_code: 0
+--- stdout ---
+............................................                             [100%]
+44 passed in 5.54s
+
+=== EXECUTION FENCE ATTESTATION ===
+CURRENT_EXECUTION_POLICY: RESEARCH_DISABLED_V1
+ACCEPTED_EXECUTION_WRITE_AUTHORITY: None
+SIGNED_NETWORK_EXECUTION_REQUESTS: 0
+TRADING_EXECUTION_AUTHORIZED: NO
+EXECUTION_FENCE_STATUS: PASS

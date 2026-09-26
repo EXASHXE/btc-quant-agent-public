@@ -1,0 +1,137 @@
+........................................................................ [  4%]
+........................................................................ [  8%]
+........................................................................ [ 12%]
+........................................................................ [ 17%]
+........................................................................ [ 21%]
+........................................................................ [ 25%]
+........................................................................ [ 29%]
+........................................................................ [ 34%]
+........................................................................ [ 38%]
+........................................................................ [ 42%]
+........................................................................ [ 46%]
+........................................................................ [ 51%]
+........................................................................ [ 55%]
+........................................................................ [ 59%]
+........................................................................ [ 63%]
+........................................................................ [ 68%]
+........................................................................ [ 72%]
+........................................................................ [ 76%]
+........................................................................ [ 80%]
+........................................................................ [ 85%]
+........................................................................ [ 89%]
+........................................................................ [ 93%]
+........................................................................ [ 97%]
+......................................                                   [100%]
+=============================== warnings summary ===============================
+tests/test_hermetic_runtime_guard.py::test_default_h39_engine_cannot_fall_back_to_operational_roots
+  /root/workspace/project/Quant-agent-sanitized/tests/test_hermetic_runtime_guard.py:80: DeprecationWarning: evaluate_validation_status() is a deprecated non-authoritative diagnostic. It MUST NOT authorize unblind, candidate promotion, or formal validation. Use check_unblind_readiness() with wall-clock denominator instead.
+    H39ResearchEngine().evaluate_validation_status()
+
+tests/test_shadow.py::ShadowTests::test_unfilled_signal_stays_pending_until_expiry
+  /root/workspace/project/Quant-agent-sanitized/tests/test_shadow.py:19: DeprecationWarning: shadow.update_shadow(repository, bars, now) is LEGACY_DIAGNOSTIC_ONLY; use update_formal_shadow with an explicit protocol/evidence job for current economics
+    self.assertEqual(update_shadow(repo, [bar], 120_000), [])
+
+tests/test_shadow.py::ShadowTests::test_unfilled_signal_stays_pending_until_expiry
+  /root/workspace/project/Quant-agent-sanitized/tests/test_shadow.py:23: DeprecationWarning: shadow.update_shadow(repository, bars, now) is LEGACY_DIAGNOSTIC_ONLY; use update_formal_shadow with an explicit protocol/evidence job for current economics
+    resolved = update_shadow(repo, [bar], item.expires_at_ms + 1)
+
+tests/test_v0323_blind_validation.py::test_final_holdout_sealed_and_execution_disabled
+  /root/workspace/project/Quant-agent-sanitized/tests/test_v0323_blind_validation.py:727: DeprecationWarning: evaluate_validation_status() is a deprecated non-authoritative diagnostic. It MUST NOT authorize unblind, candidate promotion, or formal validation. Use check_unblind_readiness() with wall-clock denominator instead.
+    val_status = engine.evaluate_validation_status()
+
+tests/test_v0323_blind_validation.py::test_metadata_only_diagnostic_never_reaches_outcome_loaders
+  /root/workspace/project/Quant-agent-sanitized/tests/test_v0323_blind_validation.py:810: DeprecationWarning: evaluate_validation_status() is a deprecated non-authoritative diagnostic. It MUST NOT authorize unblind, candidate promotion, or formal validation. Use check_unblind_readiness() with wall-clock denominator instead.
+    val_status = engine.evaluate_validation_status()
+
+tests/test_v0323_blind_validation.py::test_post_start_partition_does_not_trigger_observation_building
+  /root/workspace/project/Quant-agent-sanitized/tests/test_v0323_blind_validation.py:861: DeprecationWarning: evaluate_validation_status() is a deprecated non-authoritative diagnostic. It MUST NOT authorize unblind, candidate promotion, or formal validation. Use check_unblind_readiness() with wall-clock denominator instead.
+    val_status = engine.evaluate_validation_status()
+
+tests/test_v0323_blind_validation.py::test_absence_of_canonical_candles_does_not_break_diagnostic
+  /root/workspace/project/Quant-agent-sanitized/tests/test_v0323_blind_validation.py:889: DeprecationWarning: evaluate_validation_status() is a deprecated non-authoritative diagnostic. It MUST NOT authorize unblind, candidate promotion, or formal validation. Use check_unblind_readiness() with wall-clock denominator instead.
+    val_status = engine.evaluate_validation_status()
+
+tests/test_v0323_blind_validation.py::test_diagnostic_payload_has_no_performance_leakage
+  /root/workspace/project/Quant-agent-sanitized/tests/test_v0323_blind_validation.py:899: DeprecationWarning: evaluate_validation_status() is a deprecated non-authoritative diagnostic. It MUST NOT authorize unblind, candidate promotion, or formal validation. Use check_unblind_readiness() with wall-clock denominator instead.
+    val_status = engine.evaluate_validation_status()
+
+tests/test_v0323_blind_validation.py::test_deprecated_diagnostic_cannot_grant_authorization
+  /root/workspace/project/Quant-agent-sanitized/tests/test_v0323_blind_validation.py:921: DeprecationWarning: evaluate_validation_status() is a deprecated non-authoritative diagnostic. It MUST NOT authorize unblind, candidate promotion, or formal validation. Use check_unblind_readiness() with wall-clock denominator instead.
+    val_status = engine.evaluate_validation_status()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+============================= slowest 50 durations =============================
+22.05s call     tests/test_v0324_blind_accumulation_operations.py::test_stale_ledger_fail_closed_regression
+21.04s call     tests/test_v0323_blind_validation.py::test_maturity_requires_all_gates_simultaneously
+20.49s call     tests/test_v0323_blind_validation.py::test_readiness_does_not_execute_statistics
+10.90s call     tests/test_v051_h40_f01_lifecycle_authority.py::test_cached_calendar_preserves_full_cold_authority_and_state_isolation
+7.22s call     tests/test_v051_h40_p3b_production_discovery_verifier.py::test_v26_valid_family_continues_after_other_families_fit_invalid
+5.91s call     tests/test_v051_h40_f01_lifecycle_authority.py::test_a00_production_seal_derives_typed_verified_authority
+5.06s call     tests/test_v051_h40_p3b_production_discovery_verifier.py::test_v20_deterministic_manifest_replay
+4.71s call     tests/test_v051_h40_f01_lifecycle_authority.py::test_a21_through_a29_model_a_capability_lifetime
+4.56s call     tests/test_v043_c_lite_formal_consumers.py::test_t6_facade_has_exact_kernel_outputs_and_cold_idempotence[True]
+4.53s call     tests/test_v051_h40_p3b_production_verifier_identity_seal.py::test_a01_real_concrete_verifier_reaches_scientific_path
+4.36s call     tests/test_v050_r03b_legacy_benchmark_guards.py::test_t6_c_lite_formal_differential_remains_stable
+4.32s call     tests/test_v043_c_lite_formal_consumers.py::test_t6_facade_has_exact_kernel_outputs_and_cold_idempotence[False]
+4.30s call     tests/test_v051_h40_p3b_production_discovery_verifier.py::test_v01_protocol_and_fit_invalid_family
+4.11s call     tests/test_v051_h40_p1_scaffold.py::test_positive_split_round_trip_and_cold_verification
+4.03s call     tests/test_v051_h40_p3b_production_discovery_verifier.py::test_v26_v27_one_invalid_registered_member_poisons_full_family
+3.90s call     tests/test_v041_p6_metrics_benchmarks_qualification.py::test_tampered_result_run_and_dataset_are_atomic_failures
+3.45s call     tests/test_v050_r05c_funding_evidence_authority.py::test_t20_cold_job_replay
+3.43s call     tests/test_v051_h40_p1_scaffold.py::test_persisted_partition_tampering_with_recomputed_attestation_fails_cold_reconstruction
+3.37s call     tests/test_v051_h40_p1_scaffold.py::test_mutate_one_artifact_byte_after_serialization_fails_cold_assertion
+3.33s call     tests/test_v051_h40_p1_scaffold.py::test_source_gap_persists_in_membership_without_boundary_shifts
+3.30s call     tests/test_v051_h40_p1_scaffold.py::test_mandatory_11_hermetic_scaffold_passes_without_repo_artifacts
+3.27s call     tests/test_v051_h40_p1_scaffold.py::test_positive_synthetic_chain_succeeds_and_passes_verification
+3.26s call     tests/test_v051_h40_p3b_production_discovery_verifier.py::test_cov01_cov04_calibration_final_actions_define_coverage_population
+3.23s call     tests/test_v051_h40_p1_scaffold.py::test_persisted_split_rehash_attack_remains_closed
+3.16s call     tests/test_v051_h40_p1_scaffold.py::test_mandatory_10_synthetic_validator_output_remains_strictly_non_authoritative
+3.14s call     tests/test_v051_h40_f01r3r1_durable_authority.py::test_r03_synthetic_wf_cold_restore_avoids_caller_override_path
+2.50s call     tests/test_v051_h40_p3b_production_verifier_identity_seal.py::test_a09_foreign_verifier_cannot_cold_restore_candidate_lock
+2.46s call     tests/test_v051_h40_p3b_production_verifier_behavior_seal.py::test_b15_cold_restore_rejects_tampered_exact_verifier
+2.07s call     tests/test_v043_c_lite_formal_consumers.py::test_t10_explicit_registry_commit_uses_existing_p5_owner[True]
+2.05s call     tests/test_v043_c_lite_formal_consumers.py::test_t7_fully_rehashed_attacks_rejected_by_consumer_acceptance[random_clone]
+2.04s call     tests/test_v051_h40_p3b_production_discovery_verifier.py::test_cov_audit_persists_exact_components_and_rejects_tamper
+2.03s call     tests/test_v042_b06_random_experiment_replay.py::test_b06_t8_t9_fixed_and_larger_positive_replay[32-12]
+2.02s call     tests/test_v043_c_lite_formal_consumers.py::test_t7_fully_rehashed_attacks_rejected_by_consumer_acceptance[seed_swap]
+2.00s call     tests/test_v043_c_lite_formal_consumers.py::test_t10_explicit_registry_commit_uses_existing_p5_owner[False]
+1.96s call     tests/test_v051_h40_p1_scaffold.py::test_mutate_one_source_timestamp_after_serialization_fails_cold_assertion
+1.92s call     tests/test_v043_c_lite_formal_consumers.py::test_t7_fully_rehashed_attacks_rejected_by_consumer_acceptance[future_liquidity]
+1.91s call     tests/test_v043_c_lite_formal_consumers.py::test_publication_does_not_overwrite_frozen_artifacts
+1.89s call     tests/test_v043_c_lite_formal_consumers.py::test_t7_fully_rehashed_attacks_rejected_by_consumer_acceptance[traded_cash]
+1.89s call     tests/test_v043_c_lite_formal_consumers.py::test_t7_fully_rehashed_attacks_rejected_by_consumer_acceptance[empty_signals]
+1.89s call     tests/test_v043_c_lite_formal_consumers.py::test_t1_t2_generic_commands_use_formal_without_service_or_legacy[research]
+1.86s call     tests/test_v043_c_lite_formal_consumers.py::test_t7_fully_rehashed_attacks_rejected_by_consumer_acceptance[impossible_fill]
+1.84s call     tests/test_v043_c_lite_formal_consumers.py::test_t4_legacy_shadow_reader_remains_legacy_and_unchanged
+1.82s call     tests/test_v051_h40_p1_scaffold.py::test_serialized_manifest_with_authoritative_true_fails_verification
+1.78s call     tests/test_v043_c_lite_formal_consumers.py::test_t4_shadow_is_canonical_and_default_service_is_refusal
+1.78s call     tests/test_v051_h40_p1_scaffold.py::test_assert_authoritative_without_cold_data_root_fails
+1.75s call     tests/test_v043_c_lite_formal_consumers.py::test_t3_tool_import_and_dispatch_only_formal
+1.75s call     tests/test_v043_c_lite_formal_consumers.py::test_t11_formal_job_does_not_enable_execution
+1.75s call     tests/test_v043_c_lite_formal_consumers.py::test_t1_t2_generic_commands_use_formal_without_service_or_legacy[backtest]
+1.75s call     tests/test_v043_c_lite_formal_consumers.py::test_t1_t2_generic_commands_use_formal_without_service_or_legacy[replay]
+1.74s call     tests/test_v051_h40_p1_scaffold.py::test_mutating_source_timestamp_rejects_split_authority
+1694 passed, 9 warnings in 427.39s (0:07:07)
+	Command being timed: "pytest -q --durations=50 --durations-min=0.25"
+	User time (seconds): 343.81
+	System time (seconds): 28.53
+	Percent of CPU this job got: 78%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 7:53.25
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 279956
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 2197
+	Minor (reclaiming a frame) page faults: 259170
+	Voluntary context switches: 91601
+	Involuntary context switches: 1374
+	Swaps: 0
+	File system inputs: 659520
+	File system outputs: 1167168
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0

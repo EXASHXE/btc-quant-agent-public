@@ -1,0 +1,10 @@
+=== H40 DETERMINISM AND REPLAY EVIDENCE ===
+Lifecycle protocol hash run 1 == run 2: a83f8fc7a5ca7109fb8cd7fed114d87c3b2c968b5145c11cada203aa5111d1ce
+Lifecycle semantic root run 1 == run 2: 36cbda530352cffaa475bd835b3b629df47351ca284e09bdf31a8fc884d48b4b
+Lifecycle governance hash run 1 == run 2: bb367f2af726be105bddf42636c97652402014c8a671d43ab81b1964c258e5cf
+Lifecycle 9 child hashes run 1 == run 2: TRUE
+Source economic digest run 1 == run 2: 17e8d3dd84105bf6a7e9bf013dcf84a1951c61c6e2a193ae83cc30b2009234a6 (count=50)
+Repair B prefit run 1 == run 2: (-0.005964232391673439, 'REGIME_VOL_MID', 'O_NONE', 'PASS')
+Production search-space structural ledger hash run 1 == run 2: 483f68502b57972deae071c7bd4587ca3e57ccaa72bd99fb0de07b4f0ab8c85f (slots=168)
+
+ALL_DETERMINISM_REPLAY_CHECKS_PASSED: TRUE

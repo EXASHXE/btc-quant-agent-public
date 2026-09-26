@@ -1,0 +1,16 @@
+=== COMMAND: git diff --check ===
+exit_code: 0
+
+=== COMMAND: python -m compileall -q src ===
+exit_code: 0
+
+=== COMMAND: ruff check . ===
+exit_code: 0
+--- stdout ---
+All checks passed!
+
+=== COMMAND: mypy src ===
+exit_code: 0
+--- stdout ---
+Success: no issues found in 98 source files
+
