@@ -1839,8 +1839,10 @@ def test_preservation_42_stage_a_synthetic_domain_isolation_closed() -> None:
         )
 
 
-def test_preservation_43_production_accepted_constants_none() -> None:
-    assert ACCEPTED_LIFECYCLE_IMPLEMENTATION_AUTHORITY_HASH is None
+def test_preservation_43_production_accepted_constants() -> None:
+    assert ACCEPTED_LIFECYCLE_IMPLEMENTATION_AUTHORITY_HASH == (
+        "a23ceec50ff5703f4dff703a7b44e715501164a48ec9be48ae096f8bd4d51fca"
+    )
     assert ACCEPTED_H40_P3_CONTROLLER_AUTHORITY_HASH is None
 
 
@@ -1966,11 +1968,22 @@ def test_preservation_55_v1_persistence_context_rejected_in_production(tmp_path:
     assert "production cold restore rejects H40_LIFECYCLE_PERSISTENCE_CONTEXT_V1" in str(exc.value)
 
 
-def test_preservation_56_stale_authority_service_fails_closed() -> None:
+def test_preservation_56_stale_authority_service_fails_closed(monkeypatch: pytest.MonkeyPatch) -> None:
     prod_service = H40LifecycleAuthorityService.production()
-    # Stale/unanchored production service has no accepted implementation authority
-    with pytest.raises(H40GuardError) as exc:
-        prod_service._assert_current_anchors(require_controller=False)
-    assert exc.value.reason_code == H40ReasonCode.NOT_TESTABLE
-    assert "no independently accepted lifecycle implementation authority exists" in str(exc.value)
+    # Unanchored production service with no accepted implementation authority fails closed
+    with monkeypatch.context() as m:
+        m.setattr(
+            "btc_quant_agent.h40.lifecycle_authority.ACCEPTED_LIFECYCLE_IMPLEMENTATION_AUTHORITY_HASH",
+            None,
+        )
+        with pytest.raises(H40GuardError) as exc:
+            prod_service._assert_current_anchors(require_controller=False)
+        assert exc.value.reason_code == H40ReasonCode.NOT_TESTABLE
+        assert "no independently accepted lifecycle implementation authority exists" in str(exc.value)
+
+    # Staged production service has no accepted P3 controller authority
+    with pytest.raises(H40GuardError) as exc_ctrl:
+        prod_service._assert_current_anchors(require_controller=True)
+    assert exc_ctrl.value.reason_code == H40ReasonCode.NOT_TESTABLE
+    assert "no independently accepted H40 P3 controller authority exists" in str(exc_ctrl.value)
 

@@ -761,7 +761,9 @@ def test_t06_primitive_dict_path_denied(forged: object) -> None:
 
 
 def test_t07_implementation_authority_required() -> None:
-    assert ACCEPTED_LIFECYCLE_IMPLEMENTATION_AUTHORITY_HASH is None
+    assert ACCEPTED_LIFECYCLE_IMPLEMENTATION_AUTHORITY_HASH == (
+        "a23ceec50ff5703f4dff703a7b44e715501164a48ec9be48ae096f8bd4d51fca"
+    )
     assert ACCEPTED_H40_P3_CONTROLLER_AUTHORITY_HASH is None
     service = H40LifecycleAuthorityService.production()
     authority = _implementation_authority()

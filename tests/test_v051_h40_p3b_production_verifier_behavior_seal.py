@@ -201,5 +201,7 @@ def test_b18_frozen_identities_exact() -> None:
     assert compute_lifecycle_governance_authority_hash() == (
         "bb367f2af726be105bddf42636c97652402014c8a671d43ab81b1964c258e5cf"
     )
-    assert ACCEPTED_LIFECYCLE_IMPLEMENTATION_AUTHORITY_HASH is None
+    assert ACCEPTED_LIFECYCLE_IMPLEMENTATION_AUTHORITY_HASH == (
+        "a23ceec50ff5703f4dff703a7b44e715501164a48ec9be48ae096f8bd4d51fca"
+    )
     assert ACCEPTED_H40_P3_CONTROLLER_AUTHORITY_HASH is None

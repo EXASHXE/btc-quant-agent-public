@@ -46,34 +46,34 @@ from btc_quant_agent.h40.protocol_authority import (
 from btc_quant_agent.h40.search_space import materialize_h40_search_space_production
 
 EXACT_ACCEPTED_HASH = (
-    "ee14d950367742d9b7ed0cbda5578a04285380267bd392dcede82aa45edf26ec"
+    "a23ceec50ff5703f4dff703a7b44e715501164a48ec9be48ae096f8bd4d51fca"
 )
-EXACT_IMPLEMENTATION_COMMIT = "d73e8984446f933059b978e36c4cabd55de517aa"
-EXACT_ACCEPTANCE_COMMIT = "0cbb20a7806f2336864e430910bf6a4ff4a99df9"
+EXACT_IMPLEMENTATION_COMMIT = "7413c96301067c59b9663d8eeaeddf975facb976"
+EXACT_ACCEPTANCE_COMMIT = "32421f6f25fdff6e2b8d9373e5440e286833014e"
 EXACT_ACCEPTANCE_PATH = (
-    "reviews/v0.5/V0.5.1_H40_FINAL_EXACT_SHA_REACCEPTANCE_CONTROLLER_ACCEPTANCE.md"
+    "reviews/v0.5/V0.5.1_H40_AB_CUMULATIVE_EXACT_SHA_CONTROLLER_ACCEPTANCE.md"
 )
 EXACT_EVIDENCE_MANIFEST_PATH = (
-    "evidence/v0.5/h40/V0.5.1_H40_FINAL_REACCEPTANCE_EVIDENCE_d73e898.json"
+    "evidence/v0.5/h40/V0.5.1_H40_AB_CUMULATIVE_EXACT_SHA_EVIDENCE_7413c963.json"
 )
 EXACT_EVIDENCE_MANIFEST_SHA256 = (
-    "5cd591ef7f3f43c7897711ab4e75cb158ac048d328e1f8b0dac28a0a6bcb6540"
+    "46bce0d3406103f1ee05baef31b3bf006b38d5e46c38842802a798b57b58718f"
 )
 EXACT_GOVERNANCE_HASH = EXPECTED_LIFECYCLE_GOVERNANCE_AUTHORITY_HASH
 
 HISTORICAL_ACCEPTED_HASH = (
-    "6d61054a6a8d9bdaaf7e7d648cb941bbb893b67a1fb6a0ed0742a0cdd40697e5"
+    "ee14d950367742d9b7ed0cbda5578a04285380267bd392dcede82aa45edf26ec"
 )
-HISTORICAL_IMPLEMENTATION_COMMIT = "d0e1fe0d87d4595640edc4d7ecfa5f287640f0aa"
-HISTORICAL_ACCEPTANCE_COMMIT = "5deb937bcb84c18165de8f1938d0cac65300f1e4"
+HISTORICAL_IMPLEMENTATION_COMMIT = "d73e8984446f933059b978e36c4cabd55de517aa"
+HISTORICAL_ACCEPTANCE_COMMIT = "0cbb20a7806f2336864e430910bf6a4ff4a99df9"
 HISTORICAL_ACCEPTANCE_PATH = (
-    "reviews/v0.5/V0.5.1_POST_SANITIZATION_SOL_INDEPENDENT_ACCEPTANCE.md"
+    "reviews/v0.5/V0.5.1_H40_FINAL_EXACT_SHA_REACCEPTANCE_CONTROLLER_ACCEPTANCE.md"
 )
 HISTORICAL_EVIDENCE_MANIFEST_PATH = (
-    "evidence/v0.5/h40/V0.5.1_H40_F01_POST_SANITIZATION_AGGREGATE_IMPLEMENTATION_EVIDENCE.json"
+    "evidence/v0.5/h40/V0.5.1_H40_FINAL_REACCEPTANCE_EVIDENCE_d73e898.json"
 )
 HISTORICAL_EVIDENCE_MANIFEST_SHA256 = (
-    "8b839f6b8ddbe433be6df069928f28f0c07a6a3b966c159af26d04b561e7da24"
+    "5cd591ef7f3f43c7897711ab4e75cb158ac048d328e1f8b0dac28a0a6bcb6540"
 )
 
 
@@ -94,8 +94,11 @@ def _exact_authority() -> H40LifecycleImplementationAuthority:
 
 
 def test_p01_exact_accepted_constant() -> None:
-    """P01: Verify production constants remain None until staged publication."""
-    assert ACCEPTED_LIFECYCLE_IMPLEMENTATION_AUTHORITY_HASH is None
+    """P01: Verify production implementation constant is published while P3 controller remains None."""
+    assert (
+        ACCEPTED_LIFECYCLE_IMPLEMENTATION_AUTHORITY_HASH
+        == EXACT_ACCEPTED_HASH
+    )
     assert ACCEPTED_H40_P3_CONTROLLER_AUTHORITY_HASH is None
 
 
@@ -106,32 +109,30 @@ def test_p02_exact_typed_authority_reconstructs_accepted_hash() -> None:
 
 
 def test_p03_production_service_accepts_exact_authority(monkeypatch: pytest.MonkeyPatch) -> None:
-    """P03: Verify production service fails closed when None, and accepts exact authority when published."""
+    """P03: Verify production service accepts exact authority directly without monkeypatching, and fails closed when unconfigured."""
     authority = _exact_authority()
-    # Unconfigured production service fails closed
-    with pytest.raises(ValueError, match="implementation authority object/hash mismatch"):
-        H40LifecycleAuthorityService.production(
-            implementation_authority=authority,
-        )
-
-    # When published to exact hash, it succeeds
-    monkeypatch.setattr(
-        "btc_quant_agent.h40.lifecycle_authority.ACCEPTED_LIFECYCLE_IMPLEMENTATION_AUTHORITY_HASH",
-        EXACT_ACCEPTED_HASH,
-    )
+    # A production service supplied with the exact typed implementation authority
+    # must be accepted without monkeypatching the implementation accepted hash.
     service = H40LifecycleAuthorityService.production(
         implementation_authority=authority,
     )
     assert service._implementation_authority == authority
     assert service._accepted_implementation_authority_hash == EXACT_ACCEPTED_HASH
 
+    # When unconfigured (None), production service fails closed
+    with monkeypatch.context() as m:
+        m.setattr(
+            "btc_quant_agent.h40.lifecycle_authority.ACCEPTED_LIFECYCLE_IMPLEMENTATION_AUTHORITY_HASH",
+            None,
+        )
+        with pytest.raises(ValueError, match="implementation authority object/hash mismatch"):
+            H40LifecycleAuthorityService.production(
+                implementation_authority=authority,
+            )
 
-def test_p04_altered_authority_fails_closed(monkeypatch: pytest.MonkeyPatch) -> None:
+
+def test_p04_altered_authority_fails_closed() -> None:
     """P04: Verify altered implementation authority fails closed with mismatch error."""
-    monkeypatch.setattr(
-        "btc_quant_agent.h40.lifecycle_authority.ACCEPTED_LIFECYCLE_IMPLEMENTATION_AUTHORITY_HASH",
-        EXACT_ACCEPTED_HASH,
-    )
     # Construct an authority with a different commit SHA
     alt_commit = "1" * 40
     evidence_id = H40RequiredTestCIEvidenceIdentity(
@@ -192,12 +193,8 @@ def test_p06_tested_commit_mismatch_fails_closed() -> None:
         )
 
 
-def test_p07_synthetic_verifier_remains_fenced(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_p07_synthetic_verifier_remains_fenced() -> None:
     """P07: Verify production service cannot use synthetic/test-only verifier."""
-    monkeypatch.setattr(
-        "btc_quant_agent.h40.lifecycle_authority.ACCEPTED_LIFECYCLE_IMPLEMENTATION_AUTHORITY_HASH",
-        EXACT_ACCEPTED_HASH,
-    )
     authority = _exact_authority()
     with pytest.raises(ValueError, match="production service cannot use a synthetic/test-only verifier"):
         H40LifecycleAuthorityService.production(
@@ -253,12 +250,8 @@ def test_p10_scientific_and_lifecycle_identities_unchanged() -> None:
     )
 
 
-def test_p11_previous_authority_fails_closed(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_p11_previous_authority_fails_closed() -> None:
     """P11: Verify previous published authority object/hash is rejected by production service."""
-    monkeypatch.setattr(
-        "btc_quant_agent.h40.lifecycle_authority.ACCEPTED_LIFECYCLE_IMPLEMENTATION_AUTHORITY_HASH",
-        EXACT_ACCEPTED_HASH,
-    )
     historical_evidence_id = H40RequiredTestCIEvidenceIdentity(
         evidence_manifest_artifact_path=HISTORICAL_EVIDENCE_MANIFEST_PATH,
         evidence_manifest_sha256=HISTORICAL_EVIDENCE_MANIFEST_SHA256,
@@ -282,5 +275,77 @@ def test_p11_previous_authority_fails_closed(monkeypatch: pytest.MonkeyPatch) ->
     ):
         H40LifecycleAuthorityService.production(
             implementation_authority=historical_authority,
+        )
+
+
+def test_p12_critical_negative_paths() -> None:
+    """P12: Prove critical negative paths after publication:
+    - implementation authority published = YES
+    - P3 controller authority published = NO
+    - Discovery authorization without controller = fail-closed / NOT_TESTABLE
+    - synthetic authority cannot satisfy production controller requirement
+    - stale/foreign implementation authority rejected
+    """
+    from btc_quant_agent.h40.lifecycle_authority import (
+        H40RunAuthority,
+        H40RuntimeSnapshotSeal,
+        _synthesize_controller_authority,
+    )
+
+    # 1. Implementation authority published = YES
+    assert ACCEPTED_LIFECYCLE_IMPLEMENTATION_AUTHORITY_HASH == EXACT_ACCEPTED_HASH
+
+    # 2. P3 controller authority published = NO
+    assert ACCEPTED_H40_P3_CONTROLLER_AUTHORITY_HASH is None
+
+    authority = _exact_authority()
+    service = H40LifecycleAuthorityService.production(
+        implementation_authority=authority,
+    )
+
+    # 3. Discovery authorization without controller = fail-closed / NOT_TESTABLE
+    seal = H40RuntimeSnapshotSeal.synthetic_for_tests(
+        runtime_authority_snapshot_hash="0" * 64,
+        source_manifest_hash="1" * 64,
+        split_manifest_hash="2" * 64,
+        split_attestation_hash="3" * 64,
+        roster=(),
+        not_testable_slot_count=168,
+    )
+    run = H40RunAuthority.from_seal(seal, authority.lifecycle_implementation_authority_hash)
+    with pytest.raises(H40GuardError) as exc_info:
+        service.authorize_discovery(
+            implementation_authority=authority,
+            run_authority=run,
+            seal=seal,
+            authorized_at_utc="2026-09-26T20:00:00Z",
+        )
+    assert exc_info.value.reason_code == H40ReasonCode.NOT_TESTABLE
+
+    # 4. Synthetic authority cannot satisfy production controller requirement
+    synthetic_ctrl = _synthesize_controller_authority(authority)
+    with pytest.raises(ValueError, match="controller authority object/hash mismatch"):
+        H40LifecycleAuthorityService.production(
+            implementation_authority=authority,
+            controller_authority=synthetic_ctrl,
+        )
+
+    # 5. Stale / foreign implementation authority rejected
+    foreign_evidence = H40RequiredTestCIEvidenceIdentity(
+        evidence_manifest_artifact_path=EXACT_EVIDENCE_MANIFEST_PATH,
+        evidence_manifest_sha256=EXACT_EVIDENCE_MANIFEST_SHA256,
+        tested_commit_sha="f" * 40,
+    )
+    foreign_authority = H40LifecycleImplementationAuthority(
+        accepted_lifecycle_governance_authority_hash=EXACT_GOVERNANCE_HASH,
+        f01_implementation_acceptance_artifact_path=EXACT_ACCEPTANCE_PATH,
+        f01_implementation_acceptance_commit_sha=EXACT_ACCEPTANCE_COMMIT,
+        f01_implementation_commit_sha="f" * 40,
+        required_test_ci_evidence_identity=foreign_evidence,
+        schema_id="H40_LIFECYCLE_IMPLEMENTATION_AUTHORITY_V1",
+    )
+    with pytest.raises(ValueError, match="implementation authority object/hash mismatch"):
+        H40LifecycleAuthorityService.production(
+            implementation_authority=foreign_authority,
         )
 
