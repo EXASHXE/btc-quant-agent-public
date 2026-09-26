@@ -369,6 +369,30 @@ def build_parser() -> argparse.ArgumentParser:
     daemon = sub.add_parser("daemon", help="poll at closed 15m boundaries")
     daemon.add_argument("--once", action="store_true")
     daemon.add_argument("--poll-seconds", type=int, default=30)
+
+    market_watch = sub.add_parser("market-watch", help="isolated multi-asset operational market-watch")
+    mw_sub = market_watch.add_subparsers(dest="market_watch_command", required=True)
+
+    mw_scan = mw_sub.add_parser("scan", help="scan multi-asset market policy")
+    mw_scan.add_argument("--all", action="store_true", help="scan all configured symbols")
+    mw_scan.add_argument("--symbol", help="scan specific symbol")
+    mw_scan.add_argument("--symbols", help="comma-separated list of symbols to scan")
+    mw_scan.add_argument("--notify", action="store_true", help="send Feishu alerts on state change")
+
+    mw_status = mw_sub.add_parser("status", help="show latest state for monitored symbols")
+    mw_status.add_argument("--symbol", dest="opt_symbol", default=None, help="specific symbol to check")
+    mw_status.add_argument("symbol", nargs="?", default=None, help="specific symbol to check")
+
+    mw_top = mw_sub.add_parser("top", help="show top ranked opportunities")
+    mw_top.add_argument("--limit", type=int, default=5, help="max symbols to show")
+
+    mw_explain = mw_sub.add_parser("explain", help="structured reason codes for a symbol")
+    mw_explain.add_argument("--symbol", dest="opt_symbol", default=None, help="symbol to explain")
+    mw_explain.add_argument("symbol", nargs="?", default=None, help="symbol to explain, e.g. LINKUSDT")
+
+    mw_test_feishu = mw_sub.add_parser("test-feishu", help="send Feishu connectivity test message")
+    mw_test_feishu.add_argument("--symbol", default="BTCUSDT", help="symbol for test card")
+
     return parser
 
 
@@ -917,6 +941,39 @@ def main(argv: list[str] | None = None) -> int:
         report = audit_official_timeframes(args.root, months)
         _print(report)
         return 0 if report["price_time_passed"] else 2
+    if args.command == "market-watch":
+        from .market_watch.service import MarketWatchService
+
+        cfg = load_config(args.config)
+        mw_service = MarketWatchService.create(cfg.market_watch)
+        cmd = args.market_watch_command
+        if cmd == "scan":
+            symbols = None
+            if getattr(args, "symbols", None):
+                symbols = [s.strip().upper() for s in args.symbols.split(",") if s.strip()]
+            elif getattr(args, "symbol", None):
+                symbols = [args.symbol.strip().upper()]
+            notify_enabled = bool(args.notify)
+            results = mw_service.scan(symbols=symbols, notify=notify_enabled)
+            _print([r.as_dict() for r in results])
+            return 0
+        if cmd == "status":
+            sym = getattr(args, "opt_symbol", None) or getattr(args, "symbol", None)
+            _print(mw_service.status(sym))
+            return 0
+        if cmd == "top":
+            _print(mw_service.top(args.limit))
+            return 0
+        if cmd == "explain":
+            sym = getattr(args, "opt_symbol", None) or getattr(args, "symbol", None) or "BTCUSDT"
+            _print(mw_service.explain(sym))
+            return 0
+        if cmd == "test-feishu":
+            sym = str(getattr(args, "symbol", None) or "BTCUSDT")
+            res = mw_service.test_feishu(symbol=sym)
+            _print(res)
+            return 0 if res.get("status") == "SUCCESS" else 1
+        return 1
     if args.command == "daemon":
         service = _get_service()
         while True:

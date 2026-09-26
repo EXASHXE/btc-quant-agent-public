@@ -49,7 +49,7 @@ def find_imports_in_file(path: Path) -> list[str]:
     return sorted(set(imported))
 
 
-def get_cli_entrypoints() -> list[str]:
+def get_cli_entrypoints(*, include_operational: bool = False) -> list[str]:
     # Parser construction only: no service, network, SQLite, scan or dispatch.
     from btc_quant_agent.cli import build_parser
 
@@ -59,6 +59,7 @@ def get_cli_entrypoints() -> list[str]:
                 return [
                     leaf
                     for name, child in action.choices.items()
+                    if include_operational or name != "market-watch"
                     for leaf in walk(child, f"{prefix} {name}".strip())
                 ]
         return [prefix]
