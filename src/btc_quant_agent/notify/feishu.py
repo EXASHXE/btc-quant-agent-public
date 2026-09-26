@@ -6,6 +6,7 @@ import hmac
 import json
 import time
 import urllib.request
+from typing import Any
 
 from ..domain import Signal
 
@@ -113,3 +114,17 @@ def send_invalidation(
         result = json.loads(response.read().decode("utf-8"))
     if result.get("code", result.get("StatusCode", 0)) != 0:
         raise RuntimeError(f"Feishu rejected invalidation message: {result}")
+
+
+def build_market_watch_card(alert: Any) -> dict[str, object]:
+    from ..market_watch.alerting import build_market_watch_card as _builder
+
+    return _builder(alert)
+
+
+def send_market_watch_alert(
+    webhook_url: str, alert: Any, secret: str | None = None
+) -> None:
+    from ..market_watch.alerting import send_market_watch_alert as _sender
+
+    return _sender(webhook_url, alert, secret)
