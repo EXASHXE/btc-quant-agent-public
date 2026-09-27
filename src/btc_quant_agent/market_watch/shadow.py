@@ -25,7 +25,7 @@ def _safe_fetch_klines(client: Any, symbol: str, interval: str, limit: int = 120
         if isinstance(res, (list, tuple)):
             return [c for c in res if isinstance(c, Candle)]
     except Exception:  # noqa: BLE001
-        pass
+        return []
     return []
 
 
@@ -39,7 +39,7 @@ def _safe_fetch_historical(
         if isinstance(res, (list, tuple)):
             return [c for c in res if isinstance(c, Candle)]
     except Exception:  # noqa: BLE001
-        pass
+        return []
     return []
 
 
@@ -73,28 +73,24 @@ def resolve_shadow_fill(
         if candle.open_time_ms >= entry_window_end_ms:
             break
 
-        if dir_str == "LONG":
-            # For LONG, candidate candle must trade into entry zone: low <= entry_zone_high
-            if candle.low <= entry_zone_high and candle.high >= entry_zone_low:
-                # Conservative fill price
-                if candle.open >= entry_zone_high:
-                    fill_price = entry_zone_high
-                elif candle.open <= entry_zone_low:
-                    fill_price = entry_zone_low
-                else:
-                    fill_price = candle.open
-                return ShadowFillStatus.FILLED, fill_price, candle.close_time_ms
-        elif dir_str == "SHORT":
-            # For SHORT, candidate candle must trade into entry zone: high >= entry_zone_low
-            if candle.high >= entry_zone_low and candle.low <= entry_zone_high:
-                # Conservative fill price
-                if candle.open <= entry_zone_low:
-                    fill_price = entry_zone_low
-                elif candle.open >= entry_zone_high:
-                    fill_price = entry_zone_high
-                else:
-                    fill_price = candle.open
-                return ShadowFillStatus.FILLED, fill_price, candle.close_time_ms
+        if dir_str == "LONG" and candle.low <= entry_zone_high and candle.high >= entry_zone_low:
+            # Conservative fill price
+            if candle.open >= entry_zone_high:
+                fill_price = entry_zone_high
+            elif candle.open <= entry_zone_low:
+                fill_price = entry_zone_low
+            else:
+                fill_price = candle.open
+            return ShadowFillStatus.FILLED, fill_price, candle.close_time_ms
+        elif dir_str == "SHORT" and candle.high >= entry_zone_low and candle.low <= entry_zone_high:
+            # Conservative fill price
+            if candle.open <= entry_zone_low:
+                fill_price = entry_zone_low
+            elif candle.open >= entry_zone_high:
+                fill_price = entry_zone_high
+            else:
+                fill_price = candle.open
+            return ShadowFillStatus.FILLED, fill_price, candle.close_time_ms
 
     # If not filled: check if entry window has expired
     latest_time = valid_candles[-1].close_time_ms if valid_candles else signal_time_ms
@@ -544,7 +540,7 @@ class ShadowEvaluationManager:
         else:
             gross_r = 0.0
 
-        friction_dollars, friction_r = compute_trade_friction_r(entry_price, exit_price, risk_dist, config)
+        _friction_dollars, friction_r = compute_trade_friction_r(entry_price, exit_price, risk_dist, config)
         net_r = gross_r - friction_r
         is_terminal = sl_hit or tp2_hit
 

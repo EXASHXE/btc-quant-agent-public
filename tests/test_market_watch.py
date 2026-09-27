@@ -3042,7 +3042,7 @@ def test_r2_2_04_scanner_autorecord_and_shadow_manager_have_identical_fill_seman
 
         mgr_id = manager.record_decision(asmt)
         records = store.get_all_shadow_records()
-        mgr_rec = [r for r in records if r["id"] == mgr_id][0]
+        mgr_rec = next(r for r in records if r["id"] == mgr_id)
 
         assert mgr_rec["entry_zone_low"] == 98.0
         assert mgr_rec["entry_zone_high"] == 100.0
@@ -3493,7 +3493,7 @@ def test_r2_2_19_decision_time_after_all_input_timestamps() -> None:
         client._optional_get.return_value = None
         scanner = MarketWatchScanner(config=MarketWatchConfig(), client=client, store=store)
 
-        snap, health, _ = scanner.collect_symbol_snapshot("BTCUSDT", now_ms=1500)
+        snap, _health, _ = scanner.collect_symbol_snapshot("BTCUSDT", now_ms=1500)
         assert snap is not None
         assert snap.collection_started_at_ms <= snap.observed_at_ms <= snap.decision_time_ms
         assert snap.decision_time_ms >= snap.collection_completed_at_ms
