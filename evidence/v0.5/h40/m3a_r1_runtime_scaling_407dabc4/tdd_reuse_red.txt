@@ -1,0 +1,20 @@
+.....F                                                                   [100%]
+=================================== FAILURES ===================================
+_____ test_raw_decisions_share_only_exact_direction_horizon_and_partition ______
+
+    def test_raw_decisions_share_only_exact_direction_horizon_and_partition():
+        bars, start = _bars()
+        t = start + timedelta(hours=100)
+        slot = SimpleNamespace(direction_contract_id='D1_V1_RETURN_4H', primary_horizon='4h')
+        with science._reconstruction_scope() as state:
+            def run(candidate, horizon=4, selected=slot):
+                return science._derive_source_decision(candidate_id=candidate, slot=selected, partition_id='WF1_TRAIN', timestamp=t, product='ETHUSDT', horizon=horizon, bars=bars, source_evidence_hash='raw_source')
+            first = run('A')
+            second = run('B')
+>           assert first is second
+E           AssertionError: assert _Decision(timestamp=datetime.datetime(2022, 6, 5, 4, 0, tzinfo=datetime.timezone.utc), product='ETHUSDT', regime_state...me.timezone.utc), product='ETHUSDT', open=102.55, high=102.96000000000001, low=102.26, close=102.56, close_time=None))) is _Decision(timestamp=datetime.datetime(2022, 6, 5, 4, 0, tzinfo=datetime.timezone.utc), product='ETHUSDT', regime_state...me.timezone.utc), product='ETHUSDT', open=102.55, high=102.96000000000001, low=102.26, close=102.56, close_time=None)))
+
+tests/test_v051_h40_m3a_r1_runtime_scaling.py:132: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_v051_h40_m3a_r1_runtime_scaling.py::test_raw_decisions_share_only_exact_direction_horizon_and_partition
+1 failed, 5 passed in 0.94s

@@ -1,0 +1,93 @@
+{"python_executable": "/root/workspace/project/Quant-agent-sanitized/.venv/bin/python", "science_module": "/root/workspace/project/Quant-agent-sanitized/src/btc_quant_agent/h40/discovery_evidence.py"}
+[
+  {
+    "cache_cardinality": {
+      "candidate_independent_states": 264,
+      "decision_entries": 0,
+      "geometry_cells": 0,
+      "outcome_entries": 0,
+      "percentile_nodes": 6348,
+      "prefit_entries": 264,
+      "reference_observations": 670,
+      "source_product_indices": 1
+    },
+    "mode": "indexed",
+    "seconds": 0.10954353800480021,
+    "train_hours": 264
+  },
+  {
+    "cache_cardinality": {
+      "candidate_independent_states": 0,
+      "decision_entries": 0,
+      "geometry_cells": 0,
+      "outcome_entries": 0,
+      "percentile_nodes": 0,
+      "prefit_entries": 0,
+      "reference_observations": 0,
+      "source_product_indices": 0
+    },
+    "mode": "reference",
+    "seconds": 0.11786673500319012,
+    "train_hours": 264
+  },
+  {
+    "cache_cardinality": {
+      "candidate_independent_states": 2048,
+      "decision_entries": 0,
+      "geometry_cells": 0,
+      "outcome_entries": 0,
+      "percentile_nodes": 51142,
+      "prefit_entries": 2048,
+      "reference_observations": 4238,
+      "source_product_indices": 1
+    },
+    "mode": "indexed",
+    "seconds": 0.7973141420006868,
+    "train_hours": 2048
+  },
+  {
+    "cache_cardinality": {
+      "candidate_independent_states": 0,
+      "decision_entries": 0,
+      "geometry_cells": 0,
+      "outcome_entries": 0,
+      "percentile_nodes": 0,
+      "prefit_entries": 0,
+      "reference_observations": 0,
+      "source_product_indices": 0
+    },
+    "mode": "reference",
+    "seconds": 1.264462310995441,
+    "train_hours": 2048
+  },
+  {
+    "cache_cardinality": {
+      "candidate_independent_states": 8192,
+      "decision_entries": 0,
+      "geometry_cells": 0,
+      "outcome_entries": 0,
+      "percentile_nodes": 231650,
+      "prefit_entries": 8192,
+      "reference_observations": 16526,
+      "source_product_indices": 1
+    },
+    "mode": "indexed",
+    "seconds": 3.355938214001071,
+    "train_hours": 8192
+  },
+  {
+    "cache_cardinality": {
+      "candidate_independent_states": 15312,
+      "decision_entries": 0,
+      "geometry_cells": 0,
+      "outcome_entries": 0,
+      "percentile_nodes": 459490,
+      "prefit_entries": 15312,
+      "reference_observations": 30766,
+      "source_product_indices": 1
+    },
+    "mode": "indexed",
+    "seconds": 6.304359487003239,
+    "train_hours": 15312
+  }
+]

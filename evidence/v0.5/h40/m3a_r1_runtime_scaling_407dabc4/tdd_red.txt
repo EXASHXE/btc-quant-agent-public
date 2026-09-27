@@ -1,0 +1,39 @@
+FFF                                                                      [100%]
+=================================== FAILURES ===================================
+__________ test_exact_percentile_prefix_ties_and_out_of_order_queries __________
+
+    def test_exact_percentile_prefix_ties_and_out_of_order_queries():
+        start = datetime(2022, 1, 1, tzinfo=UTC)
+        observations = [(start + timedelta(hours=i), value) for i, value in enumerate([2.0, 2.0, 1.0, 4.0, -0.0, 0.0])]
+>       assert hasattr(science, '_CausalPercentileIndex')
+E       AssertionError: assert False
+E        +  where False = hasattr(science, '_CausalPercentileIndex')
+
+tests/test_v051_h40_m3a_r1_runtime_scaling.py:15: AssertionError
+____________ test_geometry_index_exact_multiset_floor_and_fallback _____________
+
+    def test_geometry_index_exact_multiset_floor_and_fallback():
+        start = datetime(2022, 1, 1, tzinfo=UTC)
+        owner = 'D1_V1_RETURN_4H'
+        records = {}
+        for i in range(65):
+            # L0 has 29; L1 crosses the floor, with duplicate observations intact.
+            records[(owner, 'ETH_ONLY', 4 if i < 40 else 8, start + timedelta(hours=i), 'ETHUSDT', 'LONG' if i < 29 else 'SHORT')] = (0.003 if i % 2 else 0.004, 0.001)
+>       assert hasattr(science, '_GeometryIndex')
+E       AssertionError: assert False
+E        +  where False = hasattr(science, '_GeometryIndex')
+
+tests/test_v051_h40_m3a_r1_runtime_scaling.py:35: AssertionError
+_____________ test_reconstruction_session_releases_state_on_error ______________
+
+    def test_reconstruction_session_releases_state_on_error():
+>       assert hasattr(science, '_reconstruction_scope')
+E       AssertionError: assert False
+E        +  where False = hasattr(science, '_reconstruction_scope')
+
+tests/test_v051_h40_m3a_r1_runtime_scaling.py:52: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_v051_h40_m3a_r1_runtime_scaling.py::test_exact_percentile_prefix_ties_and_out_of_order_queries
+FAILED tests/test_v051_h40_m3a_r1_runtime_scaling.py::test_geometry_index_exact_multiset_floor_and_fallback
+FAILED tests/test_v051_h40_m3a_r1_runtime_scaling.py::test_reconstruction_session_releases_state_on_error
+3 failed in 0.19s

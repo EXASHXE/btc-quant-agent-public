@@ -1,0 +1,44 @@
+{"python_executable": "/root/workspace/project/Quant-agent-sanitized/.venv/bin/python", "science_module": "/root/workspace/project/Quant-agent-sanitized/src/btc_quant_agent/h40/discovery_evidence.py"}
+{
+  "calibration_hours": 2184,
+  "candidate_rows": 314928,
+  "candidate_verify_wall_seconds": 212.35000539000612,
+  "discovery_evidence_hash": "8e08fa74eebf901cfdf920da161d3ae04371633039b56eed1e267eb68b9a17dc",
+  "evidence_disk_mib": 41.12065124511719,
+  "evidence_objects": 201,
+  "fit_status_counts": {
+    "COMPLETE": 9,
+    "FIT_INVALID": 9
+  },
+  "peak_rss_mib": 524.38671875,
+  "producer_cache_cardinality": {
+    "candidate_independent_states": 17496,
+    "decision_entries": 314928,
+    "geometry_cells": 66,
+    "outcome_entries": 52488,
+    "percentile_nodes": 479458,
+    "prefit_entries": 314928,
+    "reference_observations": 32014,
+    "source_product_indices": 1
+  },
+  "producer_wall_seconds": 83.10979156299436,
+  "registered_slots": 18,
+  "released_cache_state": true,
+  "roundtrip_only_wall_seconds": 410.7771961230028,
+  "setup_wall_seconds": 5.543970935999823,
+  "source_hours": 18264,
+  "synthetic_only": true,
+  "total_wall_seconds": 416.6480308559985,
+  "train_hours": 15312,
+  "verifier_cache_cardinality": {
+    "candidate_independent_states": 17496,
+    "decision_entries": 314928,
+    "geometry_cells": 66,
+    "outcome_entries": 52488,
+    "percentile_nodes": 479458,
+    "prefit_entries": 314928,
+    "reference_observations": 32014,
+    "source_product_indices": 1
+  },
+  "verifier_manifest_wall_seconds": 115.31739917000232
+}

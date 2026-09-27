@@ -1,0 +1,18 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+___________ test_production_session_never_adopts_caller_cache_state ____________
+
+    def test_production_session_never_adopts_caller_cache_state():
+        @science._reconstruction_session
+        def operation():
+            return science._ACTIVE_RECONSTRUCTION.get()
+        with science._reconstruction_scope() as caller_state:
+            first = operation()
+            second = operation()
+>           assert first is not caller_state
+E           assert <btc_quant_agent.h40.discovery_evidence._ReconstructionState object at 0x771d5ffa8d40> is not <btc_quant_agent.h40.discovery_evidence._ReconstructionState object at 0x771d5ffa8d40>
+
+tests/test_v051_h40_m3a_r1_runtime_scaling.py:190: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_v051_h40_m3a_r1_runtime_scaling.py::test_production_session_never_adopts_caller_cache_state
+1 failed in 0.25s

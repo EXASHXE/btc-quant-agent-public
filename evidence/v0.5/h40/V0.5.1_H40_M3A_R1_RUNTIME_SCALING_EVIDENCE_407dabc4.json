@@ -1,0 +1,187 @@
+{
+  "changed_files": [
+    "src/btc_quant_agent/h40/discovery_evidence.py",
+    "src/btc_quant_agent/h40/discovery_producer.py",
+    "tests/h40_runtime_reference.py",
+    "tests/h40_runtime_scaling_benchmark.py",
+    "tests/test_v051_h40_m3a_production_discovery_producer.py",
+    "tests/test_v051_h40_m3a_r1_runtime_scaling.py"
+  ],
+  "compact_fixture_byte_equivalence": {
+    "all_18_verifier_outputs_identical": true,
+    "decision_rows": 9504,
+    "evidence_objects": 201,
+    "identical_canonical_bytes": true,
+    "identical_digests": true,
+    "reference_sha": "16dc10213cd5b5fb3ff14e939db44a50d6d19fe2",
+    "session_isolation_verified": true
+  },
+  "formal_final_state": "M3A_R1_RUNTIME_SCALING_CLOSURE_PENDING_CONTROLLER",
+  "frozen_identities": {
+    "discovery_provenance_contract_hash": "31fc3930e44149e6b3af54ddd3b11c630f95cbbd3f152b3d0d5e614690dcf7ae",
+    "discovery_selection_correction_contract_hash": "f84c97050c7db813263e5ffda6b1c556af0b7b0e2876bb8616640d2c9d67084b",
+    "implementation_authority_hash": "088b1210c17171141e232219345fa890e182282445fd9b2a70804b177d808b96",
+    "lifecycle_governance_authority": "bb367f2af726be105bddf42636c97652402014c8a671d43ab81b1964c258e5cf",
+    "lifecycle_semantic_root": "36cbda530352cffaa475bd835b3b629df47351ca284e09bdf31a8fc884d48b4b",
+    "p3_controller_authority_hash": "37b6ea92ff61b90c07f38cadea58087a8dc91c67d3beabe34dc7792988ff3e3a",
+    "protocol_authority_hash": "a83f8fc7a5ca7109fb8cd7fed114d87c3b2c968b5145c11cada203aa5111d1ce",
+    "scientific_semantic_root": "71889a35f227ed734272b712851174a69bf9dbb12ea3f87cd84c26e7c66f6af1",
+    "structural_ledger_hash": "483f68502b57972deae071c7bd4587ca3e57ccaa72bd99fb0de07b4f0ab8c85f"
+  },
+  "full_scale_synthetic_benchmark": {
+    "calibration_hours": 2184,
+    "candidate_rows": 314928,
+    "candidate_verify_wall_seconds": 212.35000539000612,
+    "discovery_evidence_hash": "8e08fa74eebf901cfdf920da161d3ae04371633039b56eed1e267eb68b9a17dc",
+    "evidence_disk_mib": 41.12065124511719,
+    "evidence_objects": 201,
+    "fit_status_counts": {
+      "COMPLETE": 9,
+      "FIT_INVALID": 9
+    },
+    "peak_rss_mib": 524.38671875,
+    "producer_cache_cardinality": {
+      "candidate_independent_states": 17496,
+      "decision_entries": 314928,
+      "geometry_cells": 66,
+      "outcome_entries": 52488,
+      "percentile_nodes": 479458,
+      "prefit_entries": 314928,
+      "reference_observations": 32014,
+      "source_product_indices": 1
+    },
+    "producer_wall_seconds": 83.10979156299436,
+    "registered_slots": 18,
+    "released_cache_state": true,
+    "roundtrip_only_wall_seconds": 410.7771961230028,
+    "setup_wall_seconds": 5.543970935999823,
+    "source_hours": 18264,
+    "synthetic_only": true,
+    "total_wall_seconds": 416.6480308559985,
+    "train_hours": 15312,
+    "verifier_cache_cardinality": {
+      "candidate_independent_states": 17496,
+      "decision_entries": 314928,
+      "geometry_cells": 66,
+      "outcome_entries": 52488,
+      "percentile_nodes": 479458,
+      "prefit_entries": 314928,
+      "reference_observations": 32014,
+      "source_product_indices": 1
+    },
+    "verifier_manifest_wall_seconds": 115.31739917000232
+  },
+  "generated_at_utc": "2026-09-27T15:07:10.851430+00:00",
+  "golden_hashes": {
+    "geometry_projection_sha256": "27b23da5a3a6f59aecbd392c976793a138aff448395278b21746315de7fe6b92",
+    "scientific_projection_sha256": "d5a962cd9c9556b573a890b6af8cbeb09d7201187511f477d727c8670bf0b2e0"
+  },
+  "multi_scale_benchmark": [
+    {
+      "indexed_seconds": 0.10954353800480021,
+      "reference_seconds": 0.11786673500319012,
+      "speedup_vs_reference": 1.076,
+      "train_hours": 264
+    },
+    {
+      "indexed_seconds": 0.7973141420006868,
+      "reference_seconds": 1.264462310995441,
+      "speedup_vs_reference": 1.586,
+      "train_hours": 2048
+    },
+    {
+      "indexed_seconds": 3.355938214001071,
+      "reference_seconds": null,
+      "scaling_factor_vs_2048": 4.209,
+      "train_hours": 8192
+    },
+    {
+      "indexed_seconds": 6.304359487003239,
+      "reference_seconds": null,
+      "scaling_factor_vs_8192": 1.879,
+      "train_hours": 15312
+    }
+  ],
+  "next_stage": "CONTROLLER_M3A_R1_EXACT_SHA_ACCEPTANCE_THEN_EXPLICIT_GO_FOR_M3B_REAL_DISCOVERY",
+  "parent_commit_sha": "16dc10213cd5b5fb3ff14e939db44a50d6d19fe2",
+  "protected_surface_attestation": {
+    "accepted_execution_write_authority": null,
+    "candidate_lock_created": false,
+    "confirmation_accessed": false,
+    "execution_policy": "RESEARCH_DISABLED_V1",
+    "final_holdout_accessed": false,
+    "h39_accessed": false,
+    "protected_outcomes_accessed": false,
+    "real_discovery_authorization_receipt_created": false,
+    "real_discovery_result_generated": false,
+    "signed_network_requests": 0,
+    "wf1_calibration_outcomes_accessed": false
+  },
+  "raw_log_sha256": {
+    "evidence/v0.5/h40/m3a_r1_runtime_scaling_407dabc4/compact_after_profile.txt": "9646b5810a7e2063e9bf30ffdf718a0552b4ce736a275fccfee27fe744b837fb",
+    "evidence/v0.5/h40/m3a_r1_runtime_scaling_407dabc4/compact_before.txt": "979fd7e22db09b0af4d20c00f7c5b345f23d7cb3c01f280179a742985cb8383a",
+    "evidence/v0.5/h40/m3a_r1_runtime_scaling_407dabc4/compact_equivalence_development.txt": "e183e1adec1b81b9c9bbdb644ee05db2f30d3f3862e623c24fdaf827272e6f23",
+    "evidence/v0.5/h40/m3a_r1_runtime_scaling_407dabc4/compileall.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "evidence/v0.5/h40/m3a_r1_runtime_scaling_407dabc4/diff_check.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "evidence/v0.5/h40/m3a_r1_runtime_scaling_407dabc4/focused_development.txt": "a26c4aa9fcb9cc23d592da33e78bf3dcb0ab7427197a29ee2650550fd7af679f",
+    "evidence/v0.5/h40/m3a_r1_runtime_scaling_407dabc4/full_scale_development.txt": "7ab33965f77fc3ef2fc7273869247cb0788c06daa47fd960ce8c42e717afe2c5",
+    "evidence/v0.5/h40/m3a_r1_runtime_scaling_407dabc4/full_suite_summary.txt": "b48f8853a9202262ccdb15d1aacd9fa67a3caf870e1bfac134bc1bf213614ccd",
+    "evidence/v0.5/h40/m3a_r1_runtime_scaling_407dabc4/mypy.txt": "36dda6f9cde9c4724b81d27ea2de1d55f45a24bcb058ea63cdcf553e01f019e1",
+    "evidence/v0.5/h40/m3a_r1_runtime_scaling_407dabc4/p3b_verifier_tests.txt": "751a2fc1fe0cbfde092eaf58013ff097cdb874b7a42ac66a1062ed3e2cee0931",
+    "evidence/v0.5/h40/m3a_r1_runtime_scaling_407dabc4/ruff.txt": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+    "evidence/v0.5/h40/m3a_r1_runtime_scaling_407dabc4/scales_development.txt": "6500d973a13b004b25e32dd725a50f31491d4fa6957699566e4bea65b5f92a60",
+    "evidence/v0.5/h40/m3a_r1_runtime_scaling_407dabc4/scaling_tests.txt": "0f50a9840f3a0bf4b71631809803a9d5246687fefacc6c72a7703c21ee9dda63",
+    "evidence/v0.5/h40/m3a_r1_runtime_scaling_407dabc4/tdd_isolation_red.txt": "e50d13b4b9123aef916f569baeabecb709491d5425c4ab3a64cfee53bafcd1d6",
+    "evidence/v0.5/h40/m3a_r1_runtime_scaling_407dabc4/tdd_red.txt": "c783d40f99d71481937aadbe2722c22b12e936c20ca33bd3650f6730451cae7a",
+    "evidence/v0.5/h40/m3a_r1_runtime_scaling_407dabc4/tdd_reuse_red.txt": "5658f2f50166d98ebff5dfa2a8a81589ba1e138b4ef293b6190eeb06ac54c3db"
+  },
+  "remote_ref": "refs/heads/v0.5-refactor",
+  "remote_sha": "407dabc415ae8cae4210250e992941c8b9b25464",
+  "schema_id": "H40_M3A_R1_RUNTIME_SCALING_EVIDENCE_V1",
+  "tested_implementation_sha": "407dabc415ae8cae4210250e992941c8b9b25464",
+  "validation_results": {
+    "authority_pit_fence_tests": {
+      "exit_code": 0,
+      "passed": 231,
+      "seconds": 66.76
+    },
+    "compileall": {
+      "exit_code": 0,
+      "status": "PASSED"
+    },
+    "diff_check": {
+      "exit_code": 0,
+      "status": "PASSED"
+    },
+    "full_suite": {
+      "exit_code": 0,
+      "passed": 1746,
+      "seconds": 723.56,
+      "warnings": 9
+    },
+    "m3a_producer_tests": {
+      "exit_code": 0,
+      "passed": 26,
+      "seconds": 199.59
+    },
+    "m3a_r1_runtime_scaling_tests": {
+      "exit_code": 0,
+      "passed": 8,
+      "seconds": 60.25
+    },
+    "mypy": {
+      "exit_code": 0,
+      "source_files": 99,
+      "status": "PASSED"
+    },
+    "p3b_verifier_tests": {
+      "exit_code": 0,
+      "passed": 86,
+      "seconds": 51.27
+    },
+    "ruff": {
+      "exit_code": 0,
+      "status": "PASSED"
+    }
+  }
+}
