@@ -234,6 +234,7 @@ class DirectionalPlan:
     benchmark_context: BenchmarkContext = BenchmarkContext.BENCHMARK_NEUTRAL
     breakout_state: BreakoutState = BreakoutState.NONE
     breakout_level: float | None = None
+    breakout_direction: str | None = None
     breakout_bar_end_ms: int | None = None
 
     def as_dict(self) -> dict[str, Any]:

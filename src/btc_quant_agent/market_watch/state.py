@@ -66,6 +66,7 @@ class MarketWatchStateStore:
                 """
                 CREATE TABLE IF NOT EXISTS market_watch_symbol_state (
                     symbol TEXT PRIMARY KEY,
+                    setup TEXT,
                     regime TEXT,
                     directional_decision TEXT,
                     grid_decision TEXT,
@@ -100,6 +101,7 @@ class MarketWatchStateStore:
             )
             # Migrations for existing DB
             cols_symbol_state = [
+                ("setup", "TEXT"),
                 ("breakout_level", "REAL"),
                 ("breakout_direction", "TEXT"),
                 ("breakout_bar_end_ms", "INTEGER"),
@@ -181,7 +183,9 @@ class MarketWatchStateStore:
                     time_to_stop_ms INTEGER,
                     net_r REAL,
                     regime_after TEXT,
-                    resolved INTEGER DEFAULT 0
+                    resolved INTEGER DEFAULT 0,
+                    evaluation_horizon_bars INTEGER DEFAULT 16,
+                    evaluation_end_ms INTEGER
                 )
                 """
             )
@@ -194,6 +198,8 @@ class MarketWatchStateStore:
                 ("tp2", "REAL"),
                 ("direction", "TEXT"),
                 ("resolved", "INTEGER DEFAULT 0"),
+                ("evaluation_horizon_bars", "INTEGER DEFAULT 16"),
+                ("evaluation_end_ms", "INTEGER"),
             ]:
                 try:
                     conn.execute(f"ALTER TABLE market_watch_shadow_records ADD COLUMN {col_name} {col_type}")
@@ -231,7 +237,7 @@ class MarketWatchStateStore:
         d = assessment.directional
         bo_state = str(d.breakout_state) if d.breakout_state != BreakoutState.NONE else prev.get("breakout_state", "NONE")
         bo_level = d.breakout_level if d.breakout_level is not None else prev.get("breakout_level")
-        bo_dir = ("LONG" if d.decision == DirectionalDecision.LONG else ("SHORT" if d.decision == DirectionalDecision.SHORT else None)) or prev.get("breakout_direction")
+        bo_dir = d.breakout_direction or ("LONG" if d.decision == DirectionalDecision.LONG else ("SHORT" if d.decision == DirectionalDecision.SHORT else None)) or prev.get("breakout_direction")
         bo_time = d.breakout_bar_end_ms if d.breakout_bar_end_ms is not None else prev.get("breakout_bar_end_ms")
 
         # If retested or invalidated or expired, reset breakout state
@@ -251,21 +257,33 @@ class MarketWatchStateStore:
             failed_bd = assessment.snapshot.tf_1h.recent_swing_low
             failed_bd_ms = bar_end_ms
 
-        # Lifecycle timing
-        if prev.get("created_bar_end_ms") and curr_life in ("ARMED", "TRIGGERED", "CANDIDATE") and prev_life in ("ARMED", "TRIGGERED", "CANDIDATE"):
+        # Lifecycle timing keyed by setup/signal identity (R2)
+        prev_setup = prev.get("setup")
+        curr_setup = str(assessment.directional.setup.value)
+        is_same_setup = (
+            prev_setup is not None
+            and prev_setup == curr_setup
+            and curr_setup != "NO_TRADE"
+        )
+
+        if is_same_setup and prev.get("created_bar_end_ms") and curr_life in ("ARMED", "TRIGGERED", "CANDIDATE") and prev_life in ("ARMED", "TRIGGERED", "CANDIDATE"):
             created_ms = prev["created_bar_end_ms"]
         else:
             created_ms = bar_end_ms
 
-        if curr_life == "ARMED":
-            armed_ms = prev.get("armed_bar_end_ms") or bar_end_ms
-        else:
-            armed_ms = prev.get("armed_bar_end_ms")
+        if is_same_setup:
+            if curr_life == "ARMED":
+                armed_ms = prev.get("armed_bar_end_ms") or bar_end_ms
+            else:
+                armed_ms = prev.get("armed_bar_end_ms")
 
-        if curr_life == "TRIGGERED":
-            triggered_ms = prev.get("triggered_bar_end_ms") or bar_end_ms
+            if curr_life == "TRIGGERED":
+                triggered_ms = prev.get("triggered_bar_end_ms") or bar_end_ms
+            else:
+                triggered_ms = prev.get("triggered_bar_end_ms")
         else:
-            triggered_ms = prev.get("triggered_bar_end_ms")
+            armed_ms = bar_end_ms if curr_life == "ARMED" else None
+            triggered_ms = bar_end_ms if curr_life == "TRIGGERED" else None
 
         if created_ms and bar_end_ms >= created_ms:
             age_bars = max(0, int((bar_end_ms - created_ms) / (15 * 60 * 1000)))
@@ -276,14 +294,14 @@ class MarketWatchStateStore:
         if curr_life in ("ARMED", "TRIGGERED"):
             if last_shadow_state not in ("ARMED", "TRIGGERED"):
                 last_shadow_state = curr_life
-        elif curr_life in ("CANDIDATE", "INVALIDATED", "EXPIRED") and assessment.directional.setup.value == "NO_TRADE":
+        elif curr_life in ("CANDIDATE", "INVALIDATED", "EXPIRED") and curr_setup == "NO_TRADE":
             last_shadow_state = None
 
         with self._connect() as conn:
             conn.execute(
                 """
                 INSERT INTO market_watch_symbol_state (
-                    symbol, regime, directional_decision, grid_decision,
+                    symbol, setup, regime, directional_decision, grid_decision,
                     derivatives_regime, entry_quality, recent_support,
                     recent_resistance, recent_breakout_level,
                     recent_failed_breakout, recent_failed_breakdown,
@@ -294,8 +312,9 @@ class MarketWatchStateStore:
                     recent_failed_breakout_ms, recent_failed_breakdown_ms,
                     created_bar_end_ms, armed_bar_end_ms, triggered_bar_end_ms,
                     age_bars, last_shadow_recorded_state
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ON CONFLICT(symbol) DO UPDATE SET
+                    setup = excluded.setup,
                     regime = excluded.regime,
                     directional_decision = excluded.directional_decision,
                     grid_decision = excluded.grid_decision,
@@ -328,6 +347,7 @@ class MarketWatchStateStore:
                 """,
                 (
                     symbol,
+                    curr_setup,
                     str(assessment.directional.regime),
                     str(assessment.directional.decision),
                     str(assessment.grid.decision),
@@ -427,7 +447,9 @@ class MarketWatchStateStore:
         tp1: float = 0.0,
         tp2: float = 0.0,
         direction: str = "",
+        evaluation_horizon_bars: int = 16,
     ) -> int:
+        eval_end_ms = timestamp_ms + (evaluation_horizon_bars * 15 * 60 * 1000)
         with self._connect() as conn:
             cursor = conn.execute(
                 """
@@ -435,8 +457,8 @@ class MarketWatchStateStore:
                     timestamp_ms, symbol, snapshot_hash, policy_version, config_hash,
                     agent_decision, agent_setup, entry_quality, reason_codes_json,
                     reference_decision, reference_notes, entry_price, stop_loss,
-                    tp1, tp2, direction, resolved
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)
+                    tp1, tp2, direction, resolved, evaluation_horizon_bars, evaluation_end_ms
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?)
                 """,
                 (
                     timestamp_ms,
@@ -455,6 +477,8 @@ class MarketWatchStateStore:
                     tp1,
                     tp2,
                     direction,
+                    evaluation_horizon_bars,
+                    eval_end_ms,
                 ),
             )
             conn.commit()
@@ -566,11 +590,17 @@ def evaluate_alert_emission(
     if prev_state is not None:
         prev_gd = prev_state.get("grid_decision")
         if prev_gd:
+            prev_lb = prev_state.get("grid_lower_bound")
+            if prev_lb is None:
+                prev_lb = prev_state.get("recent_support")
+            prev_ub = prev_state.get("grid_upper_bound")
+            if prev_ub is None:
+                prev_ub = prev_state.get("recent_resistance")
             prev_grid = GridPlan(
                 symbol=assessment.symbol,
                 decision=GridDecision(prev_gd),
-                lower_bound=prev_state.get("grid_lower_bound") or prev_state.get("recent_support"),
-                upper_bound=prev_state.get("grid_upper_bound") or prev_state.get("recent_resistance"),
+                lower_bound=prev_lb,
+                upper_bound=prev_ub,
             )
 
     grid_change_alert = should_alert_grid_change(

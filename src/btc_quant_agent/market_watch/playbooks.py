@@ -503,14 +503,7 @@ def evaluate_volatility_expansion(
     atr = max(tf_15m.atr, 1e-6)
 
     # 1. Require actual prior compression window
-    has_prior_comp = (
-        tf_15m.has_prior_compression_window
-        or tf_1h.has_prior_compression_window
-        or tf_15m.is_volatility_compressed
-        or tf_1h.is_volatility_compressed
-        or (tf_15m.bb_width_percentile <= 0.25)
-        or (tf_1h.bb_width_percentile <= 0.25)
-    )
+    has_prior_comp = tf_15m.has_prior_compression_window or tf_1h.has_prior_compression_window
     if not has_prior_comp:
         return None
 

@@ -98,7 +98,7 @@ class MarketWatchService:
             try:
                 dec = json.loads(latest_asmt.get("decision_json", "{}"))
                 veto_reasons = dec.get("veto_reasons", [])
-                grid_codes = dec.get("grid", {}).get("reasons", [])
+                grid_codes = dec.get("grid", {}).get("reason_codes", dec.get("grid", {}).get("reasons", []))
             except (json.JSONDecodeError, TypeError):
                 veto_reasons = []
                 grid_codes = []
@@ -120,6 +120,7 @@ class MarketWatchService:
             "risk_codes": risk_codes,
             "veto_reasons": veto_reasons,
             "grid_codes": grid_codes,
+            "grid_reason_codes": grid_codes,
             "recent_support": state.get("recent_support") if state else None,
             "recent_resistance": state.get("recent_resistance") if state else None,
             "recent_failed_breakout": state.get("recent_failed_breakout") if state else None,
@@ -138,10 +139,12 @@ class MarketWatchService:
     def shadow_resolve(self) -> dict[str, Any]:
         """Resolve pending shadow observations against subsequent closed candles."""
         now_ms = int(time.time() * 1000)
-        resolved_count = self.shadow_recorder.resolve_pending_observations(self.client, now_ms)
+        res = self.shadow_recorder.resolve_pending_observations(self.client, now_ms)
         return {
             "status": "SUCCESS",
-            "resolved_count": resolved_count,
+            "resolved_count": res.get("resolved_count", 0),
+            "pending_count": res.get("pending_count", 0),
+            "results": res.get("results", []),
             "summary": self.shadow_recorder.get_status(),
         }
 

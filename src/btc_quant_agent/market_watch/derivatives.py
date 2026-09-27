@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from .config import MarketWatchConfig
-from .domain import DerivativesMetrics, DerivativesRegime
+from .domain import DerivativesMetrics, DerivativesRegime, DirectionalDecision
 
 
 def evaluate_derivatives_regime(
@@ -134,3 +134,102 @@ def evaluate_derivatives_regime(
 
     reasons.append("DERIVATIVES_BALANCED")
     return DerivativesRegime.NEUTRAL, tuple(reasons), tuple(risks)
+
+
+def is_severe_long_crowding(derivatives: DerivativesMetrics, config: MarketWatchConfig) -> bool:
+    """Determine if long crowding is severe enough to gate directional Long actions to WAIT."""
+    tc = config.thresholds
+    funding = derivatives.funding_rate
+    gls = derivatives.global_account_long_short_ratio
+    ttp = derivatives.top_trader_position_ratio
+
+    if funding is not None and funding >= tc.funding_extreme_abs:
+        return True
+    if (
+        funding is not None
+        and funding >= tc.funding_crowding_abs
+        and gls is not None
+        and gls >= tc.global_long_crowding_ratio
+    ):
+        return True
+    if (
+        funding is not None
+        and funding >= tc.funding_crowding_abs
+        and ttp is not None
+        and ttp >= tc.top_trader_crowding_ratio
+    ):
+        return True
+    if gls is not None and gls >= tc.global_long_crowding_ratio * 1.2:
+        return True
+    if ttp is not None and ttp >= tc.top_trader_crowding_ratio * 1.25:
+        return True
+    return False
+
+
+def is_severe_short_crowding(derivatives: DerivativesMetrics, config: MarketWatchConfig) -> bool:
+    """Determine if short crowding is severe enough to gate directional Short actions to WAIT."""
+    tc = config.thresholds
+    funding = derivatives.funding_rate
+    gls = derivatives.global_account_long_short_ratio
+    ttp = derivatives.top_trader_position_ratio
+
+    if funding is not None and funding <= -tc.funding_extreme_abs:
+        return True
+    if (
+        funding is not None
+        and funding <= -tc.funding_crowding_abs
+        and gls is not None
+        and gls <= tc.global_short_crowding_ratio
+    ):
+        return True
+    if (
+        funding is not None
+        and funding <= -tc.funding_crowding_abs
+        and ttp is not None
+        and ttp <= (1.0 / tc.top_trader_crowding_ratio)
+    ):
+        return True
+    if gls is not None and gls <= tc.global_short_crowding_ratio * 0.8:
+        return True
+    if ttp is not None and ttp <= (1.0 / (tc.top_trader_crowding_ratio * 1.25)):
+        return True
+    return False
+
+
+def apply_derivatives_action_gate(
+    *,
+    decision: DirectionalDecision,
+    derivatives: DerivativesMetrics,
+    config: MarketWatchConfig,
+) -> tuple[DirectionalDecision, tuple[str, ...], tuple[str, ...]]:
+    """Enforce Derivatives Action Gate.
+
+    Rules:
+    - SHORT + LONG_LIQUIDATION / DELEVERAGING => WAIT with DO_NOT_CHASE_SHORT.
+    - LONG + severe LONG_CROWDING => WAIT.
+    - SHORT + severe SHORT_CROWDING => WAIT.
+    - Moderate crowding remains score penalty only (handled in opportunity scoring).
+    """
+    if decision == DirectionalDecision.WAIT:
+        return decision, (), ()
+
+    reasons: list[str] = []
+    risks: list[str] = []
+
+    if decision == DirectionalDecision.SHORT:
+        if derivatives.regime in (DerivativesRegime.LONG_LIQUIDATION, DerivativesRegime.DELEVERAGING):
+            reasons.append("DERIVATIVES_VETO_SHORT_ON_LIQUIDATION_UNWIND")
+            risks.append("DO_NOT_CHASE_SHORT")
+            return DirectionalDecision.WAIT, tuple(reasons), tuple(risks)
+
+        if is_severe_short_crowding(derivatives, config):
+            reasons.append("DERIVATIVES_VETO_SEVERE_SHORT_CROWDING")
+            risks.append("SHORT_CROWDING_RISK")
+            return DirectionalDecision.WAIT, tuple(reasons), tuple(risks)
+
+    elif decision == DirectionalDecision.LONG and is_severe_long_crowding(derivatives, config):
+        reasons.append("DERIVATIVES_VETO_SEVERE_LONG_CROWDING")
+        risks.append("LONG_CROWDING_RISK")
+        return DirectionalDecision.WAIT, tuple(reasons), tuple(risks)
+
+    return decision, (), ()

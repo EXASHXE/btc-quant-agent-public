@@ -10,7 +10,7 @@ from ..data.binance import BinancePublicClient
 from .alerting import send_market_watch_alert
 from .config import MarketWatchConfig, compute_market_watch_config_hash
 from .context import apply_benchmark_context_gate, evaluate_benchmark_context
-from .derivatives import evaluate_derivatives_regime
+from .derivatives import apply_derivatives_action_gate, evaluate_derivatives_regime
 from .domain import (
     MARKET_WATCH_POLICY_VERSION,
     BreakoutState,
@@ -281,9 +281,27 @@ class MarketWatchScanner:
             reasons=d_reasons + d_risks,
         )
 
+        source_timestamps = [
+            int(t)
+            for t in (
+                tf_15m.closed_bar_end_time_ms,
+                tf_1h.closed_bar_end_time_ms,
+                tf_4h.closed_bar_end_time_ms,
+                funding_time_ms,
+                open_interest_time_ms,
+                taker_time_ms,
+                basis_time_ms,
+                long_short_time_ms,
+                exchange_time_ms,
+            )
+            if isinstance(t, (int, float)) and t > 0
+        ]
+        observed_at_ms = max(source_timestamps) if source_timestamps else now_ms
+        decision_time_ms = max(now_ms, observed_at_ms, *source_timestamps)
+
         snap_hash = compute_snapshot_hash(
             symbol=symbol,
-            decision_time_ms=now_ms,
+            decision_time_ms=decision_time_ms,
             price=price_metrics,
             tf_15m=tf_15m,
             tf_1h=tf_1h,
@@ -293,8 +311,8 @@ class MarketWatchScanner:
 
         snapshot = MarketSnapshot(
             symbol=symbol,
-            decision_time_ms=now_ms,
-            observed_at_ms=now_ms,
+            decision_time_ms=decision_time_ms,
+            observed_at_ms=observed_at_ms,
             exchange_time_ms=exchange_time_ms,
             price=price_metrics,
             tf_15m=tf_15m,
@@ -381,6 +399,7 @@ class MarketWatchScanner:
             confidence = pb_candidate["confidence"]
             bo_state = pb_candidate.get("breakout_state", BreakoutState.NONE)
             bo_level = pb_candidate.get("breakout_level")
+            bo_dir = pb_candidate.get("breakout_direction")
             bo_bar_end_ms = pb_candidate.get("breakout_bar_end_ms")
             reasons = list(pb_candidate["reasons"]) + tf_reasons + list(bench_reasons)
             risks = list(pb_candidate["risks"]) + list(bench_risks)
@@ -396,6 +415,7 @@ class MarketWatchScanner:
             confidence = ConfidenceBand.LOW
             bo_state = BreakoutState.NONE
             bo_level = None
+            bo_dir = None
             bo_bar_end_ms = None
             reasons = ["NO_CONFIRMED_PLAYBOOK_CANDIDATE"] + tf_reasons
             risks = list(bench_risks)
@@ -448,6 +468,15 @@ class MarketWatchScanner:
         reasons.extend(bg_reasons)
         risks.extend(bg_risks)
 
+        # 7b. Derivatives Action Gate (R2)
+        gated_decision, deriv_reasons, deriv_risks = apply_derivatives_action_gate(
+            decision=gated_decision,
+            derivatives=derivatives,
+            config=self.config,
+        )
+        reasons.extend(deriv_reasons)
+        risks.extend(deriv_risks)
+
         # 8. Fatal Vetoes (Enforced before ranking)
         has_fatal_veto, fatal_reasons = check_fatal_vetoes(
             decision=gated_decision,
@@ -499,17 +528,24 @@ class MarketWatchScanner:
             benchmark_context=bench_context,
             breakout_state=bo_state,
             breakout_level=bo_level,
+            breakout_direction=bo_dir,
             breakout_bar_end_ms=bo_bar_end_ms,
         )
 
         # 10. Grid Policy
         prev_grid = None
         if prev_state is not None and prev_state.get("grid_decision"):
+            prev_lb = prev_state.get("grid_lower_bound")
+            if prev_lb is None:
+                prev_lb = prev_state.get("recent_support")
+            prev_ub = prev_state.get("grid_upper_bound")
+            if prev_ub is None:
+                prev_ub = prev_state.get("recent_resistance")
             prev_grid = GridPlan(
                 symbol=symbol,
                 decision=GridDecision(prev_state["grid_decision"]),
-                lower_bound=prev_state.get("recent_support"),
-                upper_bound=prev_state.get("recent_resistance"),
+                lower_bound=prev_lb,
+                upper_bound=prev_ub,
             )
         grid_plan = evaluate_grid_policy(
             symbol=symbol,
@@ -520,17 +556,28 @@ class MarketWatchScanner:
             config=self.config,
         )
 
-        # 11. Lifecycle State
+        # 11. Lifecycle State (Keyed by setup/signal identity)
         prev_lifecycle = (
             SignalLifecycleState(prev_state["lifecycle_state"])
             if (prev_state and prev_state.get("lifecycle_state"))
             else None
         )
         current_bar_end = tf_15m.closed_bar_end_time_ms
-        created_bar_end = prev_state.get("created_bar_end_ms") if prev_state else None
-        if created_bar_end and current_bar_end >= created_bar_end:
-            age_bars = max(0, int((current_bar_end - created_bar_end) / (15 * 60 * 1000)))
+        prev_setup = prev_state.get("setup") if prev_state else None
+        curr_setup = str(setup.value)
+        is_same_setup = (
+            prev_setup is not None
+            and prev_setup == curr_setup
+            and curr_setup != "NO_TRADE"
+        )
+        if is_same_setup and prev_state and prev_state.get("created_bar_end_ms"):
+            created_bar_end = prev_state["created_bar_end_ms"]
+            if current_bar_end >= created_bar_end:
+                age_bars = max(0, int((current_bar_end - created_bar_end) / (15 * 60 * 1000)))
+            else:
+                age_bars = 0
         else:
+            created_bar_end = current_bar_end
             age_bars = 0
 
         has_setup = (setup != PlaybookType.NO_TRADE)
@@ -541,13 +588,14 @@ class MarketWatchScanner:
         is_invalid = False
         if (
             prev_lifecycle in (SignalLifecycleState.ARMED, SignalLifecycleState.TRIGGERED)
+            and is_same_setup
             and gated_decision == DirectionalDecision.WAIT
             and not is_near_ready
         ):
             is_invalid = True
 
         lifecycle = advance_lifecycle_state(
-            previous_state=prev_lifecycle,
+            previous_state=prev_lifecycle if is_same_setup else None,
             decision=gated_decision,
             entry_quality=entry_quality,
             is_invalidated=is_invalid,
@@ -680,7 +728,7 @@ class MarketWatchScanner:
                     entry_p = a.snapshot.price.last_price
 
                 self.store.record_shadow_observation(
-                    timestamp_ms=now_ms,
+                    timestamp_ms=a.snapshot.decision_time_ms,
                     symbol=a.symbol,
                     snapshot_hash=a.snapshot.snapshot_hash,
                     agent_decision=str(a.directional.decision),

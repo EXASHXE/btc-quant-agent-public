@@ -21,6 +21,7 @@ class ShadowEvaluationManager:
         assessment: SymbolAssessment,
         reference_decision: str | None = None,
         reference_notes: str | None = None,
+        evaluation_horizon_bars: int = 16,
     ) -> int:
         d = assessment.directional
         entry_price = (
@@ -45,6 +46,7 @@ class ShadowEvaluationManager:
             tp1=d.take_profit_1,
             tp2=d.take_profit_2,
             direction=str(d.decision),
+            evaluation_horizon_bars=evaluation_horizon_bars,
         )
 
     def resolve_pending_observations(
@@ -67,6 +69,11 @@ class ShadowEvaluationManager:
             tp1 = float(rec.get("tp1") or 0.0)
             tp2 = float(rec.get("tp2") or 0.0)
             dir_str = rec.get("direction", "WAIT")
+            eval_bars = int(rec.get("evaluation_horizon_bars") or 16)
+            eval_end_ms = rec.get("evaluation_end_ms")
+            if not eval_end_ms:
+                eval_end_ms = timestamp_ms + (eval_bars * 15 * 60 * 1000)
+
             if dir_str not in ("LONG", "SHORT") or entry_price <= 0:
                 self.store.update_shadow_outcome(
                     rec_id,
@@ -89,9 +96,10 @@ class ShadowEvaluationManager:
                 results.append({"id": rec_id, "symbol": symbol, "status": f"FETCH_FAILED: {exc}"})
                 continue
 
+            # Only complete candles up to the frozen evaluation horizon
             subsequent_closed = [
                 c for c in raw_candles
-                if c.open_time_ms >= timestamp_ms and c.close_time_ms <= current_time_ms
+                if c.open_time_ms >= timestamp_ms and c.close_time_ms <= min(current_time_ms, eval_end_ms)
             ]
             if not subsequent_closed:
                 results.append({"id": rec_id, "symbol": symbol, "status": "PENDING_AWAITING_FUTURE_BARS"})
@@ -106,12 +114,33 @@ class ShadowEvaluationManager:
                 tp2=tp2,
                 direction=direction,
                 future_candles=subsequent_closed,
+                persist=False,
             )
-            results.append({"id": rec_id, "symbol": symbol, "status": "RESOLVED", "outcome": outcome})
+
+            is_terminal = outcome.get("is_terminal", False)
+            is_matured = current_time_ms >= eval_end_ms
+
+            if is_terminal or is_matured:
+                regime_after = "RESOLVED_TERMINAL" if is_terminal else "RESOLVED_MATURED"
+                self.store.update_shadow_outcome(
+                    rec_id,
+                    future_mfe=outcome["future_mfe"],
+                    future_mae=outcome["future_mae"],
+                    tp1_hit=outcome["tp1_hit"],
+                    tp2_hit=outcome["tp2_hit"],
+                    sl_hit=outcome["sl_hit"],
+                    time_to_target_ms=outcome["time_to_target_ms"],
+                    time_to_stop_ms=outcome["time_to_stop_ms"],
+                    net_r=outcome["net_r"],
+                    regime_after=regime_after,
+                )
+                results.append({"id": rec_id, "symbol": symbol, "status": "RESOLVED", "outcome": outcome})
+            else:
+                results.append({"id": rec_id, "symbol": symbol, "status": "PENDING_UNMATURED", "outcome": outcome})
 
         return {
             "resolved_count": sum(1 for r in results if r["status"] in ("RESOLVED", "INELIGIBLE")),
-            "pending_count": sum(1 for r in results if r["status"] == "PENDING_AWAITING_FUTURE_BARS"),
+            "pending_count": sum(1 for r in results if r["status"] in ("PENDING_AWAITING_FUTURE_BARS", "PENDING_UNMATURED")),
             "results": results,
         }
 
@@ -132,6 +161,7 @@ class ShadowEvaluationManager:
         direction: DirectionalDecision,
         future_candles: Sequence[Candle],
         regime_after: str = "UNKNOWN",
+        persist: bool = True,
     ) -> dict[str, Any]:
         """Compute post-facto execution excursions strictly from subsequent candles."""
         if not future_candles or entry_price <= 0:
@@ -157,47 +187,100 @@ class ShadowEvaluationManager:
                 mfe = max(mfe, favorable / risk_dist)
                 mae = max(mae, adverse / risk_dist)
 
-                if not sl_hit and candle.low <= stop_loss:
-                    sl_hit = True
-                    time_to_stop_ms = candle.close_time_ms
-                if not tp1_hit and candle.high >= tp1:
-                    tp1_hit = True
-                    time_to_target_ms = candle.close_time_ms
-                if not tp2_hit and candle.high >= tp2:
-                    tp2_hit = True
+                bar_sl = candle.low <= stop_loss
+                bar_tp1 = candle.high >= tp1
+                bar_tp2 = candle.high >= tp2
+
+                # Conservative STOP_FIRST policy for same-bar ambiguity
+                if not sl_hit and not tp1_hit:
+                    if bar_sl and bar_tp1:
+                        sl_hit = True
+                        time_to_stop_ms = candle.close_time_ms
+                        break
+                    elif bar_sl:
+                        sl_hit = True
+                        time_to_stop_ms = candle.close_time_ms
+                        break
+                    elif bar_tp1:
+                        tp1_hit = True
+                        time_to_target_ms = candle.close_time_ms
+                        if bar_tp2:
+                            tp2_hit = True
+                            break
+                elif tp1_hit and not sl_hit:
+                    if bar_sl and bar_tp2:
+                        sl_hit = True
+                        time_to_stop_ms = candle.close_time_ms
+                        break
+                    elif bar_sl:
+                        sl_hit = True
+                        time_to_stop_ms = candle.close_time_ms
+                        break
+                    elif bar_tp2:
+                        tp2_hit = True
+                        break
             elif is_short:
                 favorable = entry_price - candle.low
                 adverse = candle.high - entry_price
                 mfe = max(mfe, favorable / risk_dist)
                 mae = max(mae, adverse / risk_dist)
 
-                if not sl_hit and candle.high >= stop_loss:
-                    sl_hit = True
-                    time_to_stop_ms = candle.close_time_ms
-                if not tp1_hit and candle.low <= tp1:
-                    tp1_hit = True
-                    time_to_target_ms = candle.close_time_ms
-                if not tp2_hit and candle.low <= tp2:
-                    tp2_hit = True
+                bar_sl = candle.high >= stop_loss
+                bar_tp1 = candle.low <= tp1
+                bar_tp2 = candle.low <= tp2
+
+                # Conservative STOP_FIRST policy for same-bar ambiguity
+                if not sl_hit and not tp1_hit:
+                    if bar_sl and bar_tp1:
+                        sl_hit = True
+                        time_to_stop_ms = candle.close_time_ms
+                        break
+                    elif bar_sl:
+                        sl_hit = True
+                        time_to_stop_ms = candle.close_time_ms
+                        break
+                    elif bar_tp1:
+                        tp1_hit = True
+                        time_to_target_ms = candle.close_time_ms
+                        if bar_tp2:
+                            tp2_hit = True
+                            break
+                elif tp1_hit and not sl_hit:
+                    if bar_sl and bar_tp2:
+                        sl_hit = True
+                        time_to_stop_ms = candle.close_time_ms
+                        break
+                    elif bar_sl:
+                        sl_hit = True
+                        time_to_stop_ms = candle.close_time_ms
+                        break
+                    elif bar_tp2:
+                        tp2_hit = True
+                        break
 
         net_r = 0.0
         if sl_hit and not tp1_hit:
             net_r = -1.0
         elif tp1_hit and not sl_hit:
             net_r = 1.0 + (1.0 if tp2_hit else 0.0)
+        elif sl_hit and tp1_hit:
+            net_r = 0.0
 
-        self.store.update_shadow_outcome(
-            shadow_id,
-            future_mfe=round(mfe, 2),
-            future_mae=round(mae, 2),
-            tp1_hit=tp1_hit,
-            tp2_hit=tp2_hit,
-            sl_hit=sl_hit,
-            time_to_target_ms=time_to_target_ms,
-            time_to_stop_ms=time_to_stop_ms,
-            net_r=round(net_r, 2),
-            regime_after=regime_after,
-        )
+        is_terminal = sl_hit or tp2_hit
+
+        if persist:
+            self.store.update_shadow_outcome(
+                shadow_id,
+                future_mfe=round(mfe, 2),
+                future_mae=round(mae, 2),
+                tp1_hit=tp1_hit,
+                tp2_hit=tp2_hit,
+                sl_hit=sl_hit,
+                time_to_target_ms=time_to_target_ms,
+                time_to_stop_ms=time_to_stop_ms,
+                net_r=round(net_r, 2),
+                regime_after=regime_after,
+            )
 
         return {
             "future_mfe": round(mfe, 2),
@@ -205,7 +288,10 @@ class ShadowEvaluationManager:
             "tp1_hit": tp1_hit,
             "tp2_hit": tp2_hit,
             "sl_hit": sl_hit,
+            "time_to_target_ms": time_to_target_ms,
+            "time_to_stop_ms": time_to_stop_ms,
             "net_r": round(net_r, 2),
+            "is_terminal": is_terminal,
         }
 
 

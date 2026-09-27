@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import tempfile
 from pathlib import Path
 from unittest.mock import MagicMock
@@ -11,7 +12,12 @@ from btc_quant_agent.market_watch.context import (
     apply_benchmark_context_gate,
     evaluate_benchmark_context,
 )
-from btc_quant_agent.market_watch.derivatives import evaluate_derivatives_regime
+from btc_quant_agent.market_watch.derivatives import (
+    apply_derivatives_action_gate,
+    evaluate_derivatives_regime,
+    is_severe_long_crowding,
+    is_severe_short_crowding,
+)
 from btc_quant_agent.market_watch.domain import (
     AlertSeverity,
     BenchmarkContext,
@@ -53,6 +59,7 @@ from btc_quant_agent.market_watch.ranking import (
     check_fatal_vetoes,
 )
 from btc_quant_agent.market_watch.scanner import MarketWatchScanner
+from btc_quant_agent.market_watch.service import MarketWatchService
 from btc_quant_agent.market_watch.shadow import ShadowEvaluationManager
 from btc_quant_agent.market_watch.snapshot import compute_snapshot_hash, compute_timeframe_snapshot
 from btc_quant_agent.market_watch.state import MarketWatchStateStore, evaluate_alert_emission
@@ -480,6 +487,7 @@ def test_volatility_expansion_playbook() -> None:
         structure="HH_HL",
         regime=Regime.RANGE,
         is_volatility_compressed=True,
+        has_prior_compression_window=True,
     )
     deriv = DerivativesMetrics(mark_price=103.0, oi_1h_change=0.03, funding_rate=0.0001)
     exhaustion = ExhaustionMetrics(distance_from_ema20_atr=1.2, state=ExhaustionState.NORMAL)
@@ -494,6 +502,44 @@ def test_volatility_expansion_playbook() -> None:
     assert res is not None
     assert res["decision"] == DirectionalDecision.LONG
     assert res["setup"] == PlaybookType.VOLATILITY_EXPANSION
+
+    # R2-07: Single bar compression without actual prior window is rejected
+    tf_no_prior = TimeframeSnapshot(
+        interval="15m",
+        latest_bar=closed,
+        latest_closed_bar=closed,
+        closed_bar_end_time_ms=closed.close_time_ms,
+        close=103.0,
+        ema_fast=101.5,
+        ema_mid=101.0,
+        ema_fast_slope=0.04,
+        ema_mid_slope=0.02,
+        atr=1.2,
+        atr_percentile=0.85,
+        adx=22.0,
+        rsi=62.0,
+        roc=0.02,
+        volume=8000.0,
+        volume_z=1.8,
+        bb_width=0.02,
+        bb_width_percentile=0.15,
+        recent_swing_high=102.5,
+        recent_swing_low=100.0,
+        supports=(100.0,),
+        resistances=(102.5,),
+        structure="HH_HL",
+        regime=Regime.RANGE,
+        is_volatility_compressed=True,
+        has_prior_compression_window=False,
+    )
+    res_no_prior = evaluate_volatility_expansion(
+        tf_1h=tf_1h,
+        tf_15m=tf_no_prior,
+        derivatives=deriv,
+        exhaustion=exhaustion,
+        config=config,
+    )
+    assert res_no_prior is None
 
 
 # =========================================================================
@@ -1747,3 +1793,518 @@ def test_r1_14_feishu_grid_only_alert_contains_no_fake_zero_price_directional_pl
     # Must display latest price and grid info
     assert "94.5" in card_str
     assert "PAUSE" in card_str
+
+
+# =========================================================================
+# 11. MARKET WATCH R2 REFINEMENT TESTS
+# =========================================================================
+
+
+def test_r2_01_two_run_scanner_breakout_persist_to_retest_triggered() -> None:
+    """R2-01: Breakout scan N persists breakout_direction -> Retest scan N+1 confirms RETEST_CONFIRMED/TRIGGERED."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        db_path = Path(tmpdir) / "mw_r2_01.db"
+        store = MarketWatchStateStore(db_path)
+        config = MarketWatchConfig()
+
+        symbol = "BTCUSDT"
+        res_level = 100.0
+        bar_len_ms = 15 * 60 * 1000
+
+        # Bar N: Closed breakout above resistance (close=102.0 > 100.0)
+        t_n = 1700000000000
+        candle_n = Candle(symbol, "15m", t_n - bar_len_ms, t_n, 99.0, 102.5, 98.5, 102.0, 5000.0)
+        tf_15m_n = TimeframeSnapshot(
+            interval="15m",
+            latest_bar=candle_n,
+            latest_closed_bar=candle_n,
+            closed_bar_end_time_ms=t_n,
+            close=102.0,
+            ema_fast=100.0,
+            ema_mid=99.0,
+            ema_fast_slope=0.02,
+            ema_mid_slope=0.01,
+            atr=1.0,
+            atr_percentile=0.5,
+            adx=25.0,
+            rsi=55.0,
+            roc=0.02,
+            volume=5000.0,
+            volume_z=1.0,
+            bb_width=0.04,
+            bb_width_percentile=0.5,
+            recent_swing_high=res_level,
+            recent_swing_low=95.0,
+            supports=(95.0,),
+            resistances=(res_level,),
+            structure="HH_HL",
+            regime=Regime.TREND_UP,
+        )
+        tf_1h_n = TimeframeSnapshot(
+            interval="1h",
+            latest_bar=candle_n,
+            latest_closed_bar=candle_n,
+            closed_bar_end_time_ms=t_n,
+            close=102.0,
+            ema_fast=100.0,
+            ema_mid=99.0,
+            ema_fast_slope=0.02,
+            ema_mid_slope=0.01,
+            atr=2.0,
+            atr_percentile=0.5,
+            adx=25.0,
+            rsi=55.0,
+            roc=0.02,
+            volume=20000.0,
+            volume_z=1.0,
+            bb_width=0.04,
+            bb_width_percentile=0.5,
+            recent_swing_high=res_level,
+            recent_swing_low=95.0,
+            supports=(95.0,),
+            resistances=(res_level,),
+            structure="HH_HL",
+            regime=Regime.TREND_UP,
+        )
+        tf_4h_n = tf_1h_n
+
+        deriv_n = DerivativesMetrics(mark_price=102.0, oi_1h_change=0.02, funding_rate=0.0001)
+
+        client_n = MagicMock()
+        client_n.server_time_ms.return_value = t_n
+        client_n.klines.return_value = [candle_n]
+
+        scanner = MarketWatchScanner(config=config, client=client_n, store=store)
+
+        # Mock collect_symbol_snapshot for Run 1
+        snap_n = MarketSnapshot(
+            symbol=symbol,
+            decision_time_ms=t_n,
+            observed_at_ms=t_n,
+            exchange_time_ms=t_n,
+            price=PriceMetrics(last_price=102.0),
+            tf_15m=tf_15m_n,
+            tf_1h=tf_1h_n,
+            tf_4h=tf_4h_n,
+            derivatives=deriv_n,
+            snapshot_hash="snap_n",
+        )
+        scanner.collect_symbol_snapshot = MagicMock(return_value=(snap_n, ScanHealth.OK, {}))  # type: ignore[method-assign]
+
+        assessments_n, _ = scanner.scan_universe([symbol])
+        assert len(assessments_n) == 1
+        asmt_n = assessments_n[0]
+
+        # Scan 1: Breakout confirmed, awaiting retest -> DirectionalDecision.WAIT
+        assert asmt_n.directional.breakout_state == BreakoutState.BREAKOUT_CONFIRMED
+        assert asmt_n.directional.breakout_direction == "LONG"
+        assert asmt_n.directional.decision == DirectionalDecision.WAIT
+
+        # Verify SQLite persistence
+        persisted_st_n = store.get_symbol_state(symbol)
+        assert persisted_st_n is not None
+        assert persisted_st_n["breakout_state"] == "BREAKOUT_CONFIRMED"
+        assert persisted_st_n["breakout_direction"] == "LONG"
+        assert persisted_st_n["breakout_level"] == res_level
+        assert persisted_st_n["breakout_bar_end_ms"] == t_n
+
+        # Bar N+1: Retests the level (low reaches level + retest_tol, closes above level at 101.5)
+        t_n1 = t_n + bar_len_ms
+        candle_n1 = Candle(symbol, "15m", t_n, t_n1, 102.0, 102.5, 100.1, 101.5, 6000.0)
+        tf_15m_n1 = TimeframeSnapshot(
+            interval="15m",
+            latest_bar=candle_n1,
+            latest_closed_bar=candle_n1,
+            closed_bar_end_time_ms=t_n1,
+            close=101.5,
+            ema_fast=100.5,
+            ema_mid=99.5,
+            ema_fast_slope=0.02,
+            ema_mid_slope=0.01,
+            atr=1.0,
+            atr_percentile=0.5,
+            adx=25.0,
+            rsi=55.0,
+            roc=0.02,
+            volume=6000.0,
+            volume_z=1.0,
+            bb_width=0.04,
+            bb_width_percentile=0.5,
+            recent_swing_high=res_level,
+            recent_swing_low=95.0,
+            supports=(95.0,),
+            resistances=(res_level,),
+            structure="HH_HL",
+            regime=Regime.TREND_UP,
+        )
+
+        snap_n1 = MarketSnapshot(
+            symbol=symbol,
+            decision_time_ms=t_n1,
+            observed_at_ms=t_n1,
+            exchange_time_ms=t_n1,
+            price=PriceMetrics(last_price=101.5),
+            tf_15m=tf_15m_n1,
+            tf_1h=tf_1h_n,
+            tf_4h=tf_4h_n,
+            derivatives=deriv_n,
+            snapshot_hash="snap_n1",
+        )
+        scanner.collect_symbol_snapshot = MagicMock(return_value=(snap_n1, ScanHealth.OK, {}))  # type: ignore[method-assign]
+
+        assessments_n1, _ = scanner.scan_universe([symbol])
+        assert len(assessments_n1) == 1
+        asmt_n1 = assessments_n1[0]
+
+        # Scan 2: Retest confirmed, directional decision triggered!
+        assert asmt_n1.directional.breakout_state == BreakoutState.RETEST_CONFIRMED
+        assert asmt_n1.directional.decision == DirectionalDecision.LONG
+        assert asmt_n1.lifecycle_state == SignalLifecycleState.TRIGGERED
+
+
+def test_r2_02_derivatives_action_gate() -> None:
+    """R2-02: Derivatives Action Gate enforcement rules."""
+    config = MarketWatchConfig()
+
+    # Rule 1: SHORT + LONG_LIQUIDATION => WAIT / DO_NOT_CHASE_SHORT
+    d_liq = DerivativesMetrics(
+        mark_price=100.0,
+        regime=DerivativesRegime.LONG_LIQUIDATION,
+    )
+    dec, reasons, risks = apply_derivatives_action_gate(decision=DirectionalDecision.SHORT, derivatives=d_liq, config=config)
+    assert dec == DirectionalDecision.WAIT
+    assert "DERIVATIVES_VETO_SHORT_ON_LIQUIDATION_UNWIND" in reasons
+    assert "DO_NOT_CHASE_SHORT" in risks
+
+    # Rule 2: SHORT + DELEVERAGING => WAIT / DO_NOT_CHASE_SHORT
+    d_del = DerivativesMetrics(
+        mark_price=100.0,
+        regime=DerivativesRegime.DELEVERAGING,
+    )
+    dec, reasons, risks = apply_derivatives_action_gate(decision=DirectionalDecision.SHORT, derivatives=d_del, config=config)
+    assert dec == DirectionalDecision.WAIT
+    assert "DERIVATIVES_VETO_SHORT_ON_LIQUIDATION_UNWIND" in reasons
+    assert "DO_NOT_CHASE_SHORT" in risks
+
+    # Rule 3: LONG + severe LONG_CROWDING => WAIT
+    d_sev_long = DerivativesMetrics(
+        mark_price=100.0,
+        regime=DerivativesRegime.LONG_CROWDING,
+        funding_rate=0.0009,  # > funding_extreme_abs (0.0008)
+    )
+    assert is_severe_long_crowding(d_sev_long, config)
+    dec, reasons, risks = apply_derivatives_action_gate(decision=DirectionalDecision.LONG, derivatives=d_sev_long, config=config)
+    assert dec == DirectionalDecision.WAIT
+    assert "DERIVATIVES_VETO_SEVERE_LONG_CROWDING" in reasons
+    assert "LONG_CROWDING_RISK" in risks
+
+    # Rule 4: SHORT + severe SHORT_CROWDING => WAIT
+    d_sev_short = DerivativesMetrics(
+        mark_price=100.0,
+        regime=DerivativesRegime.SHORT_CROWDING,
+        funding_rate=-0.0009,  # <= -funding_extreme_abs (-0.0008)
+        global_account_long_short_ratio=0.50,
+    )
+    assert is_severe_short_crowding(d_sev_short, config)
+    dec, reasons, risks = apply_derivatives_action_gate(decision=DirectionalDecision.SHORT, derivatives=d_sev_short, config=config)
+    assert dec == DirectionalDecision.WAIT
+    assert "DERIVATIVES_VETO_SEVERE_SHORT_CROWDING" in reasons
+    assert "SHORT_CROWDING_RISK" in risks
+
+    # Rule 5: Moderate crowding does NOT veto (penalty only)
+    d_mod_long = DerivativesMetrics(
+        mark_price=100.0,
+        regime=DerivativesRegime.LONG_CROWDING,
+        funding_rate=0.0005,  # Moderate between 0.0003 and 0.0008
+        global_account_long_short_ratio=1.5,
+    )
+    assert not is_severe_long_crowding(d_mod_long, config)
+    dec, reasons, risks = apply_derivatives_action_gate(decision=DirectionalDecision.LONG, derivatives=d_mod_long, config=config)
+    assert dec == DirectionalDecision.LONG
+
+
+def test_r2_03_shadow_semantics_freeze_maturity_and_stop_first() -> None:
+    """R2-03: Shadow horizon freeze, maturity gating, and conservative STOP_FIRST ambiguity."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        db_path = Path(tmpdir) / "mw_r2_03.db"
+        store = MarketWatchStateStore(db_path)
+        manager = ShadowEvaluationManager(store)
+
+        t0 = 1700000000000
+        bar_len_ms = 15 * 60 * 1000
+        eval_bars = 4
+        eval_end = t0 + eval_bars * bar_len_ms
+
+        rec_id = store.record_shadow_observation(
+            timestamp_ms=t0,
+            symbol="BTCUSDT",
+            snapshot_hash="hash_s",
+            agent_decision="LONG",
+            agent_setup="TREND_PULLBACK",
+            entry_quality="GOOD",
+            reason_codes=["TEST"],
+            entry_price=100.0,
+            stop_loss=90.0,
+            tp1=110.0,
+            tp2=120.0,
+            direction="LONG",
+            evaluation_horizon_bars=eval_bars,
+        )
+
+        # 1. Verify frozen horizon stored in DB
+        pending = store.get_pending_shadow_records()
+        assert len(pending) == 1
+        assert pending[0]["evaluation_horizon_bars"] == eval_bars
+        assert pending[0]["evaluation_end_ms"] == eval_end
+
+        # 2. At t = 2 bars (before maturity), no terminal event (price fluctuates between 95 and 105)
+        c1 = Candle("BTCUSDT", "15m", t0, t0 + bar_len_ms, 100.0, 105.0, 95.0, 102.0, 100.0)
+        c2 = Candle("BTCUSDT", "15m", t0 + bar_len_ms, t0 + 2 * bar_len_ms, 102.0, 104.0, 96.0, 101.0, 100.0)
+        client = MagicMock()
+        client.klines.return_value = [c1, c2]
+
+        res = manager.resolve_pending_observations(client, current_time_ms=t0 + 2 * bar_len_ms)
+        assert res["resolved_count"] == 0
+        assert res["pending_count"] == 1
+        assert res["results"][0]["status"] == "PENDING_UNMATURED"
+
+        # Record remains unresolved in DB
+        assert len(store.get_pending_shadow_records()) == 1
+
+        # 3. Same-bar TP/SL ambiguity: Candle touches both SL (85 <= 90) and TP1 (115 >= 110)
+        c_ambig = Candle("BTCUSDT", "15m", t0, t0 + bar_len_ms, 100.0, 115.0, 85.0, 105.0, 100.0)
+        outcome = manager.evaluate_forward_outcomes(
+            shadow_id=rec_id,
+            entry_price=100.0,
+            stop_loss=90.0,
+            tp1=110.0,
+            tp2=120.0,
+            direction=DirectionalDecision.LONG,
+            future_candles=[c_ambig],
+            persist=False,
+        )
+        # Conservative STOP_FIRST assumes SL hit first!
+        assert outcome["sl_hit"] is True
+        assert outcome["tp1_hit"] is False
+        assert outcome["net_r"] == -1.0
+        assert outcome["is_terminal"] is True
+
+
+def test_r2_04_strict_pit_timestamps() -> None:
+    """R2-04: decision_time >= all consumed source availability/receipt timestamps."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        db_path = Path(tmpdir) / "mw_r2_04.db"
+        store = MarketWatchStateStore(db_path)
+        config = MarketWatchConfig()
+
+        t_exchange = 1700000000000
+        t_deriv = 1700000006000
+        t_scan_start = 1700000001000
+
+        client = MagicMock()
+        client.server_time_ms.return_value = t_exchange
+        client.klines.side_effect = lambda sym, interval, limit: make_candle_series(sym, interval, 40)
+        client.collect_derivatives.return_value = MagicMock(
+            snapshot=MagicMock(
+                mark_price=104.0,
+                index_price=104.0,
+                funding_rate=0.0001,
+                funding_time_ms=t_deriv,
+                open_interest=1000.0,
+                open_interest_time_ms=t_deriv,
+                open_interest_change_pct=0.01,
+                taker_buy_sell_ratio=1.0,
+                taker_time_ms=t_deriv,
+                basis_rate=0.0001,
+                basis_time_ms=t_deriv,
+                long_short_account_ratio=1.0,
+                long_short_time_ms=t_deriv,
+                order_book_imbalance=0.0,
+                spread_bps=1.0,
+            ),
+            field_availability={"mark_price": True},
+            endpoint_errors={},
+        )
+        client._optional_get.return_value = None
+
+        scanner = MarketWatchScanner(config=config, client=client, store=store)
+        snap, _health, _errors = scanner.collect_symbol_snapshot("BTCUSDT", now_ms=t_scan_start)
+
+        assert snap is not None
+        # PIT guarantee: observed_at derived from sources, decision_time >= all sources
+        assert snap.observed_at_ms >= t_deriv
+        assert snap.decision_time_ms >= snap.observed_at_ms
+        assert snap.decision_time_ms >= t_scan_start
+
+
+def test_r2_05_grid_previous_bounds_uses_persisted_bounds() -> None:
+    """R2-05: Grid previous bounds must use persisted grid_lower_bound/grid_upper_bound."""
+    config = MarketWatchConfig()
+    prev_state = {
+        "grid_decision": "NEUTRAL",
+        "grid_lower_bound": 92.0,
+        "grid_upper_bound": 108.0,
+        "recent_support": 80.0,     # Outdated support
+        "recent_resistance": 120.0, # Outdated resistance
+    }
+
+    # Assessment with identical grid boundaries (92.0, 108.0)
+    asmt = SymbolAssessment(
+        symbol="BTCUSDT",
+        policy_version="1.0",
+        config_hash="h",
+        snapshot=MagicMock(decision_time_ms=1000, snapshot_hash="h", tf_15m=MagicMock(closed_bar_end_time_ms=1000)),
+        directional=DirectionalPlan(
+            symbol="BTCUSDT",
+            decision=DirectionalDecision.WAIT,
+            setup=PlaybookType.NO_TRADE,
+            regime=Regime.RANGE,
+            entry_quality=EntryQuality.POOR,
+            entry_low=0.0,
+            entry_high=0.0,
+        ),
+        grid=GridPlan(symbol="BTCUSDT", decision=GridDecision.NEUTRAL, lower_bound=92.0, upper_bound=108.0),
+        opportunity_score=50.0,
+        relative_performance=None,
+        exhaustion=ExhaustionMetrics(distance_from_ema20_atr=0.1, state=ExhaustionState.NORMAL),
+        rank=1,
+        lifecycle_state=SignalLifecycleState.CANDIDATE,
+        alert_fingerprint="fp1",
+    )
+    # Emission must recognize boundaries are identical to persisted grid bounds (no change)
+    emit, _sev, reasons = evaluate_alert_emission(asmt, prev_state, config)
+    assert "GRID_BOUNDARIES_SHIFTED" not in reasons
+
+
+def test_r2_06_lifecycle_reset_on_setup_change() -> None:
+    """R2-06: New setup resets created_bar_end_ms and age_bars."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        db_path = Path(tmpdir) / "mw_r2_06.db"
+        store = MarketWatchStateStore(db_path)
+
+        t0 = 1700000000000
+        bar_len_ms = 15 * 60 * 1000
+        # State from 5 bars ago under setup A
+        with store._connect() as conn:
+            conn.execute(
+                """
+                INSERT INTO market_watch_symbol_state (
+                    symbol, setup, lifecycle_state, created_bar_end_ms, updated_at_ms, age_bars
+                ) VALUES (?, ?, ?, ?, ?, ?)
+                """,
+                ("BTCUSDT", "TREND_PULLBACK", "CANDIDATE", t0, t0 + 5 * bar_len_ms, 5),
+            )
+
+        # Now new assessment with setup B (BREAKOUT_RETEST)
+        t_curr = t0 + 5 * bar_len_ms
+        closed = Candle("BTCUSDT", "15m", t_curr - bar_len_ms, t_curr, 100.0, 105.0, 99.0, 104.0, 100.0)
+        tf_15m = TimeframeSnapshot(
+            interval="15m",
+            latest_bar=closed,
+            latest_closed_bar=closed,
+            closed_bar_end_time_ms=t_curr,
+            close=104.0,
+            ema_fast=100.0,
+            ema_mid=99.0,
+            ema_fast_slope=0.01,
+            ema_mid_slope=0.01,
+            atr=1.0,
+            atr_percentile=0.5,
+            adx=25.0,
+            rsi=50.0,
+            roc=0.01,
+            volume=100.0,
+            volume_z=0.5,
+            bb_width=0.02,
+            bb_width_percentile=0.5,
+            recent_swing_high=105.0,
+            recent_swing_low=99.0,
+            supports=(99.0,),
+            resistances=(105.0,),
+            structure="HH_HL",
+            regime=Regime.RANGE,
+        )
+        asmt = SymbolAssessment(
+            symbol="BTCUSDT",
+            policy_version="1.0",
+            config_hash="h",
+            snapshot=MagicMock(decision_time_ms=t_curr, snapshot_hash="h", tf_15m=tf_15m, tf_1h=tf_15m),
+            directional=DirectionalPlan(
+                symbol="BTCUSDT",
+                decision=DirectionalDecision.WAIT,
+                setup=PlaybookType.BREAKOUT_RETEST,
+                regime=Regime.RANGE,
+                entry_quality=EntryQuality.POOR,
+                entry_low=0.0,
+                entry_high=0.0,
+            ),
+            grid=GridPlan(symbol="BTCUSDT", decision=GridDecision.PAUSE),
+            opportunity_score=50.0,
+            relative_performance=None,
+            exhaustion=ExhaustionMetrics(distance_from_ema20_atr=0.1, state=ExhaustionState.NORMAL),
+            rank=1,
+            lifecycle_state=SignalLifecycleState.CANDIDATE,
+            alert_fingerprint="fp2",
+        )
+
+        store.save_symbol_state("BTCUSDT", asmt, now_ms=t_curr)
+        st = store.get_symbol_state("BTCUSDT")
+        assert st is not None
+        assert st["setup"] == "BREAKOUT_RETEST"
+        # created_bar_end_ms reset to t_curr, age_bars reset to 0!
+        assert st["created_bar_end_ms"] == t_curr
+        assert st["age_bars"] == 0
+
+
+def test_r2_08_explain_grid_codes_and_shadow_resolve_return_schema() -> None:
+    """R2-08: explain() returns grid_codes from reason_codes; shadow_resolve() returns int counts and results list."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        db_path = Path(tmpdir) / "mw_r2_08.db"
+        store = MarketWatchStateStore(db_path)
+        config = MarketWatchConfig()
+        client = MagicMock()
+        client.klines.return_value = []
+
+        service = MarketWatchService(config=config, client=client, store=store)
+
+        # 1. explain() test with grid reason_codes
+        dec_payload = {
+            "symbol": "BTCUSDT",
+            "grid": {
+                "decision": "ACTIVE",
+                "reason_codes": ["VOLATILITY_RANGE_BOUND", "SUFFICIENT_PROFIT_SPREAD"],
+            },
+            "veto_reasons": [],
+        }
+        with store._connect() as conn:
+            conn.execute(
+                """
+                INSERT INTO market_watch_assessments (
+                    decision_time_ms, symbol, snapshot_hash, policy_version, config_hash,
+                    regime, setup, directional_decision, grid_decision, entry_quality,
+                    derivatives_regime, benchmark_context, opportunity_score, rank,
+                    reason_codes_json, risk_codes_json, decision_json, alert_fingerprint,
+                    notification_sent
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    1000, "BTCUSDT", "h", "1.0", "ch",
+                    "RANGE", "NO_TRADE", "WAIT", "ACTIVE", "POOR",
+                    "BALANCED", "NEUTRAL", 50.0, 1,
+                    "[]", "[]", json.dumps(dec_payload), "fp",
+                    0,
+                ),
+            )
+
+        exp = service.explain("BTCUSDT")
+        assert "grid_codes" in exp
+        assert "VOLATILITY_RANGE_BOUND" in exp["grid_codes"]
+        assert "SUFFICIENT_PROFIT_SPREAD" in exp["grid_codes"]
+
+        # 2. shadow_resolve() schema test
+        res = service.shadow_resolve()
+        assert res["status"] == "SUCCESS"
+        assert isinstance(res["resolved_count"], int)
+        assert isinstance(res["pending_count"], int)
+        assert isinstance(res["results"], list)
+        assert "summary" in res
