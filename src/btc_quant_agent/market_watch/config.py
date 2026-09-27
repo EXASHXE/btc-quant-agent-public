@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import hashlib
+import json
 import math
 from dataclasses import asdict, dataclass, field, fields
 from typing import Any
@@ -38,6 +40,12 @@ class MarketWatchRankingConfig:
     penalty_benchmark_risk: float = 25.0
     penalty_low_liquidity: float = 15.0
     penalty_timeframe_conflict: float = 20.0
+    rs_weight_15m: float = 0.20
+    rs_weight_1h: float = 0.50
+    rs_weight_4h: float = 0.30
+    rs_weight_btc: float = 0.40
+    rs_weight_eth: float = 0.30
+    rs_weight_median: float = 0.30
 
     def __post_init__(self) -> None:
         for f in fields(self):
@@ -57,6 +65,7 @@ class MarketWatchThresholdsConfig:
     pivot_right: int = 2
     high_vol_atr_percentile: float = 0.85
     vol_compression_bb_pct: float = 0.25
+    vol_compression_min_bars: int = 3
     vol_expansion_atr_mult: float = 1.25
     overextension_ema20_atr: float = 2.2
     extreme_overextension_ema20_atr: float = 3.2
@@ -64,6 +73,11 @@ class MarketWatchThresholdsConfig:
     pullback_ema_tolerance_atr: float = 0.5
     breakout_atr_threshold: float = 0.12
     retest_atr_tolerance: float = 0.35
+    failed_level_ttl_ms: int = 24 * 3600 * 1000
+    failed_level_breakout_mult: float = 1.5
+    failed_level_min_volume_z: float = 0.8
+    max_retest_bars: int = 12
+    max_signal_age_bars: int = 8
     min_volume_z: float = -0.5
     funding_crowding_abs: float = 0.0003
     funding_extreme_abs: float = 0.0008
@@ -74,11 +88,25 @@ class MarketWatchThresholdsConfig:
     min_quote_volume_24h: float = 5_000_000.0
 
     def __post_init__(self) -> None:
-        for name in ("ema_fast", "ema_mid", "ema_slow", "atr_period", "adx_period", "slope_lookback", "pivot_left", "pivot_right"):
+        int_fields = (
+            "ema_fast",
+            "ema_mid",
+            "ema_slow",
+            "atr_period",
+            "adx_period",
+            "slope_lookback",
+            "pivot_left",
+            "pivot_right",
+            "failed_level_ttl_ms",
+            "max_retest_bars",
+            "vol_compression_min_bars",
+            "max_signal_age_bars",
+        )
+        for name in int_fields:
             _require_positive_int(getattr(self, name), f"thresholds.{name}")
         _require_real(self.min_volume_z, "thresholds.min_volume_z")
         for f in fields(self):
-            if f.name not in ("ema_fast", "ema_mid", "ema_slow", "atr_period", "adx_period", "slope_lookback", "pivot_left", "pivot_right", "min_volume_z"):
+            if f.name not in int_fields and f.name != "min_volume_z":
                 _require_nonnegative_real(getattr(self, f.name), f"thresholds.{f.name}")
 
 
@@ -161,3 +189,28 @@ def build_market_watch_config(raw: dict[str, Any] | None) -> MarketWatchConfig:
     if "grid" in values and isinstance(values["grid"], dict):
         values["grid"] = MarketWatchGridConfig(**values["grid"])
     return MarketWatchConfig(**values)
+
+
+def compute_market_watch_config_hash(config: MarketWatchConfig) -> str:
+    """Compute deterministic audit hash for MarketWatch configuration.
+
+    Isolated from global research config_hash. Changes when thresholds or parameters change.
+    """
+    payload = {
+        "symbols": list(config.symbols),
+        "benchmark_symbols": list(config.benchmark_symbols),
+        "scan_interval_minutes": config.scan_interval_minutes,
+        "min_net_rr": config.min_net_rr,
+        "high_quality_net_rr": config.high_quality_net_rr,
+        "min_action_entry_quality": config.min_action_entry_quality,
+        "min_alert_severity": config.min_alert_severity,
+        "taker_fee_rate": config.taker_fee_rate,
+        "maker_fee_rate": config.maker_fee_rate,
+        "slippage_bps_per_side": config.slippage_bps_per_side,
+        "funding_stress_rate": config.funding_stress_rate,
+        "ranking": asdict(config.ranking),
+        "thresholds": asdict(config.thresholds),
+        "grid": asdict(config.grid),
+    }
+    raw = json.dumps(payload, sort_keys=True)
+    return hashlib.sha256(raw.encode("utf-8")).hexdigest()[:16]

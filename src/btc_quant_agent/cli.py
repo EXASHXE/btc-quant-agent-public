@@ -393,6 +393,9 @@ def build_parser() -> argparse.ArgumentParser:
     mw_test_feishu = mw_sub.add_parser("test-feishu", help="send Feishu connectivity test message")
     mw_test_feishu.add_argument("--symbol", default="BTCUSDT", help="symbol for test card")
 
+    mw_sub.add_parser("shadow-status", help="show shadow decision recording and resolution status")
+    mw_sub.add_parser("shadow-resolve", help="resolve pending shadow observations against closed candles")
+
     return parser
 
 
@@ -945,7 +948,7 @@ def main(argv: list[str] | None = None) -> int:
         from .market_watch.service import MarketWatchService
 
         cfg = load_config(args.config)
-        mw_service = MarketWatchService.create(cfg.market_watch)
+        mw_service = MarketWatchService.create(cfg.market_watch, data_config=cfg.data)
         cmd = args.market_watch_command
         if cmd == "scan":
             symbols = None
@@ -967,6 +970,12 @@ def main(argv: list[str] | None = None) -> int:
         if cmd == "explain":
             sym = getattr(args, "opt_symbol", None) or getattr(args, "symbol", None) or "BTCUSDT"
             _print(mw_service.explain(sym))
+            return 0
+        if cmd == "shadow-status":
+            _print(mw_service.shadow_status())
+            return 0
+        if cmd == "shadow-resolve":
+            _print(mw_service.shadow_resolve())
             return 0
         if cmd == "test-feishu":
             sym = str(getattr(args, "symbol", None) or "BTCUSDT")

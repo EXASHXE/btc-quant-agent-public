@@ -1,10 +1,12 @@
 from __future__ import annotations
 
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, field
 from enum import StrEnum
 from typing import Any
 
 from ..domain import Candle, Regime
+
+MARKET_WATCH_POLICY_VERSION = "0.5.0-r1"
 
 
 class DirectionalDecision(StrEnum):
@@ -25,6 +27,12 @@ class EntryQuality(StrEnum):
     GOOD = "GOOD"
     MARGINAL = "MARGINAL"
     POOR = "POOR"
+
+
+class BreakoutState(StrEnum):
+    NONE = "NONE"
+    BREAKOUT_CONFIRMED = "BREAKOUT_CONFIRMED"
+    RETEST_CONFIRMED = "RETEST_CONFIRMED"
 
 
 class DerivativesRegime(StrEnum):
@@ -119,6 +127,7 @@ class TimeframeSnapshot:
     regime: Regime
     is_volatility_compressed: bool = False
     is_volatility_expanded: bool = False
+    has_prior_compression_window: bool = False
 
 
 @dataclass(frozen=True)
@@ -128,19 +137,25 @@ class DerivativesMetrics:
     funding_rate: float | None = None
     funding_time_ms: int | None = None
     current_open_interest: float | None = None
+    open_interest_time_ms: int | None = None
     oi_1h_change: float | None = None
     oi_4h_change: float | None = None
     oi_12h_change: float | None = None
     global_account_long_short_ratio: float | None = None
+    long_short_time_ms: int | None = None
     top_trader_position_ratio: float | None = None
     top_trader_account_ratio: float | None = None
     taker_buy_sell_ratio: float | None = None
+    taker_time_ms: int | None = None
     basis_rate: float | None = None
+    basis_time_ms: int | None = None
     basis_bps: float | None = None
     spread_bps: float | None = None
     order_book_imbalance: float | None = None
     regime: DerivativesRegime = DerivativesRegime.NEUTRAL
     reasons: tuple[str, ...] = ()
+    field_availability: dict[str, bool] = field(default_factory=dict)
+    endpoint_errors: dict[str, str] = field(default_factory=dict)
 
 
 @dataclass(frozen=True)
@@ -179,6 +194,7 @@ class RelativePerformance:
     rel_to_eth_1h: float
     rel_to_median_1h: float
     score: float
+    multi_tf_excess: float = 0.0
     rank: int = 0
 
 
@@ -216,6 +232,9 @@ class DirectionalPlan:
     risk_codes: tuple[str, ...] = ()
     derivatives_regime: DerivativesRegime = DerivativesRegime.NEUTRAL
     benchmark_context: BenchmarkContext = BenchmarkContext.BENCHMARK_NEUTRAL
+    breakout_state: BreakoutState = BreakoutState.NONE
+    breakout_level: float | None = None
+    breakout_bar_end_ms: int | None = None
 
     def as_dict(self) -> dict[str, Any]:
         payload = asdict(self)
@@ -227,6 +246,7 @@ class DirectionalPlan:
             "confidence_band",
             "derivatives_regime",
             "benchmark_context",
+            "breakout_state",
         ):
             payload[key] = str(payload[key])
         return payload
@@ -264,12 +284,16 @@ class SymbolAssessment:
     veto_reasons: tuple[str, ...] = ()
     alert_fingerprint: str = ""
     lifecycle_state: SignalLifecycleState = SignalLifecycleState.CANDIDATE
+    policy_version: str = MARKET_WATCH_POLICY_VERSION
+    config_hash: str = ""
 
     def as_dict(self) -> dict[str, Any]:
         return {
             "symbol": self.symbol,
             "opportunity_score": round(self.opportunity_score, 2),
             "rank": self.rank,
+            "policy_version": self.policy_version,
+            "config_hash": self.config_hash,
             "lifecycle_state": str(self.lifecycle_state),
             "directional": self.directional.as_dict(),
             "grid": self.grid.as_dict(),
@@ -289,3 +313,12 @@ class MarketWatchAlert:
     evidence: tuple[str, ...]
     risks: tuple[str, ...]
     alert_time_ms: int
+    last_price: float = 0.0
+    change_24h_pct: float = 0.0
+    atr: float = 0.0
+    key_support: float | None = None
+    key_resistance: float | None = None
+    funding_rate: float | None = None
+    oi_1h_change: float | None = None
+    oi_12h_change: float | None = None
+    regime_1h: str = ""

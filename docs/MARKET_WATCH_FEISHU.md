@@ -55,9 +55,10 @@ The `market_watch` subsystem is an isolated operational market-monitoring and st
 ```
 
 ### Safety Invariants
-1. **PIT & Causal Confirmation**: Indicators and structures are computed **strictly** on confirmed closed candles (`latest_closed_bar`). Forming candles are isolated to the `latest_bar` field solely for live display and are never used to confirm triggers.
-2. **Deterministic Hashing**: Every evaluated snapshot produces a deterministic 16-character SHA-256 hash (`snapshot_hash`) for auditable replay.
-3. **Graceful Failure Isolation**: Failure to retrieve core candles marks a symbol `FAILED` without crashing the universe scan. Failure of optional derivatives data marks the symbol `DEGRADED`, continuing analysis on available price action.
+1. **PIT & Causal Confirmation**: Indicators and structures are computed **strictly** on confirmed closed candles (`latest_closed_bar`). Forming candles are isolated to the `latest_bar` field solely for live display and are never used to confirm triggers. Same-candle breakout + retest is rejected; breakout requires Bar N closed confirmation, and retest requires subsequent closed Bar N+1..N+k confirmation.
+2. **Deterministic Hashing**: Every evaluated snapshot produces a deterministic 16-character SHA-256 hash (`snapshot_hash`) for auditable replay. Config produces a deterministic SHA-256 hash (`compute_market_watch_config_hash`) and policy version `0.5.0-r1`.
+3. **Graceful Failure Isolation & Health**: Failure to retrieve core candles marks a symbol `FAILED` without crashing the universe scan. Failure of optional derivatives data or partial endpoint failures marks the symbol `DEGRADED`, continuing analysis on available price action. Candle staleness (> 1h) also marks health as `DEGRADED`.
+4. **DataConfig Propagation**: The subsystem directly inherits and respects `AppConfig.data` (REST base URLs, request timeouts, and source clock bounds).
 
 ---
 
@@ -124,19 +125,21 @@ Gross RR is heavily penalized by trading frictions before an actionable signal i
 - **Trigger**: Closed 15m bar closes back above EMA20 with green candle (`close > open`).
 - **Target**: TP1 at previous 1H swing high; TP2 at extension.
 
-### 2. Breakout Retest (`BREAKOUT_RETEST`)
-- **Condition**: 1H resistance cleanly breached. 15m retests breakout level within ATR tolerance ($0.35 \times \text{ATR}$).
-- **Trigger**: Retest holds and closed 15m bar forms rejection wick/green close above resistance.
-- **Filter**: If OI contracts during breakout, flags `BREAKOUT_LOW_PARTICIPATION` risk.
+### 2. Multi-Bar Sequential Breakout Retest (`BREAKOUT_RETEST`)
+- **Condition**: 1H resistance cleanly breached. Multi-bar state machine enforces:
+  - **Bar N**: Closed 15m candle confirms breakout above resistance (`close > resistance`), moving breakout state to `BREAKOUT_CONFIRMED`. Does not trigger entry on Bar N.
+  - **Bar N+1..N+k**: Subsequent closed candles retest the breakout level within ATR tolerance ($0.35 \times \text{ATR}$) without breaching invalidation.
+- **Trigger**: Retest holds and closed 15m bar forms rejection wick/green close above resistance, transitioning to `RETEST_CONFIRMED`.
+- **Failed Breakout Memory (R1-04)**: If a level previously failed within TTL (`failed_level_ttl_ms`), subsequent breakouts require $1.3\times$ higher ATR breakout buffer and higher volume Z-score ($\ge 1.5$) to confirm.
 
 ### 3. Failed Breakout / Breakdown Watch (`FAILED_BREAKOUT`, `FAILED_BREAKDOWN`)
 - **Condition**: Candle wicks beyond 1H resistance/support but closes back inside the range (false breakout).
 - **Derivatives Confirmation**: If OI expanded during the wick rejection and funding is high, longs/shorts are trapped.
-- **Action**: Issues high-priority **`WATCH`** alert with levels for potential counter-reversal.
+- **Action**: Issues high-priority **`WATCH`** alert with levels for potential counter-reversal and writes to failed memory store.
 
 ### 4. Volatility Expansion (`VOLATILITY_EXPANSION`)
-- **Condition**: Bollinger Band width compressed in bottom 25th percentile (`bb_width_percentile <= 0.25`).
-- **Trigger**: Sudden volume surge ($\text{Volume Z} \ge 1.0$) and ATR percentile expansion ($\ge 0.70$) breaking band edges on closed bar.
+- **Condition**: Requires prior Bollinger Band width compression window (`vol_compression_min_bars` bars in bottom 25th percentile).
+- **Trigger**: Closed structure breakout beyond recent swing level combined with simultaneous volume surge ($\text{Volume Z} \ge 1.0$) and ATR percentile expansion ($\ge 0.70$). Rejects simple EMA crossings without prior compression.
 
 ### 5. Range Mean Reversion (`RANGE_MEAN_REVERSION`)
 - **Condition**: 1H and 4H regimes are `RANGE` ($\text{ADX} < 20$).
@@ -147,6 +150,7 @@ Gross RR is heavily penalized by trading frictions before an actionable signal i
 ## 7. Benchmark Context & Altcoin Gating
 
 Altcoins do not move in a vacuum; BTC and ETH macro shocks override idiosyncratic alt setups:
+- **Automatic Benchmark Dependency Loading**: When single altcoins (e.g. `LINKUSDT`) are requested, the scanner automatically loads `BTCUSDT` and `ETHUSDT` dependencies in the background for relative strength and gating calculations, but emits reports only for the requested target symbols.
 - **BTC Downside Volatility Shock**: If BTC drops $> 1.5\%$ in 1h with elevated ATR percentile ($> 85\%$), benchmark context switches to `BTC_VOLATILITY_SHOCK` or `MARKET_RISK_OFF`.
 - **Altcoin Long Veto**: All Altcoin `LONG` recommendations are automatically vetoed and switched to `WAIT`.
 - **Exceptional Relative Strength Exemption**: An altcoin long may bypass the veto only if:
@@ -161,8 +165,8 @@ Altcoins do not move in a vacuum; BTC and ETH macro shocks override idiosyncrati
 The subsystem generates grid parameter recommendations independently from directional setups:
 - **Clean Range Regime**: When ADX is low and market is in `RANGE`, computes arithmetic grid levels between structural support and resistance with ATR padding.
 - **Minimum Grid Step**: Enforces that each grid step generates $\ge 0.25\%$ profit net of double-sided fees.
-- **Anti-Falling-Knife Guard**: If market price breaches the grid's lower bound, the policy switches to **`PAUSE`**. The lower bound is **never** blindly lowered to chase falling prices.
-- **Boundary Delta Alert Rule**: Minor boundary shifts ($< 2\%$) do not alert operators. Only boundary adjustments $\ge 2\%$ or state changes trigger notifications.
+- **Anti-Falling-Knife Guard**: If market price breaches the grid's lower bound, the policy switches to **`PAUSE`** and emits a high-priority `RISK` alert (`LOWER_BOUND_BREACHED`).
+- **Independent Alert Emission (R1-03)**: Grid change alerts (e.g., transition to/from `PAUSE`, lower bound breach, or boundary delta $\ge 2\%$) are emitted even if the directional decision is `WAIT`.
 
 ---
 
@@ -171,14 +175,12 @@ The subsystem generates grid parameter recommendations independently from direct
 Symbols are ranked using a 0–100 opportunity score:
 $$\text{Score} = \sum (w_i \times S_i) - \text{Penalties}$$
 
-### Scoring Components
-- **Trend Quality** (20%): ADX strength and EMA slope alignment.
-- **Structure Quality** (15%): Confirmed Higher-Highs/Higher-Lows structure.
-- **Entry Quality** (20%): Proximity to support and mean.
-- **Derivatives Confirmation** (15%): Healthy OI build vs deleveraging.
-- **Participation Quality** (10%): Volume Z-score and Taker ratio.
-- **Relative Strength** (10%): Excess return vs BTC, ETH, and universe median.
-- **Net RR Quality** (10%): Ratio of net reward to risk.
+### Direction-Aware Scoring (R1-02)
+- **Directional Alignment**: Scoring explicitly differentiates `LONG`, `SHORT`, and `WAIT`.
+  - `LONG`: rewards `HH_HL` structures and `HEALTHY_LONG_BUILD`.
+  - `SHORT`: rewards `LH_LL` structures and `HEALTHY_SHORT_BUILD`; penalizes `HEALTHY_LONG_BUILD`.
+  - `WAIT`: capped at $\le 25.0$ and discounted by 50%.
+- **Multi-TF Relative Strength (R1-11)**: Weights 15m (20%), 1h (50%), and 4h (30%) returns evaluated against BTC, ETH, and universe median.
 
 ### Fatal Vetoes (Precede Numerical Score)
 A symbol with a fatal veto has its score set to **0.0** regardless of other metrics:
@@ -189,12 +191,18 @@ A symbol with a fatal veto has its score set to **0.0** regardless of other metr
 
 ---
 
-## 10. State Persistence & Noise Suppression
+## 10. State Persistence, Lifecycle, & Noise Suppression
 
 Implemented in SQLite (`market_watch.db`):
-- `market_watch_symbol_state`: Tracks current regime, directional and grid decisions, recent support/resistance, and memory of recent failed breakout/breakdown levels.
-- `market_watch_assessments`: Immutable audit log of every scan evaluation.
+- `market_watch_symbol_state`: Tracks current regime, directional and grid decisions, recent support/resistance, breakout state machine, and lifecycle timestamps (`created_bar_end_ms`, `armed_bar_end_ms`, `triggered_bar_end_ms`, `age_bars`).
+- `market_watch_assessments`: Immutable audit log of every scan evaluation, storing `policy_version` and `config_hash`.
 - `market_watch_shadow_records`: Forward performance monitoring for shadow policy evaluation.
+- **Signal Lifecycle (R1-05)**:
+  - `CANDIDATE`: Candidate setup identified.
+  - `ARMED`: Reached when breakout confirms on Bar N (waiting retest) or marginal setup forms near readiness. Reachable under default configuration.
+  - `TRIGGERED`: Reached when closed candle satisfies entry quality `GOOD` or `EXCELLENT`.
+  - `INVALIDATED`: Setup breached invalidation level.
+  - `EXPIRED`: Signal age exceeds `max_signal_age_bars` without triggering.
 - **Deduplication Engine**: Generates a composite SHA-256 fingerprint (`alert_fingerprint`). If consecutive scans produce the same fingerprint, notifications are suppressed (`NO_NOTIFICATION_IDENTICAL_STATE`).
 
 ---
@@ -207,7 +215,7 @@ Alert cards are formatted as interactive JSON cards sent via signed webhooks:
   - `red`: Actionable `SHORT` setup.
   - `blue`: `WATCH` / Armed setup or Range Grid recommendation.
   - `orange`: Risk warning (Signal Invalidated, Deleveraging shock, Knife breach).
-- **Content Blocks**: Symbol badge, Decision, Setup type, Price entry zone, Stop Loss, TP1/TP2, Net RR, Derivatives regime, Benchmark context, Evidence bullet list, Risks bullet list.
+- **Completeness & Hygiene (R1-13)**: Includes latest price, 24h change %, 1h regime, 1h ATR, key support/resistance levels, derivatives state, funding rate, and 1h/12h OI change. When directional decision is `WAIT`, fake 0-price directional plans are omitted.
 - **Security**: Feishu webhook secret is verified and signed using SHA-256 HMAC timestamp signing; secrets are never logged or exported.
 
 ---
@@ -231,7 +239,11 @@ quantctl market-watch top --limit 5
 # 4. Explain detailed multi-timeframe assessment for a single symbol
 quantctl market-watch explain --symbol SOLUSDT
 
-# 5. Send test alert to Feishu to verify webhook and signature
+# 5. Shadow observation tracking and resolution
+quantctl market-watch shadow-status
+quantctl market-watch shadow-resolve
+
+# 6. Send test alert to Feishu to verify webhook and signature
 quantctl market-watch test-feishu --symbol BTCUSDT
 ```
 
@@ -240,8 +252,8 @@ quantctl market-watch test-feishu --symbol BTCUSDT
 ## 13. Shadow Evaluation & Forward Excursions
 
 To validate policy efficacy without risking capital or lookahead bias:
-1. Whenever an actionable decision (`LONG` / `SHORT`) is determined, a shadow record is logged.
-2. In subsequent scans, `ShadowEvaluationManager` evaluates forward price candles against entry, stop loss, and targets:
+1. **Auto-Recording**: Whenever a symbol enters `ARMED` or `TRIGGERED`, a shadow record is logged exactly once per signal lifecycle.
+2. **Causal Forward Resolution**: `shadow-resolve` iterates pending records and evaluates subsequently closed candles without lookahead:
    - **MFE (Maximum Favorable Excursion)**: Maximum potential profit in R-multiples.
    - **MAE (Maximum Adverse Excursion)**: Maximum drawdown in R-multiples.
    - **Target Reached**: Whether TP1, TP2, or SL was reached first.

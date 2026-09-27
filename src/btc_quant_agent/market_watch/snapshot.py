@@ -99,7 +99,12 @@ def compute_timeframe_snapshot(
         config=config,
     )
 
-    is_compressed = current_bb_pct <= tc.vol_compression_bb_pct
+    # Prior compression window detection (require actual prior compression in preceding bars)
+    prior_window = bb_pct_vals[-min(20, len(bb_pct_vals)):-1] if len(bb_pct_vals) > 1 else []
+    compressed_bars = sum(1 for v in prior_window if v <= tc.vol_compression_bb_pct)
+    has_prior_compression = compressed_bars >= tc.vol_compression_min_bars
+
+    is_compressed = (current_bb_pct <= tc.vol_compression_bb_pct) or has_prior_compression
     is_expanded = current_atr_pct >= 0.75 and current_volume_z >= 0.5
 
     return TimeframeSnapshot(
@@ -129,6 +134,7 @@ def compute_timeframe_snapshot(
         regime=regime,
         is_volatility_compressed=is_compressed,
         is_volatility_expanded=is_expanded,
+        has_prior_compression_window=has_prior_compression,
     )
 
 
@@ -193,7 +199,9 @@ def compute_snapshot_hash(
         "4h_close": tf_4h.close,
         "4h_end": tf_4h.closed_bar_end_time_ms,
         "funding": derivatives.funding_rate,
+        "funding_time_ms": derivatives.funding_time_ms,
         "oi": derivatives.current_open_interest,
+        "oi_time_ms": derivatives.open_interest_time_ms,
     }
-    raw = json.dumps(payload, sort_keys=True)
+    raw = json.dumps(payload, default=str, sort_keys=True)
     return hashlib.sha256(raw.encode("utf-8")).hexdigest()[:16]

@@ -8,10 +8,11 @@ from typing import Any
 
 from ..data.binance import BinancePublicClient
 from .alerting import send_market_watch_alert
-from .config import MarketWatchConfig
+from .config import MarketWatchConfig, compute_market_watch_config_hash
 from .context import apply_benchmark_context_gate, evaluate_benchmark_context
 from .derivatives import evaluate_derivatives_regime
 from .domain import (
+    BreakoutState,
     ConfidenceBand,
     DerivativesMetrics,
     DirectionalDecision,
@@ -19,6 +20,7 @@ from .domain import (
     EntryQuality,
     GridDecision,
     GridPlan,
+    MARKET_WATCH_POLICY_VERSION,
     MarketSnapshot,
     MarketWatchAlert,
     PlaybookType,
@@ -85,16 +87,22 @@ class MarketWatchScanner:
         funding_rate = None
         funding_time_ms = None
         open_interest = None
+        open_interest_time_ms = None
         oi_1h_change = None
         oi_4h_change = None
         oi_12h_change = None
         taker_ratio = None
+        taker_time_ms = None
         basis_rate = None
+        basis_time_ms = None
         long_short_ratio = None
+        long_short_time_ms = None
         top_pos_ratio = None
         top_acc_ratio = None
         order_book_imbalance = None
         spread_bps = None
+        field_avail: dict[str, bool] = {}
+        endpoint_errs: dict[str, str] = {}
 
         try:
             deriv_collection = self.client.collect_derivatives(symbol, include_order_book=True)
@@ -104,15 +112,26 @@ class MarketWatchScanner:
             funding_rate = snap.funding_rate
             funding_time_ms = snap.funding_time_ms
             open_interest = snap.open_interest
+            open_interest_time_ms = snap.open_interest_time_ms
             oi_1h_change = snap.open_interest_change_pct
             taker_ratio = snap.taker_buy_sell_ratio
+            taker_time_ms = snap.taker_time_ms
             basis_rate = snap.basis_rate
+            basis_time_ms = snap.basis_time_ms
             long_short_ratio = snap.long_short_account_ratio
+            long_short_time_ms = snap.long_short_time_ms
             order_book_imbalance = snap.order_book_imbalance
             spread_bps = snap.spread_bps
+            field_avail = dict(deriv_collection.field_availability)
+            if deriv_collection.endpoint_errors:
+                health = ScanHealth.DEGRADED
+                for ep, err in deriv_collection.endpoint_errors.items():
+                    health_reasons.append(f"DERIVATIVES_PARTIAL_ERROR_{ep}: {err}")
+                endpoint_errs = dict(deriv_collection.endpoint_errors)
         except Exception as exc:  # noqa: BLE001
             health = ScanHealth.DEGRADED
             health_reasons.append(f"DERIVATIVES_ERROR: {exc}")
+            endpoint_errs = {"all": str(exc)}
 
         # Optional multi-horizon OI history query
         try:
@@ -155,6 +174,20 @@ class MarketWatchScanner:
         except (KeyError, ValueError, TypeError, IndexError) as exc:
             logger.debug("Top acc ratio parse failed for %s: %s", symbol, exc)
 
+        # Exchange time and staleness check
+        exchange_time_ms = now_ms
+        try:
+            val = self.client.server_time_ms()
+            if isinstance(val, (int, float)):
+                exchange_time_ms = int(val)
+        except Exception:
+            pass
+
+        if raw_15m and isinstance(raw_15m[-1].close_time_ms, (int, float)):
+            if exchange_time_ms - int(raw_15m[-1].close_time_ms) > 3_600_000:
+                health = ScanHealth.DEGRADED
+                health_reasons.append("STALE_CANDLE_DATA")
+
         # 3. 24hr ticker for price metrics
         change_24h = 0.0
         high_24h = raw_15m[-1].close
@@ -193,17 +226,23 @@ class MarketWatchScanner:
             funding_rate=funding_rate,
             funding_time_ms=funding_time_ms,
             current_open_interest=open_interest,
+            open_interest_time_ms=open_interest_time_ms,
             oi_1h_change=oi_1h_change,
             oi_4h_change=oi_4h_change,
             oi_12h_change=oi_12h_change,
             global_account_long_short_ratio=long_short_ratio,
+            long_short_time_ms=long_short_time_ms,
             top_trader_position_ratio=top_pos_ratio,
             top_trader_account_ratio=top_acc_ratio,
             taker_buy_sell_ratio=taker_ratio,
+            taker_time_ms=taker_time_ms,
             basis_rate=basis_rate,
             basis_bps=basis_bps,
+            basis_time_ms=basis_time_ms,
             spread_bps=spread_bps,
             order_book_imbalance=order_book_imbalance,
+            field_availability=field_avail,
+            endpoint_errors=endpoint_errs,
         )
 
         # Evaluate derivatives regime
@@ -218,17 +257,23 @@ class MarketWatchScanner:
             funding_rate=deriv_metrics.funding_rate,
             funding_time_ms=deriv_metrics.funding_time_ms,
             current_open_interest=deriv_metrics.current_open_interest,
+            open_interest_time_ms=deriv_metrics.open_interest_time_ms,
             oi_1h_change=deriv_metrics.oi_1h_change,
             oi_4h_change=deriv_metrics.oi_4h_change,
             oi_12h_change=deriv_metrics.oi_12h_change,
             global_account_long_short_ratio=deriv_metrics.global_account_long_short_ratio,
+            long_short_time_ms=deriv_metrics.long_short_time_ms,
             top_trader_position_ratio=deriv_metrics.top_trader_position_ratio,
             top_trader_account_ratio=deriv_metrics.top_trader_account_ratio,
             taker_buy_sell_ratio=deriv_metrics.taker_buy_sell_ratio,
+            taker_time_ms=deriv_metrics.taker_time_ms,
             basis_rate=deriv_metrics.basis_rate,
             basis_bps=deriv_metrics.basis_bps,
+            basis_time_ms=deriv_metrics.basis_time_ms,
             spread_bps=deriv_metrics.spread_bps,
             order_book_imbalance=deriv_metrics.order_book_imbalance,
+            field_availability=deriv_metrics.field_availability,
+            endpoint_errors=deriv_metrics.endpoint_errors,
             regime=d_regime,
             reasons=d_reasons + d_risks,
         )
@@ -247,7 +292,7 @@ class MarketWatchScanner:
             symbol=symbol,
             decision_time_ms=now_ms,
             observed_at_ms=now_ms,
-            exchange_time_ms=now_ms,
+            exchange_time_ms=exchange_time_ms,
             price=price_metrics,
             tf_15m=tf_15m,
             tf_1h=tf_1h,
@@ -304,6 +349,7 @@ class MarketWatchScanner:
                 derivatives=derivatives,
                 exhaustion=exhaustion,
                 config=self.config,
+                prev_state=prev_state,
             )
             or evaluate_failed_breakout(
                 tf_1h=tf_1h,
@@ -330,6 +376,9 @@ class MarketWatchScanner:
             tp2 = pb_candidate["take_profit_2"]
             invalidation = pb_candidate["invalidation"]
             confidence = pb_candidate["confidence"]
+            bo_state = pb_candidate.get("breakout_state", BreakoutState.NONE)
+            bo_level = pb_candidate.get("breakout_level")
+            bo_bar_end_ms = pb_candidate.get("breakout_bar_end_ms")
             reasons = list(pb_candidate["reasons"]) + tf_reasons + list(bench_reasons)
             risks = list(pb_candidate["risks"]) + list(bench_risks)
         else:
@@ -342,6 +391,9 @@ class MarketWatchScanner:
             tp2 = 0.0
             invalidation = 0.0
             confidence = ConfidenceBand.LOW
+            bo_state = BreakoutState.NONE
+            bo_level = None
+            bo_bar_end_ms = None
             reasons = ["NO_CONFIRMED_PLAYBOOK_CANDIDATE"] + tf_reasons
             risks = list(bench_risks)
 
@@ -409,6 +461,7 @@ class MarketWatchScanner:
 
         # 9. Opportunity Score
         opp_score = calculate_opportunity_score(
+            decision=gated_decision,
             tf_1h=tf_1h,
             tf_15m=tf_15m,
             entry_quality=entry_quality,
@@ -441,6 +494,9 @@ class MarketWatchScanner:
             risk_codes=tuple(sorted(set(risks))),
             derivatives_regime=derivatives.regime,
             benchmark_context=bench_context,
+            breakout_state=bo_state,
+            breakout_level=bo_level,
+            breakout_bar_end_ms=bo_bar_end_ms,
         )
 
         # 10. Grid Policy
@@ -462,17 +518,40 @@ class MarketWatchScanner:
         )
 
         # 11. Lifecycle State
-        prev_lifecycle = SignalLifecycleState(prev_state["lifecycle_state"]) if (prev_state and prev_state.get("lifecycle_state")) else None
+        prev_lifecycle = (
+            SignalLifecycleState(prev_state["lifecycle_state"])
+            if (prev_state and prev_state.get("lifecycle_state"))
+            else None
+        )
+        current_bar_end = tf_15m.closed_bar_end_time_ms
+        created_bar_end = prev_state.get("created_bar_end_ms") if prev_state else None
+        if created_bar_end and current_bar_end >= created_bar_end:
+            age_bars = max(0, int((current_bar_end - created_bar_end) / (15 * 60 * 1000)))
+        else:
+            age_bars = 0
+
+        has_setup = (setup != PlaybookType.NO_TRADE)
+        is_near_ready = (bo_state == BreakoutState.BREAKOUT_CONFIRMED) or (
+            has_setup and raw_decision != DirectionalDecision.WAIT
+        )
+
         is_invalid = False
-        if prev_lifecycle in (SignalLifecycleState.ARMED, SignalLifecycleState.TRIGGERED) and gated_decision == DirectionalDecision.WAIT:
-            is_invalid = True
+        if prev_lifecycle in (SignalLifecycleState.ARMED, SignalLifecycleState.TRIGGERED):
+            if gated_decision == DirectionalDecision.WAIT and not is_near_ready:
+                is_invalid = True
 
         lifecycle = advance_lifecycle_state(
             previous_state=prev_lifecycle,
             decision=gated_decision,
             entry_quality=entry_quality,
             is_invalidated=is_invalid,
+            has_setup=has_setup,
+            is_near_ready=is_near_ready,
+            age_bars=age_bars,
+            max_age_bars=self.config.thresholds.max_signal_age_bars,
         )
+
+        cfg_hash = compute_market_watch_config_hash(self.config)
 
         # Temporary assessment to compute stable fingerprint
         temp_assessment = SymbolAssessment(
@@ -487,6 +566,8 @@ class MarketWatchScanner:
             veto_reasons=fatal_reasons,
             alert_fingerprint="",
             lifecycle_state=lifecycle,
+            policy_version=MARKET_WATCH_POLICY_VERSION,
+            config_hash=cfg_hash,
         )
         fp = compute_decision_fingerprint(temp_assessment)
 
@@ -502,6 +583,8 @@ class MarketWatchScanner:
             veto_reasons=fatal_reasons,
             alert_fingerprint=fp,
             lifecycle_state=lifecycle,
+            policy_version=MARKET_WATCH_POLICY_VERSION,
+            config_hash=cfg_hash,
         )
 
     def scan_universe(
@@ -513,9 +596,13 @@ class MarketWatchScanner:
         target_symbols = list(symbols or self.config.symbols)
         now_ms = int(time.time() * 1000)
 
+        # Always include benchmark symbols (BTC, ETH) for cross-asset relative performance and gates
+        benchmarks_needed = [b for b in ("BTCUSDT", "ETHUSDT") if b not in target_symbols]
+        all_symbols_to_collect = target_symbols + benchmarks_needed
+
         # 1. Collect snapshots across universe with failure isolation
         snapshots: dict[str, MarketSnapshot] = {}
-        for s in target_symbols:
+        for s in all_symbols_to_collect:
             snap, _health, errors = self.collect_symbol_snapshot(s, now_ms)
             if snap is not None:
                 snapshots[s] = snap
@@ -533,9 +620,12 @@ class MarketWatchScanner:
         btc_snap = snapshots.get("BTCUSDT")
         eth_snap = snapshots.get("ETHUSDT")
 
-        # 4. Assess each symbol
+        # 4. Assess target symbols
         assessments: list[SymbolAssessment] = []
-        for s, snap in snapshots.items():
+        for s in target_symbols:
+            snap = snapshots.get(s)
+            if snap is None:
+                continue
             prev_st = self.store.get_symbol_state(s)
             item = self.assess_symbol(
                 snapshot=snap,
@@ -563,6 +653,8 @@ class MarketWatchScanner:
                     veto_reasons=a.veto_reasons,
                     alert_fingerprint=a.alert_fingerprint,
                     lifecycle_state=a.lifecycle_state,
+                    policy_version=a.policy_version,
+                    config_hash=a.config_hash,
                 )
             )
 
@@ -573,6 +665,35 @@ class MarketWatchScanner:
 
         for a in ranked_assessments:
             prev_st = self.store.get_symbol_state(a.symbol)
+            prev_shadow = prev_st.get("last_shadow_recorded_state") if prev_st else None
+
+            # Auto-record shadow observation on first transition to ARMED / TRIGGERED
+            if a.lifecycle_state in (SignalLifecycleState.ARMED, SignalLifecycleState.TRIGGERED) and prev_shadow not in ("ARMED", "TRIGGERED"):
+                entry_p = a.directional.entry_high if a.directional.decision == DirectionalDecision.SHORT else a.directional.entry_low
+                if entry_p <= 0.0:
+                    entry_p = a.snapshot.price.last_price
+
+                self.store.record_shadow_observation(
+                    timestamp_ms=now_ms,
+                    symbol=a.symbol,
+                    snapshot_hash=a.snapshot.snapshot_hash,
+                    agent_decision=str(a.directional.decision),
+                    agent_setup=str(a.directional.setup),
+                    entry_quality=str(a.directional.entry_quality),
+                    reason_codes=list(a.directional.reason_codes),
+                    policy_version=a.policy_version,
+                    config_hash=a.config_hash,
+                    entry_price=entry_p,
+                    stop_loss=a.directional.stop_loss,
+                    tp1=a.directional.take_profit_1,
+                    tp2=a.directional.take_profit_2,
+                    direction=str(a.directional.decision),
+                )
+                self.store.set_last_shadow_recorded_state(a.symbol, str(a.lifecycle_state))
+            elif a.lifecycle_state in (SignalLifecycleState.CANDIDATE, SignalLifecycleState.INVALIDATED, SignalLifecycleState.EXPIRED) and a.directional.setup == PlaybookType.NO_TRADE:
+                if prev_shadow:
+                    self.store.set_last_shadow_recorded_state(a.symbol, "")
+
             emit, severity, _reasons = evaluate_alert_emission(a, prev_st, self.config)
 
             alert_sent = False
@@ -587,6 +708,15 @@ class MarketWatchScanner:
                     evidence=a.directional.reason_codes,
                     risks=a.directional.risk_codes,
                     alert_time_ms=now_ms,
+                    last_price=a.snapshot.price.last_price,
+                    change_24h_pct=a.snapshot.price.change_24h_pct,
+                    atr=a.snapshot.tf_1h.atr,
+                    key_support=a.snapshot.tf_1h.recent_swing_low,
+                    key_resistance=a.snapshot.tf_1h.recent_swing_high,
+                    funding_rate=a.snapshot.derivatives.funding_rate,
+                    oi_1h_change=a.snapshot.derivatives.oi_1h_change,
+                    oi_12h_change=a.snapshot.derivatives.oi_12h_change,
+                    regime_1h=a.snapshot.tf_1h.regime,
                 )
                 alerts_to_send.append(alert)
 

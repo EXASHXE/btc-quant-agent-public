@@ -4,6 +4,7 @@ import statistics
 from collections.abc import Sequence
 from typing import Any
 
+from ..data.binance import BinancePublicClient
 from ..domain import Candle
 from .domain import DirectionalDecision, SymbolAssessment
 from .state import MarketWatchStateStore
@@ -21,17 +22,105 @@ class ShadowEvaluationManager:
         reference_decision: str | None = None,
         reference_notes: str | None = None,
     ) -> int:
+        d = assessment.directional
+        entry_price = (
+            d.entry_high
+            if d.decision == DirectionalDecision.LONG
+            else (d.entry_low if d.decision == DirectionalDecision.SHORT else assessment.snapshot.price.last_price)
+        )
         return self.store.record_shadow_observation(
             timestamp_ms=assessment.snapshot.decision_time_ms,
             symbol=assessment.symbol,
             snapshot_hash=assessment.snapshot.snapshot_hash,
-            agent_decision=str(assessment.directional.decision),
-            agent_setup=str(assessment.directional.setup),
-            entry_quality=str(assessment.directional.entry_quality),
-            reason_codes=list(assessment.directional.reason_codes),
+            agent_decision=str(d.decision),
+            agent_setup=str(d.setup),
+            entry_quality=str(d.entry_quality),
+            reason_codes=list(d.reason_codes),
             reference_decision=reference_decision,
             reference_notes=reference_notes,
+            policy_version=assessment.policy_version,
+            config_hash=assessment.config_hash,
+            entry_price=entry_price,
+            stop_loss=d.stop_loss,
+            tp1=d.take_profit_1,
+            tp2=d.take_profit_2,
+            direction=str(d.decision),
         )
+
+    def resolve_pending_observations(
+        self,
+        client: BinancePublicClient,
+        current_time_ms: int,
+    ) -> dict[str, Any]:
+        """Resolve previous eligible shadow observations using ONLY subsequently available closed candles."""
+        pending = self.store.get_pending_shadow_records()
+        if not pending:
+            return {"resolved_count": 0, "pending_count": 0, "results": []}
+
+        results = []
+        for rec in pending:
+            symbol = rec["symbol"]
+            rec_id = rec["id"]
+            timestamp_ms = rec["timestamp_ms"]
+            entry_price = float(rec.get("entry_price") or 0.0)
+            stop_loss = float(rec.get("stop_loss") or 0.0)
+            tp1 = float(rec.get("tp1") or 0.0)
+            tp2 = float(rec.get("tp2") or 0.0)
+            dir_str = rec.get("direction", "WAIT")
+            if dir_str not in ("LONG", "SHORT") or entry_price <= 0:
+                self.store.update_shadow_outcome(
+                    rec_id,
+                    future_mfe=0.0,
+                    future_mae=0.0,
+                    tp1_hit=False,
+                    tp2_hit=False,
+                    sl_hit=False,
+                    time_to_target_ms=None,
+                    time_to_stop_ms=None,
+                    net_r=0.0,
+                    regime_after="INELIGIBLE",
+                )
+                results.append({"id": rec_id, "symbol": symbol, "status": "INELIGIBLE"})
+                continue
+
+            try:
+                raw_candles = client.klines(symbol, "15m", 120)
+            except Exception as exc:  # noqa: BLE001
+                results.append({"id": rec_id, "symbol": symbol, "status": f"FETCH_FAILED: {exc}"})
+                continue
+
+            subsequent_closed = [
+                c for c in raw_candles
+                if c.open_time_ms >= timestamp_ms and c.close_time_ms <= current_time_ms
+            ]
+            if not subsequent_closed:
+                results.append({"id": rec_id, "symbol": symbol, "status": "PENDING_AWAITING_FUTURE_BARS"})
+                continue
+
+            direction = DirectionalDecision(dir_str)
+            outcome = self.evaluate_forward_outcomes(
+                shadow_id=rec_id,
+                entry_price=entry_price,
+                stop_loss=stop_loss,
+                tp1=tp1,
+                tp2=tp2,
+                direction=direction,
+                future_candles=subsequent_closed,
+            )
+            results.append({"id": rec_id, "symbol": symbol, "status": "RESOLVED", "outcome": outcome})
+
+        return {
+            "resolved_count": sum(1 for r in results if r["status"] in ("RESOLVED", "INELIGIBLE")),
+            "pending_count": sum(1 for r in results if r["status"] == "PENDING_AWAITING_FUTURE_BARS"),
+            "results": results,
+        }
+
+    def get_status(self) -> dict[str, Any]:
+        all_records = self.store.get_all_shadow_records()
+        metrics = compute_performance_metrics(all_records)
+        metrics["total_records"] = len(all_records)
+        metrics["pending_count"] = sum(1 for r in all_records if not r.get("resolved"))
+        return metrics
 
     def evaluate_forward_outcomes(
         self,
@@ -162,3 +251,6 @@ def compute_performance_metrics(records: list[dict[str, Any]]) -> dict[str, Any]
         "median_net_r": round(statistics.median(net_rs), 2) if net_rs else 0.0,
         "stratified_by_playbook": stratified_summary,
     }
+
+
+ShadowDecisionRecorder = ShadowEvaluationManager

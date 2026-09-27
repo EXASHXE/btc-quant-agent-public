@@ -9,8 +9,11 @@ from typing import Any
 from .config import MarketWatchConfig
 from .domain import (
     AlertSeverity,
+    BreakoutState,
     DerivativesRegime,
     DirectionalDecision,
+    GridDecision,
+    GridPlan,
     SignalLifecycleState,
     SymbolAssessment,
 )
@@ -36,6 +39,7 @@ def compute_decision_fingerprint(assessment: SymbolAssessment) -> str:
         "grid_upper": round(g.upper_bound, 2) if g.upper_bound is not None else None,
         "derivatives_regime": str(d.derivatives_regime),
         "lifecycle_state": str(assessment.lifecycle_state),
+        "breakout_state": str(d.breakout_state),
     }
     raw = json.dumps(payload, sort_keys=True)
     return hashlib.sha256(raw.encode("utf-8")).hexdigest()[:16]
@@ -77,10 +81,45 @@ class MarketWatchStateStore:
                     last_rank INTEGER,
                     last_alert_fingerprint TEXT,
                     last_alert_time_ms INTEGER,
-                    updated_at_ms INTEGER
+                    updated_at_ms INTEGER,
+                    breakout_level REAL,
+                    breakout_direction TEXT,
+                    breakout_bar_end_ms INTEGER,
+                    breakout_state TEXT,
+                    grid_lower_bound REAL,
+                    grid_upper_bound REAL,
+                    recent_failed_breakout_ms INTEGER,
+                    recent_failed_breakdown_ms INTEGER,
+                    created_bar_end_ms INTEGER,
+                    armed_bar_end_ms INTEGER,
+                    triggered_bar_end_ms INTEGER,
+                    age_bars INTEGER DEFAULT 0,
+                    last_shadow_recorded_state TEXT
                 )
                 """
             )
+            # Migrations for existing DB
+            cols_symbol_state = [
+                ("breakout_level", "REAL"),
+                ("breakout_direction", "TEXT"),
+                ("breakout_bar_end_ms", "INTEGER"),
+                ("breakout_state", "TEXT"),
+                ("grid_lower_bound", "REAL"),
+                ("grid_upper_bound", "REAL"),
+                ("recent_failed_breakout_ms", "INTEGER"),
+                ("recent_failed_breakdown_ms", "INTEGER"),
+                ("created_bar_end_ms", "INTEGER"),
+                ("armed_bar_end_ms", "INTEGER"),
+                ("triggered_bar_end_ms", "INTEGER"),
+                ("age_bars", "INTEGER DEFAULT 0"),
+                ("last_shadow_recorded_state", "TEXT"),
+            ]
+            for col_name, col_type in cols_symbol_state:
+                try:
+                    conn.execute(f"ALTER TABLE market_watch_symbol_state ADD COLUMN {col_name} {col_type}")
+                except sqlite3.OperationalError:
+                    pass
+
             conn.execute(
                 """
                 CREATE TABLE IF NOT EXISTS market_watch_assessments (
@@ -88,6 +127,8 @@ class MarketWatchStateStore:
                     decision_time_ms INTEGER,
                     symbol TEXT,
                     snapshot_hash TEXT,
+                    policy_version TEXT,
+                    config_hash TEXT,
                     regime TEXT,
                     setup TEXT,
                     directional_decision TEXT,
@@ -105,6 +146,12 @@ class MarketWatchStateStore:
                 )
                 """
             )
+            for col_name, col_type in [("policy_version", "TEXT"), ("config_hash", "TEXT")]:
+                try:
+                    conn.execute(f"ALTER TABLE market_watch_assessments ADD COLUMN {col_name} {col_type}")
+                except sqlite3.OperationalError:
+                    pass
+
             conn.execute(
                 """
                 CREATE TABLE IF NOT EXISTS market_watch_shadow_records (
@@ -112,24 +159,47 @@ class MarketWatchStateStore:
                     timestamp_ms INTEGER,
                     symbol TEXT,
                     snapshot_hash TEXT,
+                    policy_version TEXT,
+                    config_hash TEXT,
                     agent_decision TEXT,
                     agent_setup TEXT,
                     entry_quality TEXT,
                     reason_codes_json TEXT,
                     reference_decision TEXT,
                     reference_notes TEXT,
+                    entry_price REAL,
+                    stop_loss REAL,
+                    tp1 REAL,
+                    tp2 REAL,
+                    direction TEXT,
                     future_mfe REAL,
                     future_mae REAL,
-                    tp1_hit INTEGER,
-                    tp2_hit INTEGER,
-                    sl_hit INTEGER,
+                    tp1_hit INTEGER DEFAULT 0,
+                    tp2_hit INTEGER DEFAULT 0,
+                    sl_hit INTEGER DEFAULT 0,
                     time_to_target_ms INTEGER,
                     time_to_stop_ms INTEGER,
                     net_r REAL,
-                    regime_after TEXT
+                    regime_after TEXT,
+                    resolved INTEGER DEFAULT 0
                 )
                 """
             )
+            for col_name, col_type in [
+                ("policy_version", "TEXT"),
+                ("config_hash", "TEXT"),
+                ("entry_price", "REAL"),
+                ("stop_loss", "REAL"),
+                ("tp1", "REAL"),
+                ("tp2", "REAL"),
+                ("direction", "TEXT"),
+                ("resolved", "INTEGER DEFAULT 0"),
+            ]:
+                try:
+                    conn.execute(f"ALTER TABLE market_watch_shadow_records ADD COLUMN {col_name} {col_type}")
+                except sqlite3.OperationalError:
+                    pass
+
             conn.commit()
 
     def get_symbol_state(self, symbol: str) -> dict[str, Any] | None:
@@ -153,13 +223,61 @@ class MarketWatchStateStore:
         last_fp = assessment.alert_fingerprint if alert_sent else prev.get("last_alert_fingerprint")
         last_alert_time = now_ms if alert_sent else prev.get("last_alert_time_ms")
 
-        # Track failed breakout/breakdown levels
+        bar_end_ms = assessment.snapshot.tf_15m.closed_bar_end_time_ms
+        curr_life = str(assessment.lifecycle_state)
+        prev_life = prev.get("lifecycle_state")
+
+        # Breakout state tracking
+        d = assessment.directional
+        bo_state = str(d.breakout_state) if d.breakout_state != BreakoutState.NONE else prev.get("breakout_state", "NONE")
+        bo_level = d.breakout_level if d.breakout_level is not None else prev.get("breakout_level")
+        bo_dir = ("LONG" if d.decision == DirectionalDecision.LONG else ("SHORT" if d.decision == DirectionalDecision.SHORT else None)) or prev.get("breakout_direction")
+        bo_time = d.breakout_bar_end_ms if d.breakout_bar_end_ms is not None else prev.get("breakout_bar_end_ms")
+
+        # If retested or invalidated or expired, reset breakout state
+        if d.breakout_state == BreakoutState.RETEST_CONFIRMED or curr_life in ("INVALIDATED", "EXPIRED"):
+            bo_state = "NONE"
+
+        # Failed breakout memory tracking (R1-04)
         failed_bo = prev.get("recent_failed_breakout")
+        failed_bo_ms = prev.get("recent_failed_breakout_ms")
         failed_bd = prev.get("recent_failed_breakdown")
+        failed_bd_ms = prev.get("recent_failed_breakdown_ms")
+
         if assessment.directional.setup.value == "FAILED_BREAKOUT":
             failed_bo = assessment.snapshot.tf_1h.recent_swing_high
+            failed_bo_ms = bar_end_ms
         if assessment.directional.setup.value == "FAILED_BREAKDOWN":
             failed_bd = assessment.snapshot.tf_1h.recent_swing_low
+            failed_bd_ms = bar_end_ms
+
+        # Lifecycle timing
+        if prev.get("created_bar_end_ms") and curr_life in ("ARMED", "TRIGGERED", "CANDIDATE") and prev_life in ("ARMED", "TRIGGERED", "CANDIDATE"):
+            created_ms = prev["created_bar_end_ms"]
+        else:
+            created_ms = bar_end_ms
+
+        if curr_life == "ARMED":
+            armed_ms = prev.get("armed_bar_end_ms") or bar_end_ms
+        else:
+            armed_ms = prev.get("armed_bar_end_ms")
+
+        if curr_life == "TRIGGERED":
+            triggered_ms = prev.get("triggered_bar_end_ms") or bar_end_ms
+        else:
+            triggered_ms = prev.get("triggered_bar_end_ms")
+
+        if created_ms and bar_end_ms >= created_ms:
+            age_bars = max(0, int((bar_end_ms - created_ms) / (15 * 60 * 1000)))
+        else:
+            age_bars = 0
+
+        last_shadow_state = prev.get("last_shadow_recorded_state")
+        if curr_life in ("ARMED", "TRIGGERED"):
+            if last_shadow_state not in ("ARMED", "TRIGGERED"):
+                last_shadow_state = curr_life
+        elif curr_life in ("CANDIDATE", "INVALIDATED", "EXPIRED") and assessment.directional.setup.value == "NO_TRADE":
+            last_shadow_state = None
 
         with self._connect() as conn:
             conn.execute(
@@ -170,8 +288,13 @@ class MarketWatchStateStore:
                     recent_resistance, recent_breakout_level,
                     recent_failed_breakout, recent_failed_breakdown,
                     lifecycle_state, last_invalidation_reason, last_rank,
-                    last_alert_fingerprint, last_alert_time_ms, updated_at_ms
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    last_alert_fingerprint, last_alert_time_ms, updated_at_ms,
+                    breakout_level, breakout_direction, breakout_bar_end_ms, breakout_state,
+                    grid_lower_bound, grid_upper_bound,
+                    recent_failed_breakout_ms, recent_failed_breakdown_ms,
+                    created_bar_end_ms, armed_bar_end_ms, triggered_bar_end_ms,
+                    age_bars, last_shadow_recorded_state
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ON CONFLICT(symbol) DO UPDATE SET
                     regime = excluded.regime,
                     directional_decision = excluded.directional_decision,
@@ -188,7 +311,20 @@ class MarketWatchStateStore:
                     last_rank = excluded.last_rank,
                     last_alert_fingerprint = excluded.last_alert_fingerprint,
                     last_alert_time_ms = excluded.last_alert_time_ms,
-                    updated_at_ms = excluded.updated_at_ms
+                    updated_at_ms = excluded.updated_at_ms,
+                    breakout_level = excluded.breakout_level,
+                    breakout_direction = excluded.breakout_direction,
+                    breakout_bar_end_ms = excluded.breakout_bar_end_ms,
+                    breakout_state = excluded.breakout_state,
+                    grid_lower_bound = excluded.grid_lower_bound,
+                    grid_upper_bound = excluded.grid_upper_bound,
+                    recent_failed_breakout_ms = excluded.recent_failed_breakout_ms,
+                    recent_failed_breakdown_ms = excluded.recent_failed_breakdown_ms,
+                    created_bar_end_ms = excluded.created_bar_end_ms,
+                    armed_bar_end_ms = excluded.armed_bar_end_ms,
+                    triggered_bar_end_ms = excluded.triggered_bar_end_ms,
+                    age_bars = excluded.age_bars,
+                    last_shadow_recorded_state = excluded.last_shadow_recorded_state
                 """,
                 (
                     symbol,
@@ -199,7 +335,7 @@ class MarketWatchStateStore:
                     str(assessment.directional.entry_quality),
                     assessment.snapshot.tf_1h.recent_swing_low,
                     assessment.snapshot.tf_1h.recent_swing_high,
-                    None,
+                    bo_level,
                     failed_bo,
                     failed_bd,
                     str(assessment.lifecycle_state),
@@ -208,23 +344,38 @@ class MarketWatchStateStore:
                     last_fp,
                     last_alert_time,
                     now_ms,
+                    bo_level,
+                    bo_dir,
+                    bo_time,
+                    bo_state,
+                    assessment.grid.lower_bound,
+                    assessment.grid.upper_bound,
+                    failed_bo_ms,
+                    failed_bd_ms,
+                    created_ms,
+                    armed_ms,
+                    triggered_ms,
+                    age_bars,
+                    last_shadow_state,
                 ),
             )
             # Record auditable assessment
             conn.execute(
                 """
                 INSERT INTO market_watch_assessments (
-                    decision_time_ms, symbol, snapshot_hash, regime, setup,
-                    directional_decision, grid_decision, entry_quality,
+                    decision_time_ms, symbol, snapshot_hash, policy_version, config_hash,
+                    regime, setup, directional_decision, grid_decision, entry_quality,
                     derivatives_regime, benchmark_context, opportunity_score,
                     rank, reason_codes_json, risk_codes_json, decision_json,
                     alert_fingerprint, notification_sent
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     assessment.snapshot.decision_time_ms,
                     symbol,
                     assessment.snapshot.snapshot_hash,
+                    assessment.policy_version,
+                    assessment.config_hash,
                     str(assessment.directional.regime),
                     str(assessment.directional.setup),
                     str(assessment.directional.decision),
@@ -243,6 +394,20 @@ class MarketWatchStateStore:
             )
             conn.commit()
 
+    def set_last_shadow_recorded_state(self, symbol: str, state_value: str) -> None:
+        with self._connect() as conn:
+            cursor = conn.execute(
+                "UPDATE market_watch_symbol_state SET last_shadow_recorded_state = ? WHERE symbol = ?",
+                (state_value, symbol.upper()),
+            )
+            if cursor.rowcount == 0:
+                conn.execute(
+                    "INSERT INTO market_watch_symbol_state (symbol, last_shadow_recorded_state) VALUES (?, ?) "
+                    "ON CONFLICT(symbol) DO UPDATE SET last_shadow_recorded_state = excluded.last_shadow_recorded_state",
+                    (symbol.upper(), state_value),
+                )
+            conn.commit()
+
     def record_shadow_observation(
         self,
         *,
@@ -255,26 +420,41 @@ class MarketWatchStateStore:
         reason_codes: list[str],
         reference_decision: str | None = None,
         reference_notes: str | None = None,
+        policy_version: str = "",
+        config_hash: str = "",
+        entry_price: float = 0.0,
+        stop_loss: float = 0.0,
+        tp1: float = 0.0,
+        tp2: float = 0.0,
+        direction: str = "",
     ) -> int:
         with self._connect() as conn:
             cursor = conn.execute(
                 """
                 INSERT INTO market_watch_shadow_records (
-                    timestamp_ms, symbol, snapshot_hash, agent_decision,
-                    agent_setup, entry_quality, reason_codes_json,
-                    reference_decision, reference_notes
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    timestamp_ms, symbol, snapshot_hash, policy_version, config_hash,
+                    agent_decision, agent_setup, entry_quality, reason_codes_json,
+                    reference_decision, reference_notes, entry_price, stop_loss,
+                    tp1, tp2, direction, resolved
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)
                 """,
                 (
                     timestamp_ms,
                     symbol,
                     snapshot_hash,
+                    policy_version,
+                    config_hash,
                     agent_decision,
                     agent_setup,
                     entry_quality,
                     json.dumps(reason_codes),
                     reference_decision,
                     reference_notes,
+                    entry_price,
+                    stop_loss,
+                    tp1,
+                    tp2,
+                    direction,
                 ),
             )
             conn.commit()
@@ -306,7 +486,8 @@ class MarketWatchStateStore:
                     time_to_target_ms = ?,
                     time_to_stop_ms = ?,
                     net_r = ?,
-                    regime_after = ?
+                    regime_after = ?,
+                    resolved = 1
                 WHERE id = ?
                 """,
                 (
@@ -323,6 +504,32 @@ class MarketWatchStateStore:
                 ),
             )
             conn.commit()
+
+    def get_pending_shadow_records(self) -> list[dict[str, Any]]:
+        with self._connect() as conn:
+            conn.row_factory = sqlite3.Row
+            cursor = conn.execute(
+                "SELECT * FROM market_watch_shadow_records WHERE resolved = 0 ORDER BY timestamp_ms ASC"
+            )
+            return [dict(row) for row in cursor.fetchall()]
+
+    def get_all_shadow_records(self) -> list[dict[str, Any]]:
+        with self._connect() as conn:
+            conn.row_factory = sqlite3.Row
+            cursor = conn.execute(
+                "SELECT * FROM market_watch_shadow_records ORDER BY timestamp_ms DESC"
+            )
+            return [dict(row) for row in cursor.fetchall()]
+
+    def get_latest_assessment(self, symbol: str) -> dict[str, Any] | None:
+        with self._connect() as conn:
+            conn.row_factory = sqlite3.Row
+            cursor = conn.execute(
+                "SELECT * FROM market_watch_assessments WHERE symbol = ? ORDER BY id DESC LIMIT 1",
+                (symbol.upper(),),
+            )
+            row = cursor.fetchone()
+            return dict(row) if row is not None else None
 
     def get_all_states(self) -> list[dict[str, Any]]:
         with self._connect() as conn:
@@ -343,16 +550,38 @@ def evaluate_alert_emission(
     - Meaningful transitions:
       * WAIT -> LONG, WAIT -> SHORT, LONG -> WAIT, SHORT -> WAIT
       * CANDIDATE -> ARMED, ARMED -> TRIGGERED, TRIGGERED -> INVALIDATED
-      * Grid state change or bounds delta >= 2%
+      * Grid state change, boundary delta >= configured threshold, or LOWER_BOUND_BREACHED
       * Derivatives regime materially changes / crowding risk
+    - Grid-only changes MUST generate an alert even when DirectionalDecision == WAIT.
+    - LOWER_BOUND_BREACHED should be RISK.
     - Filter by min_alert_severity (default WATCH or ACTION).
     """
+    from .grid_policy import should_alert_grid_change
+
     reasons: list[str] = []
     current_fp = assessment.alert_fingerprint
 
+    # Check grid changes
+    prev_grid = None
+    if prev_state is not None:
+        prev_gd = prev_state.get("grid_decision")
+        if prev_gd:
+            prev_grid = GridPlan(
+                symbol=assessment.symbol,
+                decision=GridDecision(prev_gd),
+                lower_bound=prev_state.get("grid_lower_bound") or prev_state.get("recent_support"),
+                upper_bound=prev_state.get("grid_upper_bound") or prev_state.get("recent_resistance"),
+            )
+
+    grid_change_alert = should_alert_grid_change(
+        current=assessment.grid,
+        previous=prev_grid,
+        threshold_pct=config.grid.grid_boundary_change_pct,
+    )
+
     if prev_state is not None:
         last_fp = prev_state.get("last_alert_fingerprint")
-        if config.notify_only_on_change and last_fp == current_fp:
+        if config.notify_only_on_change and last_fp == current_fp and not grid_change_alert:
             return False, AlertSeverity.INFO, ("NO_NOTIFICATION_IDENTICAL_STATE",)
 
     # Determine severity
@@ -367,11 +596,10 @@ def evaluate_alert_emission(
 
     severity = AlertSeverity.INFO
 
-    # ACTION: actionable LONG/SHORT
+    # 1. Actionable Directional Signals
     if curr_life == SignalLifecycleState.TRIGGERED and curr_dir in (DirectionalDecision.LONG, DirectionalDecision.SHORT):
         severity = AlertSeverity.ACTION
         reasons.append(f"DIRECTIONAL_{curr_dir}_TRIGGERED")
-    # RISK: active signal invalidated or deleveraging/crowding shock
     elif curr_life == SignalLifecycleState.INVALIDATED:
         severity = AlertSeverity.RISK
         reasons.append("SIGNAL_INVALIDATED")
@@ -381,7 +609,6 @@ def evaluate_alert_emission(
     ):
         severity = AlertSeverity.RISK
         reasons.append("DELEVERAGING_RISK")
-    # WATCH: setup armed or failed breakout detected
     elif curr_life == SignalLifecycleState.ARMED:
         severity = AlertSeverity.WATCH
         reasons.append("SETUP_ARMED")
@@ -391,8 +618,38 @@ def evaluate_alert_emission(
     elif prev_dir_str is not None and prev_dir_str != str(curr_dir):
         severity = AlertSeverity.WATCH
         reasons.append(f"DIRECTION_CHANGED_{prev_dir_str}_TO_{curr_dir}")
-    else:
-        severity = AlertSeverity.INFO
+
+    # 2. Grid-Only / Grid-Change Triggers (R1-03)
+    if grid_change_alert:
+        grid_sev = AlertSeverity.WATCH
+        if assessment.grid.decision == GridDecision.PAUSE and prev_grid is not None and prev_grid.decision != GridDecision.PAUSE:
+            grid_sev = AlertSeverity.RISK
+            reasons.append("GRID_STATUS_CHANGED")
+        if "LOWER_BOUND_BREACHED" in assessment.grid.reason_codes:
+            grid_sev = AlertSeverity.RISK
+            if "LOWER_BOUND_BREACHED" not in reasons:
+                reasons.append("LOWER_BOUND_BREACHED")
+        if grid_sev != AlertSeverity.RISK:
+            if prev_grid is not None and prev_grid.decision != assessment.grid.decision:
+                grid_sev = AlertSeverity.WATCH
+                reasons.append(f"GRID_DECISION_CHANGED_{prev_grid.decision}_TO_{assessment.grid.decision}")
+            elif prev_grid is None and assessment.grid.decision != GridDecision.PAUSE:
+                grid_sev = AlertSeverity.WATCH
+                reasons.append(f"GRID_INITIALIZED_{assessment.grid.decision}")
+            else:
+                grid_sev = AlertSeverity.WATCH
+                reasons.append("GRID_BOUNDARIES_SHIFTED")
+
+        severity_order = {
+            AlertSeverity.INFO: 0,
+            AlertSeverity.WATCH: 1,
+            AlertSeverity.ACTION: 2,
+            AlertSeverity.RISK: 3,
+        }
+        if severity_order[grid_sev] > severity_order[severity]:
+            severity = grid_sev
+
+    if not reasons:
         reasons.append("REGIME_OR_RANK_UPDATE")
 
     # Severity hierarchy check against config.min_alert_severity

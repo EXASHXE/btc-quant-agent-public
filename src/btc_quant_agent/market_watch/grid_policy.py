@@ -129,7 +129,11 @@ def evaluate_grid_policy(
 
 
 def should_alert_grid_change(current: GridPlan, previous: GridPlan | None, threshold_pct: float = 2.0) -> bool:
-    """Alert only if grid state changes or bounds change >= configured threshold (default 2%)."""
+    """Alert on meaningful grid transitions, boundary shifts >= threshold, or lower bound breaches."""
+    if "LOWER_BOUND_BREACHED" in current.reason_codes:
+        if previous is None or "LOWER_BOUND_BREACHED" not in previous.reason_codes:
+            return True
+
     if previous is None:
         return current.decision != GridDecision.PAUSE
 
@@ -139,12 +143,12 @@ def should_alert_grid_change(current: GridPlan, previous: GridPlan | None, thres
     if current.decision == GridDecision.PAUSE and previous.decision == GridDecision.PAUSE:
         return False
 
-    if current.lower_bound is not None and previous.lower_bound is not None:
+    if current.lower_bound is not None and previous.lower_bound is not None and previous.lower_bound > 0:
         lower_delta_pct = abs(current.lower_bound - previous.lower_bound) / previous.lower_bound * 100.0
         if lower_delta_pct >= threshold_pct:
             return True
 
-    if current.upper_bound is not None and previous.upper_bound is not None:
+    if current.upper_bound is not None and previous.upper_bound is not None and previous.upper_bound > 0:
         upper_delta_pct = abs(current.upper_bound - previous.upper_bound) / previous.upper_bound * 100.0
         if upper_delta_pct >= threshold_pct:
             return True

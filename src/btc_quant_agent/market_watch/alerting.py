@@ -43,26 +43,49 @@ def build_market_watch_card(alert: MarketWatchAlert) -> dict[str, Any]:
     # Risks bullet points
     risks_text = "\n".join(f"- {r}" for r in alert.risks) if alert.risks else "- 暂无显著异常风险"
 
-    # Directional section
+    # Market context section
+    funding_str = f"{alert.funding_rate * 100:+.4f}%" if alert.funding_rate is not None else "N/A"
+    oi_1h_str = f"{alert.oi_1h_change * 100:+.2f}%" if alert.oi_1h_change is not None else "N/A"
+    oi_12h_str = f"{alert.oi_12h_change * 100:+.2f}%" if alert.oi_12h_change is not None else "N/A"
+
+    regime_str = alert.regime_1h.value if hasattr(alert.regime_1h, "value") else (str(alert.regime_1h) if alert.regime_1h else "N/A")
+
     lines = [
-        f"**Directional**: {d.decision.value} ({d.setup.value})",
-        f"**Regime**: {d.regime.value}",
-        f"**Entry Quality**: {d.entry_quality.value}",
-        f"**Entry Zone**: {_format_price(d.entry_low)} – {_format_price(d.entry_high)}",
-        f"**Stop Loss**: {_format_price(d.stop_loss)}",
-        f"**TP1 / TP2**: {_format_price(d.take_profit_1)} / {_format_price(d.take_profit_2)}",
-        f"**Net RR**: {d.net_rr:.2f} (Gross {d.gross_rr:.2f})",
-        f"**Derivatives State**: {d.derivatives_regime.value}",
+        f"**Latest Price**: {_format_price(alert.last_price)} ({alert.change_24h_pct * 100:+.2f}%)",
+        f"**1H Regime**: {regime_str} | **1H ATR**: {_format_price(alert.atr)}",
+        f"**Key Levels**: Support {_format_price(alert.key_support)} | Resistance {_format_price(alert.key_resistance)}",
+        f"**Derivatives State**: {d.derivatives_regime.value} (Funding: {funding_str}, OI 1h/12h: {oi_1h_str}/{oi_12h_str})",
         f"**Benchmark Context**: {d.benchmark_context.value}",
-        f"**Opportunity Score**: {d.opportunity_score:.1f}",
     ]
 
-    # Grid section if active
+    # Directional section (omit 0.0 values on WAIT / grid-only alerts)
+    if d.decision != DirectionalDecision.WAIT:
+        lines.extend([
+            f"\n**Directional**: {d.decision.value} ({d.setup.value})",
+            f"**Entry Quality**: {d.entry_quality.value}",
+            f"**Entry Zone**: {_format_price(d.entry_low)} – {_format_price(d.entry_high)}",
+            f"**Stop Loss**: {_format_price(d.stop_loss)}",
+            f"**TP1 / TP2**: {_format_price(d.take_profit_1)} / {_format_price(d.take_profit_2)}",
+            f"**Net RR**: {d.net_rr:.2f} (Gross {d.gross_rr:.2f})",
+            f"**Opportunity Score**: {d.opportunity_score:.1f}",
+        ])
+    else:
+        lines.append(
+            f"\n**Directional**: WAIT (No active directional plan | Score: {d.opportunity_score:.1f})"
+        )
+
+    # Grid section if active or changed
     if g.lower_bound is not None and g.upper_bound is not None:
+        pct_str = f"~{g.estimated_grid_pct:.2f}% per step" if g.estimated_grid_pct is not None else ""
+        grid_count_str = f"Grids: {g.grid_count}" if g.grid_count is not None else ""
+        details = " | ".join(part for part in [grid_count_str, pct_str] if part)
+        details_str = f" | {details}" if details else ""
         lines.append(
             f"\n**Grid Recommendation** ({g.decision.value}):\n"
-            f"Range: {_format_price(g.lower_bound)} – {_format_price(g.upper_bound)} | Grids: {g.grid_count} | ~{g.estimated_grid_pct:.2f}% per step"
+            f"Range: {_format_price(g.lower_bound)} – {_format_price(g.upper_bound)}{details_str}"
         )
+    elif g.decision.value == "PAUSE":
+        lines.append("\n**Grid Recommendation**: PAUSED")
 
     lines.extend([
         f"\n**Evidence**:\n{evidence_text}",
@@ -72,7 +95,10 @@ def build_market_watch_card(alert: MarketWatchAlert) -> dict[str, Any]:
 
     body = "\n".join(lines)
 
-    title = f"{emoji} {alert.symbol} {d.decision.value} [{alert.severity.value}]"
+    if d.decision == DirectionalDecision.WAIT and g.decision.value != "WAIT":
+        title = f"{emoji} {alert.symbol} GRID {g.decision.value} [{alert.severity.value}]"
+    else:
+        title = f"{emoji} {alert.symbol} {d.decision.value} [{alert.severity.value}]"
 
     return {
         "msg_type": "interactive",
