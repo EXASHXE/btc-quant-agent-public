@@ -2172,7 +2172,7 @@ def test_r2_05_grid_previous_bounds_uses_persisted_bounds() -> None:
         alert_fingerprint="fp1",
     )
     # Emission must recognize boundaries are identical to persisted grid bounds (no change)
-    emit, _sev, reasons = evaluate_alert_emission(asmt, prev_state, config)
+    _emit, _sev, reasons = evaluate_alert_emission(asmt, prev_state, config)
     assert "GRID_BOUNDARIES_SHIFTED" not in reasons
 
 

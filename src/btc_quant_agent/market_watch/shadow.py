@@ -191,13 +191,11 @@ class ShadowEvaluationManager:
                 bar_tp1 = candle.high >= tp1
                 bar_tp2 = candle.high >= tp2
 
-                # Conservative STOP_FIRST policy for same-bar ambiguity
+                # Conservative STOP_FIRST policy for same-bar ambiguity:
+                # Checking bar_sl first guarantees that if both bar_sl and bar_tp occurred on the same bar,
+                # the trade stops out before target is credited.
                 if not sl_hit and not tp1_hit:
-                    if bar_sl and bar_tp1:
-                        sl_hit = True
-                        time_to_stop_ms = candle.close_time_ms
-                        break
-                    elif bar_sl:
+                    if bar_sl:
                         sl_hit = True
                         time_to_stop_ms = candle.close_time_ms
                         break
@@ -208,11 +206,7 @@ class ShadowEvaluationManager:
                             tp2_hit = True
                             break
                 elif tp1_hit and not sl_hit:
-                    if bar_sl and bar_tp2:
-                        sl_hit = True
-                        time_to_stop_ms = candle.close_time_ms
-                        break
-                    elif bar_sl:
+                    if bar_sl:
                         sl_hit = True
                         time_to_stop_ms = candle.close_time_ms
                         break
@@ -229,13 +223,11 @@ class ShadowEvaluationManager:
                 bar_tp1 = candle.low <= tp1
                 bar_tp2 = candle.low <= tp2
 
-                # Conservative STOP_FIRST policy for same-bar ambiguity
+                # Conservative STOP_FIRST policy for same-bar ambiguity:
+                # Checking bar_sl first guarantees that if both bar_sl and bar_tp occurred on the same bar,
+                # the trade stops out before target is credited.
                 if not sl_hit and not tp1_hit:
-                    if bar_sl and bar_tp1:
-                        sl_hit = True
-                        time_to_stop_ms = candle.close_time_ms
-                        break
-                    elif bar_sl:
+                    if bar_sl:
                         sl_hit = True
                         time_to_stop_ms = candle.close_time_ms
                         break
@@ -246,11 +238,7 @@ class ShadowEvaluationManager:
                             tp2_hit = True
                             break
                 elif tp1_hit and not sl_hit:
-                    if bar_sl and bar_tp2:
-                        sl_hit = True
-                        time_to_stop_ms = candle.close_time_ms
-                        break
-                    elif bar_sl:
+                    if bar_sl:
                         sl_hit = True
                         time_to_stop_ms = candle.close_time_ms
                         break
