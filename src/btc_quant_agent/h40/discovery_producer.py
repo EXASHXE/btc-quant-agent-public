@@ -386,6 +386,7 @@ class H40ProductionDiscoveryEvidenceProducer:
         }
         return payload, bars, universes
 
+    @science._reconstruction_session
     def produce(self) -> H40DiscoveryProductionResult:
         self._validate_authority()
         writer = H40DiscoveryEvidenceWriter(self.approved_evidence_root)
@@ -433,10 +434,10 @@ class H40ProductionDiscoveryEvidenceProducer:
                 for partition, keys in universes.items()
             } for item in roster
         }
-        geometry = science._geometry_training_rows([
+        geometry = science._GeometryIndex(science._geometry_training_rows([
             (slots[item.structural_configuration_hash], decisions[item.structural_configuration_hash]["WF1_TRAIN"])
             for item in roster
-        ])
+        ]))
         entries: list[H40CandidateResultEntry] = []
         for item in roster:
             candidate_id = item.structural_configuration_hash

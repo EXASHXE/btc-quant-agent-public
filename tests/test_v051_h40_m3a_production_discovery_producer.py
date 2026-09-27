@@ -16,7 +16,10 @@ from btc_quant_agent.h40.guards import H40GuardError
 from btc_quant_agent.research_contract.canonical import canonical_json, canonical_sha256
 
 
-def _synthetic_authority(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, seed: int = 31031) -> SimpleNamespace:
+def _synthetic_authority(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, seed: int = 31031,
+    *, segments: tuple[tuple[datetime, int], ...] | None = None,
+) -> SimpleNamespace:
     """Real typed production path, with only canonical byte identity rebound to synthetic OHLC."""
     import pyarrow as pa
     import pyarrow.parquet as pq
@@ -44,9 +47,12 @@ def _synthetic_authority(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, seed: 
     path.parent.mkdir(parents=True)
     rng = np.random.Generator(np.random.PCG64(seed))
     rows: list[dict[str, float | int]] = []
-    for start, count in ((datetime(2021, 1, 1, tzinfo=UTC), 96),
-                         (datetime(2022, 10, 20, tzinfo=UTC), 288),
-                         (datetime(2023, 1, 20, tzinfo=UTC), 288)):
+    source_segments = segments if segments is not None else (
+        (datetime(2021, 1, 1, tzinfo=UTC), 96),
+        (datetime(2022, 10, 20, tzinfo=UTC), 288),
+        (datetime(2023, 1, 20, tzinfo=UTC), 288),
+    )
+    for start, count in source_segments:
         price = 100.0
         step = 0.0
         for hour in range(count):

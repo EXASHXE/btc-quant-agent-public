@@ -11,14 +11,19 @@ import hashlib
 import json
 import math
 import re
-from bisect import bisect_right
-from collections.abc import Mapping, Sequence
+from array import array
+from bisect import bisect_left, bisect_right
+from collections import OrderedDict
+from collections.abc import Callable, Iterator, Mapping, Sequence
+from contextlib import contextmanager
+from contextvars import ContextVar
 from dataclasses import dataclass, replace
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
+from functools import wraps
 from pathlib import Path
 from types import MappingProxyType
-from typing import Any, NoReturn, cast
+from typing import Any, NoReturn, ParamSpec, TypeVar, cast
 from weakref import WeakKeyDictionary
 
 import numpy as np
@@ -1014,13 +1019,145 @@ def _empirical_percentile(sample: Sequence[float], x: float) -> float:
     return rank + tie
 
 
-_PREFIT_CACHE: dict[tuple[str, str, str, str, str, str, str], tuple[float, str, str, str]] = {}
+class _CausalPercentileIndex:
+    """Exact persistent prefix counts; timestamp queries can arrive in any order.
+
+    Coordinates affect only comparisons. No future observation contributes a
+    count to a prefix root. Integer arrays bound storage to O(N log distinct).
+    """
+
+    def __init__(self, observations: Sequence[tuple[datetime, float]]) -> None:
+        ordered = sorted(observations, key=lambda item: item[0])
+        self.times = tuple(t for t, _ in ordered)
+        self.values = tuple(sorted({value for _, value in ordered}))
+        self.left = array("i", [0])
+        self.right = array("i", [0])
+        self.counts = array("i", [0])
+        self.roots = [0]
+        for _, value in ordered:
+            self.roots.append(self._insert(self.roots[-1], 0, len(self.values), bisect_left(self.values, value)))
+
+    def _insert(self, previous: int, low: int, high: int, position: int) -> int:
+        node = len(self.counts)
+        self.counts.append(self.counts[previous] + 1)
+        self.left.append(self.left[previous])
+        self.right.append(self.right[previous])
+        if high - low > 1:
+            middle = (low + high) // 2
+            if position < middle:
+                self.left[node] = self._insert(self.left[previous], low, middle, position)
+            else:
+                self.right[node] = self._insert(self.right[previous], middle, high, position)
+        return node
+
+    def _less(self, root: int, position: int) -> int:
+        low, high, result = 0, len(self.values), 0
+        while root and low < high:
+            if position >= high:
+                return result + self.counts[root]
+            if position <= low:
+                return result
+            middle = (low + high) // 2
+            if position <= middle:
+                root, high = self.left[root], middle
+            else:
+                result += self.counts[self.left[root]]
+                root, low = self.right[root], middle
+        return result
+
+    def query(self, t: datetime | None, x: float) -> tuple[int, float]:
+        root = self.roots[-1] if t is None else self.roots[bisect_left(self.times, t)]
+        n = self.counts[root]
+        if not n:
+            return 0, 0.0
+        less = self._less(root, bisect_left(self.values, x))
+        equal = self._less(root, bisect_right(self.values, x)) > less
+        # Preserve the accepted two divisions and addition, including float
+        # rounding. (less + 0.5) / n is NOT substituted for this expression.
+        return n, less / n + (0.5 / n if equal else 0.0)
+
+
+class _SourcePercentiles:
+    def __init__(self, references: Mapping[str, Sequence[tuple[datetime, float]]]) -> None:
+        self.indices = {name: _CausalPercentileIndex(rows) for name, rows in references.items()}
+        self.states: dict[tuple[str, datetime], tuple[str, str]] = {}
+
+
+_PrefitKey = tuple[str, str, str, str, str, str, str]
+_PREFIT_CACHE: OrderedDict[_PrefitKey, tuple[float, str, str, str]] = OrderedDict()
 _TRAINING_REFS: dict[tuple[str, str], dict[str, list[tuple[datetime, float]]]] = {}
+_FALLBACK_INDICES: OrderedDict[tuple[str, str], _SourcePercentiles] = OrderedDict()
+
+
+class _ReconstructionState:
+    def __init__(self) -> None:
+        self.prefit: dict[_PrefitKey, tuple[float, str, str, str]] = {}
+        self.training_refs: dict[tuple[str, str], dict[str, list[tuple[datetime, float]]]] = {}
+        self.indices: dict[tuple[str, str], _SourcePercentiles] = {}
+        self.decisions: dict[tuple[str, str, str, datetime, str, int], _Decision] = {}
+        self.outcomes: dict[tuple[str, str, datetime, str, int], tuple[float, float, float, tuple[_Bar, ...]]] = {}
+        self.geometry_cells = 0
+
+    def statistics(self) -> dict[str, int]:
+        return {
+            "source_product_indices": len(self.indices), "prefit_entries": len(self.prefit),
+            "decision_entries": len(self.decisions), "outcome_entries": len(self.outcomes),
+            "candidate_independent_states": sum(len(item.states) for item in self.indices.values()),
+            "percentile_nodes": sum(len(index.counts) for item in self.indices.values() for index in item.indices.values()),
+            "reference_observations": sum(len(index.times) for item in self.indices.values() for index in item.indices.values()),
+            "geometry_cells": self.geometry_cells,
+        }
+
+
+_ACTIVE_RECONSTRUCTION: ContextVar[_ReconstructionState | None] = ContextVar("h40_reconstruction", default=None)
+# Diagnostic cardinalities only: never read as scientific or authority input.
+_LAST_RECONSTRUCTION_STATS: Mapping[str, int] = MappingProxyType({})
+
+
+@contextmanager
+def _reconstruction_scope(*, fresh: bool = False) -> Iterator[_ReconstructionState]:
+    global _LAST_RECONSTRUCTION_STATS
+    existing = _ACTIVE_RECONSTRUCTION.get()
+    if existing is not None and not fresh:
+        yield existing
+        return
+    state = _ReconstructionState()
+    token = _ACTIVE_RECONSTRUCTION.set(state)
+    try:
+        yield state
+    finally:
+        _LAST_RECONSTRUCTION_STATS = MappingProxyType(state.statistics())
+        _ACTIVE_RECONSTRUCTION.reset(token)
+        state.prefit.clear()
+        state.training_refs.clear()
+        state.indices.clear()
+        state.decisions.clear()
+        state.outcomes.clear()
+
+
+_P = ParamSpec("_P")
+_R = TypeVar("_R")
+
+
+def _reconstruction_session(function: Callable[_P, _R]) -> Callable[_P, _R]:
+    @wraps(function)
+    def scoped(*args: _P.args, **kwargs: _P.kwargs) -> _R:
+        with _reconstruction_scope(fresh=True):
+            return function(*args, **kwargs)
+    return scoped
 
 
 def clear_prefit_caches() -> None:
     _PREFIT_CACHE.clear()
     _TRAINING_REFS.clear()
+    _FALLBACK_INDICES.clear()
+    state = _ACTIVE_RECONSTRUCTION.get()
+    if state is not None:
+        state.prefit.clear()
+        state.training_refs.clear()
+        state.indices.clear()
+        state.decisions.clear()
+        state.outcomes.clear()
 
 
 def _get_training_refs(
@@ -1029,8 +1166,10 @@ def _get_training_refs(
     bars: Mapping[tuple[datetime, str], _Bar],
 ) -> dict[str, list[tuple[datetime, float]]]:
     cache_key = (source_evidence_hash, product)
-    if cache_key in _TRAINING_REFS:
-        return _TRAINING_REFS[cache_key]
+    state = _ACTIVE_RECONSTRUCTION.get()
+    cache = state.training_refs if state is not None else _TRAINING_REFS
+    if cache_key in cache:
+        return cache[cache_key]
 
     rv_list: list[tuple[datetime, float]] = []
     exp_list: list[tuple[datetime, float]] = []
@@ -1048,7 +1187,9 @@ def _get_training_refs(
             exp_list.append((dt, exp))
 
     refs = {"R_VOL": rv_list, "O_RANGE": exp_list}
-    _TRAINING_REFS[cache_key] = refs
+    if state is None and len(cache) >= 2:
+        cache.pop(next(iter(cache)))
+    cache[cache_key] = refs
     return refs
 
 
@@ -1062,7 +1203,25 @@ def _reconstruct_prefit_cached(
     bars: Mapping[tuple[datetime, str], _Bar],
     source_evidence_hash: str,
 ) -> tuple[float, str, str, str]:
+    dir_contract = str(getattr(slot, "direction_contract_id", None) or getattr(slot, "direction_variant", "D1_V1_RETURN_4H"))
+    horizon = str(getattr(slot, "primary_horizon", "4h"))
+    sec_filter = str(getattr(slot, "secondary_filter_contract_id", "NONE") or "NONE")
+    if sec_filter not in ("NONE", ""):
+        _fail(f"unsupported secondary filter contract '{sec_filter}'", H40ReasonCode.NOT_TESTABLE)
     cache_key = (
+        compute_protocol_authority_hash(),
+        DISCOVERY_PROVENANCE_CONTRACT_HASH,
+        source_evidence_hash,
+        dir_contract + ":" + horizon,
+        partition_id,
+        t.strftime("%Y-%m-%dT%H:%M:%SZ"),
+        product,
+    )
+    state = _ACTIVE_RECONSTRUCTION.get()
+    cache = state.prefit if state is not None else _PREFIT_CACHE
+    if cache_key in cache:
+        return cache[cache_key]
+    legacy_key = (
         compute_protocol_authority_hash(),
         DISCOVERY_PROVENANCE_CONTRACT_HASH,
         source_evidence_hash,
@@ -1071,10 +1230,12 @@ def _reconstruct_prefit_cached(
         t.strftime("%Y-%m-%dT%H:%M:%SZ"),
         product,
     )
+    if legacy_key in cache:
+        return cache[legacy_key]
     if cache_key in _PREFIT_CACHE:
         return _PREFIT_CACHE[cache_key]
-
-    dir_contract = str(getattr(slot, "direction_contract_id", None) or getattr(slot, "direction_variant", "D1_V1_RETURN_4H"))
+    if legacy_key in _PREFIT_CACHE:
+        return _PREFIT_CACHE[legacy_key]
     if "D1_V1" in dir_contract or dir_contract == "D1_V1_RETURN_4H":
         score = _compute_d1(bars, t, product, 4)
     elif "D1_V2" in dir_contract or dir_contract == "D1_V2_RETURN_12H":
@@ -1090,48 +1251,51 @@ def _reconstruct_prefit_cached(
     else:
         _fail(f"unsupported direction contract '{dir_contract}'", H40ReasonCode.NOT_TESTABLE)
 
-    training_refs = _get_training_refs(source_evidence_hash, product, bars)
-    rv_series = training_refs["R_VOL"]
-    exp_series = training_refs["O_RANGE"]
-
-    if partition_id == "WF1_TRAIN":
-        rv_sample = [v for dt, v in rv_series if dt < t]
-        exp_sample = [v for dt, v in exp_series if dt < t]
+    index_key = (source_evidence_hash, product)
+    indices = state.indices if state is not None else _FALLBACK_INDICES
+    if index_key not in indices:
+        if state is None and len(indices) >= 2:
+            indices.pop(next(iter(indices)))
+        indices[index_key] = _SourcePercentiles(_get_training_refs(source_evidence_hash, product, bars))
+    indexed = indices[index_key]
+    state_key = (partition_id, t)
+    if state_key in indexed.states:
+        regime_state, opportunity_state = indexed.states[state_key]
     else:
-        rv_sample = [v for _, v in rv_series]
-        exp_sample = [v for _, v in exp_series]
-
-    rv_val = _compute_r_vol_scalar(bars, t, product)
-    if rv_val is None or len(rv_sample) < 60:
-        regime_state = "REGIME_UNAVAILABLE"
-    else:
-        p_vol = _empirical_percentile(rv_sample, rv_val)
-        if p_vol < 0.40:
-            regime_state = "REGIME_VOL_LOW"
-        elif p_vol < 0.60:
-            regime_state = "REGIME_VOL_MID"
+        rv_val = _compute_r_vol_scalar(bars, t, product)
+        n_rv, p_vol = indexed.indices["R_VOL"].query(t if partition_id == "WF1_TRAIN" else None, rv_val) if rv_val is not None else (0, 0.0)
+        if rv_val is None or n_rv < 60:
+            regime_state = "REGIME_UNAVAILABLE"
         else:
-            regime_state = "REGIME_VOL_HIGH"
+            if p_vol < 0.40:
+                regime_state = "REGIME_VOL_LOW"
+            elif p_vol < 0.60:
+                regime_state = "REGIME_VOL_MID"
+            else:
+                regime_state = "REGIME_VOL_HIGH"
 
-    exp_val = _compute_o_range_scalar(bars, t, product)
-    if exp_val is None or len(exp_sample) < 60:
-        opportunity_state = "O_NONE"
-    else:
-        p_opp = _empirical_percentile(exp_sample, exp_val)
-        if p_opp < 0.60:
+        exp_val = _compute_o_range_scalar(bars, t, product)
+        n_exp, p_opp = indexed.indices["O_RANGE"].query(t if partition_id == "WF1_TRAIN" else None, exp_val) if exp_val is not None else (0, 0.0)
+        if exp_val is None or n_exp < 60:
             opportunity_state = "O_NONE"
-        elif p_opp < 0.80:
-            opportunity_state = "O_WATCH"
         else:
-            opportunity_state = "O_ELIGIBLE"
-
-    sec_filter = str(getattr(slot, "secondary_filter_contract_id", "NONE") or "NONE")
-    if sec_filter not in ("NONE", ""):
-        _fail(f"unsupported secondary filter contract '{sec_filter}'", H40ReasonCode.NOT_TESTABLE)
+            if p_opp < 0.60:
+                opportunity_state = "O_NONE"
+            elif p_opp < 0.80:
+                opportunity_state = "O_WATCH"
+            else:
+                opportunity_state = "O_ELIGIBLE"
+        if len(indexed.states) >= (131072 if state is not None else 8192):
+            indexed.states.pop(next(iter(indexed.states)))
+        indexed.states[state_key] = (regime_state, opportunity_state)
     secondary_filter_state = "PASS"
 
     result = (score, regime_state, opportunity_state, secondary_filter_state)
-    _PREFIT_CACHE[cache_key] = result
+    if state is None and len(cache) >= 8192:
+        cache.pop(next(iter(cache)))
+    if state is not None and len(cache) >= 524288:
+        cache.pop(next(iter(cache)))
+    cache[cache_key] = result
     return result
 
 
@@ -1300,6 +1464,20 @@ def _derive_source_decision(
         candidate_id=candidate_id, slot=slot, partition_id=partition_id,
         t=timestamp, product=product, bars=bars, source_evidence_hash=source_evidence_hash,
     )
+    state = _ACTIVE_RECONSTRUCTION.get()
+    direction = str(getattr(slot, "direction_contract_id", None) or getattr(slot, "direction_variant", "D1_V1_RETURN_4H"))
+    raw_key = (source_evidence_hash, direction + ":" + str(getattr(slot, "primary_horizon", "4h")), partition_id, timestamp, product, horizon)
+    if state is not None and raw_key in state.decisions:
+        return state.decisions[raw_key]
+    outcome_key = (source_evidence_hash, partition_id, timestamp, product, horizon)
+    if state is not None and outcome_key in state.outcomes:
+        r_h, p0, ch, complete_path = state.outcomes[outcome_key]
+        result = _Decision(timestamp, product, regime, opportunity, score, secondary, None, None,
+                           r_h, None, p0, ch, complete_path)
+        if len(state.decisions) >= 524288:
+            state.decisions.pop(next(iter(state.decisions)))
+        state.decisions[raw_key] = result
+        return result
     _, _, support_end = _partition_bounds(partition_id)
     first = bars.get((timestamp, product))
     exit_time = timestamp + timedelta(hours=horizon - 1)
@@ -1310,10 +1488,17 @@ def _derive_source_decision(
         _fail("missing source-local outcome-support hour", H40ReasonCode.NOT_TESTABLE)
     complete_path = tuple(cast(_Bar, bar) for bar in path)
     last = complete_path[-1]
-    return _Decision(
-        timestamp, product, regime, opportunity, score, secondary, None, None,
-        math.log(last.close / first.open), None, first.open, last.close, complete_path,
-    )
+    r_h = math.log(last.close / first.open)
+    result = _Decision(timestamp, product, regime, opportunity, score, secondary, None, None,
+                       r_h, None, first.open, last.close, complete_path)
+    if state is not None:
+        if len(state.outcomes) >= 131072:
+            state.outcomes.pop(next(iter(state.outcomes)))
+        state.outcomes[outcome_key] = (r_h, first.open, last.close, complete_path)
+        if len(state.decisions) >= 524288:
+            state.decisions.pop(next(iter(state.decisions)))
+        state.decisions[raw_key] = result
+    return result
 
 
 def _load_decisions(
@@ -1502,35 +1687,42 @@ def _geometry_training_rows(candidates: Sequence[tuple[Any, Sequence[_Decision]]
     return owners
 
 
-def _geometry_pass(
-    row: _Decision,
-    slot: Any,
-    owners: Mapping[str, Mapping[tuple[str, str, int, datetime, str, str], tuple[float, float]]],
-) -> bool:
+class _GeometryIndex:
+    """Frozen exact fallback cells built once from the deduplicated owner rows."""
+
+    def __init__(self, owners: Mapping[str, Mapping[tuple[str, str, int, datetime, str, str], tuple[float, float]]]) -> None:
+        self.members = MappingProxyType({owner: MappingProxyType(dict(records)) for owner, records in owners.items()})
+        groups: dict[tuple[str, str | None, int | None, str | None], list[tuple[float, float]]] = {}
+        for owner, records in self.members.items():
+            for (_, scope, horizon, _, _, side), values in records.items():
+                for key in ((owner, scope, horizon, side), (owner, scope, horizon, None),
+                            (owner, scope, None, None), (owner, None, None, None)):
+                    groups.setdefault(key, []).append(values)
+        self.cells = MappingProxyType({key: (len(values), _median([value[0] for value in values]),
+                                                    _median([value[1] for value in values]))
+                                      for key, values in groups.items()})
+        state = _ACTIVE_RECONSTRUCTION.get()
+        if state is not None:
+            state.geometry_cells += len(self.cells)
+
+
+def _geometry_pass(row: _Decision, slot: Any, owners: _GeometryIndex) -> bool:
     owner = str(slot.direction_contract_id)
     scope = str(slot.scope)
     horizon = int(slot.primary_horizon.rstrip("h"))
     side = row.proposed_action
-    records = owners.get(owner, {})
-    for level in range(4):
-        subset = [
-            values for (_, record_scope, record_horizon, _, _, record_side), values in records.items()
-            if (
-                (level >= 3 or record_scope == scope)
-                and (level >= 2 or record_horizon == horizon)
-                and (level >= 1 or record_side == side)
-            )
-        ]
-        if len(subset) >= 30:
-            mfe = _median([item[0] for item in subset])
-            mae = _median([item[1] for item in subset])
+    for key in ((owner, scope, horizon, side), (owner, scope, horizon, None),
+                (owner, scope, None, None), (owner, None, None, None)):
+        cell = owners.cells.get(key)
+        if cell is not None and cell[0] >= 30:
+            _, mfe, mae = cell
             return mfe >= 1.5 * 0.0012 and mfe / max(mae, 0.0012) >= 1.25
     return False
 
 
 def _candidate_science(
     candidate: _LoadedCandidate,
-    geometry: Mapping[str, Mapping[tuple[str, str, int, datetime, str, str], tuple[float, float]]],
+    geometry: _GeometryIndex,
     starts: Mapping[str, np.ndarray],
 ) -> _CandidateScience:
     training = candidate.training
@@ -1756,6 +1948,7 @@ class H40ProductionDiscoveryEvidenceVerifier:
             ],
         })
 
+    @_reconstruction_session
     def verify_discovery_manifest(
         self,
         evidence: H40DiscoveryResultEvidence,
@@ -2016,7 +2209,7 @@ class H40ProductionDiscoveryEvidenceVerifier:
     def _evaluate_candidates(
         self, candidates: Mapping[str, _LoadedCandidate], manifest_hash: str,
     ) -> None:
-        geometry = _geometry_rows(candidates)
+        geometry = _GeometryIndex(_geometry_rows(candidates))
         scientific: dict[str, _CandidateScience] = {}
         for candidate_id, candidate in candidates.items():
             matrices: dict[str, np.ndarray] = {}
