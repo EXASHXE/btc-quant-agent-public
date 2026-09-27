@@ -8,6 +8,7 @@ from typing import Any
 
 from .config import MarketWatchConfig, compute_market_watch_config_hash
 from .domain import (
+    MARKET_WATCH_EVIDENCE_VERSION,
     AlertSeverity,
     BreakoutState,
     DerivativesRegime,
@@ -16,6 +17,7 @@ from .domain import (
     GridPlan,
     SignalLifecycleState,
     SymbolAssessment,
+    extract_setup_key,
     extract_signal_identity,
 )
 
@@ -110,7 +112,9 @@ class MarketWatchStateStore:
                     last_shadow_recorded_state TEXT,
                     signal_identity TEXT,
                     last_shadow_armed_signal_id TEXT,
-                    last_shadow_triggered_signal_id TEXT
+                    last_shadow_triggered_signal_id TEXT,
+                    setup_key TEXT,
+                    setup_instance_started_bar_end_ms INTEGER
                 )
                 """
             )
@@ -133,6 +137,8 @@ class MarketWatchStateStore:
                 ("signal_identity", "TEXT"),
                 ("last_shadow_armed_signal_id", "TEXT"),
                 ("last_shadow_triggered_signal_id", "TEXT"),
+                ("setup_key", "TEXT"),
+                ("setup_instance_started_bar_end_ms", "INTEGER"),
             ]
             for col_name, col_type in cols_symbol_state:
                 try:
@@ -163,11 +169,12 @@ class MarketWatchStateStore:
                     decision_json TEXT,
                     alert_fingerprint TEXT,
                     notification_sent INTEGER,
-                    signal_identity TEXT
+                    signal_identity TEXT,
+                    setup_key TEXT
                 )
                 """
             )
-            for col_name, col_type in [("policy_version", "TEXT"), ("config_hash", "TEXT"), ("signal_identity", "TEXT")]:
+            for col_name, col_type in [("policy_version", "TEXT"), ("config_hash", "TEXT"), ("signal_identity", "TEXT"), ("setup_key", "TEXT")]:
                 try:
                     conn.execute(f"ALTER TABLE market_watch_assessments ADD COLUMN {col_name} {col_type}")
                 except sqlite3.OperationalError:
@@ -218,7 +225,16 @@ class MarketWatchStateStore:
                     gross_r REAL,
                     friction_r REAL,
                     path_resolution TEXT,
-                    execution_path_model TEXT
+                    execution_path_model TEXT,
+                    setup_key TEXT,
+                    evidence_version TEXT DEFAULT 'FORWARD_EVIDENCE_V1',
+                    entry_window_start_ms INTEGER,
+                    evaluation_start_ms INTEGER,
+                    terminal_reason TEXT,
+                    exit_time_ms INTEGER,
+                    exit_price REAL,
+                    coverage_status TEXT,
+                    coverage_reason TEXT
                 )
                 """
             )
@@ -247,6 +263,15 @@ class MarketWatchStateStore:
                 ("friction_r", "REAL"),
                 ("path_resolution", "TEXT"),
                 ("execution_path_model", "TEXT"),
+                ("setup_key", "TEXT"),
+                ("evidence_version", "TEXT DEFAULT 'FORWARD_EVIDENCE_V1'"),
+                ("entry_window_start_ms", "INTEGER"),
+                ("evaluation_start_ms", "INTEGER"),
+                ("terminal_reason", "TEXT"),
+                ("exit_time_ms", "INTEGER"),
+                ("exit_price", "REAL"),
+                ("coverage_status", "TEXT"),
+                ("coverage_reason", "TEXT"),
             ]:
                 try:
                     conn.execute(f"ALTER TABLE market_watch_shadow_records ADD COLUMN {col_name} {col_type}")
@@ -306,8 +331,21 @@ class MarketWatchStateStore:
 
         curr_setup = str(assessment.directional.setup.value)
 
-        # Signal identity tracking (R2.1)
-        curr_sig_id = assessment.signal_identity or extract_signal_identity(symbol, assessment.directional)
+        curr_setup_key = assessment.setup_key or extract_setup_key(symbol, assessment.directional, assessment.snapshot)
+        prev_setup_key = prev.get("setup_key")
+        prev_instance_started = prev.get("setup_instance_started_bar_end_ms")
+        is_same_setup = bool(
+            prev_setup_key is not None
+            and prev_setup_key == curr_setup_key
+            and curr_setup != "NO_TRADE"
+            and prev_life not in ("INVALIDATED", "EXPIRED", None)
+        )
+        if is_same_setup:
+            instance_started_ms = prev_instance_started or bar_end_ms
+        else:
+            instance_started_ms = bar_end_ms
+
+        curr_sig_id = assessment.signal_identity or extract_signal_identity(symbol, assessment.directional, assessment.snapshot, instance_started_ms)
         prev_sig_id = prev.get("signal_identity")
         prev_bo_level = prev.get("breakout_level")
         curr_bo_level = d.breakout_level
@@ -327,8 +365,7 @@ class MarketWatchStateStore:
         prev_setup = prev.get("setup")
         setup_changed = bool(prev_setup is not None and prev_setup != curr_setup)
 
-        # Requirement 4:
-        # A new breakout level or changed intended direction resets:
+        # A new breakout level or changed intended direction or new signal identity resets:
         # created_bar_end_ms, age_bars, and shadow dedupe state.
         is_reset = (
             setup_changed
@@ -393,8 +430,9 @@ class MarketWatchStateStore:
                     recent_failed_breakout_ms, recent_failed_breakdown_ms,
                     created_bar_end_ms, armed_bar_end_ms, triggered_bar_end_ms,
                     age_bars, last_shadow_recorded_state,
-                    signal_identity, last_shadow_armed_signal_id, last_shadow_triggered_signal_id
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    signal_identity, last_shadow_armed_signal_id, last_shadow_triggered_signal_id,
+                    setup_key, setup_instance_started_bar_end_ms
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ON CONFLICT(symbol) DO UPDATE SET
                     setup = excluded.setup,
                     regime = excluded.regime,
@@ -428,7 +466,9 @@ class MarketWatchStateStore:
                     last_shadow_recorded_state = excluded.last_shadow_recorded_state,
                     signal_identity = excluded.signal_identity,
                     last_shadow_armed_signal_id = excluded.last_shadow_armed_signal_id,
-                    last_shadow_triggered_signal_id = excluded.last_shadow_triggered_signal_id
+                    last_shadow_triggered_signal_id = excluded.last_shadow_triggered_signal_id,
+                    setup_key = excluded.setup_key,
+                    setup_instance_started_bar_end_ms = excluded.setup_instance_started_bar_end_ms
                 """,
                 (
                     symbol,
@@ -438,13 +478,13 @@ class MarketWatchStateStore:
                     str(assessment.grid.decision),
                     str(assessment.directional.derivatives_regime),
                     str(assessment.directional.entry_quality),
-                    assessment.snapshot.tf_1h.recent_swing_low,
-                    assessment.snapshot.tf_1h.recent_swing_high,
+                    round(assessment.snapshot.tf_1h.supports[0], 2) if assessment.snapshot.tf_1h.supports else None,
+                    round(assessment.snapshot.tf_1h.resistances[0], 2) if assessment.snapshot.tf_1h.resistances else None,
                     bo_level,
                     failed_bo,
                     failed_bd,
-                    str(assessment.lifecycle_state),
-                    None,
+                    curr_life,
+                    assessment.veto_reasons[0] if assessment.veto_reasons else None,
                     assessment.rank,
                     last_fp,
                     last_alert_time,
@@ -465,6 +505,8 @@ class MarketWatchStateStore:
                     curr_sig_id,
                     shadow_armed_id,
                     shadow_triggered_id,
+                    curr_setup_key,
+                    instance_started_ms,
                 ),
             )
             # Record auditable assessment
@@ -475,8 +517,8 @@ class MarketWatchStateStore:
                     regime, setup, directional_decision, grid_decision, entry_quality,
                     derivatives_regime, benchmark_context, opportunity_score,
                     rank, reason_codes_json, risk_codes_json, decision_json,
-                    alert_fingerprint, notification_sent, signal_identity
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    alert_fingerprint, notification_sent, signal_identity, setup_key
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     assessment.snapshot.decision_time_ms,
@@ -498,7 +540,8 @@ class MarketWatchStateStore:
                     json.dumps(assessment.as_dict()),
                     assessment.alert_fingerprint,
                     1 if alert_sent else 0,
-                    assessment.signal_identity,
+                    assessment.signal_identity or curr_sig_id,
+                    assessment.setup_key or curr_setup_key,
                 ),
             )
             conn.commit()
@@ -595,15 +638,43 @@ class MarketWatchStateStore:
         friction_r: float | None = None,
         path_resolution: str | None = None,
         execution_path_model: str | None = None,
+        setup_key: str = "",
+        evidence_version: str = MARKET_WATCH_EVIDENCE_VERSION,
+        entry_window_start_ms: int | None = None,
+        evaluation_start_ms: int | None = None,
+        terminal_reason: str | None = None,
+        exit_time_ms: int | None = None,
+        exit_price: float | None = None,
+        coverage_status: str | None = None,
+        coverage_reason: str | None = None,
     ) -> int:
         if signal_time_ms is None:
             signal_time_ms = timestamp_ms
+        if entry_window_start_ms is None:
+            entry_window_start_ms = signal_time_ms
         if entry_window_end_ms is None:
             entry_window_end_ms = signal_time_ms + (entry_window_bars * 15 * 60 * 1000)
         if evaluation_end_ms is None:
             eval_end_ms = signal_time_ms + (evaluation_horizon_bars * 15 * 60 * 1000)
         else:
             eval_end_ms = evaluation_end_ms
+
+        if entry_zone_low <= 0.0 and entry_price > 0.0:
+            entry_zone_low = entry_price
+        if entry_zone_high <= 0.0 and entry_price > 0.0:
+            entry_zone_high = entry_price
+
+        if not signal_identity:
+            anchor = entry_price if entry_price > 0 else 0.0
+            setup_key = f"{symbol.upper()}:{agent_setup}:{direction}:{anchor}"
+            signal_identity = f"{setup_key}:{signal_time_ms}"
+        elif not setup_key:
+            parts = signal_identity.split(":")
+            if len(parts) >= 5:
+                setup_key = ":".join(parts[:4])
+            else:
+                setup_key = signal_identity
+
         with self._connect() as conn:
             # Deduplication guard: exactly one ACTIONABLE_TRIGGERED per signal_identity
             if observation_type == "ACTIONABLE_TRIGGERED" and signal_identity:
@@ -625,8 +696,10 @@ class MarketWatchStateStore:
                     observation_type, signal_identity, signal_time_ms, entry_zone_low,
                     entry_zone_high, entry_window_bars, entry_window_end_ms, fill_status,
                     fill_time_ms, fill_price, gross_r, friction_r, path_resolution,
-                    execution_path_model
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    execution_path_model, setup_key, evidence_version, entry_window_start_ms,
+                    evaluation_start_ms, terminal_reason, exit_time_ms, exit_price,
+                    coverage_status, coverage_reason
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     timestamp_ms,
@@ -661,6 +734,15 @@ class MarketWatchStateStore:
                     friction_r,
                     path_resolution,
                     execution_path_model,
+                    setup_key,
+                    evidence_version,
+                    entry_window_start_ms,
+                    evaluation_start_ms,
+                    terminal_reason,
+                    exit_time_ms,
+                    exit_price,
+                    coverage_status,
+                    coverage_reason,
                 ),
             )
             conn.commit()
@@ -673,6 +755,7 @@ class MarketWatchStateStore:
         fill_status: str,
         fill_time_ms: int | None,
         fill_price: float | None,
+        evaluation_start_ms: int | None = None,
         evaluation_end_ms: int | None = None,
         path_resolution: str | None = None,
         execution_path_model: str | None = None,
@@ -685,6 +768,7 @@ class MarketWatchStateStore:
                     fill_time_ms = ?,
                     fill_price = ?,
                     entry_price = COALESCE(?, entry_price),
+                    evaluation_start_ms = COALESCE(?, evaluation_start_ms),
                     evaluation_end_ms = COALESCE(?, evaluation_end_ms),
                     path_resolution = COALESCE(?, path_resolution),
                     execution_path_model = COALESCE(?, execution_path_model)
@@ -695,6 +779,7 @@ class MarketWatchStateStore:
                     fill_time_ms,
                     fill_price,
                     fill_price,
+                    evaluation_start_ms,
                     evaluation_end_ms,
                     path_resolution,
                     execution_path_model,
@@ -707,15 +792,15 @@ class MarketWatchStateStore:
         self,
         shadow_id: int,
         *,
-        future_mfe: float | None,
-        future_mae: float | None,
-        tp1_hit: bool,
-        tp2_hit: bool,
-        sl_hit: bool,
-        time_to_target_ms: int | None,
-        time_to_stop_ms: int | None,
-        net_r: float | None,
-        regime_after: str,
+        future_mfe: float | None = None,
+        future_mae: float | None = None,
+        tp1_hit: bool = False,
+        tp2_hit: bool = False,
+        sl_hit: bool = False,
+        time_to_target_ms: int | None = None,
+        time_to_stop_ms: int | None = None,
+        net_r: float | None = None,
+        regime_after: str = "UNKNOWN",
         gross_r: float | None = None,
         friction_r: float | None = None,
         fill_status: str | None = None,
@@ -723,7 +808,13 @@ class MarketWatchStateStore:
         fill_price: float | None = None,
         path_resolution: str | None = None,
         execution_path_model: str | None = None,
+        evaluation_start_ms: int | None = None,
         evaluation_end_ms: int | None = None,
+        terminal_reason: str | None = None,
+        exit_time_ms: int | None = None,
+        exit_price: float | None = None,
+        coverage_status: str | None = None,
+        coverage_reason: str | None = None,
         resolved: int = 1,
     ) -> None:
         with self._connect() as conn:
@@ -745,9 +836,16 @@ class MarketWatchStateStore:
                     fill_status = COALESCE(?, fill_status),
                     fill_time_ms = COALESCE(?, fill_time_ms),
                     fill_price = COALESCE(?, fill_price),
+                    entry_price = COALESCE(?, entry_price),
                     path_resolution = COALESCE(?, path_resolution),
                     execution_path_model = COALESCE(?, execution_path_model),
-                    evaluation_end_ms = COALESCE(?, evaluation_end_ms)
+                    evaluation_start_ms = COALESCE(?, evaluation_start_ms),
+                    evaluation_end_ms = COALESCE(?, evaluation_end_ms),
+                    terminal_reason = COALESCE(?, terminal_reason),
+                    exit_time_ms = COALESCE(?, exit_time_ms),
+                    exit_price = COALESCE(?, exit_price),
+                    coverage_status = COALESCE(?, coverage_status),
+                    coverage_reason = COALESCE(?, coverage_reason)
                 WHERE id = ?
                 """,
                 (
@@ -766,9 +864,16 @@ class MarketWatchStateStore:
                     fill_status,
                     fill_time_ms,
                     fill_price,
+                    fill_price,
                     path_resolution,
                     execution_path_model,
+                    evaluation_start_ms,
                     evaluation_end_ms,
+                    terminal_reason,
+                    exit_time_ms,
+                    exit_price,
+                    coverage_status,
+                    coverage_reason,
                     shadow_id,
                 ),
             )
@@ -805,6 +910,18 @@ class MarketWatchStateStore:
             conn.row_factory = sqlite3.Row
             cursor = conn.execute("SELECT * FROM market_watch_symbol_state ORDER BY last_rank ASC")
             return [dict(row) for row in cursor.fetchall()]
+
+
+def is_legacy_shadow_record(record: dict[str, Any]) -> bool:
+    """Determine whether a shadow record predates modern R2.3 forward evidence semantics."""
+    if record.get("is_legacy") or record.get("regime_after") in ("LEGACY", "LEGACY_INELIGIBLE"):
+        return True
+    if record.get("terminal_reason") == "LEGACY_INELIGIBLE":
+        return True
+    if record.get("fill_status") in ("LEGACY", "INELIGIBLE"):
+        return True
+    obs_type = record.get("observation_type")
+    return not bool(obs_type)
 
 
 def evaluate_alert_emission(

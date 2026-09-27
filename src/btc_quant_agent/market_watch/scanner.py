@@ -12,6 +12,7 @@ from .config import MarketWatchConfig, compute_market_watch_config_hash
 from .context import apply_benchmark_context_gate, evaluate_benchmark_context
 from .derivatives import apply_derivatives_action_gate, evaluate_derivatives_regime
 from .domain import (
+    MARKET_WATCH_EVIDENCE_VERSION,
     MARKET_WATCH_POLICY_VERSION,
     BreakoutState,
     ConfidenceBand,
@@ -30,6 +31,7 @@ from .domain import (
     ShadowFillStatus,
     SignalLifecycleState,
     SymbolAssessment,
+    extract_setup_key,
     extract_signal_identity,
 )
 from .entry_quality import calculate_net_risk_reward, evaluate_entry_quality, evaluate_exhaustion
@@ -594,8 +596,8 @@ class MarketWatchScanner:
         )
 
         # 11. Lifecycle State (Keyed by deterministic signal_identity)
-        sig_id = extract_signal_identity(symbol, directional_plan)
-        intended_dir = sig_id.split(":")[2] if ":" in sig_id else "NONE"
+        setup_key = extract_setup_key(symbol, directional_plan, snapshot)
+        intended_dir = setup_key.split(":")[2] if ":" in setup_key else "NONE"
 
         prev_lifecycle = (
             SignalLifecycleState(prev_state["lifecycle_state"])
@@ -603,6 +605,20 @@ class MarketWatchScanner:
             else None
         )
         current_bar_end = tf_15m.closed_bar_end_time_ms
+        prev_setup_key = prev_state.get("setup_key") if prev_state else None
+        prev_instance_started = prev_state.get("setup_instance_started_bar_end_ms") if prev_state else None
+        is_same_setup = bool(
+            prev_setup_key is not None
+            and prev_setup_key == setup_key
+            and str(setup.value) != "NO_TRADE"
+            and prev_lifecycle not in (SignalLifecycleState.INVALIDATED, SignalLifecycleState.EXPIRED, None)
+        )
+        if is_same_setup:
+            instance_started_ms = prev_instance_started or current_bar_end
+        else:
+            instance_started_ms = current_bar_end
+
+        sig_id = extract_signal_identity(symbol, directional_plan, snapshot, instance_started_ms)
         prev_sig_id = prev_state.get("signal_identity") if prev_state else None
         prev_bo_level = prev_state.get("breakout_level") if prev_state else None
         curr_bo_level = directional_plan.breakout_level
@@ -678,6 +694,7 @@ class MarketWatchScanner:
             policy_version=MARKET_WATCH_POLICY_VERSION,
             config_hash=cfg_hash,
             signal_identity=sig_id,
+            setup_key=setup_key,
         )
         fp = compute_decision_fingerprint(temp_assessment, self.config)
 
@@ -696,7 +713,113 @@ class MarketWatchScanner:
             policy_version=MARKET_WATCH_POLICY_VERSION,
             config_hash=cfg_hash,
             signal_identity=sig_id,
+            setup_key=setup_key,
         )
+
+    def _record_shadow_observations_if_needed(self, a: SymbolAssessment, now_ms: int) -> None:
+        prev_st = self.store.get_symbol_state(a.symbol) or {}
+        prev_armed_id = prev_st.get("last_shadow_armed_signal_id")
+        prev_triggered_id = prev_st.get("last_shadow_triggered_signal_id")
+        sig_id = a.signal_identity or extract_signal_identity(a.symbol, a.directional)
+
+        # 1. ARMED shadow observation (SETUP_ARMED) - R2.1-01
+        # ARMED and TRIGGERED must not share one dedupe marker.
+        if a.lifecycle_state == SignalLifecycleState.ARMED:
+            if prev_armed_id != sig_id:
+                entry_low = a.directional.entry_low if a.directional.entry_low > 0.0 else a.snapshot.price.last_price
+                entry_high = a.directional.entry_high if a.directional.entry_high > 0.0 else a.snapshot.price.last_price
+                if entry_low > entry_high:
+                    entry_low, entry_high = entry_high, entry_low
+                entry_p = entry_high if a.directional.decision == DirectionalDecision.LONG else (
+                    entry_low if a.directional.decision == DirectionalDecision.SHORT else a.snapshot.price.last_price
+                )
+                entry_bars = self.config.thresholds.entry_window_bars
+                sig_time = a.snapshot.decision_time_ms
+                entry_win_end = sig_time + (entry_bars * 15 * 60 * 1000)
+
+                self.store.record_shadow_observation(
+                    timestamp_ms=sig_time,
+                    symbol=a.symbol,
+                    snapshot_hash=a.snapshot.snapshot_hash,
+                    agent_decision=str(a.directional.decision),
+                    agent_setup=str(a.directional.setup),
+                    entry_quality=str(a.directional.entry_quality),
+                    reason_codes=list(a.directional.reason_codes),
+                    policy_version=a.policy_version,
+                    config_hash=a.config_hash,
+                    entry_price=entry_p,
+                    stop_loss=a.directional.stop_loss,
+                    tp1=a.directional.take_profit_1,
+                    tp2=a.directional.take_profit_2,
+                    direction=str(a.directional.decision),
+                    observation_type="SETUP_ARMED",
+                    signal_identity=sig_id,
+                    setup_key=a.setup_key,
+                    evidence_version=MARKET_WATCH_EVIDENCE_VERSION,
+                    entry_window_start_ms=sig_time,
+                    signal_time_ms=sig_time,
+                    entry_zone_low=entry_low,
+                    entry_zone_high=entry_high,
+                    entry_window_bars=entry_bars,
+                    entry_window_end_ms=entry_win_end,
+                    fill_status=ShadowFillStatus.WAITING_FOR_FILL.value,
+                )
+                self.store.set_last_shadow_signal_ids(a.symbol, armed_id=sig_id)
+                self.store.set_last_shadow_recorded_state(a.symbol, "ARMED")
+
+        # 2. TRIGGERED shadow observation (ACTIONABLE_TRIGGERED) - R2.1-01
+        # ARMED WAIT observations must not suppress later actionable TRIGGERED records.
+        # A TRIGGERED LONG/SHORT must have exactly one eligible shadow observation.
+        elif a.lifecycle_state == SignalLifecycleState.TRIGGERED and a.directional.decision in (DirectionalDecision.LONG, DirectionalDecision.SHORT):
+            if prev_triggered_id != sig_id:
+                entry_low = a.directional.entry_low if a.directional.entry_low > 0.0 else a.snapshot.price.last_price
+                entry_high = a.directional.entry_high if a.directional.entry_high > 0.0 else a.snapshot.price.last_price
+                if entry_low > entry_high:
+                    entry_low, entry_high = entry_high, entry_low
+                entry_p = entry_high if a.directional.decision == DirectionalDecision.LONG else (
+                    entry_low if a.directional.decision == DirectionalDecision.SHORT else a.snapshot.price.last_price
+                )
+                entry_bars = self.config.thresholds.entry_window_bars
+                sig_time = a.snapshot.decision_time_ms
+                entry_win_end = sig_time + (entry_bars * 15 * 60 * 1000)
+
+                self.store.record_shadow_observation(
+                    timestamp_ms=sig_time,
+                    symbol=a.symbol,
+                    snapshot_hash=a.snapshot.snapshot_hash,
+                    agent_decision=str(a.directional.decision),
+                    agent_setup=str(a.directional.setup),
+                    entry_quality=str(a.directional.entry_quality),
+                    reason_codes=list(a.directional.reason_codes),
+                    policy_version=a.policy_version,
+                    config_hash=a.config_hash,
+                    entry_price=entry_p,
+                    stop_loss=a.directional.stop_loss,
+                    tp1=a.directional.take_profit_1,
+                    tp2=a.directional.take_profit_2,
+                    direction=str(a.directional.decision),
+                    observation_type="ACTIONABLE_TRIGGERED",
+                    signal_identity=sig_id,
+                    setup_key=a.setup_key,
+                    evidence_version=MARKET_WATCH_EVIDENCE_VERSION,
+                    entry_window_start_ms=sig_time,
+                    signal_time_ms=sig_time,
+                    entry_zone_low=entry_low,
+                    entry_zone_high=entry_high,
+                    entry_window_bars=entry_bars,
+                    entry_window_end_ms=entry_win_end,
+                    fill_status=ShadowFillStatus.WAITING_FOR_FILL.value,
+                )
+                self.store.set_last_shadow_signal_ids(a.symbol, triggered_id=sig_id)
+                self.store.set_last_shadow_recorded_state(a.symbol, "TRIGGERED")
+
+        elif (
+            a.lifecycle_state in (SignalLifecycleState.CANDIDATE, SignalLifecycleState.INVALIDATED, SignalLifecycleState.EXPIRED)
+            and a.directional.setup == PlaybookType.NO_TRADE
+            and (prev_armed_id or prev_triggered_id)
+        ):
+            self.store.set_last_shadow_signal_ids(a.symbol, armed_id="", triggered_id="")
+            self.store.set_last_shadow_recorded_state(a.symbol, "")
 
     def scan_universe(
         self,
@@ -767,6 +890,7 @@ class MarketWatchScanner:
                     policy_version=a.policy_version,
                     config_hash=a.config_hash,
                     signal_identity=a.signal_identity,
+                    setup_key=a.setup_key,
                 )
             )
 
@@ -777,102 +901,7 @@ class MarketWatchScanner:
 
         for a in ranked_assessments:
             prev_st = self.store.get_symbol_state(a.symbol) or {}
-            prev_armed_id = prev_st.get("last_shadow_armed_signal_id")
-            prev_triggered_id = prev_st.get("last_shadow_triggered_signal_id")
-            sig_id = a.signal_identity or extract_signal_identity(a.symbol, a.directional)
-
-            # 1. ARMED shadow observation (SETUP_ARMED) - R2.1-01
-            # ARMED and TRIGGERED must not share one dedupe marker.
-            if a.lifecycle_state == SignalLifecycleState.ARMED:
-                if prev_armed_id != sig_id:
-                    entry_low = a.directional.entry_low if a.directional.entry_low > 0.0 else a.snapshot.price.last_price
-                    entry_high = a.directional.entry_high if a.directional.entry_high > 0.0 else a.snapshot.price.last_price
-                    if entry_low > entry_high:
-                        entry_low, entry_high = entry_high, entry_low
-                    entry_p = entry_high if a.directional.decision == DirectionalDecision.LONG else (
-                        entry_low if a.directional.decision == DirectionalDecision.SHORT else a.snapshot.price.last_price
-                    )
-                    entry_bars = self.config.thresholds.entry_window_bars
-                    sig_time = a.snapshot.decision_time_ms
-                    entry_win_end = sig_time + (entry_bars * 15 * 60 * 1000)
-
-                    self.store.record_shadow_observation(
-                        timestamp_ms=sig_time,
-                        symbol=a.symbol,
-                        snapshot_hash=a.snapshot.snapshot_hash,
-                        agent_decision=str(a.directional.decision),
-                        agent_setup=str(a.directional.setup),
-                        entry_quality=str(a.directional.entry_quality),
-                        reason_codes=list(a.directional.reason_codes),
-                        policy_version=a.policy_version,
-                        config_hash=a.config_hash,
-                        entry_price=entry_p,
-                        stop_loss=a.directional.stop_loss,
-                        tp1=a.directional.take_profit_1,
-                        tp2=a.directional.take_profit_2,
-                        direction=str(a.directional.decision),
-                        observation_type="SETUP_ARMED",
-                        signal_identity=sig_id,
-                        signal_time_ms=sig_time,
-                        entry_zone_low=entry_low,
-                        entry_zone_high=entry_high,
-                        entry_window_bars=entry_bars,
-                        entry_window_end_ms=entry_win_end,
-                        fill_status=ShadowFillStatus.WAITING_FOR_FILL.value,
-                    )
-                    self.store.set_last_shadow_signal_ids(a.symbol, armed_id=sig_id)
-                    self.store.set_last_shadow_recorded_state(a.symbol, "ARMED")
-
-            # 2. TRIGGERED shadow observation (ACTIONABLE_TRIGGERED) - R2.1-01
-            # ARMED WAIT observations must not suppress later actionable TRIGGERED records.
-            # A TRIGGERED LONG/SHORT must have exactly one eligible shadow observation.
-            elif a.lifecycle_state == SignalLifecycleState.TRIGGERED and a.directional.decision in (DirectionalDecision.LONG, DirectionalDecision.SHORT):
-                if prev_triggered_id != sig_id:
-                    entry_low = a.directional.entry_low if a.directional.entry_low > 0.0 else a.snapshot.price.last_price
-                    entry_high = a.directional.entry_high if a.directional.entry_high > 0.0 else a.snapshot.price.last_price
-                    if entry_low > entry_high:
-                        entry_low, entry_high = entry_high, entry_low
-                    entry_p = entry_high if a.directional.decision == DirectionalDecision.LONG else (
-                        entry_low if a.directional.decision == DirectionalDecision.SHORT else a.snapshot.price.last_price
-                    )
-                    entry_bars = self.config.thresholds.entry_window_bars
-                    sig_time = a.snapshot.decision_time_ms
-                    entry_win_end = sig_time + (entry_bars * 15 * 60 * 1000)
-
-                    self.store.record_shadow_observation(
-                        timestamp_ms=sig_time,
-                        symbol=a.symbol,
-                        snapshot_hash=a.snapshot.snapshot_hash,
-                        agent_decision=str(a.directional.decision),
-                        agent_setup=str(a.directional.setup),
-                        entry_quality=str(a.directional.entry_quality),
-                        reason_codes=list(a.directional.reason_codes),
-                        policy_version=a.policy_version,
-                        config_hash=a.config_hash,
-                        entry_price=entry_p,
-                        stop_loss=a.directional.stop_loss,
-                        tp1=a.directional.take_profit_1,
-                        tp2=a.directional.take_profit_2,
-                        direction=str(a.directional.decision),
-                        observation_type="ACTIONABLE_TRIGGERED",
-                        signal_identity=sig_id,
-                        signal_time_ms=sig_time,
-                        entry_zone_low=entry_low,
-                        entry_zone_high=entry_high,
-                        entry_window_bars=entry_bars,
-                        entry_window_end_ms=entry_win_end,
-                        fill_status=ShadowFillStatus.WAITING_FOR_FILL.value,
-                    )
-                    self.store.set_last_shadow_signal_ids(a.symbol, triggered_id=sig_id)
-                    self.store.set_last_shadow_recorded_state(a.symbol, "TRIGGERED")
-
-            elif (
-                a.lifecycle_state in (SignalLifecycleState.CANDIDATE, SignalLifecycleState.INVALIDATED, SignalLifecycleState.EXPIRED)
-                and a.directional.setup == PlaybookType.NO_TRADE
-                and (prev_armed_id or prev_triggered_id)
-            ):
-                self.store.set_last_shadow_signal_ids(a.symbol, armed_id="", triggered_id="")
-                self.store.set_last_shadow_recorded_state(a.symbol, "")
+            self._record_shadow_observations_if_needed(a, now_ms)
 
             emit, severity, _reasons = evaluate_alert_emission(a, prev_st, self.config)
 

@@ -258,3 +258,46 @@ To validate policy efficacy without risking capital or lookahead bias:
    - **MAE (Maximum Adverse Excursion)**: Maximum drawdown in R-multiples.
    - **Target Reached**: Whether TP1, TP2, or SL was reached first.
    - **Net R Realization**: Standardized return in units of initial risk.
+
+---
+
+## 14. Forward Evidence Runtime Semantics (`FORWARD_EVIDENCE_V1`)
+
+The Market Watch shadow evaluation subsystem operates under strict point-in-time and causal correctness rules codified in `FORWARD_EVIDENCE_V1`:
+
+### A. Point-in-Time Signal Discovery
+A signal becomes known strictly at `signal_time_ms`, which matches the closed candle's `decision_time_ms`. Signals and shadow observations are never back-dated to bar open or unclosed candle states.
+
+### B. Post-Signal Fill Semantics
+Fills can only occur strictly post-signal ($t \ge \text{signal\_time\_ms}$). A trade cannot fill in the bar that emitted the signal prior to the signal being generated.
+
+### C. Bounded Entry Window
+The entry window is strictly bounded to `entry_window_bars` 15m bars (default 4 bars = 60 minutes). If price does not touch the entry zone within `entry_window_end_ms`, the setup expires unfilled.
+
+### D. No-Fill Requires Complete Data Coverage
+An entry window expiration can only resolve to `NO_FILL` if the historical data series provides complete, gap-free candle coverage across the entire entry window. If any data gaps exist, the observation remains open as `PENDING_DATA_GAP` (`ENTRY_WINDOW_DATA_GAP`) rather than assuming a false no-fill.
+
+### E. Fill-Anchored Horizon Freezing
+Late fills receive the full forward evaluation horizon ($H = \text{evaluation\_horizon\_bars} \times 15\text{m}$). The evaluation start is anchored at `fill_time_ms` ($\text{eval\_start\_ms} = \text{fill\_time\_ms}$), and the evaluation end is frozen at $\text{eval\_end\_ms} = \text{fill\_time\_ms} + H$. Once filled, these boundaries are immutable and never shift on subsequent solver passes.
+
+### F. Terminal Target TP1
+For Forward Evidence V1, Take-Profit 1 (TP1) is the terminal profit target. When price hits TP1 post-fill, the shadow observation resolves immediately with `terminal_reason = "TP1"` and terminal gross R calculated from entry to TP1 distance.
+
+### G. TP2 as Excursion Metric Only
+Take-Profit 2 (TP2) serves strictly as an excursion tracking metric (`tp2_hit = True`) and does not represent an active partial scale-out or secondary trailing stop in V1.
+
+### H. 1-Minute Chronological Path Disambiguation
+When available, 1-minute historical klines are queried to disambiguate intrabar fill timing and same-bar target/stop touches within 15-minute candles. The trade fill candle evaluates subsequent 1m bars after fill time for immediate TP/SL hits.
+
+### I. 15-Minute STOP_FIRST Ambiguity Fallback
+If 1-minute candle data is unavailable or if a 1-minute candle itself touches both TP1 and SL, the resolver strictly falls back to conservative `FIFTEEN_MINUTE_STOP_FIRST` resolution, counting the stop loss as hit first.
+
+### J. Zero Fake Outcomes from Data Gaps
+Maturity timeouts require complete candle coverage over the entire evaluation horizon. Missing candles prevent resolution and mark the observation as `PENDING_DATA_GAP` (`OUTCOME_WINDOW_DATA_GAP`). Data gaps never produce artificial `TIMEOUT` outcomes.
+
+### K. Legacy Evidence Isolation
+Historical shadow observations lacking `FORWARD_EVIDENCE_V1` metadata (or created prior to R2.3 schema migration) resolve as `LEGACY_INELIGIBLE`. They are strictly excluded from active trading performance metrics, win rates, and profit factors so legacy data cannot distort current policy evidence.
+
+### L. Strict Shadow Advisory Boundary
+The Market Watch subsystem is strictly advisory and operates under `EXPERIMENTAL_OPERATIONAL_MARKET_WATCH`. It maintains zero live exchange order routing, zero private API access, and zero modification of frozen research protocols (H40).
+

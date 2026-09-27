@@ -43,6 +43,7 @@ from btc_quant_agent.market_watch.domain import (
     SignalLifecycleState,
     SymbolAssessment,
     TimeframeSnapshot,
+    compute_setup_key,
     compute_signal_identity,
     extract_signal_identity,
     normalize_price_level,
@@ -3591,3 +3592,1265 @@ def test_r2_2_21_legacy_shadow_records_excluded_when_required_fields_absent() ->
     assert metrics["ineligible_count"] >= 1
     assert metrics["resolved_actionable_count"] == 1
     assert metrics["tp1_hit_rate"] == 1.0
+
+# ==============================================================================
+# R2.3 ADVERSARIAL TEST SUITE (Section 43: Tests 01 to 37)
+# ==============================================================================
+
+
+def test_r2_3_01_entry_window_fetch_empty_api_failure_not_no_fill() -> None:
+    """R2.3-01: Entry window fetch empty due to API failure MUST NOT become NO_FILL."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        db_path = Path(tmpdir) / "mw_r2_3_01.db"
+        store = MarketWatchStateStore(db_path)
+        mgr = ShadowEvaluationManager(store=store)
+        t0 = 1_700_000_000_000
+        bar_len = 15 * 60 * 1000
+
+        store.record_shadow_observation(
+            timestamp_ms=t0,
+            symbol="BTCUSDT",
+            snapshot_hash="h1",
+            agent_decision="LONG",
+            agent_setup="TREND_PULLBACK",
+            entry_quality="GOOD",
+            reason_codes=[],
+            entry_price=100.0,
+            stop_loss=95.0,
+            tp1=110.0,
+            tp2=120.0,
+            direction="LONG",
+            entry_window_bars=4,
+            entry_window_end_ms=t0 + 4 * bar_len,
+            evaluation_horizon_bars=16,
+            evaluation_end_ms=t0 + 16 * bar_len,
+            observation_type="ACTIONABLE_TRIGGERED",
+            signal_time_ms=t0,
+        )
+
+        client = MagicMock()
+        client.klines.return_value = []
+        client.historical_klines.return_value = []
+
+        res = mgr.resolve_pending_observations(client, current_time_ms=t0 + 6 * bar_len)
+        assert res["resolved_count"] == 0
+        assert res["pending_count"] == 1
+        assert res["results"][0]["status"] == "PENDING_DATA_GAP"
+
+        recs = store.get_all_shadow_records()
+        assert len(recs) == 1
+        assert recs[0]["resolved"] == 0
+        assert recs[0]["regime_after"] == "PENDING_DATA_GAP"
+        assert recs[0]["coverage_reason"] == "ENTRY_WINDOW_DATA_GAP"
+
+        metrics = compute_performance_metrics(recs)
+        assert metrics["resolved_actionable_count"] == 0
+        assert metrics["pending_data_gap_count"] == 1
+        assert metrics["no_fill_count"] == 0
+
+
+def test_r2_3_02_entry_window_has_internal_15m_gap_not_no_fill() -> None:
+    """R2.3-02: Entry window with internal 15m gap MUST NOT become NO_FILL."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        db_path = Path(tmpdir) / "mw_r2_3_02.db"
+        store = MarketWatchStateStore(db_path)
+        mgr = ShadowEvaluationManager(store=store)
+        t0 = 1_700_000_000_000
+        bar_len = 15 * 60 * 1000
+
+        store.record_shadow_observation(
+            timestamp_ms=t0,
+            symbol="BTCUSDT",
+            snapshot_hash="h2",
+            agent_decision="LONG",
+            agent_setup="TREND_PULLBACK",
+            entry_quality="GOOD",
+            reason_codes=[],
+            entry_price=100.0,
+            stop_loss=95.0,
+            tp1=110.0,
+            tp2=120.0,
+            direction="LONG",
+            entry_window_bars=4,
+            entry_window_end_ms=t0 + 4 * bar_len,
+            evaluation_horizon_bars=16,
+            evaluation_end_ms=t0 + 16 * bar_len,
+            observation_type="ACTIONABLE_TRIGGERED",
+            signal_time_ms=t0,
+        )
+
+        # Missing bar 2 (gap between bar 1 and bar 3)
+        c0 = Candle("BTCUSDT", "15m", t0, t0 + bar_len, 105.0, 108.0, 104.0, 106.0, 100.0)
+        c1 = Candle("BTCUSDT", "15m", t0 + bar_len, t0 + 2 * bar_len, 106.0, 109.0, 105.0, 107.0, 100.0)
+        c3 = Candle("BTCUSDT", "15m", t0 + 3 * bar_len, t0 + 4 * bar_len, 107.0, 110.0, 106.0, 108.0, 100.0)
+
+        client = MagicMock()
+        client.klines.return_value = [c0, c1, c3]
+
+        res = mgr.resolve_pending_observations(client, current_time_ms=t0 + 5 * bar_len)
+        assert res["resolved_count"] == 0
+        recs = store.get_all_shadow_records()
+        assert recs[0]["resolved"] == 0
+        assert recs[0]["regime_after"] == "PENDING_DATA_GAP"
+        assert recs[0]["coverage_reason"] == "ENTRY_WINDOW_DATA_GAP"
+
+
+def test_r2_3_03_complete_entry_window_with_no_touch_becomes_no_fill() -> None:
+    """R2.3-03: Complete entry window with no touch becomes NO_FILL."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        db_path = Path(tmpdir) / "mw_r2_3_03.db"
+        store = MarketWatchStateStore(db_path)
+        mgr = ShadowEvaluationManager(store=store)
+        t0 = 1_700_000_000_000
+        bar_len = 15 * 60 * 1000
+
+        store.record_shadow_observation(
+            timestamp_ms=t0,
+            symbol="BTCUSDT",
+            snapshot_hash="h3",
+            agent_decision="LONG",
+            agent_setup="TREND_PULLBACK",
+            entry_quality="GOOD",
+            reason_codes=[],
+            entry_price=100.0,
+            stop_loss=95.0,
+            tp1=110.0,
+            tp2=120.0,
+            direction="LONG",
+            entry_window_bars=4,
+            entry_window_end_ms=t0 + 4 * bar_len,
+            evaluation_horizon_bars=16,
+            evaluation_end_ms=t0 + 16 * bar_len,
+            observation_type="ACTIONABLE_TRIGGERED",
+            signal_time_ms=t0,
+        )
+
+        candles = [
+            Candle("BTCUSDT", "15m", t0 + i * bar_len, t0 + (i + 1) * bar_len, 105.0, 109.0, 103.0, 106.0, 100.0)
+            for i in range(4)
+        ]
+        client = MagicMock()
+        client.klines.return_value = candles
+
+        res = mgr.resolve_pending_observations(client, current_time_ms=t0 + 5 * bar_len)
+        assert res["resolved_count"] == 1
+        recs = store.get_all_shadow_records()
+        assert recs[0]["fill_status"] == "NO_FILL"
+        assert recs[0]["terminal_reason"] == "NO_FILL"
+        assert recs[0]["coverage_status"] == "COMPLETE"
+        assert recs[0]["resolved"] == 1
+
+        metrics = compute_performance_metrics(recs)
+        assert metrics["resolved_actionable_count"] == 0
+        assert metrics["no_fill_count"] == 1
+
+
+def test_r2_3_04_outcome_window_fetch_incomplete_at_maturity_not_timeout() -> None:
+    """R2.3-04: Outcome window fetch incomplete at maturity time MUST NOT become TIMEOUT."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        db_path = Path(tmpdir) / "mw_r2_3_04.db"
+        store = MarketWatchStateStore(db_path)
+        mgr = ShadowEvaluationManager(store=store)
+        t0 = 1_700_000_000_000
+        bar_len = 15 * 60 * 1000
+
+        store.record_shadow_observation(
+            timestamp_ms=t0,
+            symbol="BTCUSDT",
+            snapshot_hash="h4",
+            agent_decision="LONG",
+            agent_setup="TREND_PULLBACK",
+            entry_quality="GOOD",
+            reason_codes=[],
+            entry_price=100.0,
+            stop_loss=95.0,
+            tp1=110.0,
+            tp2=120.0,
+            direction="LONG",
+            evaluation_horizon_bars=16,
+            evaluation_end_ms=t0 + 16 * bar_len,
+            observation_type="ACTIONABLE_TRIGGERED",
+            signal_time_ms=t0,
+            fill_status="FILLED",
+            fill_time_ms=t0,
+            fill_price=100.0,
+            evaluation_start_ms=t0,
+        )
+
+        # Only 10 candles covering t0 to t0 + 10 * bar_len, missing bars 10 to 15!
+        candles = [
+            Candle("BTCUSDT", "15m", t0 + i * bar_len, t0 + (i + 1) * bar_len, 100.0, 104.0, 98.0, 101.0, 100.0)
+            for i in range(10)
+        ]
+        client = MagicMock()
+        client.klines.return_value = candles
+
+        res = mgr.resolve_pending_observations(client, current_time_ms=t0 + 17 * bar_len)
+        assert res["resolved_count"] == 0
+        recs = store.get_all_shadow_records()
+        assert recs[0]["resolved"] == 0
+        assert recs[0]["regime_after"] == "PENDING_DATA_GAP"
+        assert recs[0]["coverage_reason"] == "OUTCOME_WINDOW_DATA_GAP"
+
+
+def test_r2_3_05_complete_outcome_window_with_no_tp_sl_becomes_timeout() -> None:
+    """R2.3-05: Complete outcome window with no TP/SL becomes TIMEOUT."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        db_path = Path(tmpdir) / "mw_r2_3_05.db"
+        store = MarketWatchStateStore(db_path)
+        mgr = ShadowEvaluationManager(store=store)
+        t0 = 1_700_000_000_000
+        bar_len = 15 * 60 * 1000
+
+        store.record_shadow_observation(
+            timestamp_ms=t0,
+            symbol="BTCUSDT",
+            snapshot_hash="h5",
+            agent_decision="LONG",
+            agent_setup="TREND_PULLBACK",
+            entry_quality="GOOD",
+            reason_codes=[],
+            entry_price=100.0,
+            stop_loss=95.0,
+            tp1=110.0,
+            tp2=120.0,
+            direction="LONG",
+            evaluation_horizon_bars=16,
+            evaluation_end_ms=t0 + 16 * bar_len,
+            observation_type="ACTIONABLE_TRIGGERED",
+            signal_time_ms=t0,
+            fill_status="FILLED",
+            fill_time_ms=t0,
+            fill_price=100.0,
+            evaluation_start_ms=t0,
+        )
+
+        candles = [
+            Candle("BTCUSDT", "15m", t0 + i * bar_len, t0 + (i + 1) * bar_len, 100.0, 104.0, 98.0, 102.0 if i < 15 else 103.5, 100.0)
+            for i in range(16)
+        ]
+        client = MagicMock()
+        client.klines.return_value = candles
+
+        res = mgr.resolve_pending_observations(client, current_time_ms=t0 + 17 * bar_len)
+        assert res["resolved_count"] == 1
+        recs = store.get_all_shadow_records()
+        assert recs[0]["resolved"] == 1
+        assert recs[0]["terminal_reason"] == "TIMEOUT"
+        assert recs[0]["exit_price"] == 103.5
+        assert recs[0]["coverage_status"] == "COMPLETE"
+
+
+def test_r2_3_06_late_fill_receives_full_horizon() -> None:
+    """R2.3-06: Signal at 10:00, fill at 10:45 (bar 3), 4h horizon => evaluation_end must be 14:45."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        db_path = Path(tmpdir) / "mw_r2_3_06.db"
+        store = MarketWatchStateStore(db_path)
+        mgr = ShadowEvaluationManager(store=store)
+        t0 = 1_700_000_000_000  # 10:00
+        bar_len = 15 * 60 * 1000
+
+        store.record_shadow_observation(
+            timestamp_ms=t0,
+            symbol="BTCUSDT",
+            snapshot_hash="h6",
+            agent_decision="LONG",
+            agent_setup="TREND_PULLBACK",
+            entry_quality="GOOD",
+            reason_codes=[],
+            entry_price=100.0,
+            stop_loss=90.0,
+            tp1=115.0,
+            tp2=125.0,
+            direction="LONG",
+            entry_window_bars=4,
+            entry_window_end_ms=t0 + 4 * bar_len,
+            evaluation_horizon_bars=16,
+            evaluation_end_ms=t0 + 16 * bar_len,
+            observation_type="ACTIONABLE_TRIGGERED",
+            signal_time_ms=t0,
+        )
+
+        # Bar 0, 1, 2 stay above entry (105-108). Bar 3 touches 100.0 at 10:45
+        candles = [
+            Candle("BTCUSDT", "15m", t0, t0 + bar_len, 106.0, 108.0, 104.0, 105.0, 100.0),
+            Candle("BTCUSDT", "15m", t0 + bar_len, t0 + 2 * bar_len, 105.0, 107.0, 103.0, 104.0, 100.0),
+            Candle("BTCUSDT", "15m", t0 + 2 * bar_len, t0 + 3 * bar_len, 104.0, 106.0, 102.0, 103.0, 100.0),
+            Candle("BTCUSDT", "15m", t0 + 3 * bar_len, t0 + 4 * bar_len, 103.0, 104.0, 99.0, 101.0, 100.0),  # Fills here!
+        ]
+        client = MagicMock()
+        client.klines.return_value = candles
+
+        # Check at 10:45 close (t0 + 4 * bar_len)
+        mgr.resolve_pending_observations(client, current_time_ms=t0 + 4 * bar_len)
+        recs = store.get_all_shadow_records()
+        assert recs[0]["fill_status"] == "FILLED"
+        expected_fill_time = t0 + 4 * bar_len
+        expected_eval_end = expected_fill_time + 16 * bar_len
+        assert recs[0]["fill_time_ms"] == expected_fill_time
+        assert recs[0]["evaluation_start_ms"] == expected_fill_time
+        assert recs[0]["evaluation_end_ms"] == expected_eval_end
+
+
+def test_r2_3_07_initial_candles_only_to_old_horizon_refetches_through_new_horizon() -> None:
+    """R2.3-07: Initial candles only go to old signal-based horizon => resolver refetches through new fill-based horizon."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        db_path = Path(tmpdir) / "mw_r2_3_07.db"
+        store = MarketWatchStateStore(db_path)
+        mgr = ShadowEvaluationManager(store=store)
+        t0 = 1_700_000_000_000
+        bar_len = 15 * 60 * 1000
+
+        store.record_shadow_observation(
+            timestamp_ms=t0,
+            symbol="BTCUSDT",
+            snapshot_hash="h7",
+            agent_decision="LONG",
+            agent_setup="TREND_PULLBACK",
+            entry_quality="GOOD",
+            reason_codes=[],
+            entry_price=100.0,
+            stop_loss=90.0,
+            tp1=115.0,
+            tp2=125.0,
+            direction="LONG",
+            entry_window_bars=4,
+            entry_window_end_ms=t0 + 4 * bar_len,
+            evaluation_horizon_bars=16,
+            evaluation_end_ms=t0 + 16 * bar_len,
+            observation_type="ACTIONABLE_TRIGGERED",
+            signal_time_ms=t0,
+        )
+
+        # Fills at bar 3 (t0 + 4 * bar_len).
+        fill_t = t0 + 4 * bar_len
+        new_eval_end = fill_t + 16 * bar_len  # t0 + 20 * bar_len
+
+        # Initial klines only up to t0 + 16 * bar_len (bars 0-2 stay above 100.0, bar 3 fills at 99.0)
+        initial_candles = [
+            Candle("BTCUSDT", "15m", t0 + i * bar_len, t0 + (i + 1) * bar_len, 104.0, 106.0, 99.0 if i == 3 else 102.0, 103.0, 100.0)
+            for i in range(16)
+        ]
+        client = MagicMock()
+        client.klines.return_value = initial_candles
+
+        # historical_klines provides additional candles up to new_eval_end, where bar 14 hits TP1
+        extended_candles = [
+            Candle("BTCUSDT", "15m", fill_t + i * bar_len, fill_t + (i + 1) * bar_len,
+                   100.0, 116.0 if i == 14 else 104.0, 98.0, 101.0, 100.0)
+            for i in range(16)
+        ]
+        client.historical_klines.return_value = extended_candles
+
+        res = mgr.resolve_pending_observations(client, current_time_ms=new_eval_end + bar_len)
+        assert res["resolved_count"] == 1
+        recs = store.get_all_shadow_records()
+        assert recs[0]["resolved"] == 1
+        assert recs[0]["terminal_reason"] == "TP1"
+        assert recs[0]["evaluation_end_ms"] == new_eval_end
+
+
+def test_r2_3_08_rerunning_resolver_keeps_same_fill_and_evaluation_boundaries() -> None:
+    """R2.3-08: Re-running resolver keeps same fill and evaluation boundaries once frozen."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        db_path = Path(tmpdir) / "mw_r2_3_08.db"
+        store = MarketWatchStateStore(db_path)
+        mgr = ShadowEvaluationManager(store=store)
+        t0 = 1_700_000_000_000
+        bar_len = 15 * 60 * 1000
+
+        store.record_shadow_observation(
+            timestamp_ms=t0,
+            symbol="BTCUSDT",
+            snapshot_hash="h8",
+            agent_decision="LONG",
+            agent_setup="TREND_PULLBACK",
+            entry_quality="GOOD",
+            reason_codes=[],
+            entry_price=100.0,
+            stop_loss=90.0,
+            tp1=115.0,
+            tp2=125.0,
+            direction="LONG",
+            entry_window_bars=4,
+            entry_window_end_ms=t0 + 4 * bar_len,
+            evaluation_horizon_bars=16,
+            evaluation_end_ms=t0 + 16 * bar_len,
+            observation_type="ACTIONABLE_TRIGGERED",
+            signal_time_ms=t0,
+        )
+
+        c0 = Candle("BTCUSDT", "15m", t0, t0 + bar_len, 101.0, 102.0, 99.0, 100.0, 100.0)
+        client = MagicMock()
+        client.klines.return_value = [c0]
+
+        # Run 1
+        mgr.resolve_pending_observations(client, current_time_ms=t0 + bar_len)
+        r1 = store.get_all_shadow_records()[0]
+        assert r1["fill_status"] == "FILLED"
+        f_price = r1["fill_price"]
+        f_time = r1["fill_time_ms"]
+        e_start = r1["evaluation_start_ms"]
+        e_end = r1["evaluation_end_ms"]
+
+        # Run 2 at later time
+        c1 = Candle("BTCUSDT", "15m", t0 + bar_len, t0 + 2 * bar_len, 100.0, 102.0, 98.0, 101.0, 100.0)
+        client.klines.return_value = [c0, c1]
+        mgr.resolve_pending_observations(client, current_time_ms=t0 + 2 * bar_len)
+        r2 = store.get_all_shadow_records()[0]
+        assert r2["fill_price"] == f_price
+        assert r2["fill_time_ms"] == f_time
+        assert r2["evaluation_start_ms"] == e_start
+        assert r2["evaluation_end_ms"] == e_end
+
+
+def test_r2_3_09_same_setup_across_minor_ema_drift_preserves_identity() -> None:
+    """R2.3-09: Same setup across minor EMA drift keeps same setup_key and signal_identity."""
+    k1 = compute_setup_key("BTCUSDT", PlaybookType.BREAKOUT_RETEST, DirectionalDecision.LONG, 105.0)
+    k2 = compute_setup_key("BTCUSDT", "BREAKOUT_RETEST", "LONG", 105.0)
+    assert k1 == k2
+    t0 = 1_700_000_000_000
+    id1 = f"{k1}:{t0}"
+    id2 = f"{k2}:{t0}"
+    assert id1 == id2
+
+
+def test_r2_3_10_new_setup_instance_after_invalidation_new_identity() -> None:
+    """R2.3-10: New setup instance after invalidation allows same setup_key, requires new signal_identity."""
+    k = compute_setup_key("BTCUSDT", PlaybookType.BREAKOUT_RETEST, DirectionalDecision.LONG, 105.0)
+    t0 = 1_700_000_000_000
+    t1 = 1_700_100_000_000
+    id1 = f"{k}:{t0}"
+    id2 = f"{k}:{t1}"
+    assert id1 != id2
+
+
+def test_r2_3_11_same_breakout_level_three_days_later_new_identity() -> None:
+    """R2.3-11: Same breakout level 3 days later creates new signal_identity."""
+    k = compute_setup_key("BTCUSDT", PlaybookType.BREAKOUT_RETEST, DirectionalDecision.LONG, 105.0)
+    t_day1 = 1_700_000_000_000
+    t_day3 = t_day1 + (3 * 24 * 60 * 60 * 1000)
+    id_day1 = f"{k}:{t_day1}"
+    id_day3 = f"{k}:{t_day3}"
+    assert id_day1 != id_day3
+
+
+def test_r2_3_12_direction_flip_changes_setup_key_and_identity() -> None:
+    """R2.3-12: Direction flip changes setup_key and signal_identity."""
+    k_long = compute_setup_key("BTCUSDT", PlaybookType.TREND_PULLBACK, DirectionalDecision.LONG, 100.0)
+    k_short = compute_setup_key("BTCUSDT", PlaybookType.TREND_PULLBACK, DirectionalDecision.SHORT, 100.0)
+    assert k_long != k_short
+    assert "LONG" in k_long
+    assert "SHORT" in k_short
+
+
+def test_r2_3_13_doge_precision_no_collision() -> None:
+    """R2.3-13: DOGE precision retains distinct levels without collision."""
+    k1 = compute_setup_key("DOGEUSDT", PlaybookType.BREAKOUT_RETEST, DirectionalDecision.LONG, 0.123456)
+    k2 = compute_setup_key("DOGEUSDT", PlaybookType.BREAKOUT_RETEST, DirectionalDecision.LONG, 0.123457)
+    assert k1 != k2
+
+
+def test_r2_3_14_pre_signal_entry_zone_touch_cannot_fill() -> None:
+    """R2.3-14: Pre-signal entry-zone touch cannot fill."""
+    t0 = 1_700_000_000_000
+    bar_len = 15 * 60 * 1000
+    # Candle 0 is before signal (closed at t0). Candle 1 is after signal (close at t0 + bar_len)
+    c_pre = Candle("BTCUSDT", "15m", t0 - bar_len, t0, 101.0, 102.0, 99.0, 100.0, 100.0)
+    c_post = Candle("BTCUSDT", "15m", t0, t0 + bar_len, 104.0, 106.0, 103.0, 105.0, 100.0)
+
+    status, fill_p, fill_t = resolve_shadow_fill(
+        DirectionalDecision.LONG,
+        entry_zone_low=99.5,
+        entry_zone_high=100.5,
+        signal_time_ms=t0,
+        entry_window_end_ms=t0 + 4 * bar_len,
+        candles=[c_pre, c_post],
+    )
+    assert status == ShadowFillStatus.WAITING_FOR_FILL
+    assert fill_p is None
+    assert fill_t is None
+
+
+def test_r2_3_15_fill_occurs_in_1m_candle_post_fill_remainder_only_eligible() -> None:
+    """R2.3-15: Fill occurs in 1m candle; post-fill remainder only is eligible for TP/SL."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        db_path = Path(tmpdir) / "mw_r2_3_15.db"
+        store = MarketWatchStateStore(db_path)
+        mgr = ShadowEvaluationManager(store=store)
+        t0 = 1_700_000_000_000
+        bar_len_15m = 15 * 60 * 1000
+        bar_len_1m = 60 * 1000
+
+        store.record_shadow_observation(
+            timestamp_ms=t0,
+            symbol="BTCUSDT",
+            snapshot_hash="h15",
+            agent_decision="LONG",
+            agent_setup="TREND_PULLBACK",
+            entry_quality="GOOD",
+            reason_codes=[],
+            entry_price=100.0,
+            stop_loss=90.0,
+            tp1=110.0,
+            tp2=120.0,
+            direction="LONG",
+            entry_window_bars=4,
+            entry_window_end_ms=t0 + 4 * bar_len_15m,
+            evaluation_horizon_bars=16,
+            evaluation_end_ms=t0 + 16 * bar_len_15m,
+            observation_type="ACTIONABLE_TRIGGERED",
+            signal_time_ms=t0,
+        )
+
+        c15 = Candle("BTCUSDT", "15m", t0, t0 + bar_len_15m, 102.0, 111.0, 99.0, 103.0, 1000.0)
+        # 1m candles inside bar: minute 2 touches entry (100.0). Minute 5 touches TP1 (110.0).
+        m_candles = [
+            Candle("BTCUSDT", "1m", t0 + i * bar_len_1m, t0 + (i + 1) * bar_len_1m,
+                   102.0, 111.0 if i == 5 else 103.0, 99.0 if i == 2 else 101.0, 102.0, 100.0)
+            for i in range(15)
+        ]
+        client = MagicMock()
+        client.klines.return_value = [c15]
+        client.historical_klines.return_value = m_candles
+
+        res = mgr.resolve_pending_observations(client, current_time_ms=t0 + bar_len_15m)
+        assert res["resolved_count"] == 1
+        recs = store.get_all_shadow_records()
+        assert recs[0]["tp1_hit"] == 1
+        assert recs[0]["terminal_reason"] == "TP1"
+
+
+def test_r2_3_16_fill_candle_hits_tp_after_fill() -> None:
+    """R2.3-16: Fill candle hits TP after fill => TP1 recognized."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        db_path = Path(tmpdir) / "mw_r2_3_16.db"
+        store = MarketWatchStateStore(db_path)
+        mgr = ShadowEvaluationManager(store=store)
+        t0 = 1_700_000_000_000
+        bar_len_15m = 15 * 60 * 1000
+        bar_len_1m = 60 * 1000
+
+        store.record_shadow_observation(
+            timestamp_ms=t0,
+            symbol="BTCUSDT",
+            snapshot_hash="h16",
+            agent_decision="LONG",
+            agent_setup="TREND_PULLBACK",
+            entry_quality="GOOD",
+            reason_codes=[],
+            entry_price=100.0,
+            stop_loss=90.0,
+            tp1=110.0,
+            tp2=120.0,
+            direction="LONG",
+            observation_type="ACTIONABLE_TRIGGERED",
+            signal_time_ms=t0,
+        )
+
+        c15 = Candle("BTCUSDT", "15m", t0, t0 + bar_len_15m, 102.0, 112.0, 99.0, 111.0, 1000.0)
+        # minute 1 fills (low=99.0), minute 8 hits TP1 (high=112.0)
+        m_candles = [
+            Candle("BTCUSDT", "1m", t0 + i * bar_len_1m, t0 + (i + 1) * bar_len_1m,
+                   101.0, 112.0 if i == 8 else 103.0, 99.0 if i == 1 else 100.5, 102.0, 100.0)
+            for i in range(15)
+        ]
+        client = MagicMock()
+        client.klines.return_value = [c15]
+        client.historical_klines.return_value = m_candles
+
+        res = mgr.resolve_pending_observations(client, current_time_ms=t0 + bar_len_15m)
+        assert res["resolved_count"] == 1
+        recs = store.get_all_shadow_records()
+        assert recs[0]["terminal_reason"] == "TP1"
+        assert recs[0]["tp1_hit"] == 1
+        assert recs[0]["sl_hit"] == 0
+
+
+def test_r2_3_17_fill_candle_hits_sl_after_fill() -> None:
+    """R2.3-17: Fill candle hits SL after fill => STOP recognized."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        db_path = Path(tmpdir) / "mw_r2_3_17.db"
+        store = MarketWatchStateStore(db_path)
+        mgr = ShadowEvaluationManager(store=store)
+        t0 = 1_700_000_000_000
+        bar_len_15m = 15 * 60 * 1000
+        bar_len_1m = 60 * 1000
+
+        store.record_shadow_observation(
+            timestamp_ms=t0,
+            symbol="BTCUSDT",
+            snapshot_hash="h17",
+            agent_decision="LONG",
+            agent_setup="TREND_PULLBACK",
+            entry_quality="GOOD",
+            reason_codes=[],
+            entry_price=100.0,
+            stop_loss=95.0,
+            tp1=110.0,
+            tp2=120.0,
+            direction="LONG",
+            observation_type="ACTIONABLE_TRIGGERED",
+            signal_time_ms=t0,
+        )
+
+        c15 = Candle("BTCUSDT", "15m", t0, t0 + bar_len_15m, 102.0, 103.0, 94.0, 96.0, 1000.0)
+        # minute 1 fills at 100.0, minute 4 plunges to 94.0 (SL breached)
+        m_candles = [
+            Candle("BTCUSDT", "1m", t0 + i * bar_len_1m, t0 + (i + 1) * bar_len_1m,
+                   101.0, 102.0, 94.0 if i == 4 else (99.5 if i == 1 else 100.0), 96.0 if i == 4 else 101.0, 100.0)
+            for i in range(15)
+        ]
+        client = MagicMock()
+        client.klines.return_value = [c15]
+        client.historical_klines.return_value = m_candles
+
+        res = mgr.resolve_pending_observations(client, current_time_ms=t0 + bar_len_15m)
+        assert res["resolved_count"] == 1
+        recs = store.get_all_shadow_records()
+        assert recs[0]["terminal_reason"] == "STOP"
+        assert recs[0]["sl_hit"] == 1
+        assert recs[0]["tp1_hit"] == 0
+
+
+def test_r2_3_18_fill_candle_touch_before_fill_only_not_counted() -> None:
+    """R2.3-18: Fill candle high/low touched before fill only must NOT count as post-fill TP/SL."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        db_path = Path(tmpdir) / "mw_r2_3_18.db"
+        store = MarketWatchStateStore(db_path)
+        mgr = ShadowEvaluationManager(store=store)
+        t0 = 1_700_000_000_000
+        bar_len_15m = 15 * 60 * 1000
+        bar_len_1m = 60 * 1000
+
+        store.record_shadow_observation(
+            timestamp_ms=t0,
+            symbol="BTCUSDT",
+            snapshot_hash="h18",
+            agent_decision="LONG",
+            agent_setup="TREND_PULLBACK",
+            entry_quality="GOOD",
+            reason_codes=[],
+            entry_price=100.0,
+            stop_loss=90.0,
+            tp1=110.0,
+            tp2=120.0,
+            direction="LONG",
+            observation_type="ACTIONABLE_TRIGGERED",
+            signal_time_ms=t0,
+        )
+
+        c15 = Candle("BTCUSDT", "15m", t0, t0 + bar_len_15m, 105.0, 111.0, 99.0, 102.0, 1000.0)
+        # minute 0 touched 111.0 (before fill!). Minute 5 fills at 99.0. Minutes 6-14 fluctuate between 101 and 103
+        m_candles = [
+            Candle("BTCUSDT", "1m", t0 + i * bar_len_1m, t0 + (i + 1) * bar_len_1m,
+                   105.0 if i == 0 else 102.0, 111.0 if i == 0 else 103.0, 99.0 if i == 5 else 101.0, 102.0, 100.0)
+            for i in range(15)
+        ]
+        client = MagicMock()
+        client.klines.return_value = [c15]
+        client.historical_klines.return_value = m_candles
+
+        res = mgr.resolve_pending_observations(client, current_time_ms=t0 + bar_len_15m)
+        assert res["resolved_count"] == 0  # NOT resolved in fill bar!
+        recs = store.get_all_shadow_records()
+        assert recs[0]["fill_status"] == "FILLED"
+        assert recs[0]["resolved"] == 0
+        assert recs[0]["tp1_hit"] == 0
+
+
+def test_r2_3_19_fifteen_min_dual_touch_1m_proves_tp_first() -> None:
+    """R2.3-19: 15m candle touches SL and TP; 1m path proves TP first => TP1."""
+    mgr = ShadowEvaluationManager(store=MagicMock())
+    t0 = 1_700_000_000_000
+    bar_len_15m = 15 * 60 * 1000
+    bar_len_1m = 60 * 1000
+
+    c_ambig = Candle("BTCUSDT", "15m", t0, t0 + bar_len_15m, 100.0, 115.0, 85.0, 105.0, 1000.0)
+    # 1m shows TP touched at minute 3 (high=115.0), SL touched at minute 10 (low=85.0)
+    m_candles = [
+        Candle("BTCUSDT", "1m", t0 + i * bar_len_1m, t0 + (i + 1) * bar_len_1m,
+               100.0, 115.0 if i == 3 else 102.0, 85.0 if i == 10 else 99.0, 101.0, 100.0)
+        for i in range(15)
+    ]
+
+    outcome = mgr.evaluate_forward_outcomes(
+        shadow_id=1,
+        entry_price=100.0,
+        stop_loss=90.0,
+        tp1=110.0,
+        tp2=120.0,
+        direction=DirectionalDecision.LONG,
+        future_candles=[c_ambig],
+        persist=False,
+        intrabar_1m_candles=m_candles,
+    )
+    assert outcome["tp1_hit"] is True
+    assert outcome["sl_hit"] is False
+    assert outcome["terminal_reason"] == "TP1"
+    assert outcome["path_resolution"] == ShadowPathResolution.ONE_MINUTE_CHRONOLOGICAL.value
+
+
+def test_r2_3_20_fifteen_min_dual_touch_1m_proves_sl_first() -> None:
+    """R2.3-20: 15m candle touches both; 1m proves SL first => STOP."""
+    mgr = ShadowEvaluationManager(store=MagicMock())
+    t0 = 1_700_000_000_000
+    bar_len_15m = 15 * 60 * 1000
+    bar_len_1m = 60 * 1000
+
+    c_ambig = Candle("BTCUSDT", "15m", t0, t0 + bar_len_15m, 100.0, 115.0, 85.0, 105.0, 1000.0)
+    # 1m shows SL touched at minute 2 (low=85.0), TP touched at minute 8 (high=115.0)
+    m_candles = [
+        Candle("BTCUSDT", "1m", t0 + i * bar_len_1m, t0 + (i + 1) * bar_len_1m,
+               100.0, 115.0 if i == 8 else 102.0, 85.0 if i == 2 else 99.0, 101.0, 100.0)
+        for i in range(15)
+    ]
+
+    outcome = mgr.evaluate_forward_outcomes(
+        shadow_id=1,
+        entry_price=100.0,
+        stop_loss=90.0,
+        tp1=110.0,
+        tp2=120.0,
+        direction=DirectionalDecision.LONG,
+        future_candles=[c_ambig],
+        persist=False,
+        intrabar_1m_candles=m_candles,
+    )
+    assert outcome["sl_hit"] is True
+    assert outcome["tp1_hit"] is False
+    assert outcome["terminal_reason"] == "STOP"
+    assert outcome["path_resolution"] == ShadowPathResolution.ONE_MINUTE_CHRONOLOGICAL.value
+
+
+def test_r2_3_21_one_min_candle_dual_touch_stop_first_fallback() -> None:
+    """R2.3-21: 1m candle itself touches both => STOP_FIRST fallback."""
+    mgr = ShadowEvaluationManager(store=MagicMock())
+    t0 = 1_700_000_000_000
+    bar_len_15m = 15 * 60 * 1000
+    bar_len_1m = 60 * 1000
+
+    c_ambig = Candle("BTCUSDT", "15m", t0, t0 + bar_len_15m, 100.0, 115.0, 85.0, 105.0, 1000.0)
+    # minute 4 candle itself touches both high=115.0 and low=85.0
+    m_candles = [
+        Candle("BTCUSDT", "1m", t0 + i * bar_len_1m, t0 + (i + 1) * bar_len_1m,
+               100.0, 115.0 if i == 4 else 102.0, 85.0 if i == 4 else 99.0, 101.0, 100.0)
+        for i in range(15)
+    ]
+
+    outcome = mgr.evaluate_forward_outcomes(
+        shadow_id=1,
+        entry_price=100.0,
+        stop_loss=90.0,
+        tp1=110.0,
+        tp2=120.0,
+        direction=DirectionalDecision.LONG,
+        future_candles=[c_ambig],
+        persist=False,
+        intrabar_1m_candles=m_candles,
+    )
+    assert outcome["sl_hit"] is True
+    assert outcome["tp1_hit"] is False
+    assert outcome["terminal_reason"] == "STOP"
+    assert outcome["path_resolution"] == ShadowPathResolution.FIFTEEN_MINUTE_STOP_FIRST.value
+
+
+def test_r2_3_22_one_min_unavailable_fifteen_min_stop_first_fallback() -> None:
+    """R2.3-22: 1m unavailable => 15m STOP_FIRST fallback."""
+    mgr = ShadowEvaluationManager(store=MagicMock())
+    t0 = 1_700_000_000_000
+    bar_len_15m = 15 * 60 * 1000
+
+    c_ambig = Candle("BTCUSDT", "15m", t0, t0 + bar_len_15m, 100.0, 115.0, 85.0, 105.0, 1000.0)
+    outcome = mgr.evaluate_forward_outcomes(
+        shadow_id=1,
+        entry_price=100.0,
+        stop_loss=90.0,
+        tp1=110.0,
+        tp2=120.0,
+        direction=DirectionalDecision.LONG,
+        future_candles=[c_ambig],
+        persist=False,
+        intrabar_1m_candles=None,
+    )
+    assert outcome["sl_hit"] is True
+    assert outcome["tp1_hit"] is False
+    assert outcome["terminal_reason"] == "STOP"
+    assert outcome["path_resolution"] == ShadowPathResolution.FIFTEEN_MINUTE_STOP_FIRST.value
+
+
+def test_r2_3_23_non_default_taker_fee_changes_friction_r() -> None:
+    """R2.3-23: Non-default taker fee changes friction_r."""
+    from btc_quant_agent.market_watch.shadow import compute_trade_friction_r
+    config_default = MarketWatchConfig()
+    config_custom = MarketWatchConfig(taker_fee_rate=0.0010)
+
+    _d1, f_r1 = compute_trade_friction_r(100.0, 110.0, 10.0, config_default)
+    _d2, f_r2 = compute_trade_friction_r(100.0, 110.0, 10.0, config_custom)
+    assert f_r2 > f_r1
+
+
+def test_r2_3_24_non_default_slippage_changes_friction_r() -> None:
+    """R2.3-24: Non-default slippage changes friction_r."""
+    from btc_quant_agent.market_watch.shadow import compute_trade_friction_r
+    config_default = MarketWatchConfig()
+    config_custom = MarketWatchConfig(slippage_bps_per_side=6.0)
+
+    _d1, f_r1 = compute_trade_friction_r(100.0, 110.0, 10.0, config_default)
+    _d2, f_r2 = compute_trade_friction_r(100.0, 110.0, 10.0, config_custom)
+    assert f_r2 > f_r1
+
+
+def test_r2_3_25_net_r_equals_gross_r_minus_friction_r() -> None:
+    """R2.3-25: net_r = gross_r - friction_r."""
+    mgr = ShadowEvaluationManager(store=MagicMock())
+    config = MarketWatchConfig()
+    c = Candle("BTCUSDT", "15m", 1000, 2000, 100.0, 112.0, 99.0, 111.0, 100.0)
+
+    outcome = mgr.evaluate_forward_outcomes(
+        shadow_id=1,
+        entry_price=100.0,
+        stop_loss=90.0,
+        tp1=110.0,
+        tp2=120.0,
+        direction=DirectionalDecision.LONG,
+        future_candles=[c],
+        persist=False,
+        config=config,
+    )
+    gross = outcome["gross_r"]
+    fric = outcome["friction_r"]
+    net = outcome["net_r"]
+    assert abs(net - (gross - fric)) < 1e-4
+
+
+def test_r2_3_26_tp1_is_terminal_and_returns_correct_actual_r() -> None:
+    """R2.3-26: TP1 is terminal and returns correct actual R."""
+    mgr = ShadowEvaluationManager(store=MagicMock())
+    c = Candle("BTCUSDT", "15m", 1000, 2000, 100.0, 116.0, 98.0, 115.0, 100.0)
+
+    outcome = mgr.evaluate_forward_outcomes(
+        shadow_id=1,
+        entry_price=100.0,
+        stop_loss=90.0,  # Risk dist = 10.0
+        tp1=115.0,        # Reward dist = 15.0 => gross_r = 1.5
+        tp2=125.0,
+        direction=DirectionalDecision.LONG,
+        future_candles=[c],
+        persist=False,
+    )
+    assert outcome["terminal_reason"] == "TP1"
+    assert outcome["gross_r"] == 1.5
+    assert outcome["is_terminal"] is True
+
+
+def test_r2_3_27_stop_returns_approximately_minus_one_gross_r() -> None:
+    """R2.3-27: STOP returns approximately -1 gross R before friction."""
+    mgr = ShadowEvaluationManager(store=MagicMock())
+    c = Candle("BTCUSDT", "15m", 1000, 2000, 100.0, 102.0, 89.0, 90.0, 100.0)
+
+    outcome = mgr.evaluate_forward_outcomes(
+        shadow_id=1,
+        entry_price=100.0,
+        stop_loss=90.0,
+        tp1=115.0,
+        tp2=125.0,
+        direction=DirectionalDecision.LONG,
+        future_candles=[c],
+        persist=False,
+    )
+    assert outcome["terminal_reason"] == "STOP"
+    assert outcome["gross_r"] == -1.0
+
+
+def test_r2_3_28_timeout_uses_final_covered_candle_close() -> None:
+    """R2.3-28: TIMEOUT uses final covered candle close."""
+    mgr = ShadowEvaluationManager(store=MagicMock())
+    candles = [
+        Candle("BTCUSDT", "15m", 1000 + i * 900_000, 1000 + (i + 1) * 900_000, 100.0, 106.0 if i == 15 else 104.0, 96.0, 102.0 if i < 15 else 105.0, 100.0)
+        for i in range(16)
+    ]
+
+    outcome = mgr.evaluate_forward_outcomes(
+        shadow_id=1,
+        entry_price=100.0,
+        stop_loss=90.0,
+        tp1=115.0,
+        tp2=125.0,
+        direction=DirectionalDecision.LONG,
+        future_candles=candles,
+        persist=False,
+    )
+    assert outcome["terminal_reason"] == "TIMEOUT"
+    assert outcome["exit_price"] == 105.0
+    assert outcome["gross_r"] == 0.5  # (105 - 100) / 10.0
+
+
+def test_r2_3_29_tp1_then_later_sl_cannot_convert_terminal_tp1_into_loss() -> None:
+    """R2.3-29: TP1 hit then later SL cannot convert terminal TP1 into loss."""
+    mgr = ShadowEvaluationManager(store=MagicMock())
+    c1 = Candle("BTCUSDT", "15m", 1000, 2000, 100.0, 112.0, 99.0, 111.0, 100.0)  # Hits TP1 (110.0)
+    c2 = Candle("BTCUSDT", "15m", 2000, 3000, 111.0, 112.0, 85.0, 86.0, 100.0)   # Plunges below SL (90.0)
+
+    outcome = mgr.evaluate_forward_outcomes(
+        shadow_id=1,
+        entry_price=100.0,
+        stop_loss=90.0,
+        tp1=110.0,
+        tp2=120.0,
+        direction=DirectionalDecision.LONG,
+        future_candles=[c1, c2],
+        persist=False,
+    )
+    assert outcome["terminal_reason"] == "TP1"
+    assert outcome["tp1_hit"] is True
+    assert outcome["sl_hit"] is False
+    assert outcome["gross_r"] == 1.0
+
+
+def test_r2_3_30_legacy_row_without_modern_fill_semantics_is_legacy_ineligible() -> None:
+    """R2.3-30: Legacy row without modern fill semantics resolves to LEGACY_INELIGIBLE."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        db_path = Path(tmpdir) / "mw_r2_3_30.db"
+        store = MarketWatchStateStore(db_path)
+        mgr = ShadowEvaluationManager(store=store)
+        t0 = 1_700_000_000_000
+
+        with store._connect() as conn:
+            conn.execute(
+                """
+                INSERT INTO market_watch_shadow_records (
+                    timestamp_ms, symbol, snapshot_hash, policy_version, config_hash,
+                    agent_decision, agent_setup, entry_quality, reason_codes_json,
+                    entry_price, stop_loss, tp1, tp2, direction, resolved,
+                    fill_status, regime_after
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, 'LEGACY', 'LEGACY')
+                """,
+                (t0, "BTCUSDT", "h30", "1.0", "c30", "LONG", "TREND_PULLBACK", "GOOD", "[]",
+                 100.0, 90.0, 110.0, 120.0, "LONG"),
+            )
+
+        client = MagicMock()
+        res = mgr.resolve_pending_observations(client, current_time_ms=t0 + 1000)
+        assert res["resolved_count"] == 1
+        recs = store.get_all_shadow_records()
+        assert recs[0]["terminal_reason"] == "LEGACY_INELIGIBLE"
+        assert recs[0]["regime_after"] == "LEGACY_INELIGIBLE"
+        assert recs[0]["resolved"] == 1
+
+
+def test_r2_3_31_legacy_row_excluded_from_trade_denominator() -> None:
+    """R2.3-31: Legacy row is excluded from trade hit-rate denominator."""
+    records = [
+        {
+            "id": 1,
+            "observation_type": "ACTIONABLE_TRIGGERED",
+            "direction": "LONG",
+            "entry_price": 100.0,
+            "fill_status": "FILLED",
+            "signal_time_ms": 1000,
+            "resolved": 1,
+            "tp1_hit": 1,
+            "tp2_hit": 0,
+            "sl_hit": 0,
+            "net_r": 1.0,
+            "terminal_reason": "TP1",
+        },
+        {
+            "id": 2,
+            "observation_type": "ACTIONABLE_TRIGGERED",
+            "direction": "LONG",
+            "entry_price": 100.0,
+            "fill_status": "LEGACY",
+            "regime_after": "LEGACY_INELIGIBLE",
+            "terminal_reason": "LEGACY_INELIGIBLE",
+            "resolved": 1,
+            "is_legacy": True,
+        },
+    ]
+    metrics = compute_performance_metrics(records)
+    assert metrics["total_records"] == 2
+    assert metrics["resolved_actionable_count"] == 1
+    assert metrics["ineligible_count"] == 1
+    assert metrics["tp1_hit_rate"] == 1.0
+
+
+def test_r2_3_32_exactly_one_actionable_triggered_per_signal_identity() -> None:
+    """R2.3-32: Exactly one ACTIONABLE_TRIGGERED record per signal_identity."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        db_path = Path(tmpdir) / "mw_r2_3_32.db"
+        store = MarketWatchStateStore(db_path)
+        config = MarketWatchConfig()
+        client = MagicMock()
+        client.server_time_ms.return_value = 1_700_000_000_000
+        client.klines.return_value = make_candle_series("BTCUSDT", "15m", 40)
+        client.collect_derivatives.return_value = MagicMock(
+            snapshot=MagicMock(mark_price=100.0, index_price=100.0, funding_rate=0.0001, funding_time_ms=1000,
+                               open_interest=10000.0, open_interest_time_ms=1000, open_interest_change_pct=0.01,
+                               taker_buy_sell_ratio=1.1, taker_time_ms=1000, basis_rate=0.0001, basis_time_ms=1000,
+                               long_short_account_ratio=1.0, long_short_time_ms=1000, order_book_imbalance=0.1, spread_bps=1.5),
+            field_availability={"mark_price": True},
+            endpoint_errors={},
+        )
+        client._optional_get.return_value = None
+
+        scanner = MarketWatchScanner(config=config, client=client, store=store)
+        mock_tf = make_dummy_tf("BTCUSDT", "15m", 100.0)
+        snap = MarketSnapshot(
+            symbol="BTCUSDT",
+            decision_time_ms=1000,
+            observed_at_ms=1000,
+            exchange_time_ms=1000,
+            price=PriceMetrics(last_price=100.0),
+            tf_15m=mock_tf,
+            tf_1h=mock_tf,
+            tf_4h=mock_tf,
+            derivatives=DerivativesMetrics(mark_price=100.0),
+            snapshot_hash="hash_dedupe",
+        )
+        asmt = SymbolAssessment(
+            symbol="BTCUSDT",
+            snapshot=snap,
+            directional=DirectionalPlan(
+                symbol="BTCUSDT",
+                decision=DirectionalDecision.LONG,
+                setup=PlaybookType.BREAKOUT_RETEST,
+                regime=Regime.TREND_UP,
+                entry_quality=EntryQuality.GOOD,
+                entry_low=99.0,
+                entry_high=101.0,
+                stop_loss=95.0,
+                take_profit_1=110.0,
+                take_profit_2=115.0,
+                breakout_level=100.0,
+                breakout_direction="LONG",
+            ),
+            grid=GridPlan(symbol="BTCUSDT", decision=GridDecision.PAUSE),
+            opportunity_score=80.0,
+            relative_performance=None,
+            exhaustion=ExhaustionMetrics(distance_from_ema20_atr=0.1, state=ExhaustionState.NORMAL),
+            rank=1,
+            lifecycle_state=SignalLifecycleState.TRIGGERED,
+            alert_fingerprint="fp1",
+            signal_identity="BTCUSDT:BREAKOUT_RETEST:LONG:100.0:1000",
+            setup_key="BTCUSDT:BREAKOUT_RETEST:LONG:100.0",
+        )
+
+        # Run cycle 1
+        scanner._record_shadow_observations_if_needed(asmt, 1000)
+        recs1 = store.get_all_shadow_records()
+        assert len(recs1) == 1
+
+        # Run cycle 2 with identical signal_identity
+        scanner._record_shadow_observations_if_needed(asmt, 2000)
+        recs2 = store.get_all_shadow_records()
+        assert len(recs2) == 1  # Dedupe prevented duplicate!
+
+
+def test_r2_3_33_new_signal_identity_after_invalidation_creates_new_actionable_record() -> None:
+    """R2.3-33: New signal_identity after invalidation creates a new actionable record."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        db_path = Path(tmpdir) / "mw_r2_3_33.db"
+        store = MarketWatchStateStore(db_path)
+        config = MarketWatchConfig()
+        client = MagicMock()
+        scanner = MarketWatchScanner(config=config, client=client, store=store)
+
+        mock_tf = make_dummy_tf("BTCUSDT", "15m", 100.0)
+        snap = MarketSnapshot(
+            symbol="BTCUSDT",
+            decision_time_ms=1000,
+            observed_at_ms=1000,
+            exchange_time_ms=1000,
+            price=PriceMetrics(last_price=100.0),
+            tf_15m=mock_tf,
+            tf_1h=mock_tf,
+            tf_4h=mock_tf,
+            derivatives=DerivativesMetrics(mark_price=100.0),
+            snapshot_hash="hash_retrigger",
+        )
+
+        # Instance 1
+        asmt1 = SymbolAssessment(
+            symbol="BTCUSDT",
+            snapshot=snap,
+            directional=DirectionalPlan(
+                symbol="BTCUSDT", decision=DirectionalDecision.LONG, setup=PlaybookType.BREAKOUT_RETEST,
+                regime=Regime.TREND_UP, entry_quality=EntryQuality.GOOD,
+                entry_low=99.0, entry_high=101.0, stop_loss=95.0, take_profit_1=110.0, take_profit_2=115.0,
+                breakout_level=100.0, breakout_direction="LONG",
+            ),
+            grid=GridPlan(symbol="BTCUSDT", decision=GridDecision.PAUSE),
+            opportunity_score=80.0, relative_performance=None,
+            exhaustion=ExhaustionMetrics(distance_from_ema20_atr=0.1, state=ExhaustionState.NORMAL),
+            rank=1, lifecycle_state=SignalLifecycleState.TRIGGERED,
+            alert_fingerprint="fp1",
+            signal_identity="BTCUSDT:BREAKOUT_RETEST:LONG:100.0:1000",
+            setup_key="BTCUSDT:BREAKOUT_RETEST:LONG:100.0",
+        )
+        scanner._record_shadow_observations_if_needed(asmt1, 1000)
+        assert len(store.get_all_shadow_records()) == 1
+
+        # Invalidation: symbol state reset
+        store.set_last_shadow_signal_ids("BTCUSDT", triggered_id=None)
+
+        # Instance 2 (re-trigger with new identity at t=5000)
+        asmt2 = SymbolAssessment(
+            symbol="BTCUSDT",
+            snapshot=snap,
+            directional=asmt1.directional,
+            grid=asmt1.grid,
+            opportunity_score=80.0,
+            relative_performance=None,
+            exhaustion=asmt1.exhaustion,
+            rank=1,
+            lifecycle_state=SignalLifecycleState.TRIGGERED,
+            alert_fingerprint="fp2",
+            signal_identity="BTCUSDT:BREAKOUT_RETEST:LONG:100.0:5000",
+            setup_key="BTCUSDT:BREAKOUT_RETEST:LONG:100.0",
+        )
+        scanner._record_shadow_observations_if_needed(asmt2, 5000)
+        assert len(store.get_all_shadow_records()) == 2
+
+
+def test_r2_3_34_process_offline_over_120_bars_recovers_exact_window() -> None:
+    """R2.3-34: Process offline >120 15m bars recovers exact window via historical_klines."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        db_path = Path(tmpdir) / "mw_r2_3_34.db"
+        store = MarketWatchStateStore(db_path)
+        mgr = ShadowEvaluationManager(store=store)
+        t0 = 1_700_000_000_000
+        bar_len = 15 * 60 * 1000
+        eval_horizon = 16
+        eval_end = t0 + eval_horizon * bar_len
+
+        store.record_shadow_observation(
+            timestamp_ms=t0,
+            symbol="BTCUSDT",
+            snapshot_hash="h34",
+            agent_decision="LONG",
+            agent_setup="TREND_PULLBACK",
+            entry_quality="GOOD",
+            reason_codes=[],
+            entry_price=100.0,
+            stop_loss=95.0,
+            tp1=110.0,
+            tp2=120.0,
+            direction="LONG",
+            evaluation_horizon_bars=eval_horizon,
+            evaluation_end_ms=eval_end,
+            observation_type="ACTIONABLE_TRIGGERED",
+            signal_time_ms=t0,
+            fill_status="WAITING_FOR_FILL",
+        )
+
+        t_curr = t0 + 150 * bar_len  # 150 bars later
+        client = MagicMock()
+        client.klines.return_value = make_candle_series("BTCUSDT", "15m", 120, start_ms=t0 + 30 * bar_len, step_ms=bar_len)
+
+        hist_candles = make_candle_series("BTCUSDT", "15m", 16, start_ms=t0, step_ms=bar_len, base_price=100.0)
+        hist_candles[2] = Candle("BTCUSDT", "15m", hist_candles[2].open_time_ms, hist_candles[2].close_time_ms,
+                                 102.0, 112.0, 101.0, 111.0, 500.0)  # TP1 hit
+        client.historical_klines.return_value = hist_candles
+
+        res = mgr.resolve_pending_observations(client, current_time_ms=t_curr)
+        assert res["resolved_count"] == 1
+        client.historical_klines.assert_called_once_with("BTCUSDT", "15m", t0, eval_end)
+
+
+def test_r2_3_35_temporary_historical_fetch_failure_remains_pending_until_retry() -> None:
+    """R2.3-35: Temporary historical fetch failure remains pending; later retry resolves correctly."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        db_path = Path(tmpdir) / "mw_r2_3_35.db"
+        store = MarketWatchStateStore(db_path)
+        mgr = ShadowEvaluationManager(store=store)
+        t0 = 1_700_000_000_000
+        bar_len = 15 * 60 * 1000
+        eval_horizon = 16
+        eval_end = t0 + eval_horizon * bar_len
+
+        store.record_shadow_observation(
+            timestamp_ms=t0,
+            symbol="BTCUSDT",
+            snapshot_hash="h35",
+            agent_decision="LONG",
+            agent_setup="TREND_PULLBACK",
+            entry_quality="GOOD",
+            reason_codes=[],
+            entry_price=100.0,
+            stop_loss=95.0,
+            tp1=110.0,
+            tp2=120.0,
+            direction="LONG",
+            evaluation_horizon_bars=eval_horizon,
+            evaluation_end_ms=eval_end,
+            observation_type="ACTIONABLE_TRIGGERED",
+            signal_time_ms=t0,
+            fill_status="WAITING_FOR_FILL",
+        )
+
+        client = MagicMock()
+        client.klines.return_value = []
+        client.historical_klines.side_effect = RuntimeError("Network error")
+
+        # Attempt 1: Fails
+        res1 = mgr.resolve_pending_observations(client, current_time_ms=t0 + 10 * bar_len)
+        assert res1["resolved_count"] == 0
+        recs1 = store.get_all_shadow_records()
+        assert recs1[0]["resolved"] == 0
+
+        # Attempt 2: Recovers
+        client.historical_klines.side_effect = None
+        hist_candles = make_candle_series("BTCUSDT", "15m", 16, start_ms=t0, step_ms=bar_len, base_price=100.0)
+        hist_candles[2] = Candle("BTCUSDT", "15m", hist_candles[2].open_time_ms, hist_candles[2].close_time_ms,
+                                 102.0, 112.0, 101.0, 111.0, 500.0)
+        client.historical_klines.return_value = hist_candles
+
+        res2 = mgr.resolve_pending_observations(client, current_time_ms=t0 + 10 * bar_len)
+        assert res2["resolved_count"] == 1
+        recs2 = store.get_all_shadow_records()
+        assert recs2[0]["resolved"] == 1
+        assert recs2[0]["tp1_hit"] == 1
+
+
+def test_r2_3_36_decision_time_after_observed_at_after_collection_started() -> None:
+    """R2.3-36: decision_time >= observed_at >= collection_started."""
+    client = MagicMock()
+    client.server_time_ms.return_value = 1000
+    client.klines.return_value = make_candle_series("BTCUSDT", "15m", 40)
+    client.collect_derivatives.return_value = MagicMock(
+        snapshot=MagicMock(mark_price=100.0, index_price=100.0, funding_rate=0.0001, funding_time_ms=1200,
+                           open_interest=1000.0, open_interest_time_ms=1200, open_interest_change_pct=0.01,
+                           taker_buy_sell_ratio=1.0, taker_time_ms=1200, basis_rate=0.0001, basis_time_ms=1200,
+                           long_short_account_ratio=1.0, long_short_time_ms=1200, order_book_imbalance=0.1, spread_bps=1.0),
+        field_availability={"mark_price": True},
+        endpoint_errors={},
+    )
+    client._optional_get.return_value = None
+
+    scanner = MarketWatchScanner(config=MarketWatchConfig(), client=client, store=MagicMock())
+    snap, _health, _errs = scanner.collect_symbol_snapshot("BTCUSDT", now_ms=1500)
+    assert snap is not None
+    assert snap.decision_time_ms >= snap.observed_at_ms
+    assert snap.observed_at_ms >= snap.collection_started_at_ms
+
+
+def test_r2_3_37_decision_time_after_collection_completed() -> None:
+    """R2.3-37: decision_time >= collection_completed."""
+    client = MagicMock()
+    client.server_time_ms.return_value = 1000
+    client.klines.return_value = make_candle_series("BTCUSDT", "15m", 40)
+    client.collect_derivatives.return_value = MagicMock(
+        snapshot=MagicMock(mark_price=100.0, index_price=100.0, funding_rate=0.0001, funding_time_ms=1200,
+                           open_interest=1000.0, open_interest_time_ms=1200, open_interest_change_pct=0.01,
+                           taker_buy_sell_ratio=1.0, taker_time_ms=1200, basis_rate=0.0001, basis_time_ms=1200,
+                           long_short_account_ratio=1.0, long_short_time_ms=1200, order_book_imbalance=0.1, spread_bps=1.0),
+        field_availability={"mark_price": True},
+        endpoint_errors={},
+    )
+    client._optional_get.return_value = None
+
+    scanner = MarketWatchScanner(config=MarketWatchConfig(), client=client, store=MagicMock())
+    snap, _health, _errs = scanner.collect_symbol_snapshot("BTCUSDT", now_ms=1500)
+    assert snap is not None
+    assert snap.decision_time_ms >= snap.collection_completed_at_ms

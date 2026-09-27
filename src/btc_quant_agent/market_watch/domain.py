@@ -1,12 +1,14 @@
 from __future__ import annotations
 
+from collections.abc import Sequence
 from dataclasses import asdict, dataclass, field
 from enum import StrEnum
 from typing import Any
 
 from ..domain import Candle, Regime
 
-MARKET_WATCH_POLICY_VERSION = "0.5.0-r1"
+MARKET_WATCH_POLICY_VERSION: str = "0.5.0-market-watch-forward-v1"
+MARKET_WATCH_EVIDENCE_VERSION: str = "FORWARD_EVIDENCE_V1"
 
 
 class DirectionalDecision(StrEnum):
@@ -83,6 +85,40 @@ class ShadowPathResolution(StrEnum):
 
 class ShadowExecutionPathModel(StrEnum):
     PARTIAL_FIRST_BAR_1M_THEN_15M = "PARTIAL_FIRST_BAR_1M_THEN_15M"
+
+
+class ShadowTerminalReason(StrEnum):
+    STOP = "STOP"
+    TP1 = "TP1"
+    TIMEOUT = "TIMEOUT"
+    NO_FILL = "NO_FILL"
+    INELIGIBLE_DATA_GAP = "INELIGIBLE_DATA_GAP"
+    LEGACY_INELIGIBLE = "LEGACY_INELIGIBLE"
+    PENDING_DATA_GAP = "PENDING_DATA_GAP"
+
+
+@dataclass(frozen=True)
+class CoverageStatus:
+    complete: bool
+    start_covered: bool
+    end_covered: bool
+    internal_gap_count: int
+    first_available_ms: int | None
+    last_available_ms: int | None
+
+
+@dataclass(frozen=True)
+class ShadowFillResult:
+    status: ShadowFillStatus
+    fill_price: float | None = None
+    fill_time_ms: int | None = None
+    fill_candle_open_ms: int | None = None
+    fill_candle_close_ms: int | None = None
+    source_interval: str = "15m"
+    path_resolution: str = "FIFTEEN_MINUTE_STOP_FIRST"
+
+    def __iter__(self) -> Any:
+        return iter((self.status, self.fill_price, self.fill_time_ms))
 
 
 class AlertSeverity(StrEnum):
@@ -295,6 +331,57 @@ class GridPlan:
         return payload
 
 
+def validate_time_coverage(
+    candles: Sequence[Candle],
+    start_ms: int,
+    end_ms: int,
+    interval_ms: int,
+    allowed_gap_ms: int | None = None,
+) -> CoverageStatus:
+    """Validate chronological time coverage across a required window.
+
+    Requirements:
+    - Candles sorted chronologically.
+    - start_covered: first candle open <= start_ms.
+    - end_covered: last candle close >= end_ms.
+    - internal_gap_count: number of internal gaps between adjacent candles.
+    - complete: start_covered and end_covered and internal_gap_count == 0.
+    """
+    valid_candles = [c for c in candles if isinstance(c, Candle)]
+    if not valid_candles:
+        return CoverageStatus(
+            complete=False,
+            start_covered=False,
+            end_covered=False,
+            internal_gap_count=0,
+            first_available_ms=None,
+            last_available_ms=None,
+        )
+
+    valid_candles.sort(key=lambda c: c.open_time_ms)
+    first_open = valid_candles[0].open_time_ms
+    last_close = valid_candles[-1].close_time_ms
+    start_covered = (first_open <= start_ms)
+    end_covered = (last_close >= end_ms)
+
+    max_gap = allowed_gap_ms if allowed_gap_ms is not None else 0
+    internal_gap_count = 0
+    for i in range(len(valid_candles) - 1):
+        gap = valid_candles[i + 1].open_time_ms - valid_candles[i].close_time_ms
+        if gap > max_gap:
+            internal_gap_count += 1
+
+    complete = start_covered and end_covered and (internal_gap_count == 0)
+    return CoverageStatus(
+        complete=complete,
+        start_covered=start_covered,
+        end_covered=end_covered,
+        internal_gap_count=internal_gap_count,
+        first_available_ms=first_open,
+        last_available_ms=last_close,
+    )
+
+
 def normalize_price_level(price: float | None, tick_size: float | None = None) -> str:
     """Deterministic, scale-aware normalization of price level without fixed-decimal collisions."""
     if price is None or price <= 0:
@@ -311,22 +398,21 @@ def normalize_price_level(price: float | None, tick_size: float | None = None) -
     elif abs_p >= 10.0:
         return f"{price:.3f}"
     elif abs_p >= 0.1:
-        return f"{price:.5f}"
+        return f"{price:.6f}"
     elif abs_p >= 0.001:
         return f"{price:.7f}"
     else:
         return f"{price:.8f}"
 
 
-def compute_signal_identity(
+def compute_setup_key(
     symbol: str,
     playbook: PlaybookType | str,
     intended_direction: str,
     structural_anchor_id: str | float | None,
-    setup_creation_bar_end_ms: int = 0,
     tick_size: float | None = None,
 ) -> str:
-    """Deterministic signal identity combining symbol, playbook, intended direction, structural anchor, and setup bar."""
+    """Stable identity for the ongoing market setup independent of minor drift."""
     sym = symbol.upper()
     pb_str = playbook.value if isinstance(playbook, PlaybookType) else str(playbook)
     dir_str = intended_direction.upper()
@@ -337,19 +423,30 @@ def compute_signal_identity(
         anchor_str = str(structural_anchor_id)
     else:
         anchor_str = "0"
+    return f"{sym}:{pb_str}:{dir_str}:{anchor_str}"
 
+
+def compute_signal_identity(
+    symbol: str,
+    playbook: PlaybookType | str,
+    intended_direction: str,
+    structural_anchor_id: str | float | None,
+    setup_creation_bar_end_ms: int = 0,
+    tick_size: float | None = None,
+) -> str:
+    """Unique identity for one actionable setup instance."""
+    setup_key = compute_setup_key(symbol, playbook, intended_direction, structural_anchor_id, tick_size)
     bar_str = str(setup_creation_bar_end_ms) if setup_creation_bar_end_ms > 0 else "0"
-    return f"{sym}:{pb_str}:{dir_str}:{anchor_str}:{bar_str}"
+    return f"{setup_key}:{bar_str}"
 
 
-def extract_signal_identity(
+def extract_setup_key(
     symbol: str,
     directional: DirectionalPlan,
     snapshot: MarketSnapshot | None = None,
-    created_bar_end_ms: int = 0,
     tick_size: float | None = None,
 ) -> str:
-    """Extract or compute deterministic signal identity from DirectionalPlan."""
+    """Extract setup_key from DirectionalPlan and structural snapshot anchors."""
     d = directional
     if str(d.decision.value) in ("LONG", "SHORT"):
         intended_dir = str(d.decision.value)
@@ -377,16 +474,45 @@ def extract_signal_identity(
         anchor_id = f"FBD_{normalize_price_level(sw_low, tick_size)}"
     elif setup_str == "TREND_PULLBACK":
         if intended_dir == "LONG":
-            sw_low = (snapshot.tf_1h.recent_swing_low if snapshot else None) or (d.stop_loss if d.stop_loss > 0 else None) or d.entry_low
+            sw_low = (
+                (snapshot.tf_1h.recent_swing_low if snapshot else None)
+                or (snapshot.tf_4h.recent_swing_low if snapshot else None)
+                or d.entry_low
+            )
             anchor_id = f"SWL_{normalize_price_level(sw_low, tick_size)}"
         else:
-            sw_high = (snapshot.tf_1h.recent_swing_high if snapshot else None) or (d.stop_loss if d.stop_loss > 0 else None) or d.entry_high
+            sw_high = (
+                (snapshot.tf_1h.recent_swing_high if snapshot else None)
+                or (snapshot.tf_4h.recent_swing_high if snapshot else None)
+                or d.entry_high
+            )
             anchor_id = f"SWH_{normalize_price_level(sw_high, tick_size)}"
+    elif setup_str in ("VOLATILITY_EXPANSION", "RANGE_MEAN_REVERSION"):
+        anchor = (
+            (snapshot.tf_1h.recent_swing_high if intended_dir == "SHORT" and snapshot else None)
+            or (snapshot.tf_1h.recent_swing_low if intended_dir == "LONG" and snapshot else None)
+            or d.breakout_level
+            or (d.entry_low if intended_dir == "LONG" else d.entry_high)
+        )
+        anchor_id = f"VE_{normalize_price_level(anchor, tick_size)}"
     else:
         lvl = d.breakout_level or (d.entry_low if intended_dir == "LONG" else d.entry_high) or d.stop_loss
         anchor_id = f"LVL_{normalize_price_level(lvl, tick_size)}"
 
-    return compute_signal_identity(symbol, d.setup, intended_dir, anchor_id, created_bar_end_ms, tick_size)
+    return compute_setup_key(symbol, d.setup, intended_dir, anchor_id, tick_size)
+
+
+def extract_signal_identity(
+    symbol: str,
+    directional: DirectionalPlan,
+    snapshot: MarketSnapshot | None = None,
+    created_bar_end_ms: int = 0,
+    tick_size: float | None = None,
+) -> str:
+    """Extract or compute deterministic signal identity from DirectionalPlan."""
+    setup_key = extract_setup_key(symbol, directional, snapshot, tick_size)
+    bar_str = str(created_bar_end_ms) if created_bar_end_ms > 0 else "0"
+    return f"{setup_key}:{bar_str}"
 
 
 @dataclass(frozen=True)
@@ -405,6 +531,7 @@ class SymbolAssessment:
     policy_version: str = MARKET_WATCH_POLICY_VERSION
     config_hash: str = ""
     signal_identity: str = ""
+    setup_key: str = ""
 
     def as_dict(self) -> dict[str, Any]:
         return {
@@ -419,6 +546,7 @@ class SymbolAssessment:
             "veto_reasons": list(self.veto_reasons),
             "alert_fingerprint": self.alert_fingerprint,
             "signal_identity": self.signal_identity,
+            "setup_key": self.setup_key,
         }
 
 
