@@ -1,0 +1,8 @@
+command: ruff check .
+cwd: /root/workspace/project/Quant-agent-sanitized
+tested_sha: 16dc10213cd5b5fb3ff14e939db44a50d6d19fe2
+timestamp_utc: 2026-09-27T10:38:36.840609+00:00
+exit_code: 0
+wall_seconds: 0.026
+
+All checks passed!

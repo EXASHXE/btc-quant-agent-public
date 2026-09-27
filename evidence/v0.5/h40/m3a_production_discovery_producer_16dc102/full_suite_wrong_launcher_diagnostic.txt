@@ -1,0 +1,182 @@
+command: /usr/bin/time -v pytest -q
+cwd: /root/workspace/project/Quant-agent-sanitized
+tested_sha: 16dc10213cd5b5fb3ff14e939db44a50d6d19fe2
+timestamp_utc: 2026-09-27T10:45:16.204026+00:00
+exit_code: 2
+wall_seconds: 2.714
+
+
+==================================== ERRORS ====================================
+_______ ERROR collecting tests/test_v051_h40_f01_lifecycle_authority.py ________
+ImportError while importing test module '/root/workspace/project/Quant-agent-sanitized/tests/test_v051_h40_f01_lifecycle_authority.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_v051_h40_f01_lifecycle_authority.py:20: in <module>
+    from btc_quant_agent.h40 import (
+E   ImportError: cannot import name 'ACCEPTED_H40_P3_CONTROLLER_AUTHORITY_HASH' from 'btc_quant_agent.h40' (/root/workspace/project/Quant-agent/src/btc_quant_agent/h40/__init__.py)
+______ ERROR collecting tests/test_v051_h40_f01r3r1_durable_authority.py _______
+ImportError while importing test module '/root/workspace/project/Quant-agent-sanitized/tests/test_v051_h40_f01r3r1_durable_authority.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_v051_h40_f01r3r1_durable_authority.py:22: in <module>
+    from test_v051_h40_f01_lifecycle_authority import (
+tests/test_v051_h40_f01_lifecycle_authority.py:20: in <module>
+    from btc_quant_agent.h40 import (
+E   ImportError: cannot import name 'ACCEPTED_H40_P3_CONTROLLER_AUTHORITY_HASH' from 'btc_quant_agent.h40' (/root/workspace/project/Quant-agent/src/btc_quant_agent/h40/__init__.py)
+_______ ERROR collecting tests/test_v051_h40_f01r3r2_commit_authority.py _______
+ImportError while importing test module '/root/workspace/project/Quant-agent-sanitized/tests/test_v051_h40_f01r3r2_commit_authority.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_v051_h40_f01r3r2_commit_authority.py:29: in <module>
+    from test_v051_h40_f01_lifecycle_authority import (
+tests/test_v051_h40_f01_lifecycle_authority.py:20: in <module>
+    from btc_quant_agent.h40 import (
+E   ImportError: cannot import name 'ACCEPTED_H40_P3_CONTROLLER_AUTHORITY_HASH' from 'btc_quant_agent.h40' (/root/workspace/project/Quant-agent/src/btc_quant_agent/h40/__init__.py)
+___________ ERROR collecting tests/test_v051_h40_f01r3r3_api_seal.py ___________
+ImportError while importing test module '/root/workspace/project/Quant-agent-sanitized/tests/test_v051_h40_f01r3r3_api_seal.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_v051_h40_f01r3r3_api_seal.py:21: in <module>
+    from test_v051_h40_f01_lifecycle_authority import (
+tests/test_v051_h40_f01_lifecycle_authority.py:20: in <module>
+    from btc_quant_agent.h40 import (
+E   ImportError: cannot import name 'ACCEPTED_H40_P3_CONTROLLER_AUTHORITY_HASH' from 'btc_quant_agent.h40' (/root/workspace/project/Quant-agent/src/btc_quant_agent/h40/__init__.py)
+______ ERROR collecting tests/test_v051_h40_f01r3r4_lineage_durability.py ______
+ImportError while importing test module '/root/workspace/project/Quant-agent-sanitized/tests/test_v051_h40_f01r3r4_lineage_durability.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_v051_h40_f01r3r4_lineage_durability.py:16: in <module>
+    from test_v051_h40_f01_lifecycle_authority import (
+tests/test_v051_h40_f01_lifecycle_authority.py:20: in <module>
+    from btc_quant_agent.h40 import (
+E   ImportError: cannot import name 'ACCEPTED_H40_P3_CONTROLLER_AUTHORITY_HASH' from 'btc_quant_agent.h40' (/root/workspace/project/Quant-agent/src/btc_quant_agent/h40/__init__.py)
+_ ERROR collecting tests/test_v051_h40_implementation_authority_publication.py _
+ImportError while importing test module '/root/workspace/project/Quant-agent-sanitized/tests/test_v051_h40_implementation_authority_publication.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_v051_h40_implementation_authority_publication.py:29: in <module>
+    from btc_quant_agent.h40.lifecycle_authority import (
+E   ImportError: cannot import name 'ACCEPTED_H40_P3_CONTROLLER_AUTHORITY_HASH' from 'btc_quant_agent.h40.lifecycle_authority' (/root/workspace/project/Quant-agent/src/btc_quant_agent/h40/lifecycle_authority.py)
+_ ERROR collecting tests/test_v051_h40_p3_controller_authority_publication.py __
+ImportError while importing test module '/root/workspace/project/Quant-agent-sanitized/tests/test_v051_h40_p3_controller_authority_publication.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_v051_h40_p3_controller_authority_publication.py:41: in <module>
+    from btc_quant_agent.h40.lifecycle_authority import (
+E   ImportError: cannot import name 'ACCEPTED_H40_P3_CONTROLLER_AUTHORITY_HASH' from 'btc_quant_agent.h40.lifecycle_authority' (/root/workspace/project/Quant-agent/src/btc_quant_agent/h40/lifecycle_authority.py)
+__ ERROR collecting tests/test_v051_h40_p3b_production_discovery_verifier.py ___
+ImportError while importing test module '/root/workspace/project/Quant-agent-sanitized/tests/test_v051_h40_p3b_production_discovery_verifier.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_v051_h40_p3b_production_discovery_verifier.py:17: in <module>
+    from btc_quant_agent.h40 import (
+E   ImportError: cannot import name 'ACCEPTED_H40_P3_CONTROLLER_AUTHORITY_HASH' from 'btc_quant_agent.h40' (/root/workspace/project/Quant-agent/src/btc_quant_agent/h40/__init__.py)
+_ ERROR collecting tests/test_v051_h40_p3b_production_verifier_behavior_seal.py _
+ImportError while importing test module '/root/workspace/project/Quant-agent-sanitized/tests/test_v051_h40_p3b_production_verifier_behavior_seal.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_v051_h40_p3b_production_verifier_behavior_seal.py:9: in <module>
+    from test_v051_h40_f01r3r1_durable_authority import (
+tests/test_v051_h40_f01r3r1_durable_authority.py:22: in <module>
+    from test_v051_h40_f01_lifecycle_authority import (
+tests/test_v051_h40_f01_lifecycle_authority.py:20: in <module>
+    from btc_quant_agent.h40 import (
+E   ImportError: cannot import name 'ACCEPTED_H40_P3_CONTROLLER_AUTHORITY_HASH' from 'btc_quant_agent.h40' (/root/workspace/project/Quant-agent/src/btc_quant_agent/h40/__init__.py)
+_ ERROR collecting tests/test_v051_h40_p3b_production_verifier_identity_seal.py _
+ImportError while importing test module '/root/workspace/project/Quant-agent-sanitized/tests/test_v051_h40_p3b_production_verifier_identity_seal.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_v051_h40_p3b_production_verifier_identity_seal.py:11: in <module>
+    from test_v051_h40_f01_lifecycle_authority import _build_discovery_chain
+tests/test_v051_h40_f01_lifecycle_authority.py:20: in <module>
+    from btc_quant_agent.h40 import (
+E   ImportError: cannot import name 'ACCEPTED_H40_P3_CONTROLLER_AUTHORITY_HASH' from 'btc_quant_agent.h40' (/root/workspace/project/Quant-agent/src/btc_quant_agent/h40/__init__.py)
+_____ ERROR collecting tests/test_v051_h40_repair_a_lifecycle_authority.py _____
+ImportError while importing test module '/root/workspace/project/Quant-agent-sanitized/tests/test_v051_h40_repair_a_lifecycle_authority.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_v051_h40_repair_a_lifecycle_authority.py:27: in <module>
+    from btc_quant_agent.h40 import (
+E   ImportError: cannot import name 'ACCEPTED_H40_P3_CONTROLLER_AUTHORITY_HASH' from 'btc_quant_agent.h40' (/root/workspace/project/Quant-agent/src/btc_quant_agent/h40/__init__.py)
+_______ ERROR collecting tests/test_v051_h40_repair_b_provenance_pit.py ________
+ImportError while importing test module '/root/workspace/project/Quant-agent-sanitized/tests/test_v051_h40_repair_b_provenance_pit.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_v051_h40_repair_b_provenance_pit.py:26: in <module>
+    from btc_quant_agent.h40 import (
+E   ImportError: cannot import name 'ACCEPTED_H40_P3_CONTROLLER_AUTHORITY_HASH' from 'btc_quant_agent.h40' (/root/workspace/project/Quant-agent/src/btc_quant_agent/h40/__init__.py)
+=========================== short test summary info ============================
+ERROR tests/test_v051_h40_f01_lifecycle_authority.py
+ERROR tests/test_v051_h40_f01r3r1_durable_authority.py
+ERROR tests/test_v051_h40_f01r3r2_commit_authority.py
+ERROR tests/test_v051_h40_f01r3r3_api_seal.py
+ERROR tests/test_v051_h40_f01r3r4_lineage_durability.py
+ERROR tests/test_v051_h40_implementation_authority_publication.py
+ERROR tests/test_v051_h40_p3_controller_authority_publication.py
+ERROR tests/test_v051_h40_p3b_production_discovery_verifier.py
+ERROR tests/test_v051_h40_p3b_production_verifier_behavior_seal.py
+ERROR tests/test_v051_h40_p3b_production_verifier_identity_seal.py
+ERROR tests/test_v051_h40_repair_a_lifecycle_authority.py
+ERROR tests/test_v051_h40_repair_b_provenance_pit.py
+!!!!!!!!!!!!!!!!!!! Interrupted: 12 errors during collection !!!!!!!!!!!!!!!!!!!
+12 errors in 1.69s
+Command exited with non-zero status 2
+	Command being timed: "pytest -q"
+	User time (seconds): 3.49
+	System time (seconds): 0.45
+	Percent of CPU this job got: 145%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 0:02.71
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 115376
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 127
+	Minor (reclaiming a frame) page faults: 30720
+	Voluntary context switches: 930
+	Involuntary context switches: 39
+	Swaps: 0
+	File system inputs: 61656
+	File system outputs: 4584
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 2

@@ -1,0 +1,11 @@
+import json
+import sys
+import btc_quant_agent
+import btc_quant_agent.h40.discovery_producer as producer
+import pytest
+
+PROVENANCE={'executable':sys.executable,'package':btc_quant_agent.__file__,
+            'producer':producer.__file__,'pytest':pytest.__file__}
+
+def pytest_sessionstart(session):
+    print('DIRECT_PYTEST_CLI_PROVENANCE='+json.dumps(PROVENANCE,sort_keys=True))

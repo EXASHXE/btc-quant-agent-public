@@ -1,0 +1,12 @@
+import json
+import platform
+import sys
+import btc_quant_agent
+import btc_quant_agent.h40.discovery_producer as producer
+import pytest
+import numpy
+import pyarrow
+print(json.dumps({'executable':sys.executable,'package':btc_quant_agent.__file__,
+                  'producer':producer.__file__,'python':sys.version,'pytest':pytest.__version__,
+                  'numpy':numpy.__version__,'pyarrow':pyarrow.__version__,
+                  'platform':platform.platform()},indent=2,sort_keys=True))

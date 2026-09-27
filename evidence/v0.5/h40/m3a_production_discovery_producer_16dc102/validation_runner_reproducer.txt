@@ -1,0 +1,39 @@
+import hashlib
+import json
+import os
+import shlex
+import subprocess
+import sys
+import time
+from datetime import datetime, timezone
+from pathlib import Path
+
+label, expected_sha, *command = sys.argv[1:]
+root = Path.cwd()
+sha = subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip()
+if sha != expected_sha:
+    raise SystemExit('EXACT_TESTED_SHA_MISMATCH')
+output_root = Path('/tmp/h40-m3a-validation')
+output_root.mkdir(exist_ok=True)
+started = datetime.now(timezone.utc).isoformat()
+start = time.monotonic()
+environment = dict(os.environ)
+environment['PATH'] = str(root / '.venv' / 'bin') + os.pathsep + environment['PATH']
+result = subprocess.run(command, cwd=root, env=environment, stdout=subprocess.PIPE,
+                        stderr=subprocess.STDOUT, text=True, check=False)
+elapsed = time.monotonic() - start
+header = '\n'.join((f'command: {shlex.join(command)}', f'cwd: {root}', f'tested_sha: {sha}',
+                    f'timestamp_utc: {started}', f'exit_code: {result.returncode}',
+                    f'wall_seconds: {elapsed:.3f}', '')) + '\n'
+log = output_root / f'{label}.txt'
+log.write_text(header + result.stdout if result.stdout else header.rstrip('\n') + '\n')
+summary = next((line for line in reversed(result.stdout.splitlines())
+                if 'passed' in line or 'collected' in line or 'Success:' in line or 'All checks passed' in line), '')
+record = {'command': shlex.join(command), 'cwd': str(root), 'tested_sha': sha,
+          'timestamp_utc': started, 'exit_code': result.returncode, 'wall_seconds': elapsed,
+          'summary': summary, 'log': log.name, 'sha256': hashlib.sha256(log.read_bytes()).hexdigest()}
+(output_root / f'{label}.metadata.json').write_text(json.dumps(record, indent=2, sort_keys=True) + '\n')
+print(json.dumps(record, sort_keys=True))
+if result.returncode:
+    print('\n'.join(result.stdout.splitlines()[-50:]))
+raise SystemExit(result.returncode)

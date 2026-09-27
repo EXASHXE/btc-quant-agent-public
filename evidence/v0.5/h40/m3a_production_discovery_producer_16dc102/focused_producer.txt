@@ -1,0 +1,20 @@
+command: .venv/bin/python -m pytest -q tests/test_v051_h40_m3a_production_discovery_producer.py --durations=10
+cwd: /root/workspace/project/Quant-agent-sanitized
+tested_sha: 16dc10213cd5b5fb3ff14e939db44a50d6d19fe2
+timestamp_utc: 2026-09-27T10:37:35.701225+00:00
+exit_code: 0
+wall_seconds: 266.290
+
+..........................                                               [100%]
+============================= slowest 10 durations =============================
+47.41s call     tests/test_v051_h40_m3a_production_discovery_producer.py::test_p01_p19_complete_producer_verifier_roundtrip
+39.22s call     tests/test_v051_h40_m3a_production_discovery_producer.py::test_p14_p20_fresh_roots_and_fresh_scientific_state_deterministic
+30.61s call     tests/test_v051_h40_m3a_production_discovery_producer.py::test_p21_new_synthetic_source_changes_digest_graph
+26.25s call     tests/test_v051_h40_m3a_production_discovery_producer.py::test_missing_extra_duplicate_candidates_and_dependencies
+18.51s call     tests/test_v051_h40_m3a_production_discovery_producer.py::test_optimized_interpreter_publishes_final_evidence
+17.97s call     tests/test_v051_h40_m3a_production_discovery_producer.py::test_p09_through_p18_exact_scientific_graph
+10.45s call     tests/test_v051_h40_m3a_production_discovery_producer.py::test_p22_no_lifecycle_or_execution_side_effect
+6.14s setup    tests/test_v051_h40_m3a_production_discovery_producer.py::test_p01_p19_complete_producer_verifier_roundtrip
+6.05s setup    tests/test_v051_h40_m3a_production_discovery_producer.py::test_p06_p07_authority_type_and_version_fences
+5.85s setup    tests/test_v051_h40_m3a_production_discovery_producer.py::test_p08_all_receipt_run_bindings
+26 passed in 265.40s (0:04:25)

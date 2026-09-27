@@ -1,0 +1,33 @@
+import json
+from btc_quant_agent.h40 import lifecycle_authority as lc
+from btc_quant_agent.h40.search_space import materialize_h40_search_space_production
+from btc_quant_agent.execution.environment import CURRENT_EXECUTION_POLICY, ACCEPTED_EXECUTION_WRITE_AUTHORITY
+
+identities = {
+    'protocol_authority_hash': lc.compute_protocol_authority_hash(),
+    'scientific_semantic_root': lc.compute_semantic_root_hash(),
+    'structural_ledger_hash': materialize_h40_search_space_production().structural_ledger_hash,
+    'lifecycle_semantic_root': lc.compute_lifecycle_semantic_root_hash(),
+    'lifecycle_governance_authority': lc.compute_lifecycle_governance_authority_hash(),
+    'implementation_authority_hash': lc.ACCEPTED_LIFECYCLE_IMPLEMENTATION_AUTHORITY_HASH,
+    'p3_controller_authority_hash': lc.ACCEPTED_H40_P3_CONTROLLER_AUTHORITY_HASH,
+    'discovery_provenance_contract_hash': lc.DISCOVERY_PROVENANCE_CONTRACT_HASH,
+    'discovery_selection_correction_contract_hash': lc.DISCOVERY_SELECTION_CORRECTION_CONTRACT_HASH,
+}
+expected = {
+    'protocol_authority_hash': 'a83f8fc7a5ca7109fb8cd7fed114d87c3b2c968b5145c11cada203aa5111d1ce',
+    'scientific_semantic_root': '71889a35f227ed734272b712851174a69bf9dbb12ea3f87cd84c26e7c66f6af1',
+    'structural_ledger_hash': '483f68502b57972deae071c7bd4587ca3e57ccaa72bd99fb0de07b4f0ab8c85f',
+    'lifecycle_semantic_root': '36cbda530352cffaa475bd835b3b629df47351ca284e09bdf31a8fc884d48b4b',
+    'lifecycle_governance_authority': 'bb367f2af726be105bddf42636c97652402014c8a671d43ab81b1964c258e5cf',
+    'implementation_authority_hash': '088b1210c17171141e232219345fa890e182282445fd9b2a70804b177d808b96',
+    'p3_controller_authority_hash': '37b6ea92ff61b90c07f38cadea58087a8dc91c67d3beabe34dc7792988ff3e3a',
+    'discovery_provenance_contract_hash': '31fc3930e44149e6b3af54ddd3b11c630f95cbbd3f152b3d0d5e614690dcf7ae',
+    'discovery_selection_correction_contract_hash': 'f84c97050c7db813263e5ffda6b1c556af0b7b0e2876bb8616640d2c9d67084b',
+}
+if identities != expected:
+    raise RuntimeError('H40_FROZEN_IDENTITY_DRIFT')
+if CURRENT_EXECUTION_POLICY != 'RESEARCH_DISABLED_V1' or ACCEPTED_EXECUTION_WRITE_AUTHORITY is not None:
+    raise RuntimeError('EXECUTION_AUTHORITY_DRIFT')
+print(json.dumps({'frozen_identities': identities, 'CURRENT_EXECUTION_POLICY': CURRENT_EXECUTION_POLICY,
+                  'ACCEPTED_EXECUTION_WRITE_AUTHORITY': ACCEPTED_EXECUTION_WRITE_AUTHORITY}, indent=2, sort_keys=True))

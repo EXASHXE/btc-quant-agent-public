@@ -1,0 +1,12 @@
+command: env PYTHONPATH=tests:src .venv/bin/python /tmp/h40_m3a_helper_equivalence.py
+cwd: /root/workspace/project/Quant-agent-sanitized
+tested_sha: 16dc10213cd5b5fb3ff14e939db44a50d6d19fe2
+timestamp_utc: 2026-09-27T10:39:56.658674+00:00
+exit_code: 0
+wall_seconds: 24.164
+
+reviewed_reference_sha: cccfddf63b25318ac42eb05935ce3f5835347c56
+exact_decisions_equal: 9504
+scientific_projection_sha256: d5a962cd9c9556b573a890b6af8cbeb09d7201187511f477d727c8670bf0b2e0
+exact_geometry_cells_equal: 42
+geometry_projection_sha256: 27b23da5a3a6f59aecbd392c976793a138aff448395278b21746315de7fe6b92

@@ -1,0 +1,8 @@
+command: mypy src
+cwd: /root/workspace/project/Quant-agent-sanitized
+tested_sha: 16dc10213cd5b5fb3ff14e939db44a50d6d19fe2
+timestamp_utc: 2026-09-27T10:53:32.362114+00:00
+exit_code: 0
+wall_seconds: 0.666
+
+Success: no issues found in 99 source files

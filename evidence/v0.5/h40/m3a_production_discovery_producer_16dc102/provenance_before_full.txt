@@ -1,0 +1,17 @@
+command: .venv/bin/python /tmp/h40_m3a_provenance.py
+cwd: /root/workspace/project/Quant-agent-sanitized
+tested_sha: 16dc10213cd5b5fb3ff14e939db44a50d6d19fe2
+timestamp_utc: 2026-09-27T10:45:15.621999+00:00
+exit_code: 0
+wall_seconds: 0.376
+
+{
+  "executable": "/root/workspace/project/Quant-agent-sanitized/.venv/bin/python",
+  "numpy": "2.5.2",
+  "package": "/root/workspace/project/Quant-agent-sanitized/src/btc_quant_agent/__init__.py",
+  "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+  "producer": "/root/workspace/project/Quant-agent-sanitized/src/btc_quant_agent/h40/discovery_producer.py",
+  "pyarrow": "23.0.1",
+  "pytest": "8.4.2",
+  "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]"
+}

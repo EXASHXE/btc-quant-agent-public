@@ -1,0 +1,16 @@
+import json
+import sys
+from pathlib import Path
+
+changes=[]
+for name in ('pytest','mypy'):
+    path=Path('.venv/bin')/name
+    lines=path.read_text().splitlines(keepends=True)
+    old=lines[0].strip()
+    new='#!'+sys.executable
+    if old != '#!/root/workspace/project/Quant-agent/.venv/bin/python':
+        raise RuntimeError('UNEXPECTED_CONSOLE_LAUNCHER: '+name)
+    lines[0]=new+'\n'
+    path.write_text(''.join(lines))
+    changes.append({'launcher':str(path),'old_shebang':old,'new_shebang':new})
+print(json.dumps({'ignored_local_environment_only':True,'changes':changes},indent=2,sort_keys=True))

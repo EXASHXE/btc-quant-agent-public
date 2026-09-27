@@ -1,0 +1,22 @@
+command: .venv/bin/python /tmp/h40_m3a_fix_launchers.py
+cwd: /root/workspace/project/Quant-agent-sanitized
+tested_sha: 16dc10213cd5b5fb3ff14e939db44a50d6d19fe2
+timestamp_utc: 2026-09-27T10:53:30.848773+00:00
+exit_code: 0
+wall_seconds: 0.036
+
+{
+  "changes": [
+    {
+      "launcher": ".venv/bin/pytest",
+      "new_shebang": "#!/root/workspace/project/Quant-agent-sanitized/.venv/bin/python",
+      "old_shebang": "#!/root/workspace/project/Quant-agent/.venv/bin/python"
+    },
+    {
+      "launcher": ".venv/bin/mypy",
+      "new_shebang": "#!/root/workspace/project/Quant-agent-sanitized/.venv/bin/python",
+      "old_shebang": "#!/root/workspace/project/Quant-agent/.venv/bin/python"
+    }
+  ],
+  "ignored_local_environment_only": true
+}

@@ -1,0 +1,491 @@
+{
+  "changed_files": [
+    "src/btc_quant_agent/h40/__init__.py",
+    "src/btc_quant_agent/h40/discovery_evidence.py",
+    "src/btc_quant_agent/h40/discovery_producer.py",
+    "tests/test_v051_h40_m3a_production_discovery_producer.py"
+  ],
+  "coverage_map": {
+    "P01_P19": "test_p01_p19_complete_producer_verifier_roundtrip",
+    "P02_P03": "test_p02_p03_canonical_store_is_idempotent",
+    "P04": "test_p04_conflicting_noncanonical_object_rejected; test_p04_store_replaced_directory_and_duplicate_json",
+    "P05": "test_p05_unsafe_store_paths (7 cases); test_store_shard_namespace_change_cannot_publish_outside_root",
+    "P06_P07": "test_p06_p07_authority_type_and_version_fences",
+    "P08": "test_p08_all_receipt_run_bindings; test_invalid_receipt_rejected_before_cold_source_read",
+    "P09_P10_P11_P16_P17_P18": "test_p09_through_p18_exact_scientific_graph",
+    "P12_P13": "test_p12_p13_future_bars_cannot_change_causal_prefit; test_p09_through_p18_exact_scientific_graph",
+    "P14_P20": "test_p14_p20_fresh_roots_and_fresh_scientific_state_deterministic",
+    "P15": "test_p15_source_byte_mutation_fails_before_publication; test_p15_economic_digest_cannot_be_claimed",
+    "P21": "test_p21_new_synthetic_source_changes_digest_graph",
+    "P22": "test_p22_no_lifecycle_or_execution_side_effect",
+    "additional_adversarial": "test_missing_extra_duplicate_candidates_and_dependencies; test_source_symlink_rejected_before_cold_read; test_writer_rename_failure_cleans_unpublished_temp; test_optimized_interpreter_publishes_final_evidence"
+  },
+  "determinism": {
+    "canonical_source_authority_fixed": true,
+    "equalities": [
+      "Discovery evidence hash",
+      "correction hash",
+      "candidate result hashes",
+      "train/calibration decision hashes",
+      "metric/bootstrap hashes",
+      "complete dependency digest set"
+    ],
+    "fresh_process_test_runs": 2,
+    "scientific_caches_cleared_between_productions": true,
+    "separate_evidence_roots_per_run": 2
+  },
+  "diagnostic_results": {
+    "full_suite_wrong_launcher_diagnostic": {
+      "command": "/usr/bin/time -v pytest -q",
+      "cwd": "/root/workspace/project/Quant-agent-sanitized",
+      "evidence_role": "DIAGNOSTIC_ONLY_WRONG_IMPORT_PROVENANCE",
+      "exit_code": 2,
+      "log": "full_suite_wrong_launcher_diagnostic.txt",
+      "sha256": "e75031040ab99172dc8d985490fec8fb9b610fc40a7a8376c0251f718cc3aa40",
+      "summary": "",
+      "tested_sha": "16dc10213cd5b5fb3ff14e939db44a50d6d19fe2",
+      "timestamp_utc": "2026-09-27T10:45:16.204026+00:00",
+      "wall_seconds": 2.7141257010007394
+    }
+  },
+  "formal_final_state": "M3A_PRODUCTION_DISCOVERY_EVIDENCE_PRODUCER_ACCEPTANCE_PENDING_CONTROLLER",
+  "frozen_identities": {
+    "discovery_provenance_contract_hash": "31fc3930e44149e6b3af54ddd3b11c630f95cbbd3f152b3d0d5e614690dcf7ae",
+    "discovery_selection_correction_contract_hash": "f84c97050c7db813263e5ffda6b1c556af0b7b0e2876bb8616640d2c9d67084b",
+    "implementation_authority_hash": "088b1210c17171141e232219345fa890e182282445fd9b2a70804b177d808b96",
+    "lifecycle_governance_authority": "bb367f2af726be105bddf42636c97652402014c8a671d43ab81b1964c258e5cf",
+    "lifecycle_semantic_root": "36cbda530352cffaa475bd835b3b629df47351ca284e09bdf31a8fc884d48b4b",
+    "p3_controller_authority_hash": "37b6ea92ff61b90c07f38cadea58087a8dc91c67d3beabe34dc7792988ff3e3a",
+    "protocol_authority_hash": "a83f8fc7a5ca7109fb8cd7fed114d87c3b2c968b5145c11cada203aa5111d1ce",
+    "scientific_semantic_root": "71889a35f227ed734272b712851174a69bf9dbb12ea3f87cd84c26e7c66f6af1",
+    "structural_ledger_hash": "483f68502b57972deae071c7bd4587ca3e57ccaa72bd99fb0de07b4f0ab8c85f"
+  },
+  "full_suite_resource_measurements": {
+    "cpu_percent": 93,
+    "max_rss_kib": 272356,
+    "pytest_reported_seconds": 725.67,
+    "runner_monotonic_seconds": 727.5900915890015,
+    "system_cpu_seconds": 36.73,
+    "timing_limitation": "Runner monotonic and /usr/bin/time elapsed clocks disagree by 67.82 seconds; cause unproven. No performance acceptance is claimed.",
+    "user_cpu_seconds": 710.75,
+    "usr_bin_time_elapsed_seconds": 795.41
+  },
+  "generated_at_utc": "2026-09-27T11:22:54.855053Z",
+  "helper_extraction_equivalence": {
+    "exact_decision_rows": 9504,
+    "exact_geometry_cells": 42,
+    "geometry_projection_sha256": "27b23da5a3a6f59aecbd392c976793a138aff448395278b21746315de7fe6b92",
+    "reference_sha": "cccfddf63b25318ac42eb05935ce3f5835347c56",
+    "scientific_projection_sha256": "d5a962cd9c9556b573a890b6af8cbeb09d7201187511f477d727c8670bf0b2e0"
+  },
+  "implementation_authority_published": false,
+  "import_provenance": {
+    "executable": "/root/workspace/project/Quant-agent-sanitized/.venv/bin/python",
+    "numpy": "2.5.2",
+    "package": "/root/workspace/project/Quant-agent-sanitized/src/btc_quant_agent/__init__.py",
+    "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+    "producer": "/root/workspace/project/Quant-agent-sanitized/src/btc_quant_agent/h40/discovery_producer.py",
+    "pyarrow": "23.0.1",
+    "pytest": "8.4.2",
+    "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]"
+  },
+  "parent_commit_sha": "cccfddf63b25318ac42eb05935ce3f5835347c56",
+  "producer_collection_cases": 26,
+  "producer_public_api": "H40ProductionDiscoveryEvidenceProducer.produce()",
+  "protected_surface_attestation": {
+    "accepted_execution_write_authority": null,
+    "candidate_lock_created": false,
+    "confirmation_accessed": false,
+    "execution_policy": "RESEARCH_DISABLED_V1",
+    "final_holdout_accessed": false,
+    "h39_accessed": false,
+    "real_discovery_authorization_receipt_created": false,
+    "real_discovery_result_generated": false,
+    "real_h40_outcomes_accessed": false,
+    "signed_network_requests": 0,
+    "wf1_calibration_outcomes_accessed": false
+  },
+  "raw_log_sha256": {
+    "evidence/v0.5/h40/m3a_production_discovery_producer_16dc102/cli_provenance.txt": "f01bad9a686adeeb11585e59a5aa5a3153dd67fb8300b961f777694dc1782ab2",
+    "evidence/v0.5/h40/m3a_production_discovery_producer_16dc102/collect_full.txt": "0474da37a89905660241dbb7530a101b4ba4a73de2b5efb4dc4a2c5bad170ce5",
+    "evidence/v0.5/h40/m3a_production_discovery_producer_16dc102/collect_producer.txt": "907fd95ac2f257c0a86aba23bd1e8fd456890c215a1f071505b7d4cb83b1a027",
+    "evidence/v0.5/h40/m3a_production_discovery_producer_16dc102/compileall.txt": "8a4814bfb709b2eea692b2763a838a2f9dc9ec0bf883e8fb9310d92784f4e256",
+    "evidence/v0.5/h40/m3a_production_discovery_producer_16dc102/determinism_run_1.txt": "7415de931da9f49579c80f1db395551a67eeb76a4d426f1a8ca2cb53b4216c3b",
+    "evidence/v0.5/h40/m3a_production_discovery_producer_16dc102/determinism_run_2.txt": "4352bd92d570b522a4720989cee74fdf954c578bb72da82fe1b190c10ed3d7e2",
+    "evidence/v0.5/h40/m3a_production_discovery_producer_16dc102/diff_check.txt": "9013edb998916cc14272b0b37faf4e2c5e6876e154456ff3ed31078403408b32",
+    "evidence/v0.5/h40/m3a_production_discovery_producer_16dc102/execution_fences.txt": "3d8b7c8864b42319b7a54854e70db07b2fa28f5a4c60a5c4ae7c47c150648f09",
+    "evidence/v0.5/h40/m3a_production_discovery_producer_16dc102/focused_lifecycle.txt": "031f6ba54ef2901724fae8578806ddddefd459d1773240fb4310e29283c310e8",
+    "evidence/v0.5/h40/m3a_production_discovery_producer_16dc102/focused_producer.txt": "fc8b3624d8c693260618a9da1bbe9bc90f51aa41e510556ac797f19591e51c45",
+    "evidence/v0.5/h40/m3a_production_discovery_producer_16dc102/focused_verifier.txt": "021bdaea44fc3e4a8b92ad9e0a2668cc7bf34cde1b8f76a5930433c9b127855b",
+    "evidence/v0.5/h40/m3a_production_discovery_producer_16dc102/frozen_identities.txt": "74efc288daa53ed2f9279678dbde57cbb68a9c4dc7e39d42c38234f33bce9d1e",
+    "evidence/v0.5/h40/m3a_production_discovery_producer_16dc102/full_suite.txt": "f1ef94bbcd0334f677a53646aa3937859e75b04ae1db49781f6e16c24b65515c",
+    "evidence/v0.5/h40/m3a_production_discovery_producer_16dc102/full_suite_wrong_launcher_diagnostic.txt": "e75031040ab99172dc8d985490fec8fb9b610fc40a7a8376c0251f718cc3aa40",
+    "evidence/v0.5/h40/m3a_production_discovery_producer_16dc102/helper_equivalence.txt": "125b511417cfc9648e63a8b8bbd351ac250d13667e758cdab726377d6ab8b073",
+    "evidence/v0.5/h40/m3a_production_discovery_producer_16dc102/launcher_repair.txt": "c6cc438b7c2ff891ff895205790bfe5fecf9184639de21fc411a83c4a1204187",
+    "evidence/v0.5/h40/m3a_production_discovery_producer_16dc102/mypy.txt": "890e21be04e6ddf1a7b9187049606357d78b5dae776972ea93bbb6944ce183f2",
+    "evidence/v0.5/h40/m3a_production_discovery_producer_16dc102/provenance.txt": "3773674776cd8d3ce1a2af4be3d68aee10bf60723f51232ebc7079584da4c02e",
+    "evidence/v0.5/h40/m3a_production_discovery_producer_16dc102/provenance_before_full.txt": "09f0a47ff1d8fc71516f05a6961bb38af6cb29db3244fcc0c1b6a28c04119c9c",
+    "evidence/v0.5/h40/m3a_production_discovery_producer_16dc102/remote_ci.txt": "b6e4a152c228e9e015f10b56db2e0082bc3bd45fb673b78e878d79644faf6daf",
+    "evidence/v0.5/h40/m3a_production_discovery_producer_16dc102/remote_sha.txt": "3ab6f1c4c5c03690d26ca1737476b1de30d47dec496448caf4df39bd93c743be",
+    "evidence/v0.5/h40/m3a_production_discovery_producer_16dc102/ruff.txt": "49f6880053d39c46e1ecbecf2be2e3cf74d36eec36d5b4759b1d3d84d7aea86d"
+  },
+  "readiness_state": "H40_DISCOVERY_READY_AWAITING_EXPLICIT_GO",
+  "remote_ci": {
+    "conclusion": "success",
+    "databaseId": 36314798623,
+    "headSha": "16dc10213cd5b5fb3ff14e939db44a50d6d19fe2",
+    "jobs": [
+      {
+        "completedAt": "2026-09-27T11:20:51Z",
+        "conclusion": "success",
+        "databaseId": 108607364724,
+        "name": "quality (3.13)",
+        "startedAt": "2026-09-27T11:09:05Z",
+        "status": "completed",
+        "steps": [
+          {
+            "conclusion": "success",
+            "name": "Set up job",
+            "number": 1,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run actions/checkout@v4",
+            "number": 2,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run actions/setup-python@v5",
+            "number": 3,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run python -m pip install -e '.[dev,research]'",
+            "number": 4,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run ruff check .",
+            "number": 5,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run mypy",
+            "number": 6,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Full test suite",
+            "number": 7,
+            "status": "completed"
+          },
+          {
+            "conclusion": "skipped",
+            "name": "Full test suite with coverage",
+            "number": 8,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run python -m compileall -q src skill-template/scripts",
+            "number": 9,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Post Run actions/setup-python@v5",
+            "number": 17,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Post Run actions/checkout@v4",
+            "number": 18,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Complete job",
+            "number": 19,
+            "status": "completed"
+          }
+        ],
+        "url": "https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/36314798623/job/108607364724"
+      },
+      {
+        "completedAt": "2026-09-27T11:09:02Z",
+        "conclusion": "skipped",
+        "databaseId": 108607365246,
+        "name": "compatibility (${{ matrix.python-version }})",
+        "startedAt": "2026-09-27T11:09:02Z",
+        "status": "completed",
+        "steps": [],
+        "url": "https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/36314798623/job/108607365246"
+      }
+    ],
+    "status": "completed",
+    "url": "https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/36314798623"
+  },
+  "remote_implementation_sha": "16dc10213cd5b5fb3ff14e939db44a50d6d19fe2",
+  "reproducer_sha256": {
+    "evidence/v0.5/h40/m3a_production_discovery_producer_16dc102/helper_equivalence_reproducer.txt": "84de924ba6ca7ec2c5713957b6e4949ce9d163086aeb57abb5288e9671bc4a93",
+    "evidence/v0.5/h40/m3a_production_discovery_producer_16dc102/invariants_reproducer.txt": "d44373ad4539d41d4382177753686814dd951df8b6de1633e4f57dfb117983ea",
+    "evidence/v0.5/h40/m3a_production_discovery_producer_16dc102/launcher_repair_reproducer.txt": "9787a05c43f3089278a3368d4c83297bb5a7a08708d03635526689b63ffe06de",
+    "evidence/v0.5/h40/m3a_production_discovery_producer_16dc102/prov_plugin_reproducer.txt": "ea1587d94339b0c4d5a6f5d793f1c6330b38d71195b6e9505f79c1824d819b00",
+    "evidence/v0.5/h40/m3a_production_discovery_producer_16dc102/provenance_reproducer.txt": "651f760494b5b8091e0ef3a6d92cedfc82e36546a87e6eed3a67f9c3f4aac535",
+    "evidence/v0.5/h40/m3a_production_discovery_producer_16dc102/validation_runner_reproducer.txt": "1c6e4c176faba7b7d606da2e2f4f32255736a4558d6c21d74f504f7e14eda8e8"
+  },
+  "requirements_covered": "P01-P22",
+  "schema_id": "H40_M3A_PRODUCTION_DISCOVERY_EVIDENCE_PRODUCER_LOCAL_EVIDENCE_V1",
+  "schemas": {
+    "candidate_result": "H40_P3B_CANDIDATE_RESULT_INPUT_V1",
+    "correction_manifest": "H40_P3B_DISCOVERY_CORRECTION_MANIFEST_V1",
+    "discovery_result": "H40_DISCOVERY_RESULT_EVIDENCE_V1",
+    "hard_gate": "H40_P3B_HARD_GATE_INPUT_V1",
+    "invalid_metric": "H40_P3B_INVALID_METRIC_INPUT_V1",
+    "raw_decisions": "H40_P3B_RAW_DECISIONS_V2",
+    "source_derivation": "H40_P3B_SOURCE_DERIVATION_V2",
+    "valid_metric": "H40_P3B_METRIC_BOOTSTRAP_V1"
+  },
+  "synthetic_roundtrip_candidates": 18,
+  "tested_implementation_sha": "16dc10213cd5b5fb3ff14e939db44a50d6d19fe2",
+  "validation_results": {
+    "cli_provenance": {
+      "command": "env PYTHONPATH=/tmp pytest -p h40_m3a_prov_plugin -s --collect-only -q tests/test_v051_h40_m3a_production_discovery_producer.py",
+      "cwd": "/root/workspace/project/Quant-agent-sanitized",
+      "exit_code": 0,
+      "log": "cli_provenance.txt",
+      "sha256": "f01bad9a686adeeb11585e59a5aa5a3153dd67fb8300b961f777694dc1782ab2",
+      "summary": "26 tests collected in 0.03s",
+      "tested_sha": "16dc10213cd5b5fb3ff14e939db44a50d6d19fe2",
+      "timestamp_utc": "2026-09-27T10:54:38.356598+00:00",
+      "wall_seconds": 0.7048792920031701
+    },
+    "collect_full": {
+      "command": "pytest --collect-only -q",
+      "cwd": "/root/workspace/project/Quant-agent-sanitized",
+      "exit_code": 0,
+      "log": "collect_full.txt",
+      "sha256": "0474da37a89905660241dbb7530a101b4ba4a73de2b5efb4dc4a2c5bad170ce5",
+      "summary": "1738 tests collected in 1.30s",
+      "tested_sha": "16dc10213cd5b5fb3ff14e939db44a50d6d19fe2",
+      "timestamp_utc": "2026-09-27T10:53:31.085797+00:00",
+      "wall_seconds": 2.412943710005493
+    },
+    "collect_producer": {
+      "command": ".venv/bin/python -m pytest --collect-only -q tests/test_v051_h40_m3a_production_discovery_producer.py",
+      "cwd": "/root/workspace/project/Quant-agent-sanitized",
+      "exit_code": 0,
+      "log": "collect_producer.txt",
+      "sha256": "907fd95ac2f257c0a86aba23bd1e8fd456890c215a1f071505b7d4cb83b1a027",
+      "summary": "26 tests collected in 0.12s",
+      "tested_sha": "16dc10213cd5b5fb3ff14e939db44a50d6d19fe2",
+      "timestamp_utc": "2026-09-27T10:38:38.403231+00:00",
+      "wall_seconds": 0.8517968510059291
+    },
+    "compileall": {
+      "command": "python -m compileall -q src",
+      "cwd": "/root/workspace/project/Quant-agent-sanitized",
+      "exit_code": 0,
+      "log": "compileall.txt",
+      "sha256": "8a4814bfb709b2eea692b2763a838a2f9dc9ec0bf883e8fb9310d92784f4e256",
+      "summary": "",
+      "tested_sha": "16dc10213cd5b5fb3ff14e939db44a50d6d19fe2",
+      "timestamp_utc": "2026-09-27T10:38:37.758925+00:00",
+      "wall_seconds": 0.08480666900140932
+    },
+    "determinism_run_1": {
+      "command": ".venv/bin/python -m pytest -q tests/test_v051_h40_m3a_production_discovery_producer.py -k fresh_roots --durations=0",
+      "cwd": "/root/workspace/project/Quant-agent-sanitized",
+      "exit_code": 0,
+      "log": "determinism_run_1.txt",
+      "sha256": "7415de931da9f49579c80f1db395551a67eeb76a4d426f1a8ca2cb53b4216c3b",
+      "summary": "1 passed, 25 deselected in 41.55s",
+      "tested_sha": "16dc10213cd5b5fb3ff14e939db44a50d6d19fe2",
+      "timestamp_utc": "2026-09-27T10:42:53.386996+00:00",
+      "wall_seconds": 42.80618083399895
+    },
+    "determinism_run_2": {
+      "command": ".venv/bin/python -m pytest -q tests/test_v051_h40_m3a_production_discovery_producer.py -k fresh_roots --durations=0",
+      "cwd": "/root/workspace/project/Quant-agent-sanitized",
+      "exit_code": 0,
+      "log": "determinism_run_2.txt",
+      "sha256": "4352bd92d570b522a4720989cee74fdf954c578bb72da82fe1b190c10ed3d7e2",
+      "summary": "1 passed, 25 deselected in 41.49s",
+      "tested_sha": "16dc10213cd5b5fb3ff14e939db44a50d6d19fe2",
+      "timestamp_utc": "2026-09-27T10:43:51.026189+00:00",
+      "wall_seconds": 45.71712036499957
+    },
+    "diff_check": {
+      "command": "git diff --check",
+      "cwd": "/root/workspace/project/Quant-agent-sanitized",
+      "exit_code": 0,
+      "log": "diff_check.txt",
+      "sha256": "9013edb998916cc14272b0b37faf4e2c5e6876e154456ff3ed31078403408b32",
+      "summary": "",
+      "tested_sha": "16dc10213cd5b5fb3ff14e939db44a50d6d19fe2",
+      "timestamp_utc": "2026-09-27T10:38:38.133691+00:00",
+      "wall_seconds": 0.008754786998906638
+    },
+    "execution_fences": {
+      "command": ".venv/bin/python -m pytest -q tests/test_execution.py tests/test_execution_environment_authority.py",
+      "cwd": "/root/workspace/project/Quant-agent-sanitized",
+      "exit_code": 0,
+      "log": "execution_fences.txt",
+      "sha256": "3d8b7c8864b42319b7a54854e70db07b2fa28f5a4c60a5c4ae7c47c150648f09",
+      "summary": "41 passed in 2.44s",
+      "tested_sha": "16dc10213cd5b5fb3ff14e939db44a50d6d19fe2",
+      "timestamp_utc": "2026-09-27T10:39:55.471537+00:00",
+      "wall_seconds": 3.0645992440040573
+    },
+    "focused_lifecycle": {
+      "command": ".venv/bin/python -m pytest -q tests/test_v051_h40_f01_lifecycle_authority.py tests/test_v051_h40_f01r3r1_durable_authority.py tests/test_v051_h40_f01r3r2_commit_authority.py tests/test_v051_h40_f01r3r3_api_seal.py tests/test_v051_h40_f01r3r4_lineage_durability.py tests/test_v051_h40_implementation_authority_publication.py tests/test_v051_h40_p3_controller_authority_publication.py --durations=10",
+      "cwd": "/root/workspace/project/Quant-agent-sanitized",
+      "exit_code": 0,
+      "log": "focused_lifecycle.txt",
+      "sha256": "031f6ba54ef2901724fae8578806ddddefd459d1773240fb4310e29283c310e8",
+      "summary": "202 passed in 124.27s (0:02:04)",
+      "tested_sha": "16dc10213cd5b5fb3ff14e939db44a50d6d19fe2",
+      "timestamp_utc": "2026-09-27T10:37:38.059647+00:00",
+      "wall_seconds": 125.07406413499848
+    },
+    "focused_producer": {
+      "command": ".venv/bin/python -m pytest -q tests/test_v051_h40_m3a_production_discovery_producer.py --durations=10",
+      "cwd": "/root/workspace/project/Quant-agent-sanitized",
+      "exit_code": 0,
+      "log": "focused_producer.txt",
+      "sha256": "fc8b3624d8c693260618a9da1bbe9bc90f51aa41e510556ac797f19591e51c45",
+      "summary": "26 passed in 265.40s (0:04:25)",
+      "tested_sha": "16dc10213cd5b5fb3ff14e939db44a50d6d19fe2",
+      "timestamp_utc": "2026-09-27T10:37:35.701225+00:00",
+      "wall_seconds": 266.2904253550005
+    },
+    "focused_verifier": {
+      "command": ".venv/bin/python -m pytest -q tests/test_v051_h40_p3b_production_discovery_verifier.py tests/test_v051_h40_p3b_production_verifier_identity_seal.py tests/test_v051_h40_p3b_production_verifier_behavior_seal.py tests/test_v051_h40_repair_b_provenance_pit.py --durations=10",
+      "cwd": "/root/workspace/project/Quant-agent-sanitized",
+      "exit_code": 0,
+      "log": "focused_verifier.txt",
+      "sha256": "021bdaea44fc3e4a8b92ad9e0a2668cc7bf34cde1b8f76a5930433c9b127855b",
+      "summary": "171 passed in 104.14s (0:01:44)",
+      "tested_sha": "16dc10213cd5b5fb3ff14e939db44a50d6d19fe2",
+      "timestamp_utc": "2026-09-27T10:37:36.868026+00:00",
+      "wall_seconds": 105.44090113900165
+    },
+    "frozen_identities": {
+      "command": ".venv/bin/python /tmp/h40_m3a_invariants.py",
+      "cwd": "/root/workspace/project/Quant-agent-sanitized",
+      "exit_code": 0,
+      "log": "frozen_identities.txt",
+      "sha256": "74efc288daa53ed2f9279678dbde57cbb68a9c4dc7e39d42c38234f33bce9d1e",
+      "summary": "",
+      "tested_sha": "16dc10213cd5b5fb3ff14e939db44a50d6d19fe2",
+      "timestamp_utc": "2026-09-27T10:39:54.268413+00:00",
+      "wall_seconds": 0.44061612200312084
+    },
+    "full_suite": {
+      "command": "/usr/bin/time -v pytest -q",
+      "cwd": "/root/workspace/project/Quant-agent-sanitized",
+      "exit_code": 0,
+      "log": "full_suite.txt",
+      "sha256": "f1ef94bbcd0334f677a53646aa3937859e75b04ae1db49781f6e16c24b65515c",
+      "summary": "1738 passed, 8 warnings in 725.67s (0:12:05)",
+      "tested_sha": "16dc10213cd5b5fb3ff14e939db44a50d6d19fe2",
+      "timestamp_utc": "2026-09-27T10:54:45.921168+00:00",
+      "wall_seconds": 727.5900915890015
+    },
+    "helper_equivalence": {
+      "command": "env PYTHONPATH=tests:src .venv/bin/python /tmp/h40_m3a_helper_equivalence.py",
+      "cwd": "/root/workspace/project/Quant-agent-sanitized",
+      "exit_code": 0,
+      "log": "helper_equivalence.txt",
+      "sha256": "125b511417cfc9648e63a8b8bbd351ac250d13667e758cdab726377d6ab8b073",
+      "summary": "",
+      "tested_sha": "16dc10213cd5b5fb3ff14e939db44a50d6d19fe2",
+      "timestamp_utc": "2026-09-27T10:39:56.658674+00:00",
+      "wall_seconds": 24.164082554001652
+    },
+    "launcher_repair": {
+      "command": ".venv/bin/python /tmp/h40_m3a_fix_launchers.py",
+      "cwd": "/root/workspace/project/Quant-agent-sanitized",
+      "exit_code": 0,
+      "log": "launcher_repair.txt",
+      "sha256": "c6cc438b7c2ff891ff895205790bfe5fecf9184639de21fc411a83c4a1204187",
+      "summary": "",
+      "tested_sha": "16dc10213cd5b5fb3ff14e939db44a50d6d19fe2",
+      "timestamp_utc": "2026-09-27T10:53:30.848773+00:00",
+      "wall_seconds": 0.03567698800179642
+    },
+    "mypy": {
+      "command": "mypy src",
+      "cwd": "/root/workspace/project/Quant-agent-sanitized",
+      "exit_code": 0,
+      "log": "mypy.txt",
+      "sha256": "890e21be04e6ddf1a7b9187049606357d78b5dae776972ea93bbb6944ce183f2",
+      "summary": "Success: no issues found in 99 source files",
+      "tested_sha": "16dc10213cd5b5fb3ff14e939db44a50d6d19fe2",
+      "timestamp_utc": "2026-09-27T10:53:32.362114+00:00",
+      "wall_seconds": 0.6662945049974951
+    },
+    "provenance": {
+      "command": ".venv/bin/python /tmp/h40_m3a_provenance.py",
+      "cwd": "/root/workspace/project/Quant-agent-sanitized",
+      "exit_code": 0,
+      "log": "provenance.txt",
+      "sha256": "3773674776cd8d3ce1a2af4be3d68aee10bf60723f51232ebc7079584da4c02e",
+      "summary": "",
+      "tested_sha": "16dc10213cd5b5fb3ff14e939db44a50d6d19fe2",
+      "timestamp_utc": "2026-09-27T10:39:54.901033+00:00",
+      "wall_seconds": 0.3702899360068841
+    },
+    "provenance_before_full": {
+      "command": ".venv/bin/python /tmp/h40_m3a_provenance.py",
+      "cwd": "/root/workspace/project/Quant-agent-sanitized",
+      "exit_code": 0,
+      "log": "provenance_before_full.txt",
+      "sha256": "09f0a47ff1d8fc71516f05a6961bb38af6cb29db3244fcc0c1b6a28c04119c9c",
+      "summary": "",
+      "tested_sha": "16dc10213cd5b5fb3ff14e939db44a50d6d19fe2",
+      "timestamp_utc": "2026-09-27T10:45:15.621999+00:00",
+      "wall_seconds": 0.3762976539946976
+    },
+    "remote_ci": {
+      "command": "gh run view 36314798623 --repo EXASHXE/btc-quant-agent-public --json databaseId,headSha,status,conclusion,jobs,url",
+      "cwd": "/root/workspace/project/Quant-agent-sanitized",
+      "exit_code": 0,
+      "log": "remote_ci.txt",
+      "sha256": "b6e4a152c228e9e015f10b56db2e0082bc3bd45fb673b78e878d79644faf6daf",
+      "summary": "",
+      "tested_sha": "16dc10213cd5b5fb3ff14e939db44a50d6d19fe2",
+      "timestamp_utc": "2026-09-27T11:21:54.572034+00:00",
+      "wall_seconds": 1.7481875299999956
+    },
+    "remote_sha": {
+      "command": "git ls-remote origin refs/heads/v0.5-refactor",
+      "cwd": "/root/workspace/project/Quant-agent-sanitized",
+      "exit_code": 0,
+      "log": "remote_sha.txt",
+      "sha256": "3ab6f1c4c5c03690d26ca1737476b1de30d47dec496448caf4df39bd93c743be",
+      "summary": "",
+      "tested_sha": "16dc10213cd5b5fb3ff14e939db44a50d6d19fe2",
+      "timestamp_utc": "2026-09-27T11:10:26.849254+00:00",
+      "wall_seconds": 0.8969010059954599
+    },
+    "ruff": {
+      "command": "ruff check .",
+      "cwd": "/root/workspace/project/Quant-agent-sanitized",
+      "exit_code": 0,
+      "log": "ruff.txt",
+      "sha256": "49f6880053d39c46e1ecbecf2be2e3cf74d36eec36d5b4759b1d3d84d7aea86d",
+      "summary": "All checks passed!",
+      "tested_sha": "16dc10213cd5b5fb3ff14e939db44a50d6d19fe2",
+      "timestamp_utc": "2026-09-27T10:38:36.840609+00:00",
+      "wall_seconds": 0.02552031900268048
+    }
+  }
+}

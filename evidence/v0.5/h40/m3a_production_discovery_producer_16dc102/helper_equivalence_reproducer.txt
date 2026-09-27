@@ -1,0 +1,55 @@
+import importlib.util
+import subprocess
+import sys
+from pathlib import Path
+from tempfile import TemporaryDirectory
+from dataclasses import asdict
+import pytest
+from test_v051_h40_m3a_production_discovery_producer import _synthetic_authority, _producer, _read
+from btc_quant_agent.h40 import discovery_evidence as current
+from btc_quant_agent.h40.search_space import materialize_h40_search_space_production
+from btc_quant_agent.research_contract.canonical import canonical_sha256
+
+reference = subprocess.check_output(['git','show','cccfddf63b25318ac42eb05935ce3f5835347c56:src/btc_quant_agent/h40/discovery_evidence.py'])
+with TemporaryDirectory() as temporary, pytest.MonkeyPatch.context() as mp:
+    root=Path(temporary)
+    file=root/'reference.py'; file.write_bytes(reference)
+    name='btc_quant_agent.h40._m3a_reference_science'
+    spec=importlib.util.spec_from_file_location(name,file)
+    previous=importlib.util.module_from_spec(spec)
+    sys.modules[name]=previous
+    spec.loader.exec_module(previous)
+    fixture=_synthetic_authority(root,mp)
+    output=_producer(fixture).produce()
+    source,bars,universes=_producer(fixture)._source()
+    resolver=current.H40DiscoveryEvidenceResolver(fixture.root)
+    slots={s.structural_configuration_hash:s for s in materialize_h40_search_space_production().slots}
+    total=0; projection=[]; old_candidates={}; new_candidates={}
+    for entry in output.entries:
+        result=_read(fixture.root,entry.candidate_result_input_evidence_hash)
+        rows_by_partition={}
+        for partition,field in [('WF1_TRAIN','training_evidence_hash'),('WF1_CALIBRATION','calibration_evidence_hash')]:
+            args=dict(run_authority_id=fixture.run.run_authority_id,roster_hash=fixture.seal.sealed_registered_roster_hash,
+                      candidate_id=entry.structural_configuration_hash,source_manifest_hash=fixture.seal.source_manifest_hash,
+                      split_manifest_hash=fixture.seal.split_manifest_hash,source_evidence_hash=canonical_sha256(source),
+                      partition_id=partition,products=('ETHUSDT',),horizon=int(slots[entry.structural_configuration_hash].primary_horizon.rstrip('h')),
+                      bars=bars,base_universe=frozenset(universes[partition]),slot=slots[entry.structural_configuration_hash],seal=fixture.seal)
+            old=previous._load_decisions(resolver,result[field],**args)
+            new=current._load_decisions(resolver,result[field],**args)
+            assert [asdict(r) for r in old]==[asdict(r) for r in new]
+            total+=len(old)
+            projection.append([entry.structural_configuration_hash,partition,[
+                [r.timestamp.isoformat(),r.product,r.regime_state,r.opportunity_state,r.raw_score,r.secondary_filter_state,r.r_h,r.p0,r.ch]
+                for r in old]])
+            rows_by_partition[partition]=(old,new)
+        slot=slots[entry.structural_configuration_hash]
+        old_candidates[entry.structural_configuration_hash]=previous._LoadedCandidate(entry,slot,result,rows_by_partition['WF1_TRAIN'][0],rows_by_partition['WF1_CALIBRATION'][0],True)
+        new_candidates[entry.structural_configuration_hash]=current._LoadedCandidate(entry,slot,result,rows_by_partition['WF1_TRAIN'][1],rows_by_partition['WF1_CALIBRATION'][1],True)
+    old_geometry=previous._geometry_rows(old_candidates)
+    assert old_geometry==current._geometry_rows(new_candidates)
+    geometry_projection=[[owner,[[[*key[:3],key[3].isoformat(),*key[4:]],list(value)] for key,value in sorted(records.items())]] for owner,records in sorted(old_geometry.items())]
+    print('reviewed_reference_sha: cccfddf63b25318ac42eb05935ce3f5835347c56')
+    print('exact_decisions_equal:',total)
+    print('scientific_projection_sha256:',canonical_sha256(projection))
+    print('exact_geometry_cells_equal:',sum(map(len,old_geometry.values())))
+    print('geometry_projection_sha256:',canonical_sha256(geometry_projection))
