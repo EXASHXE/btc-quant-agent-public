@@ -89,18 +89,19 @@ class MarketWatchService:
             benchmark_context = latest_asmt.get("benchmark_context", "NEUTRAL")
             try:
                 reason_codes = json.loads(latest_asmt.get("reason_codes_json", "[]"))
-            except Exception:
-                pass
+            except (json.JSONDecodeError, TypeError):
+                reason_codes = []
             try:
                 risk_codes = json.loads(latest_asmt.get("risk_codes_json", "[]"))
-            except Exception:
-                pass
+            except (json.JSONDecodeError, TypeError):
+                risk_codes = []
             try:
                 dec = json.loads(latest_asmt.get("decision_json", "{}"))
                 veto_reasons = dec.get("veto_reasons", [])
                 grid_codes = dec.get("grid", {}).get("reasons", [])
-            except Exception:
-                pass
+            except (json.JSONDecodeError, TypeError):
+                veto_reasons = []
+                grid_codes = []
 
         return {
             "symbol": symbol.upper(),

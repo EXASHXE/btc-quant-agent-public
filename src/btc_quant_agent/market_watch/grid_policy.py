@@ -130,9 +130,10 @@ def evaluate_grid_policy(
 
 def should_alert_grid_change(current: GridPlan, previous: GridPlan | None, threshold_pct: float = 2.0) -> bool:
     """Alert on meaningful grid transitions, boundary shifts >= threshold, or lower bound breaches."""
-    if "LOWER_BOUND_BREACHED" in current.reason_codes:
-        if previous is None or "LOWER_BOUND_BREACHED" not in previous.reason_codes:
-            return True
+    if "LOWER_BOUND_BREACHED" in current.reason_codes and (
+        previous is None or "LOWER_BOUND_BREACHED" not in previous.reason_codes
+    ):
+        return True
 
     if previous is None:
         return current.decision != GridDecision.PAUSE

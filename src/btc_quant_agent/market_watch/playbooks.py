@@ -218,83 +218,83 @@ def evaluate_breakout_retest(
         and prev_bo_level is not None
         and prev_bo_time is not None
         and prev_bo_dir is not None
+        and current_bar_end_ms > prev_bo_time
     ):
-        if current_bar_end_ms > prev_bo_time:
-            bars_elapsed = max(1, int((current_bar_end_ms - prev_bo_time) / (15 * 60 * 1000)))
-            if bars_elapsed <= tc.max_retest_bars:
-                retest_tol = tc.retest_atr_tolerance * atr
-                if prev_bo_dir == "LONG":
-                    level = float(prev_bo_level)
-                    retested = (closed_bar.low <= level + retest_tol) and (closed_bar.low >= level - retest_tol * 1.5)
-                    closed_above = closed_bar.close >= level
-                    if retested and closed_above and exhaustion.state != ExhaustionState.EXTREME:
-                        tp1 = tf_15m.close + 2.5 * atr
-                        tp2 = tf_15m.close + 4.0 * atr
-                        stop_loss = level - 0.3 * atr
-                        invalidation = level - retest_tol
+        bars_elapsed = max(1, int((current_bar_end_ms - prev_bo_time) / (15 * 60 * 1000)))
+        if bars_elapsed <= tc.max_retest_bars:
+            retest_tol = tc.retest_atr_tolerance * atr
+            if prev_bo_dir == "LONG":
+                level = float(prev_bo_level)
+                retested = (closed_bar.low <= level + retest_tol) and (closed_bar.low >= level - retest_tol * 1.5)
+                closed_above = closed_bar.close >= level
+                if retested and closed_above and exhaustion.state != ExhaustionState.EXTREME:
+                    tp1 = tf_15m.close + 2.5 * atr
+                    tp2 = tf_15m.close + 4.0 * atr
+                    stop_loss = level - 0.3 * atr
+                    invalidation = level - retest_tol
 
-                        reasons = [
-                            "BREAKOUT_CONFIRMED",
-                            "RETEST_CONFIRMED",
-                            "CLOSED_BAR_HOLDING_ABOVE_RESISTANCE",
-                        ]
-                        risks = []
-                        if derivatives.oi_1h_change is not None and derivatives.oi_1h_change <= 0:
-                            risks.append("BREAKOUT_LOW_PARTICIPATION")
+                    reasons = [
+                        "BREAKOUT_CONFIRMED",
+                        "RETEST_CONFIRMED",
+                        "CLOSED_BAR_HOLDING_ABOVE_RESISTANCE",
+                    ]
+                    risks = []
+                    if derivatives.oi_1h_change is not None and derivatives.oi_1h_change <= 0:
+                        risks.append("BREAKOUT_LOW_PARTICIPATION")
 
-                        return {
-                            "decision": DirectionalDecision.LONG,
-                            "setup": PlaybookType.BREAKOUT_RETEST,
-                            "breakout_state": BreakoutState.RETEST_CONFIRMED,
-                            "breakout_level": level,
-                            "breakout_direction": "LONG",
-                            "breakout_bar_end_ms": prev_bo_time,
-                            "entry_low": level,
-                            "entry_high": tf_15m.close,
-                            "stop_loss": stop_loss,
-                            "take_profit_1": tp1,
-                            "take_profit_2": tp2,
-                            "invalidation": invalidation,
-                            "confidence": ConfidenceBand.MEDIUM,
-                            "reasons": reasons,
-                            "risks": risks,
-                        }
-                elif prev_bo_dir == "SHORT":
-                    level = float(prev_bo_level)
-                    retested = (closed_bar.high >= level - retest_tol) and (closed_bar.high <= level + retest_tol * 1.5)
-                    closed_below = closed_bar.close <= level
-                    if retested and closed_below and exhaustion.state != ExhaustionState.EXTREME:
-                        tp1 = tf_15m.close - 2.5 * atr
-                        tp2 = tf_15m.close - 4.0 * atr
-                        stop_loss = level + 0.3 * atr
-                        invalidation = level + retest_tol
+                    return {
+                        "decision": DirectionalDecision.LONG,
+                        "setup": PlaybookType.BREAKOUT_RETEST,
+                        "breakout_state": BreakoutState.RETEST_CONFIRMED,
+                        "breakout_level": level,
+                        "breakout_direction": "LONG",
+                        "breakout_bar_end_ms": prev_bo_time,
+                        "entry_low": level,
+                        "entry_high": tf_15m.close,
+                        "stop_loss": stop_loss,
+                        "take_profit_1": tp1,
+                        "take_profit_2": tp2,
+                        "invalidation": invalidation,
+                        "confidence": ConfidenceBand.MEDIUM,
+                        "reasons": reasons,
+                        "risks": risks,
+                    }
+            elif prev_bo_dir == "SHORT":
+                level = float(prev_bo_level)
+                retested = (closed_bar.high >= level - retest_tol) and (closed_bar.high <= level + retest_tol * 1.5)
+                closed_below = closed_bar.close <= level
+                if retested and closed_below and exhaustion.state != ExhaustionState.EXTREME:
+                    tp1 = tf_15m.close - 2.5 * atr
+                    tp2 = tf_15m.close - 4.0 * atr
+                    stop_loss = level + 0.3 * atr
+                    invalidation = level + retest_tol
 
-                        reasons = [
-                            "BREAKDOWN_CONFIRMED",
-                            "RETEST_CONFIRMED",
-                            "CLOSED_BAR_HOLDING_BELOW_SUPPORT",
-                        ]
-                        risks = []
-                        if derivatives.oi_1h_change is not None and derivatives.oi_1h_change <= 0:
-                            risks.append("BREAKDOWN_LOW_PARTICIPATION")
+                    reasons = [
+                        "BREAKDOWN_CONFIRMED",
+                        "RETEST_CONFIRMED",
+                        "CLOSED_BAR_HOLDING_BELOW_SUPPORT",
+                    ]
+                    risks = []
+                    if derivatives.oi_1h_change is not None and derivatives.oi_1h_change <= 0:
+                        risks.append("BREAKDOWN_LOW_PARTICIPATION")
 
-                        return {
-                            "decision": DirectionalDecision.SHORT,
-                            "setup": PlaybookType.BREAKOUT_RETEST,
-                            "breakout_state": BreakoutState.RETEST_CONFIRMED,
-                            "breakout_level": level,
-                            "breakout_direction": "SHORT",
-                            "breakout_bar_end_ms": prev_bo_time,
-                            "entry_low": tf_15m.close,
-                            "entry_high": level,
-                            "stop_loss": stop_loss,
-                            "take_profit_1": tp1,
-                            "take_profit_2": tp2,
-                            "invalidation": invalidation,
-                            "confidence": ConfidenceBand.MEDIUM,
-                            "reasons": reasons,
-                            "risks": risks,
-                        }
+                    return {
+                        "decision": DirectionalDecision.SHORT,
+                        "setup": PlaybookType.BREAKOUT_RETEST,
+                        "breakout_state": BreakoutState.RETEST_CONFIRMED,
+                        "breakout_level": level,
+                        "breakout_direction": "SHORT",
+                        "breakout_bar_end_ms": prev_bo_time,
+                        "entry_low": tf_15m.close,
+                        "entry_high": level,
+                        "stop_loss": stop_loss,
+                        "take_profit_1": tp1,
+                        "take_profit_2": tp2,
+                        "invalidation": invalidation,
+                        "confidence": ConfidenceBand.MEDIUM,
+                        "reasons": reasons,
+                        "risks": risks,
+                    }
 
     # Evaluate new Bar N breakout candidates (strictly cannot be retest on same bar)
     if tf_1h.resistances:
@@ -305,11 +305,15 @@ def evaluate_breakout_retest(
         failed_bo = st.get("recent_failed_breakout")
         failed_bo_ms = st.get("recent_failed_breakout_ms")
         has_failed_memory = False
-        if failed_bo is not None and failed_bo_ms is not None:
-            if abs(level - float(failed_bo)) / max(level, 1e-4) <= 0.02 and (current_bar_end_ms - int(failed_bo_ms) <= tc.failed_level_ttl_ms):
-                min_break *= tc.failed_level_breakout_mult
-                min_vol_z = max(min_vol_z, tc.failed_level_min_volume_z)
-                has_failed_memory = True
+        if (
+            failed_bo is not None
+            and failed_bo_ms is not None
+            and abs(level - float(failed_bo)) / max(level, 1e-4) <= 0.02
+            and (current_bar_end_ms - int(failed_bo_ms) <= tc.failed_level_ttl_ms)
+        ):
+            min_break *= tc.failed_level_breakout_mult
+            min_vol_z = max(min_vol_z, tc.failed_level_min_volume_z)
+            has_failed_memory = True
 
         if (
             closed_bar.close >= level + min_break
@@ -352,11 +356,15 @@ def evaluate_breakout_retest(
         failed_bd = st.get("recent_failed_breakdown")
         failed_bd_ms = st.get("recent_failed_breakdown_ms")
         has_failed_memory = False
-        if failed_bd is not None and failed_bd_ms is not None:
-            if abs(level - float(failed_bd)) / max(level, 1e-4) <= 0.02 and (current_bar_end_ms - int(failed_bd_ms) <= tc.failed_level_ttl_ms):
-                min_break *= tc.failed_level_breakout_mult
-                min_vol_z = max(min_vol_z, tc.failed_level_min_volume_z)
-                has_failed_memory = True
+        if (
+            failed_bd is not None
+            and failed_bd_ms is not None
+            and abs(level - float(failed_bd)) / max(level, 1e-4) <= 0.02
+            and (current_bar_end_ms - int(failed_bd_ms) <= tc.failed_level_ttl_ms)
+        ):
+            min_break *= tc.failed_level_breakout_mult
+            min_vol_z = max(min_vol_z, tc.failed_level_min_volume_z)
+            has_failed_memory = True
 
         if (
             closed_bar.close <= level - min_break

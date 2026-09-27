@@ -321,24 +321,22 @@ def calculate_opportunity_score(
 
     # Penalties
     total_penalty = 0.0
-    if is_long and derivatives.regime == DerivativesRegime.LONG_CROWDING:
-        total_penalty += rc.penalty_crowding
-    elif is_short and derivatives.regime == DerivativesRegime.SHORT_CROWDING:
+    if is_long and derivatives.regime == DerivativesRegime.LONG_CROWDING or is_short and derivatives.regime == DerivativesRegime.SHORT_CROWDING:
         total_penalty += rc.penalty_crowding
 
     if exhaustion.state == ExhaustionState.EXTREME:
-        if is_long and exhaustion.distance_from_ema20_atr > 0:
-            total_penalty += rc.penalty_overextension * 1.5
-        elif is_short and exhaustion.distance_from_ema20_atr < 0:
+        if is_long and exhaustion.distance_from_ema20_atr > 0 or is_short and exhaustion.distance_from_ema20_atr < 0:
             total_penalty += rc.penalty_overextension * 1.5
         elif is_wait:
             total_penalty += rc.penalty_overextension
     elif exhaustion.state == ExhaustionState.ELEVATED:
         total_penalty += rc.penalty_overextension * 0.7
 
-    if benchmark_context in (BenchmarkContext.MARKET_RISK_OFF, BenchmarkContext.BTC_VOLATILITY_SHOCK):
-        if is_long:
-            total_penalty += rc.penalty_benchmark_risk
+    if is_long and benchmark_context in (
+        BenchmarkContext.MARKET_RISK_OFF,
+        BenchmarkContext.BTC_VOLATILITY_SHOCK,
+    ):
+        total_penalty += rc.penalty_benchmark_risk
 
     if derivatives.spread_bps is not None and derivatives.spread_bps > config.thresholds.max_spread_bps:
         total_penalty += rc.penalty_low_liquidity

@@ -12,6 +12,7 @@ from .config import MarketWatchConfig, compute_market_watch_config_hash
 from .context import apply_benchmark_context_gate, evaluate_benchmark_context
 from .derivatives import evaluate_derivatives_regime
 from .domain import (
+    MARKET_WATCH_POLICY_VERSION,
     BreakoutState,
     ConfidenceBand,
     DerivativesMetrics,
@@ -20,7 +21,6 @@ from .domain import (
     EntryQuality,
     GridDecision,
     GridPlan,
-    MARKET_WATCH_POLICY_VERSION,
     MarketSnapshot,
     MarketWatchAlert,
     PlaybookType,
@@ -180,13 +180,16 @@ class MarketWatchScanner:
             val = self.client.server_time_ms()
             if isinstance(val, (int, float)):
                 exchange_time_ms = int(val)
-        except Exception:
-            pass
+        except Exception as exc:  # noqa: BLE001
+            logger.debug("Failed to fetch server time for %s: %s", symbol, exc)
 
-        if raw_15m and isinstance(raw_15m[-1].close_time_ms, (int, float)):
-            if exchange_time_ms - int(raw_15m[-1].close_time_ms) > 3_600_000:
-                health = ScanHealth.DEGRADED
-                health_reasons.append("STALE_CANDLE_DATA")
+        if (
+            raw_15m
+            and isinstance(raw_15m[-1].close_time_ms, (int, float))
+            and exchange_time_ms - int(raw_15m[-1].close_time_ms) > 3_600_000
+        ):
+            health = ScanHealth.DEGRADED
+            health_reasons.append("STALE_CANDLE_DATA")
 
         # 3. 24hr ticker for price metrics
         change_24h = 0.0
@@ -536,9 +539,12 @@ class MarketWatchScanner:
         )
 
         is_invalid = False
-        if prev_lifecycle in (SignalLifecycleState.ARMED, SignalLifecycleState.TRIGGERED):
-            if gated_decision == DirectionalDecision.WAIT and not is_near_ready:
-                is_invalid = True
+        if (
+            prev_lifecycle in (SignalLifecycleState.ARMED, SignalLifecycleState.TRIGGERED)
+            and gated_decision == DirectionalDecision.WAIT
+            and not is_near_ready
+        ):
+            is_invalid = True
 
         lifecycle = advance_lifecycle_state(
             previous_state=prev_lifecycle,
