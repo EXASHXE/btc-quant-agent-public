@@ -1,0 +1,79 @@
+{
+  "schema_id": "H40_M3B_FIRST_REAL_DISCOVERY_EVIDENCE_V1",
+  "stage": "M3B_FIRST_REAL_DISCOVERY_AND_CANDIDATE_LOCK",
+  "decision": "TERMINATION_NOT_TESTABLE",
+  "implementation_sha": "407dabc415ae8cae4210250e992941c8b9b25464",
+  "controller_m3a_r1_acceptance_commit": "2ebc1e2800693253c0bd5b3f66721baa6709eb7b",
+  "source_identity": {
+    "source_id": "ETHUSDT_USD_M_1H",
+    "product": "ETHUSDT",
+    "cadence": "1h",
+    "rows": 44568,
+    "file_sha256": "563a1a4d927ec2a007481783be9bd76896e1be57198af80c4b2a30608e124608",
+    "archive_set_sha256": "1efde37a765de90e33fd509bd1bcb729351beafa79314f684b3558665b19226c"
+  },
+  "source_manifest_hash": "49543cdbf67ede7b8527d59349b2d5f5f6fff6813a463afe53241f2a4d812d2c",
+  "split_manifest_hash": "6f0ccc95cc03a087dc877561d8da804f16ccefc224fccfdb8842021f9e49eae7",
+  "split_attestation_hash": "aa863a48a7d0d2f0e9533e42023b37451a93da92c4f75c11101c253c1c375f28",
+  "runtime_authority_snapshot_hash": "733b57a347259794e552a2bc47ecf80712d0e6b54b2d3e2b90c7d52d7a0883d2",
+  "sealed_registered_roster_hash": "78af704fff5210beddd7427a1624cae4c1fbc1415da1fdbc6fcfa8a3228179da",
+  "materialized_run_authority_hash": "b39534c47e3f965e2857da309bf29ba14122db7ee01bc5d6d00a52bf75a0e952",
+  "implementation_authority_hash": "088b1210c17171141e232219345fa890e182282445fd9b2a70804b177d808b96",
+  "controller_authority_hash": "37b6ea92ff61b90c07f38cadea58087a8dc91c67d3beabe34dc7792988ff3e3a",
+  "protocol_authority_hash": "a83f8fc7a5ca7109fb8cd7fed114d87c3b2c968b5145c11cada203aa5111d1ce",
+  "discovery_run_grant_hash": "64cc0d0ea4cbe1b1d8c12d81e08c5760bd226df28be0813fe314ca460865abf1",
+  "discovery_authorization_receipt_hash": "717bf76d568588acc53c31daa3a583e678da1d27487dec9093a391e884622d45",
+  "run_authority_id": "1c6a9942c961867524d1c9b9b0092fc9fc05ed54f0bf8e2b1e90863fa4b3a1bf",
+  "discovery_evidence_sha256": "e4243636624fe4b8e3e8b3d924c7599c1c7f435ff01969e7e678163d9138dacc",
+  "correction_manifest_hash": "90ab26428394dafc6aac1d17651831f31d9d57a6d3500a01ea4782b1ec60f627",
+  "dependency_object_count": 201,
+  "local_evidence_bytes": 42970968,
+  "local_evidence_mib": 40.98,
+  "candidate_verification_count": 18,
+  "hard_gate_passed_count": 0,
+  "scientific_unavailable_count": 18,
+  "candidate_lock": {
+    "created": false,
+    "candidate_lock_receipt_hash": null,
+    "selected_structural_configuration_hash": null,
+    "selected_slot_hash": null,
+    "selected_slot_index": null
+  },
+  "termination": {
+    "created": true,
+    "termination_receipt_hash": "3811b1f1bd58d6160b0eee63cfe42ef830b575c4ddc18ea79e5dfd5eee610e34",
+    "terminal_state": "NOT_TESTABLE",
+    "terminal_reason_code": "NOT_TESTABLE",
+    "detail_message": "no candidate passed every accepted hard gate"
+  },
+  "durable_lifecycle_head": {
+    "run_authority_id": "1c6a9942c961867524d1c9b9b0092fc9fc05ed54f0bf8e2b1e90863fa4b3a1bf",
+    "head_receipt_hash": "3811b1f1bd58d6160b0eee63cfe42ef830b575c4ddc18ea79e5dfd5eee610e34",
+    "head_state": "NOT_TESTABLE",
+    "head_predecessor_receipt_hash": "717bf76d568588acc53c31daa3a583e678da1d27487dec9093a391e884622d45",
+    "transition_sequence": 1,
+    "terminal": true,
+    "head_hash": "9469b98f889fa2d65b8503ff0d80b10ab38a7c9ae5c011807a4a2748e9efc222"
+  },
+  "execution_script": {
+    "path": "scripts/v0.5/run_h40_m3b_real_discovery.py",
+    "sha256": "d995620d5468a692619b5fde83fc69e1c3af083970db4eb7ac5844a2553ee846"
+  },
+  "runtime_metrics": {
+    "producer_wall_seconds": 89.4408,
+    "verification_wall_seconds": 302.6766,
+    "total_wall_seconds": 1378.07,
+    "peak_rss_mib": 590.18
+  },
+  "environmental_integrity": {
+    "execution_policy": "RESEARCH_DISABLED_V1",
+    "accepted_execution_write_authority": null,
+    "signed_network_requests": 0,
+    "forbidden_partitions_accessed": [],
+    "forbidden_surfaces_accessed": [],
+    "implementation_worktree_clean": true,
+    "source_identity_unchanged": true
+  },
+  "formal_final_state": "M3B_FIRST_REAL_DISCOVERY_NOT_TESTABLE",
+  "next_stage": "Controller triage before any search-space expansion or retry"
+}
