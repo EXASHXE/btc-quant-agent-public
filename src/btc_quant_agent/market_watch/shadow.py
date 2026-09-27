@@ -67,6 +67,149 @@ def _safe_fetch_historical(
     return []
 
 
+def evaluate_intrabar_path(
+    direction: DirectionalDecision | str,
+    entry_price: float,
+    stop_loss: float,
+    tp1: float,
+    tp2: float,
+    one_minute_candles: Sequence[Candle],
+    start_after_ms: int = 0,
+    is_fill_bar: bool = False,
+    fill_minute_open_ms: int | None = None,
+    entry_zone_low: float = 0.0,
+    entry_zone_high: float = 0.0,
+    prev_mfe: float = 0.0,
+    prev_mae: float = 0.0,
+) -> dict[str, Any]:
+    """Chronologically evaluate intrabar 1m candles for target/stop/excursions.
+
+    Requirements (R2.3.1 Section 6, 7, 11, 12):
+    - Within the fill minute:
+      * Touches entry + stop => STOP with ONE_MINUTE_FILL_BAR_STOP_FIRST.
+      * Touches entry + TP1 (no stop) => fill succeeds, do NOT credit same-minute TP1, continue next minute.
+      * Touches entry + TP1 + stop => STOP with ONE_MINUTE_FILL_BAR_STOP_FIRST.
+    - Subsequent 1m candles:
+      * Same 1m dual touch => STOP with FIFTEEN_MINUTE_STOP_FIRST.
+      * TP1 hit => TP1 with ONE_MINUTE_CHRONOLOGICAL, stops MFE/MAE accumulation immediately.
+      * SL hit => STOP with ONE_MINUTE_CHRONOLOGICAL, stops MFE/MAE accumulation immediately.
+    """
+    is_long = str(direction.value if isinstance(direction, DirectionalDecision) else direction).upper() == "LONG"
+    risk_dist = abs(entry_price - stop_loss) if (stop_loss > 0.0 and entry_price != stop_loss) else 1.0
+
+    mfe = prev_mfe
+    mae = prev_mae
+    terminal_reason: str | None = None
+    exit_price: float | None = None
+    exit_time_ms: int | None = None
+    tp1_hit = False
+    tp2_hit = False
+    sl_hit = False
+    path_resolution = ShadowPathResolution.ONE_MINUTE_CHRONOLOGICAL.value
+    is_terminal = False
+
+    valid_1m = [c for c in one_minute_candles if isinstance(c, Candle)]
+    valid_1m.sort(key=lambda c: c.open_time_ms)
+
+    for c1 in valid_1m:
+        if c1.close_time_ms <= start_after_ms:
+            continue
+
+        favorable = (c1.high - entry_price) if is_long else (entry_price - c1.low)
+        adverse = (entry_price - c1.low) if is_long else (c1.high - entry_price)
+        c1_sl = (c1.low <= stop_loss) if is_long else (c1.high >= stop_loss)
+        c1_tp1 = (c1.high >= tp1) if is_long else (c1.low <= tp1)
+        c1_tp2 = (c1.high >= tp2) if is_long else (c1.low <= tp2)
+
+        is_this_fill_minute = is_fill_bar and (
+            (fill_minute_open_ms is not None and c1.open_time_ms == fill_minute_open_ms)
+            or (fill_minute_open_ms is None and c1.close_time_ms > start_after_ms)
+        )
+
+        if is_this_fill_minute:
+            # Section 7: Fill-minute conservative semantics
+            if c1_sl:
+                # Touches entry + stop (even if also touches TP1) => STOP
+                sl_hit = True
+                terminal_reason = "STOP"
+                exit_price = stop_loss
+                exit_time_ms = c1.close_time_ms
+                path_resolution = ShadowPathResolution.ONE_MINUTE_FILL_BAR_STOP_FIRST.value
+                mae = max(mae, 1.0)
+                # In same-minute stop first, stop occurred first; do not credit post-stop excursion
+                is_terminal = True
+                break
+
+            if c1_tp1 and not c1_sl:
+                # Touches entry + TP1 (no stop): do NOT credit same-minute TP1 unless chronology is provable.
+                # Fill succeeds; continue from next 1m candle
+                mae = max(mae, adverse / risk_dist)
+                mfe = max(mfe, favorable / risk_dist)
+                if c1_tp2:
+                    tp2_hit = True
+                continue
+
+            # Fill minute touches entry only
+            mae = max(mae, adverse / risk_dist)
+            mfe = max(mfe, favorable / risk_dist)
+            if c1_tp2:
+                tp2_hit = True
+            continue
+
+        # Subsequent 1m candles (or post-fill 1m bars):
+        if c1_sl and (c1_tp1 or c1_tp2):
+            sl_hit = True
+            terminal_reason = "STOP"
+            exit_price = stop_loss
+            exit_time_ms = c1.close_time_ms
+            path_resolution = ShadowPathResolution.FIFTEEN_MINUTE_STOP_FIRST.value
+            mae = max(mae, 1.0)
+            is_terminal = True
+            break
+        elif c1_tp1 and not c1_sl:
+            tp1_hit = True
+            terminal_reason = "TP1"
+            exit_price = tp1
+            exit_time_ms = c1.close_time_ms
+            path_resolution = ShadowPathResolution.ONE_MINUTE_CHRONOLOGICAL.value
+            # Terminal at TP1: MFE capped at TP1 distance for this bar; do not include post-TP1 excursion!
+            mfe = max(mfe, (tp1 - entry_price) / risk_dist if is_long else (entry_price - tp1) / risk_dist)
+            mae = max(mae, adverse / risk_dist)
+            if c1_tp2:
+                tp2_hit = True
+                mfe = max(mfe, favorable / risk_dist)
+            is_terminal = True
+            break
+        elif c1_sl and not c1_tp1:
+            sl_hit = True
+            terminal_reason = "STOP"
+            exit_price = stop_loss
+            exit_time_ms = c1.close_time_ms
+            path_resolution = ShadowPathResolution.ONE_MINUTE_CHRONOLOGICAL.value
+            mae = max(mae, 1.0)
+            mfe = max(mfe, favorable / risk_dist)
+            is_terminal = True
+            break
+        else:
+            mfe = max(mfe, favorable / risk_dist)
+            mae = max(mae, adverse / risk_dist)
+            if c1_tp2:
+                tp2_hit = True
+
+    return {
+        "is_terminal": is_terminal,
+        "terminal_reason": terminal_reason,
+        "exit_price": exit_price,
+        "exit_time_ms": exit_time_ms,
+        "tp1_hit": tp1_hit,
+        "tp2_hit": tp2_hit,
+        "sl_hit": sl_hit,
+        "mfe": round(mfe, 2),
+        "mae": round(mae, 2),
+        "path_resolution": path_resolution,
+    }
+
+
 def resolve_shadow_fill(
     direction: DirectionalDecision | str,
     entry_zone_low: float,
@@ -353,6 +496,17 @@ class ShadowEvaluationManager:
 
             fill_bar_remaining_1m: list[Candle] = []
             touch_cand: Candle | None = None
+            fill_minute_open_ms: int | None = None
+            stage1_mfe = float(rec.get("future_mfe") or 0.0)
+            stage1_mae = float(rec.get("future_mae") or 0.0)
+            fill_bar_terminal = False
+            fill_bar_term_reason: str = "STOP"
+            fill_bar_exit_price: float = 0.0
+            fill_bar_exit_time_ms: int = 0
+            fill_bar_path_res: str = ShadowPathResolution.ONE_MINUTE_FILL_BAR_STOP_FIRST.value
+            fill_bar_tp1_hit = False
+            fill_bar_tp2_hit = False
+            fill_bar_sl_hit = False
 
             # Stage 1: Resolve fill if WAITING_FOR_FILL
             if fill_status == ShadowFillStatus.WAITING_FOR_FILL.value:
@@ -361,58 +515,153 @@ class ShadowEvaluationManager:
                     if c.close_time_ms > signal_time_ms and c.open_time_ms < entry_window_end_ms
                 ]
 
-                # Check candidate candles post-signal within entry window
-                for c in cand_for_fill:
-                    touches = (c.low <= entry_high and c.high >= entry_low) if dir_str == "LONG" else (c.high >= entry_low and c.low <= entry_high)
-                    if touches:
-                        touch_cand = c
-                        break
-
                 fill_res = ShadowFillStatus.WAITING_FOR_FILL
                 fill_p: float | None = None
                 fill_t: int | None = None
                 path_res = ShadowPathResolution.FIFTEEN_MINUTE_STOP_FIRST.value
                 exec_model = ShadowExecutionPathModel.PARTIAL_FIRST_BAR_1M_THEN_15M.value
+                data_gap_encountered = False
 
-                if touch_cand is not None:
-                    # Attempt 1m refinement inside touch candle only if touch candle reaches SL/TP or starts before signal_time_ms
-                    stop_loss_val = float(rec.get("stop_loss") or 0.0)
-                    tp1_val = float(rec.get("tp1") or 0.0)
-                    touches_stop = (touch_cand.low <= stop_loss_val) if dir_str == "LONG" else (touch_cand.high >= stop_loss_val)
-                    touches_tp1 = (touch_cand.high >= tp1_val) if dir_str == "LONG" else (touch_cand.low <= tp1_val)
-                    partial_start = touch_cand.open_time_ms < signal_time_ms
+                stop_loss_val = float(rec.get("stop_loss") or 0.0)
+                tp1_val = float(rec.get("tp1") or 0.0)
+                is_long = dir_str == "LONG"
 
-                    if (touches_stop or touches_tp1 or partial_start):
-                        fetched_1m = _safe_fetch_historical(client, symbol, "1m", touch_cand.open_time_ms, touch_cand.close_time_ms)
-                        valid_1m = [c for c in fetched_1m if getattr(c, "interval", "") == "1m"]
-                        if valid_1m:
-                            for idx, c1 in enumerate(valid_1m):
-                                if c1.close_time_ms <= signal_time_ms:
-                                    continue
-                                c1_touches = (c1.low <= entry_high and c1.high >= entry_low) if dir_str == "LONG" else (c1.high >= entry_low and c1.low <= entry_high)
-                                if c1_touches:
-                                    fill_res = ShadowFillStatus.FILLED
-                                    if dir_str == "LONG":
-                                        fill_p = entry_high if c1.open >= entry_high else (max(entry_low, c1.open))
-                                    else:
-                                        fill_p = entry_low if c1.open <= entry_low else (min(entry_high, c1.open))
-                                    fill_t = c1.close_time_ms
-                                    path_res = ShadowPathResolution.ONE_MINUTE_CHRONOLOGICAL.value
-                                    fill_bar_remaining_1m = [c for c in valid_1m[idx+1:] if c.close_time_ms > c1.close_time_ms]
+                for c in cand_for_fill:
+                    is_partial_bar = c.open_time_ms < signal_time_ms
+
+                    if is_partial_bar:
+                        # Requirement 2: Partial signal bar false-fill protection
+                        # Require complete 1m coverage. If missing/fails -> PENDING_DATA_GAP (PARTIAL_SIGNAL_BAR_DATA_GAP).
+                        fetched_1m = _safe_fetch_historical(client, symbol, "1m", c.open_time_ms, c.close_time_ms)
+                        valid_1m = [m for m in fetched_1m if getattr(m, "interval", "") == "1m"]
+                        cov_full = validate_time_coverage(valid_1m, c.open_time_ms, c.close_time_ms, interval_ms=60_000)
+                        cov_post = validate_time_coverage(valid_1m, signal_time_ms, c.close_time_ms, interval_ms=60_000)
+                        if not (cov_full.complete or cov_post.complete):
+                            self.store.update_shadow_outcome(
+                                rec_id,
+                                coverage_status="INCOMPLETE",
+                                coverage_reason="PARTIAL_SIGNAL_BAR_DATA_GAP",
+                                regime_after="PENDING_DATA_GAP",
+                                resolved=0,
+                            )
+                            results.append({
+                                "id": rec_id,
+                                "symbol": symbol,
+                                "status": "PENDING_DATA_GAP",
+                                "reason": "PARTIAL_SIGNAL_BAR_DATA_GAP",
+                            })
+                            data_gap_encountered = True
+                            break
+
+                        # 1m coverage complete: check post-signal 1m candles ONLY
+                        post_signal_1m = [m for m in valid_1m if m.close_time_ms > signal_time_ms]
+                        found_fill_1m = False
+                        for idx, c1 in enumerate(post_signal_1m):
+                            if c1.open_time_ms < signal_time_ms:
+                                # Section 5: Mid-minute signal policy - fail conservative:
+                                # Ignore partial 1m minute for entry fill and require next fully post-signal 1m candle.
+                                continue
+                            c1_touches = (c1.low <= entry_high and c1.high >= entry_low) if is_long else (c1.high >= entry_low and c1.low <= entry_high)
+                            if c1_touches:
+                                fill_res = ShadowFillStatus.FILLED
+                                if is_long:
+                                    fill_p = entry_high if c1.open >= entry_high else max(entry_low, c1.open)
+                                else:
+                                    fill_p = entry_low if c1.open <= entry_low else min(entry_high, c1.open)
+                                fill_t = c1.close_time_ms
+                                path_res = ShadowPathResolution.ONE_MINUTE_CHRONOLOGICAL.value
+                                fill_bar_remaining_1m = post_signal_1m[idx:]
+                                fill_minute_open_ms = c1.open_time_ms
+                                touch_cand = c
+                                found_fill_1m = True
+                                break
+
+                        if found_fill_1m:
+                            break
+                        else:
+                            # If 1m complete and no post-signal touch -> NOT a fill, continue evaluating later candles
+                            continue
+
+                    else:
+                        # Full 15m candle opening at or after signal_time_ms
+                        touches = (c.low <= entry_high and c.high >= entry_low) if is_long else (c.high >= entry_low and c.low <= entry_high)
+                        if not touches:
+                            continue
+
+                        # Touches entry zone
+                        touch_cand = c
+                        touches_stop = (c.low <= stop_loss_val) if is_long else (c.high >= stop_loss_val)
+                        touches_tp1 = (c.high >= tp1_val) if is_long else (c.low <= tp1_val)
+
+                        if touches_stop or touches_tp1:
+                            # Try fetching 1m
+                            fetched_1m = _safe_fetch_historical(client, symbol, "1m", c.open_time_ms, c.close_time_ms)
+                            valid_1m = [m for m in fetched_1m if getattr(m, "interval", "") == "1m"]
+                            cov_1m = validate_time_coverage(valid_1m, c.open_time_ms, c.close_time_ms, interval_ms=60_000)
+
+                            if cov_1m.complete and valid_1m:
+                                # 1m available: find touch minute
+                                for idx, c1 in enumerate(valid_1m):
+                                    c1_touches = (c1.low <= entry_high and c1.high >= entry_low) if is_long else (c1.high >= entry_low and c1.low <= entry_high)
+                                    if c1_touches:
+                                        fill_res = ShadowFillStatus.FILLED
+                                        if is_long:
+                                            fill_p = entry_high if c1.open >= entry_high else max(entry_low, c1.open)
+                                        else:
+                                            fill_p = entry_low if c1.open <= entry_low else min(entry_high, c1.open)
+                                        fill_t = c1.close_time_ms
+                                        path_res = ShadowPathResolution.ONE_MINUTE_CHRONOLOGICAL.value
+                                        fill_bar_remaining_1m = valid_1m[idx:]
+                                        fill_minute_open_ms = c1.open_time_ms
+                                        break
+                                if fill_res == ShadowFillStatus.FILLED:
                                     break
 
-                    if fill_res != ShadowFillStatus.FILLED:
-                        # 15m fill without 1m
-                        fill_res = ShadowFillStatus.FILLED
-                        fill_t = touch_cand.close_time_ms
-                        if dir_str == "LONG":
-                            fill_p = entry_high if touch_cand.open >= entry_high else (max(entry_low, touch_cand.open))
+                            # 1m unavailable fallback (Requirement 4):
+                            if touches_stop:
+                                # Touches entry + stop (even if also touches TP1) -> STOP
+                                fill_res = ShadowFillStatus.FILLED
+                                fill_t = c.close_time_ms
+                                if is_long:
+                                    fill_p = entry_high if c.open >= entry_high else max(entry_low, c.open)
+                                else:
+                                    fill_p = entry_low if c.open <= entry_low else min(entry_high, c.open)
+                                path_res = ShadowPathResolution.FIFTEEN_MINUTE_STOP_FIRST.value
+                                fill_bar_terminal = True
+                                fill_bar_term_reason = "STOP"
+                                fill_bar_exit_price = stop_loss_val
+                                fill_bar_exit_time_ms = c.close_time_ms
+                                fill_bar_sl_hit = True
+                                fill_bar_path_res = ShadowPathResolution.FIFTEEN_MINUTE_STOP_FIRST.value
+                                break
+                            elif touches_tp1:
+                                # Touches entry + TP1 (no stop) -> fill registered, NO same-bar TP1, continue to next 15m candle
+                                fill_res = ShadowFillStatus.FILLED
+                                fill_t = c.close_time_ms
+                                if is_long:
+                                    fill_p = entry_high if c.open >= entry_high else max(entry_low, c.open)
+                                else:
+                                    fill_p = entry_low if c.open <= entry_low else min(entry_high, c.open)
+                                path_res = ShadowPathResolution.FIFTEEN_MINUTE_STOP_FIRST.value
+                                fill_bar_remaining_1m = []
+                                break
                         else:
-                            fill_p = entry_low if touch_cand.open <= entry_low else (min(entry_high, touch_cand.open))
-                        path_res = ShadowPathResolution.FIFTEEN_MINUTE_STOP_FIRST.value
+                            # Touches entry only (no stop, no TP1): fill registered directly at 15m
+                            fill_res = ShadowFillStatus.FILLED
+                            fill_t = c.close_time_ms
+                            if is_long:
+                                fill_p = entry_high if c.open >= entry_high else max(entry_low, c.open)
+                            else:
+                                fill_p = entry_low if c.open <= entry_low else min(entry_high, c.open)
+                            path_res = ShadowPathResolution.FIFTEEN_MINUTE_STOP_FIRST.value
+                            fill_bar_remaining_1m = []
+                            break
+
+                if data_gap_encountered:
+                    continue
 
                 if fill_res == ShadowFillStatus.FILLED and fill_p is not None and fill_t is not None:
-                    # FREEZE BOUNDARIES ONCE FILLED (Test 6, 7, 8)
+                    # FREEZE BOUNDARIES ONCE FILLED
                     fill_status = ShadowFillStatus.FILLED.value
                     eval_start_ms = fill_t
                     eval_end_ms = fill_t + (eval_bars * 15 * 60 * 1000)
@@ -438,7 +687,7 @@ class ShadowEvaluationManager:
                     results.append({"id": rec_id, "symbol": symbol, "status": "PENDING_WAITING_FOR_FILL"})
                     continue
                 else:
-                    # Entry window expired: MUST VALIDATE COVERAGE (Test 1, 2, 3)
+                    # Entry window expired: MUST VALIDATE COVERAGE
                     coverage = validate_time_coverage(
                         cand_for_fill,
                         signal_time_ms,
@@ -446,7 +695,6 @@ class ShadowEvaluationManager:
                         interval_ms=15 * 60 * 1000,
                     )
                     if not coverage.complete:
-                        # DATA GAP! Must not infer NO_FILL!
                         self.store.update_shadow_outcome(
                             rec_id,
                             coverage_status="INCOMPLETE",
@@ -495,87 +743,79 @@ class ShadowEvaluationManager:
             direction = DirectionalDecision(dir_str)
             risk_dist = abs(fill_price - stop_loss) if (stop_loss > 0.0 and fill_price != stop_loss) else 1.0
 
-            # Evaluate remaining 1m candles in fill bar if any (Test 15, 16, 17, 18)
-            fill_bar_terminal = False
-            if fill_bar_remaining_1m:
-                is_long = dir_str == "LONG"
-                for c1 in fill_bar_remaining_1m:
-                    c1_sl = (c1.low <= stop_loss) if is_long else (c1.high >= stop_loss)
-                    c1_tp1 = (c1.high >= tp1) if is_long else (c1.low <= tp1)
-                    c1_tp2 = (c1.high >= tp2) if is_long else (c1.low <= tp2)
-                    if c1_sl and (c1_tp1 or c1_tp2):
-                        sl_hit = True
-                        tp1_hit = False
-                        tp2_hit = False
-                        exit_price = stop_loss
-                        exit_time_ms = c1.close_time_ms
-                        term_reason = "STOP"
-                        fill_bar_terminal = True
-                        break
-                    elif c1_tp1 and not c1_sl:
-                        tp1_hit = True
-                        sl_hit = False
-                        tp2_hit = c1_tp2
-                        exit_price = tp1
-                        exit_time_ms = c1.close_time_ms
-                        term_reason = "TP1"
-                        fill_bar_terminal = True
-                        break
-                    elif c1_sl and not c1_tp1:
-                        sl_hit = True
-                        tp1_hit = False
-                        tp2_hit = False
-                        exit_price = stop_loss
-                        exit_time_ms = c1.close_time_ms
-                        term_reason = "STOP"
-                        fill_bar_terminal = True
-                        break
+            # Evaluate fill bar 1m candles if present
+            if fill_bar_remaining_1m and not fill_bar_terminal:
+                intra = evaluate_intrabar_path(
+                    direction=direction,
+                    entry_price=fill_price,
+                    stop_loss=stop_loss,
+                    tp1=tp1,
+                    tp2=tp2,
+                    one_minute_candles=fill_bar_remaining_1m,
+                    is_fill_bar=True,
+                    fill_minute_open_ms=fill_minute_open_ms,
+                    prev_mfe=0.0,
+                    prev_mae=0.0,
+                )
+                if intra["is_terminal"]:
+                    fill_bar_terminal = True
+                    fill_bar_term_reason = intra["terminal_reason"] or "STOP"
+                    fill_bar_exit_price = float(intra["exit_price"] or fill_price)
+                    fill_bar_exit_time_ms = int(intra["exit_time_ms"] or fill_time_ms)
+                    fill_bar_tp1_hit = bool(intra["tp1_hit"])
+                    fill_bar_tp2_hit = bool(intra["tp2_hit"])
+                    fill_bar_sl_hit = bool(intra["sl_hit"])
+                    fill_bar_path_res = str(intra["path_resolution"])
+                    stage1_mfe = float(intra["mfe"])
+                    stage1_mae = float(intra["mae"])
+                else:
+                    stage1_mfe = float(intra["mfe"])
+                    stage1_mae = float(intra["mae"])
+                    fill_bar_tp2_hit = bool(intra["tp2_hit"])
 
-                if fill_bar_terminal:
-                    gross_r = (exit_price - fill_price) / risk_dist if is_long else (fill_price - exit_price) / risk_dist
-                    _f_dol, friction_r = compute_trade_friction_r(fill_price, exit_price, risk_dist, config)
-                    net_r = gross_r - friction_r
-                    mfe = max(0.0, (c1.high - fill_price) / risk_dist if is_long else (fill_price - c1.low) / risk_dist)
-                    mae = max(0.0, (fill_price - c1.low) / risk_dist if is_long else (c1.high - fill_price) / risk_dist)
-                    fill_bar_outcome = {
-                        "future_mfe": round(mfe, 2),
-                        "future_mae": round(mae, 2),
-                        "tp1_hit": tp1_hit,
-                        "tp2_hit": tp2_hit,
-                        "sl_hit": sl_hit,
-                        "time_to_target_ms": exit_time_ms if tp1_hit else None,
-                        "time_to_stop_ms": exit_time_ms if sl_hit else None,
-                        "gross_r": round(gross_r, 4),
-                        "friction_r": round(friction_r, 4),
-                        "net_r": round(net_r, 4),
-                        "path_resolution": ShadowPathResolution.ONE_MINUTE_CHRONOLOGICAL.value,
-                        "terminal_reason": term_reason,
-                        "exit_price": exit_price,
-                        "exit_time_ms": exit_time_ms,
-                        "is_terminal": True,
-                    }
-                    self.store.update_shadow_outcome(
-                        rec_id,
-                        future_mfe=_to_float(fill_bar_outcome.get("future_mfe")),
-                        future_mae=_to_float(fill_bar_outcome.get("future_mae")),
-                        tp1_hit=bool(fill_bar_outcome.get("tp1_hit")),
-                        tp2_hit=bool(fill_bar_outcome.get("tp2_hit")),
-                        sl_hit=bool(fill_bar_outcome.get("sl_hit")),
-                        time_to_target_ms=_to_int(fill_bar_outcome.get("time_to_target_ms")),
-                        time_to_stop_ms=_to_int(fill_bar_outcome.get("time_to_stop_ms")),
-                        gross_r=_to_float(fill_bar_outcome.get("gross_r")),
-                        friction_r=_to_float(fill_bar_outcome.get("friction_r")),
-                        net_r=_to_float(fill_bar_outcome.get("net_r")),
-                        path_resolution=str(fill_bar_outcome["path_resolution"]) if fill_bar_outcome.get("path_resolution") is not None else None,
-                        regime_after="RESOLVED_TERMINAL",
-                        terminal_reason=term_reason,
-                        exit_price=exit_price,
-                        exit_time_ms=exit_time_ms,
-                        coverage_status="COMPLETE",
-                        resolved=1,
-                    )
-                    results.append({"id": rec_id, "symbol": symbol, "status": "RESOLVED", "outcome": fill_bar_outcome})
-                    continue
+            if fill_bar_terminal:
+                gross_r = (fill_bar_exit_price - fill_price) / risk_dist if dir_str == "LONG" else (fill_price - fill_bar_exit_price) / risk_dist
+                _f_dol, friction_r = compute_trade_friction_r(fill_price, fill_bar_exit_price, risk_dist, config)
+                net_r = gross_r - friction_r
+                fill_bar_outcome = {
+                    "future_mfe": round(stage1_mfe, 2),
+                    "future_mae": round(stage1_mae, 2),
+                    "tp1_hit": fill_bar_tp1_hit,
+                    "tp2_hit": fill_bar_tp2_hit,
+                    "sl_hit": fill_bar_sl_hit,
+                    "time_to_target_ms": fill_bar_exit_time_ms if fill_bar_tp1_hit else None,
+                    "time_to_stop_ms": fill_bar_exit_time_ms if fill_bar_sl_hit else None,
+                    "gross_r": round(gross_r, 4),
+                    "friction_r": round(friction_r, 4),
+                    "net_r": round(net_r, 4),
+                    "path_resolution": fill_bar_path_res,
+                    "terminal_reason": fill_bar_term_reason,
+                    "exit_price": fill_bar_exit_price,
+                    "exit_time_ms": fill_bar_exit_time_ms,
+                    "is_terminal": True,
+                }
+                self.store.update_shadow_outcome(
+                    rec_id,
+                    future_mfe=_to_float(fill_bar_outcome.get("future_mfe")),
+                    future_mae=_to_float(fill_bar_outcome.get("future_mae")),
+                    tp1_hit=bool(fill_bar_outcome.get("tp1_hit")),
+                    tp2_hit=bool(fill_bar_outcome.get("tp2_hit")),
+                    sl_hit=bool(fill_bar_outcome.get("sl_hit")),
+                    time_to_target_ms=_to_int(fill_bar_outcome.get("time_to_target_ms")),
+                    time_to_stop_ms=_to_int(fill_bar_outcome.get("time_to_stop_ms")),
+                    gross_r=_to_float(fill_bar_outcome.get("gross_r")),
+                    friction_r=_to_float(fill_bar_outcome.get("friction_r")),
+                    net_r=_to_float(fill_bar_outcome.get("net_r")),
+                    path_resolution=str(fill_bar_outcome["path_resolution"]) if fill_bar_outcome.get("path_resolution") is not None else None,
+                    regime_after="RESOLVED_TERMINAL",
+                    terminal_reason=fill_bar_term_reason,
+                    exit_price=fill_bar_exit_price,
+                    exit_time_ms=fill_bar_exit_time_ms,
+                    coverage_status="COMPLETE",
+                    resolved=1,
+                )
+                results.append({"id": rec_id, "symbol": symbol, "status": "RESOLVED", "outcome": fill_bar_outcome})
+                continue
 
             # Recompute required fetch range through new eval_end_ms (Test 6, 7)
             target_fetch_end = min(current_time_ms, eval_end_ms)
@@ -607,6 +847,8 @@ class ShadowEvaluationManager:
                     config=config,
                     client=client,
                     symbol=symbol,
+                    prev_mfe=stage1_mfe,
+                    prev_mae=stage1_mae,
                 )
 
             is_terminal = bool(outcome.get("is_terminal", False))
@@ -632,6 +874,8 @@ class ShadowEvaluationManager:
                             config=config,
                             client=client,
                             symbol=symbol,
+                            prev_mfe=stage1_mfe,
+                            prev_mae=stage1_mae,
                         )
                         is_terminal = bool(outcome.get("is_terminal", False))
 
@@ -741,6 +985,8 @@ class ShadowEvaluationManager:
         intrabar_1m_candles: Sequence[Candle] | None = None,
         client: Any = None,
         symbol: str = "",
+        prev_mfe: float = 0.0,
+        prev_mae: float = 0.0,
     ) -> dict[str, Any]:
         """Compute post-facto execution excursions strictly from subsequent candles."""
         if not future_candles or entry_price <= 0.0:
@@ -755,8 +1001,8 @@ class ShadowEvaluationManager:
         sl_hit = False
         time_to_target_ms: int | None = None
         time_to_stop_ms: int | None = None
-        mfe = 0.0
-        mae = 0.0
+        mfe = prev_mfe
+        mae = prev_mae
         path_resolution = ShadowPathResolution.FIFTEEN_MINUTE_STOP_FIRST.value
         terminal_reason: str = "TIMEOUT"
         exit_price: float = future_candles[-1].close if future_candles else entry_price
@@ -781,94 +1027,82 @@ class ShadowEvaluationManager:
                 adverse = 0.0
                 bar_sl = bar_tp1 = bar_tp2 = False
 
-            mfe = max(mfe, favorable / risk_dist)
-            mae = max(mae, adverse / risk_dist)
-
-            # Check same-bar ambiguity (both SL and TP touched on same candle)
-            if bar_sl and (bar_tp1 or bar_tp2):
+            if bar_sl or bar_tp1:
                 span_1m = [
                     c for c in (intrabar_1m_candles or [])
                     if c.close_time_ms > candle.open_time_ms and c.close_time_ms <= candle.close_time_ms
                 ]
-                if not span_1m and client is not None and symbol:
+                if not span_1m and client is not None and symbol and (bar_sl and (bar_tp1 or bar_tp2)):
                     fetched = _safe_fetch_historical(client, symbol, "1m", candle.open_time_ms, candle.close_time_ms)
                     span_1m = [c for c in fetched if getattr(c, "interval", "") == "1m"]
 
                 if span_1m:
-                    disambiguated = False
-                    for c1 in span_1m:
-                        c1_sl = (c1.low <= stop_loss) if is_long else (c1.high >= stop_loss)
-                        c1_tp1 = (c1.high >= tp1) if is_long else (c1.low <= tp1)
-                        c1_tp2 = (c1.high >= tp2) if is_long else (c1.low <= tp2)
-
-                        # Test 21: 1m candle itself touches both -> conservative STOP_FIRST
-                        if c1_sl and (c1_tp1 or c1_tp2):
-                            sl_hit = True
-                            time_to_stop_ms = c1.close_time_ms
-                            exit_price = stop_loss
-                            exit_time_ms = c1.close_time_ms
-                            terminal_reason = "STOP"
-                            path_resolution = ShadowPathResolution.FIFTEEN_MINUTE_STOP_FIRST.value
-                            disambiguated = True
-                            is_terminal = True
-                            break
-                        elif c1_tp1 and not c1_sl:
-                            # Test 19: 1m path proves TP first -> TP1
-                            tp1_hit = True
-                            time_to_target_ms = c1.close_time_ms
-                            exit_price = tp1
-                            exit_time_ms = c1.close_time_ms
-                            terminal_reason = "TP1"
-                            path_resolution = ShadowPathResolution.ONE_MINUTE_CHRONOLOGICAL.value
-                            disambiguated = True
-                            is_terminal = True
-                            if c1_tp2:
-                                tp2_hit = True
-                            break
-                        elif c1_sl and not c1_tp1:
-                            # Test 20: 1m proves SL first -> STOP
-                            sl_hit = True
-                            time_to_stop_ms = c1.close_time_ms
-                            exit_price = stop_loss
-                            exit_time_ms = c1.close_time_ms
-                            terminal_reason = "STOP"
-                            path_resolution = ShadowPathResolution.ONE_MINUTE_CHRONOLOGICAL.value
-                            disambiguated = True
-                            is_terminal = True
-                            break
-                    if disambiguated:
+                    intra = evaluate_intrabar_path(
+                        direction=direction,
+                        entry_price=entry_price,
+                        stop_loss=stop_loss,
+                        tp1=tp1,
+                        tp2=tp2,
+                        one_minute_candles=span_1m,
+                        is_fill_bar=False,
+                        prev_mfe=mfe,
+                        prev_mae=mae,
+                    )
+                    if intra["is_terminal"]:
+                        tp1_hit = bool(intra["tp1_hit"])
+                        tp2_hit = bool(intra["tp2_hit"])
+                        sl_hit = bool(intra["sl_hit"])
+                        terminal_reason = str(intra["terminal_reason"])
+                        exit_price = float(intra["exit_price"] if intra["exit_price"] is not None else (stop_loss if sl_hit else tp1))
+                        exit_time_ms = int(intra["exit_time_ms"] if intra["exit_time_ms"] is not None else candle.close_time_ms)
+                        path_resolution = str(intra["path_resolution"])
+                        mfe = float(intra["mfe"])
+                        mae = float(intra["mae"])
+                        if tp1_hit:
+                            time_to_target_ms = exit_time_ms
+                        if sl_hit:
+                            time_to_stop_ms = exit_time_ms
+                        is_terminal = True
                         break
+                    else:
+                        mfe = float(intra["mfe"])
+                        mae = float(intra["mae"])
+                        if intra["tp2_hit"]:
+                            tp2_hit = True
+                        continue
 
-                # 1m unavailable or could not disambiguate -> 15m STOP_FIRST fallback (Test 22)
-                sl_hit = True
-                time_to_stop_ms = candle.close_time_ms
-                exit_price = stop_loss
-                exit_time_ms = candle.close_time_ms
-                terminal_reason = "STOP"
-                path_resolution = ShadowPathResolution.FIFTEEN_MINUTE_STOP_FIRST.value
-                is_terminal = True
-                break
+                # 1m unavailable fallback (Requirement 4 & Section 8):
+                # If stop loss is touched (whether alone or accompanied by TP), fail conservative to STOP first.
+                if bar_sl:
+                    sl_hit = True
+                    time_to_stop_ms = candle.close_time_ms
+                    exit_price = stop_loss
+                    exit_time_ms = candle.close_time_ms
+                    terminal_reason = "STOP"
+                    path_resolution = ShadowPathResolution.FIFTEEN_MINUTE_STOP_FIRST.value
+                    mae = max(mae, 1.0)
+                    is_terminal = True
+                    break
+                elif bar_tp1:
+                    tp1_hit = True
+                    time_to_target_ms = candle.close_time_ms
+                    exit_price = tp1
+                    exit_time_ms = candle.close_time_ms
+                    terminal_reason = "TP1"
+                    path_resolution = ShadowPathResolution.FIFTEEN_MINUTE_STOP_FIRST.value
+                    target_dist = (tp1 - entry_price) / risk_dist if is_long else (entry_price - tp1) / risk_dist
+                    mfe = max(mfe, target_dist)
+                    mae = max(mae, adverse / risk_dist)
+                    if bar_tp2:
+                        tp2_hit = True
+                    is_terminal = True
+                    break
 
-            elif bar_sl:
-                # Test 27: STOP
-                sl_hit = True
-                time_to_stop_ms = candle.close_time_ms
-                exit_price = stop_loss
-                exit_time_ms = candle.close_time_ms
-                terminal_reason = "STOP"
-                is_terminal = True
-                break
-            elif bar_tp1:
-                # Test 26 & 29: TP1 terminal exit
-                tp1_hit = True
-                time_to_target_ms = candle.close_time_ms
-                exit_price = tp1
-                exit_time_ms = candle.close_time_ms
-                terminal_reason = "TP1"
-                is_terminal = True
+            else:
+                mfe = max(mfe, favorable / risk_dist)
+                mae = max(mae, adverse / risk_dist)
                 if bar_tp2:
                     tp2_hit = True
-                break
 
         if not is_terminal:
             # Test 28: TIMEOUT uses final covered candle close

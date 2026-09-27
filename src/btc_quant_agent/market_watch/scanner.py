@@ -14,6 +14,7 @@ from .derivatives import apply_derivatives_action_gate, evaluate_derivatives_reg
 from .domain import (
     MARKET_WATCH_EVIDENCE_VERSION,
     MARKET_WATCH_POLICY_VERSION,
+    AlertSeverity,
     BreakoutState,
     ConfidenceBand,
     DerivativesMetrics,
@@ -28,6 +29,7 @@ from .domain import (
     PriceMetrics,
     RelativePerformance,
     ScanHealth,
+    ShadowExecutionPathModel,
     ShadowFillStatus,
     SignalLifecycleState,
     SymbolAssessment,
@@ -763,6 +765,7 @@ class MarketWatchScanner:
                     entry_window_bars=entry_bars,
                     entry_window_end_ms=entry_win_end,
                     fill_status=ShadowFillStatus.WAITING_FOR_FILL.value,
+                    execution_path_model=ShadowExecutionPathModel.PARTIAL_FIRST_BAR_1M_THEN_15M.value,
                 )
                 self.store.set_last_shadow_signal_ids(a.symbol, armed_id=sig_id)
                 self.store.set_last_shadow_recorded_state(a.symbol, "ARMED")
@@ -809,6 +812,7 @@ class MarketWatchScanner:
                     entry_window_bars=entry_bars,
                     entry_window_end_ms=entry_win_end,
                     fill_status=ShadowFillStatus.WAITING_FOR_FILL.value,
+                    execution_path_model=ShadowExecutionPathModel.PARTIAL_FIRST_BAR_1M_THEN_15M.value,
                 )
                 self.store.set_last_shadow_signal_ids(a.symbol, triggered_id=sig_id)
                 self.store.set_last_shadow_recorded_state(a.symbol, "TRIGGERED")
@@ -895,18 +899,16 @@ class MarketWatchScanner:
             )
 
         # 6. Evaluate alerts based on state changes & priority
-        alerts_to_send: list[MarketWatchAlert] = []
         webhook_url = os.getenv("FEISHU_WEBHOOK_URL")
         secret = os.getenv("FEISHU_WEBHOOK_SECRET")
 
+        candidate_alerts: list[tuple[SymbolAssessment, MarketWatchAlert, AlertSeverity]] = []
         for a in ranked_assessments:
             prev_st = self.store.get_symbol_state(a.symbol) or {}
             self._record_shadow_observations_if_needed(a, now_ms)
 
             emit, severity, _reasons = evaluate_alert_emission(a, prev_st, self.config)
-
-            alert_sent = False
-            if emit and len(alerts_to_send) < self.config.max_alert_symbols:
+            if emit:
                 alert = MarketWatchAlert(
                     symbol=a.symbol,
                     severity=severity,
@@ -927,16 +929,50 @@ class MarketWatchScanner:
                     oi_12h_change=a.snapshot.derivatives.oi_12h_change,
                     regime_1h=a.snapshot.tf_1h.regime,
                 )
-                alerts_to_send.append(alert)
+                candidate_alerts.append((a, alert, severity))
 
-                if notify and self.config.feishu_enabled and webhook_url:
-                    try:
-                        send_market_watch_alert(webhook_url, alert, secret)
-                        alert_sent = True
-                    except Exception as exc:  # noqa: BLE001
-                        logger.error("Feishu alert failed for %s: %s", a.symbol, exc)
+        # Severity priority: RISK > ACTION > WATCH > INFO
+        # Within equal severity: opportunity_score descending, then symbol alphabetically
+        severity_order = {
+            AlertSeverity.RISK: 3,
+            AlertSeverity.ACTION: 2,
+            AlertSeverity.WATCH: 1,
+            AlertSeverity.INFO: 0,
+        }
+        candidate_alerts.sort(
+            key=lambda item: (
+                -severity_order.get(item[2], 0),
+                -item[0].opportunity_score,
+                item[0].symbol,
+            )
+        )
 
-            # Persist state to SQLite
-            self.store.save_symbol_state(a.symbol, a, now_ms, alert_sent=alert_sent)
+        # Alert selection (Section 13):
+        # RISK alerts bypass or reserve capacity against ordinary WATCH/ACTION cap.
+        # Include all RISK alerts, then fill remaining slots up to max_alert_symbols with ACTION/WATCH.
+        risk_candidates = [item for item in candidate_alerts if item[2] == AlertSeverity.RISK]
+        non_risk_candidates = [item for item in candidate_alerts if item[2] != AlertSeverity.RISK]
+
+        selected_candidates: list[tuple[SymbolAssessment, MarketWatchAlert, AlertSeverity]] = list(risk_candidates)
+        remaining_slots = max(0, self.config.max_alert_symbols - len(selected_candidates))
+        selected_candidates.extend(non_risk_candidates[:remaining_slots])
+
+        selected_symbols = {item[0].symbol for item in selected_candidates}
+        alerts_to_send: list[MarketWatchAlert] = [item[1] for item in selected_candidates]
+
+        # Dispatch alerts
+        sent_symbols: set[str] = set()
+        for a, alert, _sev in selected_candidates:
+            if notify and self.config.feishu_enabled and webhook_url:
+                try:
+                    send_market_watch_alert(webhook_url, alert, secret)
+                    sent_symbols.add(a.symbol)
+                except Exception as exc:  # noqa: BLE001
+                    logger.error("Feishu alert failed for %s: %s", a.symbol, exc)
+
+        # Persist state to SQLite
+        for a in ranked_assessments:
+            is_sent = a.symbol in sent_symbols or (not notify and a.symbol in selected_symbols)
+            self.store.save_symbol_state(a.symbol, a, now_ms, alert_sent=is_sent)
 
         return ranked_assessments, alerts_to_send

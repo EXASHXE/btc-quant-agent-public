@@ -81,6 +81,8 @@ class ShadowFillStatus(StrEnum):
 class ShadowPathResolution(StrEnum):
     ONE_MINUTE_CHRONOLOGICAL = "ONE_MINUTE_CHRONOLOGICAL"
     FIFTEEN_MINUTE_STOP_FIRST = "FIFTEEN_MINUTE_STOP_FIRST"
+    ONE_MINUTE_FILL_BAR_STOP_FIRST = "ONE_MINUTE_FILL_BAR_STOP_FIRST"
+    ONE_MINUTE_AMBIGUOUS_STOP_FIRST = "ONE_MINUTE_AMBIGUOUS_STOP_FIRST"
 
 
 class ShadowExecutionPathModel(StrEnum):
@@ -343,8 +345,9 @@ def validate_time_coverage(
     Requirements:
     - Candles sorted chronologically.
     - start_covered: first candle open <= start_ms.
-    - end_covered: last candle close >= end_ms.
-    - internal_gap_count: number of internal gaps between adjacent candles.
+    - end_covered: last candle close covers end_ms (under inclusive-close: last candle close >= end_ms - 1 or last candle close >= end_ms).
+    - internal continuity: expected_next_open = previous.open_time_ms + interval_ms.
+      Tolerates up to tolerance_ms (default 1ms for inclusive-close timestamps).
     - complete: start_covered and end_covered and internal_gap_count == 0.
     """
     valid_candles = [c for c in candles if isinstance(c, Candle)]
@@ -362,13 +365,15 @@ def validate_time_coverage(
     first_open = valid_candles[0].open_time_ms
     last_close = valid_candles[-1].close_time_ms
     start_covered = (first_open <= start_ms)
-    end_covered = (last_close >= end_ms)
+    # Under Binance inclusive-close semantics (e.g. close = open + interval - 1),
+    # the last candle covering an end_ms boundary has close_time_ms == end_ms - 1.
+    end_covered = (last_close >= end_ms - 1) if end_ms > start_ms else (last_close >= end_ms)
 
-    max_gap = allowed_gap_ms if allowed_gap_ms is not None else 0
+    tolerance_ms = allowed_gap_ms if allowed_gap_ms is not None else 1
     internal_gap_count = 0
     for i in range(len(valid_candles) - 1):
-        gap = valid_candles[i + 1].open_time_ms - valid_candles[i].close_time_ms
-        if gap > max_gap:
+        expected_next_open = valid_candles[i].open_time_ms + interval_ms
+        if abs(valid_candles[i + 1].open_time_ms - expected_next_open) > tolerance_ms:
             internal_gap_count += 1
 
     complete = start_covered and end_covered and (internal_gap_count == 0)

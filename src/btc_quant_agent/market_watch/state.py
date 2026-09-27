@@ -9,12 +9,14 @@ from typing import Any
 from .config import MarketWatchConfig, compute_market_watch_config_hash
 from .domain import (
     MARKET_WATCH_EVIDENCE_VERSION,
+    MARKET_WATCH_POLICY_VERSION,
     AlertSeverity,
     BreakoutState,
     DerivativesRegime,
     DirectionalDecision,
     GridDecision,
     GridPlan,
+    ShadowExecutionPathModel,
     SignalLifecycleState,
     SymbolAssessment,
     extract_setup_key,
@@ -227,7 +229,7 @@ class MarketWatchStateStore:
                     path_resolution TEXT,
                     execution_path_model TEXT,
                     setup_key TEXT,
-                    evidence_version TEXT DEFAULT 'FORWARD_EVIDENCE_V1',
+                    evidence_version TEXT,
                     entry_window_start_ms INTEGER,
                     evaluation_start_ms INTEGER,
                     terminal_reason TEXT,
@@ -264,7 +266,7 @@ class MarketWatchStateStore:
                 ("path_resolution", "TEXT"),
                 ("execution_path_model", "TEXT"),
                 ("setup_key", "TEXT"),
-                ("evidence_version", "TEXT DEFAULT 'FORWARD_EVIDENCE_V1'"),
+                ("evidence_version", "TEXT"),
                 ("entry_window_start_ms", "INTEGER"),
                 ("evaluation_start_ms", "INTEGER"),
                 ("terminal_reason", "TEXT"),
@@ -675,6 +677,15 @@ class MarketWatchStateStore:
             else:
                 setup_key = signal_identity
 
+        if execution_path_model is None or not str(execution_path_model).strip():
+            execution_path_model = ShadowExecutionPathModel.PARTIAL_FIRST_BAR_1M_THEN_15M.value
+        if not policy_version:
+            policy_version = MARKET_WATCH_POLICY_VERSION
+        if not config_hash:
+            config_hash = "default"
+        if not evidence_version:
+            evidence_version = MARKET_WATCH_EVIDENCE_VERSION
+
         with self._connect() as conn:
             # Deduplication guard: exactly one ACTIONABLE_TRIGGERED per signal_identity
             if observation_type == "ACTIONABLE_TRIGGERED" and signal_identity:
@@ -920,8 +931,22 @@ def is_legacy_shadow_record(record: dict[str, Any]) -> bool:
         return True
     if record.get("fill_status") in ("LEGACY", "INELIGIBLE"):
         return True
-    obs_type = record.get("observation_type")
-    return not bool(obs_type)
+
+    # P0: Legacy forward evidence must be version-gated (Section 9)
+    # A database record is R2.3/V1 eligible ONLY IF evidence_version == MARKET_WATCH_EVIDENCE_VERSION
+    if "evidence_version" in record:
+        if record.get("evidence_version") != MARKET_WATCH_EVIDENCE_VERSION:
+            return True
+        if not record.get("setup_key") or not str(record.get("setup_key")).strip():
+            return True
+        if not record.get("signal_identity") or not str(record.get("signal_identity")).strip():
+            return True
+        if record.get("observation_type") == "ACTIONABLE_TRIGGERED":
+            direction = record.get("direction")
+            if not direction or str(direction).upper() not in ("LONG", "SHORT"):
+                return True
+
+    return False
 
 
 def evaluate_alert_emission(
