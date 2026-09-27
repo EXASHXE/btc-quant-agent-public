@@ -1,0 +1,572 @@
+{
+  "schema_id": "V0.5.1_ARCHITECTURE_DATA_RESEARCH_INVENTORY_R2_R1_V1",
+  "generated_at_utc": "2026-09-27T05:34:25.322259+00:00",
+  "analyzed_implementation_sha": "fdb8e98b7e6527f20c3b0a0b17fde2ca6dd73119",
+  "implementation_remote_sha": "fdb8e98b7e6527f20c3b0a0b17fde2ca6dd73119",
+  "implementation_branch": "v0.5-refactor",
+  "docs_branch": "v0.5-refactor-docs",
+  "published_lifecycle_implementation_authority_hash": "088b1210c17171141e232219345fa890e182282445fd9b2a70804b177d808b96",
+  "p3_controller_authority_hash": null,
+  "execution_policy": "RESEARCH_DISABLED_V1",
+  "prior_baseline_inputs": [
+    "prompts/v0.5/review/v0.5.1_GEMINI_FULL_REPOSITORY_DATA_ARCHITECTURE_PREAUDIT_FOR_ASTRA.md",
+    "reviews/v0.5/astra-preaudit/V0.5.1_ASTRA_PREAUDIT_INDEX.md",
+    "reviews/v0.5/astra-preaudit/V0.5.1_REPOSITORY_ARCHITECTURE_AND_CODE_MAP.md",
+    "reviews/v0.5/astra-preaudit/V0.5.1_LOCAL_DATA_AND_LINEAGE_INVENTORY.md",
+    "reviews/v0.5/astra-preaudit/V0.5.1_RESEARCH_HISTORY_AUTHORITY_AND_STAGE_MAP.md",
+    "reviews/v0.5/astra-preaudit/V0.5.1_RUNTIME_FORWARD_EVIDENCE_AND_OPERATIONS_MAP.md",
+    "reviews/v0.5/astra-preaudit/V0.5.1_TECH_DEBT_AND_REFACTOR_CANDIDATES.md",
+    "reviews/v0.5/astra-preaudit/V0.5.1_VALIDATED_PLAYBOOK_POLICY_ARCHITECTURE_FIT.md",
+    "reviews/v0.5/astra-preaudit/V0.5.1_SOL_VALIDATION_ADDENDUM.md",
+    "reviews/v0.5/V0.5.1_ARCHITECTURE_AND_DATA_BASELINE_R2_CONTROLLER_REVIEW_BLOCKER.md"
+  ],
+  "repository_census": {
+    "total_python_modules": 82,
+    "total_lines_of_code": 48286,
+    "test_files_count": 100,
+    "search_space_total_slots": 168,
+    "search_space_registered_slots": 18,
+    "search_space_not_testable_slots": 150,
+    "single_family_total_slots": 120,
+    "single_family_registered_slots": 18,
+    "single_family_not_testable_slots": 102,
+    "pair_total_slots": 48,
+    "pair_registered_slots": 0,
+    "pair_not_testable_slots": 48,
+    "pairs_breakdown": {
+      "PAIR_D1_D4_V1": 12,
+      "PAIR_D1_D5_V1": 12,
+      "PAIR_D2_D4_V1": 12,
+      "PAIR_D3_D5_V1": 12
+    },
+    "h40_structural_l2_microstructure_slots": 0
+  },
+  "modules": {
+    "DATA": [
+      "h40/source_manifest.py",
+      "data/forward_store.py",
+      "data/collector.py",
+      "data/derivatives.py",
+      "data/funding.py",
+      "data/csvio.py",
+      "data/binance.py",
+      "data/binance_archive.py",
+      "data/binance_spot_archive.py",
+      "data/binance_market_archive.py",
+      "data/manifest.py",
+      "data/vendor_contract.py",
+      "data/quality.py",
+      "data/resample.py",
+      "data/rest.py",
+      "data/network_diagnostic.py",
+      "data/historical_provenance.py",
+      "data/official_derivatives_features.py",
+      "storage.py"
+    ],
+    "FEATURE": [
+      "h40/feature_contracts.py",
+      "features.py",
+      "indicators.py",
+      "structure.py"
+    ],
+    "RESEARCH": [
+      "h40/split_manifest.py",
+      "h40/search_space.py",
+      "h40/configuration_ledger.py",
+      "h40/protocol.py",
+      "research_contract/models.py",
+      "research_contract/registry.py",
+      "research_registry.py",
+      "research.py"
+    ],
+    "QUANT_CORE": [
+      "research_contract/canonical.py",
+      "economic/simulator.py",
+      "economic/fee_model.py",
+      "economic/execution_replay.py",
+      "economic/qualification.py",
+      "economic/metrics.py"
+    ],
+    "EVIDENCE": [
+      "h40/discovery_evidence.py",
+      "economic/acceptance_verifier.py",
+      "economic/funding_evidence.py",
+      "forward_evidence.py",
+      "evidence_epoch.py"
+    ],
+    "AUTHORITY": [
+      "h40/protocol_authority.py",
+      "h40/lifecycle_authority.py",
+      "research_protocol.py",
+      "time_boundary.py"
+    ],
+    "PLAYBOOK": [
+      "strategies.py",
+      "directional_episode.py"
+    ],
+    "POLICY": [
+      "h40/guards.py",
+      "economic/policy.py",
+      "risk.py"
+    ],
+    "AGENT": [
+      "regime.py",
+      "mechanism.py"
+    ],
+    "OPERATIONS": [
+      "cli.py",
+      "service.py",
+      "api.py",
+      "opportunity_forward.py",
+      "forward_diagnostics.py",
+      "notify/feishu.py",
+      "config.py",
+      "engine.py",
+      "funnel.py",
+      "shadow.py",
+      "sqlite_schema.py",
+      "explain.py"
+    ],
+    "EXECUTION": [
+      "execution/service.py",
+      "execution/guard.py",
+      "execution/models.py",
+      "execution/environment.py",
+      "execution/binance_signed.py"
+    ],
+    "LEGACY": [
+      "microstructure_research.py",
+      "microstructure.py",
+      "formal_research.py",
+      "backtest.py",
+      "mechanism_research.py",
+      "multifactor.py",
+      "domain.py",
+      "h39_input.py",
+      "h39_baseline.py",
+      "h39_statistics.py",
+      "economic/replay_bundle.py",
+      "economic/signal_producer.py"
+    ]
+  },
+  "entrypoints": [
+    {
+      "name": "quantctl",
+      "module": "cli.py",
+      "type": "CLI",
+      "command": "quantctl"
+    },
+    {
+      "name": "quant_api",
+      "module": "api.py",
+      "type": "REST_API",
+      "port": 8000
+    },
+    {
+      "name": "microstructure_daemon",
+      "module": "service.py",
+      "type": "DAEMON",
+      "observed_pid_at_baseline": 450
+    },
+    {
+      "name": "discovery_verifier",
+      "module": "h40/discovery_evidence.py",
+      "type": "RESEARCH_VERIFIER"
+    }
+  ],
+  "datasets": [
+    {
+      "id": "BTCUSDT_CANONICAL_1M",
+      "path": "data/research/BTCUSDT/1m/",
+      "format": "Parquet",
+      "partitions": 67,
+      "size_mb": 128,
+      "rows": 2934720,
+      "cadence": "1m",
+      "time_span": "2021-01 to 2026-07",
+      "pit_status": "CLOSED_BAR_PIT",
+      "authority": "MANIFEST_VERIFIED",
+      "readiness": "READY_AFTER_SOURCE_AUTHORITY_AND_ECONOMIC_ADAPTER_CLOSURE"
+    },
+    {
+      "id": "BTCUSDT_SPOT_1M",
+      "path": "data/research/BTCUSDT_SPOT/1m/",
+      "format": "Parquet",
+      "partitions": 61,
+      "size_mb": 88,
+      "rows": 2673007,
+      "cadence": "1m",
+      "time_span": "2021-01 to 2026-01",
+      "pit_status": "CLOSED_BAR_PIT",
+      "authority": "SECONDARY_RESEARCH",
+      "readiness": "BLOCKED_BY_PIT_AUTHORITY"
+    },
+    {
+      "id": "CROSS_ASSET_1H",
+      "path": "data/research/cross_asset_1h/*.parquet",
+      "format": "Parquet",
+      "partitions": 5,
+      "size_mb": 12.5,
+      "rows": 222840,
+      "cadence": "1h",
+      "time_span": "2021-01 to 2026-02",
+      "pit_status": "CLOSED_BAR_PIT",
+      "authority": "P1_SNAPSHOT_SEALED",
+      "readiness": "READY_NOW"
+    },
+    {
+      "id": "OFFICIAL_DERIVATIVES_RAW",
+      "path": "data/research/v0.3.19_official_derivatives/raw/",
+      "format": "CSV_GZ",
+      "partitions": 732,
+      "size_mb": 81682,
+      "rows": ">1.5B",
+      "cadence": "Tick/1m",
+      "time_span": "2021 to 2025",
+      "pit_status": "EVENT_PIT",
+      "authority": "RAW_UNSEALED",
+      "readiness": "BLOCKED_BY_PIT_AUTHORITY"
+    },
+    {
+      "id": "FORWARD_MICROSTRUCTURE",
+      "path": "data/forward/BTCUSDT/microstructure/",
+      "format": "SQLite3_WAL",
+      "partitions": 27,
+      "size_mb": 52732,
+      "rows": ">550M",
+      "cadence": "100ms",
+      "time_span": "2026-08-31 to 2026-09-26",
+      "pit_status": "CAUSAL_FORWARD",
+      "authority": "OPERATIONAL_EVIDENCE",
+      "readiness": "BLOCKED_BY_DATA"
+    },
+    {
+      "id": "FORWARD_DERIVATIVES",
+      "path": "data/forward/BTCUSDT/derivatives.sqlite3",
+      "format": "SQLite3",
+      "partitions": 1,
+      "size_mb": 7.7,
+      "rows": 2500,
+      "cadence": "15m",
+      "time_span": "2026-08-31 to 2026-09-27",
+      "pit_status": "CAUSAL_FORWARD",
+      "authority": "OPERATIONAL_EVIDENCE",
+      "readiness": "BLOCKED_BY_DATA"
+    },
+    {
+      "id": "H39_VALIDATION_LEDGER",
+      "path": "data/research/h39_validation/",
+      "format": "SQLite3_ENCRYPTED",
+      "partitions": 12,
+      "size_mb": 0.34,
+      "rows": "SEALED",
+      "cadence": "Event",
+      "time_span": "SEALED",
+      "pit_status": "SEALED",
+      "authority": "SEALED_PREREGISTERED",
+      "readiness": "PROTECTED_FORBIDDEN_TO_READ"
+    }
+  ],
+  "data_lineage": {
+    "sources": [
+      "data.binance.vision",
+      "fapi.binance.com",
+      "wss://fstream.binance.com"
+    ],
+    "transformers": [
+      "tools/build_official_dataset.py",
+      "tools/build_spot_market_flow_dataset.py",
+      "tools/build_cross_asset_hourly_dataset.py"
+    ],
+    "verification_gates": [
+      "h40/source_manifest.py",
+      "h40/split_manifest.py",
+      "h40/discovery_evidence.py"
+    ],
+    "execution_consumers": [
+      "economic/simulator.py",
+      "economic/execution_replay.py"
+    ]
+  },
+  "features": {
+    "trend_momentum": [
+      "D1_V1_RETURN_4H",
+      "D1_V2_RETURN_12H"
+    ],
+    "breakout": [
+      "D2_V1_BREAKOUT_24H",
+      "D2_V2_BREAKOUT_72H"
+    ],
+    "reversal": [
+      "D3_V1_FAILED_BREAK_24H",
+      "D3_V2_FAILED_BREAK_72H"
+    ],
+    "cross_asset": [
+      "D4_V1_CONFIRMATION_4H",
+      "D4_V2_DIVERGENCE_8H"
+    ],
+    "derivatives_crowding": [
+      "D5_V1_CROWDING_Q10_D1",
+      "D5_V2_CROWDING_Q20_D2"
+    ],
+    "regime_and_filters": [
+      "R_VOL_RANGE_V1",
+      "O_RANGE_EXPANSION_V1"
+    ]
+  },
+  "research_capabilities": {
+    "total_audited": 32,
+    "ready_now_total": 8,
+    "ready_now_direction": 6,
+    "ready_now_support": 2,
+    "ready_now_direction_capabilities": [
+      "CAP-TRD-01",
+      "CAP-TRD-02",
+      "CAP-TRD-03",
+      "CAP-TRD-04",
+      "CAP-TRD-05",
+      "CAP-TRD-06"
+    ],
+    "ready_now_support_capabilities": [
+      "CAP-FLT-01",
+      "CAP-FLT-02"
+    ],
+    "ready_now": [
+      "CAP-TRD-01",
+      "CAP-TRD-02",
+      "CAP-TRD-03",
+      "CAP-TRD-04",
+      "CAP-TRD-05",
+      "CAP-TRD-06",
+      "CAP-FLT-01",
+      "CAP-FLT-02"
+    ],
+    "ready_after_source_authority_and_economic_adapter_closure": [
+      "CAP-TRD-07",
+      "CAP-TRD-08",
+      "CAP-XAS-01",
+      "CAP-XAS-02"
+    ],
+    "blocked_by_pit_authority": [
+      "CAP-DRV-01",
+      "CAP-DRV-02",
+      "CAP-DRV-03",
+      "CAP-DRV-04",
+      "CAP-DRV-05",
+      "CAP-DRV-06"
+    ],
+    "blocked_by_data": [
+      "CAP-MIC-01",
+      "CAP-MIC-02",
+      "CAP-MIC-03",
+      "CAP-MIC-04",
+      "CAP-MIC-05",
+      "CAP-MIC-06",
+      "CAP-MIC-07",
+      "CAP-OI-02",
+      "CAP-POS-01",
+      "CAP-POS-02"
+    ],
+    "missing": [
+      "CAP-MIC-08",
+      "CAP-OI-01",
+      "CAP-LIQ-01",
+      "CAP-XAS-03"
+    ],
+    "category_counts": {
+      "ready_now": 8,
+      "ready_after_source_authority_and_economic_adapter_closure": 4,
+      "blocked_by_pit_authority": 6,
+      "blocked_by_data": 10,
+      "missing": 4,
+      "total_sum": 32
+    }
+  },
+  "historical_hypothesis_families": [
+    {
+      "family": "EMA_CROSSOVER",
+      "version": "v0.2.x",
+      "status": "HISTORICAL_LESSON",
+      "observation": "Fee drag (10 bps/turn) and whipsaws in ranging markets"
+    },
+    {
+      "family": "RSI_BOLLINGER_MEAN_REVERSION",
+      "version": "v0.2.x",
+      "status": "HISTORICAL_LESSON",
+      "observation": "Counter-trend tail risk without volume exhaustion confirmation"
+    },
+    {
+      "family": "HF_L2_ORDERBOOK_SKEW",
+      "version": "v0.3.15",
+      "status": "RECLASSIFIED_TIMING",
+      "observation": "Alpha decay <3s, forward-only data; repurposed for slippage gate"
+    },
+    {
+      "family": "FUNDING_RATE_CROWDING",
+      "version": "v0.3.19",
+      "status": "SUSPENDED_AUTHORITY",
+      "observation": "Raw CSV lack of cryptographic manifest; retained for P2 D5"
+    }
+  ],
+  "ready_now_capabilities": {
+    "total_count": 8,
+    "direction_count": 6,
+    "support_count": 2,
+    "direction_features": [
+      "D1_V1_RETURN_4H",
+      "D1_V2_RETURN_12H",
+      "D2_V1_BREAKOUT_24H",
+      "D2_V2_BREAKOUT_72H",
+      "D3_V1_FAILED_BREAK_24H",
+      "D3_V2_FAILED_BREAK_72H"
+    ],
+    "support_features": [
+      "R_VOL_RANGE_V1_24H",
+      "O_RANGE_EXPANSION_V1_24H"
+    ],
+    "slots_covered": 18,
+    "scope": "ETH_ONLY",
+    "cost_model": "COST_PROXY_12BPS_V1",
+    "calibration": "CALIBRATION_PLATT_LOGISTIC_V1"
+  },
+  "blocked_capabilities": {
+    "ready_after_source_authority_and_economic_adapter_closure_count": 4,
+    "ready_after_source_authority_and_economic_adapter_closure_ids": [
+      "CAP-TRD-07",
+      "CAP-TRD-08",
+      "CAP-XAS-01",
+      "CAP-XAS-02"
+    ],
+    "pit_authority_blocked_count": 6,
+    "pit_authority_blocked_ids": [
+      "CAP-DRV-01",
+      "CAP-DRV-02",
+      "CAP-DRV-03",
+      "CAP-DRV-04",
+      "CAP-DRV-05",
+      "CAP-DRV-06"
+    ],
+    "data_blocked_count": 10,
+    "data_blocked_ids": [
+      "CAP-MIC-01",
+      "CAP-MIC-02",
+      "CAP-MIC-03",
+      "CAP-MIC-04",
+      "CAP-MIC-05",
+      "CAP-MIC-06",
+      "CAP-MIC-07",
+      "CAP-OI-02",
+      "CAP-POS-01",
+      "CAP-POS-02"
+    ],
+    "missing_count": 4,
+    "missing_ids": [
+      "CAP-MIC-08",
+      "CAP-OI-01",
+      "CAP-LIQ-01",
+      "CAP-XAS-03"
+    ]
+  },
+  "runtime_hotspots": [
+    {
+      "module": "microstructure_research.py",
+      "lines": 6621,
+      "issue": "God module, complex imports; deferred post-playbook"
+    },
+    {
+      "module": "h40/lifecycle_authority.py",
+      "lines": 6521,
+      "issue": "Large monolithic authority file; preserved for stability"
+    },
+    {
+      "module": "test_suite",
+      "duration_sec": 45,
+      "issue": "Authority fixture recalculation; cached fixtures mitigate"
+    }
+  ],
+  "mainline_blockers": [],
+  "refactor_backlog": [
+    {
+      "id": "REF-04",
+      "target": "microstructure_research.py",
+      "action": "Split into schemas, stats, and harness",
+      "category": "DEFER_UNTIL_AFTER_FIRST_PLAYBOOK"
+    },
+    {
+      "id": "REF-05",
+      "target": "service.py",
+      "action": "Refactor operational daemon",
+      "category": "DEFER_UNTIL_AFTER_FIRST_PLAYBOOK"
+    },
+    {
+      "id": "REF-07",
+      "target": "execution/service.py",
+      "action": "Live execution hardening",
+      "category": "DEFER_UNTIL_M8_M9"
+    },
+    {
+      "id": "REF-08",
+      "target": "formal_research.py",
+      "action": "Prune legacy v0.3 runner",
+      "category": "RETIRE_LATER"
+    },
+    {
+      "id": "REF-09",
+      "target": "backtest.py",
+      "action": "Prune legacy v0.2 backtester",
+      "category": "RETIRE_LATER"
+    },
+    {
+      "id": "REF-12",
+      "target": "TradingAgents",
+      "action": "Keep strictly isolated external repository",
+      "category": "DEFER_UNTIL_M8_M9"
+    }
+  ],
+  "protected_surface_attestation": {
+    "protected_outcomes_accessed": false,
+    "real_discovery_run": false,
+    "implementation_mutated": false,
+    "p3_controller_self_authorized": false,
+    "attestation": "The executor certifies zero access to protected labels, forward returns, candidate rankings, or holdout sets."
+  },
+  "remote_implementation_sha": "fdb8e98b7e6527f20c3b0a0b17fde2ca6dd73119",
+  "features_by_category": {
+    "trend_momentum": [
+      "D1_V1_RETURN_4H",
+      "D1_V2_RETURN_12H"
+    ],
+    "breakout": [
+      "D2_V1_BREAKOUT_24H",
+      "D2_V2_BREAKOUT_72H"
+    ],
+    "reversal": [
+      "D3_V1_FAILED_BREAK_24H",
+      "D3_V2_FAILED_BREAK_72H"
+    ],
+    "cross_asset": [
+      "D4_V1_CONFIRMATION_4H",
+      "D4_V2_DIVERGENCE_8H"
+    ],
+    "derivatives_crowding": [
+      "D5_V1_CROWDING_Q10_D1",
+      "D5_V2_CROWDING_Q20_D2"
+    ],
+    "regime_and_filters": [
+      "R_VOL_RANGE_V1",
+      "O_RANGE_EXPANSION_V1"
+    ]
+  },
+  "ready_now_capabilities_summary": {
+    "total_count": 8,
+    "direction_count": 6,
+    "support_count": 2,
+    "slots_covered": 18
+  },
+  "blocked_capabilities_summary": {
+    "ready_after_source_authority_and_economic_adapter_closure_count": 4,
+    "pit_authority_blocked_count": 6,
+    "data_blocked_count": 10,
+    "missing_count": 4
+  }
+}
