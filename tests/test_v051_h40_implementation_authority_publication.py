@@ -128,9 +128,11 @@ def _historical_a23_authority() -> H40LifecycleImplementationAuthority:
 
 
 def test_p01_exact_accepted_constant() -> None:
-    """P01: Verify production implementation constant is published while P3 controller remains None."""
+    """P01: Verify production implementation and P3 controller constants are published."""
     assert ACCEPTED_LIFECYCLE_IMPLEMENTATION_AUTHORITY_HASH == EXACT_ACCEPTED_HASH
-    assert ACCEPTED_H40_P3_CONTROLLER_AUTHORITY_HASH is None
+    assert ACCEPTED_H40_P3_CONTROLLER_AUTHORITY_HASH == (
+        "37b6ea92ff61b90c07f38cadea58087a8dc91c67d3beabe34dc7792988ff3e3a"
+    )
 
 
 def test_p02_exact_typed_authority_reconstructs_accepted_hash() -> None:
@@ -324,8 +326,10 @@ def test_p12_critical_negative_paths() -> None:
     # 1. Implementation authority published = YES
     assert ACCEPTED_LIFECYCLE_IMPLEMENTATION_AUTHORITY_HASH == EXACT_ACCEPTED_HASH
 
-    # 2. P3 controller authority published = NO
-    assert ACCEPTED_H40_P3_CONTROLLER_AUTHORITY_HASH is None
+    # 2. P3 controller authority published = YES
+    assert ACCEPTED_H40_P3_CONTROLLER_AUTHORITY_HASH == (
+        "37b6ea92ff61b90c07f38cadea58087a8dc91c67d3beabe34dc7792988ff3e3a"
+    )
 
     # 3. Old a23ceec... typed authority is not current
     a23_auth = _historical_a23_authority()
@@ -404,8 +408,10 @@ def test_p13_mandatory_republication_fail_closed_controller_gate() -> None:
     # 1. production implementation authority = EXACT_ACCEPTED_HASH
     assert ACCEPTED_LIFECYCLE_IMPLEMENTATION_AUTHORITY_HASH == EXACT_ACCEPTED_HASH
 
-    # 2. P3 controller authority = None
-    assert ACCEPTED_H40_P3_CONTROLLER_AUTHORITY_HASH is None
+    # 2. P3 controller authority published
+    assert ACCEPTED_H40_P3_CONTROLLER_AUTHORITY_HASH == (
+        "37b6ea92ff61b90c07f38cadea58087a8dc91c67d3beabe34dc7792988ff3e3a"
+    )
 
     # 3. old a23ceec... typed authority cannot become current merely because its historical object is valid
     hist_authority = _historical_a23_authority()

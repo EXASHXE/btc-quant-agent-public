@@ -764,7 +764,9 @@ def test_t07_implementation_authority_required() -> None:
     assert ACCEPTED_LIFECYCLE_IMPLEMENTATION_AUTHORITY_HASH == (
         "088b1210c17171141e232219345fa890e182282445fd9b2a70804b177d808b96"
     )
-    assert ACCEPTED_H40_P3_CONTROLLER_AUTHORITY_HASH is None
+    assert ACCEPTED_H40_P3_CONTROLLER_AUTHORITY_HASH == (
+        "37b6ea92ff61b90c07f38cadea58087a8dc91c67d3beabe34dc7792988ff3e3a"
+    )
     service = H40LifecycleAuthorityService.production()
     authority = _implementation_authority()
     seal = _complete_synthetic_seal()
