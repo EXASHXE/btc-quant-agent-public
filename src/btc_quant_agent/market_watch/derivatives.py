@@ -161,9 +161,7 @@ def is_severe_long_crowding(derivatives: DerivativesMetrics, config: MarketWatch
         return True
     if gls is not None and gls >= tc.global_long_crowding_ratio * 1.2:
         return True
-    if ttp is not None and ttp >= tc.top_trader_crowding_ratio * 1.25:
-        return True
-    return False
+    return bool(ttp is not None and ttp >= tc.top_trader_crowding_ratio * 1.25)
 
 
 def is_severe_short_crowding(derivatives: DerivativesMetrics, config: MarketWatchConfig) -> bool:
@@ -191,9 +189,7 @@ def is_severe_short_crowding(derivatives: DerivativesMetrics, config: MarketWatc
         return True
     if gls is not None and gls <= tc.global_short_crowding_ratio * 0.8:
         return True
-    if ttp is not None and ttp <= (1.0 / (tc.top_trader_crowding_ratio * 1.25)):
-        return True
-    return False
+    return bool(ttp is not None and ttp <= (1.0 / (tc.top_trader_crowding_ratio * 1.25)))
 
 
 def apply_derivatives_action_gate(
