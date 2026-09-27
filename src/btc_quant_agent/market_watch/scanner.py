@@ -834,10 +834,13 @@ class MarketWatchScanner:
                     self.store.set_last_shadow_signal_ids(a.symbol, triggered_id=sig_id)
                     self.store.set_last_shadow_recorded_state(a.symbol, "TRIGGERED")
 
-            elif a.lifecycle_state in (SignalLifecycleState.CANDIDATE, SignalLifecycleState.INVALIDATED, SignalLifecycleState.EXPIRED) and a.directional.setup == PlaybookType.NO_TRADE:
-                if prev_armed_id or prev_triggered_id:
-                    self.store.set_last_shadow_signal_ids(a.symbol, armed_id="", triggered_id="")
-                    self.store.set_last_shadow_recorded_state(a.symbol, "")
+            elif (
+                a.lifecycle_state in (SignalLifecycleState.CANDIDATE, SignalLifecycleState.INVALIDATED, SignalLifecycleState.EXPIRED)
+                and a.directional.setup == PlaybookType.NO_TRADE
+                and (prev_armed_id or prev_triggered_id)
+            ):
+                self.store.set_last_shadow_signal_ids(a.symbol, armed_id="", triggered_id="")
+                self.store.set_last_shadow_recorded_state(a.symbol, "")
 
             emit, severity, _reasons = evaluate_alert_emission(a, prev_st, self.config)
 

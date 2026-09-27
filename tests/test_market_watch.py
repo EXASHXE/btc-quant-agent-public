@@ -2631,7 +2631,7 @@ def test_r2_1_03_strict_pit_receipt_semantics() -> None:
         client._optional_get.return_value = None
 
         scanner = MarketWatchScanner(config=config, client=client, store=store)
-        snap, health, errors = scanner.collect_symbol_snapshot("BTCUSDT", now_ms=t_base)
+        snap, _health, _errors = scanner.collect_symbol_snapshot("BTCUSDT", now_ms=t_base)
         assert snap is not None
         # observed_at_ms must incorporate all feeds (deriv_observed_at_ms, available_at_ms, server_time receipt)
         assert snap.observed_at_ms >= t_deriv_obs
