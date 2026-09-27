@@ -13,7 +13,7 @@ import math
 import re
 from bisect import bisect_right
 from collections.abc import Mapping, Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from pathlib import Path
@@ -1290,6 +1290,32 @@ def _load_source_bars(
     return bars, universes
 
 
+def _derive_source_decision(
+    *, candidate_id: str, slot: Any, partition_id: str,
+    timestamp: datetime, product: str, horizon: int,
+    bars: Mapping[tuple[datetime, str], _Bar], source_evidence_hash: str,
+) -> _Decision:
+    """Shared frozen causal prefit and source-local outcome reconstruction."""
+    score, regime, opportunity, secondary = _reconstruct_prefit_cached(
+        candidate_id=candidate_id, slot=slot, partition_id=partition_id,
+        t=timestamp, product=product, bars=bars, source_evidence_hash=source_evidence_hash,
+    )
+    _, _, support_end = _partition_bounds(partition_id)
+    first = bars.get((timestamp, product))
+    exit_time = timestamp + timedelta(hours=horizon - 1)
+    if first is None or exit_time >= support_end:
+        _fail("missing source-bound entry or unauthorized support endpoint", H40ReasonCode.NOT_TESTABLE)
+    path = tuple(bars.get((timestamp + timedelta(hours=index), product)) for index in range(horizon))
+    if any(bar is None for bar in path):
+        _fail("missing source-local outcome-support hour", H40ReasonCode.NOT_TESTABLE)
+    complete_path = tuple(cast(_Bar, bar) for bar in path)
+    last = complete_path[-1]
+    return _Decision(
+        timestamp, product, regime, opportunity, score, secondary, None, None,
+        math.log(last.close / first.open), None, first.open, last.close, complete_path,
+    )
+
+
 def _load_decisions(
     resolver: H40DiscoveryEvidenceResolver,
     digest: str,
@@ -1328,7 +1354,7 @@ def _load_decisions(
     rows = payload["rows"]
     if not isinstance(rows, list):
         _fail("decision rows must be an array")
-    start, end, support_end = _partition_bounds(partition_id)
+    start, end, _ = _partition_bounds(partition_id)
     result: list[_Decision] = []
     previous: tuple[datetime, str] | None = None
     for raw in rows:
@@ -1345,28 +1371,13 @@ def _load_decisions(
             _fail("decision is outside sorted active-scope partition")
         previous = key
 
-        score, regime_state, opportunity_state, secondary_filter_state = _reconstruct_prefit_cached(
-            candidate_id=candidate_id,
-            slot=slot,
-            partition_id=partition_id,
-            t=timestamp,
-            product=product,
-            bars=bars,
-            source_evidence_hash=source_evidence_hash,
+        decision = _derive_source_decision(
+            candidate_id=candidate_id, slot=slot, partition_id=partition_id,
+            timestamp=timestamp, product=product, horizon=horizon,
+            bars=bars, source_evidence_hash=source_evidence_hash,
         )
-
-        first = bars.get(key)
-        exit_time = timestamp + timedelta(hours=horizon - 1)
-        if first is None or exit_time >= support_end:
-            _fail("missing source-bound entry or unauthorized support endpoint", H40ReasonCode.NOT_TESTABLE)
-        path = tuple(bars.get((timestamp + timedelta(hours=index), product)) for index in range(horizon))
-        if any(bar is None for bar in path):
-            _fail("missing source-local outcome-support hour", H40ReasonCode.NOT_TESTABLE)
-        complete_path = tuple(cast(_Bar, bar) for bar in path)
-        last = complete_path[-1]
-        computed_r_h = math.log(last.close / first.open)
         supplied_r_h = _number(item["r_h"], "r_h")
-        if supplied_r_h != computed_r_h:
+        if supplied_r_h != decision.r_h:
             _fail("supplied log return does not match raw source prices")
         supplied_p_up = None if item["p_up"] is None else _number(item["p_up"], "p_up")
         if supplied_p_up is not None and not 0 <= supplied_p_up <= 1:
@@ -1379,16 +1390,13 @@ def _load_decisions(
             _fail("calibration final action mismatch")
         supplied_net = None if item["r_net"] is None else _number(item["r_net"], "r_net")
         if action in ("LONG", "SHORT"):
-            _, expected_net = h40_proxy_net_return(action, str(first.open), str(last.close))
+            _, expected_net = h40_proxy_net_return(action, str(decision.p0), str(decision.ch))
             if supplied_net != expected_net:
                 _fail("supplied proxy net return does not match raw source prices")
         elif supplied_net is not None:
             _fail("abstaining row cannot supply trade return")
-        result.append(_Decision(
-            timestamp, product, regime_state, opportunity_state,
-            score, secondary_filter_state, supplied_p_up, action,
-            computed_r_h, supplied_net, first.open, last.close, complete_path,
-        ))
+        result.append(replace(decision, supplied_p_up=supplied_p_up,
+                              supplied_action=action, supplied_r_net=supplied_net))
     expected_keys = frozenset(key for key in base_universe if key[1] in products)
     if frozenset((item.timestamp, item.product) for item in result) != expected_keys:
         _fail("decision rows do not cover complete active-scope base universe")
@@ -1469,11 +1477,16 @@ def _median(values: Sequence[float]) -> float:
 def _geometry_rows(candidates: Mapping[str, _LoadedCandidate]) -> dict[
     str, dict[tuple[str, str, int, datetime, str, str], tuple[float, float]]
 ]:
+    return _geometry_training_rows([(candidate.slot, candidate.training) for candidate in candidates.values()])
+
+
+def _geometry_training_rows(candidates: Sequence[tuple[Any, Sequence[_Decision]]]) -> dict[
+    str, dict[tuple[str, str, int, datetime, str, str], tuple[float, float]]
+]:
     owners: dict[str, dict[tuple[str, str, int, datetime, str, str], tuple[float, float]]] = {}
-    for candidate in candidates.values():
-        slot = candidate.slot
+    for slot, training in candidates:
         owner = str(slot.direction_contract_id)
-        for row in candidate.training:
+        for row in training:
             if not row.prefit_eligible:
                 continue
             side = row.proposed_action

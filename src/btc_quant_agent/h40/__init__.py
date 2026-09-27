@@ -16,6 +16,11 @@ from .discovery_evidence import (
     H40DiscoveryEvidenceResolver,
     H40ProductionDiscoveryEvidenceVerifier,
 )
+from .discovery_producer import (
+    H40DiscoveryEvidenceWriter,
+    H40DiscoveryProductionResult,
+    H40ProductionDiscoveryEvidenceProducer,
+)
 from .feature_contracts import (
     CalibrationMethod,
     H40CalibrationContract,
@@ -230,6 +235,8 @@ __all__ = [
     "H40DiscoveryAuthorizationReceipt",
     "H40DiscoveryAuthorizationReceiptV2",
     "H40DiscoveryEvidenceResolver",
+    "H40DiscoveryEvidenceWriter",
+    "H40DiscoveryProductionResult",
     "H40DiscoveryResultEvidence",
     "H40DiscoveryRunGrant",
     "H40DurableRunHead",
@@ -252,6 +259,7 @@ __all__ = [
     "H40P3ControllerAuthority",
     "H40Partition",
     "H40PartitionType",
+    "H40ProductionDiscoveryEvidenceProducer",
     "H40ProductionDiscoveryEvidenceVerifier",
     "H40ProtectedSurfaceGuard",
     "H40ProtocolIdentity",
