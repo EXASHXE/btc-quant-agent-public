@@ -1,0 +1,141 @@
+{
+  "accepted_lifecycle_implementation_authority_hash": "088b1210c17171141e232219345fa890e182282445fd9b2a70804b177d808b96",
+  "changed_files": [
+    "src/btc_quant_agent/h40/lifecycle_authority.py",
+    "tests/test_v051_h40_f01_lifecycle_authority.py",
+    "tests/test_v051_h40_implementation_authority_publication.py",
+    "tests/test_v051_h40_p3_controller_authority_publication.py",
+    "tests/test_v051_h40_p3b_production_verifier_behavior_seal.py",
+    "tests/test_v051_h40_repair_a_lifecycle_authority.py",
+    "tests/test_v051_h40_repair_b_provenance_pit.py"
+  ],
+  "discovery_boundaries": {
+    "candidate_lock_created": false,
+    "candidate_ranking_generated": false,
+    "discovery_authorization_receipt_created": false,
+    "discovery_result_generated": false,
+    "receipt_file_exists": false
+  },
+  "focused_tests": {
+    "exit_code": 0,
+    "raw_log": "focused_tests.log",
+    "raw_log_sha256": "915da07f943751f8adb0353aa196848f64e7c6e20f6dc902c8748dc906c10869",
+    "status": "PASS"
+  },
+  "formal_final_state": "H40_DISCOVERY_READY_AWAITING_EXPLICIT_GO",
+  "frozen_identities": {
+    "discovery_provenance_contract_hash": "31fc3930e44149e6b3af54ddd3b11c630f95cbbd3f152b3d0d5e614690dcf7ae",
+    "discovery_selection_correction_contract_hash": "f84c97050c7db813263e5ffda6b1c556af0b7b0e2876bb8616640d2c9d67084b",
+    "lifecycle_child_hashes_9_of_9": {
+      "candidate_lock_receipt_contract": "96756dfebab636baa1abb33364e307d99d90a61572b813c6a60504283d3d42df",
+      "confirmation_ready_receipt_contract": "7ab0ae0c8acb17340eccaa2bb737a5300e679b8de7497a539bdc44e93d3109be",
+      "discovery_authorization_receipt_contract": "3dd91827d4a26441bd5218dc299f196841c471eb60f20e03881d2ad56ce36898",
+      "f02_boundary_contract": "5678d8bd6b83bb69e1a1ad2cf78af8ddbaece625a5a34b7018b0a5e6368756f4",
+      "persistence_replay_contract": "51e4fe6155d388c076dd1788a100265eb17b232300481a3fbcf00150f1432de1",
+      "runtime_snapshot_seal_contract": "76a0732742707c78f65da26263076bed7b586ea67d4f5ddd2dac33761e37e612",
+      "termination_receipt_contract": "b45c7021db1c63a447ddb22a1f9cb787ce71a5048c824ce38d40f19f755ecb48",
+      "transition_matrix_contract": "bea7b0593251204bbc9138c325f1c9f10ccf7a9b8df60f10bf991377e0ced42d",
+      "wf_validation_receipt_contract": "bb5698a85daec1a5b9dcd169bde3d575befe8c0a1d73c2e87136cf35afb4001b"
+    },
+    "lifecycle_governance_authority_v5": "bb367f2af726be105bddf42636c97652402014c8a671d43ab81b1964c258e5cf",
+    "lifecycle_semantic_root_v5": "36cbda530352cffaa475bd835b3b629df47351ca284e09bdf31a8fc884d48b4b",
+    "protocol_authority_hash": "a83f8fc7a5ca7109fb8cd7fed114d87c3b2c968b5145c11cada203aa5111d1ce",
+    "scientific_semantic_root_hash": "71889a35f227ed734272b712851174a69bf9dbb12ea3f87cd84c26e7c66f6af1",
+    "structural_ledger_hash": "483f68502b57972deae071c7bd4587ca3e57ccaa72bd99fb0de07b4f0ab8c85f"
+  },
+  "full_suite": {
+    "exit_code": 0,
+    "raw_log": "full_suite_run.log",
+    "raw_log_sha256": "cf3d0ed4a5aa1f1c5eb01773d1a1f2330be40c7abf2eca75c9c4cd8abaeab3cc",
+    "status": "PASS"
+  },
+  "generated_at_utc": "2026-09-27T09:23:59Z",
+  "implementation_remote_branch_sha": "cccfddf63b25318ac42eb05935ce3f5835347c56",
+  "next_stage": "CONTROLLER_M2_EXACT_SHA_ACCEPTANCE_THEN_EXPLICIT_GO_DECISION",
+  "p3_controller_authority_hash": "37b6ea92ff61b90c07f38cadea58087a8dc91c67d3beabe34dc7792988ff3e3a",
+  "protected_surface_attestation": {
+    "accepted_execution_write_authority": null,
+    "candidate_lock_created": false,
+    "candidate_ranking_generated": false,
+    "confirmation_accessed": false,
+    "discovery_result_generated": false,
+    "execution_credentials_or_order_interfaces_accessed": false,
+    "execution_policy": "RESEARCH_DISABLED_V1",
+    "final_holdout_accessed": false,
+    "h39_accessed": false,
+    "real_h40_outcomes_accessed": false,
+    "signed_network_requests": 0,
+    "wf_outcomes_accessed": false
+  },
+  "raw_logs": {
+    "authority_stage_state.log": "47f278854ded2490955f7ec1a3d5224f3c764b4c95f44bb67145f93f72521cc9",
+    "focused_tests.log": "915da07f943751f8adb0353aa196848f64e7c6e20f6dc902c8748dc906c10869",
+    "full_suite_run.log": "cf3d0ed4a5aa1f1c5eb01773d1a1f2330be40c7abf2eca75c9c4cd8abaeab3cc",
+    "identity_replay.log": "ad6017f19c9b5ba7d95b0ffffb47bdc999e560a360405b2924df8cd738c23887",
+    "production_readiness.log": "71056d1a0cc59a0935cbb8d468f9fd2d7b2a740a565e787cae0e2548a350ce2c",
+    "static_compileall.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "static_git_diff.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "static_mypy.log": "092e5eb1e45e241cfabcc8c61bcc544108ae075fc01d13940b2b24013bbd1e3a",
+    "static_ruff.log": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+  },
+  "remote_ci": {
+    "commit_sha": "cccfddf63b25318ac42eb05935ce3f5835347c56",
+    "conclusion": "success",
+    "run_id": 36308667409,
+    "status": "completed",
+    "url": "https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/36308667409"
+  },
+  "roster_accounting": {
+    "active_required_source_ids": [
+      "ETHUSDT_USD_M_1H"
+    ],
+    "not_testable_slots": 150,
+    "not_testable_source_ids": [
+      "BTCUSDT_USD_M_1H",
+      "BTCUSDT_OFFICIAL_DERIVATIVES",
+      "BTCUSDT_SPOT_FLOW",
+      "ETHUSDT_DERIVATIVES_FLOW"
+    ],
+    "registered_slots": 18,
+    "total_slots": 168
+  },
+  "runtime_authorities": {
+    "audit_timestamp_utc": "2026-09-27T08:45:00Z",
+    "materialized_run_authority_hash": "b39534c47e3f965e2857da309bf29ba14122db7ee01bc5d6d00a52bf75a0e952",
+    "readiness_discovery_run_grant_hash": "7163c0b5c8708e6a9b301d634430d34fc49dc548f0ea2f750a7766962dd21b0a",
+    "run_authority_id": "1c6a9942c961867524d1c9b9b0092fc9fc05ed54f0bf8e2b1e90863fa4b3a1bf",
+    "runtime_authority_snapshot_hash": "733b57a347259794e552a2bc47ecf80712d0e6b54b2d3e2b90c7d52d7a0883d2",
+    "sealed_registered_roster_hash": "78af704fff5210beddd7427a1624cae4c1fbc1415da1fdbc6fcfa8a3228179da",
+    "source_manifest_hash": "49543cdbf67ede7b8527d59349b2d5f5f6fff6813a463afe53241f2a4d812d2c",
+    "split_attestation_hash": "aa863a48a7d0d2f0e9533e42023b37451a93da92c4f75c11101c253c1c375f28",
+    "split_manifest_hash": "6f0ccc95cc03a087dc877561d8da804f16ccefc224fccfdb8842021f9e49eae7"
+  },
+  "schema_id": "H40_M2_P3_DISCOVERY_READINESS_EVIDENCE_V1",
+  "static_gates": {
+    "compileall": {
+      "exit_code": 0,
+      "raw_log": "static_compileall.log",
+      "raw_log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "status": "PASS"
+    },
+    "git_diff_check": {
+      "exit_code": 0,
+      "raw_log": "static_git_diff.log",
+      "raw_log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "status": "PASS"
+    },
+    "mypy": {
+      "exit_code": 0,
+      "raw_log": "static_mypy.log",
+      "raw_log_sha256": "092e5eb1e45e241cfabcc8c61bcc544108ae075fc01d13940b2b24013bbd1e3a",
+      "status": "PASS"
+    },
+    "ruff": {
+      "exit_code": 0,
+      "raw_log": "static_ruff.log",
+      "raw_log_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "status": "PASS"
+    }
+  },
+  "tested_commit_sha": "cccfddf63b25318ac42eb05935ce3f5835347c56"
+}

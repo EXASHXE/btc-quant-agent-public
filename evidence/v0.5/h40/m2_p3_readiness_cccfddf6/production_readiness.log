@@ -1,0 +1,31 @@
+{
+  "runtime_authorities": {
+    "audit_timestamp_utc": "2026-09-27T08:45:00Z",
+    "materialized_run_authority_hash": "b39534c47e3f965e2857da309bf29ba14122db7ee01bc5d6d00a52bf75a0e952",
+    "readiness_discovery_run_grant_hash": "7163c0b5c8708e6a9b301d634430d34fc49dc548f0ea2f750a7766962dd21b0a",
+    "run_authority_id": "1c6a9942c961867524d1c9b9b0092fc9fc05ed54f0bf8e2b1e90863fa4b3a1bf",
+    "runtime_authority_snapshot_hash": "733b57a347259794e552a2bc47ecf80712d0e6b54b2d3e2b90c7d52d7a0883d2",
+    "sealed_registered_roster_hash": "78af704fff5210beddd7427a1624cae4c1fbc1415da1fdbc6fcfa8a3228179da",
+    "source_manifest_hash": "49543cdbf67ede7b8527d59349b2d5f5f6fff6813a463afe53241f2a4d812d2c",
+    "split_attestation_hash": "aa863a48a7d0d2f0e9533e42023b37451a93da92c4f75c11101c253c1c375f28",
+    "split_manifest_hash": "6f0ccc95cc03a087dc877561d8da804f16ccefc224fccfdb8842021f9e49eae7"
+  },
+  "slot_counts": {
+    "not_testable_slot_count": 150,
+    "registered_slot_count": 18,
+    "total_slot_count": 168
+  },
+  "source_canonical_identity": {
+    "archive_set_sha256": "1efde37a765de90e33fd509bd1bcb729351beafa79314f684b3558665b19226c",
+    "cadence": "1h",
+    "end_utc": "2026-01-31T23:00:00Z",
+    "file_sha256": "563a1a4d927ec2a007481783be9bd76896e1be57198af80c4b2a30608e124608",
+    "product": "ETHUSDT",
+    "receipt_status": "VERIFIED",
+    "row_count": 44568,
+    "source": "ETHUSDT_USD_M_1H",
+    "start_utc": "2021-01-01T00:00:00Z",
+    "status": "VERIFIED"
+  },
+  "status": "PASS"
+}

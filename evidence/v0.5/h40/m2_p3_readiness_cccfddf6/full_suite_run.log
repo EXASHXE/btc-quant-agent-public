@@ -1,0 +1,63 @@
+........................................................................ [  4%]
+........................................................................ [  8%]
+........................................................................ [ 12%]
+........................................................................ [ 16%]
+........................................................................ [ 21%]
+........................................................................ [ 25%]
+........................................................................ [ 29%]
+........................................................................ [ 33%]
+........................................................................ [ 37%]
+........................................................................ [ 42%]
+........................................................................ [ 46%]
+........................................................................ [ 50%]
+........................................................................ [ 54%]
+........................................................................ [ 58%]
+........................................................................ [ 63%]
+........................................................................ [ 67%]
+........................................................................ [ 71%]
+........................................................................ [ 75%]
+........................................................................ [ 79%]
+........................................................................ [ 84%]
+........................................................................ [ 88%]
+........................................................................ [ 92%]
+........................................................................ [ 96%]
+........................................................                 [100%]
+=============================== warnings summary ===============================
+tests/test_hermetic_runtime_guard.py::test_default_h39_engine_cannot_fall_back_to_operational_roots
+  /root/workspace/project/Quant-agent-sanitized/tests/test_hermetic_runtime_guard.py:80: DeprecationWarning: evaluate_validation_status() is a deprecated non-authoritative diagnostic. It MUST NOT authorize unblind, candidate promotion, or formal validation. Use check_unblind_readiness() with wall-clock denominator instead.
+    H39ResearchEngine().evaluate_validation_status()
+
+tests/test_shadow.py::ShadowTests::test_unfilled_signal_stays_pending_until_expiry
+  /root/workspace/project/Quant-agent-sanitized/tests/test_shadow.py:19: DeprecationWarning: shadow.update_shadow(repository, bars, now) is LEGACY_DIAGNOSTIC_ONLY; use update_formal_shadow with an explicit protocol/evidence job for current economics
+    self.assertEqual(update_shadow(repo, [bar], 120_000), [])
+
+tests/test_shadow.py::ShadowTests::test_unfilled_signal_stays_pending_until_expiry
+  /root/workspace/project/Quant-agent-sanitized/tests/test_shadow.py:23: DeprecationWarning: shadow.update_shadow(repository, bars, now) is LEGACY_DIAGNOSTIC_ONLY; use update_formal_shadow with an explicit protocol/evidence job for current economics
+    resolved = update_shadow(repo, [bar], item.expires_at_ms + 1)
+
+tests/test_v0323_blind_validation.py::test_final_holdout_sealed_and_execution_disabled
+  /root/workspace/project/Quant-agent-sanitized/tests/test_v0323_blind_validation.py:727: DeprecationWarning: evaluate_validation_status() is a deprecated non-authoritative diagnostic. It MUST NOT authorize unblind, candidate promotion, or formal validation. Use check_unblind_readiness() with wall-clock denominator instead.
+    val_status = engine.evaluate_validation_status()
+
+tests/test_v0323_blind_validation.py::test_metadata_only_diagnostic_never_reaches_outcome_loaders
+  /root/workspace/project/Quant-agent-sanitized/tests/test_v0323_blind_validation.py:810: DeprecationWarning: evaluate_validation_status() is a deprecated non-authoritative diagnostic. It MUST NOT authorize unblind, candidate promotion, or formal validation. Use check_unblind_readiness() with wall-clock denominator instead.
+    val_status = engine.evaluate_validation_status()
+
+tests/test_v0323_blind_validation.py::test_post_start_partition_does_not_trigger_observation_building
+  /root/workspace/project/Quant-agent-sanitized/tests/test_v0323_blind_validation.py:861: DeprecationWarning: evaluate_validation_status() is a deprecated non-authoritative diagnostic. It MUST NOT authorize unblind, candidate promotion, or formal validation. Use check_unblind_readiness() with wall-clock denominator instead.
+    val_status = engine.evaluate_validation_status()
+
+tests/test_v0323_blind_validation.py::test_absence_of_canonical_candles_does_not_break_diagnostic
+  /root/workspace/project/Quant-agent-sanitized/tests/test_v0323_blind_validation.py:889: DeprecationWarning: evaluate_validation_status() is a deprecated non-authoritative diagnostic. It MUST NOT authorize unblind, candidate promotion, or formal validation. Use check_unblind_readiness() with wall-clock denominator instead.
+    val_status = engine.evaluate_validation_status()
+
+tests/test_v0323_blind_validation.py::test_diagnostic_payload_has_no_performance_leakage
+  /root/workspace/project/Quant-agent-sanitized/tests/test_v0323_blind_validation.py:899: DeprecationWarning: evaluate_validation_status() is a deprecated non-authoritative diagnostic. It MUST NOT authorize unblind, candidate promotion, or formal validation. Use check_unblind_readiness() with wall-clock denominator instead.
+    val_status = engine.evaluate_validation_status()
+
+tests/test_v0323_blind_validation.py::test_deprecated_diagnostic_cannot_grant_authorization
+  /root/workspace/project/Quant-agent-sanitized/tests/test_v0323_blind_validation.py:921: DeprecationWarning: evaluate_validation_status() is a deprecated non-authoritative diagnostic. It MUST NOT authorize unblind, candidate promotion, or formal validation. Use check_unblind_readiness() with wall-clock denominator instead.
+    val_status = engine.evaluate_validation_status()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+1712 passed, 9 warnings in 429.12s (0:07:09)
