@@ -64,6 +64,11 @@ class SignalLifecycleState(StrEnum):
     EXPIRED = "EXPIRED"
 
 
+class ShadowObservationType(StrEnum):
+    SETUP_ARMED = "SETUP_ARMED"
+    ACTIONABLE_TRIGGERED = "ACTIONABLE_TRIGGERED"
+
+
 class AlertSeverity(StrEnum):
     INFO = "INFO"
     WATCH = "WATCH"
@@ -272,6 +277,51 @@ class GridPlan:
         return payload
 
 
+def compute_signal_identity(
+    symbol: str,
+    playbook: PlaybookType | str,
+    intended_direction: str,
+    anchor_level: float | None,
+) -> str:
+    """Deterministic signal identity combining symbol, playbook, intended direction, and anchor level."""
+    norm_level = f"{anchor_level:.2f}" if anchor_level is not None and anchor_level > 0 else "0.00"
+    pb_str = playbook.value if isinstance(playbook, PlaybookType) else str(playbook)
+    return f"{symbol.upper()}:{pb_str}:{intended_direction.upper()}:{norm_level}"
+
+
+def extract_signal_identity(
+    symbol: str,
+    directional: DirectionalPlan,
+) -> str:
+    """Extract or compute deterministic signal identity from DirectionalPlan."""
+    d = directional
+    if str(d.decision.value) in ("LONG", "SHORT"):
+        intended_dir = str(d.decision.value)
+    elif d.breakout_direction:
+        intended_dir = str(d.breakout_direction)
+    elif str(d.setup.value) == "FAILED_BREAKOUT":
+        intended_dir = "SHORT"
+    elif str(d.setup.value) == "FAILED_BREAKDOWN":
+        intended_dir = "LONG"
+    elif d.take_profit_1 > 0 and d.stop_loss > 0:
+        intended_dir = "LONG" if d.take_profit_1 > d.stop_loss else "SHORT"
+    elif d.take_profit_1 > 0 and d.entry_low > 0:
+        intended_dir = "LONG" if d.take_profit_1 > d.entry_low else "SHORT"
+    else:
+        intended_dir = "NONE"
+
+    anchor = d.breakout_level
+    if anchor is None or anchor <= 0:
+        if intended_dir == "LONG" and d.entry_low > 0:
+            anchor = d.entry_low
+        elif intended_dir == "SHORT" and d.entry_high > 0:
+            anchor = d.entry_high
+        elif d.stop_loss > 0:
+            anchor = d.stop_loss
+
+    return compute_signal_identity(symbol, d.setup, intended_dir, anchor)
+
+
 @dataclass(frozen=True)
 class SymbolAssessment:
     symbol: str
@@ -287,6 +337,7 @@ class SymbolAssessment:
     lifecycle_state: SignalLifecycleState = SignalLifecycleState.CANDIDATE
     policy_version: str = MARKET_WATCH_POLICY_VERSION
     config_hash: str = ""
+    signal_identity: str = ""
 
     def as_dict(self) -> dict[str, Any]:
         return {
@@ -300,6 +351,7 @@ class SymbolAssessment:
             "grid": self.grid.as_dict(),
             "veto_reasons": list(self.veto_reasons),
             "alert_fingerprint": self.alert_fingerprint,
+            "signal_identity": self.signal_identity,
         }
 
 

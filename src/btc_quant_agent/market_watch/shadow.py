@@ -22,6 +22,7 @@ class ShadowEvaluationManager:
         reference_decision: str | None = None,
         reference_notes: str | None = None,
         evaluation_horizon_bars: int = 16,
+        observation_type: str = "ACTIONABLE_TRIGGERED",
     ) -> int:
         d = assessment.directional
         entry_price = (
@@ -47,6 +48,7 @@ class ShadowEvaluationManager:
             tp2=d.take_profit_2,
             direction=str(d.decision),
             evaluation_horizon_bars=evaluation_horizon_bars,
+            observation_type=observation_type,
         )
 
     def resolve_pending_observations(
@@ -90,16 +92,39 @@ class ShadowEvaluationManager:
                 results.append({"id": rec_id, "symbol": symbol, "status": "INELIGIBLE"})
                 continue
 
-            try:
-                raw_candles = client.klines(symbol, "15m", 120)
-            except Exception as exc:  # noqa: BLE001
-                results.append({"id": rec_id, "symbol": symbol, "status": f"FETCH_FAILED: {exc}"})
+            fetch_end_ms = min(current_time_ms, eval_end_ms)
+            if fetch_end_ms <= timestamp_ms:
+                results.append({"id": rec_id, "symbol": symbol, "status": "PENDING_AWAITING_FUTURE_BARS"})
                 continue
+
+            # Historical Recovery (R2.1-06):
+            # Resolve frozen evaluation windows using historical_klines when interval is not safely covered by 120 bars
+            raw_candles: Sequence[Candle] = []
+            if (current_time_ms - timestamp_ms) >= (100 * 15 * 60 * 1000) and hasattr(client, "historical_klines"):
+                try:
+                    raw_candles = client.historical_klines(symbol, "15m", timestamp_ms, fetch_end_ms)
+                except Exception as exc:  # noqa: BLE001
+                    results.append({"id": rec_id, "symbol": symbol, "status": f"HISTORICAL_FETCH_FAILED: {exc}"})
+                    continue
+            else:
+                try:
+                    raw_candles = client.klines(symbol, "15m", 120)
+                except Exception as exc:  # noqa: BLE001
+                    results.append({"id": rec_id, "symbol": symbol, "status": f"FETCH_FAILED: {exc}"})
+                    continue
+
+                # If raw_candles doesn't reach back to timestamp_ms, recover using historical_klines
+                if raw_candles and raw_candles[0].open_time_ms > timestamp_ms and hasattr(client, "historical_klines"):
+                    try:
+                        raw_candles = client.historical_klines(symbol, "15m", timestamp_ms, fetch_end_ms)
+                    except Exception as exc:  # noqa: BLE001
+                        results.append({"id": rec_id, "symbol": symbol, "status": f"HISTORICAL_FETCH_FAILED: {exc}"})
+                        continue
 
             # Only complete candles up to the frozen evaluation horizon
             subsequent_closed = [
                 c for c in raw_candles
-                if c.open_time_ms >= timestamp_ms and c.close_time_ms <= min(current_time_ms, eval_end_ms)
+                if c.open_time_ms >= timestamp_ms and c.close_time_ms <= fetch_end_ms
             ]
             if not subsequent_closed:
                 results.append({"id": rec_id, "symbol": symbol, "status": "PENDING_AWAITING_FUTURE_BARS"})
@@ -146,10 +171,7 @@ class ShadowEvaluationManager:
 
     def get_status(self) -> dict[str, Any]:
         all_records = self.store.get_all_shadow_records()
-        metrics = compute_performance_metrics(all_records)
-        metrics["total_records"] = len(all_records)
-        metrics["pending_count"] = sum(1 for r in all_records if not r.get("resolved"))
-        return metrics
+        return compute_performance_metrics(all_records)
 
     def evaluate_forward_outcomes(
         self,
@@ -284,25 +306,77 @@ class ShadowEvaluationManager:
 
 
 def compute_performance_metrics(records: list[dict[str, Any]]) -> dict[str, Any]:
-    """Aggregate forward performance metrics stratified by playbook and setup."""
+    """Aggregate forward performance metrics using only RESOLVED + ELIGIBLE actionable observations."""
+    total_records = len(records)
     if not records:
         return {
-            "signal_count": 0,
+            "total_records": 0,
+            "actionable_records": 0,
+            "resolved_actionable_count": 0,
+            "pending_count": 0,
+            "ineligible_count": 0,
             "tp1_hit_rate": 0.0,
+            "tp2_hit_rate": 0.0,
             "sl_hit_rate": 0.0,
+            "median_mfe": 0.0,
+            "median_mae": 0.0,
             "median_net_r": 0.0,
-            "stratified": {},
+            "signal_count": 0,
+            "stratified_by_playbook": {},
         }
 
-    total = len(records)
-    tp1_hits = sum(1 for r in records if r.get("tp1_hit"))
-    sl_hits = sum(1 for r in records if r.get("sl_hit"))
-    mfes = [r["future_mfe"] for r in records if r.get("future_mfe") is not None]
-    maes = [r["future_mae"] for r in records if r.get("future_mae") is not None]
-    net_rs = [r["net_r"] for r in records if r.get("net_r") is not None]
+    # Actionable records: observation_type == ACTIONABLE_TRIGGERED
+    actionable_records = [
+        r for r in records
+        if r.get("observation_type", "ACTIONABLE_TRIGGERED") == "ACTIONABLE_TRIGGERED"
+    ]
+    actionable_count = len(actionable_records)
+
+    # Pending records: unresolved
+    pending_count = sum(1 for r in records if not r.get("resolved"))
+
+    # Ineligible records:
+    # Any record that cannot be evaluated as an actionable trade:
+    # regime_after == 'INELIGIBLE', observation_type == 'SETUP_ARMED',
+    # direction not in ('LONG', 'SHORT'), or entry_price <= 0
+    ineligible_count = sum(
+        1 for r in records
+        if r.get("regime_after") == "INELIGIBLE"
+        or r.get("observation_type") == "SETUP_ARMED"
+        or r.get("direction") not in ("LONG", "SHORT")
+        or (float(r.get("entry_price") or 0.0) <= 0.0)
+    )
+
+    # RESOLVED + ELIGIBLE actionable observations:
+    resolved_actionable = [
+        r for r in actionable_records
+        if bool(r.get("resolved"))
+        and r.get("regime_after") != "INELIGIBLE"
+        and r.get("direction") in ("LONG", "SHORT")
+        and float(r.get("entry_price") or 0.0) > 0.0
+    ]
+    resolved_actionable_count = len(resolved_actionable)
+
+    # Pending records MUST NOT enter hit-rate denominator.
+    denom = resolved_actionable_count
+    tp1_hits = sum(1 for r in resolved_actionable if r.get("tp1_hit"))
+    tp2_hits = sum(1 for r in resolved_actionable if r.get("tp2_hit"))
+    sl_hits = sum(1 for r in resolved_actionable if r.get("sl_hit"))
+
+    tp1_hit_rate = round(tp1_hits / denom, 3) if denom > 0 else 0.0
+    tp2_hit_rate = round(tp2_hits / denom, 3) if denom > 0 else 0.0
+    sl_hit_rate = round(sl_hits / denom, 3) if denom > 0 else 0.0
+
+    mfes = [float(r["future_mfe"]) for r in resolved_actionable if r.get("future_mfe") is not None]
+    maes = [float(r["future_mae"]) for r in resolved_actionable if r.get("future_mae") is not None]
+    net_rs = [float(r["net_r"]) for r in resolved_actionable if r.get("net_r") is not None]
+
+    median_mfe = round(statistics.median(mfes), 2) if mfes else 0.0
+    median_mae = round(statistics.median(maes), 2) if maes else 0.0
+    median_net_r = round(statistics.median(net_rs), 2) if net_rs else 0.0
 
     stratified_playbook: dict[str, list[dict[str, Any]]] = {}
-    for r in records:
+    for r in resolved_actionable:
         sb = r.get("agent_setup", "UNKNOWN")
         stratified_playbook.setdefault(sb, []).append(r)
 
@@ -312,17 +386,24 @@ def compute_performance_metrics(records: list[dict[str, Any]]) -> dict[str, Any]
         stratified_summary[playbook] = {
             "count": n,
             "tp1_hit_rate": round(sum(1 for x in items if x.get("tp1_hit")) / n, 3) if n else 0.0,
+            "tp2_hit_rate": round(sum(1 for x in items if x.get("tp2_hit")) / n, 3) if n else 0.0,
             "sl_hit_rate": round(sum(1 for x in items if x.get("sl_hit")) / n, 3) if n else 0.0,
-            "median_net_r": round(statistics.median([x["net_r"] for x in items if x.get("net_r") is not None]), 2) if items else 0.0,
+            "median_net_r": round(statistics.median([float(x["net_r"]) for x in items if x.get("net_r") is not None]), 2) if items else 0.0,
         }
 
     return {
-        "signal_count": total,
-        "tp1_hit_rate": round(tp1_hits / total, 3) if total else 0.0,
-        "sl_hit_rate": round(sl_hits / total, 3) if total else 0.0,
-        "median_mfe": round(statistics.median(mfes), 2) if mfes else 0.0,
-        "median_mae": round(statistics.median(maes), 2) if maes else 0.0,
-        "median_net_r": round(statistics.median(net_rs), 2) if net_rs else 0.0,
+        "total_records": total_records,
+        "actionable_records": actionable_count,
+        "resolved_actionable_count": resolved_actionable_count,
+        "pending_count": pending_count,
+        "ineligible_count": ineligible_count,
+        "tp1_hit_rate": tp1_hit_rate,
+        "tp2_hit_rate": tp2_hit_rate,
+        "sl_hit_rate": sl_hit_rate,
+        "median_mfe": median_mfe,
+        "median_mae": median_mae,
+        "median_net_r": median_net_r,
+        "signal_count": resolved_actionable_count,
         "stratified_by_playbook": stratified_summary,
     }
 

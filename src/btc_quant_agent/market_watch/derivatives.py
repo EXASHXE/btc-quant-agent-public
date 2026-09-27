@@ -136,60 +136,70 @@ def evaluate_derivatives_regime(
     return DerivativesRegime.NEUTRAL, tuple(reasons), tuple(risks)
 
 
-def is_severe_long_crowding(derivatives: DerivativesMetrics, config: MarketWatchConfig) -> bool:
+def is_severe_long_crowding(derivatives: DerivativesMetrics, config: MarketWatchConfig | None = None) -> bool:
     """Determine if long crowding is severe enough to gate directional Long actions to WAIT."""
-    tc = config.thresholds
+    cfg = config or MarketWatchConfig()
+    tc = cfg.thresholds
     funding = derivatives.funding_rate
     gls = derivatives.global_account_long_short_ratio
     ttp = derivatives.top_trader_position_ratio
 
-    if funding is not None and funding >= tc.funding_extreme_abs:
+    if funding is not None and isinstance(funding, (int, float)) and funding >= tc.funding_extreme_abs:
         return True
     if (
         funding is not None
+        and isinstance(funding, (int, float))
         and funding >= tc.funding_crowding_abs
         and gls is not None
+        and isinstance(gls, (int, float))
         and gls >= tc.global_long_crowding_ratio
     ):
         return True
     if (
         funding is not None
+        and isinstance(funding, (int, float))
         and funding >= tc.funding_crowding_abs
         and ttp is not None
+        and isinstance(ttp, (int, float))
         and ttp >= tc.top_trader_crowding_ratio
     ):
         return True
-    if gls is not None and gls >= tc.global_long_crowding_ratio * 1.2:
+    if gls is not None and isinstance(gls, (int, float)) and gls >= tc.global_long_crowding_ratio * 1.2:
         return True
-    return bool(ttp is not None and ttp >= tc.top_trader_crowding_ratio * 1.25)
+    return bool(ttp is not None and isinstance(ttp, (int, float)) and ttp >= tc.top_trader_crowding_ratio * 1.25)
 
 
-def is_severe_short_crowding(derivatives: DerivativesMetrics, config: MarketWatchConfig) -> bool:
+def is_severe_short_crowding(derivatives: DerivativesMetrics, config: MarketWatchConfig | None = None) -> bool:
     """Determine if short crowding is severe enough to gate directional Short actions to WAIT."""
-    tc = config.thresholds
+    cfg = config or MarketWatchConfig()
+    tc = cfg.thresholds
     funding = derivatives.funding_rate
     gls = derivatives.global_account_long_short_ratio
     ttp = derivatives.top_trader_position_ratio
 
-    if funding is not None and funding <= -tc.funding_extreme_abs:
+    if funding is not None and isinstance(funding, (int, float)) and funding <= -tc.funding_extreme_abs:
         return True
     if (
         funding is not None
+        and isinstance(funding, (int, float))
         and funding <= -tc.funding_crowding_abs
         and gls is not None
+        and isinstance(gls, (int, float))
         and gls <= tc.global_short_crowding_ratio
     ):
         return True
     if (
         funding is not None
+        and isinstance(funding, (int, float))
         and funding <= -tc.funding_crowding_abs
         and ttp is not None
+        and isinstance(ttp, (int, float))
         and ttp <= (1.0 / tc.top_trader_crowding_ratio)
     ):
         return True
-    if gls is not None and gls <= tc.global_short_crowding_ratio * 0.8:
+    if gls is not None and isinstance(gls, (int, float)) and gls <= tc.global_short_crowding_ratio * 0.8:
         return True
-    return bool(ttp is not None and ttp <= (1.0 / (tc.top_trader_crowding_ratio * 1.25)))
+    return bool(ttp is not None and isinstance(ttp, (int, float)) and ttp <= (1.0 / (tc.top_trader_crowding_ratio * 1.25)))
 
 
 def apply_derivatives_action_gate(

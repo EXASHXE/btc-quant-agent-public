@@ -29,6 +29,7 @@ from .domain import (
     ScanHealth,
     SignalLifecycleState,
     SymbolAssessment,
+    extract_signal_identity,
 )
 from .entry_quality import calculate_net_risk_reward, evaluate_entry_quality, evaluate_exhaustion
 from .grid_policy import evaluate_grid_policy
@@ -104,9 +105,19 @@ class MarketWatchScanner:
         field_avail: dict[str, bool] = {}
         endpoint_errs: dict[str, str] = {}
 
+        candle_avail_timestamps: list[int] = []
+        for _tf_name, raw_tf in (("15m", raw_15m), ("1h", raw_1h), ("4h", raw_4h)):
+            if raw_tf:
+                last_c = raw_tf[-1]
+                avail = last_c.available_at_ms if last_c.available_at_ms is not None else last_c.close_time_ms
+                if avail and avail > 0:
+                    candle_avail_timestamps.append(int(avail))
+
+        deriv_observed_at_ms: int | None = None
         try:
             deriv_collection = self.client.collect_derivatives(symbol, include_order_book=True)
             snap = deriv_collection.snapshot
+            deriv_observed_at_ms = snap.observed_at_ms
             mark_price = snap.mark_price
             index_price = snap.index_price
             funding_rate = snap.funding_rate
@@ -134,11 +145,13 @@ class MarketWatchScanner:
             endpoint_errs = {"all": str(exc)}
 
         # Optional multi-horizon OI history query
+        oi_hist_receipt_ms: int | None = None
         try:
             oi_hist = self.client._optional_get(
                 "/futures/data/openInterestHist",
                 {"symbol": symbol, "period": "1h", "limit": 13},
             )
+            oi_hist_receipt_ms = int(time.time() * 1000)
             if oi_hist and len(oi_hist) >= 2:
                 curr_oi = float(oi_hist[-1].get("sumOpenInterest", 0.0))
                 if len(oi_hist) >= 2 and oi_1h_change is None:
@@ -154,21 +167,25 @@ class MarketWatchScanner:
             logger.debug("OI history parse failed for %s: %s", symbol, exc)
 
         # Optional top trader position/account ratio queries
+        top_pos_receipt_ms: int | None = None
         try:
             top_pos_payload = self.client._optional_get(
                 "/futures/data/topLongShortPositionRatio",
                 {"symbol": symbol, "period": "1h", "limit": 1},
             )
+            top_pos_receipt_ms = int(time.time() * 1000)
             if top_pos_payload and isinstance(top_pos_payload, list) and "longShortRatio" in top_pos_payload[-1]:
                 top_pos_ratio = float(top_pos_payload[-1]["longShortRatio"])
         except (KeyError, ValueError, TypeError, IndexError) as exc:
             logger.debug("Top pos ratio parse failed for %s: %s", symbol, exc)
 
+        top_acc_receipt_ms: int | None = None
         try:
             top_acc_payload = self.client._optional_get(
                 "/futures/data/topLongShortAccountRatio",
                 {"symbol": symbol, "period": "1h", "limit": 1},
             )
+            top_acc_receipt_ms = int(time.time() * 1000)
             if top_acc_payload and isinstance(top_acc_payload, list) and "longShortRatio" in top_acc_payload[-1]:
                 top_acc_ratio = float(top_acc_payload[-1]["longShortRatio"])
         except (KeyError, ValueError, TypeError, IndexError) as exc:
@@ -176,8 +193,10 @@ class MarketWatchScanner:
 
         # Exchange time and staleness check
         exchange_time_ms = now_ms
+        server_time_receipt_ms: int | None = None
         try:
             val = self.client.server_time_ms()
+            server_time_receipt_ms = int(time.time() * 1000)
             if isinstance(val, (int, float)):
                 exchange_time_ms = int(val)
         except Exception as exc:  # noqa: BLE001
@@ -196,8 +215,10 @@ class MarketWatchScanner:
         high_24h = raw_15m[-1].close
         low_24h = raw_15m[-1].close
         quote_vol_24h = 0.0
+        ticker_receipt_ms: int | None = None
         try:
             ticker = self.client._optional_get("/fapi/v1/ticker/24hr", {"symbol": symbol})
+            ticker_receipt_ms = int(time.time() * 1000)
             if ticker and isinstance(ticker, dict):
                 change_24h = float(ticker.get("priceChangePercent", 0.0)) / 100.0
                 high_24h = float(ticker.get("highPrice", high_24h))
@@ -281,23 +302,35 @@ class MarketWatchScanner:
             reasons=d_reasons + d_risks,
         )
 
-        source_timestamps = [
-            int(t)
-            for t in (
-                tf_15m.closed_bar_end_time_ms,
-                tf_1h.closed_bar_end_time_ms,
-                tf_4h.closed_bar_end_time_ms,
-                funding_time_ms,
-                open_interest_time_ms,
-                taker_time_ms,
-                basis_time_ms,
-                long_short_time_ms,
-                exchange_time_ms,
-            )
-            if isinstance(t, (int, float)) and t > 0
+        # Strict PIT receipt semantics (R2.1-03):
+        # Include latest Candle.available_at_ms for every timeframe,
+        # DerivativeCollection.observed_at_ms, and receipt timestamps of all queries.
+        # Do not confuse exchange event timestamps with local availability.
+        consumed_availability = [
+            *candle_avail_timestamps,
+            *(
+                [int(t)]
+                for t in (
+                    deriv_observed_at_ms,
+                    oi_hist_receipt_ms,
+                    top_pos_receipt_ms,
+                    top_acc_receipt_ms,
+                    ticker_receipt_ms,
+                    server_time_receipt_ms,
+                )
+                if isinstance(t, (int, float)) and t > 0
+            ),
         ]
-        observed_at_ms = max(source_timestamps) if source_timestamps else now_ms
-        decision_time_ms = max(now_ms, observed_at_ms, *source_timestamps)
+        flat_availability: list[int] = []
+        for item in consumed_availability:
+            if isinstance(item, list):
+                flat_availability.extend(item)
+            elif isinstance(item, (int, float)) and item > 0:
+                flat_availability.append(int(item))
+
+        observed_at_ms = max(flat_availability) if flat_availability else now_ms
+        collection_completed_ms = int(time.time() * 1000)
+        decision_time_ms = max(collection_completed_ms, now_ms, observed_at_ms, *flat_availability)
 
         snap_hash = compute_snapshot_hash(
             symbol=symbol,
@@ -556,21 +589,39 @@ class MarketWatchScanner:
             config=self.config,
         )
 
-        # 11. Lifecycle State (Keyed by setup/signal identity)
+        # 11. Lifecycle State (Keyed by deterministic signal_identity)
+        sig_id = extract_signal_identity(symbol, directional_plan)
+        intended_dir = sig_id.split(":")[2] if ":" in sig_id else "NONE"
+
         prev_lifecycle = (
             SignalLifecycleState(prev_state["lifecycle_state"])
             if (prev_state and prev_state.get("lifecycle_state"))
             else None
         )
         current_bar_end = tf_15m.closed_bar_end_time_ms
-        prev_setup = prev_state.get("setup") if prev_state else None
-        curr_setup = str(setup.value)
-        is_same_setup = (
-            prev_setup is not None
-            and prev_setup == curr_setup
-            and curr_setup != "NO_TRADE"
+        prev_sig_id = prev_state.get("signal_identity") if prev_state else None
+        prev_bo_level = prev_state.get("breakout_level") if prev_state else None
+        curr_bo_level = directional_plan.breakout_level
+        bo_level_changed = (
+            curr_bo_level is not None
+            and prev_bo_level is not None
+            and round(curr_bo_level, 2) != round(prev_bo_level, 2)
         )
-        if is_same_setup and prev_state and prev_state.get("created_bar_end_ms"):
+        prev_bo_dir = prev_state.get("breakout_direction") if prev_state else None
+        dir_changed = (
+            prev_bo_dir is not None
+            and intended_dir not in ("NONE", "")
+            and prev_bo_dir != intended_dir
+        )
+
+        is_same_signal = (
+            prev_sig_id is not None
+            and prev_sig_id == sig_id
+            and not bo_level_changed
+            and not dir_changed
+            and str(setup.value) != "NO_TRADE"
+        )
+        if is_same_signal and prev_state and prev_state.get("created_bar_end_ms"):
             created_bar_end = prev_state["created_bar_end_ms"]
             if current_bar_end >= created_bar_end:
                 age_bars = max(0, int((current_bar_end - created_bar_end) / (15 * 60 * 1000)))
@@ -588,14 +639,14 @@ class MarketWatchScanner:
         is_invalid = False
         if (
             prev_lifecycle in (SignalLifecycleState.ARMED, SignalLifecycleState.TRIGGERED)
-            and is_same_setup
+            and is_same_signal
             and gated_decision == DirectionalDecision.WAIT
             and not is_near_ready
         ):
             is_invalid = True
 
         lifecycle = advance_lifecycle_state(
-            previous_state=prev_lifecycle if is_same_setup else None,
+            previous_state=prev_lifecycle if is_same_signal else None,
             decision=gated_decision,
             entry_quality=entry_quality,
             is_invalidated=is_invalid,
@@ -622,6 +673,7 @@ class MarketWatchScanner:
             lifecycle_state=lifecycle,
             policy_version=MARKET_WATCH_POLICY_VERSION,
             config_hash=cfg_hash,
+            signal_identity=sig_id,
         )
         fp = compute_decision_fingerprint(temp_assessment)
 
@@ -639,6 +691,7 @@ class MarketWatchScanner:
             lifecycle_state=lifecycle,
             policy_version=MARKET_WATCH_POLICY_VERSION,
             config_hash=cfg_hash,
+            signal_identity=sig_id,
         )
 
     def scan_universe(
@@ -709,6 +762,7 @@ class MarketWatchScanner:
                     lifecycle_state=a.lifecycle_state,
                     policy_version=a.policy_version,
                     config_hash=a.config_hash,
+                    signal_identity=a.signal_identity,
                 )
             )
 
@@ -718,34 +772,71 @@ class MarketWatchScanner:
         secret = os.getenv("FEISHU_WEBHOOK_SECRET")
 
         for a in ranked_assessments:
-            prev_st = self.store.get_symbol_state(a.symbol)
-            prev_shadow = prev_st.get("last_shadow_recorded_state") if prev_st else None
+            prev_st = self.store.get_symbol_state(a.symbol) or {}
+            prev_armed_id = prev_st.get("last_shadow_armed_signal_id")
+            prev_triggered_id = prev_st.get("last_shadow_triggered_signal_id")
+            sig_id = a.signal_identity or extract_signal_identity(a.symbol, a.directional)
 
-            # Auto-record shadow observation on first transition to ARMED / TRIGGERED
-            if a.lifecycle_state in (SignalLifecycleState.ARMED, SignalLifecycleState.TRIGGERED) and prev_shadow not in ("ARMED", "TRIGGERED"):
-                entry_p = a.directional.entry_high if a.directional.decision == DirectionalDecision.SHORT else a.directional.entry_low
-                if entry_p <= 0.0:
-                    entry_p = a.snapshot.price.last_price
+            # 1. ARMED shadow observation (SETUP_ARMED) - R2.1-01
+            # ARMED and TRIGGERED must not share one dedupe marker.
+            if a.lifecycle_state == SignalLifecycleState.ARMED:
+                if prev_armed_id != sig_id:
+                    entry_p = a.directional.entry_high if a.directional.decision == DirectionalDecision.SHORT else a.directional.entry_low
+                    if entry_p <= 0.0:
+                        entry_p = a.snapshot.price.last_price
 
-                self.store.record_shadow_observation(
-                    timestamp_ms=a.snapshot.decision_time_ms,
-                    symbol=a.symbol,
-                    snapshot_hash=a.snapshot.snapshot_hash,
-                    agent_decision=str(a.directional.decision),
-                    agent_setup=str(a.directional.setup),
-                    entry_quality=str(a.directional.entry_quality),
-                    reason_codes=list(a.directional.reason_codes),
-                    policy_version=a.policy_version,
-                    config_hash=a.config_hash,
-                    entry_price=entry_p,
-                    stop_loss=a.directional.stop_loss,
-                    tp1=a.directional.take_profit_1,
-                    tp2=a.directional.take_profit_2,
-                    direction=str(a.directional.decision),
-                )
-                self.store.set_last_shadow_recorded_state(a.symbol, str(a.lifecycle_state))
+                    self.store.record_shadow_observation(
+                        timestamp_ms=a.snapshot.decision_time_ms,
+                        symbol=a.symbol,
+                        snapshot_hash=a.snapshot.snapshot_hash,
+                        agent_decision=str(a.directional.decision),
+                        agent_setup=str(a.directional.setup),
+                        entry_quality=str(a.directional.entry_quality),
+                        reason_codes=list(a.directional.reason_codes),
+                        policy_version=a.policy_version,
+                        config_hash=a.config_hash,
+                        entry_price=entry_p,
+                        stop_loss=a.directional.stop_loss,
+                        tp1=a.directional.take_profit_1,
+                        tp2=a.directional.take_profit_2,
+                        direction=str(a.directional.decision),
+                        observation_type="SETUP_ARMED",
+                    )
+                    self.store.set_last_shadow_signal_ids(a.symbol, armed_id=sig_id)
+                    self.store.set_last_shadow_recorded_state(a.symbol, "ARMED")
+
+            # 2. TRIGGERED shadow observation (ACTIONABLE_TRIGGERED) - R2.1-01
+            # ARMED WAIT observations must not suppress later actionable TRIGGERED records.
+            # A TRIGGERED LONG/SHORT must have exactly one eligible shadow observation.
+            elif a.lifecycle_state == SignalLifecycleState.TRIGGERED and a.directional.decision in (DirectionalDecision.LONG, DirectionalDecision.SHORT):
+                if prev_triggered_id != sig_id:
+                    entry_p = a.directional.entry_high if a.directional.decision == DirectionalDecision.SHORT else a.directional.entry_low
+                    if entry_p <= 0.0:
+                        entry_p = a.snapshot.price.last_price
+
+                    self.store.record_shadow_observation(
+                        timestamp_ms=a.snapshot.decision_time_ms,
+                        symbol=a.symbol,
+                        snapshot_hash=a.snapshot.snapshot_hash,
+                        agent_decision=str(a.directional.decision),
+                        agent_setup=str(a.directional.setup),
+                        entry_quality=str(a.directional.entry_quality),
+                        reason_codes=list(a.directional.reason_codes),
+                        policy_version=a.policy_version,
+                        config_hash=a.config_hash,
+                        entry_price=entry_p,
+                        stop_loss=a.directional.stop_loss,
+                        tp1=a.directional.take_profit_1,
+                        tp2=a.directional.take_profit_2,
+                        direction=str(a.directional.decision),
+                        observation_type="ACTIONABLE_TRIGGERED",
+                    )
+                    self.store.set_last_shadow_signal_ids(a.symbol, triggered_id=sig_id)
+                    self.store.set_last_shadow_recorded_state(a.symbol, "TRIGGERED")
+
             elif a.lifecycle_state in (SignalLifecycleState.CANDIDATE, SignalLifecycleState.INVALIDATED, SignalLifecycleState.EXPIRED) and a.directional.setup == PlaybookType.NO_TRADE:
-                if prev_shadow:
+                if prev_armed_id or prev_triggered_id:
+                    self.store.set_last_shadow_signal_ids(a.symbol, armed_id="", triggered_id="")
                     self.store.set_last_shadow_recorded_state(a.symbol, "")
 
             emit, severity, _reasons = evaluate_alert_emission(a, prev_st, self.config)

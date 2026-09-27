@@ -16,6 +16,7 @@ from .domain import (
     GridPlan,
     SignalLifecycleState,
     SymbolAssessment,
+    extract_signal_identity,
 )
 
 
@@ -24,6 +25,8 @@ def compute_decision_fingerprint(assessment: SymbolAssessment) -> str:
 
     Excludes volatile fields like millisecond timestamps or minor price ticks.
     """
+    from .derivatives import is_severe_long_crowding, is_severe_short_crowding
+
     d = assessment.directional
     g = assessment.grid
     payload = {
@@ -38,8 +41,11 @@ def compute_decision_fingerprint(assessment: SymbolAssessment) -> str:
         "grid_lower": round(g.lower_bound, 2) if g.lower_bound is not None else None,
         "grid_upper": round(g.upper_bound, 2) if g.upper_bound is not None else None,
         "derivatives_regime": str(d.derivatives_regime),
+        "is_severe_long_crowding": is_severe_long_crowding(assessment.snapshot.derivatives),
+        "is_severe_short_crowding": is_severe_short_crowding(assessment.snapshot.derivatives),
         "lifecycle_state": str(assessment.lifecycle_state),
         "breakout_state": str(d.breakout_state),
+        "signal_identity": str(assessment.signal_identity),
     }
     raw = json.dumps(payload, sort_keys=True)
     return hashlib.sha256(raw.encode("utf-8")).hexdigest()[:16]
@@ -95,7 +101,10 @@ class MarketWatchStateStore:
                     armed_bar_end_ms INTEGER,
                     triggered_bar_end_ms INTEGER,
                     age_bars INTEGER DEFAULT 0,
-                    last_shadow_recorded_state TEXT
+                    last_shadow_recorded_state TEXT,
+                    signal_identity TEXT,
+                    last_shadow_armed_signal_id TEXT,
+                    last_shadow_triggered_signal_id TEXT
                 )
                 """
             )
@@ -115,6 +124,9 @@ class MarketWatchStateStore:
                 ("triggered_bar_end_ms", "INTEGER"),
                 ("age_bars", "INTEGER DEFAULT 0"),
                 ("last_shadow_recorded_state", "TEXT"),
+                ("signal_identity", "TEXT"),
+                ("last_shadow_armed_signal_id", "TEXT"),
+                ("last_shadow_triggered_signal_id", "TEXT"),
             ]
             for col_name, col_type in cols_symbol_state:
                 try:
@@ -185,7 +197,8 @@ class MarketWatchStateStore:
                     regime_after TEXT,
                     resolved INTEGER DEFAULT 0,
                     evaluation_horizon_bars INTEGER DEFAULT 16,
-                    evaluation_end_ms INTEGER
+                    evaluation_end_ms INTEGER,
+                    observation_type TEXT DEFAULT 'ACTIONABLE_TRIGGERED'
                 )
                 """
             )
@@ -200,6 +213,7 @@ class MarketWatchStateStore:
                 ("resolved", "INTEGER DEFAULT 0"),
                 ("evaluation_horizon_bars", "INTEGER DEFAULT 16"),
                 ("evaluation_end_ms", "INTEGER"),
+                ("observation_type", "TEXT DEFAULT 'ACTIONABLE_TRIGGERED'"),
             ]:
                 try:
                     conn.execute(f"ALTER TABLE market_watch_shadow_records ADD COLUMN {col_name} {col_type}")
@@ -257,45 +271,79 @@ class MarketWatchStateStore:
             failed_bd = assessment.snapshot.tf_1h.recent_swing_low
             failed_bd_ms = bar_end_ms
 
-        # Lifecycle timing keyed by setup/signal identity (R2)
-        prev_setup = prev.get("setup")
         curr_setup = str(assessment.directional.setup.value)
-        is_same_setup = (
-            prev_setup is not None
-            and prev_setup == curr_setup
-            and curr_setup != "NO_TRADE"
+
+        # Signal identity tracking (R2.1)
+        curr_sig_id = assessment.signal_identity or extract_signal_identity(symbol, assessment.directional)
+        prev_sig_id = prev.get("signal_identity")
+        prev_bo_level = prev.get("breakout_level")
+        curr_bo_level = d.breakout_level
+        bo_level_changed = (
+            curr_bo_level is not None
+            and prev_bo_level is not None
+            and round(curr_bo_level, 2) != round(prev_bo_level, 2)
+        )
+        prev_bo_dir = prev.get("breakout_direction")
+        intended_dir_part = curr_sig_id.split(":")[2] if ":" in curr_sig_id else "NONE"
+        dir_changed = (
+            prev_bo_dir is not None
+            and intended_dir_part not in ("NONE", "")
+            and prev_bo_dir != intended_dir_part
         )
 
-        if is_same_setup and prev.get("created_bar_end_ms") and curr_life in ("ARMED", "TRIGGERED", "CANDIDATE") and prev_life in ("ARMED", "TRIGGERED", "CANDIDATE"):
-            created_ms = prev["created_bar_end_ms"]
-        else:
+        prev_setup = prev.get("setup")
+        setup_changed = bool(prev_setup is not None and prev_setup != curr_setup)
+
+        # Requirement 4:
+        # A new breakout level or changed intended direction resets:
+        # created_bar_end_ms, age_bars, and shadow dedupe state.
+        is_reset = (
+            setup_changed
+            or bo_level_changed
+            or dir_changed
+            or (prev_sig_id is not None and prev_sig_id != curr_sig_id)
+            or curr_setup == "NO_TRADE"
+            or curr_life in ("INVALIDATED", "EXPIRED")
+        )
+
+        if is_reset:
             created_ms = bar_end_ms
-
-        if is_same_setup:
-            if curr_life == "ARMED":
-                armed_ms = prev.get("armed_bar_end_ms") or bar_end_ms
-            else:
-                armed_ms = prev.get("armed_bar_end_ms")
-
-            if curr_life == "TRIGGERED":
-                triggered_ms = prev.get("triggered_bar_end_ms") or bar_end_ms
-            else:
-                triggered_ms = prev.get("triggered_bar_end_ms")
-        else:
+            age_bars = 0
             armed_ms = bar_end_ms if curr_life == "ARMED" else None
             triggered_ms = bar_end_ms if curr_life == "TRIGGERED" else None
-
-        if created_ms and bar_end_ms >= created_ms:
-            age_bars = max(0, int((bar_end_ms - created_ms) / (15 * 60 * 1000)))
+            prev_armed = prev.get("last_shadow_armed_signal_id")
+            prev_trig = prev.get("last_shadow_triggered_signal_id")
+            shadow_armed_id = prev_armed if prev_armed == curr_sig_id else None
+            shadow_triggered_id = prev_trig if prev_trig == curr_sig_id else None
+            last_shadow_state = (
+                prev.get("last_shadow_recorded_state")
+                if (prev_trig == curr_sig_id or prev_armed == curr_sig_id)
+                else None
+            )
         else:
-            age_bars = 0
+            shadow_armed_id = prev.get("last_shadow_armed_signal_id")
+            shadow_triggered_id = prev.get("last_shadow_triggered_signal_id")
+            last_shadow_state = prev.get("last_shadow_recorded_state")
 
-        last_shadow_state = prev.get("last_shadow_recorded_state")
-        if curr_life in ("ARMED", "TRIGGERED"):
-            if last_shadow_state not in ("ARMED", "TRIGGERED"):
-                last_shadow_state = curr_life
-        elif curr_life in ("CANDIDATE", "INVALIDATED", "EXPIRED") and curr_setup == "NO_TRADE":
-            last_shadow_state = None
+            signal_identity_matches = (
+                prev_sig_id is not None
+                and prev_sig_id == curr_sig_id
+                and curr_life in ("ARMED", "TRIGGERED", "CANDIDATE")
+                and prev_life in ("ARMED", "TRIGGERED", "CANDIDATE")
+            )
+            if signal_identity_matches and prev.get("created_bar_end_ms"):
+                created_ms = prev["created_bar_end_ms"]
+                armed_ms = prev.get("armed_bar_end_ms") or (bar_end_ms if curr_life == "ARMED" else None)
+                triggered_ms = prev.get("triggered_bar_end_ms") or (bar_end_ms if curr_life == "TRIGGERED" else None)
+                if created_ms and bar_end_ms >= created_ms:
+                    age_bars = max(0, int((bar_end_ms - created_ms) / (15 * 60 * 1000)))
+                else:
+                    age_bars = 0
+            else:
+                created_ms = prev.get("created_bar_end_ms") or bar_end_ms
+                age_bars = 0
+                armed_ms = prev.get("armed_bar_end_ms") or (bar_end_ms if curr_life == "ARMED" else None)
+                triggered_ms = prev.get("triggered_bar_end_ms") or (bar_end_ms if curr_life == "TRIGGERED" else None)
 
         with self._connect() as conn:
             conn.execute(
@@ -311,8 +359,9 @@ class MarketWatchStateStore:
                     grid_lower_bound, grid_upper_bound,
                     recent_failed_breakout_ms, recent_failed_breakdown_ms,
                     created_bar_end_ms, armed_bar_end_ms, triggered_bar_end_ms,
-                    age_bars, last_shadow_recorded_state
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    age_bars, last_shadow_recorded_state,
+                    signal_identity, last_shadow_armed_signal_id, last_shadow_triggered_signal_id
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ON CONFLICT(symbol) DO UPDATE SET
                     setup = excluded.setup,
                     regime = excluded.regime,
@@ -343,7 +392,10 @@ class MarketWatchStateStore:
                     armed_bar_end_ms = excluded.armed_bar_end_ms,
                     triggered_bar_end_ms = excluded.triggered_bar_end_ms,
                     age_bars = excluded.age_bars,
-                    last_shadow_recorded_state = excluded.last_shadow_recorded_state
+                    last_shadow_recorded_state = excluded.last_shadow_recorded_state,
+                    signal_identity = excluded.signal_identity,
+                    last_shadow_armed_signal_id = excluded.last_shadow_armed_signal_id,
+                    last_shadow_triggered_signal_id = excluded.last_shadow_triggered_signal_id
                 """,
                 (
                     symbol,
@@ -377,6 +429,9 @@ class MarketWatchStateStore:
                     triggered_ms,
                     age_bars,
                     last_shadow_state,
+                    curr_sig_id,
+                    shadow_armed_id,
+                    shadow_triggered_id,
                 ),
             )
             # Record auditable assessment
@@ -414,6 +469,49 @@ class MarketWatchStateStore:
             )
             conn.commit()
 
+    def set_last_shadow_signal_ids(
+        self,
+        symbol: str,
+        *,
+        armed_id: str | None = None,
+        triggered_id: str | None = None,
+    ) -> None:
+        with self._connect() as conn:
+            if armed_id is not None and triggered_id is not None:
+                cursor = conn.execute(
+                    "UPDATE market_watch_symbol_state SET last_shadow_armed_signal_id = ?, last_shadow_triggered_signal_id = ? WHERE symbol = ?",
+                    (armed_id, triggered_id, symbol.upper()),
+                )
+                if cursor.rowcount == 0:
+                    conn.execute(
+                        "INSERT INTO market_watch_symbol_state (symbol, last_shadow_armed_signal_id, last_shadow_triggered_signal_id) VALUES (?, ?, ?) "
+                        "ON CONFLICT(symbol) DO UPDATE SET last_shadow_armed_signal_id = excluded.last_shadow_armed_signal_id, last_shadow_triggered_signal_id = excluded.last_shadow_triggered_signal_id",
+                        (symbol.upper(), armed_id, triggered_id),
+                    )
+            elif armed_id is not None:
+                cursor = conn.execute(
+                    "UPDATE market_watch_symbol_state SET last_shadow_armed_signal_id = ? WHERE symbol = ?",
+                    (armed_id, symbol.upper()),
+                )
+                if cursor.rowcount == 0:
+                    conn.execute(
+                        "INSERT INTO market_watch_symbol_state (symbol, last_shadow_armed_signal_id) VALUES (?, ?) "
+                        "ON CONFLICT(symbol) DO UPDATE SET last_shadow_armed_signal_id = excluded.last_shadow_armed_signal_id",
+                        (symbol.upper(), armed_id),
+                    )
+            elif triggered_id is not None:
+                cursor = conn.execute(
+                    "UPDATE market_watch_symbol_state SET last_shadow_triggered_signal_id = ? WHERE symbol = ?",
+                    (triggered_id, symbol.upper()),
+                )
+                if cursor.rowcount == 0:
+                    conn.execute(
+                        "INSERT INTO market_watch_symbol_state (symbol, last_shadow_triggered_signal_id) VALUES (?, ?) "
+                        "ON CONFLICT(symbol) DO UPDATE SET last_shadow_triggered_signal_id = excluded.last_shadow_triggered_signal_id",
+                        (symbol.upper(), triggered_id),
+                    )
+            conn.commit()
+
     def set_last_shadow_recorded_state(self, symbol: str, state_value: str) -> None:
         with self._connect() as conn:
             cursor = conn.execute(
@@ -448,6 +546,7 @@ class MarketWatchStateStore:
         tp2: float = 0.0,
         direction: str = "",
         evaluation_horizon_bars: int = 16,
+        observation_type: str = "ACTIONABLE_TRIGGERED",
     ) -> int:
         eval_end_ms = timestamp_ms + (evaluation_horizon_bars * 15 * 60 * 1000)
         with self._connect() as conn:
@@ -457,8 +556,9 @@ class MarketWatchStateStore:
                     timestamp_ms, symbol, snapshot_hash, policy_version, config_hash,
                     agent_decision, agent_setup, entry_quality, reason_codes_json,
                     reference_decision, reference_notes, entry_price, stop_loss,
-                    tp1, tp2, direction, resolved, evaluation_horizon_bars, evaluation_end_ms
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?)
+                    tp1, tp2, direction, resolved, evaluation_horizon_bars, evaluation_end_ms,
+                    observation_type
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?)
                 """,
                 (
                     timestamp_ms,
@@ -479,6 +579,7 @@ class MarketWatchStateStore:
                     direction,
                     evaluation_horizon_bars,
                     eval_end_ms,
+                    observation_type,
                 ),
             )
             conn.commit()
@@ -633,12 +734,6 @@ def evaluate_alert_emission(
     elif curr_life == SignalLifecycleState.INVALIDATED:
         severity = AlertSeverity.RISK
         reasons.append("SIGNAL_INVALIDATED")
-    elif assessment.directional.derivatives_regime in (
-        DerivativesRegime.LONG_LIQUIDATION,
-        DerivativesRegime.DELEVERAGING,
-    ):
-        severity = AlertSeverity.RISK
-        reasons.append("DELEVERAGING_RISK")
     elif curr_life == SignalLifecycleState.ARMED:
         severity = AlertSeverity.WATCH
         reasons.append("SETUP_ARMED")
@@ -649,7 +744,45 @@ def evaluate_alert_emission(
         severity = AlertSeverity.WATCH
         reasons.append(f"DIRECTION_CHANGED_{prev_dir_str}_TO_{curr_dir}")
 
-    # 2. Grid-Only / Grid-Change Triggers (R1-03)
+    # 2. Derivatives State Changes & Risk Alerts (R2.1-02)
+    from .derivatives import is_severe_long_crowding, is_severe_short_crowding
+
+    curr_d_regime = assessment.directional.derivatives_regime
+    prev_d_regime_str = prev_state.get("derivatives_regime") if prev_state else None
+    deriv_changed = prev_d_regime_str is not None and prev_d_regime_str != str(curr_d_regime)
+
+    is_severe_long = is_severe_long_crowding(assessment.snapshot.derivatives, config)
+    is_severe_short = is_severe_short_crowding(assessment.snapshot.derivatives, config)
+
+    severity_order = {
+        AlertSeverity.INFO: 0,
+        AlertSeverity.WATCH: 1,
+        AlertSeverity.ACTION: 2,
+        AlertSeverity.RISK: 3,
+    }
+
+    if curr_d_regime in (DerivativesRegime.LONG_LIQUIDATION, DerivativesRegime.DELEVERAGING):
+        severity = AlertSeverity.RISK
+        shock_code = "LONG_LIQUIDATION_RISK" if curr_d_regime == DerivativesRegime.LONG_LIQUIDATION else "DELEVERAGING_RISK"
+        if shock_code not in reasons:
+            reasons.append(shock_code)
+    elif is_severe_long or is_severe_short or curr_d_regime in (DerivativesRegime.LONG_CROWDING, DerivativesRegime.SHORT_CROWDING):
+        if severity_order[AlertSeverity.WATCH] > severity_order[severity]:
+            severity = AlertSeverity.WATCH
+        if is_severe_long and "SEVERE_LONG_CROWDING" not in reasons:
+            reasons.append("SEVERE_LONG_CROWDING")
+        elif is_severe_short and "SEVERE_SHORT_CROWDING" not in reasons:
+            reasons.append("SEVERE_SHORT_CROWDING")
+        elif f"DERIVATIVES_{curr_d_regime}" not in reasons:
+            reasons.append(f"DERIVATIVES_{curr_d_regime}")
+    elif deriv_changed and curr_d_regime != DerivativesRegime.NEUTRAL:
+        if severity_order[AlertSeverity.WATCH] > severity_order[severity]:
+            severity = AlertSeverity.WATCH
+        change_code = f"DERIVATIVES_REGIME_{prev_d_regime_str}_TO_{curr_d_regime}"
+        if change_code not in reasons:
+            reasons.append(change_code)
+
+    # 3. Grid-Only / Grid-Change Triggers (R1-03)
     if grid_change_alert:
         grid_sev = AlertSeverity.WATCH
         if assessment.grid.decision == GridDecision.PAUSE and prev_grid is not None and prev_grid.decision != GridDecision.PAUSE:
