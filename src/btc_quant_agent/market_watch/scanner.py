@@ -27,6 +27,7 @@ from .domain import (
     PriceMetrics,
     RelativePerformance,
     ScanHealth,
+    ShadowFillStatus,
     SignalLifecycleState,
     SymbolAssessment,
     extract_signal_identity,
@@ -66,6 +67,7 @@ class MarketWatchScanner:
 
     def collect_symbol_snapshot(self, symbol: str, now_ms: int) -> tuple[MarketSnapshot | None, ScanHealth, tuple[str, ...]]:
         """Collect market snapshot for one symbol with robust degradation handling."""
+        collection_started_at_ms = int(time.time() * 1000)
         symbol = symbol.upper()
         health_reasons: list[str] = []
         health = ScanHealth.OK
@@ -328,8 +330,8 @@ class MarketWatchScanner:
             elif isinstance(item, (int, float)) and item > 0:
                 flat_availability.append(int(item))
 
-        observed_at_ms = max(flat_availability) if flat_availability else now_ms
         collection_completed_ms = int(time.time() * 1000)
+        observed_at_ms = max([collection_started_at_ms, *flat_availability])
         decision_time_ms = max(collection_completed_ms, now_ms, observed_at_ms, *flat_availability)
 
         snap_hash = compute_snapshot_hash(
@@ -347,6 +349,8 @@ class MarketWatchScanner:
             decision_time_ms=decision_time_ms,
             observed_at_ms=observed_at_ms,
             exchange_time_ms=exchange_time_ms,
+            collection_started_at_ms=collection_started_at_ms,
+            collection_completed_at_ms=collection_completed_ms,
             price=price_metrics,
             tf_15m=tf_15m,
             tf_1h=tf_1h,
@@ -675,7 +679,7 @@ class MarketWatchScanner:
             config_hash=cfg_hash,
             signal_identity=sig_id,
         )
-        fp = compute_decision_fingerprint(temp_assessment)
+        fp = compute_decision_fingerprint(temp_assessment, self.config)
 
         return SymbolAssessment(
             symbol=symbol,
@@ -781,12 +785,19 @@ class MarketWatchScanner:
             # ARMED and TRIGGERED must not share one dedupe marker.
             if a.lifecycle_state == SignalLifecycleState.ARMED:
                 if prev_armed_id != sig_id:
-                    entry_p = a.directional.entry_high if a.directional.decision == DirectionalDecision.SHORT else a.directional.entry_low
-                    if entry_p <= 0.0:
-                        entry_p = a.snapshot.price.last_price
+                    entry_low = a.directional.entry_low if a.directional.entry_low > 0.0 else a.snapshot.price.last_price
+                    entry_high = a.directional.entry_high if a.directional.entry_high > 0.0 else a.snapshot.price.last_price
+                    if entry_low > entry_high:
+                        entry_low, entry_high = entry_high, entry_low
+                    entry_p = entry_high if a.directional.decision == DirectionalDecision.LONG else (
+                        entry_low if a.directional.decision == DirectionalDecision.SHORT else a.snapshot.price.last_price
+                    )
+                    entry_bars = self.config.thresholds.entry_window_bars
+                    sig_time = a.snapshot.decision_time_ms
+                    entry_win_end = sig_time + (entry_bars * 15 * 60 * 1000)
 
                     self.store.record_shadow_observation(
-                        timestamp_ms=a.snapshot.decision_time_ms,
+                        timestamp_ms=sig_time,
                         symbol=a.symbol,
                         snapshot_hash=a.snapshot.snapshot_hash,
                         agent_decision=str(a.directional.decision),
@@ -801,6 +812,13 @@ class MarketWatchScanner:
                         tp2=a.directional.take_profit_2,
                         direction=str(a.directional.decision),
                         observation_type="SETUP_ARMED",
+                        signal_identity=sig_id,
+                        signal_time_ms=sig_time,
+                        entry_zone_low=entry_low,
+                        entry_zone_high=entry_high,
+                        entry_window_bars=entry_bars,
+                        entry_window_end_ms=entry_win_end,
+                        fill_status=ShadowFillStatus.WAITING_FOR_FILL.value,
                     )
                     self.store.set_last_shadow_signal_ids(a.symbol, armed_id=sig_id)
                     self.store.set_last_shadow_recorded_state(a.symbol, "ARMED")
@@ -810,12 +828,19 @@ class MarketWatchScanner:
             # A TRIGGERED LONG/SHORT must have exactly one eligible shadow observation.
             elif a.lifecycle_state == SignalLifecycleState.TRIGGERED and a.directional.decision in (DirectionalDecision.LONG, DirectionalDecision.SHORT):
                 if prev_triggered_id != sig_id:
-                    entry_p = a.directional.entry_high if a.directional.decision == DirectionalDecision.SHORT else a.directional.entry_low
-                    if entry_p <= 0.0:
-                        entry_p = a.snapshot.price.last_price
+                    entry_low = a.directional.entry_low if a.directional.entry_low > 0.0 else a.snapshot.price.last_price
+                    entry_high = a.directional.entry_high if a.directional.entry_high > 0.0 else a.snapshot.price.last_price
+                    if entry_low > entry_high:
+                        entry_low, entry_high = entry_high, entry_low
+                    entry_p = entry_high if a.directional.decision == DirectionalDecision.LONG else (
+                        entry_low if a.directional.decision == DirectionalDecision.SHORT else a.snapshot.price.last_price
+                    )
+                    entry_bars = self.config.thresholds.entry_window_bars
+                    sig_time = a.snapshot.decision_time_ms
+                    entry_win_end = sig_time + (entry_bars * 15 * 60 * 1000)
 
                     self.store.record_shadow_observation(
-                        timestamp_ms=a.snapshot.decision_time_ms,
+                        timestamp_ms=sig_time,
                         symbol=a.symbol,
                         snapshot_hash=a.snapshot.snapshot_hash,
                         agent_decision=str(a.directional.decision),
@@ -830,6 +855,13 @@ class MarketWatchScanner:
                         tp2=a.directional.take_profit_2,
                         direction=str(a.directional.decision),
                         observation_type="ACTIONABLE_TRIGGERED",
+                        signal_identity=sig_id,
+                        signal_time_ms=sig_time,
+                        entry_zone_low=entry_low,
+                        entry_zone_high=entry_high,
+                        entry_window_bars=entry_bars,
+                        entry_window_end_ms=entry_win_end,
+                        fill_status=ShadowFillStatus.WAITING_FOR_FILL.value,
                     )
                     self.store.set_last_shadow_signal_ids(a.symbol, triggered_id=sig_id)
                     self.store.set_last_shadow_recorded_state(a.symbol, "TRIGGERED")

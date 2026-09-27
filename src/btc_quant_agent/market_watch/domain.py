@@ -69,6 +69,22 @@ class ShadowObservationType(StrEnum):
     ACTIONABLE_TRIGGERED = "ACTIONABLE_TRIGGERED"
 
 
+class ShadowFillStatus(StrEnum):
+    WAITING_FOR_FILL = "WAITING_FOR_FILL"
+    FILLED = "FILLED"
+    NO_FILL = "NO_FILL"
+    RESOLVED = "RESOLVED"
+
+
+class ShadowPathResolution(StrEnum):
+    ONE_MINUTE_CHRONOLOGICAL = "ONE_MINUTE_CHRONOLOGICAL"
+    FIFTEEN_MINUTE_STOP_FIRST = "FIFTEEN_MINUTE_STOP_FIRST"
+
+
+class ShadowExecutionPathModel(StrEnum):
+    PARTIAL_FIRST_BAR_1M_THEN_15M = "PARTIAL_FIRST_BAR_1M_THEN_15M"
+
+
 class AlertSeverity(StrEnum):
     INFO = "INFO"
     WATCH = "WATCH"
@@ -187,6 +203,8 @@ class MarketSnapshot:
     snapshot_hash: str
     health: ScanHealth = ScanHealth.OK
     health_reasons: tuple[str, ...] = ()
+    collection_started_at_ms: int = 0
+    collection_completed_at_ms: int = 0
 
 
 @dataclass(frozen=True)
@@ -277,21 +295,59 @@ class GridPlan:
         return payload
 
 
+def normalize_price_level(price: float | None, tick_size: float | None = None) -> str:
+    """Deterministic, scale-aware normalization of price level without fixed-decimal collisions."""
+    if price is None or price <= 0:
+        return "0"
+    if tick_size is not None and tick_size > 0:
+        tick_str = f"{tick_size:.10f}".rstrip("0")
+        decimals = len(tick_str.split(".")[1]) if "." in tick_str else 0
+        norm_val = round(price / tick_size) * tick_size
+        return f"{norm_val:.{decimals}f}"
+
+    abs_p = abs(price)
+    if abs_p >= 1000.0:
+        return f"{price:.2f}"
+    elif abs_p >= 10.0:
+        return f"{price:.3f}"
+    elif abs_p >= 0.1:
+        return f"{price:.5f}"
+    elif abs_p >= 0.001:
+        return f"{price:.7f}"
+    else:
+        return f"{price:.8f}"
+
+
 def compute_signal_identity(
     symbol: str,
     playbook: PlaybookType | str,
     intended_direction: str,
-    anchor_level: float | None,
+    structural_anchor_id: str | float | None,
+    setup_creation_bar_end_ms: int = 0,
+    tick_size: float | None = None,
 ) -> str:
-    """Deterministic signal identity combining symbol, playbook, intended direction, and anchor level."""
-    norm_level = f"{anchor_level:.2f}" if anchor_level is not None and anchor_level > 0 else "0.00"
+    """Deterministic signal identity combining symbol, playbook, intended direction, structural anchor, and setup bar."""
+    sym = symbol.upper()
     pb_str = playbook.value if isinstance(playbook, PlaybookType) else str(playbook)
-    return f"{symbol.upper()}:{pb_str}:{intended_direction.upper()}:{norm_level}"
+    dir_str = intended_direction.upper()
+
+    if isinstance(structural_anchor_id, (int, float)):
+        anchor_str = normalize_price_level(float(structural_anchor_id), tick_size)
+    elif structural_anchor_id:
+        anchor_str = str(structural_anchor_id)
+    else:
+        anchor_str = "0"
+
+    bar_str = str(setup_creation_bar_end_ms) if setup_creation_bar_end_ms > 0 else "0"
+    return f"{sym}:{pb_str}:{dir_str}:{anchor_str}:{bar_str}"
 
 
 def extract_signal_identity(
     symbol: str,
     directional: DirectionalPlan,
+    snapshot: MarketSnapshot | None = None,
+    created_bar_end_ms: int = 0,
+    tick_size: float | None = None,
 ) -> str:
     """Extract or compute deterministic signal identity from DirectionalPlan."""
     d = directional
@@ -310,16 +366,27 @@ def extract_signal_identity(
     else:
         intended_dir = "NONE"
 
-    anchor = d.breakout_level
-    if anchor is None or anchor <= 0:
-        if intended_dir == "LONG" and d.entry_low > 0:
-            anchor = d.entry_low
-        elif intended_dir == "SHORT" and d.entry_high > 0:
-            anchor = d.entry_high
-        elif d.stop_loss > 0:
-            anchor = d.stop_loss
+    setup_str = d.setup.value if isinstance(d.setup, PlaybookType) else str(d.setup)
+    if setup_str == "BREAKOUT_RETEST":
+        anchor_id = f"BO_{normalize_price_level(d.breakout_level, tick_size)}"
+    elif setup_str == "FAILED_BREAKOUT":
+        sw_high = (snapshot.tf_1h.recent_swing_high if snapshot else None) or d.entry_high
+        anchor_id = f"FBO_{normalize_price_level(sw_high, tick_size)}"
+    elif setup_str == "FAILED_BREAKDOWN":
+        sw_low = (snapshot.tf_1h.recent_swing_low if snapshot else None) or d.entry_low
+        anchor_id = f"FBD_{normalize_price_level(sw_low, tick_size)}"
+    elif setup_str == "TREND_PULLBACK":
+        if intended_dir == "LONG":
+            sw_low = (snapshot.tf_1h.recent_swing_low if snapshot else None) or (d.stop_loss if d.stop_loss > 0 else None) or d.entry_low
+            anchor_id = f"SWL_{normalize_price_level(sw_low, tick_size)}"
+        else:
+            sw_high = (snapshot.tf_1h.recent_swing_high if snapshot else None) or (d.stop_loss if d.stop_loss > 0 else None) or d.entry_high
+            anchor_id = f"SWH_{normalize_price_level(sw_high, tick_size)}"
+    else:
+        lvl = d.breakout_level or (d.entry_low if intended_dir == "LONG" else d.entry_high) or d.stop_loss
+        anchor_id = f"LVL_{normalize_price_level(lvl, tick_size)}"
 
-    return compute_signal_identity(symbol, d.setup, intended_dir, anchor)
+    return compute_signal_identity(symbol, d.setup, intended_dir, anchor_id, created_bar_end_ms, tick_size)
 
 
 @dataclass(frozen=True)

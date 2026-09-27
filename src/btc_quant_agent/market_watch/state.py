@@ -6,7 +6,7 @@ import sqlite3
 from pathlib import Path
 from typing import Any
 
-from .config import MarketWatchConfig
+from .config import MarketWatchConfig, compute_market_watch_config_hash
 from .domain import (
     AlertSeverity,
     BreakoutState,
@@ -20,15 +20,20 @@ from .domain import (
 )
 
 
-def compute_decision_fingerprint(assessment: SymbolAssessment) -> str:
+def compute_decision_fingerprint(
+    assessment: SymbolAssessment,
+    config: MarketWatchConfig | None = None,
+) -> str:
     """Generate a stable, deterministic fingerprint reflecting meaningful operational state.
 
     Excludes volatile fields like millisecond timestamps or minor price ticks.
+    Uses active config for crowding classification and includes config_hash.
     """
     from .derivatives import is_severe_long_crowding, is_severe_short_crowding
 
     d = assessment.directional
     g = assessment.grid
+    c_hash = compute_market_watch_config_hash(config) if config is not None else assessment.config_hash
     payload = {
         "symbol": assessment.symbol,
         "direction": str(d.decision),
@@ -41,11 +46,12 @@ def compute_decision_fingerprint(assessment: SymbolAssessment) -> str:
         "grid_lower": round(g.lower_bound, 2) if g.lower_bound is not None else None,
         "grid_upper": round(g.upper_bound, 2) if g.upper_bound is not None else None,
         "derivatives_regime": str(d.derivatives_regime),
-        "is_severe_long_crowding": is_severe_long_crowding(assessment.snapshot.derivatives),
-        "is_severe_short_crowding": is_severe_short_crowding(assessment.snapshot.derivatives),
+        "is_severe_long_crowding": is_severe_long_crowding(assessment.snapshot.derivatives, config),
+        "is_severe_short_crowding": is_severe_short_crowding(assessment.snapshot.derivatives, config),
         "lifecycle_state": str(assessment.lifecycle_state),
         "breakout_state": str(d.breakout_state),
         "signal_identity": str(assessment.signal_identity),
+        "config_hash": str(c_hash),
     }
     raw = json.dumps(payload, sort_keys=True)
     return hashlib.sha256(raw.encode("utf-8")).hexdigest()[:16]
@@ -156,11 +162,12 @@ class MarketWatchStateStore:
                     risk_codes_json TEXT,
                     decision_json TEXT,
                     alert_fingerprint TEXT,
-                    notification_sent INTEGER
+                    notification_sent INTEGER,
+                    signal_identity TEXT
                 )
                 """
             )
-            for col_name, col_type in [("policy_version", "TEXT"), ("config_hash", "TEXT")]:
+            for col_name, col_type in [("policy_version", "TEXT"), ("config_hash", "TEXT"), ("signal_identity", "TEXT")]:
                 try:
                     conn.execute(f"ALTER TABLE market_watch_assessments ADD COLUMN {col_name} {col_type}")
                 except sqlite3.OperationalError:
@@ -198,7 +205,20 @@ class MarketWatchStateStore:
                     resolved INTEGER DEFAULT 0,
                     evaluation_horizon_bars INTEGER DEFAULT 16,
                     evaluation_end_ms INTEGER,
-                    observation_type TEXT DEFAULT 'ACTIONABLE_TRIGGERED'
+                    observation_type TEXT DEFAULT 'ACTIONABLE_TRIGGERED',
+                    signal_identity TEXT,
+                    signal_time_ms INTEGER,
+                    entry_zone_low REAL,
+                    entry_zone_high REAL,
+                    entry_window_bars INTEGER DEFAULT 4,
+                    entry_window_end_ms INTEGER,
+                    fill_status TEXT DEFAULT 'WAITING_FOR_FILL',
+                    fill_time_ms INTEGER,
+                    fill_price REAL,
+                    gross_r REAL,
+                    friction_r REAL,
+                    path_resolution TEXT,
+                    execution_path_model TEXT
                 )
                 """
             )
@@ -214,6 +234,19 @@ class MarketWatchStateStore:
                 ("evaluation_horizon_bars", "INTEGER DEFAULT 16"),
                 ("evaluation_end_ms", "INTEGER"),
                 ("observation_type", "TEXT DEFAULT 'ACTIONABLE_TRIGGERED'"),
+                ("signal_identity", "TEXT"),
+                ("signal_time_ms", "INTEGER"),
+                ("entry_zone_low", "REAL"),
+                ("entry_zone_high", "REAL"),
+                ("entry_window_bars", "INTEGER DEFAULT 4"),
+                ("entry_window_end_ms", "INTEGER"),
+                ("fill_status", "TEXT DEFAULT 'WAITING_FOR_FILL'"),
+                ("fill_time_ms", "INTEGER"),
+                ("fill_price", "REAL"),
+                ("gross_r", "REAL"),
+                ("friction_r", "REAL"),
+                ("path_resolution", "TEXT"),
+                ("execution_path_model", "TEXT"),
             ]:
                 try:
                     conn.execute(f"ALTER TABLE market_watch_shadow_records ADD COLUMN {col_name} {col_type}")
@@ -442,8 +475,8 @@ class MarketWatchStateStore:
                     regime, setup, directional_decision, grid_decision, entry_quality,
                     derivatives_regime, benchmark_context, opportunity_score,
                     rank, reason_codes_json, risk_codes_json, decision_json,
-                    alert_fingerprint, notification_sent
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    alert_fingerprint, notification_sent, signal_identity
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     assessment.snapshot.decision_time_ms,
@@ -465,6 +498,7 @@ class MarketWatchStateStore:
                     json.dumps(assessment.as_dict()),
                     assessment.alert_fingerprint,
                     1 if alert_sent else 0,
+                    assessment.signal_identity,
                 ),
             )
             conn.commit()
@@ -546,10 +580,41 @@ class MarketWatchStateStore:
         tp2: float = 0.0,
         direction: str = "",
         evaluation_horizon_bars: int = 16,
+        evaluation_end_ms: int | None = None,
         observation_type: str = "ACTIONABLE_TRIGGERED",
+        signal_identity: str = "",
+        signal_time_ms: int | None = None,
+        entry_zone_low: float = 0.0,
+        entry_zone_high: float = 0.0,
+        entry_window_bars: int = 4,
+        entry_window_end_ms: int | None = None,
+        fill_status: str = "WAITING_FOR_FILL",
+        fill_time_ms: int | None = None,
+        fill_price: float | None = None,
+        gross_r: float | None = None,
+        friction_r: float | None = None,
+        path_resolution: str | None = None,
+        execution_path_model: str | None = None,
     ) -> int:
-        eval_end_ms = timestamp_ms + (evaluation_horizon_bars * 15 * 60 * 1000)
+        if signal_time_ms is None:
+            signal_time_ms = timestamp_ms
+        if entry_window_end_ms is None:
+            entry_window_end_ms = signal_time_ms + (entry_window_bars * 15 * 60 * 1000)
+        if evaluation_end_ms is None:
+            eval_end_ms = signal_time_ms + (evaluation_horizon_bars * 15 * 60 * 1000)
+        else:
+            eval_end_ms = evaluation_end_ms
         with self._connect() as conn:
+            # Deduplication guard: exactly one ACTIONABLE_TRIGGERED per signal_identity
+            if observation_type == "ACTIONABLE_TRIGGERED" and signal_identity:
+                cursor = conn.execute(
+                    "SELECT id FROM market_watch_shadow_records WHERE signal_identity = ? AND observation_type = 'ACTIONABLE_TRIGGERED' LIMIT 1",
+                    (signal_identity,),
+                )
+                row = cursor.fetchone()
+                if row is not None:
+                    return int(row[0])
+
             cursor = conn.execute(
                 """
                 INSERT INTO market_watch_shadow_records (
@@ -557,8 +622,11 @@ class MarketWatchStateStore:
                     agent_decision, agent_setup, entry_quality, reason_codes_json,
                     reference_decision, reference_notes, entry_price, stop_loss,
                     tp1, tp2, direction, resolved, evaluation_horizon_bars, evaluation_end_ms,
-                    observation_type
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?)
+                    observation_type, signal_identity, signal_time_ms, entry_zone_low,
+                    entry_zone_high, entry_window_bars, entry_window_end_ms, fill_status,
+                    fill_time_ms, fill_price, gross_r, friction_r, path_resolution,
+                    execution_path_model
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     timestamp_ms,
@@ -580,24 +648,83 @@ class MarketWatchStateStore:
                     evaluation_horizon_bars,
                     eval_end_ms,
                     observation_type,
+                    signal_identity,
+                    signal_time_ms,
+                    entry_zone_low,
+                    entry_zone_high,
+                    entry_window_bars,
+                    entry_window_end_ms,
+                    fill_status,
+                    fill_time_ms,
+                    fill_price,
+                    gross_r,
+                    friction_r,
+                    path_resolution,
+                    execution_path_model,
                 ),
             )
             conn.commit()
             return int(cursor.lastrowid) if cursor.lastrowid is not None else 0
 
+    def update_shadow_fill(
+        self,
+        shadow_id: int,
+        *,
+        fill_status: str,
+        fill_time_ms: int | None,
+        fill_price: float | None,
+        evaluation_end_ms: int | None = None,
+        path_resolution: str | None = None,
+        execution_path_model: str | None = None,
+    ) -> None:
+        with self._connect() as conn:
+            conn.execute(
+                """
+                UPDATE market_watch_shadow_records SET
+                    fill_status = ?,
+                    fill_time_ms = ?,
+                    fill_price = ?,
+                    entry_price = COALESCE(?, entry_price),
+                    evaluation_end_ms = COALESCE(?, evaluation_end_ms),
+                    path_resolution = COALESCE(?, path_resolution),
+                    execution_path_model = COALESCE(?, execution_path_model)
+                WHERE id = ?
+                """,
+                (
+                    fill_status,
+                    fill_time_ms,
+                    fill_price,
+                    fill_price,
+                    evaluation_end_ms,
+                    path_resolution,
+                    execution_path_model,
+                    shadow_id,
+                ),
+            )
+            conn.commit()
+
     def update_shadow_outcome(
         self,
         shadow_id: int,
         *,
-        future_mfe: float,
-        future_mae: float,
+        future_mfe: float | None,
+        future_mae: float | None,
         tp1_hit: bool,
         tp2_hit: bool,
         sl_hit: bool,
         time_to_target_ms: int | None,
         time_to_stop_ms: int | None,
-        net_r: float,
+        net_r: float | None,
         regime_after: str,
+        gross_r: float | None = None,
+        friction_r: float | None = None,
+        fill_status: str | None = None,
+        fill_time_ms: int | None = None,
+        fill_price: float | None = None,
+        path_resolution: str | None = None,
+        execution_path_model: str | None = None,
+        evaluation_end_ms: int | None = None,
+        resolved: int = 1,
     ) -> None:
         with self._connect() as conn:
             conn.execute(
@@ -612,7 +739,15 @@ class MarketWatchStateStore:
                     time_to_stop_ms = ?,
                     net_r = ?,
                     regime_after = ?,
-                    resolved = 1
+                    resolved = ?,
+                    gross_r = COALESCE(?, gross_r),
+                    friction_r = COALESCE(?, friction_r),
+                    fill_status = COALESCE(?, fill_status),
+                    fill_time_ms = COALESCE(?, fill_time_ms),
+                    fill_price = COALESCE(?, fill_price),
+                    path_resolution = COALESCE(?, path_resolution),
+                    execution_path_model = COALESCE(?, execution_path_model),
+                    evaluation_end_ms = COALESCE(?, evaluation_end_ms)
                 WHERE id = ?
                 """,
                 (
@@ -625,6 +760,15 @@ class MarketWatchStateStore:
                     time_to_stop_ms,
                     net_r,
                     regime_after,
+                    resolved,
+                    gross_r,
+                    friction_r,
+                    fill_status,
+                    fill_time_ms,
+                    fill_price,
+                    path_resolution,
+                    execution_path_model,
+                    evaluation_end_ms,
                     shadow_id,
                 ),
             )

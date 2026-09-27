@@ -78,6 +78,7 @@ class MarketWatchThresholdsConfig:
     failed_level_min_volume_z: float = 0.8
     max_retest_bars: int = 12
     max_signal_age_bars: int = 8
+    entry_window_bars: int = 4
     min_volume_z: float = -0.5
     funding_crowding_abs: float = 0.0003
     funding_extreme_abs: float = 0.0008
@@ -101,6 +102,7 @@ class MarketWatchThresholdsConfig:
             "max_retest_bars",
             "vol_compression_min_bars",
             "max_signal_age_bars",
+            "entry_window_bars",
         )
         for name in int_fields:
             _require_positive_int(getattr(self, name), f"thresholds.{name}")
@@ -172,6 +174,10 @@ class MarketWatchConfig:
 
     def as_dict(self) -> dict[str, Any]:
         return asdict(self)
+
+    @property
+    def config_hash(self) -> str:
+        return compute_market_watch_config_hash(self)
 
 
 def build_market_watch_config(raw: dict[str, Any] | None) -> MarketWatchConfig:
