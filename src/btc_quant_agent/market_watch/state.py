@@ -10,6 +10,8 @@ from .config import MarketWatchConfig, compute_market_watch_config_hash
 from .domain import (
     MARKET_WATCH_EVIDENCE_VERSION,
     MARKET_WATCH_POLICY_VERSION,
+    RULE_SCORE_SEMANTICS_VERSION,
+    TACTICAL_POLICY_VERSION,
     AlertSeverity,
     BreakoutState,
     DerivativesRegime,
@@ -19,6 +21,7 @@ from .domain import (
     ShadowExecutionPathModel,
     SignalLifecycleState,
     SymbolAssessment,
+    TacticalSemanticIdentity,
     extract_setup_key,
     extract_signal_identity,
 )
@@ -59,6 +62,25 @@ def compute_decision_fingerprint(
     }
     raw = json.dumps(payload, sort_keys=True)
     return hashlib.sha256(raw.encode("utf-8")).hexdigest()[:16]
+
+
+def _serialize_semantic_identity(val: Any) -> str | None:
+    if val is None:
+        return None
+    if isinstance(val, str):
+        return val
+    if hasattr(val, "as_json"):
+        return str(val.as_json())
+    if hasattr(val, "to_json"):
+        return str(val.to_json())
+    if hasattr(val, "as_dict"):
+        return json.dumps(val.as_dict(), sort_keys=True)
+    if hasattr(val, "to_dict"):
+        return json.dumps(val.to_dict(), sort_keys=True)
+    try:
+        return json.dumps(val, default=str, sort_keys=True)
+    except Exception:  # noqa: BLE001
+        return str(val)
 
 
 class MarketWatchStateStore:
@@ -172,11 +194,34 @@ class MarketWatchStateStore:
                     alert_fingerprint TEXT,
                     notification_sent INTEGER,
                     signal_identity TEXT,
-                    setup_key TEXT
+                    setup_key TEXT,
+                    rule_score REAL,
+                    rule_score_semantics TEXT,
+                    eligible_playbooks_json TEXT,
+                    actionable_playbooks_json TEXT,
+                    selected_playbook TEXT,
+                    selection_method TEXT,
+                    reference_universe_status TEXT,
+                    missing_reference_members_json TEXT,
+                    semantic_identity_json TEXT
                 )
                 """
             )
-            for col_name, col_type in [("policy_version", "TEXT"), ("config_hash", "TEXT"), ("signal_identity", "TEXT"), ("setup_key", "TEXT")]:
+            for col_name, col_type in [
+                ("policy_version", "TEXT"),
+                ("config_hash", "TEXT"),
+                ("signal_identity", "TEXT"),
+                ("setup_key", "TEXT"),
+                ("rule_score", "REAL"),
+                ("rule_score_semantics", "TEXT"),
+                ("eligible_playbooks_json", "TEXT"),
+                ("actionable_playbooks_json", "TEXT"),
+                ("selected_playbook", "TEXT"),
+                ("selection_method", "TEXT"),
+                ("reference_universe_status", "TEXT"),
+                ("missing_reference_members_json", "TEXT"),
+                ("semantic_identity_json", "TEXT"),
+            ]:
                 try:
                     conn.execute(f"ALTER TABLE market_watch_assessments ADD COLUMN {col_name} {col_type}")
                 except sqlite3.OperationalError:
@@ -236,13 +281,21 @@ class MarketWatchStateStore:
                     exit_time_ms INTEGER,
                     exit_price REAL,
                     coverage_status TEXT,
-                    coverage_reason TEXT
+                    coverage_reason TEXT,
+                    semantic_identity_json TEXT
                 )
                 """
             )
             for col_name, col_type in [
+                ("snapshot_hash", "TEXT"),
                 ("policy_version", "TEXT"),
                 ("config_hash", "TEXT"),
+                ("agent_decision", "TEXT"),
+                ("agent_setup", "TEXT"),
+                ("entry_quality", "TEXT"),
+                ("reason_codes_json", "TEXT"),
+                ("reference_decision", "TEXT"),
+                ("reference_notes", "TEXT"),
                 ("entry_price", "REAL"),
                 ("stop_loss", "REAL"),
                 ("tp1", "REAL"),
@@ -274,6 +327,7 @@ class MarketWatchStateStore:
                 ("exit_price", "REAL"),
                 ("coverage_status", "TEXT"),
                 ("coverage_reason", "TEXT"),
+                ("semantic_identity_json", "TEXT"),
             ]:
                 try:
                     conn.execute(f"ALTER TABLE market_watch_shadow_records ADD COLUMN {col_name} {col_type}")
@@ -519,8 +573,12 @@ class MarketWatchStateStore:
                     regime, setup, directional_decision, grid_decision, entry_quality,
                     derivatives_regime, benchmark_context, opportunity_score,
                     rank, reason_codes_json, risk_codes_json, decision_json,
-                    alert_fingerprint, notification_sent, signal_identity, setup_key
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    alert_fingerprint, notification_sent, signal_identity, setup_key,
+                    rule_score, rule_score_semantics, eligible_playbooks_json,
+                    actionable_playbooks_json, selected_playbook, selection_method,
+                    reference_universe_status, missing_reference_members_json,
+                    semantic_identity_json
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     assessment.snapshot.decision_time_ms,
@@ -544,6 +602,15 @@ class MarketWatchStateStore:
                     1 if alert_sent else 0,
                     assessment.signal_identity or curr_sig_id,
                     assessment.setup_key or curr_setup_key,
+                    getattr(assessment, "rule_score", assessment.opportunity_score),
+                    getattr(assessment, "rule_score_semantics", RULE_SCORE_SEMANTICS_VERSION),
+                    json.dumps([p.value if hasattr(p, "value") else str(p) for p in getattr(assessment, "eligible_playbooks", ())]),
+                    json.dumps([p.value if hasattr(p, "value") else str(p) for p in getattr(assessment, "actionable_playbooks", ())]),
+                    (assessment.selected_playbook.value if hasattr(assessment.selected_playbook, "value") else str(assessment.selected_playbook)) if getattr(assessment, "selected_playbook", None) else None,
+                    getattr(assessment, "selection_method", "STATIC_PRECEDENCE"),
+                    getattr(assessment, "reference_universe_status", "UNIVERSE_COMPLETE"),
+                    json.dumps(list(getattr(assessment, "missing_reference_members", ()))),
+                    _serialize_semantic_identity(getattr(assessment, "semantic_identity", None)),
                 ),
             )
             conn.commit()
@@ -649,7 +716,11 @@ class MarketWatchStateStore:
         exit_price: float | None = None,
         coverage_status: str | None = None,
         coverage_reason: str | None = None,
+        semantic_identity: TacticalSemanticIdentity | None = None,
+        semantic_identity_json: str | None = None,
     ) -> int:
+        if semantic_identity is not None and not semantic_identity_json:
+            semantic_identity_json = _serialize_semantic_identity(semantic_identity)
         if signal_time_ms is None:
             signal_time_ms = timestamp_ms
         if entry_window_start_ms is None:
@@ -709,8 +780,8 @@ class MarketWatchStateStore:
                     fill_time_ms, fill_price, gross_r, friction_r, path_resolution,
                     execution_path_model, setup_key, evidence_version, entry_window_start_ms,
                     evaluation_start_ms, terminal_reason, exit_time_ms, exit_price,
-                    coverage_status, coverage_reason
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    coverage_status, coverage_reason, semantic_identity_json
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     timestamp_ms,
@@ -754,6 +825,7 @@ class MarketWatchStateStore:
                     exit_price,
                     coverage_status,
                     coverage_reason,
+                    semantic_identity_json,
                 ),
             )
             conn.commit()
@@ -906,6 +978,53 @@ class MarketWatchStateStore:
             )
             return [dict(row) for row in cursor.fetchall()]
 
+    def get_tactical_shadow_records(
+        self,
+        *,
+        include_legacy: bool = False,
+    ) -> list[dict[str, Any]]:
+        """Query shadow records, defaulting strictly to current compatible Tactical semantic identity."""
+        with self._connect() as conn:
+            conn.row_factory = sqlite3.Row
+            if include_legacy:
+                cursor = conn.execute(
+                    "SELECT * FROM market_watch_shadow_records ORDER BY timestamp_ms DESC"
+                )
+            else:
+                cursor = conn.execute(
+                    "SELECT * FROM market_watch_shadow_records WHERE semantic_identity_json IS NOT NULL ORDER BY timestamp_ms DESC"
+                )
+            records = [dict(row) for row in cursor.fetchall()]
+            if not include_legacy:
+                return [r for r in records if not is_legacy_tactical_record(r)]
+            return records
+
+    def get_tactical_assessments(
+        self,
+        symbol: str | None = None,
+        *,
+        include_legacy: bool = False,
+    ) -> list[dict[str, Any]]:
+        """Query assessments, defaulting strictly to current compatible Tactical semantic identity."""
+        with self._connect() as conn:
+            conn.row_factory = sqlite3.Row
+            query = "SELECT * FROM market_watch_assessments"
+            clauses: list[str] = []
+            params: list[Any] = []
+            if symbol:
+                clauses.append("symbol = ?")
+                params.append(symbol.upper())
+            if not include_legacy:
+                clauses.append("semantic_identity_json IS NOT NULL")
+            if clauses:
+                query += " WHERE " + " AND ".join(clauses)
+            query += " ORDER BY id DESC"
+            cursor = conn.execute(query, tuple(params))
+            records = [dict(row) for row in cursor.fetchall()]
+            if not include_legacy:
+                return [r for r in records if not is_legacy_tactical_record(r)]
+            return records
+
     def get_latest_assessment(self, symbol: str) -> dict[str, Any] | None:
         with self._connect() as conn:
             conn.row_factory = sqlite3.Row
@@ -921,6 +1040,20 @@ class MarketWatchStateStore:
             conn.row_factory = sqlite3.Row
             cursor = conn.execute("SELECT * FROM market_watch_symbol_state ORDER BY last_rank ASC")
             return [dict(row) for row in cursor.fetchall()]
+
+
+def is_legacy_tactical_record(record: dict[str, Any]) -> bool:
+    """Determine whether a record predates TACTICAL_POLICY_R2_B0."""
+    sem_id = record.get("semantic_identity_json")
+    if not sem_id or not str(sem_id).strip():
+        return True
+    try:
+        data = json.loads(sem_id) if isinstance(sem_id, str) else sem_id
+        if data.get("tactical_policy_version") != TACTICAL_POLICY_VERSION:
+            return True
+    except Exception:  # noqa: BLE001
+        return True
+    return False
 
 
 def is_legacy_shadow_record(record: dict[str, Any]) -> bool:

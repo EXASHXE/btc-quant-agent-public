@@ -1,17 +1,18 @@
-from __future__ import annotations
-
+from collections.abc import Sequence
 from typing import Any
 
 from ..domain import Regime
 from .config import MarketWatchConfig
 from .domain import (
     BreakoutState,
+    CandidateStatus,
     ConfidenceBand,
     DerivativesMetrics,
     DerivativesRegime,
     DirectionalDecision,
     ExhaustionMetrics,
     ExhaustionState,
+    PlaybookCandidate,
     PlaybookType,
     TimeframeSnapshot,
 )
@@ -575,3 +576,164 @@ def evaluate_volatility_expansion(
         }
 
     return None
+
+
+def candidate_dict_to_candidate(
+    d: dict[str, Any],
+    fallback_bar_end_ms: int | None = None,
+) -> PlaybookCandidate:
+    """Convert a candidate dictionary from an evaluator into a PlaybookCandidate."""
+    decision = d.get("decision", DirectionalDecision.WAIT)
+    if decision in (DirectionalDecision.LONG, DirectionalDecision.SHORT):
+        candidate_status = CandidateStatus.ACTIONABLE
+    else:
+        candidate_status = CandidateStatus.WATCH
+
+    playbook = d.get("setup", PlaybookType.NO_TRADE)
+    reasons = tuple(d.get("reasons", ()))
+    risks = tuple(d.get("risks", ()))
+    bar_end_ms = (
+        d.get("setup_creation_bar_end_ms")
+        or d.get("breakout_bar_end_ms")
+        or fallback_bar_end_ms
+    )
+
+    return PlaybookCandidate(
+        playbook=playbook,
+        candidate_status=candidate_status,
+        decision=decision,
+        entry_low=d.get("entry_low"),
+        entry_high=d.get("entry_high"),
+        stop_loss=d.get("stop_loss"),
+        take_profit_1=d.get("take_profit_1"),
+        take_profit_2=d.get("take_profit_2"),
+        structural_anchor_id=d.get("structural_anchor_id"),
+        reason_codes=reasons,
+        risk_codes=risks,
+        setup_creation_bar_end_ms=bar_end_ms,
+        invalidation=d.get("invalidation"),
+        confidence=d.get("confidence", ConfidenceBand.MEDIUM),
+        breakout_state=d.get("breakout_state", BreakoutState.NONE),
+        breakout_level=d.get("breakout_level"),
+        breakout_direction=d.get("breakout_direction"),
+        breakout_bar_end_ms=d.get("breakout_bar_end_ms"),
+        failed_level=d.get("failed_level"),
+    )
+
+
+def evaluate_all_playbook_candidates(
+    *,
+    tf_4h: TimeframeSnapshot,
+    tf_1h: TimeframeSnapshot,
+    tf_15m: TimeframeSnapshot,
+    derivatives: DerivativesMetrics,
+    exhaustion: ExhaustionMetrics,
+    config: MarketWatchConfig,
+    prev_state: dict[str, Any] | None = None,
+) -> list[PlaybookCandidate]:
+    """Evaluate ALL active playbooks without short-circuiting.
+
+    Frozen active playbooks:
+    - TREND_PULLBACK
+    - BREAKOUT_RETEST
+    - FAILED_BREAKOUT / FAILED_BREAKDOWN
+    - VOLATILITY_EXPANSION
+
+    Range Mean Reversion is frozen as RESERVED_NOT_ACTIVE.
+    """
+    candidates: list[PlaybookCandidate] = []
+    fallback_bar_end_ms = tf_15m.closed_bar_end_time_ms
+
+    # 1. Trend Pullback
+    tp_dict = evaluate_trend_pullback(
+        tf_4h=tf_4h,
+        tf_1h=tf_1h,
+        tf_15m=tf_15m,
+        derivatives=derivatives,
+        exhaustion=exhaustion,
+        config=config,
+    )
+    if tp_dict is not None:
+        candidates.append(candidate_dict_to_candidate(tp_dict, fallback_bar_end_ms))
+
+    # 2. Breakout Retest
+    br_dict = evaluate_breakout_retest(
+        tf_1h=tf_1h,
+        tf_15m=tf_15m,
+        derivatives=derivatives,
+        exhaustion=exhaustion,
+        config=config,
+        prev_state=prev_state,
+    )
+    if br_dict is not None:
+        candidates.append(candidate_dict_to_candidate(br_dict, fallback_bar_end_ms))
+
+    # 3. Failed Breakout / Breakdown
+    fb_dict = evaluate_failed_breakout(
+        tf_1h=tf_1h,
+        tf_15m=tf_15m,
+        derivatives=derivatives,
+        config=config,
+    )
+    if fb_dict is not None:
+        candidates.append(candidate_dict_to_candidate(fb_dict, fallback_bar_end_ms))
+
+    # 4. Volatility Expansion
+    ve_dict = evaluate_volatility_expansion(
+        tf_1h=tf_1h,
+        tf_15m=tf_15m,
+        derivatives=derivatives,
+        exhaustion=exhaustion,
+        config=config,
+    )
+    if ve_dict is not None:
+        candidates.append(candidate_dict_to_candidate(ve_dict, fallback_bar_end_ms))
+
+    return candidates
+
+
+def select_playbook_candidate(
+    candidates: Sequence[PlaybookCandidate],
+) -> tuple[PlaybookCandidate | None, tuple[PlaybookType, ...], tuple[PlaybookType, ...]]:
+    """Select the winning playbook candidate using frozen STATIC_PRECEDENCE_V1 order.
+
+    Order:
+    1. TREND_PULLBACK
+    2. BREAKOUT_RETEST
+    3. FAILED_BREAKOUT / FAILED_BREAKDOWN
+    4. VOLATILITY_EXPANSION
+
+    Returns:
+        (selected_candidate, eligible_playbooks, actionable_playbooks)
+    """
+    eligible = tuple(
+        c.playbook
+        for c in candidates
+        if c.candidate_status in (CandidateStatus.WATCH, CandidateStatus.ACTIONABLE)
+    )
+    actionable = tuple(
+        c.playbook
+        for c in candidates
+        if c.candidate_status == CandidateStatus.ACTIONABLE
+    )
+
+    precedence = (
+        PlaybookType.TREND_PULLBACK,
+        PlaybookType.BREAKOUT_RETEST,
+        PlaybookType.FAILED_BREAKOUT,
+        PlaybookType.FAILED_BREAKDOWN,
+        PlaybookType.VOLATILITY_EXPANSION,
+    )
+
+    candidate_map = {
+        c.playbook: c
+        for c in candidates
+        if c.candidate_status != CandidateStatus.ABSENT
+    }
+    selected: PlaybookCandidate | None = None
+    for pb in precedence:
+        if pb in candidate_map:
+            selected = candidate_map[pb]
+            break
+
+    return selected, eligible, actionable

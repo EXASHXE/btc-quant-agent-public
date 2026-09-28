@@ -4,7 +4,10 @@ import hashlib
 import json
 import math
 from dataclasses import asdict, dataclass, field, fields
-from typing import Any
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
 
 
 def _require_positive_int(value: Any, name: str) -> None:
@@ -26,6 +29,30 @@ def _require_nonnegative_real(value: Any, name: str) -> None:
         raise ValueError(f"{name} must be finite and nonnegative")
 
 
+def canonicalize_symbols(symbols: Sequence[str]) -> tuple[str, ...]:
+    """Uppercase, strip, deduplicate, and preserve stable order."""
+    seen: set[str] = set()
+    result: list[str] = []
+    for s in symbols:
+        sym = str(s).strip().upper()
+        if sym and sym not in seen:
+            seen.add(sym)
+            result.append(sym)
+    return tuple(result)
+
+
+DEFAULT_RELATIVE_STRENGTH_UNIVERSE: tuple[str, ...] = (
+    "BTCUSDT",
+    "ETHUSDT",
+    "SOLUSDT",
+    "LINKUSDT",
+    "SUIUSDT",
+    "XRPUSDT",
+    "DOGEUSDT",
+    "BNBUSDT",
+)
+
+
 @dataclass(frozen=True)
 class MarketWatchRankingConfig:
     weight_trend_quality: float = 0.20
@@ -40,9 +67,9 @@ class MarketWatchRankingConfig:
     penalty_benchmark_risk: float = 25.0
     penalty_low_liquidity: float = 15.0
     penalty_timeframe_conflict: float = 20.0
-    rs_weight_15m: float = 0.20
-    rs_weight_1h: float = 0.50
-    rs_weight_4h: float = 0.30
+    rs_weight_1h: float = 0.20
+    rs_weight_4h: float = 0.50
+    rs_weight_12h: float = 0.30
     rs_weight_btc: float = 0.40
     rs_weight_eth: float = 0.30
     rs_weight_median: float = 0.30
@@ -50,6 +77,11 @@ class MarketWatchRankingConfig:
     def __post_init__(self) -> None:
         for f in fields(self):
             _require_nonnegative_real(getattr(self, f.name), f"ranking.{f.name}")
+
+    @property
+    def rs_weight_15m(self) -> float:
+        """Deprecated legacy alias for rs_weight_1h."""
+        return self.rs_weight_1h
 
 
 @dataclass(frozen=True)
@@ -129,17 +161,9 @@ class MarketWatchGridConfig:
 @dataclass(frozen=True)
 class MarketWatchConfig:
     enabled: bool = False
-    symbols: tuple[str, ...] = (
-        "BTCUSDT",
-        "ETHUSDT",
-        "SOLUSDT",
-        "LINKUSDT",
-        "SUIUSDT",
-        "XRPUSDT",
-        "DOGEUSDT",
-        "BNBUSDT",
-    )
+    symbols: tuple[str, ...] = DEFAULT_RELATIVE_STRENGTH_UNIVERSE
     benchmark_symbols: tuple[str, ...] = ("BTCUSDT", "ETHUSDT")
+    relative_strength_universe: tuple[str, ...] = DEFAULT_RELATIVE_STRENGTH_UNIVERSE
     scan_interval_minutes: int = 15
     fast_watch_interval_minutes: int = 5
     notify_only_on_change: bool = True
@@ -161,8 +185,13 @@ class MarketWatchConfig:
     def __post_init__(self) -> None:
         if type(self.enabled) is not bool:
             raise TypeError("market_watch.enabled must be a boolean")
+        object.__setattr__(self, "symbols", canonicalize_symbols(self.symbols))
+        object.__setattr__(self, "benchmark_symbols", canonicalize_symbols(self.benchmark_symbols))
+        object.__setattr__(self, "relative_strength_universe", canonicalize_symbols(self.relative_strength_universe))
         if not self.symbols:
             raise ValueError("market_watch.symbols cannot be empty")
+        if not self.relative_strength_universe:
+            raise ValueError("market_watch.relative_strength_universe cannot be empty")
         for name in ("scan_interval_minutes", "fast_watch_interval_minutes", "max_alert_symbols"):
             _require_positive_int(getattr(self, name), f"market_watch.{name}")
         for name in ("min_net_rr", "high_quality_net_rr", "taker_fee_rate", "maker_fee_rate", "slippage_bps_per_side", "funding_stress_rate"):
@@ -180,16 +209,39 @@ class MarketWatchConfig:
         return compute_market_watch_config_hash(self)
 
 
+def compute_required_closed_bars(config: MarketWatchConfig) -> int:
+    """Centralize required closed-bar history with deterministic engineering warmup margin."""
+    existing_feature_required = 160  # level_lookback
+    return max(existing_feature_required, config.thresholds.ema_slow + 50)
+
+
+def compute_required_fetch_bars(config: MarketWatchConfig) -> int:
+    """Request enough candles to tolerate a currently forming bar."""
+    return compute_required_closed_bars(config) + 1
+
+
 def build_market_watch_config(raw: dict[str, Any] | None) -> MarketWatchConfig:
     if not raw:
         return MarketWatchConfig()
     values = dict(raw)
-    if "symbols" in values and isinstance(values["symbols"], list):
+    if "symbols" in values and isinstance(values["symbols"], (list, tuple)):
         values["symbols"] = tuple(values["symbols"])
-    if "benchmark_symbols" in values and isinstance(values["benchmark_symbols"], list):
+    if "benchmark_symbols" in values and isinstance(values["benchmark_symbols"], (list, tuple)):
         values["benchmark_symbols"] = tuple(values["benchmark_symbols"])
+    if "relative_strength_universe" in values and isinstance(values["relative_strength_universe"], (list, tuple)):
+        values["relative_strength_universe"] = tuple(values["relative_strength_universe"])
     if "ranking" in values and isinstance(values["ranking"], dict):
-        values["ranking"] = MarketWatchRankingConfig(**values["ranking"])
+        rk = dict(values["ranking"])
+        # Support legacy configuration migration:
+        # rs_weight_15m -> rs_weight_1h, rs_weight_1h -> rs_weight_4h, rs_weight_4h -> rs_weight_12h
+        if "rs_weight_15m" in rk and "rs_weight_12h" not in rk:
+            old_15m = rk.pop("rs_weight_15m")
+            old_1h = rk.get("rs_weight_1h", 0.50)
+            old_4h = rk.get("rs_weight_4h", 0.30)
+            rk["rs_weight_1h"] = old_15m
+            rk["rs_weight_4h"] = old_1h
+            rk["rs_weight_12h"] = old_4h
+        values["ranking"] = MarketWatchRankingConfig(**rk)
     if "thresholds" in values and isinstance(values["thresholds"], dict):
         values["thresholds"] = MarketWatchThresholdsConfig(**values["thresholds"])
     if "grid" in values and isinstance(values["grid"], dict):
@@ -205,6 +257,7 @@ def compute_market_watch_config_hash(config: MarketWatchConfig) -> str:
     payload = {
         "symbols": list(config.symbols),
         "benchmark_symbols": list(config.benchmark_symbols),
+        "relative_strength_universe": list(config.relative_strength_universe),
         "scan_interval_minutes": config.scan_interval_minutes,
         "min_net_rr": config.min_net_rr,
         "high_quality_net_rr": config.high_quality_net_rr,

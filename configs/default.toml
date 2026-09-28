@@ -101,6 +101,7 @@ feishu_enabled = false
 enabled = false
 symbols = ["BTCUSDT", "ETHUSDT", "SOLUSDT", "LINKUSDT", "SUIUSDT", "XRPUSDT", "DOGEUSDT", "BNBUSDT"]
 benchmark_symbols = ["BTCUSDT", "ETHUSDT"]
+relative_strength_universe = ["BTCUSDT", "ETHUSDT", "SOLUSDT", "LINKUSDT", "SUIUSDT", "XRPUSDT", "DOGEUSDT", "BNBUSDT"]
 scan_interval_minutes = 15
 fast_watch_interval_minutes = 5
 notify_only_on_change = true

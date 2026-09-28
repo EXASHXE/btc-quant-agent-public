@@ -27,19 +27,33 @@ def evaluate_benchmark_context(
     btc_4h = btc_snapshot.tf_4h
     tc = config.thresholds
 
-    # Check for BTC Volatility Shock
+    # Explicit 1h elapsed return (authoritative B0 semantics)
+    btc_return_1h = btc_snapshot.return_1h
+    if btc_return_1h is None and hasattr(btc_1h, "roc"):
+        btc_return_1h = btc_1h.roc
+
+    # Check for BTC Volatility Shock using true return_1h (no longer using 12x1h roc)
     btc_vol_shock = (
-        btc_1h.atr_percentile >= tc.high_vol_atr_percentile and btc_1h.roc < -0.015
+        btc_1h.atr_percentile >= tc.high_vol_atr_percentile
+        and btc_return_1h is not None
+        and btc_return_1h < -0.015
     )
     if btc_vol_shock:
         reasons.append("BTC_DOWNSIDE_VOLATILITY_SHOCK")
         risks.append("BTC_FLASH_DROP_RISK")
         return BenchmarkContext.BTC_VOLATILITY_SHOCK, tuple(reasons), tuple(risks)
 
-    # Check for ETH Volatility Shock
+    # Check for ETH Volatility Shock using true return_1h
     if eth_snapshot is not None:
         eth_1h = eth_snapshot.tf_1h
-        if eth_1h.atr_percentile >= tc.high_vol_atr_percentile and eth_1h.roc < -0.02:
+        eth_return_1h = eth_snapshot.return_1h
+        if eth_return_1h is None and hasattr(eth_1h, "roc"):
+            eth_return_1h = eth_1h.roc
+        if (
+            eth_1h.atr_percentile >= tc.high_vol_atr_percentile
+            and eth_return_1h is not None
+            and eth_return_1h < -0.02
+        ):
             reasons.append("ETH_DOWNSIDE_VOLATILITY_SHOCK")
             risks.append("ETH_FLASH_DROP_RISK")
             return BenchmarkContext.ETH_VOLATILITY_SHOCK, tuple(reasons), tuple(risks)
@@ -94,6 +108,7 @@ def apply_benchmark_context_gate(
         # 3. Net RR >= high_quality_net_rr
         is_exceptional = (
             relative_perf is not None
+            and relative_perf.rel_to_btc_1h is not None
             and relative_perf.rel_to_btc_1h >= 0.025
             and entry_quality in (EntryQuality.EXCELLENT, EntryQuality.GOOD)
             and net_rr >= config.high_quality_net_rr

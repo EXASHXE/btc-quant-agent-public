@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import hashlib
+import json
 from collections.abc import Sequence
 from dataclasses import asdict, dataclass, field
 from enum import StrEnum
@@ -7,8 +9,79 @@ from typing import Any
 
 from ..domain import Candle, Regime
 
-MARKET_WATCH_POLICY_VERSION: str = "0.5.0-market-watch-forward-v1"
+TACTICAL_POLICY_VERSION: str = "TACTICAL_POLICY_R2_B0"
+MARKET_SNAPSHOT_SCHEMA_VERSION: str = "MARKET_SNAPSHOT_V2"
+RETURN_FEATURE_SEMANTICS_VERSION: str = "ELAPSED_TIME_RETURNS_V1"
+PLAYBOOK_SELECTION_VERSION: str = "STATIC_PRECEDENCE_V1"
+REFERENCE_UNIVERSE_VERSION: str = "TACTICAL_RS_UNIVERSE_V1"
+RULE_SCORE_SEMANTICS_VERSION: str = "RULE_SCORE_V1"
+SEMANTIC_IDENTITY_VERSION: str = "TACTICAL_SEMANTIC_IDENTITY_V1"
 MARKET_WATCH_EVIDENCE_VERSION: str = "FORWARD_EVIDENCE_V1"
+HEURISTIC_RULE_QUALITY_BAND_VERSION: str = "HEURISTIC_RULE_QUALITY_BAND_V1"
+
+# Deprecated backward compatibility alias
+MARKET_WATCH_POLICY_VERSION: str = TACTICAL_POLICY_VERSION
+
+
+@dataclass(frozen=True)
+class TacticalSemanticIdentity:
+    semantic_identity_version: str = SEMANTIC_IDENTITY_VERSION
+    tactical_policy_version: str = TACTICAL_POLICY_VERSION
+    snapshot_schema_version: str = MARKET_SNAPSHOT_SCHEMA_VERSION
+    return_feature_semantics_version: str = RETURN_FEATURE_SEMANTICS_VERSION
+    playbook_selection_version: str = PLAYBOOK_SELECTION_VERSION
+    reference_universe_version: str = REFERENCE_UNIVERSE_VERSION
+    rule_score_semantics_version: str = RULE_SCORE_SEMANTICS_VERSION
+    forward_evidence_version: str = MARKET_WATCH_EVIDENCE_VERSION
+    config_hash: str = ""
+    return_semantics_version: str | None = None
+
+    def __post_init__(self) -> None:
+        if self.return_semantics_version is not None:
+            object.__setattr__(self, "return_feature_semantics_version", self.return_semantics_version)
+
+    def to_dict(self) -> dict[str, str]:
+        return {
+            "semantic_identity_version": self.semantic_identity_version,
+            "tactical_policy_version": self.tactical_policy_version,
+            "snapshot_schema_version": self.snapshot_schema_version,
+            "return_feature_semantics_version": self.return_feature_semantics_version,
+            "playbook_selection_version": self.playbook_selection_version,
+            "reference_universe_version": self.reference_universe_version,
+            "rule_score_semantics_version": self.rule_score_semantics_version,
+            "forward_evidence_version": self.forward_evidence_version,
+            "config_hash": self.config_hash,
+        }
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_dict(), sort_keys=True)
+
+    as_dict = to_dict
+    as_json = to_json
+
+    def canonical_hash(self) -> str:
+        return hashlib.sha256(self.to_json().encode("utf-8")).hexdigest()[:16]
+
+    @classmethod
+    def default(cls) -> TacticalSemanticIdentity:
+        return cls()
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> TacticalSemanticIdentity:
+        return cls(
+            semantic_identity_version=str(data.get("semantic_identity_version", SEMANTIC_IDENTITY_VERSION)),
+            tactical_policy_version=str(data.get("tactical_policy_version", TACTICAL_POLICY_VERSION)),
+            snapshot_schema_version=str(data.get("snapshot_schema_version", MARKET_SNAPSHOT_SCHEMA_VERSION)),
+            return_feature_semantics_version=str(data.get("return_feature_semantics_version", RETURN_FEATURE_SEMANTICS_VERSION)),
+            playbook_selection_version=str(data.get("playbook_selection_version", PLAYBOOK_SELECTION_VERSION)),
+            reference_universe_version=str(data.get("reference_universe_version", REFERENCE_UNIVERSE_VERSION)),
+            rule_score_semantics_version=str(data.get("rule_score_semantics_version", RULE_SCORE_SEMANTICS_VERSION)),
+            forward_evidence_version=str(data.get("forward_evidence_version", MARKET_WATCH_EVIDENCE_VERSION)),
+        )
+
+    @classmethod
+    def from_json(cls, text: str) -> TacticalSemanticIdentity:
+        return cls.from_dict(json.loads(text))
 
 
 class DirectionalDecision(StrEnum):
@@ -146,10 +219,58 @@ class PlaybookType(StrEnum):
     NO_TRADE = "NO_TRADE"
 
 
+ACTIVE_PLAYBOOKS: tuple[PlaybookType, ...] = (
+    PlaybookType.TREND_PULLBACK,
+    PlaybookType.BREAKOUT_RETEST,
+    PlaybookType.FAILED_BREAKOUT,
+    PlaybookType.FAILED_BREAKDOWN,
+    PlaybookType.VOLATILITY_EXPANSION,
+)
+
+RESERVED_INACTIVE_PLAYBOOKS: tuple[PlaybookType, ...] = (
+    PlaybookType.RANGE_MEAN_REVERSION,
+)
+
+
+class CandidateStatus(StrEnum):
+    ABSENT = "ABSENT"
+    WATCH = "WATCH"
+    ACTIONABLE = "ACTIONABLE"
+
+
 class ConfidenceBand(StrEnum):
     HIGH = "HIGH"
     MEDIUM = "MEDIUM"
     LOW = "LOW"
+
+
+@dataclass(frozen=True)
+class PlaybookCandidate:
+    playbook: PlaybookType
+    candidate_status: CandidateStatus
+    decision: DirectionalDecision
+    entry_low: float | None
+    entry_high: float | None
+    stop_loss: float | None
+    take_profit_1: float | None
+    take_profit_2: float | None
+    structural_anchor_id: str | None
+    reason_codes: tuple[str, ...]
+    risk_codes: tuple[str, ...]
+    setup_creation_bar_end_ms: int | None
+    invalidation: float | None = None
+    confidence: ConfidenceBand = ConfidenceBand.MEDIUM
+    breakout_state: BreakoutState = BreakoutState.NONE
+    breakout_level: float | None = None
+    breakout_direction: str | None = None
+    breakout_bar_end_ms: int | None = None
+    failed_level: float | None = None
+
+    def __getitem__(self, item: str) -> Any:
+        return asdict(self)[item]
+
+    def get(self, item: str, default: Any = None) -> Any:
+        return asdict(self).get(item, default)
 
 
 class ExhaustionState(StrEnum):
@@ -173,20 +294,29 @@ class TimeframeSnapshot:
     atr_percentile: float
     adx: float
     rsi: float
-    roc: float
-    volume: float
-    volume_z: float
-    bb_width: float
-    bb_width_percentile: float
-    recent_swing_high: float | None
-    recent_swing_low: float | None
-    supports: tuple[float, ...]
-    resistances: tuple[float, ...]
-    structure: str
-    regime: Regime
+    roc_12bars: float = 0.0
+    volume: float = 0.0
+    volume_z: float = 0.0
+    bb_width: float = 0.0
+    bb_width_percentile: float = 0.0
+    recent_swing_high: float | None = None
+    recent_swing_low: float | None = None
+    supports: tuple[float, ...] = ()
+    resistances: tuple[float, ...] = ()
+    structure: str = ""
+    regime: Regime = Regime.RANGE
     is_volatility_compressed: bool = False
     is_volatility_expanded: bool = False
     has_prior_compression_window: bool = False
+    roc: float = 0.0
+    ema_slow: float | None = None
+    ema_slow_status: str = "AVAILABLE"
+
+    def __post_init__(self) -> None:
+        if self.roc_12bars == 0.0 and self.roc != 0.0:
+            object.__setattr__(self, "roc_12bars", self.roc)
+        elif self.roc == 0.0 and self.roc_12bars != 0.0:
+            object.__setattr__(self, "roc", self.roc_12bars)
 
 
 @dataclass(frozen=True)
@@ -243,20 +373,50 @@ class MarketSnapshot:
     health_reasons: tuple[str, ...] = ()
     collection_started_at_ms: int = 0
     collection_completed_at_ms: int = 0
+    snapshot_schema_version: str = MARKET_SNAPSHOT_SCHEMA_VERSION
+    return_1h: float | None = None
+    return_4h: float | None = None
+    return_12h: float | None = None
+    return_1h_status: str = "AVAILABLE"
+    return_4h_status: str = "AVAILABLE"
+    return_12h_status: str = "AVAILABLE"
+    return_feature_semantics_version: str = RETURN_FEATURE_SEMANTICS_VERSION
+    reference_universe_version: str = REFERENCE_UNIVERSE_VERSION
+    reference_universe_status: str = "UNIVERSE_COMPLETE"
+    expected_reference_members: tuple[str, ...] = ()
+    available_reference_members: tuple[str, ...] = ()
+    missing_reference_members: tuple[str, ...] = ()
+    closed_bar_watermarks: dict[str, int] = field(default_factory=dict)
+
+    def as_dict(self) -> dict[str, Any]:
+        payload = asdict(self)
+        payload["health"] = str(self.health)
+        return payload
 
 
 @dataclass(frozen=True)
 class RelativePerformance:
     symbol: str
-    perf_15m: float
-    perf_1h: float
-    perf_4h: float
-    rel_to_btc_1h: float
-    rel_to_eth_1h: float
-    rel_to_median_1h: float
-    score: float
+    perf_1h: float | None = None
+    perf_4h: float | None = None
+    perf_12h: float | None = None
+    rel_to_btc_1h: float | None = None
+    rel_to_eth_1h: float | None = None
+    rel_to_median_1h: float | None = None
+    score: float = 0.0
     multi_tf_excess: float = 0.0
     rank: int = 0
+    perf_15m: float = 0.0
+    universe_status: str = "UNIVERSE_COMPLETE"
+    missing_members: tuple[str, ...] = ()
+    expected_members: tuple[str, ...] = ()
+    available_members: tuple[str, ...] = ()
+
+    def __post_init__(self) -> None:
+        if self.perf_1h is None and self.perf_15m != 0.0:
+            object.__setattr__(self, "perf_1h", self.perf_15m)
+        elif self.perf_15m == 0.0 and self.perf_1h is not None:
+            object.__setattr__(self, "perf_15m", self.perf_1h)
 
 
 @dataclass(frozen=True)
@@ -297,6 +457,15 @@ class DirectionalPlan:
     breakout_level: float | None = None
     breakout_direction: str | None = None
     breakout_bar_end_ms: int | None = None
+    rule_score: float = 0.0
+    rule_score_semantics: str = RULE_SCORE_SEMANTICS_VERSION
+    heuristic_quality_band_semantics: str = HEURISTIC_RULE_QUALITY_BAND_VERSION
+
+    def __post_init__(self) -> None:
+        if self.rule_score == 0.0 and self.opportunity_score != 0.0:
+            object.__setattr__(self, "rule_score", self.opportunity_score)
+        elif self.opportunity_score == 0.0 and self.rule_score != 0.0:
+            object.__setattr__(self, "opportunity_score", self.rule_score)
 
     def as_dict(self) -> dict[str, Any]:
         payload = asdict(self)
@@ -533,15 +702,36 @@ class SymbolAssessment:
     veto_reasons: tuple[str, ...] = ()
     alert_fingerprint: str = ""
     lifecycle_state: SignalLifecycleState = SignalLifecycleState.CANDIDATE
-    policy_version: str = MARKET_WATCH_POLICY_VERSION
+    policy_version: str = TACTICAL_POLICY_VERSION
     config_hash: str = ""
     signal_identity: str = ""
     setup_key: str = ""
+    rule_score: float = 0.0
+    rule_score_semantics: str = RULE_SCORE_SEMANTICS_VERSION
+    eligible_playbooks: tuple[str, ...] = ()
+    actionable_playbooks: tuple[str, ...] = ()
+    selected_playbook: str = ""
+    selection_method: str = PLAYBOOK_SELECTION_VERSION
+    selection_version: str = PLAYBOOK_SELECTION_VERSION
+    reference_universe_status: str = "UNIVERSE_COMPLETE"
+    missing_reference_members: tuple[str, ...] = ()
+    semantic_identity: TacticalSemanticIdentity = field(default_factory=TacticalSemanticIdentity)
+
+    def __post_init__(self) -> None:
+        if self.rule_score == 0.0 and self.opportunity_score != 0.0:
+            object.__setattr__(self, "rule_score", self.opportunity_score)
+        elif self.opportunity_score == 0.0 and self.rule_score != 0.0:
+            object.__setattr__(self, "opportunity_score", self.rule_score)
+        if not self.selected_playbook and self.directional is not None:
+            pb_val = self.directional.setup.value if hasattr(self.directional.setup, "value") else str(self.directional.setup)
+            object.__setattr__(self, "selected_playbook", pb_val)
 
     def as_dict(self) -> dict[str, Any]:
         return {
             "symbol": self.symbol,
             "opportunity_score": round(self.opportunity_score, 2),
+            "rule_score": round(self.rule_score, 2),
+            "rule_score_semantics": self.rule_score_semantics,
             "rank": self.rank,
             "policy_version": self.policy_version,
             "config_hash": self.config_hash,
@@ -552,6 +742,19 @@ class SymbolAssessment:
             "alert_fingerprint": self.alert_fingerprint,
             "signal_identity": self.signal_identity,
             "setup_key": self.setup_key,
+            "eligible_playbooks": list(self.eligible_playbooks),
+            "actionable_playbooks": list(self.actionable_playbooks),
+            "selected_playbook": self.selected_playbook,
+            "selection_method": self.selection_method,
+            "selection_version": self.selection_version,
+            "reference_universe_status": self.reference_universe_status,
+            "missing_reference_members": list(self.missing_reference_members),
+            "semantic_identity": self.semantic_identity.to_dict(),
+            "rule_score_explanation": (
+                "RULE_SCORE_V1 is a deterministic rule-based evaluation heuristic. "
+                "It is NOT P(win), NOT calibrated confidence, NOT expected return, "
+                "NOT probability of fill, and NOT validated alpha."
+            ),
         }
 
 

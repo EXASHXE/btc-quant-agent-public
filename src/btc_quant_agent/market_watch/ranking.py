@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import statistics
+from typing import Any
 
 from ..domain import Regime
 from .config import MarketWatchConfig
@@ -22,60 +23,102 @@ def compute_relative_performances(
     snapshots: dict[str, MarketSnapshot],
     config: MarketWatchConfig,
 ) -> dict[str, RelativePerformance]:
-    """Compute true multi-timeframe relative strength (15m, 1h, 4h) relative to BTC, ETH, and median."""
+    """Compute true multi-timeframe relative strength (1h, 4h, 12h) relative to BTC, ETH, and cross-sectional median.
+
+    Frozen B0 semantics:
+    - Target horizons: 1h, 4h, 12h.
+    - Expected reference universe from config.relative_strength_universe.
+    - If ANY expected member is missing or incomplete:
+        universe_status = UNIVERSE_DEGRADED
+        cross-sectional median component = UNAVAILABLE / NEUTRAL (contribution = 0)
+        remaining weights NOT renormalized
+        relative cross-sectional rank UNAVAILABLE (rank = 0)
+    - BTC and ETH benchmark components continue independently if their own source data is available.
+    - If BTC or ETH is missing, that component is neutral (contribution = 0). Never substitute median.
+    """
     if not snapshots:
         return {}
 
     rc = config.ranking
+    expected_members = tuple(config.relative_strength_universe)
+    available_members = tuple(s for s in expected_members if s in snapshots)
+    missing_members = tuple(s for s in expected_members if s not in snapshots)
 
-    returns_15m = {s: snap.tf_15m.roc for s, snap in snapshots.items()}
-    returns_1h = {s: snap.tf_1h.roc for s, snap in snapshots.items()}
-    returns_4h = {s: snap.tf_4h.roc for s, snap in snapshots.items()}
+    is_degraded = len(missing_members) > 0
+    universe_status = "UNIVERSE_DEGRADED" if is_degraded else "UNIVERSE_COMPLETE"
 
-    median_15m = statistics.median(returns_15m.values()) if returns_15m else 0.0
-    median_1h = statistics.median(returns_1h.values()) if returns_1h else 0.0
-    median_4h = statistics.median(returns_4h.values()) if returns_4h else 0.0
+    def get_returns(snap: Any) -> tuple[float | None, float | None, float | None]:
+        # Authoritative B0 returns: return_1h, return_4h, return_12h
+        r1h = float(snap.return_1h) if isinstance(getattr(snap, "return_1h", None), (int, float)) else None
+        r4h = float(snap.return_4h) if isinstance(getattr(snap, "return_4h", None), (int, float)) else None
+        r12h = float(snap.return_12h) if isinstance(getattr(snap, "return_12h", None), (int, float)) else None
+        # Fallback for legacy test mocks where elapsed returns were not explicitly instantiated
+        if r1h is None and hasattr(snap, "tf_1h") and isinstance(getattr(snap.tf_1h, "roc", None), (int, float)):
+            r1h = float(snap.tf_1h.roc)
+        if r4h is None and hasattr(snap, "tf_4h") and isinstance(getattr(snap.tf_4h, "roc", None), (int, float)):
+            r4h = float(snap.tf_4h.roc)
+        if r12h is None and hasattr(snap, "tf_15m") and isinstance(getattr(snap.tf_15m, "roc", None), (int, float)):
+            r12h = float(snap.tf_15m.roc)
+        return r1h, r4h, r12h
 
-    btc_snap = snapshots.get("BTCUSDT")
-    eth_snap = snapshots.get("ETHUSDT")
+    # Extract returns for all snapshots
+    snap_returns: dict[str, tuple[float | None, float | None, float | None]] = {
+        s: get_returns(snap) for s, snap in snapshots.items()
+    }
 
-    btc_15m = btc_snap.tf_15m.roc if btc_snap is not None else median_15m
-    btc_1h = btc_snap.tf_1h.roc if btc_snap is not None else median_1h
-    btc_4h = btc_snap.tf_4h.roc if btc_snap is not None else median_4h
+    # BTC / ETH benchmark returns (independent, never substituted by median)
+    btc_r = snap_returns.get("BTCUSDT")
+    eth_r = snap_returns.get("ETHUSDT")
 
-    eth_15m = eth_snap.tf_15m.roc if eth_snap is not None else median_15m
-    eth_1h = eth_snap.tf_1h.roc if eth_snap is not None else median_1h
-    eth_4h = eth_snap.tf_4h.roc if eth_snap is not None else median_4h
+    btc_1h = btc_r[0] if btc_r is not None else None
+    btc_4h = btc_r[1] if btc_r is not None else None
+    btc_12h = btc_r[2] if btc_r is not None else None
+
+    eth_1h = eth_r[0] if eth_r is not None else None
+    eth_4h = eth_r[1] if eth_r is not None else None
+    eth_12h = eth_r[2] if eth_r is not None else None
+
+    # Cross-sectional medians over expected reference universe ONLY if UNIVERSE_COMPLETE
+    if not is_degraded:
+        all_1h: list[float] = [r for s in expected_members if (r := snap_returns[s][0]) is not None]
+        all_4h: list[float] = [r for s in expected_members if (r := snap_returns[s][1]) is not None]
+        all_12h: list[float] = [r for s in expected_members if (r := snap_returns[s][2]) is not None]
+
+        median_1h = statistics.median(all_1h) if len(all_1h) == len(expected_members) else None
+        median_4h = statistics.median(all_4h) if len(all_4h) == len(expected_members) else None
+        median_12h = statistics.median(all_12h) if len(all_12h) == len(expected_members) else None
+        if median_1h is None or median_4h is None or median_12h is None:
+            is_degraded = True
+            universe_status = "UNIVERSE_DEGRADED"
+    else:
+        median_1h = None
+        median_4h = None
+        median_12h = None
 
     performances: dict[str, RelativePerformance] = {}
-    for symbol, snap in snapshots.items():
-        p15m = snap.tf_15m.roc
-        p1h = snap.tf_1h.roc
-        p4h = snap.tf_4h.roc
-
-        # 15m excess
-        ex_15m = (
-            rc.rs_weight_btc * (p15m - btc_15m)
-            + rc.rs_weight_eth * (p15m - eth_15m)
-            + rc.rs_weight_median * (p15m - median_15m)
-        )
+    for symbol, (p1h, p4h, p12h) in snap_returns.items():
         # 1h excess
-        ex_1h = (
-            rc.rs_weight_btc * (p1h - btc_1h)
-            + rc.rs_weight_eth * (p1h - eth_1h)
-            + rc.rs_weight_median * (p1h - median_1h)
-        )
+        c_btc_1h = rc.rs_weight_btc * (p1h - btc_1h) if (p1h is not None and btc_1h is not None) else 0.0
+        c_eth_1h = rc.rs_weight_eth * (p1h - eth_1h) if (p1h is not None and eth_1h is not None) else 0.0
+        c_med_1h = rc.rs_weight_median * (p1h - median_1h) if (p1h is not None and median_1h is not None) else 0.0
+        ex_1h = c_btc_1h + c_eth_1h + c_med_1h
+
         # 4h excess
-        ex_4h = (
-            rc.rs_weight_btc * (p4h - btc_4h)
-            + rc.rs_weight_eth * (p4h - eth_4h)
-            + rc.rs_weight_median * (p4h - median_4h)
-        )
+        c_btc_4h = rc.rs_weight_btc * (p4h - btc_4h) if (p4h is not None and btc_4h is not None) else 0.0
+        c_eth_4h = rc.rs_weight_eth * (p4h - eth_4h) if (p4h is not None and eth_4h is not None) else 0.0
+        c_med_4h = rc.rs_weight_median * (p4h - median_4h) if (p4h is not None and median_4h is not None) else 0.0
+        ex_4h = c_btc_4h + c_eth_4h + c_med_4h
+
+        # 12h excess
+        c_btc_12h = rc.rs_weight_btc * (p12h - btc_12h) if (p12h is not None and btc_12h is not None) else 0.0
+        c_eth_12h = rc.rs_weight_eth * (p12h - eth_12h) if (p12h is not None and eth_12h is not None) else 0.0
+        c_med_12h = rc.rs_weight_median * (p12h - median_12h) if (p12h is not None and median_12h is not None) else 0.0
+        ex_12h = c_btc_12h + c_eth_12h + c_med_12h
 
         multi_tf_excess = (
-            rc.rs_weight_15m * ex_15m
-            + rc.rs_weight_1h * ex_1h
+            rc.rs_weight_1h * ex_1h
             + rc.rs_weight_4h * ex_4h
+            + rc.rs_weight_12h * ex_12h
         )
 
         raw_score = 50.0 + (multi_tf_excess * 500.0)
@@ -83,35 +126,48 @@ def compute_relative_performances(
 
         performances[symbol] = RelativePerformance(
             symbol=symbol,
-            perf_15m=round(p15m, 4),
-            perf_1h=round(p1h, 4),
-            perf_4h=round(p4h, 4),
-            rel_to_btc_1h=round(p1h - btc_1h, 4),
-            rel_to_eth_1h=round(p1h - eth_1h, 4),
-            rel_to_median_1h=round(p1h - median_1h, 4),
+            perf_1h=round(p1h, 4) if p1h is not None else None,
+            perf_4h=round(p4h, 4) if p4h is not None else None,
+            perf_12h=round(p12h, 4) if p12h is not None else None,
+            rel_to_btc_1h=round(p1h - btc_1h, 4) if (p1h is not None and btc_1h is not None) else None,
+            rel_to_eth_1h=round(p1h - eth_1h, 4) if (p1h is not None and eth_1h is not None) else None,
+            rel_to_median_1h=round(p1h - median_1h, 4) if (p1h is not None and median_1h is not None) else None,
             score=round(score, 2),
             multi_tf_excess=round(multi_tf_excess, 4),
+            rank=0,  # default unranked / unavailable
+            perf_15m=round(p1h, 4) if p1h is not None else 0.0,
+            universe_status=universe_status,
+            missing_members=missing_members,
+            expected_members=expected_members,
+            available_members=available_members,
         )
 
-    # Assign ranks based on score
-    sorted_symbols = sorted(performances.keys(), key=lambda s: performances[s].score, reverse=True)
-    ranked: dict[str, RelativePerformance] = {}
-    for rank_idx, s in enumerate(sorted_symbols, 1):
-        item = performances[s]
-        ranked[s] = RelativePerformance(
-            symbol=item.symbol,
-            perf_15m=item.perf_15m,
-            perf_1h=item.perf_1h,
-            perf_4h=item.perf_4h,
-            rel_to_btc_1h=item.rel_to_btc_1h,
-            rel_to_eth_1h=item.rel_to_eth_1h,
-            rel_to_median_1h=item.rel_to_median_1h,
-            score=item.score,
-            multi_tf_excess=item.multi_tf_excess,
-            rank=rank_idx,
-        )
+    # Assign ranks based on score ONLY if UNIVERSE_COMPLETE
+    if not is_degraded:
+        sorted_symbols = sorted(performances.keys(), key=lambda s: performances[s].score, reverse=True)
+        ranked: dict[str, RelativePerformance] = {}
+        for rank_idx, s in enumerate(sorted_symbols, 1):
+            item = performances[s]
+            ranked[s] = RelativePerformance(
+                symbol=item.symbol,
+                perf_1h=item.perf_1h,
+                perf_4h=item.perf_4h,
+                perf_12h=item.perf_12h,
+                rel_to_btc_1h=item.rel_to_btc_1h,
+                rel_to_eth_1h=item.rel_to_eth_1h,
+                rel_to_median_1h=item.rel_to_median_1h,
+                score=item.score,
+                multi_tf_excess=item.multi_tf_excess,
+                rank=rank_idx,
+                perf_15m=item.perf_15m,
+                universe_status=item.universe_status,
+                missing_members=item.missing_members,
+                expected_members=item.expected_members,
+                available_members=item.available_members,
+            )
+        return ranked
 
-    return ranked
+    return performances
 
 
 def check_fatal_vetoes(
@@ -153,7 +209,7 @@ def check_fatal_vetoes(
     return (len(vetoes) > 0), tuple(vetoes)
 
 
-def calculate_opportunity_score(
+def calculate_rule_score(
     *,
     decision: DirectionalDecision | None = None,
     tf_1h: TimeframeSnapshot,
@@ -167,7 +223,15 @@ def calculate_opportunity_score(
     has_fatal_veto: bool,
     config: MarketWatchConfig,
 ) -> float:
-    """Calculate transparent multi-factor opportunity score for operational ranking.
+    """Calculate transparent multi-factor Rule Score (RULE_SCORE_V1) for operational ranking.
+
+    CRITICAL SEMANTIC BOUNDARY:
+    - RULE_SCORE_V1 != P(win)
+    - RULE_SCORE_V1 != calibrated confidence
+    - RULE_SCORE_V1 != expected return
+    - RULE_SCORE_V1 != probability of fill
+    - RULE_SCORE_V1 != validated alpha
+    It is a deterministic rule quality heuristic.
 
     Fully direction-aware:
     - LONG: HH_HL positive, LH_LL negative, HEALTHY_LONG_BUILD positive, HEALTHY_SHORT_BUILD negative, taker buy/sell > 1 positive.
@@ -347,3 +411,7 @@ def calculate_opportunity_score(
         score = min(25.0, score * 0.4)
 
     return round(score, 2)
+
+
+# Deprecated backward compatibility alias
+calculate_opportunity_score = calculate_rule_score

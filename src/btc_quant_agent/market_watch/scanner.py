@@ -4,16 +4,27 @@ import logging
 import os
 import time
 from collections.abc import Sequence
+from dataclasses import replace
 from typing import Any
 
 from ..data.binance import BinancePublicClient
 from .alerting import send_market_watch_alert
-from .config import MarketWatchConfig, compute_market_watch_config_hash
+from .config import (
+    MarketWatchConfig,
+    compute_market_watch_config_hash,
+    compute_required_fetch_bars,
+)
 from .context import apply_benchmark_context_gate, evaluate_benchmark_context
 from .derivatives import apply_derivatives_action_gate, evaluate_derivatives_regime
 from .domain import (
+    HEURISTIC_RULE_QUALITY_BAND_VERSION,
+    MARKET_SNAPSHOT_SCHEMA_VERSION,
     MARKET_WATCH_EVIDENCE_VERSION,
-    MARKET_WATCH_POLICY_VERSION,
+    PLAYBOOK_SELECTION_VERSION,
+    REFERENCE_UNIVERSE_VERSION,
+    RETURN_FEATURE_SEMANTICS_VERSION,
+    RULE_SCORE_SEMANTICS_VERSION,
+    TACTICAL_POLICY_VERSION,
     AlertSeverity,
     BreakoutState,
     ConfidenceBand,
@@ -33,6 +44,7 @@ from .domain import (
     ShadowFillStatus,
     SignalLifecycleState,
     SymbolAssessment,
+    TacticalSemanticIdentity,
     extract_setup_key,
     extract_signal_identity,
 )
@@ -40,18 +52,20 @@ from .entry_quality import calculate_net_risk_reward, evaluate_entry_quality, ev
 from .grid_policy import evaluate_grid_policy
 from .lifecycle import advance_lifecycle_state
 from .playbooks import (
-    evaluate_breakout_retest,
-    evaluate_failed_breakout,
+    evaluate_all_playbook_candidates,
     evaluate_timeframe_alignment,
-    evaluate_trend_pullback,
-    evaluate_volatility_expansion,
+    select_playbook_candidate,
 )
 from .ranking import (
-    calculate_opportunity_score,
+    calculate_rule_score,
     check_fatal_vetoes,
     compute_relative_performances,
 )
-from .snapshot import compute_snapshot_hash, compute_timeframe_snapshot
+from .snapshot import (
+    closed_bar_return_with_status,
+    compute_snapshot_hash,
+    compute_timeframe_snapshot,
+)
 from .state import (
     MarketWatchStateStore,
     compute_decision_fingerprint,
@@ -77,10 +91,11 @@ class MarketWatchScanner:
         health = ScanHealth.OK
 
         # 1. Core klines (15m, 1h, 4h) - Failure here is FAILED
+        fetch_bars = compute_required_fetch_bars(self.config)
         try:
-            raw_15m = self.client.klines(symbol, "15m", 120)
-            raw_1h = self.client.klines(symbol, "1h", 120)
-            raw_4h = self.client.klines(symbol, "4h", 120)
+            raw_15m = self.client.klines(symbol, "15m", fetch_bars)
+            raw_1h = self.client.klines(symbol, "1h", fetch_bars)
+            raw_4h = self.client.klines(symbol, "4h", fetch_bars)
         except Exception as exc:  # noqa: BLE001
             logger.warning("Core candle retrieval failed for %s: %s", symbol, exc)
             return None, ScanHealth.FAILED, (f"CORE_CANDLE_ERROR: {exc}",)
@@ -348,6 +363,11 @@ class MarketWatchScanner:
             derivatives=deriv_metrics,
         )
 
+        # Compute true elapsed returns from confirmed closed 15m candles
+        r1h, r1h_status = closed_bar_return_with_status(raw_15m, horizon_ms=3_600_000)
+        r4h, r4h_status = closed_bar_return_with_status(raw_15m, horizon_ms=14_400_000)
+        r12h, r12h_status = closed_bar_return_with_status(raw_15m, horizon_ms=43_200_000)
+
         snapshot = MarketSnapshot(
             symbol=symbol,
             decision_time_ms=decision_time_ms,
@@ -363,6 +383,12 @@ class MarketWatchScanner:
             snapshot_hash=snap_hash,
             health=health,
             health_reasons=tuple(health_reasons),
+            return_1h=r1h,
+            return_4h=r4h,
+            return_12h=r12h,
+            return_1h_status=r1h_status.value,
+            return_4h_status=r4h_status.value,
+            return_12h_status=r12h_status.value,
         )
 
         return snapshot, health, tuple(health_reasons)
@@ -395,55 +421,34 @@ class MarketWatchScanner:
             config=self.config,
         )
 
-        # 4. Playbook evaluation
-        pb_candidate = (
-            evaluate_trend_pullback(
-                tf_4h=tf_4h,
-                tf_1h=tf_1h,
-                tf_15m=tf_15m,
-                derivatives=derivatives,
-                exhaustion=exhaustion,
-                config=self.config,
-            )
-            or evaluate_breakout_retest(
-                tf_1h=tf_1h,
-                tf_15m=tf_15m,
-                derivatives=derivatives,
-                exhaustion=exhaustion,
-                config=self.config,
-                prev_state=prev_state,
-            )
-            or evaluate_failed_breakout(
-                tf_1h=tf_1h,
-                tf_15m=tf_15m,
-                derivatives=derivatives,
-                config=self.config,
-            )
-            or evaluate_volatility_expansion(
-                tf_1h=tf_1h,
-                tf_15m=tf_15m,
-                derivatives=derivatives,
-                exhaustion=exhaustion,
-                config=self.config,
-            )
+        # 4. Playbook candidate evaluation & selection
+        candidates = evaluate_all_playbook_candidates(
+            tf_4h=tf_4h,
+            tf_1h=tf_1h,
+            tf_15m=tf_15m,
+            derivatives=derivatives,
+            exhaustion=exhaustion,
+            config=self.config,
+            prev_state=prev_state,
         )
+        selected_candidate, eligible_playbooks, actionable_playbooks = select_playbook_candidate(candidates)
 
-        if pb_candidate is not None:
-            raw_decision = pb_candidate["decision"]
-            setup = pb_candidate["setup"]
-            entry_low = pb_candidate["entry_low"]
-            entry_high = pb_candidate["entry_high"]
-            stop_loss = pb_candidate["stop_loss"]
-            tp1 = pb_candidate["take_profit_1"]
-            tp2 = pb_candidate["take_profit_2"]
-            invalidation = pb_candidate["invalidation"]
-            confidence = pb_candidate["confidence"]
-            bo_state = pb_candidate.get("breakout_state", BreakoutState.NONE)
-            bo_level = pb_candidate.get("breakout_level")
-            bo_dir = pb_candidate.get("breakout_direction")
-            bo_bar_end_ms = pb_candidate.get("breakout_bar_end_ms")
-            reasons = list(pb_candidate["reasons"]) + tf_reasons + list(bench_reasons)
-            risks = list(pb_candidate["risks"]) + list(bench_risks)
+        if selected_candidate is not None:
+            raw_decision = selected_candidate.decision
+            setup = selected_candidate.playbook
+            entry_low = selected_candidate.entry_low or 0.0
+            entry_high = selected_candidate.entry_high or 0.0
+            stop_loss = selected_candidate.stop_loss or 0.0
+            tp1 = selected_candidate.take_profit_1 or 0.0
+            tp2 = selected_candidate.take_profit_2 or 0.0
+            invalidation = selected_candidate.invalidation or 0.0
+            confidence = selected_candidate.confidence
+            bo_state = selected_candidate.breakout_state
+            bo_level = selected_candidate.breakout_level
+            bo_dir = selected_candidate.breakout_direction
+            bo_bar_end_ms = selected_candidate.breakout_bar_end_ms
+            reasons = list(selected_candidate.reason_codes) + tf_reasons + list(bench_reasons)
+            risks = list(selected_candidate.risk_codes) + list(bench_risks)
         else:
             raw_decision = DirectionalDecision.WAIT
             setup = PlaybookType.NO_TRADE
@@ -532,8 +537,8 @@ class MarketWatchScanner:
             gated_decision = DirectionalDecision.WAIT
             reasons.extend(fatal_reasons)
 
-        # 9. Opportunity Score
-        opp_score = calculate_opportunity_score(
+        # 9. Rule Score (formerly Opportunity Score)
+        rule_score = calculate_rule_score(
             decision=gated_decision,
             tf_1h=tf_1h,
             tf_15m=tf_15m,
@@ -562,7 +567,10 @@ class MarketWatchScanner:
             gross_rr=gross_rr,
             net_rr=net_rr,
             confidence_band=confidence,
-            opportunity_score=opp_score,
+            rule_score=rule_score,
+            opportunity_score=rule_score,
+            rule_score_semantics=RULE_SCORE_SEMANTICS_VERSION,
+            heuristic_quality_band_semantics=HEURISTIC_RULE_QUALITY_BAND_VERSION,
             reason_codes=tuple(sorted(set(reasons))),
             risk_codes=tuple(sorted(set(risks))),
             derivatives_regime=derivatives.regime,
@@ -680,43 +688,55 @@ class MarketWatchScanner:
 
         cfg_hash = compute_market_watch_config_hash(self.config)
 
+        # Reference universe status and missing members
+        if relative_perf is not None:
+            ref_univ_status = relative_perf.universe_status
+            missing_ref_members = relative_perf.missing_members
+        else:
+            ref_univ_status = "UNIVERSE_DEGRADED"
+            missing_ref_members = tuple(self.config.relative_strength_universe)
+
+        sem_id = TacticalSemanticIdentity(
+            tactical_policy_version=TACTICAL_POLICY_VERSION,
+            snapshot_schema_version=MARKET_SNAPSHOT_SCHEMA_VERSION,
+            return_semantics_version=RETURN_FEATURE_SEMANTICS_VERSION,
+            playbook_selection_version=PLAYBOOK_SELECTION_VERSION,
+            reference_universe_version=REFERENCE_UNIVERSE_VERSION,
+            rule_score_semantics_version=RULE_SCORE_SEMANTICS_VERSION,
+            config_hash=cfg_hash,
+        )
+
         # Temporary assessment to compute stable fingerprint
         temp_assessment = SymbolAssessment(
             symbol=symbol,
             snapshot=snapshot,
             directional=directional_plan,
             grid=grid_plan,
-            opportunity_score=opp_score,
+            rule_score=rule_score,
+            opportunity_score=rule_score,
+            rule_score_semantics=RULE_SCORE_SEMANTICS_VERSION,
+            eligible_playbooks=eligible_playbooks,
+            actionable_playbooks=actionable_playbooks,
+            selected_playbook=str(selected_candidate.playbook.value if hasattr(selected_candidate.playbook, "value") else selected_candidate.playbook) if selected_candidate else "",
+            selection_method="STATIC_PRECEDENCE",
+            selection_version=PLAYBOOK_SELECTION_VERSION,
+            reference_universe_status=ref_univ_status,
+            missing_reference_members=missing_ref_members,
+            semantic_identity=sem_id,
             relative_performance=relative_perf,
             exhaustion=exhaustion,
             rank=0,
             veto_reasons=fatal_reasons,
             alert_fingerprint="",
             lifecycle_state=lifecycle,
-            policy_version=MARKET_WATCH_POLICY_VERSION,
+            policy_version=TACTICAL_POLICY_VERSION,
             config_hash=cfg_hash,
             signal_identity=sig_id,
             setup_key=setup_key,
         )
         fp = compute_decision_fingerprint(temp_assessment, self.config)
 
-        return SymbolAssessment(
-            symbol=symbol,
-            snapshot=snapshot,
-            directional=directional_plan,
-            grid=grid_plan,
-            opportunity_score=opp_score,
-            relative_performance=relative_perf,
-            exhaustion=exhaustion,
-            rank=0,
-            veto_reasons=fatal_reasons,
-            alert_fingerprint=fp,
-            lifecycle_state=lifecycle,
-            policy_version=MARKET_WATCH_POLICY_VERSION,
-            config_hash=cfg_hash,
-            signal_identity=sig_id,
-            setup_key=setup_key,
-        )
+        return replace(temp_assessment, alert_fingerprint=fp)
 
     def _record_shadow_observations_if_needed(self, a: SymbolAssessment, now_ms: int) -> None:
         prev_st = self.store.get_symbol_state(a.symbol) or {}
@@ -766,6 +786,7 @@ class MarketWatchScanner:
                     entry_window_end_ms=entry_win_end,
                     fill_status=ShadowFillStatus.WAITING_FOR_FILL.value,
                     execution_path_model=ShadowExecutionPathModel.PARTIAL_FIRST_BAR_1M_THEN_15M.value,
+                    semantic_identity=a.semantic_identity,
                 )
                 self.store.set_last_shadow_signal_ids(a.symbol, armed_id=sig_id)
                 self.store.set_last_shadow_recorded_state(a.symbol, "ARMED")
@@ -813,6 +834,7 @@ class MarketWatchScanner:
                     entry_window_end_ms=entry_win_end,
                     fill_status=ShadowFillStatus.WAITING_FOR_FILL.value,
                     execution_path_model=ShadowExecutionPathModel.PARTIAL_FIRST_BAR_1M_THEN_15M.value,
+                    semantic_identity=a.semantic_identity,
                 )
                 self.store.set_last_shadow_signal_ids(a.symbol, triggered_id=sig_id)
                 self.store.set_last_shadow_recorded_state(a.symbol, "TRIGGERED")
@@ -831,12 +853,17 @@ class MarketWatchScanner:
         notify: bool = False,
     ) -> tuple[list[SymbolAssessment], list[MarketWatchAlert]]:
         """Run universe scan with symbol-level failure isolation and state continuity."""
-        target_symbols = list(symbols or self.config.symbols)
+        target_symbols = [s.upper() for s in (symbols or self.config.symbols)]
         now_ms = int(time.time() * 1000)
 
-        # Always include benchmark symbols (BTC, ETH) for cross-asset relative performance and gates
-        benchmarks_needed = [b for b in ("BTCUSDT", "ETHUSDT") if b not in target_symbols]
-        all_symbols_to_collect = target_symbols + benchmarks_needed
+        # Frozen Section 21 collection semantics:
+        # Collect target_symbols UNION reference_universe UNION benchmark_symbols
+        ref_symbols = [s.upper() for s in self.config.relative_strength_universe]
+        benchmarks = ["BTCUSDT", "ETHUSDT"]
+        all_symbols_to_collect: list[str] = []
+        for s in target_symbols + ref_symbols + benchmarks:
+            if s not in all_symbols_to_collect:
+                all_symbols_to_collect.append(s)
 
         # 1. Collect snapshots across universe with failure isolation
         snapshots: dict[str, MarketSnapshot] = {}
@@ -858,7 +885,7 @@ class MarketWatchScanner:
         btc_snap = snapshots.get("BTCUSDT")
         eth_snap = snapshots.get("ETHUSDT")
 
-        # 4. Assess target symbols
+        # 4. Assess TARGET symbols only
         assessments: list[SymbolAssessment] = []
         for s in target_symbols:
             snap = snapshots.get(s)
@@ -874,29 +901,27 @@ class MarketWatchScanner:
             )
             assessments.append(item)
 
-        # 5. Rank assessments by opportunity score descending
-        assessments.sort(key=lambda a: a.opportunity_score, reverse=True)
+        # 5. Rank assessments by rule_score descending (falling back to opportunity_score)
+        def _get_sort_score(a: Any) -> float:
+            rs = getattr(a, "rule_score", None)
+            if isinstance(rs, (int, float)):
+                return float(rs)
+            os_score = getattr(a, "opportunity_score", None)
+            if isinstance(os_score, (int, float)):
+                return float(os_score)
+            return 0.0
+
+        assessments.sort(key=_get_sort_score, reverse=True)
         ranked_assessments: list[SymbolAssessment] = []
         for rank_num, a in enumerate(assessments, 1):
-            ranked_assessments.append(
-                SymbolAssessment(
-                    symbol=a.symbol,
-                    snapshot=a.snapshot,
-                    directional=a.directional,
-                    grid=a.grid,
-                    opportunity_score=a.opportunity_score,
-                    relative_performance=a.relative_performance,
-                    exhaustion=a.exhaustion,
-                    rank=rank_num,
-                    veto_reasons=a.veto_reasons,
-                    alert_fingerprint=a.alert_fingerprint,
-                    lifecycle_state=a.lifecycle_state,
-                    policy_version=a.policy_version,
-                    config_hash=a.config_hash,
-                    signal_identity=a.signal_identity,
-                    setup_key=a.setup_key,
-                )
-            )
+            if hasattr(a, "__dataclass_fields__"):
+                ranked_assessments.append(replace(a, rank=rank_num))
+            else:
+                try:
+                    object.__setattr__(a, "rank", rank_num)
+                except Exception:  # noqa: BLE001, S110
+                    pass
+                ranked_assessments.append(a)
 
         # 6. Evaluate alerts based on state changes & priority
         webhook_url = os.getenv("FEISHU_WEBHOOK_URL")

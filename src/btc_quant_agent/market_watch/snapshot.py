@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import json
 from collections.abc import Sequence
+from enum import StrEnum
 
 from ..domain import Candle, Regime
 from ..indicators import (
@@ -18,10 +19,83 @@ from ..indicators import (
 from ..structure import confirmed_pivots, structure_label
 from .config import MarketWatchConfig
 from .domain import (
+    MARKET_SNAPSHOT_SCHEMA_VERSION,
     DerivativesMetrics,
     PriceMetrics,
     TimeframeSnapshot,
 )
+
+
+class ReturnAvailability(StrEnum):
+    AVAILABLE = "AVAILABLE"
+    INSUFFICIENT_HISTORY = "INSUFFICIENT_HISTORY"
+    MISSING_HORIZON_ANCHOR = "MISSING_HORIZON_ANCHOR"
+
+
+def closed_bar_return_with_status(
+    candles: Sequence[Candle],
+    *,
+    horizon_ms: int,
+) -> tuple[float | None, ReturnAvailability]:
+    """Compute explicit elapsed-time return from confirmed closed candles with status.
+
+    Frozen semantics:
+    1. Use closed candles only.
+    2. Order deterministically by close_time_ms.
+    3. Let latest = latest confirmed closed candle.
+    4. target_close_time = latest.close_time_ms - horizon_ms.
+    5. Require an exact closed candle anchor at target_close_time.
+    6. If the exact horizon anchor is absent:
+          return (None, INSUFFICIENT_HISTORY or MISSING_HORIZON_ANCHOR)
+    7. NEVER select the nearest earlier/later candle.
+    8. NEVER interpolate.
+    9. NEVER use a forming candle.
+    10. Return latest.close / anchor.close - 1
+    """
+    if horizon_ms <= 0:
+        raise ValueError(f"horizon_ms must be positive: {horizon_ms}")
+
+    # 1. Closed candles only; filter out any forming candle (closed is False)
+    closed = [c for c in candles if getattr(c, "closed", True)]
+    if not closed:
+        return None, ReturnAvailability.INSUFFICIENT_HISTORY
+
+    # 2. Order deterministically by close_time_ms; deduplicate identical timestamps
+    by_close_time: dict[int, Candle] = {}
+    for c in closed:
+        t = c.close_time_ms
+        if t in by_close_time:
+            if by_close_time[t].close != c.close:
+                return None, ReturnAvailability.MISSING_HORIZON_ANCHOR
+        else:
+            by_close_time[t] = c
+
+    sorted_candles = sorted(by_close_time.values(), key=lambda c: c.close_time_ms)
+    latest = sorted_candles[-1]
+    target_close_time = latest.close_time_ms - horizon_ms
+
+    earliest = sorted_candles[0]
+    if earliest.close_time_ms > target_close_time:
+        return None, ReturnAvailability.INSUFFICIENT_HISTORY
+
+    anchor = by_close_time.get(target_close_time)
+    if anchor is None:
+        return None, ReturnAvailability.MISSING_HORIZON_ANCHOR
+
+    if anchor.close <= 0:
+        return None, ReturnAvailability.MISSING_HORIZON_ANCHOR
+
+    return (latest.close / anchor.close) - 1.0, ReturnAvailability.AVAILABLE
+
+
+def closed_bar_return(
+    candles: Sequence[Candle],
+    *,
+    horizon_ms: int,
+) -> float | None:
+    """Compute explicit elapsed-time return from confirmed closed candles."""
+    ret_val, _status = closed_bar_return_with_status(candles, horizon_ms=horizon_ms)
+    return ret_val
 
 
 def compute_timeframe_snapshot(
@@ -107,6 +181,16 @@ def compute_timeframe_snapshot(
     is_compressed = (current_bb_pct <= tc.vol_compression_bb_pct) or has_prior_compression
     is_expanded = current_atr_pct >= 0.75 and current_volume_z >= 0.5
 
+    # Observational EMA slow (e.g. EMA200) strictly from confirmed closed candles
+    # Requires deterministic engineering warmup margin of ema_slow + 50 closed bars
+    if len(closed_candles) >= tc.ema_slow + 50:
+        ema_slow_vals = ema(closes, tc.ema_slow)
+        current_ema_slow = ema_slow_vals[-1]
+        current_ema_slow_status = "AVAILABLE"
+    else:
+        current_ema_slow = None
+        current_ema_slow_status = "EMA_SLOW_INSUFFICIENT_HISTORY"
+
     return TimeframeSnapshot(
         interval=interval,
         latest_bar=latest_bar,
@@ -121,7 +205,7 @@ def compute_timeframe_snapshot(
         atr_percentile=current_atr_pct,
         adx=current_adx,
         rsi=current_rsi,
-        roc=current_roc,
+        roc_12bars=current_roc,
         volume=latest_closed.volume,
         volume_z=current_volume_z,
         bb_width=current_bb_width,
@@ -135,6 +219,9 @@ def compute_timeframe_snapshot(
         is_volatility_compressed=is_compressed,
         is_volatility_expanded=is_expanded,
         has_prior_compression_window=has_prior_compression,
+        roc=current_roc,
+        ema_slow=current_ema_slow,
+        ema_slow_status=current_ema_slow_status,
     )
 
 
@@ -189,6 +276,7 @@ def compute_snapshot_hash(
 ) -> str:
     """Generate a deterministic hash of the snapshot inputs for reproducibility."""
     payload = {
+        "snapshot_schema_version": MARKET_SNAPSHOT_SCHEMA_VERSION,
         "symbol": symbol,
         "decision_time_ms": decision_time_ms,
         "last_price": price.last_price,

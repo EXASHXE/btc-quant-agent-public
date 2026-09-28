@@ -67,11 +67,12 @@ def build_market_watch_card(alert: MarketWatchAlert) -> dict[str, Any]:
             f"**Stop Loss**: {_format_price(d.stop_loss)}",
             f"**TP1 / TP2**: {_format_price(d.take_profit_1)} / {_format_price(d.take_profit_2)}",
             f"**Net RR**: {d.net_rr:.2f} (Gross {d.gross_rr:.2f})",
-            f"**Opportunity Score**: {d.opportunity_score:.1f}",
+            f"**Rule Score**: {d.rule_score:.1f}",
+            f"**Heuristic Rule Quality**: {d.confidence_band.value}",
         ])
     else:
         lines.append(
-            f"\n**Directional**: WAIT (No active directional plan | Score: {d.opportunity_score:.1f})"
+            f"\n**Directional**: WAIT (No active directional plan | Rule Score: {d.rule_score:.1f})"
         )
 
     # Grid section if active or changed
