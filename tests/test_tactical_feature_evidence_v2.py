@@ -1,12 +1,14 @@
 from __future__ import annotations
 
 import dataclasses
+import math
 import sqlite3
 import subprocess
 import sys
 import tempfile
 import time
 from pathlib import Path
+from typing import Self
 from unittest.mock import MagicMock
 
 import pytest
@@ -15,6 +17,7 @@ from btc_quant_agent.domain import Candle, Regime
 from btc_quant_agent.market_watch.config import (
     MarketWatchConfig,
     compute_market_watch_config_hash,
+    compute_market_watch_config_hash_from_payload,
 )
 from btc_quant_agent.market_watch.domain import (
     ACTIVE_PLAYBOOKS,
@@ -42,10 +45,13 @@ from btc_quant_agent.market_watch.domain import (
     TimeframeSnapshot,
 )
 from btc_quant_agent.market_watch.evidence import (
+    ClosedBarEvidence,
+    DecisionConfigEvidence,
     PolicyDecisionTrace,
     PolicyGateStageTrace,
     TacticalCausalityError,
     TacticalEvidenceConflictError,
+    TacticalEvidenceIdentityError,
     TacticalEvidenceLinkageError,
     TacticalEvidenceValidationError,
     TacticalFeatureEvidenceV2,
@@ -56,6 +62,7 @@ from btc_quant_agent.market_watch.evidence import (
     compute_evidence_id,
     deserialize_tactical_feature_evidence,
     validate_tactical_feature_evidence,
+    verify_tactical_evidence_identity,
 )
 from btc_quant_agent.market_watch.ranking import (
     calculate_rule_score,
@@ -830,7 +837,11 @@ def test_b1_09_persistence_conflict_and_idempotence() -> None:
         # Third save with same natural key but DIFFERENT evidence_id: conflict error
         conflicting_ev = dataclasses.replace(
             ev,
-            evidence_id="f" * 64,
+            entry_quality="GOOD",
+        )
+        conflicting_ev = dataclasses.replace(
+            conflicting_ev,
+            evidence_id=compute_evidence_id(conflicting_ev),
         )
         with pytest.raises(TacticalEvidenceConflictError, match="Evidence conflict"):
             save_state(conflicting_ev)
@@ -994,4 +1005,574 @@ def test_storage_benchmark_1000_records() -> None:
 
         # Invariant: average row storage must be comfortably under 20 KB
         assert avg_bytes_per_row < 20 * 1024, f"Average row size {avg_bytes_per_row} exceeds 20KB limit"
+
+
+# ==============================================================================
+# B1-R1: Integrity and Completeness Seal Tests (Sections 28 - 40)
+# ==============================================================================
+
+def test_b1_r1_full_population_proof() -> None:
+    """Section 28: Population proof for LONG, SHORT, WAIT with setup, and WAIT + NO_TRADE."""
+    cfg = MarketWatchConfig()
+    now_ms = 1_700_000_100_000
+
+    def _make_client(direction: str, setup_name: str) -> MagicMock:
+        c = MagicMock()
+        c.server_time_ms.return_value = now_ms
+        c.klines.return_value = make_test_candles(count=60, end_ms=1_700_000_000_000)
+        c.collect_derivatives.return_value = MagicMock(
+            snapshot=MagicMock(
+                mark_price=50000.0,
+                index_price=50000.0,
+                funding_rate=0.0001,
+                funding_time_ms=now_ms + 14_400_000,
+                open_interest=50000.0,
+                open_interest_time_ms=now_ms - 2000,
+                open_interest_change_pct=0.01,
+                taker_buy_sell_ratio=1.0,
+                taker_time_ms=now_ms - 3000,
+                basis_rate=0.0001,
+                basis_time_ms=now_ms - 4000,
+                long_short_account_ratio=1.0,
+                long_short_time_ms=now_ms - 5000,
+                order_book_imbalance=0.0,
+                spread_bps=1.0,
+                observed_at_ms=now_ms - 500,
+            ),
+            field_availability={"mark_price": True, "funding_rate": True},
+            endpoint_errors={},
+        )
+        c._optional_get.return_value = None
+        return c
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        db_path = Path(tmpdir) / "test_population.db"
+        store = MarketWatchStateStore(db_path)
+
+        # 1. LONG fixture
+        ev_long, a_long = build_sample_evidence_and_assessment(symbol="BTCUSDT")
+        store.save_symbol_state("BTCUSDT", a_long, now_ms, evidence=ev_long)
+        ev_row_long = store.get_tactical_feature_evidence(ev_long.evidence_id)
+        assert ev_row_long is not None
+        assert ev_row_long.decision_trace.final_directional_decision == "LONG"
+        assert ev_row_long.selected_playbook == PlaybookType.BREAKOUT_RETEST.value
+
+        # 2. SHORT fixture
+        ev_short_raw, a_short_raw = build_sample_evidence_and_assessment(symbol="ETHUSDT")
+        d_short = dataclasses.replace(
+            a_short_raw.directional,
+            decision=DirectionalDecision.SHORT,
+            setup=PlaybookType.TREND_PULLBACK,
+            entry_low=2950.0,
+            entry_high=3050.0,
+            stop_loss=3200.0,
+            take_profit_1=2700.0,
+        )
+        dt_short = PolicyDecisionTrace(
+            selected_candidate_decision="SHORT",
+            after_entry_quality_gate=PolicyGateStageTrace("entry_quality_gate", "SHORT", "SHORT"),
+            after_benchmark_gate=PolicyGateStageTrace("benchmark_gate", "SHORT", "SHORT"),
+            after_derivatives_gate=PolicyGateStageTrace("derivatives_gate", "SHORT", "SHORT"),
+            after_fatal_veto=PolicyGateStageTrace("fatal_veto_gate", "SHORT", "SHORT"),
+            final_directional_decision="SHORT",
+        )
+        cand_short = PlaybookCandidate(
+            playbook=PlaybookType.TREND_PULLBACK,
+            candidate_status=CandidateStatus.ACTIONABLE,
+            decision=DirectionalDecision.SHORT,
+            entry_low=2950.0,
+            entry_high=3050.0,
+            stop_loss=3200.0,
+            take_profit_1=2700.0,
+            take_profit_2=2500.0,
+            structural_anchor_id=None,
+            reason_codes=("Valid trend pullback short",),
+            risk_codes=(),
+            setup_creation_bar_end_ms=1_700_000_000_000,
+        )
+        a_short = dataclasses.replace(
+            a_short_raw,
+            symbol="ETHUSDT",
+            directional=d_short,
+            selected_playbook=PlaybookType.TREND_PULLBACK.value,
+        )
+        ev_short = build_tactical_feature_evidence(
+            assessment=a_short,
+            playbook_candidates=[cand_short],
+            decision_trace=dt_short,
+            rule_score_breakdown=dataclasses.replace(ev_short_raw.rule_score_breakdown, effective_direction="SHORT"),
+            config=cfg,
+        )
+        store.save_symbol_state("ETHUSDT", a_short, now_ms, evidence=ev_short)
+        ev_row_short = store.get_tactical_feature_evidence(ev_short.evidence_id)
+        assert ev_row_short is not None
+        assert ev_row_short.decision_trace.final_directional_decision == "SHORT"
+        assert ev_row_short.selected_playbook == PlaybookType.TREND_PULLBACK.value
+
+        # 3. WAIT with identified setup (e.g. entry quality gated to WAIT)
+        dt_wait_setup = PolicyDecisionTrace(
+            selected_candidate_decision="LONG",
+            after_entry_quality_gate=PolicyGateStageTrace("entry_quality_gate", "LONG", "WAIT", ("ENTRY_QUALITY_BELOW_MINIMUM_WAIT",)),
+            after_benchmark_gate=PolicyGateStageTrace("benchmark_gate", "WAIT", "WAIT"),
+            after_derivatives_gate=PolicyGateStageTrace("derivatives_gate", "WAIT", "WAIT"),
+            after_fatal_veto=PolicyGateStageTrace("fatal_veto_gate", "WAIT", "WAIT"),
+            final_directional_decision="WAIT",
+        )
+        d_wait_setup = dataclasses.replace(
+            a_long.directional,
+            decision=DirectionalDecision.WAIT,
+            setup=PlaybookType.BREAKOUT_RETEST,
+            entry_quality=EntryQuality.POOR,
+            reason_codes=("ENTRY_QUALITY_BELOW_MINIMUM_WAIT",),
+        )
+        a_wait_setup = dataclasses.replace(
+            a_long,
+            symbol="SOLUSDT",
+            directional=d_wait_setup,
+            selected_playbook=PlaybookType.BREAKOUT_RETEST.value,
+        )
+        ev_wait_setup = build_tactical_feature_evidence(
+            assessment=a_wait_setup,
+            playbook_candidates=[cand_short, PlaybookCandidate(
+                playbook=PlaybookType.BREAKOUT_RETEST,
+                candidate_status=CandidateStatus.WATCH,
+                decision=DirectionalDecision.WAIT,
+                entry_low=None,
+                entry_high=None,
+                stop_loss=None,
+                take_profit_1=None,
+                take_profit_2=None,
+                structural_anchor_id=None,
+                reason_codes=("Watching breakout",),
+                risk_codes=(),
+                setup_creation_bar_end_ms=1_700_000_000_000,
+            )],
+            decision_trace=dt_wait_setup,
+            rule_score_breakdown=ev_long.rule_score_breakdown,
+            config=cfg,
+        )
+        store.save_symbol_state("SOLUSDT", a_wait_setup, now_ms, evidence=ev_wait_setup)
+        ev_row_ws = store.get_tactical_feature_evidence(ev_wait_setup.evidence_id)
+        assert ev_row_ws is not None
+        assert ev_row_ws.decision_trace.final_directional_decision == "WAIT"
+        assert ev_row_ws.selected_playbook == PlaybookType.BREAKOUT_RETEST.value
+
+        # 4. WAIT + NO_TRADE (no confirmed candidate emitted)
+        client = _make_client("WAIT", "NO_TRADE")
+        scanner = MarketWatchScanner(config=cfg, client=client, store=store)
+        ranked, _alerts = scanner.scan_universe(["BNBUSDT"])
+        assert len(ranked) >= 1
+        bnb = next(r for r in ranked if r.symbol == "BNBUSDT")
+        assert bnb.feature_evidence_id is not None
+        ev_bnb = store.get_tactical_feature_evidence(bnb.feature_evidence_id)
+        assert ev_bnb is not None
+        assert ev_bnb.decision_trace.final_directional_decision == "WAIT"
+        assert ev_bnb.selected_playbook is None
+        assert ev_bnb.directional_risk_plan.setup == "NO_TRADE"
+
+
+def test_b1_r1_candidate_completeness_proof() -> None:
+    """Section 29: Every evidence object contains exactly 5 active playbooks in frozen order and NO RANGE_MEAN_REVERSION."""
+    ev, _ = build_sample_evidence_and_assessment()
+    assert len(ev.playbook_candidates) == 5
+    expected_order = tuple(p.value for p in ACTIVE_PLAYBOOKS)
+    actual_order = tuple(c.playbook for c in ev.playbook_candidates)
+    assert actual_order == expected_order
+    assert "RANGE_MEAN_REVERSION" not in actual_order
+
+    # Candidate status validation
+    for cand in ev.playbook_candidates:
+        if cand.playbook == PlaybookType.BREAKOUT_RETEST.value:
+            assert cand.candidate_status == "ACTIONABLE"
+        else:
+            assert cand.candidate_status == "ABSENT"
+
+
+def test_b1_r1_deep_immutability_adversarial() -> None:
+    """Section 30: Adversarial tests verifying deep immutability across all reachable structures."""
+    ev, _ = build_sample_evidence_and_assessment()
+
+    # 1. Top-level dataclass mutation
+    with pytest.raises((dataclasses.FrozenInstanceError, AttributeError)):
+        ev.symbol = "DOGEUSDT"  # type: ignore[misc]
+
+    # 2. DecisionConfigEvidence immutability
+    assert isinstance(ev.decision_config, DecisionConfigEvidence)
+    assert isinstance(ev.decision_config.canonical_json, str)
+    with pytest.raises((dataclasses.FrozenInstanceError, AttributeError)):
+        ev.decision_config.canonical_json = "{}"  # type: ignore[misc]
+    # to_dict returns a fresh copy; mutating it does not affect evidence
+    cfg_copy = ev.decision_config.to_dict()
+    cfg_copy["min_net_rr"] = 999.0
+    assert ev.decision_config.to_dict()["min_net_rr"] != 999.0
+
+    # 3. Source provenance & returns
+    with pytest.raises((dataclasses.FrozenInstanceError, AttributeError)):
+        ev.source_provenance.closed_bar_watermark_15m = 0  # type: ignore[misc]
+    with pytest.raises(TypeError):
+        ev.source_provenance.returns[0] = None  # type: ignore[index]
+
+    # 4. Playbook candidates
+    with pytest.raises(TypeError):
+        ev.playbook_candidates[0] = None  # type: ignore[index]
+
+    # 5. Decision trace
+    with pytest.raises((dataclasses.FrozenInstanceError, AttributeError)):
+        ev.decision_trace.final_directional_decision = "SHORT"  # type: ignore[misc]
+
+    # 6. Rule score breakdown
+    with pytest.raises((dataclasses.FrozenInstanceError, AttributeError)):
+        ev.rule_score_breakdown.final_rule_score = 100.0  # type: ignore[misc]
+
+    # 7. Reference universe evidence
+    with pytest.raises((dataclasses.FrozenInstanceError, AttributeError)):
+        ev.reference_universe_evidence.score = 50.0  # type: ignore[misc]
+
+    # 8. Policy state before
+    with pytest.raises((dataclasses.FrozenInstanceError, AttributeError)):
+        ev.policy_state_before.previous_setup = "TREND_PULLBACK"  # type: ignore[misc]
+
+    # 9. Latest closed bar
+    tf_15m = ev.market_snapshot_features.tf_15m
+    assert isinstance(tf_15m.latest_closed_bar, ClosedBarEvidence)
+    with pytest.raises((dataclasses.FrozenInstanceError, AttributeError)):
+        tf_15m.latest_closed_bar.close = 0.0  # type: ignore[misc]
+
+
+def test_b1_r1_stale_id_mutation() -> None:
+    """Section 31: Mutating content while keeping old evidence ID fails closed across all pathways."""
+    ev, assessment = build_sample_evidence_and_assessment()
+    old_id = ev.evidence_id
+
+    # Create tampered evidence: changed rule_score but stale old_id
+    tampered_rsb = dataclasses.replace(
+        ev.rule_score_breakdown,
+        final_rule_score=ev.rule_score + 5.0,
+    )
+    tampered_ev = dataclasses.replace(
+        ev,
+        rule_score=ev.rule_score + 5.0,
+        rule_score_breakdown=tampered_rsb,
+        evidence_id=old_id,  # Stale ID!
+    )
+
+    # 1. Direct identity verification must reject
+    with pytest.raises(TacticalEvidenceIdentityError, match="Evidence identity verification failed"):
+        verify_tactical_evidence_identity(tampered_ev)
+
+    # 2. Persistence must reject
+    with tempfile.TemporaryDirectory() as tmpdir:
+        db_path = Path(tmpdir) / "test_stale_id.db"
+        store = MarketWatchStateStore(db_path)
+        with pytest.raises(TacticalEvidenceIdentityError):
+            store.save_symbol_state("BTCUSDT", assessment, 1_700_000_500_000, evidence=tampered_ev)
+
+    # 3. Deserialization must reject
+    tampered_raw = canonical_evidence_json(tampered_ev)
+    with pytest.raises(TacticalEvidenceIdentityError):
+        deserialize_tactical_feature_evidence(tampered_raw)
+
+
+def test_b1_r1_stored_corruption() -> None:
+    """Section 32: Tampered database evidence_json fails closed on read."""
+    ev, assessment = build_sample_evidence_and_assessment()
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        db_path = Path(tmpdir) / "test_corruption.db"
+        store = MarketWatchStateStore(db_path)
+        store.save_symbol_state("BTCUSDT", assessment, 1_700_000_500_000, evidence=ev)
+
+        # Directly tamper the stored evidence_json in SQLite without updating evidence_id
+        with sqlite3.connect(str(db_path)) as conn:
+            conn.execute(
+                """
+                UPDATE tactical_feature_evidence_v2
+                SET evidence_json = REPLACE(evidence_json, '"rule_score":75.58', '"rule_score":99.99')
+                WHERE evidence_id = ?
+                """,
+                (ev.evidence_id,),
+            )
+            conn.commit()
+
+        # Read path must detect the tampering and fail closed
+        with pytest.raises(TacticalEvidenceIdentityError):
+            store.get_tactical_feature_evidence(ev.evidence_id)
+
+
+def test_b1_r1_config_self_containment() -> None:
+    """Section 33: Stored DecisionConfigEvidence reproduces config_hash for default and non-default fixtures."""
+    # 1. Default config
+    cfg_default = MarketWatchConfig()
+    ev_def, _ = build_sample_evidence_and_assessment(config=cfg_default)
+    stored_payload_def = ev_def.decision_config.to_dict()
+    recomputed_hash_def = compute_market_watch_config_hash_from_payload(stored_payload_def)
+    assert recomputed_hash_def == ev_def.config_hash
+    assert ev_def.config_hash == "27f7d4c835a36330"
+
+    # 2. Non-default config
+    cfg_custom = MarketWatchConfig(min_net_rr=2.5, maker_fee_rate=0.0003, scan_interval_minutes=5)
+    ev_cust, _ = build_sample_evidence_and_assessment(config=cfg_custom)
+    stored_payload_cust = ev_cust.decision_config.to_dict()
+    recomputed_hash_cust = compute_market_watch_config_hash_from_payload(stored_payload_cust)
+    assert recomputed_hash_cust == ev_cust.config_hash
+    assert ev_cust.config_hash == "bc35d7240d77cea0"
+
+
+def test_b1_r1_pit_adversarial() -> None:
+    """Section 34: Strict point-in-time and causality invariant adversarial tests."""
+    ev, _ = build_sample_evidence_and_assessment()
+    dec_t = ev.decision_time_ms
+
+    # 1. Anchor time > latest close time
+    bad_ret_anchor = ReturnObservation(
+        horizon_ms=3_600_000,
+        value=0.01,
+        availability="AVAILABLE",
+        anchor_close_time_ms=dec_t - 1000,
+        latest_close_time_ms=dec_t - 2000,
+    )
+    ev_bad_anchor = dataclasses.replace(
+        ev,
+        source_provenance=dataclasses.replace(ev.source_provenance, returns=(bad_ret_anchor,)),
+    )
+    with pytest.raises(TacticalCausalityError, match="anchor time"):
+        validate_tactical_feature_evidence(ev_bad_anchor)
+
+    # 2. Available return with null anchor
+    bad_ret_null_anchor = ReturnObservation(
+        horizon_ms=3_600_000,
+        value=0.01,
+        availability="AVAILABLE",
+        anchor_close_time_ms=None,
+        latest_close_time_ms=dec_t - 1000,
+    )
+    ev_null_anchor = dataclasses.replace(
+        ev,
+        source_provenance=dataclasses.replace(ev.source_provenance, returns=(bad_ret_null_anchor,)),
+    )
+    with pytest.raises(TacticalCausalityError, match="anchor/latest close time is None"):
+        validate_tactical_feature_evidence(ev_null_anchor)
+
+    # 3. Available return with null value
+    bad_ret_null_val = ReturnObservation(
+        horizon_ms=3_600_000,
+        value=None,
+        availability="AVAILABLE",
+        anchor_close_time_ms=dec_t - 3_600_000,
+        latest_close_time_ms=dec_t,
+    )
+    ev_null_val = dataclasses.replace(
+        ev,
+        source_provenance=dataclasses.replace(ev.source_provenance, returns=(bad_ret_null_val,)),
+    )
+    with pytest.raises(TacticalCausalityError, match="value is None"):
+        validate_tactical_feature_evidence(ev_null_val)
+
+    # 4. Horizon span mismatch (3_600_000 required, but span is 1_800_000)
+    bad_ret_span = ReturnObservation(
+        horizon_ms=3_600_000,
+        value=0.01,
+        availability="AVAILABLE",
+        anchor_close_time_ms=dec_t - 1_800_000,
+        latest_close_time_ms=dec_t,
+    )
+    ev_bad_span = dataclasses.replace(
+        ev,
+        source_provenance=dataclasses.replace(ev.source_provenance, returns=(bad_ret_span,)),
+    )
+    with pytest.raises(TacticalCausalityError, match="span"):
+        validate_tactical_feature_evidence(ev_bad_span)
+
+    # 5. collection_completed > decision_time
+    ev_bad_coll = dataclasses.replace(ev, collection_completed_at_ms=dec_t + 1000)
+    with pytest.raises(TacticalCausalityError, match="collection_completed_at_ms"):
+        validate_tactical_feature_evidence(ev_bad_coll)
+
+    # 6. Receipt timestamp > decision_time
+    ev_bad_receipt = dataclasses.replace(
+        ev,
+        source_provenance=dataclasses.replace(ev.source_provenance, ticker_receipt_ms=dec_t + 500),
+    )
+    with pytest.raises(TacticalCausalityError, match="Receipt timestamp"):
+        validate_tactical_feature_evidence(ev_bad_receipt)
+
+    # 7. Past event timestamp > decision_time
+    ev_bad_past = dataclasses.replace(
+        ev,
+        source_provenance=dataclasses.replace(ev.source_provenance, open_interest_time_ms=dec_t + 500),
+    )
+    with pytest.raises(TacticalCausalityError, match="Source event timestamp"):
+        validate_tactical_feature_evidence(ev_bad_past)
+
+    # 8. Positive test: funding_time_ms is KNOWN_FUTURE_SCHEDULE_TIME and may legitimately be > decision_time
+    ev_future_funding = dataclasses.replace(
+        ev,
+        source_provenance=dataclasses.replace(ev.source_provenance, funding_time_ms=dec_t + 14_400_000),
+    )
+    validate_tactical_feature_evidence(ev_future_funding)
+
+
+def test_b1_r1_feature_completeness_regression() -> None:
+    """Section 35: Evidence changes when latest_closed_bar or has_prior_compression_window changes."""
+    ev1, _ = build_sample_evidence_and_assessment()
+
+    # Modify latest_closed_bar OHLC in timeframe 15m
+    lcb1 = ev1.market_snapshot_features.tf_15m.latest_closed_bar
+    lcb2 = dataclasses.replace(lcb1, high=lcb1.high + 50.0)
+    tf2 = dataclasses.replace(ev1.market_snapshot_features.tf_15m, latest_closed_bar=lcb2)
+    ev2 = dataclasses.replace(
+        ev1,
+        market_snapshot_features=dataclasses.replace(ev1.market_snapshot_features, tf_15m=tf2),
+    )
+    ev2 = dataclasses.replace(ev2, evidence_id=compute_evidence_id(canonical_evidence_payload(ev2)))
+    assert ev2.evidence_id != ev1.evidence_id
+
+    # Modify has_prior_compression_window
+    tf3 = dataclasses.replace(ev1.market_snapshot_features.tf_1h, has_prior_compression_window=True)
+    ev3 = dataclasses.replace(
+        ev1,
+        market_snapshot_features=dataclasses.replace(ev1.market_snapshot_features, tf_1h=tf3),
+    )
+    ev3 = dataclasses.replace(ev3, evidence_id=compute_evidence_id(canonical_evidence_payload(ev3)))
+    assert ev3.evidence_id != ev1.evidence_id
+
+
+def test_b1_r1_decision_trace_gates() -> None:
+    """Section 36: Verify exact runtime gate names in PolicyDecisionTrace."""
+    ev, _ = build_sample_evidence_and_assessment()
+    dt = ev.decision_trace
+    assert dt.after_entry_quality_gate.stage_name == "entry_quality_gate"
+    assert dt.after_benchmark_gate.stage_name == "benchmark_gate"
+    assert dt.after_derivatives_gate.stage_name == "derivatives_gate"
+    assert dt.after_fatal_veto.stage_name == "fatal_veto_gate"
+
+    # Verify gate veto trace
+    trace_veto = PolicyDecisionTrace(
+        selected_candidate_decision="LONG",
+        after_entry_quality_gate=PolicyGateStageTrace("entry_quality_gate", "LONG", "LONG"),
+        after_benchmark_gate=PolicyGateStageTrace("benchmark_gate", "LONG", "LONG"),
+        after_derivatives_gate=PolicyGateStageTrace("derivatives_gate", "LONG", "WAIT", ("DERIVATIVES_LONG_CROWDED",)),
+        after_fatal_veto=PolicyGateStageTrace("fatal_veto_gate", "WAIT", "WAIT", veto_flag=True),
+        final_directional_decision="WAIT",
+    )
+    assert trace_veto.after_derivatives_gate.output_decision == "WAIT"
+    assert trace_veto.after_fatal_veto.veto_flag is True
+    assert trace_veto.final_directional_decision == "WAIT"
+
+
+def test_b1_r1_rule_score_regression() -> None:
+    """Section 37: RuleScore numerical semantics preserved exactly without drift."""
+    ev, _ = build_sample_evidence_and_assessment()
+    assert math.isclose(ev.rule_score, ev.rule_score_breakdown.final_rule_score, abs_tol=1e-6)
+    assert ev.rule_score_semantics == "RULE_SCORE_V1"
+
+
+def test_b1_r1_natural_key_conflict_scan() -> None:
+    """Section 38: StateStore _init_db detects conflicting natural keys and raises B1_R1_EXISTING_EVIDENCE_CONFLICT."""
+    ev, assessment = build_sample_evidence_and_assessment()
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        db_path = Path(tmpdir) / "test_nk_conflict.db"
+        # Setup initial DB
+        store = MarketWatchStateStore(db_path)
+        store.save_symbol_state("BTCUSDT", assessment, 1_700_000_500_000, evidence=ev)
+
+        # Drop unique index and manually insert a duplicate natural key with divergent evidence_id
+        with sqlite3.connect(str(db_path)) as conn:
+            conn.execute("DROP INDEX IF EXISTS idx_tactical_feat_ev_natural_key")
+            conn.execute(
+                """
+                INSERT INTO tactical_feature_evidence_v2 (
+                    evidence_id, evidence_schema_version, decision_time_ms, symbol,
+                    snapshot_hash, policy_version, config_hash, evidence_json
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    "e" * 64,
+                    ev.evidence_schema_version,
+                    ev.decision_time_ms,
+                    ev.symbol,
+                    ev.snapshot_hash,
+                    ev.policy_version,
+                    ev.config_hash,
+                    "{}",
+                ),
+            )
+            conn.commit()
+
+        # Re-initializing MarketWatchStateStore must fail closed
+        with pytest.raises(TacticalEvidenceConflictError, match="B1_R1_EXISTING_EVIDENCE_CONFLICT"):
+            MarketWatchStateStore(db_path)
+
+
+def test_b1_r1_concurrent_persistence_conflict() -> None:
+    """Section 39: Natural-key uniqueness enforces idempotent success and conflict on divergent identity."""
+    ev, assessment = build_sample_evidence_and_assessment()
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        db_path = Path(tmpdir) / "test_concurrent.db"
+        store = MarketWatchStateStore(db_path)
+
+        # 1. First save succeeds
+        store.save_symbol_state("BTCUSDT", assessment, 1_700_000_500_000, evidence=ev)
+
+        # 2. Idempotent second save with same evidence_id succeeds
+        store.save_symbol_state("BTCUSDT", assessment, 1_700_000_500_000, evidence=ev)
+
+        # 3. Third save with same natural key but different valid evidence_id raises TacticalEvidenceConflictError
+        diff_ev = dataclasses.replace(ev, entry_quality="GOOD")
+        diff_ev = dataclasses.replace(diff_ev, evidence_id=compute_evidence_id(diff_ev))
+        with pytest.raises(TacticalEvidenceConflictError, match="Evidence conflict for natural key"):
+            store.save_symbol_state("BTCUSDT", assessment, 1_700_000_500_000, evidence=diff_ev)
+
+
+def test_b1_r1_atomic_rollback() -> None:
+    """Section 40: Force an error between evidence insert and assessment completion to prove atomic rollback."""
+    ev, assessment = build_sample_evidence_and_assessment()
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        db_path = Path(tmpdir) / "test_atomic.db"
+        store = MarketWatchStateStore(db_path)
+
+        real_connect = store._connect
+
+        class FaultyConnection:
+            def __init__(self, conn: sqlite3.Connection) -> None:
+                self._conn = conn
+
+            def __enter__(self) -> Self:
+                self._conn.__enter__()
+                return self
+
+            def __exit__(self, exc_type: object, exc_val: object, exc_tb: object) -> object:
+                return self._conn.__exit__(exc_type, exc_val, exc_tb)  # type: ignore[arg-type]
+
+            def execute(self, sql: str, *args: object, **kwargs: object) -> object:
+                if "INSERT INTO market_watch_symbol_state" in sql:
+                    raise sqlite3.OperationalError("Simulated mid-transaction failure")
+                return self._conn.execute(sql, *args, **kwargs)
+
+            def __getattr__(self, name: str) -> object:
+                return getattr(self._conn, name)
+
+        store._connect = lambda: FaultyConnection(real_connect())  # type: ignore[assignment]
+        with pytest.raises(sqlite3.OperationalError, match="Simulated mid-transaction failure"):
+            store.save_symbol_state("BTCUSDT", assessment, 1_700_000_500_000, evidence=ev)
+
+        store._connect = real_connect
+
+        # Assert atomic rollback: NO evidence row committed!
+        with sqlite3.connect(str(db_path)) as conn:
+            cursor = conn.execute("SELECT COUNT(*) FROM tactical_feature_evidence_v2")
+            assert cursor.fetchone()[0] == 0
+            cursor = conn.execute("SELECT COUNT(*) FROM market_watch_assessments")
+            assert cursor.fetchone()[0] == 0
+
+        # Normal retry succeeds exactly once
+        store.save_symbol_state("BTCUSDT", assessment, 1_700_000_500_000, evidence=ev)
+        with sqlite3.connect(str(db_path)) as conn:
+            cursor = conn.execute("SELECT COUNT(*) FROM tactical_feature_evidence_v2")
+            assert cursor.fetchone()[0] == 1
+            cursor = conn.execute("SELECT COUNT(*) FROM market_watch_assessments")
+            assert cursor.fetchone()[0] == 1
 

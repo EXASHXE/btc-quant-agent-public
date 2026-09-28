@@ -3,15 +3,29 @@ from __future__ import annotations
 import hashlib
 import json
 import math
-from collections.abc import Sequence
-from dataclasses import dataclass, replace
-from typing import Any
+import re
+from collections.abc import Mapping, Sequence
+from dataclasses import dataclass
+from typing import Any, cast
 
-from .config import MarketWatchConfig, market_watch_config_hash_payload
+from btc_quant_agent.domain import Candle
+
+from .config import (
+    MarketWatchConfig,
+    compute_market_watch_config_hash_from_payload,
+    market_watch_config_hash_payload,
+)
 from .domain import (
     ACTIVE_PLAYBOOKS,
+    MARKET_SNAPSHOT_SCHEMA_VERSION,
+    MARKET_WATCH_EVIDENCE_VERSION,
+    PLAYBOOK_SELECTION_VERSION,
+    REFERENCE_UNIVERSE_VERSION,
+    RETURN_FEATURE_SEMANTICS_VERSION,
     RULE_SCORE_SEMANTICS_VERSION,
+    SEMANTIC_IDENTITY_VERSION,
     TACTICAL_FEATURE_EVIDENCE_SCHEMA_VERSION,
+    TACTICAL_POLICY_VERSION,
     PlaybookCandidate,
     StrategyStatus,
     SymbolAssessment,
@@ -35,12 +49,19 @@ class TacticalEvidenceValidationError(TacticalEvidenceError):
     """Raised when evidence content validation fails (e.g. NaN/Inf or schema violation)."""
 
 
+class TacticalEvidenceIdentityError(TacticalEvidenceError):
+    """Raised when evidence_id format is invalid or recomputed ID does not match stored ID."""
+
+
 class TacticalEvidenceConflictError(TacticalEvidenceError):
     """Raised when different evidence content is presented for an existing natural key."""
 
 
 class TacticalEvidenceLinkageError(TacticalEvidenceError):
     """Raised when a shadow or assessment record links to a non-existent evidence_id."""
+
+
+EVIDENCE_ID_REGEX = re.compile(r"^[0-9a-f]{64}$")
 
 
 # ==============================================================================
@@ -191,9 +212,50 @@ class SourceProvenanceEvidence:
 
 
 @dataclass(frozen=True)
+class ClosedBarEvidence:
+    open_time_ms: int
+    close_time_ms: int
+    open: float
+    high: float
+    low: float
+    close: float
+    volume: float
+    quote_volume: float
+    trades: int
+
+    @classmethod
+    def from_candle(cls, candle: Candle) -> ClosedBarEvidence:
+        return cls(
+            open_time_ms=candle.open_time_ms,
+            close_time_ms=candle.close_time_ms,
+            open=candle.open,
+            high=candle.high,
+            low=candle.low,
+            close=candle.close,
+            volume=candle.volume,
+            quote_volume=candle.quote_volume,
+            trades=candle.trades,
+        )
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "open_time_ms": self.open_time_ms,
+            "close_time_ms": self.close_time_ms,
+            "open": self.open,
+            "high": self.high,
+            "low": self.low,
+            "close": self.close,
+            "volume": self.volume,
+            "quote_volume": self.quote_volume,
+            "trades": self.trades,
+        }
+
+
+@dataclass(frozen=True)
 class TimeframeFeaturesEvidence:
     interval: str
     closed_bar_end_time_ms: int
+    latest_closed_bar: ClosedBarEvidence
     close: float
     ema_fast: float
     ema_mid: float
@@ -211,6 +273,8 @@ class TimeframeFeaturesEvidence:
     bb_width: float
     bb_width_percentile: float
     is_volatility_compressed: bool
+    is_volatility_expanded: bool
+    has_prior_compression_window: bool
     recent_swing_high: float | None
     recent_swing_low: float | None
     supports: tuple[float, ...]
@@ -222,6 +286,7 @@ class TimeframeFeaturesEvidence:
         return {
             "interval": self.interval,
             "closed_bar_end_time_ms": self.closed_bar_end_time_ms,
+            "latest_closed_bar": self.latest_closed_bar.to_dict(),
             "close": self.close,
             "ema_fast": self.ema_fast,
             "ema_mid": self.ema_mid,
@@ -239,6 +304,8 @@ class TimeframeFeaturesEvidence:
             "bb_width": self.bb_width,
             "bb_width_percentile": self.bb_width_percentile,
             "is_volatility_compressed": self.is_volatility_compressed,
+            "is_volatility_expanded": self.is_volatility_expanded,
+            "has_prior_compression_window": self.has_prior_compression_window,
             "recent_swing_high": self.recent_swing_high,
             "recent_swing_low": self.recent_swing_low,
             "supports": list(self.supports),
@@ -538,6 +605,99 @@ class GridPlanEvidence:
         }
 
 
+@dataclass(frozen=True)
+class DecisionConfigEvidence:
+    canonical_json: str
+
+    @classmethod
+    def from_payload(cls, payload: Mapping[str, Any]) -> DecisionConfigEvidence:
+        return cls(canonical_json=canonical_json_dump(dict(payload)))
+
+    def to_dict(self) -> dict[str, Any]:
+        return cast(dict[str, Any], json.loads(self.canonical_json))
+
+
+@dataclass(frozen=True)
+class PolicyStateInputEvidence:
+    previous_setup: str | None = None
+    previous_breakout_state: str = "NONE"
+    previous_breakout_level: float | None = None
+    previous_breakout_direction: str | None = None
+    previous_breakout_bar_end_ms: int | None = None
+    previous_recent_failed_breakout: float | None = None
+    previous_recent_failed_breakout_ms: int | None = None
+    previous_recent_failed_breakdown: float | None = None
+    previous_recent_failed_breakdown_ms: int | None = None
+    previous_grid_decision: str = "PAUSE"
+    previous_grid_lower_bound: float | None = None
+    previous_grid_upper_bound: float | None = None
+    previous_recent_support: float | None = None
+    previous_recent_resistance: float | None = None
+    previous_lifecycle_state: str = "CANDIDATE"
+    previous_signal_identity: str | None = None
+    previous_setup_key: str | None = None
+    previous_created_bar_end_ms: int | None = None
+    previous_armed_bar_end_ms: int | None = None
+    previous_triggered_bar_end_ms: int | None = None
+    previous_age_bars: int = 0
+    previous_setup_instance_started_bar_end_ms: int | None = None
+
+    @classmethod
+    def from_prev_state(cls, prev: Mapping[str, Any] | None) -> PolicyStateInputEvidence:
+        if not prev:
+            return cls()
+        return cls(
+            previous_setup=prev.get("setup"),
+            previous_breakout_state=str(prev.get("breakout_state", "NONE")),
+            previous_breakout_level=prev.get("breakout_level"),
+            previous_breakout_direction=prev.get("breakout_direction"),
+            previous_breakout_bar_end_ms=prev.get("breakout_bar_end_ms"),
+            previous_recent_failed_breakout=prev.get("recent_failed_breakout"),
+            previous_recent_failed_breakout_ms=prev.get("recent_failed_breakout_ms"),
+            previous_recent_failed_breakdown=prev.get("recent_failed_breakdown"),
+            previous_recent_failed_breakdown_ms=prev.get("recent_failed_breakdown_ms"),
+            previous_grid_decision=str(prev.get("grid_decision", "PAUSE")),
+            previous_grid_lower_bound=prev.get("grid_lower_bound"),
+            previous_grid_upper_bound=prev.get("grid_upper_bound"),
+            previous_recent_support=prev.get("recent_support"),
+            previous_recent_resistance=prev.get("recent_resistance"),
+            previous_lifecycle_state=str(prev.get("lifecycle_state", "CANDIDATE")),
+            previous_signal_identity=prev.get("signal_identity"),
+            previous_setup_key=prev.get("setup_key"),
+            previous_created_bar_end_ms=prev.get("created_bar_end_ms"),
+            previous_armed_bar_end_ms=prev.get("armed_bar_end_ms"),
+            previous_triggered_bar_end_ms=prev.get("triggered_bar_end_ms"),
+            previous_age_bars=int(prev.get("age_bars", 0)),
+            previous_setup_instance_started_bar_end_ms=prev.get("setup_instance_started_bar_end_ms"),
+        )
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "previous_setup": self.previous_setup,
+            "previous_breakout_state": self.previous_breakout_state,
+            "previous_breakout_level": self.previous_breakout_level,
+            "previous_breakout_direction": self.previous_breakout_direction,
+            "previous_breakout_bar_end_ms": self.previous_breakout_bar_end_ms,
+            "previous_recent_failed_breakout": self.previous_recent_failed_breakout,
+            "previous_recent_failed_breakout_ms": self.previous_recent_failed_breakout_ms,
+            "previous_recent_failed_breakdown": self.previous_recent_failed_breakdown,
+            "previous_recent_failed_breakdown_ms": self.previous_recent_failed_breakdown_ms,
+            "previous_grid_decision": self.previous_grid_decision,
+            "previous_grid_lower_bound": self.previous_grid_lower_bound,
+            "previous_grid_upper_bound": self.previous_grid_upper_bound,
+            "previous_recent_support": self.previous_recent_support,
+            "previous_recent_resistance": self.previous_recent_resistance,
+            "previous_lifecycle_state": self.previous_lifecycle_state,
+            "previous_signal_identity": self.previous_signal_identity,
+            "previous_setup_key": self.previous_setup_key,
+            "previous_created_bar_end_ms": self.previous_created_bar_end_ms,
+            "previous_armed_bar_end_ms": self.previous_armed_bar_end_ms,
+            "previous_triggered_bar_end_ms": self.previous_triggered_bar_end_ms,
+            "previous_age_bars": self.previous_age_bars,
+            "previous_setup_instance_started_bar_end_ms": self.previous_setup_instance_started_bar_end_ms,
+        }
+
+
 # ==============================================================================
 # Top-Level TacticalFeatureEvidenceV2 Contract
 # ==============================================================================
@@ -555,7 +715,8 @@ class TacticalFeatureEvidenceV2:
     snapshot_hash: str
     policy_version: str
     config_hash: str
-    decision_config: dict[str, Any]
+    decision_config: DecisionConfigEvidence
+    policy_state_before: PolicyStateInputEvidence
     semantic_identity: TacticalSemanticIdentity
     strategy_status: str
     source_provenance: SourceProvenanceEvidence
@@ -600,7 +761,8 @@ def canonical_evidence_payload(evidence: TacticalFeatureEvidenceV2) -> dict[str,
         "snapshot_hash": evidence.snapshot_hash,
         "policy_version": evidence.policy_version,
         "config_hash": evidence.config_hash,
-        "decision_config": evidence.decision_config,
+        "decision_config": evidence.decision_config.to_dict(),
+        "policy_state_before": evidence.policy_state_before.to_dict(),
         "semantic_identity": evidence.semantic_identity.to_dict(),
         "strategy_status": evidence.strategy_status,
         "source_provenance": evidence.source_provenance.to_dict(),
@@ -631,8 +793,17 @@ def canonical_evidence_payload(evidence: TacticalFeatureEvidenceV2) -> dict[str,
 
 
 def canonical_json_dump(payload: dict[str, Any]) -> str:
-    """Deterministic, compact, sorted-key UTF-8 JSON serialization."""
-    return json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+    """Deterministic, compact, sorted-key UTF-8 JSON serialization rejecting non-finite numbers."""
+    try:
+        return json.dumps(
+            payload,
+            sort_keys=True,
+            separators=(",", ":"),
+            ensure_ascii=False,
+            allow_nan=False,
+        )
+    except ValueError as e:
+        raise TacticalEvidenceValidationError(f"Invalid non-finite number in evidence payload: {e}") from e
 
 
 def compute_evidence_id(payload_or_evidence: dict[str, Any] | TacticalFeatureEvidenceV2) -> str:
@@ -652,12 +823,26 @@ def canonical_evidence_json(evidence: TacticalFeatureEvidenceV2) -> str:
     return canonical_json_dump(payload)
 
 
+def verify_tactical_evidence_identity(evidence: TacticalFeatureEvidenceV2) -> None:
+    """Verify evidence_id matches canonical content SHA-256 and has valid 64-char hex format."""
+    if not isinstance(evidence.evidence_id, str) or not EVIDENCE_ID_REGEX.match(evidence.evidence_id):
+        raise TacticalEvidenceIdentityError(
+            f"Malformed evidence_id format (must be 64 lowercase hex chars): {evidence.evidence_id!r}"
+        )
+    payload = canonical_evidence_payload(evidence)
+    expected_id = compute_evidence_id(payload)
+    if evidence.evidence_id != expected_id:
+        raise TacticalEvidenceIdentityError(
+            f"Evidence identity verification failed: stored={evidence.evidence_id}, expected={expected_id}"
+        )
+
+
 # ==============================================================================
 # Validation & Causality Assertion
 # ==============================================================================
 
 def _assert_finite_number(val: Any, path: str) -> None:
-    if isinstance(val, (int, float)):
+    if isinstance(val, (int, float)) and not isinstance(val, bool):
         if math.isnan(val) or math.isinf(val):
             raise TacticalEvidenceValidationError(f"Invalid non-finite number at {path}: {val}")
     elif isinstance(val, dict):
@@ -669,10 +854,73 @@ def _assert_finite_number(val: Any, path: str) -> None:
 
 
 def validate_tactical_feature_evidence(evidence: TacticalFeatureEvidenceV2) -> None:
-    """Validate deep immutability, causality invariants, and mathematical finiteness."""
+    """Validate deep immutability, causality invariants, schema authority, and mathematical finiteness."""
+    # 0. Mathematical finiteness check (Section 15: no NaN / Infinity)
+    payload = canonical_evidence_payload(evidence)
+    _assert_finite_number(payload, "evidence")
+
     dec_t = evidence.decision_time_ms
 
-    # 1. Causality invariants (Section 15)
+    # 1. Schema, Policy version, and Semantics authority invariants (Sections 26 & 3)
+    if evidence.evidence_schema_version != TACTICAL_FEATURE_EVIDENCE_SCHEMA_VERSION:
+        raise TacticalEvidenceValidationError(
+            f"evidence_schema_version {evidence.evidence_schema_version!r} != {TACTICAL_FEATURE_EVIDENCE_SCHEMA_VERSION!r}"
+        )
+    if evidence.policy_version != TACTICAL_POLICY_VERSION:
+        raise TacticalEvidenceValidationError(
+            f"policy_version {evidence.policy_version!r} != {TACTICAL_POLICY_VERSION!r}"
+        )
+    if evidence.rule_score_semantics != RULE_SCORE_SEMANTICS_VERSION:
+        raise TacticalEvidenceValidationError(
+            f"rule_score_semantics {evidence.rule_score_semantics!r} != {RULE_SCORE_SEMANTICS_VERSION!r}"
+        )
+
+    sem = evidence.semantic_identity
+    if sem.semantic_identity_version != SEMANTIC_IDENTITY_VERSION:
+        raise TacticalEvidenceValidationError(
+            f"semantic_identity_version {sem.semantic_identity_version!r} != {SEMANTIC_IDENTITY_VERSION!r}"
+        )
+    if sem.tactical_policy_version != TACTICAL_POLICY_VERSION:
+        raise TacticalEvidenceValidationError(
+            f"semantic_identity tactical_policy_version {sem.tactical_policy_version!r} != {TACTICAL_POLICY_VERSION!r}"
+        )
+    if sem.snapshot_schema_version != MARKET_SNAPSHOT_SCHEMA_VERSION:
+        raise TacticalEvidenceValidationError(
+            f"semantic_identity snapshot_schema_version {sem.snapshot_schema_version!r} != {MARKET_SNAPSHOT_SCHEMA_VERSION!r}"
+        )
+    if sem.return_feature_semantics_version != RETURN_FEATURE_SEMANTICS_VERSION:
+        raise TacticalEvidenceValidationError(
+            f"semantic_identity return_feature_semantics_version {sem.return_feature_semantics_version!r} != {RETURN_FEATURE_SEMANTICS_VERSION!r}"
+        )
+    if sem.playbook_selection_version != PLAYBOOK_SELECTION_VERSION:
+        raise TacticalEvidenceValidationError(
+            f"semantic_identity playbook_selection_version {sem.playbook_selection_version!r} != {PLAYBOOK_SELECTION_VERSION!r}"
+        )
+    if sem.reference_universe_version != REFERENCE_UNIVERSE_VERSION:
+        raise TacticalEvidenceValidationError(
+            f"semantic_identity reference_universe_version {sem.reference_universe_version!r} != {REFERENCE_UNIVERSE_VERSION!r}"
+        )
+    if sem.rule_score_semantics_version != RULE_SCORE_SEMANTICS_VERSION:
+        raise TacticalEvidenceValidationError(
+            f"semantic_identity rule_score_semantics_version {sem.rule_score_semantics_version!r} != {RULE_SCORE_SEMANTICS_VERSION!r}"
+        )
+    if sem.forward_evidence_version != MARKET_WATCH_EVIDENCE_VERSION:
+        raise TacticalEvidenceValidationError(
+            f"semantic_identity forward_evidence_version {sem.forward_evidence_version!r} != {MARKET_WATCH_EVIDENCE_VERSION!r}"
+        )
+    if sem.config_hash and sem.config_hash != evidence.config_hash:
+        raise TacticalEvidenceValidationError(
+            f"semantic_identity.config_hash ({sem.config_hash}) != evidence.config_hash ({evidence.config_hash})"
+        )
+
+    # Decision config hash self-containment & reproducibility (Section 7, 26, 33)
+    recomputed_config_hash = compute_market_watch_config_hash_from_payload(evidence.decision_config.to_dict())
+    if recomputed_config_hash != evidence.config_hash:
+        raise TacticalEvidenceValidationError(
+            f"Recomputed config hash ({recomputed_config_hash}) != evidence.config_hash ({evidence.config_hash})"
+        )
+
+    # 2. Causality invariants (Sections 15, 23, 24, 25)
     sp = evidence.source_provenance
     if sp.closed_bar_watermark_15m > dec_t:
         raise TacticalCausalityError(
@@ -688,11 +936,34 @@ def validate_tactical_feature_evidence(evidence: TacticalFeatureEvidenceV2) -> N
         )
 
     for r in sp.returns:
-        if r.latest_close_time_ms is not None and r.latest_close_time_ms > dec_t:
-            raise TacticalCausalityError(
-                f"Return horizon {r.horizon_ms} latest close time ({r.latest_close_time_ms}) > decision_time_ms ({dec_t})"
-            )
+        if r.availability == "AVAILABLE":
+            if r.value is None:
+                raise TacticalCausalityError(
+                    f"Return horizon {r.horizon_ms} is AVAILABLE but value is None"
+                )
+            if r.anchor_close_time_ms is None or r.latest_close_time_ms is None:
+                raise TacticalCausalityError(
+                    f"Return horizon {r.horizon_ms} is AVAILABLE but anchor/latest close time is None"
+                )
+            if r.anchor_close_time_ms > r.latest_close_time_ms:
+                raise TacticalCausalityError(
+                    f"Return horizon {r.horizon_ms} anchor time ({r.anchor_close_time_ms}) > latest time ({r.latest_close_time_ms})"
+                )
+            if r.latest_close_time_ms > dec_t:
+                raise TacticalCausalityError(
+                    f"Return horizon {r.horizon_ms} latest close time ({r.latest_close_time_ms}) > decision_time_ms ({dec_t})"
+                )
+            if r.latest_close_time_ms - r.anchor_close_time_ms != r.horizon_ms:
+                raise TacticalCausalityError(
+                    f"Return horizon {r.horizon_ms} span ({r.latest_close_time_ms - r.anchor_close_time_ms}) != horizon_ms ({r.horizon_ms})"
+                )
+        else:
+            if r.value is not None:
+                raise TacticalCausalityError(
+                    f"Return horizon {r.horizon_ms} is unavailable ({r.availability}) but value is not None ({r.value})"
+                )
 
+    # Receipt timestamps (RECEIPT_TIME <= decision_time_ms)
     receipt_fields = [
         ("derivatives_observed_at_ms", sp.derivatives_observed_at_ms),
         ("ticker_receipt_ms", sp.ticker_receipt_ms),
@@ -705,10 +976,10 @@ def validate_tactical_feature_evidence(evidence: TacticalFeatureEvidenceV2) -> N
         if ts is not None:
             if not isinstance(ts, (int, float)) or isinstance(ts, bool):
                 continue
-            if ts > 0 and ts > dec_t:
+            if ts > dec_t:
                 raise TacticalCausalityError(f"Receipt timestamp {name} ({ts}) > decision_time_ms ({dec_t})")
 
-    # Past event timestamps
+    # Past event timestamps (PAST_EVENT_TIME <= decision_time_ms)
     past_event_fields = [
         ("open_interest_time_ms", sp.open_interest_time_ms),
         ("long_short_time_ms", sp.long_short_time_ms),
@@ -719,12 +990,18 @@ def validate_tactical_feature_evidence(evidence: TacticalFeatureEvidenceV2) -> N
         if ts is not None:
             if not isinstance(ts, (int, float)) or isinstance(ts, bool):
                 continue
-            if ts > 0 and ts > dec_t:
+            if ts > dec_t:
                 raise TacticalCausalityError(f"Source event timestamp {name} ({ts}) > decision_time_ms ({dec_t})")
+
+    # Note: funding_time_ms is KNOWN_FUTURE_SCHEDULE_TIME (Binance nextFundingTime), legitimately allowed to be > dec_t
 
     if evidence.collection_started_at_ms > evidence.collection_completed_at_ms:
         raise TacticalCausalityError(
             f"collection_started_at_ms ({evidence.collection_started_at_ms}) > collection_completed_at_ms ({evidence.collection_completed_at_ms})"
+        )
+    if evidence.collection_completed_at_ms > dec_t:
+        raise TacticalCausalityError(
+            f"collection_completed_at_ms ({evidence.collection_completed_at_ms}) > decision_time_ms ({dec_t})"
         )
 
     if evidence.observed_at_ms > dec_t:
@@ -732,13 +1009,45 @@ def validate_tactical_feature_evidence(evidence: TacticalFeatureEvidenceV2) -> N
             f"observed_at_ms ({evidence.observed_at_ms}) > decision_time_ms ({dec_t})"
         )
 
-    # 2. Mathematical finiteness check (Section 46-05: no NaN / Infinity)
-    payload = canonical_evidence_payload(evidence)
-    _assert_finite_number(payload, "evidence")
+    # 3. Cross-field identity invariants (Section 27)
+    if not math.isclose(evidence.rule_score, evidence.rule_score_breakdown.final_rule_score, abs_tol=1e-6):
+        raise TacticalEvidenceValidationError(
+            f"evidence.rule_score ({evidence.rule_score}) != rule_score_breakdown.final_rule_score ({evidence.rule_score_breakdown.final_rule_score})"
+        )
+
+    if (
+        evidence.directional_risk_plan is not None
+        and evidence.decision_trace.final_directional_decision != evidence.directional_risk_plan.decision
+    ):
+        raise TacticalEvidenceValidationError(
+            f"decision_trace.final_directional_decision ({evidence.decision_trace.final_directional_decision}) "
+            f"!= directional_risk_plan.decision ({evidence.directional_risk_plan.decision})"
+        )
+
+    # 4. Playbook candidate completeness (Section 29)
+    expected_playbooks = tuple(p.value for p in ACTIVE_PLAYBOOKS)
+    actual_playbooks = tuple(c.playbook for c in evidence.playbook_candidates)
+    if actual_playbooks != expected_playbooks:
+        raise TacticalEvidenceValidationError(
+            f"playbook_candidates order/content mismatch: expected {expected_playbooks}, got {actual_playbooks}"
+        )
+    if any(c.playbook == "RANGE_MEAN_REVERSION" for c in evidence.playbook_candidates):
+        raise TacticalEvidenceValidationError(
+            "RANGE_MEAN_REVERSION must not appear in evaluated playbook_candidates"
+        )
+
+    if evidence.selected_playbook is not None and evidence.selected_playbook not in expected_playbooks:
+        raise TacticalEvidenceValidationError(
+            f"selected_playbook {evidence.selected_playbook!r} not in active playbooks {expected_playbooks}"
+        )
+    if evidence.decision_trace.final_directional_decision in ("LONG", "SHORT") and not evidence.selected_playbook:
+        raise TacticalEvidenceValidationError(
+            f"Directional decision is {evidence.decision_trace.final_directional_decision} but selected_playbook is None"
+        )
 
 
 # ==============================================================================
-# Pure Deterministic Evidence Builder (Section 7)
+# Pure Deterministic Evidence Builder (Section 7, 11, 21)
 # ==============================================================================
 
 def build_tactical_feature_evidence(
@@ -748,6 +1057,7 @@ def build_tactical_feature_evidence(
     decision_trace: PolicyDecisionTrace,
     rule_score_breakdown: RuleScoreBreakdown,
     config: MarketWatchConfig,
+    policy_state_before: PolicyStateInputEvidence | Mapping[str, Any] | None = None,
 ) -> TacticalFeatureEvidenceV2:
     """Pure deterministic construction of immutable TacticalFeatureEvidenceV2."""
     snap = assessment.snapshot
@@ -771,12 +1081,19 @@ def build_tactical_feature_evidence(
             (14_400_000, snap.return_4h, snap.return_4h_status),
             (43_200_000, snap.return_12h, snap.return_12h_status),
         ]:
-            anchor_t = (tf_15m.closed_bar_end_time_ms - horizon_ms) if r_stat == "AVAILABLE" else None
+            if r_val is None:
+                actual_stat = "UNAVAILABLE" if r_stat == "AVAILABLE" else r_stat
+                anchor_t = None
+                actual_val = None
+            else:
+                actual_stat = r_stat
+                anchor_t = (tf_15m.closed_bar_end_time_ms - horizon_ms) if actual_stat == "AVAILABLE" else None
+                actual_val = r_val
             returns_obs.append(
                 ReturnObservation(
                     horizon_ms=horizon_ms,
-                    value=r_val,
-                    availability=r_stat,
+                    value=actual_val,
+                    availability=actual_stat,
                     anchor_close_time_ms=anchor_t,
                     latest_close_time_ms=tf_15m.closed_bar_end_time_ms,
                     source_interval="15m",
@@ -805,11 +1122,41 @@ def build_tactical_feature_evidence(
         endpoint_errors=tuple(sorted(d_metrics.endpoint_errors.items())),
     )
 
-    # 2. Timeframe features
+    # 2. Timeframe features with latest confirmed bar & volatility-state completeness
     def _make_tf_feat(tf: Any) -> TimeframeFeaturesEvidence:
+        lcb = getattr(tf, "latest_closed_bar", None)
+        if isinstance(lcb, Candle):
+            closed_bar_ev = ClosedBarEvidence.from_candle(lcb)
+        elif isinstance(lcb, ClosedBarEvidence):
+            closed_bar_ev = lcb
+        elif lcb is not None and hasattr(lcb, "open") and hasattr(lcb, "close"):
+            closed_bar_ev = ClosedBarEvidence(
+                open_time_ms=getattr(lcb, "open_time_ms", tf.closed_bar_end_time_ms - 900_000),
+                close_time_ms=getattr(lcb, "close_time_ms", tf.closed_bar_end_time_ms),
+                open=lcb.open,
+                high=lcb.high,
+                low=lcb.low,
+                close=lcb.close,
+                volume=lcb.volume,
+                quote_volume=getattr(lcb, "quote_volume", lcb.volume * lcb.close),
+                trades=getattr(lcb, "trades", 0),
+            )
+        else:
+            closed_bar_ev = ClosedBarEvidence(
+                open_time_ms=tf.closed_bar_end_time_ms - 900_000,
+                close_time_ms=tf.closed_bar_end_time_ms,
+                open=tf.close,
+                high=tf.close,
+                low=tf.close,
+                close=tf.close,
+                volume=tf.volume,
+                quote_volume=tf.volume * tf.close,
+                trades=0,
+            )
         return TimeframeFeaturesEvidence(
             interval=tf.interval,
             closed_bar_end_time_ms=tf.closed_bar_end_time_ms,
+            latest_closed_bar=closed_bar_ev,
             close=tf.close,
             ema_fast=tf.ema_fast,
             ema_mid=tf.ema_mid,
@@ -826,7 +1173,9 @@ def build_tactical_feature_evidence(
             volume_z=tf.volume_z,
             bb_width=tf.bb_width,
             bb_width_percentile=tf.bb_width_percentile,
-            is_volatility_compressed=tf.is_volatility_compressed,
+            is_volatility_compressed=bool(getattr(tf, "is_volatility_compressed", False)),
+            is_volatility_expanded=bool(getattr(tf, "is_volatility_expanded", False)),
+            has_prior_compression_window=bool(getattr(tf, "has_prior_compression_window", False)),
             recent_swing_high=tf.recent_swing_high,
             recent_swing_low=tf.recent_swing_low,
             supports=tuple(tf.supports),
@@ -835,6 +1184,8 @@ def build_tactical_feature_evidence(
             regime=str(tf.regime),
         )
 
+    # Derivative risks vs reasons completeness (Section 22)
+    deriv_risks = getattr(d_metrics, "risk_codes", ())
     deriv_feat = DerivativesFeaturesEvidence(
         mark_price=d_metrics.mark_price,
         index_price=d_metrics.index_price,
@@ -858,7 +1209,7 @@ def build_tactical_feature_evidence(
         order_book_imbalance=d_metrics.order_book_imbalance,
         derivatives_regime=str(d_metrics.regime),
         reasons=tuple(d_metrics.reasons),
-        risks=(),
+        risks=tuple(deriv_risks),
         field_availability=tuple(sorted(d_metrics.field_availability.items())),
         endpoint_errors=tuple(sorted(d_metrics.endpoint_errors.items())),
     )
@@ -879,9 +1230,9 @@ def build_tactical_feature_evidence(
         return_1h=snap.return_1h,
         return_4h=snap.return_4h,
         return_12h=snap.return_12h,
-        return_1h_status=snap.return_1h_status,
-        return_4h_status=snap.return_4h_status,
-        return_12h_status=snap.return_12h_status,
+        return_1h_status="UNAVAILABLE" if snap.return_1h is None and snap.return_1h_status == "AVAILABLE" else snap.return_1h_status,
+        return_4h_status="UNAVAILABLE" if snap.return_4h is None and snap.return_4h_status == "AVAILABLE" else snap.return_4h_status,
+        return_12h_status="UNAVAILABLE" if snap.return_12h is None and snap.return_12h_status == "AVAILABLE" else snap.return_12h_status,
     )
 
     # 3. Reference Universe Evidence
@@ -904,7 +1255,7 @@ def build_tactical_feature_evidence(
         rank=rp.rank if rp else 0,
     )
 
-    # 4. Playbook Candidates Evidence (Strict Frozen Registry Order, Section 21)
+    # 4. Playbook Candidates Evidence (Strict Frozen Registry Order, Section 21 & 29)
     cand_by_pb = {c.playbook: c for c in playbook_candidates}
     pb_evidences: list[PlaybookCandidateEvidence] = []
     for pb in ACTIVE_PLAYBOOKS:
@@ -1019,22 +1370,17 @@ def build_tactical_feature_evidence(
         reason_codes=tuple(g_plan.reason_codes),
     )
 
-    # 8. Assemble intermediate object to compute content hash
+    # 8. Immutable Decision Config (Section 5 & 6)
     cfg_payload = market_watch_config_hash_payload(config)
-    decision_config = {
-        "scan_interval_minutes": config.scan_interval_minutes,
-        "min_net_rr": config.min_net_rr,
-        "high_quality_net_rr": config.high_quality_net_rr,
-        "min_action_entry_quality": config.min_action_entry_quality,
-        "taker_fee_rate": config.taker_fee_rate,
-        "maker_fee_rate": config.maker_fee_rate,
-        "slippage_bps_per_side": config.slippage_bps_per_side,
-        "funding_stress_rate": config.funding_stress_rate,
-        "ranking": cfg_payload["ranking"],
-        "thresholds": cfg_payload["thresholds"],
-        "grid": cfg_payload["grid"],
-    }
+    decision_config = DecisionConfigEvidence.from_payload(cfg_payload)
 
+    # 9. Pre-decision policy state evidence (Section 20 & 21)
+    if isinstance(policy_state_before, PolicyStateInputEvidence):
+        pol_state_before = policy_state_before
+    else:
+        pol_state_before = PolicyStateInputEvidence.from_prev_state(policy_state_before)
+
+    # 10. Assemble intermediate object to compute content hash
     provisional_evidence = TacticalFeatureEvidenceV2(
         evidence_schema_version=TACTICAL_FEATURE_EVIDENCE_SCHEMA_VERSION,
         evidence_id="",
@@ -1048,13 +1394,14 @@ def build_tactical_feature_evidence(
         policy_version=assessment.policy_version,
         config_hash=assessment.config_hash,
         decision_config=decision_config,
+        policy_state_before=pol_state_before,
         semantic_identity=assessment.semantic_identity,
         strategy_status=StrategyStatus.EXPERIMENTAL.value,
         source_provenance=source_prov,
         market_snapshot_features=snap_feat,
         reference_universe_evidence=ref_univ,
         playbook_candidates=tuple(pb_evidences),
-        selected_playbook=assessment.selected_playbook or None,
+        selected_playbook=(assessment.selected_playbook if assessment.selected_playbook not in ("NO_TRADE", "NONE", "", None) else None),
         selection_method=assessment.selection_method,
         selection_version=assessment.selection_version,
         eligible_playbooks=tuple(assessment.eligible_playbooks),
@@ -1079,7 +1426,7 @@ def build_tactical_feature_evidence(
     payload = canonical_evidence_payload(provisional_evidence)
     evidence_id = compute_evidence_id(payload)
 
-    return TacticalFeatureEvidenceV2(
+    final_evidence = TacticalFeatureEvidenceV2(
         evidence_schema_version=provisional_evidence.evidence_schema_version,
         evidence_id=evidence_id,
         symbol=provisional_evidence.symbol,
@@ -1092,6 +1439,7 @@ def build_tactical_feature_evidence(
         policy_version=provisional_evidence.policy_version,
         config_hash=provisional_evidence.config_hash,
         decision_config=provisional_evidence.decision_config,
+        policy_state_before=provisional_evidence.policy_state_before,
         semantic_identity=provisional_evidence.semantic_identity,
         strategy_status=provisional_evidence.strategy_status,
         source_provenance=provisional_evidence.source_provenance,
@@ -1119,10 +1467,22 @@ def build_tactical_feature_evidence(
         veto_reasons=provisional_evidence.veto_reasons,
     )
 
+    validate_tactical_feature_evidence(final_evidence)
+    verify_tactical_evidence_identity(final_evidence)
+    return final_evidence
 
-def deserialize_tactical_feature_evidence(raw: str | dict[str, Any]) -> TacticalFeatureEvidenceV2:
-    """Deserialize canonical or database JSON / dictionary into immutable TacticalFeatureEvidenceV2."""
+
+def deserialize_tactical_feature_evidence(
+    raw: str | dict[str, Any],
+    *,
+    verify_identity: bool = True,
+) -> TacticalFeatureEvidenceV2:
+    """Deserialize canonical or database JSON / dictionary into immutable TacticalFeatureEvidenceV2 with verification."""
     data: dict[str, Any] = json.loads(raw) if isinstance(raw, str) else raw
+
+    ev_id = data.get("evidence_id")
+    if not ev_id or not isinstance(ev_id, str):
+        raise TacticalEvidenceIdentityError("Missing or invalid evidence_id in serialized evidence data")
 
     sp_data = data["source_provenance"]
     returns_obs = tuple(
@@ -1158,9 +1518,35 @@ def deserialize_tactical_feature_evidence(raw: str | dict[str, Any]) -> Tactical
     )
 
     def _parse_tf(t_data: dict[str, Any]) -> TimeframeFeaturesEvidence:
+        lcb_data = t_data.get("latest_closed_bar")
+        if lcb_data:
+            latest_closed_bar = ClosedBarEvidence(
+                open_time_ms=lcb_data["open_time_ms"],
+                close_time_ms=lcb_data["close_time_ms"],
+                open=lcb_data["open"],
+                high=lcb_data["high"],
+                low=lcb_data["low"],
+                close=lcb_data["close"],
+                volume=lcb_data["volume"],
+                quote_volume=lcb_data["quote_volume"],
+                trades=lcb_data["trades"],
+            )
+        else:
+            latest_closed_bar = ClosedBarEvidence(
+                open_time_ms=t_data["closed_bar_end_time_ms"] - 900_000,
+                close_time_ms=t_data["closed_bar_end_time_ms"],
+                open=t_data["close"],
+                high=t_data["close"],
+                low=t_data["close"],
+                close=t_data["close"],
+                volume=t_data["volume"],
+                quote_volume=t_data["volume"] * t_data["close"],
+                trades=0,
+            )
         return TimeframeFeaturesEvidence(
             interval=t_data["interval"],
             closed_bar_end_time_ms=t_data["closed_bar_end_time_ms"],
+            latest_closed_bar=latest_closed_bar,
             close=t_data["close"],
             ema_fast=t_data["ema_fast"],
             ema_mid=t_data["ema_mid"],
@@ -1177,7 +1563,9 @@ def deserialize_tactical_feature_evidence(raw: str | dict[str, Any]) -> Tactical
             volume_z=t_data["volume_z"],
             bb_width=t_data["bb_width"],
             bb_width_percentile=t_data["bb_width_percentile"],
-            is_volatility_compressed=t_data["is_volatility_compressed"],
+            is_volatility_compressed=t_data.get("is_volatility_compressed", False),
+            is_volatility_expanded=t_data.get("is_volatility_expanded", False),
+            has_prior_compression_window=t_data.get("has_prior_compression_window", False),
             recent_swing_high=t_data.get("recent_swing_high"),
             recent_swing_low=t_data.get("recent_swing_low"),
             supports=tuple(t_data.get("supports", [])),
@@ -1384,9 +1772,21 @@ def deserialize_tactical_feature_evidence(raw: str | dict[str, Any]) -> Tactical
 
     sem_id = TacticalSemanticIdentity(**data["semantic_identity"])
 
+    cfg_data = data["decision_config"]
+    if isinstance(cfg_data, dict):
+        decision_config = DecisionConfigEvidence.from_payload(cfg_data)
+    elif isinstance(cfg_data, DecisionConfigEvidence):
+        decision_config = cfg_data
+    elif isinstance(cfg_data, str):
+        decision_config = DecisionConfigEvidence(canonical_json=cfg_data)
+    else:
+        decision_config = DecisionConfigEvidence.from_payload(dict(cfg_data))
+
+    pol_state_before = PolicyStateInputEvidence.from_prev_state(data.get("policy_state_before"))
+
     evidence = TacticalFeatureEvidenceV2(
         evidence_schema_version=data["evidence_schema_version"],
-        evidence_id=data.get("evidence_id", ""),
+        evidence_id=ev_id,
         symbol=data["symbol"],
         decision_time_ms=data["decision_time_ms"],
         observed_at_ms=data["observed_at_ms"],
@@ -1396,14 +1796,15 @@ def deserialize_tactical_feature_evidence(raw: str | dict[str, Any]) -> Tactical
         snapshot_hash=data["snapshot_hash"],
         policy_version=data["policy_version"],
         config_hash=data["config_hash"],
-        decision_config=data["decision_config"],
+        decision_config=decision_config,
+        policy_state_before=pol_state_before,
         semantic_identity=sem_id,
         strategy_status=data["strategy_status"],
         source_provenance=source_prov,
         market_snapshot_features=snap_feat,
         reference_universe_evidence=ref_univ,
         playbook_candidates=candidates,
-        selected_playbook=data.get("selected_playbook"),
+        selected_playbook=(data.get("selected_playbook") if data.get("selected_playbook") not in ("NO_TRADE", "NONE", "", None) else None),
         selection_method=data["selection_method"],
         selection_version=data["selection_version"],
         eligible_playbooks=tuple(data.get("eligible_playbooks", [])),
@@ -1424,9 +1825,7 @@ def deserialize_tactical_feature_evidence(raw: str | dict[str, Any]) -> Tactical
         veto_reasons=tuple(data.get("veto_reasons", [])),
     )
 
-    if not evidence.evidence_id:
-        payload = canonical_evidence_payload(evidence)
-        computed_id = compute_evidence_id(payload)
-        evidence = replace(evidence, evidence_id=computed_id)
+    if verify_identity:
+        verify_tactical_evidence_identity(evidence)
 
     return evidence

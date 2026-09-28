@@ -351,6 +351,8 @@ class DerivativesMetrics:
     order_book_imbalance: float | None = None
     regime: DerivativesRegime = DerivativesRegime.NEUTRAL
     reasons: tuple[str, ...] = ()
+    risk_codes: tuple[str, ...] = ()
+    regime_reason_codes: tuple[str, ...] = ()
     field_availability: dict[str, bool] = field(default_factory=dict)
     endpoint_errors: dict[str, str] = field(default_factory=dict)
 

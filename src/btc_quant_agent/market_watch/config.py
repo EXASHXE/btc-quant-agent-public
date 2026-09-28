@@ -7,7 +7,7 @@ from dataclasses import asdict, dataclass, field, fields
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
-    from collections.abc import Sequence
+    from collections.abc import Mapping, Sequence
 
 
 def _require_positive_int(value: Any, name: str) -> None:
@@ -270,11 +270,16 @@ def market_watch_config_hash_payload(config: MarketWatchConfig) -> dict[str, Any
     }
 
 
+def compute_market_watch_config_hash_from_payload(payload: Mapping[str, Any]) -> str:
+    """Compute deterministic audit hash directly from configuration hash payload."""
+    raw = json.dumps(payload, sort_keys=True)
+    return hashlib.sha256(raw.encode("utf-8")).hexdigest()[:16]
+
+
 def compute_market_watch_config_hash(config: MarketWatchConfig) -> str:
     """Compute deterministic audit hash for MarketWatch configuration.
 
     Isolated from global research config_hash. Changes when thresholds or parameters change.
     """
     payload = market_watch_config_hash_payload(config)
-    raw = json.dumps(payload, sort_keys=True)
-    return hashlib.sha256(raw.encode("utf-8")).hexdigest()[:16]
+    return compute_market_watch_config_hash_from_payload(payload)

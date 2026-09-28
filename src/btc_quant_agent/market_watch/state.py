@@ -31,6 +31,8 @@ from .evidence import (
     TacticalFeatureEvidenceV2,
     canonical_evidence_json,
     deserialize_tactical_feature_evidence,
+    validate_tactical_feature_evidence,
+    verify_tactical_evidence_identity,
 )
 
 
@@ -367,9 +369,24 @@ class MarketWatchStateStore:
                 )
                 """
             )
+            # Scan for duplicate natural keys with divergent evidence IDs (Section 38)
+            cur_dup = conn.execute(
+                """
+                SELECT symbol, decision_time_ms, snapshot_hash, policy_version, config_hash, COUNT(DISTINCT evidence_id) AS cnt
+                FROM tactical_feature_evidence_v2
+                GROUP BY symbol, decision_time_ms, snapshot_hash, policy_version, config_hash
+                HAVING cnt > 1
+                """
+            )
+            conflict_row = cur_dup.fetchone()
+            if conflict_row is not None:
+                raise TacticalEvidenceConflictError(
+                    f"B1_R1_EXISTING_EVIDENCE_CONFLICT: Duplicate natural key with divergent evidence IDs found in database: {conflict_row}"
+                )
+
             conn.execute(
                 """
-                CREATE INDEX IF NOT EXISTS idx_tactical_evidence_natural_key
+                CREATE UNIQUE INDEX IF NOT EXISTS idx_tactical_feat_ev_natural_key
                 ON tactical_feature_evidence_v2 (symbol, decision_time_ms, snapshot_hash, policy_version, config_hash)
                 """
             )
@@ -515,6 +532,10 @@ class MarketWatchStateStore:
         if evidence is None:
             evidence = getattr(assessment, "feature_evidence", None)
 
+        if evidence is not None:
+            validate_tactical_feature_evidence(evidence)
+            verify_tactical_evidence_identity(evidence)
+
         with self._connect() as conn:
             if evidence is not None:
                 cur_ev = conn.execute(
@@ -560,36 +581,57 @@ class MarketWatchStateStore:
                         if hasattr(evidence.reference_universe_evidence, "status")
                         else getattr(evidence.reference_universe_evidence, "reference_universe_status", "UNIVERSE_COMPLETE")
                     )
-                    conn.execute(
-                        """
-                        INSERT INTO tactical_feature_evidence_v2 (
-                            evidence_id, evidence_schema_version, decision_time_ms, symbol,
-                            snapshot_hash, policy_version, config_hash, semantic_identity_hash,
-                            signal_identity, setup_key, lifecycle_state, selected_playbook,
-                            final_directional_decision, rule_score, reference_universe_status,
-                            evidence_json, persisted_at_ms
-                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                        """,
-                        (
-                            evidence.evidence_id,
-                            evidence.evidence_schema_version,
-                            evidence.decision_time_ms,
-                            evidence.symbol,
-                            evidence.snapshot_hash,
-                            evidence.policy_version,
-                            evidence.config_hash,
-                            sem_hash,
-                            evidence.signal_identity,
-                            evidence.setup_key,
-                            evidence.lifecycle_state,
-                            evidence.selected_playbook,
-                            final_dir,
-                            evidence.rule_score,
-                            ref_status,
-                            canonical_evidence_json(evidence),
-                            now_ms,
-                        ),
-                    )
+                    try:
+                        conn.execute(
+                            """
+                            INSERT INTO tactical_feature_evidence_v2 (
+                                evidence_id, evidence_schema_version, decision_time_ms, symbol,
+                                snapshot_hash, policy_version, config_hash, semantic_identity_hash,
+                                signal_identity, setup_key, lifecycle_state, selected_playbook,
+                                final_directional_decision, rule_score, reference_universe_status,
+                                evidence_json, persisted_at_ms
+                            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                            """,
+                            (
+                                evidence.evidence_id,
+                                evidence.evidence_schema_version,
+                                evidence.decision_time_ms,
+                                evidence.symbol,
+                                evidence.snapshot_hash,
+                                evidence.policy_version,
+                                evidence.config_hash,
+                                sem_hash,
+                                evidence.signal_identity,
+                                evidence.setup_key,
+                                evidence.lifecycle_state,
+                                evidence.selected_playbook,
+                                final_dir,
+                                evidence.rule_score,
+                                ref_status,
+                                canonical_evidence_json(evidence),
+                                now_ms,
+                            ),
+                        )
+                    except sqlite3.IntegrityError as exc:
+                        cur_race = conn.execute(
+                            """
+                            SELECT evidence_id FROM tactical_feature_evidence_v2
+                            WHERE symbol = ? AND decision_time_ms = ? AND snapshot_hash = ?
+                              AND policy_version = ? AND config_hash = ?
+                            """,
+                            (
+                                evidence.symbol,
+                                evidence.decision_time_ms,
+                                evidence.snapshot_hash,
+                                evidence.policy_version,
+                                evidence.config_hash,
+                            ),
+                        )
+                        race_row = cur_race.fetchone()
+                        if race_row is not None and race_row[0] != evidence.evidence_id:
+                            raise TacticalEvidenceConflictError(
+                                f"Concurrent conflict on natural key: existing={race_row[0]}, new={evidence.evidence_id}"
+                            ) from exc
 
             conn.execute(
                 """

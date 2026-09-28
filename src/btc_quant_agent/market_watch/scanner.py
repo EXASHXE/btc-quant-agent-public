@@ -341,9 +341,10 @@ class MarketWatchScanner:
             spread_bps=deriv_metrics.spread_bps,
             order_book_imbalance=deriv_metrics.order_book_imbalance,
             field_availability=deriv_metrics.field_availability,
-            endpoint_errors=deriv_metrics.endpoint_errors,
             regime=d_regime,
             reasons=d_reasons + d_risks,
+            risk_codes=tuple(d_risks),
+            regime_reason_codes=tuple(d_reasons),
         )
 
         # Strict PIT receipt semantics (R2.1-03):
@@ -835,6 +836,7 @@ class MarketWatchScanner:
             decision_trace=decision_trace,
             rule_score_breakdown=rule_score_breakdown,
             config=self.config,
+            policy_state_before=prev_state,
         )
         self._last_evidences[symbol] = evidence
         fp = compute_decision_fingerprint(temp_assessment, self.config)
