@@ -1,0 +1,466 @@
+{
+  "schema_id": "H41_FROZEN_PROTOCOL_AUTHORITY_V1",
+  "protocol_status": "FROZEN_AUTHORITATIVE",
+  "governance_role": "CONTROLLER_SCIENTIFIC_FREEZE",
+  "ratification_timestamp_utc": "2026-09-28T15:30:00Z",
+  "authority_hashes": {
+    "candidate_ledger_hash": "d2ee1551ab4778e8ce34e83e053aba17ebb6be240aed812a4beedb218548b7e0",
+    "event_pit_contract_hash": "88ffc23e0f28939a8cc7a3b007d181178798f0d8048aef2014e1f0f0c96bbb20",
+    "endpoint_contract_hash": "ba467d3c69d0b0f266137536d432beea9523b0ba39ccfc7ffd610eeb72c21314",
+    "inference_contract_hash": "6b7c3d5289fd9cc132affb51f85fa292049868b96041b2b749cc11cf8be11136",
+    "source_requirements_hash": "73560ed5acdb2f176c4aed125d841fdf92dff477fb73f4fa86a7847a42e4828c",
+    "validation_lifecycle_contract_hash": "6aaddc207f56b0eb39deacf13c0cc3c0c17757e16d3ca9e7834abbdeb42ee10d",
+    "frozen_h41_semantic_root_hash": "682e50dcb68563a6ab5e1d7d228827c0886a7ad2bba030c419f1602b1c31e118",
+    "frozen_protocol_hash": "682e50dcb68563a6ab5e1d7d228827c0886a7ad2bba030c419f1602b1c31e118"
+  },
+  "predecessor": {
+    "campaign": "H40",
+    "terminal_state": "CLOSED_NOT_TESTABLE",
+    "rerun_permitted": false,
+    "authority_reused": false
+  },
+  "lineage_and_transport": {
+    "scientific_execution_authority_commit": "c0059b7bd26beb90096792a5232e5ad58e75580c",
+    "docs_branch_transport_head_commit": "e9b181b7afecb38240830583b359968a86af0769",
+    "implementation_branch_expected_sha": "407dabc415ae8cae4210250e992941c8b9b25464",
+    "implementation_branch_untouched": true,
+    "rejected_submission_commit": "1cc384f467fd941330895b1c6e9663dfc4ffc5a1",
+    "rejected_submission_authority": "REJECTED_NON_AUTHORITATIVE_HISTORICAL_AUDIT_ONLY"
+  },
+  "scientific_execution_artifacts": {
+    "script": {
+      "path": "scripts/v0.5/h41_r2_inference_validation_r1.py",
+      "blob_sha": "ec8f975a45f7ff6c73beb238e4711aae62bdbb3d"
+    },
+    "tests": {
+      "path": "tests/test_h41_r2_inference_validation.py",
+      "blob_sha": "0fdbcd75975b7416293662fd417511254871658f"
+    },
+    "evidence": {
+      "path": "evidence/v0.5/h41/V0.5.1_H41_R2_INFERENCE_VALIDATION_EVIDENCE_R1.json",
+      "blob_sha": "c472831cd6c02790a62b94c93b4daf07f444cec1"
+    },
+    "report": {
+      "path": "reviews/v0.5/V0.5.1_H41_R2_INFERENCE_VALIDATION_REPORT_R1.md",
+      "blob_sha": "cbebe0429b3e5cb9226497a471b5f81f80f29278"
+    }
+  },
+  "stage_r2_formal_validation_summary": {
+    "formal_scale": {
+      "monte_carlo_runs_M": 2000,
+      "bootstrap_draws_B": 10000,
+      "canonical_hours_T": 2184,
+      "candidate_count_K": 20,
+      "dgp_classes_count": 12
+    },
+    "runtime_seconds": 2597.5,
+    "block_length_evaluations": {
+      "24h": {
+        "avg_fwer": 0.0594,
+        "max_fwer": 0.0725,
+        "avg_simultaneous_coverage": 0.9404,
+        "min_simultaneous_coverage": 0.9275,
+        "status": "ANTI_CONSERVATIVE_REJECT",
+        "notes": "Truncates Bartlett covariance taper on h=24; underestimates LRV by ~22%"
+      },
+      "48h": {
+        "avg_fwer": 0.0508,
+        "max_fwer": 0.062,
+        "avg_simultaneous_coverage": 0.949,
+        "min_simultaneous_coverage": 0.938,
+        "status": "ANTI_CONSERVATIVE_REJECT",
+        "notes": "Exceeds 0.0595 upper tolerance threshold under AR(1) persistence"
+      },
+      "72h": {
+        "avg_fwer": 0.0469,
+        "max_fwer": 0.0565,
+        "avg_simultaneous_coverage": 0.9529,
+        "min_simultaneous_coverage": 0.9435,
+        "status": "ACCEPTABLE",
+        "notes": "Full Bartlett taper captured; passes all criteria; 30.3 nominal blocks"
+      },
+      "120h": {
+        "avg_fwer": 0.0418,
+        "max_fwer": 0.0475,
+        "avg_simultaneous_coverage": 0.9579,
+        "min_simultaneous_coverage": 0.95,
+        "status": "ACCEPTABLE_SELECTED",
+        "notes": "Selected by prospective tie-break (lowest average FWER); multi-day robustness"
+      },
+      "168h": {
+        "avg_fwer": 0.0329,
+        "max_fwer": 0.0385,
+        "avg_simultaneous_coverage": 0.9669,
+        "min_simultaneous_coverage": 0.9615,
+        "status": "EXTENDED_DIAGNOSTIC_STABLE",
+        "notes": "Diagnostic only; conservative; not active without successor campaign"
+      }
+    },
+    "selected_frozen_block_length_hours": 120,
+    "r2_method_validation": "PASS"
+  },
+  "marginal_coverage_closure": {
+    "preregistered_requirement": "marginal_coordinate_coverage >= 0.945",
+    "simultaneous_coverage_minimum": 0.95,
+    "mathematical_implication": "For every coordinate i, {all coordinates covered} is a subset of {coordinate i covered}. Therefore, P(coordinate i covered) >= P(all coordinates covered) >= 0.9500 > 0.945. Marginal coverage >= 0.9500 holds universally across all 20 coordinates by simultaneous event dominance.",
+    "closure_status": "CLOSED_BY_SIMULTANEOUS_DOMINANCE"
+  },
+  "power_curve_classification": {
+    "selected_block_length_hours": 120,
+    "h4_20bp_power": 0.354,
+    "h24_20bp_power": 0.016,
+    "classification_h4": "METHOD_POWER_LIMITED",
+    "classification_h24": "METHOD_POWER_LIMITED",
+    "interpretation_mandate": "Failure to obtain simultaneous LCB > 0 on exploratory Discovery is not equivalent to proof of zero economic edge when the candidate's method-power class is limited. Low synthetic power must not be used to relax the LCB > 0 selection gate."
+  },
+  "frozen_candidate_universe": {
+    "candidate_count": 20,
+    "active_outcome_horizons": [
+      4,
+      8,
+      24
+    ],
+    "disallowed_outcome_horizons": [
+      12,
+      16,
+      18,
+      36,
+      48,
+      72
+    ],
+    "family_breakdown": {
+      "D1_TREND": 4,
+      "D2_BREAKOUT": 4,
+      "D3_FAILED_BREAK": 4,
+      "D4_MODIFIER": 8
+    },
+    "candidates": [
+      {
+        "slot": 1,
+        "candidate_id": "H41_D1_BTC_RET4_Q80_H4",
+        "family": "D1_TREND",
+        "target_asset": "BTCUSDT",
+        "lookback_window_hours": 4,
+        "decision_condition": "abs(score) >= train_frozen_Q80; score = log(Close(B0)/Close(B4)); side = sign(score)",
+        "horizon_hours": 4,
+        "parent_id": null,
+        "modifier_type": null
+      },
+      {
+        "slot": 2,
+        "candidate_id": "H41_D1_BTC_RET12_Q80_H24",
+        "family": "D1_TREND",
+        "target_asset": "BTCUSDT",
+        "lookback_window_hours": 12,
+        "decision_condition": "abs(score) >= train_frozen_Q80; score = log(Close(B0)/Close(B12)); side = sign(score)",
+        "horizon_hours": 24,
+        "parent_id": null,
+        "modifier_type": null
+      },
+      {
+        "slot": 3,
+        "candidate_id": "H41_D1_ETH_RET4_Q80_H4",
+        "family": "D1_TREND",
+        "target_asset": "ETHUSDT",
+        "lookback_window_hours": 4,
+        "decision_condition": "abs(score) >= train_frozen_Q80; score = log(Close(B0)/Close(B4)); side = sign(score)",
+        "horizon_hours": 4,
+        "parent_id": null,
+        "modifier_type": null
+      },
+      {
+        "slot": 4,
+        "candidate_id": "H41_D1_ETH_RET12_Q80_H24",
+        "family": "D1_TREND",
+        "target_asset": "ETHUSDT",
+        "lookback_window_hours": 12,
+        "decision_condition": "abs(score) >= train_frozen_Q80; score = log(Close(B0)/Close(B12)); side = sign(score)",
+        "horizon_hours": 24,
+        "parent_id": null,
+        "modifier_type": null
+      },
+      {
+        "slot": 5,
+        "candidate_id": "H41_D2_BTC_BO24_H4",
+        "family": "D2_BREAKOUT",
+        "target_asset": "BTCUSDT",
+        "lookback_window_hours": 24,
+        "decision_condition": "Close(B0) > max(High(B1..B24)) -> +1; Close(B0) < min(Low(B1..B24)) -> -1",
+        "horizon_hours": 4,
+        "parent_id": null,
+        "modifier_type": null
+      },
+      {
+        "slot": 6,
+        "candidate_id": "H41_D2_BTC_BO72_H24",
+        "family": "D2_BREAKOUT",
+        "target_asset": "BTCUSDT",
+        "lookback_window_hours": 72,
+        "decision_condition": "Close(B0) > max(High(B1..B72)) -> +1; Close(B0) < min(Low(B1..B72)) -> -1",
+        "horizon_hours": 24,
+        "parent_id": null,
+        "modifier_type": null
+      },
+      {
+        "slot": 7,
+        "candidate_id": "H41_D2_ETH_BO24_H4",
+        "family": "D2_BREAKOUT",
+        "target_asset": "ETHUSDT",
+        "lookback_window_hours": 24,
+        "decision_condition": "Close(B0) > max(High(B1..B24)) -> +1; Close(B0) < min(Low(B1..B24)) -> -1",
+        "horizon_hours": 4,
+        "parent_id": null,
+        "modifier_type": null
+      },
+      {
+        "slot": 8,
+        "candidate_id": "H41_D2_ETH_BO72_H24",
+        "family": "D2_BREAKOUT",
+        "target_asset": "ETHUSDT",
+        "lookback_window_hours": 72,
+        "decision_condition": "Close(B0) > max(High(B1..B72)) -> +1; Close(B0) < min(Low(B1..B72)) -> -1",
+        "horizon_hours": 24,
+        "parent_id": null,
+        "modifier_type": null
+      },
+      {
+        "slot": 9,
+        "candidate_id": "H41_D3_BTC_FB24_H4",
+        "family": "D3_FAILED_BREAK",
+        "target_asset": "BTCUSDT",
+        "lookback_window_hours": 24,
+        "decision_condition": "Close(B1) > max(High(B2..B25)) & Close(B0) inside -> -1; Close(B1) < min(Low(B2..B25)) & Close(B0) inside -> +1",
+        "horizon_hours": 4,
+        "parent_id": null,
+        "modifier_type": null
+      },
+      {
+        "slot": 10,
+        "candidate_id": "H41_D3_BTC_FB72_H8",
+        "family": "D3_FAILED_BREAK",
+        "target_asset": "BTCUSDT",
+        "lookback_window_hours": 72,
+        "decision_condition": "Close(B1) > max(High(B2..B73)) & Close(B0) inside -> -1; Close(B1) < min(Low(B2..B73)) & Close(B0) inside -> +1",
+        "horizon_hours": 8,
+        "parent_id": null,
+        "modifier_type": null
+      },
+      {
+        "slot": 11,
+        "candidate_id": "H41_D3_ETH_FB24_H4",
+        "family": "D3_FAILED_BREAK",
+        "target_asset": "ETHUSDT",
+        "lookback_window_hours": 24,
+        "decision_condition": "Close(B1) > max(High(B2..B25)) & Close(B0) inside -> -1; Close(B1) < min(Low(B2..B25)) & Close(B0) inside -> +1",
+        "horizon_hours": 4,
+        "parent_id": null,
+        "modifier_type": null
+      },
+      {
+        "slot": 12,
+        "candidate_id": "H41_D3_ETH_FB72_H8",
+        "family": "D3_FAILED_BREAK",
+        "target_asset": "ETHUSDT",
+        "lookback_window_hours": 72,
+        "decision_condition": "Close(B1) > max(High(B2..B73)) & Close(B0) inside -> -1; Close(B1) < min(Low(B2..B73)) & Close(B0) inside -> +1",
+        "horizon_hours": 8,
+        "parent_id": null,
+        "modifier_type": null
+      },
+      {
+        "slot": 13,
+        "candidate_id": "H41_D4_BTC_RET4_CONFIRM_H4",
+        "family": "D4_MODIFIER",
+        "target_asset": "BTCUSDT",
+        "lookback_window_hours": 4,
+        "decision_condition": "Parent BTC RET4_Q80 side matches ETH RET4 sign",
+        "horizon_hours": 4,
+        "parent_id": "H41_D1_BTC_RET4_Q80_H4",
+        "modifier_type": "CONFIRM"
+      },
+      {
+        "slot": 14,
+        "candidate_id": "H41_D4_BTC_RET4_DIVERGE_H4",
+        "family": "D4_MODIFIER",
+        "target_asset": "BTCUSDT",
+        "lookback_window_hours": 4,
+        "decision_condition": "Parent BTC RET4_Q80 side opposes ETH RET4 sign",
+        "horizon_hours": 4,
+        "parent_id": "H41_D1_BTC_RET4_Q80_H4",
+        "modifier_type": "DIVERGE"
+      },
+      {
+        "slot": 15,
+        "candidate_id": "H41_D4_ETH_RET4_CONFIRM_H4",
+        "family": "D4_MODIFIER",
+        "target_asset": "ETHUSDT",
+        "lookback_window_hours": 4,
+        "decision_condition": "Parent ETH RET4_Q80 side matches BTC RET4 sign",
+        "horizon_hours": 4,
+        "parent_id": "H41_D1_ETH_RET4_Q80_H4",
+        "modifier_type": "CONFIRM"
+      },
+      {
+        "slot": 16,
+        "candidate_id": "H41_D4_ETH_RET4_DIVERGE_H4",
+        "family": "D4_MODIFIER",
+        "target_asset": "ETHUSDT",
+        "lookback_window_hours": 4,
+        "decision_condition": "Parent ETH RET4_Q80 side opposes BTC RET4 sign",
+        "horizon_hours": 4,
+        "parent_id": "H41_D1_ETH_RET4_Q80_H4",
+        "modifier_type": "DIVERGE"
+      },
+      {
+        "slot": 17,
+        "candidate_id": "H41_D4_BTC_BO24_CONFIRM_H4",
+        "family": "D4_MODIFIER",
+        "target_asset": "BTCUSDT",
+        "lookback_window_hours": 24,
+        "decision_condition": "Parent BTC BO24 side matches ETH RET4 sign",
+        "horizon_hours": 4,
+        "parent_id": "H41_D2_BTC_BO24_H4",
+        "modifier_type": "CONFIRM"
+      },
+      {
+        "slot": 18,
+        "candidate_id": "H41_D4_BTC_BO24_DIVERGE_H4",
+        "family": "D4_MODIFIER",
+        "target_asset": "BTCUSDT",
+        "lookback_window_hours": 24,
+        "decision_condition": "Parent BTC BO24 side opposes ETH RET4 sign",
+        "horizon_hours": 4,
+        "parent_id": "H41_D2_BTC_BO24_H4",
+        "modifier_type": "DIVERGE"
+      },
+      {
+        "slot": 19,
+        "candidate_id": "H41_D4_ETH_BO24_CONFIRM_H4",
+        "family": "D4_MODIFIER",
+        "target_asset": "ETHUSDT",
+        "lookback_window_hours": 24,
+        "decision_condition": "Parent ETH BO24 side matches BTC RET4 sign",
+        "horizon_hours": 4,
+        "parent_id": "H41_D2_ETH_BO24_H4",
+        "modifier_type": "CONFIRM"
+      },
+      {
+        "slot": 20,
+        "candidate_id": "H41_D4_ETH_BO24_DIVERGE_H4",
+        "family": "D4_MODIFIER",
+        "target_asset": "ETHUSDT",
+        "lookback_window_hours": 24,
+        "decision_condition": "Parent ETH BO24 side opposes BTC RET4 sign",
+        "horizon_hours": 4,
+        "parent_id": "H41_D2_ETH_BO24_H4",
+        "modifier_type": "DIVERGE"
+      }
+    ]
+  },
+  "frozen_contracts": {
+    "event_pit_contract": {
+      "canonical_bar_interval_seconds": 3600,
+      "bar_interval_definition": "B_0(t) is last completed bar finalized at UTC hour t; B_entry(t) is [t, t+1h)",
+      "source_finalization_timestamp": "t_avail(B_k) = T_{k+1}, bar finalized and available at UTC hour boundary",
+      "decision_boundary": "t = T_{k+1}, causal execution decision occurs at t, strictly <= t information cutoff, zero forward leakage",
+      "reference_entry_price": "P_entry(t) = Open(B_entry(t)) causally following B_0(t) finalization",
+      "reference_exit_timestamp": "t_exit = t + h, where h in {4, 8, 24}",
+      "reference_exit_price": "P_exit(t) = Open(B_{t+h}) == Close(B_{t+h-1})",
+      "horizon_return_formula": "r_gross(t) = s_t * (P_exit(t) / P_entry(t) - 1) on equal entry notional",
+      "right_boundary_censoring": "Events with t + h > T_partition_end strictly prospectively censored (A[i, t] = 0); requires h-hour reserve at partition end",
+      "synchronized_eligibility": "Both BTC and ETH 1h bars must be finalized, non-missing, and consecutive at t",
+      "missing_bar_handling": "Missing or non-consecutive hourly bars fail closed with A[i, t] = 0",
+      "train_frozen_q80_policy": "Linear interpolation quantile computed exclusively on WF1_TRAIN valid bars (minimum N >= 500); permanently frozen before WF1_CALIBRATION",
+      "support_floors": {
+        "min_events_N": 60,
+        "min_occupied_calendar_days_D": 30
+      }
+    },
+    "endpoint_contract": {
+      "primary_formula": "mean(signed_simple_horizon_return - 0.0012)",
+      "fixed_friction_proxy_base_bps": 12.0,
+      "fixed_friction_proxy_stress_bps": 24.0,
+      "claim_scope": "equal-entry-notional, event-conditioned directional expectancy after a fixed friction proxy, before funding and portfolio constraints.",
+      "claim_scope_exclusions": [
+        "all-cost net execution P&L",
+        "capital-normalized portfolio return or Sharpe ratio",
+        "funded perpetual return with funding/borrow carry",
+        "executable strategy with position sizing, inventory limits, slippage modeling, or order-book queue dynamics"
+      ],
+      "stress_role": "Diagnostic only; cannot overturn or substitute primary 12bp gate"
+    },
+    "inference_contract": {
+      "methodology": "shared-clock, source-bundle preserving, non-circular moving-block Studentized bootstrap-t single-step joint maximum inference",
+      "point_estimator": "ratio estimator mu_hat_i = sum_t Z_{i,t} / sum_t A_{i,t}",
+      "frozen_block_length_hours": 120,
+      "bootstrap_replicates_B": 10000,
+      "joint_shared_clock_rule": "Exactly one block-index sequence tau_1..tau_m drawn per bootstrap replicate and applied jointly across all K=20 candidates and both assets",
+      "ratio_estimator_lrv": "Kuensch (1989) ratio-estimator moving block sum variance formula SE_hat_i = sqrt( (1 / (L*S)) * sum_s (Z^{(L)}_{i,s} - mu_hat_i * A^{(L)}_{i,s})^2 ) / A_bar_i",
+      "bootstrap_centering_rule": "center_i = sum_j Z^{(L)}_{i, tau_j} / sum_j A^{(L)}_{i, tau_j} (non-circular moving block sum)",
+      "studentization_rule": "T^*_{i,b} = (mu^*_{i,b} - center_i) / SE^*_{i,b}",
+      "joint_test_statistic": "max_{i in 0..K-1} T^*_{i,b}",
+      "critical_value_c95": "95th percentile of empirical bootstrap distribution of joint maximum statistic",
+      "simultaneous_lcb": "LCB_i = mu_hat_i - c95 * SE_hat_i",
+      "zero_event_fail_closed": "Candidates failing support floors or with zero events receive LCB = -infinity",
+      "decision_gate": "simultaneous LCB_i > 0",
+      "power_class_h4": "METHOD_POWER_LIMITED (35.4% at delta=20bp)",
+      "power_class_h24": "METHOD_POWER_LIMITED (1.6% at delta=20bp)",
+      "power_interpretation_guardrail": "Failure to obtain simultaneous LCB > 0 on exploratory Discovery is not equivalent to proof of zero economic edge when the candidate's method-power class is limited. Low synthetic power must not be used to relax the LCB > 0 selection gate."
+    },
+    "source_requirements": {
+      "btc_source_state": "NOT_YET_CLOSED",
+      "eth_source_state": "NOT_YET_CLOSED",
+      "resolution_stage": "H41_BTC_ETH_CANONICAL_SOURCE_AUTHORITY_CLOSURE",
+      "required_properties": [
+        "Canonical 1-hour OHLC intervals [T_k, T_{k+1})",
+        "Strictly UTC-aligned boundaries",
+        "Strict volume and trade count integrity",
+        "Zero forward-looking revisions (PIT invariant)",
+        "Synchronized joint timestamps between BTC and ETH across 2021-01-01 to 2023-04-30 UTC",
+        "16 source invariants from Controller Adjudication R1"
+      ]
+    },
+    "validation_lifecycle_contract": {
+      "exploratory_partition": "WF1_CALIBRATION (2022-11-01 to 2023-01-31 UTC, 2184 canonical hours)",
+      "exploratory_status": "HISTORICALLY_INFORMED_EXPLORATORY_DISCOVERY",
+      "candidate_selection_rule": "Deterministic ranking among candidates with valid simultaneous LCB > 0: (1) highest full-precision LCB, (2) larger event count N, (3) lexicographically lower candidate ID",
+      "exploratory_lock_name": "H41_EXPLORATORY_DIRECTIONAL_CANDIDATE_LOCK_V1",
+      "no_go_outcome": "H41_EXPLORATORY_NO_GO if 0 candidates pass LCB > 0 gate",
+      "validation_partition": "WF1_VALIDATION (2023-02-01 to 2023-04-30 UTC)",
+      "single_candidate_gate": "Exactly one locked candidate enters WF1_VALIDATION",
+      "no_fallback_rule": "If locked candidate fails validation, Candidate #2 is NOT evaluated; campaign terminates as validation failure",
+      "no_retuning_rule": "Zero hyperparameter tuning or semantic modification permitted after unsealing",
+      "successor_campaign_requirement": "Evaluating alternative candidates requires a separate authorized successor campaign",
+      "sealed_partitions": [
+        "WF1_VALIDATION",
+        "Confirmation",
+        "H39",
+        "Final Holdout"
+      ]
+    }
+  },
+  "lifecycle_governance": {
+    "H40": "CLOSED_NOT_TESTABLE",
+    "H41_ASTRA_AUDIT": "COMPLETE",
+    "H41_CONTROLLER_ADJUDICATION": "COMPLETE",
+    "H41_R1_1_HORIZON_SCOPE_AMENDMENT": "COMPLETE",
+    "H41_R2_REPAIR": "COMPLETE",
+    "H41_R2_FULL_SCALE": "COMPLETE",
+    "H41_R2_METHOD_VALIDATION": "PASS",
+    "H41_CANDIDATE_COUNT": 20,
+    "H41_ACTIVE_HORIZONS": [
+      4,
+      8,
+      24
+    ],
+    "H41_FROZEN_BLOCK_LENGTH": "120_HOURS",
+    "H41_PROTOCOL_FROZEN": true,
+    "H41_SEARCH_SPACE_AUTHORIZED": "YES_FOR_IMPLEMENTATION",
+    "H41_IMPLEMENTATION_AUTHORIZED": false,
+    "H41_REAL_DISCOVERY_AUTHORIZED": false,
+    "BTC_H41_SOURCE_AUTHORITY": "NOT_YET_CLOSED",
+    "ETH_H41_SOURCE_AUTHORITY": "NOT_YET_CLOSED",
+    "EXECUTION": "RESEARCH_DISABLED_V1",
+    "NEXT_STAGE": "H41_BTC_ETH_CANONICAL_SOURCE_AUTHORITY_CLOSURE"
+  }
+}
