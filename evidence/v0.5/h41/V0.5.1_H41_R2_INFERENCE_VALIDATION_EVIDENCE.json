@@ -1,0 +1,628 @@
+{
+  "metadata": {
+    "stage": "H41_R2_OUTCOME_FREE_INFERENCE_VALIDATION_R1",
+    "evaluated_block_lengths_hours": [
+      24,
+      48,
+      72,
+      120,
+      168
+    ],
+    "horizons_hours": [
+      4,
+      8,
+      24
+    ],
+    "monte_carlo_runs_M": 100,
+    "bootstrap_replicates_B": 1000,
+    "master_seed": 20260928,
+    "total_canonical_hours_T": 2184,
+    "num_candidates_K": 20,
+    "elapsed_seconds": 4967.94
+  },
+  "scenario_evaluations": {
+    "Class_1": {
+      "name": "Class 1: Independent Increments Baseline",
+      "block_length_metrics": {
+        "L_24h": {
+          "block_length_hours": 24,
+          "empirical_fwer": 0.09,
+          "fwer_std_err": 0.0286,
+          "simultaneous_coverage": 0.91,
+          "mean_se_h24": 0.002544,
+          "valid_runs": 100
+        },
+        "L_48h": {
+          "block_length_hours": 48,
+          "empirical_fwer": 0.06,
+          "fwer_std_err": 0.0237,
+          "simultaneous_coverage": 0.94,
+          "mean_se_h24": 0.00269,
+          "valid_runs": 100
+        },
+        "L_72h": {
+          "block_length_hours": 72,
+          "empirical_fwer": 0.1,
+          "fwer_std_err": 0.03,
+          "simultaneous_coverage": 0.9,
+          "mean_se_h24": 0.002719,
+          "valid_runs": 100
+        },
+        "L_120h": {
+          "block_length_hours": 120,
+          "empirical_fwer": 0.17,
+          "fwer_std_err": 0.0376,
+          "simultaneous_coverage": 0.83,
+          "mean_se_h24": 0.002773,
+          "valid_runs": 100
+        },
+        "L_168h": {
+          "block_length_hours": 168,
+          "empirical_fwer": 0.09,
+          "fwer_std_err": 0.0286,
+          "simultaneous_coverage": 0.91,
+          "mean_se_h24": 0.002651,
+          "valid_runs": 100
+        }
+      }
+    },
+    "Class_2": {
+      "name": "Class 2: Overlapping Moving-Sum Returns (h in {4,8,24})",
+      "block_length_metrics": {
+        "L_24h": {
+          "block_length_hours": 24,
+          "empirical_fwer": 0.09,
+          "fwer_std_err": 0.0286,
+          "simultaneous_coverage": 0.91,
+          "mean_se_h24": 0.002983,
+          "valid_runs": 100
+        },
+        "L_48h": {
+          "block_length_hours": 48,
+          "empirical_fwer": 0.09,
+          "fwer_std_err": 0.0286,
+          "simultaneous_coverage": 0.91,
+          "mean_se_h24": 0.003287,
+          "valid_runs": 100
+        },
+        "L_72h": {
+          "block_length_hours": 72,
+          "empirical_fwer": 0.1,
+          "fwer_std_err": 0.03,
+          "simultaneous_coverage": 0.9,
+          "mean_se_h24": 0.003292,
+          "valid_runs": 100
+        },
+        "L_120h": {
+          "block_length_hours": 120,
+          "empirical_fwer": 0.04,
+          "fwer_std_err": 0.0196,
+          "simultaneous_coverage": 0.96,
+          "mean_se_h24": 0.00336,
+          "valid_runs": 100
+        },
+        "L_168h": {
+          "block_length_hours": 168,
+          "empirical_fwer": 0.08,
+          "fwer_std_err": 0.0271,
+          "simultaneous_coverage": 0.92,
+          "mean_se_h24": 0.003257,
+          "valid_runs": 100
+        }
+      }
+    },
+    "Class_3": {
+      "name": "Class 3: Autoregressive (AR) Serial Dependence",
+      "block_length_metrics": {
+        "L_24h": {
+          "block_length_hours": 24,
+          "empirical_fwer": 0.06,
+          "fwer_std_err": 0.0237,
+          "simultaneous_coverage": 0.94,
+          "mean_se_h24": 0.003386,
+          "valid_runs": 100
+        },
+        "L_48h": {
+          "block_length_hours": 48,
+          "empirical_fwer": 0.08,
+          "fwer_std_err": 0.0271,
+          "simultaneous_coverage": 0.92,
+          "mean_se_h24": 0.00362,
+          "valid_runs": 100
+        },
+        "L_72h": {
+          "block_length_hours": 72,
+          "empirical_fwer": 0.1,
+          "fwer_std_err": 0.03,
+          "simultaneous_coverage": 0.9,
+          "mean_se_h24": 0.003621,
+          "valid_runs": 100
+        },
+        "L_120h": {
+          "block_length_hours": 120,
+          "empirical_fwer": 0.22,
+          "fwer_std_err": 0.0414,
+          "simultaneous_coverage": 0.78,
+          "mean_se_h24": 0.003656,
+          "valid_runs": 100
+        },
+        "L_168h": {
+          "block_length_hours": 168,
+          "empirical_fwer": 0.13,
+          "fwer_std_err": 0.0336,
+          "simultaneous_coverage": 0.87,
+          "mean_se_h24": 0.003627,
+          "valid_runs": 100
+        }
+      }
+    },
+    "Class_4": {
+      "name": "Class 4: Persistent Stochastic Volatility & GARCH(1,1)",
+      "block_length_metrics": {
+        "L_24h": {
+          "block_length_hours": 24,
+          "empirical_fwer": 0.1,
+          "fwer_std_err": 0.03,
+          "simultaneous_coverage": 0.9,
+          "mean_se_h24": 0.002491,
+          "valid_runs": 100
+        },
+        "L_48h": {
+          "block_length_hours": 48,
+          "empirical_fwer": 0.09,
+          "fwer_std_err": 0.0286,
+          "simultaneous_coverage": 0.91,
+          "mean_se_h24": 0.002648,
+          "valid_runs": 100
+        },
+        "L_72h": {
+          "block_length_hours": 72,
+          "empirical_fwer": 0.07,
+          "fwer_std_err": 0.0255,
+          "simultaneous_coverage": 0.93,
+          "mean_se_h24": 0.002743,
+          "valid_runs": 100
+        },
+        "L_120h": {
+          "block_length_hours": 120,
+          "empirical_fwer": 0.09,
+          "fwer_std_err": 0.0286,
+          "simultaneous_coverage": 0.91,
+          "mean_se_h24": 0.002777,
+          "valid_runs": 100
+        },
+        "L_168h": {
+          "block_length_hours": 168,
+          "empirical_fwer": 0.1,
+          "fwer_std_err": 0.03,
+          "simultaneous_coverage": 0.9,
+          "mean_se_h24": 0.002721,
+          "valid_runs": 100
+        }
+      }
+    },
+    "Class_5": {
+      "name": "Class 5: Clustered Sparse Event Masks",
+      "block_length_metrics": {
+        "L_24h": {
+          "block_length_hours": 24,
+          "empirical_fwer": 0.06,
+          "fwer_std_err": 0.0237,
+          "simultaneous_coverage": 0.94,
+          "mean_se_h24": 0.002693,
+          "valid_runs": 100
+        },
+        "L_48h": {
+          "block_length_hours": 48,
+          "empirical_fwer": 0.09,
+          "fwer_std_err": 0.0286,
+          "simultaneous_coverage": 0.91,
+          "mean_se_h24": 0.002903,
+          "valid_runs": 100
+        },
+        "L_72h": {
+          "block_length_hours": 72,
+          "empirical_fwer": 0.08,
+          "fwer_std_err": 0.0271,
+          "simultaneous_coverage": 0.92,
+          "mean_se_h24": 0.00294,
+          "valid_runs": 100
+        },
+        "L_120h": {
+          "block_length_hours": 120,
+          "empirical_fwer": 0.13,
+          "fwer_std_err": 0.0336,
+          "simultaneous_coverage": 0.87,
+          "mean_se_h24": 0.003021,
+          "valid_runs": 100
+        },
+        "L_168h": {
+          "block_length_hours": 168,
+          "empirical_fwer": 0.1,
+          "fwer_std_err": 0.03,
+          "simultaneous_coverage": 0.9,
+          "mean_se_h24": 0.002892,
+          "valid_runs": 100
+        }
+      }
+    },
+    "Class_6": {
+      "name": "Class 6: Unequal Candidate Event Counts",
+      "block_length_metrics": {
+        "L_24h": {
+          "block_length_hours": 24,
+          "empirical_fwer": 0.08,
+          "fwer_std_err": 0.0271,
+          "simultaneous_coverage": 0.92,
+          "mean_se_h24": 0.002496,
+          "valid_runs": 100
+        },
+        "L_48h": {
+          "block_length_hours": 48,
+          "empirical_fwer": 0.07,
+          "fwer_std_err": 0.0255,
+          "simultaneous_coverage": 0.93,
+          "mean_se_h24": 0.002668,
+          "valid_runs": 100
+        },
+        "L_72h": {
+          "block_length_hours": 72,
+          "empirical_fwer": 0.11,
+          "fwer_std_err": 0.0313,
+          "simultaneous_coverage": 0.89,
+          "mean_se_h24": 0.002688,
+          "valid_runs": 100
+        },
+        "L_120h": {
+          "block_length_hours": 120,
+          "empirical_fwer": 0.1,
+          "fwer_std_err": 0.03,
+          "simultaneous_coverage": 0.9,
+          "mean_se_h24": 0.00273,
+          "valid_runs": 100
+        },
+        "L_168h": {
+          "block_length_hours": 168,
+          "empirical_fwer": 0.13,
+          "fwer_std_err": 0.0336,
+          "simultaneous_coverage": 0.87,
+          "mean_se_h24": 0.002645,
+          "valid_runs": 100
+        }
+      }
+    },
+    "Class_7": {
+      "name": "Class 7: Correlated Bivariate Source Processes",
+      "block_length_metrics": {
+        "L_24h": {
+          "block_length_hours": 24,
+          "empirical_fwer": 0.12,
+          "fwer_std_err": 0.0325,
+          "simultaneous_coverage": 0.88,
+          "mean_se_h24": 0.002555,
+          "valid_runs": 100
+        },
+        "L_48h": {
+          "block_length_hours": 48,
+          "empirical_fwer": 0.12,
+          "fwer_std_err": 0.0325,
+          "simultaneous_coverage": 0.88,
+          "mean_se_h24": 0.002657,
+          "valid_runs": 100
+        },
+        "L_72h": {
+          "block_length_hours": 72,
+          "empirical_fwer": 0.09,
+          "fwer_std_err": 0.0286,
+          "simultaneous_coverage": 0.91,
+          "mean_se_h24": 0.002781,
+          "valid_runs": 100
+        },
+        "L_120h": {
+          "block_length_hours": 120,
+          "empirical_fwer": 0.09,
+          "fwer_std_err": 0.0286,
+          "simultaneous_coverage": 0.91,
+          "mean_se_h24": 0.00275,
+          "valid_runs": 100
+        },
+        "L_168h": {
+          "block_length_hours": 168,
+          "empirical_fwer": 0.14,
+          "fwer_std_err": 0.0347,
+          "simultaneous_coverage": 0.86,
+          "mean_se_h24": 0.00277,
+          "valid_runs": 100
+        }
+      }
+    },
+    "Class_8": {
+      "name": "Class 8: Heavy-Tailed Innovations (Student-t df=4)",
+      "block_length_metrics": {
+        "L_24h": {
+          "block_length_hours": 24,
+          "empirical_fwer": 0.11,
+          "fwer_std_err": 0.0313,
+          "simultaneous_coverage": 0.89,
+          "mean_se_h24": 0.002463,
+          "valid_runs": 100
+        },
+        "L_48h": {
+          "block_length_hours": 48,
+          "empirical_fwer": 0.11,
+          "fwer_std_err": 0.0313,
+          "simultaneous_coverage": 0.89,
+          "mean_se_h24": 0.002696,
+          "valid_runs": 100
+        },
+        "L_72h": {
+          "block_length_hours": 72,
+          "empirical_fwer": 0.04,
+          "fwer_std_err": 0.0196,
+          "simultaneous_coverage": 0.96,
+          "mean_se_h24": 0.002754,
+          "valid_runs": 100
+        },
+        "L_120h": {
+          "block_length_hours": 120,
+          "empirical_fwer": 0.09,
+          "fwer_std_err": 0.0286,
+          "simultaneous_coverage": 0.91,
+          "mean_se_h24": 0.002708,
+          "valid_runs": 100
+        },
+        "L_168h": {
+          "block_length_hours": 168,
+          "empirical_fwer": 0.07,
+          "fwer_std_err": 0.0255,
+          "simultaneous_coverage": 0.93,
+          "mean_se_h24": 0.002755,
+          "valid_runs": 100
+        }
+      }
+    },
+    "Class_9": {
+      "name": "Class 9: Near-Support-Threshold Candidates",
+      "block_length_metrics": {
+        "L_24h": {
+          "block_length_hours": 24,
+          "empirical_fwer": 0.09,
+          "fwer_std_err": 0.0286,
+          "simultaneous_coverage": 0.91,
+          "mean_se_h24": 0.002497,
+          "valid_runs": 100
+        },
+        "L_48h": {
+          "block_length_hours": 48,
+          "empirical_fwer": 0.04,
+          "fwer_std_err": 0.0196,
+          "simultaneous_coverage": 0.96,
+          "mean_se_h24": 0.002676,
+          "valid_runs": 100
+        },
+        "L_72h": {
+          "block_length_hours": 72,
+          "empirical_fwer": 0.14,
+          "fwer_std_err": 0.0347,
+          "simultaneous_coverage": 0.86,
+          "mean_se_h24": 0.002725,
+          "valid_runs": 100
+        },
+        "L_120h": {
+          "block_length_hours": 120,
+          "empirical_fwer": 0.13,
+          "fwer_std_err": 0.0336,
+          "simultaneous_coverage": 0.87,
+          "mean_se_h24": 0.002736,
+          "valid_runs": 100
+        },
+        "L_168h": {
+          "block_length_hours": 168,
+          "empirical_fwer": 0.1,
+          "fwer_std_err": 0.03,
+          "simultaneous_coverage": 0.9,
+          "mean_se_h24": 0.002653,
+          "valid_runs": 100
+        }
+      }
+    },
+    "Class_10": {
+      "name": "Class 10: Outcome-Correlated Missingness Stress",
+      "block_length_metrics": {
+        "L_24h": {
+          "block_length_hours": 24,
+          "empirical_fwer": 0.04,
+          "fwer_std_err": 0.0196,
+          "simultaneous_coverage": 0.96,
+          "mean_se_h24": 0.002521,
+          "valid_runs": 100
+        },
+        "L_48h": {
+          "block_length_hours": 48,
+          "empirical_fwer": 0.09,
+          "fwer_std_err": 0.0286,
+          "simultaneous_coverage": 0.91,
+          "mean_se_h24": 0.002674,
+          "valid_runs": 100
+        },
+        "L_72h": {
+          "block_length_hours": 72,
+          "empirical_fwer": 0.1,
+          "fwer_std_err": 0.03,
+          "simultaneous_coverage": 0.9,
+          "mean_se_h24": 0.002762,
+          "valid_runs": 100
+        },
+        "L_120h": {
+          "block_length_hours": 120,
+          "empirical_fwer": 0.1,
+          "fwer_std_err": 0.03,
+          "simultaneous_coverage": 0.9,
+          "mean_se_h24": 0.002705,
+          "valid_runs": 100
+        },
+        "L_168h": {
+          "block_length_hours": 168,
+          "empirical_fwer": 0.15,
+          "fwer_std_err": 0.0357,
+          "simultaneous_coverage": 0.85,
+          "mean_se_h24": 0.002677,
+          "valid_runs": 100
+        }
+      }
+    },
+    "Class_11": {
+      "name": "Class 11: Degenerate / Zero-Count Replicate Stress",
+      "block_length_metrics": {
+        "L_24h": {
+          "block_length_hours": 24,
+          "empirical_fwer": 0.09,
+          "fwer_std_err": 0.0286,
+          "simultaneous_coverage": 0.91,
+          "mean_se_h24": 0.002545,
+          "valid_runs": 100
+        },
+        "L_48h": {
+          "block_length_hours": 48,
+          "empirical_fwer": 0.03,
+          "fwer_std_err": 0.0171,
+          "simultaneous_coverage": 0.97,
+          "mean_se_h24": 0.00269,
+          "valid_runs": 100
+        },
+        "L_72h": {
+          "block_length_hours": 72,
+          "empirical_fwer": 0.11,
+          "fwer_std_err": 0.0313,
+          "simultaneous_coverage": 0.89,
+          "mean_se_h24": 0.002759,
+          "valid_runs": 100
+        },
+        "L_120h": {
+          "block_length_hours": 120,
+          "empirical_fwer": 0.1,
+          "fwer_std_err": 0.03,
+          "simultaneous_coverage": 0.9,
+          "mean_se_h24": 0.00278,
+          "valid_runs": 100
+        },
+        "L_168h": {
+          "block_length_hours": 168,
+          "empirical_fwer": 0.13,
+          "fwer_std_err": 0.0336,
+          "simultaneous_coverage": 0.87,
+          "mean_se_h24": 0.002689,
+          "valid_runs": 100
+        }
+      }
+    },
+    "Class_12": {
+      "name": "Class 12: Mixed Null/Signal Configurations (Global Null)",
+      "block_length_metrics": {
+        "L_24h": {
+          "block_length_hours": 24,
+          "empirical_fwer": 0.07,
+          "fwer_std_err": 0.0255,
+          "simultaneous_coverage": 0.93,
+          "mean_se_h24": 0.002553,
+          "valid_runs": 100
+        },
+        "L_48h": {
+          "block_length_hours": 48,
+          "empirical_fwer": 0.12,
+          "fwer_std_err": 0.0325,
+          "simultaneous_coverage": 0.88,
+          "mean_se_h24": 0.002728,
+          "valid_runs": 100
+        },
+        "L_72h": {
+          "block_length_hours": 72,
+          "empirical_fwer": 0.11,
+          "fwer_std_err": 0.0313,
+          "simultaneous_coverage": 0.89,
+          "mean_se_h24": 0.002716,
+          "valid_runs": 100
+        },
+        "L_120h": {
+          "block_length_hours": 120,
+          "empirical_fwer": 0.14,
+          "fwer_std_err": 0.0347,
+          "simultaneous_coverage": 0.86,
+          "mean_se_h24": 0.002732,
+          "valid_runs": 100
+        },
+        "L_168h": {
+          "block_length_hours": 168,
+          "empirical_fwer": 0.17,
+          "fwer_std_err": 0.0376,
+          "simultaneous_coverage": 0.83,
+          "mean_se_h24": 0.002749,
+          "valid_runs": 100
+        }
+      }
+    }
+  },
+  "block_length_comparison": {
+    "L_24h": {
+      "avg_fwer": 0.0833,
+      "max_fwer": 0.12,
+      "avg_coverage": 0.9167,
+      "min_coverage": 0.88,
+      "mean_se_h24": 0.002644,
+      "status": "ANTI_CONSERVATIVE_REJECT"
+    },
+    "L_48h": {
+      "avg_fwer": 0.0825,
+      "max_fwer": 0.12,
+      "avg_coverage": 0.9175,
+      "min_coverage": 0.88,
+      "mean_se_h24": 0.002828,
+      "status": "ANTI_CONSERVATIVE_REJECT"
+    },
+    "L_72h": {
+      "avg_fwer": 0.0958,
+      "max_fwer": 0.14,
+      "avg_coverage": 0.9042,
+      "min_coverage": 0.86,
+      "mean_se_h24": 0.002875,
+      "status": "ANTI_CONSERVATIVE_REJECT"
+    },
+    "L_120h": {
+      "avg_fwer": 0.1167,
+      "max_fwer": 0.22,
+      "avg_coverage": 0.8833,
+      "min_coverage": 0.78,
+      "mean_se_h24": 0.002894,
+      "status": "ANTI_CONSERVATIVE_REJECT"
+    },
+    "L_168h": {
+      "avg_fwer": 0.1158,
+      "max_fwer": 0.17,
+      "avg_coverage": 0.8842,
+      "min_coverage": 0.83,
+      "mean_se_h24": 0.002841,
+      "status": "ANTI_CONSERVATIVE_REJECT"
+    }
+  },
+  "power_curve_evaluation": {
+    "H41_D1_BTC_RET4_Q80_H4 (h=4)": {
+      "0.0bp": 0.0,
+      "5.0bp": 0.01,
+      "10.0bp": 0.09,
+      "20.0bp": 0.52,
+      "30.0bp": 0.89,
+      "40.0bp": 1.0
+    },
+    "H41_D1_BTC_RET12_Q80_H24 (h=24)": {
+      "0.0bp": 0.03,
+      "5.0bp": 0.01,
+      "10.0bp": 0.03,
+      "20.0bp": 0.05,
+      "30.0bp": 0.05,
+      "40.0bp": 0.11
+    }
+  },
+  "deterministic_replay_verified": true,
+  "coordinate_permutation_invariance_verified": true,
+  "recommended_block_length_hours": 72
+}
