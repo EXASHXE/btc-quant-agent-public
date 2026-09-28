@@ -1,11 +1,12 @@
 {
-  "contract": "V0.5.1_B1_R1_TACTICAL_FEATURE_EVIDENCE_V2_INTEGRITY_SEAL",
-  "status": "IMPLEMENTED_PENDING_CONTROLLER",
-  "timestamp": "2026-09-29T00:45:00+08:00",
+  "contract": "V0.5.1_B1_R2_STATEFUL_ROUNDTRIP_AND_SOURCE_TIME_SEAL",
+  "status": "B1_R2_IMPLEMENTED_PENDING_CONTROLLER",
+  "timestamp": "2026-09-29T01:50:00+08:00",
   "scientific_authority_mainline_sha": "407dabc415ae8cae4210250e992941c8b9b25464",
   "parent_accepted_b0_authority_sha": "d378d75d86678cc42a29aa0119adc85d2b6c82c4",
   "b1_initial_sha": "41d19fadf6b787006c2cd6fadd5f63981108c377",
   "b1_r1_sha": "9af27c26aaca195f14777ef891720458dc12f556",
+  "b1_r2_sha": "f5b48f166c058cac9cec40d0894e96b1480fcb17",
   "branch": "feature/tactical-policy-r2",
   "docs_branch": "v0.5-refactor-docs",
   "versions": {
@@ -48,19 +49,32 @@
     "policy_state_input_status": "VERIFIED",
     "natural_key_uniqueness_status": "VERIFIED",
     "atomic_persistence_status": "VERIFIED",
-    "full_population_capture_status": "VERIFIED"
+    "full_population_capture_status": "VERIFIED",
+    "stateful_roundtrip_status": "SEALED_EXACT_ROUNDTRIP",
+    "premium_index_time_semantics_status": "PREMIUM_INDEX_EVENT_TIME_ENFORCED",
+    "next_funding_time_semantics_status": "KNOWN_FUTURE_SCHEDULE_TIME_VALID",
+    "read_semantic_validation_status": "FULL_VALIDATION_AND_IDENTITY_VERIFIED",
+    "row_key_identity_status": "ROW_KEY_AND_EMBEDDED_ID_MATCH_ENFORCED"
   },
+  "natural_key": [
+    "symbol",
+    "decision_time_ms",
+    "snapshot_hash",
+    "policy_version",
+    "config_hash"
+  ],
   "gates": {
     "scientific_fence_h40_diff": "ZERO",
     "git_diff_check": "PASSED",
     "python_compileall": "PASSED",
     "ruff_check": "PASSED",
     "mypy": "PASSED",
-    "b1_r1_tests_passed": 25,
+    "b1_r2_tests_passed": 31,
     "b0_tests_passed": 23,
     "market_watch_tests_passed": 137,
-    "pytest_total": 1931,
-    "pytest_passed": 1929,
+    "forward_derivatives_tests_passed": 13,
+    "pytest_total": 1937,
+    "pytest_passed": 1935,
     "pytest_skipped": 2,
     "pytest_failed": 0
   },
