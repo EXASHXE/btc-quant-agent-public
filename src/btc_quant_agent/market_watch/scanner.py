@@ -49,6 +49,12 @@ from .domain import (
     extract_signal_identity,
 )
 from .entry_quality import calculate_net_risk_reward, evaluate_entry_quality, evaluate_exhaustion
+from .evidence import (
+    PolicyDecisionTrace,
+    PolicyGateStageTrace,
+    TacticalFeatureEvidenceV2,
+    build_tactical_feature_evidence,
+)
 from .grid_policy import evaluate_grid_policy
 from .lifecycle import advance_lifecycle_state
 from .playbooks import (
@@ -57,12 +63,13 @@ from .playbooks import (
     select_playbook_candidate,
 )
 from .ranking import (
-    calculate_rule_score,
+    calculate_rule_score_breakdown,
     check_fatal_vetoes,
     compute_relative_performances,
 )
 from .snapshot import (
-    closed_bar_return_with_status,
+    ReturnAvailability,
+    compute_return_observation,
     compute_snapshot_hash,
     compute_timeframe_snapshot,
 )
@@ -82,6 +89,11 @@ class MarketWatchScanner:
         self.config = config
         self.client = client
         self.store = store
+        self._last_evidences: dict[str, TacticalFeatureEvidenceV2] = {}
+
+    def get_last_evidence(self, symbol: str) -> TacticalFeatureEvidenceV2 | None:
+        """Get the latest in-memory TacticalFeatureEvidenceV2 built for symbol."""
+        return self._last_evidences.get(symbol.upper())
 
     def collect_symbol_snapshot(self, symbol: str, now_ms: int) -> tuple[MarketSnapshot | None, ScanHealth, tuple[str, ...]]:
         """Collect market snapshot for one symbol with robust degradation handling."""
@@ -134,24 +146,27 @@ class MarketWatchScanner:
                 if avail and avail > 0:
                     candle_avail_timestamps.append(int(avail))
 
+        def _to_opt_int(v: Any) -> int | None:
+            return int(v) if isinstance(v, (int, float)) and not isinstance(v, bool) else None
+
         deriv_observed_at_ms: int | None = None
         try:
             deriv_collection = self.client.collect_derivatives(symbol, include_order_book=True)
             snap = deriv_collection.snapshot
-            deriv_observed_at_ms = snap.observed_at_ms
+            deriv_observed_at_ms = _to_opt_int(getattr(snap, "observed_at_ms", None))
             mark_price = snap.mark_price
             index_price = snap.index_price
             funding_rate = snap.funding_rate
-            funding_time_ms = snap.funding_time_ms
+            funding_time_ms = _to_opt_int(getattr(snap, "funding_time_ms", None))
             open_interest = snap.open_interest
-            open_interest_time_ms = snap.open_interest_time_ms
+            open_interest_time_ms = _to_opt_int(getattr(snap, "open_interest_time_ms", None))
             oi_1h_change = snap.open_interest_change_pct
             taker_ratio = snap.taker_buy_sell_ratio
-            taker_time_ms = snap.taker_time_ms
+            taker_time_ms = _to_opt_int(getattr(snap, "taker_time_ms", None))
             basis_rate = snap.basis_rate
-            basis_time_ms = snap.basis_time_ms
+            basis_time_ms = _to_opt_int(getattr(snap, "basis_time_ms", None))
             long_short_ratio = snap.long_short_account_ratio
-            long_short_time_ms = snap.long_short_time_ms
+            long_short_time_ms = _to_opt_int(getattr(snap, "long_short_time_ms", None))
             order_book_imbalance = snap.order_book_imbalance
             spread_bps = snap.spread_bps
             field_avail = dict(deriv_collection.field_availability)
@@ -264,9 +279,12 @@ class MarketWatchScanner:
         tf_4h = compute_timeframe_snapshot("4h", raw_4h, None, self.config)
 
         # 5. Compute true elapsed returns from confirmed closed 15m candles
-        r1h, r1h_status = closed_bar_return_with_status(raw_15m, horizon_ms=3_600_000)
-        r4h, r4h_status = closed_bar_return_with_status(raw_15m, horizon_ms=14_400_000)
-        r12h, r12h_status = closed_bar_return_with_status(raw_15m, horizon_ms=43_200_000)
+        r1h_obs = compute_return_observation(raw_15m, horizon_ms=3_600_000, source_interval="15m")
+        r4h_obs = compute_return_observation(raw_15m, horizon_ms=14_400_000, source_interval="15m")
+        r12h_obs = compute_return_observation(raw_15m, horizon_ms=43_200_000, source_interval="15m")
+        r1h, r1h_status = r1h_obs.value, ReturnAvailability(r1h_obs.availability)
+        r4h, r4h_status = r4h_obs.value, ReturnAvailability(r4h_obs.availability)
+        r12h, r12h_status = r12h_obs.value, ReturnAvailability(r12h_obs.availability)
 
         # 6. Assemble DerivativesMetrics
         basis_bps = (basis_rate * 10_000.0) if basis_rate is not None else None
@@ -368,6 +386,28 @@ class MarketWatchScanner:
             derivatives=deriv_metrics,
         )
 
+        closed_bar_watermarks = {
+            "15m": raw_15m[-1].close_time_ms if raw_15m else 0,
+            "1h": raw_1h[-1].close_time_ms if raw_1h else 0,
+            "4h": raw_4h[-1].close_time_ms if raw_4h else 0,
+        }
+        source_receipt_timestamps: dict[str, int] = {
+            "collection_started_at_ms": collection_started_at_ms,
+            "collection_completed_at_ms": collection_completed_ms,
+        }
+        if deriv_observed_at_ms:
+            source_receipt_timestamps["deriv_observed_at_ms"] = int(deriv_observed_at_ms)
+        if oi_hist_receipt_ms:
+            source_receipt_timestamps["oi_hist_receipt_ms"] = oi_hist_receipt_ms
+        if top_pos_receipt_ms:
+            source_receipt_timestamps["top_pos_receipt_ms"] = top_pos_receipt_ms
+        if top_acc_receipt_ms:
+            source_receipt_timestamps["top_acc_receipt_ms"] = top_acc_receipt_ms
+        if ticker_receipt_ms:
+            source_receipt_timestamps["ticker_receipt_ms"] = ticker_receipt_ms
+        if server_time_receipt_ms:
+            source_receipt_timestamps["server_time_receipt_ms"] = server_time_receipt_ms
+
         snapshot = MarketSnapshot(
             symbol=symbol,
             decision_time_ms=decision_time_ms,
@@ -389,6 +429,9 @@ class MarketWatchScanner:
             return_1h_status=r1h_status.value,
             return_4h_status=r4h_status.value,
             return_12h_status=r12h_status.value,
+            closed_bar_watermarks=closed_bar_watermarks,
+            return_observations=(r1h_obs, r4h_obs, r12h_obs),
+            source_receipt_timestamps=source_receipt_timestamps,
         )
 
         return snapshot, health, tuple(health_reasons)
@@ -466,6 +509,8 @@ class MarketWatchScanner:
             reasons = ["NO_CONFIRMED_PLAYBOOK_CANDIDATE"] + tf_reasons
             risks = list(bench_risks)
 
+        initial_selected_decision = raw_decision.value
+
         # 5. Friction and Net Risk/Reward
         entry_mid = (entry_low + entry_high) / 2.0 if (entry_low > 0 and entry_high > 0) else tf_15m.close
         gross_rr, net_rr = calculate_net_risk_reward(
@@ -497,11 +542,24 @@ class MarketWatchScanner:
             EntryQuality.MARGINAL: 1,
             EntryQuality.POOR: 0,
         }
+        input_eq = raw_decision
+        new_eq_reasons: list[str] = []
         if raw_decision != DirectionalDecision.WAIT and quality_rank[entry_quality] < quality_rank[min_quality]:
             raw_decision = DirectionalDecision.WAIT
+            new_eq_reasons.append("ENTRY_QUALITY_BELOW_MINIMUM_WAIT")
             reasons.append("ENTRY_QUALITY_BELOW_MINIMUM_WAIT")
 
+        trace_entry_quality = PolicyGateStageTrace(
+            stage_name="entry_quality_gate",
+            input_decision=input_eq.value,
+            output_decision=raw_decision.value,
+            new_reason_codes=tuple(new_eq_reasons),
+            new_risk_codes=(),
+            veto_flag=False,
+        )
+
         # 7. Benchmark Context Gate (e.g. BTC risk-off shock)
+        input_bg = raw_decision
         gated_decision, bg_reasons, bg_risks = apply_benchmark_context_gate(
             symbol=symbol,
             decision=raw_decision,
@@ -513,8 +571,17 @@ class MarketWatchScanner:
         )
         reasons.extend(bg_reasons)
         risks.extend(bg_risks)
+        trace_benchmark = PolicyGateStageTrace(
+            stage_name="benchmark_gate",
+            input_decision=input_bg.value,
+            output_decision=gated_decision.value,
+            new_reason_codes=tuple(bg_reasons),
+            new_risk_codes=tuple(bg_risks),
+            veto_flag=False,
+        )
 
         # 7b. Derivatives Action Gate (R2)
+        input_deriv = gated_decision
         gated_decision, deriv_reasons, deriv_risks = apply_derivatives_action_gate(
             decision=gated_decision,
             derivatives=derivatives,
@@ -522,8 +589,17 @@ class MarketWatchScanner:
         )
         reasons.extend(deriv_reasons)
         risks.extend(deriv_risks)
+        trace_derivatives = PolicyGateStageTrace(
+            stage_name="derivatives_gate",
+            input_decision=input_deriv.value,
+            output_decision=gated_decision.value,
+            new_reason_codes=tuple(deriv_reasons),
+            new_risk_codes=tuple(deriv_risks),
+            veto_flag=False,
+        )
 
         # 8. Fatal Vetoes (Enforced before ranking)
+        input_fatal = gated_decision
         has_fatal_veto, fatal_reasons = check_fatal_vetoes(
             decision=gated_decision,
             exhaustion=exhaustion,
@@ -537,8 +613,26 @@ class MarketWatchScanner:
             gated_decision = DirectionalDecision.WAIT
             reasons.extend(fatal_reasons)
 
+        trace_fatal_veto = PolicyGateStageTrace(
+            stage_name="fatal_veto_gate",
+            input_decision=input_fatal.value,
+            output_decision=gated_decision.value,
+            new_reason_codes=tuple(fatal_reasons),
+            new_risk_codes=(),
+            veto_flag=has_fatal_veto,
+        )
+
+        decision_trace = PolicyDecisionTrace(
+            selected_candidate_decision=initial_selected_decision,
+            after_entry_quality_gate=trace_entry_quality,
+            after_benchmark_gate=trace_benchmark,
+            after_derivatives_gate=trace_derivatives,
+            after_fatal_veto=trace_fatal_veto,
+            final_directional_decision=gated_decision.value,
+        )
+
         # 9. Rule Score (formerly Opportunity Score)
-        rule_score = calculate_rule_score(
+        rule_score_breakdown = calculate_rule_score_breakdown(
             decision=gated_decision,
             tf_1h=tf_1h,
             tf_15m=tf_15m,
@@ -551,6 +645,7 @@ class MarketWatchScanner:
             has_fatal_veto=has_fatal_veto,
             config=self.config,
         )
+        rule_score = rule_score_breakdown.final_rule_score
 
         directional_plan = DirectionalPlan(
             symbol=symbol,
@@ -734,9 +829,22 @@ class MarketWatchScanner:
             signal_identity=sig_id,
             setup_key=setup_key,
         )
+        evidence = build_tactical_feature_evidence(
+            assessment=temp_assessment,
+            playbook_candidates=candidates,
+            decision_trace=decision_trace,
+            rule_score_breakdown=rule_score_breakdown,
+            config=self.config,
+        )
+        self._last_evidences[symbol] = evidence
         fp = compute_decision_fingerprint(temp_assessment, self.config)
 
-        return replace(temp_assessment, alert_fingerprint=fp)
+        return replace(
+            temp_assessment,
+            feature_evidence_id=evidence.evidence_id,
+            feature_evidence=evidence,
+            alert_fingerprint=fp,
+        )
 
     def _record_shadow_observations_if_needed(self, a: SymbolAssessment, now_ms: int) -> None:
         prev_st = self.store.get_symbol_state(a.symbol) or {}
@@ -787,6 +895,7 @@ class MarketWatchScanner:
                     fill_status=ShadowFillStatus.WAITING_FOR_FILL.value,
                     execution_path_model=ShadowExecutionPathModel.PARTIAL_FIRST_BAR_1M_THEN_15M.value,
                     semantic_identity=a.semantic_identity,
+                    feature_evidence_id=a.feature_evidence_id,
                 )
                 self.store.set_last_shadow_signal_ids(a.symbol, armed_id=sig_id)
                 self.store.set_last_shadow_recorded_state(a.symbol, "ARMED")
@@ -835,6 +944,7 @@ class MarketWatchScanner:
                     fill_status=ShadowFillStatus.WAITING_FOR_FILL.value,
                     execution_path_model=ShadowExecutionPathModel.PARTIAL_FIRST_BAR_1M_THEN_15M.value,
                     semantic_identity=a.semantic_identity,
+                    feature_evidence_id=a.feature_evidence_id,
                 )
                 self.store.set_last_shadow_signal_ids(a.symbol, triggered_id=sig_id)
                 self.store.set_last_shadow_recorded_state(a.symbol, "TRIGGERED")
@@ -930,8 +1040,6 @@ class MarketWatchScanner:
         candidate_alerts: list[tuple[SymbolAssessment, MarketWatchAlert, AlertSeverity]] = []
         for a in ranked_assessments:
             prev_st = self.store.get_symbol_state(a.symbol) or {}
-            self._record_shadow_observations_if_needed(a, now_ms)
-
             emit, severity, _reasons = evaluate_alert_emission(a, prev_st, self.config)
             if emit:
                 alert = MarketWatchAlert(
@@ -995,9 +1103,11 @@ class MarketWatchScanner:
                 except Exception as exc:  # noqa: BLE001
                     logger.error("Feishu alert failed for %s: %s", a.symbol, exc)
 
-        # Persist state to SQLite
+        # Persist state and feature evidence to SQLite, then record shadow observation
         for a in ranked_assessments:
             is_sent = a.symbol in sent_symbols or (not notify and a.symbol in selected_symbols)
-            self.store.save_symbol_state(a.symbol, a, now_ms, alert_sent=is_sent)
+            ev = getattr(a, "feature_evidence", None) or self._last_evidences.get(a.symbol)
+            self.store.save_symbol_state(a.symbol, a, now_ms, alert_sent=is_sent, evidence=ev)
+            self._record_shadow_observations_if_needed(a, now_ms)
 
         return ranked_assessments, alerts_to_send

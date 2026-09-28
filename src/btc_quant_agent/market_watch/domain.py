@@ -18,9 +18,17 @@ RULE_SCORE_SEMANTICS_VERSION: str = "RULE_SCORE_V1"
 SEMANTIC_IDENTITY_VERSION: str = "TACTICAL_SEMANTIC_IDENTITY_V1"
 MARKET_WATCH_EVIDENCE_VERSION: str = "FORWARD_EVIDENCE_V1"
 HEURISTIC_RULE_QUALITY_BAND_VERSION: str = "HEURISTIC_RULE_QUALITY_BAND_V1"
+TACTICAL_FEATURE_EVIDENCE_SCHEMA_VERSION: str = "TACTICAL_FEATURE_EVIDENCE_V2"
 
 # Deprecated backward compatibility alias
 MARKET_WATCH_POLICY_VERSION: str = TACTICAL_POLICY_VERSION
+
+
+class StrategyStatus(StrEnum):
+    EXPERIMENTAL = "EXPERIMENTAL"
+    SHADOW_PROVISIONAL = "SHADOW_PROVISIONAL"
+    TACTICAL_PROVISIONAL = "TACTICAL_PROVISIONAL"
+    VALIDATED_FORWARD = "VALIDATED_FORWARD"
 
 
 @dataclass(frozen=True)
@@ -387,6 +395,8 @@ class MarketSnapshot:
     available_reference_members: tuple[str, ...] = ()
     missing_reference_members: tuple[str, ...] = ()
     closed_bar_watermarks: dict[str, int] = field(default_factory=dict)
+    return_observations: tuple[Any, ...] = ()
+    source_receipt_timestamps: dict[str, int] = field(default_factory=dict)
 
     def as_dict(self) -> dict[str, Any]:
         payload = asdict(self)
@@ -730,6 +740,8 @@ class SymbolAssessment:
     reference_universe_status: str = "UNIVERSE_COMPLETE"
     missing_reference_members: tuple[str, ...] = ()
     semantic_identity: TacticalSemanticIdentity = field(default_factory=TacticalSemanticIdentity)
+    feature_evidence_id: str | None = None
+    feature_evidence: Any = None
 
     def __post_init__(self) -> None:
         if self.rule_score == 0.0 and self.opportunity_score != 0.0:
@@ -743,6 +755,7 @@ class SymbolAssessment:
     def as_dict(self) -> dict[str, Any]:
         return {
             "symbol": self.symbol,
+            "feature_evidence_id": self.feature_evidence_id,
             "opportunity_score": round(self.opportunity_score, 2),
             "rule_score": round(self.rule_score, 2),
             "rule_score_semantics": self.rule_score_semantics,

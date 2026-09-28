@@ -249,12 +249,9 @@ def build_market_watch_config(raw: dict[str, Any] | None) -> MarketWatchConfig:
     return MarketWatchConfig(**values)
 
 
-def compute_market_watch_config_hash(config: MarketWatchConfig) -> str:
-    """Compute deterministic audit hash for MarketWatch configuration.
-
-    Isolated from global research config_hash. Changes when thresholds or parameters change.
-    """
-    payload = {
+def market_watch_config_hash_payload(config: MarketWatchConfig) -> dict[str, Any]:
+    """Extract deterministic decision configuration payload used for audit hashing and self-contained evidence."""
+    return {
         "symbols": list(config.symbols),
         "benchmark_symbols": list(config.benchmark_symbols),
         "relative_strength_universe": list(config.relative_strength_universe),
@@ -271,5 +268,13 @@ def compute_market_watch_config_hash(config: MarketWatchConfig) -> str:
         "thresholds": asdict(config.thresholds),
         "grid": asdict(config.grid),
     }
+
+
+def compute_market_watch_config_hash(config: MarketWatchConfig) -> str:
+    """Compute deterministic audit hash for MarketWatch configuration.
+
+    Isolated from global research config_hash. Changes when thresholds or parameters change.
+    """
+    payload = market_watch_config_hash_payload(config)
     raw = json.dumps(payload, sort_keys=True)
     return hashlib.sha256(raw.encode("utf-8")).hexdigest()[:16]

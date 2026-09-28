@@ -25,6 +25,13 @@ from .domain import (
     extract_setup_key,
     extract_signal_identity,
 )
+from .evidence import (
+    TacticalEvidenceConflictError,
+    TacticalEvidenceLinkageError,
+    TacticalFeatureEvidenceV2,
+    canonical_evidence_json,
+    deserialize_tactical_feature_evidence,
+)
 
 
 def compute_decision_fingerprint(
@@ -221,6 +228,7 @@ class MarketWatchStateStore:
                 ("reference_universe_status", "TEXT"),
                 ("missing_reference_members_json", "TEXT"),
                 ("semantic_identity_json", "TEXT"),
+                ("feature_evidence_id", "TEXT"),
             ]:
                 try:
                     conn.execute(f"ALTER TABLE market_watch_assessments ADD COLUMN {col_name} {col_type}")
@@ -282,7 +290,8 @@ class MarketWatchStateStore:
                     exit_price REAL,
                     coverage_status TEXT,
                     coverage_reason TEXT,
-                    semantic_identity_json TEXT
+                    semantic_identity_json TEXT,
+                    feature_evidence_id TEXT
                 )
                 """
             )
@@ -328,11 +337,42 @@ class MarketWatchStateStore:
                 ("coverage_status", "TEXT"),
                 ("coverage_reason", "TEXT"),
                 ("semantic_identity_json", "TEXT"),
+                ("feature_evidence_id", "TEXT"),
             ]:
                 try:
                     conn.execute(f"ALTER TABLE market_watch_shadow_records ADD COLUMN {col_name} {col_type}")
                 except sqlite3.OperationalError:
                     pass
+
+            conn.execute(
+                """
+                CREATE TABLE IF NOT EXISTS tactical_feature_evidence_v2 (
+                    evidence_id TEXT PRIMARY KEY,
+                    evidence_schema_version TEXT NOT NULL,
+                    decision_time_ms INTEGER NOT NULL,
+                    symbol TEXT NOT NULL,
+                    snapshot_hash TEXT NOT NULL,
+                    policy_version TEXT NOT NULL,
+                    config_hash TEXT NOT NULL,
+                    semantic_identity_hash TEXT,
+                    signal_identity TEXT,
+                    setup_key TEXT,
+                    lifecycle_state TEXT,
+                    selected_playbook TEXT,
+                    final_directional_decision TEXT,
+                    rule_score REAL,
+                    reference_universe_status TEXT,
+                    evidence_json TEXT NOT NULL,
+                    persisted_at_ms INTEGER
+                )
+                """
+            )
+            conn.execute(
+                """
+                CREATE INDEX IF NOT EXISTS idx_tactical_evidence_natural_key
+                ON tactical_feature_evidence_v2 (symbol, decision_time_ms, snapshot_hash, policy_version, config_hash)
+                """
+            )
 
             conn.commit()
 
@@ -352,6 +392,7 @@ class MarketWatchStateStore:
         assessment: SymbolAssessment,
         now_ms: int,
         alert_sent: bool = False,
+        evidence: TacticalFeatureEvidenceV2 | None = None,
     ) -> None:
         prev = self.get_symbol_state(symbol) or {}
         last_fp = assessment.alert_fingerprint if alert_sent else prev.get("last_alert_fingerprint")
@@ -471,7 +512,85 @@ class MarketWatchStateStore:
                 armed_ms = prev.get("armed_bar_end_ms") or (bar_end_ms if curr_life == "ARMED" else None)
                 triggered_ms = prev.get("triggered_bar_end_ms") or (bar_end_ms if curr_life == "TRIGGERED" else None)
 
+        if evidence is None:
+            evidence = getattr(assessment, "feature_evidence", None)
+
         with self._connect() as conn:
+            if evidence is not None:
+                cur_ev = conn.execute(
+                    """
+                    SELECT evidence_id FROM tactical_feature_evidence_v2
+                    WHERE symbol = ? AND decision_time_ms = ? AND snapshot_hash = ?
+                      AND policy_version = ? AND config_hash = ?
+                    """,
+                    (
+                        evidence.symbol,
+                        evidence.decision_time_ms,
+                        evidence.snapshot_hash,
+                        evidence.policy_version,
+                        evidence.config_hash,
+                    ),
+                )
+                row_ev = cur_ev.fetchone()
+                if row_ev is not None:
+                    existing_ev_id = row_ev[0]
+                    if existing_ev_id != evidence.evidence_id:
+                        raise TacticalEvidenceConflictError(
+                            f"Evidence conflict for natural key "
+                            f"({evidence.symbol}, {evidence.decision_time_ms}, {evidence.snapshot_hash}, {evidence.policy_version}, {evidence.config_hash}): "
+                            f"existing={existing_ev_id}, new={evidence.evidence_id}"
+                        )
+                else:
+                    sem_hash = (
+                        evidence.semantic_identity.canonical_hash()
+                        if hasattr(evidence.semantic_identity, "canonical_hash")
+                        else (
+                            evidence.semantic_identity.compute_identity_hash()
+                            if hasattr(evidence.semantic_identity, "compute_identity_hash")
+                            else None
+                        )
+                    )
+                    final_dir = (
+                        evidence.decision_trace.final_directional_decision
+                        if hasattr(evidence.decision_trace, "final_directional_decision")
+                        else ""
+                    )
+                    ref_status = (
+                        evidence.reference_universe_evidence.status
+                        if hasattr(evidence.reference_universe_evidence, "status")
+                        else getattr(evidence.reference_universe_evidence, "reference_universe_status", "UNIVERSE_COMPLETE")
+                    )
+                    conn.execute(
+                        """
+                        INSERT INTO tactical_feature_evidence_v2 (
+                            evidence_id, evidence_schema_version, decision_time_ms, symbol,
+                            snapshot_hash, policy_version, config_hash, semantic_identity_hash,
+                            signal_identity, setup_key, lifecycle_state, selected_playbook,
+                            final_directional_decision, rule_score, reference_universe_status,
+                            evidence_json, persisted_at_ms
+                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        """,
+                        (
+                            evidence.evidence_id,
+                            evidence.evidence_schema_version,
+                            evidence.decision_time_ms,
+                            evidence.symbol,
+                            evidence.snapshot_hash,
+                            evidence.policy_version,
+                            evidence.config_hash,
+                            sem_hash,
+                            evidence.signal_identity,
+                            evidence.setup_key,
+                            evidence.lifecycle_state,
+                            evidence.selected_playbook,
+                            final_dir,
+                            evidence.rule_score,
+                            ref_status,
+                            canonical_evidence_json(evidence),
+                            now_ms,
+                        ),
+                    )
+
             conn.execute(
                 """
                 INSERT INTO market_watch_symbol_state (
@@ -566,53 +685,71 @@ class MarketWatchStateStore:
                 ),
             )
             # Record auditable assessment
-            conn.execute(
+            cur_a = conn.execute(
                 """
-                INSERT INTO market_watch_assessments (
-                    decision_time_ms, symbol, snapshot_hash, policy_version, config_hash,
-                    regime, setup, directional_decision, grid_decision, entry_quality,
-                    derivatives_regime, benchmark_context, opportunity_score,
-                    rank, reason_codes_json, risk_codes_json, decision_json,
-                    alert_fingerprint, notification_sent, signal_identity, setup_key,
-                    rule_score, rule_score_semantics, eligible_playbooks_json,
-                    actionable_playbooks_json, selected_playbook, selection_method,
-                    reference_universe_status, missing_reference_members_json,
-                    semantic_identity_json
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                SELECT id FROM market_watch_assessments
+                WHERE symbol = ? AND decision_time_ms = ? AND snapshot_hash = ?
+                  AND policy_version = ? AND config_hash = ?
+                LIMIT 1
                 """,
                 (
-                    assessment.snapshot.decision_time_ms,
                     symbol,
+                    assessment.snapshot.decision_time_ms,
                     assessment.snapshot.snapshot_hash,
                     assessment.policy_version,
                     assessment.config_hash,
-                    str(assessment.directional.regime),
-                    str(assessment.directional.setup),
-                    str(assessment.directional.decision),
-                    str(assessment.grid.decision),
-                    str(assessment.directional.entry_quality),
-                    str(assessment.directional.derivatives_regime),
-                    str(assessment.directional.benchmark_context),
-                    assessment.opportunity_score,
-                    assessment.rank,
-                    json.dumps(assessment.directional.reason_codes),
-                    json.dumps(assessment.directional.risk_codes),
-                    json.dumps(assessment.as_dict()),
-                    assessment.alert_fingerprint,
-                    1 if alert_sent else 0,
-                    assessment.signal_identity or curr_sig_id,
-                    assessment.setup_key or curr_setup_key,
-                    getattr(assessment, "rule_score", assessment.opportunity_score),
-                    getattr(assessment, "rule_score_semantics", RULE_SCORE_SEMANTICS_VERSION),
-                    json.dumps([p.value if hasattr(p, "value") else str(p) for p in getattr(assessment, "eligible_playbooks", ())]),
-                    json.dumps([p.value if hasattr(p, "value") else str(p) for p in getattr(assessment, "actionable_playbooks", ())]),
-                    (assessment.selected_playbook.value if hasattr(assessment.selected_playbook, "value") else str(assessment.selected_playbook)) if getattr(assessment, "selected_playbook", None) else None,
-                    getattr(assessment, "selection_method", "STATIC_PRECEDENCE"),
-                    getattr(assessment, "reference_universe_status", "UNIVERSE_COMPLETE"),
-                    json.dumps(list(getattr(assessment, "missing_reference_members", ()))),
-                    _serialize_semantic_identity(getattr(assessment, "semantic_identity", None)),
                 ),
             )
+            if cur_a.fetchone() is None:
+                feat_ev_id = evidence.evidence_id if evidence else getattr(assessment, "feature_evidence_id", None)
+                conn.execute(
+                    """
+                    INSERT INTO market_watch_assessments (
+                        decision_time_ms, symbol, snapshot_hash, policy_version, config_hash,
+                        regime, setup, directional_decision, grid_decision, entry_quality,
+                        derivatives_regime, benchmark_context, opportunity_score,
+                        rank, reason_codes_json, risk_codes_json, decision_json,
+                        alert_fingerprint, notification_sent, signal_identity, setup_key,
+                        rule_score, rule_score_semantics, eligible_playbooks_json,
+                        actionable_playbooks_json, selected_playbook, selection_method,
+                        reference_universe_status, missing_reference_members_json,
+                        semantic_identity_json, feature_evidence_id
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    """,
+                    (
+                        assessment.snapshot.decision_time_ms,
+                        symbol,
+                        assessment.snapshot.snapshot_hash,
+                        assessment.policy_version,
+                        assessment.config_hash,
+                        str(assessment.directional.regime),
+                        str(assessment.directional.setup),
+                        str(assessment.directional.decision),
+                        str(assessment.grid.decision),
+                        str(assessment.directional.entry_quality),
+                        str(assessment.directional.derivatives_regime),
+                        str(assessment.directional.benchmark_context),
+                        assessment.opportunity_score,
+                        assessment.rank,
+                        json.dumps(assessment.directional.reason_codes),
+                        json.dumps(assessment.directional.risk_codes),
+                        json.dumps(assessment.as_dict()),
+                        assessment.alert_fingerprint,
+                        1 if alert_sent else 0,
+                        assessment.signal_identity or curr_sig_id,
+                        assessment.setup_key or curr_setup_key,
+                        getattr(assessment, "rule_score", assessment.opportunity_score),
+                        getattr(assessment, "rule_score_semantics", RULE_SCORE_SEMANTICS_VERSION),
+                        json.dumps([p.value if hasattr(p, "value") else str(p) for p in getattr(assessment, "eligible_playbooks", ())]),
+                        json.dumps([p.value if hasattr(p, "value") else str(p) for p in getattr(assessment, "actionable_playbooks", ())]),
+                        (assessment.selected_playbook.value if hasattr(assessment.selected_playbook, "value") else str(assessment.selected_playbook)) if getattr(assessment, "selected_playbook", None) else None,
+                        getattr(assessment, "selection_method", "STATIC_PRECEDENCE"),
+                        getattr(assessment, "reference_universe_status", "UNIVERSE_COMPLETE"),
+                        json.dumps(list(getattr(assessment, "missing_reference_members", ()))),
+                        _serialize_semantic_identity(getattr(assessment, "semantic_identity", None)),
+                        feat_ev_id,
+                    ),
+                )
             conn.commit()
 
     def set_last_shadow_signal_ids(
@@ -718,6 +855,7 @@ class MarketWatchStateStore:
         coverage_reason: str | None = None,
         semantic_identity: TacticalSemanticIdentity | None = None,
         semantic_identity_json: str | None = None,
+        feature_evidence_id: str | None = None,
     ) -> int:
         if semantic_identity is not None and not semantic_identity_json:
             semantic_identity_json = _serialize_semantic_identity(semantic_identity)
@@ -758,6 +896,16 @@ class MarketWatchStateStore:
             evidence_version = MARKET_WATCH_EVIDENCE_VERSION
 
         with self._connect() as conn:
+            if feature_evidence_id is not None:
+                cur_ev = conn.execute(
+                    "SELECT 1 FROM tactical_feature_evidence_v2 WHERE evidence_id = ?",
+                    (feature_evidence_id,),
+                )
+                if cur_ev.fetchone() is None:
+                    raise TacticalEvidenceLinkageError(
+                        f"Shadow record links to non-existent evidence_id: {feature_evidence_id}"
+                    )
+
             # Deduplication guard: exactly one ACTIONABLE_TRIGGERED per signal_identity
             if observation_type == "ACTIONABLE_TRIGGERED" and signal_identity:
                 cursor = conn.execute(
@@ -780,8 +928,8 @@ class MarketWatchStateStore:
                     fill_time_ms, fill_price, gross_r, friction_r, path_resolution,
                     execution_path_model, setup_key, evidence_version, entry_window_start_ms,
                     evaluation_start_ms, terminal_reason, exit_time_ms, exit_price,
-                    coverage_status, coverage_reason, semantic_identity_json
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    coverage_status, coverage_reason, semantic_identity_json, feature_evidence_id
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     timestamp_ms,
@@ -826,6 +974,7 @@ class MarketWatchStateStore:
                     coverage_status,
                     coverage_reason,
                     semantic_identity_json,
+                    feature_evidence_id,
                 ),
             )
             conn.commit()
@@ -1040,6 +1189,55 @@ class MarketWatchStateStore:
             conn.row_factory = sqlite3.Row
             cursor = conn.execute("SELECT * FROM market_watch_symbol_state ORDER BY last_rank ASC")
             return [dict(row) for row in cursor.fetchall()]
+
+    def get_tactical_feature_evidence(self, evidence_id: str) -> TacticalFeatureEvidenceV2 | None:
+        """Fetch immutable TacticalFeatureEvidenceV2 by evidence_id."""
+        with self._connect() as conn:
+            conn.row_factory = sqlite3.Row
+            cursor = conn.execute(
+                "SELECT evidence_json FROM tactical_feature_evidence_v2 WHERE evidence_id = ?",
+                (evidence_id,),
+            )
+            row = cursor.fetchone()
+            if row is None:
+                return None
+            return deserialize_tactical_feature_evidence(row["evidence_json"])
+
+    def list_tactical_feature_evidence(
+        self,
+        symbol: str | None = None,
+        start_ms: int | None = None,
+        end_ms: int | None = None,
+        selected_playbook: str | None = None,
+        final_decision: str | None = None,
+        limit: int = 100,
+    ) -> list[TacticalFeatureEvidenceV2]:
+        """Query immutable TacticalFeatureEvidenceV2 records, defaulting to B1 schema."""
+        query = ["SELECT evidence_json FROM tactical_feature_evidence_v2 WHERE evidence_schema_version = 'TACTICAL_FEATURE_EVIDENCE_V2'"]
+        params: list[Any] = []
+        if symbol:
+            query.append("AND symbol = ?")
+            params.append(symbol.upper())
+        if start_ms is not None:
+            query.append("AND decision_time_ms >= ?")
+            params.append(start_ms)
+        if end_ms is not None:
+            query.append("AND decision_time_ms <= ?")
+            params.append(end_ms)
+        if selected_playbook:
+            query.append("AND selected_playbook = ?")
+            params.append(selected_playbook)
+        if final_decision:
+            query.append("AND final_directional_decision = ?")
+            params.append(final_decision)
+        query.append("ORDER BY decision_time_ms DESC LIMIT ?")
+        params.append(limit)
+
+        with self._connect() as conn:
+            conn.row_factory = sqlite3.Row
+            cursor = conn.execute(" ".join(query), tuple(params))
+            rows = cursor.fetchall()
+            return [deserialize_tactical_feature_evidence(row["evidence_json"]) for row in rows]
 
 
 def is_legacy_tactical_record(record: dict[str, Any]) -> bool:

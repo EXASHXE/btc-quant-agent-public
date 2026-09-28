@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import json
 from collections.abc import Sequence
+from dataclasses import dataclass
 from enum import StrEnum
 
 from ..domain import Candle, Regime
@@ -20,6 +21,7 @@ from ..structure import confirmed_pivots, structure_label
 from .config import MarketWatchConfig
 from .domain import (
     MARKET_SNAPSHOT_SCHEMA_VERSION,
+    RETURN_FEATURE_SEMANTICS_VERSION,
     DerivativesMetrics,
     PriceMetrics,
     TimeframeSnapshot,
@@ -32,12 +34,24 @@ class ReturnAvailability(StrEnum):
     MISSING_HORIZON_ANCHOR = "MISSING_HORIZON_ANCHOR"
 
 
-def closed_bar_return_with_status(
+@dataclass(frozen=True)
+class ReturnObservation:
+    horizon_ms: int
+    value: float | None
+    availability: str
+    anchor_close_time_ms: int | None
+    latest_close_time_ms: int | None
+    source_interval: str = "15m"
+    semantics_version: str = RETURN_FEATURE_SEMANTICS_VERSION
+
+
+def compute_return_observation(
     candles: Sequence[Candle],
     *,
     horizon_ms: int,
-) -> tuple[float | None, ReturnAvailability]:
-    """Compute explicit elapsed-time return from confirmed closed candles with status.
+    source_interval: str = "15m",
+) -> ReturnObservation:
+    """Compute explicit elapsed-time return observation with provenance from confirmed closed candles.
 
     Frozen semantics:
     1. Use closed candles only.
@@ -46,7 +60,7 @@ def closed_bar_return_with_status(
     4. target_close_time = latest.close_time_ms - horizon_ms.
     5. Require an exact closed candle anchor at target_close_time.
     6. If the exact horizon anchor is absent:
-          return (None, INSUFFICIENT_HISTORY or MISSING_HORIZON_ANCHOR)
+          return ReturnObservation(value=None, availability=INSUFFICIENT_HISTORY or MISSING_HORIZON_ANCHOR)
     7. NEVER select the nearest earlier/later candle.
     8. NEVER interpolate.
     9. NEVER use a forming candle.
@@ -58,7 +72,15 @@ def closed_bar_return_with_status(
     # 1. Closed candles only; filter out any forming candle (closed is False)
     closed = [c for c in candles if getattr(c, "closed", True)]
     if not closed:
-        return None, ReturnAvailability.INSUFFICIENT_HISTORY
+        return ReturnObservation(
+            horizon_ms=horizon_ms,
+            value=None,
+            availability=ReturnAvailability.INSUFFICIENT_HISTORY.value,
+            anchor_close_time_ms=None,
+            latest_close_time_ms=None,
+            source_interval=source_interval,
+            semantics_version=RETURN_FEATURE_SEMANTICS_VERSION,
+        )
 
     # 2. Order deterministically by close_time_ms; deduplicate identical timestamps
     by_close_time: dict[int, Candle] = {}
@@ -66,7 +88,15 @@ def closed_bar_return_with_status(
         t = c.close_time_ms
         if t in by_close_time:
             if by_close_time[t].close != c.close:
-                return None, ReturnAvailability.MISSING_HORIZON_ANCHOR
+                return ReturnObservation(
+                    horizon_ms=horizon_ms,
+                    value=None,
+                    availability=ReturnAvailability.MISSING_HORIZON_ANCHOR.value,
+                    anchor_close_time_ms=None,
+                    latest_close_time_ms=None,
+                    source_interval=source_interval,
+                    semantics_version=RETURN_FEATURE_SEMANTICS_VERSION,
+                )
         else:
             by_close_time[t] = c
 
@@ -76,16 +106,47 @@ def closed_bar_return_with_status(
 
     earliest = sorted_candles[0]
     if earliest.close_time_ms > target_close_time:
-        return None, ReturnAvailability.INSUFFICIENT_HISTORY
+        return ReturnObservation(
+            horizon_ms=horizon_ms,
+            value=None,
+            availability=ReturnAvailability.INSUFFICIENT_HISTORY.value,
+            anchor_close_time_ms=target_close_time,
+            latest_close_time_ms=latest.close_time_ms,
+            source_interval=source_interval,
+            semantics_version=RETURN_FEATURE_SEMANTICS_VERSION,
+        )
 
     anchor = by_close_time.get(target_close_time)
-    if anchor is None:
-        return None, ReturnAvailability.MISSING_HORIZON_ANCHOR
+    if anchor is None or anchor.close <= 0:
+        return ReturnObservation(
+            horizon_ms=horizon_ms,
+            value=None,
+            availability=ReturnAvailability.MISSING_HORIZON_ANCHOR.value,
+            anchor_close_time_ms=target_close_time,
+            latest_close_time_ms=latest.close_time_ms,
+            source_interval=source_interval,
+            semantics_version=RETURN_FEATURE_SEMANTICS_VERSION,
+        )
 
-    if anchor.close <= 0:
-        return None, ReturnAvailability.MISSING_HORIZON_ANCHOR
+    return ReturnObservation(
+        horizon_ms=horizon_ms,
+        value=(latest.close / anchor.close) - 1.0,
+        availability=ReturnAvailability.AVAILABLE.value,
+        anchor_close_time_ms=anchor.close_time_ms,
+        latest_close_time_ms=latest.close_time_ms,
+        source_interval=source_interval,
+        semantics_version=RETURN_FEATURE_SEMANTICS_VERSION,
+    )
 
-    return (latest.close / anchor.close) - 1.0, ReturnAvailability.AVAILABLE
+
+def closed_bar_return_with_status(
+    candles: Sequence[Candle],
+    *,
+    horizon_ms: int,
+) -> tuple[float | None, ReturnAvailability]:
+    """Compute explicit elapsed-time return from confirmed closed candles with status."""
+    obs = compute_return_observation(candles, horizon_ms=horizon_ms)
+    return obs.value, ReturnAvailability(obs.availability)
 
 
 def closed_bar_return(

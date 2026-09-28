@@ -17,6 +17,7 @@ from .domain import (
     RelativePerformance,
     TimeframeSnapshot,
 )
+from .evidence import RuleScoreBreakdown
 
 
 def compute_relative_performances(
@@ -217,7 +218,7 @@ def check_fatal_vetoes(
     return (len(vetoes) > 0), tuple(vetoes)
 
 
-def calculate_rule_score(
+def calculate_rule_score_breakdown(
     *,
     decision: DirectionalDecision | None = None,
     tf_1h: TimeframeSnapshot,
@@ -230,8 +231,8 @@ def calculate_rule_score(
     net_rr: float,
     has_fatal_veto: bool,
     config: MarketWatchConfig,
-) -> float:
-    """Calculate transparent multi-factor Rule Score (RULE_SCORE_V1) for operational ranking.
+) -> RuleScoreBreakdown:
+    """Calculate transparent multi-factor Rule Score (RULE_SCORE_V1) breakdown for operational ranking.
 
     CRITICAL SEMANTIC BOUNDARY:
     - RULE_SCORE_V1 != P(win)
@@ -246,9 +247,6 @@ def calculate_rule_score(
     - SHORT: LH_LL positive, HH_HL negative, HEALTHY_SHORT_BUILD positive, HEALTHY_LONG_BUILD negative, taker buy/sell < 1 positive.
     - WAIT: discounted/capped so it cannot receive an actionable opportunity ranking comparable to LONG/SHORT.
     """
-    if has_fatal_veto:
-        return 0.0
-
     if decision is None:
         if str(tf_1h.regime) == "TREND_UP" or tf_1h.structure == "HH_HL":
             eff_decision = DirectionalDecision.LONG
@@ -392,33 +390,111 @@ def calculate_rule_score(
     )
 
     # Penalties
-    total_penalty = 0.0
-    if is_long and derivatives.regime == DerivativesRegime.LONG_CROWDING or is_short and derivatives.regime == DerivativesRegime.SHORT_CROWDING:
-        total_penalty += rc.penalty_crowding
+    crowding_penalty = 0.0
+    if (is_long and derivatives.regime == DerivativesRegime.LONG_CROWDING) or (
+        is_short and derivatives.regime == DerivativesRegime.SHORT_CROWDING
+    ):
+        crowding_penalty = rc.penalty_crowding
 
+    overextension_penalty = 0.0
     if exhaustion.state == ExhaustionState.EXTREME:
-        if is_long and exhaustion.distance_from_ema20_atr > 0 or is_short and exhaustion.distance_from_ema20_atr < 0:
-            total_penalty += rc.penalty_overextension * 1.5
+        if (is_long and exhaustion.distance_from_ema20_atr > 0) or (
+            is_short and exhaustion.distance_from_ema20_atr < 0
+        ):
+            overextension_penalty = rc.penalty_overextension * 1.5
         elif is_wait:
-            total_penalty += rc.penalty_overextension
+            overextension_penalty = rc.penalty_overextension
     elif exhaustion.state == ExhaustionState.ELEVATED:
-        total_penalty += rc.penalty_overextension * 0.7
+        overextension_penalty = rc.penalty_overextension * 0.7
 
+    benchmark_penalty = 0.0
     if is_long and benchmark_context in (
         BenchmarkContext.MARKET_RISK_OFF,
         BenchmarkContext.BTC_VOLATILITY_SHOCK,
     ):
-        total_penalty += rc.penalty_benchmark_risk
+        benchmark_penalty = rc.penalty_benchmark_risk
 
+    low_liquidity_penalty = 0.0
     if derivatives.spread_bps is not None and derivatives.spread_bps > config.thresholds.max_spread_bps:
-        total_penalty += rc.penalty_low_liquidity
+        low_liquidity_penalty = rc.penalty_low_liquidity
 
-    score = max(0.0, min(100.0, weighted_base - total_penalty))
+    total_penalty = crowding_penalty + overextension_penalty + benchmark_penalty + low_liquidity_penalty
+    pre_wait_adjustment_score = max(0.0, min(100.0, weighted_base - total_penalty))
 
-    if is_wait:
+    wait_adjustment_applied = bool(is_wait)
+    score = pre_wait_adjustment_score
+    if wait_adjustment_applied:
         score = min(25.0, score * 0.4)
 
-    return round(score, 2)
+    final_rule_score = 0.0 if has_fatal_veto else round(score, 2)
+
+    return RuleScoreBreakdown(
+        effective_direction=eff_decision.value,
+        adx_score=round(adx_score, 4),
+        ema_slope_score=round(ema_slope_score, 4),
+        trend_quality=round(trend_quality, 4),
+        structure_quality=round(structure_quality, 4),
+        entry_quality_score=round(entry_score, 4),
+        derivatives_confirmation_score=round(deriv_score, 4),
+        volume_z_score=round(vol_z_score, 4),
+        taker_score=round(taker_score, 4),
+        participation_quality=round(participation_quality, 4),
+        relative_strength_score=round(rs_score, 4),
+        net_rr_score=round(net_rr_score, 4),
+        weighted_base=round(weighted_base, 4),
+        crowding_penalty=round(crowding_penalty, 4),
+        overextension_penalty=round(overextension_penalty, 4),
+        benchmark_penalty=round(benchmark_penalty, 4),
+        low_liquidity_penalty=round(low_liquidity_penalty, 4),
+        total_penalty=round(total_penalty, 4),
+        pre_wait_adjustment_score=round(pre_wait_adjustment_score, 4),
+        wait_adjustment_applied=wait_adjustment_applied,
+        final_rule_score=final_rule_score,
+    )
+
+
+def calculate_rule_score(
+    *,
+    decision: DirectionalDecision | None = None,
+    tf_1h: TimeframeSnapshot,
+    tf_15m: TimeframeSnapshot,
+    entry_quality: EntryQuality,
+    derivatives: DerivativesMetrics,
+    exhaustion: ExhaustionMetrics,
+    relative_perf: RelativePerformance | None,
+    benchmark_context: BenchmarkContext,
+    net_rr: float,
+    has_fatal_veto: bool,
+    config: MarketWatchConfig,
+) -> float:
+    """Calculate transparent multi-factor Rule Score (RULE_SCORE_V1) for operational ranking.
+
+    CRITICAL SEMANTIC BOUNDARY:
+    - RULE_SCORE_V1 != P(win)
+    - RULE_SCORE_V1 != calibrated confidence
+    - RULE_SCORE_V1 != expected return
+    - RULE_SCORE_V1 != probability of fill
+    - RULE_SCORE_V1 != validated alpha
+    It is a deterministic rule quality heuristic.
+
+    Fully direction-aware:
+    - LONG: HH_HL positive, LH_LL negative, HEALTHY_LONG_BUILD positive, HEALTHY_SHORT_BUILD negative, taker buy/sell > 1 positive.
+    - SHORT: LH_LL positive, HH_HL negative, HEALTHY_SHORT_BUILD positive, HEALTHY_LONG_BUILD negative, taker buy/sell < 1 positive.
+    - WAIT: discounted/capped so it cannot receive an actionable opportunity ranking comparable to LONG/SHORT.
+    """
+    return calculate_rule_score_breakdown(
+        decision=decision,
+        tf_1h=tf_1h,
+        tf_15m=tf_15m,
+        entry_quality=entry_quality,
+        derivatives=derivatives,
+        exhaustion=exhaustion,
+        relative_perf=relative_perf,
+        benchmark_context=benchmark_context,
+        net_rr=net_rr,
+        has_fatal_veto=has_fatal_veto,
+        config=config,
+    ).final_rule_score
 
 
 # Deprecated backward compatibility alias
