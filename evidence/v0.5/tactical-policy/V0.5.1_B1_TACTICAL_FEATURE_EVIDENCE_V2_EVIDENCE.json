@@ -1,10 +1,11 @@
 {
-  "contract": "V0.5.1_B1_TACTICAL_FEATURE_EVIDENCE_V2",
+  "contract": "V0.5.1_B1_R1_TACTICAL_FEATURE_EVIDENCE_V2_INTEGRITY_SEAL",
   "status": "IMPLEMENTED_PENDING_CONTROLLER",
-  "timestamp": "2026-09-28T17:40:00+08:00",
+  "timestamp": "2026-09-29T00:45:00+08:00",
   "scientific_authority_mainline_sha": "407dabc415ae8cae4210250e992941c8b9b25464",
-  "required_starting_sha": "d378d75d86678cc42a29aa0119adc85d2b6c82c4",
-  "implementation_commit_sha": "41d19fadf6b787006c2cd6fadd5f63981108c377",
+  "parent_accepted_b0_authority_sha": "d378d75d86678cc42a29aa0119adc85d2b6c82c4",
+  "b1_initial_sha": "41d19fadf6b787006c2cd6fadd5f63981108c377",
+  "b1_r1_sha": "9af27c26aaca195f14777ef891720458dc12f556",
   "branch": "feature/tactical-policy-r2",
   "docs_branch": "v0.5-refactor-docs",
   "versions": {
@@ -38,25 +39,37 @@
   "reserved_inactive_playbooks": [
     "RANGE_MEAN_REVERSION"
   ],
+  "integrity_statuses": {
+    "identity_integrity_status": "VERIFIED",
+    "deep_immutability_status": "VERIFIED",
+    "config_self_containment_status": "VERIFIED",
+    "pit_validation_status": "VERIFIED",
+    "feature_completeness_status": "VERIFIED",
+    "policy_state_input_status": "VERIFIED",
+    "natural_key_uniqueness_status": "VERIFIED",
+    "atomic_persistence_status": "VERIFIED",
+    "full_population_capture_status": "VERIFIED"
+  },
   "gates": {
     "scientific_fence_h40_diff": "ZERO",
     "git_diff_check": "PASSED",
     "python_compileall": "PASSED",
     "ruff_check": "PASSED",
     "mypy": "PASSED",
-    "b1_tests_passed": 12,
+    "b1_r1_tests_passed": 25,
     "b0_tests_passed": 23,
     "market_watch_tests_passed": 137,
-    "pytest_total": 1918,
-    "pytest_passed": 1916,
+    "pytest_total": 1931,
+    "pytest_passed": 1929,
     "pytest_skipped": 2,
     "pytest_failed": 0
   },
   "storage_benchmark": {
     "records_persisted": 1000,
-    "time_seconds": 0.18,
-    "avg_bytes_per_record": 13516,
+    "time_seconds": 0.22,
+    "avg_bytes_per_record": 15200,
     "budget_bytes_per_record": 20480,
     "budget_status": "PASSED"
-  }
+  },
+  "remote_ci": "REMOTE_CI_NOT_OBSERVED"
 }
