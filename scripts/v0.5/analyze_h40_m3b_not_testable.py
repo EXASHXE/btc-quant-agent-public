@@ -11,10 +11,16 @@ from __future__ import annotations
 
 import argparse
 import json
-import math
-from pathlib import Path
 import sys
+from pathlib import Path
 from typing import Any
+
+from btc_quant_agent.h40.discovery_evidence import (
+    H40DiscoveryEvidenceResolver,
+    _load_decisions,
+    _load_source_bars,
+    h40_fit_calibrator,
+)
 
 from btc_quant_agent.h40 import (
     H40LifecycleImplementationAuthority,
@@ -24,12 +30,6 @@ from btc_quant_agent.h40 import (
     materialize_h40_search_space_production,
     materialize_runtime_source_split_authority,
     materialize_verified_manifest,
-)
-from btc_quant_agent.h40.discovery_evidence import (
-    H40DiscoveryEvidenceResolver,
-    _load_decisions,
-    _load_source_bars,
-    h40_fit_calibrator,
 )
 
 
@@ -55,7 +55,7 @@ def run_analysis(repo_root: Path) -> dict[str, Any]:
     space = materialize_h40_search_space_production()
     slots_by_hash = {s.structural_configuration_hash: s for s in space.slots}
 
-    impl = H40LifecycleImplementationAuthority(
+    H40LifecycleImplementationAuthority(
         accepted_lifecycle_governance_authority_hash="bb367f2af726be105bddf42636c97652402014c8a671d43ab81b1964c258e5cf",
         f01_implementation_acceptance_artifact_path="reviews/v0.5/V0.5.1_H40_PRE_P3_CLOSURE_EXACT_SHA_CONTROLLER_ACCEPTANCE.md",
         f01_implementation_acceptance_commit_sha="8ae06121d1e83db8df612951914629c62ed70c4b",
@@ -150,7 +150,7 @@ def run_analysis(repo_root: Path) -> dict[str, Any]:
         replayed_reason = None
         try:
             h40_fit_calibrator(slot.calibration_contract_id, fit_rows)
-        except Exception as exc:
+        except Exception as exc:  # noqa: BLE001
             replayed_fit_status = "FIT_INVALID"
             replayed_reason = str(getattr(exc, "message", exc))
 
@@ -168,7 +168,7 @@ def run_analysis(repo_root: Path) -> dict[str, Any]:
             final_reason = "NONE"
 
         scores = [r[0] for r in fit_rows]
-        labels = [r[1] for r in fit_rows]
+        [r[1] for r in fit_rows]
         pos_scores = [s for s, l in fit_rows if l == 1]
         neg_scores = [s for s, l in fit_rows if l == 0]
 
@@ -275,7 +275,7 @@ def run_analysis(repo_root: Path) -> dict[str, Any]:
         "complete_fit_count": sum(1 for c in candidates_table if not c["direct_fit_invalid"]),
         "scientific_unavailable_count": sum(1 for c in candidates_table if c["final_scientific_unavailable_reason"] != "NONE"),
         "families": families_summary,
-        "fit_populations": sorted(list(unique_populations.values()), key=lambda x: (x["direction_variant"], int(x["primary_horizon"].rstrip("h")))),
+        "fit_populations": sorted(unique_populations.values(), key=lambda x: (x["direction_variant"], int(x["primary_horizon"].rstrip("h")))),
         "failure_reason_counts": failure_reasons,
         "root_cause_categories": root_cause_categories,
         "producer_verifier_replay_consistent": replay_consistent,
@@ -295,7 +295,7 @@ def run_analysis(repo_root: Path) -> dict[str, Any]:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Analyze H40 M3B NOT_TESTABLE failure taxonomy.")
-    parser.add_argument("--repo-root", type=Path, default=Path(".").resolve(), help="Path to repository root.")
+    parser.add_argument("--repo-root", type=Path, default=Path.cwd(), help="Path to repository root.")
     parser.add_argument("--write-json", type=Path, default=None, help="Path to write machine JSON evidence.")
     args = parser.parse_args()
 

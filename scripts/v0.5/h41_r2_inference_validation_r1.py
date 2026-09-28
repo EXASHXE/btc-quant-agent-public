@@ -27,7 +27,7 @@ import math
 import multiprocessing as mp
 import time
 from pathlib import Path
-from typing import Any, Dict, List, Tuple
+from typing import Any
 
 import numpy as np
 
@@ -83,7 +83,7 @@ def run_joint_bootstrap_studentized(
     L: int,
     B: int,
     rng: np.random.Generator
-) -> Tuple[np.ndarray, np.ndarray, float, np.ndarray]:
+) -> tuple[np.ndarray, np.ndarray, float, np.ndarray]:
     """
     Executes shared-clock, source-bundle standardized single-step joint maximum bootstrap
     with Studentized bootstrap-t and Künsch (1989) ratio-estimator block sums.
@@ -95,7 +95,7 @@ def run_joint_bootstrap_studentized(
     Returns: (mu_hat, se_hat, c95, lcb)
     """
     K, T = Z.shape
-    num_blocks = int(math.ceil(T / L))
+    num_blocks = math.ceil(T / L)
     S = T - L + 1
 
     # 1. Sample ratio estimator
@@ -194,8 +194,8 @@ def generate_dgp_scenario(
     T: int,
     rng: np.random.Generator,
     signal_delta: float = 0.0,
-    signal_slots: List[int] | None = None
-) -> Tuple[np.ndarray, np.ndarray]:
+    signal_slots: list[int] | None = None
+) -> tuple[np.ndarray, np.ndarray]:
     """
     Generates synthetic (Z, A) matrices of shape (K, T) according to scenario class.
     All processes are purely synthetic; zero real market returns accessed.
@@ -392,8 +392,8 @@ def generate_dgp_scenario(
 # ---------------------------------------------------------------------------
 
 def _mc_worker_batch(
-    args: Tuple[int, int, List[int], int, int, int]
-) -> List[Dict[str, Any]]:
+    args: tuple[int, int, list[int], int, int, int]
+) -> list[dict[str, Any]]:
     """
     Worker function executing a chunk of Monte Carlo runs for a specific scenario class.
     args: (s_idx, seed, block_lengths, chunk_size, bootstrap_draws, T)
@@ -412,10 +412,10 @@ def _mc_worker_batch(
 
     for _ in range(chunk_size):
         Z, A = generate_dgp_scenario(s_idx, T, rng)
-        run_record: Dict[str, Any] = {}
+        run_record: dict[str, Any] = {}
 
         for L in block_lengths:
-            mu_hat, se_hat, c95, lcb = run_joint_bootstrap_studentized(Z, A, L, bootstrap_draws, rng)
+            _mu_hat, se_hat, c95, lcb = run_joint_bootstrap_studentized(Z, A, L, bootstrap_draws, rng)
             if math.isnan(c95):
                 run_record[f"L_{L}h"] = None
                 continue
@@ -456,7 +456,7 @@ def run_simulation_experiment(
     master_seed: int = 20260928,
     num_workers: int | None = None,
     checkpoint_file: str | None = None
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Executes the full R2 inference validation experiment across 12 DGPs,
     candidate block lengths, and power grid. Supports checkpointing and resumption.
@@ -473,7 +473,7 @@ def run_simulation_experiment(
 
     t_start = time.time()
 
-    results: Dict[str, Any] = {
+    results: dict[str, Any] = {
         "metadata": {
             "stage": "H41_R2_OUTCOME_FREE_INFERENCE_VALIDATION_R1",
             "evaluated_block_lengths_hours": EVALUATED_BLOCK_LENGTHS,
@@ -513,7 +513,7 @@ def run_simulation_experiment(
         "Class 12: Mixed Null/Signal Configurations (True Signal on Cands 0,1)"
     ]
 
-    block_stats: Dict[int, Dict[str, List[float]]] = {
+    block_stats: dict[int, dict[str, list[float]]] = {
         L: {"fwer": [], "cov": [], "se": []} for L in EVALUATED_BLOCK_LENGTHS
     }
 
@@ -530,12 +530,12 @@ def run_simulation_experiment(
                 if L_int in block_stats:
                     block_stats[L_int] = stats
             print(f"Loaded checkpoint from {checkpoint_path}: {len(results['scenario_evaluations'])} scenarios already complete.")
-        except Exception as e:
+        except (OSError, json.JSONDecodeError, KeyError, ValueError) as e:
             print(f"Notice: could not load checkpoint ({e}); starting fresh.")
 
     # Create worker chunks
     chunk_size = max(1, num_monte_carlo // (num_workers * 4))
-    num_chunks = int(math.ceil(num_monte_carlo / chunk_size))
+    num_chunks = math.ceil(num_monte_carlo / chunk_size)
 
     with mp.Pool(processes=num_workers) as pool:
         for s_idx in range(1, 13):
@@ -610,7 +610,7 @@ def run_simulation_experiment(
                             "scenario_evaluations": results["scenario_evaluations"],
                             "block_stats": {str(L): block_stats[L] for L in EVALUATED_BLOCK_LENGTHS}
                         }, f, indent=2)
-                except Exception as e:
+                except OSError as e:
                     print(f"Notice: could not save checkpoint ({e}).")
 
     # -----------------------------------------------------------------------
@@ -674,7 +674,7 @@ def run_simulation_experiment(
     # -----------------------------------------------------------------------
     benchmark_L = results["recommended_block_length_hours"] or 72
     print(f"\n--- Phase 2: Evaluating Power Curve Across Planning Grid (L={benchmark_L}h Benchmark) ---")
-    power_results: Dict[str, Dict[str, float]] = {}
+    power_results: dict[str, dict[str, float]] = {}
     test_slots = [0, 1]  # 0: D1 RET4 H4, 1: D1 RET12 H24
     slot_labels = {0: "H41_D1_BTC_RET4_Q80_H4 (h=4)", 1: "H41_D1_BTC_RET12_Q80_H24 (h=24)"}
 
@@ -689,7 +689,7 @@ def run_simulation_experiment(
             rng_pwr = np.random.Generator(np.random.PCG64(master_seed + 9999 + int(delta_bps * 10) + slot * 100))
             for m in range(power_m):
                 Z, A = generate_dgp_scenario(2, TOTAL_HOURS_T, rng_pwr, signal_delta=delta, signal_slots=[slot])
-                mu_hat, se_hat, c95, lcb = run_joint_bootstrap_studentized(Z, A, benchmark_L, min(bootstrap_draws, 2000), rng_pwr)
+                _mu_hat, _se_hat, c95, lcb = run_joint_bootstrap_studentized(Z, A, benchmark_L, min(bootstrap_draws, 2000), rng_pwr)
                 if not math.isnan(c95) and lcb[slot] > 0.0:
                     reject_count += 1
             emp_power = reject_count / power_m
@@ -739,7 +739,7 @@ def run_simulation_experiment(
     A_zero[5, :] = 0.0
     Z_zero[5, :] = 0.0
     rng_z = np.random.Generator(np.random.PCG64(555555))
-    mu_z, se_z, c95_z, lcb_z = run_joint_bootstrap_studentized(Z_zero, A_zero, benchmark_L, 200, rng_z)
+    _mu_z, _se_z, c95_z, lcb_z = run_joint_bootstrap_studentized(Z_zero, A_zero, benchmark_L, 200, rng_z)
     zero_pass = bool(math.isinf(lcb_z[5]) and lcb_z[5] < 0 and not math.isnan(c95_z))
     results["zero_count_fail_closed_verified"] = zero_pass
     print(f"Zero-Count Fail-Closed Verification: {zero_pass}")
@@ -753,7 +753,7 @@ def run_simulation_experiment(
 # Evidence-Driven Mechanical Report Generator
 # ---------------------------------------------------------------------------
 
-def write_validation_report_r1(results: Dict[str, Any], output_path: Path) -> None:
+def write_validation_report_r1(results: dict[str, Any], output_path: Path) -> None:
     """
     Generates a 100% evidence-driven Markdown validation report.
     Every single number and status is derived mechanically from the results object.

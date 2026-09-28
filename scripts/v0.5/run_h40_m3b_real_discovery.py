@@ -11,34 +11,30 @@ Adheres strictly to V0.5.1_H40_M3B_FIRST_REAL_DISCOVERY_AND_CANDIDATE_LOCK.md:
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
-from decimal import Decimal
 import hashlib
 import json
-import os
-from pathlib import Path
 import resource
 import sys
 import time
-from typing import Any
+from datetime import UTC, datetime
+from pathlib import Path
 
 import pyarrow.parquet as pq
+from btc_quant_agent.h40.discovery_evidence import (
+    H40ProductionDiscoveryEvidenceVerifier,
+)
+from btc_quant_agent.h40.discovery_producer import (
+    H40ProductionDiscoveryEvidenceProducer,
+)
 
 from btc_quant_agent.execution import (
     ACCEPTED_EXECUTION_WRITE_AUTHORITY,
     CURRENT_EXECUTION_POLICY,
 )
 from btc_quant_agent.h40 import (
-    EXPECTED_LIFECYCLE_GOVERNANCE_AUTHORITY_HASH,
-    EXPECTED_LIFECYCLE_SEMANTIC_ROOT_HASH,
     EXPECTED_PROTOCOL_AUTHORITY_HASH,
-    EXPECTED_SEMANTIC_ROOT_HASH,
     EXPECTED_STRUCTURAL_LEDGER_HASH,
-    DISCOVERY_SELECTION_CORRECTION_CONTRACT_HASH,
-    H40CandidateLockReceipt,
-    H40CandidateResultEntry,
     H40DiscoveryAuthorizationReceipt,
-    H40DiscoveryResultEvidence,
     H40DiscoveryRunGrant,
     H40GuardError,
     H40LifecycleArtifactStore,
@@ -51,24 +47,16 @@ from btc_quant_agent.h40 import (
     H40RequiredTestCIEvidenceIdentity,
     H40RunAuthority,
     H40RuntimeSnapshotSeal,
-    H40TerminationReceipt,
     compute_lifecycle_governance_authority_hash,
-    compute_lifecycle_semantic_root_hash,
     compute_protocol_authority_hash,
     compute_semantic_root_hash,
     materialize_runtime_source_split_authority,
     materialize_verified_manifest,
 )
-from btc_quant_agent.h40.discovery_evidence import (
-    H40ProductionDiscoveryEvidenceVerifier,
-)
-from btc_quant_agent.h40.discovery_producer import (
-    H40ProductionDiscoveryEvidenceProducer,
-)
 
 
 def log(msg: str) -> None:
-    now = datetime.now(timezone.utc).isoformat()
+    now = datetime.now(UTC).isoformat()
     print(f"[{now}] {msg}", flush=True)
 
 
@@ -84,7 +72,7 @@ def main() -> int:
     t_start = time.perf_counter()
     log("=== START H40 M3B FIRST REAL DISCOVERY AND CANDIDATE LOCK ===")
 
-    repo_root = Path(".").resolve()
+    repo_root = Path.cwd()
     log(f"Working repository root: {repo_root}")
 
     # 1. Clean-run preflight checks
@@ -172,7 +160,7 @@ def main() -> int:
         authorized_at_utc = raw_auth["receipt"]["authorized_at_utc"]
         log(f"Preserving frozen authorized_at_utc: {authorized_at_utc}")
     else:
-        authorized_at_utc = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+        authorized_at_utc = datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
     grant = H40DiscoveryRunGrant.from_controller_and_run(
         controller_authority=ctrl,
         run_authority=run,
@@ -287,7 +275,7 @@ def main() -> int:
 
     # 8. Candidate Lock / Termination transition
     log("9. Transitioning Candidate Lock...")
-    now_utc = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    now_utc = datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
 
     candidate_lock_created = False
     candidate_lock_receipt_hash = None
@@ -307,7 +295,7 @@ def main() -> int:
             locked_at_utc=now_utc,
             verified_at_utc=now_utc,
         )
-        lock_path = store.persist_authorization("02_candidate_lock", cand_lock_auth, service=service)
+        store.persist_authorization("02_candidate_lock", cand_lock_auth, service=service)
         candidate_lock_created = True
         candidate_lock_receipt_hash = cand_lock_auth.receipt_hash
         selected_entry = cand_lock_auth.context["selected_entry"]
@@ -327,7 +315,7 @@ def main() -> int:
                 target_state=target_state,
                 reason_code=exc.reason_code,
                 detail_message=exc.message,
-                terminated_at_utc=datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+                terminated_at_utc=datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ"),
                 failure_evidence=real_evidence,
                 failure_evidence_hash=real_evidence.evidence_sha256,
             )

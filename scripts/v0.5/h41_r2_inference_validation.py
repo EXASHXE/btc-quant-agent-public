@@ -23,7 +23,7 @@ import json
 import math
 import time
 from pathlib import Path
-from typing import Any, Dict, List, Tuple
+from typing import Any
 
 import numpy as np
 
@@ -75,7 +75,7 @@ def run_joint_bootstrap(
     L: int,
     B: int,
     rng: np.random.Generator
-) -> Tuple[np.ndarray, np.ndarray, float, np.ndarray]:
+) -> tuple[np.ndarray, np.ndarray, float, np.ndarray]:
     """
     Executes shared-clock, source-bundle standardized single-step joint maximum bootstrap.
     Z: (K, T) - event return array (Z = A * Y)
@@ -85,7 +85,7 @@ def run_joint_bootstrap(
     Returns: (mu_hat, se_hat, c95, lcb)
     """
     K, T = Z.shape
-    num_blocks = int(math.ceil(T / L))
+    num_blocks = math.ceil(T / L)
     
     # 1. Sample ratio estimator
     denom = A.sum(axis=1)
@@ -157,8 +157,8 @@ def generate_dgp_scenario(
     T: int,
     rng: np.random.Generator,
     signal_delta: float = 0.0,
-    signal_slots: List[int] | None = None
-) -> Tuple[np.ndarray, np.ndarray]:
+    signal_slots: list[int] | None = None
+) -> tuple[np.ndarray, np.ndarray]:
     """
     Generates synthetic (Z, A) matrices of shape (K, T) according to scenario class.
     """
@@ -366,7 +366,7 @@ def run_simulation_experiment(
     num_monte_carlo: int = 500,
     bootstrap_draws: int = 2000,
     master_seed: int = 20260928
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Executes the full R2 inference validation experiment across scenarios, block lengths, and power grid.
     """
@@ -378,7 +378,7 @@ def run_simulation_experiment(
     
     rng = np.random.Generator(np.random.PCG64(master_seed))
     
-    results: Dict[str, Any] = {
+    results: dict[str, Any] = {
         "metadata": {
             "stage": "H41_R2_OUTCOME_FREE_INFERENCE_VALIDATION_R1",
             "evaluated_block_lengths_hours": EVALUATED_BLOCK_LENGTHS,
@@ -435,7 +435,7 @@ def run_simulation_experiment(
             
             for m in range(num_monte_carlo):
                 Z, A = generate_dgp_scenario(s_idx, TOTAL_HOURS_T, rng)
-                mu_hat, se_hat, c95, lcb = run_joint_bootstrap(Z, A, L, bootstrap_draws, rng)
+                _mu_hat, se_hat, c95, lcb = run_joint_bootstrap(Z, A, L, bootstrap_draws, rng)
                 
                 if math.isnan(c95):
                     continue
@@ -521,7 +521,7 @@ def run_simulation_experiment(
             reject_count = 0
             for m in range(num_monte_carlo):
                 Z, A = generate_dgp_scenario(2, TOTAL_HOURS_T, rng, signal_delta=delta, signal_slots=[slot])
-                mu_hat, se_hat, c95, lcb = run_joint_bootstrap(Z, A, 72, bootstrap_draws, rng)
+                _mu_hat, se_hat, c95, lcb = run_joint_bootstrap(Z, A, 72, bootstrap_draws, rng)
                 if not math.isnan(c95) and lcb[slot] > 0.0:
                     reject_count += 1
             emp_power = reject_count / num_monte_carlo
@@ -577,7 +577,7 @@ def run_simulation_experiment(
     return results
 
 
-def write_validation_report(results: Dict[str, Any], output_path: Path) -> None:
+def write_validation_report(results: dict[str, Any], output_path: Path) -> None:
     """
     Generates the comprehensive Markdown validation report.
     """
@@ -652,7 +652,7 @@ def write_validation_report(results: Dict[str, Any], output_path: Path) -> None:
     ]
     )
     
-    for s_key, s_data in sc_eval.items():
+    for s_data in sc_eval.values():
         name = s_data["name"]
         m = s_data["block_length_metrics"]
         lines.append(

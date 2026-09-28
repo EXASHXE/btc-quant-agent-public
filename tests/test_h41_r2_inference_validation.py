@@ -15,12 +15,11 @@ Verifies all 12 preregistered acceptance invariants:
 12. test_zero_event_fail_closed
 """
 
+import importlib.util
 import math
 from pathlib import Path
 
 import numpy as np
-
-import importlib.util
 
 repo_root = Path(__file__).resolve().parent.parent
 script_path = repo_root / "scripts" / "v0.5" / "h41_r2_inference_validation_r1.py"
@@ -48,7 +47,7 @@ def test_joint_shared_clock_resampling() -> None:
     L = 72
     B = 100
     S = TOTAL_HOURS_T - L + 1
-    num_blocks = int(math.ceil(TOTAL_HOURS_T / L))
+    num_blocks = math.ceil(TOTAL_HOURS_T / L)
 
     # Test the internal block selection mechanism
     starts = rng.integers(0, S, size=(B, num_blocks))
@@ -105,7 +104,7 @@ def test_no_horizon_creation_across_block_join() -> None:
     is calculated across synthetic block joins.
     """
     rng = np.random.Generator(np.random.PCG64(404))
-    Z, A = generate_dgp_scenario(2, TOTAL_HOURS_T, rng)
+    Z, _A = generate_dgp_scenario(2, TOTAL_HOURS_T, rng)
     L = 72
 
     # In run_joint_bootstrap_studentized, block sums Z_blocks and A_blocks
@@ -126,7 +125,7 @@ def test_null_centering() -> None:
     L = 72
     B = 5000
     S = TOTAL_HOURS_T - L + 1
-    num_blocks = int(math.ceil(TOTAL_HOURS_T / L))
+    num_blocks = math.ceil(TOTAL_HOURS_T / L)
 
     Z_cs = np.pad(np.cumsum(Z, axis=1), ((0, 0), (1, 0)))
     A_cs = np.pad(np.cumsum(A, axis=1), ((0, 0), (1, 0)))
@@ -187,7 +186,7 @@ def test_mixed_null_fwer_only_counts_nulls() -> None:
     # In Class 12, true nulls are coordinates 2..19
     null_coords = list(range(2, NUM_CANDIDATES_K))
 
-    mu_hat, se_hat, c95, lcb = run_joint_bootstrap_studentized(Z, A, 72, 1000, rng)
+    _mu_hat, _se_hat, _c95, lcb = run_joint_bootstrap_studentized(Z, A, 72, 1000, rng)
 
     # Rejection of signal candidate must not be classified as null Type I error
     # Check that null FWER evaluates only null_coords
@@ -262,7 +261,7 @@ def test_partition_edge_censoring() -> None:
     t + h > T is strictly prospectively censored (A[i, t] == 0).
     """
     rng = np.random.Generator(np.random.PCG64(1111))
-    Z, A = generate_dgp_scenario(2, TOTAL_HOURS_T, rng)
+    _Z, A = generate_dgp_scenario(2, TOTAL_HOURS_T, rng)
     horizons = np.array(CANDIDATE_HORIZONS)
 
     for i, h in enumerate(horizons):
@@ -282,7 +281,7 @@ def test_zero_event_fail_closed() -> None:
     Z[5, :] = 0.0
     A[5, :] = 0.0
 
-    mu_hat, se_hat, c95, lcb = run_joint_bootstrap_studentized(Z, A, 72, 200, rng)
+    _mu_hat, _se_hat, c95, lcb = run_joint_bootstrap_studentized(Z, A, 72, 200, rng)
     assert not math.isnan(c95), "Joint critical value should remain valid for remaining coordinates"
     assert math.isinf(lcb[5]) and lcb[5] < 0, "Zero-event candidate must fail closed with LCB = -inf"
     assert not math.isinf(lcb[0]), "Valid candidate must have finite LCB"
