@@ -1,20 +1,23 @@
 {
   "contract": "V0.5.1_B0_TACTICAL_POLICY_R2_INTEGRATION_AND_SEMANTIC_SEAL",
   "status": "IMPLEMENTED_PENDING_CONTROLLER",
-  "timestamp": "2026-09-28T11:55:00+08:00",
+  "timestamp": "2026-09-28T12:45:00+08:00",
   "authority_base_sha": "407dabc415ae8cae4210250e992941c8b9b25464",
   "prototype_sha": "d9e509ad0c3cabbfd0bd0b474e3f9be63f5133dc",
   "merge_commit_sha": "b0279eded1c15e59db1eaaab6c60391fec0b7154",
-  "implementation_commit_sha": "9f49567a9e8390adf2bfebcf0807e44ab15d6f48",
+  "b0_initial_seal_sha": "9f49567a9e8390adf2bfebcf0807e44ab15d6f48",
+  "implementation_commit_sha": "d378d75d86678cc42a29aa0119adc85d2b6c82c4",
+  "b0_r1_repair_sha": "d378d75d86678cc42a29aa0119adc85d2b6c82c4",
   "branch": "feature/tactical-policy-r2",
   "versions": {
     "tactical_policy_version": "TACTICAL_POLICY_R2_B0",
     "market_snapshot_schema_version": "MARKET_SNAPSHOT_V2",
-    "return_feature_semantics_version": "CLOSED_BAR_ELAPSED_V1",
+    "return_feature_semantics_version": "ELAPSED_TIME_RETURNS_V1",
     "rule_score_semantics_version": "RULE_SCORE_V1",
     "heuristic_rule_quality_band_version": "HEURISTIC_RULE_QUALITY_BAND_V1",
     "playbook_selection_version": "STATIC_PRECEDENCE_V1",
-    "reference_universe_version": "CANONICAL_TOP8_V1",
+    "reference_universe_version": "TACTICAL_RS_UNIVERSE_V1",
+    "semantic_identity_version": "TACTICAL_SEMANTIC_IDENTITY_V1",
     "market_watch_evidence_version": "FORWARD_EVIDENCE_V1"
   },
   "canonical_reference_universe": [
@@ -42,11 +45,11 @@
     "python_compileall": "PASSED",
     "ruff_check": "PASSED",
     "mypy": "PASSED",
-    "pytest_total": 1898,
-    "pytest_passed": 1898,
+    "pytest_total": 1906,
+    "pytest_passed": 1904,
     "pytest_skipped": 2,
     "pytest_failed": 0,
-    "pytest_duration_seconds": 800.63,
+    "pytest_duration_seconds": 823.62,
     "h40_fence_zero_diff": true,
     "private_api_fence_zero_tokens": true
   }
