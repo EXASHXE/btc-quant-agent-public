@@ -9,6 +9,8 @@ from dataclasses import asdict, dataclass, field, fields
 from pathlib import Path
 from typing import Any
 
+from .market_watch.config import MarketWatchConfig, build_market_watch_config
+
 
 def _require_positive_int(value: Any, name: str) -> None:
     if type(value) is not int or value <= 0:
@@ -247,10 +249,21 @@ class AppConfig:
     execution: ExecutionConfig = field(default_factory=ExecutionConfig)
     storage: StorageConfig = field(default_factory=StorageConfig)
     notify: NotifyConfig = field(default_factory=NotifyConfig)
+    market_watch: MarketWatchConfig = field(default_factory=MarketWatchConfig)
 
     @property
     def config_hash(self) -> str:
-        payload = json.dumps(asdict(self), sort_keys=True, separators=(",", ":"))
+        data = {
+            "runtime": asdict(self.runtime),
+            "strategy": asdict(self.strategy),
+            "risk": asdict(self.risk),
+            "data": asdict(self.data),
+            "backtest": asdict(self.backtest),
+            "execution": asdict(self.execution),
+            "storage": asdict(self.storage),
+            "notify": asdict(self.notify),
+        }
+        payload = json.dumps(data, sort_keys=True, separators=(",", ":"))
         return hashlib.sha256(payload.encode()).hexdigest()[:16]
 
 
@@ -286,6 +299,7 @@ def load_config(path: str | Path | None = None) -> AppConfig:
         "execution",
         "storage",
         "notify",
+        "market_watch",
     }
     unknown_sections = sorted(set(raw) - allowed_sections)
     if unknown_sections:
@@ -299,6 +313,7 @@ def load_config(path: str | Path | None = None) -> AppConfig:
         execution=_build(ExecutionConfig, raw.get("execution")),
         storage=_build(StorageConfig, raw.get("storage")),
         notify=_build(NotifyConfig, raw.get("notify")),
+        market_watch=build_market_watch_config(raw.get("market_watch")),
     )
     db_override = os.getenv("BTC_QUANT_DB_PATH")
     if not db_override:
@@ -312,4 +327,5 @@ def load_config(path: str | Path | None = None) -> AppConfig:
         execution=config.execution,
         storage=StorageConfig(sqlite_path=db_override),
         notify=config.notify,
+        market_watch=config.market_watch,
     )
