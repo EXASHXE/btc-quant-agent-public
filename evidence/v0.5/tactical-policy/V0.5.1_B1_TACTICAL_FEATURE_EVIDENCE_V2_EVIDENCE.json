@@ -1,0 +1,62 @@
+{
+  "contract": "V0.5.1_B1_TACTICAL_FEATURE_EVIDENCE_V2",
+  "status": "IMPLEMENTED_PENDING_CONTROLLER",
+  "timestamp": "2026-09-28T17:40:00+08:00",
+  "scientific_authority_mainline_sha": "407dabc415ae8cae4210250e992941c8b9b25464",
+  "required_starting_sha": "d378d75d86678cc42a29aa0119adc85d2b6c82c4",
+  "implementation_commit_sha": "41d19fadf6b787006c2cd6fadd5f63981108c377",
+  "branch": "feature/tactical-policy-r2",
+  "docs_branch": "v0.5-refactor-docs",
+  "versions": {
+    "tactical_policy_version": "TACTICAL_POLICY_R2_B0",
+    "evidence_schema_version": "TACTICAL_FEATURE_EVIDENCE_V2",
+    "market_snapshot_schema_version": "MARKET_SNAPSHOT_V2",
+    "return_feature_semantics_version": "ELAPSED_TIME_RETURNS_V1",
+    "rule_score_semantics_version": "RULE_SCORE_V1",
+    "heuristic_rule_quality_band_version": "HEURISTIC_RULE_QUALITY_BAND_V1",
+    "playbook_selection_version": "STATIC_PRECEDENCE_V1",
+    "reference_universe_version": "TACTICAL_RS_UNIVERSE_V1",
+    "semantic_identity_version": "TACTICAL_SEMANTIC_IDENTITY_V1"
+  },
+  "canonical_reference_universe": [
+    "BTCUSDT",
+    "ETHUSDT",
+    "SOLUSDT",
+    "LINKUSDT",
+    "SUIUSDT",
+    "XRPUSDT",
+    "DOGEUSDT",
+    "BNBUSDT"
+  ],
+  "active_playbooks": [
+    "TREND_PULLBACK",
+    "BREAKOUT_RETEST",
+    "FAILED_BREAKOUT",
+    "FAILED_BREAKDOWN",
+    "VOLATILITY_EXPANSION"
+  ],
+  "reserved_inactive_playbooks": [
+    "RANGE_MEAN_REVERSION"
+  ],
+  "gates": {
+    "scientific_fence_h40_diff": "ZERO",
+    "git_diff_check": "PASSED",
+    "python_compileall": "PASSED",
+    "ruff_check": "PASSED",
+    "mypy": "PASSED",
+    "b1_tests_passed": 12,
+    "b0_tests_passed": 23,
+    "market_watch_tests_passed": 137,
+    "pytest_total": 1918,
+    "pytest_passed": 1916,
+    "pytest_skipped": 2,
+    "pytest_failed": 0
+  },
+  "storage_benchmark": {
+    "records_persisted": 1000,
+    "time_seconds": 0.18,
+    "avg_bytes_per_record": 13516,
+    "budget_bytes_per_record": 20480,
+    "budget_status": "PASSED"
+  }
+}
