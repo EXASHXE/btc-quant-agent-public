@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 H41 R2 Outcome-Free Synthetic Inference Validation Engine (R1)
 =============================================================

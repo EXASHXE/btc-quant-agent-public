@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Deterministic One-Shot Execution Script for H40 M3B: First Real Discovery and Candidate Lock.
 
 Adheres strictly to V0.5.1_H40_M3B_FIRST_REAL_DISCOVERY_AND_CANDIDATE_LOCK.md:

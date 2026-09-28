@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Read-Only Forensic Failure Taxonomy and Root-Cause Analyzer for H40 M3B.
 
 Strictly read-only:
