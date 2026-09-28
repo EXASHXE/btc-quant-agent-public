@@ -34,6 +34,9 @@ where = ["src"]
 line-length = 100
 target-version = "py311"
 
+[tool.ruff.lint]
+ignore = ["I001"]
+
 [tool.mypy]
 files = ["src/btc_quant_agent"]
 strict = true
