@@ -263,7 +263,12 @@ class MarketWatchScanner:
         tf_1h = compute_timeframe_snapshot("1h", raw_1h, None, self.config)
         tf_4h = compute_timeframe_snapshot("4h", raw_4h, None, self.config)
 
-        # 5. Assemble DerivativesMetrics
+        # 5. Compute true elapsed returns from confirmed closed 15m candles
+        r1h, r1h_status = closed_bar_return_with_status(raw_15m, horizon_ms=3_600_000)
+        r4h, r4h_status = closed_bar_return_with_status(raw_15m, horizon_ms=14_400_000)
+        r12h, r12h_status = closed_bar_return_with_status(raw_15m, horizon_ms=43_200_000)
+
+        # 6. Assemble DerivativesMetrics
         basis_bps = (basis_rate * 10_000.0) if basis_rate is not None else None
         deriv_metrics = DerivativesMetrics(
             mark_price=mark_price,
@@ -290,9 +295,9 @@ class MarketWatchScanner:
             endpoint_errors=endpoint_errs,
         )
 
-        # Evaluate derivatives regime
+        # Evaluate derivatives regime with true 1h elapsed return
         d_regime, d_reasons, d_risks = evaluate_derivatives_regime(
-            price_change_1h_pct=tf_1h.roc,
+            price_change_1h_pct=r1h,
             derivatives=deriv_metrics,
             config=self.config,
         )
@@ -362,11 +367,6 @@ class MarketWatchScanner:
             tf_4h=tf_4h,
             derivatives=deriv_metrics,
         )
-
-        # Compute true elapsed returns from confirmed closed 15m candles
-        r1h, r1h_status = closed_bar_return_with_status(raw_15m, horizon_ms=3_600_000)
-        r4h, r4h_status = closed_bar_return_with_status(raw_15m, horizon_ms=14_400_000)
-        r12h, r12h_status = closed_bar_return_with_status(raw_15m, horizon_ms=43_200_000)
 
         snapshot = MarketSnapshot(
             symbol=symbol,

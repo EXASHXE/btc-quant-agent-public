@@ -27,6 +27,7 @@ from btc_quant_agent.market_watch.domain import (
     BenchmarkContext,
     CandidateStatus,
     DerivativesMetrics,
+    DerivativesRegime,
     DirectionalDecision,
     DirectionalPlan,
     EntryQuality,
@@ -608,3 +609,197 @@ def test_execution_fence_no_private_api_mutations() -> None:
         content = py_file.read_text(encoding="utf-8")
         for token in forbidden_tokens:
             assert token not in content, f"Forbidden execution fence token '{token}' found in {py_file}"
+
+
+# ==============================================================================
+# 46. B0-R1 Semantic Authority Reconciliation Tests
+# ==============================================================================
+
+def test_benchmark_shock_requires_return_1h_no_legacy_roc() -> None:
+    """Benchmark shock fails closed when return_1h is None; legacy tf_1h.roc cannot trigger it."""
+    cfg = MarketWatchConfig()
+
+    tf_mock = MagicMock()
+    tf_mock.atr_percentile = 0.95
+    tf_mock.roc = -0.05  # Severe drop on 12-bar ROC
+
+    # 1. BTC: return_1h is None
+    btc_snap = MagicMock(
+        symbol="BTCUSDT",
+        return_1h=None,
+        tf_1h=tf_mock,
+    )
+    ctx, reasons, risks = evaluate_benchmark_context(
+        btc_snapshot=btc_snap,
+        eth_snapshot=None,
+        config=cfg,
+    )
+    assert ctx != BenchmarkContext.BTC_VOLATILITY_SHOCK
+    assert "BTC_RETURN_1H_UNAVAILABLE" in reasons
+    assert "BTC_FLASH_DROP_RISK" not in risks
+
+    # 2. ETH: return_1h is None
+    btc_normal_tf = MagicMock(atr_percentile=0.2, roc=0.0)
+    btc_normal = MagicMock(symbol="BTCUSDT", return_1h=0.0, tf_1h=btc_normal_tf)
+    eth_snap = MagicMock(
+        symbol="ETHUSDT",
+        return_1h=None,
+        tf_1h=tf_mock,
+    )
+    ctx_eth, reasons_eth, _risks_eth = evaluate_benchmark_context(
+        btc_snapshot=btc_normal,
+        eth_snapshot=eth_snap,
+        config=cfg,
+    )
+    assert ctx_eth != BenchmarkContext.ETH_VOLATILITY_SHOCK
+    assert "ETH_RETURN_1H_UNAVAILABLE" in reasons_eth
+    assert "ETH_DOWNSIDE_VOLATILITY_SHOCK" not in reasons_eth
+
+
+def test_relative_strength_no_legacy_roc_fallback() -> None:
+    """Relative strength preserves None returns when elapsed returns are missing, without ROC fallback."""
+    cfg = MarketWatchConfig()
+    tf_mock = MagicMock(roc=0.05)
+
+    snap = MagicMock(
+        symbol="BTCUSDT",
+        return_1h=None,
+        return_4h=None,
+        return_12h=None,
+        tf_1h=tf_mock,
+        tf_4h=tf_mock,
+        tf_15m=tf_mock,
+    )
+    perfs = compute_relative_performances({"BTCUSDT": snap}, cfg)
+    rp = perfs["BTCUSDT"]
+    assert rp.perf_1h is None
+    assert rp.perf_4h is None
+    assert rp.perf_12h is None
+    assert rp.perf_15m is None
+
+
+def test_reference_universe_incomplete_return_member_degrades_universe() -> None:
+    """When a universe member has snapshot but missing return (e.g. anchor gap), universe is DEGRADED."""
+    cfg = MarketWatchConfig()
+    expected = cfg.relative_strength_universe
+
+    snaps: dict[str, Any] = {}
+    for s in expected:
+        snaps[s] = MagicMock(
+            symbol=s,
+            return_1h=0.02,
+            return_4h=0.04,
+            return_12h=0.06,
+            tf_1h=MagicMock(roc=0.05),
+        )
+
+    # Invalidate 1h return for one member (e.g. 3rd member)
+    degraded_symbol = expected[2]
+    snaps[degraded_symbol].return_1h = None
+
+    perfs = compute_relative_performances(snaps, cfg)
+    for rp in perfs.values():
+        assert rp.universe_status == "UNIVERSE_DEGRADED"
+        assert degraded_symbol in rp.incomplete_return_members
+        assert degraded_symbol not in rp.available_members
+        assert rp.rel_to_median_1h is None
+        assert rp.rank == 0
+
+
+def test_derivatives_regime_price_change_semantics() -> None:
+    """Derivatives regime follows true return_1h, handles None safely, and prevents false states."""
+    from btc_quant_agent.market_watch.derivatives import evaluate_derivatives_regime
+    cfg = MarketWatchConfig()
+
+    # Test A: follows true return_1h even if opposing legacy tf_1h.roc existed
+    deriv_long = DerivativesMetrics(
+        mark_price=100.0,
+        current_open_interest=1000.0,
+        oi_1h_change=0.02,
+        taker_buy_sell_ratio=1.2,
+    )
+    regime_a, reasons_a, _ = evaluate_derivatives_regime(
+        price_change_1h_pct=0.01,  # True 1h return up
+        derivatives=deriv_long,
+        config=cfg,
+    )
+    assert regime_a == DerivativesRegime.HEALTHY_LONG_BUILD
+    assert "PRICE_UP_OI_UP_EXPANSION" in reasons_a
+
+    # Test B: price_change_1h_pct is None + sharp OI drop gives DELEVERAGING, never LONG_LIQUIDATION
+    deriv_sharp_drop = DerivativesMetrics(
+        mark_price=100.0,
+        current_open_interest=1000.0,
+        oi_1h_change=-0.05,  # <= -0.04
+    )
+    regime_b, reasons_b, risks_b = evaluate_derivatives_regime(
+        price_change_1h_pct=None,
+        derivatives=deriv_sharp_drop,
+        config=cfg,
+    )
+    assert regime_b == DerivativesRegime.DELEVERAGING
+    assert regime_b != DerivativesRegime.LONG_LIQUIDATION
+    assert "SHARP_DELEVERAGING_ACTIVE" in risks_b
+    assert "LONG_LIQUIDATION_CASCADE" not in reasons_b
+
+    # Test C: price_change_1h_pct is None prevents price-dependent states
+    regime_c, _, _ = evaluate_derivatives_regime(
+        price_change_1h_pct=None,
+        derivatives=deriv_long,
+        config=cfg,
+    )
+    assert regime_c not in (
+        DerivativesRegime.HEALTHY_LONG_BUILD,
+        DerivativesRegime.HEALTHY_SHORT_BUILD,
+        DerivativesRegime.SHORT_COVERING,
+        DerivativesRegime.LONG_LIQUIDATION,
+    )
+    assert regime_c == DerivativesRegime.NEUTRAL
+
+
+def test_static_semantic_leak_prevention() -> None:
+    """Inspect market_watch source files to ensure no legacy ROC fallback or leakage patterns exist."""
+    mw_dir = Path("src/btc_quant_agent/market_watch")
+    forbidden_patterns = [
+        "price_change_1h_pct=tf_1h.roc",
+        "price_change_1h_pct = tf_1h.roc",
+        "btc_return_1h = btc_1h.roc",
+        "eth_return_1h = eth_1h.roc",
+        "object.__setattr__(self, \"perf_15m\", self.perf_1h)",
+        "object.__setattr__(self, 'perf_15m', self.perf_1h)",
+        "r1h = float(snap.tf_1h.roc)",
+        "r4h = float(snap.tf_4h.roc)",
+        "r12h = float(snap.tf_15m.roc)",
+    ]
+    for py_file in mw_dir.glob("*.py"):
+        content = py_file.read_text(encoding="utf-8")
+        for pattern in forbidden_patterns:
+            assert pattern not in content, f"Forbidden pattern '{pattern}' found in {py_file}"
+
+
+def test_relative_performance_serialization_no_false_perf_15m() -> None:
+    """RelativePerformance.as_dict() serializes canonical fields, perf_15m is None and not aliased."""
+    from btc_quant_agent.market_watch.domain import RelativePerformance
+
+    rp = RelativePerformance(
+        symbol="BTCUSDT",
+        perf_1h=0.015,
+        perf_4h=0.03,
+        perf_12h=0.05,
+        rel_to_btc_1h=0.0,
+        rel_to_eth_1h=0.01,
+        rel_to_median_1h=0.005,
+        score=75.5,
+        multi_tf_excess=0.025,
+        rank=1,
+        universe_status="UNIVERSE_COMPLETE",
+        missing_members=(),
+        incomplete_return_members=(),
+        expected_members=("BTCUSDT", "ETHUSDT"),
+        available_members=("BTCUSDT", "ETHUSDT"),
+    )
+    assert rp.perf_15m is None
+    d = rp.as_dict()
+    assert d["perf_1h"] == 0.015
+    assert "perf_15m" not in d
+    assert d["incomplete_return_members"] == []

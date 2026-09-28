@@ -5,7 +5,7 @@ from .domain import DerivativesMetrics, DerivativesRegime, DirectionalDecision
 
 
 def evaluate_derivatives_regime(
-    price_change_1h_pct: float,
+    price_change_1h_pct: float | None,
     derivatives: DerivativesMetrics,
     config: MarketWatchConfig,
 ) -> tuple[DerivativesRegime, tuple[str, ...], tuple[str, ...]]:
@@ -74,31 +74,31 @@ def evaluate_derivatives_regime(
     # Sharp deleveraging check
     if (oi_1h is not None and oi_1h <= -0.04) or (oi_4h is not None and oi_4h <= -0.07):
         risks.append("SHARP_DELEVERAGING_ACTIVE")
-        if price_change_1h_pct < -0.005:
+        if price_change_1h_pct is not None and price_change_1h_pct < -0.005:
             reasons.append("LONG_LIQUIDATION_CASCADE")
             risks.append("DO_NOT_CHASE_SHORT")
             return DerivativesRegime.LONG_LIQUIDATION, tuple(reasons), tuple(risks)
         return DerivativesRegime.DELEVERAGING, tuple(reasons), tuple(risks)
 
     # Price down + long crowding
-    if price_change_1h_pct < -0.002 and is_long_crowded:
+    if price_change_1h_pct is not None and price_change_1h_pct < -0.002 and is_long_crowded:
         reasons.append("PRICE_FALLING_INTO_LONG_CROWDING")
         reasons.append("STRONGER_BEARISH_CONFIRMATION")
         return DerivativesRegime.LONG_CROWDING, tuple(reasons), tuple(risks)
 
     # Price up + short crowding
-    if price_change_1h_pct > 0.002 and is_short_crowded:
+    if price_change_1h_pct is not None and price_change_1h_pct > 0.002 and is_short_crowded:
         reasons.append("PRICE_RISING_INTO_SHORT_CROWDING")
         reasons.append("SHORT_SQUEEZE_RISK_FOR_BEARS")
         return DerivativesRegime.SHORT_CROWDING, tuple(reasons), tuple(risks)
 
     # Leverage build without directional movement
-    if abs(price_change_1h_pct) < 0.003 and (oi_1h is not None and oi_1h >= 0.025):
+    if price_change_1h_pct is not None and abs(price_change_1h_pct) < 0.003 and (oi_1h is not None and oi_1h >= 0.025):
         reasons.append("OPEN_INTEREST_EXPANDING_IN_RANGE")
         return DerivativesRegime.LEVERAGE_BUILD_NO_DIRECTION, tuple(reasons), tuple(risks)
 
     # Directional interactions with OI
-    if oi_1h is not None:
+    if oi_1h is not None and price_change_1h_pct is not None:
         # Price UP + OI UP
         if price_change_1h_pct >= 0.003 and oi_1h >= 0.005 and not is_long_crowded:
             reasons.append("PRICE_UP_OI_UP_EXPANSION")

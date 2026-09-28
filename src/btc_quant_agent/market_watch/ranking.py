@@ -48,23 +48,29 @@ def compute_relative_performances(
     universe_status = "UNIVERSE_DEGRADED" if is_degraded else "UNIVERSE_COMPLETE"
 
     def get_returns(snap: Any) -> tuple[float | None, float | None, float | None]:
-        # Authoritative B0 returns: return_1h, return_4h, return_12h
+        # Authoritative B0 returns: return_1h, return_4h, return_12h (strictly no ROC fallback)
         r1h = float(snap.return_1h) if isinstance(getattr(snap, "return_1h", None), (int, float)) else None
         r4h = float(snap.return_4h) if isinstance(getattr(snap, "return_4h", None), (int, float)) else None
         r12h = float(snap.return_12h) if isinstance(getattr(snap, "return_12h", None), (int, float)) else None
-        # Fallback for legacy test mocks where elapsed returns were not explicitly instantiated
-        if r1h is None and hasattr(snap, "tf_1h") and isinstance(getattr(snap.tf_1h, "roc", None), (int, float)):
-            r1h = float(snap.tf_1h.roc)
-        if r4h is None and hasattr(snap, "tf_4h") and isinstance(getattr(snap.tf_4h, "roc", None), (int, float)):
-            r4h = float(snap.tf_4h.roc)
-        if r12h is None and hasattr(snap, "tf_15m") and isinstance(getattr(snap.tf_15m, "roc", None), (int, float)):
-            r12h = float(snap.tf_15m.roc)
         return r1h, r4h, r12h
 
     # Extract returns for all snapshots
     snap_returns: dict[str, tuple[float | None, float | None, float | None]] = {
         s: get_returns(snap) for s, snap in snapshots.items()
     }
+
+    expected_members = tuple(config.relative_strength_universe)
+    missing_members = tuple(s for s in expected_members if s not in snapshots)
+    incomplete_return_members = tuple(
+        s for s in expected_members
+        if s in snapshots and (
+            snap_returns[s][0] is None or snap_returns[s][1] is None or snap_returns[s][2] is None
+        )
+    )
+
+    is_degraded = (len(missing_members) > 0) or (len(incomplete_return_members) > 0)
+    universe_status = "UNIVERSE_DEGRADED" if is_degraded else "UNIVERSE_COMPLETE"
+    available_members = tuple(s for s in expected_members if s in snapshots and s not in incomplete_return_members)
 
     # BTC / ETH benchmark returns (independent, never substituted by median)
     btc_r = snap_returns.get("BTCUSDT")
@@ -135,9 +141,10 @@ def compute_relative_performances(
             score=round(score, 2),
             multi_tf_excess=round(multi_tf_excess, 4),
             rank=0,  # default unranked / unavailable
-            perf_15m=round(p1h, 4) if p1h is not None else 0.0,
+            perf_15m=None,
             universe_status=universe_status,
             missing_members=missing_members,
+            incomplete_return_members=incomplete_return_members,
             expected_members=expected_members,
             available_members=available_members,
         )
@@ -159,9 +166,10 @@ def compute_relative_performances(
                 score=item.score,
                 multi_tf_excess=item.multi_tf_excess,
                 rank=rank_idx,
-                perf_15m=item.perf_15m,
+                perf_15m=None,
                 universe_status=item.universe_status,
                 missing_members=item.missing_members,
+                incomplete_return_members=item.incomplete_return_members,
                 expected_members=item.expected_members,
                 available_members=item.available_members,
             )

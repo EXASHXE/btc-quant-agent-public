@@ -37,7 +37,7 @@ def evaluate_exhaustion(
     dist_to_resistance_atr = max(0.0, (res - close) / atr)
 
     # Multi-bar return approximation from ROC
-    multi_bar_extension_atr = (close * tf.roc) / atr
+    multi_bar_extension_atr = (close * tf.roc_12bars) / atr
 
     reasons: list[str] = []
     abs_d20 = abs(dist_ema20_atr)

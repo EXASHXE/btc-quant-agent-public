@@ -1746,23 +1746,27 @@ def test_r1_13_multi_tf_relative_strength_contribution() -> None:
         price=PriceMetrics(last_price=100.0), tf_15m=make_dummy_tf("BTCUSDT", "15m", roc_val=0.0),
         tf_1h=make_dummy_tf("BTCUSDT", "1h", roc_val=0.0), tf_4h=make_dummy_tf("BTCUSDT", "4h", roc_val=0.0),
         derivatives=DerivativesMetrics(mark_price=100.0), snapshot_hash="h_btc",
+        return_1h=0.0, return_4h=0.0, return_12h=0.0,
     )
     snap_eth = MarketSnapshot(
         symbol="ETHUSDT", decision_time_ms=1000, observed_at_ms=1000, exchange_time_ms=1000,
         price=PriceMetrics(last_price=10.0), tf_15m=make_dummy_tf("ETHUSDT", "15m", roc_val=0.0),
         tf_1h=make_dummy_tf("ETHUSDT", "1h", roc_val=0.0), tf_4h=make_dummy_tf("ETHUSDT", "4h", roc_val=0.0),
         derivatives=DerivativesMetrics(mark_price=10.0), snapshot_hash="h_eth",
+        return_1h=0.0, return_4h=0.0, return_12h=0.0,
     )
 
     snap_sol_a = MarketSnapshot(
         symbol="SOLUSDT", decision_time_ms=1000, observed_at_ms=1000, exchange_time_ms=1000,
         price=PriceMetrics(last_price=50.0), tf_15m=tf_15m_a, tf_1h=tf_1h_a, tf_4h=tf_4h_a,
         derivatives=DerivativesMetrics(mark_price=50.0), snapshot_hash="h_sol_a",
+        return_1h=0.02, return_4h=0.01, return_12h=0.05,
     )
     snap_sol_b = MarketSnapshot(
         symbol="SOLUSDT", decision_time_ms=1000, observed_at_ms=1000, exchange_time_ms=1000,
         price=PriceMetrics(last_price=50.0), tf_15m=tf_15m_b, tf_1h=tf_1h_a, tf_4h=tf_4h_a,
         derivatives=DerivativesMetrics(mark_price=50.0), snapshot_hash="h_sol_b",
+        return_1h=0.02, return_4h=0.01, return_12h=-0.05,
     )
 
     perfs_a = compute_relative_performances({"BTCUSDT": snap_btc, "ETHUSDT": snap_eth, "SOLUSDT": snap_sol_a}, config)

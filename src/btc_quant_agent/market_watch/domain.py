@@ -406,17 +406,31 @@ class RelativePerformance:
     score: float = 0.0
     multi_tf_excess: float = 0.0
     rank: int = 0
-    perf_15m: float = 0.0
+    perf_15m: float | None = None  # Deprecated legacy field; NEVER populated from perf_1h
     universe_status: str = "UNIVERSE_COMPLETE"
     missing_members: tuple[str, ...] = ()
+    incomplete_return_members: tuple[str, ...] = ()
     expected_members: tuple[str, ...] = ()
     available_members: tuple[str, ...] = ()
 
-    def __post_init__(self) -> None:
-        if self.perf_1h is None and self.perf_15m != 0.0:
-            object.__setattr__(self, "perf_1h", self.perf_15m)
-        elif self.perf_15m == 0.0 and self.perf_1h is not None:
-            object.__setattr__(self, "perf_15m", self.perf_1h)
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "symbol": self.symbol,
+            "perf_1h": self.perf_1h,
+            "perf_4h": self.perf_4h,
+            "perf_12h": self.perf_12h,
+            "rel_to_btc_1h": self.rel_to_btc_1h,
+            "rel_to_eth_1h": self.rel_to_eth_1h,
+            "rel_to_median_1h": self.rel_to_median_1h,
+            "score": round(self.score, 2),
+            "multi_tf_excess": round(self.multi_tf_excess, 4),
+            "rank": self.rank,
+            "universe_status": self.universe_status,
+            "missing_members": list(self.missing_members),
+            "incomplete_return_members": list(self.incomplete_return_members),
+            "expected_members": list(self.expected_members),
+            "available_members": list(self.available_members),
+        }
 
 
 @dataclass(frozen=True)

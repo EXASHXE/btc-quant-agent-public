@@ -27,15 +27,15 @@ def evaluate_benchmark_context(
     btc_4h = btc_snapshot.tf_4h
     tc = config.thresholds
 
-    # Explicit 1h elapsed return (authoritative B0 semantics)
+    # Explicit 1h elapsed return (authoritative B0 semantics, strictly no ROC fallback)
     btc_return_1h = btc_snapshot.return_1h
-    if btc_return_1h is None and hasattr(btc_1h, "roc"):
-        btc_return_1h = btc_1h.roc
+    if btc_return_1h is None:
+        reasons.append("BTC_RETURN_1H_UNAVAILABLE")
 
-    # Check for BTC Volatility Shock using true return_1h (no longer using 12x1h roc)
+    # Check for BTC Volatility Shock using true return_1h only
     btc_vol_shock = (
-        btc_1h.atr_percentile >= tc.high_vol_atr_percentile
-        and btc_return_1h is not None
+        btc_return_1h is not None
+        and btc_1h.atr_percentile >= tc.high_vol_atr_percentile
         and btc_return_1h < -0.015
     )
     if btc_vol_shock:
@@ -43,15 +43,14 @@ def evaluate_benchmark_context(
         risks.append("BTC_FLASH_DROP_RISK")
         return BenchmarkContext.BTC_VOLATILITY_SHOCK, tuple(reasons), tuple(risks)
 
-    # Check for ETH Volatility Shock using true return_1h
+    # Check for ETH Volatility Shock using true return_1h only
     if eth_snapshot is not None:
         eth_1h = eth_snapshot.tf_1h
         eth_return_1h = eth_snapshot.return_1h
-        if eth_return_1h is None and hasattr(eth_1h, "roc"):
-            eth_return_1h = eth_1h.roc
-        if (
+        if eth_return_1h is None:
+            reasons.append("ETH_RETURN_1H_UNAVAILABLE")
+        elif (
             eth_1h.atr_percentile >= tc.high_vol_atr_percentile
-            and eth_return_1h is not None
             and eth_return_1h < -0.02
         ):
             reasons.append("ETH_DOWNSIDE_VOLATILITY_SHOCK")
