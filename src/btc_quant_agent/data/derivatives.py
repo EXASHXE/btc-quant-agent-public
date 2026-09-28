@@ -138,6 +138,8 @@ class HistoricalDerivativeStore:
         integer_fields = {
             "observed_at_ms",
             "funding_time_ms",
+            "premium_index_time_ms",
+            "next_funding_time_ms",
             "open_interest_time_ms",
             "taker_time_ms",
             "basis_time_ms",

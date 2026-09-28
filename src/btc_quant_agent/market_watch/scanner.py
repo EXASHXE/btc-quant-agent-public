@@ -158,6 +158,12 @@ class MarketWatchScanner:
             index_price = snap.index_price
             funding_rate = snap.funding_rate
             funding_time_ms = _to_opt_int(getattr(snap, "funding_time_ms", None))
+            premium_index_time_ms = _to_opt_int(getattr(snap, "premium_index_time_ms", None))
+            next_funding_time_ms = _to_opt_int(getattr(snap, "next_funding_time_ms", None))
+            if premium_index_time_ms is None and funding_time_ms is not None:
+                premium_index_time_ms = funding_time_ms
+            if funding_time_ms is None and premium_index_time_ms is not None:
+                funding_time_ms = premium_index_time_ms
             open_interest = snap.open_interest
             open_interest_time_ms = _to_opt_int(getattr(snap, "open_interest_time_ms", None))
             oi_1h_change = snap.open_interest_change_pct
@@ -293,6 +299,8 @@ class MarketWatchScanner:
             index_price=index_price,
             funding_rate=funding_rate,
             funding_time_ms=funding_time_ms,
+            premium_index_time_ms=premium_index_time_ms,
+            next_funding_time_ms=next_funding_time_ms,
             current_open_interest=open_interest,
             open_interest_time_ms=open_interest_time_ms,
             oi_1h_change=oi_1h_change,
@@ -324,6 +332,8 @@ class MarketWatchScanner:
             index_price=deriv_metrics.index_price,
             funding_rate=deriv_metrics.funding_rate,
             funding_time_ms=deriv_metrics.funding_time_ms,
+            premium_index_time_ms=deriv_metrics.premium_index_time_ms,
+            next_funding_time_ms=deriv_metrics.next_funding_time_ms,
             current_open_interest=deriv_metrics.current_open_interest,
             open_interest_time_ms=deriv_metrics.open_interest_time_ms,
             oi_1h_change=deriv_metrics.oi_1h_change,

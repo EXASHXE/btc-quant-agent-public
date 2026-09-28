@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import dataclasses
+import json
 import math
 import sqlite3
 import subprocess
@@ -8,7 +9,7 @@ import sys
 import tempfile
 import time
 from pathlib import Path
-from typing import Self
+from typing import Any, Self
 from unittest.mock import MagicMock
 
 import pytest
@@ -49,6 +50,7 @@ from btc_quant_agent.market_watch.evidence import (
     DecisionConfigEvidence,
     PolicyDecisionTrace,
     PolicyGateStageTrace,
+    PolicyStateInputEvidence,
     TacticalCausalityError,
     TacticalEvidenceConflictError,
     TacticalEvidenceIdentityError,
@@ -204,6 +206,8 @@ def build_sample_evidence_and_assessment(
         index_price=50000.0,
         funding_rate=0.0001,
         funding_time_ms=watermark_ms - 1000,
+        premium_index_time_ms=watermark_ms - 1000,
+        next_funding_time_ms=watermark_ms + 14_400_000,
         current_open_interest=50000.0,
         open_interest_time_ms=watermark_ms - 2000,
         oi_1h_change=0.02,
@@ -1025,7 +1029,9 @@ def test_b1_r1_full_population_proof() -> None:
                 mark_price=50000.0,
                 index_price=50000.0,
                 funding_rate=0.0001,
-                funding_time_ms=now_ms + 14_400_000,
+                funding_time_ms=now_ms - 1000,
+                premium_index_time_ms=now_ms - 1000,
+                next_funding_time_ms=now_ms + 14_400_000,
                 open_interest=50000.0,
                 open_interest_time_ms=now_ms - 2000,
                 open_interest_change_pct=0.01,
@@ -1404,12 +1410,24 @@ def test_b1_r1_pit_adversarial() -> None:
     with pytest.raises(TacticalCausalityError, match="Source event timestamp"):
         validate_tactical_feature_evidence(ev_bad_past)
 
-    # 8. Positive test: funding_time_ms is KNOWN_FUTURE_SCHEDULE_TIME and may legitimately be > decision_time
+    # 8. Positive test: next_funding_time_ms is KNOWN_FUTURE_SCHEDULE_TIME and may legitimately be > decision_time
     ev_future_funding = dataclasses.replace(
         ev,
-        source_provenance=dataclasses.replace(ev.source_provenance, funding_time_ms=dec_t + 14_400_000),
+        source_provenance=dataclasses.replace(ev.source_provenance, next_funding_time_ms=dec_t + 14_400_000),
     )
     validate_tactical_feature_evidence(ev_future_funding)
+
+    # 9. Negative test: funding_time_ms and premium_index_time_ms are past event timestamps and must be <= decision_time
+    ev_bad_funding = dataclasses.replace(
+        ev,
+        source_provenance=dataclasses.replace(
+            ev.source_provenance,
+            funding_time_ms=dec_t + 500,
+            premium_index_time_ms=dec_t + 500,
+        ),
+    )
+    with pytest.raises(TacticalCausalityError, match="Source event timestamp"):
+        validate_tactical_feature_evidence(ev_bad_funding)
 
 
 def test_b1_r1_feature_completeness_regression() -> None:
@@ -1575,4 +1593,276 @@ def test_b1_r1_atomic_rollback() -> None:
             assert cursor.fetchone()[0] == 1
             cursor = conn.execute("SELECT COUNT(*) FROM market_watch_assessments")
             assert cursor.fetchone()[0] == 1
+
+
+# ==============================================================================
+# B1-R2: Stateful Round-Trip and Source-Time Semantic Seal Tests
+# ==============================================================================
+
+def test_b1_r2_stateful_round_trip() -> None:
+    """Section 8 & 9: PolicyStateInputEvidence canonical round-trip preserves all previous_* fields."""
+    ev_base, _ = build_sample_evidence_and_assessment()
+
+    raw_prev_state = {
+        "setup": "BREAKOUT_RETEST",
+        "breakout_state": "BREAKOUT_CONFIRMED",
+        "breakout_level": 50000.0,
+        "breakout_direction": "LONG",
+        "breakout_bar_end_ms": 1_699_998_000_000,
+        "recent_failed_breakout": 50500.0,
+        "recent_failed_breakout_ms": 1_699_995_000_000,
+        "recent_failed_breakdown": 49500.0,
+        "recent_failed_breakdown_ms": 1_699_996_000_000,
+        "grid_decision": "PAUSE",
+        "grid_lower_bound": 48000.0,
+        "grid_upper_bound": 52000.0,
+        "recent_support": 49000.0,
+        "recent_resistance": 51000.0,
+        "lifecycle_state": "ARMED",
+        "signal_identity": "SIG:BTCUSDT:LONG:BREAKOUT_RETEST:1699990000000",
+        "setup_key": "SETUP:BTCUSDT:BREAKOUT_RETEST:50000.0",
+        "created_bar_end_ms": 1_699_990_000_000,
+        "armed_bar_end_ms": 1_699_995_000_000,
+        "triggered_bar_end_ms": None,
+        "age_bars": 5,
+        "setup_instance_started_bar_end_ms": 1_699_990_000_000,
+    }
+
+    full_policy_state = PolicyStateInputEvidence.from_prev_state(raw_prev_state)
+    ev = dataclasses.replace(ev_base, policy_state_before=full_policy_state)
+    ev = dataclasses.replace(ev, evidence_id=compute_evidence_id(canonical_evidence_payload(ev)))
+
+    canonical_json = canonical_evidence_json(ev)
+    deserialized = deserialize_tactical_feature_evidence(canonical_json)
+
+    assert deserialized.evidence_id == ev.evidence_id
+    assert deserialized.policy_state_before == ev.policy_state_before
+    assert deserialized.policy_state_before.previous_setup == "BREAKOUT_RETEST"
+    assert deserialized.policy_state_before.previous_breakout_state == "BREAKOUT_CONFIRMED"
+    assert deserialized.policy_state_before.previous_lifecycle_state == "ARMED"
+    assert deserialized.policy_state_before.previous_age_bars == 5
+    assert deserialized.policy_state_before.to_dict() == full_policy_state.to_dict()
+
+    # Re-serialization exact match
+    assert canonical_evidence_json(deserialized) == canonical_json
+
+
+def test_b1_r2_stateful_db_round_trip() -> None:
+    """Section 8 & 9: Database persistence and retrieval round-trip preserves stateful evidence."""
+    ev_base, assessment = build_sample_evidence_and_assessment()
+
+    raw_prev_state = {
+        "setup": "BREAKOUT_RETEST",
+        "breakout_state": "BREAKOUT_CONFIRMED",
+        "breakout_level": 50000.0,
+        "breakout_direction": "LONG",
+        "breakout_bar_end_ms": 1_699_998_000_000,
+        "recent_failed_breakout": 50500.0,
+        "recent_failed_breakout_ms": 1_699_995_000_000,
+        "recent_failed_breakdown": 49500.0,
+        "recent_failed_breakdown_ms": 1_699_996_000_000,
+        "grid_decision": "PAUSE",
+        "grid_lower_bound": 48000.0,
+        "grid_upper_bound": 52000.0,
+        "recent_support": 49000.0,
+        "recent_resistance": 51000.0,
+        "lifecycle_state": "ARMED",
+        "signal_identity": "SIG:BTCUSDT:LONG:BREAKOUT_RETEST:1699990000000",
+        "setup_key": "SETUP:BTCUSDT:BREAKOUT_RETEST:50000.0",
+        "created_bar_end_ms": 1_699_990_000_000,
+        "armed_bar_end_ms": 1_699_995_000_000,
+        "triggered_bar_end_ms": None,
+        "age_bars": 5,
+        "setup_instance_started_bar_end_ms": 1_699_990_000_000,
+    }
+    full_policy_state = PolicyStateInputEvidence.from_prev_state(raw_prev_state)
+    ev = dataclasses.replace(ev_base, policy_state_before=full_policy_state)
+    ev = dataclasses.replace(ev, evidence_id=compute_evidence_id(canonical_evidence_payload(ev)))
+    ass = dataclasses.replace(assessment, feature_evidence_id=ev.evidence_id, feature_evidence=ev)
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        db_path = Path(tmpdir) / "test_stateful_roundtrip.db"
+        store = MarketWatchStateStore(db_path)
+
+        store.save_symbol_state("BTCUSDT", ass, 1_700_000_500_000, evidence=ev)
+
+        # 1. get_tactical_feature_evidence
+        fetched = store.get_tactical_feature_evidence(ev.evidence_id)
+        assert fetched is not None
+        assert fetched.evidence_id == ev.evidence_id
+        assert fetched.policy_state_before == full_policy_state
+        assert fetched.policy_state_before.previous_setup == "BREAKOUT_RETEST"
+        assert fetched.policy_state_before.previous_breakout_state == "BREAKOUT_CONFIRMED"
+        assert fetched.policy_state_before.previous_lifecycle_state == "ARMED"
+        assert fetched.policy_state_before.previous_age_bars == 5
+        assert canonical_evidence_json(fetched) == canonical_evidence_json(ev)
+
+        # 2. list_tactical_feature_evidence
+        listed = store.list_tactical_feature_evidence(symbol="BTCUSDT")
+        assert len(listed) == 1
+        assert listed[0].evidence_id == ev.evidence_id
+        assert listed[0].policy_state_before == full_policy_state
+
+
+def test_b1_r2_binance_premium_index_time_semantics() -> None:
+    """Section 19: Binance premium index 'time' is past event time, 'nextFundingTime' is future schedule time."""
+    from btc_quant_agent.config import DataConfig
+    from btc_quant_agent.data.binance import BinancePublicClient
+
+    client = BinancePublicClient(DataConfig())
+
+    def fake_request(path: str, params: dict[str, Any], **kwargs: Any) -> Any:
+        if path == "/fapi/v1/premiumIndex":
+            return {
+                "time": 1_700_000_000_000,
+                "nextFundingTime": 1_700_028_800_000,
+                "markPrice": "50010.5",
+                "indexPrice": "50000.0",
+                "lastFundingRate": "0.0001",
+            }
+        return {}
+
+    client._request = MagicMock(side_effect=fake_request)  # type: ignore[assignment]
+
+    result = client.collect_derivatives("BTCUSDT")
+    snap = result.snapshot
+    assert snap.funding_rate == 0.0001
+    assert snap.premium_index_time_ms == 1_700_000_000_000
+    assert snap.next_funding_time_ms == 1_700_028_800_000
+    assert snap.funding_time_ms == 1_700_000_000_000
+
+
+def test_b1_r2_causality_tests_a_b_c() -> None:
+    """Section 20: Detailed causality tests for premium_index_time_ms and next_funding_time_ms."""
+    ev, _ = build_sample_evidence_and_assessment()
+    dec_t = ev.decision_time_ms
+
+    # Test A1: premium_index_time_ms <= decision_time_ms passes
+    ev_a1 = dataclasses.replace(
+        ev,
+        source_provenance=dataclasses.replace(
+            ev.source_provenance,
+            premium_index_time_ms=dec_t - 1000,
+            funding_time_ms=dec_t - 1000,
+        ),
+    )
+    validate_tactical_feature_evidence(ev_a1)
+
+    # Test A2: premium_index_time_ms > decision_time_ms fails
+    ev_a2 = dataclasses.replace(
+        ev,
+        source_provenance=dataclasses.replace(
+            ev.source_provenance,
+            premium_index_time_ms=dec_t + 1000,
+            funding_time_ms=dec_t + 1000,
+        ),
+    )
+    with pytest.raises(TacticalCausalityError, match="Source event timestamp"):
+        validate_tactical_feature_evidence(ev_a2)
+
+    # Test B: next_funding_time_ms > decision_time_ms passes
+    ev_b = dataclasses.replace(
+        ev,
+        source_provenance=dataclasses.replace(
+            ev.source_provenance,
+            next_funding_time_ms=dec_t + 28_800_000,
+        ),
+    )
+    validate_tactical_feature_evidence(ev_b)
+
+    # Test C: Both present: premium_index_time_ms < decision_time_ms and next_funding_time_ms > decision_time_ms passes
+    ev_c = dataclasses.replace(
+        ev,
+        source_provenance=dataclasses.replace(
+            ev.source_provenance,
+            premium_index_time_ms=dec_t - 5000,
+            funding_time_ms=dec_t - 5000,
+            next_funding_time_ms=dec_t + 14_400_000,
+        ),
+    )
+    validate_tactical_feature_evidence(ev_c)
+
+    # Test D: Contradictory funding_time_ms != premium_index_time_ms raises error
+    ev_d = dataclasses.replace(
+        ev,
+        source_provenance=dataclasses.replace(
+            ev.source_provenance,
+            funding_time_ms=dec_t - 1000,
+            premium_index_time_ms=dec_t - 2000,
+        ),
+    )
+    with pytest.raises((TacticalEvidenceValidationError, TacticalCausalityError)):
+        validate_tactical_feature_evidence(ev_d)
+
+
+def test_b1_r2_row_key_embedded_id_corruption() -> None:
+    """Section 23: Row primary-key vs embedded evidence-id mismatch raises TacticalEvidenceIdentityError."""
+    ev, assessment = build_sample_evidence_and_assessment()
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        db_path = Path(tmpdir) / "test_row_key_corruption.db"
+        store = MarketWatchStateStore(db_path)
+
+        store.save_symbol_state("BTCUSDT", assessment, 1_700_000_500_000, evidence=ev)
+
+        # Corrupt the row primary key in the table, leaving evidence_json intact
+        with sqlite3.connect(str(db_path)) as conn:
+            conn.execute(
+                "UPDATE tactical_feature_evidence_v2 SET evidence_id = 'CORRUPTED_PRIMARY_KEY' WHERE evidence_id = ?",
+                (ev.evidence_id,),
+            )
+            conn.commit()
+
+        # get_tactical_feature_evidence with corrupted row key must raise TacticalEvidenceIdentityError
+        with pytest.raises(TacticalEvidenceIdentityError, match="Row evidence_id mismatch"):
+            store.get_tactical_feature_evidence("CORRUPTED_PRIMARY_KEY")
+
+        # list_tactical_feature_evidence must also raise TacticalEvidenceIdentityError
+        with pytest.raises(TacticalEvidenceIdentityError, match="Row evidence_id mismatch"):
+            store.list_tactical_feature_evidence(symbol="BTCUSDT")
+
+
+def test_b1_r2_policystate_identity_corruption() -> None:
+    """Section 24: Tampering with policy_state_before violates identity hash and recomputed ID."""
+    ev_base, assessment = build_sample_evidence_and_assessment()
+
+    full_policy_state = PolicyStateInputEvidence(
+        previous_setup="BREAKOUT_RETEST",
+        previous_breakout_state="BREAKOUT_CONFIRMED",
+        previous_lifecycle_state="ARMED",
+        previous_age_bars=4,
+    )
+    ev = dataclasses.replace(ev_base, policy_state_before=full_policy_state)
+    ev = dataclasses.replace(ev, evidence_id=compute_evidence_id(canonical_evidence_payload(ev)))
+    ass = dataclasses.replace(assessment, feature_evidence_id=ev.evidence_id, feature_evidence=ev)
+
+    raw_json = canonical_evidence_json(ev)
+    payload_dict = json.loads(raw_json)
+
+    # Tamper with policy_state_before in serialized JSON
+    payload_dict["policy_state_before"]["previous_lifecycle_state"] = "INVALIDATED"
+    tampered_json = json.dumps(payload_dict)
+
+    # Deserializing tampered JSON must fail identity verification
+    with pytest.raises(TacticalEvidenceIdentityError):
+        deserialize_tactical_feature_evidence(tampered_json)
+
+    # Tampering in database must fail on read
+    with tempfile.TemporaryDirectory() as tmpdir:
+        db_path = Path(tmpdir) / "test_policystate_tampering.db"
+        store = MarketWatchStateStore(db_path)
+        store.save_symbol_state("BTCUSDT", ass, 1_700_000_500_000, evidence=ev)
+
+        with sqlite3.connect(str(db_path)) as conn:
+            conn.execute(
+                "UPDATE tactical_feature_evidence_v2 SET evidence_json = ? WHERE evidence_id = ?",
+                (tampered_json, ev.evidence_id),
+            )
+            conn.commit()
+
+        with pytest.raises(TacticalEvidenceIdentityError):
+            store.get_tactical_feature_evidence(ev.evidence_id)
+
+        with pytest.raises(TacticalEvidenceIdentityError):
+            store.list_tactical_feature_evidence(symbol="BTCUSDT")
 

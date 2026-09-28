@@ -332,7 +332,9 @@ class DerivativesMetrics:
     mark_price: float | None = None
     index_price: float | None = None
     funding_rate: float | None = None
-    funding_time_ms: int | None = None
+    funding_time_ms: int | None = None  # Legacy alias for premium_index_time_ms (premium["time"]); NOT a future funding schedule
+    premium_index_time_ms: int | None = None
+    next_funding_time_ms: int | None = None
     current_open_interest: float | None = None
     open_interest_time_ms: int | None = None
     oi_1h_change: float | None = None

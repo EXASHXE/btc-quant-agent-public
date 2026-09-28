@@ -27,6 +27,7 @@ from .domain import (
 )
 from .evidence import (
     TacticalEvidenceConflictError,
+    TacticalEvidenceIdentityError,
     TacticalEvidenceLinkageError,
     TacticalFeatureEvidenceV2,
     canonical_evidence_json,
@@ -1237,13 +1238,18 @@ class MarketWatchStateStore:
         with self._connect() as conn:
             conn.row_factory = sqlite3.Row
             cursor = conn.execute(
-                "SELECT evidence_json FROM tactical_feature_evidence_v2 WHERE evidence_id = ?",
+                "SELECT evidence_id, evidence_json FROM tactical_feature_evidence_v2 WHERE evidence_id = ?",
                 (evidence_id,),
             )
             row = cursor.fetchone()
             if row is None:
                 return None
-            return deserialize_tactical_feature_evidence(row["evidence_json"])
+            ev = deserialize_tactical_feature_evidence(row["evidence_json"], verify_identity=True)
+            if row["evidence_id"] != ev.evidence_id:
+                raise TacticalEvidenceIdentityError(
+                    f"Row evidence_id mismatch: row={row['evidence_id']}, embedded={ev.evidence_id}"
+                )
+            return ev
 
     def list_tactical_feature_evidence(
         self,
@@ -1255,7 +1261,7 @@ class MarketWatchStateStore:
         limit: int = 100,
     ) -> list[TacticalFeatureEvidenceV2]:
         """Query immutable TacticalFeatureEvidenceV2 records, defaulting to B1 schema."""
-        query = ["SELECT evidence_json FROM tactical_feature_evidence_v2 WHERE evidence_schema_version = 'TACTICAL_FEATURE_EVIDENCE_V2'"]
+        query = ["SELECT evidence_id, evidence_json FROM tactical_feature_evidence_v2 WHERE evidence_schema_version = 'TACTICAL_FEATURE_EVIDENCE_V2'"]
         params: list[Any] = []
         if symbol:
             query.append("AND symbol = ?")
@@ -1279,7 +1285,15 @@ class MarketWatchStateStore:
             conn.row_factory = sqlite3.Row
             cursor = conn.execute(" ".join(query), tuple(params))
             rows = cursor.fetchall()
-            return [deserialize_tactical_feature_evidence(row["evidence_json"]) for row in rows]
+            evidences: list[TacticalFeatureEvidenceV2] = []
+            for row in rows:
+                ev = deserialize_tactical_feature_evidence(row["evidence_json"], verify_identity=True)
+                if row["evidence_id"] != ev.evidence_id:
+                    raise TacticalEvidenceIdentityError(
+                        f"Row evidence_id mismatch: row={row['evidence_id']}, embedded={ev.evidence_id}"
+                    )
+                evidences.append(ev)
+            return evidences
 
 
 def is_legacy_tactical_record(record: dict[str, Any]) -> bool:

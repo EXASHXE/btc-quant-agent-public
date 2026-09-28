@@ -165,7 +165,9 @@ class SourceProvenanceEvidence:
     closed_bar_watermark_4h: int
     returns: tuple[ReturnObservation, ...]
     derivatives_observed_at_ms: int | None = None
-    funding_time_ms: int | None = None
+    funding_time_ms: int | None = None  # Legacy alias for premium_index_time_ms (premium["time"])
+    premium_index_time_ms: int | None = None
+    next_funding_time_ms: int | None = None
     open_interest_time_ms: int | None = None
     long_short_time_ms: int | None = None
     taker_time_ms: int | None = None
@@ -197,6 +199,8 @@ class SourceProvenanceEvidence:
             ],
             "derivatives_observed_at_ms": self.derivatives_observed_at_ms,
             "funding_time_ms": self.funding_time_ms,
+            "premium_index_time_ms": self.premium_index_time_ms,
+            "next_funding_time_ms": self.next_funding_time_ms,
             "open_interest_time_ms": self.open_interest_time_ms,
             "long_short_time_ms": self.long_short_time_ms,
             "taker_time_ms": self.taker_time_ms,
@@ -320,28 +324,30 @@ class DerivativesFeaturesEvidence:
     mark_price: float | None
     index_price: float | None
     funding_rate: float | None
-    funding_time_ms: int | None
-    current_open_interest: float | None
-    open_interest_time_ms: int | None
-    oi_1h_change: float | None
-    oi_4h_change: float | None
-    oi_12h_change: float | None
-    global_account_long_short_ratio: float | None
-    long_short_time_ms: int | None
-    top_trader_position_ratio: float | None
-    top_trader_account_ratio: float | None
-    taker_buy_sell_ratio: float | None
-    taker_time_ms: int | None
-    basis_rate: float | None
-    basis_bps: float | None
-    basis_time_ms: int | None
-    spread_bps: float | None
-    order_book_imbalance: float | None
-    derivatives_regime: str
-    reasons: tuple[str, ...]
-    risks: tuple[str, ...]
-    field_availability: tuple[tuple[str, bool], ...]
-    endpoint_errors: tuple[tuple[str, str], ...]
+    funding_time_ms: int | None  # Legacy alias for premium_index_time_ms
+    premium_index_time_ms: int | None = None
+    next_funding_time_ms: int | None = None
+    current_open_interest: float | None = None
+    open_interest_time_ms: int | None = None
+    oi_1h_change: float | None = None
+    oi_4h_change: float | None = None
+    oi_12h_change: float | None = None
+    global_account_long_short_ratio: float | None = None
+    long_short_time_ms: int | None = None
+    top_trader_position_ratio: float | None = None
+    top_trader_account_ratio: float | None = None
+    taker_buy_sell_ratio: float | None = None
+    taker_time_ms: int | None = None
+    basis_rate: float | None = None
+    basis_bps: float | None = None
+    basis_time_ms: int | None = None
+    spread_bps: float | None = None
+    order_book_imbalance: float | None = None
+    derivatives_regime: str = "NEUTRAL"
+    reasons: tuple[str, ...] = ()
+    risks: tuple[str, ...] = ()
+    field_availability: tuple[tuple[str, bool], ...] = ()
+    endpoint_errors: tuple[tuple[str, str], ...] = ()
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -349,6 +355,8 @@ class DerivativesFeaturesEvidence:
             "index_price": self.index_price,
             "funding_rate": self.funding_rate,
             "funding_time_ms": self.funding_time_ms,
+            "premium_index_time_ms": self.premium_index_time_ms,
+            "next_funding_time_ms": self.next_funding_time_ms,
             "current_open_interest": self.current_open_interest,
             "open_interest_time_ms": self.open_interest_time_ms,
             "oi_1h_change": self.oi_1h_change,
@@ -644,6 +652,7 @@ class PolicyStateInputEvidence:
 
     @classmethod
     def from_prev_state(cls, prev: Mapping[str, Any] | None) -> PolicyStateInputEvidence:
+        """Construct from raw state-store runtime dictionary (keys without previous_ prefix)."""
         if not prev:
             return cls()
         return cls(
@@ -669,6 +678,36 @@ class PolicyStateInputEvidence:
             previous_triggered_bar_end_ms=prev.get("triggered_bar_end_ms"),
             previous_age_bars=int(prev.get("age_bars", 0)),
             previous_setup_instance_started_bar_end_ms=prev.get("setup_instance_started_bar_end_ms"),
+        )
+
+    @classmethod
+    def from_dict(cls, data: Mapping[str, Any] | None) -> PolicyStateInputEvidence:
+        """Construct from canonical serialized dictionary (exact previous_* fields)."""
+        if not data:
+            return cls()
+        return cls(
+            previous_setup=data.get("previous_setup"),
+            previous_breakout_state=str(data.get("previous_breakout_state", "NONE")),
+            previous_breakout_level=data.get("previous_breakout_level"),
+            previous_breakout_direction=data.get("previous_breakout_direction"),
+            previous_breakout_bar_end_ms=data.get("previous_breakout_bar_end_ms"),
+            previous_recent_failed_breakout=data.get("previous_recent_failed_breakout"),
+            previous_recent_failed_breakout_ms=data.get("previous_recent_failed_breakout_ms"),
+            previous_recent_failed_breakdown=data.get("previous_recent_failed_breakdown"),
+            previous_recent_failed_breakdown_ms=data.get("previous_recent_failed_breakdown_ms"),
+            previous_grid_decision=str(data.get("previous_grid_decision", "PAUSE")),
+            previous_grid_lower_bound=data.get("previous_grid_lower_bound"),
+            previous_grid_upper_bound=data.get("previous_grid_upper_bound"),
+            previous_recent_support=data.get("previous_recent_support"),
+            previous_recent_resistance=data.get("previous_recent_resistance"),
+            previous_lifecycle_state=str(data.get("previous_lifecycle_state", "CANDIDATE")),
+            previous_signal_identity=data.get("previous_signal_identity"),
+            previous_setup_key=data.get("previous_setup_key"),
+            previous_created_bar_end_ms=data.get("previous_created_bar_end_ms"),
+            previous_armed_bar_end_ms=data.get("previous_armed_bar_end_ms"),
+            previous_triggered_bar_end_ms=data.get("previous_triggered_bar_end_ms"),
+            previous_age_bars=int(data.get("previous_age_bars", 0)),
+            previous_setup_instance_started_bar_end_ms=data.get("previous_setup_instance_started_bar_end_ms"),
         )
 
     def to_dict(self) -> dict[str, Any]:
@@ -985,6 +1024,8 @@ def validate_tactical_feature_evidence(evidence: TacticalFeatureEvidenceV2) -> N
         ("long_short_time_ms", sp.long_short_time_ms),
         ("taker_time_ms", sp.taker_time_ms),
         ("basis_time_ms", sp.basis_time_ms),
+        ("premium_index_time_ms", sp.premium_index_time_ms),
+        ("funding_time_ms", sp.funding_time_ms),
     ]
     for name, ts in past_event_fields:
         if ts is not None:
@@ -993,7 +1034,16 @@ def validate_tactical_feature_evidence(evidence: TacticalFeatureEvidenceV2) -> N
             if ts > dec_t:
                 raise TacticalCausalityError(f"Source event timestamp {name} ({ts}) > decision_time_ms ({dec_t})")
 
-    # Note: funding_time_ms is KNOWN_FUTURE_SCHEDULE_TIME (Binance nextFundingTime), legitimately allowed to be > dec_t
+    if (
+        sp.funding_time_ms is not None
+        and sp.premium_index_time_ms is not None
+        and sp.funding_time_ms != sp.premium_index_time_ms
+    ):
+        raise TacticalEvidenceValidationError(
+            f"Contradictory funding_time_ms ({sp.funding_time_ms}) != premium_index_time_ms ({sp.premium_index_time_ms})"
+        )
+
+    # Note: next_funding_time_ms is KNOWN_FUTURE_SCHEDULE_TIME (Binance nextFundingTime), legitimately allowed to be > dec_t
 
     if evidence.collection_started_at_ms > evidence.collection_completed_at_ms:
         raise TacticalCausalityError(
@@ -1101,6 +1151,12 @@ def build_tactical_feature_evidence(
                 )
             )
 
+    p_idx_t = getattr(d_metrics, "premium_index_time_ms", None)
+    if p_idx_t is None:
+        p_idx_t = d_metrics.funding_time_ms
+    f_t = d_metrics.funding_time_ms if d_metrics.funding_time_ms is not None else p_idx_t
+    n_funding_t = getattr(d_metrics, "next_funding_time_ms", None)
+
     receipt_ts = snap.source_receipt_timestamps or {}
     source_prov = SourceProvenanceEvidence(
         closed_bar_watermark_15m=watermark_15m,
@@ -1108,7 +1164,9 @@ def build_tactical_feature_evidence(
         closed_bar_watermark_4h=watermark_4h,
         returns=tuple(returns_obs),
         derivatives_observed_at_ms=receipt_ts.get("deriv_observed_at_ms"),
-        funding_time_ms=d_metrics.funding_time_ms,
+        funding_time_ms=f_t,
+        premium_index_time_ms=p_idx_t,
+        next_funding_time_ms=n_funding_t,
         open_interest_time_ms=d_metrics.open_interest_time_ms,
         long_short_time_ms=d_metrics.long_short_time_ms,
         taker_time_ms=d_metrics.taker_time_ms,
@@ -1190,7 +1248,9 @@ def build_tactical_feature_evidence(
         mark_price=d_metrics.mark_price,
         index_price=d_metrics.index_price,
         funding_rate=d_metrics.funding_rate,
-        funding_time_ms=d_metrics.funding_time_ms,
+        funding_time_ms=f_t,
+        premium_index_time_ms=p_idx_t,
+        next_funding_time_ms=n_funding_t,
         current_open_interest=d_metrics.current_open_interest,
         open_interest_time_ms=d_metrics.open_interest_time_ms,
         oi_1h_change=d_metrics.oi_1h_change,
@@ -1504,6 +1564,8 @@ def deserialize_tactical_feature_evidence(
         returns=returns_obs,
         derivatives_observed_at_ms=sp_data.get("derivatives_observed_at_ms"),
         funding_time_ms=sp_data.get("funding_time_ms"),
+        premium_index_time_ms=sp_data.get("premium_index_time_ms"),
+        next_funding_time_ms=sp_data.get("next_funding_time_ms"),
         open_interest_time_ms=sp_data.get("open_interest_time_ms"),
         long_short_time_ms=sp_data.get("long_short_time_ms"),
         taker_time_ms=sp_data.get("taker_time_ms"),
@@ -1580,6 +1642,8 @@ def deserialize_tactical_feature_evidence(
         index_price=deriv_data.get("index_price"),
         funding_rate=deriv_data.get("funding_rate"),
         funding_time_ms=deriv_data.get("funding_time_ms"),
+        premium_index_time_ms=deriv_data.get("premium_index_time_ms"),
+        next_funding_time_ms=deriv_data.get("next_funding_time_ms"),
         current_open_interest=deriv_data.get("current_open_interest"),
         open_interest_time_ms=deriv_data.get("open_interest_time_ms"),
         oi_1h_change=deriv_data.get("oi_1h_change"),
@@ -1782,7 +1846,7 @@ def deserialize_tactical_feature_evidence(
     else:
         decision_config = DecisionConfigEvidence.from_payload(dict(cfg_data))
 
-    pol_state_before = PolicyStateInputEvidence.from_prev_state(data.get("policy_state_before"))
+    pol_state_before = PolicyStateInputEvidence.from_dict(data.get("policy_state_before"))
 
     evidence = TacticalFeatureEvidenceV2(
         evidence_schema_version=data["evidence_schema_version"],
@@ -1827,5 +1891,6 @@ def deserialize_tactical_feature_evidence(
 
     if verify_identity:
         verify_tactical_evidence_identity(evidence)
+        validate_tactical_feature_evidence(evidence)
 
     return evidence
