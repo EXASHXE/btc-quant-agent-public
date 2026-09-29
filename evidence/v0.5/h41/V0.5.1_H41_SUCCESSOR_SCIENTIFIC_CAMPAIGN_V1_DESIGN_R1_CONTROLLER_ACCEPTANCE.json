@@ -1,0 +1,34 @@
+{
+  "schema_id": "V0.5.1_H41_SUCCESSOR_SCIENTIFIC_CAMPAIGN_V1_DESIGN_R1_CONTROLLER_ACCEPTANCE",
+  "adjudicated_design_commit": "c308f16f4f4e849f217470066cbe80e1b2a9ceb1",
+  "accepted_implementation_reference": "8ecff4ec4b25bf73a35309689fd3ecfacc0d3399",
+  "design_report_blob_sha": "55cb4f8e25ef78362d84c1c7f98e6d59bbbdab75",
+  "design_evidence_blob_sha": "e381b82c2c6816d5c10a121992e82565f64a5101",
+  "decision": "ACCEPTED_FOR_INDEPENDENT_ASTRA_DESIGN_AUDIT",
+  "accepted_properties": [
+    "terminal_h41_no_go_preserved",
+    "no_h41_rescue",
+    "wf1_validation_sealed",
+    "compact_k_le_12_deterministic_architecture",
+    "derivatives_and_microstructure_not_promoted_without_authority",
+    "forward_validation_required",
+    "design_proposed_not_frozen",
+    "no_production_code_change",
+    "no_protected_outcome_access"
+  ],
+  "audit_focus": [
+    "fixed_window_research_latency_and_power_necessity",
+    "support_floor_and_30bp_effect_justification",
+    "historical_to_forward_source_transition_and_receive_time_parity",
+    "delayed_Open_t_plus_1h_entry_semantics",
+    "regime_hidden_multiplicity",
+    "candidate_specificity_before_freeze",
+    "Bline_H39_forward_exposure_quarantine",
+    "single_step_joint_max_vs_alternatives"
+  ],
+  "frozen": false,
+  "successor_execution_authorized": false,
+  "successor_validation_authorized": false,
+  "execution_policy": "RESEARCH_DISABLED_V1",
+  "next_stage": "ASTRA_H41_SUCCESSOR_SCIENTIFIC_CAMPAIGN_V1_DESIGN_AUDIT_R1"
+}

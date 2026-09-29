@@ -19,9 +19,14 @@
     "docs_head_rule": "VERIFY_LIVE_REMOTE_HEAD_DO_NOT_TRUST_STATIC_HANDOVER",
     "h41_discovery_result": "H41_EXPLORATORY_NO_GO",
     "h41_controller_adjudication": "ACCEPTED_TERMINAL_NO_GO",
-    "h41_candidate_lock": "NONE",
+    "h41_candidate_lock": null,
     "next_scientific_stage": "H41_SUCCESSOR_SCIENTIFIC_CAMPAIGN_V1_DESIGN",
-    "successor_execution_authorized": false
+    "successor_execution_authorized": false,
+    "h41_state": "ACCEPTED_TERMINAL_NO_GO",
+    "successor_design_commit": "c308f16f4f4e849f217470066cbe80e1b2a9ceb1",
+    "successor_design_status": "ACCEPTED_FOR_INDEPENDENT_ASTRA_DESIGN_AUDIT",
+    "successor_design_frozen": false,
+    "next_h41_stage": "ASTRA_H41_SUCCESSOR_SCIENTIFIC_CAMPAIGN_V1_DESIGN_AUDIT_R1"
   },
   "mandatory_reply_contract": {
     "every_substantive_project_reply_has_stage_progress": true,
