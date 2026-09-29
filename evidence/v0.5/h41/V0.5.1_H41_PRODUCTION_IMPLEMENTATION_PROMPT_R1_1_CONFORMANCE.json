@@ -1,0 +1,1315 @@
+{
+  "authority_files": {
+    "FROZEN_DESIGN_R1": "prompts/v0.5/design/v0.5.1_H41_SUCCESSOR_SCIENTIFIC_CAMPAIGN_V1_FROZEN_R1.md",
+    "FROZEN_R1": "evidence/v0.5/h41/V0.5.1_H41_FROZEN_PROTOCOL_AUTHORITY_R1.json",
+    "SOURCE_CONTROLLER": "evidence/v0.5/h41/V0.5.1_H41_SOURCE_AUTHORITY_CONTROLLER_ACCEPTANCE.json"
+  },
+  "docs_start_sha": "ae135999e5928eae4b7741ce17ddecc4514f24fc",
+  "rejected_prompt": "prompts/v0.5/implementation/v0.5.1_H41_PRODUCTION_IMPLEMENTATION_R1.md",
+  "repaired_prompt": "prompts/v0.5/implementation/v0.5.1_H41_PRODUCTION_IMPLEMENTATION_R1_1.md",
+  "requirement_count": 113,
+  "requirements": [
+    {
+      "authority": "SOURCE_CONTROLLER",
+      "authority_pointer": "/controller_audit_and_acceptance/btc_source_status",
+      "frozen_value": "CLOSED",
+      "frozen_value_sha256": "a8519c42d78eadafc0d8e243adf20d076e5ca3ba6e9fb79d0ad31fcf842dd38e",
+      "prompt_section": "## 0.",
+      "requirement_id": "ACCEPTED_SOURCE_BTC_STATUS",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "SOURCE_CONTROLLER",
+      "authority_pointer": "/canonical_source_authority/cadence",
+      "frozen_value": "native 1h",
+      "frozen_value_sha256": "cf3ff2aecb4f9a4517cd06c988bcc6439383532f542296b9db0a14ab65ba3af9",
+      "prompt_section": "## 2.",
+      "requirement_id": "ACCEPTED_SOURCE_CADENCE",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "SOURCE_CONTROLLER",
+      "authority_pointer": "/canonical_source_authority/canonical_projection_hashes",
+      "frozen_value": {
+        "BTC": "466f9fa2bbb483c11218bbda67e00e0f64df048b771a9a724ee61825715a32f8",
+        "ETH": "a6728877c47727d796b0c4f42a43f56956fcf05e308533d250783dccd2ae8912"
+      },
+      "frozen_value_sha256": "0ef2154774b7caf5c4519378d59d3da062739f85bd58f6a8b37eb59e66146aa0",
+      "prompt_section": "## 2.",
+      "requirement_id": "ACCEPTED_SOURCE_CANONICAL_PROJECTION_HASHES",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "SOURCE_CONTROLLER",
+      "authority_pointer": "/canonical_source_authority/canonical_receipt_hashes",
+      "frozen_value": {
+        "BTC": "cf6bd69856e06db4a15310b6533e19d60aa96e67528806f4c3d131196e770320",
+        "ETH": "6948eb9bbd13c66a49fd73079b0d426685ed0a3bc5ce061a6402f61d668896a5"
+      },
+      "frozen_value_sha256": "fb72d0db43c35f18971c36d3eeae219065cec2bd0c91e70444bd85fa3f348613",
+      "prompt_section": "## 2.",
+      "requirement_id": "ACCEPTED_SOURCE_CANONICAL_RECEIPT_HASHES",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "SOURCE_CONTROLLER",
+      "authority_pointer": "/controller_audit_and_acceptance/eth_source_status",
+      "frozen_value": "CLOSED",
+      "frozen_value_sha256": "a8519c42d78eadafc0d8e243adf20d076e5ca3ba6e9fb79d0ad31fcf842dd38e",
+      "prompt_section": "## 0.",
+      "requirement_id": "ACCEPTED_SOURCE_ETH_STATUS",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "SOURCE_CONTROLLER",
+      "authority_pointer": "/canonical_source_authority/interval_utc",
+      "frozen_value": {
+        "end_exclusive": "2023-05-01T00:00:00Z",
+        "start": "2021-01-01T00:00:00Z"
+      },
+      "frozen_value_sha256": "38b4153953166210cda006cac1a350f413acc0a8e18d13738806d20d26b7a234",
+      "prompt_section": "## 2.",
+      "requirement_id": "ACCEPTED_SOURCE_INTERVAL_UTC",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "SOURCE_CONTROLLER",
+      "authority_pointer": "/controller_audit_and_acceptance/source_invariants_status",
+      "frozen_value": "16/16_PASS",
+      "frozen_value_sha256": "3c822e518c28377be6392db994295cf724e45e88da9ee443815fb4196e7f45c1",
+      "prompt_section": "## 2.",
+      "requirement_id": "ACCEPTED_SOURCE_INVARIANTS",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "SOURCE_CONTROLLER",
+      "authority_pointer": "/canonical_source_authority/joint_source_authority_root",
+      "frozen_value": "05145d35a5cbd060ce3e9d7932b3757f901e396fa545ca624146dfbfa0cdb8b8",
+      "frozen_value_sha256": "9b9440cebed8f890d515c6bfbee938900b507cbf29ada60fcb22d684bf8a18ff",
+      "prompt_section": "## 2.",
+      "requirement_id": "ACCEPTED_SOURCE_JOINT_SOURCE_AUTHORITY_ROOT",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "SOURCE_CONTROLLER",
+      "authority_pointer": "/canonical_source_authority/market",
+      "frozen_value": "USD-M PERPETUAL",
+      "frozen_value_sha256": "93760fae2f8bb029ec0e8e49d414fd41b84b8e3fff6b2c17a01160cb737f0e54",
+      "prompt_section": "## 2.",
+      "requirement_id": "ACCEPTED_SOURCE_MARKET",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "SOURCE_CONTROLLER",
+      "authority_pointer": "/canonical_source_authority/provider",
+      "frozen_value": "Binance Public Data",
+      "frozen_value_sha256": "1957993233a5ec90386c774edfd61b78181daa2f4f98e19bc25cd94d1b0d6d1f",
+      "prompt_section": "## 2.",
+      "requirement_id": "ACCEPTED_SOURCE_PROVIDER",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "SOURCE_CONTROLLER",
+      "authority_pointer": "/canonical_source_authority/symbols",
+      "frozen_value": [
+        "BTCUSDT",
+        "ETHUSDT"
+      ],
+      "frozen_value_sha256": "2e33f9b6ff5306e7bdec24a7b706e10126e41d8325df2a7b8dfa0037d3dabe68",
+      "prompt_section": "## 2.",
+      "requirement_id": "ACCEPTED_SOURCE_SYMBOLS",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "SOURCE_CONTROLLER",
+      "authority_pointer": "/controller_audit_and_acceptance/btc_eth_source_synchronization",
+      "frozen_value": "PASS",
+      "frozen_value_sha256": "727e9bd17b077ba162e13ba877135cc6fbc6b30f83da0b34b3e20233f1cc885f",
+      "prompt_section": "## 3.",
+      "requirement_id": "ACCEPTED_SOURCE_SYNCHRONIZATION",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "FROZEN_R1",
+      "authority_pointer": "/frozen_candidate_universe/candidates/0",
+      "frozen_value": {
+        "candidate_id": "H41_D1_BTC_RET4_Q80_H4",
+        "decision_condition": "abs(score) >= train_frozen_Q80; score = log(Close(B0)/Close(B4)); side = sign(score)",
+        "family": "D1_TREND",
+        "horizon_hours": 4,
+        "lookback_window_hours": 4,
+        "modifier_type": null,
+        "parent_id": null,
+        "slot": 1,
+        "target_asset": "BTCUSDT"
+      },
+      "frozen_value_sha256": "3b0fd76a738687a39dc50f44c7679008be004efd3d24d39811c488e582effd91",
+      "prompt_section": "## 4.",
+      "requirement_id": "CANDIDATE_01_H41_D1_BTC_RET4_Q80_H4",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "FROZEN_R1",
+      "authority_pointer": "/frozen_candidate_universe/candidates/1",
+      "frozen_value": {
+        "candidate_id": "H41_D1_BTC_RET12_Q80_H24",
+        "decision_condition": "abs(score) >= train_frozen_Q80; score = log(Close(B0)/Close(B12)); side = sign(score)",
+        "family": "D1_TREND",
+        "horizon_hours": 24,
+        "lookback_window_hours": 12,
+        "modifier_type": null,
+        "parent_id": null,
+        "slot": 2,
+        "target_asset": "BTCUSDT"
+      },
+      "frozen_value_sha256": "38ad289ec0b75e25a0ec55f3d9438146fd4e5d13aed7182653692965fda3e4a4",
+      "prompt_section": "## 4.",
+      "requirement_id": "CANDIDATE_02_H41_D1_BTC_RET12_Q80_H24",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "FROZEN_R1",
+      "authority_pointer": "/frozen_candidate_universe/candidates/2",
+      "frozen_value": {
+        "candidate_id": "H41_D1_ETH_RET4_Q80_H4",
+        "decision_condition": "abs(score) >= train_frozen_Q80; score = log(Close(B0)/Close(B4)); side = sign(score)",
+        "family": "D1_TREND",
+        "horizon_hours": 4,
+        "lookback_window_hours": 4,
+        "modifier_type": null,
+        "parent_id": null,
+        "slot": 3,
+        "target_asset": "ETHUSDT"
+      },
+      "frozen_value_sha256": "b94df1ce3d91b26c2f70e3ca1f405a3daf46805c511bf2c70ed3db8b49039a7a",
+      "prompt_section": "## 4.",
+      "requirement_id": "CANDIDATE_03_H41_D1_ETH_RET4_Q80_H4",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "FROZEN_R1",
+      "authority_pointer": "/frozen_candidate_universe/candidates/3",
+      "frozen_value": {
+        "candidate_id": "H41_D1_ETH_RET12_Q80_H24",
+        "decision_condition": "abs(score) >= train_frozen_Q80; score = log(Close(B0)/Close(B12)); side = sign(score)",
+        "family": "D1_TREND",
+        "horizon_hours": 24,
+        "lookback_window_hours": 12,
+        "modifier_type": null,
+        "parent_id": null,
+        "slot": 4,
+        "target_asset": "ETHUSDT"
+      },
+      "frozen_value_sha256": "0ee2a08b580f63b851529628248c323b42541d60fcd6cbd681d6ccd24c930d98",
+      "prompt_section": "## 4.",
+      "requirement_id": "CANDIDATE_04_H41_D1_ETH_RET12_Q80_H24",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "FROZEN_R1",
+      "authority_pointer": "/frozen_candidate_universe/candidates/4",
+      "frozen_value": {
+        "candidate_id": "H41_D2_BTC_BO24_H4",
+        "decision_condition": "Close(B0) > max(High(B1..B24)) -> +1; Close(B0) < min(Low(B1..B24)) -> -1",
+        "family": "D2_BREAKOUT",
+        "horizon_hours": 4,
+        "lookback_window_hours": 24,
+        "modifier_type": null,
+        "parent_id": null,
+        "slot": 5,
+        "target_asset": "BTCUSDT"
+      },
+      "frozen_value_sha256": "763db6ebe0e556a343fbe6a55b9e71502cba94e998d33518de8c2ad46423fead",
+      "prompt_section": "## 4.",
+      "requirement_id": "CANDIDATE_05_H41_D2_BTC_BO24_H4",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "FROZEN_R1",
+      "authority_pointer": "/frozen_candidate_universe/candidates/5",
+      "frozen_value": {
+        "candidate_id": "H41_D2_BTC_BO72_H24",
+        "decision_condition": "Close(B0) > max(High(B1..B72)) -> +1; Close(B0) < min(Low(B1..B72)) -> -1",
+        "family": "D2_BREAKOUT",
+        "horizon_hours": 24,
+        "lookback_window_hours": 72,
+        "modifier_type": null,
+        "parent_id": null,
+        "slot": 6,
+        "target_asset": "BTCUSDT"
+      },
+      "frozen_value_sha256": "1608afb8ea9d782ab352b63b4a6986f8a200d90f5f3352abbabd67304f873a29",
+      "prompt_section": "## 4.",
+      "requirement_id": "CANDIDATE_06_H41_D2_BTC_BO72_H24",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "FROZEN_R1",
+      "authority_pointer": "/frozen_candidate_universe/candidates/6",
+      "frozen_value": {
+        "candidate_id": "H41_D2_ETH_BO24_H4",
+        "decision_condition": "Close(B0) > max(High(B1..B24)) -> +1; Close(B0) < min(Low(B1..B24)) -> -1",
+        "family": "D2_BREAKOUT",
+        "horizon_hours": 4,
+        "lookback_window_hours": 24,
+        "modifier_type": null,
+        "parent_id": null,
+        "slot": 7,
+        "target_asset": "ETHUSDT"
+      },
+      "frozen_value_sha256": "17afd12e1c7e18cbdcef318ac956057d57c59a689aaf5f4c2513365e70f234a7",
+      "prompt_section": "## 4.",
+      "requirement_id": "CANDIDATE_07_H41_D2_ETH_BO24_H4",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "FROZEN_R1",
+      "authority_pointer": "/frozen_candidate_universe/candidates/7",
+      "frozen_value": {
+        "candidate_id": "H41_D2_ETH_BO72_H24",
+        "decision_condition": "Close(B0) > max(High(B1..B72)) -> +1; Close(B0) < min(Low(B1..B72)) -> -1",
+        "family": "D2_BREAKOUT",
+        "horizon_hours": 24,
+        "lookback_window_hours": 72,
+        "modifier_type": null,
+        "parent_id": null,
+        "slot": 8,
+        "target_asset": "ETHUSDT"
+      },
+      "frozen_value_sha256": "46e0c85974709d0984a50874570a97b01ed75a6159dbabdc0ff53a41c4e66b53",
+      "prompt_section": "## 4.",
+      "requirement_id": "CANDIDATE_08_H41_D2_ETH_BO72_H24",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "FROZEN_R1",
+      "authority_pointer": "/frozen_candidate_universe/candidates/8",
+      "frozen_value": {
+        "candidate_id": "H41_D3_BTC_FB24_H4",
+        "decision_condition": "Close(B1) > max(High(B2..B25)) & Close(B0) inside -> -1; Close(B1) < min(Low(B2..B25)) & Close(B0) inside -> +1",
+        "family": "D3_FAILED_BREAK",
+        "horizon_hours": 4,
+        "lookback_window_hours": 24,
+        "modifier_type": null,
+        "parent_id": null,
+        "slot": 9,
+        "target_asset": "BTCUSDT"
+      },
+      "frozen_value_sha256": "ea85c6d5cb086068a49e7ba466a9dcad8778aeff14d766d2bf40f991702f42c7",
+      "prompt_section": "## 4.",
+      "requirement_id": "CANDIDATE_09_H41_D3_BTC_FB24_H4",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "FROZEN_R1",
+      "authority_pointer": "/frozen_candidate_universe/candidates/9",
+      "frozen_value": {
+        "candidate_id": "H41_D3_BTC_FB72_H8",
+        "decision_condition": "Close(B1) > max(High(B2..B73)) & Close(B0) inside -> -1; Close(B1) < min(Low(B2..B73)) & Close(B0) inside -> +1",
+        "family": "D3_FAILED_BREAK",
+        "horizon_hours": 8,
+        "lookback_window_hours": 72,
+        "modifier_type": null,
+        "parent_id": null,
+        "slot": 10,
+        "target_asset": "BTCUSDT"
+      },
+      "frozen_value_sha256": "b94e763549cd245ad11e27111bd9e43a3ee0a899cb04e9fa851947918340ba91",
+      "prompt_section": "## 4.",
+      "requirement_id": "CANDIDATE_10_H41_D3_BTC_FB72_H8",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "FROZEN_R1",
+      "authority_pointer": "/frozen_candidate_universe/candidates/10",
+      "frozen_value": {
+        "candidate_id": "H41_D3_ETH_FB24_H4",
+        "decision_condition": "Close(B1) > max(High(B2..B25)) & Close(B0) inside -> -1; Close(B1) < min(Low(B2..B25)) & Close(B0) inside -> +1",
+        "family": "D3_FAILED_BREAK",
+        "horizon_hours": 4,
+        "lookback_window_hours": 24,
+        "modifier_type": null,
+        "parent_id": null,
+        "slot": 11,
+        "target_asset": "ETHUSDT"
+      },
+      "frozen_value_sha256": "f7659c72901480a93b9f91cfe9219daa5fccf36200468f177159209e83a4b521",
+      "prompt_section": "## 4.",
+      "requirement_id": "CANDIDATE_11_H41_D3_ETH_FB24_H4",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "FROZEN_R1",
+      "authority_pointer": "/frozen_candidate_universe/candidates/11",
+      "frozen_value": {
+        "candidate_id": "H41_D3_ETH_FB72_H8",
+        "decision_condition": "Close(B1) > max(High(B2..B73)) & Close(B0) inside -> -1; Close(B1) < min(Low(B2..B73)) & Close(B0) inside -> +1",
+        "family": "D3_FAILED_BREAK",
+        "horizon_hours": 8,
+        "lookback_window_hours": 72,
+        "modifier_type": null,
+        "parent_id": null,
+        "slot": 12,
+        "target_asset": "ETHUSDT"
+      },
+      "frozen_value_sha256": "7141e77674565e9823e767f2478a5d7acf562feed24a4fe9a442e543b6766cec",
+      "prompt_section": "## 4.",
+      "requirement_id": "CANDIDATE_12_H41_D3_ETH_FB72_H8",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "FROZEN_R1",
+      "authority_pointer": "/frozen_candidate_universe/candidates/12",
+      "frozen_value": {
+        "candidate_id": "H41_D4_BTC_RET4_CONFIRM_H4",
+        "decision_condition": "Parent BTC RET4_Q80 side matches ETH RET4 sign",
+        "family": "D4_MODIFIER",
+        "horizon_hours": 4,
+        "lookback_window_hours": 4,
+        "modifier_type": "CONFIRM",
+        "parent_id": "H41_D1_BTC_RET4_Q80_H4",
+        "slot": 13,
+        "target_asset": "BTCUSDT"
+      },
+      "frozen_value_sha256": "ee6776e1434c0582072443f9233a035e7d4c73cacb705657912e3ca914468af0",
+      "prompt_section": "## 4.",
+      "requirement_id": "CANDIDATE_13_H41_D4_BTC_RET4_CONFIRM_H4",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "FROZEN_R1",
+      "authority_pointer": "/frozen_candidate_universe/candidates/13",
+      "frozen_value": {
+        "candidate_id": "H41_D4_BTC_RET4_DIVERGE_H4",
+        "decision_condition": "Parent BTC RET4_Q80 side opposes ETH RET4 sign",
+        "family": "D4_MODIFIER",
+        "horizon_hours": 4,
+        "lookback_window_hours": 4,
+        "modifier_type": "DIVERGE",
+        "parent_id": "H41_D1_BTC_RET4_Q80_H4",
+        "slot": 14,
+        "target_asset": "BTCUSDT"
+      },
+      "frozen_value_sha256": "2bea2edc52ae5ef3f89c57825117d455af56ab51c438f494848c1ed9ddd59213",
+      "prompt_section": "## 4.",
+      "requirement_id": "CANDIDATE_14_H41_D4_BTC_RET4_DIVERGE_H4",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "FROZEN_R1",
+      "authority_pointer": "/frozen_candidate_universe/candidates/14",
+      "frozen_value": {
+        "candidate_id": "H41_D4_ETH_RET4_CONFIRM_H4",
+        "decision_condition": "Parent ETH RET4_Q80 side matches BTC RET4 sign",
+        "family": "D4_MODIFIER",
+        "horizon_hours": 4,
+        "lookback_window_hours": 4,
+        "modifier_type": "CONFIRM",
+        "parent_id": "H41_D1_ETH_RET4_Q80_H4",
+        "slot": 15,
+        "target_asset": "ETHUSDT"
+      },
+      "frozen_value_sha256": "f9425f631fdc4f714886619ed49fa7263092321f71682849b84f009143c415f2",
+      "prompt_section": "## 4.",
+      "requirement_id": "CANDIDATE_15_H41_D4_ETH_RET4_CONFIRM_H4",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "FROZEN_R1",
+      "authority_pointer": "/frozen_candidate_universe/candidates/15",
+      "frozen_value": {
+        "candidate_id": "H41_D4_ETH_RET4_DIVERGE_H4",
+        "decision_condition": "Parent ETH RET4_Q80 side opposes BTC RET4 sign",
+        "family": "D4_MODIFIER",
+        "horizon_hours": 4,
+        "lookback_window_hours": 4,
+        "modifier_type": "DIVERGE",
+        "parent_id": "H41_D1_ETH_RET4_Q80_H4",
+        "slot": 16,
+        "target_asset": "ETHUSDT"
+      },
+      "frozen_value_sha256": "2c819eaf3ba40c161eb914328c5ceef20742932fc70138be7f07818dc3780906",
+      "prompt_section": "## 4.",
+      "requirement_id": "CANDIDATE_16_H41_D4_ETH_RET4_DIVERGE_H4",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "FROZEN_R1",
+      "authority_pointer": "/frozen_candidate_universe/candidates/16",
+      "frozen_value": {
+        "candidate_id": "H41_D4_BTC_BO24_CONFIRM_H4",
+        "decision_condition": "Parent BTC BO24 side matches ETH RET4 sign",
+        "family": "D4_MODIFIER",
+        "horizon_hours": 4,
+        "lookback_window_hours": 24,
+        "modifier_type": "CONFIRM",
+        "parent_id": "H41_D2_BTC_BO24_H4",
+        "slot": 17,
+        "target_asset": "BTCUSDT"
+      },
+      "frozen_value_sha256": "ce1bd46a67092e7a85c4fefb0a21c39d4312f9e1fbb501eb670cc729ecb301e0",
+      "prompt_section": "## 4.",
+      "requirement_id": "CANDIDATE_17_H41_D4_BTC_BO24_CONFIRM_H4",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "FROZEN_R1",
+      "authority_pointer": "/frozen_candidate_universe/candidates/17",
+      "frozen_value": {
+        "candidate_id": "H41_D4_BTC_BO24_DIVERGE_H4",
+        "decision_condition": "Parent BTC BO24 side opposes ETH RET4 sign",
+        "family": "D4_MODIFIER",
+        "horizon_hours": 4,
+        "lookback_window_hours": 24,
+        "modifier_type": "DIVERGE",
+        "parent_id": "H41_D2_BTC_BO24_H4",
+        "slot": 18,
+        "target_asset": "BTCUSDT"
+      },
+      "frozen_value_sha256": "a0c150fe8ec2ba58944e4bb26cba6208c4c913743aa2e00e710382603f2b0312",
+      "prompt_section": "## 4.",
+      "requirement_id": "CANDIDATE_18_H41_D4_BTC_BO24_DIVERGE_H4",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "FROZEN_R1",
+      "authority_pointer": "/frozen_candidate_universe/candidates/18",
+      "frozen_value": {
+        "candidate_id": "H41_D4_ETH_BO24_CONFIRM_H4",
+        "decision_condition": "Parent ETH BO24 side matches BTC RET4 sign",
+        "family": "D4_MODIFIER",
+        "horizon_hours": 4,
+        "lookback_window_hours": 24,
+        "modifier_type": "CONFIRM",
+        "parent_id": "H41_D2_ETH_BO24_H4",
+        "slot": 19,
+        "target_asset": "ETHUSDT"
+      },
+      "frozen_value_sha256": "1e17e263fe31f4f7a1fd2acc68739e28d2905e137540fc82b404ce52e770b015",
+      "prompt_section": "## 4.",
+      "requirement_id": "CANDIDATE_19_H41_D4_ETH_BO24_CONFIRM_H4",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "FROZEN_R1",
+      "authority_pointer": "/frozen_candidate_universe/candidates/19",
+      "frozen_value": {
+        "candidate_id": "H41_D4_ETH_BO24_DIVERGE_H4",
+        "decision_condition": "Parent ETH BO24 side opposes BTC RET4 sign",
+        "family": "D4_MODIFIER",
+        "horizon_hours": 4,
+        "lookback_window_hours": 24,
+        "modifier_type": "DIVERGE",
+        "parent_id": "H41_D2_ETH_BO24_H4",
+        "slot": 20,
+        "target_asset": "ETHUSDT"
+      },
+      "frozen_value_sha256": "1119ec6f6d55be29eafcfa515a12c6b490f5b140aea7a2d39ac6726cb4463c33",
+      "prompt_section": "## 4.",
+      "requirement_id": "CANDIDATE_20_H41_D4_ETH_BO24_DIVERGE_H4",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "FROZEN_R1",
+      "authority_pointer": "/frozen_contracts/endpoint_contract/claim_scope",
+      "frozen_value": "equal-entry-notional, event-conditioned directional expectancy after a fixed friction proxy, before funding and portfolio constraints.",
+      "frozen_value_sha256": "e0459b31a775eafbabe422fea14da8939717768a1e92e9d1dd87ba6680eae9f5",
+      "prompt_section": "## 5.",
+      "requirement_id": "ENDPOINT_CLAIM_SCOPE",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "FROZEN_R1",
+      "authority_pointer": "/frozen_contracts/endpoint_contract/claim_scope_exclusions",
+      "frozen_value": [
+        "all-cost net execution P&L",
+        "capital-normalized portfolio return or Sharpe ratio",
+        "funded perpetual return with funding/borrow carry",
+        "executable strategy with position sizing, inventory limits, slippage modeling, or order-book queue dynamics"
+      ],
+      "frozen_value_sha256": "aac3e940dad4e8de641ddb7254b65963e7185d72ab956b84bc0151a343ec56f8",
+      "prompt_section": "## 5.",
+      "requirement_id": "ENDPOINT_CLAIM_SCOPE_EXCLUSIONS",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "FROZEN_R1",
+      "authority_pointer": "/frozen_contracts/endpoint_contract/fixed_friction_proxy_base_bps",
+      "frozen_value": 12.0,
+      "frozen_value_sha256": "77c52f3feed5acdd119b1f8449d5ccc2d39be94bd0314d5b7302f36e20b6cea9",
+      "prompt_section": "## 5.",
+      "requirement_id": "ENDPOINT_FIXED_FRICTION_PROXY_BASE_BPS",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "FROZEN_R1",
+      "authority_pointer": "/frozen_contracts/endpoint_contract/fixed_friction_proxy_stress_bps",
+      "frozen_value": 24.0,
+      "frozen_value_sha256": "dce81cca484053ef71096b308cb234b77b4ff19b507b7e033677c6a3827eaeef",
+      "prompt_section": "## 5.",
+      "requirement_id": "ENDPOINT_FIXED_FRICTION_PROXY_STRESS_BPS",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "FROZEN_R1",
+      "authority_pointer": "/frozen_contracts/endpoint_contract/primary_formula",
+      "frozen_value": "mean(signed_simple_horizon_return - 0.0012)",
+      "frozen_value_sha256": "089f5399ef01dd001b2285e4987975b1498f3492fb18375ab7b7c30cf109b79b",
+      "prompt_section": "## 5.",
+      "requirement_id": "ENDPOINT_PRIMARY_FORMULA",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "FROZEN_R1",
+      "authority_pointer": "/frozen_contracts/endpoint_contract/stress_role",
+      "frozen_value": "Diagnostic only; cannot overturn or substitute primary 12bp gate",
+      "frozen_value_sha256": "b07e82070ccae26bdc4d158e6f834348c0b791afbbbf2789176cacf03625188a",
+      "prompt_section": "## 5.",
+      "requirement_id": "ENDPOINT_STRESS_ROLE",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "SOURCE_CONTROLLER",
+      "authority_pointer": "/implementation_authorization/execution_mode",
+      "frozen_value": "RESEARCH_DISABLED_V1",
+      "frozen_value_sha256": "5d75733a70c87cdff6984beccefc46a7a16e1078cdf90563eba098439430d57a",
+      "prompt_section": "## 1.",
+      "requirement_id": "GOVERNANCE_EXECUTION_MODE",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "SOURCE_CONTROLLER",
+      "authority_pointer": "/implementation_authorization/h40_immutability_fence_required",
+      "frozen_value": true,
+      "frozen_value_sha256": "b5bea41b6c623f7c09f1bf24dcae58ebab3c0cdd90ad966bc43a45b44867e12b",
+      "prompt_section": "## 1.",
+      "requirement_id": "GOVERNANCE_H40_IMMUTABILITY_FENCE_REQUIRED",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "SOURCE_CONTROLLER",
+      "authority_pointer": "/implementation_authorization/h41_implementation_authorized",
+      "frozen_value": "YES",
+      "frozen_value_sha256": "cf614faa3e31f1e2679cbeff9e379d539aaa3dbc60ac5aa3a6c4dea86a891fd5",
+      "prompt_section": "## 1.",
+      "requirement_id": "GOVERNANCE_H41_IMPLEMENTATION_AUTHORIZED",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "SOURCE_CONTROLLER",
+      "authority_pointer": "/implementation_authorization/h41_implementation_complete",
+      "frozen_value": "NO",
+      "frozen_value_sha256": "8715f26d0d6e170f900e60938fedd70eb9b8b227166bb66a99ace161a7f936bf",
+      "prompt_section": "## 8.",
+      "requirement_id": "GOVERNANCE_H41_IMPLEMENTATION_COMPLETE",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "SOURCE_CONTROLLER",
+      "authority_pointer": "/implementation_authorization/h41_real_discovery_authorized",
+      "frozen_value": "NO",
+      "frozen_value_sha256": "8715f26d0d6e170f900e60938fedd70eb9b8b227166bb66a99ace161a7f936bf",
+      "prompt_section": "## 1.",
+      "requirement_id": "GOVERNANCE_H41_REAL_DISCOVERY_AUTHORIZED",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "SOURCE_CONTROLLER",
+      "authority_pointer": "/implementation_authorization/h41_synthetic_pit_exact_sha_validated",
+      "frozen_value": "NO",
+      "frozen_value_sha256": "8715f26d0d6e170f900e60938fedd70eb9b8b227166bb66a99ace161a7f936bf",
+      "prompt_section": "## 8.",
+      "requirement_id": "GOVERNANCE_H41_SYNTHETIC_PIT_EXACT_SHA_VALIDATED",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "SOURCE_CONTROLLER",
+      "authority_pointer": "/implementation_authorization/h41_wf1_validation_authorized",
+      "frozen_value": "NO",
+      "frozen_value_sha256": "8715f26d0d6e170f900e60938fedd70eb9b8b227166bb66a99ace161a7f936bf",
+      "prompt_section": "## 1.",
+      "requirement_id": "GOVERNANCE_H41_WF1_VALIDATION_AUTHORIZED",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "SOURCE_CONTROLLER",
+      "authority_pointer": "/implementation_authorization/implementation_base_sha",
+      "frozen_value": "407dabc415ae8cae4210250e992941c8b9b25464",
+      "frozen_value_sha256": "8b917286b7b5cd6d93455cdca0d989a90eeb66ad64b2896e2d40b6ba9883fdb9",
+      "prompt_section": "## 1.",
+      "requirement_id": "GOVERNANCE_IMPLEMENTATION_BASE_SHA",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "SOURCE_CONTROLLER",
+      "authority_pointer": "/implementation_authorization/target_package",
+      "frozen_value": "src/btc_quant_agent/h41/",
+      "frozen_value_sha256": "68e93c98bd8b83671d949e34b73f3751139243ade90c3489a2dd3348607a065c",
+      "prompt_section": "## 1.",
+      "requirement_id": "GOVERNANCE_TARGET_PACKAGE",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "FROZEN_R1",
+      "authority_pointer": "/authority_hashes/candidate_ledger_hash",
+      "frozen_value": "d2ee1551ab4778e8ce34e83e053aba17ebb6be240aed812a4beedb218548b7e0",
+      "frozen_value_sha256": "b1423fbd1503c8e2822157fb764328d9e1de97547fa32f45b62df325788f9a41",
+      "prompt_section": "## 2.",
+      "requirement_id": "HASH_CANDIDATE_LEDGER_HASH",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "FROZEN_R1",
+      "authority_pointer": "/authority_hashes/endpoint_contract_hash",
+      "frozen_value": "ba467d3c69d0b0f266137536d432beea9523b0ba39ccfc7ffd610eeb72c21314",
+      "frozen_value_sha256": "8147e9f8e279ab40dc0195721842601a9795583d7825f0ae2b11af03773aeb9c",
+      "prompt_section": "## 2.",
+      "requirement_id": "HASH_ENDPOINT_CONTRACT_HASH",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "FROZEN_R1",
+      "authority_pointer": "/authority_hashes/event_pit_contract_hash",
+      "frozen_value": "dee7b3ac334dd62e68a7ee700841e9862505bc5827c3ccd665d52b046040362e",
+      "frozen_value_sha256": "421b20425c8bf9cd2b1c8014a65a3039aacd77c4ae918aa69c4ebebecd8b7908",
+      "prompt_section": "## 2.",
+      "requirement_id": "HASH_EVENT_PIT_CONTRACT_HASH",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "FROZEN_R1",
+      "authority_pointer": "/authority_hashes/frozen_h41_semantic_root_hash",
+      "frozen_value": "f784ce4cfe7ba4d1d5d30582e59ab4811aa7b1e8aed79b00a5f5e0f200c26917",
+      "frozen_value_sha256": "66efbacb526eafbc04658beb3d241baca4c94fbcb6abd87f374bfbbb7fc16518",
+      "prompt_section": "## 2.",
+      "requirement_id": "HASH_FROZEN_H41_SEMANTIC_ROOT_HASH",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "FROZEN_R1",
+      "authority_pointer": "/authority_hashes/frozen_protocol_hash",
+      "frozen_value": "f784ce4cfe7ba4d1d5d30582e59ab4811aa7b1e8aed79b00a5f5e0f200c26917",
+      "frozen_value_sha256": "66efbacb526eafbc04658beb3d241baca4c94fbcb6abd87f374bfbbb7fc16518",
+      "prompt_section": "## 2.",
+      "requirement_id": "HASH_FROZEN_PROTOCOL_HASH",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "FROZEN_R1",
+      "authority_pointer": "/authority_hashes/inference_contract_hash",
+      "frozen_value": "6b7c3d5289fd9cc132affb51f85fa292049868b96041b2b749cc11cf8be11136",
+      "frozen_value_sha256": "fee1a86e4b8a99b92fdf7d10357a484e56f6ad9ec15e522ae98f6afc93f90073",
+      "prompt_section": "## 2.",
+      "requirement_id": "HASH_INFERENCE_CONTRACT_HASH",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "FROZEN_R1",
+      "authority_pointer": "/authority_hashes/source_requirements_hash",
+      "frozen_value": "04845354af6c22f88a55da74aa4fdf8393277e28447c9d57b84a718e8aecb581",
+      "frozen_value_sha256": "c98d5499736549ebcac35c3153076909beb3e478dbcb75b1564a8516ed7177dc",
+      "prompt_section": "## 2.",
+      "requirement_id": "HASH_SOURCE_REQUIREMENTS_HASH",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "FROZEN_R1",
+      "authority_pointer": "/authority_hashes/validation_lifecycle_contract_hash",
+      "frozen_value": "7619ce3849bf4e7f5e288231cd8c38f78189bc1d61baa4c58c87edeb58c6e864",
+      "frozen_value_sha256": "e42e60e2fcdf888f0d786792189544ba31faa71a8d573d3a42d68263bf07dd9b",
+      "prompt_section": "## 2.",
+      "requirement_id": "HASH_VALIDATION_LIFECYCLE_CONTRACT_HASH",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "FROZEN_R1",
+      "authority_pointer": "/frozen_contracts/inference_contract/bootstrap_centering_rule",
+      "frozen_value": "center_i = sum_j Z^{(L)}_{i, tau_j} / sum_j A^{(L)}_{i, tau_j} (non-circular moving block sum)",
+      "frozen_value_sha256": "4600160d48712d1cde1949da832e8c2f117cbf58dfc5a38bba5867663c309178",
+      "prompt_section": "## 6.",
+      "requirement_id": "INFERENCE_BOOTSTRAP_CENTERING_RULE",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "FROZEN_R1",
+      "authority_pointer": "/frozen_contracts/inference_contract/bootstrap_replicates_B",
+      "frozen_value": 10000,
+      "frozen_value_sha256": "39e5b4830d4d9c14db7368a95b65d5463ea3d09520373723430c03a5a453b5df",
+      "prompt_section": "## 6.",
+      "requirement_id": "INFERENCE_BOOTSTRAP_REPLICATES_B",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "FROZEN_R1",
+      "authority_pointer": "/frozen_contracts/inference_contract/critical_value_c95",
+      "frozen_value": "95th percentile of empirical bootstrap distribution of joint maximum statistic",
+      "frozen_value_sha256": "16bf687faed274136800ea571cdd55d4eb26ddb098f947342e61a29b7906620e",
+      "prompt_section": "## 6.",
+      "requirement_id": "INFERENCE_CRITICAL_VALUE_C95",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "FROZEN_R1",
+      "authority_pointer": "/frozen_contracts/inference_contract/decision_gate",
+      "frozen_value": "simultaneous LCB_i > 0",
+      "frozen_value_sha256": "3ff41ea984be8c861868a04d21a3b5328cdd216ce88cb1133617f37e344f55da",
+      "prompt_section": "## 6.",
+      "requirement_id": "INFERENCE_DECISION_GATE",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "FROZEN_R1",
+      "authority_pointer": "/frozen_contracts/inference_contract/frozen_block_length_hours",
+      "frozen_value": 120,
+      "frozen_value_sha256": "2abaca4911e68fa9bfbf3482ee797fd5b9045b841fdff7253557c5fe15de6477",
+      "prompt_section": "## 6.",
+      "requirement_id": "INFERENCE_FROZEN_BLOCK_LENGTH_HOURS",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "FROZEN_R1",
+      "authority_pointer": "/frozen_contracts/inference_contract/joint_shared_clock_rule",
+      "frozen_value": "Exactly one block-index sequence tau_1..tau_m drawn per bootstrap replicate and applied jointly across all K=20 candidates and both assets",
+      "frozen_value_sha256": "792f06d54cf47c14094f9e4a1f13c59a9453c641a085a6c14deb281bdea9a047",
+      "prompt_section": "## 6.",
+      "requirement_id": "INFERENCE_JOINT_SHARED_CLOCK_RULE",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "FROZEN_R1",
+      "authority_pointer": "/frozen_contracts/inference_contract/joint_test_statistic",
+      "frozen_value": "max_{i in 0..K-1} T^*_{i,b}",
+      "frozen_value_sha256": "1825e448f52158dfc384b54bf5e466d2c2d7b66969a99dd2654a295c8b82e7c3",
+      "prompt_section": "## 6.",
+      "requirement_id": "INFERENCE_JOINT_TEST_STATISTIC",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "FROZEN_R1",
+      "authority_pointer": "/frozen_contracts/inference_contract/methodology",
+      "frozen_value": "shared-clock, source-bundle preserving, non-circular moving-block Studentized bootstrap-t single-step joint maximum inference",
+      "frozen_value_sha256": "7c29ea08ae99e81926c09429b56f7911e72bc60169ed895bb36b832074bcd40b",
+      "prompt_section": "## 6.",
+      "requirement_id": "INFERENCE_METHODOLOGY",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "FROZEN_R1",
+      "authority_pointer": "/frozen_contracts/inference_contract/point_estimator",
+      "frozen_value": "ratio estimator mu_hat_i = sum_t Z_{i,t} / sum_t A_{i,t}",
+      "frozen_value_sha256": "a943d911bec6f34c2d48423f278c6692d53a26ca92edba76741046e98b63717c",
+      "prompt_section": "## 6.",
+      "requirement_id": "INFERENCE_POINT_ESTIMATOR",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "FROZEN_R1",
+      "authority_pointer": "/frozen_contracts/inference_contract/power_class_h24",
+      "frozen_value": "METHOD_POWER_LIMITED (1.6% at delta=20bp)",
+      "frozen_value_sha256": "bf1ba4727706e9f44e273d514e5fb353f0c397c611be454a8bf18ebe0933f8b9",
+      "prompt_section": "## 6.",
+      "requirement_id": "INFERENCE_POWER_CLASS_H24",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "FROZEN_R1",
+      "authority_pointer": "/frozen_contracts/inference_contract/power_class_h4",
+      "frozen_value": "METHOD_POWER_LIMITED (35.4% at delta=20bp)",
+      "frozen_value_sha256": "f5f44e335b874de89c224153a512dafb466d3b4e05b01eb812230551cb278685",
+      "prompt_section": "## 6.",
+      "requirement_id": "INFERENCE_POWER_CLASS_H4",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "FROZEN_R1",
+      "authority_pointer": "/frozen_contracts/inference_contract/power_interpretation_guardrail",
+      "frozen_value": "Failure to obtain simultaneous LCB > 0 on exploratory Discovery is not equivalent to proof of zero economic edge when the candidate's method-power class is limited. Low synthetic power must not be used to relax the LCB > 0 selection gate.",
+      "frozen_value_sha256": "2aa9d49eea4edab344c6c5447e463247a2e3da6af532ab35447441255f2c705c",
+      "prompt_section": "## 6.",
+      "requirement_id": "INFERENCE_POWER_INTERPRETATION_GUARDRAIL",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "FROZEN_R1",
+      "authority_pointer": "/frozen_contracts/inference_contract/ratio_estimator_lrv",
+      "frozen_value": "Kuensch (1989) ratio-estimator moving block sum variance formula SE_hat_i = sqrt( (1 / (L*S)) * sum_s (Z^{(L)}_{i,s} - mu_hat_i * A^{(L)}_{i,s})^2 ) / A_bar_i",
+      "frozen_value_sha256": "77c6c4f09a404b592ff546c9e2113b2d19d56eb5fcc5b3bccbe4b66d44e17ea6",
+      "prompt_section": "## 6.",
+      "requirement_id": "INFERENCE_RATIO_ESTIMATOR_LRV",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "FROZEN_R1",
+      "authority_pointer": "/frozen_contracts/inference_contract/simultaneous_lcb",
+      "frozen_value": "LCB_i = mu_hat_i - c95 * SE_hat_i",
+      "frozen_value_sha256": "be1f270e4eff636799f2fb802e6419dbbb9020c9d43cb3c2b8f4cda1d1d5e8c9",
+      "prompt_section": "## 6.",
+      "requirement_id": "INFERENCE_SIMULTANEOUS_LCB",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "FROZEN_R1",
+      "authority_pointer": "/frozen_contracts/inference_contract/studentization_rule",
+      "frozen_value": "T^*_{i,b} = (mu^*_{i,b} - center_i) / SE^*_{i,b}",
+      "frozen_value_sha256": "b8b345554fc041326f5e0c7c244fa9d6088ce48b2cfdc85c44f765d491fac9b8",
+      "prompt_section": "## 6.",
+      "requirement_id": "INFERENCE_STUDENTIZATION_RULE",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "FROZEN_R1",
+      "authority_pointer": "/frozen_contracts/inference_contract/zero_event_fail_closed",
+      "frozen_value": "Candidates failing support floors or with zero events receive LCB = -infinity",
+      "frozen_value_sha256": "3f6527baddad5638b73248fbd93049e1f1a7d70a524b8bf898da13af2c6ca003",
+      "prompt_section": "## 6.",
+      "requirement_id": "INFERENCE_ZERO_EVENT_FAIL_CLOSED",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "FROZEN_R1",
+      "authority_pointer": "/frozen_candidate_universe/active_outcome_horizons",
+      "frozen_value": [
+        4,
+        8,
+        24
+      ],
+      "frozen_value_sha256": "affc16727d254d92d144e319698222f9922c9ff2d0c0718bc08829e691b05d2b",
+      "prompt_section": "## 4.",
+      "requirement_id": "LEDGER_ACTIVE_OUTCOME_HORIZONS",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "FROZEN_R1",
+      "authority_pointer": "/frozen_candidate_universe/candidate_count",
+      "frozen_value": 20,
+      "frozen_value_sha256": "f5ca38f748a1d6eaf726b8a42fb575c3c71f1864a8143301782de13da2d9202b",
+      "prompt_section": "## 4.",
+      "requirement_id": "LEDGER_CANDIDATE_COUNT",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "FROZEN_R1",
+      "authority_pointer": "/frozen_candidate_universe/family_breakdown",
+      "frozen_value": {
+        "D1_TREND": 4,
+        "D2_BREAKOUT": 4,
+        "D3_FAILED_BREAK": 4,
+        "D4_MODIFIER": 8
+      },
+      "frozen_value_sha256": "e77d6384946d94d80eb5d2507a87960b4226190b1eb9600f07151642cb02b3c0",
+      "prompt_section": "## 4.",
+      "requirement_id": "LEDGER_FAMILY_BREAKDOWN",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "FROZEN_R1",
+      "authority_pointer": "/frozen_contracts/validation_lifecycle_contract/candidate_selection_rule",
+      "frozen_value": "Deterministic ranking among candidates with valid simultaneous LCB > 0: (1) highest full-precision LCB, (2) larger event count N, (3) lexicographically lower candidate ID",
+      "frozen_value_sha256": "93f257b2cb49a8c4ab17ce313fe4e88435f961a62e8e15870ee156a827c4369c",
+      "prompt_section": "## 6.",
+      "requirement_id": "LIFECYCLE_CANDIDATE_SELECTION_RULE",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "FROZEN_R1",
+      "authority_pointer": "/frozen_contracts/validation_lifecycle_contract/exploratory_lock_name",
+      "frozen_value": "H41_EXPLORATORY_DIRECTIONAL_CANDIDATE_LOCK_V1",
+      "frozen_value_sha256": "65ffcd30907f3b36bb3f0caa0c88488562fd392c974f00a77a3cf76232e1394d",
+      "prompt_section": "## 6.",
+      "requirement_id": "LIFECYCLE_EXPLORATORY_LOCK_NAME",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "FROZEN_R1",
+      "authority_pointer": "/frozen_contracts/validation_lifecycle_contract/exploratory_partition",
+      "frozen_value": "WF1_CALIBRATION [2022-11-01T00:00:00Z, 2023-01-31T00:00:00Z), 2184 hours",
+      "frozen_value_sha256": "b07b2d6c63d9ac3a83205918f38fbedf1c03151782db25174aeb1c9198a0c702",
+      "prompt_section": "## 3.",
+      "requirement_id": "LIFECYCLE_EXPLORATORY_PARTITION",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "FROZEN_R1",
+      "authority_pointer": "/frozen_contracts/validation_lifecycle_contract/exploratory_status",
+      "frozen_value": "HISTORICALLY_INFORMED_EXPLORATORY_DISCOVERY",
+      "frozen_value_sha256": "5c59378f91dd1d73ef848a31711eb904543365193f89b3adb566628ca240fe3a",
+      "prompt_section": "## 6.",
+      "requirement_id": "LIFECYCLE_EXPLORATORY_STATUS",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "FROZEN_R1",
+      "authority_pointer": "/frozen_contracts/validation_lifecycle_contract/no_fallback_rule",
+      "frozen_value": "If locked candidate fails validation, Candidate #2 is NOT evaluated; campaign terminates as validation failure",
+      "frozen_value_sha256": "a185a8b80f3946a32fd4f1ee74580f428544e9507125e35b897b469b94b436e7",
+      "prompt_section": "## 6.",
+      "requirement_id": "LIFECYCLE_NO_FALLBACK_RULE",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "FROZEN_R1",
+      "authority_pointer": "/frozen_contracts/validation_lifecycle_contract/no_go_outcome",
+      "frozen_value": "H41_EXPLORATORY_NO_GO if 0 candidates pass LCB > 0 gate",
+      "frozen_value_sha256": "1fe02ffc7fc897cf568c0b2cc318e787b2565ea48c5aa9041c4790d132afdb4f",
+      "prompt_section": "## 6.",
+      "requirement_id": "LIFECYCLE_NO_GO_OUTCOME",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "FROZEN_R1",
+      "authority_pointer": "/frozen_contracts/validation_lifecycle_contract/no_retuning_rule",
+      "frozen_value": "Zero hyperparameter tuning or semantic modification permitted after unsealing",
+      "frozen_value_sha256": "5d395e093507b15971488413611e447952025679e1dc6f9a855b2d1b67229377",
+      "prompt_section": "## 1.",
+      "requirement_id": "LIFECYCLE_NO_RETUNING_RULE",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "FROZEN_R1",
+      "authority_pointer": "/frozen_contracts/validation_lifecycle_contract/purge_1_partition",
+      "frozen_value": "WF1_PURGE_1 [2022-10-31T00:00:00Z, 2022-11-01T00:00:00Z), 24 hours; source-only",
+      "frozen_value_sha256": "724625ff57e5ffb00ef05f189ff2f9d18298788327032d3c998f7d3baa5f1ab1",
+      "prompt_section": "## 3.",
+      "requirement_id": "LIFECYCLE_PURGE_1_PARTITION",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "FROZEN_R1",
+      "authority_pointer": "/frozen_contracts/validation_lifecycle_contract/purge_2_partition",
+      "frozen_value": "WF1_PURGE_2 [2023-01-31T00:00:00Z, 2023-02-01T00:00:00Z), 24 hours; source-only",
+      "frozen_value_sha256": "04ac32c41e9d023af73957250cd3ed9ec83c76419dfe2ec19c3a77c3b93784cd",
+      "prompt_section": "## 3.",
+      "requirement_id": "LIFECYCLE_PURGE_2_PARTITION",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "FROZEN_R1",
+      "authority_pointer": "/frozen_contracts/validation_lifecycle_contract/sealed_partitions",
+      "frozen_value": [
+        "WF1_VALIDATION",
+        "Confirmation",
+        "H39",
+        "Final Holdout"
+      ],
+      "frozen_value_sha256": "33ed66ea713898e1faae45911fb8a387e3e070f7e8aa757c276ac24e1a516d2d",
+      "prompt_section": "## 3.",
+      "requirement_id": "LIFECYCLE_SEALED_PARTITIONS",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "FROZEN_R1",
+      "authority_pointer": "/frozen_contracts/validation_lifecycle_contract/single_candidate_gate",
+      "frozen_value": "Exactly one locked candidate enters WF1_VALIDATION",
+      "frozen_value_sha256": "8efcefd3fdec49082fd0e3228b5da4bf63e2a05dc1c5f1b086ac6bf34bbea8e9",
+      "prompt_section": "## 6.",
+      "requirement_id": "LIFECYCLE_SINGLE_CANDIDATE_GATE",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "FROZEN_R1",
+      "authority_pointer": "/frozen_contracts/validation_lifecycle_contract/successor_campaign_requirement",
+      "frozen_value": "Evaluating alternative candidates requires a separate authorized successor campaign",
+      "frozen_value_sha256": "39993d46efaba47076eb95098b42085bbcd90a0db2d20920a79681fd8a5f8f71",
+      "prompt_section": "## 1.",
+      "requirement_id": "LIFECYCLE_SUCCESSOR_CAMPAIGN_REQUIREMENT",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "FROZEN_R1",
+      "authority_pointer": "/frozen_contracts/validation_lifecycle_contract/train_partition",
+      "frozen_value": "WF1_TRAIN [2021-01-01T00:00:00Z, 2022-10-31T00:00:00Z), 16032 hours",
+      "frozen_value_sha256": "ed8b7da3e14ce770534330c33d8c6d5ea3f3ac31c959cc398046b7671ba5f392",
+      "prompt_section": "## 3.",
+      "requirement_id": "LIFECYCLE_TRAIN_PARTITION",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "FROZEN_R1",
+      "authority_pointer": "/frozen_contracts/validation_lifecycle_contract/validation_partition",
+      "frozen_value": "WF1_VALIDATION [2023-02-01T00:00:00Z, 2023-04-30T00:00:00Z), 2112 hours; sealed",
+      "frozen_value_sha256": "4ab8f5280d3cc22cdb9eb3691e3681a5879b2fa4084b4028868322d68fb650ac",
+      "prompt_section": "## 3.",
+      "requirement_id": "LIFECYCLE_VALIDATION_PARTITION",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "FROZEN_R1",
+      "authority_pointer": "/frozen_contracts/event_pit_contract/adjacent_bar_price_relation",
+      "frozen_value": "No equality is assumed between Open(B_k) and Close(B_{k-1})",
+      "frozen_value_sha256": "d0e05beebe8dc3738df7cfdd2fd975cbee64d18877af526e9d3f6a6f1a91cd96",
+      "prompt_section": "## 3.",
+      "requirement_id": "PIT_ADJACENT_BAR_PRICE_RELATION",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "FROZEN_R1",
+      "authority_pointer": "/frozen_contracts/event_pit_contract/bar_interval_definition",
+      "frozen_value": "B_0(t) is last completed bar finalized at UTC hour t; B_entry(t) is [t, t+1h)",
+      "frozen_value_sha256": "7cc833187c2279669978a08c323c681aa2ba8b795c9a6b24fef63d5b898b807d",
+      "prompt_section": "## 3.",
+      "requirement_id": "PIT_BAR_INTERVAL_DEFINITION",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "FROZEN_R1",
+      "authority_pointer": "/frozen_contracts/event_pit_contract/canonical_bar_interval_seconds",
+      "frozen_value": 3600,
+      "frozen_value_sha256": "8b34042b7a96b3ba94b27ad723ca8f57787eefbab2083b3098173c444aefbfdf",
+      "prompt_section": "## 3.",
+      "requirement_id": "PIT_CANONICAL_BAR_INTERVAL_SECONDS",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "FROZEN_R1",
+      "authority_pointer": "/frozen_contracts/event_pit_contract/decision_boundary",
+      "frozen_value": "t is a UTC hour boundary; event mask and signal use only completed B_j(t), j>=0, with feature information cutoff <= t; Open(B_entry(t)) is forbidden as event input",
+      "frozen_value_sha256": "ae79d00eaba117a7910460aae5d3559f9ad047c8c7b29be655e761a72dccdcb1",
+      "prompt_section": "## 3.",
+      "requirement_id": "PIT_DECISION_BOUNDARY",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "FROZEN_R1",
+      "authority_pointer": "/frozen_contracts/event_pit_contract/horizon_return_formula",
+      "frozen_value": "r_gross(t,h) = s_t * (P_exit(t,h) / P_entry(t) - 1) on equal entry notional; h in {4,8,24}",
+      "frozen_value_sha256": "5c9717a54db1adb03e51bdff49f998bd16388b537dfd52ad4d4b25a00c9aab26",
+      "prompt_section": "## 5.",
+      "requirement_id": "PIT_HORIZON_RETURN_FORMULA",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "FROZEN_R1",
+      "authority_pointer": "/frozen_contracts/event_pit_contract/missing_bar_handling",
+      "frozen_value": "Missing or non-consecutive hourly bars fail closed with A[i, t] = 0",
+      "frozen_value_sha256": "bdaa420e1df56b1d385d2ffd4e34d85c2ef8ecc58d66455b6f969fea6ef8e8d5",
+      "prompt_section": "## 3.",
+      "requirement_id": "PIT_MISSING_BAR_HANDLING",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "FROZEN_R1",
+      "authority_pointer": "/frozen_contracts/event_pit_contract/reference_entry_price",
+      "frozen_value": "P_entry(t) = Open of canonical Binance USD-M perpetual 1h kline whose open_time == t; post-decision economic reference mark, not an executable-fill claim",
+      "frozen_value_sha256": "c429e3780a0948e857d7f878cfd5fb85453fa156b39705bc9af624cd73838571",
+      "prompt_section": "## 5.",
+      "requirement_id": "PIT_REFERENCE_ENTRY_PRICE",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "FROZEN_R1",
+      "authority_pointer": "/frozen_contracts/event_pit_contract/reference_exit_price",
+      "frozen_value": "P_exit(t,h) = Open of canonical Binance USD-M perpetual 1h kline whose open_time == t+h for h in {4,8,24}; Close(B_{t+h-1}) is not a substitute",
+      "frozen_value_sha256": "ca838fd84521a1482201f22d433afe614ccb29ba0875b03c4431104436c3b1f1",
+      "prompt_section": "## 5.",
+      "requirement_id": "PIT_REFERENCE_EXIT_PRICE",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "FROZEN_R1",
+      "authority_pointer": "/frozen_contracts/event_pit_contract/reference_exit_timestamp",
+      "frozen_value": "t_exit = t + h, where h in {4, 8, 24}",
+      "frozen_value_sha256": "0368d93bf2e65e753a0d3c44a9b1b8d4d35f3cd99034695da5286905b5ea50a2",
+      "prompt_section": "## 3.",
+      "requirement_id": "PIT_REFERENCE_EXIT_TIMESTAMP",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "FROZEN_R1",
+      "authority_pointer": "/frozen_contracts/event_pit_contract/reference_mark_source_scope",
+      "frozen_value": "Open is the first economic price represented for the interval beginning at its open_time; the archive supplies exchange-bucket semantics, not local receipt time",
+      "frozen_value_sha256": "39558742a26ba9e3788f9fffb227b8d4421ba1a22963254ce01aa8562f000fc1",
+      "prompt_section": "## 3.",
+      "requirement_id": "PIT_REFERENCE_MARK_SOURCE_SCOPE",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "FROZEN_R1",
+      "authority_pointer": "/frozen_contracts/event_pit_contract/right_boundary_censoring",
+      "frozen_value": "Events with t + h > T_partition_end strictly prospectively censored (A[i, t] = 0); requires h-hour reserve at partition end",
+      "frozen_value_sha256": "199d6d0fe44fc3dd914ba2329f80c490ac010b87863c77c846322fe5c46acbe5",
+      "prompt_section": "## 3.",
+      "requirement_id": "PIT_RIGHT_BOUNDARY_CENSORING",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "FROZEN_R1",
+      "authority_pointer": "/frozen_contracts/event_pit_contract/source_finalization_timestamp",
+      "frozen_value": "Exchange-bucket 1h bar B_k=[T_k,T_k+1h) finalizes at T_k+1h; historical archive does not prove true local receipt latency",
+      "frozen_value_sha256": "c40dba4a5f96af748c913f9a594f055fe037960011358c93678d815c31d49f1d",
+      "prompt_section": "## 3.",
+      "requirement_id": "PIT_SOURCE_FINALIZATION_TIMESTAMP",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "FROZEN_R1",
+      "authority_pointer": "/frozen_contracts/event_pit_contract/support_floors",
+      "frozen_value": {
+        "min_events_N": 60,
+        "min_occupied_calendar_days_D": 30
+      },
+      "frozen_value_sha256": "227d5ceae24b337989f300ed7939ad806c8015576963eb61377eefd38b4d161f",
+      "prompt_section": "## 5.",
+      "requirement_id": "PIT_SUPPORT_FLOORS",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "FROZEN_R1",
+      "authority_pointer": "/frozen_contracts/event_pit_contract/synchronized_eligibility",
+      "frozen_value": "Both BTC and ETH 1h bars must be finalized, non-missing, and consecutive at t",
+      "frozen_value_sha256": "9eda8641d1ed2bef078a6f5ab50cc4824d7f02a3709c1bd299e563a0d5e014ca",
+      "prompt_section": "## 3.",
+      "requirement_id": "PIT_SYNCHRONIZED_ELIGIBILITY",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "FROZEN_R1",
+      "authority_pointer": "/frozen_contracts/event_pit_contract/train_frozen_q80_policy",
+      "frozen_value": "Linear interpolation quantile computed exclusively on WF1_TRAIN valid bars (minimum N >= 500); permanently frozen before WF1_CALIBRATION",
+      "frozen_value_sha256": "c71ea8f9e11dabbb271c45ca959b9f85a2fe74e78748c7fec4e213a1ea0c49c0",
+      "prompt_section": "## 4.",
+      "requirement_id": "PIT_TRAIN_FROZEN_Q80_POLICY",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "FROZEN_R1",
+      "authority_pointer": "/scientific_execution_artifacts/script/blob_sha",
+      "frozen_value": "ec8f975a45f7ff6c73beb238e4711aae62bdbb3d",
+      "frozen_value_sha256": "6a89f0df870e3751a9a3f00078e246073752b3e60ead2332fb57e0de1cf811bb",
+      "prompt_section": "## 6.",
+      "requirement_id": "R2_ACCEPTED_SCRIPT_BLOB",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "FROZEN_R1",
+      "authority_pointer": "/frozen_contracts/source_requirements/canonical_product",
+      "frozen_value": "Binance Futures USD-M PERPETUAL native economic klines; BTCUSDT and ETHUSDT; 1h UTC",
+      "frozen_value_sha256": "bf58afc6cefcba97918c8c0623a60889cae02fa5a42db911e3e8f08e25ffd04c",
+      "prompt_section": "## 2.",
+      "requirement_id": "SOURCE_CANONICAL_PRODUCT",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "FROZEN_R1",
+      "authority_pointer": "/frozen_contracts/source_requirements/canonical_provider",
+      "frozen_value": "Binance Public Data",
+      "frozen_value_sha256": "1957993233a5ec90386c774edfd61b78181daa2f4f98e19bc25cd94d1b0d6d1f",
+      "prompt_section": "## 2.",
+      "requirement_id": "SOURCE_CANONICAL_PROVIDER",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "FROZEN_R1",
+      "authority_pointer": "/frozen_contracts/source_requirements/fresh_official_checksum_required",
+      "frozen_value": true,
+      "frozen_value_sha256": "b5bea41b6c623f7c09f1bf24dcae58ebab3c0cdd90ad966bc43a45b44867e12b",
+      "prompt_section": "## 2.",
+      "requirement_id": "SOURCE_FRESH_OFFICIAL_CHECKSUM_REQUIRED",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "FROZEN_R1",
+      "authority_pointer": "/frozen_contracts/source_requirements/full_source_coverage_utc",
+      "frozen_value": {
+        "end_exclusive": "2023-05-01T00:00:00Z",
+        "start": "2021-01-01T00:00:00Z"
+      },
+      "frozen_value_sha256": "38b4153953166210cda006cac1a350f413acc0a8e18d13738806d20d26b7a234",
+      "prompt_section": "## 2.",
+      "requirement_id": "SOURCE_FULL_SOURCE_COVERAGE_UTC",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "FROZEN_R1",
+      "authority_pointer": "/frozen_contracts/source_requirements/protected_value_redaction_required",
+      "frozen_value": true,
+      "frozen_value_sha256": "b5bea41b6c623f7c09f1bf24dcae58ebab3c0cdd90ad966bc43a45b44867e12b",
+      "prompt_section": "## 2.",
+      "requirement_id": "SOURCE_PROTECTED_VALUE_REDACTION_REQUIRED",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "FROZEN_R1",
+      "authority_pointer": "/frozen_contracts/source_requirements/reference_boundary_mark_rule",
+      "frozen_value": "Open at open_time t or t+h is an independent economic field; parse previous Close separately; no adjacent-bar price equality requirement",
+      "frozen_value_sha256": "2353c680995e697661f70c2bdf8976afc293fdf78bdaf653cace2f64a283f286",
+      "prompt_section": "## 2.",
+      "requirement_id": "SOURCE_REFERENCE_BOUNDARY_MARK_RULE",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "FROZEN_R1",
+      "authority_pointer": "/frozen_contracts/source_requirements/required_properties",
+      "frozen_value": [
+        "Canonical 1-hour OHLC intervals [T_k, T_{k+1})",
+        "Strictly UTC-aligned boundaries",
+        "Strict volume and trade count integrity",
+        "Zero forward-looking revisions (PIT invariant)",
+        "Synchronized joint timestamps between BTC and ETH across 2021-01-01 to 2023-04-30 UTC",
+        "16 source invariants from Controller Adjudication R1"
+      ],
+      "frozen_value_sha256": "8b9a9a5ddf563b8efdd341e5e54ecab0d6c4fac38d7d276653146438d0f8a50f",
+      "prompt_section": "## 2.",
+      "requirement_id": "SOURCE_REQUIRED_PROPERTIES",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "FROZEN_R1",
+      "authority_pointer": "/frozen_contracts/source_requirements/source_partition_schedule_utc",
+      "frozen_value": {
+        "WF1_CALIBRATION": {
+          "end_exclusive": "2023-01-31T00:00:00Z",
+          "hours": 2184,
+          "start": "2022-11-01T00:00:00Z"
+        },
+        "WF1_PURGE_1": {
+          "end_exclusive": "2022-11-01T00:00:00Z",
+          "hours": 24,
+          "start": "2022-10-31T00:00:00Z"
+        },
+        "WF1_PURGE_2": {
+          "end_exclusive": "2023-02-01T00:00:00Z",
+          "hours": 24,
+          "start": "2023-01-31T00:00:00Z"
+        },
+        "WF1_TRAIN": {
+          "end_exclusive": "2022-10-31T00:00:00Z",
+          "hours": 16032,
+          "start": "2021-01-01T00:00:00Z"
+        },
+        "WF1_VALIDATION": {
+          "end_exclusive": "2023-04-30T00:00:00Z",
+          "hours": 2112,
+          "start": "2023-02-01T00:00:00Z"
+        }
+      },
+      "frozen_value_sha256": "d05cd4c7acb33a8baf5075f6c3a54fd37d883f84d8804910e960915163cd14ab",
+      "prompt_section": "## 3.",
+      "requirement_id": "SOURCE_SOURCE_PARTITION_SCHEDULE_UTC",
+      "status": "CONFORMS"
+    },
+    {
+      "authority": "FROZEN_DESIGN_R1",
+      "authority_pointer": "#10-testability-architecture-and-outcome-free-screening",
+      "frozen_value": {
+        "source_section": "10. Testability Architecture and Outcome-Free Screening",
+        "states": [
+          "SOURCE_UNAVAILABLE",
+          "BASIC_SUPPORT_UNAVAILABLE",
+          "INFERENCE_ADEQUACY_UNAVAILABLE",
+          "TESTABLE_EXPLORATORY",
+          "INFERENCE_UNAVAILABLE",
+          "EDGE_FAIL",
+          "EDGE_PASS"
+        ]
+      },
+      "frozen_value_sha256": "c9e2b6ddf58584e7a40046e63f6a4d4813db8ecabae3dd8cd0ec4bdfccee8343",
+      "prompt_section": "## 5.",
+      "requirement_id": "TESTABILITY_FROZEN_STATE_TAXONOMY",
+      "status": "CONFORMS"
+    }
+  ],
+  "schema_id": "H41_PRODUCTION_IMPLEMENTATION_PROMPT_R1_1_CONFORMANCE_V1",
+  "semantic_mismatch_count_after": 0,
+  "semantic_mismatch_count_before": 13,
+  "unresolved_semantic_mismatches": []
+}
