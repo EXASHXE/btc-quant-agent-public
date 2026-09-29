@@ -1,0 +1,142 @@
+{
+  "schema_id": "H41_IMPLEMENTATION_CONTROLLER_ACCEPTANCE_R2",
+  "controller_decision": "ACCEPTED_AND_DISCOVERY_AUTHORIZED",
+  "generated_at_utc": "2026-09-29T12:05:00Z",
+  "accepted_implementation": {
+    "repository": "EXASHXE/btc-quant-agent-public",
+    "implementation_branch": "v0.5-refactor",
+    "implementation_sha": "8ecff4ec4b25bf73a35309689fd3ecfacc0d3399",
+    "implementation_parent_sha": "a3235fbc39667ca2a624faebd3cf9ee8a4b442de",
+    "implementation_branch_status": "UNTOUCHED_VERIFIED_AT_EXACT_SHA",
+    "production_blob_hashes": {
+      "src/btc_quant_agent/h41/__init__.py": "ad1d3480f811965455dd3587e69361133339c375",
+      "src/btc_quant_agent/h41/authority.py": "ac8889faba3dd9bf7da6be452f0d93472c7cce58",
+      "src/btc_quant_agent/h41/frozen_bindings.py": "80499b954e80680f5c9afb90522f7e3ab593aa9d",
+      "src/btc_quant_agent/h41/inference.py": "9000840cbb767b1be69395b78248a58ec3bcaafa",
+      "src/btc_quant_agent/h41/outcomes.py": "43f0209a4f8ad81ff45fbc49fcf00f4ef3f681a6",
+      "src/btc_quant_agent/h41/provenance.py": "eef7ad33ff1fd689f08ed71c853f6b6812a1431f",
+      "src/btc_quant_agent/h41/science.py": "d3ce28f6e479c8d4d911d4075c78c5bfbbab2b6a",
+      "src/btc_quant_agent/h41/selection.py": "422c112b353e5f1ddfc50533d88244246203ee77",
+      "src/btc_quant_agent/h41/source.py": "739603b1a7f123cf61eeb7c4aed89a2c6c8ec294",
+      "src/btc_quant_agent/h41/testability.py": "45706af2d2cfff8d4709a711d8b9320da1a81fd6"
+    }
+  },
+  "validation_facts_accepted": {
+    "initial_r2_validation_commit": "db9106b1bbac39076218c0f2505fba93b9a6a5b4",
+    "final_r2_reconciliation_commit": "7c79fc1f350386d4dad528651cc519557056a229",
+    "validation_review": "reviews/v0.5/V0.5.1_H41_SYNTHETIC_PIT_EXACT_SHA_VALIDATION_R2.md",
+    "validation_evidence": "evidence/v0.5/h41/V0.5.1_H41_SYNTHETIC_PIT_EXACT_SHA_VALIDATION_R2.json",
+    "validation_evidence_sha256": "4d71f3e5da13af3c1f1089f6ee1f4cbe50c207d9a69bbf7057a53f82c8e05768",
+    "H41_SYNTHETIC_PIT_EXACT_SHA_VALIDATED": "PASS",
+    "H40_DIFF": "ZERO",
+    "candidate_count": 20,
+    "family_counts": {
+      "D1_TREND": 4,
+      "D2_BREAKOUT": 4,
+      "D3_FAILED_BREAK": 4,
+      "D4_MODIFIER": 8
+    },
+    "active_horizons": [4, 8, 24],
+    "provenance_closure": "EXACT_BOUND_PROVENANCE_RATIFIED",
+    "r2_exact_equivalence": {
+      "r2_reference_commit": "c0059b7bd26beb90096792a5232e5ad58e75580c",
+      "r2_reference_blob": "ec8f975a45f7ff6c73beb238e4711aae62bdbb3d",
+      "status": "PASS"
+    }
+  },
+  "frozen_authority": {
+    "frozen_semantic_root": "f784ce4cfe7ba4d1d5d30582e59ab4811aa7b1e8aed79b00a5f5e0f200c26917",
+    "candidate_ledger_hash": "d2ee1551ab4778e8ce34e83e053aba17ebb6be240aed812a4beedb218548b7e0",
+    "event_pit_contract_hash": "dee7b3ac334dd62e68a7ee700841e9862505bc5827c3ccd665d52b046040362e",
+    "endpoint_contract_hash": "ba467d3c69d0b0f266137536d432beea9523b0ba39ccfc7ffd610eeb72c21314",
+    "inference_contract_hash": "6b7c3d5289fd9cc132affb51f85fa292049868b96041b2b749cc11cf8be11136",
+    "source_requirements_hash": "04845354af6c22f88a55da74aa4fdf8393277e28447c9d57b84a718e8aecb581",
+    "validation_lifecycle_contract_hash": "7619ce3849bf4e7f5e288231cd8c38f78189bc1d61baa4c58c87edeb58c6e864",
+    "source_authority_root": "05145d35a5cbd060ce3e9d7932b3757f901e396fa545ca624146dfbfa0cdb8b8"
+  },
+  "governance_and_lifecycle_state": {
+    "H41_PROTOCOL_FROZEN_R1": "YES",
+    "H41_SOURCE_AUTHORITY": "CLOSED",
+    "H41_IMPLEMENTATION_COMPLETE": "YES_AT_EXACT_SHA",
+    "H41_IMPLEMENTATION_CONTROLLER_ACCEPTED": "YES",
+    "H41_SYNTHETIC_PIT_EXACT_SHA_VALIDATED": "PASS",
+    "H41_REAL_DISCOVERY_AUTHORIZED": "YES_WF1_CALIBRATION_ONLY",
+    "H41_WF1_VALIDATION_AUTHORIZED": "NO",
+    "EXECUTION": "RESEARCH_DISABLED_V1"
+  },
+  "unsealed_partition": {
+    "name": "WF1_CALIBRATION",
+    "interval_utc": {
+      "start": "2022-11-01T00:00:00Z",
+      "end_exclusive": "2023-01-31T00:00:00Z"
+    },
+    "total_hours": 2184,
+    "status": "HISTORICALLY_INFORMED_EXPLORATORY_DISCOVERY",
+    "confirmatory": false
+  },
+  "strictly_sealed_partitions": [
+    "WF1_VALIDATION",
+    "Confirmation",
+    "H39",
+    "Final Holdout"
+  ],
+  "train_usage_rules": {
+    "partition": "WF1_TRAIN",
+    "interval_utc": {
+      "start": "2021-01-01T00:00:00Z",
+      "end_exclusive": "2022-10-31T00:00:00Z"
+    },
+    "role": "FROZEN_TRAIN_QUANTITIES_ONLY_D1_Q80_SEAL",
+    "retraining_or_tuning_permitted": false
+  },
+  "exploratory_discovery_contract": {
+    "prompt_path": "prompts/v0.5/execution/v0.5.1_H41_WF1_CALIBRATION_EXPLORATORY_DISCOVERY_R1.md",
+    "recommended_executor": "Codex Sol High",
+    "isolation_checkout_required": true,
+    "base_implementation_sha": "8ecff4ec4b25bf73a35309689fd3ecfacc0d3399",
+    "inference_parameters": {
+      "B": 10000,
+      "L": 120,
+      "centering": "finite_sample",
+      "method": "studentized_bootstrap_t"
+    },
+    "support_floors": {
+      "D_min": 30,
+      "N_min": 60
+    },
+    "candidate_lock_rule": "simultaneous_lcb_gt_zero",
+    "max_locked_candidates": 1,
+    "fallback_permitted": false
+  },
+  "parallel_performance_track": {
+    "status": "AUTHORIZED_PARALLEL_NON_BLOCKING",
+    "prompt_path": "prompts/v0.5/performance/v0.5.1_TEST_SUITE_PERFORMANCE_OPTIMIZATION_R1.md",
+    "recommended_executor": "Codex Sol High",
+    "feature_branch": "feature/test-suite-performance-r1",
+    "base_sha": "8ecff4ec4b25bf73a35309689fd3ecfacc0d3399",
+    "baseline_metrics": {
+      "peak_rss_kib": 291344,
+      "pytest_seconds": 896.72,
+      "tests_passed": 1798,
+      "tests_skipped": 2,
+      "wall_seconds": 914.98,
+      "warnings": 9
+    },
+    "objective_wall_reduction_min": 0.40,
+    "objective_wall_reduction_stretch": 0.60,
+    "scientific_semantic_changes_allowed": 0
+  },
+  "docs_lint_diagnostic": {
+    "r2_validator_scoped_ruff": "PASS",
+    "repository_wide_docs_ruff": "FAIL_PREEXISTING",
+    "historical_r1_scripts_failing": [
+      "evidence/v0.5/h41/h41_synthetic_pit_validation_r1/h41_validate_r2.py",
+      "evidence/v0.5/h41/h41_synthetic_pit_validation_r1/h41_validate_science.py"
+    ],
+    "adjudication": "Historical R1 validation artifacts preserved immutable. Non-gating for R2 acceptance."
+  },
+  "next_stages": {
+    "next_h41_stage": "H41_WF1_CALIBRATION_EXPLORATORY_DISCOVERY_R1",
+    "parallel_engineering_stage": "TEST_SUITE_PERFORMANCE_OPTIMIZATION_R1"
+  }
+}
