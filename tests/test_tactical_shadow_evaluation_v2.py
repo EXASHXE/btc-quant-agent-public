@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import sqlite3
 import tempfile
+from dataclasses import replace
 from pathlib import Path
 from typing import Any
 from unittest.mock import MagicMock
@@ -32,6 +33,7 @@ from btc_quant_agent.market_watch.evidence import (
 from btc_quant_agent.market_watch.shadow import ShadowEvaluationManager
 from btc_quant_agent.market_watch.shadow_evidence import (
     EvaluationTerminalStatus,
+    ExitTimeResolution,
     FundingStatus,
     TacticalShadowAttributionConflictError,
     TacticalShadowEvaluationConflictError,
@@ -109,11 +111,12 @@ def _insert_shadow_record_in_db(store: MarketWatchStateStore, rec: dict[str, Any
                 entry_window_start_ms, evaluation_start_ms, terminal_reason, exit_time_ms,
                 exit_price, coverage_status, coverage_reason, semantic_identity_json,
                 feature_evidence_id, evaluation_profile_version, evaluation_horizon_ms,
-                fill_interval_start_ms, fill_interval_end_ms, fill_time_resolution
+                fill_interval_start_ms, fill_interval_end_ms, fill_time_resolution,
+                exit_interval_start_ms, exit_interval_end_ms, exit_time_resolution
             ) VALUES (
                 ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
                 ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
-                ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+                ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
             )
             """,
             (
@@ -175,6 +178,9 @@ def _insert_shadow_record_in_db(store: MarketWatchStateStore, rec: dict[str, Any
                 rec.get("fill_interval_start_ms"),
                 rec.get("fill_interval_end_ms"),
                 rec.get("fill_time_resolution"),
+                rec.get("exit_interval_start_ms"),
+                rec.get("exit_interval_end_ms"),
+                rec.get("exit_time_resolution"),
             ),
         )
         conn.commit()
@@ -205,6 +211,9 @@ def _create_mock_shadow_record(
     fill_interval_start_ms: int | None = None,
     fill_interval_end_ms: int | None = None,
     fill_time_resolution: str | None = None,
+    exit_interval_start_ms: int | None = None,
+    exit_interval_end_ms: int | None = None,
+    exit_time_resolution: str | None = None,
 ) -> dict[str, Any]:
     """Helper to generate a DB-like shadow record matching a given feature evidence."""
     t0 = ev.decision_time_ms
@@ -229,6 +238,14 @@ def _create_mock_shadow_record(
         else:
             exit_price = fill_price
 
+    if terminal_reason == "TIMEOUT":
+        tp1_hit = False
+        sl_hit = False
+    elif fill_status == "NO_FILL":
+        tp1_hit = False
+        tp2_hit = False
+        sl_hit = False
+
     prof = get_playbook_evaluation_profile(ev.selected_playbook)
     bars = evaluation_horizon_bars if evaluation_horizon_bars is not None else prof["horizon_bars"]
     h_ms = evaluation_horizon_ms if evaluation_horizon_ms is not None else prof["horizon_ms"]
@@ -236,12 +253,28 @@ def _create_mock_shadow_record(
     if fill_status != "NO_FILL":
         if fill_time_ms is None or fill_time_ms <= t0:
             fill_time_ms = t0 + bar_len
+        eval_end = fill_time_ms + h_ms
         if exit_time_ms is None:
-            exit_time_ms = fill_time_ms + 6 * 3600 * 1000
+            if terminal_reason == "TIMEOUT":
+                exit_time_ms = eval_end
+            else:
+                exit_time_ms = fill_time_ms + 6 * 3600 * 1000
         f_start = fill_interval_start_ms if fill_interval_start_ms is not None else t0
         f_end = fill_interval_end_ms if fill_interval_end_ms is not None else fill_time_ms
         f_res = fill_time_resolution if fill_time_resolution is not None else "FIFTEEN_MINUTE_FALLBACK_INTERVAL"
-        eval_end = fill_time_ms + h_ms
+        e_end = exit_interval_end_ms if exit_interval_end_ms is not None else exit_time_ms
+        if exit_interval_start_ms is not None:
+            e_start = exit_interval_start_ms
+        elif terminal_reason == "TIMEOUT":
+            e_start = e_end
+        else:
+            e_start = e_end - 60_000
+        if exit_time_resolution is not None:
+            e_res = exit_time_resolution
+        elif terminal_reason == "TIMEOUT":
+            e_res = ExitTimeResolution.HORIZON_TIMEOUT_BOUNDARY.value
+        else:
+            e_res = ExitTimeResolution.ONE_MINUTE_TERMINAL_INTERVAL.value
     else:
         f_start = None
         f_end = None
@@ -251,6 +284,9 @@ def _create_mock_shadow_record(
         fill_price = None
         if exit_time_ms is None:
             exit_time_ms = t0 + 4 * bar_len
+        e_start = None
+        e_end = None
+        e_res = None
 
     return {
         "id": shadow_id,
@@ -312,6 +348,9 @@ def _create_mock_shadow_record(
         "fill_interval_start_ms": f_start,
         "fill_interval_end_ms": f_end,
         "fill_time_resolution": f_res,
+        "exit_interval_start_ms": e_start,
+        "exit_interval_end_ms": e_end,
+        "exit_time_resolution": e_res,
     }
 
 
@@ -1363,3 +1402,422 @@ def test_b2a_20_self_consistent_semantic_corruption() -> None:
         corr_json2 = canonical_json_dump(corrupted_payload2)
         with pytest.raises(TacticalShadowEvaluationValidationError, match="does not match playbook"):
             deserialize_tactical_shadow_evaluation(corr_json2, verify_identity=True)
+
+
+def test_b2a_21_exit_boundary_funding_causality_scenarios() -> None:
+    """Verify exit boundary funding settlement causality rules (Section 8, 9, 10, 16)."""
+    fill_t = 1_700_000_000_000
+    fill_p = 50000.0
+    sl = 49000.0  # risk = 1000
+
+    # Test A: 15m exit ambiguity (settlement occurs inside 15m exit interval)
+    exit_15m_start = fill_t + 3600_000
+    exit_15m_end = exit_15m_start + 15 * 60 * 1000
+    funding_a = [{"funding_time_ms": exit_15m_start + 5 * 60 * 1000, "funding_rate": 0.0001, "mark_price": 50000.0}]
+    acct_a = evaluate_tactical_funding_v1(
+        direction="LONG",
+        fill_price=fill_p,
+        stop_loss=sl,
+        fill_time_ms=fill_t,
+        exit_time_ms=exit_15m_end,
+        funding_records=funding_a,
+        fill_interval_start_ms=fill_t - 60_000,
+        fill_interval_end_ms=fill_t,
+        exit_interval_start_ms=exit_15m_start,
+        exit_interval_end_ms=exit_15m_end,
+        exit_time_resolution=ExitTimeResolution.FIFTEEN_MINUTE_FALLBACK_INTERVAL.value,
+    )
+    assert acct_a.funding_status == FundingStatus.AMBIGUOUS_EXIT_BOUNDARY.value
+    assert acct_a.funding_pnl_r is None
+    assert acct_a.funding_cash_total is None
+
+    # Test B: 1m exit ambiguity (settlement occurs inside 1m exit interval)
+    exit_1m_start = fill_t + 3600_000
+    exit_1m_end = exit_1m_start + 60_000
+    funding_b = [{"funding_time_ms": exit_1m_start + 30_000, "funding_rate": 0.0001, "mark_price": 50000.0}]
+    acct_b = evaluate_tactical_funding_v1(
+        direction="LONG",
+        fill_price=fill_p,
+        stop_loss=sl,
+        fill_time_ms=fill_t,
+        exit_time_ms=exit_1m_end,
+        funding_records=funding_b,
+        fill_interval_start_ms=fill_t - 60_000,
+        fill_interval_end_ms=fill_t,
+        exit_interval_start_ms=exit_1m_start,
+        exit_interval_end_ms=exit_1m_end,
+        exit_time_resolution=ExitTimeResolution.ONE_MINUTE_TERMINAL_INTERVAL.value,
+    )
+    assert acct_b.funding_status == FundingStatus.AMBIGUOUS_EXIT_BOUNDARY.value
+    assert acct_b.funding_pnl_r is None
+    assert acct_b.funding_cash_total is None
+
+    # Test C: funding strictly before exit interval start (provably open)
+    exit_c_start = fill_t + 8 * 3600_000
+    exit_c_end = exit_c_start + 60_000
+    funding_c_t = fill_t + 4 * 3600_000  # strictly between fill_end and exit_start
+    funding_c = [{"funding_time_ms": funding_c_t, "funding_rate": 0.0001, "mark_price": 50500.0}]
+    acct_c = evaluate_tactical_funding_v1(
+        direction="LONG",
+        fill_price=fill_p,
+        stop_loss=sl,
+        fill_time_ms=fill_t,
+        exit_time_ms=exit_c_end,
+        funding_records=funding_c,
+        fill_interval_start_ms=fill_t - 60_000,
+        fill_interval_end_ms=fill_t,
+        exit_interval_start_ms=exit_c_start,
+        exit_interval_end_ms=exit_c_end,
+        exit_time_resolution=ExitTimeResolution.ONE_MINUTE_TERMINAL_INTERVAL.value,
+    )
+    assert acct_c.funding_status == FundingStatus.COMPLETE.value
+    assert acct_c.settlements_count == 1
+    assert pytest.approx(acct_c.funding_cash_total, 1e-6) == -5.05
+    assert pytest.approx(acct_c.funding_pnl_r, 1e-6) == -0.00505
+
+    # Test D: funding strictly after terminal interval end (not applicable -> 0 settlements)
+    exit_d_start = fill_t + 2 * 3600_000
+    exit_d_end = exit_d_start + 60_000
+    funding_d_t = exit_d_end + 3600_000  # 1 hour after terminal exit
+    funding_d = [{"funding_time_ms": funding_d_t, "funding_rate": 0.0001, "mark_price": 50000.0}]
+    acct_d = evaluate_tactical_funding_v1(
+        direction="LONG",
+        fill_price=fill_p,
+        stop_loss=sl,
+        fill_time_ms=fill_t,
+        exit_time_ms=exit_d_end,
+        funding_records=funding_d,
+        fill_interval_start_ms=fill_t - 60_000,
+        fill_interval_end_ms=fill_t,
+        exit_interval_start_ms=exit_d_start,
+        exit_interval_end_ms=exit_d_end,
+        exit_time_resolution=ExitTimeResolution.ONE_MINUTE_TERMINAL_INTERVAL.value,
+    )
+    assert acct_d.funding_status == FundingStatus.COMPLETE.value
+    assert acct_d.settlements_count == 0
+    assert acct_d.funding_pnl_r == 0.0
+    assert acct_d.funding_cash_total == 0.0
+
+    # Test E: TIMEOUT horizon boundary semantics
+    eval_end_12h = fill_t + 12 * 3600_000
+    # E1: Funding at 11:59:00 (< 12:00) applies
+    funding_e1 = [{"funding_time_ms": eval_end_12h - 60_000, "funding_rate": 0.0001, "mark_price": 50000.0}]
+    acct_e1 = evaluate_tactical_funding_v1(
+        direction="LONG",
+        fill_price=fill_p,
+        stop_loss=sl,
+        fill_time_ms=fill_t,
+        exit_time_ms=eval_end_12h,
+        funding_records=funding_e1,
+        fill_interval_start_ms=fill_t - 60_000,
+        fill_interval_end_ms=fill_t,
+        exit_interval_start_ms=eval_end_12h,
+        exit_interval_end_ms=eval_end_12h,
+        exit_time_resolution=ExitTimeResolution.HORIZON_TIMEOUT_BOUNDARY.value,
+    )
+    assert acct_e1.funding_status == FundingStatus.COMPLETE.value
+    assert acct_e1.settlements_count == 1
+    assert acct_e1.funding_pnl_r is not None
+
+    # E2: Funding exactly at 12:00 (exit_interval_start_ms <= funding_time_ms <= exit_interval_end_ms)
+    funding_e2 = [{"funding_time_ms": eval_end_12h, "funding_rate": 0.0001, "mark_price": 50000.0}]
+    acct_e2 = evaluate_tactical_funding_v1(
+        direction="LONG",
+        fill_price=fill_p,
+        stop_loss=sl,
+        fill_time_ms=fill_t,
+        exit_time_ms=eval_end_12h,
+        funding_records=funding_e2,
+        fill_interval_start_ms=fill_t - 60_000,
+        fill_interval_end_ms=fill_t,
+        exit_interval_start_ms=eval_end_12h,
+        exit_interval_end_ms=eval_end_12h,
+        exit_time_resolution=ExitTimeResolution.HORIZON_TIMEOUT_BOUNDARY.value,
+    )
+    assert acct_e2.funding_status == FundingStatus.AMBIGUOUS_EXIT_BOUNDARY.value
+    assert acct_e2.funding_pnl_r is None
+
+    # Test F: Multiple settlements precedence (Section 10)
+    # One clean settlement at 4h, one ambiguous at exit boundary
+    funding_multi = [
+        {"funding_time_ms": fill_t + 4 * 3600_000, "funding_rate": 0.0001, "mark_price": 50000.0},
+        {"funding_time_ms": exit_15m_start + 60_000, "funding_rate": 0.0001, "mark_price": 50000.0},
+    ]
+    acct_multi = evaluate_tactical_funding_v1(
+        direction="LONG",
+        fill_price=fill_p,
+        stop_loss=sl,
+        fill_time_ms=fill_t,
+        exit_time_ms=exit_15m_end,
+        funding_records=funding_multi,
+        fill_interval_start_ms=fill_t - 60_000,
+        fill_interval_end_ms=fill_t,
+        exit_interval_start_ms=exit_15m_start,
+        exit_interval_end_ms=exit_15m_end,
+        exit_time_resolution=ExitTimeResolution.FIFTEEN_MINUTE_FALLBACK_INTERVAL.value,
+    )
+    assert acct_multi.funding_status == FundingStatus.AMBIGUOUS_EXIT_BOUNDARY.value
+    assert acct_multi.funding_pnl_r is None
+    assert acct_multi.funding_cash_total is None
+
+
+def test_b2a_22_same_candle_terminal_resolution() -> None:
+    """Verify same-candle terminal resolution for STOP and TP1 under 15m and 1m semantics (Section 17)."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        db_path = Path(tmpdir) / "test_same_candle.db"
+        store = MarketWatchStateStore(db_path)
+        mgr = ShadowEvaluationManager(store=store)
+
+        ev, _ = build_sample_evidence_and_assessment()
+        _insert_feature_evidence_in_db(store, ev)
+
+        t0 = ev.decision_time_ms
+        bar_15m = 15 * 60 * 1000
+
+        # Scenario 1: Same 15m bar fill + STOP when 1m is unavailable (15m fallback)
+        rec_id_1 = store.record_shadow_observation(
+            timestamp_ms=t0,
+            symbol=ev.symbol,
+            snapshot_hash=ev.snapshot_hash,
+            agent_decision="LONG",
+            agent_setup=ev.selected_playbook,
+            entry_quality="GOOD",
+            reason_codes=["TEST"],
+            reference_decision=None,
+            reference_notes=None,
+            policy_version=ev.policy_version,
+            config_hash=ev.config_hash,
+            entry_price=50000.0,
+            stop_loss=48000.0,
+            tp1=53000.0,
+            tp2=55000.0,
+            direction="LONG",
+            observation_type="ACTIONABLE_TRIGGERED",
+            signal_identity=ev.signal_identity,
+            setup_key=ev.setup_key,
+            evidence_version=MARKET_WATCH_EVIDENCE_VERSION,
+            entry_window_start_ms=t0,
+            signal_time_ms=t0,
+            entry_zone_low=49800.0,
+            entry_zone_high=50200.0,
+            entry_window_bars=4,
+            entry_window_end_ms=t0 + 4 * bar_15m,
+            fill_status="WAITING_FOR_FILL",
+            evaluation_profile_version=DIRECTIONAL_OUTCOME_PROFILE_VERSION,
+            evaluation_horizon_bars=48,
+            evaluation_horizon_ms=43_200_000,
+            feature_evidence_id=ev.evidence_id,
+        )
+
+        # 15m candle touching both entry (50000) and stop (48000)
+        c0 = Candle(
+            symbol="BTCUSDT",
+            interval="15m",
+            open_time_ms=t0,
+            close_time_ms=t0 + bar_15m,
+            open=50100.0,
+            high=50300.0,
+            low=47800.0,  # touches stop
+            close=47900.0,
+            volume=50.0,
+        )
+        client_mock = MagicMock()
+        client_mock.klines.return_value = [c0]
+        # 1m historical returns empty (unavailable)
+        client_mock.historical_klines.return_value = []
+
+        res = mgr.resolve_pending_observations(client_mock, current_time_ms=t0 + bar_15m)
+        assert res["resolved_count"] == 1
+        assert res["results"][0]["status"] == "RESOLVED"
+        outcome = res["results"][0]["outcome"]
+        assert outcome["terminal_reason"] == "STOP"
+        assert outcome["exit_interval_start_ms"] == c0.open_time_ms
+        assert outcome["exit_interval_end_ms"] == c0.close_time_ms
+        assert outcome["exit_time_resolution"] == ExitTimeResolution.FIFTEEN_MINUTE_FALLBACK_INTERVAL.value
+
+        eval_saved = store.get_shadow_evaluation_by_shadow_id(rec_id_1)
+        assert eval_saved is not None
+        assert eval_saved.terminal_reason == "STOP"
+        assert eval_saved.exit_interval_start_ms == c0.open_time_ms
+        assert eval_saved.exit_interval_end_ms == c0.close_time_ms
+        assert eval_saved.exit_time_resolution == ExitTimeResolution.FIFTEEN_MINUTE_FALLBACK_INTERVAL.value
+        validate_tactical_shadow_evaluation(eval_saved)
+
+    # Scenario 2: 1m candle touches entry + STOP in the same minute
+    with tempfile.TemporaryDirectory() as tmpdir2:
+        store2 = MarketWatchStateStore(Path(tmpdir2) / "test2.db")
+        mgr2 = ShadowEvaluationManager(store=store2)
+        _insert_feature_evidence_in_db(store2, ev)
+
+        rec_id_2 = store2.record_shadow_observation(
+            timestamp_ms=t0,
+            symbol=ev.symbol,
+            snapshot_hash=ev.snapshot_hash,
+            agent_decision="LONG",
+            agent_setup=ev.selected_playbook,
+            entry_quality="GOOD",
+            reason_codes=["TEST"],
+            reference_decision=None,
+            reference_notes=None,
+            policy_version=ev.policy_version,
+            config_hash=ev.config_hash,
+            entry_price=50000.0,
+            stop_loss=48000.0,
+            tp1=53000.0,
+            tp2=55000.0,
+            direction="LONG",
+            observation_type="ACTIONABLE_TRIGGERED",
+            signal_identity=ev.signal_identity,
+            setup_key=ev.setup_key,
+            evidence_version=MARKET_WATCH_EVIDENCE_VERSION,
+            entry_window_start_ms=t0,
+            signal_time_ms=t0,
+            entry_zone_low=49800.0,
+            entry_zone_high=50200.0,
+            entry_window_bars=4,
+            entry_window_end_ms=t0 + 4 * bar_15m,
+            fill_status="WAITING_FOR_FILL",
+            evaluation_profile_version=DIRECTIONAL_OUTCOME_PROFILE_VERSION,
+            evaluation_horizon_bars=48,
+            evaluation_horizon_ms=43_200_000,
+            feature_evidence_id=ev.evidence_id,
+        )
+
+        c0_2 = Candle(
+            symbol="BTCUSDT",
+            interval="15m",
+            open_time_ms=t0,
+            close_time_ms=t0 + bar_15m,
+            open=50100.0,
+            high=50300.0,
+            low=47800.0,
+            close=47900.0,
+            volume=50.0,
+        )
+        # Provide 15 1m candles for c0_2; the first 1m touches entry and stop
+        candles_1m = [
+            Candle(
+                symbol="BTCUSDT",
+                interval="1m",
+                open_time_ms=t0 + m * 60_000,
+                close_time_ms=t0 + (m + 1) * 60_000,
+                open=50000.0 if m == 0 else 47850.0,
+                high=50100.0 if m == 0 else 47900.0,
+                low=47900.0 if m == 0 else 47800.0,  # touches stop in minute 0
+                close=47920.0 if m == 0 else 47850.0,
+                volume=10.0,
+            )
+            for m in range(15)
+        ]
+        client_mock_1m = MagicMock()
+        client_mock_1m.klines.return_value = [c0_2]
+        client_mock_1m.historical_klines.return_value = candles_1m
+
+        res2 = mgr2.resolve_pending_observations(client_mock_1m, current_time_ms=t0 + bar_15m)
+        assert res2["resolved_count"] == 1
+        assert res2["results"][0]["status"] == "RESOLVED"
+        outcome2 = res2["results"][0]["outcome"]
+        assert outcome2["terminal_reason"] == "STOP"
+        assert outcome2["exit_interval_start_ms"] == t0
+        assert outcome2["exit_interval_end_ms"] == t0 + 60_000
+        assert outcome2["exit_time_resolution"] == ExitTimeResolution.ONE_MINUTE_TERMINAL_INTERVAL.value
+
+        eval_saved2 = store2.get_shadow_evaluation_by_shadow_id(rec_id_2)
+        assert eval_saved2 is not None
+        assert eval_saved2.exit_interval_start_ms == t0
+        assert eval_saved2.exit_interval_end_ms == t0 + 60_000
+        assert eval_saved2.exit_time_resolution == ExitTimeResolution.ONE_MINUTE_TERMINAL_INTERVAL.value
+        validate_tactical_shadow_evaluation(eval_saved2)
+
+
+def test_b2a_23_evaluation_identity_error_on_tampered_json() -> None:
+    """Verify missing embedded evaluation_id raises TacticalShadowEvaluationIdentityError on authoritative reads (Section 22)."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        db_path = Path(tmpdir) / "test_identity_tamper.db"
+        store = MarketWatchStateStore(db_path)
+        ev, _ = build_sample_evidence_and_assessment()
+        _insert_feature_evidence_in_db(store, ev)
+        rec = _create_mock_shadow_record(ev, shadow_id=77)
+        _insert_shadow_record_in_db(store, rec)
+
+        evaluation = build_tactical_shadow_evaluation_v2(rec, ev)
+        store.save_shadow_evaluation(evaluation)
+
+        # 1. Tamper DB: remove evaluation_id from evaluation_json
+        payload = evaluation.to_dict()
+        del payload["evaluation_id"]
+        tampered_json = json.dumps(payload)
+
+        # Direct deserialization with require_embedded_identity=True raises TacticalShadowEvaluationIdentityError
+        with pytest.raises(TacticalShadowEvaluationIdentityError, match="missing mandatory embedded evaluation_id"):
+            deserialize_tactical_shadow_evaluation(tampered_json, require_embedded_identity=True)
+
+        with store._connect() as conn:
+            conn.execute(
+                "UPDATE tactical_shadow_evaluations_v2 SET evaluation_json = ? WHERE shadow_record_id = 77",
+                (tampered_json,),
+            )
+            conn.commit()
+
+        # Authoritative reads from DB must fail closed
+        with pytest.raises(TacticalShadowEvaluationIdentityError, match="missing mandatory embedded evaluation_id"):
+            store.get_shadow_evaluation(evaluation.evaluation_id)
+
+        with pytest.raises(TacticalShadowEvaluationIdentityError, match="missing mandatory embedded evaluation_id"):
+            store.get_shadow_evaluation_by_shadow_id(77)
+
+        with pytest.raises(TacticalShadowEvaluationIdentityError, match="missing mandatory embedded evaluation_id"):
+            store.list_shadow_evaluations(symbol=ev.symbol)
+
+
+def test_b2a_24_exit_interval_validation_invariants() -> None:
+    """Verify validator enforces Section 13 & 14 exit uncertainty interval invariants."""
+    ev, _ = build_sample_evidence_and_assessment()
+    rec = _create_mock_shadow_record(ev, shadow_id=88)
+    evaluation = build_tactical_shadow_evaluation_v2(rec, ev)
+
+    # 1. Valid FILLED evaluation passes
+    validate_tactical_shadow_evaluation(evaluation)
+
+    # 2. NO_FILL with exit interval populated fails closed
+    rec_no_fill = _create_mock_shadow_record(ev, shadow_id=89, fill_status="NO_FILL")
+    eval_no_fill = build_tactical_shadow_evaluation_v2(rec_no_fill, ev)
+    validate_tactical_shadow_evaluation(eval_no_fill)
+
+    eval_no_fill_bad = replace(eval_no_fill, exit_interval_start_ms=1000)
+    with pytest.raises(TacticalShadowEvaluationValidationError, match="NO_FILL evaluation must have exit_interval_start_ms"):
+        validate_tactical_shadow_evaluation(eval_no_fill_bad)
+
+    # 3. FILLED with None exit interval fails closed
+    eval_filled_bad = replace(evaluation, exit_interval_start_ms=None)
+    with pytest.raises(TacticalShadowEvaluationValidationError, match="FILLED evaluation requires exit_interval bounds"):
+        validate_tactical_shadow_evaluation(eval_filled_bad)
+
+    # 4. FILLED with start > end fails closed
+    assert evaluation.exit_interval_end_ms is not None
+    eval_inverted = replace(
+        evaluation,
+        exit_interval_start_ms=evaluation.exit_interval_end_ms + 1000,
+    )
+    with pytest.raises(TacticalShadowEvaluationValidationError, match="exit_interval_start_ms.*>"):
+        validate_tactical_shadow_evaluation(eval_inverted)
+
+    # 5. Invalid resolution taxonomy string
+    eval_bad_res = replace(evaluation, exit_time_resolution="UNKNOWN_RESOLUTION")
+    with pytest.raises(TacticalShadowEvaluationValidationError, match="Invalid exit_time_resolution"):
+        validate_tactical_shadow_evaluation(eval_bad_res)
+
+    # 6. TIMEOUT must have exact equality with evaluation_end_ms
+    rec_timeout = _create_mock_shadow_record(ev, shadow_id=90, terminal_reason="TIMEOUT")
+    eval_timeout = build_tactical_shadow_evaluation_v2(rec_timeout, ev)
+    validate_tactical_shadow_evaluation(eval_timeout)
+
+    eval_timeout_bad = replace(eval_timeout, exit_interval_start_ms=eval_timeout.evaluation_end_ms - 1000)
+    with pytest.raises(TacticalShadowEvaluationValidationError, match="TIMEOUT requires exit_interval_start_ms == exit_interval_end_ms == evaluation_end_ms"):
+        validate_tactical_shadow_evaluation(eval_timeout_bad)
+
+    # 7. TP1 must have exit_time_ms == exit_interval_end_ms
+    assert evaluation.exit_interval_start_ms is not None
+    eval_tp1_bad = replace(evaluation, exit_time_ms=evaluation.exit_interval_start_ms)
+    with pytest.raises(TacticalShadowEvaluationValidationError, match="TP1 exit_time_ms.*must equal exit_interval_end_ms"):
+        validate_tactical_shadow_evaluation(eval_tp1_bad)

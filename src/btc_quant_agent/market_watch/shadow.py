@@ -20,6 +20,7 @@ from .domain import (
     validate_time_coverage,
 )
 from .shadow_evidence import (
+    ExitTimeResolution,
     TacticalShadowEvaluationV2,
     TacticalShadowProfileConflictError,
     build_tactical_shadow_evaluation_v2,
@@ -114,6 +115,9 @@ def evaluate_intrabar_path(
     sl_hit = False
     path_resolution = ShadowPathResolution.ONE_MINUTE_CHRONOLOGICAL.value
     is_terminal = False
+    exit_interval_start_ms: int | None = None
+    exit_interval_end_ms: int | None = None
+    exit_time_resolution: str | None = None
 
     valid_1m = [c for c in one_minute_candles if isinstance(c, Candle)]
     valid_1m.sort(key=lambda c: c.open_time_ms)
@@ -141,6 +145,9 @@ def evaluate_intrabar_path(
                 terminal_reason = "STOP"
                 exit_price = stop_loss
                 exit_time_ms = c1.close_time_ms
+                exit_interval_start_ms = c1.open_time_ms
+                exit_interval_end_ms = c1.close_time_ms
+                exit_time_resolution = "ONE_MINUTE_TERMINAL_INTERVAL"
                 path_resolution = ShadowPathResolution.ONE_MINUTE_FILL_BAR_STOP_FIRST.value
                 mae = max(mae, 1.0)
                 # In same-minute stop first, stop occurred first; do not credit post-stop excursion
@@ -169,6 +176,9 @@ def evaluate_intrabar_path(
             terminal_reason = "STOP"
             exit_price = stop_loss
             exit_time_ms = c1.close_time_ms
+            exit_interval_start_ms = c1.open_time_ms
+            exit_interval_end_ms = c1.close_time_ms
+            exit_time_resolution = "ONE_MINUTE_TERMINAL_INTERVAL"
             path_resolution = ShadowPathResolution.FIFTEEN_MINUTE_STOP_FIRST.value
             mae = max(mae, 1.0)
             is_terminal = True
@@ -178,6 +188,9 @@ def evaluate_intrabar_path(
             terminal_reason = "TP1"
             exit_price = tp1
             exit_time_ms = c1.close_time_ms
+            exit_interval_start_ms = c1.open_time_ms
+            exit_interval_end_ms = c1.close_time_ms
+            exit_time_resolution = "ONE_MINUTE_TERMINAL_INTERVAL"
             path_resolution = ShadowPathResolution.ONE_MINUTE_CHRONOLOGICAL.value
             # Terminal at TP1: MFE capped at TP1 distance for this bar; do not include post-TP1 excursion!
             mfe = max(mfe, (tp1 - entry_price) / risk_dist if is_long else (entry_price - tp1) / risk_dist)
@@ -192,6 +205,9 @@ def evaluate_intrabar_path(
             terminal_reason = "STOP"
             exit_price = stop_loss
             exit_time_ms = c1.close_time_ms
+            exit_interval_start_ms = c1.open_time_ms
+            exit_interval_end_ms = c1.close_time_ms
+            exit_time_resolution = "ONE_MINUTE_TERMINAL_INTERVAL"
             path_resolution = ShadowPathResolution.ONE_MINUTE_CHRONOLOGICAL.value
             mae = max(mae, 1.0)
             mfe = max(mfe, favorable / risk_dist)
@@ -208,6 +224,9 @@ def evaluate_intrabar_path(
         "terminal_reason": terminal_reason,
         "exit_price": exit_price,
         "exit_time_ms": exit_time_ms,
+        "exit_interval_start_ms": exit_interval_start_ms,
+        "exit_interval_end_ms": exit_interval_end_ms,
+        "exit_time_resolution": exit_time_resolution,
         "tp1_hit": tp1_hit,
         "tp2_hit": tp2_hit,
         "sl_hit": sl_hit,
@@ -620,6 +639,9 @@ class ShadowEvaluationManager:
             fill_bar_tp1_hit = False
             fill_bar_tp2_hit = False
             fill_bar_sl_hit = False
+            fill_bar_exit_int_start: int | None = None
+            fill_bar_exit_int_end: int | None = None
+            fill_bar_exit_time_res: str | None = None
 
             # Stage 1: Resolve fill if WAITING_FOR_FILL
             if fill_status == ShadowFillStatus.WAITING_FOR_FILL.value:
@@ -753,6 +775,9 @@ class ShadowEvaluationManager:
                                 fill_bar_term_reason = "STOP"
                                 fill_bar_exit_price = stop_loss_val
                                 fill_bar_exit_time_ms = c.close_time_ms
+                                fill_bar_exit_int_start = c.open_time_ms
+                                fill_bar_exit_int_end = c.close_time_ms
+                                fill_bar_exit_time_res = ExitTimeResolution.FIFTEEN_MINUTE_FALLBACK_INTERVAL.value
                                 fill_bar_sl_hit = True
                                 fill_bar_path_res = ShadowPathResolution.FIFTEEN_MINUTE_STOP_FIRST.value
                                 break
@@ -913,6 +938,9 @@ class ShadowEvaluationManager:
                     fill_bar_tp2_hit = bool(intra["tp2_hit"])
                     fill_bar_sl_hit = bool(intra["sl_hit"])
                     fill_bar_path_res = str(intra["path_resolution"])
+                    fill_bar_exit_int_start = intra.get("exit_interval_start_ms")
+                    fill_bar_exit_int_end = intra.get("exit_interval_end_ms")
+                    fill_bar_exit_time_res = intra.get("exit_time_resolution") or "ONE_MINUTE_TERMINAL_INTERVAL"
                     stage1_mfe = float(intra["mfe"])
                     stage1_mae = float(intra["mae"])
                 else:
@@ -939,6 +967,9 @@ class ShadowEvaluationManager:
                     "terminal_reason": fill_bar_term_reason,
                     "exit_price": fill_bar_exit_price,
                     "exit_time_ms": fill_bar_exit_time_ms,
+                    "exit_interval_start_ms": fill_bar_exit_int_start,
+                    "exit_interval_end_ms": fill_bar_exit_int_end,
+                    "exit_time_resolution": fill_bar_exit_time_res,
                     "is_terminal": True,
                 }
                 self.store.update_shadow_outcome(
@@ -962,11 +993,17 @@ class ShadowEvaluationManager:
                     fill_interval_start_ms=fill_int_start,
                     fill_interval_end_ms=fill_int_end,
                     fill_time_resolution=fill_time_res,
+                    exit_interval_start_ms=fill_bar_exit_int_start,
+                    exit_interval_end_ms=fill_bar_exit_int_end,
+                    exit_time_resolution=fill_bar_exit_time_res,
                     resolved=1,
                 )
                 rec["fill_interval_start_ms"] = fill_int_start
                 rec["fill_interval_end_ms"] = fill_int_end
                 rec["fill_time_resolution"] = fill_time_res
+                rec["exit_interval_start_ms"] = fill_bar_exit_int_start
+                rec["exit_interval_end_ms"] = fill_bar_exit_int_end
+                rec["exit_time_resolution"] = fill_bar_exit_time_res
                 rec["evaluation_horizon_bars"] = eval_bars
                 rec["evaluation_horizon_ms"] = eval_horizon_ms
                 rec["evaluation_start_ms"] = eval_start_ms
@@ -1041,6 +1078,9 @@ class ShadowEvaluationManager:
                 results.append({"id": rec_id, "symbol": symbol, "status": "PENDING_AWAITING_FUTURE_BARS"})
                 continue
             if is_terminal:
+                term_exit_int_start = outcome.get("exit_interval_start_ms")
+                term_exit_int_end = outcome.get("exit_interval_end_ms")
+                term_exit_time_res = outcome.get("exit_time_resolution")
                 self.store.update_shadow_outcome(
                     rec_id,
                     future_mfe=_to_float(outcome.get("future_mfe")),
@@ -1062,11 +1102,17 @@ class ShadowEvaluationManager:
                     fill_interval_start_ms=fill_int_start,
                     fill_interval_end_ms=fill_int_end,
                     fill_time_resolution=fill_time_res,
+                    exit_interval_start_ms=term_exit_int_start,
+                    exit_interval_end_ms=term_exit_int_end,
+                    exit_time_resolution=term_exit_time_res,
                     resolved=1,
                 )
                 rec["fill_interval_start_ms"] = fill_int_start
                 rec["fill_interval_end_ms"] = fill_int_end
                 rec["fill_time_resolution"] = fill_time_res
+                rec["exit_interval_start_ms"] = term_exit_int_start
+                rec["exit_interval_end_ms"] = term_exit_int_end
+                rec["exit_time_resolution"] = term_exit_time_res
                 rec["evaluation_horizon_bars"] = eval_bars
                 rec["evaluation_horizon_ms"] = eval_horizon_ms
                 rec["evaluation_start_ms"] = eval_start_ms
@@ -1119,20 +1165,27 @@ class ShadowEvaluationManager:
                         regime_after="RESOLVED_MATURED",
                         terminal_reason="TIMEOUT",
                         exit_price=_to_float(outcome.get("exit_price")),
-                        exit_time_ms=_to_int(outcome.get("exit_time_ms")),
+                        exit_time_ms=eval_end_ms,
                         coverage_status="COMPLETE",
                         fill_interval_start_ms=fill_int_start,
                         fill_interval_end_ms=fill_int_end,
                         fill_time_resolution=fill_time_res,
+                        exit_interval_start_ms=eval_end_ms,
+                        exit_interval_end_ms=eval_end_ms,
+                        exit_time_resolution="HORIZON_TIMEOUT_BOUNDARY",
                         resolved=1,
                     )
                     rec["fill_interval_start_ms"] = fill_int_start
                     rec["fill_interval_end_ms"] = fill_int_end
                     rec["fill_time_resolution"] = fill_time_res
+                    rec["exit_interval_start_ms"] = eval_end_ms
+                    rec["exit_interval_end_ms"] = eval_end_ms
+                    rec["exit_time_resolution"] = "HORIZON_TIMEOUT_BOUNDARY"
                     rec["evaluation_horizon_bars"] = eval_bars
                     rec["evaluation_horizon_ms"] = eval_horizon_ms
                     rec["evaluation_start_ms"] = eval_start_ms
                     rec["evaluation_end_ms"] = eval_end_ms
+                    rec["exit_time_ms"] = eval_end_ms
                     self._materialize_and_save_shadow_evaluation(rec_id, client=client, candles_15m=raw_candles)
                     results.append({"id": rec_id, "symbol": symbol, "status": "RESOLVED", "outcome": outcome})
                     continue
@@ -1187,6 +1240,9 @@ class ShadowEvaluationManager:
         terminal_reason: str = "TIMEOUT"
         exit_price: float = future_candles[-1].close if future_candles else entry_price
         exit_time_ms: int = future_candles[-1].close_time_ms if future_candles else 0
+        exit_interval_start_ms: int | None = None
+        exit_interval_end_ms: int | None = None
+        exit_time_resolution: str | None = None
         is_terminal = False
 
         for candle in future_candles:
@@ -1236,6 +1292,9 @@ class ShadowEvaluationManager:
                         exit_price = float(intra["exit_price"] if intra["exit_price"] is not None else (stop_loss if sl_hit else tp1))
                         exit_time_ms = int(intra["exit_time_ms"] if intra["exit_time_ms"] is not None else candle.close_time_ms)
                         path_resolution = str(intra["path_resolution"])
+                        exit_interval_start_ms = intra.get("exit_interval_start_ms")
+                        exit_interval_end_ms = intra.get("exit_interval_end_ms")
+                        exit_time_resolution = intra.get("exit_time_resolution") or "ONE_MINUTE_TERMINAL_INTERVAL"
                         mfe = float(intra["mfe"])
                         mae = float(intra["mae"])
                         if tp1_hit:
@@ -1258,6 +1317,9 @@ class ShadowEvaluationManager:
                     time_to_stop_ms = candle.close_time_ms
                     exit_price = stop_loss
                     exit_time_ms = candle.close_time_ms
+                    exit_interval_start_ms = candle.open_time_ms
+                    exit_interval_end_ms = candle.close_time_ms
+                    exit_time_resolution = "FIFTEEN_MINUTE_FALLBACK_INTERVAL"
                     terminal_reason = "STOP"
                     path_resolution = ShadowPathResolution.FIFTEEN_MINUTE_STOP_FIRST.value
                     mae = max(mae, 1.0)
@@ -1268,6 +1330,9 @@ class ShadowEvaluationManager:
                     time_to_target_ms = candle.close_time_ms
                     exit_price = tp1
                     exit_time_ms = candle.close_time_ms
+                    exit_interval_start_ms = candle.open_time_ms
+                    exit_interval_end_ms = candle.close_time_ms
+                    exit_time_resolution = "FIFTEEN_MINUTE_FALLBACK_INTERVAL"
                     terminal_reason = "TP1"
                     path_resolution = ShadowPathResolution.FIFTEEN_MINUTE_STOP_FIRST.value
                     target_dist = (tp1 - entry_price) / risk_dist if is_long else (entry_price - tp1) / risk_dist
@@ -1288,6 +1353,9 @@ class ShadowEvaluationManager:
             # Test 28: TIMEOUT uses final covered candle close
             exit_price = future_candles[-1].close
             exit_time_ms = future_candles[-1].close_time_ms
+            exit_interval_start_ms = future_candles[-1].close_time_ms
+            exit_interval_end_ms = future_candles[-1].close_time_ms
+            exit_time_resolution = "HORIZON_TIMEOUT_BOUNDARY"
             terminal_reason = "TIMEOUT"
 
         if is_long:
@@ -1318,6 +1386,9 @@ class ShadowEvaluationManager:
                 terminal_reason=terminal_reason,
                 exit_price=exit_price,
                 exit_time_ms=exit_time_ms,
+                exit_interval_start_ms=exit_interval_start_ms,
+                exit_interval_end_ms=exit_interval_end_ms,
+                exit_time_resolution=exit_time_resolution,
             )
 
         return {
@@ -1335,6 +1406,9 @@ class ShadowEvaluationManager:
             "terminal_reason": terminal_reason,
             "exit_price": exit_price,
             "exit_time_ms": exit_time_ms,
+            "exit_interval_start_ms": exit_interval_start_ms,
+            "exit_interval_end_ms": exit_interval_end_ms,
+            "exit_time_resolution": exit_time_resolution,
             "is_terminal": is_terminal,
         }
 

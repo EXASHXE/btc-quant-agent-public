@@ -313,7 +313,10 @@ class MarketWatchStateStore:
                     evaluation_horizon_ms INTEGER,
                     fill_interval_start_ms INTEGER,
                     fill_interval_end_ms INTEGER,
-                    fill_time_resolution TEXT
+                    fill_time_resolution TEXT,
+                    exit_interval_start_ms INTEGER,
+                    exit_interval_end_ms INTEGER,
+                    exit_time_resolution TEXT
                 )
                 """
             )
@@ -365,6 +368,9 @@ class MarketWatchStateStore:
                 ("fill_interval_start_ms", "INTEGER"),
                 ("fill_interval_end_ms", "INTEGER"),
                 ("fill_time_resolution", "TEXT"),
+                ("exit_interval_start_ms", "INTEGER"),
+                ("exit_interval_end_ms", "INTEGER"),
+                ("exit_time_resolution", "TEXT"),
             ]:
                 try:
                     conn.execute(f"ALTER TABLE market_watch_shadow_records ADD COLUMN {col_name} {col_type}")
@@ -983,6 +989,9 @@ class MarketWatchStateStore:
         fill_interval_start_ms: int | None = None,
         fill_interval_end_ms: int | None = None,
         fill_time_resolution: str | None = None,
+        exit_interval_start_ms: int | None = None,
+        exit_interval_end_ms: int | None = None,
+        exit_time_resolution: str | None = None,
     ) -> int:
         if semantic_identity is not None and not semantic_identity_json:
             semantic_identity_json = _serialize_semantic_identity(semantic_identity)
@@ -1076,8 +1085,9 @@ class MarketWatchStateStore:
                     evaluation_start_ms, terminal_reason, exit_time_ms, exit_price,
                     coverage_status, coverage_reason, semantic_identity_json, feature_evidence_id,
                     evaluation_profile_version, evaluation_horizon_ms,
-                    fill_interval_start_ms, fill_interval_end_ms, fill_time_resolution
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    fill_interval_start_ms, fill_interval_end_ms, fill_time_resolution,
+                    exit_interval_start_ms, exit_interval_end_ms, exit_time_resolution
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     timestamp_ms,
@@ -1128,6 +1138,9 @@ class MarketWatchStateStore:
                     fill_interval_start_ms,
                     fill_interval_end_ms,
                     fill_time_resolution,
+                    exit_interval_start_ms,
+                    exit_interval_end_ms,
+                    exit_time_resolution,
                 ),
             )
             conn.commit()
@@ -1212,6 +1225,9 @@ class MarketWatchStateStore:
         fill_interval_start_ms: int | None = None,
         fill_interval_end_ms: int | None = None,
         fill_time_resolution: str | None = None,
+        exit_interval_start_ms: int | None = None,
+        exit_interval_end_ms: int | None = None,
+        exit_time_resolution: str | None = None,
         resolved: int = 1,
     ) -> None:
         with self._connect() as conn:
@@ -1245,7 +1261,10 @@ class MarketWatchStateStore:
                     coverage_reason = COALESCE(?, coverage_reason),
                     fill_interval_start_ms = COALESCE(?, fill_interval_start_ms),
                     fill_interval_end_ms = COALESCE(?, fill_interval_end_ms),
-                    fill_time_resolution = COALESCE(?, fill_time_resolution)
+                    fill_time_resolution = COALESCE(?, fill_time_resolution),
+                    exit_interval_start_ms = COALESCE(?, exit_interval_start_ms),
+                    exit_interval_end_ms = COALESCE(?, exit_interval_end_ms),
+                    exit_time_resolution = COALESCE(?, exit_time_resolution)
                 WHERE id = ?
                 """,
                 (
@@ -1277,6 +1296,9 @@ class MarketWatchStateStore:
                     fill_interval_start_ms,
                     fill_interval_end_ms,
                     fill_time_resolution,
+                    exit_interval_start_ms,
+                    exit_interval_end_ms,
+                    exit_time_resolution,
                     shadow_id,
                 ),
             )
@@ -1591,7 +1613,11 @@ class MarketWatchStateStore:
             row = cursor.fetchone()
             if row is None:
                 return None
-            ev = deserialize_tactical_shadow_evaluation(row["evaluation_json"], verify_identity=verify_identity)
+            ev = deserialize_tactical_shadow_evaluation(
+                row["evaluation_json"],
+                verify_identity=verify_identity,
+                require_embedded_identity=True,
+            )
             if row["evaluation_id"] != ev.evaluation_id:
                 raise TacticalShadowEvaluationIdentityError(
                     f"Row evaluation_id mismatch: row={row['evaluation_id']}, embedded={ev.evaluation_id}"
@@ -1622,7 +1648,11 @@ class MarketWatchStateStore:
             row = cursor.fetchone()
             if row is None:
                 return None
-            ev = deserialize_tactical_shadow_evaluation(row["evaluation_json"], verify_identity=verify_identity)
+            ev = deserialize_tactical_shadow_evaluation(
+                row["evaluation_json"],
+                verify_identity=verify_identity,
+                require_embedded_identity=True,
+            )
             if row["evaluation_id"] != ev.evaluation_id:
                 raise TacticalShadowEvaluationIdentityError(
                     f"Row evaluation_id mismatch: row={row['evaluation_id']}, embedded={ev.evaluation_id}"
@@ -1666,7 +1696,11 @@ class MarketWatchStateStore:
             rows = cursor.fetchall()
             evaluations: list[TacticalShadowEvaluationV2] = []
             for row in rows:
-                ev = deserialize_tactical_shadow_evaluation(row["evaluation_json"], verify_identity=verify_identity)
+                ev = deserialize_tactical_shadow_evaluation(
+                    row["evaluation_json"],
+                    verify_identity=verify_identity,
+                    require_embedded_identity=True,
+                )
                 if row["evaluation_id"] != ev.evaluation_id:
                     raise TacticalShadowEvaluationIdentityError(
                         f"Row evaluation_id mismatch: row={row['evaluation_id']}, embedded={ev.evaluation_id}"

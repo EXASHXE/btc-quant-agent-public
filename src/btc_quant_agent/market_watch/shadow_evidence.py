@@ -66,9 +66,16 @@ class FundingStatus(StrEnum):
     NOT_APPLICABLE = "NOT_APPLICABLE"
     COMPLETE = "COMPLETE"
     AMBIGUOUS_FILL_BOUNDARY = "AMBIGUOUS_FILL_BOUNDARY"
+    AMBIGUOUS_EXIT_BOUNDARY = "AMBIGUOUS_EXIT_BOUNDARY"
     INCOMPLETE_HISTORY = "INCOMPLETE_HISTORY"
     INCOMPLETE_MARK_PRICE = "INCOMPLETE_MARK_PRICE"
     FETCH_ERROR = "FETCH_ERROR"
+
+
+class ExitTimeResolution(StrEnum):
+    ONE_MINUTE_TERMINAL_INTERVAL = "ONE_MINUTE_TERMINAL_INTERVAL"
+    FIFTEEN_MINUTE_FALLBACK_INTERVAL = "FIFTEEN_MINUTE_FALLBACK_INTERVAL"
+    HORIZON_TIMEOUT_BOUNDARY = "HORIZON_TIMEOUT_BOUNDARY"
 
 
 class EvaluationTerminalStatus(StrEnum):
@@ -347,6 +354,9 @@ class TacticalShadowEvaluationV2:
     fill_interval_start_ms: int | None = None
     fill_interval_end_ms: int | None = None
     fill_time_resolution: str | None = None
+    exit_interval_start_ms: int | None = None
+    exit_interval_end_ms: int | None = None
+    exit_time_resolution: str | None = None
 
     feature_evidence_hash: str = ""
     policy_version: str = ""
@@ -372,8 +382,11 @@ class TacticalShadowEvaluationV2:
             "evaluation_start_ms": self.evaluation_start_ms,
             "execution_cost_r": self.execution_cost_r,
             "execution_path_model": self.execution_path_model,
+            "exit_interval_end_ms": self.exit_interval_end_ms,
+            "exit_interval_start_ms": self.exit_interval_start_ms,
             "exit_price": self.exit_price,
             "exit_time_ms": self.exit_time_ms,
+            "exit_time_resolution": self.exit_time_resolution,
             "feature_evidence_hash": self.feature_evidence_hash,
             "feature_evidence_id": self.feature_evidence_id,
             "fill_interval_end_ms": self.fill_interval_end_ms,
@@ -571,6 +584,14 @@ def validate_tactical_shadow_evaluation(evaluation: TacticalShadowEvaluationV2) 
             raise TacticalShadowEvaluationValidationError(
                 "NO_FILL evaluation must not have fill_interval bounds"
             )
+        if (
+            evaluation.exit_interval_start_ms is not None
+            or evaluation.exit_interval_end_ms is not None
+            or evaluation.exit_time_resolution is not None
+        ):
+            raise TacticalShadowEvaluationValidationError(
+                "NO_FILL evaluation must have exit_interval_start_ms, exit_interval_end_ms, and exit_time_resolution set to None"
+            )
 
     elif evaluation.terminal_status == EvaluationTerminalStatus.FILLED.value:
         if evaluation.fill_status != "FILLED":
@@ -593,12 +614,43 @@ def validate_tactical_shadow_evaluation(evaluation: TacticalShadowEvaluationV2) 
             raise TacticalShadowEvaluationValidationError(
                 f"Fill interval starts before signal_time: {evaluation.fill_interval_start_ms} < {evaluation.signal_time_ms}"
             )
+        if evaluation.exit_interval_start_ms is None or evaluation.exit_interval_end_ms is None:
+            raise TacticalShadowEvaluationValidationError("FILLED evaluation requires exit_interval bounds")
+        if evaluation.exit_time_resolution is None:
+            raise TacticalShadowEvaluationValidationError("FILLED evaluation requires exit_time_resolution")
+        if evaluation.exit_time_resolution not in (
+            ExitTimeResolution.ONE_MINUTE_TERMINAL_INTERVAL.value,
+            ExitTimeResolution.FIFTEEN_MINUTE_FALLBACK_INTERVAL.value,
+            ExitTimeResolution.HORIZON_TIMEOUT_BOUNDARY.value,
+        ):
+            raise TacticalShadowEvaluationValidationError(
+                f"Invalid exit_time_resolution: {evaluation.exit_time_resolution}"
+            )
+        if evaluation.exit_interval_start_ms > evaluation.exit_interval_end_ms:
+            raise TacticalShadowEvaluationValidationError(
+                f"exit_interval_start_ms ({evaluation.exit_interval_start_ms}) > exit_interval_end_ms ({evaluation.exit_interval_end_ms})"
+            )
+        if not (
+            evaluation.signal_time_ms
+            <= evaluation.fill_interval_start_ms
+            <= evaluation.fill_interval_end_ms
+            <= evaluation.exit_interval_end_ms
+        ):
+            raise TacticalShadowEvaluationValidationError(
+                f"Temporal consistency violated: signal_time_ms ({evaluation.signal_time_ms}) "
+                f"<= fill_start ({evaluation.fill_interval_start_ms}) <= fill_end ({evaluation.fill_interval_end_ms}) "
+                f"<= exit_end ({evaluation.exit_interval_end_ms})"
+            )
         if evaluation.terminal_reason not in ("TP1", "STOP", "TIMEOUT"):
             raise TacticalShadowEvaluationValidationError(
                 f"FILLED evaluation terminal_reason must be TP1, STOP, or TIMEOUT, got: {evaluation.terminal_reason}"
             )
         if evaluation.exit_time_ms is None:
             raise TacticalShadowEvaluationValidationError("FILLED evaluation requires exit_time_ms")
+        if not (evaluation.exit_interval_start_ms <= evaluation.exit_time_ms <= evaluation.exit_interval_end_ms):
+            raise TacticalShadowEvaluationValidationError(
+                f"exit_time_ms {evaluation.exit_time_ms} outside exit interval [{evaluation.exit_interval_start_ms}, {evaluation.exit_interval_end_ms}]"
+            )
         if evaluation.exit_price is None or evaluation.exit_price <= 0.0:
             raise TacticalShadowEvaluationValidationError(
                 f"FILLED evaluation requires positive exit_price, got {evaluation.exit_price}"
@@ -629,16 +681,49 @@ def validate_tactical_shadow_evaluation(evaluation: TacticalShadowEvaluationV2) 
                 )
             if evaluation.tp1_hit or evaluation.sl_hit:
                 raise TacticalShadowEvaluationValidationError("TIMEOUT terminal cannot have tp1_hit or sl_hit")
+            if evaluation.exit_time_resolution != ExitTimeResolution.HORIZON_TIMEOUT_BOUNDARY.value:
+                raise TacticalShadowEvaluationValidationError(
+                    f"TIMEOUT terminal requires HORIZON_TIMEOUT_BOUNDARY resolution, got {evaluation.exit_time_resolution}"
+                )
+            if (
+                evaluation.exit_interval_start_ms != evaluation.evaluation_end_ms
+                or evaluation.exit_interval_end_ms != evaluation.evaluation_end_ms
+            ):
+                raise TacticalShadowEvaluationValidationError(
+                    f"TIMEOUT requires exit_interval_start_ms == exit_interval_end_ms == evaluation_end_ms ({evaluation.evaluation_end_ms})"
+                )
         elif evaluation.terminal_reason == "TP1":
             if not evaluation.tp1_hit or evaluation.sl_hit:
                 raise TacticalShadowEvaluationValidationError("TP1 terminal requires tp1_hit=True and sl_hit=False")
             if evaluation.exit_time_ms > evaluation.evaluation_end_ms + 900_000:
                 raise TacticalShadowEvaluationValidationError("TP1 exit cannot occur after planned evaluation end")
+            if evaluation.exit_time_resolution not in (
+                ExitTimeResolution.ONE_MINUTE_TERMINAL_INTERVAL.value,
+                ExitTimeResolution.FIFTEEN_MINUTE_FALLBACK_INTERVAL.value,
+            ):
+                raise TacticalShadowEvaluationValidationError(
+                    f"TP1 terminal requires 1m or 15m fallback resolution, got {evaluation.exit_time_resolution}"
+                )
+            if evaluation.exit_time_ms != evaluation.exit_interval_end_ms:
+                raise TacticalShadowEvaluationValidationError(
+                    f"TP1 exit_time_ms ({evaluation.exit_time_ms}) must equal exit_interval_end_ms ({evaluation.exit_interval_end_ms})"
+                )
         elif evaluation.terminal_reason == "STOP":
             if not evaluation.sl_hit or evaluation.tp1_hit:
                 raise TacticalShadowEvaluationValidationError("STOP terminal requires sl_hit=True and tp1_hit=False")
             if evaluation.exit_time_ms > evaluation.evaluation_end_ms + 900_000:
                 raise TacticalShadowEvaluationValidationError("STOP exit cannot occur after planned evaluation end")
+            if evaluation.exit_time_resolution not in (
+                ExitTimeResolution.ONE_MINUTE_TERMINAL_INTERVAL.value,
+                ExitTimeResolution.FIFTEEN_MINUTE_FALLBACK_INTERVAL.value,
+            ):
+                raise TacticalShadowEvaluationValidationError(
+                    f"STOP terminal requires 1m or 15m fallback resolution, got {evaluation.exit_time_resolution}"
+                )
+            if evaluation.exit_time_ms != evaluation.exit_interval_end_ms:
+                raise TacticalShadowEvaluationValidationError(
+                    f"STOP exit_time_ms ({evaluation.exit_time_ms}) must equal exit_interval_end_ms ({evaluation.exit_interval_end_ms})"
+                )
 
         # Net R arithmetic
         if evaluation.price_gross_r is None or evaluation.execution_cost_r is None or evaluation.net_r_ex_funding is None:
@@ -907,6 +992,9 @@ def evaluate_funding_accounting(
     fetch_error: bool = False,
     fill_interval_start_ms: int | None = None,
     fill_interval_end_ms: int | None = None,
+    exit_interval_start_ms: int | None = None,
+    exit_interval_end_ms: int | None = None,
+    exit_time_resolution: str | None = None,
 ) -> FundingAccountingEvidence:
     """Evaluate realized funding settlements causally within the filled holding interval."""
     if fill_time_ms is None or exit_time_ms is None or fill_price is None or stop_loss is None:
@@ -936,13 +1024,16 @@ def evaluate_funding_accounting(
             notes="Funding records not supplied",
         )
 
-    # Establish authoritative fill uncertainty interval
+    # Establish authoritative fill and exit uncertainty intervals
     start_int = fill_interval_start_ms if fill_interval_start_ms is not None else (fill_time_ms - 60_000)
     end_int = fill_interval_end_ms if fill_interval_end_ms is not None else fill_time_ms
+    exit_start_int = exit_interval_start_ms if exit_interval_start_ms is not None else exit_time_ms
+    exit_end_int = exit_interval_end_ms if exit_interval_end_ms is not None else exit_time_ms
 
     is_long = direction.upper() == "LONG"
     applicable_settlements: list[FundingSettlementEvidence] = []
-    has_ambiguity = False
+    has_ambiguity_fill = False
+    has_ambiguity_exit = False
     has_missing_mark = False
 
     # Standard Binance funding interval is every 8 hours: 00:00, 08:00, 16:00 UTC
@@ -952,13 +1043,13 @@ def evaluate_funding_accounting(
         mp_val = rec.get("mark_price")
         mark_price = float(mp_val) if mp_val is not None else None
 
-        # Section 20: Settlement before fill interval: not applicable
+        # Section 8: Settlement before proven fill interval: not applicable
         if f_time < start_int:
             continue
 
-        # Section 18: Ambiguous fill boundary: fill ordering vs funding cannot be proven
+        # Section 8: Ambiguous fill boundary: fill ordering vs funding cannot be proven
         if start_int <= f_time <= end_int:
-            has_ambiguity = True
+            has_ambiguity_fill = True
             applicable_settlements.append(
                 FundingSettlementEvidence(
                     funding_time_ms=f_time,
@@ -972,8 +1063,8 @@ def evaluate_funding_accounting(
             )
             continue
 
-        # Section 19: Proven open across settlement
-        if f_time > end_int and f_time <= exit_time_ms:
+        # Section 8: Proven holding interval
+        if f_time > end_int and f_time < exit_start_int:
             if mark_price is None or mark_price <= 0.0:
                 has_missing_mark = True
                 applicable_settlements.append(
@@ -1006,8 +1097,30 @@ def evaluate_funding_accounting(
                     status="SETTLED",
                 )
             )
+            continue
 
-    if has_ambiguity:
+        # Section 8: Ambiguous exit boundary
+        if exit_start_int <= f_time <= exit_end_int:
+            has_ambiguity_exit = True
+            applicable_settlements.append(
+                FundingSettlementEvidence(
+                    funding_time_ms=f_time,
+                    funding_rate=f_rate,
+                    mark_price=mark_price,
+                    funding_cash=None,
+                    funding_r=None,
+                    is_settlement_open=False,
+                    status=FundingStatus.AMBIGUOUS_EXIT_BOUNDARY.value,
+                )
+            )
+            continue
+
+        # Section 8: After exit: not applicable
+        if f_time > exit_end_int:
+            continue
+
+    # Section 10 Precedence: If ANY settlement is ambiguous, authoritative funding PnL remains unavailable
+    if has_ambiguity_fill:
         return FundingAccountingEvidence(
             funding_status=FundingStatus.AMBIGUOUS_FILL_BOUNDARY.value,
             settlements_count=len(applicable_settlements),
@@ -1016,6 +1129,17 @@ def evaluate_funding_accounting(
             funding_cash_total=None,
             initial_risk=initial_risk,
             notes="Funding settlement timestamp falls within ambiguous fill boundary",
+        )
+
+    if has_ambiguity_exit:
+        return FundingAccountingEvidence(
+            funding_status=FundingStatus.AMBIGUOUS_EXIT_BOUNDARY.value,
+            settlements_count=len(applicable_settlements),
+            settlements=tuple(applicable_settlements),
+            funding_pnl_r=None,
+            funding_cash_total=None,
+            initial_risk=initial_risk,
+            notes="Funding settlement timestamp falls within ambiguous exit boundary",
         )
 
     if has_missing_mark:
@@ -1393,6 +1517,32 @@ def build_tactical_shadow_evaluation_v2(
         exec_cost_r = float(shadow_record["friction_r"]) if shadow_record.get("friction_r") is not None else 0.0
         net_r_ex = (gross_r - exec_cost_r) if gross_r is not None else None
 
+        # Exit uncertainty intervals
+        path_res = str(shadow_record.get("path_resolution") or "FIFTEEN_MINUTE_STOP_FIRST")
+        exit_int_start = int(shadow_record["exit_interval_start_ms"]) if shadow_record.get("exit_interval_start_ms") is not None else None
+        exit_int_end = int(shadow_record["exit_interval_end_ms"]) if shadow_record.get("exit_interval_end_ms") is not None else None
+        exit_time_res = str(shadow_record["exit_time_resolution"]) if shadow_record.get("exit_time_resolution") is not None else None
+
+        if exit_int_start is None or exit_int_end is None or exit_time_res is None:
+            if terminal_rs == "TIMEOUT":
+                exit_int_start = eval_end_ms
+                exit_int_end = eval_end_ms
+                exit_t = eval_end_ms
+                exit_time_res = ExitTimeResolution.HORIZON_TIMEOUT_BOUNDARY.value
+            else:
+                is_1m = path_res in (
+                    "ONE_MINUTE_CHRONOLOGICAL",
+                    "ONE_MINUTE_FILL_BAR_STOP_FIRST",
+                )
+                if is_1m:
+                    exit_int_start = (exit_t - 60_000) if exit_int_start is None else exit_int_start
+                    exit_int_end = exit_t if exit_int_end is None else exit_int_end
+                    exit_time_res = ExitTimeResolution.ONE_MINUTE_TERMINAL_INTERVAL.value if exit_time_res is None else exit_time_res
+                else:
+                    exit_int_start = (exit_t - 15 * 60 * 1000) if exit_int_start is None else exit_int_start
+                    exit_int_end = exit_t if exit_int_end is None else exit_int_end
+                    exit_time_res = ExitTimeResolution.FIFTEEN_MINUTE_FALLBACK_INTERVAL.value if exit_time_res is None else exit_time_res
+
         # Funding Accounting (Section 20-25)
         funding_acct = evaluate_funding_accounting(
             direction=direction,
@@ -1404,6 +1554,8 @@ def build_tactical_shadow_evaluation_v2(
             fetch_error=funding_fetch_error,
             fill_interval_start_ms=fill_int_start,
             fill_interval_end_ms=fill_int_end,
+            exit_interval_start_ms=exit_int_start,
+            exit_interval_end_ms=exit_int_end,
         )
 
         if funding_acct.funding_status == FundingStatus.COMPLETE.value and funding_acct.funding_pnl_r is not None and net_r_ex is not None:
@@ -1455,6 +1607,9 @@ def build_tactical_shadow_evaluation_v2(
         fill_interval_start_ms=fill_int_start,
         fill_interval_end_ms=fill_int_end,
         fill_time_resolution=fill_time_res,
+        exit_interval_start_ms=exit_int_start if not is_no_fill else None,
+        exit_interval_end_ms=exit_int_end if not is_no_fill else None,
+        exit_time_resolution=exit_time_res if not is_no_fill else None,
         evaluation_profile_version=profile_ver,
         evaluation_horizon_bars=eval_horizon_bars,
         evaluation_horizon_ms=eval_horizon_ms,
@@ -1721,12 +1876,20 @@ def compute_tactical_cohort_summary_v1(
 def deserialize_tactical_shadow_evaluation(
     raw_json: str | dict[str, Any],
     verify_identity: bool = True,
+    require_embedded_identity: bool = False,
 ) -> TacticalShadowEvaluationV2:
     """Deserialize JSON payload into frozen TacticalShadowEvaluationV2 and verify identity."""
     if isinstance(raw_json, str):
         payload = json.loads(raw_json)
     else:
         payload = dict(raw_json)
+
+    raw_eval_id = payload.get("evaluation_id")
+    if require_embedded_identity and (raw_eval_id is None or not str(raw_eval_id).strip()):
+        raise TacticalShadowEvaluationIdentityError(
+            "Stored shadow evaluation JSON missing mandatory embedded evaluation_id"
+        )
+    eval_id = str(raw_eval_id) if raw_eval_id else compute_evaluation_id(payload)
 
     # Reconstruct sub-components
     funding_data = payload.get("funding_accounting") or {}
@@ -1805,7 +1968,7 @@ def deserialize_tactical_shadow_evaluation(
 
     evaluation = TacticalShadowEvaluationV2(
         evaluation_schema_version=str(payload["evaluation_schema_version"]),
-        evaluation_id=str(payload.get("evaluation_id") or compute_evaluation_id(payload)),
+        evaluation_id=eval_id,
         feature_evidence_id=str(payload["feature_evidence_id"]),
         shadow_record_id=int(payload["shadow_record_id"]),
         symbol=str(payload["symbol"]),
@@ -1822,6 +1985,9 @@ def deserialize_tactical_shadow_evaluation(
         fill_interval_start_ms=int(payload["fill_interval_start_ms"]) if payload.get("fill_interval_start_ms") is not None else None,
         fill_interval_end_ms=int(payload["fill_interval_end_ms"]) if payload.get("fill_interval_end_ms") is not None else None,
         fill_time_resolution=str(payload["fill_time_resolution"]) if payload.get("fill_time_resolution") is not None else None,
+        exit_interval_start_ms=int(payload["exit_interval_start_ms"]) if payload.get("exit_interval_start_ms") is not None else None,
+        exit_interval_end_ms=int(payload["exit_interval_end_ms"]) if payload.get("exit_interval_end_ms") is not None else None,
+        exit_time_resolution=str(payload["exit_time_resolution"]) if payload.get("exit_time_resolution") is not None else None,
         evaluation_profile_version=str(payload["evaluation_profile_version"]),
         evaluation_horizon_bars=int(payload.get("evaluation_horizon_bars", 0)),
         evaluation_horizon_ms=int(payload["evaluation_horizon_ms"]),
