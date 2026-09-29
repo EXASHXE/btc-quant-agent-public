@@ -1,0 +1,673 @@
+{
+  "accepted_implementation_sha": "8ecff4ec4b25bf73a35309689fd3ecfacc0d3399",
+  "authority_artifact_git_blobs": {
+    "docs": {
+      "docs/handover/V0.5.1_CONTROLLER_ROLE_HANDOVER_2026-09-29.md": "75c5cb620de1355bf00084fa58a947ae5773da92",
+      "evidence/v0.5/controller/V0.5.1_CONTROLLER_OPERATING_CONTRACT_R1.json": "cfecd3c6716be56a2eb894e53338002629c79537",
+      "evidence/v0.5/h41/V0.5.1_H41_BTC_ETH_CANONICAL_SOURCE_AUTHORITY_R1.json": "66cba32d7bb284e15586f4528271733ca735bb14",
+      "evidence/v0.5/h41/V0.5.1_H41_EXPLORATORY_NO_GO_CONTROLLER_ADJUDICATION_R1.json": "d0e087577613e8f986c4a74ee1e65abe09b1431b",
+      "evidence/v0.5/h41/V0.5.1_H41_FROZEN_PROTOCOL_AUTHORITY_R1.json": "be4efa39311d87f9e63c539883fd3acc070dff44",
+      "evidence/v0.5/h41/V0.5.1_H41_SOURCE_AUTHORITY_CONTROLLER_ACCEPTANCE.json": "d2489f62a4b252c4ff5aa69ea9597e48b80df55f",
+      "evidence/v0.5/h41/V0.5.1_H41_WF1_CALIBRATION_EXPLORATORY_DISCOVERY_R1_1.json": "61b7c494b0b1947aeb48c29bedc3f8d274be4ea3",
+      "reviews/v0.5/V0.5.1_H40_M3B_FIRST_REAL_DISCOVERY_REPORT.md": "c4022ca8369f9f1e4c38e9d0bb33d44ba3daa731",
+      "reviews/v0.5/V0.5.1_H41_EXPLORATORY_NO_GO_CONTROLLER_ADJUDICATION_R1.md": "6c6a123ba68a9b6e8f1f5fae5a61ea583faebbbb"
+    },
+    "implementation": {
+      "deliverables/v0.3.17/DERIVATIVES_V0316_SUCCESSOR_STATUS.json": "208c888da1037802204374ff3dcb97e79fc228a9",
+      "deliverables/v0.3.17/OPPORTUNITY_H36_SUCCESSOR_STATUS.json": "aa80ab41f2c1c1b77ec7ce7d078f656392e23c4d",
+      "deliverables/v0.3.22/H39_FEATURE_DICTIONARY.json": "1dd451b9b7f2bf1fa62bec33586fd06e2a6f83d4",
+      "deliverables/v0.3.22/MICROSTRUCTURE_DATA_PROVENANCE.json": "654f5016ea35d90ef2e6afafe3d4c4be0c58b65b",
+      "deliverables/v0.3.25/H39_BLIND_OPERATIONAL_STATUS.json": "3f16a87694ca82db26134bb397ab319ef7114acc",
+      "src/btc_quant_agent/data/binance_market_archive.py": "75f6d54bc523d695b8b07cf54e16f31866bb9876",
+      "src/btc_quant_agent/data/derivatives.py": "2e6547e94507a373a1b08ae976d6bb0add29bb29",
+      "src/btc_quant_agent/economic/funding_evidence.py": "ae0d4190a1c5c2d957592d24e3ebfb8d674e240f",
+      "src/btc_quant_agent/h40/split_manifest.py": "46979616e1b7b76b7e485fe2f69e3e7ef50ef270",
+      "src/btc_quant_agent/h41/source.py": "739603b1a7f123cf61eeb7c4aed89a2c6c8ec294"
+    }
+  },
+  "authority_hashes": {
+    "h41_candidate_ledger_hash": "d2ee1551ab4778e8ce34e83e053aba17ebb6be240aed812a4beedb218548b7e0",
+    "h41_frozen_semantic_root": "f784ce4cfe7ba4d1d5d30582e59ab4811aa7b1e8aed79b00a5f5e0f200c26917",
+    "h41_inference_contract_hash": "6b7c3d5289fd9cc132affb51f85fa292049868b96041b2b749cc11cf8be11136",
+    "h41_source_authority_root": "05145d35a5cbd060ce3e9d7932b3757f901e396fa545ca624146dfbfa0cdb8b8"
+  },
+  "candidate_budget_proposal": {
+    "compact": 12,
+    "medium": 16,
+    "realized_K_may_be_smaller": true,
+    "recommended_max_formal": 12,
+    "status": "PROPOSED_NOT_FROZEN",
+    "upper_bound": 24
+  },
+  "candidate_family_proposal": [
+    {
+      "family": "A_PRICE_REGIME",
+      "lookback": "TO_FREEZE",
+      "mechanism": "strong trend / normal volatility",
+      "modifier_type": null,
+      "parent_id": null,
+      "proposed_horizon_hours": 4,
+      "provisional_candidate_id": "SCV1_A_TREND_BTC",
+      "regime_gate": "TRAIN_FIT_TO_FREEZE",
+      "side_semantics": "SYMMETRIC_LONG_SHORT_PROPOSED",
+      "source_class": "OHLC",
+      "status": "PROPOSED_NOT_FROZEN",
+      "target_asset": "BTCUSDT",
+      "threshold_fit": "TRAIN_ONLY_TO_FREEZE"
+    },
+    {
+      "family": "A_PRICE_REGIME",
+      "lookback": "TO_FREEZE",
+      "mechanism": "strong trend / normal volatility",
+      "modifier_type": null,
+      "parent_id": null,
+      "proposed_horizon_hours": 4,
+      "provisional_candidate_id": "SCV1_A_TREND_ETH",
+      "regime_gate": "TRAIN_FIT_TO_FREEZE",
+      "side_semantics": "SYMMETRIC_LONG_SHORT_PROPOSED",
+      "source_class": "OHLC",
+      "status": "PROPOSED_NOT_FROZEN",
+      "target_asset": "ETHUSDT",
+      "threshold_fit": "TRAIN_ONLY_TO_FREEZE"
+    },
+    {
+      "family": "A_PRICE_REGIME",
+      "lookback": "TO_FREEZE",
+      "mechanism": "compression-to-expansion",
+      "modifier_type": null,
+      "parent_id": null,
+      "proposed_horizon_hours": 4,
+      "provisional_candidate_id": "SCV1_A_EXPAND_BTC",
+      "regime_gate": "TRAIN_FIT_TO_FREEZE",
+      "side_semantics": "SYMMETRIC_LONG_SHORT_PROPOSED",
+      "source_class": "OHLC",
+      "status": "PROPOSED_NOT_FROZEN",
+      "target_asset": "BTCUSDT",
+      "threshold_fit": "TRAIN_ONLY_TO_FREEZE"
+    },
+    {
+      "family": "A_PRICE_REGIME",
+      "lookback": "TO_FREEZE",
+      "mechanism": "compression-to-expansion",
+      "modifier_type": null,
+      "parent_id": null,
+      "proposed_horizon_hours": 4,
+      "provisional_candidate_id": "SCV1_A_EXPAND_ETH",
+      "regime_gate": "TRAIN_FIT_TO_FREEZE",
+      "side_semantics": "SYMMETRIC_LONG_SHORT_PROPOSED",
+      "source_class": "OHLC",
+      "status": "PROPOSED_NOT_FROZEN",
+      "target_asset": "ETHUSDT",
+      "threshold_fit": "TRAIN_ONLY_TO_FREEZE"
+    },
+    {
+      "family": "A_PRICE_REGIME",
+      "lookback": "TO_FREEZE",
+      "mechanism": "high-volatility failed displacement",
+      "modifier_type": null,
+      "parent_id": null,
+      "proposed_horizon_hours": 4,
+      "provisional_candidate_id": "SCV1_A_REVERT_BTC",
+      "regime_gate": "TRAIN_FIT_TO_FREEZE",
+      "side_semantics": "SYMMETRIC_LONG_SHORT_PROPOSED",
+      "source_class": "OHLC",
+      "status": "PROPOSED_NOT_FROZEN",
+      "target_asset": "BTCUSDT",
+      "threshold_fit": "TRAIN_ONLY_TO_FREEZE"
+    },
+    {
+      "family": "A_PRICE_REGIME",
+      "lookback": "TO_FREEZE",
+      "mechanism": "high-volatility failed displacement",
+      "modifier_type": null,
+      "parent_id": null,
+      "proposed_horizon_hours": 4,
+      "provisional_candidate_id": "SCV1_A_REVERT_ETH",
+      "regime_gate": "TRAIN_FIT_TO_FREEZE",
+      "side_semantics": "SYMMETRIC_LONG_SHORT_PROPOSED",
+      "source_class": "OHLC",
+      "status": "PROPOSED_NOT_FROZEN",
+      "target_asset": "ETHUSDT",
+      "threshold_fit": "TRAIN_ONLY_TO_FREEZE"
+    },
+    {
+      "family": "C_PARTICIPATION",
+      "lookback": "TO_FREEZE",
+      "mechanism": "completed-kline volume impulse",
+      "modifier_type": null,
+      "parent_id": null,
+      "proposed_horizon_hours": 4,
+      "provisional_candidate_id": "SCV1_C_VOLUME_BTC",
+      "regime_gate": "TRAIN_FIT_TO_FREEZE",
+      "side_semantics": "SYMMETRIC_LONG_SHORT_PROPOSED",
+      "source_class": "OHLCV",
+      "status": "PROPOSED_NOT_FROZEN",
+      "target_asset": "BTCUSDT",
+      "threshold_fit": "TRAIN_ONLY_TO_FREEZE"
+    },
+    {
+      "family": "C_PARTICIPATION",
+      "lookback": "TO_FREEZE",
+      "mechanism": "completed-kline volume impulse",
+      "modifier_type": null,
+      "parent_id": null,
+      "proposed_horizon_hours": 4,
+      "provisional_candidate_id": "SCV1_C_VOLUME_ETH",
+      "regime_gate": "TRAIN_FIT_TO_FREEZE",
+      "side_semantics": "SYMMETRIC_LONG_SHORT_PROPOSED",
+      "source_class": "OHLCV",
+      "status": "PROPOSED_NOT_FROZEN",
+      "target_asset": "ETHUSDT",
+      "threshold_fit": "TRAIN_ONLY_TO_FREEZE"
+    },
+    {
+      "family": "D_CROSS_ASSET",
+      "lookback": "TO_FREEZE",
+      "mechanism": "other-asset lagged lead / target nonresponse",
+      "modifier_type": null,
+      "parent_id": null,
+      "proposed_horizon_hours": 4,
+      "provisional_candidate_id": "SCV1_D_LEAD_BTC",
+      "regime_gate": "TRAIN_FIT_TO_FREEZE",
+      "side_semantics": "SYMMETRIC_LONG_SHORT_PROPOSED",
+      "source_class": "SYNCHRONIZED_OHLC",
+      "status": "PROPOSED_NOT_FROZEN",
+      "target_asset": "BTCUSDT",
+      "threshold_fit": "TRAIN_ONLY_TO_FREEZE"
+    },
+    {
+      "family": "D_CROSS_ASSET",
+      "lookback": "TO_FREEZE",
+      "mechanism": "other-asset lagged lead / target nonresponse",
+      "modifier_type": null,
+      "parent_id": null,
+      "proposed_horizon_hours": 4,
+      "provisional_candidate_id": "SCV1_D_LEAD_ETH",
+      "regime_gate": "TRAIN_FIT_TO_FREEZE",
+      "side_semantics": "SYMMETRIC_LONG_SHORT_PROPOSED",
+      "source_class": "SYNCHRONIZED_OHLC",
+      "status": "PROPOSED_NOT_FROZEN",
+      "target_asset": "ETHUSDT",
+      "threshold_fit": "TRAIN_ONLY_TO_FREEZE"
+    },
+    {
+      "family": "D_CROSS_ASSET",
+      "lookback": "TO_FREEZE",
+      "mechanism": "relative-strength divergence/convergence",
+      "modifier_type": null,
+      "parent_id": null,
+      "proposed_horizon_hours": 8,
+      "provisional_candidate_id": "SCV1_D_RELATIVE_BTC",
+      "regime_gate": "TRAIN_FIT_TO_FREEZE",
+      "side_semantics": "SYMMETRIC_LONG_SHORT_PROPOSED",
+      "source_class": "SYNCHRONIZED_OHLC",
+      "status": "PROPOSED_NOT_FROZEN",
+      "target_asset": "BTCUSDT",
+      "threshold_fit": "TRAIN_ONLY_TO_FREEZE"
+    },
+    {
+      "family": "D_CROSS_ASSET",
+      "lookback": "TO_FREEZE",
+      "mechanism": "relative-strength divergence/convergence",
+      "modifier_type": null,
+      "parent_id": null,
+      "proposed_horizon_hours": 8,
+      "provisional_candidate_id": "SCV1_D_RELATIVE_ETH",
+      "regime_gate": "TRAIN_FIT_TO_FREEZE",
+      "side_semantics": "SYMMETRIC_LONG_SHORT_PROPOSED",
+      "source_class": "SYNCHRONIZED_OHLC",
+      "status": "PROPOSED_NOT_FROZEN",
+      "target_asset": "ETHUSDT",
+      "threshold_fit": "TRAIN_ONLY_TO_FREEZE"
+    }
+  ],
+  "decision": "READY_FOR_ASTRA_AUDIT",
+  "design_status": "PROPOSED_NOT_FROZEN",
+  "docs_start_sha": "973371dc8cb66c038083ebe7ddeefdd0119a3c33",
+  "endpoint_proposal": {
+    "cost_numeric_status": "UNRESOLVED_BEFORE_PREREGISTRATION",
+    "entry": "native economic Open(t+1h) after completed-bar decision at t and verified forward receipt",
+    "executable_fill_claim": false,
+    "exit": "native economic Open(t+1h+h)",
+    "primary": "side*(exit/entry-1)-frozen_fixed_roundtrip_taker_fee_slippage_and_funding_reserve",
+    "stress": "separately frozen wider slippage/adverse funding; diagnostic only"
+  },
+  "exposure_windows_discovered": [
+    {
+      "assets": [
+        "ETHUSDT"
+      ],
+      "evidence": [
+        "src/btc_quant_agent/h40/split_manifest.py",
+        "reviews/v0.5/V0.5.1_H40_M3B_FIRST_REAL_DISCOVERY_REPORT.md"
+      ],
+      "id": "H40_WF1_TRAIN",
+      "interval_utc": "[2021-01-31,2022-10-31)",
+      "outcome_exposed": false,
+      "status": "exposed_development",
+      "type": "source_feature_fit"
+    },
+    {
+      "assets": [
+        "ETHUSDT"
+      ],
+      "evidence": [
+        "reviews/v0.5/V0.5.1_H40_M3B_FIRST_REAL_DISCOVERY_REPORT.md"
+      ],
+      "id": "H40_WF1_CALIBRATION",
+      "interval_utc": "[2022-11-01,2023-01-31)",
+      "outcome_exposed": true,
+      "status": "historical_exploratory_exposure",
+      "type": "exploratory_attempt_not_testable"
+    },
+    {
+      "assets": [
+        "ETHUSDT"
+      ],
+      "evidence": [
+        "src/btc_quant_agent/h40/split_manifest.py"
+      ],
+      "id": "H40_LATER_WF_CONFIRMATION",
+      "interval_utc": "[2023-02-01,2026-02-01)",
+      "outcome_exposed": null,
+      "status": "not_opened_by_first_M3B; no pristine claim",
+      "type": "defined_split_protected"
+    },
+    {
+      "assets": [
+        "BTCUSDT",
+        "ETHUSDT"
+      ],
+      "evidence": [
+        "evidence/v0.5/h41/V0.5.1_H41_FROZEN_PROTOCOL_AUTHORITY_R1.json"
+      ],
+      "id": "H41_WF1_TRAIN",
+      "interval_utc": "[2021-01-01,2022-10-31)",
+      "outcome_exposed": false,
+      "status": "exposed_development",
+      "type": "source_feature_q80_fit"
+    },
+    {
+      "assets": [
+        "BTCUSDT",
+        "ETHUSDT"
+      ],
+      "evidence": [
+        "evidence/v0.5/h41/V0.5.1_H41_WF1_CALIBRATION_EXPLORATORY_DISCOVERY_R1_1.json"
+      ],
+      "id": "H41_WF1_CALIBRATION",
+      "interval_utc": "[2022-11-01,2023-01-31)",
+      "outcome_exposed": true,
+      "status": "terminal_no_go",
+      "type": "exploratory_outcomes"
+    },
+    {
+      "assets": [
+        "BTCUSDT",
+        "ETHUSDT"
+      ],
+      "evidence": [
+        "evidence/v0.5/h41/V0.5.1_H41_EXPLORATORY_NO_GO_CONTROLLER_ADJUDICATION_R1.json"
+      ],
+      "id": "H41_WF1_VALIDATION",
+      "interval_utc": "[2023-02-01,2023-04-30)",
+      "outcome_exposed": false,
+      "status": "not_authorized_for_successor",
+      "type": "source_integrity_only; scientific_outcomes_sealed"
+    },
+    {
+      "assets": [
+        "BTCUSDT"
+      ],
+      "evidence": [
+        "deliverables/v0.3.25/H39_BLIND_OPERATIONAL_STATUS.json"
+      ],
+      "id": "H39_FORWARD",
+      "interval_utc": "[2026-09-04T11:15Z, unknown current end)",
+      "outcome_exposed": null,
+      "status": "protected; latest cited 2026-09-07 status insufficient",
+      "type": "blind_forward_feature_operational"
+    },
+    {
+      "assets": [
+        "BTCUSDT"
+      ],
+      "evidence": [
+        "deliverables/v0.3.17/OPPORTUNITY_H36_SUCCESSOR_STATUS.json",
+        "docs/handover/V0.5.1_TACTICAL_POLICY_B_LINE_HANDOVER_2026-09-28.md"
+      ],
+      "id": "H35_H36_BLINE_FORWARD",
+      "interval_utc": "[2026-09-01, unknown current end)",
+      "outcome_exposed": null,
+      "status": "quarantine_from_successor_authority",
+      "type": "forward_opportunity_shadow_or_operational"
+    }
+  ],
+  "formal_vs_diagnostic_metric_taxonomy": {
+    "diagnostic": [
+      "24bp_or_wider_cost_stress_to_freeze",
+      "event_overlap_and_packing",
+      "source_gap_inventory",
+      "alias_Jaccard_and_side_agreement",
+      "negative_controls",
+      "paper_fill_and_latency",
+      "regime_descriptive_summaries"
+    ],
+    "formal": [
+      "one_sided_after_cost_event_mean",
+      "joint_simultaneous_LCB_gt_zero",
+      "proposed_support_N_ge_200_D_ge_120_occupied_120h_blocks_ge_80"
+    ]
+  },
+  "forward_validation_required": true,
+  "generated_at_utc": "2026-09-29T17:52:00.713796Z",
+  "historical_validation_partition_status": "UNRESOLVED",
+  "inference_options_considered": [
+    "single_step_shared_clock_joint_max",
+    "hierarchical_family_gatekeeping",
+    "studentized_Romano_Wolf_style_stepdown"
+  ],
+  "lifecycle_recommendation": "Astra design audit then independent preregistration/source/endpoint/power closure before any new Discovery; forward validation only after lock audit and explicit GO",
+  "live_remote_refs_verified": {
+    "docs": "973371dc8cb66c038083ebe7ddeefdd0119a3c33",
+    "implementation": "8ecff4ec4b25bf73a35309689fd3ecfacc0d3399",
+    "tactical_bline": "79c8b82dd7c870b7e785af19823af8ec607c22de"
+  },
+  "next_stage": "ASTRA_H41_SUCCESSOR_SCIENTIFIC_CAMPAIGN_V1_DESIGN_AUDIT_R1",
+  "partition_proposal": {
+    "CANDIDATE_LOCK": "after Discovery, at most one positive simultaneous LCB",
+    "D0_rule": "first UTC month boundary >=30 days after independent preregistration, source, endpoint and synthetic power acceptance",
+    "INDEPENDENT_LOCK_AUDIT": "before validation, no outcome access",
+    "OPTIONAL_CONFIRMATION_FINAL_HOLDOUT": "separate future Controller authority only",
+    "PLAYBOOK_QUALIFICATION": "at least 6 further months forward shadow/paper evidence",
+    "SUCCESSOR_DISCOVERY": "[D0,D0+24 calendar months) forward",
+    "SUCCESSOR_TRAIN": "[2021-01-01,2022-10-31) historical feature-only",
+    "SUCCESSOR_VALIDATION": "first UTC month boundary >=7 days after accepted lock audit, then 12 months forward",
+    "forward_source_receipt_rule": "pre-D0 source-family/parity closure, then monthly checksum/same-buffer/synchronized membership receipts before scientific use; complete 24-month source window certified before outcome opening"
+  },
+  "primary_architecture": "deterministic",
+  "production_code_changed": false,
+  "protected_outcome_access": false,
+  "protected_partitions_not_accessed": {
+    "final_holdout": true,
+    "h39_protected_outcomes": true,
+    "h40_later_wf_and_confirmation": true,
+    "h41_wf1_validation_scientific_values": true,
+    "successor_discovery_or_validation": true
+  },
+  "recommended_inference_design": "single_step_shared_clock_source_bundle_preserving_non_circular_studentized_joint_max_K_le_12; proposed L=120h B=10000 subject to pre-outcome synthetic coverage/power audit",
+  "regime_proposal": [
+    "volatility_LOW_NORMAL_HIGH",
+    "trend_strength_WEAK_STRONG",
+    "kline_volume_NORMAL_ELEVATED"
+  ],
+  "repository": "EXASHXE/btc-quant-agent-public",
+  "schema_id": "V0.5.1_H41_SUCCESSOR_SCIENTIFIC_CAMPAIGN_V1_DESIGN_R1",
+  "source_classes_audited": [
+    {
+      "earliest_authoritative_timestamp_utc": "2021-01-01T00:00:00Z",
+      "evidence_paths": [
+        "evidence/v0.5/h41/V0.5.1_H41_BTC_ETH_CANONICAL_SOURCE_AUTHORITY_R1.json",
+        "evidence/v0.5/h41/V0.5.1_H41_SOURCE_AUTHORITY_CONTROLLER_ACCEPTANCE.json"
+      ],
+      "granularity": "1h UTC",
+      "historical_reconstruction_causal": true,
+      "id": "NATIVE_1H_OHLC",
+      "latest_authoritative_timestamp_utc": "2023-04-30T23:00:00Z",
+      "missing_gap_characteristics": "20400 rows/asset; zero gaps, duplicates, invalid OHLC; synchronized",
+      "partition_availability": {
+        "discovery": false,
+        "train": true,
+        "validation": false
+      },
+      "pit_semantics": "exchange bucket finalizes at t+1h; true local receipt latency unavailable",
+      "previous_exposure": "H40/H41 TRAIN and WF1_CALIBRATION exposed; WF1_VALIDATION scientific values sealed",
+      "provenance_checksum_authority": "56 official checksum-bound monthly archives; 14-field canonical projection; joint root 05145d35a5cbd060ce3e9d7932b3757f901e396fa545ca624146dfbfa0cdb8b8",
+      "scientific_role": "PRIMARY_ALLOWED",
+      "source_name": "Binance Public Data USD-M perpetual native economic klines",
+      "symbol_coverage": [
+        "BTCUSDT",
+        "ETHUSDT"
+      ]
+    },
+    {
+      "earliest_authoritative_timestamp_utc": "2021-01-01T00:00:00Z",
+      "evidence_paths": [
+        "evidence/v0.5/h41/V0.5.1_H41_BTC_ETH_CANONICAL_SOURCE_AUTHORITY_R1.json"
+      ],
+      "granularity": "1h UTC",
+      "historical_reconstruction_causal": true,
+      "id": "NATIVE_1H_VOLUME",
+      "latest_authoritative_timestamp_utc": "2023-04-30T23:00:00Z",
+      "missing_gap_characteristics": "same zero-gap source; nonnegative finite volume/trade integrity",
+      "partition_availability": {
+        "discovery": false,
+        "train": true,
+        "validation": false
+      },
+      "pit_semantics": "completed 1h bucket only; not signed aggTrade flow",
+      "previous_exposure": "same historical exposure as kline OHLC",
+      "provenance_checksum_authority": "same canonical 14-field BTC/ETH projection and checksums",
+      "scientific_role": "PRIMARY_ALLOWED",
+      "source_name": "Canonical kline volume/trades/taker-buy volume",
+      "symbol_coverage": [
+        "BTCUSDT",
+        "ETHUSDT"
+      ]
+    },
+    {
+      "earliest_authoritative_timestamp_utc": null,
+      "evidence_paths": [
+        "src/btc_quant_agent/data/binance_market_archive.py"
+      ],
+      "granularity": "1m template",
+      "historical_reconstruction_causal": null,
+      "id": "MARK_INDEX_PREMIUM",
+      "latest_authoritative_timestamp_utc": null,
+      "missing_gap_characteristics": "complete paired coverage/gap inventory unverified",
+      "partition_availability": {
+        "discovery": false,
+        "train": false,
+        "validation": false
+      },
+      "pit_semantics": "archive bucket may be causal after close; local receipt unproven",
+      "previous_exposure": "engineering feature code; no formal H41 source promotion",
+      "provenance_checksum_authority": "URL templates only; no accepted paired checksum/projection root",
+      "scientific_role": "UNAVAILABLE",
+      "source_name": "Official USD-M mark/index/premium 1m archive templates",
+      "symbol_coverage": [],
+      "template_symbols": [
+        "BTCUSDT",
+        "ETHUSDT"
+      ],
+      "verified_symbol_coverage_status": "UNVERIFIED_BTC_ETH_PAIR"
+    },
+    {
+      "earliest_authoritative_timestamp_utc": null,
+      "evidence_paths": [
+        "src/btc_quant_agent/data/binance_market_archive.py",
+        "src/btc_quant_agent/economic/funding_evidence.py"
+      ],
+      "granularity": "settlement events, template",
+      "historical_reconstruction_causal": null,
+      "id": "FUNDING",
+      "latest_authoritative_timestamp_utc": null,
+      "missing_gap_characteristics": "paired event coverage and revisions unverified",
+      "partition_availability": {
+        "discovery": false,
+        "train": false,
+        "validation": false
+      },
+      "pit_semantics": "settlement known only after timestamp/availability; no accepted successor lag rule",
+      "previous_exposure": "B-line funding engineering; no A-line source authority",
+      "provenance_checksum_authority": "generic parser and URL template are not accepted dataset identity",
+      "scientific_role": "UNAVAILABLE",
+      "source_name": "Official USD-M funding-rate archive template / funding evidence parser",
+      "symbol_coverage": [],
+      "template_symbols": [
+        "BTCUSDT",
+        "ETHUSDT"
+      ],
+      "verified_symbol_coverage_status": "UNVERIFIED_BTC_ETH_PAIR"
+    },
+    {
+      "earliest_authoritative_timestamp_utc": null,
+      "evidence_paths": [
+        "deliverables/v0.3.17/DERIVATIVES_V0316_SUCCESSOR_STATUS.json",
+        "src/btc_quant_agent/data/derivatives.py"
+      ],
+      "granularity": "forward scheduled snapshot; historical interval unverified",
+      "historical_reconstruction_causal": null,
+      "id": "OI",
+      "latest_authoritative_timestamp_utc": null,
+      "missing_gap_characteristics": "v0.3.17 forward epoch accumulating; 0.964 field availability in cited snapshot",
+      "partition_availability": {
+        "discovery": false,
+        "train": false,
+        "validation": false
+      },
+      "pit_semantics": "observed_at and field timestamps with as-of/staleness checks; historical publication lag unknown",
+      "previous_exposure": "forward derivatives campaign since 2026-09-01T09:30Z",
+      "provenance_checksum_authority": "generic CSV/snapshot store; no accepted BTC/ETH historical authority",
+      "scientific_role": "FORWARD_ONLY",
+      "source_name": "Open interest level/change snapshots",
+      "symbol_coverage": [
+        "BTCUSDT"
+      ]
+    },
+    {
+      "earliest_authoritative_timestamp_utc": null,
+      "evidence_paths": [
+        "deliverables/v0.3.17/DERIVATIVES_V0316_SUCCESSOR_STATUS.json",
+        "src/btc_quant_agent/data/derivatives.py"
+      ],
+      "granularity": "forward scheduled snapshot; historical interval unverified",
+      "historical_reconstruction_causal": null,
+      "id": "LONG_SHORT_RATIO",
+      "latest_authoritative_timestamp_utc": null,
+      "missing_gap_characteristics": "v0.3.17 forward field coverage 0.964 in cited snapshot",
+      "partition_availability": {
+        "discovery": false,
+        "train": false,
+        "validation": false
+      },
+      "pit_semantics": "field timestamp staleness check exists; exchange publication lag not closed",
+      "previous_exposure": "forward derivatives campaign",
+      "provenance_checksum_authority": "no accepted paired historical source root",
+      "scientific_role": "FORWARD_ONLY",
+      "source_name": "Long/short account ratio snapshots",
+      "symbol_coverage": [
+        "BTCUSDT"
+      ]
+    },
+    {
+      "earliest_authoritative_timestamp_utc": null,
+      "evidence_paths": [
+        "src/btc_quant_agent/data/binance_market_archive.py"
+      ],
+      "granularity": "event-time trade archive template",
+      "historical_reconstruction_causal": null,
+      "id": "PERP_AGGTRADE_ARCHIVE",
+      "latest_authoritative_timestamp_utc": null,
+      "missing_gap_characteristics": "paired historical archive set and gap inventory unverified",
+      "partition_availability": {
+        "discovery": false,
+        "train": false,
+        "validation": false
+      },
+      "pit_semantics": "bucket only after end; true historical local receive time unknown",
+      "previous_exposure": "BTC forward microstructure exposure; no historical formal closure",
+      "provenance_checksum_authority": "archive parser/template exists; no accepted checksum set",
+      "scientific_role": "UNAVAILABLE",
+      "source_name": "Official USD-M perp aggTrades archive",
+      "symbol_coverage": [],
+      "template_symbols": [
+        "BTCUSDT",
+        "ETHUSDT"
+      ],
+      "verified_symbol_coverage_status": "UNVERIFIED_BTC_ETH_PAIR"
+    },
+    {
+      "earliest_authoritative_timestamp_utc": null,
+      "evidence_paths": [
+        "deliverables/v0.3.22/MICROSTRUCTURE_DATA_PROVENANCE.json",
+        "deliverables/v0.3.22/H39_FEATURE_DICTIONARY.json"
+      ],
+      "granularity": "event time and local receive time; snapshot interval 2026-08-31 to 2026-09-04",
+      "historical_reconstruction_causal": false,
+      "id": "FORWARD_AGGTRADE_L2",
+      "latest_authoritative_timestamp_utc": null,
+      "missing_gap_characteristics": "five BTC partitions with explicit gaps; ETH absent; not historical",
+      "partition_availability": {
+        "discovery": false,
+        "train": false,
+        "validation": false
+      },
+      "pit_semantics": "receive<=decision and sequence continuity required",
+      "previous_exposure": "H39 and microstructure forward research",
+      "provenance_checksum_authority": "partition SHA-256 provenance; no paired full-window successor authority",
+      "scientific_role": "FORWARD_ONLY",
+      "source_name": "BTC forward aggTrades and L2 depth collector",
+      "symbol_coverage": [
+        "BTCUSDT"
+      ]
+    },
+    {
+      "earliest_authoritative_timestamp_utc": null,
+      "evidence_paths": [
+        "src/btc_quant_agent/data/derivatives.py"
+      ],
+      "granularity": "caller-provided CSV",
+      "historical_reconstruction_causal": null,
+      "id": "HISTORICAL_DERIVATIVE_CSV",
+      "latest_authoritative_timestamp_utc": null,
+      "missing_gap_characteristics": "source completeness unbound",
+      "partition_availability": {
+        "discovery": false,
+        "train": false,
+        "validation": false
+      },
+      "pit_semantics": "backward as-of filtering exists but does not authenticate original publication or bytes",
+      "previous_exposure": "generic research infrastructure only",
+      "provenance_checksum_authority": "no accepted archive/checksum/receipt",
+      "scientific_role": "UNAVAILABLE",
+      "source_name": "Generic historical derivative snapshot store",
+      "symbol_coverage": [
+        "UNBOUND"
+      ]
+    }
+  ],
+  "successor_execution_authorized": false,
+  "support_power_proposal": {
+    "formal_floor_proposed": {
+      "D": 120,
+      "N": 200,
+      "occupied_120h_blocks": 80
+    },
+    "synthetic_power_gate": "one-sided FWER<=0.05 and >=0.80 power for prospectively justified 30bp after-cost effect; otherwise redesign before D0",
+    "toy_not_market_estimate": {
+      "approx_120h_blocks": 146,
+      "assumed_block_sd_bps": [
+        60,
+        100
+      ],
+      "discovery_months": 24,
+      "illustrative_80pct_power_effect_bps": [
+        17,
+        28
+      ]
+    },
+    "train_projected_margin": {
+      "D": 150,
+      "N": 300
+    }
+  },
+  "unresolved_blockers": [
+    "future_BTC_ETH_native_1h_source_extension_and_receive_time_parity",
+    "exact_candidate_formulas_thresholds_support_and_alias_audit",
+    "numeric_primary_cost_and_funding_reserve",
+    "synthetic_joint_null_and_power_gate",
+    "Bline_H39_forward_exposure_quarantine",
+    "new_implementation_exact_SHA_and_independent_validation"
+  ]
+}
