@@ -1,0 +1,570 @@
+{
+  "accepted_implementation_reference": "8ecff4ec4b25bf73a35309689fd3ecfacc0d3399",
+  "audit_areas": {
+    "A_prospective": "NO_DEMONSTRATED_RESCUE; EXPOSURE_AND_FORMULAS_OPEN",
+    "B_source_feasibility": "PRICE_VOLUME_CLASSES_SUPPORTED; NO_FUTURE_AUTHORITY",
+    "C_source_transition": "SOURCE_CLOSURE_REQUIRED",
+    "D_roster": "REDUCE_TO_DISTINCT_MECHANISMS; EXACT_LEDGER_OPEN",
+    "E_regime_multiplicity": "ONE_FIXED_COMPOSITE_GATE_PER_COORDINATE",
+    "F_entry": "DELAY_IS_SCIENTIFIC_CHOICE; RECEIPT_DEADLINE_REQUIRED",
+    "G_cost": "UNRESOLVED_PRIMARY_RESERVE_CONTRACT",
+    "H_inference": "SINGLE_STEP_APPROPRIATE; NEW_VALIDATION_REQUIRED",
+    "I_support": "ROUND_FLOORS_NOT_ACCEPTED",
+    "J_effect": "30BP_PLANNING_ONLY_UNTIL_JUSTIFIED",
+    "K_duration": "SHORTEST_VALIDATED_FIXED; SEQUENTIAL_OPTION_EVALUATED",
+    "L_embargo": "REMOVE_UNJUSTIFIED_PADDING; BIND_CAUSAL_AND_DEPENDENCE_RULES",
+    "M_quarantine": "CURRENT_EXPOSURE_AND_CONTINUING_FIREWALL_REQUIRED",
+    "N_lifecycle": "MERGE_MECHANICAL_WORK; PRESERVE_EPISTEMIC_GATES",
+    "O_freeze": "REDESIGN_REQUIRED_BEFORE_FREEZE"
+  },
+  "audit_prompt_blob": "6b8c35c34a294d0b98c5cedb187a01855396a59b",
+  "audit_prompt_docs_snapshot": "0200aa29093728e91b3e6b71ab31919f594d01d8",
+  "audit_schema_id": "V0.5.1_H41_SUCCESSOR_SCIENTIFIC_CAMPAIGN_V1_ASTRA_DESIGN_AUDIT_R1",
+  "audit_type": "INDEPENDENT_READ_ONLY_SCIENTIFIC_DESIGN_AUDIT",
+  "audited_design_commit": "c308f16f4f4e849f217470066cbe80e1b2a9ceb1",
+  "authority_state": {
+    "EXECUTION": "RESEARCH_DISABLED_V1",
+    "H41": "ACCEPTED_TERMINAL_NO_GO",
+    "SUCCESSOR_DESIGN_FROZEN": false,
+    "SUCCESSOR_DISCOVERY_AUTHORIZED": false,
+    "SUCCESSOR_IMPLEMENTATION_AUTHORIZED": false,
+    "SUCCESSOR_SOURCE_AUTHORITY_CLOSED": false,
+    "SUCCESSOR_VALIDATION_AUTHORIZED": false
+  },
+  "design_evidence_blob": "e381b82c2c6816d5c10a121992e82565f64a5101",
+  "design_modified": false,
+  "design_report_blob": "55cb4f8e25ef78362d84c1c7f98e6d59bbbdab75",
+  "finding_ids": [
+    "SCV1-B01",
+    "SCV1-H01",
+    "SCV1-H02",
+    "SCV1-H03",
+    "SCV1-H04",
+    "SCV1-H05",
+    "SCV1-M01",
+    "SCV1-M02",
+    "SCV1-L01"
+  ],
+  "findings": [
+    {
+      "affected_design_report_path": "reviews/v0.5/V0.5.1_H41_SUCCESSOR_SCIENTIFIC_CAMPAIGN_V1_DESIGN_R1.md",
+      "affected_design_report_sections": [
+        "5",
+        "6",
+        "12"
+      ],
+      "another_astra_review_required": true,
+      "finding_id": "SCV1-B01",
+      "minimum_repair": "Define equations and one composite gate per coordinate; freeze structural pruning and full ledger before outcomes.",
+      "scientific_failure_mode": "Unfixed formulas, gates, horizons and cooldown permit scientifically different tests under the same provisional identities.",
+      "severity": "BLOCKER",
+      "status": "OPEN_REQUIRES_DESIGN_REPAIR",
+      "title": "Exact candidate and regime hypotheses remain unresolved"
+    },
+    {
+      "affected_design_report_path": "reviews/v0.5/V0.5.1_H41_SUCCESSOR_SCIENTIFIC_CAMPAIGN_V1_DESIGN_R1.md",
+      "affected_design_report_sections": [
+        "3",
+        "7",
+        "9",
+        "12"
+      ],
+      "another_astra_review_required": true,
+      "finding_id": "SCV1-H01",
+      "minimum_repair": "Separate economic equivalence from observed availability; immutable versions, paired receipt deadline before entry, no retroactive events, independent source closure.",
+      "scientific_failure_mode": "Late receipts or revisions can invalidate decision-time inputs even with valid later archive hashes.",
+      "severity": "HIGH",
+      "status": "OPEN_REQUIRES_DESIGN_REPAIR",
+      "title": "Historical economic parity does not establish forward receipt-time parity"
+    },
+    {
+      "affected_design_report_path": "reviews/v0.5/V0.5.1_H41_SUCCESSOR_SCIENTIFIC_CAMPAIGN_V1_DESIGN_R1.md",
+      "affected_design_report_sections": [
+        "9",
+        "10"
+      ],
+      "another_astra_review_required": true,
+      "finding_id": "SCV1-H02",
+      "minimum_repair": "Define ratio-influence information and economic/planning/MDE distinctions; validate shortest sufficient fixed window and full pipeline power.",
+      "scientific_failure_mode": "Occupied blocks are not effective sample size; round floors and undefined block SD cannot justify 30bp power or multiyear duration.",
+      "severity": "HIGH",
+      "status": "OPEN_REQUIRES_DESIGN_REPAIR",
+      "title": "Support, useful effect, power and duration are not jointly justified"
+    },
+    {
+      "affected_design_report_path": "reviews/v0.5/V0.5.1_H41_SUCCESSOR_SCIENTIFIC_CAMPAIGN_V1_DESIGN_R1.md",
+      "affected_design_report_sections": [
+        "8",
+        "10"
+      ],
+      "another_astra_review_required": true,
+      "finding_id": "SCV1-H03",
+      "minimum_repair": "Freeze all resampling/support rules; independently validate joint nulls, mixed alternatives and any alpha-spending process.",
+      "scientific_failure_mode": "Regime-conditioned support, new masks and optional looks can alter FWER and coverage.",
+      "severity": "HIGH",
+      "status": "OPEN_REQUIRES_DESIGN_REPAIR",
+      "title": "Historical inference acceptance is not successor or sequential validation"
+    },
+    {
+      "affected_design_report_path": "reviews/v0.5/V0.5.1_H41_SUCCESSOR_SCIENTIFIC_CAMPAIGN_V1_DESIGN_R1.md",
+      "affected_design_report_sections": [
+        "7",
+        "12"
+      ],
+      "another_astra_review_required": true,
+      "finding_id": "SCV1-H04",
+      "minimum_repair": "Freeze one evidence-backed numeric cost schedule and reserve interpretation; actual funding claims await authority; no outcome-dependent switching.",
+      "scientific_failure_mode": "Constant, horizon reserve and settlement deductions test different after-cost nulls.",
+      "severity": "HIGH",
+      "status": "OPEN_REQUIRES_DESIGN_REPAIR",
+      "title": "Primary reference cost and funding reserve lack an exact contract"
+    },
+    {
+      "affected_design_report_path": "reviews/v0.5/V0.5.1_H41_SUCCESSOR_SCIENTIFIC_CAMPAIGN_V1_DESIGN_R1.md",
+      "affected_design_report_sections": [
+        "4",
+        "9",
+        "11",
+        "12"
+      ],
+      "another_astra_review_required": true,
+      "finding_id": "SCV1-H05",
+      "minimum_repair": "Reconcile metadata/access ledger, lock roles and decision rights, start after prerequisites, no protected unblind for this audit.",
+      "scientific_failure_mode": "Unlogged ongoing B-line feedback can affect parameters, eligibility, timing or evidence exclusions after D0.",
+      "severity": "HIGH",
+      "status": "OPEN_REQUIRES_DESIGN_REPAIR",
+      "title": "Forward exposure quarantine and continuing change-rights firewall are incomplete"
+    },
+    {
+      "affected_design_report_path": "reviews/v0.5/V0.5.1_H41_SUCCESSOR_SCIENTIFIC_CAMPAIGN_V1_DESIGN_R1.md",
+      "affected_design_report_sections": [
+        "9"
+      ],
+      "another_astra_review_required": false,
+      "finding_id": "SCV1-M01",
+      "minimum_repair": "Bind actual maturity/dependency gap; preserve independent decisions while allowing prespecified blind operational collection in parallel.",
+      "scientific_failure_mode": "Unnecessary delays can lengthen research without adding a distinct evidential safeguard.",
+      "severity": "MEDIUM",
+      "status": "OPEN_REQUIRES_DESIGN_REPAIR",
+      "title": "Calendar padding and serial qualification duration lack an information basis"
+    },
+    {
+      "affected_design_report_path": "reviews/v0.5/V0.5.1_H41_SUCCESSOR_SCIENTIFIC_CAMPAIGN_V1_DESIGN_R1.md",
+      "affected_design_report_sections": [
+        "7"
+      ],
+      "another_astra_review_required": false,
+      "finding_id": "SCV1-M02",
+      "minimum_repair": "Choose delay from source-authorizable timing and mechanism; label 1+h signal-to-exit versus h holding duration; no outcome tuning.",
+      "scientific_failure_mode": "An arbitrary full-hour delay can eliminate the mechanism being tested and does not guarantee timely receipt.",
+      "severity": "MEDIUM",
+      "status": "OPEN_REQUIRES_DESIGN_REPAIR",
+      "title": "One-hour entry delay changes the economic hypothesis"
+    },
+    {
+      "affected_design_report_path": "reviews/v0.5/V0.5.1_H41_SUCCESSOR_SCIENTIFIC_CAMPAIGN_V1_DESIGN_R1.md",
+      "affected_design_report_sections": [
+        "6",
+        "11"
+      ],
+      "another_astra_review_required": false,
+      "finding_id": "SCV1-L01",
+      "minimum_repair": "Use dependence-aware language and distinguish invalid timestamp metadata from a causally delayed event.",
+      "scientific_failure_mode": "Distinct labels are not mathematical orthogonality; a genuine delayed signal is not necessarily leakage.",
+      "severity": "LOW",
+      "status": "OPEN_REQUIRES_DESIGN_REPAIR",
+      "title": "Orthogonal-regime and timestamp-negative-control wording is imprecise"
+    }
+  ],
+  "implementation_branch_modified": false,
+  "input_artifacts": [
+    {
+      "path": "reviews/v0.5/V0.5.1_H41_SUCCESSOR_SCIENTIFIC_CAMPAIGN_V1_DESIGN_R1.md"
+    },
+    {
+      "path": "evidence/v0.5/h41/V0.5.1_H41_SUCCESSOR_SCIENTIFIC_CAMPAIGN_V1_DESIGN_R1.json"
+    },
+    {
+      "path": "reviews/v0.5/V0.5.1_H41_SUCCESSOR_SCIENTIFIC_CAMPAIGN_V1_DESIGN_R1_CONTROLLER_ACCEPTANCE.md"
+    },
+    {
+      "path": "evidence/v0.5/h41/V0.5.1_H41_SUCCESSOR_SCIENTIFIC_CAMPAIGN_V1_DESIGN_R1_CONTROLLER_ACCEPTANCE.json"
+    },
+    {
+      "path": "evidence/v0.5/controller/V0.5.1_CONTROLLER_OPERATING_CONTRACT_R1.json"
+    },
+    {
+      "path": "docs/handover/V0.5.1_CONTROLLER_ROLE_HANDOVER_2026-09-29.md"
+    },
+    {
+      "path": "evidence/v0.5/h41/V0.5.1_H41_FROZEN_PROTOCOL_AUTHORITY_R1.json"
+    },
+    {
+      "path": "evidence/v0.5/h41/V0.5.1_H41_BTC_ETH_CANONICAL_SOURCE_AUTHORITY_R1.json"
+    },
+    {
+      "path": "evidence/v0.5/h41/V0.5.1_H41_SOURCE_AUTHORITY_CONTROLLER_ACCEPTANCE.json"
+    },
+    {
+      "path": "evidence/v0.5/h41/V0.5.1_H41_EXPLORATORY_NO_GO_CONTROLLER_ADJUDICATION_R1.json"
+    }
+  ],
+  "local_checkout_relation": "PARENT_OF_ACCEPTED_IMPLEMENTATION; EXACT_REF_SOURCE_USED",
+  "local_checkout_sha_observed": "a3235fbc39667ca2a624faebd3cf9ee8a4b442de",
+  "machine_evidence_path": "evidence/v0.5/h41/V0.5.1_H41_SUCCESSOR_SCIENTIFIC_CAMPAIGN_V1_ASTRA_DESIGN_AUDIT_R1.json",
+  "next_stage": "CONTROLLER_DESIGN_REPAIR",
+  "planning_calculations": {
+    "assumptions": "Toy independent equal-information 120h block influence SD, not market estimates; no source reads",
+    "fixed12_normal_critical": 2.638257273476751,
+    "months_table": [
+      {
+        "blocks_120h_nominal": 36.525,
+        "days_approx": 182.625,
+        "floor80_feasible": false,
+        "mde_80pct_bps_c2_5": [
+          33.17518550447827,
+          55.291975840797114
+        ],
+        "mde_80pct_bps_fixed12_bonf": [
+          34.54778592036395,
+          57.579643200606576
+        ],
+        "months": 6,
+        "power_delta30_c2_5": [
+          0.6990937511045658,
+          0.24606578187571554
+        ]
+      },
+      {
+        "blocks_120h_nominal": 54.7875,
+        "days_approx": 273.9375,
+        "floor80_feasible": false,
+        "mde_80pct_bps_c2_5": [
+          27.087425536049565,
+          45.145709226749275
+        ],
+        "mde_80pct_bps_fixed12_bonf": [
+          28.208149082600197,
+          47.01358180433366
+        ],
+        "months": 9,
+        "power_delta30_c2_5": [
+          0.8851106159462481,
+          0.3899525768663761
+        ]
+      },
+      {
+        "blocks_120h_nominal": 73.05,
+        "days_approx": 365.25,
+        "floor80_feasible": false,
+        "mde_80pct_bps_c2_5": [
+          23.45839863733824,
+          39.0973310622304
+        ],
+        "mde_80pct_bps_fixed12_bonf": [
+          24.428973699270482,
+          40.71495616545079
+        ],
+        "months": 12,
+        "power_delta30_c2_5": [
+          0.9619241266398553,
+          0.5255462516617536
+        ]
+      },
+      {
+        "blocks_120h_nominal": 109.575,
+        "days_approx": 547.875,
+        "floor80_feasible": true,
+        "mde_80pct_bps_c2_5": [
+          19.1537022814263,
+          31.9228371357105
+        ],
+        "mde_80pct_bps_fixed12_bonf": [
+          19.94617350102769,
+          33.243622501712814
+        ],
+        "months": 18,
+        "power_delta30_c2_5": [
+          0.9968705845436372,
+          0.7390249692890924
+        ]
+      },
+      {
+        "blocks_120h_nominal": 146.1,
+        "days_approx": 730.5,
+        "floor80_feasible": true,
+        "mde_80pct_bps_c2_5": [
+          16.587592752239136,
+          27.645987920398557
+        ],
+        "mde_80pct_bps_fixed12_bonf": [
+          17.273892960181975,
+          28.789821600303288
+        ],
+        "months": 24,
+        "power_delta30_c2_5": [
+          0.9998026419524884,
+          0.869950038962022
+        ]
+      }
+    ],
+    "n80_required": [
+      49,
+      135
+    ],
+    "sequential_example": [
+      {
+        "months": 6,
+        "normal_bonf_critical": 3.764823649533927,
+        "per_look_family_alpha": 0.001,
+        "power_delta30_at_look": [
+          0.22873241699480884,
+          0.025484174925063496
+        ]
+      },
+      {
+        "months": 9,
+        "normal_bonf_critical": 3.5879146722879613,
+        "per_look_family_alpha": 0.002,
+        "power_delta30_at_look": [
+          0.5449903771432574,
+          0.0857566681921999
+        ]
+      },
+      {
+        "months": 12,
+        "normal_bonf_critical": 3.5879146722879613,
+        "per_look_family_alpha": 0.002,
+        "power_delta30_at_look": [
+          0.7535015284605793,
+          0.15295639759062224
+        ]
+      },
+      {
+        "months": 18,
+        "normal_bonf_critical": 3.3414789560386255,
+        "per_look_family_alpha": 0.005,
+        "power_delta30_at_look": [
+          0.9707828071984959,
+          0.420295875001988
+        ]
+      },
+      {
+        "months": 24,
+        "normal_bonf_critical": 2.7130518884727204,
+        "per_look_family_alpha": 0.04,
+        "power_delta30_at_look": [
+          0.9995666110787791,
+          0.8194058399362517
+        ]
+      }
+    ],
+    "sum_alpha": 0.05,
+    "validation_n80_required": [
+      25,
+      69
+    ],
+    "validation_normal_critical": 1.6448536269514715,
+    "validation_table": [
+      {
+        "blocks": 18.2625,
+        "mde80_single": [
+          34.91043083751,
+          58.184051395850005
+        ],
+        "months": 3,
+        "power_delta30_single": [
+          0.688597448569931,
+          0.3583718283525167
+        ]
+      },
+      {
+        "blocks": 36.525,
+        "mde80_single": [
+          24.685402379347284,
+          41.142337298912146
+        ],
+        "months": 6,
+        "power_delta30_single": [
+          0.9157349401327672,
+          0.566796417424359
+        ]
+      },
+      {
+        "blocks": 54.7875,
+        "mde80_single": [
+          20.15554664156221,
+          33.59257773593702
+        ],
+        "months": 9,
+        "power_delta30_single": [
+          0.9801123711834195,
+          0.7175922749954349
+        ]
+      },
+      {
+        "blocks": 73.05,
+        "mde80_single": [
+          17.455215418755,
+          29.092025697925003
+        ],
+        "months": 12,
+        "power_delta30_single": [
+          0.995713281602193,
+          0.8210110918406501
+        ]
+      }
+    ]
+  },
+  "production_code_change": "NO",
+  "prospective_design_assessment": {
+    "complete_parameter_motivation_verified": false,
+    "demonstrated_favorable_outcome_selected_choice": false,
+    "historical_h41_terminal_state": "ACCEPTED_TERMINAL_NO_GO",
+    "status": "NO_DEMONSTRATED_RESCUE; EXACT_FORMULAS_AND_EXPOSURE_CLOSURE_PENDING"
+  },
+  "protected_outcome_access": "NO",
+  "recommended_discovery_duration": {
+    "candidate_months": [
+      6,
+      9,
+      12,
+      18,
+      24
+    ],
+    "optional_sequential_design": {
+      "look_months": [
+        6,
+        9,
+        12,
+        18,
+        24
+      ],
+      "max_months": 24,
+      "per_look_family_alpha": [
+        0.001,
+        0.002,
+        0.002,
+        0.005,
+        0.04
+      ],
+      "required": "Strong per-look family validity including support screen; no recycling; full stopping-time and expected-latency validation",
+      "status": "ILLUSTRATIVE_NOT_VALIDATED_NOT_AUTHORIZED",
+      "total_alpha": 0.05
+    },
+    "rule": "Select earliest window meeting independently justified full-pipeline support, FWER and power envelope; freeze before D0. If none qualifies, redesign or stop.",
+    "toy_higher_noise_shortest_months": 24,
+    "toy_lower_noise_shortest_months": 9,
+    "type": "PRE_D0_SHORTEST_VALIDATED_FIXED_WINDOW",
+    "unconditional_numerical_duration_established": false
+  },
+  "recommended_formal_candidate_budget": {
+    "ceiling_if_distinct_hypotheses_and_support_justified": 12,
+    "frozen": false,
+    "initial": 8,
+    "initial_pairs": [
+      "TREND",
+      "REVERT",
+      "VOLUME",
+      "ONE_OF_LEAD_OR_RELATIVE_CHOSEN_BY_MECHANISM_BEFORE_OUTCOMES"
+    ],
+    "reduce_on_prespecified_structural_alias_review": true,
+    "six_or_fewer_permitted": true
+  },
+  "recommended_inference_family": {
+    "L120_B10000_status": "STARTING_PROPOSAL_ONLY",
+    "hierarchical_gatekeeping_default": false,
+    "method": "SINGLE_STEP_SHARED_CLOCK_SOURCE_BUNDLE_PRESERVING_STUDENTIZED_JOINT_MAX",
+    "sequential_controls_required_if_multiple_looks": true,
+    "stepdown_default": false,
+    "successor_specific_validation_required": true
+  },
+  "recommended_support_policy": {
+    "N200_D120_80blocks_accepted_as_authority": false,
+    "block_origin_and_partial_block_rule_required": true,
+    "power_effect_30bp_frozen": false,
+    "screen_must_be_included_in_error_validation": true,
+    "summary": "Outcome-free fixed mask plus method-specific validated adequacy; preserve all ledger slots; no unjustified universal 80-block floor.",
+    "support_concentration_not_effective_independence": true
+  },
+  "recommended_validation_duration": {
+    "candidate_comparison_months": [
+      3,
+      6,
+      9,
+      12
+    ],
+    "optional_per_look_alpha": [
+      0.005,
+      0.045
+    ],
+    "optional_sequential_look_months": [
+      6,
+      12
+    ],
+    "toy_higher_noise_shortest_months": 12,
+    "toy_lower_noise_shortest_months": 6,
+    "type": "SINGLE_LOCKED_CANDIDATE_SHORTEST_PREVALIDATED_WINDOW",
+    "unconditional_numerical_duration_established": false
+  },
+  "redesign_required_fields": [
+    "candidate_equations_and_regime_mapping",
+    "structural_alias_pruning_and_cooldown",
+    "forward_availability_deadline_and_revision_contract",
+    "primary_cost_and_funding_reserve",
+    "support_and_information_model",
+    "economically_useful_effect_and_planning_envelope",
+    "duration_and_optional_sequential_method",
+    "exact_inference_and_synthetic_validation",
+    "exposure_quarantine_and_change_rights",
+    "D0_embargo_and_qualification_lifecycle"
+  ],
+  "report_path": "reviews/v0.5/astra-h41-successor-design/V0.5.1_H41_SUCCESSOR_SCIENTIFIC_CAMPAIGN_V1_ASTRA_DESIGN_AUDIT_R1.md",
+  "report_sha256": "99dc426a43f259578964468eb2bc8e8bb21a3041b1cd6714e8af23b6b06a4054",
+  "repository": "EXASHXE/btc-quant-agent-public",
+  "severity_counts": {
+    "BLOCKER": 1,
+    "HIGH": 5,
+    "LOW": 1,
+    "MEDIUM": 2
+  },
+  "source_closure_requirement": {
+    "before_successor_production_scientific_implementation": true,
+    "classification": "SOURCE_CLOSURE_REQUIRED",
+    "data_source_blocked": false,
+    "future_month_bytes_cannot_be_precommitted": true,
+    "historical_local_receive_time_proven": false,
+    "limited_outcome_free_source_engineering_requires_separate_authorization": true,
+    "minimum_pre_d0": [
+      "historical_economic_field_and_bucket_equivalence",
+      "paired_forward_receive_and_processing_timestamps",
+      "immutable_as_observed_versions_and_revisions",
+      "entry_deadline_and_no_retroactive_event_creation",
+      "observed_operational_prefix_meeting_frozen_acceptance_tests",
+      "source_root_and_membership_certification_rule",
+      "outcome_missingness_and_protected_storage_contract"
+    ],
+    "required": true
+  },
+  "validation_evidence": {
+    "checks_performed": [
+      "read_only_git_provenance",
+      "exact_ref_GitHub_blob_reads",
+      "canonical_JSON_hash_reconstruction",
+      "bounded_authority_and_source_code_inspection",
+      "metadata_only_exposure_review",
+      "standard_library_analytic_power_duration_calculations",
+      "report_and_machine_structural_validation"
+    ],
+    "frozen_h41_semantic_root": "f784ce4cfe7ba4d1d5d30582e59ab4811aa7b1e8aed79b00a5f5e0f200c26917",
+    "frozen_h41_six_children_and_root_recomputed": true,
+    "historical_source_receipt_file_sha256": "04cc098ca873ba985adc75f27d08941eb877afce8db26174a57b020a73da217d",
+    "historical_source_root": "05145d35a5cbd060ce3e9d7932b3757f901e396fa545ca624146dfbfa0cdb8b8",
+    "market_outcome_statistics_computed": false,
+    "new_monte_carlo_validation_run": false,
+    "production_tests_run": false,
+    "real_market_rows_read": false,
+    "target_git_blobs_recomputed": true
+  },
+  "verdict": "REDESIGN_REQUIRED_BEFORE_FREEZE"
+}
