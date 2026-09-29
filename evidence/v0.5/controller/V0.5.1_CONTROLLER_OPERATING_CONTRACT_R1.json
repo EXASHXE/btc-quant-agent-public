@@ -5,7 +5,6 @@
   "authority_doc": "docs/handover/V0.5.1_CONTROLLER_ROLE_HANDOVER_2026-09-29.md",
   "current_state": {
     "docs_branch": "v0.5-refactor-docs",
-    "docs_sha": "00c6507dd4272ad7687e9b2e598c7110ffdfc373",
     "implementation_branch": "v0.5-refactor",
     "accepted_implementation_sha": "8ecff4ec4b25bf73a35309689fd3ecfacc0d3399",
     "tactical_branch": "feature/tactical-policy-r2",
@@ -15,7 +14,9 @@
     "h41_discovery_executed": false,
     "h41_real_discovery_authorized": "YES_WF1_CALIBRATION_ONLY",
     "h41_wf1_validation_authorized": "NO",
-    "execution_policy": "RESEARCH_DISABLED_V1"
+    "execution_policy": "RESEARCH_DISABLED_V1",
+    "publication_parent_docs_sha": "00c6507dd4272ad7687e9b2e598c7110ffdfc373",
+    "docs_head_rule": "VERIFY_LIVE_REMOTE_HEAD_DO_NOT_TRUST_STATIC_HANDOVER"
   },
   "mandatory_reply_contract": {
     "every_substantive_project_reply_has_stage_progress": true,
