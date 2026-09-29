@@ -1,11 +1,11 @@
 {
-  "contract": "V0.5.1_B2A_R1_OUTCOME_HORIZON_AND_ATTRIBUTION_SEAL",
-  "status": "TACTICAL_POLICY_R2_B2A_R1_OUTCOME_AUTHORITY_READY_FOR_CONTROLLER",
-  "timestamp": "2026-09-29T17:28:00+08:00",
+  "contract": "V0.5.1_B2A_R2_EXIT_BOUNDARY_FUNDING_CAUSALITY_SEAL",
+  "status": "TACTICAL_POLICY_R2_B2A_R2_DIRECTIONAL_OUTCOME_AUTHORITY_READY_FOR_CONTROLLER",
+  "timestamp": "2026-09-29T19:35:00+08:00",
   "scientific_authority_mainline_sha": "407dabc415ae8cae4210250e992941c8b9b25464",
   "parent_accepted_b1_authority_sha": "f5b48f166c058cac9cec40d0894e96b1480fcb17",
-  "previous_b2a_implementation_sha": "a3513ff47684403acfdf7c5762ea37c85757985b",
-  "implementation_commit_sha": "16db7108b41a48e653eaaef7e1cb774a6c317185",
+  "previous_b2a_implementation_sha": "16db7108b41a48e653eaaef7e1cb774a6c317185",
+  "implementation_commit_sha": "79c8b8265001ff2f741ae0bc81fa30a08e698822",
   "branch": "feature/tactical-policy-r2",
   "docs_branch": "v0.5-refactor-docs",
   "versions": {
@@ -32,7 +32,10 @@
     "additive_shadow_record_columns": [
       "fill_interval_start_ms",
       "fill_interval_end_ms",
-      "fill_time_resolution"
+      "fill_time_resolution",
+      "exit_interval_start_ms",
+      "exit_interval_end_ms",
+      "exit_time_resolution"
     ],
     "additive_evaluation_columns": [
       "evaluation_horizon_bars"
@@ -75,8 +78,8 @@
     "provider": "Binance Public Data",
     "venue": "Binance Futures USD-M",
     "endpoint": "/fapi/v1/fundingRate",
-    "ambiguity_rule": "fill_interval_start_ms <= funding_time_ms <= fill_interval_end_ms -> AMBIGUOUS_FILL_BOUNDARY",
-    "applicable_settlement_rule": "funding_time_ms > fill_interval_end_ms and funding_time_ms <= exit_time_ms",
+    "ambiguity_rule": "fill_interval_start_ms <= funding_time_ms <= fill_interval_end_ms -> AMBIGUOUS_FILL_BOUNDARY; exit_interval_start_ms <= funding_time_ms <= exit_interval_end_ms -> AMBIGUOUS_EXIT_BOUNDARY",
+    "applicable_settlement_rule": "funding_time_ms > fill_interval_end_ms and funding_time_ms < exit_interval_start_ms",
     "sign_convention": "LONG pays positive rate (negative PnL); SHORT receives positive rate (positive PnL)"
   },
   "attribution_crosscheck": {
@@ -121,13 +124,13 @@
     "whitespace_check": "PASSED",
     "ruff_check": "PASSED",
     "mypy": "PASSED",
-    "b2a_r1_focused_tests_passed": 20,
+    "b2a_r2_focused_tests_passed": 24,
     "b1_tests_passed": 31,
     "b0_tests_passed": 23,
     "market_watch_tests_passed": 137,
-    "focused_total_passed": 211,
-    "pytest_total": 1957,
-    "pytest_passed": 1955,
+    "focused_total_passed": 215,
+    "pytest_total": 1961,
+    "pytest_passed": 1959,
     "pytest_skipped": 2,
     "pytest_failed": 0
   },
