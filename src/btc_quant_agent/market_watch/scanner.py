@@ -17,6 +17,7 @@ from .config import (
 from .context import apply_benchmark_context_gate, evaluate_benchmark_context
 from .derivatives import apply_derivatives_action_gate, evaluate_derivatives_regime
 from .domain import (
+    DIRECTIONAL_OUTCOME_PROFILE_VERSION,
     HEURISTIC_RULE_QUALITY_BAND_VERSION,
     MARKET_SNAPSHOT_SCHEMA_VERSION,
     MARKET_WATCH_EVIDENCE_VERSION,
@@ -67,6 +68,7 @@ from .ranking import (
     check_fatal_vetoes,
     compute_relative_performances,
 )
+from .shadow_evidence import get_playbook_evaluation_profile
 from .snapshot import (
     ReturnAvailability,
     compute_return_observation,
@@ -928,6 +930,9 @@ class MarketWatchScanner:
                 sig_time = a.snapshot.decision_time_ms
                 entry_win_end = sig_time + (entry_bars * 15 * 60 * 1000)
 
+                pb_str = str(a.selected_playbook or a.directional.setup)
+                prof = get_playbook_evaluation_profile(pb_str)
+
                 self.store.record_shadow_observation(
                     timestamp_ms=sig_time,
                     symbol=a.symbol,
@@ -957,6 +962,8 @@ class MarketWatchScanner:
                     execution_path_model=ShadowExecutionPathModel.PARTIAL_FIRST_BAR_1M_THEN_15M.value,
                     semantic_identity=a.semantic_identity,
                     feature_evidence_id=a.feature_evidence_id,
+                    evaluation_profile_version=DIRECTIONAL_OUTCOME_PROFILE_VERSION,
+                    evaluation_horizon_ms=prof["horizon_ms"],
                 )
                 self.store.set_last_shadow_signal_ids(a.symbol, triggered_id=sig_id)
                 self.store.set_last_shadow_recorded_state(a.symbol, "TRIGGERED")

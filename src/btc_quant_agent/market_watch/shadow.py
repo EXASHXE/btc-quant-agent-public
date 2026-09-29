@@ -9,6 +9,7 @@ from ..data.binance import BinancePublicClient
 from ..domain import Candle
 from .config import MarketWatchConfig
 from .domain import (
+    DIRECTIONAL_OUTCOME_PROFILE_VERSION,
     MARKET_WATCH_EVIDENCE_VERSION,
     DirectionalDecision,
     ShadowExecutionPathModel,
@@ -17,6 +18,11 @@ from .domain import (
     ShadowPathResolution,
     SymbolAssessment,
     validate_time_coverage,
+)
+from .shadow_evidence import (
+    TacticalShadowEvaluationV2,
+    build_tactical_shadow_evaluation_v2,
+    get_playbook_evaluation_profile,
 )
 from .state import MarketWatchStateStore, is_legacy_shadow_record
 
@@ -333,6 +339,8 @@ class ShadowEvaluationManager:
         evaluation_horizon_bars: int = 16,
         observation_type: str = "ACTIONABLE_TRIGGERED",
         entry_window_bars: int = 4,
+        evaluation_profile_version: str | None = None,
+        evaluation_horizon_ms: int | None = None,
     ) -> int:
         d = assessment.directional
         signal_time_ms = assessment.snapshot.decision_time_ms
@@ -348,6 +356,13 @@ class ShadowEvaluationManager:
             if d.decision == DirectionalDecision.LONG
             else (entry_low if d.decision == DirectionalDecision.SHORT else assessment.snapshot.price.last_price)
         )
+
+        playbook = getattr(assessment, "selected_playbook", None) or str(d.setup)
+        prof = get_playbook_evaluation_profile(playbook)
+        if evaluation_profile_version is None:
+            evaluation_profile_version = DIRECTIONAL_OUTCOME_PROFILE_VERSION
+        if evaluation_horizon_ms is None:
+            evaluation_horizon_ms = prof["horizon_ms"]
 
         return self.store.record_shadow_observation(
             timestamp_ms=signal_time_ms,
@@ -378,7 +393,65 @@ class ShadowEvaluationManager:
             entry_window_bars=entry_window_bars,
             entry_window_end_ms=entry_window_end_ms,
             fill_status=ShadowFillStatus.WAITING_FOR_FILL.value,
+            evaluation_profile_version=evaluation_profile_version,
+            evaluation_horizon_ms=evaluation_horizon_ms,
+            feature_evidence_id=getattr(assessment, "feature_evidence_id", None),
+            semantic_identity=getattr(assessment, "semantic_identity", None),
         )
+
+    def _materialize_and_save_shadow_evaluation(
+        self,
+        rec_id: int,
+        client: BinancePublicClient | None = None,
+        candles_15m: Sequence[Candle] = (),
+    ) -> TacticalShadowEvaluationV2 | None:
+        rec = self.store.get_shadow_record(rec_id)
+        if rec is None:
+            return None
+        feat_ev_id = rec.get("feature_evidence_id")
+        obs_type = rec.get("observation_type")
+        if not feat_ev_id or obs_type != "ACTIONABLE_TRIGGERED":
+            return None
+        feature_evidence = self.store.get_tactical_feature_evidence(feat_ev_id)
+        if feature_evidence is None:
+            logger.warning(
+                "No TacticalFeatureEvidenceV2 found for feature_evidence_id %s on shadow record %d",
+                feat_ev_id,
+                rec_id,
+            )
+            return None
+
+        funding_records: list[dict[str, Any]] | None = None
+        funding_fetch_error = False
+        fill_t = rec.get("fill_time_ms")
+        fill_st = rec.get("fill_status")
+        if fill_st == "FILLED" and fill_t is not None and client is not None and hasattr(client, "funding_rate_history"):
+            exit_t = rec.get("exit_time_ms") or rec.get("evaluation_end_ms") or fill_t
+            try:
+                funding_records = client.funding_rate_history(
+                    symbol=str(rec["symbol"]),
+                    start_time_ms=int(fill_t) - (8 * 3600 * 1000),
+                    end_time_ms=int(exit_t) + (8 * 3600 * 1000),
+                    limit=1000,
+                )
+            except Exception as exc:  # noqa: BLE001
+                logger.warning(
+                    "Failed to fetch funding rate history for shadow record %d: %s",
+                    rec_id,
+                    exc,
+                )
+                funding_fetch_error = True
+
+        evaluation = build_tactical_shadow_evaluation_v2(
+            shadow_record=rec,
+            feature_evidence=feature_evidence,
+            candles_15m=candles_15m,
+            funding_records=funding_records,
+            funding_fetch_error=funding_fetch_error,
+        )
+        self.store.save_shadow_evaluation(evaluation)
+        return evaluation
+
 
     def resolve_pending_observations(
         self,
@@ -729,6 +802,7 @@ class ShadowEvaluationManager:
                             coverage_status="COMPLETE",
                             resolved=1,
                         )
+                        self._materialize_and_save_shadow_evaluation(rec_id, client=client, candles_15m=cand_for_fill)
                         results.append({"id": rec_id, "symbol": symbol, "status": "NO_FILL"})
                         continue
 
@@ -814,6 +888,7 @@ class ShadowEvaluationManager:
                     coverage_status="COMPLETE",
                     resolved=1,
                 )
+                self._materialize_and_save_shadow_evaluation(rec_id, client=client, candles_15m=raw_candles)
                 results.append({"id": rec_id, "symbol": symbol, "status": "RESOLVED", "outcome": fill_bar_outcome})
                 continue
 
@@ -903,6 +978,7 @@ class ShadowEvaluationManager:
                     coverage_status="COMPLETE",
                     resolved=1,
                 )
+                self._materialize_and_save_shadow_evaluation(rec_id, client=client, candles_15m=raw_candles)
                 results.append({"id": rec_id, "symbol": symbol, "status": "RESOLVED", "outcome": outcome})
                 continue
 
@@ -954,6 +1030,7 @@ class ShadowEvaluationManager:
                         coverage_status="COMPLETE",
                         resolved=1,
                     )
+                    self._materialize_and_save_shadow_evaluation(rec_id, client=client, candles_15m=raw_candles)
                     results.append({"id": rec_id, "symbol": symbol, "status": "RESOLVED", "outcome": outcome})
                     continue
 
