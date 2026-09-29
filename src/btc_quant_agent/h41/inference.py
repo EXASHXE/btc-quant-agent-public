@@ -9,8 +9,10 @@ import math
 import numpy as np
 
 from .authority import CANDIDATES
+from .outcomes import H41ProvenanceOutcomeBatch, calibration_context_matrices
+from .provenance import H41ProvenanceEventBatch
 from .science import HOUR_MS, PARTITIONS, EventBatch
-from .testability import H41State, H41TestabilityReceipt, make_testability_receipt
+from .testability import H41State, H41TestabilityReceipt, _receipt_fields, make_testability_receipt
 
 
 def run_joint_bootstrap_studentized(
@@ -138,7 +140,31 @@ def infer_with_testability(
     Z: np.ndarray, A: np.ndarray, receipts: tuple[H41TestabilityReceipt, ...],
     batches: tuple[EventBatch, ...], rng: np.random.Generator,
 ) -> tuple[np.ndarray, np.ndarray, float, np.ndarray]:
-    """Exclude N/D-unsupported coordinates before the accepted R2 statistic."""
+    """Non-authoritative synthetic N/D gate over caller-supplied matrices."""
+    if (any(type(batch) is not EventBatch for batch in batches)
+            or any(type(receipt) is not H41TestabilityReceipt
+                   or receipt.authority_kind != "SYNTHETIC_NON_AUTHORITATIVE"
+                   for receipt in receipts)):
+        raise TypeError("synthetic batches and receipts required by scalar inference helper")
+    return _infer_checked(Z, A, receipts, batches, rng)
+
+
+def infer_context_with_testability(
+    batches: tuple[H41ProvenanceEventBatch, ...],
+    outcomes: tuple[H41ProvenanceOutcomeBatch, ...],
+    rng: np.random.Generator,
+) -> tuple[np.ndarray, np.ndarray, float, np.ndarray]:
+    """Bind source, fit, event and Open-mark lineage before Stage R2 inference."""
+    Z, A = calibration_context_matrices(batches, outcomes)
+    receipts = tuple(make_testability_receipt(batch) for batch in batches)
+    return _infer_checked(Z, A, receipts, batches, rng)
+
+
+def _infer_checked(
+    Z: np.ndarray, A: np.ndarray, receipts: tuple[H41TestabilityReceipt, ...],
+    batches: tuple[EventBatch | H41ProvenanceEventBatch, ...], rng: np.random.Generator,
+) -> tuple[np.ndarray, np.ndarray, float, np.ndarray]:
+    """Shared frozen N/D filter; the caller establishes matrix provenance."""
     if len(receipts) != 20 or len(batches) != 20 or Z.shape != (20, 2184) or A.shape != Z.shape:
         raise ValueError("frozen inference roster or clock mismatch")
     if (not np.all(np.isfinite(Z)) or not np.all(np.isfinite(A))
@@ -148,11 +174,12 @@ def infer_with_testability(
     active = np.zeros(20, dtype=np.float64)
     start, _ = PARTITIONS["WF1_CALIBRATION"]
     for i, (candidate, receipt, batch) in enumerate(zip(CANDIDATES, receipts, batches, strict=True)):
+        H41TestabilityReceipt.assert_intact(receipt)
         if (receipt.candidate_id != candidate.candidate_id
                 or receipt.partition != "WF1_CALIBRATION"
                 or batch.candidate_id != candidate.candidate_id
                 or batch.partition != "WF1_CALIBRATION"
-                or receipt != make_testability_receipt(batch)
+                or _receipt_fields(receipt) != _receipt_fields(make_testability_receipt(batch))
                 or receipt.event_count_N != int(np.sum(A[i]))):
             raise ValueError("testability receipt lineage mismatch")
         clock = {int((event.decision_time_ms - start) // HOUR_MS) for event in batch.events}
