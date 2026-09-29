@@ -1,10 +1,11 @@
 {
-  "contract": "V0.5.1_B2A_DIRECTIONAL_SHADOW_EVALUATION_V2",
-  "status": "B2A_IMPLEMENTED_PENDING_CONTROLLER",
-  "timestamp": "2026-09-29T10:23:00+08:00",
+  "contract": "V0.5.1_B2A_R1_OUTCOME_HORIZON_AND_ATTRIBUTION_SEAL",
+  "status": "TACTICAL_POLICY_R2_B2A_R1_OUTCOME_AUTHORITY_READY_FOR_CONTROLLER",
+  "timestamp": "2026-09-29T17:28:00+08:00",
   "scientific_authority_mainline_sha": "407dabc415ae8cae4210250e992941c8b9b25464",
   "parent_accepted_b1_authority_sha": "f5b48f166c058cac9cec40d0894e96b1480fcb17",
-  "b2a_execution_sha": "a3513ff47684403acfdf7c5762ea37c85757985b",
+  "previous_b2a_implementation_sha": "a3513ff47684403acfdf7c5762ea37c85757985b",
+  "implementation_commit_sha": "16db7108b41a48e653eaaef7e1cb774a6c317185",
   "branch": "feature/tactical-policy-r2",
   "docs_branch": "v0.5-refactor-docs",
   "versions": {
@@ -27,21 +28,77 @@
     "evaluation_natural_key": [
       "shadow_record_id",
       "evaluation_profile_version"
+    ],
+    "additive_shadow_record_columns": [
+      "fill_interval_start_ms",
+      "fill_interval_end_ms",
+      "fill_time_resolution"
+    ],
+    "additive_evaluation_columns": [
+      "evaluation_horizon_bars"
     ]
   },
   "playbook_outcome_horizons": {
-    "TREND_PULLBACK": "12h",
-    "BREAKOUT_RETEST": "12h",
-    "FAILED_BREAKOUT": "8h",
-    "FAILED_BREAKDOWN": "8h",
-    "VOLATILITY_EXPANSION": "8h"
+    "TREND_PULLBACK": {
+      "bars": 48,
+      "hours": 12,
+      "ms": 43200000
+    },
+    "BREAKOUT_RETEST": {
+      "bars": 48,
+      "hours": 12,
+      "ms": 43200000
+    },
+    "FAILED_BREAKOUT": {
+      "bars": 32,
+      "hours": 8,
+      "ms": 28800000
+    },
+    "FAILED_BREAKDOWN": {
+      "bars": 32,
+      "hours": 8,
+      "ms": 28800000
+    },
+    "VOLATILITY_EXPANSION": {
+      "bars": 32,
+      "hours": 8,
+      "ms": 28800000
+    }
+  },
+  "diagnostic_checkpoints": {
+    "checkpoints_hours": [4, 8, 12, 24],
+    "coverage_requirement": "Strict continuous 15m coverage across evaluated interval",
+    "gap_handling": "INSUFFICIENT_COVERAGE with mark_price=None, mark_to_market_gross_r=None, mfe_r=None, mae_r=None",
+    "post_terminal_handling": "Strict exclusion of post-terminal candles; TERMINATED_BEFORE_CHECKPOINT with barrier_status"
   },
   "funding_accounting": {
     "provider": "Binance Public Data",
     "venue": "Binance Futures USD-M",
     "endpoint": "/fapi/v1/fundingRate",
-    "causal_matching_rule": "fill_time_ms < funding_time_ms <= exit_time_ms",
+    "ambiguity_rule": "fill_interval_start_ms <= funding_time_ms <= fill_interval_end_ms -> AMBIGUOUS_FILL_BOUNDARY",
+    "applicable_settlement_rule": "funding_time_ms > fill_interval_end_ms and funding_time_ms <= exit_time_ms",
     "sign_convention": "LONG pays positive rate (negative PnL); SHORT receives positive rate (positive PnL)"
+  },
+  "attribution_crosscheck": {
+    "scale_safe_comparison": "math.isclose(a, b, rel_tol=1e-12, abs_tol=1e-12)",
+    "fields_checked": [
+      "symbol",
+      "signal_time_ms",
+      "feature_evidence_id",
+      "selected_playbook",
+      "direction",
+      "signal_identity",
+      "setup_key",
+      "snapshot_hash",
+      "policy_version",
+      "config_hash",
+      "entry_zone_low",
+      "entry_zone_high",
+      "stop_loss",
+      "tp1",
+      "tp2"
+    ],
+    "mismatch_error": "TacticalShadowAttributionConflictError"
   },
   "cohort_rules": {
     "denominators": {
@@ -61,15 +118,16 @@
     "scientific_fence_h40_diff": "ZERO",
     "execution_fence": "VERIFIED",
     "python_compileall": "PASSED",
+    "whitespace_check": "PASSED",
     "ruff_check": "PASSED",
     "mypy": "PASSED",
-    "b2a_focused_tests_passed": 12,
+    "b2a_r1_focused_tests_passed": 20,
     "b1_tests_passed": 31,
     "b0_tests_passed": 23,
     "market_watch_tests_passed": 137,
-    "focused_total_passed": 203,
-    "pytest_total": 1949,
-    "pytest_passed": 1947,
+    "focused_total_passed": 211,
+    "pytest_total": 1957,
+    "pytest_passed": 1955,
     "pytest_skipped": 2,
     "pytest_failed": 0
   },
