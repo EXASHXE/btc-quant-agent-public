@@ -115,5 +115,47 @@
       "real_h41_discovery",
       "isolated_exact_sha_runtime_validation"
     ]
+  },
+  "new_conversation_bootstrap": {
+    "enabled": true,
+    "preferred_invocation": "接管 quant-agent Controller：按此交接文档恢复上下文，先核验远端最新状态，再继续当前任务。",
+    "short_invocations": [
+      "按交接文档接管并继续",
+      "接管当前 quant-agent 任务",
+      "恢复 quant-agent Controller 上下文并继续",
+      "读取交接文档，核验远端后继续",
+      "按这个 handover 接着做"
+    ],
+    "handover_url_expected": true,
+    "user_history_restatement_required": false,
+    "mandatory_first_actions": [
+      "read_controller_handover",
+      "read_machine_operating_contract",
+      "verify_live_docs_head",
+      "verify_live_implementation_head",
+      "verify_live_tactical_head_if_present",
+      "verify_performance_branch_if_present",
+      "compare_live_state_to_handover",
+      "preserve_frozen_scientific_authority",
+      "report_stage_progress",
+      "continue_from_latest_verified_lifecycle_state"
+    ],
+    "first_reply_required_fields": [
+      "a_line_state",
+      "b_line_state",
+      "performance_parallel_state",
+      "live_remote_delta",
+      "blocker",
+      "next_executable_action"
+    ],
+    "conflict_precedence": [
+      "frozen_machine_scientific_authority",
+      "accepted_exact_sha_implementation_and_validation_evidence",
+      "live_remote_git_state_for_pushed_state",
+      "controller_handover_for_process_and_expected_state",
+      "executor_summaries_as_non_authoritative_hints"
+    ],
+    "do_not_restart_completed_stages": true,
+    "do_not_ask_user_to_repeat_documented_history": true
   }
 }
