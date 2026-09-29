@@ -1,0 +1,270 @@
+"""One-shot H41 calibration Discovery runner; executes accepted library only."""
+
+from __future__ import annotations
+
+import argparse
+import dataclasses
+import hashlib
+import json
+import math
+import os
+import subprocess
+from collections import Counter
+from datetime import UTC, datetime
+from pathlib import Path
+
+import numpy as np
+
+import btc_quant_agent
+from btc_quant_agent.h41.authority import (
+    CANDIDATES,
+    EXPECTED_HASHES,
+    EXPECTED_SOURCE_ROOT,
+    canonical_json,
+    verify_frozen_bindings,
+)
+from btc_quant_agent.h41.inference import infer_context_with_testability
+from btc_quant_agent.h41.outcomes import calibration_context_matrices, materialize_context_outcomes
+from btc_quant_agent.h41.provenance import (
+    _needs_fit,
+    build_context_event_batch,
+    fit_verified_train_context,
+    load_verified_accepted_source_context,
+)
+from btc_quant_agent.h41.science import HOUR_MS, PARTITIONS
+from btc_quant_agent.h41.selection import CandidateInference, rank_positive_lcb
+from btc_quant_agent.h41.testability import make_testability_receipt
+
+
+SHA = "8ecff4ec4b25bf73a35309689fd3ecfacc0d3399"
+PARENT = "a3235fbc39667ca2a624faebd3cf9ee8a4b442de"
+SEED = 20260929
+CHECKOUT = Path("/tmp/h41-discovery-r1-1")
+DOCS = Path("/tmp/h41-validation-r2-docs")
+SOURCE = Path("/tmp/h41_source_r1_20260929")
+ARTIFACTS = Path("/tmp/h41-discovery-r1-1-artifacts")
+PREFLIGHT = ARTIFACTS / "pre_outcome_authority_receipt.json"
+RESULT = ARTIFACTS / "exploratory_result.json"
+
+
+def _git(*args: str) -> str:
+    return subprocess.check_output(["git", *args], cwd=CHECKOUT, text=True).strip()
+
+
+def _atomic_json(path: Path, obj: object) -> None:
+    payload = json.dumps(obj, sort_keys=True, indent=2, ensure_ascii=True,
+                         allow_nan=False).encode() + b"\n"
+    temporary = path.with_suffix(path.suffix + ".tmp")
+    with temporary.open("xb") as handle:
+        handle.write(payload)
+        handle.flush()
+        os.fsync(handle.fileno())
+    os.replace(temporary, path)
+    dir_fd = os.open(path.parent, os.O_DIRECTORY)
+    try:
+        os.fsync(dir_fd)
+    finally:
+        os.close(dir_fd)
+
+
+def _float(value: float) -> float | str:
+    value = float(value)
+    if math.isnan(value):
+        return "NaN"
+    if math.isinf(value):
+        return "+Infinity" if value > 0 else "-Infinity"
+    return value
+
+
+def _verify_checkout() -> dict[str, str]:
+    head = _git("rev-parse", "HEAD")
+    status = _git("status", "--porcelain")
+    actual_parent = _git("rev-parse", "HEAD^")
+    import_path = str(Path(btc_quant_agent.__file__).resolve())
+    if (Path.cwd().resolve() != CHECKOUT or head != SHA or actual_parent != PARENT
+            or status or not Path(import_path).is_relative_to(CHECKOUT)):
+        raise RuntimeError("isolated exact-SHA checkout/import/cleanliness gate failed")
+    return {"cwd": str(Path.cwd().resolve()), "head": head,
+            "parent": actual_parent, "status_porcelain": status,
+            "runtime_import_path": import_path}
+
+
+def _verify_authority() -> dict[str, object]:
+    frozen = json.loads((DOCS / "evidence/v0.5/h41/"
+                         "V0.5.1_H41_FROZEN_PROTOCOL_AUTHORITY_R1.json").read_text())
+    source_acceptance = json.loads((DOCS / "evidence/v0.5/h41/"
+                                    "V0.5.1_H41_SOURCE_AUTHORITY_CONTROLLER_ACCEPTANCE.json").read_text())
+    verify_frozen_bindings()
+    if frozen["authority_hashes"] != EXPECTED_HASHES:
+        raise RuntimeError("docs and implementation authority hashes differ")
+    doc_candidates = frozen["frozen_candidate_universe"]["candidates"]
+    code_candidates = [dataclasses.asdict(candidate) for candidate in CANDIDATES]
+    if doc_candidates != code_candidates:
+        raise RuntimeError("frozen and executable candidate ledgers differ")
+    if len(CANDIDATES) != 20 or Counter(c.family for c in CANDIDATES) != {
+        "D1_TREND": 4, "D2_BREAKOUT": 4,
+        "D3_FAILED_BREAK": 4, "D4_MODIFIER": 8,
+    } or {c.horizon_hours for c in CANDIDATES} != {4, 8, 24}:
+        raise RuntimeError("candidate cardinality/family/horizon mismatch")
+    if source_acceptance["canonical_source_authority"]["joint_source_authority_root"] != EXPECTED_SOURCE_ROOT:
+        raise RuntimeError("accepted source root mismatch")
+    frozen_partition = source_acceptance["partitions"]["WF1_CALIBRATION"]
+    if (frozen_partition["start_utc"] != "2022-11-01T00:00:00Z"
+            or frozen_partition["end_exclusive_utc"] != "2023-01-31T00:00:00Z"
+            or frozen_partition["hours"] != 2184
+            or (PARTITIONS["WF1_CALIBRATION"][1] - PARTITIONS["WF1_CALIBRATION"][0]) // HOUR_MS != 2184
+            or (PARTITIONS["WF1_TRAIN"][1] - PARTITIONS["WF1_TRAIN"][0]) // HOUR_MS != 16032):
+        raise RuntimeError("partition authority mismatch")
+    return {
+        "frozen_semantic_root": EXPECTED_HASHES["frozen_h41_semantic_root_hash"],
+        "candidate_ledger_hash": EXPECTED_HASHES["candidate_ledger_hash"],
+        "source_authority_root": EXPECTED_SOURCE_ROOT,
+        "event_pit_contract_hash": EXPECTED_HASHES["event_pit_contract_hash"],
+        "endpoint_contract_hash": EXPECTED_HASHES["endpoint_contract_hash"],
+        "inference_contract_hash": EXPECTED_HASHES["inference_contract_hash"],
+        "validation_lifecycle_contract_hash": EXPECTED_HASHES["validation_lifecycle_contract_hash"],
+        "candidate_count": 20,
+        "candidate_order_exact": True,
+        "candidate_field_mismatch_count": 0,
+        "missing_candidate_ids": [],
+        "extra_candidate_ids": [],
+        "ordered_candidate_ids": [candidate.candidate_id for candidate in CANDIDATES],
+    }
+
+
+def _preoutcome() -> tuple[dict[str, object], object, tuple[object, ...], tuple[object, ...]]:
+    checkout = _verify_checkout()
+    authority = _verify_authority()
+    context = load_verified_accepted_source_context(SOURCE)
+    context.assert_intact()
+    if (context.authority_kind != "ACCEPTED_CANONICAL_SOURCE"
+            or context.source_authority_root != EXPECTED_SOURCE_ROOT):
+        raise RuntimeError("accepted source context gate failed")
+    fit = fit_verified_train_context(context)
+    fit.assert_intact()
+    batches = tuple(build_context_event_batch(context, candidate, "WF1_CALIBRATION",
+                                             fit if _needs_fit(candidate) else None)
+                    for candidate in CANDIDATES)
+    receipts = tuple(make_testability_receipt(batch) for batch in batches)
+    if any(receipt.authority_kind != "ACCEPTED_CANONICAL_SOURCE"
+           or receipt.source_context_id != context.source_context_id
+           or receipt.source_authority_root != EXPECTED_SOURCE_ROOT
+           for receipt in receipts):
+        raise RuntimeError("testability authority gate failed")
+    receipt = {
+        "schema_id": "H41_DISCOVERY_PRE_OUTCOME_AUTHORITY_RECEIPT_R1_1",
+        "implementation_sha": SHA,
+        "implementation_parent_sha": PARENT,
+        "worktree": checkout,
+        "authority": authority,
+        "wf1_train": {"start_utc": "2021-01-01T00:00:00Z",
+                      "end_exclusive_utc": "2022-10-31T00:00:00Z", "hours": 16032},
+        "wf1_calibration": {"start_utc": "2022-11-01T00:00:00Z",
+                            "end_exclusive_utc": "2023-01-31T00:00:00Z", "hours": 2184,
+                            "status": "HISTORICALLY_INFORMED_EXPLORATORY_DISCOVERY"},
+        "bootstrap_seed": SEED,
+        "source_context_id": context.source_context_id,
+        "source_projection_hashes": {"BTC": context.btc_projection_hash,
+                                     "ETH": context.eth_projection_hash},
+        "timestamp_membership_hash": context.timestamp_membership_hash,
+        "train_fit_seal": {"seal_id": fit.seal_id,
+                           "q80_canonical_hash": fit.q80_canonical_hash,
+                           "fit_status": fit.fit_status,
+                           "d1_candidate_ids": list(fit.d1_candidate_ids)},
+        "event_population_hashes": {batch.candidate_id: batch.event_population_hash
+                                    for batch in batches},
+        "testability_receipts": [
+            {"candidate_id": row.candidate_id, "partition": row.partition,
+             "source_authority_root": row.source_authority_root,
+             "source_context_id": row.source_context_id,
+             "train_fit_seal_id": row.train_fit_seal_id,
+             "event_population_hash": row.event_population_hash,
+             "N": row.event_count_N, "D": row.occupied_calendar_days_D,
+             "state": row.state.value, "authority_kind": row.authority_kind}
+            for row in receipts
+        ],
+        "outcomes_materialized": False,
+    }
+    return receipt, context, batches, receipts
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("phase", choices=("preflight", "execute"))
+    phase = parser.parse_args().phase
+    ARTIFACTS.mkdir(mode=0o700, parents=True, exist_ok=True)
+    receipt, context, batches, receipts = _preoutcome()
+    if phase == "preflight":
+        if PREFLIGHT.exists():
+            raise RuntimeError("pre-outcome receipt already exists; no overwrite")
+        _atomic_json(PREFLIGHT, receipt)
+        print("PRE_OUTCOME_RECEIPT_PERSISTED", hashlib.sha256(PREFLIGHT.read_bytes()).hexdigest())
+        print("SOURCE_CONTEXT_ID", context.source_context_id)
+        print("TRAIN_FIT_SEAL_ID", receipt["train_fit_seal"]["seal_id"])
+        print("CANDIDATE_COUNT", len(batches))
+        return
+    if not PREFLIGHT.is_file() or RESULT.exists():
+        raise RuntimeError("missing pre-outcome receipt or result already exists")
+    persisted = json.loads(PREFLIGHT.read_bytes())
+    if persisted != receipt or persisted["outcomes_materialized"] is not False:
+        raise RuntimeError("pre-outcome receipt does not replay exactly")
+    print("PRE_OUTCOME_RECEIPT_REPLAY_EXACT", flush=True)
+    # Scientific outcome access begins only below this line.
+    outcomes = tuple(materialize_context_outcomes(batch, context) for batch in batches)
+    z, a = calibration_context_matrices(batches, outcomes)
+    rng = np.random.default_rng(SEED)
+    mu, se, c95, lcb = infer_context_with_testability(batches, outcomes, rng)
+    ranking_inputs = tuple(CandidateInference(
+        candidate.candidate_id, float(lcb[i]), receipts[i].event_count_N,
+        float(mu[i]), receipts[i].occupied_calendar_days_D,
+    ) for i, candidate in enumerate(CANDIDATES))
+    ranking = rank_positive_lcb(ranking_inputs)
+    candidate_rows = []
+    for i, (candidate, result) in enumerate(zip(CANDIDATES, outcomes, strict=True)):
+        values = result.outcomes
+        candidate_rows.append({
+            "slot": candidate.slot, "candidate_id": candidate.candidate_id,
+            "N": receipts[i].event_count_N, "D": receipts[i].occupied_calendar_days_D,
+            "testability_state": receipts[i].state.value,
+            "mu_hat_primary_12bp": _float(mu[i]), "se_hat": _float(se[i]),
+            "simultaneous_lcb": _float(lcb[i]),
+            "primary_12bp_event_mean_diagnostic": _float(np.mean([v.primary_net for v in values]))
+            if values else None,
+            "stress_24bp_event_mean_diagnostic": _float(np.mean([v.stress_net_diagnostic
+                                                                 for v in values])) if values else None,
+            "event_population_hash": batches[i].event_population_hash,
+            "outcome_population_hash": result.outcome_population_hash,
+        })
+    result = {
+        "schema_id": "H41_WF1_CALIBRATION_EXPLORATORY_DISCOVERY_R1_1",
+        "implementation_sha": SHA,
+        "pre_outcome_receipt_sha256": hashlib.sha256(PREFLIGHT.read_bytes()).hexdigest(),
+        "pre_outcome_receipt_path": PREFLIGHT.name,
+        "bootstrap_seed": SEED, "block_length_hours": 120, "bootstrap_replicates": 10000,
+        "matrix_shape": list(z.shape),
+        "Z_primary_sha256": hashlib.sha256(np.ascontiguousarray(z, dtype="<f8").tobytes()).hexdigest(),
+        "A_mask_sha256": hashlib.sha256(np.ascontiguousarray(a, dtype="<f8").tobytes()).hexdigest(),
+        "joint_c95": _float(c95),
+        "candidate_metrics": candidate_rows,
+        "ranked_eligible_candidate_ids": [row.candidate_id for row in ranking],
+        "decision": "H41_EXPLORATORY_DIRECTIONAL_CANDIDATE_LOCK_V1" if ranking else "H41_EXPLORATORY_NO_GO",
+        "locked_candidate_id": ranking[0].candidate_id if ranking else None,
+        "status": "HISTORICALLY_INFORMED_EXPLORATORY_DISCOVERY",
+        "protected_surface_attestation": {
+            "wf1_validation_scientific_values_accessed": False,
+            "confirmation_accessed": False, "h39_accessed": False,
+            "final_holdout_accessed": False,
+            "private_exchange_api_calls": 0, "execution_writes": 0,
+            "live_trading": False,
+        },
+        "completed_at_utc": datetime.now(UTC).isoformat().replace("+00:00", "Z"),
+        "post_worktree": _verify_checkout(),
+    }
+    _atomic_json(RESULT, result)
+    print("DISCOVERY_RESULT_PERSISTED", hashlib.sha256(RESULT.read_bytes()).hexdigest())
+    print("DECISION", result["decision"])
+    print("LOCKED_CANDIDATE", result["locked_candidate_id"])
+
+
+if __name__ == "__main__":
+    main()
