@@ -1,0 +1,156 @@
+{
+  "schema_id": "H41_SOURCE_AUTHORITY_CONTROLLER_ACCEPTANCE_V1",
+  "generated_at_utc": "2026-09-29T09:20:00Z",
+  "controller_decision": "ACCEPTED",
+  "provenance": {
+    "repository": "EXASHXE/btc-quant-agent-public",
+    "docs_branch": "v0.5-refactor-docs",
+    "scientific_source_closure_commit": "807b545d7bda0801e51648e1c5bc7bfc42f121d4",
+    "source_closure_review": "reviews/v0.5/V0.5.1_H41_BTC_ETH_CANONICAL_SOURCE_AUTHORITY_CLOSURE_R1.md",
+    "source_closure_evidence": "evidence/v0.5/h41/V0.5.1_H41_BTC_ETH_CANONICAL_SOURCE_AUTHORITY_R1.json",
+    "source_closure_evidence_sha256": "04cc098ca873ba985adc75f27d08941eb877afce8db26174a57b020a73da217d",
+    "implementation_branch": "v0.5-refactor",
+    "required_implementation_base_sha": "407dabc415ae8cae4210250e992941c8b9b25464",
+    "implementation_branch_status": "UNTOUCHED_VERIFIED"
+  },
+  "frozen_protocol_authority_r1": {
+    "specification": "prompts/v0.5/design/v0.5.1_H41_SUCCESSOR_SCIENTIFIC_CAMPAIGN_V1_FROZEN_R1.md",
+    "machine_authority": "evidence/v0.5/h41/V0.5.1_H41_FROZEN_PROTOCOL_AUTHORITY_R1.json",
+    "frozen_semantic_root": "f784ce4cfe7ba4d1d5d30582e59ab4811aa7b1e8aed79b00a5f5e0f200c26917",
+    "candidate_ledger_hash": "d2ee1551ab4778e8ce34e83e053aba17ebb6be240aed812a4beedb218548b7e0",
+    "inference_contract_hash": "6b7c3d5289fd9cc132affb51f85fa292049868b96041b2b749cc11cf8be11136",
+    "endpoint_contract_hash": "ba467d3c69d0b0f266137536d432beea9523b0ba39ccfc7ffd610eeb72c21314",
+    "source_requirements_hash": "04845354af6c22f88a55da74aa4fdf8393277e28447c9d57b84a718e8aecb581",
+    "candidate_count": 20,
+    "active_horizons": [4, 8, 24]
+  },
+  "canonical_source_authority": {
+    "provider": "Binance Public Data",
+    "venue": "Binance Futures",
+    "market": "USD-M PERPETUAL",
+    "cadence": "native 1h",
+    "symbols": ["BTCUSDT", "ETHUSDT"],
+    "interval_utc": {
+      "start": "2021-01-01T00:00:00Z",
+      "end_exclusive": "2023-05-01T00:00:00Z"
+    },
+    "total_hours_per_asset": 20400,
+    "source_archive_set_hashes": {
+      "BTC": "38f07fa25a9dcfa3c1ae6ddb2564f913ff914bcd2c1229f709bf8fc862fd2d75",
+      "ETH": "a4816c5a5b9e2fdc1a56737350145cd3f6fecdfc385cea97d9dd2bfdc74224c5"
+    },
+    "canonical_projection_hashes": {
+      "BTC": "466f9fa2bbb483c11218bbda67e00e0f64df048b771a9a724ee61825715a32f8",
+      "ETH": "a6728877c47727d796b0c4f42a43f56956fcf05e308533d250783dccd2ae8912"
+    },
+    "timestamp_membership_hashes": {
+      "BTC": "ddaf3de876c021275939dce51863ef0ab9dee32d0ee9c4a6a0d7b330a4e4977f",
+      "ETH": "ddaf3de876c021275939dce51863ef0ab9dee32d0ee9c4a6a0d7b330a4e4977f",
+      "joint": "ddaf3de876c021275939dce51863ef0ab9dee32d0ee9c4a6a0d7b330a4e4977f"
+    },
+    "canonical_receipt_hashes": {
+      "BTC": "cf6bd69856e06db4a15310b6533e19d60aa96e67528806f4c3d131196e770320",
+      "ETH": "6948eb9bbd13c66a49fd73079b0d426685ed0a3bc5ce061a6402f61d668896a5"
+    },
+    "joint_source_authority_root": "05145d35a5cbd060ce3e9d7932b3757f901e396fa545ca624146dfbfa0cdb8b8"
+  },
+  "controller_audit_and_acceptance": {
+    "btc_source_status": "CLOSED",
+    "eth_source_status": "CLOSED",
+    "source_invariants_status": "16/16_PASS",
+    "btc_eth_source_synchronization": "PASS",
+    "protected_value_exposure": "ZERO",
+    "data_source_interpretation": {
+      "selected_cadence": "OFFICIAL_NATIVE_USDM_1H",
+      "january_2021_native_vs_1m_comparison": {
+        "btc_ohlc_timestamp_exact_match": "744/744",
+        "eth_ohlc_timestamp_exact_match": "744/744",
+        "volume_trade_discrepancy_hours": "1_hour_per_asset",
+        "adjudication": "Native 1h is directly frozen cadence and satisfies all invariants. Minor volume discrepancies non-material to candidate selection. 1m resampling prohibited."
+      }
+    },
+    "asset_integrity_metrics": {
+      "BTCUSDT": {
+        "row_count": 20400,
+        "gap_count": 0,
+        "duplicate_count": 0,
+        "unexpected_timestamp_count": 0,
+        "invalid_ohlc_count": 0,
+        "invalid_volume_count": 0
+      },
+      "ETHUSDT": {
+        "row_count": 20400,
+        "gap_count": 0,
+        "duplicate_count": 0,
+        "unexpected_timestamp_count": 0,
+        "invalid_ohlc_count": 0,
+        "invalid_volume_count": 0
+      }
+    }
+  },
+  "partitions": {
+    "WF1_TRAIN": {
+      "start_utc": "2021-01-01T00:00:00Z",
+      "end_exclusive_utc": "2022-10-31T00:00:00Z",
+      "hours": 16032,
+      "role": "TRAIN_ONLY"
+    },
+    "WF1_PURGE_1": {
+      "start_utc": "2022-10-31T00:00:00Z",
+      "end_exclusive_utc": "2022-11-01T00:00:00Z",
+      "hours": 24,
+      "role": "SOURCE_ONLY_PURGE"
+    },
+    "WF1_CALIBRATION": {
+      "start_utc": "2022-11-01T00:00:00Z",
+      "end_exclusive_utc": "2023-01-31T00:00:00Z",
+      "hours": 2184,
+      "role": "HISTORICALLY_INFORMED_EXPLORATORY_DISCOVERY_UNOPENED"
+    },
+    "WF1_PURGE_2": {
+      "start_utc": "2023-01-31T00:00:00Z",
+      "end_exclusive_utc": "2023-02-01T00:00:00Z",
+      "hours": 24,
+      "role": "SOURCE_ONLY_PURGE"
+    },
+    "WF1_VALIDATION": {
+      "start_utc": "2023-02-01T00:00:00Z",
+      "end_exclusive_utc": "2023-04-30T00:00:00Z",
+      "hours": 2112,
+      "role": "SEALED"
+    },
+    "SOURCE_RESERVE": {
+      "start_utc": "2023-04-30T00:00:00Z",
+      "end_exclusive_utc": "2023-05-01T00:00:00Z",
+      "hours": 24,
+      "role": "SOURCE_RESERVE_ONLY"
+    }
+  },
+  "implementation_authorization": {
+    "h41_implementation_authorized": "YES",
+    "h41_implementation_complete": "NO",
+    "h41_synthetic_pit_exact_sha_validated": "NO",
+    "h41_real_discovery_authorized": "NO",
+    "h41_wf1_validation_authorized": "NO",
+    "execution_mode": "RESEARCH_DISABLED_V1",
+    "implementation_base_sha": "407dabc415ae8cae4210250e992941c8b9b25464",
+    "h40_immutability_fence_required": true,
+    "target_package": "src/btc_quant_agent/h41/",
+    "next_execution_prompt": "prompts/v0.5/implementation/v0.5.1_H41_PRODUCTION_IMPLEMENTATION_R1.md",
+    "recommended_executor": "Codex Sol High"
+  },
+  "formal_lifecycle_state": {
+    "H41_PROTOCOL_FROZEN_R1": "YES",
+    "H41_R2_METHOD_VALIDATION": "PASS",
+    "BTC_H41_SOURCE_AUTHORITY": "CLOSED",
+    "ETH_H41_SOURCE_AUTHORITY": "CLOSED",
+    "H41_SOURCE_AUTHORITY_ROOT": "05145d35a5cbd060ce3e9d7932b3757f901e396fa545ca624146dfbfa0cdb8b8",
+    "H41_IMPLEMENTATION_AUTHORIZED": "YES",
+    "H41_IMPLEMENTATION_COMPLETE": "NO",
+    "H41_SYNTHETIC_PIT_EXACT_SHA_VALIDATED": "NO",
+    "H41_REAL_DISCOVERY_AUTHORIZED": "NO",
+    "EXECUTION": "RESEARCH_DISABLED_V1",
+    "CURRENT_STAGE": "H41_SOURCE_AUTHORITY_ACCEPTED_AND_IMPLEMENTATION_AUTHORIZED",
+    "NEXT_STAGE": "H41_PRODUCTION_IMPLEMENTATION_R1"
+  }
+}
