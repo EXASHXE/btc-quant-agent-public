@@ -1,9 +1,8 @@
 import json
-import math
 import subprocess
 from pathlib import Path
 import numpy as np
-from btc_quant_agent.h41.inference import run_frozen_joint_inference, run_joint_bootstrap_studentized
+from btc_quant_agent.h41.inference import run_frozen_joint_inference
 
 COMMIT='c0059b7bd26beb90096792a5232e5ad58e75580c'
 PATH='scripts/v0.5/h41_r2_inference_validation_r1.py'
@@ -11,7 +10,8 @@ blob=subprocess.check_output(['git','-C',str(Path(__file__).resolve().parents[4]
 assert blob=='ec8f975a45f7ff6c73beb238e4711aae62bdbb3d',blob
 source=subprocess.check_output(['git','-C',str(Path(__file__).resolve().parents[4]),'show',f'{COMMIT}:{PATH}']).decode()
 namespace={'__name__':'h41_accepted_r2_reference'}
-exec(compile(source,f'<git:{COMMIT}:{PATH}>','exec'),namespace)
+# The exact accepted Git blob is checked above before execution in this namespace.
+exec(compile(source,f'<git:{COMMIT}:{PATH}>','exec'),namespace)  # noqa: S102
 reference=namespace['run_joint_bootstrap_studentized']
 
 cases={}

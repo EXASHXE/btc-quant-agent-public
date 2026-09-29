@@ -7,7 +7,7 @@ import json
 import re
 import subprocess
 import sys
-from datetime import datetime, timezone
+from datetime import datetime, UTC
 from pathlib import Path
 
 EXPECTED = "8ecff4ec4b25bf73a35309689fd3ecfacc0d3399"
@@ -68,6 +68,11 @@ assert (authority["authority_exact"] and science["all_independent_checks_passed"
         and provenance["all_passed"] and boundaries["h40_diff"] == "ZERO")
 assert "All checks passed!" in (root / "ruff.log").read_text()
 assert "Success: no issues found" in (root / "mypy.log").read_text()
+assert "All checks passed!" in (root / "ruff_r2_scoped.log").read_text()
+docs_ruff = (root / "ruff_docs_all.log").read_text()
+assert "Found 6 errors." in docs_ruff
+assert all("h41_synthetic_pit_validation_r1/" in line
+           for line in docs_ruff.splitlines() if line.startswith("evidence/"))
 assert focused["passed"] == 54 and full["passed"] >= 1798
 
 logs = {file.name: hashlib.sha256(file.read_bytes()).hexdigest()
@@ -76,7 +81,7 @@ validators = {file.name: hashlib.sha256(file.read_bytes()).hexdigest()
               for file in sorted(root.glob("*.py"))}
 manifest = {
     "schema_id": "H41_SYNTHETIC_PIT_EXACT_SHA_VALIDATION_R2_V1",
-    "generated_at_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+    "generated_at_utc": datetime.now(UTC).isoformat(timespec="seconds"),
     "implementation_sha": EXPECTED,
     "implementation_parent_sha": PARENT,
     "validation_checkout_path": str(implementation),
@@ -125,6 +130,20 @@ manifest = {
         "compileall_exit_code": 0,
         "git_diff_check_command": "git diff --check",
         "git_diff_check_exit_code": 0,
+    },
+    "docs_branch_lint_diagnostic": {
+        "r2_validator_scoped_ruff": "PASS",
+        "repository_wide_docs_ruff": "FAIL_PREEXISTING",
+        "remaining_error_count": 6,
+        "remaining_paths": [
+            "evidence/v0.5/h41/h41_synthetic_pit_validation_r1/h41_validate_r2.py",
+            "evidence/v0.5/h41/h41_synthetic_pit_validation_r1/h41_validate_science.py",
+        ],
+        "r1_scripts_and_ruff_configuration_unchanged_from_docs_base": True,
+        "docs_base_sha": "4e24e23f2afd4c5670b27e53a5425e7d900adad3",
+        "docs_base_ci_run_id": 36549817683,
+        "initial_r2_docs_ci_run_id": 36560662275,
+        "failed_step": "Run ruff check .",
     },
     "execution_policy": boundaries["execution_policy"],
     "accepted_execution_write_authority": boundaries["accepted_execution_write_authority"],

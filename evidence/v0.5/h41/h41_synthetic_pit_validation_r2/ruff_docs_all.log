@@ -1,0 +1,8 @@
+evidence/v0.5/h41/h41_synthetic_pit_validation_r1/h41_validate_r2.py:2:8: F401 [*] `math` imported but unused
+evidence/v0.5/h41/h41_synthetic_pit_validation_r1/h41_validate_r2.py:6:71: F401 [*] `btc_quant_agent.h41.inference.run_joint_bootstrap_studentized` imported but unused
+evidence/v0.5/h41/h41_synthetic_pit_validation_r1/h41_validate_r2.py:14:1: S102 Use of `exec` detected
+evidence/v0.5/h41/h41_synthetic_pit_validation_r1/h41_validate_science.py:3:8: F401 [*] `io` imported but unused
+evidence/v0.5/h41/h41_synthetic_pit_validation_r1/h41_validate_science.py:13:149: F401 [*] `btc_quant_agent.h41.science.train_q80` imported but unused
+evidence/v0.5/h41/h41_synthetic_pit_validation_r1/h41_validate_science.py:115:45: S102 Use of `exec` detected
+Found 6 errors.
+[*] 4 fixable with the `--fix` option.

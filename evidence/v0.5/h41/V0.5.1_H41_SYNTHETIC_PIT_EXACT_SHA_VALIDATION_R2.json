@@ -10,6 +10,20 @@
   "authority_reconstruction_exact": true,
   "blob_mismatches": {},
   "candidate_count": 20,
+  "docs_branch_lint_diagnostic": {
+    "docs_base_ci_run_id": 36549817683,
+    "docs_base_sha": "4e24e23f2afd4c5670b27e53a5425e7d900adad3",
+    "failed_step": "Run ruff check .",
+    "initial_r2_docs_ci_run_id": 36560662275,
+    "r1_scripts_and_ruff_configuration_unchanged_from_docs_base": true,
+    "r2_validator_scoped_ruff": "PASS",
+    "remaining_error_count": 6,
+    "remaining_paths": [
+      "evidence/v0.5/h41/h41_synthetic_pit_validation_r1/h41_validate_r2.py",
+      "evidence/v0.5/h41/h41_synthetic_pit_validation_r1/h41_validate_science.py"
+    ],
+    "repository_wide_docs_ruff": "FAIL_PREEXISTING"
+  },
   "execution_policy": "RESEARCH_DISABLED_V1",
   "family_counts": {
     "D1_TREND": 4,
@@ -26,7 +40,7 @@
     "validation_lifecycle_contract_hash": "7619ce3849bf4e7f5e288231cd8c38f78189bc1d61baa4c58c87edeb58c6e864"
   },
   "frozen_semantic_root": "f784ce4cfe7ba4d1d5d30582e59ab4811aa7b1e8aed79b00a5f5e0f200c26917",
-  "generated_at_utc": "2026-09-29T11:15:09+00:00",
+  "generated_at_utc": "2026-09-29T11:20:30+00:00",
   "h40_diff": "ZERO",
   "h41_execution_imports": [],
   "h41_main_guards": [],
@@ -206,14 +220,16 @@
     "focused_pytest.log": "46dfa505afdea8c449a283d4948a0a99ef5a34263417e277815f9699d3df20ef",
     "full_pytest.log": "50bb76930b9aaadffc79ed88a7736f803d83f88d20b97ee875e2aa643597c49f",
     "h41_validate_authority.log": "d4eee4a997630b9d3c3e7e125b75c94edcb9148dcf4fcb701bbab9d1291bc839",
-    "h41_validate_boundaries.log": "b88970ffe2c7164bd0fce551851d9b934323b715fae1dad02cbac57beeb0a316",
-    "h41_validate_provenance.log": "d39c29d73fe5359abbbd84ebfd8e6f48cbaa01470080fe452665a2efb8d5bb46",
-    "h41_validate_r2.log": "2e4bef782918aba4f65f243722aac684c918f414c3b9f2b6cb2de29e1595fe08",
-    "h41_validate_science.log": "049c9cda646bc164d10aa7761eb27703ef1786bc284a59c4e0e9502200be87d7",
+    "h41_validate_boundaries.log": "2dda49bbcc0ed9a800524c27447c5310b5d607ff2f5c3ae0abcb58607200ff00",
+    "h41_validate_provenance.log": "333c399ec6b6efca8fea831cb9b8b32a40897f1db50f6d4ba5103c8a7d4cd618",
+    "h41_validate_r2.log": "78f0a1ca61adfcbedae5434e0bedda23e545f8504fd66ea2197ec1e7bc21fc33",
+    "h41_validate_science.log": "e54ff1ebfbab9d4c96f93e0c850036229b87cf061da32e8c105edfe179a3efa6",
     "h41_validate_source_adversarial.log": "03ee5973ceffa2aeae86ef786e2925b85035c0c9730ee737203be1d40d761516",
     "mypy.log": "92c3e508c3f44192b3ed08c24db6fda1c9011bc0b04adc58ad6dc43ff2d9fac0",
     "post_guards.log": "a82347cbf1503bbc4b76f51f469e3fd3348771b5ec167b9b39e055ebf8705884",
-    "ruff.log": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    "ruff.log": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+    "ruff_docs_all.log": "977965e96e9012f3296922ff6164182cb66498cbe2a685f5a3cdb30b928f3122",
+    "ruff_r2_scoped.log": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
   },
   "runtime_import_path": "/tmp/h41-validation-r2/src/btc_quant_agent/__init__.py",
   "schema_id": "H41_SYNTHETIC_PIT_EXACT_SHA_VALIDATION_R2_V1",
@@ -244,12 +260,12 @@
   "validation_checkout_path": "/tmp/h41-validation-r2",
   "validation_decision": "PASS_PENDING_CONTROLLER_ACCEPTANCE",
   "validator_script_sha256": {
-    "h41_build_manifest.py": "2a1bb26269fe10d6fdb796b3871072020dd04bacc78abc19004528321df61f71",
+    "h41_build_manifest.py": "07d65e28c6b885b851e05267b6a4357144a9f927cb6f07b562f24c0ea22e66a2",
     "h41_validate_authority.py": "8180a8742a38d934a445fce0b419c7afaf97e4d9cc5bbfe4cfa06e23e6eab9bc",
-    "h41_validate_boundaries.py": "1f9278f78254f50c2bb7e8b23e507cbed93796b15c02640e7488e5e88d5f8c41",
-    "h41_validate_provenance.py": "41f88d1212ae955a0cfe918cf2786c97955db8e8068c0e3e5c10953051a29796",
-    "h41_validate_r2.py": "34f3aec8ad3d99af9f2faf80e1187e7aa6d07be074b2097e8ac74f940f805815",
-    "h41_validate_science.py": "739c164c964cb899902b030f0a6748544f26ac7018a18985ca13b206dc2c7c8f",
+    "h41_validate_boundaries.py": "ef202a1e515eaa9596ba3d88aa78f3df4eba43b65b6675e8faca4a06c7f968be",
+    "h41_validate_provenance.py": "e28b2a3ebbffb68e9fb4207647b5d2ab1db2985b55520e1d17b9331221d8ac9a",
+    "h41_validate_r2.py": "14831e765d037448681e47de00f2b79d63ea5e032269be97500ab16d37f6b312",
+    "h41_validate_science.py": "5dd8b794bbd6342818f13306aaf06eb09847a4186a3a5ca436fa4c6c60f62496",
     "h41_validate_source_adversarial.py": "426565b5d452c4188e17e9cd9dd6876740975efdf394411bc706c346d1b34773"
   }
 }

@@ -64,11 +64,11 @@ for file in h41_sources:
         elif isinstance(node, ast.Import):
             execution_imports.extend((file.name, alias.name) for alias in node.names
                                      if "execution" in alias.name)
-        elif isinstance(node, ast.If) and isinstance(node.test, ast.Compare):
-            if (isinstance(node.test.left, ast.Name) and node.test.left.id == "__name__"
-                    and any(isinstance(value, ast.Constant) and value.value == "__main__"
-                            for value in node.test.comparators)):
-                entry_points.append(file.name)
+        elif (isinstance(node, ast.If) and isinstance(node.test, ast.Compare)
+              and isinstance(node.test.left, ast.Name) and node.test.left.id == "__name__"
+              and any(isinstance(value, ast.Constant) and value.value == "__main__"
+                      for value in node.test.comparators)):
+            entry_points.append(file.name)
 assert not execution_imports
 assert not entry_points
 

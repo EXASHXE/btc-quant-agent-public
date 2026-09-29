@@ -15,7 +15,6 @@ import numpy as np
 from btc_quant_agent.h41.authority import CANDIDATES, CANDIDATES_BY_ID, EXPECTED_SOURCE_ROOT
 from btc_quant_agent.h41.inference import infer_context_with_testability
 from btc_quant_agent.h41.outcomes import (
-    H41ProvenanceOutcomeBatch,
     calibration_context_matrices,
     materialize_context_outcomes,
 )

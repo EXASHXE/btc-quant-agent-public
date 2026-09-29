@@ -1,6 +1,5 @@
 import dataclasses
 import hashlib
-import io
 import json
 import math
 import subprocess
@@ -10,7 +9,7 @@ from decimal import Decimal
 from pathlib import Path
 import numpy as np
 from btc_quant_agent.h41.authority import CANDIDATES, EXPECTED_SOURCE_ROOT
-from btc_quant_agent.h41.science import HOUR_MS, PARTITIONS, CompletedBar, CompletedPairView, Event, EventBatch, build_event_batch, candidate_side, train_q80, _linear_q80
+from btc_quant_agent.h41.science import HOUR_MS, PARTITIONS, CompletedBar, CompletedPairView, Event, EventBatch, build_event_batch, candidate_side, _linear_q80
 from btc_quant_agent.h41.outcomes import materialize_outcomes
 from btc_quant_agent.h41.selection import CandidateInference, rank_positive_lcb
 from btc_quant_agent.h41.source import load_synthetic_archive, projection_sha256, canonical_number
@@ -112,7 +111,9 @@ with tempfile.TemporaryDirectory() as td:
     digest=hashlib.sha256(path.read_bytes()).hexdigest()
     parsed=load_synthetic_archive(path,symbol,month,digest)
     audit_source=subprocess.check_output(['git','-C',str(Path(__file__).resolve().parents[4]),'show','807b545d7bda0801e51648e1c5bc7bfc42f121d4:scripts/v0.5/h41_source_authority_closure.py']).decode()
-    ns={'__name__':'accepted_source_audit'};exec(compile(audit_source,'<accepted_source_audit>','exec'),ns)
+    ns={'__name__':'accepted_source_audit'}
+    # The historical source-audit code is loaded from its pinned local Git commit.
+    exec(compile(audit_source,'<accepted_source_audit>','exec'),ns)  # noqa: S102
     accepted=ns['audit_archive'](path,symbol,month,digest)
     assert parsed.projection_sha256==accepted['projection_hash']==projection_sha256((parsed,))
     assert parsed.timestamp_membership_sha256==accepted['timestamp_membership_hash']
