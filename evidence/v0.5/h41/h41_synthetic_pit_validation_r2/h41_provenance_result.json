@@ -1,0 +1,41 @@
+{
+  "all_passed": true,
+  "checks": {
+    "archive_hash_rechecks": 1180,
+    "archive_hash_rechecks_per_file": {
+      "BTCUSDT": 590,
+      "ETHUSDT": 590
+    },
+    "archive_mutation_context": "ValueError",
+    "archive_mutation_events": "ValueError",
+    "archive_mutation_fit": "ValueError",
+    "archive_mutation_outcome": "ValueError",
+    "archive_mutation_receipt": "ValueError",
+    "caller_q80_mapping_rejected": "ValueError",
+    "candidate_order_matrix_rejected": "ValueError",
+    "complete_20_coordinate_synthetic_pipeline": true,
+    "different_open_changes_only_distinct_context_outcome": true,
+    "economic_row_mutation_rejected": "ValueError",
+    "estimated_duplicate_byte_reads": 1357056,
+    "fit_hash_and_seal_replay": true,
+    "foreign_marks_rejected": "TypeError",
+    "foreign_outcome_context_rejected": "ValueError",
+    "foreign_train_fit_rejected": "ValueError",
+    "manual_receipt_remains_synthetic": true,
+    "mixed_fit_matrix_rejected": "ValueError",
+    "mixed_outcome_matrix_rejected": "ValueError",
+    "mixed_source_matrix_rejected": "ValueError",
+    "production_fit_rejects_synthetic_context": "ValueError",
+    "receipt_mutation_rejected": "ValueError",
+    "receipt_reconstruction_rejected": "ValueError",
+    "same_features_distinct_source_context": true,
+    "subclass_matrix_rejected": "TypeError",
+    "subclass_substitution_rejected": "TypeError",
+    "synthetic_context_not_accepted": true,
+    "total_synthetic_archive_bytes_read": 1359360,
+    "uninitialized_context_event_binding_rejected": "AttributeError",
+    "unregistered_exact_context": "ValueError"
+  },
+  "schema_id": "H41_PROVENANCE_VALIDATOR_R2",
+  "synthetic_only": true
+}

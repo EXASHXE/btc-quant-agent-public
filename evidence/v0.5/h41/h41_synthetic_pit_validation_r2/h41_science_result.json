@@ -1,0 +1,25 @@
+{
+  "adversarial_authority_substitution": {
+    "caller_marks_change_outcome_same_event": true,
+    "caller_q80_changes_event_count_same_completed_views": [
+      2181,
+      0
+    ],
+    "synthetic_batch_source_root": "SYNTHETIC_NON_AUTHORITATIVE"
+  },
+  "all_independent_checks_passed": true,
+  "checks": {
+    "D1_four_variants_q80_sign_equality_floor": true,
+    "D2_four_variants_both_sides_equality": true,
+    "D3_four_variants_prior_break_inside_equality": true,
+    "D4_eight_variants_RET4_sign_parent_inheritance": true,
+    "endpoint_open_ratio_12bp_24bp": true,
+    "partitions_right_boundary_protected_science": true,
+    "pit_completed_bar_field_isolation": true,
+    "ranking_LCB_over_mu_support": true,
+    "source_projection_independent_audit_same_buffer": true,
+    "testability_N_D_floors_redaction": true
+  },
+  "independent_check_count": 10,
+  "material_defect_confirmed": false
+}

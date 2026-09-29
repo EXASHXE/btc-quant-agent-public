@@ -1,0 +1,118 @@
+{
+  "authority_exact": true,
+  "blob_hashes": {
+    "src/btc_quant_agent/h41/__init__.py": "ad1d3480f811965455dd3587e69361133339c375",
+    "src/btc_quant_agent/h41/authority.py": "ac8889faba3dd9bf7da6be452f0d93472c7cce58",
+    "src/btc_quant_agent/h41/frozen_bindings.py": "80499b954e80680f5c9afb90522f7e3ab593aa9d",
+    "src/btc_quant_agent/h41/inference.py": "9000840cbb767b1be69395b78248a58ec3bcaafa",
+    "src/btc_quant_agent/h41/outcomes.py": "43f0209a4f8ad81ff45fbc49fcf00f4ef3f681a6",
+    "src/btc_quant_agent/h41/provenance.py": "eef7ad33ff1fd689f08ed71c853f6b6812a1431f",
+    "src/btc_quant_agent/h41/science.py": "d3ce28f6e479c8d4d911d4075c78c5bfbbab2b6a",
+    "src/btc_quant_agent/h41/selection.py": "422c112b353e5f1ddfc50533d88244246203ee77",
+    "src/btc_quant_agent/h41/source.py": "739603b1a7f123cf61eeb7c4aed89a2c6c8ec294",
+    "src/btc_quant_agent/h41/testability.py": "45706af2d2cfff8d4709a711d8b9320da1a81fd6",
+    "tests/h41/r2_reference.py": "c8c727a379a5c80c8de5b7f0ec7f387c27b11f2e",
+    "tests/h41/test_authority_and_signals.py": "b83d7126e6391976d59e40bbafb5ce88f094d712",
+    "tests/h41/test_inference_and_ranking.py": "b4e0f84adb80c20bf87689873ca51b98ff1ab890",
+    "tests/h41/test_provenance_repair.py": "52d0755dd46bed014f2899c4cbdbeef4973f39e6",
+    "tests/h41/test_source_and_outcomes.py": "e50ab8c93cd2f9548f8d1c9a4b260a9150603e65"
+  },
+  "blob_mismatch": {},
+  "candidate_count": 20,
+  "contract_comparison": {
+    "candidate_ledger_hash": {
+      "docs": "d2ee1551ab4778e8ce34e83e053aba17ebb6be240aed812a4beedb218548b7e0",
+      "package": "d2ee1551ab4778e8ce34e83e053aba17ebb6be240aed812a4beedb218548b7e0",
+      "recomputed": "d2ee1551ab4778e8ce34e83e053aba17ebb6be240aed812a4beedb218548b7e0"
+    },
+    "endpoint_contract_hash": {
+      "docs": "ba467d3c69d0b0f266137536d432beea9523b0ba39ccfc7ffd610eeb72c21314",
+      "package": "ba467d3c69d0b0f266137536d432beea9523b0ba39ccfc7ffd610eeb72c21314",
+      "recomputed": "ba467d3c69d0b0f266137536d432beea9523b0ba39ccfc7ffd610eeb72c21314"
+    },
+    "event_pit_contract_hash": {
+      "docs": "dee7b3ac334dd62e68a7ee700841e9862505bc5827c3ccd665d52b046040362e",
+      "package": "dee7b3ac334dd62e68a7ee700841e9862505bc5827c3ccd665d52b046040362e",
+      "recomputed": "dee7b3ac334dd62e68a7ee700841e9862505bc5827c3ccd665d52b046040362e"
+    },
+    "inference_contract_hash": {
+      "docs": "6b7c3d5289fd9cc132affb51f85fa292049868b96041b2b749cc11cf8be11136",
+      "package": "6b7c3d5289fd9cc132affb51f85fa292049868b96041b2b749cc11cf8be11136",
+      "recomputed": "6b7c3d5289fd9cc132affb51f85fa292049868b96041b2b749cc11cf8be11136"
+    },
+    "source_requirements_hash": {
+      "docs": "04845354af6c22f88a55da74aa4fdf8393277e28447c9d57b84a718e8aecb581",
+      "package": "04845354af6c22f88a55da74aa4fdf8393277e28447c9d57b84a718e8aecb581",
+      "recomputed": "04845354af6c22f88a55da74aa4fdf8393277e28447c9d57b84a718e8aecb581"
+    },
+    "validation_lifecycle_contract_hash": {
+      "docs": "7619ce3849bf4e7f5e288231cd8c38f78189bc1d61baa4c58c87edeb58c6e864",
+      "package": "7619ce3849bf4e7f5e288231cd8c38f78189bc1d61baa4c58c87edeb58c6e864",
+      "recomputed": "7619ce3849bf4e7f5e288231cd8c38f78189bc1d61baa4c58c87edeb58c6e864"
+    }
+  },
+  "docs_semantic_root": "f784ce4cfe7ba4d1d5d30582e59ab4811aa7b1e8aed79b00a5f5e0f200c26917",
+  "family_counts": {
+    "D1_TREND": 4,
+    "D2_BREAKOUT": 4,
+    "D3_FAILED_BREAK": 4,
+    "D4_MODIFIER": 8
+  },
+  "horizons": [
+    4,
+    8,
+    24
+  ],
+  "implementation_sha": "8ecff4ec4b25bf73a35309689fd3ecfacc0d3399",
+  "ledger_exact_ordered": true,
+  "package_semantic_root": "f784ce4cfe7ba4d1d5d30582e59ab4811aa7b1e8aed79b00a5f5e0f200c26917",
+  "recomputed_semantic_root": "f784ce4cfe7ba4d1d5d30582e59ab4811aa7b1e8aed79b00a5f5e0f200c26917",
+  "source_comparison": {
+    "archive_set_hashes": {
+      "docs": {
+        "BTC": "38f07fa25a9dcfa3c1ae6ddb2564f913ff914bcd2c1229f709bf8fc862fd2d75",
+        "ETH": "a4816c5a5b9e2fdc1a56737350145cd3f6fecdfc385cea97d9dd2bfdc74224c5"
+      },
+      "package": {
+        "BTC": "38f07fa25a9dcfa3c1ae6ddb2564f913ff914bcd2c1229f709bf8fc862fd2d75",
+        "ETH": "a4816c5a5b9e2fdc1a56737350145cd3f6fecdfc385cea97d9dd2bfdc74224c5"
+      }
+    },
+    "joint_root": {
+      "docs": "05145d35a5cbd060ce3e9d7932b3757f901e396fa545ca624146dfbfa0cdb8b8",
+      "package": "05145d35a5cbd060ce3e9d7932b3757f901e396fa545ca624146dfbfa0cdb8b8"
+    },
+    "membership_hashes": {
+      "docs": {
+        "BTC": "ddaf3de876c021275939dce51863ef0ab9dee32d0ee9c4a6a0d7b330a4e4977f",
+        "ETH": "ddaf3de876c021275939dce51863ef0ab9dee32d0ee9c4a6a0d7b330a4e4977f",
+        "joint": "ddaf3de876c021275939dce51863ef0ab9dee32d0ee9c4a6a0d7b330a4e4977f"
+      },
+      "package": {
+        "BTC": "ddaf3de876c021275939dce51863ef0ab9dee32d0ee9c4a6a0d7b330a4e4977f",
+        "ETH": "ddaf3de876c021275939dce51863ef0ab9dee32d0ee9c4a6a0d7b330a4e4977f",
+        "joint": "ddaf3de876c021275939dce51863ef0ab9dee32d0ee9c4a6a0d7b330a4e4977f"
+      }
+    },
+    "projection_hashes": {
+      "docs": {
+        "BTC": "466f9fa2bbb483c11218bbda67e00e0f64df048b771a9a724ee61825715a32f8",
+        "ETH": "a6728877c47727d796b0c4f42a43f56956fcf05e308533d250783dccd2ae8912"
+      },
+      "package": {
+        "BTC": "466f9fa2bbb483c11218bbda67e00e0f64df048b771a9a724ee61825715a32f8",
+        "ETH": "a6728877c47727d796b0c4f42a43f56956fcf05e308533d250783dccd2ae8912"
+      }
+    },
+    "receipt_hashes": {
+      "docs": {
+        "BTC": "cf6bd69856e06db4a15310b6533e19d60aa96e67528806f4c3d131196e770320",
+        "ETH": "6948eb9bbd13c66a49fd73079b0d426685ed0a3bc5ce061a6402f61d668896a5"
+      },
+      "package": {
+        "BTC": "cf6bd69856e06db4a15310b6533e19d60aa96e67528806f4c3d131196e770320",
+        "ETH": "6948eb9bbd13c66a49fd73079b0d426685ed0a3bc5ce061a6402f61d668896a5"
+      }
+    }
+  }
+}

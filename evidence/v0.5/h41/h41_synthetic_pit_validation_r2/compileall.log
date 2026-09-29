@@ -1,0 +1,2 @@
+command: python -m compileall -q src
+exit_code: 0

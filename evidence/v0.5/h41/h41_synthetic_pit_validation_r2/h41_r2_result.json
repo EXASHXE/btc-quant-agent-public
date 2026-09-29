@@ -1,0 +1,49 @@
+{
+  "all_exact": true,
+  "cases": {
+    "correlated_bundle": {
+      "B": 10000,
+      "L": 120,
+      "coordinate_permutation_exact": true,
+      "exact_c95": true,
+      "exact_lcb": true,
+      "exact_mu": true,
+      "exact_se": true,
+      "seed": 44,
+      "supported_coordinates": 20
+    },
+    "ordinary": {
+      "B": 10000,
+      "L": 120,
+      "exact_c95": true,
+      "exact_lcb": true,
+      "exact_mu": true,
+      "exact_se": true,
+      "seed": 41,
+      "supported_coordinates": 20
+    },
+    "sparse_zero": {
+      "B": 10000,
+      "L": 120,
+      "exact_c95": true,
+      "exact_lcb": true,
+      "exact_mu": true,
+      "exact_se": true,
+      "seed": 43,
+      "supported_coordinates": 19
+    },
+    "unequal": {
+      "B": 10000,
+      "L": 120,
+      "exact_c95": true,
+      "exact_lcb": true,
+      "exact_mu": true,
+      "exact_se": true,
+      "seed": 42,
+      "supported_coordinates": 20
+    }
+  },
+  "center_differs_from_mu": true,
+  "reference_blob": "ec8f975a45f7ff6c73beb238e4711aae62bdbb3d",
+  "reference_commit": "c0059b7bd26beb90096792a5232e5ad58e75580c"
+}

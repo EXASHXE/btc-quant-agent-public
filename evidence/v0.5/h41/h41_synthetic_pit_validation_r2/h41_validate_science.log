@@ -1,0 +1,24 @@
+{"adversarial_authority_substitution": {"caller_marks_change_outcome_same_event": true, "caller_q80_changes_event_count_same_completed_views": [2181, 0], "synthetic_batch_source_root": "SYNTHETIC_NON_AUTHORITATIVE"}, "all_independent_checks_passed": true, "checks": {"D1_four_variants_q80_sign_equality_floor": true, "D2_four_variants_both_sides_equality": true, "D3_four_variants_prior_break_inside_equality": true, "D4_eight_variants_RET4_sign_parent_inheritance": true, "endpoint_open_ratio_12bp_24bp": true, "partitions_right_boundary_protected_science": true, "pit_completed_bar_field_isolation": true, "ranking_LCB_over_mu_support": true, "source_projection_independent_audit_same_buffer": true, "testability_N_D_floors_redaction": true}, "independent_check_count": 10, "material_defect_confirmed": false}
+	Command being timed: ".venv/bin/python /tmp/h41-validation-r2-docs/evidence/v0.5/h41/h41_synthetic_pit_validation_r2/h41_validate_science.py"
+	User time (seconds): 1.50
+	System time (seconds): 0.11
+	Percent of CPU this job got: 436%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 0:00.36
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 41540
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 6623
+	Voluntary context switches: 24
+	Involuntary context switches: 161
+	Swaps: 0
+	File system inputs: 16
+	File system outputs: 40
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0
