@@ -1,0 +1,20 @@
+{
+  "all_fail_closed": true,
+  "cases": {
+    "btc_eth_desync": "ValueError",
+    "corrupt_zip": "BadZipFile",
+    "duplicate": "ValueError",
+    "gap": "ValueError",
+    "invalid_ohlc": "ValueError",
+    "invalid_volume": "ValueError",
+    "out_of_order": "ValueError",
+    "same_buffer_and_projection_replay": true,
+    "source_mutation": "ValueError",
+    "unaligned": "ValueError",
+    "wrong_checksum": "ValueError",
+    "wrong_close_time": "ValueError",
+    "wrong_month": "ValueError",
+    "wrong_symbol": "ValueError"
+  },
+  "synthetic_only": true
+}

@@ -1,0 +1,330 @@
+{
+  "FROZEN_SEMANTIC_ROOT": "f784ce4cfe7ba4d1d5d30582e59ab4811aa7b1e8aed79b00a5f5e0f200c26917",
+  "H40_DIFF": "ZERO",
+  "H41_REAL_DISCOVERY_AUTHORIZED": "NO",
+  "H41_SYNTHETIC_PIT_EXACT_SHA_VALIDATED": "FAIL",
+  "NEXT_STAGE": "H41_IMPLEMENTATION_REPAIR_R1",
+  "R2_REFERENCE_BLOB": "ec8f975a45f7ff6c73beb238e4711aae62bdbb3d",
+  "R2_REFERENCE_COMMIT": "c0059b7bd26beb90096792a5232e5ad58e75580c",
+  "R2_exact_equivalence": {
+    "cases": {
+      "correlated_bundle": {
+        "B": 10000,
+        "L": 120,
+        "coordinate_permutation_exact": true,
+        "exact_c95": true,
+        "exact_lcb": true,
+        "exact_mu": true,
+        "exact_se": true,
+        "seed": 44,
+        "supported_coordinates": 20
+      },
+      "ordinary": {
+        "B": 10000,
+        "L": 120,
+        "exact_c95": true,
+        "exact_lcb": true,
+        "exact_mu": true,
+        "exact_se": true,
+        "seed": 41,
+        "supported_coordinates": 20
+      },
+      "sparse_zero": {
+        "B": 10000,
+        "L": 120,
+        "exact_c95": true,
+        "exact_lcb": true,
+        "exact_mu": true,
+        "exact_se": true,
+        "seed": 43,
+        "supported_coordinates": 19
+      },
+      "unequal": {
+        "B": 10000,
+        "L": 120,
+        "exact_c95": true,
+        "exact_lcb": true,
+        "exact_mu": true,
+        "exact_se": true,
+        "seed": 42,
+        "supported_coordinates": 20
+      }
+    },
+    "center_differs_from_mu": true,
+    "status": "PASS"
+  },
+  "SOURCE_AUTHORITY_ROOT": "05145d35a5cbd060ce3e9d7932b3757f901e396fa545ca624146dfbfa0cdb8b8",
+  "authority_reconstruction": {
+    "contract_hashes": {
+      "candidate_ledger_hash": {
+        "docs": "d2ee1551ab4778e8ce34e83e053aba17ebb6be240aed812a4beedb218548b7e0",
+        "package": "d2ee1551ab4778e8ce34e83e053aba17ebb6be240aed812a4beedb218548b7e0",
+        "recomputed": "d2ee1551ab4778e8ce34e83e053aba17ebb6be240aed812a4beedb218548b7e0"
+      },
+      "endpoint_contract_hash": {
+        "docs": "ba467d3c69d0b0f266137536d432beea9523b0ba39ccfc7ffd610eeb72c21314",
+        "package": "ba467d3c69d0b0f266137536d432beea9523b0ba39ccfc7ffd610eeb72c21314",
+        "recomputed": "ba467d3c69d0b0f266137536d432beea9523b0ba39ccfc7ffd610eeb72c21314"
+      },
+      "event_pit_contract_hash": {
+        "docs": "dee7b3ac334dd62e68a7ee700841e9862505bc5827c3ccd665d52b046040362e",
+        "package": "dee7b3ac334dd62e68a7ee700841e9862505bc5827c3ccd665d52b046040362e",
+        "recomputed": "dee7b3ac334dd62e68a7ee700841e9862505bc5827c3ccd665d52b046040362e"
+      },
+      "inference_contract_hash": {
+        "docs": "6b7c3d5289fd9cc132affb51f85fa292049868b96041b2b749cc11cf8be11136",
+        "package": "6b7c3d5289fd9cc132affb51f85fa292049868b96041b2b749cc11cf8be11136",
+        "recomputed": "6b7c3d5289fd9cc132affb51f85fa292049868b96041b2b749cc11cf8be11136"
+      },
+      "source_requirements_hash": {
+        "docs": "04845354af6c22f88a55da74aa4fdf8393277e28447c9d57b84a718e8aecb581",
+        "package": "04845354af6c22f88a55da74aa4fdf8393277e28447c9d57b84a718e8aecb581",
+        "recomputed": "04845354af6c22f88a55da74aa4fdf8393277e28447c9d57b84a718e8aecb581"
+      },
+      "validation_lifecycle_contract_hash": {
+        "docs": "7619ce3849bf4e7f5e288231cd8c38f78189bc1d61baa4c58c87edeb58c6e864",
+        "package": "7619ce3849bf4e7f5e288231cd8c38f78189bc1d61baa4c58c87edeb58c6e864",
+        "recomputed": "7619ce3849bf4e7f5e288231cd8c38f78189bc1d61baa4c58c87edeb58c6e864"
+      }
+    },
+    "frozen_semantic_root": "f784ce4cfe7ba4d1d5d30582e59ab4811aa7b1e8aed79b00a5f5e0f200c26917",
+    "recomputed_semantic_root": "f784ce4cfe7ba4d1d5d30582e59ab4811aa7b1e8aed79b00a5f5e0f200c26917",
+    "source_authority_root": "05145d35a5cbd060ce3e9d7932b3757f901e396fa545ca624146dfbfa0cdb8b8",
+    "source_comparison": {
+      "archive_set_hashes": {
+        "docs": {
+          "BTC": "38f07fa25a9dcfa3c1ae6ddb2564f913ff914bcd2c1229f709bf8fc862fd2d75",
+          "ETH": "a4816c5a5b9e2fdc1a56737350145cd3f6fecdfc385cea97d9dd2bfdc74224c5"
+        },
+        "package": {
+          "BTC": "38f07fa25a9dcfa3c1ae6ddb2564f913ff914bcd2c1229f709bf8fc862fd2d75",
+          "ETH": "a4816c5a5b9e2fdc1a56737350145cd3f6fecdfc385cea97d9dd2bfdc74224c5"
+        }
+      },
+      "joint_root": {
+        "docs": "05145d35a5cbd060ce3e9d7932b3757f901e396fa545ca624146dfbfa0cdb8b8",
+        "package": "05145d35a5cbd060ce3e9d7932b3757f901e396fa545ca624146dfbfa0cdb8b8"
+      },
+      "membership_hashes": {
+        "docs": {
+          "BTC": "ddaf3de876c021275939dce51863ef0ab9dee32d0ee9c4a6a0d7b330a4e4977f",
+          "ETH": "ddaf3de876c021275939dce51863ef0ab9dee32d0ee9c4a6a0d7b330a4e4977f",
+          "joint": "ddaf3de876c021275939dce51863ef0ab9dee32d0ee9c4a6a0d7b330a4e4977f"
+        },
+        "package": {
+          "BTC": "ddaf3de876c021275939dce51863ef0ab9dee32d0ee9c4a6a0d7b330a4e4977f",
+          "ETH": "ddaf3de876c021275939dce51863ef0ab9dee32d0ee9c4a6a0d7b330a4e4977f",
+          "joint": "ddaf3de876c021275939dce51863ef0ab9dee32d0ee9c4a6a0d7b330a4e4977f"
+        }
+      },
+      "projection_hashes": {
+        "docs": {
+          "BTC": "466f9fa2bbb483c11218bbda67e00e0f64df048b771a9a724ee61825715a32f8",
+          "ETH": "a6728877c47727d796b0c4f42a43f56956fcf05e308533d250783dccd2ae8912"
+        },
+        "package": {
+          "BTC": "466f9fa2bbb483c11218bbda67e00e0f64df048b771a9a724ee61825715a32f8",
+          "ETH": "a6728877c47727d796b0c4f42a43f56956fcf05e308533d250783dccd2ae8912"
+        }
+      },
+      "receipt_hashes": {
+        "docs": {
+          "BTC": "cf6bd69856e06db4a15310b6533e19d60aa96e67528806f4c3d131196e770320",
+          "ETH": "6948eb9bbd13c66a49fd73079b0d426685ed0a3bc5ce061a6402f61d668896a5"
+        },
+        "package": {
+          "BTC": "cf6bd69856e06db4a15310b6533e19d60aa96e67528806f4c3d131196e770320",
+          "ETH": "6948eb9bbd13c66a49fd73079b0d426685ed0a3bc5ce061a6402f61d668896a5"
+        }
+      }
+    },
+    "status": "EXACT"
+  },
+  "blob_mismatch": {},
+  "candidate_registry": {
+    "count": 20,
+    "family_counts": {
+      "D1_TREND": 4,
+      "D2_BREAKOUT": 4,
+      "D3_FAILED_BREAK": 4,
+      "D4_MODIFIER": 8
+    },
+    "horizons": [
+      4,
+      8,
+      24
+    ],
+    "ordered_match": true,
+    "status": "EXACT"
+  },
+  "docs_authority_sha": "c44ffb6af2930c88a2b013ffb963bd06317032ff",
+  "governance": {
+    "ACCEPTED_EXECUTION_WRITE_AUTHORITY": null,
+    "EXECUTION": "RESEARCH_DISABLED_V1",
+    "H41_REAL_DISCOVERY_AUTHORIZED": "NO",
+    "H41_WF1_VALIDATION_AUTHORIZED": "NO",
+    "automatic_real_discovery_runner_found": false,
+    "signed_trading_request_found": false
+  },
+  "implementation_parent_sha": "407dabc415ae8cae4210250e992941c8b9b25464",
+  "implementation_sha": "a3235fbc39667ca2a624faebd3cf9ee8a4b442de",
+  "material_defect": {
+    "failure_class": "SOURCE_AND_TRAIN_FIT_AUTHORITY_BINDING_MISSING",
+    "minimum_repair_surface": [
+      "verified immutable source context",
+      "same-source complete TRAIN Q80 seal",
+      "context-bound event batches and receipts",
+      "same-context post-event Open marks",
+      "synthetic/accepted authority separation"
+    ],
+    "required_regressions": [
+      "same completed views with foreign Q80 rejected",
+      "constructed event batch cannot mint accepted root",
+      "foreign marks rejected",
+      "mixed source contexts rejected",
+      "source mutation invalidates all downstream authority"
+    ],
+    "scientific_consequence": "Caller Q80 changes event population; caller events mint accepted real source root; foreign Open marks change outcomes without source lineage.",
+    "source_functions": [
+      "science.build_event_batch",
+      "science.EventBatch",
+      "testability.make_testability_receipt",
+      "outcomes.materialize_outcomes"
+    ],
+    "synthetic_counterexample": {
+      "caller_marks_change_outcome_same_event": true,
+      "caller_q80_changes_event_count_same_completed_views": [
+        2181,
+        0
+      ],
+      "synthetic_batch_mints_accepted_source_root": "05145d35a5cbd060ce3e9d7932b3757f901e396fa545ca624146dfbfa0cdb8b8"
+    }
+  },
+  "production_blob_hashes": {
+    "src/btc_quant_agent/h41/__init__.py": "ad1d3480f811965455dd3587e69361133339c375",
+    "src/btc_quant_agent/h41/authority.py": "ac8889faba3dd9bf7da6be452f0d93472c7cce58",
+    "src/btc_quant_agent/h41/frozen_bindings.py": "80499b954e80680f5c9afb90522f7e3ab593aa9d",
+    "src/btc_quant_agent/h41/inference.py": "13be97f375e860463de387a46425c15e21a36e37",
+    "src/btc_quant_agent/h41/outcomes.py": "74b2704765a5880d3172b922792990efa881887f",
+    "src/btc_quant_agent/h41/science.py": "d3ce28f6e479c8d4d911d4075c78c5bfbbab2b6a",
+    "src/btc_quant_agent/h41/selection.py": "422c112b353e5f1ddfc50533d88244246203ee77",
+    "src/btc_quant_agent/h41/source.py": "739603b1a7f123cf61eeb7c4aed89a2c6c8ec294",
+    "src/btc_quant_agent/h41/testability.py": "d1432a9bb418527dd0ccb774cd822b9295b9f999"
+  },
+  "protected_surface_attestation": {
+    "WF1_VALIDATION_scientifically_accessed": false,
+    "confirmation_accessed": false,
+    "execution_writes": 0,
+    "final_holdout_accessed": false,
+    "h39_accessed": false,
+    "real_H41_rows_accessed": false,
+    "real_WF1_CALIBRATION_outcomes_accessed": false,
+    "real_candidate_lock_created": false,
+    "signed_network_requests": 0
+  },
+  "pytest_version": "8.4.2",
+  "python_executable": "/root/workspace/project/Quant-agent-sanitized/.venv/bin/python",
+  "python_import_path": "/root/workspace/project/Quant-agent-sanitized/src/btc_quant_agent/__init__.py",
+  "python_version": "3.12.3",
+  "quality_gates": {
+    "compileall": {
+      "command": "python -m compileall -q src",
+      "exit_code": 0
+    },
+    "focused_pytest_venv": {
+      "command": ".venv/bin/python -m pytest -q tests/h41/",
+      "exit_code": 0,
+      "passed": 45,
+      "pytest_seconds": 1.21,
+      "wall_seconds": 7.97,
+      "warnings": 0
+    },
+    "full_pytest_venv": {
+      "command": ".venv/bin/python -m pytest -q",
+      "exit_code": 0,
+      "max_rss_kib": 262216,
+      "passed": 1791,
+      "pytest_seconds": 794.07,
+      "wall_seconds": 857.49,
+      "warnings": 8
+    },
+    "git_diff_check": {
+      "command": "git diff --check",
+      "exit_code": 0
+    },
+    "mypy": {
+      "command": "mypy",
+      "exit_code": 0,
+      "summary": "Success: no issues found in 108 source files"
+    },
+    "plain_pytest_environment": {
+      "executable": "/root/miniconda3/bin/pytest",
+      "failure": "ModuleNotFoundError: btc_quant_agent.h41 during collection (wrong installed package path)",
+      "focused_command": "pytest -q tests/h41/",
+      "focused_exit_code": 2,
+      "full_command": "pytest -q",
+      "full_exit_code": 2
+    },
+    "ruff": {
+      "command": "ruff check .",
+      "exit_code": 0,
+      "summary": "All checks passed!"
+    }
+  },
+  "raw_evidence_sha256": {
+    "full_pytest_venv.log": "8bd44979319207bdf6684e6428f377c6ffe745c8312ea02e62cb843e03e7de11",
+    "h41_authority_result.json": "2f79e7564a48766b2f0115b473de7b4b0527bea78784a4354b93d2048c2ce853",
+    "h41_focused_pytest.log": "06d98b3e2ab68e6017e22e3d0d4871dfc6b79582b1a94034cc75dfd3e115b07a",
+    "h41_focused_pytest_venv.log": "dcc75fb9a7bcc92543d6036900052b8420e238ff85f9d70cf8128391380fb7b0",
+    "h41_full_pytest_plain.log": "4944452a0883925a860931485a7a3778bf2e5960d142f5c16d20bd623b6ed7c8",
+    "h41_r2_result.json": "a2d43bd7f6479f7f438a3a5774e1e84c4e3ca0c7cd09950ba50ecfad566b07fd",
+    "h41_science_result.json": "3e43acf45dc39193bdefa2837640c598f04b2cc1ae993c99757f8131949bcabe",
+    "h41_source_adversarial_result.json": "0c0704f47d56d25cd9cf37dbc7557a3c3ac881b67ad2ea75e59090d790c5a540",
+    "h41_validate_authority.py": "2ad8d55348229c470bc2062f21d45136f7f93ffd0da75c0891a3d25f4a041572",
+    "h41_validate_r2.py": "92ba921769858b37528d7e79a4725d19bec64b17db88404084c3c3251cb5ac72",
+    "h41_validate_science.py": "44831dcf335da365bc788187c537c68a89f3db64a6bbbc47d06e0c775a1528c8",
+    "h41_validate_source_adversarial.py": "b2e2bd12932a53113c66b1c4590e395cd22c61c95acf5514d7253664217e934c"
+  },
+  "schema_id": "H41_SYNTHETIC_PIT_EXACT_SHA_VALIDATION_R1",
+  "source_controller_acceptance_sha": "ae135999e5928eae4b7741ce17ddecc4514f24fc",
+  "source_scientific_closure_sha": "807b545d7bda0801e51648e1c5bc7bfc42f121d4",
+  "synthetic_formula_pit_endpoint_ranking_checks": {
+    "D1_four_variants_q80_sign_equality_floor": true,
+    "D2_four_variants_both_sides_equality": true,
+    "D3_four_variants_prior_break_inside_equality": true,
+    "D4_eight_variants_RET4_sign_parent_inheritance": true,
+    "endpoint_open_ratio_12bp_24bp": true,
+    "partitions_right_boundary_protected_science": true,
+    "pit_completed_bar_field_isolation": true,
+    "ranking_LCB_over_mu_support": true,
+    "source_projection_independent_audit_same_buffer": true,
+    "testability_N_D_floors_redaction": true
+  },
+  "synthetic_source_adversarial": {
+    "all_fail_closed": true,
+    "cases": {
+      "btc_eth_desync": "ValueError",
+      "corrupt_zip": "BadZipFile",
+      "duplicate": "ValueError",
+      "gap": "ValueError",
+      "invalid_ohlc": "ValueError",
+      "invalid_volume": "ValueError",
+      "out_of_order": "ValueError",
+      "same_buffer_and_projection_replay": true,
+      "source_mutation": "ValueError",
+      "unaligned": "ValueError",
+      "wrong_checksum": "ValueError",
+      "wrong_close_time": "ValueError",
+      "wrong_month": "ValueError",
+      "wrong_symbol": "ValueError"
+    },
+    "synthetic_only": true
+  },
+  "test_reference_blob_hashes": {
+    "tests/h41/r2_reference.py": "c8c727a379a5c80c8de5b7f0ec7f387c27b11f2e",
+    "tests/h41/test_authority_and_signals.py": "b83d7126e6391976d59e40bbafb5ce88f094d712",
+    "tests/h41/test_inference_and_ranking.py": "b4e0f84adb80c20bf87689873ca51b98ff1ab890",
+    "tests/h41/test_source_and_outcomes.py": "e50ab8c93cd2f9548f8d1c9a4b260a9150603e65"
+  },
+  "validation_decision": "FAIL"
+}

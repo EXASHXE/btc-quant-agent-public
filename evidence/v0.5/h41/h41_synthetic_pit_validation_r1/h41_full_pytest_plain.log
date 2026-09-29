@@ -1,0 +1,40 @@
+
+==================================== ERRORS ====================================
+___________ ERROR collecting tests/h41/test_authority_and_signals.py ___________
+ImportError while importing test module '/root/workspace/project/Quant-agent-sanitized/tests/h41/test_authority_and_signals.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/root/miniconda3/lib/python3.13/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/h41/test_authority_and_signals.py:9: in <module>
+    from btc_quant_agent.h41.authority import (
+E   ModuleNotFoundError: No module named 'btc_quant_agent.h41'
+___________ ERROR collecting tests/h41/test_inference_and_ranking.py ___________
+ImportError while importing test module '/root/workspace/project/Quant-agent-sanitized/tests/h41/test_inference_and_ranking.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/root/miniconda3/lib/python3.13/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/h41/test_inference_and_ranking.py:8: in <module>
+    from btc_quant_agent.h41.authority import CANDIDATES
+E   ModuleNotFoundError: No module named 'btc_quant_agent.h41'
+____________ ERROR collecting tests/h41/test_source_and_outcomes.py ____________
+ImportError while importing test module '/root/workspace/project/Quant-agent-sanitized/tests/h41/test_source_and_outcomes.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/root/miniconda3/lib/python3.13/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/h41/test_source_and_outcomes.py:12: in <module>
+    from btc_quant_agent.h41.authority import CANDIDATES, SOURCE_BINDING, canonical_json
+E   ModuleNotFoundError: No module named 'btc_quant_agent.h41'
+=========================== short test summary info ============================
+ERROR tests/h41/test_authority_and_signals.py
+ERROR tests/h41/test_inference_and_ranking.py
+ERROR tests/h41/test_source_and_outcomes.py
+!!!!!!!!!!!!!!!!!!! Interrupted: 3 errors during collection !!!!!!!!!!!!!!!!!!!!
+3 errors in 3.00s
+
+EXIT_CODE=2
