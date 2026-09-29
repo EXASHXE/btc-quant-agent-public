@@ -1,0 +1,48 @@
+{
+  "schema_id": "H41_IMPLEMENTATION_CONTROLLER_ACCEPTANCE_R2_1",
+  "supersedes_execution_contract_from_docs_sha": "3df14e7f759b15da0909cc8f7cfc994e5522dcd6",
+  "controller_decision": "ACCEPTED_WITH_CORRECTED_DISCOVERY_EXECUTION_CONTRACT",
+  "accepted_implementation_sha": "8ecff4ec4b25bf73a35309689fd3ecfacc0d3399",
+  "implementation_parent_sha": "a3235fbc39667ca2a624faebd3cf9ee8a4b442de",
+  "exact_sha_validation_publications": [
+    "db9106b1bbac39076218c0f2505fba93b9a6a5b4",
+    "7c79fc1f350386d4dad528651cc519557056a229"
+  ],
+  "frozen_authority": {
+    "frozen_semantic_root": "f784ce4cfe7ba4d1d5d30582e59ab4811aa7b1e8aed79b00a5f5e0f200c26917",
+    "candidate_ledger_hash": "d2ee1551ab4778e8ce34e83e053aba17ebb6be240aed812a4beedb218548b7e0",
+    "event_pit_contract_hash": "dee7b3ac334dd62e68a7ee700841e9862505bc5827c3ccd665d52b046040362e",
+    "endpoint_contract_hash": "ba467d3c69d0b0f266137536d432beea9523b0ba39ccfc7ffd610eeb72c21314",
+    "inference_contract_hash": "6b7c3d5289fd9cc132affb51f85fa292049868b96041b2b749cc11cf8be11136",
+    "source_requirements_hash": "04845354af6c22f88a55da74aa4fdf8393277e28447c9d57b84a718e8aecb581",
+    "validation_lifecycle_hash": "7619ce3849bf4e7f5e288231cd8c38f78189bc1d61baa4c58c87edeb58c6e864",
+    "source_authority_root": "05145d35a5cbd060ce3e9d7932b3757f901e396fa545ca624146dfbfa0cdb8b8"
+  },
+  "discovery_authorization": {
+    "partition": "WF1_CALIBRATION",
+    "interval_utc": "[2022-11-01T00:00:00Z,2023-01-31T00:00:00Z)",
+    "hours": 2184,
+    "status": "HISTORICALLY_INFORMED_EXPLORATORY_DISCOVERY",
+    "bootstrap_seed_precommitted": 20260929,
+    "prompt_r1_status": "REJECTED_CANDIDATE_LEDGER_DRIFT",
+    "prompt_r1_1_status": "CONTROLLER_APPROVED",
+    "prompt_r1_1_path": "prompts/v0.5/execution/v0.5.1_H41_WF1_CALIBRATION_EXPLORATORY_DISCOVERY_R1_1.md"
+  },
+  "candidate_conformance": {
+    "count": 20,
+    "order_exact": true,
+    "field_mismatch_count": 0,
+    "missing_candidate_ids": [],
+    "extra_candidate_ids": []
+  },
+  "lifecycle": {
+    "H41_IMPLEMENTATION_CONTROLLER_ACCEPTED": "YES",
+    "H41_SYNTHETIC_PIT_EXACT_SHA_VALIDATED": "PASS",
+    "H41_REAL_DISCOVERY_AUTHORIZED": "YES_WF1_CALIBRATION_ONLY",
+    "H41_DISCOVERY_EXECUTED": "NO",
+    "H41_WF1_VALIDATION_AUTHORIZED": "NO",
+    "EXECUTION": "RESEARCH_DISABLED_V1",
+    "TEST_SUITE_PERFORMANCE_TRACK": "AUTHORIZED_PARALLEL_NON_BLOCKING",
+    "NEXT_H41_STAGE": "H41_WF1_CALIBRATION_EXPLORATORY_DISCOVERY_R1_1"
+  }
+}
