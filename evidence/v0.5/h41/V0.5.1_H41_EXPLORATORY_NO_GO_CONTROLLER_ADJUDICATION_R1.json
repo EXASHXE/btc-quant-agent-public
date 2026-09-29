@@ -1,0 +1,45 @@
+{
+  "schema_id": "V0.5.1_H41_EXPLORATORY_NO_GO_CONTROLLER_ADJUDICATION_R1",
+  "adjudicated_docs_parent_sha": "5292e10e053df2aa926e1da291d736551e3ba514",
+  "accepted_implementation_sha": "8ecff4ec4b25bf73a35309689fd3ecfacc0d3399",
+  "discovery_evidence_blob_sha": "61b7c494b0b1947aeb48c29bedc3f8d274be4ea3",
+  "discovery_review_blob_sha": "09c9ee20c0e9ec083d2f306a840bdc0dfa80ce8e",
+  "decision": "CONTROLLER_ACCEPTED_H41_EXPLORATORY_NO_GO",
+  "h41_discovery_executed": true,
+  "h41_exploratory_no_go": true,
+  "h41_candidate_lock": null,
+  "h41_wf1_validation_authorized": false,
+  "execution_policy": "RESEARCH_DISABLED_V1",
+  "supported_candidate_count": 8,
+  "total_candidate_count": 20,
+  "best_supported_candidate": {
+    "candidate_id": "H41_D2_ETH_BO24_H4",
+    "simultaneous_lcb": -0.003463968742567882,
+    "mu_hat_primary_12bp": 0.0003665713965896465,
+    "stress_24bp_event_mean_diagnostic": -0.0008334286034103535
+  },
+  "all_supported_lcb_positive": false,
+  "protected_surface_attestation": {
+    "wf1_validation_scientific_values_accessed": false,
+    "confirmation_accessed": false,
+    "h39_accessed": false,
+    "final_holdout_accessed": false,
+    "private_exchange_api_calls": 0,
+    "execution_writes": 0,
+    "live_trading": false
+  },
+  "docs_ci": {
+    "publication_sha": "5292e10e053df2aa926e1da291d736551e3ba514",
+    "run_id": 36592563235,
+    "conclusion": "failure",
+    "classification": "PREEXISTING_NON_BLOCKING",
+    "failing_step": "ruff check .",
+    "finding_count": 6,
+    "scope": "historical H41 synthetic PIT validation scripts"
+  },
+  "lifecycle": {
+    "h41_state": "TERMINAL_NO_GO",
+    "next_stage": "H41_SUCCESSOR_SCIENTIFIC_CAMPAIGN_V1_DESIGN",
+    "successor_execution_authorized": false
+  }
+}

@@ -11,12 +11,17 @@
     "tactical_sha": "79c8b82dd7c870b7e785af19823af8ec607c22de",
     "performance_branch_status": "NOT_CREATED",
     "h41_discovery_prompt": "prompts/v0.5/execution/v0.5.1_H41_WF1_CALIBRATION_EXPLORATORY_DISCOVERY_R1_1.md",
-    "h41_discovery_executed": false,
-    "h41_real_discovery_authorized": "YES_WF1_CALIBRATION_ONLY",
+    "h41_discovery_executed": true,
+    "h41_real_discovery_authorized": "CONSUMED_TERMINAL_NO_GO",
     "h41_wf1_validation_authorized": "NO",
     "execution_policy": "RESEARCH_DISABLED_V1",
     "publication_parent_docs_sha": "00c6507dd4272ad7687e9b2e598c7110ffdfc373",
-    "docs_head_rule": "VERIFY_LIVE_REMOTE_HEAD_DO_NOT_TRUST_STATIC_HANDOVER"
+    "docs_head_rule": "VERIFY_LIVE_REMOTE_HEAD_DO_NOT_TRUST_STATIC_HANDOVER",
+    "h41_discovery_result": "H41_EXPLORATORY_NO_GO",
+    "h41_controller_adjudication": "ACCEPTED_TERMINAL_NO_GO",
+    "h41_candidate_lock": "NONE",
+    "next_scientific_stage": "H41_SUCCESSOR_SCIENTIFIC_CAMPAIGN_V1_DESIGN",
+    "successor_execution_authorized": false
   },
   "mandatory_reply_contract": {
     "every_substantive_project_reply_has_stage_progress": true,
