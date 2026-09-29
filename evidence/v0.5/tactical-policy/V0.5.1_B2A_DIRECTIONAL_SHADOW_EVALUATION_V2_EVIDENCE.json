@@ -1,0 +1,77 @@
+{
+  "contract": "V0.5.1_B2A_DIRECTIONAL_SHADOW_EVALUATION_V2",
+  "status": "B2A_IMPLEMENTED_PENDING_CONTROLLER",
+  "timestamp": "2026-09-29T10:23:00+08:00",
+  "scientific_authority_mainline_sha": "407dabc415ae8cae4210250e992941c8b9b25464",
+  "parent_accepted_b1_authority_sha": "f5b48f166c058cac9cec40d0894e96b1480fcb17",
+  "b2a_execution_sha": "a3513ff47684403acfdf7c5762ea37c85757985b",
+  "branch": "feature/tactical-policy-r2",
+  "docs_branch": "v0.5-refactor-docs",
+  "versions": {
+    "tactical_policy_version": "TACTICAL_POLICY_R2_B0",
+    "tactical_feature_evidence_schema_version": "TACTICAL_FEATURE_EVIDENCE_V2",
+    "market_snapshot_schema_version": "MARKET_SNAPSHOT_V2",
+    "return_feature_semantics_version": "ELAPSED_TIME_RETURNS_V1",
+    "rule_score_semantics_version": "RULE_SCORE_V1",
+    "market_watch_evidence_version": "FORWARD_EVIDENCE_V1",
+    "tactical_shadow_evaluation_schema_version": "TACTICAL_SHADOW_EVALUATION_V2",
+    "directional_outcome_profile_version": "DIRECTIONAL_OUTCOME_PROFILE_V1",
+    "funding_accounting_version": "TACTICAL_FUNDING_ACCOUNTING_V1",
+    "tactical_cohort_summary_version": "TACTICAL_COHORT_SUMMARY_V1",
+    "standard_diagnostic_checkpoints_version": "STANDARD_DIAGNOSTIC_CHECKPOINTS_V1",
+    "rule_score_buckets_version": "RULE_SCORE_BUCKETS_V1"
+  },
+  "storage": {
+    "evaluation_table": "tactical_shadow_evaluations_v2",
+    "evaluation_id_algorithm": "SHA-256 over deterministic canonical JSON excluding evaluation_id and persisted_at_ms",
+    "evaluation_natural_key": [
+      "shadow_record_id",
+      "evaluation_profile_version"
+    ]
+  },
+  "playbook_outcome_horizons": {
+    "TREND_PULLBACK": "12h",
+    "BREAKOUT_RETEST": "12h",
+    "FAILED_BREAKOUT": "8h",
+    "FAILED_BREAKDOWN": "8h",
+    "VOLATILITY_EXPANSION": "8h"
+  },
+  "funding_accounting": {
+    "provider": "Binance Public Data",
+    "venue": "Binance Futures USD-M",
+    "endpoint": "/fapi/v1/fundingRate",
+    "causal_matching_rule": "fill_time_ms < funding_time_ms <= exit_time_ms",
+    "sign_convention": "LONG pays positive rate (negative PnL); SHORT receives positive rate (positive PnL)"
+  },
+  "cohort_rules": {
+    "denominators": {
+      "sample_fill_rate": "fill_count / signal_count",
+      "sample_tp1_rate_given_fill": "tp1_count / resolved_filled_count",
+      "sample_stop_rate_given_fill": "stop_count / resolved_filled_count",
+      "sample_timeout_rate_given_fill": "timeout_count / resolved_filled_count",
+      "sample_mean_net_r_per_signal_ex_funding": "sum(net_r_ex_funding) / (resolved_filled_count + no_fill_count)"
+    },
+    "small_sample_labels": {
+      "N < 10": "VERY_LOW_SAMPLE",
+      "10 <= N < 30": "LOW_SAMPLE",
+      "N >= 30": "OBSERVED_SAMPLE"
+    }
+  },
+  "gates": {
+    "scientific_fence_h40_diff": "ZERO",
+    "execution_fence": "VERIFIED",
+    "python_compileall": "PASSED",
+    "ruff_check": "PASSED",
+    "mypy": "PASSED",
+    "b2a_focused_tests_passed": 12,
+    "b1_tests_passed": 31,
+    "b0_tests_passed": 23,
+    "market_watch_tests_passed": 137,
+    "focused_total_passed": 203,
+    "pytest_total": 1949,
+    "pytest_passed": 1947,
+    "pytest_skipped": 2,
+    "pytest_failed": 0
+  },
+  "remote_ci": "REMOTE_CI_NOT_OBSERVED"
+}
