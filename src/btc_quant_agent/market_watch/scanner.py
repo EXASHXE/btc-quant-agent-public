@@ -963,6 +963,7 @@ class MarketWatchScanner:
                     semantic_identity=a.semantic_identity,
                     feature_evidence_id=a.feature_evidence_id,
                     evaluation_profile_version=DIRECTIONAL_OUTCOME_PROFILE_VERSION,
+                    evaluation_horizon_bars=prof["horizon_bars"],
                     evaluation_horizon_ms=prof["horizon_ms"],
                 )
                 self.store.set_last_shadow_signal_ids(a.symbol, triggered_id=sig_id)

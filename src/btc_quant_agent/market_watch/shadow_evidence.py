@@ -18,8 +18,13 @@ from .domain import (
     MARKET_WATCH_EVIDENCE_VERSION,
     TACTICAL_COHORT_SUMMARY_VERSION,
     TACTICAL_SHADOW_EVALUATION_SCHEMA_VERSION,
+    validate_time_coverage,
 )
-from .evidence import TacticalFeatureEvidenceV2
+from .evidence import (
+    TacticalFeatureEvidenceV2,
+    validate_tactical_feature_evidence,
+    verify_tactical_evidence_identity,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -46,6 +51,10 @@ class TacticalShadowEvaluationValidationError(TacticalShadowEvaluationError):
 
 class TacticalShadowAttributionConflictError(TacticalShadowEvaluationConflictError):
     """Raised when shadow record fields conflict with authoritative linked FeatureEvidenceV2."""
+
+
+class TacticalShadowProfileConflictError(TacticalShadowEvaluationError):
+    """Raised when shadow evaluation profile or horizon attributes conflict with frozen authority."""
 
 
 # ==============================================================================
@@ -296,6 +305,7 @@ class TacticalShadowEvaluationV2:
     fill_price: float | None
 
     evaluation_profile_version: str
+    evaluation_horizon_bars: int
     evaluation_horizon_ms: int
 
     evaluation_start_ms: int | None
@@ -334,6 +344,10 @@ class TacticalShadowEvaluationV2:
 
     attribution: AttributionProjectionEvidence | None = None
 
+    fill_interval_start_ms: int | None = None
+    fill_interval_end_ms: int | None = None
+    fill_time_resolution: str | None = None
+
     feature_evidence_hash: str = ""
     policy_version: str = ""
     config_hash: str = ""
@@ -351,6 +365,7 @@ class TacticalShadowEvaluationV2:
             "entry_window_end_ms": self.entry_window_end_ms,
             "entry_window_start_ms": self.entry_window_start_ms,
             "evaluation_end_ms": self.evaluation_end_ms,
+            "evaluation_horizon_bars": self.evaluation_horizon_bars,
             "evaluation_horizon_ms": self.evaluation_horizon_ms,
             "evaluation_profile_version": self.evaluation_profile_version,
             "evaluation_schema_version": self.evaluation_schema_version,
@@ -361,9 +376,12 @@ class TacticalShadowEvaluationV2:
             "exit_time_ms": self.exit_time_ms,
             "feature_evidence_hash": self.feature_evidence_hash,
             "feature_evidence_id": self.feature_evidence_id,
+            "fill_interval_end_ms": self.fill_interval_end_ms,
+            "fill_interval_start_ms": self.fill_interval_start_ms,
             "fill_price": self.fill_price,
             "fill_status": self.fill_status,
             "fill_time_ms": self.fill_time_ms,
+            "fill_time_resolution": self.fill_time_resolution,
             "forward_evidence_version": self.forward_evidence_version,
             "funding_accounting": self.funding_accounting.to_dict(),
             "mae_r": self.mae_r,
@@ -472,6 +490,39 @@ def validate_tactical_shadow_evaluation(evaluation: TacticalShadowEvaluationV2) 
         raise TacticalShadowEvaluationValidationError("symbol is mandatory")
     if evaluation.direction not in ("LONG", "SHORT"):
         raise TacticalShadowEvaluationValidationError(f"Invalid direction: {evaluation.direction}")
+    if evaluation.forward_evidence_version != MARKET_WATCH_EVIDENCE_VERSION:
+        raise TacticalShadowEvaluationValidationError(
+            f"Invalid forward evidence version: {evaluation.forward_evidence_version}"
+        )
+    if evaluation.funding_accounting.accounting_version != FUNDING_ACCOUNTING_VERSION:
+        raise TacticalShadowEvaluationValidationError(
+            f"Invalid funding accounting version: {evaluation.funding_accounting.accounting_version}"
+        )
+
+    # Check profile version & horizon mapping
+    if evaluation.evaluation_profile_version != DIRECTIONAL_OUTCOME_PROFILE_VERSION:
+        raise TacticalShadowEvaluationValidationError(
+            f"Invalid evaluation profile version: {evaluation.evaluation_profile_version}"
+        )
+    if evaluation.evaluation_horizon_bars <= 0:
+        raise TacticalShadowEvaluationValidationError(
+            f"evaluation_horizon_bars must be positive, got: {evaluation.evaluation_horizon_bars}"
+        )
+    if evaluation.evaluation_horizon_ms != evaluation.evaluation_horizon_bars * 900_000:
+        raise TacticalShadowEvaluationValidationError(
+            f"Horizon invariant violated: {evaluation.evaluation_horizon_ms} != {evaluation.evaluation_horizon_bars} * 900_000"
+        )
+    prof = get_playbook_evaluation_profile(evaluation.playbook)
+    if evaluation.evaluation_horizon_bars != prof["horizon_bars"]:
+        raise TacticalShadowEvaluationValidationError(
+            f"evaluation_horizon_bars ({evaluation.evaluation_horizon_bars}) does not match playbook "
+            f"{evaluation.playbook} profile ({prof['horizon_bars']})"
+        )
+    if evaluation.evaluation_horizon_ms != prof["horizon_ms"]:
+        raise TacticalShadowEvaluationValidationError(
+            f"evaluation_horizon_ms ({evaluation.evaluation_horizon_ms}) does not match playbook "
+            f"{evaluation.playbook} profile ({prof['horizon_ms']})"
+        )
 
     # Check non-finite numbers in numeric attributes
     for attr in (
@@ -482,19 +533,158 @@ def validate_tactical_shadow_evaluation(evaluation: TacticalShadowEvaluationV2) 
         if val is not None and (math.isnan(val) or math.isinf(val)):
             raise TacticalShadowEvaluationValidationError(f"Non-finite float in {attr}: {val}")
 
-    # Check net R identity if filled and funding complete
-    if evaluation.fill_status == "FILLED" and evaluation.price_gross_r is not None and evaluation.execution_cost_r is not None:
+    # Temporal ordering
+    if evaluation.signal_time_ms > evaluation.entry_window_start_ms or evaluation.entry_window_start_ms > evaluation.entry_window_end_ms:
+        raise TacticalShadowEvaluationValidationError(
+            f"Invalid entry window temporal ordering: signal={evaluation.signal_time_ms}, "
+            f"start={evaluation.entry_window_start_ms}, end={evaluation.entry_window_end_ms}"
+        )
+
+    # Terminal status semantics
+    if evaluation.terminal_status == EvaluationTerminalStatus.NO_FILL.value:
+        if evaluation.fill_status != "NO_FILL":
+            raise TacticalShadowEvaluationValidationError(
+                f"NO_FILL terminal_status requires fill_status='NO_FILL', got {evaluation.fill_status}"
+            )
+        if evaluation.terminal_reason != "NO_FILL":
+            raise TacticalShadowEvaluationValidationError(
+                f"NO_FILL terminal_status requires terminal_reason='NO_FILL', got {evaluation.terminal_reason}"
+            )
+        if evaluation.fill_time_ms is not None or evaluation.fill_price is not None:
+            raise TacticalShadowEvaluationValidationError(
+                "NO_FILL evaluation must have fill_time_ms and fill_price set to None"
+            )
+        if (
+            evaluation.price_gross_r is not None
+            or evaluation.execution_cost_r is not None
+            or evaluation.net_r_ex_funding is not None
+            or evaluation.net_r_after_funding is not None
+        ):
+            raise TacticalShadowEvaluationValidationError(
+                "NO_FILL evaluation must have all R metrics set to None"
+            )
+        if evaluation.funding_accounting.funding_status != FundingStatus.NOT_APPLICABLE.value:
+            raise TacticalShadowEvaluationValidationError(
+                f"NO_FILL evaluation requires funding_status='NOT_APPLICABLE', got {evaluation.funding_accounting.funding_status}"
+            )
+        if evaluation.fill_interval_start_ms is not None or evaluation.fill_interval_end_ms is not None:
+            raise TacticalShadowEvaluationValidationError(
+                "NO_FILL evaluation must not have fill_interval bounds"
+            )
+
+    elif evaluation.terminal_status == EvaluationTerminalStatus.FILLED.value:
+        if evaluation.fill_status != "FILLED":
+            raise TacticalShadowEvaluationValidationError(
+                f"FILLED terminal_status requires fill_status='FILLED', got {evaluation.fill_status}"
+            )
+        if evaluation.fill_price is None or evaluation.fill_price <= 0.0:
+            raise TacticalShadowEvaluationValidationError(
+                f"FILLED evaluation requires positive fill_price, got {evaluation.fill_price}"
+            )
+        if evaluation.fill_time_ms is None:
+            raise TacticalShadowEvaluationValidationError("FILLED evaluation requires fill_time_ms")
+        if evaluation.fill_interval_start_ms is None or evaluation.fill_interval_end_ms is None:
+            raise TacticalShadowEvaluationValidationError("FILLED evaluation requires fill_interval bounds")
+        if not (evaluation.fill_interval_start_ms <= evaluation.fill_time_ms <= evaluation.fill_interval_end_ms):
+            raise TacticalShadowEvaluationValidationError(
+                f"fill_time_ms {evaluation.fill_time_ms} outside fill interval [{evaluation.fill_interval_start_ms}, {evaluation.fill_interval_end_ms}]"
+            )
+        if evaluation.fill_interval_start_ms < evaluation.signal_time_ms:
+            raise TacticalShadowEvaluationValidationError(
+                f"Fill interval starts before signal_time: {evaluation.fill_interval_start_ms} < {evaluation.signal_time_ms}"
+            )
+        if evaluation.terminal_reason not in ("TP1", "STOP", "TIMEOUT"):
+            raise TacticalShadowEvaluationValidationError(
+                f"FILLED evaluation terminal_reason must be TP1, STOP, or TIMEOUT, got: {evaluation.terminal_reason}"
+            )
+        if evaluation.exit_time_ms is None:
+            raise TacticalShadowEvaluationValidationError("FILLED evaluation requires exit_time_ms")
+        if evaluation.exit_price is None or evaluation.exit_price <= 0.0:
+            raise TacticalShadowEvaluationValidationError(
+                f"FILLED evaluation requires positive exit_price, got {evaluation.exit_price}"
+            )
+        if evaluation.exit_time_ms < evaluation.fill_interval_end_ms:
+            raise TacticalShadowEvaluationValidationError(
+                f"Exit time {evaluation.exit_time_ms} is before fill_interval_end_ms {evaluation.fill_interval_end_ms}"
+            )
+
+        # Planned horizon
+        if evaluation.evaluation_start_ms is None or evaluation.evaluation_start_ms != evaluation.fill_time_ms:
+            raise TacticalShadowEvaluationValidationError(
+                f"evaluation_start_ms ({evaluation.evaluation_start_ms}) must equal fill_time_ms ({evaluation.fill_time_ms})"
+            )
+        if evaluation.evaluation_end_ms is None:
+            raise TacticalShadowEvaluationValidationError("evaluation_end_ms is required for FILLED evaluation")
+        expected_eval_end = evaluation.evaluation_start_ms + evaluation.evaluation_horizon_ms
+        if evaluation.evaluation_end_ms != expected_eval_end:
+            raise TacticalShadowEvaluationValidationError(
+                f"evaluation_end_ms ({evaluation.evaluation_end_ms}) != evaluation_start_ms + horizon_ms ({expected_eval_end})"
+            )
+
+        # Planned horizon vs early terminal & TIMEOUT
+        if evaluation.terminal_reason == "TIMEOUT":
+            if abs(evaluation.exit_time_ms - evaluation.evaluation_end_ms) > 900_000:
+                raise TacticalShadowEvaluationValidationError(
+                    f"TIMEOUT exit_time_ms ({evaluation.exit_time_ms}) diverges from evaluation_end_ms ({evaluation.evaluation_end_ms})"
+                )
+            if evaluation.tp1_hit or evaluation.sl_hit:
+                raise TacticalShadowEvaluationValidationError("TIMEOUT terminal cannot have tp1_hit or sl_hit")
+        elif evaluation.terminal_reason == "TP1":
+            if not evaluation.tp1_hit or evaluation.sl_hit:
+                raise TacticalShadowEvaluationValidationError("TP1 terminal requires tp1_hit=True and sl_hit=False")
+            if evaluation.exit_time_ms > evaluation.evaluation_end_ms + 900_000:
+                raise TacticalShadowEvaluationValidationError("TP1 exit cannot occur after planned evaluation end")
+        elif evaluation.terminal_reason == "STOP":
+            if not evaluation.sl_hit or evaluation.tp1_hit:
+                raise TacticalShadowEvaluationValidationError("STOP terminal requires sl_hit=True and tp1_hit=False")
+            if evaluation.exit_time_ms > evaluation.evaluation_end_ms + 900_000:
+                raise TacticalShadowEvaluationValidationError("STOP exit cannot occur after planned evaluation end")
+
+        # Net R arithmetic
+        if evaluation.price_gross_r is None or evaluation.execution_cost_r is None or evaluation.net_r_ex_funding is None:
+            raise TacticalShadowEvaluationValidationError("Missing R-multiple calculations on FILLED evaluation")
         expected_net_ex = evaluation.price_gross_r - evaluation.execution_cost_r
-        if evaluation.net_r_ex_funding is not None and abs(evaluation.net_r_ex_funding - expected_net_ex) > 1e-6:
+        if not math.isclose(evaluation.net_r_ex_funding, expected_net_ex, rel_tol=1e-5, abs_tol=1e-5):
             raise TacticalShadowEvaluationValidationError(
                 f"Net R ex-funding mismatch: stored {evaluation.net_r_ex_funding} != expected {expected_net_ex}"
             )
-        if evaluation.funding_accounting.funding_status == FundingStatus.COMPLETE.value and evaluation.funding_accounting.funding_pnl_r is not None:
+        f_st = evaluation.funding_accounting.funding_status
+        if f_st == FundingStatus.COMPLETE.value:
+            if evaluation.funding_accounting.funding_pnl_r is None:
+                raise TacticalShadowEvaluationValidationError("COMPLETE funding requires funding_pnl_r")
+            if evaluation.net_r_after_funding is None:
+                raise TacticalShadowEvaluationValidationError("COMPLETE funding requires net_r_after_funding")
             expected_net_after = expected_net_ex + evaluation.funding_accounting.funding_pnl_r
-            if evaluation.net_r_after_funding is not None and abs(evaluation.net_r_after_funding - expected_net_after) > 1e-6:
+            if not math.isclose(evaluation.net_r_after_funding, expected_net_after, rel_tol=1e-5, abs_tol=1e-5):
                 raise TacticalShadowEvaluationValidationError(
                     f"Net R after funding mismatch: stored {evaluation.net_r_after_funding} != expected {expected_net_after}"
                 )
+        else:
+            if evaluation.net_r_after_funding is not None:
+                raise TacticalShadowEvaluationValidationError(
+                    f"net_r_after_funding must be None when funding_status is {f_st}"
+                )
+
+    else:
+        raise TacticalShadowEvaluationValidationError(
+            f"Invalid terminal_status: {evaluation.terminal_status}. Only FILLED or NO_FILL allowed as sealed evaluation."
+        )
+
+    # Checkpoints schema
+    if len(evaluation.outcome_checkpoints) != 4:
+        raise TacticalShadowEvaluationValidationError(
+            f"outcome_checkpoints must contain exactly 4 checkpoints, got {len(evaluation.outcome_checkpoints)}"
+        )
+    expected_hours = (4, 8, 12, 24)
+    for idx, cp in enumerate(evaluation.outcome_checkpoints):
+        if cp.checkpoint_horizon_hours != expected_hours[idx]:
+            raise TacticalShadowEvaluationValidationError(
+                f"Checkpoint {idx} has invalid horizon hours: {cp.checkpoint_horizon_hours} != {expected_hours[idx]}"
+            )
+
+    # Attribution presence
+    if evaluation.attribution is None:
+        raise TacticalShadowEvaluationValidationError("attribution projection is mandatory")
 
     verify_shadow_evaluation_identity(evaluation)
 
@@ -573,68 +763,132 @@ def validate_attribution_crosscheck(
     shadow_record: Mapping[str, Any],
 ) -> None:
     """Cross-check shadow operational row against authoritative FeatureEvidenceV2. Fail closed on conflict."""
-    # 1. Playbook
+    # 1. Symbol (Section 22, 24)
+    sh_sym = str(shadow_record.get("symbol") or "").strip().upper()
+    ev_sym = str(feature_evidence.symbol or "").strip().upper()
+    if sh_sym != ev_sym:
+        raise TacticalShadowAttributionConflictError(
+            f"Symbol conflict: shadow={sh_sym} vs feature_evidence={ev_sym}"
+        )
+
+    # 2. Signal time / Decision time (Section 22, 24)
+    sh_sig_t = int(shadow_record.get("signal_time_ms") or shadow_record.get("timestamp_ms") or 0)
+    ev_dec_t = int(feature_evidence.decision_time_ms)
+    if sh_sig_t != ev_dec_t:
+        raise TacticalShadowAttributionConflictError(
+            f"Signal time conflict: shadow={sh_sig_t} vs feature_evidence={ev_dec_t}"
+        )
+
+    # 3. Feature evidence ID (Section 22, 24)
+    sh_ev_id = str(shadow_record.get("feature_evidence_id") or "").strip()
+    ev_id = str(feature_evidence.evidence_id).strip()
+    if sh_ev_id != ev_id:
+        raise TacticalShadowAttributionConflictError(
+            f"Feature evidence ID conflict: shadow={sh_ev_id} vs feature_evidence={ev_id}"
+        )
+
+    # 4. Playbook
     sh_setup = str(shadow_record.get("agent_setup") or "").strip().upper()
     if sh_setup.startswith("PLAYBOOKTYPE."):
         sh_setup = sh_setup.split(".", 1)[1]
     ev_pb = str(feature_evidence.selected_playbook or "").strip().upper()
     if ev_pb.startswith("PLAYBOOKTYPE."):
         ev_pb = ev_pb.split(".", 1)[1]
-    if sh_setup and ev_pb and sh_setup != ev_pb:
+    if sh_setup != ev_pb:
         raise TacticalShadowAttributionConflictError(
             f"Playbook conflict: shadow={sh_setup} vs feature_evidence={ev_pb}"
         )
 
-    # 2. Direction
+    # 5. Direction
     sh_dir = str(shadow_record.get("direction") or "").strip().upper()
     ev_dir = (
         str(feature_evidence.decision_trace.final_directional_decision or "").strip().upper()
         if feature_evidence.decision_trace
         else ""
     )
-    if sh_dir and ev_dir and sh_dir != ev_dir:
+    if sh_dir != ev_dir:
         raise TacticalShadowAttributionConflictError(
             f"Direction conflict: shadow={sh_dir} vs feature_evidence={ev_dir}"
         )
 
-    # 3. Signal Identity
+    # 6. Signal Identity
     sh_sig = str(shadow_record.get("signal_identity") or "").strip()
-    ev_sig = str(feature_evidence.signal_identity).strip()
-    if sh_sig and ev_sig and sh_sig != ev_sig:
+    ev_sig = str(feature_evidence.signal_identity or "").strip()
+    if sh_sig != ev_sig:
         raise TacticalShadowAttributionConflictError(
             f"Signal identity conflict: shadow={sh_sig} vs feature_evidence={ev_sig}"
         )
 
-    # 4. Setup Key
+    # 7. Setup Key
     sh_key = str(shadow_record.get("setup_key") or "").strip()
-    ev_key = str(feature_evidence.setup_key).strip()
-    if sh_key and ev_key and sh_key != ev_key:
+    ev_key = str(feature_evidence.setup_key or "").strip()
+    if sh_key != ev_key:
         raise TacticalShadowAttributionConflictError(
             f"Setup key conflict: shadow={sh_key} vs feature_evidence={ev_key}"
         )
 
-    # 5. Snapshot Hash
+    # 8. Snapshot Hash
     sh_snap = str(shadow_record.get("snapshot_hash") or "").strip()
-    ev_snap = str(feature_evidence.snapshot_hash).strip()
-    if sh_snap and ev_snap and sh_snap != ev_snap:
+    ev_snap = str(feature_evidence.snapshot_hash or "").strip()
+    if sh_snap != ev_snap:
         raise TacticalShadowAttributionConflictError(
             f"Snapshot hash conflict: shadow={sh_snap} vs feature_evidence={ev_snap}"
         )
 
-    # 6. Policy Version
+    # 9. Policy Version
     sh_pol = str(shadow_record.get("policy_version") or "").strip()
-    ev_pol = str(feature_evidence.policy_version).strip()
-    if sh_pol and ev_pol and sh_pol != ev_pol:
+    ev_pol = str(feature_evidence.policy_version or "").strip()
+    if sh_pol != ev_pol:
         raise TacticalShadowAttributionConflictError(
             f"Policy version conflict: shadow={sh_pol} vs feature_evidence={ev_pol}"
         )
 
-    # 7. Config Hash
+    # 10. Config Hash
     sh_cfg = str(shadow_record.get("config_hash") or "").strip()
-    ev_cfg = str(feature_evidence.config_hash).strip()
-    if sh_cfg and ev_cfg and sh_cfg != ev_cfg:
+    ev_cfg = str(feature_evidence.config_hash or "").strip()
+    if sh_cfg != ev_cfg:
         raise TacticalShadowAttributionConflictError(
             f"Config hash conflict: shadow={sh_cfg} vs feature_evidence={ev_cfg}"
+        )
+
+    # 11. Risk-plan cross-check (Section 23, 24)
+    rp = feature_evidence.directional_risk_plan
+    if rp is None:
+        raise TacticalShadowAttributionConflictError(
+            "FeatureEvidenceV2 is missing directional_risk_plan"
+        )
+
+    ev_rp_dir = str(rp.decision).strip().upper()
+    if sh_dir != ev_rp_dir:
+        raise TacticalShadowAttributionConflictError(
+            f"Direction conflict with risk plan: shadow={sh_dir} vs risk_plan={ev_rp_dir}"
+        )
+
+    sh_entry_low = float(shadow_record.get("entry_zone_low") or 0.0)
+    sh_entry_high = float(shadow_record.get("entry_zone_high") or 0.0)
+    sh_sl = float(shadow_record.get("stop_loss") or 0.0)
+    sh_tp1 = float(shadow_record.get("tp1") or 0.0)
+    sh_tp2 = float(shadow_record.get("tp2") or 0.0)
+
+    if not math.isclose(sh_entry_low, rp.entry_low, rel_tol=1e-12, abs_tol=1e-12):
+        raise TacticalShadowAttributionConflictError(
+            f"Entry zone low conflict: shadow={sh_entry_low} vs risk_plan={rp.entry_low}"
+        )
+    if not math.isclose(sh_entry_high, rp.entry_high, rel_tol=1e-12, abs_tol=1e-12):
+        raise TacticalShadowAttributionConflictError(
+            f"Entry zone high conflict: shadow={sh_entry_high} vs risk_plan={rp.entry_high}"
+        )
+    if not math.isclose(sh_sl, rp.stop_loss, rel_tol=1e-12, abs_tol=1e-12):
+        raise TacticalShadowAttributionConflictError(
+            f"Stop loss conflict: shadow={sh_sl} vs risk_plan={rp.stop_loss}"
+        )
+    if not math.isclose(sh_tp1, rp.take_profit_1, rel_tol=1e-12, abs_tol=1e-12):
+        raise TacticalShadowAttributionConflictError(
+            f"TP1 conflict: shadow={sh_tp1} vs risk_plan={rp.take_profit_1}"
+        )
+    if not math.isclose(sh_tp2, rp.take_profit_2, rel_tol=1e-12, abs_tol=1e-12):
+        raise TacticalShadowAttributionConflictError(
+            f"TP2 conflict: shadow={sh_tp2} vs risk_plan={rp.take_profit_2}"
         )
 
 
@@ -651,6 +905,8 @@ def evaluate_funding_accounting(
     exit_time_ms: int | None,
     funding_records: Sequence[dict[str, Any]] | None,
     fetch_error: bool = False,
+    fill_interval_start_ms: int | None = None,
+    fill_interval_end_ms: int | None = None,
 ) -> FundingAccountingEvidence:
     """Evaluate realized funding settlements causally within the filled holding interval."""
     if fill_time_ms is None or exit_time_ms is None or fill_price is None or stop_loss is None:
@@ -680,6 +936,10 @@ def evaluate_funding_accounting(
             notes="Funding records not supplied",
         )
 
+    # Establish authoritative fill uncertainty interval
+    start_int = fill_interval_start_ms if fill_interval_start_ms is not None else (fill_time_ms - 60_000)
+    end_int = fill_interval_end_ms if fill_interval_end_ms is not None else fill_time_ms
+
     is_long = direction.upper() == "LONG"
     applicable_settlements: list[FundingSettlementEvidence] = []
     has_ambiguity = False
@@ -692,9 +952,12 @@ def evaluate_funding_accounting(
         mp_val = rec.get("mark_price")
         mark_price = float(mp_val) if mp_val is not None else None
 
-        # Check if settlement lies within holding interval
-        # If funding settlement is within 60s of fill_time_ms, ordering cannot be established (Section 21)
-        if abs(f_time - fill_time_ms) < 60_000:
+        # Section 20: Settlement before fill interval: not applicable
+        if f_time < start_int:
+            continue
+
+        # Section 18: Ambiguous fill boundary: fill ordering vs funding cannot be proven
+        if start_int <= f_time <= end_int:
             has_ambiguity = True
             applicable_settlements.append(
                 FundingSettlementEvidence(
@@ -709,8 +972,8 @@ def evaluate_funding_accounting(
             )
             continue
 
-        # Position open across settlement: fill occurred strictly before settlement minute and exit occurred strictly after
-        if (fill_time_ms + 60_000) <= f_time <= exit_time_ms:
+        # Section 19: Proven open across settlement
+        if f_time > end_int and f_time <= exit_time_ms:
             if mark_price is None or mark_price <= 0.0:
                 has_missing_mark = True
                 applicable_settlements.append(
@@ -834,11 +1097,17 @@ def compute_diagnostic_checkpoints(
         initial_risk = 1.0
     is_long = direction.upper() == "LONG"
 
+    # Section 35: Never inspect post-terminal candles!
+    if exit_time_ms is not None:
+        eligible_candles = [c for c in candles_15m if isinstance(c, Candle) and c.close_time_ms <= exit_time_ms]
+    else:
+        eligible_candles = [c for c in candles_15m if isinstance(c, Candle)]
+
     for h in standard_horizons_hours:
         h_ms = h * 3600 * 1000
         target_t = fill_time_ms + h_ms
 
-        # Check if trade terminated before checkpoint
+        # Section 35: Check if trade terminated before or at checkpoint
         if exit_time_ms is not None and exit_time_ms <= target_t:
             term_status = f"TERMINATED_{terminal_reason or 'EXIT'}"
             checkpoints.append(
@@ -856,8 +1125,13 @@ def compute_diagnostic_checkpoints(
             )
             continue
 
-        # Trade active at checkpoint target time: find candle up to target_t
-        relevant_candles = [c for c in candles_15m if c.open_time_ms >= fill_time_ms and c.close_time_ms <= target_t]
+        # Trade active at checkpoint target time: find candles strictly in observation window
+        relevant_candles = [
+            c for c in eligible_candles
+            if c.close_time_ms > fill_time_ms and c.close_time_ms <= target_t
+        ]
+        relevant_candles.sort(key=lambda c: c.open_time_ms)
+
         if not relevant_candles:
             checkpoints.append(
                 OutcomeCheckpointEvidence(
@@ -870,21 +1144,45 @@ def compute_diagnostic_checkpoints(
             )
             continue
 
+        # Section 34 & 36: Prove complete chronological 15m coverage before marking OBSERVED
+        cov = validate_time_coverage(
+            relevant_candles,
+            start_ms=fill_time_ms,
+            end_ms=target_t,
+            interval_ms=15 * 60 * 1000,
+        )
+
+        if not cov.complete:
+            checkpoints.append(
+                OutcomeCheckpointEvidence(
+                    checkpoint_horizon_hours=h,
+                    checkpoint_horizon_ms=h_ms,
+                    target_time_ms=target_t,
+                    status="INSUFFICIENT_COVERAGE",
+                    mark_price=None,
+                    mark_to_market_gross_r=None,
+                    mfe_r_to_checkpoint=None,
+                    mae_r_to_checkpoint=None,
+                    barrier_status="ACTIVE",
+                )
+            )
+            continue
+
         last_cand = relevant_candles[-1]
         mark_p = last_cand.close
         gross_pnl = (mark_p - fill_price) if is_long else (fill_price - mark_p)
-        mtm_r = gross_pnl / initial_risk
+        mtm_r = round(gross_pnl / initial_risk, 4)
 
         if is_long:
             max_h = max(c.high for c in relevant_candles)
             min_l = min(c.low for c in relevant_candles)
-            mfe_r = (max_h - fill_price) / initial_risk
-            mae_r = (fill_price - min_l) / initial_risk
+            mfe_r = round((max_h - fill_price) / initial_risk, 4)
+            mae_r = round((fill_price - min_l) / initial_risk, 4)
         else:
             max_h = max(c.high for c in relevant_candles)
             min_l = min(c.low for c in relevant_candles)
-            mfe_r = (fill_price - min_l) / initial_risk
-            mae_r = (max_h - fill_price) / initial_risk
+            mfe_r = round((fill_price - min_l) / initial_risk, 4)
+            mae_r = round((max_h - fill_price) / initial_risk, 4)
 
         checkpoints.append(
             OutcomeCheckpointEvidence(
@@ -965,7 +1263,20 @@ def build_tactical_shadow_evaluation_v2(
     override_profile_version: str | None = None,
 ) -> TacticalShadowEvaluationV2:
     """Construct, cross-check, and seal an immutable TacticalShadowEvaluationV2."""
-    # 1. Cross-check attribution (Section 9)
+    # Section 25: B1 authority verification
+    validate_tactical_feature_evidence(feature_evidence)
+    verify_tactical_evidence_identity(feature_evidence)
+
+    # Section 12, 13, 14: Profile version check - missing profile_version => reject as PRE_B2A_HORIZON / ineligible
+    raw_prof_ver = override_profile_version or shadow_record.get("evaluation_profile_version")
+    if not raw_prof_ver or str(raw_prof_ver).strip() != DIRECTIONAL_OUTCOME_PROFILE_VERSION:
+        raise TacticalShadowEvaluationValidationError(
+            f"Record is ineligible for B2A materialization: evaluation_profile_version must be "
+            f"{DIRECTIONAL_OUTCOME_PROFILE_VERSION}, got {raw_prof_ver!r} (classified as PRE_B2A_HORIZON)"
+        )
+    profile_ver = str(raw_prof_ver).strip()
+
+    # Section 22, 23, 24: Cross-check attribution
     validate_attribution_crosscheck(feature_evidence, shadow_record)
 
     rec_id = int(shadow_record["id"])
@@ -985,16 +1296,30 @@ def build_tactical_shadow_evaluation_v2(
         shadow_record.get("entry_window_end_ms") or (signal_t + (int(shadow_record.get("entry_window_bars") or 4) * 15 * 60 * 1000))
     )
 
-    profile_ver = override_profile_version or str(
-        shadow_record.get("evaluation_profile_version") or DIRECTIONAL_OUTCOME_PROFILE_VERSION
-    )
     profile_info = get_playbook_evaluation_profile(playbook)
-    eval_horizon_ms = int(shadow_record.get("evaluation_horizon_ms") or profile_info["horizon_ms"])
+    raw_bars = shadow_record.get("evaluation_horizon_bars")
+    raw_ms = shadow_record.get("evaluation_horizon_ms")
+    eval_horizon_bars = int(raw_bars) if raw_bars is not None else profile_info["horizon_bars"]
+    eval_horizon_ms = int(raw_ms) if raw_ms is not None else profile_info["horizon_ms"]
+
+    if eval_horizon_bars != profile_info["horizon_bars"] or eval_horizon_ms != profile_info["horizon_ms"]:
+        raise TacticalShadowProfileConflictError(
+            f"Horizon conflict: record bars={eval_horizon_bars}, ms={eval_horizon_ms} does not match profile "
+            f"for {playbook} (bars={profile_info['horizon_bars']}, ms={profile_info['horizon_ms']})"
+        )
+    if eval_horizon_ms != eval_horizon_bars * 900_000:
+        raise TacticalShadowProfileConflictError(
+            f"Horizon invariant violated: ms={eval_horizon_ms} != bars={eval_horizon_bars} * 900_000"
+        )
 
     fill_st = str(shadow_record.get("fill_status") or "WAITING_FOR_FILL")
     fill_p = float(shadow_record["fill_price"]) if shadow_record.get("fill_price") is not None else None
     fill_t = int(shadow_record["fill_time_ms"]) if shadow_record.get("fill_time_ms") is not None else None
     stop_loss = float(shadow_record.get("stop_loss") or 0.0)
+
+    fill_int_start = int(shadow_record["fill_interval_start_ms"]) if shadow_record.get("fill_interval_start_ms") is not None else None
+    fill_int_end = int(shadow_record["fill_interval_end_ms"]) if shadow_record.get("fill_interval_end_ms") is not None else None
+    fill_time_res = str(shadow_record["fill_time_resolution"]) if shadow_record.get("fill_time_resolution") is not None else None
 
     time_to_fill_ms = (fill_t - signal_t) if (fill_t is not None and fill_t >= signal_t) else None
 
@@ -1077,6 +1402,8 @@ def build_tactical_shadow_evaluation_v2(
             exit_time_ms=exit_t,
             funding_records=funding_records,
             fetch_error=funding_fetch_error,
+            fill_interval_start_ms=fill_int_start,
+            fill_interval_end_ms=fill_int_end,
         )
 
         if funding_acct.funding_status == FundingStatus.COMPLETE.value and funding_acct.funding_pnl_r is not None and net_r_ex is not None:
@@ -1125,7 +1452,11 @@ def build_tactical_shadow_evaluation_v2(
         fill_status=fill_st,
         fill_time_ms=fill_t,
         fill_price=fill_p,
+        fill_interval_start_ms=fill_int_start,
+        fill_interval_end_ms=fill_int_end,
+        fill_time_resolution=fill_time_res,
         evaluation_profile_version=profile_ver,
+        evaluation_horizon_bars=eval_horizon_bars,
         evaluation_horizon_ms=eval_horizon_ms,
         evaluation_start_ms=eval_start_ms,
         evaluation_end_ms=eval_end_ms,
@@ -1474,7 +1805,7 @@ def deserialize_tactical_shadow_evaluation(
 
     evaluation = TacticalShadowEvaluationV2(
         evaluation_schema_version=str(payload["evaluation_schema_version"]),
-        evaluation_id=str(payload["evaluation_id"]),
+        evaluation_id=str(payload.get("evaluation_id") or compute_evaluation_id(payload)),
         feature_evidence_id=str(payload["feature_evidence_id"]),
         shadow_record_id=int(payload["shadow_record_id"]),
         symbol=str(payload["symbol"]),
@@ -1488,7 +1819,11 @@ def deserialize_tactical_shadow_evaluation(
         fill_status=str(payload["fill_status"]),
         fill_time_ms=int(payload["fill_time_ms"]) if payload.get("fill_time_ms") is not None else None,
         fill_price=float(payload["fill_price"]) if payload.get("fill_price") is not None else None,
+        fill_interval_start_ms=int(payload["fill_interval_start_ms"]) if payload.get("fill_interval_start_ms") is not None else None,
+        fill_interval_end_ms=int(payload["fill_interval_end_ms"]) if payload.get("fill_interval_end_ms") is not None else None,
+        fill_time_resolution=str(payload["fill_time_resolution"]) if payload.get("fill_time_resolution") is not None else None,
         evaluation_profile_version=str(payload["evaluation_profile_version"]),
+        evaluation_horizon_bars=int(payload.get("evaluation_horizon_bars", 0)),
         evaluation_horizon_ms=int(payload["evaluation_horizon_ms"]),
         evaluation_start_ms=int(payload["evaluation_start_ms"]) if payload.get("evaluation_start_ms") is not None else None,
         evaluation_end_ms=int(payload["evaluation_end_ms"]) if payload.get("evaluation_end_ms") is not None else None,
@@ -1521,5 +1856,5 @@ def deserialize_tactical_shadow_evaluation(
     )
 
     if verify_identity:
-        verify_shadow_evaluation_identity(evaluation)
+        validate_tactical_shadow_evaluation(evaluation)
     return evaluation

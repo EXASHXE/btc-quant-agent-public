@@ -38,13 +38,16 @@ from .evidence import (
     verify_tactical_evidence_identity,
 )
 from .shadow_evidence import (
+    TacticalShadowAttributionConflictError,
     TacticalShadowEvaluationConflictError,
     TacticalShadowEvaluationIdentityError,
     TacticalShadowEvaluationV2,
+    TacticalShadowEvaluationValidationError,
+    TacticalShadowProfileConflictError,
     canonical_shadow_evaluation_json,
     deserialize_tactical_shadow_evaluation,
     get_playbook_evaluation_profile,
-    verify_shadow_evaluation_identity,
+    validate_tactical_shadow_evaluation,
 )
 
 
@@ -307,7 +310,10 @@ class MarketWatchStateStore:
                     semantic_identity_json TEXT,
                     feature_evidence_id TEXT,
                     evaluation_profile_version TEXT,
-                    evaluation_horizon_ms INTEGER
+                    evaluation_horizon_ms INTEGER,
+                    fill_interval_start_ms INTEGER,
+                    fill_interval_end_ms INTEGER,
+                    fill_time_resolution TEXT
                 )
                 """
             )
@@ -356,6 +362,9 @@ class MarketWatchStateStore:
                 ("feature_evidence_id", "TEXT"),
                 ("evaluation_profile_version", "TEXT"),
                 ("evaluation_horizon_ms", "INTEGER"),
+                ("fill_interval_start_ms", "INTEGER"),
+                ("fill_interval_end_ms", "INTEGER"),
+                ("fill_time_resolution", "TEXT"),
             ]:
                 try:
                     conn.execute(f"ALTER TABLE market_watch_shadow_records ADD COLUMN {col_name} {col_type}")
@@ -421,6 +430,7 @@ class MarketWatchStateStore:
                     direction TEXT NOT NULL,
                     signal_time_ms INTEGER NOT NULL,
                     evaluation_profile_version TEXT NOT NULL,
+                    evaluation_horizon_bars INTEGER NOT NULL,
                     evaluation_horizon_ms INTEGER NOT NULL,
                     fill_status TEXT NOT NULL,
                     fill_time_ms INTEGER,
@@ -435,6 +445,11 @@ class MarketWatchStateStore:
                 )
                 """
             )
+            try:
+                conn.execute("ALTER TABLE tactical_shadow_evaluations_v2 ADD COLUMN evaluation_horizon_bars INTEGER")
+            except sqlite3.OperationalError:
+                pass
+
             cur_dup_eval = conn.execute(
                 """
                 SELECT shadow_record_id, evaluation_profile_version, COUNT(DISTINCT evaluation_id) AS cnt
@@ -965,6 +980,9 @@ class MarketWatchStateStore:
         feature_evidence_id: str | None = None,
         evaluation_profile_version: str | None = None,
         evaluation_horizon_ms: int | None = None,
+        fill_interval_start_ms: int | None = None,
+        fill_interval_end_ms: int | None = None,
+        fill_time_resolution: str | None = None,
     ) -> int:
         if semantic_identity is not None and not semantic_identity_json:
             semantic_identity_json = _serialize_semantic_identity(semantic_identity)
@@ -975,16 +993,28 @@ class MarketWatchStateStore:
         if entry_window_end_ms is None:
             entry_window_end_ms = signal_time_ms + (entry_window_bars * 15 * 60 * 1000)
 
-        if evaluation_profile_version is None:
-            evaluation_profile_version = DIRECTIONAL_OUTCOME_PROFILE_VERSION
-        if evaluation_horizon_ms is None:
+        if evaluation_profile_version == DIRECTIONAL_OUTCOME_PROFILE_VERSION:
             prof = get_playbook_evaluation_profile(agent_setup)
-            evaluation_horizon_ms = prof["horizon_ms"]
-
-        if evaluation_end_ms is None:
-            eval_end_ms = signal_time_ms + (evaluation_horizon_bars * 15 * 60 * 1000)
+            if evaluation_horizon_bars is None:
+                evaluation_horizon_bars = prof["horizon_bars"]
+            if evaluation_horizon_ms is None:
+                evaluation_horizon_ms = prof["horizon_ms"]
+            if evaluation_horizon_bars != prof["horizon_bars"] or evaluation_horizon_ms != prof["horizon_ms"]:
+                raise TacticalShadowProfileConflictError(
+                    f"Profile conflict in record_shadow_observation: setup={agent_setup} expects "
+                    f"bars={prof['horizon_bars']}, ms={prof['horizon_ms']}; got bars={evaluation_horizon_bars}, ms={evaluation_horizon_ms}"
+                )
+            if evaluation_horizon_ms != evaluation_horizon_bars * 15 * 60 * 1000:
+                raise TacticalShadowProfileConflictError(
+                    f"Horizon invariant violated: {evaluation_horizon_ms} != {evaluation_horizon_bars} * 900_000"
+                )
+            eval_end_ms = evaluation_end_ms if evaluation_end_ms is not None else (signal_time_ms + evaluation_horizon_ms)
         else:
-            eval_end_ms = evaluation_end_ms
+            eval_end_ms = (
+                evaluation_end_ms
+                if evaluation_end_ms is not None
+                else (signal_time_ms + (evaluation_horizon_bars * 15 * 60 * 1000))
+            )
 
         if entry_zone_low <= 0.0 and entry_price > 0.0:
             entry_zone_low = entry_price
@@ -1045,8 +1075,9 @@ class MarketWatchStateStore:
                     execution_path_model, setup_key, evidence_version, entry_window_start_ms,
                     evaluation_start_ms, terminal_reason, exit_time_ms, exit_price,
                     coverage_status, coverage_reason, semantic_identity_json, feature_evidence_id,
-                    evaluation_profile_version, evaluation_horizon_ms
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    evaluation_profile_version, evaluation_horizon_ms,
+                    fill_interval_start_ms, fill_interval_end_ms, fill_time_resolution
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     timestamp_ms,
@@ -1094,6 +1125,9 @@ class MarketWatchStateStore:
                     feature_evidence_id,
                     evaluation_profile_version,
                     evaluation_horizon_ms,
+                    fill_interval_start_ms,
+                    fill_interval_end_ms,
+                    fill_time_resolution,
                 ),
             )
             conn.commit()
@@ -1110,6 +1144,9 @@ class MarketWatchStateStore:
         evaluation_end_ms: int | None = None,
         path_resolution: str | None = None,
         execution_path_model: str | None = None,
+        fill_interval_start_ms: int | None = None,
+        fill_interval_end_ms: int | None = None,
+        fill_time_resolution: str | None = None,
     ) -> None:
         with self._connect() as conn:
             conn.execute(
@@ -1122,7 +1159,10 @@ class MarketWatchStateStore:
                     evaluation_start_ms = COALESCE(?, evaluation_start_ms),
                     evaluation_end_ms = COALESCE(?, evaluation_end_ms),
                     path_resolution = COALESCE(?, path_resolution),
-                    execution_path_model = COALESCE(?, execution_path_model)
+                    execution_path_model = COALESCE(?, execution_path_model),
+                    fill_interval_start_ms = COALESCE(?, fill_interval_start_ms),
+                    fill_interval_end_ms = COALESCE(?, fill_interval_end_ms),
+                    fill_time_resolution = COALESCE(?, fill_time_resolution)
                 WHERE id = ?
                 """,
                 (
@@ -1134,6 +1174,9 @@ class MarketWatchStateStore:
                     evaluation_end_ms,
                     path_resolution,
                     execution_path_model,
+                    fill_interval_start_ms,
+                    fill_interval_end_ms,
+                    fill_time_resolution,
                     shadow_id,
                 ),
             )
@@ -1166,6 +1209,9 @@ class MarketWatchStateStore:
         exit_price: float | None = None,
         coverage_status: str | None = None,
         coverage_reason: str | None = None,
+        fill_interval_start_ms: int | None = None,
+        fill_interval_end_ms: int | None = None,
+        fill_time_resolution: str | None = None,
         resolved: int = 1,
     ) -> None:
         with self._connect() as conn:
@@ -1196,7 +1242,10 @@ class MarketWatchStateStore:
                     exit_time_ms = COALESCE(?, exit_time_ms),
                     exit_price = COALESCE(?, exit_price),
                     coverage_status = COALESCE(?, coverage_status),
-                    coverage_reason = COALESCE(?, coverage_reason)
+                    coverage_reason = COALESCE(?, coverage_reason),
+                    fill_interval_start_ms = COALESCE(?, fill_interval_start_ms),
+                    fill_interval_end_ms = COALESCE(?, fill_interval_end_ms),
+                    fill_time_resolution = COALESCE(?, fill_time_resolution)
                 WHERE id = ?
                 """,
                 (
@@ -1225,6 +1274,9 @@ class MarketWatchStateStore:
                     exit_price,
                     coverage_status,
                     coverage_reason,
+                    fill_interval_start_ms,
+                    fill_interval_end_ms,
+                    fill_time_resolution,
                     shadow_id,
                 ),
             )
@@ -1387,11 +1439,63 @@ class MarketWatchStateStore:
             return dict(row) if row is not None else None
 
     def save_shadow_evaluation(self, evaluation: TacticalShadowEvaluationV2) -> str:
-        """Persist immutable TacticalShadowEvaluationV2 enforcing natural key uniqueness and immutability."""
-        verify_shadow_evaluation_identity(evaluation)
+        """Persist immutable TacticalShadowEvaluationV2 enforcing natural key uniqueness, persistence authority, and immutability."""
+        validate_tactical_shadow_evaluation(evaluation)
         now_ms = int(time.time() * 1000)
 
         with self._connect() as conn:
+            conn.row_factory = sqlite3.Row
+
+            # Section 41: Persistence authority checks
+            # 1. Missing B1 evidence check
+            cur_ev = conn.execute(
+                "SELECT evidence_id, evidence_json FROM tactical_feature_evidence_v2 WHERE evidence_id = ?",
+                (evaluation.feature_evidence_id,),
+            )
+            ev_row = cur_ev.fetchone()
+            if ev_row is None:
+                raise TacticalEvidenceLinkageError(
+                    f"Linked feature_evidence_id does not exist in DB: {evaluation.feature_evidence_id}"
+                )
+            ev_b1 = deserialize_tactical_feature_evidence(ev_row["evidence_json"], verify_identity=True)
+            if ev_b1.evidence_id != evaluation.feature_evidence_id:
+                raise TacticalEvidenceIdentityError(
+                    f"Linked B1 evidence identity mismatch: DB={ev_row['evidence_id']} vs {evaluation.feature_evidence_id}"
+                )
+
+            # 2. Missing shadow source & status checks
+            cur_sh = conn.execute(
+                "SELECT id, feature_evidence_id, evaluation_profile_version, resolved, observation_type FROM market_watch_shadow_records WHERE id = ?",
+                (evaluation.shadow_record_id,),
+            )
+            sh_row = cur_sh.fetchone()
+            if sh_row is None:
+                raise TacticalShadowEvaluationValidationError(
+                    f"Linked shadow_record_id does not exist in DB: {evaluation.shadow_record_id}"
+                )
+            if int(sh_row["resolved"]) == 0:
+                raise TacticalShadowEvaluationValidationError(
+                    f"Linked shadow record is unresolved (resolved=0): id={evaluation.shadow_record_id}"
+                )
+            if str(sh_row["observation_type"] or "") != "ACTIONABLE_TRIGGERED":
+                raise TacticalShadowEvaluationValidationError(
+                    f"Linked shadow record is not ACTIONABLE_TRIGGERED: {sh_row['observation_type']}"
+                )
+
+            # 3. Linkage mismatch check
+            sh_ev_id = str(sh_row["feature_evidence_id"] or "").strip()
+            if sh_ev_id != evaluation.feature_evidence_id:
+                raise TacticalShadowAttributionConflictError(
+                    f"Linkage mismatch: shadow.feature_evidence_id ({sh_ev_id}) != evaluation.feature_evidence_id ({evaluation.feature_evidence_id})"
+                )
+
+            # 4. Profile mismatch check
+            sh_prof_ver = str(sh_row["evaluation_profile_version"] or "").strip()
+            if sh_prof_ver != evaluation.evaluation_profile_version:
+                raise TacticalShadowProfileConflictError(
+                    f"Profile mismatch: shadow.evaluation_profile_version ({sh_prof_ver}) != evaluation.evaluation_profile_version ({evaluation.evaluation_profile_version})"
+                )
+
             # Check by natural key (shadow_record_id, evaluation_profile_version)
             cur = conn.execute(
                 """
@@ -1428,10 +1532,10 @@ class MarketWatchStateStore:
                     INSERT INTO tactical_shadow_evaluations_v2 (
                         evaluation_id, evaluation_schema_version, shadow_record_id, feature_evidence_id,
                         symbol, signal_identity, setup_key, playbook, direction, signal_time_ms,
-                        evaluation_profile_version, evaluation_horizon_ms, fill_status, fill_time_ms,
+                        evaluation_profile_version, evaluation_horizon_bars, evaluation_horizon_ms, fill_status, fill_time_ms,
                         terminal_status, terminal_reason, net_r_ex_funding, net_r_after_funding,
                         funding_status, coverage_status, evaluation_json, persisted_at_ms
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                     """,
                     (
                         evaluation.evaluation_id,
@@ -1445,6 +1549,7 @@ class MarketWatchStateStore:
                         evaluation.direction,
                         evaluation.signal_time_ms,
                         evaluation.evaluation_profile_version,
+                        evaluation.evaluation_horizon_bars,
                         evaluation.evaluation_horizon_ms,
                         evaluation.fill_status,
                         evaluation.fill_time_ms,

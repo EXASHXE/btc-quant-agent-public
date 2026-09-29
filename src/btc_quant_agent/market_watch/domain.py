@@ -205,6 +205,9 @@ class ShadowFillResult:
     fill_candle_close_ms: int | None = None
     source_interval: str = "15m"
     path_resolution: str = "FIFTEEN_MINUTE_STOP_FIRST"
+    fill_interval_start_ms: int | None = None
+    fill_interval_end_ms: int | None = None
+    fill_time_resolution: str | None = None
 
     def __iter__(self) -> Any:
         return iter((self.status, self.fill_price, self.fill_time_ms))

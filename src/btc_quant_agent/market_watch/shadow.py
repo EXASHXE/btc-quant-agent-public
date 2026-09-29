@@ -21,6 +21,7 @@ from .domain import (
 )
 from .shadow_evidence import (
     TacticalShadowEvaluationV2,
+    TacticalShadowProfileConflictError,
     build_tactical_shadow_evaluation_v2,
     get_playbook_evaluation_profile,
 )
@@ -247,6 +248,7 @@ def resolve_shadow_fill(
             break
 
         src_interval = getattr(candle, "interval", "") or "15m"
+        res_tax = "ONE_MINUTE_TOUCH_INTERVAL" if src_interval == "1m" else "FIFTEEN_MINUTE_FALLBACK_INTERVAL"
 
         if dir_str == "LONG" and candle.low <= entry_zone_high and candle.high >= entry_zone_low:
             # Conservative fill price
@@ -263,6 +265,9 @@ def resolve_shadow_fill(
                 fill_candle_open_ms=candle.open_time_ms,
                 fill_candle_close_ms=candle.close_time_ms,
                 source_interval=src_interval,
+                fill_interval_start_ms=candle.open_time_ms,
+                fill_interval_end_ms=candle.close_time_ms,
+                fill_time_resolution=res_tax,
             )
         elif dir_str == "SHORT" and candle.high >= entry_zone_low and candle.low <= entry_zone_high:
             # Conservative fill price
@@ -279,6 +284,9 @@ def resolve_shadow_fill(
                 fill_candle_open_ms=candle.open_time_ms,
                 fill_candle_close_ms=candle.close_time_ms,
                 source_interval=src_interval,
+                fill_interval_start_ms=candle.open_time_ms,
+                fill_interval_end_ms=candle.close_time_ms,
+                fill_time_resolution=res_tax,
             )
 
     # If not filled: check if candles covered through entry_window_end_ms
@@ -336,7 +344,7 @@ class ShadowEvaluationManager:
         assessment: SymbolAssessment,
         reference_decision: str | None = None,
         reference_notes: str | None = None,
-        evaluation_horizon_bars: int = 16,
+        evaluation_horizon_bars: int | None = None,
         observation_type: str = "ACTIONABLE_TRIGGERED",
         entry_window_bars: int = 4,
         evaluation_profile_version: str | None = None,
@@ -361,8 +369,21 @@ class ShadowEvaluationManager:
         prof = get_playbook_evaluation_profile(playbook)
         if evaluation_profile_version is None:
             evaluation_profile_version = DIRECTIONAL_OUTCOME_PROFILE_VERSION
-        if evaluation_horizon_ms is None:
+
+        if evaluation_profile_version == DIRECTIONAL_OUTCOME_PROFILE_VERSION:
+            if evaluation_horizon_bars is not None and evaluation_horizon_bars != prof["horizon_bars"]:
+                raise TacticalShadowProfileConflictError(
+                    f"Conflicting evaluation_horizon_bars passed to record_decision: {evaluation_horizon_bars} != {prof['horizon_bars']} for {playbook}"
+                )
+            if evaluation_horizon_ms is not None and evaluation_horizon_ms != prof["horizon_ms"]:
+                raise TacticalShadowProfileConflictError(
+                    f"Conflicting evaluation_horizon_ms passed to record_decision: {evaluation_horizon_ms} != {prof['horizon_ms']} for {playbook}"
+                )
+            evaluation_horizon_bars = prof["horizon_bars"]
             evaluation_horizon_ms = prof["horizon_ms"]
+        else:
+            if evaluation_horizon_bars is None:
+                evaluation_horizon_bars = 16
 
         return self.store.record_shadow_observation(
             timestamp_ms=signal_time_ms,
@@ -412,6 +433,13 @@ class ShadowEvaluationManager:
         obs_type = rec.get("observation_type")
         if not feat_ev_id or obs_type != "ACTIONABLE_TRIGGERED":
             return None
+
+        # Section 13: Materialization eligibility - require DIRECTIONAL_OUTCOME_PROFILE_V1
+        prof_ver = rec.get("evaluation_profile_version")
+        if not prof_ver or str(prof_ver).strip() != DIRECTIONAL_OUTCOME_PROFILE_VERSION:
+            logger.info("Shadow record %d has non-B2A profile %r; skipping B2A materialization (PRE_B2A_HORIZON)", rec_id, prof_ver)
+            return None
+
         feature_evidence = self.store.get_tactical_feature_evidence(feat_ev_id)
         if feature_evidence is None:
             logger.warning(
@@ -544,16 +572,25 @@ class ShadowEvaluationManager:
             entry_window_end_ms = int(
                 rec.get("entry_window_end_ms") or (signal_time_ms + (entry_bars * 15 * 60 * 1000))
             )
-            eval_bars = int(rec.get("evaluation_horizon_bars") or 16)
+            setup_name = str(rec.get("agent_setup") or "")
+            prof_info = get_playbook_evaluation_profile(setup_name)
+            is_b2a = rec.get("evaluation_profile_version") == DIRECTIONAL_OUTCOME_PROFILE_VERSION
+            if is_b2a:
+                eval_bars = prof_info["horizon_bars"]
+                eval_horizon_ms = prof_info["horizon_ms"]
+            else:
+                eval_bars = int(rec.get("evaluation_horizon_bars") or 16)
+                eval_horizon_ms = int(rec.get("evaluation_horizon_ms") or (eval_bars * 15 * 60 * 1000))
+
             fill_status = rec.get("fill_status") or ShadowFillStatus.WAITING_FOR_FILL.value
 
             # Determine initial fetch target
             if fill_status == ShadowFillStatus.FILLED.value:
                 rec_fill_t = int(rec["fill_time_ms"])
-                eval_end_ms = int(rec.get("evaluation_end_ms") or (rec_fill_t + (eval_bars * 15 * 60 * 1000)))
+                eval_end_ms = int(rec.get("evaluation_end_ms") or (rec_fill_t + eval_horizon_ms))
                 needed_fetch_end = min(current_time_ms, eval_end_ms)
             else:
-                eval_end_ms = int(rec.get("evaluation_end_ms") or (signal_time_ms + (eval_bars * 15 * 60 * 1000)))
+                eval_end_ms = int(rec.get("evaluation_end_ms") or (signal_time_ms + eval_horizon_ms))
                 needed_fetch_end = eval_end_ms
 
             # Fetch primary 15m candles
@@ -570,6 +607,9 @@ class ShadowEvaluationManager:
             fill_bar_remaining_1m: list[Candle] = []
             touch_cand: Candle | None = None
             fill_minute_open_ms: int | None = None
+            fill_int_start: int | None = rec.get("fill_interval_start_ms")
+            fill_int_end: int | None = rec.get("fill_interval_end_ms")
+            fill_time_res: str | None = rec.get("fill_time_resolution")
             stage1_mfe = float(rec.get("future_mfe") or 0.0)
             stage1_mae = float(rec.get("future_mae") or 0.0)
             fill_bar_terminal = False
@@ -642,6 +682,9 @@ class ShadowEvaluationManager:
                                 else:
                                     fill_p = entry_low if c1.open <= entry_low else min(entry_high, c1.open)
                                 fill_t = c1.close_time_ms
+                                fill_int_start = c1.open_time_ms
+                                fill_int_end = c1.close_time_ms
+                                fill_time_res = "ONE_MINUTE_TOUCH_INTERVAL"
                                 path_res = ShadowPathResolution.ONE_MINUTE_CHRONOLOGICAL.value
                                 fill_bar_remaining_1m = post_signal_1m[idx:]
                                 fill_minute_open_ms = c1.open_time_ms
@@ -683,6 +726,9 @@ class ShadowEvaluationManager:
                                         else:
                                             fill_p = entry_low if c1.open <= entry_low else min(entry_high, c1.open)
                                         fill_t = c1.close_time_ms
+                                        fill_int_start = c1.open_time_ms
+                                        fill_int_end = c1.close_time_ms
+                                        fill_time_res = "ONE_MINUTE_TOUCH_INTERVAL"
                                         path_res = ShadowPathResolution.ONE_MINUTE_CHRONOLOGICAL.value
                                         fill_bar_remaining_1m = valid_1m[idx:]
                                         fill_minute_open_ms = c1.open_time_ms
@@ -695,6 +741,9 @@ class ShadowEvaluationManager:
                                 # Touches entry + stop (even if also touches TP1) -> STOP
                                 fill_res = ShadowFillStatus.FILLED
                                 fill_t = c.close_time_ms
+                                fill_int_start = c.open_time_ms
+                                fill_int_end = c.close_time_ms
+                                fill_time_res = "FIFTEEN_MINUTE_FALLBACK_INTERVAL"
                                 if is_long:
                                     fill_p = entry_high if c.open >= entry_high else max(entry_low, c.open)
                                 else:
@@ -711,6 +760,9 @@ class ShadowEvaluationManager:
                                 # Touches entry + TP1 (no stop) -> fill registered, NO same-bar TP1, continue to next 15m candle
                                 fill_res = ShadowFillStatus.FILLED
                                 fill_t = c.close_time_ms
+                                fill_int_start = c.open_time_ms
+                                fill_int_end = c.close_time_ms
+                                fill_time_res = "FIFTEEN_MINUTE_FALLBACK_INTERVAL"
                                 if is_long:
                                     fill_p = entry_high if c.open >= entry_high else max(entry_low, c.open)
                                 else:
@@ -722,6 +774,9 @@ class ShadowEvaluationManager:
                             # Touches entry only (no stop, no TP1): fill registered directly at 15m
                             fill_res = ShadowFillStatus.FILLED
                             fill_t = c.close_time_ms
+                            fill_int_start = c.open_time_ms
+                            fill_int_end = c.close_time_ms
+                            fill_time_res = "FIFTEEN_MINUTE_FALLBACK_INTERVAL"
                             if is_long:
                                 fill_p = entry_high if c.open >= entry_high else max(entry_low, c.open)
                             else:
@@ -737,7 +792,7 @@ class ShadowEvaluationManager:
                     # FREEZE BOUNDARIES ONCE FILLED
                     fill_status = ShadowFillStatus.FILLED.value
                     eval_start_ms = fill_t
-                    eval_end_ms = fill_t + (eval_bars * 15 * 60 * 1000)
+                    eval_end_ms = fill_t + eval_horizon_ms
                     self.store.update_shadow_fill(
                         rec_id,
                         fill_status=fill_status,
@@ -747,6 +802,9 @@ class ShadowEvaluationManager:
                         evaluation_end_ms=eval_end_ms,
                         path_resolution=path_res,
                         execution_path_model=exec_model,
+                        fill_interval_start_ms=fill_int_start,
+                        fill_interval_end_ms=fill_int_end,
+                        fill_time_resolution=fill_time_res,
                     )
                     rec["fill_status"] = fill_status
                     rec["fill_price"] = fill_p
@@ -756,6 +814,9 @@ class ShadowEvaluationManager:
                     rec["evaluation_end_ms"] = eval_end_ms
                     rec["path_resolution"] = path_res
                     rec["execution_path_model"] = exec_model
+                    rec["fill_interval_start_ms"] = fill_int_start
+                    rec["fill_interval_end_ms"] = fill_int_end
+                    rec["fill_time_resolution"] = fill_time_res
                 elif current_time_ms < entry_window_end_ms:
                     results.append({"id": rec_id, "symbol": symbol, "status": "PENDING_WAITING_FOR_FILL"})
                     continue
@@ -810,12 +871,24 @@ class ShadowEvaluationManager:
             fill_time_ms = int(rec["fill_time_ms"])
             fill_price = float(rec["fill_price"])
             eval_start_ms = int(rec.get("evaluation_start_ms") or fill_time_ms)
-            eval_end_ms = int(rec.get("evaluation_end_ms") or (fill_time_ms + (eval_bars * 15 * 60 * 1000)))
+            eval_end_ms = int(rec.get("evaluation_end_ms") or (fill_time_ms + eval_horizon_ms))
             stop_loss = float(rec.get("stop_loss") or 0.0)
             tp1 = float(rec.get("tp1") or 0.0)
             tp2 = float(rec.get("tp2") or 0.0)
             direction = DirectionalDecision(dir_str)
             risk_dist = abs(fill_price - stop_loss) if (stop_loss > 0.0 and fill_price != stop_loss) else 1.0
+
+            if fill_int_start is None:
+                fill_int_start = rec.get("fill_interval_start_ms")
+            if fill_int_end is None:
+                fill_int_end = rec.get("fill_interval_end_ms")
+            if fill_time_res is None:
+                fill_time_res = rec.get("fill_time_resolution")
+            if fill_int_start is None or fill_int_end is None:
+                is_1m_path = rec.get("path_resolution") == ShadowPathResolution.ONE_MINUTE_CHRONOLOGICAL.value
+                fill_int_start = fill_time_ms - 60_000 if is_1m_path else fill_time_ms - (15 * 60 * 1000)
+                fill_int_end = fill_time_ms
+                fill_time_res = "ONE_MINUTE_TOUCH_INTERVAL" if is_1m_path else "FIFTEEN_MINUTE_FALLBACK_INTERVAL"
 
             # Evaluate fill bar 1m candles if present
             if fill_bar_remaining_1m and not fill_bar_terminal:
@@ -886,8 +959,18 @@ class ShadowEvaluationManager:
                     exit_price=fill_bar_exit_price,
                     exit_time_ms=fill_bar_exit_time_ms,
                     coverage_status="COMPLETE",
+                    fill_interval_start_ms=fill_int_start,
+                    fill_interval_end_ms=fill_int_end,
+                    fill_time_resolution=fill_time_res,
                     resolved=1,
                 )
+                rec["fill_interval_start_ms"] = fill_int_start
+                rec["fill_interval_end_ms"] = fill_int_end
+                rec["fill_time_resolution"] = fill_time_res
+                rec["evaluation_horizon_bars"] = eval_bars
+                rec["evaluation_horizon_ms"] = eval_horizon_ms
+                rec["evaluation_start_ms"] = eval_start_ms
+                rec["evaluation_end_ms"] = eval_end_ms
                 self._materialize_and_save_shadow_evaluation(rec_id, client=client, candles_15m=raw_candles)
                 results.append({"id": rec_id, "symbol": symbol, "status": "RESOLVED", "outcome": fill_bar_outcome})
                 continue
@@ -976,8 +1059,18 @@ class ShadowEvaluationManager:
                     exit_price=_to_float(outcome.get("exit_price")),
                     exit_time_ms=_to_int(outcome.get("exit_time_ms")),
                     coverage_status="COMPLETE",
+                    fill_interval_start_ms=fill_int_start,
+                    fill_interval_end_ms=fill_int_end,
+                    fill_time_resolution=fill_time_res,
                     resolved=1,
                 )
+                rec["fill_interval_start_ms"] = fill_int_start
+                rec["fill_interval_end_ms"] = fill_int_end
+                rec["fill_time_resolution"] = fill_time_res
+                rec["evaluation_horizon_bars"] = eval_bars
+                rec["evaluation_horizon_ms"] = eval_horizon_ms
+                rec["evaluation_start_ms"] = eval_start_ms
+                rec["evaluation_end_ms"] = eval_end_ms
                 self._materialize_and_save_shadow_evaluation(rec_id, client=client, candles_15m=raw_candles)
                 results.append({"id": rec_id, "symbol": symbol, "status": "RESOLVED", "outcome": outcome})
                 continue
@@ -1028,8 +1121,18 @@ class ShadowEvaluationManager:
                         exit_price=_to_float(outcome.get("exit_price")),
                         exit_time_ms=_to_int(outcome.get("exit_time_ms")),
                         coverage_status="COMPLETE",
+                        fill_interval_start_ms=fill_int_start,
+                        fill_interval_end_ms=fill_int_end,
+                        fill_time_resolution=fill_time_res,
                         resolved=1,
                     )
+                    rec["fill_interval_start_ms"] = fill_int_start
+                    rec["fill_interval_end_ms"] = fill_int_end
+                    rec["fill_time_resolution"] = fill_time_res
+                    rec["evaluation_horizon_bars"] = eval_bars
+                    rec["evaluation_horizon_ms"] = eval_horizon_ms
+                    rec["evaluation_start_ms"] = eval_start_ms
+                    rec["evaluation_end_ms"] = eval_end_ms
                     self._materialize_and_save_shadow_evaluation(rec_id, client=client, candles_15m=raw_candles)
                     results.append({"id": rec_id, "symbol": symbol, "status": "RESOLVED", "outcome": outcome})
                     continue
