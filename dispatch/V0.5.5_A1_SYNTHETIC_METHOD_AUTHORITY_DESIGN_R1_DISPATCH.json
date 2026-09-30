@@ -1,0 +1,115 @@
+{
+  "schema_id": "V0.5.5_A1_SYNTHETIC_METHOD_AUTHORITY_DESIGN_R1_DISPATCH",
+  "repository": "EXASHXE/btc-quant-agent-public",
+  "stage": "A1_SYNTHETIC_METHOD_AUTHORITY_DESIGN_R1",
+  "execution_target": {
+    "task_branch": "feature/a1-synthetic-method-authority-r1-v055",
+    "CONTROLLER_DISPATCH_SHA": "47ecb909cd8b671ac17fdfb9e8b4a0fd8e8fde2a",
+    "code_branch": "v0.5.5",
+    "accepted_code_sha": "8ecff4ec4b25bf73a35309689fd3ecfacc0d3399"
+  },
+  "current_authority_manifest": {
+    "path": "evidence/v0.5.5/controller/A_LINE_CURRENT_AUTHORITY.json",
+    "blob_sha": "2ac9c41dab042e2943de268281e080a168db1b8a",
+    "access_mode": "BINDING_FIELDS_ONLY"
+  },
+  "inline_binding_fields": {
+    "forward_primary_route": "CONDITIONAL_AND_BOUNDED",
+    "forward_compression_trials_max": 2,
+    "compression_trial_runs_completed": 0,
+    "trial_1_state": "BLOCKED_PRE_SIMULATION",
+    "trial_2_authorized": false,
+    "trial_1_duration_grid": {
+      "discovery_months": [
+        1,
+        2,
+        3,
+        4,
+        6
+      ],
+      "validation_months": [
+        1,
+        2,
+        3
+      ],
+      "calendar_budget_total_months_max": 4
+    },
+    "trial_1_blocker_state": "SYNTHETIC_METHOD_AUTHORITY_INCOMPLETE",
+    "accepted_method_gaps": [
+      "M01_SCIENTIFIC_DGP_GAP",
+      "M02_SCIENTIFIC_DGP_GAP",
+      "M03_SCIENTIFIC_DGP_GAP",
+      "M04_INFERENCE_SPECIFICATION_GAP",
+      "M05_PROSPECTIVE_REPRODUCIBILITY_GAP"
+    ],
+    "protected_state": {
+      "h41_terminal_no_go": true,
+      "h41_wf1_validation_sealed": true,
+      "h39_protected_results_sealed": true,
+      "protected_successor_outcome_access_authorized": false,
+      "d0_authorized": false,
+      "production_code_change_authorized": false
+    }
+  },
+  "authority_refs": [
+    {
+      "path": "reviews/v0.5/V0.5.1_H41_SUCCESSOR_SCIENTIFIC_CAMPAIGN_V1_DESIGN_R1_1_CONTROLLER_REPAIR.md",
+      "blob_sha": "f65b970e810a6e6a6d5420424d62c26ee4c5c953",
+      "access_mode": "MUST_READ",
+      "reason": "Binding candidate/source/endpoint/inference/synthetic-envelope semantics."
+    },
+    {
+      "path": "src/btc_quant_agent/h41/inference.py",
+      "code_sha": "8ecff4ec4b25bf73a35309689fd3ecfacc0d3399",
+      "blob_sha": "9000840cbb767b1be69395b78248a58ec3bcaafa",
+      "access_mode": "MUST_READ",
+      "reason": "Existing exact studentization/bootstrap implementation that may be normatively reused."
+    },
+    {
+      "path": "evidence/v0.5.5/h41/V0.5.5_FORWARD_R1_1_SHORT_HORIZON_SYNTHETIC_POWER_FEASIBILITY.json",
+      "blob_sha": "b5990f4babf104aed8e2143164951f3bfc011e8a",
+      "access_mode": "IDENTITY_ONLY",
+      "reason": "Reviewed Trial-1 preflight evidence; blockers already inlined."
+    }
+  ],
+  "prompt": {
+    "path": "prompts/v0.5/design/v0.5.5_A1_SYNTHETIC_METHOD_AUTHORITY_DESIGN_R1.md",
+    "immutable_url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/47ecb909cd8b671ac17fdfb9e8b4a0fd8e8fde2a/prompts/v0.5/design/v0.5.5_A1_SYNTHETIC_METHOD_AUTHORITY_DESIGN_R1.md"
+  },
+  "allowed_scope": {
+    "docs_evidence_design": true,
+    "focused_reference_helpers_under_evidence": true,
+    "inspect_accepted_code_sha": true
+  },
+  "forbidden_scope": {
+    "run_short_horizon_simulation": true,
+    "protected_outcome_access": true,
+    "modify_src": true,
+    "modify_production_config": true,
+    "authorize_d0": true,
+    "authorize_trial2": true,
+    "recursively_hydrate_authority_chain": true
+  },
+  "expected_outputs": [
+    "reviews/v0.5/V0.5.5_A1_SYNTHETIC_METHOD_AUTHORITY_DESIGN_R1.md",
+    "evidence/v0.5.5/h41/V0.5.5_A1_SYNTHETIC_METHOD_AUTHORITY_DESIGN_R1.json"
+  ],
+  "terminal_states": [
+    "SYNTHETIC_METHOD_AUTHORITY_DESIGNED_PENDING_ASTRA",
+    "METHOD_AUTHORITY_DESIGN_BLOCKED"
+  ],
+  "next_gate": "A1_SYNTHETIC_METHOD_AUTHORITY_ASTRA_AUDIT_R1_IF_DESIGNED",
+  "execution_rules": {
+    "exact_sha_verification_required": true,
+    "worktree_clean_at_start": true,
+    "push_only_to_task_branch": true,
+    "no_direct_push_to_v0_5_5_docs": true,
+    "production_code_change_allowed": false
+  },
+  "authority_hydration_check": {
+    "identity_only_full_reads_forbidden_by_default": true,
+    "binding_fields_inlined": true,
+    "recursive_hydration_forbidden_unless_conflict_or_missing_binding": true,
+    "exact_sha_verification_preserved": true
+  }
+}
