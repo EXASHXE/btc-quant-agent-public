@@ -1,0 +1,64 @@
+{
+  "schema_id": "V0.5.5_A_LINE_CURRENT_AUTHORITY",
+  "repository": "EXASHXE/btc-quant-agent-public",
+  "line": "A_LINE",
+  "stage": "A1_SYNTHETIC_METHOD_AUTHORITY_DESIGN_R1__A2_H42_FEASIBILITY_PARALLEL",
+  "code_branch": "v0.5.5",
+  "accepted_code_sha": "8ecff4ec4b25bf73a35309689fd3ecfacc0d3399",
+  "docs_authority_commit": "c592b82cd7ab1b2ff36096eb9f9984aa1f3e4180",
+  "current_controller_authority": {
+    "path": "evidence/v0.5.5/controller/V0.5.5_A1_TRIAL1_METHOD_AUTHORITY_CONTROLLER_ADJUDICATION_R1.json",
+    "blob_sha": "5b44fcc7e137eb5853809756be9d85e763c38823"
+  },
+  "protected_state": {
+    "h41_terminal_no_go": true,
+    "h41_wf1_validation_sealed": true,
+    "h39_protected_results_sealed": true,
+    "protected_successor_outcome_access_authorized": false,
+    "d0_authorized": false,
+    "production_code_change_authorized": false
+  },
+  "authorized_next_stage": {
+    "a1": "A1_SYNTHETIC_METHOD_AUTHORITY_DESIGN_R1",
+    "a2": "H42_STRATEGY_DISCOVERY_HYBRID_CAPABLE_FEASIBILITY_R1"
+  },
+  "binding_fields": {
+    "forward_primary_route": "CONDITIONAL_AND_BOUNDED",
+    "forward_compression_trials_max": 2,
+    "compression_trial_runs_completed": 0,
+    "trial_1_state": "BLOCKED_PRE_SIMULATION",
+    "trial_2_authorized": false,
+    "trial_1_duration_grid": {
+      "discovery_months": [
+        1,
+        2,
+        3,
+        4,
+        6
+      ],
+      "validation_months": [
+        1,
+        2,
+        3
+      ],
+      "calendar_budget_total_months_max": 4
+    },
+    "trial_1_blocker_state": "SYNTHETIC_METHOD_AUTHORITY_INCOMPLETE",
+    "accepted_method_gaps": [
+      "M01_SCIENTIFIC_DGP_GAP",
+      "M02_SCIENTIFIC_DGP_GAP",
+      "M03_SCIENTIFIC_DGP_GAP",
+      "M04_INFERENCE_SPECIFICATION_GAP",
+      "M05_PROSPECTIVE_REPRODUCIBILITY_GAP"
+    ],
+    "a2_status": "AUTHORIZED_PARALLEL_FEASIBILITY",
+    "a2_scientific_root": "H42_STRATEGY_DISCOVERY_AND_HYBRID_CAPABLE_CAMPAIGN_V1"
+  },
+  "must_read": [
+    {
+      "path": "reviews/v0.5/V0.5.1_H41_SUCCESSOR_SCIENTIFIC_CAMPAIGN_V1_DESIGN_R1_1_CONTROLLER_REPAIR.md",
+      "reason": "Contains the candidate equations, source/PIT contract, endpoint/cost semantics, inference/multiplicity and synthetic-envelope semantics needed to design the missing method authority."
+    }
+  ],
+  "note": "Cache/index of already accepted authority only. Immutable underlying authority wins on conflict."
+}
