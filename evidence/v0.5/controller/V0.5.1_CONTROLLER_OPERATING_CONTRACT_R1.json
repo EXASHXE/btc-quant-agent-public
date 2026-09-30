@@ -20,7 +20,7 @@
     "h41_discovery_result": "H41_EXPLORATORY_NO_GO",
     "h41_controller_adjudication": "ACCEPTED_TERMINAL_NO_GO",
     "h41_candidate_lock": null,
-    "next_scientific_stage": "H41_SUCCESSOR_SCIENTIFIC_CAMPAIGN_V1_DESIGN",
+    "next_scientific_stage": "ASTRA_H41_SUCCESSOR_SCIENTIFIC_CAMPAIGN_V1_DESIGN_R1_1_REAUDIT",
     "successor_execution_authorized": false,
     "h41_state": "ACCEPTED_TERMINAL_NO_GO",
     "successor_design_commit": "c308f16f4f4e849f217470066cbe80e1b2a9ceb1",
@@ -36,7 +36,17 @@
       "LOW": 1
     },
     "successor_source_closure_required": true,
-    "successor_validation_authorized": false
+    "successor_validation_authorized": false,
+    "successor_design_r1_status": "AUDITED_REDESIGN_REQUIRED_BEFORE_FREEZE",
+    "successor_design_r1_1_status": "CONTROLLER_REPAIRED_READY_FOR_INDEPENDENT_REAUDIT",
+    "successor_design_r1_1_report": "reviews/v0.5/V0.5.1_H41_SUCCESSOR_SCIENTIFIC_CAMPAIGN_V1_DESIGN_R1_1_CONTROLLER_REPAIR.md",
+    "successor_design_r1_1_evidence": "evidence/v0.5/h41/V0.5.1_H41_SUCCESSOR_SCIENTIFIC_CAMPAIGN_V1_DESIGN_R1_1_CONTROLLER_REPAIR.json",
+    "successor_source_authority_closed": false,
+    "successor_synthetic_method_validated": false,
+    "successor_implementation_authorized": false,
+    "successor_discovery_authorized": false,
+    "default_technical_executor": "GPT-6.1 Sol",
+    "next_required_independent_gate": "ASTRA_FINAL_SCIENTIFIC_REAUDIT_BEFORE_FREEZE"
   },
   "mandatory_reply_contract": {
     "every_substantive_project_reply_has_stage_progress": true,
@@ -203,5 +213,36 @@
     "do_not_restart_completed_stages": true,
     "do_not_ask_user_to_repeat_documented_history": true
   },
-  "conversation_rules_supplement": "prompts/v0.5/controller/v0.5.1_CONTROLLER_CONVERSATION_RULES_SUPPLEMENT_R1.md"
+  "conversation_rules_supplement": "prompts/v0.5/controller/v0.5.1_CONTROLLER_CONVERSATION_RULES_SUPPLEMENT_R1.md",
+  "successor_design_r1_1": {
+    "status": "CONTROLLER_REPAIRED_READY_FOR_INDEPENDENT_REAUDIT",
+    "report": "reviews/v0.5/V0.5.1_H41_SUCCESSOR_SCIENTIFIC_CAMPAIGN_V1_DESIGN_R1_1_CONTROLLER_REPAIR.md",
+    "machine_evidence": "evidence/v0.5/h41/V0.5.1_H41_SUCCESSOR_SCIENTIFIC_CAMPAIGN_V1_DESIGN_R1_1_CONTROLLER_REPAIR.json",
+    "formal_k": 8,
+    "horizon_hours": 4,
+    "primary_reference_cost_bps": 12,
+    "stress_reference_cost_bps": 24,
+    "sequential_looks": false,
+    "fixed_window_grids": {
+      "discovery_months": [
+        6,
+        9,
+        12,
+        18,
+        24
+      ],
+      "validation_months": [
+        3,
+        6,
+        9,
+        12
+      ]
+    },
+    "source_closure_required": true,
+    "synthetic_method_validation_required": true,
+    "exposure_closure_required": true,
+    "protected_outcome_access": false,
+    "production_code_change": false,
+    "next_stage": "ASTRA_H41_SUCCESSOR_SCIENTIFIC_CAMPAIGN_V1_DESIGN_R1_1_REAUDIT"
+  }
 }

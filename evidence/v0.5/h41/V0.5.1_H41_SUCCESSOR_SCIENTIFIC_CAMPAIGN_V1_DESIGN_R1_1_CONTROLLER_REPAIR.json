@@ -1,0 +1,217 @@
+{
+  "schema_id": "V0.5.1_H41_SUCCESSOR_SCIENTIFIC_CAMPAIGN_V1_DESIGN_R1_1_CONTROLLER_REPAIR",
+  "repository": "EXASHXE/btc-quant-agent-public",
+  "docs_start_sha": "1db4e5c00c88589f560b6209470083ff5dc5175c",
+  "accepted_implementation_sha": "8ecff4ec4b25bf73a35309689fd3ecfacc0d3399",
+  "tactical_reference_sha": "79c8b82dd7c870b7e785af19823af8ec607c22de",
+  "audited_design_commit": "c308f16f4f4e849f217470066cbe80e1b2a9ceb1",
+  "astra_design_audit_commit": "9cacec23bcd9a795ce6315586596e8486052c87f",
+  "decision": "CONTROLLER_REPAIRED_READY_FOR_INDEPENDENT_REAUDIT",
+  "protected_outcome_access": false,
+  "production_code_changed": false,
+  "execution_policy": "RESEARCH_DISABLED_V1",
+  "h41_state": "ACCEPTED_TERMINAL_NO_GO",
+  "h41_wf1_validation_authorized": false,
+  "successor": {
+    "design_version": "R1.1",
+    "design_frozen": false,
+    "source_authority_closed": false,
+    "synthetic_method_validated": false,
+    "implementation_authorized": false,
+    "discovery_authorized": false,
+    "validation_authorized": false,
+    "primary_architecture": "DETERMINISTIC_REGIME_CONDITIONED",
+    "formal_candidate_count": 8,
+    "horizon_hours": 4,
+    "cooldown_hours": 4,
+    "sequential_looks": false
+  },
+  "source_scope": {
+    "formal_primary": [
+      "BTCUSDT_NATIVE_1H_OHLCV",
+      "ETHUSDT_NATIVE_1H_OHLCV",
+      "SYNCHRONIZED_PAIRED_HOURLY_MEMBERSHIP"
+    ],
+    "excluded_v1": [
+      "FUNDING",
+      "OPEN_INTEREST",
+      "LONG_SHORT_RATIO",
+      "MARK_INDEX_PREMIUM",
+      "AGGTRADE_CVD",
+      "L2_MICROSTRUCTURE"
+    ],
+    "on_time_rule": "max(receive_time_BTC,receive_time_ETH) < decision_boundary_plus_1h",
+    "no_backfill": true,
+    "revision_rule": "decision_inputs_immutable; later official archive reconciliation cannot rewrite events",
+    "source_closure_trials_min": 720,
+    "source_closure_on_time_point_estimate_min": 0.995,
+    "source_closure_on_time_wilson_lower_95_min": 0.99,
+    "source_closure_zero_unresolved_semantic_mismatch": true
+  },
+  "train_quantile_rule": {
+    "interval_utc": "[2021-01-01T00:00:00Z,2022-10-31T00:00:00Z)",
+    "method": "nearest_rank",
+    "rank": "ceil(p*n)",
+    "outcomes_used": false
+  },
+  "candidates": [
+    {
+      "id": "SCV1_A_TREND_BTC",
+      "asset": "BTCUSDT",
+      "family": "A_TREND",
+      "formula": "r6; abs(r6)>=Q80(abs(r6)); Q20(RV24)<=RV24<=Q80(RV24)",
+      "side": "sign(r6)",
+      "horizon_h": 4,
+      "cooldown_h": 4
+    },
+    {
+      "id": "SCV1_A_TREND_ETH",
+      "asset": "ETHUSDT",
+      "family": "A_TREND",
+      "formula": "r6; abs(r6)>=Q80(abs(r6)); Q20(RV24)<=RV24<=Q80(RV24)",
+      "side": "sign(r6)",
+      "horizon_h": 4,
+      "cooldown_h": 4
+    },
+    {
+      "id": "SCV1_A_REVERT_BTC",
+      "asset": "BTCUSDT",
+      "family": "A_REVERT",
+      "formula": "D=log(C[t-1h]/C[t-5h]); u=r1; abs(D)>=Q80(abs(D)); RV24>=Q60(RV24); D*u<0; abs(u)>=0.25*abs(D)",
+      "side": "-sign(D)",
+      "horizon_h": 4,
+      "cooldown_h": 4
+    },
+    {
+      "id": "SCV1_A_REVERT_ETH",
+      "asset": "ETHUSDT",
+      "family": "A_REVERT",
+      "formula": "D=log(C[t-1h]/C[t-5h]); u=r1; abs(D)>=Q80(abs(D)); RV24>=Q60(RV24); D*u<0; abs(u)>=0.25*abs(D)",
+      "side": "-sign(D)",
+      "horizon_h": 4,
+      "cooldown_h": 4
+    },
+    {
+      "id": "SCV1_C_VOLUME_BTC",
+      "asset": "BTCUSDT",
+      "family": "C_VOLUME",
+      "formula": "r2; abs(r2)>=Q60(abs(r2)); VR24>=Q80(VR24); RV24<=Q90(RV24)",
+      "side": "sign(r2)",
+      "horizon_h": 4,
+      "cooldown_h": 4
+    },
+    {
+      "id": "SCV1_C_VOLUME_ETH",
+      "asset": "ETHUSDT",
+      "family": "C_VOLUME",
+      "formula": "r2; abs(r2)>=Q60(abs(r2)); VR24>=Q80(VR24); RV24<=Q90(RV24)",
+      "side": "sign(r2)",
+      "horizon_h": 4,
+      "cooldown_h": 4
+    },
+    {
+      "id": "SCV1_D_LEAD_BTC",
+      "asset": "BTCUSDT",
+      "family": "D_CROSS_ASSET_LEAD",
+      "formula": "other_r2; abs(other_r2)>=Q80_other(abs(r2)); abs(target_r2)<=Q50_target(abs(r2))",
+      "side": "sign(other_r2)",
+      "horizon_h": 4,
+      "cooldown_h": 4
+    },
+    {
+      "id": "SCV1_D_LEAD_ETH",
+      "asset": "ETHUSDT",
+      "family": "D_CROSS_ASSET_LEAD",
+      "formula": "other_r2; abs(other_r2)>=Q80_other(abs(r2)); abs(target_r2)<=Q50_target(abs(r2))",
+      "side": "sign(other_r2)",
+      "horizon_h": 4,
+      "cooldown_h": 4
+    }
+  ],
+  "endpoint": {
+    "entry": "native_1h_open_at_t_plus_1h",
+    "exit": "native_1h_open_at_t_plus_5h",
+    "holding_hours": 4,
+    "signal_to_exit_hours": 5,
+    "primary_reference_cost_bps": 12,
+    "stress_reference_cost_bps": 24,
+    "primary_cost_interpretation": "REFERENCE_RESEARCH_FRICTION_NOT_ACTUAL_EXECUTABLE_ALL_COST",
+    "actual_funding_in_primary": false,
+    "formal_null": "mu_primary <= 0",
+    "economic_useful_benchmark_bps_after_primary": 12,
+    "planning_effect_bps_after_primary": 24,
+    "power_report_grid_bps": [
+      12,
+      24,
+      36,
+      48
+    ]
+  },
+  "inference": {
+    "family_size_k": 8,
+    "method": "SINGLE_STEP_SHARED_CLOCK_SOURCE_BUNDLE_PRESERVING_STUDENTIZED_JOINT_MAX",
+    "block_length_hours": 120,
+    "bootstrap_replicates": 100000,
+    "alpha_one_sided": 0.05,
+    "stepdown_fallback": false,
+    "hierarchical_fallback": false,
+    "sequential_looks": false,
+    "seed_derivation": "uint64_be(first8bytes(SHA256(semantic_root || domain_separator)))",
+    "formal_gate": "simultaneous_LCB_gt_0",
+    "support": {
+      "n_and_days_round_floors": false,
+      "min_events_mathematical": 2,
+      "positive_estimable_variance_required": true,
+      "b_eff_formula": "(sum n_j)^2 / sum(n_j^2) on fixed 120h blocks",
+      "b_eff_min_grid": [
+        12,
+        18,
+        24,
+        36,
+        48
+      ],
+      "b_eff_min_selection": "smallest value passing preregistered synthetic strong-error/full-pipeline criteria before D0"
+    }
+  },
+  "duration_selection": {
+    "discovery_month_grid": [
+      6,
+      9,
+      12,
+      18,
+      24
+    ],
+    "validation_month_grid": [
+      3,
+      6,
+      9,
+      12
+    ],
+    "primary_planning_effect_bps": 24,
+    "global_null_fwer_mc_upper_95_max": 0.05,
+    "validation_type1_mc_upper_95_max": 0.05,
+    "full_pipeline_success_mc_lower_95_min": 0.8,
+    "selection": "minimize D+V; tie smaller D; tie smaller V",
+    "no_real_outcome_extension": true,
+    "failure_state": "DESIGN_BLOCKED_INSUFFICIENT_POWER"
+  },
+  "exposure_firewall": {
+    "all_pre_d0_successor_aligned_forward_history": "QUARANTINED_DEVELOPMENT",
+    "public_price_awareness_is_incident": false,
+    "candidate_aligned_protected_outcome_to_change_rights_is_incident": true,
+    "substantive_post_d0_change": "STOP_AND_NEW_SEMANTIC_ROOT_NEW_FUTURE_D0",
+    "no_favorable_month_salvage": true
+  },
+  "astra_findings": {
+    "SCV1-B01": "DESIGN_REPAIRED_PENDING_REAUDIT",
+    "SCV1-H01": "SEMANTICS_REPAIRED_SOURCE_CLOSURE_PENDING",
+    "SCV1-H02": "DESIGN_REPAIRED_SYNTHETIC_POWER_PENDING",
+    "SCV1-H03": "DESIGN_REPAIRED_METHOD_VALIDATION_PENDING",
+    "SCV1-H04": "DESIGN_REPAIRED_PENDING_REAUDIT",
+    "SCV1-H05": "DESIGN_REPAIRED_EXPOSURE_CLOSURE_PENDING",
+    "SCV1-M01": "CLOSED_IN_DESIGN_PENDING_REAUDIT",
+    "SCV1-M02": "CLOSED_IN_DESIGN_PENDING_REAUDIT",
+    "SCV1-L01": "CLOSED_IN_DESIGN_PENDING_REAUDIT"
+  },
+  "next_stage": "ASTRA_H41_SUCCESSOR_SCIENTIFIC_CAMPAIGN_V1_DESIGN_R1_1_REAUDIT"
+}
