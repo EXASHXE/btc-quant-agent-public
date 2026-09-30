@@ -1,0 +1,73 @@
+{
+  "schema_id": "V0.5.5_A1_SYNTHETIC_METHOD_AUTHORITY_CONTROLLER_ACCEPTANCE_R1",
+  "repository": "EXASHXE/btc-quant-agent-public",
+  "controller_role": "CHATGPT_0_PRIMARY_CONTROLLER_AND_REVIEWER",
+  "reviewed_execution": {
+    "branch": "feature/a1-synthetic-method-authority-r1-v055",
+    "dispatch_start_sha": "47ecb909cd8b671ac17fdfb9e8b4a0fd8e8fde2a",
+    "final_sha": "9b92ec290e4f9de93c140ca471a0eb1644526e2b",
+    "report_path": "reviews/v0.5/V0.5.5_A1_SYNTHETIC_METHOD_AUTHORITY_DESIGN_R1.md",
+    "report_blob_sha": "2ef55f25ee0b4bf640307c291e959ce43c97cf47",
+    "evidence_path": "evidence/v0.5.5/h41/V0.5.5_A1_SYNTHETIC_METHOD_AUTHORITY_DESIGN_R1.json",
+    "evidence_blob_sha": "53b1f99bee4bef55afe166292305f6f8d2648072"
+  },
+  "code_authority": {
+    "branch": "v0.5.5",
+    "sha": "8ecff4ec4b25bf73a35309689fd3ecfacc0d3399",
+    "changed": false
+  },
+  "accepted_design": {
+    "terminal_decision": "SYNTHETIC_METHOD_AUTHORITY_DESIGNED_PENDING_ASTRA",
+    "controller_decision": "ACCEPT_METHOD_AUTHORITY_DESIGN_PENDING_ASTRA__TRIAL1_REMAINS_BLOCKED",
+    "design_semantic_root_sha256": "718efa1bbad00e68aaacf4cd2c2034265776b242024e0acbf09455847b2fc106",
+    "gap_status": {
+      "M01": "SPECIFIED_PENDING_ASTRA",
+      "M02": "SPECIFIED_PENDING_ASTRA",
+      "M03": "SPECIFIED_PENDING_ASTRA",
+      "M04": "SPECIFIED_PENDING_ASTRA",
+      "M05": "SPECIFIED_PENDING_ASTRA"
+    },
+    "simulation_executed": false,
+    "compression_trials_consumed": 0
+  },
+  "pre_run_state": {
+    "trial_1_state": "BLOCKED_PRE_SIMULATION_PENDING_METHOD_AUDIT_AND_MATERIALIZATION",
+    "resource_feasibility": "NOT_CERTIFIED",
+    "literal_logical_outer_records": 11863110020400,
+    "required_receipts": [
+      "TRAIN_CV_SOURCE_CUSTODY_AND_PREHISTORY",
+      "TRAIN_NEAREST_RANK_QUANTILES_AND_EVENT_CLOCKS",
+      "CLOCK_RATE_PROFILE_CALIBRATION_17",
+      "PAIRED_GAP_CLOCK_TABLES_19",
+      "BOUNDED_COHERENT_REFERENCE_MEAN_TABLES",
+      "EXACT_OPEN_RATIO_AND_ZERO_VARIANCE_ENDPOINT",
+      "REFERENCE_IMPLEMENTATION_AND_NUMERIC_ENVIRONMENT",
+      "NEGATIVE_CONTROL_REPLAY",
+      "RESOURCE_AND_REPRODUCTION_PLAN",
+      "CONTROLLER_VERIFICATION_AND_ASTRA_METHOD_AUDIT"
+    ]
+  },
+  "protected_state": {
+    "protected_outcome_access": false,
+    "h41_wf1_validation_sealed": true,
+    "h39_protected_results_sealed": true,
+    "d0_authorized": false,
+    "trial_2_authorized": false,
+    "production_code_change_authorized": false
+  },
+  "ci": {
+    "run_id": 36751596865,
+    "conclusion": "failure",
+    "classification": "PREEXISTING_NON_BLOCKING_REPOSITORY_HYGIENE",
+    "failing_scope": "evidence/v0.5/h41/h41_synthetic_pit_validation_r1 F401",
+    "diagnostic_count": 6,
+    "reviewed_diff_implicated": false
+  },
+  "controller_review": {
+    "path": "reviews/v0.5/V0.5.5_A1_SYNTHETIC_METHOD_AUTHORITY_CONTROLLER_ACCEPTANCE_R1.md",
+    "blob_sha": "52df66c12ebc5bd8e2c1933dc5f7a04cd4dce005"
+  },
+  "authorized_next_stage": "A1_SYNTHETIC_METHOD_AUTHORITY_ASTRA_AUDIT_R1",
+  "on_audit_pass": "CONTROLLER_DECIDE_MATERIALIZATION_REFERENCE_IMPLEMENTATION_AND_RESUME_SAME_TRIAL1",
+  "on_audit_fail": "CONTROLLER_ADJUDICATE_BOUNDED_REPAIR_OR_TERMINATE_A1_PRIMARY_ROUTE"
+}
