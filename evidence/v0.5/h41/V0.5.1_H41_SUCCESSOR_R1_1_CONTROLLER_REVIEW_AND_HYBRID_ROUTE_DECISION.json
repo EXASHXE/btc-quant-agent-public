@@ -1,0 +1,33 @@
+{
+  "schema_id": "V0.5.1_H41_SUCCESSOR_R1_1_CONTROLLER_REVIEW_HYBRID_ROUTE_DECISION",
+  "reviewed_commit": "9a8b7d467b91b2c353e465d8c93d58f527e55086",
+  "accepted_implementation_sha": "8ecff4ec4b25bf73a35309689fd3ecfacc0d3399",
+  "r1_1_review": "ACCEPTED_AS_FORWARD_BASELINE_NOT_FINAL",
+  "r1_1_astra_reaudit": "DEFERRED_PENDING_HISTORICAL_HOLDOUT_FEASIBILITY",
+  "route_decision": "CONDITIONAL_HYBRID_ROUTE_PREFERRED_IF_FEASIBLE",
+  "rationale": [
+    "R1.1 repairs Astra design findings but remains forward-only",
+    "masked historical one-shot Discovery/Validation can reduce calendar latency without relaxing statistical gates",
+    "historical masked evidence must be separated from true prospective operational confirmation",
+    "holdout cleanliness/exposure must be established before partition selection"
+  ],
+  "retained_r1_1_contracts": [
+    "K8_exact_candidate_formulas_as_proposal",
+    "4h_horizon",
+    "4h_candidate_local_cooldown",
+    "12bp_primary_reference_cost",
+    "24bp_stress_diagnostic",
+    "single_step_shared_clock_joint_max",
+    "no_sequential_outcome_looks",
+    "no_runner_up_substitution",
+    "source_revision_no_backfill_rules"
+  ],
+  "next_stage": "H41_SUCCESSOR_HYBRID_HOLDOUT_FEASIBILITY_AND_EXPOSURE_R1",
+  "lifecycle_authority": {
+    "successor_design_frozen": false,
+    "successor_implementation_authorized": false,
+    "successor_discovery_authorized": false,
+    "successor_validation_authorized": false,
+    "execution": "RESEARCH_DISABLED_V1"
+  }
+}

@@ -26,7 +26,7 @@
     "successor_design_commit": "c308f16f4f4e849f217470066cbe80e1b2a9ceb1",
     "successor_design_status": "ACCEPTED_FOR_INDEPENDENT_ASTRA_DESIGN_AUDIT",
     "successor_design_frozen": false,
-    "next_h41_stage": "CONTROLLER_DESIGN_REPAIR",
+    "next_h41_stage": "H41_SUCCESSOR_HYBRID_HOLDOUT_FEASIBILITY_AND_EXPOSURE_R1",
     "astra_successor_design_audit_commit": "9cacec23bcd9a795ce6315586596e8486052c87f",
     "astra_successor_design_audit_verdict": "REDESIGN_REQUIRED_BEFORE_FREEZE",
     "astra_successor_design_audit_severity_counts": {
@@ -46,7 +46,11 @@
     "successor_implementation_authorized": false,
     "successor_discovery_authorized": false,
     "default_technical_executor": "GPT-6.1 Sol",
-    "next_required_independent_gate": "ASTRA_FINAL_SCIENTIFIC_REAUDIT_BEFORE_FREEZE"
+    "next_required_independent_gate": "ASTRA_FINAL_SCIENTIFIC_REAUDIT_BEFORE_FREEZE",
+    "successor_r1_1_commit": "9a8b7d467b91b2c353e465d8c93d58f527e55086",
+    "successor_r1_1_review": "ACCEPTED_AS_FORWARD_BASELINE_NOT_FINAL",
+    "astra_r1_1_reaudit": "DEFERRED_PENDING_HISTORICAL_HOLDOUT_FEASIBILITY",
+    "route_decision": "CONDITIONAL_HYBRID_ROUTE_PREFERRED_IF_FEASIBLE"
   },
   "mandatory_reply_contract": {
     "every_substantive_project_reply_has_stage_progress": true,
