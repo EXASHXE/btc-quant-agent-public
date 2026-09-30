@@ -1,0 +1,1379 @@
+{
+  "schema_id": "V0.5.5_A1_SYNTHETIC_METHOD_AUTHORITY_SOL_INDEPENDENT_AUDIT_R1",
+  "repository": "EXASHXE/btc-quant-agent-public",
+  "authority_namespace": "v0.5.5",
+  "execution_class": "INDEPENDENT_SCIENTIFIC_METHOD_AUDIT / READ_ONLY_SCIENTIFIC_AUTHORITY / NO_SIMULATION / NO_PROTECTED_OUTCOME_ACCESS / NO_PRODUCTION_CHANGE",
+  "actual_review_kind": "USER_AUTHORIZED_SAME_SESSION_SELF_AUDIT",
+  "dispatch": {
+    "manifest_path": "dispatch/V0.5.5_A1_SYNTHETIC_METHOD_AUTHORITY_SOL_INDEPENDENT_AUDIT_R1_DISPATCH.json",
+    "dispatch_commit": "233d0c9cfdf15e9e74e4e87fa22b69d6460c8a2a",
+    "dispatch_blob": "1d2530ac40c751f88e434645d13a1b33730bc4d6",
+    "CONTROLLER_DISPATCH_SHA": "1d1d36238f672bee6bb2bbaecdd2a2bd028e072b",
+    "assigned_branch": "feature/a1-synthetic-method-sol-audit-r1-v055",
+    "docs_start_sha": "1d1d36238f672bee6bb2bbaecdd2a2bd028e072b"
+  },
+  "docs_start_sha": "1d1d36238f672bee6bb2bbaecdd2a2bd028e072b",
+  "accepted_code_sha": "8ecff4ec4b25bf73a35309689fd3ecfacc0d3399",
+  "start_receipt": {
+    "pwd": "/tmp/a1-method-sol-audit-r1-v055",
+    "HEAD": "1d1d36238f672bee6bb2bbaecdd2a2bd028e072b",
+    "branch": "feature/a1-synthetic-method-sol-audit-r1-v055",
+    "origin_code_sha": "8ecff4ec4b25bf73a35309689fd3ecfacc0d3399",
+    "worktree_clean": true,
+    "runtime_import_path": "NO_SCIENTIFIC_IMPORT",
+    "repository": "EXASHXE/btc-quant-agent-public"
+  },
+  "reviewer_independence": {
+    "requested_reviewer": "SOL_FRESH_INDEPENDENT_SESSION",
+    "actual_reviewer": "CURRENT_SESSION_EXECUTOR",
+    "review_kind": "USER_AUTHORIZED_SAME_SESSION_SELF_AUDIT",
+    "fresh_session": false,
+    "independent_of_design_executor": false,
+    "design_executor_context_reused": true,
+    "subagents_used_for_this_audit": false,
+    "astra_used_for_this_audit": false,
+    "isolation_fence_status": "EXPLICIT_USER_OVERRIDE",
+    "override_verbatim": "就按当前会话的自审接着执行就行",
+    "effect": "Only reviewer isolation is waived. Read-only scientific authority, no simulation, no TRAIN materialization, no protected outcomes and no production edits remain binding.",
+    "claim_limit": "This is a substantive self-audit, not an independent Sol or Astra review. Artifact filenames retain the assigned namespace; Controller must record this procedural exception before relying on the verdict."
+  },
+  "method_design_sha": "9b92ec290e4f9de93c140ca471a0eb1644526e2b",
+  "method_design_semantic_root": "718efa1bbad00e68aaacf4cd2c2034265776b242024e0acbf09455847b2fc106",
+  "binding_state": {
+    "a1_stage": "A1_SYNTHETIC_METHOD_AUTHORITY_SOL_INDEPENDENT_AUDIT_R1",
+    "method_design_sha": "9b92ec290e4f9de93c140ca471a0eb1644526e2b",
+    "method_design_semantic_root_sha256": "718efa1bbad00e68aaacf4cd2c2034265776b242024e0acbf09455847b2fc106",
+    "compression_trial_runs_completed": 0,
+    "trial_1_state": "BLOCKED_PRE_SIMULATION_PENDING_METHOD_AUDIT_AND_MATERIALIZATION",
+    "trial_2_authorized": false,
+    "d0_authorized": false,
+    "resource_feasibility": "NOT_CERTIFIED",
+    "literal_logical_outer_records": 11863110020400,
+    "accepted_code_sha": "8ecff4ec4b25bf73a35309689fd3ecfacc0d3399",
+    "method_gap_status": {
+      "M01": "SPECIFIED_PENDING_INDEPENDENT_AUDIT",
+      "M02": "SPECIFIED_PENDING_INDEPENDENT_AUDIT",
+      "M03": "SPECIFIED_PENDING_INDEPENDENT_AUDIT",
+      "M04": "SPECIFIED_PENDING_INDEPENDENT_AUDIT",
+      "M05": "SPECIFIED_PENDING_INDEPENDENT_AUDIT"
+    },
+    "protected_outcome_access_authorized": false,
+    "production_code_change_authorized": false
+  },
+  "authority_refs_and_access_modes_used": [
+    {
+      "path": "evidence/v0.5.5/controller/A_LINE_CURRENT_AUTHORITY.json",
+      "at_commit": "1d1d36238f672bee6bb2bbaecdd2a2bd028e072b",
+      "blob_sha": "0981b00fdb0d434a1350be4cbf7d43be373fbf51",
+      "requested_access_mode": "BINDING_FIELDS_ONLY",
+      "actual_access_mode": "DISPATCH_INLINE_BINDING_FIELDS_ONLY_AND_BLOB_IDENTITY",
+      "content_opened": false,
+      "note": "Inlined dispatch fields plus the user prompt binding state were consumed; no referenced Controller acceptance was opened."
+    },
+    {
+      "path": "reviews/v0.5/V0.5.5_A1_SYNTHETIC_METHOD_AUTHORITY_DESIGN_R1.md",
+      "at_commit": "9b92ec290e4f9de93c140ca471a0eb1644526e2b",
+      "blob_sha": "2ef55f25ee0b4bf640307c291e959ce43c97cf47",
+      "requested_access_mode": "MUST_READ",
+      "actual_access_mode": "MUST_READ",
+      "content_opened": true
+    },
+    {
+      "path": "evidence/v0.5.5/h41/V0.5.5_A1_SYNTHETIC_METHOD_AUTHORITY_DESIGN_R1.json",
+      "at_commit": "9b92ec290e4f9de93c140ca471a0eb1644526e2b",
+      "blob_sha": "53b1f99bee4bef55afe166292305f6f8d2648072",
+      "requested_access_mode": "IDENTITY_ONLY",
+      "actual_access_mode": "EXACT_MACHINE_CONTRACT_EXCEPTION_SEMANTIC_CONTRACT",
+      "content_opened": true,
+      "reason": "The report declares JSON semantic_contract normative. Verify its canonical semantic root, report/specification equality and exact decimal-string/grid ordering that determines seeds. Inspected semantic_contract, not historical references or result payloads."
+    },
+    {
+      "path": "reviews/v0.5/V0.5.1_H41_SUCCESSOR_SCIENTIFIC_CAMPAIGN_V1_DESIGN_R1_1_CONTROLLER_REPAIR.md",
+      "at_commit": "1d1d36238f672bee6bb2bbaecdd2a2bd028e072b",
+      "blob_sha": "f65b970e810a6e6a6d5420424d62c26ee4c5c953",
+      "requested_access_mode": "MUST_READ",
+      "actual_access_mode": "MUST_READ",
+      "content_opened": true
+    },
+    {
+      "path": "src/btc_quant_agent/h41/inference.py",
+      "at_commit": "8ecff4ec4b25bf73a35309689fd3ecfacc0d3399",
+      "blob_sha": "9000840cbb767b1be69395b78248a58ec3bcaafa",
+      "requested_access_mode": "MUST_READ",
+      "actual_access_mode": "MUST_READ",
+      "content_opened": true,
+      "note": "Exact blob verified from accepted code; stored outside src, never imported or executed."
+    }
+  ],
+  "M01_M05_dispositions": [
+    {
+      "id": "M01",
+      "before": "SPECIFIED_PENDING_INDEPENDENT_AUDIT",
+      "disposition": "PASS_DECLARED_FINITE_ENVELOPE",
+      "location": {
+        "path": "reviews/v0.5/V0.5.5_A1_SYNTHETIC_METHOD_AUTHORITY_DESIGN_R1.md",
+        "commit": "9b92ec290e4f9de93c140ca471a0eb1644526e2b",
+        "line": 62
+      },
+      "reason": "sqrt(3/5) standardizes df=5 Student-t variance to one; common chi-square mixing and common normal factor give latent covariance gamma. sqrt(1-rho^2) AR innovations have limiting unit variance. The symmetric two-state chain is initialized stationary, while the finite-burn-in AR explicitly starts nonstationary. Volatility scales 1/sqrt(5),3/sqrt(5) have mean squared scale one. Sigma is a bounded gross amplitude, not a fitted standard deviation. All nuisance values, truth vectors and mode probabilities are prospective.",
+      "qualification": "Gamma is latent-channel covariance, not a promise of observed candidate-return correlations. Eight channels collapse coherently to two asset reference noises. The claim excludes unmodeled feature/endpoint feedback and real-market power."
+    },
+    {
+      "id": "M02",
+      "before": "SPECIFIED_PENDING_INDEPENDENT_AUDIT",
+      "disposition": "PASS_CONDITIONAL_CLOCK_SCOPE",
+      "location": {
+        "path": "reviews/v0.5/V0.5.5_A1_SYNTHETIC_METHOD_AUTHORITY_DESIGN_R1.md",
+        "commit": "9b92ec290e4f9de93c140ca471a0eb1644526e2b",
+        "line": 36
+      },
+      "reason": "Frozen equations and TRAIN nearest-rank thresholds generate actual gates, sides and recurrent 4h cooldown on paired C/V clocks. The 17 profile selection rules use only feature/event rates. Exact minimum-norm rational mean fields satisfy all eight directional mean constraints. One common economic Open sequence per asset realizes every endpoint via four interleaved chains. Uniform source phase and innovation symmetry give E[A*Y]/E[A]=delta without assigning independent candidate endpoint tensors.",
+      "qualification": "This is population event-mean calibration, not a realized-window mean or E[sample mean] identity. TRAIN clock attainability, alias closure and all bounded mean solutions must pass mechanical receipts; any failure blocks all materialization, with no favorable replacement."
+    },
+    {
+      "id": "M03",
+      "before": "SPECIFIED_PENDING_INDEPENDENT_AUDIT",
+      "disposition": "PASS_FAILURES_UNCONDITIONED",
+      "location": {
+        "path": "reviews/v0.5/V0.5.5_A1_SYNTHETIC_METHOD_AUTHORITY_DESIGN_R1.md",
+        "commit": "9b92ec290e4f9de93c140ca471a0eb1644526e2b",
+        "line": 48
+      },
+      "reason": "The 19 cyclic gap profiles, strict receipt deadline, distinction between late and never-received bars, complete reference truth store, mode mixture, continuous state carry, four Gregorian anchors, 48h audit interval and endpoint tail are specified. Empty and zero-variance states remain in the full power denominator.",
+      "qualification": "Extreme concentrated/alias tensors are implementation diagnostics, not governing source-equivalent power cells. Their successful replay cannot substitute for full source-envelope support and power measurements. The actual elapsed schedule includes the disclosed 48h overhead."
+    },
+    {
+      "id": "M04",
+      "before": "SPECIFIED_PENDING_INDEPENDENT_AUDIT",
+      "disposition": "PASS_NORMATIVE_SUCCESSOR_SPECIFICATION",
+      "location": {
+        "path": "reviews/v0.5/V0.5.5_A1_SYNTHETIC_METHOD_AUTHORITY_DESIGN_R1.md",
+        "commit": "9b92ec290e4f9de93c140ca471a0eb1644526e2b",
+        "line": 90
+      },
+      "reason": "Ratio estimator, original overlapping-block SE, non-circular weighted centering, common full-block resampling, replicate studentization, linear 95th percentile, fixed K slots, strict positive LCB, rank ties and single locked Validation are executable. Invalid bootstrap draws conservatively yield +infinity; original-ineligible slots yield -infinity. There is no redraw or positive variance floor.",
+      "qualification": "The accepted H41 primitive supplies compatible algebra, not an already validated successor wrapper or guaranteed finite-sample size control. The old K=20/T=2184/N-day/B=10000 wrappers are incompatible and must not be reused as successor authority."
+    },
+    {
+      "id": "M05",
+      "before": "SPECIFIED_PENDING_INDEPENDENT_AUDIT",
+      "disposition": "PASS_PROSPECTIVE_REPRODUCIBILITY_SPECIFICATION",
+      "location": {
+        "path": "reviews/v0.5/V0.5.5_A1_SYNTHETIC_METHOD_AUTHORITY_DESIGN_R1.md",
+        "commit": "9b92ec290e4f9de93c140ca471a0eb1644526e2b",
+        "line": 110
+      },
+      "reason": "RNG byte encoding, domains/subdomains, indexed counters/rejection attempts, root derivation, exact grid strings/order, 36567 fixed outer replications, B=100000, CP tails, outward exact dyadic confidence bounds, ordered record hashing and zero-tolerance bound-environment replay are specified. All materialization and numeric/implementation choices must be hash-bound before any OC run.",
+      "qualification": "Actual seeds are absent because required pre-run receipts are absent. Indexed SHA256 streams are treated as independent pseudorandom MC streams; no mathematical proof of physical independence is claimed. Cross-setting selection-safe certification is an additional assurance, not a replacement for nominal R1.1 gates."
+    }
+  ],
+  "R1_1_compatibility_matrix": [
+    {
+      "field": "K=8 equations/sides",
+      "authority": "Baseline §§5–7; design lines 21–34",
+      "disposition": "PRESERVED",
+      "reason": "All four paired families, composite inequalities and nonzero side rule retained; no parameter additions."
+    },
+    {
+      "field": "TRAIN/quantiles",
+      "authority": "Baseline §5; design lines 21–46",
+      "disposition": "PRESERVED",
+      "reason": "Exact accepted interval, nearest-rank ceil(p*n), feature-specific eligibility, no endpoint fitting and no synthetic threshold refit."
+    },
+    {
+      "field": "Cooldown/alias/overlap",
+      "authority": "Baseline §7; design lines 34–46,82–88",
+      "disposition": "PRESERVED",
+      "reason": "4h local carry; exact alias blocks rather than deletes; overlap retained; adversarial tensor controls are diagnostics."
+    },
+    {
+      "field": "Source/PIT",
+      "authority": "Baseline §8; design lines 48–60",
+      "disposition": "PRESERVED_WITH_DECLARED_SYNTHETIC_ASSUMPTION",
+      "reason": "Paired latest-hour membership before t+1h, no backfill or event rewriting. Complete finalized synthetic economic reference marks do not prove real receipt latency/source closure."
+    },
+    {
+      "field": "Endpoint/friction",
+      "authority": "Baseline §§9–10; design lines 34,62–80",
+      "disposition": "PRESERVED",
+      "reason": "Native Open t+1h/t+5h, 4h hold, side*(ratio-1), 12bp primary and 24bp diagnostic, null <=0, effects 12/24/36/48bp."
+    },
+    {
+      "field": "Inference/multiplicity",
+      "authority": "Baseline §12; design lines 90–108",
+      "disposition": "PRESERVED_BY_SPECIFIED_ADAPTATION",
+      "reason": "K=8, common non-circular 120h blocks, B=100000, studentized joint max, unavailable slots retained, strict simultaneous LCB."
+    },
+    {
+      "field": "Support/lock",
+      "authority": "Baseline §§11–12,15; design lines 92,102–108,134–146",
+      "disposition": "PRESERVED",
+      "reason": "N>=2/positive variance/B_eff grid; highest LCB then B_eff/N/ID; one lock and no runner-up."
+    },
+    {
+      "field": "Duration grid",
+      "authority": "Latest task/dispatch; baseline §11; design lines 84,140–142",
+      "disposition": "AUTHORIZED_TRIAL_GRID_CHANGE",
+      "reason": "D={1,2,3,4,6}, V={1,2,3}, D+V<=4 supersede the original long grid for Trial 1 only; 48h overhead is additional."
+    },
+    {
+      "field": "OC scientific gates",
+      "authority": "Baseline §11; design lines 134–142",
+      "disposition": "PRESERVED",
+      "reason": "Nominal one-sided 95% MC upper error bounds <=.05 and 24bp true-coordinate full-pipeline lower bounds >=.80 across every governing cell; no support conditioning."
+    },
+    {
+      "field": "Failure/dependence envelope",
+      "authority": "Baseline §13; design lines 48–88",
+      "disposition": "PRESERVED_WITH_SCOPE_LIMIT",
+      "reason": "t5/rho/gamma/persistence and TRAIN clock perturbations, gaps, unequal counts and failure modes. Fixed finite conditional-clock model; not arbitrary market-model coverage."
+    },
+    {
+      "field": "Governance/one-shot access",
+      "authority": "Baseline §§14–18; design lines 134–170",
+      "disposition": "PRESERVED",
+      "reason": "No real sequential looks, future retuning, outcome-adaptive seeds, D0/Trial2 or execution authorization."
+    }
+  ],
+  "inference_difference_matrix": [
+    {
+      "difference": "Ratio and original SE",
+      "accepted_code_location": "inference.py:39–62",
+      "classification": "SEMANTICALLY_COMPATIBLE_EXTENSION",
+      "assessment": "Same mu and overlapping-block residual SE algebra; arbitrary T/K and explicit zero-variance rejection. Algebraic compatibility is not bitwise wrapper reuse."
+    },
+    {
+      "difference": "Common full non-circular blocks",
+      "accepted_code_location": "inference.py:35–36,65,69–93",
+      "classification": "SEMANTICALLY_COMPATIBLE_EXTENSION",
+      "assessment": "Same q=ceil(T/L), S=T-L+1 and shared start vector across coordinates; no final trimming or independent resampling."
+    },
+    {
+      "difference": "Replicate SE and centering",
+      "accepted_code_location": "inference.py:104–114",
+      "classification": "SEMANTICALLY_COMPATIBLE_EXTENSION",
+      "assessment": "Same quadratic residual sum, q/(q-1)/A_b^2 and overlapping-start ratio centering, on original eligible coordinates."
+    },
+    {
+      "difference": "Family sizes/calendar/B",
+      "accepted_code_location": "inference.py:127–136,163–194",
+      "classification": "INTENTIONAL_SUCCESSOR_CHANGE_ACCEPTABLE",
+      "assessment": "Replace 20/2184/10000 wrapper constants with fixed eight slots, varying T and B=100000 as required by R1.1."
+    },
+    {
+      "difference": "Eligibility",
+      "accepted_code_location": "inference.py:41,188–190",
+      "classification": "INTENTIONAL_SUCCESSOR_CHANGE_ACCEPTABLE",
+      "assessment": "Replace N>=60 and occupied days>=30 with N>=2, positive estimable variance and the prospectively selected B_eff rule."
+    },
+    {
+      "difference": "Variance floors",
+      "accepted_code_location": "inference.py:62,96,108,111",
+      "classification": "INTENTIONAL_SUCCESSOR_CHANGE_ACCEPTABLE",
+      "assessment": "Remove positive floors; original zero variance is unavailable and invalid bootstrap draws receive +infinity. Preserves mathematical minimums rather than inventing testable variance."
+    },
+    {
+      "difference": "Zero/sparse bootstrap draws",
+      "accepted_code_location": "inference.py:99–102",
+      "classification": "INTENTIONAL_SUCCESSOR_CHANGE_ACCEPTABLE",
+      "assessment": "Accepted primitive substitutes original mu on zero-event draws; successor assigns +infinity for A_b<2/zero SE/nonfinite values, without redraw. Conservative critical-value handling, to be measured later."
+    },
+    {
+      "difference": "Max statistic/critical value",
+      "accepted_code_location": "inference.py:116–122",
+      "classification": "SEMANTICALLY_COMPATIBLE_EXTENSION",
+      "assessment": "Same max and linear percentile/LCB algebra, with explicit -infinity inactive slots and +infinity bad draws. No eligible slot means unavailable family."
+    },
+    {
+      "difference": "RNG transport",
+      "accepted_code_location": "inference.py:65; baseline §12",
+      "classification": "INTENTIONAL_SUCCESSOR_CHANGE_ACCEPTABLE",
+      "assessment": "Replace NumPy generator with fully indexed SHA256 sampler while retaining uniform start law and R1.1 stage-seed separators. No claim of accepted NumPy bitwise replay."
+    },
+    {
+      "difference": "Source lineage/lock/Validation",
+      "accepted_code_location": "inference.py:152–194; baseline §§12,15",
+      "classification": "INTENTIONAL_SUCCESSOR_CHANGE_ACCEPTABLE",
+      "assessment": "Successor receipts, ranking and one active locked Validation coordinate replace old partition/testability bindings. Implementation must be independently verified before execution."
+    }
+  ],
+  "mc_certification_disposition": "VALID_CONSERVATIVE_CERTIFICATION",
+  "mc_certification_assessment": {
+    "disposition": "VALID_CONSERVATIVE_CERTIFICATION",
+    "outer_replicates": 36567,
+    "inner_bootstrap_replicates": 100000,
+    "nominal_ci": "One-sided 95% Clopper-Pearson, alpha_MC=0.05, with conservative exact dyadic outward brackets.",
+    "additional_certificate_alpha": "1/1500",
+    "selected_setting_count": 75,
+    "precision_rule": "ceil(log(1500)/(2*0.01^2))=36567; prospective one-sided Hoeffding radius 0.01.",
+    "coverage_proof": "For a fixed invalid (D,V,s), at least one fixed governing constraint is false. Falsely certifying its all-constraints intersection implies falsely certifying that constraint, with probability at most 1/1500. Union over 75 settings is <=0.05. No additional union over every cell is needed for this intersection-union claim.",
+    "not_claimed": [
+      "Simultaneous 95% coverage of every individual interval",
+      "Strong FWER under every mixed alternative from global-null checks alone",
+      "Conditional level .05 for the actually selected Validation candidate from fixed-candidate unconditional rates"
+    ],
+    "gates_unchanged": true,
+    "required_reporting": "Report nominal scientific admissibility separately. Stronger-certification failure is MC-certification uncertainty, not nominal gate failure, an alpha failure or proof of calendar infeasibility. Controller must freeze the additional assurance/selection reporting before Trial 1.",
+    "mixed_and_selected_null_metrics": "Mixed alternatives and selected-null unconditional/conditional Validation errors remain separately labeled diagnostics, including no-lock [0,1] conditional intervals."
+  },
+  "resource_disposition": "RESOURCE_EXECUTION_REQUIRES_PROVEN_EQUIVALENT_ACCELERATION",
+  "resource_assessment": {
+    "literal_logical_outer_records": 11863110020400,
+    "nuisance_cells": 69768,
+    "truth_vectors": 62,
+    "DV_support_settings": 75,
+    "outer_per_tuple": 36567,
+    "formal_inner_B": 100000,
+    "execution_feasibility_certified": false,
+    "benchmark_or_simulation_executed": false,
+    "equivalence_acceleration_assessments": [
+      {
+        "method": "Deterministic calibration reuse",
+        "assessment": "ALLOWED_WITH_EXACT_HASH_EQUIVALENCE",
+        "scope": "Compute each frozen quantile/17-profile/19-gap/cooldown/mean table once, keyed by all dependencies. No cell or truth vector is deleted."
+      },
+      {
+        "method": "Economic ratio factorization",
+        "assessment": "ALLOWED_NORMATIVE_IDENTITY",
+        "scope": "P(t+5)/P(t+1)-1=R(t+1) by exact cancellation. Materialize coherent Open lineage without repeatedly expanding huge price products."
+      },
+      {
+        "method": "Block sufficient statistics",
+        "assessment": "ALLOWED_WITH_BITWISE_REPLAY_PROOF",
+        "scope": "Cache z_i,a_i,z_i^2,z_i*a_i,a_i^2 within each realized sample; shared sampled starts reuse the same eight-coordinate block bundle. Ordered floating arithmetic and every inner draw remain exact."
+      },
+      {
+        "method": "Batching/vectorization",
+        "assessment": "ALLOWED_ONLY_WITH_BOUND_ENVIRONMENT_EQUIVALENCE",
+        "scope": "May change scheduling/storage, not arithmetic order, stream indices, B or fields. Reduction reordering/fast math is not automatically equivalent."
+      },
+      {
+        "method": "Analytic support rejection",
+        "assessment": "PROVEN_DECISION_BOUND_WITH_LIMITED_RECORD_SCOPE",
+        "scope": "B_eff<=occupied_blocks<=ceil(T/120). Statically impossible support settings cannot meet the 80% gate. No claim that their unrelated numeric diagnostics/leaf hashes can be fabricated or skipped if still required."
+      },
+      {
+        "method": "Exact no-event/zero-variance short circuit",
+        "assessment": "ALLOWED_FOR_DETERMINISTIC_FAILED_PIPELINE_PATHS",
+        "scope": "A valid no-event or target-zero-variance path cannot pass; skip unnecessary formal bootstraps while preserving its record/status and all still-required counterfactual metrics."
+      },
+      {
+        "method": "Common-random-number cross-setting reuse",
+        "assessment": "NOT_AUTOMATICALLY_ALLOWED",
+        "scope": "run_root includes cell,truth,D,V,s and outer index. Different keys generally generate different streams; replacing them with common streams changes indexed records and the materialized protocol."
+      },
+      {
+        "method": "Distributional cell/null deduplication",
+        "assessment": "REQUIRES_POINTWISE_OR_CERTIFIED_PROTOCOL_EQUIVALENCE",
+        "scope": "Equal distributions alone do not preserve distinct seeded records, per-cell counts or result root. No deduplication proof or executable acceleration plan was supplied."
+      },
+      {
+        "method": "Outcome-driven early rejection/cell pruning",
+        "assessment": "FORBIDDEN",
+        "scope": "Observed favorable/unfavorable MC results cannot stop a run, select nuisance settings or lower B/outer counts. Only proven mathematical impossibility may certify a negative feasibility constraint."
+      }
+    ],
+    "reason": "Specific static exact identities/savings exist, but no complete executable-equivalence/resource/replay proof exists. Finite logical executability does not certify practical capacity."
+  },
+  "static_calendar_support_analysis": {
+    "analysis_type": "DETERMINISTIC_CALENDAR_AND_CONTRACT_ARITHMETIC_NOT_SIMULATION",
+    "pairs": [
+      {
+        "D_months": 1,
+        "V_months": 1,
+        "within_calendar_budget": true,
+        "support_thresholds_not_statically_excluded_across_all_anchors": [],
+        "anchors": [
+          {
+            "anchor": "2032-01-01T00:00:00Z",
+            "D_hours": 744,
+            "V_hours": 696,
+            "D_block_ceiling": 7,
+            "V_block_ceiling": 6,
+            "support_thresholds_not_statically_excluded": [],
+            "elapsed_hours_including_audit": 1488
+          },
+          {
+            "anchor": "2032-02-01T00:00:00Z",
+            "D_hours": 696,
+            "V_hours": 744,
+            "D_block_ceiling": 6,
+            "V_block_ceiling": 7,
+            "support_thresholds_not_statically_excluded": [],
+            "elapsed_hours_including_audit": 1488
+          },
+          {
+            "anchor": "2033-01-01T00:00:00Z",
+            "D_hours": 744,
+            "V_hours": 672,
+            "D_block_ceiling": 7,
+            "V_block_ceiling": 6,
+            "support_thresholds_not_statically_excluded": [],
+            "elapsed_hours_including_audit": 1464
+          },
+          {
+            "anchor": "2033-02-01T00:00:00Z",
+            "D_hours": 672,
+            "V_hours": 744,
+            "D_block_ceiling": 6,
+            "V_block_ceiling": 7,
+            "support_thresholds_not_statically_excluded": [],
+            "elapsed_hours_including_audit": 1464
+          }
+        ]
+      },
+      {
+        "D_months": 1,
+        "V_months": 2,
+        "within_calendar_budget": true,
+        "support_thresholds_not_statically_excluded_across_all_anchors": [],
+        "anchors": [
+          {
+            "anchor": "2032-01-01T00:00:00Z",
+            "D_hours": 744,
+            "V_hours": 1440,
+            "D_block_ceiling": 7,
+            "V_block_ceiling": 12,
+            "support_thresholds_not_statically_excluded": [],
+            "elapsed_hours_including_audit": 2232
+          },
+          {
+            "anchor": "2032-02-01T00:00:00Z",
+            "D_hours": 696,
+            "V_hours": 1464,
+            "D_block_ceiling": 6,
+            "V_block_ceiling": 13,
+            "support_thresholds_not_statically_excluded": [],
+            "elapsed_hours_including_audit": 2208
+          },
+          {
+            "anchor": "2033-01-01T00:00:00Z",
+            "D_hours": 744,
+            "V_hours": 1416,
+            "D_block_ceiling": 7,
+            "V_block_ceiling": 12,
+            "support_thresholds_not_statically_excluded": [],
+            "elapsed_hours_including_audit": 2208
+          },
+          {
+            "anchor": "2033-02-01T00:00:00Z",
+            "D_hours": 672,
+            "V_hours": 1464,
+            "D_block_ceiling": 6,
+            "V_block_ceiling": 13,
+            "support_thresholds_not_statically_excluded": [],
+            "elapsed_hours_including_audit": 2184
+          }
+        ]
+      },
+      {
+        "D_months": 1,
+        "V_months": 3,
+        "within_calendar_budget": true,
+        "support_thresholds_not_statically_excluded_across_all_anchors": [],
+        "anchors": [
+          {
+            "anchor": "2032-01-01T00:00:00Z",
+            "D_hours": 744,
+            "V_hours": 2160,
+            "D_block_ceiling": 7,
+            "V_block_ceiling": 18,
+            "support_thresholds_not_statically_excluded": [],
+            "elapsed_hours_including_audit": 2952
+          },
+          {
+            "anchor": "2032-02-01T00:00:00Z",
+            "D_hours": 696,
+            "V_hours": 2208,
+            "D_block_ceiling": 6,
+            "V_block_ceiling": 19,
+            "support_thresholds_not_statically_excluded": [],
+            "elapsed_hours_including_audit": 2952
+          },
+          {
+            "anchor": "2033-01-01T00:00:00Z",
+            "D_hours": 744,
+            "V_hours": 2136,
+            "D_block_ceiling": 7,
+            "V_block_ceiling": 18,
+            "support_thresholds_not_statically_excluded": [],
+            "elapsed_hours_including_audit": 2928
+          },
+          {
+            "anchor": "2033-02-01T00:00:00Z",
+            "D_hours": 672,
+            "V_hours": 2208,
+            "D_block_ceiling": 6,
+            "V_block_ceiling": 19,
+            "support_thresholds_not_statically_excluded": [],
+            "elapsed_hours_including_audit": 2928
+          }
+        ]
+      },
+      {
+        "D_months": 2,
+        "V_months": 1,
+        "within_calendar_budget": true,
+        "support_thresholds_not_statically_excluded_across_all_anchors": [],
+        "anchors": [
+          {
+            "anchor": "2032-01-01T00:00:00Z",
+            "D_hours": 1440,
+            "V_hours": 744,
+            "D_block_ceiling": 12,
+            "V_block_ceiling": 7,
+            "support_thresholds_not_statically_excluded": [],
+            "elapsed_hours_including_audit": 2232
+          },
+          {
+            "anchor": "2032-02-01T00:00:00Z",
+            "D_hours": 1440,
+            "V_hours": 720,
+            "D_block_ceiling": 12,
+            "V_block_ceiling": 6,
+            "support_thresholds_not_statically_excluded": [],
+            "elapsed_hours_including_audit": 2208
+          },
+          {
+            "anchor": "2033-01-01T00:00:00Z",
+            "D_hours": 1416,
+            "V_hours": 744,
+            "D_block_ceiling": 12,
+            "V_block_ceiling": 7,
+            "support_thresholds_not_statically_excluded": [],
+            "elapsed_hours_including_audit": 2208
+          },
+          {
+            "anchor": "2033-02-01T00:00:00Z",
+            "D_hours": 1416,
+            "V_hours": 720,
+            "D_block_ceiling": 12,
+            "V_block_ceiling": 6,
+            "support_thresholds_not_statically_excluded": [],
+            "elapsed_hours_including_audit": 2184
+          }
+        ]
+      },
+      {
+        "D_months": 2,
+        "V_months": 2,
+        "within_calendar_budget": true,
+        "support_thresholds_not_statically_excluded_across_all_anchors": [
+          12
+        ],
+        "anchors": [
+          {
+            "anchor": "2032-01-01T00:00:00Z",
+            "D_hours": 1440,
+            "V_hours": 1464,
+            "D_block_ceiling": 12,
+            "V_block_ceiling": 13,
+            "support_thresholds_not_statically_excluded": [
+              12
+            ],
+            "elapsed_hours_including_audit": 2952
+          },
+          {
+            "anchor": "2032-02-01T00:00:00Z",
+            "D_hours": 1440,
+            "V_hours": 1464,
+            "D_block_ceiling": 12,
+            "V_block_ceiling": 13,
+            "support_thresholds_not_statically_excluded": [
+              12
+            ],
+            "elapsed_hours_including_audit": 2952
+          },
+          {
+            "anchor": "2033-01-01T00:00:00Z",
+            "D_hours": 1416,
+            "V_hours": 1464,
+            "D_block_ceiling": 12,
+            "V_block_ceiling": 13,
+            "support_thresholds_not_statically_excluded": [
+              12
+            ],
+            "elapsed_hours_including_audit": 2928
+          },
+          {
+            "anchor": "2033-02-01T00:00:00Z",
+            "D_hours": 1416,
+            "V_hours": 1464,
+            "D_block_ceiling": 12,
+            "V_block_ceiling": 13,
+            "support_thresholds_not_statically_excluded": [
+              12
+            ],
+            "elapsed_hours_including_audit": 2928
+          }
+        ]
+      },
+      {
+        "D_months": 2,
+        "V_months": 3,
+        "within_calendar_budget": false,
+        "support_thresholds_not_statically_excluded_across_all_anchors": [
+          12
+        ],
+        "anchors": [
+          {
+            "anchor": "2032-01-01T00:00:00Z",
+            "D_hours": 1440,
+            "V_hours": 2208,
+            "D_block_ceiling": 12,
+            "V_block_ceiling": 19,
+            "support_thresholds_not_statically_excluded": [
+              12
+            ],
+            "elapsed_hours_including_audit": 3696
+          },
+          {
+            "anchor": "2032-02-01T00:00:00Z",
+            "D_hours": 1440,
+            "V_hours": 2184,
+            "D_block_ceiling": 12,
+            "V_block_ceiling": 19,
+            "support_thresholds_not_statically_excluded": [
+              12
+            ],
+            "elapsed_hours_including_audit": 3672
+          },
+          {
+            "anchor": "2033-01-01T00:00:00Z",
+            "D_hours": 1416,
+            "V_hours": 2208,
+            "D_block_ceiling": 12,
+            "V_block_ceiling": 19,
+            "support_thresholds_not_statically_excluded": [
+              12
+            ],
+            "elapsed_hours_including_audit": 3672
+          },
+          {
+            "anchor": "2033-02-01T00:00:00Z",
+            "D_hours": 1416,
+            "V_hours": 2184,
+            "D_block_ceiling": 12,
+            "V_block_ceiling": 19,
+            "support_thresholds_not_statically_excluded": [
+              12
+            ],
+            "elapsed_hours_including_audit": 3648
+          }
+        ]
+      },
+      {
+        "D_months": 3,
+        "V_months": 1,
+        "within_calendar_budget": true,
+        "support_thresholds_not_statically_excluded_across_all_anchors": [],
+        "anchors": [
+          {
+            "anchor": "2032-01-01T00:00:00Z",
+            "D_hours": 2184,
+            "V_hours": 720,
+            "D_block_ceiling": 19,
+            "V_block_ceiling": 6,
+            "support_thresholds_not_statically_excluded": [],
+            "elapsed_hours_including_audit": 2952
+          },
+          {
+            "anchor": "2032-02-01T00:00:00Z",
+            "D_hours": 2160,
+            "V_hours": 744,
+            "D_block_ceiling": 18,
+            "V_block_ceiling": 7,
+            "support_thresholds_not_statically_excluded": [],
+            "elapsed_hours_including_audit": 2952
+          },
+          {
+            "anchor": "2033-01-01T00:00:00Z",
+            "D_hours": 2160,
+            "V_hours": 720,
+            "D_block_ceiling": 18,
+            "V_block_ceiling": 6,
+            "support_thresholds_not_statically_excluded": [],
+            "elapsed_hours_including_audit": 2928
+          },
+          {
+            "anchor": "2033-02-01T00:00:00Z",
+            "D_hours": 2136,
+            "V_hours": 744,
+            "D_block_ceiling": 18,
+            "V_block_ceiling": 7,
+            "support_thresholds_not_statically_excluded": [],
+            "elapsed_hours_including_audit": 2928
+          }
+        ]
+      },
+      {
+        "D_months": 3,
+        "V_months": 2,
+        "within_calendar_budget": false,
+        "support_thresholds_not_statically_excluded_across_all_anchors": [
+          12
+        ],
+        "anchors": [
+          {
+            "anchor": "2032-01-01T00:00:00Z",
+            "D_hours": 2184,
+            "V_hours": 1464,
+            "D_block_ceiling": 19,
+            "V_block_ceiling": 13,
+            "support_thresholds_not_statically_excluded": [
+              12
+            ],
+            "elapsed_hours_including_audit": 3696
+          },
+          {
+            "anchor": "2032-02-01T00:00:00Z",
+            "D_hours": 2160,
+            "V_hours": 1464,
+            "D_block_ceiling": 18,
+            "V_block_ceiling": 13,
+            "support_thresholds_not_statically_excluded": [
+              12
+            ],
+            "elapsed_hours_including_audit": 3672
+          },
+          {
+            "anchor": "2033-01-01T00:00:00Z",
+            "D_hours": 2160,
+            "V_hours": 1464,
+            "D_block_ceiling": 18,
+            "V_block_ceiling": 13,
+            "support_thresholds_not_statically_excluded": [
+              12
+            ],
+            "elapsed_hours_including_audit": 3672
+          },
+          {
+            "anchor": "2033-02-01T00:00:00Z",
+            "D_hours": 2136,
+            "V_hours": 1464,
+            "D_block_ceiling": 18,
+            "V_block_ceiling": 13,
+            "support_thresholds_not_statically_excluded": [
+              12
+            ],
+            "elapsed_hours_including_audit": 3648
+          }
+        ]
+      },
+      {
+        "D_months": 3,
+        "V_months": 3,
+        "within_calendar_budget": false,
+        "support_thresholds_not_statically_excluded_across_all_anchors": [
+          12,
+          18
+        ],
+        "anchors": [
+          {
+            "anchor": "2032-01-01T00:00:00Z",
+            "D_hours": 2184,
+            "V_hours": 2184,
+            "D_block_ceiling": 19,
+            "V_block_ceiling": 19,
+            "support_thresholds_not_statically_excluded": [
+              12,
+              18
+            ],
+            "elapsed_hours_including_audit": 4416
+          },
+          {
+            "anchor": "2032-02-01T00:00:00Z",
+            "D_hours": 2160,
+            "V_hours": 2208,
+            "D_block_ceiling": 18,
+            "V_block_ceiling": 19,
+            "support_thresholds_not_statically_excluded": [
+              12,
+              18
+            ],
+            "elapsed_hours_including_audit": 4416
+          },
+          {
+            "anchor": "2033-01-01T00:00:00Z",
+            "D_hours": 2160,
+            "V_hours": 2184,
+            "D_block_ceiling": 18,
+            "V_block_ceiling": 19,
+            "support_thresholds_not_statically_excluded": [
+              12,
+              18
+            ],
+            "elapsed_hours_including_audit": 4392
+          },
+          {
+            "anchor": "2033-02-01T00:00:00Z",
+            "D_hours": 2136,
+            "V_hours": 2208,
+            "D_block_ceiling": 18,
+            "V_block_ceiling": 19,
+            "support_thresholds_not_statically_excluded": [
+              12,
+              18
+            ],
+            "elapsed_hours_including_audit": 4392
+          }
+        ]
+      },
+      {
+        "D_months": 4,
+        "V_months": 1,
+        "within_calendar_budget": false,
+        "support_thresholds_not_statically_excluded_across_all_anchors": [],
+        "anchors": [
+          {
+            "anchor": "2032-01-01T00:00:00Z",
+            "D_hours": 2904,
+            "V_hours": 744,
+            "D_block_ceiling": 25,
+            "V_block_ceiling": 7,
+            "support_thresholds_not_statically_excluded": [],
+            "elapsed_hours_including_audit": 3696
+          },
+          {
+            "anchor": "2032-02-01T00:00:00Z",
+            "D_hours": 2904,
+            "V_hours": 720,
+            "D_block_ceiling": 25,
+            "V_block_ceiling": 6,
+            "support_thresholds_not_statically_excluded": [],
+            "elapsed_hours_including_audit": 3672
+          },
+          {
+            "anchor": "2033-01-01T00:00:00Z",
+            "D_hours": 2880,
+            "V_hours": 744,
+            "D_block_ceiling": 24,
+            "V_block_ceiling": 7,
+            "support_thresholds_not_statically_excluded": [],
+            "elapsed_hours_including_audit": 3672
+          },
+          {
+            "anchor": "2033-02-01T00:00:00Z",
+            "D_hours": 2880,
+            "V_hours": 720,
+            "D_block_ceiling": 24,
+            "V_block_ceiling": 6,
+            "support_thresholds_not_statically_excluded": [],
+            "elapsed_hours_including_audit": 3648
+          }
+        ]
+      },
+      {
+        "D_months": 4,
+        "V_months": 2,
+        "within_calendar_budget": false,
+        "support_thresholds_not_statically_excluded_across_all_anchors": [
+          12
+        ],
+        "anchors": [
+          {
+            "anchor": "2032-01-01T00:00:00Z",
+            "D_hours": 2904,
+            "V_hours": 1464,
+            "D_block_ceiling": 25,
+            "V_block_ceiling": 13,
+            "support_thresholds_not_statically_excluded": [
+              12
+            ],
+            "elapsed_hours_including_audit": 4416
+          },
+          {
+            "anchor": "2032-02-01T00:00:00Z",
+            "D_hours": 2904,
+            "V_hours": 1464,
+            "D_block_ceiling": 25,
+            "V_block_ceiling": 13,
+            "support_thresholds_not_statically_excluded": [
+              12
+            ],
+            "elapsed_hours_including_audit": 4416
+          },
+          {
+            "anchor": "2033-01-01T00:00:00Z",
+            "D_hours": 2880,
+            "V_hours": 1464,
+            "D_block_ceiling": 24,
+            "V_block_ceiling": 13,
+            "support_thresholds_not_statically_excluded": [
+              12
+            ],
+            "elapsed_hours_including_audit": 4392
+          },
+          {
+            "anchor": "2033-02-01T00:00:00Z",
+            "D_hours": 2880,
+            "V_hours": 1464,
+            "D_block_ceiling": 24,
+            "V_block_ceiling": 13,
+            "support_thresholds_not_statically_excluded": [
+              12
+            ],
+            "elapsed_hours_including_audit": 4392
+          }
+        ]
+      },
+      {
+        "D_months": 4,
+        "V_months": 3,
+        "within_calendar_budget": false,
+        "support_thresholds_not_statically_excluded_across_all_anchors": [
+          12,
+          18
+        ],
+        "anchors": [
+          {
+            "anchor": "2032-01-01T00:00:00Z",
+            "D_hours": 2904,
+            "V_hours": 2208,
+            "D_block_ceiling": 25,
+            "V_block_ceiling": 19,
+            "support_thresholds_not_statically_excluded": [
+              12,
+              18
+            ],
+            "elapsed_hours_including_audit": 5160
+          },
+          {
+            "anchor": "2032-02-01T00:00:00Z",
+            "D_hours": 2904,
+            "V_hours": 2208,
+            "D_block_ceiling": 25,
+            "V_block_ceiling": 19,
+            "support_thresholds_not_statically_excluded": [
+              12,
+              18
+            ],
+            "elapsed_hours_including_audit": 5160
+          },
+          {
+            "anchor": "2033-01-01T00:00:00Z",
+            "D_hours": 2880,
+            "V_hours": 2208,
+            "D_block_ceiling": 24,
+            "V_block_ceiling": 19,
+            "support_thresholds_not_statically_excluded": [
+              12,
+              18
+            ],
+            "elapsed_hours_including_audit": 5136
+          },
+          {
+            "anchor": "2033-02-01T00:00:00Z",
+            "D_hours": 2880,
+            "V_hours": 2208,
+            "D_block_ceiling": 24,
+            "V_block_ceiling": 19,
+            "support_thresholds_not_statically_excluded": [
+              12,
+              18
+            ],
+            "elapsed_hours_including_audit": 5136
+          }
+        ]
+      },
+      {
+        "D_months": 6,
+        "V_months": 1,
+        "within_calendar_budget": false,
+        "support_thresholds_not_statically_excluded_across_all_anchors": [],
+        "anchors": [
+          {
+            "anchor": "2032-01-01T00:00:00Z",
+            "D_hours": 4368,
+            "V_hours": 744,
+            "D_block_ceiling": 37,
+            "V_block_ceiling": 7,
+            "support_thresholds_not_statically_excluded": [],
+            "elapsed_hours_including_audit": 5160
+          },
+          {
+            "anchor": "2032-02-01T00:00:00Z",
+            "D_hours": 4368,
+            "V_hours": 744,
+            "D_block_ceiling": 37,
+            "V_block_ceiling": 7,
+            "support_thresholds_not_statically_excluded": [],
+            "elapsed_hours_including_audit": 5160
+          },
+          {
+            "anchor": "2033-01-01T00:00:00Z",
+            "D_hours": 4344,
+            "V_hours": 744,
+            "D_block_ceiling": 37,
+            "V_block_ceiling": 7,
+            "support_thresholds_not_statically_excluded": [],
+            "elapsed_hours_including_audit": 5136
+          },
+          {
+            "anchor": "2033-02-01T00:00:00Z",
+            "D_hours": 4344,
+            "V_hours": 744,
+            "D_block_ceiling": 37,
+            "V_block_ceiling": 7,
+            "support_thresholds_not_statically_excluded": [],
+            "elapsed_hours_including_audit": 5136
+          }
+        ]
+      },
+      {
+        "D_months": 6,
+        "V_months": 2,
+        "within_calendar_budget": false,
+        "support_thresholds_not_statically_excluded_across_all_anchors": [
+          12
+        ],
+        "anchors": [
+          {
+            "anchor": "2032-01-01T00:00:00Z",
+            "D_hours": 4368,
+            "V_hours": 1488,
+            "D_block_ceiling": 37,
+            "V_block_ceiling": 13,
+            "support_thresholds_not_statically_excluded": [
+              12
+            ],
+            "elapsed_hours_including_audit": 5904
+          },
+          {
+            "anchor": "2032-02-01T00:00:00Z",
+            "D_hours": 4368,
+            "V_hours": 1464,
+            "D_block_ceiling": 37,
+            "V_block_ceiling": 13,
+            "support_thresholds_not_statically_excluded": [
+              12
+            ],
+            "elapsed_hours_including_audit": 5880
+          },
+          {
+            "anchor": "2033-01-01T00:00:00Z",
+            "D_hours": 4344,
+            "V_hours": 1488,
+            "D_block_ceiling": 37,
+            "V_block_ceiling": 13,
+            "support_thresholds_not_statically_excluded": [
+              12
+            ],
+            "elapsed_hours_including_audit": 5880
+          },
+          {
+            "anchor": "2033-02-01T00:00:00Z",
+            "D_hours": 4344,
+            "V_hours": 1464,
+            "D_block_ceiling": 37,
+            "V_block_ceiling": 13,
+            "support_thresholds_not_statically_excluded": [
+              12
+            ],
+            "elapsed_hours_including_audit": 5856
+          }
+        ]
+      },
+      {
+        "D_months": 6,
+        "V_months": 3,
+        "within_calendar_budget": false,
+        "support_thresholds_not_statically_excluded_across_all_anchors": [
+          12,
+          18
+        ],
+        "anchors": [
+          {
+            "anchor": "2032-01-01T00:00:00Z",
+            "D_hours": 4368,
+            "V_hours": 2208,
+            "D_block_ceiling": 37,
+            "V_block_ceiling": 19,
+            "support_thresholds_not_statically_excluded": [
+              12,
+              18
+            ],
+            "elapsed_hours_including_audit": 6624
+          },
+          {
+            "anchor": "2032-02-01T00:00:00Z",
+            "D_hours": 4368,
+            "V_hours": 2208,
+            "D_block_ceiling": 37,
+            "V_block_ceiling": 19,
+            "support_thresholds_not_statically_excluded": [
+              12,
+              18
+            ],
+            "elapsed_hours_including_audit": 6624
+          },
+          {
+            "anchor": "2033-01-01T00:00:00Z",
+            "D_hours": 4344,
+            "V_hours": 2208,
+            "D_block_ceiling": 37,
+            "V_block_ceiling": 19,
+            "support_thresholds_not_statically_excluded": [
+              12,
+              18
+            ],
+            "elapsed_hours_including_audit": 6600
+          },
+          {
+            "anchor": "2033-02-01T00:00:00Z",
+            "D_hours": 4344,
+            "V_hours": 2208,
+            "D_block_ceiling": 37,
+            "V_block_ceiling": 19,
+            "support_thresholds_not_statically_excluded": [
+              12,
+              18
+            ],
+            "elapsed_hours_including_audit": 6600
+          }
+        ]
+      }
+    ],
+    "outer_count": 36567,
+    "nuisance_cells": 69768,
+    "logical_outer_records": 11863110020400,
+    "report_semantic_sections_match": true,
+    "alpha_mc": "1/1500"
+  },
+  "static_failure_mode_bound": {
+    "single_true_coordinate_success_probability_upper_bound": "37/40 = 0.925",
+    "proof": "ALL_DECISION_SOURCE_MISSING, FLAT_FEATURE_CLOCK and true-coordinate ZERO_VARIANCE each have probability 1/40 and force failure. No empirical estimate or Monte Carlo run is used. This ceiling does not prove >=0.80 power."
+  },
+  "pre_run_materialization_boundary_disposition": "MECHANICAL_OR_CORRECTNESS_RESOURCE_RECEIPTS_NO_NEW_SCIENTIFIC_PARAMETER_CHOICE",
+  "pre_run_materialization_boundary": [
+    {
+      "receipt_class": "TRAIN custody/prehistory",
+      "disposition": "MECHANICAL_INPUT_RECEIPT",
+      "rule": "Accepted interval/projection/source hashes and prehistory; unavailable inputs block, never use protected data.",
+      "materialized_in_audit": false
+    },
+    {
+      "receipt_class": "Quantiles and event clocks",
+      "disposition": "MECHANICAL_FROZEN_ALGORITHM",
+      "rule": "Exact scalar eligibility/nearest ranks/formulas/cooldown and paired membership; no endpoint or profitability calibration.",
+      "materialized_in_audit": false
+    },
+    {
+      "receipt_class": "17 rate profiles",
+      "disposition": "MECHANICAL_EXHAUSTIVE_SELECTION",
+      "rule": "Frozen 9^4 transformation grid, constrained rates and deterministic lexicographic minimizer; unattainable profile blocks all materialization.",
+      "materialized_in_audit": false
+    },
+    {
+      "receipt_class": "19 gap tables/state carry",
+      "disposition": "MECHANICAL_FROZEN_CONSTRUCTION",
+      "rule": "Exact cyclic clusters/late receipts/native missing unions, recurrent cooldown orbits and fixed phase chronology.",
+      "materialized_in_audit": false
+    },
+    {
+      "receipt_class": "Mean tables/truth effects",
+      "disposition": "MECHANICAL_EXACT_LINEAR_ALGEBRA",
+      "rule": "Rational rank/consistency, unique minimum norm, all equalities and .25 bound for every required normal/zero-variance truth; inconsistency blocks all materialization.",
+      "materialized_in_audit": false
+    },
+    {
+      "receipt_class": "Open ratio/constant endpoint",
+      "disposition": "MECHANICAL_PROOF_RECEIPT",
+      "rule": "Exact shared chains and cancellation, cost and once-rounded zero-variance equality; no candidate-specific replacement tensor.",
+      "materialized_in_audit": false
+    },
+    {
+      "receipt_class": "Reference implementation/numerics",
+      "disposition": "IMPLEMENTATION_WITH_INDEPENDENT_CORRECTNESS_RECEIPT",
+      "rule": "Bound operation order/libm/environment/hash before any OC result; no implementation choice may change a normative formula. Deviations return to Controller, not self-repair.",
+      "materialized_in_audit": false
+    },
+    {
+      "receipt_class": "Negative controls",
+      "disposition": "MECHANICAL_COMPONENT_REPLAY_RECEIPT",
+      "rule": "Fixed required behaviors for lookahead/source revisions/gaps/cooldown/alias/variance/lock roots; replay is not this audit and is not a power trial result.",
+      "materialized_in_audit": false
+    },
+    {
+      "receipt_class": "Resource/reproduction plan",
+      "disposition": "SEPARATE_FEASIBILITY_CERTIFICATION",
+      "rule": "Prove exact acceleration and capacity; do not substitute approximate independence, fewer cells, B or samples.",
+      "materialized_in_audit": false
+    },
+    {
+      "receipt_class": "Roots and seeds",
+      "disposition": "MECHANICAL_POST_RECEIPT_HASHING",
+      "rule": "Compute roots only after bound receipts exist; do not search seeds or rematerialize inputs after OC outcomes.",
+      "materialized_in_audit": false
+    }
+  ],
+  "findings_by_severity": {
+    "BLOCKER": [],
+    "HIGH": [
+      {
+        "id": "SOL-R01",
+        "severity": "HIGH",
+        "category": "EXECUTION_PREREQUISITE",
+        "location": {
+          "path": "reviews/v0.5/V0.5.5_A1_SYNTHETIC_METHOD_AUTHORITY_DESIGN_R1.md",
+          "commit": "9b92ec290e4f9de93c140ca471a0eb1644526e2b",
+          "line": 124
+        },
+        "scientific_method_blocker": false,
+        "finding": "Literal protocol is 11,863,110,020,400 logical outer records before B=100000 bootstrap work. Execution capacity and a full exact acceleration/replay proof are absent.",
+        "consequence": "Method semantics may pass while Trial 1 remains blocked. Precomputation and support bounds prove some savings, not an affordable end-to-end run.",
+        "required_action": "Separately certify an exact resource/replay plan, preserving all required evidence and declared counts/gates.",
+        "method_repair_required": false,
+        "design_semantic_root_change_required": false
+      }
+    ],
+    "MEDIUM": [
+      {
+        "id": "SOL-S01",
+        "severity": "MEDIUM",
+        "category": "CLAIM_SCOPE",
+        "location": {
+          "path": "reviews/v0.5/V0.5.5_A1_SYNTHETIC_METHOD_AUTHORITY_DESIGN_R1.md",
+          "commit": "9b92ec290e4f9de93c140ca471a0eb1644526e2b",
+          "line": 13
+        },
+        "scientific_method_blocker": false,
+        "finding": "Frozen TRAIN C/V phase clocks are independent of generated Open innovation feedback, and latent gamma is not the observed candidate-return correlation.",
+        "consequence": "Acceptable only for the declared finite conditional-clock OC claim. It cannot certify unconditional real-market calendar/power or economic execution.",
+        "required_action": "Carry this scope qualification into every future schedule claim; a richer market-model claim needs a new reviewed design.",
+        "method_repair_required": false,
+        "design_semantic_root_change_required": false
+      },
+      {
+        "id": "SOL-S02",
+        "severity": "MEDIUM",
+        "category": "CALENDAR_SUPPORT",
+        "location": {
+          "path": "reviews/v0.5/V0.5.5_A1_SYNTHETIC_METHOD_AUTHORITY_DESIGN_R1.md",
+          "commit": "9b92ec290e4f9de93c140ca471a0eb1644526e2b",
+          "line": 48
+        },
+        "scientific_method_blocker": false,
+        "finding": "Five of the six utility pairs have a one-month stage and are statically below B_eff_min=12. Only (2,2,s=12) survives the calendar upper bound. At leap anchors its Discovery has exactly 12 full 120h blocks.",
+        "consequence": "At those anchors B_eff>=12 requires equal positive event counts in all 12 blocks. This is necessary, not evidence that a TRAIN clock or 80% power passes.",
+        "required_action": "Preserve this analytic rejection and equality check in the resource/materialization receipt; do not tune windows to favorable phases.",
+        "method_repair_required": false,
+        "design_semantic_root_change_required": false
+      },
+      {
+        "id": "SOL-S03",
+        "severity": "MEDIUM",
+        "category": "ERROR_CLAIM_BOUNDARY",
+        "location": {
+          "path": "reviews/v0.5/V0.5.5_A1_SYNTHETIC_METHOD_AUTHORITY_DESIGN_R1.md",
+          "commit": "9b92ec290e4f9de93c140ca471a0eb1644526e2b",
+          "line": 134
+        },
+        "scientific_method_blocker": false,
+        "finding": "Governing Validation type-I checks are fixed-candidate unconditional checks. Locked-null conditional Validation error and mixed-null rejection are diagnostics.",
+        "consequence": "Do not label fixed-candidate checks as conditional selected-candidate error control or global-null results as proven strong mixed-alternative FWER.",
+        "required_action": "Retain explicit diagnostic denominators/scope. Any stronger claim requires a separately specified gate and review.",
+        "method_repair_required": false,
+        "design_semantic_root_change_required": false
+      },
+      {
+        "id": "SOL-G01",
+        "severity": "MEDIUM",
+        "category": "GOVERNANCE_EXCEPTION",
+        "location": {
+          "path": "User conversation",
+          "section": "Latest explicit reviewer override"
+        },
+        "scientific_method_blocker": false,
+        "finding": "The user explicitly waived fresh-session independence and requested current-session self-audit. The reviewer participated in the design.",
+        "consequence": "This artifact supplies a substantive self-audit, not the originally dispatched independent-model review. Controller must adjudicate that procedural exception separately.",
+        "required_action": "Record and accept/reject the exact reviewer-isolation waiver before treating the method audit gate as closed.",
+        "method_repair_required": false,
+        "design_semantic_root_change_required": false
+      }
+    ],
+    "INFO": [
+      {
+        "id": "SOL-I01",
+        "severity": "INFO",
+        "category": "INPUT_FEASIBILITY",
+        "location": {
+          "path": "reviews/v0.5/V0.5.5_A1_SYNTHETIC_METHOD_AUTHORITY_DESIGN_R1.md",
+          "commit": "9b92ec290e4f9de93c140ca471a0eb1644526e2b",
+          "line": 144
+        },
+        "scientific_method_blocker": false,
+        "finding": "None of TRAIN, rate/alias, bounded mean, ratio, implementation/numeric, negative-control or resource receipts is materialized.",
+        "consequence": "Prospective completeness is not proof that those frozen receipts are attainable. A missing or failed receipt blocks execution rather than enabling a discretionary replacement.",
+        "required_action": "Controller dispatches receipt materialization separately; retain pre-simulation blocked state.",
+        "method_repair_required": false,
+        "design_semantic_root_change_required": false
+      }
+    ]
+  },
+  "scientific_method_blockers": [],
+  "bounded_method_repairs_required": [],
+  "protected_outcome_access_attestation": {
+    "H41_WF1_VALIDATION_access": false,
+    "protected_H39_access": false,
+    "successor_real_outcome_access": false,
+    "real_candidate_support_access": false,
+    "raw_TRAIN_payload_access": false,
+    "performance_guided_selection": false
+  },
+  "simulation_executed_attestation": {
+    "simulation_executed": false,
+    "TRAIN_materialization_executed": false,
+    "calibration_executed": false,
+    "bootstrap_executed": false,
+    "negative_control_execution": false,
+    "compression_trials_consumed": 0,
+    "completed_compression_trials_remain": 0,
+    "only_executed_analysis": "Static JSON/hash/contract/grid and Gregorian calendar arithmetic; no stochastic generation."
+  },
+  "production_code_change_attestation": {
+    "production_code_changed": false,
+    "accepted_code_branch_change": false,
+    "scientific_authority_modified": false,
+    "allowed_diff_paths": [
+      "reviews/v0.5/V0.5.5_A1_SYNTHETIC_METHOD_AUTHORITY_SOL_INDEPENDENT_AUDIT_R1.md",
+      "evidence/v0.5.5/h41/V0.5.5_A1_SYNTHETIC_METHOD_AUTHORITY_SOL_INDEPENDENT_AUDIT_R1.json"
+    ]
+  },
+  "authority_hydration_check": {
+    "manifest_binding_fields_only": true,
+    "machine_identity_exception_documented": true,
+    "machine_semantic_contract_root_verified": true,
+    "only_report_baseline_inference_MUST_READ": true,
+    "adjacent_tests_opened": false,
+    "recursive_historical_hydration": false,
+    "scientific_package_imports": false,
+    "Quant_agent_sanitized_used_or_modified": false,
+    "earlier_same_task_self_audit_context_reused_under_explicit_override": true,
+    "immutable_scientific_inputs_unchanged_on_redispatch": true
+  },
+  "authorization": {
+    "Trial_1_resume": false,
+    "Trial_2": false,
+    "D0": false,
+    "protected_outcomes": false,
+    "production_implementation": false
+  },
+  "final_verdict": "PASS_METHOD_AUTHORITY_TO_MATERIALIZATION",
+  "verdict_scope": "Substantive method specification passes for the declared finite conditional envelope. Same-session self-review status is explicitly waived by user, not falsely described as independent review. Materialization and execution remain separate gates.",
+  "next_controller_action": "Controller records/adjudicates the explicit same-session self-audit waiver and accepts/rejects the finite-envelope scope plus additional selection-safe MC assurance. If accepted, dispatch TRAIN/input and deterministic method materialization plus independently verified implementation/numeric/negative-control receipts and exact resource/reproduction-plan certification. Keep Trial 1 BLOCKED_PRE_SIMULATION until all pre-run receipts pass; do not authorize Trial 2, D0, protected outcomes or production changes from this verdict.",
+  "artifacts": {
+    "report": "reviews/v0.5/V0.5.5_A1_SYNTHETIC_METHOD_AUTHORITY_SOL_INDEPENDENT_AUDIT_R1.md",
+    "machine_evidence": "evidence/v0.5.5/h41/V0.5.5_A1_SYNTHETIC_METHOD_AUTHORITY_SOL_INDEPENDENT_AUDIT_R1.json"
+  },
+  "validation": {
+    "design_root_recomputed": true,
+    "report_semantic_sections_match": true,
+    "grid_arithmetic_checked": true,
+    "calendar_bounds_checked": true,
+    "deterministic_audit_artifact_builder": "Static metadata/text only; reproduce exact files before publication",
+    "full_pytest": "NOT_REQUIRED_DOCS_EVIDENCE_ONLY",
+    "source_audit_rerun": false,
+    "unrelated_CI_failure_claims": []
+  }
+}
