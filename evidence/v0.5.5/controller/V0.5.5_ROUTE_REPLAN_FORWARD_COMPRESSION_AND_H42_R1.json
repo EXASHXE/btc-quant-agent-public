@@ -1,0 +1,157 @@
+{
+  "schema_id": "V0.5.5_ROUTE_REPLAN_FORWARD_COMPRESSION_AND_H42_R1",
+  "repository": "EXASHXE/btc-quant-agent-public",
+  "controller_role": "CHATGPT_0_PRIMARY_CONTROLLER_AND_REVIEWER",
+  "decision": "ADOPT_A1_BOUNDED_FORWARD_COMPRESSION_PLUS_A2_PARALLEL_H42_FEASIBILITY",
+  "verified_live_state_at_replan": {
+    "code_branch": "v0.5.5",
+    "code_sha": "8ecff4ec4b25bf73a35309689fd3ecfacc0d3399",
+    "docs_branch": "v0.5.5-docs",
+    "docs_sha_before_replan": "9c808578f0e8bf6a44f82ab52660066cb7825079",
+    "previous_a_line_stage": "H41_SUCCESSOR_FORWARD_R1_1_REAUDIT",
+    "forward_r1_1_reaudit_result_found": false
+  },
+  "a1": {
+    "name": "BOUNDED_FORWARD_COMPRESSION",
+    "forward_primary_route": "CONDITIONAL_AND_BOUNDED",
+    "compression_trials_max": 2,
+    "trial_1": {
+      "name": "FORWARD_R1_1_SHORT_HORIZON_SYNTHETIC_POWER_FEASIBILITY",
+      "discovery_month_grid": [
+        1,
+        2,
+        3,
+        4,
+        6
+      ],
+      "validation_month_grid": [
+        1,
+        2,
+        3
+      ],
+      "calendar_utility_max_total_months": 4,
+      "protected_outcome_access": false,
+      "pre_d0": true,
+      "current_r1_1_candidate_family_frozen_for_trial": true,
+      "endpoint_frozen_for_trial": true,
+      "scientific_gates_not_weakened": true
+    },
+    "trial_2": {
+      "authorized_condition": "ONLY_IF_TRIAL_1_FAILS_CALENDAR_UTILITY",
+      "concept": "OUTCOME_BLIND_MULTI_ASSET_PANEL_FORWARD_INFORMATION_RATE_FEASIBILITY",
+      "assets_not_independent_copies": true
+    },
+    "terminal_choices": [
+      "KEEP_FORWARD_AS_PRIMARY_ROUTE",
+      "TERMINATE_FORWARD_AS_PRIMARY_DISCOVERY_ROUTE"
+    ],
+    "existing_forward_r1_1_astra_reaudit": "DEFERRED_PENDING_A1_COMPRESSION_FEASIBILITY"
+  },
+  "a2": {
+    "namespace": "H42_STRATEGY_DISCOVERY_AND_HYBRID_CAPABLE_CAMPAIGN_V1",
+    "scientific_root": "NEW",
+    "reopens_h41_hybrid_root": false,
+    "status": "AUTHORIZED_PARALLEL_FEASIBILITY",
+    "mission": [
+      "FAST_STRATEGY_LEARNING",
+      "DEFENSIBLE_PROMOTION_TO_VALIDATION"
+    ],
+    "required_families": [
+      "MULTI_ASSET_CROSS_SECTIONAL",
+      "OI_X_PRICE",
+      "FUNDING_BASIS",
+      "CROSS_VENUE"
+    ],
+    "required_source_comparison": [
+      "BINANCE_UNUSED_ASSETS",
+      "BYBIT",
+      "OKX"
+    ],
+    "required_holdout_designs": [
+      "TIME_HOLDOUT",
+      "ASSET_HOLDOUT",
+      "VENUE_HOLDOUT",
+      "ASSET_X_TIME_HOLDOUT",
+      "ASSET_X_VENUE_HOLDOUT"
+    ],
+    "initial_working_priority": [
+      "MULTI_ASSET_CROSS_SECTIONAL",
+      "ASSET_HOLDOUT",
+      "OI_X_PRICE_IF_SOURCE_AUTHORITY_SUPPORTS",
+      "FUNDING_BASIS_IF_SOURCE_AUTHORITY_SUPPORTS",
+      "CROSS_VENUE_REPLICATION_AND_HOLDOUT"
+    ],
+    "giant_unconstrained_alpha_search_authorized": false
+  },
+  "source_observations": {
+    "binance": {
+      "multi_asset_ohlcv_public_archives": "SUPPORTED_BY_OFFICIAL_PUBLIC_DATA_REPOSITORY",
+      "checksums": "SUPPORTED",
+      "usd_m_open_interest_rest_deep_history": "NOT_ASSUMED; official connector docs state latest 30 days for openInterestHist"
+    },
+    "bybit": {
+      "kline": "DOCUMENTED",
+      "mark_price_kline": "DOCUMENTED",
+      "index_price_kline": "DOCUMENTED",
+      "premium_index_kline": "DOCUMENTED",
+      "open_interest_history": "DOCUMENTED; query upper limit to symbol launch stated, actual depth must be verified",
+      "funding_history": "DOCUMENTED",
+      "deep_history_pit_authority": "REQUIRES_FEASIBILITY_VERIFICATION"
+    },
+    "okx": {
+      "history_candles": "DOCUMENTED",
+      "index_candles": "DOCUMENTED",
+      "mark_price": "DOCUMENTED",
+      "funding_history": "DOCUMENTED",
+      "open_interest": "DOCUMENTED",
+      "deep_historical_oi_and_pit": "REQUIRES_FEASIBILITY_VERIFICATION"
+    }
+  },
+  "reuse_summary": {
+    "REUSE_AS_IS": [
+      "EXACT_SHA_VALIDATION",
+      "MACHINE_EVIDENCE"
+    ],
+    "REUSE_WITH_EXTENSION": [
+      "STRICT_PIT_CONCEPTS",
+      "SOURCE_CANONICALIZATION_AND_RECEIPTS",
+      "COMMON_CLOCK",
+      "EVENT_FORMATION_AND_COOLDOWN",
+      "ENDPOINT_FRAMEWORK",
+      "CANDIDATE_LEDGER",
+      "SEMANTIC_ROOT_HASHING",
+      "JOINT_BOOTSTRAP_INFERENCE",
+      "MULTIPLICITY",
+      "SUPPORT_CONCENTRATION",
+      "LIFECYCLE_STATE_MACHINE",
+      "PROTECTED_PARTITIONS",
+      "SOURCE_RECEIPT_REVISION_NO_BACKFILL"
+    ],
+    "NEW_REQUIRED": [
+      "MULTI_ASSET_UNIVERSE_SELECTION",
+      "ASSET_HOLDOUT_SPLIT_AUTHORITY",
+      "VENUE_HOLDOUT_AUTHORITY",
+      "OI_FUNDING_HISTORICAL_SOURCE_AUTHORITY",
+      "CROSS_VENUE_CANONICALIZATION"
+    ]
+  },
+  "isolation": {
+    "a1_a2_outcome_authority_shared": false,
+    "b_line_isolated": true,
+    "shared_engineering_primitives_allowed": true,
+    "post_d0_a1_redesign_from_a2_requires_new_semantic_root": true
+  },
+  "protected_fences": {
+    "h41_terminal_no_go_preserved": true,
+    "h41_wf1_validation_sealed": true,
+    "h39_protected_results_sealed": true,
+    "production_code_change_authorized_by_replan": false
+  },
+  "next_actions": [
+    "PUBLISH_A1_TRIAL_1_EXECUTION_PROMPT",
+    "PUBLISH_H42_FEASIBILITY_EXECUTION_PROMPT",
+    "RUN_IN_PARALLEL_ON_ISOLATED_FEATURE_BRANCHES",
+    "CONTROLLER_REVIEW_RESULTS",
+    "ASTRA_ONLY_AT_NEXT_PRE_FREEZE_SCIENTIFIC_DESIGN_CHECKPOINT"
+  ]
+}
