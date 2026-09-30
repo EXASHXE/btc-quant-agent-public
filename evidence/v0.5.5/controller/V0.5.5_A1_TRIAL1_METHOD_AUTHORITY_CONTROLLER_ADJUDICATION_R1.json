@@ -1,0 +1,70 @@
+{
+  "schema_id": "V0.5.5_A1_TRIAL1_METHOD_AUTHORITY_CONTROLLER_ADJUDICATION_R1",
+  "repository": "EXASHXE/btc-quant-agent-public",
+  "controller_role": "CHATGPT_0_PRIMARY_CONTROLLER_AND_REVIEWER",
+  "reviewed_execution": {
+    "branch": "feature/a1-forward-compression-trial1-v055",
+    "dispatch_start_sha": "e0d9624350c3dae048c6f4ceea51c62e5a641290",
+    "final_sha": "f76c05ceab83963d6a5cb1271805b3c217ebfa33",
+    "parent_sha": "e0d9624350c3dae048c6f4ceea51c62e5a641290",
+    "report_path": "reviews/v0.5/V0.5.5_FORWARD_R1_1_SHORT_HORIZON_SYNTHETIC_POWER_FEASIBILITY.md",
+    "report_blob_sha": "ab59694219aaa6ddf783ed5557c70e288b36c532",
+    "evidence_path": "evidence/v0.5.5/h41/V0.5.5_FORWARD_R1_1_SHORT_HORIZON_SYNTHETIC_POWER_FEASIBILITY.json",
+    "evidence_blob_sha": "b5990f4babf104aed8e2143164951f3bfc011e8a"
+  },
+  "code_authority": {
+    "branch": "v0.5.5",
+    "sha": "8ecff4ec4b25bf73a35309689fd3ecfacc0d3399",
+    "changed": false
+  },
+  "accepted_result": {
+    "decision": "SYNTHETIC_METHOD_AUTHORITY_INCOMPLETE",
+    "scientific_failure": false,
+    "alpha_failure": false,
+    "short_horizon_route_failure": false,
+    "simulation_ran": false,
+    "compression_trial_runs_completed": 0,
+    "trial_1_state": "BLOCKED_PRE_SIMULATION",
+    "trial_2_authorized": false,
+    "scientifically_admissible_pairs": [],
+    "selected_pair": null
+  },
+  "accepted_blockers": [
+    "M01_SCIENTIFIC_DGP_GAP",
+    "M02_SCIENTIFIC_DGP_GAP",
+    "M03_SCIENTIFIC_DGP_GAP",
+    "M04_INFERENCE_SPECIFICATION_GAP",
+    "M05_PROSPECTIVE_REPRODUCIBILITY_GAP"
+  ],
+  "failure_taxonomy": "TESTABILITY_FAILURE__PRE_SIMULATION_METHOD_AUTHORITY_GAP",
+  "route_decision": {
+    "next_stage": "A1_SYNTHETIC_METHOD_AUTHORITY_DESIGN_R1",
+    "max_design_passes_without_new_evidence": 1,
+    "trial_counter_consumed": false,
+    "post_design_gate": "A1_SYNTHETIC_METHOD_AUTHORITY_ASTRA_AUDIT_R1",
+    "on_astra_pass": "RESUME_SAME_FORWARD_COMPRESSION_TRIAL_1",
+    "on_astra_fail": "CONTROLLER_ADJUDICATE_BOUNDED_REPAIR_OR_TERMINATE_A1_PRIMARY_ROUTE",
+    "trial_2_starts_automatically": false
+  },
+  "protected_fences": {
+    "protected_outcome_access": false,
+    "h41_wf1_validation_sealed": true,
+    "h39_protected_results_sealed": true,
+    "d0_authorized": false,
+    "production_code_change_authorized": false,
+    "a2_h42_isolated": true
+  },
+  "ci": {
+    "run_id": 36709028475,
+    "conclusion": "failure",
+    "failing_scope": "pre-existing evidence/v0.5/h41/h41_synthetic_pit_validation_r1 F401 diagnostics",
+    "diagnostic_count": 6,
+    "classification": "PREEXISTING_NON_BLOCKING_REPOSITORY_HYGIENE",
+    "reviewed_diff_implicated": false
+  },
+  "controller_review": {
+    "path": "reviews/v0.5/V0.5.5_A1_TRIAL1_METHOD_AUTHORITY_CONTROLLER_ADJUDICATION_R1.md",
+    "blob_sha": "6c40cd0178c7ca251129e2466746c43cf2fcf9e9"
+  },
+  "controller_decision": "ACCEPT_SYNTHETIC_METHOD_AUTHORITY_INCOMPLETE__AUTHORIZE_ONE_METHOD_AUTHORITY_DESIGN__TRIAL1_NOT_CONSUMED"
+}
