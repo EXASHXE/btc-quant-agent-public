@@ -1,0 +1,39 @@
+{
+  "schema_id": "V0.5.5_H41_SUCCESSOR_FORWARD_R1_1_REAUDIT_DISPATCH",
+  "repository": "EXASHXE/btc-quant-agent-public",
+  "authority_namespace": "v0.5.5",
+  "purpose": "Exact-SHA dispatch for independent re-audit of the R1.1 forward-only successor design after Hybrid route termination.",
+  "dispatch_branch": "dispatch/v0.5.5-h41-successor-forward-r1-1-reaudit",
+  "execution_target": {
+    "docs_branch": "v0.5.5-docs",
+    "CONTROLLER_DISPATCH_SHA": "25a105f20d23453360bc56ad7fbc9f119d0e1a57",
+    "code_branch": "v0.5.5",
+    "accepted_code_sha": "8ecff4ec4b25bf73a35309689fd3ecfacc0d3399"
+  },
+  "active_prompt": {
+    "path": "prompts/v0.5/audit/v0.5.5_H41_SUCCESSOR_FORWARD_R1_1_REAUDIT.md",
+    "immutable_url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/25a105f20d23453360bc56ad7fbc9f119d0e1a57/prompts/v0.5/audit/v0.5.5_H41_SUCCESSOR_FORWARD_R1_1_REAUDIT.md"
+  },
+  "controller_authority": {
+    "review": "reviews/v0.5/V0.5.5_H41_SUCCESSOR_EXPOSURE_REPAIR_CONTROLLER_ADJUDICATION_R1.md",
+    "machine": "evidence/v0.5.5/controller/V0.5.5_H41_SUCCESSOR_EXPOSURE_REPAIR_CONTROLLER_ADJUDICATION_R1.json"
+  },
+  "route_state": {
+    "hybrid_route": "HYBRID_ROUTE_NOT_CERTIFIABLE_FROM_AVAILABLE_PROVENANCE",
+    "recursive_exposure_repair_authorized": false,
+    "next_stage": "H41_SUCCESSOR_FORWARD_R1_1_REAUDIT"
+  },
+  "execution_rules": {
+    "preferred_reviewer": "ASTRA",
+    "start_gate": "Checked-out v0.5.5-docs HEAD MUST equal 25a105f20d23453360bc56ad7fbc9f119d0e1a57.",
+    "code_gate": "v0.5.5 MUST equal 8ecff4ec4b25bf73a35309689fd3ecfacc0d3399.",
+    "no_substitution": true,
+    "no_hybrid_reopen": true,
+    "no_protected_outcome_access": true,
+    "no_production_code_change": true
+  },
+  "required_outputs": {
+    "review": "reviews/v0.5/V0.5.5_H41_SUCCESSOR_FORWARD_R1_1_REAUDIT.md",
+    "machine_evidence": "evidence/v0.5.5/h41/V0.5.5_H41_SUCCESSOR_FORWARD_R1_1_REAUDIT.json"
+  }
+}
