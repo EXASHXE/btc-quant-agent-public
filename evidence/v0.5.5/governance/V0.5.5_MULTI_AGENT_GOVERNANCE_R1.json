@@ -1,0 +1,47 @@
+{
+  "schema_id": "V0.5.5_MULTI_AGENT_GOVERNANCE_R1",
+  "repository": "EXASHXE/btc-quant-agent-public",
+  "code_branch": "v0.5.5",
+  "docs_branch": "v0.5.5-docs",
+  "project_status_document": "docs/project/V0.5.5_PROJECT_STATUS_AND_ROADMAP.md",
+  "roles": {
+    "CHATGPT_0": {
+      "role": "PRIMARY_CONTROLLER_AND_REVIEWER",
+      "document": "docs/roles/V0.5.5_CHATGPT_0_PRIMARY_CONTROLLER.md",
+      "cadence": "DAY_TO_DAY",
+      "authority": "OPERATIONAL_CONTROLLER"
+    },
+    "CHATGPT_1": {
+      "role": "SUPERVISORY_AUDITOR_AND_STRATEGIC_REVIEWER",
+      "document": "docs/roles/V0.5.5_CHATGPT_1_SUPERVISORY_AUDITOR.md",
+      "cadence": "SPARSE_TRIGGER_BASED",
+      "authority": "SUPERVISORY_CHALLENGE"
+    }
+  },
+  "executors": {
+    "GPT_6_1_SOL_CODEX": "DEFAULT_TECHNICAL_EXECUTOR",
+    "GEMINI": "MECHANICAL_LONG_TASK_EXECUTOR",
+    "ASTRA": "HIGH_VALUE_INDEPENDENT_SCIENTIFIC_AUDITOR"
+  },
+  "operating_principle": "CHATGPT_0_DRIVES__CHATGPT_1_CHALLENGES__EXECUTORS_EXECUTE",
+  "chatgpt_1_triggers": [
+    "MAJOR_ROUTE_CHANGE",
+    "TERMINAL_NO_GO",
+    "PRE_FREEZE",
+    "NEW_PRIMARY_SOURCE_AUTHORITY",
+    "MAJOR_INFERENCE_OR_POWER_CHANGE",
+    "PROTECTED_PARTITION_CHANGE",
+    "CANDIDATE_LOCK",
+    "MAJOR_SCIENTIFIC_IMPLEMENTATION_CHANGE",
+    "UNEXPLAINED_LONG_DURATION_PLAN",
+    "USER_REQUEST"
+  ],
+  "conflict_policy": {
+    "BLOCKER": "HOLD_AFFECTED_PROTECTED_GATE",
+    "HIGH": "CHATGPT_0_MUST_DOCUMENT_DISPOSITION",
+    "SCIENTIFIC_DISAGREEMENT": "FAIL_CLOSED_AND_SEEK_INDEPENDENT_REVIEW_IF_NEEDED",
+    "FINAL_DIRECTION": "USER"
+  },
+  "dynamic_state_rule": "VERIFY_LIVE_GIT_AND_READ_PROJECT_STATUS_DOCUMENT",
+  "scientific_authority_rule": "ROLE_DOCUMENTS_DO_NOT_OVERRIDE_FROZEN_MACHINE_SCIENTIFIC_AUTHORITY"
+}
