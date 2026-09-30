@@ -1,0 +1,4781 @@
+{
+  "schema_id": "V0.5.5_FORWARD_R1_1_SHORT_HORIZON_SYNTHETIC_POWER_FEASIBILITY_V1",
+  "repository": "EXASHXE/btc-quant-agent-public",
+  "execution_class": "PRE_D0_SYNTHETIC_ONLY / OUTCOME_BLIND / NO_PROTECTED_MARKET_OUTCOMES / NO_PRODUCTION_CHANGE",
+  "target_branch": "feature/a1-forward-compression-trial1-v055",
+  "docs_start_sha": "e0d9624350c3dae048c6f4ceea51c62e5a641290",
+  "controller_dispatch_sha": "e0d9624350c3dae048c6f4ceea51c62e5a641290",
+  "accepted_code_sha": "8ecff4ec4b25bf73a35309689fd3ecfacc0d3399",
+  "dispatch_manifest": {
+    "branch": "dispatch/v0.5.5-a1-forward-compression-trial1",
+    "commit": "9b51d7742ae2530aafaee48c7475a798ed21f756",
+    "path": "dispatch/V0.5.5_A1_FORWARD_COMPRESSION_TRIAL1_DISPATCH.json",
+    "blob_sha": "2b91716e1fa9abf5eae6d20902a64fbcd1dafd6d"
+  },
+  "start_gate": {
+    "pwd": "/tmp/a1-forward-compression-trial1-v055",
+    "HEAD": "e0d9624350c3dae048c6f4ceea51c62e5a641290",
+    "branch": "feature/a1-forward-compression-trial1-v055",
+    "origin_v0_5_5": "8ecff4ec4b25bf73a35309689fd3ecfacc0d3399",
+    "clean_worktree": true,
+    "runtime_import_path": "NOT_APPLICABLE; no scientific package imported",
+    "origin_fetch_transport": "GitHub Git-object API after native HTTPS failure; exact commit/tree/selected-blob SHA verification",
+    "native_http_fetch_succeeded": false,
+    "equivalent_origin_object_fetch_verified": true,
+    "Quant-agent-sanitized_used_or_modified": false
+  },
+  "forward_compression_trial": 1,
+  "forward_compression_trials_max": 2,
+  "authority_hashes": [
+    {
+      "path": "reviews/v0.5/V0.5.1_H41_SUCCESSOR_SCIENTIFIC_CAMPAIGN_V1_DESIGN_R1_1_CONTROLLER_REPAIR.md",
+      "at_commit": "e0d9624350c3dae048c6f4ceea51c62e5a641290",
+      "git_blob_sha": "f65b970e810a6e6a6d5420424d62c26ee4c5c953",
+      "sha256": "875cc7671d7b2063fa45ec883cbe5e113c2a3d2bb46648179a4d6818b83255fc"
+    },
+    {
+      "path": "evidence/v0.5/h41/V0.5.1_H41_SUCCESSOR_SCIENTIFIC_CAMPAIGN_V1_DESIGN_R1_1_CONTROLLER_REPAIR.json",
+      "at_commit": "e0d9624350c3dae048c6f4ceea51c62e5a641290",
+      "git_blob_sha": "098ce65b18a901283cad43e68590c6edef2fdfc3",
+      "sha256": "37401fbc8516aca02dd801d098e7e74eb5cf55ac77e29b56edfd1ebcf9dae1d8"
+    },
+    {
+      "path": "reviews/v0.5/V0.5.5_CONTROLLER_ROUTE_REPLAN_FORWARD_COMPRESSION_AND_H42_R1.md",
+      "at_commit": "e0d9624350c3dae048c6f4ceea51c62e5a641290",
+      "git_blob_sha": "fbb348f1fb109b4f6d4fa9d7f5905c378a498f43",
+      "sha256": "0da9da65c252d9268c4473efa9a1f2ca249b0ec9fce57d9b89d81f63b1b88894"
+    },
+    {
+      "path": "evidence/v0.5.5/controller/V0.5.5_ROUTE_REPLAN_FORWARD_COMPRESSION_AND_H42_R1.json",
+      "at_commit": "e0d9624350c3dae048c6f4ceea51c62e5a641290",
+      "git_blob_sha": "c890e059dd583e78dc87c0ad833352284bdac3c0",
+      "sha256": "f97c00ac156bfd9d1d1b792e2d1ad6b79c085ef714b244954f1da59ef7144cbe"
+    },
+    {
+      "path": "prompts/v0.5/research/v0.5.5_FORWARD_R1_1_SHORT_HORIZON_SYNTHETIC_POWER_FEASIBILITY.md",
+      "at_commit": "e0d9624350c3dae048c6f4ceea51c62e5a641290",
+      "git_blob_sha": "2395fbd3ea603162a25d5b3b5738778f149cc9d7",
+      "sha256": "146b579775c4676c3efbcd622cfe277e4c70d9f41d91a58ecf77e80ff15d0322"
+    }
+  ],
+  "authority_scope": "Only immutable design/prompt/replan documents and Git metadata. No market data, historical outcome payload, candidate support or production module imported.",
+  "duration_grid": {
+    "discovery_months": [
+      1,
+      2,
+      3,
+      4,
+      6
+    ],
+    "validation_months": [
+      1,
+      2,
+      3
+    ],
+    "cartesian_pair_count": 15,
+    "calendar_budget_months": 4,
+    "grid_override_authority": "Controller route replan §3 and active Trial-1 prompt §4"
+  },
+  "frozen_baseline": {
+    "candidates": [
+      {
+        "id": "SCV1_A_TREND_BTC",
+        "asset": "BTCUSDT",
+        "family": "A_TREND",
+        "formula": "r6; abs(r6)>=Q80(abs(r6)); Q20(RV24)<=RV24<=Q80(RV24)",
+        "side": "sign(r6)",
+        "horizon_h": 4,
+        "cooldown_h": 4
+      },
+      {
+        "id": "SCV1_A_TREND_ETH",
+        "asset": "ETHUSDT",
+        "family": "A_TREND",
+        "formula": "r6; abs(r6)>=Q80(abs(r6)); Q20(RV24)<=RV24<=Q80(RV24)",
+        "side": "sign(r6)",
+        "horizon_h": 4,
+        "cooldown_h": 4
+      },
+      {
+        "id": "SCV1_A_REVERT_BTC",
+        "asset": "BTCUSDT",
+        "family": "A_REVERT",
+        "formula": "D=log(C[t-1h]/C[t-5h]); u=r1; abs(D)>=Q80(abs(D)); RV24>=Q60(RV24); D*u<0; abs(u)>=0.25*abs(D)",
+        "side": "-sign(D)",
+        "horizon_h": 4,
+        "cooldown_h": 4
+      },
+      {
+        "id": "SCV1_A_REVERT_ETH",
+        "asset": "ETHUSDT",
+        "family": "A_REVERT",
+        "formula": "D=log(C[t-1h]/C[t-5h]); u=r1; abs(D)>=Q80(abs(D)); RV24>=Q60(RV24); D*u<0; abs(u)>=0.25*abs(D)",
+        "side": "-sign(D)",
+        "horizon_h": 4,
+        "cooldown_h": 4
+      },
+      {
+        "id": "SCV1_C_VOLUME_BTC",
+        "asset": "BTCUSDT",
+        "family": "C_VOLUME",
+        "formula": "r2; abs(r2)>=Q60(abs(r2)); VR24>=Q80(VR24); RV24<=Q90(RV24)",
+        "side": "sign(r2)",
+        "horizon_h": 4,
+        "cooldown_h": 4
+      },
+      {
+        "id": "SCV1_C_VOLUME_ETH",
+        "asset": "ETHUSDT",
+        "family": "C_VOLUME",
+        "formula": "r2; abs(r2)>=Q60(abs(r2)); VR24>=Q80(VR24); RV24<=Q90(RV24)",
+        "side": "sign(r2)",
+        "horizon_h": 4,
+        "cooldown_h": 4
+      },
+      {
+        "id": "SCV1_D_LEAD_BTC",
+        "asset": "BTCUSDT",
+        "family": "D_CROSS_ASSET_LEAD",
+        "formula": "other_r2; abs(other_r2)>=Q80_other(abs(r2)); abs(target_r2)<=Q50_target(abs(r2))",
+        "side": "sign(other_r2)",
+        "horizon_h": 4,
+        "cooldown_h": 4
+      },
+      {
+        "id": "SCV1_D_LEAD_ETH",
+        "asset": "ETHUSDT",
+        "family": "D_CROSS_ASSET_LEAD",
+        "formula": "other_r2; abs(other_r2)>=Q80_other(abs(r2)); abs(target_r2)<=Q50_target(abs(r2))",
+        "side": "sign(other_r2)",
+        "horizon_h": 4,
+        "cooldown_h": 4
+      }
+    ],
+    "train_quantile_rule": {
+      "interval_utc": "[2021-01-01T00:00:00Z,2022-10-31T00:00:00Z)",
+      "method": "nearest_rank",
+      "rank": "ceil(p*n)",
+      "outcomes_used": false
+    },
+    "endpoint": {
+      "entry": "native_1h_open_at_t_plus_1h",
+      "exit": "native_1h_open_at_t_plus_5h",
+      "holding_hours": 4,
+      "signal_to_exit_hours": 5,
+      "primary_reference_cost_bps": 12,
+      "stress_reference_cost_bps": 24,
+      "primary_cost_interpretation": "REFERENCE_RESEARCH_FRICTION_NOT_ACTUAL_EXECUTABLE_ALL_COST",
+      "actual_funding_in_primary": false,
+      "formal_null": "mu_primary <= 0",
+      "economic_useful_benchmark_bps_after_primary": 12,
+      "planning_effect_bps_after_primary": 24,
+      "power_report_grid_bps": [
+        12,
+        24,
+        36,
+        48
+      ]
+    },
+    "inference": {
+      "family_size_k": 8,
+      "method": "SINGLE_STEP_SHARED_CLOCK_SOURCE_BUNDLE_PRESERVING_STUDENTIZED_JOINT_MAX",
+      "block_length_hours": 120,
+      "bootstrap_replicates": 100000,
+      "alpha_one_sided": 0.05,
+      "stepdown_fallback": false,
+      "hierarchical_fallback": false,
+      "sequential_looks": false,
+      "seed_derivation": "uint64_be(first8bytes(SHA256(semantic_root || domain_separator)))",
+      "formal_gate": "simultaneous_LCB_gt_0",
+      "support": {
+        "n_and_days_round_floors": false,
+        "min_events_mathematical": 2,
+        "positive_estimable_variance_required": true,
+        "b_eff_formula": "(sum n_j)^2 / sum(n_j^2) on fixed 120h blocks",
+        "b_eff_min_grid": [
+          12,
+          18,
+          24,
+          36,
+          48
+        ],
+        "b_eff_min_selection": "smallest value passing preregistered synthetic strong-error/full-pipeline criteria before D0"
+      }
+    },
+    "cooldown_hours": 4,
+    "entry_offset_hours": 1,
+    "exit_offset_hours": 5,
+    "primary_friction_bps": 12,
+    "stress_diagnostic_friction_bps": 24,
+    "formal_null": "mean primary costed endpoint <= 0",
+    "no_runner_up_substitution": true,
+    "no_sequential_real_outcome_looks": true
+  },
+  "synthetic_method_authority": {
+    "status": "INCOMPLETE",
+    "citations": [
+      "R1.1 report §11: exact error/power and full-pipeline gates",
+      "R1.1 report §12: shared-clock bootstrap constants, support grid and frozen lock rule",
+      "R1.1 report §13: mandatory envelope and future materialization of exact generator/version/RNG/count/grids",
+      "R1.1 machine authority: inference, duration_selection, successor.synthetic_method_validated=false",
+      "Trial-1 prompt §6: return incomplete; no arbitrary DGP or self-repair"
+    ],
+    "declared_envelope": {
+      "innovation_family": "multivariate Student-t df=5",
+      "serial_rho": [
+        0.0,
+        0.3,
+        0.6
+      ],
+      "cross_coordinate_dependence": [
+        0.25,
+        0.6,
+        0.9
+      ],
+      "volatility_state_persistence": [
+        0.8,
+        0.95
+      ],
+      "event_rate_perturbation": "at least ±25% around TRAIN feature-clock rates",
+      "support_threshold_grid": [
+        12,
+        18,
+        24,
+        36,
+        48
+      ],
+      "effect_bps_after_primary_cost": [
+        0,
+        12,
+        24,
+        36,
+        48
+      ]
+    },
+    "missing_semantics": [
+      {
+        "id": "M01",
+        "kind": "SCIENTIFIC_DGP_GAP",
+        "authority": "R1.1 report §13, lines 588–612; machine authority has no exact DGP generator",
+        "missing_semantics": "Exact joint stochastic generator and absolute innovation/endpoint variance scales; construction of serial and cross-coordinate dependence, volatility-state transition probabilities and low/high scale ratio. The stated df/rho/correlation/persistence grids do not identify a distribution.",
+        "consequence": "Power at 24bp and null operating characteristics are not identified by the supplied envelope."
+      },
+      {
+        "id": "M02",
+        "kind": "SCIENTIFIC_DGP_GAP",
+        "authority": "R1.1 report §13, lines 595–605; candidate formulas and endpoint remain frozen in §§5–8",
+        "missing_semantics": "Exact coupling of synthetic hourly source bundles, features, event masks and delayed costed endpoints; one-coordinate effect injection preserving the fixed candidate equations, shared dependence, aliases and global/mixed null semantics. Exact TRAIN-clock calibration receipt and burstiness/event-rate perturbation generator are not supplied.",
+        "consequence": "An arbitrary event-clock or return process could change effective information and full-pipeline lock power."
+      },
+      {
+        "id": "M03",
+        "kind": "SCIENTIFIC_DGP_GAP",
+        "authority": "R1.1 report §§11–13, especially lines 484–485 and 598–602",
+        "missing_semantics": "Quantified paired-source gap/clustered-mask process and adversarial-case envelope, including support/zero-variance cases and their role in the declared gate; prospective calendar anchor, warmup and inter-stage boundary/state treatment.",
+        "consequence": "Support failures cannot be conditioned away or assigned executor-selected frequencies to obtain short-calendar feasibility."
+      },
+      {
+        "id": "M04",
+        "kind": "INFERENCE_SPECIFICATION_GAP",
+        "authority": "R1.1 report §12, lines 513–581; machine inference object",
+        "missing_semantics": "Exact SE/studentization and null-centering/bootstrap test algorithm, joint critical-value construction, and source-bundle/block-boundary handling for features, cooldown and delayed endpoints; precise Validation statistic and handling of ineligible bootstrap coordinates. A compatible normative reference implementation is not bound by these authorities.",
+        "consequence": "The fixed method name, L=120h and B=100000 do not alone specify an executable successor full-pipeline test."
+      },
+      {
+        "id": "M05",
+        "kind": "PROSPECTIVE_REPRODUCIBILITY_GAP",
+        "authority": "R1.1 report §13, lines 607–612; §12 seed derivation, lines 526–531",
+        "missing_semantics": "Materialized generator/version, RNG, outer Monte-Carlo replicate counts, complete parameter grids and confidence-interval protocol; semantic root and resulting bootstrap seeds. Formal inner bootstrap B=100000 is specified and is not the outer simulation count.",
+        "consequence": "A reproducible MC gate evaluation requires these to be declared before simulation; choosing these alone would not resolve M01–M04."
+      }
+    ],
+    "executor_scientific_defaults_supplied": false,
+    "candidate_formulas_or_endpoint_modified": false
+  },
+  "simulation": {
+    "executed": false,
+    "outer_mc_replicates": 0,
+    "formal_bootstrap_replicates_per_test_required": 100000,
+    "actual_bootstrap_tests_run": 0,
+    "rng": null,
+    "deterministic_seeds": null,
+    "seed_status": "NOT_ASSIGNED; no simulation and no materialized semantic root",
+    "mc_confidence_method": null,
+    "mc_confidence_requirement": "One-sided 95% upper error bounds and lower full-pipeline success bounds; exact calculation protocol not frozen",
+    "planning_effect_bps": 24,
+    "sensitivity_effect_bps": [
+      12,
+      24,
+      36,
+      48
+    ],
+    "deterministic_synthetic_rerun_hash_check": "NOT_APPLICABLE_NO_SYNTHETIC_RESULT_GENERATED"
+  },
+  "required_failure_state_behavior": {
+    "source_gaps": "Include common paired-source gaps and clustered masks; do not condition failures away.",
+    "zero_event_one_event_nonfinite_or_zero_variance": "Inference unavailable; coordinate retains its K=8 slot and cannot lock.",
+    "support": "Include eligibility changes and prospectively select B_eff_min from the frozen grid by the same operating-characteristic gates.",
+    "full_pipeline": "Eligible true coordinate -> simultaneous Discovery LCB -> frozen highest-LCB selection -> independent lock audit -> later disjoint Validation; no runner-up.",
+    "implementation_or_verification_in_this_trial": "NOT_RUN"
+  },
+  "pair_results": [
+    {
+      "D_months": 1,
+      "V_months": 1,
+      "total_months": 2,
+      "scientific_status": "INCONCLUSIVE_METHOD_AUTHORITY",
+      "calendar_utility_status": "WITHIN_USER_CALENDAR_BUDGET",
+      "discovery_global_null_fwer": {
+        "estimate": null,
+        "mc_bound_95": null,
+        "simulations": 0,
+        "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+        "required_upper_95_max": 0.05
+      },
+      "validation_single_candidate_type1": {
+        "estimate": null,
+        "mc_bound_95": null,
+        "simulations": 0,
+        "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+        "required_upper_95_max": 0.05
+      },
+      "per_coordinate_full_pipeline_power_24bp": {
+        "SCV1_A_TREND_BTC": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_A_TREND_ETH": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_A_REVERT_BTC": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_A_REVERT_ETH": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_C_VOLUME_BTC": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_C_VOLUME_ETH": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_D_LEAD_BTC": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_D_LEAD_ETH": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        }
+      },
+      "sensitivity_bps": {
+        "12": {
+          "SCV1_A_TREND_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_TREND_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          }
+        },
+        "24": {
+          "SCV1_A_TREND_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_TREND_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          }
+        },
+        "36": {
+          "SCV1_A_TREND_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_TREND_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          }
+        },
+        "48": {
+          "SCV1_A_TREND_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_TREND_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          }
+        }
+      },
+      "eligibility_correct_lock_validation_pass_diagnostics": "NOT_RUN",
+      "support_gap_zero_variance_behavior": "REQUIRED_BY_AUTHORITY_NOT_SIMULATED",
+      "blocker_ids": [
+        "M01",
+        "M02",
+        "M03",
+        "M04",
+        "M05"
+      ]
+    },
+    {
+      "D_months": 1,
+      "V_months": 2,
+      "total_months": 3,
+      "scientific_status": "INCONCLUSIVE_METHOD_AUTHORITY",
+      "calendar_utility_status": "WITHIN_USER_CALENDAR_BUDGET",
+      "discovery_global_null_fwer": {
+        "estimate": null,
+        "mc_bound_95": null,
+        "simulations": 0,
+        "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+        "required_upper_95_max": 0.05
+      },
+      "validation_single_candidate_type1": {
+        "estimate": null,
+        "mc_bound_95": null,
+        "simulations": 0,
+        "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+        "required_upper_95_max": 0.05
+      },
+      "per_coordinate_full_pipeline_power_24bp": {
+        "SCV1_A_TREND_BTC": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_A_TREND_ETH": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_A_REVERT_BTC": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_A_REVERT_ETH": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_C_VOLUME_BTC": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_C_VOLUME_ETH": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_D_LEAD_BTC": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_D_LEAD_ETH": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        }
+      },
+      "sensitivity_bps": {
+        "12": {
+          "SCV1_A_TREND_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_TREND_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          }
+        },
+        "24": {
+          "SCV1_A_TREND_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_TREND_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          }
+        },
+        "36": {
+          "SCV1_A_TREND_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_TREND_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          }
+        },
+        "48": {
+          "SCV1_A_TREND_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_TREND_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          }
+        }
+      },
+      "eligibility_correct_lock_validation_pass_diagnostics": "NOT_RUN",
+      "support_gap_zero_variance_behavior": "REQUIRED_BY_AUTHORITY_NOT_SIMULATED",
+      "blocker_ids": [
+        "M01",
+        "M02",
+        "M03",
+        "M04",
+        "M05"
+      ]
+    },
+    {
+      "D_months": 1,
+      "V_months": 3,
+      "total_months": 4,
+      "scientific_status": "INCONCLUSIVE_METHOD_AUTHORITY",
+      "calendar_utility_status": "WITHIN_USER_CALENDAR_BUDGET",
+      "discovery_global_null_fwer": {
+        "estimate": null,
+        "mc_bound_95": null,
+        "simulations": 0,
+        "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+        "required_upper_95_max": 0.05
+      },
+      "validation_single_candidate_type1": {
+        "estimate": null,
+        "mc_bound_95": null,
+        "simulations": 0,
+        "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+        "required_upper_95_max": 0.05
+      },
+      "per_coordinate_full_pipeline_power_24bp": {
+        "SCV1_A_TREND_BTC": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_A_TREND_ETH": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_A_REVERT_BTC": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_A_REVERT_ETH": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_C_VOLUME_BTC": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_C_VOLUME_ETH": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_D_LEAD_BTC": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_D_LEAD_ETH": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        }
+      },
+      "sensitivity_bps": {
+        "12": {
+          "SCV1_A_TREND_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_TREND_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          }
+        },
+        "24": {
+          "SCV1_A_TREND_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_TREND_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          }
+        },
+        "36": {
+          "SCV1_A_TREND_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_TREND_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          }
+        },
+        "48": {
+          "SCV1_A_TREND_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_TREND_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          }
+        }
+      },
+      "eligibility_correct_lock_validation_pass_diagnostics": "NOT_RUN",
+      "support_gap_zero_variance_behavior": "REQUIRED_BY_AUTHORITY_NOT_SIMULATED",
+      "blocker_ids": [
+        "M01",
+        "M02",
+        "M03",
+        "M04",
+        "M05"
+      ]
+    },
+    {
+      "D_months": 2,
+      "V_months": 1,
+      "total_months": 3,
+      "scientific_status": "INCONCLUSIVE_METHOD_AUTHORITY",
+      "calendar_utility_status": "WITHIN_USER_CALENDAR_BUDGET",
+      "discovery_global_null_fwer": {
+        "estimate": null,
+        "mc_bound_95": null,
+        "simulations": 0,
+        "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+        "required_upper_95_max": 0.05
+      },
+      "validation_single_candidate_type1": {
+        "estimate": null,
+        "mc_bound_95": null,
+        "simulations": 0,
+        "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+        "required_upper_95_max": 0.05
+      },
+      "per_coordinate_full_pipeline_power_24bp": {
+        "SCV1_A_TREND_BTC": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_A_TREND_ETH": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_A_REVERT_BTC": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_A_REVERT_ETH": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_C_VOLUME_BTC": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_C_VOLUME_ETH": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_D_LEAD_BTC": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_D_LEAD_ETH": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        }
+      },
+      "sensitivity_bps": {
+        "12": {
+          "SCV1_A_TREND_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_TREND_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          }
+        },
+        "24": {
+          "SCV1_A_TREND_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_TREND_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          }
+        },
+        "36": {
+          "SCV1_A_TREND_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_TREND_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          }
+        },
+        "48": {
+          "SCV1_A_TREND_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_TREND_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          }
+        }
+      },
+      "eligibility_correct_lock_validation_pass_diagnostics": "NOT_RUN",
+      "support_gap_zero_variance_behavior": "REQUIRED_BY_AUTHORITY_NOT_SIMULATED",
+      "blocker_ids": [
+        "M01",
+        "M02",
+        "M03",
+        "M04",
+        "M05"
+      ]
+    },
+    {
+      "D_months": 2,
+      "V_months": 2,
+      "total_months": 4,
+      "scientific_status": "INCONCLUSIVE_METHOD_AUTHORITY",
+      "calendar_utility_status": "WITHIN_USER_CALENDAR_BUDGET",
+      "discovery_global_null_fwer": {
+        "estimate": null,
+        "mc_bound_95": null,
+        "simulations": 0,
+        "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+        "required_upper_95_max": 0.05
+      },
+      "validation_single_candidate_type1": {
+        "estimate": null,
+        "mc_bound_95": null,
+        "simulations": 0,
+        "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+        "required_upper_95_max": 0.05
+      },
+      "per_coordinate_full_pipeline_power_24bp": {
+        "SCV1_A_TREND_BTC": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_A_TREND_ETH": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_A_REVERT_BTC": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_A_REVERT_ETH": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_C_VOLUME_BTC": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_C_VOLUME_ETH": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_D_LEAD_BTC": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_D_LEAD_ETH": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        }
+      },
+      "sensitivity_bps": {
+        "12": {
+          "SCV1_A_TREND_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_TREND_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          }
+        },
+        "24": {
+          "SCV1_A_TREND_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_TREND_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          }
+        },
+        "36": {
+          "SCV1_A_TREND_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_TREND_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          }
+        },
+        "48": {
+          "SCV1_A_TREND_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_TREND_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          }
+        }
+      },
+      "eligibility_correct_lock_validation_pass_diagnostics": "NOT_RUN",
+      "support_gap_zero_variance_behavior": "REQUIRED_BY_AUTHORITY_NOT_SIMULATED",
+      "blocker_ids": [
+        "M01",
+        "M02",
+        "M03",
+        "M04",
+        "M05"
+      ]
+    },
+    {
+      "D_months": 2,
+      "V_months": 3,
+      "total_months": 5,
+      "scientific_status": "INCONCLUSIVE_METHOD_AUTHORITY",
+      "calendar_utility_status": "OUTSIDE_USER_CALENDAR_BUDGET",
+      "discovery_global_null_fwer": {
+        "estimate": null,
+        "mc_bound_95": null,
+        "simulations": 0,
+        "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+        "required_upper_95_max": 0.05
+      },
+      "validation_single_candidate_type1": {
+        "estimate": null,
+        "mc_bound_95": null,
+        "simulations": 0,
+        "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+        "required_upper_95_max": 0.05
+      },
+      "per_coordinate_full_pipeline_power_24bp": {
+        "SCV1_A_TREND_BTC": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_A_TREND_ETH": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_A_REVERT_BTC": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_A_REVERT_ETH": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_C_VOLUME_BTC": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_C_VOLUME_ETH": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_D_LEAD_BTC": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_D_LEAD_ETH": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        }
+      },
+      "sensitivity_bps": {
+        "12": {
+          "SCV1_A_TREND_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_TREND_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          }
+        },
+        "24": {
+          "SCV1_A_TREND_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_TREND_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          }
+        },
+        "36": {
+          "SCV1_A_TREND_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_TREND_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          }
+        },
+        "48": {
+          "SCV1_A_TREND_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_TREND_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          }
+        }
+      },
+      "eligibility_correct_lock_validation_pass_diagnostics": "NOT_RUN",
+      "support_gap_zero_variance_behavior": "REQUIRED_BY_AUTHORITY_NOT_SIMULATED",
+      "blocker_ids": [
+        "M01",
+        "M02",
+        "M03",
+        "M04",
+        "M05"
+      ]
+    },
+    {
+      "D_months": 3,
+      "V_months": 1,
+      "total_months": 4,
+      "scientific_status": "INCONCLUSIVE_METHOD_AUTHORITY",
+      "calendar_utility_status": "WITHIN_USER_CALENDAR_BUDGET",
+      "discovery_global_null_fwer": {
+        "estimate": null,
+        "mc_bound_95": null,
+        "simulations": 0,
+        "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+        "required_upper_95_max": 0.05
+      },
+      "validation_single_candidate_type1": {
+        "estimate": null,
+        "mc_bound_95": null,
+        "simulations": 0,
+        "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+        "required_upper_95_max": 0.05
+      },
+      "per_coordinate_full_pipeline_power_24bp": {
+        "SCV1_A_TREND_BTC": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_A_TREND_ETH": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_A_REVERT_BTC": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_A_REVERT_ETH": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_C_VOLUME_BTC": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_C_VOLUME_ETH": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_D_LEAD_BTC": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_D_LEAD_ETH": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        }
+      },
+      "sensitivity_bps": {
+        "12": {
+          "SCV1_A_TREND_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_TREND_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          }
+        },
+        "24": {
+          "SCV1_A_TREND_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_TREND_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          }
+        },
+        "36": {
+          "SCV1_A_TREND_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_TREND_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          }
+        },
+        "48": {
+          "SCV1_A_TREND_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_TREND_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          }
+        }
+      },
+      "eligibility_correct_lock_validation_pass_diagnostics": "NOT_RUN",
+      "support_gap_zero_variance_behavior": "REQUIRED_BY_AUTHORITY_NOT_SIMULATED",
+      "blocker_ids": [
+        "M01",
+        "M02",
+        "M03",
+        "M04",
+        "M05"
+      ]
+    },
+    {
+      "D_months": 3,
+      "V_months": 2,
+      "total_months": 5,
+      "scientific_status": "INCONCLUSIVE_METHOD_AUTHORITY",
+      "calendar_utility_status": "OUTSIDE_USER_CALENDAR_BUDGET",
+      "discovery_global_null_fwer": {
+        "estimate": null,
+        "mc_bound_95": null,
+        "simulations": 0,
+        "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+        "required_upper_95_max": 0.05
+      },
+      "validation_single_candidate_type1": {
+        "estimate": null,
+        "mc_bound_95": null,
+        "simulations": 0,
+        "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+        "required_upper_95_max": 0.05
+      },
+      "per_coordinate_full_pipeline_power_24bp": {
+        "SCV1_A_TREND_BTC": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_A_TREND_ETH": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_A_REVERT_BTC": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_A_REVERT_ETH": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_C_VOLUME_BTC": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_C_VOLUME_ETH": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_D_LEAD_BTC": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_D_LEAD_ETH": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        }
+      },
+      "sensitivity_bps": {
+        "12": {
+          "SCV1_A_TREND_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_TREND_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          }
+        },
+        "24": {
+          "SCV1_A_TREND_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_TREND_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          }
+        },
+        "36": {
+          "SCV1_A_TREND_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_TREND_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          }
+        },
+        "48": {
+          "SCV1_A_TREND_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_TREND_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          }
+        }
+      },
+      "eligibility_correct_lock_validation_pass_diagnostics": "NOT_RUN",
+      "support_gap_zero_variance_behavior": "REQUIRED_BY_AUTHORITY_NOT_SIMULATED",
+      "blocker_ids": [
+        "M01",
+        "M02",
+        "M03",
+        "M04",
+        "M05"
+      ]
+    },
+    {
+      "D_months": 3,
+      "V_months": 3,
+      "total_months": 6,
+      "scientific_status": "INCONCLUSIVE_METHOD_AUTHORITY",
+      "calendar_utility_status": "OUTSIDE_USER_CALENDAR_BUDGET",
+      "discovery_global_null_fwer": {
+        "estimate": null,
+        "mc_bound_95": null,
+        "simulations": 0,
+        "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+        "required_upper_95_max": 0.05
+      },
+      "validation_single_candidate_type1": {
+        "estimate": null,
+        "mc_bound_95": null,
+        "simulations": 0,
+        "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+        "required_upper_95_max": 0.05
+      },
+      "per_coordinate_full_pipeline_power_24bp": {
+        "SCV1_A_TREND_BTC": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_A_TREND_ETH": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_A_REVERT_BTC": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_A_REVERT_ETH": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_C_VOLUME_BTC": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_C_VOLUME_ETH": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_D_LEAD_BTC": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_D_LEAD_ETH": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        }
+      },
+      "sensitivity_bps": {
+        "12": {
+          "SCV1_A_TREND_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_TREND_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          }
+        },
+        "24": {
+          "SCV1_A_TREND_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_TREND_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          }
+        },
+        "36": {
+          "SCV1_A_TREND_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_TREND_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          }
+        },
+        "48": {
+          "SCV1_A_TREND_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_TREND_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          }
+        }
+      },
+      "eligibility_correct_lock_validation_pass_diagnostics": "NOT_RUN",
+      "support_gap_zero_variance_behavior": "REQUIRED_BY_AUTHORITY_NOT_SIMULATED",
+      "blocker_ids": [
+        "M01",
+        "M02",
+        "M03",
+        "M04",
+        "M05"
+      ]
+    },
+    {
+      "D_months": 4,
+      "V_months": 1,
+      "total_months": 5,
+      "scientific_status": "INCONCLUSIVE_METHOD_AUTHORITY",
+      "calendar_utility_status": "OUTSIDE_USER_CALENDAR_BUDGET",
+      "discovery_global_null_fwer": {
+        "estimate": null,
+        "mc_bound_95": null,
+        "simulations": 0,
+        "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+        "required_upper_95_max": 0.05
+      },
+      "validation_single_candidate_type1": {
+        "estimate": null,
+        "mc_bound_95": null,
+        "simulations": 0,
+        "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+        "required_upper_95_max": 0.05
+      },
+      "per_coordinate_full_pipeline_power_24bp": {
+        "SCV1_A_TREND_BTC": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_A_TREND_ETH": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_A_REVERT_BTC": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_A_REVERT_ETH": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_C_VOLUME_BTC": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_C_VOLUME_ETH": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_D_LEAD_BTC": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_D_LEAD_ETH": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        }
+      },
+      "sensitivity_bps": {
+        "12": {
+          "SCV1_A_TREND_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_TREND_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          }
+        },
+        "24": {
+          "SCV1_A_TREND_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_TREND_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          }
+        },
+        "36": {
+          "SCV1_A_TREND_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_TREND_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          }
+        },
+        "48": {
+          "SCV1_A_TREND_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_TREND_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          }
+        }
+      },
+      "eligibility_correct_lock_validation_pass_diagnostics": "NOT_RUN",
+      "support_gap_zero_variance_behavior": "REQUIRED_BY_AUTHORITY_NOT_SIMULATED",
+      "blocker_ids": [
+        "M01",
+        "M02",
+        "M03",
+        "M04",
+        "M05"
+      ]
+    },
+    {
+      "D_months": 4,
+      "V_months": 2,
+      "total_months": 6,
+      "scientific_status": "INCONCLUSIVE_METHOD_AUTHORITY",
+      "calendar_utility_status": "OUTSIDE_USER_CALENDAR_BUDGET",
+      "discovery_global_null_fwer": {
+        "estimate": null,
+        "mc_bound_95": null,
+        "simulations": 0,
+        "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+        "required_upper_95_max": 0.05
+      },
+      "validation_single_candidate_type1": {
+        "estimate": null,
+        "mc_bound_95": null,
+        "simulations": 0,
+        "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+        "required_upper_95_max": 0.05
+      },
+      "per_coordinate_full_pipeline_power_24bp": {
+        "SCV1_A_TREND_BTC": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_A_TREND_ETH": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_A_REVERT_BTC": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_A_REVERT_ETH": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_C_VOLUME_BTC": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_C_VOLUME_ETH": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_D_LEAD_BTC": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_D_LEAD_ETH": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        }
+      },
+      "sensitivity_bps": {
+        "12": {
+          "SCV1_A_TREND_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_TREND_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          }
+        },
+        "24": {
+          "SCV1_A_TREND_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_TREND_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          }
+        },
+        "36": {
+          "SCV1_A_TREND_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_TREND_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          }
+        },
+        "48": {
+          "SCV1_A_TREND_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_TREND_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          }
+        }
+      },
+      "eligibility_correct_lock_validation_pass_diagnostics": "NOT_RUN",
+      "support_gap_zero_variance_behavior": "REQUIRED_BY_AUTHORITY_NOT_SIMULATED",
+      "blocker_ids": [
+        "M01",
+        "M02",
+        "M03",
+        "M04",
+        "M05"
+      ]
+    },
+    {
+      "D_months": 4,
+      "V_months": 3,
+      "total_months": 7,
+      "scientific_status": "INCONCLUSIVE_METHOD_AUTHORITY",
+      "calendar_utility_status": "OUTSIDE_USER_CALENDAR_BUDGET",
+      "discovery_global_null_fwer": {
+        "estimate": null,
+        "mc_bound_95": null,
+        "simulations": 0,
+        "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+        "required_upper_95_max": 0.05
+      },
+      "validation_single_candidate_type1": {
+        "estimate": null,
+        "mc_bound_95": null,
+        "simulations": 0,
+        "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+        "required_upper_95_max": 0.05
+      },
+      "per_coordinate_full_pipeline_power_24bp": {
+        "SCV1_A_TREND_BTC": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_A_TREND_ETH": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_A_REVERT_BTC": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_A_REVERT_ETH": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_C_VOLUME_BTC": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_C_VOLUME_ETH": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_D_LEAD_BTC": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_D_LEAD_ETH": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        }
+      },
+      "sensitivity_bps": {
+        "12": {
+          "SCV1_A_TREND_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_TREND_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          }
+        },
+        "24": {
+          "SCV1_A_TREND_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_TREND_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          }
+        },
+        "36": {
+          "SCV1_A_TREND_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_TREND_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          }
+        },
+        "48": {
+          "SCV1_A_TREND_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_TREND_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          }
+        }
+      },
+      "eligibility_correct_lock_validation_pass_diagnostics": "NOT_RUN",
+      "support_gap_zero_variance_behavior": "REQUIRED_BY_AUTHORITY_NOT_SIMULATED",
+      "blocker_ids": [
+        "M01",
+        "M02",
+        "M03",
+        "M04",
+        "M05"
+      ]
+    },
+    {
+      "D_months": 6,
+      "V_months": 1,
+      "total_months": 7,
+      "scientific_status": "INCONCLUSIVE_METHOD_AUTHORITY",
+      "calendar_utility_status": "OUTSIDE_USER_CALENDAR_BUDGET",
+      "discovery_global_null_fwer": {
+        "estimate": null,
+        "mc_bound_95": null,
+        "simulations": 0,
+        "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+        "required_upper_95_max": 0.05
+      },
+      "validation_single_candidate_type1": {
+        "estimate": null,
+        "mc_bound_95": null,
+        "simulations": 0,
+        "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+        "required_upper_95_max": 0.05
+      },
+      "per_coordinate_full_pipeline_power_24bp": {
+        "SCV1_A_TREND_BTC": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_A_TREND_ETH": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_A_REVERT_BTC": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_A_REVERT_ETH": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_C_VOLUME_BTC": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_C_VOLUME_ETH": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_D_LEAD_BTC": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_D_LEAD_ETH": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        }
+      },
+      "sensitivity_bps": {
+        "12": {
+          "SCV1_A_TREND_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_TREND_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          }
+        },
+        "24": {
+          "SCV1_A_TREND_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_TREND_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          }
+        },
+        "36": {
+          "SCV1_A_TREND_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_TREND_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          }
+        },
+        "48": {
+          "SCV1_A_TREND_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_TREND_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          }
+        }
+      },
+      "eligibility_correct_lock_validation_pass_diagnostics": "NOT_RUN",
+      "support_gap_zero_variance_behavior": "REQUIRED_BY_AUTHORITY_NOT_SIMULATED",
+      "blocker_ids": [
+        "M01",
+        "M02",
+        "M03",
+        "M04",
+        "M05"
+      ]
+    },
+    {
+      "D_months": 6,
+      "V_months": 2,
+      "total_months": 8,
+      "scientific_status": "INCONCLUSIVE_METHOD_AUTHORITY",
+      "calendar_utility_status": "OUTSIDE_USER_CALENDAR_BUDGET",
+      "discovery_global_null_fwer": {
+        "estimate": null,
+        "mc_bound_95": null,
+        "simulations": 0,
+        "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+        "required_upper_95_max": 0.05
+      },
+      "validation_single_candidate_type1": {
+        "estimate": null,
+        "mc_bound_95": null,
+        "simulations": 0,
+        "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+        "required_upper_95_max": 0.05
+      },
+      "per_coordinate_full_pipeline_power_24bp": {
+        "SCV1_A_TREND_BTC": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_A_TREND_ETH": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_A_REVERT_BTC": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_A_REVERT_ETH": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_C_VOLUME_BTC": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_C_VOLUME_ETH": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_D_LEAD_BTC": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_D_LEAD_ETH": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        }
+      },
+      "sensitivity_bps": {
+        "12": {
+          "SCV1_A_TREND_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_TREND_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          }
+        },
+        "24": {
+          "SCV1_A_TREND_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_TREND_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          }
+        },
+        "36": {
+          "SCV1_A_TREND_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_TREND_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          }
+        },
+        "48": {
+          "SCV1_A_TREND_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_TREND_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          }
+        }
+      },
+      "eligibility_correct_lock_validation_pass_diagnostics": "NOT_RUN",
+      "support_gap_zero_variance_behavior": "REQUIRED_BY_AUTHORITY_NOT_SIMULATED",
+      "blocker_ids": [
+        "M01",
+        "M02",
+        "M03",
+        "M04",
+        "M05"
+      ]
+    },
+    {
+      "D_months": 6,
+      "V_months": 3,
+      "total_months": 9,
+      "scientific_status": "INCONCLUSIVE_METHOD_AUTHORITY",
+      "calendar_utility_status": "OUTSIDE_USER_CALENDAR_BUDGET",
+      "discovery_global_null_fwer": {
+        "estimate": null,
+        "mc_bound_95": null,
+        "simulations": 0,
+        "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+        "required_upper_95_max": 0.05
+      },
+      "validation_single_candidate_type1": {
+        "estimate": null,
+        "mc_bound_95": null,
+        "simulations": 0,
+        "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+        "required_upper_95_max": 0.05
+      },
+      "per_coordinate_full_pipeline_power_24bp": {
+        "SCV1_A_TREND_BTC": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_A_TREND_ETH": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_A_REVERT_BTC": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_A_REVERT_ETH": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_C_VOLUME_BTC": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_C_VOLUME_ETH": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_D_LEAD_BTC": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        },
+        "SCV1_D_LEAD_ETH": {
+          "estimate": null,
+          "mc_bound_95": null,
+          "simulations": 0,
+          "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE",
+          "required_lower_95_min": 0.8
+        }
+      },
+      "sensitivity_bps": {
+        "12": {
+          "SCV1_A_TREND_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_TREND_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          }
+        },
+        "24": {
+          "SCV1_A_TREND_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_TREND_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          }
+        },
+        "36": {
+          "SCV1_A_TREND_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_TREND_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          }
+        },
+        "48": {
+          "SCV1_A_TREND_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_TREND_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_A_REVERT_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_C_VOLUME_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_BTC": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          },
+          "SCV1_D_LEAD_ETH": {
+            "estimate": null,
+            "mc_bound_95": null,
+            "simulations": 0,
+            "status": "NOT_RUN_METHOD_AUTHORITY_INCOMPLETE"
+          }
+        }
+      },
+      "eligibility_correct_lock_validation_pass_diagnostics": "NOT_RUN",
+      "support_gap_zero_variance_behavior": "REQUIRED_BY_AUTHORITY_NOT_SIMULATED",
+      "blocker_ids": [
+        "M01",
+        "M02",
+        "M03",
+        "M04",
+        "M05"
+      ]
+    }
+  ],
+  "scientifically_admissible_pairs": [],
+  "scientifically_inadmissible_pairs": [],
+  "inconclusive_pair_count": 15,
+  "within_calendar_budget_pairs": [
+    {
+      "D_months": 1,
+      "V_months": 1,
+      "total_months": 2
+    },
+    {
+      "D_months": 1,
+      "V_months": 2,
+      "total_months": 3
+    },
+    {
+      "D_months": 1,
+      "V_months": 3,
+      "total_months": 4
+    },
+    {
+      "D_months": 2,
+      "V_months": 1,
+      "total_months": 3
+    },
+    {
+      "D_months": 2,
+      "V_months": 2,
+      "total_months": 4
+    },
+    {
+      "D_months": 3,
+      "V_months": 1,
+      "total_months": 4
+    }
+  ],
+  "selected_pair": null,
+  "decision": "SYNTHETIC_METHOD_AUTHORITY_INCOMPLETE",
+  "interpretation": "No pair is statistically certified or rejected. Six pairs satisfy calendar arithmetic only. This is neither an alpha failure nor an established failure of the four-month utility target.",
+  "protected_outcome_attestation": {
+    "protected_outcome_access": "NO",
+    "h41_wf1_validation_access": "NO",
+    "protected_h39_access": "NO",
+    "real_successor_returns_pnl_mu_se_lcb_access": "NO",
+    "protected_real_event_support_access": "NO",
+    "market_data_access": "NO",
+    "successor_execution": "NO",
+    "performance_guided_selection": "NO"
+  },
+  "production_code_change_attestation": {
+    "production_code_changed": "NO",
+    "allowed_changed_paths": [
+      "reviews/v0.5/V0.5.5_FORWARD_R1_1_SHORT_HORIZON_SYNTHETIC_POWER_FEASIBILITY.md",
+      "evidence/v0.5.5/h41/V0.5.5_FORWARD_R1_1_SHORT_HORIZON_SYNTHETIC_POWER_FEASIBILITY.json"
+    ],
+    "accepted_code_authority_recheck_required_before_publication": true,
+    "scientific_implementation_or_d0_authorization": false
+  },
+  "validation": {
+    "status": "PASS_FOR_AUTHORITY_ONLY_ARTIFACTS",
+    "json_consistency": "Verified: 15 ordered Cartesian pairs; six budget pairs; all scientific metrics null/zero simulations; all eight candidate coordinates and four sensitivity levels present; no selected pair.",
+    "authority_hash_check": "Git blob and SHA256 identities verified for all five bound inputs.",
+    "deterministic_evidence_generation": "Temporary standard-library metadata generator rerun twice; both output SHA256 values matched. This is document reproducibility, not synthetic replay.",
+    "independent_review": "Read-only reviewer found no blocking correctness issue; checked authorities, all pair statuses and report/JSON agreement. M05 reproducibility choices alone are not the core scientific gap; M01–M04 independently require the stop.",
+    "focused_evidence_helper_tests": "NOT_APPLICABLE; no reproducibility helper committed and no synthetic algorithm implemented.",
+    "diff_fence": "Verified staged paths equal the two allowed new docs/evidence files; git diff --cached --check passed. Remote compare is also required before ref publication.",
+    "code_authority_recheck": "8ecff4ec4b25bf73a35309689fd3ecfacc0d3399",
+    "target_branch_recheck_before_publication": "e0d9624350c3dae048c6f4ceea51c62e5a641290",
+    "full_pytest": "NOT_RUN_NOT_REQUIRED",
+    "unrelated_ci_hygiene": "No repository-wide CI/lint suite rerun or new CI outcome asserted. Native GitHub HTTPS fetch failure is a transport limitation, not a scientific result; equivalent exact Git-object API fetch was verified."
+  },
+  "blockers": [
+    {
+      "id": "M01",
+      "kind": "SCIENTIFIC_DGP_GAP",
+      "authority": "R1.1 report §13, lines 588–612; machine authority has no exact DGP generator",
+      "missing_semantics": "Exact joint stochastic generator and absolute innovation/endpoint variance scales; construction of serial and cross-coordinate dependence, volatility-state transition probabilities and low/high scale ratio. The stated df/rho/correlation/persistence grids do not identify a distribution.",
+      "consequence": "Power at 24bp and null operating characteristics are not identified by the supplied envelope."
+    },
+    {
+      "id": "M02",
+      "kind": "SCIENTIFIC_DGP_GAP",
+      "authority": "R1.1 report §13, lines 595–605; candidate formulas and endpoint remain frozen in §§5–8",
+      "missing_semantics": "Exact coupling of synthetic hourly source bundles, features, event masks and delayed costed endpoints; one-coordinate effect injection preserving the fixed candidate equations, shared dependence, aliases and global/mixed null semantics. Exact TRAIN-clock calibration receipt and burstiness/event-rate perturbation generator are not supplied.",
+      "consequence": "An arbitrary event-clock or return process could change effective information and full-pipeline lock power."
+    },
+    {
+      "id": "M03",
+      "kind": "SCIENTIFIC_DGP_GAP",
+      "authority": "R1.1 report §§11–13, especially lines 484–485 and 598–602",
+      "missing_semantics": "Quantified paired-source gap/clustered-mask process and adversarial-case envelope, including support/zero-variance cases and their role in the declared gate; prospective calendar anchor, warmup and inter-stage boundary/state treatment.",
+      "consequence": "Support failures cannot be conditioned away or assigned executor-selected frequencies to obtain short-calendar feasibility."
+    },
+    {
+      "id": "M04",
+      "kind": "INFERENCE_SPECIFICATION_GAP",
+      "authority": "R1.1 report §12, lines 513–581; machine inference object",
+      "missing_semantics": "Exact SE/studentization and null-centering/bootstrap test algorithm, joint critical-value construction, and source-bundle/block-boundary handling for features, cooldown and delayed endpoints; precise Validation statistic and handling of ineligible bootstrap coordinates. A compatible normative reference implementation is not bound by these authorities.",
+      "consequence": "The fixed method name, L=120h and B=100000 do not alone specify an executable successor full-pipeline test."
+    },
+    {
+      "id": "M05",
+      "kind": "PROSPECTIVE_REPRODUCIBILITY_GAP",
+      "authority": "R1.1 report §13, lines 607–612; §12 seed derivation, lines 526–531",
+      "missing_semantics": "Materialized generator/version, RNG, outer Monte-Carlo replicate counts, complete parameter grids and confidence-interval protocol; semantic root and resulting bootstrap seeds. Formal inner bootstrap B=100000 is specified and is not the outer simulation count.",
+      "consequence": "A reproducible MC gate evaluation requires these to be declared before simulation; choosing these alone would not resolve M01–M04."
+    }
+  ],
+  "next_controller_action": "ChatGPT-0 adjudicate SYNTHETIC_METHOD_AUTHORITY_INCOMPLETE and the five cited gaps. Any completed DGP/inference authority requires a separate prospective scientific decision before simulation; do not self-repair in Trial 1, freeze D0, or automatically dispatch Trial 2. Calendar utility failure has not been established."
+}
