@@ -1,0 +1,1424 @@
+{
+  "schema_id": "V0.5.5_A1_SYNTHETIC_METHOD_AUTHORITY_DESIGN_R1_V1",
+  "repository": "EXASHXE/btc-quant-agent-public",
+  "execution_class": "PROSPECTIVE_SCIENTIFIC_METHOD_DESIGN / PRE_D0 / NO_PROTECTED_OUTCOME_ACCESS / NO_SIMULATION / NO_PRODUCTION_CHANGE",
+  "target_branch": "feature/a1-synthetic-method-authority-r1-v055",
+  "docs_start_sha": "47ecb909cd8b671ac17fdfb9e8b4a0fd8e8fde2a",
+  "controller_dispatch_sha": "47ecb909cd8b671ac17fdfb9e8b4a0fd8e8fde2a",
+  "accepted_code_sha": "8ecff4ec4b25bf73a35309689fd3ecfacc0d3399",
+  "start_gate": {
+    "pwd": "/tmp/a1-method-authority-r1-v055",
+    "HEAD": "47ecb909cd8b671ac17fdfb9e8b4a0fd8e8fde2a",
+    "branch": "feature/a1-synthetic-method-authority-r1-v055",
+    "accepted_code_sha": "8ecff4ec4b25bf73a35309689fd3ecfacc0d3399",
+    "clean_worktree": true,
+    "transport": "GitHub Git-object API; exact commit/tree SHA verification; metadata-only sparse repository; no forbidden workspace access",
+    "runtime_import_path": "NOT_APPLICABLE_NO_SCIENTIFIC_IMPORT"
+  },
+  "dispatch": {
+    "branch": "dispatch/v0.5.5-a1-synthetic-method-authority-r1",
+    "commit": "03c44007e6f3d92bc1bec2b470d2024139294d4f",
+    "path": "dispatch/V0.5.5_A1_SYNTHETIC_METHOD_AUTHORITY_DESIGN_R1_DISPATCH.json",
+    "blob_sha": "3a04da6573d0fa662c7d3e5ee8dff082b8247fb6"
+  },
+  "current_manifest_binding_fields": {
+    "accepted_code_sha": "8ecff4ec4b25bf73a35309689fd3ecfacc0d3399",
+    "protected_state": {
+      "h41_terminal_no_go": true,
+      "h41_wf1_validation_sealed": true,
+      "h39_protected_results_sealed": true,
+      "protected_successor_outcome_access_authorized": false,
+      "d0_authorized": false,
+      "production_code_change_authorized": false
+    },
+    "binding_fields": {
+      "forward_compression_trials_max": 2,
+      "compression_trial_runs_completed": 0,
+      "trial_1_state": "BLOCKED_PRE_SIMULATION",
+      "trial_2_authorized": false,
+      "trial_1_duration_grid": {
+        "discovery_months": [
+          1,
+          2,
+          3,
+          4,
+          6
+        ],
+        "validation_months": [
+          1,
+          2,
+          3
+        ],
+        "calendar_budget_total_months_max": 4
+      },
+      "accepted_method_gaps": [
+        "M01_SCIENTIFIC_DGP_GAP",
+        "M02_SCIENTIFIC_DGP_GAP",
+        "M03_SCIENTIFIC_DGP_GAP",
+        "M04_INFERENCE_SPECIFICATION_GAP",
+        "M05_PROSPECTIVE_REPRODUCIBILITY_GAP"
+      ]
+    },
+    "a1_next_stage": "A1_SYNTHETIC_METHOD_AUTHORITY_DESIGN_R1"
+  },
+  "authority_refs_and_access_modes": [
+    {
+      "path": "evidence/v0.5.5/controller/A_LINE_CURRENT_AUTHORITY.json",
+      "blob_sha": "2ac9c41dab042e2943de268281e080a168db1b8a",
+      "at_commit": "47ecb909cd8b671ac17fdfb9e8b4a0fd8e8fde2a",
+      "access_mode": "BINDING_FIELDS_ONLY"
+    },
+    {
+      "path": "reviews/v0.5/V0.5.1_H41_SUCCESSOR_SCIENTIFIC_CAMPAIGN_V1_DESIGN_R1_1_CONTROLLER_REPAIR.md",
+      "blob_sha": "f65b970e810a6e6a6d5420424d62c26ee4c5c953",
+      "at_commit": "47ecb909cd8b671ac17fdfb9e8b4a0fd8e8fde2a",
+      "access_mode": "MUST_READ",
+      "sha256": "875cc7671d7b2063fa45ec883cbe5e113c2a3d2bb46648179a4d6818b83255fc"
+    },
+    {
+      "path": "src/btc_quant_agent/h41/inference.py",
+      "blob_sha": "9000840cbb767b1be69395b78248a58ec3bcaafa",
+      "at_commit": "8ecff4ec4b25bf73a35309689fd3ecfacc0d3399",
+      "access_mode": "MUST_READ",
+      "sha256": "36b039153fe894dd938c3d9267a3f706797f52b812319e032f409171b993dd48"
+    },
+    {
+      "path": "evidence/v0.5.5/h41/V0.5.5_FORWARD_R1_1_SHORT_HORIZON_SYNTHETIC_POWER_FEASIBILITY.json",
+      "blob_sha": "b5990f4babf104aed8e2143164951f3bfc011e8a",
+      "access_mode": "IDENTITY_ONLY",
+      "content_opened_in_this_task": false,
+      "identity_check": "git cat-file -e known blob; dispatch identity match; no content read"
+    }
+  ],
+  "semantic_contract": {
+    "generator_name": "A1_PAIRED_CLOCK_NATIVE_OPEN_V1",
+    "semantic_version": "1.0.0",
+    "inference_name": "SCV1_RATIO_MBB_T_V1",
+    "rng_name": "SHA256_COUNTER_U64_V1",
+    "authority_refs": [
+      {
+        "path": "evidence/v0.5.5/controller/A_LINE_CURRENT_AUTHORITY.json",
+        "blob_sha": "2ac9c41dab042e2943de268281e080a168db1b8a",
+        "at_commit": "47ecb909cd8b671ac17fdfb9e8b4a0fd8e8fde2a",
+        "access_mode": "BINDING_FIELDS_ONLY"
+      },
+      {
+        "path": "reviews/v0.5/V0.5.1_H41_SUCCESSOR_SCIENTIFIC_CAMPAIGN_V1_DESIGN_R1_1_CONTROLLER_REPAIR.md",
+        "blob_sha": "f65b970e810a6e6a6d5420424d62c26ee4c5c953",
+        "at_commit": "47ecb909cd8b671ac17fdfb9e8b4a0fd8e8fde2a",
+        "access_mode": "MUST_READ",
+        "sha256": "875cc7671d7b2063fa45ec883cbe5e113c2a3d2bb46648179a4d6818b83255fc"
+      },
+      {
+        "path": "src/btc_quant_agent/h41/inference.py",
+        "blob_sha": "9000840cbb767b1be69395b78248a58ec3bcaafa",
+        "at_commit": "8ecff4ec4b25bf73a35309689fd3ecfacc0d3399",
+        "access_mode": "MUST_READ",
+        "sha256": "36b039153fe894dd938c3d9267a3f706797f52b812319e032f409171b993dd48"
+      },
+      {
+        "path": "evidence/v0.5.5/h41/V0.5.5_FORWARD_R1_1_SHORT_HORIZON_SYNTHETIC_POWER_FEASIBILITY.json",
+        "blob_sha": "b5990f4babf104aed8e2143164951f3bfc011e8a",
+        "access_mode": "IDENTITY_ONLY",
+        "content_opened_in_this_task": false,
+        "identity_check": "git cat-file -e known blob; dispatch identity match; no content read"
+      }
+    ],
+    "candidate_order": [
+      "SCV1_A_TREND_BTC",
+      "SCV1_A_TREND_ETH",
+      "SCV1_A_REVERT_BTC",
+      "SCV1_A_REVERT_ETH",
+      "SCV1_C_VOLUME_BTC",
+      "SCV1_C_VOLUME_ETH",
+      "SCV1_D_LEAD_BTC",
+      "SCV1_D_LEAD_ETH"
+    ],
+    "parameter_grids": {
+      "calendar_anchors": [
+        "2032-01-01T00:00:00Z",
+        "2032-02-01T00:00:00Z",
+        "2033-01-01T00:00:00Z",
+        "2033-02-01T00:00:00Z"
+      ],
+      "rho": [
+        "0",
+        "0.3",
+        "0.6"
+      ],
+      "gamma": [
+        "0.25",
+        "0.60",
+        "0.90"
+      ],
+      "volatility_persistence": [
+        "0.80",
+        "0.95"
+      ],
+      "sigma_gross_amplitude": [
+        "0.0025",
+        "0.005",
+        "0.01"
+      ],
+      "clock_profiles": [
+        "BASE",
+        "MINUS_SCV1_A_TREND_BTC",
+        "MINUS_SCV1_A_TREND_ETH",
+        "MINUS_SCV1_A_REVERT_BTC",
+        "MINUS_SCV1_A_REVERT_ETH",
+        "MINUS_SCV1_C_VOLUME_BTC",
+        "MINUS_SCV1_C_VOLUME_ETH",
+        "MINUS_SCV1_D_LEAD_BTC",
+        "MINUS_SCV1_D_LEAD_ETH",
+        "PLUS_SCV1_A_TREND_BTC",
+        "PLUS_SCV1_A_TREND_ETH",
+        "PLUS_SCV1_A_REVERT_BTC",
+        "PLUS_SCV1_A_REVERT_ETH",
+        "PLUS_SCV1_C_VOLUME_BTC",
+        "PLUS_SCV1_C_VOLUME_ETH",
+        "PLUS_SCV1_D_LEAD_BTC",
+        "PLUS_SCV1_D_LEAD_ETH"
+      ],
+      "gap_profiles": [
+        {
+          "id": "NONE",
+          "fraction": "0",
+          "cluster_hours": 0,
+          "feed": "ON_TIME"
+        },
+        {
+          "id": "GAP_0.001_1_BOTH_MISSING",
+          "fraction": "0.001",
+          "cluster_hours": 1,
+          "feed": "BOTH_MISSING"
+        },
+        {
+          "id": "GAP_0.001_1_BTC_LATE",
+          "fraction": "0.001",
+          "cluster_hours": 1,
+          "feed": "BTC_LATE"
+        },
+        {
+          "id": "GAP_0.001_1_ETH_LATE",
+          "fraction": "0.001",
+          "cluster_hours": 1,
+          "feed": "ETH_LATE"
+        },
+        {
+          "id": "GAP_0.001_6_BOTH_MISSING",
+          "fraction": "0.001",
+          "cluster_hours": 6,
+          "feed": "BOTH_MISSING"
+        },
+        {
+          "id": "GAP_0.001_6_BTC_LATE",
+          "fraction": "0.001",
+          "cluster_hours": 6,
+          "feed": "BTC_LATE"
+        },
+        {
+          "id": "GAP_0.001_6_ETH_LATE",
+          "fraction": "0.001",
+          "cluster_hours": 6,
+          "feed": "ETH_LATE"
+        },
+        {
+          "id": "GAP_0.001_24_BOTH_MISSING",
+          "fraction": "0.001",
+          "cluster_hours": 24,
+          "feed": "BOTH_MISSING"
+        },
+        {
+          "id": "GAP_0.001_24_BTC_LATE",
+          "fraction": "0.001",
+          "cluster_hours": 24,
+          "feed": "BTC_LATE"
+        },
+        {
+          "id": "GAP_0.001_24_ETH_LATE",
+          "fraction": "0.001",
+          "cluster_hours": 24,
+          "feed": "ETH_LATE"
+        },
+        {
+          "id": "GAP_0.005_1_BOTH_MISSING",
+          "fraction": "0.005",
+          "cluster_hours": 1,
+          "feed": "BOTH_MISSING"
+        },
+        {
+          "id": "GAP_0.005_1_BTC_LATE",
+          "fraction": "0.005",
+          "cluster_hours": 1,
+          "feed": "BTC_LATE"
+        },
+        {
+          "id": "GAP_0.005_1_ETH_LATE",
+          "fraction": "0.005",
+          "cluster_hours": 1,
+          "feed": "ETH_LATE"
+        },
+        {
+          "id": "GAP_0.005_6_BOTH_MISSING",
+          "fraction": "0.005",
+          "cluster_hours": 6,
+          "feed": "BOTH_MISSING"
+        },
+        {
+          "id": "GAP_0.005_6_BTC_LATE",
+          "fraction": "0.005",
+          "cluster_hours": 6,
+          "feed": "BTC_LATE"
+        },
+        {
+          "id": "GAP_0.005_6_ETH_LATE",
+          "fraction": "0.005",
+          "cluster_hours": 6,
+          "feed": "ETH_LATE"
+        },
+        {
+          "id": "GAP_0.005_24_BOTH_MISSING",
+          "fraction": "0.005",
+          "cluster_hours": 24,
+          "feed": "BOTH_MISSING"
+        },
+        {
+          "id": "GAP_0.005_24_BTC_LATE",
+          "fraction": "0.005",
+          "cluster_hours": 24,
+          "feed": "BTC_LATE"
+        },
+        {
+          "id": "GAP_0.005_24_ETH_LATE",
+          "fraction": "0.005",
+          "cluster_hours": 24,
+          "feed": "ETH_LATE"
+        }
+      ],
+      "transformation_calibration_grid": [
+        "0.25",
+        "0.5",
+        "0.75",
+        "1",
+        "1.25",
+        "1.5",
+        "2",
+        "3",
+        "4"
+      ],
+      "discovery_months": [
+        1,
+        2,
+        3,
+        4,
+        6
+      ],
+      "validation_months": [
+        1,
+        2,
+        3
+      ],
+      "support_thresholds": [
+        12,
+        18,
+        24,
+        36,
+        48
+      ],
+      "effect_bps": [
+        0,
+        12,
+        24,
+        36,
+        48
+      ],
+      "truth_vectors": [
+        {
+          "id": "NULL",
+          "effect_bps_vector": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "governing": true
+        },
+        {
+          "id": "SINGLE:SCV1_A_TREND_BTC:E12",
+          "effect_bps_vector": [
+            12,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "governing": false
+        },
+        {
+          "id": "SINGLE:SCV1_A_TREND_BTC:E24",
+          "effect_bps_vector": [
+            24,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "governing": true
+        },
+        {
+          "id": "SINGLE:SCV1_A_TREND_BTC:E36",
+          "effect_bps_vector": [
+            36,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "governing": false
+        },
+        {
+          "id": "SINGLE:SCV1_A_TREND_BTC:E48",
+          "effect_bps_vector": [
+            48,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "governing": false
+        },
+        {
+          "id": "SINGLE:SCV1_A_TREND_ETH:E12",
+          "effect_bps_vector": [
+            0,
+            12,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "governing": false
+        },
+        {
+          "id": "SINGLE:SCV1_A_TREND_ETH:E24",
+          "effect_bps_vector": [
+            0,
+            24,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "governing": true
+        },
+        {
+          "id": "SINGLE:SCV1_A_TREND_ETH:E36",
+          "effect_bps_vector": [
+            0,
+            36,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "governing": false
+        },
+        {
+          "id": "SINGLE:SCV1_A_TREND_ETH:E48",
+          "effect_bps_vector": [
+            0,
+            48,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "governing": false
+        },
+        {
+          "id": "SINGLE:SCV1_A_REVERT_BTC:E12",
+          "effect_bps_vector": [
+            0,
+            0,
+            12,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "governing": false
+        },
+        {
+          "id": "SINGLE:SCV1_A_REVERT_BTC:E24",
+          "effect_bps_vector": [
+            0,
+            0,
+            24,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "governing": true
+        },
+        {
+          "id": "SINGLE:SCV1_A_REVERT_BTC:E36",
+          "effect_bps_vector": [
+            0,
+            0,
+            36,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "governing": false
+        },
+        {
+          "id": "SINGLE:SCV1_A_REVERT_BTC:E48",
+          "effect_bps_vector": [
+            0,
+            0,
+            48,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "governing": false
+        },
+        {
+          "id": "SINGLE:SCV1_A_REVERT_ETH:E12",
+          "effect_bps_vector": [
+            0,
+            0,
+            0,
+            12,
+            0,
+            0,
+            0,
+            0
+          ],
+          "governing": false
+        },
+        {
+          "id": "SINGLE:SCV1_A_REVERT_ETH:E24",
+          "effect_bps_vector": [
+            0,
+            0,
+            0,
+            24,
+            0,
+            0,
+            0,
+            0
+          ],
+          "governing": true
+        },
+        {
+          "id": "SINGLE:SCV1_A_REVERT_ETH:E36",
+          "effect_bps_vector": [
+            0,
+            0,
+            0,
+            36,
+            0,
+            0,
+            0,
+            0
+          ],
+          "governing": false
+        },
+        {
+          "id": "SINGLE:SCV1_A_REVERT_ETH:E48",
+          "effect_bps_vector": [
+            0,
+            0,
+            0,
+            48,
+            0,
+            0,
+            0,
+            0
+          ],
+          "governing": false
+        },
+        {
+          "id": "SINGLE:SCV1_C_VOLUME_BTC:E12",
+          "effect_bps_vector": [
+            0,
+            0,
+            0,
+            0,
+            12,
+            0,
+            0,
+            0
+          ],
+          "governing": false
+        },
+        {
+          "id": "SINGLE:SCV1_C_VOLUME_BTC:E24",
+          "effect_bps_vector": [
+            0,
+            0,
+            0,
+            0,
+            24,
+            0,
+            0,
+            0
+          ],
+          "governing": true
+        },
+        {
+          "id": "SINGLE:SCV1_C_VOLUME_BTC:E36",
+          "effect_bps_vector": [
+            0,
+            0,
+            0,
+            0,
+            36,
+            0,
+            0,
+            0
+          ],
+          "governing": false
+        },
+        {
+          "id": "SINGLE:SCV1_C_VOLUME_BTC:E48",
+          "effect_bps_vector": [
+            0,
+            0,
+            0,
+            0,
+            48,
+            0,
+            0,
+            0
+          ],
+          "governing": false
+        },
+        {
+          "id": "SINGLE:SCV1_C_VOLUME_ETH:E12",
+          "effect_bps_vector": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            12,
+            0,
+            0
+          ],
+          "governing": false
+        },
+        {
+          "id": "SINGLE:SCV1_C_VOLUME_ETH:E24",
+          "effect_bps_vector": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            24,
+            0,
+            0
+          ],
+          "governing": true
+        },
+        {
+          "id": "SINGLE:SCV1_C_VOLUME_ETH:E36",
+          "effect_bps_vector": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            36,
+            0,
+            0
+          ],
+          "governing": false
+        },
+        {
+          "id": "SINGLE:SCV1_C_VOLUME_ETH:E48",
+          "effect_bps_vector": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            48,
+            0,
+            0
+          ],
+          "governing": false
+        },
+        {
+          "id": "SINGLE:SCV1_D_LEAD_BTC:E12",
+          "effect_bps_vector": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            12,
+            0
+          ],
+          "governing": false
+        },
+        {
+          "id": "SINGLE:SCV1_D_LEAD_BTC:E24",
+          "effect_bps_vector": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            24,
+            0
+          ],
+          "governing": true
+        },
+        {
+          "id": "SINGLE:SCV1_D_LEAD_BTC:E36",
+          "effect_bps_vector": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            36,
+            0
+          ],
+          "governing": false
+        },
+        {
+          "id": "SINGLE:SCV1_D_LEAD_BTC:E48",
+          "effect_bps_vector": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            48,
+            0
+          ],
+          "governing": false
+        },
+        {
+          "id": "SINGLE:SCV1_D_LEAD_ETH:E12",
+          "effect_bps_vector": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            12
+          ],
+          "governing": false
+        },
+        {
+          "id": "SINGLE:SCV1_D_LEAD_ETH:E24",
+          "effect_bps_vector": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            24
+          ],
+          "governing": true
+        },
+        {
+          "id": "SINGLE:SCV1_D_LEAD_ETH:E36",
+          "effect_bps_vector": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            36
+          ],
+          "governing": false
+        },
+        {
+          "id": "SINGLE:SCV1_D_LEAD_ETH:E48",
+          "effect_bps_vector": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            48
+          ],
+          "governing": false
+        },
+        {
+          "id": "PAIR:SCV1_A_TREND_BTC:SCV1_A_TREND_ETH:E24",
+          "effect_bps_vector": [
+            24,
+            24,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "governing": false
+        },
+        {
+          "id": "PAIR:SCV1_A_TREND_BTC:SCV1_A_REVERT_BTC:E24",
+          "effect_bps_vector": [
+            24,
+            0,
+            24,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "governing": false
+        },
+        {
+          "id": "PAIR:SCV1_A_TREND_BTC:SCV1_A_REVERT_ETH:E24",
+          "effect_bps_vector": [
+            24,
+            0,
+            0,
+            24,
+            0,
+            0,
+            0,
+            0
+          ],
+          "governing": false
+        },
+        {
+          "id": "PAIR:SCV1_A_TREND_BTC:SCV1_C_VOLUME_BTC:E24",
+          "effect_bps_vector": [
+            24,
+            0,
+            0,
+            0,
+            24,
+            0,
+            0,
+            0
+          ],
+          "governing": false
+        },
+        {
+          "id": "PAIR:SCV1_A_TREND_BTC:SCV1_C_VOLUME_ETH:E24",
+          "effect_bps_vector": [
+            24,
+            0,
+            0,
+            0,
+            0,
+            24,
+            0,
+            0
+          ],
+          "governing": false
+        },
+        {
+          "id": "PAIR:SCV1_A_TREND_BTC:SCV1_D_LEAD_BTC:E24",
+          "effect_bps_vector": [
+            24,
+            0,
+            0,
+            0,
+            0,
+            0,
+            24,
+            0
+          ],
+          "governing": false
+        },
+        {
+          "id": "PAIR:SCV1_A_TREND_BTC:SCV1_D_LEAD_ETH:E24",
+          "effect_bps_vector": [
+            24,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            24
+          ],
+          "governing": false
+        },
+        {
+          "id": "PAIR:SCV1_A_TREND_ETH:SCV1_A_REVERT_BTC:E24",
+          "effect_bps_vector": [
+            0,
+            24,
+            24,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "governing": false
+        },
+        {
+          "id": "PAIR:SCV1_A_TREND_ETH:SCV1_A_REVERT_ETH:E24",
+          "effect_bps_vector": [
+            0,
+            24,
+            0,
+            24,
+            0,
+            0,
+            0,
+            0
+          ],
+          "governing": false
+        },
+        {
+          "id": "PAIR:SCV1_A_TREND_ETH:SCV1_C_VOLUME_BTC:E24",
+          "effect_bps_vector": [
+            0,
+            24,
+            0,
+            0,
+            24,
+            0,
+            0,
+            0
+          ],
+          "governing": false
+        },
+        {
+          "id": "PAIR:SCV1_A_TREND_ETH:SCV1_C_VOLUME_ETH:E24",
+          "effect_bps_vector": [
+            0,
+            24,
+            0,
+            0,
+            0,
+            24,
+            0,
+            0
+          ],
+          "governing": false
+        },
+        {
+          "id": "PAIR:SCV1_A_TREND_ETH:SCV1_D_LEAD_BTC:E24",
+          "effect_bps_vector": [
+            0,
+            24,
+            0,
+            0,
+            0,
+            0,
+            24,
+            0
+          ],
+          "governing": false
+        },
+        {
+          "id": "PAIR:SCV1_A_TREND_ETH:SCV1_D_LEAD_ETH:E24",
+          "effect_bps_vector": [
+            0,
+            24,
+            0,
+            0,
+            0,
+            0,
+            0,
+            24
+          ],
+          "governing": false
+        },
+        {
+          "id": "PAIR:SCV1_A_REVERT_BTC:SCV1_A_REVERT_ETH:E24",
+          "effect_bps_vector": [
+            0,
+            0,
+            24,
+            24,
+            0,
+            0,
+            0,
+            0
+          ],
+          "governing": false
+        },
+        {
+          "id": "PAIR:SCV1_A_REVERT_BTC:SCV1_C_VOLUME_BTC:E24",
+          "effect_bps_vector": [
+            0,
+            0,
+            24,
+            0,
+            24,
+            0,
+            0,
+            0
+          ],
+          "governing": false
+        },
+        {
+          "id": "PAIR:SCV1_A_REVERT_BTC:SCV1_C_VOLUME_ETH:E24",
+          "effect_bps_vector": [
+            0,
+            0,
+            24,
+            0,
+            0,
+            24,
+            0,
+            0
+          ],
+          "governing": false
+        },
+        {
+          "id": "PAIR:SCV1_A_REVERT_BTC:SCV1_D_LEAD_BTC:E24",
+          "effect_bps_vector": [
+            0,
+            0,
+            24,
+            0,
+            0,
+            0,
+            24,
+            0
+          ],
+          "governing": false
+        },
+        {
+          "id": "PAIR:SCV1_A_REVERT_BTC:SCV1_D_LEAD_ETH:E24",
+          "effect_bps_vector": [
+            0,
+            0,
+            24,
+            0,
+            0,
+            0,
+            0,
+            24
+          ],
+          "governing": false
+        },
+        {
+          "id": "PAIR:SCV1_A_REVERT_ETH:SCV1_C_VOLUME_BTC:E24",
+          "effect_bps_vector": [
+            0,
+            0,
+            0,
+            24,
+            24,
+            0,
+            0,
+            0
+          ],
+          "governing": false
+        },
+        {
+          "id": "PAIR:SCV1_A_REVERT_ETH:SCV1_C_VOLUME_ETH:E24",
+          "effect_bps_vector": [
+            0,
+            0,
+            0,
+            24,
+            0,
+            24,
+            0,
+            0
+          ],
+          "governing": false
+        },
+        {
+          "id": "PAIR:SCV1_A_REVERT_ETH:SCV1_D_LEAD_BTC:E24",
+          "effect_bps_vector": [
+            0,
+            0,
+            0,
+            24,
+            0,
+            0,
+            24,
+            0
+          ],
+          "governing": false
+        },
+        {
+          "id": "PAIR:SCV1_A_REVERT_ETH:SCV1_D_LEAD_ETH:E24",
+          "effect_bps_vector": [
+            0,
+            0,
+            0,
+            24,
+            0,
+            0,
+            0,
+            24
+          ],
+          "governing": false
+        },
+        {
+          "id": "PAIR:SCV1_C_VOLUME_BTC:SCV1_C_VOLUME_ETH:E24",
+          "effect_bps_vector": [
+            0,
+            0,
+            0,
+            0,
+            24,
+            24,
+            0,
+            0
+          ],
+          "governing": false
+        },
+        {
+          "id": "PAIR:SCV1_C_VOLUME_BTC:SCV1_D_LEAD_BTC:E24",
+          "effect_bps_vector": [
+            0,
+            0,
+            0,
+            0,
+            24,
+            0,
+            24,
+            0
+          ],
+          "governing": false
+        },
+        {
+          "id": "PAIR:SCV1_C_VOLUME_BTC:SCV1_D_LEAD_ETH:E24",
+          "effect_bps_vector": [
+            0,
+            0,
+            0,
+            0,
+            24,
+            0,
+            0,
+            24
+          ],
+          "governing": false
+        },
+        {
+          "id": "PAIR:SCV1_C_VOLUME_ETH:SCV1_D_LEAD_BTC:E24",
+          "effect_bps_vector": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            24,
+            24,
+            0
+          ],
+          "governing": false
+        },
+        {
+          "id": "PAIR:SCV1_C_VOLUME_ETH:SCV1_D_LEAD_ETH:E24",
+          "effect_bps_vector": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            24,
+            0,
+            24
+          ],
+          "governing": false
+        },
+        {
+          "id": "PAIR:SCV1_D_LEAD_BTC:SCV1_D_LEAD_ETH:E24",
+          "effect_bps_vector": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            24,
+            24
+          ],
+          "governing": false
+        },
+        {
+          "id": "ALL_8_24BP",
+          "effect_bps_vector": [
+            24,
+            24,
+            24,
+            24,
+            24,
+            24,
+            24,
+            24
+          ],
+          "governing": false
+        }
+      ],
+      "iteration_order": [
+        "calendar_anchor",
+        "rho",
+        "gamma",
+        "volatility_persistence",
+        "sigma",
+        "clock_profile",
+        "gap_profile",
+        "truth_id",
+        "D",
+        "V",
+        "support_threshold",
+        "outer_index"
+      ],
+      "nuisance_cell_count": 69768,
+      "truth_vector_count": 62,
+      "cartesian_D_V_pair_count": 15
+    },
+    "outer_mc_replicates_per_tuple": 36567,
+    "logical_outer_record_count": 11863110020400,
+    "mc_precision_rule": {
+      "absolute_one_sided_radius": "0.01",
+      "nominal_alpha_mc": "0.05",
+      "selection_setting_count": 75,
+      "selection_safe_alpha_mc": "1/1500",
+      "n_rule": "ceil(log(1500)/(2*0.01^2))",
+      "stronger_certification_status": "PROPOSED_PENDING_EXPLICIT_ASTRA_CONTROLLER_ACCEPTANCE"
+    },
+    "inner_formal_bootstrap_replicates": 100000,
+    "calendar_budget_months": 4,
+    "planning_effect_bps": 24,
+    "sections": {
+      "01_claim_and_scope": "This is one prospective specification, A1_PAIRED_CLOCK_NATIVE_OPEN_V1, semantic version 1.0.0. Its operating-characteristic claim is over the finite envelope below, not over all possible BTC/ETH price processes. Nothing here certifies power, affordable execution, historical exposure cleanliness, operational receipt latency, or executable PnL. No stochastic generator, calibration, bootstrap or power trial is executed in this design pass.\n\nThe generator uses accepted TRAIN C/V feature clocks and an explicit, independently generated, coherent reference-Open process. It is deliberately a conditional-clock stress model: empirical feature-clock persistence and cross-candidate overlap are retained, while endpoint innovations stress serial/common-factor/volatility dependence. It is not a fitted model of joint real-market Open/Close dynamics. This limitation must accompany any later feasibility claim and is an explicit Astra review question. The model does not assert that the candidate return correlations equal the latent common-factor parameter.\n\nA complete specification may fail its required TRAIN materialization or mean-realizability receipts. Such a failure blocks execution; it cannot justify deleting a cell, changing an equation, reducing the stress envelope or selecting a favorable nuisance value. These receipts are pre-run input/correctness requirements, not discretionary scientific choices.",
+      "02_frozen_fields_and_train": "The candidate order is SCV1_A_TREND_BTC, SCV1_A_TREND_ETH, SCV1_A_REVERT_BTC, SCV1_A_REVERT_ETH, SCV1_C_VOLUME_BTC, SCV1_C_VOLUME_ETH, SCV1_D_LEAD_BTC, SCV1_D_LEAD_ETH. K=8, h=4h, candidate-local cooldown=4h. r_m(t)=log(C[t]/C[t-m]); RV24(t)=sqrt(sum_{j=0}^{23} r_1(t-j)^2); VR24(t)=V[t]/median(V[t-1],...,V[t-24]), ordinary midpoint median.\n\nTRAIN is [2021-01-01T00:00:00Z,2022-10-31T00:00:00Z). Fit each required scalar feature quantile by sorting eligible finite TRAIN feature values and selecting rank ceil(p*n); latest-hour paired membership is required, and each scalar feature must have its own mathematically required positive C/V dependencies. No endpoint or future label is fitted. Quantile inputs retain missing hours; they are not filled. Required C/V prehistory supplies up to 24h of lookback and never contributes a threshold observation outside TRAIN. Missing prehistory makes the corresponding scalar observation ineligible. Empty quantile inputs block materialization.\n\nTREND(a): abs(r6)>=Q80(abs(r6)) AND Q20(RV24)<=RV24<=Q80(RV24), side=sign(r6).\nREVERT(a): d=log(C[t-1]/C[t-5]), u=r1; abs(d)>=Q80(abs(d)) AND RV24>=Q60(RV24) AND d*u<0 AND abs(u)>=0.25*abs(d), side=-sign(d).\nVOLUME(a): abs(r2)>=Q60(abs(r2)) AND VR24>=Q80(VR24) AND RV24<=Q90(RV24), side=sign(r2).\nLEAD(a,o): abs(r2_o)>=Q80_o(abs(r2)) AND abs(r2_a)<=Q50_a(abs(r2)), side=sign(r2_o).\n\nSign zero creates no event. All thresholds are the single accepted TRAIN fit, including Q50, Q60, Q80 and Q90 in the equations above. No synthetic re-fit is permitted. At decision t all required source fields must be available before t+1h; the latest BTC/ETH pair must both be on time. After an event at t0, t<t0+4h is suppressed and t=t0+4h is eligible. Cross-candidate overlap is retained. Formula-hash identity or nonempty TRAIN masks with Jaccard=1 and side agreement=1 blocks materialization; no roster deletion.\n\nReference entry is native economic Open P_a[t+1], exit P_a[t+5]. G=side*(P_exit/P_entry-1), Y=G-12/10000, stress=G-24/10000. Formal null is mean primary endpoint<=0; planning effect is 24bp after primary friction; sensitivity is 12/24/36/48bp. Stress never replaces primary. L=120h, B=100000, one-sided alpha=0.05, non-circular common-time moving blocks and no sequential real-outcome looks remain fixed.",
+      "03_train_clock_calibration": "Required inputs are a custody/hash-bound accepted TRAIN paired-hour C/V projection, missing/membership flags and 24h prehistory, not any TRAIN forward-return array. This pass does not fetch those inputs. The receipt must bind source hashes, clock bounds, scalar quantile arrays/hashes, eight pre-cooldown gates, eight accepted TRAIN event/side masks, eligibility reasons, formula hashes and the alias audit. Compute q_train[k]=accepted TRAIN events / every expected TRAIN hour, starting cooldown clear at TRAIN start. Every q_train must be positive.\n\nLet N be the exact number of expected TRAIN hours. Construct a paired cyclic template retaining every hour and any native missing flag, with synthetic phase drawn uniformly later. For asset a and original eligible C/V row, set C'_a[j]=exp(alpha_a*(log(C_a[j])-log(C_a[first eligible row]))) and V'_a[j]=exp(beta_a*(log(V_a[j])-median_train(log(V_a)))). Missing fields remain missing. alpha_BTC,alpha_ETH,beta_BTC,beta_ETH each range over {0.25,0.5,0.75,1,1.25,1.5,2,3,4}. This is a source transformation, not a threshold change. Required prices/volumes must be positive/finite. The wrap boundary is included in recomputed log-return features; it is not silently removed. No observed TRAIN Open/forward endpoint, observed profitability or protected source enters the template or its calibration.\n\nRecompute the actual eight equations on each cyclic C'/V' template, with nominal paired receipts at t+5 seconds, and exact cyclic cooldown state. A candidate's before-hour cooldown state q is in {0,1,2,3}. If q=0 and a valid nonzero-side trigger exists, accept and set next-hour q=3; otherwise set next-hour q=max(q-1,0). Compose one template cycle into a map F on these four states. Iterate F from state 0 until its first repeated state (at most five states inspected), retain that recurrent orbit, rotate it to the lexicographically smallest state sequence, and initialize the template-cycle boundary to its first state. For all candidates use the least common multiple of their orbit lengths (at most 12), repeat the N-hour source template that many times, and recompute the complete joint event/side table. This specifies a causal, indefinitely periodic cooldown history. Source transformations and gap changes each require their own recomputed orbit; event masks are never copied across them.\n\nThere are exactly 17 clock profiles: BASE has alpha=beta=1; MINUS_k and PLUS_k for each of eight IDs. For MINUS_k require 0<q_template[k]<=0.75*q_train[k]; for PLUS_k require q_template[k]>=1.25*q_train[k]. All other q_template must stay positive, and the template must pass the same alias audit. Select one admissible transformation minimizing, in order: abs(q_template[k]/q_train[k]-target), sum_{j!=k}(q_template[j]/q_train[j]-1)^2, sum over four transformations of log(transform)^2, then lexicographic (alpha_BTC,alpha_ETH,beta_BTC,beta_ETH). target is 0.75 or 1.25. Exact rational event rates determine constraints; binary64 objective values with fixed order determine ties, then lexicographic order resolves exact numerical ties. BASE is never optimized. A profile with no admissible transformation blocks the entire method materialization. This guarantees perturbations of at least +/-25% for every coordinate; it does not promise simultaneous uniform perturbation of all eight.\n\nThe clock-calibration receipt enumerates every transformation examined, selected tuples, rates, cyclic state/orbits, full mask/side hashes and input hashes. It includes no outcome statistics. TRAIN-only feature calibration must be separately dispatched; it is not performed here.",
+      "04_source_gaps_calendar_and_modes": "The 19 gap profiles are NONE and the Cartesian product fraction f in {0.001,0.005}, cluster length d in {1,6,24} hours, feed mode in {BOTH_MISSING,BTC_LATE,ETH_LATE}. For f>0 mark exactly n=ceil(f*N) hours of each base N-hour source cycle. Let b=ceil(n/d); cluster j=0..b-1 begins at floor(j*N/b), has length min(d,n-j*d), with modular indexing. Any overlap is a calibration error and blocks materialization. There is no discretionary gap placement. Retained native TRAIN missing flags combine by union.\n\nNormal receipt is boundary+5 seconds. BOTH_MISSING has no live decision receipt for either feed at that hour; BTC_LATE or ETH_LATE has the named feed's receipt exactly boundary+1h and the other at +5 seconds. Thus equality at the deadline fails. A late historical bar can enter a later feature only after its actual receipt; it cannot backfill its own missed event. Never-received required rows never enter later features; a received-late row is not a never-received row. At decision t, every required C/V lookback row is selected from the as-observed prefix before t+1h, with no interpolation. Raw latent economic rows, including reference Opens, remain preserved in a separate synthetic reconciliation store. Native reference marks are complete and finalized by each Open+1h+5 seconds; they do not repair a missed decision. This assumption is explicit. A fixture that removes a required reference mark makes the whole affected candidate/stage INFERENCE_UNAVAILABLE, never deletes only the bad event.\n\nEach outer replicate selects one campaign-level mode with exact probabilities: NORMAL=37/40, ALL_DECISION_SOURCE_MISSING=1/40, FLAT_FEATURE_CLOCK=1/40, ZERO_VARIANCE=1/40. Missing-source mode has no live decision receipts throughout warmup/Discovery/audit/Validation. Flat mode sets both C=V=1 throughout, yielding sign-zero and no events, with normal receipts. These modes have zero event mass and count as full-pipeline failures. They cannot be rejected or redrawn. In ZERO_VARIANCE, use the actual selected template/gap clock but force the specified candidate's primary endpoint constant at its prescribed mean using section 05. The global-null zero-variance target is uniform over all eight; a single alternative targets its true ID; a mixed alternative targets its lexicographically first non-null ID. Its mathematical variance is exactly zero, so it cannot pass eligibility. Other candidates remain coherently generated.\n\nThe finite calendar anchor grid is {2032-01-01T00:00:00Z,2032-02-01T00:00:00Z,2033-01-01T00:00:00Z,2033-02-01T00:00:00Z}; these labels address leap/non-leap month lengths and do not designate real protected samples. D_end=add_months(D_start,D); V_start=D_end+48h; V_end=add_months(V_start,V). add_months preserves UTC day/hour with Gregorian arithmetic; all chosen days are 1 or 3, so clipping is never needed. Discovery decisions are [D_start,D_end), Validation decisions [V_start,V_end). Endpoint tails extend to the last decision+5h; do not append tail hours to inference denominators.\n\nDraw one common uniform cyclic phase per replicate, then generate the entire chronology continuously. Feature/cooldown history is the exact periodic history; retain at least 24h feature warmup. Endpoint innovations have an independent 4096h burn-in. Features, thresholds, latent volatility, AR state, phase and cooldown carry across Discovery, the audit gap and Validation. No fit/reset occurs. Only the locked candidate is formally tested in Validation. Synthetic counterfactual Validation tests are separate operating-characteristic measurements.\n\nAll Discovery reference marks are available before D_end+6h; a valid synthetic lock-audit receipt must be produced by V_start-1h and Controller-GO simulated before V_start. A late or invalid receipt yields failure, never shifts Validation. The synthetic audit is the deterministic invariant predicate in section 09, not a probability model of a human auditor's reliability. Real independent audit and explicit GO remain required later. D+V<=4 is the frozen utility calculation; the fixed 48h audit/tail overhead is separately disclosed in actual elapsed schedules and is not counted as a scientific month or hidden.",
+      "05_exact_joint_dgp_and_coherent_effects": "The endpoint latent state has eight channels, ordered as the candidate ledger, on a common hourly clock. At each hour draw independent standard normals z0,z1,...,z8 and five more standard normals w1,...,w5; Q=sum(w_i^2). Define eta_k=sqrt(3/5)*(sqrt(gamma)*z0+sqrt(1-gamma)*z_k)/sqrt(Q/5). This is standardized multivariate Student-t innovation df=5: unit marginal innovation variance and covariance gamma. gamma is in {0.25,0.60,0.90}. Multiply the entire eta vector by one shared independent Rademacher sign; this leaves the theoretical Student-t distribution unchanged and ensures symmetric numerical innovation construction.\n\nx_k(j)=rho*x_k(j-1)+sqrt(1-rho^2)*eta_k(j), rho in {0,0.3,0.6}. Relative UTC hour 0 is Discovery start; j0=-4096. Set x_k(j0-1)=0 and S(j0-1) to an independent uniform {0,1} state, then generate innovations/transitions at each integer j from j0 through the final reference tail. Exactly 4096 innovation hours precede hour 0. This explicitly initializes a nonstationary AR process; no exact stationarity is claimed after finite burn-in. Its limiting variance is one. From that initial state, at each hour retain S with probability p in {0.80,0.95}, otherwise flip. The transition matrix is [[p,1-p],[1-p,p]], stationary probabilities 1/2,1/2. v(S)=1/sqrt(5) if low and 3/sqrt(5) if high; high/low ratio=3 and E[v^2]=1. The volatility state is shared across all channels.\n\nFor each asset, average its four candidate-associated x channels and divide by sqrt((1+3*gamma)/4), obtaining u_a(t). nu_a(t)=sigma*v(S_t)*tanh(u_a(t)), sigma in {0.0025,0.005,0.01}, a frozen absolute 4h gross-return amplitude grid (25/50/100bp, not a claimed standard deviation). Innovations, volatility, source phase and campaign mode use disjoint streams. Before tanh the two asset-averaged noise channels have limiting covariance 4*gamma/(1+3*gamma). After gates, sides and tanh, measured candidate-return correlations need not equal gamma. Same-asset/same-hour candidates share the very same nu and economic Opens; they are never treated as independent.\n\nFor each materialized template/gap clock, let P be its joint cyclic period. Let A[k,j], s[k,j] be actual accepted event masks/sides and n_k=sum_j A[k,j]. Require n_k>0 for every coordinate. There are 2P gross-return-mean variables m[a,j]. Define M[k,(a,j)]=1{asset(k)=a}*A[k,j]*s[k,j]/n_k. The desired primary mean vector is delta; desired gross means are b=delta+0.0012. Global-null delta is eight zeros. Single alternatives put exactly one effect e/10000 at the named coordinate and zero elsewhere, e in {12,24,36,48}. Mixed diagnostic vectors put 24bp at each unordered pair of IDs (28 cases), plus one case with all eight at 24bp.\n\nNORMAL mean field is the unique minimum Euclidean-norm solution of M*m=b: choose independent rows by left-to-right exact rational RREF, reject inconsistent constraints, then m=M_R^T*(M_R*M_R^T)^(-1)*b_R with exact rational arithmetic. Verify all eight original equalities exactly and max(abs(m))<=1/4. No ridge, clipping, omitted coordinate or outcome-based choice is allowed. ZERO_VARIANCE additionally fixes m[asset(k0),j]=s[k0,j]*b[k0] at every k0 event; subtract these fixed contributions and apply the same exact minimum-norm algorithm on the free columns. For every k0 event at decision hour t, set nu_asset(k0)(t+1)=0, the entry-hour reference increment, not the decision-hour noise. Verify all original equalities and the bound. This gives every k0 event exactly Y=delta[k0] while preserving all other mean constraints. The reference-mean receipt binds all coefficient tables, rank/consistency checks and source-clock hashes for every declared truth vector and zero-variance target. Inconsistent, unbounded or unavailable tables block the entire materialization before any trial; they cannot be counted as valid alternatives or replaced with a favorable generator.\n\nLet phi be the common uniform cyclic phase at Discovery hour 0. At relative integer decision hour t the source-clock phase is (phi+t) mod P. Assign each native 4h reference increment R_a(j)=m[a,(phi+j-1) mod P]+nu_a(j). For the two no-event modes use the same selected clock/gap NORMAL mean table; no event mean is asserted for an empty realized stage. For ZERO_VARIANCE use its constrained table. R>-1 always: |m|<=1/4 and |nu|<=0.01*3/sqrt(5), so every Open is positive.\n\nConstruct four interleaved price chains per asset: initialize P_a(j0),P_a(j0+1),P_a(j0+2),P_a(j0+3)=1, then P_a(j+4)=P_a(j)*(1+R_a(j)) for each j>=j0. It follows algebraically that P_a(t+5)/P_a(t+1)-1=R_a(t+1). One scalar sequence of native Opens serves every candidate. Native bar B_a[t] has O=P_a(t-1), C=C'_a[phase(t)], V=V'_a[phase(t)], H=max(O,C), L=min(O,C). This defines positive, internally valid synthetic OHLCV, with possible boundary price jumps and no empirical Open/Close calibration claim.\n\nNormative economic representation stores Opens as exact positive multiplicative products plus their factor lineage. Compute nu in the bound binary64 environment, interpret its bits as an exact rational and add exact rational m to form R without intermediate rounding. Evaluate the entry/exit ratio by exact cancellation on that shared chain, then evaluate side*ratio-minus-one and decimal-rational cost, then round the primary endpoint once to binary64 for inference. Do not round each Open independently and create a spurious nonzero variance in the constant-endpoint control. A materialization receipt must prove the ratio identity and that the once-rounded ZERO_VARIANCE endpoint is the identical binary64 value for every target event. The population proof concerns the exact source endpoint; the numeric receipt must bound once-rounded endpoint error and test symmetric innovation encoding without fitting outcome means. This equivalent representation changes no reference-return equation; no candidate-specific endpoint tensor is assigned independently.\n\nProof of coupling: A/s/cooldown are actual equations on the source C/V path, independent of endpoint innovations. Conditional innovation means are zero by symmetry. Uniform cyclic phase implies E[A_k*G_k]/E[A_k]=sum_j A[k,j]*s[k,j]*m[a,j]/n_k=b[k]. Thus mean primary endpoint=delta[k]; both NORMAL and ZERO_VARIANCE obey the same constraints. Empty-source/flat modes contribute zero event mass, so the same ratio holds for the ensemble, while their no-support failures remain in the pipeline denominator. This is a population event-mean claim, not a claim that every short realized window has identical sample mean. Finite digital rounding is audited under section 08; it is not used to retune means.",
+      "06_envelope_and_adversarial_cases": "The governing nuisance envelope is the full Cartesian product, in this order: calendar anchor (4), rho (3), gamma (3), state persistence (2), sigma (3), clock profile (17), gap profile (19). There are 69768 nuisance cells. Every cell uses the four-mode mixture without conditioning on support. Global-null plus 32 single-coordinate/effect vectors plus 29 mixed vectors gives 62 truth vectors per nuisance cell. Mixed vectors are diagnostic as in R1.1; they do not replace global-null gates or one-true-coordinate power. Discovery/Validation grid is the full 5x3 Cartesian product, and every B_eff_min in {12,18,24,36,48} is evaluated. There are no post-result additions or omissions.\n\nUnequal counts and burstiness are retained from TRAIN masks and their rate-perturbed cyclic source clocks. Gaps include shared missing bars and asset-specific late feeds, with paired no-event behavior. The mixture explicitly generates zero events and zero variance with nonzero probability. Concentrated-mask component controls further restrict an input tensor to one 12h interval per 120h block; exact-alias controls duplicate two complete (A,Z,side,lineage) bundles; near-alias controls copy 90% of a bundle using integer sample indices i mod 10!=0. These last tensor fixtures are component-level adversarial tests, not source-equivalent alternative cells and not a way to alter the eight candidate formulas. Exact alias must trigger the structural audit/no-lock path; near alias remains joint and K=8, with no independence assertion. They have expected behavioral outcomes, never an expected 80% power requirement for an unidentifiable coordinate.\n\nAdditional deterministic negative controls: no events, one event, identical endpoint values, a removed endpoint mark after an otherwise valid event, missing BTC only, late ETH exactly at deadline, future-bar feature read, archive revision rewriting an event, cooldown at 3h59m59s and 4h, and corrupted lock/root receipt. Each violation is unavailable/rejected rather than repaired. Component fixtures do not certify full-pipeline power. Failure states produced by the governing source-generating ensemble always remain in MC denominators; no result is conditioned on eligibility.",
+      "07_exact_inference_and_code_relation": "Normative successor algorithm SCV1_RATIO_MBB_T_V1 mechanically adapts run_joint_bootstrap_studentized in src/btc_quant_agent/h41/inference.py at code SHA 8ecff4ec4b25bf73a35309689fd3ecfacc0d3399, blob 9000840cbb767b1be69395b78248a58ec3bcaafa. It is a specification, not a production edit or a claim of accepted successor implementation.\n\nBuild binary64 A/Z arrays on all T expected decision hours in the stage: A=1 for an accepted event, Z=A*Y with Z=0 at no event. Retain source/event/side/Open/endpoint lineage as the indivisible hourly bundle. Missing/nonfinite endpoints at any accepted event make that candidate unavailable; do not remove that event. Original eligibility: T>=L, N=sum A>=2, finite Y, not all event Y exactly identical, strictly positive finite original SE below, and B_eff>=s. B_eff=(sum n_j)^2/sum n_j^2 with n_j from non-overlapping 120h blocks anchored at stage start, including the final partial block. s is one of the frozen support thresholds. Unavailable slots retain K=8 with statistic/LCB unavailable and cannot lock.\n\nFor original eligible coordinates: mu=sum Z/N. Let S=T-L+1, q=ceil(T/L). For each start i=0..S-1 let z_i=sum_{t=i}^{i+L-1}Z_t, a_i=sum A_t, e_i=z_i-mu*a_i, e_bar=sum_i e_i/S. SE=sqrt(T/(L*S)*sum_i(e_i-e_bar)^2)/N. No 1e-12 variance floor is used. Zero/nonfinite SE makes the original coordinate unavailable; all such decisions are recorded before any formal critical value is returned.\n\nFor each bootstrap replicate b=0..99999 draw q independent starts uniformly from 0..S-1 using one common vector of starts for all eight coordinates. Full L-hour blocks are retained; the final concatenation is not trimmed (resampled length q*L, matching the accepted primitive). The bootstrap resamples already-formed, complete hourly estimating-equation bundles jointly; it does not recompute features or cooldown at artificial joins, splice price paths, independently resample candidates, or relabel a delayed endpoint. Original source hashes and external lookback/endpoint references remain attached. Dependence beyond block joins is handled only by this fixed moving-block approximation; no stronger preservation claim is made.\n\nFor each original eligible k, Z_b=sum drawn z_i, A_b=sum drawn a_i, mu_b=Z_b/A_b. Let Q_b=sum drawn (z_i-mu_b*a_i)^2; compute it in the accepted quadratic form sum(z_i^2)-2*mu_b*sum(z_i*a_i)+mu_b^2*sum(a_i^2), clamping a negative rounding residual to zero, never to a positive floor. SE_b=sqrt(q*Q_b/((q-1)*A_b^2)). For A_b<2, q<2, zero/nonfinite SE_b or any nonfinite statistic, assign T*_k,b=+infinity, a conservative bad-draw value; never redraw. Original-ineligible k gets -infinity and remains a family slot. Do not re-screen B_eff on artificial bootstrap joins; original support screening varies across outer replications. Center_k=sum_{i=0}^{S-1}z_i/sum_{i=0}^{S-1}a_i, the accepted finite non-circular centering rule. Otherwise T*_k,b=(mu_b-center_k)/SE_b.\n\nmaxT_b=max over the fixed eight slots. If none is originally eligible, return INFERENCE_UNAVAILABLE for the family without a claim. Sort all B maxT values and use the linear empirical percentile at h=0.95*(B-1): c=(1-f)*v[floor(h)]+f*v[ceil(h)], f=h-floor(h). A positive-weight +infinity yields c=+infinity. An infinite critical value produces no pass, not NaN arithmetic. LCB=mu-c*SE; Discovery pass is strict LCB>0. No rounding tolerance converts equality into a pass.\n\nLock exactly one eligible pass using descending LCB, descending B_eff, descending N, then ascending candidate_id; exact computed ties use the next key. Independent lock-audit failure ends the pipeline; never substitute a runner-up.\n\nValidation runs this same estimator, SE, source-bundle MBB, centering, percentile and bad-draw treatment with only the locked coordinate active. Its family maximum is the one coordinate; same s,L,B,alpha and strict LCB>0 apply. Other Discovery family slots are never alternative Validation candidates. Counterfactual null operating-characteristic calls activate each fixed k separately using a dedicated counterfactual seed domain and never affect lock or full-pipeline success.\n\nReused algebra: ratio estimator, overlapping block sums, original Kunsch-style SE formula, common non-circular full-block starts, replicate ratio/SE, weighted non-circular centering and linear 95th percentile. Required changes: K=8 and variable T; N>=2/positive variance/B_eff replacing hardcoded N>=60; B=100000 replacing the frozen wrapper's B=10000; no positive variance floors; conservative invalid bootstrap draws; successor lineage/support/selection and single-candidate Validation. run_frozen_joint_inference, infer_with_testability, infer_context_with_testability and _infer_checked cannot be reused as wrappers: they bind K=20, T=2184, WF1_CALIBRATION and old receipts/N/day gates. No adjacent code or outcome payload was opened; no function was imported or run.",
+      "08_rng_roots_numerics_and_mc": "RNG family is SHA256_COUNTER_U64_V1. A draw digest is SHA256(uint32_be(len(domain_bytes)) || domain_bytes || uint32_be(len(seed_bytes)) || seed_bytes || uint64_be(draw_index) || uint64_be(attempt)), where domain_bytes are UTF-8. Use the first eight digest bytes as u64. Seeds are 32 bytes except the exact 8-byte formal bootstrap seed. Each stream/domain has its immutable draw index; initial attempt is zero. Uniform integer on n values rejects u64>=2^64-(2^64 mod n), then returns u64 mod n, incrementing attempt only for that indexed draw. Open-real uniform uses top 52 bits i=u64>>12 and U=(i+1)/(2^52+1), with binary64 endpoints strictly between 0 and 1.\n\nNormal(domain,i) obtains U1 and U2 from subdomains domain+':U1' and domain+':U2' at index i and returns sqrt(-2*log(U1))*cos(2*pi*U2); discard the sine companion. Each complete generative subdomain derives its own seed from run_root and that full name by the recipe below; it does not reuse the parent-domain seed. There is no cached hidden RNG state. pi is binary64 0x1.921fb54442d18p+1. Chi-square uses five independent such normals squared. A shared independent sign from integer(2) multiplies the full innovation vector. Persistence 0.80 and 0.95 uses integer(10)<8 or integer(20)<19 to retain the volatility state, exact digital probabilities. Mode uses integer(40): 0..36 NORMAL,37 missing source,38 flat clock,39 zero variance; the global-null zero-variance target uses integer(8).\n\nDomains are SOURCE_PHASE, CAMPAIGN_MODE, ZERO_VARIANCE_TARGET, INNOV_COMMON, INNOV_IDIO:<candidate_id>, INNOV_CHI:<1..5>, INNOV_SIGN, VOL_INITIAL, VOL_TRANSITION, DISCOVERY_BOOTSTRAP, VALIDATION_BOOTSTRAP, VALIDATION_COUNTERFACTUAL:<candidate_id>. SOURCE_PHASE, CAMPAIGN_MODE, ZERO_VARIANCE_TARGET and VOL_INITIAL use index 0. Innovation/transition at relative hour j uses index j-j0. Bootstrap starts use index b*q+h for b=0..99999 and block position h=0..q-1. There is no execution-order dependence and a failed campaign changes no other stream.\n\nCanonical bytes are UTF-8 json.dumps(object,sort_keys=True,separators=(',',':'),ensure_ascii=False,allow_nan=False). Semantic numeric constants are integers or exact decimal strings. design_root=SHA256(canonical semantic_contract). Materialized_method_root=SHA256(canonical {design_root,TRAIN_receipt_hash,clock_table_hash,reference_mean_table_hash,numeric_environment_hash,reference_implementation_hash,negative_control_receipt_hash}). Numeric/implementation receipts bind exact interpreter/library/libm versions, ordered binary64 operations and implementation hashes before outcomes. Actual-campaign semantic authority is separate and later; the design root is not circularly included in its own contract.\n\nAll hash/root identifiers below are lowercase 64-character hexadecimal strings; a SHA256 used as a stream seed is instead its raw 32 digest bytes. Cell_id is hex(SHA256(canonical {calendar_anchor: anchor, rho: rho, gamma: gamma, volatility_persistence: p, sigma_gross_amplitude: sigma, clock_profile_id: profile_id, gap_profile_id: gap_id})), with exactly those literal JSON keys and decimal-string parameter values. Truth order is NULL; each ledger ID at ascending 12/24/36/48bp; unordered ledger-index pairs i<j in ascending i,j at 24bp; ALL_8_24BP. IDs are NULL, SINGLE:<id>:E<effect>, PAIR:<left>:<right>:E24 and ALL_8_24BP. run_root=hex(SHA256(canonical {materialized_method_root,cell_id,truth_id,D,V,s,outer_index})), using those literal keys and integer D,V,s,outer_index. Generative stream seed is the 32-byte SHA256(UTF8(run_root)||':'||domain). Formal stage seeds retain R1.1 exactly: uint64_be(first8(SHA256(UTF8(run_root)||':DISCOVERY_BOOTSTRAP'))) and analogously ':VALIDATION_BOOTSTRAP'. Counterfactual root is hex(SHA256(UTF8(run_root)||':VALIDATION_COUNTERFACTUAL:'||UTF8(candidate_id))); then apply the same Validation separator. Formal bootstrap seed_bytes are the resulting integer encoded as exactly eight big-endian bytes. Actual seed values materialize only after required receipts exist; no seed search is authorized.\n\nEvery cell/truth/pair/support tuple uses exactly 36567 outer replicates indexed 0..36566; inner formal B=100000. There are J=15*5=75 possible D/V/support settings. Freeze alpha_MC=0.05/75=1/1500 for a proposed selection-safe certificate, alongside ordinary one-sided 95% CP outputs. N_outer=ceil(log(1500)/(2*0.01^2))=36567 prospectively meets a one-percentage-point one-sided Hoeffding precision target at that stricter level, without a pilot. For any fixed invalid setting at least one governing constraint is false, so its all-constraints intersection can falsely certify with probability at most alpha_MC. The union bound over 75 settings is at most 0.05, without requiring independence between settings. This is a 95% selected-setting certificate, not simultaneous 95% coverage of every individual interval. It assumes independent outer replicates within each cell under the specified indexed pseudorandom generator.\n\nThis conservative certificate is a proposed additional MC assurance requiring explicit Astra/Controller acceptance. It is not asserted to be already accepted R1.1 semantics. Formal alpha=0.05 and numerical error/power thresholds remain unchanged. Nominal scientific admissibility is reported separately; failure of this stronger certificate must not be mislabeled as failing the nominal scientific gate or as proven calendar-utility failure.\n\nNo adaptive stopping, extension or post-result sample-size changes. Common-random-number/computation reuse is permitted only if it exactly reproduces every indexed record and cannot reduce counts. The machine evidence binds the exact arithmetic logical record count 69768*62*75*36567. This is a very large protocol, not an affordable execution claim. A separately verified resource/acceleration/replay plan is required before resume; no favorable cell pruning or count reduction is permitted.\n\nFor every Bernoulli metric report ordinary one-sided 95% Clopper-Pearson bounds with a=0.05. Additionally use a=1/1500 for every governing constraint in the proposed selection-safe certificate. If x=0 lower=0; otherwise lower=BetaQuantile(a,x,n-x+1). If x=n upper=1; otherwise upper=BetaQuantile(1-a,x+1,n-x). Numerical reference: initialize lo=0,hi=1 and perform 64 dyadic bisections. For upper, CDF(mid)=P_Binomial(n,mid)(X<=x); if CDF(mid)>a set lo=mid, else hi=mid; return hi. For lower, tail(mid)=P_Binomial(n,mid)(X>=x); if tail(mid)<a set lo=mid, else hi=mid; return lo. Evaluate dyadic probabilities with exact integer/rational binomial sums, making outward brackets conservative. Endpoint shortcuts are exact. Conditional/sensitivity/mixed diagnostics retain nominal 95% bounds; they cannot substitute for 24bp certification or tune any method choice.\n\nFixed numerical order: ledger candidate order, increasing UTC hour, block start, bootstrap index and sampled block position. Binary64 round-to-nearest-even; no nondeterministic BLAS reductions. Parse accepted decimal C/V fields by correctly rounded conversion; nearest-rank p is an exact rational when calculating ceil(p*n). Exact rational mean calibration and native-Open cancellation precede rounding. Pre-run numeric receipts check covariance construction, innovation sign symmetry, constant-endpoint identity, source/ratio lineage and estimator algebra; production parity is not asserted from this specification. A nonfinite/undefined innovation, latent state or derived required value is NUMERIC_GENERATOR_FAILURE: preserve its indexed receipt, do not redraw or count it as a valid null realization, and block the affected operating-characteristic certification. Inference-unavailable states deliberately generated by valid source/support cases remain ordinary pipeline failures; they are not generator errors.\n\nParallel work keys are (cell_id,truth_id,D,V,s,outer_index); concatenate in declared grid order, not completion time. Store all Bernoulli indicators and failure codes. Floating diagnostics use IEEE754 big-endian hexadecimal encodings; unavailable/nonfinite values use explicit status tokens, never JSON NaN. Leaf hash=SHA256(canonical record); result root=SHA256(canonical ordered list of {record_id,leaf_hash}); aggregates are exact integer counts. Reruns on the bound environment must match records and hashes exactly, tolerance zero. A different-platform approximate replay cannot replace the accepted bound environment.",
+      "09_full_pipeline_gates_schema_and_receipts": "For global-null trials, Discovery FWER indicator is 1 if any eligible Discovery coordinate has LCB>0, regardless of a later lock audit. Measure Validation type-I for each of the eight prospectively fixed candidate IDs on the later Validation clock using the same support/failure rules; count no-support states as no pass and use all 36567 trials as denominator. Report their maximum upper bound as the fixed-candidate Validation gate. Also report the selected-null Validation false-pass rate both unconditionally and conditional on an audited null lock, with the latter's actual lock denominator and CP interval (if no locks, interval [0,1]); neither is hidden by support conditioning. These diagnostics expose cross-stage selection dependence. Mixed-alternative null-coordinate rejection rates are reported separately. No conditional diagnostic can replace either specified error gate.\n\nFor a single true ID k and effect e, full_pipeline_success is the exact conjunction: all calibrated/synthetic source and lineage receipts are intact; k is mathematically/support eligible in Discovery; its simultaneous LCB>0; frozen ranking locks k; the deterministic lock audit verifies root/source/threshold/event/Open/endpoint/seed/ranking/access-ledger hashes without reading Validation outcomes and completes before the fixed deadline; simulated GO precedes V_start; locked k is eligible in Validation; its one-candidate LCB>0. Every failure, including the two empty-clock modes, the zero-variance mode, gap-driven support loss and an audit failure, contributes zero to success. Diagnostics eligibility/correct lock/audit acceptance/Validation pass use the full denominator unless explicitly labeled conditional.\n\nFor each (s,D,V), across every governing nuisance cell, nominal R1.1 admissibility requires upper 95% Discovery global-null FWER<=0.05; upper 95% Validation type-I<=0.05 for every fixed k; lower 95% full-pipeline success>=0.80 for every k at 24bp. Report nominal scientific admissibility separately from selection-safe certification. The proposed conservative certificate applies the identical thresholds to a=1/1500 bounds. It may refuse to certify a nominally admissible setting; this is not failure of a nominal R1.1 gate. Explicit Astra/Controller acceptance of this stronger assurance and selection protocol is required before resume. Sensitivity effects and mixed alternatives are diagnostics, not substitutes for 24bp. No nominal or certified admissibility is asserted here.\n\nUnder that prospectively accepted assurance choose s* as the smallest threshold for which at least one declared pair is nominally admissible and selection-safe certified. If none, report nominal results and NO_MC_CERTIFIED_SCHEDULE; do not force a statistical or utility verdict from MC uncertainty. At s* choose among certified admissible utility pairs by smaller D+V, then D, then V. Nominally admissible utility pairs without certification require Controller adjudication; do not select a least-bad pair or claim established calendar failure. No real-outcome rescheduling, seed changes or runner-up substitution are permitted.\n\nMachine-result schema A1_SYNTHETIC_OC_RESULT_V1 requires dispatch/start/code/design/materialized root hashes; exact cells/truths/seeds; replicate counts; all source/support/numeric/audit failure counts; Discovery FWER, eight Validation fixed-candidate errors, selected-null diagnostics, eight single-true-coordinate pipeline powers at each effect, mixed diagnostics; per-pair/s scientific and calendar statuses; selected pair or null; exact aggregate/leaf/root hashes; protection/production attestations and Controller disposition. Each record is keyed by (cell_id,truth_id,D,V,s,outer_index), with Boolean discovery_false_claim, fixed_validation_false_claim[8], original_eligible[8], lock_id or null, lock_audit_valid, actual_validation_pass, correct_lock, full_pipeline_success, and failure_codes. Absent/failed metrics are status-tagged, never favorable zero estimates.\n\nMandatory pre-run receipts: accepted TRAIN C/V custody and quantile materialization; all 17 rate profiles with exact equation/cooldown/alias hashes; all 19 gap clocks; consistent bounded mean fields for every normal/zero-variance truth case; exact economic-ratio/constant-endpoint proofs; independently audited successor reference implementation and numeric environment; deterministic negative controls; separately feasible resource/replay plan; Controller verification and independent Astra method audit. None is materialized or asserted passed here. Missing input receipts are permitted pre-run requirements under task §10; their contents cannot be substituted with protected data. Failure of pre-run receipt materialization blocks execution before any power trial starts. Trial counting for an authorized run that actually starts remains Controller-governed; this design pass consumes none."
+    }
+  },
+  "design_semantic_root_sha256": "718efa1bbad00e68aaacf4cd2c2034265776b242024e0acbf09455847b2fc106",
+  "closure_receipts": [
+    {
+      "gap": "M01",
+      "status": "SPECIFIED_PENDING_ASTRA",
+      "sections": [
+        "05_exact_joint_dgp_and_coherent_effects",
+        "06_envelope_and_adversarial_cases"
+      ],
+      "receipt": "Named generator, standardized Student-t, absolute scales, joint AR/common-factor/state laws and complete numeric Cartesian grids."
+    },
+    {
+      "gap": "M02",
+      "status": "SPECIFIED_PENDING_ASTRA",
+      "sections": [
+        "02_frozen_fields_and_train",
+        "03_train_clock_calibration",
+        "05_exact_joint_dgp_and_coherent_effects"
+      ],
+      "receipt": "Actual equations on TRAIN-derived C/V; exact cooldown; coherent four-chain native Opens; bounded rational mean constraints and endpoint identity proof. Materialization must verify all cells."
+    },
+    {
+      "gap": "M03",
+      "status": "SPECIFIED_PENDING_ASTRA",
+      "sections": [
+        "04_source_gaps_calendar_and_modes",
+        "06_envelope_and_adversarial_cases"
+      ],
+      "receipt": "Exact missing/late/gap placement, zero-event/variance mixture, lookbacks, tails, state carry, fixed anchors and audit overhead."
+    },
+    {
+      "gap": "M04",
+      "status": "SPECIFIED_PENDING_ASTRA",
+      "sections": [
+        "07_exact_inference_and_code_relation",
+        "09_full_pipeline_gates_schema_and_receipts"
+      ],
+      "receipt": "Explicit estimator/SE/null centering, full shared blocks, bad-draw/ineligible handling, percentile, lock and one-candidate Validation; differences from accepted H41 code enumerated."
+    },
+    {
+      "gap": "M05",
+      "status": "SPECIFIED_PENDING_ASTRA",
+      "sections": [
+        "08_rng_roots_numerics_and_mc",
+        "09_full_pipeline_gates_schema_and_receipts"
+      ],
+      "receipt": "Indexed SHA256 RNG/byte encoding, exact seed/root domains, prospective 36567 outer and 100000 inner counts, nominal CP intervals plus proposed selection-safe certificate, ordering, hashes and zero-tolerance replay."
+    }
+  ],
+  "pre_run_receipt_requirements": [
+    {
+      "id": "TRAIN_CV_SOURCE_CUSTODY_AND_PREHISTORY",
+      "status": "NOT_MATERIALIZED_IN_THIS_DESIGN_PASS",
+      "failure_rule": "BLOCK_EXECUTION_NO_SUBSTITUTION_OR_CELL_OMISSION"
+    },
+    {
+      "id": "TRAIN_NEAREST_RANK_QUANTILES_AND_EVENT_CLOCKS",
+      "status": "NOT_MATERIALIZED_IN_THIS_DESIGN_PASS",
+      "failure_rule": "BLOCK_EXECUTION_NO_SUBSTITUTION_OR_CELL_OMISSION"
+    },
+    {
+      "id": "CLOCK_RATE_PROFILE_CALIBRATION_17",
+      "status": "NOT_MATERIALIZED_IN_THIS_DESIGN_PASS",
+      "failure_rule": "BLOCK_EXECUTION_NO_SUBSTITUTION_OR_CELL_OMISSION"
+    },
+    {
+      "id": "PAIRED_GAP_CLOCK_TABLES_19",
+      "status": "NOT_MATERIALIZED_IN_THIS_DESIGN_PASS",
+      "failure_rule": "BLOCK_EXECUTION_NO_SUBSTITUTION_OR_CELL_OMISSION"
+    },
+    {
+      "id": "BOUNDED_COHERENT_REFERENCE_MEAN_TABLES",
+      "status": "NOT_MATERIALIZED_IN_THIS_DESIGN_PASS",
+      "failure_rule": "BLOCK_EXECUTION_NO_SUBSTITUTION_OR_CELL_OMISSION"
+    },
+    {
+      "id": "EXACT_OPEN_RATIO_AND_ZERO_VARIANCE_ENDPOINT",
+      "status": "NOT_MATERIALIZED_IN_THIS_DESIGN_PASS",
+      "failure_rule": "BLOCK_EXECUTION_NO_SUBSTITUTION_OR_CELL_OMISSION"
+    },
+    {
+      "id": "REFERENCE_IMPLEMENTATION_AND_NUMERIC_ENVIRONMENT",
+      "status": "NOT_MATERIALIZED_IN_THIS_DESIGN_PASS",
+      "failure_rule": "BLOCK_EXECUTION_NO_SUBSTITUTION_OR_CELL_OMISSION"
+    },
+    {
+      "id": "NEGATIVE_CONTROL_REPLAY",
+      "status": "NOT_MATERIALIZED_IN_THIS_DESIGN_PASS",
+      "failure_rule": "BLOCK_EXECUTION_NO_SUBSTITUTION_OR_CELL_OMISSION"
+    },
+    {
+      "id": "RESOURCE_AND_REPRODUCTION_PLAN",
+      "status": "NOT_MATERIALIZED_IN_THIS_DESIGN_PASS",
+      "failure_rule": "BLOCK_EXECUTION_NO_SUBSTITUTION_OR_CELL_OMISSION"
+    },
+    {
+      "id": "CONTROLLER_VERIFICATION_AND_ASTRA_METHOD_AUDIT",
+      "status": "NOT_MATERIALIZED_IN_THIS_DESIGN_PASS",
+      "failure_rule": "BLOCK_EXECUTION_NO_SUBSTITUTION_OR_CELL_OMISSION"
+    }
+  ],
+  "semantic_root_plan": {
+    "design_root": "718efa1bbad00e68aaacf4cd2c2034265776b242024e0acbf09455847b2fc106",
+    "materialized_method_root": null,
+    "rule_section": "08_rng_roots_numerics_and_mc",
+    "actual_seed_values": null,
+    "seed_rules_exact": true,
+    "reason_numeric_seeds_not_materialized": "Required TRAIN/implementation/numeric receipts do not yet exist; deterministic derivation is fully specified, no seed choice remains."
+  },
+  "validation": {
+    "schema_and_semantic_hash_checks": "PASS_STATIC_DESIGN_INVARIANTS_AND_CANONICAL_ROOT",
+    "deterministic_document_regeneration": "PASS_IDENTICAL_REPORT_AND_JSON_SHA256",
+    "static_design_only": true,
+    "simulation_or_calibration_run": false,
+    "independent_design_review": "READ_ONLY_REVIEW_PASSED_AFTER_LITERAL_RNG_GAP_ZERO_VARIANCE_AND_MC_CERTIFICATION_REPAIRS; no remaining material semantic blocker reported; feasibility/materialization/resource receipts remain pending",
+    "full_pytest": "NOT_RUN_NOT_REQUIRED",
+    "focused_helper_tests": "NOT_APPLICABLE_NO_EXECUTABLE_GENERATOR_HELPER_COMMITTED"
+  },
+  "pre_run_blockers": [
+    "Required TRAIN feature/quantile/rate and coherent mean table receipts are not materialized",
+    "Reference implementation/numeric/negative-control receipts are not materialized",
+    "Literal protocol contains 11863110020400 logical outer records; resource/acceleration plan not certified",
+    "Controller verification and independent Astra audit have not occurred"
+  ],
+  "authority_hydration_check": {
+    "manifest_binding_fields_only_consumed": true,
+    "trial1_evidence_identity_only": true,
+    "must_read_fully_hydrated": [
+      "R1.1 scientific design",
+      "exact accepted inference.py"
+    ],
+    "recursive_historical_reference_chain_hydrated": false,
+    "adjacent_tests_opened": false,
+    "protected_outcomes_opened": false,
+    "incidental_nonbinding_metadata": "authorized_next_stage.a2 sibling label appeared once during field extraction; discarded and not used; no A2 or Controller authority reference opened. Git trees/dispatch metadata were read only for exact identities."
+  },
+  "protected_outcome_attestation": {
+    "access": "NO",
+    "h41_wf1_validation": "NO",
+    "h39_protected_results": "NO",
+    "successor_returns_pnl_mu_se_lcb": "NO",
+    "protected_real_event_support": "NO",
+    "market_or_train_payloads_read_in_this_pass": "NO",
+    "accepted_inference_code_read_not_executed": true
+  },
+  "production_code_change_attestation": {
+    "production_code_changed": "NO",
+    "accepted_code_sha": "8ecff4ec4b25bf73a35309689fd3ecfacc0d3399",
+    "allowed_changed_paths": [
+      "reviews/v0.5/V0.5.5_A1_SYNTHETIC_METHOD_AUTHORITY_DESIGN_R1.md",
+      "evidence/v0.5.5/h41/V0.5.5_A1_SYNTHETIC_METHOD_AUTHORITY_DESIGN_R1.json"
+    ],
+    "production_import_or_execution": false
+  },
+  "simulation_attestation": {
+    "simulation_executed": false,
+    "outer_replicates_executed": 0,
+    "bootstrap_replicates_executed": 0,
+    "train_calibration_executed": false,
+    "compression_trials_consumed": 0,
+    "completed_compression_trials_remain": 0,
+    "trial1_state_remains": "BLOCKED_PRE_SIMULATION",
+    "trial2_authorized": false,
+    "d0_authorized": false,
+    "self_authorized_trial1_resume": false
+  },
+  "unresolved_blockers": [],
+  "audit_questions": [
+    "Acceptability and scope of conditional TRAIN-clock/synthetic-Open model versus full joint real-market dynamics",
+    "TRAIN rate-profile and coherent mean/zero-variance feasibility receipts may fail; no cell omission permitted",
+    "Explicit acceptance of proposed conservative selection-safe MC assurance in addition to nominal R1.1 gates",
+    "Actual elapsed calendar includes 48h overhead beyond the D+V utility arithmetic",
+    "Full-envelope computation affordability and certified equivalent acceleration"
+  ],
+  "terminal_decision": "SYNTHETIC_METHOD_AUTHORITY_DESIGNED_PENDING_ASTRA",
+  "next_controller_action": "Verify this exact design/closure/root and hydration ledger; if accepted dispatch A1_SYNTHETIC_METHOD_AUTHORITY_ASTRA_AUDIT_R1. Do not resume Trial 1, authorize D0 or authorize Trial 2 from this artifact."
+}
