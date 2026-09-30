@@ -1,0 +1,68 @@
+{
+  "schema_id": "V0.5.5_H41_SUCCESSOR_EXPOSURE_REPAIR_CONTROLLER_ADJUDICATION_R1",
+  "repository": "EXASHXE/btc-quant-agent-public",
+  "controller_role": "CHATGPT_0_PRIMARY_CONTROLLER_AND_REVIEWER",
+  "reviewed_execution": {
+    "docs_branch": "v0.5.5-docs",
+    "execution_commit": "98d886c698433163d3b3ce1325df2a735173d840",
+    "dispatch_parent": "20334839173dee20aa4dd417d960573d9ddc7707",
+    "report_path": "reviews/v0.5/V0.5.5_H41_SUCCESSOR_CONTROLLER_EXPOSURE_REPAIR_R1.md",
+    "report_blob_sha": "bafc3bd9f8029ae825f8ee9a9a36e144cb0928eb",
+    "evidence_path": "evidence/v0.5.5/h41/V0.5.5_H41_SUCCESSOR_CONTROLLER_EXPOSURE_REPAIR_R1.json",
+    "evidence_blob_sha": "6788ec55bd272739fc551678a7c7ffaafecc506f"
+  },
+  "code_authority": {
+    "branch": "v0.5.5",
+    "sha": "8ecff4ec4b25bf73a35309689fd3ecfacc0d3399",
+    "changed_by_repair": false
+  },
+  "accepted_repair_result": {
+    "provenance_authority_state": "NO_NEW_PROVENANCE_AUTHORITY",
+    "exposure_repair_iteration": 1,
+    "exposure_repair_max_iterations": 1,
+    "provisional_recommendation": "REPAIR_INCOMPLETE_FAIL_CLOSED",
+    "months_reclassified_from_unknown": 0,
+    "certified_holdout_month_count": 0,
+    "feasible_discovery_validation_pairs": []
+  },
+  "protected_outcome_fence": {
+    "protected_candidate_outcome_access": "NO",
+    "successor_candidate_execution": false,
+    "h41_wf1_validation_outcome_access": false,
+    "protected_h39_result_unblinding": false,
+    "performance_guided_window_selection": false,
+    "h0_source_audit_rerun": false
+  },
+  "recoverability_adjudication": {
+    "practically_recoverable_from_current_authority": false,
+    "missing_authorities": [
+      "target historical runtime/result custody",
+      "candidate-search expression/evaluation identity and equivalence receipts",
+      "historical aligned-output access/disclosure logs",
+      "dated recipient/change-rights attestations",
+      "aligned export/report/alert delivery history"
+    ],
+    "recursive_exposure_repair_authorized": false,
+    "future_reopen_condition": "GENUINELY_NEW_EXTERNAL_PROVENANCE_AUTHORITY_REQUIRING_EXPLICIT_CONTROLLER_DECISION"
+  },
+  "route_disposition": {
+    "hybrid_route": "HYBRID_ROUTE_NOT_CERTIFIABLE_FROM_AVAILABLE_PROVENANCE",
+    "interpretation": "HOLDOUT_GOVERNANCE_LIMITATION_NOT_ALPHA_RESULT",
+    "forward_fallback": "SUCCESSOR_R1_1_ACCEPTED_AS_FORWARD_BASELINE_NOT_FINAL",
+    "next_stage": "H41_SUCCESSOR_FORWARD_R1_1_REAUDIT"
+  },
+  "ci": {
+    "run_id": 36686876400,
+    "conclusion": "failure",
+    "failing_step": "ruff check .",
+    "failing_scope": "pre-existing evidence/v0.5/h41/h41_synthetic_pit_validation_r1 scripts",
+    "diagnostic_count": 6,
+    "classification": "PREEXISTING_NON_BLOCKING_REPOSITORY_HYGIENE",
+    "repair_diff_implicated": false
+  },
+  "controller_decision": "ACCEPT_REPAIR_INCOMPLETE_FAIL_CLOSED__TERMINATE_HYBRID_ROUTE__PROCEED_FORWARD_R1_1_REAUDIT",
+  "implementation_authorized": false,
+  "discovery_authorized": false,
+  "validation_authorized": false,
+  "execution_policy": "RESEARCH_DISABLED_V1"
+}
