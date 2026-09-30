@@ -26,7 +26,17 @@
     "successor_design_commit": "c308f16f4f4e849f217470066cbe80e1b2a9ceb1",
     "successor_design_status": "ACCEPTED_FOR_INDEPENDENT_ASTRA_DESIGN_AUDIT",
     "successor_design_frozen": false,
-    "next_h41_stage": "ASTRA_H41_SUCCESSOR_SCIENTIFIC_CAMPAIGN_V1_DESIGN_AUDIT_R1"
+    "next_h41_stage": "CONTROLLER_DESIGN_REPAIR",
+    "astra_successor_design_audit_commit": "9cacec23bcd9a795ce6315586596e8486052c87f",
+    "astra_successor_design_audit_verdict": "REDESIGN_REQUIRED_BEFORE_FREEZE",
+    "astra_successor_design_audit_severity_counts": {
+      "BLOCKER": 1,
+      "HIGH": 5,
+      "MEDIUM": 2,
+      "LOW": 1
+    },
+    "successor_source_closure_required": true,
+    "successor_validation_authorized": false
   },
   "mandatory_reply_contract": {
     "every_substantive_project_reply_has_stage_progress": true,
@@ -61,7 +71,20 @@
       "required_final_status",
       "next_lifecycle_state"
     ],
-    "prefer_machine_authority_over_hand_transcription": true
+    "prefer_machine_authority_over_hand_transcription": true,
+    "long_prompt_rendering_preference": [
+      "chatgpt_writing_block_collapsible_reusable",
+      "html_details_when_supported",
+      "single_fenced_code_block_with_scroll_copy_surface"
+    ],
+    "main_reply_for_long_prompt": [
+      "prompt_name",
+      "repository_path",
+      "direct_link_if_published",
+      "recommended_model",
+      "status",
+      "one_line_purpose"
+    ]
   },
   "stage_density_contract": {
     "policy": "FEWER_DENSER_OUTCOME_ORIENTED_STAGES",
@@ -94,10 +117,22 @@
     "runtime_import_path_must_match_checkout": true
   },
   "model_allocation": {
-    "controller": "GPT-5.6 Sol High",
-    "implementation_and_scientific_execution": "Codex Sol High",
-    "mechanical_docs_and_evidence": "Gemini 3.8 Flash",
-    "major_post_discovery_audit": "Astra"
+    "controller": "GPT-5.6 Sol High / current Controller model",
+    "default_codex_and_technical_executor": "GPT-6.1 Sol",
+    "default_reasoning_guidance": "high/xhigh/max when available and justified",
+    "gpt_6_sol_status": "SUPERSEDED_FOR_NEW_TASKS_BY_GPT_6_1_SOL",
+    "astra_policy": "RESERVED_FOR_HIGHEST_VALUE_SCIENTIFIC_EPISTEMIC_GATES",
+    "gpt_6_1_sol_can_replace_astra_for": [
+      "most_independent_technical_reviews",
+      "non_final_scientific_audits",
+      "implementation_validation_and_source_pit_reviews"
+    ],
+    "retain_astra_for": [
+      "final_campaign_design_audit_before_freeze_when_scientific_degrees_of_freedom_remain",
+      "post_discovery_candidate_lock_audit_before_validation",
+      "controller_vs_gpt_6_1_material_disagreement",
+      "hardest_statistical_or_source_causality_audits"
+    ]
   },
   "scientific_fences": {
     "h40": "IMMUTABLE_CLOSED_NOT_TESTABLE",
@@ -167,5 +202,6 @@
     ],
     "do_not_restart_completed_stages": true,
     "do_not_ask_user_to_repeat_documented_history": true
-  }
+  },
+  "conversation_rules_supplement": "prompts/v0.5/controller/v0.5.1_CONTROLLER_CONVERSATION_RULES_SUPPLEMENT_R1.md"
 }
