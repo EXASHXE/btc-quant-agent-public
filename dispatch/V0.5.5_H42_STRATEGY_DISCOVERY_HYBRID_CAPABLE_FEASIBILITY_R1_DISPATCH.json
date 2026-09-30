@@ -27,7 +27,8 @@
     "push_only_to_target_feature_branch": true,
     "no_direct_push_to_v0_5_5_docs": true,
     "no_protected_outcome_access": true,
-    "no_production_code_change_unless_prompt_explicitly_allows": false
+    "production_code_change_allowed": false,
+    "evidence_or_docs_helper_scripts_allowed": "ONLY_AS_SPECIFIED_BY_ACTIVE_PROMPT"
   },
   "final_instruction": "Use CONTROLLER_DISPATCH_SHA exactly. Do not substitute a later v0.5.5-docs HEAD. If the target feature branch moves before execution begins, stop and request a new dispatch."
 }
