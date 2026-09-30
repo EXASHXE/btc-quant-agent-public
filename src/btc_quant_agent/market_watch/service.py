@@ -10,6 +10,7 @@ from ..data.binance import BinancePublicClient
 from .alerting import send_test_market_watch_alert
 from .config import MarketWatchConfig
 from .domain import SymbolAssessment
+from .grid_shadow import GridShadowEvaluationManager
 from .scanner import MarketWatchScanner
 from .shadow import ShadowDecisionRecorder
 from .state import MarketWatchStateStore
@@ -29,6 +30,7 @@ class MarketWatchService:
         self.store = store
         self.scanner = MarketWatchScanner(config, client, store)
         self.shadow_recorder = ShadowDecisionRecorder(store)
+        self.grid_shadow_manager = GridShadowEvaluationManager(store)
 
     @classmethod
     def create(
@@ -146,6 +148,18 @@ class MarketWatchService:
             "pending_count": res.get("pending_count", 0),
             "results": res.get("results", []),
             "summary": self.shadow_recorder.get_status(),
+        }
+
+    def grid_shadow_resolve(self) -> dict[str, Any]:
+        """Resolve pending grid shadow evaluations against forward closed candles."""
+        now_ms = int(time.time() * 1000)
+        res = self.grid_shadow_manager.resolve_pending_evaluations(self.client, now_ms)
+        return {
+            "status": "SUCCESS",
+            "resolved_count": res.get("resolved_count", 0),
+            "pending_count": res.get("pending_count", 0),
+            "skipped_count": res.get("skipped_count", 0),
+            "results": res.get("results", []),
         }
 
     def test_feishu(self, symbol: str = "BTCUSDT") -> dict[str, Any]:

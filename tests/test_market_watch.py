@@ -2333,6 +2333,14 @@ def test_r2_08_explain_grid_codes_and_shadow_resolve_return_schema() -> None:
         assert isinstance(res["results"], list)
         assert "summary" in res
 
+        # 3. grid_shadow_resolve() schema test
+        grid_res = service.grid_shadow_resolve()
+        assert grid_res["status"] == "SUCCESS"
+        assert isinstance(grid_res["resolved_count"], int)
+        assert isinstance(grid_res["pending_count"], int)
+        assert isinstance(grid_res["skipped_count"], int)
+        assert isinstance(grid_res["results"], list)
+
 
 def test_r2_1_01_shadow_armed_and_triggered_independent_dedupe() -> None:
     """R2.1-01: ARMED and TRIGGERED have independent dedupe markers; ARMED does not suppress TRIGGERED."""

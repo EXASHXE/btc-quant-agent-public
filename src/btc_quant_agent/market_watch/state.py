@@ -37,6 +37,14 @@ from .evidence import (
     validate_tactical_feature_evidence,
     verify_tactical_evidence_identity,
 )
+from .grid_shadow_evidence import (
+    TacticalGridShadowEvaluationConflictError,
+    TacticalGridShadowEvaluationIdentityError,
+    TacticalGridShadowEvaluationV1,
+    canonical_grid_shadow_evaluation_json,
+    deserialize_tactical_grid_shadow_evaluation,
+    validate_tactical_grid_shadow_evaluation,
+)
 from .shadow_evidence import (
     TacticalShadowAttributionConflictError,
     TacticalShadowEvaluationConflictError,
@@ -474,6 +482,52 @@ class MarketWatchStateStore:
                 """
                 CREATE UNIQUE INDEX IF NOT EXISTS idx_tactical_shadow_eval_unique
                 ON tactical_shadow_evaluations_v2 (shadow_record_id, evaluation_profile_version)
+                """
+            )
+
+            conn.execute(
+                """
+                CREATE TABLE IF NOT EXISTS tactical_grid_shadow_evaluations_v1 (
+                    evaluation_id TEXT PRIMARY KEY,
+                    evaluation_schema_version TEXT NOT NULL,
+                    feature_evidence_id TEXT NOT NULL,
+                    symbol TEXT NOT NULL,
+                    decision_time_ms INTEGER NOT NULL,
+                    evaluation_profile_version TEXT NOT NULL,
+                    grid_path_model_version TEXT NOT NULL,
+                    grid_accounting_version TEXT NOT NULL,
+                    grid_decision TEXT NOT NULL,
+                    eligibility_status TEXT NOT NULL,
+                    terminal_reason TEXT,
+                    terminal_time_ms INTEGER,
+                    net_pnl_after_fees_slippage REAL NOT NULL,
+                    net_pnl_after_funding REAL,
+                    funding_coverage TEXT NOT NULL,
+                    market_path_coverage TEXT NOT NULL,
+                    evaluation_json TEXT NOT NULL,
+                    persisted_at_ms INTEGER NOT NULL
+                )
+                """
+            )
+
+            cur_dup_grid = conn.execute(
+                """
+                SELECT feature_evidence_id, evaluation_profile_version, COUNT(DISTINCT evaluation_id) AS cnt
+                FROM tactical_grid_shadow_evaluations_v1
+                GROUP BY feature_evidence_id, evaluation_profile_version
+                HAVING cnt > 1
+                """
+            )
+            conflict_grid_row = cur_dup_grid.fetchone()
+            if conflict_grid_row is not None:
+                raise TacticalGridShadowEvaluationConflictError(
+                    f"B2B_EXISTING_EVALUATION_CONFLICT: Duplicate natural key with divergent evaluation IDs found in database: {conflict_grid_row}"
+                )
+
+            conn.execute(
+                """
+                CREATE UNIQUE INDEX IF NOT EXISTS idx_tactical_grid_shadow_eval_unique
+                ON tactical_grid_shadow_evaluations_v1 (feature_evidence_id, evaluation_profile_version)
                 """
             )
 
@@ -1703,6 +1757,224 @@ class MarketWatchStateStore:
                 )
                 if row["evaluation_id"] != ev.evaluation_id:
                     raise TacticalShadowEvaluationIdentityError(
+                        f"Row evaluation_id mismatch: row={row['evaluation_id']}, embedded={ev.evaluation_id}"
+                    )
+                evaluations.append(ev)
+            return evaluations
+
+    def save_grid_shadow_evaluation(self, evaluation: TacticalGridShadowEvaluationV1) -> str:
+        """Persist an immutable TacticalGridShadowEvaluationV1 artifact fail-closed."""
+        validate_tactical_grid_shadow_evaluation(evaluation)
+        now_ms = int(time.time() * 1000)
+
+        with self._connect() as conn:
+            conn.row_factory = sqlite3.Row
+
+            # 1. Natural key check: (feature_evidence_id, evaluation_profile_version)
+            cur = conn.execute(
+                """
+                SELECT evaluation_id, evaluation_json FROM tactical_grid_shadow_evaluations_v1
+                WHERE feature_evidence_id = ? AND evaluation_profile_version = ?
+                """,
+                (evaluation.feature_evidence_id, evaluation.evaluation_profile_version),
+            )
+            row = cur.fetchone()
+            if row is not None:
+                existing_id = str(row[0])
+                if existing_id == evaluation.evaluation_id:
+                    return existing_id
+                raise TacticalGridShadowEvaluationConflictError(
+                    f"B2B_EVALUATION_CONFLICT: Natural key ({evaluation.feature_evidence_id}, {evaluation.evaluation_profile_version}) "
+                    f"already exists with different evaluation_id: existing={existing_id}, new={evaluation.evaluation_id}"
+                )
+
+            # 2. Check primary key evaluation_id
+            cur_pk = conn.execute(
+                "SELECT evaluation_id FROM tactical_grid_shadow_evaluations_v1 WHERE evaluation_id = ?",
+                (evaluation.evaluation_id,),
+            )
+            row_pk = cur_pk.fetchone()
+            if row_pk is not None:
+                raise TacticalGridShadowEvaluationConflictError(
+                    f"B2B_EVALUATION_CONFLICT: evaluation_id {evaluation.evaluation_id} already exists."
+                )
+
+            # 3. Linkage check to tactical_feature_evidence_v2
+            cur_ev = conn.execute(
+                "SELECT evidence_id, evidence_json FROM tactical_feature_evidence_v2 WHERE evidence_id = ?",
+                (evaluation.feature_evidence_id,),
+            )
+            ev_row = cur_ev.fetchone()
+            if ev_row is None:
+                raise TacticalEvidenceLinkageError(
+                    f"Linked feature_evidence_id does not exist in DB: {evaluation.feature_evidence_id}"
+                )
+            ev_b1 = deserialize_tactical_feature_evidence(ev_row["evidence_json"], verify_identity=True)
+            if ev_b1.evidence_id != evaluation.feature_evidence_id:
+                raise TacticalEvidenceIdentityError(
+                    f"Linked B1 evidence identity mismatch: DB={ev_row['evidence_id']} vs {evaluation.feature_evidence_id}"
+                )
+
+            ev_json = canonical_grid_shadow_evaluation_json(evaluation)
+            try:
+                conn.execute(
+                    """
+                    INSERT INTO tactical_grid_shadow_evaluations_v1 (
+                        evaluation_id, evaluation_schema_version, feature_evidence_id, symbol,
+                        decision_time_ms, evaluation_profile_version, grid_path_model_version,
+                        grid_accounting_version, grid_decision, eligibility_status, terminal_reason,
+                        terminal_time_ms, net_pnl_after_fees_slippage, net_pnl_after_funding,
+                        funding_coverage, market_path_coverage, evaluation_json, persisted_at_ms
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    """,
+                    (
+                        evaluation.evaluation_id,
+                        evaluation.evaluation_schema_version,
+                        evaluation.feature_evidence_id,
+                        evaluation.symbol,
+                        evaluation.decision_time_ms,
+                        evaluation.evaluation_profile_version,
+                        evaluation.grid_path_model_version,
+                        evaluation.grid_accounting_version,
+                        evaluation.grid_decision,
+                        evaluation.eligibility_status,
+                        evaluation.terminal_reason,
+                        evaluation.terminal_time_ms,
+                        evaluation.net_pnl_after_fees_slippage,
+                        evaluation.net_pnl_after_funding,
+                        evaluation.funding_coverage,
+                        evaluation.market_path_coverage,
+                        ev_json,
+                        now_ms,
+                    ),
+                )
+                conn.commit()
+                return evaluation.evaluation_id
+            except sqlite3.IntegrityError as exc:
+                cur_race = conn.execute(
+                    """
+                    SELECT evaluation_id FROM tactical_grid_shadow_evaluations_v1
+                    WHERE feature_evidence_id = ? AND evaluation_profile_version = ?
+                    """,
+                    (evaluation.feature_evidence_id, evaluation.evaluation_profile_version),
+                )
+                row_race = cur_race.fetchone()
+                if row_race is not None and row_race[0] == evaluation.evaluation_id:
+                    return evaluation.evaluation_id
+                raise TacticalGridShadowEvaluationConflictError(
+                    f"B2B_EVALUATION_CONFLICT: Concurrent or conflicting insert for evaluation natural key: {exc}"
+                ) from exc
+
+    def get_grid_shadow_evaluation(
+        self,
+        evaluation_id: str,
+        verify_identity: bool = True,
+    ) -> TacticalGridShadowEvaluationV1 | None:
+        """Fetch immutable TacticalGridShadowEvaluationV1 by evaluation_id."""
+        with self._connect() as conn:
+            conn.row_factory = sqlite3.Row
+            cursor = conn.execute(
+                "SELECT evaluation_id, evaluation_json FROM tactical_grid_shadow_evaluations_v1 WHERE evaluation_id = ?",
+                (evaluation_id,),
+            )
+            row = cursor.fetchone()
+            if row is None:
+                return None
+            ev = deserialize_tactical_grid_shadow_evaluation(
+                row["evaluation_json"],
+                verify_identity=verify_identity,
+                require_embedded_identity=True,
+            )
+            if row["evaluation_id"] != ev.evaluation_id:
+                raise TacticalGridShadowEvaluationIdentityError(
+                    f"Row evaluation_id mismatch: row={row['evaluation_id']}, embedded={ev.evaluation_id}"
+                )
+            return ev
+
+    def get_grid_shadow_evaluation_by_feature_id(
+        self,
+        feature_evidence_id: str,
+        evaluation_profile_version: str | None = None,
+        verify_identity: bool = True,
+    ) -> TacticalGridShadowEvaluationV1 | None:
+        """Fetch immutable TacticalGridShadowEvaluationV1 by feature_evidence_id and optional profile version."""
+        with self._connect() as conn:
+            conn.row_factory = sqlite3.Row
+            if evaluation_profile_version is not None:
+                cursor = conn.execute(
+                    "SELECT evaluation_id, evaluation_json FROM tactical_grid_shadow_evaluations_v1 "
+                    "WHERE feature_evidence_id = ? AND evaluation_profile_version = ?",
+                    (feature_evidence_id, evaluation_profile_version),
+                )
+            else:
+                cursor = conn.execute(
+                    "SELECT evaluation_id, evaluation_json FROM tactical_grid_shadow_evaluations_v1 "
+                    "WHERE feature_evidence_id = ? ORDER BY persisted_at_ms DESC LIMIT 1",
+                    (feature_evidence_id,),
+                )
+            row = cursor.fetchone()
+            if row is None:
+                return None
+            ev = deserialize_tactical_grid_shadow_evaluation(
+                row["evaluation_json"],
+                verify_identity=verify_identity,
+                require_embedded_identity=True,
+            )
+            if row["evaluation_id"] != ev.evaluation_id:
+                raise TacticalGridShadowEvaluationIdentityError(
+                    f"Row evaluation_id mismatch: row={row['evaluation_id']}, embedded={ev.evaluation_id}"
+                )
+            return ev
+
+    def list_grid_shadow_evaluations(
+        self,
+        symbol: str | None = None,
+        grid_decision: str | None = None,
+        eligibility_status: str | None = None,
+        start_time_ms: int | None = None,
+        end_time_ms: int | None = None,
+        limit: int = 1000,
+        verify_identity: bool = True,
+    ) -> list[TacticalGridShadowEvaluationV1]:
+        """Query immutable TacticalGridShadowEvaluationV1 records."""
+        query = [
+            (
+                "SELECT evaluation_id, evaluation_json FROM tactical_grid_shadow_evaluations_v1 "
+                "WHERE evaluation_schema_version = 'TACTICAL_GRID_SHADOW_EVALUATION_V1'"
+            )
+        ]
+        params: list[Any] = []
+        if symbol:
+            query.append("AND symbol = ?")
+            params.append(symbol.upper())
+        if grid_decision:
+            query.append("AND grid_decision = ?")
+            params.append(grid_decision)
+        if eligibility_status:
+            query.append("AND eligibility_status = ?")
+            params.append(eligibility_status)
+        if start_time_ms is not None:
+            query.append("AND decision_time_ms >= ?")
+            params.append(start_time_ms)
+        if end_time_ms is not None:
+            query.append("AND decision_time_ms <= ?")
+            params.append(end_time_ms)
+        query.append("ORDER BY decision_time_ms DESC LIMIT ?")
+        params.append(limit)
+
+        with self._connect() as conn:
+            conn.row_factory = sqlite3.Row
+            cursor = conn.execute(" ".join(query), tuple(params))
+            rows = cursor.fetchall()
+            evaluations: list[TacticalGridShadowEvaluationV1] = []
+            for row in rows:
+                ev = deserialize_tactical_grid_shadow_evaluation(
+                    row["evaluation_json"],
+                    verify_identity=verify_identity,
+                    require_embedded_identity=True,
+                )
+                if row["evaluation_id"] != ev.evaluation_id:
+                    raise TacticalGridShadowEvaluationIdentityError(
                         f"Row evaluation_id mismatch: row={row['evaluation_id']}, embedded={ev.evaluation_id}"
                     )
                 evaluations.append(ev)
