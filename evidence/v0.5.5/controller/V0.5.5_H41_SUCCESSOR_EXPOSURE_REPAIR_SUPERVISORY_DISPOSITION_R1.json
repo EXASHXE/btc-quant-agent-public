@@ -48,9 +48,13 @@
     "REPAIR_INCOMPLETE_FAIL_CLOSED": "H41_SUCCESSOR_FORWARD_R1_1_REAUDIT_IF_MISSING_AUTHORITY_NOT_PRACTICALLY_RECOVERABLE"
   },
   "corrected_prompt": {
-    "path": "prompts/v0.5/design/v0.5.1_H41_SUCCESSOR_CONTROLLER_EXPOSURE_REPAIR_R1.md",
-    "update_commit": "ab752a8dfaf1d9cca39c54e87acc5e4e9d666b7c",
-    "blob_sha": "5076e7f570c9833a7c782c7b5679d336af548ff7"
+    "path": "prompts/v0.5/design/v0.5.5_H41_SUCCESSOR_CONTROLLER_EXPOSURE_REPAIR_R1.md",
+    "publication_commit": "1872c71f338698cf14ef6b7f34ac9157d2d8d7fd",
+    "blob_sha": "f457d7f605b5f2feefc10e4370967bbeb9281cc0",
+    "legacy_alias": {
+      "path": "prompts/v0.5/design/v0.5.1_H41_SUCCESSOR_CONTROLLER_EXPOSURE_REPAIR_R1.md",
+      "executable": false
+    }
   },
   "controller_review": {
     "path": "reviews/v0.5/V0.5.5_H41_SUCCESSOR_EXPOSURE_REPAIR_CHATGPT0_DISPOSITION_R1.md",
@@ -65,5 +69,5 @@
     "production_code_change_authorized": false,
     "h0_source_rerun_authorized": false
   },
-  "next_action": "BIND_CORRECTED_PROMPT_TO_LIVE_V0_5_5_DOCS_HEAD_AND_EXECUTE_ONE_BOUNDED_REPAIR_PASS"
+  "next_action": "BIND_ACTIVE_V0_5_5_PROMPT_TO_LIVE_V0_5_5_DOCS_HEAD_AND_EXECUTE_ONE_BOUNDED_REPAIR_PASS"
 }
