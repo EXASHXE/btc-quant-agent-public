@@ -1,0 +1,38 @@
+{
+  "schema_id": "V0.5.5_H41_SUCCESSOR_EXPOSURE_REPAIR_R1_DISPATCH",
+  "repository": "EXASHXE/btc-quant-agent-public",
+  "purpose": "External exact-SHA binding for the single bounded H41 successor exposure-repair pass.",
+  "dispatch_branch": "dispatch/v0.5.5-h41-successor-exposure-repair-r1",
+  "execution_target": {
+    "docs_branch": "v0.5.5-docs",
+    "CONTROLLER_DISPATCH_SHA": "b62e5f5876b96427ef62b254c69233abb2704fdb",
+    "code_branch": "v0.5.5",
+    "accepted_code_sha": "8ecff4ec4b25bf73a35309689fd3ecfacc0d3399"
+  },
+  "prompt": {
+    "path": "prompts/v0.5/design/v0.5.1_H41_SUCCESSOR_CONTROLLER_EXPOSURE_REPAIR_R1.md",
+    "immutable_url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/b62e5f5876b96427ef62b254c69233abb2704fdb/prompts/v0.5/design/v0.5.1_H41_SUCCESSOR_CONTROLLER_EXPOSURE_REPAIR_R1.md",
+    "branch_url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/v0.5.5-docs/prompts/v0.5/design/v0.5.1_H41_SUCCESSOR_CONTROLLER_EXPOSURE_REPAIR_R1.md"
+  },
+  "execution_rules": {
+    "exposure_repair_max_iterations": 1,
+    "start_gate": "Checked-out v0.5.5-docs HEAD MUST equal b62e5f5876b96427ef62b254c69233abb2704fdb.",
+    "code_gate": "v0.5.5 MUST equal 8ecff4ec4b25bf73a35309689fd3ecfacc0d3399.",
+    "no_substitution": true,
+    "no_legacy_branch_execution": true,
+    "legacy_branches": [
+      "v0.5-refactor",
+      "v0.5-refactor-docs"
+    ],
+    "legacy_note": "Historical sources only. Do not execute or commit successor-stage work there.",
+    "local_branch_note": "Strings such as v0.5.1 in prompt filenames are artifact/protocol version identifiers, not Git branch names."
+  },
+  "local_preflight": [
+    "git fetch origin --prune",
+    "git switch v0.5.5-docs",
+    "git reset --hard origin/v0.5.5-docs",
+    "test \"$(git rev-parse HEAD)\" = \"b62e5f5876b96427ef62b254c69233abb2704fdb\"",
+    "test \"$(git rev-parse origin/v0.5.5)\" = \"8ecff4ec4b25bf73a35309689fd3ecfacc0d3399\""
+  ],
+  "final_instruction": "Use CONTROLLER_DISPATCH_SHA exactly as supplied above. Do not substitute a later live HEAD. If origin/v0.5.5-docs moves before execution begins, stop and ask ChatGPT-0 for a new dispatch binding."
+}
