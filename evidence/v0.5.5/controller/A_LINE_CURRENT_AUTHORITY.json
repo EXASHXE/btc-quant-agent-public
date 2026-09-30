@@ -2,13 +2,13 @@
   "schema_id": "V0.5.5_A_LINE_CURRENT_AUTHORITY",
   "repository": "EXASHXE/btc-quant-agent-public",
   "line": "A_LINE",
-  "stage": "A1_SYNTHETIC_METHOD_AUTHORITY_DESIGN_R1__A2_H42_FEASIBILITY_PARALLEL",
+  "stage": "A1_SYNTHETIC_METHOD_AUTHORITY_ASTRA_AUDIT_R1__A2_H42_FEASIBILITY_PARALLEL",
   "code_branch": "v0.5.5",
   "accepted_code_sha": "8ecff4ec4b25bf73a35309689fd3ecfacc0d3399",
-  "docs_authority_commit": "c592b82cd7ab1b2ff36096eb9f9984aa1f3e4180",
+  "docs_authority_commit": "5585d8844e7cd61f26af5291f0db102283dd8106",
   "current_controller_authority": {
-    "path": "evidence/v0.5.5/controller/V0.5.5_A1_TRIAL1_METHOD_AUTHORITY_CONTROLLER_ADJUDICATION_R1.json",
-    "blob_sha": "5b44fcc7e137eb5853809756be9d85e763c38823"
+    "path": "evidence/v0.5.5/controller/V0.5.5_A1_SYNTHETIC_METHOD_AUTHORITY_CONTROLLER_ACCEPTANCE_R1.json",
+    "blob_sha": "78da376b5aa56c511ed5a5492521469322f9135f"
   },
   "protected_state": {
     "h41_terminal_no_go": true,
@@ -19,14 +19,14 @@
     "production_code_change_authorized": false
   },
   "authorized_next_stage": {
-    "a1": "A1_SYNTHETIC_METHOD_AUTHORITY_DESIGN_R1",
+    "a1": "A1_SYNTHETIC_METHOD_AUTHORITY_ASTRA_AUDIT_R1",
     "a2": "H42_STRATEGY_DISCOVERY_HYBRID_CAPABLE_FEASIBILITY_R1"
   },
   "binding_fields": {
     "forward_primary_route": "CONDITIONAL_AND_BOUNDED",
     "forward_compression_trials_max": 2,
     "compression_trial_runs_completed": 0,
-    "trial_1_state": "BLOCKED_PRE_SIMULATION",
+    "trial_1_state": "BLOCKED_PRE_SIMULATION_PENDING_METHOD_AUDIT_AND_MATERIALIZATION",
     "trial_2_authorized": false,
     "trial_1_duration_grid": {
       "discovery_months": [
@@ -43,7 +43,7 @@
       ],
       "calendar_budget_total_months_max": 4
     },
-    "trial_1_blocker_state": "SYNTHETIC_METHOD_AUTHORITY_INCOMPLETE",
+    "trial_1_blocker_state": "METHOD_DESIGN_ACCEPTED_PENDING_ASTRA",
     "accepted_method_gaps": [
       "M01_SCIENTIFIC_DGP_GAP",
       "M02_SCIENTIFIC_DGP_GAP",
@@ -52,13 +52,32 @@
       "M05_PROSPECTIVE_REPRODUCIBILITY_GAP"
     ],
     "a2_status": "AUTHORIZED_PARALLEL_FEASIBILITY",
-    "a2_scientific_root": "H42_STRATEGY_DISCOVERY_AND_HYBRID_CAPABLE_CAMPAIGN_V1"
+    "a2_scientific_root": "H42_STRATEGY_DISCOVERY_AND_HYBRID_CAPABLE_CAMPAIGN_V1",
+    "method_design_sha": "9b92ec290e4f9de93c140ca471a0eb1644526e2b",
+    "method_design_semantic_root_sha256": "718efa1bbad00e68aaacf4cd2c2034265776b242024e0acbf09455847b2fc106",
+    "method_gap_status": {
+      "M01": "SPECIFIED_PENDING_ASTRA",
+      "M02": "SPECIFIED_PENDING_ASTRA",
+      "M03": "SPECIFIED_PENDING_ASTRA",
+      "M04": "SPECIFIED_PENDING_ASTRA",
+      "M05": "SPECIFIED_PENDING_ASTRA"
+    },
+    "resource_feasibility": "NOT_CERTIFIED",
+    "literal_logical_outer_records": 11863110020400
   },
   "must_read": [
     {
+      "path": "reviews/v0.5/V0.5.5_A1_SYNTHETIC_METHOD_AUTHORITY_DESIGN_R1.md",
+      "reason": "Current normative synthetic-method design under independent audit."
+    },
+    {
       "path": "reviews/v0.5/V0.5.1_H41_SUCCESSOR_SCIENTIFIC_CAMPAIGN_V1_DESIGN_R1_1_CONTROLLER_REPAIR.md",
-      "reason": "Contains the candidate equations, source/PIT contract, endpoint/cost semantics, inference/multiplicity and synthetic-envelope semantics needed to design the missing method authority."
+      "reason": "Baseline scientific semantics needed to test compatibility and unauthorized drift."
+    },
+    {
+      "path": "src/btc_quant_agent/h41/inference.py",
+      "reason": "Accepted implementation semantics needed to review claimed inference compatibility."
     }
   ],
-  "note": "Cache/index of already accepted authority only. Immutable underlying authority wins on conflict."
+  "note": "Cache/index of accepted authority only. Immutable underlying authority wins on conflict."
 }
