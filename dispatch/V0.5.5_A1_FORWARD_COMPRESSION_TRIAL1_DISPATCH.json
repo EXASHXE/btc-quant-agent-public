@@ -1,0 +1,33 @@
+{
+  "schema_id": "V0.5.5_A1_FORWARD_COMPRESSION_TRIAL1_DISPATCH",
+  "repository": "EXASHXE/btc-quant-agent-public",
+  "authority_namespace": "v0.5.5",
+  "stage": "FORWARD_R1_1_SHORT_HORIZON_SYNTHETIC_POWER_FEASIBILITY",
+  "execution_target": {
+    "target_branch": "feature/a1-forward-compression-trial1-v055",
+    "CONTROLLER_DISPATCH_SHA": "e0d9624350c3dae048c6f4ceea51c62e5a641290",
+    "code_branch": "v0.5.5",
+    "accepted_code_sha": "8ecff4ec4b25bf73a35309689fd3ecfacc0d3399"
+  },
+  "prompt": {
+    "path": "prompts/v0.5/research/v0.5.5_FORWARD_R1_1_SHORT_HORIZON_SYNTHETIC_POWER_FEASIBILITY.md",
+    "immutable_url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/e0d9624350c3dae048c6f4ceea51c62e5a641290/prompts/v0.5/research/v0.5.5_FORWARD_R1_1_SHORT_HORIZON_SYNTHETIC_POWER_FEASIBILITY.md"
+  },
+  "controller_authority": {
+    "route_review": "reviews/v0.5/V0.5.5_CONTROLLER_ROUTE_REPLAN_FORWARD_COMPRESSION_AND_H42_R1.md",
+    "route_machine": "evidence/v0.5.5/controller/V0.5.5_ROUTE_REPLAN_FORWARD_COMPRESSION_AND_H42_R1.json"
+  },
+  "required_outputs": [
+    "reviews/v0.5/V0.5.5_FORWARD_R1_1_SHORT_HORIZON_SYNTHETIC_POWER_FEASIBILITY.md",
+    "evidence/v0.5.5/h41/V0.5.5_FORWARD_R1_1_SHORT_HORIZON_SYNTHETIC_POWER_FEASIBILITY.json"
+  ],
+  "execution_rules": {
+    "start_gate": "Checked-out feature/a1-forward-compression-trial1-v055 HEAD MUST equal e0d9624350c3dae048c6f4ceea51c62e5a641290.",
+    "code_gate": "origin/v0.5.5 MUST equal 8ecff4ec4b25bf73a35309689fd3ecfacc0d3399.",
+    "push_only_to_target_feature_branch": true,
+    "no_direct_push_to_v0_5_5_docs": true,
+    "no_protected_outcome_access": true,
+    "no_production_code_change_unless_prompt_explicitly_allows": false
+  },
+  "final_instruction": "Use CONTROLLER_DISPATCH_SHA exactly. Do not substitute a later v0.5.5-docs HEAD. If the target feature branch moves before execution begins, stop and request a new dispatch."
+}
