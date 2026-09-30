@@ -1,0 +1,69 @@
+{
+  "schema_id": "V0.5.5_H41_SUCCESSOR_EXPOSURE_REPAIR_SUPERVISORY_DISPOSITION_R1",
+  "repository": "EXASHXE/btc-quant-agent-public",
+  "controller_role": "CHATGPT_0_PRIMARY_CONTROLLER_AND_REVIEWER",
+  "stage": "CONTROLLER_EXPOSURE_REPAIR",
+  "disposition": "ACCEPT_WITH_BINDING_MODIFICATIONS",
+  "code_authority": {
+    "branch": "v0.5.5",
+    "sha": "8ecff4ec4b25bf73a35309689fd3ecfacc0d3399"
+  },
+  "docs_authority_before_correction": {
+    "branch": "v0.5.5-docs",
+    "sha": "54853135f733581cd55c1c8c77f6ee43ea8b6e80"
+  },
+  "supervisory_findings": {
+    "high_1": {
+      "disposition": "ACCEPT",
+      "binding_change": "PROVENANCE_AUTHORITY_AVAILABILITY_CHECK before broad reconstruction"
+    },
+    "high_2": {
+      "disposition": "ACCEPT_WITH_PRECISION",
+      "binding_change": "contamination limited to candidate/hypothesis-family-aligned materially equivalent outcome exposure reaching principals with successor scientific change rights"
+    },
+    "high_3": {
+      "disposition": "ACCEPT",
+      "binding_change": "mandatory candidate_family_relation classification EXACT|SUBSTANTIALLY_EQUIVALENT|RELATED_BUT_NON_ALIGNED|UNRELATED|UNKNOWN"
+    },
+    "concern": {
+      "disposition": "ACCEPT",
+      "binding_change": "one bounded repair pass and compressed post-hybrid pre-freeze package"
+    },
+    "blockers": "NONE_AT_CURRENT_LIFECYCLE_STATE"
+  },
+  "bounded_repair": {
+    "exposure_repair_max_iterations": 1,
+    "recursive_repair_without_new_authority": false,
+    "early_stop_rule": "If material private/local provenance remains unavailable, no materially new affirmative provenance source exists, and unresolved evidence is required for every otherwise calendar-feasible D/V window, emit REPAIR_INCOMPLETE_FAIL_CLOSED and stop."
+  },
+  "month_certification_standard": {
+    "universal_zero_information_exposure_required": false,
+    "candidate_aligned_materiality_required": true,
+    "material_unknowns_must_be_empty_for_certification": true,
+    "non_material_unknowns_recorded_not_automatic_contamination": true
+  },
+  "route_after_single_pass": {
+    "REPAIR_SUPPORTS_HYBRID_DESIGN_REVIEW": "H41_SUCCESSOR_HYBRID_R1_2_PRE_FREEZE_PACKAGE",
+    "REPAIR_PROVES_HISTORICAL_CAPACITY_INSUFFICIENT": "H41_SUCCESSOR_FORWARD_R1_1_REAUDIT",
+    "REPAIR_INCOMPLETE_FAIL_CLOSED": "H41_SUCCESSOR_FORWARD_R1_1_REAUDIT_IF_MISSING_AUTHORITY_NOT_PRACTICALLY_RECOVERABLE"
+  },
+  "corrected_prompt": {
+    "path": "prompts/v0.5/design/v0.5.1_H41_SUCCESSOR_CONTROLLER_EXPOSURE_REPAIR_R1.md",
+    "update_commit": "ab752a8dfaf1d9cca39c54e87acc5e4e9d666b7c",
+    "blob_sha": "5076e7f570c9833a7c782c7b5679d336af548ff7"
+  },
+  "controller_review": {
+    "path": "reviews/v0.5/V0.5.5_H41_SUCCESSOR_EXPOSURE_REPAIR_CHATGPT0_DISPOSITION_R1.md",
+    "commit": "3ace8c37d38ad74fe1c8762c96b2b50646a10484"
+  },
+  "preserved_fences": {
+    "h41_terminal_state": "ACCEPTED_TERMINAL_NO_GO",
+    "h41_wf1_validation_sealed": true,
+    "h39_protected_results_sealed": true,
+    "successor_discovery_authorized": false,
+    "successor_validation_authorized": false,
+    "production_code_change_authorized": false,
+    "h0_source_rerun_authorized": false
+  },
+  "next_action": "BIND_CORRECTED_PROMPT_TO_LIVE_V0_5_5_DOCS_HEAD_AND_EXECUTE_ONE_BOUNDED_REPAIR_PASS"
+}
