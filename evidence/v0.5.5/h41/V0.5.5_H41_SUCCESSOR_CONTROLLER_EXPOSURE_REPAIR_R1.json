@@ -1,0 +1,1974 @@
+{
+  "schema_id": "V0.5.5_H41_SUCCESSOR_CONTROLLER_EXPOSURE_REPAIR_R1",
+  "repository": "EXASHXE/btc-quant-agent-public",
+  "authority_namespace": "v0.5.5",
+  "execution_class": "EXPOSURE_PROVENANCE_REPAIR_ONLY / NO_PROTECTED_OUTCOME_ACCESS / NO_PRODUCTION_CHANGE",
+  "docs_start_sha": "20334839173dee20aa4dd417d960573d9ddc7707",
+  "CONTROLLER_DISPATCH_SHA": "20334839173dee20aa4dd417d960573d9ddc7707",
+  "accepted_code_sha": "8ecff4ec4b25bf73a35309689fd3ecfacc0d3399",
+  "target_docs_branch": "v0.5.5-docs",
+  "target_code_branch": "v0.5.5",
+  "EXPOSURE_REPAIR_MAX_ITERATIONS": 1,
+  "exposure_repair_iteration": 1,
+  "start_gate_receipt": {
+    "pwd": "/tmp/h41-exposure-repair-v055-r1",
+    "branch": "v0.5.5-docs",
+    "HEAD": "20334839173dee20aa4dd417d960573d9ddc7707",
+    "clean_worktree": true,
+    "runtime_import_path": "NOT_APPLICABLE; no package/candidate imports or execution",
+    "Quant-agent-sanitized_used": false
+  },
+  "code_start_gate": {
+    "observed_sha": "8ecff4ec4b25bf73a35309689fd3ecfacc0d3399",
+    "matches_accepted_sha": true,
+    "evidence": "Live GitHub branch read before repair"
+  },
+  "H0_source_evidence_hashes": {
+    "original_execution_commit": "248f00f88d5bb659d80db658ff9bf6d55402a329",
+    "report": {
+      "path": "reviews/v0.5/V0.5.1_H41_SUCCESSOR_HYBRID_HOLDOUT_FEASIBILITY_AND_EXPOSURE_R1.md",
+      "git_blob": "22e25a92c0671eb439ff0ec18eb3ba28e0968dcc",
+      "sha256": "20df77b1b8b7906e1cb9c1bc39247292524cd93edd80715166f95cf1f619e428"
+    },
+    "machine_evidence": {
+      "path": "evidence/v0.5/h41/V0.5.1_H41_SUCCESSOR_HYBRID_HOLDOUT_FEASIBILITY_AND_EXPOSURE_R1.json",
+      "git_blob": "9aacbb0fecf992db5e6216560c77fc0f88c555c2",
+      "sha256": "b1bd092014e2f0e40cf0d560428305c14eb2766a4187dd5a5585a6f05620a9d4"
+    },
+    "migration_acceptance": {
+      "path": "evidence/v0.5.5/controller/V0.5.5_H41_SUCCESSOR_H0_LEGACY_EXECUTION_MIGRATION_ACCEPTANCE_R1.json",
+      "commit": "20334839173dee20aa4dd417d960573d9ddc7707",
+      "blob": "a024c23d639a70bc8c64073b8817d372eb867774",
+      "last_change_commit": "99a02c3c4f9e6cd9c40a93f60e6dd689ef62d7d3",
+      "last_change_timestamp": "2026-09-30T14:45:56+08:00",
+      "evidence_type": "GOVERNANCE_OR_EXACT_SHA_ACCEPTANCE_METADATA",
+      "materially_new_exposure_authority": false,
+      "protected_content_opened": false
+    },
+    "byte_identity_verified": true,
+    "immutable_predecessor_rewritten": false,
+    "source_audit_rerun": false,
+    "source_snapshot_available_through": "2026-08",
+    "source_capable_month_count": 40,
+    "source_capture_utc": "2026-09-30T03:39:51.040520Z"
+  },
+  "provenance_authority_availability_classification": {
+    "repository_history_new_evidence": "NO",
+    "local_runtime_metadata_available": "NO",
+    "historical_result_store_metadata_available": "NO",
+    "alert_export_history_available": "NO",
+    "access_or_audit_logs_available": "NO",
+    "role_or_human_attestation_available": "NO",
+    "other_new_provenance_authority": "NO"
+  },
+  "availability_field_semantics": "YES means materially useful new authority, or target-store/log/attestation access capable of closing an H0 uncertainty; newly copied H0 records and prospective role rules are not historical exposure evidence",
+  "provenance_authority_state": "NO_NEW_PROVENANCE_AUTHORITY",
+  "concrete_new_material_provenance_sources": [],
+  "new_non_material_governance_sources": [
+    {
+      "path": "evidence/v0.5.5/controller/V0.5.5_H41_SUCCESSOR_EXPOSURE_REPAIR_SUPERVISORY_DISPOSITION_R1.json",
+      "commit": "20334839173dee20aa4dd417d960573d9ddc7707",
+      "blob": "46d518e8669d418902b5f0459c0a6dab22ddee7f",
+      "last_change_commit": "20334839173dee20aa4dd417d960573d9ddc7707",
+      "last_change_timestamp": "2026-09-30T15:28:26+08:00",
+      "evidence_type": "GOVERNANCE_OR_EXACT_SHA_ACCEPTANCE_METADATA",
+      "materially_new_exposure_authority": false,
+      "protected_content_opened": false
+    },
+    {
+      "path": "evidence/v0.5.5/controller/V0.5.5_H41_SUCCESSOR_H0_LEGACY_EXECUTION_MIGRATION_ACCEPTANCE_R1.json",
+      "commit": "20334839173dee20aa4dd417d960573d9ddc7707",
+      "blob": "a024c23d639a70bc8c64073b8817d372eb867774",
+      "last_change_commit": "99a02c3c4f9e6cd9c40a93f60e6dd689ef62d7d3",
+      "last_change_timestamp": "2026-09-30T14:45:56+08:00",
+      "evidence_type": "GOVERNANCE_OR_EXACT_SHA_ACCEPTANCE_METADATA",
+      "materially_new_exposure_authority": false,
+      "protected_content_opened": false
+    },
+    {
+      "path": "reviews/v0.5/V0.5.5_H41_SUCCESSOR_EXPOSURE_REPAIR_CHATGPT0_DISPOSITION_R1.md",
+      "commit": "20334839173dee20aa4dd417d960573d9ddc7707",
+      "blob": "611f872e742300d3ab3332b89984cde1607845a8",
+      "last_change_commit": "3ace8c37d38ad74fe1c8762c96b2b50646a10484",
+      "last_change_timestamp": "2026-09-30T15:08:11+08:00",
+      "evidence_type": "GOVERNANCE_OR_EXACT_SHA_ACCEPTANCE_METADATA",
+      "materially_new_exposure_authority": false,
+      "protected_content_opened": false
+    },
+    {
+      "path": "docs/roles/V0.5.5_CHATGPT_0_PRIMARY_CONTROLLER.md",
+      "commit": "20334839173dee20aa4dd417d960573d9ddc7707",
+      "blob": "9ae8831ae2afd2326f5ec414a2d34a90ce20cf2c",
+      "last_change_commit": "b62e5f5876b96427ef62b254c69233abb2704fdb",
+      "last_change_timestamp": "2026-09-30T15:19:48+08:00",
+      "evidence_type": "GOVERNANCE_OR_EXACT_SHA_ACCEPTANCE_METADATA",
+      "materially_new_exposure_authority": false,
+      "protected_content_opened": false
+    },
+    {
+      "path": "docs/roles/V0.5.5_CHATGPT_1_SUPERVISORY_AUDITOR.md",
+      "commit": "20334839173dee20aa4dd417d960573d9ddc7707",
+      "blob": "8679de565cfc80c55734bd7490ae97acc2b4f4b0",
+      "last_change_commit": "3851002a5e9fdc12b567860ee1ca2b91980658c0",
+      "last_change_timestamp": "2026-09-30T15:07:39+08:00",
+      "evidence_type": "GOVERNANCE_OR_EXACT_SHA_ACCEPTANCE_METADATA",
+      "materially_new_exposure_authority": false,
+      "protected_content_opened": false
+    },
+    {
+      "path": "reviews/v0.5/tactical-policy/V0.5.5_B2A_R2_CONTROLLER_EXACT_SHA_REVIEW.md",
+      "commit": "20334839173dee20aa4dd417d960573d9ddc7707",
+      "blob": "4b5b12a87186f9cb1c67863b5694ade69f5c52a9",
+      "last_change_commit": "981899f91906c543a6b687fa75912ea5baf75183",
+      "last_change_timestamp": "2026-09-30T15:11:26+08:00",
+      "evidence_type": "GOVERNANCE_OR_EXACT_SHA_ACCEPTANCE_METADATA",
+      "materially_new_exposure_authority": false,
+      "protected_content_opened": false
+    },
+    {
+      "path": "prompts/v0.5/design/v0.5.5_H41_SUCCESSOR_CONTROLLER_EXPOSURE_REPAIR_R1.md",
+      "commit": "20334839173dee20aa4dd417d960573d9ddc7707",
+      "blob": "f457d7f605b5f2feefc10e4370967bbeb9281cc0",
+      "last_change_commit": "1872c71f338698cf14ef6b7f34ac9157d2d8d7fd",
+      "last_change_timestamp": "2026-09-30T15:27:48+08:00",
+      "evidence_type": "GOVERNANCE_OR_EXACT_SHA_ACCEPTANCE_METADATA",
+      "materially_new_exposure_authority": false,
+      "protected_content_opened": false
+    }
+  ],
+  "changes_since_H0_evidence_migration": [
+    "A\tdocs/governance/V0.5.5_B_LINE_GEMINI_EXECUTION_STANDARD.md",
+    "M\tdocs/handover/V0.5.1_TACTICAL_POLICY_B_LINE_HANDOVER_2026-09-28.md",
+    "M\tdocs/project/V0.5.5_PROJECT_STATUS_AND_ROADMAP.md",
+    "M\tdocs/roles/V0.5.5_CHATGPT_0_PRIMARY_CONTROLLER.md",
+    "M\tdocs/roles/V0.5.5_CHATGPT_1_SUPERVISORY_AUDITOR.md",
+    "A\tevidence/v0.5.5/controller/V0.5.5_H41_SUCCESSOR_EXPOSURE_REPAIR_SUPERVISORY_DISPOSITION_R1.json",
+    "A\tevidence/v0.5.5/controller/V0.5.5_H41_SUCCESSOR_H0_LEGACY_EXECUTION_MIGRATION_ACCEPTANCE_R1.json",
+    "A\tprompts/v0.5/design/v0.5.1_H41_SUCCESSOR_CONTROLLER_EXPOSURE_REPAIR_R1.md",
+    "A\tprompts/v0.5/design/v0.5.5_H41_SUCCESSOR_CONTROLLER_EXPOSURE_REPAIR_R1.md",
+    "A\tprompts/v0.5/validation/v0.5.5_B2A_R2_EXACT_SHA_REVALIDATION_AND_AUTHORITY_REPAIR.md",
+    "A\treviews/v0.5/V0.5.5_H41_SUCCESSOR_EXPOSURE_REPAIR_CHATGPT0_DISPOSITION_R1.md",
+    "A\treviews/v0.5/tactical-policy/V0.5.5_B2A_R2_CONTROLLER_EXACT_SHA_REVIEW.md"
+  ],
+  "repository_comparison_baseline": "900696394f5ad4b887864ced17606577c360152d (H0 evidence migration commit; identical bound blob)",
+  "availability_check": {
+    "completed_before_broad_reconstruction": true,
+    "broad_reconstruction_started": false,
+    "target_runtime_available": false,
+    "isolated_checkout_runtime_directories": "data/runtime/logs/exports/alerts/cache/results/notebooks absent; no inference of target cleanliness",
+    "accessible_custody": "Public Git snapshot and executor-created scratch; no target runtime or private historical disclosure store supplied"
+  },
+  "provenance_surfaces_inspected": [
+    "Dispatch/code live refs and isolated checkout identity",
+    "H0 blob identity and permitted metadata projections",
+    "Changes since H0 migration (names/history only)",
+    "New Controller migration/supervisory/disposition governance",
+    "Current Controller/auditor role-policy excerpts",
+    "B2A exact-SHA review provenance/governance excerpts",
+    "Presence metadata for isolated checkout runtime-store categories only"
+  ],
+  "unavailable_provenance_surfaces": [
+    {
+      "id": "TARGET_RUNTIME_RESULT_CUSTODY",
+      "identity": "Deployment-host result databases, Parquet/JSON results, experiment manifests and caches; actual host/path not supplied",
+      "coverage": "Historical evaluated intervals in 2023-05 through 2026-08; exact actual-use coverage unresolved",
+      "custodian": "Target deployment/operator, not the isolated public Git checkout",
+      "why_needed": "Resolve candidate-expression identities, evaluated intervals and custody for already known symbolic/development outputs",
+      "materiality": "Only for known potentially aligned output routes; unrelated stores alone are not contamination"
+    },
+    {
+      "id": "TARGET_ACCESS_AUDIT_LOGS",
+      "identity": "Historical file/API/notebook/export access or disclosure logs linking candidate outputs to successor change-rights principals",
+      "coverage": "Actual creation/disclosure dates and historical evaluation periods unresolved",
+      "custodian": "Controller/executors/auditors/operator systems; no access-log custody path supplied",
+      "why_needed": "Resolve actual accessibility/disclosure and recipient/change-rights routes for the known candidate-search artifacts",
+      "materiality": "Potentially material candidate-output route, not generic market observation"
+    },
+    {
+      "id": "ALIGNED_EXPORT_REPORT_ALERT_HISTORY",
+      "identity": "Copies/exports of known A-line candidate/search results and any materially equivalent B-line shadow reports; delivery/channel endpoints not supplied",
+      "coverage": "Only candidate/hypothesis-family aligned historical disclosures are material; actual coverage unresolved",
+      "custodian": "Report/alert delivery and export custodians; no authorized target service supplied",
+      "why_needed": "Close onward disclosure of aligned outputs; generic operational alerts are non-material residuals",
+      "materiality": "Conditional on candidate-family equivalence and influence route; no generic alert contamination claim"
+    },
+    {
+      "id": "HISTORICAL_ROLE_AND_HUMAN_ATTESTATIONS",
+      "identity": "Dated principal/change-rights mapping and access/custody attestations for Controller, scientific executors/auditors and B-line operators",
+      "coverage": "Historical periods, evaluation dates and subsequent pre-freeze design access",
+      "custodian": "Controller and relevant humans/service owners",
+      "why_needed": "Current role policies do not attest which historical candidate outputs reached which design-rights principals",
+      "materiality": "Needed for known potentially aligned result-to-design routes, not a universal information-exposure negative"
+    }
+  ],
+  "candidate_family_relation_classifications": [
+    {
+      "id": "A_LINE_SYMBOLIC_CANDIDATE_SEARCH",
+      "family": "Registered symbolic candidate-expression search on native BTCUSDT hourly economics",
+      "candidate_family_relation": "UNKNOWN",
+      "materiality": "POTENTIALLY_MATERIAL_KNOWN_ROUTE_NOT_CLOSED",
+      "basis": "Known candidate-search/result identities and explicit Discovery/Validation/pseudo-forward scopes exist. Search-expression identity, conditioning and endpoint equivalence to the successor must be resolved; shared crypto prices alone would not suffice.",
+      "intervals": [
+        "[2021-01-01T00:00:00Z, 2024-01-01T00:00:00Z)",
+        "[2024-02-01T00:00:00Z, 2025-01-01T00:00:00Z)",
+        "[2025-02-01T00:00:00Z, 2026-02-01T00:00:00Z)"
+      ],
+      "artifacts": [
+        {
+          "path": "deliverables/v0.3.18/SYMBOLIC_SEARCH_AUDIT.json",
+          "git_blob": "4c265276939ffbebe1c1127b1181072814454158",
+          "content_access": "NOT_OPENED_FOR_INVENTORY"
+        },
+        {
+          "path": "deliverables/v0.3.18/V0.3.18_NUMERIC_ANSWERS.json",
+          "git_blob": "7f9fb91c4b06bceaa2c27952130943af9de3682e",
+          "content_access": "NOT_OPENED_FOR_INVENTORY"
+        },
+        {
+          "path": "deliverables/v0.3.18/V0.3.18_RECOMMENDATION.md",
+          "git_blob": "0b233e8a1ad90c5b5239b82dcf66239a031d42af",
+          "content_access": "NOT_OPENED_FOR_INVENTORY"
+        },
+        {
+          "path": "deliverables/v0.3.19/SYMBOLIC_SEARCH_AUDIT.json",
+          "git_blob": "9be3aea7d76da16b3d10ac82dfa43b6e5556cfde",
+          "content_access": "NOT_OPENED_FOR_INVENTORY"
+        },
+        {
+          "path": "deliverables/v0.3.19/V0.3.19_NUMERIC_ANSWERS.json",
+          "git_blob": "35bbc0451cd2f6dc8926d634ba410ad951f509fa",
+          "content_access": "NOT_OPENED_FOR_INVENTORY"
+        },
+        {
+          "path": "deliverables/v0.3.19/V0.3.19_RECOMMENDATION.md",
+          "git_blob": "0e97b6d79856cc937a384645da682065b912d01b",
+          "content_access": "NOT_OPENED_FOR_INVENTORY"
+        }
+      ],
+      "current_scientific_change_rights_route": "Repository-accessible scientific output artifacts could be available to the current Controller before successor freeze; historical recipient/access and specific expression equivalence are not attested",
+      "blocking": true
+    },
+    {
+      "id": "H40_DIRECTIONAL_CANDIDATE_FAMILY",
+      "family": "H40 registered medium-horizon directional configurations",
+      "candidate_family_relation": "UNKNOWN",
+      "materiality": "POTENTIAL_ALIGNMENT_ONLY; NOT_AN_INDEPENDENT_CONTAMINATION_FINDING",
+      "basis": "H0 documents actual run access only to WF1 Train/Calibration. Later folds are planned membership, not execution. Detailed equation/endpoint equivalence and any other disclosure are unresolved; that documented run alone does not contaminate extension months.",
+      "intervals": [
+        "Documented actual WF1_CALIBRATION ends 2023-01-31; later planned fold/Confirmation metadata retained in H0"
+      ],
+      "artifacts": [
+        {
+          "id": "h40_prereg",
+          "path": "reviews/v0.5/V0.5.1_H40_SELECTIVE_MEDIUM_HORIZON_DIRECTIONAL_EDGE_PREREGISTRATION.md",
+          "ref": "9a8b7d467b91b2c353e465d8c93d58f527e55086",
+          "git_blob": "0e3d8caa3465fc8bf1838972f9943b122d46f8d0",
+          "access_scope": "SOURCE_PROTOCOL_OR_WHITELISTED_EXPOSURE_METADATA_ONLY"
+        },
+        {
+          "id": "h40_actual",
+          "path": "reviews/v0.5/V0.5.1_H40_M3B_FIRST_REAL_DISCOVERY_REPORT.md",
+          "ref": "9a8b7d467b91b2c353e465d8c93d58f527e55086",
+          "git_blob": "c4022ca8369f9f1e4c38e9d0bb33d44ba3daa731",
+          "access_scope": "SOURCE_PROTOCOL_OR_WHITELISTED_EXPOSURE_METADATA_ONLY"
+        }
+      ],
+      "blocking": false
+    },
+    {
+      "id": "H41_PREDECESSOR",
+      "family": "Frozen H41 predecessor candidate universe and exploratory Calibration",
+      "candidate_family_relation": "UNKNOWN",
+      "materiality": "NON_MATERIAL_TO_EXTENSION_BY_KNOWN_DOCUMENTED_INTERVAL",
+      "basis": "Its documented outcome-access interval ends in January 2023, outside the May 2023 extension. WF1_VALIDATION remains sealed. Neither family similarity nor shared OHLCV proves extension contamination.",
+      "intervals": [
+        "WF1_CALIBRATION [2022-11-01,2023-01-31); WF1_VALIDATION protected [2023-02-01,2023-04-30)"
+      ],
+      "artifacts": [
+        {
+          "id": "h41_actual",
+          "path": "reviews/v0.5/V0.5.1_H41_WF1_CALIBRATION_EXPLORATORY_DISCOVERY_R1_1.md",
+          "ref": "9a8b7d467b91b2c353e465d8c93d58f527e55086",
+          "git_blob": "09c9ee20c0e9ec083d2f306a840bdc0dfa80ce8e",
+          "access_scope": "SOURCE_PROTOCOL_OR_WHITELISTED_EXPOSURE_METADATA_ONLY"
+        },
+        {
+          "id": "h41_protocol",
+          "path": "evidence/v0.5/h41/V0.5.1_H41_FROZEN_PROTOCOL_AUTHORITY_R1.json",
+          "ref": "9a8b7d467b91b2c353e465d8c93d58f527e55086",
+          "git_blob": "be4efa39311d87f9e63c539883fd3acc070dff44",
+          "access_scope": "SOURCE_PROTOCOL_OR_WHITELISTED_EXPOSURE_METADATA_ONLY"
+        }
+      ],
+      "blocking": false
+    },
+    {
+      "id": "RUN0_DEVELOPMENT",
+      "family": "run0 frozen development strategy; equation/endpoint identity not established in H0 permitted metadata",
+      "candidate_family_relation": "UNKNOWN",
+      "materiality": "NOT_ESTABLISHED; EXISTENCE_OR_DATASET_COVERAGE_ALONE_NON_MATERIAL",
+      "basis": "Dataset through July 2026 and development result filenames do not establish evaluation of every month or successor-family equivalence. No contamination inferred from a result-store name.",
+      "intervals": [
+        "2021-01-01T00:00:00Z to 2026-08-01T00:00:00Z (dataset only)"
+      ],
+      "artifacts": [
+        {
+          "path": "artifacts/research/run0-dev-frozen-v022-seed7-20260825/decision_samples.json",
+          "git_blob": "fa4807425b2eb4567466b75a8b6c07442b07203f",
+          "content_access": "NOT_OPENED_FOR_INVENTORY"
+        },
+        {
+          "path": "artifacts/research/run0-dev-frozen-v022-seed7-20260825/equity_curve.csv",
+          "git_blob": "1bc17e64a834209cd5204ef94f31acd33a9224fa",
+          "content_access": "NOT_OPENED_FOR_INVENTORY"
+        },
+        {
+          "path": "artifacts/research/run0-dev-frozen-v022-seed7-20260825/research_report.json",
+          "git_blob": "512980d5f6d23fe1a2c4b23c8cd28482e9308d11",
+          "content_access": "NOT_OPENED_FOR_INVENTORY"
+        },
+        {
+          "path": "artifacts/research/run0-dev-frozen-v022-seed7-20260825/research_report.md",
+          "git_blob": "664a69c1cee0ab813fc730882b711d17138576fd",
+          "content_access": "NOT_OPENED_FOR_INVENTORY"
+        },
+        {
+          "path": "artifacts/research/run0-dev-frozen-v022-seed7-20260825/trades.parquet",
+          "git_blob": "e3ffe269fba72350e5cbb64204d0d8e973428b9d",
+          "content_access": "NOT_OPENED_FOR_INVENTORY"
+        }
+      ],
+      "blocking": false
+    },
+    {
+      "id": "H35",
+      "family": "Opportunity forward campaign; family identity unresolved",
+      "candidate_family_relation": "UNKNOWN",
+      "materiality": "NOT_ESTABLISHED; CAMPAIGN_STATUS_ALONE_NON_MATERIAL",
+      "basis": "Known campaign begins August 31, 2026. Data-quality/collection state is not performance disclosure or equivalence proof.",
+      "intervals": [
+        "2026-08-31 onward; actual candidate-outcome coverage unknown"
+      ],
+      "artifacts": [
+        {
+          "path": "deliverables/v0.3.17/OPPORTUNITY_H35_ARCHIVE_AUDIT.json",
+          "git_blob": "0ae4d24fefd324c3295ac7ef17d3a4c2e1bed3cd",
+          "safe_metadata": {
+            "campaign_id": "OPPORTUNITY_FORWARD_V0313_20260831T050656Z",
+            "formal_role": "DATA_QUALITY_AT_RISK_ARCHIVE",
+            "data_quality_state": "H35_DATA_QUALITY_AT_RISK",
+            "validated_evidence": false,
+            "superseded_by": "OPPORTUNITY_FORWARD_V0317_20260901T160000Z"
+          }
+        }
+      ],
+      "blocking": false
+    },
+    {
+      "id": "H36",
+      "family": "Successor opportunity forward campaign",
+      "candidate_family_relation": "UNKNOWN",
+      "materiality": "NON_MATERIAL_TO_COMPLETED_EXTENSION_BY_KNOWN_START",
+      "basis": "Known campaign starts September 1, 2026 at 16:00Z, after the H0 completed-month extension.",
+      "intervals": [
+        "2026-09-01T16:00:00Z onward"
+      ],
+      "artifacts": [
+        {
+          "path": "deliverables/v0.3.17/OPPORTUNITY_H36_SUCCESSOR_STATUS.json",
+          "git_blob": "aa80ab41f2c1c1b77ec7ce7d078f656392e23c4d",
+          "safe_metadata": {
+            "campaign_id": "OPPORTUNITY_FORWARD_V0317_20260901T160000Z",
+            "start_utc": "2026-09-01T16:00:00Z",
+            "state": "FORWARD_CAMPAIGN_ACCUMULATING",
+            "data_quality_state": "ACTIVE_ACCUMULATING"
+          }
+        }
+      ],
+      "blocking": false
+    },
+    {
+      "id": "H39",
+      "family": "Microstructure forward blind campaign plus separately unresolved development diagnostics",
+      "candidate_family_relation": "UNKNOWN",
+      "materiality": "NON_MATERIAL_FORWARD_SUBSET; DEVELOPMENT_INTERVAL_AND_EQUIVALENCE_UNESTABLISHED",
+      "basis": "H0 permitted metadata identifies the September 2026 fresh forward partition, which excludes only that forward subset from the extension. H0 also inventories H39_DEVELOPMENT_DIAGNOSTICS.json; its evaluated interval and successor-family equivalence are unestablished. Neither this diagnostic filename nor forward start proves development cleanliness, contamination or an additional material blocking route. Protected ledger/result and development result contents remain excluded.",
+      "intervals": [
+        "Forward subset: microstructure-2026-09-04.sqlite3; exclusion metadata 2026-09-01 to 2026-09-04",
+        "Development diagnostic evaluated/disclosed interval unknown"
+      ],
+      "artifacts": [
+        {
+          "path": "deliverables/v0.3.22/H39_PROTOCOL_FREEZE_MANIFEST.json",
+          "git_blob": "f1cc8b6438390733abcf10081f0a8ba4a5f4612b",
+          "safe_metadata": {
+            "artifact_type": "protocol freeze manifest; only presence/schema checked",
+            "exposure_note": "H39 protocol/development lineage exists; contents beyond non-outcome metadata not read"
+          }
+        },
+        {
+          "path": "deliverables/v0.3.22/H39_VALIDATION_STATUS.json",
+          "git_blob": "a121188e1447460d31bf051ef77d5f9e0e92318a",
+          "safe_metadata": {
+            "status": "FORWARD_DATA_INSUFFICIENT",
+            "exclusion_buffer": {
+              "start_utc": "2026-09-01T00:00:00Z",
+              "end_utc": "2026-09-04T11:15:00Z"
+            },
+            "fresh_partition": "microstructure-2026-09-04.sqlite3"
+          }
+        },
+        {
+          "path": "deliverables/v0.3.23/H39_BLINDNESS_ATTESTATION.json",
+          "git_blob": "c3899b19326fbfd2eac0d310de4ca62074c34e85",
+          "safe_metadata": {
+            "schema_version": "1.0.0",
+            "note": "Attestation contents were not inspected beyond schema-level metadata; cannot assert historical cleanliness."
+          }
+        },
+        {
+          "path": "deliverables/v0.3.23/H39_BLIND_VALIDATION_LEDGER_MANIFEST.json",
+          "git_blob": "5aff3c41970516eeae1576a2009da79884498969",
+          "safe_metadata": {
+            "summary.state": "FORWARD_DATA_INSUFFICIENT",
+            "note": "ledger contents excluded"
+          }
+        },
+        {
+          "path": "deliverables/v0.3.23/H39_BLIND_VALIDATION_STATUS.json",
+          "git_blob": "cbf141426fc2ba3da3bc71be8ff15eefcd6216b8",
+          "safe_metadata": {
+            "state": "FORWARD_DATA_INSUFFICIENT"
+          }
+        },
+        {
+          "path": "deliverables/v0.3.24/H39_BLIND_OPERATIONAL_STATUS.json",
+          "git_blob": "c7947f7542a96d31b2751e42d54c35766ba5cc66",
+          "safe_metadata": {
+            "state": "FORWARD_DATA_INSUFFICIENT"
+          }
+        },
+        {
+          "path": "deliverables/v0.3.25/H39_UNBLIND_PREREGISTRATION_MANIFEST.json",
+          "git_blob": "ab1863e90498d8b5751d86513165340e12932459",
+          "safe_metadata": {
+            "secondary_horizon.role": "SUPPORTING_ONLY",
+            "note": "manifest preregistration exists; no protected results accessed"
+          }
+        },
+        {
+          "path": "deliverables/v0.3.22/H39_DEVELOPMENT_DIAGNOSTICS.json",
+          "git_blob": "67449b5b98ca78c6ec1d9e1ea3f52c47bb844267",
+          "content_access": "NOT_OPENED_FOR_INVENTORY"
+        }
+      ],
+      "blocking": false
+    },
+    {
+      "id": "B_LINE_TACTICAL_SHADOW",
+      "family": "B0/B1/B2A operational directional policy and shadow outcome authority",
+      "candidate_family_relation": "UNKNOWN",
+      "materiality": "NOT_ESTABLISHED; ENGINEERING_AUTHORITY_NOT_PERFORMANCE_DISCLOSURE",
+      "basis": "H0 status fields and the new exact-SHA hold/revalidation review provide engineering/governance identities, not historical candidate-aligned outcomes or disclosure attestations.",
+      "intervals": [
+        "Historical evaluated interval not established; September 30 governance changes are prospective"
+      ],
+      "artifacts": [
+        {
+          "path": "evidence/v0.5/tactical-policy/V0.5.1_B0_TACTICAL_POLICY_R2_EVIDENCE.json",
+          "git_blob": "6eec0a4c7c749369ff6978067f952b322a41a779",
+          "safe_metadata": {
+            "status": "IMPLEMENTED_PENDING_CONTROLLER"
+          }
+        },
+        {
+          "path": "evidence/v0.5/tactical-policy/V0.5.1_B1_TACTICAL_FEATURE_EVIDENCE_V2_EVIDENCE.json",
+          "git_blob": "af07afed1a20801b0b3523187dd1064ff7640423",
+          "safe_metadata": {
+            "status": "B1_R2_IMPLEMENTED_PENDING_CONTROLLER"
+          }
+        },
+        {
+          "path": "evidence/v0.5/tactical-policy/V0.5.1_B2A_DIRECTIONAL_SHADOW_EVALUATION_V2_EVIDENCE.json",
+          "git_blob": "e7ec4545090ba5edae6ac02b72b72c1faf3b25bd",
+          "safe_metadata": {
+            "status": "TACTICAL_POLICY_R2_B2A_R2_DIRECTIONAL_OUTCOME_AUTHORITY_READY_FOR_CONTROLLER"
+          }
+        }
+      ],
+      "blocking": false
+    },
+    {
+      "id": "MARKETWATCH_OPERATIONAL_DESIGN",
+      "family": "Stateful multi-timeframe operational/advisory playbooks, grids and shadow telemetry",
+      "candidate_family_relation": "RELATED_BUT_NON_ALIGNED",
+      "materiality": "NON_MATERIAL_DESIGN_AND_GENERIC_ALERT_SURFACE",
+      "basis": "H0 documents distinct operational/advisory purpose and multi-timeframe policy design. This classification covers that design/generic-alert surface only, not any undisclosed materially equivalent outcome export.",
+      "intervals": [
+        "Historical shadow result/disclosure interval not established"
+      ],
+      "artifacts": [
+        {
+          "ref": "d9e509ad0c3cabbfd0bd0b474e3f9be63f5133dc",
+          "path": "docs/MARKET_WATCH_FEISHU.md",
+          "git_blob": "0b5130f7a34ec4ccd3edec337a5e51d71024b04c",
+          "governance_class": "EXPERIMENTAL_OPERATIONAL_MARKET_WATCH",
+          "shadow_storage": true,
+          "month_specific_access_provenance": "UNRESOLVED"
+        }
+      ],
+      "blocking": false
+    }
+  ],
+  "candidate_family_relation_summary": {
+    "counts": {
+      "EXACT": 0,
+      "SUBSTANTIALLY_EQUIVALENT": 0,
+      "RELATED_BUT_NON_ALIGNED": 1,
+      "UNRELATED": 0,
+      "UNKNOWN": 8
+    },
+    "material_UNKNOWNs": [
+      "A_LINE_SYMBOLIC_CANDIDATE_SEARCH"
+    ],
+    "other_UNKNOWNs_not_automatically_material": true
+  },
+  "repair_ledger": [
+    {
+      "assertion_id": "A_LINE_SYMBOLIC_CANDIDATE_SEARCH",
+      "month_or_interval": [
+        "[2021-01-01T00:00:00Z, 2024-01-01T00:00:00Z)",
+        "[2024-02-01T00:00:00Z, 2025-01-01T00:00:00Z)",
+        "[2025-02-01T00:00:00Z, 2026-02-01T00:00:00Z)"
+      ],
+      "exposure_surface": "Registered symbolic candidate-expression search on native BTCUSDT hourly economics",
+      "artifact_store_log_identity": [
+        {
+          "path": "deliverables/v0.3.18/SYMBOLIC_SEARCH_AUDIT.json",
+          "git_blob": "4c265276939ffbebe1c1127b1181072814454158",
+          "content_access": "NOT_OPENED_FOR_INVENTORY"
+        },
+        {
+          "path": "deliverables/v0.3.18/V0.3.18_NUMERIC_ANSWERS.json",
+          "git_blob": "7f9fb91c4b06bceaa2c27952130943af9de3682e",
+          "content_access": "NOT_OPENED_FOR_INVENTORY"
+        },
+        {
+          "path": "deliverables/v0.3.18/V0.3.18_RECOMMENDATION.md",
+          "git_blob": "0b233e8a1ad90c5b5239b82dcf66239a031d42af",
+          "content_access": "NOT_OPENED_FOR_INVENTORY"
+        },
+        {
+          "path": "deliverables/v0.3.19/SYMBOLIC_SEARCH_AUDIT.json",
+          "git_blob": "9be3aea7d76da16b3d10ac82dfa43b6e5556cfde",
+          "content_access": "NOT_OPENED_FOR_INVENTORY"
+        },
+        {
+          "path": "deliverables/v0.3.19/V0.3.19_NUMERIC_ANSWERS.json",
+          "git_blob": "35bbc0451cd2f6dc8926d634ba410ad951f509fa",
+          "content_access": "NOT_OPENED_FOR_INVENTORY"
+        },
+        {
+          "path": "deliverables/v0.3.19/V0.3.19_RECOMMENDATION.md",
+          "git_blob": "0e97b6d79856cc937a384645da682065b912d01b",
+          "content_access": "NOT_OPENED_FOR_INVENTORY"
+        }
+      ],
+      "git_commit": "9a8b7d467b91b2c353e465d8c93d58f527e55086",
+      "timestamp_range": "Evaluation ranges as declared in inherited metadata; actual creation/disclosure/access timestamps unavailable",
+      "principal_role": "Current Controller has prospective governance/change authority; historical human/service recipients not established",
+      "scientific_change_rights_status": "CURRENT_CONTROLLER_AUTHORITY_DOCUMENTED; HISTORICAL_PRINCIPAL_MAPPING_UNKNOWN",
+      "evidence_type": "IMMUTABLE_H0_METADATA_INHERITED; no new outcome-body access",
+      "classification_implication": "UNKNOWN_FAIL_CLOSED retained; no contamination asserted",
+      "candidate_family_relation": "UNKNOWN",
+      "materiality": "POTENTIALLY_MATERIAL_KNOWN_ROUTE_NOT_CLOSED",
+      "confidence_ambiguity": "Known candidate-search/result identities and explicit Discovery/Validation/pseudo-forward scopes exist. Search-expression identity, conditioning and endpoint equivalence to the successor must be resolved; shared crypto prices alone would not suffice.",
+      "protected_content_intentionally_not_opened": true,
+      "causal_route_questions": {
+        "candidate_or_family_evaluated": "Registered symbolic candidate-expression search on native BTCUSDT hourly economics; exact evaluated equation/endpoint identity is not newly established",
+        "historical_interval_evaluated": [
+          "[2021-01-01T00:00:00Z, 2024-01-01T00:00:00Z)",
+          "[2024-02-01T00:00:00Z, 2025-01-01T00:00:00Z)",
+          "[2025-02-01T00:00:00Z, 2026-02-01T00:00:00Z)"
+        ],
+        "outcome_or_statistic_generated": "Known output/artifact category only; neither protected values nor actual generated statistic/support was inspected",
+        "disclosed_or_accessible": "Repository artifact existence only where named; runtime/onward disclosure unverified",
+        "recipient": "Repository-access principals may include Controller; actual historical recipient mapping unknown",
+        "recipient_successor_scientific_change_rights": "Current Controller policy exists; historical mapping unavailable",
+        "potential_influence_on_current_design": "POTENTIALLY_MATERIAL_KNOWN_ROUTE_NOT_CLOSED; Known candidate-search/result identities and explicit Discovery/Validation/pseudo-forward scopes exist. Search-expression identity, conditioning and endpoint equivalence to the successor must be resolved; shared crypto prices alone would not suffice."
+      }
+    },
+    {
+      "assertion_id": "H40_DIRECTIONAL_CANDIDATE_FAMILY",
+      "month_or_interval": [
+        "Documented actual WF1_CALIBRATION ends 2023-01-31; later planned fold/Confirmation metadata retained in H0"
+      ],
+      "exposure_surface": "H40 registered medium-horizon directional configurations",
+      "artifact_store_log_identity": [
+        {
+          "id": "h40_prereg",
+          "path": "reviews/v0.5/V0.5.1_H40_SELECTIVE_MEDIUM_HORIZON_DIRECTIONAL_EDGE_PREREGISTRATION.md",
+          "ref": "9a8b7d467b91b2c353e465d8c93d58f527e55086",
+          "git_blob": "0e3d8caa3465fc8bf1838972f9943b122d46f8d0",
+          "access_scope": "SOURCE_PROTOCOL_OR_WHITELISTED_EXPOSURE_METADATA_ONLY"
+        },
+        {
+          "id": "h40_actual",
+          "path": "reviews/v0.5/V0.5.1_H40_M3B_FIRST_REAL_DISCOVERY_REPORT.md",
+          "ref": "9a8b7d467b91b2c353e465d8c93d58f527e55086",
+          "git_blob": "c4022ca8369f9f1e4c38e9d0bb33d44ba3daa731",
+          "access_scope": "SOURCE_PROTOCOL_OR_WHITELISTED_EXPOSURE_METADATA_ONLY"
+        }
+      ],
+      "git_commit": "9a8b7d467b91b2c353e465d8c93d58f527e55086",
+      "timestamp_range": "Evaluation ranges as declared in inherited metadata; actual creation/disclosure/access timestamps unavailable",
+      "principal_role": "Current Controller has prospective governance/change authority; historical human/service recipients not established",
+      "scientific_change_rights_status": "CURRENT_CONTROLLER_AUTHORITY_DOCUMENTED; HISTORICAL_PRINCIPAL_MAPPING_UNKNOWN",
+      "evidence_type": "IMMUTABLE_H0_METADATA_INHERITED; no new outcome-body access",
+      "classification_implication": "No automatic contamination or independent blocking inference",
+      "candidate_family_relation": "UNKNOWN",
+      "materiality": "POTENTIAL_ALIGNMENT_ONLY; NOT_AN_INDEPENDENT_CONTAMINATION_FINDING",
+      "confidence_ambiguity": "H0 documents actual run access only to WF1 Train/Calibration. Later folds are planned membership, not execution. Detailed equation/endpoint equivalence and any other disclosure are unresolved; that documented run alone does not contaminate extension months.",
+      "protected_content_intentionally_not_opened": true,
+      "causal_route_questions": {
+        "candidate_or_family_evaluated": "H40 registered medium-horizon directional configurations; exact evaluated equation/endpoint identity is not newly established",
+        "historical_interval_evaluated": [
+          "Documented actual WF1_CALIBRATION ends 2023-01-31; later planned fold/Confirmation metadata retained in H0"
+        ],
+        "outcome_or_statistic_generated": "Known output/artifact category only; neither protected values nor actual generated statistic/support was inspected",
+        "disclosed_or_accessible": "Repository artifact existence only where named; runtime/onward disclosure unverified",
+        "recipient": "Repository-access principals may include Controller; actual historical recipient mapping unknown",
+        "recipient_successor_scientific_change_rights": "Current Controller policy exists; historical mapping unavailable",
+        "potential_influence_on_current_design": "POTENTIAL_ALIGNMENT_ONLY; NOT_AN_INDEPENDENT_CONTAMINATION_FINDING; H0 documents actual run access only to WF1 Train/Calibration. Later folds are planned membership, not execution. Detailed equation/endpoint equivalence and any other disclosure are unresolved; that documented run alone does not contaminate extension months."
+      }
+    },
+    {
+      "assertion_id": "H41_PREDECESSOR",
+      "month_or_interval": [
+        "WF1_CALIBRATION [2022-11-01,2023-01-31); WF1_VALIDATION protected [2023-02-01,2023-04-30)"
+      ],
+      "exposure_surface": "Frozen H41 predecessor candidate universe and exploratory Calibration",
+      "artifact_store_log_identity": [
+        {
+          "id": "h41_actual",
+          "path": "reviews/v0.5/V0.5.1_H41_WF1_CALIBRATION_EXPLORATORY_DISCOVERY_R1_1.md",
+          "ref": "9a8b7d467b91b2c353e465d8c93d58f527e55086",
+          "git_blob": "09c9ee20c0e9ec083d2f306a840bdc0dfa80ce8e",
+          "access_scope": "SOURCE_PROTOCOL_OR_WHITELISTED_EXPOSURE_METADATA_ONLY"
+        },
+        {
+          "id": "h41_protocol",
+          "path": "evidence/v0.5/h41/V0.5.1_H41_FROZEN_PROTOCOL_AUTHORITY_R1.json",
+          "ref": "9a8b7d467b91b2c353e465d8c93d58f527e55086",
+          "git_blob": "be4efa39311d87f9e63c539883fd3acc070dff44",
+          "access_scope": "SOURCE_PROTOCOL_OR_WHITELISTED_EXPOSURE_METADATA_ONLY"
+        }
+      ],
+      "git_commit": "9a8b7d467b91b2c353e465d8c93d58f527e55086",
+      "timestamp_range": "Evaluation ranges as declared in inherited metadata; actual creation/disclosure/access timestamps unavailable",
+      "principal_role": "Current Controller has prospective governance/change authority; historical human/service recipients not established",
+      "scientific_change_rights_status": "CURRENT_CONTROLLER_AUTHORITY_DOCUMENTED; HISTORICAL_PRINCIPAL_MAPPING_UNKNOWN",
+      "evidence_type": "IMMUTABLE_H0_METADATA_INHERITED; no new outcome-body access",
+      "classification_implication": "No automatic contamination or independent blocking inference",
+      "candidate_family_relation": "UNKNOWN",
+      "materiality": "NON_MATERIAL_TO_EXTENSION_BY_KNOWN_DOCUMENTED_INTERVAL",
+      "confidence_ambiguity": "Its documented outcome-access interval ends in January 2023, outside the May 2023 extension. WF1_VALIDATION remains sealed. Neither family similarity nor shared OHLCV proves extension contamination.",
+      "protected_content_intentionally_not_opened": true,
+      "causal_route_questions": {
+        "candidate_or_family_evaluated": "Frozen H41 predecessor candidate universe and exploratory Calibration; exact evaluated equation/endpoint identity is not newly established",
+        "historical_interval_evaluated": [
+          "WF1_CALIBRATION [2022-11-01,2023-01-31); WF1_VALIDATION protected [2023-02-01,2023-04-30)"
+        ],
+        "outcome_or_statistic_generated": "Known output/artifact category only; neither protected values nor actual generated statistic/support was inspected",
+        "disclosed_or_accessible": "Repository artifact existence only where named; runtime/onward disclosure unverified",
+        "recipient": "Repository-access principals may include Controller; actual historical recipient mapping unknown",
+        "recipient_successor_scientific_change_rights": "Current Controller policy exists; historical mapping unavailable",
+        "potential_influence_on_current_design": "NON_MATERIAL_TO_EXTENSION_BY_KNOWN_DOCUMENTED_INTERVAL; Its documented outcome-access interval ends in January 2023, outside the May 2023 extension. WF1_VALIDATION remains sealed. Neither family similarity nor shared OHLCV proves extension contamination."
+      }
+    },
+    {
+      "assertion_id": "RUN0_DEVELOPMENT",
+      "month_or_interval": [
+        "2021-01-01T00:00:00Z to 2026-08-01T00:00:00Z (dataset only)"
+      ],
+      "exposure_surface": "run0 frozen development strategy; equation/endpoint identity not established in H0 permitted metadata",
+      "artifact_store_log_identity": [
+        {
+          "path": "artifacts/research/run0-dev-frozen-v022-seed7-20260825/decision_samples.json",
+          "git_blob": "fa4807425b2eb4567466b75a8b6c07442b07203f",
+          "content_access": "NOT_OPENED_FOR_INVENTORY"
+        },
+        {
+          "path": "artifacts/research/run0-dev-frozen-v022-seed7-20260825/equity_curve.csv",
+          "git_blob": "1bc17e64a834209cd5204ef94f31acd33a9224fa",
+          "content_access": "NOT_OPENED_FOR_INVENTORY"
+        },
+        {
+          "path": "artifacts/research/run0-dev-frozen-v022-seed7-20260825/research_report.json",
+          "git_blob": "512980d5f6d23fe1a2c4b23c8cd28482e9308d11",
+          "content_access": "NOT_OPENED_FOR_INVENTORY"
+        },
+        {
+          "path": "artifacts/research/run0-dev-frozen-v022-seed7-20260825/research_report.md",
+          "git_blob": "664a69c1cee0ab813fc730882b711d17138576fd",
+          "content_access": "NOT_OPENED_FOR_INVENTORY"
+        },
+        {
+          "path": "artifacts/research/run0-dev-frozen-v022-seed7-20260825/trades.parquet",
+          "git_blob": "e3ffe269fba72350e5cbb64204d0d8e973428b9d",
+          "content_access": "NOT_OPENED_FOR_INVENTORY"
+        }
+      ],
+      "git_commit": "9a8b7d467b91b2c353e465d8c93d58f527e55086",
+      "timestamp_range": "Evaluation ranges as declared in inherited metadata; actual creation/disclosure/access timestamps unavailable",
+      "principal_role": "Current Controller has prospective governance/change authority; historical human/service recipients not established",
+      "scientific_change_rights_status": "CURRENT_CONTROLLER_AUTHORITY_DOCUMENTED; HISTORICAL_PRINCIPAL_MAPPING_UNKNOWN",
+      "evidence_type": "IMMUTABLE_H0_METADATA_INHERITED; no new outcome-body access",
+      "classification_implication": "No automatic contamination or independent blocking inference",
+      "candidate_family_relation": "UNKNOWN",
+      "materiality": "NOT_ESTABLISHED; EXISTENCE_OR_DATASET_COVERAGE_ALONE_NON_MATERIAL",
+      "confidence_ambiguity": "Dataset through July 2026 and development result filenames do not establish evaluation of every month or successor-family equivalence. No contamination inferred from a result-store name.",
+      "protected_content_intentionally_not_opened": true,
+      "causal_route_questions": {
+        "candidate_or_family_evaluated": "run0 frozen development strategy; equation/endpoint identity not established in H0 permitted metadata; exact evaluated equation/endpoint identity is not newly established",
+        "historical_interval_evaluated": [
+          "2021-01-01T00:00:00Z to 2026-08-01T00:00:00Z (dataset only)"
+        ],
+        "outcome_or_statistic_generated": "Known output/artifact category only; neither protected values nor actual generated statistic/support was inspected",
+        "disclosed_or_accessible": "Repository artifact existence only where named; runtime/onward disclosure unverified",
+        "recipient": "Repository-access principals may include Controller; actual historical recipient mapping unknown",
+        "recipient_successor_scientific_change_rights": "Current Controller policy exists; historical mapping unavailable",
+        "potential_influence_on_current_design": "NOT_ESTABLISHED; EXISTENCE_OR_DATASET_COVERAGE_ALONE_NON_MATERIAL; Dataset through July 2026 and development result filenames do not establish evaluation of every month or successor-family equivalence. No contamination inferred from a result-store name."
+      }
+    },
+    {
+      "assertion_id": "H35",
+      "month_or_interval": [
+        "2026-08-31 onward; actual candidate-outcome coverage unknown"
+      ],
+      "exposure_surface": "Opportunity forward campaign; family identity unresolved",
+      "artifact_store_log_identity": [
+        {
+          "path": "deliverables/v0.3.17/OPPORTUNITY_H35_ARCHIVE_AUDIT.json",
+          "git_blob": "0ae4d24fefd324c3295ac7ef17d3a4c2e1bed3cd",
+          "safe_metadata": {
+            "campaign_id": "OPPORTUNITY_FORWARD_V0313_20260831T050656Z",
+            "formal_role": "DATA_QUALITY_AT_RISK_ARCHIVE",
+            "data_quality_state": "H35_DATA_QUALITY_AT_RISK",
+            "validated_evidence": false,
+            "superseded_by": "OPPORTUNITY_FORWARD_V0317_20260901T160000Z"
+          }
+        }
+      ],
+      "git_commit": "9a8b7d467b91b2c353e465d8c93d58f527e55086",
+      "timestamp_range": "Evaluation ranges as declared in inherited metadata; actual creation/disclosure/access timestamps unavailable",
+      "principal_role": "Current Controller has prospective governance/change authority; historical human/service recipients not established",
+      "scientific_change_rights_status": "CURRENT_CONTROLLER_AUTHORITY_DOCUMENTED; HISTORICAL_PRINCIPAL_MAPPING_UNKNOWN",
+      "evidence_type": "IMMUTABLE_H0_METADATA_INHERITED; no new outcome-body access",
+      "classification_implication": "No automatic contamination or independent blocking inference",
+      "candidate_family_relation": "UNKNOWN",
+      "materiality": "NOT_ESTABLISHED; CAMPAIGN_STATUS_ALONE_NON_MATERIAL",
+      "confidence_ambiguity": "Known campaign begins August 31, 2026. Data-quality/collection state is not performance disclosure or equivalence proof.",
+      "protected_content_intentionally_not_opened": true,
+      "causal_route_questions": {
+        "candidate_or_family_evaluated": "Opportunity forward campaign; family identity unresolved; exact evaluated equation/endpoint identity is not newly established",
+        "historical_interval_evaluated": [
+          "2026-08-31 onward; actual candidate-outcome coverage unknown"
+        ],
+        "outcome_or_statistic_generated": "Known output/artifact category only; neither protected values nor actual generated statistic/support was inspected",
+        "disclosed_or_accessible": "Repository artifact existence only where named; runtime/onward disclosure unverified",
+        "recipient": "Repository-access principals may include Controller; actual historical recipient mapping unknown",
+        "recipient_successor_scientific_change_rights": "Current Controller policy exists; historical mapping unavailable",
+        "potential_influence_on_current_design": "NOT_ESTABLISHED; CAMPAIGN_STATUS_ALONE_NON_MATERIAL; Known campaign begins August 31, 2026. Data-quality/collection state is not performance disclosure or equivalence proof."
+      }
+    },
+    {
+      "assertion_id": "H36",
+      "month_or_interval": [
+        "2026-09-01T16:00:00Z onward"
+      ],
+      "exposure_surface": "Successor opportunity forward campaign",
+      "artifact_store_log_identity": [
+        {
+          "path": "deliverables/v0.3.17/OPPORTUNITY_H36_SUCCESSOR_STATUS.json",
+          "git_blob": "aa80ab41f2c1c1b77ec7ce7d078f656392e23c4d",
+          "safe_metadata": {
+            "campaign_id": "OPPORTUNITY_FORWARD_V0317_20260901T160000Z",
+            "start_utc": "2026-09-01T16:00:00Z",
+            "state": "FORWARD_CAMPAIGN_ACCUMULATING",
+            "data_quality_state": "ACTIVE_ACCUMULATING"
+          }
+        }
+      ],
+      "git_commit": "9a8b7d467b91b2c353e465d8c93d58f527e55086",
+      "timestamp_range": "Evaluation ranges as declared in inherited metadata; actual creation/disclosure/access timestamps unavailable",
+      "principal_role": "Current Controller has prospective governance/change authority; historical human/service recipients not established",
+      "scientific_change_rights_status": "CURRENT_CONTROLLER_AUTHORITY_DOCUMENTED; HISTORICAL_PRINCIPAL_MAPPING_UNKNOWN",
+      "evidence_type": "IMMUTABLE_H0_METADATA_INHERITED; no new outcome-body access",
+      "classification_implication": "No automatic contamination or independent blocking inference",
+      "candidate_family_relation": "UNKNOWN",
+      "materiality": "NON_MATERIAL_TO_COMPLETED_EXTENSION_BY_KNOWN_START",
+      "confidence_ambiguity": "Known campaign starts September 1, 2026 at 16:00Z, after the H0 completed-month extension.",
+      "protected_content_intentionally_not_opened": true,
+      "causal_route_questions": {
+        "candidate_or_family_evaluated": "Successor opportunity forward campaign; exact evaluated equation/endpoint identity is not newly established",
+        "historical_interval_evaluated": [
+          "2026-09-01T16:00:00Z onward"
+        ],
+        "outcome_or_statistic_generated": "Known output/artifact category only; neither protected values nor actual generated statistic/support was inspected",
+        "disclosed_or_accessible": "Repository artifact existence only where named; runtime/onward disclosure unverified",
+        "recipient": "Repository-access principals may include Controller; actual historical recipient mapping unknown",
+        "recipient_successor_scientific_change_rights": "Current Controller policy exists; historical mapping unavailable",
+        "potential_influence_on_current_design": "NON_MATERIAL_TO_COMPLETED_EXTENSION_BY_KNOWN_START; Known campaign starts September 1, 2026 at 16:00Z, after the H0 completed-month extension."
+      }
+    },
+    {
+      "assertion_id": "H39",
+      "month_or_interval": [
+        "Forward subset: microstructure-2026-09-04.sqlite3; exclusion metadata 2026-09-01 to 2026-09-04",
+        "Development diagnostic evaluated/disclosed interval unknown"
+      ],
+      "exposure_surface": "Microstructure forward blind campaign plus separately unresolved development diagnostics",
+      "artifact_store_log_identity": [
+        {
+          "path": "deliverables/v0.3.22/H39_PROTOCOL_FREEZE_MANIFEST.json",
+          "git_blob": "f1cc8b6438390733abcf10081f0a8ba4a5f4612b",
+          "safe_metadata": {
+            "artifact_type": "protocol freeze manifest; only presence/schema checked",
+            "exposure_note": "H39 protocol/development lineage exists; contents beyond non-outcome metadata not read"
+          }
+        },
+        {
+          "path": "deliverables/v0.3.22/H39_VALIDATION_STATUS.json",
+          "git_blob": "a121188e1447460d31bf051ef77d5f9e0e92318a",
+          "safe_metadata": {
+            "status": "FORWARD_DATA_INSUFFICIENT",
+            "exclusion_buffer": {
+              "start_utc": "2026-09-01T00:00:00Z",
+              "end_utc": "2026-09-04T11:15:00Z"
+            },
+            "fresh_partition": "microstructure-2026-09-04.sqlite3"
+          }
+        },
+        {
+          "path": "deliverables/v0.3.23/H39_BLINDNESS_ATTESTATION.json",
+          "git_blob": "c3899b19326fbfd2eac0d310de4ca62074c34e85",
+          "safe_metadata": {
+            "schema_version": "1.0.0",
+            "note": "Attestation contents were not inspected beyond schema-level metadata; cannot assert historical cleanliness."
+          }
+        },
+        {
+          "path": "deliverables/v0.3.23/H39_BLIND_VALIDATION_LEDGER_MANIFEST.json",
+          "git_blob": "5aff3c41970516eeae1576a2009da79884498969",
+          "safe_metadata": {
+            "summary.state": "FORWARD_DATA_INSUFFICIENT",
+            "note": "ledger contents excluded"
+          }
+        },
+        {
+          "path": "deliverables/v0.3.23/H39_BLIND_VALIDATION_STATUS.json",
+          "git_blob": "cbf141426fc2ba3da3bc71be8ff15eefcd6216b8",
+          "safe_metadata": {
+            "state": "FORWARD_DATA_INSUFFICIENT"
+          }
+        },
+        {
+          "path": "deliverables/v0.3.24/H39_BLIND_OPERATIONAL_STATUS.json",
+          "git_blob": "c7947f7542a96d31b2751e42d54c35766ba5cc66",
+          "safe_metadata": {
+            "state": "FORWARD_DATA_INSUFFICIENT"
+          }
+        },
+        {
+          "path": "deliverables/v0.3.25/H39_UNBLIND_PREREGISTRATION_MANIFEST.json",
+          "git_blob": "ab1863e90498d8b5751d86513165340e12932459",
+          "safe_metadata": {
+            "secondary_horizon.role": "SUPPORTING_ONLY",
+            "note": "manifest preregistration exists; no protected results accessed"
+          }
+        },
+        {
+          "path": "deliverables/v0.3.22/H39_DEVELOPMENT_DIAGNOSTICS.json",
+          "git_blob": "67449b5b98ca78c6ec1d9e1ea3f52c47bb844267",
+          "content_access": "NOT_OPENED_FOR_INVENTORY"
+        }
+      ],
+      "git_commit": "9a8b7d467b91b2c353e465d8c93d58f527e55086",
+      "timestamp_range": "Evaluation ranges as declared in inherited metadata; actual creation/disclosure/access timestamps unavailable",
+      "principal_role": "Current Controller has prospective governance/change authority; historical human/service recipients not established",
+      "scientific_change_rights_status": "CURRENT_CONTROLLER_AUTHORITY_DOCUMENTED; HISTORICAL_PRINCIPAL_MAPPING_UNKNOWN",
+      "evidence_type": "IMMUTABLE_H0_METADATA_INHERITED; no new outcome-body access",
+      "classification_implication": "No automatic contamination or independent blocking inference",
+      "candidate_family_relation": "UNKNOWN",
+      "materiality": "NON_MATERIAL_FORWARD_SUBSET; DEVELOPMENT_INTERVAL_AND_EQUIVALENCE_UNESTABLISHED",
+      "confidence_ambiguity": "H0 permitted metadata identifies the September 2026 fresh forward partition, which excludes only that forward subset from the extension. H0 also inventories H39_DEVELOPMENT_DIAGNOSTICS.json; its evaluated interval and successor-family equivalence are unestablished. Neither this diagnostic filename nor forward start proves development cleanliness, contamination or an additional material blocking route. Protected ledger/result and development result contents remain excluded.",
+      "protected_content_intentionally_not_opened": true,
+      "causal_route_questions": {
+        "candidate_or_family_evaluated": "Microstructure forward blind campaign plus separately unresolved development diagnostics; exact evaluated equation/endpoint identity is not newly established",
+        "historical_interval_evaluated": [
+          "Forward subset: microstructure-2026-09-04.sqlite3; exclusion metadata 2026-09-01 to 2026-09-04",
+          "Development diagnostic evaluated/disclosed interval unknown"
+        ],
+        "outcome_or_statistic_generated": "Known output/artifact category only; neither protected values nor actual generated statistic/support was inspected",
+        "disclosed_or_accessible": "Repository artifact existence only where named; runtime/onward disclosure unverified",
+        "recipient": "Repository-access principals may include Controller; actual historical recipient mapping unknown",
+        "recipient_successor_scientific_change_rights": "Current Controller policy exists; historical mapping unavailable",
+        "potential_influence_on_current_design": "NON_MATERIAL_FORWARD_SUBSET; DEVELOPMENT_INTERVAL_AND_EQUIVALENCE_UNESTABLISHED; H0 permitted metadata identifies the September 2026 fresh forward partition, which excludes only that forward subset from the extension. H0 also inventories H39_DEVELOPMENT_DIAGNOSTICS.json; its evaluated interval and successor-family equivalence are unestablished. Neither this diagnostic filename nor forward start proves development cleanliness, contamination or an additional material blocking route. Protected ledger/result and development result contents remain excluded."
+      }
+    },
+    {
+      "assertion_id": "B_LINE_TACTICAL_SHADOW",
+      "month_or_interval": [
+        "Historical evaluated interval not established; September 30 governance changes are prospective"
+      ],
+      "exposure_surface": "B0/B1/B2A operational directional policy and shadow outcome authority",
+      "artifact_store_log_identity": [
+        {
+          "path": "evidence/v0.5/tactical-policy/V0.5.1_B0_TACTICAL_POLICY_R2_EVIDENCE.json",
+          "git_blob": "6eec0a4c7c749369ff6978067f952b322a41a779",
+          "safe_metadata": {
+            "status": "IMPLEMENTED_PENDING_CONTROLLER"
+          }
+        },
+        {
+          "path": "evidence/v0.5/tactical-policy/V0.5.1_B1_TACTICAL_FEATURE_EVIDENCE_V2_EVIDENCE.json",
+          "git_blob": "af07afed1a20801b0b3523187dd1064ff7640423",
+          "safe_metadata": {
+            "status": "B1_R2_IMPLEMENTED_PENDING_CONTROLLER"
+          }
+        },
+        {
+          "path": "evidence/v0.5/tactical-policy/V0.5.1_B2A_DIRECTIONAL_SHADOW_EVALUATION_V2_EVIDENCE.json",
+          "git_blob": "e7ec4545090ba5edae6ac02b72b72c1faf3b25bd",
+          "safe_metadata": {
+            "status": "TACTICAL_POLICY_R2_B2A_R2_DIRECTIONAL_OUTCOME_AUTHORITY_READY_FOR_CONTROLLER"
+          }
+        }
+      ],
+      "git_commit": "9a8b7d467b91b2c353e465d8c93d58f527e55086",
+      "timestamp_range": "Evaluation ranges as declared in inherited metadata; actual creation/disclosure/access timestamps unavailable",
+      "principal_role": "Current Controller has prospective governance/change authority; historical human/service recipients not established",
+      "scientific_change_rights_status": "CURRENT_CONTROLLER_AUTHORITY_DOCUMENTED; HISTORICAL_PRINCIPAL_MAPPING_UNKNOWN",
+      "evidence_type": "IMMUTABLE_H0_METADATA_INHERITED; no new outcome-body access",
+      "classification_implication": "No automatic contamination or independent blocking inference",
+      "candidate_family_relation": "UNKNOWN",
+      "materiality": "NOT_ESTABLISHED; ENGINEERING_AUTHORITY_NOT_PERFORMANCE_DISCLOSURE",
+      "confidence_ambiguity": "H0 status fields and the new exact-SHA hold/revalidation review provide engineering/governance identities, not historical candidate-aligned outcomes or disclosure attestations.",
+      "protected_content_intentionally_not_opened": true,
+      "causal_route_questions": {
+        "candidate_or_family_evaluated": "B0/B1/B2A operational directional policy and shadow outcome authority; exact evaluated equation/endpoint identity is not newly established",
+        "historical_interval_evaluated": [
+          "Historical evaluated interval not established; September 30 governance changes are prospective"
+        ],
+        "outcome_or_statistic_generated": "Known output/artifact category only; neither protected values nor actual generated statistic/support was inspected",
+        "disclosed_or_accessible": "Repository artifact existence only where named; runtime/onward disclosure unverified",
+        "recipient": "Repository-access principals may include Controller; actual historical recipient mapping unknown",
+        "recipient_successor_scientific_change_rights": "Current Controller policy exists; historical mapping unavailable",
+        "potential_influence_on_current_design": "NOT_ESTABLISHED; ENGINEERING_AUTHORITY_NOT_PERFORMANCE_DISCLOSURE; H0 status fields and the new exact-SHA hold/revalidation review provide engineering/governance identities, not historical candidate-aligned outcomes or disclosure attestations."
+      }
+    },
+    {
+      "assertion_id": "MARKETWATCH_OPERATIONAL_DESIGN",
+      "month_or_interval": [
+        "Historical shadow result/disclosure interval not established"
+      ],
+      "exposure_surface": "Stateful multi-timeframe operational/advisory playbooks, grids and shadow telemetry",
+      "artifact_store_log_identity": [
+        {
+          "ref": "d9e509ad0c3cabbfd0bd0b474e3f9be63f5133dc",
+          "path": "docs/MARKET_WATCH_FEISHU.md",
+          "git_blob": "0b5130f7a34ec4ccd3edec337a5e51d71024b04c",
+          "governance_class": "EXPERIMENTAL_OPERATIONAL_MARKET_WATCH",
+          "shadow_storage": true,
+          "month_specific_access_provenance": "UNRESOLVED"
+        }
+      ],
+      "git_commit": "d9e509ad0c3cabbfd0bd0b474e3f9be63f5133dc",
+      "timestamp_range": "Evaluation ranges as declared in inherited metadata; actual creation/disclosure/access timestamps unavailable",
+      "principal_role": "Current Controller has prospective governance/change authority; historical human/service recipients not established",
+      "scientific_change_rights_status": "CURRENT_CONTROLLER_AUTHORITY_DOCUMENTED; HISTORICAL_PRINCIPAL_MAPPING_UNKNOWN",
+      "evidence_type": "IMMUTABLE_H0_METADATA_INHERITED; no new outcome-body access",
+      "classification_implication": "No automatic contamination or independent blocking inference",
+      "candidate_family_relation": "RELATED_BUT_NON_ALIGNED",
+      "materiality": "NON_MATERIAL_DESIGN_AND_GENERIC_ALERT_SURFACE",
+      "confidence_ambiguity": "H0 documents distinct operational/advisory purpose and multi-timeframe policy design. This classification covers that design/generic-alert surface only, not any undisclosed materially equivalent outcome export.",
+      "protected_content_intentionally_not_opened": true,
+      "causal_route_questions": {
+        "candidate_or_family_evaluated": "Stateful multi-timeframe operational/advisory playbooks, grids and shadow telemetry; exact evaluated equation/endpoint identity is not newly established",
+        "historical_interval_evaluated": [
+          "Historical shadow result/disclosure interval not established"
+        ],
+        "outcome_or_statistic_generated": "Known output/artifact category only; neither protected values nor actual generated statistic/support was inspected",
+        "disclosed_or_accessible": "Repository artifact existence only where named; runtime/onward disclosure unverified",
+        "recipient": "Repository-access principals may include Controller; actual historical recipient mapping unknown",
+        "recipient_successor_scientific_change_rights": "Current Controller policy exists; historical mapping unavailable",
+        "potential_influence_on_current_design": "NON_MATERIAL_DESIGN_AND_GENERIC_ALERT_SURFACE; H0 documents distinct operational/advisory purpose and multi-timeframe policy design. This classification covers that design/generic-alert surface only, not any undisclosed materially equivalent outcome export."
+      }
+    }
+  ],
+  "month_level_before_after_classifications": [
+    {
+      "month": "2023-05",
+      "before": "UNKNOWN_FAIL_CLOSED",
+      "after": "UNKNOWN_FAIL_CLOSED",
+      "certified_holdout_candidate": false,
+      "transition": "NO_TRANSITION_SINGLE_PASS_EARLY_STOP",
+      "classification_basis": "Inherited uncertainty is not converted to contamination. No new affirmative closure receipt was supplied; required bounded authority check triggered early stop.",
+      "material_route_scope": "Known symbolic candidate-search equivalence/custody route is potentially material for its declared evaluated intervals; no claim that every historical surface or every month is contaminated.",
+      "supporting_assertion_ids": [
+        "A_LINE_SYMBOLIC_CANDIDATE_SEARCH",
+        "AVAILABILITY_CHECK",
+        "CONTROLLER_BOUNDED_REPAIR_AUTHORITY"
+      ],
+      "inherited_evidence_blob": "9aacbb0fecf992db5e6216560c77fc0f88c555c2"
+    },
+    {
+      "month": "2023-06",
+      "before": "UNKNOWN_FAIL_CLOSED",
+      "after": "UNKNOWN_FAIL_CLOSED",
+      "certified_holdout_candidate": false,
+      "transition": "NO_TRANSITION_SINGLE_PASS_EARLY_STOP",
+      "classification_basis": "Inherited uncertainty is not converted to contamination. No new affirmative closure receipt was supplied; required bounded authority check triggered early stop.",
+      "material_route_scope": "Known symbolic candidate-search equivalence/custody route is potentially material for its declared evaluated intervals; no claim that every historical surface or every month is contaminated.",
+      "supporting_assertion_ids": [
+        "A_LINE_SYMBOLIC_CANDIDATE_SEARCH",
+        "AVAILABILITY_CHECK",
+        "CONTROLLER_BOUNDED_REPAIR_AUTHORITY"
+      ],
+      "inherited_evidence_blob": "9aacbb0fecf992db5e6216560c77fc0f88c555c2"
+    },
+    {
+      "month": "2023-07",
+      "before": "UNKNOWN_FAIL_CLOSED",
+      "after": "UNKNOWN_FAIL_CLOSED",
+      "certified_holdout_candidate": false,
+      "transition": "NO_TRANSITION_SINGLE_PASS_EARLY_STOP",
+      "classification_basis": "Inherited uncertainty is not converted to contamination. No new affirmative closure receipt was supplied; required bounded authority check triggered early stop.",
+      "material_route_scope": "Known symbolic candidate-search equivalence/custody route is potentially material for its declared evaluated intervals; no claim that every historical surface or every month is contaminated.",
+      "supporting_assertion_ids": [
+        "A_LINE_SYMBOLIC_CANDIDATE_SEARCH",
+        "AVAILABILITY_CHECK",
+        "CONTROLLER_BOUNDED_REPAIR_AUTHORITY"
+      ],
+      "inherited_evidence_blob": "9aacbb0fecf992db5e6216560c77fc0f88c555c2"
+    },
+    {
+      "month": "2023-08",
+      "before": "UNKNOWN_FAIL_CLOSED",
+      "after": "UNKNOWN_FAIL_CLOSED",
+      "certified_holdout_candidate": false,
+      "transition": "NO_TRANSITION_SINGLE_PASS_EARLY_STOP",
+      "classification_basis": "Inherited uncertainty is not converted to contamination. No new affirmative closure receipt was supplied; required bounded authority check triggered early stop.",
+      "material_route_scope": "Known symbolic candidate-search equivalence/custody route is potentially material for its declared evaluated intervals; no claim that every historical surface or every month is contaminated.",
+      "supporting_assertion_ids": [
+        "A_LINE_SYMBOLIC_CANDIDATE_SEARCH",
+        "AVAILABILITY_CHECK",
+        "CONTROLLER_BOUNDED_REPAIR_AUTHORITY"
+      ],
+      "inherited_evidence_blob": "9aacbb0fecf992db5e6216560c77fc0f88c555c2"
+    },
+    {
+      "month": "2023-09",
+      "before": "UNKNOWN_FAIL_CLOSED",
+      "after": "UNKNOWN_FAIL_CLOSED",
+      "certified_holdout_candidate": false,
+      "transition": "NO_TRANSITION_SINGLE_PASS_EARLY_STOP",
+      "classification_basis": "Inherited uncertainty is not converted to contamination. No new affirmative closure receipt was supplied; required bounded authority check triggered early stop.",
+      "material_route_scope": "Known symbolic candidate-search equivalence/custody route is potentially material for its declared evaluated intervals; no claim that every historical surface or every month is contaminated.",
+      "supporting_assertion_ids": [
+        "A_LINE_SYMBOLIC_CANDIDATE_SEARCH",
+        "AVAILABILITY_CHECK",
+        "CONTROLLER_BOUNDED_REPAIR_AUTHORITY"
+      ],
+      "inherited_evidence_blob": "9aacbb0fecf992db5e6216560c77fc0f88c555c2"
+    },
+    {
+      "month": "2023-10",
+      "before": "UNKNOWN_FAIL_CLOSED",
+      "after": "UNKNOWN_FAIL_CLOSED",
+      "certified_holdout_candidate": false,
+      "transition": "NO_TRANSITION_SINGLE_PASS_EARLY_STOP",
+      "classification_basis": "Inherited uncertainty is not converted to contamination. No new affirmative closure receipt was supplied; required bounded authority check triggered early stop.",
+      "material_route_scope": "Known symbolic candidate-search equivalence/custody route is potentially material for its declared evaluated intervals; no claim that every historical surface or every month is contaminated.",
+      "supporting_assertion_ids": [
+        "A_LINE_SYMBOLIC_CANDIDATE_SEARCH",
+        "AVAILABILITY_CHECK",
+        "CONTROLLER_BOUNDED_REPAIR_AUTHORITY"
+      ],
+      "inherited_evidence_blob": "9aacbb0fecf992db5e6216560c77fc0f88c555c2"
+    },
+    {
+      "month": "2023-11",
+      "before": "UNKNOWN_FAIL_CLOSED",
+      "after": "UNKNOWN_FAIL_CLOSED",
+      "certified_holdout_candidate": false,
+      "transition": "NO_TRANSITION_SINGLE_PASS_EARLY_STOP",
+      "classification_basis": "Inherited uncertainty is not converted to contamination. No new affirmative closure receipt was supplied; required bounded authority check triggered early stop.",
+      "material_route_scope": "Known symbolic candidate-search equivalence/custody route is potentially material for its declared evaluated intervals; no claim that every historical surface or every month is contaminated.",
+      "supporting_assertion_ids": [
+        "A_LINE_SYMBOLIC_CANDIDATE_SEARCH",
+        "AVAILABILITY_CHECK",
+        "CONTROLLER_BOUNDED_REPAIR_AUTHORITY"
+      ],
+      "inherited_evidence_blob": "9aacbb0fecf992db5e6216560c77fc0f88c555c2"
+    },
+    {
+      "month": "2023-12",
+      "before": "UNKNOWN_FAIL_CLOSED",
+      "after": "UNKNOWN_FAIL_CLOSED",
+      "certified_holdout_candidate": false,
+      "transition": "NO_TRANSITION_SINGLE_PASS_EARLY_STOP",
+      "classification_basis": "Inherited uncertainty is not converted to contamination. No new affirmative closure receipt was supplied; required bounded authority check triggered early stop.",
+      "material_route_scope": "Known symbolic candidate-search equivalence/custody route is potentially material for its declared evaluated intervals; no claim that every historical surface or every month is contaminated.",
+      "supporting_assertion_ids": [
+        "A_LINE_SYMBOLIC_CANDIDATE_SEARCH",
+        "AVAILABILITY_CHECK",
+        "CONTROLLER_BOUNDED_REPAIR_AUTHORITY"
+      ],
+      "inherited_evidence_blob": "9aacbb0fecf992db5e6216560c77fc0f88c555c2"
+    },
+    {
+      "month": "2024-01",
+      "before": "UNKNOWN_FAIL_CLOSED",
+      "after": "UNKNOWN_FAIL_CLOSED",
+      "certified_holdout_candidate": false,
+      "transition": "NO_TRANSITION_SINGLE_PASS_EARLY_STOP",
+      "classification_basis": "Inherited uncertainty is not converted to contamination. No new affirmative closure receipt was supplied; required bounded authority check triggered early stop.",
+      "material_route_scope": "Known symbolic candidate-search equivalence/custody route is potentially material for its declared evaluated intervals; no claim that every historical surface or every month is contaminated.",
+      "supporting_assertion_ids": [
+        "A_LINE_SYMBOLIC_CANDIDATE_SEARCH",
+        "AVAILABILITY_CHECK",
+        "CONTROLLER_BOUNDED_REPAIR_AUTHORITY"
+      ],
+      "inherited_evidence_blob": "9aacbb0fecf992db5e6216560c77fc0f88c555c2"
+    },
+    {
+      "month": "2024-02",
+      "before": "UNKNOWN_FAIL_CLOSED",
+      "after": "UNKNOWN_FAIL_CLOSED",
+      "certified_holdout_candidate": false,
+      "transition": "NO_TRANSITION_SINGLE_PASS_EARLY_STOP",
+      "classification_basis": "Inherited uncertainty is not converted to contamination. No new affirmative closure receipt was supplied; required bounded authority check triggered early stop.",
+      "material_route_scope": "Known symbolic candidate-search equivalence/custody route is potentially material for its declared evaluated intervals; no claim that every historical surface or every month is contaminated.",
+      "supporting_assertion_ids": [
+        "A_LINE_SYMBOLIC_CANDIDATE_SEARCH",
+        "AVAILABILITY_CHECK",
+        "CONTROLLER_BOUNDED_REPAIR_AUTHORITY"
+      ],
+      "inherited_evidence_blob": "9aacbb0fecf992db5e6216560c77fc0f88c555c2"
+    },
+    {
+      "month": "2024-03",
+      "before": "UNKNOWN_FAIL_CLOSED",
+      "after": "UNKNOWN_FAIL_CLOSED",
+      "certified_holdout_candidate": false,
+      "transition": "NO_TRANSITION_SINGLE_PASS_EARLY_STOP",
+      "classification_basis": "Inherited uncertainty is not converted to contamination. No new affirmative closure receipt was supplied; required bounded authority check triggered early stop.",
+      "material_route_scope": "Known symbolic candidate-search equivalence/custody route is potentially material for its declared evaluated intervals; no claim that every historical surface or every month is contaminated.",
+      "supporting_assertion_ids": [
+        "A_LINE_SYMBOLIC_CANDIDATE_SEARCH",
+        "AVAILABILITY_CHECK",
+        "CONTROLLER_BOUNDED_REPAIR_AUTHORITY"
+      ],
+      "inherited_evidence_blob": "9aacbb0fecf992db5e6216560c77fc0f88c555c2"
+    },
+    {
+      "month": "2024-04",
+      "before": "UNKNOWN_FAIL_CLOSED",
+      "after": "UNKNOWN_FAIL_CLOSED",
+      "certified_holdout_candidate": false,
+      "transition": "NO_TRANSITION_SINGLE_PASS_EARLY_STOP",
+      "classification_basis": "Inherited uncertainty is not converted to contamination. No new affirmative closure receipt was supplied; required bounded authority check triggered early stop.",
+      "material_route_scope": "Known symbolic candidate-search equivalence/custody route is potentially material for its declared evaluated intervals; no claim that every historical surface or every month is contaminated.",
+      "supporting_assertion_ids": [
+        "A_LINE_SYMBOLIC_CANDIDATE_SEARCH",
+        "AVAILABILITY_CHECK",
+        "CONTROLLER_BOUNDED_REPAIR_AUTHORITY"
+      ],
+      "inherited_evidence_blob": "9aacbb0fecf992db5e6216560c77fc0f88c555c2"
+    },
+    {
+      "month": "2024-05",
+      "before": "UNKNOWN_FAIL_CLOSED",
+      "after": "UNKNOWN_FAIL_CLOSED",
+      "certified_holdout_candidate": false,
+      "transition": "NO_TRANSITION_SINGLE_PASS_EARLY_STOP",
+      "classification_basis": "Inherited uncertainty is not converted to contamination. No new affirmative closure receipt was supplied; required bounded authority check triggered early stop.",
+      "material_route_scope": "Known symbolic candidate-search equivalence/custody route is potentially material for its declared evaluated intervals; no claim that every historical surface or every month is contaminated.",
+      "supporting_assertion_ids": [
+        "A_LINE_SYMBOLIC_CANDIDATE_SEARCH",
+        "AVAILABILITY_CHECK",
+        "CONTROLLER_BOUNDED_REPAIR_AUTHORITY"
+      ],
+      "inherited_evidence_blob": "9aacbb0fecf992db5e6216560c77fc0f88c555c2"
+    },
+    {
+      "month": "2024-06",
+      "before": "UNKNOWN_FAIL_CLOSED",
+      "after": "UNKNOWN_FAIL_CLOSED",
+      "certified_holdout_candidate": false,
+      "transition": "NO_TRANSITION_SINGLE_PASS_EARLY_STOP",
+      "classification_basis": "Inherited uncertainty is not converted to contamination. No new affirmative closure receipt was supplied; required bounded authority check triggered early stop.",
+      "material_route_scope": "Known symbolic candidate-search equivalence/custody route is potentially material for its declared evaluated intervals; no claim that every historical surface or every month is contaminated.",
+      "supporting_assertion_ids": [
+        "A_LINE_SYMBOLIC_CANDIDATE_SEARCH",
+        "AVAILABILITY_CHECK",
+        "CONTROLLER_BOUNDED_REPAIR_AUTHORITY"
+      ],
+      "inherited_evidence_blob": "9aacbb0fecf992db5e6216560c77fc0f88c555c2"
+    },
+    {
+      "month": "2024-07",
+      "before": "UNKNOWN_FAIL_CLOSED",
+      "after": "UNKNOWN_FAIL_CLOSED",
+      "certified_holdout_candidate": false,
+      "transition": "NO_TRANSITION_SINGLE_PASS_EARLY_STOP",
+      "classification_basis": "Inherited uncertainty is not converted to contamination. No new affirmative closure receipt was supplied; required bounded authority check triggered early stop.",
+      "material_route_scope": "Known symbolic candidate-search equivalence/custody route is potentially material for its declared evaluated intervals; no claim that every historical surface or every month is contaminated.",
+      "supporting_assertion_ids": [
+        "A_LINE_SYMBOLIC_CANDIDATE_SEARCH",
+        "AVAILABILITY_CHECK",
+        "CONTROLLER_BOUNDED_REPAIR_AUTHORITY"
+      ],
+      "inherited_evidence_blob": "9aacbb0fecf992db5e6216560c77fc0f88c555c2"
+    },
+    {
+      "month": "2024-08",
+      "before": "UNKNOWN_FAIL_CLOSED",
+      "after": "UNKNOWN_FAIL_CLOSED",
+      "certified_holdout_candidate": false,
+      "transition": "NO_TRANSITION_SINGLE_PASS_EARLY_STOP",
+      "classification_basis": "Inherited uncertainty is not converted to contamination. No new affirmative closure receipt was supplied; required bounded authority check triggered early stop.",
+      "material_route_scope": "Known symbolic candidate-search equivalence/custody route is potentially material for its declared evaluated intervals; no claim that every historical surface or every month is contaminated.",
+      "supporting_assertion_ids": [
+        "A_LINE_SYMBOLIC_CANDIDATE_SEARCH",
+        "AVAILABILITY_CHECK",
+        "CONTROLLER_BOUNDED_REPAIR_AUTHORITY"
+      ],
+      "inherited_evidence_blob": "9aacbb0fecf992db5e6216560c77fc0f88c555c2"
+    },
+    {
+      "month": "2024-09",
+      "before": "UNKNOWN_FAIL_CLOSED",
+      "after": "UNKNOWN_FAIL_CLOSED",
+      "certified_holdout_candidate": false,
+      "transition": "NO_TRANSITION_SINGLE_PASS_EARLY_STOP",
+      "classification_basis": "Inherited uncertainty is not converted to contamination. No new affirmative closure receipt was supplied; required bounded authority check triggered early stop.",
+      "material_route_scope": "Known symbolic candidate-search equivalence/custody route is potentially material for its declared evaluated intervals; no claim that every historical surface or every month is contaminated.",
+      "supporting_assertion_ids": [
+        "A_LINE_SYMBOLIC_CANDIDATE_SEARCH",
+        "AVAILABILITY_CHECK",
+        "CONTROLLER_BOUNDED_REPAIR_AUTHORITY"
+      ],
+      "inherited_evidence_blob": "9aacbb0fecf992db5e6216560c77fc0f88c555c2"
+    },
+    {
+      "month": "2024-10",
+      "before": "UNKNOWN_FAIL_CLOSED",
+      "after": "UNKNOWN_FAIL_CLOSED",
+      "certified_holdout_candidate": false,
+      "transition": "NO_TRANSITION_SINGLE_PASS_EARLY_STOP",
+      "classification_basis": "Inherited uncertainty is not converted to contamination. No new affirmative closure receipt was supplied; required bounded authority check triggered early stop.",
+      "material_route_scope": "Known symbolic candidate-search equivalence/custody route is potentially material for its declared evaluated intervals; no claim that every historical surface or every month is contaminated.",
+      "supporting_assertion_ids": [
+        "A_LINE_SYMBOLIC_CANDIDATE_SEARCH",
+        "AVAILABILITY_CHECK",
+        "CONTROLLER_BOUNDED_REPAIR_AUTHORITY"
+      ],
+      "inherited_evidence_blob": "9aacbb0fecf992db5e6216560c77fc0f88c555c2"
+    },
+    {
+      "month": "2024-11",
+      "before": "UNKNOWN_FAIL_CLOSED",
+      "after": "UNKNOWN_FAIL_CLOSED",
+      "certified_holdout_candidate": false,
+      "transition": "NO_TRANSITION_SINGLE_PASS_EARLY_STOP",
+      "classification_basis": "Inherited uncertainty is not converted to contamination. No new affirmative closure receipt was supplied; required bounded authority check triggered early stop.",
+      "material_route_scope": "Known symbolic candidate-search equivalence/custody route is potentially material for its declared evaluated intervals; no claim that every historical surface or every month is contaminated.",
+      "supporting_assertion_ids": [
+        "A_LINE_SYMBOLIC_CANDIDATE_SEARCH",
+        "AVAILABILITY_CHECK",
+        "CONTROLLER_BOUNDED_REPAIR_AUTHORITY"
+      ],
+      "inherited_evidence_blob": "9aacbb0fecf992db5e6216560c77fc0f88c555c2"
+    },
+    {
+      "month": "2024-12",
+      "before": "UNKNOWN_FAIL_CLOSED",
+      "after": "UNKNOWN_FAIL_CLOSED",
+      "certified_holdout_candidate": false,
+      "transition": "NO_TRANSITION_SINGLE_PASS_EARLY_STOP",
+      "classification_basis": "Inherited uncertainty is not converted to contamination. No new affirmative closure receipt was supplied; required bounded authority check triggered early stop.",
+      "material_route_scope": "Known symbolic candidate-search equivalence/custody route is potentially material for its declared evaluated intervals; no claim that every historical surface or every month is contaminated.",
+      "supporting_assertion_ids": [
+        "A_LINE_SYMBOLIC_CANDIDATE_SEARCH",
+        "AVAILABILITY_CHECK",
+        "CONTROLLER_BOUNDED_REPAIR_AUTHORITY"
+      ],
+      "inherited_evidence_blob": "9aacbb0fecf992db5e6216560c77fc0f88c555c2"
+    },
+    {
+      "month": "2025-01",
+      "before": "UNKNOWN_FAIL_CLOSED",
+      "after": "UNKNOWN_FAIL_CLOSED",
+      "certified_holdout_candidate": false,
+      "transition": "NO_TRANSITION_SINGLE_PASS_EARLY_STOP",
+      "classification_basis": "Inherited uncertainty is not converted to contamination. No new affirmative closure receipt was supplied; required bounded authority check triggered early stop.",
+      "material_route_scope": "Known symbolic candidate-search equivalence/custody route is potentially material for its declared evaluated intervals; no claim that every historical surface or every month is contaminated.",
+      "supporting_assertion_ids": [
+        "A_LINE_SYMBOLIC_CANDIDATE_SEARCH",
+        "AVAILABILITY_CHECK",
+        "CONTROLLER_BOUNDED_REPAIR_AUTHORITY"
+      ],
+      "inherited_evidence_blob": "9aacbb0fecf992db5e6216560c77fc0f88c555c2"
+    },
+    {
+      "month": "2025-02",
+      "before": "UNKNOWN_FAIL_CLOSED",
+      "after": "UNKNOWN_FAIL_CLOSED",
+      "certified_holdout_candidate": false,
+      "transition": "NO_TRANSITION_SINGLE_PASS_EARLY_STOP",
+      "classification_basis": "Inherited uncertainty is not converted to contamination. No new affirmative closure receipt was supplied; required bounded authority check triggered early stop.",
+      "material_route_scope": "Known symbolic candidate-search equivalence/custody route is potentially material for its declared evaluated intervals; no claim that every historical surface or every month is contaminated.",
+      "supporting_assertion_ids": [
+        "A_LINE_SYMBOLIC_CANDIDATE_SEARCH",
+        "AVAILABILITY_CHECK",
+        "CONTROLLER_BOUNDED_REPAIR_AUTHORITY"
+      ],
+      "inherited_evidence_blob": "9aacbb0fecf992db5e6216560c77fc0f88c555c2"
+    },
+    {
+      "month": "2025-03",
+      "before": "UNKNOWN_FAIL_CLOSED",
+      "after": "UNKNOWN_FAIL_CLOSED",
+      "certified_holdout_candidate": false,
+      "transition": "NO_TRANSITION_SINGLE_PASS_EARLY_STOP",
+      "classification_basis": "Inherited uncertainty is not converted to contamination. No new affirmative closure receipt was supplied; required bounded authority check triggered early stop.",
+      "material_route_scope": "Known symbolic candidate-search equivalence/custody route is potentially material for its declared evaluated intervals; no claim that every historical surface or every month is contaminated.",
+      "supporting_assertion_ids": [
+        "A_LINE_SYMBOLIC_CANDIDATE_SEARCH",
+        "AVAILABILITY_CHECK",
+        "CONTROLLER_BOUNDED_REPAIR_AUTHORITY"
+      ],
+      "inherited_evidence_blob": "9aacbb0fecf992db5e6216560c77fc0f88c555c2"
+    },
+    {
+      "month": "2025-04",
+      "before": "UNKNOWN_FAIL_CLOSED",
+      "after": "UNKNOWN_FAIL_CLOSED",
+      "certified_holdout_candidate": false,
+      "transition": "NO_TRANSITION_SINGLE_PASS_EARLY_STOP",
+      "classification_basis": "Inherited uncertainty is not converted to contamination. No new affirmative closure receipt was supplied; required bounded authority check triggered early stop.",
+      "material_route_scope": "Known symbolic candidate-search equivalence/custody route is potentially material for its declared evaluated intervals; no claim that every historical surface or every month is contaminated.",
+      "supporting_assertion_ids": [
+        "A_LINE_SYMBOLIC_CANDIDATE_SEARCH",
+        "AVAILABILITY_CHECK",
+        "CONTROLLER_BOUNDED_REPAIR_AUTHORITY"
+      ],
+      "inherited_evidence_blob": "9aacbb0fecf992db5e6216560c77fc0f88c555c2"
+    },
+    {
+      "month": "2025-05",
+      "before": "UNKNOWN_FAIL_CLOSED",
+      "after": "UNKNOWN_FAIL_CLOSED",
+      "certified_holdout_candidate": false,
+      "transition": "NO_TRANSITION_SINGLE_PASS_EARLY_STOP",
+      "classification_basis": "Inherited uncertainty is not converted to contamination. No new affirmative closure receipt was supplied; required bounded authority check triggered early stop.",
+      "material_route_scope": "Known symbolic candidate-search equivalence/custody route is potentially material for its declared evaluated intervals; no claim that every historical surface or every month is contaminated.",
+      "supporting_assertion_ids": [
+        "A_LINE_SYMBOLIC_CANDIDATE_SEARCH",
+        "AVAILABILITY_CHECK",
+        "CONTROLLER_BOUNDED_REPAIR_AUTHORITY"
+      ],
+      "inherited_evidence_blob": "9aacbb0fecf992db5e6216560c77fc0f88c555c2"
+    },
+    {
+      "month": "2025-06",
+      "before": "UNKNOWN_FAIL_CLOSED",
+      "after": "UNKNOWN_FAIL_CLOSED",
+      "certified_holdout_candidate": false,
+      "transition": "NO_TRANSITION_SINGLE_PASS_EARLY_STOP",
+      "classification_basis": "Inherited uncertainty is not converted to contamination. No new affirmative closure receipt was supplied; required bounded authority check triggered early stop.",
+      "material_route_scope": "Known symbolic candidate-search equivalence/custody route is potentially material for its declared evaluated intervals; no claim that every historical surface or every month is contaminated.",
+      "supporting_assertion_ids": [
+        "A_LINE_SYMBOLIC_CANDIDATE_SEARCH",
+        "AVAILABILITY_CHECK",
+        "CONTROLLER_BOUNDED_REPAIR_AUTHORITY"
+      ],
+      "inherited_evidence_blob": "9aacbb0fecf992db5e6216560c77fc0f88c555c2"
+    },
+    {
+      "month": "2025-07",
+      "before": "UNKNOWN_FAIL_CLOSED",
+      "after": "UNKNOWN_FAIL_CLOSED",
+      "certified_holdout_candidate": false,
+      "transition": "NO_TRANSITION_SINGLE_PASS_EARLY_STOP",
+      "classification_basis": "Inherited uncertainty is not converted to contamination. No new affirmative closure receipt was supplied; required bounded authority check triggered early stop.",
+      "material_route_scope": "Known symbolic candidate-search equivalence/custody route is potentially material for its declared evaluated intervals; no claim that every historical surface or every month is contaminated.",
+      "supporting_assertion_ids": [
+        "A_LINE_SYMBOLIC_CANDIDATE_SEARCH",
+        "AVAILABILITY_CHECK",
+        "CONTROLLER_BOUNDED_REPAIR_AUTHORITY"
+      ],
+      "inherited_evidence_blob": "9aacbb0fecf992db5e6216560c77fc0f88c555c2"
+    },
+    {
+      "month": "2025-08",
+      "before": "UNKNOWN_FAIL_CLOSED",
+      "after": "UNKNOWN_FAIL_CLOSED",
+      "certified_holdout_candidate": false,
+      "transition": "NO_TRANSITION_SINGLE_PASS_EARLY_STOP",
+      "classification_basis": "Inherited uncertainty is not converted to contamination. No new affirmative closure receipt was supplied; required bounded authority check triggered early stop.",
+      "material_route_scope": "Known symbolic candidate-search equivalence/custody route is potentially material for its declared evaluated intervals; no claim that every historical surface or every month is contaminated.",
+      "supporting_assertion_ids": [
+        "A_LINE_SYMBOLIC_CANDIDATE_SEARCH",
+        "AVAILABILITY_CHECK",
+        "CONTROLLER_BOUNDED_REPAIR_AUTHORITY"
+      ],
+      "inherited_evidence_blob": "9aacbb0fecf992db5e6216560c77fc0f88c555c2"
+    },
+    {
+      "month": "2025-09",
+      "before": "UNKNOWN_FAIL_CLOSED",
+      "after": "UNKNOWN_FAIL_CLOSED",
+      "certified_holdout_candidate": false,
+      "transition": "NO_TRANSITION_SINGLE_PASS_EARLY_STOP",
+      "classification_basis": "Inherited uncertainty is not converted to contamination. No new affirmative closure receipt was supplied; required bounded authority check triggered early stop.",
+      "material_route_scope": "Known symbolic candidate-search equivalence/custody route is potentially material for its declared evaluated intervals; no claim that every historical surface or every month is contaminated.",
+      "supporting_assertion_ids": [
+        "A_LINE_SYMBOLIC_CANDIDATE_SEARCH",
+        "AVAILABILITY_CHECK",
+        "CONTROLLER_BOUNDED_REPAIR_AUTHORITY"
+      ],
+      "inherited_evidence_blob": "9aacbb0fecf992db5e6216560c77fc0f88c555c2"
+    },
+    {
+      "month": "2025-10",
+      "before": "UNKNOWN_FAIL_CLOSED",
+      "after": "UNKNOWN_FAIL_CLOSED",
+      "certified_holdout_candidate": false,
+      "transition": "NO_TRANSITION_SINGLE_PASS_EARLY_STOP",
+      "classification_basis": "Inherited uncertainty is not converted to contamination. No new affirmative closure receipt was supplied; required bounded authority check triggered early stop.",
+      "material_route_scope": "Known symbolic candidate-search equivalence/custody route is potentially material for its declared evaluated intervals; no claim that every historical surface or every month is contaminated.",
+      "supporting_assertion_ids": [
+        "A_LINE_SYMBOLIC_CANDIDATE_SEARCH",
+        "AVAILABILITY_CHECK",
+        "CONTROLLER_BOUNDED_REPAIR_AUTHORITY"
+      ],
+      "inherited_evidence_blob": "9aacbb0fecf992db5e6216560c77fc0f88c555c2"
+    },
+    {
+      "month": "2025-11",
+      "before": "UNKNOWN_FAIL_CLOSED",
+      "after": "UNKNOWN_FAIL_CLOSED",
+      "certified_holdout_candidate": false,
+      "transition": "NO_TRANSITION_SINGLE_PASS_EARLY_STOP",
+      "classification_basis": "Inherited uncertainty is not converted to contamination. No new affirmative closure receipt was supplied; required bounded authority check triggered early stop.",
+      "material_route_scope": "Known symbolic candidate-search equivalence/custody route is potentially material for its declared evaluated intervals; no claim that every historical surface or every month is contaminated.",
+      "supporting_assertion_ids": [
+        "A_LINE_SYMBOLIC_CANDIDATE_SEARCH",
+        "AVAILABILITY_CHECK",
+        "CONTROLLER_BOUNDED_REPAIR_AUTHORITY"
+      ],
+      "inherited_evidence_blob": "9aacbb0fecf992db5e6216560c77fc0f88c555c2"
+    },
+    {
+      "month": "2025-12",
+      "before": "UNKNOWN_FAIL_CLOSED",
+      "after": "UNKNOWN_FAIL_CLOSED",
+      "certified_holdout_candidate": false,
+      "transition": "NO_TRANSITION_SINGLE_PASS_EARLY_STOP",
+      "classification_basis": "Inherited uncertainty is not converted to contamination. No new affirmative closure receipt was supplied; required bounded authority check triggered early stop.",
+      "material_route_scope": "Known symbolic candidate-search equivalence/custody route is potentially material for its declared evaluated intervals; no claim that every historical surface or every month is contaminated.",
+      "supporting_assertion_ids": [
+        "A_LINE_SYMBOLIC_CANDIDATE_SEARCH",
+        "AVAILABILITY_CHECK",
+        "CONTROLLER_BOUNDED_REPAIR_AUTHORITY"
+      ],
+      "inherited_evidence_blob": "9aacbb0fecf992db5e6216560c77fc0f88c555c2"
+    },
+    {
+      "month": "2026-01",
+      "before": "UNKNOWN_FAIL_CLOSED",
+      "after": "UNKNOWN_FAIL_CLOSED",
+      "certified_holdout_candidate": false,
+      "transition": "NO_TRANSITION_SINGLE_PASS_EARLY_STOP",
+      "classification_basis": "Inherited uncertainty is not converted to contamination. No new affirmative closure receipt was supplied; required bounded authority check triggered early stop.",
+      "material_route_scope": "Known symbolic candidate-search equivalence/custody route is potentially material for its declared evaluated intervals; no claim that every historical surface or every month is contaminated.",
+      "supporting_assertion_ids": [
+        "A_LINE_SYMBOLIC_CANDIDATE_SEARCH",
+        "AVAILABILITY_CHECK",
+        "CONTROLLER_BOUNDED_REPAIR_AUTHORITY"
+      ],
+      "inherited_evidence_blob": "9aacbb0fecf992db5e6216560c77fc0f88c555c2"
+    },
+    {
+      "month": "2026-02",
+      "before": "UNKNOWN_FAIL_CLOSED",
+      "after": "UNKNOWN_FAIL_CLOSED",
+      "certified_holdout_candidate": false,
+      "transition": "NO_TRANSITION_SINGLE_PASS_EARLY_STOP",
+      "classification_basis": "Inherited uncertainty is not converted to contamination. No new affirmative closure receipt was supplied; required bounded authority check triggered early stop.",
+      "material_route_scope": "Known symbolic candidate-search equivalence/custody route is potentially material for its declared evaluated intervals; no claim that every historical surface or every month is contaminated.",
+      "supporting_assertion_ids": [
+        "A_LINE_SYMBOLIC_CANDIDATE_SEARCH",
+        "AVAILABILITY_CHECK",
+        "CONTROLLER_BOUNDED_REPAIR_AUTHORITY"
+      ],
+      "inherited_evidence_blob": "9aacbb0fecf992db5e6216560c77fc0f88c555c2"
+    },
+    {
+      "month": "2026-03",
+      "before": "UNKNOWN_FAIL_CLOSED",
+      "after": "UNKNOWN_FAIL_CLOSED",
+      "certified_holdout_candidate": false,
+      "transition": "NO_TRANSITION_SINGLE_PASS_EARLY_STOP",
+      "classification_basis": "Inherited uncertainty is not converted to contamination. No new affirmative closure receipt was supplied; required bounded authority check triggered early stop.",
+      "material_route_scope": "Known symbolic candidate-search equivalence/custody route is potentially material for its declared evaluated intervals; no claim that every historical surface or every month is contaminated.",
+      "supporting_assertion_ids": [
+        "A_LINE_SYMBOLIC_CANDIDATE_SEARCH",
+        "AVAILABILITY_CHECK",
+        "CONTROLLER_BOUNDED_REPAIR_AUTHORITY"
+      ],
+      "inherited_evidence_blob": "9aacbb0fecf992db5e6216560c77fc0f88c555c2"
+    },
+    {
+      "month": "2026-04",
+      "before": "UNKNOWN_FAIL_CLOSED",
+      "after": "UNKNOWN_FAIL_CLOSED",
+      "certified_holdout_candidate": false,
+      "transition": "NO_TRANSITION_SINGLE_PASS_EARLY_STOP",
+      "classification_basis": "Inherited uncertainty is not converted to contamination. No new affirmative closure receipt was supplied; required bounded authority check triggered early stop.",
+      "material_route_scope": "Known symbolic candidate-search equivalence/custody route is potentially material for its declared evaluated intervals; no claim that every historical surface or every month is contaminated.",
+      "supporting_assertion_ids": [
+        "A_LINE_SYMBOLIC_CANDIDATE_SEARCH",
+        "AVAILABILITY_CHECK",
+        "CONTROLLER_BOUNDED_REPAIR_AUTHORITY"
+      ],
+      "inherited_evidence_blob": "9aacbb0fecf992db5e6216560c77fc0f88c555c2"
+    },
+    {
+      "month": "2026-05",
+      "before": "UNKNOWN_FAIL_CLOSED",
+      "after": "UNKNOWN_FAIL_CLOSED",
+      "certified_holdout_candidate": false,
+      "transition": "NO_TRANSITION_SINGLE_PASS_EARLY_STOP",
+      "classification_basis": "Inherited uncertainty is not converted to contamination. No new affirmative closure receipt was supplied; required bounded authority check triggered early stop.",
+      "material_route_scope": "Known symbolic candidate-search equivalence/custody route is potentially material for its declared evaluated intervals; no claim that every historical surface or every month is contaminated.",
+      "supporting_assertion_ids": [
+        "A_LINE_SYMBOLIC_CANDIDATE_SEARCH",
+        "AVAILABILITY_CHECK",
+        "CONTROLLER_BOUNDED_REPAIR_AUTHORITY"
+      ],
+      "inherited_evidence_blob": "9aacbb0fecf992db5e6216560c77fc0f88c555c2"
+    },
+    {
+      "month": "2026-06",
+      "before": "UNKNOWN_FAIL_CLOSED",
+      "after": "UNKNOWN_FAIL_CLOSED",
+      "certified_holdout_candidate": false,
+      "transition": "NO_TRANSITION_SINGLE_PASS_EARLY_STOP",
+      "classification_basis": "Inherited uncertainty is not converted to contamination. No new affirmative closure receipt was supplied; required bounded authority check triggered early stop.",
+      "material_route_scope": "Known symbolic candidate-search equivalence/custody route is potentially material for its declared evaluated intervals; no claim that every historical surface or every month is contaminated.",
+      "supporting_assertion_ids": [
+        "A_LINE_SYMBOLIC_CANDIDATE_SEARCH",
+        "AVAILABILITY_CHECK",
+        "CONTROLLER_BOUNDED_REPAIR_AUTHORITY"
+      ],
+      "inherited_evidence_blob": "9aacbb0fecf992db5e6216560c77fc0f88c555c2"
+    },
+    {
+      "month": "2026-07",
+      "before": "UNKNOWN_FAIL_CLOSED",
+      "after": "UNKNOWN_FAIL_CLOSED",
+      "certified_holdout_candidate": false,
+      "transition": "NO_TRANSITION_SINGLE_PASS_EARLY_STOP",
+      "classification_basis": "Inherited uncertainty is not converted to contamination. No new affirmative closure receipt was supplied; required bounded authority check triggered early stop.",
+      "material_route_scope": "Known symbolic candidate-search equivalence/custody route is potentially material for its declared evaluated intervals; no claim that every historical surface or every month is contaminated.",
+      "supporting_assertion_ids": [
+        "A_LINE_SYMBOLIC_CANDIDATE_SEARCH",
+        "AVAILABILITY_CHECK",
+        "CONTROLLER_BOUNDED_REPAIR_AUTHORITY"
+      ],
+      "inherited_evidence_blob": "9aacbb0fecf992db5e6216560c77fc0f88c555c2"
+    },
+    {
+      "month": "2026-08",
+      "before": "UNKNOWN_FAIL_CLOSED",
+      "after": "UNKNOWN_FAIL_CLOSED",
+      "certified_holdout_candidate": false,
+      "transition": "NO_TRANSITION_SINGLE_PASS_EARLY_STOP",
+      "classification_basis": "Inherited uncertainty is not converted to contamination. No new affirmative closure receipt was supplied; required bounded authority check triggered early stop.",
+      "material_route_scope": "Known symbolic candidate-search equivalence/custody route is potentially material for its declared evaluated intervals; no claim that every historical surface or every month is contaminated.",
+      "supporting_assertion_ids": [
+        "A_LINE_SYMBOLIC_CANDIDATE_SEARCH",
+        "AVAILABILITY_CHECK",
+        "CONTROLLER_BOUNDED_REPAIR_AUTHORITY"
+      ],
+      "inherited_evidence_blob": "9aacbb0fecf992db5e6216560c77fc0f88c555c2"
+    }
+  ],
+  "months_reclassified_from_unknown": 0,
+  "certified_holdout_month_count": 0,
+  "affirmative_closure_receipts": [],
+  "closure_receipt_required_fields": [
+    "known_candidate_aligned_surfaces_closed",
+    "known_change_rights_routes_closed",
+    "candidate_family_relation_resolved",
+    "known_local_runtime_surfaces_closed_or_non_material",
+    "known_exports_alerts_closed_or_non_material",
+    "known_protected_campaign_overlap_resolved",
+    "material_unknowns=[]",
+    "explicit_non_material_residual_risks"
+  ],
+  "confirmed_contamination_intervals": [],
+  "unresolved_intervals": [
+    {
+      "start_utc": "2023-05-01T00:00:00Z",
+      "end_exclusive_utc": "2024-01-01T00:00:00Z",
+      "assertion": "A_LINE_SYMBOLIC_CANDIDATE_SEARCH",
+      "kind": "DECLARED_DISCOVERY_SCOPE; actual expression/outcome disclosure unresolved"
+    },
+    {
+      "start_utc": "2024-02-01T00:00:00Z",
+      "end_exclusive_utc": "2025-01-01T00:00:00Z",
+      "assertion": "A_LINE_SYMBOLIC_CANDIDATE_SEARCH",
+      "kind": "DECLARED_VALIDATION_SCOPE; actual expression/outcome disclosure unresolved"
+    },
+    {
+      "start_utc": "2025-02-01T00:00:00Z",
+      "end_exclusive_utc": "2026-02-01T00:00:00Z",
+      "assertion": "A_LINE_SYMBOLIC_CANDIDATE_SEARCH",
+      "kind": "DECLARED_PSEUDO_FORWARD_SCOPE; actual expression/outcome disclosure unresolved"
+    },
+    {
+      "start_utc": "2023-05-01T00:00:00Z",
+      "end_exclusive_utc": "2026-09-01T00:00:00Z",
+      "kind": "INHERITED_UNKNOWN_CLASSIFICATIONS; no per-month contamination inference and no new closure receipts"
+    }
+  ],
+  "non_material_residual_risks": [
+    "Generic BTC/ETH price awareness and source access",
+    "Unrelated strategy research and generic operational alerts",
+    "Result-store existence without family/interval/change-rights route",
+    "Prospective role-policy and B-line engineering authority changes",
+    "Documented H41/H40 Calibration outside the extension; September H36/H39 forward lineage outside completed extension"
+  ],
+  "cross_month_support": {
+    "inherited_R1_1_feature_lag_hours": 24,
+    "raw_completed_bar_support_hours": 25,
+    "delayed_reference_entry_hours": 1,
+    "holding_horizon_hours": 4,
+    "decision_to_exit_hours": 5,
+    "cooldown_hours": 4,
+    "bootstrap_block_hours": 120,
+    "H0_proposed_buffer_hours": 150,
+    "buffer_is_frozen_R1_1_authority": false,
+    "this_pass_selected_new_purge_embargo_rule": false,
+    "semantics": "Do not certify a decision month without its warmup, label tail, cooldown/state and TRAIN-fit/export support closure. Missing disclosure intervals are not artificially narrowed. No event/support computation.",
+    "capacity_invariance": "No certified months, so exact later accepted embargo cannot create a certified pair. A 120h block does not prove finite dependence."
+  },
+  "D_V_calendar_exposure_feasibility_matrix": [
+    {
+      "discovery_months": 6,
+      "validation_months": 3,
+      "source_calendar_feasible_in_H0": true,
+      "certified_exposure_feasible": false,
+      "status": "UNCERTIFIABLE_NOT_PROVEN_CONTAMINATED_OR_CALENDAR_INSUFFICIENT",
+      "reason": "No certified month closure receipts; both contiguous stages need affirmative exposure certification"
+    },
+    {
+      "discovery_months": 6,
+      "validation_months": 6,
+      "source_calendar_feasible_in_H0": true,
+      "certified_exposure_feasible": false,
+      "status": "UNCERTIFIABLE_NOT_PROVEN_CONTAMINATED_OR_CALENDAR_INSUFFICIENT",
+      "reason": "No certified month closure receipts; both contiguous stages need affirmative exposure certification"
+    },
+    {
+      "discovery_months": 6,
+      "validation_months": 9,
+      "source_calendar_feasible_in_H0": true,
+      "certified_exposure_feasible": false,
+      "status": "UNCERTIFIABLE_NOT_PROVEN_CONTAMINATED_OR_CALENDAR_INSUFFICIENT",
+      "reason": "No certified month closure receipts; both contiguous stages need affirmative exposure certification"
+    },
+    {
+      "discovery_months": 6,
+      "validation_months": 12,
+      "source_calendar_feasible_in_H0": true,
+      "certified_exposure_feasible": false,
+      "status": "UNCERTIFIABLE_NOT_PROVEN_CONTAMINATED_OR_CALENDAR_INSUFFICIENT",
+      "reason": "No certified month closure receipts; both contiguous stages need affirmative exposure certification"
+    },
+    {
+      "discovery_months": 9,
+      "validation_months": 3,
+      "source_calendar_feasible_in_H0": true,
+      "certified_exposure_feasible": false,
+      "status": "UNCERTIFIABLE_NOT_PROVEN_CONTAMINATED_OR_CALENDAR_INSUFFICIENT",
+      "reason": "No certified month closure receipts; both contiguous stages need affirmative exposure certification"
+    },
+    {
+      "discovery_months": 9,
+      "validation_months": 6,
+      "source_calendar_feasible_in_H0": true,
+      "certified_exposure_feasible": false,
+      "status": "UNCERTIFIABLE_NOT_PROVEN_CONTAMINATED_OR_CALENDAR_INSUFFICIENT",
+      "reason": "No certified month closure receipts; both contiguous stages need affirmative exposure certification"
+    },
+    {
+      "discovery_months": 9,
+      "validation_months": 9,
+      "source_calendar_feasible_in_H0": true,
+      "certified_exposure_feasible": false,
+      "status": "UNCERTIFIABLE_NOT_PROVEN_CONTAMINATED_OR_CALENDAR_INSUFFICIENT",
+      "reason": "No certified month closure receipts; both contiguous stages need affirmative exposure certification"
+    },
+    {
+      "discovery_months": 9,
+      "validation_months": 12,
+      "source_calendar_feasible_in_H0": true,
+      "certified_exposure_feasible": false,
+      "status": "UNCERTIFIABLE_NOT_PROVEN_CONTAMINATED_OR_CALENDAR_INSUFFICIENT",
+      "reason": "No certified month closure receipts; both contiguous stages need affirmative exposure certification"
+    },
+    {
+      "discovery_months": 12,
+      "validation_months": 3,
+      "source_calendar_feasible_in_H0": true,
+      "certified_exposure_feasible": false,
+      "status": "UNCERTIFIABLE_NOT_PROVEN_CONTAMINATED_OR_CALENDAR_INSUFFICIENT",
+      "reason": "No certified month closure receipts; both contiguous stages need affirmative exposure certification"
+    },
+    {
+      "discovery_months": 12,
+      "validation_months": 6,
+      "source_calendar_feasible_in_H0": true,
+      "certified_exposure_feasible": false,
+      "status": "UNCERTIFIABLE_NOT_PROVEN_CONTAMINATED_OR_CALENDAR_INSUFFICIENT",
+      "reason": "No certified month closure receipts; both contiguous stages need affirmative exposure certification"
+    },
+    {
+      "discovery_months": 12,
+      "validation_months": 9,
+      "source_calendar_feasible_in_H0": true,
+      "certified_exposure_feasible": false,
+      "status": "UNCERTIFIABLE_NOT_PROVEN_CONTAMINATED_OR_CALENDAR_INSUFFICIENT",
+      "reason": "No certified month closure receipts; both contiguous stages need affirmative exposure certification"
+    },
+    {
+      "discovery_months": 12,
+      "validation_months": 12,
+      "source_calendar_feasible_in_H0": true,
+      "certified_exposure_feasible": false,
+      "status": "UNCERTIFIABLE_NOT_PROVEN_CONTAMINATED_OR_CALENDAR_INSUFFICIENT",
+      "reason": "No certified month closure receipts; both contiguous stages need affirmative exposure certification"
+    },
+    {
+      "discovery_months": 18,
+      "validation_months": 3,
+      "source_calendar_feasible_in_H0": true,
+      "certified_exposure_feasible": false,
+      "status": "UNCERTIFIABLE_NOT_PROVEN_CONTAMINATED_OR_CALENDAR_INSUFFICIENT",
+      "reason": "No certified month closure receipts; both contiguous stages need affirmative exposure certification"
+    },
+    {
+      "discovery_months": 18,
+      "validation_months": 6,
+      "source_calendar_feasible_in_H0": true,
+      "certified_exposure_feasible": false,
+      "status": "UNCERTIFIABLE_NOT_PROVEN_CONTAMINATED_OR_CALENDAR_INSUFFICIENT",
+      "reason": "No certified month closure receipts; both contiguous stages need affirmative exposure certification"
+    },
+    {
+      "discovery_months": 18,
+      "validation_months": 9,
+      "source_calendar_feasible_in_H0": true,
+      "certified_exposure_feasible": false,
+      "status": "UNCERTIFIABLE_NOT_PROVEN_CONTAMINATED_OR_CALENDAR_INSUFFICIENT",
+      "reason": "No certified month closure receipts; both contiguous stages need affirmative exposure certification"
+    },
+    {
+      "discovery_months": 18,
+      "validation_months": 12,
+      "source_calendar_feasible_in_H0": true,
+      "certified_exposure_feasible": false,
+      "status": "UNCERTIFIABLE_NOT_PROVEN_CONTAMINATED_OR_CALENDAR_INSUFFICIENT",
+      "reason": "No certified month closure receipts; both contiguous stages need affirmative exposure certification"
+    },
+    {
+      "discovery_months": 24,
+      "validation_months": 3,
+      "source_calendar_feasible_in_H0": true,
+      "certified_exposure_feasible": false,
+      "status": "UNCERTIFIABLE_NOT_PROVEN_CONTAMINATED_OR_CALENDAR_INSUFFICIENT",
+      "reason": "No certified month closure receipts; both contiguous stages need affirmative exposure certification"
+    },
+    {
+      "discovery_months": 24,
+      "validation_months": 6,
+      "source_calendar_feasible_in_H0": true,
+      "certified_exposure_feasible": false,
+      "status": "UNCERTIFIABLE_NOT_PROVEN_CONTAMINATED_OR_CALENDAR_INSUFFICIENT",
+      "reason": "No certified month closure receipts; both contiguous stages need affirmative exposure certification"
+    },
+    {
+      "discovery_months": 24,
+      "validation_months": 9,
+      "source_calendar_feasible_in_H0": true,
+      "certified_exposure_feasible": false,
+      "status": "UNCERTIFIABLE_NOT_PROVEN_CONTAMINATED_OR_CALENDAR_INSUFFICIENT",
+      "reason": "No certified month closure receipts; both contiguous stages need affirmative exposure certification"
+    },
+    {
+      "discovery_months": 24,
+      "validation_months": 12,
+      "source_calendar_feasible_in_H0": true,
+      "certified_exposure_feasible": false,
+      "status": "UNCERTIFIABLE_NOT_PROVEN_CONTAMINATED_OR_CALENDAR_INSUFFICIENT",
+      "reason": "No certified month closure receipts; both contiguous stages need affirmative exposure certification"
+    }
+  ],
+  "feasible_discovery_validation_pairs": [],
+  "calendar_only_H0_pairs_reused": [
+    [
+      6,
+      3
+    ],
+    [
+      6,
+      6
+    ],
+    [
+      6,
+      9
+    ],
+    [
+      6,
+      12
+    ],
+    [
+      9,
+      3
+    ],
+    [
+      9,
+      6
+    ],
+    [
+      9,
+      9
+    ],
+    [
+      9,
+      12
+    ],
+    [
+      12,
+      3
+    ],
+    [
+      12,
+      6
+    ],
+    [
+      12,
+      9
+    ],
+    [
+      12,
+      12
+    ],
+    [
+      18,
+      3
+    ],
+    [
+      18,
+      6
+    ],
+    [
+      18,
+      9
+    ],
+    [
+      18,
+      12
+    ],
+    [
+      24,
+      3
+    ],
+    [
+      24,
+      6
+    ],
+    [
+      24,
+      9
+    ],
+    [
+      24,
+      12
+    ]
+  ],
+  "final_duration_pair_chosen": false,
+  "synthetic_power_gate_separate": true,
+  "early_stop": {
+    "applied": true,
+    "material_private_local_provenance_unavailable": true,
+    "materially_new_affirmative_provenance_exists": false,
+    "missing_route_is_necessary_for_every_calendar_feasible_pair": true,
+    "calendar_reason": "Outside the three declared symbolic evaluation scopes, the available extension has two isolated single-month purge/embargo gaps (2024-01,2025-01) and one 7-month suffix (2026-02..2026-08). No two contiguous windows with D>=6,V>=3 can both avoid those scopes. That is a relevance proof for unavailable provenance, not proof the scopes were actually exposed or contaminated.",
+    "authority": "Active prompt sections 3A and 10A; new Controller supervisory/disposition authority",
+    "stopped_activity": "Broad reconstruction, original result enumeration and additional provenance hunting",
+    "remaining_authorized_activity": "Write/validate/publish the two required early-stop artifacts"
+  },
+  "protected_outcome_access_attestation": {
+    "protected_candidate_outcome_access": "NO",
+    "successor_candidate_execution": false,
+    "successor_returns_PnL_mu_SE_LCB_rankings_charts_access": false,
+    "candidate_event_support_counts_access": false,
+    "H41_WF1_VALIDATION_outcome_access": false,
+    "protected_H39_result_unblinding": false,
+    "performance_guided_window_selection": false,
+    "protected_result_content_read_to_prove_exposure": false,
+    "H0_source_audit_rerun": false,
+    "market_archive_downloads": 0,
+    "read_scope": "H0 metadata, immutable hashes, Git path/history metadata and prospective governance excerpts only; inherited result bodies were not opened"
+  },
+  "production_code_change_attestation": {
+    "production_code_changed": "NO",
+    "code_branch_start_sha": "8ecff4ec4b25bf73a35309689fd3ecfacc0d3399",
+    "implementation_or_config_or_test_edits": false,
+    "legacy_branch_writes": false,
+    "allowed_changed_paths": [
+      "reviews/v0.5/V0.5.5_H41_SUCCESSOR_CONTROLLER_EXPOSURE_REPAIR_R1.md",
+      "evidence/v0.5.5/h41/V0.5.5_H41_SUCCESSOR_CONTROLLER_EXPOSURE_REPAIR_R1.json"
+    ],
+    "runtime_imports": "NONE"
+  },
+  "repository_hygiene_separate": {
+    "source": "H0 Controller migration acceptance",
+    "legacy_CI_run_id": 36671505228,
+    "legacy_CI_conclusion": "failure",
+    "classification": "PREEXISTING_NON_BLOCKING_REPOSITORY_HYGIENE",
+    "reported_failure": "ruff check .; pre-existing evidence/v0.5/h41/h41_synthetic_pit_validation_r1 scripts",
+    "new_CI_execution_claimed": false,
+    "exposure_repair_failure": false,
+    "full_pytest_required": false
+  },
+  "provisional_recommendation": "REPAIR_INCOMPLETE_FAIL_CLOSED",
+  "blockers": [
+    "No materially new affirmative historical exposure authority is available",
+    "Known symbolic candidate-search expression/endpoint equivalence and actual evaluation/disclosure custody remain unresolved",
+    "Historical recipient/change-rights and target aligned-output access/export attestations unavailable",
+    "Zero affirmative certified-month closure receipts; no certified D/V pair"
+  ],
+  "next_controller_action": "CHATGPT_0_ADJUDICATE_SINGLE_PASS_NOW: determine whether the specifically missing candidate-search identity/custody and change-rights evidence is practically recoverable without protected unblinding; if not, terminate the Hybrid route and proceed to H41_SUCCESSOR_FORWARD_R1_1_REAUDIT. Do not start Exposure Repair R2/R3 from the same evidence set. Executor grants no scientific-stage authority.",
+  "controller_route_authorization_granted_by_executor": false,
+  "report": "reviews/v0.5/V0.5.5_H41_SUCCESSOR_CONTROLLER_EXPOSURE_REPAIR_R1.md",
+  "machine_evidence": "evidence/v0.5.5/h41/V0.5.5_H41_SUCCESSOR_CONTROLLER_EXPOSURE_REPAIR_R1.json"
+}
