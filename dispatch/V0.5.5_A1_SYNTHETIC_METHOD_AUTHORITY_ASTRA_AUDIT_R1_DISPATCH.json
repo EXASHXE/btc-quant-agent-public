@@ -1,0 +1,99 @@
+{
+  "schema_id": "V0.5.5_A1_SYNTHETIC_METHOD_AUTHORITY_ASTRA_AUDIT_R1_DISPATCH",
+  "repository": "EXASHXE/btc-quant-agent-public",
+  "stage": "A1_SYNTHETIC_METHOD_AUTHORITY_ASTRA_AUDIT_R1",
+  "reviewer": "ASTRA",
+  "execution_target": {
+    "task_branch": "feature/a1-synthetic-method-astra-audit-r1-v055",
+    "CONTROLLER_DISPATCH_SHA": "736cde806bcbd726eaab2bca4d794c3a2df20ee6",
+    "code_branch": "v0.5.5",
+    "accepted_code_sha": "8ecff4ec4b25bf73a35309689fd3ecfacc0d3399"
+  },
+  "current_authority_manifest": {
+    "path": "evidence/v0.5.5/controller/A_LINE_CURRENT_AUTHORITY.json",
+    "blob_sha": "23fd1a3028541f8aacd019957e044ad4aa108c72",
+    "access_mode": "BINDING_FIELDS_ONLY"
+  },
+  "inline_binding_fields": {
+    "a1_stage": "A1_SYNTHETIC_METHOD_AUTHORITY_ASTRA_AUDIT_R1",
+    "method_design_sha": "9b92ec290e4f9de93c140ca471a0eb1644526e2b",
+    "method_design_semantic_root_sha256": "718efa1bbad00e68aaacf4cd2c2034265776b242024e0acbf09455847b2fc106",
+    "method_gap_status": {
+      "M01": "SPECIFIED_PENDING_ASTRA",
+      "M02": "SPECIFIED_PENDING_ASTRA",
+      "M03": "SPECIFIED_PENDING_ASTRA",
+      "M04": "SPECIFIED_PENDING_ASTRA",
+      "M05": "SPECIFIED_PENDING_ASTRA"
+    },
+    "compression_trial_runs_completed": 0,
+    "trial_1_state": "BLOCKED_PRE_SIMULATION_PENDING_METHOD_AUDIT_AND_MATERIALIZATION",
+    "trial_2_authorized": false,
+    "d0_authorized": false,
+    "protected_outcome_access_authorized": false,
+    "production_code_change_authorized": false,
+    "resource_feasibility": "NOT_CERTIFIED",
+    "literal_logical_outer_records": 11863110020400
+  },
+  "authority_refs": [
+    {
+      "path": "reviews/v0.5/V0.5.5_A1_SYNTHETIC_METHOD_AUTHORITY_DESIGN_R1.md",
+      "blob_sha": "2ef55f25ee0b4bf640307c291e959ce43c97cf47",
+      "access_mode": "MUST_READ",
+      "reason": "Normative method design under independent audit."
+    },
+    {
+      "path": "evidence/v0.5.5/h41/V0.5.5_A1_SYNTHETIC_METHOD_AUTHORITY_DESIGN_R1.json",
+      "blob_sha": "53b1f99bee4bef55afe166292305f6f8d2648072",
+      "access_mode": "IDENTITY_ONLY",
+      "reason": "Machine design identity; key binding fields are inlined."
+    },
+    {
+      "path": "reviews/v0.5/V0.5.1_H41_SUCCESSOR_SCIENTIFIC_CAMPAIGN_V1_DESIGN_R1_1_CONTROLLER_REPAIR.md",
+      "blob_sha": "f65b970e810a6e6a6d5420424d62c26ee4c5c953",
+      "access_mode": "MUST_READ",
+      "reason": "Baseline scientific semantics for compatibility/drift audit."
+    },
+    {
+      "path": "src/btc_quant_agent/h41/inference.py",
+      "code_sha": "8ecff4ec4b25bf73a35309689fd3ecfacc0d3399",
+      "blob_sha": "9000840cbb767b1be69395b78248a58ec3bcaafa",
+      "access_mode": "MUST_READ",
+      "reason": "Accepted inference implementation semantics for compatibility audit."
+    }
+  ],
+  "prompt": {
+    "path": "prompts/v0.5/audit/v0.5.5_A1_SYNTHETIC_METHOD_AUTHORITY_ASTRA_AUDIT_R1.md",
+    "blob_sha": "0113b990df9fa874065b6513affdbbdfd0c5b5cf",
+    "immutable_url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/736cde806bcbd726eaab2bca4d794c3a2df20ee6/prompts/v0.5/audit/v0.5.5_A1_SYNTHETIC_METHOD_AUTHORITY_ASTRA_AUDIT_R1.md"
+  },
+  "expected_outputs": [
+    "reviews/v0.5/V0.5.5_A1_SYNTHETIC_METHOD_AUTHORITY_ASTRA_AUDIT_R1.md",
+    "evidence/v0.5.5/h41/V0.5.5_A1_SYNTHETIC_METHOD_AUTHORITY_ASTRA_AUDIT_R1.json"
+  ],
+  "terminal_states": [
+    "PASS_METHOD_AUTHORITY_TO_MATERIALIZATION",
+    "BOUNDED_METHOD_REPAIR_REQUIRED",
+    "METHOD_AUTHORITY_ROUTE_BLOCKED"
+  ],
+  "forbidden": {
+    "simulation": true,
+    "train_materialization": true,
+    "protected_outcome_access": true,
+    "production_code_change": true,
+    "d0_authorization": true,
+    "trial2_authorization": true,
+    "recursive_authority_hydration": true
+  },
+  "execution_rules": {
+    "exact_sha_verification_required": true,
+    "worktree_clean_at_start": true,
+    "push_only_to_task_branch": true,
+    "no_direct_push_to_v0_5_5_docs": true
+  },
+  "authority_hydration_check": {
+    "current_manifest_binding_fields_only": true,
+    "method_machine_evidence_identity_only_by_default": true,
+    "recursive_hydration_forbidden_unless_conflict_or_missing_binding": true,
+    "exact_sha_verification_preserved": true
+  }
+}
