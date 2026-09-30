@@ -1,0 +1,63 @@
+{
+  "schema_id": "V0.5.5_H41_SUCCESSOR_H0_LEGACY_EXECUTION_MIGRATION_ACCEPTANCE_R1",
+  "repository": "EXASHXE/btc-quant-agent-public",
+  "controller_role": "CHATGPT_0_PRIMARY_CONTROLLER_AND_REVIEWER",
+  "decision": "ACCEPTED_H0_EXECUTION_EVIDENCE__EXPOSURE_UNRESOLVED",
+  "source_execution": {
+    "branch": "v0.5-refactor-docs",
+    "execution_commit": "248f00f88d5bb659d80db658ff9bf6d55402a329",
+    "publication_parent": "8fc931df8f246ff6be0046853e4f6906cfbe88d9",
+    "requested_exact_audit_start_sha": "9a8b7d467b91b2c353e465d8c93d58f527e55086",
+    "commit_message": "design(h41): assess hybrid historical holdout feasibility",
+    "changed_files": [
+      "reviews/v0.5/V0.5.1_H41_SUCCESSOR_HYBRID_HOLDOUT_FEASIBILITY_AND_EXPOSURE_R1.md",
+      "evidence/v0.5/h41/V0.5.1_H41_SUCCESSOR_HYBRID_HOLDOUT_FEASIBILITY_AND_EXPOSURE_R1.json"
+    ]
+  },
+  "migrated_to": {
+    "branch": "v0.5.5-docs",
+    "report_import_commit": "17aed2cad0f4178c501569bc793b639c70466db3",
+    "evidence_import_commit": "900696394f5ad4b887864ced17606577c360152d",
+    "report_blob_sha": "22e25a92c0671eb439ff0ec18eb3ba28e0968dcc",
+    "evidence_blob_sha": "9aacbb0fecf992db5e6216560c77fc0f88c555c2",
+    "byte_identity_verified": true,
+    "rewritten": false
+  },
+  "accepted_code_reference": {
+    "branch": "v0.5.5",
+    "sha": "8ecff4ec4b25bf73a35309689fd3ecfacc0d3399",
+    "production_code_changed_by_h0": false
+  },
+  "h0_result": {
+    "decision": "EXPOSURE_UNRESOLVED",
+    "official_source_capacity_through_completed_month": "2026-08",
+    "synchronized_completed_months_audited": 40,
+    "monthly_archives_audited": 80,
+    "source_integrity_result": "PASS_CURRENT_OFFICIAL_SNAPSHOT",
+    "certified_historical_holdout_months": 0,
+    "jointly_source_exposure_feasible_pairs": [],
+    "exposure_policy": "UNKNOWN_FAIL_CLOSED",
+    "next_stage": "CONTROLLER_EXPOSURE_REPAIR"
+  },
+  "protected_data_attestation": {
+    "protected_candidate_outcome_access": "NO",
+    "successor_outcomes_computed_or_inspected": false,
+    "h41_wf1_validation_outcome_access": false,
+    "protected_h39_result_unblinding": false
+  },
+  "ci": {
+    "legacy_h0_run_id": 36671505228,
+    "conclusion": "failure",
+    "classification": "PREEXISTING_NON_BLOCKING_REPOSITORY_HYGIENE",
+    "failing_step": "ruff check .",
+    "failing_scope": "pre-existing evidence/v0.5/h41/h41_synthetic_pit_validation_r1 scripts",
+    "h0_added_artifacts_implicated": false
+  },
+  "branch_policy": {
+    "active_code_branch": "v0.5.5",
+    "active_docs_branch": "v0.5.5-docs",
+    "legacy_v0_5_refactor_docs_accepts_new_work": false,
+    "future_successor_tasks_must_target_v0_5_5": true
+  },
+  "next_action": "CONTROLLER_EXPOSURE_REPAIR_ON_V0_5_5_DOCS"
+}
