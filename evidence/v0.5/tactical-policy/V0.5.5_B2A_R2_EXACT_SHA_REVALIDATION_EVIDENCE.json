@@ -1,0 +1,258 @@
+{
+  "stage": "B2A_R2_EXACT_SHA_REVALIDATION",
+  "decision": "B2A_R2_EXACT_SHA_VALIDATED",
+  "repository": "EXASHXE/btc-quant-agent-public",
+  "implementation_branch": "feature/tactical-policy-r2",
+  "validated_implementation_sha": "79c8b82dd7c870b7e785af19823af8ec607c22de",
+  "parent_sha": "16db7108b41a48e653eaaef7e1cb774a6c317185",
+  "controller_dispatch_sha": "b62f82222c8b4966f7454d3daa3b914fd9cd451a",
+  "invalid_prior_sha": "79c8b8265001ff2f741ae0bc81fa30a08e698822",
+  "workspace": {
+    "pwd": "/root/workspace/project/Quant-agent-market-watch",
+    "clean_before": true,
+    "clean_after": true,
+    "runtime_import_path": "/root/workspace/project/Quant-agent-market-watch/src/btc_quant_agent/__init__.py",
+    "python_executable": "/root/workspace/project/Quant-agent-market-watch/.venv/bin/python3",
+    "python_version": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+    "pytest_version": "pytest 8.4.2",
+    "ruff_version": "ruff 0.16.9",
+    "mypy_version": "mypy 1.20.2 (compiled: yes)"
+  },
+  "implementation_diff": {
+    "commit_count_from_r1": 1,
+    "changed_files": [
+      "src/btc_quant_agent/market_watch/shadow.py",
+      "src/btc_quant_agent/market_watch/shadow_evidence.py",
+      "src/btc_quant_agent/market_watch/state.py",
+      "tests/test_tactical_shadow_evaluation_v2.py"
+    ]
+  },
+  "gates": [
+    {
+      "command": "python3 -m compileall -q src tests",
+      "working_directory": "/root/workspace/project/Quant-agent-market-watch",
+      "start_head": "79c8b82dd7c870b7e785af19823af8ec607c22de",
+      "exit_code": 0,
+      "summary": "Passed with 0 bytecode or syntax errors",
+      "duration_seconds": 0.066
+    },
+    {
+      "command": "git diff --check",
+      "working_directory": "/root/workspace/project/Quant-agent-market-watch",
+      "start_head": "79c8b82dd7c870b7e785af19823af8ec607c22de",
+      "exit_code": 0,
+      "summary": "Passed with 0 whitespace or formatting errors",
+      "duration_seconds": 0.005
+    },
+    {
+      "command": "ruff check .",
+      "working_directory": "/root/workspace/project/Quant-agent-market-watch",
+      "start_head": "79c8b82dd7c870b7e785af19823af8ec607c22de",
+      "exit_code": 0,
+      "summary": "All checks passed!",
+      "duration_seconds": 0.026
+    },
+    {
+      "command": "mypy src",
+      "working_directory": "/root/workspace/project/Quant-agent-market-watch",
+      "start_head": "79c8b82dd7c870b7e785af19823af8ec607c22de",
+      "exit_code": 0,
+      "summary": "Success: no issues found in 117 source files",
+      "duration_seconds": 0.272
+    }
+  ],
+  "focused_tests": {
+    "test_tactical_shadow_evaluation_v2": {
+      "command": "pytest -q tests/test_tactical_shadow_evaluation_v2.py",
+      "passed": 24,
+      "failed": 0,
+      "skipped": 0,
+      "xfailed": 0,
+      "xpassed": 0,
+      "warnings": 0,
+      "duration_seconds": 1.42,
+      "exit_code": 0
+    },
+    "test_tactical_feature_evidence_v2": {
+      "command": "pytest -q tests/test_tactical_feature_evidence_v2.py",
+      "passed": 31,
+      "failed": 0,
+      "skipped": 0,
+      "xfailed": 0,
+      "xpassed": 0,
+      "warnings": 0,
+      "duration_seconds": 1.92,
+      "exit_code": 0
+    },
+    "test_tactical_policy_b0": {
+      "command": "pytest -q tests/test_tactical_policy_b0.py",
+      "passed": 23,
+      "failed": 0,
+      "skipped": 0,
+      "xfailed": 0,
+      "xpassed": 0,
+      "warnings": 0,
+      "duration_seconds": 0.53,
+      "exit_code": 0
+    },
+    "test_market_watch": {
+      "command": "pytest -q tests/test_market_watch.py",
+      "passed": 137,
+      "failed": 0,
+      "skipped": 0,
+      "xfailed": 0,
+      "xpassed": 0,
+      "warnings": 0,
+      "duration_seconds": 3.89,
+      "exit_code": 0
+    }
+  },
+  "adversarial_invariants": [
+    {
+      "invariant_id": "B2AR2-A01",
+      "description": "funding before fill excluded",
+      "test_function_or_probe": "test_b2a_13_funding_ambiguity_scenarios",
+      "file": "tests/test_tactical_shadow_evaluation_v2.py",
+      "result": "PASS"
+    },
+    {
+      "invariant_id": "B2AR2-A02",
+      "description": "funding at/inside fill uncertainty -> ambiguous fill",
+      "test_function_or_probe": "test_b2a_05_funding_ambiguous_fill_boundary",
+      "file": "tests/test_tactical_shadow_evaluation_v2.py",
+      "result": "PASS"
+    },
+    {
+      "invariant_id": "B2AR2-A03",
+      "description": "funding strictly inside provable holding interval -> settled",
+      "test_function_or_probe": "test_b2a_13_funding_ambiguity_scenarios",
+      "file": "tests/test_tactical_shadow_evaluation_v2.py",
+      "result": "PASS"
+    },
+    {
+      "invariant_id": "B2AR2-A04",
+      "description": "funding at/inside exit uncertainty -> ambiguous exit",
+      "test_function_or_probe": "test_b2a_21_exit_boundary_funding_causality_scenarios",
+      "file": "tests/test_tactical_shadow_evaluation_v2.py",
+      "result": "PASS"
+    },
+    {
+      "invariant_id": "B2AR2-A05",
+      "description": "any ambiguity nulls aggregate authoritative funding result",
+      "test_function_or_probe": "test_b2a_21_exit_boundary_funding_causality_scenarios",
+      "file": "tests/test_tactical_shadow_evaluation_v2.py",
+      "result": "PASS"
+    },
+    {
+      "invariant_id": "B2AR2-A06",
+      "description": "funding after exit excluded",
+      "test_function_or_probe": "test_b2a_21_exit_boundary_funding_causality_scenarios",
+      "file": "tests/test_tactical_shadow_evaluation_v2.py",
+      "result": "PASS"
+    },
+    {
+      "invariant_id": "B2AR2-A07",
+      "description": "1m TP1 exit interval materialized and persisted",
+      "test_function_or_probe": "test_b2a_08_filled_tp1_evaluation_structure",
+      "file": "tests/test_tactical_shadow_evaluation_v2.py",
+      "result": "PASS"
+    },
+    {
+      "invariant_id": "B2AR2-A08",
+      "description": "1m STOP exit interval materialized and persisted",
+      "test_function_or_probe": "test_b2a_22_same_candle_terminal_resolution",
+      "file": "tests/test_tactical_shadow_evaluation_v2.py",
+      "result": "PASS"
+    },
+    {
+      "invariant_id": "B2AR2-A09",
+      "description": "15m fallback terminal interval materialized and persisted",
+      "test_function_or_probe": "test_b2a_22_same_candle_terminal_resolution",
+      "file": "tests/test_tactical_shadow_evaluation_v2.py",
+      "result": "PASS"
+    },
+    {
+      "invariant_id": "B2AR2-A10",
+      "description": "TIMEOUT exact boundary semantics",
+      "test_function_or_probe": "test_b2a_24_exit_interval_validation_invariants",
+      "file": "tests/test_tactical_shadow_evaluation_v2.py",
+      "result": "PASS"
+    },
+    {
+      "invariant_id": "B2AR2-A11",
+      "description": "NO_FILL contains no fill/exit interval authority",
+      "test_function_or_probe": "test_b2a_07_no_fill_evaluation_structure",
+      "file": "tests/test_tactical_shadow_evaluation_v2.py",
+      "result": "PASS"
+    },
+    {
+      "invariant_id": "B2AR2-A12",
+      "description": "missing embedded evaluation_id fails authoritative read",
+      "test_function_or_probe": "test_b2a_23_evaluation_identity_error_on_tampered_json",
+      "file": "tests/test_tactical_shadow_evaluation_v2.py",
+      "result": "PASS"
+    },
+    {
+      "invariant_id": "B2AR2-A13",
+      "description": "tampered embedded evaluation_id fails authoritative read",
+      "test_function_or_probe": "test_b2a_23_evaluation_identity_error_on_tampered_json",
+      "file": "tests/test_tactical_shadow_evaluation_v2.py",
+      "result": "PASS"
+    },
+    {
+      "invariant_id": "B2AR2-A14",
+      "description": "natural-key identical replay is idempotent",
+      "test_function_or_probe": "test_b2a_10_database_persistence_and_conflict",
+      "file": "tests/test_tactical_shadow_evaluation_v2.py",
+      "result": "PASS"
+    },
+    {
+      "invariant_id": "B2AR2-A15",
+      "description": "natural-key divergent replay fails closed",
+      "test_function_or_probe": "test_b2a_10_database_persistence_and_conflict",
+      "file": "tests/test_tactical_shadow_evaluation_v2.py",
+      "result": "PASS"
+    },
+    {
+      "invariant_id": "B2AR2-A16",
+      "description": "pre-B2A row cannot materialize B2A evaluation",
+      "test_function_or_probe": "test_b2a_18_legacy_b1_shadow_isolation",
+      "file": "tests/test_tactical_shadow_evaluation_v2.py",
+      "result": "PASS"
+    },
+    {
+      "invariant_id": "B2AR2-A17",
+      "description": "horizon bars/ms arithmetic invariant",
+      "test_function_or_probe": "test_b2a_01_playbook_evaluation_profiles",
+      "file": "tests/test_tactical_shadow_evaluation_v2.py",
+      "result": "PASS"
+    },
+    {
+      "invariant_id": "B2AR2-A18",
+      "description": "playbook-specific horizon mapping preserved",
+      "test_function_or_probe": "test_b2a_01_playbook_evaluation_profiles",
+      "file": "tests/test_tactical_shadow_evaluation_v2.py",
+      "result": "PASS"
+    }
+  ],
+  "full_suite": {
+    "command": "pytest -q",
+    "passed": 1959,
+    "skipped": 2,
+    "failed": 0,
+    "warnings": 8,
+    "duration_seconds": 800.42,
+    "exit_code": 0
+  },
+  "a_line_h40_fence": "ZERO_DIFF",
+  "execution_fence": {
+    "private_authenticated_trading_api": "ABSENT",
+    "order_placement": "ABSENT",
+    "order_cancel_amend": "ABSENT",
+    "account_position_mutation": "ABSENT",
+    "automatic_execution": "ABSENT"
+  },
+  "implementation_mutated_during_validation": false,
+  "blockers": [],
+  "next_lifecycle_state": "TACTICAL_POLICY_R2_B2A_R2_EXACT_SHA_VALIDATED_PENDING_CONTROLLER_ACCEPTANCE"
+}

@@ -1,13 +1,14 @@
 {
   "contract": "V0.5.1_B2A_R2_EXIT_BOUNDARY_FUNDING_CAUSALITY_SEAL",
-  "status": "TACTICAL_POLICY_R2_B2A_R2_DIRECTIONAL_OUTCOME_AUTHORITY_READY_FOR_CONTROLLER",
-  "timestamp": "2026-09-29T19:35:00+08:00",
+  "status": "TACTICAL_POLICY_R2_B2A_R2_EXACT_SHA_VALIDATED_PENDING_CONTROLLER_ACCEPTANCE",
+  "timestamp": "2026-09-30T18:00:00+08:00",
   "scientific_authority_mainline_sha": "407dabc415ae8cae4210250e992941c8b9b25464",
   "parent_accepted_b1_authority_sha": "f5b48f166c058cac9cec40d0894e96b1480fcb17",
   "previous_b2a_implementation_sha": "16db7108b41a48e653eaaef7e1cb774a6c317185",
-  "implementation_commit_sha": "79c8b8265001ff2f741ae0bc81fa30a08e698822",
+  "implementation_commit_sha": "79c8b82dd7c870b7e785af19823af8ec607c22de",
+  "invalid_prior_sha": "79c8b8265001ff2f741ae0bc81fa30a08e698822",
   "branch": "feature/tactical-policy-r2",
-  "docs_branch": "v0.5-refactor-docs",
+  "docs_branch": "v0.5.5-docs",
   "versions": {
     "tactical_policy_version": "TACTICAL_POLICY_R2_B0",
     "tactical_feature_evidence_schema_version": "TACTICAL_FEATURE_EVIDENCE_V2",
