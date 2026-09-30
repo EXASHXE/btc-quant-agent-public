@@ -2,7 +2,7 @@
   "schema_id": "V0.5.5_A_LINE_CURRENT_AUTHORITY",
   "repository": "EXASHXE/btc-quant-agent-public",
   "line": "A_LINE",
-  "stage": "A1_SYNTHETIC_METHOD_AUTHORITY_ASTRA_AUDIT_R1__A2_H42_FEASIBILITY_PARALLEL",
+  "stage": "A1_SYNTHETIC_METHOD_AUTHORITY_SOL_INDEPENDENT_AUDIT_R1__A2_H42_FEASIBILITY_PARALLEL",
   "code_branch": "v0.5.5",
   "accepted_code_sha": "8ecff4ec4b25bf73a35309689fd3ecfacc0d3399",
   "docs_authority_commit": "5585d8844e7cd61f26af5291f0db102283dd8106",
@@ -19,7 +19,7 @@
     "production_code_change_authorized": false
   },
   "authorized_next_stage": {
-    "a1": "A1_SYNTHETIC_METHOD_AUTHORITY_ASTRA_AUDIT_R1",
+    "a1": "A1_SYNTHETIC_METHOD_AUTHORITY_SOL_INDEPENDENT_AUDIT_R1",
     "a2": "H42_STRATEGY_DISCOVERY_HYBRID_CAPABLE_FEASIBILITY_R1"
   },
   "binding_fields": {
@@ -43,7 +43,7 @@
       ],
       "calendar_budget_total_months_max": 4
     },
-    "trial_1_blocker_state": "METHOD_DESIGN_ACCEPTED_PENDING_ASTRA",
+    "trial_1_blocker_state": "METHOD_DESIGN_ACCEPTED_PENDING_INDEPENDENT_AUDIT",
     "accepted_method_gaps": [
       "M01_SCIENTIFIC_DGP_GAP",
       "M02_SCIENTIFIC_DGP_GAP",
@@ -56,11 +56,11 @@
     "method_design_sha": "9b92ec290e4f9de93c140ca471a0eb1644526e2b",
     "method_design_semantic_root_sha256": "718efa1bbad00e68aaacf4cd2c2034265776b242024e0acbf09455847b2fc106",
     "method_gap_status": {
-      "M01": "SPECIFIED_PENDING_ASTRA",
-      "M02": "SPECIFIED_PENDING_ASTRA",
-      "M03": "SPECIFIED_PENDING_ASTRA",
-      "M04": "SPECIFIED_PENDING_ASTRA",
-      "M05": "SPECIFIED_PENDING_ASTRA"
+      "M01": "SPECIFIED_PENDING_INDEPENDENT_AUDIT",
+      "M02": "SPECIFIED_PENDING_INDEPENDENT_AUDIT",
+      "M03": "SPECIFIED_PENDING_INDEPENDENT_AUDIT",
+      "M04": "SPECIFIED_PENDING_INDEPENDENT_AUDIT",
+      "M05": "SPECIFIED_PENDING_INDEPENDENT_AUDIT"
     },
     "resource_feasibility": "NOT_CERTIFIED",
     "literal_logical_outer_records": 11863110020400
@@ -79,5 +79,5 @@
       "reason": "Accepted implementation semantics needed to review claimed inference compatibility."
     }
   ],
-  "note": "Cache/index of accepted authority only. Immutable underlying authority wins on conflict."
+  "note": "Cache/index of accepted authority only. Immutable underlying authority wins on conflict. Current independent reviewer is Sol in a fresh isolated audit session."
 }
