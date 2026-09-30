@@ -1,0 +1,43 @@
+{
+  "schema_id": "V0.5.5_H41_SUCCESSOR_H0_DISPATCH_CONFORMANCE_R1",
+  "repository": "EXASHXE/btc-quant-agent-public",
+  "controller_role": "CHATGPT_0_PRIMARY_CONTROLLER_AND_REVIEWER",
+  "stage": "H41_SUCCESSOR_HYBRID_HOLDOUT_FEASIBILITY_AND_EXPOSURE_R1",
+  "execution_class": "SOURCE_AND_EXPOSURE_FEASIBILITY_ONLY_NO_CANDIDATE_OUTCOME_ACCESS_NO_PRODUCTION_CHANGE",
+  "prompt_path": "prompts/v0.5/design/v0.5.1_H41_SUCCESSOR_HYBRID_HOLDOUT_FEASIBILITY_AND_EXPOSURE_R1.md",
+  "prompt_dispatch_lineage_repair_commit": "a29998533261a2edbada935667d1ed4b4037ac02",
+  "project_status_binding_commit": "ad18663d886c57f19a943310a5c5b41cd6a4e060",
+  "docs_branch": "v0.5.5-docs",
+  "code_branch": "v0.5.5",
+  "accepted_code_head": "8ecff4ec4b25bf73a35309689fd3ecfacc0d3399",
+  "tactical_b_line_head": "79c8b82dd7c870b7e785af19823af8ec607c22de",
+  "dispatch_rule": {
+    "docs_start_sha_source": "LIVE_CONTROLLER_DISPATCH",
+    "executor_must_match_checked_out_head": true,
+    "mismatch_state": "START_SHA_MISMATCH",
+    "rebase_across_unreviewed_changes_allowed": false
+  },
+  "repaired_stale_bindings": {
+    "old_docs_branch": "v0.5-refactor-docs",
+    "old_embedded_docs_start_sha": "9a8b7d467b91b2c353e465d8c93d58f527e55086",
+    "old_sha_disposition": "HISTORICAL_R1_1_LINEAGE_ONLY",
+    "current_docs_branch": "v0.5.5-docs"
+  },
+  "scientific_fences": {
+    "h41": "ACCEPTED_TERMINAL_NO_GO",
+    "h41_wf1_validation": "SEALED",
+    "successor_design_frozen": false,
+    "successor_implementation_authorized": false,
+    "successor_discovery_authorized": false,
+    "successor_validation_authorized": false
+  },
+  "controller_actions": {
+    "production_code_changed": false,
+    "protected_candidate_outcome_access": false,
+    "protected_h39_unblind": false,
+    "h41_validation_outcome_access": false
+  },
+  "decision": "H0_EXECUTION_READY_FOR_EXTERNAL_TECHNICAL_EXECUTOR",
+  "recommended_executor": "GPT-6.1 Sol / Codex",
+  "next_action": "EXECUTE_H0_FROM_EXACT_CONTROLLER_DISPATCH_SHA"
+}
