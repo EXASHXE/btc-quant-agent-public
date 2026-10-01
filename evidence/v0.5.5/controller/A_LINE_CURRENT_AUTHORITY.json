@@ -2,13 +2,13 @@
   "schema_id": "V0.5.5_A_LINE_CURRENT_AUTHORITY",
   "repository": "EXASHXE/btc-quant-agent-public",
   "line": "A_LINE",
-  "stage": "A1_SYNTHETIC_METHOD_AUTHORITY_SOL_INDEPENDENT_AUDIT_R1B__A2_H42_FEASIBILITY_PARALLEL",
+  "stage": "A1_METHOD_MATERIALIZATION_REFERENCE_IMPLEMENTATION_AND_RESOURCE_CERTIFICATION_R1__A2_H42_FEASIBILITY_PARALLEL",
   "code_branch": "v0.5.5",
   "accepted_code_sha": "8ecff4ec4b25bf73a35309689fd3ecfacc0d3399",
-  "docs_authority_commit": "cb440874d39f3ecd2d9828955b6f192a14765a06",
+  "docs_authority_commit": "6081e89abf729c3af3c2d5ef5d89748ca0bd57ab",
   "current_controller_authority": {
-    "path": "evidence/v0.5.5/controller/V0.5.5_A1_SOL_SELF_AUDIT_CONTROLLER_DISPOSITION_R1.json",
-    "blob_sha": "a278fb2d3eef738e4dd390e24754caeab362fa0e"
+    "path": "evidence/v0.5.5/controller/V0.5.5_A1_SOL_INDEPENDENT_AUDIT_R1B_CONTROLLER_ACCEPTANCE.json",
+    "blob_sha": "0b6892f8ac6c57463dd1951d91a95174353666ce"
   },
   "protected_state": {
     "h41_terminal_no_go": true,
@@ -19,7 +19,7 @@
     "production_code_change_authorized": false
   },
   "authorized_next_stage": {
-    "a1": "A1_SYNTHETIC_METHOD_AUTHORITY_SOL_INDEPENDENT_AUDIT_R1B",
+    "a1": "A1_METHOD_MATERIALIZATION_REFERENCE_IMPLEMENTATION_AND_RESOURCE_CERTIFICATION_R1",
     "a2": "H42_STRATEGY_DISCOVERY_HYBRID_CAPABLE_FEASIBILITY_R1"
   },
   "binding_fields": {
@@ -43,7 +43,7 @@
       ],
       "calendar_budget_total_months_max": 4
     },
-    "trial_1_blocker_state": "INDEPENDENCE_GATE_NOT_SATISFIED",
+    "trial_1_blocker_state": "METHOD_AUDIT_PASSED_PENDING_MATERIALIZATION_IMPLEMENTATION_RESOURCE_CERTIFICATION",
     "accepted_method_gaps": [
       "M01_SCIENTIFIC_DGP_GAP",
       "M02_SCIENTIFIC_DGP_GAP",
@@ -56,32 +56,39 @@
     "method_design_sha": "9b92ec290e4f9de93c140ca471a0eb1644526e2b",
     "method_design_semantic_root_sha256": "718efa1bbad00e68aaacf4cd2c2034265776b242024e0acbf09455847b2fc106",
     "method_gap_status": {
-      "M01": "SPECIFIED_PENDING_INDEPENDENT_AUDIT",
-      "M02": "SPECIFIED_PENDING_INDEPENDENT_AUDIT",
-      "M03": "SPECIFIED_PENDING_INDEPENDENT_AUDIT",
-      "M04": "SPECIFIED_PENDING_INDEPENDENT_AUDIT",
-      "M05": "SPECIFIED_PENDING_INDEPENDENT_AUDIT"
+      "M01": "PASS",
+      "M02": "PASS",
+      "M03": "PASS",
+      "M04": "PASS",
+      "M05": "PASS"
     },
-    "resource_feasibility": "NOT_CERTIFIED",
+    "resource_feasibility": "REQUIRES_PROVEN_EQUIVALENT_ACCELERATION",
     "literal_logical_outer_records": 11863110020400,
     "prior_self_review_sha": "a7db56f516f616688438f1c02bc47c7618a9d281",
     "prior_self_review_status": "ADVISORY_EVIDENCE_ONLY",
-    "independent_audit_required": true,
-    "independent_audit_attempt": "R1B"
+    "independent_audit_required": false,
+    "independent_audit_attempt": "R1B_PASSED",
+    "mc_certification": "VALID_CONSERVATIVE_CERTIFICATION",
+    "only_potential_utility_setting": {
+      "discovery_months": 2,
+      "validation_months": 2,
+      "support_threshold": 12
+    },
+    "materialization_stage": "A1_METHOD_MATERIALIZATION_REFERENCE_IMPLEMENTATION_AND_RESOURCE_CERTIFICATION_R1"
   },
   "must_read": [
     {
       "path": "reviews/v0.5/V0.5.5_A1_SYNTHETIC_METHOD_AUTHORITY_DESIGN_R1.md",
-      "reason": "Normative method design under independent audit."
+      "reason": "Normative method semantics to materialize and implement exactly."
     },
     {
-      "path": "reviews/v0.5/V0.5.1_H41_SUCCESSOR_SCIENTIFIC_CAMPAIGN_V1_DESIGN_R1_1_CONTROLLER_REPAIR.md",
-      "reason": "Baseline scientific semantics for compatibility and unauthorized-drift audit."
+      "path": "evidence/v0.5.5/h41/V0.5.5_A1_SYNTHETIC_METHOD_AUTHORITY_DESIGN_R1.json",
+      "reason": "Normative machine semantic_contract, roots, grids, and receipt schema needed for materialization."
     },
     {
       "path": "src/btc_quant_agent/h41/inference.py",
-      "reason": "Accepted inference implementation semantics for compatibility audit."
+      "reason": "Accepted inference primitive to adapt consistently in the reference implementation."
     }
   ],
-  "note": "Cache/index of accepted authority only. Prior same-session self-review is advisory evidence and should not be supplied to the fresh R1B reviewer by default. Immutable underlying authority wins on conflict."
+  "note": "Cache/index of accepted authority only. Independent R1B audit passed. Immutable underlying authority wins on conflict."
 }
