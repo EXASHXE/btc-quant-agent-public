@@ -329,3 +329,51 @@ def load_config(path: str | Path | None = None) -> AppConfig:
         notify=config.notify,
         market_watch=config.market_watch,
     )
+
+
+@dataclass(frozen=True)
+class LiveV1Config:
+    """Separate, opt-in Day-1 service configuration. Credentials stay in env/client boundaries."""
+
+    enabled: bool = False
+    sqlite_path: str = "./var/live_v1.db"
+    responses_model: str = ""
+    codex_model: str = ""
+    codex_enabled: bool = False
+    analysis_timeout_seconds: float = 60.0
+    case_ttl_ms: int = 120000
+    feishu_app_id: str = ""
+    feishu_receive_id: str = ""
+    feishu_approver_open_ids: tuple[str, ...] = ()
+
+    def __post_init__(self) -> None:
+        _require_positive_int(self.case_ttl_ms, "live_v1.case_ttl_ms")
+        _require_nonnegative_real(self.analysis_timeout_seconds, "live_v1.analysis_timeout_seconds")
+        if self.analysis_timeout_seconds == 0:
+            raise ValueError("live_v1.analysis_timeout_seconds must be positive")
+        if self.codex_enabled and not self.codex_model:
+            raise ValueError("live_v1.codex_model is required when Codex is enabled")
+
+    @classmethod
+    def from_env(cls) -> LiveV1Config:
+        def flag(name: str) -> bool:
+            value = os.getenv(name, "false").lower()
+            if value not in ("true", "false"):
+                raise ValueError(f"{name} must be true or false")
+            return value == "true"
+
+        return cls(
+            enabled=flag("BTC_QUANT_LIVE_V1_ENABLED"),
+            sqlite_path=os.getenv("BTC_QUANT_LIVE_V1_DB_PATH", "./var/live_v1.db"),
+            responses_model=os.getenv("BTC_QUANT_LIVE_RESPONSES_MODEL", ""),
+            codex_model=os.getenv("BTC_QUANT_LIVE_CODEX_MODEL", ""),
+            codex_enabled=flag("BTC_QUANT_LIVE_CODEX_ENABLED"),
+            analysis_timeout_seconds=float(os.getenv("BTC_QUANT_LIVE_ANALYSIS_TIMEOUT", "60")),
+            case_ttl_ms=int(os.getenv("BTC_QUANT_LIVE_CASE_TTL_MS", "120000")),
+            feishu_app_id=os.getenv("FEISHU_APP_ID", ""),
+            feishu_receive_id=os.getenv("FEISHU_RECEIVE_ID", ""),
+            feishu_approver_open_ids=tuple(
+                item.strip() for item in os.getenv("FEISHU_APPROVER_OPEN_IDS", "").split(",")
+                if item.strip()
+            ),
+        )

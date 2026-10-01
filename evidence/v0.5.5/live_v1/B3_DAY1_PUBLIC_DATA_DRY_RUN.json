@@ -1,0 +1,12 @@
+{
+  "public_market_data": "REAL_BINANCE",
+  "assessment_direction": "WAIT",
+  "source_evidence_id": "686a42f771811bc7d5e97da4ddf61cccec2e454c3a328cbf193690c149294cf9",
+  "case_hash": "bdcd1ea7c7cfe430c6583afdd4cce1e4cfc456e83cc5bbb7942b52c74f03c00a",
+  "proposal_hash": "3ef990d3b08054465d2fa4e6e4afc5f02abbef9ef12a28e96bc940baded02ec2",
+  "responses_provider": "MOCK_CREDENTIALS_ABSENT",
+  "feishu_provider": "MOCK_CREDENTIALS_ABSENT",
+  "callback_status": 200,
+  "persisted_state": "REJECTED",
+  "exchange_write_count": 0
+}

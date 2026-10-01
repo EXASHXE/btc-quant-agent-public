@@ -3,11 +3,15 @@ from __future__ import annotations
 import os
 import secrets
 import time
+from typing import TYPE_CHECKING
 
 from . import __version__
 from .config import load_config
 from .explain import explain_signal
 from .service import QuantService
+
+if TYPE_CHECKING:
+    from .decision.service import TacticalLiveService
 
 try:
     from fastapi import Depends, FastAPI, HTTPException
@@ -37,13 +41,35 @@ def _require_api_token(
         )
 
 
-def create_app() -> FastAPI:
+def create_app(live_service: TacticalLiveService | None = None) -> FastAPI:
     app = FastAPI(
         title="BTC Quant Signal API",
         version=__version__,
         dependencies=[Depends(_require_api_token)],
     )
     service = QuantService.create(load_config())
+
+    if live_service is not None or os.getenv("BTC_QUANT_LIVE_V1_ENABLED", "false") == "true":
+        from .approval.callback import create_callback_app
+        from .config import LiveV1Config
+        from .decision.api import create_live_router
+        from .decision.service import TacticalLiveService
+        from .market_watch.service import MarketWatchService
+
+        live_config = LiveV1Config.from_env()
+        live = live_service or TacticalLiveService.from_config(
+            live_config,
+            MarketWatchService.create(service.config.market_watch, service.config.data),
+        )
+        # Mounted app authenticates Feishu callbacks independently of the API bearer.
+        app.mount("/live-v1/feishu", create_callback_app(
+            live.store, os.getenv("FEISHU_VERIFICATION_TOKEN", ""),
+            signing_secret=os.getenv("FEISHU_ENCRYPT_KEY", ""),
+            approver_open_ids=live_config.feishu_approver_open_ids,
+            app_id=live_config.feishu_app_id,
+        ))
+
+        app.include_router(create_live_router(live))
 
     @app.get("/health")
     def health() -> dict[str, object]:

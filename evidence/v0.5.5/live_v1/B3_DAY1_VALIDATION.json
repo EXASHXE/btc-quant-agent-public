@@ -1,0 +1,115 @@
+{
+  "task": "B3_LIVE_V1_DECISION_PIPELINE_IMPLEMENTATION",
+  "repository": "EXASHXE/btc-quant-agent-public",
+  "task_branch": "feature/b-line-live-v1",
+  "start_sha": "52c16a28153de307dc6132c0975fe29341a0a918",
+  "accepted_bline_code_sha": "52c16a28153de307dc6132c0975fe29341a0a918",
+  "controller_dispatch_sha": "f6978a1025e646e5ca6e47d2c863cfd424602d60",
+  "precheck": {
+    "remote_ref_refreshed": true,
+    "branch_head_and_clean_worktree_verified": true,
+    "runtime_import_from_checkout": true,
+    "python": "3.12.3"
+  },
+  "authority_identity": {
+    "current_authority_blob": "7532310f97026dad9623d09f8e3372f473d23a18",
+    "live_v1_manifest_blob": "93854106184b70cb7b6207bb4510d2f73ac663eb",
+    "current_dispatch_manifest_blob": "18bc8c90fa5db49d75fae62d14eb2c984c1c1ecf",
+    "b3_prompt_blob": "bc7c3f8761041f41affb30b9f44cbec8dc59df94",
+    "architecture_plan_blob": "8c10d41baecf43571b93061804d4bb98341ec224"
+  },
+  "authority_hydration": {
+    "exact_SHA_verification_retained": "YES",
+    "B_line_historical_acceptance_full_read": "NO",
+    "B2B_accepted_authority_full_history_hydration": "NO",
+    "recursive_authority_chasing": "NO",
+    "dispatch_manifest": "BINDING_FIELDS_ONLY",
+    "current_implementation_interfaces": "MUST_READ_COMPLETED",
+    "external_current_API_docs": "MUST_READ_COMPLETED_WHERE_CALL_SHAPE_DEPENDS_ON_THEM"
+  },
+  "quality_gates": {
+    "compileall": "PASS: src tests",
+    "git_diff_check": "PASS",
+    "ruff": "PASS",
+    "mypy": "PASS: 131 source files",
+    "final_live_v1_tests": {
+      "passed": 75
+    },
+    "affected_API_MarketWatch_execution_B2A_regressions": {
+      "passed": 209
+    },
+    "combined_live_and_affected_and_catalog_run": {
+      "passed": 309
+    },
+    "full_pytest": {
+      "passed": 2084,
+      "skipped": 2,
+      "warnings": 8,
+      "duration_seconds": 920.71
+    },
+    "independent_review": "NO_REMAINING_BLOCKING_FINDINGS"
+  },
+  "schemas": {
+    "case": "immutable CasePackageV1; canonical JSON and verified SHA-256",
+    "analysis": "strict AnalysisResultV1; executable authority fields forbidden",
+    "proposal": "deterministic TradeProposalV1; account_authority=DRY_RUN"
+  },
+  "provider_validation": {
+    "responses": "REAL_ASYNC_OPENAI_SDK_WITH_MOCK_HTTP; refusal/incomplete/schema/timeout tests",
+    "configured_responses_model": null,
+    "codex": "MOCK_PROCESS_SCHEMA_TIMEOUT_AND_FENCED_REVIEW_TESTS; REAL_RESTRICTED_SANDBOX_PROBE",
+    "configured_codex_model": null,
+    "codex_host_file_probe": "SYNTHETIC_FILE_OUTSIDE_WORKSPACE_READ_DENIED",
+    "codex_bounds": "wall timeout, input limit, result size validation, process-group cleanup",
+    "feishu": "MOCK_CUSTOM_APP_HTTP; REAL_AUTHENTICATED_ASGI_CALLBACK_AND_SQLITE_PERSISTENCE",
+    "credentialed_provider_calls": "NOT_RUN: configuration/credentials absent"
+  },
+  "public_market_e2e": "B3_DAY1_PUBLIC_DATA_DRY_RUN.json: real Binance assessment, mock providers, persisted REJECTED",
+  "approval": "exact active proposal/case hash binding; callback replay idempotency; TTL expiry; fenced durable review queue",
+  "fences": {
+    "h40_diff_zero": true,
+    "h41_diff_zero": true,
+    "tactical_policy_r2_untouched": true,
+    "accepted_B2B_evaluator_unchanged": true,
+    "existing_market_watch_strategy_unchanged": true,
+    "existing_exchange_write_path_unchanged_and_unreachable": true,
+    "existing_webhook_path_unchanged": true,
+    "controller_docs_branch_untouched": true
+  },
+  "exchange_write_count": 0,
+  "secret_isolation": "allowlisted immutable evidence projection; sanitized failures; no credential values in evidence/logs",
+  "remaining_validation": "credentialed Responses/Feishu and actual Codex model invocation require configured model IDs and credentials",
+  "changed_files": [
+    "evidence/v0.5.5/live_v1/B3_DAY1_PUBLIC_DATA_DRY_RUN.json",
+    "evidence/v0.5.5/live_v1/B3_DAY1_VALIDATION.json",
+    "pyproject.toml",
+    "src/btc_quant_agent/api.py",
+    "src/btc_quant_agent/approval/__init__.py",
+    "src/btc_quant_agent/approval/callback.py",
+    "src/btc_quant_agent/approval/feishu.py",
+    "src/btc_quant_agent/approval/store.py",
+    "src/btc_quant_agent/config.py",
+    "src/btc_quant_agent/decision/__init__.py",
+    "src/btc_quant_agent/decision/api.py",
+    "src/btc_quant_agent/decision/backends.py",
+    "src/btc_quant_agent/decision/case.py",
+    "src/btc_quant_agent/decision/fusion.py",
+    "src/btc_quant_agent/decision/models.py",
+    "src/btc_quant_agent/decision/risk.py",
+    "src/btc_quant_agent/decision/service.py",
+    "tests/test_live_v1_decision_api.py",
+    "tests/test_live_v1_decision_approval.py",
+    "tests/test_live_v1_decision_backends.py",
+    "tests/test_live_v1_decision_case.py",
+    "tests/test_live_v1_decision_e2e.py",
+    "tests/test_live_v1_decision_models.py",
+    "tests/test_live_v1_decision_risk.py"
+  ],
+  "external_API_references": [
+    "https://developers.openai.com/api/docs/guides/text",
+    "https://developers.openai.com/api/docs/guides/structured-outputs",
+    "https://learn.chatgpt.com/docs/non-interactive-mode",
+    "https://learn.chatgpt.com/docs/developer-commands?surface=cli",
+    "https://learn.chatgpt.com/docs/permissions"
+  ]
+}
