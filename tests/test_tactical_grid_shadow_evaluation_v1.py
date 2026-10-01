@@ -4,6 +4,7 @@ import json
 import subprocess
 from dataclasses import replace
 from pathlib import Path
+from typing import Any
 
 import pytest
 from test_tactical_feature_evidence_v2 import build_sample_evidence_and_assessment
@@ -22,6 +23,8 @@ from btc_quant_agent.market_watch.evidence import (
     compute_evidence_id,
 )
 from btc_quant_agent.market_watch.grid_shadow import (
+    GridShadowEvaluationManager,
+    _build_pause_evaluation,
     evaluate_grid_shadow_episode,
 )
 from btc_quant_agent.market_watch.grid_shadow_evidence import (
@@ -30,6 +33,7 @@ from btc_quant_agent.market_watch.grid_shadow_evidence import (
     GridTerminalReason,
     TacticalGridShadowEvaluationConflictError,
     TacticalGridShadowEvaluationIdentityError,
+    canonical_grid_shadow_evaluation_json,
     compute_anchor_index,
     construct_grid_levels,
     deserialize_tactical_grid_shadow_evaluation,
@@ -194,12 +198,13 @@ def test_b2b_a04_divergent_same_natural_key_replay_fails_closed(tmp_path: Path) 
     ev = _make_grid_evidence()
     _insert_feature_evidence(store, ev)
 
-    candles1 = _make_1m_candles(ev.decision_time_ms, 5, [(50000.0, 50000.0, 50000.0, 50000.0)])
+    candles1 = _make_1m_candles(ev.decision_time_ms, 1440, [(50000.0, 50000.0, 50000.0, 50000.0)] * 1440)
     eval_res1 = evaluate_grid_shadow_episode(ev, candles1)
+    assert eval_res1.eligibility_status == GridEligibilityStatus.RESOLVED.value
     store.save_grid_shadow_evaluation(eval_res1)
 
     # Different candles produce different evaluation_id under the same feature_evidence_id
-    candles2 = _make_1m_candles(ev.decision_time_ms, 5, [(49000.0, 49000.0, 48500.0, 48500.0)])
+    candles2 = _make_1m_candles(ev.decision_time_ms, 1440, [(49000.0, 49000.0, 48500.0, 48500.0)] * 1440)
     eval_res2 = evaluate_grid_shadow_episode(ev, candles2)
     assert eval_res1.evaluation_id != eval_res2.evaluation_id
     assert eval_res1.feature_evidence_id == eval_res2.feature_evidence_id
@@ -754,3 +759,557 @@ def test_b2b_a35_no_authenticated_or_private_order_mutation_exists() -> None:
         content = p.read_text(encoding="utf-8")
         for term in forbidden_terms:
             assert term not in content, f"Forbidden execution term '{term}' found in {tf}"
+
+
+# ==============================================================================
+# R1-A01 .. R1-A15: Pending Lifecycle Repair Adversarial Tests
+# ==============================================================================
+
+class _MockBinanceClient:
+    def __init__(self, candles: list[Candle]) -> None:
+        self._candles = candles
+
+    def historical_klines(self, symbol: str, interval: str, start_ms: int, end_ms: int) -> list[Candle]:
+        return [c for c in self._candles if start_ms <= c.open_time_ms < end_ms]
+
+    def funding_rate_history(self, symbol: str, start_ms: int, end_ms: int) -> list[dict[str, Any]]:
+        return []
+
+
+def test_r1_a01_pending_horizon_identical_idempotent(tmp_path: Path) -> None:
+    """R1-A01: persist PENDING_HORIZON -> save identical artifact -> same ID idempotent."""
+    store = MarketWatchStateStore(tmp_path / "mw.db")
+    ev = _make_grid_evidence()
+    _insert_feature_evidence(store, ev)
+
+    candles = _make_1m_candles(ev.decision_time_ms, 5, [(50000.0, 50000.0, 50000.0, 50000.0)])
+    eval_res = evaluate_grid_shadow_episode(ev, candles)
+    assert eval_res.eligibility_status == GridEligibilityStatus.PENDING_HORIZON.value
+
+    id1 = store.save_grid_shadow_evaluation(eval_res)
+    id2 = store.save_grid_shadow_evaluation(eval_res)
+    assert id1 == id2 == eval_res.evaluation_id
+
+    # Verify single row in DB
+    evals = store.list_grid_shadow_evaluations(symbol=ev.symbol)
+    assert len(evals) == 1
+    assert evals[0].evaluation_id == id1
+
+
+def test_r1_a02_pending_horizon_to_newer_pending_horizon(tmp_path: Path) -> None:
+    """R1-A02: persist PENDING_HORIZON -> newer PENDING_HORIZON -> replacement succeeds."""
+    store = MarketWatchStateStore(tmp_path / "mw.db")
+    ev = _make_grid_evidence()
+    _insert_feature_evidence(store, ev)
+
+    candles1 = _make_1m_candles(ev.decision_time_ms, 5, [(50000.0, 50000.0, 50000.0, 50000.0)] * 5)
+    eval1 = evaluate_grid_shadow_episode(ev, candles1)
+    assert eval1.eligibility_status == GridEligibilityStatus.PENDING_HORIZON.value
+    id1 = store.save_grid_shadow_evaluation(eval1)
+
+    candles2 = _make_1m_candles(
+        ev.decision_time_ms,
+        10,
+        [(50000.0, 50000.0, 50000.0, 50000.0)] * 5 + [(49500.0, 49500.0, 49000.0, 49200.0)] * 5,
+    )
+    eval2 = evaluate_grid_shadow_episode(ev, candles2)
+    assert eval2.eligibility_status == GridEligibilityStatus.PENDING_HORIZON.value
+    assert eval1.evaluation_id != eval2.evaluation_id
+
+    id2 = store.save_grid_shadow_evaluation(eval2)
+    assert id2 == eval2.evaluation_id
+
+    # Old provisional evaluation_id is no longer the natural-key authority
+    assert store.get_grid_shadow_evaluation(id1) is None
+    fetched = store.get_grid_shadow_evaluation(id2)
+    assert fetched is not None
+    assert fetched.evaluation_id == id2
+
+    by_feat = store.get_grid_shadow_evaluation_by_feature_id(ev.evidence_id, eval2.evaluation_profile_version)
+    assert by_feat is not None
+    assert by_feat.evaluation_id == id2
+
+    evals = store.list_grid_shadow_evaluations(symbol=ev.symbol)
+    assert len(evals) == 1
+
+
+def test_r1_a03_pending_data_gap_to_newer_pending_data_gap(tmp_path: Path) -> None:
+    """R1-A03: persist PENDING_DATA_GAP -> newer PENDING_DATA_GAP -> replacement succeeds."""
+    store = MarketWatchStateStore(tmp_path / "mw.db")
+    ev = _make_grid_evidence()
+    _insert_feature_evidence(store, ev)
+
+    # Missing first candle creates data gap
+    gap_candles1 = _make_1m_candles(ev.decision_time_ms + 120_000, 5, [(50000.0, 50000.0, 50000.0, 50000.0)] * 5)
+    eval1 = evaluate_grid_shadow_episode(ev, gap_candles1)
+    assert eval1.eligibility_status == GridEligibilityStatus.PENDING_DATA_GAP.value
+    id1 = store.save_grid_shadow_evaluation(eval1)
+
+    gap_candles2 = _make_1m_candles(
+        ev.decision_time_ms + 120_000,
+        10,
+        [(50000.0, 50000.0, 50000.0, 50000.0)] * 5 + [(49500.0, 49500.0, 49000.0, 49200.0)] * 5,
+    )
+    eval2 = evaluate_grid_shadow_episode(ev, gap_candles2)
+    assert eval2.eligibility_status == GridEligibilityStatus.PENDING_DATA_GAP.value
+    assert eval1.evaluation_id != eval2.evaluation_id
+
+    id2 = store.save_grid_shadow_evaluation(eval2)
+    assert id2 == eval2.evaluation_id
+
+    assert store.get_grid_shadow_evaluation(id1) is None
+    fetched = store.get_grid_shadow_evaluation(id2)
+    assert fetched is not None
+    assert fetched.evaluation_id == id2
+
+    evals = store.list_grid_shadow_evaluations(symbol=ev.symbol)
+    assert len(evals) == 1
+
+
+def test_r1_a04_pending_data_gap_to_pending_horizon(tmp_path: Path) -> None:
+    """R1-A04: PENDING_DATA_GAP -> PENDING_HORIZON succeeds."""
+    store = MarketWatchStateStore(tmp_path / "mw.db")
+    ev = _make_grid_evidence()
+    _insert_feature_evidence(store, ev)
+
+    gap_candles = _make_1m_candles(ev.decision_time_ms + 120_000, 5, [(50000.0, 50000.0, 50000.0, 50000.0)])
+    eval_gap = evaluate_grid_shadow_episode(ev, gap_candles)
+    assert eval_gap.eligibility_status == GridEligibilityStatus.PENDING_DATA_GAP.value
+    id_gap = store.save_grid_shadow_evaluation(eval_gap)
+
+    # Gap repaired: continuous from decision time, but partial horizon
+    cont_candles = _make_1m_candles(ev.decision_time_ms, 10, [(50000.0, 50000.0, 50000.0, 50000.0)])
+    eval_horiz = evaluate_grid_shadow_episode(ev, cont_candles)
+    assert eval_horiz.eligibility_status == GridEligibilityStatus.PENDING_HORIZON.value
+    assert eval_gap.evaluation_id != eval_horiz.evaluation_id
+
+    id_horiz = store.save_grid_shadow_evaluation(eval_horiz)
+    assert id_horiz == eval_horiz.evaluation_id
+
+    assert store.get_grid_shadow_evaluation(id_gap) is None
+    fetched = store.get_grid_shadow_evaluation(id_horiz)
+    assert fetched is not None
+    assert fetched.eligibility_status == GridEligibilityStatus.PENDING_HORIZON.value
+
+    evals = store.list_grid_shadow_evaluations(symbol=ev.symbol)
+    assert len(evals) == 1
+
+
+def test_r1_a05_pending_horizon_to_pending_data_gap(tmp_path: Path) -> None:
+    """R1-A05: PENDING_HORIZON -> PENDING_DATA_GAP succeeds."""
+    store = MarketWatchStateStore(tmp_path / "mw.db")
+    ev = _make_grid_evidence()
+    _insert_feature_evidence(store, ev)
+
+    cont_candles = _make_1m_candles(ev.decision_time_ms, 5, [(50000.0, 50000.0, 50000.0, 50000.0)])
+    eval_horiz = evaluate_grid_shadow_episode(ev, cont_candles)
+    assert eval_horiz.eligibility_status == GridEligibilityStatus.PENDING_HORIZON.value
+    id_horiz = store.save_grid_shadow_evaluation(eval_horiz)
+
+    # Gap revealed in data stream
+    gap_candles = _make_1m_candles(ev.decision_time_ms + 180_000, 5, [(50000.0, 50000.0, 50000.0, 50000.0)])
+    eval_gap = evaluate_grid_shadow_episode(ev, gap_candles)
+    assert eval_gap.eligibility_status == GridEligibilityStatus.PENDING_DATA_GAP.value
+    assert eval_horiz.evaluation_id != eval_gap.evaluation_id
+
+    id_gap = store.save_grid_shadow_evaluation(eval_gap)
+    assert id_gap == eval_gap.evaluation_id
+
+    assert store.get_grid_shadow_evaluation(id_horiz) is None
+    fetched = store.get_grid_shadow_evaluation(id_gap)
+    assert fetched is not None
+    assert fetched.eligibility_status == GridEligibilityStatus.PENDING_DATA_GAP.value
+
+    evals = store.list_grid_shadow_evaluations(symbol=ev.symbol)
+    assert len(evals) == 1
+
+
+def test_r1_a06_pending_horizon_to_resolved(tmp_path: Path) -> None:
+    """R1-A06: PENDING_HORIZON -> RESOLVED succeeds."""
+    store = MarketWatchStateStore(tmp_path / "mw.db")
+    ev = _make_grid_evidence()
+    _insert_feature_evidence(store, ev)
+
+    candles_partial = _make_1m_candles(ev.decision_time_ms, 5, [(50000.0, 50000.0, 50000.0, 50000.0)])
+    eval_pending = evaluate_grid_shadow_episode(ev, candles_partial)
+    assert eval_pending.eligibility_status == GridEligibilityStatus.PENDING_HORIZON.value
+    id_pending = store.save_grid_shadow_evaluation(eval_pending)
+
+    candles_full = _make_1m_candles(ev.decision_time_ms, 1440, [(50000.0, 50000.0, 50000.0, 50000.0)] * 1440)
+    eval_resolved = evaluate_grid_shadow_episode(ev, candles_full)
+    assert eval_resolved.eligibility_status == GridEligibilityStatus.RESOLVED.value
+    assert eval_pending.evaluation_id != eval_resolved.evaluation_id
+
+    id_resolved = store.save_grid_shadow_evaluation(eval_resolved)
+    assert id_resolved == eval_resolved.evaluation_id
+
+    assert store.get_grid_shadow_evaluation(id_pending) is None
+    fetched = store.get_grid_shadow_evaluation(id_resolved)
+    assert fetched is not None
+    assert fetched.eligibility_status == GridEligibilityStatus.RESOLVED.value
+
+    evals = store.list_grid_shadow_evaluations(symbol=ev.symbol)
+    assert len(evals) == 1
+
+
+def test_r1_a07_pending_data_gap_to_resolved(tmp_path: Path) -> None:
+    """R1-A07: PENDING_DATA_GAP -> RESOLVED succeeds."""
+    store = MarketWatchStateStore(tmp_path / "mw.db")
+    ev = _make_grid_evidence()
+    _insert_feature_evidence(store, ev)
+
+    gap_candles = _make_1m_candles(ev.decision_time_ms + 120_000, 5, [(50000.0, 50000.0, 50000.0, 50000.0)])
+    eval_gap = evaluate_grid_shadow_episode(ev, gap_candles)
+    assert eval_gap.eligibility_status == GridEligibilityStatus.PENDING_DATA_GAP.value
+    id_gap = store.save_grid_shadow_evaluation(eval_gap)
+
+    # Full repaired 1440 candles
+    candles_full = _make_1m_candles(ev.decision_time_ms, 1440, [(50000.0, 50000.0, 50000.0, 50000.0)] * 1440)
+    eval_resolved = evaluate_grid_shadow_episode(ev, candles_full)
+    assert eval_resolved.eligibility_status == GridEligibilityStatus.RESOLVED.value
+    assert eval_gap.evaluation_id != eval_resolved.evaluation_id
+
+    id_resolved = store.save_grid_shadow_evaluation(eval_resolved)
+    assert id_resolved == eval_resolved.evaluation_id
+
+    assert store.get_grid_shadow_evaluation(id_gap) is None
+    fetched = store.get_grid_shadow_evaluation(id_resolved)
+    assert fetched is not None
+    assert fetched.eligibility_status == GridEligibilityStatus.RESOLVED.value
+
+    evals = store.list_grid_shadow_evaluations(symbol=ev.symbol)
+    assert len(evals) == 1
+
+
+def test_r1_a08_resolved_rejects_divergent_replay(tmp_path: Path) -> None:
+    """R1-A08: after pending -> RESOLVED, divergent later result under same natural key fails closed."""
+    store = MarketWatchStateStore(tmp_path / "mw.db")
+    ev = _make_grid_evidence()
+    _insert_feature_evidence(store, ev)
+
+    candles_partial = _make_1m_candles(ev.decision_time_ms, 5, [(50000.0, 50000.0, 50000.0, 50000.0)])
+    eval_pending = evaluate_grid_shadow_episode(ev, candles_partial)
+    store.save_grid_shadow_evaluation(eval_pending)
+
+    candles_full = _make_1m_candles(ev.decision_time_ms, 1440, [(50000.0, 50000.0, 50000.0, 50000.0)] * 1440)
+    eval_resolved = evaluate_grid_shadow_episode(ev, candles_full)
+    id_resolved = store.save_grid_shadow_evaluation(eval_resolved)
+
+    # Attempt divergent replay with different candle prices
+    candles_divergent = _make_1m_candles(ev.decision_time_ms, 1440, [(49000.0, 49000.0, 48500.0, 48500.0)] * 1440)
+    eval_divergent = evaluate_grid_shadow_episode(ev, candles_divergent)
+    assert eval_divergent.evaluation_id != id_resolved
+
+    with pytest.raises(TacticalGridShadowEvaluationConflictError, match="B2B_EVALUATION_CONFLICT"):
+        store.save_grid_shadow_evaluation(eval_divergent)
+
+    # Attempt replay with pending artifact
+    with pytest.raises(TacticalGridShadowEvaluationConflictError, match="B2B_EVALUATION_CONFLICT"):
+        store.save_grid_shadow_evaluation(eval_pending)
+
+    # DB row remains untouched
+    fetched = store.get_grid_shadow_evaluation(id_resolved)
+    assert fetched is not None
+    assert fetched.evaluation_id == id_resolved
+
+
+def test_r1_a09_not_active_pause_rejects_divergent_replay(tmp_path: Path) -> None:
+    """R1-A09: NOT_ACTIVE_PAUSE remains immutable against divergent replay."""
+    store = MarketWatchStateStore(tmp_path / "mw.db")
+    ev = _make_grid_evidence(decision=GridDecision.PAUSE)
+    _insert_feature_evidence(store, ev)
+
+    pause_eval = _build_pause_evaluation(
+        evidence=ev,
+        grid_plan_ev=ev.grid_advisory_plan,
+        future_assessments=[],
+        assessment_diagnostic_coverage="UNAVAILABLE",
+    )
+    assert pause_eval.eligibility_status == GridEligibilityStatus.NOT_ACTIVE_PAUSE.value
+    id_pause = store.save_grid_shadow_evaluation(pause_eval)
+
+    # Attempt divergent replay: create another evaluation artifact under same natural key by supplying future assessments
+    asmt = {
+        "decision_time_ms": ev.decision_time_ms + 60_000,
+        "grid": {"decision": "PAUSE"},
+        "directional": {"regime": "NEUTRAL"},
+    }
+    pause_eval_divergent = _build_pause_evaluation(
+        evidence=ev,
+        grid_plan_ev=ev.grid_advisory_plan,
+        future_assessments=[asmt],
+        assessment_diagnostic_coverage="COMPLETE",
+    )
+    assert pause_eval_divergent.evaluation_id != id_pause
+    assert pause_eval_divergent.feature_evidence_id == ev.evidence_id
+
+    with pytest.raises(TacticalGridShadowEvaluationConflictError, match="Authoritative terminal row"):
+        store.save_grid_shadow_evaluation(pause_eval_divergent)
+
+    fetched = store.get_grid_shadow_evaluation(id_pause)
+    assert fetched is not None
+    assert fetched.evaluation_id == id_pause
+
+
+def test_r1_a10_pending_to_not_active_pause_fails_closed(tmp_path: Path) -> None:
+    """R1-A10: pending -> NOT_ACTIVE_PAUSE fails closed."""
+    store = MarketWatchStateStore(tmp_path / "mw.db")
+    ev = _make_grid_evidence(decision=GridDecision.LONG_BIAS)
+    _insert_feature_evidence(store, ev)
+
+    candles = _make_1m_candles(ev.decision_time_ms, 5, [(50000.0, 50000.0, 50000.0, 50000.0)])
+    eval_pending = evaluate_grid_shadow_episode(ev, candles)
+    assert eval_pending.eligibility_status == GridEligibilityStatus.PENDING_HORIZON.value
+    id_pending = store.save_grid_shadow_evaluation(eval_pending)
+
+    # Create a pause evaluation with the same feature_evidence_id
+    pause_eval = _build_pause_evaluation(
+        evidence=ev,
+        grid_plan_ev=replace(ev.grid_advisory_plan, decision=GridDecision.PAUSE.value),
+        future_assessments=[],
+        assessment_diagnostic_coverage="UNAVAILABLE",
+    )
+    assert pause_eval.eligibility_status == GridEligibilityStatus.NOT_ACTIVE_PAUSE.value
+
+    with pytest.raises(TacticalGridShadowEvaluationConflictError, match="Forbidden transition"):
+        store.save_grid_shadow_evaluation(pause_eval)
+
+    # Confirm original pending row unchanged
+    fetched = store.get_grid_shadow_evaluation(id_pending)
+    assert fetched is not None
+    assert fetched.evaluation_id == id_pending
+
+
+def test_r1_a11_tampered_existing_persisted_fails_closed(tmp_path: Path) -> None:
+    """R1-A11: tampered existing persisted evaluation_id/JSON fails closed before replacement."""
+    store = MarketWatchStateStore(tmp_path / "mw.db")
+    ev = _make_grid_evidence()
+    _insert_feature_evidence(store, ev)
+
+    candles1 = _make_1m_candles(ev.decision_time_ms, 5, [(50000.0, 50000.0, 50000.0, 50000.0)])
+    eval1 = evaluate_grid_shadow_episode(ev, candles1)
+    id1 = store.save_grid_shadow_evaluation(eval1)
+
+    # Tamper the DB row's evaluation_id to cause row/embedded mismatch
+    with store._connect() as conn:
+        conn.execute(
+            "UPDATE tactical_grid_shadow_evaluations_v1 SET evaluation_id = 'tampered_id_00000000000000000000' WHERE evaluation_id = ?",
+            (id1,),
+        )
+        conn.commit()
+
+    candles2 = _make_1m_candles(ev.decision_time_ms, 10, [(50000.0, 50000.0, 50000.0, 50000.0)] * 10)
+    eval2 = evaluate_grid_shadow_episode(ev, candles2)
+
+    with pytest.raises(TacticalGridShadowEvaluationIdentityError):
+        store.save_grid_shadow_evaluation(eval2)
+
+    # Also test corrupted JSON: deserialize, tamper a field, and serialize back without updating evaluation_id
+    tampered_dict = json.loads(canonical_grid_shadow_evaluation_json(eval1))
+    tampered_dict["paired_cycle_count"] = 999
+    tampered_json = json.dumps(tampered_dict)
+    with store._connect() as conn:
+        conn.execute(
+            "UPDATE tactical_grid_shadow_evaluations_v1 SET evaluation_id = ?, evaluation_json = ? WHERE feature_evidence_id = ?",
+            (id1, tampered_json, ev.evidence_id),
+        )
+        conn.commit()
+
+    with pytest.raises(TacticalGridShadowEvaluationIdentityError):
+        store.save_grid_shadow_evaluation(eval2)
+
+
+def test_r1_a12_pk_collision_under_different_natural_key_fails_closed(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """R1-A12: incoming artifact with primary-key collision under another natural key fails closed."""
+    store = MarketWatchStateStore(tmp_path / "mw.db")
+    ev1 = _make_grid_evidence(decision_time_ms=1_700_000_100_000)
+    _insert_feature_evidence(store, ev1)
+
+    candles1 = _make_1m_candles(ev1.decision_time_ms, 5, [(50000.0, 50000.0, 50000.0, 50000.0)])
+    eval1 = evaluate_grid_shadow_episode(ev1, candles1)
+    id1 = store.save_grid_shadow_evaluation(eval1)
+
+    ev2 = _make_grid_evidence(decision_time_ms=1_700_000_200_000)
+    _insert_feature_evidence(store, ev2)
+
+    candles2 = _make_1m_candles(ev2.decision_time_ms, 5, [(50000.0, 50000.0, 50000.0, 50000.0)])
+    eval2 = evaluate_grid_shadow_episode(ev2, candles2)
+
+    # Collide evaluation_id with eval1 under a different natural key
+    eval2_colliding = replace(eval2, evaluation_id=id1)
+
+    # 1. Unmodified validator fails closed with identity mismatch
+    with pytest.raises(TacticalGridShadowEvaluationIdentityError):
+        store.save_grid_shadow_evaluation(eval2_colliding)
+
+    # 2. Even if content hash check is bypassed, DB primary-key collision check fails closed with conflict error
+    import btc_quant_agent.market_watch.state as state_mod
+    monkeypatch.setattr(state_mod, "validate_tactical_grid_shadow_evaluation", lambda e: None)
+
+    with pytest.raises(TacticalGridShadowEvaluationConflictError, match="B2B_EVALUATION_CONFLICT.*under different natural key"):
+        store.save_grid_shadow_evaluation(eval2_colliding)
+
+
+def test_r1_a13_manager_e2e_pending_horizon_to_resolved(tmp_path: Path) -> None:
+    """R1-A13: manager end-to-end run: first run persists PENDING_HORIZON, later run with full 24h data resolves same natural key without ERROR."""
+    store = MarketWatchStateStore(tmp_path / "mw.db")
+    ev = _make_grid_evidence()
+    _insert_feature_evidence(store, ev)
+
+    # First run: client only has 5 candles
+    candles_5 = _make_1m_candles(ev.decision_time_ms, 5, [(50000.0, 50000.0, 50000.0, 50000.0)])
+    client1 = _MockBinanceClient(candles_5)
+    manager = GridShadowEvaluationManager(store)
+
+    res1 = manager.resolve_grid_evaluations(
+        client=client1,  # type: ignore[arg-type]
+        current_time_ms=ev.decision_time_ms + 5 * 60_000,
+        symbols=[ev.symbol],
+    )
+    assert res1["pending_count"] == 1
+    assert res1["resolved_count"] == 0
+    assert len(res1["results"]) == 1
+    assert res1["results"][0]["status"] == GridEligibilityStatus.PENDING_HORIZON.value
+    id_pending = res1["results"][0]["evaluation_id"]
+
+    eval_pending = store.get_grid_shadow_evaluation(id_pending)
+    assert eval_pending is not None
+    assert eval_pending.eligibility_status == GridEligibilityStatus.PENDING_HORIZON.value
+
+    # Second run: full 24h of data available (1440 candles)
+    candles_1440 = _make_1m_candles(ev.decision_time_ms, 1440, [(50000.0, 50000.0, 50000.0, 50000.0)] * 1440)
+    client2 = _MockBinanceClient(candles_1440)
+
+    res2 = manager.resolve_grid_evaluations(
+        client=client2,  # type: ignore[arg-type]
+        current_time_ms=ev.decision_time_ms + 1440 * 60_000,
+        symbols=[ev.symbol],
+    )
+    assert res2["pending_count"] == 0
+    assert res2["resolved_count"] == 1
+    assert len(res2["results"]) == 1
+    assert res2["results"][0]["status"] == "RESOLVED"
+    id_resolved = res2["results"][0]["evaluation_id"]
+
+    # Verify DB has exactly one row, old provisional id is gone, resolved id is authority
+    assert store.get_grid_shadow_evaluation(id_pending) is None
+    eval_resolved = store.get_grid_shadow_evaluation(id_resolved)
+    assert eval_resolved is not None
+    assert eval_resolved.eligibility_status == GridEligibilityStatus.RESOLVED.value
+
+    # Third run: already resolved, should be skipped
+    res3 = manager.resolve_grid_evaluations(
+        client=client2,  # type: ignore[arg-type]
+        current_time_ms=ev.decision_time_ms + 1440 * 60_000,
+        symbols=[ev.symbol],
+    )
+    assert res3["skipped_count"] == 1
+    assert res3["pending_count"] == 0
+    assert res3["resolved_count"] == 0
+
+
+def test_r1_a14_manager_e2e_pending_data_gap_to_resolved(tmp_path: Path) -> None:
+    """R1-A14: manager end-to-end run: first run persists PENDING_DATA_GAP, later repaired coverage resolves same natural key without ERROR."""
+    store = MarketWatchStateStore(tmp_path / "mw.db")
+    ev = _make_grid_evidence()
+    _insert_feature_evidence(store, ev)
+
+    # First run: data has gap at start (starts 2 min after decision time)
+    gap_candles = _make_1m_candles(ev.decision_time_ms + 120_000, 10, [(50000.0, 50000.0, 50000.0, 50000.0)])
+    client1 = _MockBinanceClient(gap_candles)
+    manager = GridShadowEvaluationManager(store)
+
+    res1 = manager.resolve_grid_evaluations(
+        client=client1,  # type: ignore[arg-type]
+        current_time_ms=ev.decision_time_ms + 15 * 60_000,
+        symbols=[ev.symbol],
+    )
+    assert res1["pending_count"] == 1
+    assert res1["results"][0]["status"] == GridEligibilityStatus.PENDING_DATA_GAP.value
+    id_gap = res1["results"][0]["evaluation_id"]
+
+    eval_gap = store.get_grid_shadow_evaluation(id_gap)
+    assert eval_gap is not None
+    assert eval_gap.eligibility_status == GridEligibilityStatus.PENDING_DATA_GAP.value
+
+    # Second run: backfill repaired gap, full 1440 candles
+    candles_full = _make_1m_candles(ev.decision_time_ms, 1440, [(50000.0, 50000.0, 50000.0, 50000.0)] * 1440)
+    client2 = _MockBinanceClient(candles_full)
+
+    res2 = manager.resolve_grid_evaluations(
+        client=client2,  # type: ignore[arg-type]
+        current_time_ms=ev.decision_time_ms + 1440 * 60_000,
+        symbols=[ev.symbol],
+    )
+    assert res2["resolved_count"] == 1
+    assert res2["pending_count"] == 0
+    id_resolved = res2["results"][0]["evaluation_id"]
+
+    assert store.get_grid_shadow_evaluation(id_gap) is None
+    eval_resolved = store.get_grid_shadow_evaluation(id_resolved)
+    assert eval_resolved is not None
+    assert eval_resolved.eligibility_status == GridEligibilityStatus.RESOLVED.value
+
+
+def test_r1_a15_manager_multiple_refreshes_then_resolved(tmp_path: Path) -> None:
+    """R1-A15: multiple intermediate pending refreshes followed by RESOLVED produce one natural-key row whose final embedded evaluation identity verifies."""
+    store = MarketWatchStateStore(tmp_path / "mw.db")
+    ev = _make_grid_evidence()
+    _insert_feature_evidence(store, ev)
+    manager = GridShadowEvaluationManager(store)
+
+    intermediate_ids: list[str] = []
+
+    # Refresh 1: 5 candles (PENDING_HORIZON, 0 fills)
+    c1 = _make_1m_candles(ev.decision_time_ms, 5, [(50000.0, 50000.0, 50000.0, 50000.0)] * 5)
+    r1 = manager.resolve_grid_evaluations(client=_MockBinanceClient(c1), current_time_ms=ev.decision_time_ms + 5 * 60_000, symbols=[ev.symbol])  # type: ignore[arg-type]
+    intermediate_ids.append(r1["results"][0]["evaluation_id"])
+
+    # Refresh 2: 15 candles with dip below 49000 (PENDING_HORIZON, 1 open lot)
+    c2 = _make_1m_candles(
+        ev.decision_time_ms,
+        15,
+        [(50000.0, 50000.0, 50000.0, 50000.0)] * 5 + [(49500.0, 49500.0, 48900.0, 48900.0)] * 10,
+    )
+    r2 = manager.resolve_grid_evaluations(client=_MockBinanceClient(c2), current_time_ms=ev.decision_time_ms + 15 * 60_000, symbols=[ev.symbol])  # type: ignore[arg-type]
+    intermediate_ids.append(r2["results"][0]["evaluation_id"])
+
+    # Refresh 3: gap candles (PENDING_DATA_GAP)
+    c3 = _make_1m_candles(ev.decision_time_ms + 120_000, 20, [(50000.0, 50000.0, 50000.0, 50000.0)] * 20)
+    r3 = manager.resolve_grid_evaluations(client=_MockBinanceClient(c3), current_time_ms=ev.decision_time_ms + 25 * 60_000, symbols=[ev.symbol])  # type: ignore[arg-type]
+    intermediate_ids.append(r3["results"][0]["evaluation_id"])
+
+    # Refresh 4: 50 continuous candles dipping then rebounding to close pair (PENDING_HORIZON, 1 paired cycle)
+    c4 = _make_1m_candles(
+        ev.decision_time_ms,
+        50,
+        [(50000.0, 50000.0, 50000.0, 50000.0)] * 5
+        + [(49500.0, 49500.0, 48900.0, 48900.0)] * 5
+        + [(49500.0, 50200.0, 49500.0, 50200.0)] * 40,
+    )
+    r4 = manager.resolve_grid_evaluations(client=_MockBinanceClient(c4), current_time_ms=ev.decision_time_ms + 50 * 60_000, symbols=[ev.symbol])  # type: ignore[arg-type]
+    intermediate_ids.append(r4["results"][0]["evaluation_id"])
+
+    # Final: 1440 candles (RESOLVED)
+    c_final = _make_1m_candles(ev.decision_time_ms, 1440, [(50000.0, 50000.0, 50000.0, 50000.0)] * 1440)
+    r_final = manager.resolve_grid_evaluations(client=_MockBinanceClient(c_final), current_time_ms=ev.decision_time_ms + 1440 * 60_000, symbols=[ev.symbol])  # type: ignore[arg-type]
+    final_id = r_final["results"][0]["evaluation_id"]
+
+    # All intermediate IDs are distinct
+    assert len(set(intermediate_ids)) == 4
+    assert final_id not in intermediate_ids
+
+    # Old provisional IDs are no longer in DB
+    for old_id in intermediate_ids:
+        assert store.get_grid_shadow_evaluation(old_id) is None
+
+    # DB has exactly one row, and identity verifies
+    evals = store.list_grid_shadow_evaluations(symbol=ev.symbol)
+    assert len(evals) == 1
+    assert evals[0].evaluation_id == final_id
+    assert evals[0].eligibility_status == GridEligibilityStatus.RESOLVED.value
+
+    # Verify identity directly
+    final_obj = store.get_grid_shadow_evaluation(final_id, verify_identity=True)
+    assert final_obj is not None
+    assert final_obj.evaluation_id == final_id

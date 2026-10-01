@@ -38,6 +38,7 @@ from .evidence import (
     verify_tactical_evidence_identity,
 )
 from .grid_shadow_evidence import (
+    GridEligibilityStatus,
     TacticalGridShadowEvaluationConflictError,
     TacticalGridShadowEvaluationIdentityError,
     TacticalGridShadowEvaluationV1,
@@ -1764,42 +1765,14 @@ class MarketWatchStateStore:
 
     def save_grid_shadow_evaluation(self, evaluation: TacticalGridShadowEvaluationV1) -> str:
         """Persist an immutable TacticalGridShadowEvaluationV1 artifact fail-closed."""
+        # Section 6: Validation-before-mutation
         validate_tactical_grid_shadow_evaluation(evaluation)
         now_ms = int(time.time() * 1000)
 
         with self._connect() as conn:
             conn.row_factory = sqlite3.Row
 
-            # 1. Natural key check: (feature_evidence_id, evaluation_profile_version)
-            cur = conn.execute(
-                """
-                SELECT evaluation_id, evaluation_json FROM tactical_grid_shadow_evaluations_v1
-                WHERE feature_evidence_id = ? AND evaluation_profile_version = ?
-                """,
-                (evaluation.feature_evidence_id, evaluation.evaluation_profile_version),
-            )
-            row = cur.fetchone()
-            if row is not None:
-                existing_id = str(row[0])
-                if existing_id == evaluation.evaluation_id:
-                    return existing_id
-                raise TacticalGridShadowEvaluationConflictError(
-                    f"B2B_EVALUATION_CONFLICT: Natural key ({evaluation.feature_evidence_id}, {evaluation.evaluation_profile_version}) "
-                    f"already exists with different evaluation_id: existing={existing_id}, new={evaluation.evaluation_id}"
-                )
-
-            # 2. Check primary key evaluation_id
-            cur_pk = conn.execute(
-                "SELECT evaluation_id FROM tactical_grid_shadow_evaluations_v1 WHERE evaluation_id = ?",
-                (evaluation.evaluation_id,),
-            )
-            row_pk = cur_pk.fetchone()
-            if row_pk is not None:
-                raise TacticalGridShadowEvaluationConflictError(
-                    f"B2B_EVALUATION_CONFLICT: evaluation_id {evaluation.evaluation_id} already exists."
-                )
-
-            # 3. Linkage check to tactical_feature_evidence_v2
+            # 1. Linkage check to tactical_feature_evidence_v2 (source evidence exists and identity verifies)
             cur_ev = conn.execute(
                 "SELECT evidence_id, evidence_json FROM tactical_feature_evidence_v2 WHERE evidence_id = ?",
                 (evaluation.feature_evidence_id,),
@@ -1815,6 +1788,167 @@ class MarketWatchStateStore:
                     f"Linked B1 evidence identity mismatch: DB={ev_row['evidence_id']} vs {evaluation.feature_evidence_id}"
                 )
 
+            # 2. Primary-key collision check under a different natural key
+            cur_pk = conn.execute(
+                "SELECT feature_evidence_id, evaluation_profile_version FROM tactical_grid_shadow_evaluations_v1 WHERE evaluation_id = ?",
+                (evaluation.evaluation_id,),
+            )
+            pk_row = cur_pk.fetchone()
+            if pk_row is not None and (
+                str(pk_row["feature_evidence_id"]) != evaluation.feature_evidence_id
+                or str(pk_row["evaluation_profile_version"]) != evaluation.evaluation_profile_version
+            ):
+                raise TacticalGridShadowEvaluationConflictError(
+                    f"B2B_EVALUATION_CONFLICT: evaluation_id {evaluation.evaluation_id} already exists "
+                    f"under different natural key ({pk_row['feature_evidence_id']}, {pk_row['evaluation_profile_version']})"
+                )
+
+            # 3. Check natural key: (feature_evidence_id, evaluation_profile_version)
+            cur_nk = conn.execute(
+                """
+                SELECT evaluation_id, evaluation_json FROM tactical_grid_shadow_evaluations_v1
+                WHERE feature_evidence_id = ? AND evaluation_profile_version = ?
+                """,
+                (evaluation.feature_evidence_id, evaluation.evaluation_profile_version),
+            )
+            nk_row = cur_nk.fetchone()
+
+            if nk_row is not None:
+                existing_row_id = str(nk_row["evaluation_id"])
+                existing_json = nk_row["evaluation_json"]
+
+                # Section 7: Existing-row identity: deserialize evaluation_json with identity verification
+                existing_eval = deserialize_tactical_grid_shadow_evaluation(
+                    existing_json,
+                    verify_identity=True,
+                    require_embedded_identity=True,
+                )
+                if existing_row_id != existing_eval.evaluation_id:
+                    raise TacticalGridShadowEvaluationIdentityError(
+                        f"Row evaluation_id mismatch: row={existing_row_id}, embedded={existing_eval.evaluation_id}"
+                    )
+
+                # Section 5.1: Same evaluation ID: idempotent return
+                if existing_row_id == evaluation.evaluation_id:
+                    return existing_row_id
+
+                existing_status = str(existing_eval.eligibility_status)
+                incoming_status = str(evaluation.eligibility_status)
+
+                # Section 5.2: Existing authoritative terminal row
+                if existing_status in (
+                    GridEligibilityStatus.RESOLVED.value,
+                    GridEligibilityStatus.NOT_ACTIVE_PAUSE.value,
+                ):
+                    raise TacticalGridShadowEvaluationConflictError(
+                        f"B2B_EVALUATION_CONFLICT: Authoritative terminal row ({existing_status}) "
+                        f"cannot be modified or replaced under natural key ({evaluation.feature_evidence_id}, {evaluation.evaluation_profile_version}): "
+                        f"existing={existing_row_id}, new={evaluation.evaluation_id}"
+                    )
+
+                # Section 5.3 & 5.4: Existing provisional row
+                if existing_status in (
+                    GridEligibilityStatus.PENDING_HORIZON.value,
+                    GridEligibilityStatus.PENDING_DATA_GAP.value,
+                ):
+                    if incoming_status not in (
+                        GridEligibilityStatus.PENDING_HORIZON.value,
+                        GridEligibilityStatus.PENDING_DATA_GAP.value,
+                        GridEligibilityStatus.RESOLVED.value,
+                    ):
+                        raise TacticalGridShadowEvaluationConflictError(
+                            f"B2B_EVALUATION_CONFLICT: Forbidden transition from {existing_status} to {incoming_status} "
+                            f"under natural key ({evaluation.feature_evidence_id}, {evaluation.evaluation_profile_version})"
+                        )
+                else:
+                    raise TacticalGridShadowEvaluationConflictError(
+                        f"B2B_EVALUATION_CONFLICT: Existing evaluation has invalid status for update: {existing_status}"
+                    )
+
+                # Section 8: Atomic replacement of provisional row via conditional UPDATE
+                ev_json = canonical_grid_shadow_evaluation_json(evaluation)
+                try:
+                    cur_upd = conn.execute(
+                        """
+                        UPDATE tactical_grid_shadow_evaluations_v1 SET
+                            evaluation_id = ?,
+                            evaluation_schema_version = ?,
+                            feature_evidence_id = ?,
+                            symbol = ?,
+                            decision_time_ms = ?,
+                            evaluation_profile_version = ?,
+                            grid_path_model_version = ?,
+                            grid_accounting_version = ?,
+                            grid_decision = ?,
+                            eligibility_status = ?,
+                            terminal_reason = ?,
+                            terminal_time_ms = ?,
+                            net_pnl_after_fees_slippage = ?,
+                            net_pnl_after_funding = ?,
+                            funding_coverage = ?,
+                            market_path_coverage = ?,
+                            evaluation_json = ?,
+                            persisted_at_ms = ?
+                        WHERE feature_evidence_id = ? AND evaluation_profile_version = ? AND evaluation_id = ?
+                        """,
+                        (
+                            evaluation.evaluation_id,
+                            evaluation.evaluation_schema_version,
+                            evaluation.feature_evidence_id,
+                            evaluation.symbol,
+                            evaluation.decision_time_ms,
+                            evaluation.evaluation_profile_version,
+                            evaluation.grid_path_model_version,
+                            evaluation.grid_accounting_version,
+                            evaluation.grid_decision,
+                            evaluation.eligibility_status,
+                            evaluation.terminal_reason,
+                            evaluation.terminal_time_ms,
+                            evaluation.net_pnl_after_fees_slippage,
+                            evaluation.net_pnl_after_funding,
+                            evaluation.funding_coverage,
+                            evaluation.market_path_coverage,
+                            ev_json,
+                            now_ms,
+                            evaluation.feature_evidence_id,
+                            evaluation.evaluation_profile_version,
+                            existing_row_id,
+                        ),
+                    )
+                    if cur_upd.rowcount != 1:
+                        # Conditional update matched 0 rows (concurrent race)
+                        cur_race = conn.execute(
+                            """
+                            SELECT evaluation_id FROM tactical_grid_shadow_evaluations_v1
+                            WHERE feature_evidence_id = ? AND evaluation_profile_version = ?
+                            """,
+                            (evaluation.feature_evidence_id, evaluation.evaluation_profile_version),
+                        )
+                        race_row = cur_race.fetchone()
+                        if race_row is not None and str(race_row[0]) == evaluation.evaluation_id:
+                            return evaluation.evaluation_id
+                        raise TacticalGridShadowEvaluationConflictError(
+                            f"B2B_EVALUATION_CONFLICT: Conditional update failed for evaluation natural key: "
+                            f"expected prior evaluation_id {existing_row_id}, found {race_row[0] if race_row else 'none'}"
+                        )
+                    conn.commit()
+                    return evaluation.evaluation_id
+                except sqlite3.IntegrityError as exc:
+                    cur_race = conn.execute(
+                        """
+                        SELECT evaluation_id FROM tactical_grid_shadow_evaluations_v1
+                        WHERE feature_evidence_id = ? AND evaluation_profile_version = ?
+                        """,
+                        (evaluation.feature_evidence_id, evaluation.evaluation_profile_version),
+                    )
+                    race_row = cur_race.fetchone()
+                    if race_row is not None and str(race_row[0]) == evaluation.evaluation_id:
+                        return evaluation.evaluation_id
+                    raise TacticalGridShadowEvaluationConflictError(
+                        f"B2B_EVALUATION_CONFLICT: Concurrent or conflicting update for evaluation natural key: {exc}"
+                    ) from exc
+
+            # 4. If no existing natural key row, perform fresh INSERT
             ev_json = canonical_grid_shadow_evaluation_json(evaluation)
             try:
                 conn.execute(
@@ -1859,7 +1993,7 @@ class MarketWatchStateStore:
                     (evaluation.feature_evidence_id, evaluation.evaluation_profile_version),
                 )
                 row_race = cur_race.fetchone()
-                if row_race is not None and row_race[0] == evaluation.evaluation_id:
+                if row_race is not None and str(row_race[0]) == evaluation.evaluation_id:
                     return evaluation.evaluation_id
                 raise TacticalGridShadowEvaluationConflictError(
                     f"B2B_EVALUATION_CONFLICT: Concurrent or conflicting insert for evaluation natural key: {exc}"
