@@ -1,0 +1,522 @@
+{
+  "schema_id": "V0.5.5_A1_SYNTHETIC_METHOD_AUTHORITY_SOL_INDEPENDENT_AUDIT_R1B",
+  "repository": "EXASHXE/btc-quant-agent-public",
+  "execution_class": "INDEPENDENT_SCIENTIFIC_METHOD_AUDIT / READ_ONLY_SCIENTIFIC_AUTHORITY / NO_SIMULATION / NO_PROTECTED_OUTCOME_ACCESS / NO_PRODUCTION_CHANGE",
+  "reviewer": {
+    "agent_id": "/root/sol_independent_audit_r1b",
+    "session_kind": "FRESH_ISOLATED_FORK_NONE_INDEPENDENT_SOL_AGENT",
+    "fresh_session": true,
+    "independent_of_design_executor": true,
+    "design_executor_context_reused": false,
+    "parent_role": "OPERATIONAL_GIT_TRANSPORT_AND_PUBLICATION_ONLY",
+    "scientific_findings_derived_by_this_agent": true,
+    "prior_self_review_content_opened": false,
+    "prior_self_review_findings_reused": false,
+    "recursive_subagents_used": false
+  },
+  "dispatch": {
+    "official_branch": "dispatch/v0.5.5-a1-synthetic-method-sol-audit-r1b",
+    "official_branch_sha": "9fdb8b804e1f7b8eb6e261640eb1399c7eabe873",
+    "path": "dispatch/V0.5.5_A1_SYNTHETIC_METHOD_AUTHORITY_SOL_INDEPENDENT_AUDIT_R1B_DISPATCH.json",
+    "blob_sha": "db036308544ae3360520e3aee946178150c30125",
+    "controller_dispatch_sha": "2f17f2e9aa3e7cec318493538548f4926cc40577",
+    "task_branch": "feature/a1-synthetic-method-sol-audit-r1b-v055",
+    "prompt_blob_sha": "f3a9bf05585ef3140ae6e26a0f879fe88967cc2d"
+  },
+  "start_gate": {
+    "disposition": "PASS",
+    "worktree": "/tmp/a1-sol-independent-audit-r1b-v055",
+    "branch": "feature/a1-synthetic-method-sol-audit-r1b-v055",
+    "head": "2f17f2e9aa3e7cec318493538548f4926cc40577",
+    "tree_sha": "456d3f7df4ea6df173eb27481ea292420e65e5eb",
+    "origin_url": "https://github.com/EXASHXE/btc-quant-agent-public.git",
+    "origin_v055_sha": "8ecff4ec4b25bf73a35309689fd3ecfacc0d3399",
+    "worktree_clean_before_scientific_authority_reads": true,
+    "metadata_only_sparse_checkout": true,
+    "quant_agent_sanitized_used": false,
+    "verified_independently_after_parent_transport": true
+  },
+  "accepted_code_sha": "8ecff4ec4b25bf73a35309689fd3ecfacc0d3399",
+  "design_sha": "9b92ec290e4f9de93c140ca471a0eb1644526e2b",
+  "design_semantic_root_sha256": "718efa1bbad00e68aaacf4cd2c2034265776b242024e0acbf09455847b2fc106",
+  "authority_refs_and_actual_access_modes": [
+    {
+      "label": "A",
+      "path": "evidence/v0.5.5/controller/A_LINE_CURRENT_AUTHORITY.json",
+      "blob_sha": "52fa23007032f4589435913ccd0274957e1f44b1",
+      "actual_access_mode": "BINDING_FIELDS_ONLY_DISPATCH_INLINE",
+      "content_opened": false,
+      "identity_verified_against_start_tree": true
+    },
+    {
+      "label": "B",
+      "path": "reviews/v0.5/V0.5.5_A1_SYNTHETIC_METHOD_AUTHORITY_DESIGN_R1.md",
+      "blob_sha": "2ef55f25ee0b4bf640307c291e959ce43c97cf47",
+      "access_mode": "MUST_READ",
+      "at_commit": "9b92ec290e4f9de93c140ca471a0eb1644526e2b",
+      "actual_access_mode": "MUST_READ",
+      "git_blob_hash_verified": true
+    },
+    {
+      "label": "C",
+      "path": "evidence/v0.5.5/h41/V0.5.5_A1_SYNTHETIC_METHOD_AUTHORITY_DESIGN_R1.json",
+      "blob_sha": "53b1f99bee4bef55afe166292305f6f8d2648072",
+      "access_mode": "IDENTITY_ONLY",
+      "at_commit": "9b92ec290e4f9de93c140ca471a0eb1644526e2b",
+      "actual_access_mode": "SELECTIVE_MACHINE_CONTRACT_VERIFICATION",
+      "content_opened": true,
+      "reason": "The MUST_READ report supplies only 5x3 grid cardinality, while R1.1 has different literal D/V sets. Verify exact semantic_contract duration/grid literals and canonical semantic-root/report section identity. Only semantic_contract and its root were inspected; prior validation/closure/static-receipt claims were not used.",
+      "git_blob_hash_verified": true
+    },
+    {
+      "label": "D",
+      "path": "reviews/v0.5/V0.5.1_H41_SUCCESSOR_SCIENTIFIC_CAMPAIGN_V1_DESIGN_R1_1_CONTROLLER_REPAIR.md",
+      "blob_sha": "f65b970e810a6e6a6d5420424d62c26ee4c5c953",
+      "access_mode": "MUST_READ",
+      "at_commit": "2f17f2e9aa3e7cec318493538548f4926cc40577",
+      "actual_access_mode": "MUST_READ",
+      "git_blob_hash_verified": true
+    },
+    {
+      "label": "E",
+      "path": "src/btc_quant_agent/h41/inference.py",
+      "code_sha": "8ecff4ec4b25bf73a35309689fd3ecfacc0d3399",
+      "blob_sha": "9000840cbb767b1be69395b78248a58ec3bcaafa",
+      "access_mode": "MUST_READ",
+      "at_commit": "8ecff4ec4b25bf73a35309689fd3ecfacc0d3399",
+      "actual_access_mode": "MUST_READ",
+      "git_blob_hash_verified": true,
+      "package_imported": false
+    },
+    {
+      "label": "PRIOR_SELF_REVIEW",
+      "path": "reviews/v0.5/V0.5.5_A1_SYNTHETIC_METHOD_AUTHORITY_SOL_INDEPENDENT_AUDIT_R1.md",
+      "blob_sha": "6344c45d5e1a9f0be8e64f54131002a6f35c2a0a",
+      "access_mode": "IDENTITY_ONLY",
+      "reason": "Prior same-session self-review; advisory only and must not be opened by default.",
+      "actual_access_mode": "IDENTITY_ONLY_MANIFEST_DECLARATION",
+      "content_opened": false,
+      "prior_machine_evidence_opened": false
+    }
+  ],
+  "binding_current_state": {
+    "current_stage": "A1_SYNTHETIC_METHOD_AUTHORITY_SOL_INDEPENDENT_AUDIT_R1B",
+    "accepted_code_sha": "8ecff4ec4b25bf73a35309689fd3ecfacc0d3399",
+    "method_design_sha": "9b92ec290e4f9de93c140ca471a0eb1644526e2b",
+    "method_root": "718efa1bbad00e68aaacf4cd2c2034265776b242024e0acbf09455847b2fc106",
+    "M01": "SPECIFIED_PENDING_INDEPENDENT_AUDIT",
+    "M02": "SPECIFIED_PENDING_INDEPENDENT_AUDIT",
+    "M03": "SPECIFIED_PENDING_INDEPENDENT_AUDIT",
+    "M04": "SPECIFIED_PENDING_INDEPENDENT_AUDIT",
+    "M05": "SPECIFIED_PENDING_INDEPENDENT_AUDIT",
+    "compression_trial_runs_completed": 0,
+    "trial_1_state": "BLOCKED_PRE_SIMULATION_PENDING_METHOD_AUDIT_AND_MATERIALIZATION",
+    "trial_2_authorized": false,
+    "d0_authorized": false,
+    "protected_outcome_access_authorized": false,
+    "production_code_change_authorized": false,
+    "resource_feasibility": "NOT_CERTIFIED",
+    "literal_logical_outer_records": 11863110020400
+  },
+  "M01_M05_dispositions": [
+    {
+      "id": "M01",
+      "disposition": "PASS_FINITE_ENVELOPE_SPECIFICATION_PENDING_MATERIALIZATION",
+      "rationale": "sqrt(3/5) standardizes df5 marginal variance; common Gaussian factor/shared chi-square and volatility preserve nontrivial joint dependence. AR initialization/burn-in and bounded amplitude are explicit; phase-conditioned mean constraints fix null/alternative event means."
+    },
+    {
+      "id": "M02",
+      "disposition": "PASS_CONDITIONAL_CLOCK_AND_COHERENT_ENDPOINT_SPECIFICATION",
+      "rationale": "Actual K8 equations, fixed TRAIN quantiles, causal receipts/cooldown and recomputed transformed clocks determine events. Shared exact Open chains and phase-shifted rational mean fields couple all endpoints; no independent candidate endpoint tensor or outcome-fit nuisance remains."
+    },
+    {
+      "id": "M03",
+      "disposition": "PASS_SOURCE_SUPPORT_AND_CALENDAR_SPECIFICATION",
+      "rationale": "Missing/late distinctions, gaps, warmup, periodic state, tails and continuous audit-gap carry are fixed. Campaign-level zero-support/zero-variance failures remain in full denominators; all calendar anchors and 48h overhead are explicit."
+    },
+    {
+      "id": "M04",
+      "disposition": "PASS_EXPLICIT_SUCCESSOR_INFERENCE_SPECIFICATION",
+      "rationale": "Estimator/SE/center/full non-circular blocks/studentized maximum/percentile/LCB/support/lock/Validation and zero/infinite behavior are defined. Every material accepted-code difference is classified below; none requires repair."
+    },
+    {
+      "id": "M05",
+      "disposition": "PASS_REPRODUCIBILITY_AND_PROPOSED_CONSERVATIVE_MC_SPECIFICATION",
+      "rationale": "Version/domain/index/root/count/CI/order/hash/replay semantics are fixed. Selection-safe intersection/union argument is conservative; numeric implementation and resource proofs remain separate acceptance receipts."
+    }
+  ],
+  "r11_compatibility_matrix": [
+    {
+      "topic": "K=8 equations, TRAIN nearest-rank thresholds, signs, cooldown and alias policy",
+      "disposition": "PRESERVED",
+      "locations": "R1.1 \u00a7\u00a75-7; report 21-46",
+      "rationale": "Exact gate equations and nonempty exact aliases remain fail-closed; scalar eligibility and prehistory are explicit."
+    },
+    {
+      "topic": "As-observed paired source availability and reconciliation",
+      "disposition": "PRESERVED",
+      "locations": "R1.1 \u00a78; report 48-60",
+      "rationale": "Receipt equality at t+1h fails; late historical rows may enter only later eligible features; missing hours remain."
+    },
+    {
+      "topic": "Native t+1/t+5 endpoint and 12/24bp costs",
+      "disposition": "PRESERVED",
+      "locations": "R1.1 \u00a7\u00a79-10; report 34,70-80",
+      "rationale": "One shared positive Open sequence supplies every same-asset endpoint; stress is diagnostic."
+    },
+    {
+      "topic": "Formal null and 24bp planning alternative",
+      "disposition": "PRESERVED_WITH_FINITE_ENVELOPE_SCOPE",
+      "locations": "R1.1 \u00a710; report 70-80,134-146",
+      "rationale": "Exact coherent population event means are imposed; short realized-window means need not equal them. Negative-null and all real markets are not newly certified."
+    },
+    {
+      "topic": "Fixed windows, duration grid and utility budget",
+      "disposition": "INTENTIONAL_SUCCESSOR_CHANGE_ACCEPTABLE",
+      "locations": "R1.1 \u00a711; semantic_contract.parameter_grids; report 56-60,84,142",
+      "rationale": "A1 explicitly uses D={1,2,3,4,6}, V={1,2,3}, utility D+V<=4, and 48h overhead instead of the R1.1 long-duration grid. No post-outcome extension."
+    },
+    {
+      "topic": "Support selection and lock ranking",
+      "disposition": "PRESERVED_WITH_EXPLICIT_EXTENSION",
+      "locations": "R1.1 \u00a712; report 94-108,142",
+      "rationale": "N>=2, positive variance, B_eff grid, smallest passing support threshold, exact LCB/B_eff/N/ID ranking and no runner-up."
+    },
+    {
+      "topic": "MBB studentization, L/B/alpha and family handling",
+      "disposition": "PRESERVED_WITH_INTENTIONAL_SUCCESSOR_CHANGES",
+      "locations": "R1.1 \u00a712; report 90-108",
+      "rationale": "L=120, B=100000, one-sided .05, common non-circular blocks and single-step joint maximum are retained; unsafe floors and invalid-draw fallbacks change explicitly."
+    },
+    {
+      "topic": "Finite envelope and support-failure inclusion",
+      "disposition": "PRESERVED_AND_SPECIFIED",
+      "locations": "R1.1 \u00a713; report 48-88",
+      "rationale": "t5/AR/factor/volatility, actual equation clocks, >=25% rate perturbations, gaps, aliases and failure modes are specified; no support-conditioned denominator."
+    },
+    {
+      "topic": "Error and every-coordinate full-pipeline power gates",
+      "disposition": "PRESERVED",
+      "locations": "R1.1 \u00a7\u00a711-13; report 134-146",
+      "rationale": "Global-null Discovery error, fixed-candidate Validation error and each ID's 24bp pipeline power retain nominal one-sided 95% CP thresholds .05/.80. Mixed/sensitivity cases remain diagnostics."
+    },
+    {
+      "topic": "Selection-safe MC assurance",
+      "disposition": "ACCEPTABLE_PROPOSED_ADDITIONAL_CERTIFICATION",
+      "locations": "R1.1 \u00a7\u00a711-13; report 120-128,140-142",
+      "rationale": "Valid union-intersection certificate over 75 settings; requires explicit Controller adoption and does not relabel nominal failures."
+    },
+    {
+      "topic": "Discovery/lock-audit/GO/Validation state and protected lifecycle",
+      "disposition": "PRESERVED",
+      "locations": "R1.1 \u00a7\u00a714-18; report 56-60,104-108,136-146",
+      "rationale": "Continuous state and fixed deadlines; deterministic synthetic audit is not a reliability model of a real auditor. Actual audit/GO/D0 prerequisites remain separate."
+    }
+  ],
+  "inference_difference_matrix": [
+    {
+      "difference": "Generic ratio estimator, original overlapping-block SE and weighted non-circular center",
+      "classification": "SEMANTICALLY_COMPATIBLE_EXTENSION",
+      "locations": "inference.py:38-60,107-118; report 94-100",
+      "rationale": "Same real-arithmetic formulas; successor variable T and source lineage attach without changing the estimating equation."
+    },
+    {
+      "difference": "K=20/T=2184/WF1 wrappers versus K=8/stage-specific T and receipts",
+      "classification": "INTENTIONAL_SUCCESSOR_CHANGE_ACCEPTABLE",
+      "locations": "inference.py:128-195; report 92-108",
+      "rationale": "Frozen H41 wrappers cannot serve the successor. New lineage/shape validation is required before implementation acceptance."
+    },
+    {
+      "difference": "N>=60 and old N/day receipt filter versus N>=2/positive variance/B_eff",
+      "classification": "INTENTIONAL_SUCCESSOR_CHANGE_ACCEPTABLE",
+      "locations": "inference.py:40,171-194; report 94-96",
+      "rationale": "This implements R1.1's revised support contract; no coordinate replacement."
+    },
+    {
+      "difference": "B=10000 frozen wrapper versus B=100000",
+      "classification": "INTENTIONAL_SUCCESSOR_CHANGE_ACCEPTABLE",
+      "locations": "inference.py:135-137; report 34,98,120",
+      "rationale": "R1.1 freezes the larger count; generic primitive already takes B."
+    },
+    {
+      "difference": "Original 1e-12 variance floor versus genuine zero/nonfinite SE unavailable",
+      "classification": "INTENTIONAL_SUCCESSOR_CHANGE_ACCEPTABLE",
+      "locations": "inference.py:60; report 94-96",
+      "rationale": "Prevents a fabricated positive variance from making a constant endpoint eligible."
+    },
+    {
+      "difference": "Bootstrap denominator floor, zero-event mu fallback and SE floor versus +infinity bad draw",
+      "classification": "INTENTIONAL_SUCCESSOR_CHANGE_ACCEPTABLE",
+      "locations": "inference.py:96-106; report 100-102",
+      "rationale": "A_b<2, undefined or zero SE never redraws or passes; an infinite critical value yields no claim."
+    },
+    {
+      "difference": "Quadratic replicate SE and negative residual clamp",
+      "classification": "SEMANTICALLY_COMPATIBLE_EXTENSION",
+      "locations": "inference.py:102-106; report 100",
+      "rationale": "The q/(q-1) block formula is preserved with no positive floor."
+    },
+    {
+      "difference": "Common non-circular full-length sampled blocks and untrimmed qL length",
+      "classification": "SEMANTICALLY_COMPATIBLE_EXTENSION",
+      "locations": "inference.py:32-34,50-71; report 96-100",
+      "rationale": "Shared starts jointly resample already formed A/Z/source-lineage bundles; no feature/cooldown recomputation at joins."
+    },
+    {
+      "difference": "Omitted inactive coordinates versus fixed -infinity K=8 slots",
+      "classification": "SEMANTICALLY_COMPATIBLE_EXTENSION",
+      "locations": "inference.py:41-47,115-122; report 94,100-102",
+      "rationale": "Equivalent maximum over eligible slots; unavailable slots cannot lock and an empty family is unavailable."
+    },
+    {
+      "difference": "np.percentile default linear 95th percentile versus explicit interpolation/infinity handling",
+      "classification": "SEMANTICALLY_COMPATIBLE_EXTENSION",
+      "locations": "inference.py:116-122; report 102",
+      "rationale": "Finite interpolation matches; infinity is treated fail-closed rather than allowing NaN arithmetic."
+    },
+    {
+      "difference": "Caller-supplied NumPy RNG versus SHA256_COUNTER_U64_V1 domain-indexed starts",
+      "classification": "INTENTIONAL_SUCCESSOR_CHANGE_ACCEPTABLE",
+      "locations": "inference.py:19,63; report 110-132",
+      "rationale": "A newly frozen deterministic random-number contract requires its own implementation and replay receipt; accepted historical draw parity is not claimed."
+    },
+    {
+      "difference": "Successor locking, single-active Validation and diagnostic counterfactual calls",
+      "classification": "SEMANTICALLY_COMPATIBLE_EXTENSION",
+      "locations": "inference.py:13-125; R1.1 \u00a712; report 104-108,134-138",
+      "rationale": "Selection is outside the accepted primitive; the same algebra is reused for the sole locked ID. Counterfactual seeds never influence selection."
+    },
+    {
+      "difference": "Candidate-wide endpoint unavailability versus wrapper-level invalid-matrix exception",
+      "classification": "SEMANTICALLY_COMPATIBLE_EXTENSION",
+      "locations": "inference.py:130-136,169-174; report 52,94",
+      "rationale": "The successor explicitly preserves an invalid accepted event and makes that whole candidate/stage unavailable; it does not delete a bad observation."
+    }
+  ],
+  "mc_certification": {
+    "classification": "VALID_CONSERVATIVE_CERTIFICATION",
+    "nominal_confidence_alpha": "0.05",
+    "selection_safe_alpha": "1/1500",
+    "selection_setting_count": 75,
+    "outer_count": 36567,
+    "inner_B": 100000,
+    "argument": "For any invalid fixed setting, at least one governing constraint is false. Incorrect certification of that all-constraints intersection is bounded by that constraint's alpha=1/1500. Union over 75 possible selected settings is <=0.05; no independence between settings or simultaneous per-cell coverage assertion is needed.",
+    "limitations": "Assumes the specified independent-outer-replicate Monte Carlo model. Exact indexed pseudorandom semantics and bound numeric environment require implementation validation. Not a real-market model certificate.",
+    "explicit_controller_acceptance_required": true,
+    "nominal_gate_unchanged": true,
+    "uncertified_nominal_setting_is_not_nominal_failure": true
+  },
+  "resource": {
+    "classification": "RESOURCE_EXECUTION_REQUIRES_PROVEN_EQUIVALENT_ACCELERATION",
+    "logical_outer_records": 11863110020400,
+    "resource_execution_certified": false,
+    "trial_1_resource_block_remains": true,
+    "assessed_options": [
+      {
+        "option": "Deterministic table reuse",
+        "disposition": "EXACTLY_AVAILABLE",
+        "detail": "Reuse fixed 17x19 clock/gap/cooldown tables, quantiles, rational mean tables and block-count lookup by calendar."
+      },
+      {
+        "option": "Analytic factorization",
+        "disposition": "LIMITED_PROVEN_EQUIVALENCE_REQUIRED",
+        "detail": "Mode mixture and support bounds permit exact failure calculations, but replacing indexed samples with mixture expectations does not reproduce required Bernoulli records/hashes."
+      },
+      {
+        "option": "Vectorization/batching",
+        "disposition": "AVAILABLE_IF_FIXED_REDUCTIONS_AND_HASHES_PRESERVED",
+        "detail": "Parallel keyed draws and bounded batches are possible; ordered binary64 arithmetic must remain identical."
+      },
+      {
+        "option": "Sufficient-statistic caching",
+        "disposition": "EXACT_WITHIN_RECORD",
+        "detail": "Block sums, squared sums/cross-products and cumulative-sum tables reproduce the declared primitive without repeatedly splicing source arrays."
+      },
+      {
+        "option": "Common-RNG reuse",
+        "disposition": "NOT_AUTOMATIC_ACROSS_TUPLES",
+        "detail": "run_root includes cell, truth, D,V,s and outer index; no common cross-setting innovation/phase/bootstrap seed is frozen."
+      },
+      {
+        "option": "Cell deduplication/identical null reuse",
+        "disposition": "ONLY_AFTER_EXACT_OUTPUT_EQUIVALENCE_PROOF",
+        "detail": "Equal null effect vectors do not equate source clocks, phases or seed-separated stochastic records. All labels/counts/hash records remain."
+      },
+      {
+        "option": "Mathematical-impossibility early rejection",
+        "disposition": "EXACTLY_AVAILABLE_FOR_PROVEN_SUPPORT_PATHS",
+        "detail": "B_eff<=ceil(T/120). One-month stages cannot reach s>=12; two-month stages cannot reach s>=18. Avoid unavailable formal bootstraps and emit equivalent indexed failure receipts, preserving all required diagnostics."
+      }
+    ],
+    "forbidden": [
+      "Drop expensive cells",
+      "Reduce B or outer counts",
+      "Weaken error/power gates",
+      "Choose favorable nuisance/source/mean settings",
+      "Use approximate independence",
+      "Change frozen seeds/roots to obtain reuse without a separately accepted new design"
+    ]
+  },
+  "pre_run_materialization_boundary": {
+    "disposition": "MECHANICAL_FAIL_CLOSED_NO_UNRESOLVED_SCIENTIFIC_CHOICE",
+    "items": [
+      {
+        "item": "TRAIN custody and 24h prehistory",
+        "disposition": "MECHANICAL_CONDITIONAL_ON_UNIQUE_ACCEPTED_SOURCE",
+        "rule": "Use the accepted immutable C/V/membership projection; hashes and bounds are receipts, not permission to choose favorable data."
+      },
+      {
+        "item": "TRAIN scalar quantiles and q_train/event clocks",
+        "disposition": "MECHANICAL",
+        "rule": "Nearest rank and each feature's required positive dependencies are specified; empty quantiles or zero q_train block."
+      },
+      {
+        "item": "17 rate profiles",
+        "disposition": "MECHANICAL_EXHAUSTIVE_DETERMINISTIC_SEARCH",
+        "rule": "The 9^4 transformation grid, rational rate constraints, objective order and lexicographic tie break are fixed; unreachable profile blocks all materialization."
+      },
+      {
+        "item": "19 paired gap tables and periodic cooldown",
+        "disposition": "MECHANICAL",
+        "rule": "Gap placement, receipt deadlines, missing/late distinction, cycle recurrence and joint period are fixed; masks must be recomputed."
+      },
+      {
+        "item": "Coherent mean tables and zero-variance targets",
+        "disposition": "MECHANICAL_EXACT_CONSTRAINED_ALGEBRA",
+        "rule": "Exact rational minimum norm, equality verification and 1/4 bound are fixed. Inconsistency or bound failure blocks; no ridge/clipping/omission."
+      },
+      {
+        "item": "Open-ratio and zero-variance receipts",
+        "disposition": "MECHANICAL_PROOF_AND_NUMERIC_VALIDATION",
+        "rule": "Exact multiplicative lineage and cancellation, once-rounded endpoints and identical constant values are prescribed."
+      },
+      {
+        "item": "Reference implementation and numeric environment",
+        "disposition": "MECHANICAL_IMPLEMENTATION_WITH_INDEPENDENT_ACCEPTANCE",
+        "rule": "Bind exact versions, ordered operations and replay environment before outcomes. Implementation cannot select another algebra or retune means; failed numerical receipts block."
+      },
+      {
+        "item": "Negative controls",
+        "disposition": "MECHANICAL_VALIDATION",
+        "rule": "Required source, alias, support, time, ratio, selection and root failure outcomes are prescribed; component fixtures are not alternate power cells."
+      },
+      {
+        "item": "Resource and reproduction plan",
+        "disposition": "PROOF_OBLIGATION_NO_SCIENTIFIC_CHOICE",
+        "rule": "Any accelerated implementation must preserve every required indexed record, B, counts, thresholds and hashes, or return for separately reviewed design change."
+      }
+    ],
+    "materialization_performed": false,
+    "receipt_failure_requires_block_or_separate_design_dispatch": true
+  },
+  "protected_outcome_attestation": {
+    "protected_outcomes_accessed": false,
+    "successor_real_returns_or_pnl_accessed": false,
+    "protected_event_support_payload_accessed": false,
+    "raw_train_market_or_source_archive_accessed": false,
+    "prior_self_review_report_or_json_accessed": false,
+    "scientific_package_imported": false,
+    "recursive_historical_authority_hydration": false
+  },
+  "simulation_attestation": {
+    "simulation_executed": false,
+    "train_calibration_executed": false,
+    "train_materialization_executed": false,
+    "DGP_executed": false,
+    "bootstrap_executed": false,
+    "power_trial_executed": false,
+    "trial_count_consumed": 0
+  },
+  "production_code_change_attestation": {
+    "production_code_modified": false,
+    "method_repaired": false,
+    "allowed_output_paths": [
+      "reviews/v0.5/V0.5.5_A1_SYNTHETIC_METHOD_AUTHORITY_SOL_INDEPENDENT_AUDIT_R1B.md",
+      "evidence/v0.5.5/h41/V0.5.5_A1_SYNTHETIC_METHOD_AUTHORITY_SOL_INDEPENDENT_AUDIT_R1B.json"
+    ]
+  },
+  "findings_by_severity": {
+    "BLOCKER": [],
+    "HIGH": [],
+    "MEDIUM": [],
+    "LOW": [],
+    "INFORMATIONAL": [
+      {
+        "id": "R1B-I01",
+        "severity": "INFORMATIONAL",
+        "location": "Method report lines 15-19, 64-80; semantic_contract.sections.01_claim_and_scope and 05_exact_joint_dgp_and_coherent_effects",
+        "finding": "The result is a finite-envelope conditional feature-clock operating-characteristic certificate. Generated Opens are not a fitted continuation of the TRAIN Close process, and the four interleaved chains do not impose an empirical one-hour return-overlap model.",
+        "consequence": "A later passing trial supports only the declared conditional model; it cannot establish real-market calendar power or executable profitability.",
+        "disposition": "ACCEPTABLE_EXPLICIT_SCOPE_LIMITATION",
+        "minimal_repair": null,
+        "semantic_root_change_required": false
+      },
+      {
+        "id": "R1B-I02",
+        "severity": "INFORMATIONAL",
+        "location": "semantic_contract.parameter_grids.discovery_months/validation_months; method report lines 56-60, 94, 142",
+        "finding": "Only (D,V,s)=(2,2,12) can possibly satisfy the four-month utility budget and the declared support grid. B_eff cannot exceed the number of non-overlapping 120h blocks. A one-month stage has at most seven blocks; each two-month stage has at most thirteen.",
+        "consequence": "The other utility tuples have mathematically impossible full-pipeline power. This is a prospective upper bound, not a measured power result; (2,2,12) remains unproven.",
+        "disposition": "EXACT_PRE_RUN_BOUND_NOT_METHOD_FAILURE",
+        "minimal_repair": null,
+        "semantic_root_change_required": false
+      },
+      {
+        "id": "R1B-I03",
+        "severity": "INFORMATIONAL",
+        "location": "Method report lines 84, 118-132, 146; semantic_contract.logical_outer_record_count",
+        "finding": "There are 11863110020400 indexed logical outer records. run_root includes cell, truth, D, V, support and outer index, so broad common-RNG or identical-null reuse across settings is not already part of the frozen stochastic contract.",
+        "consequence": "Trial 1 remains blocked until an independently proven equivalent resource/replay plan exists; static table reuse alone does not establish affordable execution.",
+        "disposition": "RESOURCE_EXECUTION_REQUIRES_PROVEN_EQUIVALENT_ACCELERATION",
+        "minimal_repair": null,
+        "semantic_root_change_required": false
+      },
+      {
+        "id": "R1B-I04",
+        "severity": "INFORMATIONAL",
+        "location": "Method report lines 36-46, 70-78, 146",
+        "finding": "TRAIN source custody, reachable rate profiles, aliases, and bounded consistent mean fields have not been materialized.",
+        "consequence": "These receipts may fail and block the whole method. A failed receipt cannot authorize choosing another source, deleting a cell or roster slot, clipping a mean, or relaxing a constraint.",
+        "disposition": "MECHANICAL_FAIL_CLOSED_MATERIALIZATION_BOUNDARY",
+        "minimal_repair": null,
+        "semantic_root_change_required": false
+      },
+      {
+        "id": "R1B-I05",
+        "severity": "INFORMATIONAL",
+        "location": "Method report lines 120-128, 140-142; semantic_contract.mc_precision_rule",
+        "finding": "The 1/1500 selection-safe Monte Carlo certificate is mathematically conservative and explicitly proposed for Controller acceptance. Nominal 95% admissibility is separately reported.",
+        "consequence": "It may withhold a certified schedule despite nominal admissibility. Such withholding cannot be labeled a failed nominal scientific gate or a proven utility failure.",
+        "disposition": "VALID_CONSERVATIVE_CERTIFICATION",
+        "minimal_repair": null,
+        "semantic_root_change_required": false
+      },
+      {
+        "id": "R1B-I06",
+        "severity": "INFORMATIONAL",
+        "location": "Method report lines 56-60, 142-146",
+        "finding": "The calendar budget excludes the fixed 48h audit gap; a nonempty nominal or certified diagnostic schedule outside the budget does not supply a utility schedule. An empty utility selection is represented by the schema's null selected pair and per-pair calendar statuses.",
+        "consequence": "Report actual elapsed UTC schedules and both nominal/certified utility status. No favorable rescheduling, larger-support rescue, or nonutility schedule can be promoted to four-month success.",
+        "disposition": "ACCEPTABLE_DISCLOSED_CALENDAR_AND_EMPTY_SELECTION_SEMANTICS",
+        "minimal_repair": null,
+        "semantic_root_change_required": false
+      }
+    ]
+  },
+  "material_repair_findings": [],
+  "final_verdict": "PASS_METHOD_AUTHORITY_TO_MATERIALIZATION",
+  "next_controller_action": "Accept this independent scientific audit and explicitly adjudicate the proposed conservative MC assurance. Separately dispatch fail-closed TRAIN/method materialization and independent implementation/numeric/resource/replay verification. Keep Trial 1 blocked until all required receipts are accepted. This audit grants no simulation, Trial 2, D0, protected access, production edit or live-campaign authority.",
+  "validation": {
+    "exact_start_gate_verified": true,
+    "authority_git_blob_hashes_verified": true,
+    "canonical_design_root_verified": true,
+    "report_semantic_sections_matched": true,
+    "grid_count_verified": true,
+    "mc_count_formula_verified": true,
+    "calendar_support_bound_checked": true,
+    "static_schema_report_consistency_checked": true,
+    "only_two_allowed_output_paths": true,
+    "pytest_required": false,
+    "pytest_run": false
+  }
+}
