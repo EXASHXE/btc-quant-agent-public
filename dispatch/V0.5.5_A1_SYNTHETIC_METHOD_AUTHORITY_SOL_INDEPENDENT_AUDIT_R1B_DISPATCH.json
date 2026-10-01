@@ -1,0 +1,91 @@
+{
+  "schema_id": "V0.5.5_A1_SYNTHETIC_METHOD_AUTHORITY_SOL_INDEPENDENT_AUDIT_R1B_DISPATCH",
+  "repository": "EXASHXE/btc-quant-agent-public",
+  "stage": "A1_SYNTHETIC_METHOD_AUTHORITY_SOL_INDEPENDENT_AUDIT_R1B",
+  "reviewer": "SOL_FRESH_INDEPENDENT_SESSION",
+  "execution_target": {
+    "task_branch": "feature/a1-synthetic-method-sol-audit-r1b-v055",
+    "CONTROLLER_DISPATCH_SHA": "2f17f2e9aa3e7cec318493538548f4926cc40577",
+    "code_branch": "v0.5.5",
+    "accepted_code_sha": "8ecff4ec4b25bf73a35309689fd3ecfacc0d3399"
+  },
+  "current_authority_manifest": {
+    "path": "evidence/v0.5.5/controller/A_LINE_CURRENT_AUTHORITY.json",
+    "blob_sha": "52fa23007032f4589435913ccd0274957e1f44b1",
+    "access_mode": "BINDING_FIELDS_ONLY"
+  },
+  "inline_binding_fields": {
+    "method_design_sha": "9b92ec290e4f9de93c140ca471a0eb1644526e2b",
+    "method_design_semantic_root_sha256": "718efa1bbad00e68aaacf4cd2c2034265776b242024e0acbf09455847b2fc106",
+    "compression_trial_runs_completed": 0,
+    "trial_1_state": "BLOCKED_PRE_SIMULATION",
+    "trial_2_authorized": false,
+    "d0_authorized": false,
+    "protected_outcome_access_authorized": false,
+    "production_code_change_authorized": false,
+    "prior_self_review_sha": "a7db56f516f616688438f1c02bc47c7618a9d281",
+    "prior_self_review_status": "ADVISORY_EVIDENCE_ONLY",
+    "independence_gate_required": true
+  },
+  "authority_refs": [
+    {
+      "path": "reviews/v0.5/V0.5.5_A1_SYNTHETIC_METHOD_AUTHORITY_DESIGN_R1.md",
+      "blob_sha": "2ef55f25ee0b4bf640307c291e959ce43c97cf47",
+      "access_mode": "MUST_READ"
+    },
+    {
+      "path": "evidence/v0.5.5/h41/V0.5.5_A1_SYNTHETIC_METHOD_AUTHORITY_DESIGN_R1.json",
+      "blob_sha": "53b1f99bee4bef55afe166292305f6f8d2648072",
+      "access_mode": "IDENTITY_ONLY"
+    },
+    {
+      "path": "reviews/v0.5/V0.5.1_H41_SUCCESSOR_SCIENTIFIC_CAMPAIGN_V1_DESIGN_R1_1_CONTROLLER_REPAIR.md",
+      "blob_sha": "f65b970e810a6e6a6d5420424d62c26ee4c5c953",
+      "access_mode": "MUST_READ"
+    },
+    {
+      "path": "src/btc_quant_agent/h41/inference.py",
+      "code_sha": "8ecff4ec4b25bf73a35309689fd3ecfacc0d3399",
+      "blob_sha": "9000840cbb767b1be69395b78248a58ec3bcaafa",
+      "access_mode": "MUST_READ"
+    },
+    {
+      "path": "reviews/v0.5/V0.5.5_A1_SYNTHETIC_METHOD_AUTHORITY_SOL_INDEPENDENT_AUDIT_R1.md",
+      "blob_sha": "6344c45d5e1a9f0be8e64f54131002a6f35c2a0a",
+      "access_mode": "IDENTITY_ONLY",
+      "reason": "Prior same-session self-review; advisory only and must not be opened by default."
+    }
+  ],
+  "prompt": {
+    "path": "prompts/v0.5/audit/v0.5.5_A1_SYNTHETIC_METHOD_AUTHORITY_SOL_INDEPENDENT_AUDIT_R1B.md",
+    "blob_sha": "f3a9bf05585ef3140ae6e26a0f879fe88967cc2d",
+    "immutable_url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/2f17f2e9aa3e7cec318493538548f4926cc40577/prompts/v0.5/audit/v0.5.5_A1_SYNTHETIC_METHOD_AUTHORITY_SOL_INDEPENDENT_AUDIT_R1B.md"
+  },
+  "independence_fence": {
+    "fresh_session_required": true,
+    "independent_of_design_executor_required": true,
+    "design_executor_context_reuse_forbidden": true,
+    "prior_self_review_content_read_forbidden_by_default": true,
+    "read_only_audit": true,
+    "repair_in_same_run_forbidden": true,
+    "simulation_forbidden": true
+  },
+  "expected_outputs": [
+    "reviews/v0.5/V0.5.5_A1_SYNTHETIC_METHOD_AUTHORITY_SOL_INDEPENDENT_AUDIT_R1B.md",
+    "evidence/v0.5.5/h41/V0.5.5_A1_SYNTHETIC_METHOD_AUTHORITY_SOL_INDEPENDENT_AUDIT_R1B.json"
+  ],
+  "terminal_states": [
+    "PASS_METHOD_AUTHORITY_TO_MATERIALIZATION",
+    "BOUNDED_METHOD_REPAIR_REQUIRED",
+    "METHOD_AUTHORITY_ROUTE_BLOCKED",
+    "INDEPENDENCE_GATE_NOT_SATISFIED"
+  ],
+  "execution_rules": {
+    "exact_sha_verification_required": true,
+    "worktree_clean_at_start": true,
+    "push_only_to_task_branch": true,
+    "no_direct_push_to_v0_5_5_docs": true,
+    "protected_outcome_access_forbidden": true,
+    "production_code_change_forbidden": true
+  }
+}
