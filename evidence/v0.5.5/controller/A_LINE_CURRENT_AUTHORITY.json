@@ -2,13 +2,13 @@
   "schema_id": "V0.5.5_A_LINE_CURRENT_AUTHORITY",
   "repository": "EXASHXE/btc-quant-agent-public",
   "line": "A_LINE",
-  "stage": "A1_SYNTHETIC_METHOD_AUTHORITY_SOL_INDEPENDENT_AUDIT_R1__A2_H42_FEASIBILITY_PARALLEL",
+  "stage": "A1_SYNTHETIC_METHOD_AUTHORITY_SOL_INDEPENDENT_AUDIT_R1B__A2_H42_FEASIBILITY_PARALLEL",
   "code_branch": "v0.5.5",
   "accepted_code_sha": "8ecff4ec4b25bf73a35309689fd3ecfacc0d3399",
-  "docs_authority_commit": "5585d8844e7cd61f26af5291f0db102283dd8106",
+  "docs_authority_commit": "cb440874d39f3ecd2d9828955b6f192a14765a06",
   "current_controller_authority": {
-    "path": "evidence/v0.5.5/controller/V0.5.5_A1_SYNTHETIC_METHOD_AUTHORITY_CONTROLLER_ACCEPTANCE_R1.json",
-    "blob_sha": "78da376b5aa56c511ed5a5492521469322f9135f"
+    "path": "evidence/v0.5.5/controller/V0.5.5_A1_SOL_SELF_AUDIT_CONTROLLER_DISPOSITION_R1.json",
+    "blob_sha": "a278fb2d3eef738e4dd390e24754caeab362fa0e"
   },
   "protected_state": {
     "h41_terminal_no_go": true,
@@ -19,7 +19,7 @@
     "production_code_change_authorized": false
   },
   "authorized_next_stage": {
-    "a1": "A1_SYNTHETIC_METHOD_AUTHORITY_SOL_INDEPENDENT_AUDIT_R1",
+    "a1": "A1_SYNTHETIC_METHOD_AUTHORITY_SOL_INDEPENDENT_AUDIT_R1B",
     "a2": "H42_STRATEGY_DISCOVERY_HYBRID_CAPABLE_FEASIBILITY_R1"
   },
   "binding_fields": {
@@ -43,7 +43,7 @@
       ],
       "calendar_budget_total_months_max": 4
     },
-    "trial_1_blocker_state": "METHOD_DESIGN_ACCEPTED_PENDING_INDEPENDENT_AUDIT",
+    "trial_1_blocker_state": "INDEPENDENCE_GATE_NOT_SATISFIED",
     "accepted_method_gaps": [
       "M01_SCIENTIFIC_DGP_GAP",
       "M02_SCIENTIFIC_DGP_GAP",
@@ -63,21 +63,25 @@
       "M05": "SPECIFIED_PENDING_INDEPENDENT_AUDIT"
     },
     "resource_feasibility": "NOT_CERTIFIED",
-    "literal_logical_outer_records": 11863110020400
+    "literal_logical_outer_records": 11863110020400,
+    "prior_self_review_sha": "a7db56f516f616688438f1c02bc47c7618a9d281",
+    "prior_self_review_status": "ADVISORY_EVIDENCE_ONLY",
+    "independent_audit_required": true,
+    "independent_audit_attempt": "R1B"
   },
   "must_read": [
     {
       "path": "reviews/v0.5/V0.5.5_A1_SYNTHETIC_METHOD_AUTHORITY_DESIGN_R1.md",
-      "reason": "Current normative synthetic-method design under independent audit."
+      "reason": "Normative method design under independent audit."
     },
     {
       "path": "reviews/v0.5/V0.5.1_H41_SUCCESSOR_SCIENTIFIC_CAMPAIGN_V1_DESIGN_R1_1_CONTROLLER_REPAIR.md",
-      "reason": "Baseline scientific semantics needed to test compatibility and unauthorized drift."
+      "reason": "Baseline scientific semantics for compatibility and unauthorized-drift audit."
     },
     {
       "path": "src/btc_quant_agent/h41/inference.py",
-      "reason": "Accepted implementation semantics needed to review claimed inference compatibility."
+      "reason": "Accepted inference implementation semantics for compatibility audit."
     }
   ],
-  "note": "Cache/index of accepted authority only. Immutable underlying authority wins on conflict. Current independent reviewer is Sol in a fresh isolated audit session."
+  "note": "Cache/index of accepted authority only. Prior same-session self-review is advisory evidence and should not be supplied to the fresh R1B reviewer by default. Immutable underlying authority wins on conflict."
 }
