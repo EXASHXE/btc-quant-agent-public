@@ -53,12 +53,65 @@ class BinanceSignedClient:
                 body = response.read().decode("utf-8")
                 return json.loads(body) if body else {}
         except urllib.error.HTTPError as exc:
-            detail = exc.read().decode("utf-8", errors="replace")
-            raise BinanceExecutionError(
-                f"Binance order request failed: {exc.code} {detail}"
-            ) from exc
-        except (urllib.error.URLError, TimeoutError, json.JSONDecodeError) as exc:
-            raise BinanceExecutionError(f"Binance order request failed: {exc}") from exc
+            raise BinanceExecutionError(f"Binance request failed: HTTP {exc.code}") from None
+        except (urllib.error.URLError, TimeoutError, json.JSONDecodeError):
+            raise BinanceExecutionError("Binance request failed") from None
+
+    def _api_key_request(self, method: str, path: str) -> dict[str, Any]:
+        """USER_STREAM requests authenticate with the key header, never a signature."""
+        request = urllib.request.Request(
+            f"{self.base_url.rstrip('/')}{path}", method=method,
+            headers={"X-MBX-APIKEY": self.api_key, "User-Agent": "btc-quant-agent/0.2.1"},
+        )
+        try:
+            with urllib.request.urlopen(request, timeout=self.timeout_seconds) as response:
+                payload = response.read().decode("utf-8")
+                parsed = json.loads(payload) if payload else {}
+                if not isinstance(parsed, dict):
+                    raise BinanceExecutionError("invalid Binance user stream response")
+                return parsed
+        except urllib.error.HTTPError as exc:
+            raise BinanceExecutionError(f"Binance user stream request failed: HTTP {exc.code}") from None
+        except (urllib.error.URLError, TimeoutError, json.JSONDecodeError):
+            raise BinanceExecutionError("Binance user stream request failed") from None
+
+    def account_information(self) -> dict[str, Any]:
+        return cast(dict[str, Any], self._signed_request("GET", "/fapi/v3/account"))
+
+    def balances(self) -> list[dict[str, Any]]:
+        return cast(list[dict[str, Any]], self._signed_request("GET", "/fapi/v3/balance"))
+
+    def open_orders(self, symbol: str | None = None) -> list[dict[str, Any]]:
+        params = {"symbol": symbol} if symbol else None
+        return cast(list[dict[str, Any]], self._signed_request("GET", "/fapi/v1/openOrders", params))
+
+    def query_order_by_client_id(self, symbol: str, client_order_id: str) -> dict[str, Any]:
+        return cast(dict[str, Any], self._signed_request(
+            "GET", "/fapi/v1/order", {"symbol": symbol, "origClientOrderId": client_order_id},
+        ))
+
+    def query_protective_order(self, algo_id: str) -> dict[str, Any]:
+        return cast(dict[str, Any], self._signed_request(
+            "GET", "/fapi/v1/algoOrder", {"algoId": algo_id},
+        ))
+
+    def open_protective_orders(self, symbol: str | None = None) -> list[dict[str, Any]]:
+        params = {"symbol": symbol} if symbol else None
+        return cast(list[dict[str, Any]], self._signed_request(
+            "GET", "/fapi/v1/openAlgoOrders", params,
+        ))
+
+    def start_user_stream(self) -> str:
+        key = self._api_key_request("POST", "/fapi/v1/listenKey").get("listenKey")
+        if not isinstance(key, str) or not key:
+            raise BinanceExecutionError("invalid Binance user stream response")
+        return key
+
+    def keepalive_user_stream(self, _listen_key: str) -> None:
+        self._api_key_request("PUT", "/fapi/v1/listenKey")
+
+    def close_user_stream(self, _listen_key: str) -> None:
+        self._api_key_request("DELETE", "/fapi/v1/listenKey")
 
     def change_leverage(self, symbol: str, leverage: int) -> dict[str, Any]:
         return cast(

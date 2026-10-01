@@ -67,8 +67,10 @@ class CasePackageV1(ImmutableModel):
     evidence_id: Hash
     snapshot_hash: Annotated[str, Field(min_length=1)]
     signal_identity: Annotated[str, Field(min_length=1)]
-    source: Literal["MARKET_WATCH"] = "MARKET_WATCH"
+    source: Literal["MARKET_WATCH", "POSITION_SUPERVISOR"] = "MARKET_WATCH"
     source_receipts: tuple[tuple[str, int], ...] = ()
+    base_case_hash: Hash | None = None
+    position_event_hash: Hash | None = None
     price: Positive
     entry_low: Nonnegative
     entry_high: Nonnegative

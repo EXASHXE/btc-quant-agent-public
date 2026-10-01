@@ -1,0 +1,168 @@
+{
+  "task": "B4_LIVE_V1_ACCOUNT_EXECUTION_AND_POSITION_SUPERVISOR",
+  "repository": "EXASHXE/btc-quant-agent-public",
+  "task_branch": "feature/b-line-live-v1",
+  "start_binding_mode": "CURRENT_BRANCH_HEAD",
+  "actual_start_sha": "961a0f4d4b37cdb9365d5e5867813ff3129c14db",
+  "accepted_predecessor_sha": "961a0f4d4b37cdb9365d5e5867813ff3129c14db",
+  "predecessor_ancestry": "IS_ANCESTOR_VERIFIED",
+  "parent_sha": "961a0f4d4b37cdb9365d5e5867813ff3129c14db",
+  "initial_worktree_state": "DIRTY_EXPLAINED_B4_PARTIAL_WORK",
+  "continued_codex_partial_work": [
+    "src/btc_quant_agent/live_db.py",
+    "src/btc_quant_agent/approval/store.py",
+    "tests/test_live_v1_execution_storage.py"
+  ],
+  "sqlite_durability": {
+    "journal_mode": "WAL",
+    "busy_timeout_ms": 10000,
+    "foreign_keys": "ON",
+    "synchronous": "FULL",
+    "concurrent_contention": "VERIFIED_PASSING",
+    "busy_rollback_and_restart_recovery": "VERIFIED_PASSING"
+  },
+  "market_stream": {
+    "public_ws_and_simulated": "VERIFIED",
+    "stale_heartbeat_detection": "VERIFIED",
+    "mark_price_and_spread_capture": "VERIFIED"
+  },
+  "account_stream_and_reconciliation": {
+    "account_snapshot_schema": "AccountSnapshotV1 (immutable, verified hash, canonical JSON)",
+    "signed_rest_reconciliation": "VERIFIED (/fapi/v3/account, /fapi/v3/balance, /fapi/v1/openOrders)",
+    "user_data_stream": "IMPLEMENTED (listenKey session management, ORDER_TRADE_UPDATE, ACCOUNT_UPDATE)",
+    "disconnect_marking": "reconciled=False on stream drop"
+  },
+  "trade_intent": {
+    "schema": "TradeIntentV1 (deterministic intent_hash, immutable)",
+    "approval_binding": "strictly verified against active CasePackageV1 and approved TradeProposalV1",
+    "llm_field_isolation": "LLM/Feishu cannot set executable prices, quantities, or order parameters"
+  },
+  "pre_execution_validator": {
+    "checks": [
+      "intent integrity",
+      "ttl validity",
+      "kill switch active",
+      "price drift vs mark price",
+      "spread tolerance",
+      "market staleness",
+      "account staleness and reconciliation",
+      "available margin check",
+      "opposing position check",
+      "duplicate intent idempotency"
+    ],
+    "fail_closed": true
+  },
+  "execution_capability_policy": {
+    "shadow": "PERMITTED",
+    "dry_run": "PERMITTED",
+    "paper": "PERMITTED",
+    "testnet": "PERMITTED_WITH_TESTNET_CONFIG_AND_URL",
+    "live": "HARD_BLOCKED (LIVE_WRITE_AUTHORITY = None, no bypass)",
+    "autonomous": "HARD_BLOCKED"
+  },
+  "order_lifecycle_and_semantics": {
+    "idempotency": "deterministic clientOrderId (cuid_v1_{intent_id})",
+    "transport_uncertainty": "query_order_by_client_id before retry or failure; fail closed",
+    "partial_fill": "tracks filled_qty; PositionSupervisor emits PARTIAL_FILL_STALE trigger if uncompleted",
+    "protective_orders": "sized strictly to actual filled_qty (reduceOnly=True); missing protective stop trips KillSwitch"
+  },
+  "position_supervisor": {
+    "triggers": [
+      "POSITION_OPENED",
+      "PARTIAL_FILL_STALE",
+      "STOP_NEAR",
+      "TP_NEAR",
+      "REGIME_REVERSAL",
+      "OI_SHOCK",
+      "FUNDING_SHOCK",
+      "VOLATILITY_SPIKE",
+      "LIQUIDITY_DETERIORATION",
+      "GRID_BOUNDARY_BREACH",
+      "ADD_OPPORTUNITY"
+    ],
+    "deduplication_and_cooldown": "VERIFIED",
+    "position_case_generation": "PositionCasePackageV1 linked via base_case_hash and position_event_hash"
+  },
+  "kill_switch": {
+    "schema": "KillObservationV1 with latched SQLite state across process restarts",
+    "reasons": [
+      "DRAWDOWN_CAP",
+      "ACCOUNT_UNRECONCILED",
+      "ORDER_STATE_CONFLICT",
+      "WRONG_ENVIRONMENT",
+      "PROTECTIVE_ORDER_MISSING"
+    ],
+    "risk_reduction_allowed": "true for TESTNET / DRY_RUN, strictly false for LIVE"
+  },
+  "quality_gates": {
+    "compileall": "PASS: python -m compileall -q src tests",
+    "git_diff_check": "PASS: git diff --check",
+    "ruff": "PASS: ruff check .",
+    "mypy": "PASS: mypy src (148 source files)",
+    "live_v1_tests": {
+      "passed": 121,
+      "failed": 0
+    },
+    "affected_execution_market_api_tests": {
+      "passed": 89,
+      "failed": 0
+    },
+    "combined_live_and_affected_tests": {
+      "passed": 306,
+      "failed": 0
+    },
+    "full_pytest": {
+      "passed": 2130,
+      "skipped": 2,
+      "warnings": 9
+    }
+  },
+  "fences": {
+    "h40_fence_diff_zero": true,
+    "h41_fence_diff_zero": true,
+    "tactical_policy_r2_untouched": true,
+    "b2b_grid_evaluator_untouched": true,
+    "controller_docs_branch_untouched": true
+  },
+  "live_write_count": 0,
+  "secret_isolation": "no API keys or HMAC secrets in snapshots, intents, events, or logs; errors sanitized",
+  "provider_smoke_status": {
+    "credentialed_openai_responses_smoke": "PENDING (credentials absent)",
+    "credentialed_feishu_smoke": "PENDING (credentials absent)",
+    "actual_codex_model_invocation": "PENDING (credentials absent)",
+    "testnet_credentialed_exchange_smoke": "PENDING (credentials absent)"
+  },
+  "remaining_blockers": "None for B4. Real-money LIVE execution remains permanently forbidden.",
+  "changed_files": [
+    "evidence/v0.5.5/live_v1/B4_DAY2_VALIDATION.json",
+    "src/btc_quant_agent/account_watch/__init__.py",
+    "src/btc_quant_agent/account_watch/models.py",
+    "src/btc_quant_agent/account_watch/service.py",
+    "src/btc_quant_agent/account_watch/store.py",
+    "src/btc_quant_agent/approval/store.py",
+    "src/btc_quant_agent/decision/models.py",
+    "src/btc_quant_agent/execution/__init__.py",
+    "src/btc_quant_agent/execution/backend.py",
+    "src/btc_quant_agent/execution/binance_signed.py",
+    "src/btc_quant_agent/execution/executor.py",
+    "src/btc_quant_agent/execution/intents.py",
+    "src/btc_quant_agent/execution/policy.py",
+    "src/btc_quant_agent/execution/validator.py",
+    "src/btc_quant_agent/live_db.py",
+    "src/btc_quant_agent/live_market/__init__.py",
+    "src/btc_quant_agent/live_market/models.py",
+    "src/btc_quant_agent/live_market/service.py",
+    "src/btc_quant_agent/position_supervisor/__init__.py",
+    "src/btc_quant_agent/position_supervisor/kill_switch.py",
+    "src/btc_quant_agent/position_supervisor/models.py",
+    "src/btc_quant_agent/position_supervisor/supervisor.py",
+    "tests/test_live_v1_account_watch.py",
+    "tests/test_live_v1_day2_e2e.py",
+    "tests/test_live_v1_execution_backend.py",
+    "tests/test_live_v1_execution_intent.py",
+    "tests/test_live_v1_execution_storage.py",
+    "tests/test_live_v1_execution_validator.py",
+    "tests/test_live_v1_position_kill.py",
+    "tests/test_live_v1_position_supervisor.py"
+  ]
+}

@@ -11,6 +11,7 @@ from enum import StrEnum
 from pathlib import Path
 
 from btc_quant_agent.decision.models import AnalysisResultV1, CasePackageV1, TradeProposalV1
+from btc_quant_agent.live_db import connection
 
 
 class LiveState(StrEnum):
@@ -92,17 +93,8 @@ class LiveStore:
 
     @contextmanager
     def _connection(self) -> Iterator[sqlite3.Connection]:
-        db = sqlite3.connect(self.path, timeout=10)
-        db.row_factory = sqlite3.Row
-        db.execute("PRAGMA foreign_keys=ON")
-        try:
+        with connection(self.path) as db:
             yield db
-            db.commit()
-        except BaseException:
-            db.rollback()
-            raise
-        finally:
-            db.close()
 
     def save_case(self, case: CasePackageV1) -> bool:
         case.verify()
