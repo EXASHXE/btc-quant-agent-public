@@ -54,17 +54,17 @@ class PositionObservationV1(ImmutableModel):
     margin_usdt: float
     stop_price: float
     take_profit_price: float
-    funding_rate: float
-    oi_change_pct: float
-    volatility_percentile: float
-    spread_bps: float
-    tactical_regime: str
-    grid_boundary_breached: bool
+    funding_rate: float | None = None
+    oi_change_pct: float | None = None
+    volatility_percentile: float | None = None
+    spread_bps: float | None = None
+    tactical_regime: str | None = None
+    grid_boundary_breached: bool = False
     order_status: str
     order_filled_quantity: float
     order_observed_at_ms: Annotated[int, Field(ge=0)]
-    evidence_id: str
-    signal_identity: str
+    evidence_id: str | None = None
+    signal_identity: str | None = None
     prior_evidence_ids: tuple[str, ...] = ()
     prior_signal_identities: tuple[str, ...] = ()
     add_opportunity: bool = False

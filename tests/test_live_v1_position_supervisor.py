@@ -118,3 +118,95 @@ def test_only_material_new_event_invokes_existing_analysis(tmp_path):
         assert len(calls) == 1
 
     asyncio.run(run())
+
+
+def test_r1_06_short_position_opened_and_reopen_cycle(tmp_path):
+    supervisor = PositionSupervisor(tmp_path / "live.db")
+
+    # 1. 0 -> negative opens short
+    short_obs = observation(previous_quantity=0.0, quantity=-0.5)
+    events1 = supervisor.evaluate(short_obs, NOW)
+    assert any(e.trigger == "POSITION_OPENED" for e in events1)
+
+    # 2. Repeated same observation dedupes
+    events2 = supervisor.evaluate(short_obs, NOW + 1)
+    assert events2 == ()
+
+    # 3. Close position
+    close_obs = observation(previous_quantity=-0.5, quantity=0.0)
+    events3 = supervisor.evaluate(close_obs, NOW + 10_000)
+    assert not any(e.trigger == "POSITION_OPENED" for e in events3)
+
+    # 4. Reopen short works correctly after cooldown
+    reopen_short_obs = observation(previous_quantity=0.0, quantity=-0.8)
+    events4 = supervisor.evaluate(reopen_short_obs, NOW + 70_000)
+    assert any(e.trigger == "POSITION_OPENED" for e in events4)
+
+    # 5. Close and reopen long works correctly
+    close_obs2 = observation(previous_quantity=-0.8, quantity=0.0)
+    supervisor.evaluate(close_obs2, NOW + 80_000)
+    reopen_long_obs = observation(previous_quantity=0.0, quantity=1.0)
+    events5 = supervisor.evaluate(reopen_long_obs, NOW + 150_000)
+    assert any(e.trigger == "POSITION_OPENED" for e in events5)
+
+
+def test_r1_05_unavailable_data_does_not_fire_triggers(tmp_path):
+    supervisor = PositionSupervisor(tmp_path / "live.db")
+
+    # When optional data fields are None (unavailable), data-dependent triggers must NOT fire
+    obs_unavailable = observation(
+        previous_quantity=1.0,
+        funding_rate=None,
+        oi_change_pct=None,
+        volatility_percentile=None,
+        tactical_regime=None,
+        spread_bps=None,
+        evidence_id=None,
+        signal_identity=None,
+        add_opportunity=True,
+    )
+    events = supervisor.evaluate(obs_unavailable, NOW)
+    triggers = {e.trigger for e in events}
+    assert "FUNDING_SHOCK" not in triggers
+    assert "OI_SHOCK" not in triggers
+    assert "VOLATILITY_SPIKE" not in triggers
+    assert "REGIME_REVERSAL" not in triggers
+    assert "LIQUIDITY_DETERIORATION" not in triggers
+    assert "ADD_OPPORTUNITY" not in triggers
+
+    # When verified source data is provided, corresponding trigger fires
+    obs_funding = observation(previous_quantity=1.0, funding_rate=0.002)
+    events_funding = supervisor.evaluate(obs_funding, NOW + 65_000)
+    assert any(e.trigger == "FUNDING_SHOCK" for e in events_funding)
+
+    obs_regime = observation(previous_quantity=1.0, quantity=1.0, tactical_regime="BEARISH")
+    events_regime = supervisor.evaluate(obs_regime, NOW + 130_000)
+    assert any(e.trigger == "REGIME_REVERSAL" for e in events_regime)
+
+
+def test_r1_05_restart_does_not_duplicate_position_case_analysis(tmp_path):
+    async def run() -> None:
+        calls: list[str] = []
+
+        class Spy:
+            async def analyze_case(self, case: CasePackageV1) -> None:
+                calls.append(case.case_hash)
+
+        db_file = tmp_path / "live.db"
+        supervisor1 = PositionSupervisor(
+            db_file, analysis_service=Spy(), fresh_market_case=lambda _: market_case(),
+        )
+        obs = observation(previous_quantity=0.0, quantity=1.0)
+        events = await supervisor1.process(obs, NOW)
+        assert len(events) >= 1
+        assert len(calls) == 1
+
+        # Simulate restart on same DB
+        supervisor2 = PositionSupervisor(
+            db_file, analysis_service=Spy(), fresh_market_case=lambda _: market_case(),
+        )
+        # Even if process is called with the observation again, dispatches table prevents duplicate analysis
+        await supervisor2.process(obs, NOW)
+        assert len(calls) == 1
+
+    asyncio.run(run())

@@ -15,6 +15,8 @@ from btc_quant_agent.account_watch import (
     PositionV1,
 )
 from btc_quant_agent.config import ExecutionConfig
+from btc_quant_agent.execution.binance_signed import BinanceSignedClient
+from btc_quant_agent.execution.guard import ExecutionBlocked
 
 NOW = 1_700_000_000_000
 
@@ -170,3 +172,47 @@ def test_user_stream_disconnect_marks_unreconciled(tmp_path):
     assert reconciled_snap.reconciled
     assert reconciled_snap.quality == "OK"
     assert watch.is_reconciled
+
+
+def test_r1_02_account_watch_rejects_mismatched_signed_client_authority(tmp_path):
+    store = AccountStore(tmp_path / "live.db")
+    cfg = ExecutionConfig(mode="testnet")
+
+    # 1. Missing signed_client in testnet mode
+    with pytest.raises(ExecutionBlocked, match="TESTNET mode requires a signed_client"):
+        AccountWatch(cfg, store, signed_client=None)
+
+    # 2. Client with live namespace
+    live_ns_client = BinanceSignedClient(
+        base_url="https://testnet.binancefuture.com",
+        api_key="k",
+        api_secret="s",
+        environment="TESTNET",
+        credential_namespace="BINANCE_LIVE",
+    )
+    with pytest.raises(ExecutionBlocked, match="authority mismatch for TESTNET"):
+        AccountWatch(cfg, store, signed_client=live_ns_client)
+
+    # 3. Client with live endpoint
+    live_url_client = BinanceSignedClient(
+        base_url="https://fapi.binance.com",
+        api_key="k",
+        api_secret="s",
+        environment="TESTNET",
+        credential_namespace="BINANCE_TESTNET",
+    )
+    with pytest.raises(ExecutionBlocked, match="authority mismatch for TESTNET"):
+        AccountWatch(cfg, store, signed_client=live_url_client)
+
+    # 4. Valid client succeeds and binds authority
+    valid_client = BinanceSignedClient(
+        base_url="https://testnet.binancefuture.com",
+        api_key="k",
+        api_secret="s",
+        environment="TESTNET",
+        credential_namespace="BINANCE_TESTNET",
+    )
+    valid_watch = AccountWatch(cfg, store, signed_client=valid_client)
+    assert valid_watch.environment == "TESTNET"
+    assert valid_watch.credential_namespace == "BINANCE_TESTNET"
+    assert valid_watch.rest_base_url == "https://testnet.binancefuture.com"

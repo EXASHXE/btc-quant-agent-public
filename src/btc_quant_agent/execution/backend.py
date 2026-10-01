@@ -167,15 +167,67 @@ class DryRunExecutionBackend:
                 avg_price=0.0,
                 reason="ORDER_NOT_FOUND",
             )
+
+        filled_qty = float(row["filled_qty"])
+        stop_order_id: str | None = None
+
+        if filled_qty > 0:
+            filled_qty = min(filled_qty, intent.quantity)
+            stop_order_id = f"sim-stop-{intent.intent_id}"
+            stop_client_oid = f"bqa-stop-{intent.client_order_id[:12]}-{int(filled_qty * 1000):04d}"
+
+            with connection(self.path) as db:
+                db.execute("BEGIN IMMEDIATE")
+                stop_row = db.execute(
+                    "SELECT * FROM live_execution_orders WHERE intent_id=? AND is_protective=1",
+                    (intent.intent_id,),
+                ).fetchone()
+
+                if stop_row is None:
+                    db.execute(
+                        "INSERT INTO live_execution_orders VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                        (
+                            stop_order_id,
+                            intent.intent_id,
+                            stop_client_oid,
+                            intent.symbol,
+                            "SELL" if intent.side == "BUY" else "BUY",
+                            "NEW",
+                            filled_qty,
+                            0.0,
+                            0.0,
+                            intent.stop_loss,
+                            1,
+                            1,
+                            now_ms,
+                            now_ms,
+                            json.dumps({"dry_run": True, "type": "STOP_MARKET", "stopPrice": intent.stop_loss, "quantity": filled_qty}),
+                        ),
+                    )
+                elif float(stop_row["requested_qty"]) < filled_qty:
+                    db.execute(
+                        "UPDATE live_execution_orders SET requested_qty=?, client_order_id=?, receipt_time_ms=?, payload=? WHERE order_id=?",
+                        (
+                            filled_qty,
+                            stop_client_oid,
+                            now_ms,
+                            json.dumps({"dry_run": True, "type": "STOP_MARKET", "stopPrice": intent.stop_loss, "quantity": filled_qty}),
+                            stop_row["order_id"],
+                        ),
+                    )
+                    stop_order_id = stop_row["order_id"]
+                else:
+                    stop_order_id = stop_row["order_id"]
+
         return ExecutionReport(
             intent_id=intent.intent_id,
             status=row["status"],
             order_id=row["order_id"],
             client_order_id=row["client_order_id"],
             requested_qty=row["requested_qty"],
-            filled_qty=row["filled_qty"],
+            filled_qty=filled_qty,
             avg_price=row["avg_price"],
-            protective_stop_id=f"sim-stop-{intent.intent_id}",
+            protective_stop_id=stop_order_id,
             reason="RECONCILED",
         )
 
@@ -211,13 +263,16 @@ class TestnetExecutionBackend:
             """)
 
     def submit_intent(self, intent: TradeIntentV1, now_ms: int) -> ExecutionReport:
-        # 1. Capability check
+        # 1. Capability check using client's actual authority metadata
+        auth = getattr(self.client, "authority", None)
+        if auth is None:
+            raise ExecutionBlocked("missing credential authority on signed client")
         ExecutionCapabilityPolicyV1.check_capability(
-            "TESTNET",
+            auth.environment,
             "SUBMIT_INTENT",
-            env_id="binance_usdm_testnet",
-            cred_ns="BINANCE_TESTNET",
-            rest_url=self.client.base_url,
+            env_id=auth.environment,
+            cred_ns=auth.credential_namespace,
+            rest_url=auth.rest_base_url,
         )
 
         # 2. Check local database for existing order with this client_order_id (idempotency)
@@ -317,7 +372,7 @@ class TestnetExecutionBackend:
         # 5. Protective orders for actual filled quantity
         stop_order_id: str | None = None
         if filled_qty > 0:
-            stop_order_id = self._place_protective_stop(intent, filled_qty, now_ms)
+            stop_order_id = self._reconcile_protective_stop(intent, filled_qty, now_ms)
 
         return ExecutionReport(
             intent_id=intent.intent_id,
@@ -331,10 +386,83 @@ class TestnetExecutionBackend:
             raw=raw_order,
         )
 
+    def _trip_kill_switch(self, now_ms: int, reason: str) -> None:
+        from ..position_supervisor.models import KillObservationV1
+        auth = getattr(self.client, "authority", None)
+        env = auth.environment if auth else "TESTNET"
+        ns = auth.credential_namespace if auth else "TESTNET"
+        url = auth.rest_base_url if auth else getattr(self.client, "base_url", "https://testnet.binancefuture.com")
+        obs = KillObservationV1(
+            account_snapshot_hash="0" * 64,
+            environment=env,
+            credential_namespace=ns,
+            rest_url=url,
+            observed_at_ms=now_ms,
+            last_reconciled_at_ms=now_ms,
+            reconciled=True,
+            equity_usdt=1000.0,
+            daily_loss_usdt=0.0,
+            drawdown_pct=0.0,
+            order_conflicts=0,
+            protective_missing_since_ms=now_ms - 20_000,
+        )
+        self.kill_switch.evaluate(obs, now_ms)
+
+    def _reconcile_protective_stop(self, intent: TradeIntentV1, filled_qty: float, now_ms: int) -> str | None:
+        if filled_qty <= 0.0:
+            return None
+
+        # Protection quantity must never exceed position quantity
+        filled_qty = min(filled_qty, intent.quantity)
+
+        # 1. Query open protective orders from exchange
+        try:
+            open_algos_raw = self.client.open_protective_orders(intent.symbol)
+            open_algos = open_algos_raw if isinstance(open_algos_raw, list) else []
+        except Exception as exc:
+            self._trip_kill_switch(now_ms, f"protective query failed: {exc}")
+            raise ExecutionBlocked(f"protective query uncertainty: {exc}") from exc
+
+        # 2. Check for active protective order on exchange for this intent
+        target_prefix = f"bqa-stop-{intent.client_order_id[:12]}"
+        matched_algo: dict[str, Any] | None = None
+        for algo in open_algos:
+            if not isinstance(algo, dict):
+                continue
+            client_id = str(algo.get("clientAlgoId", ""))
+            if client_id.startswith(target_prefix):
+                matched_algo = algo
+                break
+
+        if matched_algo is not None:
+            algo_id = str(matched_algo.get("algoId", matched_algo.get("orderId", "")))
+            current_protected_qty = float(matched_algo.get("quantity", matched_algo.get("origQty", 0.0)))
+            if current_protected_qty >= filled_qty:
+                # Already adequately protected (idempotent replay)
+                return algo_id
+
+            # Existing protection is smaller than current filled_qty: cancel smaller order
+            try:
+                self.client.cancel_protective_order(intent.symbol, algo_id)
+            except Exception as exc:
+                self._trip_kill_switch(now_ms, f"failed to cancel smaller protective stop {algo_id}: {exc}")
+                raise ExecutionBlocked(f"failed to cancel smaller protective stop: {exc}") from exc
+
+            # Mark cancelled in local DB
+            with connection(self.path) as db:
+                db.execute(
+                    "UPDATE live_execution_orders SET status='CANCELED' WHERE order_id=?",
+                    (algo_id,),
+                )
+
+        # 3. Place resized or new protective stop for full filled_qty
+        return self._place_protective_stop(intent, filled_qty, now_ms)
+
     def _place_protective_stop(self, intent: TradeIntentV1, filled_qty: float, now_ms: int) -> str:
         # Quantity MUST be <= actual filled position
+        filled_qty = min(filled_qty, intent.quantity)
         exit_side = "SELL" if intent.side == "BUY" else "BUY"
-        stop_client_oid = f"bqa-stop-{intent.client_order_id[:16]}"
+        stop_client_oid = f"bqa-stop-{intent.client_order_id[:12]}-{int(filled_qty * 1000):04d}"
 
         try:
             raw_stop = self.client.place_protective_order(
@@ -355,7 +483,8 @@ class TestnetExecutionBackend:
             with connection(self.path) as db:
                 db.execute("BEGIN IMMEDIATE")
                 db.execute(
-                    "INSERT INTO live_execution_orders VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                    "INSERT INTO live_execution_orders VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) "
+                    "ON CONFLICT(order_id) DO UPDATE SET requested_qty=excluded.requested_qty, status=excluded.status",
                     (
                         stop_id,
                         intent.intent_id,
@@ -376,26 +505,21 @@ class TestnetExecutionBackend:
                 )
             return stop_id
         except Exception as exc:
-            # If placing protective stop fails, activate Kill Switch!
-            from ..position_supervisor.models import KillObservationV1
-            obs = KillObservationV1(
-                account_snapshot_hash="0" * 64,
-                environment="TESTNET",
-                credential_namespace="TESTNET",
-                rest_url=self.client.base_url,
-                observed_at_ms=now_ms,
-                last_reconciled_at_ms=now_ms,
-                reconciled=True,
-                equity_usdt=1000.0,
-                daily_loss_usdt=0.0,
-                drawdown_pct=0.0,
-                order_conflicts=0,
-                protective_missing_since_ms=now_ms - 20_000,
-            )
-            self.kill_switch.evaluate(obs, now_ms)
+            self._trip_kill_switch(now_ms, f"failed to place required protective stop: {exc}")
             raise ExecutionBlocked(f"failed to place required protective stop: {exc}") from exc
 
     def reconcile_intent(self, intent: TradeIntentV1, now_ms: int) -> ExecutionReport:
+        auth = getattr(self.client, "authority", None)
+        if auth is None:
+            raise ExecutionBlocked("missing credential authority on signed client")
+        ExecutionCapabilityPolicyV1.check_capability(
+            auth.environment,
+            "RECONCILE_INTENT",
+            env_id=auth.environment,
+            cred_ns=auth.credential_namespace,
+            rest_url=auth.rest_base_url,
+        )
+
         try:
             raw = self.client.query_order_by_client_id(intent.symbol, intent.client_order_id)
         except Exception as exc:
@@ -414,6 +538,10 @@ class TestnetExecutionBackend:
                 (status, filled_qty, avg_price, int(raw.get("updateTime", now_ms)), intent.client_order_id),
             )
 
+        stop_order_id: str | None = None
+        if filled_qty > 0:
+            stop_order_id = self._reconcile_protective_stop(intent, filled_qty, now_ms)
+
         return ExecutionReport(
             intent_id=intent.intent_id,
             status=status,
@@ -422,5 +550,6 @@ class TestnetExecutionBackend:
             requested_qty=intent.quantity,
             filled_qty=filled_qty,
             avg_price=avg_price,
+            protective_stop_id=stop_order_id,
             raw=raw,
         )

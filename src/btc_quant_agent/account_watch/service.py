@@ -8,6 +8,7 @@ from collections.abc import Callable
 
 from ..config import AppConfig, ExecutionConfig
 from ..execution.binance_signed import BinanceSignedClient
+from ..execution.guard import ExecutionBlocked
 from .models import AccountSnapshotV1, OrderSide, OrderStatus, OrderV1, PositionV1
 from .store import AccountStore
 
@@ -28,11 +29,21 @@ class AccountWatch:
         self.account_id = account_id
         self.clock_ms = clock_ms or (lambda: int(time.time() * 1000))
 
-        mode = getattr(exec_cfg, "mode", "paper")
+        mode = getattr(exec_cfg, "mode", "paper").lower()
         if mode == "testnet":
-            self.environment = "TESTNET"
-            self.credential_namespace = "BINANCE_TESTNET"
-            self.rest_base_url = "https://testnet.binancefuture.com"
+            if self.signed_client is None:
+                raise ExecutionBlocked("TESTNET mode requires a signed_client")
+            auth = getattr(self.signed_client, "authority", None)
+            if (
+                auth is None
+                or auth.environment != "TESTNET"
+                or auth.credential_namespace != "BINANCE_TESTNET"
+                or auth.rest_base_url.rstrip("/").lower() != "https://testnet.binancefuture.com"
+            ):
+                raise ExecutionBlocked("AccountWatch signed client authority mismatch for TESTNET")
+            self.environment = auth.environment
+            self.credential_namespace = auth.credential_namespace
+            self.rest_base_url = auth.rest_base_url
             self.ws_base_url = "wss://stream.binancefuture.com"
         else:
             self.environment = "DRY_RUN"

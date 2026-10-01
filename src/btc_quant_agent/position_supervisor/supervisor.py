@@ -79,6 +79,11 @@ class PositionSupervisor:
                     is_open INTEGER NOT NULL DEFAULT 0,
                     last_opened_at_ms INTEGER NOT NULL DEFAULT 0
                 );
+                CREATE TABLE IF NOT EXISTS live_position_case_dispatches (
+                    event_hash TEXT PRIMARY KEY,
+                    case_hash TEXT NOT NULL,
+                    dispatched_at_ms INTEGER NOT NULL
+                );
             """)
 
     def evaluate(
@@ -114,7 +119,7 @@ class PositionSupervisor:
             # 2. Check each trigger predicate
             triggers_to_check: list[str] = []
 
-            if obs.previous_quantity == 0.0 and obs.quantity > 0.0 and not is_currently_open:
+            if obs.previous_quantity == 0.0 and obs.quantity != 0.0 and not is_currently_open:
                 triggers_to_check.append("POSITION_OPENED")
 
             if (
@@ -133,21 +138,22 @@ class PositionSupervisor:
                 if dist_tp <= self.policy.tp_near_pct:
                     triggers_to_check.append("TP_NEAR")
 
-            if (obs.quantity > 0 and obs.tactical_regime == "BEARISH") or (
-                obs.quantity < 0 and obs.tactical_regime == "BULLISH"
+            if obs.tactical_regime is not None and (
+                (obs.quantity > 0 and obs.tactical_regime == "BEARISH")
+                or (obs.quantity < 0 and obs.tactical_regime == "BULLISH")
             ):
                 triggers_to_check.append("REGIME_REVERSAL")
 
-            if abs(obs.oi_change_pct) >= self.policy.oi_shock_pct:
+            if obs.oi_change_pct is not None and abs(obs.oi_change_pct) >= self.policy.oi_shock_pct:
                 triggers_to_check.append("OI_SHOCK")
 
-            if abs(obs.funding_rate) >= self.policy.funding_shock_rate:
+            if obs.funding_rate is not None and abs(obs.funding_rate) >= self.policy.funding_shock_rate:
                 triggers_to_check.append("FUNDING_SHOCK")
 
-            if obs.volatility_percentile >= self.policy.volatility_spike_percentile:
+            if obs.volatility_percentile is not None and obs.volatility_percentile >= self.policy.volatility_spike_percentile:
                 triggers_to_check.append("VOLATILITY_SPIKE")
 
-            if obs.spread_bps >= self.policy.liquidity_deterioration_bps:
+            if obs.spread_bps is not None and obs.spread_bps >= self.policy.liquidity_deterioration_bps:
                 triggers_to_check.append("LIQUIDITY_DETERIORATION")
 
             if obs.grid_boundary_breached:
@@ -155,6 +161,8 @@ class PositionSupervisor:
 
             if (
                 obs.add_opportunity
+                and obs.evidence_id is not None
+                and obs.signal_identity is not None
                 and obs.evidence_id not in obs.prior_evidence_ids
                 and obs.signal_identity not in obs.prior_signal_identities
             ):
@@ -219,7 +227,21 @@ class PositionSupervisor:
         events = self.evaluate(obs, now_ms)
         if events and self.analysis_service is not None and self.fresh_market_case is not None:
             for event in events:
+                with connection(self.path) as db:
+                    dispatched = db.execute(
+                        "SELECT 1 FROM live_position_case_dispatches WHERE event_hash=?",
+                        (event.event_hash,),
+                    ).fetchone()
+                if dispatched is not None:
+                    continue
+
                 base_case = self.fresh_market_case(obs.symbol)
                 pos_case = position_case_from_event(base_case, event, now_ms=now_ms)
                 await self.analysis_service.analyze_case(pos_case)
+
+                with connection(self.path) as db:
+                    db.execute(
+                        "INSERT OR IGNORE INTO live_position_case_dispatches VALUES (?, ?, ?)",
+                        (event.event_hash, pos_case.case_hash, now_ms),
+                    )
         return events

@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
-import secrets
 from pathlib import Path
 from typing import Annotated, Any, Literal, Self
 
@@ -78,6 +78,7 @@ def build_trade_intent(
     now_ms: int,
     idempotency_key: str | None = None,
     client_order_id: str | None = None,
+    intent_store: IntentStore | None = None,
 ) -> TradeIntentV1:
     account_snapshot.verify()
     if account_snapshot.quality != "OK" or not account_snapshot.reconciled:
@@ -150,10 +151,18 @@ def build_trade_intent(
     if quantity <= 0:
         raise ExecutionBlocked("computed order quantity must be positive")
 
-    intent_seed = secrets.token_hex(12)
-    intent_id = f"intent-{intent_seed}"
-    idem_key = idempotency_key or f"idem-{intent_seed}"
-    client_oid = client_order_id or f"bqa-{intent_seed[:16]}"
+    # One approval authority (case_hash, proposal_hash, approval_event_id)
+    # maps deterministically to exactly one executable TradeIntent authority
+    authority_payload = f"{case.case_hash}:{proposal.proposal_hash}:{approval_event_id}"
+    authority_hash = hashlib.sha256(authority_payload.encode("utf-8")).hexdigest()
+    intent_id = f"intent_{authority_hash[:24]}"
+    idem_key = idempotency_key or f"idem_{authority_hash[:24]}"
+    client_oid = client_order_id or f"cuid_v1_{authority_hash[:16]}"
+
+    if intent_store is not None:
+        existing = intent_store.get_intent_by_approval_event(approval_event_id)
+        if existing is not None:
+            return existing
 
     env_val: Literal["DRY_RUN", "TESTNET"] = (
         "TESTNET" if account_snapshot.environment == "TESTNET" else "DRY_RUN"
@@ -198,12 +207,14 @@ class IntentStore:
                     intent_hash TEXT NOT NULL UNIQUE,
                     idempotency_key TEXT NOT NULL UNIQUE,
                     client_order_id TEXT NOT NULL UNIQUE,
+                    approval_event_id TEXT NOT NULL UNIQUE,
                     proposal_hash TEXT NOT NULL,
                     case_hash TEXT NOT NULL,
                     status TEXT NOT NULL,
                     created_at_ms INTEGER NOT NULL,
                     payload TEXT NOT NULL
                 );
+                CREATE INDEX IF NOT EXISTS idx_intents_approval ON live_trade_intents(approval_event_id);
                 CREATE INDEX IF NOT EXISTS idx_intents_proposal ON live_trade_intents(proposal_hash);
                 CREATE INDEX IF NOT EXISTS idx_intents_idempotency ON live_trade_intents(idempotency_key);
                 CREATE TABLE IF NOT EXISTS live_intent_transitions (
@@ -220,13 +231,23 @@ class IntentStore:
         intent.verify()
         with connection(self.path) as db:
             db.execute("BEGIN IMMEDIATE")
+            row = db.execute(
+                "SELECT intent_hash, payload FROM live_trade_intents WHERE approval_event_id=? OR intent_id=?",
+                (intent.approval_event_id, intent.intent_id),
+            ).fetchone()
+            if row is not None:
+                if row["intent_hash"] == intent.intent_hash:
+                    return  # Identical replay returns existing identical authority
+                raise ExecutionBlocked(f"divergent intent for approval event {intent.approval_event_id}")
+
             db.execute(
-                "INSERT INTO live_trade_intents VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                "INSERT INTO live_trade_intents VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 (
                     intent.intent_id,
                     intent.intent_hash,
                     intent.idempotency_key,
                     intent.client_order_id,
+                    intent.approval_event_id,
                     intent.proposal_hash,
                     intent.case_hash,
                     status,
@@ -239,6 +260,15 @@ class IntentStore:
                 "VALUES (?, NULL, ?, 'CREATED', ?)",
                 (intent.intent_id, status, intent.created_at_ms),
             )
+
+    def get_intent_by_approval_event(self, approval_event_id: str) -> TradeIntentV1 | None:
+        with connection(self.path) as db:
+            row = db.execute(
+                "SELECT payload FROM live_trade_intents WHERE approval_event_id=?", (approval_event_id,)
+            ).fetchone()
+            if row is None:
+                return None
+            return TradeIntentV1.model_validate(json.loads(row["payload"]))
 
     def get_intent(self, intent_id: str) -> TradeIntentV1 | None:
         with connection(self.path) as db:

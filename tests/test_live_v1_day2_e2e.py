@@ -32,7 +32,6 @@ from btc_quant_agent.live_market.service import MarketStreamService
 from btc_quant_agent.position_supervisor.kill_switch import KillSwitch
 from btc_quant_agent.position_supervisor.supervisor import (
     PositionSupervisor,
-    position_case_from_event,
 )
 
 NOW = 1_700_000_000_000
@@ -64,7 +63,8 @@ def test_day2_full_operational_e2e_cycle(tmp_path):
     analysis = sample_analysis(case)
     live_store.save_analysis(analysis)
 
-    compiler = RiskCompilerV1(RiskPolicyV1(proposal_ttl_ms=300_000))
+    risk_policy = RiskPolicyV1(proposal_ttl_ms=300_000)
+    compiler = RiskCompilerV1(risk_policy)
     proposal = compiler.compile(
         case,
         analysis,
@@ -140,6 +140,7 @@ def test_day2_full_operational_e2e_cycle(tmp_path):
         live_store=live_store,
         intent_store=intent_store,
         kill_switch=kill_switch,
+        risk_policy=risk_policy,
     )
     dry_run_backend = DryRunExecutionBackend(db_path)
 
@@ -156,7 +157,7 @@ def test_day2_full_operational_e2e_cycle(tmp_path):
     )
 
     # 9. Execute approved intent
-    report = exec_service.execute_approved_intent(intent.intent_id, NOW)
+    report = asyncio.run(exec_service.execute_approved_intent(intent.intent_id, NOW))
     assert report.status == "FILLED"
     assert report.filled_qty == intent.quantity
     assert report.protective_stop_id is not None
@@ -174,33 +175,22 @@ def test_day2_full_operational_e2e_cycle(tmp_path):
     opened_event = PositionEventV1.model_validate_json(row["payload"])
     assert opened_event.trigger == "POSITION_OPENED"
 
-    # 11. PositionCase generated from event and verified
-    pos_case = position_case_from_event(case, opened_event, NOW)
+    # 11. Coordinator fill automatically orchestrated PositionCase to AnalysisService end-to-end!
+    assert len(analyzed_position_cases) == 1
+    pos_case = analyzed_position_cases[0]
     pos_case.verify()
+    assert pos_case.trigger == "POSITION_OPENED"
     assert pos_case.source == "POSITION_SUPERVISOR"
     assert pos_case.base_case_hash == case.case_hash
     assert pos_case.position_event_hash == opened_event.event_hash
+    assert pos_case.evidence_id == case.evidence_id
+    assert pos_case.signal_identity == case.signal_identity
     assert pos_case.case_hash != case.case_hash
 
-    # 12. Async process call delivers PositionCase to AnalysisBackend
-    async def run_analysis() -> None:
-        obs = report_to_observation(report, intent, account_snap, market_stream.latest_observation(NOW), NOW + 60_000)
-        # Change trigger condition (e.g. stop near)
-        obs_stop_near = obs.model_copy(update={
-            "mark_price": 91.0,
-            "previous_quantity": report.filled_qty,
-            "observation_hash": "",
-        })
-        # Rebuild hash
-        from btc_quant_agent.decision.models import content_hash
-        exp = content_hash(obs_stop_near.model_dump(mode="json", exclude={"observation_hash"}))
-        object.__setattr__(obs_stop_near, "observation_hash", exp)
-
-        await supervisor.process(obs_stop_near, NOW + 60_000)
-
-    asyncio.run(run_analysis())
+    # 12. Replay does not duplicate PositionCase analysis
+    report_replay = asyncio.run(exec_service.execute_approved_intent(intent.intent_id, NOW + 1000))
+    assert report_replay.status == "FILLED"
     assert len(analyzed_position_cases) == 1
-    assert analyzed_position_cases[0].trigger == "STOP_NEAR"
 
 
 def report_to_observation(report, intent, account_snap, market_obs, now_ms):
@@ -246,7 +236,8 @@ def test_adversarial_restart_does_not_resubmit_or_duplicate(tmp_path):
     analysis = sample_analysis(case)
     live_store.save_analysis(analysis)
 
-    compiler = RiskCompilerV1(RiskPolicyV1(proposal_ttl_ms=300_000))
+    risk_policy = RiskPolicyV1(proposal_ttl_ms=300_000)
+    compiler = RiskCompilerV1(risk_policy)
     proposal = compiler.compile(case, analysis, now_ms=NOW, requires_manual_review=False)
     live_store.save_proposal(proposal)
 
@@ -266,12 +257,12 @@ def test_adversarial_restart_does_not_resubmit_or_duplicate(tmp_path):
     market_stream = MarketStreamService(clock_ms=lambda: NOW)
     market_stream.update_simulated(intent.price, intent.price - 0.01, intent.price + 0.01, intent.price, NOW)
 
-    validator = PreExecutionValidator(live_store, intent_store, kill_switch)
+    validator = PreExecutionValidator(live_store, intent_store, kill_switch, risk_policy=risk_policy)
     backend = DryRunExecutionBackend(db_path)
     service = LiveExecutionService(intent_store, live_store, account_watch, market_stream, validator, kill_switch, backend)
 
     # First execution succeeds
-    rep1 = service.execute_approved_intent(intent.intent_id, NOW)
+    rep1 = asyncio.run(service.execute_approved_intent(intent.intent_id, NOW))
     assert rep1.status == "FILLED"
 
     # Simulate process restart by instantiating new service instances on the same SQLite database
@@ -282,6 +273,87 @@ def test_adversarial_restart_does_not_resubmit_or_duplicate(tmp_path):
     )
 
     # Resubmitting the same intent ID recovers existing state without creating duplicate orders
-    rep2 = restarted_service.execute_approved_intent(intent.intent_id, NOW + 1000)
+    rep2 = asyncio.run(restarted_service.execute_approved_intent(intent.intent_id, NOW + 1000))
     assert rep2.order_id == rep1.order_id
     assert rep2.reason == "IDEMPOTENT_REPLAY"
+
+
+def test_r1_05_coordinator_fill_source_bound_and_no_neutral_masquerade(tmp_path):
+    db_path = tmp_path / "live.db"
+    live_store = LiveStore(db_path)
+    intent_store = IntentStore(db_path)
+    account_store = AccountStore(db_path)
+    kill_switch = KillSwitch(db_path)
+
+    case = sample_case(
+        case_id="case-r1-05",
+        created_at_ms=NOW,
+        observed_at_ms=NOW,
+        expires_at_ms=NOW + 300_000,
+        evidence_id="a" * 64,
+        signal_identity="sig-real-source-456",
+    )
+    live_store.save_case(case)
+    analysis = sample_analysis(case)
+    live_store.save_analysis(analysis)
+
+    risk_policy = RiskPolicyV1(proposal_ttl_ms=300_000)
+    compiler = RiskCompilerV1(risk_policy)
+    proposal = compiler.compile(case, analysis, now_ms=NOW, requires_manual_review=False)
+    live_store.save_proposal(proposal)
+
+    live_store.transition(case.case_id, LiveState.LLM_ANALYZING, NOW)
+    live_store.transition(case.case_id, LiveState.PLAN_READY, NOW)
+    live_store.transition(case.case_id, LiveState.NOTIFIED, NOW)
+    live_store.transition(case.case_id, LiveState.WAITING_APPROVAL, NOW)
+    live_store.record_callback("appr-r1-05", "APPROVE", "alice", proposal.proposal_hash, case.case_hash, NOW)
+
+    account_watch = AccountWatch(ExecutionConfig(mode="paper"), account_store, clock_ms=lambda: NOW)
+    snap = account_watch.reconcile_rest()
+
+    intent = build_trade_intent(live_store, snap, proposal.proposal_hash, "appr-r1-05", now_ms=NOW)
+    intent_store.save_intent(intent)
+
+    market_stream = MarketStreamService(clock_ms=lambda: NOW)
+    market_stream.update_simulated(intent.price, intent.price - 0.01, intent.price + 0.01, intent.price, NOW)
+
+    analyzed_cases: list[CasePackageV1] = []
+
+    class MockAnalysisService:
+        async def analyze_case(self, pos_case: CasePackageV1) -> None:
+            analyzed_cases.append(pos_case)
+
+    supervisor = PositionSupervisor(
+        db_path,
+        analysis_service=MockAnalysisService(),
+        fresh_market_case=lambda _: case,
+    )
+    validator = PreExecutionValidator(live_store, intent_store, kill_switch, risk_policy=risk_policy)
+    backend = DryRunExecutionBackend(db_path)
+
+    # Supply explicit verified source providers for tactical and market feeds
+    service = LiveExecutionService(
+        intent_store,
+        live_store,
+        account_watch,
+        market_stream,
+        validator,
+        kill_switch,
+        backend,
+        supervisor=supervisor,
+        tactical_regime_provider=lambda _sym: "BULLISH",
+        funding_rate_provider=lambda _sym: 0.0001,
+        oi_change_provider=lambda _sym: 0.05,
+        volatility_provider=lambda _sym: 0.40,
+    )
+
+    report = asyncio.run(service.execute_approved_intent(intent.intent_id, NOW))
+    assert report.status == "FILLED"
+
+    # Verify that the coordinator built PositionObservationV1 bound to actual sources
+    assert len(analyzed_cases) == 1
+    analyzed = analyzed_cases[0]
+    assert analyzed.trigger == "POSITION_OPENED"
+    # Evidence ID and signal identity are strictly from the real case, NOT "0"*64 or "live-signal"
+    assert analyzed.evidence_id == "a" * 64
+    assert analyzed.signal_identity == "sig-real-source-456"

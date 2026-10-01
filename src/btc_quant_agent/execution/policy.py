@@ -60,17 +60,23 @@ class ExecutionCapabilityPolicyV1:
             )
 
         if normalized == "TESTNET":
-            # Testnet and Live credential and endpoint isolation
-            if env_id and env_id != "binance_usdm_testnet":
+            # Missing authority metadata -> fail closed
+            if not env_id or not cred_ns or not rest_url:
+                raise ExecutionBlocked(
+                    f"missing credential authority metadata for TESTNET (env_id='{env_id}', cred_ns='{cred_ns}', rest_url='{rest_url}')"
+                )
+
+            if env_id.lower() not in {"binance_usdm_testnet", "testnet"}:
                 raise ExecutionBlocked(f"environment mismatch for TESTNET: '{env_id}'")
-            if cred_ns and cred_ns != "BINANCE_TESTNET":
+
+            if cred_ns != "BINANCE_TESTNET":
                 raise ExecutionBlocked(f"credential namespace mismatch for TESTNET: '{cred_ns}'")
-            if rest_url:
-                cleaned_url = rest_url.rstrip("/").lower()
-                if cleaned_url != "https://testnet.binancefuture.com":
-                    raise ExecutionBlocked(
-                        f"endpoint/environment mismatch: '{rest_url}' is not allowlisted for TESTNET"
-                    )
+
+            cleaned_url = rest_url.rstrip("/").lower()
+            if cleaned_url != "https://testnet.binancefuture.com":
+                raise ExecutionBlocked(
+                    f"endpoint/environment mismatch: '{rest_url}' is not allowlisted for TESTNET"
+                )
             return
 
         if normalized in {"PAPER", "DRY_RUN", "SHADOW"}:

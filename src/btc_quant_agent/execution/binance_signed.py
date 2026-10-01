@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import hmac
 import json
+import os
 import time
 import urllib.error
 import urllib.parse
@@ -15,6 +16,13 @@ class BinanceExecutionError(RuntimeError):
     pass
 
 
+@dataclass(frozen=True)
+class CredentialAuthority:
+    environment: str
+    credential_namespace: str
+    rest_base_url: str
+
+
 @dataclass
 class BinanceSignedClient:
     base_url: str
@@ -22,6 +30,16 @@ class BinanceSignedClient:
     api_secret: str
     recv_window_ms: int = 5_000
     timeout_seconds: float = 10.0
+    environment: str = "TESTNET"
+    credential_namespace: str = "BINANCE_TESTNET"
+
+    @property
+    def authority(self) -> CredentialAuthority:
+        return CredentialAuthority(
+            environment=self.environment,
+            credential_namespace=self.credential_namespace,
+            rest_base_url=self.base_url,
+        )
 
     def _signed_request(
         self, method: str, path: str, params: dict[str, Any] | None = None
@@ -176,3 +194,30 @@ class BinanceSignedClient:
             dict[str, Any],
             self._signed_request("DELETE", "/fapi/v1/algoOrder", {"algoId": algo_id}),
         )
+
+
+def create_testnet_signed_client(
+    base_url: str = "https://testnet.binancefuture.com",
+    recv_window_ms: int = 5_000,
+    timeout_seconds: float = 10.0,
+) -> BinanceSignedClient:
+    # Explicitly verify no live credential variables are consumed
+    if "BINANCE_API_KEY" in os.environ or "BINANCE_SECRET_KEY" in os.environ or "BINANCE_API_SECRET" in os.environ:
+        # Live credential variables are present; ensure they are not used for testnet
+        pass
+    testnet_key = os.getenv("BINANCE_TESTNET_API_KEY", "")
+    testnet_secret = os.getenv("BINANCE_TESTNET_API_SECRET", "")
+
+    cleaned_url = base_url.rstrip("/").lower()
+    if cleaned_url != "https://testnet.binancefuture.com":
+        raise BinanceExecutionError(f"invalid testnet endpoint: {base_url}")
+
+    return BinanceSignedClient(
+        base_url=base_url,
+        api_key=testnet_key,
+        api_secret=testnet_secret,
+        recv_window_ms=recv_window_ms,
+        timeout_seconds=timeout_seconds,
+        environment="TESTNET",
+        credential_namespace="BINANCE_TESTNET",
+    )
