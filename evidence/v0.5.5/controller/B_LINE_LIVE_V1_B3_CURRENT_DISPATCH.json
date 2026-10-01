@@ -1,0 +1,49 @@
+{
+  "manifest_type": "B_LINE_LIVE_V1_B3_CURRENT_DISPATCH_V1",
+  "repository": "EXASHXE/btc-quant-agent-public",
+  "task": "B3_LIVE_V1_DECISION_PIPELINE_IMPLEMENTATION",
+  "task_branch": "feature/b-line-live-v1",
+  "required_start_sha": "52c16a28153de307dc6132c0975fe29341a0a918",
+  "accepted_bline_code_sha": "52c16a28153de307dc6132c0975fe29341a0a918",
+  "prompt_path": "prompts/v0.5/implementation/v0.5.5_B3_LIVE_V1_DECISION_PIPELINE_IMPLEMENTATION.md",
+  "prompt_blob_sha": "bc7c3f8761041f41affb30b9f44cbec8dc59df94",
+  "authority_refs": [
+    {
+      "path": "evidence/v0.5.5/controller/B_LINE_CURRENT_AUTHORITY.json",
+      "blob_sha": "7532310f97026dad9623d09f8e3372f473d23a18",
+      "access_mode": "IDENTITY_ONLY"
+    },
+    {
+      "path": "evidence/v0.5.5/controller/B_LINE_LIVE_V1_DISPATCH_MANIFEST.json",
+      "blob_sha": "93854106184b70cb7b6207bb4510d2f73ac663eb",
+      "access_mode": "BINDING_FIELDS_ONLY"
+    },
+    {
+      "path": "docs/architecture/V0.5.5_B_LINE_LIVE_V1_TWO_DAY_ARCHITECTURE_AND_IMPLEMENTATION_PLAN.md",
+      "blob_sha": "8c10d41baecf43571b93061804d4bb98341ec224",
+      "access_mode": "IDENTITY_ONLY"
+    }
+  ],
+  "precheck_recovery": [
+    "git fetch origin --prune",
+    "git switch feature/b-line-live-v1",
+    "git reset --hard origin/feature/b-line-live-v1",
+    "git clean -fd",
+    "git branch --show-current",
+    "git rev-parse HEAD",
+    "git status --porcelain"
+  ],
+  "expected_precheck": {
+    "branch": "feature/b-line-live-v1",
+    "head": "52c16a28153de307dc6132c0975fe29341a0a918",
+    "worktree": "clean"
+  },
+  "fail_closed_on": [
+    "branch mismatch",
+    "HEAD mismatch",
+    "authority blob mismatch",
+    "dirty worktree",
+    "runtime import outside checkout"
+  ],
+  "terminal_success": "LIVE_V1_DECISION_PIPELINE_IMPLEMENTED_PENDING_CONTROLLER_REVIEW"
+}
