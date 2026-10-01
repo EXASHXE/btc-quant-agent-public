@@ -1,34 +1,32 @@
 {
   "line": "B_LINE",
-  "stage": "B2A_R2_ACCEPTED__B2B_IMPLEMENTATION_DISPATCHED",
+  "stage": "B2B_IMPLEMENTED_PENDING_INDEPENDENT_EXACT_SHA_VALIDATION",
   "code_branch": "feature/tactical-policy-r2",
   "accepted_code_sha": "79c8b82dd7c870b7e785af19823af8ec607c22de",
-  "accepted_code_parent_sha": "16db7108b41a48e653eaaef7e1cb774a6c317185",
-  "docs_authority_commit": "363b7b4565d65ebb6e10ec43ad4a89bfffba23f3",
+  "candidate_code_sha": "a32ab775ac2cc168c9f45a38a7b11fd5b9c85f37",
+  "candidate_state": "B2B_IMPLEMENTED_PENDING_INDEPENDENT_EXACT_SHA_VALIDATION",
+  "docs_authority_commit": "d96708cdf2cdc7c88386c02d635f5edf4021d857",
   "current_controller_authority": {
     "path": "reviews/v0.5/tactical-policy/V0.5.5_B2A_R2_CONTROLLER_ACCEPTANCE.md",
     "blob_sha": "7eb6229e14e8a9c7472e7a0abb0d53ad336f5b48"
-  },
-  "current_controller_evidence": {
-    "path": "evidence/v0.5/tactical-policy/V0.5.5_B2A_R2_CONTROLLER_ACCEPTANCE.json",
-    "blob_sha": "f54e381effbb81ccfcc82b079d15025abe67dd06"
   },
   "protected_state": {
     "a_line_isolation": "REQUIRED",
     "h40_mutation": "FORBIDDEN",
     "protected_outcome_access": "FORBIDDEN",
-    "automatic_execution": "FORBIDDEN",
-    "private_exchange_mutation": "FORBIDDEN"
+    "automatic_live_execution": "FORBIDDEN",
+    "live_write_authority": "NONE"
   },
-  "authorized_next_stage": "B2B_GRID_SHADOW_EVALUATION_V1",
+  "authorized_next_stage": "B2B_INDEPENDENT_EXACT_SHA_VALIDATION",
   "binding_fields": {
-    "predecessor_state": "B2A_R2_ACCEPTED",
-    "b2b_authorized": true,
-    "implementation_start_sha": "79c8b82dd7c870b7e785af19823af8ec607c22de",
-    "implementation_expected_parent": "16db7108b41a48e653eaaef7e1cb774a6c317185",
-    "terminal_state_on_success": "B2B_IMPLEMENTED_PENDING_INDEPENDENT_EXACT_SHA_VALIDATION",
-    "b3_authorized": false,
-    "b4_authorized": false
+    "b2a_r2_state": "B2A_R2_ACCEPTED",
+    "accepted_code_sha": "79c8b82dd7c870b7e785af19823af8ec607c22de",
+    "b2b_candidate_sha": "a32ab775ac2cc168c9f45a38a7b11fd5b9c85f37",
+    "live_v1_parallel_branch": "feature/b-line-live-v1",
+    "live_v1_parallel_base_sha": "79c8b82dd7c870b7e785af19823af8ec607c22de",
+    "b3_tactical_authorized": false,
+    "b4_tactical_authorized": false,
+    "real_funds_live_authorized": false
   },
   "must_read": []
 }
