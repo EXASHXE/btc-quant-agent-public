@@ -1,0 +1,204 @@
+{
+  "stage": "B2B_PENDING_LIFECYCLE_REPAIR_R1",
+  "decision": "B2B_PENDING_LIFECYCLE_REPAIRED_PENDING_INDEPENDENT_REVALIDATION",
+  "failure_code": null,
+  "repository": "EXASHXE/btc-quant-agent-public",
+  "implementation_branch": "feature/tactical-policy-r2",
+  "start_sha": "a32ab775ac2cc168c9f45a38a7b11fd5b9c85f37",
+  "final_sha": "52c16a28153de307dc6132c0975fe29341a0a918",
+  "parent_sha": "a32ab775ac2cc168c9f45a38a7b11fd5b9c85f37",
+  "accepted_predecessor_sha": "79c8b82dd7c870b7e785af19823af8ec607c22de",
+  "remote_head": "52c16a28153de307dc6132c0975fe29341a0a918",
+  "controller_dispatch_sha": "898f82872c5f78bea6220663047d86cdb1837547",
+  "docs_branch": "v0.5.5-docs",
+  "workspace": {
+    "pwd": "/root/workspace/project/Quant-agent-market-watch",
+    "clean_before": true,
+    "clean_after": true,
+    "runtime_import_path": "/root/workspace/project/Quant-agent-market-watch/src/btc_quant_agent/__init__.py",
+    "python_executable": "/root/workspace/project/Quant-agent-market-watch/.venv/bin/python3",
+    "python_version": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+    "pytest_version": "pytest 8.4.2",
+    "ruff_version": "ruff 0.16.9",
+    "mypy_version": "mypy 1.20.2 (compiled: yes)"
+  },
+  "implementation_diff": {
+    "commit_count_from_start": 1,
+    "changed_files_count": 2,
+    "changed_files": [
+      "src/btc_quant_agent/market_watch/state.py",
+      "tests/test_tactical_grid_shadow_evaluation_v1.py"
+    ],
+    "insertions": 726,
+    "deletions": 33
+  },
+  "repair_specification": {
+    "blocker_repaired": "S08_PENDING_RESOLVE_BLOCKED_BY_CONFLICT",
+    "root_cause": "MarketWatchStateStore.save_grid_shadow_evaluation unconditionally rejected non-identical evaluation_id for existing natural key, preventing provisional PENDING rows from advancing or resolving.",
+    "repair_mechanics": {
+      "provisional_statuses": ["PENDING_HORIZON", "PENDING_DATA_GAP"],
+      "terminal_statuses": ["RESOLVED", "NOT_ACTIVE_PAUSE"],
+      "existing_row_identity_check": "deserializes evaluation_json with verify_identity=True and requires row evaluation_id == embedded evaluation_id before evaluating transition authority",
+      "atomic_conditional_update": "UPDATE tactical_grid_shadow_evaluations_v1 SET all 18 columns WHERE feature_evidence_id = ? AND evaluation_profile_version = ? AND evaluation_id = existing_row_id",
+      "fail_closed_transitions": {
+        "pending_to_newer_pending": "ALLOWED",
+        "pending_to_resolved": "ALLOWED",
+        "pending_to_not_active_pause": "FORBIDDEN (fails closed)",
+        "terminal_to_any_divergent": "FORBIDDEN (fails closed)",
+        "tampered_existing_row": "FORBIDDEN (fails closed with IdentityError)",
+        "pk_collision_different_natural_key": "FORBIDDEN (fails closed with ConflictError)"
+      }
+    }
+  },
+  "r1_adversarial_tests": {
+    "total": 15,
+    "passed": 15,
+    "failed": 0,
+    "mapping": {
+      "R1-A01": {
+        "probe": "test_r1_a01_pending_horizon_identical_idempotent",
+        "status": "PASS",
+        "description": "persist PENDING_HORIZON -> save identical artifact -> same ID idempotent, exactly 1 row"
+      },
+      "R1-A02": {
+        "probe": "test_r1_a02_pending_horizon_to_newer_pending_horizon",
+        "status": "PASS",
+        "description": "persist PENDING_HORIZON -> newer PENDING_HORIZON -> replacement succeeds, old provisional ID removed"
+      },
+      "R1-A03": {
+        "probe": "test_r1_a03_pending_data_gap_to_newer_pending_data_gap",
+        "status": "PASS",
+        "description": "persist PENDING_DATA_GAP -> newer PENDING_DATA_GAP -> replacement succeeds, old provisional ID removed"
+      },
+      "R1-A04": {
+        "probe": "test_r1_a04_pending_data_gap_to_pending_horizon",
+        "status": "PASS",
+        "description": "PENDING_DATA_GAP -> PENDING_HORIZON succeeds upon gap repair"
+      },
+      "R1-A05": {
+        "probe": "test_r1_a05_pending_horizon_to_pending_data_gap",
+        "status": "PASS",
+        "description": "PENDING_HORIZON -> PENDING_DATA_GAP succeeds upon later gap emergence"
+      },
+      "R1-A06": {
+        "probe": "test_r1_a06_pending_horizon_to_resolved",
+        "status": "PASS",
+        "description": "PENDING_HORIZON -> RESOLVED succeeds on full 24h horizon arrival"
+      },
+      "R1-A07": {
+        "probe": "test_r1_a07_pending_data_gap_to_resolved",
+        "status": "PASS",
+        "description": "PENDING_DATA_GAP -> RESOLVED succeeds on repaired coverage and full horizon arrival"
+      },
+      "R1-A08": {
+        "probe": "test_r1_a08_resolved_rejects_divergent_replay",
+        "status": "PASS",
+        "description": "RESOLVED terminal status is strictly immutable against divergent replay"
+      },
+      "R1-A09": {
+        "probe": "test_r1_a09_not_active_pause_rejects_divergent_replay",
+        "status": "PASS",
+        "description": "NOT_ACTIVE_PAUSE terminal status is strictly immutable against divergent replay"
+      },
+      "R1-A10": {
+        "probe": "test_r1_a10_pending_to_not_active_pause_fails_closed",
+        "status": "PASS",
+        "description": "pending -> NOT_ACTIVE_PAUSE transition is strictly forbidden and fails closed"
+      },
+      "R1-A11": {
+        "probe": "test_r1_a11_tampered_existing_persisted_fails_closed",
+        "status": "PASS",
+        "description": "tampered existing persisted evaluation_id or JSON fails closed before replacement"
+      },
+      "R1-A12": {
+        "probe": "test_r1_a12_pk_collision_under_different_natural_key_fails_closed",
+        "status": "PASS",
+        "description": "incoming artifact with primary-key collision under another natural key fails closed"
+      },
+      "R1-A13": {
+        "probe": "test_r1_a13_manager_e2e_pending_horizon_to_resolved",
+        "status": "PASS",
+        "description": "manager end-to-end run: run 1 persists PENDING_HORIZON, run 2 resolves with full 24h data without ERROR"
+      },
+      "R1-A14": {
+        "probe": "test_r1_a14_manager_e2e_pending_data_gap_to_resolved",
+        "status": "PASS",
+        "description": "manager end-to-end run: run 1 persists PENDING_DATA_GAP, run 2 resolves on repaired coverage without ERROR"
+      },
+      "R1-A15": {
+        "probe": "test_r1_a15_manager_multiple_refreshes_then_resolved",
+        "status": "PASS",
+        "description": "multiple intermediate pending refreshes followed by RESOLVED produce 1 natural-key row whose final embedded identity verifies"
+      }
+    }
+  },
+  "b2b_a01_a35_regression": {
+    "total": 35,
+    "passed": 35,
+    "failed": 0,
+    "fixture_updates": [
+      {
+        "test": "test_b2b_a04_divergent_same_natural_key_replay_fails_closed",
+        "reason": "Updated initial fixture from 5 candles (provisional) to 1440 candles (RESOLVED terminal) to test divergent replay rejection on authoritative terminal row without conflicting with new provisional replacement semantics."
+      }
+    ]
+  },
+  "static_gates": {
+    "compileall": "PASS (0 bytecode/syntax errors)",
+    "diff_check": "PASS (0 whitespace errors)",
+    "ruff": "PASS (0 lint issues)",
+    "mypy": "PASS (119 source files checked, 0 errors)"
+  },
+  "focused_test_suites": {
+    "b2b_grid_shadow_evaluation_v1": {
+      "command": "pytest -q tests/test_tactical_grid_shadow_evaluation_v1.py",
+      "passed": 50,
+      "failed": 0,
+      "duration_seconds": 2.81
+    },
+    "b2a_directional_shadow_evaluation_v2": {
+      "command": "pytest -q tests/test_tactical_shadow_evaluation_v2.py",
+      "passed": 24,
+      "failed": 0,
+      "duration_seconds": 1.25
+    },
+    "b1_feature_evidence_v2": {
+      "command": "pytest -q tests/test_tactical_feature_evidence_v2.py",
+      "passed": 31,
+      "failed": 0,
+      "duration_seconds": 2.16
+    },
+    "b0_tactical_policy": {
+      "command": "pytest -q tests/test_tactical_policy_b0.py",
+      "passed": 23,
+      "failed": 0,
+      "duration_seconds": 0.45
+    },
+    "market_watch_service": {
+      "command": "pytest -q tests/test_market_watch.py",
+      "passed": 137,
+      "failed": 0,
+      "duration_seconds": 3.79
+    }
+  },
+  "full_test_suite": {
+    "command": "pytest -q",
+    "passed": 2009,
+    "skipped": 2,
+    "warnings": 8,
+    "failed": 0,
+    "duration_seconds": 875.90
+  },
+  "safety_fences": {
+    "h40_diff": "ZERO_DIFF against 407dabc415ae8cae4210250e992941c8b9b25464",
+    "b2a_isolation": "VERIFIED (B2A tables, models, and tests remain isolated and untouched)",
+    "execution_fence": "VERIFIED (zero authenticated/private APIs, zero order placement, zero execution mutation)"
+  },
+  "exact_sha_self_validation": {
+    "exact_sha": "52c16a28153de307dc6132c0975fe29341a0a918",
+    "parent_sha": "a32ab775ac2cc168c9f45a38a7b11fd5b9c85f37",
+    "status": "PASS"
+  },
+  "blockers": [],
+  "next_lifecycle_state": "TACTICAL_POLICY_R2_B2B_PENDING_LIFECYCLE_REPAIRED_PENDING_INDEPENDENT_REVALIDATION"
+}
