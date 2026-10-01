@@ -1,9 +1,9 @@
 {
   "line": "B_LINE",
-  "stage": "B2B_ACCEPTED__LIVE_V1_B3_ACCEPTED",
+  "stage": "B2B_ACCEPTED__LIVE_V1_B3_ACCEPTED__B4_CONTROLLER_REVIEW_BLOCKED_PENDING_REPAIR_R1",
   "code_branch": "feature/tactical-policy-r2",
   "accepted_code_sha": "52c16a28153de307dc6132c0975fe29341a0a918",
-  "docs_authority_commit": "f6978a1025e646e5ca6e47d2c863cfd424602d60",
+  "docs_authority_commit": "77adc1551b29268b2595ff298f3c5f4690693927",
   "current_controller_authority": {
     "path": "reviews/v0.5/tactical-policy/V0.5.5_B2B_CONTROLLER_ACCEPTANCE.md",
     "blob_sha": "4d6d65dad35e42e10d175875093dc045bbc63503"
@@ -35,7 +35,19 @@
     "live_v1_b5_authorized": false,
     "live_v1_day2_target_write": "TESTNET_ONLY",
     "provider_credential_smoke": "PENDING",
-    "live_store_concurrency_gate": "B4_MUST_ESTABLISH_WAL_OR_EQUIVALENT"
+    "live_store_concurrency_gate": "B4_MUST_ESTABLISH_WAL_OR_EQUIVALENT",
+    "live_v1_b4_state": "LIVE_V1_B4_CONTROLLER_REVIEW_BLOCKED_PENDING_REPAIR_R1",
+    "live_v1_b4_candidate_sha": "fd42f2cc1a67506d05117e3daa9a072309f7f998",
+    "live_v1_b4_candidate_parent_sha": "961a0f4d4b37cdb9365d5e5867813ff3129c14db",
+    "live_v1_b4_repair_authorized": true,
+    "b4_review_blockers": [
+      "APPROVAL_CAN_MATERIALIZE_MULTIPLE_RANDOM_TRADE_INTENTS",
+      "TESTNET_CREDENTIAL_NAMESPACE_NOT_STRUCTURALLY_BOUND_TO_SIGNED_CLIENT",
+      "PREEXEC_REVALIDATION_INCOMPLETE",
+      "DELAYED_FILL_PROTECTIVE_RECONCILIATION_INCOMPLETE",
+      "POSITION_SUPERVISOR_NOT_WIRED_TO_REAL_POSITIONCASE_ANALYSIS_PATH",
+      "SHORT_POSITION_OPEN_EVENT_MISSING"
+    ]
   },
   "must_read": [],
   "validation_authority": {
@@ -60,7 +72,7 @@
     "evidence_path": "evidence/v0.5.5/controller/V0.5.5_B2B_CONTROLLER_ACCEPTANCE.json",
     "evidence_blob_sha": "73a11708a85b5f1896397d745c3b7252d3c51f8d"
   },
-  "parallel_authorized_next_stage": "LIVE_V1_B4_ACCOUNT_EXECUTION_AND_POSITION_SUPERVISOR",
+  "parallel_authorized_next_stage": "LIVE_V1_B4_SAFETY_CLOSURE_REPAIR_R1",
   "live_v1_acceptance_authority": {
     "report_path": "reviews/v0.5/live_v1/V0.5.5_LIVE_V1_B3_CONTROLLER_ACCEPTANCE.md",
     "report_blob_sha": "21ad4492feb4750f5fc85a5f88b54d1da36c157d",
