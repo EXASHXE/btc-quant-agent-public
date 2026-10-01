@@ -1,0 +1,103 @@
+{
+  "schema_id": "V0.5.5_A1_METHOD_MATERIALIZATION_REFERENCE_IMPLEMENTATION_AND_RESOURCE_CERTIFICATION_R1_DISPATCH",
+  "repository": "EXASHXE/btc-quant-agent-public",
+  "stage": "A1_METHOD_MATERIALIZATION_REFERENCE_IMPLEMENTATION_AND_RESOURCE_CERTIFICATION_R1",
+  "executor": "GPT-6.1_SOL_OR_CODEX",
+  "execution_target": {
+    "task_branch": "feature/a1-method-materialization-r1-v055",
+    "CONTROLLER_DISPATCH_SHA": "d96708cdf2cdc7c88386c02d635f5edf4021d857",
+    "code_branch": "v0.5.5",
+    "accepted_code_sha": "8ecff4ec4b25bf73a35309689fd3ecfacc0d3399"
+  },
+  "current_authority_manifest": {
+    "path": "evidence/v0.5.5/controller/A_LINE_CURRENT_AUTHORITY.json",
+    "blob_sha": "ad2a6ca00035026e44c0fed0670c3065bc18b448",
+    "access_mode": "BINDING_FIELDS_ONLY"
+  },
+  "inline_binding_fields": {
+    "method_design_sha": "9b92ec290e4f9de93c140ca471a0eb1644526e2b",
+    "method_design_semantic_root_sha256": "718efa1bbad00e68aaacf4cd2c2034265776b242024e0acbf09455847b2fc106",
+    "independent_audit_sha": "d2905d80daacab1cd2aad55cfaf4501445c65fb2",
+    "independent_audit_verdict": "PASS_METHOD_AUTHORITY_TO_MATERIALIZATION",
+    "M01_M05": "PASS",
+    "compression_trial_runs_completed": 0,
+    "trial_1_state": "BLOCKED_PRE_SIMULATION",
+    "trial_2_authorized": false,
+    "d0_authorized": false,
+    "protected_outcome_access_authorized": false,
+    "production_code_change_authorized": false,
+    "mc_certification": "VALID_CONSERVATIVE_CERTIFICATION",
+    "resource_state": "RESOURCE_EXECUTION_REQUIRES_PROVEN_EQUIVALENT_ACCELERATION",
+    "logical_outer_records": 11863110020400,
+    "static_support_bound": "B_eff <= occupied_120h_blocks <= ceil(T/120h)",
+    "only_potential_utility_setting": {
+      "discovery_months": 2,
+      "validation_months": 2,
+      "support_threshold": 12
+    }
+  },
+  "authority_refs": [
+    {
+      "path": "reviews/v0.5/V0.5.5_A1_SYNTHETIC_METHOD_AUTHORITY_DESIGN_R1.md",
+      "blob_sha": "2ef55f25ee0b4bf640307c291e959ce43c97cf47",
+      "access_mode": "MUST_READ"
+    },
+    {
+      "path": "evidence/v0.5.5/h41/V0.5.5_A1_SYNTHETIC_METHOD_AUTHORITY_DESIGN_R1.json",
+      "blob_sha": "53b1f99bee4bef55afe166292305f6f8d2648072",
+      "access_mode": "MUST_READ"
+    },
+    {
+      "path": "src/btc_quant_agent/h41/inference.py",
+      "code_sha": "8ecff4ec4b25bf73a35309689fd3ecfacc0d3399",
+      "blob_sha": "9000840cbb767b1be69395b78248a58ec3bcaafa",
+      "access_mode": "MUST_READ"
+    },
+    {
+      "path": "evidence/v0.5.5/h41/V0.5.5_A1_SYNTHETIC_METHOD_AUTHORITY_SOL_INDEPENDENT_AUDIT_R1B.json",
+      "blob_sha": "846b4ea942ff3c07545a07fb9888b42b96d290a0",
+      "access_mode": "IDENTITY_ONLY"
+    }
+  ],
+  "allowed_scope": {
+    "new_reference_package_root": "evidence/v0.5.5/h41/a1_method_materialization_r1/",
+    "train_only_source_materialization": true,
+    "focused_network_source_retrieval": true,
+    "non_production_reference_implementation": true,
+    "negative_controls": true,
+    "resource_benchmarking_without_formal_trial": true
+  },
+  "forbidden_scope": {
+    "src_modification": true,
+    "production_config_change": true,
+    "trial1_formal_simulation": true,
+    "protected_outcome_access": true,
+    "trial2_authorization": true,
+    "d0_authorization": true,
+    "live_private_execution": true,
+    "scientific_redesign": true
+  },
+  "prompt": {
+    "path": "prompts/v0.5/implementation/v0.5.5_A1_METHOD_MATERIALIZATION_REFERENCE_IMPLEMENTATION_AND_RESOURCE_CERTIFICATION_R1.md",
+    "blob_sha": "639304cd58e48ad791bf441a6a732348597c1060",
+    "immutable_url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/d96708cdf2cdc7c88386c02d635f5edf4021d857/prompts/v0.5/implementation/v0.5.5_A1_METHOD_MATERIALIZATION_REFERENCE_IMPLEMENTATION_AND_RESOURCE_CERTIFICATION_R1.md"
+  },
+  "expected_outputs": [
+    "reviews/v0.5/V0.5.5_A1_METHOD_MATERIALIZATION_REFERENCE_IMPLEMENTATION_AND_RESOURCE_CERTIFICATION_R1.md",
+    "evidence/v0.5.5/h41/V0.5.5_A1_METHOD_MATERIALIZATION_REFERENCE_IMPLEMENTATION_AND_RESOURCE_CERTIFICATION_R1.json",
+    "evidence/v0.5.5/h41/a1_method_materialization_r1/**"
+  ],
+  "terminal_states": [
+    "A1_MATERIALIZATION_IMPLEMENTED_PENDING_INDEPENDENT_EXACT_SHA_VALIDATION",
+    "A1_MATERIALIZATION_BLOCKED"
+  ],
+  "next_gate": "INDEPENDENT_EXACT_SHA_VALIDATION_BEFORE_TRIAL1_RESUME",
+  "execution_rules": {
+    "exact_sha_verification_required": true,
+    "worktree_clean_at_start": true,
+    "push_only_to_task_branch": true,
+    "no_direct_push_to_v0_5_5_docs": true,
+    "final_sha_must_be_sealed_before_validation": true,
+    "self_authorized_trial1_resume_forbidden": true
+  }
+}
