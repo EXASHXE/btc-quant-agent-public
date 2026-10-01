@@ -1,0 +1,516 @@
+{
+  "stage": "B2B_GRID_SHADOW_EVALUATION_V1_INDEPENDENT_VALIDATION",
+  "decision": "B2B_INDEPENDENT_VALIDATION_FAILED",
+  "failure_code": "S08_PENDING_RESOLVE_BLOCKED_BY_CONFLICT",
+  "repository": "EXASHXE/btc-quant-agent-public",
+  "implementation_branch": "feature/tactical-policy-r2",
+  "accepted_predecessor_sha": "79c8b82dd7c870b7e785af19823af8ec607c22de",
+  "validated_sha": "a32ab775ac2cc168c9f45a38a7b11fd5b9c85f37",
+  "validated_parent_sha": "79c8b82dd7c870b7e785af19823af8ec607c22de",
+  "remote_branch_head": "a32ab775ac2cc168c9f45a38a7b11fd5b9c85f37",
+  "controller_dispatch_sha": "d3d0a59884dfcdb9a2b50585d15c79859f6f69bf",
+  "docs_branch": "v0.5.5-docs",
+  "workspace": {
+    "pwd": "/root/workspace/project/Quant-agent-market-watch",
+    "clean_before": true,
+    "clean_after": true,
+    "runtime_import_path": "/root/workspace/project/Quant-agent-market-watch/src/btc_quant_agent/__init__.py",
+    "python_executable": "/root/workspace/project/Quant-agent-market-watch/.venv/bin/python3",
+    "python_version": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+    "pytest_version": "pytest 8.4.2",
+    "ruff_version": "ruff 0.16.9",
+    "mypy_version": "mypy 1.20.2 (compiled: yes)"
+  },
+  "implementation_diff": {
+    "commit_count_from_predecessor": 1,
+    "changed_files_count": 8,
+    "changed_files": [
+      "src/btc_quant_agent/market_watch/__init__.py",
+      "src/btc_quant_agent/market_watch/domain.py",
+      "src/btc_quant_agent/market_watch/grid_shadow.py",
+      "src/btc_quant_agent/market_watch/grid_shadow_evidence.py",
+      "src/btc_quant_agent/market_watch/service.py",
+      "src/btc_quant_agent/market_watch/state.py",
+      "tests/test_market_watch.py",
+      "tests/test_tactical_grid_shadow_evaluation_v1.py"
+    ],
+    "insertions": 2781,
+    "deletions": 0
+  },
+  "frozen_identities": {
+    "tactical_grid_shadow_evaluation_schema_version": "TACTICAL_GRID_SHADOW_EVALUATION_V1",
+    "grid_outcome_profile_version": "GRID_OUTCOME_PROFILE_V1",
+    "grid_path_model_version": "GRID_1M_CONSERVATIVE_TWO_PATH_V1",
+    "grid_accounting_version": "NORMALIZED_GRID_ACCOUNTING_V1"
+  },
+  "gates": [
+    {
+      "gate": "compileall",
+      "command": "python3 -m compileall -q src tests",
+      "working_directory": "/root/workspace/project/Quant-agent-market-watch",
+      "head": "a32ab775ac2cc168c9f45a38a7b11fd5b9c85f37",
+      "exit_code": 0,
+      "result": "PASS",
+      "summary": "Passed with 0 bytecode or syntax errors"
+    },
+    {
+      "gate": "diff_check",
+      "command": "git diff --check",
+      "working_directory": "/root/workspace/project/Quant-agent-market-watch",
+      "head": "a32ab775ac2cc168c9f45a38a7b11fd5b9c85f37",
+      "exit_code": 0,
+      "result": "PASS",
+      "summary": "Passed with 0 whitespace or formatting errors"
+    },
+    {
+      "gate": "ruff",
+      "command": "ruff check .",
+      "working_directory": "/root/workspace/project/Quant-agent-market-watch",
+      "head": "a32ab775ac2cc168c9f45a38a7b11fd5b9c85f37",
+      "exit_code": 0,
+      "result": "PASS",
+      "summary": "All checks passed!"
+    },
+    {
+      "gate": "mypy",
+      "command": "mypy src",
+      "working_directory": "/root/workspace/project/Quant-agent-market-watch",
+      "head": "a32ab775ac2cc168c9f45a38a7b11fd5b9c85f37",
+      "exit_code": 0,
+      "result": "PASS",
+      "summary": "Success: no issues found in 119 source files"
+    }
+  ],
+  "focused_tests": {
+    "test_tactical_grid_shadow_evaluation_v1": {
+      "command": "pytest -q tests/test_tactical_grid_shadow_evaluation_v1.py",
+      "passed": 35,
+      "failed": 0,
+      "skipped": 0,
+      "xfailed": 0,
+      "xpassed": 0,
+      "warnings": 0,
+      "duration_seconds": 0.53,
+      "exit_code": 0,
+      "result": "PASS"
+    },
+    "test_tactical_shadow_evaluation_v2": {
+      "command": "pytest -q tests/test_tactical_shadow_evaluation_v2.py",
+      "passed": 24,
+      "failed": 0,
+      "skipped": 0,
+      "xfailed": 0,
+      "xpassed": 0,
+      "warnings": 0,
+      "duration_seconds": 0.94,
+      "exit_code": 0,
+      "result": "PASS"
+    },
+    "test_tactical_feature_evidence_v2": {
+      "command": "pytest -q tests/test_tactical_feature_evidence_v2.py",
+      "passed": 31,
+      "failed": 0,
+      "skipped": 0,
+      "xfailed": 0,
+      "xpassed": 0,
+      "warnings": 0,
+      "duration_seconds": 1.64,
+      "exit_code": 0,
+      "result": "PASS"
+    },
+    "test_tactical_policy_b0": {
+      "command": "pytest -q tests/test_tactical_policy_b0.py",
+      "passed": 23,
+      "failed": 0,
+      "skipped": 0,
+      "xfailed": 0,
+      "xpassed": 0,
+      "warnings": 0,
+      "duration_seconds": 0.38,
+      "exit_code": 0,
+      "result": "PASS"
+    },
+    "test_market_watch": {
+      "command": "pytest -q tests/test_market_watch.py",
+      "passed": 137,
+      "failed": 0,
+      "skipped": 0,
+      "xfailed": 0,
+      "xpassed": 0,
+      "warnings": 0,
+      "duration_seconds": 3.42,
+      "exit_code": 0,
+      "result": "PASS"
+    }
+  },
+  "adversarial_invariants": [
+    {
+      "invariant_id": "B2B-A01",
+      "description": "Source feature evidence identity verified cryptographically fail-closed",
+      "test_function": "test_b2b_a01_source_feature_evidence_identity_verifies",
+      "file": "tests/test_tactical_grid_shadow_evaluation_v1.py",
+      "result": "PASS",
+      "validator_note": "Evaluates cleanly for valid evidence; tampering evidence_id raises TacticalEvidenceIdentityError"
+    },
+    {
+      "invariant_id": "B2B-A02",
+      "description": "Tampered embedded evaluation_id rejected on authoritative read",
+      "test_function": "test_b2b_a02_tampered_embedded_evaluation_id_rejected",
+      "file": "tests/test_tactical_grid_shadow_evaluation_v1.py",
+      "result": "PASS",
+      "validator_note": "Tampered evaluation_id raises TacticalGridShadowEvaluationIdentityError with B2B_EVALUATION_ID_MISMATCH"
+    },
+    {
+      "invariant_id": "B2B-A03",
+      "description": "Natural-key identical replay is idempotent",
+      "test_function": "test_b2b_a03_identical_natural_key_replay_is_idempotent",
+      "file": "tests/test_tactical_grid_shadow_evaluation_v1.py",
+      "result": "PASS",
+      "validator_note": "Re-saving exact same evaluation returns identical evaluation_id"
+    },
+    {
+      "invariant_id": "B2B-A04",
+      "description": "Divergent same natural-key replay fails closed",
+      "test_function": "test_b2b_a04_divergent_same_natural_key_replay_fails_closed",
+      "file": "tests/test_tactical_grid_shadow_evaluation_v1.py",
+      "result": "PASS",
+      "validator_note": "Re-saving divergent evaluation under same feature_evidence_id raises TacticalGridShadowEvaluationConflictError"
+    },
+    {
+      "invariant_id": "B2B-A05",
+      "description": "Pre-decision candle cannot fill (strict forward-only causality)",
+      "test_function": "test_b2b_a05_pre_decision_candle_cannot_fill",
+      "file": "tests/test_tactical_grid_shadow_evaluation_v1.py",
+      "result": "PASS",
+      "validator_note": "Candles strictly before decision time produce zero fills and zero lots"
+    },
+    {
+      "invariant_id": "B2B-A06",
+      "description": "Incomplete 1m coverage cannot fabricate pnl",
+      "test_function": "test_b2b_a06_incomplete_1m_coverage_cannot_fabricate_pnl",
+      "file": "tests/test_tactical_grid_shadow_evaluation_v1.py",
+      "result": "PASS",
+      "validator_note": "Gap in 1m candles sets market_path_coverage=INCOMPLETE and eligibility_status=PENDING_DATA_GAP"
+    },
+    {
+      "invariant_id": "B2B-A07",
+      "description": "Exact 24h horizon cannot outcome-guidedly extend",
+      "test_function": "test_b2b_a07_exact_24h_horizon_cannot_outcome_guidedly_extend",
+      "file": "tests/test_tactical_grid_shadow_evaluation_v1.py",
+      "result": "PASS",
+      "validator_note": "Position closes exactly at decision_time_ms + 86_400_000 ms with terminal_reason=HORIZON"
+    },
+    {
+      "invariant_id": "B2B-A08",
+      "description": "N intervals produce N+1 deterministic levels",
+      "test_function": "test_b2b_a08_n_intervals_produce_n_plus_1_deterministic_levels",
+      "file": "tests/test_tactical_grid_shadow_evaluation_v1.py",
+      "result": "PASS",
+      "validator_note": "Decimal arithmetic generates monotonic strictly ordered levels"
+    },
+    {
+      "invariant_id": "B2B-A09",
+      "description": "Nearest level tie chooses lower anchor index",
+      "test_function": "test_b2b_a09_nearest_level_tie_chooses_lower_anchor_index",
+      "file": "tests/test_tactical_grid_shadow_evaluation_v1.py",
+      "result": "PASS",
+      "validator_note": "Exact midpoint reference price tie-breaks to lower level index"
+    },
+    {
+      "invariant_id": "B2B-A10",
+      "description": "Slot cannot hold duplicate simultaneous lots",
+      "test_function": "test_b2b_a10_slot_cannot_hold_duplicate_simultaneous_lots",
+      "file": "tests/test_tactical_grid_shadow_evaluation_v1.py",
+      "result": "PASS",
+      "validator_note": "Repeated crossing of open slot does not duplicate lots (max_open_lot_count=1)"
+    },
+    {
+      "invariant_id": "B2B-A11",
+      "description": "Paired close re-arms slot",
+      "test_function": "test_b2b_a11_paired_close_re_arms_slot",
+      "file": "tests/test_tactical_grid_shadow_evaluation_v1.py",
+      "result": "PASS",
+      "validator_note": "Popping closed lot re-arms slot for subsequent crossings (paired_cycle_count=2)"
+    },
+    {
+      "invariant_id": "B2B-A12",
+      "description": "LONG_BIAS never opens short",
+      "test_function": "test_b2b_a12_long_bias_never_opens_short",
+      "file": "tests/test_tactical_grid_shadow_evaluation_v1.py",
+      "result": "PASS",
+      "validator_note": "Ascending crossing in LONG_BIAS closes long lots; never creates short inventory"
+    },
+    {
+      "invariant_id": "B2B-A13",
+      "description": "SHORT_BIAS never opens long",
+      "test_function": "test_b2b_a13_short_bias_never_opens_long",
+      "file": "tests/test_tactical_grid_shadow_evaluation_v1.py",
+      "result": "PASS",
+      "validator_note": "Descending crossing in SHORT_BIAS closes short lots; never creates long inventory"
+    },
+    {
+      "invariant_id": "B2B-A14",
+      "description": "NEUTRAL uses below-anchor long and above-anchor short",
+      "test_function": "test_b2b_a14_neutral_uses_below_anchor_long_and_above_anchor_short",
+      "file": "tests/test_tactical_grid_shadow_evaluation_v1.py",
+      "result": "PASS",
+      "validator_note": "Long inventory below anchor and short inventory above anchor verified"
+    },
+    {
+      "invariant_id": "B2B-A15",
+      "description": "PAUSE creates NOT_ACTIVE with no fills or pnl",
+      "test_function": "test_b2b_a15_pause_creates_not_active_with_no_fills_or_pnl",
+      "file": "tests/test_tactical_grid_shadow_evaluation_v1.py",
+      "result": "PASS",
+      "validator_note": "PAUSE yields eligibility_status=NOT_ACTIVE_PAUSE, 0 cycles, 0.0 PnL, null funding"
+    },
+    {
+      "invariant_id": "B2B-A16",
+      "description": "Ascending multi-level crossing is processed low to high",
+      "test_function": "test_b2b_a16_ascending_multi_level_crossing_is_low_to_high",
+      "file": "tests/test_tactical_grid_shadow_evaluation_v1.py",
+      "result": "PASS",
+      "validator_note": "Levels crossed in ascending order sorted low to high"
+    },
+    {
+      "invariant_id": "B2B-A17",
+      "description": "Descending multi-level crossing is processed high to low",
+      "test_function": "test_b2b_a17_descending_multi_level_crossing_is_high_to_low",
+      "file": "tests/test_tactical_grid_shadow_evaluation_v1.py",
+      "result": "PASS",
+      "validator_note": "Levels crossed in descending order sorted high to low"
+    },
+    {
+      "invariant_id": "B2B-A18",
+      "description": "Divergent 1m paths evaluate both O-H-L-C and O-L-H-C, selecting conservative",
+      "test_function": "test_b2b_a18_divergent_1m_paths_evaluate_both_and_select_conservative",
+      "file": "tests/test_tactical_grid_shadow_evaluation_v1.py",
+      "result": "PASS",
+      "validator_note": "Arbiter selects path producing lower marked equity / worse inventory"
+    },
+    {
+      "invariant_id": "B2B-A19",
+      "description": "Paired gross pnl formulas correct for long and short",
+      "test_function": "test_b2b_a19_paired_gross_pnl_formulas_correct",
+      "file": "tests/test_tactical_grid_shadow_evaluation_v1.py",
+      "result": "PASS",
+      "validator_note": "Math matches unit notional times level spread divided by fill price"
+    },
+    {
+      "invariant_id": "B2B-A20",
+      "description": "Maker fee on every normal open and paired close",
+      "test_function": "test_b2b_a20_maker_fee_on_every_normal_open_and_paired_close",
+      "file": "tests/test_tactical_grid_shadow_evaluation_v1.py",
+      "result": "PASS",
+      "validator_note": "Maker fee applied to opening notional and closing notional"
+    },
+    {
+      "invariant_id": "B2B-A21",
+      "description": "Terminal liquidation uses taker fee and adverse slippage",
+      "test_function": "test_b2b_a21_terminal_liquidation_uses_taker_fee_and_adverse_slippage",
+      "file": "tests/test_tactical_grid_shadow_evaluation_v1.py",
+      "result": "PASS",
+      "validator_note": "Terminal stop-loss liquidation applies taker_fee_rate and slippage_bps_per_side"
+    },
+    {
+      "invariant_id": "B2B-A22",
+      "description": "Utilization never exceeds normalized reference capital (1.0)",
+      "test_function": "test_b2b_a22_utilization_never_exceeds_normalized_cap",
+      "file": "tests/test_tactical_grid_shadow_evaluation_v1.py",
+      "result": "PASS",
+      "validator_note": "Crash through all levels leaves peak_capital_utilization <= 1.0"
+    },
+    {
+      "invariant_id": "B2B-A23",
+      "description": "Maximum underwater differs mathematically from peak-to-trough drawdown",
+      "test_function": "test_b2b_a23_maximum_underwater_differs_from_peak_to_trough_drawdown",
+      "file": "tests/test_tactical_grid_shadow_evaluation_v1.py",
+      "result": "PASS",
+      "validator_note": "Underwater measures drop below 0.0, while drawdown measures drop from peak"
+    },
+    {
+      "invariant_id": "B2B-A24",
+      "description": "Positive funding debits long inventory and credits short inventory",
+      "test_function": "test_b2b_a24_positive_funding_debits_long_and_credits_short",
+      "file": "tests/test_tactical_grid_shadow_evaluation_v1.py",
+      "result": "PASS",
+      "validator_note": "Long position pays positive funding rate resulting in negative funding_pnl"
+    },
+    {
+      "invariant_id": "B2B-A25",
+      "description": "Negative funding reverses signs (credits long, debits short)",
+      "test_function": "test_b2b_a25_negative_funding_reverses_signs",
+      "file": "tests/test_tactical_grid_shadow_evaluation_v1.py",
+      "result": "PASS",
+      "validator_note": "Long position receives negative funding rate resulting in positive funding_pnl"
+    },
+    {
+      "invariant_id": "B2B-A26",
+      "description": "Settlement in inventory-changing minute creates timing ambiguity",
+      "test_function": "test_b2b_a26_settlement_in_inventory_changing_minute_creates_ambiguity",
+      "file": "tests/test_tactical_grid_shadow_evaluation_v1.py",
+      "result": "PASS",
+      "validator_note": "Funding during order crossing sets funding_coverage=AMBIGUOUS_FUNDING_BOUNDARY and nulls funding_pnl"
+    },
+    {
+      "invariant_id": "B2B-A27",
+      "description": "Missing settlement mark price makes funding unavailable",
+      "test_function": "test_b2b_a27_missing_settlement_mark_price_makes_funding_unavailable",
+      "file": "tests/test_tactical_grid_shadow_evaluation_v1.py",
+      "result": "PASS",
+      "validator_note": "None mark_price nulls funding_pnl and net_pnl_after_funding"
+    },
+    {
+      "invariant_id": "B2B-A28",
+      "description": "Boundary touch is not breach, strict outside is breach",
+      "test_function": "test_b2b_a28_boundary_touch_is_not_breach_strict_outside_is_breach",
+      "file": "tests/test_tactical_grid_shadow_evaluation_v1.py",
+      "result": "PASS",
+      "validator_note": "Exact bound touch does not trigger breach; 1 unit beyond bound triggers breach"
+    },
+    {
+      "invariant_id": "B2B-A29",
+      "description": "Future grid shift diagnostic cannot mutate frozen decision-time plan",
+      "test_function": "test_b2b_a29_future_grid_shift_diagnostic_cannot_mutate_frozen_plan",
+      "file": "tests/test_tactical_grid_shadow_evaluation_v1.py",
+      "result": "PASS",
+      "validator_note": "Frozen grid plan and levels remain unchanged while shift count increments"
+    },
+    {
+      "invariant_id": "B2B-A30",
+      "description": "Incomplete assessment coverage never defaults to zero shifts",
+      "test_function": "test_b2b_a30_incomplete_assessment_coverage_never_becomes_zero_shifts",
+      "file": "tests/test_tactical_grid_shadow_evaluation_v1.py",
+      "result": "PASS",
+      "validator_note": "UNAVAILABLE coverage sets shift metrics to None rather than 0"
+    },
+    {
+      "invariant_id": "B2B-A31",
+      "description": "Technical trend transition reason detected without backward leakage",
+      "test_function": "test_b2b_a31_technical_trend_transition_reason_detected_without_backward_leakage",
+      "file": "tests/test_tactical_grid_shadow_evaluation_v1.py",
+      "result": "PASS",
+      "validator_note": "Trend transition timestamp detected without modifying earlier fills"
+    },
+    {
+      "invariant_id": "B2B-A32",
+      "description": "Trend transition loss null unless coverage authoritative",
+      "test_function": "test_b2b_a32_trend_transition_loss_null_unless_coverage_authoritative",
+      "file": "tests/test_tactical_grid_shadow_evaluation_v1.py",
+      "result": "PASS",
+      "validator_note": "UNAVAILABLE diagnostic coverage sets trend_transition_loss to None"
+    },
+    {
+      "invariant_id": "B2B-A33",
+      "description": "Directional B2A rows remain unchanged in SQLite storage",
+      "test_function": "test_b2b_a33_directional_b2a_rows_remain_unchanged",
+      "file": "tests/test_tactical_grid_shadow_evaluation_v1.py",
+      "result": "PASS",
+      "validator_note": "B2B persistence leaves tactical_shadow_evaluations_v2 intact"
+    },
+    {
+      "invariant_id": "B2B-A34",
+      "description": "A-line H40 code diff remains zero against baseline 407dabc415ae8cae4210250e992941c8b9b25464",
+      "test_function": "test_b2b_a34_h40_diff_remains_zero",
+      "file": "tests/test_tactical_grid_shadow_evaluation_v1.py",
+      "result": "PASS",
+      "validator_note": "Zero diff verified by git diff subprocess"
+    },
+    {
+      "invariant_id": "B2B-A35",
+      "description": "No authenticated or private exchange order mutation exists",
+      "test_function": "test_b2b_a35_no_authenticated_or_private_order_mutation_exists",
+      "file": "tests/test_tactical_grid_shadow_evaluation_v1.py",
+      "result": "PASS",
+      "validator_note": "Static audit confirms absence of private execution terms"
+    }
+  ],
+  "manual_semantic_review": {
+    "S01": {
+      "name": "dual-path starts from identical state and conservative selector is deterministic",
+      "grade": "PASS",
+      "details": "Both path A and path B branch from state.clone(); _select_conservative_state applies deterministic four-level hierarchy (marked equity, inventory, fees, path name tie-break)."
+    },
+    "S02": {
+      "name": "no hidden 15m execution fallback",
+      "grade": "PASS",
+      "details": "Fills and crossings use 1m candles exclusively. Missing or discontinuous 1m candles flag PENDING_DATA_GAP without falling back to 15m candles."
+    },
+    "S03": {
+      "name": "slot duplicate prevention + re-arm",
+      "grade": "PASS",
+      "details": "Opening checks slot_index not in open_lots; closing pops slot from open_lots, re-arming it."
+    },
+    "S04": {
+      "name": "terminal close/costs cannot double count",
+      "grade": "PASS",
+      "details": "Terminal close liquidates remaining open lots only; sets is_terminal=True to prevent further crossings; sums paired cycles and terminal liquidation without overlap."
+    },
+    "S05": {
+      "name": "funding ambiguity cannot create authoritative net-after-funding",
+      "grade": "PASS",
+      "details": "Ambiguous boundary funding sets status to AMBIGUOUS_FUNDING_BOUNDARY and forces funding_pnl and net_pnl_after_funding to None, validated fail-closed."
+    },
+    "S06": {
+      "name": "utilization cap is structural",
+      "grade": "PASS",
+      "details": "Unit notional is 1.0/N, maximum lots is N, bounding peak capital utilization to 1.0 reference capital."
+    },
+    "S07": {
+      "name": "future diagnostics cannot feed fill simulation",
+      "grade": "PASS",
+      "details": "Fill simulation executes completely before _compute_future_policy_diagnostics is called; future assessments cannot mutate frozen plan or past fills."
+    },
+    "S08": {
+      "name": "pending->resolved allowed; resolved immutable",
+      "grade": "BLOCKER",
+      "details": "In src/btc_quant_agent/market_watch/state.py:1773-1789, save_grid_shadow_evaluation unconditionally raises TacticalGridShadowEvaluationConflictError on any pre-existing natural key with a different evaluation_id, with no exception for pending rows. GridShadowEvaluationManager persists pending evaluations (PENDING_HORIZON / PENDING_DATA_GAP); when forward candles arrive to resolve the episode, attempting to save the resolved evaluation raises TacticalGridShadowEvaluationConflictError. This violates Frozen Semantics #21 and prevents pending rows from ever resolving."
+    },
+    "S09": {
+      "name": "source evidence deeply verified before persistence",
+      "grade": "PASS",
+      "details": "save_grid_shadow_evaluation verifies B1 evidence existence in DB, deserializes payload, verifies cryptographic SHA256 identity, and enforces schema validation."
+    },
+    "S10": {
+      "name": "B2A natural key/funding/path semantics unchanged",
+      "grade": "PASS",
+      "details": "tactical_shadow_evaluations_v2 table, unique index, and B2A directional evaluation structures remain completely isolated and intact."
+    }
+  },
+  "full_suite": {
+    "command": "pytest -q",
+    "passed": 1994,
+    "skipped": 2,
+    "failed": 0,
+    "warnings": 8,
+    "duration_seconds": 741.99,
+    "exit_code": 0
+  },
+  "a_line_h40_fence": "ZERO_DIFF",
+  "execution_fence": {
+    "private_authenticated_trading_api": "ABSENT",
+    "order_placement": "ABSENT",
+    "order_cancel_amend": "ABSENT",
+    "account_position_mutation": "ABSENT",
+    "automatic_execution": "ABSENT"
+  },
+  "implementation_mutated_during_validation": false,
+  "findings": [
+    {
+      "finding_id": "FINDING-B2B-01",
+      "severity": "BLOCKER",
+      "component": "src/btc_quant_agent/market_watch/state.py & src/btc_quant_agent/market_watch/grid_shadow.py",
+      "description": "Pending grid shadow evaluations cannot resolve to RESOLVED in database because save_grid_shadow_evaluation unconditionally rejects updates to existing natural keys, raising TacticalGridShadowEvaluationConflictError."
+    },
+    {
+      "finding_id": "FINDING-B2B-02",
+      "severity": "LOW",
+      "component": "tests/test_tactical_grid_shadow_evaluation_v1.py",
+      "description": "ADVERSARIAL_COVERAGE_GAP: Test suite A01-A35 tests divergent replay rejection (A04) and memory-only evaluation of incomplete coverage (A06), but omits end-to-end database persistence tests for the pending-to-resolved lifecycle."
+    }
+  ],
+  "blockers": [
+    "S08_BLOCKER: In src/btc_quant_agent/market_watch/state.py:1773-1789, save_grid_shadow_evaluation unconditionally raises TacticalGridShadowEvaluationConflictError on any pre-existing natural key with a different evaluation_id. When GridShadowEvaluationManager persists an evaluation in PENDING_HORIZON or PENDING_DATA_GAP status, subsequent re-evaluation upon candle arrival attempts to save the newly RESOLVED evaluation and crashes with TacticalGridShadowEvaluationConflictError. This violates Frozen Semantics #21 ('Resolved authoritative evaluations are immutable; only pending rows may later resolve') and fails Phase 5 Semantic Review S08."
+  ],
+  "next_lifecycle_state": "TACTICAL_POLICY_R2_B2B_INDEPENDENT_VALIDATION_FAILED"
+}
