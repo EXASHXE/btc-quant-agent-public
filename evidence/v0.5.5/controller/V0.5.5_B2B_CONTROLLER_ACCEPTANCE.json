@@ -1,0 +1,71 @@
+{
+  "stage": "B2B_GRID_SHADOW_EVALUATION_V1_CONTROLLER_ACCEPTANCE",
+  "decision": "B2B_ACCEPTED",
+  "repository": "EXASHXE/btc-quant-agent-public",
+  "branch": "feature/tactical-policy-r2",
+  "accepted_code_sha": "52c16a28153de307dc6132c0975fe29341a0a918",
+  "original_candidate_sha": "a32ab775ac2cc168c9f45a38a7b11fd5b9c85f37",
+  "repair_parent_sha": "a32ab775ac2cc168c9f45a38a7b11fd5b9c85f37",
+  "accepted_b2a_predecessor_sha": "79c8b82dd7c870b7e785af19823af8ec607c22de",
+  "independent_revalidation": {
+    "publication_commit": "a1c6366f5d43416ff2a33507520ee78314631edf",
+    "report_path": "reviews/v0.5/tactical-policy/V0.5.5_B2B_REPAIR_R1_INDEPENDENT_REVALIDATION_REPORT.md",
+    "report_blob_sha": "c3ac853da7695a288f712a9f91d645b2da309b24",
+    "evidence_path": "evidence/v0.5/tactical-policy/V0.5.5_B2B_REPAIR_R1_INDEPENDENT_REVALIDATION_EVIDENCE.json",
+    "evidence_blob_sha": "0bab1da17462678629b6f2818f11337105c00ec4",
+    "decision": "B2B_EXACT_SHA_REVALIDATED_PENDING_CONTROLLER_ACCEPTANCE"
+  },
+  "verification": {
+    "repair_commit_count": 1,
+    "repair_changed_files": [
+      "src/btc_quant_agent/market_watch/state.py",
+      "tests/test_tactical_grid_shadow_evaluation_v1.py"
+    ],
+    "total_b2b_commit_count": 2,
+    "total_b2b_changed_files_count": 8,
+    "s08_semantics": "S08-R01..S08-R14 PASS",
+    "repair_adversarial": "R1-A01..R1-A15 PASS",
+    "original_b2b_adversarial": "B2B-A01..B2B-A35 PASS",
+    "focused": {
+      "b2b": 50,
+      "b2a": 24,
+      "b1": 31,
+      "b0": 23,
+      "market_watch": 137,
+      "failed": 0
+    },
+    "full_suite_python312": {
+      "passed": 2009,
+      "skipped": 2,
+      "failed": 0
+    },
+    "ruff": "PASS",
+    "mypy": "PASS",
+    "compileall": "PASS",
+    "diff_check": "PASS",
+    "h40_fence": "ZERO_DIFF_FULL_HISTORY",
+    "execution_fence": "PASS",
+    "implementation_immutability": true
+  },
+  "remote_ci": {
+    "run_id": 36865868087,
+    "attempt": 2,
+    "runtime": "Python 3.13",
+    "conclusion": "failure",
+    "passed": 2008,
+    "failed": 1,
+    "skipped": 2,
+    "remaining_failure": "test_b2b_a34_h40_diff_remains_zero",
+    "classification": "KNOWN_NONBLOCKING_CI_HARNESS_DEBT_A34_SHALLOW_CHECKOUT",
+    "transient_h40_golden_mismatch_attempt1_resolved_attempt2": true
+  },
+  "next_tactical_stage": "B3_HISTORICAL_REPLAY_AND_ROLLING_OOS",
+  "live_v1": {
+    "branch": "feature/b-line-live-v1",
+    "rebound_base_sha": "52c16a28153de307dc6132c0975fe29341a0a918",
+    "state": "LIVE_V1_B3_READY_TO_DISPATCH",
+    "day1_exchange_write": "NONE",
+    "real_funds_write_authority": "NONE"
+  },
+  "automatic_live_execution": "FORBIDDEN"
+}

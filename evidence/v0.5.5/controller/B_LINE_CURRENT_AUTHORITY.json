@@ -1,14 +1,12 @@
 {
   "line": "B_LINE",
-  "stage": "B2B_PENDING_LIFECYCLE_REPAIRED_PENDING_INDEPENDENT_REVALIDATION",
+  "stage": "B2B_ACCEPTED",
   "code_branch": "feature/tactical-policy-r2",
-  "accepted_code_sha": "79c8b82dd7c870b7e785af19823af8ec607c22de",
-  "candidate_code_sha": "52c16a28153de307dc6132c0975fe29341a0a918",
-  "candidate_state": "B2B_PENDING_LIFECYCLE_REPAIRED_PENDING_INDEPENDENT_REVALIDATION",
-  "docs_authority_commit": "2829c848d97cd8bb2d5e612de6b73865f81797bc",
+  "accepted_code_sha": "52c16a28153de307dc6132c0975fe29341a0a918",
+  "docs_authority_commit": "a1c6366f5d43416ff2a33507520ee78314631edf",
   "current_controller_authority": {
-    "path": "reviews/v0.5/tactical-policy/V0.5.5_B2A_R2_CONTROLLER_ACCEPTANCE.md",
-    "blob_sha": "7eb6229e14e8a9c7472e7a0abb0d53ad336f5b48"
+    "path": "reviews/v0.5/tactical-policy/V0.5.5_B2B_CONTROLLER_ACCEPTANCE.md",
+    "blob_sha": "4d6d65dad35e42e10d175875093dc045bbc63503"
   },
   "protected_state": {
     "a_line_isolation": "REQUIRED",
@@ -17,23 +15,20 @@
     "automatic_live_execution": "FORBIDDEN",
     "live_write_authority": "NONE"
   },
-  "authorized_next_stage": "B2B_INDEPENDENT_REVALIDATION_R1",
+  "authorized_next_stage": "B3_HISTORICAL_REPLAY_AND_ROLLING_OOS",
   "binding_fields": {
     "b2a_r2_state": "B2A_R2_ACCEPTED",
-    "accepted_code_sha": "79c8b82dd7c870b7e785af19823af8ec607c22de",
-    "b2b_candidate_sha": "52c16a28153de307dc6132c0975fe29341a0a918",
+    "b2b_state": "B2B_ACCEPTED",
+    "accepted_code_sha": "52c16a28153de307dc6132c0975fe29341a0a918",
+    "accepted_code_parent_sha": "a32ab775ac2cc168c9f45a38a7b11fd5b9c85f37",
+    "tactical_b3_authorized": true,
+    "tactical_b4_authorized": false,
     "live_v1_parallel_branch": "feature/b-line-live-v1",
-    "live_v1_parallel_base_sha": "79c8b82dd7c870b7e785af19823af8ec607c22de",
-    "b3_tactical_authorized": false,
-    "b4_tactical_authorized": false,
+    "live_v1_parallel_base_sha": "52c16a28153de307dc6132c0975fe29341a0a918",
+    "live_v1_b3_ready_to_dispatch": true,
+    "live_v1_day1_exchange_write": "NONE",
     "real_funds_live_authorized": false,
-    "b2b_validation_decision": "B2B_INDEPENDENT_VALIDATION_FAILED",
-    "b2b_validation_failure_code": "S08_PENDING_RESOLVE_BLOCKED_BY_CONFLICT",
-    "b2b_repair_scope": "pending lifecycle persistence only",
-    "b2b_candidate_parent_sha": "a32ab775ac2cc168c9f45a38a7b11fd5b9c85f37",
-    "b2b_repair_decision": "B2B_PENDING_LIFECYCLE_REPAIRED_PENDING_INDEPENDENT_REVALIDATION",
-    "b2b_revalidation_required": true,
-    "remote_ci_status": "RED_WITH_PREEXISTING_A34_SHALLOW_CHECKOUT_AND_PY313_H40_GOLDEN_MISMATCH_UNDER_RECHECK"
+    "remote_ci_debt": "KNOWN_NONBLOCKING_CI_HARNESS_DEBT_A34_SHALLOW_CHECKOUT"
   },
   "must_read": [],
   "validation_authority": {
@@ -47,5 +42,15 @@
     "report_blob_sha": "ffcd21be8539f247d2a723a6c824db391f158148",
     "evidence_path": "evidence/v0.5/tactical-policy/V0.5.5_B2B_PENDING_LIFECYCLE_REPAIR_R1_EVIDENCE.json",
     "evidence_blob_sha": "c353e1699f180bc8ca73c55795c87201577d4a84"
+  },
+  "current_controller_evidence": {
+    "path": "evidence/v0.5.5/controller/V0.5.5_B2B_CONTROLLER_ACCEPTANCE.json",
+    "blob_sha": "73a11708a85b5f1896397d745c3b7252d3c51f8d"
+  },
+  "acceptance_authority": {
+    "report_path": "reviews/v0.5/tactical-policy/V0.5.5_B2B_CONTROLLER_ACCEPTANCE.md",
+    "report_blob_sha": "4d6d65dad35e42e10d175875093dc045bbc63503",
+    "evidence_path": "evidence/v0.5.5/controller/V0.5.5_B2B_CONTROLLER_ACCEPTANCE.json",
+    "evidence_blob_sha": "73a11708a85b5f1896397d745c3b7252d3c51f8d"
   }
 }
