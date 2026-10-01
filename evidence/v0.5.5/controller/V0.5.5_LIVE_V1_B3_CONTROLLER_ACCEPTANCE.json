@@ -1,0 +1,72 @@
+{
+  "stage": "LIVE_V1_B3_CONTROLLER_ACCEPTANCE",
+  "decision": "LIVE_V1_B3_ACCEPTED",
+  "repository": "EXASHXE/btc-quant-agent-public",
+  "branch": "feature/b-line-live-v1",
+  "accepted_sha": "961a0f4d4b37cdb9365d5e5867813ff3129c14db",
+  "accepted_parent_sha": "52c16a28153de307dc6132c0975fe29341a0a918",
+  "source_evidence": {
+    "validation_path": "evidence/v0.5.5/live_v1/B3_DAY1_VALIDATION.json",
+    "validation_blob_sha": "da1b57e8ef41eef999948d8f75f43bad5a29b08d",
+    "public_dry_run_path": "evidence/v0.5.5/live_v1/B3_DAY1_PUBLIC_DATA_DRY_RUN.json",
+    "public_dry_run_blob_sha": "5bf77a90b8b13a5dc18c7696ed1216ca4bb322f1"
+  },
+  "verification": {
+    "commit_count": 1,
+    "changed_files_count": 24,
+    "full_suite_python312": {
+      "passed": 2084,
+      "skipped": 2,
+      "failed": 0
+    },
+    "live_v1_tests": {
+      "passed": 75,
+      "failed": 0
+    },
+    "affected_regressions": {
+      "passed": 209,
+      "failed": 0
+    },
+    "ruff": "PASS",
+    "mypy": "PASS",
+    "compileall": "PASS",
+    "diff_check": "PASS",
+    "exchange_write_count": 0,
+    "h40_fence": "ZERO_DIFF",
+    "tactical_semantics_unchanged": true,
+    "b2b_evaluator_unchanged": true,
+    "signed_execution_unchanged": true
+  },
+  "remote_ci": {
+    "run_id": 36899369271,
+    "runtime": "Python 3.13",
+    "conclusion": "failure",
+    "passed": 2083,
+    "failed": 1,
+    "skipped": 2,
+    "remaining_failure": "test_b2b_a34_h40_diff_remains_zero",
+    "classification": "KNOWN_NONBLOCKING_CI_HARNESS_DEBT_A34_SHALLOW_CHECKOUT"
+  },
+  "accepted_boundaries": {
+    "llm_side_effect_authority": "NONE",
+    "account_authority": "DRY_RUN",
+    "day1_exchange_write": "NONE",
+    "live_write_authority": "NONE"
+  },
+  "pending_integration_evidence": [
+    "credentialed OpenAI Responses model call",
+    "credentialed Feishu Custom App delivery/callback",
+    "actual configured Codex model invocation"
+  ],
+  "b4_mandatory_carry_forward": [
+    "SQLite WAL or equivalently proven serialized single-writer concurrency",
+    "immutable AccountSnapshotV1",
+    "approval-bound TradeIntentV1",
+    "pre-execution revalidation",
+    "TESTNET-only capability authority",
+    "order/fill/protective reconciliation",
+    "PositionSupervisor and kill switch",
+    "no LIVE real-money write authority"
+  ],
+  "next_state": "LIVE_V1_B4_ACCOUNT_EXECUTION_AND_POSITION_SUPERVISOR_AUTHORIZED"
+}
