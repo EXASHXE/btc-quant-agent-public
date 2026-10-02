@@ -1,0 +1,52 @@
+{
+  "stage": "LIVE_V1_B5_CONTROLLER_ADJUDICATION",
+  "validated_sha": "32c1c9976dc20cf003a06398c465c4c089dd99d9",
+  "expected_parent_sha": "fd4e6fc19085e698c50eca70afe5e419cbd8e060",
+  "decision": "LIVE_V1_INDEPENDENT_VALIDATION_FAILED",
+  "implementation_read_only": true,
+  "reproduced_findings": [
+    {
+      "severity": "BLOCKER",
+      "id": "APPROVAL_EXECUTABLE_SEMANTICS_NOT_BOUND_TO_INTENT",
+      "summary": "PreExecutionValidator does not recompute approved executable fields; a self-rehashed intent can diverge in quantity/price/leverage/order_type/SL/TP."
+    },
+    {
+      "severity": "BLOCKER",
+      "id": "BACKEND_SIDE_EFFECT_BOUNDARY_ACCEPTS_UNAUTHORIZED_INTENT_OBJECT",
+      "summary": "TestnetExecutionBackend.submit_intent accepts a raw TradeIntent object and can reach margin/leverage/order calls without persisted pre-execution authorization."
+    },
+    {
+      "severity": "HIGH",
+      "id": "STALE_OUTBOX_LEASE_OWNER_CAN_CROSS_EXTERNAL_ANALYSIS_BOUNDARY",
+      "summary": "PositionCase freeze UPDATE is lease-guarded but rowcount is unchecked; stale worker can continue to external analysis after losing lease."
+    },
+    {
+      "severity": "HIGH",
+      "id": "B4_OPERATIONAL_RUNTIME_LIFECYCLE_NOT_WIRED",
+      "summary": "api.py/CLI/QuantService do not own/start B4 AccountWatch user stream, REST reconcile loop, MarketStream, LiveExecutionService, PositionSupervisor recovery lifecycle."
+    }
+  ],
+  "tests": {
+    "independent_reported_focused_live_v1_passed": 163,
+    "independent_reported_full_suite_passed": 2172,
+    "independent_reported_skipped": 2,
+    "ruff": "PASS",
+    "mypy": "PASS",
+    "compileall": "PASS",
+    "diff_check": "PASS"
+  },
+  "remote_ci": {
+    "exact_target_run_id": 36978039210,
+    "passed": 2171,
+    "failed": 1,
+    "skipped": 2,
+    "only_failure": "B2B_A34_INVALID_HISTORICAL_REVISION_UNDER_SHALLOW_CHECKOUT",
+    "classification": "KNOWN_NONBLOCKING_CI_HARNESS_DEBT_A34_SHALLOW_CHECKOUT"
+  },
+  "safety": {
+    "live_write_authority": "NONE",
+    "real_funds_authorized": false,
+    "autonomous_live": "FORBIDDEN"
+  },
+  "next_state": "LIVE_V1_B4_B5_FINDINGS_REPAIR_R2"
+}

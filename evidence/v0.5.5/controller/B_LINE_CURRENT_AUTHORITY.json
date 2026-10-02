@@ -1,9 +1,9 @@
 {
   "line": "B_LINE",
-  "stage": "B2B_ACCEPTED__LIVE_V1_B3_ACCEPTED__B4_R1_2_SEALED_PENDING_B5_EXACT_SHA_VALIDATION",
+  "stage": "B2B_ACCEPTED__LIVE_V1_B3_ACCEPTED__B5_FAILED_PENDING_B4_R2",
   "code_branch": "feature/tactical-policy-r2",
   "accepted_code_sha": "52c16a28153de307dc6132c0975fe29341a0a918",
-  "docs_authority_commit": "9d2c82333a58610302835ea71e28f2e0f53fb4e3",
+  "docs_authority_commit": "fc6d8d7910a4ff847685d606fb43198133c510c2",
   "current_controller_authority": {
     "path": "reviews/v0.5/tactical-policy/V0.5.5_B2B_CONTROLLER_ACCEPTANCE.md",
     "blob_sha": "4d6d65dad35e42e10d175875093dc045bbc63503"
@@ -32,11 +32,11 @@
     "live_v1_b3_state": "LIVE_V1_B3_ACCEPTED",
     "live_v1_b3_accepted_sha": "961a0f4d4b37cdb9365d5e5867813ff3129c14db",
     "live_v1_b4_authorized": true,
-    "live_v1_b5_authorized": true,
+    "live_v1_b5_authorized": false,
     "live_v1_day2_target_write": "TESTNET_ONLY",
     "provider_credential_smoke": "PENDING",
     "live_store_concurrency_gate": "B4_MUST_ESTABLISH_WAL_OR_EQUIVALENT",
-    "live_v1_b4_state": "LIVE_V1_B4_SAFETY_CLOSED_R1_2_PENDING_B5_EXACT_SHA_VALIDATION",
+    "live_v1_b4_state": "B5_FAILED_PENDING_FINDINGS_REPAIR_R2",
     "live_v1_b4_candidate_sha": "fd42f2cc1a67506d05117e3daa9a072309f7f998",
     "live_v1_b4_candidate_parent_sha": "961a0f4d4b37cdb9365d5e5867813ff3129c14db",
     "live_v1_b4_repair_authorized": true,
@@ -64,7 +64,16 @@
     "live_v1_b5_binding_mode": "EXACT_CODE_SHA",
     "live_v1_b5_target_sha": "32c1c9976dc20cf003a06398c465c4c089dd99d9",
     "live_v1_b5_expected_parent_sha": "fd4e6fc19085e698c50eca70afe5e419cbd8e060",
-    "live_v1_b5_validator": "INDEPENDENT_FRESH_SESSION"
+    "live_v1_b5_validator": "INDEPENDENT_FRESH_SESSION",
+    "live_v1_b5_last_target_sha": "32c1c9976dc20cf003a06398c465c4c089dd99d9",
+    "live_v1_b5_last_decision": "LIVE_V1_INDEPENDENT_VALIDATION_FAILED",
+    "live_v1_b4_r2_authorized": true,
+    "live_v1_b4_r2_findings": [
+      "BLOCKER_APPROVAL_EXECUTABLE_SEMANTICS_NOT_BOUND_TO_INTENT",
+      "BLOCKER_BACKEND_SIDE_EFFECT_BOUNDARY_ACCEPTS_UNAUTHORIZED_INTENT_OBJECT",
+      "HIGH_STALE_OUTBOX_LEASE_OWNER_CAN_CROSS_EXTERNAL_ANALYSIS_BOUNDARY",
+      "HIGH_B4_OPERATIONAL_RUNTIME_LIFECYCLE_NOT_WIRED"
+    ]
   },
   "must_read": [],
   "validation_authority": {
@@ -89,11 +98,17 @@
     "evidence_path": "evidence/v0.5.5/controller/V0.5.5_B2B_CONTROLLER_ACCEPTANCE.json",
     "evidence_blob_sha": "73a11708a85b5f1896397d745c3b7252d3c51f8d"
   },
-  "parallel_authorized_next_stage": "B5_LIVE_V1_INDEPENDENT_EXACT_SHA_AND_SAFETY_VALIDATION",
+  "parallel_authorized_next_stage": "LIVE_V1_B4_B5_FINDINGS_REPAIR_R2",
   "live_v1_acceptance_authority": {
     "report_path": "reviews/v0.5/live_v1/V0.5.5_LIVE_V1_B3_CONTROLLER_ACCEPTANCE.md",
     "report_blob_sha": "21ad4492feb4750f5fc85a5f88b54d1da36c157d",
     "evidence_path": "evidence/v0.5.5/controller/V0.5.5_LIVE_V1_B3_CONTROLLER_ACCEPTANCE.json",
     "evidence_blob_sha": "195bcdc0b8c3cda118aeb464d348776264d481ff"
+  },
+  "live_v1_b5_failure_authority": {
+    "report_path": "reviews/v0.5/live_v1/V0.5.5_LIVE_V1_B5_CONTROLLER_ADJUDICATION.md",
+    "report_blob_sha": "23063b8e95cdad29c7dd1cf0669471cd35598ff8",
+    "evidence_path": "evidence/v0.5.5/controller/V0.5.5_LIVE_V1_B5_CONTROLLER_ADJUDICATION.json",
+    "evidence_blob_sha": "45a76c1157b1b3566d8e77a67e01c99474f582a7"
   }
 }
