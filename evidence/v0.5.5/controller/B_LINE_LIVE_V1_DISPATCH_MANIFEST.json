@@ -14,7 +14,7 @@
   "authority_refs": [
     {
       "path": "evidence/v0.5.5/controller/B_LINE_CURRENT_AUTHORITY.json",
-      "blob_sha": "d0248d3dbddd301b817d3bef8dca1e405e7e5b71",
+      "blob_sha": "764ad7894fa57eeacdac4037c42b914e4d3e5f04",
       "access_mode": "IDENTITY_ONLY"
     }
   ],
@@ -34,14 +34,16 @@
     "accepted_b2b_sha": "52c16a28153de307dc6132c0975fe29341a0a918",
     "live_v1_b3_status": "ACCEPTED",
     "live_v1_b3_accepted_sha": "961a0f4d4b37cdb9365d5e5867813ff3129c14db",
-    "live_v1_b4_status": "R2_1_1_SEALED_PENDING_B5_REVALIDATION",
+    "live_v1_b4_status": "B5_REVALIDATION_FAILED_PENDING_R3",
     "provider_credential_smoke": "PENDING",
     "sqlite_concurrency_gate": "B4_MUST_ESTABLISH_WAL_OR_EQUIVALENT",
     "live_v1_b4_final_sha": "937b2b26518ceea0952a7e17279cc42924c88848",
-    "live_v1_b5_status": "READY_TO_REVALIDATE",
+    "live_v1_b5_status": "FAILED",
     "live_v1_b5_binding_mode": "EXACT_CODE_SHA",
     "live_v1_b5_target_sha": "937b2b26518ceea0952a7e17279cc42924c88848",
-    "live_v1_b5_expected_parent_sha": "592e35c29d55e7c17ce58487384a49368c4eee4b"
+    "live_v1_b5_expected_parent_sha": "592e35c29d55e7c17ce58487384a49368c4eee4b",
+    "live_v1_b5_last_target_sha": "937b2b26518ceea0952a7e17279cc42924c88848",
+    "live_v1_b4_r3_status": "READY_TO_DISPATCH"
   },
   "must_read_defaults": [],
   "terminal_states": {

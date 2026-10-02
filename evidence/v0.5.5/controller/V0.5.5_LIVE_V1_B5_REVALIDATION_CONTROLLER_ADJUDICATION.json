@@ -1,0 +1,41 @@
+{
+  "stage": "LIVE_V1_B5_REVALIDATION_CONTROLLER_ADJUDICATION",
+  "validated_sha": "937b2b26518ceea0952a7e17279cc42924c88848",
+  "expected_parent_sha": "592e35c29d55e7c17ce58487384a49368c4eee4b",
+  "decision": "LIVE_V1_INDEPENDENT_VALIDATION_FAILED",
+  "implementation_read_only": true,
+  "independent_validation_summary": {
+    "blockers": 3,
+    "highs": 5,
+    "focused_tests_passed": 214,
+    "full_suite_passed": 2223,
+    "skipped": 2,
+    "ruff": "PASS",
+    "mypy": "PASS",
+    "compileall": "PASS",
+    "h40_fence": "ZERO_DIFF",
+    "live_write_count": 0,
+    "testnet_network_smoke": "NOT_RUN_CREDENTIALS_UNAVAILABLE"
+  },
+  "controller_source_review": [
+    "BLOCKER_PLACEMENT_GATE_USES_STALEABLE_TIME_AND_ACCOUNT_AUTHORITY",
+    "BLOCKER_PROTECTIVE_ORDER_OWNERSHIP_NOT_EXACT_INTENT_BOUND",
+    "BLOCKER_NEW_RISK_NOT_BOUNDED_BY_REMAINING_ACCOUNT_LOSS_HEADROOM",
+    "HIGH_RUNTIME_ENABLE_AUTHORITY_NOT_SINGLE_SOURCE",
+    "HIGH_FLAT_POSITION_TRANSITION_NOT_DURABLY_AUTHORITATIVE",
+    "HIGH_MARK_BOOK_KLINE_FRESHNESS_NOT_SEPARATELY_PROVEN",
+    "HIGH_EXECUTION_IDENTITIES_NOT_CANONICAL_RECOMPUTED_ON_VERIFY",
+    "HIGH_ACTIVE_ORDER_RECONCILIATION_ORDERING_CAN_DROP_STATE_RECOVERY"
+  ],
+  "remote_ci": {
+    "exact_target_run_id": 37019731744,
+    "only_failure": "B2B_A34_INVALID_HISTORICAL_REVISION_UNDER_SHALLOW_CHECKOUT",
+    "classification": "KNOWN_NONBLOCKING_CI_HARNESS_DEBT_A34_SHALLOW_CHECKOUT"
+  },
+  "safety": {
+    "live_write_authority": "NONE",
+    "real_funds_authorized": false,
+    "autonomous_live": "FORBIDDEN"
+  },
+  "next_state": "LIVE_V1_B4_B5_FINDINGS_REPAIR_R3"
+}
