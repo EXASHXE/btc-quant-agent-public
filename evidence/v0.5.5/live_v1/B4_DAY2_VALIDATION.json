@@ -1,13 +1,13 @@
 {
-  "task": "LIVE_V1_B4_B5_FINDINGS_REPAIR_R2",
+  "task": "LIVE_V1_B4_R2_1_ENTRY_SURFACE_AND_CAPABILITY_SEAL",
   "repository": "EXASHXE/btc-quant-agent-public",
   "task_branch": "feature/b-line-live-v1",
   "start_binding_mode": "CURRENT_BRANCH_HEAD",
-  "actual_start_sha": "32c1c9976dc20cf003a06398c465c4c089dd99d9",
-  "reviewed_candidate_sha": "32c1c9976dc20cf003a06398c465c4c089dd99d9",
+  "actual_start_sha": "99831b09ff5444409e9f342df78c1c78e4f0fc51",
+  "reviewed_candidate_sha": "99831b09ff5444409e9f342df78c1c78e4f0fc51",
   "accepted_predecessor_sha": "961a0f4d4b37cdb9365d5e5867813ff3129c14db",
   "predecessor_ancestry": "IS_ANCESTOR_VERIFIED",
-  "parent_sha": "32c1c9976dc20cf003a06398c465c4c089dd99d9",
+  "parent_sha": "99831b09ff5444409e9f342df78c1c78e4f0fc51",
   "initial_worktree_state": "CLEAN",
   "closed_blockers": {
     "R1_01_approval_intent_singleton": {
@@ -65,6 +65,14 @@
     "R2_04_live_v1_operational_runtime": {
       "status": "CLOSED",
       "mechanism": "LiveV1Runtime owns async lifecycles for market stream, TESTNET user data stream, periodic REST reconciliation loop, position outbox recovery drain, and position supervisor polling; integrated into FastAPI lifespan; requires explicit testnet_execution_enabled opt-in; rejects LIVE and AUTONOMOUS configurations; starts unreconciled and recovers state before accepting risk"
+    },
+    "R2_1_01_signed_client_capability_policy_seal": {
+      "status": "CLOSED",
+      "mechanism": "removed production TEST and .test exceptions from _require_mutation_authority; all mutating signed requests strictly enforce ExecutionCapabilityPolicyV1 and TESTNET authority; unit tests use test-scoped patch"
+    },
+    "R2_1_02_readonly_public_api_seal": {
+      "status": "CLOSED",
+      "mechanism": "removed public runtime execution POST route from api.py; public REST surface remains strictly read-only GET/HEAD across all runtime modes; runtime status integrated into existing /execution/status; LiveV1Runtime.execute_intent retained for internal orchestration"
     }
   },
   "sqlite_durability": {
@@ -89,15 +97,15 @@
     "ruff": "PASS: ruff check .",
     "mypy": "PASS: mypy src (150 source files)",
     "live_v1_tests": {
-      "passed": 212,
+      "passed": 213,
       "failed": 0
     },
     "execution_tests": {
-      "passed": 69,
+      "passed": 70,
       "failed": 0
     },
     "full_pytest": {
-      "passed": 2221,
+      "passed": 2222,
       "skipped": 2,
       "warnings": 9
     }
@@ -117,6 +125,6 @@
     "actual_codex_model_invocation": "PENDING (credentials absent)",
     "testnet_credentialed_exchange_smoke": "PENDING (credentials absent)"
   },
-  "remaining_blockers": "None. All R1, R1.1, R1.2, and R2 safety blockers closed. Real-money LIVE execution remains permanently forbidden.",
-  "decision": "LIVE_V1_B4_B5_FINDINGS_REPAIRED_PENDING_B5_REVALIDATION"
+  "remaining_blockers": "None. All R1, R1.1, R1.2, R2, and R2.1 safety blockers closed. Real-money LIVE execution remains permanently forbidden.",
+  "decision": "LIVE_V1_B4_R2_1_SEALED_PENDING_B5_REVALIDATION"
 }

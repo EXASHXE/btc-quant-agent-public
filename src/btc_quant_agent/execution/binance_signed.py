@@ -97,13 +97,20 @@ class BinanceSignedClient:
             raise BinanceExecutionError("Binance user stream request failed") from None
 
     def _require_mutation_authority(self) -> None:
-        if self.environment == "TEST" or self.base_url.endswith(".test"):
-            return
+        from .guard import ExecutionBlocked
         from .policy import ExecutionCapabilityPolicyV1
+
         ExecutionCapabilityPolicyV1.check_capability(
-            "TESTNET", "SIGNED_MUTATION", env_id=self.environment,
-            cred_ns=self.credential_namespace, rest_url=self.base_url,
+            self.environment,
+            "SIGNED_MUTATION",
+            env_id=self.environment,
+            cred_ns=self.credential_namespace,
+            rest_url=self.base_url,
         )
+        if self.environment.upper() != "TESTNET":
+            raise ExecutionBlocked(
+                f"signed client mutation requires TESTNET environment, got '{self.environment}'"
+            )
 
     def account_information(self) -> dict[str, Any]:
         return cast(dict[str, Any], self._signed_request("GET", "/fapi/v3/account"))

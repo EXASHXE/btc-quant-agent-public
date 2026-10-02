@@ -17,7 +17,7 @@ if TYPE_CHECKING:
     from .live_runtime import LiveV1Runtime
 
 try:
-    from fastapi import Depends, FastAPI, HTTPException, Request
+    from fastapi import Depends, FastAPI, HTTPException
     from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 except ImportError as exc:  # pragma: no cover - optional dependency guard
     raise RuntimeError("Install the API extra: pip install -e '.[api]'") from exc
@@ -93,37 +93,6 @@ def create_app(
             from .live_runtime import LiveV1Runtime
             live_runtime = LiveV1Runtime.create(live_config, live)
 
-    if live_runtime is not None:
-        from .execution.guard import ExecutionBlocked
-
-        def live_runtime_status() -> dict[str, object]:
-            assert live_runtime is not None
-            return live_runtime.status()
-
-        async def execute_live_intent(intent_id: str, request: Request) -> dict[str, object]:
-            assert live_runtime is not None
-            if request.query_params or await request.body():
-                raise HTTPException(422, "execution accepts only an intent ID")
-            try:
-                report = await live_runtime.execute_intent(intent_id)
-            except KeyError as exc:
-                raise HTTPException(404, "intent not found") from exc
-            except ExecutionBlocked as exc:
-                raise HTTPException(409, str(exc)) from exc
-            return {
-                "intent_id": report.intent_id,
-                "status": report.status,
-                "order_id": report.order_id,
-                "client_order_id": report.client_order_id,
-                "requested_qty": report.requested_qty,
-                "filled_qty": report.filled_qty,
-                "avg_price": report.avg_price,
-                "reason": report.reason,
-            }
-
-        app.add_api_route("/live-v1/runtime/status", live_runtime_status, methods=["GET"])
-        app.add_api_route("/live-v1/runtime/intents/{intent_id}/execute", execute_live_intent, methods=["POST"])
-
     @app.get("/health")
     def health() -> dict[str, object]:
         return service.health()
@@ -160,7 +129,10 @@ def create_app(
 
     @app.get("/execution/status")
     def execution_status() -> dict[str, object]:
-        return service.execution.status()
+        status = dict(service.execution.status())
+        if live_runtime is not None:
+            status["live_v1_runtime"] = live_runtime.status()
+        return status
 
     return app
 

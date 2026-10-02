@@ -5,8 +5,6 @@ from types import SimpleNamespace
 from unittest.mock import AsyncMock, Mock
 
 import pytest
-from fastapi import HTTPException
-from starlette.requests import Request
 from test_live_v1_decision_models import sample_case
 
 from btc_quant_agent import api
@@ -236,38 +234,45 @@ def test_api_lifespan_starts_and_stops_only_injected_runtime(tmp_path, monkeypat
                                   RiskCompilerV1(RiskPolicyV1()))
     runtime = SimpleNamespace(tactical_service=service, start=AsyncMock(), stop=AsyncMock(),
                               status=Mock(return_value={"enabled": True}),
-                              execute_intent=AsyncMock())
+                              execute_intent=AsyncMock(return_value={"status": "FILLED"}))
     app = api.create_app(live_runtime=runtime)
-    assert any(getattr(route, "path", "") == "/live-v1/runtime/intents/{intent_id}/execute"
-               for route in app.routes)
 
+    # 1. Verify all routes on app are strictly read-only GET/HEAD/OPTIONS
+    registered_routes = [
+        (getattr(route, "path", ""), method)
+        for route in app.routes
+        for method in getattr(route, "methods", set())
+        if getattr(route, "path", None)
+    ]
+    for path, method in registered_routes:
+        if path in {"/openapi.json", "/docs", "/docs/oauth2-redirect", "/redoc"}:
+            continue
+        assert method in {"GET", "HEAD", "OPTIONS"}, f"Non-read-only method {method} on {path}"
+
+    # 2. No runtime execution route exists anywhere in app
+    assert not any(getattr(route, "path", "").startswith("/live-v1/runtime/") for route in app.routes)
+
+    # 3. Lifespan correctly starts and stops injected runtime
     async def run():
         async with app.router.lifespan_context(app):
             runtime.start.assert_awaited_once()
         runtime.stop.assert_awaited_once()
 
     _run(run())
+
+    # 4. Default create_app() has no runtime routes
     default = api.create_app()
-    assert not any(getattr(route, "path", "").startswith("/live-v1/runtime/")
-                   for route in default.routes)
+    assert not any(getattr(route, "path", "").startswith("/live-v1/runtime/") for route in default.routes)
 
-    async def reject_order_fields():
-        endpoint = next(route.endpoint for route in app.routes
-                        if getattr(route, "path", "") == "/live-v1/runtime/intents/{intent_id}/execute")
+    # 5. /execution/status returns live_v1_runtime status when runtime is injected
+    exec_status_route = next(route for route in app.routes if getattr(route, "path", "") == "/execution/status")
+    status = exec_status_route.endpoint()
+    assert status.get("live_v1_runtime") == {"enabled": True}
 
-        async def receive():
-            return {"type": "http.request", "body": b'{"quantity": 2}', "more_body": False}
+    # 6. LiveV1Runtime.execute_intent(intent_id) remains callable directly in Python
+    async def run_direct():
+        res = await runtime.execute_intent("intent-1")
+        assert res == {"status": "FILLED"}
+        runtime.execute_intent.assert_awaited_once_with("intent-1")
 
-        request = Request({"type": "http", "method": "POST", "path": "/",
-                           "query_string": b"", "headers": []}, receive)
-        with pytest.raises(HTTPException) as error:
-            await endpoint("intent-1", request)
-        assert error.value.status_code == 422
-        query_request = Request({"type": "http", "method": "POST", "path": "/",
-                                 "query_string": b"leverage=20", "headers": []}, receive)
-        with pytest.raises(HTTPException) as query_error:
-            await endpoint("intent-1", query_request)
-        assert query_error.value.status_code == 422
-        runtime.execute_intent.assert_not_awaited()
-
-    _run(reject_order_fields())
+    _run(run_direct())

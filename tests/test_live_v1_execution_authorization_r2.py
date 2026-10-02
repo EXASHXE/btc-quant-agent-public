@@ -73,6 +73,80 @@ def test_unbound_signed_client_is_rejected_before_transport(monkeypatch):
     transport.assert_not_called()
 
 
+def test_signed_client_mutation_capability_policy_matrix(monkeypatch):
+    from btc_quant_agent.execution.binance_signed import BinanceSignedClient
+
+    # In conftest hermetic guard, _signed_request is wrapped to block Binance domains.
+    # Unwrap original _signed_request to test BinanceSignedClient's own authority validation.
+    if getattr(BinanceSignedClient._signed_request, "__closure__", None):
+        for cell in BinanceSignedClient._signed_request.__closure__:
+            if getattr(cell.cell_contents, "__name__", "") == "_signed_request":
+                monkeypatch.setattr(BinanceSignedClient, "_signed_request", cell.cell_contents)
+                break
+
+    transport = MagicMock()
+    fake_resp = MagicMock()
+    fake_resp.read.return_value = b'{"status": "OK"}'
+    fake_resp.__enter__.return_value = fake_resp
+    fake_resp.__exit__.return_value = False
+    transport.return_value = fake_resp
+    monkeypatch.setattr("urllib.request.urlopen", transport)
+
+    # 1. TEST environment string alone => blocked before transport
+    c_test_env = BinanceSignedClient(
+        "https://testnet.binancefuture.com", "k", "s",
+        environment="TEST", credential_namespace="BINANCE_TESTNET",
+    )
+    with pytest.raises(ExecutionBlocked):
+        c_test_env._signed_request("POST", "/fapi/v1/order", {"symbol": "BTCUSDT"})
+    transport.assert_not_called()
+
+    # 2. .test URL alone => blocked before transport
+    c_test_url = BinanceSignedClient(
+        "https://binance.test", "k", "s",
+        environment="TESTNET", credential_namespace="BINANCE_TESTNET",
+    )
+    with pytest.raises(ExecutionBlocked):
+        c_test_url._signed_request("POST", "/fapi/v1/order", {"symbol": "BTCUSDT"})
+    transport.assert_not_called()
+
+    # 3. TESTNET namespace + wrong endpoint => blocked before transport
+    c_wrong_url = BinanceSignedClient(
+        "https://wrong-endpoint.com", "k", "s",
+        environment="TESTNET", credential_namespace="BINANCE_TESTNET",
+    )
+    with pytest.raises(ExecutionBlocked):
+        c_wrong_url._signed_request("POST", "/fapi/v1/order", {"symbol": "BTCUSDT"})
+    transport.assert_not_called()
+
+    # 4. wrong namespace + TESTNET endpoint => blocked before transport
+    c_wrong_ns = BinanceSignedClient(
+        "https://testnet.binancefuture.com", "k", "s",
+        environment="TESTNET", credential_namespace="PROD_NAMESPACE",
+    )
+    with pytest.raises(ExecutionBlocked):
+        c_wrong_ns._signed_request("POST", "/fapi/v1/order", {"symbol": "BTCUSDT"})
+    transport.assert_not_called()
+
+    # 5. LIVE/production endpoint => permanently blocked before transport
+    c_live = BinanceSignedClient(
+        "https://fapi.binance.com", "k", "s",
+        environment="LIVE", credential_namespace="BINANCE_LIVE",
+    )
+    with pytest.raises(ExecutionBlocked):
+        c_live._signed_request("POST", "/fapi/v1/order", {"symbol": "BTCUSDT"})
+    transport.assert_not_called()
+
+    # 6. TESTNET authority + official TESTNET endpoint => allowed to reach transport
+    c_valid = BinanceSignedClient(
+        "https://testnet.binancefuture.com", "k", "s",
+        environment="TESTNET", credential_namespace="BINANCE_TESTNET",
+    )
+    res = c_valid._signed_request("POST", "/fapi/v1/order", {"symbol": "BTCUSDT"})
+    assert res == {"status": "OK"}
+    transport.assert_called_once()
+
+
 @pytest.mark.parametrize("target", ["authorization", "account", "market", "intent"])
 def test_persisted_authority_payload_tamper_precedes_all_mutations(tmp_path, target):
     import json
