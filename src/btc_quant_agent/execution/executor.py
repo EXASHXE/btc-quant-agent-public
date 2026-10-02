@@ -168,15 +168,33 @@ class LiveExecutionService:
         else:
             backend = self.dry_run_backend
 
-        self.intent_store.update_status(intent_id, "SUBMITTING", reason="SUBMITTING_ORDER", now_ms=now)
+        if isinstance(backend, TestnetExecutionBackend):
+            receipt = self.validator.authorize(intent_id, market_obs, account_snap, now)
+            mutation_task = asyncio.create_task(
+                asyncio.to_thread(backend.submit_authorized, receipt.authorization_id, now)
+            )
+        else:
+            self.intent_store.update_status(intent_id, "SUBMITTING", reason="SUBMITTING_ORDER", now_ms=now)
+            mutation_task = asyncio.create_task(
+                asyncio.to_thread(backend.submit_intent, intent, now)
+            )
 
-        report = backend.submit_intent(intent, now)
+        cancelled_exc: asyncio.CancelledError | None = None
+        try:
+            report = await asyncio.shield(mutation_task)
+        except asyncio.CancelledError as exc:
+            cancelled_exc = exc
+            report = await mutation_task
+
         self.intent_store.update_status(intent_id, report.status, reason=report.reason, now_ms=now)
 
         # If fill occurred and supervisor is present, orchestrate end-to-end position supervision
         if report.filled_qty > 0 and self.supervisor is not None:
             obs = self._build_position_observation(intent, report, account_snap, market_obs, now)
             await self.supervisor.process(obs, now)
+
+        if cancelled_exc is not None:
+            raise cancelled_exc
 
         return report
 
@@ -211,7 +229,22 @@ class LiveExecutionService:
         else:
             backend = self.dry_run_backend
 
-        report = backend.reconcile_intent(intent, now)
+        if isinstance(backend, TestnetExecutionBackend):
+            mutation_task = asyncio.create_task(
+                asyncio.to_thread(backend.reconcile_authorized, intent_id, now)
+            )
+        else:
+            mutation_task = asyncio.create_task(
+                asyncio.to_thread(backend.reconcile_intent, intent, now)
+            )
+
+        cancelled_exc: asyncio.CancelledError | None = None
+        try:
+            report = await asyncio.shield(mutation_task)
+        except asyncio.CancelledError as exc:
+            cancelled_exc = exc
+            report = await mutation_task
+
         self.intent_store.update_status(intent_id, report.status, reason=report.reason, now_ms=now)
 
         if report.filled_qty > 0 and self.supervisor is not None:
@@ -220,6 +253,9 @@ class LiveExecutionService:
             if market_obs is not None and account_snap is not None:
                 obs = self._build_position_observation(intent, report, account_snap, market_obs, now)
                 await self.supervisor.process(obs, now)
+
+        if cancelled_exc is not None:
+            raise cancelled_exc
 
         return report
 

@@ -4,18 +4,23 @@ from __future__ import annotations
 
 import hashlib
 import json
+from decimal import ROUND_DOWN, Decimal
 from pathlib import Path
 from typing import Annotated, Any, Literal, Self
 
 from pydantic import Field, ValidationInfo, model_validator
 
 from ..account_watch.models import AccountSnapshotV1
+from ..account_watch.store import AccountStore
 from ..approval.store import LiveStore
 from ..decision.models import (
+    CasePackageV1,
     Hash,
     ImmutableModel,
+    TradeProposalV1,
     content_hash,
 )
+from ..decision.risk import RiskPolicyV1
 from ..live_db import connection
 from .guard import ExecutionBlocked
 
@@ -68,6 +73,50 @@ class TradeIntentV1(ImmutableModel):
         self.model_validate_json(self.canonical_json())
 
 
+def compile_executable_intent_fields(
+    case: CasePackageV1, proposal: TradeProposalV1,
+    account_snapshot: AccountSnapshotV1, risk_policy: RiskPolicyV1 | None = None,
+) -> dict[str, Any]:
+    """The single approved executable contract, shared by builder and validator."""
+    case.verify()
+    proposal.verify()
+    account_snapshot.verify()
+    if proposal.case_id != case.case_id or proposal.case_hash != case.case_hash:
+        raise ExecutionBlocked("EXECUTABLE_CASE_BINDING_MISMATCH")
+    if risk_policy is not None and proposal.risk_policy_hash != risk_policy.policy_hash:
+        raise ExecutionBlocked("RISK_POLICY_HASH_MISMATCH")
+    if proposal.action not in {"OPEN_LONG", "OPEN_SHORT", "ADD"}:
+        raise ExecutionBlocked("UNSUPPORTED_EXECUTABLE_ACTION")
+    side = "SELL" if case.direction == "SHORT" else "BUY"
+    if (proposal.action == "OPEN_LONG" and side != "BUY"
+            or proposal.action == "OPEN_SHORT" and side != "SELL"):
+        raise ExecutionBlocked("EXECUTABLE_DIRECTION_MISMATCH")
+    if account_snapshot.environment == "TESTNET":
+        if (account_snapshot.credential_namespace != "BINANCE_TESTNET"
+                or account_snapshot.rest_base_url != "https://testnet.binancefuture.com"):
+            raise ExecutionBlocked("EXECUTABLE_ACCOUNT_AUTHORITY_MISMATCH")
+    elif (account_snapshot.environment != "DRY_RUN"
+          or account_snapshot.credential_namespace != "NONE"
+          or account_snapshot.rest_base_url != "local://paper"):
+        raise ExecutionBlocked("EXECUTABLE_ACCOUNT_AUTHORITY_MISMATCH")
+    price = round((proposal.entry_low + proposal.entry_high) / 2.0, 2)
+    if price <= 0 or not proposal.entry_low <= price <= proposal.entry_high:
+        raise ExecutionBlocked("EXECUTABLE_PRICE_INVALID")
+    quantity = float((Decimal(str(proposal.recommended_notional_usdt)) / Decimal(str(price)))
+                     .quantize(Decimal("0.0001"), rounding=ROUND_DOWN))
+    if quantity <= 0:
+        raise ExecutionBlocked("computed order quantity must be positive")
+    return {
+        "symbol": case.symbol, "side": side, "order_type": "LIMIT",
+        "price": price, "quantity": quantity, "leverage": proposal.leverage,
+        "stop_loss": proposal.stop_loss, "take_profit_1": proposal.take_profit_1,
+        "take_profit_2": proposal.take_profit_2 if proposal.take_profit_2 > 0 else None,
+        "risk_policy_hash": proposal.risk_policy_hash,
+        "environment": account_snapshot.environment,
+        "account_authority": account_snapshot.account_id,
+    }
+
+
 def build_trade_intent(
     live_store: LiveStore,
     account_snapshot: AccountSnapshotV1,
@@ -79,6 +128,7 @@ def build_trade_intent(
     idempotency_key: str | None = None,
     client_order_id: str | None = None,
     intent_store: IntentStore | None = None,
+    risk_policy: RiskPolicyV1 | None = None,
 ) -> TradeIntentV1:
     account_snapshot.verify()
     if account_snapshot.quality != "OK" or not account_snapshot.reconciled:
@@ -137,19 +187,8 @@ def build_trade_intent(
     }
     approval_hash = content_hash(approval_dict)
 
-    if proposal.action in ("OPEN_LONG", "ADD"):
-        side = "BUY"
-    elif proposal.action == "OPEN_SHORT":
-        side = "SELL"
-    else:
-        raise ExecutionBlocked(f"unsupported proposal action for intent: {proposal.action}")
-
-    midpoint = (proposal.entry_low + proposal.entry_high) / 2.0
-    price = round(midpoint, 2)
-    quantity = round(proposal.recommended_notional_usdt / price, 4) if price > 0 else 0.0
-
-    if quantity <= 0:
-        raise ExecutionBlocked("computed order quantity must be positive")
+    executable = compile_executable_intent_fields(case, proposal, account_snapshot, risk_policy)
+    AccountStore(live_store.path).save(account_snapshot)
 
     # One approval authority (case_hash, proposal_hash, approval_event_id)
     # maps deterministically to exactly one executable TradeIntent authority
@@ -164,10 +203,6 @@ def build_trade_intent(
         if existing is not None:
             return existing
 
-    env_val: Literal["DRY_RUN", "TESTNET"] = (
-        "TESTNET" if account_snapshot.environment == "TESTNET" else "DRY_RUN"
-    )
-
     return TradeIntentV1.build(
         intent_id=intent_id,
         case_id=case.case_id,
@@ -177,23 +212,12 @@ def build_trade_intent(
         approval_event_id=approval_event_id,
         approval_actor=actor,
         approval_hash=approval_hash,
-        risk_policy_hash=proposal.risk_policy_hash,
         account_snapshot_hash=account_snapshot.snapshot_hash,
-        environment=env_val,
-        account_authority=account_snapshot.account_id,
-        symbol=case.symbol,
-        side=side,
-        order_type="LIMIT",
-        quantity=quantity,
-        price=price,
-        leverage=proposal.leverage,
-        stop_loss=proposal.stop_loss,
-        take_profit_1=proposal.take_profit_1,
-        take_profit_2=proposal.take_profit_2 if proposal.take_profit_2 > 0 else None,
         created_at_ms=now_ms,
         expires_at_ms=min(case.expires_at_ms, proposal.expires_at_ms),
         idempotency_key=idem_key,
         client_order_id=client_oid,
+        **executable,
     )
 
 
@@ -264,29 +288,42 @@ class IntentStore:
     def get_intent_by_approval_event(self, approval_event_id: str) -> TradeIntentV1 | None:
         with connection(self.path) as db:
             row = db.execute(
-                "SELECT payload FROM live_trade_intents WHERE approval_event_id=?", (approval_event_id,)
+                "SELECT * FROM live_trade_intents WHERE approval_event_id=?", (approval_event_id,)
             ).fetchone()
             if row is None:
                 return None
-            return TradeIntentV1.model_validate(json.loads(row["payload"]))
+            return self._verified_row(row)
 
     def get_intent(self, intent_id: str) -> TradeIntentV1 | None:
         with connection(self.path) as db:
             row = db.execute(
-                "SELECT payload FROM live_trade_intents WHERE intent_id=?", (intent_id,)
+                "SELECT * FROM live_trade_intents WHERE intent_id=?", (intent_id,)
             ).fetchone()
             if row is None:
                 return None
-            return TradeIntentV1.model_validate(json.loads(row["payload"]))
+            return self._verified_row(row)
 
     def get_intent_by_idempotency_key(self, idempotency_key: str) -> TradeIntentV1 | None:
         with connection(self.path) as db:
             row = db.execute(
-                "SELECT payload FROM live_trade_intents WHERE idempotency_key=?", (idempotency_key,)
+                "SELECT * FROM live_trade_intents WHERE idempotency_key=?", (idempotency_key,)
             ).fetchone()
             if row is None:
                 return None
-            return TradeIntentV1.model_validate(json.loads(row["payload"]))
+            return self._verified_row(row)
+
+    @staticmethod
+    def _verified_row(row: Any) -> TradeIntentV1:
+        intent = TradeIntentV1.model_validate(json.loads(row["payload"]))
+        for key in ("intent_id", "intent_hash", "approval_event_id", "client_order_id", "idempotency_key", "proposal_hash", "case_hash"):
+            if getattr(intent, key) != row[key]:
+                raise ExecutionBlocked("PERSISTED_INTENT_IDENTITY_MISMATCH")
+        return intent
+
+    def unfinished_intent_ids(self) -> tuple[str, ...]:
+        with connection(self.path) as db:
+            rows = db.execute("SELECT intent_id FROM live_trade_intents WHERE status IN ('SUBMITTING','UNKNOWN','NEW','PARTIALLY_FILLED','FILLED') ORDER BY created_at_ms").fetchall()
+        return tuple(str(row["intent_id"]) for row in rows)
 
     def update_status(self, intent_id: str, new_status: str, reason: str = "", now_ms: int = 0) -> None:
         with connection(self.path) as db:

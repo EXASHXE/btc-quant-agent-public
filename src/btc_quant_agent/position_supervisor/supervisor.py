@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import secrets
 import sqlite3
+import time
 from collections.abc import Callable
 from pathlib import Path
 from typing import Any
@@ -55,11 +56,13 @@ class PositionSupervisor:
         analysis_service: Any = None,
         fresh_market_case: Callable[[str], CasePackageV1] | None = None,
         policy: SupervisorPolicyV1 | None = None,
+        lease_clock_ms: Callable[[], int] | None = None,
     ) -> None:
         self.path = Path(path)
         self.analysis_service = analysis_service
         self.fresh_market_case = fresh_market_case
         self.policy = policy or SupervisorPolicyV1()
+        self.lease_clock_ms = lease_clock_ms
 
         with connection(self.path) as db:
             cols = [
@@ -301,10 +304,17 @@ class PositionSupervisor:
             return ()
 
         dispatched_events: list[PositionEventV1] = []
+        started = time.monotonic()
+
+        def lease_now_ms() -> int:
+            if self.lease_clock_ms is not None:
+                return self.lease_clock_ms()
+            return now_ms + int((time.monotonic() - started) * 1000)
 
         while True:
             lease_token = secrets.token_hex(16)
             claimed_row: sqlite3.Row | None = None
+            claim_now = lease_now_ms()
 
             with connection(self.path) as db:
                 db.execute("BEGIN IMMEDIATE")
@@ -318,7 +328,7 @@ class PositionSupervisor:
                     ORDER BY created_at_ms ASC
                     LIMIT 1
                     """,
-                    (now_ms,),
+                    (claim_now,),
                 ).fetchone()
 
                 if candidate is None:
@@ -334,7 +344,7 @@ class PositionSupervisor:
                         SET state = 'FAILED_CLOSED', lease_token = NULL, updated_at_ms = ?
                         WHERE event_id = ?
                         """,
-                        (now_ms, event_id),
+                        (claim_now, event_id),
                     )
                     continue
 
@@ -349,7 +359,7 @@ class PositionSupervisor:
                     WHERE event_id = ?
                       AND (state = 'PENDING' OR (state = 'DISPATCHING' AND lease_expires_at_ms <= ?))
                     """,
-                    (lease_token, now_ms + lease_ms, now_ms, event_id, now_ms),
+                    (lease_token, claim_now + lease_ms, claim_now, event_id, claim_now),
                 )
                 if cursor.rowcount == 1:
                     claimed_row = candidate
@@ -450,8 +460,9 @@ class PositionSupervisor:
                     continue
 
                 # Commit durable freeze to SQLite before external side effect
+                freeze_now = lease_now_ms()
                 with connection(self.path) as db:
-                    db.execute(
+                    frozen = db.execute(
                         """
                         UPDATE live_position_case_dispatches
                         SET position_case_id = ?,
@@ -459,24 +470,50 @@ class PositionSupervisor:
                             position_case_json = ?,
                             case_hash = ?,
                             updated_at_ms = ?
-                        WHERE event_id = ? AND lease_token = ?
+                        WHERE event_id = ? AND state = 'DISPATCHING'
+                          AND lease_token = ? AND lease_expires_at_ms > ?
+                          AND position_case_json = ''
                         """,
                         (
                             pos_case.case_id,
                             pos_case.case_hash,
                             pos_case.canonical_json(),
                             pos_case.case_hash,
-                            now_ms,
+                            freeze_now,
                             event_id,
                             lease_token,
+                            freeze_now,
                         ),
                     )
+                if frozen.rowcount != 1:
+                    break
+
+            # A lease can expire while materializing the case. Renew only if this
+            # worker still owns the exact frozen authority before external analysis.
+            analysis_now = lease_now_ms()
+            with connection(self.path) as db:
+                owned = db.execute(
+                    """
+                    UPDATE live_position_case_dispatches
+                    SET lease_expires_at_ms = ?, updated_at_ms = ?
+                    WHERE event_id = ? AND state = 'DISPATCHING'
+                      AND lease_token = ? AND lease_expires_at_ms > ?
+                      AND position_case_id = ? AND position_case_hash = ?
+                      AND position_case_json = ?
+                    """,
+                    (analysis_now + lease_ms, analysis_now, event_id, lease_token,
+                     analysis_now, pos_case.case_id, pos_case.case_hash,
+                     pos_case.canonical_json()),
+                )
+            if owned.rowcount != 1:
+                break
 
             try:
                 await self.analysis_service.analyze_case(pos_case)
 
+                done_now = lease_now_ms()
                 with connection(self.path) as db:
-                    db.execute(
+                    done = db.execute(
                         """
                         UPDATE live_position_case_dispatches
                         SET state = 'DONE',
@@ -485,10 +522,15 @@ class PositionSupervisor:
                             lease_token = NULL,
                             lease_expires_at_ms = 0,
                             updated_at_ms = ?
-                        WHERE event_id = ? AND lease_token = ?
+                        WHERE event_id = ? AND state = 'DISPATCHING'
+                          AND lease_token = ? AND lease_expires_at_ms > ?
+                          AND position_case_id = ? AND position_case_json = ?
                         """,
-                        (pos_case.case_hash, pos_case.case_hash, now_ms, event_id, lease_token),
+                        (pos_case.case_hash, pos_case.case_hash, done_now, event_id,
+                         lease_token, done_now, pos_case.case_id, pos_case.canonical_json()),
                     )
+                if done.rowcount != 1:
+                    break
                 dispatched_events.append(event)
             except Exception:  # noqa: BLE001
                 with connection(self.path) as db:
@@ -499,7 +541,7 @@ class PositionSupervisor:
                             lease_token = NULL,
                             lease_expires_at_ms = 0,
                             updated_at_ms = ?
-                        WHERE event_id = ? AND lease_token = ?
+                        WHERE event_id = ? AND state = 'DISPATCHING' AND lease_token = ?
                         """,
                         (max_retries, now_ms, event_id, lease_token),
                     )

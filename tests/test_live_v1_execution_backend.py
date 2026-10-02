@@ -7,7 +7,9 @@ from unittest.mock import MagicMock
 import pytest
 from test_live_v1_account_watch import sample_snapshot
 from test_live_v1_execution_intent import setup_approved_state
+from test_live_v1_execution_validator import sample_market_obs
 
+from btc_quant_agent.execution.authorization import AuthorizationStore
 from btc_quant_agent.execution.backend import DryRunExecutionBackend, TestnetExecutionBackend
 from btc_quant_agent.execution.binance_signed import (
     BinanceExecutionError,
@@ -16,8 +18,9 @@ from btc_quant_agent.execution.binance_signed import (
     create_testnet_signed_client,
 )
 from btc_quant_agent.execution.guard import ExecutionBlocked
-from btc_quant_agent.execution.intents import build_trade_intent
+from btc_quant_agent.execution.intents import IntentStore, build_trade_intent
 from btc_quant_agent.execution.policy import ExecutionCapabilityPolicyV1
+from btc_quant_agent.execution.validator import PreExecutionValidator
 from btc_quant_agent.live_db import connection
 from btc_quant_agent.position_supervisor.kill_switch import KillSwitch
 
@@ -45,6 +48,26 @@ def make_mock_testnet_client(
         {"symbol": "BTCUSDT", "positionSide": "BOTH", "positionAmt": str(amt)}
     ]
     return mock_client
+
+
+def authorize_testnet_intent(backend, store, intent, kill_switch, *, claimed=False):
+    """Persist and validate the entry before exercising a fake TESTNET client."""
+    intent_store = IntentStore(backend.path)
+    intent_store.save_intent(intent)
+    validator = PreExecutionValidator(
+        store, intent_store, kill_switch,
+        tactical_validity_provider=lambda _symbol, _now: True,
+    )
+    backend.validator = validator
+    current_account = sample_snapshot(
+        observed_at_ms=NOW, last_rest_at_ms=NOW, positions=(), orders=(),
+    )
+    receipt = validator.authorize(
+        intent.intent_id, sample_market_obs(mark_price=intent.price), current_account, NOW,
+    )
+    if claimed:
+        assert AuthorizationStore(backend.path).claim(receipt, NOW)
+    return receipt.authorization_id
 
 
 def test_live_execution_permanently_blocked(monkeypatch):
@@ -142,7 +165,11 @@ def test_testnet_transport_uncertainty_queries_before_retry(tmp_path):
     mock_client.place_protective_order.return_value = {"algoId": "algo-stop-1"}
 
     backend = TestnetExecutionBackend(tmp_path / "live.db", mock_client, kill_switch)
-    report = backend.submit_intent(intent, NOW)
+    authorization_id = authorize_testnet_intent(
+        backend, store, intent, kill_switch,
+        claimed=False,
+    )
+    report = backend.submit_authorized(authorization_id, NOW)
 
     # Proves transport uncertainty was resolved by querying clientOrderId
     assert report.order_id == "987654"
@@ -171,10 +198,14 @@ def test_testnet_transport_uncertainty_fails_closed_when_query_fails(tmp_path):
     mock_client.query_order_by_client_id.side_effect = BinanceExecutionError("Query timeout")
 
     backend = TestnetExecutionBackend(tmp_path / "live.db", mock_client, kill_switch)
+    authorization_id = authorize_testnet_intent(
+        backend, store, intent, kill_switch,
+        claimed=False,
+    )
 
     # Must FAIL CLOSED! Never blindly retry
     with pytest.raises(ExecutionBlocked, match="Transport uncertainty"):
-        backend.submit_intent(intent, NOW)
+        backend.submit_authorized(authorization_id, NOW)
 
 
 def test_testnet_protective_stop_failure_activates_kill_switch(tmp_path):
@@ -206,10 +237,14 @@ def test_testnet_protective_stop_failure_activates_kill_switch(tmp_path):
     mock_client.place_protective_order.side_effect = BinanceExecutionError("Insufficient balance for algo order")
 
     backend = TestnetExecutionBackend(tmp_path / "live.db", mock_client, kill_switch)
+    authorization_id = authorize_testnet_intent(
+        backend, store, intent, kill_switch,
+        claimed=False,
+    )
 
     # Placing fails closed
     with pytest.raises(ExecutionBlocked, match="failed to place required protective stop"):
-        backend.submit_intent(intent, NOW)
+        backend.submit_authorized(authorization_id, NOW)
 
     # Kill switch must now be tripped and block any new risk!
     assert not kill_switch.allows_new_risk()
@@ -291,7 +326,11 @@ def test_r1_04_delayed_partial_fill_and_resizing_protection(tmp_path):
         "updateTime": NOW,
     }
     backend = TestnetExecutionBackend(tmp_path / "live.db", mock_client, kill_switch)
-    rep1 = backend.submit_intent(intent, NOW)
+    authorization_id = authorize_testnet_intent(
+        backend, store, intent, kill_switch,
+        claimed=False,
+    )
+    rep1 = backend.submit_authorized(authorization_id, NOW)
     assert rep1.status == "NEW"
     assert rep1.filled_qty == 0.0
     assert rep1.protective_stop_id is None
@@ -310,7 +349,7 @@ def test_r1_04_delayed_partial_fill_and_resizing_protection(tmp_path):
     mock_client.open_protective_orders.return_value = []
     mock_client.place_protective_order.return_value = {"algoId": "stop-part-1"}
 
-    rep2 = backend.reconcile_intent(intent, NOW + 10_000)
+    rep2 = backend.reconcile_authorized(intent.intent_id, NOW + 10_000)
     assert rep2.status == "PARTIALLY_FILLED"
     assert rep2.filled_qty == partial_qty
     assert rep2.protective_stop_id == "stop-part-1"
@@ -339,7 +378,7 @@ def test_r1_04_delayed_partial_fill_and_resizing_protection(tmp_path):
     mock_client.place_protective_order.reset_mock()
     mock_client.place_protective_order.return_value = {"algoId": "stop-full-2"}
 
-    rep3 = backend.reconcile_intent(intent, NOW + 20_000)
+    rep3 = backend.reconcile_authorized(intent.intent_id, NOW + 20_000)
     assert rep3.status == "FILLED"
     assert rep3.filled_qty == full_qty
     assert rep3.protective_stop_id == "stop-full-2"
@@ -363,6 +402,10 @@ def test_r1_04_reconciliation_replay_idempotence(tmp_path):
     mock_client = make_mock_testnet_client()
     kill_switch = KillSwitch(tmp_path / "live.db")
     backend = TestnetExecutionBackend(tmp_path / "live.db", mock_client, kill_switch)
+    authorize_testnet_intent(
+        backend, store, intent, kill_switch,
+        claimed=True,
+    )
 
     full_qty = intent.quantity
     mock_client.query_order_by_client_id.return_value = {
@@ -382,7 +425,7 @@ def test_r1_04_reconciliation_replay_idempotence(tmp_path):
         }
     ]
 
-    rep = backend.reconcile_intent(intent, NOW)
+    rep = backend.reconcile_authorized(intent.intent_id, NOW)
     assert rep.status == "FILLED"
     assert rep.filled_qty == full_qty
     assert rep.protective_stop_id == "stop-full-200"
@@ -405,6 +448,10 @@ def test_r1_04_protective_query_uncertainty_fails_closed(tmp_path):
     mock_client = make_mock_testnet_client()
     kill_switch = KillSwitch(tmp_path / "live.db")
     backend = TestnetExecutionBackend(tmp_path / "live.db", mock_client, kill_switch)
+    authorize_testnet_intent(
+        backend, store, intent, kill_switch,
+        claimed=True,
+    )
 
     mock_client.query_order_by_client_id.return_value = {
         "orderId": "ord-300",
@@ -418,7 +465,7 @@ def test_r1_04_protective_query_uncertainty_fails_closed(tmp_path):
     mock_client.open_protective_orders.side_effect = BinanceExecutionError("504 Gateway Timeout")
 
     with pytest.raises(ExecutionBlocked, match="protective query uncertainty"):
-        backend.reconcile_intent(intent, NOW)
+        backend.reconcile_authorized(intent.intent_id, NOW)
 
     # Must trip kill switch and block new risk!
     assert not kill_switch.allows_new_risk()
@@ -552,6 +599,10 @@ def test_r1_1_02_protection_limited_to_actual_open_position(tmp_path):
     mock_client = make_mock_testnet_client(position_amt=current_open)
     kill_switch = KillSwitch(tmp_path / "live.db")
     backend = TestnetExecutionBackend(tmp_path / "live.db", mock_client, kill_switch)
+    authorize_testnet_intent(
+        backend, store, intent, kill_switch,
+        claimed=True,
+    )
 
     mock_client.query_order_by_client_id.return_value = {
         "orderId": "ord-reduced",
@@ -564,7 +615,7 @@ def test_r1_1_02_protection_limited_to_actual_open_position(tmp_path):
     mock_client.open_protective_orders.return_value = []
     mock_client.place_protective_order.return_value = {"algoId": "stop-reduced-1"}
 
-    rep = backend.reconcile_intent(intent, NOW)
+    rep = backend.reconcile_authorized(intent.intent_id, NOW)
     assert rep.status == "FILLED"
     assert rep.protective_stop_id == "stop-reduced-1"
     # Sized to current_open, NEVER exceeding actual open position!
@@ -587,6 +638,10 @@ def test_r1_1_02_flat_position_cancels_stale_protection(tmp_path):
     mock_client = make_mock_testnet_client(position_amt=0.0)
     kill_switch = KillSwitch(tmp_path / "live.db")
     backend = TestnetExecutionBackend(tmp_path / "live.db", mock_client, kill_switch)
+    authorize_testnet_intent(
+        backend, store, intent, kill_switch,
+        claimed=True,
+    )
 
     mock_client.query_order_by_client_id.return_value = {
         "orderId": "ord-flat",
@@ -606,7 +661,7 @@ def test_r1_1_02_flat_position_cancels_stale_protection(tmp_path):
     ]
     mock_client.cancel_protective_order.return_value = {"algoId": "stop-stale-flat", "status": "CANCELED"}
 
-    rep = backend.reconcile_intent(intent, NOW)
+    rep = backend.reconcile_authorized(intent.intent_id, NOW)
     assert rep.status == "FILLED"
     assert rep.protective_stop_id is None
     # Stale order cancelled
@@ -629,6 +684,10 @@ def test_r1_1_02_position_query_uncertainty_trips_kill_switch(tmp_path):
     mock_client = make_mock_testnet_client()
     kill_switch = KillSwitch(tmp_path / "live.db")
     backend = TestnetExecutionBackend(tmp_path / "live.db", mock_client, kill_switch)
+    authorize_testnet_intent(
+        backend, store, intent, kill_switch,
+        claimed=True,
+    )
 
     mock_client.query_order_by_client_id.return_value = {
         "orderId": "ord-pos-fail",
@@ -642,7 +701,7 @@ def test_r1_1_02_position_query_uncertainty_trips_kill_switch(tmp_path):
     mock_client.positions.side_effect = BinanceExecutionError("Network timeout on /fapi/v3/positionRisk")
 
     with pytest.raises(ExecutionBlocked, match="position query uncertainty"):
-        backend.reconcile_intent(intent, NOW)
+        backend.reconcile_authorized(intent.intent_id, NOW)
 
     assert not kill_switch.allows_new_risk()
 

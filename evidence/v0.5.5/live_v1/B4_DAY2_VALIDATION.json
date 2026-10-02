@@ -1,13 +1,13 @@
 {
-  "task": "B4_LIVE_V1_POSITION_CASE_OUTBOX_SEAL_R1_2",
+  "task": "LIVE_V1_B4_B5_FINDINGS_REPAIR_R2",
   "repository": "EXASHXE/btc-quant-agent-public",
   "task_branch": "feature/b-line-live-v1",
   "start_binding_mode": "CURRENT_BRANCH_HEAD",
-  "actual_start_sha": "fd4e6fc19085e698c50eca70afe5e419cbd8e060",
-  "reviewed_candidate_sha": "fd4e6fc19085e698c50eca70afe5e419cbd8e060",
+  "actual_start_sha": "32c1c9976dc20cf003a06398c465c4c089dd99d9",
+  "reviewed_candidate_sha": "32c1c9976dc20cf003a06398c465c4c089dd99d9",
   "accepted_predecessor_sha": "961a0f4d4b37cdb9365d5e5867813ff3129c14db",
   "predecessor_ancestry": "IS_ANCESTOR_VERIFIED",
-  "parent_sha": "fd4e6fc19085e698c50eca70afe5e419cbd8e060",
+  "parent_sha": "32c1c9976dc20cf003a06398c465c4c089dd99d9",
   "initial_worktree_state": "CLEAN",
   "closed_blockers": {
     "R1_01_approval_intent_singleton": {
@@ -49,6 +49,22 @@
     "R1_2_01_frozen_position_case_outbox": {
       "status": "CLOSED",
       "mechanism": "PositionSupervisor persists exact PositionCase authority (position_case_id, position_case_hash, position_case_json, case_hash) into live_position_case_dispatches before external side effects; retry reuses exact stored case without re-querying fresh_market_case; tampered hash/JSON or event-linkage mismatch fails closed; additive migration maintains backward compatibility"
+    },
+    "R2_01_proposal_intent_compilation_binding": {
+      "status": "CLOSED",
+      "mechanism": "Shared compile_executable_intent_fields derives canonical executable fields (symbol, side, order_type, price, quantity, leverage, stop_loss, take_profit_1, take_profit_2, risk_policy_hash, account authority) used by both TradeIntent builder and PreExecutionValidator; validator recomputes approved contract and rejects any divergence with EXECUTABLE_CONTRACT_MISMATCH"
+    },
+    "R2_02_testnet_side_effect_persisted_authorization": {
+      "status": "CLOSED",
+      "mechanism": "PreExecutionAuthorizationV1 receipt durable storage in live_pre_execution_authorizations; TestnetExecutionBackend rejects unpersisted/tampered intents and exposes submit_authorized and reconcile_authorized requiring valid authorization_id; verifies hashes, account authority, and TTL before exchange mutation; in-flight mutation shielded against task cancellation"
+    },
+    "R2_03_position_lease_ownership_verification": {
+      "status": "CLOSED",
+      "mechanism": "PositionSupervisor verifies lease ownership at each lifecycle transition: case freeze checks rowcount == 1, renews and verifies lease ownership immediately before calling external analysis, and verifies lease on DONE transition; stale workers abort with zero downstream analysis calls"
+    },
+    "R2_04_live_v1_operational_runtime": {
+      "status": "CLOSED",
+      "mechanism": "LiveV1Runtime owns async lifecycles for market stream, TESTNET user data stream, periodic REST reconciliation loop, position outbox recovery drain, and position supervisor polling; integrated into FastAPI lifespan; requires explicit testnet_execution_enabled opt-in; rejects LIVE and AUTONOMOUS configurations; starts unreconciled and recovers state before accepting risk"
     }
   },
   "sqlite_durability": {
@@ -71,17 +87,17 @@
     "compileall": "PASS: python -m compileall -q src tests",
     "git_diff_check": "PASS: git diff --check",
     "ruff": "PASS: ruff check .",
-    "mypy": "PASS: mypy src (148 source files)",
+    "mypy": "PASS: mypy src (150 source files)",
     "live_v1_tests": {
-      "passed": 163,
+      "passed": 212,
       "failed": 0
     },
     "execution_tests": {
-      "passed": 50,
+      "passed": 69,
       "failed": 0
     },
     "full_pytest": {
-      "passed": 2172,
+      "passed": 2221,
       "skipped": 2,
       "warnings": 9
     }
@@ -101,6 +117,6 @@
     "actual_codex_model_invocation": "PENDING (credentials absent)",
     "testnet_credentialed_exchange_smoke": "PENDING (credentials absent)"
   },
-  "remaining_blockers": "None. All R1, R1.1, and R1.2 safety blockers closed. Real-money LIVE execution remains permanently forbidden.",
-  "decision": "LIVE_V1_B4_SAFETY_CLOSED_R1_2_PENDING_B5_EXACT_SHA_VALIDATION"
+  "remaining_blockers": "None. All R1, R1.1, R1.2, and R2 safety blockers closed. Real-money LIVE execution remains permanently forbidden.",
+  "decision": "LIVE_V1_B4_B5_FINDINGS_REPAIRED_PENDING_B5_REVALIDATION"
 }

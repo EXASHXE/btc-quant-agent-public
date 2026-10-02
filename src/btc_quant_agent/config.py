@@ -336,6 +336,12 @@ class LiveV1Config:
     """Separate, opt-in Day-1 service configuration. Credentials stay in env/client boundaries."""
 
     enabled: bool = False
+    runtime_enabled: bool = False
+    execution_mode: str = "DRY_RUN"
+    testnet_execution_enabled: bool = False
+    rest_reconcile_seconds: float = 30.0
+    account_id: str = "DEFAULT_ACCOUNT"
+    symbol: str = "BTCUSDT"
     sqlite_path: str = "./var/live_v1.db"
     responses_model: str = ""
     codex_model: str = ""
@@ -347,6 +353,16 @@ class LiveV1Config:
     feishu_approver_open_ids: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
+        if self.execution_mode in {"SHADOW", "PAPER"}:
+            object.__setattr__(self, "execution_mode", "DRY_RUN")
+        if self.execution_mode not in {"DRY_RUN", "TESTNET"}:
+            raise ValueError("live_v1.execution_mode must be DRY_RUN or TESTNET")
+        if self.execution_mode == "TESTNET" and not self.testnet_execution_enabled:
+            raise ValueError("TESTNET requires explicit execution opt-in")
+        if not 30 <= self.rest_reconcile_seconds <= 60:
+            raise ValueError("live_v1.rest_reconcile_seconds must be 30 to 60")
+        if not self.account_id or not self.symbol:
+            raise ValueError("live_v1 account and symbol are required")
         _require_positive_int(self.case_ttl_ms, "live_v1.case_ttl_ms")
         _require_nonnegative_real(self.analysis_timeout_seconds, "live_v1.analysis_timeout_seconds")
         if self.analysis_timeout_seconds == 0:
@@ -364,6 +380,12 @@ class LiveV1Config:
 
         return cls(
             enabled=flag("BTC_QUANT_LIVE_V1_ENABLED"),
+            runtime_enabled=flag("BTC_QUANT_LIVE_V1_RUNTIME_ENABLED"),
+            execution_mode=os.getenv("BTC_QUANT_LIVE_V1_EXECUTION_MODE", "DRY_RUN").upper(),
+            testnet_execution_enabled=flag("BTC_QUANT_LIVE_V1_TESTNET_EXECUTION_ENABLED"),
+            rest_reconcile_seconds=float(os.getenv("BTC_QUANT_LIVE_V1_REST_RECONCILE_SECONDS", "30")),
+            account_id=os.getenv("BTC_QUANT_LIVE_V1_ACCOUNT_ID", "DEFAULT_ACCOUNT"),
+            symbol=os.getenv("BTC_QUANT_LIVE_V1_SYMBOL", "BTCUSDT"),
             sqlite_path=os.getenv("BTC_QUANT_LIVE_V1_DB_PATH", "./var/live_v1.db"),
             responses_model=os.getenv("BTC_QUANT_LIVE_RESPONSES_MODEL", ""),
             codex_model=os.getenv("BTC_QUANT_LIVE_CODEX_MODEL", ""),

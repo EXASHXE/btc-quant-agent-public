@@ -7,7 +7,10 @@ import logging
 from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Protocol
+from typing import TYPE_CHECKING, Any, Protocol
+
+if TYPE_CHECKING:
+    from .validator import PreExecutionValidator
 
 from ..live_db import connection
 from ..position_supervisor.kill_switch import KillSwitch
@@ -34,8 +37,8 @@ class ExecutionReport:
 
 
 class ExecutionBackend(Protocol):
-    def submit_intent(self, intent: TradeIntentV1, now_ms: int) -> ExecutionReport: ...
-    def reconcile_intent(self, intent: TradeIntentV1, now_ms: int) -> ExecutionReport: ...
+    def submit_authorized(self, authorization_id: str, now_ms: int) -> ExecutionReport: ...
+    def reconcile_authorized(self, intent_id: str, now_ms: int) -> ExecutionReport: ...
 
 
 class DryRunExecutionBackend:
@@ -258,10 +261,14 @@ class TestnetExecutionBackend:
 
     __test__ = False
 
-    def __init__(self, db_path: str | Path, signed_client: BinanceSignedClient, kill_switch: KillSwitch) -> None:
+    def __init__(self, db_path: str | Path, signed_client: BinanceSignedClient, kill_switch: KillSwitch,
+                 *, validator: PreExecutionValidator | None = None) -> None:
         self.path = Path(db_path)
         self.client = signed_client
         self.kill_switch = kill_switch
+        self.validator = validator
+        from .authorization import AuthorizationStore
+        self.authorizations = AuthorizationStore(self.path)
         with connection(self.path) as db:
             db.executescript("""
                 CREATE TABLE IF NOT EXISTS live_execution_orders (
@@ -284,17 +291,58 @@ class TestnetExecutionBackend:
             """)
 
     def submit_intent(self, intent: TradeIntentV1, now_ms: int) -> ExecutionReport:
-        # 1. Capability check using client's actual authority metadata
-        auth = getattr(self.client, "authority", None)
-        if auth is None:
+        self._check_client_authority()
+        raise ExecutionBlocked("AUTHORIZATION_REQUIRED: submit a persisted authorization ID")
+
+    def _check_client_authority(self) -> None:
+        authority = getattr(self.client, "authority", None)
+        if authority is None:
             raise ExecutionBlocked("missing credential authority on signed client")
         ExecutionCapabilityPolicyV1.check_capability(
-            auth.environment,
-            "SUBMIT_INTENT",
-            env_id=auth.environment,
-            cred_ns=auth.credential_namespace,
-            rest_url=auth.rest_base_url,
+            authority.environment, "SUBMIT_INTENT", env_id=authority.environment,
+            cred_ns=authority.credential_namespace, rest_url=authority.rest_base_url,
         )
+        if authority.environment != "TESTNET":
+            raise ExecutionBlocked("TESTNET_CREDENTIAL_AUTHORITY_REQUIRED")
+
+    def submit_authorized(self, authorization_id: str, now_ms: int) -> ExecutionReport:
+        auth, intent, account, market = self.authorizations.load(authorization_id)
+        if not auth.validated_at_ms <= now_ms < auth.expires_at_ms or auth.expires_at_ms > auth.validated_at_ms + 5000:
+            raise ExecutionBlocked("AUTHORIZATION_EXPIRED")
+        if self.validator is None:
+            raise ExecutionBlocked("AUTHORIZATION_REQUIRED")
+        from ..account_watch.store import AccountStore
+        from ..decision.models import content_hash
+        from .intents import compile_executable_intent_fields
+        latest = AccountStore(self.path).latest(account.account_id)
+        if latest is None or latest.snapshot_hash != auth.account_snapshot_hash:
+            raise ExecutionBlocked("AUTHORIZATION_CURRENT_ACCOUNT_CHANGED")
+        result = self.validator.validate(intent, market, account, now_ms)
+        if not result.is_valid:
+            raise ExecutionBlocked(result.reason)
+        case = self.validator.live_store.get_case(intent.case_id)
+        proposal = self.validator.live_store.get_proposal(intent.proposal_hash)
+        compiled = compile_executable_intent_fields(case, proposal, account, self.validator.risk_policy)
+        if content_hash(compiled) != auth.execution_compilation_hash:
+            raise ExecutionBlocked("AUTHORIZATION_COMPILATION_MISMATCH")
+        # 1. Capability check using client's actual authority metadata
+        client_auth = getattr(self.client, "authority", None)
+        if client_auth is None:
+            raise ExecutionBlocked("missing credential authority on signed client")
+        ExecutionCapabilityPolicyV1.check_capability(
+            client_auth.environment,
+            "SUBMIT_INTENT",
+            env_id=client_auth.environment,
+            cred_ns=client_auth.credential_namespace,
+            rest_url=client_auth.rest_base_url,
+        )
+        if (client_auth.environment != auth.environment
+                or client_auth.credential_namespace != account.credential_namespace
+                or client_auth.rest_base_url != account.rest_base_url):
+            raise ExecutionBlocked("AUTHORIZATION_CLIENT_ENVIRONMENT_MISMATCH")
+
+        receipt, _, _, _ = self.authorizations.load(authorization_id)
+        claimed = self.authorizations.claim(receipt, now_ms)
 
         # 2. Check local database for existing order with this client_order_id (idempotency)
         with connection(self.path) as db:
@@ -303,6 +351,8 @@ class TestnetExecutionBackend:
                 (intent.client_order_id,),
             ).fetchone()
             if row is not None:
+                if row["intent_id"] != intent.intent_id:
+                    raise ExecutionBlocked("ORDER_INTENT_BINDING_MISMATCH")
                 return ExecutionReport(
                     intent_id=intent.intent_id,
                     status=row["status"],
@@ -313,6 +363,9 @@ class TestnetExecutionBackend:
                     avg_price=row["avg_price"],
                     reason="LOCAL_IDEMPOTENT_REPLAY",
                 )
+
+        if not claimed:
+            raise ExecutionBlocked("AUTHORIZATION_IN_FLIGHT_RECONCILIATION_REQUIRED")
 
         # 3. Setup margin type and leverage
         try:
@@ -479,6 +532,7 @@ class TestnetExecutionBackend:
             raise ExecutionBlocked(f"position query uncertainty: {exc}") from exc
 
     def _reconcile_protective_stop(self, intent: TradeIntentV1, filled_qty: float, now_ms: int) -> str | None:
+        self._require_claimed_intent(intent)
         open_qty = self._query_open_position(intent.symbol, intent.side, now_ms)
         target_qty = max(min(open_qty, filled_qty, intent.quantity), 0.0)
 
@@ -542,6 +596,7 @@ class TestnetExecutionBackend:
         return self._place_protective_stop(intent, target_qty, now_ms)
 
     def _place_protective_stop(self, intent: TradeIntentV1, target_qty: float, now_ms: int) -> str:
+        self._require_claimed_intent(intent)
         # Quantity MUST be <= actual filled position and current open position
         target_qty = min(target_qty, intent.quantity)
         exit_side = "SELL" if intent.side == "BUY" else "BUY"
@@ -592,6 +647,42 @@ class TestnetExecutionBackend:
             raise ExecutionBlocked(f"failed to place required protective stop: {exc}") from exc
 
     def reconcile_intent(self, intent: TradeIntentV1, now_ms: int) -> ExecutionReport:
+        raise ExecutionBlocked("AUTHORIZATION_REQUIRED: reconcile a persisted intent ID")
+
+    def _require_claimed_intent(self, intent: TradeIntentV1) -> None:
+        auth_id = self.authorizations.for_claimed_intent(intent.intent_id)
+        _auth, persisted, account, _market = self.authorizations.load(auth_id)
+        if persisted.intent_hash != intent.intent_hash or self.validator is None:
+            raise ExecutionBlocked("AUTHORIZATION_INTENT_MISMATCH")
+        from ..decision.models import content_hash
+        from .intents import compile_executable_intent_fields
+        with self.validator.live_store._connection() as db:
+            approval = db.execute(
+                "SELECT event_id, action, actor, proposal_hash, case_hash, at_ms FROM approval_records WHERE event_id=?",
+                (intent.approval_event_id,),
+            ).fetchone()
+        if (approval is None or approval["action"] != "APPROVE"
+                or approval["actor"] != intent.approval_actor
+                or approval["proposal_hash"] != intent.proposal_hash
+                or approval["case_hash"] != intent.case_hash
+                or content_hash(dict(approval)) != intent.approval_hash):
+            raise ExecutionBlocked("APPROVAL_AUTHORITY_MISMATCH")
+        self._check_client_authority()
+        client_auth = self.client.authority
+        if (client_auth.environment != account.environment
+                or client_auth.credential_namespace != account.credential_namespace
+                or client_auth.rest_base_url != account.rest_base_url):
+            raise ExecutionBlocked("AUTHORIZATION_CLIENT_ENVIRONMENT_MISMATCH")
+        case = self.validator.live_store.get_case(intent.case_id)
+        proposal = self.validator.live_store.get_proposal(intent.proposal_hash)
+        expected = compile_executable_intent_fields(case, proposal, account, self.validator.risk_policy)
+        if content_hash(expected) != _auth.execution_compilation_hash or any(getattr(intent, key) != value for key, value in expected.items()):
+            raise ExecutionBlocked("EXECUTABLE_CONTRACT_MISMATCH")
+
+    def reconcile_authorized(self, intent_id: str, now_ms: int) -> ExecutionReport:
+        auth_id = self.authorizations.for_claimed_intent(intent_id)
+        _receipt, intent, _account, _market = self.authorizations.load(auth_id)
+        self._require_claimed_intent(intent)
         auth = getattr(self.client, "authority", None)
         if auth is None:
             raise ExecutionBlocked("missing credential authority on signed client")
@@ -616,9 +707,13 @@ class TestnetExecutionBackend:
         with connection(self.path) as db:
             db.execute("BEGIN IMMEDIATE")
             db.execute(
-                "UPDATE live_execution_orders SET status=?, filled_qty=?, avg_price=?, exchange_time_ms=? "
-                "WHERE client_order_id=?",
-                (status, filled_qty, avg_price, int(raw.get("updateTime", now_ms)), intent.client_order_id),
+                "INSERT INTO live_execution_orders VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) "
+                "ON CONFLICT(client_order_id) DO UPDATE SET status=excluded.status, "
+                "filled_qty=excluded.filled_qty, avg_price=excluded.avg_price, "
+                "exchange_time_ms=excluded.exchange_time_ms, receipt_time_ms=excluded.receipt_time_ms, payload=excluded.payload",
+                (order_id, intent.intent_id, intent.client_order_id, intent.symbol, intent.side,
+                 status, intent.quantity, filled_qty, avg_price, None, 0, 0,
+                 int(raw.get("updateTime", now_ms)), now_ms, json.dumps(raw)),
             )
 
         has_stop = False

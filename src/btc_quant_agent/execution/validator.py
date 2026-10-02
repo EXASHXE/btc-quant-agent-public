@@ -4,15 +4,19 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from dataclasses import dataclass
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .authorization import PreExecutionAuthorizationV1
 
 from ..account_watch.models import AccountSnapshotV1
 from ..approval.store import LiveStore
-from ..decision.models import content_hash
+from ..decision.models import CasePackageV1, content_hash
 from ..decision.risk import RiskPolicyV1
 from ..live_db import connection
 from ..live_market.models import MarketObservationV1
 from ..position_supervisor.kill_switch import KillSwitch
-from .intents import IntentStore, TradeIntentV1
+from .intents import IntentStore, TradeIntentV1, compile_executable_intent_fields
 
 
 @dataclass(frozen=True)
@@ -29,6 +33,7 @@ class PreExecutionValidator:
         kill_switch: KillSwitch,
         risk_policy: RiskPolicyV1 | None = None,
         tactical_validity_provider: Callable[[str, int], bool] | None = None,
+        tactical_case_provider: Callable[[str, int], CasePackageV1] | None = None,
         max_market_staleness_ms: int = 15_000,
         max_account_staleness_ms: int = 60_000,
         max_spread_bps: float = 10.0,
@@ -39,6 +44,7 @@ class PreExecutionValidator:
         self.kill_switch = kill_switch
         self.risk_policy = risk_policy or RiskPolicyV1()
         self.tactical_validity_provider = tactical_validity_provider
+        self.tactical_case_provider = tactical_case_provider
         self.max_market_staleness_ms = max_market_staleness_ms
         self.max_account_staleness_ms = max_account_staleness_ms
         self.max_spread_bps = max_spread_bps
@@ -113,6 +119,24 @@ class PreExecutionValidator:
         if content_hash(approval_dict) != intent.approval_hash:
             return ValidationResult(is_valid=False, reason="APPROVAL_HASH_MISMATCH")
 
+        if proposal.risk_policy_hash != self.risk_policy.policy_hash or intent.risk_policy_hash != self.risk_policy.policy_hash:
+            return ValidationResult(False, "RISK_POLICY_HASH_MISMATCH")
+        try:
+            with connection(self.intent_store.path) as db:
+                compiled_row = db.execute(
+                    "SELECT payload FROM live_account_snapshots WHERE snapshot_hash=?", (intent.account_snapshot_hash,),
+                ).fetchone()
+            if compiled_row is None:
+                return ValidationResult(False, "COMPILE_ACCOUNT_SNAPSHOT_NOT_FOUND")
+            compile_snapshot = AccountSnapshotV1.model_validate_json(compiled_row["payload"])
+            if compile_snapshot.snapshot_hash != intent.account_snapshot_hash:
+                return ValidationResult(False, "COMPILE_ACCOUNT_SNAPSHOT_HASH_MISMATCH")
+            expected = compile_executable_intent_fields(case, proposal, compile_snapshot, self.risk_policy)
+        except Exception:  # noqa: BLE001
+            return ValidationResult(False, "EXECUTABLE_COMPILATION_INVALID")
+        if any(getattr(intent, field) != value for field, value in expected.items()):
+            return ValidationResult(False, "EXECUTABLE_CONTRACT_MISMATCH")
+
         # 6. Current Account snapshot verification (recalculated from fresh current snapshot)
         try:
             account_snapshot.verify()
@@ -125,8 +149,12 @@ class PreExecutionValidator:
             return ValidationResult(is_valid=False, reason="ACCOUNT_AUTHORITY_MISMATCH")
         if not account_snapshot.reconciled or account_snapshot.quality != "OK":
             return ValidationResult(is_valid=False, reason="ACCOUNT_UNRECONCILED")
+        if intent.environment == "TESTNET" and not account_snapshot.stream_connected:
+            return ValidationResult(is_valid=False, reason="ACCOUNT_STREAM_DISCONNECTED")
         if (now_ms - account_snapshot.observed_at_ms) > self.max_account_staleness_ms:
             return ValidationResult(is_valid=False, reason="ACCOUNT_SNAPSHOT_STALE")
+        if account_snapshot.observed_at_ms > now_ms:
+            return ValidationResult(False, "ACCOUNT_SNAPSHOT_FUTURE")
 
         # 8. Risk Policy authority check
         bound_policy_hash = content_hash(self.risk_policy.model_dump(mode="json"))
@@ -142,6 +170,16 @@ class PreExecutionValidator:
         margin_required = notional / intent.leverage
         if account_snapshot.available_balance_usdt < margin_required:
             return ValidationResult(is_valid=False, reason="INSUFFICIENT_MARGIN")
+        if account_snapshot.margin_used_usdt + margin_required > account_snapshot.equity_usdt * self.risk_policy.max_margin_utilization:
+            return ValidationResult(False, "MARGIN_UTILIZATION_CAP_EXCEEDED")
+        stop_fraction = abs(intent.price - intent.stop_loss) / intent.price
+        costs = (self.risk_policy.round_trip_fee_bps + self.risk_policy.slippage_bps
+                 + max(self.risk_policy.funding_buffer_bps, abs(case.funding_rate or 0) * 10000)) / 10000
+        max_loss = notional * (stop_fraction + costs)
+        current_risk_cap = min(proposal.risk_budget_usdt, self.risk_policy.max_trade_risk_usdt,
+                               account_snapshot.equity_usdt * self.risk_policy.max_trade_risk_pct)
+        if max_loss > current_risk_cap + 1e-9:
+            return ValidationResult(False, "TRADE_RISK_CAP_EXCEEDED")
 
         max_daily_loss = min(
             self.kill_switch.policy.daily_loss_cap_usdt,
@@ -204,6 +242,12 @@ class PreExecutionValidator:
         # 9. Market data verification
         if market_obs.symbol != intent.symbol:
             return ValidationResult(is_valid=False, reason="MARKET_SYMBOL_MISMATCH")
+        try:
+            MarketObservationV1.model_validate_json(market_obs.canonical_json())
+        except Exception:  # noqa: BLE001
+            return ValidationResult(False, "MARKET_OBSERVATION_HASH_MISMATCH")
+        if market_obs.receipt_timestamp_ms > now_ms or market_obs.source_timestamp_ms > now_ms:
+            return ValidationResult(False, "MARKET_DATA_FUTURE")
         if (now_ms - market_obs.receipt_timestamp_ms) > self.max_market_staleness_ms:
             return ValidationResult(is_valid=False, reason="MARKET_DATA_STALE")
 
@@ -234,6 +278,18 @@ class PreExecutionValidator:
                 return ValidationResult(is_valid=False, reason="DUPLICATE_CLIENT_ORDER_ID_LOCAL")
 
         # 11. Current Tactical validity
+        if self.tactical_case_provider is not None:
+            try:
+                current_case = self.tactical_case_provider(intent.symbol, now_ms)
+                current_case.verify()
+                if (current_case.symbol != case.symbol or current_case.direction != case.direction
+                        or current_case.strategy != case.strategy or current_case.strategy_version != case.strategy_version
+                        or current_case.data_quality != "OK" or current_case.veto_reasons or current_case.source_errors
+                        or not current_case.observed_at_ms <= now_ms < current_case.expires_at_ms
+                        or now_ms - current_case.observed_at_ms > self.risk_policy.max_staleness_ms):
+                    return ValidationResult(False, "TACTICAL_VALIDITY_INVALID")
+            except Exception:  # noqa: BLE001
+                return ValidationResult(False, "TACTICAL_VALIDITY_UNAVAILABLE")
         if intent.environment == "TESTNET":
             if self.tactical_validity_provider is None:
                 return ValidationResult(is_valid=False, reason="TACTICAL_VALIDITY_UNAVAILABLE")
@@ -252,3 +308,24 @@ class PreExecutionValidator:
                 return ValidationResult(is_valid=False, reason="TACTICAL_VALIDITY_INVALID")
 
         return ValidationResult(is_valid=True, reason="OK")
+
+    def authorize(self, intent_id: str, market_obs: MarketObservationV1,
+                  account_snapshot: AccountSnapshotV1, now_ms: int) -> PreExecutionAuthorizationV1:
+        from .authorization import AuthorizationStore
+        from .guard import ExecutionBlocked
+
+        intent = self.intent_store.get_intent(intent_id)
+        if intent is None:
+            raise ExecutionBlocked("AUTHORIZATION_INTENT_NOT_PERSISTED")
+        result = self.validate(intent, market_obs, account_snapshot, now_ms)
+        if not result.is_valid:
+            raise ExecutionBlocked(result.reason)
+        if intent.environment != "TESTNET":
+            raise ExecutionBlocked("TESTNET_AUTHORIZATION_REQUIRED")
+        proposal = self.live_store.get_proposal(intent.proposal_hash)
+        case = self.live_store.get_case(intent.case_id)
+        executable = compile_executable_intent_fields(case, proposal, account_snapshot, self.risk_policy)
+        expires = min(intent.expires_at_ms, now_ms + 5000,
+                      market_obs.receipt_timestamp_ms + self.max_market_staleness_ms,
+                      account_snapshot.observed_at_ms + self.max_account_staleness_ms)
+        return AuthorizationStore(self.intent_store.path).issue(intent, account_snapshot, market_obs, executable, now_ms, expires)

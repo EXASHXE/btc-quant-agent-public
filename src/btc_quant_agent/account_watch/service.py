@@ -3,8 +3,11 @@
 from __future__ import annotations
 
 import asyncio
+import json
+import threading
 import time
 from collections.abc import Callable
+from typing import Any, cast
 
 from ..config import AppConfig, ExecutionConfig
 from ..execution.binance_signed import BinanceSignedClient
@@ -21,6 +24,7 @@ class AccountWatch:
         signed_client: BinanceSignedClient | None = None,
         account_id: str = "DEFAULT_ACCOUNT",
         clock_ms: Callable[[], int] | None = None,
+        websocket_connect: Callable[..., Any] | None = None,
     ) -> None:
         exec_cfg = config.execution if isinstance(config, AppConfig) else config
         self.config = exec_cfg
@@ -28,6 +32,7 @@ class AccountWatch:
         self.signed_client = signed_client
         self.account_id = account_id
         self.clock_ms = clock_ms or (lambda: int(time.time() * 1000))
+        self._websocket_connect = websocket_connect
 
         mode = getattr(exec_cfg, "mode", "paper").lower()
         if mode == "testnet":
@@ -72,6 +77,20 @@ class AccountWatch:
         self._simulated_orders: tuple[OrderV1, ...] = ()
 
         self._latest_snapshot: AccountSnapshotV1 | None = None
+        self._last_user_event_ms = 0
+        self._user_event_sources: dict[str, tuple[int, str]] = {}
+        self._state_generation = 0
+        self._rest_lock = threading.Lock()
+        self._state_lock = threading.RLock()
+        restored = self.store.latest(self.account_id)
+        if restored is not None:
+            self._latest_snapshot = restored
+            self._peak_equity_usdt = restored.peak_equity_usdt
+            self._conflict_count = restored.conflict_count
+            self._last_rest_at_ms = restored.last_rest_at_ms
+            # A process restart invalidates all in-memory stream continuity.
+            if restored.environment == "TESTNET" and (restored.reconciled or restored.stream_connected):
+                self.mark_stream_disconnected(self.clock_ms())
 
     @property
     def is_reconciled(self) -> bool:
@@ -102,6 +121,11 @@ class AccountWatch:
         self._simulated_orders = orders
 
     def reconcile_rest(self, now_ms: int | None = None) -> AccountSnapshotV1:
+        with self._rest_lock:
+            return self._reconcile_rest_locked(now_ms)
+
+    def _reconcile_rest_locked(self, now_ms: int | None = None) -> AccountSnapshotV1:
+        generation = self._state_generation
         now = self.clock_ms() if now_ms is None else now_ms
 
         if self.environment == "TESTNET":
@@ -167,7 +191,7 @@ class AccountWatch:
                         status=status,
                         order_type=str(o.get("type", "LIMIT")),
                         quantity=qty,
-                        filled_quantity=min(filled, qty),
+                        filled_quantity=filled,
                         price=price,
                         average_price=avg_price,
                         reduce_only=bool(o.get("reduceOnly", False)),
@@ -229,13 +253,32 @@ class AccountWatch:
                 quality="OK" if self._reconciled else "STALE",
             )
 
-        self.store.save(snapshot, event_type="REST_RECONCILED")
-        self._latest_snapshot = snapshot
+        with self._state_lock:
+            if self._state_generation != generation:
+                latest = self._latest_snapshot
+                if latest is not None:
+                    self._conflict_count += 1
+                    self._reconciled = False
+                    snapshot = AccountSnapshotV1.build(
+                        **{**latest.model_dump(exclude={"snapshot_hash"}),
+                           "reconciled": False,
+                           "quality": "STALE" if latest.quality == "STALE" else "CONFLICT",
+                           "conflict_count": self._conflict_count,
+                           "observed_at_ms": max(latest.observed_at_ms, now),
+                           "last_rest_at_ms": max(latest.last_rest_at_ms, now)}
+                    )
+            self.store.save(snapshot, event_type="REST_RECONCILED")
+            self._latest_snapshot = snapshot
         return snapshot
 
     def mark_stream_disconnected(self, now_ms: int | None = None) -> None:
         """Mark account state unreconciled on user-stream disconnect."""
+        with self._state_lock:
+            self._mark_stream_disconnected_locked(now_ms)
+
+    def _mark_stream_disconnected_locked(self, now_ms: int | None = None) -> None:
         now = self.clock_ms() if now_ms is None else now_ms
+        self._state_generation += 1
         self._stream_connected = False
         self._reconciled = False
         if self._latest_snapshot is not None:
@@ -268,10 +311,237 @@ class AccountWatch:
             return self._latest_snapshot
         return self.store.latest(self.account_id)
 
+    def handle_user_event(self, payload: dict[str, object], now_ms: int) -> bool:
+        """Apply allowlisted TESTNET account events over a fresh REST baseline."""
+        with self._state_lock:
+            return self._handle_user_event_locked(payload, now_ms)
+
+    def _handle_user_event_locked(self, payload: dict[str, object], now_ms: int) -> bool:
+        if self.environment != "TESTNET" or not isinstance(payload, dict):
+            self.mark_stream_disconnected(now_ms)
+            return False
+        event_type = payload.get("e")
+        if event_type == "listenKeyExpired":
+            self.mark_stream_disconnected(now_ms)
+            return False
+        if event_type in {"MARGIN_CALL", "ALGO_UPDATE"}:
+            self._conflict_count += 1
+            self.mark_stream_disconnected(now_ms)
+            return False
+        if event_type not in {"ACCOUNT_UPDATE", "ORDER_TRADE_UPDATE"}:
+            self.mark_stream_disconnected(now_ms)
+            return False
+        try:
+            event_ms = int(str(payload["E"]))
+            tx_ms = int(str(payload.get("T", event_ms)))
+        except (KeyError, TypeError, ValueError):
+            self.mark_stream_disconnected(now_ms)
+            return False
+        snap = self.latest_snapshot()
+        order_payload = payload.get("o")
+        order_key = str(order_payload.get("i")) if isinstance(order_payload, dict) else "ACCOUNT"
+        source = str(event_type) + ":" + order_key
+        event_digest = json.dumps(payload, sort_keys=True, separators=(",", ":"))
+        prior = self._user_event_sources.get(source)
+        if prior is not None and event_ms == prior[0] and event_digest == prior[1]:
+            return False
+        if (not self._reconciled or snap is None or not snap.reconciled
+                or event_ms < self._last_user_event_ms or event_ms <= snap.last_rest_at_ms
+                or (prior is not None and event_ms <= prior[0])
+                or tx_ms < 0):
+            self._conflict_count += 1
+            self.mark_stream_disconnected(now_ms)
+            return False
+        try:
+            values = snap.model_dump(exclude={"snapshot_hash"})
+            values["observed_at_ms"] = max(snap.observed_at_ms, event_ms)
+            values["stream_connected"] = True
+            if event_type == "ACCOUNT_UPDATE":
+                account = payload["a"]
+                if not isinstance(account, dict):
+                    raise ValueError("invalid account update")
+                balances = account.get("B", [])
+                positions = account.get("P", [])
+                if not isinstance(balances, list) or not isinstance(positions, list):
+                    raise ValueError("invalid account update rows")
+                wallet = snap.wallet_balance_usdt
+                available = snap.available_balance_usdt
+                for balance in balances:
+                    if not isinstance(balance, dict):
+                        raise TypeError("invalid balance row")
+                    if balance.get("a") == "USDT":
+                        wallet = float(balance["wb"])
+                current = {p.symbol: p for p in snap.positions}
+                for item in positions:
+                    if not isinstance(item, dict):
+                        raise TypeError("invalid position row")
+                    symbol = str(item["s"])
+                    qty = float(item["pa"])
+                    if qty == 0:
+                        current.pop(symbol, None)
+                        continue
+                    old_position = current.get(symbol)
+                    entry = float(item.get("ep", old_position.entry_price if old_position else 0))
+                    unrealized = float(item.get("up", old_position.unrealized_pnl_usdt if old_position else 0))
+                    current[symbol] = PositionV1(
+                        symbol=symbol, quantity=qty, entry_price=entry,
+                        mark_price=old_position.mark_price if old_position else entry,
+                        unrealized_pnl_usdt=unrealized,
+                        leverage=old_position.leverage if old_position else 1,
+                        liquidation_price=old_position.liquidation_price if old_position else None,
+                        margin_type=str(item.get("mt", old_position.margin_type if old_position else "ISOLATED")).upper(),
+                        observed_at_ms=event_ms,
+                    )
+                new_positions = tuple(sorted(current.values(), key=lambda p: p.symbol))
+                equity = max(0.0, wallet + sum(p.unrealized_pnl_usdt for p in new_positions))
+                values.update(wallet_balance_usdt=wallet, available_balance_usdt=available,
+                              equity_usdt=equity,
+                              positions=new_positions)
+            else:
+                order = payload["o"]
+                if not isinstance(order, dict):
+                    raise ValueError("invalid order update")
+                status = str(order["X"])
+                if status == "EXPIRED_IN_MATCH":
+                    status = "EXPIRED"
+                if status not in {"NEW", "PARTIALLY_FILLED", "FILLED", "CANCELED", "EXPIRED", "REJECTED"}:
+                    raise ValueError("unsupported order status")
+                order_id = str(order["i"])
+                old_orders = {o.order_id: o for o in snap.orders}
+                quantity = float(order["q"])
+                filled = float(order["z"])
+                old_order = old_orders.get(order_id)
+                old_orders[order_id] = OrderV1(
+                    symbol=str(order["s"]), order_id=order_id,
+                    client_order_id=str(order.get("c", "")),
+                    side="SELL" if str(order["S"]).upper() == "SELL" else "BUY",
+                    status=cast(OrderStatus, status), order_type=str(order.get("o", "UNKNOWN")),
+                    quantity=quantity, filled_quantity=filled,
+                    price=float(order.get("p", old_order.price if old_order else 0)),
+                    average_price=float(order.get("ap", old_order.average_price if old_order else 0)),
+                    reduce_only=bool(order.get("R", False)),
+                    stop_price=(float(order["sp"]) if float(order.get("sp", 0)) > 0 else None),
+                    observed_at_ms=event_ms,
+                )
+                values["orders"] = tuple(sorted(old_orders.values(), key=lambda o: o.order_id))
+            updated = AccountSnapshotV1.build(**values)
+        except (KeyError, TypeError, ValueError, OverflowError):
+            self.mark_stream_disconnected(now_ms)
+            return False
+        self.store.save(updated, event_type="WS_UPDATE")
+        self._latest_snapshot = updated
+        self._last_user_event_ms = max(self._last_user_event_ms, event_ms)
+        self._user_event_sources[source] = (event_ms, event_digest)
+        self._state_generation += 1
+        return True
+
+    async def _keepalive_user_stream(self, listen_key: str) -> None:
+        while not self._stop_event.is_set():
+            try:
+                await asyncio.wait_for(self._stop_event.wait(), timeout=30 * 60)
+            except TimeoutError:
+                if self.signed_client is None:
+                    return
+                await asyncio.to_thread(self.signed_client.keepalive_user_stream, listen_key)
+
+    async def reconcile_rest_async(self, now_ms: int | None = None) -> AccountSnapshotV1:
+        """Keep an in-flight REST read owned through task cancellation."""
+        operation = asyncio.create_task(asyncio.to_thread(self.reconcile_rest, now_ms))
+        try:
+            return await asyncio.shield(operation)
+        except asyncio.CancelledError:
+            await operation
+            raise
+
+    async def close_user_stream(self) -> None:
+        task = self._keepalive_task
+        self._keepalive_task = None
+        if task is not None and task is not asyncio.current_task():
+            task.cancel()
+            await asyncio.gather(task, return_exceptions=True)
+        listen_key, self._listen_key = self._listen_key, None
+        if listen_key and self.signed_client is not None:
+            try:
+                await asyncio.to_thread(self.signed_client.close_user_stream, listen_key)
+            except Exception:  # noqa: BLE001,S110 - cleanup is best effort; key is never exposed
+                pass
+
+    async def run_user_stream(self) -> None:
+        """Own the TESTNET websocket/listen-key lifecycle until stopped."""
+        if self.environment != "TESTNET" or self.signed_client is None:
+            raise ExecutionBlocked("account user stream requires TESTNET authority")
+        auth = getattr(self.signed_client, "authority", None)
+        if (auth is None or auth.environment != "TESTNET"
+                or auth.credential_namespace != "BINANCE_TESTNET"
+                or auth.rest_base_url.rstrip("/").lower() != "https://testnet.binancefuture.com"):
+            raise ExecutionBlocked("account user stream authority mismatch for TESTNET")
+        if self._websocket_connect is None:
+            import websockets
+            connect: Callable[..., Any] = cast(Callable[..., Any], websockets.connect)
+        else:
+            connect = self._websocket_connect
+        self._stop_event.clear()
+        backoff = 1.0
+        while not self._stop_event.is_set():
+            try:
+                listen_key = await asyncio.to_thread(self.signed_client.start_user_stream)
+                self._listen_key = listen_key
+                self._keepalive_task = asyncio.create_task(self._keepalive_user_stream(listen_key))
+                # The Futures TESTNET stream is restricted to this host. Never derive it from
+                # a configurable or production REST endpoint.
+                url = f"{self.ws_base_url.rstrip('/')}/ws/{listen_key}"
+                async with connect(url, open_timeout=15) as socket:
+                    self.mark_stream_disconnected(self.clock_ms())
+                    try:
+                        await self.reconcile_rest_async()
+                    except Exception:  # noqa: BLE001 - remain fail-closed until REST repair works
+                        raise RuntimeError("account REST repair failed") from None
+                    self._stream_connected = True
+                    snap = self._latest_snapshot
+                    if snap is not None:
+                        self._latest_snapshot = AccountSnapshotV1.build(
+                            **{**snap.model_dump(exclude={"snapshot_hash"}),
+                               "stream_connected": True})
+                        self.store.save(self._latest_snapshot, event_type="REST_RECONCILED")
+                    backoff = 1.0
+                    async for message in socket:
+                        if self._stop_event.is_set():
+                            break
+                        try:
+                            payload = json.loads(message)
+                            if isinstance(payload, dict):
+                                accepted = self.handle_user_event(payload, self.clock_ms())
+                                if payload.get("e") == "listenKeyExpired":
+                                    break
+                                if not accepted and not self._reconciled:
+                                    await self.reconcile_rest_async()
+                                    self._stream_connected = True
+                                    snap = self._latest_snapshot
+                                    if snap is not None:
+                                        self._latest_snapshot = AccountSnapshotV1.build(
+                                            **{**snap.model_dump(exclude={"snapshot_hash"}),
+                                               "stream_connected": True})
+                                        self.store.save(self._latest_snapshot, event_type="REST_RECONCILED")
+                        except (ValueError, TypeError, json.JSONDecodeError):
+                            self.mark_stream_disconnected(self.clock_ms())
+                            break
+            except asyncio.CancelledError:
+                raise
+            except Exception:  # noqa: BLE001,S110 - retry without exposing transport/key details
+                pass
+            finally:
+                self.mark_stream_disconnected(self.clock_ms())
+                await self.close_user_stream()
+            if not self._stop_event.is_set():
+                try:
+                    await asyncio.wait_for(self._stop_event.wait(), timeout=backoff)
+                except TimeoutError:
+                    backoff = min(30.0, backoff * 2)
+
     async def run_reconciliation_loop(self, interval_seconds: float = 30.0) -> None:
         while not self._stop_event.is_set():
             try:
-                self.reconcile_rest()
+                await self.reconcile_rest_async()
             except Exception:  # noqa: BLE001,S110 - keep reconciliation loop resilient
                 pass
             try:
@@ -281,7 +551,7 @@ class AccountWatch:
 
     def stop(self) -> None:
         self._stop_event.set()
+        self.mark_stream_disconnected(self.clock_ms())
+        # The runtime owns and awaits run_user_stream; this method only requests shutdown.
         if self._stream_task and not self._stream_task.done():
             self._stream_task.cancel()
-        if self._keepalive_task and not self._keepalive_task.done():
-            self._keepalive_task.cancel()

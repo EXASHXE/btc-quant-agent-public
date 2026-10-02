@@ -44,6 +44,8 @@ class BinanceSignedClient:
     def _signed_request(
         self, method: str, path: str, params: dict[str, Any] | None = None
     ) -> dict[str, Any] | list[dict[str, Any]]:
+        if method.upper() != "GET":
+            self._require_mutation_authority()
         payload = dict(params or {})
         payload["timestamp"] = int(time.time() * 1000)
         payload["recvWindow"] = self.recv_window_ms
@@ -77,6 +79,7 @@ class BinanceSignedClient:
 
     def _api_key_request(self, method: str, path: str) -> dict[str, Any]:
         """USER_STREAM requests authenticate with the key header, never a signature."""
+        self._require_mutation_authority()
         request = urllib.request.Request(
             f"{self.base_url.rstrip('/')}{path}", method=method,
             headers={"X-MBX-APIKEY": self.api_key, "User-Agent": "btc-quant-agent/0.2.1"},
@@ -92,6 +95,15 @@ class BinanceSignedClient:
             raise BinanceExecutionError(f"Binance user stream request failed: HTTP {exc.code}") from None
         except (urllib.error.URLError, TimeoutError, json.JSONDecodeError):
             raise BinanceExecutionError("Binance user stream request failed") from None
+
+    def _require_mutation_authority(self) -> None:
+        if self.environment == "TEST" or self.base_url.endswith(".test"):
+            return
+        from .policy import ExecutionCapabilityPolicyV1
+        ExecutionCapabilityPolicyV1.check_capability(
+            "TESTNET", "SIGNED_MUTATION", env_id=self.environment,
+            cred_ns=self.credential_namespace, rest_url=self.base_url,
+        )
 
     def account_information(self) -> dict[str, Any]:
         return cast(dict[str, Any], self._signed_request("GET", "/fapi/v3/account"))

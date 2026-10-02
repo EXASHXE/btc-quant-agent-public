@@ -3,6 +3,8 @@ from __future__ import annotations
 import os
 import secrets
 import time
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
 from typing import TYPE_CHECKING
 
 from . import __version__
@@ -12,9 +14,10 @@ from .service import QuantService
 
 if TYPE_CHECKING:
     from .decision.service import TacticalLiveService
+    from .live_runtime import LiveV1Runtime
 
 try:
-    from fastapi import Depends, FastAPI, HTTPException
+    from fastapi import Depends, FastAPI, HTTPException, Request
     from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 except ImportError as exc:  # pragma: no cover - optional dependency guard
     raise RuntimeError("Install the API extra: pip install -e '.[api]'") from exc
@@ -41,15 +44,30 @@ def _require_api_token(
         )
 
 
-def create_app(live_service: TacticalLiveService | None = None) -> FastAPI:
+def create_app(
+    live_service: TacticalLiveService | None = None,
+    live_runtime: LiveV1Runtime | None = None,
+) -> FastAPI:
+    @asynccontextmanager
+    async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
+        if live_runtime is not None:
+            await live_runtime.start()
+        try:
+            yield
+        finally:
+            if live_runtime is not None:
+                await live_runtime.stop()
+
     app = FastAPI(
         title="BTC Quant Signal API",
         version=__version__,
         dependencies=[Depends(_require_api_token)],
+        lifespan=lifespan,
     )
     service = QuantService.create(load_config())
 
-    if live_service is not None or os.getenv("BTC_QUANT_LIVE_V1_ENABLED", "false") == "true":
+    runtime_requested = os.getenv("BTC_QUANT_LIVE_V1_RUNTIME_ENABLED", "false") == "true"
+    if live_service is not None or live_runtime is not None or runtime_requested or os.getenv("BTC_QUANT_LIVE_V1_ENABLED", "false") == "true":
         from .approval.callback import create_callback_app
         from .config import LiveV1Config
         from .decision.api import create_live_router
@@ -57,7 +75,7 @@ def create_app(live_service: TacticalLiveService | None = None) -> FastAPI:
         from .market_watch.service import MarketWatchService
 
         live_config = LiveV1Config.from_env()
-        live = live_service or TacticalLiveService.from_config(
+        live = live_service or (live_runtime.tactical_service if live_runtime is not None else None) or TacticalLiveService.from_config(
             live_config,
             MarketWatchService.create(service.config.market_watch, service.config.data),
         )
@@ -70,6 +88,41 @@ def create_app(live_service: TacticalLiveService | None = None) -> FastAPI:
         ))
 
         app.include_router(create_live_router(live))
+
+        if runtime_requested and live_runtime is None:
+            from .live_runtime import LiveV1Runtime
+            live_runtime = LiveV1Runtime.create(live_config, live)
+
+    if live_runtime is not None:
+        from .execution.guard import ExecutionBlocked
+
+        def live_runtime_status() -> dict[str, object]:
+            assert live_runtime is not None
+            return live_runtime.status()
+
+        async def execute_live_intent(intent_id: str, request: Request) -> dict[str, object]:
+            assert live_runtime is not None
+            if request.query_params or await request.body():
+                raise HTTPException(422, "execution accepts only an intent ID")
+            try:
+                report = await live_runtime.execute_intent(intent_id)
+            except KeyError as exc:
+                raise HTTPException(404, "intent not found") from exc
+            except ExecutionBlocked as exc:
+                raise HTTPException(409, str(exc)) from exc
+            return {
+                "intent_id": report.intent_id,
+                "status": report.status,
+                "order_id": report.order_id,
+                "client_order_id": report.client_order_id,
+                "requested_qty": report.requested_qty,
+                "filled_qty": report.filled_qty,
+                "avg_price": report.avg_price,
+                "reason": report.reason,
+            }
+
+        app.add_api_route("/live-v1/runtime/status", live_runtime_status, methods=["GET"])
+        app.add_api_route("/live-v1/runtime/intents/{intent_id}/execute", execute_live_intent, methods=["POST"])
 
     @app.get("/health")
     def health() -> dict[str, object]:
