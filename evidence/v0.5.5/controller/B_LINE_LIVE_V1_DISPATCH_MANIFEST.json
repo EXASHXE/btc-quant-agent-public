@@ -2,8 +2,8 @@
   "manifest_type": "B_LINE_LIVE_V1_DISPATCH_MANIFEST_V1",
   "repository": "EXASHXE/btc-quant-agent-public",
   "live_branch": "feature/b-line-live-v1",
-  "branch_start_sha": "32c1c9976dc20cf003a06398c465c4c089dd99d9",
-  "accepted_bline_code_sha": "32c1c9976dc20cf003a06398c465c4c089dd99d9",
+  "branch_start_sha": "937b2b26518ceea0952a7e17279cc42924c88848",
+  "accepted_bline_code_sha": "937b2b26518ceea0952a7e17279cc42924c88848",
   "b2b_candidate_sha": null,
   "b2b_candidate_usage": "B2B_ACCEPTED_IN_BRANCH_BASE",
   "architecture_plan": {
@@ -14,7 +14,7 @@
   "authority_refs": [
     {
       "path": "evidence/v0.5.5/controller/B_LINE_CURRENT_AUTHORITY.json",
-      "blob_sha": "9b529135830ceabd860b24ebda67f91c2d2d6956",
+      "blob_sha": "d0248d3dbddd301b817d3bef8dca1e405e7e5b71",
       "access_mode": "IDENTITY_ONLY"
     }
   ],
@@ -34,14 +34,14 @@
     "accepted_b2b_sha": "52c16a28153de307dc6132c0975fe29341a0a918",
     "live_v1_b3_status": "ACCEPTED",
     "live_v1_b3_accepted_sha": "961a0f4d4b37cdb9365d5e5867813ff3129c14db",
-    "live_v1_b4_status": "SEALED_PENDING_B5_EXACT_SHA_VALIDATION",
+    "live_v1_b4_status": "R2_1_1_SEALED_PENDING_B5_REVALIDATION",
     "provider_credential_smoke": "PENDING",
     "sqlite_concurrency_gate": "B4_MUST_ESTABLISH_WAL_OR_EQUIVALENT",
-    "live_v1_b4_final_sha": "32c1c9976dc20cf003a06398c465c4c089dd99d9",
-    "live_v1_b5_status": "READY_TO_DISPATCH",
+    "live_v1_b4_final_sha": "937b2b26518ceea0952a7e17279cc42924c88848",
+    "live_v1_b5_status": "READY_TO_REVALIDATE",
     "live_v1_b5_binding_mode": "EXACT_CODE_SHA",
-    "live_v1_b5_target_sha": "32c1c9976dc20cf003a06398c465c4c089dd99d9",
-    "live_v1_b5_expected_parent_sha": "fd4e6fc19085e698c50eca70afe5e419cbd8e060"
+    "live_v1_b5_target_sha": "937b2b26518ceea0952a7e17279cc42924c88848",
+    "live_v1_b5_expected_parent_sha": "592e35c29d55e7c17ce58487384a49368c4eee4b"
   },
   "must_read_defaults": [],
   "terminal_states": {
