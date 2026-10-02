@@ -4,13 +4,14 @@ from __future__ import annotations
 
 import json
 import logging
+from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Protocol
 
 from ..live_db import connection
 from ..position_supervisor.kill_switch import KillSwitch
-from .binance_signed import BinanceSignedClient
+from .binance_signed import BinanceExecutionError, BinanceSignedClient
 from .guard import ExecutionBlocked
 from .intents import TradeIntentV1
 from .policy import ExecutionCapabilityPolicyV1
@@ -40,8 +41,13 @@ class ExecutionBackend(Protocol):
 class DryRunExecutionBackend:
     """Deterministic simulated execution backend."""
 
-    def __init__(self, db_path: str | Path) -> None:
+    def __init__(
+        self,
+        db_path: str | Path,
+        open_position_provider: Callable[[str, str], float | None] | None = None,
+    ) -> None:
         self.path = Path(db_path)
+        self.open_position_provider = open_position_provider
         with connection(self.path) as db:
             db.executescript("""
                 CREATE TABLE IF NOT EXISTS live_execution_orders (
@@ -150,7 +156,9 @@ class DryRunExecutionBackend:
             reason="FILLED",
         )
 
-    def reconcile_intent(self, intent: TradeIntentV1, now_ms: int) -> ExecutionReport:
+    def reconcile_intent(
+        self, intent: TradeIntentV1, now_ms: int, open_position: float | None = None
+    ) -> ExecutionReport:
         with connection(self.path) as db:
             row = db.execute(
                 "SELECT * FROM live_execution_orders WHERE client_order_id=?",
@@ -169,19 +177,32 @@ class DryRunExecutionBackend:
             )
 
         filled_qty = float(row["filled_qty"])
+        open_qty = open_position
+        if open_qty is None and self.open_position_provider is not None:
+            open_qty = self.open_position_provider(intent.symbol, intent.side)
+        if open_qty is None:
+            open_qty = filled_qty
+
+        target_qty = min(open_qty, filled_qty, intent.quantity)
         stop_order_id: str | None = None
 
-        if filled_qty > 0:
-            filled_qty = min(filled_qty, intent.quantity)
-            stop_order_id = f"sim-stop-{intent.intent_id}"
-            stop_client_oid = f"bqa-stop-{intent.client_order_id[:12]}-{int(filled_qty * 1000):04d}"
+        with connection(self.path) as db:
+            db.execute("BEGIN IMMEDIATE")
+            stop_row = db.execute(
+                "SELECT * FROM live_execution_orders WHERE intent_id=? AND is_protective=1",
+                (intent.intent_id,),
+            ).fetchone()
 
-            with connection(self.path) as db:
-                db.execute("BEGIN IMMEDIATE")
-                stop_row = db.execute(
-                    "SELECT * FROM live_execution_orders WHERE intent_id=? AND is_protective=1",
-                    (intent.intent_id,),
-                ).fetchone()
+            if target_qty <= 0.0:
+                # If flat, cancel stale protection
+                if stop_row is not None:
+                    db.execute(
+                        "UPDATE live_execution_orders SET status='CANCELED' WHERE order_id=?",
+                        (stop_row["order_id"],),
+                    )
+            else:
+                stop_order_id = f"sim-stop-{intent.intent_id}"
+                stop_client_oid = f"bqa-stop-{intent.client_order_id[:12]}-{int(target_qty * 1000):04d}"
 
                 if stop_row is None:
                     db.execute(
@@ -193,7 +214,7 @@ class DryRunExecutionBackend:
                             intent.symbol,
                             "SELL" if intent.side == "BUY" else "BUY",
                             "NEW",
-                            filled_qty,
+                            target_qty,
                             0.0,
                             0.0,
                             intent.stop_loss,
@@ -201,17 +222,17 @@ class DryRunExecutionBackend:
                             1,
                             now_ms,
                             now_ms,
-                            json.dumps({"dry_run": True, "type": "STOP_MARKET", "stopPrice": intent.stop_loss, "quantity": filled_qty}),
+                            json.dumps({"dry_run": True, "type": "STOP_MARKET", "stopPrice": intent.stop_loss, "quantity": target_qty}),
                         ),
                     )
-                elif float(stop_row["requested_qty"]) < filled_qty:
+                elif float(stop_row["requested_qty"]) != target_qty or stop_row["status"] == "CANCELED":
                     db.execute(
-                        "UPDATE live_execution_orders SET requested_qty=?, client_order_id=?, receipt_time_ms=?, payload=? WHERE order_id=?",
+                        "UPDATE live_execution_orders SET requested_qty=?, status='NEW', client_order_id=?, receipt_time_ms=?, payload=? WHERE order_id=?",
                         (
-                            filled_qty,
+                            target_qty,
                             stop_client_oid,
                             now_ms,
-                            json.dumps({"dry_run": True, "type": "STOP_MARKET", "stopPrice": intent.stop_loss, "quantity": filled_qty}),
+                            json.dumps({"dry_run": True, "type": "STOP_MARKET", "stopPrice": intent.stop_loss, "quantity": target_qty}),
                             stop_row["order_id"],
                         ),
                     )
@@ -408,12 +429,58 @@ class TestnetExecutionBackend:
         )
         self.kill_switch.evaluate(obs, now_ms)
 
-    def _reconcile_protective_stop(self, intent: TradeIntentV1, filled_qty: float, now_ms: int) -> str | None:
-        if filled_qty <= 0.0:
-            return None
+    def _query_open_position(self, symbol: str, side: str, now_ms: int) -> float:
+        """Query authoritative open position from exchange for symbol and side.
 
-        # Protection quantity must never exceed position quantity
-        filled_qty = min(filled_qty, intent.quantity)
+        Returns the intent-side open quantity (>= 0.0).
+        Fails closed and trips kill switch on uncertainty or unsupported mode.
+        """
+        try:
+            mode_data = self.client.position_mode()
+            if not isinstance(mode_data, dict) or "dualSidePosition" not in mode_data:
+                raise BinanceExecutionError(f"unparseable position mode response: {mode_data}")
+            is_hedge = bool(mode_data["dualSidePosition"])
+
+            risk_rows = self.client.positions(symbol)
+            if not isinstance(risk_rows, list):
+                raise BinanceExecutionError(f"unparseable position risk response: {risk_rows}")
+
+            open_qty = 0.0
+            found = False
+            for row in risk_rows:
+                if not isinstance(row, dict):
+                    continue
+                if row.get("symbol") != symbol:
+                    continue
+                pos_side = str(row.get("positionSide", "BOTH"))
+                amt = float(row.get("positionAmt", 0.0))
+                if is_hedge:
+                    if side == "BUY" and pos_side == "LONG":
+                        open_qty = max(0.0, amt)
+                        found = True
+                        break
+                    elif side == "SELL" and pos_side == "SHORT":
+                        open_qty = max(0.0, abs(amt))
+                        found = True
+                        break
+                else:
+                    if pos_side == "BOTH":
+                        if side == "BUY":
+                            open_qty = max(0.0, amt)
+                        else:
+                            open_qty = max(0.0, -amt)
+                        found = True
+                        break
+            if not found:
+                open_qty = 0.0
+            return open_qty
+        except Exception as exc:
+            self._trip_kill_switch(now_ms, f"position query uncertainty: {exc}")
+            raise ExecutionBlocked(f"position query uncertainty: {exc}") from exc
+
+    def _reconcile_protective_stop(self, intent: TradeIntentV1, filled_qty: float, now_ms: int) -> str | None:
+        open_qty = self._query_open_position(intent.symbol, intent.side, now_ms)
+        target_qty = max(min(open_qty, filled_qty, intent.quantity), 0.0)
 
         # 1. Query open protective orders from exchange
         try:
@@ -434,19 +501,35 @@ class TestnetExecutionBackend:
                 matched_algo = algo
                 break
 
+        if target_qty <= 0.0:
+            if matched_algo is not None:
+                algo_id = str(matched_algo.get("algoId", matched_algo.get("orderId", "")))
+                try:
+                    self.client.cancel_protective_order(intent.symbol, algo_id)
+                except Exception as exc:
+                    self._trip_kill_switch(now_ms, f"failed to cancel stale protective stop {algo_id}: {exc}")
+                    raise ExecutionBlocked(f"failed to cancel stale protective stop: {exc}") from exc
+
+                with connection(self.path) as db:
+                    db.execute(
+                        "UPDATE live_execution_orders SET status='CANCELED' WHERE order_id=?",
+                        (algo_id,),
+                    )
+            return None
+
         if matched_algo is not None:
             algo_id = str(matched_algo.get("algoId", matched_algo.get("orderId", "")))
             current_protected_qty = float(matched_algo.get("quantity", matched_algo.get("origQty", 0.0)))
-            if current_protected_qty >= filled_qty:
+            if current_protected_qty == target_qty:
                 # Already adequately protected (idempotent replay)
                 return algo_id
 
-            # Existing protection is smaller than current filled_qty: cancel smaller order
+            # Existing protection size differs: cancel mismatched order before replacing
             try:
                 self.client.cancel_protective_order(intent.symbol, algo_id)
             except Exception as exc:
-                self._trip_kill_switch(now_ms, f"failed to cancel smaller protective stop {algo_id}: {exc}")
-                raise ExecutionBlocked(f"failed to cancel smaller protective stop: {exc}") from exc
+                self._trip_kill_switch(now_ms, f"failed to cancel mismatched protective stop {algo_id}: {exc}")
+                raise ExecutionBlocked(f"failed to cancel mismatched protective stop: {exc}") from exc
 
             # Mark cancelled in local DB
             with connection(self.path) as db:
@@ -455,14 +538,14 @@ class TestnetExecutionBackend:
                     (algo_id,),
                 )
 
-        # 3. Place resized or new protective stop for full filled_qty
-        return self._place_protective_stop(intent, filled_qty, now_ms)
+        # 3. Place resized or new protective stop for target_qty
+        return self._place_protective_stop(intent, target_qty, now_ms)
 
-    def _place_protective_stop(self, intent: TradeIntentV1, filled_qty: float, now_ms: int) -> str:
-        # Quantity MUST be <= actual filled position
-        filled_qty = min(filled_qty, intent.quantity)
+    def _place_protective_stop(self, intent: TradeIntentV1, target_qty: float, now_ms: int) -> str:
+        # Quantity MUST be <= actual filled position and current open position
+        target_qty = min(target_qty, intent.quantity)
         exit_side = "SELL" if intent.side == "BUY" else "BUY"
-        stop_client_oid = f"bqa-stop-{intent.client_order_id[:12]}-{int(filled_qty * 1000):04d}"
+        stop_client_oid = f"bqa-stop-{intent.client_order_id[:12]}-{int(target_qty * 1000):04d}"
 
         try:
             raw_stop = self.client.place_protective_order(
@@ -472,7 +555,7 @@ class TestnetExecutionBackend:
                 type="STOP_MARKET",
                 triggerPrice=intent.stop_loss,
                 closePosition="false",
-                quantity=filled_qty,
+                quantity=target_qty,
                 reduceOnly="true",
                 workingType="MARK_PRICE",
                 priceProtect="TRUE",
@@ -492,7 +575,7 @@ class TestnetExecutionBackend:
                         intent.symbol,
                         exit_side,
                         "NEW",
-                        filled_qty,
+                        target_qty,
                         0.0,
                         0.0,
                         intent.stop_loss,
@@ -538,8 +621,17 @@ class TestnetExecutionBackend:
                 (status, filled_qty, avg_price, int(raw.get("updateTime", now_ms)), intent.client_order_id),
             )
 
+        has_stop = False
+        with connection(self.path) as db:
+            row_stop = db.execute(
+                "SELECT 1 FROM live_execution_orders WHERE intent_id=? AND is_protective=1 AND status != 'CANCELED'",
+                (intent.intent_id,),
+            ).fetchone()
+            if row_stop is not None:
+                has_stop = True
+
         stop_order_id: str | None = None
-        if filled_qty > 0:
+        if filled_qty > 0 or has_stop:
             stop_order_id = self._reconcile_protective_stop(intent, filled_qty, now_ms)
 
         return ExecutionReport(

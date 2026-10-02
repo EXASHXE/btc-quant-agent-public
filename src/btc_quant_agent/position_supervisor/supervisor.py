@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import secrets
+import sqlite3
 from collections.abc import Callable
 from pathlib import Path
 from typing import Any
@@ -14,14 +15,15 @@ from .models import PositionEventV1, PositionObservationV1, SupervisorPolicyV1
 
 
 def position_case_from_event(
-    base: CasePackageV1, event: PositionEventV1, now_ms: int
+    base: CasePackageV1, event: PositionEventV1, now_ms: int | None = None
 ) -> CasePackageV1:
     ttl = max(60_000, base.expires_at_ms - base.created_at_ms)
+    event_time = event.observed_at_ms
     return CasePackageV1.build(
         case_id=f"pos-{event.event_id}",
-        created_at_ms=now_ms,
-        observed_at_ms=now_ms,
-        expires_at_ms=now_ms + ttl,
+        created_at_ms=event_time,
+        observed_at_ms=event_time,
+        expires_at_ms=event_time + ttl,
         symbol=base.symbol,
         trigger=event.trigger,
         strategy=base.strategy,
@@ -60,6 +62,13 @@ class PositionSupervisor:
         self.policy = policy or SupervisorPolicyV1()
 
         with connection(self.path) as db:
+            cols = [
+                col["name"]
+                for col in db.execute("PRAGMA table_info(live_position_case_dispatches)").fetchall()
+            ]
+            if cols and "state" not in cols:
+                db.execute("DROP TABLE live_position_case_dispatches")
+
             db.executescript("""
                 CREATE TABLE IF NOT EXISTS live_position_events (
                     event_id TEXT PRIMARY KEY,
@@ -80,10 +89,19 @@ class PositionSupervisor:
                     last_opened_at_ms INTEGER NOT NULL DEFAULT 0
                 );
                 CREATE TABLE IF NOT EXISTS live_position_case_dispatches (
-                    event_hash TEXT PRIMARY KEY,
+                    event_id TEXT PRIMARY KEY,
+                    event_hash TEXT NOT NULL UNIQUE,
                     case_hash TEXT NOT NULL,
-                    dispatched_at_ms INTEGER NOT NULL
+                    symbol TEXT NOT NULL,
+                    state TEXT NOT NULL,
+                    retry_count INTEGER NOT NULL DEFAULT 0,
+                    lease_token TEXT,
+                    lease_expires_at_ms INTEGER NOT NULL DEFAULT 0,
+                    created_at_ms INTEGER NOT NULL,
+                    updated_at_ms INTEGER NOT NULL
                 );
+                CREATE INDEX IF NOT EXISTS idx_dispatches_state
+                    ON live_position_case_dispatches(state, lease_expires_at_ms);
             """)
 
     def evaluate(
@@ -199,6 +217,22 @@ class PositionSupervisor:
                         event.canonical_json(),
                     ),
                 )
+                db.execute(
+                    """
+                    INSERT OR IGNORE INTO live_position_case_dispatches (
+                        event_id, event_hash, case_hash, symbol, state,
+                        retry_count, lease_token, lease_expires_at_ms,
+                        created_at_ms, updated_at_ms
+                    ) VALUES (?, ?, '', ?, 'PENDING', 0, NULL, 0, ?, ?)
+                    """,
+                    (
+                        event.event_id,
+                        event.event_hash,
+                        event.symbol,
+                        now_ms,
+                        now_ms,
+                    ),
+                )
                 events.append(event)
 
                 if trigger == "POSITION_OPENED":
@@ -221,27 +255,126 @@ class PositionSupervisor:
                 return None
             return PositionEventV1.model_validate(json.loads(row["payload"]))
 
-    async def process(
-        self, obs: PositionObservationV1, now_ms: int
+    async def drain_pending_dispatches(
+        self, now_ms: int, lease_ms: int = 30_000, max_retries: int = 3
     ) -> tuple[PositionEventV1, ...]:
-        events = self.evaluate(obs, now_ms)
-        if events and self.analysis_service is not None and self.fresh_market_case is not None:
-            for event in events:
-                with connection(self.path) as db:
-                    dispatched = db.execute(
-                        "SELECT 1 FROM live_position_case_dispatches WHERE event_hash=?",
-                        (event.event_hash,),
-                    ).fetchone()
-                if dispatched is not None:
+        """Drain unfinished position case dispatches using atomic leasing.
+
+        Transitions rows through PENDING -> DISPATCHING -> DONE.
+        Excessive retries or unrecoverable errors transition to FAILED_CLOSED.
+        Returns the tuple of PositionEventV1 instances that were successfully dispatched.
+        """
+        if self.analysis_service is None or self.fresh_market_case is None:
+            return ()
+
+        dispatched_events: list[PositionEventV1] = []
+
+        while True:
+            lease_token = secrets.token_hex(16)
+            claimed_row: sqlite3.Row | None = None
+
+            with connection(self.path) as db:
+                db.execute("BEGIN IMMEDIATE")
+                candidate = db.execute(
+                    """
+                    SELECT event_id, event_hash, symbol, retry_count
+                    FROM live_position_case_dispatches
+                    WHERE state = 'PENDING'
+                       OR (state = 'DISPATCHING' AND lease_expires_at_ms <= ?)
+                    ORDER BY created_at_ms ASC
+                    LIMIT 1
+                    """,
+                    (now_ms,),
+                ).fetchone()
+
+                if candidate is None:
+                    break
+
+                event_id = candidate["event_id"]
+                retry_count = int(candidate["retry_count"])
+
+                if retry_count >= max_retries:
+                    db.execute(
+                        """
+                        UPDATE live_position_case_dispatches
+                        SET state = 'FAILED_CLOSED', lease_token = NULL, updated_at_ms = ?
+                        WHERE event_id = ?
+                        """,
+                        (now_ms, event_id),
+                    )
                     continue
 
-                base_case = self.fresh_market_case(obs.symbol)
+                cursor = db.execute(
+                    """
+                    UPDATE live_position_case_dispatches
+                    SET state = 'DISPATCHING',
+                        lease_token = ?,
+                        lease_expires_at_ms = ?,
+                        retry_count = retry_count + 1,
+                        updated_at_ms = ?
+                    WHERE event_id = ?
+                      AND (state = 'PENDING' OR (state = 'DISPATCHING' AND lease_expires_at_ms <= ?))
+                    """,
+                    (lease_token, now_ms + lease_ms, now_ms, event_id, now_ms),
+                )
+                if cursor.rowcount == 1:
+                    claimed_row = candidate
+
+            if claimed_row is None:
+                continue
+
+            event_id = claimed_row["event_id"]
+            event = self.get_event(event_id)
+            if event is None:
+                with connection(self.path) as db:
+                    db.execute(
+                        """
+                        UPDATE live_position_case_dispatches
+                        SET state = 'FAILED_CLOSED', lease_token = NULL, updated_at_ms = ?
+                        WHERE event_id = ? AND lease_token = ?
+                        """,
+                        (now_ms, event_id, lease_token),
+                    )
+                continue
+
+            try:
+                base_case = self.fresh_market_case(claimed_row["symbol"])
                 pos_case = position_case_from_event(base_case, event, now_ms=now_ms)
                 await self.analysis_service.analyze_case(pos_case)
 
                 with connection(self.path) as db:
                     db.execute(
-                        "INSERT OR IGNORE INTO live_position_case_dispatches VALUES (?, ?, ?)",
-                        (event.event_hash, pos_case.case_hash, now_ms),
+                        """
+                        UPDATE live_position_case_dispatches
+                        SET state = 'DONE',
+                            case_hash = ?,
+                            lease_token = NULL,
+                            lease_expires_at_ms = 0,
+                            updated_at_ms = ?
+                        WHERE event_id = ? AND lease_token = ?
+                        """,
+                        (pos_case.case_hash, now_ms, event_id, lease_token),
                     )
+                dispatched_events.append(event)
+            except Exception:  # noqa: BLE001
+                with connection(self.path) as db:
+                    db.execute(
+                        """
+                        UPDATE live_position_case_dispatches
+                        SET state = CASE WHEN retry_count >= ? THEN 'FAILED_CLOSED' ELSE 'PENDING' END,
+                            lease_token = NULL,
+                            lease_expires_at_ms = 0,
+                            updated_at_ms = ?
+                        WHERE event_id = ? AND lease_token = ?
+                        """,
+                        (max_retries, now_ms, event_id, lease_token),
+                    )
+
+        return tuple(dispatched_events)
+
+    async def process(
+        self, obs: PositionObservationV1, now_ms: int
+    ) -> tuple[PositionEventV1, ...]:
+        events = self.evaluate(obs, now_ms)
+        await self.drain_pending_dispatches(now_ms)
         return events

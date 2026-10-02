@@ -30,8 +30,8 @@ class BinanceSignedClient:
     api_secret: str
     recv_window_ms: int = 5_000
     timeout_seconds: float = 10.0
-    environment: str = "TESTNET"
-    credential_namespace: str = "BINANCE_TESTNET"
+    environment: str = "UNBOUND"
+    credential_namespace: str = "UNBOUND"
 
     @property
     def authority(self) -> CredentialAuthority:
@@ -200,22 +200,23 @@ def create_testnet_signed_client(
     base_url: str = "https://testnet.binancefuture.com",
     recv_window_ms: int = 5_000,
     timeout_seconds: float = 10.0,
+    api_key: str | None = None,
+    api_secret: str | None = None,
 ) -> BinanceSignedClient:
-    # Explicitly verify no live credential variables are consumed
-    if "BINANCE_API_KEY" in os.environ or "BINANCE_SECRET_KEY" in os.environ or "BINANCE_API_SECRET" in os.environ:
-        # Live credential variables are present; ensure they are not used for testnet
-        pass
-    testnet_key = os.getenv("BINANCE_TESTNET_API_KEY", "")
-    testnet_secret = os.getenv("BINANCE_TESTNET_API_SECRET", "")
-
     cleaned_url = base_url.rstrip("/").lower()
     if cleaned_url != "https://testnet.binancefuture.com":
         raise BinanceExecutionError(f"invalid testnet endpoint: {base_url}")
 
+    key = api_key if api_key is not None else os.getenv("BINANCE_TESTNET_API_KEY", "")
+    secret = api_secret if api_secret is not None else os.getenv("BINANCE_TESTNET_API_SECRET", "")
+
+    if not key or not secret:
+        raise BinanceExecutionError("missing required BINANCE_TESTNET_API_KEY or BINANCE_TESTNET_API_SECRET")
+
     return BinanceSignedClient(
         base_url=base_url,
-        api_key=testnet_key,
-        api_secret=testnet_secret,
+        api_key=key,
+        api_secret=secret,
         recv_window_ms=recv_window_ms,
         timeout_seconds=timeout_seconds,
         environment="TESTNET",

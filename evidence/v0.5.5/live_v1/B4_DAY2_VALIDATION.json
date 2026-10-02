@@ -1,13 +1,13 @@
 {
-  "task": "B4_LIVE_V1_SAFETY_CLOSURE_REPAIR_R1",
+  "task": "B4_LIVE_V1_SAFETY_CLOSURE_REPAIR_R1_1",
   "repository": "EXASHXE/btc-quant-agent-public",
   "task_branch": "feature/b-line-live-v1",
   "start_binding_mode": "CURRENT_BRANCH_HEAD",
-  "actual_start_sha": "fd42f2cc1a67506d05117e3daa9a072309f7f998",
-  "reviewed_candidate_sha": "fd42f2cc1a67506d05117e3daa9a072309f7f998",
+  "actual_start_sha": "dfeca901256c0da9998410d0908a62d5e79a3dfb",
+  "reviewed_candidate_sha": "dfeca901256c0da9998410d0908a62d5e79a3dfb",
   "accepted_predecessor_sha": "961a0f4d4b37cdb9365d5e5867813ff3129c14db",
   "predecessor_ancestry": "IS_ANCESTOR_VERIFIED",
-  "parent_sha": "fd42f2cc1a67506d05117e3daa9a072309f7f998",
+  "parent_sha": "dfeca901256c0da9998410d0908a62d5e79a3dfb",
   "initial_worktree_state": "CLEAN",
   "closed_blockers": {
     "R1_01_approval_intent_singleton": {
@@ -33,6 +33,18 @@
     "R1_06_short_position_open": {
       "status": "CLOSED",
       "mechanism": "PositionSupervisor.evaluate triggers POSITION_OPENED on previous_quantity == 0.0 and quantity != 0.0; supports both long (quantity > 0) and short (quantity < 0) positions with durable open-state tracking and deduplication"
+    },
+    "R1_1_01_durable_position_case_recovery": {
+      "status": "CLOSED",
+      "mechanism": "PositionSupervisor persists PositionEvent and outbox record in live_position_case_dispatches with explicit PENDING/DISPATCHING/DONE/FAILED_CLOSED lifecycle in single atomic transaction; atomic lease claiming with lease_expires_at_ms ensures safe restart recovery without requiring original observation replay; position_case_from_event derives deterministic CasePackageV1 identity strictly from immutable event.observed_at_ms; downstream LiveStore case reservation prevents repeated primary-provider LLM analysis across retries; DONE never dispatches twice"
+    },
+    "R1_1_02_protection_uses_current_open_position": {
+      "status": "CLOSED",
+      "mechanism": "protective reconciliation queries authoritative current position risk from exchange (handling One-Way and Hedge modes); target protection quantity is strictly min(current open position, relevant entry fill, intent.quantity) and never exceeds actual open position; if open position is flat (<= 0.0), cancels stale protection without placing new order; position query failure or unsupported mode trips KillSwitch and fails closed; DryRun backend supports open_position_provider"
+    },
+    "R1_1_03_signed_client_isolated_testnet_authority": {
+      "status": "CLOSED",
+      "mechanism": "BinanceSignedClient constructor defaults environment='UNBOUND' and credential_namespace='UNBOUND', which fails closed under ExecutionCapabilityPolicyV1; create_testnet_signed_client factory requires valid BINANCE_TESTNET_API_KEY and BINANCE_TESTNET_API_SECRET, never reads LIVE credentials, and fails startup closed on missing credentials"
     }
   },
   "sqlite_durability": {
@@ -57,19 +69,15 @@
     "ruff": "PASS: ruff check .",
     "mypy": "PASS: mypy src (148 source files)",
     "live_v1_tests": {
-      "passed": 141,
+      "passed": 153,
       "failed": 0
     },
     "execution_tests": {
-      "passed": 44,
-      "failed": 0
-    },
-    "market_watch_tests": {
-      "passed": 137,
+      "passed": 50,
       "failed": 0
     },
     "full_pytest": {
-      "passed": 2150,
+      "passed": 2162,
       "skipped": 2,
       "warnings": 9
     }
@@ -89,6 +97,6 @@
     "actual_codex_model_invocation": "PENDING (credentials absent)",
     "testnet_credentialed_exchange_smoke": "PENDING (credentials absent)"
   },
-  "remaining_blockers": "None. All R1-01 through R1-06 safety blockers closed. Real-money LIVE execution remains permanently forbidden.",
-  "decision": "LIVE_V1_B4_SAFETY_CLOSED_PENDING_INDEPENDENT_EXACT_SHA_VALIDATION"
+  "remaining_blockers": "None. All R1 and R1.1 safety blockers closed. Real-money LIVE execution remains permanently forbidden.",
+  "decision": "LIVE_V1_B4_SAFETY_CLOSED_R1_1_PENDING_B5_EXACT_SHA_VALIDATION"
 }

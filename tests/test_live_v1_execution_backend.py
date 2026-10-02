@@ -18,6 +18,7 @@ from btc_quant_agent.execution.binance_signed import (
 from btc_quant_agent.execution.guard import ExecutionBlocked
 from btc_quant_agent.execution.intents import build_trade_intent
 from btc_quant_agent.execution.policy import ExecutionCapabilityPolicyV1
+from btc_quant_agent.live_db import connection
 from btc_quant_agent.position_supervisor.kill_switch import KillSwitch
 
 NOW = 1_700_000_000_000
@@ -27,6 +28,7 @@ def make_mock_testnet_client(
     base_url: str = "https://testnet.binancefuture.com",
     environment: str = "TESTNET",
     credential_namespace: str = "BINANCE_TESTNET",
+    position_amt: float | None = None,
 ) -> MagicMock:
     mock_client = MagicMock(spec=BinanceSignedClient)
     mock_client.base_url = base_url
@@ -37,6 +39,11 @@ def make_mock_testnet_client(
         credential_namespace=credential_namespace,
         rest_base_url=base_url,
     )
+    mock_client.position_mode.return_value = {"dualSidePosition": False}
+    amt = position_amt if position_amt is not None else 1000.0
+    mock_client.positions.return_value = [
+        {"symbol": "BTCUSDT", "positionSide": "BOTH", "positionAmt": str(amt)}
+    ]
     return mock_client
 
 
@@ -484,3 +491,204 @@ def test_r1_04_dry_run_reconciliation_delayed_and_resized(tmp_path):
                                (intent.intent_id,)).fetchone()
     assert stop_row2 is not None
     assert stop_row2["requested_qty"] == intent.quantity
+
+
+def test_r1_1_03_signed_client_default_unbound_fails_capability(tmp_path):
+    client = BinanceSignedClient(base_url="https://testnet.binancefuture.com", api_key="key", api_secret="secret")
+    assert client.authority.environment == "UNBOUND"
+    assert client.authority.credential_namespace == "UNBOUND"
+    assert not ExecutionCapabilityPolicyV1.is_allowed("UNBOUND")
+
+    store, _case, proposal, event_id, _actor = setup_approved_state(tmp_path)
+    snapshot = sample_snapshot(observed_at_ms=NOW, last_rest_at_ms=NOW)
+    intent = build_trade_intent(
+        live_store=store,
+        account_snapshot=snapshot,
+        proposal_hash=proposal.proposal_hash,
+        approval_event_id=event_id,
+        now_ms=NOW,
+    )
+    kill_switch = KillSwitch(tmp_path / "live.db")
+    backend = TestnetExecutionBackend(tmp_path / "live.db", client, kill_switch)
+
+    with pytest.raises(ExecutionBlocked, match="unknown or unhandled execution capability: 'UNBOUND'"):
+        backend.submit_intent(intent, NOW)
+
+
+def test_r1_1_03_create_testnet_client_credential_gates(monkeypatch):
+    monkeypatch.delenv("BINANCE_TESTNET_API_KEY", raising=False)
+    monkeypatch.delenv("BINANCE_TESTNET_API_SECRET", raising=False)
+
+    # Missing credentials must fail closed
+    with pytest.raises(BinanceExecutionError, match="missing required BINANCE_TESTNET_API_KEY"):
+        create_testnet_signed_client()
+
+    # Presence of LIVE variables must NOT self-authorize testnet
+    monkeypatch.setenv("BINANCE_API_KEY", "live-key")
+    monkeypatch.setenv("BINANCE_API_SECRET", "live-secret")
+    with pytest.raises(BinanceExecutionError, match="missing required BINANCE_TESTNET_API_KEY"):
+        create_testnet_signed_client()
+
+    # Valid testnet credentials via factory mint TESTNET authority
+    client = create_testnet_signed_client(api_key="test-key", api_secret="test-secret")
+    assert client.authority.environment == "TESTNET"
+    assert client.authority.credential_namespace == "BINANCE_TESTNET"
+
+
+def test_r1_1_02_protection_limited_to_actual_open_position(tmp_path):
+    store, _case, proposal, event_id, _actor = setup_approved_state(tmp_path)
+    snapshot = sample_snapshot(observed_at_ms=NOW, last_rest_at_ms=NOW)
+    intent = build_trade_intent(
+        live_store=store,
+        account_snapshot=snapshot,
+        proposal_hash=proposal.proposal_hash,
+        approval_event_id=event_id,
+        now_ms=NOW,
+    )
+
+    # Entry filled 0.1, but current open position has been reduced to 0.04
+    entry_fill = intent.quantity  # e.g. 0.1
+    current_open = entry_fill * 0.4  # 0.04
+    mock_client = make_mock_testnet_client(position_amt=current_open)
+    kill_switch = KillSwitch(tmp_path / "live.db")
+    backend = TestnetExecutionBackend(tmp_path / "live.db", mock_client, kill_switch)
+
+    mock_client.query_order_by_client_id.return_value = {
+        "orderId": "ord-reduced",
+        "clientOrderId": intent.client_order_id,
+        "status": "FILLED",
+        "executedQty": str(entry_fill),
+        "avgPrice": str(intent.price),
+        "updateTime": NOW,
+    }
+    mock_client.open_protective_orders.return_value = []
+    mock_client.place_protective_order.return_value = {"algoId": "stop-reduced-1"}
+
+    rep = backend.reconcile_intent(intent, NOW)
+    assert rep.status == "FILLED"
+    assert rep.protective_stop_id == "stop-reduced-1"
+    # Sized to current_open, NEVER exceeding actual open position!
+    mock_client.place_protective_order.assert_called_once()
+    assert mock_client.place_protective_order.call_args.kwargs["quantity"] == pytest.approx(current_open)
+
+
+def test_r1_1_02_flat_position_cancels_stale_protection(tmp_path):
+    store, _case, proposal, event_id, _actor = setup_approved_state(tmp_path)
+    snapshot = sample_snapshot(observed_at_ms=NOW, last_rest_at_ms=NOW)
+    intent = build_trade_intent(
+        live_store=store,
+        account_snapshot=snapshot,
+        proposal_hash=proposal.proposal_hash,
+        approval_event_id=event_id,
+        now_ms=NOW,
+    )
+
+    # Current open position is 0.0 (flat after stop/TP)
+    mock_client = make_mock_testnet_client(position_amt=0.0)
+    kill_switch = KillSwitch(tmp_path / "live.db")
+    backend = TestnetExecutionBackend(tmp_path / "live.db", mock_client, kill_switch)
+
+    mock_client.query_order_by_client_id.return_value = {
+        "orderId": "ord-flat",
+        "clientOrderId": intent.client_order_id,
+        "status": "FILLED",
+        "executedQty": str(intent.quantity),
+        "avgPrice": str(intent.price),
+        "updateTime": NOW,
+    }
+    # Exchange has stale protective order
+    mock_client.open_protective_orders.return_value = [
+        {
+            "algoId": "stop-stale-flat",
+            "clientAlgoId": f"bqa-stop-{intent.client_order_id[:12]}-0100",
+            "quantity": str(intent.quantity),
+        }
+    ]
+    mock_client.cancel_protective_order.return_value = {"algoId": "stop-stale-flat", "status": "CANCELED"}
+
+    rep = backend.reconcile_intent(intent, NOW)
+    assert rep.status == "FILLED"
+    assert rep.protective_stop_id is None
+    # Stale order cancelled
+    mock_client.cancel_protective_order.assert_called_once_with(intent.symbol, "stop-stale-flat")
+    # No new order placed
+    mock_client.place_protective_order.assert_not_called()
+
+
+def test_r1_1_02_position_query_uncertainty_trips_kill_switch(tmp_path):
+    store, _case, proposal, event_id, _actor = setup_approved_state(tmp_path)
+    snapshot = sample_snapshot(observed_at_ms=NOW, last_rest_at_ms=NOW)
+    intent = build_trade_intent(
+        live_store=store,
+        account_snapshot=snapshot,
+        proposal_hash=proposal.proposal_hash,
+        approval_event_id=event_id,
+        now_ms=NOW,
+    )
+
+    mock_client = make_mock_testnet_client()
+    kill_switch = KillSwitch(tmp_path / "live.db")
+    backend = TestnetExecutionBackend(tmp_path / "live.db", mock_client, kill_switch)
+
+    mock_client.query_order_by_client_id.return_value = {
+        "orderId": "ord-pos-fail",
+        "clientOrderId": intent.client_order_id,
+        "status": "FILLED",
+        "executedQty": str(intent.quantity),
+        "avgPrice": str(intent.price),
+        "updateTime": NOW,
+    }
+    # Position query fails with network uncertainty
+    mock_client.positions.side_effect = BinanceExecutionError("Network timeout on /fapi/v3/positionRisk")
+
+    with pytest.raises(ExecutionBlocked, match="position query uncertainty"):
+        backend.reconcile_intent(intent, NOW)
+
+    assert not kill_switch.allows_new_risk()
+
+
+def test_r1_1_02_dry_run_backend_open_position_provider(tmp_path):
+    store, _case, proposal, event_id, _actor = setup_approved_state(tmp_path)
+    snapshot = sample_snapshot(observed_at_ms=NOW, last_rest_at_ms=NOW)
+    intent = build_trade_intent(
+        live_store=store,
+        account_snapshot=snapshot,
+        proposal_hash=proposal.proposal_hash,
+        approval_event_id=event_id,
+        now_ms=NOW,
+    )
+
+    db_path = tmp_path / "live.db"
+    open_pos = 0.05
+    backend = DryRunExecutionBackend(
+        db_path,
+        open_position_provider=lambda sym, side: open_pos,
+    )
+
+    with connection(db_path) as db:
+        db.execute(
+            "INSERT INTO live_execution_orders VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            ("sim-ord-1", intent.intent_id, intent.client_order_id, intent.symbol, intent.side,
+             "FILLED", intent.quantity, intent.quantity, intent.price, None, 0, 0, NOW, NOW, "{}"),
+        )
+
+    # 1. Reconcile with open position = 0.05 (< filled 0.1)
+    rep1 = backend.reconcile_intent(intent, NOW)
+    assert rep1.protective_stop_id is not None
+    with connection(db_path) as db:
+        stop_row = db.execute(
+            "SELECT * FROM live_execution_orders WHERE intent_id=? AND is_protective=1",
+            (intent.intent_id,),
+        ).fetchone()
+    assert stop_row["requested_qty"] == 0.05
+
+    # 2. Position closes (flat)
+    open_pos = 0.0
+    rep2 = backend.reconcile_intent(intent, NOW + 1000)
+    assert rep2.protective_stop_id is None
+    with connection(db_path) as db:
+        stop_row2 = db.execute(
+            "SELECT * FROM live_execution_orders WHERE intent_id=? AND is_protective=1",
+            (intent.intent_id,),
+        ).fetchone()
+    assert stop_row2["status"] == "CANCELED"
