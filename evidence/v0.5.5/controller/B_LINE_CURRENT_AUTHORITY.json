@@ -1,9 +1,9 @@
 {
   "line": "B_LINE",
-  "stage": "B2B_ACCEPTED__LIVE_V1_B3_ACCEPTED__B4_R1_1_REVIEWED_PENDING_R1_2",
+  "stage": "B2B_ACCEPTED__LIVE_V1_B3_ACCEPTED__B4_R1_2_SEALED_PENDING_B5_EXACT_SHA_VALIDATION",
   "code_branch": "feature/tactical-policy-r2",
   "accepted_code_sha": "52c16a28153de307dc6132c0975fe29341a0a918",
-  "docs_authority_commit": "d8f32a30effe8bccea9ebffacbf707c31699614d",
+  "docs_authority_commit": "9d2c82333a58610302835ea71e28f2e0f53fb4e3",
   "current_controller_authority": {
     "path": "reviews/v0.5/tactical-policy/V0.5.5_B2B_CONTROLLER_ACCEPTANCE.md",
     "blob_sha": "4d6d65dad35e42e10d175875093dc045bbc63503"
@@ -32,11 +32,11 @@
     "live_v1_b3_state": "LIVE_V1_B3_ACCEPTED",
     "live_v1_b3_accepted_sha": "961a0f4d4b37cdb9365d5e5867813ff3129c14db",
     "live_v1_b4_authorized": true,
-    "live_v1_b5_authorized": false,
+    "live_v1_b5_authorized": true,
     "live_v1_day2_target_write": "TESTNET_ONLY",
     "provider_credential_smoke": "PENDING",
     "live_store_concurrency_gate": "B4_MUST_ESTABLISH_WAL_OR_EQUIVALENT",
-    "live_v1_b4_state": "LIVE_V1_B4_R1_1_REVIEWED_PENDING_POSITION_CASE_OUTBOX_SEAL_R1_2",
+    "live_v1_b4_state": "LIVE_V1_B4_SAFETY_CLOSED_R1_2_PENDING_B5_EXACT_SHA_VALIDATION",
     "live_v1_b4_candidate_sha": "fd42f2cc1a67506d05117e3daa9a072309f7f998",
     "live_v1_b4_candidate_parent_sha": "961a0f4d4b37cdb9365d5e5867813ff3129c14db",
     "live_v1_b4_repair_authorized": true,
@@ -58,7 +58,13 @@
     ],
     "live_v1_b4_r1_1_sha": "fd4e6fc19085e698c50eca70afe5e419cbd8e060",
     "live_v1_b4_r1_2_authorized": true,
-    "b4_r1_2_blocker": "POSITION_CASE_IDENTITY_NOT_FROZEN_BEFORE_EXTERNAL_ANALYSIS"
+    "b4_r1_2_blocker": "POSITION_CASE_IDENTITY_NOT_FROZEN_BEFORE_EXTERNAL_ANALYSIS",
+    "live_v1_b4_final_sha": "32c1c9976dc20cf003a06398c465c4c089dd99d9",
+    "live_v1_b4_final_parent_sha": "fd4e6fc19085e698c50eca70afe5e419cbd8e060",
+    "live_v1_b5_binding_mode": "EXACT_CODE_SHA",
+    "live_v1_b5_target_sha": "32c1c9976dc20cf003a06398c465c4c089dd99d9",
+    "live_v1_b5_expected_parent_sha": "fd4e6fc19085e698c50eca70afe5e419cbd8e060",
+    "live_v1_b5_validator": "INDEPENDENT_FRESH_SESSION"
   },
   "must_read": [],
   "validation_authority": {
@@ -83,7 +89,7 @@
     "evidence_path": "evidence/v0.5.5/controller/V0.5.5_B2B_CONTROLLER_ACCEPTANCE.json",
     "evidence_blob_sha": "73a11708a85b5f1896397d745c3b7252d3c51f8d"
   },
-  "parallel_authorized_next_stage": "LIVE_V1_B4_POSITION_CASE_OUTBOX_SEAL_R1_2",
+  "parallel_authorized_next_stage": "B5_LIVE_V1_INDEPENDENT_EXACT_SHA_AND_SAFETY_VALIDATION",
   "live_v1_acceptance_authority": {
     "report_path": "reviews/v0.5/live_v1/V0.5.5_LIVE_V1_B3_CONTROLLER_ACCEPTANCE.md",
     "report_blob_sha": "21ad4492feb4750f5fc85a5f88b54d1da36c157d",

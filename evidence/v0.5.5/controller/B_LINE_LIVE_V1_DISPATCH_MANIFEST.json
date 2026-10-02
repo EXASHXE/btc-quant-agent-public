@@ -2,8 +2,8 @@
   "manifest_type": "B_LINE_LIVE_V1_DISPATCH_MANIFEST_V1",
   "repository": "EXASHXE/btc-quant-agent-public",
   "live_branch": "feature/b-line-live-v1",
-  "branch_start_sha": "961a0f4d4b37cdb9365d5e5867813ff3129c14db",
-  "accepted_bline_code_sha": "961a0f4d4b37cdb9365d5e5867813ff3129c14db",
+  "branch_start_sha": "32c1c9976dc20cf003a06398c465c4c089dd99d9",
+  "accepted_bline_code_sha": "32c1c9976dc20cf003a06398c465c4c089dd99d9",
   "b2b_candidate_sha": null,
   "b2b_candidate_usage": "B2B_ACCEPTED_IN_BRANCH_BASE",
   "architecture_plan": {
@@ -14,7 +14,7 @@
   "authority_refs": [
     {
       "path": "evidence/v0.5.5/controller/B_LINE_CURRENT_AUTHORITY.json",
-      "blob_sha": "d8acaf1fc5bf7ef5cf76dff9d5e273a1af20b700",
+      "blob_sha": "9b529135830ceabd860b24ebda67f91c2d2d6956",
       "access_mode": "IDENTITY_ONLY"
     }
   ],
@@ -26,7 +26,7 @@
     "llm_side_effect_authority": "NONE",
     "day1_execution_write": "NONE",
     "day2_target_write": "TESTNET_ONLY",
-    "live_approval_only": "IMPLEMENT_BUT_HARD_DISABLED",
+    "live_approval_only": "HARD_DISABLED",
     "autonomous_live": "FORBIDDEN",
     "testnet_before_live": true,
     "real_funds_requires_independent_pre_live_audit": true,
@@ -34,9 +34,14 @@
     "accepted_b2b_sha": "52c16a28153de307dc6132c0975fe29341a0a918",
     "live_v1_b3_status": "ACCEPTED",
     "live_v1_b3_accepted_sha": "961a0f4d4b37cdb9365d5e5867813ff3129c14db",
-    "live_v1_b4_status": "READY_TO_DISPATCH",
+    "live_v1_b4_status": "SEALED_PENDING_B5_EXACT_SHA_VALIDATION",
     "provider_credential_smoke": "PENDING",
-    "sqlite_concurrency_gate": "B4_MUST_ESTABLISH_WAL_OR_EQUIVALENT"
+    "sqlite_concurrency_gate": "B4_MUST_ESTABLISH_WAL_OR_EQUIVALENT",
+    "live_v1_b4_final_sha": "32c1c9976dc20cf003a06398c465c4c089dd99d9",
+    "live_v1_b5_status": "READY_TO_DISPATCH",
+    "live_v1_b5_binding_mode": "EXACT_CODE_SHA",
+    "live_v1_b5_target_sha": "32c1c9976dc20cf003a06398c465c4c089dd99d9",
+    "live_v1_b5_expected_parent_sha": "fd4e6fc19085e698c50eca70afe5e419cbd8e060"
   },
   "must_read_defaults": [],
   "terminal_states": {

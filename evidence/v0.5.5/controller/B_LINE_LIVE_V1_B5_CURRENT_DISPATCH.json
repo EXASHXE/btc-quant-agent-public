@@ -1,0 +1,33 @@
+{
+  "manifest_type": "B_LINE_LIVE_V1_B5_EXACT_SHA_DISPATCH_V1",
+  "repository": "EXASHXE/btc-quant-agent-public",
+  "task": "B5_LIVE_V1_INDEPENDENT_EXACT_SHA_AND_SAFETY_VALIDATION",
+  "validation_binding_mode": "EXACT_CODE_SHA",
+  "validation_branch": "feature/b-line-live-v1",
+  "target_sha": "32c1c9976dc20cf003a06398c465c4c089dd99d9",
+  "expected_parent_sha": "fd4e6fc19085e698c50eca70afe5e419cbd8e060",
+  "b3_accepted_sha": "961a0f4d4b37cdb9365d5e5867813ff3129c14db",
+  "live_v1_base_sha": "52c16a28153de307dc6132c0975fe29341a0a918",
+  "prompt_path": "prompts/v0.5/validation/v0.5.5_B5_LIVE_V1_INDEPENDENT_EXACT_SHA_AND_SAFETY_VALIDATION.md",
+  "prompt_blob_sha": "8e8de036bf4db7252d6df57e6edc86f2f17e9f1e",
+  "authority_refs": [
+    {
+      "path": "evidence/v0.5.5/controller/B_LINE_CURRENT_AUTHORITY.json",
+      "blob_sha": "9b529135830ceabd860b24ebda67f91c2d2d6956",
+      "access_mode": "IDENTITY_ONLY"
+    },
+    {
+      "path": "evidence/v0.5.5/controller/B_LINE_LIVE_V1_DISPATCH_MANIFEST.json",
+      "blob_sha": "a88479e9f49ba1d02ae7509e4486f1cc7e4fba05",
+      "access_mode": "BINDING_FIELDS_ONLY"
+    }
+  ],
+  "implementation_read_only": true,
+  "repair_in_validation": false,
+  "testnet_only": true,
+  "live_write_authority": "NONE",
+  "autonomous_live": "FORBIDDEN",
+  "controller_dispatch_sha": "SUPPLIED_OUT_OF_BAND_AS_CURRENT_DOCS_HEAD",
+  "pass_state": "LIVE_V1_TESTNET_VALIDATED_LIVE_STILL_DISABLED",
+  "fail_state": "LIVE_V1_INDEPENDENT_VALIDATION_FAILED"
+}
