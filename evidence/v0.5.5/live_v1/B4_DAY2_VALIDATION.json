@@ -1,13 +1,13 @@
 {
-  "task": "B4_LIVE_V1_SAFETY_CLOSURE_REPAIR_R1_1",
+  "task": "B4_LIVE_V1_POSITION_CASE_OUTBOX_SEAL_R1_2",
   "repository": "EXASHXE/btc-quant-agent-public",
   "task_branch": "feature/b-line-live-v1",
   "start_binding_mode": "CURRENT_BRANCH_HEAD",
-  "actual_start_sha": "dfeca901256c0da9998410d0908a62d5e79a3dfb",
-  "reviewed_candidate_sha": "dfeca901256c0da9998410d0908a62d5e79a3dfb",
+  "actual_start_sha": "fd4e6fc19085e698c50eca70afe5e419cbd8e060",
+  "reviewed_candidate_sha": "fd4e6fc19085e698c50eca70afe5e419cbd8e060",
   "accepted_predecessor_sha": "961a0f4d4b37cdb9365d5e5867813ff3129c14db",
   "predecessor_ancestry": "IS_ANCESTOR_VERIFIED",
-  "parent_sha": "dfeca901256c0da9998410d0908a62d5e79a3dfb",
+  "parent_sha": "fd4e6fc19085e698c50eca70afe5e419cbd8e060",
   "initial_worktree_state": "CLEAN",
   "closed_blockers": {
     "R1_01_approval_intent_singleton": {
@@ -45,6 +45,10 @@
     "R1_1_03_signed_client_isolated_testnet_authority": {
       "status": "CLOSED",
       "mechanism": "BinanceSignedClient constructor defaults environment='UNBOUND' and credential_namespace='UNBOUND', which fails closed under ExecutionCapabilityPolicyV1; create_testnet_signed_client factory requires valid BINANCE_TESTNET_API_KEY and BINANCE_TESTNET_API_SECRET, never reads LIVE credentials, and fails startup closed on missing credentials"
+    },
+    "R1_2_01_frozen_position_case_outbox": {
+      "status": "CLOSED",
+      "mechanism": "PositionSupervisor persists exact PositionCase authority (position_case_id, position_case_hash, position_case_json, case_hash) into live_position_case_dispatches before external side effects; retry reuses exact stored case without re-querying fresh_market_case; tampered hash/JSON or event-linkage mismatch fails closed; additive migration maintains backward compatibility"
     }
   },
   "sqlite_durability": {
@@ -69,7 +73,7 @@
     "ruff": "PASS: ruff check .",
     "mypy": "PASS: mypy src (148 source files)",
     "live_v1_tests": {
-      "passed": 153,
+      "passed": 163,
       "failed": 0
     },
     "execution_tests": {
@@ -77,7 +81,7 @@
       "failed": 0
     },
     "full_pytest": {
-      "passed": 2162,
+      "passed": 2172,
       "skipped": 2,
       "warnings": 9
     }
@@ -97,6 +101,6 @@
     "actual_codex_model_invocation": "PENDING (credentials absent)",
     "testnet_credentialed_exchange_smoke": "PENDING (credentials absent)"
   },
-  "remaining_blockers": "None. All R1 and R1.1 safety blockers closed. Real-money LIVE execution remains permanently forbidden.",
-  "decision": "LIVE_V1_B4_SAFETY_CLOSED_R1_1_PENDING_B5_EXACT_SHA_VALIDATION"
+  "remaining_blockers": "None. All R1, R1.1, and R1.2 safety blockers closed. Real-money LIVE execution remains permanently forbidden.",
+  "decision": "LIVE_V1_B4_SAFETY_CLOSED_R1_2_PENDING_B5_EXACT_SHA_VALIDATION"
 }

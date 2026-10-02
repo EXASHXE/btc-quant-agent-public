@@ -66,8 +66,27 @@ class PositionSupervisor:
                 col["name"]
                 for col in db.execute("PRAGMA table_info(live_position_case_dispatches)").fetchall()
             ]
-            if cols and "state" not in cols:
-                db.execute("DROP TABLE live_position_case_dispatches")
+            if cols:
+                if "position_case_id" not in cols:
+                    db.execute(
+                        "ALTER TABLE live_position_case_dispatches ADD COLUMN position_case_id TEXT NOT NULL DEFAULT ''"
+                    )
+                if "position_case_hash" not in cols:
+                    db.execute(
+                        "ALTER TABLE live_position_case_dispatches ADD COLUMN position_case_hash TEXT NOT NULL DEFAULT ''"
+                    )
+                if "position_case_json" not in cols:
+                    db.execute(
+                        "ALTER TABLE live_position_case_dispatches ADD COLUMN position_case_json TEXT NOT NULL DEFAULT ''"
+                    )
+                if "case_hash" not in cols:
+                    db.execute(
+                        "ALTER TABLE live_position_case_dispatches ADD COLUMN case_hash TEXT NOT NULL DEFAULT ''"
+                    )
+                db.execute(
+                    "UPDATE live_position_case_dispatches SET position_case_hash = case_hash "
+                    "WHERE position_case_hash = '' AND case_hash != ''"
+                )
 
             db.executescript("""
                 CREATE TABLE IF NOT EXISTS live_position_events (
@@ -91,7 +110,10 @@ class PositionSupervisor:
                 CREATE TABLE IF NOT EXISTS live_position_case_dispatches (
                     event_id TEXT PRIMARY KEY,
                     event_hash TEXT NOT NULL UNIQUE,
-                    case_hash TEXT NOT NULL,
+                    position_case_id TEXT NOT NULL DEFAULT '',
+                    position_case_hash TEXT NOT NULL DEFAULT '',
+                    position_case_json TEXT NOT NULL DEFAULT '',
+                    case_hash TEXT NOT NULL DEFAULT '',
                     symbol TEXT NOT NULL,
                     state TEXT NOT NULL,
                     retry_count INTEGER NOT NULL DEFAULT 0,
@@ -220,10 +242,11 @@ class PositionSupervisor:
                 db.execute(
                     """
                     INSERT OR IGNORE INTO live_position_case_dispatches (
-                        event_id, event_hash, case_hash, symbol, state,
+                        event_id, event_hash, position_case_id, position_case_hash,
+                        position_case_json, case_hash, symbol, state,
                         retry_count, lease_token, lease_expires_at_ms,
                         created_at_ms, updated_at_ms
-                    ) VALUES (?, ?, '', ?, 'PENDING', 0, NULL, 0, ?, ?)
+                    ) VALUES (?, ?, '', '', '', '', ?, 'PENDING', 0, NULL, 0, ?, ?)
                     """,
                     (
                         event.event_id,
@@ -255,6 +278,16 @@ class PositionSupervisor:
                 return None
             return PositionEventV1.model_validate(json.loads(row["payload"]))
 
+    def get_dispatch(self, event_id: str) -> dict[str, Any] | None:
+        with connection(self.path) as db:
+            row = db.execute(
+                "SELECT * FROM live_position_case_dispatches WHERE event_id=?",
+                (event_id,),
+            ).fetchone()
+            if row is None:
+                return None
+            return dict(row)
+
     async def drain_pending_dispatches(
         self, now_ms: int, lease_ms: int = 30_000, max_retries: int = 3
     ) -> tuple[PositionEventV1, ...]:
@@ -277,7 +310,8 @@ class PositionSupervisor:
                 db.execute("BEGIN IMMEDIATE")
                 candidate = db.execute(
                     """
-                    SELECT event_id, event_hash, symbol, retry_count
+                    SELECT event_id, event_hash, symbol, retry_count,
+                           position_case_id, position_case_hash, position_case_json, case_hash
                     FROM live_position_case_dispatches
                     WHERE state = 'PENDING'
                        OR (state = 'DISPATCHING' AND lease_expires_at_ms <= ?)
@@ -338,8 +372,107 @@ class PositionSupervisor:
                 continue
 
             try:
-                base_case = self.fresh_market_case(claimed_row["symbol"])
-                pos_case = position_case_from_event(base_case, event, now_ms=now_ms)
+                event.verify()
+            except Exception:  # noqa: BLE001
+                with connection(self.path) as db:
+                    db.execute(
+                        """
+                        UPDATE live_position_case_dispatches
+                        SET state = 'FAILED_CLOSED', lease_token = NULL, updated_at_ms = ?
+                        WHERE event_id = ? AND lease_token = ?
+                        """,
+                        (now_ms, event_id, lease_token),
+                    )
+                continue
+
+            if event.event_hash != claimed_row["event_hash"]:
+                with connection(self.path) as db:
+                    db.execute(
+                        """
+                        UPDATE live_position_case_dispatches
+                        SET state = 'FAILED_CLOSED', lease_token = NULL, updated_at_ms = ?
+                        WHERE event_id = ? AND lease_token = ?
+                        """,
+                        (now_ms, event_id, lease_token),
+                    )
+                continue
+
+            stored_case_json = claimed_row["position_case_json"]
+            stored_case_hash = claimed_row["position_case_hash"] or claimed_row["case_hash"]
+            stored_case_id = claimed_row["position_case_id"]
+
+            pos_case: CasePackageV1
+            if stored_case_json:
+                # 3.2 Retry rule: exact stored case must be used; fresh_market_case is NOT called.
+                try:
+                    pos_case = CasePackageV1.model_validate_json(stored_case_json)
+                    pos_case.verify()
+                    if stored_case_hash and pos_case.case_hash != stored_case_hash:
+                        raise ValueError(f"stored case hash mismatch: {pos_case.case_hash} != {stored_case_hash}")
+                    if stored_case_id and pos_case.case_id != stored_case_id:
+                        raise ValueError(f"stored case id mismatch: {pos_case.case_id} != {stored_case_id}")
+                    if pos_case.position_event_hash != event.event_hash:
+                        raise ValueError(f"event hash linkage mismatch: {pos_case.position_event_hash} != {event.event_hash}")
+                    if pos_case.case_id != f"pos-{event.event_id}":
+                        raise ValueError(f"case_id linkage mismatch: {pos_case.case_id} != pos-{event.event_id}")
+                except Exception:  # noqa: BLE001
+                    # Tampered or corrupted stored case -> mark FAILED_CLOSED without calling analysis
+                    with connection(self.path) as db:
+                        db.execute(
+                            """
+                            UPDATE live_position_case_dispatches
+                            SET state = 'FAILED_CLOSED', lease_token = NULL, updated_at_ms = ?
+                            WHERE event_id = ? AND lease_token = ?
+                            """,
+                            (now_ms, event_id, lease_token),
+                        )
+                    continue
+            else:
+                # 3.3 First materialization: obtain base case once and freeze PositionCase before calling analysis
+                try:
+                    base_case = self.fresh_market_case(claimed_row["symbol"])
+                    base_case.verify()
+                    pos_case = position_case_from_event(base_case, event, now_ms=now_ms)
+                    pos_case.verify()
+                except Exception:  # noqa: BLE001
+                    with connection(self.path) as db:
+                        db.execute(
+                            """
+                            UPDATE live_position_case_dispatches
+                            SET state = CASE WHEN retry_count >= ? THEN 'FAILED_CLOSED' ELSE 'PENDING' END,
+                                lease_token = NULL,
+                                lease_expires_at_ms = 0,
+                                updated_at_ms = ?
+                            WHERE event_id = ? AND lease_token = ?
+                            """,
+                            (max_retries, now_ms, event_id, lease_token),
+                        )
+                    continue
+
+                # Commit durable freeze to SQLite before external side effect
+                with connection(self.path) as db:
+                    db.execute(
+                        """
+                        UPDATE live_position_case_dispatches
+                        SET position_case_id = ?,
+                            position_case_hash = ?,
+                            position_case_json = ?,
+                            case_hash = ?,
+                            updated_at_ms = ?
+                        WHERE event_id = ? AND lease_token = ?
+                        """,
+                        (
+                            pos_case.case_id,
+                            pos_case.case_hash,
+                            pos_case.canonical_json(),
+                            pos_case.case_hash,
+                            now_ms,
+                            event_id,
+                            lease_token,
+                        ),
+                    )
+
+            try:
                 await self.analysis_service.analyze_case(pos_case)
 
                 with connection(self.path) as db:
@@ -348,12 +481,13 @@ class PositionSupervisor:
                         UPDATE live_position_case_dispatches
                         SET state = 'DONE',
                             case_hash = ?,
+                            position_case_hash = ?,
                             lease_token = NULL,
                             lease_expires_at_ms = 0,
                             updated_at_ms = ?
                         WHERE event_id = ? AND lease_token = ?
                         """,
-                        (pos_case.case_hash, now_ms, event_id, lease_token),
+                        (pos_case.case_hash, pos_case.case_hash, now_ms, event_id, lease_token),
                     )
                 dispatched_events.append(event)
             except Exception:  # noqa: BLE001

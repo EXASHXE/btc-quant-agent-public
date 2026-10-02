@@ -7,6 +7,7 @@ import pytest
 from btc_quant_agent.decision.models import CasePackageV1
 from btc_quant_agent.live_db import connection
 from btc_quant_agent.position_supervisor import (
+    PositionEventV1,
     PositionObservationV1,
     PositionSupervisor,
     position_case_from_event,
@@ -438,5 +439,465 @@ def test_r1_1_01_no_event_silently_disappears_due_to_source_hash_dedupe(tmp_path
         # But process() or drain_pending_dispatches() drains unfinished dispatches; event was not lost!
         await supervisor2.drain_pending_dispatches(NOW + 1000)
         assert len(calls) == 1
+
+    asyncio.run(run())
+
+
+def test_r1_2_a01_first_materialization_freezes_case_before_analysis(tmp_path):
+    async def run() -> None:
+        db_file = tmp_path / "live.db"
+        frozen_states_during_analysis: list[dict[str, object]] = []
+
+        class VerifyingSpy:
+            async def analyze_case(self, case: CasePackageV1) -> None:
+                # Query DB during analysis execution to prove freeze occurred BEFORE this call
+                with connection(db_file) as db:
+                    row = db.execute(
+                        "SELECT position_case_id, position_case_hash, position_case_json FROM live_position_case_dispatches",
+                    ).fetchone()
+                    assert row is not None
+                    frozen_states_during_analysis.append(dict(row))
+
+        supervisor = PositionSupervisor(
+            db_file, analysis_service=VerifyingSpy(), fresh_market_case=lambda _: market_case(),
+        )
+        events = await supervisor.process(observation(), NOW)
+        assert len(events) >= 1
+        assert len(frozen_states_during_analysis) == 1
+
+        frozen = frozen_states_during_analysis[0]
+        assert frozen["position_case_id"] == f"pos-{events[0].event_id}"
+        assert len(str(frozen["position_case_hash"])) == 64
+        # Validate that frozen JSON decodes to a valid case whose hash matches
+        restored = CasePackageV1.model_validate_json(str(frozen["position_case_json"]))
+        restored.verify()
+        assert restored.case_hash == frozen["position_case_hash"]
+
+    asyncio.run(run())
+
+
+def test_r1_2_a02_crash_after_frozen_persistence_uses_identical_case_hash_on_restart(tmp_path):
+    async def run() -> None:
+        db_file = tmp_path / "live.db"
+        supervisor1 = PositionSupervisor(db_file, fresh_market_case=lambda _: market_case())
+        events = supervisor1.evaluate(observation(), NOW)
+        assert len(events) >= 1
+        event = events[0]
+
+        # Simulate first materialization freeze occurring right before a crash
+        base = market_case()
+        pos_case = position_case_from_event(base, event, now_ms=NOW)
+        with connection(db_file) as db:
+            db.execute(
+                """
+                UPDATE live_position_case_dispatches
+                SET position_case_id = ?,
+                    position_case_hash = ?,
+                    position_case_json = ?,
+                    case_hash = ?,
+                    state = 'DISPATCHING',
+                    lease_token = 'crashed-worker',
+                    lease_expires_at_ms = ?,
+                    retry_count = 1
+                WHERE event_id = ?
+                """,
+                (
+                    pos_case.case_id,
+                    pos_case.case_hash,
+                    pos_case.canonical_json(),
+                    pos_case.case_hash,
+                    NOW + 5_000,
+                    event.event_id,
+                ),
+            )
+
+        # Restart supervisor with spy
+        observed_hashes: list[str] = []
+
+        class Spy:
+            async def analyze_case(self, case: CasePackageV1) -> None:
+                observed_hashes.append(case.case_hash)
+
+        supervisor2 = PositionSupervisor(
+            db_file, analysis_service=Spy(), fresh_market_case=lambda _: market_case(),
+        )
+
+        # Advance past lease expiry: recovery must reuse identical case hash
+        drained = await supervisor2.drain_pending_dispatches(NOW + 10_000)
+        assert len(drained) == 1
+        assert len(observed_hashes) == 1
+        assert observed_hashes[0] == pos_case.case_hash
+
+        dispatch = supervisor2.get_dispatch(event.event_id)
+        assert dispatch is not None
+        assert dispatch["state"] == "DONE"
+        assert dispatch["position_case_hash"] == pos_case.case_hash
+
+    asyncio.run(run())
+
+
+def test_r1_2_a03_fresh_market_case_mutation_never_replaces_frozen_case(tmp_path):
+    async def run() -> None:
+        db_file = tmp_path / "live.db"
+
+        # 1. First run freezes case with original price (100.0)
+        base_original = market_case()
+        supervisor1 = PositionSupervisor(
+            db_file, analysis_service=None, fresh_market_case=lambda _: base_original,
+        )
+        events = supervisor1.evaluate(observation(), NOW)
+        event = events[0]
+
+        frozen_case = position_case_from_event(base_original, event, now_ms=NOW)
+        with connection(db_file) as db:
+            db.execute(
+                """
+                UPDATE live_position_case_dispatches
+                SET position_case_id = ?,
+                    position_case_hash = ?,
+                    position_case_json = ?,
+                    case_hash = ?,
+                    state = 'PENDING'
+                WHERE event_id = ?
+                """,
+                (
+                    frozen_case.case_id,
+                    frozen_case.case_hash,
+                    frozen_case.canonical_json(),
+                    frozen_case.case_hash,
+                    event.event_id,
+                ),
+            )
+
+        # 2. Restarted supervisor has a mutated fresh_market_case (e.g. price 999999.0)
+        fresh_case_calls: list[str] = []
+
+        def mutated_fresh_case(sym: str) -> CasePackageV1:
+            fresh_case_calls.append(sym)
+            return CasePackageV1.build(
+                case_id="mutated", created_at_ms=NOW, observed_at_ms=NOW,
+                expires_at_ms=NOW + 60_000, symbol="BTCUSDT", trigger="MARKET_WATCH",
+                strategy="CORRUPTED", strategy_version="v2", direction="SHORT",
+                evidence_id="e" * 64, snapshot_hash="corrupted", signal_identity="corrupted",
+                price=999_999.0, entry_low=999_998.0, entry_high=1_000_000.0, stop_loss=990_000.0,
+                take_profit_1=1_100_000.0, take_profit_2=1_200_000.0, atr=100.0,
+                data_quality="OK", spread_bps=1.0, liquidity_usdt=100_000.0,
+            )
+
+        observed_cases: list[CasePackageV1] = []
+
+        class Spy:
+            async def analyze_case(self, case: CasePackageV1) -> None:
+                observed_cases.append(case)
+
+        supervisor2 = PositionSupervisor(
+            db_file, analysis_service=Spy(), fresh_market_case=mutated_fresh_case,
+        )
+
+        # 3. Drain must NOT call fresh_market_case, and MUST analyze original frozen case
+        drained = await supervisor2.drain_pending_dispatches(NOW + 1000)
+        assert len(drained) == 1
+        assert len(fresh_case_calls) == 0  # fresh_market_case was NEVER invoked!
+        assert len(observed_cases) == 1
+        assert observed_cases[0].case_hash == frozen_case.case_hash
+        assert observed_cases[0].price == 100.0
+        assert observed_cases[0].strategy == base_original.strategy
+
+    asyncio.run(run())
+
+
+def test_r1_2_a04_analysis_service_observes_exact_stored_case_hash(tmp_path):
+    async def run() -> None:
+        db_file = tmp_path / "live.db"
+        observed_hashes: list[str] = []
+
+        class Spy:
+            async def analyze_case(self, case: CasePackageV1) -> None:
+                observed_hashes.append(case.case_hash)
+
+        supervisor = PositionSupervisor(
+            db_file, analysis_service=Spy(), fresh_market_case=lambda _: market_case(),
+        )
+        events = await supervisor.process(observation(), NOW)
+        assert len(events) >= 1
+        assert len(observed_hashes) == 1
+
+        dispatch = supervisor.get_dispatch(events[0].event_id)
+        assert dispatch is not None
+        assert dispatch["position_case_hash"] == observed_hashes[0]
+        assert dispatch["case_hash"] == observed_hashes[0]
+
+    asyncio.run(run())
+
+
+def test_r1_2_a05_crash_after_b3_reservation_retry_does_not_reissue_provider(tmp_path):
+    async def run() -> None:
+        from types import SimpleNamespace
+
+        from test_live_v1_decision_models import sample_analysis
+
+        from btc_quant_agent.approval.store import LiveStore
+        from btc_quant_agent.decision.backends import ResponsesBackend
+        from btc_quant_agent.decision.risk import RiskCompilerV1, RiskPolicyV1
+        from btc_quant_agent.decision.service import TacticalLiveService
+
+        provider_calls = []
+
+        async def parse(**kwargs):
+            provider_calls.append(kwargs)
+            case_data = json.loads(kwargs["input"][1]["content"])
+            validated = CasePackageV1.model_validate_json(json.dumps(case_data))
+            return SimpleNamespace(
+                status="completed", output=[], model="configured-model",
+                id="resp-1", output_parsed=sample_analysis(validated),
+            )
+
+        db_file = tmp_path / "live.db"
+        store = LiveStore(str(db_file))
+        backend = ResponsesBackend(
+            "configured-model", 1,
+            client=SimpleNamespace(responses=SimpleNamespace(parse=parse)),
+            clock_ms=lambda: NOW,
+        )
+        decision_service = TacticalLiveService(
+            store, backend, RiskCompilerV1(RiskPolicyV1()), clock_ms=lambda: NOW,
+        )
+
+        supervisor = PositionSupervisor(
+            db_file, analysis_service=decision_service, fresh_market_case=lambda _: market_case(),
+        )
+
+        # 1. Process event: first materialization freezes case and analyzes it -> primary LLM invoked once
+        events = await supervisor.process(observation(), NOW)
+        assert len(events) >= 1
+        assert len(provider_calls) == 1
+
+        # 2. Simulate worker crash before marking DONE: reset dispatch to PENDING with frozen case intact
+        with connection(db_file) as db:
+            db.execute(
+                "UPDATE live_position_case_dispatches SET state='PENDING' WHERE event_id=?",
+                (events[0].event_id,),
+            )
+
+        # 3. Retry dispatch: exact stored case is replayed -> B3 case reservation returns active proposal without calling LLM
+        drained = await supervisor.drain_pending_dispatches(NOW + 1000)
+        assert len(drained) == 1
+        assert len(provider_calls) == 1  # Provider was NOT reissued!
+
+        dispatch = supervisor.get_dispatch(events[0].event_id)
+        assert dispatch is not None
+        assert dispatch["state"] == "DONE"
+
+    asyncio.run(run())
+
+
+def test_r1_2_a06_tampered_stored_case_fails_closed_no_analysis(tmp_path):
+    async def run() -> None:
+        db_file = tmp_path / "live.db"
+        calls: list[str] = []
+
+        class Spy:
+            async def analyze_case(self, case: CasePackageV1) -> None:
+                calls.append(case.case_hash)
+
+        supervisor = PositionSupervisor(
+            db_file, analysis_service=Spy(), fresh_market_case=lambda _: market_case(),
+        )
+        events = supervisor.evaluate(observation(), NOW)
+        event = events[0]
+
+        # Freeze case with tampered hash (mismatch between JSON and stored hash)
+        base = market_case()
+        pos_case = position_case_from_event(base, event, now_ms=NOW)
+        with connection(db_file) as db:
+            db.execute(
+                """
+                UPDATE live_position_case_dispatches
+                SET position_case_id = ?,
+                    position_case_hash = 'tampered-hash-000000000000000000000000000000000000000000000000000',
+                    position_case_json = ?,
+                    case_hash = 'tampered-hash-000000000000000000000000000000000000000000000000000',
+                    state = 'PENDING'
+                WHERE event_id = ?
+                """,
+                (pos_case.case_id, pos_case.canonical_json(), event.event_id),
+            )
+
+        # Drain must detect mismatch and transition to FAILED_CLOSED without calling analysis
+        drained = await supervisor.drain_pending_dispatches(NOW + 1000)
+        assert len(drained) == 0
+        assert len(calls) == 0
+
+        dispatch = supervisor.get_dispatch(event.event_id)
+        assert dispatch is not None
+        assert dispatch["state"] == "FAILED_CLOSED"
+
+    asyncio.run(run())
+
+
+def test_r1_2_a07_tampered_event_linkage_fails_closed(tmp_path):
+    async def run() -> None:
+        db_file = tmp_path / "live.db"
+        calls: list[str] = []
+
+        class Spy:
+            async def analyze_case(self, case: CasePackageV1) -> None:
+                calls.append(case.case_hash)
+
+        supervisor = PositionSupervisor(
+            db_file, analysis_service=Spy(), fresh_market_case=lambda _: market_case(),
+        )
+        events = supervisor.evaluate(observation(), NOW)
+        event = events[0]
+
+        # Build case for a different event to create a linkage mismatch
+        foreign_event = PositionEventV1.build(
+            event_id="pe-foreign-123",
+            trigger="STOP_NEAR",
+            symbol="BTCUSDT",
+            source_hash="f" * 64,
+            observed_at_ms=NOW,
+            details={},
+        )
+        foreign_case = position_case_from_event(market_case(), foreign_event, now_ms=NOW)
+
+        with connection(db_file) as db:
+            db.execute(
+                """
+                UPDATE live_position_case_dispatches
+                SET position_case_id = ?,
+                    position_case_hash = ?,
+                    position_case_json = ?,
+                    case_hash = ?,
+                    state = 'PENDING'
+                WHERE event_id = ?
+                """,
+                (
+                    foreign_case.case_id,
+                    foreign_case.case_hash,
+                    foreign_case.canonical_json(),
+                    foreign_case.case_hash,
+                    event.event_id,
+                ),
+            )
+
+        # Drain must detect linkage mismatch and fail closed without calling analysis
+        drained = await supervisor.drain_pending_dispatches(NOW + 1000)
+        assert len(drained) == 0
+        assert len(calls) == 0
+
+        dispatch = supervisor.get_dispatch(event.event_id)
+        assert dispatch is not None
+        assert dispatch["state"] == "FAILED_CLOSED"
+
+    asyncio.run(run())
+
+
+def test_r1_2_a08_done_row_never_redispatches(tmp_path):
+    async def run() -> None:
+        calls: list[str] = []
+
+        class Spy:
+            async def analyze_case(self, case: CasePackageV1) -> None:
+                calls.append(case.case_hash)
+
+        db_file = tmp_path / "live.db"
+        supervisor = PositionSupervisor(
+            db_file, analysis_service=Spy(), fresh_market_case=lambda _: market_case(),
+        )
+        events = await supervisor.process(observation(), NOW)
+        assert len(events) >= 1
+        assert len(calls) == 1
+
+        # Calling drain repeatedly never dispatches DONE row
+        for offset in (1000, 2000, 30_000, 100_000):
+            drained = await supervisor.drain_pending_dispatches(NOW + offset)
+            assert len(drained) == 0
+            assert len(calls) == 1
+
+    asyncio.run(run())
+
+
+def test_r1_2_a09_legacy_pending_row_without_frozen_payload_gets_first_materialization(tmp_path):
+    async def run() -> None:
+        db_file = tmp_path / "live.db"
+        calls: list[str] = []
+
+        class Spy:
+            async def analyze_case(self, case: CasePackageV1) -> None:
+                calls.append(case.case_hash)
+
+        # Create supervisor to initialize schema
+        supervisor = PositionSupervisor(
+            db_file, analysis_service=Spy(), fresh_market_case=lambda _: market_case(),
+        )
+        event = supervisor.evaluate(observation(), NOW)[0]
+
+        # Reset row to legacy R1.1 state: empty position_case_json and position_case_hash
+        with connection(db_file) as db:
+            db.execute(
+                """
+                UPDATE live_position_case_dispatches
+                SET position_case_id = '',
+                    position_case_hash = '',
+                    position_case_json = '',
+                    case_hash = '',
+                    state = 'PENDING'
+                WHERE event_id = ?
+                """,
+                (event.event_id,),
+            )
+
+        # Drain must perform one first materialization, freeze the case, and mark DONE
+        drained = await supervisor.drain_pending_dispatches(NOW + 1000)
+        assert len(drained) == 1
+        assert len(calls) == 1
+
+        dispatch = supervisor.get_dispatch(event.event_id)
+        assert dispatch is not None
+        assert dispatch["state"] == "DONE"
+        assert dispatch["position_case_hash"] == calls[0]
+        assert len(dispatch["position_case_json"]) > 0
+
+    asyncio.run(run())
+
+
+def test_r1_2_a10_legacy_done_row_without_frozen_payload_stays_done(tmp_path):
+    async def run() -> None:
+        db_file = tmp_path / "live.db"
+        calls: list[str] = []
+
+        class Spy:
+            async def analyze_case(self, case: CasePackageV1) -> None:
+                calls.append(case.case_hash)
+
+        supervisor = PositionSupervisor(
+            db_file, analysis_service=Spy(), fresh_market_case=lambda _: market_case(),
+        )
+        event = supervisor.evaluate(observation(), NOW)[0]
+
+        # Manually create legacy DONE row without frozen payload
+        with connection(db_file) as db:
+            db.execute(
+                """
+                UPDATE live_position_case_dispatches
+                SET position_case_id = '',
+                    position_case_hash = '',
+                    position_case_json = '',
+                    case_hash = 'legacy-done-hash',
+                    state = 'DONE'
+                WHERE event_id = ?
+                """,
+                (event.event_id,),
+            )
+
+        # Drain must preserve DONE state and NOT reissue
+        drained = await supervisor.drain_pending_dispatches(NOW + 1000)
+        assert len(drained) == 0
+        assert len(calls) == 0
+
+        dispatch = supervisor.get_dispatch(event.event_id)
+        assert dispatch is not None
+        assert dispatch["state"] == "DONE"
 
     asyncio.run(run())
