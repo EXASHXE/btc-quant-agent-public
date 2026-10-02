@@ -237,13 +237,25 @@ def test_api_lifespan_starts_and_stops_only_injected_runtime(tmp_path, monkeypat
                               execute_intent=AsyncMock(return_value={"status": "FILLED"}))
     app = api.create_app(live_runtime=runtime)
 
-    # 1. Verify all routes on app are strictly read-only GET/HEAD/OPTIONS
-    registered_routes = [
-        (getattr(route, "path", ""), method)
-        for route in app.routes
-        for method in getattr(route, "methods", set())
-        if getattr(route, "path", None)
-    ]
+    def _all_routes(application):
+        routes = []
+        for route in application.routes:
+            path = getattr(route, "path", None)
+            methods = getattr(route, "methods", None)
+            if path and methods:
+                for method in methods:
+                    routes.append((path, method))
+            if hasattr(route, "original_router"):
+                for sub in route.original_router.routes:
+                    sub_path = getattr(sub, "path", None)
+                    sub_methods = getattr(sub, "methods", None)
+                    if sub_path and sub_methods:
+                        for method in sub_methods:
+                            routes.append((sub_path, method))
+        return routes
+
+    # 1. Verify all routes on app (including any nested routers) are strictly read-only GET/HEAD/OPTIONS
+    registered_routes = _all_routes(app)
     for path, method in registered_routes:
         if path in {"/openapi.json", "/docs", "/docs/oauth2-redirect", "/redoc"}:
             continue
@@ -251,6 +263,7 @@ def test_api_lifespan_starts_and_stops_only_injected_runtime(tmp_path, monkeypat
 
     # 2. No runtime execution route exists anywhere in app
     assert not any(getattr(route, "path", "").startswith("/live-v1/runtime/") for route in app.routes)
+    assert not any(p in {"/live-v1/scan", "/live-v1/reviews"} for p, _ in registered_routes)
 
     # 3. Lifespan correctly starts and stops injected runtime
     async def run():
@@ -276,3 +289,124 @@ def test_api_lifespan_starts_and_stops_only_injected_runtime(tmp_path, monkeypat
         runtime.execute_intent.assert_awaited_once_with("intent-1")
 
     _run(run_direct())
+
+
+def test_b4_runtime_host_api_governance_matrix(tmp_path, monkeypatch):
+    import httpx
+
+    monkeypatch.setenv("FEISHU_VERIFICATION_TOKEN", "test-token")
+    monkeypatch.setenv("FEISHU_APPROVER_OPEN_IDS", "approver-1")
+    monkeypatch.setattr(api, "load_config", lambda: AppConfig(
+        storage=StorageConfig(sqlite_path=str(tmp_path / "api.db"))))
+    service = TacticalLiveService(LiveStore(tmp_path / "live.db"), None,
+                                  RiskCompilerV1(RiskPolicyV1()))
+    runtime = SimpleNamespace(tactical_service=service, start=AsyncMock(), stop=AsyncMock(),
+                              status=Mock(return_value={"enabled": True, "mode": "B4_RUNTIME"}),
+                              execute_intent=AsyncMock(return_value={"status": "FILLED"}))
+
+    def _all_routes(application):
+        routes = []
+        for r in application.routes:
+            p = getattr(r, "path", None)
+            m = getattr(r, "methods", None)
+            if p and m:
+                for method in m:
+                    routes.append((p, method))
+            if hasattr(r, "original_router"):
+                for sub in r.original_router.routes:
+                    sp = getattr(sub, "path", None)
+                    sm = getattr(sub, "methods", None)
+                    if sp and sm:
+                        for method in sm:
+                            routes.append((sp, method))
+        return routes
+
+    # R2.1.1-A01 & A02: Injected runtime mode -> host routes are strictly read-only; no scan/reviews/execute
+    app_injected = api.create_app(live_runtime=runtime)
+    routes_injected = _all_routes(app_injected)
+    for path, method in routes_injected:
+        if path in {"/openapi.json", "/docs", "/docs/oauth2-redirect", "/redoc"}:
+            continue
+        assert method in {"GET", "HEAD", "OPTIONS"}, f"Non-read-only method {method} on {path}"
+    assert not any(p in {"/live-v1/scan", "/live-v1/reviews"} for p, _ in routes_injected)
+    assert not any(p.startswith("/live-v1/runtime/") for p, _ in routes_injected)
+
+    # R2.1.1-A03: BTC_QUANT_LIVE_V1_RUNTIME_ENABLED=true -> same read-only host invariant
+    monkeypatch.setenv("BTC_QUANT_LIVE_V1_RUNTIME_ENABLED", "true")
+    monkeypatch.delenv("BTC_QUANT_LIVE_V1_ENABLED", raising=False)
+    app_env = api.create_app()
+    routes_env = _all_routes(app_env)
+    for path, method in routes_env:
+        if path in {"/openapi.json", "/docs", "/docs/oauth2-redirect", "/redoc"}:
+            continue
+        assert method in {"GET", "HEAD", "OPTIONS"}, f"Non-read-only method {method} on {path}"
+    assert not any(p in {"/live-v1/scan", "/live-v1/reviews"} for p, _ in routes_env)
+    assert not any(p.startswith("/live-v1/runtime/") for p, _ in routes_env)
+
+    # R2.1.1-A04: Both legacy B3 enabled + runtime enabled -> runtime mode takes precedence and remains host-read-only
+    monkeypatch.setenv("BTC_QUANT_LIVE_V1_ENABLED", "true")
+    monkeypatch.setenv("BTC_QUANT_LIVE_V1_RUNTIME_ENABLED", "true")
+    app_both = api.create_app()
+    routes_both = _all_routes(app_both)
+    for path, method in routes_both:
+        if path in {"/openapi.json", "/docs", "/docs/oauth2-redirect", "/redoc"}:
+            continue
+        assert method in {"GET", "HEAD", "OPTIONS"}, f"Non-read-only method {method} on {path}"
+    assert not any(p in {"/live-v1/scan", "/live-v1/reviews"} for p, _ in routes_both)
+    assert not any(p.startswith("/live-v1/runtime/") for p, _ in routes_both)
+
+    # R2.1.1-A05: Legacy B3 control-plane mode without B4 runtime -> existing B3 router behavior preserved
+    monkeypatch.delenv("BTC_QUANT_LIVE_V1_RUNTIME_ENABLED", raising=False)
+    monkeypatch.setenv("BTC_QUANT_LIVE_V1_ENABLED", "true")
+    app_b3 = api.create_app(live_service=service)
+    routes_b3 = _all_routes(app_b3)
+    assert any(p == "/live-v1/scan" and m == "POST" for p, m in routes_b3)
+    assert any(p == "/live-v1/reviews" and m == "POST" for p, m in routes_b3)
+    assert any(p == "/live-v1/cases/{case_id}" and m == "GET" for p, m in routes_b3)
+
+    # R2.1.1-A06: Lifespan in runtime mode starts and stops LiveV1Runtime
+    async def run_lifespan():
+        async with app_injected.router.lifespan_context(app_injected):
+            runtime.start.assert_awaited_once()
+        runtime.stop.assert_awaited_once()
+
+    _run(run_lifespan())
+
+    # R2.1.1-A07: /execution/status remains GET/read-only and surfaces runtime status
+    exec_status_route = next(r for r in app_injected.routes if getattr(r, "path", "") == "/execution/status")
+    status_payload = exec_status_route.endpoint()
+    assert status_payload.get("live_v1_runtime") == {"enabled": True, "mode": "B4_RUNTIME"}
+
+    # R2.1.1-A08: Direct Python call LiveV1Runtime.execute_intent(intent_id) remains functional
+    async def run_direct():
+        res = await runtime.execute_intent("intent-governance-1")
+        assert res == {"status": "FILLED"}
+        runtime.execute_intent.assert_awaited_once_with("intent-governance-1")
+
+    _run(run_direct())
+
+    # R2.1.1-A09: Feishu callback cannot carry executable order fields and cannot directly call execution backend
+    async def test_feishu_callback_execution_isolation():
+        monkeypatch.setenv("FEISHU_VERIFICATION_TOKEN", "test-token")
+        async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app_injected),
+                                     base_url="http://test") as client:
+            malicious_payload = {
+                "schema": "2.0",
+                "header": {"event_type": "card.action.trigger", "event_id": "evt-1", "token": "test-token"},
+                "event": {
+                    "operator": {"open_id": "approver-1"},
+                    "action": {
+                        "value": {
+                            "action": "APPROVE",
+                            "proposal_hash": "h1",
+                            "case_hash": "c1",
+                            "quantity": "1.5",
+                            "leverage": 10,
+                        }
+                    }
+                }
+            }
+            resp = await client.post("/live-v1/feishu/callback", json=malicious_payload)
+            assert resp.status_code == 400
+
+    _run(test_feishu_callback_execution_isolation())

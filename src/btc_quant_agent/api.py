@@ -67,10 +67,12 @@ def create_app(
     service = QuantService.create(load_config())
 
     runtime_requested = os.getenv("BTC_QUANT_LIVE_V1_RUNTIME_ENABLED", "false") == "true"
-    if live_service is not None or live_runtime is not None or runtime_requested or os.getenv("BTC_QUANT_LIVE_V1_ENABLED", "false") == "true":
+    runtime_mode = live_runtime is not None or runtime_requested
+    b3_mode = (live_service is not None or os.getenv("BTC_QUANT_LIVE_V1_ENABLED", "false") == "true") and not runtime_mode
+
+    if b3_mode or runtime_mode:
         from .approval.callback import create_callback_app
         from .config import LiveV1Config
-        from .decision.api import create_live_router
         from .decision.service import TacticalLiveService
         from .market_watch.service import MarketWatchService
 
@@ -87,10 +89,14 @@ def create_app(
             app_id=live_config.feishu_app_id,
         ))
 
-        app.include_router(create_live_router(live))
+        if b3_mode:
+            from .decision.api import create_live_router
+
+            app.include_router(create_live_router(live))
 
         if runtime_requested and live_runtime is None:
             from .live_runtime import LiveV1Runtime
+
             live_runtime = LiveV1Runtime.create(live_config, live)
 
     @app.get("/health")

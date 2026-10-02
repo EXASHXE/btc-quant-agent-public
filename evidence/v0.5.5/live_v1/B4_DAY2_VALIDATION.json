@@ -72,7 +72,7 @@
     },
     "R2_1_02_readonly_public_api_seal": {
       "status": "CLOSED",
-      "mechanism": "removed public runtime execution POST route from api.py; public REST surface remains strictly read-only GET/HEAD across all runtime modes; runtime status integrated into existing /execution/status; LiveV1Runtime.execute_intent retained for internal orchestration"
+      "mechanism": "removed public runtime execution POST route from api.py; separated B3 control-plane router from B4 operational runtime mode so runtime injection and runtime env flag register zero mutating routes on host API (scan/reviews/execute omitted); public REST surface remains strictly read-only GET/HEAD across all runtime configurations; Feishu callback isolated as mounted non-execution webhook; runtime status integrated into existing /execution/status; LiveV1Runtime.execute_intent retained for internal orchestration"
     }
   },
   "sqlite_durability": {
@@ -97,7 +97,7 @@
     "ruff": "PASS: ruff check .",
     "mypy": "PASS: mypy src (150 source files)",
     "live_v1_tests": {
-      "passed": 213,
+      "passed": 214,
       "failed": 0
     },
     "execution_tests": {
@@ -105,7 +105,7 @@
       "failed": 0
     },
     "full_pytest": {
-      "passed": 2222,
+      "passed": 2223,
       "skipped": 2,
       "warnings": 9
     }
