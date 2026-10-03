@@ -1,0 +1,42 @@
+import asyncio
+from dataclasses import replace
+import json
+from pathlib import Path
+import tempfile
+from test_live_v1_execution_authorization_r2 import authorized_backend
+from test_live_v1_execution_validator import NOW,sample_market_obs
+from test_live_v1_runtime_r2 import _runtime
+from btc_quant_agent.account_watch.models import AccountSnapshotV1,PositionV1
+from btc_quant_agent.execution.backend import DryRunExecutionBackend
+from btc_quant_agent.execution.executor import LiveExecutionService
+
+with tempfile.TemporaryDirectory(prefix='b5-r5-integrated-runtime-') as temp:
+    backend,validator,intent,good,client,receipt=authorized_backend(Path(temp))
+    runtime=_runtime(mode='TESTNET')
+    runtime.config=replace(runtime.config,account_id=good.account_id)
+    runtime.account_watch.latest_snapshot.return_value=good
+    runtime.market_stream.latest_observation.return_value=sample_market_obs()
+    runtime._started=True
+    runtime.accepting_risk=True
+    runtime.intent_store=validator.intent_store
+    position=PositionV1(symbol='ETHUSDT',quantity=1,entry_price=100,mark_price=100,
+        unrealized_pnl_usdt=0,leverage=1,liquidation_price=None,margin_type='ISOLATED',observed_at_ms=NOW)
+    bad=AccountSnapshotV1.build(**(good.model_dump(exclude={'snapshot_hash'})|{'positions':(position,)}))
+    bad.verify()
+    runtime.execution_service=LiveExecutionService(validator.intent_store,validator.live_store,
+        runtime.account_watch,runtime.market_stream,validator,backend.kill_switch,
+        DryRunExecutionBackend(backend.path),testnet_backend=backend,clock_ms=lambda:NOW)
+    async def flip(_):
+        runtime.account_watch.latest_snapshot.return_value=bad
+        backend.account_provider=lambda:bad
+    runtime._refresh_case=flip
+    async def run():return await runtime.execute_intent(intent.intent_id)
+    report=asyncio.run(run())
+    result={'target_sha':'a663921abf90504412d0d67b2b9c9f134f204d85',
+        'actual_execution_service':True,'typed_snapshot_verified':True,
+        'current_readiness':runtime._readiness_reason(),'report_status':report.status,
+        'fake_entry_post_count':client.place_order.call_count,
+        'new_risk_should_have_been_blocked':True,'real_network_calls':0,'real_money_writes':0}
+    print(json.dumps(result,indent=2))
+    assert result['current_readiness']=='UNCONFIGURED_POSITION_SYMBOL'
+    assert result['fake_entry_post_count']==1,'Probe did not reproduce backend entry placement'

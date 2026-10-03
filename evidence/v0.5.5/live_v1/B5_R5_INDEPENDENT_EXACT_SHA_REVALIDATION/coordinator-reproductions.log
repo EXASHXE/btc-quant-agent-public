@@ -1,0 +1,111 @@
+FFFFFFFFFFFF                                                             [100%]
+=================================== FAILURES ===================================
+_______ test_boolean_quantity_alias_cannot_promote_protection_to_active ________
+../b5-r5-evidence/test_coordinator_reproductions.py:34: in test_boolean_quantity_alias_cannot_promote_protection_to_active
+    assert owner.status != 'ACTIVE', {'owner_status':owner.status,'quantity':owner.quantity,'posts':client.place_protective_order.call_count}
+E   AssertionError: {'owner_status': 'ACTIVE', 'posts': 1, 'quantity': 1.0}
+E   assert 'ACTIVE' != 'ACTIVE'
+E    +  where 'ACTIVE' = ProtectionOwner(owner_key='2ea4992789b6d49fe76189055457a58afb31e0d7f70dc912075384536a71819b', intent_id='intent_10491e...78dd2c47e', exchange_id='coordinator-stop', status='ACTIVE', quantity=1.0, generation=1, confirmed_at_ms=1700000000000).status
+____________ test_account_authority_is_current_at_new_risk_handoff _____________
+../b5-r5-evidence/test_coordinator_reproductions.py:58: in test_account_authority_is_current_at_new_risk_handoff
+    assert runtime.execution_service.execute_approved_intent.await_count==0, 'new-risk orchestration admitted despite currently invalid typed snapshot'
+E   AssertionError: new-risk orchestration admitted despite currently invalid typed snapshot
+E   assert 1 == 0
+E    +  where 1 = <AsyncMock id='127089220182352'>.await_count
+E    +    where <AsyncMock id='127089220182352'> = namespace(reconcile_intent=<AsyncMock id='127089220178512'>, execute_approved_intent=<AsyncMock id='127089220182352'>).execute_approved_intent
+E    +      where namespace(reconcile_intent=<AsyncMock id='127089220178512'>, execute_approved_intent=<AsyncMock id='127089220182352'>) = <btc_quant_agent.live_runtime.LiveV1Runtime object at 0x739643d20860>.execution_service
+_ test_outbox_binding_survives_materialization_boundary[live_position_case_dispatches-event_hash-ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff] _
+../b5-r5-evidence/test_coordinator_reproductions.py:86: in test_outbox_binding_survives_materialization_boundary
+    assert state=='FAILED_CLOSED', {'field':field,'state':state,'analysis_calls':analysis.analyze_case.await_count}
+E   AssertionError: {'analysis_calls': 1, 'field': 'event_hash', 'state': 'DONE'}
+E   assert 'DONE' == 'FAILED_CLOSED'
+E
+E     - FAILED_CLOSED
+E     + DONE
+_ test_outbox_binding_survives_materialization_boundary[live_position_case_dispatches-symbol-ETHUSDT] _
+../b5-r5-evidence/test_coordinator_reproductions.py:86: in test_outbox_binding_survives_materialization_boundary
+    assert state=='FAILED_CLOSED', {'field':field,'state':state,'analysis_calls':analysis.analyze_case.await_count}
+E   AssertionError: {'analysis_calls': 1, 'field': 'symbol', 'state': 'DONE'}
+E   assert 'DONE' == 'FAILED_CLOSED'
+E
+E     - FAILED_CLOSED
+E     + DONE
+_ test_outbox_binding_survives_materialization_boundary[live_position_events-event_id-changed-event-id] _
+../b5-r5-evidence/test_coordinator_reproductions.py:86: in test_outbox_binding_survives_materialization_boundary
+    assert state=='FAILED_CLOSED', {'field':field,'state':state,'analysis_calls':analysis.analyze_case.await_count}
+E   AssertionError: {'analysis_calls': 1, 'field': 'event_id', 'state': 'DONE'}
+E   assert 'DONE' == 'FAILED_CLOSED'
+E
+E     - FAILED_CLOSED
+E     + DONE
+_ test_outbox_binding_survives_materialization_boundary[live_position_events-event_hash-ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff] _
+../b5-r5-evidence/test_coordinator_reproductions.py:86: in test_outbox_binding_survives_materialization_boundary
+    assert state=='FAILED_CLOSED', {'field':field,'state':state,'analysis_calls':analysis.analyze_case.await_count}
+E   AssertionError: {'analysis_calls': 1, 'field': 'event_hash', 'state': 'DONE'}
+E   assert 'DONE' == 'FAILED_CLOSED'
+E
+E     - FAILED_CLOSED
+E     + DONE
+_ test_outbox_binding_survives_materialization_boundary[live_position_events-symbol-ETHUSDT] _
+../b5-r5-evidence/test_coordinator_reproductions.py:86: in test_outbox_binding_survives_materialization_boundary
+    assert state=='FAILED_CLOSED', {'field':field,'state':state,'analysis_calls':analysis.analyze_case.await_count}
+E   AssertionError: {'analysis_calls': 1, 'field': 'symbol', 'state': 'DONE'}
+E   assert 'DONE' == 'FAILED_CLOSED'
+E
+E     - FAILED_CLOSED
+E     + DONE
+_ test_outbox_binding_survives_materialization_boundary[live_position_events-environment-TESTNET] _
+../b5-r5-evidence/test_coordinator_reproductions.py:86: in test_outbox_binding_survives_materialization_boundary
+    assert state=='FAILED_CLOSED', {'field':field,'state':state,'analysis_calls':analysis.analyze_case.await_count}
+E   AssertionError: {'analysis_calls': 1, 'field': 'environment', 'state': 'DONE'}
+E   assert 'DONE' == 'FAILED_CLOSED'
+E
+E     - FAILED_CLOSED
+E     + DONE
+_ test_outbox_binding_survives_materialization_boundary[live_position_events-credential_namespace-FOREIGN_NAMESPACE] _
+../b5-r5-evidence/test_coordinator_reproductions.py:86: in test_outbox_binding_survives_materialization_boundary
+    assert state=='FAILED_CLOSED', {'field':field,'state':state,'analysis_calls':analysis.analyze_case.await_count}
+E   AssertionError: {'analysis_calls': 1, 'field': 'credential_namespace', 'state': 'DONE'}
+E   assert 'DONE' == 'FAILED_CLOSED'
+E
+E     - FAILED_CLOSED
+E     + DONE
+_ test_outbox_binding_survives_materialization_boundary[live_position_events-account_id-foreign-account] _
+../b5-r5-evidence/test_coordinator_reproductions.py:86: in test_outbox_binding_survives_materialization_boundary
+    assert state=='FAILED_CLOSED', {'field':field,'state':state,'analysis_calls':analysis.analyze_case.await_count}
+E   AssertionError: {'analysis_calls': 1, 'field': 'account_id', 'state': 'DONE'}
+E   assert 'DONE' == 'FAILED_CLOSED'
+E
+E     - FAILED_CLOSED
+E     + DONE
+_ test_outbox_binding_survives_materialization_boundary[live_position_events-position_side-SHORT] _
+../b5-r5-evidence/test_coordinator_reproductions.py:86: in test_outbox_binding_survives_materialization_boundary
+    assert state=='FAILED_CLOSED', {'field':field,'state':state,'analysis_calls':analysis.analyze_case.await_count}
+E   AssertionError: {'analysis_calls': 1, 'field': 'position_side', 'state': 'DONE'}
+E   assert 'DONE' == 'FAILED_CLOSED'
+E
+E     - FAILED_CLOSED
+E     + DONE
+_ test_outbox_binding_survives_materialization_boundary[live_position_events-position_authority_key-foreign-key] _
+../b5-r5-evidence/test_coordinator_reproductions.py:86: in test_outbox_binding_survives_materialization_boundary
+    assert state=='FAILED_CLOSED', {'field':field,'state':state,'analysis_calls':analysis.analyze_case.await_count}
+E   AssertionError: {'analysis_calls': 1, 'field': 'position_authority_key', 'state': 'DONE'}
+E   assert 'DONE' == 'FAILED_CLOSED'
+E
+E     - FAILED_CLOSED
+E     + DONE
+---- generated xml file: /tmp/b5-r5-evidence/coordinator-reproductions.xml -----
+=========================== short test summary info ============================
+FAILED ../b5-r5-evidence/test_coordinator_reproductions.py::test_boolean_quantity_alias_cannot_promote_protection_to_active
+FAILED ../b5-r5-evidence/test_coordinator_reproductions.py::test_account_authority_is_current_at_new_risk_handoff
+FAILED ../b5-r5-evidence/test_coordinator_reproductions.py::test_outbox_binding_survives_materialization_boundary[live_position_case_dispatches-event_hash-ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff]
+FAILED ../b5-r5-evidence/test_coordinator_reproductions.py::test_outbox_binding_survives_materialization_boundary[live_position_case_dispatches-symbol-ETHUSDT]
+FAILED ../b5-r5-evidence/test_coordinator_reproductions.py::test_outbox_binding_survives_materialization_boundary[live_position_events-event_id-changed-event-id]
+FAILED ../b5-r5-evidence/test_coordinator_reproductions.py::test_outbox_binding_survives_materialization_boundary[live_position_events-event_hash-ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff]
+FAILED ../b5-r5-evidence/test_coordinator_reproductions.py::test_outbox_binding_survives_materialization_boundary[live_position_events-symbol-ETHUSDT]
+FAILED ../b5-r5-evidence/test_coordinator_reproductions.py::test_outbox_binding_survives_materialization_boundary[live_position_events-environment-TESTNET]
+FAILED ../b5-r5-evidence/test_coordinator_reproductions.py::test_outbox_binding_survives_materialization_boundary[live_position_events-credential_namespace-FOREIGN_NAMESPACE]
+FAILED ../b5-r5-evidence/test_coordinator_reproductions.py::test_outbox_binding_survives_materialization_boundary[live_position_events-account_id-foreign-account]
+FAILED ../b5-r5-evidence/test_coordinator_reproductions.py::test_outbox_binding_survives_materialization_boundary[live_position_events-position_side-SHORT]
+FAILED ../b5-r5-evidence/test_coordinator_reproductions.py::test_outbox_binding_survives_materialization_boundary[live_position_events-position_authority_key-foreign-key]
+12 failed in 3.32s

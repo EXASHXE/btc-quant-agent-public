@@ -1,0 +1,205 @@
+from __future__ import annotations
+import json
+import math
+import tempfile
+from pathlib import Path
+from types import SimpleNamespace
+from unittest.mock import MagicMock
+
+from test_live_v1_execution_protection_r3 import _backend
+from btc_quant_agent.execution.backend import TestnetExecutionBackend
+from btc_quant_agent.execution.binance_signed import BinanceExecutionError
+from btc_quant_agent.execution.guard import ExecutionBlocked
+
+NOW=1700000000000
+results=[]
+
+def case(name, fn):
+    try:
+        detail=fn()
+        results.append({'case':name,'result':'PASS','detail':detail})
+    except AssertionError as e:
+        results.append({'case':name,'result':'FAIL','detail':str(e)})
+    except Exception as e:
+        results.append({'case':name,'result':'ERROR','detail':f'{type(e).__name__}: {e}'})
+
+def setup(position=.1):
+    temp=tempfile.TemporaryDirectory(prefix='r5protect-', dir='/tmp')
+    backend,client,kill,intent=_backend(Path(temp.name),position)
+    client.place_protective_order.return_value={'algoId':'r5-independent'}
+    client.query_protective_order.side_effect=BinanceExecutionError('exact unavailable')
+    try: backend._reconcile_protective_stop(intent,.1,NOW)
+    except ExecutionBlocked: pass
+    else: raise AssertionError('initial query failure accepted')
+    owner=backend.protections.get_owner(intent)
+    assert owner.status=='PENDING_CONFIRMATION' and owner.exchange_id=='r5-independent'
+    return temp,backend,client,kill,intent,owner
+
+def payload(intent,owner):
+    return {'algoId':owner.exchange_id,'clientAlgoId':owner.protective_client_id,'symbol':intent.symbol,
+      'side':'SELL','algoType':'CONDITIONAL','orderType':'STOP_MARKET','workingType':'MARK_PRICE',
+      'priceProtect':True,'closePosition':False,'reduceOnly':True,'positionSide':'BOTH',
+      'triggerPrice':intent.stop_loss,'quantity':str(owner.quantity),'algoStatus':'NEW'}
+
+def reject_mutation(field,value=None,omit=False):
+    temp,b,c,k,i,o=setup()
+    try:
+      raw=payload(i,o)
+      if omit: raw.pop(field)
+      else: raw[field]=value
+      c.query_protective_order.side_effect=lambda _:raw
+      c.open_protective_orders.return_value=[payload(i,o)]
+      restarted=TestnetExecutionBackend(b.path,c,k,validator=b.validator)
+      try: restarted._reconcile_protective_stop(i,.1,NOW+1)
+      except ExecutionBlocked: pass
+      else: raise AssertionError('mutated exact contract promoted')
+      current=restarted.protections.get_owner(i)
+      assert current.status=='PENDING_CONFIRMATION' and current.exchange_id==o.exchange_id
+      assert c.place_protective_order.call_count==1
+      assert not k.allows_new_risk()
+      return {'owner':current.status,'posts':c.place_protective_order.call_count}
+    finally: temp.cleanup()
+
+for key,val in [('algoType','OTHER'),('orderType','TAKE_PROFIT_MARKET'),('type','TAKE_PROFIT_MARKET'),('workingType','CONTRACT_PRICE'),('priceProtect',False),('closePosition',True),('reduceOnly',False),('positionSide','LONG'),('symbol','ETHUSDT'),('side','BUY'),('triggerPrice',123.45),('quantity','0.2'),('clientAlgoId','other'),('algoId','other'),('orderId','other'),('algoStatus','FILLED'),('status','CANCELED'),('stopPrice',123.45),('origQty','0.2')]:
+    case(f'mutate:{key}',lambda key=key,val=val:reject_mutation(key,val))
+for key in ['algoType','orderType','workingType','priceProtect','closePosition','reduceOnly','positionSide','symbol','side','triggerPrice','quantity','clientAlgoId','algoId','algoStatus']:
+    case(f'omit:{key}',lambda key=key:reject_mutation(key,omit=True))
+for key,val in [('triggerPrice','NaN'),('triggerPrice','Infinity'),('quantity','NaN'),('quantity','-Infinity'),('algoId',True),('algoId',float('inf')),('priceProtect',1),('closePosition',0),('reduceOnly','false'),('algoStatus','FILLED')]:
+    case(f'numeric:{key}:{val}',lambda key=key,val=val:reject_mutation(key,val))
+
+def pending_aggregate_absence():
+    temp,b,c,k,i,o=setup()
+    try:
+      c.open_protective_orders.return_value=[payload(i,o)]
+      c.query_protective_order.side_effect=BinanceExecutionError('unavailable')
+      for n in range(2):
+        restarted=TestnetExecutionBackend(b.path,c,k,validator=b.validator)
+        try: restarted._reconcile_protective_stop(i,.1,NOW+n+1)
+        except ExecutionBlocked: pass
+        else: raise AssertionError('aggregate promoted pending')
+      assert c.place_protective_order.call_count==1
+      assert c.query_protective_order.call_count==3
+      return {'posts':1,'exact_queries':3,'owner':restarted.protections.get_owner(i).status}
+    finally: temp.cleanup()
+case('pending:aggregate_only_restart',pending_aggregate_absence)
+
+def exact_recover():
+    temp,b,c,k,i,o=setup()
+    try:
+      c.query_protective_order.side_effect=lambda _:payload(i,o)
+      c.open_protective_orders.return_value=[payload(i,o)]
+      for n in range(2):
+        restarted=TestnetExecutionBackend(b.path,c,k,validator=b.validator)
+        assert restarted._reconcile_protective_stop(i,.1,NOW+n+1)==o.exchange_id
+      assert c.place_protective_order.call_count==1
+      assert restarted.protections.get_owner(i).status=='ACTIVE'
+      return {'posts':1,'owner':'ACTIVE'}
+    finally:temp.cleanup()
+case('pending:exact_recovery_once',exact_recover)
+
+def flat_absence(structured):
+    temp,b,c,k,i,o=setup()
+    try:
+      c.positions.return_value=[{'symbol':i.symbol,'positionSide':'BOTH','positionAmt':'0'}]
+      c.open_protective_orders.return_value=[]
+      c.query_protective_order.side_effect=BinanceExecutionError('-2013',code=-2013 if structured else None)
+      restarted=TestnetExecutionBackend(b.path,c,k,validator=b.validator)
+      if structured: assert restarted._reconcile_protective_stop(i,.1,NOW+1) is None
+      else:
+        try:restarted._reconcile_protective_stop(i,.1,NOW+1)
+        except ExecutionBlocked:pass
+        else:raise AssertionError('unstructured absence released')
+      owner=restarted.protections.get_owner(i)
+      assert owner.status==('RELEASED' if structured else 'PENDING_CONFIRMATION')
+      assert owner.exchange_id==(None if structured else o.exchange_id)
+      assert c.cancel_protective_order.call_count==0
+      return {'structured':structured,'owner':owner.status,'cancels':0}
+    finally:temp.cleanup()
+case('flat:structured_exact_absence',lambda:flat_absence(True))
+case('flat:unstructured_exact_absence',lambda:flat_absence(False))
+
+def flat_cancel_restart():
+    temp,b,c,k,i,o=setup()
+    try:
+      c.positions.return_value=[{'symbol':i.symbol,'positionSide':'BOTH','positionAmt':'0'}]
+      c.open_protective_orders.return_value=[]
+      c.query_protective_order.side_effect=[payload(i,o),BinanceExecutionError('cancel confirmation unavailable')]
+      try:b._reconcile_protective_stop(i,.1,NOW+1)
+      except ExecutionBlocked:pass
+      else:raise AssertionError('uncertain cancellation released')
+      owner=b.protections.get_owner(i)
+      assert owner.status=='CANCEL_PENDING' and owner.exchange_id==o.exchange_id
+      later=SimpleNamespace(intent_id='later',intent_hash='a'*64,symbol=i.symbol,side=i.side)
+      restarted=TestnetExecutionBackend(b.path,c,k,validator=b.validator)
+      try:restarted.protections.reserve_owner(later,NOW+2)
+      except ExecutionBlocked:pass
+      else:raise AssertionError('later owner acquired symbol')
+      def terminal(_):
+        raw=payload(i,o)
+        raw['algoStatus']='CANCELED'
+        return raw
+      c.query_protective_order.side_effect=terminal
+      assert restarted._reconcile_protective_stop(i,.1,NOW+2) is None
+      assert restarted.protections.get_owner(i).status=='RELEASED'
+      assert c.cancel_protective_order.call_count==1
+      return {'cancels':1,'owner':'RELEASED'}
+    finally:temp.cleanup()
+case('flat:cancel_uncertainty_restart',flat_cancel_restart)
+
+def no_id_post_uncertainty():
+    temp=tempfile.TemporaryDirectory(prefix='r5protect-',dir='/tmp')
+    try:
+      b,c,k,i=_backend(Path(temp.name),.1)
+      c.place_protective_order.side_effect=BinanceExecutionError('post timeout')
+      try:b._reconcile_protective_stop(i,.1,NOW)
+      except ExecutionBlocked:pass
+      else:raise AssertionError('POST failure accepted')
+      first=b.protections.get_owner(i)
+      assert first.status=='PENDING_CONFIRMATION' and first.protective_client_id and first.exchange_id is None
+      c.open_protective_orders.return_value=[]
+      restarted=TestnetExecutionBackend(b.path,c,k,validator=b.validator)
+      try:restarted._reconcile_protective_stop(i,.1,NOW+1)
+      except ExecutionBlocked:pass
+      else:raise AssertionError('no-ID pending blindly resubmitted')
+      assert c.place_protective_order.call_count==1
+      assert c.query_protective_order.call_count==0
+      assert restarted.protections.get_owner(i).protective_client_id==first.protective_client_id
+      return {'posts':1,'exact_queries':0,'owner':'PENDING_CONFIRMATION'}
+    finally:temp.cleanup()
+case('pending:no_id_post_uncertainty',no_id_post_uncertainty)
+
+def cancel_pending_still_new():
+    temp,b,c,k,i,o=setup()
+    try:
+      c.positions.return_value=[{'symbol':i.symbol,'positionSide':'BOTH','positionAmt':'0'}]
+      c.open_protective_orders.return_value=[]
+      c.query_protective_order.side_effect=[payload(i,o),BinanceExecutionError('confirm unavailable')]
+      try:b._reconcile_protective_stop(i,.1,NOW+1)
+      except ExecutionBlocked:pass
+      else:raise AssertionError('uncertain cancellation accepted')
+      c.query_protective_order.side_effect=lambda _:payload(i,o)
+      restarted=TestnetExecutionBackend(b.path,c,k,validator=b.validator)
+      try:restarted._reconcile_protective_stop(i,.1,NOW+2)
+      except ExecutionBlocked:pass
+      else:raise AssertionError('NEW cancellation released')
+      owner=restarted.protections.get_owner(i)
+      assert owner.status=='CANCEL_PENDING' and owner.exchange_id==o.exchange_id
+      assert c.cancel_protective_order.call_count==1
+      return {'owner':'CANCEL_PENDING','cancels':1}
+    finally:temp.cleanup()
+case('flat:cancel_pending_still_new_restart',cancel_pending_still_new)
+
+def numeric_alias_boolean():
+    intent=SimpleNamespace(symbol='BTCUSDT',side='BUY',stop_loss=90000.0,quantity=1.0)
+    owner=SimpleNamespace(exchange_id='r5-independent',protective_client_id='bqa_stop_test',quantity=1.0)
+    raw=payload(intent,owner)
+    raw['quantity']=1.0
+    raw['origQty']=True
+    try:
+      result=TestnetExecutionBackend._validate_protective_contract(intent,raw,owner.protective_client_id,owner.exchange_id,1.0)
+    except ExecutionBlocked:
+      return {'rejected':True}
+    raise AssertionError(f'boolean origQty alias accepted as numeric authority: {result}')
+case('contract:boolean_numeric_alias_conflict',numeric_alias_boolean)
+
+print(json.dumps({'sha':'a663921abf90504412d0d67b2b9c9f134f204d85','count':len(results),'passed':sum(r['result']=='PASS' for r in results),'failed':[r for r in results if r['result']!='PASS'],'results':results},indent=2))

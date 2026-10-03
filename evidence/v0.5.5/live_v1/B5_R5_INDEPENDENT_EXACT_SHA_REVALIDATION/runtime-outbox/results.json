@@ -1,0 +1,785 @@
+[
+  {
+    "name": "runtime/start/account_id",
+    "expected": false,
+    "actual": false,
+    "pass_": true
+  },
+  {
+    "name": "runtime/status/account_id",
+    "expected": false,
+    "actual": false,
+    "pass_": true
+  },
+  {
+    "name": "runtime/execute/account_id",
+    "expected": false,
+    "actual": false,
+    "pass_": true,
+    "orchestration_calls": 0
+  },
+  {
+    "name": "runtime/poll/account_id",
+    "expected": [
+      false,
+      0
+    ],
+    "actual": [
+      false,
+      0
+    ],
+    "pass_": true
+  },
+  {
+    "name": "runtime/rest/account_id",
+    "expected": false,
+    "actual": false,
+    "pass_": true
+  },
+  {
+    "name": "runtime/start/environment",
+    "expected": false,
+    "actual": false,
+    "pass_": true
+  },
+  {
+    "name": "runtime/status/environment",
+    "expected": false,
+    "actual": false,
+    "pass_": true
+  },
+  {
+    "name": "runtime/execute/environment",
+    "expected": false,
+    "actual": false,
+    "pass_": true,
+    "orchestration_calls": 0
+  },
+  {
+    "name": "runtime/poll/environment",
+    "expected": [
+      false,
+      0
+    ],
+    "actual": [
+      false,
+      0
+    ],
+    "pass_": true
+  },
+  {
+    "name": "runtime/rest/environment",
+    "expected": false,
+    "actual": false,
+    "pass_": true
+  },
+  {
+    "name": "runtime/start/namespace",
+    "expected": false,
+    "actual": false,
+    "pass_": true
+  },
+  {
+    "name": "runtime/status/namespace",
+    "expected": false,
+    "actual": false,
+    "pass_": true
+  },
+  {
+    "name": "runtime/execute/namespace",
+    "expected": false,
+    "actual": false,
+    "pass_": true,
+    "orchestration_calls": 0
+  },
+  {
+    "name": "runtime/poll/namespace",
+    "expected": [
+      false,
+      0
+    ],
+    "actual": [
+      false,
+      0
+    ],
+    "pass_": true
+  },
+  {
+    "name": "runtime/rest/namespace",
+    "expected": false,
+    "actual": false,
+    "pass_": true
+  },
+  {
+    "name": "runtime/start/hash",
+    "expected": false,
+    "actual": false,
+    "pass_": true
+  },
+  {
+    "name": "runtime/status/hash",
+    "expected": false,
+    "actual": false,
+    "pass_": true
+  },
+  {
+    "name": "runtime/execute/hash",
+    "expected": false,
+    "actual": false,
+    "pass_": true,
+    "orchestration_calls": 0
+  },
+  {
+    "name": "runtime/poll/hash",
+    "expected": [
+      false,
+      0
+    ],
+    "actual": [
+      false,
+      0
+    ],
+    "pass_": true
+  },
+  {
+    "name": "runtime/rest/hash",
+    "expected": false,
+    "actual": false,
+    "pass_": true
+  },
+  {
+    "name": "runtime/start/unreconciled",
+    "expected": false,
+    "actual": false,
+    "pass_": true
+  },
+  {
+    "name": "runtime/status/unreconciled",
+    "expected": false,
+    "actual": false,
+    "pass_": true
+  },
+  {
+    "name": "runtime/execute/unreconciled",
+    "expected": false,
+    "actual": false,
+    "pass_": true,
+    "orchestration_calls": 0
+  },
+  {
+    "name": "runtime/poll/unreconciled",
+    "expected": [
+      false,
+      0
+    ],
+    "actual": [
+      false,
+      0
+    ],
+    "pass_": true
+  },
+  {
+    "name": "runtime/rest/unreconciled",
+    "expected": false,
+    "actual": false,
+    "pass_": true
+  },
+  {
+    "name": "runtime/start/quality",
+    "expected": false,
+    "actual": false,
+    "pass_": true
+  },
+  {
+    "name": "runtime/status/quality",
+    "expected": false,
+    "actual": false,
+    "pass_": true
+  },
+  {
+    "name": "runtime/execute/quality",
+    "expected": false,
+    "actual": false,
+    "pass_": true,
+    "orchestration_calls": 0
+  },
+  {
+    "name": "runtime/poll/quality",
+    "expected": [
+      false,
+      0
+    ],
+    "actual": [
+      false,
+      0
+    ],
+    "pass_": true
+  },
+  {
+    "name": "runtime/rest/quality",
+    "expected": false,
+    "actual": false,
+    "pass_": true
+  },
+  {
+    "name": "runtime/start/unconfigured_symbol",
+    "expected": false,
+    "actual": false,
+    "pass_": true
+  },
+  {
+    "name": "runtime/status/unconfigured_symbol",
+    "expected": false,
+    "actual": false,
+    "pass_": true
+  },
+  {
+    "name": "runtime/execute/unconfigured_symbol",
+    "expected": false,
+    "actual": false,
+    "pass_": true,
+    "orchestration_calls": 0
+  },
+  {
+    "name": "runtime/poll/unconfigured_symbol",
+    "expected": [
+      false,
+      0
+    ],
+    "actual": [
+      false,
+      0
+    ],
+    "pass_": true
+  },
+  {
+    "name": "runtime/rest/unconfigured_symbol",
+    "expected": false,
+    "actual": false,
+    "pass_": true
+  },
+  {
+    "name": "runtime/recovery",
+    "expected": "RECOVERED",
+    "actual": "RECOVERED",
+    "pass_": true
+  },
+  {
+    "name": "runtime/rest-result-stale",
+    "expected": false,
+    "actual": true,
+    "pass_": false,
+    "status_accepting": false
+  },
+  {
+    "name": "runtime/execute-snapshot-flip",
+    "expected": 0,
+    "actual": 1,
+    "pass_": false,
+    "current_readiness": "UNCONFIGURED_POSITION_SYMBOL",
+    "snapshot_verified": true
+  },
+  {
+    "name": "outbox/static/live_position_events-event_id",
+    "expected": [
+      "FAILED_CLOSED",
+      []
+    ],
+    "actual": [
+      "FAILED_CLOSED",
+      []
+    ],
+    "pass_": true
+  },
+  {
+    "name": "outbox/static/live_position_events-event_hash",
+    "expected": [
+      "FAILED_CLOSED",
+      []
+    ],
+    "actual": [
+      "FAILED_CLOSED",
+      []
+    ],
+    "pass_": true
+  },
+  {
+    "name": "outbox/static/live_position_events-symbol",
+    "expected": [
+      "FAILED_CLOSED",
+      []
+    ],
+    "actual": [
+      "FAILED_CLOSED",
+      []
+    ],
+    "pass_": true
+  },
+  {
+    "name": "outbox/static/live_position_events-environment",
+    "expected": [
+      "FAILED_CLOSED",
+      []
+    ],
+    "actual": [
+      "FAILED_CLOSED",
+      []
+    ],
+    "pass_": true
+  },
+  {
+    "name": "outbox/static/live_position_events-credential_namespace",
+    "expected": [
+      "FAILED_CLOSED",
+      []
+    ],
+    "actual": [
+      "FAILED_CLOSED",
+      []
+    ],
+    "pass_": true
+  },
+  {
+    "name": "outbox/static/live_position_events-account_id",
+    "expected": [
+      "FAILED_CLOSED",
+      []
+    ],
+    "actual": [
+      "FAILED_CLOSED",
+      []
+    ],
+    "pass_": true
+  },
+  {
+    "name": "outbox/static/live_position_events-position_side",
+    "expected": [
+      "FAILED_CLOSED",
+      []
+    ],
+    "actual": [
+      "FAILED_CLOSED",
+      []
+    ],
+    "pass_": true
+  },
+  {
+    "name": "outbox/static/live_position_events-position_authority_key",
+    "expected": [
+      "FAILED_CLOSED",
+      []
+    ],
+    "actual": [
+      "FAILED_CLOSED",
+      []
+    ],
+    "pass_": true
+  },
+  {
+    "name": "outbox/static/live_position_case_dispatches-event_id",
+    "expected": [
+      "FAILED_CLOSED",
+      []
+    ],
+    "actual": [
+      "FAILED_CLOSED",
+      []
+    ],
+    "pass_": true
+  },
+  {
+    "name": "outbox/static/live_position_case_dispatches-event_hash",
+    "expected": [
+      "FAILED_CLOSED",
+      []
+    ],
+    "actual": [
+      "FAILED_CLOSED",
+      []
+    ],
+    "pass_": true
+  },
+  {
+    "name": "outbox/static/live_position_case_dispatches-symbol",
+    "expected": [
+      "FAILED_CLOSED",
+      []
+    ],
+    "actual": [
+      "FAILED_CLOSED",
+      []
+    ],
+    "pass_": true
+  },
+  {
+    "name": "outbox/static/live_position_case_dispatches-environment",
+    "expected": [
+      "FAILED_CLOSED",
+      []
+    ],
+    "actual": [
+      "FAILED_CLOSED",
+      []
+    ],
+    "pass_": true
+  },
+  {
+    "name": "outbox/static/live_position_case_dispatches-credential_namespace",
+    "expected": [
+      "FAILED_CLOSED",
+      []
+    ],
+    "actual": [
+      "FAILED_CLOSED",
+      []
+    ],
+    "pass_": true
+  },
+  {
+    "name": "outbox/static/live_position_case_dispatches-account_id",
+    "expected": [
+      "FAILED_CLOSED",
+      []
+    ],
+    "actual": [
+      "FAILED_CLOSED",
+      []
+    ],
+    "pass_": true
+  },
+  {
+    "name": "outbox/static/live_position_case_dispatches-position_side",
+    "expected": [
+      "FAILED_CLOSED",
+      []
+    ],
+    "actual": [
+      "FAILED_CLOSED",
+      []
+    ],
+    "pass_": true
+  },
+  {
+    "name": "outbox/static/live_position_case_dispatches-position_authority_key",
+    "expected": [
+      "FAILED_CLOSED",
+      []
+    ],
+    "actual": [
+      "FAILED_CLOSED",
+      []
+    ],
+    "pass_": true
+  },
+  {
+    "name": "outbox/frozen/case_hash/wrong",
+    "expected": [
+      "FAILED_CLOSED",
+      []
+    ],
+    "actual": [
+      "FAILED_CLOSED",
+      []
+    ],
+    "pass_": true
+  },
+  {
+    "name": "outbox/frozen/position_case_hash/wrong",
+    "expected": [
+      "FAILED_CLOSED",
+      []
+    ],
+    "actual": [
+      "FAILED_CLOSED",
+      []
+    ],
+    "pass_": true
+  },
+  {
+    "name": "outbox/frozen/position_case_id/wrong",
+    "expected": [
+      "FAILED_CLOSED",
+      []
+    ],
+    "actual": [
+      "FAILED_CLOSED",
+      []
+    ],
+    "pass_": true
+  },
+  {
+    "name": "outbox/frozen/case_hash/empty",
+    "expected": [
+      "FAILED_CLOSED",
+      []
+    ],
+    "actual": [
+      "DONE",
+      [
+        "analysis"
+      ]
+    ],
+    "pass_": false
+  },
+  {
+    "name": "outbox/frozen/position_case_hash/empty",
+    "expected": [
+      "FAILED_CLOSED",
+      []
+    ],
+    "actual": [
+      "DISPATCHING",
+      []
+    ],
+    "pass_": false
+  },
+  {
+    "name": "outbox/frozen/position_case_id/empty",
+    "expected": [
+      "FAILED_CLOSED",
+      []
+    ],
+    "actual": [
+      "DISPATCHING",
+      []
+    ],
+    "pass_": false
+  },
+  {
+    "name": "outbox/first-market-symbol",
+    "expected": [
+      "FAILED_CLOSED",
+      [
+        "market"
+      ]
+    ],
+    "actual": [
+      "FAILED_CLOSED",
+      [
+        "market"
+      ]
+    ],
+    "pass_": true
+  },
+  {
+    "name": "outbox/race/market",
+    "expected": "FAILED_CLOSED",
+    "actual": "DONE",
+    "pass_": false,
+    "calls": [
+      "market",
+      "analysis"
+    ]
+  },
+  {
+    "name": "outbox/race/analysis",
+    "expected": "FAILED_CLOSED",
+    "actual": "DONE",
+    "pass_": false,
+    "calls": [
+      "market",
+      "analysis"
+    ]
+  },
+  {
+    "name": "outbox/dynamic/live_position_events/event_id",
+    "expected": "FAILED_CLOSED",
+    "actual": "DONE",
+    "pass_": false,
+    "calls": [
+      "market",
+      "analysis"
+    ]
+  },
+  {
+    "name": "outbox/dynamic/live_position_events/event_hash",
+    "expected": "FAILED_CLOSED",
+    "actual": "DONE",
+    "pass_": false,
+    "calls": [
+      "market",
+      "analysis"
+    ]
+  },
+  {
+    "name": "outbox/dynamic/live_position_events/symbol",
+    "expected": "FAILED_CLOSED",
+    "actual": "DONE",
+    "pass_": false,
+    "calls": [
+      "market",
+      "analysis"
+    ]
+  },
+  {
+    "name": "outbox/dynamic/live_position_events/environment",
+    "expected": "FAILED_CLOSED",
+    "actual": "DONE",
+    "pass_": false,
+    "calls": [
+      "market",
+      "analysis"
+    ]
+  },
+  {
+    "name": "outbox/dynamic/live_position_events/credential_namespace",
+    "expected": "FAILED_CLOSED",
+    "actual": "DONE",
+    "pass_": false,
+    "calls": [
+      "market",
+      "analysis"
+    ]
+  },
+  {
+    "name": "outbox/dynamic/live_position_events/account_id",
+    "expected": "FAILED_CLOSED",
+    "actual": "DONE",
+    "pass_": false,
+    "calls": [
+      "market",
+      "analysis"
+    ]
+  },
+  {
+    "name": "outbox/dynamic/live_position_events/position_side",
+    "expected": "FAILED_CLOSED",
+    "actual": "DONE",
+    "pass_": false,
+    "calls": [
+      "market",
+      "analysis"
+    ]
+  },
+  {
+    "name": "outbox/dynamic/live_position_events/position_authority_key",
+    "expected": "FAILED_CLOSED",
+    "actual": "DONE",
+    "pass_": false,
+    "calls": [
+      "market",
+      "analysis"
+    ]
+  },
+  {
+    "name": "outbox/dynamic/live_position_case_dispatches/event_id",
+    "expected": "FAILED_CLOSED",
+    "actual": "DISPATCHING",
+    "pass_": false,
+    "calls": [
+      "market"
+    ]
+  },
+  {
+    "name": "outbox/dynamic/live_position_case_dispatches/event_hash",
+    "expected": "FAILED_CLOSED",
+    "actual": "DONE",
+    "pass_": false,
+    "calls": [
+      "market",
+      "analysis"
+    ]
+  },
+  {
+    "name": "outbox/dynamic/live_position_case_dispatches/symbol",
+    "expected": "FAILED_CLOSED",
+    "actual": "DONE",
+    "pass_": false,
+    "calls": [
+      "market",
+      "analysis"
+    ]
+  },
+  {
+    "name": "outbox/dynamic/live_position_case_dispatches/environment",
+    "expected": "FAILED_CLOSED",
+    "actual": "DONE",
+    "pass_": false,
+    "calls": [
+      "market",
+      "analysis"
+    ]
+  },
+  {
+    "name": "outbox/dynamic/live_position_case_dispatches/credential_namespace",
+    "expected": "FAILED_CLOSED",
+    "actual": "DONE",
+    "pass_": false,
+    "calls": [
+      "market",
+      "analysis"
+    ]
+  },
+  {
+    "name": "outbox/dynamic/live_position_case_dispatches/account_id",
+    "expected": "FAILED_CLOSED",
+    "actual": "DONE",
+    "pass_": false,
+    "calls": [
+      "market",
+      "analysis"
+    ]
+  },
+  {
+    "name": "outbox/dynamic/live_position_case_dispatches/position_side",
+    "expected": "FAILED_CLOSED",
+    "actual": "DONE",
+    "pass_": false,
+    "calls": [
+      "market",
+      "analysis"
+    ]
+  },
+  {
+    "name": "outbox/dynamic/live_position_case_dispatches/position_authority_key",
+    "expected": "FAILED_CLOSED",
+    "actual": "DONE",
+    "pass_": false,
+    "calls": [
+      "market",
+      "analysis"
+    ]
+  },
+  {
+    "name": "outbox/frozen-retry",
+    "expected": [
+      "DONE",
+      "DONE",
+      1,
+      [
+        "058f38cddae6b5cc099dd4521410987e0607ae05bce647115f891d684c274b32",
+        "058f38cddae6b5cc099dd4521410987e0607ae05bce647115f891d684c274b32"
+      ],
+      2
+    ],
+    "actual": [
+      "DONE",
+      "DONE",
+      1,
+      [
+        "058f38cddae6b5cc099dd4521410987e0607ae05bce647115f891d684c274b32",
+        "058f38cddae6b5cc099dd4521410987e0607ae05bce647115f891d684c274b32"
+      ],
+      2
+    ],
+    "pass_": true
+  },
+  {
+    "name": "outbox/expired-owner",
+    "expected": [
+      "DISPATCHING",
+      "",
+      [
+        "market"
+      ]
+    ],
+    "actual": [
+      "DISPATCHING",
+      "",
+      [
+        "market"
+      ]
+    ],
+    "pass_": true
+  }
+]

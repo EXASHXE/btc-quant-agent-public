@@ -1,0 +1,20 @@
+{
+  "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+  "versions": {
+    "pytest": "8.4.2",
+    "ruff": "0.16.9",
+    "mypy": "1.20.2",
+    "numpy": "2.5.3",
+    "pyarrow": "23.0.1",
+    "pydantic": "2.13.5",
+    "fastapi": "0.141.1",
+    "httpx": "0.28.1"
+  },
+  "imported_source": {
+    "backend": "/tmp/b5-r5-independent-code/src/btc_quant_agent/execution/backend.py",
+    "runtime": "/tmp/b5-r5-independent-code/src/btc_quant_agent/live_runtime.py"
+  },
+  "validation_credentials_inherited": false,
+  "safe_context": "temporary SQLite, fake exchange/provider and hermetic repository guards",
+  "testnet_network_smoke": "NOT_RUN_CREDENTIALS_UNAVAILABLE"
+}

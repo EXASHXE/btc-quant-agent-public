@@ -1,0 +1,70 @@
+........................................................................ [  2%]
+........................................................................ [  5%]
+........................................................................ [  8%]
+........................................................................ [ 11%]
+........................................................................ [ 14%]
+........................................................................ [ 17%]
+........................................................................ [ 20%]
+........................................................................ [ 23%]
+........................................................................ [ 26%]
+........................................................................ [ 29%]
+........................................................................ [ 32%]
+........................................................................ [ 35%]
+........................................................................ [ 38%]
+........................................................................ [ 41%]
+........................................................................ [ 44%]
+........................................................................ [ 47%]
+........................................................................ [ 50%]
+........................................................................ [ 53%]
+........................................................................ [ 56%]
+........................................................................ [ 59%]
+........................................................................ [ 62%]
+........................................................................ [ 65%]
+........................................................................ [ 68%]
+........................................................................ [ 71%]
+........................................................................ [ 74%]
+........................................................................ [ 77%]
+........................................................................ [ 80%]
+........................................................................ [ 83%]
+........................................................................ [ 86%]
+........................................................................ [ 89%]
+........................................ss.............................. [ 92%]
+........................................................................ [ 95%]
+........................................................................ [ 98%]
+................................................                         [100%]
+=============================== warnings summary ===============================
+tests/test_shadow.py::ShadowTests::test_unfilled_signal_stays_pending_until_expiry
+  /tmp/b5-r5-independent-code/tests/test_shadow.py:19: DeprecationWarning: shadow.update_shadow(repository, bars, now) is LEGACY_DIAGNOSTIC_ONLY; use update_formal_shadow with an explicit protocol/evidence job for current economics
+    self.assertEqual(update_shadow(repo, [bar], 120_000), [])
+
+tests/test_shadow.py::ShadowTests::test_unfilled_signal_stays_pending_until_expiry
+  /tmp/b5-r5-independent-code/tests/test_shadow.py:23: DeprecationWarning: shadow.update_shadow(repository, bars, now) is LEGACY_DIAGNOSTIC_ONLY; use update_formal_shadow with an explicit protocol/evidence job for current economics
+    resolved = update_shadow(repo, [bar], item.expires_at_ms + 1)
+
+tests/test_v0323_blind_validation.py::test_final_holdout_sealed_and_execution_disabled
+  /tmp/b5-r5-independent-code/tests/test_v0323_blind_validation.py:727: DeprecationWarning: evaluate_validation_status() is a deprecated non-authoritative diagnostic. It MUST NOT authorize unblind, candidate promotion, or formal validation. Use check_unblind_readiness() with wall-clock denominator instead.
+    val_status = engine.evaluate_validation_status()
+
+tests/test_v0323_blind_validation.py::test_metadata_only_diagnostic_never_reaches_outcome_loaders
+  /tmp/b5-r5-independent-code/tests/test_v0323_blind_validation.py:810: DeprecationWarning: evaluate_validation_status() is a deprecated non-authoritative diagnostic. It MUST NOT authorize unblind, candidate promotion, or formal validation. Use check_unblind_readiness() with wall-clock denominator instead.
+    val_status = engine.evaluate_validation_status()
+
+tests/test_v0323_blind_validation.py::test_post_start_partition_does_not_trigger_observation_building
+  /tmp/b5-r5-independent-code/tests/test_v0323_blind_validation.py:861: DeprecationWarning: evaluate_validation_status() is a deprecated non-authoritative diagnostic. It MUST NOT authorize unblind, candidate promotion, or formal validation. Use check_unblind_readiness() with wall-clock denominator instead.
+    val_status = engine.evaluate_validation_status()
+
+tests/test_v0323_blind_validation.py::test_absence_of_canonical_candles_does_not_break_diagnostic
+  /tmp/b5-r5-independent-code/tests/test_v0323_blind_validation.py:889: DeprecationWarning: evaluate_validation_status() is a deprecated non-authoritative diagnostic. It MUST NOT authorize unblind, candidate promotion, or formal validation. Use check_unblind_readiness() with wall-clock denominator instead.
+    val_status = engine.evaluate_validation_status()
+
+tests/test_v0323_blind_validation.py::test_diagnostic_payload_has_no_performance_leakage
+  /tmp/b5-r5-independent-code/tests/test_v0323_blind_validation.py:899: DeprecationWarning: evaluate_validation_status() is a deprecated non-authoritative diagnostic. It MUST NOT authorize unblind, candidate promotion, or formal validation. Use check_unblind_readiness() with wall-clock denominator instead.
+    val_status = engine.evaluate_validation_status()
+
+tests/test_v0323_blind_validation.py::test_deprecated_diagnostic_cannot_grant_authorization
+  /tmp/b5-r5-independent-code/tests/test_v0323_blind_validation.py:921: DeprecationWarning: evaluate_validation_status() is a deprecated non-authoritative diagnostic. It MUST NOT authorize unblind, candidate promotion, or formal validation. Use check_unblind_readiness() with wall-clock denominator instead.
+    val_status = engine.evaluate_validation_status()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+-------- generated xml file: /tmp/b5-r5-evidence/gates/full_pytest.xml ---------
+2422 passed, 2 skipped, 8 warnings in 848.51s (0:14:08)

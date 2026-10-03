@@ -1,0 +1,87 @@
+"""Coordinator reproductions of consequential independent-review findings."""
+import asyncio
+from types import SimpleNamespace
+from unittest.mock import AsyncMock, Mock
+
+import pytest
+from conftest import hermetic_guard as hermetic_guard
+from test_live_v1_account_watch import sample_snapshot
+from test_live_v1_execution_protection_r3 import _backend
+from test_live_v1_runtime_r2 import _runtime
+from test_live_v1_position_supervisor import NOW, observation, market_case
+
+from btc_quant_agent.account_watch.models import PositionV1
+from btc_quant_agent.execution.guard import ExecutionBlocked
+from btc_quant_agent.live_db import connection
+from btc_quant_agent.position_supervisor import PositionSupervisor
+
+def test_boolean_quantity_alias_cannot_promote_protection_to_active(tmp_path):
+    backend, client, _, intent = _backend(tmp_path, 1.0)
+    client.place_protective_order.return_value = {'algoId':'coordinator-stop'}
+    def exact(_):
+        args=client.place_protective_order.call_args.kwargs
+        return {'algoId':'coordinator-stop','clientAlgoId':args['clientAlgoId'],
+                'symbol':intent.symbol,'side':'SELL','algoType':'CONDITIONAL',
+                'orderType':'STOP_MARKET','workingType':'MARK_PRICE','priceProtect':True,
+                'closePosition':False,'reduceOnly':True,'positionSide':'BOTH',
+                'triggerPrice':intent.stop_loss,'quantity':1.0,'origQty':True,'algoStatus':'NEW'}
+    client.query_protective_order.side_effect=exact
+    try:
+        backend._reconcile_protective_stop(intent,1.0,NOW)
+    except ExecutionBlocked:
+        pass
+    owner=backend.protections.get_owner(intent)
+    assert owner.status != 'ACTIVE', {'owner_status':owner.status,'quantity':owner.quantity,'posts':client.place_protective_order.call_count}
+
+def test_account_authority_is_current_at_new_risk_handoff():
+    runtime=_runtime(mode='TESTNET')
+    good=sample_snapshot(account_id=runtime.config.account_id,positions=(),orders=())
+    foreign_position=PositionV1(symbol='ETHUSDT',quantity=1,entry_price=100,mark_price=100,
+        unrealized_pnl_usdt=0,leverage=1,liquidation_price=None,margin_type='ISOLATED',observed_at_ms=NOW)
+    bad=sample_snapshot(account_id=runtime.config.account_id,positions=(foreign_position,),orders=())
+    good.verify()
+    bad.verify()
+    runtime.account_watch.latest_snapshot.return_value=good
+    runtime._started=True
+    runtime.accepting_risk=True
+    runtime.intent_store.get_intent=Mock(return_value=SimpleNamespace(symbol=runtime.config.symbol))
+    async def change_snapshot(_):
+        runtime.account_watch.latest_snapshot.return_value=bad
+    runtime._refresh_case=change_snapshot
+    async def run():
+        try:
+            await runtime.execute_intent('coordinator-new-risk')
+        except ExecutionBlocked:
+            pass
+    asyncio.run(run())
+    assert runtime._readiness_reason()=='UNCONFIGURED_POSITION_SYMBOL'
+    assert runtime.execution_service.execute_approved_intent.await_count==0, 'new-risk orchestration admitted despite currently invalid typed snapshot'
+
+@pytest.mark.parametrize('table,field,value',[
+    ('live_position_case_dispatches','event_hash','f'*64),
+    ('live_position_case_dispatches','symbol','ETHUSDT'),
+    ('live_position_events','event_id','changed-event-id'),
+    ('live_position_events','event_hash','f'*64),
+    ('live_position_events','symbol','ETHUSDT'),
+    ('live_position_events','environment','TESTNET'),
+    ('live_position_events','credential_namespace','FOREIGN_NAMESPACE'),
+    ('live_position_events','account_id','foreign-account'),
+    ('live_position_events','position_side','SHORT'),
+    ('live_position_events','position_authority_key','foreign-key')])
+def test_outbox_binding_survives_materialization_boundary(tmp_path,table,field,value):
+    path=tmp_path/'outbox.db'
+    analysis=SimpleNamespace(analyze_case=AsyncMock())
+    worker=PositionSupervisor(path,analysis_service=analysis,fresh_market_case=lambda _:market_case())
+    event=worker.evaluate(observation(quantity=1,previous_quantity=0),NOW)[0]
+    mutations=[]
+    def mutate_then_materialize(_symbol):
+        with connection(path) as db:
+            changed=db.execute(f'UPDATE {table} SET {field}=? WHERE event_id=?',(value,event.event_id))
+            mutations.append(changed.rowcount)
+        return market_case()
+    worker.fresh_market_case=mutate_then_materialize
+    asyncio.run(worker.drain_pending_dispatches(NOW))
+    state=worker.get_dispatch(event.event_id)['state']
+    assert mutations==[1], 'the corruption must have actually been injected'
+    assert state=='FAILED_CLOSED', {'field':field,'state':state,'analysis_calls':analysis.analyze_case.await_count}
+    analysis.analyze_case.assert_not_awaited()

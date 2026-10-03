@@ -1,0 +1,11 @@
+{
+  "target_sha": "a663921abf90504412d0d67b2b9c9f134f204d85",
+  "actual_execution_service": true,
+  "typed_snapshot_verified": true,
+  "current_readiness": "UNCONFIGURED_POSITION_SYMBOL",
+  "report_status": "NEW",
+  "fake_entry_post_count": 1,
+  "new_risk_should_have_been_blocked": true,
+  "real_network_calls": 0,
+  "real_money_writes": 0
+}

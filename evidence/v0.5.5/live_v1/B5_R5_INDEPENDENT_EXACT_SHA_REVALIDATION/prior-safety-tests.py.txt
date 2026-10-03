@@ -1,0 +1,208 @@
+"""Fresh validator attacks; only setup helpers are reused from executor tests."""
+import asyncio
+from concurrent.futures import ThreadPoolExecutor
+import hashlib
+import sqlite3
+from types import SimpleNamespace
+from unittest.mock import AsyncMock, Mock
+
+import httpx
+import pytest
+from conftest import hermetic_guard as hermetic_guard
+from test_live_v1_execution_placement_r3 import placement, fresh_account
+from test_live_v1_execution_validator import NOW, sample_market_obs, setup_validator_and_intent
+from test_live_v1_execution_recovery_r3 import recovered_service
+from test_live_v1_position_supervisor import observation
+from test_live_v1_account_watch import sample_snapshot
+from test_live_v1_decision_approval import prepared, callback_body
+
+from btc_quant_agent import api
+from btc_quant_agent.approval.callback import create_callback_app
+from btc_quant_agent.approval.store import LiveStore
+from btc_quant_agent.config import AppConfig, StorageConfig, LiveV1Config
+from btc_quant_agent.decision.models import content_hash
+from btc_quant_agent.decision.risk import RiskCompilerV1, RiskPolicyV1
+from btc_quant_agent.decision.service import TacticalLiveService
+from btc_quant_agent.execution.binance_signed import BinanceExecutionError, BinanceSignedClient, create_testnet_signed_client
+from btc_quant_agent.execution.guard import ExecutionBlocked
+from btc_quant_agent.execution.intents import TradeIntentV1
+from btc_quant_agent.live_db import connection
+from btc_quant_agent.position_supervisor import PositionSupervisor
+
+@pytest.mark.parametrize('caller_delta', [-999999, 0, 999999])
+@pytest.mark.parametrize('late', [0, 1, 1000])
+def test_actual_clock_overrules_caller_time(tmp_path, caller_delta, late):
+    backend, _, _, _, client, receipt, clock = placement(tmp_path)
+    clock['now'] = receipt.expires_at_ms + late
+    with pytest.raises(ExecutionBlocked):
+        backend.submit_authorized(receipt.authorization_id, NOW+caller_delta)
+    for name in ('change_margin_type', 'change_leverage', 'place_order', 'place_protective_order'):
+        getattr(client, name).assert_not_called()
+
+@pytest.mark.parametrize('field,value', [('daily_loss_usdt',24.9999), ('drawdown_pct',.0499999), ('available_balance_usdt',.000001), ('reconciled',False), ('stream_connected',False)])
+def test_second_forced_account_read_blocks_entry(tmp_path, field, value):
+    backend, _, _, account, client, receipt, _ = placement(tmp_path)
+    bad = fresh_account(account, **{field:value})
+    backend.account_provider.side_effect = [account, bad]
+    with pytest.raises(ExecutionBlocked):
+        backend.submit_authorized(receipt.authorization_id, NOW-100000)
+    assert backend.account_provider.call_count == 2
+    client.place_order.assert_not_called()
+
+@pytest.mark.parametrize('field,value', [('daily_loss_usdt',24.99999),('drawdown_pct',.04999999)])
+def test_fresh_loss_headroom_rejects_old_approved_size(tmp_path, field, value):
+    validator, intent, snap, _ = setup_validator_and_intent(tmp_path)
+    result = validator.validate(intent, sample_market_obs(), fresh_account(snap, **{field:value}), NOW)
+    assert not result.is_valid and 'HEADROOM' in result.reason
+
+@pytest.mark.parametrize('field', ['intent_id','idempotency_key','client_order_id'])
+def test_self_rehash_cannot_replace_canonical_ids(tmp_path, field):
+    _, intent, _, _ = setup_validator_and_intent(tmp_path)
+    raw = intent.model_dump(mode='json')
+    raw[field] = 'independent-foreign-id'
+    raw['intent_hash'] = content_hash({k:v for k,v in raw.items() if k != 'intent_hash'})
+    with pytest.raises(ValueError):
+        TradeIntentV1.model_validate(raw)
+    digest = hashlib.sha256(f'{intent.case_hash}:{intent.proposal_hash}:{intent.approval_event_id}'.encode()).hexdigest()
+    assert (intent.intent_id,intent.idempotency_key,intent.client_order_id)==(f'intent_{digest[:24]}',f'idem_{digest[:24]}',f'cuid_v1_{digest[:16]}')
+
+@pytest.mark.parametrize('component', ['mark','book','kline'])
+@pytest.mark.parametrize('timestamp', ['source','receipt'])
+@pytest.mark.parametrize('delta', [-16000, 1])
+def test_each_market_component_has_independent_freshness(tmp_path, component, timestamp, delta):
+    validator, intent, snap, _ = setup_validator_and_intent(tmp_path)
+    market = sample_market_obs()
+    field = f'{component}_{timestamp}_timestamp_ms'
+    raw = market.model_dump(exclude={'observation_hash'})
+    raw[field] = NOW+delta
+    modified = type(market).build(**raw)
+    result = validator.validate(intent, modified, snap, NOW)
+    assert not result.is_valid
+    assert f'MARKET_{component.upper()}' in result.reason
+
+@pytest.mark.parametrize('filled', [False, True])
+def test_recovery_precedes_new_risk_gates_after_restart(tmp_path, filled):
+    service, backend, intent, client = recovered_service(tmp_path, filled=filled)
+    backend.kill_switch.allows_new_risk = lambda: False
+    backend.validator.tactical_validity_provider = lambda *_: False
+    for _ in range(2):
+        result = asyncio.run(service.execute_approved_intent(intent.intent_id, intent.expires_at_ms+9999))
+        assert result.filled_qty == (intent.quantity/2 if filled else 0)
+    client.place_order.assert_not_called()
+    client.change_margin_type.assert_not_called()
+    if filled:
+        client.place_protective_order.assert_called_once()
+        assert client.place_protective_order.call_args.kwargs['quantity'] == intent.quantity/2
+
+def test_transport_uncertainty_never_reposts_on_restart(tmp_path):
+    backend, _, intent, _, client, receipt, _ = placement(tmp_path)
+    client.place_order.side_effect = TimeoutError('local simulated lost response')
+    client.query_order_by_client_id.side_effect = BinanceExecutionError('local uncertain exact query')
+    with pytest.raises(ExecutionBlocked):
+        backend.submit_authorized(receipt.authorization_id, NOW)
+    for _ in range(2):
+        with pytest.raises(ExecutionBlocked):
+            backend.submit_authorized(receipt.authorization_id, NOW+1)
+    client.place_order.assert_called_once()
+    assert client.query_order_by_client_id.call_count == 3
+    assert backend.validator.intent_store.has_existing_side_effect(intent.intent_id)
+
+@pytest.mark.parametrize('environment,namespace', [('DRY_RUN','NONE'),('TESTNET','BINANCE_TESTNET')])
+@pytest.mark.parametrize('account', ['validator-a','validator-b'])
+def test_flat_reopen_lifecycle_survives_restart(tmp_path, environment, namespace, account):
+    path=tmp_path/'lifecycle.db'
+    changes=dict(account_id=account,environment=environment,credential_namespace=namespace)
+    first=PositionSupervisor(path)
+    first.evaluate(observation(**changes,quantity=-.25,previous_quantity=0),NOW)
+    first.evaluate(observation(**changes,quantity=0,observed_at_ms=NOW+1),NOW+1)
+    restarted=PositionSupervisor(path)
+    assert restarted.current_quantity(account,'BTCUSDT',environment,namespace)==0
+    events=restarted.evaluate(observation(**changes,quantity=.4,observed_at_ms=NOW+2),NOW+2)
+    assert len([e for e in events if e.trigger=='POSITION_OPENED'])==1
+    assert restarted.current_quantity(account,'BTCUSDT',environment,namespace)==.4
+
+def test_cooldown_cannot_cross_account_or_environment(tmp_path):
+    supervisor=PositionSupervisor(tmp_path/'cooldown.db')
+    for i,(account,env,ns) in enumerate([('A','DRY_RUN','NONE'),('B','DRY_RUN','NONE'),('A','TESTNET','BINANCE_TESTNET')]):
+        events=supervisor.evaluate(observation(account_id=account,environment=env,credential_namespace=ns,mark_price=91,observed_at_ms=NOW+i),NOW+i)
+        assert 'STOP_NEAR' in [e.trigger for e in events]
+    events=PositionSupervisor(tmp_path/'cooldown.db').evaluate(observation(account_id='A',mark_price=91,observed_at_ms=NOW+3),NOW+3)
+    assert 'STOP_NEAR' not in [e.trigger for e in events]
+
+def test_sqlite_contention_and_rollback_preserve_durable_state(tmp_path):
+    path=tmp_path/'durable.db'
+    with connection(path) as db:
+        assert db.execute('PRAGMA synchronous').fetchone()[0]==2
+        assert db.execute('PRAGMA journal_mode').fetchone()[0]=='wal'
+        db.execute('CREATE TABLE independent_events(id INTEGER PRIMARY KEY)')
+    def write(i):
+        with connection(path) as db:
+            db.execute('BEGIN IMMEDIATE')
+            db.execute('INSERT INTO independent_events VALUES(?)',(i,))
+    with ThreadPoolExecutor(max_workers=4) as pool:
+        list(pool.map(write,range(24)))
+    with pytest.raises(RuntimeError):
+        with connection(path) as db:
+            db.execute('INSERT INTO independent_events VALUES(999)')
+            raise RuntimeError('local abort')
+    with connection(path) as held:
+        held.execute('BEGIN IMMEDIATE')
+        with pytest.raises(sqlite3.OperationalError):
+            with connection(path,busy_timeout_ms=20) as contender:
+                contender.execute('INSERT INTO independent_events VALUES(998)')
+    with connection(path) as db:
+        assert db.execute('SELECT COUNT(*) FROM independent_events').fetchone()[0]==24
+
+@pytest.mark.parametrize('mode',['LIVE','LIVE_APPROVAL_ONLY','AUTONOMOUS','AUTONOMOUS_LIVE'])
+def test_no_live_or_autonomous_runtime_mode(mode):
+    with pytest.raises(ValueError):
+        LiveV1Config(runtime_enabled=True,execution_mode=mode,testnet_execution_enabled=True)
+
+@pytest.mark.parametrize('name',['BTC_QUANT_LIVE_V1_ENABLED','BTC_QUANT_LIVE_V1_RUNTIME_ENABLED','BTC_QUANT_LIVE_V1_TESTNET_EXECUTION_ENABLED'])
+def test_config_flags_are_strict(name,monkeypatch):
+    monkeypatch.setenv(name,'1')
+    with pytest.raises(ValueError):
+        LiveV1Config.from_env()
+
+@pytest.mark.parametrize('url',['https://fapi.binance.com','https://testnet.binancefuture.com.evil.invalid','http://testnet.binancefuture.com','https://testnet.binancefuture.com@evil.invalid'])
+def test_testnet_factory_rejects_cross_endpoint_authority(url):
+    with pytest.raises(BinanceExecutionError):
+        create_testnet_signed_client(base_url=url,api_key='fake-key',api_secret='fake-secret')
+
+def test_live_credentials_cannot_satisfy_testnet_namespace(monkeypatch):
+    monkeypatch.delenv('BINANCE_TESTNET_API_KEY',raising=False)
+    monkeypatch.delenv('BINANCE_TESTNET_API_SECRET',raising=False)
+    monkeypatch.setenv('BINANCE_API_KEY','fake-live-key')
+    monkeypatch.setenv('BINANCE_API_SECRET','fake-live-secret')
+    with pytest.raises(BinanceExecutionError):
+        create_testnet_signed_client()
+
+@pytest.mark.parametrize('field',['api_key','api_secret','secret','signature','listen_key','headers'])
+def test_snapshot_forbids_secret_material(field):
+    with pytest.raises(ValueError):
+        sample_snapshot(**{field:'FAKE_SECRET_SENTINEL'})
+    assert 'FAKE_SECRET_SENTINEL' not in sample_snapshot().canonical_json()
+
+@pytest.mark.parametrize('b3_enabled',[False,True])
+def test_b4_host_routes_have_read_only_authority(tmp_path,monkeypatch,b3_enabled):
+    monkeypatch.setattr(api,'load_config',lambda:AppConfig(storage=StorageConfig(sqlite_path=str(tmp_path/'api.db'))))
+    monkeypatch.setenv('BTC_QUANT_LIVE_V1_ENABLED','true' if b3_enabled else 'false')
+    monkeypatch.setenv('BTC_QUANT_LIVE_V1_RUNTIME_ENABLED','true')
+    service=TacticalLiveService(LiveStore(tmp_path/'live.db'),None,RiskCompilerV1(RiskPolicyV1()))
+    runtime=SimpleNamespace(tactical_service=service,start=AsyncMock(),stop=AsyncMock(),status=Mock(return_value={}),execute_intent=AsyncMock())
+    app=api.create_app(live_runtime=runtime)
+    for route in app.routes:
+        assert set(getattr(route,'methods',[])) <= {'GET','HEAD','OPTIONS'}
+        assert getattr(route,'path','') not in {'/live-v1/scan','/live-v1/reviews'}
+    runtime.execute_intent.assert_not_awaited()
+
+@pytest.mark.parametrize('field,value',[('quantity',999),('side','SELL'),('stop_loss',1),('leverage',125),('execution_mode','LIVE'),('intent_id','foreign')])
+def test_feishu_payload_cannot_supply_executable_authority(tmp_path,field,value):
+    store,case,_,proposal=prepared(tmp_path)
+    app=create_callback_app(store,'verify',approver_open_ids=('allowed',),app_id='app',clock_ms=lambda:3000)
+    async def request():
+        async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app),base_url='http://fake') as client:
+            response=await client.post('/callback',json=callback_body(case,proposal,value_extra={field:value}))
+            assert response.status_code==400
+    asyncio.run(request())
+    assert store.state(case.case_id)=='WAITING_APPROVAL'

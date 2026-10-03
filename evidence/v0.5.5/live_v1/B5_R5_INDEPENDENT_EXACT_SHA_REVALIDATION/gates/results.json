@@ -1,0 +1,335 @@
+[
+  {
+    "name": "r5_focused",
+    "command": [
+      "/root/workspace/project/Quant-agent-market-watch/.venv/bin/python",
+      "-m",
+      "pytest",
+      "-q",
+      "--tb=short",
+      "-o",
+      "cache_dir=/tmp/b5-r5-evidence/gates/pytest-cache-r5_focused",
+      "--junitxml=/tmp/b5-r5-evidence/gates/r5_focused.xml",
+      "tests/test_live_v1_execution_protection_r5.py",
+      "tests/test_live_v1_position_outbox_r5.py",
+      "tests/test_live_v1_runtime_authority_r5.py"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 22.463,
+    "counts": {
+      "tests": 77,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 77
+    },
+    "failure_ids": [],
+    "tail": "........................................................................ [ 93%]\n.....                                                                    [100%]\n--------- generated xml file: /tmp/b5-r5-evidence/gates/r5_focused.xml ---------\n77 passed in 17.49s\n"
+  },
+  {
+    "name": "r3_r4_regressions",
+    "command": [
+      "/root/workspace/project/Quant-agent-market-watch/.venv/bin/python",
+      "-m",
+      "pytest",
+      "-q",
+      "--tb=short",
+      "-o",
+      "cache_dir=/tmp/b5-r5-evidence/gates/pytest-cache-r3_r4_regressions",
+      "--junitxml=/tmp/b5-r5-evidence/gates/r3_r4_regressions.xml",
+      "tests/test_live_v1_approval_environment_r4.py",
+      "tests/test_live_v1_execution_identity_r3.py",
+      "tests/test_live_v1_execution_placement_r3.py",
+      "tests/test_live_v1_execution_protection_r3.py",
+      "tests/test_live_v1_execution_protection_r4.py",
+      "tests/test_live_v1_execution_recovery_r3.py",
+      "tests/test_live_v1_position_authority_r4.py",
+      "tests/test_live_v1_runtime_recovery_r3.py"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 28.173,
+    "counts": {
+      "tests": 122,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 122
+    },
+    "failure_ids": [],
+    "tail": "........................................................................ [ 59%]\n..................................................                       [100%]\n----- generated xml file: /tmp/b5-r5-evidence/gates/r3_r4_regressions.xml ------\n122 passed in 24.99s\n"
+  },
+  {
+    "name": "all_live_v1",
+    "command": [
+      "/root/workspace/project/Quant-agent-market-watch/.venv/bin/python",
+      "-m",
+      "pytest",
+      "-q",
+      "--tb=short",
+      "-o",
+      "cache_dir=/tmp/b5-r5-evidence/gates/pytest-cache-all_live_v1",
+      "--junitxml=/tmp/b5-r5-evidence/gates/all_live_v1.xml",
+      "tests/test_live_v1_account_stream_r2.py",
+      "tests/test_live_v1_account_watch.py",
+      "tests/test_live_v1_approval_environment_r4.py",
+      "tests/test_live_v1_day2_e2e.py",
+      "tests/test_live_v1_decision_api.py",
+      "tests/test_live_v1_decision_approval.py",
+      "tests/test_live_v1_decision_backends.py",
+      "tests/test_live_v1_decision_case.py",
+      "tests/test_live_v1_decision_e2e.py",
+      "tests/test_live_v1_decision_models.py",
+      "tests/test_live_v1_decision_risk.py",
+      "tests/test_live_v1_execution_authorization_r2.py",
+      "tests/test_live_v1_execution_backend.py",
+      "tests/test_live_v1_execution_compilation_r2.py",
+      "tests/test_live_v1_execution_identity_r3.py",
+      "tests/test_live_v1_execution_intent.py",
+      "tests/test_live_v1_execution_placement_r3.py",
+      "tests/test_live_v1_execution_protection_r3.py",
+      "tests/test_live_v1_execution_protection_r4.py",
+      "tests/test_live_v1_execution_protection_r5.py",
+      "tests/test_live_v1_execution_recovery_r3.py",
+      "tests/test_live_v1_execution_storage.py",
+      "tests/test_live_v1_execution_validator.py",
+      "tests/test_live_v1_position_authority_r4.py",
+      "tests/test_live_v1_position_kill.py",
+      "tests/test_live_v1_position_lease_r2.py",
+      "tests/test_live_v1_position_outbox_r5.py",
+      "tests/test_live_v1_position_supervisor.py",
+      "tests/test_live_v1_runtime_authority_r5.py",
+      "tests/test_live_v1_runtime_r2.py",
+      "tests/test_live_v1_runtime_recovery_r3.py"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 63.462,
+    "counts": {
+      "tests": 413,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 413
+    },
+    "failure_ids": [],
+    "tail": "........................................................................ [ 17%]\n........................................................................ [ 34%]\n........................................................................ [ 52%]\n........................................................................ [ 69%]\n........................................................................ [ 87%]\n.....................................................                    [100%]\n-------- generated xml file: /tmp/b5-r5-evidence/gates/all_live_v1.xml ---------\n413 passed in 58.79s\n"
+  },
+  {
+    "name": "execution_account_supervisor_runtime",
+    "command": [
+      "/root/workspace/project/Quant-agent-market-watch/.venv/bin/python",
+      "-m",
+      "pytest",
+      "-q",
+      "--tb=short",
+      "-o",
+      "cache_dir=/tmp/b5-r5-evidence/gates/pytest-cache-execution_account_supervisor_runtime",
+      "--junitxml=/tmp/b5-r5-evidence/gates/execution_account_supervisor_runtime.xml",
+      "tests/test_live_v1_account_stream_r2.py",
+      "tests/test_live_v1_account_watch.py",
+      "tests/test_live_v1_execution_authorization_r2.py",
+      "tests/test_live_v1_execution_backend.py",
+      "tests/test_live_v1_execution_compilation_r2.py",
+      "tests/test_live_v1_execution_identity_r3.py",
+      "tests/test_live_v1_execution_intent.py",
+      "tests/test_live_v1_execution_placement_r3.py",
+      "tests/test_live_v1_execution_protection_r3.py",
+      "tests/test_live_v1_execution_protection_r4.py",
+      "tests/test_live_v1_execution_protection_r5.py",
+      "tests/test_live_v1_execution_recovery_r3.py",
+      "tests/test_live_v1_execution_storage.py",
+      "tests/test_live_v1_execution_validator.py",
+      "tests/test_live_v1_position_authority_r4.py",
+      "tests/test_live_v1_position_kill.py",
+      "tests/test_live_v1_position_lease_r2.py",
+      "tests/test_live_v1_position_outbox_r5.py",
+      "tests/test_live_v1_position_supervisor.py",
+      "tests/test_live_v1_runtime_authority_r5.py",
+      "tests/test_live_v1_runtime_r2.py",
+      "tests/test_live_v1_runtime_recovery_r3.py"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 53.853,
+    "counts": {
+      "tests": 333,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 333
+    },
+    "failure_ids": [],
+    "tail": "........................................................................ [ 21%]\n........................................................................ [ 43%]\n........................................................................ [ 64%]\n........................................................................ [ 86%]\n.............................................                            [100%]\n- generated xml file: /tmp/b5-r5-evidence/gates/execution_account_supervisor_runtime.xml -\n333 passed in 50.95s\n"
+  },
+  {
+    "name": "r02_governance",
+    "command": [
+      "/root/workspace/project/Quant-agent-market-watch/.venv/bin/python",
+      "-m",
+      "pytest",
+      "-q",
+      "--tb=short",
+      "-o",
+      "cache_dir=/tmp/b5-r5-evidence/gates/pytest-cache-r02_governance",
+      "--junitxml=/tmp/b5-r5-evidence/gates/r02_governance.xml",
+      "tests/test_v050_r02_orchestration_guards.py"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 3.712,
+    "counts": {
+      "tests": 26,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 26
+    },
+    "failure_ids": [],
+    "tail": "..........................                                               [100%]\n------- generated xml file: /tmp/b5-r5-evidence/gates/r02_governance.xml -------\n26 passed in 1.09s\n"
+  },
+  {
+    "name": "marketwatch_b2a_b2b",
+    "command": [
+      "/root/workspace/project/Quant-agent-market-watch/.venv/bin/python",
+      "-m",
+      "pytest",
+      "-q",
+      "--tb=short",
+      "-o",
+      "cache_dir=/tmp/b5-r5-evidence/gates/pytest-cache-marketwatch_b2a_b2b",
+      "--junitxml=/tmp/b5-r5-evidence/gates/marketwatch_b2a_b2b.xml",
+      "tests/test_market_watch.py",
+      "tests/test_tactical_policy_b0.py",
+      "tests/test_tactical_feature_evidence_v2.py",
+      "tests/test_tactical_shadow_evaluation_v2.py",
+      "tests/test_tactical_grid_shadow_evaluation_v1.py"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 10.978,
+    "counts": {
+      "tests": 265,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 265
+    },
+    "failure_ids": [],
+    "tail": "........................................................................ [ 27%]\n........................................................................ [ 54%]\n........................................................................ [ 81%]\n.................................................                        [100%]\n---- generated xml file: /tmp/b5-r5-evidence/gates/marketwatch_b2a_b2b.xml -----\n265 passed in 10.05s\n"
+  },
+  {
+    "name": "full_pytest",
+    "command": [
+      "/root/workspace/project/Quant-agent-market-watch/.venv/bin/python",
+      "-m",
+      "pytest",
+      "-q",
+      "--tb=short",
+      "-o",
+      "cache_dir=/tmp/b5-r5-evidence/gates/pytest-cache-full_pytest",
+      "--junitxml=/tmp/b5-r5-evidence/gates/full_pytest.xml"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 890.889,
+    "counts": {
+      "tests": 2424,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 2,
+      "passed": 2422
+    },
+    "failure_ids": [],
+    "tail": "ndidate promotion, or formal validation. Use check_unblind_readiness() with wall-clock denominator instead.\n    val_status = engine.evaluate_validation_status()\n\ntests/test_v0323_blind_validation.py::test_post_start_partition_does_not_trigger_observation_building\n  /tmp/b5-r5-independent-code/tests/test_v0323_blind_validation.py:861: DeprecationWarning: evaluate_validation_status() is a deprecated non-authoritative diagnostic. It MUST NOT authorize unblind, candidate promotion, or formal validation. Use check_unblind_readiness() with wall-clock denominator instead.\n    val_status = engine.evaluate_validation_status()\n\ntests/test_v0323_blind_validation.py::test_absence_of_canonical_candles_does_not_break_diagnostic\n  /tmp/b5-r5-independent-code/tests/test_v0323_blind_validation.py:889: DeprecationWarning: evaluate_validation_status() is a deprecated non-authoritative diagnostic. It MUST NOT authorize unblind, candidate promotion, or formal validation. Use check_unblind_readiness() with wall-clock denominator instead.\n    val_status = engine.evaluate_validation_status()\n\ntests/test_v0323_blind_validation.py::test_diagnostic_payload_has_no_performance_leakage\n  /tmp/b5-r5-independent-code/tests/test_v0323_blind_validation.py:899: DeprecationWarning: evaluate_validation_status() is a deprecated non-authoritative diagnostic. It MUST NOT authorize unblind, candidate promotion, or formal validation. Use check_unblind_readiness() with wall-clock denominator instead.\n    val_status = engine.evaluate_validation_status()\n\ntests/test_v0323_blind_validation.py::test_deprecated_diagnostic_cannot_grant_authorization\n  /tmp/b5-r5-independent-code/tests/test_v0323_blind_validation.py:921: DeprecationWarning: evaluate_validation_status() is a deprecated non-authoritative diagnostic. It MUST NOT authorize unblind, candidate promotion, or formal validation. Use check_unblind_readiness() with wall-clock denominator instead.\n    val_status = engine.evaluate_validation_status()\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n-------- generated xml file: /tmp/b5-r5-evidence/gates/full_pytest.xml ---------\n2422 passed, 2 skipped, 8 warnings in 848.51s (0:14:08)\n"
+  },
+  {
+    "name": "ruff",
+    "command": [
+      "/root/workspace/project/Quant-agent-market-watch/.venv/bin/ruff",
+      "check",
+      "."
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 0.181,
+    "tail": "All checks passed!\n"
+  },
+  {
+    "name": "mypy",
+    "command": [
+      "/root/workspace/project/Quant-agent-market-watch/.venv/bin/mypy"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 22.206,
+    "tail": "Success: no issues found in 151 source files\n"
+  },
+  {
+    "name": "compileall",
+    "command": [
+      "/root/workspace/project/Quant-agent-market-watch/.venv/bin/python",
+      "-m",
+      "compileall",
+      "-q",
+      "src",
+      "skill-template/scripts"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 0.122,
+    "tail": ""
+  },
+  {
+    "name": "git_diff_check",
+    "command": [
+      "git",
+      "diff",
+      "--check"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 0.029,
+    "tail": ""
+  },
+  {
+    "name": "h40_fresh_process_1",
+    "command": [
+      "/root/workspace/project/Quant-agent-market-watch/.venv/bin/python",
+      "-m",
+      "pytest",
+      "-q",
+      "--tb=short",
+      "-o",
+      "cache_dir=/tmp/b5-r5-evidence/gates/pytest-cache-h40_fresh_process_1",
+      "--junitxml=/tmp/b5-r5-evidence/gates/h40_fresh_process_1.xml",
+      "tests/test_v051_h40_m3a_production_discovery_producer.py::test_p09_through_p18_exact_scientific_graph"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 25.555,
+    "counts": {
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 1
+    },
+    "failure_ids": [],
+    "tail": ".                                                                        [100%]\n---- generated xml file: /tmp/b5-r5-evidence/gates/h40_fresh_process_1.xml -----\n1 passed in 22.91s\n"
+  },
+  {
+    "name": "h40_fresh_process_2",
+    "command": [
+      "/root/workspace/project/Quant-agent-market-watch/.venv/bin/python",
+      "-m",
+      "pytest",
+      "-q",
+      "--tb=short",
+      "-o",
+      "cache_dir=/tmp/b5-r5-evidence/gates/pytest-cache-h40_fresh_process_2",
+      "--junitxml=/tmp/b5-r5-evidence/gates/h40_fresh_process_2.xml",
+      "tests/test_v051_h40_m3a_production_discovery_producer.py::test_p09_through_p18_exact_scientific_graph"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 20.847,
+    "counts": {
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 1
+    },
+    "failure_ids": [],
+    "tail": ".                                                                        [100%]\n---- generated xml file: /tmp/b5-r5-evidence/gates/h40_fresh_process_2.xml -----\n1 passed in 19.87s\n"
+  }
+]

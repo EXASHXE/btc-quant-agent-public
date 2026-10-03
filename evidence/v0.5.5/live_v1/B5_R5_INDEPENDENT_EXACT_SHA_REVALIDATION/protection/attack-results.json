@@ -1,0 +1,423 @@
+{
+  "sha": "a663921abf90504412d0d67b2b9c9f134f204d85",
+  "count": 51,
+  "passed": 50,
+  "failed": [
+    {
+      "case": "contract:boolean_numeric_alias_conflict",
+      "result": "FAIL",
+      "detail": "boolean origQty alias accepted as numeric authority: ('r5-independent', 1.0)"
+    }
+  ],
+  "results": [
+    {
+      "case": "mutate:algoType",
+      "result": "PASS",
+      "detail": {
+        "owner": "PENDING_CONFIRMATION",
+        "posts": 1
+      }
+    },
+    {
+      "case": "mutate:orderType",
+      "result": "PASS",
+      "detail": {
+        "owner": "PENDING_CONFIRMATION",
+        "posts": 1
+      }
+    },
+    {
+      "case": "mutate:type",
+      "result": "PASS",
+      "detail": {
+        "owner": "PENDING_CONFIRMATION",
+        "posts": 1
+      }
+    },
+    {
+      "case": "mutate:workingType",
+      "result": "PASS",
+      "detail": {
+        "owner": "PENDING_CONFIRMATION",
+        "posts": 1
+      }
+    },
+    {
+      "case": "mutate:priceProtect",
+      "result": "PASS",
+      "detail": {
+        "owner": "PENDING_CONFIRMATION",
+        "posts": 1
+      }
+    },
+    {
+      "case": "mutate:closePosition",
+      "result": "PASS",
+      "detail": {
+        "owner": "PENDING_CONFIRMATION",
+        "posts": 1
+      }
+    },
+    {
+      "case": "mutate:reduceOnly",
+      "result": "PASS",
+      "detail": {
+        "owner": "PENDING_CONFIRMATION",
+        "posts": 1
+      }
+    },
+    {
+      "case": "mutate:positionSide",
+      "result": "PASS",
+      "detail": {
+        "owner": "PENDING_CONFIRMATION",
+        "posts": 1
+      }
+    },
+    {
+      "case": "mutate:symbol",
+      "result": "PASS",
+      "detail": {
+        "owner": "PENDING_CONFIRMATION",
+        "posts": 1
+      }
+    },
+    {
+      "case": "mutate:side",
+      "result": "PASS",
+      "detail": {
+        "owner": "PENDING_CONFIRMATION",
+        "posts": 1
+      }
+    },
+    {
+      "case": "mutate:triggerPrice",
+      "result": "PASS",
+      "detail": {
+        "owner": "PENDING_CONFIRMATION",
+        "posts": 1
+      }
+    },
+    {
+      "case": "mutate:quantity",
+      "result": "PASS",
+      "detail": {
+        "owner": "PENDING_CONFIRMATION",
+        "posts": 1
+      }
+    },
+    {
+      "case": "mutate:clientAlgoId",
+      "result": "PASS",
+      "detail": {
+        "owner": "PENDING_CONFIRMATION",
+        "posts": 1
+      }
+    },
+    {
+      "case": "mutate:algoId",
+      "result": "PASS",
+      "detail": {
+        "owner": "PENDING_CONFIRMATION",
+        "posts": 1
+      }
+    },
+    {
+      "case": "mutate:orderId",
+      "result": "PASS",
+      "detail": {
+        "owner": "PENDING_CONFIRMATION",
+        "posts": 1
+      }
+    },
+    {
+      "case": "mutate:algoStatus",
+      "result": "PASS",
+      "detail": {
+        "owner": "PENDING_CONFIRMATION",
+        "posts": 1
+      }
+    },
+    {
+      "case": "mutate:status",
+      "result": "PASS",
+      "detail": {
+        "owner": "PENDING_CONFIRMATION",
+        "posts": 1
+      }
+    },
+    {
+      "case": "mutate:stopPrice",
+      "result": "PASS",
+      "detail": {
+        "owner": "PENDING_CONFIRMATION",
+        "posts": 1
+      }
+    },
+    {
+      "case": "mutate:origQty",
+      "result": "PASS",
+      "detail": {
+        "owner": "PENDING_CONFIRMATION",
+        "posts": 1
+      }
+    },
+    {
+      "case": "omit:algoType",
+      "result": "PASS",
+      "detail": {
+        "owner": "PENDING_CONFIRMATION",
+        "posts": 1
+      }
+    },
+    {
+      "case": "omit:orderType",
+      "result": "PASS",
+      "detail": {
+        "owner": "PENDING_CONFIRMATION",
+        "posts": 1
+      }
+    },
+    {
+      "case": "omit:workingType",
+      "result": "PASS",
+      "detail": {
+        "owner": "PENDING_CONFIRMATION",
+        "posts": 1
+      }
+    },
+    {
+      "case": "omit:priceProtect",
+      "result": "PASS",
+      "detail": {
+        "owner": "PENDING_CONFIRMATION",
+        "posts": 1
+      }
+    },
+    {
+      "case": "omit:closePosition",
+      "result": "PASS",
+      "detail": {
+        "owner": "PENDING_CONFIRMATION",
+        "posts": 1
+      }
+    },
+    {
+      "case": "omit:reduceOnly",
+      "result": "PASS",
+      "detail": {
+        "owner": "PENDING_CONFIRMATION",
+        "posts": 1
+      }
+    },
+    {
+      "case": "omit:positionSide",
+      "result": "PASS",
+      "detail": {
+        "owner": "PENDING_CONFIRMATION",
+        "posts": 1
+      }
+    },
+    {
+      "case": "omit:symbol",
+      "result": "PASS",
+      "detail": {
+        "owner": "PENDING_CONFIRMATION",
+        "posts": 1
+      }
+    },
+    {
+      "case": "omit:side",
+      "result": "PASS",
+      "detail": {
+        "owner": "PENDING_CONFIRMATION",
+        "posts": 1
+      }
+    },
+    {
+      "case": "omit:triggerPrice",
+      "result": "PASS",
+      "detail": {
+        "owner": "PENDING_CONFIRMATION",
+        "posts": 1
+      }
+    },
+    {
+      "case": "omit:quantity",
+      "result": "PASS",
+      "detail": {
+        "owner": "PENDING_CONFIRMATION",
+        "posts": 1
+      }
+    },
+    {
+      "case": "omit:clientAlgoId",
+      "result": "PASS",
+      "detail": {
+        "owner": "PENDING_CONFIRMATION",
+        "posts": 1
+      }
+    },
+    {
+      "case": "omit:algoId",
+      "result": "PASS",
+      "detail": {
+        "owner": "PENDING_CONFIRMATION",
+        "posts": 1
+      }
+    },
+    {
+      "case": "omit:algoStatus",
+      "result": "PASS",
+      "detail": {
+        "owner": "PENDING_CONFIRMATION",
+        "posts": 1
+      }
+    },
+    {
+      "case": "numeric:triggerPrice:NaN",
+      "result": "PASS",
+      "detail": {
+        "owner": "PENDING_CONFIRMATION",
+        "posts": 1
+      }
+    },
+    {
+      "case": "numeric:triggerPrice:Infinity",
+      "result": "PASS",
+      "detail": {
+        "owner": "PENDING_CONFIRMATION",
+        "posts": 1
+      }
+    },
+    {
+      "case": "numeric:quantity:NaN",
+      "result": "PASS",
+      "detail": {
+        "owner": "PENDING_CONFIRMATION",
+        "posts": 1
+      }
+    },
+    {
+      "case": "numeric:quantity:-Infinity",
+      "result": "PASS",
+      "detail": {
+        "owner": "PENDING_CONFIRMATION",
+        "posts": 1
+      }
+    },
+    {
+      "case": "numeric:algoId:True",
+      "result": "PASS",
+      "detail": {
+        "owner": "PENDING_CONFIRMATION",
+        "posts": 1
+      }
+    },
+    {
+      "case": "numeric:algoId:inf",
+      "result": "PASS",
+      "detail": {
+        "owner": "PENDING_CONFIRMATION",
+        "posts": 1
+      }
+    },
+    {
+      "case": "numeric:priceProtect:1",
+      "result": "PASS",
+      "detail": {
+        "owner": "PENDING_CONFIRMATION",
+        "posts": 1
+      }
+    },
+    {
+      "case": "numeric:closePosition:0",
+      "result": "PASS",
+      "detail": {
+        "owner": "PENDING_CONFIRMATION",
+        "posts": 1
+      }
+    },
+    {
+      "case": "numeric:reduceOnly:false",
+      "result": "PASS",
+      "detail": {
+        "owner": "PENDING_CONFIRMATION",
+        "posts": 1
+      }
+    },
+    {
+      "case": "numeric:algoStatus:FILLED",
+      "result": "PASS",
+      "detail": {
+        "owner": "PENDING_CONFIRMATION",
+        "posts": 1
+      }
+    },
+    {
+      "case": "pending:aggregate_only_restart",
+      "result": "PASS",
+      "detail": {
+        "posts": 1,
+        "exact_queries": 3,
+        "owner": "PENDING_CONFIRMATION"
+      }
+    },
+    {
+      "case": "pending:exact_recovery_once",
+      "result": "PASS",
+      "detail": {
+        "posts": 1,
+        "owner": "ACTIVE"
+      }
+    },
+    {
+      "case": "flat:structured_exact_absence",
+      "result": "PASS",
+      "detail": {
+        "structured": true,
+        "owner": "RELEASED",
+        "cancels": 0
+      }
+    },
+    {
+      "case": "flat:unstructured_exact_absence",
+      "result": "PASS",
+      "detail": {
+        "structured": false,
+        "owner": "PENDING_CONFIRMATION",
+        "cancels": 0
+      }
+    },
+    {
+      "case": "flat:cancel_uncertainty_restart",
+      "result": "PASS",
+      "detail": {
+        "cancels": 1,
+        "owner": "RELEASED"
+      }
+    },
+    {
+      "case": "pending:no_id_post_uncertainty",
+      "result": "PASS",
+      "detail": {
+        "posts": 1,
+        "exact_queries": 0,
+        "owner": "PENDING_CONFIRMATION"
+      }
+    },
+    {
+      "case": "flat:cancel_pending_still_new_restart",
+      "result": "PASS",
+      "detail": {
+        "owner": "CANCEL_PENDING",
+        "cancels": 1
+      }
+    },
+    {
+      "case": "contract:boolean_numeric_alias_conflict",
+      "result": "FAIL",
+      "detail": "boolean origQty alias accepted as numeric authority: ('r5-independent', 1.0)"
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "run_id": 37099190279,
+  "head_sha": "c2c7cc83294f44340dd9fa1873bff760501fae12",
+  "attempt1": {
+    "job_id": 111135202456,
+    "excerpts": [
+      "2026-10-03T05:14:36.9255613Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +c2c7cc83294f44340dd9fa1873bff760501fae12:refs/remotes/origin/feature/b-line-live-v1",
+      "2026-10-03T05:14:37.6994739Z  * [new ref]         c2c7cc83294f44340dd9fa1873bff760501fae12 -> origin/feature/b-line-live-v1",
+      "2026-10-03T05:14:37.7489050Z c2c7cc83294f44340dd9fa1873bff760501fae12",
+      "2026-10-03T05:14:44.8678885Z   Using cached numpy-2.5.3-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (6.6 kB)",
+      "2026-10-03T05:14:44.9110049Z   Using cached pyarrow-23.0.1-cp313-cp313-manylinux_2_28_x86_64.whl.metadata (3.1 kB)",
+      "2026-10-03T05:14:46.6296507Z Using cached numpy-2.5.3-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (16.7 MB)",
+      "2026-10-03T05:14:46.7073452Z Using cached pyarrow-23.0.1-cp313-cp313-manylinux_2_28_x86_64.whl (47.6 MB)",
+      "2026-10-03T05:14:52.4915057Z Successfully installed annotated-doc-0.0.5 annotated-types-0.8.0 anyio-4.15.1 btc-quant-agent-0.3.19 certifi-2026.7.22 click-8.5.0 coverage-7.16.2 distro-1.9.0 fastapi-0.142.2 h11-0.16.0 httpcore-1.0.9 httpx-0.28.1 idna-3.20 iniconfig-2.3.0 jiter-0.17.0 librt-0.16.0 mypy-1.20.2 mypy_extensions-1.1.0 numpy-2.5.3 openai-2.54.0 opentelemetry-api-1.45.0 packaging-26.3 pathspec-1.1.1 pluggy-1.6.0 pyarrow-23.0.1 pydantic-2.13.5 pydantic-core-2.46.5 pygments-2.21.0 pytest-8.4.2 pytest-cov-7.1.0 ruff-0.16.10 sniffio-1.3.1 starlette-1.7.0 tqdm-4.70.1 typing-extensions-4.16.0 typing-inspection-0.4.4 uvicorn-0.54.0 websockets-16.1.1",
+      "2026-10-03T05:21:55.5981797Z >       assert canonical_sha256(scientific_projection) == \"d5a962cd9c9556b573a890b6af8cbeb09d7201187511f477d727c8670bf0b2e0\"",
+      "2026-10-03T05:21:55.5982190Z E       AssertionError: assert 'ee185f1fce50...be9e54526643d' == 'd5a962cd9c95...7c8670bf0b2e0'",
+      "2026-10-03T05:21:55.5982614Z E         - d5a962cd9c9556b573a890b6af8cbeb09d7201187511f477d727c8670bf0b2e0",
+      "2026-10-03T05:21:55.5982884Z E         + ee185f1fce50bdf710295a23506a5c29d83a70c361aff72e2b6be9e54526643d",
+      "2026-10-03T05:21:55.6021992Z FAILED tests/test_tactical_grid_shadow_evaluation_v1.py::test_b2b_a34_h40_diff_remains_zero - subprocess.CalledProcessError: Command '['git', 'diff', '407dabc415ae8cae4210250e992941c8b9b25464..HEAD', '--', 'src/btc_quant_agent/h40']' returned non-zero exit status 128.",
+      "2026-10-03T05:21:55.6023406Z FAILED tests/test_v051_h40_m3a_production_discovery_producer.py::test_p09_through_p18_exact_scientific_graph - AssertionError: assert 'ee185f1fce50...be9e54526643d' == 'd5a962cd9c95...7c8670bf0b2e0'",
+      "2026-10-03T05:21:55.6024794Z   - d5a962cd9c9556b573a890b6af8cbeb09d7201187511f477d727c8670bf0b2e0",
+      "2026-10-03T05:21:55.6025232Z   + ee185f1fce50bdf710295a23506a5c29d83a70c361aff72e2b6be9e54526643d",
+      "2026-10-03T05:21:55.6025653Z 2 failed, 2285 passed, 2 skipped, 9 warnings in 411.01s (0:06:51)"
+    ]
+  },
+  "attempt2": {
+    "job_id": 111155995904,
+    "excerpts": [
+      "2026-10-03T07:29:35.6768450Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +c2c7cc83294f44340dd9fa1873bff760501fae12:refs/remotes/origin/feature/b-line-live-v1",
+      "2026-10-03T07:29:36.1845733Z  * [new ref]         c2c7cc83294f44340dd9fa1873bff760501fae12 -> origin/feature/b-line-live-v1",
+      "2026-10-03T07:29:36.2561391Z c2c7cc83294f44340dd9fa1873bff760501fae12",
+      "2026-10-03T07:29:42.1119728Z   Using cached numpy-2.5.3-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (6.6 kB)",
+      "2026-10-03T07:29:42.1879918Z   Using cached pyarrow-23.0.1-cp313-cp313-manylinux_2_28_x86_64.whl.metadata (3.1 kB)",
+      "2026-10-03T07:29:44.6809101Z Using cached numpy-2.5.3-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (16.7 MB)",
+      "2026-10-03T07:29:44.7320002Z Using cached pyarrow-23.0.1-cp313-cp313-manylinux_2_28_x86_64.whl (47.6 MB)",
+      "2026-10-03T07:29:54.5245929Z Successfully installed annotated-doc-0.0.5 annotated-types-0.8.0 anyio-4.15.1 btc-quant-agent-0.3.19 certifi-2026.7.22 click-8.5.0 coverage-7.16.2 distro-1.9.0 fastapi-0.142.2 h11-0.16.0 httpcore-1.0.9 httpx-0.28.1 idna-3.20 iniconfig-2.3.0 jiter-0.17.0 librt-0.16.0 mypy-1.20.2 mypy_extensions-1.1.0 numpy-2.5.3 openai-2.54.0 opentelemetry-api-1.45.0 packaging-26.3 pathspec-1.1.1 pluggy-1.6.0 pyarrow-23.0.1 pydantic-2.13.5 pydantic-core-2.46.5 pygments-2.21.0 pytest-8.4.2 pytest-cov-7.1.0 ruff-0.16.10 sniffio-1.3.1 starlette-1.7.0 tqdm-4.70.1 typing-extensions-4.16.0 typing-inspection-0.4.4 uvicorn-0.54.0 websockets-16.1.1",
+      "2026-10-03T07:43:16.0247017Z FAILED tests/test_tactical_grid_shadow_evaluation_v1.py::test_b2b_a34_h40_diff_remains_zero - subprocess.CalledProcessError: Command '['git', 'diff', '407dabc415ae8cae4210250e992941c8b9b25464..HEAD', '--', 'src/btc_quant_agent/h40']' returned non-zero exit status 128.",
+      "2026-10-03T07:43:16.0248208Z 1 failed, 2286 passed, 2 skipped, 9 warnings in 780.33s (0:13:00)"
+    ]
+  }
+}

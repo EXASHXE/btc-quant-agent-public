@@ -1,0 +1,55 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-8.4.2, pluggy-1.6.0 -- /root/workspace/project/Quant-agent-market-watch/.venv/bin/python
+cachedir: /tmp/b5-r5-diagnostic-cache
+rootdir: /tmp/b5-r5-independent-code
+configfile: pyproject.toml
+plugins: cov-7.1.0, anyio-4.15.1
+collecting ... collected 2 items
+
+tests/test_live_v1_execution_recovery_r3.py::test_restart_expired_authority_reconciles_active_order_and_protection[False] Timeout (0:00:10)!
+Thread 0x00007e1b829ef6c0 (most recent call first):
+  File "/usr/lib/python3.12/concurrent/futures/thread.py", line 89 in _worker
+  File "/usr/lib/python3.12/threading.py", line 1010 in run
+  File "/usr/lib/python3.12/threading.py", line 1073 in _bootstrap_inner
+  File "/usr/lib/python3.12/threading.py", line 1030 in _bootstrap
+
+Thread 0x00007e1bb027b080 (most recent call first):
+  File "/usr/lib/python3.12/selectors.py", line 468 in select
+  File "/usr/lib/python3.12/asyncio/base_events.py", line 1949 in _run_once
+  File "/usr/lib/python3.12/asyncio/base_events.py", line 641 in run_forever
+  File "/usr/lib/python3.12/asyncio/base_events.py", line 674 in run_until_complete
+  File "/usr/lib/python3.12/asyncio/runners.py", line 118 in run
+  File "/usr/lib/python3.12/asyncio/runners.py", line 194 in run
+  File "/tmp/b5-r5-independent-code/tests/test_live_v1_execution_recovery_r3.py", line 67 in test_restart_expired_authority_reconciles_active_order_and_protection
+  File "/root/workspace/project/Quant-agent-market-watch/.venv/lib/python3.12/site-packages/_pytest/python.py", line 157 in pytest_pyfunc_call
+  File "/root/workspace/project/Quant-agent-market-watch/.venv/lib/python3.12/site-packages/pluggy/_callers.py", line 121 in _multicall
+  File "/root/workspace/project/Quant-agent-market-watch/.venv/lib/python3.12/site-packages/pluggy/_manager.py", line 120 in _hookexec
+  File "/root/workspace/project/Quant-agent-market-watch/.venv/lib/python3.12/site-packages/pluggy/_hooks.py", line 512 in __call__
+  File "/root/workspace/project/Quant-agent-market-watch/.venv/lib/python3.12/site-packages/_pytest/python.py", line 1671 in runtest
+  File "/root/workspace/project/Quant-agent-market-watch/.venv/lib/python3.12/site-packages/_pytest/runner.py", line 178 in pytest_runtest_call
+  File "/root/workspace/project/Quant-agent-market-watch/.venv/lib/python3.12/site-packages/pluggy/_callers.py", line 121 in _multicall
+  File "/root/workspace/project/Quant-agent-market-watch/.venv/lib/python3.12/site-packages/pluggy/_manager.py", line 120 in _hookexec
+  File "/root/workspace/project/Quant-agent-market-watch/.venv/lib/python3.12/site-packages/pluggy/_hooks.py", line 512 in __call__
+  File "/root/workspace/project/Quant-agent-market-watch/.venv/lib/python3.12/site-packages/_pytest/runner.py", line 246 in <lambda>
+  File "/root/workspace/project/Quant-agent-market-watch/.venv/lib/python3.12/site-packages/_pytest/runner.py", line 344 in from_call
+  File "/root/workspace/project/Quant-agent-market-watch/.venv/lib/python3.12/site-packages/_pytest/runner.py", line 245 in call_and_report
+  File "/root/workspace/project/Quant-agent-market-watch/.venv/lib/python3.12/site-packages/_pytest/runner.py", line 136 in runtestprotocol
+  File "/root/workspace/project/Quant-agent-market-watch/.venv/lib/python3.12/site-packages/_pytest/runner.py", line 117 in pytest_runtest_protocol
+  File "/root/workspace/project/Quant-agent-market-watch/.venv/lib/python3.12/site-packages/pluggy/_callers.py", line 121 in _multicall
+  File "/root/workspace/project/Quant-agent-market-watch/.venv/lib/python3.12/site-packages/pluggy/_manager.py", line 120 in _hookexec
+  File "/root/workspace/project/Quant-agent-market-watch/.venv/lib/python3.12/site-packages/pluggy/_hooks.py", line 512 in __call__
+  File "/root/workspace/project/Quant-agent-market-watch/.venv/lib/python3.12/site-packages/_pytest/main.py", line 367 in pytest_runtestloop
+  File "/root/workspace/project/Quant-agent-market-watch/.venv/lib/python3.12/site-packages/pluggy/_callers.py", line 121 in _multicall
+  File "/root/workspace/project/Quant-agent-market-watch/.venv/lib/python3.12/site-packages/pluggy/_manager.py", line 120 in _hookexec
+  File "/root/workspace/project/Quant-agent-market-watch/.venv/lib/python3.12/site-packages/pluggy/_hooks.py", line 512 in __call__
+  File "/root/workspace/project/Quant-agent-market-watch/.venv/lib/python3.12/site-packages/_pytest/main.py", line 343 in _main
+  File "/root/workspace/project/Quant-agent-market-watch/.venv/lib/python3.12/site-packages/_pytest/main.py", line 289 in wrap_session
+  File "/root/workspace/project/Quant-agent-market-watch/.venv/lib/python3.12/site-packages/_pytest/main.py", line 336 in pytest_cmdline_main
+  File "/root/workspace/project/Quant-agent-market-watch/.venv/lib/python3.12/site-packages/pluggy/_callers.py", line 121 in _multicall
+  File "/root/workspace/project/Quant-agent-market-watch/.venv/lib/python3.12/site-packages/pluggy/_manager.py", line 120 in _hookexec
+  File "/root/workspace/project/Quant-agent-market-watch/.venv/lib/python3.12/site-packages/pluggy/_hooks.py", line 512 in __call__
+  File "/root/workspace/project/Quant-agent-market-watch/.venv/lib/python3.12/site-packages/_pytest/config/__init__.py", line 175 in main
+  File "/root/workspace/project/Quant-agent-market-watch/.venv/lib/python3.12/site-packages/_pytest/config/__init__.py", line 201 in console_main
+  File "/root/workspace/project/Quant-agent-market-watch/.venv/lib/python3.12/site-packages/pytest/__main__.py", line 9 in <module>
+  File "<frozen runpy>", line 88 in _run_code
+  File "<frozen runpy>", line 198 in _run_module_as_main

@@ -1,0 +1,60 @@
+import json
+import os
+from pathlib import Path
+import subprocess
+import time
+import xml.etree.ElementTree as ET
+
+CODE = Path('/tmp/b5-r5-independent-code')
+OUT = Path('/tmp/b5-r5-evidence/gates')
+OUT.mkdir(parents=True, exist_ok=True)
+BIN = Path('/root/workspace/project/Quant-agent-market-watch/.venv/bin')
+env = {k: os.environ[k] for k in ('LANG', 'LC_ALL', 'SYSTEMROOT') if k in os.environ}
+env.update(PATH=f'{BIN}:/usr/local/bin:/usr/bin:/bin',
+           PYTHONPATH=f'{CODE}/src:{CODE}/tests',
+           PYTHONPYCACHEPREFIX='/tmp/b5-r5-pycache',
+           RUFF_CACHE_DIR='/tmp/b5-r5-ruff-cache',
+           MYPY_CACHE_DIR='/tmp/b5-r5-mypy-cache')
+files = sorted(CODE.glob('tests/test_live_v1_*.py'))
+relative = lambda paths: [str(p.relative_to(CODE)) for p in paths]
+groups = [
+    ('r5_focused', relative([p for p in files if p.stem.endswith('_r5')])),
+    ('r3_r4_regressions', relative([p for p in files if p.stem.endswith(('_r3', '_r4'))])),
+    ('all_live_v1', relative(files)),
+    ('execution_account_supervisor_runtime', relative([p for p in files if any(s in p.name for s in ('execution_', 'account_', 'position_', 'runtime_'))])),
+    ('r02_governance', ['tests/test_v050_r02_orchestration_guards.py']),
+    ('marketwatch_b2a_b2b', ['tests/test_market_watch.py', 'tests/test_tactical_policy_b0.py', 'tests/test_tactical_feature_evidence_v2.py', 'tests/test_tactical_shadow_evaluation_v2.py', 'tests/test_tactical_grid_shadow_evaluation_v1.py']),
+    ('full_pytest', []),
+]
+jobs = [(name, [str(BIN/'python'), '-m', 'pytest', '-q', '--tb=short', '-o', f'cache_dir={OUT}/pytest-cache-{name}', f'--junitxml={OUT}/{name}.xml', *paths]) for name, paths in groups]
+jobs += [
+    ('ruff', [str(BIN/'ruff'), 'check', '.']),
+    ('mypy', [str(BIN/'mypy')]),
+    ('compileall', [str(BIN/'python'), '-m', 'compileall', '-q', 'src', 'skill-template/scripts']),
+    ('git_diff_check', ['git', 'diff', '--check']),
+]
+golden = 'tests/test_v051_h40_m3a_production_discovery_producer.py::test_p09_through_p18_exact_scientific_graph'
+for n in (1, 2):
+    name = f'h40_fresh_process_{n}'
+    jobs.append((name, [str(BIN/'python'), '-m', 'pytest', '-q', '--tb=short', '-o', f'cache_dir={OUT}/pytest-cache-{name}', f'--junitxml={OUT}/{name}.xml', golden]))
+results = json.loads((OUT/'results.json').read_text()) if (OUT/'results.json').exists() else []
+for name, command in jobs:
+    if any(result['name'] == name for result in results):
+        continue
+    print('START', name, flush=True)
+    started = time.time()
+    with (OUT/f'{name}.log').open('w') as log:
+        completed = subprocess.run(command, cwd=CODE, env=env, stdout=log, stderr=subprocess.STDOUT)
+    result = dict(name=name, command=command, exit_code=completed.returncode, elapsed_seconds=round(time.time()-started, 3))
+    xml = OUT/f'{name}.xml'
+    if xml.exists():
+        suites = list(ET.parse(xml).getroot().iter('testsuite'))
+        counts = {key: sum(int(s.get(key, '0')) for s in suites) for key in ('tests', 'failures', 'errors', 'skipped')}
+        counts['passed'] = counts['tests']-counts['failures']-counts['errors']-counts['skipped']
+        result['counts'] = counts
+        result['failure_ids'] = [f"{test.get('classname')}.{test.get('name')}" for test in ET.parse(xml).getroot().iter('testcase') if test.find('failure') is not None or test.find('error') is not None]
+    result['tail'] = (OUT/f'{name}.log').read_text()[-2200:]
+    results.append(result)
+    (OUT/'results.json').write_text(json.dumps(results, indent=2)+'\n')
+    print(json.dumps({k:v for k,v in result.items() if k not in ('command', 'tail')}), flush=True)
+print('FINISHED', flush=True)

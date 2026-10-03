@@ -1,0 +1,300 @@
+"""Independent R5 attacks against the frozen checkout; no network or source writes."""
+import asyncio
+import json
+import tempfile
+from pathlib import Path
+from types import SimpleNamespace
+from unittest.mock import AsyncMock, Mock
+
+from test_live_v1_runtime_r2 import _runtime
+from test_live_v1_account_watch import sample_snapshot
+from test_live_v1_position_supervisor import NOW, market_case, observation
+
+from btc_quant_agent.execution.guard import ExecutionBlocked
+from btc_quant_agent.account_watch.models import AccountSnapshotV1, PositionV1
+from btc_quant_agent.live_db import connection
+from btc_quant_agent.position_supervisor import PositionSupervisor
+from btc_quant_agent.position_supervisor.supervisor import position_case_from_event
+
+
+results = []
+
+
+def record(name, expected, actual, **details):
+    results.append(dict(name=name, expected=expected, actual=actual,
+                        pass_=expected == actual, **details))
+
+
+def snapshot(runtime, **changes):
+    values = vars(runtime.account_watch.latest_snapshot()).copy()
+    values.update(changes)
+    return SimpleNamespace(**values)
+
+
+async def runtime_matrix():
+    changes = {
+        "account_id": {"account_id": "foreign"},
+        "environment": {"environment": "TESTNET"},
+        "namespace": {"credential_namespace": "BINANCE_TESTNET"},
+        "hash": {"verify": Mock(side_effect=ValueError("hash"))},
+        "unreconciled": {"reconciled": False},
+        "quality": {"quality": "STALE"},
+        "unconfigured_symbol": {"positions": (SimpleNamespace(symbol="ETHUSDT", quantity=1),)},
+    }
+    for name, change in changes.items():
+        runtime = _runtime()
+        runtime.account_watch.latest_snapshot.return_value = snapshot(runtime, **change)
+        try:
+            await runtime.start()
+            started = True
+            await runtime.stop()
+        except ExecutionBlocked:
+            started = False
+        record(f"runtime/start/{name}", False, started)
+
+        runtime = _runtime()
+        runtime._started = True
+        runtime.accepting_risk = True
+        runtime.account_watch.latest_snapshot.return_value = snapshot(runtime, **change)
+        record(f"runtime/status/{name}", False, runtime.status()["accepting_risk"])
+        try:
+            await runtime.execute_intent("x")
+            executed = True
+        except ExecutionBlocked:
+            executed = False
+        record(f"runtime/execute/{name}", False, executed,
+               orchestration_calls=runtime.execution_service.execute_approved_intent.await_count)
+
+        runtime = _runtime()
+        runtime.accepting_risk = True
+        runtime.account_watch.latest_snapshot.return_value = snapshot(runtime, **change)
+        runtime.market_stream.latest_observation.return_value = SimpleNamespace(symbol="BTCUSDT")
+        runtime.supervisor.process = AsyncMock()
+        await runtime.poll_positions(NOW)
+        record(f"runtime/poll/{name}", (False, 0),
+               (runtime.accepting_risk, runtime.supervisor.process.await_count))
+
+        runtime = _runtime()
+        runtime.accepting_risk = True
+        runtime.config = SimpleNamespace(**{**vars(runtime.config), "rest_reconcile_seconds": 0.001})
+        bad = snapshot(runtime, **change)
+        async def reconcile():
+            runtime._stop_event.set()
+            return bad
+        runtime.account_watch.reconcile_rest_async.side_effect = reconcile
+        await runtime._rest_loop()
+        record(f"runtime/rest/{name}", False, runtime.accepting_risk)
+
+    runtime = _runtime()
+    runtime.account_watch.latest_snapshot.return_value = snapshot(runtime, account_id="foreign")
+    runtime.intent_store.has_existing_side_effect.return_value = True
+    runtime.execution_service.reconcile_intent = AsyncMock(return_value="RECOVERED")
+    record("runtime/recovery", "RECOVERED", await runtime.execute_intent("x"))
+
+    # The REST result can become stale while _refresh_case awaits; readiness reads
+    # latest, while _rest_loop decides accepting_risk from the earlier local object.
+    runtime = _runtime()
+    runtime._started = True
+    runtime.accepting_risk = True
+    runtime.config = SimpleNamespace(**{**vars(runtime.config), "rest_reconcile_seconds": 0.001})
+    valid = runtime.account_watch.latest_snapshot()
+    bad = snapshot(runtime, account_id="foreign")
+    async def reconcile_valid():
+        runtime._stop_event.set()
+        return valid
+    async def change_latest(_symbol):
+        runtime.account_watch.latest_snapshot.return_value = bad
+    runtime.account_watch.reconcile_rest_async.side_effect = reconcile_valid
+    runtime._refresh_case = change_latest
+    await runtime._rest_loop()
+    record("runtime/rest-result-stale", False, runtime.accepting_risk,
+           status_accepting=runtime.status()["accepting_risk"] if runtime._started else None)
+
+    # An unconfigured live position appears during the awaited case refresh,
+    # after readiness checked the prior snapshot.
+    runtime = _runtime()
+    runtime._started = True
+    runtime.accepting_risk = True
+    runtime.intent_store.get_intent = Mock(return_value=SimpleNamespace(symbol="BTCUSDT"))
+    original = sample_snapshot(environment="DRY_RUN", credential_namespace="NONE",
+                               rest_base_url="", account_id="DEFAULT_ACCOUNT",
+                               positions=(), orders=())
+    runtime.account_watch.latest_snapshot.return_value = original
+    async def flip_snapshot(_symbol):
+        values = original.model_dump(mode="python", exclude={"snapshot_hash"})
+        values["positions"] = (PositionV1(
+            symbol="ETHUSDT", quantity=0.01, entry_price=100.0,
+            mark_price=100.0, unrealized_pnl_usdt=0.0, leverage=2,
+            liquidation_price=None, margin_type="ISOLATED", observed_at_ms=NOW),)
+        runtime.account_watch.latest_snapshot.return_value = AccountSnapshotV1.build(**values)
+    runtime._refresh_case = flip_snapshot
+    await runtime.execute_intent("x")
+    record("runtime/execute-snapshot-flip", 0,
+           runtime.execution_service.execute_approved_intent.await_count,
+           current_readiness=runtime._readiness_reason(),
+           snapshot_verified=True)
+
+
+async def outbox_matrix(tmp):
+    def make(label):
+        path = tmp / f"{label}.db"
+        called = []
+        class Analysis:
+            async def analyze_case(self, case):
+                called.append("analysis")
+        def fresh(symbol):
+            called.append("market")
+            return market_case()
+        worker = PositionSupervisor(path, analysis_service=Analysis(), fresh_market_case=fresh)
+        event = worker.evaluate(observation(), NOW)[0]
+        return path, worker, event, called
+
+    fields = ["event_id", "event_hash", "symbol", "environment",
+              "credential_namespace", "account_id", "position_side",
+              "position_authority_key"]
+    for table in ("live_position_events", "live_position_case_dispatches"):
+        for field in fields:
+            label = f"{table}-{field}"
+            path, worker, event, called = make(label)
+            with connection(path) as db:
+                if table.endswith("dispatches") and field not in worker.get_dispatch(event.event_id):
+                    db.execute(f"ALTER TABLE {table} ADD COLUMN {field} TEXT")
+                value = "changed" if field != "event_id" else "different-event-id"
+                db.execute(f"UPDATE {table} SET {field}=? WHERE event_id=?", (value, event.event_id))
+            await worker.drain_pending_dispatches(NOW)
+            dispatch_id = value if table.endswith("dispatches") and field == "event_id" else event.event_id
+            state = worker.get_dispatch(dispatch_id)["state"]
+            record(f"outbox/static/{label}", ("FAILED_CLOSED", []), (state, called))
+
+    # Frozen case linkage and denormalized hash/id each remain binding on retry.
+    for field, value in (("case_hash", "wrong"), ("position_case_hash", "wrong"),
+                         ("position_case_id", "wrong"), ("case_hash", ""),
+                         ("position_case_hash", ""), ("position_case_id", "")):
+        path, worker, event, called = make(f"frozen-{field}-{value or 'empty'}")
+        case = position_case_from_event(market_case(), event)
+        with connection(path) as db:
+            db.execute("UPDATE live_position_case_dispatches SET position_case_id=?, "
+                       "position_case_hash=?, position_case_json=?, case_hash=? WHERE event_id=?",
+                       (case.case_id, case.case_hash, case.canonical_json(), case.case_hash, event.event_id))
+            db.execute(f"UPDATE live_position_case_dispatches SET {field}=? WHERE event_id=?",
+                       (value, event.event_id))
+        await worker.drain_pending_dispatches(NOW)
+        record(f"outbox/frozen/{field}/{value or 'empty'}", ("FAILED_CLOSED", []),
+               (worker.get_dispatch(event.event_id)["state"], called))
+
+    path, worker, event, called = make("wrong-first-market-symbol")
+    base = market_case()
+    values = base.model_dump(mode="python", exclude={"case_hash"})
+    values["symbol"] = "ETHUSDT"
+    worker.fresh_market_case = lambda symbol: (called.append("market"), type(base).build(**values))[1]
+    await worker.drain_pending_dispatches(NOW)
+    record("outbox/first-market-symbol", ("FAILED_CLOSED", ["market"]),
+           (worker.get_dispatch(event.event_id)["state"], called))
+
+    # A callback supplies the exact requested symbol, then changes a dispatch
+    # authority field before the frozen case and DONE updates.
+    for point in ("market", "analysis"):
+        path, worker, event, called = make(f"race-{point}")
+        if point == "market":
+            def mutate(symbol):
+                called.append("market")
+                with connection(path) as db:
+                    db.execute("UPDATE live_position_case_dispatches SET symbol='ETHUSDT' WHERE event_id=?",
+                               (event.event_id,))
+                return market_case()
+            worker.fresh_market_case = mutate
+        else:
+            class MutatingAnalysis:
+                async def analyze_case(self, case):
+                    called.append("analysis")
+                    with connection(path) as db:
+                        db.execute("UPDATE live_position_case_dispatches SET symbol='ETHUSDT' WHERE event_id=?",
+                                   (event.event_id,))
+            worker.analysis_service = MutatingAnalysis()
+        await worker.drain_pending_dispatches(NOW)
+        state = worker.get_dispatch(event.event_id)["state"]
+        record(f"outbox/race/{point}", "FAILED_CLOSED", state, calls=called)
+
+    for table in ("live_position_events", "live_position_case_dispatches"):
+        for field in fields:
+            label = f"dynamic-{table}-{field}"
+            path, worker, event, called = make(label)
+            if table.endswith("dispatches") and field not in worker.get_dispatch(event.event_id):
+                with connection(path) as db:
+                    db.execute(f"ALTER TABLE {table} ADD COLUMN {field} TEXT")
+                    db.execute(f"UPDATE {table} SET {field}=? WHERE event_id=?",
+                               (getattr(event, field), event.event_id))
+            def mutating_market(symbol, table=table, field=field, path=path, event=event):
+                called.append("market")
+                with connection(path) as db:
+                    db.execute(f"UPDATE {table} SET {field}=? WHERE event_id=?",
+                               ("other-event" if field == "event_id" else "changed", event.event_id))
+                return market_case()
+            worker.fresh_market_case = mutating_market
+            await worker.drain_pending_dispatches(NOW)
+            dispatch_id = "other-event" if table.endswith("dispatches") and field == "event_id" else event.event_id
+            state = worker.get_dispatch(dispatch_id)["state"]
+            record(f"outbox/dynamic/{table}/{field}", "FAILED_CLOSED", state,
+                   calls=called)
+
+    # A failed analysis must retry the exact frozen case without another market read.
+    path = tmp / "frozen-retry.db"
+    market_calls = []
+    analyzed_hashes = []
+    class FlakyAnalysis:
+        async def analyze_case(self, case):
+            analyzed_hashes.append(case.case_hash)
+            if len(analyzed_hashes) == 1:
+                raise RuntimeError("injected failure")
+    def changing_market(symbol):
+        market_calls.append(symbol)
+        case = market_case()
+        if len(market_calls) > 1:
+            values = case.model_dump(mode="python", exclude={"case_hash"})
+            values["price"] = 105.0
+            return type(case).build(**values)
+        return case
+    worker = PositionSupervisor(path, analysis_service=FlakyAnalysis(),
+                                fresh_market_case=changing_market)
+    event = worker.evaluate(observation(), NOW)[0]
+    await worker.drain_pending_dispatches(NOW, max_retries=3)
+    frozen_hash = worker.get_dispatch(event.event_id)["position_case_hash"]
+    first_state = worker.get_dispatch(event.event_id)["state"]
+    await worker.drain_pending_dispatches(NOW + 1, max_retries=3)
+    record("outbox/frozen-retry", ("DONE", "DONE", 1, [frozen_hash, frozen_hash], 2),
+           (first_state, worker.get_dispatch(event.event_id)["state"],
+            len(market_calls), analyzed_hashes, worker.get_dispatch(event.event_id)["retry_count"]))
+
+    # Expiry while materializing must prevent the stale worker from freezing or analyzing.
+    path = tmp / "expired-owner.db"
+    lease_time = [NOW]
+    stale_calls = []
+    class SpyAnalysis:
+        async def analyze_case(self, case):
+            stale_calls.append("analysis")
+    def slow_market(symbol):
+        stale_calls.append("market")
+        lease_time[0] += 100
+        return market_case()
+    worker = PositionSupervisor(path, analysis_service=SpyAnalysis(),
+                                fresh_market_case=slow_market,
+                                lease_clock_ms=lambda: lease_time[0])
+    event = worker.evaluate(observation(), NOW)[0]
+    await worker.drain_pending_dispatches(NOW, lease_ms=10)
+    row = worker.get_dispatch(event.event_id)
+    record("outbox/expired-owner", ("DISPATCHING", "", ["market"]),
+           (row["state"], row["position_case_json"], stale_calls))
+
+
+async def main():
+    with tempfile.TemporaryDirectory(prefix="r5-attack-") as directory:
+        await runtime_matrix()
+        await outbox_matrix(Path(directory))
+    output = Path(__file__).with_name("results.json")
+    output.write_text(json.dumps(results, indent=2) + "\n")
+    print(json.dumps({"cases": len(results), "passed": sum(x["pass_"] for x in results),
+                      "failed": [x for x in results if not x["pass_"]]}, indent=2))
+
+
+if __name__ == "__main__":
+    asyncio.run(main())

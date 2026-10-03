@@ -1,0 +1,425 @@
+{
+  "task": "LIVE_V1_B5_R5_INDEPENDENT_EXACT_SHA_REVALIDATION",
+  "decision": "LIVE_V1_INDEPENDENT_VALIDATION_FAILED",
+  "validated_sha": "a663921abf90504412d0d67b2b9c9f134f204d85",
+  "parent_sha": "4bc05e1a7c7fae86f41c1dd9b5a1635d0540ee58",
+  "controller_dispatch_sha": "6319ddbaddd69d5522696992ec1565169da88e03",
+  "publication_branch": "validation/v0.5.5-live-v1-b5-r5-independent-20261004",
+  "publication_parent_sha": "6319ddbaddd69d5522696992ec1565169da88e03",
+  "identity_gate": "PASS",
+  "independence_gate": "PASS",
+  "independence": {
+    "fresh_coordinating_session": true,
+    "r5_implementation_participation": false,
+    "controller_seal_participation": false,
+    "inherited_implementation_conversation": false,
+    "checkout": "independent full clone with no hardlinks",
+    "claims_treated_as_untrusted": true
+  },
+  "r5_pending_exact_confirmation": "PASS",
+  "r5_full_protective_contract": "FAIL_R5_F01",
+  "r5_flat_unresolved_identity": "PASS",
+  "r5_runtime_account_authority": "FAIL_R5_F02",
+  "r5_outbox_event_binding": "FAIL_R5_F03",
+  "prior_safety_matrix": [
+    {
+      "boundary": "placement-time actual clock and forced fresh account",
+      "status": "PASS",
+      "evidence": "prior-safety-tests.py.txt; execution_placement_r3"
+    },
+    {
+      "boundary": "authorization TTL",
+      "status": "PASS",
+      "evidence": "9 independent caller-clock/expiry attacks; authorization_r2"
+    },
+    {
+      "boundary": "remaining daily-loss/drawdown headroom",
+      "status": "PASS",
+      "evidence": "second-read and fresh-budget attacks"
+    },
+    {
+      "boundary": "canonical intent/idempotency/client IDs",
+      "status": "PASS",
+      "evidence": "3 independent self-rehash attacks; execution_identity_r3"
+    },
+    {
+      "boundary": "exact protection ownership",
+      "status": "PASS_IDENTITY__FAIL_COMPLETE_CONTRACT",
+      "evidence": "protection attack owner conflicts; R5-F01"
+    },
+    {
+      "boundary": "recovery before new-entry gates",
+      "status": "PASS",
+      "evidence": "2 independent repeated recovery cases; recovery_r3"
+    },
+    {
+      "boundary": "independent mark/book/kline freshness",
+      "status": "PASS",
+      "evidence": "12 independent stale/future component attacks"
+    },
+    {
+      "boundary": "runtime config normalization",
+      "status": "PASS",
+      "evidence": "strict flags and mode fences; runtime_recovery_r3"
+    },
+    {
+      "boundary": "durable account/environment/namespace flat/reopen lifecycle",
+      "status": "PASS",
+      "evidence": "4 independent restart/reopen cases; position_authority_r4"
+    },
+    {
+      "boundary": "account-scoped cooldown",
+      "status": "PASS",
+      "evidence": "independent cross-account/environment and restart attack"
+    },
+    {
+      "boundary": "PositionCase lease/frozen outbox",
+      "status": "PASS_LEASE_FROZEN_CASE__FAIL_EVENT_BINDING",
+      "evidence": "runtime-outbox lease and frozen retry; R5-F03"
+    },
+    {
+      "boundary": "transport uncertainty query-before-retry",
+      "status": "PASS",
+      "evidence": "independent one POST/three queries attack"
+    },
+    {
+      "boundary": "partial-fill protection",
+      "status": "PASS",
+      "evidence": "independent repeated partial recovery protects actual half fill"
+    },
+    {
+      "boundary": "SQLite durability/contention",
+      "status": "PASS",
+      "evidence": "24 concurrent writes, rollback and held-lock timeout"
+    },
+    {
+      "boundary": "read-only host API in B4 runtime mode",
+      "status": "PASS",
+      "evidence": "2 independent host route matrices; R02 26 tests"
+    },
+    {
+      "boundary": "Feishu callback has no executable authority",
+      "status": "PASS",
+      "evidence": "6 independent injected execution fields rejected"
+    },
+    {
+      "boundary": "TESTNET credential isolation",
+      "status": "PASS",
+      "evidence": "4 endpoint attacks and LIVE-key-only factory rejection"
+    },
+    {
+      "boundary": "secret isolation",
+      "status": "PASS",
+      "evidence": "6 independent snapshot secret-field attacks; credential-free runs"
+    },
+    {
+      "boundary": "LIVE and AUTONOMOUS hard blocks",
+      "status": "PASS",
+      "evidence": "4 independent forbidden runtime modes; policy regressions"
+    }
+  ],
+  "execution_idempotency": "PASS",
+  "account_reconciliation": "PASS_STATIC_CHECKS__FAIL_RUNTIME_HANDOFF",
+  "position_supervisor": "FAIL_OUTBOX_AUTHORITY",
+  "runtime_governance": "FAIL_CURRENT_AUTHORITY__READ_ONLY_HOST_PASS",
+  "provider_boundaries": "FAIL_TYPED_PROTECTIVE_ALIAS__EXACT_ABSENCE_PASS",
+  "secret_isolation": "PASS",
+  "testnet_only_fence": "PASS",
+  "live_write_count": 0,
+  "testnet_network_smoke": "NOT_RUN_CREDENTIALS_UNAVAILABLE",
+  "provider_credential_smoke": "NOT_RUN_CREDENTIALS_UNAVAILABLE",
+  "focused_tests": {
+    "r5_focused": {
+      "tests": 77,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 77
+    },
+    "r3_r4_regressions": {
+      "tests": 122,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 122
+    },
+    "all_live_v1": {
+      "tests": 413,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 413
+    },
+    "execution_account_supervisor_runtime": {
+      "tests": 333,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 333
+    },
+    "r02_governance": {
+      "tests": 26,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 26
+    },
+    "marketwatch_b2a_b2b": {
+      "tests": 265,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 265
+    }
+  },
+  "independent_prior_tests": {
+    "tests": 66,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "passed": 66
+  },
+  "coordinator_reproductions": {
+    "tests": 12,
+    "failures": 12,
+    "errors": 0,
+    "skipped": 0,
+    "passed": 0
+  },
+  "runtime_real_service_probe": {
+    "target_sha": "a663921abf90504412d0d67b2b9c9f134f204d85",
+    "actual_execution_service": true,
+    "typed_snapshot_verified": true,
+    "current_readiness": "UNCONFIGURED_POSITION_SYMBOL",
+    "report_status": "NEW",
+    "fake_entry_post_count": 1,
+    "new_risk_should_have_been_blocked": true,
+    "real_network_calls": 0,
+    "real_money_writes": 0
+  },
+  "reviewer_attack_counts": {
+    "protection": {
+      "total": 51,
+      "strict_pass": 50,
+      "strict_fail": 1
+    },
+    "runtime_outbox": {
+      "total": 81,
+      "strict_pass": 58,
+      "strict_fail": 23,
+      "note": "Includes repeated race variants and three diagnostic/operational strict-oracle mismatches, not 23 distinct blockers."
+    }
+  },
+  "full_suite": {
+    "name": "full_pytest",
+    "command": [
+      "/root/workspace/project/Quant-agent-market-watch/.venv/bin/python",
+      "-m",
+      "pytest",
+      "-q",
+      "--tb=short",
+      "-o",
+      "cache_dir=/tmp/b5-r5-evidence/gates/pytest-cache-full_pytest",
+      "--junitxml=/tmp/b5-r5-evidence/gates/full_pytest.xml"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 890.889,
+    "counts": {
+      "tests": 2424,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 2,
+      "passed": 2422
+    },
+    "failure_ids": [],
+    "tail": "ndidate promotion, or formal validation. Use check_unblind_readiness() with wall-clock denominator instead.\n    val_status = engine.evaluate_validation_status()\n\ntests/test_v0323_blind_validation.py::test_post_start_partition_does_not_trigger_observation_building\n  /tmp/b5-r5-independent-code/tests/test_v0323_blind_validation.py:861: DeprecationWarning: evaluate_validation_status() is a deprecated non-authoritative diagnostic. It MUST NOT authorize unblind, candidate promotion, or formal validation. Use check_unblind_readiness() with wall-clock denominator instead.\n    val_status = engine.evaluate_validation_status()\n\ntests/test_v0323_blind_validation.py::test_absence_of_canonical_candles_does_not_break_diagnostic\n  /tmp/b5-r5-independent-code/tests/test_v0323_blind_validation.py:889: DeprecationWarning: evaluate_validation_status() is a deprecated non-authoritative diagnostic. It MUST NOT authorize unblind, candidate promotion, or formal validation. Use check_unblind_readiness() with wall-clock denominator instead.\n    val_status = engine.evaluate_validation_status()\n\ntests/test_v0323_blind_validation.py::test_diagnostic_payload_has_no_performance_leakage\n  /tmp/b5-r5-independent-code/tests/test_v0323_blind_validation.py:899: DeprecationWarning: evaluate_validation_status() is a deprecated non-authoritative diagnostic. It MUST NOT authorize unblind, candidate promotion, or formal validation. Use check_unblind_readiness() with wall-clock denominator instead.\n    val_status = engine.evaluate_validation_status()\n\ntests/test_v0323_blind_validation.py::test_deprecated_diagnostic_cannot_grant_authorization\n  /tmp/b5-r5-independent-code/tests/test_v0323_blind_validation.py:921: DeprecationWarning: evaluate_validation_status() is a deprecated non-authoritative diagnostic. It MUST NOT authorize unblind, candidate promotion, or formal validation. Use check_unblind_readiness() with wall-clock denominator instead.\n    val_status = engine.evaluate_validation_status()\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n-------- generated xml file: /tmp/b5-r5-evidence/gates/full_pytest.xml ---------\n2422 passed, 2 skipped, 8 warnings in 848.51s (0:14:08)\n"
+  },
+  "ruff": {
+    "name": "ruff",
+    "command": [
+      "/root/workspace/project/Quant-agent-market-watch/.venv/bin/ruff",
+      "check",
+      "."
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 0.181,
+    "tail": "All checks passed!\n"
+  },
+  "mypy": {
+    "name": "mypy",
+    "command": [
+      "/root/workspace/project/Quant-agent-market-watch/.venv/bin/mypy"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 22.206,
+    "tail": "Success: no issues found in 151 source files\n"
+  },
+  "compileall": {
+    "name": "compileall",
+    "command": [
+      "/root/workspace/project/Quant-agent-market-watch/.venv/bin/python",
+      "-m",
+      "compileall",
+      "-q",
+      "src",
+      "skill-template/scripts"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 0.122,
+    "tail": "",
+    "python_source_file_count": 152
+  },
+  "git_diff_check": {
+    "name": "git_diff_check",
+    "command": [
+      "git",
+      "diff",
+      "--check"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 0.029,
+    "tail": ""
+  },
+  "h40_fence": "PASS_ZERO_SOURCE_AND_CANONICAL_DIFF_NO_R5_H40_IMPORTS",
+  "h40_numeric_reproducibility": {
+    "classification": "KNOWN_H40_CI_NUMERIC_REPRODUCIBILITY_DEBT",
+    "scope": "B_LINE_ONLY_NO_A_LINE_SCIENTIFIC_AUTHORITY_CHANGE",
+    "raw_floating_projection": true,
+    "historical_same_sha_fail_pass_verified": true,
+    "historical_run": 37099190279,
+    "historical_sha": "c2c7cc83294f44340dd9fa1873bff760501fae12",
+    "fresh_processes": [
+      {
+        "name": "h40_fresh_process_1",
+        "command": [
+          "/root/workspace/project/Quant-agent-market-watch/.venv/bin/python",
+          "-m",
+          "pytest",
+          "-q",
+          "--tb=short",
+          "-o",
+          "cache_dir=/tmp/b5-r5-evidence/gates/pytest-cache-h40_fresh_process_1",
+          "--junitxml=/tmp/b5-r5-evidence/gates/h40_fresh_process_1.xml",
+          "tests/test_v051_h40_m3a_production_discovery_producer.py::test_p09_through_p18_exact_scientific_graph"
+        ],
+        "exit_code": 0,
+        "elapsed_seconds": 25.555,
+        "counts": {
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "passed": 1
+        },
+        "failure_ids": [],
+        "tail": ".                                                                        [100%]\n---- generated xml file: /tmp/b5-r5-evidence/gates/h40_fresh_process_1.xml -----\n1 passed in 22.91s\n"
+      },
+      {
+        "name": "h40_fresh_process_2",
+        "command": [
+          "/root/workspace/project/Quant-agent-market-watch/.venv/bin/python",
+          "-m",
+          "pytest",
+          "-q",
+          "--tb=short",
+          "-o",
+          "cache_dir=/tmp/b5-r5-evidence/gates/pytest-cache-h40_fresh_process_2",
+          "--junitxml=/tmp/b5-r5-evidence/gates/h40_fresh_process_2.xml",
+          "tests/test_v051_h40_m3a_production_discovery_producer.py::test_p09_through_p18_exact_scientific_graph"
+        ],
+        "exit_code": 0,
+        "elapsed_seconds": 20.847,
+        "counts": {
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "passed": 1
+        },
+        "failure_ids": [],
+        "tail": ".                                                                        [100%]\n---- generated xml file: /tmp/b5-r5-evidence/gates/h40_fresh_process_2.xml -----\n1 passed in 19.87s\n"
+      }
+    ]
+  },
+  "remote_ci": {
+    "run_id": 37141954018,
+    "head_sha": "a663921abf90504412d0d67b2b9c9f134f204d85",
+    "attempts": {
+      "1": {
+        "passed": 2420,
+        "failed": 2,
+        "skipped": 2
+      },
+      "2": {
+        "passed": 2420,
+        "failed": 2,
+        "skipped": 2
+      }
+    },
+    "ruff": "PASS_BOTH",
+    "mypy": "PASS_151_SOURCE_FILES_BOTH",
+    "compileall": "NOT_RUN_REMOTE_FAIL_FAST",
+    "failures": [
+      "A34_SHALLOW_CHECKOUT_HISTORICAL_REVISION_ABSENT",
+      "H40_EXACT_FLOATING_PROJECTION_GOLDEN_MISMATCH"
+    ],
+    "adjudication": "A34 checkout-harness debt and H40 numeric debt; neither excuses the independently reproduced R5 safety failures."
+  },
+  "blockers": [
+    {
+      "id": "R5-F01",
+      "severity": "HIGH",
+      "contract": "R5-02",
+      "title": "BOOLEAN_NUMERIC_ALIAS_CAN_CONFIRM_ACTIVE_PROTECTION",
+      "source": [
+        "src/btc_quant_agent/execution/protection.py:66",
+        "src/btc_quant_agent/execution/backend.py:693"
+      ],
+      "trigger": "A complete exact response with quantity=1.0 and origQty=true for a requested one-unit stop.",
+      "observed": "Protective owner ACTIVE, quantity 1.0, one POST. Python 1.0 == True makes alias disagreement invisible; only primary is type-checked.",
+      "required": "Each present quantity/trigger alias must have valid numeric semantics; malformed alias cannot confirm ACTIVE."
+    },
+    {
+      "id": "R5-F02",
+      "severity": "HIGH",
+      "contract": "R5-04",
+      "title": "NEW_RISK_HANDOFF_USES_AUTHORITY_FROM_BEFORE_AWAIT",
+      "source": [
+        "src/btc_quant_agent/live_runtime.py:355",
+        "src/btc_quant_agent/live_runtime.py:363"
+      ],
+      "trigger": "A typed hash-valid account snapshot gains a nonzero unconfigured ETHUSDT position during awaited fresh-case loading.",
+      "observed": "execute_approved_intent awaited once while current readiness returns UNCONFIGURED_POSITION_SYMBOL. An additional probe using the actual execution service and backend placed one fake entry POST and returned NEW.",
+      "required": "The unified current-account rule must hold at the new-risk orchestration boundary, including after awaited preparation.",
+      "limit": "Uses a fake exchange, temporary SQLite and no credentials. Proves local entry submission through the actual service/backend, not a real exchange order. Later placement guards did not block the unconfigured-position case."
+    },
+    {
+      "id": "R5-F03",
+      "severity": "HIGH",
+      "contract": "R5-05",
+      "title": "OUTBOX_AUTHORITY_CHANGED_AFTER_CLAIM_REACHES_ANALYSIS_AND_DONE",
+      "source": [
+        "src/btc_quant_agent/position_supervisor/supervisor.py:575",
+        "src/btc_quant_agent/position_supervisor/supervisor.py:653",
+        "src/btc_quant_agent/position_supervisor/supervisor.py:705"
+      ],
+      "trigger": "Concurrent SQLite change after initial row/event comparison, reproduced deterministically inside fresh-market materialization.",
+      "observed": "Dispatch event_hash/symbol corruption and each of the eight stored event authority fields reach analysis and DONE.",
+      "required": "Exact immutable event/dispatch/case binding must still hold at freeze, analysis admission and DONE.",
+      "limit": "Requires concurrent storage tampering; static pre-claim tampering is correctly blocked. Calls already made before a later mutation cannot be retroactively prevented."
+    }
+  ],
+  "diagnostics": {
+    "rest_stale_snapshot": "Internal accepting_risk may be true while current-snapshot status correctly reports false; direct new-risk readiness still blocks unless snapshot changes after its check. Related to R5-F02.",
+    "legacy_empty_case_hash": "Optional legacy case_hash blank is repaired; exact mandatory case hash and event linkage remain. Not independently blocking.",
+    "blank_mandatory_frozen_identity": "Missing position_case_hash/id retains DISPATCHING with zero analysis; operationally fail closed. Not an authority bypass.",
+    "sandbox": "Initial asyncio thread-completion runs were interrupted after a selector hang; an identical hermetic test completed outside sandbox (2 passed), and affected gates were rerun with credentials stripped and repository guards active. No implementation repair."
+  },
+  "implementation_mutation": false,
+  "protected_data_access": "NONE",
+  "LIVE_APPROVAL_ONLY": "NOT_AUTHORIZED",
+  "REAL_FUNDS_WRITE_AUTHORITY": "NONE",
+  "AUTONOMOUS_LIVE": "FORBIDDEN",
+  "next_state": "LIVE_V1_INDEPENDENT_VALIDATION_FAILED",
+  "artifact_normalization": "Published log copies have trailing whitespace removed; test observations/counts are unchanged and original local logs remain in /tmp."
+}
