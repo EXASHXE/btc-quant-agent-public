@@ -165,6 +165,20 @@ class LiveV1Runtime:
         await self.reconcile_unfinished_intents()
         snapshot = self.account_watch.latest_snapshot()
         market = self.market_stream.latest_observation(now_ms)
+        if snapshot is not None:
+            try:
+                snapshot.verify()
+            except (ValueError, AttributeError):
+                self.accepting_risk = False
+                self.blocked_reason = "POSITION_ACCOUNT_AUTHORITY_MISMATCH"
+                return
+            required_namespace = "BINANCE_TESTNET" if self.config.execution_mode == "TESTNET" else "NONE"
+            if (snapshot.environment != self.config.execution_mode
+                    or snapshot.credential_namespace != required_namespace
+                    or snapshot.account_id != self.config.account_id):
+                self.accepting_risk = False
+                self.blocked_reason = "POSITION_ACCOUNT_AUTHORITY_MISMATCH"
+                return
         if snapshot is not None and any(
             position.symbol != self.config.symbol and position.quantity != 0
             for position in snapshot.positions
@@ -184,11 +198,12 @@ class LiveV1Runtime:
                    for intent_id in self.intent_store.unfinished_intent_ids()]
         by_symbol = {intent.symbol: intent for intent in intents if intent is not None}
         positions = {position.symbol: position for position in snapshot.positions}
-        account_id = getattr(snapshot, "account_id", self.config.account_id)
+        account_id = snapshot.account_id
         for symbol in (self.config.symbol,):
             position = positions.get(symbol)
             quantity = position.quantity if position is not None else 0.0
-            previous = self.supervisor.current_quantity(account_id, symbol)
+            previous = self.supervisor.current_quantity(
+                account_id, symbol, snapshot.environment, snapshot.credential_namespace)
             intent = by_symbol.get(symbol)
             order = next((item for item in snapshot.orders
                           if intent is not None and item.client_order_id == intent.client_order_id), None)
@@ -197,6 +212,8 @@ class LiveV1Runtime:
             obs = PositionObservationV1.build(
                 account_snapshot_hash=snapshot.snapshot_hash,
                 market_source_hash=market.observation_hash,
+                environment=snapshot.environment,
+                credential_namespace=snapshot.credential_namespace,
                 symbol=symbol, account_id=account_id, position_side="BOTH",
                 observed_at_ms=now_ms,
                 quantity=quantity, previous_quantity=previous,
@@ -211,7 +228,14 @@ class LiveV1Runtime:
                 order_filled_quantity=order.filled_quantity if order is not None else abs(quantity),
                 order_observed_at_ms=order.observed_at_ms if order is not None else now_ms,
             )
-            await self.supervisor.process(obs, now_ms)
+            try:
+                await self.supervisor.process(obs, now_ms)
+            except ValueError as exc:
+                if str(exc) != "LEGACY_POSITION_LIFECYCLE_AUTHORITY_UNBOUND":
+                    raise
+                self.accepting_risk = False
+                self.blocked_reason = str(exc)
+                return
 
     async def _position_loop(self) -> None:
         while not self._stop_event.is_set():
@@ -241,6 +265,10 @@ class LiveV1Runtime:
                 except Exception:  # noqa: BLE001 - recovery failure keeps new risk blocked
                     self.accepting_risk = False
                     self.blocked_reason = "RUNTIME_RECOVERY_FAILED"
+                    continue
+                if self._position_authority_block_reason():
+                    self.accepting_risk = False
+                    self.blocked_reason = "LEGACY_POSITION_LIFECYCLE_AUTHORITY_UNBOUND"
                     continue
                 self.accepting_risk = bool(
                     snapshot.reconciled and snapshot.quality == "OK"
@@ -274,6 +302,8 @@ class LiveV1Runtime:
             snapshot = self.account_watch.latest_snapshot()
             if snapshot is None or not snapshot.reconciled or snapshot.quality != "OK":
                 raise ExecutionBlocked("ACCOUNT_RECONCILIATION_REQUIRED")
+            if self._position_authority_block_reason():
+                raise ExecutionBlocked("LEGACY_POSITION_LIFECYCLE_AUTHORITY_UNBOUND")
             await self._refresh_case(self.config.symbol)
             await self.supervisor.drain_pending_dispatches(int(time.time() * 1000))
             tasks = [asyncio.create_task(self.market_stream.run_stream(), name="live-v1-market")]
@@ -330,6 +360,8 @@ class LiveV1Runtime:
     def _readiness_reason(self) -> str:
         if not self._started or not self.accepting_risk:
             return self.blocked_reason or "LIVE_RUNTIME_NOT_READY"
+        if self._position_authority_block_reason():
+            return "LEGACY_POSITION_LIFECYCLE_AUTHORITY_UNBOUND"
         if not self.kill_switch.allows_new_risk():
             return "KILL_SWITCH_ACTIVE"
         if any(task.done() for task in self.tasks):
@@ -345,6 +377,12 @@ class LiveV1Runtime:
         if self.config.execution_mode == "TESTNET" and not self.account_watch.is_stream_connected:
             return "ACCOUNT_STREAM_DISCONNECTED"
         return ""
+
+    def _position_authority_block_reason(self) -> bool:
+        namespace = "BINANCE_TESTNET" if self.config.execution_mode == "TESTNET" else "NONE"
+        return self.supervisor.has_unbound_legacy_lifecycle(
+            self.config.execution_mode, namespace, self.config.account_id, self.config.symbol,
+        )
 
     def status(self) -> dict[str, object]:
         reason = self._readiness_reason()

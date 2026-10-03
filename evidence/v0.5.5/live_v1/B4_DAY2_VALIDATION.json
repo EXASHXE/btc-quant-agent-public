@@ -1,12 +1,12 @@
 {
-  "task": "LIVE_V1_B4_B5_FINDINGS_REPAIR_R3",
+  "task": "LIVE_V1_B4_B5_FINDINGS_REPAIR_R4",
   "repository": "EXASHXE/btc-quant-agent-public",
   "task_branch": "feature/b-line-live-v1",
   "start_binding_mode": "CURRENT_BRANCH_HEAD",
-  "actual_start_sha": "937b2b26518ceea0952a7e17279cc42924c88848",
+  "actual_start_sha": "c2c7cc83294f44340dd9fa1873bff760501fae12",
   "accepted_predecessor_sha": "961a0f4d4b37cdb9365d5e5867813ff3129c14db",
   "predecessor_ancestry": "IS_ANCESTOR_VERIFIED",
-  "parent_sha": "937b2b26518ceea0952a7e17279cc42924c88848",
+  "parent_sha": "c2c7cc83294f44340dd9fa1873bff760501fae12",
   "initial_worktree_state": "CLEAN",
   "closed_blockers": {
     "R1_01_approval_intent_singleton": {
@@ -23,7 +23,7 @@
     },
     "R1_04_delayed_fill_protection": {
       "status": "CLOSED",
-      "mechanism": "Delayed fill and current position reconciliation use exact persisted owner identity and validate full reduce-only stop contract; uncertain or missing protection fails closed and trips kill switch."
+      "mechanism": "Strict algoId/orderId parsing; RESERVED -> PENDING_CONFIRMATION persisted before POST; exact authoritative query validates exchange/client ID, symbol, exit side, STOP_MARKET, BOTH, reduceOnly, trigger, quantity, NEW; ACTIVE owner and protective execution row commit atomically. Pending identity survives uncertainty/restart; missing stop never blindly resubmits. Cancellation becomes pending before remote request; write/resize faults trip kill switch."
     },
     "R1_05_supervisor_orchestration": {
       "status": "CLOSED",
@@ -31,7 +31,7 @@
     },
     "R1_06_short_position_open": {
       "status": "CLOSED",
-      "mechanism": "Durable account/symbol/BOTH lifecycle recognizes flat/open/close and direct long/short reversal; source dedupe and atomic event outbox survive restart."
+      "mechanism": "Durable full environment/namespace/account/symbol/BOTH lifecycle records every flat/open/close observation and atomic outbox; short opens and direct reversals preserved."
     },
     "R1_1_01_durable_position_case_recovery": {
       "status": "CLOSED",
@@ -91,53 +91,54 @@
     "autonomous": "HARD_BLOCKED"
   },
   "quality_gates": {
-    "compileall": "PASS: Python 3.12 compileall -q src tests",
+    "compileall": "PASS: Python 3.12 python -m compileall -q src tests",
     "git_diff_check": "PASS",
     "ruff": "PASS: ruff check .",
     "mypy": "PASS: mypy src (151 source files)",
     "focused_tests": {
-      "passed": 544,
+      "command": "pytest -q tests/test_live_v1_*.py tests/test_execution*.py tests/test_market_watch*.py tests/test_api.py tests/test_v050_r02_orchestration_guards.py --tb=short",
+      "passed": 546,
       "failed": 0,
-      "seconds": 45.62
+      "seconds": 51.15,
+      "note": "Run before final two-account dispatch test addition; that addition passed in subsequent R4 subset and is included in full suite."
     },
-    "live_v1_tests": {
-      "passed": 278,
-      "failed": 0
+    "r4_position_and_approval_final_subset": {
+      "passed": 24,
+      "failed": 0,
+      "seconds": 5.93
     },
-    "r3_focused_tests": {
-      "passed": 64,
-      "failed": 0
-    },
-    "b3_regressions": {
-      "passed": 75,
-      "failed": 0
-    },
-    "existing_execution": {
-      "passed": 44,
-      "failed": 0
-    },
-    "api": {
-      "passed": 4,
-      "failed": 0
-    },
-    "market_watch": {
-      "passed": 137,
-      "failed": 0
-    },
-    "b2a_regressions": {
+    "r4_protection_and_position_initial_subset": {
       "passed": 55,
-      "failed": 0
+      "failed": 0,
+      "seconds": 11.54
     },
-    "r02_governance": {
-      "passed": 26,
-      "failed": 0
+    "live_v1_collection": {
+      "collected": 336,
+      "passing_results": "INCLUDED_IN_FOCUSED_AND_FULL_GATES"
+    },
+    "b2a_b2b_regressions": {
+      "command": "pytest -q tests/test_tactical_shadow_evaluation_v2.py tests/test_tactical_grid_shadow_evaluation_v1.py --tb=short",
+      "passed": 74,
+      "failed": 0,
+      "seconds": 4.39
     },
     "full_pytest": {
-      "passed": 2287,
+      "command": "pytest -q --tb=short",
+      "passed": 2345,
       "skipped": 2,
       "failed": 0,
       "warnings": 8,
-      "seconds": 839.07
+      "seconds": 1029.6
+    },
+    "live_v1_tests": {
+      "passed": 336,
+      "failed": 0,
+      "proof": "All 336 collected Live V1 cases included in passing full suite."
+    },
+    "r4_focused_tests": {
+      "passed": 58,
+      "failed": 0,
+      "proof": "34 protection cases plus final 24 account/lifecycle/approval cases; all also passed full suite."
     }
   },
   "fences": {
@@ -156,8 +157,8 @@
     "testnet_credentialed_exchange_smoke": "NOT_RUN_CREDENTIALS_UNAVAILABLE"
   },
   "remaining_blockers": [],
-  "decision": "LIVE_V1_B4_B5_FINDINGS_REPAIRED_R3_PENDING_B5_REVALIDATION",
-  "failed_b5_target": "937b2b26518ceea0952a7e17279cc42924c88848",
+  "decision": "LIVE_V1_B4_B5_FINDINGS_REPAIRED_R4_PENDING_B5_REVALIDATION",
+  "failed_b5_target": "c2c7cc83294f44340dd9fa1873bff760501fae12",
   "runtime": {
     "python": "3.12.3",
     "import_path": "/root/workspace/project/Quant-agent-market-watch/src/btc_quant_agent/__init__.py",
@@ -173,35 +174,23 @@
       "mypy": "1.20.2"
     }
   },
-  "tested_source_digest": "033e27ec74c85898bd690c336a36e6b3be3fe02395c85cda3eabbdd3350b75d9",
+  "tested_source_digest": "5b83676c89cc0d83b1c349a893af52406df0b34acde265c8bcfa1f7197902cba",
   "tested_source_files": {
-    "src/btc_quant_agent/account_watch/service.py": "738cb81f869e494dc5d72719a210055de08986e5248d42542383f89a149e1f78",
-    "src/btc_quant_agent/api.py": "08119fe43d1480bf33703f3156eddc4e00a78a730668d3b28d09965f5fda643c",
-    "src/btc_quant_agent/config.py": "a099dd776dbad675b9be3da62b758bcc24893d2bb9728e5df2de18d37a0299bb",
-    "src/btc_quant_agent/decision/risk.py": "74149df66852552a404f031e914e5b9180d7d7e2dd3b15730f44d7acb7d3c628",
-    "src/btc_quant_agent/execution/authorization.py": "1cb5197c6ca06e86429915a50df59e61b998c97c16673ab18f55f3edf592ab89",
-    "src/btc_quant_agent/execution/backend.py": "d44d61ba5a29cc964263ddd80b427afeb7b4d4cdf9fc90a9ebae1bc44a96fda3",
-    "src/btc_quant_agent/execution/executor.py": "a66584b6e9229c36a3f2c34cf1984f1eb5d5c7133991b74dc84f0140ca956c20",
-    "src/btc_quant_agent/execution/intents.py": "57d09735ea576a9d17b8b6ce192e4271713a9abc9ccd37a9f856875da0c16885",
-    "src/btc_quant_agent/execution/protection.py": "a1635caf4344924533ed7f1af04f18f253cb4f51bbb4d0dc41c07a9c81d12f40",
-    "src/btc_quant_agent/execution/validator.py": "ff9416e15d48ded2e7fb06823ff494b53f685a235d49045d0789822aaf43e1c5",
-    "src/btc_quant_agent/live_market/models.py": "22c4d700de64d94b6474d3d3e006292926d7892a149e03e055f79912d6bea2dd",
-    "src/btc_quant_agent/live_market/service.py": "e52913c0b4bd14825fca028e47f7df32c84c91436328e933b6baead20e31a517",
-    "src/btc_quant_agent/live_runtime.py": "3b892394d3e676500b66155a7eea049fb4d425a48f0c52a67da529ae7c3b9302",
-    "src/btc_quant_agent/position_supervisor/models.py": "8805a80def8e98ca1f0be2674f3eb526272ff7e79bdce69f28c3701ba93ae11b",
-    "src/btc_quant_agent/position_supervisor/supervisor.py": "c765c80b85678ef4860a4875476f743316bf1cab008f3b593c6359fe47829553",
-    "tests/test_live_v1_account_watch.py": "c8f43ee7418c4e08126c71f4a73f11d4ceb65275e7e520b2b90e95ec071ee48f",
-    "tests/test_live_v1_day2_e2e.py": "c69e0a05f2490af5c1ad6a8ae8f4773358b80da9ae106acc51dd3bb088d8428e",
-    "tests/test_live_v1_execution_authorization_r2.py": "d3d48faabe0ecc973b1b2e401db86924157cc76403cb7cf6563c6a121c17e6d1",
-    "tests/test_live_v1_execution_backend.py": "e3098fe05ee1eeebcede0aec16d3c24cf3a7b26019b0e22f538cce93ec06b1b6",
-    "tests/test_live_v1_execution_identity_r3.py": "abd0e5acf85a9f6f1d66972293bc1d4f17b0bbf0a5a1163b6f5ea5676c1c5ab3",
-    "tests/test_live_v1_execution_placement_r3.py": "19f45a28f03010fb762a41890ba077b9e2118ccb94076469ce23d85c1047ceb9",
-    "tests/test_live_v1_execution_protection_r3.py": "8563d8f58907375a49f52c2cec075cad8aa3395e9a12b4d073f6ce019b6863b3",
-    "tests/test_live_v1_execution_recovery_r3.py": "f0438dbedd76bc1ce47b1605add042b3b32779cdaca810236adc1261a1b99be3",
-    "tests/test_live_v1_execution_validator.py": "f2497232a528b86961f9e5b5e6b798da6ef378cbe72c4f4f4e696e6030007668",
-    "tests/test_live_v1_position_supervisor.py": "d892749f8b41589f7e854ad031d06005389addd0617df54a1102308406b3fc2b",
-    "tests/test_live_v1_runtime_r2.py": "b303836237a8209abdfb4721dc146c3fc2479bd4cf480f5683d9bee5fa1c10d6",
-    "tests/test_live_v1_runtime_recovery_r3.py": "840e1b4d56c157a99de26b046a2010a9a646a0f3163c0eb9acd6c3b00c661c72"
+    "src/btc_quant_agent/execution/backend.py": "81bff3731e796145b2a51486580e3d8bd9439cb51b2f5d1a6c999c646f3e2a24",
+    "src/btc_quant_agent/execution/executor.py": "a9d7dbc848a5e89c114c31bf074f3c6805828d49be015df850f40f46be9b1e7f",
+    "src/btc_quant_agent/execution/protection.py": "63dfdd60b181abe5af47ea2d41db9b54923439cc1f9db40a0625a9d8dae16b52",
+    "src/btc_quant_agent/live_runtime.py": "4815257a3de85009ac5b1827839871828fb5206e8645cab1c0866312495f247a",
+    "src/btc_quant_agent/position_supervisor/models.py": "1647e2e2fdd2de0a42b9afd3707ffd8cede43c13d7778ca6586372d0d7ea7f5c",
+    "src/btc_quant_agent/position_supervisor/supervisor.py": "4dc8b3bd72f4c559017aeae7451b37e99a4dc452051e2a5f4e1efac94f866d8a",
+    "tests/test_live_v1_day2_e2e.py": "5621c3fdc5f21d87154451a3a4526f589f16c8c6a721082cfd0aed9d451a5c9b",
+    "tests/test_live_v1_execution_backend.py": "8c73001d5841fe43535c2c112593dd21d633f2786be3ee20fc66f59490b871b7",
+    "tests/test_live_v1_execution_recovery_r3.py": "c1a9f1f777535db2ad48cbb8b0dd3358f5df76aa13f4af4b63055c866d0cafd0",
+    "tests/test_live_v1_position_supervisor.py": "7183ca48fe02132c9d77ad51191ecf6725637a57cbd06891ea0a76198af06208",
+    "tests/test_live_v1_runtime_r2.py": "aacd52927927f0ca0228b7011afcdb3344b80277e42fd8f7d3a14b5721803024",
+    "tests/test_live_v1_runtime_recovery_r3.py": "f010987825e8b10a5feaea91a5e12c5ffc507ecdba6a9d48cdcad71c9c600706",
+    "tests/test_live_v1_approval_environment_r4.py": "bd630eda9291f3835046a887068540d1dbb5dcd51195a4501bf7ac7fc318dc4f",
+    "tests/test_live_v1_execution_protection_r4.py": "208d09df1e9c6e11a162e01bdcf1cccd9020d56cddc47c1fdcde60abb75a197f",
+    "tests/test_live_v1_position_authority_r4.py": "bf03e1e880098a9466cb1de48e1e1815f549b53ce687750261bb4505ed1f6643"
   },
   "r3_safety_layers": {
     "placement_authority": {
@@ -226,7 +215,9 @@
     "repeated execution and shutdown cancellation stays owned",
     "retire terminal flat owners before later same-symbol activity",
     "direct one-way sign reversals durably emit both lifecycle edges",
-    "verified legacy lifecycle migration without silent account reassignment"
+    "verified legacy lifecycle migration without silent account reassignment",
+    "independent fault probes: cancel succeeds then local persistence fails; replacement reservation fails; both now fail closed and block risk",
+    "ambiguous pre-R4 DRY_RUN lifecycle authority blocks transition/startup rather than silently resetting state"
   ],
   "required_final_safety_state": {
     "LIVE_WRITE_AUTHORITY": "NONE",
@@ -244,11 +235,12 @@
     "proof": "existing repository-wide network/signed-client guards, negative mock call-count assertions, B4 route matrix and signed capability regressions"
   },
   "operational_limitations": [
+    "Existing DRY_RUN databases with matching unscoped live_position_lifecycle rows fail closed with LEGACY_POSITION_LIFECYCLE_AUTHORITY_UNBOUND until explicitly remediated; no automatic TESTNET or DRY_RUN rebinding.",
     "legacy executable rows with noncanonical identity fail closed",
     "legacy protective orders without an exact owner ledger fail closed; no prefix-based adoption",
     "hedge mode and aggregate same-symbol ownership unsupported and blocked",
     "network provider and TESTNET smokes not run; no production provider integration claim",
-    "fresh Controller B5 EXACT_CODE_SHA revalidation required; real-funds authority remains NONE"
+    "Fresh B5 coordinator must not have implemented R4; no self-authorization of B5 or real funds."
   ],
   "evidence_binding": "EXACT_PARENT_SHA_PLUS_TESTED_SOURCE_SHA256_DIGEST; final code SHA supplied by commit seal",
   "full_suite_skip_cases": [
@@ -261,37 +253,93 @@
       "reason": "Requires non-protected local ETHUSDT.parquet (omitted from git / remote CI)"
     }
   ],
-  "next_state": "FRESH_B5_EXACT_CODE_SHA_REVALIDATION_REQUIRED",
+  "next_state": "FRESH_INDEPENDENT_COORDINATOR_B5_EXACT_CODE_SHA_REVALIDATION_REQUIRED",
   "docs_publication": "NOT_REQUESTED_NOT_PERFORMED; v0.5.5-docs untouched",
-  "remote_ci": "PENDING_FINAL_SHA_PUBLICATION; historical A34 shallow-checkout debt must be verified on exact final target",
+  "remote_ci": {
+    "final_target": "PENDING_COMMIT_AND_PUSH",
+    "predecessor_exact_run": 37099190279,
+    "attempt": 2,
+    "result": "2286 passed / 1 failed / 2 skipped",
+    "only_failure": "test_b2b_a34_h40_diff_remains_zero: git diff historical revision exit 128 under shallow actions/checkout",
+    "classification": "KNOWN_NONBLOCKING_CI_HARNESS_DEBT_A34_SHALLOW_CHECKOUT",
+    "full_history_local_h40_diff": "ZERO"
+  },
   "changed_files": [
     "evidence/v0.5.5/live_v1/B4_DAY2_VALIDATION.json",
-    "src/btc_quant_agent/account_watch/service.py",
-    "src/btc_quant_agent/api.py",
-    "src/btc_quant_agent/config.py",
-    "src/btc_quant_agent/decision/risk.py",
-    "src/btc_quant_agent/execution/authorization.py",
     "src/btc_quant_agent/execution/backend.py",
     "src/btc_quant_agent/execution/executor.py",
-    "src/btc_quant_agent/execution/intents.py",
     "src/btc_quant_agent/execution/protection.py",
-    "src/btc_quant_agent/execution/validator.py",
-    "src/btc_quant_agent/live_market/models.py",
-    "src/btc_quant_agent/live_market/service.py",
     "src/btc_quant_agent/live_runtime.py",
     "src/btc_quant_agent/position_supervisor/models.py",
     "src/btc_quant_agent/position_supervisor/supervisor.py",
-    "tests/test_live_v1_account_watch.py",
+    "tests/test_live_v1_approval_environment_r4.py",
     "tests/test_live_v1_day2_e2e.py",
-    "tests/test_live_v1_execution_authorization_r2.py",
     "tests/test_live_v1_execution_backend.py",
-    "tests/test_live_v1_execution_identity_r3.py",
-    "tests/test_live_v1_execution_placement_r3.py",
-    "tests/test_live_v1_execution_protection_r3.py",
+    "tests/test_live_v1_execution_protection_r4.py",
     "tests/test_live_v1_execution_recovery_r3.py",
-    "tests/test_live_v1_execution_validator.py",
+    "tests/test_live_v1_position_authority_r4.py",
     "tests/test_live_v1_position_supervisor.py",
     "tests/test_live_v1_runtime_r2.py",
     "tests/test_live_v1_runtime_recovery_r3.py"
-  ]
+  ],
+  "controller_bindings": {
+    "docs_sha": "732e6fbef8734b60d31d576506628664ed71dfc3",
+    "prompt_blob": "f6a6cf336a173c4da40989d329f5fb9e74e94589",
+    "current_authority_blob": "240affecd2f2c81410abb84c66b64dc5a3112a9f",
+    "live_dispatch_blob": "b148f427c39e2a960447366377ee25d7d0cfec58",
+    "identity_verification": "VERIFIED_WITH_GIT_OBJECT_IDENTITIES",
+    "historical_authority_full_read": false,
+    "recursive_authority_chasing": false
+  },
+  "r4_repairs": {
+    "R4_01": {
+      "status": "IMPLEMENTED_LOCAL_MOCK_VALIDATED_PENDING_B5",
+      "mechanism": "Strict algoId/orderId parsing; RESERVED -> PENDING_CONFIRMATION persisted before POST; exact authoritative query validates exchange/client ID, symbol, exit side, STOP_MARKET, BOTH, reduceOnly, trigger, quantity, NEW; ACTIVE owner and protective execution row commit atomically. Pending identity survives uncertainty/restart; missing stop never blindly resubmits. Cancellation becomes pending before remote request; write/resize faults trip kill switch.",
+      "tests": "tests/test_live_v1_execution_protection_r4.py",
+      "cases": 34
+    },
+    "R4_02": {
+      "status": "IMPLEMENTED_LOCAL_MOCK_VALIDATED_PENDING_B5",
+      "mechanism": "Canonical environment/namespace/account/symbol/position-side key in immutable event, additive event columns and cooldown index; legacy NULL authority cannot suppress scoped events; payload/row authority checked at dispatch. Two accounts dispatch distinct frozen cases once.",
+      "tests": "tests/test_live_v1_position_authority_r4.py"
+    },
+    "R4_03": {
+      "status": "IMPLEMENTED_LOCAL_MOCK_VALIDATED_PENDING_B5",
+      "mechanism": "Required environment and namespace in observation hash; additive lifecycle_v2 keyed by full environment/namespace/account/symbol/side authority; verified runtime snapshot/config supply authority; legacy unscoped lifecycle is isolated from TESTNET and blocks ambiguous DRY_RUN use. Flat/reopen and namespace isolation survive restart.",
+      "tests": "tests/test_live_v1_position_authority_r4.py"
+    },
+    "R4_04": {
+      "status": "REGRESSION_INVARIANT_VERIFIED",
+      "mechanism": "Card display strings do not grant execution authority. Button payload contains only action and exact proposal/case hashes; compiled intent environment comes from verified account snapshot, while execution capability/config authority separately gates TESTNET. Changing a card title to LIVE cannot grant LIVE capability.",
+      "tests": "tests/test_live_v1_approval_environment_r4.py",
+      "cases": 2
+    }
+  },
+  "approval_presentation_invariant": "UI account_authority/header are display only; approval binds hashes, persisted account/config/capability controls execution environment independently.",
+  "red_green_evidence": {
+    "baseline_sha": "c2c7cc83294f44340dd9fa1873bff760501fae12",
+    "test": "test_filled_entry_malformed_stop_is_failed_closed",
+    "baseline": "FAIL: expected ExecutionBlocked not raised; fake entry fill plus null protective ID",
+    "repaired": "PASS",
+    "scope": "Read-only exact baseline checkout, synthetic clients and temporary SQLite; no network calls."
+  },
+  "independent_repair_review": {
+    "status": "SOURCE_REVIEW_AND_LOCAL_FAULT_PROBES_COMPLETE_NO_REMAINING_SOURCE_FINDINGS",
+    "scope": "R4 protection and account/lifecycle boundaries; not B5 acceptance",
+    "followup_findings_fixed": [
+      "legacy DRY_RUN lifecycle reset",
+      "post-cancel persistence/reservation fault"
+    ]
+  },
+  "local_validation_log_sha256": {
+    "r4-focused.log": "9499e4c193512bb68b92ff1062663930d2064e8e1c61308ecf442520c6bba8f8",
+    "r4-final-focused.log": "648bdd20a30d84507907ad7f37e122ac3e89cd5a867076d262942826840bcba8",
+    "r4-regressions.log": "0d84cf54d9e8afa98b40d3203472d9fd9fbc6f3865580f4a4b8e827a0c9f3896",
+    "r4-bline-regressions.log": "2cd215a44c9c95184ee403a7229042d7608c457787c0ee0a9a0cc4eec1deedcd",
+    "r4-full-suite.log": "bede65bf579cd96750ad3d3d77a500c365452dd5e8b3641cb4f3c68104353974",
+    "r4-ruff.log": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+    "r4-mypy.log": "46068eced9129924d3b0be52573b15943bf1750d772d5fb26c8ee0dcfc5840b2",
+    "r4-public-baseline-red.log": "8bb0ca4e4241b52fb2e67f2ce4c0392728d5f00df4b738fc18b604d67f73e80c",
+    "r4-predecessor-ci.log": "fb918803531987db027b970d79d21ad2279a4456d07b413b8e25b12ceb6f5787"
+  }
 }

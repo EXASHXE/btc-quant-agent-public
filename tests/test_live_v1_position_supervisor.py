@@ -20,6 +20,7 @@ HASH = "a" * 64
 def observation(**changes: object) -> PositionObservationV1:
     values: dict[str, object] = {
         "account_snapshot_hash": HASH, "market_source_hash": "b" * 64,
+        "environment": "DRY_RUN", "credential_namespace": "NONE",
         "symbol": "BTCUSDT", "observed_at_ms": NOW, "quantity": 1.0,
         "previous_quantity": 0.0, "entry_price": 100.0, "mark_price": 100.0,
         "unrealized_pnl_usdt": 0.0, "realized_pnl_usdt": 0.0,
@@ -756,6 +757,11 @@ def test_r1_2_a07_tampered_event_linkage_fails_closed(tmp_path):
             trigger="STOP_NEAR",
             symbol="BTCUSDT",
             source_hash="f" * 64,
+            environment=event.environment,
+            credential_namespace=event.credential_namespace,
+            account_id=event.account_id,
+            position_side=event.position_side,
+            position_authority_key=event.position_authority_key,
             observed_at_ms=NOW,
             details={},
         )

@@ -65,7 +65,7 @@ def test_position_close_is_durable_and_reopen_survives_restart(tmp_path):
         observation(quantity=-1, previous_quantity=0), NOW))
     first.evaluate(observation(quantity=0, previous_quantity=-1, observed_at_ms=NOW + 1), NOW + 1)
     with connection(path) as db:
-        state = db.execute("SELECT quantity, is_open FROM live_position_lifecycle WHERE account_id=? AND symbol=? AND position_side=?",
+        state = db.execute("SELECT quantity, is_open FROM live_position_lifecycle_v2 WHERE account_id=? AND symbol=? AND position_side=?",
                            ("DEFAULT_ACCOUNT", "BTCUSDT", "BOTH")).fetchone()
     assert state["quantity"] == 0
     assert state["is_open"] == 0
@@ -79,7 +79,7 @@ def test_position_flat_observation_persists_without_event(tmp_path):
     supervisor = PositionSupervisor(path)
     assert supervisor.evaluate(observation(quantity=0, previous_quantity=0), NOW) == ()
     with connection(path) as db:
-        row = db.execute("SELECT quantity, source_hash FROM live_position_lifecycle").fetchone()
+        row = db.execute("SELECT quantity, source_hash FROM live_position_lifecycle_v2").fetchone()
     assert row["quantity"] == 0
     assert row["source_hash"] == observation(quantity=0, previous_quantity=0).observation_hash
 
@@ -98,8 +98,8 @@ def test_position_lifecycle_is_separate_by_account(tmp_path):
     second = supervisor.evaluate(observation(account_id="account-b", quantity=1), NOW + 1)
     assert any(event.trigger == "POSITION_OPENED" for event in first)
     assert any(event.trigger == "POSITION_OPENED" for event in second)
-    assert supervisor.current_quantity("account-a", "BTCUSDT") == 1
-    assert supervisor.current_quantity("account-b", "BTCUSDT") == 1
+    assert supervisor.current_quantity("account-a", "BTCUSDT", "DRY_RUN", "NONE") == 1
+    assert supervisor.current_quantity("account-b", "BTCUSDT", "DRY_RUN", "NONE") == 1
 
 
 def test_older_position_observation_cannot_revert_ledger(tmp_path):
@@ -107,7 +107,7 @@ def test_older_position_observation_cannot_revert_ledger(tmp_path):
     supervisor.evaluate(observation(quantity=1, observed_at_ms=NOW + 100), NOW + 100)
     with pytest.raises(ValueError, match="POSITION_OBSERVATION_OUT_OF_ORDER"):
         supervisor.evaluate(observation(quantity=0, observed_at_ms=NOW), NOW + 101)
-    assert supervisor.current_quantity("DEFAULT_ACCOUNT", "BTCUSDT") == 1
+    assert supervisor.current_quantity("DEFAULT_ACCOUNT", "BTCUSDT", "DRY_RUN", "NONE") == 1
 
 
 def test_restart_direct_sign_flip_persists_close_and_open_edges(tmp_path):
@@ -120,7 +120,7 @@ def test_restart_direct_sign_flip_persists_close_and_open_edges(tmp_path):
     assert [event.trigger for event in edges] == ["POSITION_CLOSED", "POSITION_OPENED"]
     assert len({event.event_hash for event in edges}) == 2
     assert all(event.source_hash == flip.observation_hash for event in edges)
-    assert restarted.current_quantity("DEFAULT_ACCOUNT", "BTCUSDT") == -0.5
+    assert restarted.current_quantity("DEFAULT_ACCOUNT", "BTCUSDT", "DRY_RUN", "NONE") == -0.5
     assert PositionSupervisor(path).evaluate(flip, NOW + 2) == ()
 
 
@@ -128,7 +128,9 @@ def _seed_legacy(path, *, is_open: bool, account_id: str | None = "legacy-a") ->
     PositionSupervisor(path)
     snapshot_hash = "account-hash"
     if account_id is not None:
-        snapshot = sample_snapshot(account_id=account_id, positions=(), orders=())
+        snapshot = sample_snapshot(account_id=account_id, environment="DRY_RUN",
+                                   credential_namespace="NONE", rest_base_url="local://paper",
+                                   positions=(), orders=())
         AccountStore(path).save(snapshot)
         snapshot_hash = snapshot.snapshot_hash
     with connection(path) as db:
@@ -145,7 +147,7 @@ def test_legacy_open_is_bound_and_consumed_without_duplicate_open(tmp_path):
                                              account_snapshot_hash=snapshot_hash,
                                              quantity=0.25), NOW)
     assert not any(event.trigger == "POSITION_OPENED" for event in events)
-    assert supervisor.current_quantity("legacy-a", "BTCUSDT") == 0.25
+    assert supervisor.current_quantity("legacy-a", "BTCUSDT", "DRY_RUN", "NONE") == 0.25
     with connection(path) as db:
         assert db.execute("SELECT 1 FROM live_position_active").fetchone() is None
 
@@ -156,7 +158,7 @@ def test_legacy_open_first_flat_emits_close_across_restart(tmp_path):
     events = PositionSupervisor(path).evaluate(observation(account_id="legacy-a",
         account_snapshot_hash=snapshot_hash, quantity=0), NOW)
     assert any(event.trigger == "POSITION_CLOSED" for event in events)
-    assert PositionSupervisor(path).current_quantity("legacy-a", "BTCUSDT") == 0
+    assert PositionSupervisor(path).current_quantity("legacy-a", "BTCUSDT", "DRY_RUN", "NONE") == 0
 
 
 def test_legacy_flat_first_nonzero_emits_open(tmp_path):
@@ -185,7 +187,7 @@ def test_legacy_unbound_state_fails_closed_without_consumption(tmp_path):
         PositionSupervisor(path).evaluate(observation(quantity=0.25), NOW)
     with connection(path) as db:
         assert db.execute("SELECT 1 FROM live_position_active").fetchone() is not None
-        assert db.execute("SELECT 1 FROM live_position_lifecycle").fetchone() is None
+        assert db.execute("SELECT 1 FROM live_position_lifecycle_v2").fetchone() is None
 
 
 def test_legacy_ambiguous_account_binding_fails_closed(tmp_path):

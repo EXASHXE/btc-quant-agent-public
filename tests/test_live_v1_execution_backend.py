@@ -48,6 +48,15 @@ def make_mock_testnet_client(
         {"symbol": "BTCUSDT", "positionSide": "BOTH", "positionAmt": str(amt)}
     ]
     mock_client.open_protective_orders.return_value = []
+
+    def confirmed_protection(algo_id):
+        args = mock_client.place_protective_order.call_args.kwargs
+        return {"algoId": algo_id, "clientAlgoId": args["clientAlgoId"],
+                "symbol": args["symbol"], "side": args["side"], "orderType": args["type"],
+                "positionSide": "BOTH", "reduceOnly": True, "triggerPrice": args["triggerPrice"],
+                "quantity": str(args["quantity"]), "algoStatus": "NEW"}
+
+    mock_client.query_protective_order.side_effect = confirmed_protection
     return mock_client
 
 

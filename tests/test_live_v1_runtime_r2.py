@@ -27,11 +27,14 @@ def _runtime(*, mode: str = "DRY_RUN", pending: tuple[str, ...] = ()) -> LiveV1R
         reconcile_rest=Mock(), reconcile_rest_async=AsyncMock(), mark_stream_disconnected=Mock(),
         run_user_stream=wait_forever, close_user_stream=AsyncMock(), stop=Mock(),
         latest_snapshot=Mock(return_value=SimpleNamespace(
-            reconciled=True, quality="OK", positions=(), orders=(), snapshot_hash="account")),
+            reconciled=True, quality="OK", positions=(), orders=(), snapshot_hash="account",
+            environment=mode, credential_namespace="BINANCE_TESTNET" if mode == "TESTNET" else "NONE",
+            account_id="DEFAULT_ACCOUNT", verify=Mock())),
     )
     execution = SimpleNamespace(reconcile_intent=AsyncMock(), execute_approved_intent=AsyncMock())
     supervisor = SimpleNamespace(drain_pending_dispatches=AsyncMock(),
-                                 current_quantity=Mock(return_value=0.0))
+                                 current_quantity=Mock(return_value=0.0),
+                                 has_unbound_legacy_lifecycle=Mock(return_value=False))
     kill = SimpleNamespace(allows_new_risk=Mock(return_value=True))
     runtime = LiveV1Runtime(
         config=LiveV1Config(runtime_enabled=True, execution_mode=mode,
@@ -130,6 +133,8 @@ def test_position_poll_uses_account_quantity_and_previous_quantity():
     position = SimpleNamespace(symbol="BTCUSDT", quantity=0.25, entry_price=100.0,
                                unrealized_pnl_usdt=1.0, leverage=2)
     snapshot = SimpleNamespace(snapshot_hash="account-hash", reconciled=True, quality="OK",
+                               environment="DRY_RUN", credential_namespace="NONE",
+                               account_id="DEFAULT_ACCOUNT", verify=Mock(),
                                positions=(position,), orders=())
     runtime.account_watch.latest_snapshot.return_value = snapshot
     runtime.market_stream.latest_observation = Mock(return_value=SimpleNamespace(
@@ -161,7 +166,9 @@ def test_foreign_account_position_never_uses_btc_market_observation():
     foreign = SimpleNamespace(symbol="ETHUSDT", quantity=1.0, entry_price=50.0,
                               unrealized_pnl_usdt=0.0, leverage=1)
     runtime.account_watch.latest_snapshot.return_value = SimpleNamespace(
-        snapshot_hash="account", reconciled=True, quality="OK", positions=(foreign,), orders=())
+        snapshot_hash="account", reconciled=True, quality="OK", positions=(foreign,), orders=(),
+        environment="DRY_RUN", credential_namespace="NONE", account_id="DEFAULT_ACCOUNT",
+        verify=Mock())
     runtime.market_stream.latest_observation.return_value = SimpleNamespace(
         symbol="BTCUSDT", observation_hash="btc-market", mark_price=100.0, spread_bps=1.0)
     runtime.supervisor.process = AsyncMock()

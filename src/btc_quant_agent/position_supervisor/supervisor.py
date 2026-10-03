@@ -13,7 +13,30 @@ from typing import Any
 from ..account_watch.models import AccountSnapshotV1
 from ..decision.models import CasePackageV1
 from ..live_db import connection
-from .models import PositionEventV1, PositionObservationV1, SupervisorPolicyV1
+from .models import (
+    PositionEventV1,
+    PositionObservationV1,
+    SupervisorPolicyV1,
+    position_authority_key,
+)
+
+
+def _unbound_legacy_lifecycle(
+    db: sqlite3.Connection, environment: str, credential_namespace: str,
+    account_id: str, symbol: str, position_side: str,
+) -> bool:
+    if environment != "DRY_RUN" or credential_namespace != "NONE":
+        return False
+    row = db.execute(
+        "SELECT 1 FROM live_position_lifecycle old "
+        "WHERE old.account_id=? AND old.symbol=? AND old.position_side=? "
+        "AND NOT EXISTS (SELECT 1 FROM live_position_lifecycle_v2 scoped "
+        "WHERE scoped.environment=? AND scoped.credential_namespace=? "
+        "AND scoped.account_id=old.account_id AND scoped.symbol=old.symbol "
+        "AND scoped.position_side=old.position_side) LIMIT 1",
+        (account_id, symbol, position_side, environment, credential_namespace),
+    ).fetchone()
+    return row is not None
 
 
 def position_case_from_event(
@@ -123,6 +146,20 @@ class PositionSupervisor:
                     source_hash TEXT NOT NULL,
                     PRIMARY KEY (account_id, symbol, position_side)
                 );
+                CREATE TABLE IF NOT EXISTS live_position_lifecycle_v2 (
+                    environment TEXT NOT NULL,
+                    credential_namespace TEXT NOT NULL,
+                    account_id TEXT NOT NULL,
+                    symbol TEXT NOT NULL,
+                    position_side TEXT NOT NULL,
+                    quantity REAL NOT NULL,
+                    is_open INTEGER NOT NULL,
+                    last_transition TEXT NOT NULL,
+                    last_transition_at_ms INTEGER NOT NULL,
+                    observed_at_ms INTEGER NOT NULL,
+                    source_hash TEXT NOT NULL,
+                    PRIMARY KEY (environment, credential_namespace, account_id, symbol, position_side)
+                );
                 CREATE TABLE IF NOT EXISTS live_position_observed_sources (
                     source_hash TEXT PRIMARY KEY
                 );
@@ -144,10 +181,28 @@ class PositionSupervisor:
                 CREATE INDEX IF NOT EXISTS idx_dispatches_state
                     ON live_position_case_dispatches(state, lease_expires_at_ms);
             """)
+            # Existing unscoped event rows remain legacy authority and cannot
+            # suppress events from any current account/environment.
+            event_columns = {
+                col["name"] for col in db.execute("PRAGMA table_info(live_position_events)")
+            }
+            for name in ("environment", "credential_namespace", "account_id",
+                         "position_side", "position_authority_key"):
+                if name not in event_columns:
+                    db.execute(f"ALTER TABLE live_position_events ADD COLUMN {name} TEXT")
+            db.execute(
+                "CREATE INDEX IF NOT EXISTS idx_live_position_events_authority "
+                "ON live_position_events(position_authority_key, trigger, observed_at_ms DESC)"
+            )
 
     def evaluate(
         self, obs: PositionObservationV1, now_ms: int
     ) -> tuple[PositionEventV1, ...]:
+        obs.verify()
+        authority_key = position_authority_key(
+            obs.environment, obs.credential_namespace, obs.account_id,
+            obs.symbol, obs.position_side,
+        )
         with connection(self.path) as db:
             db.execute("BEGIN IMMEDIATE")
 
@@ -161,13 +216,20 @@ class PositionSupervisor:
 
             active_row = db.execute(
                 "SELECT quantity, is_open, last_transition, last_transition_at_ms, observed_at_ms "
-                "FROM live_position_lifecycle WHERE account_id=? AND symbol=? AND position_side=?",
-                (obs.account_id, obs.symbol, obs.position_side),
+                "FROM live_position_lifecycle_v2 WHERE environment=? AND credential_namespace=? "
+                "AND account_id=? AND symbol=? AND position_side=?",
+                (obs.environment, obs.credential_namespace, obs.account_id,
+                 obs.symbol, obs.position_side),
             ).fetchone()
+            if active_row is None and _unbound_legacy_lifecycle(
+                db, obs.environment, obs.credential_namespace, obs.account_id,
+                obs.symbol, obs.position_side,
+            ):
+                raise ValueError("LEGACY_POSITION_LIFECYCLE_AUTHORITY_UNBOUND")
             if active_row is not None and obs.observed_at_ms < active_row["observed_at_ms"]:
                 raise ValueError("POSITION_OBSERVATION_OUT_OF_ORDER")
             legacy_row = None
-            if active_row is None:
+            if active_row is None and obs.environment == "DRY_RUN" and obs.credential_namespace == "NONE":
                 legacy_row = db.execute(
                     "SELECT is_open, last_opened_at_ms FROM live_position_active WHERE symbol=?",
                     (obs.symbol,),
@@ -192,7 +254,9 @@ class PositionSupervisor:
                     snapshot = AccountSnapshotV1.model_validate_json(latest["payload"])
                 except Exception as exc:
                     raise ValueError("LEGACY_POSITION_ACCOUNT_BINDING_REQUIRED") from exc
-                if (snapshot.account_id != obs.account_id
+                if (snapshot.environment != "DRY_RUN"
+                        or snapshot.credential_namespace != "NONE"
+                        or snapshot.account_id != obs.account_id
                         or snapshot.snapshot_hash != latest["snapshot_hash"]
                         or snapshot.snapshot_hash != obs.account_snapshot_hash
                         or legacy_row["is_open"] not in (0, 1)):
@@ -216,13 +280,15 @@ class PositionSupervisor:
                                   active_row["last_transition_at_ms"] if active_row is not None else
                                   legacy_row["last_opened_at_ms"] if was_open and legacy_row is not None else 0)
             db.execute(
-                "INSERT INTO live_position_lifecycle VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) "
-                "ON CONFLICT(account_id, symbol, position_side) DO UPDATE SET "
+                "INSERT INTO live_position_lifecycle_v2 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) "
+                "ON CONFLICT(environment, credential_namespace, account_id, symbol, position_side) "
+                "DO UPDATE SET "
                 "quantity=excluded.quantity, is_open=excluded.is_open, "
                 "last_transition=excluded.last_transition, "
                 "last_transition_at_ms=excluded.last_transition_at_ms, "
                 "observed_at_ms=excluded.observed_at_ms, source_hash=excluded.source_hash",
-                (obs.account_id, obs.symbol, obs.position_side, obs.quantity,
+                (obs.environment, obs.credential_namespace, obs.account_id,
+                 obs.symbol, obs.position_side, obs.quantity,
                  int(obs.quantity != 0), last_transition, last_transition_at,
                  obs.observed_at_ms, obs.observation_hash),
             )
@@ -285,9 +351,9 @@ class PositionSupervisor:
                 # Cooldown check
                 recent = db.execute(
                     "SELECT observed_at_ms FROM live_position_events "
-                    "WHERE symbol=? AND trigger=? AND (? - observed_at_ms) < ? "
+                    "WHERE position_authority_key=? AND trigger=? AND (? - observed_at_ms) < ? "
                     "ORDER BY observed_at_ms DESC LIMIT 1",
-                    (obs.symbol, trigger, now_ms, self.policy.cooldown_ms),
+                    (authority_key, trigger, now_ms, self.policy.cooldown_ms),
                 ).fetchone()
                 if recent is not None and trigger not in {"POSITION_OPENED", "POSITION_CLOSED"}:
                     continue
@@ -297,12 +363,20 @@ class PositionSupervisor:
                     trigger=trigger,
                     symbol=obs.symbol,
                     source_hash=obs.observation_hash,
+                    environment=obs.environment,
+                    credential_namespace=obs.credential_namespace,
+                    account_id=obs.account_id,
+                    position_side=obs.position_side,
+                    position_authority_key=authority_key,
                     observed_at_ms=now_ms,
                     details={"mark_price": obs.mark_price,
                              "quantity": 0.0 if trigger == "POSITION_CLOSED" else obs.quantity},
                 )
                 db.execute(
-                    "INSERT INTO live_position_events VALUES (?, ?, ?, ?, ?, ?, ?)",
+                    "INSERT INTO live_position_events (event_id, event_hash, trigger, symbol, "
+                    "source_hash, observed_at_ms, payload, environment, credential_namespace, "
+                    "account_id, position_side, position_authority_key) "
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                     (
                         event.event_id,
                         event.event_hash,
@@ -311,6 +385,11 @@ class PositionSupervisor:
                         event.source_hash,
                         event.observed_at_ms,
                         event.canonical_json(),
+                        event.environment,
+                        event.credential_namespace,
+                        event.account_id,
+                        event.position_side,
+                        event.position_authority_key,
                     ),
                 )
                 db.execute(
@@ -335,26 +414,46 @@ class PositionSupervisor:
 
             return tuple(events)
 
-    def current_quantity(self, account_id: str, symbol: str, position_side: str = "BOTH") -> float:
+    def current_quantity(
+        self, account_id: str, symbol: str, environment: str,
+        credential_namespace: str, position_side: str = "BOTH",
+    ) -> float:
         if position_side != "BOTH":
             raise ValueError("unsupported position side")
         with connection(self.path) as db:
             row = db.execute(
-                "SELECT quantity FROM live_position_lifecycle "
-                "WHERE account_id=? AND symbol=? AND position_side=?",
-                (account_id, symbol, position_side),
+                "SELECT quantity FROM live_position_lifecycle_v2 "
+                "WHERE environment=? AND credential_namespace=? AND account_id=? "
+                "AND symbol=? AND position_side=?",
+                (environment, credential_namespace, account_id, symbol, position_side),
             ).fetchone()
         return float(row["quantity"]) if row is not None else 0.0
+
+    def has_unbound_legacy_lifecycle(
+        self, environment: str, credential_namespace: str, account_id: str,
+        symbol: str, position_side: str = "BOTH",
+    ) -> bool:
+        with connection(self.path) as db:
+            return _unbound_legacy_lifecycle(
+                db, environment, credential_namespace, account_id, symbol, position_side,
+            )
 
     def get_event(self, event_id: str) -> PositionEventV1 | None:
         with connection(self.path) as db:
             row = db.execute(
-                "SELECT payload FROM live_position_events WHERE event_id=?",
+                "SELECT * FROM live_position_events WHERE event_id=?",
                 (event_id,),
             ).fetchone()
             if row is None:
                 return None
-            return PositionEventV1.model_validate(json.loads(row["payload"]))
+            event = PositionEventV1.model_validate(json.loads(row["payload"]))
+            if event.event_id != row["event_id"] or event.event_hash != row["event_hash"]:
+                raise ValueError("position event storage identity mismatch")
+            for field in ("environment", "credential_namespace", "account_id",
+                          "position_side", "position_authority_key"):
+                if getattr(event, field) != row[field]:
+                    raise ValueError("position event storage authority mismatch")
+            return event
 
     def get_dispatch(self, event_id: str) -> dict[str, Any] | None:
         with connection(self.path) as db:
@@ -443,7 +542,10 @@ class PositionSupervisor:
                 continue
 
             event_id = claimed_row["event_id"]
-            event = self.get_event(event_id)
+            try:
+                event = self.get_event(event_id)
+            except ValueError:
+                event = None
             if event is None:
                 with connection(self.path) as db:
                     db.execute(

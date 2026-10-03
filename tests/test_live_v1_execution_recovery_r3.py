@@ -234,7 +234,7 @@ def test_proven_pre_entry_abort_releases_owner_only_after_absence_and_flat(tmp_p
     with pytest.raises(ExecutionBlocked, match="INSUFFICIENT_MARGIN"):
         backend.submit_authorized(receipt.authorization_id, NOW)
     client.place_order.assert_not_called()
-    assert backend.protections.get_owner(intent).status == "ACTIVE"
+    assert backend.protections.get_owner(intent).status == "RESERVED"
     client.query_order_by_client_id.side_effect = BinanceExecutionError("-2013 Order does not exist")
     assert backend.reconcile_authorized(intent.intent_id, NOW).reason == "PROVEN_PRE_ENTRY_ABORTED"
     assert backend.protections.get_owner(intent).status == "RELEASED"

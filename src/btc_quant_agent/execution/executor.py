@@ -93,6 +93,8 @@ class LiveExecutionService:
         tactical_regime = self.tactical_regime_provider(intent.symbol) if self.tactical_regime_provider else None
 
         return PositionObservationV1.build(
+            environment=account_snap.environment,
+            credential_namespace=account_snap.credential_namespace,
             account_snapshot_hash=account_snap.snapshot_hash,
             account_id=account_snap.account_id,
             position_side="BOTH",

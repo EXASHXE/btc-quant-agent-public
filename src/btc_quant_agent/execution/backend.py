@@ -23,7 +23,7 @@ from .binance_signed import BinanceExecutionError, BinanceSignedClient
 from .guard import ExecutionBlocked
 from .intents import IntentStore, TradeIntentV1
 from .policy import ExecutionCapabilityPolicyV1
-from .protection import ProtectionStore
+from .protection import ProtectionStore, parse_protective_exchange_id
 
 logger = logging.getLogger(__name__)
 
@@ -564,7 +564,7 @@ class TestnetExecutionBackend:
         if owner.status == "RELEASED":
             return None
         open_qty = self._query_open_position(intent.symbol, intent.side, now_ms)
-        if owner.status != "ACTIVE":
+        if owner.status not in {"RESERVED", "PENDING_CONFIRMATION", "ACTIVE"}:
             self._trip_kill_switch(now_ms, "inactive protective ownership on open position")
             raise ExecutionBlocked("PROTECTION_OWNER_MISSING")
         target_qty = max(min(open_qty, filled_qty, intent.quantity), 0.0)
@@ -585,7 +585,7 @@ class TestnetExecutionBackend:
             if not isinstance(algo, dict):
                 self._trip_kill_switch(now_ms, "ambiguous protective order response")
                 raise ExecutionBlocked("PROTECTION_ORDER_AMBIGUOUS")
-            client_id = str(algo.get("clientAlgoId", ""))
+            client_id = algo.get("clientAlgoId")
             if client_id == owner.protective_client_id:
                 if matched_algo is not None:
                     self._trip_kill_switch(now_ms, "duplicate owned protective stop")
@@ -597,90 +597,97 @@ class TestnetExecutionBackend:
 
         if matched_algo is not None:
             try:
-                valid_contract = (
-                    matched_algo.get("symbol") == intent.symbol
-                    and matched_algo.get("side") == ("SELL" if intent.side == "BUY" else "BUY")
-                    and matched_algo.get("orderType", matched_algo.get("type")) == "STOP_MARKET"
-                    and matched_algo.get("positionSide") == "BOTH"
-                    and matched_algo.get("reduceOnly") in (True, "true")
-                    and float(matched_algo.get("triggerPrice", matched_algo.get("stopPrice", 0))) == intent.stop_loss
+                algo_id, current_protected_qty = self._validate_protective_contract(
+                    intent, matched_algo, owner.protective_client_id, owner.exchange_id,
                 )
-            except (ValueError, TypeError):
-                valid_contract = False
-            if not valid_contract:
+            except ExecutionBlocked:
                 self._trip_kill_switch(now_ms, "invalid owned protective contract")
-                raise ExecutionBlocked("PROTECTION_CONTRACT_MISMATCH")
-            algo_id = str(matched_algo.get("algoId", matched_algo.get("orderId", "")))
-            if not algo_id or (owner.exchange_id is not None and algo_id != owner.exchange_id):
-                self._trip_kill_switch(now_ms, "protective stop identity mismatch")
-                raise ExecutionBlocked("PROTECTION_ORDER_ID_MISMATCH")
+                raise
         elif owner.protective_client_id is not None and target_qty > 0:
             self._trip_kill_switch(now_ms, "owned protective stop missing")
             raise ExecutionBlocked("PROTECTION_ORDER_MISSING")
 
         if target_qty <= 0.0:
             if matched_algo is not None:
-                algo_id = str(matched_algo.get("algoId", matched_algo.get("orderId", "")))
-                try:
-                    self.client.cancel_protective_order(intent.symbol, algo_id)
-                except Exception as exc:
-                    self._trip_kill_switch(now_ms, f"failed to cancel stale protective stop {algo_id}: {exc}")
-                    raise ExecutionBlocked(f"failed to cancel stale protective stop: {exc}") from exc
-
-                with connection(self.path) as db:
-                    db.execute(
-                        "UPDATE live_execution_orders SET status='CANCELED' WHERE order_id=?",
-                        (algo_id,),
-                    )
                 if owner.protective_client_id is None:
                     raise ExecutionBlocked("PROTECTION_OWNER_MISSING")
-                self.protections.clear_stop(intent, owner.protective_client_id, algo_id, now_ms)
+                self._cancel_protective_stop(intent, owner.protective_client_id, algo_id, now_ms)
             self.protections.release_flat(intent, now_ms)
             return None
 
         if matched_algo is not None:
-            algo_id = str(matched_algo.get("algoId", matched_algo.get("orderId", "")))
-            current_protected_qty = float(matched_algo.get("quantity", matched_algo.get("origQty", 0.0)))
-            if not math.isfinite(current_protected_qty) or current_protected_qty <= 0:
-                self._trip_kill_switch(now_ms, "invalid protective stop quantity")
-                raise ExecutionBlocked("PROTECTION_ORDER_AMBIGUOUS")
             if current_protected_qty == target_qty:
                 # Already adequately protected (idempotent replay)
                 if owner.protective_client_id is None:
                     raise ExecutionBlocked("PROTECTION_OWNER_MISSING")
-                self.protections.record_stop(intent, owner.protective_client_id, algo_id, target_qty, now_ms)
+                try:
+                    self.protections.record_stop(intent, owner.protective_client_id, algo_id, target_qty, now_ms,
+                                                 confirmed_order=matched_algo)
+                except Exception:  # noqa: BLE001 - uncertain persistence must block risk
+                    self._trip_kill_switch(now_ms, "protective confirmation persistence failed")
+                    raise ExecutionBlocked("PROTECTION_PERSISTENCE_UNCERTAIN") from None
                 return algo_id
 
             # Existing protection size differs: cancel mismatched order before replacing
-            try:
-                self.client.cancel_protective_order(intent.symbol, algo_id)
-            except Exception as exc:
-                self._trip_kill_switch(now_ms, f"failed to cancel mismatched protective stop {algo_id}: {exc}")
-                raise ExecutionBlocked(f"failed to cancel mismatched protective stop: {exc}") from exc
-
-            # Mark cancelled in local DB
-            with connection(self.path) as db:
-                db.execute(
-                    "UPDATE live_execution_orders SET status='CANCELED' WHERE order_id=?",
-                    (algo_id,),
-                )
             if owner.protective_client_id is None:
                 raise ExecutionBlocked("PROTECTION_OWNER_MISSING")
-            self.protections.clear_stop(intent, owner.protective_client_id, algo_id, now_ms)
+            self._cancel_protective_stop(intent, owner.protective_client_id, algo_id, now_ms)
 
         # 3. Place resized or new protective stop for target_qty
         return self._place_protective_stop(intent, target_qty, now_ms)
 
-    def _place_protective_stop(self, intent: TradeIntentV1, target_qty: float, now_ms: int) -> str:
-        self._require_claimed_intent(intent)
-        # Quantity MUST be <= actual filled position and current open position
-        target_qty = min(target_qty, intent.quantity, self._query_open_position(intent.symbol, intent.side, now_ms))
-        if target_qty <= 0:
-            raise ExecutionBlocked("PROTECTION_POSITION_FLAT")
-        exit_side = "SELL" if intent.side == "BUY" else "BUY"
-        stop_client_oid = self.protections.next_client_id(intent, now_ms)
-
+    def _cancel_protective_stop(self, intent: TradeIntentV1, client_id: str, exchange_id: str, now_ms: int) -> None:
         try:
+            self.protections.begin_cancellation(intent, client_id, exchange_id, now_ms)
+            self.client.cancel_protective_order(intent.symbol, exchange_id)
+            self.protections.clear_stop(intent, client_id, exchange_id, now_ms, cancelled_order=True)
+        except Exception:  # noqa: BLE001 - remote cancellation and storage uncertainty retain the exact owner
+            self._trip_kill_switch(now_ms, "protective cancellation uncertainty")
+            raise ExecutionBlocked("PROTECTION_CANCELLATION_UNCERTAIN") from None
+
+    @staticmethod
+    def _validate_protective_contract(
+        intent: TradeIntentV1, raw: Any, client_id: str | None, exchange_id: str | None,
+        expected_quantity: float | None = None,
+    ) -> tuple[str, float]:
+        parsed_id = parse_protective_exchange_id(raw)
+        try:
+            quantity = raw.get("quantity", raw.get("origQty"))
+            stop = raw.get("triggerPrice", raw.get("stopPrice"))
+            if isinstance(quantity, bool) or isinstance(stop, bool):
+                raise TypeError("invalid numeric protective contract")
+            quantity = float(quantity)
+            stop = float(stop)
+            reduce_only = raw.get("reduceOnly")
+            valid = (
+                isinstance(client_id, str) and bool(client_id)
+                and raw.get("clientAlgoId") == client_id
+                and (exchange_id is None or parsed_id == exchange_id)
+                and raw.get("symbol") == intent.symbol
+                and raw.get("side") == ("SELL" if intent.side == "BUY" else "BUY")
+                and raw.get("orderType", raw.get("type")) == "STOP_MARKET"
+                and raw.get("positionSide") == "BOTH"
+                and (reduce_only is True or reduce_only == "true")
+                and math.isfinite(stop) and stop == intent.stop_loss
+                and math.isfinite(quantity) and 0 < quantity <= intent.quantity
+                and (expected_quantity is None or quantity == expected_quantity)
+                and raw.get("algoStatus", raw.get("status", "NEW" if expected_quantity is None else None)) == "NEW"
+            )
+        except (ValueError, TypeError, OverflowError):
+            valid = False
+        if not valid:
+            raise ExecutionBlocked("PROTECTION_CONTRACT_MISMATCH")
+        return parsed_id, quantity
+
+    def _place_protective_stop(self, intent: TradeIntentV1, target_qty: float, now_ms: int) -> str:
+        try:
+            self._require_claimed_intent(intent)
+            # Quantity MUST be <= actual filled position and current open position.
+            target_qty = min(target_qty, intent.quantity, self._query_open_position(intent.symbol, intent.side, now_ms))
+            if target_qty <= 0:
+                raise ExecutionBlocked("PROTECTION_POSITION_FLAT")
+            exit_side = "SELL" if intent.side == "BUY" else "BUY"
+            stop_client_oid = self.protections.next_client_id(intent, now_ms, target_qty)
             raw_stop = self.client.place_protective_order(
                 algoType="CONDITIONAL",
                 symbol=intent.symbol,
@@ -694,32 +701,15 @@ class TestnetExecutionBackend:
                 priceProtect="TRUE",
                 clientAlgoId=stop_client_oid,
             )
-            stop_id = str(raw_stop.get("algoId", raw_stop.get("orderId", "")))
-            self.protections.record_stop(intent, stop_client_oid, stop_id, target_qty, now_ms)
-
-            with connection(self.path) as db:
-                db.execute("BEGIN IMMEDIATE")
-                db.execute(
-                    "INSERT INTO live_execution_orders VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) "
-                    "ON CONFLICT(order_id) DO UPDATE SET requested_qty=excluded.requested_qty, status=excluded.status",
-                    (
-                        stop_id,
-                        intent.intent_id,
-                        stop_client_oid,
-                        intent.symbol,
-                        exit_side,
-                        "NEW",
-                        target_qty,
-                        0.0,
-                        0.0,
-                        intent.stop_loss,
-                        1,
-                        1,
-                        now_ms,
-                        now_ms,
-                        json.dumps(raw_stop),
-                    ),
-                )
+            stop_id = parse_protective_exchange_id(raw_stop)
+            self.protections.pending_exchange_id(intent, stop_client_oid, stop_id, now_ms)
+            # A successful POST is only a pending claim. The query establishes installation.
+            confirmed = self.client.query_protective_order(stop_id)
+            self._validate_protective_contract(intent, confirmed, stop_client_oid, stop_id, target_qty)
+            if target_qty > self._query_open_position(intent.symbol, intent.side, now_ms):
+                raise ExecutionBlocked("PROTECTION_POSITION_CHANGED")
+            self.protections.record_stop(intent, stop_client_oid, stop_id, target_qty, now_ms,
+                                         confirmed_order=confirmed)
             return stop_id
         except Exception as exc:
             self._trip_kill_switch(now_ms, f"failed to place required protective stop: {exc}")

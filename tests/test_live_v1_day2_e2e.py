@@ -196,6 +196,9 @@ def test_day2_full_operational_e2e_cycle(tmp_path):
 def report_to_observation(report, intent, account_snap, market_obs, now_ms):
     from btc_quant_agent.position_supervisor.models import PositionObservationV1
     return PositionObservationV1.build(
+        environment=account_snap.environment,
+        credential_namespace=account_snap.credential_namespace,
+        account_id=account_snap.account_id,
         account_snapshot_hash=account_snap.snapshot_hash,
         market_source_hash=market_obs.observation_hash,
         symbol=intent.symbol,

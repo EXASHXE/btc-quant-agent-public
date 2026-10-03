@@ -43,6 +43,8 @@ class KillObservationV1(ImmutableModel):
 class PositionObservationV1(ImmutableModel):
     account_snapshot_hash: str
     market_source_hash: str
+    environment: Literal["DRY_RUN", "TESTNET"]
+    credential_namespace: Annotated[str, Field(min_length=1)]
     symbol: str
     account_id: str = "DEFAULT_ACCOUNT"
     position_side: Literal["BOTH"] = "BOTH"
@@ -74,6 +76,10 @@ class PositionObservationV1(ImmutableModel):
 
     @model_validator(mode="after")
     def validate_identity(self, info: ValidationInfo) -> Self:
+        if (self.environment == "DRY_RUN" and self.credential_namespace != "NONE") or (
+            self.environment == "TESTNET" and self.credential_namespace == "NONE"
+        ):
+            raise ValueError("position observation account authority mismatch")
         expected = content_hash(self.model_dump(mode="json", exclude={"observation_hash"}))
         if info is not None and info.context and info.context.get("build") and not self.observation_hash:
             object.__setattr__(self, "observation_hash", expected)
@@ -96,12 +102,29 @@ class PositionEventV1(ImmutableModel):
     trigger: str
     symbol: str
     source_hash: str
+    environment: str | None = None
+    credential_namespace: str | None = None
+    account_id: str | None = None
+    position_side: str | None = None
+    position_authority_key: str | None = None
     observed_at_ms: Annotated[int, Field(ge=0)]
     details: dict[str, Any] = Field(default_factory=dict)
 
     @model_validator(mode="after")
     def validate_identity(self, info: ValidationInfo) -> Self:
-        expected = content_hash(self.model_dump(mode="json", exclude={"event_hash"}))
+        authority_fields = {"environment", "credential_namespace", "account_id",
+                            "position_side", "position_authority_key"}
+        present = [getattr(self, field) is not None for field in authority_fields]
+        if any(present) and not all(present):
+            raise ValueError("position event authority incomplete")
+        if all(present):
+            expected_key = position_authority_key(
+                self.environment or "", self.credential_namespace or "",
+                self.account_id or "", self.symbol, self.position_side or "")
+            if self.position_authority_key != expected_key:
+                raise ValueError("position event authority mismatch")
+        expected = content_hash(self.model_dump(
+            mode="json", exclude={"event_hash"} | (set() if all(present) else authority_fields)))
         if info.context and info.context.get("build") and not self.event_hash:
             object.__setattr__(self, "event_hash", expected)
         elif self.event_hash != expected:
@@ -110,7 +133,26 @@ class PositionEventV1(ImmutableModel):
 
     @classmethod
     def build(cls, **values: Any) -> Self:
+        required_authority = ("environment", "credential_namespace", "account_id",
+                              "position_side", "position_authority_key")
+        if not all(values.get(field) for field in required_authority):
+            raise ValueError("position event authority incomplete")
         return cls.model_validate(values, context={"build": True})
 
     def verify(self) -> None:
         self.model_validate_json(self.canonical_json())
+
+
+def position_authority_key(
+    environment: str, credential_namespace: str, account_id: str,
+    symbol: str, position_side: str,
+) -> str:
+    if not all((environment, credential_namespace, account_id, symbol, position_side)):
+        raise ValueError("position authority incomplete")
+    return content_hash({
+        "environment": environment,
+        "credential_namespace": credential_namespace,
+        "account_id": account_id,
+        "symbol": symbol,
+        "position_side": position_side,
+    })
