@@ -1,9 +1,9 @@
 {
   "line": "B_LINE",
-  "stage": "B2B_ACCEPTED__LIVE_V1_B3_ACCEPTED__B5_REVALIDATION_FAILED_PENDING_B4_R3",
+  "stage": "B2B_ACCEPTED__LIVE_V1_B3_ACCEPTED__R3_PRESEAL_BLOCKED_H40_CI_ADJUDICATION",
   "code_branch": "feature/tactical-policy-r2",
   "accepted_code_sha": "52c16a28153de307dc6132c0975fe29341a0a918",
-  "docs_authority_commit": "045d967d9cddfe5c949cdead339f6671bcbf06fa",
+  "docs_authority_commit": "666450530564b274f10439dde5d6dd9359aff3fd",
   "current_controller_authority": {
     "path": "reviews/v0.5/tactical-policy/V0.5.5_B2B_CONTROLLER_ACCEPTANCE.md",
     "blob_sha": "4d6d65dad35e42e10d175875093dc045bbc63503"
@@ -36,7 +36,7 @@
     "live_v1_day2_target_write": "TESTNET_ONLY",
     "provider_credential_smoke": "PENDING",
     "live_store_concurrency_gate": "B4_MUST_ESTABLISH_WAL_OR_EQUIVALENT",
-    "live_v1_b4_state": "B5_REVALIDATION_FAILED_PENDING_FINDINGS_REPAIR_R3",
+    "live_v1_b4_state": "R3_SAFETY_SOURCE_REVIEW_PASS_EXACT_SHA_SEAL_BLOCKED_BY_H40_CI_ADJUDICATION",
     "live_v1_b4_candidate_sha": "fd42f2cc1a67506d05117e3daa9a072309f7f998",
     "live_v1_b4_candidate_parent_sha": "961a0f4d4b37cdb9365d5e5867813ff3129c14db",
     "live_v1_b4_repair_authorized": true,
@@ -96,7 +96,18 @@
       "HIGH_MARK_BOOK_KLINE_FRESHNESS_NOT_SEPARATELY_PROVEN",
       "HIGH_EXECUTION_IDENTITIES_NOT_CANONICAL_RECOMPUTED_ON_VERIFY",
       "HIGH_ACTIVE_ORDER_RECONCILIATION_ORDERING_CAN_DROP_STATE_RECOVERY"
-    ]
+    ],
+    "live_v1_b4_r3_sha": "c2c7cc83294f44340dd9fa1873bff760501fae12",
+    "live_v1_b4_r3_parent_sha": "937b2b26518ceea0952a7e17279cc42924c88848",
+    "live_v1_b4_r3_safety_source_review": "PASS",
+    "live_v1_b4_r3_exact_sha_sealed": false,
+    "h40_ci_adjudication": {
+      "workflow_run_id": 37099190279,
+      "attempt_1": "NEW_H40_SCIENTIFIC_GOLDEN_MISMATCH_PLUS_KNOWN_A34_SHALLOW_CHECKOUT",
+      "attempt_2": "IN_PROGRESS",
+      "direct_h40_source_diff": "ZERO",
+      "dependency_version_drift": "NOT_OBSERVED"
+    }
   },
   "must_read": [],
   "validation_authority": {
@@ -121,7 +132,7 @@
     "evidence_path": "evidence/v0.5.5/controller/V0.5.5_B2B_CONTROLLER_ACCEPTANCE.json",
     "evidence_blob_sha": "73a11708a85b5f1896397d745c3b7252d3c51f8d"
   },
-  "parallel_authorized_next_stage": "LIVE_V1_B4_B5_FINDINGS_REPAIR_R3",
+  "parallel_authorized_next_stage": "R3_H40_CI_ADJUDICATION",
   "live_v1_acceptance_authority": {
     "report_path": "reviews/v0.5/live_v1/V0.5.5_LIVE_V1_B3_CONTROLLER_ACCEPTANCE.md",
     "report_blob_sha": "21ad4492feb4750f5fc85a5f88b54d1da36c157d",
@@ -147,5 +158,9 @@
     "report_blob_sha": "e6409e9a8b9c282686861cc235f38c7a279c3819",
     "evidence_path": "evidence/v0.5.5/controller/V0.5.5_LIVE_V1_B5_REVALIDATION_CONTROLLER_ADJUDICATION.json",
     "evidence_blob_sha": "342833d4461f0baad41a170eb631f778b239639a"
+  },
+  "live_v1_b4_r3_preseal_review": {
+    "path": "reviews/v0.5/live_v1/V0.5.5_LIVE_V1_B4_R3_CONTROLLER_PRESEAL_REVIEW.md",
+    "blob_sha": "e28bf2be351cd411d7609575fbb7e0bb92900f93"
   }
 }
