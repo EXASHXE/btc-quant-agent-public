@@ -1,9 +1,9 @@
 {
   "line": "B_LINE",
-  "stage": "B2B_ACCEPTED__LIVE_V1_B3_ACCEPTED__B5_R4_FAILED_PENDING_R5",
+  "stage": "B2B_ACCEPTED__LIVE_V1_B3_ACCEPTED__R5_PRESEAL_PENDING_CI_AND_EVIDENCE",
   "code_branch": "feature/tactical-policy-r2",
   "accepted_code_sha": "52c16a28153de307dc6132c0975fe29341a0a918",
-  "docs_authority_commit": "0c5ba8c871a22024a038cdce79ac0809d7cf8204",
+  "docs_authority_commit": "0a477f0a45a5010408c20cfaabd2be06004643c6",
   "current_controller_authority": {
     "path": "reviews/v0.5/tactical-policy/V0.5.5_B2B_CONTROLLER_ACCEPTANCE.md",
     "blob_sha": "4d6d65dad35e42e10d175875093dc045bbc63503"
@@ -36,7 +36,7 @@
     "live_v1_day2_target_write": "TESTNET_ONLY",
     "provider_credential_smoke": "PENDING",
     "live_store_concurrency_gate": "B4_MUST_ESTABLISH_WAL_OR_EQUIVALENT",
-    "live_v1_b4_state": "B5_R4_FAILED_PENDING_FINDINGS_REPAIR_R5",
+    "live_v1_b4_state": "R5_IMPLEMENTED_SOURCE_REVIEW_PASS_EXACT_SEAL_PENDING_CI_AND_EVIDENCE",
     "live_v1_b4_candidate_sha": "fd42f2cc1a67506d05117e3daa9a072309f7f998",
     "live_v1_b4_candidate_parent_sha": "961a0f4d4b37cdb9365d5e5867813ff3129c14db",
     "live_v1_b4_repair_authorized": true,
@@ -102,15 +102,9 @@
     "live_v1_b4_r3_safety_source_review": "PASS",
     "live_v1_b4_r3_exact_sha_sealed": true,
     "h40_ci_adjudication": {
-      "workflow_run_id": 37099190279,
-      "attempt_1": "A34_SHALLOW_CHECKOUT_PLUS_TRANSIENT_H40_GOLDEN_MISMATCH",
-      "attempt_2": "ONLY_A34_SHALLOW_CHECKOUT",
-      "attempt_2_counts": {
-        "passed": 2286,
-        "failed": 1,
-        "skipped": 2
-      },
-      "h40_anomaly": "TRANSIENT_NONREPRODUCED_ON_EXACT_SHA_RERUN",
+      "workflow_run_id": 37141954018,
+      "attempt_1": "A34_SHALLOW_CHECKOUT_PLUS_H40_GOLDEN_MISMATCH",
+      "attempt_2": "IN_PROGRESS",
       "direct_h40_source_diff": "ZERO"
     },
     "live_v1_b4_r4_authorized": true,
@@ -129,7 +123,12 @@
       "HIGH_FLAT_RELEASE_CAN_DISCARD_UNRESOLVED_PROTECTION_AUTHORITY",
       "HIGH_RUNTIME_READINESS_ACCOUNT_AUTHORITY_NOT_SINGLE_GATE",
       "HIGH_POSITION_OUTBOX_SYMBOL_NOT_BOUND_TO_EVENT"
-    ]
+    ],
+    "live_v1_b4_r5_sha": "a663921abf90504412d0d67b2b9c9f134f204d85",
+    "live_v1_b4_r5_parent_sha": "4bc05e1a7c7fae86f41c1dd9b5a1635d0540ee58",
+    "live_v1_b4_r5_source_review": "PASS",
+    "live_v1_b4_r5_exact_sha_sealed": false,
+    "live_v1_b4_r5_machine_evidence": "STALE_R4_ARTIFACT"
   },
   "must_read": [],
   "validation_authority": {
@@ -154,7 +153,7 @@
     "evidence_path": "evidence/v0.5.5/controller/V0.5.5_B2B_CONTROLLER_ACCEPTANCE.json",
     "evidence_blob_sha": "73a11708a85b5f1896397d745c3b7252d3c51f8d"
   },
-  "parallel_authorized_next_stage": "LIVE_V1_B4_B5_FINDINGS_REPAIR_R5",
+  "parallel_authorized_next_stage": "R5_CI_AND_EVIDENCE_ADJUDICATION",
   "live_v1_acceptance_authority": {
     "report_path": "reviews/v0.5/live_v1/V0.5.5_LIVE_V1_B3_CONTROLLER_ACCEPTANCE.md",
     "report_blob_sha": "21ad4492feb4750f5fc85a5f88b54d1da36c157d",
@@ -236,5 +235,9 @@
   "live_v1_b4_r5_prompt": {
     "path": "prompts/v0.5/repair/v0.5.5_B4_LIVE_V1_B5_FINDINGS_REPAIR_R5.md",
     "blob_sha": "ab6c9855440039e6a8fa90a96fee23172a00fdb6"
+  },
+  "live_v1_b4_r5_preseal_review": {
+    "path": "reviews/v0.5/live_v1/V0.5.5_LIVE_V1_B4_R5_CONTROLLER_PRESEAL_REVIEW.md",
+    "blob_sha": "35daae81ce60caab95298101292a472632a277fe"
   }
 }
