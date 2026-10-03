@@ -1,0 +1,51 @@
+{
+  "task": "LIVE_V1_B4_B5_FINDINGS_REPAIR_R5_CONTROLLER_SEAL",
+  "repository": "EXASHXE/btc-quant-agent-public",
+  "branch": "feature/b-line-live-v1",
+  "sealed_sha": "a663921abf90504412d0d67b2b9c9f134f204d85",
+  "expected_parent_sha": "4bc05e1a7c7fae86f41c1dd9b5a1635d0540ee58",
+  "decision": "LIVE_V1_B4_R5_EXACT_SHA_SEALED_PENDING_B5_INDEPENDENT_REVALIDATION",
+  "source_review": {
+    "pending_exact_confirmation": "PASS",
+    "full_protective_contract": "PASS",
+    "flat_unresolved_identity": "PASS",
+    "runtime_account_authority": "PASS",
+    "outbox_event_binding": "PASS"
+  },
+  "implementation_evidence_file": "STALE_R4_ARTIFACT_NOT_USED_AS_R5_AUTHORITY",
+  "remote_ci": {
+    "workflow_run_id": 37141954018,
+    "attempt_1": {
+      "passed": 2420,
+      "failed": 2,
+      "skipped": 2
+    },
+    "attempt_2": {
+      "passed": 2420,
+      "failed": 2,
+      "skipped": 2
+    },
+    "ruff": "PASS",
+    "mypy": "PASS",
+    "compileall": "NOT_RUN_REMOTE_FAIL_FAST",
+    "failures": [
+      "KNOWN_NONBLOCKING_CI_HARNESS_DEBT_A34_SHALLOW_CHECKOUT",
+      "KNOWN_H40_CI_NUMERIC_REPRODUCIBILITY_DEBT"
+    ]
+  },
+  "h40_adjudication": {
+    "full_history_h40_source_diff": "ZERO",
+    "canonical_helper_diff": "ZERO",
+    "expected_hash": "d5a962cd9c9556b573a890b6af8cbeb09d7201187511f477d727c8670bf0b2e0",
+    "alternate_observed_hash": "ee185f1fce50bdf710295a23506a5c29d83a70c361aff72e2b6be9e54526643d",
+    "classification": "KNOWN_H40_CI_NUMERIC_REPRODUCIBILITY_DEBT",
+    "bline_blocking": false,
+    "aline_scientific_authority_changed": false
+  },
+  "safety": {
+    "live_write_authority": "NONE",
+    "real_funds_authorized": false,
+    "autonomous_live": "FORBIDDEN"
+  },
+  "next_state": "LIVE_V1_B5_R5_INDEPENDENT_EXACT_SHA_REVALIDATION"
+}
