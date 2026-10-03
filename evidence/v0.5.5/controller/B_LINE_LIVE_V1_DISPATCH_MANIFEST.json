@@ -2,8 +2,8 @@
   "manifest_type": "B_LINE_LIVE_V1_DISPATCH_MANIFEST_V1",
   "repository": "EXASHXE/btc-quant-agent-public",
   "live_branch": "feature/b-line-live-v1",
-  "branch_start_sha": "c2c7cc83294f44340dd9fa1873bff760501fae12",
-  "accepted_bline_code_sha": "c2c7cc83294f44340dd9fa1873bff760501fae12",
+  "branch_start_sha": "4bc05e1a7c7fae86f41c1dd9b5a1635d0540ee58",
+  "accepted_bline_code_sha": "4bc05e1a7c7fae86f41c1dd9b5a1635d0540ee58",
   "b2b_candidate_sha": null,
   "b2b_candidate_usage": "B2B_ACCEPTED_IN_BRANCH_BASE",
   "architecture_plan": {
@@ -14,8 +14,8 @@
   "authority_refs": [
     {
       "path": "evidence/v0.5.5/controller/B_LINE_CURRENT_AUTHORITY.json",
-      "blob_sha": "240affecd2f2c81410abb84c66b64dc5a3112a9f",
-      "access_mode": "IDENTITY_ONLY"
+      "blob_sha": "2758c7b02896dcce8120d5c986fe1fc10b1897e1",
+      "access_mode": "BINDING_FIELDS_ONLY"
     }
   ],
   "binding_fields": {
@@ -34,17 +34,17 @@
     "accepted_b2b_sha": "52c16a28153de307dc6132c0975fe29341a0a918",
     "live_v1_b3_status": "ACCEPTED",
     "live_v1_b3_accepted_sha": "961a0f4d4b37cdb9365d5e5867813ff3129c14db",
-    "live_v1_b4_status": "B5_R3_FAILED_PENDING_R4",
+    "live_v1_b4_status": "R4_EXACT_SHA_SEALED",
     "provider_credential_smoke": "PENDING",
     "sqlite_concurrency_gate": "B4_MUST_ESTABLISH_WAL_OR_EQUIVALENT",
-    "live_v1_b4_final_sha": "c2c7cc83294f44340dd9fa1873bff760501fae12",
-    "live_v1_b5_status": "FAILED",
+    "live_v1_b4_final_sha": "4bc05e1a7c7fae86f41c1dd9b5a1635d0540ee58",
+    "live_v1_b5_status": "READY_TO_DISPATCH_R4_REVALIDATION",
     "live_v1_b5_binding_mode": "EXACT_CODE_SHA",
-    "live_v1_b5_target_sha": "c2c7cc83294f44340dd9fa1873bff760501fae12",
-    "live_v1_b5_expected_parent_sha": "937b2b26518ceea0952a7e17279cc42924c88848",
+    "live_v1_b5_target_sha": "4bc05e1a7c7fae86f41c1dd9b5a1635d0540ee58",
+    "live_v1_b5_expected_parent_sha": "c2c7cc83294f44340dd9fa1873bff760501fae12",
     "live_v1_b5_last_target_sha": "c2c7cc83294f44340dd9fa1873bff760501fae12",
     "live_v1_b4_r3_status": "SEALED",
-    "live_v1_b5_validator": "INDEPENDENT_FRESH_SESSION",
+    "live_v1_b5_validator": "FULLY_FRESH_COORDINATING_SESSION",
     "h40_ci_attempt2": "ONLY_KNOWN_A34_SHALLOW_CHECKOUT",
     "live_v1_b4_r4_status": "READY_TO_DISPATCH"
   },

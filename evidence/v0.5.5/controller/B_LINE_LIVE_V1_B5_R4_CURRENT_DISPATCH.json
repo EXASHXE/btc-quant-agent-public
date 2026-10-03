@@ -1,0 +1,17 @@
+{
+  "task": "LIVE_V1_B5_R4_INDEPENDENT_EXACT_SHA_REVALIDATION",
+  "repository": "EXASHXE/btc-quant-agent-public",
+  "implementation_branch": "feature/b-line-live-v1",
+  "binding_mode": "EXACT_CODE_SHA",
+  "target_sha": "4bc05e1a7c7fae86f41c1dd9b5a1635d0540ee58",
+  "expected_parent_sha": "c2c7cc83294f44340dd9fa1873bff760501fae12",
+  "controller_dispatch_sha": "SUPPLIED_OUT_OF_BAND_AS_CURRENT_DOCS_HEAD",
+  "validator_requirement": "FULLY_FRESH_COORDINATING_SESSION",
+  "implementation_mutation": "FORBIDDEN",
+  "validation_publication": "SEPARATE_VALIDATION_BRANCH",
+  "expected_pass_state": "LIVE_V1_TESTNET_VALIDATED_LIVE_STILL_DISABLED",
+  "fail_state": "LIVE_V1_INDEPENDENT_VALIDATION_FAILED",
+  "real_funds_write_authority": "NONE",
+  "live_approval_only": "NOT_AUTHORIZED",
+  "autonomous_live": "FORBIDDEN"
+}

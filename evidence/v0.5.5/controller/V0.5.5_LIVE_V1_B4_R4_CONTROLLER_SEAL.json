@@ -1,0 +1,32 @@
+{
+  "task": "LIVE_V1_B4_B5_FINDINGS_REPAIR_R4_CONTROLLER_SEAL",
+  "sealed_sha": "4bc05e1a7c7fae86f41c1dd9b5a1635d0540ee58",
+  "expected_parent_sha": "c2c7cc83294f44340dd9fa1873bff760501fae12",
+  "decision": "LIVE_V1_B4_R4_EXACT_SHA_SEALED_PENDING_B5_INDEPENDENT_REVALIDATION",
+  "source_review": {
+    "protective_confirmation": "PASS",
+    "account_scoped_event_authority": "PASS",
+    "environment_namespace_lifecycle_authority": "PASS"
+  },
+  "local_tests": {
+    "passed": 2345,
+    "skipped": 2,
+    "failed": 0,
+    "live_v1": 336,
+    "r4_focused": 58
+  },
+  "remote_ci": {
+    "workflow_run_id": 37118592732,
+    "passed": 2344,
+    "failed": 1,
+    "skipped": 2,
+    "only_failure": "KNOWN_NONBLOCKING_CI_HARNESS_DEBT_A34_SHALLOW_CHECKOUT"
+  },
+  "h40_full_history_diff": "ZERO",
+  "safety": {
+    "live_write_authority": "NONE",
+    "real_funds_authorized": false,
+    "autonomous_live": "FORBIDDEN"
+  },
+  "next_state": "LIVE_V1_B5_R4_INDEPENDENT_EXACT_SHA_REVALIDATION"
+}
