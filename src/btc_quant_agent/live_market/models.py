@@ -19,6 +19,13 @@ class MarketObservationV1(ImmutableModel):
     kline_1m_close_time_ms: Annotated[int, Field(ge=0)]
     source_timestamp_ms: Annotated[int, Field(ge=0)]
     receipt_timestamp_ms: Annotated[int, Field(ge=0)]
+    mark_source_timestamp_ms: Annotated[int, Field(ge=0)] | None = None
+    mark_receipt_timestamp_ms: Annotated[int, Field(ge=0)] | None = None
+    book_source_timestamp_ms: Annotated[int, Field(ge=0)] | None = None
+    book_receipt_timestamp_ms: Annotated[int, Field(ge=0)] | None = None
+    kline_source_timestamp_ms: Annotated[int, Field(ge=0)] | None = None
+    kline_receipt_timestamp_ms: Annotated[int, Field(ge=0)] | None = None
+    stream_connected: bool = False
     spread_bps: Annotated[float, Field(ge=0)]
     observation_hash: str = ""
 
@@ -38,4 +45,19 @@ class MarketObservationV1(ImmutableModel):
         return cls.model_validate(values, context={"build": True})
 
     def is_stale(self, now_ms: int, max_age_ms: int = 10_000) -> bool:
-        return (now_ms - self.receipt_timestamp_ms) > max_age_ms
+        return bool(self.freshness_reason(now_ms, max_age_ms))
+
+    def freshness_reason(self, now_ms: int, max_age_ms: int = 10_000) -> str:
+        if not self.stream_connected:
+            return "MARKET_STREAM_DISCONNECTED"
+        for component in ("mark", "book", "kline"):
+            source = getattr(self, f"{component}_source_timestamp_ms")
+            receipt = getattr(self, f"{component}_receipt_timestamp_ms")
+            label = f"MARKET_{component.upper()}"
+            if source is None or receipt is None:
+                return f"{label}_MISSING"
+            if source > now_ms or receipt > now_ms or source > receipt:
+                return f"{label}_FUTURE"
+            if now_ms - source > max_age_ms or now_ms - receipt > max_age_ms:
+                return f"{label}_STALE"
+        return ""

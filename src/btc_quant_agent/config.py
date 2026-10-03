@@ -352,6 +352,12 @@ class LiveV1Config:
     feishu_receive_id: str = ""
     feishu_approver_open_ids: tuple[str, ...] = ()
 
+    @property
+    def normalized_mode(self) -> str:
+        if self.runtime_enabled:
+            return "B4_RUNTIME"
+        return "B3_CONTROL" if self.enabled else "DISABLED"
+
     def __post_init__(self) -> None:
         if self.execution_mode in {"SHADOW", "PAPER"}:
             object.__setattr__(self, "execution_mode", "DRY_RUN")

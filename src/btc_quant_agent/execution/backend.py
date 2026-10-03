@@ -4,20 +4,26 @@ from __future__ import annotations
 
 import json
 import logging
+import math
+import time
 from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Protocol
 
 if TYPE_CHECKING:
+    from ..account_watch.models import AccountSnapshotV1
+    from ..live_market.models import MarketObservationV1
+    from .authorization import PreExecutionAuthorizationV1
     from .validator import PreExecutionValidator
 
 from ..live_db import connection
 from ..position_supervisor.kill_switch import KillSwitch
 from .binance_signed import BinanceExecutionError, BinanceSignedClient
 from .guard import ExecutionBlocked
-from .intents import TradeIntentV1
+from .intents import IntentStore, TradeIntentV1
 from .policy import ExecutionCapabilityPolicyV1
+from .protection import ProtectionStore
 
 logger = logging.getLogger(__name__)
 
@@ -262,11 +268,18 @@ class TestnetExecutionBackend:
     __test__ = False
 
     def __init__(self, db_path: str | Path, signed_client: BinanceSignedClient, kill_switch: KillSwitch,
-                 *, validator: PreExecutionValidator | None = None) -> None:
+                 *, validator: PreExecutionValidator | None = None,
+                 clock_ms: Callable[[], int] | None = None,
+                 account_provider: Callable[[], AccountSnapshotV1] | None = None,
+                 market_provider: Callable[[int], MarketObservationV1 | None] | None = None) -> None:
         self.path = Path(db_path)
         self.client = signed_client
         self.kill_switch = kill_switch
         self.validator = validator
+        self.clock_ms = clock_ms or (lambda: int(time.time() * 1000))
+        self.account_provider = account_provider
+        self.market_provider = market_provider
+        self.protections = ProtectionStore(self.path)
         from .authorization import AuthorizationStore
         self.authorizations = AuthorizationStore(self.path)
         with connection(self.path) as db:
@@ -305,75 +318,92 @@ class TestnetExecutionBackend:
         if authority.environment != "TESTNET":
             raise ExecutionBlocked("TESTNET_CREDENTIAL_AUTHORITY_REQUIRED")
 
-    def submit_authorized(self, authorization_id: str, now_ms: int) -> ExecutionReport:
-        auth, intent, account, market = self.authorizations.load(authorization_id)
-        if not auth.validated_at_ms <= now_ms < auth.expires_at_ms or auth.expires_at_ms > auth.validated_at_ms + 5000:
+    def _active_receipt(self, auth: PreExecutionAuthorizationV1) -> int:
+        now = self.clock_ms()
+        if not auth.validated_at_ms <= now < auth.expires_at_ms or auth.expires_at_ms > auth.validated_at_ms + 5000:
             raise ExecutionBlocked("AUTHORIZATION_EXPIRED")
-        if self.validator is None:
-            raise ExecutionBlocked("AUTHORIZATION_REQUIRED")
-        from ..account_watch.store import AccountStore
-        from ..decision.models import content_hash
-        from .intents import compile_executable_intent_fields
-        latest = AccountStore(self.path).latest(account.account_id)
-        if latest is None or latest.snapshot_hash != auth.account_snapshot_hash:
-            raise ExecutionBlocked("AUTHORIZATION_CURRENT_ACCOUNT_CHANGED")
-        result = self.validator.validate(intent, market, account, now_ms)
-        if not result.is_valid:
-            raise ExecutionBlocked(result.reason)
-        case = self.validator.live_store.get_case(intent.case_id)
-        proposal = self.validator.live_store.get_proposal(intent.proposal_hash)
-        compiled = compile_executable_intent_fields(case, proposal, account, self.validator.risk_policy)
-        if content_hash(compiled) != auth.execution_compilation_hash:
-            raise ExecutionBlocked("AUTHORIZATION_COMPILATION_MISMATCH")
-        # 1. Capability check using client's actual authority metadata
-        client_auth = getattr(self.client, "authority", None)
-        if client_auth is None:
-            raise ExecutionBlocked("missing credential authority on signed client")
-        ExecutionCapabilityPolicyV1.check_capability(
-            client_auth.environment,
-            "SUBMIT_INTENT",
-            env_id=client_auth.environment,
-            cred_ns=client_auth.credential_namespace,
-            rest_url=client_auth.rest_base_url,
-        )
-        if (client_auth.environment != auth.environment
+        if not self.kill_switch.allows_new_risk():
+            raise ExecutionBlocked("KILL_SWITCH_ACTIVE")
+        self._check_client_authority()
+        return now
+
+    def _fresh_placement_authority(self, auth: PreExecutionAuthorizationV1, intent: TradeIntentV1,
+                                   *, claimed: bool) -> PreExecutionAuthorizationV1:
+        """Forced REST read and full current-risk validation owned by the side-effect backend."""
+        rest_started_at = self._active_receipt(auth)
+        if self.validator is None or self.account_provider is None or self.market_provider is None:
+            raise ExecutionBlocked("PLACEMENT_ACCOUNT_PROVIDER_REQUIRED")
+        try:
+            account = self.account_provider()
+        except Exception:  # noqa: BLE001 - provider failure is never placement authority
+            raise ExecutionBlocked("ACCOUNT_RECONCILIATION_FAILED") from None
+        now = self._active_receipt(auth)
+        try:
+            market = self.market_provider(now)
+        except Exception:  # noqa: BLE001 - provider failure is never placement authority
+            raise ExecutionBlocked("MARKET_DATA_UNAVAILABLE") from None
+        if account is None:
+            raise ExecutionBlocked("ACCOUNT_RECONCILIATION_FAILED")
+        if market is None:
+            raise ExecutionBlocked("MARKET_DATA_UNAVAILABLE")
+        if account.last_rest_at_ms < rest_started_at:
+            raise ExecutionBlocked("PLACEMENT_REST_SNAPSHOT_NOT_CURRENT")
+        client_auth = self.client.authority
+        if (client_auth.environment != account.environment
                 or client_auth.credential_namespace != account.credential_namespace
                 or client_auth.rest_base_url != account.rest_base_url):
             raise ExecutionBlocked("AUTHORIZATION_CLIENT_ENVIRONMENT_MISMATCH")
+        result = self.validator.validate(intent, market, account, now)
+        if not result.is_valid:
+            raise ExecutionBlocked(result.reason)
+        from ..decision.models import content_hash
+        from .intents import compile_executable_intent_fields
+        case = self.validator.live_store.get_case(intent.case_id)
+        proposal = self.validator.live_store.get_proposal(intent.proposal_hash)
+        executable = compile_executable_intent_fields(case, proposal, account, self.validator.risk_policy)
+        if content_hash(executable) != auth.execution_compilation_hash:
+            raise ExecutionBlocked("AUTHORIZATION_COMPILATION_MISMATCH")
+        self._active_receipt(auth)
+        if claimed:
+            return self.authorizations.refresh_claimed(auth, account, market, executable, now)
+        return self.validator.authorize(intent.intent_id, market, account, now, expires_at_ms=auth.expires_at_ms)
 
-        receipt, _, _, _ = self.authorizations.load(authorization_id)
-        claimed = self.authorizations.claim(receipt, now_ms)
-
-        # 2. Check local database for existing order with this client_order_id (idempotency)
-        with connection(self.path) as db:
-            row = db.execute(
-                "SELECT * FROM live_execution_orders WHERE client_order_id=?",
-                (intent.client_order_id,),
-            ).fetchone()
-            if row is not None:
-                if row["intent_id"] != intent.intent_id:
-                    raise ExecutionBlocked("ORDER_INTENT_BINDING_MISMATCH")
-                return ExecutionReport(
-                    intent_id=intent.intent_id,
-                    status=row["status"],
-                    order_id=row["order_id"],
-                    client_order_id=row["client_order_id"],
-                    requested_qty=row["requested_qty"],
-                    filled_qty=row["filled_qty"],
-                    avg_price=row["avg_price"],
-                    reason="LOCAL_IDEMPOTENT_REPLAY",
-                )
-
-        if not claimed:
+    def submit_authorized(self, authorization_id: str, now_ms: int) -> ExecutionReport:
+        # Caller time is diagnostic only. Existing side effects use observation authority.
+        auth, intent, _account, _market = self.authorizations.load(authorization_id)
+        if IntentStore(self.path).has_existing_side_effect(intent.intent_id):
+            return self.reconcile_authorized(intent.intent_id, self.clock_ms())
+        self._active_receipt(auth)
+        auth = self._fresh_placement_authority(auth, intent, claimed=False)
+        now_ms = self._active_receipt(auth)
+        if not self.authorizations.claim(auth, now_ms):
             raise ExecutionBlocked("AUTHORIZATION_IN_FLIGHT_RECONCILIATION_REQUIRED")
-
-        # 3. Setup margin type and leverage
         try:
-            self.client.change_margin_type(intent.symbol, "ISOLATED")
-        except Exception as exc:
-            if "-4046" not in str(exc):  # -4046 = No need to change margin type
-                raise
-        self.client.change_leverage(intent.symbol, intent.leverage)
+            self.protections.reserve_owner(intent, now_ms)
+            self._active_receipt(auth)
+            try:
+                self.client.change_margin_type(intent.symbol, "ISOLATED")
+            except Exception as exc:
+                if "-4046" not in str(exc):
+                    raise
+            self._active_receipt(auth)
+            self.client.change_leverage(intent.symbol, intent.leverage)
+            auth = self._fresh_placement_authority(auth, intent, claimed=True)
+            now_ms = self._active_receipt(auth)
+            stored, stored_intent, account, market = self.authorizations.load(auth.authorization_id)
+            if stored != auth or stored_intent != intent:
+                raise ExecutionBlocked("AUTHORIZATION_BINDING_MISMATCH")
+            if self.validator is None:
+                raise ExecutionBlocked("AUTHORIZATION_REQUIRED")
+            final_result = self.validator.validate(intent, market, account, now_ms)
+            if not final_result.is_valid:
+                raise ExecutionBlocked(final_result.reason)
+            if self.authorizations.for_claimed_intent(intent.intent_id) != auth.authorization_id:
+                raise ExecutionBlocked("AUTHORIZATION_CLAIM_OWNERSHIP_LOST")
+
+        except Exception:  # No entry request has begun in this phase.
+            IntentStore(self.path).update_status(intent.intent_id, "ABORTED", reason="PRE_ENTRY_ABORTED", now_ms=self.clock_ms())
+            raise
 
         # 4. Submit order with transport uncertainty handling
         params: dict[str, Any] = {
@@ -388,6 +418,7 @@ class TestnetExecutionBackend:
             params["timeInForce"] = "GTC"
 
         raw_order: dict[str, Any]
+        now_ms = self._active_receipt(auth)
         try:
             raw_order = self.client.place_order(**params)
         except Exception:  # noqa: BLE001
@@ -413,6 +444,7 @@ class TestnetExecutionBackend:
                     f"Transport uncertainty: order submission timed out and query failed: {query_exc}"
                 ) from query_exc
 
+        self._verify_exchange_entry(intent, raw_order, now_ms)
         order_id = str(raw_order.get("orderId", ""))
         status = str(raw_order.get("status", "NEW"))
         filled_qty = float(raw_order.get("executedQty", 0.0))
@@ -492,7 +524,9 @@ class TestnetExecutionBackend:
             mode_data = self.client.position_mode()
             if not isinstance(mode_data, dict) or "dualSidePosition" not in mode_data:
                 raise BinanceExecutionError(f"unparseable position mode response: {mode_data}")
-            is_hedge = bool(mode_data["dualSidePosition"])
+            mode = mode_data["dualSidePosition"]
+            if mode not in (False, "false", "False"):
+                raise BinanceExecutionError("unsupported hedge position mode")
 
             risk_rows = self.client.positions(symbol)
             if not isinstance(risk_rows, list):
@@ -507,25 +541,14 @@ class TestnetExecutionBackend:
                     continue
                 pos_side = str(row.get("positionSide", "BOTH"))
                 amt = float(row.get("positionAmt", 0.0))
-                if is_hedge:
-                    if side == "BUY" and pos_side == "LONG":
-                        open_qty = max(0.0, amt)
-                        found = True
-                        break
-                    elif side == "SELL" and pos_side == "SHORT":
-                        open_qty = max(0.0, abs(amt))
-                        found = True
-                        break
-                else:
-                    if pos_side == "BOTH":
-                        if side == "BUY":
-                            open_qty = max(0.0, amt)
-                        else:
-                            open_qty = max(0.0, -amt)
-                        found = True
-                        break
+                if not math.isfinite(amt):
+                    raise BinanceExecutionError("invalid position quantity")
+                if pos_side != "BOTH" or found:
+                    raise BinanceExecutionError("ambiguous position side")
+                open_qty = max(0.0, amt if side == "BUY" else -amt)
+                found = True
             if not found:
-                open_qty = 0.0
+                raise BinanceExecutionError("position row missing")
             return open_qty
         except Exception as exc:
             self._trip_kill_switch(now_ms, f"position query uncertainty: {exc}")
@@ -533,27 +556,67 @@ class TestnetExecutionBackend:
 
     def _reconcile_protective_stop(self, intent: TradeIntentV1, filled_qty: float, now_ms: int) -> str | None:
         self._require_claimed_intent(intent)
+        owner = self.protections.get_owner(intent)
+        if owner is None:
+            self._trip_kill_switch(now_ms, "protective ownership missing")
+            raise ExecutionBlocked("PROTECTION_OWNER_MISSING")
+        # A released terminal owner cannot claim any later position on this symbol.
+        if owner.status == "RELEASED":
+            return None
         open_qty = self._query_open_position(intent.symbol, intent.side, now_ms)
+        if owner.status != "ACTIVE":
+            self._trip_kill_switch(now_ms, "inactive protective ownership on open position")
+            raise ExecutionBlocked("PROTECTION_OWNER_MISSING")
         target_qty = max(min(open_qty, filled_qty, intent.quantity), 0.0)
 
         # 1. Query open protective orders from exchange
         try:
             open_algos_raw = self.client.open_protective_orders(intent.symbol)
-            open_algos = open_algos_raw if isinstance(open_algos_raw, list) else []
+            if not isinstance(open_algos_raw, list):
+                raise BinanceExecutionError("unparseable protective order response")
+            open_algos = open_algos_raw
         except Exception as exc:
             self._trip_kill_switch(now_ms, f"protective query failed: {exc}")
             raise ExecutionBlocked(f"protective query uncertainty: {exc}") from exc
 
         # 2. Check for active protective order on exchange for this intent
-        target_prefix = f"bqa-stop-{intent.client_order_id[:12]}"
         matched_algo: dict[str, Any] | None = None
         for algo in open_algos:
             if not isinstance(algo, dict):
-                continue
+                self._trip_kill_switch(now_ms, "ambiguous protective order response")
+                raise ExecutionBlocked("PROTECTION_ORDER_AMBIGUOUS")
             client_id = str(algo.get("clientAlgoId", ""))
-            if client_id.startswith(target_prefix):
+            if client_id == owner.protective_client_id:
+                if matched_algo is not None:
+                    self._trip_kill_switch(now_ms, "duplicate owned protective stop")
+                    raise ExecutionBlocked("PROTECTION_ORDER_AMBIGUOUS")
                 matched_algo = algo
-                break
+            elif target_qty > 0:
+                self._trip_kill_switch(now_ms, "unknown protective stop on open position")
+                raise ExecutionBlocked("PROTECTION_ORDER_UNKNOWN")
+
+        if matched_algo is not None:
+            try:
+                valid_contract = (
+                    matched_algo.get("symbol") == intent.symbol
+                    and matched_algo.get("side") == ("SELL" if intent.side == "BUY" else "BUY")
+                    and matched_algo.get("orderType", matched_algo.get("type")) == "STOP_MARKET"
+                    and matched_algo.get("positionSide") == "BOTH"
+                    and matched_algo.get("reduceOnly") in (True, "true")
+                    and float(matched_algo.get("triggerPrice", matched_algo.get("stopPrice", 0))) == intent.stop_loss
+                )
+            except (ValueError, TypeError):
+                valid_contract = False
+            if not valid_contract:
+                self._trip_kill_switch(now_ms, "invalid owned protective contract")
+                raise ExecutionBlocked("PROTECTION_CONTRACT_MISMATCH")
+            algo_id = str(matched_algo.get("algoId", matched_algo.get("orderId", "")))
+            if not algo_id or (owner.exchange_id is not None and algo_id != owner.exchange_id):
+                self._trip_kill_switch(now_ms, "protective stop identity mismatch")
+                raise ExecutionBlocked("PROTECTION_ORDER_ID_MISMATCH")
+        elif owner.protective_client_id is not None and target_qty > 0:
+            self._trip_kill_switch(now_ms, "owned protective stop missing")
+            raise ExecutionBlocked("PROTECTION_ORDER_MISSING")
 
         if target_qty <= 0.0:
             if matched_algo is not None:
@@ -569,13 +632,23 @@ class TestnetExecutionBackend:
                         "UPDATE live_execution_orders SET status='CANCELED' WHERE order_id=?",
                         (algo_id,),
                     )
+                if owner.protective_client_id is None:
+                    raise ExecutionBlocked("PROTECTION_OWNER_MISSING")
+                self.protections.clear_stop(intent, owner.protective_client_id, algo_id, now_ms)
+            self.protections.release_flat(intent, now_ms)
             return None
 
         if matched_algo is not None:
             algo_id = str(matched_algo.get("algoId", matched_algo.get("orderId", "")))
             current_protected_qty = float(matched_algo.get("quantity", matched_algo.get("origQty", 0.0)))
+            if not math.isfinite(current_protected_qty) or current_protected_qty <= 0:
+                self._trip_kill_switch(now_ms, "invalid protective stop quantity")
+                raise ExecutionBlocked("PROTECTION_ORDER_AMBIGUOUS")
             if current_protected_qty == target_qty:
                 # Already adequately protected (idempotent replay)
+                if owner.protective_client_id is None:
+                    raise ExecutionBlocked("PROTECTION_OWNER_MISSING")
+                self.protections.record_stop(intent, owner.protective_client_id, algo_id, target_qty, now_ms)
                 return algo_id
 
             # Existing protection size differs: cancel mismatched order before replacing
@@ -591,6 +664,9 @@ class TestnetExecutionBackend:
                     "UPDATE live_execution_orders SET status='CANCELED' WHERE order_id=?",
                     (algo_id,),
                 )
+            if owner.protective_client_id is None:
+                raise ExecutionBlocked("PROTECTION_OWNER_MISSING")
+            self.protections.clear_stop(intent, owner.protective_client_id, algo_id, now_ms)
 
         # 3. Place resized or new protective stop for target_qty
         return self._place_protective_stop(intent, target_qty, now_ms)
@@ -598,9 +674,11 @@ class TestnetExecutionBackend:
     def _place_protective_stop(self, intent: TradeIntentV1, target_qty: float, now_ms: int) -> str:
         self._require_claimed_intent(intent)
         # Quantity MUST be <= actual filled position and current open position
-        target_qty = min(target_qty, intent.quantity)
+        target_qty = min(target_qty, intent.quantity, self._query_open_position(intent.symbol, intent.side, now_ms))
+        if target_qty <= 0:
+            raise ExecutionBlocked("PROTECTION_POSITION_FLAT")
         exit_side = "SELL" if intent.side == "BUY" else "BUY"
-        stop_client_oid = f"bqa-stop-{intent.client_order_id[:12]}-{int(target_qty * 1000):04d}"
+        stop_client_oid = self.protections.next_client_id(intent, now_ms)
 
         try:
             raw_stop = self.client.place_protective_order(
@@ -617,6 +695,7 @@ class TestnetExecutionBackend:
                 clientAlgoId=stop_client_oid,
             )
             stop_id = str(raw_stop.get("algoId", raw_stop.get("orderId", "")))
+            self.protections.record_stop(intent, stop_client_oid, stop_id, target_qty, now_ms)
 
             with connection(self.path) as db:
                 db.execute("BEGIN IMMEDIATE")
@@ -675,9 +754,31 @@ class TestnetExecutionBackend:
             raise ExecutionBlocked("AUTHORIZATION_CLIENT_ENVIRONMENT_MISMATCH")
         case = self.validator.live_store.get_case(intent.case_id)
         proposal = self.validator.live_store.get_proposal(intent.proposal_hash)
-        expected = compile_executable_intent_fields(case, proposal, account, self.validator.risk_policy)
+        expected = compile_executable_intent_fields(case, proposal, account)
         if content_hash(expected) != _auth.execution_compilation_hash or any(getattr(intent, key) != value for key, value in expected.items()):
             raise ExecutionBlocked("EXECUTABLE_CONTRACT_MISMATCH")
+
+    def _verify_exchange_entry(self, intent: TradeIntentV1, raw: Any, now_ms: int) -> None:
+        try:
+            if not isinstance(raw, dict) or not raw.get("orderId"):
+                raise ValueError
+            if (raw.get("clientOrderId") != intent.client_order_id
+                    or raw.get("symbol") != intent.symbol
+                    or raw.get("side") != intent.side
+                    or raw.get("status") not in {"NEW", "PARTIALLY_FILLED", "FILLED", "CANCELED", "EXPIRED", "REJECTED"}):
+                raise ValueError
+            filled = float(raw.get("executedQty", 0))
+            if not math.isfinite(filled) or not 0 <= filled <= intent.quantity + 1e-9:
+                raise ValueError
+            with connection(self.path) as db:
+                rows = db.execute("SELECT intent_id,client_order_id,order_id FROM live_execution_orders WHERE client_order_id=? OR order_id=?",
+                                  (intent.client_order_id, str(raw["orderId"]))).fetchall()
+            if any(row["intent_id"] != intent.intent_id or row["client_order_id"] != intent.client_order_id
+                   or row["order_id"] != str(raw["orderId"]) for row in rows):
+                raise ValueError
+        except (ValueError, TypeError):
+            self._trip_kill_switch(now_ms, "ORDER_IDENTITY_CONFLICT")
+            raise ExecutionBlocked("ORDER_IDENTITY_CONFLICT") from None
 
     def reconcile_authorized(self, intent_id: str, now_ms: int) -> ExecutionReport:
         auth_id = self.authorizations.for_claimed_intent(intent_id)
@@ -696,9 +797,27 @@ class TestnetExecutionBackend:
 
         try:
             raw = self.client.query_order_by_client_id(intent.symbol, intent.client_order_id)
-        except Exception as exc:
-            raise ExecutionBlocked(f"reconcile query failed: {exc}") from exc
+        except Exception as exc:  # noqa: BLE001 - uncertainty retains the durable claim
+            if isinstance(exc, BinanceExecutionError) and "-2013" in str(exc):
+                # Release only a durably proven pre-entry abort, never a live setup worker
+                # or an uncertain submitted request whose order has not appeared yet.
+                with connection(self.path) as db:
+                    latest = db.execute("SELECT reason FROM live_intent_transitions WHERE intent_id=? ORDER BY rowid DESC LIMIT 1",
+                                        (intent.intent_id,)).fetchone()
+                    order = db.execute("SELECT 1 FROM live_execution_orders WHERE intent_id=? AND is_protective=0",
+                                       (intent.intent_id,)).fetchone()
+                if latest is not None and latest["reason"] == "PRE_ENTRY_ABORTED" and order is None:
+                    owner = self.protections.get_owner(intent)
+                    if owner is not None and owner.protective_client_id is None and self._query_open_position(intent.symbol, intent.side, now_ms) == 0:
+                        self.protections.release_flat(intent, now_ms)
+                        return ExecutionReport(intent.intent_id, "ABORTED", "", intent.client_order_id,
+                                               intent.quantity, 0.0, 0.0, reason="PROVEN_PRE_ENTRY_ABORTED")
+                return ExecutionReport(intent.intent_id, "UNKNOWN", "", intent.client_order_id,
+                                       intent.quantity, 0.0, 0.0, reason="ENTRY_PROVEN_ABSENT_NO_NEW_PLACEMENT")
+            self._trip_kill_switch(now_ms, "ORDER_RECONCILIATION_UNCERTAIN")
+            raise ExecutionBlocked("ORDER_RECONCILIATION_UNCERTAIN") from None
 
+        self._verify_exchange_entry(intent, raw, now_ms)
         order_id = str(raw.get("orderId", ""))
         status = str(raw.get("status", "UNKNOWN"))
         filled_qty = float(raw.get("executedQty", 0.0))
@@ -726,7 +845,7 @@ class TestnetExecutionBackend:
                 has_stop = True
 
         stop_order_id: str | None = None
-        if filled_qty > 0 or has_stop:
+        if filled_qty > 0 or has_stop or status in {"CANCELED", "EXPIRED", "REJECTED"}:
             stop_order_id = self._reconcile_protective_stop(intent, filled_qty, now_ms)
 
         return ExecutionReport(

@@ -58,6 +58,11 @@ class TradeIntentV1(ImmutableModel):
     def validate_identity(self, info: ValidationInfo) -> Self:
         if self.created_at_ms >= self.expires_at_ms:
             raise ValueError("intent chronology invalid")
+        expected_ids = canonical_execution_identity(
+            self.case_hash, self.proposal_hash, self.approval_event_id,
+        )
+        if (self.intent_id, self.idempotency_key, self.client_order_id) != expected_ids:
+            raise ValueError("trade intent canonical identity mismatch")
         expected = content_hash(self.model_dump(mode="json", exclude={"intent_hash"}))
         if info.context and info.context.get("build") and not self.intent_hash:
             object.__setattr__(self, "intent_hash", expected)
@@ -71,6 +76,19 @@ class TradeIntentV1(ImmutableModel):
 
     def verify(self) -> None:
         self.model_validate_json(self.canonical_json())
+
+
+def canonical_execution_identity(
+    case_hash: str, proposal_hash: str, approval_event_id: str,
+) -> tuple[str, str, str]:
+    authority_hash = hashlib.sha256(
+        f"{case_hash}:{proposal_hash}:{approval_event_id}".encode()
+    ).hexdigest()
+    return (
+        f"intent_{authority_hash[:24]}",
+        f"idem_{authority_hash[:24]}",
+        f"cuid_v1_{authority_hash[:16]}",
+    )
 
 
 def compile_executable_intent_fields(
@@ -192,11 +210,13 @@ def build_trade_intent(
 
     # One approval authority (case_hash, proposal_hash, approval_event_id)
     # maps deterministically to exactly one executable TradeIntent authority
-    authority_payload = f"{case.case_hash}:{proposal.proposal_hash}:{approval_event_id}"
-    authority_hash = hashlib.sha256(authority_payload.encode("utf-8")).hexdigest()
-    intent_id = f"intent_{authority_hash[:24]}"
-    idem_key = idempotency_key or f"idem_{authority_hash[:24]}"
-    client_oid = client_order_id or f"cuid_v1_{authority_hash[:16]}"
+    intent_id, idem_key, client_oid = canonical_execution_identity(
+        case.case_hash, proposal.proposal_hash, approval_event_id,
+    )
+    if idempotency_key is not None and idempotency_key != idem_key:
+        raise ExecutionBlocked("NONCANONICAL_IDEMPOTENCY_KEY")
+    if client_order_id is not None and client_order_id != client_oid:
+        raise ExecutionBlocked("NONCANONICAL_CLIENT_ORDER_ID")
 
     if intent_store is not None:
         existing = intent_store.get_intent_by_approval_event(approval_event_id)
@@ -321,9 +341,38 @@ class IntentStore:
         return intent
 
     def unfinished_intent_ids(self) -> tuple[str, ...]:
+        # Durable claims/order identities survive stale legacy ABORTED transitions.
         with connection(self.path) as db:
-            rows = db.execute("SELECT intent_id FROM live_trade_intents WHERE status IN ('SUBMITTING','UNKNOWN','NEW','PARTIALLY_FILLED','FILLED') ORDER BY created_at_ms").fetchall()
-        return tuple(str(row["intent_id"]) for row in rows)
+            rows = db.execute("SELECT intent_id FROM live_trade_intents ORDER BY created_at_ms").fetchall()
+        return tuple(str(row["intent_id"]) for row in rows
+                     if self.has_existing_side_effect(str(row["intent_id"])))
+
+    def has_existing_side_effect(self, intent_id: str) -> bool:
+        """Whether an intent must reconcile before any new-entry gates run."""
+        with connection(self.path) as db:
+            row = db.execute("SELECT status FROM live_trade_intents WHERE intent_id=?", (intent_id,)).fetchone()
+            if row is None:
+                return False
+            tables = {r["name"] for r in db.execute(
+                "SELECT name FROM sqlite_master WHERE type='table' "
+                "AND name IN ('live_execution_claims','live_execution_orders','live_protection_owners')"
+            ).fetchall()}
+            if row["status"] in {"FILLED", "CANCELED", "EXPIRED", "REJECTED", "ABORTED"} and "live_protection_owners" in tables:
+                released = db.execute("SELECT intent_hash FROM live_protection_owners WHERE intent_id=? AND status='RELEASED'",
+                                      (intent_id,)).fetchone()
+                persisted = self.get_intent(intent_id)
+                if released is not None and persisted is not None and released["intent_hash"] == persisted.intent_hash:
+                    return False
+            if row["status"] in {"SUBMITTING", "UNKNOWN", "NEW", "PARTIALLY_FILLED", "FILLED"}:
+                return True
+            if "live_execution_claims" in tables and db.execute(
+                "SELECT 1 FROM live_execution_claims WHERE intent_id=? LIMIT 1", (intent_id,)
+            ).fetchone() is not None:
+                return True
+            return "live_execution_orders" in tables and db.execute(
+                "SELECT 1 FROM live_execution_orders WHERE intent_id=? AND is_protective=0 LIMIT 1",
+                (intent_id,),
+            ).fetchone() is not None
 
     def update_status(self, intent_id: str, new_status: str, reason: str = "", now_ms: int = 0) -> None:
         with connection(self.path) as db:

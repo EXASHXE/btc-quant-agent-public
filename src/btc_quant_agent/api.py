@@ -8,7 +8,7 @@ from contextlib import asynccontextmanager
 from typing import TYPE_CHECKING
 
 from . import __version__
-from .config import load_config
+from .config import LiveV1Config, load_config
 from .explain import explain_signal
 from .service import QuantService
 
@@ -48,6 +48,11 @@ def create_app(
     live_service: TacticalLiveService | None = None,
     live_runtime: LiveV1Runtime | None = None,
 ) -> FastAPI:
+    live_config = LiveV1Config.from_env()
+    runtime_requested = live_config.normalized_mode == "B4_RUNTIME"
+    runtime_mode = live_runtime is not None or runtime_requested
+    b3_mode = (live_service is not None or live_config.normalized_mode == "B3_CONTROL") and not runtime_mode
+
     @asynccontextmanager
     async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
         if live_runtime is not None:
@@ -66,17 +71,11 @@ def create_app(
     )
     service = QuantService.create(load_config())
 
-    runtime_requested = os.getenv("BTC_QUANT_LIVE_V1_RUNTIME_ENABLED", "false") == "true"
-    runtime_mode = live_runtime is not None or runtime_requested
-    b3_mode = (live_service is not None or os.getenv("BTC_QUANT_LIVE_V1_ENABLED", "false") == "true") and not runtime_mode
-
     if b3_mode or runtime_mode:
         from .approval.callback import create_callback_app
-        from .config import LiveV1Config
         from .decision.service import TacticalLiveService
         from .market_watch.service import MarketWatchService
 
-        live_config = LiveV1Config.from_env()
         live = live_service or (live_runtime.tactical_service if live_runtime is not None else None) or TacticalLiveService.from_config(
             live_config,
             MarketWatchService.create(service.config.market_watch, service.config.data),

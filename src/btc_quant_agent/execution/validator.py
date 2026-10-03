@@ -12,7 +12,7 @@ if TYPE_CHECKING:
 from ..account_watch.models import AccountSnapshotV1
 from ..approval.store import LiveStore
 from ..decision.models import CasePackageV1, content_hash
-from ..decision.risk import RiskPolicyV1
+from ..decision.risk import RiskPolicyV1, remaining_loss_headroom, worst_case_loss_rate
 from ..live_db import connection
 from ..live_market.models import MarketObservationV1
 from ..position_supervisor.kill_switch import KillSwitch
@@ -80,6 +80,8 @@ class PreExecutionValidator:
 
         if case.case_hash != intent.case_hash:
             return ValidationResult(is_valid=False, reason="CASE_HASH_MISMATCH")
+        if proposal.proposal_id != intent.proposal_id:
+            return ValidationResult(False, "PROPOSAL_ID_MISMATCH")
         if proposal.proposal_hash != intent.proposal_hash:
             return ValidationResult(is_valid=False, reason="PROPOSAL_HASH_MISMATCH")
         if now_ms >= case.expires_at_ms or now_ms >= proposal.expires_at_ms:
@@ -172,10 +174,7 @@ class PreExecutionValidator:
             return ValidationResult(is_valid=False, reason="INSUFFICIENT_MARGIN")
         if account_snapshot.margin_used_usdt + margin_required > account_snapshot.equity_usdt * self.risk_policy.max_margin_utilization:
             return ValidationResult(False, "MARGIN_UTILIZATION_CAP_EXCEEDED")
-        stop_fraction = abs(intent.price - intent.stop_loss) / intent.price
-        costs = (self.risk_policy.round_trip_fee_bps + self.risk_policy.slippage_bps
-                 + max(self.risk_policy.funding_buffer_bps, abs(case.funding_rate or 0) * 10000)) / 10000
-        max_loss = notional * (stop_fraction + costs)
+        max_loss = notional * worst_case_loss_rate(intent.price, intent.stop_loss, self.risk_policy, case.funding_rate)
         current_risk_cap = min(proposal.risk_budget_usdt, self.risk_policy.max_trade_risk_usdt,
                                account_snapshot.equity_usdt * self.risk_policy.max_trade_risk_pct)
         if max_loss > current_risk_cap + 1e-9:
@@ -194,6 +193,22 @@ class PreExecutionValidator:
         )
         if account_snapshot.drawdown_pct >= max_drawdown:
             return ValidationResult(is_valid=False, reason="DRAWDOWN_CAP_REACHED")
+
+        try:
+            remaining_daily, remaining_drawdown = remaining_loss_headroom(
+                equity=account_snapshot.equity_usdt, peak_equity=account_snapshot.peak_equity_usdt,
+                daily_loss=account_snapshot.daily_loss_usdt, daily_cap=max_daily_loss,
+                drawdown_cap=max_drawdown,
+            )
+            expected_drawdown = 1 - account_snapshot.equity_usdt / account_snapshot.peak_equity_usdt
+            if abs(expected_drawdown - account_snapshot.drawdown_pct) > 1e-8:
+                return ValidationResult(False, "ACCOUNT_EQUITY_INCONSISTENT")
+        except ValueError:
+            return ValidationResult(False, "ACCOUNT_EQUITY_INCONSISTENT")
+        if max_loss > remaining_daily + 1e-9:
+            return ValidationResult(False, "DAILY_LOSS_HEADROOM_EXCEEDED")
+        if max_loss > remaining_drawdown + 1e-9:
+            return ValidationResult(False, "DRAWDOWN_HEADROOM_EXCEEDED")
 
         # Symbol & portfolio exposure headroom recalculated against current account snapshot
         current_symbol_exp = sum(
@@ -239,6 +254,10 @@ class PreExecutionValidator:
             ):
                 return ValidationResult(is_valid=False, reason="CONFLICTING_POSITION_EXISTS")
 
+        if any(pos.symbol == intent.symbol and pos.quantity != 0 for pos in account_snapshot.positions):
+            # V1 explicitly forbids aggregation with manual or earlier same-symbol risk.
+            return ValidationResult(False, "CURRENT_POSITION_OWNER_CONFLICT")
+
         # 9. Market data verification
         if market_obs.symbol != intent.symbol:
             return ValidationResult(is_valid=False, reason="MARKET_SYMBOL_MISMATCH")
@@ -250,6 +269,10 @@ class PreExecutionValidator:
             return ValidationResult(False, "MARKET_DATA_FUTURE")
         if (now_ms - market_obs.receipt_timestamp_ms) > self.max_market_staleness_ms:
             return ValidationResult(is_valid=False, reason="MARKET_DATA_STALE")
+
+        component_reason = market_obs.freshness_reason(now_ms, self.max_market_staleness_ms)
+        if component_reason:
+            return ValidationResult(False, component_reason)
 
         effective_max_spread = min(self.max_spread_bps, float(self.risk_policy.max_spread_bps))
         if market_obs.spread_bps > effective_max_spread:
@@ -310,7 +333,8 @@ class PreExecutionValidator:
         return ValidationResult(is_valid=True, reason="OK")
 
     def authorize(self, intent_id: str, market_obs: MarketObservationV1,
-                  account_snapshot: AccountSnapshotV1, now_ms: int) -> PreExecutionAuthorizationV1:
+                  account_snapshot: AccountSnapshotV1, now_ms: int,
+                  *, expires_at_ms: int | None = None) -> PreExecutionAuthorizationV1:
         from .authorization import AuthorizationStore
         from .guard import ExecutionBlocked
 
@@ -325,7 +349,10 @@ class PreExecutionValidator:
         proposal = self.live_store.get_proposal(intent.proposal_hash)
         case = self.live_store.get_case(intent.case_id)
         executable = compile_executable_intent_fields(case, proposal, account_snapshot, self.risk_policy)
+        component_times = [getattr(market_obs, f"{component}_{kind}_timestamp_ms")
+                           for component in ("mark", "book", "kline") for kind in ("source", "receipt")]
         expires = min(intent.expires_at_ms, now_ms + 5000,
-                      market_obs.receipt_timestamp_ms + self.max_market_staleness_ms,
+                      expires_at_ms if expires_at_ms is not None else intent.expires_at_ms,
+                      *(int(t) + self.max_market_staleness_ms for t in component_times if t is not None),
                       account_snapshot.observed_at_ms + self.max_account_staleness_ms)
         return AuthorizationStore(self.intent_store.path).issue(intent, account_snapshot, market_obs, executable, now_ms, expires)

@@ -53,6 +53,25 @@ class RiskPolicyV1(ImmutableModel):
         return content_hash(self.model_dump(mode="json"))
 
 
+def remaining_loss_headroom(*, equity: float, peak_equity: float,
+                            daily_loss: float, daily_cap: float,
+                            drawdown_cap: float) -> tuple[float, float]:
+    """Current equity already includes losses; subtract each budget exactly once."""
+    if (not all(math.isfinite(x) for x in (equity, peak_equity, daily_loss, daily_cap, drawdown_cap))
+            or equity <= 0 or peak_equity < equity or daily_loss < 0
+            or not 0 < drawdown_cap <= 1):
+        raise ValueError("ACCOUNT_EQUITY_INCONSISTENT")
+    return (max(0.0, daily_cap - daily_loss),
+            max(0.0, equity - peak_equity * (1 - drawdown_cap)))
+
+
+def worst_case_loss_rate(entry: float, stop: float, policy: RiskPolicyV1,
+                         funding_rate: float | None) -> float:
+    return (abs(entry - stop) / entry
+            + (policy.round_trip_fee_bps + policy.slippage_bps) / 10000
+            + max(policy.funding_buffer_bps / 10000, abs(funding_rate or 0)))
+
+
 class RiskCompilerV1:
     """Deterministic simulation sizing. Model advice can only reduce or block risk."""
 
@@ -120,16 +139,14 @@ class RiskCompilerV1:
         entry = case.entry_high if long else case.entry_low
         # All costs are adverse, including funding; rebates never expand risk.
         funding_rate = max(p.funding_buffer_bps / 10000, abs(case.funding_rate or 0))
-        loss_rate = (
-            abs(entry - case.stop_loss) / entry if entry > 0 else 1.0
-        ) + p.round_trip_fee_bps / 10000 + p.slippage_bps / 10000 + funding_rate
+        loss_rate = worst_case_loss_rate(entry, case.stop_loss, p, case.funding_rate)
         risk = min(p.max_trade_risk_usdt, equity * p.max_trade_risk_pct)
         if account:
-            remaining_daily = max(0.0, equity * p.max_daily_loss_pct - account.daily_loss_usdt)
-            remaining_drawdown = max(
-                0.0, equity / (1 - account.drawdown_pct)
-                * (p.drawdown_kill_pct - account.drawdown_pct),
-            ) if account.drawdown_pct < p.drawdown_kill_pct else 0.0
+            remaining_daily, remaining_drawdown = remaining_loss_headroom(
+                equity=equity, peak_equity=equity / (1 - account.drawdown_pct),
+                daily_loss=account.daily_loss_usdt, daily_cap=equity * p.max_daily_loss_pct,
+                drawdown_cap=p.drawdown_kill_pct,
+            )
             risk = min(risk, remaining_daily, remaining_drawdown)
         if analysis.risk_modifier == "REDUCE":
             risk *= p.reduced_risk_fraction

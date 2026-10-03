@@ -1,13 +1,12 @@
 {
-  "task": "LIVE_V1_B4_R2_1_ENTRY_SURFACE_AND_CAPABILITY_SEAL",
+  "task": "LIVE_V1_B4_B5_FINDINGS_REPAIR_R3",
   "repository": "EXASHXE/btc-quant-agent-public",
   "task_branch": "feature/b-line-live-v1",
   "start_binding_mode": "CURRENT_BRANCH_HEAD",
-  "actual_start_sha": "99831b09ff5444409e9f342df78c1c78e4f0fc51",
-  "reviewed_candidate_sha": "99831b09ff5444409e9f342df78c1c78e4f0fc51",
+  "actual_start_sha": "937b2b26518ceea0952a7e17279cc42924c88848",
   "accepted_predecessor_sha": "961a0f4d4b37cdb9365d5e5867813ff3129c14db",
   "predecessor_ancestry": "IS_ANCESTOR_VERIFIED",
-  "parent_sha": "99831b09ff5444409e9f342df78c1c78e4f0fc51",
+  "parent_sha": "937b2b26518ceea0952a7e17279cc42924c88848",
   "initial_worktree_state": "CLEAN",
   "closed_blockers": {
     "R1_01_approval_intent_singleton": {
@@ -20,19 +19,19 @@
     },
     "R1_03_preexec_revalidation": {
       "status": "CLOSED",
-      "mechanism": "PreExecutionValidator verifies active proposal on case, approval record actor and recomputed content_hash, distinguishes compile snapshot vs fresh reconciled current snapshot, recalculates RiskPolicy authority & risk limits (daily loss, drawdown, symbol/portfolio exposure, available margin, position counts, open orders), checks Tactical validity provider (fails closed with TACTICAL_VALIDITY_UNAVAILABLE if missing in TESTNET), and prevents local duplicate client_order_id"
+      "mechanism": "Approved executable compilation and current account/risk revalidation, including remaining loss headroom, forced placement-time REST, independent component freshness and backend clock expiry."
     },
     "R1_04_delayed_fill_protection": {
       "status": "CLOSED",
-      "mechanism": "reconcile_intent and submit_intent query exchange open protective orders; if filled_qty > 0 and no protection exists, places protective stop for filled_qty; if existing protection < filled_qty, cancels smaller order and places resized order for full filled_qty; exchange query uncertainty trips KillSwitch and fails closed; protection quantity never exceeds position quantity"
+      "mechanism": "Delayed fill and current position reconciliation use exact persisted owner identity and validate full reduce-only stop contract; uncertain or missing protection fails closed and trips kill switch."
     },
     "R1_05_supervisor_orchestration": {
       "status": "CLOSED",
-      "mechanism": "real execution coordinator (LiveExecutionService.execute_approved_intent and reconcile_intent) orchestrates post-fill PositionObservationV1 directly into PositionSupervisor.process; converts material PositionEvent to PositionCase and delivers to AnalysisService; durable live_position_case_dispatches prevents duplicate analysis across restarts; source-bound market/Tactical inputs are explicitly nullable without neutral masquerade"
+      "mechanism": "Runtime TESTNET supervision uses authoritative account observations; DRY_RUN coordinator may emit simulated fill observations. Frozen material outbox preserves case reservation and provider idempotency."
     },
     "R1_06_short_position_open": {
       "status": "CLOSED",
-      "mechanism": "PositionSupervisor.evaluate triggers POSITION_OPENED on previous_quantity == 0.0 and quantity != 0.0; supports both long (quantity > 0) and short (quantity < 0) positions with durable open-state tracking and deduplication"
+      "mechanism": "Durable account/symbol/BOTH lifecycle recognizes flat/open/close and direct long/short reversal; source dedupe and atomic event outbox survive restart."
     },
     "R1_1_01_durable_position_case_recovery": {
       "status": "CLOSED",
@@ -40,7 +39,7 @@
     },
     "R1_1_02_protection_uses_current_open_position": {
       "status": "CLOSED",
-      "mechanism": "protective reconciliation queries authoritative current position risk from exchange (handling One-Way and Hedge modes); target protection quantity is strictly min(current open position, relevant entry fill, intent.quantity) and never exceeds actual open position; if open position is flat (<= 0.0), cancels stale protection without placing new order; position query failure or unsupported mode trips KillSwitch and fails closed; DryRun backend supports open_position_provider"
+      "mechanism": "One-way current position queried; unsupported hedge mode blocked. Only exact owned stops may be resized/canceled, and protection never exceeds actual open or approved filled quantity."
     },
     "R1_1_03_signed_client_isolated_testnet_authority": {
       "status": "CLOSED",
@@ -92,22 +91,53 @@
     "autonomous": "HARD_BLOCKED"
   },
   "quality_gates": {
-    "compileall": "PASS: python -m compileall -q src tests",
-    "git_diff_check": "PASS: git diff --check",
+    "compileall": "PASS: Python 3.12 compileall -q src tests",
+    "git_diff_check": "PASS",
     "ruff": "PASS: ruff check .",
-    "mypy": "PASS: mypy src (150 source files)",
+    "mypy": "PASS: mypy src (151 source files)",
+    "focused_tests": {
+      "passed": 544,
+      "failed": 0,
+      "seconds": 45.62
+    },
     "live_v1_tests": {
-      "passed": 214,
+      "passed": 278,
       "failed": 0
     },
-    "execution_tests": {
-      "passed": 70,
+    "r3_focused_tests": {
+      "passed": 64,
+      "failed": 0
+    },
+    "b3_regressions": {
+      "passed": 75,
+      "failed": 0
+    },
+    "existing_execution": {
+      "passed": 44,
+      "failed": 0
+    },
+    "api": {
+      "passed": 4,
+      "failed": 0
+    },
+    "market_watch": {
+      "passed": 137,
+      "failed": 0
+    },
+    "b2a_regressions": {
+      "passed": 55,
+      "failed": 0
+    },
+    "r02_governance": {
+      "passed": 26,
       "failed": 0
     },
     "full_pytest": {
-      "passed": 2223,
+      "passed": 2287,
       "skipped": 2,
-      "warnings": 9
+      "failed": 0,
+      "warnings": 8,
+      "seconds": 839.07
     }
   },
   "fences": {
@@ -120,11 +150,148 @@
   "live_write_count": 0,
   "secret_isolation": "no API keys or HMAC secrets in snapshots, intents, events, or logs; errors sanitized",
   "provider_smoke_status": {
-    "credentialed_openai_responses_smoke": "PENDING (credentials absent)",
-    "credentialed_feishu_smoke": "PENDING (credentials absent)",
-    "actual_codex_model_invocation": "PENDING (credentials absent)",
-    "testnet_credentialed_exchange_smoke": "PENDING (credentials absent)"
+    "credentialed_openai_responses_smoke": "NOT_RUN_CREDENTIALS_UNAVAILABLE",
+    "credentialed_feishu_smoke": "NOT_RUN_CREDENTIALS_UNAVAILABLE",
+    "actual_codex_model_invocation": "NOT_RUN_MODEL_UNCONFIGURED",
+    "testnet_credentialed_exchange_smoke": "NOT_RUN_CREDENTIALS_UNAVAILABLE"
   },
-  "remaining_blockers": "None. All R1, R1.1, R1.2, R2, and R2.1 safety blockers closed. Real-money LIVE execution remains permanently forbidden.",
-  "decision": "LIVE_V1_B4_R2_1_SEALED_PENDING_B5_REVALIDATION"
+  "remaining_blockers": [],
+  "decision": "LIVE_V1_B4_B5_FINDINGS_REPAIRED_R3_PENDING_B5_REVALIDATION",
+  "failed_b5_target": "937b2b26518ceea0952a7e17279cc42924c88848",
+  "runtime": {
+    "python": "3.12.3",
+    "import_path": "/root/workspace/project/Quant-agent-market-watch/src/btc_quant_agent/__init__.py",
+    "dependencies": {
+      "openai": "2.54.0",
+      "pydantic": "2.13.5",
+      "fastapi": "0.141.1",
+      "uvicorn": "0.54.0",
+      "httpx": "0.28.1",
+      "websockets": "16.1.1",
+      "pytest": "8.4.2",
+      "ruff": "0.16.9",
+      "mypy": "1.20.2"
+    }
+  },
+  "tested_source_digest": "033e27ec74c85898bd690c336a36e6b3be3fe02395c85cda3eabbdd3350b75d9",
+  "tested_source_files": {
+    "src/btc_quant_agent/account_watch/service.py": "738cb81f869e494dc5d72719a210055de08986e5248d42542383f89a149e1f78",
+    "src/btc_quant_agent/api.py": "08119fe43d1480bf33703f3156eddc4e00a78a730668d3b28d09965f5fda643c",
+    "src/btc_quant_agent/config.py": "a099dd776dbad675b9be3da62b758bcc24893d2bb9728e5df2de18d37a0299bb",
+    "src/btc_quant_agent/decision/risk.py": "74149df66852552a404f031e914e5b9180d7d7e2dd3b15730f44d7acb7d3c628",
+    "src/btc_quant_agent/execution/authorization.py": "1cb5197c6ca06e86429915a50df59e61b998c97c16673ab18f55f3edf592ab89",
+    "src/btc_quant_agent/execution/backend.py": "d44d61ba5a29cc964263ddd80b427afeb7b4d4cdf9fc90a9ebae1bc44a96fda3",
+    "src/btc_quant_agent/execution/executor.py": "a66584b6e9229c36a3f2c34cf1984f1eb5d5c7133991b74dc84f0140ca956c20",
+    "src/btc_quant_agent/execution/intents.py": "57d09735ea576a9d17b8b6ce192e4271713a9abc9ccd37a9f856875da0c16885",
+    "src/btc_quant_agent/execution/protection.py": "a1635caf4344924533ed7f1af04f18f253cb4f51bbb4d0dc41c07a9c81d12f40",
+    "src/btc_quant_agent/execution/validator.py": "ff9416e15d48ded2e7fb06823ff494b53f685a235d49045d0789822aaf43e1c5",
+    "src/btc_quant_agent/live_market/models.py": "22c4d700de64d94b6474d3d3e006292926d7892a149e03e055f79912d6bea2dd",
+    "src/btc_quant_agent/live_market/service.py": "e52913c0b4bd14825fca028e47f7df32c84c91436328e933b6baead20e31a517",
+    "src/btc_quant_agent/live_runtime.py": "3b892394d3e676500b66155a7eea049fb4d425a48f0c52a67da529ae7c3b9302",
+    "src/btc_quant_agent/position_supervisor/models.py": "8805a80def8e98ca1f0be2674f3eb526272ff7e79bdce69f28c3701ba93ae11b",
+    "src/btc_quant_agent/position_supervisor/supervisor.py": "c765c80b85678ef4860a4875476f743316bf1cab008f3b593c6359fe47829553",
+    "tests/test_live_v1_account_watch.py": "c8f43ee7418c4e08126c71f4a73f11d4ceb65275e7e520b2b90e95ec071ee48f",
+    "tests/test_live_v1_day2_e2e.py": "c69e0a05f2490af5c1ad6a8ae8f4773358b80da9ae106acc51dd3bb088d8428e",
+    "tests/test_live_v1_execution_authorization_r2.py": "d3d48faabe0ecc973b1b2e401db86924157cc76403cb7cf6563c6a121c17e6d1",
+    "tests/test_live_v1_execution_backend.py": "e3098fe05ee1eeebcede0aec16d3c24cf3a7b26019b0e22f538cce93ec06b1b6",
+    "tests/test_live_v1_execution_identity_r3.py": "abd0e5acf85a9f6f1d66972293bc1d4f17b0bbf0a5a1163b6f5ea5676c1c5ab3",
+    "tests/test_live_v1_execution_placement_r3.py": "19f45a28f03010fb762a41890ba077b9e2118ccb94076469ce23d85c1047ceb9",
+    "tests/test_live_v1_execution_protection_r3.py": "8563d8f58907375a49f52c2cec075cad8aa3395e9a12b4d073f6ce019b6863b3",
+    "tests/test_live_v1_execution_recovery_r3.py": "f0438dbedd76bc1ce47b1605add042b3b32779cdaca810236adc1261a1b99be3",
+    "tests/test_live_v1_execution_validator.py": "f2497232a528b86961f9e5b5e6b798da6ef378cbe72c4f4f4e696e6030007668",
+    "tests/test_live_v1_position_supervisor.py": "d892749f8b41589f7e854ad031d06005389addd0617df54a1102308406b3fc2b",
+    "tests/test_live_v1_runtime_r2.py": "b303836237a8209abdfb4721dc146c3fc2479bd4cf480f5683d9bee5fa1c10d6",
+    "tests/test_live_v1_runtime_recovery_r3.py": "840e1b4d56c157a99de26b046a2010a9a646a0f3163c0eb9acd6c3b00c661c72"
+  },
+  "r3_safety_layers": {
+    "placement_authority": {
+      "R3_01": "backend clock gates; forced REST before setup and after setup; immutable fresh receipt under singleton claim; original expiry retained; final persisted receipt reload + risk validation; cancellation stays owned until durable result",
+      "R3_03": "shared conservative stop+fee+slippage+funding math; current risk <= remaining daily cap and current equity minus peak-equity drawdown floor; inconsistent peak rejected"
+    },
+    "execution_identity_and_ownership": {
+      "R3_02": "exact persisted owner hash and protective client ID; symbol/BOTH active-owner singleton; unknown/malformed protective contracts rejected; same-symbol existing position excluded from new entry; terminal flat owners retired and cannot adopt a later position",
+      "R3_04": "shared canonical intent/idempotency/client ID helper; recomputed self-hash cannot legitimize noncanonical IDs; persisted row/payload checks"
+    },
+    "runtime_recovery_authority": {
+      "R3_05": "durable claims/orders reconcile before new-entry TTL/Tactical/kill gates; absent claimed entry never blindly resubmitted; proven pre-entry abort can retire only after absent and flat reads; old ABORTED claim remains recoverable",
+      "R3_06": "account/symbol/BOTH lifecycle atomically stores every flat/nonflat observation and material outbox; direct reversal emits close/open; legacy state requires verified sole-account latest-snapshot binding",
+      "R3_07": "mark/book/kline each have source and receipt timestamps, hash and connected authority; every component must meet the configured max age (10s in validation fixtures, 15s runtime default)",
+      "R3_08": "API consumes one parsed LiveV1Config normalized mode; B4 takes precedence over B3; host REST read-only; authenticated Feishu callback remains separate; TESTNET explicit opt-in; LIVE/AUTONOMOUS invalid"
+    }
+  },
+  "review_followups": [
+    "strict explicit exchange entry identity fields",
+    "complete protective contract checks",
+    "exclude manual same-symbol risk aggregation",
+    "repeated execution and shutdown cancellation stays owned",
+    "retire terminal flat owners before later same-symbol activity",
+    "direct one-way sign reversals durably emit both lifecycle edges",
+    "verified legacy lifecycle migration without silent account reassignment"
+  ],
+  "required_final_safety_state": {
+    "LIVE_WRITE_AUTHORITY": "NONE",
+    "REAL_FUNDS_WRITE_COUNT": 0,
+    "AUTONOMOUS_LIVE": "FORBIDDEN",
+    "PUBLIC_REST_MUTATION_SURFACES": 0,
+    "PRODUCTION_CAPABILITY_BYPASS": 0
+  },
+  "side_effects": {
+    "external_exchange_writes": 0,
+    "live_endpoint_writes": 0,
+    "real_funds_writes": 0,
+    "testnet_network_writes": 0,
+    "validation_scope": "LOCAL_SOURCE_AND_HERMETIC_MOCK_TESTS_ONLY",
+    "proof": "existing repository-wide network/signed-client guards, negative mock call-count assertions, B4 route matrix and signed capability regressions"
+  },
+  "operational_limitations": [
+    "legacy executable rows with noncanonical identity fail closed",
+    "legacy protective orders without an exact owner ledger fail closed; no prefix-based adoption",
+    "hedge mode and aggregate same-symbol ownership unsupported and blocked",
+    "network provider and TESTNET smokes not run; no production provider integration claim",
+    "fresh Controller B5 EXACT_CODE_SHA revalidation required; real-funds authority remains NONE"
+  ],
+  "evidence_binding": "EXACT_PARENT_SHA_PLUS_TESTED_SOURCE_SHA256_DIGEST; final code SHA supplied by commit seal",
+  "full_suite_skip_cases": [
+    {
+      "case": "tests.test_v051_h40_p3_controller_authority_publication.test_p3_11_production_readiness_chain_with_real_local_data",
+      "reason": "Requires non-protected local ETHUSDT.parquet (omitted from git / remote CI)"
+    },
+    {
+      "case": "tests.test_v051_h40_p3_controller_authority_publication.test_p3_12_run_grant_negative_bindings_fail_closed",
+      "reason": "Requires non-protected local ETHUSDT.parquet (omitted from git / remote CI)"
+    }
+  ],
+  "next_state": "FRESH_B5_EXACT_CODE_SHA_REVALIDATION_REQUIRED",
+  "docs_publication": "NOT_REQUESTED_NOT_PERFORMED; v0.5.5-docs untouched",
+  "remote_ci": "PENDING_FINAL_SHA_PUBLICATION; historical A34 shallow-checkout debt must be verified on exact final target",
+  "changed_files": [
+    "evidence/v0.5.5/live_v1/B4_DAY2_VALIDATION.json",
+    "src/btc_quant_agent/account_watch/service.py",
+    "src/btc_quant_agent/api.py",
+    "src/btc_quant_agent/config.py",
+    "src/btc_quant_agent/decision/risk.py",
+    "src/btc_quant_agent/execution/authorization.py",
+    "src/btc_quant_agent/execution/backend.py",
+    "src/btc_quant_agent/execution/executor.py",
+    "src/btc_quant_agent/execution/intents.py",
+    "src/btc_quant_agent/execution/protection.py",
+    "src/btc_quant_agent/execution/validator.py",
+    "src/btc_quant_agent/live_market/models.py",
+    "src/btc_quant_agent/live_market/service.py",
+    "src/btc_quant_agent/live_runtime.py",
+    "src/btc_quant_agent/position_supervisor/models.py",
+    "src/btc_quant_agent/position_supervisor/supervisor.py",
+    "tests/test_live_v1_account_watch.py",
+    "tests/test_live_v1_day2_e2e.py",
+    "tests/test_live_v1_execution_authorization_r2.py",
+    "tests/test_live_v1_execution_backend.py",
+    "tests/test_live_v1_execution_identity_r3.py",
+    "tests/test_live_v1_execution_placement_r3.py",
+    "tests/test_live_v1_execution_protection_r3.py",
+    "tests/test_live_v1_execution_recovery_r3.py",
+    "tests/test_live_v1_execution_validator.py",
+    "tests/test_live_v1_position_supervisor.py",
+    "tests/test_live_v1_runtime_r2.py",
+    "tests/test_live_v1_runtime_recovery_r3.py"
+  ]
 }

@@ -113,7 +113,7 @@ def test_only_material_new_event_invokes_existing_analysis(tmp_path):
         supervisor = PositionSupervisor(
             tmp_path / "live.db", analysis_service=Spy(), fresh_market_case=lambda _: market_case(),
         )
-        ordinary = observation(previous_quantity=1.0)
+        ordinary = observation(previous_quantity=0.0, quantity=0.0)
         assert await supervisor.process(ordinary, NOW) == ()
         assert not calls
         assert await supervisor.process(observation(), NOW)

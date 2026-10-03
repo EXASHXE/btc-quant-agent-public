@@ -30,13 +30,15 @@ def _runtime(*, mode: str = "DRY_RUN", pending: tuple[str, ...] = ()) -> LiveV1R
             reconciled=True, quality="OK", positions=(), orders=(), snapshot_hash="account")),
     )
     execution = SimpleNamespace(reconcile_intent=AsyncMock(), execute_approved_intent=AsyncMock())
-    supervisor = SimpleNamespace(drain_pending_dispatches=AsyncMock())
+    supervisor = SimpleNamespace(drain_pending_dispatches=AsyncMock(),
+                                 current_quantity=Mock(return_value=0.0))
     kill = SimpleNamespace(allows_new_risk=Mock(return_value=True))
     runtime = LiveV1Runtime(
         config=LiveV1Config(runtime_enabled=True, execution_mode=mode,
                             testnet_execution_enabled=mode == "TESTNET"),
         tactical_service=SimpleNamespace(), market_stream=market, account_watch=account,
-        intent_store=SimpleNamespace(unfinished_intent_ids=Mock(return_value=pending)),
+        intent_store=SimpleNamespace(unfinished_intent_ids=Mock(return_value=pending),
+                                     has_existing_side_effect=Mock(return_value=False)),
         execution_service=execution, supervisor=supervisor, kill_switch=kill,
     )
     return runtime
@@ -137,6 +139,7 @@ def test_position_poll_uses_account_quantity_and_previous_quantity():
         take_profit_1=110.0, client_order_id="client-1",
         environment="DRY_RUN", account_authority="DEFAULT_ACCOUNT"))
     runtime.supervisor.process = AsyncMock(return_value=())
+    runtime.supervisor.current_quantity.side_effect = (0.0, 0.25)
 
     async def run():
         await runtime.poll_positions(1_700_000_000_000)
@@ -344,8 +347,8 @@ def test_b4_runtime_host_api_governance_matrix(tmp_path, monkeypatch):
     assert not any(p.startswith("/live-v1/runtime/") for p, _ in routes_env)
 
     # R2.1.1-A04: Both legacy B3 enabled + runtime enabled -> runtime mode takes precedence and remains host-read-only
-    monkeypatch.setenv("BTC_QUANT_LIVE_V1_ENABLED", "true")
-    monkeypatch.setenv("BTC_QUANT_LIVE_V1_RUNTIME_ENABLED", "true")
+    monkeypatch.setenv("BTC_QUANT_LIVE_V1_ENABLED", "TRUE")
+    monkeypatch.setenv("BTC_QUANT_LIVE_V1_RUNTIME_ENABLED", "TRUE")
     app_both = api.create_app()
     routes_both = _all_routes(app_both)
     for path, method in routes_both:

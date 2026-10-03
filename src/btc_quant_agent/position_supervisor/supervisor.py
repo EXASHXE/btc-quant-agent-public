@@ -10,6 +10,7 @@ from collections.abc import Callable
 from pathlib import Path
 from typing import Any
 
+from ..account_watch.models import AccountSnapshotV1
 from ..decision.models import CasePackageV1
 from ..live_db import connection
 from .models import PositionEventV1, PositionObservationV1, SupervisorPolicyV1
@@ -110,6 +111,21 @@ class PositionSupervisor:
                     is_open INTEGER NOT NULL DEFAULT 0,
                     last_opened_at_ms INTEGER NOT NULL DEFAULT 0
                 );
+                CREATE TABLE IF NOT EXISTS live_position_lifecycle (
+                    account_id TEXT NOT NULL,
+                    symbol TEXT NOT NULL,
+                    position_side TEXT NOT NULL,
+                    quantity REAL NOT NULL,
+                    is_open INTEGER NOT NULL,
+                    last_transition TEXT NOT NULL,
+                    last_transition_at_ms INTEGER NOT NULL,
+                    observed_at_ms INTEGER NOT NULL,
+                    source_hash TEXT NOT NULL,
+                    PRIMARY KEY (account_id, symbol, position_side)
+                );
+                CREATE TABLE IF NOT EXISTS live_position_observed_sources (
+                    source_hash TEXT PRIMARY KEY
+                );
                 CREATE TABLE IF NOT EXISTS live_position_case_dispatches (
                     event_id TEXT PRIMARY KEY,
                     event_hash TEXT NOT NULL UNIQUE,
@@ -137,33 +153,87 @@ class PositionSupervisor:
 
             # 1. Exact source deduplication
             existing = db.execute(
-                "SELECT 1 FROM live_position_events WHERE source_hash=? LIMIT 1",
+                "SELECT 1 FROM live_position_observed_sources WHERE source_hash=? LIMIT 1",
                 (obs.observation_hash,),
             ).fetchone()
             if existing is not None:
                 return ()
 
             active_row = db.execute(
-                "SELECT is_open FROM live_position_active WHERE symbol=?",
-                (obs.symbol,),
+                "SELECT quantity, is_open, last_transition, last_transition_at_ms, observed_at_ms "
+                "FROM live_position_lifecycle WHERE account_id=? AND symbol=? AND position_side=?",
+                (obs.account_id, obs.symbol, obs.position_side),
             ).fetchone()
-            is_currently_open = bool(active_row and active_row["is_open"])
-
-            # Handle position closing update
-            if obs.quantity == 0.0 and is_currently_open:
-                db.execute(
-                    "UPDATE live_position_active SET is_open=0 WHERE symbol=?",
+            if active_row is not None and obs.observed_at_ms < active_row["observed_at_ms"]:
+                raise ValueError("POSITION_OBSERVATION_OUT_OF_ORDER")
+            legacy_row = None
+            if active_row is None:
+                legacy_row = db.execute(
+                    "SELECT is_open, last_opened_at_ms FROM live_position_active WHERE symbol=?",
                     (obs.symbol,),
-                )
-                is_currently_open = False
+                ).fetchone()
+            if legacy_row is not None:
+                table = db.execute(
+                    "SELECT 1 FROM sqlite_master WHERE type='table' AND name='live_account_snapshots'"
+                ).fetchone()
+                if table is None:
+                    raise ValueError("LEGACY_POSITION_ACCOUNT_BINDING_REQUIRED")
+                accounts = db.execute(
+                    "SELECT DISTINCT account_id FROM live_account_snapshots"
+                ).fetchall()
+                latest = db.execute(
+                    "SELECT snapshot_hash, payload FROM live_account_snapshots "
+                    "WHERE account_id=? ORDER BY observed_at_ms DESC, rowid DESC LIMIT 1",
+                    (obs.account_id,),
+                ).fetchone()
+                if len(accounts) != 1 or latest is None:
+                    raise ValueError("LEGACY_POSITION_ACCOUNT_BINDING_REQUIRED")
+                try:
+                    snapshot = AccountSnapshotV1.model_validate_json(latest["payload"])
+                except Exception as exc:
+                    raise ValueError("LEGACY_POSITION_ACCOUNT_BINDING_REQUIRED") from exc
+                if (snapshot.account_id != obs.account_id
+                        or snapshot.snapshot_hash != latest["snapshot_hash"]
+                        or snapshot.snapshot_hash != obs.account_snapshot_hash
+                        or legacy_row["is_open"] not in (0, 1)):
+                    raise ValueError("LEGACY_POSITION_ACCOUNT_BINDING_REQUIRED")
+                db.execute("DELETE FROM live_position_active WHERE symbol=?", (obs.symbol,))
+
+            previous = float(active_row["quantity"]) if active_row is not None else 0.0
+            was_open = (bool(active_row["is_open"]) if active_row is not None
+                        else bool(legacy_row["is_open"]) if legacy_row is not None else False)
+            transitions: list[str] = []
+            if was_open and obs.quantity == 0:
+                transitions.append("POSITION_CLOSED")
+            elif not was_open and obs.quantity != 0:
+                transitions.append("POSITION_OPENED")
+            elif active_row is not None and previous * obs.quantity < 0:
+                transitions.extend(("POSITION_CLOSED", "POSITION_OPENED"))
+            last_transition = (transitions[-1] if transitions else
+                               active_row["last_transition"] if active_row is not None else
+                               "POSITION_OPENED" if was_open else "")
+            last_transition_at = (now_ms if transitions else
+                                  active_row["last_transition_at_ms"] if active_row is not None else
+                                  legacy_row["last_opened_at_ms"] if was_open and legacy_row is not None else 0)
+            db.execute(
+                "INSERT INTO live_position_lifecycle VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) "
+                "ON CONFLICT(account_id, symbol, position_side) DO UPDATE SET "
+                "quantity=excluded.quantity, is_open=excluded.is_open, "
+                "last_transition=excluded.last_transition, "
+                "last_transition_at_ms=excluded.last_transition_at_ms, "
+                "observed_at_ms=excluded.observed_at_ms, source_hash=excluded.source_hash",
+                (obs.account_id, obs.symbol, obs.position_side, obs.quantity,
+                 int(obs.quantity != 0), last_transition, last_transition_at,
+                 obs.observed_at_ms, obs.observation_hash),
+            )
+            db.execute("INSERT INTO live_position_observed_sources VALUES (?)", (obs.observation_hash,))
 
             events: list[PositionEventV1] = []
 
             # 2. Check each trigger predicate
             triggers_to_check: list[str] = []
 
-            if obs.previous_quantity == 0.0 and obs.quantity != 0.0 and not is_currently_open:
-                triggers_to_check.append("POSITION_OPENED")
+            triggers_to_check.extend(transitions)
 
             if (
                 obs.order_status == "PARTIALLY_FILLED"
@@ -219,7 +289,7 @@ class PositionSupervisor:
                     "ORDER BY observed_at_ms DESC LIMIT 1",
                     (obs.symbol, trigger, now_ms, self.policy.cooldown_ms),
                 ).fetchone()
-                if recent is not None:
+                if recent is not None and trigger not in {"POSITION_OPENED", "POSITION_CLOSED"}:
                     continue
 
                 event = PositionEventV1.build(
@@ -228,7 +298,8 @@ class PositionSupervisor:
                     symbol=obs.symbol,
                     source_hash=obs.observation_hash,
                     observed_at_ms=now_ms,
-                    details={"mark_price": obs.mark_price, "quantity": obs.quantity},
+                    details={"mark_price": obs.mark_price,
+                             "quantity": 0.0 if trigger == "POSITION_CLOSED" else obs.quantity},
                 )
                 db.execute(
                     "INSERT INTO live_position_events VALUES (?, ?, ?, ?, ?, ?, ?)",
@@ -261,15 +332,19 @@ class PositionSupervisor:
                 )
                 events.append(event)
 
-                if trigger == "POSITION_OPENED":
-                    db.execute(
-                        "INSERT INTO live_position_active (symbol, is_open, last_opened_at_ms) "
-                        "VALUES (?, 1, ?) "
-                        "ON CONFLICT(symbol) DO UPDATE SET is_open=1, last_opened_at_ms=?",
-                        (obs.symbol, now_ms, now_ms),
-                    )
 
             return tuple(events)
+
+    def current_quantity(self, account_id: str, symbol: str, position_side: str = "BOTH") -> float:
+        if position_side != "BOTH":
+            raise ValueError("unsupported position side")
+        with connection(self.path) as db:
+            row = db.execute(
+                "SELECT quantity FROM live_position_lifecycle "
+                "WHERE account_id=? AND symbol=? AND position_side=?",
+                (account_id, symbol, position_side),
+            ).fetchone()
+        return float(row["quantity"]) if row is not None else 0.0
 
     def get_event(self, event_id: str) -> PositionEventV1 | None:
         with connection(self.path) as db:

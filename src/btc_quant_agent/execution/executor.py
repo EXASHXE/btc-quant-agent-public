@@ -22,6 +22,18 @@ from .intents import IntentStore, TradeIntentV1
 from .validator import PreExecutionValidator
 
 
+async def _await_owned_mutation(task: asyncio.Task[ExecutionReport]) -> tuple[ExecutionReport, asyncio.CancelledError | None]:
+    """Repeated cancellation cannot detach an in-flight exchange request."""
+    cancelled: asyncio.CancelledError | None = None
+    while True:
+        try:
+            return await asyncio.shield(task), cancelled
+        except asyncio.CancelledError as exc:
+            if task.cancelled():
+                raise
+            cancelled = exc
+
+
 class LiveExecutionService:
     def __init__(
         self,
@@ -82,6 +94,8 @@ class LiveExecutionService:
 
         return PositionObservationV1.build(
             account_snapshot_hash=account_snap.snapshot_hash,
+            account_id=account_snap.account_id,
+            position_side="BOTH",
             market_source_hash=market_obs.observation_hash,
             symbol=intent.symbol,
             observed_at_ms=now_ms,
@@ -115,6 +129,9 @@ class LiveExecutionService:
         intent = self.intent_store.get_intent(intent_id)
         if intent is None:
             raise KeyError(f"unknown intent: {intent_id}")
+
+        if self.intent_store.has_existing_side_effect(intent_id):
+            return await self.reconcile_intent(intent_id, now)
 
         market_obs = self.market_stream.latest_observation(now)
         if market_obs is None:
@@ -179,17 +196,12 @@ class LiveExecutionService:
                 asyncio.to_thread(backend.submit_intent, intent, now)
             )
 
-        cancelled_exc: asyncio.CancelledError | None = None
-        try:
-            report = await asyncio.shield(mutation_task)
-        except asyncio.CancelledError as exc:
-            cancelled_exc = exc
-            report = await mutation_task
+        report, cancelled_exc = await _await_owned_mutation(mutation_task)
 
         self.intent_store.update_status(intent_id, report.status, reason=report.reason, now_ms=now)
 
         # If fill occurred and supervisor is present, orchestrate end-to-end position supervision
-        if report.filled_qty > 0 and self.supervisor is not None:
+        if report.filled_qty > 0 and self.supervisor is not None and intent.environment != "TESTNET":
             obs = self._build_position_observation(intent, report, account_snap, market_obs, now)
             await self.supervisor.process(obs, now)
 
@@ -238,16 +250,11 @@ class LiveExecutionService:
                 asyncio.to_thread(backend.reconcile_intent, intent, now)
             )
 
-        cancelled_exc: asyncio.CancelledError | None = None
-        try:
-            report = await asyncio.shield(mutation_task)
-        except asyncio.CancelledError as exc:
-            cancelled_exc = exc
-            report = await mutation_task
+        report, cancelled_exc = await _await_owned_mutation(mutation_task)
 
         self.intent_store.update_status(intent_id, report.status, reason=report.reason, now_ms=now)
 
-        if report.filled_qty > 0 and self.supervisor is not None:
+        if report.filled_qty > 0 and self.supervisor is not None and intent.environment != "TESTNET":
             market_obs = self.market_stream.latest_observation(now)
             account_snap = self.account_watch.latest_snapshot()
             if market_obs is not None and account_snap is not None:

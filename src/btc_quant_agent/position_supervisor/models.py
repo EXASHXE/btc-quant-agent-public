@@ -44,6 +44,8 @@ class PositionObservationV1(ImmutableModel):
     account_snapshot_hash: str
     market_source_hash: str
     symbol: str
+    account_id: str = "DEFAULT_ACCOUNT"
+    position_side: Literal["BOTH"] = "BOTH"
     observed_at_ms: Annotated[int, Field(ge=0)]
     quantity: float
     previous_quantity: float

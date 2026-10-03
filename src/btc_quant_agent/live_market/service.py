@@ -29,6 +29,7 @@ class MarketStreamService:
         self._kline_close_time: int = 0
         self._source_timestamp_ms: int = 0
         self._receipt_timestamp_ms: int = 0
+        self._component_times: dict[str, tuple[int, int]] = {}
         self._connected: bool = False
         self._stop_event = asyncio.Event()
         self._task: asyncio.Task[None] | None = None
@@ -56,6 +57,7 @@ class MarketStreamService:
         self._kline_close_time = kline_close_time_ms or now
         self._source_timestamp_ms = now
         self._receipt_timestamp_ms = now
+        self._component_times = {name: (now, now) for name in ("mark", "book", "kline")}
         self._connected = True
 
     def latest_observation(self, now_ms: int | None = None) -> MarketObservationV1 | None:
@@ -78,6 +80,13 @@ class MarketStreamService:
             kline_1m_close_time_ms=self._kline_close_time,
             source_timestamp_ms=self._source_timestamp_ms,
             receipt_timestamp_ms=self._receipt_timestamp_ms,
+            mark_source_timestamp_ms=self._component_times.get("mark", (None, None))[0],
+            mark_receipt_timestamp_ms=self._component_times.get("mark", (None, None))[1],
+            book_source_timestamp_ms=self._component_times.get("book", (None, None))[0],
+            book_receipt_timestamp_ms=self._component_times.get("book", (None, None))[1],
+            kline_source_timestamp_ms=self._component_times.get("kline", (None, None))[0],
+            kline_receipt_timestamp_ms=self._component_times.get("kline", (None, None))[1],
+            stream_connected=self._connected,
             spread_bps=max(0.0, spread_bps),
         )
 
@@ -85,23 +94,38 @@ class MarketStreamService:
         data = json.loads(raw_message)
         payload = data.get("data", data)
         event_type = payload.get("e")
+        component = {"markPriceUpdate": "mark", "bookTicker": "book", "kline": "kline"}.get(event_type)
+        if component is None or "E" not in payload:
+            return
+        required = {"mark": ("p",), "book": ("b", "a"), "kline": ("c", "t", "T")}
+        values = payload.get("k", {}) if component == "kline" else payload
+        if not isinstance(values, dict) or any(key not in values for key in required[component]):
+            return
+        if component == "mark":
+            mark_price = float(values["p"])
+        elif component == "book":
+            best_bid = float(values["b"])
+            best_ask = float(values["a"])
+        else:
+            kline_close = float(values["c"])
+            kline_open_time = int(values["t"])
+            kline_close_time = int(values["T"])
+        source_ms = int(payload["E"])
+        if source_ms > receipt_ms or source_ms < self._component_times.get(component, (0, 0))[0]:
+            return
+        self._component_times[component] = (source_ms, receipt_ms)
+        self._source_timestamp_ms = source_ms
+        self._receipt_timestamp_ms = receipt_ms
 
         if event_type == "markPriceUpdate":
-            self._mark_price = float(payload.get("p", self._mark_price))
-            self._source_timestamp_ms = int(payload.get("E", receipt_ms))
-            self._receipt_timestamp_ms = receipt_ms
+            self._mark_price = mark_price
         elif event_type == "bookTicker":
-            self._best_bid = float(payload.get("b", self._best_bid))
-            self._best_ask = float(payload.get("a", self._best_ask))
-            self._source_timestamp_ms = int(payload.get("E", receipt_ms))
-            self._receipt_timestamp_ms = receipt_ms
+            self._best_bid = best_bid
+            self._best_ask = best_ask
         elif event_type == "kline":
-            k = payload.get("k", {})
-            self._kline_close = float(k.get("c", self._kline_close))
-            self._kline_open_time = int(k.get("t", self._kline_open_time))
-            self._kline_close_time = int(k.get("T", self._kline_close_time))
-            self._source_timestamp_ms = int(payload.get("E", receipt_ms))
-            self._receipt_timestamp_ms = receipt_ms
+            self._kline_close = kline_close
+            self._kline_open_time = kline_open_time
+            self._kline_close_time = kline_close_time
 
     async def run_stream(self) -> None:
         import websockets

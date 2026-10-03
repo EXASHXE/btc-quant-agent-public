@@ -21,6 +21,18 @@ if TYPE_CHECKING:
     from .position_supervisor.supervisor import PositionSupervisor
 
 
+async def _finish_owned(operation: asyncio.Future[Any]) -> asyncio.CancelledError | None:
+    cancelled: asyncio.CancelledError | None = None
+    while True:
+        try:
+            await asyncio.shield(operation)
+            return cancelled
+        except asyncio.CancelledError as exc:
+            if operation.cancelled():
+                raise
+            cancelled = exc
+
+
 class LiveV1Runtime:
     def __init__(
         self, *, config: LiveV1Config, tactical_service: TacticalLiveService,
@@ -45,7 +57,6 @@ class LiveV1Runtime:
         self.kill_switch = kill_switch
         self._case_loader = case_loader
         self._case_cache: dict[str, CasePackageV1] = {}
-        self._position_quantities: dict[str, float] = {}
         self.accepting_risk = False
         self.blocked_reason = "RUNTIME_NOT_STARTED"
         self.tasks: tuple[asyncio.Task[None], ...] = ()
@@ -116,7 +127,10 @@ class LiveV1Runtime:
             tactical_case_provider=lambda symbol, _now: fresh_case(symbol),
         )
         dry = DryRunExecutionBackend(path)
-        testnet = (TestnetExecutionBackend(path, signed_client, kill, validator=validator)
+        testnet = (TestnetExecutionBackend(path, signed_client, kill, validator=validator,
+                                          clock_ms=market.clock_ms,
+                                          account_provider=account.reconcile_rest,
+                                          market_provider=market.latest_observation)
                    if signed_client is not None else None)
         execution = LiveExecutionService(intents, tactical_service.store, account, market,
                                          validator, kill, dry, testnet_backend=testnet,
@@ -157,6 +171,7 @@ class LiveV1Runtime:
         ):
             self.accepting_risk = False
             self.blocked_reason = "UNCONFIGURED_POSITION_SYMBOL"
+            return
         if (snapshot is None or market is None or not snapshot.reconciled
                 or snapshot.quality != "OK"
                 or (self.config.execution_mode == "TESTNET" and not self.account_watch.is_stream_connected)):
@@ -169,17 +184,12 @@ class LiveV1Runtime:
                    for intent_id in self.intent_store.unfinished_intent_ids()]
         by_symbol = {intent.symbol: intent for intent in intents if intent is not None}
         positions = {position.symbol: position for position in snapshot.positions}
-        for symbol in positions.keys() | self._position_quantities.keys():
-            if symbol != self.config.symbol:
-                continue
+        account_id = getattr(snapshot, "account_id", self.config.account_id)
+        for symbol in (self.config.symbol,):
             position = positions.get(symbol)
             quantity = position.quantity if position is not None else 0.0
-            previous = self._position_quantities.get(symbol, 0.0)
-            if quantity == 0 and previous == 0:
-                continue
+            previous = self.supervisor.current_quantity(account_id, symbol)
             intent = by_symbol.get(symbol)
-            if position is None and intent is None:
-                continue
             order = next((item for item in snapshot.orders
                           if intent is not None and item.client_order_id == intent.client_order_id), None)
             entry = (position.entry_price if position is not None
@@ -187,7 +197,8 @@ class LiveV1Runtime:
             obs = PositionObservationV1.build(
                 account_snapshot_hash=snapshot.snapshot_hash,
                 market_source_hash=market.observation_hash,
-                symbol=symbol, observed_at_ms=now_ms,
+                symbol=symbol, account_id=account_id, position_side="BOTH",
+                observed_at_ms=now_ms,
                 quantity=quantity, previous_quantity=previous,
                 entry_price=entry, mark_price=market.mark_price,
                 unrealized_pnl_usdt=position.unrealized_pnl_usdt if position is not None else 0.0,
@@ -201,7 +212,6 @@ class LiveV1Runtime:
                 order_observed_at_ms=order.observed_at_ms if order is not None else now_ms,
             )
             await self.supervisor.process(obs, now_ms)
-            self._position_quantities[symbol] = quantity
 
     async def _position_loop(self) -> None:
         while not self._stop_event.is_set():
@@ -258,16 +268,12 @@ class LiveV1Runtime:
         self.blocked_reason = "RUNTIME_STARTING"
         self._stop_event.clear()
         try:
-            restored = self.account_watch.latest_snapshot()
-            if restored is not None:
-                self._position_quantities = {position.symbol: position.quantity
-                                             for position in restored.positions}
             self.account_watch.mark_stream_disconnected()
+            await self.reconcile_unfinished_intents()
             await self.account_watch.reconcile_rest_async()
             snapshot = self.account_watch.latest_snapshot()
             if snapshot is None or not snapshot.reconciled or snapshot.quality != "OK":
                 raise ExecutionBlocked("ACCOUNT_RECONCILIATION_REQUIRED")
-            await self.reconcile_unfinished_intents()
             await self._refresh_case(self.config.symbol)
             await self.supervisor.drain_pending_dispatches(int(time.time() * 1000))
             tasks = [asyncio.create_task(self.market_stream.run_stream(), name="live-v1-market")]
@@ -296,13 +302,20 @@ class LiveV1Runtime:
             # after the stop event, so shutdown never leaves a detached exchange read.
             if task.get_name() != "live-v1-position":
                 task.cancel()
+        cancelled: asyncio.CancelledError | None = None
         if self.tasks:
-            await asyncio.gather(*self.tasks, return_exceptions=True)
-        await self.account_watch.close_user_stream()
+            cancelled = await _finish_owned(asyncio.gather(*self.tasks, return_exceptions=True))
+        cleanup_cancelled = await _finish_owned(asyncio.create_task(self.account_watch.close_user_stream()))
         self.account_watch.mark_stream_disconnected()
         self._started = False
+        if cancelled is not None:
+            raise cancelled
+        if cleanup_cancelled is not None:
+            raise cleanup_cancelled
 
     async def execute_intent(self, intent_id: str) -> Any:
+        if self.intent_store.has_existing_side_effect(intent_id):
+            return await self.execution_service.reconcile_intent(intent_id)
         reason = self._readiness_reason()
         if reason:
             raise ExecutionBlocked(reason)

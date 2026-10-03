@@ -151,6 +151,8 @@ class AccountWatch:
 
             parsed_positions: list[PositionV1] = []
             for p in raw_positions:
+                if str(p.get("positionSide", "BOTH")) != "BOTH":
+                    raise ValueError("UNSUPPORTED_HEDGE_POSITION_AUTHORITY")
                 qty = float(p.get("positionAmt", 0.0))
                 if abs(qty) > 0:
                     entry = float(p.get("entryPrice", 0.0))
@@ -447,11 +449,18 @@ class AccountWatch:
     async def reconcile_rest_async(self, now_ms: int | None = None) -> AccountSnapshotV1:
         """Keep an in-flight REST read owned through task cancellation."""
         operation = asyncio.create_task(asyncio.to_thread(self.reconcile_rest, now_ms))
-        try:
-            return await asyncio.shield(operation)
-        except asyncio.CancelledError:
-            await operation
-            raise
+        cancelled: asyncio.CancelledError | None = None
+        while True:
+            try:
+                result = await asyncio.shield(operation)
+                break
+            except asyncio.CancelledError as exc:
+                if operation.cancelled():
+                    raise
+                cancelled = exc
+        if cancelled is not None:
+            raise cancelled
+        return result
 
     async def close_user_stream(self) -> None:
         task = self._keepalive_task

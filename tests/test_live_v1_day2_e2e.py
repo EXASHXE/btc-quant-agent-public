@@ -275,7 +275,7 @@ def test_adversarial_restart_does_not_resubmit_or_duplicate(tmp_path):
     # Resubmitting the same intent ID recovers existing state without creating duplicate orders
     rep2 = asyncio.run(restarted_service.execute_approved_intent(intent.intent_id, NOW + 1000))
     assert rep2.order_id == rep1.order_id
-    assert rep2.reason == "IDEMPOTENT_REPLAY"
+    assert rep2.reason == "RECONCILED"
 
 
 def test_r1_05_coordinator_fill_source_bound_and_no_neutral_masquerade(tmp_path):

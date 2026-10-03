@@ -26,8 +26,21 @@ def sample_market_obs(**overrides) -> MarketObservationV1:
         "kline_1m_close_time_ms": NOW,
         "source_timestamp_ms": NOW,
         "receipt_timestamp_ms": NOW,
+        "mark_source_timestamp_ms": NOW,
+        "mark_receipt_timestamp_ms": NOW,
+        "book_source_timestamp_ms": NOW,
+        "book_receipt_timestamp_ms": NOW,
+        "kline_source_timestamp_ms": NOW,
+        "kline_receipt_timestamp_ms": NOW,
+        "stream_connected": True,
         "spread_bps": 4.0,
     }
+    for component in ("mark", "book", "kline"):
+        for kind in ("source", "receipt"):
+            key = f"{kind}_timestamp_ms"
+            component_key = f"{component}_{key}"
+            if key in overrides and component_key not in overrides:
+                values[component_key] = overrides[key]
     values.update(overrides)
     return MarketObservationV1.build(**values)
 

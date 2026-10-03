@@ -72,6 +72,12 @@ def sample_snapshot(**overrides) -> AccountSnapshotV1:
         "quality": "OK",
     }
     values.update(overrides)
+    if "drawdown_pct" in overrides and "peak_equity_usdt" not in overrides:
+        values["peak_equity_usdt"] = values["equity_usdt"] / (1 - values["drawdown_pct"])
+    elif "drawdown_pct" not in overrides:
+        if "peak_equity_usdt" not in overrides:
+            values["peak_equity_usdt"] = max(values["peak_equity_usdt"], values["equity_usdt"])
+        values["drawdown_pct"] = max(0.0, 1 - values["equity_usdt"] / values["peak_equity_usdt"])
     return AccountSnapshotV1.build(**values)
 
 

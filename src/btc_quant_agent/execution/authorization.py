@@ -31,7 +31,7 @@ class PreExecutionAuthorizationV1(ImmutableModel):
     environment: Literal["TESTNET"]
     validated_at_ms: int
     expires_at_ms: int
-    validator_version: Literal["PRE_EXECUTION_VALIDATOR_R2"] = "PRE_EXECUTION_VALIDATOR_R2"
+    validator_version: Literal["PRE_EXECUTION_VALIDATOR_R2", "PRE_EXECUTION_VALIDATOR_R3"] = "PRE_EXECUTION_VALIDATOR_R3"
 
     @model_validator(mode="after")
     def identity(self, info: ValidationInfo) -> Self:
@@ -154,3 +154,38 @@ class AuthorizationStore:
             db.execute("UPDATE live_trade_intents SET status='SUBMITTING' WHERE intent_id=?", (auth.intent_id,))
             db.execute("INSERT INTO live_intent_transitions(intent_id,from_status,to_status,reason,at_ms) VALUES (?,'AUTHORIZED','SUBMITTING','AUTHORIZATION_CLAIMED',?)", (auth.intent_id, now_ms))
             return True
+
+    def refresh_claimed(
+        self, previous: PreExecutionAuthorizationV1, account: AccountSnapshotV1,
+        market: MarketObservationV1, executable: dict[str, Any], now_ms: int,
+    ) -> PreExecutionAuthorizationV1:
+        """Replace observations under the same singleton claim, never extend its TTL."""
+        if not previous.validated_at_ms <= now_ms < previous.expires_at_ms:
+            raise ExecutionBlocked("AUTHORIZATION_EXPIRED")
+        account.verify()
+        MarketObservationV1.model_validate_json(market.canonical_json())
+        values = previous.model_dump(exclude={"authorization_id", "authorization_hash"})
+        values.update(account_snapshot_hash=account.snapshot_hash,
+                      market_observation_hash=market.observation_hash,
+                      execution_compilation_hash=content_hash(executable), validated_at_ms=now_ms,
+                      validator_version="PRE_EXECUTION_VALIDATOR_R3")
+        auth = PreExecutionAuthorizationV1.build(authorization_id="auth_" + content_hash(values)[:32], **values)
+        AccountStore(self.path).save(account)
+        with connection(self.path) as db:
+            db.execute("BEGIN IMMEDIATE")
+            claim = db.execute("SELECT authorization_id FROM live_execution_claims WHERE intent_id=?", (previous.intent_id,)).fetchone()
+            intent = db.execute("SELECT intent_hash,status FROM live_trade_intents WHERE intent_id=?", (previous.intent_id,)).fetchone()
+            receipt = db.execute("SELECT authorization_hash,status FROM live_pre_execution_authorizations WHERE authorization_id=?", (previous.authorization_id,)).fetchone()
+            order = db.execute("SELECT 1 FROM live_execution_orders WHERE intent_id=? AND is_protective=0", (previous.intent_id,)).fetchone()
+            if (claim is None or claim["authorization_id"] != previous.authorization_id
+                    or intent is None or intent["intent_hash"] != previous.intent_hash or intent["status"] != "SUBMITTING"
+                    or receipt is None or receipt["authorization_hash"] != previous.authorization_hash or receipt["status"] != "CLAIMED"
+                    or order is not None):
+                raise ExecutionBlocked("AUTHORIZATION_CLAIM_OWNERSHIP_LOST")
+            db.execute("INSERT OR IGNORE INTO live_execution_market_observations VALUES (?,?)", (market.observation_hash, market.canonical_json()))
+            if auth.authorization_id != previous.authorization_id:
+                db.execute("INSERT INTO live_pre_execution_authorizations VALUES (?,?,?,'CLAIMED',?)", (auth.authorization_id, auth.authorization_hash, previous.intent_id, auth.canonical_json()))
+                db.execute("UPDATE live_pre_execution_authorizations SET status='SUPERSEDED' WHERE authorization_id=?", (previous.authorization_id,))
+                db.execute("UPDATE live_execution_claims SET authorization_id=? WHERE intent_id=?", (auth.authorization_id, previous.intent_id))
+            db.execute("INSERT INTO live_intent_transitions(intent_id,from_status,to_status,reason,at_ms) VALUES (?,'SUBMITTING','SUBMITTING','FRESH_PLACEMENT_AUTHORITY',?)", (previous.intent_id, now_ms))
+        return auth
