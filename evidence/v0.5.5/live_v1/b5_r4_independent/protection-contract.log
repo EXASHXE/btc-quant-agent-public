@@ -1,0 +1,151 @@
+FFFFFFF                                                                  [100%]
+=================================== FAILURES ===================================
+________ test_pending_restart_requires_successful_exact_id_query[False] ________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-413/test_pending_restart_requires_0')
+omit_status = False
+
+    @pytest.mark.parametrize("omit_status", [False, True])
+    def test_pending_restart_requires_successful_exact_id_query(tmp_path, omit_status):
+        backend, client, kill, intent = _backend(tmp_path, 0.1)
+        client.place_protective_order.return_value = {"algoId": "owned-stop"}
+        client.query_protective_order.side_effect = BinanceExecutionError("exact query unavailable")
+        with pytest.raises(ExecutionBlocked):
+            backend._reconcile_protective_stop(intent, 0.1, NOW)
+        assert backend.protections.get_owner(intent).status == "PENDING_CONFIRMATION"
+        listing = confirmation(client, intent)
+        if omit_status:
+            listing.pop("algoStatus")
+        client.open_protective_orders.return_value = [listing]
+        restarted = TestnetExecutionBackend(backend.path, client, kill, validator=backend.validator)
+>       with pytest.raises(ExecutionBlocked):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE <class 'btc_quant_agent.execution.guard.ExecutionBlocked'>
+
+../b5-r4-evidence/test_independent_protection_contract.py:24: Failed
+________ test_pending_restart_requires_successful_exact_id_query[True] _________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-413/test_pending_restart_requires_1')
+omit_status = True
+
+    @pytest.mark.parametrize("omit_status", [False, True])
+    def test_pending_restart_requires_successful_exact_id_query(tmp_path, omit_status):
+        backend, client, kill, intent = _backend(tmp_path, 0.1)
+        client.place_protective_order.return_value = {"algoId": "owned-stop"}
+        client.query_protective_order.side_effect = BinanceExecutionError("exact query unavailable")
+        with pytest.raises(ExecutionBlocked):
+            backend._reconcile_protective_stop(intent, 0.1, NOW)
+        assert backend.protections.get_owner(intent).status == "PENDING_CONFIRMATION"
+        listing = confirmation(client, intent)
+        if omit_status:
+            listing.pop("algoStatus")
+        client.open_protective_orders.return_value = [listing]
+        restarted = TestnetExecutionBackend(backend.path, client, kill, validator=backend.validator)
+>       with pytest.raises(ExecutionBlocked):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE <class 'btc_quant_agent.execution.guard.ExecutionBlocked'>
+
+../b5-r4-evidence/test_independent_protection_contract.py:24: Failed
+___ test_exact_confirmation_must_preserve_submitted_stop_semantics[changed0] ___
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-413/test_exact_confirmation_must_p0')
+changed = {'workingType': 'CONTRACT_PRICE'}
+
+    @pytest.mark.parametrize("changed", [
+        {"workingType": "CONTRACT_PRICE"}, {"priceProtect": False},
+        {"closePosition": True}, {"algoType": "OTHER"},
+    ])
+    def test_exact_confirmation_must_preserve_submitted_stop_semantics(tmp_path, changed):
+        backend, client, _, intent = _backend(tmp_path, 0.1)
+        client.place_protective_order.return_value = {"algoId": "owned-stop"}
+        client.query_protective_order.side_effect = lambda _: confirmation(client, intent, **changed)
+>       with pytest.raises(ExecutionBlocked):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE <class 'btc_quant_agent.execution.guard.ExecutionBlocked'>
+
+../b5-r4-evidence/test_independent_protection_contract.py:37: Failed
+___ test_exact_confirmation_must_preserve_submitted_stop_semantics[changed1] ___
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-413/test_exact_confirmation_must_p1')
+changed = {'priceProtect': False}
+
+    @pytest.mark.parametrize("changed", [
+        {"workingType": "CONTRACT_PRICE"}, {"priceProtect": False},
+        {"closePosition": True}, {"algoType": "OTHER"},
+    ])
+    def test_exact_confirmation_must_preserve_submitted_stop_semantics(tmp_path, changed):
+        backend, client, _, intent = _backend(tmp_path, 0.1)
+        client.place_protective_order.return_value = {"algoId": "owned-stop"}
+        client.query_protective_order.side_effect = lambda _: confirmation(client, intent, **changed)
+>       with pytest.raises(ExecutionBlocked):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE <class 'btc_quant_agent.execution.guard.ExecutionBlocked'>
+
+../b5-r4-evidence/test_independent_protection_contract.py:37: Failed
+___ test_exact_confirmation_must_preserve_submitted_stop_semantics[changed2] ___
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-413/test_exact_confirmation_must_p2')
+changed = {'closePosition': True}
+
+    @pytest.mark.parametrize("changed", [
+        {"workingType": "CONTRACT_PRICE"}, {"priceProtect": False},
+        {"closePosition": True}, {"algoType": "OTHER"},
+    ])
+    def test_exact_confirmation_must_preserve_submitted_stop_semantics(tmp_path, changed):
+        backend, client, _, intent = _backend(tmp_path, 0.1)
+        client.place_protective_order.return_value = {"algoId": "owned-stop"}
+        client.query_protective_order.side_effect = lambda _: confirmation(client, intent, **changed)
+>       with pytest.raises(ExecutionBlocked):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE <class 'btc_quant_agent.execution.guard.ExecutionBlocked'>
+
+../b5-r4-evidence/test_independent_protection_contract.py:37: Failed
+___ test_exact_confirmation_must_preserve_submitted_stop_semantics[changed3] ___
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-413/test_exact_confirmation_must_p3')
+changed = {'algoType': 'OTHER'}
+
+    @pytest.mark.parametrize("changed", [
+        {"workingType": "CONTRACT_PRICE"}, {"priceProtect": False},
+        {"closePosition": True}, {"algoType": "OTHER"},
+    ])
+    def test_exact_confirmation_must_preserve_submitted_stop_semantics(tmp_path, changed):
+        backend, client, _, intent = _backend(tmp_path, 0.1)
+        client.place_protective_order.return_value = {"algoId": "owned-stop"}
+        client.query_protective_order.side_effect = lambda _: confirmation(client, intent, **changed)
+>       with pytest.raises(ExecutionBlocked):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE <class 'btc_quant_agent.execution.guard.ExecutionBlocked'>
+
+../b5-r4-evidence/test_independent_protection_contract.py:37: Failed
+________ test_flat_position_must_retain_unresolved_exact_stop_identity _________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-413/test_flat_position_must_retain0')
+
+    def test_flat_position_must_retain_unresolved_exact_stop_identity(tmp_path):
+        backend, client, _, intent = _backend(tmp_path, 0.1)
+        client.place_protective_order.return_value = {"algoId": "owned-stop"}
+        client.query_protective_order.side_effect = BinanceExecutionError("exact query unavailable")
+        with pytest.raises(ExecutionBlocked):
+            backend._reconcile_protective_stop(intent, 0.1, NOW)
+        client.positions.return_value = [{"symbol": intent.symbol, "positionSide": "BOTH", "positionAmt": "0"}]
+        client.open_protective_orders.return_value = []
+        backend._reconcile_protective_stop(intent, 0.1, NOW + 1)
+        owner = backend.protections.get_owner(intent)
+>       assert owner.status == "PENDING_CONFIRMATION"
+E       AssertionError: assert 'RELEASED' == 'PENDING_CONFIRMATION'
+E         
+E         - PENDING_CONFIRMATION
+E         + RELEASED
+
+../b5-r4-evidence/test_independent_protection_contract.py:52: AssertionError
+------- generated xml file: /tmp/b5-r4-evidence/protection-contract.xml --------
+=========================== short test summary info ============================
+FAILED ../b5-r4-evidence/test_independent_protection_contract.py::test_pending_restart_requires_successful_exact_id_query[False]
+FAILED ../b5-r4-evidence/test_independent_protection_contract.py::test_pending_restart_requires_successful_exact_id_query[True]
+FAILED ../b5-r4-evidence/test_independent_protection_contract.py::test_exact_confirmation_must_preserve_submitted_stop_semantics[changed0]
+FAILED ../b5-r4-evidence/test_independent_protection_contract.py::test_exact_confirmation_must_preserve_submitted_stop_semantics[changed1]
+FAILED ../b5-r4-evidence/test_independent_protection_contract.py::test_exact_confirmation_must_preserve_submitted_stop_semantics[changed2]
+FAILED ../b5-r4-evidence/test_independent_protection_contract.py::test_exact_confirmation_must_preserve_submitted_stop_semantics[changed3]
+FAILED ../b5-r4-evidence/test_independent_protection_contract.py::test_flat_position_must_retain_unresolved_exact_stop_identity
+7 failed in 2.55s

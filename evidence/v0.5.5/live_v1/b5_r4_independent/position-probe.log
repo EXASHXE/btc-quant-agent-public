@@ -1,0 +1,135 @@
+........FFFFF                                                            [100%]
+=================================== FAILURES ===================================
+________ test_dispatch_rejects_symbol_mismatch_between_event_and_outbox ________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-403/test_dispatch_rejects_symbol_m0')
+
+    def test_dispatch_rejects_symbol_mismatch_between_event_and_outbox(tmp_path):
+        path = tmp_path / "live.db"
+        seen = []
+    
+        class Analyze:
+            async def analyze_case(self, case):
+                seen.append(case)
+    
+        def case_for(symbol):
+            data = market_case().model_dump(mode="python", exclude={"case_hash"})
+            data["symbol"] = symbol
+            return CasePackageV1.build(**data)
+    
+        s = PositionSupervisor(path, analysis_service=Analyze(), fresh_market_case=case_for)
+        event = next(e for e in s.evaluate(observation(), NOW) if e.trigger == "POSITION_OPENED")
+        with connection(path) as db:
+            db.execute("UPDATE live_position_case_dispatches SET symbol='ETHUSDT' WHERE event_id=?",
+                       (event.event_id,))
+        asyncio.run(s.drain_pending_dispatches(NOW))
+>       assert all(case.position_event_hash != event.event_hash for case in seen)
+E       assert False
+E        +  where False = all(<generator object test_dispatch_rejects_symbol_mismatch_between_event_and_outbox.<locals>.<genexpr> at 0x72e18a7dbed0>)
+
+../b5-r4-evidence/position/test_independent_position_probe.py:172: AssertionError
+_______ test_runtime_readiness_rejects_verified_other_account_namespace ________
+
+    def test_runtime_readiness_rejects_verified_other_account_namespace():
+        runtime = _runtime(mode="TESTNET")
+        runtime._started = True
+        runtime.accepting_risk = True
+        snapshot = runtime.account_watch.latest_snapshot.return_value
+        snapshot.account_id = "OTHER_ACCOUNT"
+        snapshot.verify = Mock()
+>       assert runtime._readiness_reason() == "POSITION_ACCOUNT_AUTHORITY_MISMATCH"
+E       AssertionError: assert '' == 'POSITION_ACC...RITY_MISMATCH'
+E         
+E         - POSITION_ACCOUNT_AUTHORITY_MISMATCH
+
+../b5-r4-evidence/position/test_independent_position_probe.py:183: AssertionError
+_____________ test_runtime_readiness_rejects_invalid_snapshot_hash _____________
+
+    def test_runtime_readiness_rejects_invalid_snapshot_hash():
+        runtime = _runtime(mode="DRY_RUN")
+        runtime._started = True
+        runtime.accepting_risk = True
+        runtime.account_watch.latest_snapshot.return_value.verify = Mock(side_effect=ValueError("hash mismatch"))
+>       assert runtime._readiness_reason() == "POSITION_ACCOUNT_AUTHORITY_MISMATCH"
+E       AssertionError: assert '' == 'POSITION_ACC...RITY_MISMATCH'
+E         
+E         - POSITION_ACCOUNT_AUTHORITY_MISMATCH
+
+../b5-r4-evidence/position/test_independent_position_probe.py:191: AssertionError
+______ test_start_does_not_accept_other_account_after_rest_reconciliation ______
+
+    def test_start_does_not_accept_other_account_after_rest_reconciliation():
+        runtime = _runtime(mode="TESTNET")
+        runtime.account_watch.latest_snapshot.return_value = sample_snapshot(
+            account_id="OTHER_ACCOUNT", environment="TESTNET",
+            credential_namespace="BINANCE_TESTNET", rest_base_url="https://testnet.binancefuture.com",
+            positions=(), orders=())
+    
+        async def run():
+            try:
+                await runtime.start()
+                assert not runtime.accepting_risk
+            finally:
+                await runtime.stop()
+    
+>       asyncio.run(run())
+
+../b5-r4-evidence/position/test_independent_position_probe.py:208: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/root/miniconda3/lib/python3.13/asyncio/runners.py:195: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/root/miniconda3/lib/python3.13/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/root/miniconda3/lib/python3.13/asyncio/base_events.py:725: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    async def run():
+        try:
+            await runtime.start()
+>           assert not runtime.accepting_risk
+E           assert not True
+E            +  where True = <btc_quant_agent.live_runtime.LiveV1Runtime object at 0x72e18aa47c50>.accepting_risk
+
+../b5-r4-evidence/position/test_independent_position_probe.py:204: AssertionError
+__________ test_runtime_delegates_intent_with_wrong_account_snapshot ___________
+
+    def test_runtime_delegates_intent_with_wrong_account_snapshot():
+        runtime = _runtime(mode="TESTNET")
+        runtime._started = True
+        runtime.accepting_risk = True
+        runtime.account_watch.latest_snapshot.return_value = sample_snapshot(
+            account_id="OTHER_ACCOUNT", environment="TESTNET",
+            credential_namespace="BINANCE_TESTNET", rest_base_url="https://testnet.binancefuture.com",
+            positions=(), orders=())
+        runtime.intent_store.get_intent = Mock(return_value=Mock(symbol=runtime.config.symbol))
+        asyncio.run(runtime.execute_intent("intent-1"))
+>       runtime.execution_service.execute_approved_intent.assert_not_awaited()
+
+../b5-r4-evidence/position/test_independent_position_probe.py:221: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <AsyncMock id='126313015708368'>
+
+    def assert_not_awaited(self):
+        """
+        Assert that the mock was never awaited.
+        """
+        if self.await_count != 0:
+            msg = (f"Expected {self._mock_name or 'mock'} to not have been awaited."
+                   f" Awaited {self.await_count} times.")
+>           raise AssertionError(msg)
+E           AssertionError: Expected mock to not have been awaited. Awaited 1 times.
+
+/root/miniconda3/lib/python3.13/unittest/mock.py:2465: AssertionError
+---------- generated xml file: /tmp/b5-r4-evidence/position-probe.xml ----------
+=========================== short test summary info ============================
+FAILED ../b5-r4-evidence/position/test_independent_position_probe.py::test_dispatch_rejects_symbol_mismatch_between_event_and_outbox
+FAILED ../b5-r4-evidence/position/test_independent_position_probe.py::test_runtime_readiness_rejects_verified_other_account_namespace
+FAILED ../b5-r4-evidence/position/test_independent_position_probe.py::test_runtime_readiness_rejects_invalid_snapshot_hash
+FAILED ../b5-r4-evidence/position/test_independent_position_probe.py::test_start_does_not_accept_other_account_after_rest_reconciliation
+FAILED ../b5-r4-evidence/position/test_independent_position_probe.py::test_runtime_delegates_intent_with_wrong_account_snapshot
+5 failed, 8 passed in 2.09s

@@ -1,0 +1,29 @@
+{
+  "initial_dispatch_sha": "75c9c5cfa1bfaf6cad0c91214fecccc2eb578928",
+  "observed_later_head": "0c5ba8c871a22024a038cdce79ac0809d7cf8204",
+  "later_commit_scope": "docs/project/V0.5.5_PROJECT_STATUS_AND_ROADMAP.md",
+  "current_binding_blobs": [
+    {
+      "path": "evidence/v0.5.5/controller/B_LINE_CURRENT_AUTHORITY.json",
+      "sha": "2758c7b02896dcce8120d5c986fe1fc10b1897e1",
+      "isError": false
+    },
+    {
+      "path": "evidence/v0.5.5/controller/B_LINE_LIVE_V1_DISPATCH_MANIFEST.json",
+      "sha": "3b6add8216dc0bedf44d86dc713c3458311a17a0",
+      "isError": false
+    },
+    {
+      "path": "evidence/v0.5.5/controller/B_LINE_LIVE_V1_B5_R4_CURRENT_DISPATCH.json",
+      "sha": "a3da974ca68fe049248a6fdb128c50f3c8dbee5e",
+      "isError": false
+    },
+    {
+      "path": "prompts/v0.5/validation/v0.5.5_B5_LIVE_V1_R4_INDEPENDENT_EXACT_SHA_REVALIDATION.md",
+      "sha": "724e1466c6bb4e78e0cd4a644cd7c8f8a75c95d7",
+      "isError": false
+    }
+  ],
+  "publication_parent": "75c9c5cfa1bfaf6cad0c91214fecccc2eb578928",
+  "adjudication": "Frozen dispatch preserved; later roadmap edit leaves all B5 binding blobs unchanged"
+}

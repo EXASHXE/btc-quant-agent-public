@@ -1,0 +1,8 @@
+2026-10-03T11:06:35.1152994Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +4bc05e1a7c7fae86f41c1dd9b5a1635d0540ee58:refs/remotes/origin/feature/b-line-live-v1
+2026-10-03T11:06:35.6384790Z  * [new ref]         4bc05e1a7c7fae86f41c1dd9b5a1635d0540ee58 -> origin/feature/b-line-live-v1
+2026-10-03T11:06:35.7043835Z 4bc05e1a7c7fae86f41c1dd9b5a1635d0540ee58
+2026-10-03T11:06:52.1034099Z All checks passed!
+2026-10-03T11:07:10.6759103Z Success: no issues found in 151 source files
+2026-10-03T11:19:56.4391966Z stderr = 'fatal: Invalid revision range 407dabc415ae8cae4210250e992941c8b9b25464..HEAD\n'
+2026-10-03T11:19:57.1975091Z FAILED tests/test_tactical_grid_shadow_evaluation_v1.py::test_b2b_a34_h40_diff_remains_zero - subprocess.CalledProcessError: Command '['git', 'diff', '407dabc415ae8cae4210250e992941c8b9b25464..HEAD', '--', 'src/btc_quant_agent/h40']' returned non-zero exit status 128.
+2026-10-03T11:19:57.1976857Z 1 failed, 2344 passed, 2 skipped, 9 warnings in 764.49s (0:12:44)

@@ -1,0 +1,989 @@
+{
+  "task": "LIVE_V1_B5_R4_INDEPENDENT_EXACT_SHA_REVALIDATION",
+  "decision": "LIVE_V1_INDEPENDENT_VALIDATION_FAILED",
+  "validation_binding_mode": "EXACT_CODE_SHA",
+  "validated_sha": "4bc05e1a7c7fae86f41c1dd9b5a1635d0540ee58",
+  "parent_sha": "c2c7cc83294f44340dd9fa1873bff760501fae12",
+  "controller_dispatch_sha": "75c9c5cfa1bfaf6cad0c91214fecccc2eb578928",
+  "publication_branch": "validation/v0.5.5-live-v1-b5-r4-independent-20261003",
+  "publication_parent_sha": "75c9c5cfa1bfaf6cad0c91214fecccc2eb578928",
+  "publication_commit_sha": "CONTAINING_COMMIT_IDENTIFIES_PUBLICATION; exact SHA returned by final publication receipt",
+  "created_at_utc": "2026-10-03T15:35:04.183828+00:00",
+  "identity_gate": {
+    "result": "PASS",
+    "repository": "EXASHXE/btc-quant-agent-public",
+    "branch": "feature/b-line-live-v1",
+    "clean_independent_clone": true,
+    "checkout": "/tmp/b5-r4-independent-code",
+    "head": "4bc05e1a7c7fae86f41c1dd9b5a1635d0540ee58",
+    "parent": "c2c7cc83294f44340dd9fa1873bff760501fae12",
+    "shallow": false,
+    "authority": {
+      "docs_sha": "75c9c5cfa1bfaf6cad0c91214fecccc2eb578928",
+      "authority_blob": "2758c7b02896dcce8120d5c986fe1fc10b1897e1",
+      "manifest_blob": "3b6add8216dc0bedf44d86dc713c3458311a17a0",
+      "dispatch_blob": "a3da974ca68fe049248a6fdb128c50f3c8dbee5e",
+      "dispatch": {
+        "task": "LIVE_V1_B5_R4_INDEPENDENT_EXACT_SHA_REVALIDATION",
+        "repository": "EXASHXE/btc-quant-agent-public",
+        "implementation_branch": "feature/b-line-live-v1",
+        "binding_mode": "EXACT_CODE_SHA",
+        "target_sha": "4bc05e1a7c7fae86f41c1dd9b5a1635d0540ee58",
+        "expected_parent_sha": "c2c7cc83294f44340dd9fa1873bff760501fae12",
+        "controller_dispatch_sha": "SUPPLIED_OUT_OF_BAND_AS_CURRENT_DOCS_HEAD",
+        "validator_requirement": "FULLY_FRESH_COORDINATING_SESSION",
+        "implementation_mutation": "FORBIDDEN",
+        "validation_publication": "SEPARATE_VALIDATION_BRANCH",
+        "expected_pass_state": "LIVE_V1_TESTNET_VALIDATED_LIVE_STILL_DISABLED",
+        "fail_state": "LIVE_V1_INDEPENDENT_VALIDATION_FAILED",
+        "real_funds_write_authority": "NONE",
+        "live_approval_only": "NOT_AUTHORIZED",
+        "autonomous_live": "FORBIDDEN"
+      },
+      "manifest_binding": {
+        "namespace": "LIVE_V1",
+        "runtime": "Python 3.12 + asyncio + FastAPI/Uvicorn + Pydantic v2 + SQLite",
+        "primary_analysis": "OpenAI Responses API Structured Output",
+        "secondary_analysis": "codex exec --output-schema; restricted sandbox",
+        "llm_side_effect_authority": "NONE",
+        "day1_execution_write": "NONE",
+        "day2_target_write": "TESTNET_ONLY",
+        "live_approval_only": "HARD_DISABLED",
+        "autonomous_live": "FORBIDDEN",
+        "testnet_before_live": true,
+        "real_funds_requires_independent_pre_live_audit": true,
+        "accepted_b2b_state": "B2B_ACCEPTED",
+        "accepted_b2b_sha": "52c16a28153de307dc6132c0975fe29341a0a918",
+        "live_v1_b3_status": "ACCEPTED",
+        "live_v1_b3_accepted_sha": "961a0f4d4b37cdb9365d5e5867813ff3129c14db",
+        "live_v1_b4_status": "R4_EXACT_SHA_SEALED",
+        "provider_credential_smoke": "PENDING",
+        "sqlite_concurrency_gate": "B4_MUST_ESTABLISH_WAL_OR_EQUIVALENT",
+        "live_v1_b4_final_sha": "4bc05e1a7c7fae86f41c1dd9b5a1635d0540ee58",
+        "live_v1_b5_status": "READY_TO_DISPATCH_R4_REVALIDATION",
+        "live_v1_b5_binding_mode": "EXACT_CODE_SHA",
+        "live_v1_b5_target_sha": "4bc05e1a7c7fae86f41c1dd9b5a1635d0540ee58",
+        "live_v1_b5_expected_parent_sha": "c2c7cc83294f44340dd9fa1873bff760501fae12",
+        "live_v1_b5_last_target_sha": "c2c7cc83294f44340dd9fa1873bff760501fae12",
+        "live_v1_b4_r3_status": "SEALED",
+        "live_v1_b5_validator": "FULLY_FRESH_COORDINATING_SESSION",
+        "h40_ci_attempt2": "ONLY_KNOWN_A34_SHALLOW_CHECKOUT",
+        "live_v1_b4_r4_status": "READY_TO_DISPATCH"
+      },
+      "blob_identities": {
+        "evidence/v0.5.5/controller/B_LINE_CURRENT_AUTHORITY.json": "2758c7b02896dcce8120d5c986fe1fc10b1897e1",
+        "evidence/v0.5.5/controller/B_LINE_LIVE_V1_DISPATCH_MANIFEST.json": "3b6add8216dc0bedf44d86dc713c3458311a17a0",
+        "reviews/v0.5/live_v1/V0.5.5_LIVE_V1_B4_R4_CONTROLLER_SEAL.md": "f7194647a82272f1f97eb3f95bb92ad25c770380",
+        "evidence/v0.5.5/controller/V0.5.5_LIVE_V1_B4_R4_CONTROLLER_SEAL.json": "5b94f1955d492bcb956360e3277b616a3f120111",
+        "prompts/v0.5/validation/v0.5.5_B5_LIVE_V1_R4_INDEPENDENT_EXACT_SHA_REVALIDATION.md": "724e1466c6bb4e78e0cd4a644cd7c8f8a75c95d7",
+        "docs/architecture/V0.5.5_B_LINE_LIVE_V1_TWO_DAY_ARCHITECTURE_AND_IMPLEMENTATION_PLAN.md": "8c10d41baecf43571b93061804d4bb98341ec224",
+        "reviews/v0.5/live_v1/V0.5.5_LIVE_V1_B3_CONTROLLER_ACCEPTANCE.md": "21ad4492feb4750f5fc85a5f88b54d1da36c157d",
+        "evidence/v0.5.5/controller/V0.5.5_LIVE_V1_B3_CONTROLLER_ACCEPTANCE.json": "195bcdc0b8c3cda118aeb464d348776264d481ff",
+        "reviews/v0.5/tactical-policy/V0.5.5_B2B_CONTROLLER_ACCEPTANCE.md": "4d6d65dad35e42e10d175875093dc045bbc63503",
+        "evidence/v0.5.5/controller/V0.5.5_B2B_CONTROLLER_ACCEPTANCE.json": "73a11708a85b5f1896397d745c3b7252d3c51f8d"
+      }
+    }
+  },
+  "independence_gate": {
+    "result": "PASS",
+    "fresh_coordinator": true,
+    "prior_R4_implementation_or_repair_or_seal_involvement": false,
+    "inherited_implementation_conversation": false,
+    "helpers_fresh_isolated_context": true,
+    "executor_evidence_and_seal_used_as_safety_proof": false,
+    "source_checkout_origin": "Separate no-hardlinks clone of full-history repository; remote bindings independently verified via GitHub"
+  },
+  "implementation_mutations": [],
+  "complete_changed_file_list": [
+    "evidence/v0.5.5/live_v1/B4_DAY2_VALIDATION.json",
+    "src/btc_quant_agent/execution/backend.py",
+    "src/btc_quant_agent/execution/executor.py",
+    "src/btc_quant_agent/execution/protection.py",
+    "src/btc_quant_agent/live_runtime.py",
+    "src/btc_quant_agent/position_supervisor/models.py",
+    "src/btc_quant_agent/position_supervisor/supervisor.py",
+    "tests/test_live_v1_approval_environment_r4.py",
+    "tests/test_live_v1_day2_e2e.py",
+    "tests/test_live_v1_execution_backend.py",
+    "tests/test_live_v1_execution_protection_r4.py",
+    "tests/test_live_v1_execution_recovery_r3.py",
+    "tests/test_live_v1_position_authority_r4.py",
+    "tests/test_live_v1_position_supervisor.py",
+    "tests/test_live_v1_runtime_r2.py",
+    "tests/test_live_v1_runtime_recovery_r3.py"
+  ],
+  "published_artifact_base": "evidence/v0.5.5/live_v1/b5_r4_independent/",
+  "probe_publication_paths": {
+    "test_independent_governance_probe.py": "probes/governance_probe.py",
+    "test_independent_protection_contract.py": "probes/protective_contract_probe.py",
+    "protection/test_independent_protection_probe.py": "probes/observed_protection_probe.py",
+    "position/test_independent_position_probe.py": "probes/position_authority_probe.py"
+  },
+  "r4_protective_confirmation": {
+    "result": "FAIL",
+    "findings": [
+      "B5R4-01",
+      "B5R4-02",
+      "B5R4-03"
+    ],
+    "attack_matrix": [
+      {
+        "gate": "Malformed algoId/orderId, including null, bool, empty, whitespace, typed values, invalid characters and conflicting aliases",
+        "result": "PASS",
+        "evidence": "independent probe test_malformed_provider_id_is_never_authority (20 cases), test_valid_provider_aliases (3 cases); protection.py:32-53"
+      },
+      {
+        "gate": "POST acceptance requires exact-ID query and full stop identity before ACTIVE",
+        "result": "FAIL on restart; initial placement path passed tested exact-ID scenarios",
+        "evidence": "independent probes test_post_success_wrong_exact_confirmation_stays_pending (15 cases), test_post_success_query_not_found_keeps_exact_claim_and_blocks_replay, test_exact_confirmation_and_restart_are_idempotent, test_pending_restart_promotes_from_open_list_without_exact_query (2 cases); backend.py:598-629,682-713; findings P2 and P3"
+      },
+      {
+        "gate": "Unknown or foreign open stops and durable same-symbol ownership",
+        "result": "PASS",
+        "evidence": "independent probes test_foreign_and_duplicate_open_stops_block_without_mutation, test_symbol_owner_conflict_survives_pending_and_restart; protection.py:112-140,142-162; backend.py:582-608"
+      },
+      {
+        "gate": "Remote placement/local insert failure, restart pending and no duplicate placement",
+        "result": "PASS for tested non-flat recovery",
+        "evidence": "independent probes test_remote_success_local_insert_failure_rolls_back_and_recovers, test_post_success_query_not_found_keeps_exact_claim_and_blocks_replay; protection.py:191-220; backend.py:623-637; restart may promote without exact query as finding P3"
+      },
+      {
+        "gate": "Remote cancellation/local update failure",
+        "result": "PASS for tested resize failure",
+        "evidence": "independent probe test_remote_cancel_local_update_failure_keeps_pending_owner; backend.py:639-646; protection.py:178-189,222-238"
+      },
+      {
+        "gate": "Flat reconciliation retains unresolved remote stop identity",
+        "result": "FAIL",
+        "evidence": "independent probe test_pending_unknown_stop_is_released_when_position_goes_flat; backend.py:606-616; protection.py:240-254; finding P1"
+      },
+      {
+        "gate": "Confirmed exchange stop preserves submitted trigger settings",
+        "result": "FAIL",
+        "evidence": "independent probe test_explicitly_wrong_exchange_settings_are_currently_confirmed (4 cases); backend.py:648-680,691-712; finding P2"
+      },
+      {
+        "gate": "Backend-owned current time, forced fresh REST account, unchanged authorization TTL, loss/drawdown headroom",
+        "result": "SOURCE REVIEW + focused repository tests; no new independent boundary probe",
+        "evidence": "backend.py:321-369,371-423; authorization.py:158-190; validator.py:142-211; tests/test_live_v1_position_authority_r4.py; tests/test_live_v1_approval_environment_r4.py"
+      },
+      {
+        "gate": "Canonical approval/account/client identities, reconcile before entry, transport query before retry, partial-fill resizing and concurrent claim",
+        "result": "SOURCE REVIEW + focused repository tests; no new independent boundary probe",
+        "evidence": "backend.py:371-447,557-637,721-771; authorization.py:103-155; intents.py:343-375; executor.py:127-201,230-257; live_runtime.py:156-165,346-358; tests/test_live_v1_execution_protection_r3.py; tests/test_live_v1_position_authority_r4.py"
+      }
+    ],
+    "observed_behavior_probes": {
+      "counts": {
+        "tests": 51,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": 51
+      },
+      "seconds": 8.872,
+      "log": "protection-probe.log",
+      "per_class": {
+        "b5-r4-evidence.protection.test_independent_protection_probe": 51
+      }
+    },
+    "safety_contract_probes": {
+      "counts": {
+        "tests": 7,
+        "failures": 7,
+        "errors": 0,
+        "skipped": 0,
+        "passed": 0
+      },
+      "seconds": 2.55,
+      "log": "protection-contract.log",
+      "per_class": {
+        "b5-r4-evidence.test_independent_protection_contract": 7
+      }
+    }
+  },
+  "r4_account_cooldown": {
+    "result": "PASS_FOR_NORMAL_SCOPED_COOLDOWN",
+    "attack_matrix": [
+      {
+        "case": "two accounts same symbol STOP_NEAR 1ms",
+        "result": "pass",
+        "probe": "test_two_accounts_independent_and_same_account_cools_after_restart[STOP_NEAR]"
+      },
+      {
+        "case": "LIQUIDITY_DETERIORATION account A cannot suppress B",
+        "result": "pass",
+        "probe": "test_two_accounts_independent_and_same_account_cools_after_restart[LIQUIDITY_DETERIORATION]"
+      },
+      {
+        "case": "same authority/symbol/trigger cooldown survives restart",
+        "result": "pass",
+        "probe": "test_two_accounts_independent_and_same_account_cools_after_restart"
+      },
+      {
+        "case": "different trigger, symbol, environment, namespace independent",
+        "result": "pass",
+        "probe": "test_cooldown_full_scope_trigger_symbol_namespace_and_legacy"
+      },
+      {
+        "case": "legacy event without authority excluded from cooldown",
+        "result": "pass",
+        "probe": "test_cooldown_full_scope_trigger_symbol_namespace_and_legacy"
+      },
+      {
+        "case": "DRY_RUN default lifecycle cannot suppress TESTNET and namespaces A/B isolated",
+        "result": "pass",
+        "probe": "test_lifecycle_flat_reopen_namespace_isolation_and_replay_rejection"
+      },
+      {
+        "case": "durable flat/reopen, prior quantity scoped, changed env/namespace replay hash rejected",
+        "result": "pass",
+        "probe": "test_lifecycle_flat_reopen_namespace_isolation_and_replay_rejection"
+      },
+      {
+        "case": "legacy unbound lifecycle cannot rebind to DRY_RUN; TESTNET unaffected",
+        "result": "pass",
+        "probe": "test_unbound_legacy_dry_run_blocks_without_rebinding_testnet"
+      },
+      {
+        "case": "event payload/hash/account authority match storage; altered authority fails",
+        "result": "pass",
+        "probe": "test_event_storage_authority_and_hash_must_agree"
+      },
+      {
+        "case": "outbox two account cases frozen, distinct, and not redispatched after DONE/restart",
+        "result": "pass",
+        "probe": "test_outbox_two_accounts_frozen_identity_once_and_restart"
+      },
+      {
+        "case": "expired lease before analysis blocks callback and preserves frozen case",
+        "result": "pass",
+        "probe": "test_expired_lease_does_not_call_analysis"
+      }
+    ],
+    "outbox_identity_finding": "B5R4-05"
+  },
+  "r4_environment_namespace_lifecycle": {
+    "result": "FAIL_RUNTIME_AUTHORITY; persisted scoped lifecycle checks PASS",
+    "finding": "B5R4-04",
+    "attack_matrix": [
+      {
+        "case": "two accounts same symbol STOP_NEAR 1ms",
+        "result": "pass",
+        "probe": "test_two_accounts_independent_and_same_account_cools_after_restart[STOP_NEAR]"
+      },
+      {
+        "case": "LIQUIDITY_DETERIORATION account A cannot suppress B",
+        "result": "pass",
+        "probe": "test_two_accounts_independent_and_same_account_cools_after_restart[LIQUIDITY_DETERIORATION]"
+      },
+      {
+        "case": "same authority/symbol/trigger cooldown survives restart",
+        "result": "pass",
+        "probe": "test_two_accounts_independent_and_same_account_cools_after_restart"
+      },
+      {
+        "case": "different trigger, symbol, environment, namespace independent",
+        "result": "pass",
+        "probe": "test_cooldown_full_scope_trigger_symbol_namespace_and_legacy"
+      },
+      {
+        "case": "legacy event without authority excluded from cooldown",
+        "result": "pass",
+        "probe": "test_cooldown_full_scope_trigger_symbol_namespace_and_legacy"
+      },
+      {
+        "case": "DRY_RUN default lifecycle cannot suppress TESTNET and namespaces A/B isolated",
+        "result": "pass",
+        "probe": "test_lifecycle_flat_reopen_namespace_isolation_and_replay_rejection"
+      },
+      {
+        "case": "durable flat/reopen, prior quantity scoped, changed env/namespace replay hash rejected",
+        "result": "pass",
+        "probe": "test_lifecycle_flat_reopen_namespace_isolation_and_replay_rejection"
+      },
+      {
+        "case": "legacy unbound lifecycle cannot rebind to DRY_RUN; TESTNET unaffected",
+        "result": "pass",
+        "probe": "test_unbound_legacy_dry_run_blocks_without_rebinding_testnet"
+      },
+      {
+        "case": "event payload/hash/account authority match storage; altered authority fails",
+        "result": "pass",
+        "probe": "test_event_storage_authority_and_hash_must_agree"
+      },
+      {
+        "case": "outbox two account cases frozen, distinct, and not redispatched after DONE/restart",
+        "result": "pass",
+        "probe": "test_outbox_two_accounts_frozen_identity_once_and_restart"
+      },
+      {
+        "case": "expired lease before analysis blocks callback and preserves frozen case",
+        "result": "pass",
+        "probe": "test_expired_lease_does_not_call_analysis"
+      },
+      {
+        "case": "outbox event symbol versus dispatch symbol",
+        "result": "fail",
+        "probe": "test_dispatch_rejects_symbol_mismatch_between_event_and_outbox"
+      },
+      {
+        "case": "runtime readiness verifies snapshot account and hash",
+        "result": "fail",
+        "probe": "test_runtime_readiness_rejects_verified_other_account_namespace; test_runtime_readiness_rejects_invalid_snapshot_hash"
+      },
+      {
+        "case": "runtime start rejects other account before accepting risk",
+        "result": "fail",
+        "probe": "test_start_does_not_accept_other_account_after_rest_reconciliation"
+      },
+      {
+        "case": "runtime intent admission rejects other account",
+        "result": "fail",
+        "probe": "test_runtime_delegates_intent_with_wrong_account_snapshot"
+      }
+    ]
+  },
+  "prior_safety_matrix": [
+    {
+      "gate": "placement backend clock + fresh REST account",
+      "result": "PASS",
+      "evidence": "execution/backend.py:321-369; test_live_v1_execution_placement_r3.py; 64-test R3 run"
+    },
+    {
+      "gate": "immutable authorization TTL",
+      "result": "PASS",
+      "evidence": "execution/authorization.py; test_live_v1_execution_placement_r3.py and execution_recovery_r3.py"
+    },
+    {
+      "gate": "daily-loss/drawdown remaining headroom",
+      "result": "PASS",
+      "evidence": "execution/validator.py and intents.py; test_live_v1_execution_placement_r3.py"
+    },
+    {
+      "gate": "canonical intent/idempotency/client identities",
+      "result": "PASS",
+      "evidence": "execution/intents.py; test_live_v1_execution_identity_r3.py; live-v1 run"
+    },
+    {
+      "gate": "exact protective ownership",
+      "result": "FAIL",
+      "evidence": "ProtectionStore exact owner/foreign/duplicate rejection passes, but B5R4-01/02/03 fail confirmation/recovery contract"
+    },
+    {
+      "gate": "reconcile existing before new entry",
+      "result": "PASS",
+      "evidence": "live_runtime.py:346; execution/executor.py; test_live_v1_execution_recovery_r3.py and runtime_recovery_r3.py"
+    },
+    {
+      "gate": "independent mark/book/kline freshness",
+      "result": "PASS",
+      "evidence": "test_live_v1_runtime_recovery_r3.py and test_live_v1_execution_recovery_r3.py; market_stream.py"
+    },
+    {
+      "gate": "runtime config single source",
+      "result": "PASS_WITH_RELATED_HIGH",
+      "evidence": "api.py:49-99; config.py; runtime_recovery_r3 tests pass; snapshot authority gap B5R4-04"
+    },
+    {
+      "gate": "durable flat/reopen",
+      "result": "PASS",
+      "evidence": "position independent lifecycle probe + test_live_v1_runtime_recovery_r3.py"
+    },
+    {
+      "gate": "PositionCase outbox lease/frozen identity",
+      "result": "FAIL",
+      "evidence": "Lease and normal DONE/restart exactly-once probes pass; symbol corruption gap B5R4-05"
+    },
+    {
+      "gate": "TESTNET credential namespace isolation",
+      "result": "PASS",
+      "evidence": "binance_signed.py:218-243; governance credential-sentinel probe; live-v1 backend authority tests"
+    },
+    {
+      "gate": "host API read-only governance",
+      "result": "PASS",
+      "evidence": "api.py runtime excludes mutating router; 26 R02 tests + governance independent route probe"
+    },
+    {
+      "gate": "Feishu callback no executable order authority",
+      "result": "PASS",
+      "evidence": "approval/callback.py:80 strict three-field allowlist; 6 independent executable-field injection probes"
+    },
+    {
+      "gate": "transport uncertainty query before retry",
+      "result": "PASS_FOR_ENTRY_FAIL_FOR_PROTECTION",
+      "evidence": "Entry tests test_live_v1_execution_backend.py pass; PENDING stop recovery violates exact-query gate B5R4-01"
+    },
+    {
+      "gate": "partial fill/protection resize",
+      "result": "PASS_WITH_CONFIRMATION_GAPS",
+      "evidence": "backend.py:557; live-v1 backend tests and remote-cancel/local-write-failure probes pass; B5R4-01/02/03 remain"
+    },
+    {
+      "gate": "concurrency/idempotency",
+      "result": "PASS",
+      "evidence": "test_live_v1_execution_storage.py, decision_approval.py, execution_intent.py; normal outbox independent probes"
+    },
+    {
+      "gate": "SQLite WAL/FULL/busy_timeout/foreign_keys",
+      "result": "PASS",
+      "evidence": "live_db.py; independent governance PRAGMA assertions = wal/2/10000/1"
+    },
+    {
+      "gate": "secret isolation",
+      "result": "PASS_OFFLINE",
+      "evidence": "AccountSnapshot extra-field isolation tests; independent Codex child sentinel env/prompt checks; no credential values read or published"
+    },
+    {
+      "gate": "LIVE/AUTONOMOUS hard block",
+      "result": "PASS",
+      "evidence": "execution/policy.py + signed client; five independent blocked-mode probes with transport never called"
+    }
+  ],
+  "approval_display_contract": "PASS: tampered LIVE card title cannot change persisted DRY_RUN/TESTNET account or capability authority",
+  "execution_idempotency": "PASS_FOR_ENTRY; protection confirmation FAIL",
+  "account_reconciliation": "PASS_FOR_ENTRY_BACKEND; runtime readiness HIGH B5R4-04",
+  "position_supervisor": "Scoped lifecycle/cooldown PASS; corrupted outbox symbol HIGH B5R4-05",
+  "runtime_governance": "Host API/config governance PASS; runtime account admission HIGH B5R4-04",
+  "provider_boundaries": "PASS_OFFLINE: no executable fields/authority; Codex read-only/no-network/no-tools restricted child",
+  "secret_isolation": "PASS_OFFLINE",
+  "testnet_only_fence": "PASS",
+  "live_write_count": 0,
+  "smokes": {
+    "binance_testnet": "NOT_RUN_CREDENTIALS_UNAVAILABLE",
+    "openai": "NOT_RUN_CREDENTIALS_UNAVAILABLE",
+    "feishu": "NOT_RUN_CREDENTIALS_UNAVAILABLE",
+    "codex": "NOT_RUN_DEDICATED_CONFIGURATION_UNAVAILABLE; binary present but model/auth configuration absent"
+  },
+  "credential_configuration_presence_only": {
+    "BINANCE_TESTNET_API_KEY": false,
+    "BINANCE_TESTNET_API_SECRET": false,
+    "OPENAI_API_KEY": false,
+    "FEISHU_APP_ID": false,
+    "FEISHU_APP_SECRET": false,
+    "FEISHU_RECEIVE_ID": false,
+    "FEISHU_VERIFICATION_TOKEN": false,
+    "FEISHU_APPROVER_OPEN_IDS": false,
+    "BTC_QUANT_LIVE_V1_PRIMARY_MODEL": false,
+    "BTC_QUANT_LIVE_V1_SECONDARY_MODEL": false,
+    "codex_binary_present": true,
+    "BTC_QUANT_LIVE_RESPONSES_MODEL": false,
+    "BTC_QUANT_LIVE_CODEX_MODEL": false,
+    "BTC_QUANT_LIVE_CODEX_ENABLED": false,
+    "FEISHU_CHAT_ID": false,
+    "FEISHU_ENCRYPT_KEY": false,
+    "BTC_QUANT_LIVE_V1_TESTNET_EXECUTION_ENABLED": false
+  },
+  "tests": {
+    "full-suite": {
+      "counts": {
+        "tests": 2347,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 2,
+        "passed": 2345
+      },
+      "seconds": 781.554,
+      "log": "full-suite.log",
+      "per_class": {
+        "tests.test_api.ApiCorrectnessTests": 4,
+        "tests.test_backtest.BacktestTests": 7,
+        "tests.test_binance_archive.BinanceArchiveTests": 5,
+        "tests.test_binance_signed.BinanceSignedTests": 2,
+        "tests.test_binance_spot_archive": 4,
+        "tests.test_config.ConfigTests": 1,
+        "tests.test_csvio.CsvTests": 1,
+        "tests.test_data_manifest.DataManifestTests": 2,
+        "tests.test_derivatives.HistoricalDerivativeTests": 7,
+        "tests.test_engine.EngineTests": 1,
+        "tests.test_engine_correctness.EngineCorrectnessTests": 12,
+        "tests.test_event_backtest.EventBacktestTests": 5,
+        "tests.test_execution.ExecutionTests": 5,
+        "tests.test_execution_environment_authority.ExecutionEnvironmentAuthorityTests": 36,
+        "tests.test_execution_guard.ExecutionGuardTests": 3,
+        "tests.test_explain.ExplainTests": 1,
+        "tests.test_features.FeatureOptimizationParityTests": 2,
+        "tests.test_forward_derivatives": 13,
+        "tests.test_funnel": 9,
+        "tests.test_hermetic_runtime_guard": 25,
+        "tests.test_live_v1_account_stream_r2": 9,
+        "tests.test_live_v1_account_watch": 7,
+        "tests.test_live_v1_approval_environment_r4": 2,
+        "tests.test_live_v1_day2_e2e": 3,
+        "tests.test_live_v1_decision_api": 2,
+        "tests.test_live_v1_decision_approval": 28,
+        "tests.test_live_v1_decision_backends": 14,
+        "tests.test_live_v1_decision_case": 3,
+        "tests.test_live_v1_decision_e2e": 7,
+        "tests.test_live_v1_decision_models": 8,
+        "tests.test_live_v1_decision_risk": 13,
+        "tests.test_live_v1_execution_authorization_r2": 18,
+        "tests.test_live_v1_execution_backend": 18,
+        "tests.test_live_v1_execution_compilation_r2": 10,
+        "tests.test_live_v1_execution_identity_r3": 3,
+        "tests.test_live_v1_execution_intent": 10,
+        "tests.test_live_v1_execution_placement_r3": 10,
+        "tests.test_live_v1_execution_protection_r3": 11,
+        "tests.test_live_v1_execution_protection_r4": 34,
+        "tests.test_live_v1_execution_recovery_r3": 19,
+        "tests.test_live_v1_execution_storage": 2,
+        "tests.test_live_v1_execution_validator": 12,
+        "tests.test_live_v1_position_authority_r4": 22,
+        "tests.test_live_v1_position_kill": 2,
+        "tests.test_live_v1_position_lease_r2": 3,
+        "tests.test_live_v1_position_supervisor": 34,
+        "tests.test_live_v1_runtime_r2": 11,
+        "tests.test_live_v1_runtime_recovery_r3": 21,
+        "tests.test_market_watch": 137,
+        "tests.test_mechanism": 20,
+        "tests.test_microstructure_stats_cache": 12,
+        "tests.test_microstructure_status_incremental_performance": 26,
+        "tests.test_multifactor.MultiFactorTests": 3,
+        "tests.test_notify.NotifyTests": 1,
+        "tests.test_quality.QualityTests": 2,
+        "tests.test_regime.RegimeTests": 5,
+        "tests.test_research.ResearchTests": 6,
+        "tests.test_research_protocol.ResearchProtocolTests": 4,
+        "tests.test_risk.RiskTests": 10,
+        "tests.test_service_correctness.ServiceCorrectnessTests": 1,
+        "tests.test_shadow.ShadowTests": 1,
+        "tests.test_storage.StorageTests": 4,
+        "tests.test_strategies.StrategyBoundaryTests": 10,
+        "tests.test_structure.StructureTests": 2,
+        "tests.test_tactical_feature_evidence_v2": 31,
+        "tests.test_tactical_grid_shadow_evaluation_v1": 50,
+        "tests.test_tactical_policy_b0": 23,
+        "tests.test_tactical_shadow_evaluation_v2": 24,
+        "tests.test_v0311_runtime_registry": 18,
+        "tests.test_v0313_forward_reliability": 13,
+        "tests.test_v0314_evidence_epoch": 10,
+        "tests.test_v0315_microstructure": 9,
+        "tests.test_v0316_reliability": 18,
+        "tests.test_v0317_opportunity_successor": 12,
+        "tests.test_v0320_reliability": 8,
+        "tests.test_v0321_resilience": 6,
+        "tests.test_v0322_microstructure_research": 16,
+        "tests.test_v0323_blind_validation": 26,
+        "tests.test_v0324_blind_accumulation_operations": 16,
+        "tests.test_v0325_one_shot_unblind_preregistration": 59,
+        "tests.test_v0326_h39_blocker_repairs": 33,
+        "tests.test_v040_research_kernel_economic_validation": 16,
+        "tests.test_v041_acceptance_repair_causal_risk": 18,
+        "tests.test_v041_c2_intrabar_exit_slippage_bounds": 30,
+        "tests.test_v041_p0_p1_cash_ledger": 58,
+        "tests.test_v041_p2_p3_causal_execution": 19,
+        "tests.test_v041_p4_risk_policy": 17,
+        "tests.test_v041_p5_protocol_evidence_persistence": 22,
+        "tests.test_v041_p6_metrics_benchmarks_qualification": 39,
+        "tests.test_v042_a04_semantic_goldens": 15,
+        "tests.test_v042_b01_limit_causality": 20,
+        "tests.test_v042_b02_causal_liquidity": 16,
+        "tests.test_v042_b03_formal_pit_boundary": 15,
+        "tests.test_v042_b04_verified_replay_input_bundle": 20,
+        "tests.test_v042_b04r2_authority_acceptance_repair": 13,
+        "tests.test_v042_b04r3_protocol_producer_contract_fail_closed": 7,
+        "tests.test_v042_b04r4_random_benchmark_authority_boundary": 9,
+        "tests.test_v042_b04r5_candidate_identity_relabel_fail_closed": 12,
+        "tests.test_v042_b04r_replay_bundle_acceptance_repair": 21,
+        "tests.test_v042_b05_candidate_execution_replay": 13,
+        "tests.test_v042_b06_random_experiment_replay": 10,
+        "tests.test_v042_b07_cash_reconstruction": 13,
+        "tests.test_v042_b08_clock_config": 16,
+        "tests.test_v042_b09_durable_publication": 10,
+        "tests.test_v042_b10_writer_finalization": 8,
+        "tests.test_v042_b11_sqlite_compatibility": 18,
+        "tests.test_v042_b12_bounded_rest_requester": 28,
+        "tests.test_v042_ba_information_set_integration": 3,
+        "tests.test_v042_bar_pit_formal_promotion": 7,
+        "tests.test_v043_c_lite_formal_consumers": 34,
+        "tests.test_v050_r01_retained_owner_guards": 9,
+        "tests.test_v050_r01_surface_reduction": 13,
+        "tests.test_v050_r02_orchestration_guards": 26,
+        "tests.test_v050_r03b_legacy_benchmark_guards": 6,
+        "tests.test_v050_r04_kernel_convergence": 3,
+        "tests.test_v050_r05a_ag03_producer_contract_immutability": 19,
+        "tests.test_v050_r05a_ag04_health_read_only_inspection.R05AHealthReadOnlyInspectionTests": 10,
+        "tests.test_v050_r05b_material_input_selector_authority": 22,
+        "tests.test_v050_r05c_funding_evidence_authority": 29,
+        "tests.test_v051_h40_f01_lifecycle_authority": 109,
+        "tests.test_v051_h40_f01r3r1_durable_authority": 29,
+        "tests.test_v051_h40_f01r3r2_commit_authority": 16,
+        "tests.test_v051_h40_f01r3r3_api_seal": 8,
+        "tests.test_v051_h40_f01r3r4_lineage_durability": 13,
+        "tests.test_v051_h40_implementation_authority_publication": 13,
+        "tests.test_v051_h40_m3a_production_discovery_producer": 26,
+        "tests.test_v051_h40_m3a_r1_runtime_scaling": 8,
+        "tests.test_v051_h40_p1_scaffold": 81,
+        "tests.test_v051_h40_p2_search_space": 22,
+        "tests.test_v051_h40_p2r1_contract_materialization": 27,
+        "tests.test_v051_h40_p3_controller_authority_publication": 14,
+        "tests.test_v051_h40_p3b_production_discovery_verifier": 86,
+        "tests.test_v051_h40_p3b_production_verifier_behavior_seal": 17,
+        "tests.test_v051_h40_p3b_production_verifier_identity_seal": 9,
+        "tests.test_v051_h40_repair_a_lifecycle_authority": 49,
+        "tests.test_v051_h40_repair_b_provenance_pit": 59
+      }
+    },
+    "live-v1": {
+      "counts": {
+        "tests": 336,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": 336
+      },
+      "seconds": 58.159,
+      "log": "live-v1.log",
+      "per_class": {
+        "tests.test_live_v1_account_stream_r2": 9,
+        "tests.test_live_v1_account_watch": 7,
+        "tests.test_live_v1_approval_environment_r4": 2,
+        "tests.test_live_v1_day2_e2e": 3,
+        "tests.test_live_v1_decision_api": 2,
+        "tests.test_live_v1_decision_approval": 28,
+        "tests.test_live_v1_decision_backends": 14,
+        "tests.test_live_v1_decision_case": 3,
+        "tests.test_live_v1_decision_e2e": 7,
+        "tests.test_live_v1_decision_models": 8,
+        "tests.test_live_v1_decision_risk": 13,
+        "tests.test_live_v1_execution_authorization_r2": 18,
+        "tests.test_live_v1_execution_backend": 18,
+        "tests.test_live_v1_execution_compilation_r2": 10,
+        "tests.test_live_v1_execution_identity_r3": 3,
+        "tests.test_live_v1_execution_intent": 10,
+        "tests.test_live_v1_execution_placement_r3": 10,
+        "tests.test_live_v1_execution_protection_r3": 11,
+        "tests.test_live_v1_execution_protection_r4": 34,
+        "tests.test_live_v1_execution_recovery_r3": 19,
+        "tests.test_live_v1_execution_storage": 2,
+        "tests.test_live_v1_execution_validator": 12,
+        "tests.test_live_v1_position_authority_r4": 22,
+        "tests.test_live_v1_position_kill": 2,
+        "tests.test_live_v1_position_lease_r2": 3,
+        "tests.test_live_v1_position_supervisor": 34,
+        "tests.test_live_v1_runtime_r2": 11,
+        "tests.test_live_v1_runtime_recovery_r3": 21
+      }
+    },
+    "r3": {
+      "counts": {
+        "tests": 64,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": 64
+      },
+      "seconds": 16.537,
+      "log": "r3.log",
+      "per_class": {
+        "tests.test_live_v1_execution_identity_r3": 3,
+        "tests.test_live_v1_execution_placement_r3": 10,
+        "tests.test_live_v1_execution_protection_r3": 11,
+        "tests.test_live_v1_execution_recovery_r3": 19,
+        "tests.test_live_v1_runtime_recovery_r3": 21
+      }
+    },
+    "affected": {
+      "counts": {
+        "tests": 355,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": 355
+      },
+      "seconds": 13.103,
+      "log": "affected.log",
+      "per_class": {
+        "tests.test_execution.ExecutionTests": 5,
+        "tests.test_execution_guard.ExecutionGuardTests": 3,
+        "tests.test_execution_environment_authority.ExecutionEnvironmentAuthorityTests": 36,
+        "tests.test_hermetic_runtime_guard": 25,
+        "tests.test_v0311_runtime_registry": 18,
+        "tests.test_v050_r02_orchestration_guards": 26,
+        "tests.test_market_watch": 137,
+        "tests.test_tactical_feature_evidence_v2": 31,
+        "tests.test_tactical_shadow_evaluation_v2": 24,
+        "tests.test_tactical_grid_shadow_evaluation_v1": 50
+      }
+    },
+    "governance-probe": {
+      "counts": {
+        "tests": 17,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": 17
+      },
+      "seconds": 1.515,
+      "log": "governance-probe.log",
+      "per_class": {
+        "b5-r4-evidence.test_independent_governance_probe": 17
+      }
+    },
+    "protection-probe": {
+      "counts": {
+        "tests": 51,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": 51
+      },
+      "seconds": 8.872,
+      "log": "protection-probe.log",
+      "per_class": {
+        "b5-r4-evidence.protection.test_independent_protection_probe": 51
+      }
+    },
+    "position-probe": {
+      "counts": {
+        "tests": 13,
+        "failures": 5,
+        "errors": 0,
+        "skipped": 0,
+        "passed": 8
+      },
+      "seconds": 2.095,
+      "log": "position-probe.log",
+      "per_class": {
+        "b5-r4-evidence.position.test_independent_position_probe": 13
+      }
+    },
+    "protection-contract": {
+      "counts": {
+        "tests": 7,
+        "failures": 7,
+        "errors": 0,
+        "skipped": 0,
+        "passed": 0
+      },
+      "seconds": 2.55,
+      "log": "protection-contract.log",
+      "per_class": {
+        "b5-r4-evidence.test_independent_protection_contract": 7
+      }
+    },
+    "independent-final": {
+      "counts": {
+        "tests": 88,
+        "failures": 12,
+        "errors": 0,
+        "skipped": 0,
+        "passed": 76
+      },
+      "seconds": 14.033,
+      "log": "independent-final.log",
+      "per_class": {
+        "b5-r4-evidence.test_independent_governance_probe": 17,
+        "b5-r4-evidence.test_independent_protection_contract": 7,
+        "b5-r4-evidence.protection.test_independent_protection_probe": 51,
+        "b5-r4-evidence.position.test_independent_position_probe": 13
+      }
+    },
+    "r4-focused": {
+      "counts": {
+        "tests": 58,
+        "passed": 58,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "log": "r4-focused.log"
+    }
+  },
+  "ruff": {
+    "result": "PASS",
+    "violations": 0,
+    "log": "ruff.log"
+  },
+  "mypy": {
+    "result": "PASS",
+    "source_files": 151,
+    "errors": 0,
+    "log": "mypy.log"
+  },
+  "compileall": {
+    "result": "PASS",
+    "command": "python -m compileall -q src skill-template/scripts",
+    "compiled_source_files": 152
+  },
+  "git_diff_check": {
+    "result": "PASS",
+    "violations": 0,
+    "implementation_clean_after_validation": true
+  },
+  "h40_fence": {
+    "result": "PASS",
+    "baseline": "407dabc415ae8cae4210250e992941c8b9b25464",
+    "source_diff_bytes": 0,
+    "A34_full_history_local_test": "PASS"
+  },
+  "remote_ci": {
+    "run_id": 37118592732,
+    "branch": "feature/b-line-live-v1",
+    "sha": "4bc05e1a7c7fae86f41c1dd9b5a1635d0540ee58",
+    "attempt": 1,
+    "status": "completed",
+    "conclusion": "failure",
+    "url": "https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/37118592732",
+    "job_id": 111190099138,
+    "counts": {
+      "passed": 2344,
+      "failed": 1,
+      "skipped": 2
+    },
+    "sole_failure": "tests/test_tactical_grid_shadow_evaluation_v1.py::test_b2b_a34_h40_diff_remains_zero",
+    "cause": "actions/checkout fetch --depth=1; historical revision range absent",
+    "local_h40_full_history_diff_bytes": 0,
+    "adjudication": "KNOWN_NONBLOCKING_CI_HARNESS_DEBT_A34_SHALLOW_CHECKOUT",
+    "evidence": "remote-ci-excerpt.log",
+    "all_exact_target_runs": [
+      {
+        "id": 37118592732,
+        "name": "CI",
+        "head_sha": "4bc05e1a7c7fae86f41c1dd9b5a1635d0540ee58",
+        "conclusion": "failure",
+        "status": "completed",
+        "run_attempt": 1
+      }
+    ]
+  },
+  "local_harness_adjudication": {
+    "initial_runs": "Interrupted or timed out; not counted as completed suite results",
+    "cause": "Managed sandbox network restriction denies AF_UNIX socketpair send with PermissionError errno 1. asyncio completion/shutdown wakeup is lost.",
+    "local_reproduction": "socket.socketpair(); s1.send(b'x') => PermissionError 1; asyncio.to_thread returns but asyncio.run shutdown stalls",
+    "approved_read_only_execution": "Same local diagnostic outside sandbox: socketpair send, to_thread result, asyncio shutdown all pass. Same repository account-stream fake-client test: 1 passed in 0.08s.",
+    "test_protection": "Unmodified tests/conftest.py hermetic_guard blocks external DNS/urlopen, Binance signed transport, operational data and protected outcomes.",
+    "implementation_repair": false,
+    "classification": "LOCAL_VALIDATION_HARNESS_ENVIRONMENT; not an implementation defect"
+  },
+  "docs_head_drift": {
+    "initial_dispatch_sha": "75c9c5cfa1bfaf6cad0c91214fecccc2eb578928",
+    "observed_later_head": "0c5ba8c871a22024a038cdce79ac0809d7cf8204",
+    "later_commit_scope": "docs/project/V0.5.5_PROJECT_STATUS_AND_ROADMAP.md",
+    "current_binding_blobs": [
+      {
+        "path": "evidence/v0.5.5/controller/B_LINE_CURRENT_AUTHORITY.json",
+        "sha": "2758c7b02896dcce8120d5c986fe1fc10b1897e1",
+        "isError": false
+      },
+      {
+        "path": "evidence/v0.5.5/controller/B_LINE_LIVE_V1_DISPATCH_MANIFEST.json",
+        "sha": "3b6add8216dc0bedf44d86dc713c3458311a17a0",
+        "isError": false
+      },
+      {
+        "path": "evidence/v0.5.5/controller/B_LINE_LIVE_V1_B5_R4_CURRENT_DISPATCH.json",
+        "sha": "a3da974ca68fe049248a6fdb128c50f3c8dbee5e",
+        "isError": false
+      },
+      {
+        "path": "prompts/v0.5/validation/v0.5.5_B5_LIVE_V1_R4_INDEPENDENT_EXACT_SHA_REVALIDATION.md",
+        "sha": "724e1466c6bb4e78e0cd4a644cd7c8f8a75c95d7",
+        "isError": false
+      }
+    ],
+    "publication_parent": "75c9c5cfa1bfaf6cad0c91214fecccc2eb578928",
+    "adjudication": "Frozen dispatch preserved; later roadmap edit leaves all B5 binding blobs unchanged"
+  },
+  "findings": [
+    {
+      "id": "B5R4-01",
+      "severity": "BLOCKER",
+      "title": "PENDING recovery promotes protection without exact-ID confirmation",
+      "source": [
+        "src/btc_quant_agent/execution/backend.py:598",
+        "src/btc_quant_agent/execution/backend.py:618",
+        "src/btc_quant_agent/execution/backend.py:675"
+      ],
+      "reproduction": "Protective POST returns owned-stop; exact-ID query fails; owner is PENDING_CONFIRMATION. Restart with an otherwise matching openAlgoOrders listing while exact-ID query remains unavailable. Recovery returns owned-stop and writes ACTIVE without retrying query_protective_order. A listing with algoStatus omitted is also accepted via implicit NEW.",
+      "evidence": [
+        "test_independent_protection_contract.py::test_pending_restart_requires_successful_exact_id_query (2 failing safety assertions)",
+        "protection/test_independent_protection_probe.py::test_pending_restart_promotes_from_open_list_without_exact_query (2 observed-behavior cases)"
+      ],
+      "impact": "Violates the mandatory authoritative exact-ID query before atomic ACTIVE invariant. Aggregate listing becomes installation authority after an uncertain placement.",
+      "limits": "No duplicate placement was observed, and the kill switch remains latched from the initial uncertainty. No network or real-money write was exercised."
+    },
+    {
+      "id": "B5R4-02",
+      "severity": "HIGH",
+      "title": "Confirmation ignores explicitly different protective execution settings",
+      "source": [
+        "src/btc_quant_agent/execution/backend.py:649",
+        "src/btc_quant_agent/execution/backend.py:691"
+      ],
+      "reproduction": "POST requests workingType=MARK_PRICE, priceProtect=TRUE, closePosition=false, algoType=CONDITIONAL. Exact-ID query returning CONTRACT_PRICE, priceProtect=false, closePosition=true, or algoType=OTHER is accepted and persisted ACTIVE.",
+      "evidence": [
+        "test_independent_protection_contract.py::test_exact_confirmation_must_preserve_submitted_stop_semantics (4 failing safety assertions)"
+      ],
+      "impact": "Matching numeric trigger price alone does not establish the requested stop trigger source or full execution contract.",
+      "limits": "Fake responses demonstrate missing validation, not that Binance normally changes submitted fields."
+    },
+    {
+      "id": "B5R4-03",
+      "severity": "HIGH",
+      "title": "Flat reconciliation discards unresolved remote stop identity",
+      "source": [
+        "src/btc_quant_agent/execution/backend.py:606",
+        "src/btc_quant_agent/execution/protection.py:240"
+      ],
+      "reproduction": "After POST success/query uncertainty leaves PENDING_CONFIRMATION with exchange_id, a flat position and empty aggregate listing cause RELEASED and exchange_id=NULL without exact-ID absence or cancellation confirmation.",
+      "evidence": [
+        "test_independent_protection_contract.py::test_flat_position_must_retain_unresolved_exact_stop_identity"
+      ],
+      "impact": "Durable exact stop authority is lost under uncertainty; later reconciliation ignores the RELEASED owner.",
+      "limits": "The position is flat, kill remains latched, and orphan-stop impact requires a stale/inconsistent listing plus later risk reenablement. No immediate excess exposure or duplicate submit was proved."
+    },
+    {
+      "id": "B5R4-04",
+      "severity": "HIGH",
+      "title": "Runtime startup/readiness admits wrong or invalid account snapshot",
+      "source": [
+        "src/btc_quant_agent/live_runtime.py:269",
+        "src/btc_quant_agent/live_runtime.py:303",
+        "src/btc_quant_agent/live_runtime.py:346",
+        "src/btc_quant_agent/live_runtime.py:360"
+      ],
+      "reproduction": "A hash-valid TESTNET snapshot for OTHER_ACCOUNT is accepted at startup and sets accepting_risk=true. Readiness also accepts a failed snapshot.verify(), and execute_intent delegates before poll_positions applies the authority check.",
+      "evidence": [
+        "position/test_independent_position_probe.py (4 failing runtime safety assertions)"
+      ],
+      "impact": "Runtime readiness/status and task admission do not consistently use verified configured account authority; REST loop may reenable risk.",
+      "limits": "Actual validator verifies the snapshot and matches intent account/environment; backend obtains fresh matching REST authority before placement. Wrong-account exchange placement was not established."
+    },
+    {
+      "id": "B5R4-05",
+      "severity": "HIGH",
+      "title": "Outbox dispatch symbol is not bound to verified position event",
+      "source": [
+        "src/btc_quant_agent/position_supervisor/supervisor.py:42",
+        "src/btc_quant_agent/position_supervisor/supervisor.py:620"
+      ],
+      "reproduction": "Change only pending dispatch row symbol BTCUSDT to ETHUSDT, preserving the valid BTCUSDT event payload/hash. A symbol-aware fresh case provider returns ETHUSDT; dispatch analyzes an ETHUSDT PositionCase linked to the BTCUSDT event hash and marks DONE.",
+      "evidence": [
+        "position/test_independent_position_probe.py::test_dispatch_rejects_symbol_mismatch_between_event_and_outbox"
+      ],
+      "impact": "A corrupted persisted dispatch row can break event-to-case frozen symbol identity.",
+      "limits": "Requires corrupt/modified SQLite row. Ordinary supervisor writes matching symbols. Wrong-symbol analysis is proved; exchange placement is not."
+    }
+  ],
+  "blockers": [
+    "B5R4-01"
+  ],
+  "high_findings": [
+    "B5R4-02",
+    "B5R4-03",
+    "B5R4-04",
+    "B5R4-05"
+  ],
+  "next_state": "LIVE_V1_INDEPENDENT_VALIDATION_FAILED",
+  "LIVE_APPROVAL_ONLY": "NOT_AUTHORIZED",
+  "REAL_FUNDS_WRITE_AUTHORITY": "NONE",
+  "AUTONOMOUS_LIVE": "FORBIDDEN",
+  "limits": [
+    "Fake/mock clients and temporary SQLite only; no credentialed provider or exchange smoke",
+    "Passing implementation tests do not override reproduced independent safety failures",
+    "Observed-behavior protection probes intentionally pass when documenting defects; separate safety-contract probes fail",
+    "Initial sandbox runs were interrupted/timed out and excluded from final completed-suite counts"
+  ]
+}

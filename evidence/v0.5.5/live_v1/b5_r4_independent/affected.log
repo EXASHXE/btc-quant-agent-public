@@ -1,0 +1,13 @@
+........................................................................ [ 20%]
+........................................................................ [ 40%]
+........................................................................ [ 60%]
+........................................................................ [ 81%]
+...................................................................      [100%]
+=============================== warnings summary ===============================
+tests/test_hermetic_runtime_guard.py::test_default_h39_engine_cannot_fall_back_to_operational_roots
+  /tmp/b5-r4-independent-code/tests/test_hermetic_runtime_guard.py:80: DeprecationWarning: evaluate_validation_status() is a deprecated non-authoritative diagnostic. It MUST NOT authorize unblind, candidate promotion, or formal validation. Use check_unblind_readiness() with wall-clock denominator instead.
+    H39ResearchEngine().evaluate_validation_status()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+------------- generated xml file: /tmp/b5-r4-evidence/affected.xml -------------
+355 passed, 1 warning in 13.11s

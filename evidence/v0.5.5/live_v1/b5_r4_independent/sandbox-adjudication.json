@@ -1,0 +1,9 @@
+{
+  "initial_runs": "Interrupted or timed out; not counted as completed suite results",
+  "cause": "Managed sandbox network restriction denies AF_UNIX socketpair send with PermissionError errno 1. asyncio completion/shutdown wakeup is lost.",
+  "local_reproduction": "socket.socketpair(); s1.send(b'x') => PermissionError 1; asyncio.to_thread returns but asyncio.run shutdown stalls",
+  "approved_read_only_execution": "Same local diagnostic outside sandbox: socketpair send, to_thread result, asyncio shutdown all pass. Same repository account-stream fake-client test: 1 passed in 0.08s.",
+  "test_protection": "Unmodified tests/conftest.py hermetic_guard blocks external DNS/urlopen, Binance signed transport, operational data and protected outcomes.",
+  "implementation_repair": false,
+  "classification": "LOCAL_VALIDATION_HARNESS_ENVIRONMENT; not an implementation defect"
+}

@@ -1,0 +1,282 @@
+.................FFFFFFF................................................ [ 81%]
+...........FFFFF                                                         [100%]
+=================================== FAILURES ===================================
+________ test_pending_restart_requires_successful_exact_id_query[False] ________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-414/test_pending_restart_requires_0')
+omit_status = False
+
+    @pytest.mark.parametrize("omit_status", [False, True])
+    def test_pending_restart_requires_successful_exact_id_query(tmp_path, omit_status):
+        backend, client, kill, intent = _backend(tmp_path, 0.1)
+        client.place_protective_order.return_value = {"algoId": "owned-stop"}
+        client.query_protective_order.side_effect = BinanceExecutionError("exact query unavailable")
+        with pytest.raises(ExecutionBlocked):
+            backend._reconcile_protective_stop(intent, 0.1, NOW)
+        assert backend.protections.get_owner(intent).status == "PENDING_CONFIRMATION"
+        listing = confirmation(client, intent)
+        if omit_status:
+            listing.pop("algoStatus")
+        client.open_protective_orders.return_value = [listing]
+        restarted = TestnetExecutionBackend(backend.path, client, kill, validator=backend.validator)
+>       with pytest.raises(ExecutionBlocked):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE <class 'btc_quant_agent.execution.guard.ExecutionBlocked'>
+
+../b5-r4-evidence/test_independent_protection_contract.py:24: Failed
+________ test_pending_restart_requires_successful_exact_id_query[True] _________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-414/test_pending_restart_requires_1')
+omit_status = True
+
+    @pytest.mark.parametrize("omit_status", [False, True])
+    def test_pending_restart_requires_successful_exact_id_query(tmp_path, omit_status):
+        backend, client, kill, intent = _backend(tmp_path, 0.1)
+        client.place_protective_order.return_value = {"algoId": "owned-stop"}
+        client.query_protective_order.side_effect = BinanceExecutionError("exact query unavailable")
+        with pytest.raises(ExecutionBlocked):
+            backend._reconcile_protective_stop(intent, 0.1, NOW)
+        assert backend.protections.get_owner(intent).status == "PENDING_CONFIRMATION"
+        listing = confirmation(client, intent)
+        if omit_status:
+            listing.pop("algoStatus")
+        client.open_protective_orders.return_value = [listing]
+        restarted = TestnetExecutionBackend(backend.path, client, kill, validator=backend.validator)
+>       with pytest.raises(ExecutionBlocked):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE <class 'btc_quant_agent.execution.guard.ExecutionBlocked'>
+
+../b5-r4-evidence/test_independent_protection_contract.py:24: Failed
+___ test_exact_confirmation_must_preserve_submitted_stop_semantics[changed0] ___
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-414/test_exact_confirmation_must_p0')
+changed = {'workingType': 'CONTRACT_PRICE'}
+
+    @pytest.mark.parametrize("changed", [
+        {"workingType": "CONTRACT_PRICE"}, {"priceProtect": False},
+        {"closePosition": True}, {"algoType": "OTHER"},
+    ])
+    def test_exact_confirmation_must_preserve_submitted_stop_semantics(tmp_path, changed):
+        backend, client, _, intent = _backend(tmp_path, 0.1)
+        client.place_protective_order.return_value = {"algoId": "owned-stop"}
+        client.query_protective_order.side_effect = lambda _: confirmation(client, intent, **changed)
+>       with pytest.raises(ExecutionBlocked):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE <class 'btc_quant_agent.execution.guard.ExecutionBlocked'>
+
+../b5-r4-evidence/test_independent_protection_contract.py:37: Failed
+___ test_exact_confirmation_must_preserve_submitted_stop_semantics[changed1] ___
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-414/test_exact_confirmation_must_p1')
+changed = {'priceProtect': False}
+
+    @pytest.mark.parametrize("changed", [
+        {"workingType": "CONTRACT_PRICE"}, {"priceProtect": False},
+        {"closePosition": True}, {"algoType": "OTHER"},
+    ])
+    def test_exact_confirmation_must_preserve_submitted_stop_semantics(tmp_path, changed):
+        backend, client, _, intent = _backend(tmp_path, 0.1)
+        client.place_protective_order.return_value = {"algoId": "owned-stop"}
+        client.query_protective_order.side_effect = lambda _: confirmation(client, intent, **changed)
+>       with pytest.raises(ExecutionBlocked):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE <class 'btc_quant_agent.execution.guard.ExecutionBlocked'>
+
+../b5-r4-evidence/test_independent_protection_contract.py:37: Failed
+___ test_exact_confirmation_must_preserve_submitted_stop_semantics[changed2] ___
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-414/test_exact_confirmation_must_p2')
+changed = {'closePosition': True}
+
+    @pytest.mark.parametrize("changed", [
+        {"workingType": "CONTRACT_PRICE"}, {"priceProtect": False},
+        {"closePosition": True}, {"algoType": "OTHER"},
+    ])
+    def test_exact_confirmation_must_preserve_submitted_stop_semantics(tmp_path, changed):
+        backend, client, _, intent = _backend(tmp_path, 0.1)
+        client.place_protective_order.return_value = {"algoId": "owned-stop"}
+        client.query_protective_order.side_effect = lambda _: confirmation(client, intent, **changed)
+>       with pytest.raises(ExecutionBlocked):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE <class 'btc_quant_agent.execution.guard.ExecutionBlocked'>
+
+../b5-r4-evidence/test_independent_protection_contract.py:37: Failed
+___ test_exact_confirmation_must_preserve_submitted_stop_semantics[changed3] ___
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-414/test_exact_confirmation_must_p3')
+changed = {'algoType': 'OTHER'}
+
+    @pytest.mark.parametrize("changed", [
+        {"workingType": "CONTRACT_PRICE"}, {"priceProtect": False},
+        {"closePosition": True}, {"algoType": "OTHER"},
+    ])
+    def test_exact_confirmation_must_preserve_submitted_stop_semantics(tmp_path, changed):
+        backend, client, _, intent = _backend(tmp_path, 0.1)
+        client.place_protective_order.return_value = {"algoId": "owned-stop"}
+        client.query_protective_order.side_effect = lambda _: confirmation(client, intent, **changed)
+>       with pytest.raises(ExecutionBlocked):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE <class 'btc_quant_agent.execution.guard.ExecutionBlocked'>
+
+../b5-r4-evidence/test_independent_protection_contract.py:37: Failed
+________ test_flat_position_must_retain_unresolved_exact_stop_identity _________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-414/test_flat_position_must_retain0')
+
+    def test_flat_position_must_retain_unresolved_exact_stop_identity(tmp_path):
+        backend, client, _, intent = _backend(tmp_path, 0.1)
+        client.place_protective_order.return_value = {"algoId": "owned-stop"}
+        client.query_protective_order.side_effect = BinanceExecutionError("exact query unavailable")
+        with pytest.raises(ExecutionBlocked):
+            backend._reconcile_protective_stop(intent, 0.1, NOW)
+        client.positions.return_value = [{"symbol": intent.symbol, "positionSide": "BOTH", "positionAmt": "0"}]
+        client.open_protective_orders.return_value = []
+        backend._reconcile_protective_stop(intent, 0.1, NOW + 1)
+        owner = backend.protections.get_owner(intent)
+>       assert owner.status == "PENDING_CONFIRMATION"
+E       AssertionError: assert 'RELEASED' == 'PENDING_CONFIRMATION'
+E         
+E         - PENDING_CONFIRMATION
+E         + RELEASED
+
+../b5-r4-evidence/test_independent_protection_contract.py:52: AssertionError
+________ test_dispatch_rejects_symbol_mismatch_between_event_and_outbox ________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-414/test_dispatch_rejects_symbol_m0')
+
+    def test_dispatch_rejects_symbol_mismatch_between_event_and_outbox(tmp_path):
+        path = tmp_path / "live.db"
+        seen = []
+    
+        class Analyze:
+            async def analyze_case(self, case):
+                seen.append(case)
+    
+        def case_for(symbol):
+            data = market_case().model_dump(mode="python", exclude={"case_hash"})
+            data["symbol"] = symbol
+            return CasePackageV1.build(**data)
+    
+        s = PositionSupervisor(path, analysis_service=Analyze(), fresh_market_case=case_for)
+        event = next(e for e in s.evaluate(observation(), NOW) if e.trigger == "POSITION_OPENED")
+        with connection(path) as db:
+            db.execute("UPDATE live_position_case_dispatches SET symbol='ETHUSDT' WHERE event_id=?",
+                       (event.event_id,))
+        asyncio.run(s.drain_pending_dispatches(NOW))
+>       assert all(case.position_event_hash != event.event_hash for case in seen)
+E       assert False
+E        +  where False = all(<generator object test_dispatch_rejects_symbol_mismatch_between_event_and_outbox.<locals>.<genexpr> at 0x75a5777198a0>)
+
+../b5-r4-evidence/position/test_independent_position_probe.py:174: AssertionError
+_______ test_runtime_readiness_rejects_verified_other_account_namespace ________
+
+    def test_runtime_readiness_rejects_verified_other_account_namespace():
+        runtime = _runtime(mode="TESTNET")
+        runtime._started = True
+        runtime.accepting_risk = True
+        snapshot = runtime.account_watch.latest_snapshot.return_value
+        snapshot.account_id = "OTHER_ACCOUNT"
+        snapshot.verify = Mock()
+>       assert runtime._readiness_reason() == "POSITION_ACCOUNT_AUTHORITY_MISMATCH"
+E       AssertionError: assert '' == 'POSITION_ACC...RITY_MISMATCH'
+E         
+E         - POSITION_ACCOUNT_AUTHORITY_MISMATCH
+
+../b5-r4-evidence/position/test_independent_position_probe.py:185: AssertionError
+_____________ test_runtime_readiness_rejects_invalid_snapshot_hash _____________
+
+    def test_runtime_readiness_rejects_invalid_snapshot_hash():
+        runtime = _runtime(mode="DRY_RUN")
+        runtime._started = True
+        runtime.accepting_risk = True
+        runtime.account_watch.latest_snapshot.return_value.verify = Mock(side_effect=ValueError("hash mismatch"))
+>       assert runtime._readiness_reason() == "POSITION_ACCOUNT_AUTHORITY_MISMATCH"
+E       AssertionError: assert '' == 'POSITION_ACC...RITY_MISMATCH'
+E         
+E         - POSITION_ACCOUNT_AUTHORITY_MISMATCH
+
+../b5-r4-evidence/position/test_independent_position_probe.py:193: AssertionError
+______ test_start_does_not_accept_other_account_after_rest_reconciliation ______
+
+    def test_start_does_not_accept_other_account_after_rest_reconciliation():
+        runtime = _runtime(mode="TESTNET")
+        runtime.account_watch.latest_snapshot.return_value = sample_snapshot(
+            account_id="OTHER_ACCOUNT", environment="TESTNET",
+            credential_namespace="BINANCE_TESTNET", rest_base_url="https://testnet.binancefuture.com",
+            positions=(), orders=())
+    
+        async def run():
+            try:
+                await runtime.start()
+                assert not runtime.accepting_risk
+            finally:
+                await runtime.stop()
+    
+>       asyncio.run(run())
+
+../b5-r4-evidence/position/test_independent_position_probe.py:210: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/root/miniconda3/lib/python3.13/asyncio/runners.py:195: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/root/miniconda3/lib/python3.13/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/root/miniconda3/lib/python3.13/asyncio/base_events.py:725: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    async def run():
+        try:
+            await runtime.start()
+>           assert not runtime.accepting_risk
+E           assert not True
+E            +  where True = <btc_quant_agent.live_runtime.LiveV1Runtime object at 0x75a5777a5f30>.accepting_risk
+
+../b5-r4-evidence/position/test_independent_position_probe.py:206: AssertionError
+__________ test_runtime_delegates_intent_with_wrong_account_snapshot ___________
+
+    def test_runtime_delegates_intent_with_wrong_account_snapshot():
+        runtime = _runtime(mode="TESTNET")
+        runtime._started = True
+        runtime.accepting_risk = True
+        runtime.account_watch.latest_snapshot.return_value = sample_snapshot(
+            account_id="OTHER_ACCOUNT", environment="TESTNET",
+            credential_namespace="BINANCE_TESTNET", rest_base_url="https://testnet.binancefuture.com",
+            positions=(), orders=())
+        runtime.intent_store.get_intent = Mock(return_value=Mock(symbol=runtime.config.symbol))
+        asyncio.run(runtime.execute_intent("intent-1"))
+>       runtime.execution_service.execute_approved_intent.assert_not_awaited()
+
+../b5-r4-evidence/position/test_independent_position_probe.py:223: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <AsyncMock id='129353533886480'>
+
+    def assert_not_awaited(self):
+        """
+        Assert that the mock was never awaited.
+        """
+        if self.await_count != 0:
+            msg = (f"Expected {self._mock_name or 'mock'} to not have been awaited."
+                   f" Awaited {self.await_count} times.")
+>           raise AssertionError(msg)
+E           AssertionError: Expected mock to not have been awaited. Awaited 1 times.
+
+/root/miniconda3/lib/python3.13/unittest/mock.py:2465: AssertionError
+-------- generated xml file: /tmp/b5-r4-evidence/independent-final.xml ---------
+=========================== short test summary info ============================
+FAILED ../b5-r4-evidence/test_independent_protection_contract.py::test_pending_restart_requires_successful_exact_id_query[False]
+FAILED ../b5-r4-evidence/test_independent_protection_contract.py::test_pending_restart_requires_successful_exact_id_query[True]
+FAILED ../b5-r4-evidence/test_independent_protection_contract.py::test_exact_confirmation_must_preserve_submitted_stop_semantics[changed0]
+FAILED ../b5-r4-evidence/test_independent_protection_contract.py::test_exact_confirmation_must_preserve_submitted_stop_semantics[changed1]
+FAILED ../b5-r4-evidence/test_independent_protection_contract.py::test_exact_confirmation_must_preserve_submitted_stop_semantics[changed2]
+FAILED ../b5-r4-evidence/test_independent_protection_contract.py::test_exact_confirmation_must_preserve_submitted_stop_semantics[changed3]
+FAILED ../b5-r4-evidence/test_independent_protection_contract.py::test_flat_position_must_retain_unresolved_exact_stop_identity
+FAILED ../b5-r4-evidence/position/test_independent_position_probe.py::test_dispatch_rejects_symbol_mismatch_between_event_and_outbox
+FAILED ../b5-r4-evidence/position/test_independent_position_probe.py::test_runtime_readiness_rejects_verified_other_account_namespace
+FAILED ../b5-r4-evidence/position/test_independent_position_probe.py::test_runtime_readiness_rejects_invalid_snapshot_hash
+FAILED ../b5-r4-evidence/position/test_independent_position_probe.py::test_start_does_not_accept_other_account_after_rest_reconciliation
+FAILED ../b5-r4-evidence/position/test_independent_position_probe.py::test_runtime_delegates_intent_with_wrong_account_snapshot
+12 failed, 76 passed in 14.04s
