@@ -19,7 +19,9 @@ def confirmation(client, intent, **changes):
         "algoId": "owned-stop", "clientAlgoId": args["clientAlgoId"],
         "symbol": intent.symbol, "side": "SELL", "orderType": "STOP_MARKET",
         "positionSide": "BOTH", "reduceOnly": True, "triggerPrice": intent.stop_loss,
-        "quantity": "0.1", "algoStatus": "NEW", **changes,
+        "quantity": "0.1", "algoStatus": "CANCELED" if client.cancel_protective_order.called else "NEW",
+        "algoType": "CONDITIONAL",
+        "workingType": "MARK_PRICE", "priceProtect": True, "closePosition": False, **changes,
     }
 
 

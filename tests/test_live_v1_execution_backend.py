@@ -49,12 +49,24 @@ def make_mock_testnet_client(
     ]
     mock_client.open_protective_orders.return_value = []
 
+    protections = {}
+
     def confirmed_protection(algo_id):
-        args = mock_client.place_protective_order.call_args.kwargs
-        return {"algoId": algo_id, "clientAlgoId": args["clientAlgoId"],
-                "symbol": args["symbol"], "side": args["side"], "orderType": args["type"],
-                "positionSide": "BOTH", "reduceOnly": True, "triggerPrice": args["triggerPrice"],
-                "quantity": str(args["quantity"]), "algoStatus": "NEW"}
+        if algo_id not in protections:
+            if mock_client.place_protective_order.call_args is not None:
+                args = mock_client.place_protective_order.call_args.kwargs
+                protections[algo_id] = {"algoId": algo_id, "clientAlgoId": args["clientAlgoId"],
+                    "symbol": args["symbol"], "side": args["side"], "orderType": args["type"],
+                    "positionSide": "BOTH", "reduceOnly": True, "triggerPrice": args["triggerPrice"],
+                    "quantity": str(args["quantity"]), "algoStatus": "NEW", "algoType": "CONDITIONAL",
+                    "workingType": "MARK_PRICE", "priceProtect": True, "closePosition": False}
+            else:
+                protections[algo_id] = next(row for row in mock_client.open_protective_orders.return_value
+                                            if row["algoId"] == algo_id)
+        raw = dict(protections[algo_id])
+        if any(call.args[1] == algo_id for call in mock_client.cancel_protective_order.call_args_list):
+            raw["algoStatus"] = "CANCELED"
+        return raw
 
     mock_client.query_protective_order.side_effect = confirmed_protection
     return mock_client
@@ -413,7 +425,8 @@ def test_r1_04_delayed_partial_fill_and_resizing_protection(tmp_path):
             "side": "SELL",
             "orderType": "STOP_MARKET",
             "positionSide": "BOTH",
-            "reduceOnly": True,
+            "reduceOnly": True, "algoType": "CONDITIONAL", "workingType": "MARK_PRICE",
+            "priceProtect": True, "closePosition": False, "algoStatus": "NEW",
             "triggerPrice": intent.stop_loss,
             "algoId": "stop-part-1",
             "clientAlgoId": backend.protections.get_owner(intent).protective_client_id,
@@ -478,7 +491,8 @@ def test_r1_04_reconciliation_replay_idempotence(tmp_path):
             "side": "SELL",
             "orderType": "STOP_MARKET",
             "positionSide": "BOTH",
-            "reduceOnly": True,
+            "reduceOnly": True, "algoType": "CONDITIONAL", "workingType": "MARK_PRICE",
+            "priceProtect": True, "closePosition": False, "algoStatus": "NEW",
             "triggerPrice": intent.stop_loss,
             "algoId": "stop-full-200",
             "clientAlgoId": owned_client_id,
@@ -759,7 +773,8 @@ def test_r1_1_02_flat_position_cancels_stale_protection(tmp_path):
             "side": "SELL",
             "orderType": "STOP_MARKET",
             "positionSide": "BOTH",
-            "reduceOnly": True,
+            "reduceOnly": True, "algoType": "CONDITIONAL", "workingType": "MARK_PRICE",
+            "priceProtect": True, "closePosition": False, "algoStatus": "NEW",
             "triggerPrice": intent.stop_loss,
             "algoId": "stop-stale-flat",
             "clientAlgoId": owned_client_id,

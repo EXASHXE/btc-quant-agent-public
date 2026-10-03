@@ -447,7 +447,8 @@ class PositionSupervisor:
             if row is None:
                 return None
             event = PositionEventV1.model_validate(json.loads(row["payload"]))
-            if event.event_id != row["event_id"] or event.event_hash != row["event_hash"]:
+            if (event.event_id != row["event_id"] or event.event_hash != row["event_hash"]
+                    or event.symbol != row["symbol"]):
                 raise ValueError("position event storage identity mismatch")
             for field in ("environment", "credential_namespace", "account_id",
                           "position_side", "position_authority_key"):
@@ -494,8 +495,7 @@ class PositionSupervisor:
                 db.execute("BEGIN IMMEDIATE")
                 candidate = db.execute(
                     """
-                    SELECT event_id, event_hash, symbol, retry_count,
-                           position_case_id, position_case_hash, position_case_json, case_hash
+                    SELECT *
                     FROM live_position_case_dispatches
                     WHERE state = 'PENDING'
                        OR (state = 'DISPATCHING' AND lease_expires_at_ms <= ?)
@@ -572,7 +572,13 @@ class PositionSupervisor:
                     )
                 continue
 
-            if event.event_hash != claimed_row["event_hash"]:
+            if (event.event_id != claimed_row["event_id"]
+                    or event.event_hash != claimed_row["event_hash"]
+                    or event.symbol != claimed_row["symbol"]
+                    or any(claimed_row[field] != getattr(event, field)
+                           for field in ("environment", "credential_namespace", "account_id",
+                                         "position_side", "position_authority_key")
+                           if field in claimed_row.keys())):  # noqa: SIM118 - sqlite.Row iterates values
                 with connection(self.path) as db:
                     db.execute(
                         """
@@ -585,7 +591,6 @@ class PositionSupervisor:
                 continue
 
             stored_case_json = claimed_row["position_case_json"]
-            stored_case_hash = claimed_row["position_case_hash"] or claimed_row["case_hash"]
             stored_case_id = claimed_row["position_case_id"]
 
             pos_case: CasePackageV1
@@ -594,14 +599,17 @@ class PositionSupervisor:
                 try:
                     pos_case = CasePackageV1.model_validate_json(stored_case_json)
                     pos_case.verify()
-                    if stored_case_hash and pos_case.case_hash != stored_case_hash:
-                        raise ValueError(f"stored case hash mismatch: {pos_case.case_hash} != {stored_case_hash}")
+                    if any(claimed_row[field] and pos_case.case_hash != claimed_row[field]
+                           for field in ("position_case_hash", "case_hash")):
+                        raise ValueError("stored case hash mismatch")
                     if stored_case_id and pos_case.case_id != stored_case_id:
                         raise ValueError(f"stored case id mismatch: {pos_case.case_id} != {stored_case_id}")
                     if pos_case.position_event_hash != event.event_hash:
                         raise ValueError(f"event hash linkage mismatch: {pos_case.position_event_hash} != {event.event_hash}")
                     if pos_case.case_id != f"pos-{event.event_id}":
                         raise ValueError(f"case_id linkage mismatch: {pos_case.case_id} != pos-{event.event_id}")
+                    if pos_case.symbol != event.symbol:
+                        raise ValueError("position case symbol mismatch")
                 except Exception:  # noqa: BLE001
                     # Tampered or corrupted stored case -> mark FAILED_CLOSED without calling analysis
                     with connection(self.path) as db:
@@ -617,22 +625,25 @@ class PositionSupervisor:
             else:
                 # 3.3 First materialization: obtain base case once and freeze PositionCase before calling analysis
                 try:
-                    base_case = self.fresh_market_case(claimed_row["symbol"])
+                    base_case = self.fresh_market_case(event.symbol)
                     base_case.verify()
+                    if base_case.symbol != event.symbol:
+                        raise ValueError("FRESH_MARKET_CASE_SYMBOL_MISMATCH")
                     pos_case = position_case_from_event(base_case, event, now_ms=now_ms)
                     pos_case.verify()
-                except Exception:  # noqa: BLE001
+                except Exception as exc:  # noqa: BLE001
                     with connection(self.path) as db:
                         db.execute(
                             """
                             UPDATE live_position_case_dispatches
-                            SET state = CASE WHEN retry_count >= ? THEN 'FAILED_CLOSED' ELSE 'PENDING' END,
+                            SET state = CASE WHEN ? OR retry_count >= ? THEN 'FAILED_CLOSED' ELSE 'PENDING' END,
                                 lease_token = NULL,
                                 lease_expires_at_ms = 0,
                                 updated_at_ms = ?
                             WHERE event_id = ? AND lease_token = ?
                             """,
-                            (max_retries, now_ms, event_id, lease_token),
+                            (str(exc) == "FRESH_MARKET_CASE_SYMBOL_MISMATCH",
+                             max_retries, now_ms, event_id, lease_token),
                         )
                     continue
 

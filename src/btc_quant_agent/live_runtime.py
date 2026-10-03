@@ -158,6 +158,25 @@ class LiveV1Runtime:
             for intent_id in self.intent_store.unfinished_intent_ids():
                 await self.execution_service.reconcile_intent(intent_id)
 
+    def _snapshot_authority_reason(self, snapshot: Any) -> str:
+        if snapshot is None:
+            return "ACCOUNT_RECONCILIATION_REQUIRED"
+        try:
+            snapshot.verify()
+            namespace = "BINANCE_TESTNET" if self.config.execution_mode == "TESTNET" else "NONE"
+            if (snapshot.environment != self.config.execution_mode
+                    or snapshot.credential_namespace != namespace
+                    or snapshot.account_id != self.config.account_id):
+                return "POSITION_ACCOUNT_AUTHORITY_MISMATCH"
+            if any(position.symbol != self.config.symbol and position.quantity != 0
+                   for position in snapshot.positions):
+                return "UNCONFIGURED_POSITION_SYMBOL"
+            if not snapshot.reconciled or snapshot.quality != "OK":
+                return "ACCOUNT_RECONCILIATION_REQUIRED"
+        except Exception:  # noqa: BLE001 - malformed authority must block new risk
+            return "POSITION_ACCOUNT_AUTHORITY_MISMATCH"
+        return ""
+
     async def poll_positions(self, now_ms: int) -> None:
         """Reconcile known orders and observe actual current account quantities."""
         from .position_supervisor.models import PositionObservationV1
@@ -165,30 +184,14 @@ class LiveV1Runtime:
         await self.reconcile_unfinished_intents()
         snapshot = self.account_watch.latest_snapshot()
         market = self.market_stream.latest_observation(now_ms)
-        if snapshot is not None:
-            try:
-                snapshot.verify()
-            except (ValueError, AttributeError):
-                self.accepting_risk = False
-                self.blocked_reason = "POSITION_ACCOUNT_AUTHORITY_MISMATCH"
-                return
-            required_namespace = "BINANCE_TESTNET" if self.config.execution_mode == "TESTNET" else "NONE"
-            if (snapshot.environment != self.config.execution_mode
-                    or snapshot.credential_namespace != required_namespace
-                    or snapshot.account_id != self.config.account_id):
-                self.accepting_risk = False
-                self.blocked_reason = "POSITION_ACCOUNT_AUTHORITY_MISMATCH"
-                return
-        if snapshot is not None and any(
-            position.symbol != self.config.symbol and position.quantity != 0
-            for position in snapshot.positions
-        ):
+        authority_reason = self._snapshot_authority_reason(snapshot)
+        if authority_reason:
             self.accepting_risk = False
-            self.blocked_reason = "UNCONFIGURED_POSITION_SYMBOL"
+            self.blocked_reason = authority_reason
             return
-        if (snapshot is None or market is None or not snapshot.reconciled
-                or snapshot.quality != "OK"
-                or (self.config.execution_mode == "TESTNET" and not self.account_watch.is_stream_connected)):
+        assert snapshot is not None
+        if (market is None or (self.config.execution_mode == "TESTNET"
+                              and not self.account_watch.is_stream_connected)):
             return
         if market.symbol != self.config.symbol:
             self.accepting_risk = False
@@ -270,11 +273,13 @@ class LiveV1Runtime:
                     self.accepting_risk = False
                     self.blocked_reason = "LEGACY_POSITION_LIFECYCLE_AUTHORITY_UNBOUND"
                     continue
+                authority_reason = self._snapshot_authority_reason(snapshot)
+                if authority_reason:
+                    self.accepting_risk = False
+                    self.blocked_reason = authority_reason
+                    continue
                 self.accepting_risk = bool(
-                    snapshot.reconciled and snapshot.quality == "OK"
-                    and self.kill_switch.allows_new_risk()
-                    and not any(position.symbol != self.config.symbol and position.quantity != 0
-                                for position in snapshot.positions)
+                    self.kill_switch.allows_new_risk()
                     and (self.config.execution_mode != "TESTNET"
                          or self.account_watch.is_stream_connected)
                 )
@@ -300,8 +305,9 @@ class LiveV1Runtime:
             await self.reconcile_unfinished_intents()
             await self.account_watch.reconcile_rest_async()
             snapshot = self.account_watch.latest_snapshot()
-            if snapshot is None or not snapshot.reconciled or snapshot.quality != "OK":
-                raise ExecutionBlocked("ACCOUNT_RECONCILIATION_REQUIRED")
+            authority_reason = self._snapshot_authority_reason(snapshot)
+            if authority_reason:
+                raise ExecutionBlocked(authority_reason)
             if self._position_authority_block_reason():
                 raise ExecutionBlocked("LEGACY_POSITION_LIFECYCLE_AUTHORITY_UNBOUND")
             await self._refresh_case(self.config.symbol)
@@ -369,11 +375,9 @@ class LiveV1Runtime:
         if not self.market_stream.is_connected:
             return "MARKET_STREAM_DISCONNECTED"
         snapshot = self.account_watch.latest_snapshot()
-        if snapshot is None or not snapshot.reconciled or snapshot.quality != "OK":
-            return "ACCOUNT_RECONCILIATION_REQUIRED"
-        if any(position.symbol != self.config.symbol and position.quantity != 0
-               for position in snapshot.positions):
-            return "UNCONFIGURED_POSITION_SYMBOL"
+        authority_reason = self._snapshot_authority_reason(snapshot)
+        if authority_reason:
+            return authority_reason
         if self.config.execution_mode == "TESTNET" and not self.account_watch.is_stream_connected:
             return "ACCOUNT_STREAM_DISCONNECTED"
         return ""

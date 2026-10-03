@@ -53,6 +53,25 @@ def parse_protective_exchange_id(raw_stop: Any) -> str:
     return identifiers[0]
 
 
+def parse_protective_bool(value: Any) -> bool:
+    if type(value) is bool:
+        return value
+    if isinstance(value, str) and value.lower() in {"true", "false"}:
+        return value.lower() == "true"
+    raise ExecutionBlocked("PROTECTION_CONTRACT_MISMATCH")
+
+
+def protective_field(raw: dict[str, Any], primary: str, alias: str) -> Any:
+    """Missing or contradictory aliases are never confirmation defaults."""
+    if primary in raw and alias in raw and raw[primary] != raw[alias]:
+        raise ExecutionBlocked("PROTECTION_CONTRACT_MISMATCH")
+    if primary in raw:
+        return raw[primary]
+    if alias in raw:
+        return raw[alias]
+    raise ExecutionBlocked("PROTECTION_CONTRACT_MISMATCH")
+
+
 def _owner_key(intent: Any) -> str:
     raw = f"{intent.intent_hash}:{intent.symbol}:{intent.side}:BOTH:STOP:1"
     return hashlib.sha256(raw.encode("utf-8")).hexdigest()
@@ -81,6 +100,7 @@ class ProtectionStore:
                     ON live_protection_owners(symbol, position_side)
                     WHERE status = 'ACTIVE';
             """)
+            db.execute("BEGIN IMMEDIATE")
             columns = {row["name"] for row in db.execute("PRAGMA table_info(live_protection_owners)")}
             if "confirmed_at_ms" not in columns:
                 db.execute("ALTER TABLE live_protection_owners ADD COLUMN confirmed_at_ms INTEGER NOT NULL DEFAULT 0")
@@ -88,9 +108,10 @@ class ProtectionStore:
                 db.execute("UPDATE live_protection_owners SET status=CASE WHEN protective_client_id IS NULL "
                            "THEN 'RESERVED' ELSE 'PENDING_CONFIRMATION' END WHERE status='ACTIVE'")
             db.execute("DROP INDEX IF EXISTS idx_active_protection_symbol")
+            db.execute("DROP INDEX IF EXISTS idx_risk_protection_symbol")
             db.execute("CREATE UNIQUE INDEX IF NOT EXISTS idx_risk_protection_symbol "
                        "ON live_protection_owners(symbol, position_side) "
-                       "WHERE status IN ('RESERVED','PENDING_CONFIRMATION','ACTIVE')")
+                       "WHERE status IN ('RESERVED','PENDING_CONFIRMATION','ACTIVE','CANCEL_PENDING','TERMINAL_CONFIRMED')")
 
     @staticmethod
     def _owner(row: Any) -> ProtectionOwner:
@@ -115,7 +136,7 @@ class ProtectionStore:
             db.execute("BEGIN IMMEDIATE")
             conflicting = db.execute(
                 "SELECT owner_key FROM live_protection_owners "
-                "WHERE symbol=? AND position_side='BOTH' AND status IN ('RESERVED','PENDING_CONFIRMATION','ACTIVE') AND owner_key!=?",
+                "WHERE symbol=? AND position_side='BOTH' AND status IN ('RESERVED','PENDING_CONFIRMATION','ACTIVE','CANCEL_PENDING','TERMINAL_CONFIRMED') AND owner_key!=?",
                 (intent.symbol, key),
             ).fetchone()
             if conflicting is not None:
@@ -179,11 +200,11 @@ class ProtectionStore:
         """Persist uncertainty before cancel can remove exchange-side protection."""
         with connection(self.path) as db:
             changed = db.execute(
-                "UPDATE live_protection_owners SET status='PENDING_CONFIRMATION',confirmed_at_ms=0,updated_at_ms=? "
+                "UPDATE live_protection_owners SET status='CANCEL_PENDING',exchange_id=?,confirmed_at_ms=0,updated_at_ms=? "
                 "WHERE owner_key=? AND intent_id=? AND intent_hash=? "
                 "AND status IN ('ACTIVE','PENDING_CONFIRMATION') AND protective_client_id=? "
                 "AND (exchange_id=? OR exchange_id IS NULL)",
-                (now_ms, _owner_key(intent), intent.intent_id, intent.intent_hash, client_id, exchange_id),
+                (exchange_id, now_ms, _owner_key(intent), intent.intent_id, intent.intent_hash, client_id, exchange_id),
             )
             if changed.rowcount != 1:
                 raise ExecutionBlocked("PROTECTION_OWNER_CHANGED")
@@ -219,6 +240,26 @@ class ProtectionStore:
                      intent.stop_loss, 1, 1, now_ms, now_ms, json.dumps(confirmed_order)),
                 )
 
+    def confirm_terminal(self, intent: Any, client_id: str, exchange_id: str,
+                         status: str, now_ms: int) -> None:
+        if status not in {"CANCELED", "EXPIRED", "NOT_FOUND"}:
+            raise ExecutionBlocked("PROTECTION_TERMINAL_INVALID")
+        parse_protective_exchange_id({"algoId": exchange_id})
+        with connection(self.path) as db:
+            db.execute("BEGIN IMMEDIATE")
+            changed = db.execute(
+                "UPDATE live_protection_owners SET status='TERMINAL_CONFIRMED',confirmed_at_ms=?,updated_at_ms=? "
+                "WHERE owner_key=? AND intent_id=? AND intent_hash=? "
+                "AND status IN ('ACTIVE','PENDING_CONFIRMATION','CANCEL_PENDING') "
+                "AND protective_client_id=? AND exchange_id=?",
+                (now_ms, now_ms, _owner_key(intent), intent.intent_id, intent.intent_hash, client_id, exchange_id),
+            )
+            if changed.rowcount != 1:
+                raise ExecutionBlocked("PROTECTION_OWNER_CHANGED")
+            db.execute("UPDATE live_execution_orders SET status=? WHERE order_id=? AND intent_id=? "
+                       "AND client_order_id=? AND is_protective=1",
+                       (status, exchange_id, intent.intent_id, client_id))
+
     def clear_stop(self, intent: Any, client_id: str, exchange_id: str, now_ms: int,
                    *, cancelled_order: bool = False) -> None:
         with connection(self.path) as db:
@@ -226,8 +267,7 @@ class ProtectionStore:
             changed = db.execute(
                 "UPDATE live_protection_owners SET protective_client_id=NULL,exchange_id=NULL,"
                 "quantity=0,status='RESERVED',confirmed_at_ms=0,updated_at_ms=? WHERE owner_key=? AND intent_id=? AND intent_hash=? "
-                "AND status IN ('ACTIVE','PENDING_CONFIRMATION') AND protective_client_id=? "
-                "AND (exchange_id=? OR exchange_id IS NULL)",
+                "AND status='TERMINAL_CONFIRMED' AND protective_client_id=? AND exchange_id=?",
                 (now_ms, _owner_key(intent), intent.intent_id, intent.intent_hash, client_id, exchange_id),
             )
             if changed.rowcount != 1:
@@ -250,5 +290,12 @@ class ProtectionStore:
             ).fetchone()
             if pending is not None:
                 return
+            current = db.execute("SELECT status,protective_client_id,exchange_id FROM live_protection_owners "
+                                 "WHERE owner_key=?", (owner.owner_key,)).fetchone()
+            if current["status"] != "TERMINAL_CONFIRMED" and (
+                current["protective_client_id"] is not None or current["exchange_id"] is not None
+                or current["status"] not in {"RESERVED", "RELEASED"}
+            ):
+                raise ExecutionBlocked("PROTECTION_REMOTE_STATE_UNCERTAIN")
             db.execute("UPDATE live_protection_owners SET status='RELEASED',exchange_id=NULL,"
-                       "quantity=0,updated_at_ms=? WHERE owner_key=?", (now_ms, owner.owner_key))
+                       "protective_client_id=NULL,quantity=0,updated_at_ms=? WHERE owner_key=?", (now_ms, owner.owner_key))

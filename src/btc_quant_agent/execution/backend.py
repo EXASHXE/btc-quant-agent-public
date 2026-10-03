@@ -23,7 +23,12 @@ from .binance_signed import BinanceExecutionError, BinanceSignedClient
 from .guard import ExecutionBlocked
 from .intents import IntentStore, TradeIntentV1
 from .policy import ExecutionCapabilityPolicyV1
-from .protection import ProtectionStore, parse_protective_exchange_id
+from .protection import (
+    ProtectionStore,
+    parse_protective_bool,
+    parse_protective_exchange_id,
+    protective_field,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -428,7 +433,7 @@ class TestnetExecutionBackend:
                 raw_order = self.client.query_order_by_client_id(intent.symbol, intent.client_order_id)
             except Exception as query_exc:
                 # If query proves order does not exist (-2013)
-                if "-2013" in str(query_exc):
+                if isinstance(query_exc, BinanceExecutionError) and query_exc.code == -2013:
                     return ExecutionReport(
                         intent_id=intent.intent_id,
                         status="ABORTED",
@@ -564,114 +569,150 @@ class TestnetExecutionBackend:
         if owner.status == "RELEASED":
             return None
         open_qty = self._query_open_position(intent.symbol, intent.side, now_ms)
-        if owner.status not in {"RESERVED", "PENDING_CONFIRMATION", "ACTIVE"}:
-            self._trip_kill_switch(now_ms, "inactive protective ownership on open position")
-            raise ExecutionBlocked("PROTECTION_OWNER_MISSING")
         target_qty = max(min(open_qty, filled_qty, intent.quantity), 0.0)
-
-        # 1. Query open protective orders from exchange
         try:
-            open_algos_raw = self.client.open_protective_orders(intent.symbol)
-            if not isinstance(open_algos_raw, list):
-                raise BinanceExecutionError("unparseable protective order response")
-            open_algos = open_algos_raw
-        except Exception as exc:
-            self._trip_kill_switch(now_ms, f"protective query failed: {exc}")
-            raise ExecutionBlocked(f"protective query uncertainty: {exc}") from exc
-
-        # 2. Check for active protective order on exchange for this intent
-        matched_algo: dict[str, Any] | None = None
-        for algo in open_algos:
-            if not isinstance(algo, dict):
-                self._trip_kill_switch(now_ms, "ambiguous protective order response")
-                raise ExecutionBlocked("PROTECTION_ORDER_AMBIGUOUS")
-            client_id = algo.get("clientAlgoId")
-            if client_id == owner.protective_client_id:
-                if matched_algo is not None:
-                    self._trip_kill_switch(now_ms, "duplicate owned protective stop")
-                    raise ExecutionBlocked("PROTECTION_ORDER_AMBIGUOUS")
-                matched_algo = algo
-            elif target_qty > 0:
-                self._trip_kill_switch(now_ms, "unknown protective stop on open position")
-                raise ExecutionBlocked("PROTECTION_ORDER_UNKNOWN")
-
-        if matched_algo is not None:
-            try:
-                algo_id, current_protected_qty = self._validate_protective_contract(
-                    intent, matched_algo, owner.protective_client_id, owner.exchange_id,
-                )
-            except ExecutionBlocked:
-                self._trip_kill_switch(now_ms, "invalid owned protective contract")
-                raise
-        elif owner.protective_client_id is not None and target_qty > 0:
-            self._trip_kill_switch(now_ms, "owned protective stop missing")
-            raise ExecutionBlocked("PROTECTION_ORDER_MISSING")
-
-        if target_qty <= 0.0:
-            if matched_algo is not None:
-                if owner.protective_client_id is None:
+            if owner.status == "TERMINAL_CONFIRMED":
+                if target_qty == 0:
+                    self.protections.release_flat(intent, now_ms)
+                    return None
+                if owner.protective_client_id is None or owner.exchange_id is None:
                     raise ExecutionBlocked("PROTECTION_OWNER_MISSING")
-                self._cancel_protective_stop(intent, owner.protective_client_id, algo_id, now_ms)
-            self.protections.release_flat(intent, now_ms)
-            return None
-
-        if matched_algo is not None:
-            if current_protected_qty == target_qty:
-                # Already adequately protected (idempotent replay)
-                if owner.protective_client_id is None:
+                self.protections.clear_stop(intent, owner.protective_client_id, owner.exchange_id, now_ms)
+                owner = self.protections.get_owner(intent)
+                if owner is None:
                     raise ExecutionBlocked("PROTECTION_OWNER_MISSING")
-                try:
-                    self.protections.record_stop(intent, owner.protective_client_id, algo_id, target_qty, now_ms,
-                                                 confirmed_order=matched_algo)
-                except Exception:  # noqa: BLE001 - uncertain persistence must block risk
-                    self._trip_kill_switch(now_ms, "protective confirmation persistence failed")
-                    raise ExecutionBlocked("PROTECTION_PERSISTENCE_UNCERTAIN") from None
-                return algo_id
-
-            # Existing protection size differs: cancel mismatched order before replacing
-            if owner.protective_client_id is None:
+            if owner.status not in {"RESERVED", "PENDING_CONFIRMATION", "ACTIVE", "CANCEL_PENDING"}:
                 raise ExecutionBlocked("PROTECTION_OWNER_MISSING")
-            self._cancel_protective_stop(intent, owner.protective_client_id, algo_id, now_ms)
 
-        # 3. Place resized or new protective stop for target_qty
-        return self._place_protective_stop(intent, target_qty, now_ms)
+            # Pending/restarted ownership is confirmed only by its durable exact remote ID.
+            # Aggregate listings never supply confirmation or authoritative absence.
+            confirmed = None
+            if owner.protective_client_id is not None:
+                if owner.exchange_id is None:
+                    raise ExecutionBlocked("PROTECTION_STOP_UNCERTAIN")
+                confirmed, remote_status = self._query_exact_protection(
+                    intent, owner.protective_client_id, owner.exchange_id, owner.quantity,
+                    allow_absent=target_qty == 0,
+                )
+                if remote_status != "NEW":
+                    self.protections.confirm_terminal(intent, owner.protective_client_id,
+                                                      owner.exchange_id, remote_status, now_ms)
+                    if target_qty == 0:
+                        self.protections.release_flat(intent, now_ms)
+                        return None
+                    if owner.status != "CANCEL_PENDING":
+                        raise ExecutionBlocked("PROTECTION_ORDER_MISSING")
+                    self.protections.clear_stop(intent, owner.protective_client_id, owner.exchange_id, now_ms)
+                    owner = self.protections.get_owner(intent)
+                    if owner is None:
+                        raise ExecutionBlocked("PROTECTION_OWNER_MISSING")
+                    confirmed = None
+                elif owner.status == "CANCEL_PENDING":
+                    # A previous cancel might still be in flight. Never repeat it blindly.
+                    raise ExecutionBlocked("PROTECTION_CANCELLATION_UNCERTAIN")
+            elif owner.status != "RESERVED":
+                raise ExecutionBlocked("PROTECTION_STOP_UNCERTAIN")
+
+            try:
+                open_algos = self.client.open_protective_orders(intent.symbol)
+            except Exception as exc:
+                raise ExecutionBlocked("protective query uncertainty") from exc
+            if not isinstance(open_algos, list):
+                raise ExecutionBlocked("PROTECTION_ORDER_AMBIGUOUS")
+            matched = False
+            for algo in open_algos:
+                if not isinstance(algo, dict):
+                    raise ExecutionBlocked("PROTECTION_ORDER_AMBIGUOUS")
+                if owner.protective_client_id is not None and algo.get("clientAlgoId") == owner.protective_client_id:
+                    if matched:
+                        raise ExecutionBlocked("PROTECTION_ORDER_AMBIGUOUS")
+                    matched = True
+                    if target_qty > 0:
+                        self._validate_protective_contract(intent, algo, owner.protective_client_id,
+                                                           owner.exchange_id, owner.quantity)
+                elif target_qty > 0:
+                    raise ExecutionBlocked("PROTECTION_ORDER_UNKNOWN")
+
+            if target_qty == 0:
+                if confirmed is not None:
+                    assert owner.protective_client_id is not None and owner.exchange_id is not None
+                    self._cancel_protective_stop(intent, owner.protective_client_id, owner.exchange_id, now_ms)
+                self.protections.release_flat(intent, now_ms)
+                return None
+            if confirmed is not None:
+                assert owner.protective_client_id is not None and owner.exchange_id is not None
+                if owner.quantity == target_qty:
+                    self.protections.record_stop(intent, owner.protective_client_id, owner.exchange_id,
+                                                 target_qty, now_ms, confirmed_order=confirmed)
+                    return owner.exchange_id
+                self._cancel_protective_stop(intent, owner.protective_client_id, owner.exchange_id, now_ms)
+                self.protections.clear_stop(intent, owner.protective_client_id, owner.exchange_id, now_ms)
+            return self._place_protective_stop(intent, target_qty, now_ms)
+        except Exception as exc:
+            self._trip_kill_switch(now_ms, "protective reconciliation uncertainty")
+            if isinstance(exc, ExecutionBlocked):
+                raise
+            raise ExecutionBlocked("PROTECTION_RECONCILIATION_UNCERTAIN") from exc
+
+    def _query_exact_protection(self, intent: TradeIntentV1, client_id: str, exchange_id: str,
+                                quantity: float, *, allow_absent: bool = False) -> tuple[Any, str]:
+        try:
+            raw = self.client.query_protective_order(exchange_id)
+        except BinanceExecutionError as exc:
+            # Only the signed provider's structured NO_SUCH_ORDER result proves absence.
+            if allow_absent and exc.code == -2013:
+                return None, "NOT_FOUND"
+            raise
+        self._validate_protective_contract(intent, raw, client_id, exchange_id, quantity,
+                                           allowed_statuses=frozenset({"NEW", "CANCELED", "EXPIRED"}))
+        return raw, protective_field(raw, "algoStatus", "status")
 
     def _cancel_protective_stop(self, intent: TradeIntentV1, client_id: str, exchange_id: str, now_ms: int) -> None:
         try:
+            owner = self.protections.get_owner(intent)
+            if owner is None:
+                raise ExecutionBlocked("PROTECTION_OWNER_MISSING")
             self.protections.begin_cancellation(intent, client_id, exchange_id, now_ms)
             self.client.cancel_protective_order(intent.symbol, exchange_id)
-            self.protections.clear_stop(intent, client_id, exchange_id, now_ms, cancelled_order=True)
-        except Exception:  # noqa: BLE001 - remote cancellation and storage uncertainty retain the exact owner
+            _, status = self._query_exact_protection(intent, client_id, exchange_id, owner.quantity,
+                                                     allow_absent=True)
+            if status == "NEW":
+                raise ExecutionBlocked("PROTECTION_CANCELLATION_UNCERTAIN")
+            self.protections.confirm_terminal(intent, client_id, exchange_id, status, now_ms)
+        except Exception:  # noqa: BLE001 - cancellation uncertainty retains exact ownership.
             self._trip_kill_switch(now_ms, "protective cancellation uncertainty")
             raise ExecutionBlocked("PROTECTION_CANCELLATION_UNCERTAIN") from None
 
     @staticmethod
     def _validate_protective_contract(
         intent: TradeIntentV1, raw: Any, client_id: str | None, exchange_id: str | None,
-        expected_quantity: float | None = None,
+        expected_quantity: float | None = None, *, allowed_statuses: frozenset[str] = frozenset({"NEW"}),
     ) -> tuple[str, float]:
         parsed_id = parse_protective_exchange_id(raw)
         try:
-            quantity = raw.get("quantity", raw.get("origQty"))
-            stop = raw.get("triggerPrice", raw.get("stopPrice"))
+            quantity = protective_field(raw, "quantity", "origQty")
+            stop = protective_field(raw, "triggerPrice", "stopPrice")
             if isinstance(quantity, bool) or isinstance(stop, bool):
                 raise TypeError("invalid numeric protective contract")
             quantity = float(quantity)
             stop = float(stop)
-            reduce_only = raw.get("reduceOnly")
             valid = (
                 isinstance(client_id, str) and bool(client_id)
                 and raw.get("clientAlgoId") == client_id
                 and (exchange_id is None or parsed_id == exchange_id)
                 and raw.get("symbol") == intent.symbol
                 and raw.get("side") == ("SELL" if intent.side == "BUY" else "BUY")
-                and raw.get("orderType", raw.get("type")) == "STOP_MARKET"
+                and raw.get("algoType") == "CONDITIONAL"
+                and protective_field(raw, "orderType", "type") == "STOP_MARKET"
+                and raw.get("workingType") == "MARK_PRICE"
+                and parse_protective_bool(raw.get("priceProtect"))
+                and not parse_protective_bool(raw.get("closePosition"))
                 and raw.get("positionSide") == "BOTH"
-                and (reduce_only is True or reduce_only == "true")
+                and parse_protective_bool(raw.get("reduceOnly"))
                 and math.isfinite(stop) and stop == intent.stop_loss
                 and math.isfinite(quantity) and 0 < quantity <= intent.quantity
                 and (expected_quantity is None or quantity == expected_quantity)
-                and raw.get("algoStatus", raw.get("status", "NEW" if expected_quantity is None else None)) == "NEW"
+                and protective_field(raw, "algoStatus", "status") in allowed_statuses
             )
         except (ValueError, TypeError, OverflowError):
             valid = False
@@ -690,6 +731,7 @@ class TestnetExecutionBackend:
             stop_client_oid = self.protections.next_client_id(intent, now_ms, target_qty)
             raw_stop = self.client.place_protective_order(
                 algoType="CONDITIONAL",
+                positionSide="BOTH",
                 symbol=intent.symbol,
                 side=exit_side,
                 type="STOP_MARKET",
@@ -788,7 +830,7 @@ class TestnetExecutionBackend:
         try:
             raw = self.client.query_order_by_client_id(intent.symbol, intent.client_order_id)
         except Exception as exc:  # noqa: BLE001 - uncertainty retains the durable claim
-            if isinstance(exc, BinanceExecutionError) and "-2013" in str(exc):
+            if isinstance(exc, BinanceExecutionError) and exc.code == -2013:
                 # Release only a durably proven pre-entry abort, never a live setup worker
                 # or an uncertain submitted request whose order has not appeared yet.
                 with connection(self.path) as db:

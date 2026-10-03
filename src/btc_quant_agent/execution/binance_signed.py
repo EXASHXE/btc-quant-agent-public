@@ -13,7 +13,9 @@ from typing import Any, cast
 
 
 class BinanceExecutionError(RuntimeError):
-    pass
+    def __init__(self, message: str, *, code: int | None = None) -> None:
+        super().__init__(message)
+        self.code = code
 
 
 @dataclass(frozen=True)
@@ -73,7 +75,14 @@ class BinanceSignedClient:
                 body = response.read().decode("utf-8")
                 return json.loads(body) if body else {}
         except urllib.error.HTTPError as exc:
-            raise BinanceExecutionError(f"Binance request failed: HTTP {exc.code}") from None
+            code = None
+            try:
+                error = json.loads(exc.read(65536))
+                if isinstance(error, dict) and type(error.get("code")) is int:
+                    code = error["code"]
+            except (ValueError, OSError):
+                pass
+            raise BinanceExecutionError(f"Binance request failed: HTTP {exc.code}", code=code) from None
         except (urllib.error.URLError, TimeoutError, json.JSONDecodeError):
             raise BinanceExecutionError("Binance request failed") from None
 

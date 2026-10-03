@@ -82,7 +82,7 @@ def test_restart_expired_authority_reconciles_active_order_and_protection(tmp_pa
 def test_claimed_absent_entry_expired_receipt_never_resubmits(tmp_path):
     service, backend, intent, client = recovered_service(tmp_path)
     client.query_order_by_client_id.side_effect = BinanceExecutionError(
-        "-2013 Order does not exist"
+        "Order does not exist", code=-2013
     )
     report = asyncio.run(
         service.execute_approved_intent(intent.intent_id, intent.expires_at_ms + 1)
@@ -235,7 +235,7 @@ def test_proven_pre_entry_abort_releases_owner_only_after_absence_and_flat(tmp_p
         backend.submit_authorized(receipt.authorization_id, NOW)
     client.place_order.assert_not_called()
     assert backend.protections.get_owner(intent).status == "RESERVED"
-    client.query_order_by_client_id.side_effect = BinanceExecutionError("-2013 Order does not exist")
+    client.query_order_by_client_id.side_effect = BinanceExecutionError("Order does not exist", code=-2013)
     assert backend.reconcile_authorized(intent.intent_id, NOW).reason == "PROVEN_PRE_ENTRY_ABORTED"
     assert backend.protections.get_owner(intent).status == "RELEASED"
     assert intent.intent_id not in backend.validator.intent_store.unfinished_intent_ids()

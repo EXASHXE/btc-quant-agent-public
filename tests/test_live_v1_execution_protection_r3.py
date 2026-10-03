@@ -47,6 +47,9 @@ def test_client_ids_are_exact_bounded_and_unique(tmp_path):
     with pytest.raises(ExecutionBlocked, match="PROTECTION_STOP_UNCERTAIN"):
         store.next_client_id(first, 102)
     store.record_stop(first, first_id, "stop-1", 0.1, 102)
+    with connection(store.path) as db:
+        db.execute("CREATE TABLE live_execution_orders (order_id TEXT, intent_id TEXT, client_order_id TEXT, is_protective INTEGER, status TEXT)")
+    store.confirm_terminal(first, first_id, "stop-1", "CANCELED", 103)
     store.clear_stop(first, first_id, "stop-1", 103)
     assert first_id != store.next_client_id(first, 104)
     assert ProtectionStore(tmp_path / "live.db").get_owner(first).protective_client_id != second_id
@@ -78,7 +81,8 @@ def test_unknown_similar_stop_is_never_adopted_or_cancelled(tmp_path):
             "side": "SELL",
             "orderType": "STOP_MARKET",
             "positionSide": "BOTH",
-            "reduceOnly": True,
+            "reduceOnly": True, "algoType": "CONDITIONAL", "workingType": "MARK_PRICE",
+            "priceProtect": True, "closePosition": False, "algoStatus": "NEW",
             "triggerPrice": intent.stop_loss,
             "algoId": "foreign",
             "clientAlgoId": f"bqa-stop-{intent.client_order_id[:12]}-0100",
@@ -122,7 +126,8 @@ def test_restart_exact_owner_and_flat_cleanup(tmp_path):
             "side": "SELL",
             "orderType": "STOP_MARKET",
             "positionSide": "BOTH",
-            "reduceOnly": True,
+            "reduceOnly": True, "algoType": "CONDITIONAL", "workingType": "MARK_PRICE",
+            "priceProtect": True, "closePosition": False, "algoStatus": "NEW",
             "triggerPrice": intent.stop_loss,
             "algoId": "owned-stop",
             "clientAlgoId": owner.protective_client_id,
@@ -133,7 +138,8 @@ def test_restart_exact_owner_and_flat_cleanup(tmp_path):
             "side": "SELL",
             "orderType": "STOP_MARKET",
             "positionSide": "BOTH",
-            "reduceOnly": True,
+            "reduceOnly": True, "algoType": "CONDITIONAL", "workingType": "MARK_PRICE",
+            "priceProtect": True, "closePosition": False, "algoStatus": "NEW",
             "triggerPrice": intent.stop_loss,
             "algoId": "foreign-stop",
             "clientAlgoId": "bqa-stop-similar",
