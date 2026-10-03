@@ -1,9 +1,9 @@
 {
   "line": "B_LINE",
-  "stage": "B2B_ACCEPTED__LIVE_V1_B3_ACCEPTED__R4_EXACT_SHA_SEALED_PENDING_B5_REVALIDATION",
+  "stage": "B2B_ACCEPTED__LIVE_V1_B3_ACCEPTED__B5_R4_FAILED_PENDING_R5",
   "code_branch": "feature/tactical-policy-r2",
   "accepted_code_sha": "52c16a28153de307dc6132c0975fe29341a0a918",
-  "docs_authority_commit": "732e6fbef8734b60d31d576506628664ed71dfc3",
+  "docs_authority_commit": "0c5ba8c871a22024a038cdce79ac0809d7cf8204",
   "current_controller_authority": {
     "path": "reviews/v0.5/tactical-policy/V0.5.5_B2B_CONTROLLER_ACCEPTANCE.md",
     "blob_sha": "4d6d65dad35e42e10d175875093dc045bbc63503"
@@ -32,11 +32,11 @@
     "live_v1_b3_state": "LIVE_V1_B3_ACCEPTED",
     "live_v1_b3_accepted_sha": "961a0f4d4b37cdb9365d5e5867813ff3129c14db",
     "live_v1_b4_authorized": true,
-    "live_v1_b5_authorized": true,
+    "live_v1_b5_authorized": false,
     "live_v1_day2_target_write": "TESTNET_ONLY",
     "provider_credential_smoke": "PENDING",
     "live_store_concurrency_gate": "B4_MUST_ESTABLISH_WAL_OR_EQUIVALENT",
-    "live_v1_b4_state": "R4_EXACT_SHA_SEALED_PENDING_B5_INDEPENDENT_REVALIDATION",
+    "live_v1_b4_state": "B5_R4_FAILED_PENDING_FINDINGS_REPAIR_R5",
     "live_v1_b4_candidate_sha": "fd42f2cc1a67506d05117e3daa9a072309f7f998",
     "live_v1_b4_candidate_parent_sha": "961a0f4d4b37cdb9365d5e5867813ff3129c14db",
     "live_v1_b4_repair_authorized": true,
@@ -65,7 +65,7 @@
     "live_v1_b5_target_sha": "4bc05e1a7c7fae86f41c1dd9b5a1635d0540ee58",
     "live_v1_b5_expected_parent_sha": "c2c7cc83294f44340dd9fa1873bff760501fae12",
     "live_v1_b5_validator": "FULLY_FRESH_COORDINATING_SESSION",
-    "live_v1_b5_last_target_sha": "c2c7cc83294f44340dd9fa1873bff760501fae12",
+    "live_v1_b5_last_target_sha": "4bc05e1a7c7fae86f41c1dd9b5a1635d0540ee58",
     "live_v1_b5_last_decision": "LIVE_V1_INDEPENDENT_VALIDATION_FAILED",
     "live_v1_b4_r2_authorized": true,
     "live_v1_b4_r2_findings": [
@@ -121,7 +121,15 @@
     ],
     "live_v1_b4_r4_sha": "4bc05e1a7c7fae86f41c1dd9b5a1635d0540ee58",
     "live_v1_b4_r4_parent_sha": "c2c7cc83294f44340dd9fa1873bff760501fae12",
-    "live_v1_b4_r4_exact_sha_sealed": true
+    "live_v1_b4_r4_exact_sha_sealed": true,
+    "live_v1_b4_r5_authorized": true,
+    "live_v1_b4_r5_findings": [
+      "BLOCKER_PENDING_PROTECTION_RECOVERY_LACKS_EXACT_ID_CONFIRMATION",
+      "HIGH_PROTECTIVE_CONFIRMATION_CONTRACT_INCOMPLETE",
+      "HIGH_FLAT_RELEASE_CAN_DISCARD_UNRESOLVED_PROTECTION_AUTHORITY",
+      "HIGH_RUNTIME_READINESS_ACCOUNT_AUTHORITY_NOT_SINGLE_GATE",
+      "HIGH_POSITION_OUTBOX_SYMBOL_NOT_BOUND_TO_EVENT"
+    ]
   },
   "must_read": [],
   "validation_authority": {
@@ -146,7 +154,7 @@
     "evidence_path": "evidence/v0.5.5/controller/V0.5.5_B2B_CONTROLLER_ACCEPTANCE.json",
     "evidence_blob_sha": "73a11708a85b5f1896397d745c3b7252d3c51f8d"
   },
-  "parallel_authorized_next_stage": "LIVE_V1_B5_R4_INDEPENDENT_EXACT_SHA_REVALIDATION",
+  "parallel_authorized_next_stage": "LIVE_V1_B4_B5_FINDINGS_REPAIR_R5",
   "live_v1_acceptance_authority": {
     "report_path": "reviews/v0.5/live_v1/V0.5.5_LIVE_V1_B3_CONTROLLER_ACCEPTANCE.md",
     "report_blob_sha": "21ad4492feb4750f5fc85a5f88b54d1da36c157d",
@@ -214,5 +222,19 @@
     "prompt_blob_sha": "724e1466c6bb4e78e0cd4a644cd7c8f8a75c95d7",
     "dispatch_path": "evidence/v0.5.5/controller/B_LINE_LIVE_V1_B5_R4_CURRENT_DISPATCH.json",
     "dispatch_blob_sha": "a3da974ca68fe049248a6fdb128c50f3c8dbee5e"
+  },
+  "live_v1_b5_r4_failure_authority": {
+    "report_path": "reviews/v0.5/live_v1/V0.5.5_LIVE_V1_B5_R4_CONTROLLER_ADJUDICATION.md",
+    "report_blob_sha": "888288f1307df57e9410ed95b5b6b9ad7dacfc2e",
+    "evidence_path": "evidence/v0.5.5/controller/V0.5.5_LIVE_V1_B5_R4_CONTROLLER_ADJUDICATION.json",
+    "evidence_blob_sha": "57a2758c30dbd4ecc6d2cc98f59ce8bfbe176d56",
+    "source_validation_branch": "validation/v0.5.5-live-v1-b5-r4-independent-20261003",
+    "source_validation_commit": "80f6123a58520bca739f74ea62c7315bf44f1cf5",
+    "source_report_blob": "0194c99752352da1e431f7b8bb7f9fe4949cdcb4",
+    "source_evidence_blob": "7d52d65eeb4b252b5bcc2c75c1f4211ea5cdd380"
+  },
+  "live_v1_b4_r5_prompt": {
+    "path": "prompts/v0.5/repair/v0.5.5_B4_LIVE_V1_B5_FINDINGS_REPAIR_R5.md",
+    "blob_sha": "ab6c9855440039e6a8fa90a96fee23172a00fdb6"
   }
 }

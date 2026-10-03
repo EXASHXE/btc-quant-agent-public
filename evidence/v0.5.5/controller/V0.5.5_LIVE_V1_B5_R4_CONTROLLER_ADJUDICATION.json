@@ -1,0 +1,67 @@
+{
+  "task": "LIVE_V1_B5_R4_CONTROLLER_ADJUDICATION",
+  "validated_sha": "4bc05e1a7c7fae86f41c1dd9b5a1635d0540ee58",
+  "expected_parent_sha": "c2c7cc83294f44340dd9fa1873bff760501fae12",
+  "validation_branch": "validation/v0.5.5-live-v1-b5-r4-independent-20261003",
+  "validation_commit": "80f6123a58520bca739f74ea62c7315bf44f1cf5",
+  "validation_parent": "75c9c5cfa1bfaf6cad0c91214fecccc2eb578928",
+  "validation_report_blob": "0194c99752352da1e431f7b8bb7f9fe4949cdcb4",
+  "validation_evidence_blob": "7d52d65eeb4b252b5bcc2c75c1f4211ea5cdd380",
+  "independence_gate": "PASS_FULLY_FRESH_COORDINATOR",
+  "decision": "LIVE_V1_INDEPENDENT_VALIDATION_FAILED",
+  "controller_confirmed_findings": [
+    {
+      "severity": "BLOCKER",
+      "id": "PENDING_PROTECTION_RECOVERY_LACKS_EXACT_ID_CONFIRMATION"
+    },
+    {
+      "severity": "HIGH",
+      "id": "PROTECTIVE_CONFIRMATION_CONTRACT_INCOMPLETE"
+    },
+    {
+      "severity": "HIGH",
+      "id": "FLAT_RELEASE_CAN_DISCARD_UNRESOLVED_PROTECTION_AUTHORITY"
+    },
+    {
+      "severity": "HIGH",
+      "id": "RUNTIME_READINESS_ACCOUNT_AUTHORITY_NOT_SINGLE_GATE"
+    },
+    {
+      "severity": "HIGH",
+      "id": "POSITION_OUTBOX_SYMBOL_NOT_BOUND_TO_EVENT"
+    }
+  ],
+  "tests": {
+    "full_suite": {
+      "passed": 2345,
+      "skipped": 2,
+      "failed": 0
+    },
+    "independent_final": {
+      "passed": 76,
+      "failed": 12
+    },
+    "live_v1": {
+      "passed": 336,
+      "failed": 0
+    },
+    "r4_focused": {
+      "passed": 58,
+      "failed": 0
+    }
+  },
+  "remote_ci": {
+    "run_id": 37118592732,
+    "passed": 2344,
+    "failed": 1,
+    "skipped": 2,
+    "only_failure": "KNOWN_NONBLOCKING_CI_HARNESS_DEBT_A34_SHALLOW_CHECKOUT"
+  },
+  "h40_full_history_diff": "ZERO",
+  "safety": {
+    "live_write_authority": "NONE",
+    "real_funds_authorized": false,
+    "autonomous_live": "FORBIDDEN"
+  },
+  "next_state": "LIVE_V1_B4_B5_FINDINGS_REPAIR_R5"
+}
