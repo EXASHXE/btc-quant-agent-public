@@ -1,0 +1,2 @@
+{'b_baseline': ['POSITION_OPENED'], 'a_stop': ['POSITION_OPENED', 'STOP_NEAR'], 'b_stop': []}
+{'dry_run': ['POSITION_OPENED'], 'testnet': []}

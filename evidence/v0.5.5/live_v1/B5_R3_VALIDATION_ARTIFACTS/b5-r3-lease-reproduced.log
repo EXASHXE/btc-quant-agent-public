@@ -1,0 +1,1 @@
+{'provider_calls': 1, 'second_dispatched': 1, 'state_after_second': 'DONE', 'final_outbox_state': 'DONE', 'decision_state': 'MANUAL', 'proposal': None}

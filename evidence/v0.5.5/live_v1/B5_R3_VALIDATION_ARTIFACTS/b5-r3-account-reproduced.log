@@ -1,0 +1,2 @@
+events {'accepted_same_E': (True, True), 'position_qty': -0.1, 'order_filled': 0.1, 'duplicate_accepted': False, 'conflict_accepted': False, 'after_conflict': (False, 'STALE', 0.1), 'rest_repaired': True, 'stale_accepted': False, 'after_stale_reconciled': False}
+lifecycle {'connections': 2, 'all_testnet_url': True, 'listen_keys_started': 2, 'listen_keys_closed': 2, 'final_reconciled': False, 'listen_key_in_snapshot': False}

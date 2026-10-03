@@ -1,0 +1,207 @@
+{
+  "account_reconciliation": "PASS for inspected forced REST placement path; stale REST timestamp blocked in independent fake probe",
+  "approval_safety": "PASS for callback/action/case/proposal swap in inspected paths; public contract caveat: DRY_RUN-labeled card can build TESTNET intent, with no production materialization caller identified.",
+  "blockers": [
+    {
+      "id": "B2-null-algo-id",
+      "impact": "A malformed or uncertain protective response is recorded as an installed stop with an unusable exchange identity. The filled position can be reported protected while no verifiable protective order exists.",
+      "observed": "ExecutionReport(status='FILLED', protective_stop_id='None'); live_execution_orders protective order_id='None', status='NEW'; owner exchange_id='None', quantity=1.6472; kill switch allows_new_risk() is True",
+      "reproduction": "PYTHONPATH=/tmp/live-v1-b5-r3-independent-c2c7cc8/src /root/workspace/project/Quant-agent-market-watch/.venv/bin/python /tmp/b5_r3_authority_probe.py",
+      "severity": "BLOCKER",
+      "source": "src/btc_quant_agent/execution/backend.py:697-723; src/btc_quant_agent/execution/protection.py:126-139",
+      "trigger": "During public TestnetExecutionBackend.submit_authorized, fake entry returns FILLED, fake place_protective_order returns {'algoId': None}"
+    }
+  ],
+  "compileall": "Parent coordinated; not run by this reviewer",
+  "decision": "FAIL",
+  "execution_idempotency": "PASS by inspected singleton claim, local entry identity checks, reconciliation-first path, and query-before-retry path; malformed protective ID is separate blocker",
+  "focused_tests": "Independent synthetic probes: /tmp/b5_r3_authority_probe.py (5 negative gates + direct/public malformed protection), /tmp/b5_r3_risk_identity_probe.py (LONG/SHORT independent formula and 5 outcomes each), /tmp/b5_r3_contract_probe.py (4 tamper/swap, canonical identity, refreshed receipt, concurrency, LIVE endpoint fence); all assertions passed while B2 unsafe acceptance reproduced.",
+  "full_suite": "Parent coordinated; not run by this reviewer",
+  "h40_fence": "No H40 paths in accepted-base-to-target changed-file list; full-history adjudication delegated to parent",
+  "identity_gate": "PASS: exact HEAD, parent, branch feature/b-line-live-v1, origin EXASHXE/btc-quant-agent-public, clean clone",
+  "live_write_count": 0,
+  "mypy": "Parent coordinated; not run by this reviewer",
+  "next_state": "LIVE_V1_INDEPENDENT_VALIDATION_FAILED",
+  "optional_improvements": [
+    {
+      "anchors": [
+        "decision/models.py:185",
+        "approval/feishu.py:20-45",
+        "execution/intents.py:198-240"
+      ],
+      "evidence": "Approval card and TradeProposalV1 declare DRY_RUN, while public build_trade_intent can compile TESTNET from same approved proposal and callback. The current src tree has no caller of build_trade_intent, so production callback-to-placement reachability is not established by this review.",
+      "id": "approval-environment-disclosure",
+      "severity": "PUBLIC_CONTRACT_CONCERN"
+    }
+  ],
+  "parent_sha": "937b2b26518ceea0952a7e17279cc42924c88848",
+  "position_supervisor": "Delegated to another independent reviewer",
+  "prior_3_blockers": {
+    "B1": "PASS in inspected paths and independent fake probes: expiry during leverage, declining current margin after setup, stale REST timestamp all blocked before entry; backend forces second current account read, reloads persisted refreshed receipt, and revalidates before placement",
+    "B2": "FAIL: null protective algoId accepted as string 'None' and persisted as installed stop; see blocker B2-null-algo-id",
+    "B3": "PASS by source math: worst_case_loss_rate includes stop distance plus fee/slippage/funding, validator bounds by remaining daily loss and peak-equity drawdown; exact boundary direct test inspected"
+  },
+  "prior_5_highs": "Delegated to another independent reviewer; no conclusion asserted here",
+  "provider_boundaries": "PASS for inspected BinanceSignedClient mutation policy and TESTNET factory; actual network smoke NOT_RUN",
+  "remote_ci": "Parent coordinated; no independent remote claim",
+  "risk_math": "PASS independent LONG and SHORT arithmetic, exact daily/drawdown boundaries, just-over-boundary and inconsistent equity; see safety_matrix and /tmp/b5_r3_risk_identity_probe.py.",
+  "ruff": "Parent coordinated; not run by this reviewer",
+  "runtime_governance": "Delegated to another independent reviewer",
+  "safety_matrix": {
+    "B1_placement_time_authority": {
+      "anchors": [
+        "execution/backend.py:321-421",
+        "execution/authorization.py:158-190",
+        "execution/validator.py:53-275"
+      ],
+      "evidence": "expiry during leverage setup, lower current available margin, stale forced REST timestamp, wrong client namespace, and stale kline all blocked with zero entry calls; changed safe account generated a new claimed receipt bound to its hash with unchanged original 5000-ms expiry",
+      "probe": "/tmp/b5_r3_authority_probe.py and /tmp/b5_r3_contract_probe.py",
+      "result": "PASS"
+    },
+    "B2_exact_protection_ownership": {
+      "anchors": [
+        "execution/backend.py:697-723",
+        "execution/protection.py:126-139"
+      ],
+      "evidence": "public FILLED entry plus protective response algoId=null returned protective_stop_id=\"None\", persisted NEW protective row and ACTIVE owner exchange_id=\"None\", kill switch stayed permissive",
+      "probe": "/tmp/b5_r3_authority_probe.py",
+      "result": "FAIL"
+    },
+    "B3_long_risk_headroom": {
+      "anchors": [
+        "decision/risk.py:56-72",
+        "execution/validator.py:166-211"
+      ],
+      "evidence": "independent formula 1.6472*5 + 164.72*0.0013=8.450136 USDT; daily and drawdown exact boundaries accepted; daily over by 1e-5 and drawdown floor over by peak +1e-4 rejected; inconsistent peak/drawdown rejected",
+      "probe": "/tmp/b5_r3_risk_identity_probe.py",
+      "result": "PASS"
+    },
+    "B3_short_risk_headroom": {
+      "anchors": [
+        "decision/risk.py:56-72",
+        "execution/validator.py:166-211"
+      ],
+      "evidence": "independent formula 1.6153*5 + 161.53*0.0013=8.286489 USDT; same exact-boundary/over-boundary/inconsistent results as LONG",
+      "probe": "/tmp/b5_r3_risk_identity_probe.py",
+      "result": "PASS"
+    },
+    "account_namespace_isolation": {
+      "anchors": [
+        "execution/validator.py:142-159",
+        "execution/backend.py:310-355"
+      ],
+      "evidence": "current account environment/account_id compared to intent; backend compares client environment, credential namespace and REST URL to current account; wrong client namespace probe blocked before setup/entry",
+      "probe": "/tmp/b5_r3_authority_probe.py",
+      "result": "PASS_IN_INSPECTED_PATHS"
+    },
+    "approval_case_proposal_swap": {
+      "anchors": [
+        "approval/callback.py:26-89",
+        "approval/store.py:266-304",
+        "execution/validator.py:74-122",
+        "approval/feishu.py:20-45",
+        "execution/intents.py:198-240"
+      ],
+      "evidence": "approval case-hash swap rejected before entry; callback value accepts only action/proposal_hash/case_hash and validates actor/token/signature; card says DRY_RUN while public builder can generate TESTNET intent; no production builder caller found",
+      "probe": "/tmp/b5_r3_contract_probe.py and /tmp/b5_r3_risk_identity_probe.py",
+      "result": "PASS_WITH_CAVEAT"
+    },
+    "database_durability_contention": {
+      "anchors": [
+        "live_db.py:11-33",
+        "execution/authorization.py:140-155",
+        "execution/protection.py:37-55",
+        "execution/protection.py:74-102"
+      ],
+      "evidence": "shared connection sets WAL, busy_timeout, synchronous FULL and foreign_keys ON; claim and protective reservation use BEGIN IMMEDIATE with unique indexes",
+      "result": "PASS_BY_SOURCE"
+    },
+    "executable_equivalence": {
+      "anchors": [
+        "execution/intents.py:94-135",
+        "execution/validator.py:124-140"
+      ],
+      "evidence": "all 12 compiled executable fields equal approved LONG and SHORT intents; validation recompiles against saved original account and compares every field",
+      "probe": "/tmp/b5_r3_risk_identity_probe.py",
+      "result": "PASS"
+    },
+    "persisted_authorization_binding": {
+      "anchors": [
+        "execution/authorization.py:28-52",
+        "execution/authorization.py:103-127",
+        "execution/authorization.py:158-190"
+      ],
+      "evidence": "authorization column hash tamper and TTL payload tamper rejected before mutation; safe refreshed receipt bound updated account hash without extending expiry",
+      "probe": "/tmp/b5_r3_contract_probe.py",
+      "result": "PASS"
+    },
+    "provider_raw_schema": {
+      "anchors": [
+        "decision/models.py:28-29",
+        "decision/models.py:134-172",
+        "decision/backends.py:31-57",
+        "decision/backends.py:80-126",
+        "decision/backends.py:139-220"
+      ],
+      "evidence": "provider output parsed as strict extra-forbid AnalysisResultV1 and verified to case before provenance replacement; executable fields absent from schema; errors fail NO_ACTION; Codex restricted secondary only and bounded",
+      "result": "PASS_BY_SOURCE"
+    },
+    "runtime_supervisor_H1_H5": {
+      "evidence": "delegated to separate independent reviewer",
+      "result": "NOT_ASSESSED_HERE"
+    },
+    "secret_isolation": {
+      "anchors": [
+        "config.py:334-405",
+        "execution/binance_signed.py:218-243",
+        "decision/backends.py:164-200"
+      ],
+      "evidence": "LiveV1Config has model names but no API secret fields; testnet factory reads only BINANCE_TESTNET_API_KEY/SECRET; Codex subprocess env allowlist omits exchange/OpenAI/Feishu secrets and denies network",
+      "result": "PASS_BY_SOURCE"
+    },
+    "singleton_approval_idempotency": {
+      "anchors": [
+        "execution/intents.py:211-240",
+        "execution/intents.py:244-305",
+        "execution/authorization.py:140-155",
+        "execution/backend.py:371-402"
+      ],
+      "evidence": "same approval deterministic canonical identity and unique approval/intent/idempotency/client ID columns; two concurrent submit_authorized calls produced one exchange entry, second blocked as in-flight",
+      "probe": "/tmp/b5_r3_contract_probe.py",
+      "result": "PASS"
+    },
+    "testnet_only_write_fence": {
+      "anchors": [
+        "execution/policy.py:34-87",
+        "execution/binance_signed.py:44-49",
+        "execution/binance_signed.py:99-113"
+      ],
+      "evidence": "LIVE/AUTONOMOUS excluded by capability policy; signed mutation checks TESTNET namespace and exact REST URL; fake BinanceSignedClient pointed at live endpoint was blocked before urlopen",
+      "probe": "/tmp/b5_r3_contract_probe.py",
+      "result": "PASS"
+    },
+    "trade_intent_canonical_identity": {
+      "anchors": [
+        "execution/intents.py:57-91",
+        "execution/intents.py:335-340"
+      ],
+      "evidence": "self-rehashed noncanonical intent_id/idempotency_key/client_order_id rejected at model construction; persisted idempotency column swap rejected before entry",
+      "probe": "/tmp/b5_r3_contract_probe.py",
+      "result": "PASS"
+    },
+    "transport_uncertainty": {
+      "anchors": [
+        "execution/backend.py:420-475",
+        "execution/backend.py:783-861"
+      ],
+      "evidence": "entry placement exception queries by client order ID and retains durable claim on unresolved query; recovery queries exact ID before protective reconcile; no retry in inspected path",
+      "result": "PASS_BY_SOURCE"
+    }
+  },
+  "schema_identity_attacks": "PASS by inspected TradeIntentV1 canonical_execution_identity/model validator, IntentStore verified row, and PreExecutionAuthorizationV1 hash/load bindings",
+  "scope": "Independent execution authorization, identity, approval, risk, idempotency, protective ownership, provider and TESTNET-only write fence; no implementation/test edits",
+  "secret_isolation": "PASS by inspected factory reading only BINANCE_TESTNET_API_KEY and BINANCE_TESTNET_API_SECRET; no real secrets used",
+  "testnet_network_smoke": "NOT_RUN: no dedicated credentials; fake clients only",
+  "testnet_only_fence": "PASS for inspected capability policy and signed mutation path; LIVE/AUTONOMOUS blocked, no LIVE write performed",
+  "validated_sha": "c2c7cc83294f44340dd9fa1873bff760501fae12"
+}

@@ -1,0 +1,8 @@
+auth_column_tamper ExecutionBlocked:AUTHORIZATION_HASH_MISMATCH entry_calls 0
+auth_payload_tamper ExecutionBlocked:AUTHORIZATION_HASH_MISMATCH entry_calls 0
+approval_case_swap ExecutionBlocked:APPROVAL_CASE_HASH_MISMATCH entry_calls 0
+intent_column_swap ExecutionBlocked:PERSISTED_INTENT_IDENTITY_MISMATCH entry_calls 0
+self_rehashed_noncanonical ValidationError:1 validation error for TradeIntentV1
+refreshed_claim NEW new_id True new_account_bound True original_expiry 1700000005000 claimed_expiry 1700000005000 order_count 1
+concurrent_singleton ['NEW', 'ExecutionBlocked:AUTHORIZATION_IN_FLIGHT_RECONCILIATION_REQUIRED'] entry_count 1
+live_endpoint_mutation ExecutionBlocked:endpoint/environment mismatch: 'https://fapi.binance.com' is not allowlisted for TESTNET transport_calls 0

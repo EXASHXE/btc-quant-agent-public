@@ -1,0 +1,1 @@
+{'settings': {'journal_mode': 'wal', 'synchronous': 2, 'foreign_keys': 1, 'busy_timeout': 10000}, 'rollback_rows': 0, 'bounded_lock_rejected': True, 'committed_rows': [2]}

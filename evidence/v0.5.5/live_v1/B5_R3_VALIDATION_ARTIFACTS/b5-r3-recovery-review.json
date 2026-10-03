@@ -1,0 +1,251 @@
+{
+  "validated_sha": "c2c7cc83294f44340dd9fa1873bff760501fae12",
+  "parent_sha": "937b2b26518ceea0952a7e17279cc42924c88848",
+  "branch": "feature/b-line-live-v1",
+  "repository": "EXASHXE/btc-quant-agent-public",
+  "identity_gate": "PASS",
+  "independent_decision": "FAIL: explicit H2 account-separation acceptance is unmet by cross-account cooldown; conditional namespace collision is HIGH; lease overlap is informational after B3 reservation adjudication.",
+  "scope": "H1/H2/H3/H4/H5, account/market/PositionSupervisor/outbox/recovery; read-only source and tests; probes use temp SQLite and local mocks",
+  "prior_highs": {
+    "H1_runtime_authority": "No issue found in targeted config.py/api.py source review; strict env booleans and B4 precedence present.",
+    "H2_lifecycle": "FAIL: lifecycle account scoping is incomplete; account-independent event cooldown and cross-environment key collision reproduced.",
+    "H3_component_freshness": "No issue found: mark/book/kline each carry source and receipt times; validator requires all components fresh.",
+    "H4_canonical_identity": "No issue found: TradeIntentV1 validation derives canonical IDs and verifies hash, and IntentStore compares persisted columns.",
+    "H5_recovery_before_new_entry": "No direct issue found in examined paths: execute_approved_intent and runtime.execute_intent check durable side effect before new-entry gates; restart reconciliation queries exchange even with expired authorization or kill switch."
+  },
+  "optional_improvements": [],
+  "probe_artifacts": [
+    "/tmp/b5_r3_lease_probe.py",
+    "/tmp/b5_r3_lease_real_service_probe.py",
+    "/tmp/b5_r3_h2_account_probe.py",
+    "/tmp/b5_r3_account_stream_probe.py",
+    "/tmp/b5_r3_sqlite_probe.py",
+    "/tmp/b5_r3_runtime_probe.py"
+  ],
+  "checks": {
+    "source_checkout_clean": true,
+    "network_calls": 0,
+    "exchange_calls": 0,
+    "real_credentials": false,
+    "existing_suite": "Parent owns test suite and static checks; no duplicate run here",
+    "focused_matrix": "Four standalone probes completed; existing account-stream pytest attempt hung in this sandbox on asyncio.to_thread executor shutdown after three tests and was interrupted; parent full suite reported 2287 passed, 2 skipped.",
+    "full_suite_parent_report": {
+      "passed": 2287,
+      "skipped": 2,
+      "source": "parent report; not independently rerun"
+    }
+  },
+  "blocking_findings": [
+    {
+      "id": "B5-R3-H2-ACCOUNT-COOLDOWN",
+      "severity": "HIGH",
+      "locations": [
+        "src/btc_quant_agent/position_supervisor/supervisor.py:96",
+        "src/btc_quant_agent/position_supervisor/supervisor.py:284"
+      ],
+      "evidence": "Position lifecycle keys account_id/symbol/side, but live_position_events has no account_id and cooldown SELECT filters only symbol and trigger. Temp SQLite probe with account B already open: B baseline at mark 100 emits POSITION_OPENED; A mark 91 one ms later emits POSITION_OPENED and STOP_NEAR; B mark 91 one ms after A emits no events at all. Thus B receives no stop-near case analysis.",
+      "impact": "A separate account's recent event suppresses account B's stop-near, liquidity, partial-fill or other time-sensitive position event and its case analysis for the cooldown interval.",
+      "repro": "PYTHONPATH=/tmp/live-v1-b5-r3-independent-c2c7cc8/src:/tmp/live-v1-b5-r3-independent-c2c7cc8/tests /root/workspace/project/Quant-agent-market-watch/.venv/bin/python /tmp/b5_r3_h2_account_probe.py"
+    }
+  ],
+  "high_findings": [
+    {
+      "id": "B5-R3-H2-ENV-NAMESPACE-COLLISION",
+      "severity": "HIGH",
+      "locations": [
+        "src/btc_quant_agent/position_supervisor/models.py:43",
+        "src/btc_quant_agent/position_supervisor/supervisor.py:114",
+        "src/btc_quant_agent/live_runtime.py:187",
+        "src/btc_quant_agent/config.py:343"
+      ],
+      "evidence": "PositionObservation carries account_id and account_snapshot_hash but omits environment and credential namespace. Lifecycle primary key uses account_id/symbol/side. Runtime defaults account_id=DEFAULT_ACCOUNT and a shared SQLite path for both DRY_RUN and TESTNET. Temp SQLite probe: first DEFAULT_ACCOUNT observation qty=1 emits POSITION_OPENED; a second observation with a distinct account snapshot hash and same account_id/symbol/qty at NOW+1 emits no event.",
+      "impact": "Switching runtime environment or credential namespace on a reused database binds a TESTNET position to DRY_RUN or previous credential lifecycle state. It can suppress opening/closing events and position case dispatches for the current account. No model field permits checking the authority boundary.",
+      "qualification": "Conditional on reusing the same SQLite database and configured account_id across DRY_RUN and TESTNET or credential changes; direct runtime mode-switch was not exercised.",
+      "repro": "PYTHONPATH=/tmp/live-v1-b5-r3-independent-c2c7cc8/src:/tmp/live-v1-b5-r3-independent-c2c7cc8/tests /root/workspace/project/Quant-agent-market-watch/.venv/bin/python /tmp/b5_r3_h2_account_probe.py"
+    }
+  ],
+  "probe_outputs": {
+    "cross_account_cooldown": {
+      "account_b_baseline": [
+        "POSITION_OPENED"
+      ],
+      "account_a_stop": [
+        "POSITION_OPENED",
+        "STOP_NEAR"
+      ],
+      "account_b_stop": []
+    },
+    "cross_environment_same_id": {
+      "dry_run": [
+        "POSITION_OPENED"
+      ],
+      "testnet": [],
+      "lifecycle_qty": 1.0
+    },
+    "lease_spy": {
+      "calls": 2,
+      "identical_case": true,
+      "first_dispatched": 0,
+      "second_dispatched": 1,
+      "final_state": "DONE"
+    },
+    "lease_real_service": {
+      "provider_calls": 1,
+      "second_dispatched": 1,
+      "state_after_second": "DONE",
+      "final_outbox_state": "DONE",
+      "decision_state": "MANUAL",
+      "proposal": null
+    }
+  },
+  "informational_observations": [
+    {
+      "id": "B5-R3-OUTBOX-LEASE-FALSE-DONE",
+      "severity": "INFORMATIONAL",
+      "locations": [
+        "src/btc_quant_agent/position_supervisor/supervisor.py:401",
+        "src/btc_quant_agent/position_supervisor/supervisor.py:568",
+        "src/btc_quant_agent/position_supervisor/supervisor.py:586",
+        "src/btc_quant_agent/decision/service.py:99"
+      ],
+      "evidence": "A lease is renewed immediately before analyze_case, but not during its awaited provider call. After expiry a second worker can reclaim the frozen case. TacticalLiveService.save_case rejects the second reservation and analyze_case returns None; supervisor treats the return as success and commits DONE. /tmp/b5_r3_lease_real_service_probe.py used the real TacticalLiveService/LiveStore, a blocking fake provider and temp SQLite: provider_calls=1, second_dispatched=1, state_after_second=DONE. After canceling first, final_outbox_state=DONE, decision_state=MANUAL, proposal=None.",
+      "impact": "The outbox records DONE while analysis is in flight and can remain DONE after the only worker is canceled. The corresponding decision case is MANUAL with no proposal. This breaks outbox completion semantics and obscures recovery, while the decision layer remains fail closed.",
+      "qualification": "B3 LiveStore reservation prevents duplicate provider calls in the real-service probe; interrupted case remains MANUAL, so impact is false outbox completion rather than silently authorized trading.",
+      "adjudication": "Not a blocking correctness finding: B3 save_case reserves the exact frozen case durably, blocks a second provider call, and marks interrupted work MANUAL. DONE here represents the second worker delivering that reserved case to analyze_case, even though no proposal is returned. Lease overlap alone is expected after expiry."
+    }
+  ],
+  "broad_matrix": {
+    "account_watch_user_stream": {
+      "status": "PASS with local fake; no provider network",
+      "source_anchors": [
+        "src/btc_quant_agent/account_watch/service.py:123",
+        "src/btc_quant_agent/account_watch/service.py:316",
+        "src/btc_quant_agent/account_watch/service.py:337",
+        "src/btc_quant_agent/account_watch/service.py:350",
+        "src/btc_quant_agent/account_watch/service.py:361",
+        "src/btc_quant_agent/account_watch/service.py:402",
+        "src/btc_quant_agent/account_watch/service.py:433",
+        "src/btc_quant_agent/account_watch/service.py:440",
+        "src/btc_quant_agent/account_watch/service.py:478",
+        "src/btc_quant_agent/account_watch/service.py:502",
+        "src/btc_quant_agent/account_watch/service.py:523",
+        "src/btc_quant_agent/account_watch/service.py:541"
+      ],
+      "related_tests": [
+        "tests/test_live_v1_account_stream_r2.py:65",
+        "tests/test_live_v1_account_stream_r2.py:80",
+        "tests/test_live_v1_account_stream_r2.py:100",
+        "tests/test_live_v1_account_stream_r2.py:133",
+        "tests/test_live_v1_account_stream_r2.py:153",
+        "tests/test_live_v1_account_stream_r2.py:179",
+        "tests/test_live_v1_account_stream_r2.py:210"
+      ],
+      "probe": "/tmp/b5_r3_account_stream_probe.py",
+      "probe_output": {
+        "accepted_same_exchange_timestamp": [
+          true,
+          true
+        ],
+        "position_quantity": -0.1,
+        "order_filled_quantity": 0.1,
+        "duplicate_event_accepted": false,
+        "conflicting_equal_timestamp_accepted": false,
+        "conflict_snapshot_quality": "STALE",
+        "rest_repaired": true,
+        "stale_after_rest_accepted": false,
+        "reconnections_after_listen_key_expiry": 2,
+        "testnet_websocket_url_only": true,
+        "listen_keys_started": 2,
+        "listen_keys_closed": 2,
+        "final_reconciled": false,
+        "listen_key_in_snapshot": false
+      },
+      "assessment": "Both event types apply over REST baseline and accept distinct sources with equal exchange E. Exact duplicate is idempotent; conflicting same-source E and pre-REST E mark unreconciled/stale. User stream keeps TESTNET URL, closes listen keys, and reconnects after listenKeyExpired. Keepalive is scheduled every 30 minutes. TESTNET placement separately forces fresh REST through backend account_provider; periodic runtime interval constrained 30\u201360 seconds."
+    },
+    "sqlite_durability": {
+      "status": "PASS local negative probe",
+      "source_anchors": [
+        "src/btc_quant_agent/live_db.py:12",
+        "src/btc_quant_agent/live_db.py:19",
+        "src/btc_quant_agent/live_db.py:25",
+        "src/btc_quant_agent/live_db.py:29"
+      ],
+      "related_tests": [
+        "tests/test_live_v1_execution_storage.py:11",
+        "tests/test_live_v1_execution_storage.py:34"
+      ],
+      "probe": "/tmp/b5_r3_sqlite_probe.py",
+      "probe_output": {
+        "journal_mode": "wal",
+        "synchronous": 2,
+        "foreign_keys": 1,
+        "busy_timeout_ms": 10000,
+        "rollback_rows_after_foreign_key_error": 0,
+        "bounded_30ms_writer_lock_rejected": true,
+        "rows_committed_after_lock_release": [
+          2
+        ]
+      },
+      "assessment": "Connection enforces WAL, synchronous FULL (SQLite value 2), foreign keys, default 10s busy timeout and rollback on BaseException. The failed FK transaction did not partially commit; a 30ms contending writer failed while the first BEGIN IMMEDIATE writer committed."
+    },
+    "runtime_startup_shutdown_restart": {
+      "status": "PASS local mock probe",
+      "source_anchors": [
+        "src/btc_quant_agent/live_runtime.py:24",
+        "src/btc_quant_agent/live_runtime.py:225",
+        "src/btc_quant_agent/live_runtime.py:264",
+        "src/btc_quant_agent/live_runtime.py:294",
+        "src/btc_quant_agent/live_runtime.py:330",
+        "src/btc_quant_agent/config.py:368"
+      ],
+      "related_tests": [
+        "tests/test_live_v1_runtime_r2.py:51",
+        "tests/test_live_v1_runtime_r2.py:70",
+        "tests/test_live_v1_runtime_r2.py:110",
+        "tests/test_live_v1_runtime_r2.py:207",
+        "tests/test_live_v1_runtime_recovery_r3.py:200",
+        "tests/test_live_v1_runtime_recovery_r3.py:232"
+      ],
+      "probe": "/tmp/b5_r3_runtime_probe.py",
+      "probe_output": {
+        "startup_order": [
+          "reconcile:claimed-intent",
+          "rest"
+        ],
+        "tasks": [
+          "live-v1-market",
+          "live-v1-rest",
+          "live-v1-outbox",
+          "live-v1-position"
+        ],
+        "stopped_accepting_risk": false,
+        "all_tasks_done_after_stop": true,
+        "close_user_stream_calls": 1,
+        "restart_reconcile_count": 2,
+        "all_tasks_done_after_second_stop": true
+      },
+      "assessment": "Recovery precedes REST/start risk acceptance; start owns market, REST, outbox and position tasks, plus TESTNET user-stream task. Stop requests exit, does not detach position reconciliation, awaits all tasks and listen-key close, then marks account stale. Restart repeats recovery. Task failure and stream disconnect block readiness."
+    },
+    "position_supervisor_outbox": {
+      "status": "PASS for frozen identity and lease guards; H2 account cooldown finding remains separate",
+      "source_anchors": [
+        "src/btc_quant_agent/position_supervisor/supervisor.py:394",
+        "src/btc_quant_agent/position_supervisor/supervisor.py:485",
+        "src/btc_quant_agent/position_supervisor/supervisor.py:537",
+        "src/btc_quant_agent/position_supervisor/supervisor.py:568",
+        "src/btc_quant_agent/position_supervisor/supervisor.py:589"
+      ],
+      "related_tests": [
+        "tests/test_live_v1_position_supervisor.py:449",
+        "tests/test_live_v1_position_supervisor.py:479",
+        "tests/test_live_v1_position_supervisor.py:539",
+        "tests/test_live_v1_position_supervisor.py:696",
+        "tests/test_live_v1_position_lease_r2.py:15",
+        "tests/test_live_v1_position_lease_r2.py:70",
+        "tests/test_live_v1_position_lease_r2.py:93"
+      ],
+      "probe": "/tmp/b5_r3_lease_real_service_probe.py",
+      "assessment": "BEGIN IMMEDIATE claims lease atomically; first materialization stores canonical PositionCase before external analysis. Retries load and verify frozen JSON/hash/event link. Worker renews exact token and frozen case immediately before analyze_case and stale worker cannot mark DONE. During analysis expiry, B3 save_case reservation prevents duplicate provider call; this remains informational."
+    }
+  }
+}
