@@ -1,0 +1,33 @@
+{
+  "task": "LIVE_V1_B5_R3_INDEPENDENT_EXACT_SHA_REVALIDATION",
+  "repository": "EXASHXE/btc-quant-agent-public",
+  "task_branch": "feature/b-line-live-v1",
+  "binding_mode": "EXACT_CODE_SHA",
+  "target_sha": "c2c7cc83294f44340dd9fa1873bff760501fae12",
+  "expected_parent_sha": "937b2b26518ceea0952a7e17279cc42924c88848",
+  "b3_accepted_sha": "961a0f4d4b37cdb9365d5e5867813ff3129c14db",
+  "live_v1_base_sha": "52c16a28153de307dc6132c0975fe29341a0a918",
+  "controller_dispatch_sha": "SUPPLIED_OUT_OF_BAND_AS_CURRENT_DOCS_HEAD",
+  "validator_requirement": "INDEPENDENT_FRESH_SESSION",
+  "implementation_mutation": "FORBIDDEN",
+  "r3_seal_required": true,
+  "prior_failure_findings": {
+    "blockers": [
+      "PLACEMENT_GATE_USES_STALEABLE_TIME_AND_ACCOUNT_AUTHORITY",
+      "PROTECTIVE_ORDER_OWNERSHIP_NOT_EXACT_INTENT_BOUND",
+      "NEW_RISK_NOT_BOUNDED_BY_REMAINING_ACCOUNT_LOSS_HEADROOM"
+    ],
+    "highs": [
+      "RUNTIME_ENABLE_AUTHORITY_NOT_SINGLE_SOURCE",
+      "FLAT_POSITION_TRANSITION_NOT_DURABLY_AUTHORITATIVE",
+      "MARK_BOOK_KLINE_FRESHNESS_NOT_SEPARATELY_PROVEN",
+      "EXECUTION_IDENTITIES_NOT_CANONICAL_RECOMPUTED_ON_VERIFY",
+      "ACTIVE_ORDER_RECONCILIATION_ORDERING_CAN_DROP_STATE_RECOVERY"
+    ]
+  },
+  "expected_pass_state": "LIVE_V1_TESTNET_VALIDATED_LIVE_STILL_DISABLED",
+  "fail_state": "LIVE_V1_INDEPENDENT_VALIDATION_FAILED",
+  "live_approval_only": "NOT_AUTHORIZED",
+  "real_funds_write_authority": "NONE",
+  "autonomous_live": "FORBIDDEN"
+}

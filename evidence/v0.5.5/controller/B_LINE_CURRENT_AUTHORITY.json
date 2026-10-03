@@ -1,6 +1,6 @@
 {
   "line": "B_LINE",
-  "stage": "B2B_ACCEPTED__LIVE_V1_B3_ACCEPTED__R3_PRESEAL_BLOCKED_H40_CI_ADJUDICATION",
+  "stage": "B2B_ACCEPTED__LIVE_V1_B3_ACCEPTED__R3_EXACT_SHA_SEALED_PENDING_B5_REVALIDATION",
   "code_branch": "feature/tactical-policy-r2",
   "accepted_code_sha": "52c16a28153de307dc6132c0975fe29341a0a918",
   "docs_authority_commit": "666450530564b274f10439dde5d6dd9359aff3fd",
@@ -32,11 +32,11 @@
     "live_v1_b3_state": "LIVE_V1_B3_ACCEPTED",
     "live_v1_b3_accepted_sha": "961a0f4d4b37cdb9365d5e5867813ff3129c14db",
     "live_v1_b4_authorized": true,
-    "live_v1_b5_authorized": false,
+    "live_v1_b5_authorized": true,
     "live_v1_day2_target_write": "TESTNET_ONLY",
     "provider_credential_smoke": "PENDING",
     "live_store_concurrency_gate": "B4_MUST_ESTABLISH_WAL_OR_EQUIVALENT",
-    "live_v1_b4_state": "R3_SAFETY_SOURCE_REVIEW_PASS_EXACT_SHA_SEAL_BLOCKED_BY_H40_CI_ADJUDICATION",
+    "live_v1_b4_state": "R3_EXACT_SHA_SEALED_PENDING_B5_INDEPENDENT_REVALIDATION",
     "live_v1_b4_candidate_sha": "fd42f2cc1a67506d05117e3daa9a072309f7f998",
     "live_v1_b4_candidate_parent_sha": "961a0f4d4b37cdb9365d5e5867813ff3129c14db",
     "live_v1_b4_repair_authorized": true,
@@ -62,8 +62,8 @@
     "live_v1_b4_final_sha": "937b2b26518ceea0952a7e17279cc42924c88848",
     "live_v1_b4_final_parent_sha": "592e35c29d55e7c17ce58487384a49368c4eee4b",
     "live_v1_b5_binding_mode": "EXACT_CODE_SHA",
-    "live_v1_b5_target_sha": "937b2b26518ceea0952a7e17279cc42924c88848",
-    "live_v1_b5_expected_parent_sha": "592e35c29d55e7c17ce58487384a49368c4eee4b",
+    "live_v1_b5_target_sha": "c2c7cc83294f44340dd9fa1873bff760501fae12",
+    "live_v1_b5_expected_parent_sha": "937b2b26518ceea0952a7e17279cc42924c88848",
     "live_v1_b5_validator": "INDEPENDENT_FRESH_SESSION",
     "live_v1_b5_last_target_sha": "937b2b26518ceea0952a7e17279cc42924c88848",
     "live_v1_b5_last_decision": "LIVE_V1_INDEPENDENT_VALIDATION_FAILED",
@@ -100,13 +100,18 @@
     "live_v1_b4_r3_sha": "c2c7cc83294f44340dd9fa1873bff760501fae12",
     "live_v1_b4_r3_parent_sha": "937b2b26518ceea0952a7e17279cc42924c88848",
     "live_v1_b4_r3_safety_source_review": "PASS",
-    "live_v1_b4_r3_exact_sha_sealed": false,
+    "live_v1_b4_r3_exact_sha_sealed": true,
     "h40_ci_adjudication": {
       "workflow_run_id": 37099190279,
-      "attempt_1": "NEW_H40_SCIENTIFIC_GOLDEN_MISMATCH_PLUS_KNOWN_A34_SHALLOW_CHECKOUT",
-      "attempt_2": "IN_PROGRESS",
-      "direct_h40_source_diff": "ZERO",
-      "dependency_version_drift": "NOT_OBSERVED"
+      "attempt_1": "A34_SHALLOW_CHECKOUT_PLUS_TRANSIENT_H40_GOLDEN_MISMATCH",
+      "attempt_2": "ONLY_A34_SHALLOW_CHECKOUT",
+      "attempt_2_counts": {
+        "passed": 2286,
+        "failed": 1,
+        "skipped": 2
+      },
+      "h40_anomaly": "TRANSIENT_NONREPRODUCED_ON_EXACT_SHA_RERUN",
+      "direct_h40_source_diff": "ZERO"
     }
   },
   "must_read": [],
@@ -132,7 +137,7 @@
     "evidence_path": "evidence/v0.5.5/controller/V0.5.5_B2B_CONTROLLER_ACCEPTANCE.json",
     "evidence_blob_sha": "73a11708a85b5f1896397d745c3b7252d3c51f8d"
   },
-  "parallel_authorized_next_stage": "R3_H40_CI_ADJUDICATION",
+  "parallel_authorized_next_stage": "LIVE_V1_B5_R3_INDEPENDENT_EXACT_SHA_REVALIDATION",
   "live_v1_acceptance_authority": {
     "report_path": "reviews/v0.5/live_v1/V0.5.5_LIVE_V1_B3_CONTROLLER_ACCEPTANCE.md",
     "report_blob_sha": "21ad4492feb4750f5fc85a5f88b54d1da36c157d",
@@ -162,5 +167,17 @@
   "live_v1_b4_r3_preseal_review": {
     "path": "reviews/v0.5/live_v1/V0.5.5_LIVE_V1_B4_R3_CONTROLLER_PRESEAL_REVIEW.md",
     "blob_sha": "e28bf2be351cd411d7609575fbb7e0bb92900f93"
+  },
+  "live_v1_b4_r3_seal_authority": {
+    "report_path": "reviews/v0.5/live_v1/V0.5.5_LIVE_V1_B4_R3_CONTROLLER_SEAL.md",
+    "report_blob_sha": "5a12b9c10c82c6ba8ab3622b18c59d3d198f1c4f",
+    "evidence_path": "evidence/v0.5.5/controller/V0.5.5_LIVE_V1_B4_R3_CONTROLLER_SEAL.json",
+    "evidence_blob_sha": "f83e02eaf34a012260838530a5fd28f8312a51ba"
+  },
+  "live_v1_b5_r3_dispatch": {
+    "prompt_path": "prompts/v0.5/validation/v0.5.5_B5_LIVE_V1_R3_INDEPENDENT_EXACT_SHA_REVALIDATION.md",
+    "prompt_blob_sha": "db61132c2f15360d063dee8bbfd87887f3d2cc38",
+    "dispatch_path": "evidence/v0.5.5/controller/B_LINE_LIVE_V1_B5_R3_CURRENT_DISPATCH.json",
+    "dispatch_blob_sha": "6b27f68aacdbfc6310a6e43446b65c4064e2b79f"
   }
 }

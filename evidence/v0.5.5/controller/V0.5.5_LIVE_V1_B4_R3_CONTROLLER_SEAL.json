@@ -1,0 +1,47 @@
+{
+  "task": "LIVE_V1_B4_B5_FINDINGS_REPAIR_R3_CONTROLLER_SEAL",
+  "repository": "EXASHXE/btc-quant-agent-public",
+  "branch": "feature/b-line-live-v1",
+  "sealed_sha": "c2c7cc83294f44340dd9fa1873bff760501fae12",
+  "expected_parent_sha": "937b2b26518ceea0952a7e17279cc42924c88848",
+  "decision": "LIVE_V1_B4_R3_EXACT_SHA_SEALED_PENDING_B5_INDEPENDENT_REVALIDATION",
+  "safety_source_review": "PASS",
+  "prior_findings": {
+    "blocker": 3,
+    "high": 5,
+    "closure": "SUBSTANTIVE_SOURCE_CLOSURE_CONFIRMED"
+  },
+  "local_machine_evidence": {
+    "passed": 2287,
+    "skipped": 2,
+    "failed": 0
+  },
+  "remote_ci": {
+    "workflow_run_id": 37099190279,
+    "attempt_1": {
+      "passed": 2285,
+      "failed": 2,
+      "skipped": 2,
+      "failures": [
+        "KNOWN_NONBLOCKING_CI_HARNESS_DEBT_A34_SHALLOW_CHECKOUT",
+        "H40_SCIENTIFIC_PROJECTION_GOLDEN_MISMATCH"
+      ]
+    },
+    "attempt_2": {
+      "passed": 2286,
+      "failed": 1,
+      "skipped": 2,
+      "failures": [
+        "KNOWN_NONBLOCKING_CI_HARNESS_DEBT_A34_SHALLOW_CHECKOUT"
+      ]
+    },
+    "h40_anomaly_classification": "TRANSIENT_NONREPRODUCED_ON_EXACT_SHA_RERUN"
+  },
+  "fences": {
+    "full_history_h40_diff": "ZERO",
+    "real_funds_write_authority": "NONE",
+    "autonomous_live": "FORBIDDEN",
+    "b5_independent_revalidation_required": true
+  },
+  "next_state": "LIVE_V1_B5_R3_INDEPENDENT_EXACT_SHA_REVALIDATION"
+}
