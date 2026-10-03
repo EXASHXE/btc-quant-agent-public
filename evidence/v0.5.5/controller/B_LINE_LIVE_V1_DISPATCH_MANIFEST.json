@@ -14,8 +14,8 @@
   "authority_refs": [
     {
       "path": "evidence/v0.5.5/controller/B_LINE_CURRENT_AUTHORITY.json",
-      "blob_sha": "0c46494515d1bcc581e943ff33637dd44d6ca6f7",
-      "access_mode": "BINDING_FIELDS_ONLY"
+      "blob_sha": "03705a8489928b44277dc53c128d41939c7901b6",
+      "access_mode": "IDENTITY_ONLY"
     }
   ],
   "binding_fields": {
@@ -34,21 +34,22 @@
     "accepted_b2b_sha": "52c16a28153de307dc6132c0975fe29341a0a918",
     "live_v1_b3_status": "ACCEPTED",
     "live_v1_b3_accepted_sha": "961a0f4d4b37cdb9365d5e5867813ff3129c14db",
-    "live_v1_b4_status": "R5_EXACT_SHA_SEALED",
+    "live_v1_b4_status": "B5_R5_FAILED_PENDING_R6",
     "provider_credential_smoke": "PENDING",
     "sqlite_concurrency_gate": "B4_MUST_ESTABLISH_WAL_OR_EQUIVALENT",
     "live_v1_b4_final_sha": "a663921abf90504412d0d67b2b9c9f134f204d85",
-    "live_v1_b5_status": "READY_TO_DISPATCH_R5_REVALIDATION",
+    "live_v1_b5_status": "FAILED",
     "live_v1_b5_binding_mode": "EXACT_CODE_SHA",
     "live_v1_b5_target_sha": "a663921abf90504412d0d67b2b9c9f134f204d85",
     "live_v1_b5_expected_parent_sha": "4bc05e1a7c7fae86f41c1dd9b5a1635d0540ee58",
-    "live_v1_b5_last_target_sha": "4bc05e1a7c7fae86f41c1dd9b5a1635d0540ee58",
+    "live_v1_b5_last_target_sha": "a663921abf90504412d0d67b2b9c9f134f204d85",
     "live_v1_b4_r3_status": "SEALED",
     "live_v1_b5_validator": "FULLY_FRESH_COORDINATING_SESSION",
     "h40_ci_attempt2": "ONLY_KNOWN_A34_SHALLOW_CHECKOUT",
     "live_v1_b4_r4_status": "READY_TO_DISPATCH",
     "live_v1_b4_r5_status": "READY_TO_DISPATCH",
-    "h40_ci_numeric_reproducibility_debt": true
+    "h40_ci_numeric_reproducibility_debt": true,
+    "live_v1_b4_r6_status": "READY_TO_DISPATCH"
   },
   "must_read_defaults": [],
   "terminal_states": {

@@ -1,0 +1,77 @@
+{
+  "task": "LIVE_V1_B5_R5_CONTROLLER_ADJUDICATION",
+  "validated_sha": "a663921abf90504412d0d67b2b9c9f134f204d85",
+  "expected_parent_sha": "4bc05e1a7c7fae86f41c1dd9b5a1635d0540ee58",
+  "validation_branch": "validation/v0.5.5-live-v1-b5-r5-independent-20261004",
+  "validation_commit": "7e795ec525bac50841c5ce45014bafd38fdb7990",
+  "validation_parent": "6319ddbaddd69d5522696992ec1565169da88e03",
+  "validation_report_blob": "402bccd8391897b87b08adfbf11d7f965638ace7",
+  "validation_evidence_blob": "3ebd18275fce5d0de49333eb3b1e85c619efaad1",
+  "identity_gate": "PASS",
+  "independence_gate": "PASS_FULLY_FRESH_COORDINATOR",
+  "decision": "LIVE_V1_INDEPENDENT_VALIDATION_FAILED",
+  "controller_confirmed_findings": [
+    {
+      "severity": "HIGH",
+      "blocking": true,
+      "id": "PROTECTIVE_TYPED_ALIAS_AMBIGUITY"
+    },
+    {
+      "severity": "HIGH",
+      "blocking": true,
+      "id": "RUNTIME_AUTHORITY_ASYNC_HANDOFF_STALE"
+    },
+    {
+      "severity": "HIGH",
+      "blocking": true,
+      "id": "POSITION_OUTBOX_AUTHORITY_MUTABLE_AFTER_CLAIM"
+    }
+  ],
+  "committed_gates": {
+    "r5_focused": {
+      "passed": 77,
+      "failed": 0
+    },
+    "r3_r4": {
+      "passed": 122,
+      "failed": 0
+    },
+    "all_live_v1": {
+      "passed": 413,
+      "failed": 0
+    },
+    "execution_account_supervisor_runtime": {
+      "passed": 333,
+      "failed": 0
+    },
+    "r02": {
+      "passed": 26,
+      "failed": 0
+    },
+    "marketwatch_b2a_b2b": {
+      "passed": 265,
+      "failed": 0
+    },
+    "full_pytest": {
+      "passed": 2422,
+      "failed": 0,
+      "skipped": 2
+    },
+    "ruff": "PASS",
+    "mypy": "PASS",
+    "compileall": "PASS",
+    "git_diff_check": "PASS"
+  },
+  "h40": {
+    "local_fresh_process_runs": "2_PASS",
+    "full_history_diff": "ZERO",
+    "classification": "KNOWN_H40_CI_NUMERIC_REPRODUCIBILITY_DEBT",
+    "bline_blocking": false
+  },
+  "safety": {
+    "live_write_authority": "NONE",
+    "real_funds_authorized": false,
+    "autonomous_live": "FORBIDDEN"
+  },
+  "next_state": "LIVE_V1_B4_B5_FINDINGS_REPAIR_R6"
+}
