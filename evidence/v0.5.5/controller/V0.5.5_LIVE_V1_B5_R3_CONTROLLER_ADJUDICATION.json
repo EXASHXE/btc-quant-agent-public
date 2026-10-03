@@ -1,0 +1,37 @@
+{
+  "task": "LIVE_V1_B5_R3_CONTROLLER_ADJUDICATION",
+  "validated_sha": "c2c7cc83294f44340dd9fa1873bff760501fae12",
+  "expected_parent_sha": "937b2b26518ceea0952a7e17279cc42924c88848",
+  "validation_branch": "validation/v0.5.5-live-v1-b5-r3",
+  "validation_commit": "f39c7cca6040f507e2778253ab70adb438cc12bf",
+  "validation_parent": "9213801c19506b92f206dd09c625cb62705d0bf3",
+  "validation_report_blob": "a3a6a047a6500b19c73ffca7146a18233bbd9e89",
+  "validation_evidence_blob": "3f3da815b37c5359ebf01836242c3afb8fd94fe0",
+  "decision": "LIVE_V1_INDEPENDENT_VALIDATION_FAILED",
+  "controller_confirmed_findings": [
+    {
+      "severity": "BLOCKER",
+      "id": "PROTECTIVE_CONFIRMATION_IDENTITY_NOT_FAIL_CLOSED"
+    },
+    {
+      "severity": "HIGH",
+      "id": "POSITION_EVENT_COOLDOWN_NOT_ACCOUNT_SCOPED"
+    },
+    {
+      "severity": "HIGH",
+      "id": "POSITION_LIFECYCLE_ENVIRONMENT_NAMESPACE_COLLISION",
+      "conditional": true
+    }
+  ],
+  "validation_independence": {
+    "fully_fresh_coordinator": false,
+    "fresh_reviewer_contexts": true,
+    "adjudication": "FAIL_FINDINGS_ACCEPTED; FUTURE_PASS_REQUIRES_FULLY_FRESH_COORDINATOR"
+  },
+  "safety": {
+    "live_write_authority": "NONE",
+    "real_funds_authorized": false,
+    "autonomous_live": "FORBIDDEN"
+  },
+  "next_state": "LIVE_V1_B4_B5_FINDINGS_REPAIR_R4"
+}
