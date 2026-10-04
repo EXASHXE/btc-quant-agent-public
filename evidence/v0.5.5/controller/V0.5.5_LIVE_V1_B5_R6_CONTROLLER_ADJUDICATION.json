@@ -1,0 +1,83 @@
+{
+  "task": "LIVE_V1_B5_R6_CONTROLLER_ADJUDICATION",
+  "validated_sha": "b3dcf4230e08e30c5d6a1d70916e11ae987f35a5",
+  "expected_parent_sha": "a663921abf90504412d0d67b2b9c9f134f204d85",
+  "validation_branch": "validation/v0.5.5-live-v1-b5-r6-independent-20261004",
+  "validation_commit": "8a80203ec6f10ff6fdbcca346ca3a1e7924064d2",
+  "validation_parent": "41a25db780f7ab038bd6d64c37dae8df776ebbe4",
+  "validation_report_blob": "810098327b50eb1c0dd379ea4e147e5dd6cb6cf0",
+  "validation_evidence_blob": "5db2a0992c902183b9d011dd77f4debaf1d7fe4b",
+  "identity_gate": "PASS",
+  "independence_gate": "PASS_FULLY_FRESH_COORDINATOR",
+  "decision": "LIVE_V1_INDEPENDENT_VALIDATION_FAILED",
+  "controller_disposition": "ACCEPT_FAIL",
+  "closed_findings": {
+    "HIGH_PROTECTIVE_TYPED_ALIAS_AMBIGUITY": "PASS_INDEPENDENT",
+    "HIGH_RUNTIME_AUTHORITY_ASYNC_HANDOFF_STALE": "PASS_INDEPENDENT"
+  },
+  "blocking_finding": {
+    "id": "R6-F03-RESIDUAL-TOCTOU",
+    "severity": "HIGH",
+    "blocking": true,
+    "class": "POSITION_OUTBOX_DURABLE_AUTHORITY_CHECK_USE_GAP",
+    "controller_confirmation": "CONFIRMED_SOURCE_CONTRACT_GAP",
+    "scope": "ANALYSIS_ADMISSION_AND_DONE_ATOMIC_AUTHORITY_BINDING"
+  },
+  "rationale": [
+    "R6 contract required schema immutability and independent durable transition binding",
+    "disposable-fixture trigger bypass validly isolated the second defense layer",
+    "current DONE transition binds dispatch authority but does not atomically bind canonical event authority",
+    "additional read checkpoints alone would not remove TOCTOU"
+  ],
+  "retained_gates": {
+    "r6_focused": {
+      "passed": 86,
+      "failed": 0
+    },
+    "r5_focused": {
+      "passed": 77,
+      "failed": 0
+    },
+    "r3_r4": {
+      "passed": 122,
+      "failed": 0
+    },
+    "live_v1": {
+      "passed": 499,
+      "failed": 0
+    },
+    "tactical": {
+      "passed": 128,
+      "failed": 0
+    },
+    "execution_account_supervisor_runtime": {
+      "passed": 419,
+      "failed": 0
+    },
+    "r02": {
+      "passed": 26,
+      "failed": 0
+    },
+    "full_pytest": {
+      "passed": 2508,
+      "failed": 0,
+      "skipped": 2
+    },
+    "compileall": "PASS",
+    "ruff": "PASS",
+    "mypy": "PASS",
+    "git_diff_check": "PASS"
+  },
+  "remote_ci": {
+    "run_id": 37181618710,
+    "result": "FAIL_2507_PASS_1_FAIL_2_SKIP",
+    "failure": "KNOWN_A34_SHALLOW_CHECKOUT",
+    "blocking_for_r7": false
+  },
+  "safety": {
+    "live_write_authority": "NONE",
+    "real_funds_authorized": false,
+    "autonomous_live": "FORBIDDEN"
+  },
+  "next_state": "LIVE_V1_B4_B5_FINDINGS_REPAIR_R7"
+}
