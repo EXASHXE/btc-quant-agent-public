@@ -1,6 +1,6 @@
 {
   "line": "B_LINE",
-  "stage": "B2B_ACCEPTED__LIVE_V1_B3_ACCEPTED__R6_IMPLEMENTED_PENDING_CONTROLLER_SEAL",
+  "stage": "B2B_ACCEPTED__LIVE_V1_B3_ACCEPTED__R6_CONTROLLER_SEALED__B5_R6_AUTHORIZED",
   "code_branch": "feature/tactical-policy-r2",
   "accepted_code_sha": "52c16a28153de307dc6132c0975fe29341a0a918",
   "docs_authority_commit": "6319ddbaddd69d5522696992ec1565169da88e03",
@@ -36,7 +36,7 @@
     "live_v1_day2_target_write": "TESTNET_ONLY",
     "provider_credential_smoke": "PENDING",
     "live_store_concurrency_gate": "B4_MUST_ESTABLISH_WAL_OR_EQUIVALENT",
-    "live_v1_b4_state": "R6_IMPLEMENTED_PENDING_CONTROLLER_EXACT_SHA_REVIEW_AND_SEAL",
+    "live_v1_b4_state": "R6_EXACT_SHA_SEALED_PENDING_B5_R6_INDEPENDENT_REVALIDATION",
     "live_v1_b4_candidate_sha": "fd42f2cc1a67506d05117e3daa9a072309f7f998",
     "live_v1_b4_candidate_parent_sha": "961a0f4d4b37cdb9365d5e5867813ff3129c14db",
     "live_v1_b4_repair_authorized": true,
@@ -62,8 +62,8 @@
     "live_v1_b4_final_sha": "937b2b26518ceea0952a7e17279cc42924c88848",
     "live_v1_b4_final_parent_sha": "592e35c29d55e7c17ce58487384a49368c4eee4b",
     "live_v1_b5_binding_mode": "EXACT_CODE_SHA",
-    "live_v1_b5_target_sha": "a663921abf90504412d0d67b2b9c9f134f204d85",
-    "live_v1_b5_expected_parent_sha": "4bc05e1a7c7fae86f41c1dd9b5a1635d0540ee58",
+    "live_v1_b5_target_sha": "b3dcf4230e08e30c5d6a1d70916e11ae987f35a5",
+    "live_v1_b5_expected_parent_sha": "a663921abf90504412d0d67b2b9c9f134f204d85",
     "live_v1_b5_validator": "FULLY_FRESH_COORDINATING_SESSION",
     "live_v1_b5_last_target_sha": "a663921abf90504412d0d67b2b9c9f134f204d85",
     "live_v1_b5_last_decision": "LIVE_V1_INDEPENDENT_VALIDATION_FAILED",
@@ -142,14 +142,19 @@
     "live_v1_b5_r5_decision": "LIVE_V1_INDEPENDENT_VALIDATION_FAILED",
     "live_v1_b4_r6_candidate_sha": "b3dcf4230e08e30c5d6a1d70916e11ae987f35a5",
     "live_v1_b4_r6_parent_sha": "a663921abf90504412d0d67b2b9c9f134f204d85",
-    "live_v1_b4_r6_controller_sealed": false,
-    "live_v1_b5_r6_authorized": false,
-    "live_v1_next_action": "CONTROLLER_EXACT_SHA_REVIEW_AND_SEAL_R6",
+    "live_v1_b4_r6_controller_sealed": true,
+    "live_v1_b5_r6_authorized": true,
+    "live_v1_next_action": "LIVE_V1_B5_R6_INDEPENDENT_EXACT_SHA_REVALIDATION",
     "live_v1_b5_r5_findings": [
       "HIGH_PROTECTIVE_TYPED_ALIAS_AMBIGUITY",
       "HIGH_RUNTIME_AUTHORITY_ASYNC_HANDOFF_STALE",
       "HIGH_POSITION_OUTBOX_AUTHORITY_MUTABLE_AFTER_CLAIM"
-    ]
+    ],
+    "live_v1_b4_r6_source_review": "PASS_NO_NEW_R7_BLOCKER",
+    "live_v1_b4_r6_remote_ci": "NO_REMOTE_CI_OBSERVED__B5_MUST_REEXECUTE",
+    "live_v1_b5_r6_target_sha": "b3dcf4230e08e30c5d6a1d70916e11ae987f35a5",
+    "live_v1_b5_r6_expected_parent_sha": "a663921abf90504412d0d67b2b9c9f134f204d85",
+    "live_v1_b5_r6_validator": "FULLY_FRESH_COORDINATING_SESSION"
   },
   "must_read": [],
   "validation_authority": {
@@ -174,7 +179,7 @@
     "evidence_path": "evidence/v0.5.5/controller/V0.5.5_B2B_CONTROLLER_ACCEPTANCE.json",
     "evidence_blob_sha": "73a11708a85b5f1896397d745c3b7252d3c51f8d"
   },
-  "parallel_authorized_next_stage": "LIVE_V1_B4_B5_FINDINGS_REPAIR_R6",
+  "parallel_authorized_next_stage": "LIVE_V1_B5_R6_INDEPENDENT_EXACT_SHA_REVALIDATION",
   "live_v1_acceptance_authority": {
     "report_path": "reviews/v0.5/live_v1/V0.5.5_LIVE_V1_B3_CONTROLLER_ACCEPTANCE.md",
     "report_blob_sha": "21ad4492feb4750f5fc85a5f88b54d1da36c157d",
@@ -291,5 +296,18 @@
   "live_v1_b4_r6_prompt": {
     "path": "prompts/v0.5/repair/v0.5.5_B4_LIVE_V1_B5_FINDINGS_REPAIR_R6.md",
     "blob_sha": "b979ec720f758b59b1e59048d8f7dec0833fef5a"
+  },
+  "live_v1_b4_r6_seal_authority": {
+    "report_path": "reviews/v0.5/live_v1/V0.5.5_LIVE_V1_B4_R6_CONTROLLER_SEAL.md",
+    "report_blob_sha": "dd9b59717bab99f99d4315ac70bb51e0c28e59a1",
+    "evidence_path": "evidence/v0.5.5/controller/V0.5.5_LIVE_V1_B4_R6_CONTROLLER_SEAL.json",
+    "evidence_blob_sha": "ba581e99d3e0a4aa7a79d7db3d3baa6a9fa0ae5c"
+  },
+  "live_v1_b5_r6_dispatch": {
+    "prompt_path": "prompts/v0.5/validation/v0.5.5_B5_LIVE_V1_R6_INDEPENDENT_EXACT_SHA_REVALIDATION.md",
+    "prompt_blob_sha": "2e793138cc728559741ace3165f548484ab324a1",
+    "dispatch_path": "evidence/v0.5.5/controller/B_LINE_LIVE_V1_B5_R6_CURRENT_DISPATCH.json",
+    "dispatch_blob_sha": "28d92845c539ff404dcddfd13da4efa63a7838b3",
+    "controller_dispatch_sha": "SUPPLIED_OUT_OF_BAND_AS_THIS_PUBLICATION_COMMIT_SHA"
   }
 }
