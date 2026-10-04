@@ -1,6 +1,6 @@
 {
   "line": "B_LINE",
-  "stage": "B2B_ACCEPTED__LIVE_V1_B3_ACCEPTED__B5_R5_FAILED_PENDING_R6",
+  "stage": "B2B_ACCEPTED__LIVE_V1_B3_ACCEPTED__R6_IMPLEMENTED_PENDING_CONTROLLER_SEAL",
   "code_branch": "feature/tactical-policy-r2",
   "accepted_code_sha": "52c16a28153de307dc6132c0975fe29341a0a918",
   "docs_authority_commit": "6319ddbaddd69d5522696992ec1565169da88e03",
@@ -36,7 +36,7 @@
     "live_v1_day2_target_write": "TESTNET_ONLY",
     "provider_credential_smoke": "PENDING",
     "live_store_concurrency_gate": "B4_MUST_ESTABLISH_WAL_OR_EQUIVALENT",
-    "live_v1_b4_state": "B5_R5_FAILED_PENDING_FINDINGS_REPAIR_R6",
+    "live_v1_b4_state": "R6_IMPLEMENTED_PENDING_CONTROLLER_EXACT_SHA_REVIEW_AND_SEAL",
     "live_v1_b4_candidate_sha": "fd42f2cc1a67506d05117e3daa9a072309f7f998",
     "live_v1_b4_candidate_parent_sha": "961a0f4d4b37cdb9365d5e5867813ff3129c14db",
     "live_v1_b4_repair_authorized": true,
@@ -133,6 +133,19 @@
     "live_v1_b4_r5_machine_evidence": "CONTROLLER_SEAL_REMOTE_CI_BOUND",
     "live_v1_b4_r6_authorized": true,
     "live_v1_b4_r6_findings": [
+      "HIGH_PROTECTIVE_TYPED_ALIAS_AMBIGUITY",
+      "HIGH_RUNTIME_AUTHORITY_ASYNC_HANDOFF_STALE",
+      "HIGH_POSITION_OUTBOX_AUTHORITY_MUTABLE_AFTER_CLAIM"
+    ],
+    "live_v1_b4_r5_failed_sha": "a663921abf90504412d0d67b2b9c9f134f204d85",
+    "live_v1_b5_r5_validation_publication": "validation/v0.5.5-live-v1-b5-r5-independent-20261004@7e795ec525bac50841c5ce45014bafd38fdb7990",
+    "live_v1_b5_r5_decision": "LIVE_V1_INDEPENDENT_VALIDATION_FAILED",
+    "live_v1_b4_r6_candidate_sha": "b3dcf4230e08e30c5d6a1d70916e11ae987f35a5",
+    "live_v1_b4_r6_parent_sha": "a663921abf90504412d0d67b2b9c9f134f204d85",
+    "live_v1_b4_r6_controller_sealed": false,
+    "live_v1_b5_r6_authorized": false,
+    "live_v1_next_action": "CONTROLLER_EXACT_SHA_REVIEW_AND_SEAL_R6",
+    "live_v1_b5_r5_findings": [
       "HIGH_PROTECTIVE_TYPED_ALIAS_AMBIGUITY",
       "HIGH_RUNTIME_AUTHORITY_ASYNC_HANDOFF_STALE",
       "HIGH_POSITION_OUTBOX_AUTHORITY_MUTABLE_AFTER_CLAIM"
