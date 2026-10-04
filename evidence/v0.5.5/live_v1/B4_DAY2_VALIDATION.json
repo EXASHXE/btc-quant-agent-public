@@ -1,12 +1,12 @@
 {
-  "task": "LIVE_V1_B4_B5_FINDINGS_REPAIR_R6",
+  "task": "LIVE_V1_B4_B5_FINDINGS_REPAIR_R7",
   "repository": "EXASHXE/btc-quant-agent-public",
   "task_branch": "feature/b-line-live-v1",
   "start_binding_mode": "CURRENT_BRANCH_HEAD",
-  "actual_start_sha": "a663921abf90504412d0d67b2b9c9f134f204d85",
-  "accepted_predecessor_sha": "a663921abf90504412d0d67b2b9c9f134f204d85",
-  "predecessor_ancestry": "IS_ANCESTOR_VERIFIED",
-  "parent_sha": "a663921abf90504412d0d67b2b9c9f134f204d85",
+  "actual_start_sha": "b3dcf4230e08e30c5d6a1d70916e11ae987f35a5",
+  "accepted_predecessor_sha": "b3dcf4230e08e30c5d6a1d70916e11ae987f35a5",
+  "predecessor_ancestry": "EXACT_DIRECT_PARENT_REQUIRED",
+  "parent_sha": "b3dcf4230e08e30c5d6a1d70916e11ae987f35a5",
   "initial_worktree_state": "CLEAN",
   "closed_blockers": {
     "R1_01_approval_intent_singleton": {
@@ -112,6 +112,18 @@
     "R6_03_position_event_outbox_authority_immutable": {
       "status": "CLOSED",
       "mechanism": "SQLite triggers trg_live_position_events_immutable_update, trg_live_position_events_immutable_delete, trg_live_position_dispatches_immutable_authority, trg_live_position_dispatches_immutable_delete block mutating or deleting authority columns; canonical _verify_durable_authority helper revalidates authority at 5 lifecycle checkpoints; SQL freeze/renew/DONE transitions bind event_hash and symbol in WHERE predicates"
+    },
+    "R6_F03_residual_toctou_R7": {
+      "status": "LOCALLY_REPAIRED_PENDING_CONTROLLER_SEAL",
+      "mechanism": "Immutable atomic admission and same-authority terminal transaction, with protected completion marker and exact preexisting frozen case identities."
+    },
+    "R7_C1": {
+      "status": "PASS",
+      "mechanism": "Completion marker and DONE are one protected transaction; no separate success commit."
+    },
+    "R7_C2": {
+      "status": "PASS",
+      "mechanism": "Existing case_hash and all frozen case fields validated; no silent correction."
     }
   },
   "sqlite_durability": {
@@ -131,42 +143,366 @@
     "autonomous": "HARD_BLOCKED"
   },
   "quality_gates": {
-    "compileall": "PASS: Python 3.12 python -m compileall -q src tests",
-    "git_diff_check": "PASS",
-    "ruff": "PASS: ruff check .",
-    "mypy": "PASS: mypy src (151 source files)",
-    "r6_focused_tests": {
-      "command": "pytest -q tests/test_live_v1_*_r6.py",
-      "passed": 86,
-      "failed": 0
+    "compileall": {
+      "command": [
+        "/root/miniconda3/bin/python",
+        "-m",
+        "compileall",
+        "-q",
+        "src",
+        "tests"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.076,
+      "local_log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     },
-    "r5_tests": {
-      "command": "pytest -q tests/test_live_v1_*_r5.py",
-      "passed": 77,
-      "failed": 0
+    "git_diff_check": {
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.006,
+      "local_log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     },
-    "r4_r3_regressions": {
-      "command": "pytest -q tests/test_live_v1_*_r4.py tests/test_live_v1_*_r3.py",
-      "passed": 122,
-      "failed": 0
+    "ruff": {
+      "command": [
+        "ruff",
+        "check",
+        "."
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.027,
+      "local_log_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
     },
-    "live_v1_tests": {
-      "command": "pytest -q tests/test_live_v1_*.py",
-      "passed": 499,
-      "failed": 0
+    "mypy": {
+      "command": [
+        "mypy",
+        "src"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 19.289,
+      "local_log_sha256": "46068eced9129924d3b0be52573b15943bf1750d772d5fb26c8ee0dcfc5840b2"
     },
-    "b2a_b2b_regressions": {
-      "command": "pytest -q tests/test_tactical_*.py",
-      "passed": 128,
-      "failed": 0
+    "r7_focused": {
+      "command": [
+        "/root/miniconda3/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "--tb=short",
+        "-o",
+        "cache_dir=/tmp/b4-r7-evidence/gates/cache-r7_focused",
+        "--junitxml=/tmp/b4-r7-evidence/gates/r7_focused.xml",
+        "tests/test_live_v1_position_outbox_r7.py"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 12.562,
+      "counts": {
+        "tests": 67,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": 67
+      },
+      "failure_ids": [],
+      "local_log_sha256": "ffc23381b36b9ec175e22f03db1e99bfcf6e3add3b3ab0bbab3df0470a5fcae9"
+    },
+    "r6_focused": {
+      "command": [
+        "/root/miniconda3/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "--tb=short",
+        "-o",
+        "cache_dir=/tmp/b4-r7-evidence/gates/cache-r6_focused",
+        "--junitxml=/tmp/b4-r7-evidence/gates/r6_focused.xml",
+        "tests/test_live_v1_execution_protection_r6.py",
+        "tests/test_live_v1_position_outbox_r6.py",
+        "tests/test_live_v1_runtime_authority_r6.py"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 11.153,
+      "counts": {
+        "tests": 86,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": 86
+      },
+      "failure_ids": [],
+      "local_log_sha256": "ae364e2e90d3fdb51d27c61dd9d0f2d3c5a73ef95cc80c9387cfe8ba8b6a40f8"
+    },
+    "r5_focused": {
+      "command": [
+        "/root/miniconda3/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "--tb=short",
+        "-o",
+        "cache_dir=/tmp/b4-r7-evidence/gates/cache-r5_focused",
+        "--junitxml=/tmp/b4-r7-evidence/gates/r5_focused.xml",
+        "tests/test_live_v1_execution_protection_r5.py",
+        "tests/test_live_v1_position_outbox_r5.py",
+        "tests/test_live_v1_runtime_authority_r5.py"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 17.322,
+      "counts": {
+        "tests": 77,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": 77
+      },
+      "failure_ids": [],
+      "local_log_sha256": "58ea19dbbe2548dbac3b7540684b47542eb57953bdd628c2e06c28e5f81cf103"
+    },
+    "r3_r4_regressions": {
+      "command": [
+        "/root/miniconda3/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "--tb=short",
+        "-o",
+        "cache_dir=/tmp/b4-r7-evidence/gates/cache-r3_r4_regressions",
+        "--junitxml=/tmp/b4-r7-evidence/gates/r3_r4_regressions.xml",
+        "tests/test_live_v1_approval_environment_r4.py",
+        "tests/test_live_v1_execution_protection_r4.py",
+        "tests/test_live_v1_position_authority_r4.py",
+        "tests/test_live_v1_execution_identity_r3.py",
+        "tests/test_live_v1_execution_placement_r3.py",
+        "tests/test_live_v1_execution_protection_r3.py",
+        "tests/test_live_v1_execution_recovery_r3.py",
+        "tests/test_live_v1_runtime_recovery_r3.py"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 26.414,
+      "counts": {
+        "tests": 122,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": 122
+      },
+      "failure_ids": [],
+      "local_log_sha256": "65d4f907132aff3078013100250b5a8b6f06b3a6c38037eeb3fd67efe03005de"
+    },
+    "all_live_v1": {
+      "command": [
+        "/root/miniconda3/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "--tb=short",
+        "-o",
+        "cache_dir=/tmp/b4-r7-evidence/gates/cache-all_live_v1",
+        "--junitxml=/tmp/b4-r7-evidence/gates/all_live_v1.xml",
+        "tests/test_live_v1_account_stream_r2.py",
+        "tests/test_live_v1_account_watch.py",
+        "tests/test_live_v1_approval_environment_r4.py",
+        "tests/test_live_v1_day2_e2e.py",
+        "tests/test_live_v1_decision_api.py",
+        "tests/test_live_v1_decision_approval.py",
+        "tests/test_live_v1_decision_backends.py",
+        "tests/test_live_v1_decision_case.py",
+        "tests/test_live_v1_decision_e2e.py",
+        "tests/test_live_v1_decision_models.py",
+        "tests/test_live_v1_decision_risk.py",
+        "tests/test_live_v1_execution_authorization_r2.py",
+        "tests/test_live_v1_execution_backend.py",
+        "tests/test_live_v1_execution_compilation_r2.py",
+        "tests/test_live_v1_execution_identity_r3.py",
+        "tests/test_live_v1_execution_intent.py",
+        "tests/test_live_v1_execution_placement_r3.py",
+        "tests/test_live_v1_execution_protection_r3.py",
+        "tests/test_live_v1_execution_protection_r4.py",
+        "tests/test_live_v1_execution_protection_r5.py",
+        "tests/test_live_v1_execution_protection_r6.py",
+        "tests/test_live_v1_execution_recovery_r3.py",
+        "tests/test_live_v1_execution_storage.py",
+        "tests/test_live_v1_execution_validator.py",
+        "tests/test_live_v1_position_authority_r4.py",
+        "tests/test_live_v1_position_kill.py",
+        "tests/test_live_v1_position_lease_r2.py",
+        "tests/test_live_v1_position_outbox_r5.py",
+        "tests/test_live_v1_position_outbox_r6.py",
+        "tests/test_live_v1_position_outbox_r7.py",
+        "tests/test_live_v1_position_supervisor.py",
+        "tests/test_live_v1_runtime_authority_r5.py",
+        "tests/test_live_v1_runtime_authority_r6.py",
+        "tests/test_live_v1_runtime_r2.py",
+        "tests/test_live_v1_runtime_recovery_r3.py"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 88.474,
+      "counts": {
+        "tests": 566,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": 566
+      },
+      "failure_ids": [],
+      "local_log_sha256": "4c6d2e6725394316f30da23af9112682daf743aea6d07c4fc32303d2f4ab0b82"
+    },
+    "tactical": {
+      "command": [
+        "/root/miniconda3/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "--tb=short",
+        "-o",
+        "cache_dir=/tmp/b4-r7-evidence/gates/cache-tactical",
+        "--junitxml=/tmp/b4-r7-evidence/gates/tactical.xml",
+        "tests/test_tactical_feature_evidence_v2.py",
+        "tests/test_tactical_grid_shadow_evaluation_v1.py",
+        "tests/test_tactical_policy_b0.py",
+        "tests/test_tactical_shadow_evaluation_v2.py"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 7.626,
+      "counts": {
+        "tests": 128,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": 128
+      },
+      "failure_ids": [],
+      "local_log_sha256": "c437e5e0186a68dc4ad7ec1cfe8d1aa98dfe05b2f69ef300bb33650e3aa8f008"
+    },
+    "execution_account_supervisor_runtime": {
+      "command": [
+        "/root/miniconda3/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "--tb=short",
+        "-o",
+        "cache_dir=/tmp/b4-r7-evidence/gates/cache-execution_account_supervisor_runtime",
+        "--junitxml=/tmp/b4-r7-evidence/gates/execution_account_supervisor_runtime.xml",
+        "tests/test_live_v1_account_stream_r2.py",
+        "tests/test_live_v1_account_watch.py",
+        "tests/test_live_v1_execution_authorization_r2.py",
+        "tests/test_live_v1_execution_backend.py",
+        "tests/test_live_v1_execution_compilation_r2.py",
+        "tests/test_live_v1_execution_identity_r3.py",
+        "tests/test_live_v1_execution_intent.py",
+        "tests/test_live_v1_execution_placement_r3.py",
+        "tests/test_live_v1_execution_protection_r3.py",
+        "tests/test_live_v1_execution_protection_r4.py",
+        "tests/test_live_v1_execution_protection_r5.py",
+        "tests/test_live_v1_execution_protection_r6.py",
+        "tests/test_live_v1_execution_recovery_r3.py",
+        "tests/test_live_v1_execution_storage.py",
+        "tests/test_live_v1_execution_validator.py",
+        "tests/test_live_v1_position_authority_r4.py",
+        "tests/test_live_v1_position_kill.py",
+        "tests/test_live_v1_position_lease_r2.py",
+        "tests/test_live_v1_position_outbox_r5.py",
+        "tests/test_live_v1_position_outbox_r6.py",
+        "tests/test_live_v1_position_outbox_r7.py",
+        "tests/test_live_v1_position_supervisor.py",
+        "tests/test_live_v1_runtime_authority_r5.py",
+        "tests/test_live_v1_runtime_authority_r6.py",
+        "tests/test_live_v1_runtime_r2.py",
+        "tests/test_live_v1_runtime_recovery_r3.py"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 78.163,
+      "counts": {
+        "tests": 486,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": 486
+      },
+      "failure_ids": [],
+      "local_log_sha256": "8359607f78a584760787894b83374f4bfde2ffbee09d345edf3f647d378ae044"
+    },
+    "position_supervisor_outbox": {
+      "command": [
+        "/root/miniconda3/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "--tb=short",
+        "-o",
+        "cache_dir=/tmp/b4-r7-evidence/gates/cache-position_supervisor_outbox",
+        "--junitxml=/tmp/b4-r7-evidence/gates/position_supervisor_outbox.xml",
+        "tests/test_live_v1_position_authority_r4.py",
+        "tests/test_live_v1_position_kill.py",
+        "tests/test_live_v1_position_lease_r2.py",
+        "tests/test_live_v1_position_outbox_r5.py",
+        "tests/test_live_v1_position_outbox_r6.py",
+        "tests/test_live_v1_position_outbox_r7.py",
+        "tests/test_live_v1_position_supervisor.py"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 21.908,
+      "counts": {
+        "tests": 175,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": 175
+      },
+      "failure_ids": [],
+      "local_log_sha256": "4f91f1c282f855acf5207d14de2dab0a1e6f8a721b1c96ed9adb1cacc37c5b79"
+    },
+    "r02_governance": {
+      "command": [
+        "/root/miniconda3/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "--tb=short",
+        "-o",
+        "cache_dir=/tmp/b4-r7-evidence/gates/cache-r02_governance",
+        "--junitxml=/tmp/b4-r7-evidence/gates/r02_governance.xml",
+        "tests/test_v050_r02_orchestration_guards.py"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 2.179,
+      "counts": {
+        "tests": 26,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "passed": 26
+      },
+      "failure_ids": [],
+      "local_log_sha256": "82a16f41fc8dcd36c7d246b5b912c7ed4d8d09e8ed663c1f013939cf71ca7a38"
     },
     "full_pytest": {
-      "command": "pytest -q",
-      "passed": 2508,
-      "skipped": 2,
-      "failed": 0,
-      "warnings": 9,
-      "seconds": 756.21
+      "command": [
+        "/root/miniconda3/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "--tb=short",
+        "-o",
+        "cache_dir=/tmp/b4-r7-evidence/gates/cache-full_pytest",
+        "--junitxml=/tmp/b4-r7-evidence/gates/full_pytest.xml"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 799.377,
+      "counts": {
+        "tests": 2577,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 2,
+        "passed": 2575
+      },
+      "failure_ids": [],
+      "local_log_sha256": "34f51ad14acb4dd1b4b07cd6c2a873db8e0cca88afa528e6d4179a389e725259",
+      "warnings": 9
     }
   },
   "fences": {
@@ -174,18 +510,15 @@
     "h41_fence_diff_zero": true,
     "tactical_policy_r2_untouched": true,
     "b2b_grid_evaluator_untouched": true,
-    "controller_docs_branch_untouched": true
+    "controller_docs_branch_untouched": true,
+    "a_line_authority_untouched": true,
+    "f01_f02_semantics_untouched": true
   },
   "live_write_count": 0,
-  "secret_isolation": "no API keys or HMAC secrets in snapshots, intents, events, or logs; errors sanitized",
-  "provider_smoke_status": {
-    "credentialed_openai_responses_smoke": "NOT_RUN_CREDENTIALS_UNAVAILABLE",
-    "credentialed_feishu_smoke": "NOT_RUN_CREDENTIALS_UNAVAILABLE",
-    "actual_codex_model_invocation": "NOT_RUN_MODEL_UNCONFIGURED",
-    "testnet_credentialed_exchange_smoke": "NOT_RUN_CREDENTIALS_UNAVAILABLE"
-  },
+  "secret_isolation": "Credential-free env allowlist; existing autouse hermetic network/signed-client/data guards active; no secret reads or writes.",
+  "provider_smoke_status": "NOT_RUN: repository-bounded local mocks/disposable SQLite only; no credentials loaded or external provider/exchange calls.",
   "remaining_blockers": [],
-  "decision": "LIVE_V1_B4_B5_FINDINGS_REPAIRED_R6_PENDING_B5_REVALIDATION",
+  "decision": "LIVE_V1_B4_B5_FINDINGS_REPAIRED_R7_PENDING_CONTROLLER_SEAL",
   "failed_b5_target": "a663921abf90504412d0d67b2b9c9f134f204d85",
   "runtime": {
     "python": "3.12.3",
@@ -207,19 +540,21 @@
     "src/btc_quant_agent/execution/protection.py": "ec8b005e623aaf1ffc9bf197ed4115f4c7a853512533c16b87615363ba3219a9",
     "src/btc_quant_agent/execution/validator.py": "ee7495d0231e210b4aec890e28949bfc61b4f48abc4b48bf0c91216e17f0cc4e",
     "src/btc_quant_agent/live_runtime.py": "0af2b6805dcb64d6206d95161cf3b2b9094d3cde92611fb767b733b494708dd7",
-    "src/btc_quant_agent/position_supervisor/supervisor.py": "c594f571dbb39199074ae1fba65b501c87a289867f03927202b3f00b98bd3da9",
+    "src/btc_quant_agent/position_supervisor/supervisor.py": "59900bc19a200b63603772f05fa987856f28e561124b91270d13518484a9e629",
     "tests/test_live_v1_execution_protection_r6.py": "317d4ee4d80f759ad2127695a0254fc495068695ccd4e3535bbaea78be4cfbfb",
     "tests/test_live_v1_position_authority_r4.py": "2228ead8eeb62a6dafb5831ac4c511b26346480532003308bac8bf7bb239420a",
     "tests/test_live_v1_position_outbox_r5.py": "24fea739b095da3587f6550792e29b82615283ddf5a92fe892d40d65c190e544",
     "tests/test_live_v1_position_outbox_r6.py": "469295e7a41e6cd7bcdbaae3a5a166c21b83d402d71394733c2b6b70a297613e",
-    "tests/test_live_v1_runtime_authority_r6.py": "161fb177a979aa22e4a28b24afe4732baf7366225948281622f9e89a419d5d4d"
+    "tests/test_live_v1_runtime_authority_r6.py": "161fb177a979aa22e4a28b24afe4732baf7366225948281622f9e89a419d5d4d",
+    "tests/test_live_v1_position_outbox_r7.py": "f311a7e9a88813fa65e8e6013df9591048165c811a437d394ea9230f6e46ccbb"
   },
   "required_final_safety_state": {
     "LIVE_WRITE_AUTHORITY": "NONE",
     "REAL_FUNDS_WRITE_COUNT": 0,
     "AUTONOMOUS_LIVE": "FORBIDDEN",
     "PUBLIC_REST_MUTATION_SURFACES": 0,
-    "PRODUCTION_CAPABILITY_BYPASS": 0
+    "PRODUCTION_CAPABILITY_BYPASS": 0,
+    "LIVE_APPROVAL_ONLY": "NOT_AUTHORIZED"
   },
   "side_effects": {
     "external_exchange_writes": 0,
@@ -230,12 +565,10 @@
     "proof": "existing repository-wide network/signed-client guards, negative mock call-count assertions, B4 route matrix and signed capability regressions"
   },
   "operational_limitations": [
-    "Existing DRY_RUN databases with matching unscoped live_position_lifecycle rows fail closed with LEGACY_POSITION_LIFECYCLE_AUTHORITY_UNBOUND until explicitly remediated; no automatic TESTNET or DRY_RUN rebinding.",
-    "legacy executable rows with noncanonical identity fail closed",
-    "legacy protective orders without an exact owner ledger fail closed; no prefix-based adoption",
-    "hedge mode and aggregate same-symbol ownership unsupported and blocked",
-    "network provider and TESTNET smokes not run; no production provider integration claim",
-    "Fresh B5 coordinator must not have implemented R6; no self-authorization of B5 or real funds."
+    "Pending Controller seal and separate B5 R7 independent validation.",
+    "Known A34 shallow-checkout CI debt remains diagnostic; no repair performed.",
+    "Two existing full-suite local ETHUSDT parquet prerequisites skip unchanged; no new acceptance skips.",
+    "Uncertain post-admission completion requires manual recovery; automatic external replay is deliberately refused."
   ],
   "full_suite_skip_cases": [
     {
@@ -247,19 +580,11 @@
       "reason": "Requires non-protected local ETHUSDT.parquet (omitted from git / remote CI)"
     }
   ],
-  "next_state": "FRESH_INDEPENDENT_COORDINATOR_B5_EXACT_CODE_SHA_REVALIDATION_REQUIRED",
+  "next_state": "PENDING_CONTROLLER_SEAL",
   "changed_files": [
-    "evidence/v0.5.5/live_v1/B4_DAY2_VALIDATION.json",
-    "src/btc_quant_agent/execution/backend.py",
-    "src/btc_quant_agent/execution/protection.py",
-    "src/btc_quant_agent/execution/validator.py",
-    "src/btc_quant_agent/live_runtime.py",
     "src/btc_quant_agent/position_supervisor/supervisor.py",
-    "tests/test_live_v1_execution_protection_r6.py",
-    "tests/test_live_v1_position_authority_r4.py",
-    "tests/test_live_v1_position_outbox_r5.py",
-    "tests/test_live_v1_position_outbox_r6.py",
-    "tests/test_live_v1_runtime_authority_r6.py"
+    "tests/test_live_v1_position_outbox_r7.py",
+    "evidence/v0.5.5/live_v1/B4_DAY2_VALIDATION.json"
   ],
   "r6_repairs": {
     "R6_01": {
@@ -280,5 +605,845 @@
       "tests": "tests/test_live_v1_position_outbox_r6.py",
       "cases": 36
     }
+  },
+  "prior_r6_execution_record": {
+    "task": "LIVE_V1_B4_B5_FINDINGS_REPAIR_R7",
+    "actual_start_sha": "b3dcf4230e08e30c5d6a1d70916e11ae987f35a5",
+    "parent_sha": "b3dcf4230e08e30c5d6a1d70916e11ae987f35a5",
+    "decision": "LIVE_V1_B4_B5_FINDINGS_REPAIRED_R7_PENDING_CONTROLLER_SEAL",
+    "quality_gates": {
+      "compileall": {
+        "command": [
+          "/root/miniconda3/bin/python",
+          "-m",
+          "compileall",
+          "-q",
+          "src",
+          "tests"
+        ],
+        "exit_code": 0,
+        "elapsed_seconds": 0.076,
+        "local_log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "git_diff_check": {
+        "command": [
+          "git",
+          "diff",
+          "--check"
+        ],
+        "exit_code": 0,
+        "elapsed_seconds": 0.006,
+        "local_log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "ruff": {
+        "command": [
+          "ruff",
+          "check",
+          "."
+        ],
+        "exit_code": 0,
+        "elapsed_seconds": 0.027,
+        "local_log_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+      },
+      "mypy": {
+        "command": [
+          "mypy",
+          "src"
+        ],
+        "exit_code": 0,
+        "elapsed_seconds": 19.289,
+        "local_log_sha256": "46068eced9129924d3b0be52573b15943bf1750d772d5fb26c8ee0dcfc5840b2"
+      },
+      "r7_focused": {
+        "command": [
+          "/root/miniconda3/bin/python",
+          "-m",
+          "pytest",
+          "-q",
+          "--tb=short",
+          "-o",
+          "cache_dir=/tmp/b4-r7-evidence/gates/cache-r7_focused",
+          "--junitxml=/tmp/b4-r7-evidence/gates/r7_focused.xml",
+          "tests/test_live_v1_position_outbox_r7.py"
+        ],
+        "exit_code": 0,
+        "elapsed_seconds": 12.562,
+        "counts": {
+          "tests": 67,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "passed": 67
+        },
+        "failure_ids": [],
+        "local_log_sha256": "ffc23381b36b9ec175e22f03db1e99bfcf6e3add3b3ab0bbab3df0470a5fcae9"
+      },
+      "r6_focused": {
+        "command": [
+          "/root/miniconda3/bin/python",
+          "-m",
+          "pytest",
+          "-q",
+          "--tb=short",
+          "-o",
+          "cache_dir=/tmp/b4-r7-evidence/gates/cache-r6_focused",
+          "--junitxml=/tmp/b4-r7-evidence/gates/r6_focused.xml",
+          "tests/test_live_v1_execution_protection_r6.py",
+          "tests/test_live_v1_position_outbox_r6.py",
+          "tests/test_live_v1_runtime_authority_r6.py"
+        ],
+        "exit_code": 0,
+        "elapsed_seconds": 11.153,
+        "counts": {
+          "tests": 86,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "passed": 86
+        },
+        "failure_ids": [],
+        "local_log_sha256": "ae364e2e90d3fdb51d27c61dd9d0f2d3c5a73ef95cc80c9387cfe8ba8b6a40f8"
+      },
+      "r5_focused": {
+        "command": [
+          "/root/miniconda3/bin/python",
+          "-m",
+          "pytest",
+          "-q",
+          "--tb=short",
+          "-o",
+          "cache_dir=/tmp/b4-r7-evidence/gates/cache-r5_focused",
+          "--junitxml=/tmp/b4-r7-evidence/gates/r5_focused.xml",
+          "tests/test_live_v1_execution_protection_r5.py",
+          "tests/test_live_v1_position_outbox_r5.py",
+          "tests/test_live_v1_runtime_authority_r5.py"
+        ],
+        "exit_code": 0,
+        "elapsed_seconds": 17.322,
+        "counts": {
+          "tests": 77,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "passed": 77
+        },
+        "failure_ids": [],
+        "local_log_sha256": "58ea19dbbe2548dbac3b7540684b47542eb57953bdd628c2e06c28e5f81cf103"
+      },
+      "r3_r4_regressions": {
+        "command": [
+          "/root/miniconda3/bin/python",
+          "-m",
+          "pytest",
+          "-q",
+          "--tb=short",
+          "-o",
+          "cache_dir=/tmp/b4-r7-evidence/gates/cache-r3_r4_regressions",
+          "--junitxml=/tmp/b4-r7-evidence/gates/r3_r4_regressions.xml",
+          "tests/test_live_v1_approval_environment_r4.py",
+          "tests/test_live_v1_execution_protection_r4.py",
+          "tests/test_live_v1_position_authority_r4.py",
+          "tests/test_live_v1_execution_identity_r3.py",
+          "tests/test_live_v1_execution_placement_r3.py",
+          "tests/test_live_v1_execution_protection_r3.py",
+          "tests/test_live_v1_execution_recovery_r3.py",
+          "tests/test_live_v1_runtime_recovery_r3.py"
+        ],
+        "exit_code": 0,
+        "elapsed_seconds": 26.414,
+        "counts": {
+          "tests": 122,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "passed": 122
+        },
+        "failure_ids": [],
+        "local_log_sha256": "65d4f907132aff3078013100250b5a8b6f06b3a6c38037eeb3fd67efe03005de"
+      },
+      "all_live_v1": {
+        "command": [
+          "/root/miniconda3/bin/python",
+          "-m",
+          "pytest",
+          "-q",
+          "--tb=short",
+          "-o",
+          "cache_dir=/tmp/b4-r7-evidence/gates/cache-all_live_v1",
+          "--junitxml=/tmp/b4-r7-evidence/gates/all_live_v1.xml",
+          "tests/test_live_v1_account_stream_r2.py",
+          "tests/test_live_v1_account_watch.py",
+          "tests/test_live_v1_approval_environment_r4.py",
+          "tests/test_live_v1_day2_e2e.py",
+          "tests/test_live_v1_decision_api.py",
+          "tests/test_live_v1_decision_approval.py",
+          "tests/test_live_v1_decision_backends.py",
+          "tests/test_live_v1_decision_case.py",
+          "tests/test_live_v1_decision_e2e.py",
+          "tests/test_live_v1_decision_models.py",
+          "tests/test_live_v1_decision_risk.py",
+          "tests/test_live_v1_execution_authorization_r2.py",
+          "tests/test_live_v1_execution_backend.py",
+          "tests/test_live_v1_execution_compilation_r2.py",
+          "tests/test_live_v1_execution_identity_r3.py",
+          "tests/test_live_v1_execution_intent.py",
+          "tests/test_live_v1_execution_placement_r3.py",
+          "tests/test_live_v1_execution_protection_r3.py",
+          "tests/test_live_v1_execution_protection_r4.py",
+          "tests/test_live_v1_execution_protection_r5.py",
+          "tests/test_live_v1_execution_protection_r6.py",
+          "tests/test_live_v1_execution_recovery_r3.py",
+          "tests/test_live_v1_execution_storage.py",
+          "tests/test_live_v1_execution_validator.py",
+          "tests/test_live_v1_position_authority_r4.py",
+          "tests/test_live_v1_position_kill.py",
+          "tests/test_live_v1_position_lease_r2.py",
+          "tests/test_live_v1_position_outbox_r5.py",
+          "tests/test_live_v1_position_outbox_r6.py",
+          "tests/test_live_v1_position_outbox_r7.py",
+          "tests/test_live_v1_position_supervisor.py",
+          "tests/test_live_v1_runtime_authority_r5.py",
+          "tests/test_live_v1_runtime_authority_r6.py",
+          "tests/test_live_v1_runtime_r2.py",
+          "tests/test_live_v1_runtime_recovery_r3.py"
+        ],
+        "exit_code": 0,
+        "elapsed_seconds": 88.474,
+        "counts": {
+          "tests": 566,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "passed": 566
+        },
+        "failure_ids": [],
+        "local_log_sha256": "4c6d2e6725394316f30da23af9112682daf743aea6d07c4fc32303d2f4ab0b82"
+      },
+      "tactical": {
+        "command": [
+          "/root/miniconda3/bin/python",
+          "-m",
+          "pytest",
+          "-q",
+          "--tb=short",
+          "-o",
+          "cache_dir=/tmp/b4-r7-evidence/gates/cache-tactical",
+          "--junitxml=/tmp/b4-r7-evidence/gates/tactical.xml",
+          "tests/test_tactical_feature_evidence_v2.py",
+          "tests/test_tactical_grid_shadow_evaluation_v1.py",
+          "tests/test_tactical_policy_b0.py",
+          "tests/test_tactical_shadow_evaluation_v2.py"
+        ],
+        "exit_code": 0,
+        "elapsed_seconds": 7.626,
+        "counts": {
+          "tests": 128,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "passed": 128
+        },
+        "failure_ids": [],
+        "local_log_sha256": "c437e5e0186a68dc4ad7ec1cfe8d1aa98dfe05b2f69ef300bb33650e3aa8f008"
+      },
+      "execution_account_supervisor_runtime": {
+        "command": [
+          "/root/miniconda3/bin/python",
+          "-m",
+          "pytest",
+          "-q",
+          "--tb=short",
+          "-o",
+          "cache_dir=/tmp/b4-r7-evidence/gates/cache-execution_account_supervisor_runtime",
+          "--junitxml=/tmp/b4-r7-evidence/gates/execution_account_supervisor_runtime.xml",
+          "tests/test_live_v1_account_stream_r2.py",
+          "tests/test_live_v1_account_watch.py",
+          "tests/test_live_v1_execution_authorization_r2.py",
+          "tests/test_live_v1_execution_backend.py",
+          "tests/test_live_v1_execution_compilation_r2.py",
+          "tests/test_live_v1_execution_identity_r3.py",
+          "tests/test_live_v1_execution_intent.py",
+          "tests/test_live_v1_execution_placement_r3.py",
+          "tests/test_live_v1_execution_protection_r3.py",
+          "tests/test_live_v1_execution_protection_r4.py",
+          "tests/test_live_v1_execution_protection_r5.py",
+          "tests/test_live_v1_execution_protection_r6.py",
+          "tests/test_live_v1_execution_recovery_r3.py",
+          "tests/test_live_v1_execution_storage.py",
+          "tests/test_live_v1_execution_validator.py",
+          "tests/test_live_v1_position_authority_r4.py",
+          "tests/test_live_v1_position_kill.py",
+          "tests/test_live_v1_position_lease_r2.py",
+          "tests/test_live_v1_position_outbox_r5.py",
+          "tests/test_live_v1_position_outbox_r6.py",
+          "tests/test_live_v1_position_outbox_r7.py",
+          "tests/test_live_v1_position_supervisor.py",
+          "tests/test_live_v1_runtime_authority_r5.py",
+          "tests/test_live_v1_runtime_authority_r6.py",
+          "tests/test_live_v1_runtime_r2.py",
+          "tests/test_live_v1_runtime_recovery_r3.py"
+        ],
+        "exit_code": 0,
+        "elapsed_seconds": 78.163,
+        "counts": {
+          "tests": 486,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "passed": 486
+        },
+        "failure_ids": [],
+        "local_log_sha256": "8359607f78a584760787894b83374f4bfde2ffbee09d345edf3f647d378ae044"
+      },
+      "position_supervisor_outbox": {
+        "command": [
+          "/root/miniconda3/bin/python",
+          "-m",
+          "pytest",
+          "-q",
+          "--tb=short",
+          "-o",
+          "cache_dir=/tmp/b4-r7-evidence/gates/cache-position_supervisor_outbox",
+          "--junitxml=/tmp/b4-r7-evidence/gates/position_supervisor_outbox.xml",
+          "tests/test_live_v1_position_authority_r4.py",
+          "tests/test_live_v1_position_kill.py",
+          "tests/test_live_v1_position_lease_r2.py",
+          "tests/test_live_v1_position_outbox_r5.py",
+          "tests/test_live_v1_position_outbox_r6.py",
+          "tests/test_live_v1_position_outbox_r7.py",
+          "tests/test_live_v1_position_supervisor.py"
+        ],
+        "exit_code": 0,
+        "elapsed_seconds": 21.908,
+        "counts": {
+          "tests": 175,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "passed": 175
+        },
+        "failure_ids": [],
+        "local_log_sha256": "4f91f1c282f855acf5207d14de2dab0a1e6f8a721b1c96ed9adb1cacc37c5b79"
+      },
+      "r02_governance": {
+        "command": [
+          "/root/miniconda3/bin/python",
+          "-m",
+          "pytest",
+          "-q",
+          "--tb=short",
+          "-o",
+          "cache_dir=/tmp/b4-r7-evidence/gates/cache-r02_governance",
+          "--junitxml=/tmp/b4-r7-evidence/gates/r02_governance.xml",
+          "tests/test_v050_r02_orchestration_guards.py"
+        ],
+        "exit_code": 0,
+        "elapsed_seconds": 2.179,
+        "counts": {
+          "tests": 26,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "passed": 26
+        },
+        "failure_ids": [],
+        "local_log_sha256": "82a16f41fc8dcd36c7d246b5b912c7ed4d8d09e8ed663c1f013939cf71ca7a38"
+      },
+      "full_pytest": {
+        "command": [
+          "/root/miniconda3/bin/python",
+          "-m",
+          "pytest",
+          "-q",
+          "--tb=short",
+          "-o",
+          "cache_dir=/tmp/b4-r7-evidence/gates/cache-full_pytest",
+          "--junitxml=/tmp/b4-r7-evidence/gates/full_pytest.xml"
+        ],
+        "exit_code": 0,
+        "elapsed_seconds": 799.377,
+        "counts": {
+          "tests": 2577,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 2,
+          "passed": 2575
+        },
+        "failure_ids": [],
+        "local_log_sha256": "34f51ad14acb4dd1b4b07cd6c2a873db8e0cca88afa528e6d4179a389e725259",
+        "warnings": 9
+      }
+    },
+    "changed_files": [
+      "src/btc_quant_agent/position_supervisor/supervisor.py",
+      "tests/test_live_v1_position_outbox_r7.py",
+      "evidence/v0.5.5/live_v1/B4_DAY2_VALIDATION.json"
+    ]
+  },
+  "new_evidence_authority": {
+    "publication_sha": "8a80203ec6f10ff6fdbcca346ca3a1e7924064d2",
+    "finding": "R6-F03-RESIDUAL-TOCTOU",
+    "controller_dispatch_sha": "41a25db780f7ab038bd6d64c37dae8df776ebbe4"
+  },
+  "final_sha_binding": {
+    "method": "GIT_CONTAINING_COMMIT",
+    "resolution": "git log -1 --format=%H -- evidence/v0.5.5/live_v1/B4_DAY2_VALIDATION.json",
+    "required_parent_sha": "b3dcf4230e08e30c5d6a1d70916e11ae987f35a5",
+    "reason": "A tracked artifact cannot contain its own commit SHA without a circular content hash. The containing commit binds this evidence and the tested source hashes atomically."
+  },
+  "scope_fence": {
+    "required_parent_sha": "b3dcf4230e08e30c5d6a1d70916e11ae987f35a5",
+    "current_head": "b3dcf4230e08e30c5d6a1d70916e11ae987f35a5",
+    "branch": "feature/b-line-live-v1",
+    "changed_files": [
+      "evidence/v0.5.5/live_v1/B4_DAY2_VALIDATION.json",
+      "src/btc_quant_agent/position_supervisor/supervisor.py",
+      "tests/test_live_v1_position_outbox_r7.py"
+    ],
+    "authorized_scope": true,
+    "f01_f02_frozen_files_unchanged": {
+      "src/btc_quant_agent/execution/backend.py": true,
+      "src/btc_quant_agent/execution/protection.py": true,
+      "src/btc_quant_agent/execution/validator.py": true,
+      "src/btc_quant_agent/live_runtime.py": true
+    },
+    "h40_h41_a_line_and_scientific_goldens_diff_zero": true,
+    "proof": "Complete working-tree tracked/untracked change set restricted to authorized supervisor module, dedicated R7 test, machine evidence."
+  },
+  "r7_case_results": [
+    {
+      "test": "test_final_clock_event_authority_corruption_cannot_reach_done[event_hash]",
+      "status": "PASS"
+    },
+    {
+      "test": "test_final_clock_event_authority_corruption_cannot_reach_done[symbol]",
+      "status": "PASS"
+    },
+    {
+      "test": "test_final_clock_event_authority_corruption_cannot_reach_done[environment]",
+      "status": "PASS"
+    },
+    {
+      "test": "test_final_clock_event_authority_corruption_cannot_reach_done[credential_namespace]",
+      "status": "PASS"
+    },
+    {
+      "test": "test_final_clock_event_authority_corruption_cannot_reach_done[account_id]",
+      "status": "PASS"
+    },
+    {
+      "test": "test_final_clock_event_authority_corruption_cannot_reach_done[position_side]",
+      "status": "PASS"
+    },
+    {
+      "test": "test_final_clock_event_authority_corruption_cannot_reach_done[position_authority_key]",
+      "status": "PASS"
+    },
+    {
+      "test": "test_unknown_provider_completion_is_never_called_a_second_time",
+      "status": "PASS"
+    },
+    {
+      "test": "test_crash_after_persisted_admission_before_provider_fails_closed_on_restart",
+      "status": "PASS"
+    },
+    {
+      "test": "test_normal_sqlite_cannot_fabricate_analysis_completion_after_mint",
+      "status": "PASS"
+    },
+    {
+      "test": "test_coherent_event_authority_replacement_before_admission_has_no_provider_call[event_hash]",
+      "status": "PASS"
+    },
+    {
+      "test": "test_coherent_event_authority_replacement_before_admission_has_no_provider_call[symbol]",
+      "status": "PASS"
+    },
+    {
+      "test": "test_coherent_event_authority_replacement_before_admission_has_no_provider_call[environment]",
+      "status": "PASS"
+    },
+    {
+      "test": "test_coherent_event_authority_replacement_before_admission_has_no_provider_call[credential_namespace]",
+      "status": "PASS"
+    },
+    {
+      "test": "test_coherent_event_authority_replacement_before_admission_has_no_provider_call[account_id]",
+      "status": "PASS"
+    },
+    {
+      "test": "test_coherent_event_authority_replacement_before_admission_has_no_provider_call[position_side]",
+      "status": "PASS"
+    },
+    {
+      "test": "test_coherent_event_authority_replacement_before_admission_has_no_provider_call[position_authority_key]",
+      "status": "PASS"
+    },
+    {
+      "test": "test_replacement_after_last_pre_admission_check_is_rejected_by_mint[event_hash]",
+      "status": "PASS"
+    },
+    {
+      "test": "test_replacement_after_last_pre_admission_check_is_rejected_by_mint[symbol]",
+      "status": "PASS"
+    },
+    {
+      "test": "test_replacement_after_last_pre_admission_check_is_rejected_by_mint[environment]",
+      "status": "PASS"
+    },
+    {
+      "test": "test_replacement_after_last_pre_admission_check_is_rejected_by_mint[credential_namespace]",
+      "status": "PASS"
+    },
+    {
+      "test": "test_replacement_after_last_pre_admission_check_is_rejected_by_mint[account_id]",
+      "status": "PASS"
+    },
+    {
+      "test": "test_replacement_after_last_pre_admission_check_is_rejected_by_mint[position_side]",
+      "status": "PASS"
+    },
+    {
+      "test": "test_replacement_after_last_pre_admission_check_is_rejected_by_mint[position_authority_key]",
+      "status": "PASS"
+    },
+    {
+      "test": "test_archival_replacement_after_mint_preserves_provider_case_and_blocks_done",
+      "status": "PASS"
+    },
+    {
+      "test": "test_archival_replacement_during_analysis_preserves_provider_case_and_blocks_done",
+      "status": "PASS"
+    },
+    {
+      "test": "test_admitted_receipt_fields_are_immutable_in_normal_sqlite[dispatch_authority_json]",
+      "status": "PASS"
+    },
+    {
+      "test": "test_admitted_receipt_fields_are_immutable_in_normal_sqlite[dispatch_authority_hash]",
+      "status": "PASS"
+    },
+    {
+      "test": "test_admitted_receipt_fields_are_immutable_in_normal_sqlite[analysis_admission_hash]",
+      "status": "PASS"
+    },
+    {
+      "test": "test_admitted_receipt_fields_are_immutable_in_normal_sqlite[position_case_id]",
+      "status": "PASS"
+    },
+    {
+      "test": "test_admitted_receipt_fields_are_immutable_in_normal_sqlite[position_case_hash]",
+      "status": "PASS"
+    },
+    {
+      "test": "test_admitted_receipt_fields_are_immutable_in_normal_sqlite[position_case_json]",
+      "status": "PASS"
+    },
+    {
+      "test": "test_admitted_receipt_fields_are_immutable_in_normal_sqlite[case_hash]",
+      "status": "PASS"
+    },
+    {
+      "test": "test_bypassed_admission_or_case_tamper_cannot_reach_done[dispatch_authority_json]",
+      "status": "PASS"
+    },
+    {
+      "test": "test_bypassed_admission_or_case_tamper_cannot_reach_done[dispatch_authority_hash]",
+      "status": "PASS"
+    },
+    {
+      "test": "test_bypassed_admission_or_case_tamper_cannot_reach_done[analysis_admission_hash]",
+      "status": "PASS"
+    },
+    {
+      "test": "test_bypassed_admission_or_case_tamper_cannot_reach_done[position_case_id]",
+      "status": "PASS"
+    },
+    {
+      "test": "test_bypassed_admission_or_case_tamper_cannot_reach_done[position_case_json]",
+      "status": "PASS"
+    },
+    {
+      "test": "test_bypassed_admission_or_case_tamper_cannot_reach_done[position_case_hash]",
+      "status": "PASS"
+    },
+    {
+      "test": "test_bypassed_admission_or_case_tamper_cannot_reach_done[case_hash]",
+      "status": "PASS"
+    },
+    {
+      "test": "test_bypassed_case_substitution_after_mint_cannot_change_provider_input",
+      "status": "PASS"
+    },
+    {
+      "test": "test_normal_admission_is_canonical_and_exactly_once",
+      "status": "PASS"
+    },
+    {
+      "test": "test_terminal_update_abort_rolls_back_done_and_completion_marker",
+      "status": "PASS"
+    },
+    {
+      "test": "test_stale_unexpired_lease_does_not_create_admission_or_call",
+      "status": "PASS"
+    },
+    {
+      "test": "test_superseded_admitted_lease_cannot_complete_or_create_another_admission",
+      "status": "PASS"
+    },
+    {
+      "test": "test_unadmitted_frozen_retry_uses_original_case_and_single_admission",
+      "status": "PASS"
+    },
+    {
+      "test": "test_completed_receipt_replay_preserves_admission_without_provider_recall",
+      "status": "PASS"
+    },
+    {
+      "test": "test_concurrent_r6_to_r7_constructors_upgrade_once[0]",
+      "status": "PASS"
+    },
+    {
+      "test": "test_concurrent_r6_to_r7_constructors_upgrade_once[1]",
+      "status": "PASS"
+    },
+    {
+      "test": "test_concurrent_r6_to_r7_constructors_upgrade_once[2]",
+      "status": "PASS"
+    },
+    {
+      "test": "test_concurrent_r6_to_r7_constructors_upgrade_once[3]",
+      "status": "PASS"
+    },
+    {
+      "test": "test_concurrent_r6_to_r7_constructors_upgrade_once[4]",
+      "status": "PASS"
+    },
+    {
+      "test": "test_concurrent_r6_to_r7_constructors_upgrade_once[5]",
+      "status": "PASS"
+    },
+    {
+      "test": "test_concurrent_r6_to_r7_constructors_upgrade_once[6]",
+      "status": "PASS"
+    },
+    {
+      "test": "test_concurrent_r6_to_r7_constructors_upgrade_once[7]",
+      "status": "PASS"
+    },
+    {
+      "test": "test_concurrent_r6_to_r7_constructors_upgrade_once[8]",
+      "status": "PASS"
+    },
+    {
+      "test": "test_concurrent_r6_to_r7_constructors_upgrade_once[9]",
+      "status": "PASS"
+    },
+    {
+      "test": "test_concurrent_r6_to_r7_constructors_upgrade_once[10]",
+      "status": "PASS"
+    },
+    {
+      "test": "test_concurrent_r6_to_r7_constructors_upgrade_once[11]",
+      "status": "PASS"
+    },
+    {
+      "test": "test_concurrent_r6_to_r7_constructors_upgrade_once[12]",
+      "status": "PASS"
+    },
+    {
+      "test": "test_concurrent_r6_to_r7_constructors_upgrade_once[13]",
+      "status": "PASS"
+    },
+    {
+      "test": "test_concurrent_r6_to_r7_constructors_upgrade_once[14]",
+      "status": "PASS"
+    },
+    {
+      "test": "test_concurrent_r6_to_r7_constructors_upgrade_once[15]",
+      "status": "PASS"
+    },
+    {
+      "test": "test_concurrent_r6_to_r7_constructors_upgrade_once[16]",
+      "status": "PASS"
+    },
+    {
+      "test": "test_concurrent_r6_to_r7_constructors_upgrade_once[17]",
+      "status": "PASS"
+    },
+    {
+      "test": "test_concurrent_r6_to_r7_constructors_upgrade_once[18]",
+      "status": "PASS"
+    },
+    {
+      "test": "test_concurrent_r6_to_r7_constructors_upgrade_once[19]",
+      "status": "PASS"
+    }
+  ],
+  "r7_repairs": {
+    "scope": "Only PositionSupervisor durable admission/terminal authority, dedicated tests and this machine evidence; F01/F02 source unchanged.",
+    "authority_capsule": {
+      "status": "PASS",
+      "storage": [
+        "dispatch_authority_json",
+        "dispatch_authority_hash",
+        "analysis_admission_hash",
+        "analysis_completed"
+      ],
+      "canonical_serialization": "decision.models.canonical_json: deterministic sorted JSON; SHA256 via content_hash",
+      "dispatch_hash_contract": {
+        "schema_version": "POSITION_DISPATCH_AUTHORITY_V1",
+        "fields": [
+          "event_id",
+          "event_hash",
+          "symbol",
+          "environment",
+          "credential_namespace",
+          "account_id",
+          "position_side",
+          "position_authority_key",
+          "position_case_id",
+          "position_case_hash",
+          "lease_token"
+        ]
+      },
+      "admission_hash_contract": {
+        "schema_version": "POSITION_ANALYSIS_ADMISSION_V1",
+        "dispatch_authority_hash": "SHA256 of canonical dispatch capsule"
+      },
+      "independent_recomputation": "Dedicated valid control recomputes canonical JSON and SHA256 without invoking production authority helpers."
+    },
+    "atomic_admission": {
+      "status": "PASS",
+      "transaction": "BEGIN IMMEDIATE; canonical event payload/hash/denormalized fields, expected event, current dispatch owner/unexpired lease, exact frozen case_id/hash/json/case_hash verified on same connection; guarded one-shot admission UPDATE; commit",
+      "provider_input": "Only immutable admission.case_json captured at mint is parsed and supplied to external analysis; mutable archival row cannot substitute provider case.",
+      "immutable_fences": "Existing event/dispatch UPDATE and DELETE guards; admitted capsule/hash/receipt/all frozen-case fields immutable; completion marker 1-to-0 forbidden."
+    },
+    "terminal": {
+      "status": "PASS",
+      "completion_marker_atomic_with_done": "PASS",
+      "preexisting_case_hash_terminal_validation": "PASS",
+      "transaction": "BEGIN IMMEDIATE verifies current canonical event, original immutable receipt/capsule, current lease ownership/expiry and exact preexisting frozen case_id/hash/json/case_hash; connection-local authorization installed only after verification; one guarded UPDATE writes analysis_completed=1 and DONE; commit. No authority field is repaired.",
+      "completion_capability": "BEFORE UPDATE OF analysis_completed rejects 0-to-1 without terminal shape and connection-local callback bound to captured receipt/hash/current owner/case_hash. Other connections have no callback.",
+      "rollback": "AFTER UPDATE abort fixture proves completion marker and DONE both roll back; failure handler enters FAILED_CLOSED with marker=0.",
+      "lease_time": "Elapsed monotonic lock acquisition time advances supplied logical authority time before admission/terminal expiry checks."
+    },
+    "crash_retry": {
+      "status": "PASS",
+      "uncertain_completion": "Persisted admission with marker=0 is never automatically called again; provider exception fails closed, crash/cancellation retains admission and expired restart enters FAILED_CLOSED/manual recovery without fresh case/provider/new admission.",
+      "completed_but_terminal_rejected": "Provider may have completed externally; no durable success marker commits. Admission remains uncertain. Authority divergence fails closed, lease loss preserves superseding owner; no second provider call on expired recovery.",
+      "known_safe_retry": "Unadmitted frozen retry preserves original case. Already durably completed receipt uses exact original admission with no provider recall and guarded current-owner terminal transition."
+    },
+    "negative_case_groups": {
+      "parent": "b3dcf4230e08e30c5d6a1d70916e11ae987f35a5",
+      "test_file": "tests/test_live_v1_position_outbox_r7.py",
+      "groups": {
+        "A_coherent_pre_admission_replacement": 7,
+        "B_check_use_window_before_mint": 7,
+        "C_post_mint_archival_replacement": 1,
+        "D_during_analysis_archival_replacement": 1,
+        "E_final_clock_all_seven_authority_fields": 7,
+        "F_sqlite_immutable_and_bypass_tamper": 15,
+        "H_concurrent_r6_to_r7_upgrade": 20,
+        "G_exactly_once_crash_replay_lease_and_terminal_atomicity": 9
+      },
+      "total": 67,
+      "r6_red": {
+        "failed": 8,
+        "log": "/tmp/b4-r7-evidence/r7-red.log"
+      },
+      "r7_targeted_repair": {
+        "passed": 21,
+        "deselected": 22,
+        "log": "/tmp/b4-r7-evidence/r7-repair-focused.log"
+      },
+      "new_red": {
+        "completion_marker_and_case_hash": {
+          "failed": 2,
+          "log": "/tmp/b4-r7-evidence/r7-red-2.log"
+        },
+        "concurrent_r6_upgrade": {
+          "failed": 20,
+          "log": "/tmp/b4-r7-evidence/r7-red-migration.log"
+        }
+      },
+      "r7_focused_before_new_red": {
+        "passed": 43,
+        "log": "/tmp/b4-r7-evidence/r7-focused.log"
+      },
+      "r7_focused": {
+        "passed": 67,
+        "log": "/tmp/b4-r7-evidence/r7-focused.log"
+      },
+      "c1_c2_targeted": {
+        "passed": 24,
+        "log": "/tmp/b4-r7-evidence/r7-c1c2-focused.log"
+      }
+    },
+    "gate_iteration": {
+      "initial_static_ruff": "I001 import order and RUF059 unused test variable; imports formatted and valid-control provider count asserted. Final Ruff PASS. Full suite was not started until focused review and static gates passed."
+    },
+    "red_to_green": {
+      "r6_baseline_failed": 8,
+      "c1_c2_failed": 2,
+      "concurrent_upgrade_failed_rounds": 20,
+      "final_dedicated_passed": 67,
+      "combined_position_focused_passed": 151,
+      "assertions_weakened": 0,
+      "new_skips": 0,
+      "new_xfails": 0
+    },
+    "independent_in_task_review": {
+      "review": "R7 in-task independent consequential correctness review",
+      "disposition": "PASS",
+      "scope": "Revised PositionSupervisor source and directly relevant R7 tests; not B5 independent validation or Controller seal.",
+      "source": {
+        "path": "src/btc_quant_agent/position_supervisor/supervisor.py",
+        "sha256": "59900bc19a200b63603772f05fa987856f28e561124b91270d13518484a9e629"
+      },
+      "closed_findings": [
+        "C1: fabricated analysis_completed marker is guarded by connection-local authorization installed after same-transaction terminal authority verification; marker and DONE update atomically.",
+        "C2: frozen case_hash is checked and SQL-bound at admission and terminal completion; mint does not silently repair corruption.",
+        "R7 migration: new-column inspection and ALTER are serialized under BEGIN IMMEDIATE; isolated two-constructor R6-to-R7 upgrade probe passed 30/30 attempts."
+      ],
+      "lease_lock_probe": {
+        "lease_ms": 200,
+        "writer_lock_hold_ms": 450,
+        "provider_calls": 1,
+        "returned_done_events": 0,
+        "analysis_completed": 0,
+        "state_after_attempt": "DISPATCHING",
+        "result": "Expired lease did not reach DONE; later recovery remains subject to fail-closed rule."
+      },
+      "probe_caveat": "An initial exploratory asyncio.to_thread event-wait harness hung during asyncio.run executor shutdown and was stopped with timeout. The corrected synchronous threading-event probe completed and supplied the lease-lock result above.",
+      "repository_edits": 0,
+      "remaining_blocking_findings": []
+    },
+    "frozen_findings": {
+      "F01": {
+        "status": "PASS",
+        "source_unchanged": true,
+        "r6_typed_protection_regressions_passed": 41,
+        "prior_independent_r6_pass_carried_forward": true
+      },
+      "F02": {
+        "status": "PASS",
+        "source_unchanged": true,
+        "r6_native_async_runtime_regressions_passed": 9,
+        "prior_independent_r6_pass_carried_forward": true
+      }
+    },
+    "not_authorized": "This execution record is not B5 R7 validation, Controller seal, or LIVE authorization."
+  },
+  "local_detailed_evidence": {
+    "root": "/tmp/b4-r7-evidence",
+    "gates": "gates/{name}.log and XML + results.json",
+    "review": "in_task_review.json",
+    "red_logs": [
+      "r7-red.log",
+      "r7-red-2.log",
+      "r7-red-migration.log"
+    ],
+    "repository_artifact": "This artifact embeds authority contracts, groups, review result and exact gate counts; raw scripts/transcripts remain local."
   }
 }

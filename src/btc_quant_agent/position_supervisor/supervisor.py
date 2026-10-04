@@ -7,11 +7,12 @@ import secrets
 import sqlite3
 import time
 from collections.abc import Callable
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
 from ..account_watch.models import AccountSnapshotV1
-from ..decision.models import CasePackageV1
+from ..decision.models import CasePackageV1, canonical_json, content_hash
 from ..live_db import connection
 from .models import (
     PositionEventV1,
@@ -19,6 +20,38 @@ from .models import (
     SupervisorPolicyV1,
     position_authority_key,
 )
+
+
+@dataclass(frozen=True)
+class _AnalysisAdmission:
+    authority_json: str
+    authority_hash: str
+    admission_hash: str
+    case_json: str
+    event_json: str
+    provider_completed: bool
+
+
+def _dispatch_authority(
+    event: PositionEventV1, case: CasePackageV1, lease_token: str,
+) -> dict[str, Any]:
+    return {
+        "schema_version": "POSITION_DISPATCH_AUTHORITY_V1",
+        **{name: getattr(event, name) for name in (
+            "event_id", "event_hash", "symbol", "environment", "credential_namespace",
+            "account_id", "position_side", "position_authority_key",
+        )},
+        "position_case_id": case.case_id,
+        "position_case_hash": case.case_hash,
+        "lease_token": lease_token,
+    }
+
+
+def _admission_hash(authority_hash: str) -> str:
+    return content_hash({
+        "schema_version": "POSITION_ANALYSIS_ADMISSION_V1",
+        "dispatch_authority_hash": authority_hash,
+    })
 
 
 def _unbound_legacy_lifecycle(
@@ -113,6 +146,8 @@ class PositionSupervisor:
                 db.execute(
                     "UPDATE live_position_case_dispatches SET position_case_hash = case_hash "
                     "WHERE position_case_hash = '' AND case_hash != ''"
+                    + (" AND analysis_admission_hash = ''"
+                       if "analysis_admission_hash" in cols else "")
                 )
 
             db.executescript("""
@@ -170,6 +205,10 @@ class PositionSupervisor:
                     position_case_hash TEXT NOT NULL DEFAULT '',
                     position_case_json TEXT NOT NULL DEFAULT '',
                     case_hash TEXT NOT NULL DEFAULT '',
+                    dispatch_authority_json TEXT NOT NULL DEFAULT '',
+                    dispatch_authority_hash TEXT NOT NULL DEFAULT '',
+                    analysis_admission_hash TEXT NOT NULL DEFAULT '',
+                    analysis_completed INTEGER NOT NULL DEFAULT 0 CHECK(analysis_completed IN (0, 1)),
                     symbol TEXT NOT NULL,
                     state TEXT NOT NULL,
                     retry_count INTEGER NOT NULL DEFAULT 0,
@@ -181,6 +220,22 @@ class PositionSupervisor:
                 CREATE INDEX IF NOT EXISTS idx_dispatches_state
                     ON live_position_case_dispatches(state, lease_expires_at_ms);
             """)
+            # Serialize inspection and additive R7 migration across concurrent starters.
+            db.execute("BEGIN IMMEDIATE")
+            dispatch_columns = {
+                col["name"] for col in db.execute("PRAGMA table_info(live_position_case_dispatches)")
+            }
+            for name, definition in (
+                ("dispatch_authority_json", "TEXT NOT NULL DEFAULT ''"),
+                ("dispatch_authority_hash", "TEXT NOT NULL DEFAULT ''"),
+                ("analysis_admission_hash", "TEXT NOT NULL DEFAULT ''"),
+                ("analysis_completed", "INTEGER NOT NULL DEFAULT 0 CHECK(analysis_completed IN (0, 1))"),
+            ):
+                if name not in dispatch_columns:
+                    db.execute(f"ALTER TABLE live_position_case_dispatches ADD COLUMN {name} {definition}")
+
+            db.commit()
+
             # Existing unscoped event rows remain legacy authority and cannot
             # suppress events from any current account/environment.
             event_columns = {
@@ -229,6 +284,35 @@ class PositionSupervisor:
                     WHERE OLD.event_id != NEW.event_id
                        OR OLD.event_hash != NEW.event_hash
                        OR OLD.symbol != NEW.symbol;
+                END;
+
+                CREATE TRIGGER IF NOT EXISTS trg_live_position_dispatch_admission_immutable
+                BEFORE UPDATE ON live_position_case_dispatches
+                FOR EACH ROW
+                BEGIN
+                    SELECT RAISE(ABORT, 'DISPATCH_ADMISSION_IMMUTABLE')
+                    WHERE (OLD.analysis_admission_hash != '' OR OLD.dispatch_authority_hash != '')
+                      AND (OLD.dispatch_authority_json IS NOT NEW.dispatch_authority_json
+                        OR OLD.dispatch_authority_hash IS NOT NEW.dispatch_authority_hash
+                        OR OLD.analysis_admission_hash IS NOT NEW.analysis_admission_hash
+                        OR OLD.position_case_id IS NOT NEW.position_case_id
+                        OR OLD.position_case_hash IS NOT NEW.position_case_hash
+                        OR OLD.position_case_json IS NOT NEW.position_case_json
+                        OR OLD.case_hash IS NOT NEW.case_hash);
+                    SELECT RAISE(ABORT, 'ANALYSIS_COMPLETION_IMMUTABLE')
+                    WHERE OLD.analysis_completed = 1 AND NEW.analysis_completed IS NOT 1;
+                END;
+
+                CREATE TRIGGER IF NOT EXISTS trg_live_position_analysis_completion_guard
+                BEFORE UPDATE OF analysis_completed ON live_position_case_dispatches
+                FOR EACH ROW WHEN OLD.analysis_completed = 0 AND NEW.analysis_completed = 1
+                BEGIN
+                    SELECT RAISE(ABORT, 'ANALYSIS_COMPLETION_REQUIRES_TERMINAL_AUTHORITY')
+                    WHERE OLD.state != 'DISPATCHING' OR NEW.state != 'DONE'
+                       OR NEW.lease_token IS NOT NULL OR NEW.lease_expires_at_ms != 0
+                       OR position_analysis_completion_authorized(
+                            OLD.analysis_admission_hash, OLD.dispatch_authority_hash,
+                            OLD.lease_token, OLD.case_hash) != 1;
                 END;
 
                 CREATE TRIGGER IF NOT EXISTS trg_live_position_dispatches_immutable_delete
@@ -482,23 +566,25 @@ class PositionSupervisor:
                 db, environment, credential_namespace, account_id, symbol, position_side,
             )
 
+    @staticmethod
+    def _event_from_row(row: sqlite3.Row) -> PositionEventV1:
+        event = PositionEventV1.model_validate_json(row["payload"])
+        event.verify()
+        for name in (
+            "event_id", "event_hash", "symbol", "trigger", "source_hash", "observed_at_ms",
+            "environment", "credential_namespace", "account_id", "position_side",
+            "position_authority_key",
+        ):
+            if getattr(event, name) != row[name]:
+                raise ValueError("position event storage authority mismatch")
+        return event
+
     def get_event(self, event_id: str) -> PositionEventV1 | None:
         with connection(self.path) as db:
             row = db.execute(
-                "SELECT * FROM live_position_events WHERE event_id=?",
-                (event_id,),
+                "SELECT * FROM live_position_events WHERE event_id=?", (event_id,),
             ).fetchone()
-            if row is None:
-                return None
-            event = PositionEventV1.model_validate(json.loads(row["payload"]))
-            if (event.event_id != row["event_id"] or event.event_hash != row["event_hash"]
-                    or event.symbol != row["symbol"]):
-                raise ValueError("position event storage identity mismatch")
-            for field in ("environment", "credential_namespace", "account_id",
-                          "position_side", "position_authority_key"):
-                if getattr(event, field) != row[field]:
-                    raise ValueError("position event storage authority mismatch")
-            return event
+            return None if row is None else self._event_from_row(row)
 
     def get_dispatch(self, event_id: str) -> dict[str, Any] | None:
         with connection(self.path) as db:
@@ -519,26 +605,26 @@ class PositionSupervisor:
         expected_symbol: str | None = None,
         pos_case: CasePackageV1 | None = None,
         check_lease_now: int | None = None,
+        _db: sqlite3.Connection | None = None,
     ) -> tuple[PositionEventV1, dict[str, Any]]:
-        with connection(self.path) as db:
+        def read_rows(db: sqlite3.Connection) -> tuple[sqlite3.Row, sqlite3.Row]:
             event_row = db.execute(
-                "SELECT * FROM live_position_events WHERE event_id=?",
-                (event_id,),
+                "SELECT * FROM live_position_events WHERE event_id=?", (event_id,),
             ).fetchone()
-            if event_row is None:
-                raise ValueError("position event missing")
-
             dispatch_row = db.execute(
-                "SELECT * FROM live_position_case_dispatches WHERE event_id=?",
-                (event_id,),
+                "SELECT * FROM live_position_case_dispatches WHERE event_id=?", (event_id,),
             ).fetchone()
-            if dispatch_row is None:
-                raise ValueError("dispatch row missing")
+            if event_row is None or dispatch_row is None:
+                raise ValueError("position event or dispatch missing")
+            return event_row, dispatch_row
 
-        event = self.get_event(event_id)
-        if event is None:
-            raise ValueError("position event missing")
-        event.verify()
+        if _db is None:
+            with connection(self.path) as db:
+                db.execute("BEGIN")
+                event_row, dispatch_row = read_rows(db)
+        else:
+            event_row, dispatch_row = read_rows(_db)
+        event = self._event_from_row(event_row)
 
         if expected_event_hash is not None and event.event_hash != expected_event_hash:
             raise ValueError("position event hash mismatch")
@@ -594,6 +680,133 @@ class PositionSupervisor:
 
         return event, dict(dispatch_row)
 
+    @staticmethod
+    def _verify_admission(
+        dispatch: dict[str, Any], event: PositionEventV1, case: CasePackageV1,
+    ) -> tuple[str, str, str]:
+        capsule = json.loads(dispatch["dispatch_authority_json"])
+        if not isinstance(capsule, dict) or not isinstance(capsule.get("lease_token"), str):
+            raise TypeError("invalid dispatch capsule")
+        if not capsule["lease_token"]:
+            raise ValueError("missing admitting lease")
+        expected = _dispatch_authority(event, case, capsule["lease_token"])
+        authority_json = canonical_json(expected)
+        authority_hash = content_hash(expected)
+        admission_hash = _admission_hash(authority_hash)
+        if (dispatch["dispatch_authority_json"] != authority_json
+                or dispatch["dispatch_authority_hash"] != authority_hash
+                or dispatch["analysis_admission_hash"] != admission_hash):
+            raise ValueError("analysis admission authority mismatch")
+        return authority_json, authority_hash, admission_hash
+
+    def _mint_analysis_admission(
+        self, event_id: str, lease_token: str, expected_event_hash: str,
+        expected_symbol: str, pos_case: CasePackageV1, now_ms: int, lease_ms: int,
+    ) -> _AnalysisAdmission:
+        lock_started = time.monotonic()
+        with connection(self.path) as db:
+            db.execute("BEGIN IMMEDIATE")
+            now_ms += int((time.monotonic() - lock_started) * 1000)
+            event, dispatch = self._verify_durable_authority(
+                event_id, lease_token=lease_token, expected_event_hash=expected_event_hash,
+                expected_symbol=expected_symbol, pos_case=pos_case, check_lease_now=now_ms,
+                _db=db,
+            )
+            if (dispatch["position_case_id"] != pos_case.case_id
+                    or dispatch["position_case_hash"] != pos_case.case_hash
+                    or dispatch["position_case_json"] != pos_case.canonical_json()
+                    or dispatch["case_hash"] != pos_case.case_hash):
+                raise ValueError("incomplete frozen case authority")
+            if dispatch["analysis_admission_hash"]:
+                authority_json, authority_hash, admission_hash = self._verify_admission(
+                    dispatch, event, pos_case,
+                )
+                if dispatch["analysis_completed"] != 1:
+                    raise ValueError("uncertain admitted analysis requires manual recovery")
+                provider_completed = True
+            else:
+                if (dispatch["dispatch_authority_json"] or dispatch["dispatch_authority_hash"]
+                        or dispatch["analysis_completed"] != 0):
+                    raise ValueError("partial analysis admission")
+                authority = _dispatch_authority(event, pos_case, lease_token)
+                authority_json = canonical_json(authority)
+                authority_hash = content_hash(authority)
+                admission_hash = _admission_hash(authority_hash)
+                minted = db.execute(
+                    """
+                    UPDATE live_position_case_dispatches
+                    SET dispatch_authority_json=?, dispatch_authority_hash=?,
+                        analysis_admission_hash=?,
+                        lease_expires_at_ms=?, updated_at_ms=?
+                    WHERE event_id=? AND state='DISPATCHING' AND lease_token=?
+                      AND lease_expires_at_ms>? AND analysis_admission_hash=''
+                      AND dispatch_authority_hash='' AND dispatch_authority_json=''
+                      AND position_case_id=? AND position_case_hash=? AND position_case_json=?
+                      AND case_hash=?
+                    """,
+                    (authority_json, authority_hash, admission_hash,
+                     now_ms + lease_ms, now_ms, event_id, lease_token, now_ms,
+                     pos_case.case_id, pos_case.case_hash, pos_case.canonical_json(),
+                     pos_case.case_hash),
+                )
+                if minted.rowcount != 1:
+                    raise KeyError("analysis admission lease lost")
+                provider_completed = False
+            return _AnalysisAdmission(
+                authority_json, authority_hash, admission_hash, pos_case.canonical_json(),
+                event.canonical_json(), provider_completed,
+            )
+
+    def _complete_analysis(
+        self, admission: _AnalysisAdmission, lease_token: str, now_ms: int,
+    ) -> PositionEventV1:
+        lock_started = time.monotonic()
+        admitted_event = PositionEventV1.model_validate_json(admission.event_json)
+        admitted_case = CasePackageV1.model_validate_json(admission.case_json)
+        with connection(self.path) as db:
+            db.execute("BEGIN IMMEDIATE")
+            now_ms += int((time.monotonic() - lock_started) * 1000)
+            event, dispatch = self._verify_durable_authority(
+                admitted_event.event_id, lease_token=lease_token,
+                expected_event_hash=admitted_event.event_hash, expected_symbol=admitted_event.symbol,
+                pos_case=admitted_case, check_lease_now=now_ms, _db=db,
+            )
+            current = self._verify_admission(dispatch, event, admitted_case)
+            if (current != (admission.authority_json, admission.authority_hash,
+                            admission.admission_hash)
+                    or event.canonical_json() != admission.event_json
+                    or dispatch["case_hash"] != admitted_case.case_hash):
+                raise ValueError("admitted analysis authority changed")
+            # Only this validated connection can authorize the completion marker.
+            # The capability disappears when the terminal transaction closes.
+            db.create_function(
+                "position_analysis_completion_authorized", 4,
+                lambda receipt, authority, owner, case_hash: int(
+                    (receipt, authority, owner, case_hash) == (
+                        admission.admission_hash, admission.authority_hash,
+                        lease_token, admitted_case.case_hash,
+                    )
+                ),
+            )
+            done = db.execute(
+                """
+                UPDATE live_position_case_dispatches
+                SET state='DONE', analysis_completed=1, lease_token=NULL,
+                    lease_expires_at_ms=0, updated_at_ms=?
+                WHERE event_id=? AND state='DISPATCHING' AND lease_token=?
+                  AND lease_expires_at_ms>? AND position_case_id=? AND position_case_hash=?
+                  AND case_hash=? AND position_case_json=? AND dispatch_authority_json=?
+                  AND dispatch_authority_hash=? AND analysis_admission_hash=?
+                """,
+                (now_ms, event.event_id, lease_token, now_ms, admitted_case.case_id,
+                 admitted_case.case_hash, admitted_case.case_hash, admission.case_json,
+                 admission.authority_json,
+                 admission.authority_hash, admission.admission_hash),
+            )
+            if done.rowcount != 1:
+                raise KeyError("analysis completion lease lost")
+            return event
+
     async def drain_pending_dispatches(
         self, now_ms: int, lease_ms: int = 30_000, max_retries: int = 3
     ) -> tuple[PositionEventV1, ...]:
@@ -639,7 +852,8 @@ class PositionSupervisor:
                 event_id = candidate["event_id"]
                 retry_count = int(candidate["retry_count"])
 
-                if retry_count >= max_retries:
+                if (candidate["analysis_admission_hash"] and candidate["analysis_completed"] != 1
+                        or retry_count >= max_retries):
                     db.execute(
                         """
                         UPDATE live_position_case_dispatches
@@ -826,108 +1040,43 @@ class PositionSupervisor:
                 if frozen.rowcount != 1:
                     break
 
-            # Checkpoint 4: immediately before provider/analysis call
+            # Mint the immutable one-shot receipt under the same write transaction
+            # that verifies event, frozen case and current dispatch ownership.
             analysis_now = lease_now_ms()
-            with connection(self.path) as db:
-                owned = db.execute(
-                    """
-                    UPDATE live_position_case_dispatches
-                    SET lease_expires_at_ms = ?, updated_at_ms = ?
-                    WHERE event_id = ? AND event_hash = ? AND symbol = ?
-                      AND state = 'DISPATCHING'
-                      AND lease_token = ? AND lease_expires_at_ms > ?
-                      AND position_case_id = ? AND position_case_hash = ?
-                      AND position_case_json = ?
-                    """,
-                    (analysis_now + lease_ms, analysis_now, event_id,
-                     claim_event_hash, claim_symbol, lease_token,
-                     analysis_now, pos_case.case_id, pos_case.case_hash,
-                     pos_case.canonical_json()),
-                )
-            if owned.rowcount != 1:
-                break
-
             try:
-                event, current_dispatch = self._verify_durable_authority(
-                    event_id, lease_token=lease_token,
-                    expected_event_hash=claim_event_hash,
-                    expected_symbol=claim_symbol,
-                    pos_case=pos_case,
+                admission = self._mint_analysis_admission(
+                    event_id, lease_token, claim_event_hash, claim_symbol,
+                    pos_case, analysis_now, lease_ms,
                 )
             except KeyError:
                 break
-            except Exception:  # noqa: BLE001
+            except Exception:  # noqa: BLE001 - corrupt/uncertain authority fails closed.
                 with connection(self.path) as db:
                     db.execute(
-                        """
-                        UPDATE live_position_case_dispatches
-                        SET state = 'FAILED_CLOSED', lease_token = NULL, updated_at_ms = ?
-                        WHERE event_id = ? AND lease_token = ?
-                        """,
+                        "UPDATE live_position_case_dispatches "
+                        "SET state='FAILED_CLOSED', lease_token=NULL, updated_at_ms=? "
+                        "WHERE event_id=? AND state='DISPATCHING' AND lease_token=?",
                         (now_ms, event_id, lease_token),
                     )
                 continue
 
             try:
-                await self.analysis_service.analyze_case(pos_case)
-
-                # Checkpoint 5: after analysis and before DONE transition
-                try:
-                    event, current_dispatch = self._verify_durable_authority(
-                        event_id, lease_token=lease_token,
-                        expected_event_hash=claim_event_hash,
-                        expected_symbol=claim_symbol,
-                        pos_case=pos_case,
-                    )
-                except KeyError:
-                    break
-                except Exception:  # noqa: BLE001
-                    with connection(self.path) as db:
-                        db.execute(
-                            """
-                            UPDATE live_position_case_dispatches
-                            SET state = 'FAILED_CLOSED', lease_token = NULL, updated_at_ms = ?
-                            WHERE event_id = ? AND lease_token = ?
-                            """,
-                            (now_ms, event_id, lease_token),
-                        )
-                    continue
-
+                if not admission.provider_completed:
+                    # Archival changes cannot replace the immutable admitted case.
+                    admitted_case = CasePackageV1.model_validate_json(admission.case_json)
+                    await self.analysis_service.analyze_case(admitted_case)
                 done_now = lease_now_ms()
-                with connection(self.path) as db:
-                    done = db.execute(
-                        """
-                        UPDATE live_position_case_dispatches
-                        SET state = 'DONE',
-                            case_hash = ?,
-                            position_case_hash = ?,
-                            lease_token = NULL,
-                            lease_expires_at_ms = 0,
-                            updated_at_ms = ?
-                        WHERE event_id = ? AND event_hash = ? AND symbol = ?
-                          AND state = 'DISPATCHING'
-                          AND lease_token = ? AND lease_expires_at_ms > ?
-                          AND position_case_id = ? AND position_case_json = ?
-                        """,
-                        (pos_case.case_hash, pos_case.case_hash, done_now, event_id,
-                         claim_event_hash, claim_symbol,
-                         lease_token, done_now, pos_case.case_id, pos_case.canonical_json()),
-                    )
-                if done.rowcount != 1:
-                    break
+                event = self._complete_analysis(admission, lease_token, done_now)
                 dispatched_events.append(event)
-            except Exception:  # noqa: BLE001
+            except KeyError:
+                break
+            except Exception:  # noqa: BLE001 - admitted completion is uncertain: never replay.
                 with connection(self.path) as db:
                     db.execute(
-                        """
-                        UPDATE live_position_case_dispatches
-                        SET state = CASE WHEN retry_count >= ? THEN 'FAILED_CLOSED' ELSE 'PENDING' END,
-                            lease_token = NULL,
-                            lease_expires_at_ms = 0,
-                            updated_at_ms = ?
-                        WHERE event_id = ? AND state = 'DISPATCHING' AND lease_token = ?
-                        """,
-                        (max_retries, now_ms, event_id, lease_token),
+                        "UPDATE live_position_case_dispatches "
+                        "SET state='FAILED_CLOSED', lease_token=NULL, lease_expires_at_ms=0, "
+                        "updated_at_ms=? WHERE event_id=? AND state='DISPATCHING' AND lease_token=?",
+                        (now_ms, event_id, lease_token),
                     )
 
         return tuple(dispatched_events)
