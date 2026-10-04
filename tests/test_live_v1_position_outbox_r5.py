@@ -39,6 +39,7 @@ def test_corrupt_dispatch_symbol_fails_closed_before_market_or_analysis(tmp_path
     worker, analyzed, market_symbols = _worker(path)
     event = worker.evaluate(observation(), NOW)[0]
     with connection(path) as db:
+        db.execute("DROP TRIGGER IF EXISTS trg_live_position_dispatches_immutable_authority")
         db.execute("UPDATE live_position_case_dispatches SET symbol='ETHUSDT' WHERE event_id=?", (event.event_id,))
     assert asyncio.run(worker.drain_pending_dispatches(NOW)) == ()
     assert worker.get_dispatch(event.event_id)["state"] == "FAILED_CLOSED"
@@ -50,6 +51,7 @@ def test_corrupt_event_row_symbol_fails_closed_before_market_or_analysis(tmp_pat
     worker, analyzed, market_symbols = _worker(path)
     event = worker.evaluate(observation(), NOW)[0]
     with connection(path) as db:
+        db.execute("DROP TRIGGER IF EXISTS trg_live_position_events_immutable_update")
         db.execute("UPDATE live_position_events SET symbol='ETHUSDT' WHERE event_id=?", (event.event_id,))
     assert asyncio.run(worker.drain_pending_dispatches(NOW)) == ()
     assert worker.get_dispatch(event.event_id)["state"] == "FAILED_CLOSED"

@@ -151,6 +151,9 @@ class PreExecutionValidator:
             return ValidationResult(is_valid=False, reason="ACCOUNT_AUTHORITY_MISMATCH")
         if not account_snapshot.reconciled or account_snapshot.quality != "OK":
             return ValidationResult(is_valid=False, reason="ACCOUNT_UNRECONCILED")
+        if any(position.symbol != intent.symbol and position.quantity != 0
+               for position in account_snapshot.positions):
+            return ValidationResult(is_valid=False, reason="UNCONFIGURED_POSITION_SYMBOL")
         if intent.environment == "TESTNET" and not account_snapshot.stream_connected:
             return ValidationResult(is_valid=False, reason="ACCOUNT_STREAM_DISCONNECTED")
         if (now_ms - account_snapshot.observed_at_ms) > self.max_account_staleness_ms:

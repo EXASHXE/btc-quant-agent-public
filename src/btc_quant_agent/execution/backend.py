@@ -25,9 +25,11 @@ from .intents import IntentStore, TradeIntentV1
 from .policy import ExecutionCapabilityPolicyV1
 from .protection import (
     ProtectionStore,
-    parse_protective_bool,
     parse_protective_exchange_id,
-    protective_field,
+    protective_bool_field,
+    protective_numeric_field,
+    protective_status_field,
+    protective_text_field,
 )
 
 logger = logging.getLogger(__name__)
@@ -665,7 +667,8 @@ class TestnetExecutionBackend:
             raise
         self._validate_protective_contract(intent, raw, client_id, exchange_id, quantity,
                                            allowed_statuses=frozenset({"NEW", "CANCELED", "EXPIRED"}))
-        return raw, protective_field(raw, "algoStatus", "status")
+        return raw, protective_status_field(raw, "algoStatus", "status",
+                                            allowed_statuses=frozenset({"NEW", "CANCELED", "EXPIRED"}))
 
     def _cancel_protective_stop(self, intent: TradeIntentV1, client_id: str, exchange_id: str, now_ms: int) -> None:
         try:
@@ -690,12 +693,10 @@ class TestnetExecutionBackend:
     ) -> tuple[str, float]:
         parsed_id = parse_protective_exchange_id(raw)
         try:
-            quantity = protective_field(raw, "quantity", "origQty")
-            stop = protective_field(raw, "triggerPrice", "stopPrice")
-            if isinstance(quantity, bool) or isinstance(stop, bool):
-                raise TypeError("invalid numeric protective contract")
-            quantity = float(quantity)
-            stop = float(stop)
+            quantity = protective_numeric_field(raw, "quantity", "origQty")
+            stop = protective_numeric_field(raw, "triggerPrice", "stopPrice")
+            status = protective_status_field(raw, "algoStatus", "status", allowed_statuses=allowed_statuses)
+            order_type = protective_text_field(raw, "orderType", "type", allowed_values=frozenset({"STOP_MARKET"}))
             valid = (
                 isinstance(client_id, str) and bool(client_id)
                 and raw.get("clientAlgoId") == client_id
@@ -703,18 +704,18 @@ class TestnetExecutionBackend:
                 and raw.get("symbol") == intent.symbol
                 and raw.get("side") == ("SELL" if intent.side == "BUY" else "BUY")
                 and raw.get("algoType") == "CONDITIONAL"
-                and protective_field(raw, "orderType", "type") == "STOP_MARKET"
+                and order_type == "STOP_MARKET"
                 and raw.get("workingType") == "MARK_PRICE"
-                and parse_protective_bool(raw.get("priceProtect"))
-                and not parse_protective_bool(raw.get("closePosition"))
+                and protective_bool_field(raw, "priceProtect")
+                and not protective_bool_field(raw, "closePosition")
                 and raw.get("positionSide") == "BOTH"
-                and parse_protective_bool(raw.get("reduceOnly"))
+                and protective_bool_field(raw, "reduceOnly")
                 and math.isfinite(stop) and stop == intent.stop_loss
                 and math.isfinite(quantity) and 0 < quantity <= intent.quantity
                 and (expected_quantity is None or quantity == expected_quantity)
-                and protective_field(raw, "algoStatus", "status") in allowed_statuses
+                and status in allowed_statuses
             )
-        except (ValueError, TypeError, OverflowError):
+        except (ValueError, TypeError, OverflowError, ExecutionBlocked):
             valid = False
         if not valid:
             raise ExecutionBlocked("PROTECTION_CONTRACT_MISMATCH")

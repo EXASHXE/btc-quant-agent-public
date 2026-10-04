@@ -7,6 +7,7 @@ import json
 import math
 import re
 from dataclasses import dataclass
+from decimal import Decimal, InvalidOperation
 from pathlib import Path
 from typing import Any
 
@@ -61,15 +62,162 @@ def parse_protective_bool(value: Any) -> bool:
     raise ExecutionBlocked("PROTECTION_CONTRACT_MISMATCH")
 
 
+def _parse_canonical_numeric(value: Any) -> Decimal:
+    if type(value) is bool or isinstance(value, bool):
+        raise ExecutionBlocked("PROTECTION_CONTRACT_MISMATCH")
+    if isinstance(value, (int, float)):
+        if isinstance(value, float) and not math.isfinite(value):
+            raise ExecutionBlocked("PROTECTION_CONTRACT_MISMATCH")
+        try:
+            d = Decimal(str(value))
+        except (InvalidOperation, ValueError):
+            raise ExecutionBlocked("PROTECTION_CONTRACT_MISMATCH")
+        if not d.is_finite():
+            raise ExecutionBlocked("PROTECTION_CONTRACT_MISMATCH")
+        return d
+    if isinstance(value, str):
+        val_str = value.strip()
+        if not val_str:
+            raise ExecutionBlocked("PROTECTION_CONTRACT_MISMATCH")
+        try:
+            d = Decimal(val_str)
+        except (InvalidOperation, ValueError):
+            raise ExecutionBlocked("PROTECTION_CONTRACT_MISMATCH")
+        if not d.is_finite():
+            raise ExecutionBlocked("PROTECTION_CONTRACT_MISMATCH")
+        return d
+    if isinstance(value, Decimal):
+        if not value.is_finite():
+            raise ExecutionBlocked("PROTECTION_CONTRACT_MISMATCH")
+        return value
+    raise ExecutionBlocked("PROTECTION_CONTRACT_MISMATCH")
+
+
+def protective_numeric_field(raw: dict[str, Any], primary: str, alias: str | None = None) -> float:
+    if not isinstance(raw, dict):
+        raise ExecutionBlocked("PROTECTION_CONTRACT_MISMATCH")
+    has_primary = primary in raw
+    has_alias = alias is not None and alias in raw
+    if not has_primary and not has_alias:
+        raise ExecutionBlocked("PROTECTION_CONTRACT_MISMATCH")
+    d_primary: Decimal | None = None
+    d_alias: Decimal | None = None
+    if has_primary:
+        d_primary = _parse_canonical_numeric(raw[primary])
+    if has_alias:
+        assert alias is not None
+        d_alias = _parse_canonical_numeric(raw[alias])
+    if has_primary and has_alias:
+        assert d_primary is not None and d_alias is not None
+        if d_primary != d_alias:
+            raise ExecutionBlocked("PROTECTION_CONTRACT_MISMATCH")
+        return float(d_primary)
+    if has_primary:
+        assert d_primary is not None
+        return float(d_primary)
+    assert d_alias is not None
+    return float(d_alias)
+
+
+def protective_text_field(
+    raw: dict[str, Any],
+    primary: str,
+    alias: str | None = None,
+    *,
+    allowed_values: frozenset[str] | set[str] | None = None,
+) -> str:
+    if not isinstance(raw, dict):
+        raise ExecutionBlocked("PROTECTION_CONTRACT_MISMATCH")
+    has_primary = primary in raw
+    has_alias = alias is not None and alias in raw
+    if not has_primary and not has_alias:
+        raise ExecutionBlocked("PROTECTION_CONTRACT_MISMATCH")
+    val_primary: str | None = None
+    val_alias: str | None = None
+    if has_primary:
+        v = raw[primary]
+        if not isinstance(v, str):
+            raise ExecutionBlocked("PROTECTION_CONTRACT_MISMATCH")
+        if allowed_values is not None and v not in allowed_values:
+            raise ExecutionBlocked("PROTECTION_CONTRACT_MISMATCH")
+        val_primary = v
+    if has_alias:
+        assert alias is not None
+        v = raw[alias]
+        if not isinstance(v, str):
+            raise ExecutionBlocked("PROTECTION_CONTRACT_MISMATCH")
+        if allowed_values is not None and v not in allowed_values:
+            raise ExecutionBlocked("PROTECTION_CONTRACT_MISMATCH")
+        val_alias = v
+    if has_primary and has_alias:
+        assert val_primary is not None and val_alias is not None
+        if val_primary != val_alias:
+            raise ExecutionBlocked("PROTECTION_CONTRACT_MISMATCH")
+        return val_primary
+    if has_primary:
+        assert val_primary is not None
+        return val_primary
+    assert val_alias is not None
+    return val_alias
+
+
+def protective_status_field(
+    raw: dict[str, Any],
+    primary: str,
+    alias: str | None = None,
+    *,
+    allowed_statuses: frozenset[str] | set[str],
+) -> str:
+    return protective_text_field(raw, primary, alias, allowed_values=allowed_statuses)
+
+
+def protective_bool_field(
+    raw: dict[str, Any],
+    primary: str,
+    alias: str | None = None,
+) -> bool:
+    if not isinstance(raw, dict):
+        raise ExecutionBlocked("PROTECTION_CONTRACT_MISMATCH")
+    has_primary = primary in raw
+    has_alias = alias is not None and alias in raw
+    if not has_primary and not has_alias:
+        raise ExecutionBlocked("PROTECTION_CONTRACT_MISMATCH")
+    b_primary: bool | None = None
+    b_alias: bool | None = None
+    if has_primary:
+        b_primary = parse_protective_bool(raw[primary])
+    if has_alias:
+        assert alias is not None
+        b_alias = parse_protective_bool(raw[alias])
+    if has_primary and has_alias:
+        assert b_primary is not None and b_alias is not None
+        if b_primary != b_alias:
+            raise ExecutionBlocked("PROTECTION_CONTRACT_MISMATCH")
+        return b_primary
+    if has_primary:
+        assert b_primary is not None
+        return b_primary
+    assert b_alias is not None
+    return b_alias
+
+
 def protective_field(raw: dict[str, Any], primary: str, alias: str) -> Any:
     """Missing or contradictory aliases are never confirmation defaults."""
-    if primary in raw and alias in raw and raw[primary] != raw[alias]:
+    if not isinstance(raw, dict):
         raise ExecutionBlocked("PROTECTION_CONTRACT_MISMATCH")
-    if primary in raw:
+    has_primary = primary in raw
+    has_alias = alias in raw
+    if not has_primary and not has_alias:
+        raise ExecutionBlocked("PROTECTION_CONTRACT_MISMATCH")
+    if has_primary and has_alias:
+        val_p = raw[primary]
+        val_a = raw[alias]
+        if type(val_p) is not type(val_a) or val_p != val_a:
+            raise ExecutionBlocked("PROTECTION_CONTRACT_MISMATCH")
+        return val_p
+    if has_primary:
         return raw[primary]
-    if alias in raw:
-        return raw[alias]
-    raise ExecutionBlocked("PROTECTION_CONTRACT_MISMATCH")
+    return raw[alias]
 
 
 def _owner_key(intent: Any) -> str:

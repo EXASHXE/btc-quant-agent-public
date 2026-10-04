@@ -11,6 +11,7 @@ from .config import ExecutionConfig, LiveV1Config
 from .execution.guard import ExecutionBlocked
 
 if TYPE_CHECKING:
+    from .account_watch.models import AccountSnapshotV1
     from .account_watch.service import AccountWatch
     from .decision.models import CasePackageV1
     from .decision.service import TacticalLiveService
@@ -256,7 +257,7 @@ class LiveV1Runtime:
                     await self._stop_event.wait()
             except TimeoutError:
                 try:
-                    snapshot = await self.account_watch.reconcile_rest_async()
+                    await self.account_watch.reconcile_rest_async()
                 except Exception:  # noqa: BLE001 - any REST failure blocks new risk
                     self.accepting_risk = False
                     self.blocked_reason = "ACCOUNT_REST_RECONCILIATION_FAILED"
@@ -269,21 +270,13 @@ class LiveV1Runtime:
                     self.accepting_risk = False
                     self.blocked_reason = "RUNTIME_RECOVERY_FAILED"
                     continue
-                if self._position_authority_block_reason():
+                try:
+                    self.assert_current_new_risk_authority()
+                    self.accepting_risk = True
+                    self.blocked_reason = ""
+                except ExecutionBlocked as exc:
                     self.accepting_risk = False
-                    self.blocked_reason = "LEGACY_POSITION_LIFECYCLE_AUTHORITY_UNBOUND"
-                    continue
-                authority_reason = self._snapshot_authority_reason(snapshot)
-                if authority_reason:
-                    self.accepting_risk = False
-                    self.blocked_reason = authority_reason
-                    continue
-                self.accepting_risk = bool(
-                    self.kill_switch.allows_new_risk()
-                    and (self.config.execution_mode != "TESTNET"
-                         or self.account_watch.is_stream_connected)
-                )
-                self.blocked_reason = "" if self.accepting_risk else "ACCOUNT_OR_KILL_NOT_READY"
+                    self.blocked_reason = str(exc)
 
     async def run_position_outbox(self) -> None:
         while not self._stop_event.is_set():
@@ -349,38 +342,72 @@ class LiveV1Runtime:
         if cleanup_cancelled is not None:
             raise cleanup_cancelled
 
+    def assert_current_new_risk_authority(
+        self, snapshot: AccountSnapshotV1 | None = None
+    ) -> AccountSnapshotV1:
+        if self._position_authority_block_reason():
+            raise ExecutionBlocked("LEGACY_POSITION_LIFECYCLE_AUTHORITY_UNBOUND")
+        if not self._started:
+            raise ExecutionBlocked(self.blocked_reason or "LIVE_RUNTIME_NOT_READY")
+        if not self.kill_switch.allows_new_risk():
+            raise ExecutionBlocked("KILL_SWITCH_ACTIVE")
+        if any(task.done() for task in self.tasks):
+            raise ExecutionBlocked("RUNTIME_TASK_FAILED")
+        if not self.market_stream.is_connected:
+            raise ExecutionBlocked("MARKET_STREAM_DISCONNECTED")
+        if self.config.execution_mode == "TESTNET" and not self.account_watch.is_stream_connected:
+            raise ExecutionBlocked("ACCOUNT_STREAM_DISCONNECTED")
+
+        if snapshot is None:
+            snapshot = self.account_watch.latest_snapshot()
+        if snapshot is None:
+            raise ExecutionBlocked("ACCOUNT_RECONCILIATION_REQUIRED")
+        try:
+            snapshot.verify()
+        except Exception:  # noqa: BLE001 - malformed snapshot authority blocks risk
+            raise ExecutionBlocked("POSITION_ACCOUNT_AUTHORITY_MISMATCH")
+
+        namespace = "BINANCE_TESTNET" if self.config.execution_mode == "TESTNET" else "NONE"
+        if (snapshot.environment != self.config.execution_mode
+                or snapshot.credential_namespace != namespace
+                or snapshot.account_id != self.config.account_id):
+            raise ExecutionBlocked("POSITION_ACCOUNT_AUTHORITY_MISMATCH")
+        if not snapshot.reconciled or snapshot.quality != "OK":
+            raise ExecutionBlocked("ACCOUNT_RECONCILIATION_REQUIRED")
+        if any(position.symbol != self.config.symbol and position.quantity != 0
+               for position in snapshot.positions):
+            raise ExecutionBlocked("UNCONFIGURED_POSITION_SYMBOL")
+        return snapshot
+
     async def execute_intent(self, intent_id: str) -> Any:
         if self.intent_store.has_existing_side_effect(intent_id):
             return await self.execution_service.reconcile_intent(intent_id)
-        reason = self._readiness_reason()
-        if reason:
-            raise ExecutionBlocked(reason)
+        if not self.accepting_risk:
+            raise ExecutionBlocked(self.blocked_reason or "LIVE_RUNTIME_NOT_READY")
+        initial_snapshot = self.assert_current_new_risk_authority()
         intent = self.intent_store.get_intent(intent_id)
         if intent is None:
             raise KeyError(f"unknown intent: {intent_id}")
         if intent.symbol != self.config.symbol:
             raise ExecutionBlocked("INTENT_SYMBOL_UNCONFIGURED")
         await self._refresh_case(intent.symbol)
+        latest_snapshot = self.assert_current_new_risk_authority()
+        if (latest_snapshot.account_id != initial_snapshot.account_id
+                or latest_snapshot.environment != initial_snapshot.environment
+                or latest_snapshot.credential_namespace != initial_snapshot.credential_namespace):
+            raise ExecutionBlocked("POSITION_ACCOUNT_AUTHORITY_MISMATCH")
+        if not self.accepting_risk:
+            raise ExecutionBlocked(self.blocked_reason or "LIVE_RUNTIME_NOT_READY")
         return await self.execution_service.execute_approved_intent(intent_id)
 
     def _readiness_reason(self) -> str:
         if not self._started or not self.accepting_risk:
             return self.blocked_reason or "LIVE_RUNTIME_NOT_READY"
-        if self._position_authority_block_reason():
-            return "LEGACY_POSITION_LIFECYCLE_AUTHORITY_UNBOUND"
-        if not self.kill_switch.allows_new_risk():
-            return "KILL_SWITCH_ACTIVE"
-        if any(task.done() for task in self.tasks):
-            return "RUNTIME_TASK_FAILED"
-        if not self.market_stream.is_connected:
-            return "MARKET_STREAM_DISCONNECTED"
-        snapshot = self.account_watch.latest_snapshot()
-        authority_reason = self._snapshot_authority_reason(snapshot)
-        if authority_reason:
-            return authority_reason
-        if self.config.execution_mode == "TESTNET" and not self.account_watch.is_stream_connected:
-            return "ACCOUNT_STREAM_DISCONNECTED"
-        return ""
+        try:
+            self.assert_current_new_risk_authority()
+            return ""
+        except ExecutionBlocked as exc:
+            return str(exc)
 
     def _position_authority_block_reason(self) -> bool:
         namespace = "BINANCE_TESTNET" if self.config.execution_mode == "TESTNET" else "NONE"

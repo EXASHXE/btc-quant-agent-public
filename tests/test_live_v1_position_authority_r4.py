@@ -317,6 +317,7 @@ def test_outbox_fails_closed_if_event_authority_row_disagrees_with_payload(tmp_p
                                     fresh_market_case=lambda _: market_case())
     event = supervisor.evaluate(observation(mark_price=91), NOW)[0]
     with connection(path) as db:
+        db.execute("DROP TRIGGER IF EXISTS trg_live_position_events_immutable_update")
         db.execute("UPDATE live_position_events SET account_id='other-account' WHERE event_id=?",
                    (event.event_id,))
     dispatched = asyncio.run(supervisor.drain_pending_dispatches(NOW))

@@ -1,12 +1,12 @@
 {
-  "task": "LIVE_V1_B4_B5_FINDINGS_REPAIR_R4",
+  "task": "LIVE_V1_B4_B5_FINDINGS_REPAIR_R6",
   "repository": "EXASHXE/btc-quant-agent-public",
   "task_branch": "feature/b-line-live-v1",
   "start_binding_mode": "CURRENT_BRANCH_HEAD",
-  "actual_start_sha": "c2c7cc83294f44340dd9fa1873bff760501fae12",
-  "accepted_predecessor_sha": "961a0f4d4b37cdb9365d5e5867813ff3129c14db",
+  "actual_start_sha": "a663921abf90504412d0d67b2b9c9f134f204d85",
+  "accepted_predecessor_sha": "a663921abf90504412d0d67b2b9c9f134f204d85",
   "predecessor_ancestry": "IS_ANCESTOR_VERIFIED",
-  "parent_sha": "c2c7cc83294f44340dd9fa1873bff760501fae12",
+  "parent_sha": "a663921abf90504412d0d67b2b9c9f134f204d85",
   "initial_worktree_state": "CLEAN",
   "closed_blockers": {
     "R1_01_approval_intent_singleton": {
@@ -72,6 +72,46 @@
     "R2_1_02_readonly_public_api_seal": {
       "status": "CLOSED",
       "mechanism": "removed public runtime execution POST route from api.py; separated B3 control-plane router from B4 operational runtime mode so runtime injection and runtime env flag register zero mutating routes on host API (scan/reviews/execute omitted); public REST surface remains strictly read-only GET/HEAD across all runtime configurations; Feishu callback isolated as mounted non-execution webhook; runtime status integrated into existing /execution/status; LiveV1Runtime.execute_intent retained for internal orchestration"
+    },
+    "R4_01_protective_order_confirmation": {
+      "status": "CLOSED",
+      "mechanism": "Exact authoritative query and state tracking for protective stop orders"
+    },
+    "R4_02_position_authority_scoping": {
+      "status": "CLOSED",
+      "mechanism": "Canonical environment/namespace/account/symbol/position-side key in immutable event"
+    },
+    "R4_03_position_lifecycle_v2": {
+      "status": "CLOSED",
+      "mechanism": "Required environment and namespace in observation hash and additive lifecycle_v2 table"
+    },
+    "R4_04_approval_presentation_invariant": {
+      "status": "CLOSED",
+      "mechanism": "Card display strings do not grant execution authority"
+    },
+    "R5_01_exact_id_pending_protection_recovery": {
+      "status": "CLOSED",
+      "mechanism": "Exact-ID full-contract confirmation for pending protection; persist cancel-pending and terminal-confirmed identities until remote resolution; reject missing or conflicting mandatory protective execution semantics"
+    },
+    "R5_02_shared_runtime_account_authority": {
+      "status": "CLOSED",
+      "mechanism": "Share verified runtime account authority across startup, readiness, REST reconciliation, execution admission and position polling"
+    },
+    "R5_03_dispatch_event_hash_binding": {
+      "status": "CLOSED",
+      "mechanism": "Bind dispatch and frozen PositionCase identities to the immutable PositionEvent before analysis"
+    },
+    "R6_01_typed_protective_aliases": {
+      "status": "CLOSED",
+      "mechanism": "Introduced typed protective field helpers (protective_numeric_field, protective_text_field, protective_status_field, protective_bool_field); reject bool before numeric conversion; reject NaN/Inf and non-finite values; exact Decimal canonicalization compares numeric values without coercive equality (1.0 == True rejected); malformed alias fails closed even if primary is valid"
+    },
+    "R6_02_async_runtime_authority_handoff": {
+      "status": "CLOSED",
+      "mechanism": "assert_current_new_risk_authority primitive evaluates latest verified snapshot, account_id, environment, credential namespace, quality, unconfigured nonzero positions, kill switch, tasks/streams; dual defense across await boundary + PreExecutionValidator placement-time account position check rejecting unconfigured nonzero symbols; periodic REST re-reads latest snapshot before setting accepting_risk=True"
+    },
+    "R6_03_position_event_outbox_authority_immutable": {
+      "status": "CLOSED",
+      "mechanism": "SQLite triggers trg_live_position_events_immutable_update, trg_live_position_events_immutable_delete, trg_live_position_dispatches_immutable_authority, trg_live_position_dispatches_immutable_delete block mutating or deleting authority columns; canonical _verify_durable_authority helper revalidates authority at 5 lifecycle checkpoints; SQL freeze/renew/DONE transitions bind event_hash and symbol in WHERE predicates"
     }
   },
   "sqlite_durability": {
@@ -95,50 +135,38 @@
     "git_diff_check": "PASS",
     "ruff": "PASS: ruff check .",
     "mypy": "PASS: mypy src (151 source files)",
-    "focused_tests": {
-      "command": "pytest -q tests/test_live_v1_*.py tests/test_execution*.py tests/test_market_watch*.py tests/test_api.py tests/test_v050_r02_orchestration_guards.py --tb=short",
-      "passed": 546,
-      "failed": 0,
-      "seconds": 51.15,
-      "note": "Run before final two-account dispatch test addition; that addition passed in subsequent R4 subset and is included in full suite."
+    "r6_focused_tests": {
+      "command": "pytest -q tests/test_live_v1_*_r6.py",
+      "passed": 86,
+      "failed": 0
     },
-    "r4_position_and_approval_final_subset": {
-      "passed": 24,
-      "failed": 0,
-      "seconds": 5.93
+    "r5_tests": {
+      "command": "pytest -q tests/test_live_v1_*_r5.py",
+      "passed": 77,
+      "failed": 0
     },
-    "r4_protection_and_position_initial_subset": {
-      "passed": 55,
-      "failed": 0,
-      "seconds": 11.54
-    },
-    "live_v1_collection": {
-      "collected": 336,
-      "passing_results": "INCLUDED_IN_FOCUSED_AND_FULL_GATES"
-    },
-    "b2a_b2b_regressions": {
-      "command": "pytest -q tests/test_tactical_shadow_evaluation_v2.py tests/test_tactical_grid_shadow_evaluation_v1.py --tb=short",
-      "passed": 74,
-      "failed": 0,
-      "seconds": 4.39
-    },
-    "full_pytest": {
-      "command": "pytest -q --tb=short",
-      "passed": 2345,
-      "skipped": 2,
-      "failed": 0,
-      "warnings": 8,
-      "seconds": 1029.6
+    "r4_r3_regressions": {
+      "command": "pytest -q tests/test_live_v1_*_r4.py tests/test_live_v1_*_r3.py",
+      "passed": 122,
+      "failed": 0
     },
     "live_v1_tests": {
-      "passed": 336,
-      "failed": 0,
-      "proof": "All 336 collected Live V1 cases included in passing full suite."
+      "command": "pytest -q tests/test_live_v1_*.py",
+      "passed": 499,
+      "failed": 0
     },
-    "r4_focused_tests": {
-      "passed": 58,
+    "b2a_b2b_regressions": {
+      "command": "pytest -q tests/test_tactical_*.py",
+      "passed": 128,
+      "failed": 0
+    },
+    "full_pytest": {
+      "command": "pytest -q",
+      "passed": 2508,
+      "skipped": 2,
       "failed": 0,
-      "proof": "34 protection cases plus final 24 account/lifecycle/approval cases; all also passed full suite."
+      "warnings": 9,
+      "seconds": 756.21
     }
   },
   "fences": {
@@ -157,8 +185,8 @@
     "testnet_credentialed_exchange_smoke": "NOT_RUN_CREDENTIALS_UNAVAILABLE"
   },
   "remaining_blockers": [],
-  "decision": "LIVE_V1_B4_B5_FINDINGS_REPAIRED_R4_PENDING_B5_REVALIDATION",
-  "failed_b5_target": "c2c7cc83294f44340dd9fa1873bff760501fae12",
+  "decision": "LIVE_V1_B4_B5_FINDINGS_REPAIRED_R6_PENDING_B5_REVALIDATION",
+  "failed_b5_target": "a663921abf90504412d0d67b2b9c9f134f204d85",
   "runtime": {
     "python": "3.12.3",
     "import_path": "/root/workspace/project/Quant-agent-market-watch/src/btc_quant_agent/__init__.py",
@@ -174,51 +202,18 @@
       "mypy": "1.20.2"
     }
   },
-  "tested_source_digest": "5b83676c89cc0d83b1c349a893af52406df0b34acde265c8bcfa1f7197902cba",
   "tested_source_files": {
-    "src/btc_quant_agent/execution/backend.py": "81bff3731e796145b2a51486580e3d8bd9439cb51b2f5d1a6c999c646f3e2a24",
-    "src/btc_quant_agent/execution/executor.py": "a9d7dbc848a5e89c114c31bf074f3c6805828d49be015df850f40f46be9b1e7f",
-    "src/btc_quant_agent/execution/protection.py": "63dfdd60b181abe5af47ea2d41db9b54923439cc1f9db40a0625a9d8dae16b52",
-    "src/btc_quant_agent/live_runtime.py": "4815257a3de85009ac5b1827839871828fb5206e8645cab1c0866312495f247a",
-    "src/btc_quant_agent/position_supervisor/models.py": "1647e2e2fdd2de0a42b9afd3707ffd8cede43c13d7778ca6586372d0d7ea7f5c",
-    "src/btc_quant_agent/position_supervisor/supervisor.py": "4dc8b3bd72f4c559017aeae7451b37e99a4dc452051e2a5f4e1efac94f866d8a",
-    "tests/test_live_v1_day2_e2e.py": "5621c3fdc5f21d87154451a3a4526f589f16c8c6a721082cfd0aed9d451a5c9b",
-    "tests/test_live_v1_execution_backend.py": "8c73001d5841fe43535c2c112593dd21d633f2786be3ee20fc66f59490b871b7",
-    "tests/test_live_v1_execution_recovery_r3.py": "c1a9f1f777535db2ad48cbb8b0dd3358f5df76aa13f4af4b63055c866d0cafd0",
-    "tests/test_live_v1_position_supervisor.py": "7183ca48fe02132c9d77ad51191ecf6725637a57cbd06891ea0a76198af06208",
-    "tests/test_live_v1_runtime_r2.py": "aacd52927927f0ca0228b7011afcdb3344b80277e42fd8f7d3a14b5721803024",
-    "tests/test_live_v1_runtime_recovery_r3.py": "f010987825e8b10a5feaea91a5e12c5ffc507ecdba6a9d48cdcad71c9c600706",
-    "tests/test_live_v1_approval_environment_r4.py": "bd630eda9291f3835046a887068540d1dbb5dcd51195a4501bf7ac7fc318dc4f",
-    "tests/test_live_v1_execution_protection_r4.py": "208d09df1e9c6e11a162e01bdcf1cccd9020d56cddc47c1fdcde60abb75a197f",
-    "tests/test_live_v1_position_authority_r4.py": "bf03e1e880098a9466cb1de48e1e1815f549b53ce687750261bb4505ed1f6643"
+    "src/btc_quant_agent/execution/backend.py": "d694a14d1f9af0a8fa29d3a67fcc3ad6cca8beb064022a19b64b2ec9256782e2",
+    "src/btc_quant_agent/execution/protection.py": "ec8b005e623aaf1ffc9bf197ed4115f4c7a853512533c16b87615363ba3219a9",
+    "src/btc_quant_agent/execution/validator.py": "ee7495d0231e210b4aec890e28949bfc61b4f48abc4b48bf0c91216e17f0cc4e",
+    "src/btc_quant_agent/live_runtime.py": "0af2b6805dcb64d6206d95161cf3b2b9094d3cde92611fb767b733b494708dd7",
+    "src/btc_quant_agent/position_supervisor/supervisor.py": "c594f571dbb39199074ae1fba65b501c87a289867f03927202b3f00b98bd3da9",
+    "tests/test_live_v1_execution_protection_r6.py": "317d4ee4d80f759ad2127695a0254fc495068695ccd4e3535bbaea78be4cfbfb",
+    "tests/test_live_v1_position_authority_r4.py": "2228ead8eeb62a6dafb5831ac4c511b26346480532003308bac8bf7bb239420a",
+    "tests/test_live_v1_position_outbox_r5.py": "24fea739b095da3587f6550792e29b82615283ddf5a92fe892d40d65c190e544",
+    "tests/test_live_v1_position_outbox_r6.py": "469295e7a41e6cd7bcdbaae3a5a166c21b83d402d71394733c2b6b70a297613e",
+    "tests/test_live_v1_runtime_authority_r6.py": "161fb177a979aa22e4a28b24afe4732baf7366225948281622f9e89a419d5d4d"
   },
-  "r3_safety_layers": {
-    "placement_authority": {
-      "R3_01": "backend clock gates; forced REST before setup and after setup; immutable fresh receipt under singleton claim; original expiry retained; final persisted receipt reload + risk validation; cancellation stays owned until durable result",
-      "R3_03": "shared conservative stop+fee+slippage+funding math; current risk <= remaining daily cap and current equity minus peak-equity drawdown floor; inconsistent peak rejected"
-    },
-    "execution_identity_and_ownership": {
-      "R3_02": "exact persisted owner hash and protective client ID; symbol/BOTH active-owner singleton; unknown/malformed protective contracts rejected; same-symbol existing position excluded from new entry; terminal flat owners retired and cannot adopt a later position",
-      "R3_04": "shared canonical intent/idempotency/client ID helper; recomputed self-hash cannot legitimize noncanonical IDs; persisted row/payload checks"
-    },
-    "runtime_recovery_authority": {
-      "R3_05": "durable claims/orders reconcile before new-entry TTL/Tactical/kill gates; absent claimed entry never blindly resubmitted; proven pre-entry abort can retire only after absent and flat reads; old ABORTED claim remains recoverable",
-      "R3_06": "account/symbol/BOTH lifecycle atomically stores every flat/nonflat observation and material outbox; direct reversal emits close/open; legacy state requires verified sole-account latest-snapshot binding",
-      "R3_07": "mark/book/kline each have source and receipt timestamps, hash and connected authority; every component must meet the configured max age (10s in validation fixtures, 15s runtime default)",
-      "R3_08": "API consumes one parsed LiveV1Config normalized mode; B4 takes precedence over B3; host REST read-only; authenticated Feishu callback remains separate; TESTNET explicit opt-in; LIVE/AUTONOMOUS invalid"
-    }
-  },
-  "review_followups": [
-    "strict explicit exchange entry identity fields",
-    "complete protective contract checks",
-    "exclude manual same-symbol risk aggregation",
-    "repeated execution and shutdown cancellation stays owned",
-    "retire terminal flat owners before later same-symbol activity",
-    "direct one-way sign reversals durably emit both lifecycle edges",
-    "verified legacy lifecycle migration without silent account reassignment",
-    "independent fault probes: cancel succeeds then local persistence fails; replacement reservation fails; both now fail closed and block risk",
-    "ambiguous pre-R4 DRY_RUN lifecycle authority blocks transition/startup rather than silently resetting state"
-  ],
   "required_final_safety_state": {
     "LIVE_WRITE_AUTHORITY": "NONE",
     "REAL_FUNDS_WRITE_COUNT": 0,
@@ -240,9 +235,8 @@
     "legacy protective orders without an exact owner ledger fail closed; no prefix-based adoption",
     "hedge mode and aggregate same-symbol ownership unsupported and blocked",
     "network provider and TESTNET smokes not run; no production provider integration claim",
-    "Fresh B5 coordinator must not have implemented R4; no self-authorization of B5 or real funds."
+    "Fresh B5 coordinator must not have implemented R6; no self-authorization of B5 or real funds."
   ],
-  "evidence_binding": "EXACT_PARENT_SHA_PLUS_TESTED_SOURCE_SHA256_DIGEST; final code SHA supplied by commit seal",
   "full_suite_skip_cases": [
     {
       "case": "tests.test_v051_h40_p3_controller_authority_publication.test_p3_11_production_readiness_chain_with_real_local_data",
@@ -254,92 +248,37 @@
     }
   ],
   "next_state": "FRESH_INDEPENDENT_COORDINATOR_B5_EXACT_CODE_SHA_REVALIDATION_REQUIRED",
-  "docs_publication": "NOT_REQUESTED_NOT_PERFORMED; v0.5.5-docs untouched",
-  "remote_ci": {
-    "final_target": "PENDING_COMMIT_AND_PUSH",
-    "predecessor_exact_run": 37099190279,
-    "attempt": 2,
-    "result": "2286 passed / 1 failed / 2 skipped",
-    "only_failure": "test_b2b_a34_h40_diff_remains_zero: git diff historical revision exit 128 under shallow actions/checkout",
-    "classification": "KNOWN_NONBLOCKING_CI_HARNESS_DEBT_A34_SHALLOW_CHECKOUT",
-    "full_history_local_h40_diff": "ZERO"
-  },
   "changed_files": [
     "evidence/v0.5.5/live_v1/B4_DAY2_VALIDATION.json",
     "src/btc_quant_agent/execution/backend.py",
-    "src/btc_quant_agent/execution/executor.py",
     "src/btc_quant_agent/execution/protection.py",
+    "src/btc_quant_agent/execution/validator.py",
     "src/btc_quant_agent/live_runtime.py",
-    "src/btc_quant_agent/position_supervisor/models.py",
     "src/btc_quant_agent/position_supervisor/supervisor.py",
-    "tests/test_live_v1_approval_environment_r4.py",
-    "tests/test_live_v1_day2_e2e.py",
-    "tests/test_live_v1_execution_backend.py",
-    "tests/test_live_v1_execution_protection_r4.py",
-    "tests/test_live_v1_execution_recovery_r3.py",
+    "tests/test_live_v1_execution_protection_r6.py",
     "tests/test_live_v1_position_authority_r4.py",
-    "tests/test_live_v1_position_supervisor.py",
-    "tests/test_live_v1_runtime_r2.py",
-    "tests/test_live_v1_runtime_recovery_r3.py"
+    "tests/test_live_v1_position_outbox_r5.py",
+    "tests/test_live_v1_position_outbox_r6.py",
+    "tests/test_live_v1_runtime_authority_r6.py"
   ],
-  "controller_bindings": {
-    "docs_sha": "732e6fbef8734b60d31d576506628664ed71dfc3",
-    "prompt_blob": "f6a6cf336a173c4da40989d329f5fb9e74e94589",
-    "current_authority_blob": "240affecd2f2c81410abb84c66b64dc5a3112a9f",
-    "live_dispatch_blob": "b148f427c39e2a960447366377ee25d7d0cfec58",
-    "identity_verification": "VERIFIED_WITH_GIT_OBJECT_IDENTITIES",
-    "historical_authority_full_read": false,
-    "recursive_authority_chasing": false
-  },
-  "r4_repairs": {
-    "R4_01": {
+  "r6_repairs": {
+    "R6_01": {
       "status": "IMPLEMENTED_LOCAL_MOCK_VALIDATED_PENDING_B5",
-      "mechanism": "Strict algoId/orderId parsing; RESERVED -> PENDING_CONFIRMATION persisted before POST; exact authoritative query validates exchange/client ID, symbol, exit side, STOP_MARKET, BOTH, reduceOnly, trigger, quantity, NEW; ACTIVE owner and protective execution row commit atomically. Pending identity survives uncertainty/restart; missing stop never blindly resubmits. Cancellation becomes pending before remote request; write/resize faults trip kill switch.",
-      "tests": "tests/test_live_v1_execution_protection_r4.py",
-      "cases": 34
+      "mechanism": "Strict typed protective field helpers: protective_numeric_field parses Decimal representations, rejects bool, NaN, Inf, non-finite values, and ensures exact numeric equality across aliases; protective_text_field and protective_status_field validate strings against canonical allowed sets; protective_bool_field parses strict booleans. Contradictory, missing or malformed aliases fail closed even if primary alias is valid.",
+      "tests": "tests/test_live_v1_execution_protection_r6.py",
+      "cases": 41
     },
-    "R4_02": {
+    "R6_02": {
       "status": "IMPLEMENTED_LOCAL_MOCK_VALIDATED_PENDING_B5",
-      "mechanism": "Canonical environment/namespace/account/symbol/position-side key in immutable event, additive event columns and cooldown index; legacy NULL authority cannot suppress scoped events; payload/row authority checked at dispatch. Two accounts dispatch distinct frozen cases once.",
-      "tests": "tests/test_live_v1_position_authority_r4.py"
+      "mechanism": "assert_current_new_risk_authority primitive checks latest account snapshot, verifies snapshot integrity, matching account_id, environment, namespace, quality, unconfigured nonzero positions, kill switch, and async stream/task health; dual defense with PreExecutionValidator placement-time snapshot check rejecting unconfigured nonzero symbols; periodic REST loop re-reads latest snapshot before setting accepting_risk=True.",
+      "tests": "tests/test_live_v1_runtime_authority_r6.py",
+      "cases": 9
     },
-    "R4_03": {
+    "R6_03": {
       "status": "IMPLEMENTED_LOCAL_MOCK_VALIDATED_PENDING_B5",
-      "mechanism": "Required environment and namespace in observation hash; additive lifecycle_v2 keyed by full environment/namespace/account/symbol/side authority; verified runtime snapshot/config supply authority; legacy unscoped lifecycle is isolated from TESTNET and blocks ambiguous DRY_RUN use. Flat/reopen and namespace isolation survive restart.",
-      "tests": "tests/test_live_v1_position_authority_r4.py"
-    },
-    "R4_04": {
-      "status": "REGRESSION_INVARIANT_VERIFIED",
-      "mechanism": "Card display strings do not grant execution authority. Button payload contains only action and exact proposal/case hashes; compiled intent environment comes from verified account snapshot, while execution capability/config authority separately gates TESTNET. Changing a card title to LIVE cannot grant LIVE capability.",
-      "tests": "tests/test_live_v1_approval_environment_r4.py",
-      "cases": 2
+      "mechanism": "SQLite triggers trg_live_position_events_immutable_update, trg_live_position_events_immutable_delete, trg_live_position_dispatches_immutable_authority, trg_live_position_dispatches_immutable_delete block mutating or deleting authority columns (event_id, event_hash, symbol, environment, credential_namespace, account_id, position_side, position_authority_key); 5 lifecycle checkpoint boundary revalidations via _verify_durable_authority; SQL freeze/renew/DONE transitions bind event_hash = ? AND symbol = ?.",
+      "tests": "tests/test_live_v1_position_outbox_r6.py",
+      "cases": 36
     }
-  },
-  "approval_presentation_invariant": "UI account_authority/header are display only; approval binds hashes, persisted account/config/capability controls execution environment independently.",
-  "red_green_evidence": {
-    "baseline_sha": "c2c7cc83294f44340dd9fa1873bff760501fae12",
-    "test": "test_filled_entry_malformed_stop_is_failed_closed",
-    "baseline": "FAIL: expected ExecutionBlocked not raised; fake entry fill plus null protective ID",
-    "repaired": "PASS",
-    "scope": "Read-only exact baseline checkout, synthetic clients and temporary SQLite; no network calls."
-  },
-  "independent_repair_review": {
-    "status": "SOURCE_REVIEW_AND_LOCAL_FAULT_PROBES_COMPLETE_NO_REMAINING_SOURCE_FINDINGS",
-    "scope": "R4 protection and account/lifecycle boundaries; not B5 acceptance",
-    "followup_findings_fixed": [
-      "legacy DRY_RUN lifecycle reset",
-      "post-cancel persistence/reservation fault"
-    ]
-  },
-  "local_validation_log_sha256": {
-    "r4-focused.log": "9499e4c193512bb68b92ff1062663930d2064e8e1c61308ecf442520c6bba8f8",
-    "r4-final-focused.log": "648bdd20a30d84507907ad7f37e122ac3e89cd5a867076d262942826840bcba8",
-    "r4-regressions.log": "0d84cf54d9e8afa98b40d3203472d9fd9fbc6f3865580f4a4b8e827a0c9f3896",
-    "r4-bline-regressions.log": "2cd215a44c9c95184ee403a7229042d7608c457787c0ee0a9a0cc4eec1deedcd",
-    "r4-full-suite.log": "bede65bf579cd96750ad3d3d77a500c365452dd5e8b3641cb4f3c68104353974",
-    "r4-ruff.log": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
-    "r4-mypy.log": "46068eced9129924d3b0be52573b15943bf1750d772d5fb26c8ee0dcfc5840b2",
-    "r4-public-baseline-red.log": "8bb0ca4e4241b52fb2e67f2ce4c0392728d5f00df4b738fc18b604d67f73e80c",
-    "r4-predecessor-ci.log": "fb918803531987db027b970d79d21ad2279a4456d07b413b8e25b12ceb6f5787"
   }
 }

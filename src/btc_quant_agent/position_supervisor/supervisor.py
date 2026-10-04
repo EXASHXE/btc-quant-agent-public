@@ -194,6 +194,50 @@ class PositionSupervisor:
                 "CREATE INDEX IF NOT EXISTS idx_live_position_events_authority "
                 "ON live_position_events(position_authority_key, trigger, observed_at_ms DESC)"
             )
+            db.executescript("""
+                CREATE TRIGGER IF NOT EXISTS trg_live_position_events_immutable_update
+                BEFORE UPDATE ON live_position_events
+                FOR EACH ROW
+                BEGIN
+                    SELECT RAISE(ABORT, 'POSITION_EVENT_IMMUTABLE_UPDATE_BLOCKED')
+                    WHERE OLD.event_id != NEW.event_id
+                       OR OLD.event_hash != NEW.event_hash
+                       OR OLD.symbol != NEW.symbol
+                       OR OLD.trigger != NEW.trigger
+                       OR OLD.source_hash != NEW.source_hash
+                       OR OLD.observed_at_ms != NEW.observed_at_ms
+                       OR OLD.payload != NEW.payload
+                       OR OLD.environment IS NOT NEW.environment
+                       OR OLD.credential_namespace IS NOT NEW.credential_namespace
+                       OR OLD.account_id IS NOT NEW.account_id
+                       OR OLD.position_side IS NOT NEW.position_side
+                       OR OLD.position_authority_key IS NOT NEW.position_authority_key;
+                END;
+
+                CREATE TRIGGER IF NOT EXISTS trg_live_position_events_immutable_delete
+                BEFORE DELETE ON live_position_events
+                FOR EACH ROW
+                BEGIN
+                    SELECT RAISE(ABORT, 'POSITION_EVENT_IMMUTABLE_DELETE_BLOCKED');
+                END;
+
+                CREATE TRIGGER IF NOT EXISTS trg_live_position_dispatches_immutable_authority
+                BEFORE UPDATE ON live_position_case_dispatches
+                FOR EACH ROW
+                BEGIN
+                    SELECT RAISE(ABORT, 'DISPATCH_AUTHORITY_IMMUTABLE')
+                    WHERE OLD.event_id != NEW.event_id
+                       OR OLD.event_hash != NEW.event_hash
+                       OR OLD.symbol != NEW.symbol;
+                END;
+
+                CREATE TRIGGER IF NOT EXISTS trg_live_position_dispatches_immutable_delete
+                BEFORE DELETE ON live_position_case_dispatches
+                FOR EACH ROW
+                BEGIN
+                    SELECT RAISE(ABORT, 'DISPATCH_DELETE_BLOCKED');
+                END;
+            """)
 
     def evaluate(
         self, obs: PositionObservationV1, now_ms: int
@@ -466,6 +510,90 @@ class PositionSupervisor:
                 return None
             return dict(row)
 
+    def _verify_durable_authority(
+        self,
+        event_id: str,
+        *,
+        lease_token: str | None = None,
+        expected_event_hash: str | None = None,
+        expected_symbol: str | None = None,
+        pos_case: CasePackageV1 | None = None,
+        check_lease_now: int | None = None,
+    ) -> tuple[PositionEventV1, dict[str, Any]]:
+        with connection(self.path) as db:
+            event_row = db.execute(
+                "SELECT * FROM live_position_events WHERE event_id=?",
+                (event_id,),
+            ).fetchone()
+            if event_row is None:
+                raise ValueError("position event missing")
+
+            dispatch_row = db.execute(
+                "SELECT * FROM live_position_case_dispatches WHERE event_id=?",
+                (event_id,),
+            ).fetchone()
+            if dispatch_row is None:
+                raise ValueError("dispatch row missing")
+
+        event = self.get_event(event_id)
+        if event is None:
+            raise ValueError("position event missing")
+        event.verify()
+
+        if expected_event_hash is not None and event.event_hash != expected_event_hash:
+            raise ValueError("position event hash mismatch")
+        if expected_symbol is not None and event.symbol != expected_symbol:
+            raise ValueError("position event symbol mismatch")
+
+        if (event.event_id != dispatch_row["event_id"]
+                or event.event_hash != dispatch_row["event_hash"]
+                or event.symbol != dispatch_row["symbol"]):
+            raise ValueError("event and dispatch identity mismatch")
+
+        if (event.environment is not None
+                and event.credential_namespace is not None
+                and event.account_id is not None
+                and event.position_side is not None):
+            expected_auth_key = position_authority_key(
+                event.environment, event.credential_namespace, event.account_id,
+                event.symbol, event.position_side,
+            )
+            if event.position_authority_key != expected_auth_key:
+                raise ValueError("position authority key mismatch")
+        elif event.position_authority_key is not None:
+            raise ValueError("position authority key mismatch")
+
+        dispatch_keys = dispatch_row.keys() if hasattr(dispatch_row, "keys") else tuple(dispatch_row)
+        for field in ("environment", "credential_namespace", "account_id",
+                      "position_side", "position_authority_key"):
+            if field in dispatch_keys:
+                dispatch_val = dispatch_row[field]
+                if dispatch_val is None or dispatch_val != getattr(event, field):
+                    raise ValueError(f"dispatch authority mismatch for {field}")
+
+        if lease_token is not None:
+            if dispatch_row["lease_token"] != lease_token:
+                raise KeyError("lease token mismatch")
+            if dispatch_row["state"] != "DISPATCHING":
+                raise KeyError("dispatch state not DISPATCHING")
+            if check_lease_now is not None and dispatch_row["lease_expires_at_ms"] <= check_lease_now:
+                raise KeyError("lease expired")
+
+        if pos_case is not None:
+            pos_case.verify()
+            if pos_case.position_event_hash != event.event_hash:
+                raise ValueError("case event_hash linkage mismatch")
+            if pos_case.case_id != f"pos-{event.event_id}":
+                raise ValueError("case_id linkage mismatch")
+            if pos_case.symbol != event.symbol:
+                raise ValueError("case symbol mismatch")
+            if dispatch_row["position_case_hash"] and pos_case.case_hash != dispatch_row["position_case_hash"]:
+                raise ValueError("frozen case hash mismatch")
+            if dispatch_row["position_case_json"] and pos_case.canonical_json() != dispatch_row["position_case_json"]:
+                raise ValueError("frozen case json mismatch")
+
+        return event, dict(dispatch_row)
+
     async def drain_pending_dispatches(
         self, now_ms: int, lease_ms: int = 30_000, max_retries: int = 3
     ) -> tuple[PositionEventV1, ...]:
@@ -542,24 +670,18 @@ class PositionSupervisor:
                 continue
 
             event_id = claimed_row["event_id"]
-            try:
-                event = self.get_event(event_id)
-            except ValueError:
-                event = None
-            if event is None:
-                with connection(self.path) as db:
-                    db.execute(
-                        """
-                        UPDATE live_position_case_dispatches
-                        SET state = 'FAILED_CLOSED', lease_token = NULL, updated_at_ms = ?
-                        WHERE event_id = ? AND lease_token = ?
-                        """,
-                        (now_ms, event_id, lease_token),
-                    )
-                continue
+            claim_event_hash = claimed_row["event_hash"]
+            claim_symbol = claimed_row["symbol"]
 
+            # Checkpoint 1: after claim
             try:
-                event.verify()
+                event, current_dispatch = self._verify_durable_authority(
+                    event_id, lease_token=lease_token,
+                    expected_event_hash=claim_event_hash,
+                    expected_symbol=claim_symbol,
+                )
+            except KeyError:
+                break
             except Exception:  # noqa: BLE001
                 with connection(self.path) as db:
                     db.execute(
@@ -572,26 +694,8 @@ class PositionSupervisor:
                     )
                 continue
 
-            if (event.event_id != claimed_row["event_id"]
-                    or event.event_hash != claimed_row["event_hash"]
-                    or event.symbol != claimed_row["symbol"]
-                    or any(claimed_row[field] != getattr(event, field)
-                           for field in ("environment", "credential_namespace", "account_id",
-                                         "position_side", "position_authority_key")
-                           if field in claimed_row.keys())):  # noqa: SIM118 - sqlite.Row iterates values
-                with connection(self.path) as db:
-                    db.execute(
-                        """
-                        UPDATE live_position_case_dispatches
-                        SET state = 'FAILED_CLOSED', lease_token = NULL, updated_at_ms = ?
-                        WHERE event_id = ? AND lease_token = ?
-                        """,
-                        (now_ms, event_id, lease_token),
-                    )
-                continue
-
-            stored_case_json = claimed_row["position_case_json"]
-            stored_case_id = claimed_row["position_case_id"]
+            stored_case_json = current_dispatch["position_case_json"]
+            stored_case_id = current_dispatch["position_case_id"]
 
             pos_case: CasePackageV1
             if stored_case_json:
@@ -599,7 +703,7 @@ class PositionSupervisor:
                 try:
                     pos_case = CasePackageV1.model_validate_json(stored_case_json)
                     pos_case.verify()
-                    if any(claimed_row[field] and pos_case.case_hash != claimed_row[field]
+                    if any(current_dispatch[field] and pos_case.case_hash != current_dispatch[field]
                            for field in ("position_case_hash", "case_hash")):
                         raise ValueError("stored case hash mismatch")
                     if stored_case_id and pos_case.case_id != stored_case_id:
@@ -623,6 +727,27 @@ class PositionSupervisor:
                         )
                     continue
             else:
+                # Checkpoint 2: immediately before first external fresh-market call
+                try:
+                    event, current_dispatch = self._verify_durable_authority(
+                        event_id, lease_token=lease_token,
+                        expected_event_hash=claim_event_hash,
+                        expected_symbol=claim_symbol,
+                    )
+                except KeyError:
+                    break
+                except Exception:  # noqa: BLE001
+                    with connection(self.path) as db:
+                        db.execute(
+                            """
+                            UPDATE live_position_case_dispatches
+                            SET state = 'FAILED_CLOSED', lease_token = NULL, updated_at_ms = ?
+                            WHERE event_id = ? AND lease_token = ?
+                            """,
+                            (now_ms, event_id, lease_token),
+                        )
+                    continue
+
                 # 3.3 First materialization: obtain base case once and freeze PositionCase before calling analysis
                 try:
                     base_case = self.fresh_market_case(event.symbol)
@@ -647,6 +772,28 @@ class PositionSupervisor:
                         )
                     continue
 
+                # Checkpoint 3: after fresh-market materialization and before freezing
+                try:
+                    event, current_dispatch = self._verify_durable_authority(
+                        event_id, lease_token=lease_token,
+                        expected_event_hash=claim_event_hash,
+                        expected_symbol=claim_symbol,
+                        pos_case=pos_case,
+                    )
+                except KeyError:
+                    break
+                except Exception:  # noqa: BLE001
+                    with connection(self.path) as db:
+                        db.execute(
+                            """
+                            UPDATE live_position_case_dispatches
+                            SET state = 'FAILED_CLOSED', lease_token = NULL, updated_at_ms = ?
+                            WHERE event_id = ? AND lease_token = ?
+                            """,
+                            (now_ms, event_id, lease_token),
+                        )
+                    continue
+
                 # Commit durable freeze to SQLite before external side effect
                 freeze_now = lease_now_ms()
                 with connection(self.path) as db:
@@ -658,7 +805,8 @@ class PositionSupervisor:
                             position_case_json = ?,
                             case_hash = ?,
                             updated_at_ms = ?
-                        WHERE event_id = ? AND state = 'DISPATCHING'
+                        WHERE event_id = ? AND event_hash = ? AND symbol = ?
+                          AND state = 'DISPATCHING'
                           AND lease_token = ? AND lease_expires_at_ms > ?
                           AND position_case_json = ''
                         """,
@@ -669,6 +817,8 @@ class PositionSupervisor:
                             pos_case.case_hash,
                             freeze_now,
                             event_id,
+                            claim_event_hash,
+                            claim_symbol,
                             lease_token,
                             freeze_now,
                         ),
@@ -676,20 +826,21 @@ class PositionSupervisor:
                 if frozen.rowcount != 1:
                     break
 
-            # A lease can expire while materializing the case. Renew only if this
-            # worker still owns the exact frozen authority before external analysis.
+            # Checkpoint 4: immediately before provider/analysis call
             analysis_now = lease_now_ms()
             with connection(self.path) as db:
                 owned = db.execute(
                     """
                     UPDATE live_position_case_dispatches
                     SET lease_expires_at_ms = ?, updated_at_ms = ?
-                    WHERE event_id = ? AND state = 'DISPATCHING'
+                    WHERE event_id = ? AND event_hash = ? AND symbol = ?
+                      AND state = 'DISPATCHING'
                       AND lease_token = ? AND lease_expires_at_ms > ?
                       AND position_case_id = ? AND position_case_hash = ?
                       AND position_case_json = ?
                     """,
-                    (analysis_now + lease_ms, analysis_now, event_id, lease_token,
+                    (analysis_now + lease_ms, analysis_now, event_id,
+                     claim_event_hash, claim_symbol, lease_token,
                      analysis_now, pos_case.case_id, pos_case.case_hash,
                      pos_case.canonical_json()),
                 )
@@ -697,7 +848,50 @@ class PositionSupervisor:
                 break
 
             try:
+                event, current_dispatch = self._verify_durable_authority(
+                    event_id, lease_token=lease_token,
+                    expected_event_hash=claim_event_hash,
+                    expected_symbol=claim_symbol,
+                    pos_case=pos_case,
+                )
+            except KeyError:
+                break
+            except Exception:  # noqa: BLE001
+                with connection(self.path) as db:
+                    db.execute(
+                        """
+                        UPDATE live_position_case_dispatches
+                        SET state = 'FAILED_CLOSED', lease_token = NULL, updated_at_ms = ?
+                        WHERE event_id = ? AND lease_token = ?
+                        """,
+                        (now_ms, event_id, lease_token),
+                    )
+                continue
+
+            try:
                 await self.analysis_service.analyze_case(pos_case)
+
+                # Checkpoint 5: after analysis and before DONE transition
+                try:
+                    event, current_dispatch = self._verify_durable_authority(
+                        event_id, lease_token=lease_token,
+                        expected_event_hash=claim_event_hash,
+                        expected_symbol=claim_symbol,
+                        pos_case=pos_case,
+                    )
+                except KeyError:
+                    break
+                except Exception:  # noqa: BLE001
+                    with connection(self.path) as db:
+                        db.execute(
+                            """
+                            UPDATE live_position_case_dispatches
+                            SET state = 'FAILED_CLOSED', lease_token = NULL, updated_at_ms = ?
+                            WHERE event_id = ? AND lease_token = ?
+                            """,
+                            (now_ms, event_id, lease_token),
+                        )
+                    continue
 
                 done_now = lease_now_ms()
                 with connection(self.path) as db:
@@ -710,11 +904,13 @@ class PositionSupervisor:
                             lease_token = NULL,
                             lease_expires_at_ms = 0,
                             updated_at_ms = ?
-                        WHERE event_id = ? AND state = 'DISPATCHING'
+                        WHERE event_id = ? AND event_hash = ? AND symbol = ?
+                          AND state = 'DISPATCHING'
                           AND lease_token = ? AND lease_expires_at_ms > ?
                           AND position_case_id = ? AND position_case_json = ?
                         """,
                         (pos_case.case_hash, pos_case.case_hash, done_now, event_id,
+                         claim_event_hash, claim_symbol,
                          lease_token, done_now, pos_case.case_id, pos_case.canonical_json()),
                     )
                 if done.rowcount != 1:
