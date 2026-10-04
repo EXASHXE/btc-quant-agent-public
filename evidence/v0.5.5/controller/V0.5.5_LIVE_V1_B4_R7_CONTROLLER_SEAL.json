@@ -1,0 +1,87 @@
+{
+  "task": "LIVE_V1_B4_R7_CONTROLLER_EXACT_SHA_SEAL",
+  "implementation_branch": "feature/b-line-live-v1",
+  "sealed_sha": "fde61dafb301d5bd5af3dc7eb81e5618f979036c",
+  "parent_sha": "b3dcf4230e08e30c5d6a1d70916e11ae987f35a5",
+  "decision": "LIVE_V1_B4_R7_EXACT_SHA_SEALED_PENDING_B5_R7_INDEPENDENT_REVALIDATION",
+  "changed_files": [
+    "evidence/v0.5.5/live_v1/B4_DAY2_VALIDATION.json",
+    "src/btc_quant_agent/position_supervisor/supervisor.py",
+    "tests/test_live_v1_position_outbox_r7.py"
+  ],
+  "controller_source_review": {
+    "r7_authority_capsule": "PASS",
+    "r7_atomic_analysis_admission": "PASS",
+    "r7_terminal_done_binding": "PASS",
+    "completion_marker_atomic_with_done": "PASS",
+    "preexisting_case_hash_terminal_validation": "PASS",
+    "residual_r6_f03_toctou": "PASS_FOR_INDEPENDENT_REVALIDATION",
+    "crash_retry_semantics": "PASS_FOR_INDEPENDENT_REVALIDATION",
+    "new_r8_blocker": false
+  },
+  "local_machine_evidence": {
+    "r7_focused": {
+      "passed": 67,
+      "failed": 0,
+      "skipped": 0
+    },
+    "r6_focused": {
+      "passed": 86,
+      "failed": 0,
+      "skipped": 0
+    },
+    "r5_focused": {
+      "passed": 77,
+      "failed": 0,
+      "skipped": 0
+    },
+    "r3_r4": {
+      "passed": 122,
+      "failed": 0,
+      "skipped": 0
+    },
+    "all_live_v1": {
+      "passed": 566,
+      "failed": 0,
+      "skipped": 0
+    },
+    "tactical": {
+      "passed": 128,
+      "failed": 0,
+      "skipped": 0
+    },
+    "execution_account_supervisor_runtime": {
+      "passed": 486,
+      "failed": 0,
+      "skipped": 0
+    },
+    "position_supervisor_outbox": {
+      "passed": 175,
+      "failed": 0,
+      "skipped": 0
+    },
+    "r02": {
+      "passed": 26,
+      "failed": 0,
+      "skipped": 0
+    },
+    "full_pytest": {
+      "passed": 2575,
+      "failed": 0,
+      "skipped": 2
+    },
+    "compileall": "PASS",
+    "git_diff_check": "PASS",
+    "ruff": "PASS",
+    "mypy": "PASS"
+  },
+  "remote_ci": "NO_REMOTE_CI_OR_COMMIT_STATUS_OBSERVED__B5_MUST_REEXECUTE",
+  "b5_r7_authorized": true,
+  "safety": {
+    "live_write_authority": "NONE",
+    "live_approval_only": "NOT_AUTHORIZED",
+    "real_funds_write_count": 0,
+    "autonomous_live": "FORBIDDEN"
+  },
+  "next_state": "LIVE_V1_B5_R7_INDEPENDENT_EXACT_SHA_REVALIDATION"
+}
