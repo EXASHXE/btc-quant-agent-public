@@ -1,0 +1,232 @@
+{
+  "schema": "V0.5.5_B5_LIVE_V1_R7_INDEPENDENT_EXACT_SHA_REVALIDATION_EVIDENCE_V1",
+  "decision": "LIVE_V1_INDEPENDENT_VALIDATION_FAILED",
+  "identity_gate": {
+    "status": "PASS",
+    "validated_sha": "fde61dafb301d5bd5af3dc7eb81e5618f979036c",
+    "parent_sha": "b3dcf4230e08e30c5d6a1d70916e11ae987f35a5",
+    "controller_dispatch_sha": "90165893751a5465bf65672cfb74a29ad2cc9c4b",
+    "fresh_checkout": {
+      "path": "/tmp/quant-agent-r7-validation",
+      "clone_mode": "git clone --no-hardlinks",
+      "shallow": false,
+      "detached": true,
+      "clean": true,
+      "runtime_import": "/tmp/quant-agent-r7-validation/src/btc_quant_agent/position_supervisor/supervisor.py"
+    },
+    "changed_files": [
+      "src/btc_quant_agent/position_supervisor/supervisor.py",
+      "tests/test_live_v1_position_outbox_r7.py",
+      "evidence/v0.5.5/live_v1/B4_DAY2_VALIDATION.json"
+    ],
+    "original_implementation_branch_clean": true
+  },
+  "independence_gate": {
+    "status": "PASS",
+    "basis": "Fresh coordinating context; prompt fetched at exact controller dispatch SHA; independent V1-V7 behavioral probes written and run against fresh clone. R7 tests are supporting checks only, not behavior proof."
+  },
+  "tool_versions": {
+    "python": "3.13.13",
+    "pytest": "8.4.2",
+    "ruff": "0.16.9",
+    "mypy": "1.20.2 (compiled: yes)"
+  },
+  "implementation_mutation": "NONE",
+  "independent_probes": {
+    "V1": {
+      "status": "PASS",
+      "method": "Rebuilt canonical sorted JSON capsule and SHA-256 values independently; checked event/account/environment/namespace/side/authority key plus frozen case and lease binding.",
+      "observed": "capsule JSON, authority hash, admission hash and stored frozen case matched"
+    },
+    "V2": {
+      "status": "PASS_FOR_EXERCISED_CASES",
+      "probes": [
+        "dispatch symbol mismatch before claim",
+        "event storage symbol mismatch after fresh materialization and before freeze",
+        "existing case_hash corruption injected immediately before admission mint"
+      ],
+      "observed": "invalid authority cases minted no admission, invoked provider 0 times and did not reach DONE"
+    },
+    "V3": {
+      "status": "PASS",
+      "method": "Mutated archived frozen case JSON at provider entry after admission.",
+      "observed": "provider had received the exact admitted CasePackage object; tampered archive prevented terminal DONE"
+    },
+    "V4": {
+      "status": "PASS_FOR_TESTED_TERMINAL_FIELDS",
+      "mutations": [
+        "event authority mismatch",
+        "position_case_id",
+        "position_case_hash",
+        "position_case_json",
+        "case_hash"
+      ],
+      "observed": "all five post-provider mutations left analysis_completed=0 and prevented DONE"
+    },
+    "V5": {
+      "status": "FAIL",
+      "blocked_cases": [
+        "ordinary UPDATE fabrication",
+        "lease token loss",
+        "admission hash mismatch",
+        "frozen-case mismatch",
+        "terminal rollback"
+      ],
+      "ordinary_valid_completion": "DONE and analysis_completed committed together once",
+      "fabrication_reproduction": {
+        "fixture": "fresh disposable SQLite database; normal event+dispatch created; no provider called",
+        "sqlite_recursive_triggers": 0,
+        "dispatch_triggers_installed": [
+          "trg_live_position_analysis_completion_guard",
+          "trg_live_position_dispatch_admission_immutable",
+          "trg_live_position_dispatches_immutable_authority",
+          "trg_live_position_dispatches_immutable_delete"
+        ],
+        "statement": "INSERT OR REPLACE INTO live_position_case_dispatches(event_id,event_hash,symbol,state,analysis_completed,created_at_ms,updated_at_ms) VALUES (?, ?, ?, 'DONE', 1, ?, ?)",
+        "provider_calls": 0,
+        "poststate": {
+          "state": "DONE",
+          "analysis_completed": 1,
+          "analysis_admission_hash": "",
+          "dispatch_authority_hash": "",
+          "position_case_id": "",
+          "position_case_hash": "",
+          "position_case_json": "",
+          "case_hash": ""
+        },
+        "root_cause": "Completion guard applies only to UPDATE OF analysis_completed; SQLite REPLACE implicit delete does not run delete trigger when recursive_triggers=0."
+      }
+    },
+    "V6": {
+      "status": "PASS_NORMAL_TRANSITIONS_WITH_BOUNDED_RECOVERY_LIMITATION",
+      "cases": {
+        "provider error with unknown completion": "one provider invocation; admission persisted; no replay on restart",
+        "crash after admission before provider": "expired restart failed closed; zero provider invocations",
+        "provider completed but terminal rejects": "one provider invocation; no DONE/marker",
+        "expired uncertain admission": "failed closed without replay",
+        "safe unadmitted frozen retry": "retried exact persisted case; fresh-market called once total",
+        "durable completed receipt finalization": "normal retry_count replay finalized DONE with no provider recall",
+        "completed receipt at retry cap": "fixture restored DONE row to expired DISPATCHING with retry_count=3; restart marked FAILED_CLOSED, retained marker, and made no provider recall; state not reachable in ordinary R7 completion"
+      }
+    },
+    "V7": {
+      "status": "PASS",
+      "fixture": "Disposable legacy dispatch table created by dropping four R7 columns from fresh schema, then 8 simultaneous PositionSupervisor constructors.",
+      "observed": "all constructors returned; all four R7 columns present after serialized additive migration"
+    }
+  },
+  "regression_gates": {
+    "r7_focused": {
+      "command": "pytest -q tests/test_live_v1_position_outbox_r7.py",
+      "status": "PASS",
+      "passed": 67
+    },
+    "r6_execution_protection": {
+      "status": "PASS",
+      "passed": 41
+    },
+    "r6_position_outbox": {
+      "status": "PASS",
+      "passed": 36
+    },
+    "r6_wildcard": {
+      "command": "pytest -q tests/test_live_v1_*_r6.py",
+      "status": "NOT_COMPLETED",
+      "collected": 86,
+      "completed_subfiles": {
+        "execution_protection": 41,
+        "position_outbox": 36
+      },
+      "blocking_test": "tests/test_live_v1_runtime_authority_r6.py::test_handoff_rejects_account_change_during_await",
+      "interrupted_exit": 130,
+      "diagnostic": "faulthandler showed main thread waiting in asyncio event loop during asyncio.runners.close; no test changed or skipped"
+    },
+    "r5_wildcard": {
+      "command": "pytest -q tests/test_live_v1_*_r5.py",
+      "status": "PASS",
+      "passed": 77
+    },
+    "r3_r4": {
+      "command": "pytest -q tests/test_live_v1_*_r4.py tests/test_live_v1_*_r3.py",
+      "status": "NOT_COMPLETED",
+      "collected": 122,
+      "blocking_test": "test_restart_expired_authority_reconciles_active_order_and_protection",
+      "interrupted_exit": 130,
+      "diagnostic": "async loop/executor shutdown wait pattern"
+    },
+    "all_live_v1": {
+      "command": "pytest -q tests/test_live_v1_*.py",
+      "status": "NOT_COMPLETED",
+      "diagnostic": "stalled during runtime tests; interrupted; no skips/xfails"
+    },
+    "tactical": {
+      "command": "pytest -q tests/test_tactical_*.py",
+      "status": "PASS",
+      "passed": 128
+    },
+    "r02_governance": {
+      "command": "pytest -q tests/test_v050_r02_orchestration_guards.py",
+      "status": "PASS",
+      "passed": 26
+    },
+    "full_suite": {
+      "command": "timeout 120s pytest -q",
+      "status": "NOT_COMPLETED",
+      "collected": 2577,
+      "passed_before_stall": 148,
+      "exit": 124,
+      "blocking_test": "tests/test_live_v1_account_stream_r2.py::test_user_stream_uses_allowlisted_testnet_url_and_closes_listen_key",
+      "diagnostic": "bounded verbose/faulthandler run showed the test awaiting in asyncio.run at line 126; thread was waiting in concurrent.futures.thread._worker"
+    },
+    "compileall": {
+      "command": "python -m compileall -q src tests",
+      "status": "PASS"
+    },
+    "diff_check": {
+      "command": "git diff --check",
+      "status": "PASS"
+    },
+    "ruff": {
+      "command": "ruff check .",
+      "status": "PASS"
+    },
+    "mypy": {
+      "command": "mypy src",
+      "status": "PASS",
+      "source_files": 151
+    }
+  },
+  "frozen_findings": {
+    "F01": {
+      "status": "PASS",
+      "current_gate": "R6 execution protection 41/41",
+      "prior_artifact": "evidence/v0.5.5/live_v1/B4_DAY2_VALIDATION.json"
+    },
+    "F02": {
+      "status": "NOT_COMPLETED",
+      "current_gate": "R6 runtime authority wildcard stalled in asyncio loop shutdown",
+      "prior_artifact": "evidence/v0.5.5/live_v1/B4_DAY2_VALIDATION.json"
+    }
+  },
+  "prior_safety_matrix": {
+    "reference": "evidence/v0.5.5/live_v1/B4_DAY2_VALIDATION.json",
+    "current_observations": "No R7 live exchange mutation endpoint introduced; no credentials or network calls; repository has pre-existing app-level POST routes outside R7 diff."
+  },
+  "safety_terminal_state": {
+    "LIVE_WRITE_AUTHORITY": "NONE",
+    "REAL_FUNDS_WRITE_COUNT": 0,
+    "LIVE_APPROVAL_ONLY": "NOT_AUTHORIZED",
+    "AUTONOMOUS_LIVE": "FORBIDDEN",
+    "PUBLIC_REST_MUTATION_SURFACES": 0,
+    "scope": "live exchange-order mutation surfaces introduced by R7",
+    "testnet_network_smoke": "NOT_RUN"
+  },
+  "blockers": [
+    "V5 SQLite INSERT OR REPLACE fabricates DONE plus analysis_completed=1 without admission/provider.",
+    "R6, R3/R4, all Live V1 and full pytest gates not completed due async executor/loop shutdown stalls."
+  ],
+  "validation_branch": "validation/v0.5.5-live-v1-b5-r7-independent-20261005",
+  "report_path": "reviews/v0.5/live_v1/V0.5.5_LIVE_V1_B5_R7_INDEPENDENT_EXACT_SHA_REVALIDATION_REPORT.md",
+  "evidence_path": "evidence/v0.5.5/live_v1/B5_R7_INDEPENDENT_EXACT_SHA_REVALIDATION/EVIDENCE.json",
+  "publication_binding": "One commit with only the report and this evidence file; direct parent is CONTROLLER_DISPATCH_SHA. Publication commit SHA is available from validation branch tip."
+}
