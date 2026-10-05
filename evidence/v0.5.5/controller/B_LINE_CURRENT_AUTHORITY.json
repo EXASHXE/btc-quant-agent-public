@@ -180,7 +180,13 @@
     "live_v1_b4_r8_findings": [
       "R7-V5-REPLACE_COMPLETION_FABRICATION"
     ],
-    "live_v1_b4_r8_scope": "COMPLETION_FABRICATION_SEAL_ONLY"
+    "live_v1_b4_r8_scope": "COMPLETION_FABRICATION_SEAL_ONLY",
+    "live_v1_b4_r8_fixture_scope_extension_authorized": true,
+    "live_v1_b4_r8_fixture_scope_extension_files": [
+      "tests/test_live_v1_position_authority_r4.py",
+      "tests/test_live_v1_position_supervisor.py"
+    ],
+    "live_v1_b4_r8_fixture_scope_extension_mode": "MECHANICAL_FIXTURE_ONLY__NO_ASSERTION_WEAKENING__NO_PRODUCTION_GUARD_RELAXATION"
   },
   "must_read": [],
   "validation_authority": {
@@ -376,5 +382,9 @@
   "live_v1_b4_r8_prompt": {
     "path": "prompts/v0.5/repair/v0.5.5_B4_LIVE_V1_B5_FINDINGS_REPAIR_R8_COMPLETION_FABRICATION_SEAL.md",
     "blob_sha": "e6f843f80cd64c838f027853db787628f4ce5321"
+  },
+  "live_v1_b4_r8_fixture_scope_authority": {
+    "path": "reviews/v0.5/live_v1/V0.5.5_LIVE_V1_R8_FIXTURE_SCOPE_AUTHORIZATION.md",
+    "blob_sha": "fb5c1e2d02d42f63b83ac54796ac6e5addce7aa4"
   }
 }
