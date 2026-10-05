@@ -1,6 +1,6 @@
 {
   "line": "B_LINE",
-  "stage": "B2B_ACCEPTED__LIVE_V1_B3_ACCEPTED__R7_CONTROLLER_SEALED__B5_R7_AUTHORIZED",
+  "stage": "B2B_ACCEPTED__LIVE_V1_B3_ACCEPTED__B5_R7_FAILED__R8_AUTHORIZED",
   "code_branch": "feature/tactical-policy-r2",
   "accepted_code_sha": "52c16a28153de307dc6132c0975fe29341a0a918",
   "docs_authority_commit": "6319ddbaddd69d5522696992ec1565169da88e03",
@@ -36,7 +36,7 @@
     "live_v1_day2_target_write": "TESTNET_ONLY",
     "provider_credential_smoke": "PENDING",
     "live_store_concurrency_gate": "B4_MUST_ESTABLISH_WAL_OR_EQUIVALENT",
-    "live_v1_b4_state": "R7_EXACT_SHA_SEALED_PENDING_B5_R7_INDEPENDENT_REVALIDATION",
+    "live_v1_b4_state": "R7_INDEPENDENT_REVALIDATION_FAILED_PENDING_R8",
     "live_v1_b4_candidate_sha": "fd42f2cc1a67506d05117e3daa9a072309f7f998",
     "live_v1_b4_candidate_parent_sha": "961a0f4d4b37cdb9365d5e5867813ff3129c14db",
     "live_v1_b4_repair_authorized": true,
@@ -65,7 +65,7 @@
     "live_v1_b5_target_sha": "fde61dafb301d5bd5af3dc7eb81e5618f979036c",
     "live_v1_b5_expected_parent_sha": "b3dcf4230e08e30c5d6a1d70916e11ae987f35a5",
     "live_v1_b5_validator": "FULLY_FRESH_COORDINATING_SESSION",
-    "live_v1_b5_last_target_sha": "b3dcf4230e08e30c5d6a1d70916e11ae987f35a5",
+    "live_v1_b5_last_target_sha": "fde61dafb301d5bd5af3dc7eb81e5618f979036c",
     "live_v1_b5_last_decision": "LIVE_V1_INDEPENDENT_VALIDATION_FAILED",
     "live_v1_b4_r2_authorized": true,
     "live_v1_b4_r2_findings": [
@@ -144,7 +144,7 @@
     "live_v1_b4_r6_parent_sha": "a663921abf90504412d0d67b2b9c9f134f204d85",
     "live_v1_b4_r6_controller_sealed": true,
     "live_v1_b5_r6_authorized": false,
-    "live_v1_next_action": "LIVE_V1_B5_R7_INDEPENDENT_EXACT_SHA_REVALIDATION",
+    "live_v1_next_action": "LIVE_V1_B4_B5_FINDINGS_REPAIR_R8_COMPLETION_FABRICATION_SEAL",
     "live_v1_b5_r5_findings": [
       "HIGH_PROTECTIVE_TYPED_ALIAS_AMBIGUITY",
       "HIGH_RUNTIME_AUTHORITY_ASYNC_HANDOFF_STALE",
@@ -169,10 +169,18 @@
     "live_v1_b4_r7_controller_sealed": true,
     "live_v1_b4_r7_source_review": "PASS_NO_NEW_R8_BLOCKER",
     "live_v1_b4_r7_remote_ci": "NO_REMOTE_CI_OR_COMMIT_STATUS_OBSERVED__B5_MUST_REEXECUTE",
-    "live_v1_b5_r7_authorized": true,
+    "live_v1_b5_r7_authorized": false,
     "live_v1_b5_r7_target_sha": "fde61dafb301d5bd5af3dc7eb81e5618f979036c",
     "live_v1_b5_r7_expected_parent_sha": "b3dcf4230e08e30c5d6a1d70916e11ae987f35a5",
-    "live_v1_b5_r7_validator": "FULLY_FRESH_COORDINATING_SESSION"
+    "live_v1_b5_r7_validator": "FULLY_FRESH_COORDINATING_SESSION",
+    "live_v1_b5_r7_decision": "LIVE_V1_INDEPENDENT_VALIDATION_FAILED",
+    "live_v1_b5_r7_validation_publication": "validation/v0.5.5-live-v1-b5-r7-independent-20261005@9d5ca2da3c11fb3a6680c20b00808f22c760359d",
+    "live_v1_b5_r7_blocker": "R7-V5-REPLACE_COMPLETION_FABRICATION",
+    "live_v1_b4_r8_authorized": true,
+    "live_v1_b4_r8_findings": [
+      "R7-V5-REPLACE_COMPLETION_FABRICATION"
+    ],
+    "live_v1_b4_r8_scope": "COMPLETION_FABRICATION_SEAL_ONLY"
   },
   "must_read": [],
   "validation_authority": {
@@ -197,7 +205,7 @@
     "evidence_path": "evidence/v0.5.5/controller/V0.5.5_B2B_CONTROLLER_ACCEPTANCE.json",
     "evidence_blob_sha": "73a11708a85b5f1896397d745c3b7252d3c51f8d"
   },
-  "parallel_authorized_next_stage": "LIVE_V1_B5_R7_INDEPENDENT_EXACT_SHA_REVALIDATION",
+  "parallel_authorized_next_stage": "LIVE_V1_B4_B5_FINDINGS_REPAIR_R8_COMPLETION_FABRICATION_SEAL",
   "live_v1_acceptance_authority": {
     "report_path": "reviews/v0.5/live_v1/V0.5.5_LIVE_V1_B3_CONTROLLER_ACCEPTANCE.md",
     "report_blob_sha": "21ad4492feb4750f5fc85a5f88b54d1da36c157d",
@@ -354,5 +362,19 @@
     "dispatch_path": "evidence/v0.5.5/controller/B_LINE_LIVE_V1_B5_R7_CURRENT_DISPATCH.json",
     "dispatch_blob_sha": "9575c14e5142b10fa9db0feb908a7db3b34e5fcd",
     "controller_dispatch_sha": "SUPPLIED_OUT_OF_BAND_AS_THIS_PUBLICATION_COMMIT_SHA"
+  },
+  "live_v1_b5_r7_failure_authority": {
+    "report_path": "reviews/v0.5/live_v1/V0.5.5_LIVE_V1_B5_R7_CONTROLLER_ADJUDICATION.md",
+    "report_blob_sha": "766dd9b7b53c95a5a657f219a7c6a53338494528",
+    "evidence_path": "evidence/v0.5.5/controller/V0.5.5_LIVE_V1_B5_R7_CONTROLLER_ADJUDICATION.json",
+    "evidence_blob_sha": "5ee635e446ae9bb95f0520ea51d08a863c8dda82",
+    "source_validation_branch": "validation/v0.5.5-live-v1-b5-r7-independent-20261005",
+    "source_validation_commit": "9d5ca2da3c11fb3a6680c20b00808f22c760359d",
+    "source_report_blob": "0d0ef1a0c92933e476d6dbb0c83634b4e363d84e",
+    "source_evidence_blob": "8501cb0ddb0a3c1866febd38d7357b57da64367c"
+  },
+  "live_v1_b4_r8_prompt": {
+    "path": "prompts/v0.5/repair/v0.5.5_B4_LIVE_V1_B5_FINDINGS_REPAIR_R8_COMPLETION_FABRICATION_SEAL.md",
+    "blob_sha": "e6f843f80cd64c838f027853db787628f4ce5321"
   }
 }

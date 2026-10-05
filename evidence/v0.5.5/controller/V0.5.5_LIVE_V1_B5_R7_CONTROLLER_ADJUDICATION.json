@@ -1,0 +1,38 @@
+{
+  "task": "LIVE_V1_B5_R7_CONTROLLER_ADJUDICATION",
+  "validated_sha": "fde61dafb301d5bd5af3dc7eb81e5618f979036c",
+  "validation_branch": "validation/v0.5.5-live-v1-b5-r7-independent-20261005",
+  "validation_commit": "9d5ca2da3c11fb3a6680c20b00808f22c760359d",
+  "validation_report_blob": "0d0ef1a0c92933e476d6dbb0c83634b4e363d84e",
+  "validation_evidence_blob": "8501cb0ddb0a3c1866febd38d7357b57da64367c",
+  "decision": "LIVE_V1_INDEPENDENT_VALIDATION_FAILED",
+  "controller_disposition": "ACCEPT_FAIL",
+  "identity_gate": "PASS",
+  "independence_gate": "PASS",
+  "implementation_mutation": "NONE",
+  "blocker": {
+    "id": "R7-V5-REPLACE_COMPLETION_FABRICATION",
+    "severity": "BLOCKER",
+    "class": "DURABLE_COMPLETION_AUTHORITY_FABRICATION",
+    "confirmed": true
+  },
+  "retained_independent_results": {
+    "V1": "PASS",
+    "V2": "PASS_FOR_EXERCISED_CASES",
+    "V3": "PASS",
+    "V4": "PASS_FOR_TESTED_TERMINAL_FIELDS",
+    "V5": "FAIL",
+    "V6": "PASS_NORMAL_TRANSITIONS_WITH_BOUNDED_RECOVERY_LIMITATION",
+    "V7": "PASS"
+  },
+  "regression_gate_classification": "OPERATIONAL_INFRASTRUCTURE_FAILURE__ASYNC_EXECUTOR_SHUTDOWN_STALL",
+  "r8_authorized": true,
+  "r8_scope": "COMPLETION_FABRICATION_SEAL_ONLY",
+  "safety": {
+    "live_write_authority": "NONE",
+    "real_funds_write_count": 0,
+    "live_approval_only": "NOT_AUTHORIZED",
+    "autonomous_live": "FORBIDDEN"
+  },
+  "next_state": "LIVE_V1_B4_B5_FINDINGS_REPAIR_R8_COMPLETION_FABRICATION_SEAL"
+}
