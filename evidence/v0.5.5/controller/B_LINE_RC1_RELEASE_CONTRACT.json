@@ -1,0 +1,24 @@
+{
+  "schema_version": "B_LINE_RC1_RELEASE_CONTRACT_V1",
+  "release_id": "B_LINE_INITIAL_USABLE_RELEASE_V1_RC1",
+  "base_sha": "08e81bec003d645a0a0582db183a1b6916887eff",
+  "tactical_accepted_sha": "52c16a28153de307dc6132c0975fe29341a0a918",
+  "tactical_ancestor_of_base": true,
+  "work_packages": [
+    "WP-A",
+    "WP-B",
+    "WP-C",
+    "WP-D"
+  ],
+  "startup_contract": "SERIALIZED_SINGLE_RUNTIME_INITIALIZER",
+  "integration_branch": "feature/b-line-v1-rc1",
+  "final_gates": [
+    "B_LINE_RC1_MECHANICAL_VALIDATION",
+    "B_LINE_V1_RC1_INDEPENDENT_EXACT_SHA_VALIDATION"
+  ],
+  "safety": {
+    "real_funds_write_authority": "NONE",
+    "live_approval_only": "NOT_AUTHORIZED",
+    "autonomous_live": "FORBIDDEN"
+  }
+}

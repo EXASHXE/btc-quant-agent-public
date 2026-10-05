@@ -1,0 +1,24 @@
+{
+  "schema_version": "B_LINE_TACTICAL_DECISION_QUALITY_R1_EVALUATION_CONTRACT_V1",
+  "frozen_before_new_oos_results": true,
+  "base_sha": "08e81bec003d645a0a0582db183a1b6916887eff",
+  "tactical_accepted_sha": "52c16a28153de307dc6132c0975fe29341a0a918",
+  "oos_partitions_min": 3,
+  "pass_thresholds": {
+    "actionable_count_min": 100,
+    "enabled_direction_count_min": 20,
+    "mean_net_R_min": 0.05,
+    "median_net_R_min": -0.05,
+    "nonnegative_supported_partitions_min_fraction": "2/3",
+    "stop_before_target_max": 0.65
+  },
+  "hard_fail_thresholds": {
+    "mean_net_R_max": -0.1,
+    "median_net_R_max": -0.2,
+    "bad_partition_mean_net_R_max": -0.25,
+    "bad_partitions_min": 2,
+    "stop_before_target_min_exclusive": 0.7
+  },
+  "shadow_only": "TREND_EVIDENCE_V2_SHADOW",
+  "a_line_authority": false
+}

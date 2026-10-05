@@ -1,6 +1,6 @@
 {
   "line": "B_LINE",
-  "stage": "B2B_ACCEPTED__LIVE_V1_B3_ACCEPTED__R8_SAFETY_SEMANTICS_ACCEPTED__TESTNET_OPERATIONAL_READINESS_PENDING",
+  "stage": "B_LINE_INITIAL_USABLE_RELEASE_V1_RC1_CONTRACT_FROZEN__WP_DISPATCH_PENDING",
   "code_branch": "feature/tactical-policy-r2",
   "accepted_code_sha": "52c16a28153de307dc6132c0975fe29341a0a918",
   "docs_authority_commit": "6319ddbaddd69d5522696992ec1565169da88e03",
@@ -144,7 +144,7 @@
     "live_v1_b4_r6_parent_sha": "a663921abf90504412d0d67b2b9c9f134f204d85",
     "live_v1_b4_r6_controller_sealed": true,
     "live_v1_b5_r6_authorized": false,
-    "live_v1_next_action": "B_LINE_LIVE_V1_TESTNET_OPERATIONAL_READINESS_R1",
+    "live_v1_next_action": "B_LINE_RC1_PARALLEL_WORK_PACKAGE_DISPATCH",
     "live_v1_b5_r5_findings": [
       "HIGH_PROTECTIVE_TYPED_ALIAS_AMBIGUITY",
       "HIGH_RUNTIME_AUTHORITY_ASYNC_HANDOFF_STALE",
@@ -203,7 +203,19 @@
     "live_v1_r8_completion_fabrication": "CLOSED",
     "live_v1_r9_safety_repair_authorized": false,
     "live_v1_testnet_operational_release": "HELD",
-    "live_v1_testnet_startup_constraint_pending": "SERIALIZED_SINGLE_RUNTIME_INITIALIZER"
+    "live_v1_testnet_startup_constraint_pending": "SERIALIZED_SINGLE_RUNTIME_INITIALIZER",
+    "rc1_release_id": "B_LINE_INITIAL_USABLE_RELEASE_V1_RC1",
+    "rc1_base_sha": "08e81bec003d645a0a0582db183a1b6916887eff",
+    "rc1_release_contract_frozen": true,
+    "rc1_startup_contract": "SERIALIZED_SINGLE_RUNTIME_INITIALIZER",
+    "rc1_decision_quality_contract_frozen": true,
+    "rc1_work_packages": [
+      "WP-A",
+      "WP-B",
+      "WP-C",
+      "WP-D"
+    ],
+    "rc1_integration_branch": "feature/b-line-v1-rc1"
   },
   "must_read": [],
   "validation_authority": {
@@ -228,7 +240,7 @@
     "evidence_path": "evidence/v0.5.5/controller/V0.5.5_B2B_CONTROLLER_ACCEPTANCE.json",
     "evidence_blob_sha": "73a11708a85b5f1896397d745c3b7252d3c51f8d"
   },
-  "parallel_authorized_next_stage": "B_LINE_LIVE_V1_TESTNET_OPERATIONAL_READINESS_R1",
+  "parallel_authorized_next_stage": "B_LINE_RC1_PARALLEL_WORK_PACKAGE_DISPATCH",
   "live_v1_acceptance_authority": {
     "report_path": "reviews/v0.5/live_v1/V0.5.5_LIVE_V1_B3_CONTROLLER_ACCEPTANCE.md",
     "report_blob_sha": "21ad4492feb4750f5fc85a5f88b54d1da36c157d",
@@ -431,5 +443,13 @@
     "binding_mode": "EXACT_CODE_SHA",
     "target_sha": "08e81bec003d645a0a0582db183a1b6916887eff",
     "controller_dispatch_sha": "SUPPLIED_OUT_OF_BAND_AS_THIS_PUBLICATION_COMMIT_SHA"
+  },
+  "rc1_release_contract": {
+    "path": "reviews/v0.5/live_v1/V0.5.5_B_LINE_INITIAL_USABLE_RELEASE_V1_RC1_CONTRACT.md",
+    "blob_sha": "aa08d06a497954d96903cda9051e5d93a190f6dd"
+  },
+  "rc1_decision_quality_contract": {
+    "path": "reviews/v0.5/tactical-policy/V0.5.5_B_LINE_TACTICAL_DECISION_QUALITY_R1_EVALUATION_CONTRACT.md",
+    "blob_sha": "d1eb9df40dd7347a14a4755a3648650a8066d79e"
   }
 }
