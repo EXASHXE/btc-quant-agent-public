@@ -24,6 +24,9 @@ def connection(path: str | Path, busy_timeout_ms: int = 10000) -> Iterator[sqlit
             raise RuntimeError("LIVE_WAL_REQUIRED")
         db.execute("PRAGMA synchronous=FULL")
         db.execute("PRAGMA foreign_keys=ON")
+        db.execute("PRAGMA recursive_triggers=ON")
+        if db.execute("PRAGMA recursive_triggers").fetchone()[0] != 1:
+            raise RuntimeError("LIVE_RECURSIVE_TRIGGERS_REQUIRED")
         yield db
         db.commit()
     except BaseException:

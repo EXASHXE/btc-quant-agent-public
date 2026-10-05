@@ -348,11 +348,14 @@ def test_legacy_frozen_position_case_dispatch_retains_exact_event_hash(tmp_path)
                    (event.event_id, event.event_hash, event.trigger, event.symbol,
                     event.source_hash, event.observed_at_ms, json.dumps(old_payload)))
         db.execute("INSERT INTO live_position_case_dispatches "
-                   "(event_id, event_hash, position_case_id, position_case_hash, "
-                   "position_case_json, case_hash, symbol, state, created_at_ms, updated_at_ms) "
-                   "VALUES (?, ?, ?, ?, ?, ?, ?, 'PENDING', ?, ?)",
-                   (event.event_id, event.event_hash, frozen.case_id, frozen.case_hash,
-                    frozen.canonical_json(), frozen.case_hash, event.symbol, NOW, NOW))
+                   "(event_id, event_hash, symbol, state, created_at_ms, updated_at_ms) "
+                   "VALUES (?, ?, ?, 'PENDING', ?, ?)",
+                   (event.event_id, event.event_hash, event.symbol, NOW, NOW))
+        db.execute("UPDATE live_position_case_dispatches "
+                   "SET position_case_id=?, position_case_hash=?, position_case_json=?, "
+                   "case_hash=? WHERE event_id=?",
+                   (frozen.case_id, frozen.case_hash, frozen.canonical_json(),
+                    frozen.case_hash, event.event_id))
     assert asyncio.run(supervisor.drain_pending_dispatches(NOW)) == (event,)
     assert len(analyzed) == 1
     assert analyzed[0].canonical_json() == frozen.canonical_json()

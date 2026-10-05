@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import sqlite3
 
 import pytest
 
@@ -877,32 +878,42 @@ def test_r1_2_a10_legacy_done_row_without_frozen_payload_stays_done(tmp_path):
             async def analyze_case(self, case: CasePackageV1) -> None:
                 calls.append(case.case_hash)
 
+        event_id = "legacy-event"
+        # Seed a historical dispatch before any current supervisor installs guards.
+        with sqlite3.connect(db_file) as db:
+            db.execute("""
+                CREATE TABLE live_position_case_dispatches (
+                    event_id TEXT PRIMARY KEY,
+                    event_hash TEXT NOT NULL UNIQUE,
+                    position_case_id TEXT NOT NULL DEFAULT '',
+                    position_case_hash TEXT NOT NULL DEFAULT '',
+                    position_case_json TEXT NOT NULL DEFAULT '',
+                    case_hash TEXT NOT NULL DEFAULT '',
+                    symbol TEXT NOT NULL,
+                    state TEXT NOT NULL,
+                    retry_count INTEGER NOT NULL DEFAULT 0,
+                    lease_token TEXT,
+                    lease_expires_at_ms INTEGER NOT NULL DEFAULT 0,
+                    created_at_ms INTEGER NOT NULL,
+                    updated_at_ms INTEGER NOT NULL
+                )
+            """)
+            db.execute("""
+                INSERT INTO live_position_case_dispatches
+                    (event_id, event_hash, case_hash, symbol, state, created_at_ms, updated_at_ms)
+                VALUES (?, ?, 'legacy-done-hash', 'BTCUSDT', 'DONE', ?, ?)
+            """, (event_id, "legacy-event-hash", NOW, NOW))
+
         supervisor = PositionSupervisor(
             db_file, analysis_service=Spy(), fresh_market_case=lambda _: market_case(),
         )
-        event = supervisor.evaluate(observation(), NOW)[0]
-
-        # Manually create legacy DONE row without frozen payload
-        with connection(db_file) as db:
-            db.execute(
-                """
-                UPDATE live_position_case_dispatches
-                SET position_case_id = '',
-                    position_case_hash = '',
-                    position_case_json = '',
-                    case_hash = 'legacy-done-hash',
-                    state = 'DONE'
-                WHERE event_id = ?
-                """,
-                (event.event_id,),
-            )
 
         # Drain must preserve DONE state and NOT reissue
         drained = await supervisor.drain_pending_dispatches(NOW + 1000)
         assert len(drained) == 0
         assert len(calls) == 0
 
-        dispatch = supervisor.get_dispatch(event.event_id)
+        dispatch = supervisor.get_dispatch(event_id)
         assert dispatch is not None
         assert dispatch["state"] == "DONE"
 

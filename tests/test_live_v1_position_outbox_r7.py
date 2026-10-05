@@ -600,6 +600,8 @@ def test_concurrent_r6_to_r7_constructors_upgrade_once(tmp_path, round_number):
     with connection(path) as db:
         db.execute("DROP TRIGGER trg_live_position_dispatch_admission_immutable")
         db.execute("DROP TRIGGER trg_live_position_analysis_completion_guard")
+        db.execute("DROP TRIGGER trg_live_position_dispatch_blank_insert")
+        db.execute("DROP TRIGGER trg_live_position_dispatch_done_requires_completion")
         for column in ("analysis_completed", "analysis_admission_hash",
                        "dispatch_authority_hash", "dispatch_authority_json"):
             db.execute(f"ALTER TABLE live_position_case_dispatches DROP COLUMN {column}")

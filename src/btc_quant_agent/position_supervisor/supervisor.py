@@ -286,6 +286,25 @@ class PositionSupervisor:
                        OR OLD.symbol != NEW.symbol;
                 END;
 
+                CREATE TRIGGER IF NOT EXISTS trg_live_position_dispatch_blank_insert
+                BEFORE INSERT ON live_position_case_dispatches
+                FOR EACH ROW
+                BEGIN
+                    SELECT RAISE(ABORT, 'DISPATCH_INSERT_REQUIRES_BLANK_PENDING')
+                    WHERE NEW.state != 'PENDING'
+                       OR NEW.analysis_completed != 0
+                       OR NEW.dispatch_authority_json != ''
+                       OR NEW.dispatch_authority_hash != ''
+                       OR NEW.analysis_admission_hash != ''
+                       OR NEW.position_case_id != ''
+                       OR NEW.position_case_hash != ''
+                       OR NEW.position_case_json != ''
+                       OR NEW.case_hash != ''
+                       OR NEW.retry_count != 0
+                       OR NEW.lease_token IS NOT NULL
+                       OR NEW.lease_expires_at_ms != 0;
+                END;
+
                 CREATE TRIGGER IF NOT EXISTS trg_live_position_dispatch_admission_immutable
                 BEFORE UPDATE ON live_position_case_dispatches
                 FOR EACH ROW
@@ -301,6 +320,15 @@ class PositionSupervisor:
                         OR OLD.case_hash IS NOT NEW.case_hash);
                     SELECT RAISE(ABORT, 'ANALYSIS_COMPLETION_IMMUTABLE')
                     WHERE OLD.analysis_completed = 1 AND NEW.analysis_completed IS NOT 1;
+                END;
+
+                CREATE TRIGGER IF NOT EXISTS trg_live_position_dispatch_done_requires_completion
+                BEFORE UPDATE ON live_position_case_dispatches
+                FOR EACH ROW
+                BEGIN
+                    SELECT RAISE(ABORT, 'DONE_REQUIRES_ANALYSIS_COMPLETION')
+                    WHERE OLD.state != 'DONE' AND NEW.state = 'DONE'
+                      AND NEW.analysis_completed != 1;
                 END;
 
                 CREATE TRIGGER IF NOT EXISTS trg_live_position_analysis_completion_guard
