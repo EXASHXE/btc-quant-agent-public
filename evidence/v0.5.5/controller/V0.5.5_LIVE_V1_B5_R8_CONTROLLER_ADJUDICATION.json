@@ -1,0 +1,46 @@
+{
+  "task": "LIVE_V1_B5_R8_CONTROLLER_ADJUDICATION",
+  "validated_sha": "08e81bec003d645a0a0582db183a1b6916887eff",
+  "validation_branch": "validation/v0.5.5-live-v1-b5-r8-independent-20261005",
+  "validation_commit": "05e375b202b0119b52e5f890c20ac77925890ff6",
+  "validator_decision": "LIVE_V1_INDEPENDENT_VALIDATION_FAILED",
+  "controller_disposition": "ACCEPT_OBSERVATION__RECLASSIFY_V7_AS_INHERITED_FAIL_CLOSED_AVAILABILITY__ACCEPT_R8_SAFETY_SEMANTICS__HOLD_TESTNET_RELEASE",
+  "r8_safety_semantics": "ACCEPTED",
+  "completion_fabrication": "CLOSED",
+  "independent_semantics": {
+    "V1": "PASS",
+    "V2": "PASS",
+    "V3": "PASS",
+    "V4": "PASS",
+    "V5": "PASS",
+    "V6": "PASS",
+    "V7": "FAIL_RECLASSIFIED_INHERITED_FAIL_CLOSED_OPERATIONAL_AVAILABILITY"
+  },
+  "primary_semantic_probe_count": 77,
+  "primary_semantic_passed": 76,
+  "primary_semantic_failed": 1,
+  "v7_basis": {
+    "event_column_ddl_path_source_identical_parent_target": true,
+    "wal_lock_race_reproduced_parent_and_target": true,
+    "initialized_supervisor_authority_bypass_observed": false,
+    "failed_constructor_fail_closed": true,
+    "target_followup_guard_snapshot": "ALL_8_R8_GUARDS_PRESENT_WHEN_PEER_COMPLETED",
+    "production_runtime_position_supervisor_count_per_runtime": 1
+  },
+  "regression_gate_disposition": {
+    "status": "INCOMPLETE",
+    "classification": "OPERATIONAL_INFRASTRUCTURE_FAILURE__ASYNC_EXECUTOR_SHUTDOWN_STALL",
+    "inherited_pre_r8": true,
+    "silently_promoted_to_pass": false
+  },
+  "testnet_operational_release": "HELD",
+  "r9_safety_repair_authorized": false,
+  "next_state": "B_LINE_LIVE_V1_TESTNET_OPERATIONAL_READINESS_R1",
+  "deployment_constraint_pending_readiness": "SERIALIZED_SINGLE_RUNTIME_INITIALIZER",
+  "safety": {
+    "live_write_authority": "NONE",
+    "real_funds_write_count": 0,
+    "live_approval_only": "NOT_AUTHORIZED",
+    "autonomous_live": "FORBIDDEN"
+  }
+}
