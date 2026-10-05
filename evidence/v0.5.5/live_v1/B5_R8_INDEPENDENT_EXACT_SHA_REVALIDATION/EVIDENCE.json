@@ -1,0 +1,659 @@
+{
+  "schema_version": "B5_R8_INDEPENDENT_EXACT_SHA_REVALIDATION_V1",
+  "generated_utc": "2026-10-05T12:52:10.728367+00:00",
+  "decision": "LIVE_V1_INDEPENDENT_VALIDATION_FAILED",
+  "validated_sha": "08e81bec003d645a0a0582db183a1b6916887eff",
+  "parent_sha": "fde61dafb301d5bd5af3dc7eb81e5618f979036c",
+  "controller_dispatch_sha": "77199fc13682843fade048813500b678a07abcf3",
+  "publication": {
+    "branch": "validation/v0.5.5-live-v1-b5-r8-independent-20261005",
+    "base_sha": "77199fc13682843fade048813500b678a07abcf3",
+    "report_path": "reviews/v0.5/live_v1/V0.5.5_LIVE_V1_B5_R8_INDEPENDENT_EXACT_SHA_REVALIDATION_REPORT.md",
+    "evidence_path": "evidence/v0.5.5/live_v1/B5_R8_INDEPENDENT_EXACT_SHA_REVALIDATION/EVIDENCE.json",
+    "commit_sha": "Resolve from publication branch tip; omitted to avoid self-referential commit hash",
+    "allowed_changes": "Independent report and evidence only",
+    "remote_status": "BLOCKED_AUTHENTICATION; git push failed with terminal prompts and credential helpers disabled; no credential access/recovery attempted",
+    "local_status": "Evidence-only validation branch committed; exported into supplied repository as a separate branch without checkout or implementation ref change"
+  },
+  "identity_gate": {
+    "status": "PASS",
+    "checkout": "/tmp/b5-r8-independent-source",
+    "creation": "Fresh git clone --no-local of full local history, followed by public unauthenticated fetch of target and dispatch objects",
+    "head": "08e81bec003d645a0a0582db183a1b6916887eff",
+    "direct_parent": "fde61dafb301d5bd5af3dc7eb81e5618f979036c",
+    "full_history": true,
+    "reachable_target_commits": 478,
+    "head_tree": "3ce992da4ef24efe7fee15580d4bfacff1d93b2c",
+    "status_before": "",
+    "status_after": "",
+    "changed_files": [
+      "evidence/v0.5.5/live_v1/B4_DAY2_VALIDATION.json",
+      "src/btc_quant_agent/live_db.py",
+      "src/btc_quant_agent/position_supervisor/supervisor.py",
+      "tests/test_live_v1_position_authority_r4.py",
+      "tests/test_live_v1_position_outbox_r7.py",
+      "tests/test_live_v1_position_outbox_r8.py",
+      "tests/test_live_v1_position_supervisor.py"
+    ],
+    "expected_changed_files": [
+      "evidence/v0.5.5/live_v1/B4_DAY2_VALIDATION.json",
+      "src/btc_quant_agent/live_db.py",
+      "src/btc_quant_agent/position_supervisor/supervisor.py",
+      "tests/test_live_v1_position_authority_r4.py",
+      "tests/test_live_v1_position_outbox_r7.py",
+      "tests/test_live_v1_position_outbox_r8.py",
+      "tests/test_live_v1_position_supervisor.py"
+    ],
+    "exact_seven_file_match": true,
+    "source_file_sha256": {
+      "evidence/v0.5.5/live_v1/B4_DAY2_VALIDATION.json": "2b89d1c979ed23bd1ba8eabf4ebeee115cb7e68d7c45ab53a1a81b4cd14ceee5",
+      "src/btc_quant_agent/live_db.py": "ffd326e94a0deb0efb6feb64370d717ef04e385f78202c73c0a034bcc9673755",
+      "src/btc_quant_agent/position_supervisor/supervisor.py": "661ba5d8f681ad1be654e42bee4be8a1a219e2d470125907f84f2e6864c31061",
+      "tests/test_live_v1_position_authority_r4.py": "7ec5f5e70bc5a00476aa764faebc88ac5d7b50718914a939b33a597a93a3ece0",
+      "tests/test_live_v1_position_outbox_r7.py": "1cf1fc90c69ee060fb50fd751f5823e9e54e4aac178f9ec0df9f64414fa73465",
+      "tests/test_live_v1_position_outbox_r8.py": "9174f621bc0af72dbac970c4a559a59f2267b477af3cdf58fb6648b373938396",
+      "tests/test_live_v1_position_supervisor.py": "6855507e92be4ccf363542b1f452dd94e38d1a5e5f3541b6969a69d7a4aedb51"
+    },
+    "target_diff_check": "PASS",
+    "runtime_imports": "PASS: initial/final independent probe loaded module paths are all inside target checkout/src",
+    "original_workspace": {
+      "head": "fde61dafb301d5bd5af3dc7eb81e5618f979036c",
+      "branch": "feature/b-line-live-v1",
+      "preexisting_changes_preserved": true,
+      "status_before": [
+        " M evidence/v0.5.5/live_v1/B4_DAY2_VALIDATION.json",
+        " M src/btc_quant_agent/live_db.py",
+        " M src/btc_quant_agent/position_supervisor/supervisor.py",
+        " M tests/test_live_v1_position_authority_r4.py",
+        " M tests/test_live_v1_position_outbox_r7.py",
+        " M tests/test_live_v1_position_supervisor.py",
+        "?? tests/test_live_v1_position_outbox_r8.py"
+      ],
+      "status_after": [
+        " M evidence/v0.5.5/live_v1/B4_DAY2_VALIDATION.json",
+        " M src/btc_quant_agent/live_db.py",
+        " M src/btc_quant_agent/position_supervisor/supervisor.py",
+        " M tests/test_live_v1_position_authority_r4.py",
+        " M tests/test_live_v1_position_outbox_r7.py",
+        " M tests/test_live_v1_position_supervisor.py",
+        "?? tests/test_live_v1_position_outbox_r8.py"
+      ],
+      "note": "Original checkout was dirty on arrival; never used as validation source and never written by this task."
+    }
+  },
+  "independence_gate": {
+    "status": "PASS",
+    "coordinator": "Fresh session; no R8 implementation involvement",
+    "supporting_agents": [
+      "Fresh explorer for gates",
+      "Fresh reviewer for source review"
+    ],
+    "independent_probe_source": "evidence/v0.5.5/live_v1/B5_R8_INDEPENDENT_EXACT_SHA_REVALIDATION/probes/independent_probes.py",
+    "committed_test_helpers_imported": false,
+    "committed_tests_are_supporting_gates_only": true,
+    "primary_semantic_probe_count": 77,
+    "primary_semantic_passed": 76,
+    "primary_semantic_failed": 1,
+    "identity_probe_count": 2,
+    "differential_cold_start_runs": 6,
+    "differential_constructor_calls": 36
+  },
+  "semantic_groups": {
+    "V1": {
+      "status": "PASS",
+      "probe_names": [
+        "V1_settings_10000",
+        "V1_settings_1739",
+        "V1_settings_1",
+        "V1_fail_closed_enable_error",
+        "V1_fail_closed_readback_zero",
+        "V1_fail_closed_read_error",
+        "V1_fail_closed_read_missing"
+      ],
+      "passed": 7,
+      "failed": 0
+    },
+    "V2": {
+      "status": "PASS",
+      "probe_names": [
+        "V2_blank_pending",
+        "V2_reject_state",
+        "V2_reject_analysis_completed",
+        "V2_reject_dispatch_authority_json",
+        "V2_reject_dispatch_authority_hash",
+        "V2_reject_analysis_admission_hash",
+        "V2_reject_position_case_id",
+        "V2_reject_position_case_hash",
+        "V2_reject_position_case_json",
+        "V2_reject_case_hash",
+        "V2_reject_retry_count",
+        "V2_reject_lease_token",
+        "V2_reject_lease_expires_at_ms",
+        "V2_new_terminal_INSERT OR REPLACE",
+        "V2_new_terminal_REPLACE"
+      ],
+      "passed": 15,
+      "failed": 0
+    },
+    "V3": {
+      "status": "PASS",
+      "probe_names": [
+        "V3_frozen_INSERT OR REPLACE_blank_primary",
+        "V3_frozen_INSERT OR REPLACE_blank_unique",
+        "V3_frozen_INSERT OR REPLACE_fabricated_terminal_primary",
+        "V3_frozen_INSERT OR REPLACE_fabricated_terminal_unique",
+        "V3_frozen_REPLACE_blank_primary",
+        "V3_frozen_REPLACE_blank_unique",
+        "V3_frozen_REPLACE_fabricated_terminal_primary",
+        "V3_frozen_REPLACE_fabricated_terminal_unique",
+        "V3_admitted_INSERT OR REPLACE_blank_primary",
+        "V3_admitted_INSERT OR REPLACE_blank_unique",
+        "V3_admitted_INSERT OR REPLACE_fabricated_terminal_primary",
+        "V3_admitted_INSERT OR REPLACE_fabricated_terminal_unique",
+        "V3_admitted_REPLACE_blank_primary",
+        "V3_admitted_REPLACE_blank_unique",
+        "V3_admitted_REPLACE_fabricated_terminal_primary",
+        "V3_admitted_REPLACE_fabricated_terminal_unique",
+        "V3_completed_INSERT OR REPLACE_blank_primary",
+        "V3_completed_INSERT OR REPLACE_blank_unique",
+        "V3_completed_INSERT OR REPLACE_fabricated_terminal_primary",
+        "V3_completed_INSERT OR REPLACE_fabricated_terminal_unique",
+        "V3_completed_REPLACE_blank_primary",
+        "V3_completed_REPLACE_blank_unique",
+        "V3_completed_REPLACE_fabricated_terminal_primary",
+        "V3_completed_REPLACE_fabricated_terminal_unique"
+      ],
+      "passed": 24,
+      "failed": 0
+    },
+    "V4": {
+      "status": "PASS",
+      "probe_names": [
+        "V4_upsert_authority",
+        "V4_upsert_completion",
+        "V4_completion",
+        "V4_marker_only",
+        "V4_done_only",
+        "V4_delete",
+        "V4_authority_event_hash",
+        "V4_authority_symbol",
+        "V4_authority_dispatch_authority_json",
+        "V4_authority_dispatch_authority_hash",
+        "V4_authority_analysis_admission_hash",
+        "V4_authority_position_case_id",
+        "V4_authority_position_case_hash",
+        "V4_authority_position_case_json",
+        "V4_authority_case_hash"
+      ],
+      "passed": 15,
+      "failed": 0
+    },
+    "V5": {
+      "status": "PASS",
+      "probe_names": [
+        "V5_V6_positive_atomic_terminal_canonical_admission_exact_provider",
+        "V5_terminal_commit_rollback",
+        "V5_V6_restart_frozen",
+        "V5_V6_restart_admitted",
+        "V5_V6_restart_provider_returned"
+      ],
+      "passed": 5,
+      "failed": 0
+    },
+    "V6": {
+      "status": "PASS",
+      "probe_names": [
+        "V5_V6_positive_atomic_terminal_canonical_admission_exact_provider",
+        "V5_V6_restart_frozen",
+        "V5_V6_restart_admitted",
+        "V5_V6_restart_provider_returned",
+        "V6_terminal_binding_lease",
+        "V6_terminal_binding_authority_json",
+        "V6_terminal_binding_authority_hash",
+        "V6_terminal_binding_admission_hash",
+        "V6_terminal_binding_event_json",
+        "V6_terminal_binding_case_json"
+      ],
+      "passed": 10,
+      "failed": 0
+    },
+    "V7": {
+      "status": "FAIL",
+      "probe_names": [
+        "V7_historical_DONE",
+        "V7_historical_PENDING",
+        "V7_concurrent_current",
+        "V7_concurrent_legacy",
+        "V7_concurrent_cold"
+      ],
+      "passed": 4,
+      "failed": 1
+    }
+  },
+  "completion_fabrication_repair": "PASS: R7-V5-REPLACE_COMPLETION_FABRICATION closed in all independently probed normal shared-connection write forms",
+  "accepted_r7_authority_model": "PASS in bounded sample: canonical admission, exact provider input, protected terminal binding, rollback and uncertain no-replay; inherited cold-start availability failures recorded separately",
+  "all_required_r8_semantics": "FAIL: V7 cold concurrent startup requirement not satisfied",
+  "legacy_fixture_compatibility": {
+    "legacy_done": "PASS",
+    "historical_frozen_pending": "PASS",
+    "concurrent_current": "PASS",
+    "concurrent_legacy_dispatch_migration": "PASS",
+    "concurrent_cold": "FAIL"
+  },
+  "regression_gate_status": "INCOMPLETE",
+  "regression": {
+    "source": "/tmp/b5-r8-independent-source",
+    "head": "08e81bec003d645a0a0582db183a1b6916887eff",
+    "commands": [
+      {
+        "index": 1,
+        "command": "python -m compileall -q src tests",
+        "exit_code": 0,
+        "elapsed_seconds": 1.27,
+        "timed_out": false,
+        "log": "/tmp/b5-r8-independent-publication/evidence/v0.5.5/live_v1/B5_R8_INDEPENDENT_EXACT_SHA_REVALIDATION/regression/01.log",
+        "stall_file": null,
+        "classification": "passed",
+        "selected_tests": null,
+        "passed_tests": null
+      },
+      {
+        "index": 2,
+        "command": "git diff --check",
+        "exit_code": 0,
+        "elapsed_seconds": 0.01,
+        "timed_out": false,
+        "log": "/tmp/b5-r8-independent-publication/evidence/v0.5.5/live_v1/B5_R8_INDEPENDENT_EXACT_SHA_REVALIDATION/regression/02.log",
+        "stall_file": null,
+        "classification": "passed",
+        "selected_tests": null,
+        "passed_tests": null
+      },
+      {
+        "index": 3,
+        "command": "ruff check .",
+        "exit_code": 0,
+        "elapsed_seconds": 0.17,
+        "timed_out": false,
+        "log": "/tmp/b5-r8-independent-publication/evidence/v0.5.5/live_v1/B5_R8_INDEPENDENT_EXACT_SHA_REVALIDATION/regression/03.log",
+        "stall_file": null,
+        "classification": "passed",
+        "selected_tests": null,
+        "passed_tests": null
+      },
+      {
+        "index": 4,
+        "command": "mypy src",
+        "exit_code": 0,
+        "elapsed_seconds": 18.16,
+        "timed_out": false,
+        "log": "/tmp/b5-r8-independent-publication/evidence/v0.5.5/live_v1/B5_R8_INDEPENDENT_EXACT_SHA_REVALIDATION/regression/04.log",
+        "stall_file": null,
+        "classification": "passed",
+        "selected_tests": null,
+        "passed_tests": null
+      },
+      {
+        "index": 5,
+        "command": "pytest -q tests/test_live_v1_position_outbox_r8.py",
+        "exit_code": 0,
+        "elapsed_seconds": 5.43,
+        "timed_out": false,
+        "log": "/tmp/b5-r8-independent-publication/evidence/v0.5.5/live_v1/B5_R8_INDEPENDENT_EXACT_SHA_REVALIDATION/regression/05.log",
+        "stall_file": null,
+        "classification": "passed",
+        "selected_tests": 38,
+        "passed_tests": 38,
+        "expanded_command": "pytest -q tests/test_live_v1_position_outbox_r8.py",
+        "stall": null
+      },
+      {
+        "index": 6,
+        "command": "pytest -q tests/test_live_v1_position_outbox_r7.py",
+        "exit_code": 0,
+        "elapsed_seconds": 11.95,
+        "timed_out": false,
+        "log": "/tmp/b5-r8-independent-publication/evidence/v0.5.5/live_v1/B5_R8_INDEPENDENT_EXACT_SHA_REVALIDATION/regression/06.log",
+        "stall_file": null,
+        "classification": "passed",
+        "selected_tests": 67,
+        "passed_tests": 67,
+        "expanded_command": "pytest -q tests/test_live_v1_position_outbox_r7.py",
+        "stall": null
+      },
+      {
+        "index": 7,
+        "command": "pytest -q tests/test_live_v1_*_r6.py",
+        "exit_code": 124,
+        "elapsed_seconds": 120.0,
+        "timed_out": true,
+        "log": "/tmp/b5-r8-independent-publication/evidence/v0.5.5/live_v1/B5_R8_INDEPENDENT_EXACT_SHA_REVALIDATION/regression/07.log",
+        "stall_file": "/tmp/b5-r8-independent-publication/evidence/v0.5.5/live_v1/B5_R8_INDEPENDENT_EXACT_SHA_REVALIDATION/regression/07.stall.txt",
+        "classification": "incomplete_timeout",
+        "selected_tests": null,
+        "passed_tests": null,
+        "expanded_command": "pytest -q tests/test_live_v1_execution_protection_r6.py tests/test_live_v1_position_outbox_r6.py tests/test_live_v1_runtime_authority_r6.py",
+        "stall": {
+          "pid": 338,
+          "no_progress_seconds": 90.8,
+          "current_node": "tests/test_live_v1_runtime_authority_r6.py::test_handoff_rejects_account_change_during_await"
+        },
+        "termination": "runner sent SIGTERM to process group at 120s, then SIGKILL after 5s only if needed"
+      },
+      {
+        "index": 8,
+        "command": "pytest -q tests/test_live_v1_*_r5.py",
+        "exit_code": 0,
+        "elapsed_seconds": 17.31,
+        "timed_out": false,
+        "log": "/tmp/b5-r8-independent-publication/evidence/v0.5.5/live_v1/B5_R8_INDEPENDENT_EXACT_SHA_REVALIDATION/regression/08.log",
+        "stall_file": null,
+        "classification": "passed",
+        "selected_tests": 77,
+        "passed_tests": 77,
+        "expanded_command": "pytest -q tests/test_live_v1_execution_protection_r5.py tests/test_live_v1_position_outbox_r5.py tests/test_live_v1_runtime_authority_r5.py",
+        "stall": null
+      },
+      {
+        "index": 9,
+        "command": "pytest -q tests/test_live_v1_*_r4.py tests/test_live_v1_*_r3.py",
+        "exit_code": 124,
+        "elapsed_seconds": 120.0,
+        "timed_out": true,
+        "log": "/tmp/b5-r8-independent-publication/evidence/v0.5.5/live_v1/B5_R8_INDEPENDENT_EXACT_SHA_REVALIDATION/regression/09.log",
+        "stall_file": "/tmp/b5-r8-independent-publication/evidence/v0.5.5/live_v1/B5_R8_INDEPENDENT_EXACT_SHA_REVALIDATION/regression/09.stall.txt",
+        "classification": "incomplete_timeout",
+        "selected_tests": null,
+        "passed_tests": null,
+        "expanded_command": "pytest -q tests/test_live_v1_approval_environment_r4.py tests/test_live_v1_execution_protection_r4.py tests/test_live_v1_position_authority_r4.py tests/test_live_v1_execution_identity_r3.py tests/test_live_v1_execution_placement_r3.py tests/test_live_v1_execution_protection_r3.py tests/test_live_v1_execution_recovery_r3.py tests/test_live_v1_runtime_recovery_r3.py",
+        "stall": {
+          "pid": 376,
+          "no_progress_seconds": 90.1,
+          "current_node": "tests/test_live_v1_execution_recovery_r3.py::test_restart_expired_authority_reconciles_active_order_and_protection[False]"
+        },
+        "termination": "runner sent SIGTERM to process group at 120s, then SIGKILL after 5s only if needed"
+      },
+      {
+        "index": 10,
+        "command": "pytest -q tests/test_live_v1_*.py",
+        "exit_code": 124,
+        "elapsed_seconds": 120.01,
+        "timed_out": true,
+        "log": "/tmp/b5-r8-independent-publication/evidence/v0.5.5/live_v1/B5_R8_INDEPENDENT_EXACT_SHA_REVALIDATION/regression/10.log",
+        "stall_file": "/tmp/b5-r8-independent-publication/evidence/v0.5.5/live_v1/B5_R8_INDEPENDENT_EXACT_SHA_REVALIDATION/regression/10.stall.txt",
+        "classification": "incomplete_timeout",
+        "selected_tests": null,
+        "passed_tests": null,
+        "expanded_command": "pytest -q tests/test_live_v1_account_stream_r2.py tests/test_live_v1_account_watch.py tests/test_live_v1_approval_environment_r4.py tests/test_live_v1_day2_e2e.py tests/test_live_v1_decision_api.py tests/test_live_v1_decision_approval.py tests/test_live_v1_decision_backends.py tests/test_live_v1_decision_case.py tests/test_live_v1_decision_e2e.py tests/test_live_v1_decision_models.py tests/test_live_v1_decision_risk.py tests/test_live_v1_execution_authorization_r2.py tests/test_live_v1_execution_backend.py tests/test_live_v1_execution_compilation_r2.py tests/test_live_v1_execution_identity_r3.py tests/test_live_v1_execution_intent.py tests/test_live_v1_execution_placement_r3.py tests/test_live_v1_execution_protection_r3.py tests/test_live_v1_execution_protection_r4.py tests/test_live_v1_execution_protection_r5.py tests/test_live_v1_execution_protection_r6.py tests/test_live_v1_execution_recovery_r3.py tests/test_live_v1_execution_storage.py tests/test_live_v1_execution_validator.py tests/test_live_v1_position_authority_r4.py tests/test_live_v1_position_kill.py tests/test_live_v1_position_lease_r2.py tests/test_live_v1_position_outbox_r5.py tests/test_live_v1_position_outbox_r6.py tests/test_live_v1_position_outbox_r7.py tests/test_live_v1_position_outbox_r8.py tests/test_live_v1_position_supervisor.py tests/test_live_v1_runtime_authority_r5.py tests/test_live_v1_runtime_authority_r6.py tests/test_live_v1_runtime_r2.py tests/test_live_v1_runtime_recovery_r3.py",
+        "stall": {
+          "pid": 395,
+          "no_progress_seconds": 90.7,
+          "current_node": "tests/test_live_v1_account_stream_r2.py::test_user_stream_uses_allowlisted_testnet_url_and_closes_listen_key"
+        },
+        "termination": "runner sent SIGTERM to process group at 120s, then SIGKILL after 5s only if needed"
+      },
+      {
+        "index": 11,
+        "command": "pytest -q tests/test_tactical_*.py",
+        "exit_code": 0,
+        "elapsed_seconds": 8.25,
+        "timed_out": false,
+        "log": "/tmp/b5-r8-independent-publication/evidence/v0.5.5/live_v1/B5_R8_INDEPENDENT_EXACT_SHA_REVALIDATION/regression/11.log",
+        "stall_file": null,
+        "classification": "passed",
+        "selected_tests": 128,
+        "passed_tests": 128,
+        "expanded_command": "pytest -q tests/test_tactical_feature_evidence_v2.py tests/test_tactical_grid_shadow_evaluation_v1.py tests/test_tactical_policy_b0.py tests/test_tactical_shadow_evaluation_v2.py",
+        "stall": null
+      },
+      {
+        "index": 12,
+        "command": "pytest -q tests/test_v050_r02_orchestration_guards.py",
+        "exit_code": 0,
+        "elapsed_seconds": 2.18,
+        "timed_out": false,
+        "log": "/tmp/b5-r8-independent-publication/evidence/v0.5.5/live_v1/B5_R8_INDEPENDENT_EXACT_SHA_REVALIDATION/regression/12.log",
+        "stall_file": null,
+        "classification": "passed",
+        "selected_tests": 26,
+        "passed_tests": 26,
+        "expanded_command": "pytest -q tests/test_v050_r02_orchestration_guards.py",
+        "stall": null
+      },
+      {
+        "index": 13,
+        "command": "pytest -q",
+        "exit_code": 124,
+        "elapsed_seconds": 120.01,
+        "timed_out": true,
+        "log": "/tmp/b5-r8-independent-publication/evidence/v0.5.5/live_v1/B5_R8_INDEPENDENT_EXACT_SHA_REVALIDATION/regression/13.log",
+        "stall_file": "/tmp/b5-r8-independent-publication/evidence/v0.5.5/live_v1/B5_R8_INDEPENDENT_EXACT_SHA_REVALIDATION/regression/13.stall.txt",
+        "classification": "incomplete_timeout",
+        "selected_tests": null,
+        "passed_tests": null,
+        "expanded_command": "pytest -q",
+        "stall": {
+          "pid": 452,
+          "no_progress_seconds": 90.4,
+          "current_node": "tests/test_live_v1_account_stream_r2.py::test_user_stream_uses_allowlisted_testnet_url_and_closes_listen_key"
+        },
+        "termination": "runner sent SIGTERM to process group at 120s, then SIGKILL after 5s only if needed"
+      }
+    ],
+    "runtime_import_check": {
+      "python": "/root/miniconda3/bin/python 3.13.13",
+      "PYTHONPATH": "/tmp/b5-r8-independent-source/src",
+      "package": "btc_quant_agent",
+      "package_file": "/tmp/b5-r8-independent-source/src/btc_quant_agent/__init__.py",
+      "loaded_package_modules": 1,
+      "modules_outside_source": []
+    },
+    "source_status_after": "",
+    "source_tree_after": "08e81bec003d645a0a0582db183a1b6916887eff",
+    "publication_status_after": "?? evidence/v0.5.5/live_v1/",
+    "overall_regression_gate_status": "INCOMPLETE: 4 pytest gates timed out; all others completed successfully; no test result inferred for timed-out gates",
+    "known_context": "Asyncio event-loop / executor shutdown stalls were observed in the captured stacks; matching a known environment issue is not proof of causal linkage.",
+    "source_status_before": "clean",
+    "source_tree_before": "08e81bec003d645a0a0582db183a1b6916887eff",
+    "publication_status_before": "clean in assigned evidence target at task start",
+    "counts_note": "selected_tests and passed_tests are exact pytest terminal counts for completed pytest gates. Timed-out gates have null counts because pytest did not emit terminal summaries; no incomplete test is classified as passed."
+  },
+  "async_shutdown_stall_status": "REPRODUCED_R6; three additional async stalls captured with causal linkage unproven",
+  "blockers": [
+    {
+      "id": "B5-R8-V7-COLD_CONSTRUCTOR_COMPATIBILITY",
+      "severity": "required semantic acceptance failure",
+      "inherited": true,
+      "authority_bypass_observed": false,
+      "description": "Six concurrent cold constructors failed with duplicate event column account_id in primary probe; differential target and parent each had one PRAGMA journal_mode=WAL database-is-locked failure across 18 constructors. Event migration and WAL setup are unchanged from R7. Warm/current and legacy dispatch migration controls pass.",
+      "evidence": [
+        "probes/results.json#V7_concurrent_cold",
+        "probes/cold_target.json",
+        "probes/cold_parent.json",
+        "cold_constructor_review.json"
+      ]
+    },
+    {
+      "id": "OPERATIONAL_INFRASTRUCTURE_FAILURE__ASYNC_EXECUTOR_SHUTDOWN_STALL",
+      "severity": "regression incompleteness",
+      "description": "R6 captured asyncio Runner.close waiting on shutdown_default_executor at runners.py:72. Other three incomplete gates show event-loop waits and idle executor workers; identical causal mechanism is not proven by thread snapshots. No timeout is PASS.",
+      "gate_indices": [
+        7,
+        9,
+        10,
+        13
+      ],
+      "evidence": [
+        "regression/07.stall.txt",
+        "regression/09.stall.txt",
+        "regression/10.stall.txt",
+        "regression/13.stall.txt"
+      ]
+    },
+    {
+      "id": "REMOTE_PUBLICATION_AUTHENTICATION_UNAVAILABLE",
+      "severity": "publication transport only",
+      "description": "Anonymous public HTTPS push cannot read Username with terminal prompts disabled. Local publication branch and commit are available; do not access/recover credentials."
+    }
+  ],
+  "safety": {
+    "LIVE_WRITE_AUTHORITY": "NONE",
+    "REAL_FUNDS_WRITE_COUNT": 0,
+    "LIVE_APPROVAL_ONLY": "NOT_AUTHORIZED",
+    "AUTONOMOUS_LIVE": "FORBIDDEN",
+    "PUBLIC_REST_MUTATION_SURFACES": 0,
+    "REAL_CREDENTIAL_ACCESS": "FORBIDDEN",
+    "REAL_FUNDS_SIDE_EFFECTS": "FORBIDDEN",
+    "implementation_mutation": 0,
+    "H40_H41_A_LINE_SCIENTIFIC_GOLDEN_MUTATION": 0
+  },
+  "adjudication": "Not eligible for full TESTNET validation or SEMANTICS_PASS_REGRESSION_INFRA_INCOMPLETE: required V7 fails independently of regression stalls; no new R8 authority bypass observed. No repairs made.",
+  "next_state": "CONTROLLER_DISPOSITION_REQUIRED__V7_INHERITED_COLD_START_FAILURE_AND_REGRESSION_INCOMPLETE__LIVE_STILL_DISABLED",
+  "artifact_manifest": [
+    {
+      "path": "evidence/v0.5.5/live_v1/B5_R8_INDEPENDENT_EXACT_SHA_REVALIDATION/cold_constructor_review.json",
+      "bytes": 6999,
+      "sha256": "627dd8126b8500a9b1c3d51370d338d677a8a35283d598c0021bc482d87be721"
+    },
+    {
+      "path": "evidence/v0.5.5/live_v1/B5_R8_INDEPENDENT_EXACT_SHA_REVALIDATION/probes/cold_constructor_reproduction.py",
+      "bytes": 2402,
+      "sha256": "0863a50d6457d8bfcf63e96486903798eaeaed7ea2e61dcfbdd3f8cfea1f2d7b"
+    },
+    {
+      "path": "evidence/v0.5.5/live_v1/B5_R8_INDEPENDENT_EXACT_SHA_REVALIDATION/probes/cold_parent.json",
+      "bytes": 5100,
+      "sha256": "55c0114dd48b5929f9e2a7dd32591bca56b39444c375842f7f29df605b751733"
+    },
+    {
+      "path": "evidence/v0.5.5/live_v1/B5_R8_INDEPENDENT_EXACT_SHA_REVALIDATION/probes/cold_target.json",
+      "bytes": 5442,
+      "sha256": "28a4075aee964d86ff67a5c2f3152c24a892fa3d47b3f9acdca3f568429f1ee3"
+    },
+    {
+      "path": "evidence/v0.5.5/live_v1/B5_R8_INDEPENDENT_EXACT_SHA_REVALIDATION/probes/independent_probes.py",
+      "bytes": 28532,
+      "sha256": "e5c0c236408cd2ab4c354292f6cdad735e5415b50829e47044b3ca20ff1087fa"
+    },
+    {
+      "path": "evidence/v0.5.5/live_v1/B5_R8_INDEPENDENT_EXACT_SHA_REVALIDATION/probes/results.json",
+      "bytes": 123432,
+      "sha256": "d36cc02af38c8392e61d5fa807ad1724766a886b59957b78c71d49f4c1d934b2"
+    },
+    {
+      "path": "evidence/v0.5.5/live_v1/B5_R8_INDEPENDENT_EXACT_SHA_REVALIDATION/probes/run.log",
+      "bytes": 3383,
+      "sha256": "943bf9801539508a9f6f9f45c35869973947242a190510d3a34651f3a8f2ea06"
+    },
+    {
+      "path": "evidence/v0.5.5/live_v1/B5_R8_INDEPENDENT_EXACT_SHA_REVALIDATION/regression/01.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/v0.5.5/live_v1/B5_R8_INDEPENDENT_EXACT_SHA_REVALIDATION/regression/02.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/v0.5.5/live_v1/B5_R8_INDEPENDENT_EXACT_SHA_REVALIDATION/regression/03.log",
+      "bytes": 19,
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "path": "evidence/v0.5.5/live_v1/B5_R8_INDEPENDENT_EXACT_SHA_REVALIDATION/regression/04.log",
+      "bytes": 45,
+      "sha256": "46068eced9129924d3b0be52573b15943bf1750d772d5fb26c8ee0dcfc5840b2"
+    },
+    {
+      "path": "evidence/v0.5.5/live_v1/B5_R8_INDEPENDENT_EXACT_SHA_REVALIDATION/regression/05.log",
+      "bytes": 99,
+      "sha256": "20ff441af1f777f46eab424ef014836d8db8761ea9e3f224991372722542f7be"
+    },
+    {
+      "path": "evidence/v0.5.5/live_v1/B5_R8_INDEPENDENT_EXACT_SHA_REVALIDATION/regression/06.log",
+      "bytes": 100,
+      "sha256": "afd54351ca35eeca30ec11c5e4d02271d3f6f496c41c4450ba95230215985609"
+    },
+    {
+      "path": "evidence/v0.5.5/live_v1/B5_R8_INDEPENDENT_EXACT_SHA_REVALIDATION/regression/07.log",
+      "bytes": 85,
+      "sha256": "b10b6d360c99b893eb35e623c7c7df6ea4c2e38c62a3962edd1d2dff20b2302f"
+    },
+    {
+      "path": "evidence/v0.5.5/live_v1/B5_R8_INDEPENDENT_EXACT_SHA_REVALIDATION/regression/07.stall.txt",
+      "bytes": 4216,
+      "sha256": "73ec0d67ca48b2241b902b64c86b6699ec257942c65be36c6c7d8e6a111e427d"
+    },
+    {
+      "path": "evidence/v0.5.5/live_v1/B5_R8_INDEPENDENT_EXACT_SHA_REVALIDATION/regression/08.log",
+      "bytes": 180,
+      "sha256": "cef26fadf1316d9715afdfeb067dcd4c50e08cca404619d55146d9c007ab652c"
+    },
+    {
+      "path": "evidence/v0.5.5/live_v1/B5_R8_INDEPENDENT_EXACT_SHA_REVALIDATION/regression/09.log",
+      "bytes": 90,
+      "sha256": "4ce61e4c064e0b19fad16af336a6445ea9feab7e85594578280a8ad50321e9a7"
+    },
+    {
+      "path": "evidence/v0.5.5/live_v1/B5_R8_INDEPENDENT_EXACT_SHA_REVALIDATION/regression/09.stall.txt",
+      "bytes": 4563,
+      "sha256": "7ea5ce97a244f85c44e961ec8de99b0e138bdd0e1cf73ad2c74da234b026696c"
+    },
+    {
+      "path": "evidence/v0.5.5/live_v1/B5_R8_INDEPENDENT_EXACT_SHA_REVALIDATION/regression/10.log",
+      "bytes": 3,
+      "sha256": "ab5df625bc76dbd4e163bed2dd888df828f90159bb93556525c31821b6541d46"
+    },
+    {
+      "path": "evidence/v0.5.5/live_v1/B5_R8_INDEPENDENT_EXACT_SHA_REVALIDATION/regression/10.stall.txt",
+      "bytes": 4545,
+      "sha256": "13c7e845d3040a472f23f35a34021038eaee183d13dcebd74ace55bc551445c1"
+    },
+    {
+      "path": "evidence/v0.5.5/live_v1/B5_R8_INDEPENDENT_EXACT_SHA_REVALIDATION/regression/11.log",
+      "bytes": 180,
+      "sha256": "efcca7d80f227c9870201e8248d6c5e51a5aa47a4ff9f48e828de38395d3d994"
+    },
+    {
+      "path": "evidence/v0.5.5/live_v1/B5_R8_INDEPENDENT_EXACT_SHA_REVALIDATION/regression/12.log",
+      "bytes": 99,
+      "sha256": "b3cc05ba2c9b56c87fc658c44e220228f61d441d99a344b813e62bd22fd93fc2"
+    },
+    {
+      "path": "evidence/v0.5.5/live_v1/B5_R8_INDEPENDENT_EXACT_SHA_REVALIDATION/regression/13.log",
+      "bytes": 164,
+      "sha256": "bc70e4ba52a84adb0b484c6f325099a31740880be3d470c29543f4c7a52c564a"
+    },
+    {
+      "path": "evidence/v0.5.5/live_v1/B5_R8_INDEPENDENT_EXACT_SHA_REVALIDATION/regression/13.stall.txt",
+      "bytes": 4545,
+      "sha256": "f41eeeae07a1e6f1b46661511608423dc62194caf3b7f16489e40d308fcd9a19"
+    },
+    {
+      "path": "evidence/v0.5.5/live_v1/B5_R8_INDEPENDENT_EXACT_SHA_REVALIDATION/regression/runner.py",
+      "bytes": 2265,
+      "sha256": "da8d02354820165bf908a441bcddf2363570e187555c2865a8feb2cb873635fb"
+    },
+    {
+      "path": "evidence/v0.5.5/live_v1/B5_R8_INDEPENDENT_EXACT_SHA_REVALIDATION/regression/summary.json",
+      "bytes": 11426,
+      "sha256": "3675f7bbb11a0b344d0dcc87c3897b8b08d8b7156e83e68358042a8d49bd4846"
+    },
+    {
+      "path": "evidence/v0.5.5/live_v1/B5_R8_INDEPENDENT_EXACT_SHA_REVALIDATION/regression/watchdog_plugin.py",
+      "bytes": 1147,
+      "sha256": "28c1f44c55eb5fb732f8ad452b1a6492a454acd0ce89d7acd74473832333797f"
+    },
+    {
+      "path": "evidence/v0.5.5/live_v1/B5_R8_INDEPENDENT_EXACT_SHA_REVALIDATION/source_review.json",
+      "bytes": 7205,
+      "sha256": "1c290d504f52255a9e71a86f3f066dc1606b64eeca1f656ccf3bc52830ae46a7"
+    },
+    {
+      "path": "reviews/v0.5/live_v1/V0.5.5_LIVE_V1_B5_R8_INDEPENDENT_EXACT_SHA_REVALIDATION_REPORT.md",
+      "bytes": 8393,
+      "sha256": "78c317dcd8327dec720015d0d81b737324413c730749c84bf410c5c394f56786"
+    }
+  ]
+}

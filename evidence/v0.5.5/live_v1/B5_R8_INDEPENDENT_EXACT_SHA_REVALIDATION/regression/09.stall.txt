@@ -1,0 +1,53 @@
+STALL pid=376 elapsed_no_progress=90.1s node=tests/test_live_v1_execution_recovery_r3.py::test_restart_expired_authority_reconciles_active_order_and_protection[False]
+THREAD_STACKS_BEGIN
+Thread 0x0000778fd59446c0 (most recent call first):
+  File "/root/miniconda3/lib/python3.13/concurrent/futures/thread.py", line 90 in _worker
+  File "/root/miniconda3/lib/python3.13/threading.py", line 995 in run
+  File "/root/miniconda3/lib/python3.13/threading.py", line 1044 in _bootstrap_inner
+  File "/root/miniconda3/lib/python3.13/threading.py", line 1015 in _bootstrap
+
+Current thread 0x0000778fd75f06c0 (most recent call first):
+  File "/tmp/b5r8_gatewatch.py", line 11 in report
+  File "/root/miniconda3/lib/python3.13/threading.py", line 995 in run
+  File "/root/miniconda3/lib/python3.13/threading.py", line 1044 in _bootstrap_inner
+  File "/root/miniconda3/lib/python3.13/threading.py", line 1015 in _bootstrap
+
+Thread 0x000077900580d740 (most recent call first):
+  File "/root/miniconda3/lib/python3.13/selectors.py", line 452 in select
+  File "/root/miniconda3/lib/python3.13/asyncio/base_events.py", line 2023 in _run_once
+  File "/root/miniconda3/lib/python3.13/asyncio/base_events.py", line 683 in run_forever
+  File "/root/miniconda3/lib/python3.13/asyncio/base_events.py", line 712 in run_until_complete
+  File "/root/miniconda3/lib/python3.13/asyncio/runners.py", line 118 in run
+  File "/root/miniconda3/lib/python3.13/asyncio/runners.py", line 195 in run
+  File "/tmp/b5-r8-independent-source/tests/test_live_v1_execution_recovery_r3.py", line 67 in test_restart_expired_authority_reconciles_active_order_and_protection
+  File "/root/miniconda3/lib/python3.13/site-packages/_pytest/python.py", line 157 in pytest_pyfunc_call
+  File "/root/miniconda3/lib/python3.13/site-packages/pluggy/_callers.py", line 121 in _multicall
+  File "/root/miniconda3/lib/python3.13/site-packages/pluggy/_manager.py", line 120 in _hookexec
+  File "/root/miniconda3/lib/python3.13/site-packages/pluggy/_hooks.py", line 512 in __call__
+  File "/root/miniconda3/lib/python3.13/site-packages/_pytest/python.py", line 1671 in runtest
+  File "/root/miniconda3/lib/python3.13/site-packages/_pytest/runner.py", line 178 in pytest_runtest_call
+  File "/root/miniconda3/lib/python3.13/site-packages/pluggy/_callers.py", line 121 in _multicall
+  File "/root/miniconda3/lib/python3.13/site-packages/pluggy/_manager.py", line 120 in _hookexec
+  File "/root/miniconda3/lib/python3.13/site-packages/pluggy/_hooks.py", line 512 in __call__
+  File "/root/miniconda3/lib/python3.13/site-packages/_pytest/runner.py", line 246 in <lambda>
+  File "/root/miniconda3/lib/python3.13/site-packages/_pytest/runner.py", line 344 in from_call
+  File "/root/miniconda3/lib/python3.13/site-packages/_pytest/runner.py", line 245 in call_and_report
+  File "/root/miniconda3/lib/python3.13/site-packages/_pytest/runner.py", line 136 in runtestprotocol
+  File "/root/miniconda3/lib/python3.13/site-packages/_pytest/runner.py", line 117 in pytest_runtest_protocol
+  File "/root/miniconda3/lib/python3.13/site-packages/pluggy/_callers.py", line 121 in _multicall
+  File "/root/miniconda3/lib/python3.13/site-packages/pluggy/_manager.py", line 120 in _hookexec
+  File "/root/miniconda3/lib/python3.13/site-packages/pluggy/_hooks.py", line 512 in __call__
+  File "/root/miniconda3/lib/python3.13/site-packages/_pytest/main.py", line 367 in pytest_runtestloop
+  File "/root/miniconda3/lib/python3.13/site-packages/pluggy/_callers.py", line 121 in _multicall
+  File "/root/miniconda3/lib/python3.13/site-packages/pluggy/_manager.py", line 120 in _hookexec
+  File "/root/miniconda3/lib/python3.13/site-packages/pluggy/_hooks.py", line 512 in __call__
+  File "/root/miniconda3/lib/python3.13/site-packages/_pytest/main.py", line 343 in _main
+  File "/root/miniconda3/lib/python3.13/site-packages/_pytest/main.py", line 289 in wrap_session
+  File "/root/miniconda3/lib/python3.13/site-packages/_pytest/main.py", line 336 in pytest_cmdline_main
+  File "/root/miniconda3/lib/python3.13/site-packages/pluggy/_callers.py", line 121 in _multicall
+  File "/root/miniconda3/lib/python3.13/site-packages/pluggy/_manager.py", line 120 in _hookexec
+  File "/root/miniconda3/lib/python3.13/site-packages/pluggy/_hooks.py", line 512 in __call__
+  File "/root/miniconda3/lib/python3.13/site-packages/_pytest/config/__init__.py", line 175 in main
+  File "/root/miniconda3/lib/python3.13/site-packages/_pytest/config/__init__.py", line 201 in console_main
+  File "/root/miniconda3/bin/pytest", line 6 in <module>
+THREAD_STACKS_END

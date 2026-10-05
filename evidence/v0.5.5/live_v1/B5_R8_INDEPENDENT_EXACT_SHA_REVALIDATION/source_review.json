@@ -1,0 +1,86 @@
+{
+  "review_type": "independent_consequential_correctness_source_review",
+  "base_sha": "fde61dafb301d5bd5af3dc7eb81e5618f979036c",
+  "reviewed_sha": "08e81bec003d645a0a0582db183a1b6916887eff",
+  "source_tree": "/tmp/b5-r8-independent-source",
+  "read_only_source_review": true,
+  "blocking_correctness_issues": [
+    {
+      "id": "inherited_cold_event_column_ddl_race",
+      "classification": "Inherited source path; exact duplicate-column behavior observed on target only.",
+      "evidence": [
+        "probes/results.json V7_concurrent_cold: target OperationalError duplicate column name account_id at supervisor.py:247.",
+        "Both parent and target supervisor.py:224-247 commit the dispatch migration lock before reading event columns and performing conditional ALTER TABLE."
+      ],
+      "impact": "A cold concurrent constructor can fail before reaching R8 trigger installation; this violates an all-constructors-succeed startup requirement. No initialized-supervisor authority bypass was observed."
+    },
+    {
+      "id": "inherited_cold_wal_initialization_lock_race",
+      "classification": "Behaviorally reproduced on parent and target using the same differential probe script.",
+      "evidence": [
+        "probes/cold_target.json and probes/cold_parent.json: three cold runs with six constructors each; one of 18 failed on each SHA with OperationalError database is locked at live_db.py:22 PRAGMA journal_mode=WAL.",
+        "All three target final snapshots list eight R8 triggers, including blank-insert and DONE completion guards; all three parent snapshots list six parent triggers."
+      ],
+      "impact": "A constructor can fail before schema migration during concurrent cold WAL initialization. The observed target final databases remained guarded; this is a startup availability failure, not an observed authority bypass."
+    }
+  ],
+  "optional_improvements": [],
+  "findings": [
+    {
+      "id": "recursive_triggers_connection_boundary",
+      "assessment": "Supported within normal Live V1 shared connection usage.",
+      "evidence": [
+        "src/btc_quant_agent/live_db.py:16-36 opens and closes the connection, enables recursive_triggers before yield, verifies a readback of 1, and rolls back/closes on setup failure.",
+        "Targeted imports/callers in src/btc_quant_agent/{account_watch,approval,execution,position_supervisor} use live_db.connection; targeted sqlite3.connect search found no bypass in those modules.",
+        "src/btc_quant_agent/position_supervisor/supervisor.py:346-351 has the pre-existing dispatch DELETE-abort trigger; recursive trigger enablement makes it fire on the implicit DELETE from SQLite REPLACE on the shared connection."
+      ],
+      "impact": "A failed recursive-trigger setup cannot yield a Live V1 connection; a normal shared-connection REPLACE cannot erase an existing dispatch authority row."
+    },
+    {
+      "id": "initial_insert_and_upsert_boundary",
+      "assessment": "Supported.",
+      "evidence": [
+        "src/btc_quant_agent/position_supervisor/supervisor.py:201-218 declares non-null dispatch fields and defaults.",
+        "src/btc_quant_agent/position_supervisor/supervisor.py:289-306 rejects a new row unless it is blank PENDING with analysis_completed=0, no authority/case material, no retries, and no lease.",
+        "src/btc_quant_agent/position_supervisor/supervisor.py:551-558 inserts the normal blank PENDING shape.",
+        "src/btc_quant_agent/position_supervisor/supervisor.py:279-286,308-344 retains update-side identity, admitted-authority, marker, and terminal guards, which also apply to the UPDATE arm of UPSERT."
+      ],
+      "impact": "The added INSERT guard prevents initial forged completion and authority receipts while preserving the production outbox insertion shape."
+    },
+    {
+      "id": "done_transition_and_provider_binding",
+      "assessment": "Supported.",
+      "evidence": [
+        "src/btc_quant_agent/position_supervisor/supervisor.py:325-344 rejects transition to DONE with marker 0 and retains the R7 authorization-function guard for marker 0-to-1.",
+        "src/btc_quant_agent/position_supervisor/supervisor.py:730-786 mints admission only after checking the durable event, lease, frozen case, and existing receipt; an admitted incomplete receipt raises rather than replays.",
+        "src/btc_quant_agent/position_supervisor/supervisor.py:788-835 validates admission and lease under BEGIN IMMEDIATE, installs the one-transaction completion function, and sets DONE plus marker in one guarded UPDATE.",
+        "src/btc_quant_agent/position_supervisor/supervisor.py:883-893 and 1091-1108 fail closed on an admitted incomplete candidate or uncertain provider/completion outcome."
+      ],
+      "impact": "A state-only DONE update cannot fabricate completion. The legitimate terminal transition remains coupled to the admitted case and provider path; uncertain admitted work is not replayed."
+    },
+    {
+      "id": "bounded_change_scope",
+      "assessment": "Supported by exact base-to-reviewed-SHA path diff.",
+      "evidence": [
+        "git diff --name-only fde61dafb301d5bd5af3dc7eb81e5618f979036c 08e81bec003d645a0a0582db183a1b6916887eff lists exactly seven files: evidence/v0.5.5/live_v1/B4_DAY2_VALIDATION.json; src/btc_quant_agent/live_db.py; src/btc_quant_agent/position_supervisor/supervisor.py; tests/test_live_v1_position_authority_r4.py; tests/test_live_v1_position_outbox_r7.py; tests/test_live_v1_position_outbox_r8.py; tests/test_live_v1_position_supervisor.py.",
+        "No H40, H41, A-line, or scientific-golden file appears in those changed paths; no public REST source or route file appears in those changed paths."
+      ],
+      "impact": "H40/H41/A-line/scientific-golden mutation count is zero and public REST new mutation count is zero for this bounded diff."
+    }
+  ],
+  "limitations": [
+    "This is source review, not an independent behavioral test result. The R8 committed tests were read to understand claimed behavior but were not used as semantic proof.",
+    "The source cannot authenticate pre-R8 historical rows that already carried fabricated completion markers; the new guards prevent new insert or transition fabrication after installation.",
+    "Raw sqlite connections that deliberately leave recursive_triggers OFF, PRAGMA changes after the shared connection yields, and schema/trigger tampering fall outside normal shared-connection semantics and are not treated as R8 correctness regressions.",
+    "No credentials, account/execution databases, network endpoints, or funds were accessed.",
+    "Cold-start concurrency is not fully compatible: original target probe observed duplicate-column failure; differential target and parent probes each observed a WAL lock failure. The source-identical duplicate-column path is inherited, but that exact exception was not behaviorally reproduced on parent. See cold_constructor_review.json."
+  ],
+  "required_safety_state": {
+    "LIVE_WRITE_AUTHORITY": "NONE",
+    "REAL_FUNDS_WRITE_COUNT": 0,
+    "LIVE_APPROVAL_ONLY": "NOT_AUTHORIZED",
+    "AUTONOMOUS_LIVE": "FORBIDDEN",
+    "PUBLIC_REST_MUTATION_SURFACES": 0
+  },
+  "r8_new_blocking_correctness_issues": []
+}

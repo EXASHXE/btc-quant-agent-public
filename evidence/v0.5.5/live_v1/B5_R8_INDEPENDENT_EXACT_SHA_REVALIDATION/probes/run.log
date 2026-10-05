@@ -1,0 +1,80 @@
+IDENTITY_runtime_imports PASS
+V1_settings_10000 PASS
+V1_settings_1739 PASS
+V1_settings_1 PASS
+V1_fail_closed_enable_error PASS
+V1_fail_closed_readback_zero PASS
+V1_fail_closed_read_error PASS
+V1_fail_closed_read_missing PASS
+V2_blank_pending PASS
+V2_reject_state PASS
+V2_reject_analysis_completed PASS
+V2_reject_dispatch_authority_json PASS
+V2_reject_dispatch_authority_hash PASS
+V2_reject_analysis_admission_hash PASS
+V2_reject_position_case_id PASS
+V2_reject_position_case_hash PASS
+V2_reject_position_case_json PASS
+V2_reject_case_hash PASS
+V2_reject_retry_count PASS
+V2_reject_lease_token PASS
+V2_reject_lease_expires_at_ms PASS
+V2_new_terminal_INSERT OR REPLACE PASS
+V2_new_terminal_REPLACE PASS
+V3_frozen_INSERT OR REPLACE_blank_primary PASS
+V3_frozen_INSERT OR REPLACE_blank_unique PASS
+V3_frozen_INSERT OR REPLACE_fabricated_terminal_primary PASS
+V3_frozen_INSERT OR REPLACE_fabricated_terminal_unique PASS
+V3_frozen_REPLACE_blank_primary PASS
+V3_frozen_REPLACE_blank_unique PASS
+V3_frozen_REPLACE_fabricated_terminal_primary PASS
+V3_frozen_REPLACE_fabricated_terminal_unique PASS
+V3_admitted_INSERT OR REPLACE_blank_primary PASS
+V3_admitted_INSERT OR REPLACE_blank_unique PASS
+V3_admitted_INSERT OR REPLACE_fabricated_terminal_primary PASS
+V3_admitted_INSERT OR REPLACE_fabricated_terminal_unique PASS
+V3_admitted_REPLACE_blank_primary PASS
+V3_admitted_REPLACE_blank_unique PASS
+V3_admitted_REPLACE_fabricated_terminal_primary PASS
+V3_admitted_REPLACE_fabricated_terminal_unique PASS
+V3_completed_INSERT OR REPLACE_blank_primary PASS
+V3_completed_INSERT OR REPLACE_blank_unique PASS
+V3_completed_INSERT OR REPLACE_fabricated_terminal_primary PASS
+V3_completed_INSERT OR REPLACE_fabricated_terminal_unique PASS
+V3_completed_REPLACE_blank_primary PASS
+V3_completed_REPLACE_blank_unique PASS
+V3_completed_REPLACE_fabricated_terminal_primary PASS
+V3_completed_REPLACE_fabricated_terminal_unique PASS
+V4_upsert_authority PASS
+V4_upsert_completion PASS
+V4_completion PASS
+V4_marker_only PASS
+V4_done_only PASS
+V4_delete PASS
+V4_authority_event_hash PASS
+V4_authority_symbol PASS
+V4_authority_dispatch_authority_json PASS
+V4_authority_dispatch_authority_hash PASS
+V4_authority_analysis_admission_hash PASS
+V4_authority_position_case_id PASS
+V4_authority_position_case_hash PASS
+V4_authority_position_case_json PASS
+V4_authority_case_hash PASS
+V5_V6_positive_atomic_terminal_canonical_admission_exact_provider PASS
+V5_terminal_commit_rollback PASS
+V5_V6_restart_frozen PASS
+V5_V6_restart_admitted PASS
+V5_V6_restart_provider_returned PASS
+V6_terminal_binding_lease PASS
+V6_terminal_binding_authority_json PASS
+V6_terminal_binding_authority_hash PASS
+V6_terminal_binding_admission_hash PASS
+V6_terminal_binding_event_json PASS
+V6_terminal_binding_case_json PASS
+V7_historical_DONE PASS
+V7_historical_PENDING PASS
+V7_concurrent_current PASS
+V7_concurrent_legacy PASS
+V7_concurrent_cold FAIL
+IDENTITY_runtime_imports_final PASS
+{"authorship":"Fresh independent coordinating validator; no committed test/helper imports","count":79,"failed":1,"passed":78,"python":"3.13.13 | packaged by Anaconda, Inc. | (main, Apr 14 2026, 06:19:41) [GCC 14.3.0]","safety":{"AUTONOMOUS_LIVE":"FORBIDDEN","LIVE_APPROVAL_ONLY":"NOT_AUTHORIZED","LIVE_WRITE_AUTHORITY":"NONE","PUBLIC_REST_MUTATION_SURFACES":0,"REAL_FUNDS_WRITE_COUNT":0},"source_checkout":"/tmp/b5-r8-independent-source","sqlite":"3.51.2"}

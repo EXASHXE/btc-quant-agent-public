@@ -1,0 +1,1830 @@
+{
+  "authorship": "Fresh independent coordinating validator; no committed test/helper imports",
+  "source_checkout": "/tmp/b5-r8-independent-source",
+  "python": "3.13.13 | packaged by Anaconda, Inc. | (main, Apr 14 2026, 06:19:41) [GCC 14.3.0]",
+  "sqlite": "3.51.2",
+  "count": 79,
+  "passed": 78,
+  "failed": 1,
+  "results": [
+    {
+      "name": "IDENTITY_runtime_imports",
+      "status": "PASS",
+      "detail": {
+        "btc_quant_agent": "/tmp/b5-r8-independent-source/src/btc_quant_agent/__init__.py",
+        "btc_quant_agent.live_db": "/tmp/b5-r8-independent-source/src/btc_quant_agent/live_db.py",
+        "btc_quant_agent.decision": "/tmp/b5-r8-independent-source/src/btc_quant_agent/decision/__init__.py",
+        "btc_quant_agent.decision.models": "/tmp/b5-r8-independent-source/src/btc_quant_agent/decision/models.py",
+        "btc_quant_agent.approval.store": "/tmp/b5-r8-independent-source/src/btc_quant_agent/approval/store.py",
+        "btc_quant_agent.approval": "/tmp/b5-r8-independent-source/src/btc_quant_agent/approval/__init__.py",
+        "btc_quant_agent.decision.risk": "/tmp/b5-r8-independent-source/src/btc_quant_agent/decision/risk.py",
+        "btc_quant_agent.approval.feishu": "/tmp/b5-r8-independent-source/src/btc_quant_agent/approval/feishu.py",
+        "btc_quant_agent.market_watch.config": "/tmp/b5-r8-independent-source/src/btc_quant_agent/market_watch/config.py",
+        "btc_quant_agent.domain": "/tmp/b5-r8-independent-source/src/btc_quant_agent/domain.py",
+        "btc_quant_agent.market_watch.domain": "/tmp/b5-r8-independent-source/src/btc_quant_agent/market_watch/domain.py",
+        "btc_quant_agent.indicators": "/tmp/b5-r8-independent-source/src/btc_quant_agent/indicators.py",
+        "btc_quant_agent.structure": "/tmp/b5-r8-independent-source/src/btc_quant_agent/structure.py",
+        "btc_quant_agent.market_watch.snapshot": "/tmp/b5-r8-independent-source/src/btc_quant_agent/market_watch/snapshot.py",
+        "btc_quant_agent.market_watch.evidence": "/tmp/b5-r8-independent-source/src/btc_quant_agent/market_watch/evidence.py",
+        "btc_quant_agent.market_watch.grid_shadow_evidence": "/tmp/b5-r8-independent-source/src/btc_quant_agent/market_watch/grid_shadow_evidence.py",
+        "btc_quant_agent.market_watch.shadow_evidence": "/tmp/b5-r8-independent-source/src/btc_quant_agent/market_watch/shadow_evidence.py",
+        "btc_quant_agent.market_watch": "/tmp/b5-r8-independent-source/src/btc_quant_agent/market_watch/__init__.py",
+        "btc_quant_agent.config": "/tmp/b5-r8-independent-source/src/btc_quant_agent/config.py",
+        "btc_quant_agent.data": "/tmp/b5-r8-independent-source/src/btc_quant_agent/data/__init__.py",
+        "btc_quant_agent.time_boundary": "/tmp/b5-r8-independent-source/src/btc_quant_agent/time_boundary.py",
+        "btc_quant_agent.data.rest": "/tmp/b5-r8-independent-source/src/btc_quant_agent/data/rest.py",
+        "btc_quant_agent.data.binance": "/tmp/b5-r8-independent-source/src/btc_quant_agent/data/binance.py",
+        "btc_quant_agent.notify": "/tmp/b5-r8-independent-source/src/btc_quant_agent/notify/__init__.py",
+        "btc_quant_agent.notify.feishu": "/tmp/b5-r8-independent-source/src/btc_quant_agent/notify/feishu.py",
+        "btc_quant_agent.market_watch.alerting": "/tmp/b5-r8-independent-source/src/btc_quant_agent/market_watch/alerting.py",
+        "btc_quant_agent.market_watch.grid_policy": "/tmp/b5-r8-independent-source/src/btc_quant_agent/market_watch/grid_policy.py",
+        "btc_quant_agent.market_watch.state": "/tmp/b5-r8-independent-source/src/btc_quant_agent/market_watch/state.py",
+        "btc_quant_agent.market_watch.grid_shadow": "/tmp/b5-r8-independent-source/src/btc_quant_agent/market_watch/grid_shadow.py",
+        "btc_quant_agent.market_watch.context": "/tmp/b5-r8-independent-source/src/btc_quant_agent/market_watch/context.py",
+        "btc_quant_agent.market_watch.derivatives": "/tmp/b5-r8-independent-source/src/btc_quant_agent/market_watch/derivatives.py",
+        "btc_quant_agent.market_watch.entry_quality": "/tmp/b5-r8-independent-source/src/btc_quant_agent/market_watch/entry_quality.py",
+        "btc_quant_agent.market_watch.lifecycle": "/tmp/b5-r8-independent-source/src/btc_quant_agent/market_watch/lifecycle.py",
+        "btc_quant_agent.market_watch.playbooks": "/tmp/b5-r8-independent-source/src/btc_quant_agent/market_watch/playbooks.py",
+        "btc_quant_agent.market_watch.ranking": "/tmp/b5-r8-independent-source/src/btc_quant_agent/market_watch/ranking.py",
+        "btc_quant_agent.market_watch.scanner": "/tmp/b5-r8-independent-source/src/btc_quant_agent/market_watch/scanner.py",
+        "btc_quant_agent.market_watch.shadow": "/tmp/b5-r8-independent-source/src/btc_quant_agent/market_watch/shadow.py",
+        "btc_quant_agent.market_watch.service": "/tmp/b5-r8-independent-source/src/btc_quant_agent/market_watch/service.py",
+        "btc_quant_agent.decision.backends": "/tmp/b5-r8-independent-source/src/btc_quant_agent/decision/backends.py",
+        "btc_quant_agent.decision.case": "/tmp/b5-r8-independent-source/src/btc_quant_agent/decision/case.py",
+        "btc_quant_agent.decision.fusion": "/tmp/b5-r8-independent-source/src/btc_quant_agent/decision/fusion.py",
+        "btc_quant_agent.decision.service": "/tmp/b5-r8-independent-source/src/btc_quant_agent/decision/service.py",
+        "btc_quant_agent.position_supervisor.models": "/tmp/b5-r8-independent-source/src/btc_quant_agent/position_supervisor/models.py",
+        "btc_quant_agent.position_supervisor.kill_switch": "/tmp/b5-r8-independent-source/src/btc_quant_agent/position_supervisor/kill_switch.py",
+        "btc_quant_agent.account_watch.models": "/tmp/b5-r8-independent-source/src/btc_quant_agent/account_watch/models.py",
+        "btc_quant_agent.execution.binance_signed": "/tmp/b5-r8-independent-source/src/btc_quant_agent/execution/binance_signed.py",
+        "btc_quant_agent.execution.models": "/tmp/b5-r8-independent-source/src/btc_quant_agent/execution/models.py",
+        "btc_quant_agent.execution.guard": "/tmp/b5-r8-independent-source/src/btc_quant_agent/execution/guard.py",
+        "btc_quant_agent.account_watch.store": "/tmp/b5-r8-independent-source/src/btc_quant_agent/account_watch/store.py",
+        "btc_quant_agent.execution.intents": "/tmp/b5-r8-independent-source/src/btc_quant_agent/execution/intents.py",
+        "btc_quant_agent.execution.policy": "/tmp/b5-r8-independent-source/src/btc_quant_agent/execution/policy.py",
+        "btc_quant_agent.execution.protection": "/tmp/b5-r8-independent-source/src/btc_quant_agent/execution/protection.py",
+        "btc_quant_agent.execution.backend": "/tmp/b5-r8-independent-source/src/btc_quant_agent/execution/backend.py",
+        "btc_quant_agent.execution.environment": "/tmp/b5-r8-independent-source/src/btc_quant_agent/execution/environment.py",
+        "btc_quant_agent.live_market.models": "/tmp/b5-r8-independent-source/src/btc_quant_agent/live_market/models.py",
+        "btc_quant_agent.live_market.service": "/tmp/b5-r8-independent-source/src/btc_quant_agent/live_market/service.py",
+        "btc_quant_agent.live_market": "/tmp/b5-r8-independent-source/src/btc_quant_agent/live_market/__init__.py",
+        "btc_quant_agent.execution.validator": "/tmp/b5-r8-independent-source/src/btc_quant_agent/execution/validator.py",
+        "btc_quant_agent.execution.executor": "/tmp/b5-r8-independent-source/src/btc_quant_agent/execution/executor.py",
+        "btc_quant_agent.execution": "/tmp/b5-r8-independent-source/src/btc_quant_agent/execution/__init__.py",
+        "btc_quant_agent.account_watch.service": "/tmp/b5-r8-independent-source/src/btc_quant_agent/account_watch/service.py",
+        "btc_quant_agent.account_watch": "/tmp/b5-r8-independent-source/src/btc_quant_agent/account_watch/__init__.py",
+        "btc_quant_agent.position_supervisor.supervisor": "/tmp/b5-r8-independent-source/src/btc_quant_agent/position_supervisor/supervisor.py",
+        "btc_quant_agent.position_supervisor": "/tmp/b5-r8-independent-source/src/btc_quant_agent/position_supervisor/__init__.py"
+      }
+    },
+    {
+      "name": "V1_settings_10000",
+      "status": "PASS",
+      "detail": [
+        {
+          "recursive_triggers": 1,
+          "journal_mode": "wal",
+          "synchronous": 2,
+          "foreign_keys": 1,
+          "busy_timeout": 10000
+        },
+        {
+          "recursive_triggers": 1,
+          "journal_mode": "wal",
+          "synchronous": 2,
+          "foreign_keys": 1,
+          "busy_timeout": 10000
+        },
+        {
+          "recursive_triggers": 1,
+          "journal_mode": "wal",
+          "synchronous": 2,
+          "foreign_keys": 1,
+          "busy_timeout": 10000
+        }
+      ]
+    },
+    {
+      "name": "V1_settings_1739",
+      "status": "PASS",
+      "detail": [
+        {
+          "recursive_triggers": 1,
+          "journal_mode": "wal",
+          "synchronous": 2,
+          "foreign_keys": 1,
+          "busy_timeout": 1739
+        },
+        {
+          "recursive_triggers": 1,
+          "journal_mode": "wal",
+          "synchronous": 2,
+          "foreign_keys": 1,
+          "busy_timeout": 1739
+        },
+        {
+          "recursive_triggers": 1,
+          "journal_mode": "wal",
+          "synchronous": 2,
+          "foreign_keys": 1,
+          "busy_timeout": 1739
+        }
+      ]
+    },
+    {
+      "name": "V1_settings_1",
+      "status": "PASS",
+      "detail": [
+        {
+          "recursive_triggers": 1,
+          "journal_mode": "wal",
+          "synchronous": 2,
+          "foreign_keys": 1,
+          "busy_timeout": 1
+        },
+        {
+          "recursive_triggers": 1,
+          "journal_mode": "wal",
+          "synchronous": 2,
+          "foreign_keys": 1,
+          "busy_timeout": 1
+        },
+        {
+          "recursive_triggers": 1,
+          "journal_mode": "wal",
+          "synchronous": 2,
+          "foreign_keys": 1,
+          "busy_timeout": 1
+        }
+      ]
+    },
+    {
+      "name": "V1_fail_closed_enable_error",
+      "status": "PASS",
+      "detail": {
+        "yielded": false,
+        "rollback": true,
+        "closed": true,
+        "error": "synthetic unsupported pragma"
+      }
+    },
+    {
+      "name": "V1_fail_closed_readback_zero",
+      "status": "PASS",
+      "detail": {
+        "yielded": false,
+        "rollback": true,
+        "closed": true,
+        "error": "LIVE_RECURSIVE_TRIGGERS_REQUIRED"
+      }
+    },
+    {
+      "name": "V1_fail_closed_read_error",
+      "status": "PASS",
+      "detail": {
+        "yielded": false,
+        "rollback": true,
+        "closed": true,
+        "error": "synthetic unreadable pragma"
+      }
+    },
+    {
+      "name": "V1_fail_closed_read_missing",
+      "status": "PASS",
+      "detail": {
+        "yielded": false,
+        "rollback": true,
+        "closed": true,
+        "error": "'NoneType' object is not subscriptable"
+      }
+    },
+    {
+      "name": "V2_blank_pending",
+      "status": "PASS",
+      "detail": {
+        "mutation": {},
+        "sql": "INSERT INTO live_position_case_dispatches (event_id,event_hash,symbol,state,created_at_ms,updated_at_ms) VALUES (?,?,?,?,?,?)",
+        "error": null,
+        "stored": {
+          "event_id": "fresh-independent",
+          "event_hash": "fresh-independent-hash",
+          "position_case_id": "",
+          "position_case_hash": "",
+          "position_case_json": "",
+          "case_hash": "",
+          "dispatch_authority_json": "",
+          "dispatch_authority_hash": "",
+          "analysis_admission_hash": "",
+          "analysis_completed": 0,
+          "symbol": "BTCUSDT",
+          "state": "PENDING",
+          "retry_count": 0,
+          "lease_token": null,
+          "lease_expires_at_ms": 0,
+          "created_at_ms": 1790000000000,
+          "updated_at_ms": 1790000000000
+        }
+      }
+    },
+    {
+      "name": "V2_reject_state",
+      "status": "PASS",
+      "detail": {
+        "mutation": {
+          "state": "DONE"
+        },
+        "sql": "INSERT INTO live_position_case_dispatches (event_id,event_hash,symbol,state,created_at_ms,updated_at_ms) VALUES (?,?,?,?,?,?)",
+        "error": "DISPATCH_INSERT_REQUIRES_BLANK_PENDING",
+        "stored": null
+      }
+    },
+    {
+      "name": "V2_reject_analysis_completed",
+      "status": "PASS",
+      "detail": {
+        "mutation": {
+          "analysis_completed": 1
+        },
+        "sql": "INSERT INTO live_position_case_dispatches (event_id,event_hash,symbol,state,created_at_ms,updated_at_ms,analysis_completed) VALUES (?,?,?,?,?,?,?)",
+        "error": "DISPATCH_INSERT_REQUIRES_BLANK_PENDING",
+        "stored": null
+      }
+    },
+    {
+      "name": "V2_reject_dispatch_authority_json",
+      "status": "PASS",
+      "detail": {
+        "mutation": {
+          "dispatch_authority_json": "{}"
+        },
+        "sql": "INSERT INTO live_position_case_dispatches (event_id,event_hash,symbol,state,created_at_ms,updated_at_ms,dispatch_authority_json) VALUES (?,?,?,?,?,?,?)",
+        "error": "DISPATCH_INSERT_REQUIRES_BLANK_PENDING",
+        "stored": null
+      }
+    },
+    {
+      "name": "V2_reject_dispatch_authority_hash",
+      "status": "PASS",
+      "detail": {
+        "mutation": {
+          "dispatch_authority_hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+        },
+        "sql": "INSERT INTO live_position_case_dispatches (event_id,event_hash,symbol,state,created_at_ms,updated_at_ms,dispatch_authority_hash) VALUES (?,?,?,?,?,?,?)",
+        "error": "DISPATCH_INSERT_REQUIRES_BLANK_PENDING",
+        "stored": null
+      }
+    },
+    {
+      "name": "V2_reject_analysis_admission_hash",
+      "status": "PASS",
+      "detail": {
+        "mutation": {
+          "analysis_admission_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+        },
+        "sql": "INSERT INTO live_position_case_dispatches (event_id,event_hash,symbol,state,created_at_ms,updated_at_ms,analysis_admission_hash) VALUES (?,?,?,?,?,?,?)",
+        "error": "DISPATCH_INSERT_REQUIRES_BLANK_PENDING",
+        "stored": null
+      }
+    },
+    {
+      "name": "V2_reject_position_case_id",
+      "status": "PASS",
+      "detail": {
+        "mutation": {
+          "position_case_id": "forged"
+        },
+        "sql": "INSERT INTO live_position_case_dispatches (event_id,event_hash,symbol,state,created_at_ms,updated_at_ms,position_case_id) VALUES (?,?,?,?,?,?,?)",
+        "error": "DISPATCH_INSERT_REQUIRES_BLANK_PENDING",
+        "stored": null
+      }
+    },
+    {
+      "name": "V2_reject_position_case_hash",
+      "status": "PASS",
+      "detail": {
+        "mutation": {
+          "position_case_hash": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+        },
+        "sql": "INSERT INTO live_position_case_dispatches (event_id,event_hash,symbol,state,created_at_ms,updated_at_ms,position_case_hash) VALUES (?,?,?,?,?,?,?)",
+        "error": "DISPATCH_INSERT_REQUIRES_BLANK_PENDING",
+        "stored": null
+      }
+    },
+    {
+      "name": "V2_reject_position_case_json",
+      "status": "PASS",
+      "detail": {
+        "mutation": {
+          "position_case_json": "{}"
+        },
+        "sql": "INSERT INTO live_position_case_dispatches (event_id,event_hash,symbol,state,created_at_ms,updated_at_ms,position_case_json) VALUES (?,?,?,?,?,?,?)",
+        "error": "DISPATCH_INSERT_REQUIRES_BLANK_PENDING",
+        "stored": null
+      }
+    },
+    {
+      "name": "V2_reject_case_hash",
+      "status": "PASS",
+      "detail": {
+        "mutation": {
+          "case_hash": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+        },
+        "sql": "INSERT INTO live_position_case_dispatches (event_id,event_hash,symbol,state,created_at_ms,updated_at_ms,case_hash) VALUES (?,?,?,?,?,?,?)",
+        "error": "DISPATCH_INSERT_REQUIRES_BLANK_PENDING",
+        "stored": null
+      }
+    },
+    {
+      "name": "V2_reject_retry_count",
+      "status": "PASS",
+      "detail": {
+        "mutation": {
+          "retry_count": 1
+        },
+        "sql": "INSERT INTO live_position_case_dispatches (event_id,event_hash,symbol,state,created_at_ms,updated_at_ms,retry_count) VALUES (?,?,?,?,?,?,?)",
+        "error": "DISPATCH_INSERT_REQUIRES_BLANK_PENDING",
+        "stored": null
+      }
+    },
+    {
+      "name": "V2_reject_lease_token",
+      "status": "PASS",
+      "detail": {
+        "mutation": {
+          "lease_token": "forged-lease"
+        },
+        "sql": "INSERT INTO live_position_case_dispatches (event_id,event_hash,symbol,state,created_at_ms,updated_at_ms,lease_token) VALUES (?,?,?,?,?,?,?)",
+        "error": "DISPATCH_INSERT_REQUIRES_BLANK_PENDING",
+        "stored": null
+      }
+    },
+    {
+      "name": "V2_reject_lease_expires_at_ms",
+      "status": "PASS",
+      "detail": {
+        "mutation": {
+          "lease_expires_at_ms": 1790000001000
+        },
+        "sql": "INSERT INTO live_position_case_dispatches (event_id,event_hash,symbol,state,created_at_ms,updated_at_ms,lease_expires_at_ms) VALUES (?,?,?,?,?,?,?)",
+        "error": "DISPATCH_INSERT_REQUIRES_BLANK_PENDING",
+        "stored": null
+      }
+    },
+    {
+      "name": "V2_new_terminal_INSERT OR REPLACE",
+      "status": "PASS",
+      "detail": {
+        "mutation": {
+          "state": "DONE",
+          "analysis_completed": 1
+        },
+        "sql": "INSERT OR REPLACE INTO live_position_case_dispatches (event_id,event_hash,symbol,state,created_at_ms,updated_at_ms,analysis_completed) VALUES (?,?,?,?,?,?,?)",
+        "error": "DISPATCH_INSERT_REQUIRES_BLANK_PENDING",
+        "stored": null
+      }
+    },
+    {
+      "name": "V2_new_terminal_REPLACE",
+      "status": "PASS",
+      "detail": {
+        "mutation": {
+          "state": "DONE",
+          "analysis_completed": 1
+        },
+        "sql": "REPLACE INTO live_position_case_dispatches (event_id,event_hash,symbol,state,created_at_ms,updated_at_ms,analysis_completed) VALUES (?,?,?,?,?,?,?)",
+        "error": "DISPATCH_INSERT_REQUIRES_BLANK_PENDING",
+        "stored": null
+      }
+    },
+    {
+      "name": "V3_frozen_INSERT OR REPLACE_blank_primary",
+      "status": "PASS",
+      "detail": {
+        "sql": "INSERT OR REPLACE INTO live_position_case_dispatches (event_id,event_hash,symbol,state,created_at_ms,updated_at_ms) VALUES (?,?,?,?,?,?)",
+        "error": "DISPATCH_DELETE_BLOCKED",
+        "unchanged_row_hash": "bafedee63ffa46f5c40a96d11e9df22eb6871d15fe5f93f3140fe4625b16b25f",
+        "phase": "frozen",
+        "form": "INSERT OR REPLACE",
+        "payload": "blank",
+        "collision": "primary"
+      }
+    },
+    {
+      "name": "V3_frozen_INSERT OR REPLACE_blank_unique",
+      "status": "PASS",
+      "detail": {
+        "sql": "INSERT OR REPLACE INTO live_position_case_dispatches (event_id,event_hash,symbol,state,created_at_ms,updated_at_ms) VALUES (?,?,?,?,?,?)",
+        "error": "DISPATCH_DELETE_BLOCKED",
+        "unchanged_row_hash": "f861a6c4a7d3d5af13725855572d77b211c5500c90a006d7a9fb9688a4f23fec",
+        "phase": "frozen",
+        "form": "INSERT OR REPLACE",
+        "payload": "blank",
+        "collision": "unique"
+      }
+    },
+    {
+      "name": "V3_frozen_INSERT OR REPLACE_fabricated_terminal_primary",
+      "status": "PASS",
+      "detail": {
+        "sql": "INSERT OR REPLACE INTO live_position_case_dispatches (event_id,event_hash,symbol,state,created_at_ms,updated_at_ms,position_case_id,position_case_hash,position_case_json,case_hash,dispatch_authority_json,dispatch_authority_hash,analysis_admission_hash,analysis_completed,retry_count,lease_token,lease_expires_at_ms) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+        "error": "DISPATCH_INSERT_REQUIRES_BLANK_PENDING",
+        "unchanged_row_hash": "6ff3a827c7f9950aa1538e2eaf05c8b2e0d7ebf2940b3fbd74e6881ebfdd6a09",
+        "phase": "frozen",
+        "form": "INSERT OR REPLACE",
+        "payload": "fabricated_terminal",
+        "collision": "primary"
+      }
+    },
+    {
+      "name": "V3_frozen_INSERT OR REPLACE_fabricated_terminal_unique",
+      "status": "PASS",
+      "detail": {
+        "sql": "INSERT OR REPLACE INTO live_position_case_dispatches (event_id,event_hash,symbol,state,created_at_ms,updated_at_ms,position_case_id,position_case_hash,position_case_json,case_hash,dispatch_authority_json,dispatch_authority_hash,analysis_admission_hash,analysis_completed,retry_count,lease_token,lease_expires_at_ms) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+        "error": "DISPATCH_INSERT_REQUIRES_BLANK_PENDING",
+        "unchanged_row_hash": "a1783fc4fcd1b02de61b8e8fec15d0675822e883783c0ef5254e1a9e13f75b03",
+        "phase": "frozen",
+        "form": "INSERT OR REPLACE",
+        "payload": "fabricated_terminal",
+        "collision": "unique"
+      }
+    },
+    {
+      "name": "V3_frozen_REPLACE_blank_primary",
+      "status": "PASS",
+      "detail": {
+        "sql": "REPLACE INTO live_position_case_dispatches (event_id,event_hash,symbol,state,created_at_ms,updated_at_ms) VALUES (?,?,?,?,?,?)",
+        "error": "DISPATCH_DELETE_BLOCKED",
+        "unchanged_row_hash": "2964dd38f65f974279d467af642d7a4e7b37662ab6883ca419aefac58d4291ab",
+        "phase": "frozen",
+        "form": "REPLACE",
+        "payload": "blank",
+        "collision": "primary"
+      }
+    },
+    {
+      "name": "V3_frozen_REPLACE_blank_unique",
+      "status": "PASS",
+      "detail": {
+        "sql": "REPLACE INTO live_position_case_dispatches (event_id,event_hash,symbol,state,created_at_ms,updated_at_ms) VALUES (?,?,?,?,?,?)",
+        "error": "DISPATCH_DELETE_BLOCKED",
+        "unchanged_row_hash": "cbea67aeb1322648580faa04277f6ce7f8b740e5828cd09dcde6d0507bbc7dda",
+        "phase": "frozen",
+        "form": "REPLACE",
+        "payload": "blank",
+        "collision": "unique"
+      }
+    },
+    {
+      "name": "V3_frozen_REPLACE_fabricated_terminal_primary",
+      "status": "PASS",
+      "detail": {
+        "sql": "REPLACE INTO live_position_case_dispatches (event_id,event_hash,symbol,state,created_at_ms,updated_at_ms,position_case_id,position_case_hash,position_case_json,case_hash,dispatch_authority_json,dispatch_authority_hash,analysis_admission_hash,analysis_completed,retry_count,lease_token,lease_expires_at_ms) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+        "error": "DISPATCH_INSERT_REQUIRES_BLANK_PENDING",
+        "unchanged_row_hash": "878679b349a8197f4fb7d27aa719c2ff1319699490eef4ca8dc2e58b424b2543",
+        "phase": "frozen",
+        "form": "REPLACE",
+        "payload": "fabricated_terminal",
+        "collision": "primary"
+      }
+    },
+    {
+      "name": "V3_frozen_REPLACE_fabricated_terminal_unique",
+      "status": "PASS",
+      "detail": {
+        "sql": "REPLACE INTO live_position_case_dispatches (event_id,event_hash,symbol,state,created_at_ms,updated_at_ms,position_case_id,position_case_hash,position_case_json,case_hash,dispatch_authority_json,dispatch_authority_hash,analysis_admission_hash,analysis_completed,retry_count,lease_token,lease_expires_at_ms) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+        "error": "DISPATCH_INSERT_REQUIRES_BLANK_PENDING",
+        "unchanged_row_hash": "65d91d13392fcf13fb77f9ff64a87d44f7bb93cc7f1b630ae7582ab784c8b6db",
+        "phase": "frozen",
+        "form": "REPLACE",
+        "payload": "fabricated_terminal",
+        "collision": "unique"
+      }
+    },
+    {
+      "name": "V3_admitted_INSERT OR REPLACE_blank_primary",
+      "status": "PASS",
+      "detail": {
+        "sql": "INSERT OR REPLACE INTO live_position_case_dispatches (event_id,event_hash,symbol,state,created_at_ms,updated_at_ms) VALUES (?,?,?,?,?,?)",
+        "error": "DISPATCH_DELETE_BLOCKED",
+        "unchanged_row_hash": "a2e49c6f76025a074c9250c5e4a10e503b28fc15b51a34c8fdfa321aaca40494",
+        "phase": "admitted",
+        "form": "INSERT OR REPLACE",
+        "payload": "blank",
+        "collision": "primary"
+      }
+    },
+    {
+      "name": "V3_admitted_INSERT OR REPLACE_blank_unique",
+      "status": "PASS",
+      "detail": {
+        "sql": "INSERT OR REPLACE INTO live_position_case_dispatches (event_id,event_hash,symbol,state,created_at_ms,updated_at_ms) VALUES (?,?,?,?,?,?)",
+        "error": "DISPATCH_DELETE_BLOCKED",
+        "unchanged_row_hash": "95708e6e267b25059b45937f7c9b760eed57ab91f0a262cda04a5480682f1323",
+        "phase": "admitted",
+        "form": "INSERT OR REPLACE",
+        "payload": "blank",
+        "collision": "unique"
+      }
+    },
+    {
+      "name": "V3_admitted_INSERT OR REPLACE_fabricated_terminal_primary",
+      "status": "PASS",
+      "detail": {
+        "sql": "INSERT OR REPLACE INTO live_position_case_dispatches (event_id,event_hash,symbol,state,created_at_ms,updated_at_ms,position_case_id,position_case_hash,position_case_json,case_hash,dispatch_authority_json,dispatch_authority_hash,analysis_admission_hash,analysis_completed,retry_count,lease_token,lease_expires_at_ms) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+        "error": "DISPATCH_INSERT_REQUIRES_BLANK_PENDING",
+        "unchanged_row_hash": "ef54f0c500f8de487e7314f3ec1a28e97f16614a2b27605e86bb7372ee1cb89e",
+        "phase": "admitted",
+        "form": "INSERT OR REPLACE",
+        "payload": "fabricated_terminal",
+        "collision": "primary"
+      }
+    },
+    {
+      "name": "V3_admitted_INSERT OR REPLACE_fabricated_terminal_unique",
+      "status": "PASS",
+      "detail": {
+        "sql": "INSERT OR REPLACE INTO live_position_case_dispatches (event_id,event_hash,symbol,state,created_at_ms,updated_at_ms,position_case_id,position_case_hash,position_case_json,case_hash,dispatch_authority_json,dispatch_authority_hash,analysis_admission_hash,analysis_completed,retry_count,lease_token,lease_expires_at_ms) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+        "error": "DISPATCH_INSERT_REQUIRES_BLANK_PENDING",
+        "unchanged_row_hash": "bd40cd3be40183c4c553c5f0ca18b9972e4c9bb9e0e9cd6c3a637c95d2460559",
+        "phase": "admitted",
+        "form": "INSERT OR REPLACE",
+        "payload": "fabricated_terminal",
+        "collision": "unique"
+      }
+    },
+    {
+      "name": "V3_admitted_REPLACE_blank_primary",
+      "status": "PASS",
+      "detail": {
+        "sql": "REPLACE INTO live_position_case_dispatches (event_id,event_hash,symbol,state,created_at_ms,updated_at_ms) VALUES (?,?,?,?,?,?)",
+        "error": "DISPATCH_DELETE_BLOCKED",
+        "unchanged_row_hash": "2afe7dd761192812d67ab69908798cba11d5315ea05255163eab61e03a4f6817",
+        "phase": "admitted",
+        "form": "REPLACE",
+        "payload": "blank",
+        "collision": "primary"
+      }
+    },
+    {
+      "name": "V3_admitted_REPLACE_blank_unique",
+      "status": "PASS",
+      "detail": {
+        "sql": "REPLACE INTO live_position_case_dispatches (event_id,event_hash,symbol,state,created_at_ms,updated_at_ms) VALUES (?,?,?,?,?,?)",
+        "error": "DISPATCH_DELETE_BLOCKED",
+        "unchanged_row_hash": "67eccd4d427749c1dcbaab39739295e4046d4bea4db0220cf5332bec8008fd7c",
+        "phase": "admitted",
+        "form": "REPLACE",
+        "payload": "blank",
+        "collision": "unique"
+      }
+    },
+    {
+      "name": "V3_admitted_REPLACE_fabricated_terminal_primary",
+      "status": "PASS",
+      "detail": {
+        "sql": "REPLACE INTO live_position_case_dispatches (event_id,event_hash,symbol,state,created_at_ms,updated_at_ms,position_case_id,position_case_hash,position_case_json,case_hash,dispatch_authority_json,dispatch_authority_hash,analysis_admission_hash,analysis_completed,retry_count,lease_token,lease_expires_at_ms) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+        "error": "DISPATCH_INSERT_REQUIRES_BLANK_PENDING",
+        "unchanged_row_hash": "88a8d2e34da0330f5e85f81c78e7f0674bd2598abb00a5aa8413d09f7675b6d4",
+        "phase": "admitted",
+        "form": "REPLACE",
+        "payload": "fabricated_terminal",
+        "collision": "primary"
+      }
+    },
+    {
+      "name": "V3_admitted_REPLACE_fabricated_terminal_unique",
+      "status": "PASS",
+      "detail": {
+        "sql": "REPLACE INTO live_position_case_dispatches (event_id,event_hash,symbol,state,created_at_ms,updated_at_ms,position_case_id,position_case_hash,position_case_json,case_hash,dispatch_authority_json,dispatch_authority_hash,analysis_admission_hash,analysis_completed,retry_count,lease_token,lease_expires_at_ms) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+        "error": "DISPATCH_INSERT_REQUIRES_BLANK_PENDING",
+        "unchanged_row_hash": "2b72fd60ea7a2260c76ff79987743d7618a197740e1fcc7768a10be06e42b7d4",
+        "phase": "admitted",
+        "form": "REPLACE",
+        "payload": "fabricated_terminal",
+        "collision": "unique"
+      }
+    },
+    {
+      "name": "V3_completed_INSERT OR REPLACE_blank_primary",
+      "status": "PASS",
+      "detail": {
+        "sql": "INSERT OR REPLACE INTO live_position_case_dispatches (event_id,event_hash,symbol,state,created_at_ms,updated_at_ms) VALUES (?,?,?,?,?,?)",
+        "error": "DISPATCH_DELETE_BLOCKED",
+        "unchanged_row_hash": "7c4c2f3ecd421b673eb5e42e2e27073488a9b6ffc2884defffe2efaf8525eb22",
+        "phase": "completed",
+        "form": "INSERT OR REPLACE",
+        "payload": "blank",
+        "collision": "primary"
+      }
+    },
+    {
+      "name": "V3_completed_INSERT OR REPLACE_blank_unique",
+      "status": "PASS",
+      "detail": {
+        "sql": "INSERT OR REPLACE INTO live_position_case_dispatches (event_id,event_hash,symbol,state,created_at_ms,updated_at_ms) VALUES (?,?,?,?,?,?)",
+        "error": "DISPATCH_DELETE_BLOCKED",
+        "unchanged_row_hash": "62ac422365fa6bb55df723d48aefad3e4ab5eee32b4a6ca50dc5685f3023e8e0",
+        "phase": "completed",
+        "form": "INSERT OR REPLACE",
+        "payload": "blank",
+        "collision": "unique"
+      }
+    },
+    {
+      "name": "V3_completed_INSERT OR REPLACE_fabricated_terminal_primary",
+      "status": "PASS",
+      "detail": {
+        "sql": "INSERT OR REPLACE INTO live_position_case_dispatches (event_id,event_hash,symbol,state,created_at_ms,updated_at_ms,position_case_id,position_case_hash,position_case_json,case_hash,dispatch_authority_json,dispatch_authority_hash,analysis_admission_hash,analysis_completed,retry_count,lease_token,lease_expires_at_ms) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+        "error": "DISPATCH_INSERT_REQUIRES_BLANK_PENDING",
+        "unchanged_row_hash": "013ac16fe9eff95f1b12e42d65090335cf56cdf48a5fc3cf0625d9534523072b",
+        "phase": "completed",
+        "form": "INSERT OR REPLACE",
+        "payload": "fabricated_terminal",
+        "collision": "primary"
+      }
+    },
+    {
+      "name": "V3_completed_INSERT OR REPLACE_fabricated_terminal_unique",
+      "status": "PASS",
+      "detail": {
+        "sql": "INSERT OR REPLACE INTO live_position_case_dispatches (event_id,event_hash,symbol,state,created_at_ms,updated_at_ms,position_case_id,position_case_hash,position_case_json,case_hash,dispatch_authority_json,dispatch_authority_hash,analysis_admission_hash,analysis_completed,retry_count,lease_token,lease_expires_at_ms) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+        "error": "DISPATCH_INSERT_REQUIRES_BLANK_PENDING",
+        "unchanged_row_hash": "1dc38bd114018189d1cab6b2c4d58228204ff4a842a693f5bf4ad915b9d16216",
+        "phase": "completed",
+        "form": "INSERT OR REPLACE",
+        "payload": "fabricated_terminal",
+        "collision": "unique"
+      }
+    },
+    {
+      "name": "V3_completed_REPLACE_blank_primary",
+      "status": "PASS",
+      "detail": {
+        "sql": "REPLACE INTO live_position_case_dispatches (event_id,event_hash,symbol,state,created_at_ms,updated_at_ms) VALUES (?,?,?,?,?,?)",
+        "error": "DISPATCH_DELETE_BLOCKED",
+        "unchanged_row_hash": "99df7404e931ca53af6bfe284b2107cde22305b89dfd84523c53ffcee3e1df75",
+        "phase": "completed",
+        "form": "REPLACE",
+        "payload": "blank",
+        "collision": "primary"
+      }
+    },
+    {
+      "name": "V3_completed_REPLACE_blank_unique",
+      "status": "PASS",
+      "detail": {
+        "sql": "REPLACE INTO live_position_case_dispatches (event_id,event_hash,symbol,state,created_at_ms,updated_at_ms) VALUES (?,?,?,?,?,?)",
+        "error": "DISPATCH_DELETE_BLOCKED",
+        "unchanged_row_hash": "77c98ac4c0eb819429687d85614c00dfd081da0e32f0569c2e163c98e9b3918d",
+        "phase": "completed",
+        "form": "REPLACE",
+        "payload": "blank",
+        "collision": "unique"
+      }
+    },
+    {
+      "name": "V3_completed_REPLACE_fabricated_terminal_primary",
+      "status": "PASS",
+      "detail": {
+        "sql": "REPLACE INTO live_position_case_dispatches (event_id,event_hash,symbol,state,created_at_ms,updated_at_ms,position_case_id,position_case_hash,position_case_json,case_hash,dispatch_authority_json,dispatch_authority_hash,analysis_admission_hash,analysis_completed,retry_count,lease_token,lease_expires_at_ms) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+        "error": "DISPATCH_INSERT_REQUIRES_BLANK_PENDING",
+        "unchanged_row_hash": "d0e5445fa6eaaeac09199ff4fa35f69b38211662566e39f65c7e119c8f8c00ca",
+        "phase": "completed",
+        "form": "REPLACE",
+        "payload": "fabricated_terminal",
+        "collision": "primary"
+      }
+    },
+    {
+      "name": "V3_completed_REPLACE_fabricated_terminal_unique",
+      "status": "PASS",
+      "detail": {
+        "sql": "REPLACE INTO live_position_case_dispatches (event_id,event_hash,symbol,state,created_at_ms,updated_at_ms,position_case_id,position_case_hash,position_case_json,case_hash,dispatch_authority_json,dispatch_authority_hash,analysis_admission_hash,analysis_completed,retry_count,lease_token,lease_expires_at_ms) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+        "error": "DISPATCH_INSERT_REQUIRES_BLANK_PENDING",
+        "unchanged_row_hash": "36b510bca5519750fb6d1d760f4a09cfa2201de99ae269912bca209a6b35c675",
+        "phase": "completed",
+        "form": "REPLACE",
+        "payload": "fabricated_terminal",
+        "collision": "unique"
+      }
+    },
+    {
+      "name": "V4_upsert_authority",
+      "status": "PASS",
+      "detail": {
+        "sql": "INSERT INTO live_position_case_dispatches (event_id,event_hash,symbol,state,created_at_ms,updated_at_ms) VALUES (?,?,?,?,?,?) ON CONFLICT(event_id) DO UPDATE SET dispatch_authority_json='{}'",
+        "error": "DISPATCH_ADMISSION_IMMUTABLE",
+        "unchanged_row_hash": "105e912904c5a9fff2256d9d6912adb761034e83f048daa682700f1a254f7910"
+      }
+    },
+    {
+      "name": "V4_upsert_completion",
+      "status": "PASS",
+      "detail": {
+        "sql": "INSERT INTO live_position_case_dispatches (event_id,event_hash,symbol,state,created_at_ms,updated_at_ms) VALUES (?,?,?,?,?,?) ON CONFLICT(event_id) DO UPDATE SET state='DONE',analysis_completed=1,lease_token=NULL,lease_expires_at_ms=0",
+        "error": "no such function: position_analysis_completion_authorized",
+        "unchanged_row_hash": "7842a51082b4fde319f69de4ccf35b2cce09c38ed4b774556f3a27a2cec6738b"
+      }
+    },
+    {
+      "name": "V4_completion",
+      "status": "PASS",
+      "detail": {
+        "sql": "UPDATE live_position_case_dispatches SET state='DONE',analysis_completed=1,lease_token=NULL,lease_expires_at_ms=0 WHERE event_id=?",
+        "error": "no such function: position_analysis_completion_authorized",
+        "unchanged_row_hash": "016b2a44565ee7aa970f566328d34c076cecd472496f544ca7c6829628d923e6"
+      }
+    },
+    {
+      "name": "V4_marker_only",
+      "status": "PASS",
+      "detail": {
+        "sql": "UPDATE live_position_case_dispatches SET analysis_completed=1 WHERE event_id=?",
+        "error": "no such function: position_analysis_completion_authorized",
+        "unchanged_row_hash": "d6e03e6eadc1e001a46db014d289771cb40acd7a4188fa4a9510d0b64d3ecbc3"
+      }
+    },
+    {
+      "name": "V4_done_only",
+      "status": "PASS",
+      "detail": {
+        "sql": "UPDATE live_position_case_dispatches SET state='DONE' WHERE event_id=?",
+        "error": "DONE_REQUIRES_ANALYSIS_COMPLETION",
+        "unchanged_row_hash": "cb5480929456b5df6cb8b74eca6e3d38585981c0eabab6a119aa417d7d662d8c"
+      }
+    },
+    {
+      "name": "V4_delete",
+      "status": "PASS",
+      "detail": {
+        "sql": "DELETE FROM live_position_case_dispatches WHERE event_id=?",
+        "error": "DISPATCH_DELETE_BLOCKED",
+        "unchanged_row_hash": "7e186c3b1003a6b263e88802b3143f1909ebdcb8c3fc00e6fc36a28bdb87d0e8"
+      }
+    },
+    {
+      "name": "V4_authority_event_hash",
+      "status": "PASS",
+      "detail": {
+        "sql": "UPDATE live_position_case_dispatches SET event_hash='changed' WHERE event_id=?",
+        "error": "DISPATCH_AUTHORITY_IMMUTABLE",
+        "unchanged_row_hash": "a39b3fa38c4e5a4685a0c2311a3e64cbee0f1f2729c17f01dfdbc2b5c66ab9d5"
+      }
+    },
+    {
+      "name": "V4_authority_symbol",
+      "status": "PASS",
+      "detail": {
+        "sql": "UPDATE live_position_case_dispatches SET symbol='changed' WHERE event_id=?",
+        "error": "DISPATCH_AUTHORITY_IMMUTABLE",
+        "unchanged_row_hash": "94cf2d9a8ab91f4bf3f52dc6f59fa20c40fabaee15db9d7481c81c3f225bfd16"
+      }
+    },
+    {
+      "name": "V4_authority_dispatch_authority_json",
+      "status": "PASS",
+      "detail": {
+        "sql": "UPDATE live_position_case_dispatches SET dispatch_authority_json='changed' WHERE event_id=?",
+        "error": "DISPATCH_ADMISSION_IMMUTABLE",
+        "unchanged_row_hash": "42013801e488e0b6d9e566b1382620c7a8278cf3f9f78e3af41d7ee4a6705806"
+      }
+    },
+    {
+      "name": "V4_authority_dispatch_authority_hash",
+      "status": "PASS",
+      "detail": {
+        "sql": "UPDATE live_position_case_dispatches SET dispatch_authority_hash='changed' WHERE event_id=?",
+        "error": "DISPATCH_ADMISSION_IMMUTABLE",
+        "unchanged_row_hash": "55c8f2ab00b8ad6fd3fec872d22481a7114736a252a4083e23466cab9567c6b7"
+      }
+    },
+    {
+      "name": "V4_authority_analysis_admission_hash",
+      "status": "PASS",
+      "detail": {
+        "sql": "UPDATE live_position_case_dispatches SET analysis_admission_hash='changed' WHERE event_id=?",
+        "error": "DISPATCH_ADMISSION_IMMUTABLE",
+        "unchanged_row_hash": "b6261db4991c7a05463b452439eab30251742a64cb4e4f5e44dc8f5f0cf12e9a"
+      }
+    },
+    {
+      "name": "V4_authority_position_case_id",
+      "status": "PASS",
+      "detail": {
+        "sql": "UPDATE live_position_case_dispatches SET position_case_id='changed' WHERE event_id=?",
+        "error": "DISPATCH_ADMISSION_IMMUTABLE",
+        "unchanged_row_hash": "1524f56ee28b43bd6a0ca640274fb6f22455b201e403e59f0fb126c6a1d671f1"
+      }
+    },
+    {
+      "name": "V4_authority_position_case_hash",
+      "status": "PASS",
+      "detail": {
+        "sql": "UPDATE live_position_case_dispatches SET position_case_hash='changed' WHERE event_id=?",
+        "error": "DISPATCH_ADMISSION_IMMUTABLE",
+        "unchanged_row_hash": "60844e1445501d9d58e5c2ed84d280d0be4f30cc343a1749d2069fd5c74156df"
+      }
+    },
+    {
+      "name": "V4_authority_position_case_json",
+      "status": "PASS",
+      "detail": {
+        "sql": "UPDATE live_position_case_dispatches SET position_case_json='changed' WHERE event_id=?",
+        "error": "DISPATCH_ADMISSION_IMMUTABLE",
+        "unchanged_row_hash": "d6fa55ca33723f65408bfe626def5511a3df7433c6376bdd1c67c65bc2eb3cdf"
+      }
+    },
+    {
+      "name": "V4_authority_case_hash",
+      "status": "PASS",
+      "detail": {
+        "sql": "UPDATE live_position_case_dispatches SET case_hash='changed' WHERE event_id=?",
+        "error": "DISPATCH_ADMISSION_IMMUTABLE",
+        "unchanged_row_hash": "0402990cdeb408239480a1e809fd1d0d985ba2da185b77df1764a64abe5f6aed"
+      }
+    },
+    {
+      "name": "V5_V6_positive_atomic_terminal_canonical_admission_exact_provider",
+      "status": "PASS",
+      "detail": {
+        "row": {
+          "event_id": "pe-c6c8dee93f7a33f48e12f235",
+          "event_hash": "6e484d0f905698110fade748d4490b0a24c40a0a8514a29d226ec49dc0bee784",
+          "position_case_id": "pos-pe-c6c8dee93f7a33f48e12f235",
+          "position_case_hash": "9b82e22096fb6df6a861d095bba75442245e33683f710b78082e406262fcb49d",
+          "position_case_json": "{\"account\":null,\"atr\":700.0,\"base_case_hash\":\"6fa8ac3bad1383d607d43c82ad62199bd3b90972eea1ff252d24d70bb6be87d5\",\"basis_rate\":null,\"book_imbalance\":null,\"calibration\":null,\"case_hash\":\"9b82e22096fb6df6a861d095bba75442245e33683f710b78082e406262fcb49d\",\"case_id\":\"pos-pe-c6c8dee93f7a33f48e12f235\",\"created_at_ms\":1790000000000,\"data_quality\":\"OK\",\"direction\":\"LONG\",\"entry_high\":60010.0,\"entry_low\":59990.0,\"entry_quality\":\"UNKNOWN\",\"evidence_id\":\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\"expires_at_ms\":1790000180000,\"funding_rate\":null,\"global_account_ratio\":null,\"grid_state\":\"UNKNOWN\",\"liquidity_measure\":\"UNKNOWN\",\"liquidity_usdt\":1000000.0,\"missing_fields\":[],\"observed_at_ms\":1790000000000,\"oi_12h_change\":null,\"oi_1h_change\":null,\"oi_4h_change\":null,\"open_interest\":null,\"position_event_hash\":\"6e484d0f905698110fade748d4490b0a24c40a0a8514a29d226ec49dc0bee784\",\"price\":60000.0,\"reason_codes\":[],\"regime_15m\":\"UNKNOWN\",\"regime_1h\":\"UNKNOWN\",\"regime_4h\":\"UNKNOWN\",\"resistances\":[],\"risk_codes\":[],\"schema_version\":\"CASE_PACKAGE_V1\",\"signal_identity\":\"independent-local\",\"snapshot_hash\":\"synthetic-only\",\"source\":\"POSITION_SUPERVISOR\",\"source_errors\":[],\"source_receipts\":[],\"spread_bps\":1.0,\"stop_loss\":55000.0,\"strategy\":\"SYNTHETIC\",\"strategy_version\":\"probe-v1\",\"supports\":[],\"symbol\":\"BTCUSDT\",\"take_profit_1\":66000.0,\"take_profit_2\":70000.0,\"taker_ratio\":null,\"top_trader_account_ratio\":null,\"top_trader_position_ratio\":null,\"trigger\":\"POSITION_OPENED\",\"veto_reasons\":[],\"volatility_percentile\":null,\"volume\":0.0}",
+          "case_hash": "9b82e22096fb6df6a861d095bba75442245e33683f710b78082e406262fcb49d",
+          "dispatch_authority_json": "{\"account_id\":\"probe-account\",\"credential_namespace\":\"NONE\",\"environment\":\"DRY_RUN\",\"event_hash\":\"6e484d0f905698110fade748d4490b0a24c40a0a8514a29d226ec49dc0bee784\",\"event_id\":\"pe-c6c8dee93f7a33f48e12f235\",\"lease_token\":\"b04d17516ed5bd93809eb337128c372c\",\"position_authority_key\":\"e82402c36638c9bd51fe9ff235da6eb648100fb0bbf6796c58106ac05e0e9fb9\",\"position_case_hash\":\"9b82e22096fb6df6a861d095bba75442245e33683f710b78082e406262fcb49d\",\"position_case_id\":\"pos-pe-c6c8dee93f7a33f48e12f235\",\"position_side\":\"BOTH\",\"schema_version\":\"POSITION_DISPATCH_AUTHORITY_V1\",\"symbol\":\"BTCUSDT\"}",
+          "dispatch_authority_hash": "f04aa56f89afba23e550b57ca05bef2f9f395978bb9b1f4d6bff83af8b6d4eee",
+          "analysis_admission_hash": "0e8388f96b660509cad2213a1d9737149fd822e3c48fc7efd501c0cae79d6dbb",
+          "analysis_completed": 1,
+          "symbol": "BTCUSDT",
+          "state": "DONE",
+          "retry_count": 1,
+          "lease_token": null,
+          "lease_expires_at_ms": 0,
+          "created_at_ms": 1790000000000,
+          "updated_at_ms": 1790000000005
+        },
+        "before_terminal": {
+          "event_id": "pe-c6c8dee93f7a33f48e12f235",
+          "event_hash": "6e484d0f905698110fade748d4490b0a24c40a0a8514a29d226ec49dc0bee784",
+          "position_case_id": "pos-pe-c6c8dee93f7a33f48e12f235",
+          "position_case_hash": "9b82e22096fb6df6a861d095bba75442245e33683f710b78082e406262fcb49d",
+          "position_case_json": "{\"account\":null,\"atr\":700.0,\"base_case_hash\":\"6fa8ac3bad1383d607d43c82ad62199bd3b90972eea1ff252d24d70bb6be87d5\",\"basis_rate\":null,\"book_imbalance\":null,\"calibration\":null,\"case_hash\":\"9b82e22096fb6df6a861d095bba75442245e33683f710b78082e406262fcb49d\",\"case_id\":\"pos-pe-c6c8dee93f7a33f48e12f235\",\"created_at_ms\":1790000000000,\"data_quality\":\"OK\",\"direction\":\"LONG\",\"entry_high\":60010.0,\"entry_low\":59990.0,\"entry_quality\":\"UNKNOWN\",\"evidence_id\":\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\"expires_at_ms\":1790000180000,\"funding_rate\":null,\"global_account_ratio\":null,\"grid_state\":\"UNKNOWN\",\"liquidity_measure\":\"UNKNOWN\",\"liquidity_usdt\":1000000.0,\"missing_fields\":[],\"observed_at_ms\":1790000000000,\"oi_12h_change\":null,\"oi_1h_change\":null,\"oi_4h_change\":null,\"open_interest\":null,\"position_event_hash\":\"6e484d0f905698110fade748d4490b0a24c40a0a8514a29d226ec49dc0bee784\",\"price\":60000.0,\"reason_codes\":[],\"regime_15m\":\"UNKNOWN\",\"regime_1h\":\"UNKNOWN\",\"regime_4h\":\"UNKNOWN\",\"resistances\":[],\"risk_codes\":[],\"schema_version\":\"CASE_PACKAGE_V1\",\"signal_identity\":\"independent-local\",\"snapshot_hash\":\"synthetic-only\",\"source\":\"POSITION_SUPERVISOR\",\"source_errors\":[],\"source_receipts\":[],\"spread_bps\":1.0,\"stop_loss\":55000.0,\"strategy\":\"SYNTHETIC\",\"strategy_version\":\"probe-v1\",\"supports\":[],\"symbol\":\"BTCUSDT\",\"take_profit_1\":66000.0,\"take_profit_2\":70000.0,\"taker_ratio\":null,\"top_trader_account_ratio\":null,\"top_trader_position_ratio\":null,\"trigger\":\"POSITION_OPENED\",\"veto_reasons\":[],\"volatility_percentile\":null,\"volume\":0.0}",
+          "case_hash": "9b82e22096fb6df6a861d095bba75442245e33683f710b78082e406262fcb49d",
+          "dispatch_authority_json": "{\"account_id\":\"probe-account\",\"credential_namespace\":\"NONE\",\"environment\":\"DRY_RUN\",\"event_hash\":\"6e484d0f905698110fade748d4490b0a24c40a0a8514a29d226ec49dc0bee784\",\"event_id\":\"pe-c6c8dee93f7a33f48e12f235\",\"lease_token\":\"b04d17516ed5bd93809eb337128c372c\",\"position_authority_key\":\"e82402c36638c9bd51fe9ff235da6eb648100fb0bbf6796c58106ac05e0e9fb9\",\"position_case_hash\":\"9b82e22096fb6df6a861d095bba75442245e33683f710b78082e406262fcb49d\",\"position_case_id\":\"pos-pe-c6c8dee93f7a33f48e12f235\",\"position_side\":\"BOTH\",\"schema_version\":\"POSITION_DISPATCH_AUTHORITY_V1\",\"symbol\":\"BTCUSDT\"}",
+          "dispatch_authority_hash": "f04aa56f89afba23e550b57ca05bef2f9f395978bb9b1f4d6bff83af8b6d4eee",
+          "analysis_admission_hash": "0e8388f96b660509cad2213a1d9737149fd822e3c48fc7efd501c0cae79d6dbb",
+          "analysis_completed": 0,
+          "symbol": "BTCUSDT",
+          "state": "DISPATCHING",
+          "retry_count": 1,
+          "lease_token": "b04d17516ed5bd93809eb337128c372c",
+          "lease_expires_at_ms": 1790000030005,
+          "created_at_ms": 1790000000000,
+          "updated_at_ms": 1790000000005
+        },
+        "provider_inputs": [
+          {
+            "case_json": "{\"account\":null,\"atr\":700.0,\"base_case_hash\":\"6fa8ac3bad1383d607d43c82ad62199bd3b90972eea1ff252d24d70bb6be87d5\",\"basis_rate\":null,\"book_imbalance\":null,\"calibration\":null,\"case_hash\":\"9b82e22096fb6df6a861d095bba75442245e33683f710b78082e406262fcb49d\",\"case_id\":\"pos-pe-c6c8dee93f7a33f48e12f235\",\"created_at_ms\":1790000000000,\"data_quality\":\"OK\",\"direction\":\"LONG\",\"entry_high\":60010.0,\"entry_low\":59990.0,\"entry_quality\":\"UNKNOWN\",\"evidence_id\":\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\"expires_at_ms\":1790000180000,\"funding_rate\":null,\"global_account_ratio\":null,\"grid_state\":\"UNKNOWN\",\"liquidity_measure\":\"UNKNOWN\",\"liquidity_usdt\":1000000.0,\"missing_fields\":[],\"observed_at_ms\":1790000000000,\"oi_12h_change\":null,\"oi_1h_change\":null,\"oi_4h_change\":null,\"open_interest\":null,\"position_event_hash\":\"6e484d0f905698110fade748d4490b0a24c40a0a8514a29d226ec49dc0bee784\",\"price\":60000.0,\"reason_codes\":[],\"regime_15m\":\"UNKNOWN\",\"regime_1h\":\"UNKNOWN\",\"regime_4h\":\"UNKNOWN\",\"resistances\":[],\"risk_codes\":[],\"schema_version\":\"CASE_PACKAGE_V1\",\"signal_identity\":\"independent-local\",\"snapshot_hash\":\"synthetic-only\",\"source\":\"POSITION_SUPERVISOR\",\"source_errors\":[],\"source_receipts\":[],\"spread_bps\":1.0,\"stop_loss\":55000.0,\"strategy\":\"SYNTHETIC\",\"strategy_version\":\"probe-v1\",\"supports\":[],\"symbol\":\"BTCUSDT\",\"take_profit_1\":66000.0,\"take_profit_2\":70000.0,\"taker_ratio\":null,\"top_trader_account_ratio\":null,\"top_trader_position_ratio\":null,\"trigger\":\"POSITION_OPENED\",\"veto_reasons\":[],\"volatility_percentile\":null,\"volume\":0.0}",
+            "mode": "PRIMARY"
+          }
+        ],
+        "admission": {
+          "authority_json": "{\"account_id\":\"probe-account\",\"credential_namespace\":\"NONE\",\"environment\":\"DRY_RUN\",\"event_hash\":\"6e484d0f905698110fade748d4490b0a24c40a0a8514a29d226ec49dc0bee784\",\"event_id\":\"pe-c6c8dee93f7a33f48e12f235\",\"lease_token\":\"b04d17516ed5bd93809eb337128c372c\",\"position_authority_key\":\"e82402c36638c9bd51fe9ff235da6eb648100fb0bbf6796c58106ac05e0e9fb9\",\"position_case_hash\":\"9b82e22096fb6df6a861d095bba75442245e33683f710b78082e406262fcb49d\",\"position_case_id\":\"pos-pe-c6c8dee93f7a33f48e12f235\",\"position_side\":\"BOTH\",\"schema_version\":\"POSITION_DISPATCH_AUTHORITY_V1\",\"symbol\":\"BTCUSDT\"}",
+          "authority_hash": "f04aa56f89afba23e550b57ca05bef2f9f395978bb9b1f4d6bff83af8b6d4eee",
+          "admission_hash": "0e8388f96b660509cad2213a1d9737149fd822e3c48fc7efd501c0cae79d6dbb",
+          "case_json": "{\"account\":null,\"atr\":700.0,\"base_case_hash\":\"6fa8ac3bad1383d607d43c82ad62199bd3b90972eea1ff252d24d70bb6be87d5\",\"basis_rate\":null,\"book_imbalance\":null,\"calibration\":null,\"case_hash\":\"9b82e22096fb6df6a861d095bba75442245e33683f710b78082e406262fcb49d\",\"case_id\":\"pos-pe-c6c8dee93f7a33f48e12f235\",\"created_at_ms\":1790000000000,\"data_quality\":\"OK\",\"direction\":\"LONG\",\"entry_high\":60010.0,\"entry_low\":59990.0,\"entry_quality\":\"UNKNOWN\",\"evidence_id\":\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\"expires_at_ms\":1790000180000,\"funding_rate\":null,\"global_account_ratio\":null,\"grid_state\":\"UNKNOWN\",\"liquidity_measure\":\"UNKNOWN\",\"liquidity_usdt\":1000000.0,\"missing_fields\":[],\"observed_at_ms\":1790000000000,\"oi_12h_change\":null,\"oi_1h_change\":null,\"oi_4h_change\":null,\"open_interest\":null,\"position_event_hash\":\"6e484d0f905698110fade748d4490b0a24c40a0a8514a29d226ec49dc0bee784\",\"price\":60000.0,\"reason_codes\":[],\"regime_15m\":\"UNKNOWN\",\"regime_1h\":\"UNKNOWN\",\"regime_4h\":\"UNKNOWN\",\"resistances\":[],\"risk_codes\":[],\"schema_version\":\"CASE_PACKAGE_V1\",\"signal_identity\":\"independent-local\",\"snapshot_hash\":\"synthetic-only\",\"source\":\"POSITION_SUPERVISOR\",\"source_errors\":[],\"source_receipts\":[],\"spread_bps\":1.0,\"stop_loss\":55000.0,\"strategy\":\"SYNTHETIC\",\"strategy_version\":\"probe-v1\",\"supports\":[],\"symbol\":\"BTCUSDT\",\"take_profit_1\":66000.0,\"take_profit_2\":70000.0,\"taker_ratio\":null,\"top_trader_account_ratio\":null,\"top_trader_position_ratio\":null,\"trigger\":\"POSITION_OPENED\",\"veto_reasons\":[],\"volatility_percentile\":null,\"volume\":0.0}",
+          "event_json": "{\"account_id\":\"probe-account\",\"credential_namespace\":\"NONE\",\"details\":{\"mark_price\":60000.0,\"quantity\":0.01},\"environment\":\"DRY_RUN\",\"event_hash\":\"6e484d0f905698110fade748d4490b0a24c40a0a8514a29d226ec49dc0bee784\",\"event_id\":\"pe-c6c8dee93f7a33f48e12f235\",\"observed_at_ms\":1790000000000,\"position_authority_key\":\"e82402c36638c9bd51fe9ff235da6eb648100fb0bbf6796c58106ac05e0e9fb9\",\"position_side\":\"BOTH\",\"schema_version\":\"POSITION_EVENT_V1\",\"source_hash\":\"9e6bb930c671fbc6d102a419158a4b987a96604a2df86b02067b45129265e8ec\",\"symbol\":\"BTCUSDT\",\"trigger\":\"POSITION_OPENED\"}",
+          "provider_completed": false
+        },
+        "exchange_write_count": 0
+      }
+    },
+    {
+      "name": "V5_terminal_commit_rollback",
+      "status": "PASS",
+      "detail": {
+        "row": {
+          "event_id": "pe-34606c926231c5e8bceb48b4",
+          "event_hash": "1634a313f3a0470ae865116ed2e27a0b1509c93de7e9a2d89fdc6cd4e6698f03",
+          "position_case_id": "pos-pe-34606c926231c5e8bceb48b4",
+          "position_case_hash": "48e54bc8628525075f8c75143b62204d1708fab823a8213fe008ca65fd44ca13",
+          "position_case_json": "{\"account\":null,\"atr\":700.0,\"base_case_hash\":\"6fa8ac3bad1383d607d43c82ad62199bd3b90972eea1ff252d24d70bb6be87d5\",\"basis_rate\":null,\"book_imbalance\":null,\"calibration\":null,\"case_hash\":\"48e54bc8628525075f8c75143b62204d1708fab823a8213fe008ca65fd44ca13\",\"case_id\":\"pos-pe-34606c926231c5e8bceb48b4\",\"created_at_ms\":1790000000000,\"data_quality\":\"OK\",\"direction\":\"LONG\",\"entry_high\":60010.0,\"entry_low\":59990.0,\"entry_quality\":\"UNKNOWN\",\"evidence_id\":\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\"expires_at_ms\":1790000180000,\"funding_rate\":null,\"global_account_ratio\":null,\"grid_state\":\"UNKNOWN\",\"liquidity_measure\":\"UNKNOWN\",\"liquidity_usdt\":1000000.0,\"missing_fields\":[],\"observed_at_ms\":1790000000000,\"oi_12h_change\":null,\"oi_1h_change\":null,\"oi_4h_change\":null,\"open_interest\":null,\"position_event_hash\":\"1634a313f3a0470ae865116ed2e27a0b1509c93de7e9a2d89fdc6cd4e6698f03\",\"price\":60000.0,\"reason_codes\":[],\"regime_15m\":\"UNKNOWN\",\"regime_1h\":\"UNKNOWN\",\"regime_4h\":\"UNKNOWN\",\"resistances\":[],\"risk_codes\":[],\"schema_version\":\"CASE_PACKAGE_V1\",\"signal_identity\":\"independent-local\",\"snapshot_hash\":\"synthetic-only\",\"source\":\"POSITION_SUPERVISOR\",\"source_errors\":[],\"source_receipts\":[],\"spread_bps\":1.0,\"stop_loss\":55000.0,\"strategy\":\"SYNTHETIC\",\"strategy_version\":\"probe-v1\",\"supports\":[],\"symbol\":\"BTCUSDT\",\"take_profit_1\":66000.0,\"take_profit_2\":70000.0,\"taker_ratio\":null,\"top_trader_account_ratio\":null,\"top_trader_position_ratio\":null,\"trigger\":\"POSITION_OPENED\",\"veto_reasons\":[],\"volatility_percentile\":null,\"volume\":0.0}",
+          "case_hash": "48e54bc8628525075f8c75143b62204d1708fab823a8213fe008ca65fd44ca13",
+          "dispatch_authority_json": "{\"account_id\":\"probe-account\",\"credential_namespace\":\"NONE\",\"environment\":\"DRY_RUN\",\"event_hash\":\"1634a313f3a0470ae865116ed2e27a0b1509c93de7e9a2d89fdc6cd4e6698f03\",\"event_id\":\"pe-34606c926231c5e8bceb48b4\",\"lease_token\":\"e619261eff45447e392bba847fe8c2d0\",\"position_authority_key\":\"e82402c36638c9bd51fe9ff235da6eb648100fb0bbf6796c58106ac05e0e9fb9\",\"position_case_hash\":\"48e54bc8628525075f8c75143b62204d1708fab823a8213fe008ca65fd44ca13\",\"position_case_id\":\"pos-pe-34606c926231c5e8bceb48b4\",\"position_side\":\"BOTH\",\"schema_version\":\"POSITION_DISPATCH_AUTHORITY_V1\",\"symbol\":\"BTCUSDT\"}",
+          "dispatch_authority_hash": "bcfb3a592beef7d05dbf77d59f2f5d48a3c3f8e44f436522385f001e3d9824a3",
+          "analysis_admission_hash": "488751bb869ec663841721be87e26c20c90c246c27899158c52f15ab1d721def",
+          "analysis_completed": 0,
+          "symbol": "BTCUSDT",
+          "state": "FAILED_CLOSED",
+          "retry_count": 1,
+          "lease_token": null,
+          "lease_expires_at_ms": 0,
+          "created_at_ms": 1790000000000,
+          "updated_at_ms": 1790000000005
+        },
+        "before_terminal": {
+          "event_id": "pe-34606c926231c5e8bceb48b4",
+          "event_hash": "1634a313f3a0470ae865116ed2e27a0b1509c93de7e9a2d89fdc6cd4e6698f03",
+          "position_case_id": "pos-pe-34606c926231c5e8bceb48b4",
+          "position_case_hash": "48e54bc8628525075f8c75143b62204d1708fab823a8213fe008ca65fd44ca13",
+          "position_case_json": "{\"account\":null,\"atr\":700.0,\"base_case_hash\":\"6fa8ac3bad1383d607d43c82ad62199bd3b90972eea1ff252d24d70bb6be87d5\",\"basis_rate\":null,\"book_imbalance\":null,\"calibration\":null,\"case_hash\":\"48e54bc8628525075f8c75143b62204d1708fab823a8213fe008ca65fd44ca13\",\"case_id\":\"pos-pe-34606c926231c5e8bceb48b4\",\"created_at_ms\":1790000000000,\"data_quality\":\"OK\",\"direction\":\"LONG\",\"entry_high\":60010.0,\"entry_low\":59990.0,\"entry_quality\":\"UNKNOWN\",\"evidence_id\":\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\"expires_at_ms\":1790000180000,\"funding_rate\":null,\"global_account_ratio\":null,\"grid_state\":\"UNKNOWN\",\"liquidity_measure\":\"UNKNOWN\",\"liquidity_usdt\":1000000.0,\"missing_fields\":[],\"observed_at_ms\":1790000000000,\"oi_12h_change\":null,\"oi_1h_change\":null,\"oi_4h_change\":null,\"open_interest\":null,\"position_event_hash\":\"1634a313f3a0470ae865116ed2e27a0b1509c93de7e9a2d89fdc6cd4e6698f03\",\"price\":60000.0,\"reason_codes\":[],\"regime_15m\":\"UNKNOWN\",\"regime_1h\":\"UNKNOWN\",\"regime_4h\":\"UNKNOWN\",\"resistances\":[],\"risk_codes\":[],\"schema_version\":\"CASE_PACKAGE_V1\",\"signal_identity\":\"independent-local\",\"snapshot_hash\":\"synthetic-only\",\"source\":\"POSITION_SUPERVISOR\",\"source_errors\":[],\"source_receipts\":[],\"spread_bps\":1.0,\"stop_loss\":55000.0,\"strategy\":\"SYNTHETIC\",\"strategy_version\":\"probe-v1\",\"supports\":[],\"symbol\":\"BTCUSDT\",\"take_profit_1\":66000.0,\"take_profit_2\":70000.0,\"taker_ratio\":null,\"top_trader_account_ratio\":null,\"top_trader_position_ratio\":null,\"trigger\":\"POSITION_OPENED\",\"veto_reasons\":[],\"volatility_percentile\":null,\"volume\":0.0}",
+          "case_hash": "48e54bc8628525075f8c75143b62204d1708fab823a8213fe008ca65fd44ca13",
+          "dispatch_authority_json": "{\"account_id\":\"probe-account\",\"credential_namespace\":\"NONE\",\"environment\":\"DRY_RUN\",\"event_hash\":\"1634a313f3a0470ae865116ed2e27a0b1509c93de7e9a2d89fdc6cd4e6698f03\",\"event_id\":\"pe-34606c926231c5e8bceb48b4\",\"lease_token\":\"e619261eff45447e392bba847fe8c2d0\",\"position_authority_key\":\"e82402c36638c9bd51fe9ff235da6eb648100fb0bbf6796c58106ac05e0e9fb9\",\"position_case_hash\":\"48e54bc8628525075f8c75143b62204d1708fab823a8213fe008ca65fd44ca13\",\"position_case_id\":\"pos-pe-34606c926231c5e8bceb48b4\",\"position_side\":\"BOTH\",\"schema_version\":\"POSITION_DISPATCH_AUTHORITY_V1\",\"symbol\":\"BTCUSDT\"}",
+          "dispatch_authority_hash": "bcfb3a592beef7d05dbf77d59f2f5d48a3c3f8e44f436522385f001e3d9824a3",
+          "analysis_admission_hash": "488751bb869ec663841721be87e26c20c90c246c27899158c52f15ab1d721def",
+          "analysis_completed": 0,
+          "symbol": "BTCUSDT",
+          "state": "DISPATCHING",
+          "retry_count": 1,
+          "lease_token": "e619261eff45447e392bba847fe8c2d0",
+          "lease_expires_at_ms": 1790000030005,
+          "created_at_ms": 1790000000000,
+          "updated_at_ms": 1790000000005
+        },
+        "saw_uncommitted_done": true,
+        "provider_calls": 1
+      }
+    },
+    {
+      "name": "V5_V6_restart_frozen",
+      "status": "PASS",
+      "detail": {
+        "before": {
+          "event_id": "pe-9d2752124a99972784304b40",
+          "event_hash": "1bd7170b29691ef8bfe1c85bd8b545152bf413e099b8d854a0339104fc35b70d",
+          "position_case_id": "pos-pe-9d2752124a99972784304b40",
+          "position_case_hash": "85e6f97949b60b96ebafb44d5791b5c0f49791eefd77c8c2ebf9337355b5f6f1",
+          "position_case_json": "{\"account\":null,\"atr\":700.0,\"base_case_hash\":\"6fa8ac3bad1383d607d43c82ad62199bd3b90972eea1ff252d24d70bb6be87d5\",\"basis_rate\":null,\"book_imbalance\":null,\"calibration\":null,\"case_hash\":\"85e6f97949b60b96ebafb44d5791b5c0f49791eefd77c8c2ebf9337355b5f6f1\",\"case_id\":\"pos-pe-9d2752124a99972784304b40\",\"created_at_ms\":1790000000000,\"data_quality\":\"OK\",\"direction\":\"LONG\",\"entry_high\":60010.0,\"entry_low\":59990.0,\"entry_quality\":\"UNKNOWN\",\"evidence_id\":\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\"expires_at_ms\":1790000180000,\"funding_rate\":null,\"global_account_ratio\":null,\"grid_state\":\"UNKNOWN\",\"liquidity_measure\":\"UNKNOWN\",\"liquidity_usdt\":1000000.0,\"missing_fields\":[],\"observed_at_ms\":1790000000000,\"oi_12h_change\":null,\"oi_1h_change\":null,\"oi_4h_change\":null,\"open_interest\":null,\"position_event_hash\":\"1bd7170b29691ef8bfe1c85bd8b545152bf413e099b8d854a0339104fc35b70d\",\"price\":60000.0,\"reason_codes\":[],\"regime_15m\":\"UNKNOWN\",\"regime_1h\":\"UNKNOWN\",\"regime_4h\":\"UNKNOWN\",\"resistances\":[],\"risk_codes\":[],\"schema_version\":\"CASE_PACKAGE_V1\",\"signal_identity\":\"independent-local\",\"snapshot_hash\":\"synthetic-only\",\"source\":\"POSITION_SUPERVISOR\",\"source_errors\":[],\"source_receipts\":[],\"spread_bps\":1.0,\"stop_loss\":55000.0,\"strategy\":\"SYNTHETIC\",\"strategy_version\":\"probe-v1\",\"supports\":[],\"symbol\":\"BTCUSDT\",\"take_profit_1\":66000.0,\"take_profit_2\":70000.0,\"taker_ratio\":null,\"top_trader_account_ratio\":null,\"top_trader_position_ratio\":null,\"trigger\":\"POSITION_OPENED\",\"veto_reasons\":[],\"volatility_percentile\":null,\"volume\":0.0}",
+          "case_hash": "85e6f97949b60b96ebafb44d5791b5c0f49791eefd77c8c2ebf9337355b5f6f1",
+          "dispatch_authority_json": "",
+          "dispatch_authority_hash": "",
+          "analysis_admission_hash": "",
+          "analysis_completed": 0,
+          "symbol": "BTCUSDT",
+          "state": "DISPATCHING",
+          "retry_count": 1,
+          "lease_token": "00026cad5840638126ea196bf754ac97",
+          "lease_expires_at_ms": 1790000030005,
+          "created_at_ms": 1790000000000,
+          "updated_at_ms": 1790000000005
+        },
+        "after": {
+          "event_id": "pe-9d2752124a99972784304b40",
+          "event_hash": "1bd7170b29691ef8bfe1c85bd8b545152bf413e099b8d854a0339104fc35b70d",
+          "position_case_id": "pos-pe-9d2752124a99972784304b40",
+          "position_case_hash": "85e6f97949b60b96ebafb44d5791b5c0f49791eefd77c8c2ebf9337355b5f6f1",
+          "position_case_json": "{\"account\":null,\"atr\":700.0,\"base_case_hash\":\"6fa8ac3bad1383d607d43c82ad62199bd3b90972eea1ff252d24d70bb6be87d5\",\"basis_rate\":null,\"book_imbalance\":null,\"calibration\":null,\"case_hash\":\"85e6f97949b60b96ebafb44d5791b5c0f49791eefd77c8c2ebf9337355b5f6f1\",\"case_id\":\"pos-pe-9d2752124a99972784304b40\",\"created_at_ms\":1790000000000,\"data_quality\":\"OK\",\"direction\":\"LONG\",\"entry_high\":60010.0,\"entry_low\":59990.0,\"entry_quality\":\"UNKNOWN\",\"evidence_id\":\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\"expires_at_ms\":1790000180000,\"funding_rate\":null,\"global_account_ratio\":null,\"grid_state\":\"UNKNOWN\",\"liquidity_measure\":\"UNKNOWN\",\"liquidity_usdt\":1000000.0,\"missing_fields\":[],\"observed_at_ms\":1790000000000,\"oi_12h_change\":null,\"oi_1h_change\":null,\"oi_4h_change\":null,\"open_interest\":null,\"position_event_hash\":\"1bd7170b29691ef8bfe1c85bd8b545152bf413e099b8d854a0339104fc35b70d\",\"price\":60000.0,\"reason_codes\":[],\"regime_15m\":\"UNKNOWN\",\"regime_1h\":\"UNKNOWN\",\"regime_4h\":\"UNKNOWN\",\"resistances\":[],\"risk_codes\":[],\"schema_version\":\"CASE_PACKAGE_V1\",\"signal_identity\":\"independent-local\",\"snapshot_hash\":\"synthetic-only\",\"source\":\"POSITION_SUPERVISOR\",\"source_errors\":[],\"source_receipts\":[],\"spread_bps\":1.0,\"stop_loss\":55000.0,\"strategy\":\"SYNTHETIC\",\"strategy_version\":\"probe-v1\",\"supports\":[],\"symbol\":\"BTCUSDT\",\"take_profit_1\":66000.0,\"take_profit_2\":70000.0,\"taker_ratio\":null,\"top_trader_account_ratio\":null,\"top_trader_position_ratio\":null,\"trigger\":\"POSITION_OPENED\",\"veto_reasons\":[],\"volatility_percentile\":null,\"volume\":0.0}",
+          "case_hash": "85e6f97949b60b96ebafb44d5791b5c0f49791eefd77c8c2ebf9337355b5f6f1",
+          "dispatch_authority_json": "{\"account_id\":\"probe-account\",\"credential_namespace\":\"NONE\",\"environment\":\"DRY_RUN\",\"event_hash\":\"1bd7170b29691ef8bfe1c85bd8b545152bf413e099b8d854a0339104fc35b70d\",\"event_id\":\"pe-9d2752124a99972784304b40\",\"lease_token\":\"2906de2f855ac8b000d17a77b8b5a646\",\"position_authority_key\":\"e82402c36638c9bd51fe9ff235da6eb648100fb0bbf6796c58106ac05e0e9fb9\",\"position_case_hash\":\"85e6f97949b60b96ebafb44d5791b5c0f49791eefd77c8c2ebf9337355b5f6f1\",\"position_case_id\":\"pos-pe-9d2752124a99972784304b40\",\"position_side\":\"BOTH\",\"schema_version\":\"POSITION_DISPATCH_AUTHORITY_V1\",\"symbol\":\"BTCUSDT\"}",
+          "dispatch_authority_hash": "40528ad33efa363ffe48a1cacba0cf0294fb3f519b6c89e2d54c3f340eafba0b",
+          "analysis_admission_hash": "b0c21f29beb8aecc6803d849ec7a8c413ac039596f51867b99dafd50d5c650fb",
+          "analysis_completed": 1,
+          "symbol": "BTCUSDT",
+          "state": "DONE",
+          "retry_count": 2,
+          "lease_token": null,
+          "lease_expires_at_ms": 0,
+          "created_at_ms": 1790000000000,
+          "updated_at_ms": 1790000100000
+        },
+        "provider_calls": 1
+      }
+    },
+    {
+      "name": "V5_V6_restart_admitted",
+      "status": "PASS",
+      "detail": {
+        "before": {
+          "event_id": "pe-394b681686fbad24cf5dc611",
+          "event_hash": "6e5ae9412ee9b988d8f1cd6cfaae110c2d5a66aa6e58266e480bf7cbdb40f9dd",
+          "position_case_id": "pos-pe-394b681686fbad24cf5dc611",
+          "position_case_hash": "6aa0cfc623995305b48414d3274ba277d020b71502644debc7698f5c87e24632",
+          "position_case_json": "{\"account\":null,\"atr\":700.0,\"base_case_hash\":\"6fa8ac3bad1383d607d43c82ad62199bd3b90972eea1ff252d24d70bb6be87d5\",\"basis_rate\":null,\"book_imbalance\":null,\"calibration\":null,\"case_hash\":\"6aa0cfc623995305b48414d3274ba277d020b71502644debc7698f5c87e24632\",\"case_id\":\"pos-pe-394b681686fbad24cf5dc611\",\"created_at_ms\":1790000000000,\"data_quality\":\"OK\",\"direction\":\"LONG\",\"entry_high\":60010.0,\"entry_low\":59990.0,\"entry_quality\":\"UNKNOWN\",\"evidence_id\":\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\"expires_at_ms\":1790000180000,\"funding_rate\":null,\"global_account_ratio\":null,\"grid_state\":\"UNKNOWN\",\"liquidity_measure\":\"UNKNOWN\",\"liquidity_usdt\":1000000.0,\"missing_fields\":[],\"observed_at_ms\":1790000000000,\"oi_12h_change\":null,\"oi_1h_change\":null,\"oi_4h_change\":null,\"open_interest\":null,\"position_event_hash\":\"6e5ae9412ee9b988d8f1cd6cfaae110c2d5a66aa6e58266e480bf7cbdb40f9dd\",\"price\":60000.0,\"reason_codes\":[],\"regime_15m\":\"UNKNOWN\",\"regime_1h\":\"UNKNOWN\",\"regime_4h\":\"UNKNOWN\",\"resistances\":[],\"risk_codes\":[],\"schema_version\":\"CASE_PACKAGE_V1\",\"signal_identity\":\"independent-local\",\"snapshot_hash\":\"synthetic-only\",\"source\":\"POSITION_SUPERVISOR\",\"source_errors\":[],\"source_receipts\":[],\"spread_bps\":1.0,\"stop_loss\":55000.0,\"strategy\":\"SYNTHETIC\",\"strategy_version\":\"probe-v1\",\"supports\":[],\"symbol\":\"BTCUSDT\",\"take_profit_1\":66000.0,\"take_profit_2\":70000.0,\"taker_ratio\":null,\"top_trader_account_ratio\":null,\"top_trader_position_ratio\":null,\"trigger\":\"POSITION_OPENED\",\"veto_reasons\":[],\"volatility_percentile\":null,\"volume\":0.0}",
+          "case_hash": "6aa0cfc623995305b48414d3274ba277d020b71502644debc7698f5c87e24632",
+          "dispatch_authority_json": "{\"account_id\":\"probe-account\",\"credential_namespace\":\"NONE\",\"environment\":\"DRY_RUN\",\"event_hash\":\"6e5ae9412ee9b988d8f1cd6cfaae110c2d5a66aa6e58266e480bf7cbdb40f9dd\",\"event_id\":\"pe-394b681686fbad24cf5dc611\",\"lease_token\":\"3a3ececcaa926daa1c50ce05613ef433\",\"position_authority_key\":\"e82402c36638c9bd51fe9ff235da6eb648100fb0bbf6796c58106ac05e0e9fb9\",\"position_case_hash\":\"6aa0cfc623995305b48414d3274ba277d020b71502644debc7698f5c87e24632\",\"position_case_id\":\"pos-pe-394b681686fbad24cf5dc611\",\"position_side\":\"BOTH\",\"schema_version\":\"POSITION_DISPATCH_AUTHORITY_V1\",\"symbol\":\"BTCUSDT\"}",
+          "dispatch_authority_hash": "c3d910a60f7e53646113317b400c0f7f9ead81e06146e6a570f773aeeddf9f5f",
+          "analysis_admission_hash": "be68d17f034453665d1ee33547b79e107cabad2c94156690b4ef856e09fcaec8",
+          "analysis_completed": 0,
+          "symbol": "BTCUSDT",
+          "state": "DISPATCHING",
+          "retry_count": 1,
+          "lease_token": "3a3ececcaa926daa1c50ce05613ef433",
+          "lease_expires_at_ms": 1790000030005,
+          "created_at_ms": 1790000000000,
+          "updated_at_ms": 1790000000005
+        },
+        "after": {
+          "event_id": "pe-394b681686fbad24cf5dc611",
+          "event_hash": "6e5ae9412ee9b988d8f1cd6cfaae110c2d5a66aa6e58266e480bf7cbdb40f9dd",
+          "position_case_id": "pos-pe-394b681686fbad24cf5dc611",
+          "position_case_hash": "6aa0cfc623995305b48414d3274ba277d020b71502644debc7698f5c87e24632",
+          "position_case_json": "{\"account\":null,\"atr\":700.0,\"base_case_hash\":\"6fa8ac3bad1383d607d43c82ad62199bd3b90972eea1ff252d24d70bb6be87d5\",\"basis_rate\":null,\"book_imbalance\":null,\"calibration\":null,\"case_hash\":\"6aa0cfc623995305b48414d3274ba277d020b71502644debc7698f5c87e24632\",\"case_id\":\"pos-pe-394b681686fbad24cf5dc611\",\"created_at_ms\":1790000000000,\"data_quality\":\"OK\",\"direction\":\"LONG\",\"entry_high\":60010.0,\"entry_low\":59990.0,\"entry_quality\":\"UNKNOWN\",\"evidence_id\":\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\"expires_at_ms\":1790000180000,\"funding_rate\":null,\"global_account_ratio\":null,\"grid_state\":\"UNKNOWN\",\"liquidity_measure\":\"UNKNOWN\",\"liquidity_usdt\":1000000.0,\"missing_fields\":[],\"observed_at_ms\":1790000000000,\"oi_12h_change\":null,\"oi_1h_change\":null,\"oi_4h_change\":null,\"open_interest\":null,\"position_event_hash\":\"6e5ae9412ee9b988d8f1cd6cfaae110c2d5a66aa6e58266e480bf7cbdb40f9dd\",\"price\":60000.0,\"reason_codes\":[],\"regime_15m\":\"UNKNOWN\",\"regime_1h\":\"UNKNOWN\",\"regime_4h\":\"UNKNOWN\",\"resistances\":[],\"risk_codes\":[],\"schema_version\":\"CASE_PACKAGE_V1\",\"signal_identity\":\"independent-local\",\"snapshot_hash\":\"synthetic-only\",\"source\":\"POSITION_SUPERVISOR\",\"source_errors\":[],\"source_receipts\":[],\"spread_bps\":1.0,\"stop_loss\":55000.0,\"strategy\":\"SYNTHETIC\",\"strategy_version\":\"probe-v1\",\"supports\":[],\"symbol\":\"BTCUSDT\",\"take_profit_1\":66000.0,\"take_profit_2\":70000.0,\"taker_ratio\":null,\"top_trader_account_ratio\":null,\"top_trader_position_ratio\":null,\"trigger\":\"POSITION_OPENED\",\"veto_reasons\":[],\"volatility_percentile\":null,\"volume\":0.0}",
+          "case_hash": "6aa0cfc623995305b48414d3274ba277d020b71502644debc7698f5c87e24632",
+          "dispatch_authority_json": "{\"account_id\":\"probe-account\",\"credential_namespace\":\"NONE\",\"environment\":\"DRY_RUN\",\"event_hash\":\"6e5ae9412ee9b988d8f1cd6cfaae110c2d5a66aa6e58266e480bf7cbdb40f9dd\",\"event_id\":\"pe-394b681686fbad24cf5dc611\",\"lease_token\":\"3a3ececcaa926daa1c50ce05613ef433\",\"position_authority_key\":\"e82402c36638c9bd51fe9ff235da6eb648100fb0bbf6796c58106ac05e0e9fb9\",\"position_case_hash\":\"6aa0cfc623995305b48414d3274ba277d020b71502644debc7698f5c87e24632\",\"position_case_id\":\"pos-pe-394b681686fbad24cf5dc611\",\"position_side\":\"BOTH\",\"schema_version\":\"POSITION_DISPATCH_AUTHORITY_V1\",\"symbol\":\"BTCUSDT\"}",
+          "dispatch_authority_hash": "c3d910a60f7e53646113317b400c0f7f9ead81e06146e6a570f773aeeddf9f5f",
+          "analysis_admission_hash": "be68d17f034453665d1ee33547b79e107cabad2c94156690b4ef856e09fcaec8",
+          "analysis_completed": 0,
+          "symbol": "BTCUSDT",
+          "state": "FAILED_CLOSED",
+          "retry_count": 1,
+          "lease_token": null,
+          "lease_expires_at_ms": 1790000030005,
+          "created_at_ms": 1790000000000,
+          "updated_at_ms": 1790000100000
+        },
+        "provider_calls": 0
+      }
+    },
+    {
+      "name": "V5_V6_restart_provider_returned",
+      "status": "PASS",
+      "detail": {
+        "before": {
+          "event_id": "pe-ea2d59231e6b45186f6d7bd0",
+          "event_hash": "07e0aa0f44404abb3a389782d39cf2c6e2a7c0025b233586f7c430bd4c254d57",
+          "position_case_id": "pos-pe-ea2d59231e6b45186f6d7bd0",
+          "position_case_hash": "077defdb2cbf1fe6699fa12788bd60c4f47a5274510d851b0add07a5fccf2c0a",
+          "position_case_json": "{\"account\":null,\"atr\":700.0,\"base_case_hash\":\"6fa8ac3bad1383d607d43c82ad62199bd3b90972eea1ff252d24d70bb6be87d5\",\"basis_rate\":null,\"book_imbalance\":null,\"calibration\":null,\"case_hash\":\"077defdb2cbf1fe6699fa12788bd60c4f47a5274510d851b0add07a5fccf2c0a\",\"case_id\":\"pos-pe-ea2d59231e6b45186f6d7bd0\",\"created_at_ms\":1790000000000,\"data_quality\":\"OK\",\"direction\":\"LONG\",\"entry_high\":60010.0,\"entry_low\":59990.0,\"entry_quality\":\"UNKNOWN\",\"evidence_id\":\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\"expires_at_ms\":1790000180000,\"funding_rate\":null,\"global_account_ratio\":null,\"grid_state\":\"UNKNOWN\",\"liquidity_measure\":\"UNKNOWN\",\"liquidity_usdt\":1000000.0,\"missing_fields\":[],\"observed_at_ms\":1790000000000,\"oi_12h_change\":null,\"oi_1h_change\":null,\"oi_4h_change\":null,\"open_interest\":null,\"position_event_hash\":\"07e0aa0f44404abb3a389782d39cf2c6e2a7c0025b233586f7c430bd4c254d57\",\"price\":60000.0,\"reason_codes\":[],\"regime_15m\":\"UNKNOWN\",\"regime_1h\":\"UNKNOWN\",\"regime_4h\":\"UNKNOWN\",\"resistances\":[],\"risk_codes\":[],\"schema_version\":\"CASE_PACKAGE_V1\",\"signal_identity\":\"independent-local\",\"snapshot_hash\":\"synthetic-only\",\"source\":\"POSITION_SUPERVISOR\",\"source_errors\":[],\"source_receipts\":[],\"spread_bps\":1.0,\"stop_loss\":55000.0,\"strategy\":\"SYNTHETIC\",\"strategy_version\":\"probe-v1\",\"supports\":[],\"symbol\":\"BTCUSDT\",\"take_profit_1\":66000.0,\"take_profit_2\":70000.0,\"taker_ratio\":null,\"top_trader_account_ratio\":null,\"top_trader_position_ratio\":null,\"trigger\":\"POSITION_OPENED\",\"veto_reasons\":[],\"volatility_percentile\":null,\"volume\":0.0}",
+          "case_hash": "077defdb2cbf1fe6699fa12788bd60c4f47a5274510d851b0add07a5fccf2c0a",
+          "dispatch_authority_json": "{\"account_id\":\"probe-account\",\"credential_namespace\":\"NONE\",\"environment\":\"DRY_RUN\",\"event_hash\":\"07e0aa0f44404abb3a389782d39cf2c6e2a7c0025b233586f7c430bd4c254d57\",\"event_id\":\"pe-ea2d59231e6b45186f6d7bd0\",\"lease_token\":\"6cdffc026f8bf3008a2d88baf15edd81\",\"position_authority_key\":\"e82402c36638c9bd51fe9ff235da6eb648100fb0bbf6796c58106ac05e0e9fb9\",\"position_case_hash\":\"077defdb2cbf1fe6699fa12788bd60c4f47a5274510d851b0add07a5fccf2c0a\",\"position_case_id\":\"pos-pe-ea2d59231e6b45186f6d7bd0\",\"position_side\":\"BOTH\",\"schema_version\":\"POSITION_DISPATCH_AUTHORITY_V1\",\"symbol\":\"BTCUSDT\"}",
+          "dispatch_authority_hash": "a4f372127f016e778ec699911e9e3c087cb6b0f66fdba0b34ac6254e25c68295",
+          "analysis_admission_hash": "d23dc584dfbd641e5535a99826743ed401aab81b3c6b72bafac64b26d4a7673b",
+          "analysis_completed": 0,
+          "symbol": "BTCUSDT",
+          "state": "DISPATCHING",
+          "retry_count": 1,
+          "lease_token": "6cdffc026f8bf3008a2d88baf15edd81",
+          "lease_expires_at_ms": 1790000030005,
+          "created_at_ms": 1790000000000,
+          "updated_at_ms": 1790000000005
+        },
+        "after": {
+          "event_id": "pe-ea2d59231e6b45186f6d7bd0",
+          "event_hash": "07e0aa0f44404abb3a389782d39cf2c6e2a7c0025b233586f7c430bd4c254d57",
+          "position_case_id": "pos-pe-ea2d59231e6b45186f6d7bd0",
+          "position_case_hash": "077defdb2cbf1fe6699fa12788bd60c4f47a5274510d851b0add07a5fccf2c0a",
+          "position_case_json": "{\"account\":null,\"atr\":700.0,\"base_case_hash\":\"6fa8ac3bad1383d607d43c82ad62199bd3b90972eea1ff252d24d70bb6be87d5\",\"basis_rate\":null,\"book_imbalance\":null,\"calibration\":null,\"case_hash\":\"077defdb2cbf1fe6699fa12788bd60c4f47a5274510d851b0add07a5fccf2c0a\",\"case_id\":\"pos-pe-ea2d59231e6b45186f6d7bd0\",\"created_at_ms\":1790000000000,\"data_quality\":\"OK\",\"direction\":\"LONG\",\"entry_high\":60010.0,\"entry_low\":59990.0,\"entry_quality\":\"UNKNOWN\",\"evidence_id\":\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\"expires_at_ms\":1790000180000,\"funding_rate\":null,\"global_account_ratio\":null,\"grid_state\":\"UNKNOWN\",\"liquidity_measure\":\"UNKNOWN\",\"liquidity_usdt\":1000000.0,\"missing_fields\":[],\"observed_at_ms\":1790000000000,\"oi_12h_change\":null,\"oi_1h_change\":null,\"oi_4h_change\":null,\"open_interest\":null,\"position_event_hash\":\"07e0aa0f44404abb3a389782d39cf2c6e2a7c0025b233586f7c430bd4c254d57\",\"price\":60000.0,\"reason_codes\":[],\"regime_15m\":\"UNKNOWN\",\"regime_1h\":\"UNKNOWN\",\"regime_4h\":\"UNKNOWN\",\"resistances\":[],\"risk_codes\":[],\"schema_version\":\"CASE_PACKAGE_V1\",\"signal_identity\":\"independent-local\",\"snapshot_hash\":\"synthetic-only\",\"source\":\"POSITION_SUPERVISOR\",\"source_errors\":[],\"source_receipts\":[],\"spread_bps\":1.0,\"stop_loss\":55000.0,\"strategy\":\"SYNTHETIC\",\"strategy_version\":\"probe-v1\",\"supports\":[],\"symbol\":\"BTCUSDT\",\"take_profit_1\":66000.0,\"take_profit_2\":70000.0,\"taker_ratio\":null,\"top_trader_account_ratio\":null,\"top_trader_position_ratio\":null,\"trigger\":\"POSITION_OPENED\",\"veto_reasons\":[],\"volatility_percentile\":null,\"volume\":0.0}",
+          "case_hash": "077defdb2cbf1fe6699fa12788bd60c4f47a5274510d851b0add07a5fccf2c0a",
+          "dispatch_authority_json": "{\"account_id\":\"probe-account\",\"credential_namespace\":\"NONE\",\"environment\":\"DRY_RUN\",\"event_hash\":\"07e0aa0f44404abb3a389782d39cf2c6e2a7c0025b233586f7c430bd4c254d57\",\"event_id\":\"pe-ea2d59231e6b45186f6d7bd0\",\"lease_token\":\"6cdffc026f8bf3008a2d88baf15edd81\",\"position_authority_key\":\"e82402c36638c9bd51fe9ff235da6eb648100fb0bbf6796c58106ac05e0e9fb9\",\"position_case_hash\":\"077defdb2cbf1fe6699fa12788bd60c4f47a5274510d851b0add07a5fccf2c0a\",\"position_case_id\":\"pos-pe-ea2d59231e6b45186f6d7bd0\",\"position_side\":\"BOTH\",\"schema_version\":\"POSITION_DISPATCH_AUTHORITY_V1\",\"symbol\":\"BTCUSDT\"}",
+          "dispatch_authority_hash": "a4f372127f016e778ec699911e9e3c087cb6b0f66fdba0b34ac6254e25c68295",
+          "analysis_admission_hash": "d23dc584dfbd641e5535a99826743ed401aab81b3c6b72bafac64b26d4a7673b",
+          "analysis_completed": 0,
+          "symbol": "BTCUSDT",
+          "state": "FAILED_CLOSED",
+          "retry_count": 1,
+          "lease_token": null,
+          "lease_expires_at_ms": 1790000030005,
+          "created_at_ms": 1790000000000,
+          "updated_at_ms": 1790000100000
+        },
+        "provider_calls": 1
+      }
+    },
+    {
+      "name": "V6_terminal_binding_lease",
+      "status": "PASS",
+      "detail": {
+        "changed_field": "lease",
+        "error": "'lease token mismatch'",
+        "unchanged_row_hash": "b4c563ec063a50f24a5c3c4ac80843f314cc0e940f62fabe3954940c564509c3"
+      }
+    },
+    {
+      "name": "V6_terminal_binding_authority_json",
+      "status": "PASS",
+      "detail": {
+        "changed_field": "authority_json",
+        "error": "admitted analysis authority changed",
+        "unchanged_row_hash": "3623a8ca51181edaa4ccac7a69ae4be3f4971070bfd576af02a79c3ce951ba73"
+      }
+    },
+    {
+      "name": "V6_terminal_binding_authority_hash",
+      "status": "PASS",
+      "detail": {
+        "changed_field": "authority_hash",
+        "error": "admitted analysis authority changed",
+        "unchanged_row_hash": "726ec87f2f2a48eaab08604080aa96b997e865d2fa9047aee948ef5ba2c13874"
+      }
+    },
+    {
+      "name": "V6_terminal_binding_admission_hash",
+      "status": "PASS",
+      "detail": {
+        "changed_field": "admission_hash",
+        "error": "admitted analysis authority changed",
+        "unchanged_row_hash": "66cbc41799ae2bcba078c949c75f812a9d73d08a4cd8fa8ebded5ac8fbd075ed"
+      }
+    },
+    {
+      "name": "V6_terminal_binding_event_json",
+      "status": "PASS",
+      "detail": {
+        "changed_field": "event_json",
+        "error": "position event hash mismatch",
+        "unchanged_row_hash": "0649cada757b9072499209406885344697ade18b65b816476ebde02d3f29b9e5"
+      }
+    },
+    {
+      "name": "V6_terminal_binding_case_json",
+      "status": "PASS",
+      "detail": {
+        "changed_field": "case_json",
+        "error": "frozen case hash mismatch",
+        "unchanged_row_hash": "115e5d20fdc8dab1cdaa899eca9496d70a4978b87a9c1ff0b03f7d6a49545d2f"
+      }
+    },
+    {
+      "name": "V7_historical_DONE",
+      "status": "PASS",
+      "detail": {
+        "before": {
+          "event_id": "pe-4f76078efc5716b68435c057",
+          "event_hash": "c56a39ec000a7502cb0ed169c9ae39a98f6019e7c23a7cf15c3da80e9d343c92",
+          "position_case_id": "pos-pe-4f76078efc5716b68435c057",
+          "position_case_hash": "3e10477af0f0b2a48e3f595ebe67997afbc63e111ea7846fbfccc89cf439430a",
+          "position_case_json": "{\"account\":null,\"atr\":700.0,\"base_case_hash\":\"6fa8ac3bad1383d607d43c82ad62199bd3b90972eea1ff252d24d70bb6be87d5\",\"basis_rate\":null,\"book_imbalance\":null,\"calibration\":null,\"case_hash\":\"3e10477af0f0b2a48e3f595ebe67997afbc63e111ea7846fbfccc89cf439430a\",\"case_id\":\"pos-pe-4f76078efc5716b68435c057\",\"created_at_ms\":1790000000000,\"data_quality\":\"OK\",\"direction\":\"LONG\",\"entry_high\":60010.0,\"entry_low\":59990.0,\"entry_quality\":\"UNKNOWN\",\"evidence_id\":\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\"expires_at_ms\":1790000180000,\"funding_rate\":null,\"global_account_ratio\":null,\"grid_state\":\"UNKNOWN\",\"liquidity_measure\":\"UNKNOWN\",\"liquidity_usdt\":1000000.0,\"missing_fields\":[],\"observed_at_ms\":1790000000000,\"oi_12h_change\":null,\"oi_1h_change\":null,\"oi_4h_change\":null,\"open_interest\":null,\"position_event_hash\":\"c56a39ec000a7502cb0ed169c9ae39a98f6019e7c23a7cf15c3da80e9d343c92\",\"price\":60000.0,\"reason_codes\":[],\"regime_15m\":\"UNKNOWN\",\"regime_1h\":\"UNKNOWN\",\"regime_4h\":\"UNKNOWN\",\"resistances\":[],\"risk_codes\":[],\"schema_version\":\"CASE_PACKAGE_V1\",\"signal_identity\":\"independent-local\",\"snapshot_hash\":\"synthetic-only\",\"source\":\"POSITION_SUPERVISOR\",\"source_errors\":[],\"source_receipts\":[],\"spread_bps\":1.0,\"stop_loss\":55000.0,\"strategy\":\"SYNTHETIC\",\"strategy_version\":\"probe-v1\",\"supports\":[],\"symbol\":\"BTCUSDT\",\"take_profit_1\":66000.0,\"take_profit_2\":70000.0,\"taker_ratio\":null,\"top_trader_account_ratio\":null,\"top_trader_position_ratio\":null,\"trigger\":\"POSITION_OPENED\",\"veto_reasons\":[],\"volatility_percentile\":null,\"volume\":0.0}",
+          "case_hash": "3e10477af0f0b2a48e3f595ebe67997afbc63e111ea7846fbfccc89cf439430a",
+          "symbol": "BTCUSDT",
+          "state": "DONE",
+          "retry_count": 0,
+          "lease_token": null,
+          "lease_expires_at_ms": 0,
+          "created_at_ms": 1790000000000,
+          "updated_at_ms": 1790000000000
+        },
+        "migrated": {
+          "event_id": "pe-4f76078efc5716b68435c057",
+          "event_hash": "c56a39ec000a7502cb0ed169c9ae39a98f6019e7c23a7cf15c3da80e9d343c92",
+          "position_case_id": "pos-pe-4f76078efc5716b68435c057",
+          "position_case_hash": "3e10477af0f0b2a48e3f595ebe67997afbc63e111ea7846fbfccc89cf439430a",
+          "position_case_json": "{\"account\":null,\"atr\":700.0,\"base_case_hash\":\"6fa8ac3bad1383d607d43c82ad62199bd3b90972eea1ff252d24d70bb6be87d5\",\"basis_rate\":null,\"book_imbalance\":null,\"calibration\":null,\"case_hash\":\"3e10477af0f0b2a48e3f595ebe67997afbc63e111ea7846fbfccc89cf439430a\",\"case_id\":\"pos-pe-4f76078efc5716b68435c057\",\"created_at_ms\":1790000000000,\"data_quality\":\"OK\",\"direction\":\"LONG\",\"entry_high\":60010.0,\"entry_low\":59990.0,\"entry_quality\":\"UNKNOWN\",\"evidence_id\":\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\"expires_at_ms\":1790000180000,\"funding_rate\":null,\"global_account_ratio\":null,\"grid_state\":\"UNKNOWN\",\"liquidity_measure\":\"UNKNOWN\",\"liquidity_usdt\":1000000.0,\"missing_fields\":[],\"observed_at_ms\":1790000000000,\"oi_12h_change\":null,\"oi_1h_change\":null,\"oi_4h_change\":null,\"open_interest\":null,\"position_event_hash\":\"c56a39ec000a7502cb0ed169c9ae39a98f6019e7c23a7cf15c3da80e9d343c92\",\"price\":60000.0,\"reason_codes\":[],\"regime_15m\":\"UNKNOWN\",\"regime_1h\":\"UNKNOWN\",\"regime_4h\":\"UNKNOWN\",\"resistances\":[],\"risk_codes\":[],\"schema_version\":\"CASE_PACKAGE_V1\",\"signal_identity\":\"independent-local\",\"snapshot_hash\":\"synthetic-only\",\"source\":\"POSITION_SUPERVISOR\",\"source_errors\":[],\"source_receipts\":[],\"spread_bps\":1.0,\"stop_loss\":55000.0,\"strategy\":\"SYNTHETIC\",\"strategy_version\":\"probe-v1\",\"supports\":[],\"symbol\":\"BTCUSDT\",\"take_profit_1\":66000.0,\"take_profit_2\":70000.0,\"taker_ratio\":null,\"top_trader_account_ratio\":null,\"top_trader_position_ratio\":null,\"trigger\":\"POSITION_OPENED\",\"veto_reasons\":[],\"volatility_percentile\":null,\"volume\":0.0}",
+          "case_hash": "3e10477af0f0b2a48e3f595ebe67997afbc63e111ea7846fbfccc89cf439430a",
+          "symbol": "BTCUSDT",
+          "state": "DONE",
+          "retry_count": 0,
+          "lease_token": null,
+          "lease_expires_at_ms": 0,
+          "created_at_ms": 1790000000000,
+          "updated_at_ms": 1790000000000,
+          "dispatch_authority_json": "",
+          "dispatch_authority_hash": "",
+          "analysis_admission_hash": "",
+          "analysis_completed": 0
+        },
+        "after": {
+          "event_id": "pe-4f76078efc5716b68435c057",
+          "event_hash": "c56a39ec000a7502cb0ed169c9ae39a98f6019e7c23a7cf15c3da80e9d343c92",
+          "position_case_id": "pos-pe-4f76078efc5716b68435c057",
+          "position_case_hash": "3e10477af0f0b2a48e3f595ebe67997afbc63e111ea7846fbfccc89cf439430a",
+          "position_case_json": "{\"account\":null,\"atr\":700.0,\"base_case_hash\":\"6fa8ac3bad1383d607d43c82ad62199bd3b90972eea1ff252d24d70bb6be87d5\",\"basis_rate\":null,\"book_imbalance\":null,\"calibration\":null,\"case_hash\":\"3e10477af0f0b2a48e3f595ebe67997afbc63e111ea7846fbfccc89cf439430a\",\"case_id\":\"pos-pe-4f76078efc5716b68435c057\",\"created_at_ms\":1790000000000,\"data_quality\":\"OK\",\"direction\":\"LONG\",\"entry_high\":60010.0,\"entry_low\":59990.0,\"entry_quality\":\"UNKNOWN\",\"evidence_id\":\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\"expires_at_ms\":1790000180000,\"funding_rate\":null,\"global_account_ratio\":null,\"grid_state\":\"UNKNOWN\",\"liquidity_measure\":\"UNKNOWN\",\"liquidity_usdt\":1000000.0,\"missing_fields\":[],\"observed_at_ms\":1790000000000,\"oi_12h_change\":null,\"oi_1h_change\":null,\"oi_4h_change\":null,\"open_interest\":null,\"position_event_hash\":\"c56a39ec000a7502cb0ed169c9ae39a98f6019e7c23a7cf15c3da80e9d343c92\",\"price\":60000.0,\"reason_codes\":[],\"regime_15m\":\"UNKNOWN\",\"regime_1h\":\"UNKNOWN\",\"regime_4h\":\"UNKNOWN\",\"resistances\":[],\"risk_codes\":[],\"schema_version\":\"CASE_PACKAGE_V1\",\"signal_identity\":\"independent-local\",\"snapshot_hash\":\"synthetic-only\",\"source\":\"POSITION_SUPERVISOR\",\"source_errors\":[],\"source_receipts\":[],\"spread_bps\":1.0,\"stop_loss\":55000.0,\"strategy\":\"SYNTHETIC\",\"strategy_version\":\"probe-v1\",\"supports\":[],\"symbol\":\"BTCUSDT\",\"take_profit_1\":66000.0,\"take_profit_2\":70000.0,\"taker_ratio\":null,\"top_trader_account_ratio\":null,\"top_trader_position_ratio\":null,\"trigger\":\"POSITION_OPENED\",\"veto_reasons\":[],\"volatility_percentile\":null,\"volume\":0.0}",
+          "case_hash": "3e10477af0f0b2a48e3f595ebe67997afbc63e111ea7846fbfccc89cf439430a",
+          "symbol": "BTCUSDT",
+          "state": "DONE",
+          "retry_count": 0,
+          "lease_token": null,
+          "lease_expires_at_ms": 0,
+          "created_at_ms": 1790000000000,
+          "updated_at_ms": 1790000000000,
+          "dispatch_authority_json": "",
+          "dispatch_authority_hash": "",
+          "analysis_admission_hash": "",
+          "analysis_completed": 0
+        },
+        "provider_calls": 0
+      }
+    },
+    {
+      "name": "V7_historical_PENDING",
+      "status": "PASS",
+      "detail": {
+        "before": {
+          "event_id": "pe-4b0e98035dd581ddc7939cf1",
+          "event_hash": "df0ff803d4dabe8c13f893e724d9ade623ec439c88051a074d7937f20f8f3154",
+          "position_case_id": "pos-pe-4b0e98035dd581ddc7939cf1",
+          "position_case_hash": "1f7bf08fb9421ea34a8ef3c4eb47e99f9aa682f7173218b4037740435b831284",
+          "position_case_json": "{\"account\":null,\"atr\":700.0,\"base_case_hash\":\"6fa8ac3bad1383d607d43c82ad62199bd3b90972eea1ff252d24d70bb6be87d5\",\"basis_rate\":null,\"book_imbalance\":null,\"calibration\":null,\"case_hash\":\"1f7bf08fb9421ea34a8ef3c4eb47e99f9aa682f7173218b4037740435b831284\",\"case_id\":\"pos-pe-4b0e98035dd581ddc7939cf1\",\"created_at_ms\":1790000000000,\"data_quality\":\"OK\",\"direction\":\"LONG\",\"entry_high\":60010.0,\"entry_low\":59990.0,\"entry_quality\":\"UNKNOWN\",\"evidence_id\":\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\"expires_at_ms\":1790000180000,\"funding_rate\":null,\"global_account_ratio\":null,\"grid_state\":\"UNKNOWN\",\"liquidity_measure\":\"UNKNOWN\",\"liquidity_usdt\":1000000.0,\"missing_fields\":[],\"observed_at_ms\":1790000000000,\"oi_12h_change\":null,\"oi_1h_change\":null,\"oi_4h_change\":null,\"open_interest\":null,\"position_event_hash\":\"df0ff803d4dabe8c13f893e724d9ade623ec439c88051a074d7937f20f8f3154\",\"price\":60000.0,\"reason_codes\":[],\"regime_15m\":\"UNKNOWN\",\"regime_1h\":\"UNKNOWN\",\"regime_4h\":\"UNKNOWN\",\"resistances\":[],\"risk_codes\":[],\"schema_version\":\"CASE_PACKAGE_V1\",\"signal_identity\":\"independent-local\",\"snapshot_hash\":\"synthetic-only\",\"source\":\"POSITION_SUPERVISOR\",\"source_errors\":[],\"source_receipts\":[],\"spread_bps\":1.0,\"stop_loss\":55000.0,\"strategy\":\"SYNTHETIC\",\"strategy_version\":\"probe-v1\",\"supports\":[],\"symbol\":\"BTCUSDT\",\"take_profit_1\":66000.0,\"take_profit_2\":70000.0,\"taker_ratio\":null,\"top_trader_account_ratio\":null,\"top_trader_position_ratio\":null,\"trigger\":\"POSITION_OPENED\",\"veto_reasons\":[],\"volatility_percentile\":null,\"volume\":0.0}",
+          "case_hash": "1f7bf08fb9421ea34a8ef3c4eb47e99f9aa682f7173218b4037740435b831284",
+          "symbol": "BTCUSDT",
+          "state": "PENDING",
+          "retry_count": 0,
+          "lease_token": null,
+          "lease_expires_at_ms": 0,
+          "created_at_ms": 1790000000000,
+          "updated_at_ms": 1790000000000
+        },
+        "migrated": {
+          "event_id": "pe-4b0e98035dd581ddc7939cf1",
+          "event_hash": "df0ff803d4dabe8c13f893e724d9ade623ec439c88051a074d7937f20f8f3154",
+          "position_case_id": "pos-pe-4b0e98035dd581ddc7939cf1",
+          "position_case_hash": "1f7bf08fb9421ea34a8ef3c4eb47e99f9aa682f7173218b4037740435b831284",
+          "position_case_json": "{\"account\":null,\"atr\":700.0,\"base_case_hash\":\"6fa8ac3bad1383d607d43c82ad62199bd3b90972eea1ff252d24d70bb6be87d5\",\"basis_rate\":null,\"book_imbalance\":null,\"calibration\":null,\"case_hash\":\"1f7bf08fb9421ea34a8ef3c4eb47e99f9aa682f7173218b4037740435b831284\",\"case_id\":\"pos-pe-4b0e98035dd581ddc7939cf1\",\"created_at_ms\":1790000000000,\"data_quality\":\"OK\",\"direction\":\"LONG\",\"entry_high\":60010.0,\"entry_low\":59990.0,\"entry_quality\":\"UNKNOWN\",\"evidence_id\":\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\"expires_at_ms\":1790000180000,\"funding_rate\":null,\"global_account_ratio\":null,\"grid_state\":\"UNKNOWN\",\"liquidity_measure\":\"UNKNOWN\",\"liquidity_usdt\":1000000.0,\"missing_fields\":[],\"observed_at_ms\":1790000000000,\"oi_12h_change\":null,\"oi_1h_change\":null,\"oi_4h_change\":null,\"open_interest\":null,\"position_event_hash\":\"df0ff803d4dabe8c13f893e724d9ade623ec439c88051a074d7937f20f8f3154\",\"price\":60000.0,\"reason_codes\":[],\"regime_15m\":\"UNKNOWN\",\"regime_1h\":\"UNKNOWN\",\"regime_4h\":\"UNKNOWN\",\"resistances\":[],\"risk_codes\":[],\"schema_version\":\"CASE_PACKAGE_V1\",\"signal_identity\":\"independent-local\",\"snapshot_hash\":\"synthetic-only\",\"source\":\"POSITION_SUPERVISOR\",\"source_errors\":[],\"source_receipts\":[],\"spread_bps\":1.0,\"stop_loss\":55000.0,\"strategy\":\"SYNTHETIC\",\"strategy_version\":\"probe-v1\",\"supports\":[],\"symbol\":\"BTCUSDT\",\"take_profit_1\":66000.0,\"take_profit_2\":70000.0,\"taker_ratio\":null,\"top_trader_account_ratio\":null,\"top_trader_position_ratio\":null,\"trigger\":\"POSITION_OPENED\",\"veto_reasons\":[],\"volatility_percentile\":null,\"volume\":0.0}",
+          "case_hash": "1f7bf08fb9421ea34a8ef3c4eb47e99f9aa682f7173218b4037740435b831284",
+          "symbol": "BTCUSDT",
+          "state": "PENDING",
+          "retry_count": 0,
+          "lease_token": null,
+          "lease_expires_at_ms": 0,
+          "created_at_ms": 1790000000000,
+          "updated_at_ms": 1790000000000,
+          "dispatch_authority_json": "",
+          "dispatch_authority_hash": "",
+          "analysis_admission_hash": "",
+          "analysis_completed": 0
+        },
+        "after": {
+          "event_id": "pe-4b0e98035dd581ddc7939cf1",
+          "event_hash": "df0ff803d4dabe8c13f893e724d9ade623ec439c88051a074d7937f20f8f3154",
+          "position_case_id": "pos-pe-4b0e98035dd581ddc7939cf1",
+          "position_case_hash": "1f7bf08fb9421ea34a8ef3c4eb47e99f9aa682f7173218b4037740435b831284",
+          "position_case_json": "{\"account\":null,\"atr\":700.0,\"base_case_hash\":\"6fa8ac3bad1383d607d43c82ad62199bd3b90972eea1ff252d24d70bb6be87d5\",\"basis_rate\":null,\"book_imbalance\":null,\"calibration\":null,\"case_hash\":\"1f7bf08fb9421ea34a8ef3c4eb47e99f9aa682f7173218b4037740435b831284\",\"case_id\":\"pos-pe-4b0e98035dd581ddc7939cf1\",\"created_at_ms\":1790000000000,\"data_quality\":\"OK\",\"direction\":\"LONG\",\"entry_high\":60010.0,\"entry_low\":59990.0,\"entry_quality\":\"UNKNOWN\",\"evidence_id\":\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\"expires_at_ms\":1790000180000,\"funding_rate\":null,\"global_account_ratio\":null,\"grid_state\":\"UNKNOWN\",\"liquidity_measure\":\"UNKNOWN\",\"liquidity_usdt\":1000000.0,\"missing_fields\":[],\"observed_at_ms\":1790000000000,\"oi_12h_change\":null,\"oi_1h_change\":null,\"oi_4h_change\":null,\"open_interest\":null,\"position_event_hash\":\"df0ff803d4dabe8c13f893e724d9ade623ec439c88051a074d7937f20f8f3154\",\"price\":60000.0,\"reason_codes\":[],\"regime_15m\":\"UNKNOWN\",\"regime_1h\":\"UNKNOWN\",\"regime_4h\":\"UNKNOWN\",\"resistances\":[],\"risk_codes\":[],\"schema_version\":\"CASE_PACKAGE_V1\",\"signal_identity\":\"independent-local\",\"snapshot_hash\":\"synthetic-only\",\"source\":\"POSITION_SUPERVISOR\",\"source_errors\":[],\"source_receipts\":[],\"spread_bps\":1.0,\"stop_loss\":55000.0,\"strategy\":\"SYNTHETIC\",\"strategy_version\":\"probe-v1\",\"supports\":[],\"symbol\":\"BTCUSDT\",\"take_profit_1\":66000.0,\"take_profit_2\":70000.0,\"taker_ratio\":null,\"top_trader_account_ratio\":null,\"top_trader_position_ratio\":null,\"trigger\":\"POSITION_OPENED\",\"veto_reasons\":[],\"volatility_percentile\":null,\"volume\":0.0}",
+          "case_hash": "1f7bf08fb9421ea34a8ef3c4eb47e99f9aa682f7173218b4037740435b831284",
+          "symbol": "BTCUSDT",
+          "state": "DONE",
+          "retry_count": 1,
+          "lease_token": null,
+          "lease_expires_at_ms": 0,
+          "created_at_ms": 1790000000000,
+          "updated_at_ms": 1790000000005,
+          "dispatch_authority_json": "{\"account_id\":\"probe-account\",\"credential_namespace\":\"NONE\",\"environment\":\"DRY_RUN\",\"event_hash\":\"df0ff803d4dabe8c13f893e724d9ade623ec439c88051a074d7937f20f8f3154\",\"event_id\":\"pe-4b0e98035dd581ddc7939cf1\",\"lease_token\":\"593405ae25a000a7beac8bf164f9432a\",\"position_authority_key\":\"e82402c36638c9bd51fe9ff235da6eb648100fb0bbf6796c58106ac05e0e9fb9\",\"position_case_hash\":\"1f7bf08fb9421ea34a8ef3c4eb47e99f9aa682f7173218b4037740435b831284\",\"position_case_id\":\"pos-pe-4b0e98035dd581ddc7939cf1\",\"position_side\":\"BOTH\",\"schema_version\":\"POSITION_DISPATCH_AUTHORITY_V1\",\"symbol\":\"BTCUSDT\"}",
+          "dispatch_authority_hash": "d0797fdd980cc4dea72b5ceb642f0342ce3a007e55479cd8271e18c4054636e8",
+          "analysis_admission_hash": "c431a16be3db473f8f149c10126abc204b1fbcc5a681617d803016e45b2032f9",
+          "analysis_completed": 1
+        },
+        "provider_calls": 1
+      }
+    },
+    {
+      "name": "V7_concurrent_current",
+      "status": "PASS",
+      "detail": {
+        "initial": "current",
+        "observations": [
+          {
+            "index": 0,
+            "settings": {
+              "recursive_triggers": 1,
+              "journal_mode": "wal",
+              "synchronous": 2,
+              "foreign_keys": 1,
+              "busy_timeout": 2700
+            },
+            "columns": [
+              "event_id",
+              "event_hash",
+              "position_case_id",
+              "position_case_hash",
+              "position_case_json",
+              "case_hash",
+              "dispatch_authority_json",
+              "dispatch_authority_hash",
+              "analysis_admission_hash",
+              "analysis_completed",
+              "symbol",
+              "state",
+              "retry_count",
+              "lease_token",
+              "lease_expires_at_ms",
+              "created_at_ms",
+              "updated_at_ms"
+            ],
+            "triggers": [
+              "trg_live_position_analysis_completion_guard",
+              "trg_live_position_dispatch_admission_immutable",
+              "trg_live_position_dispatch_blank_insert",
+              "trg_live_position_dispatch_done_requires_completion",
+              "trg_live_position_dispatches_immutable_authority",
+              "trg_live_position_dispatches_immutable_delete",
+              "trg_live_position_events_immutable_delete",
+              "trg_live_position_events_immutable_update"
+            ]
+          },
+          {
+            "index": 1,
+            "settings": {
+              "recursive_triggers": 1,
+              "journal_mode": "wal",
+              "synchronous": 2,
+              "foreign_keys": 1,
+              "busy_timeout": 2701
+            },
+            "columns": [
+              "event_id",
+              "event_hash",
+              "position_case_id",
+              "position_case_hash",
+              "position_case_json",
+              "case_hash",
+              "dispatch_authority_json",
+              "dispatch_authority_hash",
+              "analysis_admission_hash",
+              "analysis_completed",
+              "symbol",
+              "state",
+              "retry_count",
+              "lease_token",
+              "lease_expires_at_ms",
+              "created_at_ms",
+              "updated_at_ms"
+            ],
+            "triggers": [
+              "trg_live_position_analysis_completion_guard",
+              "trg_live_position_dispatch_admission_immutable",
+              "trg_live_position_dispatch_blank_insert",
+              "trg_live_position_dispatch_done_requires_completion",
+              "trg_live_position_dispatches_immutable_authority",
+              "trg_live_position_dispatches_immutable_delete",
+              "trg_live_position_events_immutable_delete",
+              "trg_live_position_events_immutable_update"
+            ]
+          },
+          {
+            "index": 2,
+            "settings": {
+              "recursive_triggers": 1,
+              "journal_mode": "wal",
+              "synchronous": 2,
+              "foreign_keys": 1,
+              "busy_timeout": 2702
+            },
+            "columns": [
+              "event_id",
+              "event_hash",
+              "position_case_id",
+              "position_case_hash",
+              "position_case_json",
+              "case_hash",
+              "dispatch_authority_json",
+              "dispatch_authority_hash",
+              "analysis_admission_hash",
+              "analysis_completed",
+              "symbol",
+              "state",
+              "retry_count",
+              "lease_token",
+              "lease_expires_at_ms",
+              "created_at_ms",
+              "updated_at_ms"
+            ],
+            "triggers": [
+              "trg_live_position_analysis_completion_guard",
+              "trg_live_position_dispatch_admission_immutable",
+              "trg_live_position_dispatch_blank_insert",
+              "trg_live_position_dispatch_done_requires_completion",
+              "trg_live_position_dispatches_immutable_authority",
+              "trg_live_position_dispatches_immutable_delete",
+              "trg_live_position_events_immutable_delete",
+              "trg_live_position_events_immutable_update"
+            ]
+          },
+          {
+            "index": 3,
+            "settings": {
+              "recursive_triggers": 1,
+              "journal_mode": "wal",
+              "synchronous": 2,
+              "foreign_keys": 1,
+              "busy_timeout": 2703
+            },
+            "columns": [
+              "event_id",
+              "event_hash",
+              "position_case_id",
+              "position_case_hash",
+              "position_case_json",
+              "case_hash",
+              "dispatch_authority_json",
+              "dispatch_authority_hash",
+              "analysis_admission_hash",
+              "analysis_completed",
+              "symbol",
+              "state",
+              "retry_count",
+              "lease_token",
+              "lease_expires_at_ms",
+              "created_at_ms",
+              "updated_at_ms"
+            ],
+            "triggers": [
+              "trg_live_position_analysis_completion_guard",
+              "trg_live_position_dispatch_admission_immutable",
+              "trg_live_position_dispatch_blank_insert",
+              "trg_live_position_dispatch_done_requires_completion",
+              "trg_live_position_dispatches_immutable_authority",
+              "trg_live_position_dispatches_immutable_delete",
+              "trg_live_position_events_immutable_delete",
+              "trg_live_position_events_immutable_update"
+            ]
+          },
+          {
+            "index": 4,
+            "settings": {
+              "recursive_triggers": 1,
+              "journal_mode": "wal",
+              "synchronous": 2,
+              "foreign_keys": 1,
+              "busy_timeout": 2704
+            },
+            "columns": [
+              "event_id",
+              "event_hash",
+              "position_case_id",
+              "position_case_hash",
+              "position_case_json",
+              "case_hash",
+              "dispatch_authority_json",
+              "dispatch_authority_hash",
+              "analysis_admission_hash",
+              "analysis_completed",
+              "symbol",
+              "state",
+              "retry_count",
+              "lease_token",
+              "lease_expires_at_ms",
+              "created_at_ms",
+              "updated_at_ms"
+            ],
+            "triggers": [
+              "trg_live_position_analysis_completion_guard",
+              "trg_live_position_dispatch_admission_immutable",
+              "trg_live_position_dispatch_blank_insert",
+              "trg_live_position_dispatch_done_requires_completion",
+              "trg_live_position_dispatches_immutable_authority",
+              "trg_live_position_dispatches_immutable_delete",
+              "trg_live_position_events_immutable_delete",
+              "trg_live_position_events_immutable_update"
+            ]
+          },
+          {
+            "index": 5,
+            "settings": {
+              "recursive_triggers": 1,
+              "journal_mode": "wal",
+              "synchronous": 2,
+              "foreign_keys": 1,
+              "busy_timeout": 2705
+            },
+            "columns": [
+              "event_id",
+              "event_hash",
+              "position_case_id",
+              "position_case_hash",
+              "position_case_json",
+              "case_hash",
+              "dispatch_authority_json",
+              "dispatch_authority_hash",
+              "analysis_admission_hash",
+              "analysis_completed",
+              "symbol",
+              "state",
+              "retry_count",
+              "lease_token",
+              "lease_expires_at_ms",
+              "created_at_ms",
+              "updated_at_ms"
+            ],
+            "triggers": [
+              "trg_live_position_analysis_completion_guard",
+              "trg_live_position_dispatch_admission_immutable",
+              "trg_live_position_dispatch_blank_insert",
+              "trg_live_position_dispatch_done_requires_completion",
+              "trg_live_position_dispatches_immutable_authority",
+              "trg_live_position_dispatches_immutable_delete",
+              "trg_live_position_events_immutable_delete",
+              "trg_live_position_events_immutable_update"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "V7_concurrent_legacy",
+      "status": "PASS",
+      "detail": {
+        "initial": "legacy",
+        "observations": [
+          {
+            "index": 0,
+            "settings": {
+              "recursive_triggers": 1,
+              "journal_mode": "wal",
+              "synchronous": 2,
+              "foreign_keys": 1,
+              "busy_timeout": 2700
+            },
+            "columns": [
+              "event_id",
+              "event_hash",
+              "position_case_id",
+              "position_case_hash",
+              "position_case_json",
+              "case_hash",
+              "symbol",
+              "state",
+              "retry_count",
+              "lease_token",
+              "lease_expires_at_ms",
+              "created_at_ms",
+              "updated_at_ms",
+              "dispatch_authority_json",
+              "dispatch_authority_hash",
+              "analysis_admission_hash",
+              "analysis_completed"
+            ],
+            "triggers": [
+              "trg_live_position_analysis_completion_guard",
+              "trg_live_position_dispatch_admission_immutable",
+              "trg_live_position_dispatch_blank_insert",
+              "trg_live_position_dispatch_done_requires_completion",
+              "trg_live_position_dispatches_immutable_authority",
+              "trg_live_position_dispatches_immutable_delete",
+              "trg_live_position_events_immutable_delete",
+              "trg_live_position_events_immutable_update"
+            ]
+          },
+          {
+            "index": 1,
+            "settings": {
+              "recursive_triggers": 1,
+              "journal_mode": "wal",
+              "synchronous": 2,
+              "foreign_keys": 1,
+              "busy_timeout": 2701
+            },
+            "columns": [
+              "event_id",
+              "event_hash",
+              "position_case_id",
+              "position_case_hash",
+              "position_case_json",
+              "case_hash",
+              "symbol",
+              "state",
+              "retry_count",
+              "lease_token",
+              "lease_expires_at_ms",
+              "created_at_ms",
+              "updated_at_ms",
+              "dispatch_authority_json",
+              "dispatch_authority_hash",
+              "analysis_admission_hash",
+              "analysis_completed"
+            ],
+            "triggers": [
+              "trg_live_position_analysis_completion_guard",
+              "trg_live_position_dispatch_admission_immutable",
+              "trg_live_position_dispatch_blank_insert",
+              "trg_live_position_dispatch_done_requires_completion",
+              "trg_live_position_dispatches_immutable_authority",
+              "trg_live_position_dispatches_immutable_delete",
+              "trg_live_position_events_immutable_delete",
+              "trg_live_position_events_immutable_update"
+            ]
+          },
+          {
+            "index": 2,
+            "settings": {
+              "recursive_triggers": 1,
+              "journal_mode": "wal",
+              "synchronous": 2,
+              "foreign_keys": 1,
+              "busy_timeout": 2702
+            },
+            "columns": [
+              "event_id",
+              "event_hash",
+              "position_case_id",
+              "position_case_hash",
+              "position_case_json",
+              "case_hash",
+              "symbol",
+              "state",
+              "retry_count",
+              "lease_token",
+              "lease_expires_at_ms",
+              "created_at_ms",
+              "updated_at_ms",
+              "dispatch_authority_json",
+              "dispatch_authority_hash",
+              "analysis_admission_hash",
+              "analysis_completed"
+            ],
+            "triggers": [
+              "trg_live_position_analysis_completion_guard",
+              "trg_live_position_dispatch_admission_immutable",
+              "trg_live_position_dispatch_blank_insert",
+              "trg_live_position_dispatch_done_requires_completion",
+              "trg_live_position_dispatches_immutable_authority",
+              "trg_live_position_dispatches_immutable_delete",
+              "trg_live_position_events_immutable_delete",
+              "trg_live_position_events_immutable_update"
+            ]
+          },
+          {
+            "index": 3,
+            "settings": {
+              "recursive_triggers": 1,
+              "journal_mode": "wal",
+              "synchronous": 2,
+              "foreign_keys": 1,
+              "busy_timeout": 2703
+            },
+            "columns": [
+              "event_id",
+              "event_hash",
+              "position_case_id",
+              "position_case_hash",
+              "position_case_json",
+              "case_hash",
+              "symbol",
+              "state",
+              "retry_count",
+              "lease_token",
+              "lease_expires_at_ms",
+              "created_at_ms",
+              "updated_at_ms",
+              "dispatch_authority_json",
+              "dispatch_authority_hash",
+              "analysis_admission_hash",
+              "analysis_completed"
+            ],
+            "triggers": [
+              "trg_live_position_analysis_completion_guard",
+              "trg_live_position_dispatch_admission_immutable",
+              "trg_live_position_dispatch_blank_insert",
+              "trg_live_position_dispatch_done_requires_completion",
+              "trg_live_position_dispatches_immutable_authority",
+              "trg_live_position_dispatches_immutable_delete",
+              "trg_live_position_events_immutable_delete",
+              "trg_live_position_events_immutable_update"
+            ]
+          },
+          {
+            "index": 4,
+            "settings": {
+              "recursive_triggers": 1,
+              "journal_mode": "wal",
+              "synchronous": 2,
+              "foreign_keys": 1,
+              "busy_timeout": 2704
+            },
+            "columns": [
+              "event_id",
+              "event_hash",
+              "position_case_id",
+              "position_case_hash",
+              "position_case_json",
+              "case_hash",
+              "symbol",
+              "state",
+              "retry_count",
+              "lease_token",
+              "lease_expires_at_ms",
+              "created_at_ms",
+              "updated_at_ms",
+              "dispatch_authority_json",
+              "dispatch_authority_hash",
+              "analysis_admission_hash",
+              "analysis_completed"
+            ],
+            "triggers": [
+              "trg_live_position_analysis_completion_guard",
+              "trg_live_position_dispatch_admission_immutable",
+              "trg_live_position_dispatch_blank_insert",
+              "trg_live_position_dispatch_done_requires_completion",
+              "trg_live_position_dispatches_immutable_authority",
+              "trg_live_position_dispatches_immutable_delete",
+              "trg_live_position_events_immutable_delete",
+              "trg_live_position_events_immutable_update"
+            ]
+          },
+          {
+            "index": 5,
+            "settings": {
+              "recursive_triggers": 1,
+              "journal_mode": "wal",
+              "synchronous": 2,
+              "foreign_keys": 1,
+              "busy_timeout": 2705
+            },
+            "columns": [
+              "event_id",
+              "event_hash",
+              "position_case_id",
+              "position_case_hash",
+              "position_case_json",
+              "case_hash",
+              "symbol",
+              "state",
+              "retry_count",
+              "lease_token",
+              "lease_expires_at_ms",
+              "created_at_ms",
+              "updated_at_ms",
+              "dispatch_authority_json",
+              "dispatch_authority_hash",
+              "analysis_admission_hash",
+              "analysis_completed"
+            ],
+            "triggers": [
+              "trg_live_position_analysis_completion_guard",
+              "trg_live_position_dispatch_admission_immutable",
+              "trg_live_position_dispatch_blank_insert",
+              "trg_live_position_dispatch_done_requires_completion",
+              "trg_live_position_dispatches_immutable_authority",
+              "trg_live_position_dispatches_immutable_delete",
+              "trg_live_position_events_immutable_delete",
+              "trg_live_position_events_immutable_update"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "V7_concurrent_cold",
+      "status": "FAIL",
+      "error": "OperationalError('duplicate column name: account_id')",
+      "traceback": "Traceback (most recent call last):\n  File \"/tmp/b5-r8-independent-publication/evidence/v0.5.5/live_v1/B5_R8_INDEPENDENT_EXACT_SHA_REVALIDATION/probes/independent_probes.py\", line 54, in probe\n    detail = fn(Path(tmp))\n  File \"/tmp/b5-r8-independent-publication/evidence/v0.5.5/live_v1/B5_R8_INDEPENDENT_EXACT_SHA_REVALIDATION/probes/independent_probes.py\", line 557, in <lambda>\n    probe(\"V7_concurrent_\" + initial, lambda tmp, initial=initial: v7_concurrent(tmp, initial))\n                                                                   ~~~~~~~~~~~~~^^^^^^^^^^^^^^\n  File \"/tmp/b5-r8-independent-publication/evidence/v0.5.5/live_v1/B5_R8_INDEPENDENT_EXACT_SHA_REVALIDATION/probes/independent_probes.py\", line 510, in v7_concurrent\n    observations = list(pool.map(construct, range(6)))\n  File \"/root/miniconda3/lib/python3.13/concurrent/futures/_base.py\", line 619, in result_iterator\n    yield _result_or_cancel(fs.pop())\n          ~~~~~~~~~~~~~~~~~^^^^^^^^^^\n  File \"/root/miniconda3/lib/python3.13/concurrent/futures/_base.py\", line 317, in _result_or_cancel\n    return fut.result(timeout)\n           ~~~~~~~~~~^^^^^^^^^\n  File \"/root/miniconda3/lib/python3.13/concurrent/futures/_base.py\", line 449, in result\n    return self.__get_result()\n           ~~~~~~~~~~~~~~~~~^^\n  File \"/root/miniconda3/lib/python3.13/concurrent/futures/_base.py\", line 401, in __get_result\n    raise self._exception\n  File \"/root/miniconda3/lib/python3.13/concurrent/futures/thread.py\", line 59, in run\n    result = self.fn(*self.args, **self.kwargs)\n  File \"/tmp/b5-r8-independent-publication/evidence/v0.5.5/live_v1/B5_R8_INDEPENDENT_EXACT_SHA_REVALIDATION/probes/independent_probes.py\", line 495, in construct\n    sm.PositionSupervisor(path)\n    ~~~~~~~~~~~~~~~~~~~~~^^^^^^\n  File \"/tmp/b5-r8-independent-source/src/btc_quant_agent/position_supervisor/supervisor.py\", line 247, in __init__\n    db.execute(f\"ALTER TABLE live_position_events ADD COLUMN {name} TEXT\")\n    ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nsqlite3.OperationalError: duplicate column name: account_id\n"
+    },
+    {
+      "name": "IDENTITY_runtime_imports_final",
+      "status": "PASS",
+      "detail": {
+        "btc_quant_agent": "/tmp/b5-r8-independent-source/src/btc_quant_agent/__init__.py",
+        "btc_quant_agent.live_db": "/tmp/b5-r8-independent-source/src/btc_quant_agent/live_db.py",
+        "btc_quant_agent.decision": "/tmp/b5-r8-independent-source/src/btc_quant_agent/decision/__init__.py",
+        "btc_quant_agent.decision.models": "/tmp/b5-r8-independent-source/src/btc_quant_agent/decision/models.py",
+        "btc_quant_agent.approval.store": "/tmp/b5-r8-independent-source/src/btc_quant_agent/approval/store.py",
+        "btc_quant_agent.approval": "/tmp/b5-r8-independent-source/src/btc_quant_agent/approval/__init__.py",
+        "btc_quant_agent.decision.risk": "/tmp/b5-r8-independent-source/src/btc_quant_agent/decision/risk.py",
+        "btc_quant_agent.approval.feishu": "/tmp/b5-r8-independent-source/src/btc_quant_agent/approval/feishu.py",
+        "btc_quant_agent.market_watch.config": "/tmp/b5-r8-independent-source/src/btc_quant_agent/market_watch/config.py",
+        "btc_quant_agent.domain": "/tmp/b5-r8-independent-source/src/btc_quant_agent/domain.py",
+        "btc_quant_agent.market_watch.domain": "/tmp/b5-r8-independent-source/src/btc_quant_agent/market_watch/domain.py",
+        "btc_quant_agent.indicators": "/tmp/b5-r8-independent-source/src/btc_quant_agent/indicators.py",
+        "btc_quant_agent.structure": "/tmp/b5-r8-independent-source/src/btc_quant_agent/structure.py",
+        "btc_quant_agent.market_watch.snapshot": "/tmp/b5-r8-independent-source/src/btc_quant_agent/market_watch/snapshot.py",
+        "btc_quant_agent.market_watch.evidence": "/tmp/b5-r8-independent-source/src/btc_quant_agent/market_watch/evidence.py",
+        "btc_quant_agent.market_watch.grid_shadow_evidence": "/tmp/b5-r8-independent-source/src/btc_quant_agent/market_watch/grid_shadow_evidence.py",
+        "btc_quant_agent.market_watch.shadow_evidence": "/tmp/b5-r8-independent-source/src/btc_quant_agent/market_watch/shadow_evidence.py",
+        "btc_quant_agent.market_watch": "/tmp/b5-r8-independent-source/src/btc_quant_agent/market_watch/__init__.py",
+        "btc_quant_agent.config": "/tmp/b5-r8-independent-source/src/btc_quant_agent/config.py",
+        "btc_quant_agent.data": "/tmp/b5-r8-independent-source/src/btc_quant_agent/data/__init__.py",
+        "btc_quant_agent.time_boundary": "/tmp/b5-r8-independent-source/src/btc_quant_agent/time_boundary.py",
+        "btc_quant_agent.data.rest": "/tmp/b5-r8-independent-source/src/btc_quant_agent/data/rest.py",
+        "btc_quant_agent.data.binance": "/tmp/b5-r8-independent-source/src/btc_quant_agent/data/binance.py",
+        "btc_quant_agent.notify": "/tmp/b5-r8-independent-source/src/btc_quant_agent/notify/__init__.py",
+        "btc_quant_agent.notify.feishu": "/tmp/b5-r8-independent-source/src/btc_quant_agent/notify/feishu.py",
+        "btc_quant_agent.market_watch.alerting": "/tmp/b5-r8-independent-source/src/btc_quant_agent/market_watch/alerting.py",
+        "btc_quant_agent.market_watch.grid_policy": "/tmp/b5-r8-independent-source/src/btc_quant_agent/market_watch/grid_policy.py",
+        "btc_quant_agent.market_watch.state": "/tmp/b5-r8-independent-source/src/btc_quant_agent/market_watch/state.py",
+        "btc_quant_agent.market_watch.grid_shadow": "/tmp/b5-r8-independent-source/src/btc_quant_agent/market_watch/grid_shadow.py",
+        "btc_quant_agent.market_watch.context": "/tmp/b5-r8-independent-source/src/btc_quant_agent/market_watch/context.py",
+        "btc_quant_agent.market_watch.derivatives": "/tmp/b5-r8-independent-source/src/btc_quant_agent/market_watch/derivatives.py",
+        "btc_quant_agent.market_watch.entry_quality": "/tmp/b5-r8-independent-source/src/btc_quant_agent/market_watch/entry_quality.py",
+        "btc_quant_agent.market_watch.lifecycle": "/tmp/b5-r8-independent-source/src/btc_quant_agent/market_watch/lifecycle.py",
+        "btc_quant_agent.market_watch.playbooks": "/tmp/b5-r8-independent-source/src/btc_quant_agent/market_watch/playbooks.py",
+        "btc_quant_agent.market_watch.ranking": "/tmp/b5-r8-independent-source/src/btc_quant_agent/market_watch/ranking.py",
+        "btc_quant_agent.market_watch.scanner": "/tmp/b5-r8-independent-source/src/btc_quant_agent/market_watch/scanner.py",
+        "btc_quant_agent.market_watch.shadow": "/tmp/b5-r8-independent-source/src/btc_quant_agent/market_watch/shadow.py",
+        "btc_quant_agent.market_watch.service": "/tmp/b5-r8-independent-source/src/btc_quant_agent/market_watch/service.py",
+        "btc_quant_agent.decision.backends": "/tmp/b5-r8-independent-source/src/btc_quant_agent/decision/backends.py",
+        "btc_quant_agent.decision.case": "/tmp/b5-r8-independent-source/src/btc_quant_agent/decision/case.py",
+        "btc_quant_agent.decision.fusion": "/tmp/b5-r8-independent-source/src/btc_quant_agent/decision/fusion.py",
+        "btc_quant_agent.decision.service": "/tmp/b5-r8-independent-source/src/btc_quant_agent/decision/service.py",
+        "btc_quant_agent.position_supervisor.models": "/tmp/b5-r8-independent-source/src/btc_quant_agent/position_supervisor/models.py",
+        "btc_quant_agent.position_supervisor.kill_switch": "/tmp/b5-r8-independent-source/src/btc_quant_agent/position_supervisor/kill_switch.py",
+        "btc_quant_agent.account_watch.models": "/tmp/b5-r8-independent-source/src/btc_quant_agent/account_watch/models.py",
+        "btc_quant_agent.execution.binance_signed": "/tmp/b5-r8-independent-source/src/btc_quant_agent/execution/binance_signed.py",
+        "btc_quant_agent.execution.models": "/tmp/b5-r8-independent-source/src/btc_quant_agent/execution/models.py",
+        "btc_quant_agent.execution.guard": "/tmp/b5-r8-independent-source/src/btc_quant_agent/execution/guard.py",
+        "btc_quant_agent.account_watch.store": "/tmp/b5-r8-independent-source/src/btc_quant_agent/account_watch/store.py",
+        "btc_quant_agent.execution.intents": "/tmp/b5-r8-independent-source/src/btc_quant_agent/execution/intents.py",
+        "btc_quant_agent.execution.policy": "/tmp/b5-r8-independent-source/src/btc_quant_agent/execution/policy.py",
+        "btc_quant_agent.execution.protection": "/tmp/b5-r8-independent-source/src/btc_quant_agent/execution/protection.py",
+        "btc_quant_agent.execution.backend": "/tmp/b5-r8-independent-source/src/btc_quant_agent/execution/backend.py",
+        "btc_quant_agent.execution.environment": "/tmp/b5-r8-independent-source/src/btc_quant_agent/execution/environment.py",
+        "btc_quant_agent.live_market.models": "/tmp/b5-r8-independent-source/src/btc_quant_agent/live_market/models.py",
+        "btc_quant_agent.live_market.service": "/tmp/b5-r8-independent-source/src/btc_quant_agent/live_market/service.py",
+        "btc_quant_agent.live_market": "/tmp/b5-r8-independent-source/src/btc_quant_agent/live_market/__init__.py",
+        "btc_quant_agent.execution.validator": "/tmp/b5-r8-independent-source/src/btc_quant_agent/execution/validator.py",
+        "btc_quant_agent.execution.executor": "/tmp/b5-r8-independent-source/src/btc_quant_agent/execution/executor.py",
+        "btc_quant_agent.execution": "/tmp/b5-r8-independent-source/src/btc_quant_agent/execution/__init__.py",
+        "btc_quant_agent.account_watch.service": "/tmp/b5-r8-independent-source/src/btc_quant_agent/account_watch/service.py",
+        "btc_quant_agent.account_watch": "/tmp/b5-r8-independent-source/src/btc_quant_agent/account_watch/__init__.py",
+        "btc_quant_agent.position_supervisor.supervisor": "/tmp/b5-r8-independent-source/src/btc_quant_agent/position_supervisor/supervisor.py",
+        "btc_quant_agent.position_supervisor": "/tmp/b5-r8-independent-source/src/btc_quant_agent/position_supervisor/__init__.py"
+      }
+    }
+  ],
+  "safety": {
+    "LIVE_WRITE_AUTHORITY": "NONE",
+    "REAL_FUNDS_WRITE_COUNT": 0,
+    "LIVE_APPROVAL_ONLY": "NOT_AUTHORIZED",
+    "AUTONOMOUS_LIVE": "FORBIDDEN",
+    "PUBLIC_REST_MUTATION_SURFACES": 0
+  }
+}

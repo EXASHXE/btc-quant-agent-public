@@ -1,0 +1,71 @@
+{
+  "review_type": "independent_cold_constructor_migration_race_review",
+  "base_sha": "fde61dafb301d5bd5af3dc7eb81e5618f979036c",
+  "reviewed_sha": "08e81bec003d645a0a0582db183a1b6916887eff",
+  "classification": "Two inherited cold-start constructor availability races: source-identical event-column DDL race and parent/target behaviorally reproduced WAL-init lock race; neither is an R8-added authority guard bypass.",
+  "severity": "Blocking V7 cold-start compatibility: six concurrent constructors are not guaranteed all to succeed. Observed final target follow-up databases retained all eight R8 triggers, so no authority bypass was observed.",
+  "observation": {
+    "source": "probes/results.json",
+    "failed_probe": "V7_concurrent_cold",
+    "error": "sqlite3.OperationalError: duplicate column name: account_id",
+    "trace_site": "src/btc_quant_agent/position_supervisor/supervisor.py:247",
+    "controls": [
+      "V7_concurrent_current PASS",
+      "V7_concurrent_legacy PASS"
+    ],
+    "probe_concurrency": "six PositionSupervisor constructors released through a barrier against a missing SQLite database; ThreadPoolExecutor.map surfaces a constructor exception before returning observations.",
+    "differential_followup": {
+      "target": "probes/cold_target.json",
+      "parent": "probes/cold_parent.json",
+      "method": "Same cold_constructor_reproduction.py SHA-256 in both records; three fresh cold databases per SHA, six barrier-released PositionSupervisor constructors each.",
+      "result": "One of 18 constructors failed on each SHA with sqlite3.OperationalError: database is locked at live_db.py:22 PRAGMA journal_mode=WAL; the other 17 constructors on each SHA passed.",
+      "guard_snapshots": "Each target follow-up final schema has all eight expected R8 triggers and recursive_triggers=1 on a new shared connection. Each parent follow-up final schema has its six expected R7 triggers; parent new connection recursive_triggers=0.",
+      "distinction": "The original V7_concurrent_cold failure was duplicate column name account_id at supervisor.py:247 on the target. The differential follow-up reproduced cold-start failure on both SHAs, but did not separately reproduce that exact duplicate-column error on the parent."
+    }
+  },
+  "root_cause": [
+    "The constructor first creates base tables with executescript at supervisor.py:153-222.",
+    "BEGIN IMMEDIATE at supervisor.py:224 protects only inspection and additive R7 dispatch migration at :225-235; db.commit() at :237 releases that lock.",
+    "Event-column inspection at :241-243 and ALTER TABLE loop at :244-247 are outside the locked transaction. Concurrent starters can inspect the same old event schema and race on the same ALTER TABLE.",
+    "The parent SHA has identical control flow and line locations (git show fde61daf:src/btc_quant_agent/position_supervisor/supervisor.py); R8 only adds shared connection PRAGMA and two triggers later in the constructor.",
+    "A separate shared connection startup race occurs before constructor schema migration: concurrent cold connections can attempt PRAGMA journal_mode=WAL at live_db.py:20-24 while another connection holds a conflicting SQLite lock; the pragma raises OperationalError despite the configured busy timeout. This exact path exists in both parent and target, and both differential runs observed it at live_db.py:22."
+  ],
+  "partial_installation": {
+    "answer": "Yes, a failed constructor can leave partial schema migration; guard installation by that constructor is absent when it fails at line 247.",
+    "evidence": "Event ALTER statements at :244-247 run after commit at :237 and before trigger executescript at :252-352. On duplicate-column exception the connection context rolls back only its open transaction and closes; already committed/autocommitted DDL from earlier statements is not undone. The failed constructor never reaches R8 blank-insert and DONE guards at :289 and :325.",
+    "limits": "For the original duplicate-column failure, a failed constructor did not reach the trigger script; the original probe did not capture final trigger state. In the differential WAL failures, the failed constructors stopped before any supervisor DDL, but at least one other constructor completed. The final target snapshots explicitly show all eight R8 guards installed in each of three runs.",
+    "security_interpretation": "These failures reduce cold-start availability. The target follow-up final snapshots show guard installation completed despite one WAL failure; no write-form bypass or initialized-supervisor authority bypass was observed. A failed constructor alone cannot certify guard installation, but neither observed failure proves missing final guards."
+  },
+  "implementation_changed": false,
+  "required_safety_state": {
+    "LIVE_WRITE_AUTHORITY": "NONE",
+    "REAL_FUNDS_WRITE_COUNT": 0,
+    "LIVE_APPROVAL_ONLY": "NOT_AUTHORIZED",
+    "AUTONOMOUS_LIVE": "FORBIDDEN",
+    "PUBLIC_REST_MUTATION_SURFACES": 0
+  },
+  "evidence_limits": [
+    "The exact duplicate-column exception was observed only in the initial target probe; parent source has identical unlocked event-column migration, but the differential parent run observed a different inherited WAL lock exception.",
+    "The original duplicate-column run did not record final trigger state; the separate differential target runs did, and each showed eight guards."
+  ],
+  "blocking_correctness_issues": [
+    {
+      "id": "inherited_cold_event_column_ddl_race",
+      "classification": "Inherited source path; exact duplicate-column behavior observed on target only.",
+      "evidence": [
+        "probes/results.json V7_concurrent_cold: target OperationalError duplicate column name account_id at supervisor.py:247.",
+        "Both parent and target supervisor.py:224-247 commit the dispatch migration lock before reading event columns and performing conditional ALTER TABLE."
+      ],
+      "impact": "A cold concurrent constructor can fail before reaching R8 trigger installation; this violates an all-constructors-succeed startup requirement. No initialized-supervisor authority bypass was observed."
+    },
+    {
+      "id": "inherited_cold_wal_initialization_lock_race",
+      "classification": "Behaviorally reproduced on parent and target using the same differential probe script.",
+      "evidence": [
+        "probes/cold_target.json and probes/cold_parent.json: three cold runs with six constructors each; one of 18 failed on each SHA with OperationalError database is locked at live_db.py:22 PRAGMA journal_mode=WAL.",
+        "All three target final snapshots list eight R8 triggers, including blank-insert and DONE completion guards; all three parent snapshots list six parent triggers."
+      ],
+      "impact": "A constructor can fail before schema migration during concurrent cold WAL initialization. The observed target final databases remained guarded; this is a startup availability failure, not an observed authority bypass."
+    }
+  ]
+}
