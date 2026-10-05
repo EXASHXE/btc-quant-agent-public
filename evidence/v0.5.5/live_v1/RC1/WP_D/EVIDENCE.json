@@ -1,0 +1,161 @@
+{
+  "schema_version": "B_LINE_RC1_WP_D_EVIDENCE_V1",
+  "release_id": "B_LINE_INITIAL_USABLE_RELEASE_V1_RC1",
+  "work_package": "WP_D",
+  "task_id": "B_LINE_RELEASE_ENGINEERING_R1",
+  "repository": "EXASHXE/btc-quant-agent-public",
+  "branch": "feature/b-line-rc1-wp-d-release-engineering",
+  "start_sha": "08e81bec003d645a0a0582db183a1b6916887eff",
+  "parent_sha": "08e81bec003d645a0a0582db183a1b6916887eff",
+  "baseline_parent_sha": "fde61dafb301d5bd5af3dc7eb81e5618f979036c",
+  "controller_dispatch_sha": "f8e894f2f39adb66340f6bc8cbd803e1b9515b2a",
+  "decision": "RELEASE_ENGINEERING_PASS",
+  "canonical_startup": {
+    "startup_contract": "SERIALIZED_SINGLE_RUNTIME_INITIALIZER",
+    "canonical_startup_command": "uvicorn btc_quant_agent.api:app --host 127.0.0.1 --port 8787 --workers 1",
+    "container_startup_command": "uvicorn btc_quant_agent.api:app --host 0.0.0.0 --port 8787 --workers 1",
+    "config_check_command": "python -m btc_quant_agent.api --check-config",
+    "readiness_print_command": "python -m btc_quant_agent.api --print-readiness",
+    "manifest_print_command": "python -m btc_quant_agent.api --print-manifest",
+    "manifest_verify_command": "python -m btc_quant_agent.api --verify-manifest evidence/v0.5.5/live_v1/RC1/WP_D/B_LINE_INITIAL_USABLE_RELEASE_V1_RC1_MANIFEST.json",
+    "legacy_quantd_removed_from_compose_and_docs": true
+  },
+  "config_template_identity": {
+    "path": ".env.example",
+    "sha256": "f5d44a5048be62a3eeaf417707a7b4e7867bad0469515c05bdd95002d6d5b821",
+    "non_secret": true,
+    "mainnet_credentials_excluded": true,
+    "documented_variables": [
+      "BTC_QUANT_CONFIG",
+      "BTC_QUANT_DB_PATH",
+      "BTC_QUANT_LIVE_V1_DB_PATH",
+      "BTC_QUANT_API_TOKEN",
+      "BTC_QUANT_LIVE_V1_RUNTIME_ENABLED",
+      "BTC_QUANT_LIVE_V1_ENABLED",
+      "BTC_QUANT_LIVE_V1_EXECUTION_MODE",
+      "BTC_QUANT_LIVE_V1_TESTNET_EXECUTION_ENABLED",
+      "REAL_FUNDS_WRITE_AUTHORITY",
+      "LIVE_APPROVAL_ONLY",
+      "AUTONOMOUS_LIVE",
+      "BTC_QUANT_LIVE_V1_SYMBOL",
+      "BTC_QUANT_LIVE_V1_ACCOUNT_ID",
+      "BTC_QUANT_LIVE_V1_WS_URL",
+      "BTC_QUANT_LIVE_V1_REST_RECONCILE_SECONDS",
+      "BTC_QUANT_LIVE_V1_POSITION_POLL_SECONDS",
+      "BTC_QUANT_LIVE_V1_OUTBOX_POLL_SECONDS",
+      "BTC_QUANT_LIVE_RESPONSES_MODEL",
+      "OPENAI_API_KEY",
+      "BTC_QUANT_LIVE_CODEX_ENABLED",
+      "BTC_QUANT_LIVE_CODEX_MODEL",
+      "BTC_QUANT_LIVE_ANALYSIS_TIMEOUT",
+      "BTC_QUANT_LIVE_CASE_TTL_MS",
+      "BTC_QUANT_LIVE_RISK_POLICY_JSON",
+      "FEISHU_APP_ID",
+      "FEISHU_APP_SECRET",
+      "FEISHU_RECEIVE_ID",
+      "FEISHU_RECEIVE_ID_TYPE",
+      "FEISHU_VERIFICATION_TOKEN",
+      "FEISHU_ENCRYPT_KEY",
+      "FEISHU_APPROVER_OPEN_IDS",
+      "BINANCE_TESTNET_API_KEY",
+      "BINANCE_TESTNET_API_SECRET",
+      "BINANCE_TESTNET_FAPI_BASE_URL",
+      "BINANCE_TESTNET_WS_BASE_URL"
+    ]
+  },
+  "readiness_field_matrix": {
+    "required_fields": [
+      "service_started",
+      "database_ready",
+      "migration_ready",
+      "market_source_ready",
+      "analysis_backend_ready",
+      "approval_backend_state",
+      "account_stream_state",
+      "execution_mode",
+      "kill_switch_state"
+    ],
+    "exposure_channels": [
+      "GET /health -> live_v1_readiness",
+      "GET /execution/status -> live_v1_readiness",
+      "python -m btc_quant_agent.api --print-readiness",
+      "structured JSON lifespan logs on logger btc_quant_agent.live_v1.readiness"
+    ],
+    "structured_log_events": [
+      "LIVE_V1_STARTUP_READINESS",
+      "LIVE_V1_STARTUP_READINESS_FAILED",
+      "LIVE_V1_SHUTDOWN_COMPLETE"
+    ],
+    "health_inspection_read_only": true
+  },
+  "runbook": {
+    "path": "docs/LIVE_V1_RC1_OPERATIONAL_RUNBOOK.md",
+    "sha256": "0de66a0671a98d0cc16869437be9c1d3e042f858abdb2672a2d6f8a74cd92268",
+    "architecture_doc_path": "docs/CURRENT_ARCHITECTURE.md",
+    "covered_operational_scenarios": [
+      "first_start",
+      "normal_start",
+      "stop",
+      "restart",
+      "stale_state",
+      "provider_outage",
+      "binance_outage",
+      "feishu_outage",
+      "testnet_uncertainty",
+      "partial_fill",
+      "protection_uncertainty",
+      "kill_switch",
+      "recovery",
+      "evidence_and_log_location"
+    ]
+  },
+  "release_manifest": {
+    "path": "evidence/v0.5.5/live_v1/RC1/WP_D/B_LINE_INITIAL_USABLE_RELEASE_V1_RC1_MANIFEST.json",
+    "sha256": "b47f3e83828be004a1adba288c4dd9523f69b20d0589780a2c2e35f557a30504",
+    "deterministic_verifier": "btc_quant_agent.api:verify_rc1_release_manifest",
+    "verification_result": {
+      "valid": true,
+      "errors": []
+    }
+  },
+  "supported_modes": {
+    "canonical_modes": [
+      "DRY_RUN",
+      "TESTNET"
+    ],
+    "default_mode": "DRY_RUN",
+    "unavailable_modes": [
+      "LIVE"
+    ],
+    "testnet_requires_explicit_opt_in": true
+  },
+  "safety_authority_values": {
+    "REAL_FUNDS_WRITE_AUTHORITY": "NONE",
+    "LIVE_APPROVAL_ONLY": "NOT_AUTHORIZED",
+    "AUTONOMOUS_LIVE": "FORBIDDEN",
+    "manifest_is_descriptive_identity_only": true
+  },
+  "tests_and_static_results": {
+    "focused_tests": {
+      "command": "pytest tests/test_live_v1_rc1_wp_d_release_engineering.py -q",
+      "passed": 32,
+      "failed": 0,
+      "status": "PASS"
+    },
+    "regression_tests": {
+      "command": "pytest tests/test_api.py tests/test_live_v1_decision_api.py tests/test_live_v1_runtime_r2.py tests/test_live_v1_runtime_recovery_r3.py tests/test_v050_r01_surface_reduction.py tests/test_v050_r02_orchestration_guards.py tests/test_v050_r05a_ag04_health_read_only_inspection.py -q",
+      "passed": 87,
+      "failed": 0,
+      "status": "PASS"
+    },
+    "static_checks": {
+      "compileall": "PASS (0 errors)",
+      "git_diff_check": "PASS (0 whitespace/EOF issues)",
+      "ruff": "PASS (All checks passed!)",
+      "mypy": "PASS (Success: no issues found in 2 source files)",
+      "docs_command_smoke_dry_run": "PASS (python -m btc_quant_agent.api --check-config & --verify-manifest exited 0)",
+      "secret_literal_scan": "PASS (0 secret literals or forbidden mainnet credential keys across all release artifacts)"
+    }
+  },
+  "forbidden_paths_modified": []
+}

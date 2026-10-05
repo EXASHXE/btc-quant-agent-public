@@ -1,0 +1,312 @@
+{
+  "baseline_parent_sha": "fde61dafb301d5bd5af3dc7eb81e5618f979036c",
+  "canonical_startup_command": "uvicorn btc_quant_agent.api:app --host 127.0.0.1 --port 8787 --workers 1",
+  "component_versions": {
+    "analysis_result_schema": "AnalysisResultV1",
+    "case_package_schema": "CasePackageV1",
+    "directional_shadow_evaluation_version": "DIRECTIONAL_SHADOW_EVALUATION_V2",
+    "forward_evidence_contract_version": "FORWARD_EVIDENCE_V1",
+    "grid_shadow_evaluation_version": "GRID_SHADOW_EVALUATION_V1",
+    "market_watch_policy_version": "0.5.0-r1",
+    "package_name": "btc-quant-agent",
+    "package_version": "0.3.19",
+    "position_observation_schema": "PositionObservationV1",
+    "release_line": "v0.5.5-B-LINE-RC1",
+    "tactical_feature_evidence_version": "TACTICAL_FEATURE_EVIDENCE_V2",
+    "trade_intent_schema": "TradeIntentV1",
+    "trade_proposal_schema": "TradeProposalV1"
+  },
+  "controller_dispatch_sha": "f8e894f2f39adb66340f6bc8cbd803e1b9515b2a",
+  "database_identity": {
+    "b3_tables": [
+      "live_cases",
+      "analysis_results",
+      "trade_proposals",
+      "approval_records",
+      "live_state_events"
+    ],
+    "b4_tables": [
+      "live_cases",
+      "analysis_results",
+      "trade_proposals",
+      "approval_records",
+      "live_state_events",
+      "live_account_snapshots",
+      "live_account_events",
+      "live_trade_intents",
+      "live_intent_transitions",
+      "live_execution_market_observations",
+      "live_pre_execution_authorizations",
+      "live_execution_claims",
+      "live_execution_orders",
+      "live_protection_owners",
+      "live_kill_switch_state",
+      "live_position_events",
+      "live_position_active",
+      "live_position_lifecycle",
+      "live_position_lifecycle_v2",
+      "live_position_observed_sources",
+      "live_position_case_dispatches"
+    ],
+    "busy_timeout_ms": 10000,
+    "default_host_db_path": "./var/quant.db",
+    "default_live_v1_db_path": "./var/live_v1.db",
+    "default_market_watch_db_path": "./var/market_watch.db",
+    "foreign_keys": true,
+    "immutable_triggers": [
+      "trg_live_position_events_immutable_update",
+      "trg_live_position_events_immutable_delete",
+      "trg_live_position_dispatches_immutable_authority",
+      "trg_live_position_dispatch_blank_insert",
+      "trg_live_position_dispatch_admission_immutable",
+      "trg_live_position_dispatch_done_requires_completion",
+      "trg_live_position_analysis_completion_guard",
+      "trg_live_position_dispatches_immutable_delete"
+    ],
+    "journal_mode": "wal",
+    "migrated_columns": {
+      "approval_records": [
+        "review_processed",
+        "review_claim_until_ms",
+        "review_claim_token"
+      ],
+      "live_position_case_dispatches": [
+        "position_case_id",
+        "position_case_hash",
+        "position_case_json",
+        "case_hash",
+        "dispatch_authority_json",
+        "dispatch_authority_hash",
+        "analysis_admission_hash",
+        "analysis_completed"
+      ],
+      "live_position_events": [
+        "environment",
+        "credential_namespace",
+        "account_id",
+        "position_side",
+        "position_authority_key"
+      ],
+      "live_protection_owners": [
+        "confirmed_at_ms"
+      ]
+    },
+    "recursive_triggers": true,
+    "startup_migration_policy": "SERIALIZED_SINGLE_RUNTIME_INITIALIZER_IDEMPOTENT_DDL",
+    "synchronous": "FULL"
+  },
+  "evidence_identities": {
+    "b3_day1_public_data_dry_run": "evidence/v0.5.5/live_v1/B3_DAY1_PUBLIC_DATA_DRY_RUN.json",
+    "b3_day1_validation": "evidence/v0.5.5/live_v1/B3_DAY1_VALIDATION.json",
+    "b4_day2_validation": "evidence/v0.5.5/live_v1/B4_DAY2_VALIDATION.json",
+    "config_template": ".env.example",
+    "operational_runbook": "docs/LIVE_V1_RC1_OPERATIONAL_RUNBOOK.md",
+    "rc1_release_contract": "reviews/v0.5/live_v1/V0.5.5_B_LINE_INITIAL_USABLE_RELEASE_V1_RC1_CONTRACT.md",
+    "wp_d_evidence": "evidence/v0.5.5/live_v1/RC1/WP_D/EVIDENCE.json",
+    "wp_d_release_manifest": "evidence/v0.5.5/live_v1/RC1/WP_D/B_LINE_INITIAL_USABLE_RELEASE_V1_RC1_MANIFEST.json"
+  },
+  "execution_modes": {
+    "aliases_normalized_to_dry_run": [
+      "PAPER",
+      "SHADOW"
+    ],
+    "canonical_modes": [
+      "DRY_RUN",
+      "TESTNET"
+    ],
+    "default_mode": "DRY_RUN",
+    "testnet_requires_explicit_opt_in": true,
+    "unavailable_modes": [
+      "LIVE"
+    ]
+  },
+  "feature_flags": {
+    "BTC_QUANT_LIVE_CODEX_ENABLED": {
+      "default": false,
+      "description": "Enable secondary Codex CLI review backend",
+      "type": "bool"
+    },
+    "BTC_QUANT_LIVE_V1_ENABLED": {
+      "default": false,
+      "description": "Legacy B3_CONTROL mode flag (superseded when BTC_QUANT_LIVE_V1_RUNTIME_ENABLED=true)",
+      "type": "bool"
+    },
+    "BTC_QUANT_LIVE_V1_EXECUTION_MODE": {
+      "allowed": [
+        "DRY_RUN",
+        "TESTNET"
+      ],
+      "default": "DRY_RUN",
+      "forbidden": [
+        "LIVE"
+      ],
+      "type": "enum"
+    },
+    "BTC_QUANT_LIVE_V1_RUNTIME_ENABLED": {
+      "canonical_rc1_service_value": true,
+      "default": false,
+      "description": "Enable canonical B4_RUNTIME single-initializer operational service",
+      "type": "bool"
+    },
+    "BTC_QUANT_LIVE_V1_TESTNET_EXECUTION_ENABLED": {
+      "default": false,
+      "description": "Explicit opt-in required when BTC_QUANT_LIVE_V1_EXECUTION_MODE=TESTNET",
+      "type": "bool"
+    }
+  },
+  "known_limitations": [
+    "LIVE execution mode is unavailable in RC1; only DRY_RUN and TESTNET are supported.",
+    "Real-money write authority is NONE; LIVE_APPROVAL_ONLY is NOT_AUTHORIZED; AUTONOMOUS_LIVE is FORBIDDEN.",
+    "Runtime must be started as a single serialized process (--workers 1) under SERIALIZED_SINGLE_RUNTIME_INITIALIZER.",
+    "Single configured symbol (default BTCUSDT) and ONE_WAY position mode only; foreign or unconfigured nonzero positions block new risk.",
+    "Provider (Responses/Codex), Feishu notification, or Binance stream/REST outages fail closed to MANUAL or block new risk until reconciled.",
+    "Release manifest is descriptive engineering identity only and grants zero authority to trade real funds."
+  ],
+  "model_config_identifiers": {
+    "approval_feishu_identifiers": {
+      "app_id_env_var": "FEISHU_APP_ID",
+      "app_secret_env_var": "FEISHU_APP_SECRET",
+      "approver_open_ids_env_var": "FEISHU_APPROVER_OPEN_IDS",
+      "encrypt_key_env_var": "FEISHU_ENCRYPT_KEY",
+      "receive_id_env_var": "FEISHU_RECEIVE_ID",
+      "receive_id_type_env_var": "FEISHU_RECEIVE_ID_TYPE",
+      "verification_token_env_var": "FEISHU_VERIFICATION_TOKEN"
+    },
+    "decision_risk_compiler": {
+      "case_ttl_env_var": "BTC_QUANT_LIVE_CASE_TTL_MS",
+      "compiler_id": "RiskCompilerV1",
+      "default_case_ttl_ms": 120000,
+      "policy_override_env_var": "BTC_QUANT_LIVE_RISK_POLICY_JSON",
+      "policy_schema": "RiskPolicyV1"
+    },
+    "primary_responses_backend": {
+      "backend_id": "responses",
+      "credential_env_var": "OPENAI_API_KEY",
+      "default_model_identifier": "gpt-5.4",
+      "default_timeout_seconds": 60.0,
+      "model_env_var": "BTC_QUANT_LIVE_RESPONSES_MODEL",
+      "timeout_env_var": "BTC_QUANT_LIVE_ANALYSIS_TIMEOUT"
+    },
+    "secondary_codex_backend": {
+      "backend_id": "codex_exec",
+      "default_model_identifier": "gpt-5.3-codex-spark",
+      "default_timeout_seconds": 60.0,
+      "enabled_env_var": "BTC_QUANT_LIVE_CODEX_ENABLED",
+      "model_env_var": "BTC_QUANT_LIVE_CODEX_MODEL",
+      "timeout_env_var": "BTC_QUANT_LIVE_ANALYSIS_TIMEOUT"
+    }
+  },
+  "parent_sha": "08e81bec003d645a0a0582db183a1b6916887eff",
+  "readiness_field_matrix": [
+    "service_started",
+    "database_ready",
+    "migration_ready",
+    "market_source_ready",
+    "analysis_backend_ready",
+    "approval_backend_state",
+    "account_stream_state",
+    "execution_mode",
+    "kill_switch_state"
+  ],
+  "real_money_authority": {
+    "autonomous_live": "FORBIDDEN",
+    "grants_trading_authority": false,
+    "live_approval_only": "NOT_AUTHORIZED",
+    "live_mode_available": false,
+    "manifest_is_descriptive_identity_only": true,
+    "real_funds_write_authority": "NONE"
+  },
+  "release_id": "B_LINE_INITIAL_USABLE_RELEASE_V1_RC1",
+  "schema_identity": {
+    "b3_tables": [
+      "live_cases",
+      "analysis_results",
+      "trade_proposals",
+      "approval_records",
+      "live_state_events"
+    ],
+    "b4_tables": [
+      "live_cases",
+      "analysis_results",
+      "trade_proposals",
+      "approval_records",
+      "live_state_events",
+      "live_account_snapshots",
+      "live_account_events",
+      "live_trade_intents",
+      "live_intent_transitions",
+      "live_execution_market_observations",
+      "live_pre_execution_authorizations",
+      "live_execution_claims",
+      "live_execution_orders",
+      "live_protection_owners",
+      "live_kill_switch_state",
+      "live_position_events",
+      "live_position_active",
+      "live_position_lifecycle",
+      "live_position_lifecycle_v2",
+      "live_position_observed_sources",
+      "live_position_case_dispatches"
+    ],
+    "busy_timeout_ms": 10000,
+    "default_host_db_path": "./var/quant.db",
+    "default_live_v1_db_path": "./var/live_v1.db",
+    "default_market_watch_db_path": "./var/market_watch.db",
+    "foreign_keys": true,
+    "immutable_triggers": [
+      "trg_live_position_events_immutable_update",
+      "trg_live_position_events_immutable_delete",
+      "trg_live_position_dispatches_immutable_authority",
+      "trg_live_position_dispatch_blank_insert",
+      "trg_live_position_dispatch_admission_immutable",
+      "trg_live_position_dispatch_done_requires_completion",
+      "trg_live_position_analysis_completion_guard",
+      "trg_live_position_dispatches_immutable_delete"
+    ],
+    "journal_mode": "wal",
+    "migrated_columns": {
+      "approval_records": [
+        "review_processed",
+        "review_claim_until_ms",
+        "review_claim_token"
+      ],
+      "live_position_case_dispatches": [
+        "position_case_id",
+        "position_case_hash",
+        "position_case_json",
+        "case_hash",
+        "dispatch_authority_json",
+        "dispatch_authority_hash",
+        "analysis_admission_hash",
+        "analysis_completed"
+      ],
+      "live_position_events": [
+        "environment",
+        "credential_namespace",
+        "account_id",
+        "position_side",
+        "position_authority_key"
+      ],
+      "live_protection_owners": [
+        "confirmed_at_ms"
+      ]
+    },
+    "recursive_triggers": true,
+    "startup_migration_policy": "SERIALIZED_SINGLE_RUNTIME_INITIALIZER_IDEMPOTENT_DDL",
+    "synchronous": "FULL"
+  },
+  "schema_version": "B_LINE_RC1_RELEASE_MANIFEST_V1",
+  "source_sha": "08e81bec003d645a0a0582db183a1b6916887eff",
+  "startup_contract": "SERIALIZED_SINGLE_RUNTIME_INITIALIZER",
+  "supported_python": {
+    "container_runtime_version": "3.12",
+    "requires_python": ">=3.11",
+    "supported_versions": [
+      "3.11",
+      "3.12",
+      "3.13"
+    ]
+  },
+  "task_id": "B_LINE_RELEASE_ENGINEERING_R1",
+  "work_package": "WP_D"
+}
