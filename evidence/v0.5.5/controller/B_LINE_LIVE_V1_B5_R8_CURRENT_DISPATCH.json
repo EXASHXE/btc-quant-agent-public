@@ -1,0 +1,26 @@
+{
+  "line": "B_LINE",
+  "task": "LIVE_V1_B5_R8_INDEPENDENT_EXACT_SHA_REVALIDATION",
+  "binding_mode": "EXACT_CODE_SHA",
+  "implementation_branch": "feature/b-line-live-v1",
+  "target_sha": "08e81bec003d645a0a0582db183a1b6916887eff",
+  "expected_parent_sha": "fde61dafb301d5bd5af3dc7eb81e5618f979036c",
+  "validator_requirement": "FULLY_FRESH_COORDINATING_SESSION",
+  "implementation_mutation": "FORBIDDEN",
+  "controller_dispatch_sha": "SUPPLIED_OUT_OF_BAND_AS_THIS_PUBLICATION_COMMIT_SHA",
+  "validation_publication": {
+    "branch_suggestion": "validation/v0.5.5-live-v1-b5-r8-independent-20261005",
+    "parent": "CONTROLLER_DISPATCH_SHA",
+    "report_path": "reviews/v0.5/live_v1/V0.5.5_LIVE_V1_B5_R8_INDEPENDENT_EXACT_SHA_REVALIDATION_REPORT.md",
+    "evidence_path": "evidence/v0.5.5/live_v1/B5_R8_INDEPENDENT_EXACT_SHA_REVALIDATION/EVIDENCE.json"
+  },
+  "pass_state": "LIVE_V1_TESTNET_VALIDATED_LIVE_STILL_DISABLED",
+  "infra_incomplete_state": "LIVE_V1_R8_SEMANTICS_PASS_REGRESSION_INFRA_INCOMPLETE",
+  "fail_state": "LIVE_V1_INDEPENDENT_VALIDATION_FAILED",
+  "safety": {
+    "live_write_authority": "NONE",
+    "real_funds_write_count": 0,
+    "live_approval_only": "NOT_AUTHORIZED",
+    "autonomous_live": "FORBIDDEN"
+  }
+}

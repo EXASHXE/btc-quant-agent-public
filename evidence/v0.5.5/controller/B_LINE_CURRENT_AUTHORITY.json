@@ -1,6 +1,6 @@
 {
   "line": "B_LINE",
-  "stage": "B2B_ACCEPTED__LIVE_V1_B3_ACCEPTED__B5_R7_FAILED__R8_AUTHORIZED",
+  "stage": "B2B_ACCEPTED__LIVE_V1_B3_ACCEPTED__R8_CONTROLLER_SEALED__B5_R8_AUTHORIZED",
   "code_branch": "feature/tactical-policy-r2",
   "accepted_code_sha": "52c16a28153de307dc6132c0975fe29341a0a918",
   "docs_authority_commit": "6319ddbaddd69d5522696992ec1565169da88e03",
@@ -36,7 +36,7 @@
     "live_v1_day2_target_write": "TESTNET_ONLY",
     "provider_credential_smoke": "PENDING",
     "live_store_concurrency_gate": "B4_MUST_ESTABLISH_WAL_OR_EQUIVALENT",
-    "live_v1_b4_state": "R7_INDEPENDENT_REVALIDATION_FAILED_PENDING_R8",
+    "live_v1_b4_state": "R8_EXACT_SHA_SEALED_PENDING_B5_R8_INDEPENDENT_REVALIDATION",
     "live_v1_b4_candidate_sha": "fd42f2cc1a67506d05117e3daa9a072309f7f998",
     "live_v1_b4_candidate_parent_sha": "961a0f4d4b37cdb9365d5e5867813ff3129c14db",
     "live_v1_b4_repair_authorized": true,
@@ -62,8 +62,8 @@
     "live_v1_b4_final_sha": "937b2b26518ceea0952a7e17279cc42924c88848",
     "live_v1_b4_final_parent_sha": "592e35c29d55e7c17ce58487384a49368c4eee4b",
     "live_v1_b5_binding_mode": "EXACT_CODE_SHA",
-    "live_v1_b5_target_sha": "fde61dafb301d5bd5af3dc7eb81e5618f979036c",
-    "live_v1_b5_expected_parent_sha": "b3dcf4230e08e30c5d6a1d70916e11ae987f35a5",
+    "live_v1_b5_target_sha": "08e81bec003d645a0a0582db183a1b6916887eff",
+    "live_v1_b5_expected_parent_sha": "fde61dafb301d5bd5af3dc7eb81e5618f979036c",
     "live_v1_b5_validator": "FULLY_FRESH_COORDINATING_SESSION",
     "live_v1_b5_last_target_sha": "fde61dafb301d5bd5af3dc7eb81e5618f979036c",
     "live_v1_b5_last_decision": "LIVE_V1_INDEPENDENT_VALIDATION_FAILED",
@@ -144,7 +144,7 @@
     "live_v1_b4_r6_parent_sha": "a663921abf90504412d0d67b2b9c9f134f204d85",
     "live_v1_b4_r6_controller_sealed": true,
     "live_v1_b5_r6_authorized": false,
-    "live_v1_next_action": "LIVE_V1_B4_B5_FINDINGS_REPAIR_R8_COMPLETION_FABRICATION_SEAL",
+    "live_v1_next_action": "LIVE_V1_B5_R8_INDEPENDENT_EXACT_SHA_REVALIDATION",
     "live_v1_b5_r5_findings": [
       "HIGH_PROTECTIVE_TYPED_ALIAS_AMBIGUITY",
       "HIGH_RUNTIME_AUTHORITY_ASYNC_HANDOFF_STALE",
@@ -186,7 +186,16 @@
       "tests/test_live_v1_position_authority_r4.py",
       "tests/test_live_v1_position_supervisor.py"
     ],
-    "live_v1_b4_r8_fixture_scope_extension_mode": "MECHANICAL_FIXTURE_ONLY__NO_ASSERTION_WEAKENING__NO_PRODUCTION_GUARD_RELAXATION"
+    "live_v1_b4_r8_fixture_scope_extension_mode": "MECHANICAL_FIXTURE_ONLY__NO_ASSERTION_WEAKENING__NO_PRODUCTION_GUARD_RELAXATION",
+    "live_v1_b4_r8_candidate_sha": "08e81bec003d645a0a0582db183a1b6916887eff",
+    "live_v1_b4_r8_parent_sha": "fde61dafb301d5bd5af3dc7eb81e5618f979036c",
+    "live_v1_b4_r8_controller_sealed": true,
+    "live_v1_b4_r8_source_review": "PASS_NO_NEW_R9_BLOCKER",
+    "live_v1_b4_r8_remote_ci": "NO_REMOTE_CI_OR_COMMIT_STATUS_OBSERVED__B5_MUST_REEXECUTE",
+    "live_v1_b5_r8_authorized": true,
+    "live_v1_b5_r8_target_sha": "08e81bec003d645a0a0582db183a1b6916887eff",
+    "live_v1_b5_r8_expected_parent_sha": "fde61dafb301d5bd5af3dc7eb81e5618f979036c",
+    "live_v1_b5_r8_validator": "FULLY_FRESH_COORDINATING_SESSION"
   },
   "must_read": [],
   "validation_authority": {
@@ -211,7 +220,7 @@
     "evidence_path": "evidence/v0.5.5/controller/V0.5.5_B2B_CONTROLLER_ACCEPTANCE.json",
     "evidence_blob_sha": "73a11708a85b5f1896397d745c3b7252d3c51f8d"
   },
-  "parallel_authorized_next_stage": "LIVE_V1_B4_B5_FINDINGS_REPAIR_R8_COMPLETION_FABRICATION_SEAL",
+  "parallel_authorized_next_stage": "LIVE_V1_B5_R8_INDEPENDENT_EXACT_SHA_REVALIDATION",
   "live_v1_acceptance_authority": {
     "report_path": "reviews/v0.5/live_v1/V0.5.5_LIVE_V1_B3_CONTROLLER_ACCEPTANCE.md",
     "report_blob_sha": "21ad4492feb4750f5fc85a5f88b54d1da36c157d",
@@ -386,5 +395,18 @@
   "live_v1_b4_r8_fixture_scope_authority": {
     "path": "reviews/v0.5/live_v1/V0.5.5_LIVE_V1_R8_FIXTURE_SCOPE_AUTHORIZATION.md",
     "blob_sha": "fb5c1e2d02d42f63b83ac54796ac6e5addce7aa4"
+  },
+  "live_v1_b4_r8_seal_authority": {
+    "report_path": "reviews/v0.5/live_v1/V0.5.5_LIVE_V1_B4_R8_CONTROLLER_SEAL.md",
+    "report_blob_sha": "4879b82ebd7c2bc8a1af67935354e1a791242212",
+    "evidence_path": "evidence/v0.5.5/controller/V0.5.5_LIVE_V1_B4_R8_CONTROLLER_SEAL.json",
+    "evidence_blob_sha": "bc0e1e66aac69593b1ad11351572210b7fdfe92b"
+  },
+  "live_v1_b5_r8_dispatch": {
+    "prompt_path": "prompts/v0.5/validation/v0.5.5_B5_LIVE_V1_R8_INDEPENDENT_EXACT_SHA_REVALIDATION.md",
+    "prompt_blob_sha": "14246a23f80e2046d0a294e0ac6b3d7c65a7aa79",
+    "dispatch_path": "evidence/v0.5.5/controller/B_LINE_LIVE_V1_B5_R8_CURRENT_DISPATCH.json",
+    "dispatch_blob_sha": "1225fb83358d6743678f3b3e2198610dd5fae3f0",
+    "controller_dispatch_sha": "SUPPLIED_OUT_OF_BAND_AS_THIS_PUBLICATION_COMMIT_SHA"
   }
 }

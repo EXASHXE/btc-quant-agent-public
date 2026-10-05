@@ -1,0 +1,78 @@
+{
+  "task": "LIVE_V1_B4_R8_CONTROLLER_EXACT_SHA_SEAL",
+  "implementation_branch": "feature/b-line-live-v1",
+  "sealed_sha": "08e81bec003d645a0a0582db183a1b6916887eff",
+  "parent_sha": "fde61dafb301d5bd5af3dc7eb81e5618f979036c",
+  "decision": "LIVE_V1_B4_R8_EXACT_SHA_SEALED_PENDING_B5_R8_INDEPENDENT_REVALIDATION",
+  "changed_files": [
+    "evidence/v0.5.5/live_v1/B4_DAY2_VALIDATION.json",
+    "src/btc_quant_agent/live_db.py",
+    "src/btc_quant_agent/position_supervisor/supervisor.py",
+    "tests/test_live_v1_position_authority_r4.py",
+    "tests/test_live_v1_position_outbox_r7.py",
+    "tests/test_live_v1_position_outbox_r8.py",
+    "tests/test_live_v1_position_supervisor.py"
+  ],
+  "controller_source_review": {
+    "recursive_triggers_invariant": "PASS",
+    "initial_insert_guard": "PASS",
+    "replace_reinsert_guard": "PASS_FOR_INDEPENDENT_REVALIDATION",
+    "upsert_update_delete_guard": "PASS_FOR_INDEPENDENT_REVALIDATION",
+    "state_only_done_guard": "PASS",
+    "fixture_scope_compliance": "PASS",
+    "r7_semantics_retained": "PASS",
+    "new_r9_blocker": false
+  },
+  "local_machine_evidence": {
+    "r8_focused": {
+      "passed": 38,
+      "failed": 0
+    },
+    "r7_focused": {
+      "passed": 67,
+      "failed": 0
+    },
+    "r5": {
+      "passed": 77,
+      "failed": 0
+    },
+    "tactical": {
+      "passed": 128,
+      "failed": 0
+    },
+    "r02": {
+      "passed": 26,
+      "failed": 0
+    },
+    "fixture_files": {
+      "passed": 56,
+      "failed": 0
+    },
+    "position_supervisor_outbox": {
+      "passed": 103,
+      "failed": 0
+    },
+    "compileall": "PASS",
+    "ruff": "PASS",
+    "mypy": "PASS",
+    "h40_h41_fence": "PASS",
+    "live_write_count": 0
+  },
+  "incomplete_gates": {
+    "classification": "OPERATIONAL_INFRASTRUCTURE_FAILURE__ASYNC_EXECUTOR_SHUTDOWN_STALL",
+    "r6": "NOT_COMPLETED",
+    "r3_r4": "NOT_COMPLETED",
+    "all_live_v1": "NOT_COMPLETED",
+    "full_suite": "NOT_COMPLETED",
+    "note": "same stall class independently observed on B5 R7 target before R8"
+  },
+  "remote_ci": "NO_REMOTE_CI_OR_COMMIT_STATUS_OBSERVED__B5_MUST_REEXECUTE",
+  "b5_r8_authorized": true,
+  "safety": {
+    "live_write_authority": "NONE",
+    "live_approval_only": "NOT_AUTHORIZED",
+    "real_funds_write_count": 0,
+    "autonomous_live": "FORBIDDEN"
+  },
+  "next_state": "LIVE_V1_B5_R8_INDEPENDENT_EXACT_SHA_REVALIDATION"
+}
