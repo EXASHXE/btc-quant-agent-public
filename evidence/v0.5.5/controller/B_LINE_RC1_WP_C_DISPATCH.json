@@ -1,0 +1,29 @@
+{
+  "schema_version": "B_LINE_RC1_WORK_PACKAGE_DISPATCH_V1",
+  "release_id": "B_LINE_INITIAL_USABLE_RELEASE_V1_RC1",
+  "work_package": "WP_C",
+  "task_id": "B_LINE_LLM_APPROVAL_INTEGRATION_CLOSURE_R1",
+  "repository": "EXASHXE/btc-quant-agent-public",
+  "target_branch": "feature/b-line-rc1-wp-c-llm-approval",
+  "start_sha": "08e81bec003d645a0a0582db183a1b6916887eff",
+  "controller_dispatch_sha": "f8e894f2f39adb66340f6bc8cbd803e1b9515b2a",
+  "prompt_publication": "THIS_MANIFEST_AND_PROMPT_COMMIT",
+  "allowed_paths": [
+    "src/btc_quant_agent/decision/**",
+    "src/btc_quant_agent/approval/**",
+    "src/btc_quant_agent/config.py",
+    "tests/test_live_v1_decision_*.py",
+    "tests/test_live_v1_rc1_llm_approval_*.py",
+    "evidence/v0.5.5/live_v1/RC1/WP_C/**"
+  ],
+  "frozen_authority": {
+    "rc1_contract": "reviews/v0.5/live_v1/V0.5.5_B_LINE_INITIAL_USABLE_RELEASE_V1_RC1_CONTRACT.md",
+    "decision_quality_contract": null
+  },
+  "safety": {
+    "real_funds_write_authority": "NONE",
+    "live_approval_only": "NOT_AUTHORIZED",
+    "autonomous_live": "FORBIDDEN"
+  },
+  "terminal_state": "LLM_APPROVAL_INTEGRATION_PASS_OR_EXTERNAL_SMOKE_PENDING_OR_BLOCKED"
+}

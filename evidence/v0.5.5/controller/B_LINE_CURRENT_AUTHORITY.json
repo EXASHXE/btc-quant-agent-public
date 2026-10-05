@@ -1,6 +1,6 @@
 {
   "line": "B_LINE",
-  "stage": "B_LINE_INITIAL_USABLE_RELEASE_V1_RC1_CONTRACT_FROZEN__WP_DISPATCH_PENDING",
+  "stage": "B_LINE_INITIAL_USABLE_RELEASE_V1_RC1__PARALLEL_WORK_PACKAGES_AUTHORIZED",
   "code_branch": "feature/tactical-policy-r2",
   "accepted_code_sha": "52c16a28153de307dc6132c0975fe29341a0a918",
   "docs_authority_commit": "6319ddbaddd69d5522696992ec1565169da88e03",
@@ -144,7 +144,7 @@
     "live_v1_b4_r6_parent_sha": "a663921abf90504412d0d67b2b9c9f134f204d85",
     "live_v1_b4_r6_controller_sealed": true,
     "live_v1_b5_r6_authorized": false,
-    "live_v1_next_action": "B_LINE_RC1_PARALLEL_WORK_PACKAGE_DISPATCH",
+    "live_v1_next_action": "B_LINE_RC1_WP_A_B_C_D_PARALLEL_EXECUTION",
     "live_v1_b5_r5_findings": [
       "HIGH_PROTECTIVE_TYPED_ALIAS_AMBIGUITY",
       "HIGH_RUNTIME_AUTHORITY_ASYNC_HANDOFF_STALE",
@@ -215,7 +215,17 @@
       "WP-C",
       "WP-D"
     ],
-    "rc1_integration_branch": "feature/b-line-v1-rc1"
+    "rc1_integration_branch": "feature/b-line-v1-rc1",
+    "rc1_dispatch_root_sha": "f8e894f2f39adb66340f6bc8cbd803e1b9515b2a",
+    "rc1_parallel_work_packages_authorized": true,
+    "rc1_wp_a_state": "AUTHORIZED",
+    "rc1_wp_b_state": "AUTHORIZED",
+    "rc1_wp_c_state": "AUTHORIZED",
+    "rc1_wp_d_state": "AUTHORIZED",
+    "rc1_wp_a_branch": "feature/b-line-rc1-wp-a-operational-readiness",
+    "rc1_wp_b_branch": "feature/b-line-rc1-wp-b-decision-quality",
+    "rc1_wp_c_branch": "feature/b-line-rc1-wp-c-llm-approval",
+    "rc1_wp_d_branch": "feature/b-line-rc1-wp-d-release-engineering"
   },
   "must_read": [],
   "validation_authority": {
@@ -240,7 +250,7 @@
     "evidence_path": "evidence/v0.5.5/controller/V0.5.5_B2B_CONTROLLER_ACCEPTANCE.json",
     "evidence_blob_sha": "73a11708a85b5f1896397d745c3b7252d3c51f8d"
   },
-  "parallel_authorized_next_stage": "B_LINE_RC1_PARALLEL_WORK_PACKAGE_DISPATCH",
+  "parallel_authorized_next_stage": "B_LINE_RC1_WP_A_B_C_D_PARALLEL_EXECUTION",
   "live_v1_acceptance_authority": {
     "report_path": "reviews/v0.5/live_v1/V0.5.5_LIVE_V1_B3_CONTROLLER_ACCEPTANCE.md",
     "report_blob_sha": "21ad4492feb4750f5fc85a5f88b54d1da36c157d",
@@ -451,5 +461,35 @@
   "rc1_decision_quality_contract": {
     "path": "reviews/v0.5/tactical-policy/V0.5.5_B_LINE_TACTICAL_DECISION_QUALITY_R1_EVALUATION_CONTRACT.md",
     "blob_sha": "d1eb9df40dd7347a14a4755a3648650a8066d79e"
+  },
+  "rc1_dispatches": {
+    "wp_a": {
+      "prompt_path": "prompts/v0.5/rc1/v0.5.5_B_LINE_RC1_WP_A_OPERATIONAL_READINESS_R1.md",
+      "prompt_blob_sha": "2abba3c504f2f283888005239fbb4aa6dd2bae36",
+      "manifest_path": "evidence/v0.5.5/controller/B_LINE_RC1_WP_A_DISPATCH.json",
+      "manifest_blob_sha": "264554ac4ee86c9336f4f594d16007048fa39b6f",
+      "controller_dispatch_sha": "f8e894f2f39adb66340f6bc8cbd803e1b9515b2a"
+    },
+    "wp_b": {
+      "prompt_path": "prompts/v0.5/rc1/v0.5.5_B_LINE_RC1_WP_B_TACTICAL_DECISION_QUALITY_R1.md",
+      "prompt_blob_sha": "ce36b58fd7b3e8c45f9247108013f3eb78333400",
+      "manifest_path": "evidence/v0.5.5/controller/B_LINE_RC1_WP_B_DISPATCH.json",
+      "manifest_blob_sha": "86da4e27e6064a8b26bd2e50abe635319178f469",
+      "controller_dispatch_sha": "f8e894f2f39adb66340f6bc8cbd803e1b9515b2a"
+    },
+    "wp_c": {
+      "prompt_path": "prompts/v0.5/rc1/v0.5.5_B_LINE_RC1_WP_C_LLM_APPROVAL_INTEGRATION_CLOSURE_R1.md",
+      "prompt_blob_sha": "33d9bc2d121f6541adc01fa49e5a1be285cb3ffe",
+      "manifest_path": "evidence/v0.5.5/controller/B_LINE_RC1_WP_C_DISPATCH.json",
+      "manifest_blob_sha": "6ab06ac8f199384b556c8f5f194f37ed5c3023b7",
+      "controller_dispatch_sha": "f8e894f2f39adb66340f6bc8cbd803e1b9515b2a"
+    },
+    "wp_d": {
+      "prompt_path": "prompts/v0.5/rc1/v0.5.5_B_LINE_RC1_WP_D_RELEASE_ENGINEERING_R1.md",
+      "prompt_blob_sha": "559e041e567daa35efb134bbb5616c9e8e8f9b2b",
+      "manifest_path": "evidence/v0.5.5/controller/B_LINE_RC1_WP_D_DISPATCH.json",
+      "manifest_blob_sha": "828d1eda0146d1b06e3a4df3bb1647d505bf82a3",
+      "controller_dispatch_sha": "f8e894f2f39adb66340f6bc8cbd803e1b9515b2a"
+    }
   }
 }

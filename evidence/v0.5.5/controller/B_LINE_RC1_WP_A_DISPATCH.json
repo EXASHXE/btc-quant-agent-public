@@ -1,0 +1,31 @@
+{
+  "schema_version": "B_LINE_RC1_WORK_PACKAGE_DISPATCH_V1",
+  "release_id": "B_LINE_INITIAL_USABLE_RELEASE_V1_RC1",
+  "work_package": "WP_A",
+  "task_id": "B_LINE_LIVE_V1_TESTNET_OPERATIONAL_READINESS_R1",
+  "repository": "EXASHXE/btc-quant-agent-public",
+  "target_branch": "feature/b-line-rc1-wp-a-operational-readiness",
+  "start_sha": "08e81bec003d645a0a0582db183a1b6916887eff",
+  "controller_dispatch_sha": "f8e894f2f39adb66340f6bc8cbd803e1b9515b2a",
+  "prompt_publication": "THIS_MANIFEST_AND_PROMPT_COMMIT",
+  "allowed_paths": [
+    "src/btc_quant_agent/live_db.py",
+    "src/btc_quant_agent/live_runtime.py",
+    "src/btc_quant_agent/position_supervisor/**",
+    "src/btc_quant_agent/account_watch/service.py",
+    "tests/test_live_v1_position_*.py",
+    "tests/test_live_v1_runtime_*.py",
+    "tests/test_live_v1_account_stream_r2.py",
+    "evidence/v0.5.5/live_v1/RC1/WP_A/**"
+  ],
+  "frozen_authority": {
+    "rc1_contract": "reviews/v0.5/live_v1/V0.5.5_B_LINE_INITIAL_USABLE_RELEASE_V1_RC1_CONTRACT.md",
+    "decision_quality_contract": null
+  },
+  "safety": {
+    "real_funds_write_authority": "NONE",
+    "live_approval_only": "NOT_AUTHORIZED",
+    "autonomous_live": "FORBIDDEN"
+  },
+  "terminal_state": "OPERATIONAL_READINESS_PASS"
+}
