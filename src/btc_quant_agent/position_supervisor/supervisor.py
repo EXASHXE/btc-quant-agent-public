@@ -13,7 +13,7 @@ from typing import Any
 
 from ..account_watch.models import AccountSnapshotV1
 from ..decision.models import CasePackageV1, canonical_json, content_hash
-from ..live_db import connection
+from ..live_db import connection, serialized_initializer
 from .models import (
     PositionEventV1,
     PositionObservationV1,
@@ -106,6 +106,18 @@ def position_case_from_event(
     )
 
 
+REQUIRED_R8_GUARDS: tuple[str, ...] = (
+    "trg_live_position_events_immutable_update",
+    "trg_live_position_events_immutable_delete",
+    "trg_live_position_dispatches_immutable_authority",
+    "trg_live_position_dispatch_blank_insert",
+    "trg_live_position_dispatch_admission_immutable",
+    "trg_live_position_analysis_completion_guard",
+    "trg_live_position_dispatch_done_requires_completion",
+    "trg_live_position_dispatches_immutable_delete",
+)
+
+
 class PositionSupervisor:
     def __init__(
         self,
@@ -121,6 +133,22 @@ class PositionSupervisor:
         self.policy = policy or SupervisorPolicyV1()
         self.lease_clock_ms = lease_clock_ms
 
+        with serialized_initializer(self.path):
+            self._init_schema()
+            self.assert_guards_installed()
+
+    def assert_guards_installed(self) -> None:
+        with connection(self.path) as db:
+            triggers = {
+                r[0] for r in db.execute(
+                    "SELECT name FROM sqlite_master WHERE type='trigger'"
+                ).fetchall()
+            }
+        missing = [g for g in REQUIRED_R8_GUARDS if g not in triggers]
+        if missing:
+            raise RuntimeError(f"R8_GUARDS_MISSING: {missing}")
+
+    def _init_schema(self) -> None:
         with connection(self.path) as db:
             cols = [
                 col["name"]
@@ -220,10 +248,10 @@ class PositionSupervisor:
                 CREATE INDEX IF NOT EXISTS idx_dispatches_state
                     ON live_position_case_dispatches(state, lease_expires_at_ms);
             """)
-            # Serialize inspection and additive R7 migration across concurrent starters.
+            # Serialize inspection and additive migrations across concurrent starters.
             db.execute("BEGIN IMMEDIATE")
             dispatch_columns = {
-                col["name"] for col in db.execute("PRAGMA table_info(live_position_case_dispatches)")
+                col["name"] for col in db.execute("PRAGMA table_info(live_position_case_dispatches)").fetchall()
             }
             for name, definition in (
                 ("dispatch_authority_json", "TEXT NOT NULL DEFAULT ''"),
@@ -234,12 +262,10 @@ class PositionSupervisor:
                 if name not in dispatch_columns:
                     db.execute(f"ALTER TABLE live_position_case_dispatches ADD COLUMN {name} {definition}")
 
-            db.commit()
-
             # Existing unscoped event rows remain legacy authority and cannot
             # suppress events from any current account/environment.
             event_columns = {
-                col["name"] for col in db.execute("PRAGMA table_info(live_position_events)")
+                col["name"] for col in db.execute("PRAGMA table_info(live_position_events)").fetchall()
             }
             for name in ("environment", "credential_namespace", "account_id",
                          "position_side", "position_authority_key"):
@@ -249,6 +275,8 @@ class PositionSupervisor:
                 "CREATE INDEX IF NOT EXISTS idx_live_position_events_authority "
                 "ON live_position_events(position_authority_key, trigger, observed_at_ms DESC)"
             )
+            db.commit()
+
             db.executescript("""
                 CREATE TRIGGER IF NOT EXISTS trg_live_position_events_immutable_update
                 BEFORE UPDATE ON live_position_events

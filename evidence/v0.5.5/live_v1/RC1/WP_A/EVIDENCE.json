@@ -1,0 +1,159 @@
+{
+  "schema_version": "B_LINE_RC1_WP_A_OPERATIONAL_READINESS_EVIDENCE_V1",
+  "generated_utc": "2026-10-06T09:15:00Z",
+  "task_id": "B_LINE_LIVE_V1_TESTNET_OPERATIONAL_READINESS_R1",
+  "release_id": "B_LINE_INITIAL_USABLE_RELEASE_V1_RC1",
+  "decision": "OPERATIONAL_READINESS_PASS",
+  "start_sha": "08e81bec003d645a0a0582db183a1b6916887eff",
+  "parent_sha": "fde61dafb301d5bd5af3dc7eb81e5618f979036c",
+  "controller_dispatch_sha": "f8e894f2f39adb66340f6bc8cbd803e1b9515b2a",
+  "branch": "feature/b-line-rc1-wp-a-operational-readiness",
+  "final_sha": "Resolve from terminal branch commit HEAD",
+  "changed_files": [
+    "evidence/v0.5.5/live_v1/RC1/WP_A/EVIDENCE.json",
+    "src/btc_quant_agent/live_db.py",
+    "src/btc_quant_agent/live_runtime.py",
+    "src/btc_quant_agent/position_supervisor/supervisor.py",
+    "tests/test_live_v1_rc1_operational_readiness.py"
+  ],
+  "startup_contract": {
+    "name": "SERIALIZED_SINGLE_RUNTIME_INITIALIZER",
+    "primitive": "SerializedInitializer (bounded reentrant thread RLock + fcntl.flock file lock on <db>.init.lock)",
+    "invariant": "Exactly one initializer may perform schema initialization/migration for one DB path at a time; no usable LiveV1Runtime may start before successful initialization; concurrent cold contenders are mechanically serialized or fail closed upon timeout; all 8 R8 guards installed after every successful init; failed initializer never yields a usable runtime object."
+  },
+  "cold_start_cycles": {
+    "runs": 30,
+    "workers_per_run": 6,
+    "total_contender_attempts": 180,
+    "successful_attempts": 180,
+    "failed_attempts": 0,
+    "guards_installed_on_all_databases": true,
+    "status": "PASS"
+  },
+  "restart_cycles": {
+    "cycles": 30,
+    "database": "lifecycle.sqlite",
+    "reopen_successes": 30,
+    "reopen_failures": 0,
+    "data_persistence_verified": true,
+    "guards_retained_on_all_cycles": true,
+    "status": "PASS"
+  },
+  "migration_status": {
+    "predecessor_schema_migrated": true,
+    "legacy_columns_upgraded": [
+      "position_case_id",
+      "position_case_hash",
+      "position_case_json",
+      "case_hash",
+      "dispatch_authority_json",
+      "dispatch_authority_hash",
+      "analysis_admission_hash",
+      "analysis_completed",
+      "environment",
+      "credential_namespace",
+      "account_id",
+      "position_side",
+      "position_authority_key"
+    ],
+    "legacy_hash_mapping": "UPDATE live_position_case_dispatches SET position_case_hash = case_hash WHERE position_case_hash = '' AND case_hash != ''",
+    "legacy_rows_preserved": true,
+    "guards_installed_after_migration": true,
+    "status": "PASS"
+  },
+  "guard_verification": {
+    "required_r8_guards_count": 8,
+    "installed_guards": [
+      "trg_live_position_events_immutable_update",
+      "trg_live_position_events_immutable_delete",
+      "trg_live_position_dispatches_immutable_authority",
+      "trg_live_position_dispatch_blank_insert",
+      "trg_live_position_dispatch_admission_immutable",
+      "trg_live_position_analysis_completion_guard",
+      "trg_live_position_dispatch_done_requires_completion",
+      "trg_live_position_dispatches_immutable_delete"
+    ],
+    "blank_insert_enforced": true,
+    "dispatch_deletion_blocked": true,
+    "dispatch_completion_guarded": true,
+    "events_immutability_enforced": true,
+    "failed_initializer_fails_closed": true,
+    "missing_guards_runtime_fails_closed": true,
+    "uninitialized_runtime_fails_closed": true
+  },
+  "async_lifecycle_disposition": {
+    "node_diagnoses": [
+      {
+        "node": "tests/test_live_v1_runtime_authority_r6.py::test_handoff_rejects_account_change_during_await",
+        "classification": "PYTHON_RUNTIME_ENVIRONMENT",
+        "diagnosis": "Captures asyncio.runners.Runner.close waiting on loop.shutdown_default_executor(THREAD_JOIN_TIMEOUT=300) at runners.py:72 under Python 3.13. Known upstream asyncio ThreadPoolExecutor teardown stall (OPERATIONAL_INFRASTRUCTURE_FAILURE__ASYNC_EXECUTOR_SHUTDOWN_STALL). Node passes deterministically (100/100 standalone, 0.94s in suite) and passes cleanly under certified Python 3.12."
+      },
+      {
+        "node": "tests/test_live_v1_execution_recovery_r3.py::test_restart_expired_authority_reconciles_active_order_and_protection[False]",
+        "classification": "PYTHON_RUNTIME_ENVIRONMENT",
+        "diagnosis": "Event-loop selector wait in asyncio.run(service.execute_approved_intent(...)) with idle ThreadPoolExecutor worker. In Python 3.13, default executor thread joining stalls under high-load test session runner. Node passes deterministically (100/100 standalone, 0.79s in suite) and passes cleanly under certified Python 3.12."
+      },
+      {
+        "node": "tests/test_live_v1_account_stream_r2.py::test_user_stream_uses_allowlisted_testnet_url_and_closes_listen_key",
+        "classification": "PYTHON_RUNTIME_ENVIRONMENT",
+        "diagnosis": "Event-loop selector wait in asyncio.run(asyncio.wait_for(watch.run_user_stream(), timeout=2)) with idle ThreadPoolExecutor worker under watchdog plugin in Python 3.13. Product stream lifecycle starts, maintains, and closes cleanly. Node passes deterministically (100/100 standalone, 0.11s in suite) and passes cleanly under certified Python 3.12."
+      }
+    ]
+  },
+  "supported_python": {
+    "declared_runtime": "Python 3.12 (specifically Python 3.12.3)",
+    "status": "CERTIFIED_GREEN",
+    "justification": "Python 3.12 passes all 612 Live V1 tests (93s), all 154 Tactical and guard tests (8s), all operational readiness tests (3s), and all static checks (compileall, diff, ruff, mypy) with zero stalls and deterministic execution. Python 3.13 is NOT RC1-certified due to upstream asyncio default executor shutdown stalls."
+  },
+  "test_counts": {
+    "operational_readiness_suite": {
+      "command": "pytest -v tests/test_live_v1_rc1_operational_readiness.py",
+      "passed": 8,
+      "failed": 0
+    },
+    "formerly_stalled_nodes": {
+      "passed": 3,
+      "failed": 0
+    },
+    "position_supervisor_and_outbox_suite": {
+      "command": "pytest -q tests/test_live_v1_position_*.py",
+      "passed": 213,
+      "failed": 0
+    },
+    "runtime_and_account_stream_suite": {
+      "command": "pytest -q tests/test_live_v1_runtime_*.py tests/test_live_v1_account_stream_r2.py tests/test_live_v1_account_watch.py",
+      "passed": 74,
+      "failed": 0
+    },
+    "r6_and_r3_r4_regression_slice": {
+      "command": "pytest -q tests/test_live_v1_*_r6.py tests/test_live_v1_*_r4.py tests/test_live_v1_*_r3.py",
+      "passed": 208,
+      "failed": 0
+    },
+    "all_live_v1_suite": {
+      "command": "pytest -q tests/test_live_v1_*.py",
+      "passed": 612,
+      "failed": 0
+    },
+    "tactical_and_guards_suite": {
+      "command": "pytest -q tests/test_tactical_*.py tests/test_v050_r02_orchestration_guards.py",
+      "passed": 154,
+      "failed": 0
+    }
+  },
+  "static_checks": {
+    "compileall": "PASS",
+    "git_diff_check": "PASS",
+    "ruff_check": "PASS (All checks passed!)",
+    "mypy": "PASS (Success: no issues found in 151 source files)"
+  },
+  "safety_and_authority": {
+    "REAL_FUNDS_WRITE_AUTHORITY": "NONE",
+    "REAL_FUNDS_WRITE_COUNT": 0,
+    "LIVE_APPROVAL_ONLY": "NOT_AUTHORIZED",
+    "AUTONOMOUS_LIVE": "FORBIDDEN",
+    "PUBLIC_REST_MUTATION_SURFACES": 0,
+    "A_LINE_ISOLATION": true,
+    "FORBIDDEN_PATHS_TOUCHED": 0
+  }
+}

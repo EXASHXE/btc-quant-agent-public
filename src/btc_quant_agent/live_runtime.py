@@ -9,6 +9,7 @@ from typing import TYPE_CHECKING, Any
 
 from .config import ExecutionConfig, LiveV1Config
 from .execution.guard import ExecutionBlocked
+from .live_db import serialized_initializer
 
 if TYPE_CHECKING:
     from .account_watch.models import AccountSnapshotV1
@@ -64,6 +65,7 @@ class LiveV1Runtime:
         self._started = False
         self._stop_event = asyncio.Event()
         self._reconcile_lock = asyncio.Lock()
+        self._initialized = True
 
     @classmethod
     def create(cls, config: LiveV1Config, tactical_service: TacticalLiveService) -> LiveV1Runtime:
@@ -83,64 +85,67 @@ class LiveV1Runtime:
         from .position_supervisor.supervisor import PositionSupervisor
 
         path = config.sqlite_path
-        mode = config.execution_mode
-        signed_client = create_testnet_signed_client() if mode == "TESTNET" else None
-        account = AccountWatch(ExecutionConfig(mode="testnet" if mode == "TESTNET" else "paper"),
-                               AccountStore(path), signed_client=signed_client,
-                               account_id=config.account_id)
-        market = MarketStreamService(symbol=config.symbol)
-        intents = IntentStore(path)
-        kill = KillSwitch(path)
-        market_watch = tactical_service.market_watch
+        with serialized_initializer(path):
+            mode = config.execution_mode
+            signed_client = create_testnet_signed_client() if mode == "TESTNET" else None
+            account = AccountWatch(ExecutionConfig(mode="testnet" if mode == "TESTNET" else "paper"),
+                                   AccountStore(path), signed_client=signed_client,
+                                   account_id=config.account_id)
+            market = MarketStreamService(symbol=config.symbol)
+            intents = IntentStore(path)
+            kill = KillSwitch(path)
+            market_watch = tactical_service.market_watch
 
-        case_cache: dict[str, CasePackageV1] = {}
+            case_cache: dict[str, CasePackageV1] = {}
 
-        def scan_case(symbol: str) -> CasePackageV1:
-            if market_watch is None:
-                raise ValueError("MARKET_WATCH_UNAVAILABLE")
-            assessments = market_watch.scan([symbol], False)
-            matching = [a for a in assessments if a.symbol == symbol]
-            if len(matching) != 1:
-                raise ValueError("FRESH_MARKET_CASE_UNAVAILABLE")
-            return case_from_assessment(matching[0], ttl_ms=config.case_ttl_ms)
+            def scan_case(symbol: str) -> CasePackageV1:
+                if market_watch is None:
+                    raise ValueError("MARKET_WATCH_UNAVAILABLE")
+                assessments = market_watch.scan([symbol], False)
+                matching = [a for a in assessments if a.symbol == symbol]
+                if len(matching) != 1:
+                    raise ValueError("FRESH_MARKET_CASE_UNAVAILABLE")
+                return case_from_assessment(matching[0], ttl_ms=config.case_ttl_ms)
 
-        def fresh_case(symbol: str) -> CasePackageV1:
-            case = case_cache.get(symbol)
-            now = int(time.time() * 1000)
-            if (case is None or case.direction not in {"LONG", "SHORT"}
-                    or case.data_quality != "OK" or case.entry_quality not in {"GOOD", "EXCELLENT"}
-                    or case.veto_reasons or case.source_errors or case.missing_fields
-                    or not case.observed_at_ms <= now < case.expires_at_ms
-                    or now - case.observed_at_ms > tactical_service.compiler.policy.max_staleness_ms):
-                raise ValueError("FRESH_MARKET_CASE_UNAVAILABLE")
-            return case
+            def fresh_case(symbol: str) -> CasePackageV1:
+                case = case_cache.get(symbol)
+                now = int(time.time() * 1000)
+                if (case is None or case.direction not in {"LONG", "SHORT"}
+                        or case.data_quality != "OK" or case.entry_quality not in {"GOOD", "EXCELLENT"}
+                        or case.veto_reasons or case.source_errors or case.missing_fields
+                        or not case.observed_at_ms <= now < case.expires_at_ms
+                        or now - case.observed_at_ms > tactical_service.compiler.policy.max_staleness_ms):
+                    raise ValueError("FRESH_MARKET_CASE_UNAVAILABLE")
+                return case
 
-        def tactical_valid(symbol: str, now_ms: int) -> bool:
-            case = fresh_case(symbol)
-            return case.observed_at_ms <= now_ms < case.expires_at_ms
+            def tactical_valid(symbol: str, now_ms: int) -> bool:
+                case = fresh_case(symbol)
+                return case.observed_at_ms <= now_ms < case.expires_at_ms
 
-        supervisor = PositionSupervisor(path, analysis_service=tactical_service,
-                                        fresh_market_case=fresh_case)
-        validator = PreExecutionValidator(
-            tactical_service.store, intents, kill,
-            risk_policy=tactical_service.compiler.policy,
-            tactical_validity_provider=tactical_valid,
-            tactical_case_provider=lambda symbol, _now: fresh_case(symbol),
-        )
-        dry = DryRunExecutionBackend(path)
-        testnet = (TestnetExecutionBackend(path, signed_client, kill, validator=validator,
-                                          clock_ms=market.clock_ms,
-                                          account_provider=account.reconcile_rest,
-                                          market_provider=market.latest_observation)
-                   if signed_client is not None else None)
-        execution = LiveExecutionService(intents, tactical_service.store, account, market,
-                                         validator, kill, dry, testnet_backend=testnet,
-                                         supervisor=supervisor)
-        runtime = cls(config=config, tactical_service=tactical_service, market_stream=market,
-                   account_watch=account, intent_store=intents, execution_service=execution,
-                   supervisor=supervisor, kill_switch=kill, case_loader=scan_case)
-        runtime._case_cache = case_cache
-        return runtime
+            supervisor = PositionSupervisor(path, analysis_service=tactical_service,
+                                            fresh_market_case=fresh_case)
+            supervisor.assert_guards_installed()
+            validator = PreExecutionValidator(
+                tactical_service.store, intents, kill,
+                risk_policy=tactical_service.compiler.policy,
+                tactical_validity_provider=tactical_valid,
+                tactical_case_provider=lambda symbol, _now: fresh_case(symbol),
+            )
+            dry = DryRunExecutionBackend(path)
+            testnet = (TestnetExecutionBackend(path, signed_client, kill, validator=validator,
+                                              clock_ms=market.clock_ms,
+                                              account_provider=account.reconcile_rest,
+                                              market_provider=market.latest_observation)
+                       if signed_client is not None else None)
+            execution = LiveExecutionService(intents, tactical_service.store, account, market,
+                                             validator, kill, dry, testnet_backend=testnet,
+                                             supervisor=supervisor)
+            runtime = cls(config=config, tactical_service=tactical_service, market_stream=market,
+                       account_watch=account, intent_store=intents, execution_service=execution,
+                       supervisor=supervisor, kill_switch=kill, case_loader=scan_case)
+            runtime._case_cache = case_cache
+            runtime._initialized = True
+            return runtime
 
     async def _refresh_case(self, symbol: str) -> None:
         if self._case_loader is None:
@@ -290,6 +295,10 @@ class LiveV1Runtime:
     async def start(self) -> None:
         if self._started:
             return
+        if not getattr(self, "_initialized", True):
+            raise ExecutionBlocked("DATABASE_INITIALIZATION_REQUIRED")
+        if hasattr(self.supervisor, "assert_guards_installed"):
+            self.supervisor.assert_guards_installed()
         self.accepting_risk = False
         self.blocked_reason = "RUNTIME_STARTING"
         self._stop_event.clear()
