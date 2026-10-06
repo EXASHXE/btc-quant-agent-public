@@ -1,0 +1,40 @@
+{
+  "schema_version": "B_LINE_RC1_WP_D_CONTROLLER_ACCEPTANCE_V1",
+  "work_package": "WP_D",
+  "decision": "WP_D_REPAIR_ACCEPTED__READY_FOR_RC_INTEGRATION_BINDING",
+  "candidate_sha": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea",
+  "parent_sha": "07fa03883ef1956535eaa2ff7f718a4e5a72d9d1",
+  "repair_dispatch_sha": "b5ad376f4fd00d5609c678989eae3156a9e14737",
+  "release_level_state": "PENDING_RC_INTEGRATION_BINDING",
+  "implementation_repair_accepted": true,
+  "wp_a_binding": {
+    "accepted_candidate_sha": "606f286dbb5d7af46776043d1287d9b3e7b1e679",
+    "controller_acceptance_docs_sha": "35e9f432c88763f513660a59ea74156e61f48178",
+    "controller_acceptance_evidence": "evidence/v0.5.5/controller/B_LINE_RC1_WP_A_ACCEPTANCE.json",
+    "certified_os": "Linux/POSIX",
+    "certified_python": [
+      "3.12"
+    ],
+    "executor_exact_python": "3.12.3",
+    "process_model": "single canonical uvicorn worker",
+    "startup_mechanical_certification": "CERTIFIED_BY_WP_A",
+    "python_3_13_certified": false,
+    "native_windows_certified": false
+  },
+  "integration_binding_required": {
+    "source_sha": "EXACT_RC_INTEGRATION_CODE_SHA",
+    "parent_sha": "EXACT_PARENT_OF_RC_INTEGRATION_CODE_SHA",
+    "require_bound": true,
+    "wp_a_evidence_identity": "evidence/v0.5.5/controller/B_LINE_RC1_WP_A_ACCEPTANCE.json"
+  },
+  "tests_reported": {
+    "focused_passed": 33,
+    "regression_passed": 87
+  },
+  "remote_ci_status": "NO_REMOTE_WORKFLOW_OR_COMMIT_STATUS_OBSERVED",
+  "safety": {
+    "real_funds_write_authority": "NONE",
+    "live_approval_only": "NOT_AUTHORIZED",
+    "autonomous_live": "FORBIDDEN"
+  }
+}

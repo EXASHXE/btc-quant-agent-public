@@ -1,6 +1,6 @@
 {
   "line": "B_LINE",
-  "stage": "B_LINE_INITIAL_USABLE_RELEASE_V1_RC1__WP_A_C_ACCEPTED__WP_B_D_REPAIR",
+  "stage": "B_LINE_INITIAL_USABLE_RELEASE_V1_RC1__WP_A_C_ACCEPTED__WP_D_READY_BINDING__WP_B_REPAIR",
   "code_branch": "feature/tactical-policy-r2",
   "accepted_code_sha": "52c16a28153de307dc6132c0975fe29341a0a918",
   "docs_authority_commit": "6319ddbaddd69d5522696992ec1565169da88e03",
@@ -144,7 +144,7 @@
     "live_v1_b4_r6_parent_sha": "a663921abf90504412d0d67b2b9c9f134f204d85",
     "live_v1_b4_r6_controller_sealed": true,
     "live_v1_b5_r6_authorized": false,
-    "live_v1_next_action": "RC1_PARALLEL__WP_B_REPAIR_1M__WP_D_REPAIR_IDENTITY__WP_C_EXTERNAL_SMOKE_PENDING",
+    "live_v1_next_action": "RC1_PARALLEL__WP_B_REPAIR_1M__THEN_RC_INTEGRATION_BINDING",
     "live_v1_b5_r5_findings": [
       "HIGH_PROTECTIVE_TYPED_ALIAS_AMBIGUITY",
       "HIGH_RUNTIME_AUTHORITY_ASYNC_HANDOFF_STALE",
@@ -221,7 +221,7 @@
     "rc1_wp_a_state": "ACCEPTED_OPERATIONAL_READINESS_PASS",
     "rc1_wp_b_state": "REPAIR_1M_EVIDENCE_AUTHORIZED",
     "rc1_wp_c_state": "ACCEPTED_EXTERNAL_SMOKE_PENDING",
-    "rc1_wp_d_state": "REPAIR_IDENTITY_BINDING_AUTHORIZED",
+    "rc1_wp_d_state": "REPAIR_ACCEPTED_READY_FOR_RC_INTEGRATION_BINDING",
     "rc1_wp_a_branch": "feature/b-line-rc1-wp-a-operational-readiness",
     "rc1_wp_b_branch": "feature/b-line-rc1-wp-b-decision-quality",
     "rc1_wp_c_branch": "feature/b-line-rc1-wp-c-llm-approval",
@@ -230,14 +230,19 @@
     "rc1_wp_b_executor_decision": "TACTICAL_DECISION_QUALITY_FAIL",
     "rc1_wp_b_controller_disposition": "EVIDENCE_REPAIR_REQUIRED__SYNTHETIC_1M_PATH_NOT_RELEASE_AUTHORITY",
     "rc1_wp_c_candidate_sha": "72b39de71024b3051357c17eee7922e657dcb81f",
-    "rc1_wp_d_candidate_sha": "07fa03883ef1956535eaa2ff7f718a4e5a72d9d1",
+    "rc1_wp_d_candidate_sha": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea",
     "rc1_wp_d_controller_disposition": "RELEASE_ENGINEERING_INCOMPLETE__IDENTITY_AND_RUNTIME_CERTIFICATION_PENDING",
     "rc1_wp_a_candidate_sha": "606f286dbb5d7af46776043d1287d9b3e7b1e679",
     "rc1_wp_a_certified_os": "Linux/POSIX",
     "rc1_wp_a_certified_python": "3.12.3",
     "rc1_wp_a_process_model": "single canonical uvicorn worker",
     "rc1_wp_a_native_windows_certified": false,
-    "rc1_wp_a_python_3_13_certified": false
+    "rc1_wp_a_python_3_13_certified": false,
+    "rc1_wp_d_release_level_state": "PENDING_RC_INTEGRATION_BINDING",
+    "rc1_wp_d_bound_python": [
+      "3.12"
+    ],
+    "rc1_wp_d_wp_a_acceptance_evidence": "evidence/v0.5.5/controller/B_LINE_RC1_WP_A_ACCEPTANCE.json"
   },
   "must_read": [],
   "validation_authority": {
@@ -262,7 +267,7 @@
     "evidence_path": "evidence/v0.5.5/controller/V0.5.5_B2B_CONTROLLER_ACCEPTANCE.json",
     "evidence_blob_sha": "73a11708a85b5f1896397d745c3b7252d3c51f8d"
   },
-  "parallel_authorized_next_stage": "RC1_PARALLEL__WP_B_REPAIR_1M__WP_D_REPAIR_IDENTITY",
+  "parallel_authorized_next_stage": "RC1_PARALLEL__WP_B_REPAIR_1M",
   "live_v1_acceptance_authority": {
     "report_path": "reviews/v0.5/live_v1/V0.5.5_LIVE_V1_B3_CONTROLLER_ACCEPTANCE.md",
     "report_blob_sha": "21ad4492feb4750f5fc85a5f88b54d1da36c157d",
@@ -528,5 +533,12 @@
     "evidence_path": "evidence/v0.5.5/controller/B_LINE_RC1_WP_A_ACCEPTANCE.json",
     "evidence_blob_sha": "2c0b7b71759bcdb51acd2b70a3d0cc9e851819a3",
     "candidate_sha": "606f286dbb5d7af46776043d1287d9b3e7b1e679"
+  },
+  "rc1_wp_d_controller_acceptance": {
+    "report_path": "reviews/v0.5/rc1/V0.5.5_RC1_WP_D_REPAIR_CONTROLLER_REVIEW.md",
+    "report_blob_sha": "747a2cab6498e8d54088601fafe55b554aafb081",
+    "evidence_path": "evidence/v0.5.5/controller/B_LINE_RC1_WP_D_ACCEPTANCE.json",
+    "evidence_blob_sha": "11714e6c3df96efb96d3b104aafd1ca6c5b94dd9",
+    "candidate_sha": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea"
   }
 }
