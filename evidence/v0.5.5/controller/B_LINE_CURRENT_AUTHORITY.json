@@ -1,6 +1,6 @@
 {
   "line": "B_LINE",
-  "stage": "B_LINE_INITIAL_USABLE_RELEASE_V1_RC2__HOLDOUT_R1_INVALID__FRESH_HOLDOUT_PREP",
+  "stage": "B_LINE_INITIAL_USABLE_RELEASE_V1_RC2__FRESH_HOLDOUT_R1_1_AUTHORIZED",
   "code_branch": "feature/tactical-policy-r2",
   "accepted_code_sha": "52c16a28153de307dc6132c0975fe29341a0a918",
   "docs_authority_commit": "6319ddbaddd69d5522696992ec1565169da88e03",
@@ -309,7 +309,12 @@
       "XRPUSDT",
       "DOGEUSDT",
       "BNBUSDT"
-    ]
+    ],
+    "rc2_holdout_r1_1_branch": "validation/b-line-rc2-successor-r1-holdout-r1-1",
+    "rc2_holdout_r1_1_dispatch_sha": "f7ca663d6d661ae7b88d6c5e44e670d3d2898445",
+    "rc2_holdout_r1_1_exact_candidate_sha": "10be512f2cf4d7eccdc8a9849c925b5f73c568fd",
+    "rc2_holdout_r1_1_attempts_authorized": 1,
+    "rc2_holdout_r1_1_policy_mutation": "FORBIDDEN"
   },
   "must_read": [],
   "validation_authority": {
@@ -651,5 +656,13 @@
     "evidence_blob_sha": "fff138ff5f4ccf91163770b6f9fdb704d75373f5",
     "fresh_contract_path": "reviews/v0.5/rc2/V0.5.5_RC2_TACTICAL_HOLDOUT_R1_1_CONTRACT.md",
     "fresh_contract_blob_sha": "33cdd6b30a4329784c33fd2edc30a079273f7eb0"
+  },
+  "rc2_holdout_r1_1_dispatch": {
+    "prompt_path": "prompts/v0.5/rc2/v0.5.5_B_LINE_RC2_TACTICAL_SUCCESSOR_FRESH_HOLDOUT_R1_1.md",
+    "prompt_blob_sha": "f3321fa139a31785842105675512764cff4c5f7a",
+    "manifest_path": "evidence/v0.5.5/controller/B_LINE_RC2_FRESH_HOLDOUT_R1_1_DISPATCH.json",
+    "manifest_blob_sha": "2152cf4e6953e4dbd3ff37811fb3bdb7edd72a01",
+    "controller_dispatch_sha": "f7ca663d6d661ae7b88d6c5e44e670d3d2898445",
+    "exact_candidate_sha": "10be512f2cf4d7eccdc8a9849c925b5f73c568fd"
   }
 }

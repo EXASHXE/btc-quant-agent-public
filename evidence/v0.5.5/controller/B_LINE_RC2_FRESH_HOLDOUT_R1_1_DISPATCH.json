@@ -1,0 +1,46 @@
+{
+  "schema_version": "B_LINE_RC2_FRESH_HOLDOUT_R1_1_DISPATCH_V1",
+  "task_id": "B_LINE_RC2_TACTICAL_SUCCESSOR_FRESH_HOLDOUT_R1_1",
+  "branch": "validation/b-line-rc2-successor-r1-holdout-r1-1",
+  "exact_candidate_sha": "10be512f2cf4d7eccdc8a9849c925b5f73c568fd",
+  "controller_dispatch_sha": "f7ca663d6d661ae7b88d6c5e44e670d3d2898445",
+  "protected_targets": [
+    "FILUSDT",
+    "ETCUSDT",
+    "AAVEUSDT",
+    "XLMUSDT",
+    "UNIUSDT",
+    "ICPUSDT",
+    "ARBUSDT",
+    "OPUSDT"
+  ],
+  "context_only": [
+    "BTCUSDT",
+    "ETHUSDT",
+    "SOLUSDT",
+    "LINKUSDT",
+    "SUIUSDT",
+    "XRPUSDT",
+    "DOGEUSDT",
+    "BNBUSDT"
+  ],
+  "burned_r1_targets": [
+    "ADAUSDT",
+    "AVAXUSDT",
+    "LTCUSDT",
+    "TRXUSDT",
+    "BCHUSDT",
+    "DOTUSDT",
+    "ATOMUSDT",
+    "NEARUSDT"
+  ],
+  "min_pre_first_step_closed_bars": {
+    "15m": 300,
+    "1h": 300,
+    "4h": 300
+  },
+  "production_source_mutation_allowed": false,
+  "candidate_mutation_allowed": false,
+  "recommended_executor": "Luna",
+  "real_funds_write_authority": "NONE"
+}
