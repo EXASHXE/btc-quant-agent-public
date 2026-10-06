@@ -1,6 +1,6 @@
 {
   "line": "B_LINE",
-  "stage": "B_LINE_INITIAL_USABLE_RELEASE_V1_RC2__TACTICAL_SUCCESSOR_IMPLEMENTATION_AUTHORIZED",
+  "stage": "B_LINE_INITIAL_USABLE_RELEASE_V1_RC2__TACTICAL_CANDIDATE_FROZEN_PENDING_HOLDOUT",
   "code_branch": "feature/tactical-policy-r2",
   "accepted_code_sha": "52c16a28153de307dc6132c0975fe29341a0a918",
   "docs_authority_commit": "6319ddbaddd69d5522696992ec1565169da88e03",
@@ -144,7 +144,7 @@
     "live_v1_b4_r6_parent_sha": "a663921abf90504412d0d67b2b9c9f134f204d85",
     "live_v1_b4_r6_controller_sealed": true,
     "live_v1_b5_r6_authorized": false,
-    "live_v1_next_action": "RC2_TACTICAL_SUCCESSOR_IMPLEMENTATION_R1",
+    "live_v1_next_action": "RC2_TACTICAL_SUCCESSOR_INDEPENDENT_PROTECTED_HOLDOUT_R1",
     "live_v1_b5_r5_findings": [
       "HIGH_PROTECTIVE_TYPED_ALIAS_AMBIGUITY",
       "HIGH_RUNTIME_AUTHORITY_ASYNC_HANDOFF_STALE",
@@ -263,7 +263,15 @@
     "rc2_tactical_branch": "feature/b-line-rc2-tactical-successor-r1",
     "rc2_tactical_task_id": "B_LINE_RC2_TACTICAL_SUCCESSOR_R1_IMPLEMENTATION",
     "rc2_tactical_dispatch_sha": "2480e60816b28cb9afbc972cee4029d424d2fd25",
-    "rc2_protected_validation_access": "FORBIDDEN_DURING_IMPLEMENTATION"
+    "rc2_protected_validation_access": "FORBIDDEN_DURING_IMPLEMENTATION",
+    "rc2_tactical_candidate_state": "FROZEN_PENDING_INDEPENDENT_HOLDOUT",
+    "rc2_tactical_candidate_sha": "10be512f2cf4d7eccdc8a9849c925b5f73c568fd",
+    "rc2_tactical_policy_version": "TACTICAL_POLICY_R2_B1",
+    "rc2_tactical_config_hash": "bba61849e64f37f9",
+    "rc2_tactical_selected_candidate_id": "C5_BOUNDED_COMBINATION_B",
+    "rc2_tactical_development_gate": "DIAGNOSTIC_ONLY_INSUFFICIENT_SUPPORT",
+    "rc2_tactical_holdout_attempts_authorized": 1,
+    "rc2_tactical_policy_mutation_after_freeze": "FORBIDDEN"
   },
   "must_read": [],
   "validation_authority": {
@@ -288,7 +296,7 @@
     "evidence_path": "evidence/v0.5.5/controller/V0.5.5_B2B_CONTROLLER_ACCEPTANCE.json",
     "evidence_blob_sha": "73a11708a85b5f1896397d745c3b7252d3c51f8d"
   },
-  "parallel_authorized_next_stage": "RC2_TACTICAL_SUCCESSOR_IMPLEMENTATION_R1",
+  "parallel_authorized_next_stage": "RC2_TACTICAL_SUCCESSOR_INDEPENDENT_PROTECTED_HOLDOUT_R1",
   "live_v1_acceptance_authority": {
     "report_path": "reviews/v0.5/live_v1/V0.5.5_LIVE_V1_B3_CONTROLLER_ACCEPTANCE.md",
     "report_blob_sha": "21ad4492feb4750f5fc85a5f88b54d1da36c157d",
@@ -582,5 +590,12 @@
     "manifest_blob_sha": "95f48eeb8912f30bfa8479c3ee4023e93ac261a2",
     "controller_dispatch_sha": "2480e60816b28cb9afbc972cee4029d424d2fd25",
     "start_sha": "597d2dd7452d6e2ab11e8500d253be1e6d53f8db"
+  },
+  "rc2_tactical_candidate_freeze": {
+    "report_path": "reviews/v0.5/rc2/V0.5.5_RC2_TACTICAL_SUCCESSOR_R1_CONTROLLER_FREEZE.md",
+    "report_blob_sha": "594aea91469235ef667855a1b3a7973347cfd0fe",
+    "evidence_path": "evidence/v0.5.5/controller/B_LINE_RC2_TACTICAL_SUCCESSOR_FREEZE.json",
+    "evidence_blob_sha": "f7f2e093a515f972c7ecfc44bbc2dd27662d8a7a",
+    "candidate_sha": "10be512f2cf4d7eccdc8a9849c925b5f73c568fd"
   }
 }

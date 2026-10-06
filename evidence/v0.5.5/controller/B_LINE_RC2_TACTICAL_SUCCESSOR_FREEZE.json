@@ -1,0 +1,54 @@
+{
+  "schema_version": "B_LINE_RC2_TACTICAL_CANDIDATE_FREEZE_V1",
+  "decision": "RC2_TACTICAL_SUCCESSOR_CANDIDATE_FROZEN_PENDING_INDEPENDENT_HOLDOUT",
+  "candidate_sha": "10be512f2cf4d7eccdc8a9849c925b5f73c568fd",
+  "parent_sha": "597d2dd7452d6e2ab11e8500d253be1e6d53f8db",
+  "implementation_dispatch_sha": "2480e60816b28cb9afbc972cee4029d424d2fd25",
+  "policy_version": "TACTICAL_POLICY_R2_B1",
+  "config_hash": "bba61849e64f37f9",
+  "selected_candidate_id": "C5_BOUNDED_COMBINATION_B",
+  "development_metrics": {
+    "actionable": 44,
+    "long": 20,
+    "short": 24,
+    "mean_net_R": -0.13216,
+    "median_net_R": -1.235369,
+    "stop_before_target": 0.659091,
+    "partitions": [
+      {
+        "id": "P1",
+        "n": 13,
+        "mean_net_R": -0.861199
+      },
+      {
+        "id": "P2",
+        "n": 14,
+        "mean_net_R": 0.56146
+      },
+      {
+        "id": "P3",
+        "n": 17,
+        "mean_net_R": -0.145876
+      }
+    ]
+  },
+  "development_gate": "DIAGNOSTIC_ONLY_INSUFFICIENT_SUPPORT",
+  "release_ready": false,
+  "protected_validation_symbols": [
+    "ADAUSDT",
+    "AVAXUSDT",
+    "LTCUSDT",
+    "TRXUSDT",
+    "BCHUSDT",
+    "DOTUSDT",
+    "ATOMUSDT",
+    "NEARUSDT"
+  ],
+  "protected_validation_access_before_freeze": 0,
+  "holdout_attempts_authorized": 1,
+  "safety": {
+    "real_funds_write_authority": "NONE",
+    "live_approval_only": "NOT_AUTHORIZED",
+    "autonomous_live": "FORBIDDEN"
+  }
+}
