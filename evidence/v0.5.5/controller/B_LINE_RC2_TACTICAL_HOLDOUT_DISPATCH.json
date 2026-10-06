@@ -1,0 +1,25 @@
+{
+  "schema_version": "B_LINE_RC2_TACTICAL_HOLDOUT_DISPATCH_V1",
+  "task_id": "B_LINE_RC2_TACTICAL_SUCCESSOR_R1_INDEPENDENT_HOLDOUT",
+  "release_id": "B_LINE_INITIAL_USABLE_RELEASE_V1_RC2",
+  "branch": "validation/b-line-rc2-successor-r1-holdout",
+  "exact_candidate_sha": "10be512f2cf4d7eccdc8a9849c925b5f73c568fd",
+  "controller_dispatch_sha": "02652d0671c4e9476f2cf6b607b2c2e1242f3fde",
+  "policy_version": "TACTICAL_POLICY_R2_B1",
+  "config_hash": "bba61849e64f37f9",
+  "protected_symbols": [
+    "ADAUSDT",
+    "AVAXUSDT",
+    "LTCUSDT",
+    "TRXUSDT",
+    "BCHUSDT",
+    "DOTUSDT",
+    "ATOMUSDT",
+    "NEARUSDT"
+  ],
+  "authorized_attempts": 1,
+  "production_source_mutation_allowed": false,
+  "recommended_executor": "Luna",
+  "semantic_review_after_push": "fresh GPT-6.1 Sol/Codex",
+  "real_funds_write_authority": "NONE"
+}

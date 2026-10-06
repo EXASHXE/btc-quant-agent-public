@@ -1,6 +1,6 @@
 {
   "line": "B_LINE",
-  "stage": "B_LINE_INITIAL_USABLE_RELEASE_V1_RC2__TACTICAL_CANDIDATE_FROZEN_PENDING_HOLDOUT",
+  "stage": "B_LINE_INITIAL_USABLE_RELEASE_V1_RC2__INDEPENDENT_PROTECTED_HOLDOUT_AUTHORIZED",
   "code_branch": "feature/tactical-policy-r2",
   "accepted_code_sha": "52c16a28153de307dc6132c0975fe29341a0a918",
   "docs_authority_commit": "6319ddbaddd69d5522696992ec1565169da88e03",
@@ -144,7 +144,7 @@
     "live_v1_b4_r6_parent_sha": "a663921abf90504412d0d67b2b9c9f134f204d85",
     "live_v1_b4_r6_controller_sealed": true,
     "live_v1_b5_r6_authorized": false,
-    "live_v1_next_action": "RC2_TACTICAL_SUCCESSOR_INDEPENDENT_PROTECTED_HOLDOUT_R1",
+    "live_v1_next_action": "RC2_TACTICAL_SUCCESSOR_R1_INDEPENDENT_HOLDOUT",
     "live_v1_b5_r5_findings": [
       "HIGH_PROTECTIVE_TYPED_ALIAS_AMBIGUITY",
       "HIGH_RUNTIME_AUTHORITY_ASYNC_HANDOFF_STALE",
@@ -271,7 +271,12 @@
     "rc2_tactical_selected_candidate_id": "C5_BOUNDED_COMBINATION_B",
     "rc2_tactical_development_gate": "DIAGNOSTIC_ONLY_INSUFFICIENT_SUPPORT",
     "rc2_tactical_holdout_attempts_authorized": 1,
-    "rc2_tactical_policy_mutation_after_freeze": "FORBIDDEN"
+    "rc2_tactical_policy_mutation_after_freeze": "FORBIDDEN",
+    "rc2_holdout_branch": "validation/b-line-rc2-successor-r1-holdout",
+    "rc2_holdout_task_id": "B_LINE_RC2_TACTICAL_SUCCESSOR_R1_INDEPENDENT_HOLDOUT",
+    "rc2_holdout_dispatch_sha": "02652d0671c4e9476f2cf6b607b2c2e1242f3fde",
+    "rc2_holdout_exact_candidate_sha": "10be512f2cf4d7eccdc8a9849c925b5f73c568fd",
+    "rc2_holdout_attempts_remaining": 1
   },
   "must_read": [],
   "validation_authority": {
@@ -597,5 +602,13 @@
     "evidence_path": "evidence/v0.5.5/controller/B_LINE_RC2_TACTICAL_SUCCESSOR_FREEZE.json",
     "evidence_blob_sha": "f7f2e093a515f972c7ecfc44bbc2dd27662d8a7a",
     "candidate_sha": "10be512f2cf4d7eccdc8a9849c925b5f73c568fd"
+  },
+  "rc2_holdout_dispatch": {
+    "prompt_path": "prompts/v0.5/rc2/v0.5.5_B_LINE_RC2_TACTICAL_SUCCESSOR_HOLDOUT_R1.md",
+    "prompt_blob_sha": "7728cd4bc77e27b05b936f8339f8957efab81077",
+    "manifest_path": "evidence/v0.5.5/controller/B_LINE_RC2_TACTICAL_HOLDOUT_DISPATCH.json",
+    "manifest_blob_sha": "0fc7d1b58aee58aef405afeaa83f0d79b2621bea",
+    "controller_dispatch_sha": "02652d0671c4e9476f2cf6b607b2c2e1242f3fde",
+    "exact_candidate_sha": "10be512f2cf4d7eccdc8a9849c925b5f73c568fd"
   }
 }
