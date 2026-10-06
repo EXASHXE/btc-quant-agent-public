@@ -1,6 +1,6 @@
 {
   "line": "B_LINE",
-  "stage": "B_LINE_INITIAL_USABLE_RELEASE_V1_RC1__WP_A_C_ACCEPTED__WP_D_READY_BINDING__WP_B_REPAIR",
+  "stage": "B_LINE_INITIAL_USABLE_RELEASE_V1_RC2__TACTICAL_SUCCESSOR_PREVALIDATION",
   "code_branch": "feature/tactical-policy-r2",
   "accepted_code_sha": "52c16a28153de307dc6132c0975fe29341a0a918",
   "docs_authority_commit": "6319ddbaddd69d5522696992ec1565169da88e03",
@@ -144,7 +144,7 @@
     "live_v1_b4_r6_parent_sha": "a663921abf90504412d0d67b2b9c9f134f204d85",
     "live_v1_b4_r6_controller_sealed": true,
     "live_v1_b5_r6_authorized": false,
-    "live_v1_next_action": "RC1_PARALLEL__WP_B_REPAIR_1M__THEN_RC_INTEGRATION_BINDING",
+    "live_v1_next_action": "RC2_TACTICAL_SUCCESSOR_IMPLEMENTATION_R1",
     "live_v1_b5_r5_findings": [
       "HIGH_PROTECTIVE_TYPED_ALIAS_AMBIGUITY",
       "HIGH_RUNTIME_AUTHORITY_ASYNC_HANDOFF_STALE",
@@ -219,16 +219,16 @@
     "rc1_dispatch_root_sha": "f8e894f2f39adb66340f6bc8cbd803e1b9515b2a",
     "rc1_parallel_work_packages_authorized": true,
     "rc1_wp_a_state": "ACCEPTED_OPERATIONAL_READINESS_PASS",
-    "rc1_wp_b_state": "REPAIR_1M_EVIDENCE_AUTHORIZED",
+    "rc1_wp_b_state": "ACCEPTED_VALID_HARD_FAIL",
     "rc1_wp_c_state": "ACCEPTED_EXTERNAL_SMOKE_PENDING",
     "rc1_wp_d_state": "REPAIR_ACCEPTED_READY_FOR_RC_INTEGRATION_BINDING",
     "rc1_wp_a_branch": "feature/b-line-rc1-wp-a-operational-readiness",
     "rc1_wp_b_branch": "feature/b-line-rc1-wp-b-decision-quality",
     "rc1_wp_c_branch": "feature/b-line-rc1-wp-c-llm-approval",
     "rc1_wp_d_branch": "feature/b-line-rc1-wp-d-release-engineering",
-    "rc1_wp_b_candidate_sha": "9e1c73c38213f30f0064c6b4b25509c109b1cd84",
+    "rc1_wp_b_candidate_sha": "597d2dd7452d6e2ab11e8500d253be1e6d53f8db",
     "rc1_wp_b_executor_decision": "TACTICAL_DECISION_QUALITY_FAIL",
-    "rc1_wp_b_controller_disposition": "EVIDENCE_REPAIR_REQUIRED__SYNTHETIC_1M_PATH_NOT_RELEASE_AUTHORITY",
+    "rc1_wp_b_controller_disposition": "WP_B_ACCEPTED_VALID_HARD_FAIL__RC1_RELEASE_BLOCKED",
     "rc1_wp_c_candidate_sha": "72b39de71024b3051357c17eee7922e657dcb81f",
     "rc1_wp_d_candidate_sha": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea",
     "rc1_wp_d_controller_disposition": "RELEASE_ENGINEERING_INCOMPLETE__IDENTITY_AND_RUNTIME_CERTIFICATION_PENDING",
@@ -242,7 +242,24 @@
     "rc1_wp_d_bound_python": [
       "3.12"
     ],
-    "rc1_wp_d_wp_a_acceptance_evidence": "evidence/v0.5.5/controller/B_LINE_RC1_WP_A_ACCEPTANCE.json"
+    "rc1_wp_d_wp_a_acceptance_evidence": "evidence/v0.5.5/controller/B_LINE_RC1_WP_A_ACCEPTANCE.json",
+    "rc1_release_state": "BLOCKED_BY_TACTICAL_DECISION_QUALITY",
+    "rc1_integration_as_release_authorized": false,
+    "rc2_release_id": "B_LINE_INITIAL_USABLE_RELEASE_V1_RC2",
+    "rc2_tactical_base_sha": "597d2dd7452d6e2ab11e8500d253be1e6d53f8db",
+    "rc2_inherit_wp_a_sha": "606f286dbb5d7af46776043d1287d9b3e7b1e679",
+    "rc2_inherit_wp_c_sha": "72b39de71024b3051357c17eee7922e657dcb81f",
+    "rc2_inherit_wp_d_sha": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea",
+    "rc2_protected_validation_symbols": [
+      "ADAUSDT",
+      "AVAXUSDT",
+      "LTCUSDT",
+      "TRXUSDT",
+      "BCHUSDT",
+      "DOTUSDT",
+      "ATOMUSDT",
+      "NEARUSDT"
+    ]
   },
   "must_read": [],
   "validation_authority": {
@@ -267,7 +284,7 @@
     "evidence_path": "evidence/v0.5.5/controller/V0.5.5_B2B_CONTROLLER_ACCEPTANCE.json",
     "evidence_blob_sha": "73a11708a85b5f1896397d745c3b7252d3c51f8d"
   },
-  "parallel_authorized_next_stage": "RC1_PARALLEL__WP_B_REPAIR_1M",
+  "parallel_authorized_next_stage": "RC2_TACTICAL_SUCCESSOR_IMPLEMENTATION_R1",
   "live_v1_acceptance_authority": {
     "report_path": "reviews/v0.5/live_v1/V0.5.5_LIVE_V1_B3_CONTROLLER_ACCEPTANCE.md",
     "report_blob_sha": "21ad4492feb4750f5fc85a5f88b54d1da36c157d",
@@ -540,5 +557,18 @@
     "evidence_path": "evidence/v0.5.5/controller/B_LINE_RC1_WP_D_ACCEPTANCE.json",
     "evidence_blob_sha": "11714e6c3df96efb96d3b104aafd1ca6c5b94dd9",
     "candidate_sha": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea"
+  },
+  "rc1_wp_b_controller_acceptance": {
+    "report_path": "reviews/v0.5/rc1/V0.5.5_RC1_WP_B_REPAIR_CONTROLLER_REVIEW.md",
+    "report_blob_sha": "c2265b51e603e9270e0761aaed19de6ef10a7684",
+    "evidence_path": "evidence/v0.5.5/controller/B_LINE_RC1_WP_B_ADJUDICATION.json",
+    "evidence_blob_sha": "89f35ced17438595b11e389d990fa48004ebf7ce",
+    "candidate_sha": "597d2dd7452d6e2ab11e8500d253be1e6d53f8db"
+  },
+  "rc2_contract": {
+    "release_contract_path": "reviews/v0.5/rc2/V0.5.5_B_LINE_INITIAL_USABLE_RELEASE_V1_RC2_CONTRACT.md",
+    "release_contract_blob_sha": "d7751f5eec4b1a31abd819a75239b0efaebb6d94",
+    "evaluation_contract_path": "reviews/v0.5/rc2/V0.5.5_B_LINE_RC2_TACTICAL_SUCCESSOR_R1_EVALUATION_CONTRACT.md",
+    "evaluation_contract_blob_sha": "3d4164e602b3928c91b849184ac390ee1fa1bfaf"
   }
 }
