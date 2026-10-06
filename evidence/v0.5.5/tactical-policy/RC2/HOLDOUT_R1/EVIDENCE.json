@@ -1,0 +1,1789 @@
+{
+  "aggregate_metrics": {
+    "MAE": {
+      "max_r": 1.0,
+      "mean_r": 0.861111,
+      "median_r": 1.0
+    },
+    "MFE": {
+      "max_r": 5.22,
+      "mean_r": 1.159444,
+      "median_r": 0.65
+    },
+    "action_frequency": 0.004318,
+    "actionable_evaluation_count": 76,
+    "actionable_signal_count": 72,
+    "boundary_breach": {
+      "invalidation_breach_count": 80,
+      "stop_boundary_breach_count": 57,
+      "stop_boundary_breach_rate": 0.791667
+    },
+    "cohort_label": "AGGREGATE_OOS",
+    "drawdown_adverse_excursion": {
+      "max_adverse_excursion_r": 1.0,
+      "max_cumulative_net_r_drawdown": 37.176492,
+      "mean_adverse_excursion_r": 0.861111,
+      "median_adverse_excursion_r": 1.0
+    },
+    "fees": {
+      "maker_fee_rate": 0.0002,
+      "mean_fee_r": 0.203839,
+      "taker_fee_rate": 0.0005,
+      "total_fee_r": 14.676429
+    },
+    "fill_rate": 1.0,
+    "filled_count": 72,
+    "funding": {
+      "funding_complete_count": 68,
+      "mean_funding_pnl_r": 5.7e-05,
+      "median_funding_pnl_r": 0.0,
+      "settlements_total": 13,
+      "total_funding_pnl_r": 0.003857
+    },
+    "gross_R": {
+      "mean": -0.149374,
+      "median": -1.0,
+      "total": -10.75491
+    },
+    "holding_time": {
+      "mean_holding_time_ms": 3440000.0,
+      "mean_time_to_fill_ms": 666666.67,
+      "median_holding_time_ms": 1800000.0,
+      "median_time_to_fill_ms": 900000.0
+    },
+    "long_actionable_count": 24,
+    "long_short_wait_distribution": {
+      "LONG": {
+        "count": 24,
+        "share": 0.001364
+      },
+      "SHORT": {
+        "count": 52,
+        "share": 0.002955
+      },
+      "WAIT": {
+        "count": 17524,
+        "share": 0.995682
+      }
+    },
+    "mean_R": -0.434695,
+    "mean_gross_R": -0.149374,
+    "mean_net_R": -0.434695,
+    "median_R": -1.21205,
+    "median_gross_R": -1.0,
+    "median_net_R": -1.21205,
+    "net_R": {
+      "mean": -0.434695,
+      "mean_ex_funding": -0.434749,
+      "median": -1.21205,
+      "median_ex_funding": -1.21205,
+      "total": -31.298053
+    },
+    "no_fill_count": 0,
+    "policy_shift": {
+      "directional_policy_shift_count": 1,
+      "directional_policy_shift_rate": 0.013889
+    },
+    "sample_count": 17600,
+    "short_actionable_count": 48,
+    "slippage": {
+      "mean_slippage_r": 0.081536,
+      "slippage_bps_per_side": 2.0,
+      "total_slippage_r": 5.870571
+    },
+    "stop_before_target": 0.791667,
+    "stop_before_target_count": 57,
+    "stop_rate_all_filled": 0.791667,
+    "target_stop_resolved_count": 72,
+    "timeout_count": 0,
+    "tp1_before_sl": 0.208333,
+    "tp1_before_sl_count": 15,
+    "tp2_before_sl": 0.055556,
+    "tp2_before_sl_count": 4,
+    "trend_transition": {
+      "shadow_trend_transition_distribution": {
+        "EMERGING_TREND": 3369,
+        "EXHAUSTING_TREND": 312,
+        "MATURE_TREND": 777,
+        "PULLBACK_IN_TREND": 2270,
+        "RANGE_BOUND": 3385,
+        "TRANSITION_TO_RANGE": 1454,
+        "VOLATILITY_SHOCK": 6033
+      },
+      "technical_trend_transition_count": 9,
+      "technical_trend_transition_rate": 0.125
+    }
+  },
+  "config_hash": "bba61849e64f37f9",
+  "controller_dispatch_sha": "02652d0671c4e9476f2cf6b607b2c2e1242f3fde",
+  "deterministic_replay_proof": {
+    "pass": true,
+    "run_1_evidence_ids_sha256": "f160928de0ce11ce00b4cf891fe8b87a7f14ce6935b8f92ffc678af0f6b1b7ef",
+    "run_1_input_hash": "b95d8afb8ce3deded46d6d864b201dc9b01038845271df5043f8d0bf8615e55c",
+    "run_1_output_hash": "fe99d8bcb230dfd165105495ead398ad3904a86aef4a7ae89ac65fbdd3c94b92",
+    "run_1_shadow_ids_sha256": "65bcb186a314dbae9ca96ce0b6ad3342d50ded204e5b4f3f0da110dd46e6655c",
+    "run_2_evidence_ids_sha256": "f160928de0ce11ce00b4cf891fe8b87a7f14ce6935b8f92ffc678af0f6b1b7ef",
+    "run_2_input_hash": "b95d8afb8ce3deded46d6d864b201dc9b01038845271df5043f8d0bf8615e55c",
+    "run_2_output_hash": "fe99d8bcb230dfd165105495ead398ad3904a86aef4a7ae89ac65fbdd3c94b92",
+    "run_2_shadow_ids_sha256": "65bcb186a314dbae9ca96ce0b6ad3342d50ded204e5b4f3f0da110dd46e6655c",
+    "same_evidence_ids": true,
+    "same_input_manifest": true,
+    "same_output_manifest": true,
+    "same_shadow_ids": true
+  },
+  "frozen_candidate_sha": "10be512f2cf4d7eccdc8a9849c925b5f73c568fd",
+  "gate_evaluation": {
+    "contract_version": "V0.5.5_B_LINE_TACTICAL_DECISION_QUALITY_R1",
+    "decision": "TACTICAL_DECISION_QUALITY_FAIL",
+    "gross_to_net_sign_flip_observed": false,
+    "hard_negative_gates": {
+      "any_triggered": true,
+      "mean_net_r_le_minus_0_10_with_100_actionable": false,
+      "median_net_r_le_minus_0_20_with_100_actionable": false,
+      "stop_before_target_gt_0_70_with_100_resolved": false,
+      "systematic_cost_omission_sign_flip": false,
+      "two_supported_partitions_mean_net_r_le_minus_0_25": true
+    },
+    "integrity_gates": {
+      "all_passed": true,
+      "authentic_1m_data_granularity_complete": true,
+      "deterministic_manifest_replay_identical": true,
+      "no_outcome_informed_policy_retuning": true,
+      "no_protected_a_line_outcomes_accessed": true,
+      "pit_chronology_manifest_integrity": true,
+      "transaction_costs_included_in_net_r": true
+    },
+    "pass_band_gates": {
+      "all_passed": false,
+      "mean_net_r_ge_plus_0_05": false,
+      "median_net_r_ge_minus_0_05": false,
+      "positive_supported_partition_ratio": 0.333333,
+      "positive_supported_partitions_count": 1,
+      "stop_before_target_le_0_65": false,
+      "supported_partitions_count": 3,
+      "supported_partitions_non_negative_ge_2_of_3": false
+    },
+    "reasons": [
+      "HARD_NEGATIVE_GATE_TRIGGERED:two_supported_partitions_mean_net_r_le_minus_0_25"
+    ],
+    "stability_gate": {
+      "oos_partitions": 3,
+      "positive_mean_net_r_partitions": 1,
+      "severe_negative_partitions": 2,
+      "status": "FAIL",
+      "supported_partitions": 3
+    },
+    "subgroup_rescue_applied": false,
+    "subgroup_rescue_permitted": false,
+    "support_gates": {
+      "actionable_oos_count": 72,
+      "all_passed": false,
+      "long_actionable_count": 24,
+      "long_actionable_count_ge_20": true,
+      "oos_actionable_count_ge_100": false,
+      "oos_partitions_count": 3,
+      "oos_partitions_ge_3": true,
+      "short_actionable_count": 48,
+      "short_actionable_count_ge_20": true,
+      "supported_partitions_count": 3,
+      "supported_partitions_ge_2": true
+    },
+    "thresholds": {
+      "hard_fail_mean_net_r_max": -0.1,
+      "hard_fail_median_net_r_max": -0.2,
+      "hard_fail_min_actionable_support": 100,
+      "hard_fail_partition_count_min": 2,
+      "hard_fail_partition_mean_net_r_max": -0.25,
+      "hard_fail_stop_before_target_min": 0.7,
+      "min_long_actionable_count": 20,
+      "min_oos_actionable_count": 100,
+      "min_oos_partitions": 3,
+      "min_partition_actionable_count": 20,
+      "min_short_actionable_count": 20,
+      "min_supported_partitions": 2,
+      "pass_mean_net_r_min": 0.05,
+      "pass_median_net_r_min": -0.05,
+      "pass_positive_partition_ratio_min": 0.6666666666666666,
+      "pass_stop_before_target_max": 0.65
+    }
+  },
+  "input_manifest": {
+    "config_hash": "bba61849e64f37f9",
+    "contract_version": "V0.5.5_B_LINE_TACTICAL_DECISION_QUALITY_R1",
+    "data_end_ms": 1791223199999,
+    "first_step_ms": 1788717599999,
+    "frozen_predecessor_sha": "52c16a28153de307dc6132c0975fe29341a0a918",
+    "input_manifest_hash": "b95d8afb8ce3deded46d6d864b201dc9b01038845271df5043f8d0bf8615e55c",
+    "last_step_ms": 1791136799999,
+    "manifest_version": "RC1_WP_B_REPLAY_INPUT_MANIFEST_V1",
+    "partitions": [
+      {
+        "calibration_end_ms": 1788890399999,
+        "calibration_start_ms": 1788717599999,
+        "oos_end_ms": 1789639199999,
+        "oos_start_ms": 1788890399999,
+        "partition_id": "P1"
+      },
+      {
+        "calibration_end_ms": 1789639199999,
+        "calibration_start_ms": 1788717599999,
+        "oos_end_ms": 1790387999999,
+        "oos_start_ms": 1789639199999,
+        "partition_id": "P2"
+      },
+      {
+        "calibration_end_ms": 1790387999999,
+        "calibration_start_ms": 1788717599999,
+        "oos_end_ms": 1791136799999,
+        "oos_start_ms": 1790387999999,
+        "partition_id": "P3"
+      }
+    ],
+    "policy_version": "TACTICAL_POLICY_R2_B1",
+    "protected_a_line_outcomes_accessed": false,
+    "source_provenance": "BINANCE_PUBLIC_FUTURES_UNAUTHENTICATED_HISTORICAL",
+    "step_count": 2689,
+    "step_timestamps_sha256": "2fbb55fbc40cf2426775d65a0b81f79f564d4481b0698b8b8b89fbe454a793ce",
+    "symbol_digests": {
+      "ADAUSDT": {
+        "basis_hist_count": 7776,
+        "funding_rates_count": 87,
+        "funding_rates_sha256": "70fe3e2584abf09ae12096cf4393e4b46a158577f1eda6a3d380888fd84dded9",
+        "gls_hist_count": 648,
+        "klines_15m_count": 2785,
+        "klines_15m_sha256": "edc2c245a3ec767e4e6232c56aa51b4b81aef904cd15eb7539b4230b22f81b4b",
+        "klines_1h_count": 696,
+        "klines_1h_sha256": "ff284b3975c2e91ea856922adc729309793c16d9d76066c75865b25f5ae255d9",
+        "klines_1m_count": 41775,
+        "klines_1m_sha256": "fcce4934066d08550dbbfd2a4238089e6e2fe3b6924be3b3b162a8a9b18042aa",
+        "klines_4h_count": 173,
+        "klines_4h_sha256": "45dec03c1afcf0049ab9cfa4e829a9c0ea8f16862af86e7446d93c76681c4768",
+        "oi_hist_count": 648,
+        "oi_hist_sha256": "8520a79a0af2a9f0425910efa1964745d285dfe73a51a044db88c9cfd82aa029",
+        "symbol": "ADAUSDT",
+        "taker_hist_count": 2592,
+        "top_acc_hist_count": 648,
+        "top_pos_hist_count": 648
+      },
+      "ATOMUSDT": {
+        "basis_hist_count": 7776,
+        "funding_rates_count": 87,
+        "funding_rates_sha256": "609780d539c0e20e4ad16dc5f5c0e4425ea2b32f82bcf7972d689bf7148f23b7",
+        "gls_hist_count": 648,
+        "klines_15m_count": 2785,
+        "klines_15m_sha256": "3c130ac8bb828e0cbf7401b20c830a89d8c1b1a1e12b83ec0995b801484cb06f",
+        "klines_1h_count": 696,
+        "klines_1h_sha256": "9880f450de591a0fe84794b83ff6adc1d23d624e04c16aaf815978d5e8877008",
+        "klines_1m_count": 41775,
+        "klines_1m_sha256": "fa777818c59d2ff7b2ce22fab00eb4c3de716c6a364f9f51e943f556da7b3b75",
+        "klines_4h_count": 173,
+        "klines_4h_sha256": "23c80bf3ee6633f59884bffa647fa32fec804ccf52a94accf558bc31e2a3b237",
+        "oi_hist_count": 648,
+        "oi_hist_sha256": "f2abb2d6d2feb07673be58fae81a554e5081482ee94c41dc83ed917acfb80f6d",
+        "symbol": "ATOMUSDT",
+        "taker_hist_count": 2592,
+        "top_acc_hist_count": 648,
+        "top_pos_hist_count": 648
+      },
+      "AVAXUSDT": {
+        "basis_hist_count": 7776,
+        "funding_rates_count": 87,
+        "funding_rates_sha256": "97f0868d8d2ffca6848ee8a3e65b75584a9d9830ef844fe57363a7bfc5dd62a9",
+        "gls_hist_count": 648,
+        "klines_15m_count": 2785,
+        "klines_15m_sha256": "0d1b7a5dab23daa390dc38de78c70a98034240db18b5d2ac61c36af0ffca2ff9",
+        "klines_1h_count": 696,
+        "klines_1h_sha256": "ccf6d624a7d1f104eeda8b3a3ece8bceb238f02ee1ad3f05d096a47fb98605b8",
+        "klines_1m_count": 41775,
+        "klines_1m_sha256": "8af94394bd7a0e913eb9484d36570e710edb90eadfe610b5a2743bea4070f855",
+        "klines_4h_count": 173,
+        "klines_4h_sha256": "f30dd36445e01528aa844eb30eb0ba4dc7f6d44f65db420dc7757d354975ae4b",
+        "oi_hist_count": 648,
+        "oi_hist_sha256": "a727823f5b560f77fc2d19ab54c52bbcbef938512cf9258da7f62bf4dec08b2f",
+        "symbol": "AVAXUSDT",
+        "taker_hist_count": 2592,
+        "top_acc_hist_count": 648,
+        "top_pos_hist_count": 648
+      },
+      "BCHUSDT": {
+        "basis_hist_count": 7776,
+        "funding_rates_count": 87,
+        "funding_rates_sha256": "8625979357f12dad6ccca22c3394d4743cc6080c1c62967f5154e972a8c1787a",
+        "gls_hist_count": 648,
+        "klines_15m_count": 2785,
+        "klines_15m_sha256": "7204cf322be8a6c47149b5c671b209df33e4f7979701bdf8a2b8e192eaeaef87",
+        "klines_1h_count": 696,
+        "klines_1h_sha256": "54462fba35165dc9b72f5b1283f7dd92517dc16954723235495fd7e0c3ced169",
+        "klines_1m_count": 41775,
+        "klines_1m_sha256": "3bf897703f1b6ffa8b9ea110d9273ee2a249ca5a6607b911015639cc9b2e6a30",
+        "klines_4h_count": 173,
+        "klines_4h_sha256": "6038e1aaba8045bb07faf9d78038fadb2289d952905be53c4552b0eaa37dd441",
+        "oi_hist_count": 648,
+        "oi_hist_sha256": "0b67b3faa1a89587464bb579f0ed2720e03f0a78ed015ee3d22a6da29f34940f",
+        "symbol": "BCHUSDT",
+        "taker_hist_count": 2592,
+        "top_acc_hist_count": 648,
+        "top_pos_hist_count": 648
+      },
+      "DOTUSDT": {
+        "basis_hist_count": 7776,
+        "funding_rates_count": 87,
+        "funding_rates_sha256": "ee42d22e5d379443237e6dcfd3c37c665e5afd325cad1caa4581ba7991615b21",
+        "gls_hist_count": 648,
+        "klines_15m_count": 2785,
+        "klines_15m_sha256": "ee084018ea6fc6bc94294497f18871b09bfa44e39684ee1c57dd86cc2e8a50ea",
+        "klines_1h_count": 696,
+        "klines_1h_sha256": "6264ddb23f1ac5180189eaf6b119f141c1c67fa9b02d9ffd198247061cd946a1",
+        "klines_1m_count": 41775,
+        "klines_1m_sha256": "e0c20967b252574732792a43dea7141a877c1dde80aec9d63d19f27fdbbc8a61",
+        "klines_4h_count": 173,
+        "klines_4h_sha256": "8637cb41717bc751cdfc4a651b29d629fce7e0ccd4491ef3dd20e5cb61654ee9",
+        "oi_hist_count": 648,
+        "oi_hist_sha256": "3ae124602b4a59b43c3172485c7aa906cff9aea32fc8ca57035229ca9f70a5f4",
+        "symbol": "DOTUSDT",
+        "taker_hist_count": 2592,
+        "top_acc_hist_count": 648,
+        "top_pos_hist_count": 648
+      },
+      "LTCUSDT": {
+        "basis_hist_count": 7776,
+        "funding_rates_count": 87,
+        "funding_rates_sha256": "085bf4de24a4c29756f26552688ba49ac41ee8b85dcb54feb5bfd5fb053070f2",
+        "gls_hist_count": 648,
+        "klines_15m_count": 2785,
+        "klines_15m_sha256": "13052643ab2a1cbee89c1fb6122770ecce5a02ff614dbbb6d62c80d5a993e7ca",
+        "klines_1h_count": 696,
+        "klines_1h_sha256": "9e0fd8638a82a6d55321162162bb595628b9f7855e5a29a16a563ad57ad992f8",
+        "klines_1m_count": 41775,
+        "klines_1m_sha256": "0c0eade3a08761b810df40fe342722d051024f393e092ea9739998f412f53d6a",
+        "klines_4h_count": 173,
+        "klines_4h_sha256": "1075e91b6e6f5371a2a3d3707fca5681153d64b1dc380dfefe8fb4753317d9f2",
+        "oi_hist_count": 648,
+        "oi_hist_sha256": "c1f20d6e23d336bad4ed60c639d350f14a8fe20b7ba986f80cfd819eac4b2db4",
+        "symbol": "LTCUSDT",
+        "taker_hist_count": 2592,
+        "top_acc_hist_count": 648,
+        "top_pos_hist_count": 648
+      },
+      "NEARUSDT": {
+        "basis_hist_count": 7776,
+        "funding_rates_count": 87,
+        "funding_rates_sha256": "66395c831346ed3981de3eb88ffaf90be73985473fcf53e2e6bf23ac4d61fe18",
+        "gls_hist_count": 648,
+        "klines_15m_count": 2785,
+        "klines_15m_sha256": "0157917da91e3724ace01bb44909b74085bb823df98568458da4bffaf0f22c41",
+        "klines_1h_count": 696,
+        "klines_1h_sha256": "b7004d858d9d7ae4a833f7fc0a292359e1c7af04b80fea55bd2844b2bb4fd599",
+        "klines_1m_count": 41775,
+        "klines_1m_sha256": "cd4e73d127e93378220a26b1420a31082ff82074bdde237cabb56a7572eb14df",
+        "klines_4h_count": 173,
+        "klines_4h_sha256": "00edf99eb9227cce8e49f75ad4dc12f01946731cc649746cd89dd568b6001218",
+        "oi_hist_count": 648,
+        "oi_hist_sha256": "e17a87da2b3092e2fe0377fdc70ea5eaf406d10a8c01d3cf42a5c9893bbd7abc",
+        "symbol": "NEARUSDT",
+        "taker_hist_count": 2592,
+        "top_acc_hist_count": 648,
+        "top_pos_hist_count": 648
+      },
+      "TRXUSDT": {
+        "basis_hist_count": 7776,
+        "funding_rates_count": 87,
+        "funding_rates_sha256": "36d7b4e1c7b339dde4cf2a92e5378ee30245b1b00ee2e79b297632c433566057",
+        "gls_hist_count": 648,
+        "klines_15m_count": 2785,
+        "klines_15m_sha256": "a0928debef542a0cdff9030dd5ddb5311dbbf9e19799fddf826d8cbb72888f3e",
+        "klines_1h_count": 696,
+        "klines_1h_sha256": "035c1da0e0091718d23a4236c2235746b1eff0d1defa7b4f031376bcc614b4a4",
+        "klines_1m_count": 41775,
+        "klines_1m_sha256": "2054416d07eaedb7fcca82fa0acc0da20380ea74351337417f13c20df7ed6d18",
+        "klines_4h_count": 173,
+        "klines_4h_sha256": "445d51ede8be9e29b5f6b945005819cd122a5393dc5da21181e7ed97c7cac2cf",
+        "oi_hist_count": 648,
+        "oi_hist_sha256": "477f98a9231e596c47dc890dafe6b34206239975f56d7bb4b09573ef6299df53",
+        "symbol": "TRXUSDT",
+        "taker_hist_count": 2592,
+        "top_acc_hist_count": 648,
+        "top_pos_hist_count": 648
+      }
+    },
+    "symbols": [
+      "ADAUSDT",
+      "AVAXUSDT",
+      "LTCUSDT",
+      "TRXUSDT",
+      "BCHUSDT",
+      "DOTUSDT",
+      "ATOMUSDT",
+      "NEARUSDT"
+    ]
+  },
+  "output_manifest": {
+    "actionable_oos_count": 72,
+    "aggregate_oos_mean_net_R": -0.434695,
+    "aggregate_oos_median_net_R": -1.21205,
+    "config_hash": "bba61849e64f37f9",
+    "evidence_ids_sha256": "f160928de0ce11ce00b4cf891fe8b87a7f14ce6935b8f92ffc678af0f6b1b7ef",
+    "grid_evaluation_ids_sha256": "4a89780b9aa3bf5380313e079e5833e7e6540b3b0948ba24f0352ec0a378ed60",
+    "input_manifest_hash": "b95d8afb8ce3deded46d6d864b201dc9b01038845271df5043f8d0bf8615e55c",
+    "manifest_version": "RC1_WP_B_REPLAY_OUTPUT_MANIFEST_V1",
+    "oos_evaluations_count": 72,
+    "oos_evidences_count": 17600,
+    "output_manifest_hash": "fe99d8bcb230dfd165105495ead398ad3904a86aef4a7ae89ac65fbdd3c94b92",
+    "policy_version": "TACTICAL_POLICY_R2_B1",
+    "shadow_evaluation_ids_sha256": "65bcb186a314dbae9ca96ce0b6ad3342d50ded204e5b4f3f0da110dd46e6655c",
+    "total_evidences_count": 17608,
+    "trend_shadow_ids_sha256": "ae7a254e1a81ebae166bfd4e90ebb8c7f6644889d10b2a7be21d15bf40120a29"
+  },
+  "pit_causality_audit": {
+    "authentic_1m_coverage_by_symbol": {
+      "ADAUSDT": {
+        "complete": true,
+        "first_open_ms": 1788716700000,
+        "klines_1m_count": 41775,
+        "last_close_ms": 1791223199999,
+        "window_1m_count": 41775
+      },
+      "ATOMUSDT": {
+        "complete": true,
+        "first_open_ms": 1788716700000,
+        "klines_1m_count": 41775,
+        "last_close_ms": 1791223199999,
+        "window_1m_count": 41775
+      },
+      "AVAXUSDT": {
+        "complete": true,
+        "first_open_ms": 1788716700000,
+        "klines_1m_count": 41775,
+        "last_close_ms": 1791223199999,
+        "window_1m_count": 41775
+      },
+      "BCHUSDT": {
+        "complete": true,
+        "first_open_ms": 1788716700000,
+        "klines_1m_count": 41775,
+        "last_close_ms": 1791223199999,
+        "window_1m_count": 41775
+      },
+      "DOTUSDT": {
+        "complete": true,
+        "first_open_ms": 1788716700000,
+        "klines_1m_count": 41775,
+        "last_close_ms": 1791223199999,
+        "window_1m_count": 41775
+      },
+      "LTCUSDT": {
+        "complete": true,
+        "first_open_ms": 1788716700000,
+        "klines_1m_count": 41775,
+        "last_close_ms": 1791223199999,
+        "window_1m_count": 41775
+      },
+      "NEARUSDT": {
+        "complete": true,
+        "first_open_ms": 1788716700000,
+        "klines_1m_count": 41775,
+        "last_close_ms": 1791223199999,
+        "window_1m_count": 41775
+      },
+      "TRXUSDT": {
+        "complete": true,
+        "first_open_ms": 1788716700000,
+        "klines_1m_count": 41775,
+        "last_close_ms": 1791223199999,
+        "window_1m_count": 41775
+      }
+    },
+    "authentic_1m_queries_count": 370,
+    "data_end_ms": 1791223199999,
+    "granularity_violations_count": 0,
+    "max_returned_candle_close_ms": 1791223199999,
+    "pit_queries_count": 262996,
+    "pit_violations_count": 0,
+    "synthetic_1m_queries_count": 0
+  },
+  "policy_freeze_proof": {
+    "candidate_manifest_rule_match": true,
+    "config_hash": "bba61849e64f37f9",
+    "controller_dispatch_sha": "02652d0671c4e9476f2cf6b607b2c2e1242f3fde",
+    "current_head_at_replay": "10be512f2cf4d7eccdc8a9849c925b5f73c568fd",
+    "exact_candidate_sha": "10be512f2cf4d7eccdc8a9849c925b5f73c568fd",
+    "pass": true,
+    "policy_version": "TACTICAL_POLICY_R2_B1",
+    "production_source_diff_empty": true,
+    "release_id": "B_LINE_INITIAL_USABLE_RELEASE_V1_RC2",
+    "selected_candidate_id": "C5_BOUNDED_COMBINATION_B",
+    "selected_manifest_config_hash": "bba61849e64f37f9",
+    "selected_manifest_policy_version": "TACTICAL_POLICY_R2_B1",
+    "selected_policy_manifest_sha256": "5013f30a1eee9feea84e66967a6c87677a16a395f5d8b52adb5860ec3278daf3",
+    "validation_branch": "validation/b-line-rc2-successor-r1-holdout"
+  },
+  "policy_version": "TACTICAL_POLICY_R2_B1",
+  "preflight": "PASS",
+  "real_money_authority": false,
+  "release_id": "B_LINE_INITIAL_USABLE_RELEASE_V1_RC2",
+  "replay_coverage_notes": {
+    "fail_closed_insufficient_history": true,
+    "maximum_oos_evidence_count": 19968,
+    "missing_oos_steps_per_symbol": 296,
+    "missing_reference_data_accessed": false,
+    "missing_reference_symbols": [
+      "BTCUSDT",
+      "ETHUSDT",
+      "SOLUSDT",
+      "LINKUSDT",
+      "SUIUSDT",
+      "XRPUSDT",
+      "DOGEUSDT",
+      "BNBUSDT"
+    ],
+    "oos_evidence_count": 17600,
+    "policy_or_threshold_changed": false
+  },
+  "rolling_oos_table": [
+    {
+      "MAE": {
+        "max_r": 1.0,
+        "mean_r": 0.86381,
+        "median_r": 1.0
+      },
+      "MFE": {
+        "max_r": 5.22,
+        "mean_r": 1.026667,
+        "median_r": 0.17
+      },
+      "action_frequency": 0.004897,
+      "actionable_evaluation_count": 21,
+      "actionable_signal_count": 21,
+      "boundary_breach": {
+        "invalidation_breach_count": 19,
+        "stop_boundary_breach_count": 18,
+        "stop_boundary_breach_rate": 0.857143
+      },
+      "cohort_label": "P1",
+      "drawdown_adverse_excursion": {
+        "max_adverse_excursion_r": 1.0,
+        "max_cumulative_net_r_drawdown": 23.357186,
+        "mean_adverse_excursion_r": 0.86381,
+        "median_adverse_excursion_r": 1.0
+      },
+      "fees": {
+        "maker_fee_rate": 0.0002,
+        "mean_fee_r": 0.315694,
+        "taker_fee_rate": 0.0005,
+        "total_fee_r": 6.629571
+      },
+      "fill_rate": 1.0,
+      "filled_count": 21,
+      "funding": {
+        "funding_complete_count": 21,
+        "mean_funding_pnl_r": -0.000861,
+        "median_funding_pnl_r": 0.0,
+        "settlements_total": 1,
+        "total_funding_pnl_r": -0.018086
+      },
+      "gross_R": {
+        "mean": -0.389489,
+        "median": -1.0,
+        "total": -8.179261
+      },
+      "holding_time": {
+        "mean_holding_time_ms": 1848571.43,
+        "mean_time_to_fill_ms": 540000.0,
+        "median_holding_time_ms": 900000.0,
+        "median_time_to_fill_ms": 900000.0
+      },
+      "long_actionable_count": 6,
+      "long_short_wait_distribution": {
+        "LONG": {
+          "count": 6,
+          "share": 0.001399
+        },
+        "SHORT": {
+          "count": 15,
+          "share": 0.003498
+        },
+        "WAIT": {
+          "count": 4267,
+          "share": 0.995103
+        }
+      },
+      "mean_R": -0.832321,
+      "mean_gross_R": -0.389489,
+      "mean_net_R": -0.832321,
+      "median_R": -1.349,
+      "median_gross_R": -1.0,
+      "median_net_R": -1.349,
+      "net_R": {
+        "mean": -0.832321,
+        "mean_ex_funding": -0.83146,
+        "median": -1.349,
+        "median_ex_funding": -1.349,
+        "total": -17.478746
+      },
+      "no_fill_count": 0,
+      "partition_spec": {
+        "calibration_end_ms": 1788890399999,
+        "calibration_start_ms": 1788717599999,
+        "oos_end_ms": 1789639199999,
+        "oos_start_ms": 1788890399999,
+        "partition_id": "P1"
+      },
+      "policy_shift": {
+        "directional_policy_shift_count": 0,
+        "directional_policy_shift_rate": 0.0
+      },
+      "sample_count": 4288,
+      "short_actionable_count": 15,
+      "slippage": {
+        "mean_slippage_r": 0.126278,
+        "slippage_bps_per_side": 2.0,
+        "total_slippage_r": 2.651829
+      },
+      "stop_before_target": 0.857143,
+      "stop_before_target_count": 18,
+      "stop_rate_all_filled": 0.857143,
+      "target_stop_resolved_count": 21,
+      "timeout_count": 0,
+      "tp1_before_sl": 0.142857,
+      "tp1_before_sl_count": 3,
+      "tp2_before_sl": 0.0,
+      "tp2_before_sl_count": 0,
+      "trend_transition": {
+        "shadow_trend_transition_distribution": {
+          "EMERGING_TREND": 764,
+          "EXHAUSTING_TREND": 87,
+          "MATURE_TREND": 229,
+          "PULLBACK_IN_TREND": 629,
+          "RANGE_BOUND": 960,
+          "TRANSITION_TO_RANGE": 347,
+          "VOLATILITY_SHOCK": 1272
+        },
+        "technical_trend_transition_count": 3,
+        "technical_trend_transition_rate": 0.142857
+      }
+    },
+    {
+      "MAE": {
+        "max_r": 1.0,
+        "mean_r": 0.802917,
+        "median_r": 1.0
+      },
+      "MFE": {
+        "max_r": 5.08,
+        "mean_r": 1.624583,
+        "median_r": 1.11
+      },
+      "action_frequency": 0.003906,
+      "actionable_evaluation_count": 26,
+      "actionable_signal_count": 24,
+      "boundary_breach": {
+        "invalidation_breach_count": 31,
+        "stop_boundary_breach_count": 17,
+        "stop_boundary_breach_rate": 0.708333
+      },
+      "cohort_label": "P2",
+      "drawdown_adverse_excursion": {
+        "max_adverse_excursion_r": 1.0,
+        "max_cumulative_net_r_drawdown": 8.218541,
+        "mean_adverse_excursion_r": 0.802917,
+        "median_adverse_excursion_r": 1.0
+      },
+      "fees": {
+        "maker_fee_rate": 0.0002,
+        "mean_fee_r": 0.155589,
+        "taker_fee_rate": 0.0005,
+        "total_fee_r": 3.734143
+      },
+      "fill_rate": 1.0,
+      "filled_count": 24,
+      "funding": {
+        "funding_complete_count": 22,
+        "mean_funding_pnl_r": -0.000203,
+        "median_funding_pnl_r": 0.0,
+        "settlements_total": 6,
+        "total_funding_pnl_r": -0.004474
+      },
+      "gross_R": {
+        "mean": 0.29257,
+        "median": -1.0,
+        "total": 7.021689
+      },
+      "holding_time": {
+        "mean_holding_time_ms": 5012500.0,
+        "mean_time_to_fill_ms": 760000.0,
+        "median_holding_time_ms": 2700000.0,
+        "median_time_to_fill_ms": 900000.0
+      },
+      "long_actionable_count": 13,
+      "long_short_wait_distribution": {
+        "LONG": {
+          "count": 13,
+          "share": 0.001953
+        },
+        "SHORT": {
+          "count": 13,
+          "share": 0.001953
+        },
+        "WAIT": {
+          "count": 6630,
+          "share": 0.996094
+        }
+      },
+      "mean_R": 0.074559,
+      "mean_gross_R": 0.29257,
+      "mean_net_R": 0.074559,
+      "median_R": -1.12507,
+      "median_gross_R": -1.0,
+      "median_net_R": -1.12507,
+      "net_R": {
+        "mean": 0.074559,
+        "mean_ex_funding": 0.074745,
+        "median": -1.12507,
+        "median_ex_funding": -1.1201,
+        "total": 1.789415
+      },
+      "no_fill_count": 0,
+      "partition_spec": {
+        "calibration_end_ms": 1789639199999,
+        "calibration_start_ms": 1788717599999,
+        "oos_end_ms": 1790387999999,
+        "oos_start_ms": 1789639199999,
+        "partition_id": "P2"
+      },
+      "policy_shift": {
+        "directional_policy_shift_count": 0,
+        "directional_policy_shift_rate": 0.0
+      },
+      "sample_count": 6656,
+      "short_actionable_count": 11,
+      "slippage": {
+        "mean_slippage_r": 0.062236,
+        "slippage_bps_per_side": 2.0,
+        "total_slippage_r": 1.493657
+      },
+      "stop_before_target": 0.708333,
+      "stop_before_target_count": 17,
+      "stop_rate_all_filled": 0.708333,
+      "target_stop_resolved_count": 24,
+      "timeout_count": 0,
+      "tp1_before_sl": 0.291667,
+      "tp1_before_sl_count": 7,
+      "tp2_before_sl": 0.125,
+      "tp2_before_sl_count": 3,
+      "trend_transition": {
+        "shadow_trend_transition_distribution": {
+          "EMERGING_TREND": 887,
+          "EXHAUSTING_TREND": 112,
+          "MATURE_TREND": 228,
+          "PULLBACK_IN_TREND": 749,
+          "RANGE_BOUND": 903,
+          "TRANSITION_TO_RANGE": 366,
+          "VOLATILITY_SHOCK": 3411
+        },
+        "technical_trend_transition_count": 2,
+        "technical_trend_transition_rate": 0.083333
+      }
+    },
+    {
+      "MAE": {
+        "max_r": 1.0,
+        "mean_r": 0.910741,
+        "median_r": 1.0
+      },
+      "MFE": {
+        "max_r": 3.73,
+        "mean_r": 0.849259,
+        "median_r": 0.55
+      },
+      "action_frequency": 0.004357,
+      "actionable_evaluation_count": 29,
+      "actionable_signal_count": 27,
+      "boundary_breach": {
+        "invalidation_breach_count": 30,
+        "stop_boundary_breach_count": 22,
+        "stop_boundary_breach_rate": 0.814815
+      },
+      "cohort_label": "P3",
+      "drawdown_adverse_excursion": {
+        "max_adverse_excursion_r": 1.0,
+        "max_cumulative_net_r_drawdown": 15.608721,
+        "mean_adverse_excursion_r": 0.910741,
+        "median_adverse_excursion_r": 1.0
+      },
+      "fees": {
+        "maker_fee_rate": 0.0002,
+        "mean_fee_r": 0.15973,
+        "taker_fee_rate": 0.0005,
+        "total_fee_r": 4.312714
+      },
+      "fill_rate": 1.0,
+      "filled_count": 27,
+      "funding": {
+        "funding_complete_count": 25,
+        "mean_funding_pnl_r": 0.001057,
+        "median_funding_pnl_r": 0.0,
+        "settlements_total": 6,
+        "total_funding_pnl_r": 0.026417
+      },
+      "gross_R": {
+        "mean": -0.355457,
+        "median": -1.0,
+        "total": -9.597338
+      },
+      "holding_time": {
+        "mean_holding_time_ms": 3280000.0,
+        "mean_time_to_fill_ms": 682222.22,
+        "median_holding_time_ms": 1800000.0,
+        "median_time_to_fill_ms": 900000.0
+      },
+      "long_actionable_count": 5,
+      "long_short_wait_distribution": {
+        "LONG": {
+          "count": 5,
+          "share": 0.000751
+        },
+        "SHORT": {
+          "count": 24,
+          "share": 0.003606
+        },
+        "WAIT": {
+          "count": 6627,
+          "share": 0.995643
+        }
+      },
+      "mean_R": -0.578101,
+      "mean_gross_R": -0.355457,
+      "mean_net_R": -0.578101,
+      "median_R": -1.1691,
+      "median_gross_R": -1.0,
+      "median_net_R": -1.1691,
+      "net_R": {
+        "mean": -0.578101,
+        "mean_ex_funding": -0.579079,
+        "median": -1.1691,
+        "median_ex_funding": -1.1691,
+        "total": -15.608721
+      },
+      "no_fill_count": 0,
+      "partition_spec": {
+        "calibration_end_ms": 1790387999999,
+        "calibration_start_ms": 1788717599999,
+        "oos_end_ms": 1791136799999,
+        "oos_start_ms": 1790387999999,
+        "partition_id": "P3"
+      },
+      "policy_shift": {
+        "directional_policy_shift_count": 1,
+        "directional_policy_shift_rate": 0.037037
+      },
+      "sample_count": 6656,
+      "short_actionable_count": 22,
+      "slippage": {
+        "mean_slippage_r": 0.063892,
+        "slippage_bps_per_side": 2.0,
+        "total_slippage_r": 1.725086
+      },
+      "stop_before_target": 0.814815,
+      "stop_before_target_count": 22,
+      "stop_rate_all_filled": 0.814815,
+      "target_stop_resolved_count": 27,
+      "timeout_count": 0,
+      "tp1_before_sl": 0.185185,
+      "tp1_before_sl_count": 5,
+      "tp2_before_sl": 0.037037,
+      "tp2_before_sl_count": 1,
+      "trend_transition": {
+        "shadow_trend_transition_distribution": {
+          "EMERGING_TREND": 1718,
+          "EXHAUSTING_TREND": 113,
+          "MATURE_TREND": 320,
+          "PULLBACK_IN_TREND": 892,
+          "RANGE_BOUND": 1522,
+          "TRANSITION_TO_RANGE": 741,
+          "VOLATILITY_SHOCK": 1350
+        },
+        "technical_trend_transition_count": 4,
+        "technical_trend_transition_rate": 0.148148
+      }
+    }
+  ],
+  "selected_candidate_id": "C5_BOUNDED_COMBINATION_B",
+  "source_coverage_digest": {
+    "raw_dataset_sha256": "4cc4d24405009cf6d0ce0fe6d7847e0543ce3aae6d69cd6e5c630631f730980d",
+    "retrieved_at_ms": 1791310652529,
+    "source": "Binance USD-M public unauthenticated REST historical endpoints",
+    "source_window": {
+      "end_close_ms": 1791223199999,
+      "start_open_ms": 1788716700000
+    },
+    "symbol_coverage": {
+      "ADAUSDT": {
+        "basis_hist": {
+          "availability_start_ms": 1788890399999,
+          "count": 7776,
+          "first_timestamp_ms": 1788890400000,
+          "last_timestamp_ms": 1791222900000,
+          "period": "5m",
+          "pit_rule": "timestamp <= decision_time_ms",
+          "sha256": "2f4636ba2eeedd1372e8cba4cf19d820908f6ea8a58aec863ed3d75ab6de05a8",
+          "source_endpoint": "/futures/data/basis"
+        },
+        "funding_rates": {
+          "count": 87,
+          "pit_rule": "fundingTime <= decision_time_ms; mark price resolved from closed 15m bars",
+          "sha256": "56166bb078ca84bc28ce0a439d06b2754563d9dd24417bb47815f0b2e6e451b4",
+          "source_endpoint": "/fapi/v1/fundingRate"
+        },
+        "gls_hist": {
+          "availability_start_ms": 1788890399999,
+          "count": 648,
+          "first_timestamp_ms": 1788890400000,
+          "last_timestamp_ms": 1791219600000,
+          "period": "1h",
+          "pit_rule": "timestamp <= decision_time_ms",
+          "sha256": "5d0a5a520e0d73f7cc0a4c5c3028660660e719684ebe4504815e7b4075e81c7b",
+          "source_endpoint": "/futures/data/globalLongShortAccountRatio"
+        },
+        "klines_15m": {
+          "count": 2785,
+          "expected_count": 2785,
+          "first_open_ms": 1788716700000,
+          "gap_count": 0,
+          "last_open_ms": 1791222300000,
+          "sha256": "1207c8a3acd73d3b4b17f829d9bd97dd58548758284ae76af4911e2773054ec2",
+          "source_endpoint": "/fapi/v1/klines",
+          "synthetic": false
+        },
+        "klines_1h": {
+          "count": 696,
+          "expected_count": 696,
+          "first_open_ms": 1788717600000,
+          "gap_count": 0,
+          "last_open_ms": 1791219600000,
+          "sha256": "5dbf9fa5a895deea7953ce8ea8f0d1cfb39d1ca1b381e70b7c4f93a161c1f2ea",
+          "source_endpoint": "/fapi/v1/klines",
+          "synthetic": false
+        },
+        "klines_1m": {
+          "count": 41775,
+          "expected_count": 41775,
+          "first_open_ms": 1788716700000,
+          "gap_count": 0,
+          "last_open_ms": 1791223140000,
+          "sha256": "8f43f2d74d64cd27ac3633c7d0c34cad3cd35442ccd76470e24960950695f135",
+          "source_endpoint": "/fapi/v1/klines",
+          "synthetic": false
+        },
+        "klines_4h": {
+          "count": 173,
+          "expected_count": 173,
+          "first_open_ms": 1788724800000,
+          "gap_count": 0,
+          "last_open_ms": 1791201600000,
+          "sha256": "5d7215633ee3978cc2e8c2bec05d42af36bed6050107c2ffe9b9119f890d8b04",
+          "source_endpoint": "/fapi/v1/klines",
+          "synthetic": false
+        },
+        "oi_hist": {
+          "availability_start_ms": 1788890399999,
+          "count": 648,
+          "first_timestamp_ms": 1788890400000,
+          "last_timestamp_ms": 1791219600000,
+          "period": "1h",
+          "pit_rule": "timestamp <= decision_time_ms",
+          "sha256": "8520a79a0af2a9f0425910efa1964745d285dfe73a51a044db88c9cfd82aa029",
+          "source_endpoint": "/futures/data/openInterestHist"
+        },
+        "taker_hist": {
+          "availability_start_ms": 1788890399999,
+          "count": 2592,
+          "first_timestamp_ms": 1788889500000,
+          "last_timestamp_ms": 1791221400000,
+          "period": "15m",
+          "pit_rule": "timestamp <= decision_time_ms",
+          "sha256": "a7e95c2cb760dbb87643cd7f38524c6f50fcd0c1010b1c6ad032a584c6dd1aee",
+          "source_endpoint": "/futures/data/takerlongshortRatio"
+        },
+        "top_acc_hist": {
+          "availability_start_ms": 1788890399999,
+          "count": 648,
+          "first_timestamp_ms": 1788890400000,
+          "last_timestamp_ms": 1791219600000,
+          "period": "1h",
+          "pit_rule": "timestamp <= decision_time_ms",
+          "sha256": "fac5be80fc5d75ffa119b721b839161386d5781e6b1d7b0a4c47968f169540f2",
+          "source_endpoint": "/futures/data/topLongShortAccountRatio"
+        },
+        "top_pos_hist": {
+          "availability_start_ms": 1788890399999,
+          "count": 648,
+          "first_timestamp_ms": 1788890400000,
+          "last_timestamp_ms": 1791219600000,
+          "period": "1h",
+          "pit_rule": "timestamp <= decision_time_ms",
+          "sha256": "ddc9e656208a0a1b7b1c44ea37b85e404c1d46971463f29dc8d86d0de497beba",
+          "source_endpoint": "/futures/data/topLongShortPositionRatio"
+        }
+      },
+      "ATOMUSDT": {
+        "basis_hist": {
+          "availability_start_ms": 1788890399999,
+          "count": 7776,
+          "first_timestamp_ms": 1788890400000,
+          "last_timestamp_ms": 1791222900000,
+          "period": "5m",
+          "pit_rule": "timestamp <= decision_time_ms",
+          "sha256": "31d53af5aa54daf9c3348a9d9d18f62e65e828968f2831a33405967c3c5c219f",
+          "source_endpoint": "/futures/data/basis"
+        },
+        "funding_rates": {
+          "count": 87,
+          "pit_rule": "fundingTime <= decision_time_ms; mark price resolved from closed 15m bars",
+          "sha256": "1f3c23faa7415ddd9b8af561a639f954699dcbf1a92bad8abf1a0f42816517b8",
+          "source_endpoint": "/fapi/v1/fundingRate"
+        },
+        "gls_hist": {
+          "availability_start_ms": 1788890399999,
+          "count": 648,
+          "first_timestamp_ms": 1788890400000,
+          "last_timestamp_ms": 1791219600000,
+          "period": "1h",
+          "pit_rule": "timestamp <= decision_time_ms",
+          "sha256": "a020d7a32a02b3d05364ee1ca1149bad7262cf2526abd039378069eb0112cb19",
+          "source_endpoint": "/futures/data/globalLongShortAccountRatio"
+        },
+        "klines_15m": {
+          "count": 2785,
+          "expected_count": 2785,
+          "first_open_ms": 1788716700000,
+          "gap_count": 0,
+          "last_open_ms": 1791222300000,
+          "sha256": "4f680c6981de5d533dc4ca154546da5304495b73712eb3c238aa3b852454a963",
+          "source_endpoint": "/fapi/v1/klines",
+          "synthetic": false
+        },
+        "klines_1h": {
+          "count": 696,
+          "expected_count": 696,
+          "first_open_ms": 1788717600000,
+          "gap_count": 0,
+          "last_open_ms": 1791219600000,
+          "sha256": "8e0fa209e22e36fa9421d1da7087e11ec900c5e90959bf6f8214653bc0283287",
+          "source_endpoint": "/fapi/v1/klines",
+          "synthetic": false
+        },
+        "klines_1m": {
+          "count": 41775,
+          "expected_count": 41775,
+          "first_open_ms": 1788716700000,
+          "gap_count": 0,
+          "last_open_ms": 1791223140000,
+          "sha256": "1cd10017985bd8d24c33558793facdd504bb339dc98265e01026ff20bc3f8aba",
+          "source_endpoint": "/fapi/v1/klines",
+          "synthetic": false
+        },
+        "klines_4h": {
+          "count": 173,
+          "expected_count": 173,
+          "first_open_ms": 1788724800000,
+          "gap_count": 0,
+          "last_open_ms": 1791201600000,
+          "sha256": "2e6be6d80308a3fd006f5ef3b0056c63f7eb59035371d73f67bc0d02b6aabc9d",
+          "source_endpoint": "/fapi/v1/klines",
+          "synthetic": false
+        },
+        "oi_hist": {
+          "availability_start_ms": 1788890399999,
+          "count": 648,
+          "first_timestamp_ms": 1788890400000,
+          "last_timestamp_ms": 1791219600000,
+          "period": "1h",
+          "pit_rule": "timestamp <= decision_time_ms",
+          "sha256": "f2abb2d6d2feb07673be58fae81a554e5081482ee94c41dc83ed917acfb80f6d",
+          "source_endpoint": "/futures/data/openInterestHist"
+        },
+        "taker_hist": {
+          "availability_start_ms": 1788890399999,
+          "count": 2592,
+          "first_timestamp_ms": 1788889500000,
+          "last_timestamp_ms": 1791221400000,
+          "period": "15m",
+          "pit_rule": "timestamp <= decision_time_ms",
+          "sha256": "9d385e1206754dfb4a55f38f22c473eb71b3499d8332834569b230967bb23ad2",
+          "source_endpoint": "/futures/data/takerlongshortRatio"
+        },
+        "top_acc_hist": {
+          "availability_start_ms": 1788890399999,
+          "count": 648,
+          "first_timestamp_ms": 1788890400000,
+          "last_timestamp_ms": 1791219600000,
+          "period": "1h",
+          "pit_rule": "timestamp <= decision_time_ms",
+          "sha256": "3989e432d1030b179519fd9453873b3cde678c7750fca5e071e49dcf751dc034",
+          "source_endpoint": "/futures/data/topLongShortAccountRatio"
+        },
+        "top_pos_hist": {
+          "availability_start_ms": 1788890399999,
+          "count": 648,
+          "first_timestamp_ms": 1788890400000,
+          "last_timestamp_ms": 1791219600000,
+          "period": "1h",
+          "pit_rule": "timestamp <= decision_time_ms",
+          "sha256": "c161db8c904a05417e924f7010d0ae619621ef6127b8760f1bd290cb0f9a31cd",
+          "source_endpoint": "/futures/data/topLongShortPositionRatio"
+        }
+      },
+      "AVAXUSDT": {
+        "basis_hist": {
+          "availability_start_ms": 1788890399999,
+          "count": 7776,
+          "first_timestamp_ms": 1788890400000,
+          "last_timestamp_ms": 1791222900000,
+          "period": "5m",
+          "pit_rule": "timestamp <= decision_time_ms",
+          "sha256": "be654981e9acdc29f1dacc6f7602cf81336560d902b639e69f535aa03c152a8a",
+          "source_endpoint": "/futures/data/basis"
+        },
+        "funding_rates": {
+          "count": 87,
+          "pit_rule": "fundingTime <= decision_time_ms; mark price resolved from closed 15m bars",
+          "sha256": "f42e4afd6b8a00ffcc417a779a51e82477480c862a51e404f636ce587bb403cb",
+          "source_endpoint": "/fapi/v1/fundingRate"
+        },
+        "gls_hist": {
+          "availability_start_ms": 1788890399999,
+          "count": 648,
+          "first_timestamp_ms": 1788890400000,
+          "last_timestamp_ms": 1791219600000,
+          "period": "1h",
+          "pit_rule": "timestamp <= decision_time_ms",
+          "sha256": "bd913fb473db992031838c20e32edb44c57a8a29788f0caedd9fe7e42c560a46",
+          "source_endpoint": "/futures/data/globalLongShortAccountRatio"
+        },
+        "klines_15m": {
+          "count": 2785,
+          "expected_count": 2785,
+          "first_open_ms": 1788716700000,
+          "gap_count": 0,
+          "last_open_ms": 1791222300000,
+          "sha256": "91d9ea27ef121ef6f803d33de9a45b583cfd3349c4e62b1df6a05f713e60124d",
+          "source_endpoint": "/fapi/v1/klines",
+          "synthetic": false
+        },
+        "klines_1h": {
+          "count": 696,
+          "expected_count": 696,
+          "first_open_ms": 1788717600000,
+          "gap_count": 0,
+          "last_open_ms": 1791219600000,
+          "sha256": "aee07ad00098c45222b26bd18429dbc6d68974f09d6749d981c79da293945019",
+          "source_endpoint": "/fapi/v1/klines",
+          "synthetic": false
+        },
+        "klines_1m": {
+          "count": 41775,
+          "expected_count": 41775,
+          "first_open_ms": 1788716700000,
+          "gap_count": 0,
+          "last_open_ms": 1791223140000,
+          "sha256": "cbac838f414c11bd6c625492588bf4c514870aeb84ad09364a67730e9c2e566c",
+          "source_endpoint": "/fapi/v1/klines",
+          "synthetic": false
+        },
+        "klines_4h": {
+          "count": 173,
+          "expected_count": 173,
+          "first_open_ms": 1788724800000,
+          "gap_count": 0,
+          "last_open_ms": 1791201600000,
+          "sha256": "f568fc4dc6b6634e755abaed9b7237bf58483e197cc85b5c312e4a2d18dd77d0",
+          "source_endpoint": "/fapi/v1/klines",
+          "synthetic": false
+        },
+        "oi_hist": {
+          "availability_start_ms": 1788890399999,
+          "count": 648,
+          "first_timestamp_ms": 1788890400000,
+          "last_timestamp_ms": 1791219600000,
+          "period": "1h",
+          "pit_rule": "timestamp <= decision_time_ms",
+          "sha256": "a727823f5b560f77fc2d19ab54c52bbcbef938512cf9258da7f62bf4dec08b2f",
+          "source_endpoint": "/futures/data/openInterestHist"
+        },
+        "taker_hist": {
+          "availability_start_ms": 1788890399999,
+          "count": 2592,
+          "first_timestamp_ms": 1788889500000,
+          "last_timestamp_ms": 1791221400000,
+          "period": "15m",
+          "pit_rule": "timestamp <= decision_time_ms",
+          "sha256": "afe66e86d8b119541327631e2312d575da0e183aa07f5b82db9d7c76cc686649",
+          "source_endpoint": "/futures/data/takerlongshortRatio"
+        },
+        "top_acc_hist": {
+          "availability_start_ms": 1788890399999,
+          "count": 648,
+          "first_timestamp_ms": 1788890400000,
+          "last_timestamp_ms": 1791219600000,
+          "period": "1h",
+          "pit_rule": "timestamp <= decision_time_ms",
+          "sha256": "24594fe24345e58f36ccb3039ca069d05b7d060018f364ba5905cac403798895",
+          "source_endpoint": "/futures/data/topLongShortAccountRatio"
+        },
+        "top_pos_hist": {
+          "availability_start_ms": 1788890399999,
+          "count": 648,
+          "first_timestamp_ms": 1788890400000,
+          "last_timestamp_ms": 1791219600000,
+          "period": "1h",
+          "pit_rule": "timestamp <= decision_time_ms",
+          "sha256": "ae392ab4d22b0d08042deb722d82c5a84f175b5ab8a35e5c0778d15a5358407f",
+          "source_endpoint": "/futures/data/topLongShortPositionRatio"
+        }
+      },
+      "BCHUSDT": {
+        "basis_hist": {
+          "availability_start_ms": 1788890399999,
+          "count": 7776,
+          "first_timestamp_ms": 1788890400000,
+          "last_timestamp_ms": 1791222900000,
+          "period": "5m",
+          "pit_rule": "timestamp <= decision_time_ms",
+          "sha256": "2628b946a3b8158c323814e5d3671b8f0cb4f7df204f35465c10d6d0fd5ba16c",
+          "source_endpoint": "/futures/data/basis"
+        },
+        "funding_rates": {
+          "count": 87,
+          "pit_rule": "fundingTime <= decision_time_ms; mark price resolved from closed 15m bars",
+          "sha256": "d0a35fd3447f3201c1391d5b2e3dcc447cd4dc0d54d6e5bbcd1939875e4965c0",
+          "source_endpoint": "/fapi/v1/fundingRate"
+        },
+        "gls_hist": {
+          "availability_start_ms": 1788890399999,
+          "count": 648,
+          "first_timestamp_ms": 1788890400000,
+          "last_timestamp_ms": 1791219600000,
+          "period": "1h",
+          "pit_rule": "timestamp <= decision_time_ms",
+          "sha256": "fdfcefe0f82919578142f4cb2b29ed3b83606b411892947cabe6d6f2251954e1",
+          "source_endpoint": "/futures/data/globalLongShortAccountRatio"
+        },
+        "klines_15m": {
+          "count": 2785,
+          "expected_count": 2785,
+          "first_open_ms": 1788716700000,
+          "gap_count": 0,
+          "last_open_ms": 1791222300000,
+          "sha256": "e6261de79cc9591a63c76485adb2408c6692751cc47effa396da06dfad70801d",
+          "source_endpoint": "/fapi/v1/klines",
+          "synthetic": false
+        },
+        "klines_1h": {
+          "count": 696,
+          "expected_count": 696,
+          "first_open_ms": 1788717600000,
+          "gap_count": 0,
+          "last_open_ms": 1791219600000,
+          "sha256": "b52e951ae719ecc89536202cef90f6a6d557d4f2dba1d26cdccec125e23f922c",
+          "source_endpoint": "/fapi/v1/klines",
+          "synthetic": false
+        },
+        "klines_1m": {
+          "count": 41775,
+          "expected_count": 41775,
+          "first_open_ms": 1788716700000,
+          "gap_count": 0,
+          "last_open_ms": 1791223140000,
+          "sha256": "7d4ee14f9cf76c83420857f76cb5c4569c2d163e5d1e8d55e2b870e3e3946193",
+          "source_endpoint": "/fapi/v1/klines",
+          "synthetic": false
+        },
+        "klines_4h": {
+          "count": 173,
+          "expected_count": 173,
+          "first_open_ms": 1788724800000,
+          "gap_count": 0,
+          "last_open_ms": 1791201600000,
+          "sha256": "54a6e7ca31db8b5d6a4aa217a305581d2ef93bc9653a09d17a2065c4a122ad5c",
+          "source_endpoint": "/fapi/v1/klines",
+          "synthetic": false
+        },
+        "oi_hist": {
+          "availability_start_ms": 1788890399999,
+          "count": 648,
+          "first_timestamp_ms": 1788890400000,
+          "last_timestamp_ms": 1791219600000,
+          "period": "1h",
+          "pit_rule": "timestamp <= decision_time_ms",
+          "sha256": "0b67b3faa1a89587464bb579f0ed2720e03f0a78ed015ee3d22a6da29f34940f",
+          "source_endpoint": "/futures/data/openInterestHist"
+        },
+        "taker_hist": {
+          "availability_start_ms": 1788890399999,
+          "count": 2592,
+          "first_timestamp_ms": 1788889500000,
+          "last_timestamp_ms": 1791221400000,
+          "period": "15m",
+          "pit_rule": "timestamp <= decision_time_ms",
+          "sha256": "d883c02e5d19da0ab21e857be729412bc9dc2448e525e267507cb0551b1468ff",
+          "source_endpoint": "/futures/data/takerlongshortRatio"
+        },
+        "top_acc_hist": {
+          "availability_start_ms": 1788890399999,
+          "count": 648,
+          "first_timestamp_ms": 1788890400000,
+          "last_timestamp_ms": 1791219600000,
+          "period": "1h",
+          "pit_rule": "timestamp <= decision_time_ms",
+          "sha256": "d9f3e640570a140b99c37971d512a0ea426a0f461c35cdf8c2a1627ab8dfbc89",
+          "source_endpoint": "/futures/data/topLongShortAccountRatio"
+        },
+        "top_pos_hist": {
+          "availability_start_ms": 1788890399999,
+          "count": 648,
+          "first_timestamp_ms": 1788890400000,
+          "last_timestamp_ms": 1791219600000,
+          "period": "1h",
+          "pit_rule": "timestamp <= decision_time_ms",
+          "sha256": "c64941fa0437c546279fe7f443c1dd4530b2394f5f52b4e9357ed81b389f56df",
+          "source_endpoint": "/futures/data/topLongShortPositionRatio"
+        }
+      },
+      "DOTUSDT": {
+        "basis_hist": {
+          "availability_start_ms": 1788890399999,
+          "count": 7776,
+          "first_timestamp_ms": 1788890400000,
+          "last_timestamp_ms": 1791222900000,
+          "period": "5m",
+          "pit_rule": "timestamp <= decision_time_ms",
+          "sha256": "d0d2dc472c69e8087a5eb580309c62454051b9e006b825e2cbd855277ca37bda",
+          "source_endpoint": "/futures/data/basis"
+        },
+        "funding_rates": {
+          "count": 87,
+          "pit_rule": "fundingTime <= decision_time_ms; mark price resolved from closed 15m bars",
+          "sha256": "cb6656610991676288198e4d9b80860f2b3ffe9b22e0c8c0c84a4d8bfd452552",
+          "source_endpoint": "/fapi/v1/fundingRate"
+        },
+        "gls_hist": {
+          "availability_start_ms": 1788890399999,
+          "count": 648,
+          "first_timestamp_ms": 1788890400000,
+          "last_timestamp_ms": 1791219600000,
+          "period": "1h",
+          "pit_rule": "timestamp <= decision_time_ms",
+          "sha256": "2761f4795722567d36d48de86b28c862296902b187a63a8427100c6ab2a569d1",
+          "source_endpoint": "/futures/data/globalLongShortAccountRatio"
+        },
+        "klines_15m": {
+          "count": 2785,
+          "expected_count": 2785,
+          "first_open_ms": 1788716700000,
+          "gap_count": 0,
+          "last_open_ms": 1791222300000,
+          "sha256": "176d9db9af0a44678dcc9f8ec73f14e43664e91e78fe5fcc6c0997f8c15062bd",
+          "source_endpoint": "/fapi/v1/klines",
+          "synthetic": false
+        },
+        "klines_1h": {
+          "count": 696,
+          "expected_count": 696,
+          "first_open_ms": 1788717600000,
+          "gap_count": 0,
+          "last_open_ms": 1791219600000,
+          "sha256": "e8cbc229df2b61e75d995e603e60b0a0cc407baaf27dc6853377d24cb76e491b",
+          "source_endpoint": "/fapi/v1/klines",
+          "synthetic": false
+        },
+        "klines_1m": {
+          "count": 41775,
+          "expected_count": 41775,
+          "first_open_ms": 1788716700000,
+          "gap_count": 0,
+          "last_open_ms": 1791223140000,
+          "sha256": "4bcf1959a8dded6c4995cba4f4f0e7f52fd9e89d19f369593f95c63fddcb6b4b",
+          "source_endpoint": "/fapi/v1/klines",
+          "synthetic": false
+        },
+        "klines_4h": {
+          "count": 173,
+          "expected_count": 173,
+          "first_open_ms": 1788724800000,
+          "gap_count": 0,
+          "last_open_ms": 1791201600000,
+          "sha256": "50bef6dd4a539d4721df10203ff2b8382de9f023fc1d68ae6cb8c39d2d743edb",
+          "source_endpoint": "/fapi/v1/klines",
+          "synthetic": false
+        },
+        "oi_hist": {
+          "availability_start_ms": 1788890399999,
+          "count": 648,
+          "first_timestamp_ms": 1788890400000,
+          "last_timestamp_ms": 1791219600000,
+          "period": "1h",
+          "pit_rule": "timestamp <= decision_time_ms",
+          "sha256": "3ae124602b4a59b43c3172485c7aa906cff9aea32fc8ca57035229ca9f70a5f4",
+          "source_endpoint": "/futures/data/openInterestHist"
+        },
+        "taker_hist": {
+          "availability_start_ms": 1788890399999,
+          "count": 2592,
+          "first_timestamp_ms": 1788889500000,
+          "last_timestamp_ms": 1791221400000,
+          "period": "15m",
+          "pit_rule": "timestamp <= decision_time_ms",
+          "sha256": "835ae506b2a6aee19b1f0811af35afeae71d92bf026bbacfd1d67bcb82294f36",
+          "source_endpoint": "/futures/data/takerlongshortRatio"
+        },
+        "top_acc_hist": {
+          "availability_start_ms": 1788890399999,
+          "count": 648,
+          "first_timestamp_ms": 1788890400000,
+          "last_timestamp_ms": 1791219600000,
+          "period": "1h",
+          "pit_rule": "timestamp <= decision_time_ms",
+          "sha256": "23c64674d52d9b5564b31a4b6b79687a0f2f9bb678109adcd19917e699c9f9bb",
+          "source_endpoint": "/futures/data/topLongShortAccountRatio"
+        },
+        "top_pos_hist": {
+          "availability_start_ms": 1788890399999,
+          "count": 648,
+          "first_timestamp_ms": 1788890400000,
+          "last_timestamp_ms": 1791219600000,
+          "period": "1h",
+          "pit_rule": "timestamp <= decision_time_ms",
+          "sha256": "33e04d6876219518e717f0165725e04356b53dab79755cc0e499b640778bd0d2",
+          "source_endpoint": "/futures/data/topLongShortPositionRatio"
+        }
+      },
+      "LTCUSDT": {
+        "basis_hist": {
+          "availability_start_ms": 1788890399999,
+          "count": 7776,
+          "first_timestamp_ms": 1788890400000,
+          "last_timestamp_ms": 1791222900000,
+          "period": "5m",
+          "pit_rule": "timestamp <= decision_time_ms",
+          "sha256": "0afa742891b85a94729a7b555ec95f650d4f780dba285280c773aa2a885f9317",
+          "source_endpoint": "/futures/data/basis"
+        },
+        "funding_rates": {
+          "count": 87,
+          "pit_rule": "fundingTime <= decision_time_ms; mark price resolved from closed 15m bars",
+          "sha256": "09ad1923c5d3b43af951d520b57888364b68eae37e18bebd181c1af7af92f9ed",
+          "source_endpoint": "/fapi/v1/fundingRate"
+        },
+        "gls_hist": {
+          "availability_start_ms": 1788890399999,
+          "count": 648,
+          "first_timestamp_ms": 1788890400000,
+          "last_timestamp_ms": 1791219600000,
+          "period": "1h",
+          "pit_rule": "timestamp <= decision_time_ms",
+          "sha256": "ad70705460155b82cedc132a388f287cdce8b14afaf1eb709b4f0d87c22a0280",
+          "source_endpoint": "/futures/data/globalLongShortAccountRatio"
+        },
+        "klines_15m": {
+          "count": 2785,
+          "expected_count": 2785,
+          "first_open_ms": 1788716700000,
+          "gap_count": 0,
+          "last_open_ms": 1791222300000,
+          "sha256": "1dc1fa289065a588cab7fd8e962e1183578775dd251fcffc8411802d8828625f",
+          "source_endpoint": "/fapi/v1/klines",
+          "synthetic": false
+        },
+        "klines_1h": {
+          "count": 696,
+          "expected_count": 696,
+          "first_open_ms": 1788717600000,
+          "gap_count": 0,
+          "last_open_ms": 1791219600000,
+          "sha256": "9f6f4a4b450aa8e5452560f439cb774e980a853c1fb7fae6144e22fcc9c5196d",
+          "source_endpoint": "/fapi/v1/klines",
+          "synthetic": false
+        },
+        "klines_1m": {
+          "count": 41775,
+          "expected_count": 41775,
+          "first_open_ms": 1788716700000,
+          "gap_count": 0,
+          "last_open_ms": 1791223140000,
+          "sha256": "2f32a74430ba19a16e7c06797bda4397f9d86debb568d9bc5964b39671a2eb2c",
+          "source_endpoint": "/fapi/v1/klines",
+          "synthetic": false
+        },
+        "klines_4h": {
+          "count": 173,
+          "expected_count": 173,
+          "first_open_ms": 1788724800000,
+          "gap_count": 0,
+          "last_open_ms": 1791201600000,
+          "sha256": "472ba0d775511107950f86bff75f95dd5aabe4488aa0c605d8a880fbcd914a18",
+          "source_endpoint": "/fapi/v1/klines",
+          "synthetic": false
+        },
+        "oi_hist": {
+          "availability_start_ms": 1788890399999,
+          "count": 648,
+          "first_timestamp_ms": 1788890400000,
+          "last_timestamp_ms": 1791219600000,
+          "period": "1h",
+          "pit_rule": "timestamp <= decision_time_ms",
+          "sha256": "c1f20d6e23d336bad4ed60c639d350f14a8fe20b7ba986f80cfd819eac4b2db4",
+          "source_endpoint": "/futures/data/openInterestHist"
+        },
+        "taker_hist": {
+          "availability_start_ms": 1788890399999,
+          "count": 2592,
+          "first_timestamp_ms": 1788889500000,
+          "last_timestamp_ms": 1791221400000,
+          "period": "15m",
+          "pit_rule": "timestamp <= decision_time_ms",
+          "sha256": "289f2148cb97cafcbfff996c1e69b1313a5fd9cb4978daa5d3816c76823577cc",
+          "source_endpoint": "/futures/data/takerlongshortRatio"
+        },
+        "top_acc_hist": {
+          "availability_start_ms": 1788890399999,
+          "count": 648,
+          "first_timestamp_ms": 1788890400000,
+          "last_timestamp_ms": 1791219600000,
+          "period": "1h",
+          "pit_rule": "timestamp <= decision_time_ms",
+          "sha256": "abb6acb2f27ba8cb33f66bc599522d33d4d375c4b2fb67cb2c4c1c10df87d7e5",
+          "source_endpoint": "/futures/data/topLongShortAccountRatio"
+        },
+        "top_pos_hist": {
+          "availability_start_ms": 1788890399999,
+          "count": 648,
+          "first_timestamp_ms": 1788890400000,
+          "last_timestamp_ms": 1791219600000,
+          "period": "1h",
+          "pit_rule": "timestamp <= decision_time_ms",
+          "sha256": "31cbe15302ef38e84ff266936cb875d2e326c0fe323e6f7dda45d04400f1edc6",
+          "source_endpoint": "/futures/data/topLongShortPositionRatio"
+        }
+      },
+      "NEARUSDT": {
+        "basis_hist": {
+          "availability_start_ms": 1788890399999,
+          "count": 7776,
+          "first_timestamp_ms": 1788890400000,
+          "last_timestamp_ms": 1791222900000,
+          "period": "5m",
+          "pit_rule": "timestamp <= decision_time_ms",
+          "sha256": "6682ecb01e17b4c1d2c131b852ffb53f371158e22bc0f2f6623adceeca7b0770",
+          "source_endpoint": "/futures/data/basis"
+        },
+        "funding_rates": {
+          "count": 87,
+          "pit_rule": "fundingTime <= decision_time_ms; mark price resolved from closed 15m bars",
+          "sha256": "060fe010620901566bb938188ef82ec0d82dcf451d38177c622df69d9894233b",
+          "source_endpoint": "/fapi/v1/fundingRate"
+        },
+        "gls_hist": {
+          "availability_start_ms": 1788890399999,
+          "count": 648,
+          "first_timestamp_ms": 1788890400000,
+          "last_timestamp_ms": 1791219600000,
+          "period": "1h",
+          "pit_rule": "timestamp <= decision_time_ms",
+          "sha256": "6f3d91daf311208cbc7f3c930fe2db300f30472b9d26181f346e98f41461a57a",
+          "source_endpoint": "/futures/data/globalLongShortAccountRatio"
+        },
+        "klines_15m": {
+          "count": 2785,
+          "expected_count": 2785,
+          "first_open_ms": 1788716700000,
+          "gap_count": 0,
+          "last_open_ms": 1791222300000,
+          "sha256": "8472a90fa34d359e96e8878cd138a0b85b16843e305eefa7ef4f012f766163dd",
+          "source_endpoint": "/fapi/v1/klines",
+          "synthetic": false
+        },
+        "klines_1h": {
+          "count": 696,
+          "expected_count": 696,
+          "first_open_ms": 1788717600000,
+          "gap_count": 0,
+          "last_open_ms": 1791219600000,
+          "sha256": "160175cf8b0f06c8f321dcdb7f385d438a6df436fdfbc35950db4f2d19f25d3c",
+          "source_endpoint": "/fapi/v1/klines",
+          "synthetic": false
+        },
+        "klines_1m": {
+          "count": 41775,
+          "expected_count": 41775,
+          "first_open_ms": 1788716700000,
+          "gap_count": 0,
+          "last_open_ms": 1791223140000,
+          "sha256": "bd2f930a2a9e40c50e6699548a924a3dd640206b15d7ebc9372a19c5ccf0592c",
+          "source_endpoint": "/fapi/v1/klines",
+          "synthetic": false
+        },
+        "klines_4h": {
+          "count": 173,
+          "expected_count": 173,
+          "first_open_ms": 1788724800000,
+          "gap_count": 0,
+          "last_open_ms": 1791201600000,
+          "sha256": "3ebcf54201399260763ce1079546176bc69b191b5f36461c5ab5a2031323ef0d",
+          "source_endpoint": "/fapi/v1/klines",
+          "synthetic": false
+        },
+        "oi_hist": {
+          "availability_start_ms": 1788890399999,
+          "count": 648,
+          "first_timestamp_ms": 1788890400000,
+          "last_timestamp_ms": 1791219600000,
+          "period": "1h",
+          "pit_rule": "timestamp <= decision_time_ms",
+          "sha256": "e17a87da2b3092e2fe0377fdc70ea5eaf406d10a8c01d3cf42a5c9893bbd7abc",
+          "source_endpoint": "/futures/data/openInterestHist"
+        },
+        "taker_hist": {
+          "availability_start_ms": 1788890399999,
+          "count": 2592,
+          "first_timestamp_ms": 1788889500000,
+          "last_timestamp_ms": 1791221400000,
+          "period": "15m",
+          "pit_rule": "timestamp <= decision_time_ms",
+          "sha256": "332e90f5a6d175248d2bca17006f5eb0b6f2a36674622ea91ce8bcd0c3f9e24e",
+          "source_endpoint": "/futures/data/takerlongshortRatio"
+        },
+        "top_acc_hist": {
+          "availability_start_ms": 1788890399999,
+          "count": 648,
+          "first_timestamp_ms": 1788890400000,
+          "last_timestamp_ms": 1791219600000,
+          "period": "1h",
+          "pit_rule": "timestamp <= decision_time_ms",
+          "sha256": "ab69ca00f2693df6c78356f870249ca2ba88c5281cf05592f323b5b902ff4961",
+          "source_endpoint": "/futures/data/topLongShortAccountRatio"
+        },
+        "top_pos_hist": {
+          "availability_start_ms": 1788890399999,
+          "count": 648,
+          "first_timestamp_ms": 1788890400000,
+          "last_timestamp_ms": 1791219600000,
+          "period": "1h",
+          "pit_rule": "timestamp <= decision_time_ms",
+          "sha256": "214fe434b10206ed8ef13db3731a263a0bded9986324d96757c2ccbfea86889a",
+          "source_endpoint": "/futures/data/topLongShortPositionRatio"
+        }
+      },
+      "TRXUSDT": {
+        "basis_hist": {
+          "availability_start_ms": 1788890399999,
+          "count": 7776,
+          "first_timestamp_ms": 1788890400000,
+          "last_timestamp_ms": 1791222900000,
+          "period": "5m",
+          "pit_rule": "timestamp <= decision_time_ms",
+          "sha256": "89e91dcda58d6c6bf5a5a59c53462c816f3dbf11d04c67319fd6796d0121fec0",
+          "source_endpoint": "/futures/data/basis"
+        },
+        "funding_rates": {
+          "count": 87,
+          "pit_rule": "fundingTime <= decision_time_ms; mark price resolved from closed 15m bars",
+          "sha256": "9ab6048dc600dbcd91cd461890e830436452ca556cc73a90a21ee11718bdf166",
+          "source_endpoint": "/fapi/v1/fundingRate"
+        },
+        "gls_hist": {
+          "availability_start_ms": 1788890399999,
+          "count": 648,
+          "first_timestamp_ms": 1788890400000,
+          "last_timestamp_ms": 1791219600000,
+          "period": "1h",
+          "pit_rule": "timestamp <= decision_time_ms",
+          "sha256": "99ea4f78a285c99985a7bf3f96b2947c9a8c6d84a90524942f4377215c5a698a",
+          "source_endpoint": "/futures/data/globalLongShortAccountRatio"
+        },
+        "klines_15m": {
+          "count": 2785,
+          "expected_count": 2785,
+          "first_open_ms": 1788716700000,
+          "gap_count": 0,
+          "last_open_ms": 1791222300000,
+          "sha256": "d133327235f4892a3db7607091d1a9db1557fa9bbd5668820709d56ebf7f0f18",
+          "source_endpoint": "/fapi/v1/klines",
+          "synthetic": false
+        },
+        "klines_1h": {
+          "count": 696,
+          "expected_count": 696,
+          "first_open_ms": 1788717600000,
+          "gap_count": 0,
+          "last_open_ms": 1791219600000,
+          "sha256": "adc75d8e2e6625bfdf9fe388527433b4056d8a001b35983526cd3ce8ea1fa434",
+          "source_endpoint": "/fapi/v1/klines",
+          "synthetic": false
+        },
+        "klines_1m": {
+          "count": 41775,
+          "expected_count": 41775,
+          "first_open_ms": 1788716700000,
+          "gap_count": 0,
+          "last_open_ms": 1791223140000,
+          "sha256": "4f79246d7a87239d6258294894c0284b688af5d1cdef95a22f3ab9d2280471d3",
+          "source_endpoint": "/fapi/v1/klines",
+          "synthetic": false
+        },
+        "klines_4h": {
+          "count": 173,
+          "expected_count": 173,
+          "first_open_ms": 1788724800000,
+          "gap_count": 0,
+          "last_open_ms": 1791201600000,
+          "sha256": "9bf375cfd687019132dce73386aa378030cfabf4e99a745ccd8a177c233e21e7",
+          "source_endpoint": "/fapi/v1/klines",
+          "synthetic": false
+        },
+        "oi_hist": {
+          "availability_start_ms": 1788890399999,
+          "count": 648,
+          "first_timestamp_ms": 1788890400000,
+          "last_timestamp_ms": 1791219600000,
+          "period": "1h",
+          "pit_rule": "timestamp <= decision_time_ms",
+          "sha256": "477f98a9231e596c47dc890dafe6b34206239975f56d7bb4b09573ef6299df53",
+          "source_endpoint": "/futures/data/openInterestHist"
+        },
+        "taker_hist": {
+          "availability_start_ms": 1788890399999,
+          "count": 2592,
+          "first_timestamp_ms": 1788889500000,
+          "last_timestamp_ms": 1791221400000,
+          "period": "15m",
+          "pit_rule": "timestamp <= decision_time_ms",
+          "sha256": "357ee54d5392dd47ef0b2f4c0d69bcd7083ee0bc01d6522a39f4fe474ced9380",
+          "source_endpoint": "/futures/data/takerlongshortRatio"
+        },
+        "top_acc_hist": {
+          "availability_start_ms": 1788890399999,
+          "count": 648,
+          "first_timestamp_ms": 1788890400000,
+          "last_timestamp_ms": 1791219600000,
+          "period": "1h",
+          "pit_rule": "timestamp <= decision_time_ms",
+          "sha256": "20992b699242a79d8ece15967a091c87e6cb313a98fb16d5401c940df83f5ca0",
+          "source_endpoint": "/futures/data/topLongShortAccountRatio"
+        },
+        "top_pos_hist": {
+          "availability_start_ms": 1788890399999,
+          "count": 648,
+          "first_timestamp_ms": 1788890400000,
+          "last_timestamp_ms": 1791219600000,
+          "period": "1h",
+          "pit_rule": "timestamp <= decision_time_ms",
+          "sha256": "a7ac09da94fae75f96a0ccada2227b43bce27f9fd4266fe97c3d0d659bb3e3c6",
+          "source_endpoint": "/futures/data/topLongShortPositionRatio"
+        }
+      }
+    }
+  },
+  "task_id": "B_LINE_RC2_TACTICAL_SUCCESSOR_R1_INDEPENDENT_HOLDOUT",
+  "terminal_result": "RC2_TACTICAL_HOLDOUT_FAIL",
+  "validation_branch": "validation/b-line-rc2-successor-r1-holdout"
+}

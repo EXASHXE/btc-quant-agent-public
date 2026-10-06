@@ -1,0 +1,18 @@
+{
+  "actionable_oos_count": 72,
+  "aggregate_oos_mean_net_R": -0.434695,
+  "aggregate_oos_median_net_R": -1.21205,
+  "config_hash": "bba61849e64f37f9",
+  "evidence_ids_sha256": "f160928de0ce11ce00b4cf891fe8b87a7f14ce6935b8f92ffc678af0f6b1b7ef",
+  "grid_evaluation_ids_sha256": "4a89780b9aa3bf5380313e079e5833e7e6540b3b0948ba24f0352ec0a378ed60",
+  "input_manifest_hash": "b95d8afb8ce3deded46d6d864b201dc9b01038845271df5043f8d0bf8615e55c",
+  "manifest_version": "RC1_WP_B_REPLAY_OUTPUT_MANIFEST_V1",
+  "oos_evaluations_count": 72,
+  "oos_evidences_count": 17600,
+  "output_manifest_hash": "fe99d8bcb230dfd165105495ead398ad3904a86aef4a7ae89ac65fbdd3c94b92",
+  "policy_version": "TACTICAL_POLICY_R2_B1",
+  "shadow_evaluation_ids_sha256": "65bcb186a314dbae9ca96ce0b6ad3342d50ded204e5b4f3f0da110dd46e6655c",
+  "terminal_result": "RC2_TACTICAL_HOLDOUT_FAIL",
+  "total_evidences_count": 17608,
+  "trend_shadow_ids_sha256": "ae7a254e1a81ebae166bfd4e90ebb8c7f6644889d10b2a7be21d15bf40120a29"
+}

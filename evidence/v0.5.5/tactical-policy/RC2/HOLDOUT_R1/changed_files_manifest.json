@@ -1,0 +1,15 @@
+{
+  "changed_files": [
+    "evidence/v0.5.5/tactical-policy/RC2/HOLDOUT_R1/EVIDENCE.json",
+    "evidence/v0.5.5/tactical-policy/RC2/HOLDOUT_R1/INPUT_MANIFEST.json",
+    "evidence/v0.5.5/tactical-policy/RC2/HOLDOUT_R1/OUTPUT_MANIFEST.json",
+    "evidence/v0.5.5/tactical-policy/RC2/HOLDOUT_R1/aggregate_metrics.json",
+    "evidence/v0.5.5/tactical-policy/RC2/HOLDOUT_R1/changed_files_manifest.json",
+    "evidence/v0.5.5/tactical-policy/RC2/HOLDOUT_R1/deterministic_replay_proof.json",
+    "evidence/v0.5.5/tactical-policy/RC2/HOLDOUT_R1/policy_freeze_proof.json",
+    "evidence/v0.5.5/tactical-policy/RC2/HOLDOUT_R1/preflight_report.json",
+    "evidence/v0.5.5/tactical-policy/RC2/HOLDOUT_R1/rolling_oos_table.json",
+    "evidence/v0.5.5/tactical-policy/RC2/HOLDOUT_R1/source_coverage_digest.json",
+    "scripts/rc2/validation/run_holdout_r1.py"
+  ]
+}

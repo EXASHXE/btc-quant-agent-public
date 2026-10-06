@@ -1,0 +1,15 @@
+{
+  "pass": true,
+  "run_1_evidence_ids_sha256": "f160928de0ce11ce00b4cf891fe8b87a7f14ce6935b8f92ffc678af0f6b1b7ef",
+  "run_1_input_hash": "b95d8afb8ce3deded46d6d864b201dc9b01038845271df5043f8d0bf8615e55c",
+  "run_1_output_hash": "fe99d8bcb230dfd165105495ead398ad3904a86aef4a7ae89ac65fbdd3c94b92",
+  "run_1_shadow_ids_sha256": "65bcb186a314dbae9ca96ce0b6ad3342d50ded204e5b4f3f0da110dd46e6655c",
+  "run_2_evidence_ids_sha256": "f160928de0ce11ce00b4cf891fe8b87a7f14ce6935b8f92ffc678af0f6b1b7ef",
+  "run_2_input_hash": "b95d8afb8ce3deded46d6d864b201dc9b01038845271df5043f8d0bf8615e55c",
+  "run_2_output_hash": "fe99d8bcb230dfd165105495ead398ad3904a86aef4a7ae89ac65fbdd3c94b92",
+  "run_2_shadow_ids_sha256": "65bcb186a314dbae9ca96ce0b6ad3342d50ded204e5b4f3f0da110dd46e6655c",
+  "same_evidence_ids": true,
+  "same_input_manifest": true,
+  "same_output_manifest": true,
+  "same_shadow_ids": true
+}

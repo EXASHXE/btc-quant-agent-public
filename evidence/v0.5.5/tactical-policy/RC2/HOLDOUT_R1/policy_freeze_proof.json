@@ -1,0 +1,16 @@
+{
+  "candidate_manifest_rule_match": true,
+  "config_hash": "bba61849e64f37f9",
+  "controller_dispatch_sha": "02652d0671c4e9476f2cf6b607b2c2e1242f3fde",
+  "current_head_at_replay": "10be512f2cf4d7eccdc8a9849c925b5f73c568fd",
+  "exact_candidate_sha": "10be512f2cf4d7eccdc8a9849c925b5f73c568fd",
+  "pass": true,
+  "policy_version": "TACTICAL_POLICY_R2_B1",
+  "production_source_diff_empty": true,
+  "release_id": "B_LINE_INITIAL_USABLE_RELEASE_V1_RC2",
+  "selected_candidate_id": "C5_BOUNDED_COMBINATION_B",
+  "selected_manifest_config_hash": "bba61849e64f37f9",
+  "selected_manifest_policy_version": "TACTICAL_POLICY_R2_B1",
+  "selected_policy_manifest_sha256": "5013f30a1eee9feea84e66967a6c87677a16a395f5d8b52adb5860ec3278daf3",
+  "validation_branch": "validation/b-line-rc2-successor-r1-holdout"
+}

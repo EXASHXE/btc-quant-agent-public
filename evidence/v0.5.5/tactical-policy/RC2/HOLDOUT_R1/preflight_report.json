@@ -1,0 +1,12 @@
+{
+  "compileall": "PASS",
+  "focused_regressions": {
+    "command": "pytest -q tests/test_rc2_tactical_successor_r1.py tests/test_market_watch.py tests/test_tactical_policy_b0.py tests/test_rc1_tactical_quality_r1.py tests/test_tactical_grid_shadow_evaluation_v1.py tests/test_tactical_feature_evidence_v2.py tests/test_tactical_shadow_evaluation_v2.py",
+    "passed": 288,
+    "status": "PASS"
+  },
+  "git_diff_check": "PASS",
+  "mypy": "PASS",
+  "ruff": "PASS",
+  "status": "PASS"
+}
