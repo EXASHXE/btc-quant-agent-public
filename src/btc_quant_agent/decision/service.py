@@ -57,7 +57,8 @@ class TacticalLiveService:
         )
         secret = os.getenv("FEISHU_APP_SECRET", "")
         notifier = (
-            FeishuAppClient(config.feishu_app_id, secret, config.feishu_receive_id)
+            FeishuAppClient(config.feishu_app_id, secret, config.feishu_receive_id,
+                            receive_id_type=config.feishu_receive_id_type)
             if config.feishu_app_id and secret and config.feishu_receive_id else None
         )
         return cls(LiveStore(config.sqlite_path), primary, RiskCompilerV1(policy),

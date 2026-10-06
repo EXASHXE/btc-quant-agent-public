@@ -34,8 +34,16 @@ class DecisionFusion:
             reasons.append("STRATEGY_DATA_DISAGREEMENT")
         if primary.requires_secondary_review:
             reasons.append("SECONDARY_REVIEW_REQUESTED")
+        if primary.requires_manual_review:
+            reasons.append("PRIMARY_REVIEW_REQUESTED")
         if manual_codex_request:
             reasons.append("MANUAL_CODEX_REQUEST")
+        is_reversal = (case.direction == "LONG" and primary.action == "OPEN_SHORT") or (
+            case.direction == "SHORT" and primary.action == "OPEN_LONG"
+        )
+        is_close_sensitive = primary.action in ("CLOSE", "REDUCE", "TAKE_PARTIAL")
+        if is_reversal or is_close_sensitive:
+            reasons.append("REVERSE_OR_CLOSE_ACTION")
         if case.account is not None and (
             max(case.account.symbol_exposure_usdt, case.account.portfolio_exposure_usdt)
             / case.account.equity_usdt >= self.high_exposure_fraction
@@ -63,9 +71,11 @@ class DecisionFusion:
             or abs(primary.thesis_strength - secondary.thesis_strength) >= 0.3
         ):
             reasons.append("MODEL_DISAGREEMENT")
+            reasons.append("MANUAL_REVIEW_REQUIRED")
         manual = (primary.requires_manual_review or
                   (secondary.requires_manual_review if secondary else False) or
-                  "SECONDARY_UNAVAILABLE" in reasons or "MODEL_DISAGREEMENT" in reasons)
+                  "SECONDARY_UNAVAILABLE" in reasons or "MODEL_DISAGREEMENT" in reasons or
+                  "MANUAL_REVIEW_REQUIRED" in reasons)
         modifier = primary.risk_modifier
         if secondary is not None and secondary.risk_modifier == "BLOCK":
             modifier = "BLOCK"

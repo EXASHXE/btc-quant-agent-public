@@ -106,7 +106,9 @@ class ResponsesBackend:
                 max_output_tokens=self.max_output_tokens,
             ), timeout=self.timeout_seconds)
             if response.status != "completed" or _has_refusal(response.output):
-                raise ValueError("incomplete or refused response")
+                if getattr(response, "status", None) == "refused" or _has_refusal(response.output):
+                    raise ValueError("provider refused response")
+                raise ValueError("incomplete response")
             if response.output_parsed is None:
                 raise ValueError("missing parsed response")
             actual_model = getattr(response, "model", None) or self.model
@@ -115,8 +117,15 @@ class ResponsesBackend:
                                  request_id)
         except TimeoutError:
             reason = "BACKEND_TIMEOUT"
-        except Exception:  # noqa: BLE001 - provider errors must not reach the caller
-            reason = "BACKEND_RESPONSE_INVALID"
+        except Exception as err:  # noqa: BLE001 - provider errors must not reach the caller
+            if "case identity mismatch" in str(err) or "case mismatch" in str(err):
+                reason = "CASE_MISMATCH"
+            elif "refus" in str(err).lower():
+                reason = "BACKEND_REFUSAL"
+            elif "too large" in str(err).lower() or "oversize" in str(err).lower():
+                reason = "CASE_TOO_LARGE"
+            else:
+                reason = "BACKEND_RESPONSE_INVALID"
         finally:
             if owned_client and client is not None:
                 try:
@@ -157,8 +166,13 @@ class CodexExecBackend:
             return await asyncio.wait_for(self._run(case, prompt), self.timeout_seconds)
         except TimeoutError:
             reason = "BACKEND_TIMEOUT"
-        except Exception:  # noqa: BLE001 - subprocess errors must not reach the caller
-            reason = "BACKEND_RESPONSE_INVALID"
+        except Exception as err:  # noqa: BLE001 - subprocess errors must not reach the caller
+            if "case identity mismatch" in str(err) or "case mismatch" in str(err):
+                reason = "CASE_MISMATCH"
+            elif "too large" in str(err).lower() or "oversize" in str(err).lower():
+                reason = "CASE_TOO_LARGE"
+            else:
+                reason = "BACKEND_RESPONSE_INVALID"
         return AnalysisResultV1.fail_closed(case, "codex_exec", self.model, reason)
 
     async def _run(self, case: CasePackageV1, prompt: bytes) -> AnalysisResultV1:

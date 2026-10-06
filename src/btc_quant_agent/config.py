@@ -350,6 +350,8 @@ class LiveV1Config:
     case_ttl_ms: int = 120000
     feishu_app_id: str = ""
     feishu_receive_id: str = ""
+    feishu_receive_id_type: str = "chat_id"
+    feishu_verification_token: str = ""
     feishu_approver_open_ids: tuple[str, ...] = ()
 
     @property
@@ -375,6 +377,8 @@ class LiveV1Config:
             raise ValueError("live_v1.analysis_timeout_seconds must be positive")
         if self.codex_enabled and not self.codex_model:
             raise ValueError("live_v1.codex_model is required when Codex is enabled")
+        if self.feishu_receive_id_type not in {"chat_id", "open_id", "user_id", "email"}:
+            raise ValueError("live_v1.feishu_receive_id_type must be chat_id, open_id, user_id, or email")
 
     @classmethod
     def from_env(cls) -> LiveV1Config:
@@ -400,6 +404,8 @@ class LiveV1Config:
             case_ttl_ms=int(os.getenv("BTC_QUANT_LIVE_CASE_TTL_MS", "120000")),
             feishu_app_id=os.getenv("FEISHU_APP_ID", ""),
             feishu_receive_id=os.getenv("FEISHU_RECEIVE_ID", ""),
+            feishu_receive_id_type=os.getenv("FEISHU_RECEIVE_ID_TYPE", "chat_id"),
+            feishu_verification_token=os.getenv("FEISHU_VERIFICATION_TOKEN", ""),
             feishu_approver_open_ids=tuple(
                 item.strip() for item in os.getenv("FEISHU_APPROVER_OPEN_IDS", "").split(",")
                 if item.strip()

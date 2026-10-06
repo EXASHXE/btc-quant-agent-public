@@ -48,12 +48,16 @@ def build_interactive_card(proposal: TradeProposalV1) -> dict[str, Any]:
 
 class FeishuAppClient:
     def __init__(self, app_id: str, app_secret: str, receive_id: str,
-                 client: httpx.AsyncClient | None = None) -> None:
+                 client: httpx.AsyncClient | None = None,
+                 receive_id_type: str = "chat_id") -> None:
         if not app_id or not app_secret or not receive_id:
             raise ValueError("Feishu app configuration required")
+        if receive_id_type not in {"chat_id", "open_id", "user_id", "email"}:
+            raise ValueError("invalid receive_id_type")
         self.app_id = app_id
         self.app_secret = app_secret
         self.receive_id = receive_id
+        self.receive_id_type = receive_id_type
         self.client = client
 
     async def send_proposal(self, proposal: TradeProposalV1) -> str:
@@ -90,7 +94,7 @@ class FeishuAppClient:
                      "content": json.dumps(card, ensure_ascii=False),
                      "uuid": str(uuid.UUID(proposal.proposal_hash[:32]))},
                     headers={"Authorization": f"Bearer {token_body['tenant_access_token']}"},
-                    params={"receive_id_type": "chat_id"},
+                    params={"receive_id_type": self.receive_id_type},
                 )
                 data = body.get("data")
                 message_id = data.get("message_id") if isinstance(data, dict) else None
