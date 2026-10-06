@@ -28,6 +28,7 @@ from btc_quant_agent.market_watch.replay import (
     HistoricalReplayClient,
     OOSPartitionSpec,
     PITCausalityViolationError,
+    ReplayDataGranularityError,
     ReplayDataset,
     validate_oos_partitions,
 )
@@ -49,18 +50,21 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 def _make_synthetic_raw_cache(
     symbols: tuple[str, ...] = ("BTCUSDT", "ETHUSDT"),
     n_15m: int = 360,
-    base_ms: int = 1_750_000_000_000,
+    base_ms: int = 1_750_000_500_000,
+    include_1m_from_step_idx: int | None = None,
 ) -> dict[str, Any]:
     """Create a deterministic synthetic multi-timeframe dataset for fast unit tests."""
+    step_1m = 60_000
     step_15m = 900_000
     step_1h = 3_600_000
     step_4h = 14_400_000
-    anchor_end_ms = base_ms + n_15m * step_15m
+    anchor_end_ms = base_ms + n_15m * step_15m - 1
 
     data: dict[str, Any] = {}
     for sym_idx, sym in enumerate(symbols):
         base_price = 60_000.0 if sym == "BTCUSDT" else 3_000.0 + sym_idx * 100.0
         klines_15m: list[list[Any]] = []
+        klines_1m: list[list[Any]] = []
         for i in range(n_15m):
             open_ms = base_ms + i * step_15m
             close_ms = open_ms + step_15m - 1
@@ -71,9 +75,16 @@ def _make_synthetic_raw_cache(
             l_p = round(min(o_p, c_p) * 0.997, 4)
             vol = 100.0 + (i % 15) * 12.0
             klines_15m.append([open_ms, o_p, h_p, l_p, c_p, vol, close_ms, vol * c_p, 500, vol * 0.52])
+            if include_1m_from_step_idx is not None and i >= include_1m_from_step_idx:
+                for m in range(15):
+                    m_open = open_ms + m * step_1m
+                    m_close = m_open + step_1m - 1
+                    klines_1m.append(
+                        [m_open, o_p, h_p, l_p, c_p, vol / 15.0, m_close, (vol / 15.0) * c_p, 35, (vol / 15.0) * 0.52]
+                    )
 
         n_1h = max(260, n_15m // 4 + 200)
-        start_1h = anchor_end_ms - n_1h * step_1h
+        start_1h = (base_ms + n_15m * step_15m) - n_1h * step_1h
         klines_1h: list[list[Any]] = []
         for i in range(n_1h):
             open_ms = start_1h + i * step_1h
@@ -87,7 +98,7 @@ def _make_synthetic_raw_cache(
             klines_1h.append([open_ms, o_p, h_p, l_p, c_p, vol, close_ms, vol * c_p, 1800, vol * 0.51])
 
         n_4h = 260
-        start_4h = anchor_end_ms - n_4h * step_4h
+        start_4h = (base_ms + n_15m * step_15m) - n_4h * step_4h
         klines_4h: list[list[Any]] = []
         for i in range(n_4h):
             open_ms = start_4h + i * step_4h
@@ -140,6 +151,7 @@ def _make_synthetic_raw_cache(
             for i in range(n_1h)
         ]
         data[sym] = {
+            "klines_1m": klines_1m,
             "klines_15m": klines_15m,
             "klines_1h": klines_1h,
             "klines_4h": klines_4h,
@@ -161,7 +173,9 @@ def _make_synthetic_raw_cache(
 
 def test_deterministic_manifest_replay_twice() -> None:
     """Identical input manifest must produce bit-for-bit identical output manifest and hashes across two runs."""
-    raw = _make_synthetic_raw_cache(symbols=("BTCUSDT", "ETHUSDT"), n_15m=320)
+    raw = _make_synthetic_raw_cache(
+        symbols=("BTCUSDT", "ETHUSDT"), n_15m=320, include_1m_from_step_idx=260
+    )
     btc_closes = [int(r[6]) for r in raw["data"]["BTCUSDT"]["klines_15m"]]
     steps = btc_closes[260:272]
     s0 = btc_closes[256]
@@ -194,6 +208,83 @@ def test_deterministic_manifest_replay_twice() -> None:
     assert res1["output_manifest"]["evidence_ids_sha256"] == res2["output_manifest"]["evidence_ids_sha256"]
     assert res1["output_manifest"]["trend_shadow_ids_sha256"] == res2["output_manifest"]["trend_shadow_ids_sha256"]
     assert res1["pit_audit"]["pit_violations_count"] == 0
+    assert res1["pit_audit"]["synthetic_1m_queries_count"] == 0
+    assert res1["pit_audit"]["granularity_violations_count"] == 0
+
+
+def test_authoritative_replay_rejects_missing_or_incomplete_authentic_1m_coverage() -> None:
+    """Release-gating replay must fail closed on missing, truncated, or gapped authentic 1m coverage."""
+    raw_no_1m = _make_synthetic_raw_cache(
+        symbols=("BTCUSDT", "ETHUSDT"), n_15m=300, include_1m_from_step_idx=None
+    )
+    btc_closes = [int(r[6]) for r in raw_no_1m["data"]["BTCUSDT"]["klines_15m"]]
+    steps = btc_closes[260:268]
+    partitions = [
+        OOSPartitionSpec("OOS_P1", btc_closes[255], steps[0], steps[0], steps[2]),
+        OOSPartitionSpec("OOS_P2", btc_closes[255], steps[2], steps[2], steps[5]),
+        OOSPartitionSpec("OOS_P3", btc_closes[255], steps[5], steps[5], steps[-1] + 1),
+    ]
+    ds_no_1m = ReplayDataset.from_raw_cache(
+        raw_no_1m,
+        step_timestamps_ms=steps,
+        partitions=partitions,
+        data_end_ms=raw_no_1m["anchor_end_ms"],
+    )
+    cfg = MarketWatchConfig(
+        symbols=("BTCUSDT", "ETHUSDT"),
+        relative_strength_universe=("BTCUSDT", "ETHUSDT"),
+    )
+
+    # 1. Authoritative runner fails closed when klines_1m is empty
+    with pytest.raises(ReplayDataGranularityError, match="Missing authentic 1m klines"):
+        DeterministicTacticalReplayRunner(ds_no_1m, config=cfg).run()
+
+    # 2. Authoritative HistoricalReplayClient fails closed on 1m query without synthetic test flag
+    auth_client = HistoricalReplayClient(ds_no_1m, steps[-1], allow_synthetic_1m_for_tests=False)
+    with pytest.raises(ReplayDataGranularityError, match="MISSING_AUTHENTIC_1M"):
+        auth_client.historical_klines("BTCUSDT", "1m", steps[0], steps[2])
+    assert auth_client.granularity_violations_count == 1
+    assert auth_client.synthetic_1m_queries_count == 0
+
+    # 3. Explicitly labeled test-only synthetic path still works for non-authoritative unit fixtures
+    synth_client = HistoricalReplayClient(ds_no_1m, steps[-1], allow_synthetic_1m_for_tests=True)
+    synth_bars = synth_client.historical_klines("BTCUSDT", "1m", steps[0], steps[2])
+    assert len(synth_bars) > 0
+    assert synth_client.synthetic_1m_queries_count == 1
+
+    # 4. Authoritative runner fails closed when authentic 1m coverage has an internal 1-minute gap
+    raw_gapped_1m = _make_synthetic_raw_cache(
+        symbols=("BTCUSDT", "ETHUSDT"), n_15m=300, include_1m_from_step_idx=260
+    )
+    del raw_gapped_1m["data"]["BTCUSDT"]["klines_1m"][10]
+    ds_gapped_1m = ReplayDataset.from_raw_cache(
+        raw_gapped_1m,
+        step_timestamps_ms=steps,
+        partitions=partitions,
+        data_end_ms=raw_gapped_1m["anchor_end_ms"],
+    )
+    with pytest.raises(ReplayDataGranularityError, match="Incomplete authentic 1m coverage"):
+        DeterministicTacticalReplayRunner(ds_gapped_1m, config=cfg).run()
+
+    gapped_client = HistoricalReplayClient(
+        ds_gapped_1m, raw_gapped_1m["anchor_end_ms"], allow_synthetic_1m_for_tests=False
+    )
+    with pytest.raises(ReplayDataGranularityError, match="INCOMPLETE_AUTHENTIC_1M"):
+        gapped_client.historical_klines(
+            "BTCUSDT", "1m", steps[0] - 899_999, steps[2]
+        )
+
+    # 5. If fail_closed_on_missing_1m=False, gate evaluation emits DIAGNOSTIC_ONLY_DATA_GRANULARITY_INSUFFICIENT
+    diag_res = DeterministicTacticalReplayRunner(
+        ds_no_1m,
+        config=cfg,
+        allow_synthetic_1m_for_tests=False,
+        fail_closed_on_missing_1m=False,
+    ).run()
+    assert (
+        diag_res["gate_evaluation"]["decision"]
+        == TacticalDecisionQualityDecision.DIAGNOSTIC_ONLY_DATA_GRANULARITY_INSUFFICIENT.value
+    )
 
 
 def test_pit_causality_enforced_in_replay_client_and_trend_shadow(tmp_path: Path) -> None:
@@ -291,6 +382,7 @@ def test_cost_accounting_enters_net_r_and_detects_sign_flip() -> None:
         "no_outcome_informed_policy_retuning": True,
         "no_protected_a_line_outcomes_accessed": True,
         "deterministic_manifest_replay_identical": True,
+        "authentic_1m_data_granularity_complete": True,
     }
     agg_sign_flip = {
         "actionable_signal_count": 120,
@@ -327,6 +419,7 @@ def test_mechanical_gate_evaluation_and_no_subgroup_rescue() -> None:
         "no_outcome_informed_policy_retuning": True,
         "no_protected_a_line_outcomes_accessed": True,
         "deterministic_manifest_replay_identical": True,
+        "authentic_1m_data_granularity_complete": True,
     }
 
     # 1. Well-supported PASS case
@@ -378,31 +471,56 @@ def test_mechanical_gate_evaluation_and_no_subgroup_rescue() -> None:
 
 
 def test_wp_b_evidence_json_integrity() -> None:
-    """Verify generated RC1 WP-B EVIDENCE.json contains all required contract sections and proofs."""
+    """Verify generated RC1 WP-B EVIDENCE.json contains all required contract sections, authentic 1m coverage, and proofs."""
     import json
 
     ev_path = REPO_ROOT / "evidence" / "v0.5.5" / "tactical-policy" / "RC1" / "WP_B" / "EVIDENCE.json"
     assert ev_path.exists(), f"Missing {ev_path}"
     payload = json.loads(ev_path.read_text(encoding="utf-8"))
 
-    assert payload["task_id"] == "B_LINE_TACTICAL_DECISION_QUALITY_R1"
+    assert payload["task_id"] == "B_LINE_TACTICAL_DECISION_QUALITY_R1_REPAIR_1M_EVIDENCE"
+    assert payload["parent_task_id"] == "B_LINE_TACTICAL_DECISION_QUALITY_R1"
     assert payload["release_id"] == "B_LINE_INITIAL_USABLE_RELEASE_V1_RC1"
+    assert payload["start_sha"] == "9e1c73c38213f30f0064c6b4b25509c109b1cd84"
+    assert payload["controller_dispatch_sha"] == "b5ad376f4fd00d5609c678989eae3156a9e14737"
     assert payload["frozen_tactical_predecessor_sha"] == FROZEN_TACTICAL_PREDECESSOR_SHA
     assert payload["policy_version"] == "TACTICAL_POLICY_R2_B0"
     assert payload["config_hash"] == "27f7d4c835a36330"
+
+    empty_sha256 = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    sym_digests = payload["input_manifest"]["symbol_digests"]
+    assert len(sym_digests) == 8
+    for sym, digest in sym_digests.items():
+        assert digest["klines_1m_count"] == 41775, f"{sym} missing authentic 1m bars"
+        assert digest["klines_1m_sha256"] != empty_sha256, f"{sym} has empty 1m hash"
+
+    ba = payload["before_after_source_identity_proof"]
+    assert ba["candidate_1_sha"] == "9e1c73c38213f30f0064c6b4b25509c109b1cd84"
+    assert ba["all_non_1m_symbol_identities_unchanged"] is True
+    assert ba["all_symbols_have_authentic_1m_coverage"] is True
+    assert ba["step_timestamps_sha256_identical"] is True
+    assert ba["partitions_identical"] is True
 
     det = payload["deterministic_replay_verification"]
     assert det["identical_manifest_produces_identical_results"] is True
     assert det["run_1_input_manifest_hash"] == det["run_2_input_manifest_hash"]
     assert det["run_1_output_manifest_hash"] == det["run_2_output_manifest_hash"]
 
+    pit = payload["pit_causality_audit"]
+    assert pit["pit_violations_count"] == 0
+    assert pit["synthetic_1m_queries_count"] == 0
+    assert pit["granularity_violations_count"] == 0
+    assert pit["authentic_1m_queries_count"] > 0
+
     assert len(payload["rolling_oos_table"]) >= 3
     assert payload["shadow_trend_diagnostics"]["authority"] == "SHADOW_ONLY"
     assert payload["shadow_trend_diagnostics"]["active_policy_influence"] == "NONE"
     assert payload["no_protected_a_line_outcomes_proof"]["protected_a_line_outcomes_accessed"] is False
     assert payload["executable_tactical_policy_unchanged_proof"]["zero_diff_on_executable_policy_files"] is True
+    assert payload["gate_evaluation"]["integrity_gates"]["authentic_1m_data_granularity_complete"] is True
     assert payload["gate_evaluation"]["subgroup_rescue_permitted"] is False
     assert payload["gate_evaluation"]["subgroup_rescue_applied"] is False
+    assert payload["test_and_static_verification"]["focused_tests"]["status"] == "PASS"
 
 
 def test_trend_evidence_v2_shadow_all_12_fields_and_shadow_only_authority(tmp_path: Path) -> None:

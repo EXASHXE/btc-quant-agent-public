@@ -5,7 +5,7 @@
     "CONTINUATION_DOWN": {
       "count": 2344,
       "mean_adx_slope": 0.187734,
-      "mean_net_R": -0.483814,
+      "mean_net_R": -0.473643,
       "mean_pullback_depth_atr": 2.157801,
       "mean_trend_age": 6.901,
       "mean_trend_persistence": 0.65529,
@@ -71,7 +71,7 @@
     "STABLE_RANGE": {
       "count": 4368,
       "mean_adx_slope": -0.084985,
-      "mean_net_R": -0.573183,
+      "mean_net_R": -0.5636,
       "mean_pullback_depth_atr": 2.160323,
       "mean_trend_age": 6.5009,
       "mean_trend_persistence": 0.618513,
@@ -82,7 +82,7 @@
     "TREND_TO_RANGE": {
       "count": 4108,
       "mean_adx_slope": -0.266413,
-      "mean_net_R": -0.851606,
+      "mean_net_R": -0.934728,
       "mean_pullback_depth_atr": 2.021347,
       "mean_trend_age": 6.3418,
       "mean_trend_persistence": 0.642405,
@@ -117,29 +117,29 @@
     "MATURE_TREND": {
       "count": 848,
       "mean_adx_slope": 0.530566,
-      "mean_net_R": -0.216794,
+      "mean_net_R": -0.619552,
       "mean_pullback_depth_atr": 2.187365,
       "mean_trend_age": 20.6073,
       "mean_trend_persistence": 0.948703,
-      "median_net_R": -1.1578,
+      "median_net_R": -1.195814,
       "resolved_actionable_count": 9,
       "share": 0.042468
     },
     "PULLBACK_IN_TREND": {
       "count": 2937,
       "mean_adx_slope": 0.188479,
-      "mean_net_R": -0.967481,
+      "mean_net_R": -0.956821,
       "mean_pullback_depth_atr": 1.472061,
       "mean_trend_age": 18.1318,
       "mean_trend_persistence": 0.871439,
-      "median_net_R": -1.5247,
+      "median_net_R": -1.45545,
       "resolved_actionable_count": 20,
       "share": 0.147085
     },
     "RANGE_BOUND": {
       "count": 4011,
       "mean_adx_slope": -0.536828,
-      "mean_net_R": -0.37479,
+      "mean_net_R": -0.36411,
       "mean_pullback_depth_atr": 2.212434,
       "mean_trend_age": 0.2947,
       "mean_trend_persistence": 0.492521,
@@ -150,18 +150,18 @@
     "TRANSITION_TO_RANGE": {
       "count": 1773,
       "mean_adx_slope": -0.599792,
-      "mean_net_R": -0.962022,
+      "mean_net_R": -0.932884,
       "mean_pullback_depth_atr": 2.039368,
       "mean_trend_age": 0.3158,
       "mean_trend_persistence": 0.508225,
-      "median_net_R": -1.3626,
+      "median_net_R": -1.3601,
       "resolved_actionable_count": 16,
       "share": 0.088792
     },
     "VOLATILITY_SHOCK": {
       "count": 6061,
       "mean_adx_slope": 0.277921,
-      "mean_net_R": -0.351714,
+      "mean_net_R": -0.350654,
       "mean_pullback_depth_atr": 2.288209,
       "mean_trend_age": 8.4169,
       "mean_trend_persistence": 0.654334,

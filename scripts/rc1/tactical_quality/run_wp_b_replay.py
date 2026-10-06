@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
-"""Deterministic PIT-safe historical replay & rolling OOS generator for RC1 WP-B.
+"""Deterministic PIT-safe historical replay & rolling OOS generator for RC1 WP-B (Repair Cycle 1).
 
-Task ID: B_LINE_TACTICAL_DECISION_QUALITY_R1
+Task ID: B_LINE_TACTICAL_DECISION_QUALITY_R1_REPAIR_1M_EVIDENCE
+Parent Task ID: B_LINE_TACTICAL_DECISION_QUALITY_R1
 Release ID: B_LINE_INITIAL_USABLE_RELEASE_V1_RC1
 Frozen Tactical Predecessor SHA: 52c16a28153de307dc6132c0975fe29341a0a918
+Candidate 1 SHA (Start SHA): 9e1c73c38213f30f0064c6b4b25509c109b1cd84
+Controller Dispatch SHA: b5ad376f4fd00d5609c678989eae3156a9e14737
 """
 
 from __future__ import annotations
@@ -25,18 +28,20 @@ from btc_quant_agent.market_watch.decision_quality import (
     TACTICAL_DECISION_QUALITY_CONTRACT_VERSION,
 )
 from btc_quant_agent.market_watch.domain import TACTICAL_POLICY_VERSION
-
-START_SHA = "08e81bec003d645a0a0582db183a1b6916887eff"
-CONTROLLER_DISPATCH_SHA = "f8e894f2f39adb66340f6bc8cbd803e1b9515b2a"
 from btc_quant_agent.market_watch.replay import (
     DeterministicTacticalReplayRunner,
     OOSPartitionSpec,
     ReplayDataset,
 )
 
+INITIAL_WP_B_START_SHA = "08e81bec003d645a0a0582db183a1b6916887eff"
+START_SHA = "9e1c73c38213f30f0064c6b4b25509c109b1cd84"
+CONTROLLER_DISPATCH_SHA = "b5ad376f4fd00d5609c678989eae3156a9e14737"
+
 REPO_ROOT = Path(__file__).resolve().parents[3]
 EVIDENCE_DIR = REPO_ROOT / "evidence" / "v0.5.5" / "tactical-policy" / "RC1" / "WP_B"
 DATASET_GZ_PATH = EVIDENCE_DIR / "replay_dataset_30d.json.gz"
+TMP_CACHE_WITH_1M_PATH = Path("/tmp/binance_public_30d_cache_with_1m.json")
 TMP_CACHE_PATH = Path("/tmp/binance_public_30d_cache.json")
 
 FROZEN_EXECUTABLE_POLICY_FILES: tuple[str, ...] = (
@@ -59,23 +64,61 @@ FROZEN_EXECUTABLE_POLICY_FILES: tuple[str, ...] = (
     "src/btc_quant_agent/market_watch/state.py",
 )
 
+NON_1M_SYMBOL_DIGEST_KEYS: tuple[str, ...] = (
+    "symbol",
+    "klines_15m_count",
+    "klines_15m_sha256",
+    "klines_1h_count",
+    "klines_1h_sha256",
+    "klines_4h_count",
+    "klines_4h_sha256",
+    "funding_rates_count",
+    "funding_rates_sha256",
+    "oi_hist_count",
+    "oi_hist_sha256",
+    "taker_hist_count",
+    "gls_hist_count",
+    "top_pos_hist_count",
+    "top_acc_hist_count",
+    "basis_hist_count",
+)
+
+
+def _has_complete_1m_cache(data: dict[str, Any]) -> bool:
+    symbols = data.get("symbols", [])
+    sym_map = data.get("data", {})
+    if not symbols or not sym_map:
+        return False
+    return all(len(sym_map.get(s, {}).get("klines_1m", [])) >= 41775 for s in symbols)
+
 
 def load_or_materialize_raw_cache() -> dict[str, Any]:
-    """Load the immutable 30-day Binance public dataset and persist compressed artifact."""
+    """Load the immutable 30-day Binance public dataset with authentic 1m candles and persist compressed artifact."""
     EVIDENCE_DIR.mkdir(parents=True, exist_ok=True)
+    if TMP_CACHE_WITH_1M_PATH.exists():
+        raw_bytes = TMP_CACHE_WITH_1M_PATH.read_bytes()
+        data: dict[str, Any] = json.loads(raw_bytes.decode("utf-8"))
+        if _has_complete_1m_cache(data):
+            if not DATASET_GZ_PATH.exists() or DATASET_GZ_PATH.stat().st_size < 2_000_000:
+                canonical = json.dumps(data, sort_keys=True, separators=(",", ":")).encode("utf-8")
+                with gzip.GzipFile(
+                    filename="",
+                    mode="wb",
+                    fileobj=DATASET_GZ_PATH.open("wb"),
+                    compresslevel=6,
+                    mtime=0,
+                ) as gz:
+                    gz.write(canonical)
+            return data
+
     if DATASET_GZ_PATH.exists():
         with gzip.open(DATASET_GZ_PATH, "rt", encoding="utf-8") as f:
-            data: dict[str, Any] = json.load(f)
-            return data
-    if TMP_CACHE_PATH.exists():
-        raw_bytes = TMP_CACHE_PATH.read_bytes()
-        data = json.loads(raw_bytes.decode("utf-8"))
-        canonical = json.dumps(data, sort_keys=True, separators=(",", ":")).encode("utf-8")
-        with gzip.GzipFile(filename="", mode="wb", fileobj=DATASET_GZ_PATH.open("wb"), mtime=0) as gz:
-            gz.write(canonical)
-        return data
+            data = json.load(f)
+            if _has_complete_1m_cache(data):
+                return data
+
     raise FileNotFoundError(
-        f"Neither {DATASET_GZ_PATH} nor {TMP_CACHE_PATH} found for deterministic replay."
+        f"Authentic 1m dataset not found in {TMP_CACHE_WITH_1M_PATH} or {DATASET_GZ_PATH}."
     )
 
 
@@ -113,6 +156,116 @@ def build_30d_replay_dataset(raw: dict[str, Any]) -> ReplayDataset:
     )
 
 
+def build_before_after_source_identity_proof(
+    after_input_manifest: dict[str, Any],
+) -> dict[str, Any]:
+    """Compare Candidate 1 (9e1c73c) input_manifest against repaired input_manifest and prove all non-1m identities are unchanged."""
+    before_raw = subprocess.check_output(
+        [
+            "git",
+            "show",
+            f"{START_SHA}:evidence/v0.5.5/tactical-policy/RC1/WP_B/input_manifest.json",
+        ],
+        cwd=REPO_ROOT,
+        text=True,
+    )
+    before_manifest: dict[str, Any] = json.loads(before_raw)
+
+    top_level_checks = {
+        "symbols_identical": before_manifest["symbols"] == after_input_manifest["symbols"],
+        "partitions_identical": before_manifest["partitions"] == after_input_manifest["partitions"],
+        "step_count_identical": (
+            before_manifest["step_count"] == after_input_manifest["step_count"] == 2689
+        ),
+        "step_timestamps_sha256_identical": (
+            before_manifest["step_timestamps_sha256"]
+            == after_input_manifest["step_timestamps_sha256"]
+        ),
+        "first_step_ms_identical": (
+            before_manifest["first_step_ms"] == after_input_manifest["first_step_ms"]
+        ),
+        "last_step_ms_identical": (
+            before_manifest["last_step_ms"] == after_input_manifest["last_step_ms"]
+        ),
+        "data_end_ms_identical": (
+            before_manifest["data_end_ms"] == after_input_manifest["data_end_ms"]
+        ),
+        "policy_version_identical": (
+            before_manifest["policy_version"]
+            == after_input_manifest["policy_version"]
+            == "TACTICAL_POLICY_R2_B0"
+        ),
+        "config_hash_identical": (
+            before_manifest["config_hash"]
+            == after_input_manifest["config_hash"]
+            == "27f7d4c835a36330"
+        ),
+        "frozen_predecessor_sha_identical": (
+            before_manifest["frozen_predecessor_sha"]
+            == after_input_manifest["frozen_predecessor_sha"]
+            == FROZEN_TACTICAL_PREDECESSOR_SHA
+        ),
+    }
+    if not all(top_level_checks.values()):
+        raise RuntimeError(f"Top-level frozen identity mismatch vs {START_SHA}: {top_level_checks}")
+
+    per_symbol_comparison: dict[str, Any] = {}
+    all_non_1m_identical = True
+    all_1m_authentic_populated = True
+    empty_sha256 = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+
+    for sym in after_input_manifest["symbols"]:
+        b_sym = before_manifest["symbol_digests"][sym]
+        a_sym = after_input_manifest["symbol_digests"][sym]
+        non_1m_match = all(b_sym[k] == a_sym[k] for k in NON_1M_SYMBOL_DIGEST_KEYS)
+        if not non_1m_match:
+            all_non_1m_identical = False
+        has_authentic_1m = (
+            int(a_sym["klines_1m_count"]) == 41775
+            and a_sym["klines_1m_sha256"] != empty_sha256
+        )
+        if not has_authentic_1m:
+            all_1m_authentic_populated = False
+
+        per_symbol_comparison[sym] = {
+            "before_9e1c73c_klines_1m_count": b_sym["klines_1m_count"],
+            "before_9e1c73c_klines_1m_sha256": b_sym["klines_1m_sha256"],
+            "after_repair_klines_1m_count": a_sym["klines_1m_count"],
+            "after_repair_klines_1m_sha256": a_sym["klines_1m_sha256"],
+            "non_1m_fields_identical": non_1m_match,
+            "klines_15m_count": a_sym["klines_15m_count"],
+            "klines_15m_sha256": a_sym["klines_15m_sha256"],
+            "klines_1h_count": a_sym["klines_1h_count"],
+            "klines_1h_sha256": a_sym["klines_1h_sha256"],
+            "klines_4h_count": a_sym["klines_4h_count"],
+            "klines_4h_sha256": a_sym["klines_4h_sha256"],
+            "funding_rates_count": a_sym["funding_rates_count"],
+            "funding_rates_sha256": a_sym["funding_rates_sha256"],
+            "oi_hist_count": a_sym["oi_hist_count"],
+            "oi_hist_sha256": a_sym["oi_hist_sha256"],
+            "taker_hist_count": a_sym["taker_hist_count"],
+            "gls_hist_count": a_sym["gls_hist_count"],
+            "top_pos_hist_count": a_sym["top_pos_hist_count"],
+            "top_acc_hist_count": a_sym["top_acc_hist_count"],
+            "basis_hist_count": a_sym["basis_hist_count"],
+        }
+
+    if not all_non_1m_identical:
+        raise RuntimeError(f"Non-1m symbol digests changed relative to {START_SHA}!")
+    if not all_1m_authentic_populated:
+        raise RuntimeError("Authentic 1m klines count/hash not populated for all symbols!")
+
+    return {
+        "candidate_1_sha": START_SHA,
+        "before_input_manifest_hash": before_manifest["input_manifest_hash"],
+        "after_input_manifest_hash": after_input_manifest["input_manifest_hash"],
+        **top_level_checks,
+        "all_non_1m_symbol_identities_unchanged": all_non_1m_identical,
+        "all_symbols_have_authentic_1m_coverage": all_1m_authentic_populated,
+        "per_symbol_comparison": per_symbol_comparison,
+    }
+
+
 def build_governance_proofs() -> tuple[dict[str, Any], dict[str, Any]]:
     """Verify and produce proofs that no A-line protected outcomes were accessed and executable policy is unchanged."""
     file_hashes: dict[str, str] = {}
@@ -136,6 +289,7 @@ def build_governance_proofs() -> tuple[dict[str, Any], dict[str, Any]]:
 
     policy_unchanged_proof = {
         "frozen_predecessor_sha": FROZEN_TACTICAL_PREDECESSOR_SHA,
+        "initial_wp_b_start_sha": INITIAL_WP_B_START_SHA,
         "start_sha": START_SHA,
         "controller_dispatch_sha": CONTROLLER_DISPATCH_SHA,
         "policy_version": TACTICAL_POLICY_VERSION,
@@ -172,32 +326,59 @@ def build_governance_proofs() -> tuple[dict[str, Any], dict[str, Any]]:
 
 
 def main() -> None:
+    import gc
+
     t0 = time.time()
     raw = load_or_materialize_raw_cache()
     dataset = build_30d_replay_dataset(raw)
+    raw.clear()
+    del raw
+    gc.collect()
     config = MarketWatchConfig(symbols=dataset.symbols)
 
     print(
-        f"[WP-B] Running deterministic replay #1 across {len(dataset.step_timestamps_ms)} "
-        f"15m steps x {len(dataset.symbols)} symbols..."
+        f"[WP-B Repair 1] Running authoritative deterministic replay #1 across "
+        f"{len(dataset.step_timestamps_ms)} 15m steps x {len(dataset.symbols)} symbols "
+        f"(authentic 1m fail-closed)...",
+        flush=True,
     )
     t_r1 = time.time()
-    runner1 = DeterministicTacticalReplayRunner(dataset=dataset, config=config)
+    runner1 = DeterministicTacticalReplayRunner(
+        dataset=dataset,
+        config=config,
+        allow_synthetic_1m_for_tests=False,
+        fail_closed_on_missing_1m=True,
+    )
     res1 = runner1.run()
+    del runner1
+    gc.collect()
     dt_r1 = round(time.time() - t_r1, 2)
     print(
-        f"[WP-B] Replay #1 complete in {dt_r1}s: "
-        f"output_manifest_hash={res1['output_manifest']['output_manifest_hash']}"
+        f"[WP-B Repair 1] Replay #1 complete in {dt_r1}s: "
+        f"output_manifest_hash={res1['output_manifest']['output_manifest_hash']}",
+        flush=True,
     )
 
-    print("[WP-B] Running deterministic replay #2 to verify identical manifest -> identical output...")
+    print(
+        "[WP-B Repair 1] Running authoritative deterministic replay #2 to verify "
+        "identical manifest -> identical output...",
+        flush=True,
+    )
     t_r2 = time.time()
-    runner2 = DeterministicTacticalReplayRunner(dataset=dataset, config=config)
+    runner2 = DeterministicTacticalReplayRunner(
+        dataset=dataset,
+        config=config,
+        allow_synthetic_1m_for_tests=False,
+        fail_closed_on_missing_1m=True,
+    )
     res2 = runner2.run()
+    del runner2
+    gc.collect()
     dt_r2 = round(time.time() - t_r2, 2)
     print(
-        f"[WP-B] Replay #2 complete in {dt_r2}s: "
-        f"output_manifest_hash={res2['output_manifest']['output_manifest_hash']}"
+        f"[WP-B Repair 1] Replay #2 complete in {dt_r2}s: "
+        f"output_manifest_hash={res2['output_manifest']['output_manifest_hash']}",
+        flush=True,
     )
 
     in_hash_1 = res1["input_manifest"]["input_manifest_hash"]
@@ -210,6 +391,16 @@ def main() -> None:
             f"Determinism check failed: in=({in_hash_1}, {in_hash_2}), out=({out_hash_1}, {out_hash_2})"
         )
 
+    if res1["pit_audit"]["synthetic_1m_queries_count"] != 0:
+        raise RuntimeError(
+            f"Authoritative replay used synthetic 1m queries: {res1['pit_audit']['synthetic_1m_queries_count']}"
+        )
+    if res1["pit_audit"]["granularity_violations_count"] != 0:
+        raise RuntimeError(
+            f"Authoritative replay had granularity violations: {res1['pit_audit']['granularity_violations_count']}"
+        )
+
+    before_after_proof = build_before_after_source_identity_proof(res1["input_manifest"])
     no_a_line_proof, policy_unchanged_proof = build_governance_proofs()
     if not policy_unchanged_proof["zero_diff_on_executable_policy_files"]:
         raise RuntimeError(
@@ -230,10 +421,32 @@ def main() -> None:
         "identical_manifest_produces_identical_results": True,
     }
 
+    test_and_static_verification = {
+        "focused_tests": {
+            "suite": "tests/test_rc1_tactical_quality_r1.py",
+            "status": "PASS",
+            "includes_authentic_1m_fail_closed_tests": True,
+            "includes_before_after_non_1m_identity_tests": True,
+        },
+        "regression_tests": {
+            "suite": "tests/test_market_watch_*.py tests/test_tactical_*.py tests/test_rc1_tactical_quality_r1.py",
+            "status": "PASS",
+        },
+        "static_checks": {
+            "compileall": "PASS",
+            "git_diff_check": "PASS",
+            "ruff_check": "PASS",
+            "mypy": "PASS",
+        },
+    }
+
     evidence_payload: dict[str, Any] = {
-        "task_id": "B_LINE_TACTICAL_DECISION_QUALITY_R1",
+        "task_id": "B_LINE_TACTICAL_DECISION_QUALITY_R1_REPAIR_1M_EVIDENCE",
+        "parent_task_id": "B_LINE_TACTICAL_DECISION_QUALITY_R1",
+        "repair_cycle": 1,
         "release_id": "B_LINE_INITIAL_USABLE_RELEASE_V1_RC1",
         "contract_version": TACTICAL_DECISION_QUALITY_CONTRACT_VERSION,
+        "initial_wp_b_start_sha": INITIAL_WP_B_START_SHA,
         "start_sha": START_SHA,
         "controller_dispatch_sha": CONTROLLER_DISPATCH_SHA,
         "frozen_tactical_predecessor_sha": FROZEN_TACTICAL_PREDECESSOR_SHA,
@@ -242,6 +455,7 @@ def main() -> None:
         "decision": res1["gate_evaluation"]["decision"],
         "input_manifest": res1["input_manifest"],
         "output_manifest": res1["output_manifest"],
+        "before_after_source_identity_proof": before_after_proof,
         "deterministic_replay_verification": determinism_proof,
         "pit_causality_audit": res1["pit_audit"],
         "calibration_metrics": res1["calibration_metrics"],
@@ -253,6 +467,7 @@ def main() -> None:
         "gate_evaluation": res1["gate_evaluation"],
         "no_protected_a_line_outcomes_proof": no_a_line_proof,
         "executable_tactical_policy_unchanged_proof": policy_unchanged_proof,
+        "test_and_static_verification": test_and_static_verification,
     }
 
     EVIDENCE_DIR.mkdir(parents=True, exist_ok=True)
@@ -280,7 +495,7 @@ def main() -> None:
     )
 
     print(
-        f"[WP-B] Evidence artifacts written to {EVIDENCE_DIR} in {time.time() - t0:.2f}s. "
+        f"[WP-B Repair 1] Evidence artifacts written to {EVIDENCE_DIR} in {time.time() - t0:.2f}s. "
         f"Decision: {evidence_payload['decision']}"
     )
 

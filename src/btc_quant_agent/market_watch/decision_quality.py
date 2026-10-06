@@ -28,6 +28,9 @@ class TacticalDecisionQualityDecision(StrEnum):
     PASS = "TACTICAL_DECISION_QUALITY_PASS"
     DIAGNOSTIC_ONLY = "TACTICAL_DECISION_QUALITY_DIAGNOSTIC_ONLY"
     FAIL = "TACTICAL_DECISION_QUALITY_FAIL"
+    DIAGNOSTIC_ONLY_DATA_GRANULARITY_INSUFFICIENT = (
+        "TACTICAL_DECISION_QUALITY_DIAGNOSTIC_ONLY_DATA_GRANULARITY_INSUFFICIENT"
+    )
 
 
 @dataclass(frozen=True)
@@ -706,12 +709,19 @@ def evaluate_decision_quality_gates(
     }
     pass_band_all_passed = all(pass_band_gates.values())
 
+    authentic_1m_granularity_complete = bool(
+        integrity_checks.get("authentic_1m_data_granularity_complete", True)
+    )
+
     # Mechanical terminal decision
     reasons: list[str] = []
     if not integrity_all_passed:
         decision = TacticalDecisionQualityDecision.FAIL
         failed_int = [k for k, v in integrity_gate_map.items() if not v]
         reasons.append(f"INTEGRITY_GATE_VIOLATION:{','.join(failed_int)}")
+    elif not authentic_1m_granularity_complete:
+        decision = TacticalDecisionQualityDecision.DIAGNOSTIC_ONLY_DATA_GRANULARITY_INSUFFICIENT
+        reasons.append("DATA_GRANULARITY_INSUFFICIENT:missing_or_incomplete_authentic_1m_candles")
     elif any_hard_negative:
         decision = TacticalDecisionQualityDecision.FAIL
         triggered_hn = [k for k, v in hard_negative_gates.items() if v]
@@ -737,7 +747,8 @@ def evaluate_decision_quality_gates(
         "subgroup_rescue_applied": False,
         "integrity_gates": {
             **integrity_gate_map,
-            "all_passed": integrity_all_passed,
+            "authentic_1m_data_granularity_complete": authentic_1m_granularity_complete,
+            "all_passed": integrity_all_passed and authentic_1m_granularity_complete,
         },
         "hard_negative_gates": {
             **hard_negative_gates,

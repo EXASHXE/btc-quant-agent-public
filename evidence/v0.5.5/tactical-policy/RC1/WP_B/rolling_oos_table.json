@@ -2,34 +2,34 @@
   {
     "MAE": {
       "max_r": 1.0,
-      "mean_r": 0.8895,
+      "mean_r": 0.9145,
       "median_r": 1.0
     },
     "MFE": {
       "max_r": 5.06,
-      "mean_r": 1.2545,
-      "median_r": 0.55
+      "mean_r": 1.23025,
+      "median_r": 0.395
     },
     "action_frequency": 0.006611,
     "actionable_evaluation_count": 44,
     "actionable_signal_count": 40,
     "boundary_breach": {
       "invalidation_breach_count": 35,
-      "stop_boundary_breach_count": 35,
-      "stop_boundary_breach_rate": 0.875
+      "stop_boundary_breach_count": 36,
+      "stop_boundary_breach_rate": 0.9
     },
     "cohort_label": "OOS_P1",
     "drawdown_adverse_excursion": {
       "max_adverse_excursion_r": 1.0,
-      "max_cumulative_net_r_drawdown": 40.680798,
-      "mean_adverse_excursion_r": 0.8895,
+      "max_cumulative_net_r_drawdown": 44.305621,
+      "mean_adverse_excursion_r": 0.9145,
       "median_adverse_excursion_r": 1.0
     },
     "fees": {
       "maker_fee_rate": 0.0002,
-      "mean_fee_r": 0.349952,
+      "mean_fee_r": 0.349998,
       "taker_fee_rate": 0.0005,
-      "total_fee_r": 13.998071
+      "total_fee_r": 13.999929
     },
     "fill_rate": 1.0,
     "filled_count": 40,
@@ -41,13 +41,13 @@
       "total_funding_pnl_r": 0.009975
     },
     "gross_R": {
-      "mean": -0.495859,
+      "mean": -0.586414,
       "median": -1.0,
-      "total": -19.834352
+      "total": -23.456574
     },
     "holding_time": {
-      "mean_holding_time_ms": 4452000.0,
-      "mean_time_to_fill_ms": 733500.0,
+      "mean_holding_time_ms": 4428000.0,
+      "mean_time_to_fill_ms": 732000.0,
       "median_holding_time_ms": 2250000.0,
       "median_time_to_fill_ms": 900000.0
     },
@@ -66,18 +66,18 @@
         "share": 0.993389
       }
     },
-    "mean_R": -0.985542,
-    "mean_gross_R": -0.495859,
-    "mean_net_R": -0.985542,
+    "mean_R": -1.076162,
+    "mean_gross_R": -0.586414,
+    "mean_net_R": -1.076162,
     "median_R": -1.415256,
     "median_gross_R": -1.0,
     "median_net_R": -1.415256,
     "net_R": {
-      "mean": -0.985542,
-      "mean_ex_funding": -0.985791,
+      "mean": -1.076162,
+      "mean_ex_funding": -1.076412,
       "median": -1.415256,
       "median_ex_funding": -1.40645,
-      "total": -39.421677
+      "total": -43.046499
     },
     "no_fill_count": 0,
     "partition_spec": {
@@ -94,17 +94,17 @@
     "sample_count": 6656,
     "short_actionable_count": 30,
     "slippage": {
-      "mean_slippage_r": 0.139981,
+      "mean_slippage_r": 0.139999,
       "slippage_bps_per_side": 2.0,
-      "total_slippage_r": 5.599229
+      "total_slippage_r": 5.599971
     },
-    "stop_before_target": 0.875,
-    "stop_before_target_count": 35,
-    "stop_rate_all_filled": 0.875,
+    "stop_before_target": 0.9,
+    "stop_before_target_count": 36,
+    "stop_rate_all_filled": 0.9,
     "target_stop_resolved_count": 40,
     "timeout_count": 0,
-    "tp1_before_sl": 0.125,
-    "tp1_before_sl_count": 5,
+    "tp1_before_sl": 0.1,
+    "tp1_before_sl_count": 4,
     "tp2_before_sl": 0.0,
     "tp2_before_sl_count": 0,
     "trend_transition": {
@@ -124,13 +124,13 @@
   {
     "MAE": {
       "max_r": 1.0,
-      "mean_r": 0.704146,
+      "mean_r": 0.777317,
       "median_r": 1.0
     },
     "MFE": {
       "max_r": 7.97,
-      "mean_r": 1.438537,
-      "median_r": 0.86
+      "mean_r": 1.434634,
+      "median_r": 0.7
     },
     "action_frequency": 0.00631,
     "actionable_evaluation_count": 42,
@@ -144,14 +144,14 @@
     "drawdown_adverse_excursion": {
       "max_adverse_excursion_r": 1.0,
       "max_cumulative_net_r_drawdown": 10.2175,
-      "mean_adverse_excursion_r": 0.704146,
+      "mean_adverse_excursion_r": 0.777317,
       "median_adverse_excursion_r": 1.0
     },
     "fees": {
       "maker_fee_rate": 0.0002,
-      "mean_fee_r": 0.290439,
+      "mean_fee_r": 0.281357,
       "taker_fee_rate": 0.0005,
-      "total_fee_r": 11.908
+      "total_fee_r": 11.535643
     },
     "fill_rate": 1.0,
     "filled_count": 41,
@@ -168,8 +168,8 @@
       "total": 18.002142
     },
     "holding_time": {
-      "mean_holding_time_ms": 6588292.68,
-      "mean_time_to_fill_ms": 696585.37,
+      "mean_holding_time_ms": 6610243.9,
+      "mean_time_to_fill_ms": 613170.73,
       "median_holding_time_ms": 900000.0,
       "median_time_to_fill_ms": 900000.0
     },
@@ -188,18 +188,18 @@
         "share": 0.99369
       }
     },
-    "mean_R": 0.030954,
+    "mean_R": 0.043668,
     "mean_gross_R": 0.439077,
-    "mean_net_R": 0.030954,
+    "mean_net_R": 0.043668,
     "median_R": -1.2107,
     "median_gross_R": -1.0,
     "median_net_R": -1.2107,
     "net_R": {
-      "mean": 0.030954,
-      "mean_ex_funding": 0.032462,
+      "mean": 0.043668,
+      "mean_ex_funding": 0.045177,
       "median": -1.2107,
       "median_ex_funding": -1.2107,
-      "total": 1.269097
+      "total": 1.790397
     },
     "no_fill_count": 0,
     "partition_spec": {
@@ -216,9 +216,9 @@
     "sample_count": 6656,
     "short_actionable_count": 10,
     "slippage": {
-      "mean_slippage_r": 0.116176,
+      "mean_slippage_r": 0.112543,
       "slippage_bps_per_side": 2.0,
-      "total_slippage_r": 4.7632
+      "total_slippage_r": 4.614257
     },
     "stop_before_target": 0.658537,
     "stop_before_target_count": 27,
@@ -246,13 +246,13 @@
   {
     "MAE": {
       "max_r": 1.0,
-      "mean_r": 0.817463,
+      "mean_r": 0.847313,
       "median_r": 1.0
     },
     "MFE": {
       "max_r": 5.13,
-      "mean_r": 0.969552,
-      "median_r": 0.33
+      "mean_r": 0.999403,
+      "median_r": 0.39
     },
     "action_frequency": 0.011118,
     "actionable_evaluation_count": 74,
@@ -265,15 +265,15 @@
     "cohort_label": "OOS_P3",
     "drawdown_adverse_excursion": {
       "max_adverse_excursion_r": 1.0,
-      "max_cumulative_net_r_drawdown": 53.399789,
-      "mean_adverse_excursion_r": 0.817463,
+      "max_cumulative_net_r_drawdown": 52.972989,
+      "mean_adverse_excursion_r": 0.847313,
       "median_adverse_excursion_r": 1.0
     },
     "fees": {
       "maker_fee_rate": 0.0002,
-      "mean_fee_r": 0.288366,
+      "mean_fee_r": 0.283816,
       "taker_fee_rate": 0.0005,
-      "total_fee_r": 19.3205
+      "total_fee_r": 19.015643
     },
     "fill_rate": 1.0,
     "filled_count": 67,
@@ -290,8 +290,8 @@
       "total": -18.99085
     },
     "holding_time": {
-      "mean_holding_time_ms": 3945671.64,
-      "mean_time_to_fill_ms": 737910.45,
+      "mean_holding_time_ms": 3949253.73,
+      "mean_time_to_fill_ms": 699402.99,
       "median_holding_time_ms": 1800000.0,
       "median_time_to_fill_ms": 900000.0
     },
@@ -310,18 +310,18 @@
         "share": 0.988882
       }
     },
-    "mean_R": -0.686484,
+    "mean_R": -0.680114,
     "mean_gross_R": -0.283446,
-    "mean_net_R": -0.686484,
+    "mean_net_R": -0.680114,
     "median_R": -1.2497,
     "median_gross_R": -1.0,
     "median_net_R": -1.2497,
     "net_R": {
-      "mean": -0.686484,
-      "mean_ex_funding": -0.687157,
+      "mean": -0.680114,
+      "mean_ex_funding": -0.680787,
       "median": -1.2497,
       "median_ex_funding": -1.2497,
-      "total": -45.994461
+      "total": -45.567661
     },
     "no_fill_count": 0,
     "partition_spec": {
@@ -338,9 +338,9 @@
     "sample_count": 6656,
     "short_actionable_count": 42,
     "slippage": {
-      "mean_slippage_r": 0.115346,
+      "mean_slippage_r": 0.113526,
       "slippage_bps_per_side": 2.0,
-      "total_slippage_r": 7.7282
+      "total_slippage_r": 7.606257
     },
     "stop_before_target": 0.791045,
     "stop_before_target_count": 53,

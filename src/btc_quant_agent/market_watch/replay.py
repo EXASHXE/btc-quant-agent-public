@@ -4,7 +4,7 @@ import bisect
 import hashlib
 import json
 from collections.abc import Mapping, Sequence
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, replace
 from typing import Any
 from unittest.mock import patch
 
@@ -42,6 +42,10 @@ REPLAY_OUTPUT_MANIFEST_VERSION = "RC1_WP_B_REPLAY_OUTPUT_MANIFEST_V1"
 
 class PITCausalityViolationError(RuntimeError):
     """Raised when historical replay attempts to access data after as_of_ms or out of chronological order."""
+
+
+class ReplayDataGranularityError(RuntimeError):
+    """Raised when authoritative replay lacks complete authentic 1m candle coverage."""
 
 
 @dataclass(frozen=True)
@@ -149,6 +153,10 @@ class SymbolReplaySeries:
     basis_hist: tuple[dict[str, Any], ...] = ()
 
     def digest(self) -> dict[str, Any]:
+        cached = getattr(self, "_cached_digest", None)
+        if cached is not None:
+            return dict(cached)
+
         def _candles_hash(seq: Sequence[Candle]) -> str:
             h = hashlib.sha256()
             for c in seq:
@@ -161,7 +169,7 @@ class SymbolReplaySeries:
             raw = json.dumps(list(seq), sort_keys=True, separators=(",", ":"))
             return hashlib.sha256(raw.encode("utf-8")).hexdigest()
 
-        return {
+        res = {
             "symbol": self.symbol,
             "klines_15m_count": len(self.klines_15m),
             "klines_15m_sha256": _candles_hash(self.klines_15m),
@@ -181,6 +189,8 @@ class SymbolReplaySeries:
             "top_acc_hist_count": len(self.top_acc_hist),
             "basis_hist_count": len(self.basis_hist),
         }
+        object.__setattr__(self, "_cached_digest", res)
+        return dict(res)
 
 
 @dataclass(frozen=True)
@@ -200,6 +210,7 @@ class ReplayDataset:
         step_timestamps_ms: Sequence[int],
         partitions: Sequence[OOSPartitionSpec],
         data_end_ms: int | None = None,
+        consume_raw: bool = False,
     ) -> ReplayDataset:
         validate_oos_partitions(partitions)
         steps = tuple(sorted(int(t) for t in step_timestamps_ms))
@@ -281,6 +292,9 @@ class ReplayDataset:
                 top_acc_hist=_sort_ts(s_raw.get("top_acc_hist", ())),
                 basis_hist=_sort_ts(s_raw.get("basis_hist", ())),
             )
+            series_map[sym].digest()
+            if consume_raw and isinstance(s_raw, dict):
+                s_raw.clear()
 
         return cls(
             symbols=symbols,
@@ -289,6 +303,63 @@ class ReplayDataset:
             partitions=tuple(partitions),
             data_end_ms=max_end,
         )
+
+    def validate_authentic_1m_coverage(self, fail_closed: bool = True) -> dict[str, Any]:
+        """Verify that every symbol has complete, gap-free authentic 1m candles across the replay horizon."""
+        req_start_open_ms = ((self.step_timestamps_ms[0] - 899_999) // 60_000) * 60_000
+        req_end_close_ms = ((self.data_end_ms + 1) // 60_000) * 60_000 - 1
+        expected_bars = max(0, (req_end_close_ms + 1 - req_start_open_ms) // 60_000)
+        summary: dict[str, Any] = {}
+        for sym in self.symbols:
+            ser = self.series_by_symbol[sym]
+            c1m = ser.klines_1m
+            if not c1m:
+                if fail_closed:
+                    raise ReplayDataGranularityError(
+                        f"Missing authentic 1m klines for {sym}: klines_1m_count=0"
+                    )
+                summary[sym] = {
+                    "klines_1m_count": 0,
+                    "window_1m_count": 0,
+                    "expected_bars": expected_bars,
+                    "complete": False,
+                }
+                continue
+            in_win = [
+                c
+                for c in c1m
+                if c.open_time_ms >= req_start_open_ms and c.close_time_ms <= req_end_close_ms
+            ]
+            has_gap = (
+                len(in_win) != expected_bars
+                or in_win[0].open_time_ms != req_start_open_ms
+                or in_win[-1].close_time_ms != req_end_close_ms
+                or any(
+                    in_win[idx + 1].open_time_ms - in_win[idx].open_time_ms != 60_000
+                    for idx in range(len(in_win) - 1)
+                )
+            )
+            if has_gap:
+                if fail_closed:
+                    raise ReplayDataGranularityError(
+                        f"Incomplete authentic 1m coverage for {sym} in [{req_start_open_ms}, {req_end_close_ms}]: "
+                        f"got {len(in_win)} bars, expected {expected_bars}"
+                    )
+                summary[sym] = {
+                    "klines_1m_count": len(c1m),
+                    "window_1m_count": len(in_win),
+                    "expected_bars": expected_bars,
+                    "complete": False,
+                }
+                continue
+            summary[sym] = {
+                "klines_1m_count": len(c1m),
+                "window_1m_count": len(in_win),
+                "first_open_ms": in_win[0].open_time_ms,
+                "last_close_ms": in_win[-1].close_time_ms,
+                "complete": True,
+            }
+        return summary
 
     def build_input_manifest(self, config: MarketWatchConfig | None = None) -> dict[str, Any]:
         cfg = config or MarketWatchConfig()
@@ -319,25 +390,47 @@ class ReplayDataset:
 class HistoricalReplayClient(BinancePublicClient):
     """Deterministic PIT-safe replay client enforcing close_time_ms <= as_of_ms on all queries."""
 
-    def __init__(self, dataset: ReplayDataset, initial_as_of_ms: int) -> None:
+    def __init__(
+        self,
+        dataset: ReplayDataset,
+        initial_as_of_ms: int,
+        *,
+        allow_synthetic_1m_for_tests: bool = False,
+    ) -> None:
         super().__init__(DataConfig())
         self.dataset = dataset
         self._as_of_ms = int(initial_as_of_ms)
+        self.allow_synthetic_1m_for_tests = bool(allow_synthetic_1m_for_tests)
         self.pit_queries_count = 0
         self.pit_violations_count = 0
+        self.authentic_1m_queries_count = 0
+        self.synthetic_1m_queries_count = 0
+        self.granularity_violations_count = 0
+        self.granularity_violation_reasons: list[str] = []
         self.max_returned_candle_close_ms = 0
         self.max_returned_derivative_time_ms = 0
         self.max_returned_funding_time_ms = 0
 
-        # Pre-index close_time_ms and timestamps for O(log N) PIT slicing
+        # Pre-index open_time_ms, close_time_ms, and timestamps for O(log N) PIT slicing
+        self._candle_opens: dict[tuple[str, str], list[int]] = {}
         self._candle_closes: dict[tuple[str, str], list[int]] = {}
+        self._1m_gap_free: dict[str, bool] = {}
         self._funding_times: dict[str, list[int]] = {}
         self._deriv_times: dict[tuple[str, str], list[int]] = {}
         for sym, ser in dataset.series_by_symbol.items():
-            self._candle_closes[(sym, "15m")] = [c.close_time_ms for c in ser.klines_15m]
-            self._candle_closes[(sym, "1h")] = [c.close_time_ms for c in ser.klines_1h]
-            self._candle_closes[(sym, "4h")] = [c.close_time_ms for c in ser.klines_4h]
-            self._candle_closes[(sym, "1m")] = [c.close_time_ms for c in ser.klines_1m]
+            for iv, seq_iv in (
+                ("15m", ser.klines_15m),
+                ("1h", ser.klines_1h),
+                ("4h", ser.klines_4h),
+                ("1m", ser.klines_1m),
+            ):
+                self._candle_opens[(sym, iv)] = [c.open_time_ms for c in seq_iv]
+                self._candle_closes[(sym, iv)] = [c.close_time_ms for c in seq_iv]
+            c1m_seq = ser.klines_1m
+            self._1m_gap_free[sym] = bool(c1m_seq) and all(
+                c1m_seq[i + 1].open_time_ms - c1m_seq[i].open_time_ms == 60_000
+                for i in range(len(c1m_seq) - 1)
+            )
             self._funding_times[sym] = [int(r["funding_time_ms"]) for r in ser.funding_rates]
             for d_name, d_seq in (
                 ("oi", ser.oi_hist),
@@ -402,7 +495,15 @@ class HistoricalReplayClient(BinancePublicClient):
         sym = symbol.upper()
         ser = self._get_series(sym)
         if interval == "1m" and not ser.klines_1m:
-            # Synthesize PIT-safe 1m bars from closed 15m bars strictly <= end_time_ms
+            if not self.allow_synthetic_1m_for_tests:
+                self.granularity_violations_count += 1
+                reason = f"MISSING_AUTHENTIC_1M:{sym}:{start_time_ms}:{end_time_ms}"
+                self.granularity_violation_reasons.append(reason)
+                raise ReplayDataGranularityError(
+                    f"Authoritative replay requires authentic 1m candles ({reason}); synthetic 1m is forbidden"
+                )
+            # Explicitly labeled non-authority unit-test fixture path only
+            self.synthetic_1m_queries_count += 1
             closes_15m = self._candle_closes[(sym, "15m")]
             end_idx = bisect.bisect_right(closes_15m, min(end_time_ms, self._as_of_ms))
             start_idx = max(0, bisect.bisect_left(closes_15m, start_time_ms) - 1)
@@ -421,14 +522,41 @@ class HistoricalReplayClient(BinancePublicClient):
 
         seq_map = {"15m": ser.klines_15m, "1h": ser.klines_1h, "4h": ser.klines_4h, "1m": ser.klines_1m}
         seq = seq_map[interval]
+        opens = self._candle_opens[(sym, interval)]
         closes = self._candle_closes[(sym, interval)]
-        end_idx = bisect.bisect_right(closes, min(end_time_ms, self._as_of_ms))
-        start_idx = max(0, bisect.bisect_left(closes, start_time_ms) - 1)
-        out = [
-            c
-            for c in seq[start_idx:end_idx]
-            if c.open_time_ms >= start_time_ms and c.close_time_ms <= end_time_ms
-        ]
+        eff_end_ms = min(end_time_ms, self._as_of_ms)
+        s_idx = bisect.bisect_left(opens, start_time_ms)
+        e_idx = bisect.bisect_right(closes, eff_end_ms)
+        out = list(seq[s_idx:e_idx]) if s_idx < e_idx else []
+        if interval == "1m":
+            self.authentic_1m_queries_count += 1
+            if not self.allow_synthetic_1m_for_tests:
+                exp_first_open = ((start_time_ms + 59_999) // 60_000) * 60_000
+                exp_last_close = ((eff_end_ms + 1) // 60_000) * 60_000 - 1
+                exp_n = max(0, (exp_last_close + 1 - exp_first_open) // 60_000)
+                if exp_n > 0:
+                    has_gap = (
+                        len(out) != exp_n
+                        or out[0].open_time_ms != exp_first_open
+                        or out[-1].close_time_ms != exp_last_close
+                        or (
+                            not self._1m_gap_free[sym]
+                            and any(
+                                out[idx + 1].open_time_ms - out[idx].open_time_ms != 60_000
+                                for idx in range(len(out) - 1)
+                            )
+                        )
+                    )
+                    if has_gap:
+                        self.granularity_violations_count += 1
+                        reason = (
+                            f"INCOMPLETE_AUTHENTIC_1M:{sym}:{start_time_ms}:{end_time_ms}:"
+                            f"got={len(out)},expected={exp_n}"
+                        )
+                        self.granularity_violation_reasons.append(reason)
+                        raise ReplayDataGranularityError(
+                            f"Incomplete authentic 1m coverage in authoritative replay ({reason})"
+                        )
         if out:
             if out[-1].close_time_ms > self._as_of_ms:
                 self.pit_violations_count += 1
@@ -661,6 +789,10 @@ class _InMemoryReplayStateStore(MarketWatchStateStore):
         self._persistent_conn.execute("PRAGMA journal_mode = MEMORY")
         self._evidence_by_id: dict[str, TacticalFeatureEvidenceV2] = {}
         super().__init__(":memory:")
+        self._persistent_conn.execute(
+            "CREATE TRIGGER IF NOT EXISTS skip_replay_assessments "
+            "BEFORE INSERT ON market_watch_assessments BEGIN SELECT RAISE(IGNORE); END"
+        )
 
     def _ensure_dir(self) -> None:
         pass
@@ -679,10 +811,10 @@ class _InMemoryReplayStateStore(MarketWatchStateStore):
         from dataclasses import replace
 
         ev = evidence or getattr(assessment, "feature_evidence", None)
-        if ev is not None:
-            self._evidence_by_id[ev.evidence_id] = ev
         life = str(getattr(assessment, "lifecycle_state", ""))
         if life in ("ARMED", "TRIGGERED"):
+            if ev is not None:
+                self._evidence_by_id[ev.evidence_id] = ev
             super().save_symbol_state(symbol, assessment, now_ms, alert_sent=alert_sent, evidence=ev)
         else:
             a_no_ev = replace(assessment, feature_evidence=None)
@@ -695,7 +827,11 @@ class _InMemoryReplayStateStore(MarketWatchStateStore):
         return super().get_tactical_feature_evidence(evidence_id)
 
     def close(self) -> None:
+        self._evidence_by_id.clear()
         self._persistent_conn.close()
+
+
+_REPLAY_TF_CACHE: dict[tuple[str, str, int, int, int, float, str], TimeframeSnapshot] = {}
 
 
 class DeterministicTacticalReplayRunner:
@@ -706,18 +842,22 @@ class DeterministicTacticalReplayRunner:
         dataset: ReplayDataset,
         config: MarketWatchConfig | None = None,
         evaluate_grid_stride: int = 16,
+        allow_synthetic_1m_for_tests: bool = False,
+        fail_closed_on_missing_1m: bool = True,
     ) -> None:
         self.dataset = dataset
         self.config = config or MarketWatchConfig(symbols=dataset.symbols)
         self.evaluate_grid_stride = max(1, evaluate_grid_stride)
+        self.allow_synthetic_1m_for_tests = allow_synthetic_1m_for_tests
+        self.fail_closed_on_missing_1m = fail_closed_on_missing_1m
 
     def run(self) -> dict[str, Any]:
         validate_oos_partitions(self.dataset.partitions)
+        coverage_1m = self.dataset.validate_authentic_1m_coverage(
+            fail_closed=(not self.allow_synthetic_1m_for_tests and self.fail_closed_on_missing_1m)
+        )
         input_manifest = self.dataset.build_input_manifest(self.config)
         cfg_hash = compute_market_watch_config_hash(self.config)
-
-        # Memoization cache for (symbol, interval, len, last_close_ms, cfg_hash) -> TimeframeSnapshot
-        tf_cache: dict[tuple[str, str, int, int, str], TimeframeSnapshot] = {}
 
         def _cached_compute_tf(
             interval: str,
@@ -730,20 +870,26 @@ class DeterministicTacticalReplayRunner:
                     closed_candles[-1].symbol,
                     interval,
                     len(closed_candles),
+                    closed_candles[0].open_time_ms,
                     closed_candles[-1].close_time_ms,
+                    closed_candles[-1].close,
                     cfg_hash,
                 )
-                cached = tf_cache.get(key)
+                cached = _REPLAY_TF_CACHE.get(key)
                 if cached is not None:
                     return cached
                 res = compute_timeframe_snapshot(interval, closed_candles, None, config)
-                tf_cache[key] = res
+                _REPLAY_TF_CACHE[key] = res
                 return res
             return compute_timeframe_snapshot(interval, closed_candles, forming_candle, config)
 
         store = _InMemoryReplayStateStore()
         try:
-            client = HistoricalReplayClient(self.dataset, self.dataset.step_timestamps_ms[0])
+            client = HistoricalReplayClient(
+                self.dataset,
+                self.dataset.step_timestamps_ms[0],
+                allow_synthetic_1m_for_tests=self.allow_synthetic_1m_for_tests,
+            )
             scanner = MarketWatchScanner(self.config, client, store)
             shadow_mgr = ShadowEvaluationManager(store)
 
@@ -764,13 +910,16 @@ class DeterministicTacticalReplayRunner:
                 patch("btc_quant_agent.market_watch.snapshot.bollinger_width", side_effect=_fast_bb_width_tail140),
                 patch("btc_quant_agent.market_watch.evidence.verify_tactical_evidence_identity", lambda _ev: None),
                 patch("btc_quant_agent.market_watch.evidence.validate_tactical_feature_evidence", lambda _ev: None),
+                patch("btc_quant_agent.market_watch.scanner.time.time", side_effect=lambda: client.as_of_ms / 1000.0),
             ):
+                n_steps = len(self.dataset.step_timestamps_ms)
                 for step_idx, step_ms in enumerate(self.dataset.step_timestamps_ms):
+                    if step_idx > 0 and step_idx % 100 == 0 and n_steps > 200:
+                        print(f"[WP-B] replay step {step_idx}/{n_steps}", flush=True)
                     client.set_as_of_ms(step_ms)
-                    with patch("btc_quant_agent.market_watch.scanner.time.time", return_value=step_ms / 1000.0):
-                        assessments, _alerts = scanner.scan_universe(
-                            symbols=self.dataset.symbols, notify=False
-                        )
+                    assessments, _alerts = scanner.scan_universe(
+                        symbols=self.dataset.symbols, notify=False
+                    )
 
                     # Verify PIT causality at this step
                     if client.max_returned_candle_close_ms > step_ms:
@@ -783,13 +932,31 @@ class DeterministicTacticalReplayRunner:
                         ev = a.feature_evidence or scanner.get_last_evidence(a.symbol)
                         if ev is None:
                             continue
-                        if step_idx == 0 or str(a.lifecycle_state) in ("ARMED", "TRIGGERED"):
+                        is_active_life = str(a.lifecycle_state) in ("ARMED", "TRIGGERED")
+                        is_grid_sample = (step_idx % self.evaluate_grid_stride == 0)
+                        if step_idx == 0 or is_active_life:
                             verify_tactical_evidence_identity(ev)
-                        all_evidences.append(ev)
-                        evidences_by_symbol[a.symbol].append(ev)
-
-                        if step_idx % self.evaluate_grid_stride == 0:
+                        if is_grid_sample:
                             sampled_grid_evidences.append(ev)
+                        if is_active_life or is_grid_sample:
+                            ev_stored = ev
+                        else:
+                            ev_stored = replace(
+                                ev,
+                                rule_score_breakdown=None,
+                                exhaustion=None,
+                                directional_risk_plan=None,
+                                reference_universe_evidence=None,
+                                semantic_identity=None,
+                                market_snapshot_features=replace(
+                                    ev.market_snapshot_features,
+                                    tf_15m=None,
+                                    tf_4h=None,
+                                    derivatives=None,
+                                ),
+                            )
+                        all_evidences.append(ev_stored)
+                        evidences_by_symbol[a.symbol].append(ev_stored)
 
                         # Compute SHADOW_ONLY TrendEvidenceV2Shadow from PIT raw inputs
                         raw_15m = client.klines(a.symbol, "15m", 60)
@@ -816,11 +983,39 @@ class DeterministicTacticalReplayRunner:
                 current_time_ms=self.dataset.data_end_ms,
                 config=self.config,
             )
+            if (
+                not self.allow_synthetic_1m_for_tests
+                and self.fail_closed_on_missing_1m
+                and client.granularity_violations_count > 0
+            ):
+                raise ReplayDataGranularityError(
+                    f"Authoritative replay encountered {client.granularity_violations_count} "
+                    "authentic 1m granularity violation(s) during outcome resolution."
+                )
+
             all_shadow_evals: list[TacticalShadowEvaluationV2] = store.list_shadow_evaluations()
 
             # Evaluate sampled B2B grid shadow episodes
             grid_evals: list[TacticalGridShadowEvaluationV1] = []
             from .grid_shadow import evaluate_grid_shadow_episode
+
+            fut_asmt_times_by_sym: dict[str, list[int]] = {}
+            fut_asmt_rows_by_sym: dict[str, list[dict[str, Any]]] = {}
+            for sym_k, fe_list in evidences_by_symbol.items():
+                fut_asmt_times_by_sym[sym_k] = [fe.decision_time_ms for fe in fe_list]
+                fut_asmt_rows_by_sym[sym_k] = [
+                    {
+                        "symbol": fe.symbol,
+                        "decision_time_ms": fe.decision_time_ms,
+                        "decision_json": {
+                            "grid": fe.grid_advisory_plan.to_dict() if fe.grid_advisory_plan else {}
+                        },
+                        "reason_codes_json": (
+                            list(fe.grid_advisory_plan.reason_codes) if fe.grid_advisory_plan else []
+                        ),
+                    }
+                    for fe in fe_list
+                ]
 
             for gev in sampled_grid_evidences:
                 if gev.grid_advisory_plan is None:
@@ -833,29 +1028,28 @@ class DeterministicTacticalReplayRunner:
                     if gev.grid_advisory_plan.decision != "PAUSE"
                     else ()
                 )
+                c1m_grid = [
+                    replace(
+                        c,
+                        close_time_ms=c.open_time_ms + 60_000,
+                        available_at_ms=c.open_time_ms + 60_000,
+                    )
+                    for c in c1m
+                ]
                 f_hist = (
                     client.funding_rate_history(gev.symbol, gev.decision_time_ms, end_grid_ms)
                     if gev.grid_advisory_plan.decision != "PAUSE"
                     else ()
                 )
-                fut_asmts = [
-                    {
-                        "symbol": fe.symbol,
-                        "decision_time_ms": fe.decision_time_ms,
-                        "decision_json": {
-                            "grid": fe.grid_advisory_plan.to_dict() if fe.grid_advisory_plan else {}
-                        },
-                        "reason_codes_json": (
-                            list(fe.grid_advisory_plan.reason_codes) if fe.grid_advisory_plan else []
-                        ),
-                    }
-                    for fe in evidences_by_symbol.get(gev.symbol, ())
-                    if gev.decision_time_ms < fe.decision_time_ms <= end_grid_ms
-                ]
+                sym_times = fut_asmt_times_by_sym.get(gev.symbol, [])
+                sym_rows = fut_asmt_rows_by_sym.get(gev.symbol, [])
+                fa_s = bisect.bisect_right(sym_times, gev.decision_time_ms)
+                fa_e = bisect.bisect_right(sym_times, end_grid_ms)
+                fut_asmts = sym_rows[fa_s:fa_e]
                 try:
                     g_eval = evaluate_grid_shadow_episode(
                         evidence=gev,
-                        candles_1m=c1m,
+                        candles_1m=c1m_grid,
                         funding_records=f_hist,
                         future_assessments=fut_asmts,
                         assessment_diagnostic_coverage="COMPLETE",
@@ -973,6 +1167,12 @@ class DeterministicTacticalReplayRunner:
             output_manifest_payload, exclude_keys=("output_manifest_hash",)
         )
 
+        authentic_1m_complete = (
+            all(bool(v["complete"]) for v in coverage_1m.values())
+            and client.granularity_violations_count == 0
+            and client.synthetic_1m_queries_count == 0
+        )
+
         integrity_checks = {
             "pit_chronology_manifest_integrity": (
                 client.pit_violations_count == 0 and pit_step_violations == 0
@@ -983,6 +1183,7 @@ class DeterministicTacticalReplayRunner:
             ),
             "no_protected_a_line_outcomes_accessed": True,
             "deterministic_manifest_replay_identical": True,
+            "authentic_1m_data_granularity_complete": authentic_1m_complete,
         }
 
         gate_evaluation = evaluate_decision_quality_gates(
@@ -1000,6 +1201,10 @@ class DeterministicTacticalReplayRunner:
                 "pit_violations_count": client.pit_violations_count + pit_step_violations,
                 "max_returned_candle_close_ms": client.max_returned_candle_close_ms,
                 "data_end_ms": self.dataset.data_end_ms,
+                "authentic_1m_queries_count": client.authentic_1m_queries_count,
+                "synthetic_1m_queries_count": client.synthetic_1m_queries_count,
+                "granularity_violations_count": client.granularity_violations_count,
+                "authentic_1m_coverage_by_symbol": coverage_1m,
             },
             "calibration_metrics": calibration_metrics,
             "rolling_oos_table": partition_metrics_list,
@@ -1018,6 +1223,7 @@ __all__ = [
     "HistoricalReplayClient",
     "OOSPartitionSpec",
     "PITCausalityViolationError",
+    "ReplayDataGranularityError",
     "ReplayDataset",
     "SymbolReplaySeries",
     "validate_oos_partitions",
