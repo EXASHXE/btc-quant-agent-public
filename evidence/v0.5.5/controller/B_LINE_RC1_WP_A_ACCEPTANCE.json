@@ -1,0 +1,41 @@
+{
+  "schema_version": "B_LINE_RC1_WP_A_CONTROLLER_ACCEPTANCE_V1",
+  "work_package": "WP_A",
+  "decision": "WP_A_ACCEPTED_OPERATIONAL_READINESS_PASS",
+  "candidate_sha": "606f286dbb5d7af46776043d1287d9b3e7b1e679",
+  "start_sha": "08e81bec003d645a0a0582db183a1b6916887eff",
+  "parent_sha": "08e81bec003d645a0a0582db183a1b6916887eff",
+  "original_controller_dispatch_sha": "f8e894f2f39adb66340f6bc8cbd803e1b9515b2a",
+  "executor_evidence_metadata_corrections": {
+    "executor_parent_sha": "fde61dafb301d5bd5af3dc7eb81e5618f979036c",
+    "corrected_parent_sha": "08e81bec003d645a0a0582db183a1b6916887eff",
+    "executor_final_sha": "Resolve from terminal branch commit HEAD",
+    "corrected_final_sha": "606f286dbb5d7af46776043d1287d9b3e7b1e679"
+  },
+  "certified_runtime": {
+    "os_family": "Linux/POSIX",
+    "python": "3.12.3",
+    "process_model": "single canonical uvicorn worker",
+    "startup_contract": "SERIALIZED_SINGLE_RUNTIME_INITIALIZER",
+    "python_3_13_certified": false,
+    "native_windows_certified": false
+  },
+  "tests_reported": {
+    "cold_start_runs": 30,
+    "contenders_per_run": 6,
+    "contender_attempts": 180,
+    "restart_cycles": 30,
+    "position_supervisor_outbox_passed": 213,
+    "runtime_account_stream_passed": 74,
+    "r6_r3_r4_passed": 208,
+    "all_live_v1_passed": 612,
+    "tactical_guards_passed": 154
+  },
+  "remote_ci_status": "NO_REMOTE_WORKFLOW_OR_COMMIT_STATUS_OBSERVED",
+  "safety": {
+    "real_funds_write_authority": "NONE",
+    "real_funds_write_count": 0,
+    "live_approval_only": "NOT_AUTHORIZED",
+    "autonomous_live": "FORBIDDEN"
+  }
+}
