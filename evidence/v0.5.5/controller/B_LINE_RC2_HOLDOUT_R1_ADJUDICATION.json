@@ -1,0 +1,53 @@
+{
+  "schema_version": "B_LINE_RC2_HOLDOUT_R1_CONTROLLER_ADJUDICATION_V1",
+  "validation_sha": "f5da2f2f90d55da42563a21d61faa05d1fd4ecc0",
+  "frozen_candidate_sha": "10be512f2cf4d7eccdc8a9849c925b5f73c568fd",
+  "executor_result": "RC2_TACTICAL_HOLDOUT_FAIL",
+  "controller_disposition": "RC2_HOLDOUT_R1_INVALID_METHOD__NOT_POLICY_FAIL__PROTECTED_UNIVERSE_BURNED",
+  "defects": [
+    "MISSING_PRODUCTION_REFERENCE_CONTEXT",
+    "INSUFFICIENT_PRE_DECISION_WARMUP"
+  ],
+  "production_semantic_effects": [
+    "BTC_MISSING_FORCES_BENCHMARK_NEUTRAL",
+    "BTC_RISK_OFF_AND_VOLATILITY_SHOCK_VETOES_ABSENT",
+    "RELATIVE_STRENGTH_CONTEXT_INCOMPLETE",
+    "296_OOS_STEPS_PER_SYMBOL_FAIL_CLOSED_FOR_HISTORY"
+  ],
+  "burned_target_symbols": [
+    "ADAUSDT",
+    "AVAXUSDT",
+    "LTCUSDT",
+    "TRXUSDT",
+    "BCHUSDT",
+    "DOTUSDT",
+    "ATOMUSDT",
+    "NEARUSDT"
+  ],
+  "candidate_retired": false,
+  "candidate_mutation_allowed": false,
+  "fresh_holdout_authorized": true,
+  "fresh_target_symbols": [
+    "FILUSDT",
+    "ETCUSDT",
+    "AAVEUSDT",
+    "XLMUSDT",
+    "UNIUSDT",
+    "ICPUSDT",
+    "ARBUSDT",
+    "OPUSDT"
+  ],
+  "context_only_symbols": [
+    "BTCUSDT",
+    "ETHUSDT",
+    "SOLUSDT",
+    "LINKUSDT",
+    "SUIUSDT",
+    "XRPUSDT",
+    "DOGEUSDT",
+    "BNBUSDT"
+  ],
+  "safety": {
+    "real_funds_write_authority": "NONE"
+  }
+}
