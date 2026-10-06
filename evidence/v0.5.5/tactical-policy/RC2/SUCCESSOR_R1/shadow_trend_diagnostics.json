@@ -1,0 +1,202 @@
+{
+  "active_policy_influence": "NONE",
+  "authority": "SHADOW_ONLY",
+  "by_structure_transition": {
+    "CONTINUATION_DOWN": {
+      "count": 2344,
+      "mean_adx_slope": 0.187734,
+      "mean_net_R": -0.183461,
+      "mean_pullback_depth_atr": 2.157801,
+      "mean_trend_age": 6.901,
+      "mean_trend_persistence": 0.65529,
+      "median_net_R": -1.2156,
+      "resolved_actionable_count": 9,
+      "share": 0.117388
+    },
+    "CONTINUATION_UP": {
+      "count": 4252,
+      "mean_adx_slope": 0.179224,
+      "mean_net_R": 0.143919,
+      "mean_pullback_depth_atr": 1.939743,
+      "mean_trend_age": 12.5974,
+      "mean_trend_persistence": 0.704688,
+      "median_net_R": -1.18425,
+      "resolved_actionable_count": 14,
+      "share": 0.212941
+    },
+    "RANGE_TO_TREND_DOWN": {
+      "count": 1864,
+      "mean_adx_slope": -0.139005,
+      "mean_net_R": null,
+      "mean_pullback_depth_atr": 2.208954,
+      "mean_trend_age": 6.2339,
+      "mean_trend_persistence": 0.683834,
+      "median_net_R": null,
+      "resolved_actionable_count": 0,
+      "share": 0.093349
+    },
+    "RANGE_TO_TREND_UP": {
+      "count": 2272,
+      "mean_adx_slope": -0.303901,
+      "mean_net_R": null,
+      "mean_pullback_depth_atr": 1.959303,
+      "mean_trend_age": 6.4525,
+      "mean_trend_persistence": 0.598298,
+      "median_net_R": null,
+      "resolved_actionable_count": 0,
+      "share": 0.113782
+    },
+    "REVERSAL_DOWN_TO_UP": {
+      "count": 384,
+      "mean_adx_slope": -0.344627,
+      "mean_net_R": 0.391242,
+      "mean_pullback_depth_atr": 1.870255,
+      "mean_trend_age": 3.9479,
+      "mean_trend_persistence": 0.588542,
+      "median_net_R": -0.01411,
+      "resolved_actionable_count": 4,
+      "share": 0.019231
+    },
+    "REVERSAL_UP_TO_DOWN": {
+      "count": 376,
+      "mean_adx_slope": -0.370735,
+      "mean_net_R": -1.5673,
+      "mean_pullback_depth_atr": 2.31824,
+      "mean_trend_age": 4.383,
+      "mean_trend_persistence": 0.625,
+      "median_net_R": -1.5673,
+      "resolved_actionable_count": 1,
+      "share": 0.01883
+    },
+    "STABLE_RANGE": {
+      "count": 4368,
+      "mean_adx_slope": -0.084985,
+      "mean_net_R": -0.386026,
+      "mean_pullback_depth_atr": 2.160323,
+      "mean_trend_age": 6.5009,
+      "mean_trend_persistence": 0.618513,
+      "median_net_R": -1.256519,
+      "resolved_actionable_count": 16,
+      "share": 0.21875
+    },
+    "TREND_TO_RANGE": {
+      "count": 4108,
+      "mean_adx_slope": -0.266413,
+      "mean_net_R": null,
+      "mean_pullback_depth_atr": 2.021347,
+      "mean_trend_age": 6.3418,
+      "mean_trend_persistence": 0.642405,
+      "median_net_R": null,
+      "resolved_actionable_count": 0,
+      "share": 0.205729
+    }
+  },
+  "by_trend_transition_state": {
+    "EMERGING_TREND": {
+      "count": 3988,
+      "mean_adx_slope": -0.191227,
+      "mean_net_R": -0.75478,
+      "mean_pullback_depth_atr": 1.949277,
+      "mean_trend_age": 5.3225,
+      "mean_trend_persistence": 0.610603,
+      "median_net_R": -1.4145,
+      "resolved_actionable_count": 4,
+      "share": 0.19972
+    },
+    "EXHAUSTING_TREND": {
+      "count": 350,
+      "mean_adx_slope": -0.552959,
+      "mean_net_R": null,
+      "mean_pullback_depth_atr": 2.553619,
+      "mean_trend_age": 25.4886,
+      "mean_trend_persistence": 0.932857,
+      "median_net_R": null,
+      "resolved_actionable_count": 0,
+      "share": 0.017528
+    },
+    "MATURE_TREND": {
+      "count": 848,
+      "mean_adx_slope": 0.530566,
+      "mean_net_R": -0.19886,
+      "mean_pullback_depth_atr": 2.187365,
+      "mean_trend_age": 20.6073,
+      "mean_trend_persistence": 0.948703,
+      "median_net_R": -1.1389,
+      "resolved_actionable_count": 6,
+      "share": 0.042468
+    },
+    "PULLBACK_IN_TREND": {
+      "count": 2937,
+      "mean_adx_slope": 0.188479,
+      "mean_net_R": -0.487611,
+      "mean_pullback_depth_atr": 1.472061,
+      "mean_trend_age": 18.1318,
+      "mean_trend_persistence": 0.871439,
+      "median_net_R": -1.4978,
+      "resolved_actionable_count": 11,
+      "share": 0.147085
+    },
+    "RANGE_BOUND": {
+      "count": 4011,
+      "mean_adx_slope": -0.536828,
+      "mean_net_R": 0.789269,
+      "mean_pullback_depth_atr": 2.212434,
+      "mean_trend_age": 0.2947,
+      "mean_trend_persistence": 0.492521,
+      "median_net_R": 0.508649,
+      "resolved_actionable_count": 8,
+      "share": 0.200871
+    },
+    "TRANSITION_TO_RANGE": {
+      "count": 1773,
+      "mean_adx_slope": -0.599792,
+      "mean_net_R": null,
+      "mean_pullback_depth_atr": 2.039368,
+      "mean_trend_age": 0.3158,
+      "mean_trend_persistence": 0.508225,
+      "median_net_R": null,
+      "resolved_actionable_count": 0,
+      "share": 0.088792
+    },
+    "VOLATILITY_SHOCK": {
+      "count": 6061,
+      "mean_adx_slope": 0.277921,
+      "mean_net_R": -0.170212,
+      "mean_pullback_depth_atr": 2.288209,
+      "mean_trend_age": 8.4169,
+      "mean_trend_persistence": 0.654334,
+      "median_net_R": -1.2107,
+      "resolved_actionable_count": 15,
+      "share": 0.303536
+    }
+  },
+  "feature_means": {
+    "adx_slope": -0.074361,
+    "bars_since_breakout": 6.244477,
+    "basis_delta": -7.5e-05,
+    "ema_slope_acceleration": 0.001699,
+    "funding_delta": 0.0,
+    "oi_acceleration": 6e-06,
+    "price_oi_divergence": 0.0002,
+    "pullback_depth_atr": 2.063528,
+    "trend_age": 7.69391,
+    "trend_persistence": 0.649439
+  },
+  "fields_present": [
+    "trend_age",
+    "trend_persistence",
+    "adx_slope",
+    "ema_slope_acceleration",
+    "structure_transition",
+    "bars_since_breakout",
+    "pullback_depth_atr",
+    "oi_acceleration",
+    "price_oi_divergence",
+    "funding_delta",
+    "basis_delta",
+    "trend_transition_state"
+  ],
+  "pit_safe_all": true,
+  "sample_count": 19968,
+  "schema_version": "TREND_EVIDENCE_V2_SHADOW"
+}

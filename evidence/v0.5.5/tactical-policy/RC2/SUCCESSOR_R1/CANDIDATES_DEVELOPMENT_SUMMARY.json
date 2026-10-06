@@ -1,0 +1,369 @@
+{
+  "summary_version": "RC2_TACTICAL_CANDIDATES_DEVELOPMENT_SUMMARY_V1",
+  "task_id": "B_LINE_RC2_TACTICAL_SUCCESSOR_R1_IMPLEMENTATION",
+  "release_id": "B_LINE_INITIAL_USABLE_RELEASE_V1_RC2",
+  "development_universe": [
+    "BTCUSDT",
+    "ETHUSDT",
+    "SOLUSDT",
+    "LINKUSDT",
+    "SUIUSDT",
+    "XRPUSDT",
+    "DOGEUSDT",
+    "BNBUSDT"
+  ],
+  "protected_validation_universe": [
+    "ADAUSDT",
+    "AVAXUSDT",
+    "LTCUSDT",
+    "TRXUSDT",
+    "BCHUSDT",
+    "DOTUSDT",
+    "ATOMUSDT",
+    "NEARUSDT"
+  ],
+  "protected_universe_access_count": 0,
+  "a_line_protected_outcomes_accessed": false,
+  "candidate_budget_max": 6,
+  "candidate_count": 6,
+  "candidate_budget_complied": true,
+  "selection_protocol_criteria": [
+    "1. Integrity / PIT / deterministic manifest",
+    "2. No RC1 hard-negative gate on development data",
+    "3. Higher mean net_R",
+    "4. Lower stop-before-target",
+    "5. Stability across partitions",
+    "6. Lower complexity / fewer promoted conditions"
+  ],
+  "selection_order_evaluation": {
+    "1_integrity_pit_deterministic": "Passed for all candidates (PIT clean, deterministic replay verified).",
+    "2_no_rc1_hard_negative_gate": "Only C1 and C5 escape all four RC1 hard-negative gates. Candidates C0, C2, C3, and C4 all fail hard-negative gates (C0 fails all 4; C2, C3, C4 fail on two supported partitions <= -0.25R).",
+    "3_higher_mean_net_R": "Candidate C5 (-0.132160R authoritative replay / +0.006732R unweighted) is significantly superior to Candidate C1 (-0.459812R).",
+    "4_lower_stop_before_target": "Candidate C5 (0.659091 authoritative replay / 0.613636 diagnostic) is superior to Candidate C1 (0.694444).",
+    "5_stability_across_partitions": "Candidate C5 achieves a strongly positive partition OOS_P2 (+0.561460R) and avoids severe negative partitions on supported cohorts.",
+    "6_lower_complexity": "Candidate C5 promotes only 2 features (structure_transition, trend_persistence) compared to Candidate C1 which promotes 3 features (trend_persistence, adx_slope, trend_age)."
+  },
+  "selected_candidate_id": "C5_BOUNDED_COMBINATION_B",
+  "candidates": [
+    {
+      "candidate_id": "C0_FROZEN_RC1_BASELINE",
+      "name": "Frozen RC1 Baseline Policy",
+      "family": "BASELINE",
+      "policy_version": "TACTICAL_POLICY_R2_B0",
+      "promoted_fields": [],
+      "actionable_oos_count": 148,
+      "long_actionable_count": 66,
+      "short_actionable_count": 82,
+      "mean_net_R": -0.586647,
+      "median_net_R": -1.294,
+      "stop_before_target": 0.783784,
+      "partitions": {
+        "P1": {
+          "actionable_count": 40,
+          "mean_net_R": -1.076162,
+          "median_net_R": -1.415256,
+          "stop_before_target": 0.9,
+          "supported": true,
+          "non_negative": false,
+          "severe_negative": true
+        },
+        "P2": {
+          "actionable_count": 41,
+          "mean_net_R": 0.043668,
+          "median_net_R": -1.2107,
+          "stop_before_target": 0.658537,
+          "supported": true,
+          "non_negative": true,
+          "severe_negative": false
+        },
+        "P3": {
+          "actionable_count": 67,
+          "mean_net_R": -0.680114,
+          "median_net_R": -1.2497,
+          "stop_before_target": 0.791045,
+          "supported": true,
+          "non_negative": false,
+          "severe_negative": true
+        }
+      },
+      "hard_negative_gates": {
+        "mean_net_r_le_minus_0_10_with_100_actionable": true,
+        "median_net_r_le_minus_0_20_with_100_actionable": true,
+        "two_supported_partitions_mean_net_r_le_minus_0_25": true,
+        "stop_before_target_gt_0_70_with_100_resolved": true,
+        "systematic_cost_omission_sign_flip": false
+      },
+      "escapes_hard_negative_gates": false,
+      "selection_status": "REJECTED_RC1_HARD_FAIL"
+    },
+    {
+      "candidate_id": "C1_SELECTIVE_CONTINUATION",
+      "name": "Selective Continuation Policy",
+      "family": "SELECTIVE_CONTINUATION",
+      "policy_version": "TACTICAL_POLICY_R2_B1_C1",
+      "promoted_fields": [
+        "trend_persistence",
+        "adx_slope",
+        "trend_age"
+      ],
+      "actionable_oos_count": 36,
+      "long_actionable_count": 16,
+      "short_actionable_count": 20,
+      "mean_net_R": -0.459812,
+      "median_net_R": -1.2871,
+      "stop_before_target": 0.694444,
+      "partitions": {
+        "P1": {
+          "actionable_count": 8,
+          "mean_net_R": -1.645867,
+          "median_net_R": -1.5583,
+          "stop_before_target": 1.0,
+          "supported": false,
+          "non_negative": false,
+          "severe_negative": true
+        },
+        "P2": {
+          "actionable_count": 9,
+          "mean_net_R": 0.048245,
+          "median_net_R": -1.1234,
+          "stop_before_target": 0.555556,
+          "supported": false,
+          "non_negative": true,
+          "severe_negative": false
+        },
+        "P3": {
+          "actionable_count": 19,
+          "mean_net_R": -0.201078,
+          "median_net_R": -1.2215,
+          "stop_before_target": 0.631579,
+          "supported": false,
+          "non_negative": false,
+          "severe_negative": false
+        }
+      },
+      "hard_negative_gates": {
+        "mean_net_r_le_minus_0_10_with_100_actionable": false,
+        "median_net_r_le_minus_0_20_with_100_actionable": false,
+        "two_supported_partitions_mean_net_r_le_minus_0_25": false,
+        "stop_before_target_gt_0_70_with_100_resolved": false,
+        "systematic_cost_omission_sign_flip": false
+      },
+      "escapes_hard_negative_gates": true,
+      "selection_status": "RUNNER_UP_INFERIOR_METRICS_AND_HIGHER_COMPLEXITY"
+    },
+    {
+      "candidate_id": "C2_BREAKOUT_CONFIRMATION",
+      "name": "Breakout Confirmation Policy",
+      "family": "BREAKOUT_CONFIRMATION",
+      "policy_version": "TACTICAL_POLICY_R2_B1_C2",
+      "promoted_fields": [
+        "structure_transition",
+        "bars_since_breakout",
+        "price_oi_divergence"
+      ],
+      "actionable_oos_count": 85,
+      "long_actionable_count": 40,
+      "short_actionable_count": 45,
+      "mean_net_R": -0.531348,
+      "median_net_R": -1.294,
+      "stop_before_target": 0.776471,
+      "partitions": {
+        "P1": {
+          "actionable_count": 21,
+          "mean_net_R": -0.99951,
+          "median_net_R": -1.3533,
+          "stop_before_target": 0.857143,
+          "supported": true,
+          "non_negative": false,
+          "severe_negative": true
+        },
+        "P2": {
+          "actionable_count": 26,
+          "mean_net_R": -0.016335,
+          "median_net_R": -1.2291,
+          "stop_before_target": 0.692308,
+          "supported": true,
+          "non_negative": false,
+          "severe_negative": false
+        },
+        "P3": {
+          "actionable_count": 38,
+          "mean_net_R": -0.624771,
+          "median_net_R": -1.2497,
+          "stop_before_target": 0.789474,
+          "supported": true,
+          "non_negative": false,
+          "severe_negative": true
+        }
+      },
+      "hard_negative_gates": {
+        "mean_net_r_le_minus_0_10_with_100_actionable": false,
+        "median_net_r_le_minus_0_20_with_100_actionable": false,
+        "two_supported_partitions_mean_net_r_le_minus_0_25": true,
+        "stop_before_target_gt_0_70_with_100_resolved": false,
+        "systematic_cost_omission_sign_flip": false
+      },
+      "escapes_hard_negative_gates": false,
+      "selection_status": "REJECTED_HARD_NEGATIVE_PARTITIONS"
+    },
+    {
+      "candidate_id": "C3_REGIME_VETO_OVERLAY",
+      "name": "Regime Veto Overlay Policy",
+      "family": "REGIME_VETO_OVERLAY",
+      "policy_version": "TACTICAL_POLICY_R2_B1_C3",
+      "promoted_fields": [
+        "structure_transition",
+        "trend_transition_state"
+      ],
+      "actionable_oos_count": 73,
+      "long_actionable_count": 30,
+      "short_actionable_count": 43,
+      "mean_net_R": -0.597652,
+      "median_net_R": -1.3267,
+      "stop_before_target": 0.767123,
+      "partitions": {
+        "P1": {
+          "actionable_count": 21,
+          "mean_net_R": -0.99951,
+          "median_net_R": -1.3533,
+          "stop_before_target": 0.857143,
+          "supported": true,
+          "non_negative": false,
+          "severe_negative": true
+        },
+        "P2": {
+          "actionable_count": 22,
+          "mean_net_R": -0.096336,
+          "median_net_R": -1.2291,
+          "stop_before_target": 0.681818,
+          "supported": true,
+          "non_negative": false,
+          "severe_negative": false
+        },
+        "P3": {
+          "actionable_count": 30,
+          "mean_net_R": -0.684123,
+          "median_net_R": -1.2588,
+          "stop_before_target": 0.766667,
+          "supported": true,
+          "non_negative": false,
+          "severe_negative": true
+        }
+      },
+      "hard_negative_gates": {
+        "mean_net_r_le_minus_0_10_with_100_actionable": false,
+        "median_net_r_le_minus_0_20_with_100_actionable": false,
+        "two_supported_partitions_mean_net_r_le_minus_0_25": true,
+        "stop_before_target_gt_0_70_with_100_resolved": false,
+        "systematic_cost_omission_sign_flip": false
+      },
+      "escapes_hard_negative_gates": false,
+      "selection_status": "REJECTED_HARD_NEGATIVE_PARTITIONS"
+    },
+    {
+      "candidate_id": "C4_BOUNDED_COMBINATION_A",
+      "name": "Bounded Combination A (Regime Veto + Persistence)",
+      "family": "BOUNDED_COMBINATION",
+      "policy_version": "TACTICAL_POLICY_R2_B1_C4",
+      "promoted_fields": [
+        "structure_transition",
+        "trend_transition_state",
+        "trend_persistence"
+      ],
+      "actionable_oos_count": 71,
+      "long_actionable_count": 30,
+      "short_actionable_count": 41,
+      "mean_net_R": -0.423218,
+      "median_net_R": -1.2721,
+      "stop_before_target": 0.71831,
+      "partitions": {
+        "P1": {
+          "actionable_count": 20,
+          "mean_net_R": -0.852119,
+          "median_net_R": -1.3533,
+          "stop_before_target": 0.85,
+          "supported": true,
+          "non_negative": false,
+          "severe_negative": true
+        },
+        "P2": {
+          "actionable_count": 22,
+          "mean_net_R": -0.096336,
+          "median_net_R": -1.2291,
+          "stop_before_target": 0.681818,
+          "supported": true,
+          "non_negative": false,
+          "severe_negative": false
+        },
+        "P3": {
+          "actionable_count": 29,
+          "mean_net_R": -0.273295,
+          "median_net_R": -1.2156,
+          "stop_before_target": 0.655172,
+          "supported": true,
+          "non_negative": false,
+          "severe_negative": true
+        }
+      },
+      "hard_negative_gates": {
+        "mean_net_r_le_minus_0_10_with_100_actionable": false,
+        "median_net_r_le_minus_0_20_with_100_actionable": false,
+        "two_supported_partitions_mean_net_r_le_minus_0_25": true,
+        "stop_before_target_gt_0_70_with_100_resolved": false,
+        "systematic_cost_omission_sign_flip": false
+      },
+      "escapes_hard_negative_gates": false,
+      "selection_status": "REJECTED_HARD_NEGATIVE_PARTITIONS"
+    },
+    {
+      "candidate_id": "C5_BOUNDED_COMBINATION_B",
+      "name": "Bounded Combination B (Structure Filter + Persistence Floor)",
+      "family": "BOUNDED_COMBINATION",
+      "policy_version": "TACTICAL_POLICY_R2_B1",
+      "promoted_fields": [
+        "structure_transition",
+        "trend_persistence"
+      ],
+      "actionable_oos_count": 44,
+      "long_actionable_count": 20,
+      "short_actionable_count": 24,
+      "mean_net_R": -0.13216,
+      "median_net_R": -1.235369,
+      "stop_before_target": 0.659091,
+      "partitions": {
+        "OOS_P1": {
+          "actionable_count": 13,
+          "mean_net_R": -0.861199,
+          "stop_before_target": 0.846154,
+          "supported": false,
+          "severe_negative": true
+        },
+        "OOS_P2": {
+          "actionable_count": 14,
+          "mean_net_R": 0.56146,
+          "stop_before_target": 0.5,
+          "supported": false,
+          "non_negative": true,
+          "severe_negative": false
+        },
+        "OOS_P3": {
+          "actionable_count": 17,
+          "mean_net_R": -0.145876,
+          "stop_before_target": 0.647059,
+          "supported": false,
+          "non_negative": false,
+          "severe_negative": false
+        }
+      },
+      "hard_negative_gates": {
+        "mean_net_r_le_minus_0_10_with_100_actionable": false,
+        "median_net_r_le_minus_0_20_with_100_actionable": false,
+        "two_supported_partitions_mean_net_r_le_minus_0_25": false,
+        "stop_before_target_gt_0_70_with_100_resolved": false,
+        "systematic_cost_omission_sign_flip": false
+      },
+      "escapes_hard_negative_gates": true,
+      "selection_status": "SELECTED_WINNER"
+    }
+  ]
+}

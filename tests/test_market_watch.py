@@ -1962,6 +1962,10 @@ def test_r2_01_two_run_scanner_breakout_persist_to_retest_triggered() -> None:
             regime=Regime.TREND_UP,
         )
 
+        mock_trend = MagicMock()
+        mock_trend.structure_transition = "CONTINUATION_UP"
+        mock_trend.trend_persistence = 0.80
+
         snap_n1 = MarketSnapshot(
             symbol=symbol,
             decision_time_ms=t_n1,
@@ -1973,6 +1977,7 @@ def test_r2_01_two_run_scanner_breakout_persist_to_retest_triggered() -> None:
             tf_4h=tf_4h_n,
             derivatives=deriv_n,
             snapshot_hash="snap_n1",
+            trend_evidence=mock_trend,
         )
         scanner.collect_symbol_snapshot = MagicMock(return_value=(snap_n1, ScanHealth.OK, {}))  # type: ignore[method-assign]
 

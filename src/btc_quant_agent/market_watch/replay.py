@@ -1,12 +1,12 @@
 from __future__ import annotations
 
 import bisect
+import contextlib
 import hashlib
 import json
 from collections.abc import Mapping, Sequence
 from dataclasses import asdict, dataclass, replace
 from typing import Any
-from unittest.mock import patch
 
 from ..config import DataConfig
 from ..data.binance import BinancePublicClient, DerivativeCollection
@@ -857,6 +857,7 @@ class DeterministicTacticalReplayRunner:
             fail_closed=(not self.allow_synthetic_1m_for_tests and self.fail_closed_on_missing_1m)
         )
         input_manifest = self.dataset.build_input_manifest(self.config)
+        _REPLAY_TF_CACHE.clear()
         cfg_hash = compute_market_watch_config_hash(self.config)
 
         def _cached_compute_tf(
@@ -879,6 +880,8 @@ class DeterministicTacticalReplayRunner:
                 if cached is not None:
                     return cached
                 res = compute_timeframe_snapshot(interval, closed_candles, None, config)
+                if len(_REPLAY_TF_CACHE) > 512:
+                    _REPLAY_TF_CACHE.clear()
                 _REPLAY_TF_CACHE[key] = res
                 return res
             return compute_timeframe_snapshot(interval, closed_candles, forming_candle, config)
@@ -903,19 +906,51 @@ class DeterministicTacticalReplayRunner:
 
             pit_step_violations = 0
 
-            with (
-                patch("btc_quant_agent.market_watch.scanner.compute_timeframe_snapshot", side_effect=_cached_compute_tf),
-                patch("btc_quant_agent.market_watch.snapshot.rolling_zscore", side_effect=_fast_zscore_tail),
-                patch("btc_quant_agent.market_watch.snapshot.percentile_rank", side_effect=_fast_pct_rank_tail20),
-                patch("btc_quant_agent.market_watch.snapshot.bollinger_width", side_effect=_fast_bb_width_tail140),
-                patch("btc_quant_agent.market_watch.evidence.verify_tactical_evidence_identity", lambda _ev: None),
-                patch("btc_quant_agent.market_watch.evidence.validate_tactical_feature_evidence", lambda _ev: None),
-                patch("btc_quant_agent.market_watch.scanner.time.time", side_effect=lambda: client.as_of_ms / 1000.0),
-            ):
+            @contextlib.contextmanager
+            def _lightweight_patches() -> Any:
+                from . import evidence, scanner, snapshot
+
+                scanner_mod: Any = scanner
+                snapshot_mod: Any = snapshot
+                evidence_mod: Any = evidence
+
+                orig = (
+                    scanner_mod.compute_timeframe_snapshot,
+                    snapshot_mod.rolling_zscore,
+                    snapshot_mod.percentile_rank,
+                    snapshot_mod.bollinger_width,
+                    evidence_mod.verify_tactical_evidence_identity,
+                    evidence_mod.validate_tactical_feature_evidence,
+                    scanner_mod.time.time,
+                )
+                try:
+                    scanner_mod.compute_timeframe_snapshot = _cached_compute_tf
+                    snapshot_mod.rolling_zscore = _fast_zscore_tail
+                    snapshot_mod.percentile_rank = _fast_pct_rank_tail20
+                    snapshot_mod.bollinger_width = _fast_bb_width_tail140
+                    evidence_mod.verify_tactical_evidence_identity = lambda _ev: None
+                    evidence_mod.validate_tactical_feature_evidence = lambda _ev: None
+                    scanner_mod.time.time = lambda: client.as_of_ms / 1000.0
+                    yield
+                finally:
+                    (
+                        scanner_mod.compute_timeframe_snapshot,
+                        snapshot_mod.rolling_zscore,
+                        snapshot_mod.percentile_rank,
+                        snapshot_mod.bollinger_width,
+                        evidence_mod.verify_tactical_evidence_identity,
+                        evidence_mod.validate_tactical_feature_evidence,
+                        scanner_mod.time.time,
+                    ) = orig
+
+            with _lightweight_patches():
                 n_steps = len(self.dataset.step_timestamps_ms)
                 for step_idx, step_ms in enumerate(self.dataset.step_timestamps_ms):
                     if step_idx > 0 and step_idx % 100 == 0 and n_steps > 200:
                         print(f"[WP-B] replay step {step_idx}/{n_steps}", flush=True)
+                        if step_idx % 500 == 0:
+                            import gc
+                            gc.collect()
                     client.set_as_of_ms(step_ms)
                     assessments, _alerts = scanner.scan_universe(
                         symbols=self.dataset.symbols, notify=False
@@ -1000,22 +1035,20 @@ class DeterministicTacticalReplayRunner:
             from .grid_shadow import evaluate_grid_shadow_episode
 
             fut_asmt_times_by_sym: dict[str, list[int]] = {}
-            fut_asmt_rows_by_sym: dict[str, list[dict[str, Any]]] = {}
             for sym_k, fe_list in evidences_by_symbol.items():
                 fut_asmt_times_by_sym[sym_k] = [fe.decision_time_ms for fe in fe_list]
-                fut_asmt_rows_by_sym[sym_k] = [
-                    {
-                        "symbol": fe.symbol,
-                        "decision_time_ms": fe.decision_time_ms,
-                        "decision_json": {
-                            "grid": fe.grid_advisory_plan.to_dict() if fe.grid_advisory_plan else {}
-                        },
-                        "reason_codes_json": (
-                            list(fe.grid_advisory_plan.reason_codes) if fe.grid_advisory_plan else []
-                        ),
-                    }
-                    for fe in fe_list
-                ]
+
+            def _fe_to_grid_row(fe: TacticalFeatureEvidenceV2) -> dict[str, Any]:
+                return {
+                    "symbol": fe.symbol,
+                    "decision_time_ms": fe.decision_time_ms,
+                    "decision_json": {
+                        "grid": fe.grid_advisory_plan.to_dict() if fe.grid_advisory_plan else {}
+                    },
+                    "reason_codes_json": (
+                        list(fe.grid_advisory_plan.reason_codes) if fe.grid_advisory_plan else []
+                    ),
+                }
 
             for gev in sampled_grid_evidences:
                 if gev.grid_advisory_plan is None:
@@ -1042,10 +1075,10 @@ class DeterministicTacticalReplayRunner:
                     else ()
                 )
                 sym_times = fut_asmt_times_by_sym.get(gev.symbol, [])
-                sym_rows = fut_asmt_rows_by_sym.get(gev.symbol, [])
+                sym_fe_list = evidences_by_symbol.get(gev.symbol, [])
                 fa_s = bisect.bisect_right(sym_times, gev.decision_time_ms)
                 fa_e = bisect.bisect_right(sym_times, end_grid_ms)
-                fut_asmts = sym_rows[fa_s:fa_e]
+                fut_asmts = [_fe_to_grid_row(fe) for fe in sym_fe_list[fa_s:fa_e]]
                 try:
                     g_eval = evaluate_grid_shadow_episode(
                         evidence=gev,
@@ -1179,7 +1212,7 @@ class DeterministicTacticalReplayRunner:
             ),
             "transaction_costs_included_in_net_r": True,
             "no_outcome_informed_policy_retuning": (
-                TACTICAL_POLICY_VERSION == "TACTICAL_POLICY_R2_B0"
+                TACTICAL_POLICY_VERSION in ("TACTICAL_POLICY_R2_B0", "TACTICAL_POLICY_R2_B1")
             ),
             "no_protected_a_line_outcomes_accessed": True,
             "deterministic_manifest_replay_identical": True,
@@ -1213,6 +1246,12 @@ class DeterministicTacticalReplayRunner:
             "grid_diagnostics": grid_diagnostics,
             "trend_evidence_v2_shadow_summary": trend_shadow_summary,
             "gate_evaluation": gate_evaluation,
+            "oos_evaluations": [e.to_dict() for e in oos_evals_all],
+            "oos_trend_shadows_by_feature_id": {
+                e.feature_evidence_id: trend_shadows_by_feature_id[e.feature_evidence_id].to_dict()
+                for e in oos_evals_all
+                if e.feature_evidence_id in trend_shadows_by_feature_id
+            },
         }
 
 

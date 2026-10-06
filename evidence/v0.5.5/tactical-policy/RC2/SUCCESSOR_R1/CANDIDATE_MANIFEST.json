@@ -1,0 +1,216 @@
+{
+  "manifest_version": "RC2_TACTICAL_CANDIDATE_MANIFEST_V1",
+  "task_id": "B_LINE_RC2_TACTICAL_SUCCESSOR_R1_IMPLEMENTATION",
+  "release_id": "B_LINE_INITIAL_USABLE_RELEASE_V1_RC2",
+  "candidate_budget_max": 6,
+  "candidate_count": 6,
+  "candidate_budget_complied": true,
+  "development_universe": [
+    "BTCUSDT",
+    "ETHUSDT",
+    "SOLUSDT",
+    "LINKUSDT",
+    "SUIUSDT",
+    "XRPUSDT",
+    "DOGEUSDT",
+    "BNBUSDT"
+  ],
+  "protected_validation_universe": [
+    "ADAUSDT",
+    "AVAXUSDT",
+    "LTCUSDT",
+    "TRXUSDT",
+    "BCHUSDT",
+    "DOTUSDT",
+    "ATOMUSDT",
+    "NEARUSDT"
+  ],
+  "protected_universe_access_count": 0,
+  "candidates": [
+    {
+      "candidate_id": "C0_FROZEN_RC1_BASELINE",
+      "family": "BASELINE",
+      "name": "Frozen RC1 Baseline Policy",
+      "policy_version": "TACTICAL_POLICY_R2_B0",
+      "description": "Frozen RC1 decision policy without promoted trend/structure evidence.",
+      "promoted_rules": [],
+      "rule_differences": "Baseline frozen policy, no promoted rules or threshold modifications."
+    },
+    {
+      "candidate_id": "C1_SELECTIVE_CONTINUATION",
+      "family": "SELECTIVE_CONTINUATION",
+      "name": "Selective Continuation Policy",
+      "policy_version": "TACTICAL_POLICY_R2_B1_C1",
+      "description": "Requires trend persistence and momentum slope agreement; rejects late/exhausted continuation.",
+      "promoted_rules": [
+        {
+          "field": "trend_persistence",
+          "source_field": "TrendEvidenceV2Shadow.trend_persistence",
+          "computation_version": "TREND_EVIDENCE_V2_SHADOW",
+          "type": "ENTRY_REQUIREMENT",
+          "condition": "trend_persistence >= 0.55",
+          "missing_data_behavior": "FAIL_CLOSED_TO_WAIT",
+          "reason_code": "VETO_INSUFFICIENT_TREND_PERSISTENCE"
+        },
+        {
+          "field": "adx_slope",
+          "source_field": "TrendEvidenceV2Shadow.adx_slope",
+          "computation_version": "TREND_EVIDENCE_V2_SHADOW",
+          "type": "ENTRY_REQUIREMENT",
+          "condition": "adx_slope >= -0.35",
+          "missing_data_behavior": "FAIL_CLOSED_TO_WAIT",
+          "reason_code": "VETO_ADX_SLOPE_DETERIORATING"
+        },
+        {
+          "field": "trend_age",
+          "source_field": "TrendEvidenceV2Shadow.trend_age",
+          "computation_version": "TREND_EVIDENCE_V2_SHADOW",
+          "type": "VETO",
+          "condition": "trend_age <= 18",
+          "missing_data_behavior": "FAIL_CLOSED_TO_WAIT",
+          "reason_code": "VETO_TREND_EXHAUSTION_AGE"
+        }
+      ],
+      "rule_differences": "Promotes trend_persistence, adx_slope, and trend_age to reject low-persistence or exhausted trends."
+    },
+    {
+      "candidate_id": "C2_BREAKOUT_CONFIRMATION",
+      "family": "BREAKOUT_CONFIRMATION",
+      "name": "Breakout Confirmation Policy",
+      "policy_version": "TACTICAL_POLICY_R2_B1_C2",
+      "description": "Requires structure transition agreement, bounded bars-since-breakout, and price-OI consistency.",
+      "promoted_rules": [
+        {
+          "field": "structure_transition",
+          "source_field": "TrendEvidenceV2Shadow.structure_transition",
+          "computation_version": "TREND_EVIDENCE_V2_SHADOW",
+          "type": "VETO",
+          "condition": "structure_transition != 'TREND_TO_RANGE'",
+          "missing_data_behavior": "FAIL_CLOSED_TO_WAIT",
+          "reason_code": "VETO_STRUCTURE_TRANSITION_RANGE"
+        },
+        {
+          "field": "bars_since_breakout",
+          "source_field": "TrendEvidenceV2Shadow.bars_since_breakout",
+          "computation_version": "TREND_EVIDENCE_V2_SHADOW",
+          "type": "ENTRY_REQUIREMENT",
+          "condition": "bars_since_breakout is not None and bars_since_breakout <= 8",
+          "missing_data_behavior": "FAIL_CLOSED_TO_WAIT",
+          "reason_code": "VETO_STALE_BREAKOUT_AGE"
+        },
+        {
+          "field": "price_oi_divergence",
+          "source_field": "TrendEvidenceV2Shadow.price_oi_divergence",
+          "computation_version": "TREND_EVIDENCE_V2_SHADOW",
+          "type": "VETO",
+          "condition": "LONG requires price_oi_divergence >= -0.015; SHORT requires price_oi_divergence <= 0.015",
+          "missing_data_behavior": "CONSERVATIVE_VETO_IF_ADVERSE",
+          "reason_code": "VETO_PRICE_OI_DIVERGENCE"
+        }
+      ],
+      "rule_differences": "Promotes structure_transition, bars_since_breakout, and price_oi_divergence to avoid false breakout fading into range."
+    },
+    {
+      "candidate_id": "C3_REGIME_VETO_OVERLAY",
+      "family": "REGIME_VETO_OVERLAY",
+      "name": "Regime Veto Overlay Policy",
+      "policy_version": "TACTICAL_POLICY_R2_B1_C3",
+      "description": "Preserves directional signal but vetoes adverse range transition and volatility shock.",
+      "promoted_rules": [
+        {
+          "field": "structure_transition",
+          "source_field": "TrendEvidenceV2Shadow.structure_transition",
+          "computation_version": "TREND_EVIDENCE_V2_SHADOW",
+          "type": "VETO",
+          "condition": "structure_transition != 'TREND_TO_RANGE'",
+          "missing_data_behavior": "FAIL_CLOSED_TO_WAIT",
+          "reason_code": "REGIME_VETO_TREND_TO_RANGE"
+        },
+        {
+          "field": "trend_transition_state",
+          "source_field": "TrendEvidenceV2Shadow.trend_transition_state",
+          "computation_version": "TREND_EVIDENCE_V2_SHADOW",
+          "type": "VETO",
+          "condition": "trend_transition_state != 'TRANSITION_TO_RANGE'",
+          "missing_data_behavior": "FAIL_CLOSED_TO_WAIT",
+          "reason_code": "REGIME_VETO_TRANSITION_TO_RANGE"
+        },
+        {
+          "field": "trend_transition_state",
+          "source_field": "TrendEvidenceV2Shadow.trend_transition_state",
+          "computation_version": "TREND_EVIDENCE_V2_SHADOW",
+          "type": "VETO",
+          "condition": "trend_transition_state != 'VOLATILITY_SHOCK' or entry_quality == 'EXCELLENT'",
+          "missing_data_behavior": "FAIL_CLOSED_TO_WAIT",
+          "reason_code": "REGIME_VETO_VOLATILITY_SHOCK"
+        }
+      ],
+      "rule_differences": "Adds regime vetoes against adverse range transitions and unhedged volatility shocks."
+    },
+    {
+      "candidate_id": "C4_BOUNDED_COMBINATION_A",
+      "family": "BOUNDED_COMBINATION",
+      "name": "Bounded Combination A (Regime Veto + Persistence Floor)",
+      "policy_version": "TACTICAL_POLICY_R2_B1_C4",
+      "description": "Combines regime veto against range transition with trend persistence floor.",
+      "promoted_rules": [
+        {
+          "field": "structure_transition",
+          "source_field": "TrendEvidenceV2Shadow.structure_transition",
+          "computation_version": "TREND_EVIDENCE_V2_SHADOW",
+          "type": "VETO",
+          "condition": "structure_transition != 'TREND_TO_RANGE'",
+          "missing_data_behavior": "FAIL_CLOSED_TO_WAIT",
+          "reason_code": "VETO_STRUCTURE_TRANSITION_TREND_TO_RANGE"
+        },
+        {
+          "field": "trend_transition_state",
+          "source_field": "TrendEvidenceV2Shadow.trend_transition_state",
+          "computation_version": "TREND_EVIDENCE_V2_SHADOW",
+          "type": "VETO",
+          "condition": "trend_transition_state != 'TRANSITION_TO_RANGE'",
+          "missing_data_behavior": "FAIL_CLOSED_TO_WAIT",
+          "reason_code": "REGIME_VETO_TRANSITION_TO_RANGE"
+        },
+        {
+          "field": "trend_persistence",
+          "source_field": "TrendEvidenceV2Shadow.trend_persistence",
+          "computation_version": "TREND_EVIDENCE_V2_SHADOW",
+          "type": "ENTRY_REQUIREMENT",
+          "condition": "trend_persistence >= 0.55",
+          "missing_data_behavior": "FAIL_CLOSED_TO_WAIT",
+          "reason_code": "VETO_INSUFFICIENT_TREND_PERSISTENCE"
+        }
+      ],
+      "rule_differences": "Combines C3 transition-to-range vetoes with C1 persistence requirement."
+    },
+    {
+      "candidate_id": "C5_BOUNDED_COMBINATION_B",
+      "family": "BOUNDED_COMBINATION",
+      "name": "Bounded Combination B (Structure Filter + Persistence Floor)",
+      "policy_version": "TACTICAL_POLICY_R2_B1",
+      "description": "Bounded combination rejecting adverse structure transitions (TREND_TO_RANGE, RANGE_TO_TREND_*) and enforcing a 0.60 trend persistence floor.",
+      "promoted_rules": [
+        {
+          "field": "structure_transition",
+          "source_field": "TrendEvidenceV2Shadow.structure_transition",
+          "computation_version": "TREND_EVIDENCE_V2_SHADOW",
+          "type": "VETO",
+          "condition": "structure_transition not in ('TREND_TO_RANGE', 'RANGE_TO_TREND_UP', 'RANGE_TO_TREND_DOWN')",
+          "missing_data_behavior": "FAIL_CLOSED_TO_WAIT",
+          "reason_code": "VETO_UNCONFIRMED_STRUCTURE_TRANSITION"
+        },
+        {
+          "field": "trend_persistence",
+          "source_field": "TrendEvidenceV2Shadow.trend_persistence",
+          "computation_version": "TREND_EVIDENCE_V2_SHADOW",
+          "type": "ENTRY_REQUIREMENT",
+          "condition": "trend_persistence >= 0.60",
+          "missing_data_behavior": "FAIL_CLOSED_TO_WAIT",
+          "reason_code": "VETO_INSUFFICIENT_TREND_PERSISTENCE"
+        }
+      ],
+      "rule_differences": "Enforces structure transition confirmation and 0.60 trend persistence floor for all directional entries."
+    }
+  ]
+}

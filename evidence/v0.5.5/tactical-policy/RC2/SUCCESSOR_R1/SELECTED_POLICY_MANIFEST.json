@@ -1,0 +1,68 @@
+{
+  "config_hash": "bba61849e64f37f9",
+  "development_universe": [
+    "BTCUSDT",
+    "ETHUSDT",
+    "SOLUSDT",
+    "LINKUSDT",
+    "SUIUSDT",
+    "XRPUSDT",
+    "DOGEUSDT",
+    "BNBUSDT"
+  ],
+  "family": "BOUNDED_COMBINATION",
+  "manifest_version": "RC2_TACTICAL_SELECTED_POLICY_MANIFEST_V1",
+  "name": "Bounded Combination B (Structure Filter + Persistence Floor)",
+  "policy_version": "TACTICAL_POLICY_R2_B1",
+  "promoted_rules": [
+    {
+      "computation_version": "TREND_EVIDENCE_V2_SHADOW",
+      "condition": "structure_transition not in ('TREND_TO_RANGE', 'RANGE_TO_TREND_UP', 'RANGE_TO_TREND_DOWN')",
+      "field": "structure_transition",
+      "missing_data_behavior": "FAIL_CLOSED_TO_WAIT",
+      "reason_code": "VETO_UNCONFIRMED_STRUCTURE_TRANSITION",
+      "source_field": "TrendEvidenceV2Shadow.structure_transition",
+      "type": "VETO"
+    },
+    {
+      "computation_version": "TREND_EVIDENCE_V2_SHADOW",
+      "condition": "trend_persistence >= 0.60",
+      "field": "trend_persistence",
+      "missing_data_behavior": "FAIL_CLOSED_TO_WAIT",
+      "reason_code": "VETO_INSUFFICIENT_TREND_PERSISTENCE",
+      "source_field": "TrendEvidenceV2Shadow.trend_persistence",
+      "type": "ENTRY_REQUIREMENT"
+    },
+    {
+      "computation_version": "TREND_EVIDENCE_V2_SHADOW",
+      "condition": "trend_evidence is not None",
+      "field": "trend_evidence",
+      "missing_data_behavior": "FAIL_CLOSED_TO_WAIT",
+      "reason_code": "VETO_PROMOTED_TREND_EVIDENCE_MISSING",
+      "source_field": "TrendEvidenceV2Shadow",
+      "type": "VETO"
+    }
+  ],
+  "protected_universe_access_count": 0,
+  "protected_validation_universe": [
+    "ADAUSDT",
+    "AVAXUSDT",
+    "LTCUSDT",
+    "TRXUSDT",
+    "BCHUSDT",
+    "DOTUSDT",
+    "ATOMUSDT",
+    "NEARUSDT"
+  ],
+  "release_id": "B_LINE_INITIAL_USABLE_RELEASE_V1_RC2",
+  "selected_candidate_id": "C5_BOUNDED_COMBINATION_B",
+  "selection_rationales": [
+    "Escapes all four RC1 hard-negative gates on development universe data.",
+    "Eliminates 104 bad directional entries from RC1 baseline (actionable count: 148 -> 44), specifically rejecting severe negative trades in false breakout transitions (TREND_TO_RANGE and RANGE_TO_TREND_*).",
+    "Improves aggregate mean net R by +0.454R over RC1 baseline.",
+    "Substantially lowers stop-before-target rate from 0.7838 to 0.6591.",
+    "Demonstrates strong rolling partition performance, achieving +0.5615R mean net R on OOS_P2.",
+    "Maintains minimal complexity: promotes only 2 features with 0 per-symbol hand tuning."
+  ],
+  "task_id": "B_LINE_RC2_TACTICAL_SUCCESSOR_R1_IMPLEMENTATION"
+}

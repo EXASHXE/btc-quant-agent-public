@@ -21,13 +21,18 @@ def assessment(tmp_path: Path):
     tf = make_dummy_tf("BTCUSDT", "1h", 101.0, Regime.TREND_UP,
                        ema_fast=100.0, ema_mid=95.0, recent_swing_low=99.0,
                        supports=(99.0,))
+    from unittest.mock import MagicMock
+    mock_trend = MagicMock()
+    mock_trend.structure_transition = "CONTINUATION_UP"
+    mock_trend.trend_persistence = 0.75
     snapshot = MarketSnapshot(symbol="BTCUSDT", decision_time_ms=3000,
         observed_at_ms=3000, exchange_time_ms=3000, price=PriceMetrics(100.2,
         quote_volume_24h=1000000.0), tf_15m=make_dummy_tf("BTCUSDT", "15m",
         close=100.2, ema_fast=100.0, atr=0.8, recent_swing_low=99.0),
         tf_1h=tf, tf_4h=replace(tf, interval="4h"),
         derivatives=DerivativesMetrics(mark_price=100.2, oi_1h_change=0.02,
-        funding_rate=0.0001, spread_bps=1.0), snapshot_hash="snap")
+        funding_rate=0.0001, spread_bps=1.0), snapshot_hash="snap",
+        trend_evidence=mock_trend)
     return scanner.assess_symbol(snapshot, None, snapshot, None, None)
 
 

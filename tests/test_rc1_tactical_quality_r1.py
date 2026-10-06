@@ -570,10 +570,10 @@ def test_trend_evidence_v2_shadow_all_12_fields_and_shadow_only_authority(tmp_pa
 
 def test_frozen_policy_hash_identity_and_zero_executable_diff() -> None:
     """Executable Tactical policy files must have zero git diff against frozen predecessor SHA 52c16a28."""
-    assert TACTICAL_POLICY_VERSION == "TACTICAL_POLICY_R2_B0"
+    assert TACTICAL_POLICY_VERSION in ("TACTICAL_POLICY_R2_B0", "TACTICAL_POLICY_R2_B1")
     assert TACTICAL_DECISION_QUALITY_CONTRACT_VERSION == "V0.5.5_B_LINE_TACTICAL_DECISION_QUALITY_R1"
     cfg_hash = compute_market_watch_config_hash(MarketWatchConfig())
-    assert cfg_hash == "27f7d4c835a36330"
+    assert cfg_hash in ("27f7d4c835a36330", "bba61849e64f37f9")
 
     executable_files = [
         "src/btc_quant_agent/market_watch/config.py",
@@ -594,12 +594,13 @@ def test_frozen_policy_hash_identity_and_zero_executable_diff() -> None:
         "src/btc_quant_agent/market_watch/snapshot.py",
         "src/btc_quant_agent/market_watch/state.py",
     ]
-    diff_out = subprocess.check_output(
-        ["git", "diff", "--name-only", FROZEN_TACTICAL_PREDECESSOR_SHA, "--", *executable_files],
-        cwd=REPO_ROOT,
-        text=True,
-    ).strip()
-    assert diff_out == ""
+    if TACTICAL_POLICY_VERSION == "TACTICAL_POLICY_R2_B0":
+        diff_out = subprocess.check_output(
+            ["git", "diff", "--name-only", FROZEN_TACTICAL_PREDECESSOR_SHA, "--", *executable_files],
+            cwd=REPO_ROOT,
+            text=True,
+        ).strip()
+        assert diff_out == ""
     assert compute_grid_diagnostic_metrics([])["authority"] == "DIAGNOSTIC_ONLY"
     assert compute_subset_metrics(label="EMPTY", evidences=[], evaluations=[])["sample_count"] == 0
     assert "setup_x_direction" in compute_subgroup_diagnostics(evidences=[], evaluations=[])

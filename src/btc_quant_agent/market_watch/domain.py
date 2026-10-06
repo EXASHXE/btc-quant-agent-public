@@ -9,7 +9,7 @@ from typing import Any
 
 from ..domain import Candle, Regime
 
-TACTICAL_POLICY_VERSION: str = "TACTICAL_POLICY_R2_B0"
+TACTICAL_POLICY_VERSION: str = "TACTICAL_POLICY_R2_B1"
 MARKET_SNAPSHOT_SCHEMA_VERSION: str = "MARKET_SNAPSHOT_V2"
 RETURN_FEATURE_SEMANTICS_VERSION: str = "ELAPSED_TIME_RETURNS_V1"
 PLAYBOOK_SELECTION_VERSION: str = "STATIC_PRECEDENCE_V1"
@@ -414,6 +414,7 @@ class MarketSnapshot:
     closed_bar_watermarks: dict[str, int] = field(default_factory=dict)
     return_observations: tuple[Any, ...] = ()
     source_receipt_timestamps: dict[str, int] = field(default_factory=dict)
+    trend_evidence: Any | None = None
 
     def as_dict(self) -> dict[str, Any]:
         payload = asdict(self)

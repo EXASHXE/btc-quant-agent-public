@@ -188,6 +188,8 @@ def check_fatal_vetoes(
     derivatives: DerivativesMetrics,
     benchmark_context: BenchmarkContext,
     config: MarketWatchConfig,
+    trend_evidence: Any | None = None,
+    enforce_promoted_evidence: bool = False,
 ) -> tuple[bool, tuple[str, ...]]:
     """Enforce fatal vetoes that MUST occur BEFORE ranking.
 
@@ -210,6 +212,18 @@ def check_fatal_vetoes(
         # Fatal Veto 3: Direct HTF Conflict
         if decision == DirectionalDecision.LONG and tf_4h.regime == Regime.TREND_DOWN or decision == DirectionalDecision.SHORT and tf_4h.regime == Regime.TREND_UP:
             vetoes.append("FATAL_VETO_CONFIRMED_HTF_CONFLICT")
+
+        # Fatal Veto 5: Promoted Trend & Structure Evidence (TACTICAL_POLICY_R2_B1)
+        if config.thresholds.enable_promoted_trend_filter and (enforce_promoted_evidence or trend_evidence is not None):
+            if trend_evidence is None:
+                vetoes.append("VETO_PROMOTED_TREND_EVIDENCE_MISSING")
+            else:
+                trans = getattr(trend_evidence, "structure_transition", None)
+                if trans in config.thresholds.disallowed_structure_transitions:
+                    vetoes.append("VETO_UNCONFIRMED_STRUCTURE_TRANSITION")
+                pers = getattr(trend_evidence, "trend_persistence", None)
+                if pers is None or pers < config.thresholds.min_trend_persistence:
+                    vetoes.append("VETO_INSUFFICIENT_TREND_PERSISTENCE")
 
     # Fatal Veto 4: Excessive spread
     if derivatives.spread_bps is not None and derivatives.spread_bps > config.thresholds.max_spread_bps * 1.5:

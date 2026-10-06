@@ -1,0 +1,5207 @@
+{
+  "aggregate_metrics": {
+    "MAE": {
+      "max_r": 1.0,
+      "mean_r": 0.739545,
+      "median_r": 1.0
+    },
+    "MFE": {
+      "max_r": 5.06,
+      "mean_r": 1.454091,
+      "median_r": 1.195
+    },
+    "action_frequency": 0.002354,
+    "actionable_evaluation_count": 47,
+    "actionable_signal_count": 44,
+    "boundary_breach": {
+      "invalidation_breach_count": 127,
+      "stop_boundary_breach_count": 29,
+      "stop_boundary_breach_rate": 0.659091
+    },
+    "cohort_label": "AGGREGATE_OOS",
+    "drawdown_adverse_excursion": {
+      "max_adverse_excursion_r": 1.0,
+      "max_cumulative_net_r_drawdown": 14.189007,
+      "mean_adverse_excursion_r": 0.739545,
+      "median_adverse_excursion_r": 1.0
+    },
+    "fees": {
+      "maker_fee_rate": 0.0002,
+      "mean_fee_r": 0.283693,
+      "taker_fee_rate": 0.0005,
+      "total_fee_r": 12.4825
+    },
+    "fill_rate": 1.0,
+    "filled_count": 44,
+    "funding": {
+      "funding_complete_count": 42,
+      "mean_funding_pnl_r": 0.000773,
+      "median_funding_pnl_r": 0.0,
+      "settlements_total": 13,
+      "total_funding_pnl_r": 0.032487
+    },
+    "gross_R": {
+      "mean": 0.264272,
+      "median": -1.0,
+      "total": 11.627984
+    },
+    "holding_time": {
+      "mean_holding_time_ms": 5232272.73,
+      "mean_time_to_fill_ms": 690000.0,
+      "median_holding_time_ms": 2700000.0,
+      "median_time_to_fill_ms": 900000.0
+    },
+    "long_actionable_count": 20,
+    "long_short_wait_distribution": {
+      "LONG": {
+        "count": 20,
+        "share": 0.001002
+      },
+      "SHORT": {
+        "count": 27,
+        "share": 0.001352
+      },
+      "WAIT": {
+        "count": 19921,
+        "share": 0.997646
+      }
+    },
+    "mean_R": -0.13216,
+    "mean_gross_R": 0.264272,
+    "mean_net_R": -0.13216,
+    "median_R": -1.235369,
+    "median_gross_R": -1.0,
+    "median_net_R": -1.235369,
+    "net_R": {
+      "mean": -0.13216,
+      "mean_ex_funding": -0.132898,
+      "median": -1.235369,
+      "median_ex_funding": -1.23635,
+      "total": -5.81503
+    },
+    "no_fill_count": 0,
+    "policy_shift": {
+      "directional_policy_shift_count": 0,
+      "directional_policy_shift_rate": 0.0
+    },
+    "sample_count": 19968,
+    "short_actionable_count": 24,
+    "slippage": {
+      "mean_slippage_r": 0.113477,
+      "slippage_bps_per_side": 2.0,
+      "total_slippage_r": 4.993
+    },
+    "stop_before_target": 0.659091,
+    "stop_before_target_count": 29,
+    "stop_rate_all_filled": 0.659091,
+    "target_stop_resolved_count": 44,
+    "timeout_count": 0,
+    "tp1_before_sl": 0.340909,
+    "tp1_before_sl_count": 15,
+    "tp2_before_sl": 0.068182,
+    "tp2_before_sl_count": 3,
+    "trend_transition": {
+      "shadow_trend_transition_distribution": {
+        "EMERGING_TREND": 3988,
+        "EXHAUSTING_TREND": 350,
+        "MATURE_TREND": 848,
+        "PULLBACK_IN_TREND": 2937,
+        "RANGE_BOUND": 4011,
+        "TRANSITION_TO_RANGE": 1773,
+        "VOLATILITY_SHOCK": 6061
+      },
+      "technical_trend_transition_count": 7,
+      "technical_trend_transition_rate": 0.159091
+    }
+  },
+  "calibration_metrics": {
+    "MAE": {
+      "max_r": 1.0,
+      "mean_r": 1.0,
+      "median_r": 1.0
+    },
+    "MFE": {
+      "max_r": 0.0,
+      "mean_r": 0.0,
+      "median_r": 0.0
+    },
+    "action_frequency": 0.001302,
+    "actionable_evaluation_count": 2,
+    "actionable_signal_count": 2,
+    "boundary_breach": {
+      "invalidation_breach_count": 11,
+      "stop_boundary_breach_count": 2,
+      "stop_boundary_breach_rate": 1.0
+    },
+    "cohort_label": "CALIBRATION_PRE_OOS",
+    "drawdown_adverse_excursion": {
+      "max_adverse_excursion_r": 1.0,
+      "max_cumulative_net_r_drawdown": 3.000797,
+      "mean_adverse_excursion_r": 1.0,
+      "median_adverse_excursion_r": 1.0
+    },
+    "fees": {
+      "maker_fee_rate": 0.0002,
+      "mean_fee_r": 0.358393,
+      "taker_fee_rate": 0.0005,
+      "total_fee_r": 0.716786
+    },
+    "fill_rate": 1.0,
+    "filled_count": 2,
+    "funding": {
+      "funding_complete_count": 2,
+      "mean_funding_pnl_r": 0.001352,
+      "median_funding_pnl_r": 0.001352,
+      "settlements_total": 1,
+      "total_funding_pnl_r": 0.002703
+    },
+    "gross_R": {
+      "mean": -1.0,
+      "median": -1.0,
+      "total": -2.0
+    },
+    "holding_time": {
+      "mean_holding_time_ms": 2700000.0,
+      "mean_time_to_fill_ms": 900000.0,
+      "median_holding_time_ms": 2700000.0,
+      "median_time_to_fill_ms": 900000.0
+    },
+    "long_actionable_count": 0,
+    "long_short_wait_distribution": {
+      "LONG": {
+        "count": 0,
+        "share": 0.0
+      },
+      "SHORT": {
+        "count": 2,
+        "share": 0.001302
+      },
+      "WAIT": {
+        "count": 1534,
+        "share": 0.998698
+      }
+    },
+    "mean_R": -1.500398,
+    "mean_gross_R": -1.0,
+    "mean_net_R": -1.500398,
+    "median_R": -1.500398,
+    "median_gross_R": -1.0,
+    "median_net_R": -1.500398,
+    "net_R": {
+      "mean": -1.500398,
+      "mean_ex_funding": -1.50175,
+      "median": -1.500398,
+      "median_ex_funding": -1.50175,
+      "total": -3.000797
+    },
+    "no_fill_count": 0,
+    "policy_shift": {
+      "directional_policy_shift_count": 0,
+      "directional_policy_shift_rate": 0.0
+    },
+    "sample_count": 1536,
+    "short_actionable_count": 2,
+    "slippage": {
+      "mean_slippage_r": 0.143357,
+      "slippage_bps_per_side": 2.0,
+      "total_slippage_r": 0.286714
+    },
+    "stop_before_target": 1.0,
+    "stop_before_target_count": 2,
+    "stop_rate_all_filled": 1.0,
+    "target_stop_resolved_count": 2,
+    "timeout_count": 0,
+    "tp1_before_sl": 0.0,
+    "tp1_before_sl_count": 0,
+    "tp2_before_sl": 0.0,
+    "tp2_before_sl_count": 0,
+    "trend_transition": {
+      "shadow_trend_transition_distribution": {
+        "EMERGING_TREND": 342,
+        "EXHAUSTING_TREND": 9,
+        "MATURE_TREND": 32,
+        "PULLBACK_IN_TREND": 87,
+        "RANGE_BOUND": 361,
+        "TRANSITION_TO_RANGE": 175,
+        "VOLATILITY_SHOCK": 530
+      },
+      "technical_trend_transition_count": 0,
+      "technical_trend_transition_rate": 0.0
+    }
+  },
+  "config_hash": "bba61849e64f37f9",
+  "controller_dispatch_sha": "2480e60816b28cb9afbc972cee4029d424d2fd25",
+  "deterministic_replay_verification": {
+    "identical_manifest_produces_identical_results": true,
+    "run_1_evidence_ids_sha256": "fd0566a25e32255bb188bf3b5fa911240fa43d7297cc3dd161a147a0258351a5",
+    "run_1_input_manifest_hash": "6da0ff14f1c4cb53c53bc33a92dae5cf3e365b0e011054c406d73c95b96cc4ae",
+    "run_1_output_manifest_hash": "6247915466c0aff765020215a0a19ba7e0e5c963f1a659e9fb36432e20ed1ace",
+    "run_1_shadow_evaluation_ids_sha256": "919bee92401f222ac753f14906e7a5bba386fcf5a9e17d4fd7148a047a736634",
+    "run_2_evidence_ids_sha256": "fd0566a25e32255bb188bf3b5fa911240fa43d7297cc3dd161a147a0258351a5",
+    "run_2_input_manifest_hash": "6da0ff14f1c4cb53c53bc33a92dae5cf3e365b0e011054c406d73c95b96cc4ae",
+    "run_2_output_manifest_hash": "6247915466c0aff765020215a0a19ba7e0e5c963f1a659e9fb36432e20ed1ace",
+    "run_2_shadow_evaluation_ids_sha256": "919bee92401f222ac753f14906e7a5bba386fcf5a9e17d4fd7148a047a736634"
+  },
+  "development_universe": [
+    "BTCUSDT",
+    "ETHUSDT",
+    "SOLUSDT",
+    "LINKUSDT",
+    "SUIUSDT",
+    "XRPUSDT",
+    "DOGEUSDT",
+    "BNBUSDT"
+  ],
+  "firewall_proof": {
+    "a_line_protected_outcomes_accessed": false,
+    "h40_h41_protected_outcomes_accessed": false,
+    "protected_validation_firewall_intact": true,
+    "protected_validation_symbols": [
+      "ADAUSDT",
+      "AVAXUSDT",
+      "LTCUSDT",
+      "TRXUSDT",
+      "BCHUSDT",
+      "DOTUSDT",
+      "ATOMUSDT",
+      "NEARUSDT"
+    ],
+    "protected_validation_symbols_accessed_count": 0
+  },
+  "gate_evaluation": {
+    "contract_version": "V0.5.5_B_LINE_TACTICAL_DECISION_QUALITY_R1",
+    "decision": "TACTICAL_DECISION_QUALITY_DIAGNOSTIC_ONLY",
+    "gross_to_net_sign_flip_observed": true,
+    "hard_negative_gates": {
+      "any_triggered": false,
+      "mean_net_r_le_minus_0_10_with_100_actionable": false,
+      "median_net_r_le_minus_0_20_with_100_actionable": false,
+      "stop_before_target_gt_0_70_with_100_resolved": false,
+      "systematic_cost_omission_sign_flip": false,
+      "two_supported_partitions_mean_net_r_le_minus_0_25": false
+    },
+    "integrity_gates": {
+      "all_passed": true,
+      "authentic_1m_data_granularity_complete": true,
+      "deterministic_manifest_replay_identical": true,
+      "no_outcome_informed_policy_retuning": true,
+      "no_protected_a_line_outcomes_accessed": true,
+      "pit_chronology_manifest_integrity": true,
+      "transaction_costs_included_in_net_r": true
+    },
+    "pass_band_gates": {
+      "all_passed": false,
+      "mean_net_r_ge_plus_0_05": false,
+      "median_net_r_ge_minus_0_05": false,
+      "positive_supported_partition_ratio": 0.0,
+      "positive_supported_partitions_count": 0,
+      "stop_before_target_le_0_65": false,
+      "supported_partitions_count": 0,
+      "supported_partitions_non_negative_ge_2_of_3": false
+    },
+    "reasons": [
+      "INSUFFICIENT_EVIDENCE_SUPPORT:oos_actionable_count_ge_100,supported_partitions_ge_2"
+    ],
+    "stability_gate": {
+      "oos_partitions": 3,
+      "positive_mean_net_r_partitions": 0,
+      "severe_negative_partitions": 0,
+      "status": "DIAGNOSTIC_ONLY",
+      "supported_partitions": 0
+    },
+    "subgroup_rescue_applied": false,
+    "subgroup_rescue_permitted": false,
+    "support_gates": {
+      "actionable_oos_count": 44,
+      "all_passed": false,
+      "long_actionable_count": 20,
+      "long_actionable_count_ge_20": true,
+      "oos_actionable_count_ge_100": false,
+      "oos_partitions_count": 3,
+      "oos_partitions_ge_3": true,
+      "short_actionable_count": 24,
+      "short_actionable_count_ge_20": true,
+      "supported_partitions_count": 0,
+      "supported_partitions_ge_2": false
+    },
+    "thresholds": {
+      "hard_fail_mean_net_r_max": -0.1,
+      "hard_fail_median_net_r_max": -0.2,
+      "hard_fail_min_actionable_support": 100,
+      "hard_fail_partition_count_min": 2,
+      "hard_fail_partition_mean_net_r_max": -0.25,
+      "hard_fail_stop_before_target_min": 0.7,
+      "min_long_actionable_count": 20,
+      "min_oos_actionable_count": 100,
+      "min_oos_partitions": 3,
+      "min_partition_actionable_count": 20,
+      "min_short_actionable_count": 20,
+      "min_supported_partitions": 2,
+      "pass_mean_net_r_min": 0.05,
+      "pass_median_net_r_min": -0.05,
+      "pass_positive_partition_ratio_min": 0.6666666666666666,
+      "pass_stop_before_target_max": 0.65
+    }
+  },
+  "grid_diagnostics": {
+    "active_resolved_episodes": 224,
+    "authority": "DIAGNOSTIC_ONLY",
+    "boundary_breach": {
+      "any_boundary_breach_rate": 0.9375,
+      "lower_boundary_breach_count": 119,
+      "total_boundary_breach_events": 16637,
+      "upper_boundary_breach_count": 116
+    },
+    "capital_utilization": {
+      "mean_capital_utilization": 0.224117,
+      "peak_capital_utilization": 0.999737
+    },
+    "inactive_pause_episodes": 1559,
+    "inventory_excursion": {
+      "max_abs_inventory_notional": 0.999737,
+      "mean_long_inventory_peak": 0.271125,
+      "mean_max_abs_inventory_notional": 0.477167,
+      "mean_short_inventory_peak": 0.2207,
+      "mean_time_weighted_abs_inventory": 0.224117
+    },
+    "paired_profit": {
+      "mean_net_pnl_after_fees_slippage": 9e-05,
+      "mean_net_pnl_after_funding": 8.7e-05,
+      "mean_paired_gross_pnl": 0.003995,
+      "mean_paired_net_pnl": 0.003422,
+      "total_paired_cycles": 2411,
+      "total_paired_net_pnl": 0.766561
+    },
+    "policy_shift": {
+      "mean_grid_shift_count": 2.973214,
+      "mean_grid_shift_frequency_per_day": 2.973214,
+      "policy_pause_transition_count": 122
+    },
+    "total_episodes": 1783,
+    "trend_transition": {
+      "mean_net_equity_at_first_trend_transition": 0.000907,
+      "mean_post_transition_net_pnl_delta": -0.00062,
+      "mean_trend_transition_loss": -0.002269,
+      "trend_transition_episode_count": 29
+    },
+    "underwater_duration": {
+      "mean_maximum_underwater": -0.003846,
+      "mean_underwater_duration_ms": 40779242.52,
+      "underwater_episode_count": 200,
+      "underwater_episode_rate": 0.892857,
+      "worst_drawdown_from_prior_peak": -0.028304
+    }
+  },
+  "input_manifest": {
+    "config_hash": "bba61849e64f37f9",
+    "contract_version": "V0.5.5_B_LINE_TACTICAL_DECISION_QUALITY_R1",
+    "data_end_ms": 1791223199999,
+    "first_step_ms": 1788717599999,
+    "frozen_predecessor_sha": "52c16a28153de307dc6132c0975fe29341a0a918",
+    "input_manifest_hash": "6da0ff14f1c4cb53c53bc33a92dae5cf3e365b0e011054c406d73c95b96cc4ae",
+    "last_step_ms": 1791136799999,
+    "manifest_version": "RC1_WP_B_REPLAY_INPUT_MANIFEST_V1",
+    "partitions": [
+      {
+        "calibration_end_ms": 1788890399999,
+        "calibration_start_ms": 1788717599999,
+        "oos_end_ms": 1789639199999,
+        "oos_start_ms": 1788890399999,
+        "partition_id": "OOS_P1"
+      },
+      {
+        "calibration_end_ms": 1789639199999,
+        "calibration_start_ms": 1788717599999,
+        "oos_end_ms": 1790387999999,
+        "oos_start_ms": 1789639199999,
+        "partition_id": "OOS_P2"
+      },
+      {
+        "calibration_end_ms": 1790387999999,
+        "calibration_start_ms": 1788717599999,
+        "oos_end_ms": 1791136799999,
+        "oos_start_ms": 1790387999999,
+        "partition_id": "OOS_P3"
+      }
+    ],
+    "policy_version": "TACTICAL_POLICY_R2_B1",
+    "protected_a_line_outcomes_accessed": false,
+    "source_provenance": "BINANCE_PUBLIC_FUTURES_UNAUTHENTICATED_HISTORICAL",
+    "step_count": 2689,
+    "step_timestamps_sha256": "2fbb55fbc40cf2426775d65a0b81f79f564d4481b0698b8b8b89fbe454a793ce",
+    "symbol_digests": {
+      "BNBUSDT": {
+        "basis_hist_count": 500,
+        "funding_rates_count": 111,
+        "funding_rates_sha256": "3cdc5ef69b20e64b0750e498912c7ed132715a06c87889086d0f881aa75e0334",
+        "gls_hist_count": 719,
+        "klines_15m_count": 3150,
+        "klines_15m_sha256": "11c4abbd2b437d4a4caee6709154a4385d17c3b92b398a04ab08b30aa4714545",
+        "klines_1h_count": 990,
+        "klines_1h_sha256": "1d1c89ee47837c1447d6ff4d7aa884a744cf411901e394fa53fd1134b168abe9",
+        "klines_1m_count": 41775,
+        "klines_1m_sha256": "a374c91da79f77e564c38a93cb3f150054efe5a32927af98db52cd704f898eba",
+        "klines_4h_count": 449,
+        "klines_4h_sha256": "22e3efb4fa3dbabcd102bf59cdc9bff7b2427ee20e926d7aaf2752d8e50cfc50",
+        "oi_hist_count": 719,
+        "oi_hist_sha256": "12b108ff402741186d74e8b9792de3cf6342564c6efb61db92a2fe923bce0ca3",
+        "symbol": "BNBUSDT",
+        "taker_hist_count": 718,
+        "top_acc_hist_count": 719,
+        "top_pos_hist_count": 719
+      },
+      "BTCUSDT": {
+        "basis_hist_count": 500,
+        "funding_rates_count": 111,
+        "funding_rates_sha256": "c8eb6527f2c77cee8f5d4fd7014d46786bd6c081bd1e43c57e94fec002566026",
+        "gls_hist_count": 719,
+        "klines_15m_count": 3150,
+        "klines_15m_sha256": "20e82e8e44835f3a7d7220631b416690bce5f5dcd6bcb8847b00d0bb74d28e2e",
+        "klines_1h_count": 990,
+        "klines_1h_sha256": "2de3899b5326d3937ded026271829da38df6edd6cfcc18ae75997deb62612da2",
+        "klines_1m_count": 41775,
+        "klines_1m_sha256": "cf80d669ffc7e8759a5185f98ea12f8bfa1e0752ad1a8268950fa3b4e3225f17",
+        "klines_4h_count": 449,
+        "klines_4h_sha256": "dd38976a6f3b33c066462356f166fc3d2cdf4ce6fb5800c6e372fd9796074763",
+        "oi_hist_count": 719,
+        "oi_hist_sha256": "87ab047ec8d333850b62fc2e7ef5f0f91cf63b5f1456180d1bea8cf86eaadd20",
+        "symbol": "BTCUSDT",
+        "taker_hist_count": 718,
+        "top_acc_hist_count": 719,
+        "top_pos_hist_count": 719
+      },
+      "DOGEUSDT": {
+        "basis_hist_count": 500,
+        "funding_rates_count": 111,
+        "funding_rates_sha256": "723e035d05f36ca321fbf21217c714e29760fd36494ddfcbcdf046bacf5d617e",
+        "gls_hist_count": 719,
+        "klines_15m_count": 3150,
+        "klines_15m_sha256": "c3f3fbd22cd5ee800d869bed1dc76c3e848e44c845026d3cbbc6b9d9f5b8bec9",
+        "klines_1h_count": 990,
+        "klines_1h_sha256": "ffb4485b91d5422b269488a59ffe0527ef4c1bf22bb03db4a45ffdc5c35c1007",
+        "klines_1m_count": 41775,
+        "klines_1m_sha256": "ee3715aca58a3604a7f1415cfe10f8bb7c8ff3d8ec176de872427af15c44e021",
+        "klines_4h_count": 449,
+        "klines_4h_sha256": "eb86db825c218a1f5de1a99d33ed153973472c1545ef2d2f8b32ae0ffc4cf20b",
+        "oi_hist_count": 719,
+        "oi_hist_sha256": "67b2ff99ee95e5e5261f1785e3e6a5bb8bb33c77fa732627be69887ff7e6302b",
+        "symbol": "DOGEUSDT",
+        "taker_hist_count": 718,
+        "top_acc_hist_count": 719,
+        "top_pos_hist_count": 719
+      },
+      "ETHUSDT": {
+        "basis_hist_count": 500,
+        "funding_rates_count": 111,
+        "funding_rates_sha256": "9895dd6a1a4cdd590d4a4a41f6a4fb096b6c3080216078ec47c7cc328fe043b8",
+        "gls_hist_count": 719,
+        "klines_15m_count": 3150,
+        "klines_15m_sha256": "aece9e3e45ecd167be0402bae22d518ee1d0302254f9fbb003c156b795f8a7b1",
+        "klines_1h_count": 990,
+        "klines_1h_sha256": "5319561823ddad3aa445c933aa34df302c62713bed90fd9ca1172109b655c159",
+        "klines_1m_count": 41775,
+        "klines_1m_sha256": "e219b3355fc5c9e3e9c1cdc6671f97860de445abaa6f53a05537c849933160b7",
+        "klines_4h_count": 449,
+        "klines_4h_sha256": "65d97bcc6e8079c6f4cc50262715186c0b19049c912f6ca9371c655cac9fe0e2",
+        "oi_hist_count": 719,
+        "oi_hist_sha256": "85b7dc461640a7bc511b92f52c25add00697e1d67fbbc7fb82f5b41a2399a839",
+        "symbol": "ETHUSDT",
+        "taker_hist_count": 718,
+        "top_acc_hist_count": 719,
+        "top_pos_hist_count": 719
+      },
+      "LINKUSDT": {
+        "basis_hist_count": 0,
+        "funding_rates_count": 111,
+        "funding_rates_sha256": "725c7f4af5450a87c0926b67f8cfef7909f5c411c205685549db5600988e8238",
+        "gls_hist_count": 719,
+        "klines_15m_count": 3150,
+        "klines_15m_sha256": "50f0e837d8cfc00be50e7faa6fdb837bf2e194e7afa666699aabc9468bc416dd",
+        "klines_1h_count": 990,
+        "klines_1h_sha256": "890fe4df94660b4c69d985e6161519cbbe21a3f92b0d9728d134f0dff69d70ea",
+        "klines_1m_count": 41775,
+        "klines_1m_sha256": "aadedcbd44bd7ace1ee7fb514f15c4a657e1c406079fa53751cf96c92893f14d",
+        "klines_4h_count": 449,
+        "klines_4h_sha256": "fed24272a9b292f13ad4b1c99dfd713ce08a8f2209b758df0366408c4df7dbac",
+        "oi_hist_count": 719,
+        "oi_hist_sha256": "d4641fb1989beda490371212cf8d75a6b7088109666e1f38840e1f7defba6158",
+        "symbol": "LINKUSDT",
+        "taker_hist_count": 718,
+        "top_acc_hist_count": 0,
+        "top_pos_hist_count": 719
+      },
+      "SOLUSDT": {
+        "basis_hist_count": 500,
+        "funding_rates_count": 111,
+        "funding_rates_sha256": "1e53d55bb5857a945220763492a31b69f825e13628bbdae4a969dd3184a27ef2",
+        "gls_hist_count": 719,
+        "klines_15m_count": 3150,
+        "klines_15m_sha256": "0851776c915976109147b7479696fb66c3730b6983757c92b784cf1174ae3073",
+        "klines_1h_count": 990,
+        "klines_1h_sha256": "bad9ea17c64fa40aec53ce386158b8e6f9ec5e85858e1d00de77a510966eedf0",
+        "klines_1m_count": 41775,
+        "klines_1m_sha256": "fa4db2d34a4c4ab71ce071056fd5e904d573aba7302b10990b82ca9bd50aa537",
+        "klines_4h_count": 449,
+        "klines_4h_sha256": "593c1a055df805ece24ba42a4512c02dd11b24480c39ae1575da23aa769abebe",
+        "oi_hist_count": 719,
+        "oi_hist_sha256": "4a372f323bd2c98e5da8ad3cb84ebc9f2c49337ac6877f023dfab606b1657844",
+        "symbol": "SOLUSDT",
+        "taker_hist_count": 718,
+        "top_acc_hist_count": 719,
+        "top_pos_hist_count": 719
+      },
+      "SUIUSDT": {
+        "basis_hist_count": 500,
+        "funding_rates_count": 111,
+        "funding_rates_sha256": "40faadd40b148582cd95c1f9c4a333e171287a1a61b44ae6ff9692ff52d0e628",
+        "gls_hist_count": 719,
+        "klines_15m_count": 3150,
+        "klines_15m_sha256": "f7fb7804b1684b1a6b4711766469c8fc6dd5411523d3b9e0d347b0c9e224ca28",
+        "klines_1h_count": 990,
+        "klines_1h_sha256": "83fabb33ce32ea17ea2b9fa687101ffb20447b6479bea9af3740d2cda0527269",
+        "klines_1m_count": 41775,
+        "klines_1m_sha256": "389611db9a78ff84bca447fec55ef2a66b97fa2d2f5607cb4e4c69d838716c54",
+        "klines_4h_count": 449,
+        "klines_4h_sha256": "9f605c513c6639aa73a29cdacab284a5c3e752c9c779a025369f6603a9ce8118",
+        "oi_hist_count": 719,
+        "oi_hist_sha256": "cc44c158269073d4be17a6b78836b7fcbc4b3819fc5414b53f80994f2a43c992",
+        "symbol": "SUIUSDT",
+        "taker_hist_count": 718,
+        "top_acc_hist_count": 719,
+        "top_pos_hist_count": 719
+      },
+      "XRPUSDT": {
+        "basis_hist_count": 500,
+        "funding_rates_count": 111,
+        "funding_rates_sha256": "180d6cd5a240e250523e1a3645c8f5a66dff457d397f62098412a83e3cdc0c72",
+        "gls_hist_count": 719,
+        "klines_15m_count": 3150,
+        "klines_15m_sha256": "6f3c2e2b0a23eb5a9b65205bc1610f71940b8f15fa1f59d0dac8f3418b0d2f8e",
+        "klines_1h_count": 990,
+        "klines_1h_sha256": "e3df35af0a5ff81f03932bcc4a03d575e330648dad30ccb769c7c4d56c7eb433",
+        "klines_1m_count": 41775,
+        "klines_1m_sha256": "72c32dc640e4f187ad3885c78cfdffdaadd97579ef5cd02e505470e9aeaf017b",
+        "klines_4h_count": 449,
+        "klines_4h_sha256": "28a02f0e330a9bb9193aacde2f150018c57031fa1cc3a9af449588a704776bb1",
+        "oi_hist_count": 719,
+        "oi_hist_sha256": "588f5c32569f646a450bd2dc597096f9fb11aac7b56e50ee49d964a635146a4b",
+        "symbol": "XRPUSDT",
+        "taker_hist_count": 718,
+        "top_acc_hist_count": 719,
+        "top_pos_hist_count": 719
+      }
+    },
+    "symbols": [
+      "BTCUSDT",
+      "ETHUSDT",
+      "SOLUSDT",
+      "LINKUSDT",
+      "SUIUSDT",
+      "XRPUSDT",
+      "DOGEUSDT",
+      "BNBUSDT"
+    ]
+  },
+  "output_manifest": {
+    "actionable_oos_count": 44,
+    "aggregate_oos_mean_net_R": -0.13216,
+    "aggregate_oos_median_net_R": -1.235369,
+    "config_hash": "bba61849e64f37f9",
+    "evidence_ids_sha256": "fd0566a25e32255bb188bf3b5fa911240fa43d7297cc3dd161a147a0258351a5",
+    "grid_evaluation_ids_sha256": "27265560b6109ae1b247f18672db5610c5687108c1303ad8072dc96fd352fa96",
+    "input_manifest_hash": "6da0ff14f1c4cb53c53bc33a92dae5cf3e365b0e011054c406d73c95b96cc4ae",
+    "manifest_version": "RC1_WP_B_REPLAY_OUTPUT_MANIFEST_V1",
+    "oos_evaluations_count": 44,
+    "oos_evidences_count": 19968,
+    "output_manifest_hash": "6247915466c0aff765020215a0a19ba7e0e5c963f1a659e9fb36432e20ed1ace",
+    "policy_version": "TACTICAL_POLICY_R2_B1",
+    "shadow_evaluation_ids_sha256": "919bee92401f222ac753f14906e7a5bba386fcf5a9e17d4fd7148a047a736634",
+    "total_evidences_count": 21512,
+    "trend_shadow_ids_sha256": "58deec1415d01f8b8a633bc4cb136d68eb21383dfc779c03df4a53b740c0dae9"
+  },
+  "parent_task_id": "B_LINE_TACTICAL_DECISION_QUALITY_R1_REPAIR_1M_EVIDENCE",
+  "pit_causality_audit": {
+    "authentic_1m_coverage_by_symbol": {
+      "BNBUSDT": {
+        "complete": true,
+        "first_open_ms": 1788716700000,
+        "klines_1m_count": 41775,
+        "last_close_ms": 1791223199999,
+        "window_1m_count": 41775
+      },
+      "BTCUSDT": {
+        "complete": true,
+        "first_open_ms": 1788716700000,
+        "klines_1m_count": 41775,
+        "last_close_ms": 1791223199999,
+        "window_1m_count": 41775
+      },
+      "DOGEUSDT": {
+        "complete": true,
+        "first_open_ms": 1788716700000,
+        "klines_1m_count": 41775,
+        "last_close_ms": 1791223199999,
+        "window_1m_count": 41775
+      },
+      "ETHUSDT": {
+        "complete": true,
+        "first_open_ms": 1788716700000,
+        "klines_1m_count": 41775,
+        "last_close_ms": 1791223199999,
+        "window_1m_count": 41775
+      },
+      "LINKUSDT": {
+        "complete": true,
+        "first_open_ms": 1788716700000,
+        "klines_1m_count": 41775,
+        "last_close_ms": 1791223199999,
+        "window_1m_count": 41775
+      },
+      "SOLUSDT": {
+        "complete": true,
+        "first_open_ms": 1788716700000,
+        "klines_1m_count": 41775,
+        "last_close_ms": 1791223199999,
+        "window_1m_count": 41775
+      },
+      "SUIUSDT": {
+        "complete": true,
+        "first_open_ms": 1788716700000,
+        "klines_1m_count": 41775,
+        "last_close_ms": 1791223199999,
+        "window_1m_count": 41775
+      },
+      "XRPUSDT": {
+        "complete": true,
+        "first_open_ms": 1788716700000,
+        "klines_1m_count": 41775,
+        "last_close_ms": 1791223199999,
+        "window_1m_count": 41775
+      }
+    },
+    "authentic_1m_queries_count": 252,
+    "data_end_ms": 1791223199999,
+    "granularity_violations_count": 0,
+    "max_returned_candle_close_ms": 1791212399999,
+    "pit_queries_count": 280245,
+    "pit_violations_count": 0,
+    "synthetic_1m_queries_count": 0
+  },
+  "policy_version": "TACTICAL_POLICY_R2_B1",
+  "protected_validation_universe": [
+    "ADAUSDT",
+    "AVAXUSDT",
+    "LTCUSDT",
+    "TRXUSDT",
+    "BCHUSDT",
+    "DOTUSDT",
+    "ATOMUSDT",
+    "NEARUSDT"
+  ],
+  "release_id": "B_LINE_INITIAL_USABLE_RELEASE_V1_RC2",
+  "rolling_oos_table": [
+    {
+      "MAE": {
+        "max_r": 1.0,
+        "mean_r": 0.890769,
+        "median_r": 1.0
+      },
+      "MFE": {
+        "max_r": 5.06,
+        "mean_r": 1.118462,
+        "median_r": 0.38
+      },
+      "action_frequency": 0.002254,
+      "actionable_evaluation_count": 15,
+      "actionable_signal_count": 13,
+      "boundary_breach": {
+        "invalidation_breach_count": 35,
+        "stop_boundary_breach_count": 11,
+        "stop_boundary_breach_rate": 0.846154
+      },
+      "cohort_label": "OOS_P1",
+      "drawdown_adverse_excursion": {
+        "max_adverse_excursion_r": 1.0,
+        "max_cumulative_net_r_drawdown": 14.189007,
+        "mean_adverse_excursion_r": 0.890769,
+        "median_adverse_excursion_r": 1.0
+      },
+      "fees": {
+        "maker_fee_rate": 0.0002,
+        "mean_fee_r": 0.364346,
+        "taker_fee_rate": 0.0005,
+        "total_fee_r": 4.7365
+      },
+      "fill_rate": 1.0,
+      "filled_count": 13,
+      "funding": {
+        "funding_complete_count": 12,
+        "mean_funding_pnl_r": 0.000942,
+        "median_funding_pnl_r": 0.0,
+        "settlements_total": 4,
+        "total_funding_pnl_r": 0.011306
+      },
+      "gross_R": {
+        "mean": -0.351984,
+        "median": -1.0,
+        "total": -4.575792
+      },
+      "holding_time": {
+        "mean_holding_time_ms": 3420000.0,
+        "mean_time_to_fill_ms": 641538.46,
+        "median_holding_time_ms": 900000.0,
+        "median_time_to_fill_ms": 900000.0
+      },
+      "long_actionable_count": 3,
+      "long_short_wait_distribution": {
+        "LONG": {
+          "count": 3,
+          "share": 0.000451
+        },
+        "SHORT": {
+          "count": 12,
+          "share": 0.001803
+        },
+        "WAIT": {
+          "count": 6641,
+          "share": 0.997746
+        }
+      },
+      "mean_R": -0.861199,
+      "mean_gross_R": -0.351984,
+      "mean_net_R": -0.861199,
+      "median_R": -1.5537,
+      "median_gross_R": -1.0,
+      "median_net_R": -1.5537,
+      "net_R": {
+        "mean": -0.861199,
+        "mean_ex_funding": -0.862069,
+        "median": -1.5537,
+        "median_ex_funding": -1.5537,
+        "total": -11.195586
+      },
+      "no_fill_count": 0,
+      "partition_spec": {
+        "calibration_end_ms": 1788890399999,
+        "calibration_start_ms": 1788717599999,
+        "oos_end_ms": 1789639199999,
+        "oos_start_ms": 1788890399999,
+        "partition_id": "OOS_P1"
+      },
+      "policy_shift": {
+        "directional_policy_shift_count": 0,
+        "directional_policy_shift_rate": 0.0
+      },
+      "sample_count": 6656,
+      "short_actionable_count": 10,
+      "slippage": {
+        "mean_slippage_r": 0.145738,
+        "slippage_bps_per_side": 2.0,
+        "total_slippage_r": 1.8946
+      },
+      "stop_before_target": 0.846154,
+      "stop_before_target_count": 11,
+      "stop_rate_all_filled": 0.846154,
+      "target_stop_resolved_count": 13,
+      "timeout_count": 0,
+      "tp1_before_sl": 0.153846,
+      "tp1_before_sl_count": 2,
+      "tp2_before_sl": 0.0,
+      "tp2_before_sl_count": 0,
+      "trend_transition": {
+        "shadow_trend_transition_distribution": {
+          "EMERGING_TREND": 1245,
+          "EXHAUSTING_TREND": 122,
+          "MATURE_TREND": 276,
+          "PULLBACK_IN_TREND": 1044,
+          "RANGE_BOUND": 1297,
+          "TRANSITION_TO_RANGE": 511,
+          "VOLATILITY_SHOCK": 2161
+        },
+        "technical_trend_transition_count": 2,
+        "technical_trend_transition_rate": 0.153846
+      }
+    },
+    {
+      "MAE": {
+        "max_r": 1.0,
+        "mean_r": 0.649286,
+        "median_r": 0.825
+      },
+      "MFE": {
+        "max_r": 4.14,
+        "mean_r": 1.492857,
+        "median_r": 1.455
+      },
+      "action_frequency": 0.002103,
+      "actionable_evaluation_count": 14,
+      "actionable_signal_count": 14,
+      "boundary_breach": {
+        "invalidation_breach_count": 46,
+        "stop_boundary_breach_count": 7,
+        "stop_boundary_breach_rate": 0.5
+      },
+      "cohort_label": "OOS_P2",
+      "drawdown_adverse_excursion": {
+        "max_adverse_excursion_r": 1.0,
+        "max_cumulative_net_r_drawdown": 5.0675,
+        "mean_adverse_excursion_r": 0.649286,
+        "median_adverse_excursion_r": 0.825
+      },
+      "fees": {
+        "maker_fee_rate": 0.0002,
+        "mean_fee_r": 0.235143,
+        "taker_fee_rate": 0.0005,
+        "total_fee_r": 3.292
+      },
+      "fill_rate": 1.0,
+      "filled_count": 14,
+      "funding": {
+        "funding_complete_count": 14,
+        "mean_funding_pnl_r": -0.000436,
+        "median_funding_pnl_r": 0.0,
+        "settlements_total": 4,
+        "total_funding_pnl_r": -0.00611
+      },
+      "gross_R": {
+        "mean": 0.891096,
+        "median": 0.508333,
+        "total": 12.47535
+      },
+      "holding_time": {
+        "mean_holding_time_ms": 6300000.0,
+        "mean_time_to_fill_ms": 600000.0,
+        "median_holding_time_ms": 1800000.0,
+        "median_time_to_fill_ms": 900000.0
+      },
+      "long_actionable_count": 11,
+      "long_short_wait_distribution": {
+        "LONG": {
+          "count": 11,
+          "share": 0.001653
+        },
+        "SHORT": {
+          "count": 3,
+          "share": 0.000451
+        },
+        "WAIT": {
+          "count": 6642,
+          "share": 0.997897
+        }
+      },
+      "mean_R": 0.56146,
+      "mean_gross_R": 0.891096,
+      "mean_net_R": 0.56146,
+      "median_R": 0.330944,
+      "median_gross_R": 0.508333,
+      "median_net_R": 0.330944,
+      "net_R": {
+        "mean": 0.56146,
+        "mean_ex_funding": 0.561896,
+        "median": 0.330944,
+        "median_ex_funding": 0.331465,
+        "total": 7.86044
+      },
+      "no_fill_count": 0,
+      "partition_spec": {
+        "calibration_end_ms": 1789639199999,
+        "calibration_start_ms": 1788717599999,
+        "oos_end_ms": 1790387999999,
+        "oos_start_ms": 1789639199999,
+        "partition_id": "OOS_P2"
+      },
+      "policy_shift": {
+        "directional_policy_shift_count": 0,
+        "directional_policy_shift_rate": 0.0
+      },
+      "sample_count": 6656,
+      "short_actionable_count": 3,
+      "slippage": {
+        "mean_slippage_r": 0.094057,
+        "slippage_bps_per_side": 2.0,
+        "total_slippage_r": 1.3168
+      },
+      "stop_before_target": 0.5,
+      "stop_before_target_count": 7,
+      "stop_rate_all_filled": 0.5,
+      "target_stop_resolved_count": 14,
+      "timeout_count": 0,
+      "tp1_before_sl": 0.5,
+      "tp1_before_sl_count": 7,
+      "tp2_before_sl": 0.142857,
+      "tp2_before_sl_count": 2,
+      "trend_transition": {
+        "shadow_trend_transition_distribution": {
+          "EMERGING_TREND": 1033,
+          "EXHAUSTING_TREND": 138,
+          "MATURE_TREND": 352,
+          "PULLBACK_IN_TREND": 1192,
+          "RANGE_BOUND": 1031,
+          "TRANSITION_TO_RANGE": 411,
+          "VOLATILITY_SHOCK": 2499
+        },
+        "technical_trend_transition_count": 1,
+        "technical_trend_transition_rate": 0.071429
+      }
+    },
+    {
+      "MAE": {
+        "max_r": 1.0,
+        "mean_r": 0.698235,
+        "median_r": 1.0
+      },
+      "MFE": {
+        "max_r": 4.7,
+        "mean_r": 1.678824,
+        "median_r": 1.66
+      },
+      "action_frequency": 0.002704,
+      "actionable_evaluation_count": 18,
+      "actionable_signal_count": 17,
+      "boundary_breach": {
+        "invalidation_breach_count": 46,
+        "stop_boundary_breach_count": 11,
+        "stop_boundary_breach_rate": 0.647059
+      },
+      "cohort_label": "OOS_P3",
+      "drawdown_adverse_excursion": {
+        "max_adverse_excursion_r": 1.0,
+        "max_cumulative_net_r_drawdown": 9.262136,
+        "mean_adverse_excursion_r": 0.698235,
+        "median_adverse_excursion_r": 1.0
+      },
+      "fees": {
+        "maker_fee_rate": 0.0002,
+        "mean_fee_r": 0.262,
+        "taker_fee_rate": 0.0005,
+        "total_fee_r": 4.454
+      },
+      "fill_rate": 1.0,
+      "filled_count": 17,
+      "funding": {
+        "funding_complete_count": 16,
+        "mean_funding_pnl_r": 0.001706,
+        "median_funding_pnl_r": 0.0,
+        "settlements_total": 5,
+        "total_funding_pnl_r": 0.02729
+      },
+      "gross_R": {
+        "mean": 0.219319,
+        "median": -1.0,
+        "total": 3.728425
+      },
+      "holding_time": {
+        "mean_holding_time_ms": 5738823.53,
+        "mean_time_to_fill_ms": 801176.47,
+        "median_holding_time_ms": 3600000.0,
+        "median_time_to_fill_ms": 900000.0
+      },
+      "long_actionable_count": 6,
+      "long_short_wait_distribution": {
+        "LONG": {
+          "count": 6,
+          "share": 0.000901
+        },
+        "SHORT": {
+          "count": 12,
+          "share": 0.001803
+        },
+        "WAIT": {
+          "count": 6638,
+          "share": 0.997296
+        }
+      },
+      "mean_R": -0.145876,
+      "mean_gross_R": 0.219319,
+      "mean_net_R": -0.145876,
+      "median_R": -1.2156,
+      "median_gross_R": -1.0,
+      "median_net_R": -1.2156,
+      "net_R": {
+        "mean": -0.145876,
+        "mean_ex_funding": -0.147481,
+        "median": -1.2156,
+        "median_ex_funding": -1.2156,
+        "total": -2.479884
+      },
+      "no_fill_count": 0,
+      "partition_spec": {
+        "calibration_end_ms": 1790387999999,
+        "calibration_start_ms": 1788717599999,
+        "oos_end_ms": 1791136799999,
+        "oos_start_ms": 1790387999999,
+        "partition_id": "OOS_P3"
+      },
+      "policy_shift": {
+        "directional_policy_shift_count": 0,
+        "directional_policy_shift_rate": 0.0
+      },
+      "sample_count": 6656,
+      "short_actionable_count": 11,
+      "slippage": {
+        "mean_slippage_r": 0.1048,
+        "slippage_bps_per_side": 2.0,
+        "total_slippage_r": 1.7816
+      },
+      "stop_before_target": 0.647059,
+      "stop_before_target_count": 11,
+      "stop_rate_all_filled": 0.647059,
+      "target_stop_resolved_count": 17,
+      "timeout_count": 0,
+      "tp1_before_sl": 0.352941,
+      "tp1_before_sl_count": 6,
+      "tp2_before_sl": 0.058824,
+      "tp2_before_sl_count": 1,
+      "trend_transition": {
+        "shadow_trend_transition_distribution": {
+          "EMERGING_TREND": 1710,
+          "EXHAUSTING_TREND": 90,
+          "MATURE_TREND": 220,
+          "PULLBACK_IN_TREND": 701,
+          "RANGE_BOUND": 1683,
+          "TRANSITION_TO_RANGE": 851,
+          "VOLATILITY_SHOCK": 1401
+        },
+        "technical_trend_transition_count": 4,
+        "technical_trend_transition_rate": 0.235294
+      }
+    }
+  ],
+  "selected_candidate_id": "C5_BOUNDED_COMBINATION_B",
+  "selected_policy_manifest": {
+    "config_hash": "bba61849e64f37f9",
+    "development_universe": [
+      "BTCUSDT",
+      "ETHUSDT",
+      "SOLUSDT",
+      "LINKUSDT",
+      "SUIUSDT",
+      "XRPUSDT",
+      "DOGEUSDT",
+      "BNBUSDT"
+    ],
+    "family": "BOUNDED_COMBINATION",
+    "manifest_version": "RC2_TACTICAL_SELECTED_POLICY_MANIFEST_V1",
+    "name": "Bounded Combination B (Structure Filter + Persistence Floor)",
+    "policy_version": "TACTICAL_POLICY_R2_B1",
+    "promoted_rules": [
+      {
+        "computation_version": "TREND_EVIDENCE_V2_SHADOW",
+        "condition": "structure_transition not in ('TREND_TO_RANGE', 'RANGE_TO_TREND_UP', 'RANGE_TO_TREND_DOWN')",
+        "field": "structure_transition",
+        "missing_data_behavior": "FAIL_CLOSED_TO_WAIT",
+        "reason_code": "VETO_UNCONFIRMED_STRUCTURE_TRANSITION",
+        "source_field": "TrendEvidenceV2Shadow.structure_transition",
+        "type": "VETO"
+      },
+      {
+        "computation_version": "TREND_EVIDENCE_V2_SHADOW",
+        "condition": "trend_persistence >= 0.60",
+        "field": "trend_persistence",
+        "missing_data_behavior": "FAIL_CLOSED_TO_WAIT",
+        "reason_code": "VETO_INSUFFICIENT_TREND_PERSISTENCE",
+        "source_field": "TrendEvidenceV2Shadow.trend_persistence",
+        "type": "ENTRY_REQUIREMENT"
+      },
+      {
+        "computation_version": "TREND_EVIDENCE_V2_SHADOW",
+        "condition": "trend_evidence is not None",
+        "field": "trend_evidence",
+        "missing_data_behavior": "FAIL_CLOSED_TO_WAIT",
+        "reason_code": "VETO_PROMOTED_TREND_EVIDENCE_MISSING",
+        "source_field": "TrendEvidenceV2Shadow",
+        "type": "VETO"
+      }
+    ],
+    "protected_universe_access_count": 0,
+    "protected_validation_universe": [
+      "ADAUSDT",
+      "AVAXUSDT",
+      "LTCUSDT",
+      "TRXUSDT",
+      "BCHUSDT",
+      "DOTUSDT",
+      "ATOMUSDT",
+      "NEARUSDT"
+    ],
+    "release_id": "B_LINE_INITIAL_USABLE_RELEASE_V1_RC2",
+    "selected_candidate_id": "C5_BOUNDED_COMBINATION_B",
+    "selection_rationales": [
+      "Escapes all four RC1 hard-negative gates on development universe data.",
+      "Eliminates 104 bad directional entries from RC1 baseline (actionable count: 148 -> 44), specifically rejecting severe negative trades in false breakout transitions (TREND_TO_RANGE and RANGE_TO_TREND_*).",
+      "Improves aggregate mean net R by +0.454R over RC1 baseline.",
+      "Substantially lowers stop-before-target rate from 0.7838 to 0.6591.",
+      "Demonstrates strong rolling partition performance, achieving +0.5615R mean net R on OOS_P2.",
+      "Maintains minimal complexity: promotes only 2 features with 0 per-symbol hand tuning."
+    ],
+    "task_id": "B_LINE_RC2_TACTICAL_SUCCESSOR_R1_IMPLEMENTATION"
+  },
+  "shadow_trend_diagnostics": {
+    "active_policy_influence": "NONE",
+    "authority": "SHADOW_ONLY",
+    "by_structure_transition": {
+      "CONTINUATION_DOWN": {
+        "count": 2344,
+        "mean_adx_slope": 0.187734,
+        "mean_net_R": -0.183461,
+        "mean_pullback_depth_atr": 2.157801,
+        "mean_trend_age": 6.901,
+        "mean_trend_persistence": 0.65529,
+        "median_net_R": -1.2156,
+        "resolved_actionable_count": 9,
+        "share": 0.117388
+      },
+      "CONTINUATION_UP": {
+        "count": 4252,
+        "mean_adx_slope": 0.179224,
+        "mean_net_R": 0.143919,
+        "mean_pullback_depth_atr": 1.939743,
+        "mean_trend_age": 12.5974,
+        "mean_trend_persistence": 0.704688,
+        "median_net_R": -1.18425,
+        "resolved_actionable_count": 14,
+        "share": 0.212941
+      },
+      "RANGE_TO_TREND_DOWN": {
+        "count": 1864,
+        "mean_adx_slope": -0.139005,
+        "mean_net_R": null,
+        "mean_pullback_depth_atr": 2.208954,
+        "mean_trend_age": 6.2339,
+        "mean_trend_persistence": 0.683834,
+        "median_net_R": null,
+        "resolved_actionable_count": 0,
+        "share": 0.093349
+      },
+      "RANGE_TO_TREND_UP": {
+        "count": 2272,
+        "mean_adx_slope": -0.303901,
+        "mean_net_R": null,
+        "mean_pullback_depth_atr": 1.959303,
+        "mean_trend_age": 6.4525,
+        "mean_trend_persistence": 0.598298,
+        "median_net_R": null,
+        "resolved_actionable_count": 0,
+        "share": 0.113782
+      },
+      "REVERSAL_DOWN_TO_UP": {
+        "count": 384,
+        "mean_adx_slope": -0.344627,
+        "mean_net_R": 0.391242,
+        "mean_pullback_depth_atr": 1.870255,
+        "mean_trend_age": 3.9479,
+        "mean_trend_persistence": 0.588542,
+        "median_net_R": -0.01411,
+        "resolved_actionable_count": 4,
+        "share": 0.019231
+      },
+      "REVERSAL_UP_TO_DOWN": {
+        "count": 376,
+        "mean_adx_slope": -0.370735,
+        "mean_net_R": -1.5673,
+        "mean_pullback_depth_atr": 2.31824,
+        "mean_trend_age": 4.383,
+        "mean_trend_persistence": 0.625,
+        "median_net_R": -1.5673,
+        "resolved_actionable_count": 1,
+        "share": 0.01883
+      },
+      "STABLE_RANGE": {
+        "count": 4368,
+        "mean_adx_slope": -0.084985,
+        "mean_net_R": -0.386026,
+        "mean_pullback_depth_atr": 2.160323,
+        "mean_trend_age": 6.5009,
+        "mean_trend_persistence": 0.618513,
+        "median_net_R": -1.256519,
+        "resolved_actionable_count": 16,
+        "share": 0.21875
+      },
+      "TREND_TO_RANGE": {
+        "count": 4108,
+        "mean_adx_slope": -0.266413,
+        "mean_net_R": null,
+        "mean_pullback_depth_atr": 2.021347,
+        "mean_trend_age": 6.3418,
+        "mean_trend_persistence": 0.642405,
+        "median_net_R": null,
+        "resolved_actionable_count": 0,
+        "share": 0.205729
+      }
+    },
+    "by_trend_transition_state": {
+      "EMERGING_TREND": {
+        "count": 3988,
+        "mean_adx_slope": -0.191227,
+        "mean_net_R": -0.75478,
+        "mean_pullback_depth_atr": 1.949277,
+        "mean_trend_age": 5.3225,
+        "mean_trend_persistence": 0.610603,
+        "median_net_R": -1.4145,
+        "resolved_actionable_count": 4,
+        "share": 0.19972
+      },
+      "EXHAUSTING_TREND": {
+        "count": 350,
+        "mean_adx_slope": -0.552959,
+        "mean_net_R": null,
+        "mean_pullback_depth_atr": 2.553619,
+        "mean_trend_age": 25.4886,
+        "mean_trend_persistence": 0.932857,
+        "median_net_R": null,
+        "resolved_actionable_count": 0,
+        "share": 0.017528
+      },
+      "MATURE_TREND": {
+        "count": 848,
+        "mean_adx_slope": 0.530566,
+        "mean_net_R": -0.19886,
+        "mean_pullback_depth_atr": 2.187365,
+        "mean_trend_age": 20.6073,
+        "mean_trend_persistence": 0.948703,
+        "median_net_R": -1.1389,
+        "resolved_actionable_count": 6,
+        "share": 0.042468
+      },
+      "PULLBACK_IN_TREND": {
+        "count": 2937,
+        "mean_adx_slope": 0.188479,
+        "mean_net_R": -0.487611,
+        "mean_pullback_depth_atr": 1.472061,
+        "mean_trend_age": 18.1318,
+        "mean_trend_persistence": 0.871439,
+        "median_net_R": -1.4978,
+        "resolved_actionable_count": 11,
+        "share": 0.147085
+      },
+      "RANGE_BOUND": {
+        "count": 4011,
+        "mean_adx_slope": -0.536828,
+        "mean_net_R": 0.789269,
+        "mean_pullback_depth_atr": 2.212434,
+        "mean_trend_age": 0.2947,
+        "mean_trend_persistence": 0.492521,
+        "median_net_R": 0.508649,
+        "resolved_actionable_count": 8,
+        "share": 0.200871
+      },
+      "TRANSITION_TO_RANGE": {
+        "count": 1773,
+        "mean_adx_slope": -0.599792,
+        "mean_net_R": null,
+        "mean_pullback_depth_atr": 2.039368,
+        "mean_trend_age": 0.3158,
+        "mean_trend_persistence": 0.508225,
+        "median_net_R": null,
+        "resolved_actionable_count": 0,
+        "share": 0.088792
+      },
+      "VOLATILITY_SHOCK": {
+        "count": 6061,
+        "mean_adx_slope": 0.277921,
+        "mean_net_R": -0.170212,
+        "mean_pullback_depth_atr": 2.288209,
+        "mean_trend_age": 8.4169,
+        "mean_trend_persistence": 0.654334,
+        "median_net_R": -1.2107,
+        "resolved_actionable_count": 15,
+        "share": 0.303536
+      }
+    },
+    "feature_means": {
+      "adx_slope": -0.074361,
+      "bars_since_breakout": 6.244477,
+      "basis_delta": -7.5e-05,
+      "ema_slope_acceleration": 0.001699,
+      "funding_delta": 0.0,
+      "oi_acceleration": 6e-06,
+      "price_oi_divergence": 0.0002,
+      "pullback_depth_atr": 2.063528,
+      "trend_age": 7.69391,
+      "trend_persistence": 0.649439
+    },
+    "fields_present": [
+      "trend_age",
+      "trend_persistence",
+      "adx_slope",
+      "ema_slope_acceleration",
+      "structure_transition",
+      "bars_since_breakout",
+      "pullback_depth_atr",
+      "oi_acceleration",
+      "price_oi_divergence",
+      "funding_delta",
+      "basis_delta",
+      "trend_transition_state"
+    ],
+    "pit_safe_all": true,
+    "sample_count": 19968,
+    "schema_version": "TREND_EVIDENCE_V2_SHADOW"
+  },
+  "start_sha": "597d2dd7452d6e2ab11e8500d253be1e6d53f8db",
+  "subgroup_diagnostics": {
+    "entry_quality_bucket": {
+      "EXCELLENT": {
+        "MAE": {
+          "max_r": 1.0,
+          "mean_r": 0.60125,
+          "median_r": 0.575
+        },
+        "MFE": {
+          "max_r": 4.14,
+          "mean_r": 2.5775,
+          "median_r": 2.285
+        },
+        "action_frequency": 0.32,
+        "actionable_evaluation_count": 8,
+        "actionable_signal_count": 8,
+        "boundary_breach": {
+          "invalidation_breach_count": 0,
+          "stop_boundary_breach_count": 3,
+          "stop_boundary_breach_rate": 0.375
+        },
+        "cohort_label": "EXCELLENT",
+        "drawdown_adverse_excursion": {
+          "max_adverse_excursion_r": 1.0,
+          "max_cumulative_net_r_drawdown": 1.6258,
+          "mean_adverse_excursion_r": 0.60125,
+          "median_adverse_excursion_r": 0.575
+        },
+        "fees": {
+          "maker_fee_rate": 0.0002,
+          "mean_fee_r": 0.261946,
+          "taker_fee_rate": 0.0005,
+          "total_fee_r": 2.095571
+        },
+        "fill_rate": 1.0,
+        "filled_count": 8,
+        "funding": {
+          "funding_complete_count": 8,
+          "mean_funding_pnl_r": 0.000857,
+          "median_funding_pnl_r": 0.0,
+          "settlements_total": 3,
+          "total_funding_pnl_r": 0.006855
+        },
+        "gross_R": {
+          "mean": 1.480045,
+          "median": 2.017949,
+          "total": 11.840359
+        },
+        "holding_time": {
+          "mean_holding_time_ms": 9750000.0,
+          "mean_time_to_fill_ms": 795000.0,
+          "median_holding_time_ms": 6750000.0,
+          "median_time_to_fill_ms": 900000.0
+        },
+        "long_actionable_count": 5,
+        "long_short_wait_distribution": {
+          "LONG": {
+            "count": 5,
+            "share": 0.2
+          },
+          "SHORT": {
+            "count": 3,
+            "share": 0.12
+          },
+          "WAIT": {
+            "count": 17,
+            "share": 0.68
+          }
+        },
+        "mean_R": 1.114177,
+        "mean_gross_R": 1.480045,
+        "mean_net_R": 1.114177,
+        "median_R": 1.82021,
+        "median_gross_R": 2.017949,
+        "median_net_R": 1.82021,
+        "net_R": {
+          "mean": 1.114177,
+          "mean_ex_funding": 1.11332,
+          "median": 1.82021,
+          "median_ex_funding": 1.832499,
+          "total": 8.913414
+        },
+        "no_fill_count": 0,
+        "policy_shift": {
+          "directional_policy_shift_count": 0,
+          "directional_policy_shift_rate": 0.0
+        },
+        "sample_count": 25,
+        "short_actionable_count": 3,
+        "slippage": {
+          "mean_slippage_r": 0.104779,
+          "slippage_bps_per_side": 2.0,
+          "total_slippage_r": 0.838229
+        },
+        "stop_before_target": 0.375,
+        "stop_before_target_count": 3,
+        "stop_rate_all_filled": 0.375,
+        "target_stop_resolved_count": 8,
+        "timeout_count": 0,
+        "tp1_before_sl": 0.625,
+        "tp1_before_sl_count": 5,
+        "tp2_before_sl": 0.25,
+        "tp2_before_sl_count": 2,
+        "trend_transition": {
+          "shadow_trend_transition_distribution": {},
+          "technical_trend_transition_count": 0,
+          "technical_trend_transition_rate": 0.0
+        }
+      },
+      "GOOD": {
+        "MAE": {
+          "max_r": 1.0,
+          "mean_r": 0.770278,
+          "median_r": 1.0
+        },
+        "MFE": {
+          "max_r": 5.06,
+          "mean_r": 1.204444,
+          "median_r": 0.51
+        },
+        "action_frequency": 0.245283,
+        "actionable_evaluation_count": 39,
+        "actionable_signal_count": 36,
+        "boundary_breach": {
+          "invalidation_breach_count": 0,
+          "stop_boundary_breach_count": 26,
+          "stop_boundary_breach_rate": 0.722222
+        },
+        "cohort_label": "GOOD",
+        "drawdown_adverse_excursion": {
+          "max_adverse_excursion_r": 1.0,
+          "max_cumulative_net_r_drawdown": 17.838679,
+          "mean_adverse_excursion_r": 0.770278,
+          "median_adverse_excursion_r": 1.0
+        },
+        "fees": {
+          "maker_fee_rate": 0.0002,
+          "mean_fee_r": 0.288526,
+          "taker_fee_rate": 0.0005,
+          "total_fee_r": 10.386929
+        },
+        "fill_rate": 1.0,
+        "filled_count": 36,
+        "funding": {
+          "funding_complete_count": 34,
+          "mean_funding_pnl_r": 0.000754,
+          "median_funding_pnl_r": 0.0,
+          "settlements_total": 10,
+          "total_funding_pnl_r": 0.025632
+        },
+        "gross_R": {
+          "mean": -0.005899,
+          "median": -1.0,
+          "total": -0.212375
+        },
+        "holding_time": {
+          "mean_holding_time_ms": 4228333.33,
+          "mean_time_to_fill_ms": 666666.67,
+          "median_holding_time_ms": 2250000.0,
+          "median_time_to_fill_ms": 900000.0
+        },
+        "long_actionable_count": 15,
+        "long_short_wait_distribution": {
+          "LONG": {
+            "count": 15,
+            "share": 0.09434
+          },
+          "SHORT": {
+            "count": 24,
+            "share": 0.150943
+          },
+          "WAIT": {
+            "count": 120,
+            "share": 0.754717
+          }
+        },
+        "mean_R": -0.409123,
+        "mean_gross_R": -0.005899,
+        "mean_net_R": -0.409123,
+        "median_R": -1.3014,
+        "median_gross_R": -1.0,
+        "median_net_R": -1.3014,
+        "net_R": {
+          "mean": -0.409123,
+          "mean_ex_funding": -0.409835,
+          "median": -1.3014,
+          "median_ex_funding": -1.3014,
+          "total": -14.728443
+        },
+        "no_fill_count": 0,
+        "policy_shift": {
+          "directional_policy_shift_count": 0,
+          "directional_policy_shift_rate": 0.0
+        },
+        "sample_count": 159,
+        "short_actionable_count": 21,
+        "slippage": {
+          "mean_slippage_r": 0.11541,
+          "slippage_bps_per_side": 2.0,
+          "total_slippage_r": 4.154771
+        },
+        "stop_before_target": 0.722222,
+        "stop_before_target_count": 26,
+        "stop_rate_all_filled": 0.722222,
+        "target_stop_resolved_count": 36,
+        "timeout_count": 0,
+        "tp1_before_sl": 0.277778,
+        "tp1_before_sl_count": 10,
+        "tp2_before_sl": 0.027778,
+        "tp2_before_sl_count": 1,
+        "trend_transition": {
+          "shadow_trend_transition_distribution": {},
+          "technical_trend_transition_count": 0,
+          "technical_trend_transition_rate": 0.0
+        }
+      },
+      "MARGINAL": {
+        "MAE": {
+          "max_r": null,
+          "mean_r": null,
+          "median_r": null
+        },
+        "MFE": {
+          "max_r": null,
+          "mean_r": null,
+          "median_r": null
+        },
+        "action_frequency": 0.0,
+        "actionable_evaluation_count": 0,
+        "actionable_signal_count": 0,
+        "boundary_breach": {
+          "invalidation_breach_count": 117,
+          "stop_boundary_breach_count": 0,
+          "stop_boundary_breach_rate": null
+        },
+        "cohort_label": "MARGINAL",
+        "drawdown_adverse_excursion": {
+          "max_adverse_excursion_r": null,
+          "max_cumulative_net_r_drawdown": 0.0,
+          "mean_adverse_excursion_r": null,
+          "median_adverse_excursion_r": null
+        },
+        "fees": {
+          "maker_fee_rate": 0.0002,
+          "mean_fee_r": 0.0,
+          "taker_fee_rate": 0.0005,
+          "total_fee_r": 0.0
+        },
+        "fill_rate": null,
+        "filled_count": 0,
+        "funding": {
+          "funding_complete_count": 0,
+          "mean_funding_pnl_r": 0.0,
+          "median_funding_pnl_r": 0.0,
+          "settlements_total": 0,
+          "total_funding_pnl_r": 0.0
+        },
+        "gross_R": {
+          "mean": null,
+          "median": null,
+          "total": 0.0
+        },
+        "holding_time": {
+          "mean_holding_time_ms": null,
+          "mean_time_to_fill_ms": null,
+          "median_holding_time_ms": null,
+          "median_time_to_fill_ms": null
+        },
+        "long_actionable_count": 0,
+        "long_short_wait_distribution": {
+          "LONG": {
+            "count": 0,
+            "share": 0.0
+          },
+          "SHORT": {
+            "count": 0,
+            "share": 0.0
+          },
+          "WAIT": {
+            "count": 345,
+            "share": 1.0
+          }
+        },
+        "mean_R": null,
+        "mean_gross_R": null,
+        "mean_net_R": null,
+        "median_R": null,
+        "median_gross_R": null,
+        "median_net_R": null,
+        "net_R": {
+          "mean": null,
+          "mean_ex_funding": null,
+          "median": null,
+          "median_ex_funding": null,
+          "total": 0.0
+        },
+        "no_fill_count": 0,
+        "policy_shift": {
+          "directional_policy_shift_count": 0,
+          "directional_policy_shift_rate": 0.0
+        },
+        "sample_count": 345,
+        "short_actionable_count": 0,
+        "slippage": {
+          "mean_slippage_r": 0.0,
+          "slippage_bps_per_side": 2.0,
+          "total_slippage_r": 0.0
+        },
+        "stop_before_target": null,
+        "stop_before_target_count": 0,
+        "stop_rate_all_filled": null,
+        "target_stop_resolved_count": 0,
+        "timeout_count": 0,
+        "tp1_before_sl": null,
+        "tp1_before_sl_count": 0,
+        "tp2_before_sl": null,
+        "tp2_before_sl_count": 0,
+        "trend_transition": {
+          "shadow_trend_transition_distribution": {},
+          "technical_trend_transition_count": 0,
+          "technical_trend_transition_rate": 0.0
+        }
+      },
+      "POOR": {
+        "MAE": {
+          "max_r": null,
+          "mean_r": null,
+          "median_r": null
+        },
+        "MFE": {
+          "max_r": null,
+          "mean_r": null,
+          "median_r": null
+        },
+        "action_frequency": 0.0,
+        "actionable_evaluation_count": 0,
+        "actionable_signal_count": 0,
+        "boundary_breach": {
+          "invalidation_breach_count": 10,
+          "stop_boundary_breach_count": 0,
+          "stop_boundary_breach_rate": null
+        },
+        "cohort_label": "POOR",
+        "drawdown_adverse_excursion": {
+          "max_adverse_excursion_r": null,
+          "max_cumulative_net_r_drawdown": 0.0,
+          "mean_adverse_excursion_r": null,
+          "median_adverse_excursion_r": null
+        },
+        "fees": {
+          "maker_fee_rate": 0.0002,
+          "mean_fee_r": 0.0,
+          "taker_fee_rate": 0.0005,
+          "total_fee_r": 0.0
+        },
+        "fill_rate": null,
+        "filled_count": 0,
+        "funding": {
+          "funding_complete_count": 0,
+          "mean_funding_pnl_r": 0.0,
+          "median_funding_pnl_r": 0.0,
+          "settlements_total": 0,
+          "total_funding_pnl_r": 0.0
+        },
+        "gross_R": {
+          "mean": null,
+          "median": null,
+          "total": 0.0
+        },
+        "holding_time": {
+          "mean_holding_time_ms": null,
+          "mean_time_to_fill_ms": null,
+          "median_holding_time_ms": null,
+          "median_time_to_fill_ms": null
+        },
+        "long_actionable_count": 0,
+        "long_short_wait_distribution": {
+          "LONG": {
+            "count": 0,
+            "share": 0.0
+          },
+          "SHORT": {
+            "count": 0,
+            "share": 0.0
+          },
+          "WAIT": {
+            "count": 19439,
+            "share": 1.0
+          }
+        },
+        "mean_R": null,
+        "mean_gross_R": null,
+        "mean_net_R": null,
+        "median_R": null,
+        "median_gross_R": null,
+        "median_net_R": null,
+        "net_R": {
+          "mean": null,
+          "mean_ex_funding": null,
+          "median": null,
+          "median_ex_funding": null,
+          "total": 0.0
+        },
+        "no_fill_count": 0,
+        "policy_shift": {
+          "directional_policy_shift_count": 0,
+          "directional_policy_shift_rate": 0.0
+        },
+        "sample_count": 19439,
+        "short_actionable_count": 0,
+        "slippage": {
+          "mean_slippage_r": 0.0,
+          "slippage_bps_per_side": 2.0,
+          "total_slippage_r": 0.0
+        },
+        "stop_before_target": null,
+        "stop_before_target_count": 0,
+        "stop_rate_all_filled": null,
+        "target_stop_resolved_count": 0,
+        "timeout_count": 0,
+        "tp1_before_sl": null,
+        "tp1_before_sl_count": 0,
+        "tp2_before_sl": null,
+        "tp2_before_sl_count": 0,
+        "trend_transition": {
+          "shadow_trend_transition_distribution": {},
+          "technical_trend_transition_count": 0,
+          "technical_trend_transition_rate": 0.0
+        }
+      }
+    },
+    "regime_x_direction": {
+      "HIGH_VOLATILITY__LONG": {
+        "MAE": {
+          "max_r": 1.0,
+          "mean_r": 0.7725,
+          "median_r": 1.0
+        },
+        "MFE": {
+          "max_r": 2.91,
+          "mean_r": 0.9,
+          "median_r": 0.345
+        },
+        "action_frequency": 1.0,
+        "actionable_evaluation_count": 4,
+        "actionable_signal_count": 4,
+        "boundary_breach": {
+          "invalidation_breach_count": 0,
+          "stop_boundary_breach_count": 3,
+          "stop_boundary_breach_rate": 0.75
+        },
+        "cohort_label": "HIGH_VOLATILITY__LONG",
+        "drawdown_adverse_excursion": {
+          "max_adverse_excursion_r": 1.0,
+          "max_cumulative_net_r_drawdown": 2.5638,
+          "mean_adverse_excursion_r": 0.7725,
+          "median_adverse_excursion_r": 1.0
+        },
+        "fees": {
+          "maker_fee_rate": 0.0002,
+          "mean_fee_r": 0.202786,
+          "taker_fee_rate": 0.0005,
+          "total_fee_r": 0.811143
+        },
+        "fill_rate": 1.0,
+        "filled_count": 4,
+        "funding": {
+          "funding_complete_count": 4,
+          "mean_funding_pnl_r": 0.0,
+          "median_funding_pnl_r": 0.0,
+          "settlements_total": 0,
+          "total_funding_pnl_r": 0.0
+        },
+        "gross_R": {
+          "mean": -0.023421,
+          "median": -1.0,
+          "total": -0.093683
+        },
+        "holding_time": {
+          "mean_holding_time_ms": 2010000.0,
+          "mean_time_to_fill_ms": 480000.0,
+          "median_holding_time_ms": 780000.0,
+          "median_time_to_fill_ms": 480000.0
+        },
+        "long_actionable_count": 4,
+        "long_short_wait_distribution": {
+          "LONG": {
+            "count": 4,
+            "share": 1.0
+          },
+          "SHORT": {
+            "count": 0,
+            "share": 0.0
+          },
+          "WAIT": {
+            "count": 0,
+            "share": 0.0
+          }
+        },
+        "mean_R": -0.307321,
+        "mean_gross_R": -0.023421,
+        "mean_net_R": -0.307321,
+        "median_R": -1.1905,
+        "median_gross_R": -1.0,
+        "median_net_R": -1.1905,
+        "net_R": {
+          "mean": -0.307321,
+          "mean_ex_funding": -0.307321,
+          "median": -1.1905,
+          "median_ex_funding": -1.1905,
+          "total": -1.229283
+        },
+        "no_fill_count": 0,
+        "policy_shift": {
+          "directional_policy_shift_count": 0,
+          "directional_policy_shift_rate": 0.0
+        },
+        "sample_count": 4,
+        "short_actionable_count": 0,
+        "slippage": {
+          "mean_slippage_r": 0.081114,
+          "slippage_bps_per_side": 2.0,
+          "total_slippage_r": 0.324457
+        },
+        "stop_before_target": 0.75,
+        "stop_before_target_count": 3,
+        "stop_rate_all_filled": 0.75,
+        "target_stop_resolved_count": 4,
+        "timeout_count": 0,
+        "tp1_before_sl": 0.25,
+        "tp1_before_sl_count": 1,
+        "tp2_before_sl": 0.0,
+        "tp2_before_sl_count": 0,
+        "trend_transition": {
+          "shadow_trend_transition_distribution": {},
+          "technical_trend_transition_count": 0,
+          "technical_trend_transition_rate": 0.0
+        }
+      },
+      "HIGH_VOLATILITY__SHORT": {
+        "MAE": {
+          "max_r": 1.0,
+          "mean_r": 0.666667,
+          "median_r": 1.0
+        },
+        "MFE": {
+          "max_r": 3.18,
+          "mean_r": 1.723333,
+          "median_r": 1.99
+        },
+        "action_frequency": 1.0,
+        "actionable_evaluation_count": 4,
+        "actionable_signal_count": 3,
+        "boundary_breach": {
+          "invalidation_breach_count": 0,
+          "stop_boundary_breach_count": 2,
+          "stop_boundary_breach_rate": 0.666667
+        },
+        "cohort_label": "HIGH_VOLATILITY__SHORT",
+        "drawdown_adverse_excursion": {
+          "max_adverse_excursion_r": 1.0,
+          "max_cumulative_net_r_drawdown": 1.601,
+          "mean_adverse_excursion_r": 0.666667,
+          "median_adverse_excursion_r": 1.0
+        },
+        "fees": {
+          "maker_fee_rate": 0.0002,
+          "mean_fee_r": 0.274071,
+          "taker_fee_rate": 0.0005,
+          "total_fee_r": 0.822214
+        },
+        "fill_rate": 1.0,
+        "filled_count": 3,
+        "funding": {
+          "funding_complete_count": 3,
+          "mean_funding_pnl_r": 0.0,
+          "median_funding_pnl_r": 0.0,
+          "settlements_total": 0,
+          "total_funding_pnl_r": 0.0
+        },
+        "gross_R": {
+          "mean": 0.391727,
+          "median": -1.0,
+          "total": 1.175182
+        },
+        "holding_time": {
+          "mean_holding_time_ms": 1820000.0,
+          "mean_time_to_fill_ms": 620000.0,
+          "median_holding_time_ms": 1800000.0,
+          "median_time_to_fill_ms": 900000.0
+        },
+        "long_actionable_count": 0,
+        "long_short_wait_distribution": {
+          "LONG": {
+            "count": 0,
+            "share": 0.0
+          },
+          "SHORT": {
+            "count": 4,
+            "share": 1.0
+          },
+          "WAIT": {
+            "count": 0,
+            "share": 0.0
+          }
+        },
+        "mean_R": 0.008027,
+        "mean_gross_R": 0.391727,
+        "mean_net_R": 0.008027,
+        "median_R": -1.4259,
+        "median_gross_R": -1.0,
+        "median_net_R": -1.4259,
+        "net_R": {
+          "mean": 0.008027,
+          "mean_ex_funding": 0.008027,
+          "median": -1.4259,
+          "median_ex_funding": -1.4259,
+          "total": 0.024082
+        },
+        "no_fill_count": 0,
+        "policy_shift": {
+          "directional_policy_shift_count": 0,
+          "directional_policy_shift_rate": 0.0
+        },
+        "sample_count": 4,
+        "short_actionable_count": 3,
+        "slippage": {
+          "mean_slippage_r": 0.109629,
+          "slippage_bps_per_side": 2.0,
+          "total_slippage_r": 0.328886
+        },
+        "stop_before_target": 0.666667,
+        "stop_before_target_count": 2,
+        "stop_rate_all_filled": 0.666667,
+        "target_stop_resolved_count": 3,
+        "timeout_count": 0,
+        "tp1_before_sl": 0.333333,
+        "tp1_before_sl_count": 1,
+        "tp2_before_sl": 0.0,
+        "tp2_before_sl_count": 0,
+        "trend_transition": {
+          "shadow_trend_transition_distribution": {},
+          "technical_trend_transition_count": 0,
+          "technical_trend_transition_rate": 0.0
+        }
+      },
+      "HIGH_VOLATILITY__WAIT": {
+        "MAE": {
+          "max_r": null,
+          "mean_r": null,
+          "median_r": null
+        },
+        "MFE": {
+          "max_r": null,
+          "mean_r": null,
+          "median_r": null
+        },
+        "action_frequency": 0.0,
+        "actionable_evaluation_count": 0,
+        "actionable_signal_count": 0,
+        "boundary_breach": {
+          "invalidation_breach_count": 13,
+          "stop_boundary_breach_count": 0,
+          "stop_boundary_breach_rate": null
+        },
+        "cohort_label": "HIGH_VOLATILITY__WAIT",
+        "drawdown_adverse_excursion": {
+          "max_adverse_excursion_r": null,
+          "max_cumulative_net_r_drawdown": 0.0,
+          "mean_adverse_excursion_r": null,
+          "median_adverse_excursion_r": null
+        },
+        "fees": {
+          "maker_fee_rate": 0.0002,
+          "mean_fee_r": 0.0,
+          "taker_fee_rate": 0.0005,
+          "total_fee_r": 0.0
+        },
+        "fill_rate": null,
+        "filled_count": 0,
+        "funding": {
+          "funding_complete_count": 0,
+          "mean_funding_pnl_r": 0.0,
+          "median_funding_pnl_r": 0.0,
+          "settlements_total": 0,
+          "total_funding_pnl_r": 0.0
+        },
+        "gross_R": {
+          "mean": null,
+          "median": null,
+          "total": 0.0
+        },
+        "holding_time": {
+          "mean_holding_time_ms": null,
+          "mean_time_to_fill_ms": null,
+          "median_holding_time_ms": null,
+          "median_time_to_fill_ms": null
+        },
+        "long_actionable_count": 0,
+        "long_short_wait_distribution": {
+          "LONG": {
+            "count": 0,
+            "share": 0.0
+          },
+          "SHORT": {
+            "count": 0,
+            "share": 0.0
+          },
+          "WAIT": {
+            "count": 3564,
+            "share": 1.0
+          }
+        },
+        "mean_R": null,
+        "mean_gross_R": null,
+        "mean_net_R": null,
+        "median_R": null,
+        "median_gross_R": null,
+        "median_net_R": null,
+        "net_R": {
+          "mean": null,
+          "mean_ex_funding": null,
+          "median": null,
+          "median_ex_funding": null,
+          "total": 0.0
+        },
+        "no_fill_count": 0,
+        "policy_shift": {
+          "directional_policy_shift_count": 0,
+          "directional_policy_shift_rate": 0.0
+        },
+        "sample_count": 3564,
+        "short_actionable_count": 0,
+        "slippage": {
+          "mean_slippage_r": 0.0,
+          "slippage_bps_per_side": 2.0,
+          "total_slippage_r": 0.0
+        },
+        "stop_before_target": null,
+        "stop_before_target_count": 0,
+        "stop_rate_all_filled": null,
+        "target_stop_resolved_count": 0,
+        "timeout_count": 0,
+        "tp1_before_sl": null,
+        "tp1_before_sl_count": 0,
+        "tp2_before_sl": null,
+        "tp2_before_sl_count": 0,
+        "trend_transition": {
+          "shadow_trend_transition_distribution": {},
+          "technical_trend_transition_count": 0,
+          "technical_trend_transition_rate": 0.0
+        }
+      },
+      "RANGE__LONG": {
+        "MAE": {
+          "max_r": 1.0,
+          "mean_r": 1.0,
+          "median_r": 1.0
+        },
+        "MFE": {
+          "max_r": 0.2,
+          "mean_r": 0.11,
+          "median_r": 0.11
+        },
+        "action_frequency": 1.0,
+        "actionable_evaluation_count": 2,
+        "actionable_signal_count": 2,
+        "boundary_breach": {
+          "invalidation_breach_count": 0,
+          "stop_boundary_breach_count": 2,
+          "stop_boundary_breach_rate": 1.0
+        },
+        "cohort_label": "RANGE__LONG",
+        "drawdown_adverse_excursion": {
+          "max_adverse_excursion_r": 1.0,
+          "max_cumulative_net_r_drawdown": 3.2643,
+          "mean_adverse_excursion_r": 1.0,
+          "median_adverse_excursion_r": 1.0
+        },
+        "fees": {
+          "maker_fee_rate": 0.0002,
+          "mean_fee_r": 0.451536,
+          "taker_fee_rate": 0.0005,
+          "total_fee_r": 0.903071
+        },
+        "fill_rate": 1.0,
+        "filled_count": 2,
+        "funding": {
+          "funding_complete_count": 2,
+          "mean_funding_pnl_r": 0.0,
+          "median_funding_pnl_r": 0.0,
+          "settlements_total": 0,
+          "total_funding_pnl_r": 0.0
+        },
+        "gross_R": {
+          "mean": -1.0,
+          "median": -1.0,
+          "total": -2.0
+        },
+        "holding_time": {
+          "mean_holding_time_ms": 240000.0,
+          "mean_time_to_fill_ms": 60000.0,
+          "median_holding_time_ms": 240000.0,
+          "median_time_to_fill_ms": 60000.0
+        },
+        "long_actionable_count": 2,
+        "long_short_wait_distribution": {
+          "LONG": {
+            "count": 2,
+            "share": 1.0
+          },
+          "SHORT": {
+            "count": 0,
+            "share": 0.0
+          },
+          "WAIT": {
+            "count": 0,
+            "share": 0.0
+          }
+        },
+        "mean_R": -1.63215,
+        "mean_gross_R": -1.0,
+        "mean_net_R": -1.63215,
+        "median_R": -1.63215,
+        "median_gross_R": -1.0,
+        "median_net_R": -1.63215,
+        "net_R": {
+          "mean": -1.63215,
+          "mean_ex_funding": -1.63215,
+          "median": -1.63215,
+          "median_ex_funding": -1.63215,
+          "total": -3.2643
+        },
+        "no_fill_count": 0,
+        "policy_shift": {
+          "directional_policy_shift_count": 0,
+          "directional_policy_shift_rate": 0.0
+        },
+        "sample_count": 2,
+        "short_actionable_count": 0,
+        "slippage": {
+          "mean_slippage_r": 0.180614,
+          "slippage_bps_per_side": 2.0,
+          "total_slippage_r": 0.361229
+        },
+        "stop_before_target": 1.0,
+        "stop_before_target_count": 2,
+        "stop_rate_all_filled": 1.0,
+        "target_stop_resolved_count": 2,
+        "timeout_count": 0,
+        "tp1_before_sl": 0.0,
+        "tp1_before_sl_count": 0,
+        "tp2_before_sl": 0.0,
+        "tp2_before_sl_count": 0,
+        "trend_transition": {
+          "shadow_trend_transition_distribution": {},
+          "technical_trend_transition_count": 0,
+          "technical_trend_transition_rate": 0.0
+        }
+      },
+      "RANGE__WAIT": {
+        "MAE": {
+          "max_r": null,
+          "mean_r": null,
+          "median_r": null
+        },
+        "MFE": {
+          "max_r": null,
+          "mean_r": null,
+          "median_r": null
+        },
+        "action_frequency": 0.0,
+        "actionable_evaluation_count": 0,
+        "actionable_signal_count": 0,
+        "boundary_breach": {
+          "invalidation_breach_count": 45,
+          "stop_boundary_breach_count": 0,
+          "stop_boundary_breach_rate": null
+        },
+        "cohort_label": "RANGE__WAIT",
+        "drawdown_adverse_excursion": {
+          "max_adverse_excursion_r": null,
+          "max_cumulative_net_r_drawdown": 0.0,
+          "mean_adverse_excursion_r": null,
+          "median_adverse_excursion_r": null
+        },
+        "fees": {
+          "maker_fee_rate": 0.0002,
+          "mean_fee_r": 0.0,
+          "taker_fee_rate": 0.0005,
+          "total_fee_r": 0.0
+        },
+        "fill_rate": null,
+        "filled_count": 0,
+        "funding": {
+          "funding_complete_count": 0,
+          "mean_funding_pnl_r": 0.0,
+          "median_funding_pnl_r": 0.0,
+          "settlements_total": 0,
+          "total_funding_pnl_r": 0.0
+        },
+        "gross_R": {
+          "mean": null,
+          "median": null,
+          "total": 0.0
+        },
+        "holding_time": {
+          "mean_holding_time_ms": null,
+          "mean_time_to_fill_ms": null,
+          "median_holding_time_ms": null,
+          "median_time_to_fill_ms": null
+        },
+        "long_actionable_count": 0,
+        "long_short_wait_distribution": {
+          "LONG": {
+            "count": 0,
+            "share": 0.0
+          },
+          "SHORT": {
+            "count": 0,
+            "share": 0.0
+          },
+          "WAIT": {
+            "count": 4086,
+            "share": 1.0
+          }
+        },
+        "mean_R": null,
+        "mean_gross_R": null,
+        "mean_net_R": null,
+        "median_R": null,
+        "median_gross_R": null,
+        "median_net_R": null,
+        "net_R": {
+          "mean": null,
+          "mean_ex_funding": null,
+          "median": null,
+          "median_ex_funding": null,
+          "total": 0.0
+        },
+        "no_fill_count": 0,
+        "policy_shift": {
+          "directional_policy_shift_count": 0,
+          "directional_policy_shift_rate": 0.0
+        },
+        "sample_count": 4086,
+        "short_actionable_count": 0,
+        "slippage": {
+          "mean_slippage_r": 0.0,
+          "slippage_bps_per_side": 2.0,
+          "total_slippage_r": 0.0
+        },
+        "stop_before_target": null,
+        "stop_before_target_count": 0,
+        "stop_rate_all_filled": null,
+        "target_stop_resolved_count": 0,
+        "timeout_count": 0,
+        "tp1_before_sl": null,
+        "tp1_before_sl_count": 0,
+        "tp2_before_sl": null,
+        "tp2_before_sl_count": 0,
+        "trend_transition": {
+          "shadow_trend_transition_distribution": {},
+          "technical_trend_transition_count": 0,
+          "technical_trend_transition_rate": 0.0
+        }
+      },
+      "TRANSITION__LONG": {
+        "MAE": {
+          "max_r": 1.0,
+          "mean_r": 0.3125,
+          "median_r": 0.125
+        },
+        "MFE": {
+          "max_r": 4.12,
+          "mean_r": 2.435,
+          "median_r": 2.49
+        },
+        "action_frequency": 1.0,
+        "actionable_evaluation_count": 4,
+        "actionable_signal_count": 4,
+        "boundary_breach": {
+          "invalidation_breach_count": 0,
+          "stop_boundary_breach_count": 1,
+          "stop_boundary_breach_rate": 0.25
+        },
+        "cohort_label": "TRANSITION__LONG",
+        "drawdown_adverse_excursion": {
+          "max_adverse_excursion_r": 1.0,
+          "max_cumulative_net_r_drawdown": 1.2156,
+          "mean_adverse_excursion_r": 0.3125,
+          "median_adverse_excursion_r": 0.125
+        },
+        "fees": {
+          "maker_fee_rate": 0.0002,
+          "mean_fee_r": 0.220714,
+          "taker_fee_rate": 0.0005,
+          "total_fee_r": 0.882857
+        },
+        "fill_rate": 1.0,
+        "filled_count": 4,
+        "funding": {
+          "funding_complete_count": 4,
+          "mean_funding_pnl_r": -0.003241,
+          "median_funding_pnl_r": 0.0,
+          "settlements_total": 1,
+          "total_funding_pnl_r": -0.012965
+        },
+        "gross_R": {
+          "mean": 2.022163,
+          "median": 2.485709,
+          "total": 8.088653
+        },
+        "holding_time": {
+          "mean_holding_time_ms": 3600000.0,
+          "mean_time_to_fill_ms": 900000.0,
+          "median_holding_time_ms": 3150000.0,
+          "median_time_to_fill_ms": 900000.0
+        },
+        "long_actionable_count": 4,
+        "long_short_wait_distribution": {
+          "LONG": {
+            "count": 4,
+            "share": 1.0
+          },
+          "SHORT": {
+            "count": 0,
+            "share": 0.0
+          },
+          "WAIT": {
+            "count": 0,
+            "share": 0.0
+          }
+        },
+        "mean_R": 1.709922,
+        "mean_gross_R": 2.022163,
+        "mean_net_R": 1.709922,
+        "median_R": 2.236377,
+        "median_gross_R": 2.485709,
+        "median_net_R": 2.236377,
+        "net_R": {
+          "mean": 1.709922,
+          "mean_ex_funding": 1.713163,
+          "median": 2.236377,
+          "median_ex_funding": 2.242859,
+          "total": 6.839688
+        },
+        "no_fill_count": 0,
+        "policy_shift": {
+          "directional_policy_shift_count": 0,
+          "directional_policy_shift_rate": 0.0
+        },
+        "sample_count": 4,
+        "short_actionable_count": 0,
+        "slippage": {
+          "mean_slippage_r": 0.088286,
+          "slippage_bps_per_side": 2.0,
+          "total_slippage_r": 0.353143
+        },
+        "stop_before_target": 0.25,
+        "stop_before_target_count": 1,
+        "stop_rate_all_filled": 0.25,
+        "target_stop_resolved_count": 4,
+        "timeout_count": 0,
+        "tp1_before_sl": 0.75,
+        "tp1_before_sl_count": 3,
+        "tp2_before_sl": 0.5,
+        "tp2_before_sl_count": 2,
+        "trend_transition": {
+          "shadow_trend_transition_distribution": {},
+          "technical_trend_transition_count": 0,
+          "technical_trend_transition_rate": 0.0
+        }
+      },
+      "TRANSITION__SHORT": {
+        "MAE": {
+          "max_r": 1.0,
+          "mean_r": 0.716875,
+          "median_r": 1.0
+        },
+        "MFE": {
+          "max_r": 5.06,
+          "mean_r": 1.76125,
+          "median_r": 1.6
+        },
+        "action_frequency": 1.0,
+        "actionable_evaluation_count": 18,
+        "actionable_signal_count": 16,
+        "boundary_breach": {
+          "invalidation_breach_count": 0,
+          "stop_boundary_breach_count": 10,
+          "stop_boundary_breach_rate": 0.625
+        },
+        "cohort_label": "TRANSITION__SHORT",
+        "drawdown_adverse_excursion": {
+          "max_adverse_excursion_r": 1.0,
+          "max_cumulative_net_r_drawdown": 7.2165,
+          "mean_adverse_excursion_r": 0.716875,
+          "median_adverse_excursion_r": 1.0
+        },
+        "fees": {
+          "maker_fee_rate": 0.0002,
+          "mean_fee_r": 0.289473,
+          "taker_fee_rate": 0.0005,
+          "total_fee_r": 4.631571
+        },
+        "fill_rate": 1.0,
+        "filled_count": 16,
+        "funding": {
+          "funding_complete_count": 16,
+          "mean_funding_pnl_r": 0.004135,
+          "median_funding_pnl_r": 0.0,
+          "settlements_total": 6,
+          "total_funding_pnl_r": 0.066153
+        },
+        "gross_R": {
+          "mean": 0.421679,
+          "median": -1.0,
+          "total": 6.746861
+        },
+        "holding_time": {
+          "mean_holding_time_ms": 7012500.0,
+          "mean_time_to_fill_ms": 742500.0,
+          "median_holding_time_ms": 6300000.0,
+          "median_time_to_fill_ms": 900000.0
+        },
+        "long_actionable_count": 0,
+        "long_short_wait_distribution": {
+          "LONG": {
+            "count": 0,
+            "share": 0.0
+          },
+          "SHORT": {
+            "count": 18,
+            "share": 1.0
+          },
+          "WAIT": {
+            "count": 0,
+            "share": 0.0
+          }
+        },
+        "mean_R": 0.020551,
+        "mean_gross_R": 0.421679,
+        "mean_net_R": 0.020551,
+        "median_R": -1.235369,
+        "median_gross_R": -1.0,
+        "median_net_R": -1.235369,
+        "net_R": {
+          "mean": 0.020551,
+          "mean_ex_funding": 0.016416,
+          "median": -1.235369,
+          "median_ex_funding": -1.23635,
+          "total": 0.328814
+        },
+        "no_fill_count": 0,
+        "policy_shift": {
+          "directional_policy_shift_count": 0,
+          "directional_policy_shift_rate": 0.0
+        },
+        "sample_count": 18,
+        "short_actionable_count": 16,
+        "slippage": {
+          "mean_slippage_r": 0.115789,
+          "slippage_bps_per_side": 2.0,
+          "total_slippage_r": 1.852629
+        },
+        "stop_before_target": 0.625,
+        "stop_before_target_count": 10,
+        "stop_rate_all_filled": 0.625,
+        "target_stop_resolved_count": 16,
+        "timeout_count": 0,
+        "tp1_before_sl": 0.375,
+        "tp1_before_sl_count": 6,
+        "tp2_before_sl": 0.0,
+        "tp2_before_sl_count": 0,
+        "trend_transition": {
+          "shadow_trend_transition_distribution": {},
+          "technical_trend_transition_count": 0,
+          "technical_trend_transition_rate": 0.0
+        }
+      },
+      "TRANSITION__WAIT": {
+        "MAE": {
+          "max_r": null,
+          "mean_r": null,
+          "median_r": null
+        },
+        "MFE": {
+          "max_r": null,
+          "mean_r": null,
+          "median_r": null
+        },
+        "action_frequency": 0.0,
+        "actionable_evaluation_count": 0,
+        "actionable_signal_count": 0,
+        "boundary_breach": {
+          "invalidation_breach_count": 49,
+          "stop_boundary_breach_count": 0,
+          "stop_boundary_breach_rate": null
+        },
+        "cohort_label": "TRANSITION__WAIT",
+        "drawdown_adverse_excursion": {
+          "max_adverse_excursion_r": null,
+          "max_cumulative_net_r_drawdown": 0.0,
+          "mean_adverse_excursion_r": null,
+          "median_adverse_excursion_r": null
+        },
+        "fees": {
+          "maker_fee_rate": 0.0002,
+          "mean_fee_r": 0.0,
+          "taker_fee_rate": 0.0005,
+          "total_fee_r": 0.0
+        },
+        "fill_rate": null,
+        "filled_count": 0,
+        "funding": {
+          "funding_complete_count": 0,
+          "mean_funding_pnl_r": 0.0,
+          "median_funding_pnl_r": 0.0,
+          "settlements_total": 0,
+          "total_funding_pnl_r": 0.0
+        },
+        "gross_R": {
+          "mean": null,
+          "median": null,
+          "total": 0.0
+        },
+        "holding_time": {
+          "mean_holding_time_ms": null,
+          "mean_time_to_fill_ms": null,
+          "median_holding_time_ms": null,
+          "median_time_to_fill_ms": null
+        },
+        "long_actionable_count": 0,
+        "long_short_wait_distribution": {
+          "LONG": {
+            "count": 0,
+            "share": 0.0
+          },
+          "SHORT": {
+            "count": 0,
+            "share": 0.0
+          },
+          "WAIT": {
+            "count": 9074,
+            "share": 1.0
+          }
+        },
+        "mean_R": null,
+        "mean_gross_R": null,
+        "mean_net_R": null,
+        "median_R": null,
+        "median_gross_R": null,
+        "median_net_R": null,
+        "net_R": {
+          "mean": null,
+          "mean_ex_funding": null,
+          "median": null,
+          "median_ex_funding": null,
+          "total": 0.0
+        },
+        "no_fill_count": 0,
+        "policy_shift": {
+          "directional_policy_shift_count": 0,
+          "directional_policy_shift_rate": 0.0
+        },
+        "sample_count": 9074,
+        "short_actionable_count": 0,
+        "slippage": {
+          "mean_slippage_r": 0.0,
+          "slippage_bps_per_side": 2.0,
+          "total_slippage_r": 0.0
+        },
+        "stop_before_target": null,
+        "stop_before_target_count": 0,
+        "stop_rate_all_filled": null,
+        "target_stop_resolved_count": 0,
+        "timeout_count": 0,
+        "tp1_before_sl": null,
+        "tp1_before_sl_count": 0,
+        "tp2_before_sl": null,
+        "tp2_before_sl_count": 0,
+        "trend_transition": {
+          "shadow_trend_transition_distribution": {},
+          "technical_trend_transition_count": 0,
+          "technical_trend_transition_rate": 0.0
+        }
+      },
+      "TREND_DOWN__LONG": {
+        "MAE": {
+          "max_r": 1.0,
+          "mean_r": 1.0,
+          "median_r": 1.0
+        },
+        "MFE": {
+          "max_r": 1.74,
+          "mean_r": 1.74,
+          "median_r": 1.74
+        },
+        "action_frequency": 1.0,
+        "actionable_evaluation_count": 1,
+        "actionable_signal_count": 1,
+        "boundary_breach": {
+          "invalidation_breach_count": 0,
+          "stop_boundary_breach_count": 1,
+          "stop_boundary_breach_rate": 1.0
+        },
+        "cohort_label": "TREND_DOWN__LONG",
+        "drawdown_adverse_excursion": {
+          "max_adverse_excursion_r": 1.0,
+          "max_cumulative_net_r_drawdown": 1.5673,
+          "mean_adverse_excursion_r": 1.0,
+          "median_adverse_excursion_r": 1.0
+        },
+        "fees": {
+          "maker_fee_rate": 0.0002,
+          "mean_fee_r": 0.405214,
+          "taker_fee_rate": 0.0005,
+          "total_fee_r": 0.405214
+        },
+        "fill_rate": 1.0,
+        "filled_count": 1,
+        "funding": {
+          "funding_complete_count": 1,
+          "mean_funding_pnl_r": 0.0,
+          "median_funding_pnl_r": 0.0,
+          "settlements_total": 0,
+          "total_funding_pnl_r": 0.0
+        },
+        "gross_R": {
+          "mean": -1.0,
+          "median": -1.0,
+          "total": -1.0
+        },
+        "holding_time": {
+          "mean_holding_time_ms": 3600000.0,
+          "mean_time_to_fill_ms": 900000.0,
+          "median_holding_time_ms": 3600000.0,
+          "median_time_to_fill_ms": 900000.0
+        },
+        "long_actionable_count": 1,
+        "long_short_wait_distribution": {
+          "LONG": {
+            "count": 1,
+            "share": 1.0
+          },
+          "SHORT": {
+            "count": 0,
+            "share": 0.0
+          },
+          "WAIT": {
+            "count": 0,
+            "share": 0.0
+          }
+        },
+        "mean_R": -1.5673,
+        "mean_gross_R": -1.0,
+        "mean_net_R": -1.5673,
+        "median_R": -1.5673,
+        "median_gross_R": -1.0,
+        "median_net_R": -1.5673,
+        "net_R": {
+          "mean": -1.5673,
+          "mean_ex_funding": -1.5673,
+          "median": -1.5673,
+          "median_ex_funding": -1.5673,
+          "total": -1.5673
+        },
+        "no_fill_count": 0,
+        "policy_shift": {
+          "directional_policy_shift_count": 0,
+          "directional_policy_shift_rate": 0.0
+        },
+        "sample_count": 1,
+        "short_actionable_count": 0,
+        "slippage": {
+          "mean_slippage_r": 0.162086,
+          "slippage_bps_per_side": 2.0,
+          "total_slippage_r": 0.162086
+        },
+        "stop_before_target": 1.0,
+        "stop_before_target_count": 1,
+        "stop_rate_all_filled": 1.0,
+        "target_stop_resolved_count": 1,
+        "timeout_count": 0,
+        "tp1_before_sl": 0.0,
+        "tp1_before_sl_count": 0,
+        "tp2_before_sl": 0.0,
+        "tp2_before_sl_count": 0,
+        "trend_transition": {
+          "shadow_trend_transition_distribution": {},
+          "technical_trend_transition_count": 0,
+          "technical_trend_transition_rate": 0.0
+        }
+      },
+      "TREND_DOWN__SHORT": {
+        "MAE": {
+          "max_r": 1.0,
+          "mean_r": 0.916,
+          "median_r": 1.0
+        },
+        "MFE": {
+          "max_r": 1.37,
+          "mean_r": 0.46,
+          "median_r": 0.23
+        },
+        "action_frequency": 1.0,
+        "actionable_evaluation_count": 5,
+        "actionable_signal_count": 5,
+        "boundary_breach": {
+          "invalidation_breach_count": 0,
+          "stop_boundary_breach_count": 4,
+          "stop_boundary_breach_rate": 0.8
+        },
+        "cohort_label": "TREND_DOWN__SHORT",
+        "drawdown_adverse_excursion": {
+          "max_adverse_excursion_r": 1.0,
+          "max_cumulative_net_r_drawdown": 5.682371,
+          "mean_adverse_excursion_r": 0.916,
+          "median_adverse_excursion_r": 1.0
+        },
+        "fees": {
+          "maker_fee_rate": 0.0002,
+          "mean_fee_r": 0.255214,
+          "taker_fee_rate": 0.0005,
+          "total_fee_r": 1.276071
+        },
+        "fill_rate": 1.0,
+        "filled_count": 5,
+        "funding": {
+          "funding_complete_count": 4,
+          "mean_funding_pnl_r": 0.000969,
+          "median_funding_pnl_r": 0.0,
+          "settlements_total": 3,
+          "total_funding_pnl_r": 0.003876
+        },
+        "gross_R": {
+          "mean": -0.526923,
+          "median": -1.0,
+          "total": -2.634615
+        },
+        "holding_time": {
+          "mean_holding_time_ms": 3228000.0,
+          "mean_time_to_fill_ms": 564000.0,
+          "median_holding_time_ms": 900000.0,
+          "median_time_to_fill_ms": 900000.0
+        },
+        "long_actionable_count": 0,
+        "long_short_wait_distribution": {
+          "LONG": {
+            "count": 0,
+            "share": 0.0
+          },
+          "SHORT": {
+            "count": 5,
+            "share": 1.0
+          },
+          "WAIT": {
+            "count": 0,
+            "share": 0.0
+          }
+        },
+        "mean_R": -0.883448,
+        "mean_gross_R": -0.526923,
+        "mean_net_R": -0.883448,
+        "median_R": -1.3726,
+        "median_gross_R": -1.0,
+        "median_net_R": -1.3726,
+        "net_R": {
+          "mean": -0.883448,
+          "mean_ex_funding": -0.884223,
+          "median": -1.3726,
+          "median_ex_funding": -1.3726,
+          "total": -4.417239
+        },
+        "no_fill_count": 0,
+        "policy_shift": {
+          "directional_policy_shift_count": 0,
+          "directional_policy_shift_rate": 0.0
+        },
+        "sample_count": 5,
+        "short_actionable_count": 5,
+        "slippage": {
+          "mean_slippage_r": 0.102086,
+          "slippage_bps_per_side": 2.0,
+          "total_slippage_r": 0.510429
+        },
+        "stop_before_target": 0.8,
+        "stop_before_target_count": 4,
+        "stop_rate_all_filled": 0.8,
+        "target_stop_resolved_count": 5,
+        "timeout_count": 0,
+        "tp1_before_sl": 0.2,
+        "tp1_before_sl_count": 1,
+        "tp2_before_sl": 0.0,
+        "tp2_before_sl_count": 0,
+        "trend_transition": {
+          "shadow_trend_transition_distribution": {},
+          "technical_trend_transition_count": 0,
+          "technical_trend_transition_rate": 0.0
+        }
+      },
+      "TREND_DOWN__WAIT": {
+        "MAE": {
+          "max_r": null,
+          "mean_r": null,
+          "median_r": null
+        },
+        "MFE": {
+          "max_r": null,
+          "mean_r": null,
+          "median_r": null
+        },
+        "action_frequency": 0.0,
+        "actionable_evaluation_count": 0,
+        "actionable_signal_count": 0,
+        "boundary_breach": {
+          "invalidation_breach_count": 3,
+          "stop_boundary_breach_count": 0,
+          "stop_boundary_breach_rate": null
+        },
+        "cohort_label": "TREND_DOWN__WAIT",
+        "drawdown_adverse_excursion": {
+          "max_adverse_excursion_r": null,
+          "max_cumulative_net_r_drawdown": 0.0,
+          "mean_adverse_excursion_r": null,
+          "median_adverse_excursion_r": null
+        },
+        "fees": {
+          "maker_fee_rate": 0.0002,
+          "mean_fee_r": 0.0,
+          "taker_fee_rate": 0.0005,
+          "total_fee_r": 0.0
+        },
+        "fill_rate": null,
+        "filled_count": 0,
+        "funding": {
+          "funding_complete_count": 0,
+          "mean_funding_pnl_r": 0.0,
+          "median_funding_pnl_r": 0.0,
+          "settlements_total": 0,
+          "total_funding_pnl_r": 0.0
+        },
+        "gross_R": {
+          "mean": null,
+          "median": null,
+          "total": 0.0
+        },
+        "holding_time": {
+          "mean_holding_time_ms": null,
+          "mean_time_to_fill_ms": null,
+          "median_holding_time_ms": null,
+          "median_time_to_fill_ms": null
+        },
+        "long_actionable_count": 0,
+        "long_short_wait_distribution": {
+          "LONG": {
+            "count": 0,
+            "share": 0.0
+          },
+          "SHORT": {
+            "count": 0,
+            "share": 0.0
+          },
+          "WAIT": {
+            "count": 1366,
+            "share": 1.0
+          }
+        },
+        "mean_R": null,
+        "mean_gross_R": null,
+        "mean_net_R": null,
+        "median_R": null,
+        "median_gross_R": null,
+        "median_net_R": null,
+        "net_R": {
+          "mean": null,
+          "mean_ex_funding": null,
+          "median": null,
+          "median_ex_funding": null,
+          "total": 0.0
+        },
+        "no_fill_count": 0,
+        "policy_shift": {
+          "directional_policy_shift_count": 0,
+          "directional_policy_shift_rate": 0.0
+        },
+        "sample_count": 1366,
+        "short_actionable_count": 0,
+        "slippage": {
+          "mean_slippage_r": 0.0,
+          "slippage_bps_per_side": 2.0,
+          "total_slippage_r": 0.0
+        },
+        "stop_before_target": null,
+        "stop_before_target_count": 0,
+        "stop_rate_all_filled": null,
+        "target_stop_resolved_count": 0,
+        "timeout_count": 0,
+        "tp1_before_sl": null,
+        "tp1_before_sl_count": 0,
+        "tp2_before_sl": null,
+        "tp2_before_sl_count": 0,
+        "trend_transition": {
+          "shadow_trend_transition_distribution": {},
+          "technical_trend_transition_count": 0,
+          "technical_trend_transition_rate": 0.0
+        }
+      },
+      "TREND_UP__LONG": {
+        "MAE": {
+          "max_r": 1.0,
+          "mean_r": 0.794444,
+          "median_r": 1.0
+        },
+        "MFE": {
+          "max_r": 4.7,
+          "mean_r": 1.447778,
+          "median_r": 0.89
+        },
+        "action_frequency": 1.0,
+        "actionable_evaluation_count": 9,
+        "actionable_signal_count": 9,
+        "boundary_breach": {
+          "invalidation_breach_count": 0,
+          "stop_boundary_breach_count": 6,
+          "stop_boundary_breach_rate": 0.666667
+        },
+        "cohort_label": "TREND_UP__LONG",
+        "drawdown_adverse_excursion": {
+          "max_adverse_excursion_r": 1.0,
+          "max_cumulative_net_r_drawdown": 7.3312,
+          "mean_adverse_excursion_r": 0.794444,
+          "median_adverse_excursion_r": 1.0
+        },
+        "fees": {
+          "maker_fee_rate": 0.0002,
+          "mean_fee_r": 0.305595,
+          "taker_fee_rate": 0.0005,
+          "total_fee_r": 2.750357
+        },
+        "fill_rate": 1.0,
+        "filled_count": 9,
+        "funding": {
+          "funding_complete_count": 8,
+          "mean_funding_pnl_r": -0.003072,
+          "median_funding_pnl_r": 0.0,
+          "settlements_total": 3,
+          "total_funding_pnl_r": -0.024578
+        },
+        "gross_R": {
+          "mean": 0.14951,
+          "median": -1.0,
+          "total": 1.345586
+        },
+        "holding_time": {
+          "mean_holding_time_ms": 7766666.67,
+          "mean_time_to_fill_ms": 806666.67,
+          "median_holding_time_ms": 3600000.0,
+          "median_time_to_fill_ms": 900000.0
+        },
+        "long_actionable_count": 9,
+        "long_short_wait_distribution": {
+          "LONG": {
+            "count": 9,
+            "share": 1.0
+          },
+          "SHORT": {
+            "count": 0,
+            "share": 0.0
+          },
+          "WAIT": {
+            "count": 0,
+            "share": 0.0
+          }
+        },
+        "mean_R": -0.281055,
+        "mean_gross_R": 0.14951,
+        "mean_net_R": -0.281055,
+        "median_R": -1.4054,
+        "median_gross_R": -1.0,
+        "median_net_R": -1.4054,
+        "net_R": {
+          "mean": -0.281055,
+          "mean_ex_funding": -0.278324,
+          "median": -1.4054,
+          "median_ex_funding": -1.4054,
+          "total": -2.529492
+        },
+        "no_fill_count": 0,
+        "policy_shift": {
+          "directional_policy_shift_count": 0,
+          "directional_policy_shift_rate": 0.0
+        },
+        "sample_count": 9,
+        "short_actionable_count": 0,
+        "slippage": {
+          "mean_slippage_r": 0.122238,
+          "slippage_bps_per_side": 2.0,
+          "total_slippage_r": 1.100143
+        },
+        "stop_before_target": 0.666667,
+        "stop_before_target_count": 6,
+        "stop_rate_all_filled": 0.666667,
+        "target_stop_resolved_count": 9,
+        "timeout_count": 0,
+        "tp1_before_sl": 0.333333,
+        "tp1_before_sl_count": 3,
+        "tp2_before_sl": 0.111111,
+        "tp2_before_sl_count": 1,
+        "trend_transition": {
+          "shadow_trend_transition_distribution": {},
+          "technical_trend_transition_count": 0,
+          "technical_trend_transition_rate": 0.0
+        }
+      },
+      "TREND_UP__WAIT": {
+        "MAE": {
+          "max_r": null,
+          "mean_r": null,
+          "median_r": null
+        },
+        "MFE": {
+          "max_r": null,
+          "mean_r": null,
+          "median_r": null
+        },
+        "action_frequency": 0.0,
+        "actionable_evaluation_count": 0,
+        "actionable_signal_count": 0,
+        "boundary_breach": {
+          "invalidation_breach_count": 17,
+          "stop_boundary_breach_count": 0,
+          "stop_boundary_breach_rate": null
+        },
+        "cohort_label": "TREND_UP__WAIT",
+        "drawdown_adverse_excursion": {
+          "max_adverse_excursion_r": null,
+          "max_cumulative_net_r_drawdown": 0.0,
+          "mean_adverse_excursion_r": null,
+          "median_adverse_excursion_r": null
+        },
+        "fees": {
+          "maker_fee_rate": 0.0002,
+          "mean_fee_r": 0.0,
+          "taker_fee_rate": 0.0005,
+          "total_fee_r": 0.0
+        },
+        "fill_rate": null,
+        "filled_count": 0,
+        "funding": {
+          "funding_complete_count": 0,
+          "mean_funding_pnl_r": 0.0,
+          "median_funding_pnl_r": 0.0,
+          "settlements_total": 0,
+          "total_funding_pnl_r": 0.0
+        },
+        "gross_R": {
+          "mean": null,
+          "median": null,
+          "total": 0.0
+        },
+        "holding_time": {
+          "mean_holding_time_ms": null,
+          "mean_time_to_fill_ms": null,
+          "median_holding_time_ms": null,
+          "median_time_to_fill_ms": null
+        },
+        "long_actionable_count": 0,
+        "long_short_wait_distribution": {
+          "LONG": {
+            "count": 0,
+            "share": 0.0
+          },
+          "SHORT": {
+            "count": 0,
+            "share": 0.0
+          },
+          "WAIT": {
+            "count": 1831,
+            "share": 1.0
+          }
+        },
+        "mean_R": null,
+        "mean_gross_R": null,
+        "mean_net_R": null,
+        "median_R": null,
+        "median_gross_R": null,
+        "median_net_R": null,
+        "net_R": {
+          "mean": null,
+          "mean_ex_funding": null,
+          "median": null,
+          "median_ex_funding": null,
+          "total": 0.0
+        },
+        "no_fill_count": 0,
+        "policy_shift": {
+          "directional_policy_shift_count": 0,
+          "directional_policy_shift_rate": 0.0
+        },
+        "sample_count": 1831,
+        "short_actionable_count": 0,
+        "slippage": {
+          "mean_slippage_r": 0.0,
+          "slippage_bps_per_side": 2.0,
+          "total_slippage_r": 0.0
+        },
+        "stop_before_target": null,
+        "stop_before_target_count": 0,
+        "stop_rate_all_filled": null,
+        "target_stop_resolved_count": 0,
+        "timeout_count": 0,
+        "tp1_before_sl": null,
+        "tp1_before_sl_count": 0,
+        "tp2_before_sl": null,
+        "tp2_before_sl_count": 0,
+        "trend_transition": {
+          "shadow_trend_transition_distribution": {},
+          "technical_trend_transition_count": 0,
+          "technical_trend_transition_rate": 0.0
+        }
+      }
+    },
+    "rule_score_bucket": {
+      "0\u201339.999": {
+        "MAE": {
+          "max_r": null,
+          "mean_r": null,
+          "median_r": null
+        },
+        "MFE": {
+          "max_r": null,
+          "mean_r": null,
+          "median_r": null
+        },
+        "action_frequency": 0.0,
+        "actionable_evaluation_count": 0,
+        "actionable_signal_count": 0,
+        "boundary_breach": {
+          "invalidation_breach_count": 127,
+          "stop_boundary_breach_count": 0,
+          "stop_boundary_breach_rate": null
+        },
+        "cohort_label": "0\u201339.999",
+        "drawdown_adverse_excursion": {
+          "max_adverse_excursion_r": null,
+          "max_cumulative_net_r_drawdown": 0.0,
+          "mean_adverse_excursion_r": null,
+          "median_adverse_excursion_r": null
+        },
+        "fees": {
+          "maker_fee_rate": 0.0002,
+          "mean_fee_r": 0.0,
+          "taker_fee_rate": 0.0005,
+          "total_fee_r": 0.0
+        },
+        "fill_rate": null,
+        "filled_count": 0,
+        "funding": {
+          "funding_complete_count": 0,
+          "mean_funding_pnl_r": 0.0,
+          "median_funding_pnl_r": 0.0,
+          "settlements_total": 0,
+          "total_funding_pnl_r": 0.0
+        },
+        "gross_R": {
+          "mean": null,
+          "median": null,
+          "total": 0.0
+        },
+        "holding_time": {
+          "mean_holding_time_ms": null,
+          "mean_time_to_fill_ms": null,
+          "median_holding_time_ms": null,
+          "median_time_to_fill_ms": null
+        },
+        "long_actionable_count": 0,
+        "long_short_wait_distribution": {
+          "LONG": {
+            "count": 0,
+            "share": 0.0
+          },
+          "SHORT": {
+            "count": 0,
+            "share": 0.0
+          },
+          "WAIT": {
+            "count": 19921,
+            "share": 1.0
+          }
+        },
+        "mean_R": null,
+        "mean_gross_R": null,
+        "mean_net_R": null,
+        "median_R": null,
+        "median_gross_R": null,
+        "median_net_R": null,
+        "net_R": {
+          "mean": null,
+          "mean_ex_funding": null,
+          "median": null,
+          "median_ex_funding": null,
+          "total": 0.0
+        },
+        "no_fill_count": 0,
+        "policy_shift": {
+          "directional_policy_shift_count": 0,
+          "directional_policy_shift_rate": 0.0
+        },
+        "sample_count": 19921,
+        "short_actionable_count": 0,
+        "slippage": {
+          "mean_slippage_r": 0.0,
+          "slippage_bps_per_side": 2.0,
+          "total_slippage_r": 0.0
+        },
+        "stop_before_target": null,
+        "stop_before_target_count": 0,
+        "stop_rate_all_filled": null,
+        "target_stop_resolved_count": 0,
+        "timeout_count": 0,
+        "tp1_before_sl": null,
+        "tp1_before_sl_count": 0,
+        "tp2_before_sl": null,
+        "tp2_before_sl_count": 0,
+        "trend_transition": {
+          "shadow_trend_transition_distribution": {},
+          "technical_trend_transition_count": 0,
+          "technical_trend_transition_rate": 0.0
+        }
+      },
+      "40\u201359.999": {
+        "MAE": {
+          "max_r": 1.0,
+          "mean_r": 0.714615,
+          "median_r": 1.0
+        },
+        "MFE": {
+          "max_r": 4.12,
+          "mean_r": 1.398462,
+          "median_r": 1.53
+        },
+        "action_frequency": 1.0,
+        "actionable_evaluation_count": 13,
+        "actionable_signal_count": 13,
+        "boundary_breach": {
+          "invalidation_breach_count": 0,
+          "stop_boundary_breach_count": 8,
+          "stop_boundary_breach_rate": 0.615385
+        },
+        "cohort_label": "40\u201359.999",
+        "drawdown_adverse_excursion": {
+          "max_adverse_excursion_r": 1.0,
+          "max_cumulative_net_r_drawdown": 5.7321,
+          "mean_adverse_excursion_r": 0.714615,
+          "median_adverse_excursion_r": 1.0
+        },
+        "fees": {
+          "maker_fee_rate": 0.0002,
+          "mean_fee_r": 0.27117,
+          "taker_fee_rate": 0.0005,
+          "total_fee_r": 3.525214
+        },
+        "fill_rate": 1.0,
+        "filled_count": 13,
+        "funding": {
+          "funding_complete_count": 13,
+          "mean_funding_pnl_r": 0.000991,
+          "median_funding_pnl_r": 0.0,
+          "settlements_total": 2,
+          "total_funding_pnl_r": 0.012886
+        },
+        "gross_R": {
+          "mean": 0.377505,
+          "median": -1.0,
+          "total": 4.907565
+        },
+        "holding_time": {
+          "mean_holding_time_ms": 5769230.77,
+          "mean_time_to_fill_ms": 641538.46,
+          "median_holding_time_ms": 3600000.0,
+          "median_time_to_fill_ms": 900000.0
+        },
+        "long_actionable_count": 8,
+        "long_short_wait_distribution": {
+          "LONG": {
+            "count": 8,
+            "share": 0.615385
+          },
+          "SHORT": {
+            "count": 5,
+            "share": 0.384615
+          },
+          "WAIT": {
+            "count": 0,
+            "share": 0.0
+          }
+        },
+        "mean_R": -0.001142,
+        "mean_gross_R": 0.377505,
+        "mean_net_R": -0.001142,
+        "median_R": -1.2107,
+        "median_gross_R": -1.0,
+        "median_net_R": -1.2107,
+        "net_R": {
+          "mean": -0.001142,
+          "mean_ex_funding": -0.002133,
+          "median": -1.2107,
+          "median_ex_funding": -1.2107,
+          "total": -0.014849
+        },
+        "no_fill_count": 0,
+        "policy_shift": {
+          "directional_policy_shift_count": 0,
+          "directional_policy_shift_rate": 0.0
+        },
+        "sample_count": 13,
+        "short_actionable_count": 5,
+        "slippage": {
+          "mean_slippage_r": 0.108468,
+          "slippage_bps_per_side": 2.0,
+          "total_slippage_r": 1.410086
+        },
+        "stop_before_target": 0.615385,
+        "stop_before_target_count": 8,
+        "stop_rate_all_filled": 0.615385,
+        "target_stop_resolved_count": 13,
+        "timeout_count": 0,
+        "tp1_before_sl": 0.384615,
+        "tp1_before_sl_count": 5,
+        "tp2_before_sl": 0.0,
+        "tp2_before_sl_count": 0,
+        "trend_transition": {
+          "shadow_trend_transition_distribution": {},
+          "technical_trend_transition_count": 0,
+          "technical_trend_transition_rate": 0.0
+        }
+      },
+      "60\u201374.999": {
+        "MAE": {
+          "max_r": 1.0,
+          "mean_r": 0.739048,
+          "median_r": 1.0
+        },
+        "MFE": {
+          "max_r": 5.06,
+          "mean_r": 1.455238,
+          "median_r": 1.02
+        },
+        "action_frequency": 1.0,
+        "actionable_evaluation_count": 24,
+        "actionable_signal_count": 21,
+        "boundary_breach": {
+          "invalidation_breach_count": 0,
+          "stop_boundary_breach_count": 15,
+          "stop_boundary_breach_rate": 0.714286
+        },
+        "cohort_label": "60\u201374.999",
+        "drawdown_adverse_excursion": {
+          "max_adverse_excursion_r": 1.0,
+          "max_cumulative_net_r_drawdown": 8.362471,
+          "mean_adverse_excursion_r": 0.739048,
+          "median_adverse_excursion_r": 1.0
+        },
+        "fees": {
+          "maker_fee_rate": 0.0002,
+          "mean_fee_r": 0.288173,
+          "taker_fee_rate": 0.0005,
+          "total_fee_r": 6.051643
+        },
+        "fill_rate": 1.0,
+        "filled_count": 21,
+        "funding": {
+          "funding_complete_count": 20,
+          "mean_funding_pnl_r": 0.002237,
+          "median_funding_pnl_r": 0.0,
+          "settlements_total": 7,
+          "total_funding_pnl_r": 0.044732
+        },
+        "gross_R": {
+          "mean": 0.190926,
+          "median": -1.0,
+          "total": 4.009448
+        },
+        "holding_time": {
+          "mean_holding_time_ms": 3894285.71,
+          "mean_time_to_fill_ms": 740000.0,
+          "median_holding_time_ms": 2700000.0,
+          "median_time_to_fill_ms": 900000.0
+        },
+        "long_actionable_count": 6,
+        "long_short_wait_distribution": {
+          "LONG": {
+            "count": 6,
+            "share": 0.25
+          },
+          "SHORT": {
+            "count": 18,
+            "share": 0.75
+          },
+          "WAIT": {
+            "count": 0,
+            "share": 0.0
+          }
+        },
+        "mean_R": -0.210387,
+        "mean_gross_R": 0.190926,
+        "mean_net_R": -0.210387,
+        "median_R": -1.237639,
+        "median_gross_R": -1.0,
+        "median_net_R": -1.237639,
+        "net_R": {
+          "mean": -0.210387,
+          "mean_ex_funding": -0.212517,
+          "median": -1.237639,
+          "median_ex_funding": -1.2396,
+          "total": -4.41812
+        },
+        "no_fill_count": 0,
+        "policy_shift": {
+          "directional_policy_shift_count": 0,
+          "directional_policy_shift_rate": 0.0
+        },
+        "sample_count": 24,
+        "short_actionable_count": 15,
+        "slippage": {
+          "mean_slippage_r": 0.115269,
+          "slippage_bps_per_side": 2.0,
+          "total_slippage_r": 2.420657
+        },
+        "stop_before_target": 0.714286,
+        "stop_before_target_count": 15,
+        "stop_rate_all_filled": 0.714286,
+        "target_stop_resolved_count": 21,
+        "timeout_count": 0,
+        "tp1_before_sl": 0.285714,
+        "tp1_before_sl_count": 6,
+        "tp2_before_sl": 0.095238,
+        "tp2_before_sl_count": 2,
+        "trend_transition": {
+          "shadow_trend_transition_distribution": {},
+          "technical_trend_transition_count": 0,
+          "technical_trend_transition_rate": 0.0
+        }
+      },
+      "75\u201389.999": {
+        "MAE": {
+          "max_r": 1.0,
+          "mean_r": 0.773,
+          "median_r": 1.0
+        },
+        "MFE": {
+          "max_r": 4.7,
+          "mean_r": 1.524,
+          "median_r": 1.13
+        },
+        "action_frequency": 1.0,
+        "actionable_evaluation_count": 10,
+        "actionable_signal_count": 10,
+        "boundary_breach": {
+          "invalidation_breach_count": 0,
+          "stop_boundary_breach_count": 6,
+          "stop_boundary_breach_rate": 0.6
+        },
+        "cohort_label": "75\u201389.999",
+        "drawdown_adverse_excursion": {
+          "max_adverse_excursion_r": 1.0,
+          "max_cumulative_net_r_drawdown": 4.768,
+          "mean_adverse_excursion_r": 0.773,
+          "median_adverse_excursion_r": 1.0
+        },
+        "fees": {
+          "maker_fee_rate": 0.0002,
+          "mean_fee_r": 0.290564,
+          "taker_fee_rate": 0.0005,
+          "total_fee_r": 2.905643
+        },
+        "fill_rate": 1.0,
+        "filled_count": 10,
+        "funding": {
+          "funding_complete_count": 9,
+          "mean_funding_pnl_r": -0.002792,
+          "median_funding_pnl_r": 0.0,
+          "settlements_total": 4,
+          "total_funding_pnl_r": -0.025131
+        },
+        "gross_R": {
+          "mean": 0.271097,
+          "median": -1.0,
+          "total": 2.710971
+        },
+        "holding_time": {
+          "mean_holding_time_ms": 7344000.0,
+          "mean_time_to_fill_ms": 648000.0,
+          "median_holding_time_ms": 2250000.0,
+          "median_time_to_fill_ms": 900000.0
+        },
+        "long_actionable_count": 6,
+        "long_short_wait_distribution": {
+          "LONG": {
+            "count": 6,
+            "share": 0.6
+          },
+          "SHORT": {
+            "count": 4,
+            "share": 0.4
+          },
+          "WAIT": {
+            "count": 0,
+            "share": 0.0
+          }
+        },
+        "mean_R": -0.138206,
+        "mean_gross_R": 0.271097,
+        "mean_net_R": -0.138206,
+        "median_R": -1.4621,
+        "median_gross_R": -1.0,
+        "median_net_R": -1.4621,
+        "net_R": {
+          "mean": -0.138206,
+          "mean_ex_funding": -0.135693,
+          "median": -1.4621,
+          "median_ex_funding": -1.4621,
+          "total": -1.38206
+        },
+        "no_fill_count": 0,
+        "policy_shift": {
+          "directional_policy_shift_count": 0,
+          "directional_policy_shift_rate": 0.0
+        },
+        "sample_count": 10,
+        "short_actionable_count": 4,
+        "slippage": {
+          "mean_slippage_r": 0.116226,
+          "slippage_bps_per_side": 2.0,
+          "total_slippage_r": 1.162257
+        },
+        "stop_before_target": 0.6,
+        "stop_before_target_count": 6,
+        "stop_rate_all_filled": 0.6,
+        "target_stop_resolved_count": 10,
+        "timeout_count": 0,
+        "tp1_before_sl": 0.4,
+        "tp1_before_sl_count": 4,
+        "tp2_before_sl": 0.1,
+        "tp2_before_sl_count": 1,
+        "trend_transition": {
+          "shadow_trend_transition_distribution": {},
+          "technical_trend_transition_count": 0,
+          "technical_trend_transition_rate": 0.0
+        }
+      },
+      "90\u2013100": {
+        "MAE": {
+          "max_r": null,
+          "mean_r": null,
+          "median_r": null
+        },
+        "MFE": {
+          "max_r": null,
+          "mean_r": null,
+          "median_r": null
+        },
+        "action_frequency": 0.0,
+        "actionable_evaluation_count": 0,
+        "actionable_signal_count": 0,
+        "boundary_breach": {
+          "invalidation_breach_count": 0,
+          "stop_boundary_breach_count": 0,
+          "stop_boundary_breach_rate": null
+        },
+        "cohort_label": "90\u2013100",
+        "drawdown_adverse_excursion": {
+          "max_adverse_excursion_r": null,
+          "max_cumulative_net_r_drawdown": 0.0,
+          "mean_adverse_excursion_r": null,
+          "median_adverse_excursion_r": null
+        },
+        "fees": {
+          "maker_fee_rate": 0.0002,
+          "mean_fee_r": 0.0,
+          "taker_fee_rate": 0.0005,
+          "total_fee_r": 0.0
+        },
+        "fill_rate": null,
+        "filled_count": 0,
+        "funding": {
+          "funding_complete_count": 0,
+          "mean_funding_pnl_r": 0.0,
+          "median_funding_pnl_r": 0.0,
+          "settlements_total": 0,
+          "total_funding_pnl_r": 0.0
+        },
+        "gross_R": {
+          "mean": null,
+          "median": null,
+          "total": 0.0
+        },
+        "holding_time": {
+          "mean_holding_time_ms": null,
+          "mean_time_to_fill_ms": null,
+          "median_holding_time_ms": null,
+          "median_time_to_fill_ms": null
+        },
+        "long_actionable_count": 0,
+        "long_short_wait_distribution": {
+          "LONG": {
+            "count": 0,
+            "share": 0.0
+          },
+          "SHORT": {
+            "count": 0,
+            "share": 0.0
+          },
+          "WAIT": {
+            "count": 0,
+            "share": 0.0
+          }
+        },
+        "mean_R": null,
+        "mean_gross_R": null,
+        "mean_net_R": null,
+        "median_R": null,
+        "median_gross_R": null,
+        "median_net_R": null,
+        "net_R": {
+          "mean": null,
+          "mean_ex_funding": null,
+          "median": null,
+          "median_ex_funding": null,
+          "total": 0.0
+        },
+        "no_fill_count": 0,
+        "policy_shift": {
+          "directional_policy_shift_count": 0,
+          "directional_policy_shift_rate": 0.0
+        },
+        "sample_count": 0,
+        "short_actionable_count": 0,
+        "slippage": {
+          "mean_slippage_r": 0.0,
+          "slippage_bps_per_side": 2.0,
+          "total_slippage_r": 0.0
+        },
+        "stop_before_target": null,
+        "stop_before_target_count": 0,
+        "stop_rate_all_filled": null,
+        "target_stop_resolved_count": 0,
+        "timeout_count": 0,
+        "tp1_before_sl": null,
+        "tp1_before_sl_count": 0,
+        "tp2_before_sl": null,
+        "tp2_before_sl_count": 0,
+        "trend_transition": {
+          "shadow_trend_transition_distribution": {},
+          "technical_trend_transition_count": 0,
+          "technical_trend_transition_rate": 0.0
+        }
+      }
+    },
+    "setup_x_direction": {
+      "BREAKOUT_RETEST__LONG": {
+        "MAE": {
+          "max_r": 1.0,
+          "mean_r": 0.7245,
+          "median_r": 1.0
+        },
+        "MFE": {
+          "max_r": 4.7,
+          "mean_r": 1.4165,
+          "median_r": 0.765
+        },
+        "action_frequency": 1.0,
+        "actionable_evaluation_count": 20,
+        "actionable_signal_count": 20,
+        "boundary_breach": {
+          "invalidation_breach_count": 0,
+          "stop_boundary_breach_count": 13,
+          "stop_boundary_breach_rate": 0.65
+        },
+        "cohort_label": "BREAKOUT_RETEST__LONG",
+        "drawdown_adverse_excursion": {
+          "max_adverse_excursion_r": 1.0,
+          "max_cumulative_net_r_drawdown": 6.580884,
+          "mean_adverse_excursion_r": 0.7245,
+          "median_adverse_excursion_r": 1.0
+        },
+        "fees": {
+          "maker_fee_rate": 0.0002,
+          "mean_fee_r": 0.287632,
+          "taker_fee_rate": 0.0005,
+          "total_fee_r": 5.752643
+        },
+        "fill_rate": 1.0,
+        "filled_count": 20,
+        "funding": {
+          "funding_complete_count": 19,
+          "mean_funding_pnl_r": -0.001976,
+          "median_funding_pnl_r": 0.0,
+          "settlements_total": 4,
+          "total_funding_pnl_r": -0.037543
+        },
+        "gross_R": {
+          "mean": 0.317028,
+          "median": -1.0,
+          "total": 6.340556
+        },
+        "holding_time": {
+          "mean_holding_time_ms": 4821000.0,
+          "mean_time_to_fill_ms": 690000.0,
+          "median_holding_time_ms": 2700000.0,
+          "median_time_to_fill_ms": 900000.0
+        },
+        "long_actionable_count": 20,
+        "long_short_wait_distribution": {
+          "LONG": {
+            "count": 20,
+            "share": 1.0
+          },
+          "SHORT": {
+            "count": 0,
+            "share": 0.0
+          },
+          "WAIT": {
+            "count": 0,
+            "share": 0.0
+          }
+        },
+        "mean_R": -0.087534,
+        "mean_gross_R": 0.317028,
+        "mean_net_R": -0.087534,
+        "median_R": -1.21315,
+        "median_gross_R": -1.0,
+        "median_net_R": -1.21315,
+        "net_R": {
+          "mean": -0.087534,
+          "mean_ex_funding": -0.085657,
+          "median": -1.21315,
+          "median_ex_funding": -1.21315,
+          "total": -1.750687
+        },
+        "no_fill_count": 0,
+        "policy_shift": {
+          "directional_policy_shift_count": 0,
+          "directional_policy_shift_rate": 0.0
+        },
+        "sample_count": 20,
+        "short_actionable_count": 0,
+        "slippage": {
+          "mean_slippage_r": 0.115053,
+          "slippage_bps_per_side": 2.0,
+          "total_slippage_r": 2.301057
+        },
+        "stop_before_target": 0.65,
+        "stop_before_target_count": 13,
+        "stop_rate_all_filled": 0.65,
+        "target_stop_resolved_count": 20,
+        "timeout_count": 0,
+        "tp1_before_sl": 0.35,
+        "tp1_before_sl_count": 7,
+        "tp2_before_sl": 0.15,
+        "tp2_before_sl_count": 3,
+        "trend_transition": {
+          "shadow_trend_transition_distribution": {},
+          "technical_trend_transition_count": 0,
+          "technical_trend_transition_rate": 0.0
+        }
+      },
+      "BREAKOUT_RETEST__SHORT": {
+        "MAE": {
+          "max_r": 1.0,
+          "mean_r": 0.7925,
+          "median_r": 1.0
+        },
+        "MFE": {
+          "max_r": 5.06,
+          "mean_r": 1.609,
+          "median_r": 1.45
+        },
+        "action_frequency": 1.0,
+        "actionable_evaluation_count": 21,
+        "actionable_signal_count": 20,
+        "boundary_breach": {
+          "invalidation_breach_count": 0,
+          "stop_boundary_breach_count": 14,
+          "stop_boundary_breach_rate": 0.7
+        },
+        "cohort_label": "BREAKOUT_RETEST__SHORT",
+        "drawdown_adverse_excursion": {
+          "max_adverse_excursion_r": 1.0,
+          "max_cumulative_net_r_drawdown": 9.595907,
+          "mean_adverse_excursion_r": 0.7925,
+          "median_adverse_excursion_r": 1.0
+        },
+        "fees": {
+          "maker_fee_rate": 0.0002,
+          "mean_fee_r": 0.317139,
+          "taker_fee_rate": 0.0005,
+          "total_fee_r": 6.342786
+        },
+        "fill_rate": 1.0,
+        "filled_count": 20,
+        "funding": {
+          "funding_complete_count": 19,
+          "mean_funding_pnl_r": 0.002427,
+          "median_funding_pnl_r": 0.0,
+          "settlements_total": 6,
+          "total_funding_pnl_r": 0.046117
+        },
+        "gross_R": {
+          "mean": 0.196259,
+          "median": -1.0,
+          "total": 3.925176
+        },
+        "holding_time": {
+          "mean_holding_time_ms": 5205000.0,
+          "mean_time_to_fill_ms": 648000.0,
+          "median_holding_time_ms": 1800000.0,
+          "median_time_to_fill_ms": 900000.0
+        },
+        "long_actionable_count": 0,
+        "long_short_wait_distribution": {
+          "LONG": {
+            "count": 0,
+            "share": 0.0
+          },
+          "SHORT": {
+            "count": 21,
+            "share": 1.0
+          },
+          "WAIT": {
+            "count": 0,
+            "share": 0.0
+          }
+        },
+        "mean_R": -0.24543,
+        "mean_gross_R": 0.196259,
+        "mean_net_R": -0.24543,
+        "median_R": -1.35,
+        "median_gross_R": -1.0,
+        "median_net_R": -1.35,
+        "net_R": {
+          "mean": -0.24543,
+          "mean_ex_funding": -0.247736,
+          "median": -1.35,
+          "median_ex_funding": -1.35,
+          "total": -4.908607
+        },
+        "no_fill_count": 0,
+        "policy_shift": {
+          "directional_policy_shift_count": 0,
+          "directional_policy_shift_rate": 0.0
+        },
+        "sample_count": 21,
+        "short_actionable_count": 20,
+        "slippage": {
+          "mean_slippage_r": 0.126856,
+          "slippage_bps_per_side": 2.0,
+          "total_slippage_r": 2.537114
+        },
+        "stop_before_target": 0.7,
+        "stop_before_target_count": 14,
+        "stop_rate_all_filled": 0.7,
+        "target_stop_resolved_count": 20,
+        "timeout_count": 0,
+        "tp1_before_sl": 0.3,
+        "tp1_before_sl_count": 6,
+        "tp2_before_sl": 0.0,
+        "tp2_before_sl_count": 0,
+        "trend_transition": {
+          "shadow_trend_transition_distribution": {},
+          "technical_trend_transition_count": 0,
+          "technical_trend_transition_rate": 0.0
+        }
+      },
+      "BREAKOUT_RETEST__WAIT": {
+        "MAE": {
+          "max_r": null,
+          "mean_r": null,
+          "median_r": null
+        },
+        "MFE": {
+          "max_r": null,
+          "mean_r": null,
+          "median_r": null
+        },
+        "action_frequency": 0.0,
+        "actionable_evaluation_count": 0,
+        "actionable_signal_count": 0,
+        "boundary_breach": {
+          "invalidation_breach_count": 119,
+          "stop_boundary_breach_count": 0,
+          "stop_boundary_breach_rate": null
+        },
+        "cohort_label": "BREAKOUT_RETEST__WAIT",
+        "drawdown_adverse_excursion": {
+          "max_adverse_excursion_r": null,
+          "max_cumulative_net_r_drawdown": 0.0,
+          "mean_adverse_excursion_r": null,
+          "median_adverse_excursion_r": null
+        },
+        "fees": {
+          "maker_fee_rate": 0.0002,
+          "mean_fee_r": 0.0,
+          "taker_fee_rate": 0.0005,
+          "total_fee_r": 0.0
+        },
+        "fill_rate": null,
+        "filled_count": 0,
+        "funding": {
+          "funding_complete_count": 0,
+          "mean_funding_pnl_r": 0.0,
+          "median_funding_pnl_r": 0.0,
+          "settlements_total": 0,
+          "total_funding_pnl_r": 0.0
+        },
+        "gross_R": {
+          "mean": null,
+          "median": null,
+          "total": 0.0
+        },
+        "holding_time": {
+          "mean_holding_time_ms": null,
+          "mean_time_to_fill_ms": null,
+          "median_holding_time_ms": null,
+          "median_time_to_fill_ms": null
+        },
+        "long_actionable_count": 0,
+        "long_short_wait_distribution": {
+          "LONG": {
+            "count": 0,
+            "share": 0.0
+          },
+          "SHORT": {
+            "count": 0,
+            "share": 0.0
+          },
+          "WAIT": {
+            "count": 1158,
+            "share": 1.0
+          }
+        },
+        "mean_R": null,
+        "mean_gross_R": null,
+        "mean_net_R": null,
+        "median_R": null,
+        "median_gross_R": null,
+        "median_net_R": null,
+        "net_R": {
+          "mean": null,
+          "mean_ex_funding": null,
+          "median": null,
+          "median_ex_funding": null,
+          "total": 0.0
+        },
+        "no_fill_count": 0,
+        "policy_shift": {
+          "directional_policy_shift_count": 0,
+          "directional_policy_shift_rate": 0.0
+        },
+        "sample_count": 1158,
+        "short_actionable_count": 0,
+        "slippage": {
+          "mean_slippage_r": 0.0,
+          "slippage_bps_per_side": 2.0,
+          "total_slippage_r": 0.0
+        },
+        "stop_before_target": null,
+        "stop_before_target_count": 0,
+        "stop_rate_all_filled": null,
+        "target_stop_resolved_count": 0,
+        "timeout_count": 0,
+        "tp1_before_sl": null,
+        "tp1_before_sl_count": 0,
+        "tp2_before_sl": null,
+        "tp2_before_sl_count": 0,
+        "trend_transition": {
+          "shadow_trend_transition_distribution": {},
+          "technical_trend_transition_count": 0,
+          "technical_trend_transition_rate": 0.0
+        }
+      },
+      "FAILED_BREAKDOWN__WAIT": {
+        "MAE": {
+          "max_r": null,
+          "mean_r": null,
+          "median_r": null
+        },
+        "MFE": {
+          "max_r": null,
+          "mean_r": null,
+          "median_r": null
+        },
+        "action_frequency": 0.0,
+        "actionable_evaluation_count": 0,
+        "actionable_signal_count": 0,
+        "boundary_breach": {
+          "invalidation_breach_count": 0,
+          "stop_boundary_breach_count": 0,
+          "stop_boundary_breach_rate": null
+        },
+        "cohort_label": "FAILED_BREAKDOWN__WAIT",
+        "drawdown_adverse_excursion": {
+          "max_adverse_excursion_r": null,
+          "max_cumulative_net_r_drawdown": 0.0,
+          "mean_adverse_excursion_r": null,
+          "median_adverse_excursion_r": null
+        },
+        "fees": {
+          "maker_fee_rate": 0.0002,
+          "mean_fee_r": 0.0,
+          "taker_fee_rate": 0.0005,
+          "total_fee_r": 0.0
+        },
+        "fill_rate": null,
+        "filled_count": 0,
+        "funding": {
+          "funding_complete_count": 0,
+          "mean_funding_pnl_r": 0.0,
+          "median_funding_pnl_r": 0.0,
+          "settlements_total": 0,
+          "total_funding_pnl_r": 0.0
+        },
+        "gross_R": {
+          "mean": null,
+          "median": null,
+          "total": 0.0
+        },
+        "holding_time": {
+          "mean_holding_time_ms": null,
+          "mean_time_to_fill_ms": null,
+          "median_holding_time_ms": null,
+          "median_time_to_fill_ms": null
+        },
+        "long_actionable_count": 0,
+        "long_short_wait_distribution": {
+          "LONG": {
+            "count": 0,
+            "share": 0.0
+          },
+          "SHORT": {
+            "count": 0,
+            "share": 0.0
+          },
+          "WAIT": {
+            "count": 702,
+            "share": 1.0
+          }
+        },
+        "mean_R": null,
+        "mean_gross_R": null,
+        "mean_net_R": null,
+        "median_R": null,
+        "median_gross_R": null,
+        "median_net_R": null,
+        "net_R": {
+          "mean": null,
+          "mean_ex_funding": null,
+          "median": null,
+          "median_ex_funding": null,
+          "total": 0.0
+        },
+        "no_fill_count": 0,
+        "policy_shift": {
+          "directional_policy_shift_count": 0,
+          "directional_policy_shift_rate": 0.0
+        },
+        "sample_count": 702,
+        "short_actionable_count": 0,
+        "slippage": {
+          "mean_slippage_r": 0.0,
+          "slippage_bps_per_side": 2.0,
+          "total_slippage_r": 0.0
+        },
+        "stop_before_target": null,
+        "stop_before_target_count": 0,
+        "stop_rate_all_filled": null,
+        "target_stop_resolved_count": 0,
+        "timeout_count": 0,
+        "tp1_before_sl": null,
+        "tp1_before_sl_count": 0,
+        "tp2_before_sl": null,
+        "tp2_before_sl_count": 0,
+        "trend_transition": {
+          "shadow_trend_transition_distribution": {},
+          "technical_trend_transition_count": 0,
+          "technical_trend_transition_rate": 0.0
+        }
+      },
+      "FAILED_BREAKOUT__WAIT": {
+        "MAE": {
+          "max_r": null,
+          "mean_r": null,
+          "median_r": null
+        },
+        "MFE": {
+          "max_r": null,
+          "mean_r": null,
+          "median_r": null
+        },
+        "action_frequency": 0.0,
+        "actionable_evaluation_count": 0,
+        "actionable_signal_count": 0,
+        "boundary_breach": {
+          "invalidation_breach_count": 0,
+          "stop_boundary_breach_count": 0,
+          "stop_boundary_breach_rate": null
+        },
+        "cohort_label": "FAILED_BREAKOUT__WAIT",
+        "drawdown_adverse_excursion": {
+          "max_adverse_excursion_r": null,
+          "max_cumulative_net_r_drawdown": 0.0,
+          "mean_adverse_excursion_r": null,
+          "median_adverse_excursion_r": null
+        },
+        "fees": {
+          "maker_fee_rate": 0.0002,
+          "mean_fee_r": 0.0,
+          "taker_fee_rate": 0.0005,
+          "total_fee_r": 0.0
+        },
+        "fill_rate": null,
+        "filled_count": 0,
+        "funding": {
+          "funding_complete_count": 0,
+          "mean_funding_pnl_r": 0.0,
+          "median_funding_pnl_r": 0.0,
+          "settlements_total": 0,
+          "total_funding_pnl_r": 0.0
+        },
+        "gross_R": {
+          "mean": null,
+          "median": null,
+          "total": 0.0
+        },
+        "holding_time": {
+          "mean_holding_time_ms": null,
+          "mean_time_to_fill_ms": null,
+          "median_holding_time_ms": null,
+          "median_time_to_fill_ms": null
+        },
+        "long_actionable_count": 0,
+        "long_short_wait_distribution": {
+          "LONG": {
+            "count": 0,
+            "share": 0.0
+          },
+          "SHORT": {
+            "count": 0,
+            "share": 0.0
+          },
+          "WAIT": {
+            "count": 950,
+            "share": 1.0
+          }
+        },
+        "mean_R": null,
+        "mean_gross_R": null,
+        "mean_net_R": null,
+        "median_R": null,
+        "median_gross_R": null,
+        "median_net_R": null,
+        "net_R": {
+          "mean": null,
+          "mean_ex_funding": null,
+          "median": null,
+          "median_ex_funding": null,
+          "total": 0.0
+        },
+        "no_fill_count": 0,
+        "policy_shift": {
+          "directional_policy_shift_count": 0,
+          "directional_policy_shift_rate": 0.0
+        },
+        "sample_count": 950,
+        "short_actionable_count": 0,
+        "slippage": {
+          "mean_slippage_r": 0.0,
+          "slippage_bps_per_side": 2.0,
+          "total_slippage_r": 0.0
+        },
+        "stop_before_target": null,
+        "stop_before_target_count": 0,
+        "stop_rate_all_filled": null,
+        "target_stop_resolved_count": 0,
+        "timeout_count": 0,
+        "tp1_before_sl": null,
+        "tp1_before_sl_count": 0,
+        "tp2_before_sl": null,
+        "tp2_before_sl_count": 0,
+        "trend_transition": {
+          "shadow_trend_transition_distribution": {},
+          "technical_trend_transition_count": 0,
+          "technical_trend_transition_rate": 0.0
+        }
+      },
+      "NO_TRADE__WAIT": {
+        "MAE": {
+          "max_r": null,
+          "mean_r": null,
+          "median_r": null
+        },
+        "MFE": {
+          "max_r": null,
+          "mean_r": null,
+          "median_r": null
+        },
+        "action_frequency": 0.0,
+        "actionable_evaluation_count": 0,
+        "actionable_signal_count": 0,
+        "boundary_breach": {
+          "invalidation_breach_count": 0,
+          "stop_boundary_breach_count": 0,
+          "stop_boundary_breach_rate": null
+        },
+        "cohort_label": "NO_TRADE__WAIT",
+        "drawdown_adverse_excursion": {
+          "max_adverse_excursion_r": null,
+          "max_cumulative_net_r_drawdown": 0.0,
+          "mean_adverse_excursion_r": null,
+          "median_adverse_excursion_r": null
+        },
+        "fees": {
+          "maker_fee_rate": 0.0002,
+          "mean_fee_r": 0.0,
+          "taker_fee_rate": 0.0005,
+          "total_fee_r": 0.0
+        },
+        "fill_rate": null,
+        "filled_count": 0,
+        "funding": {
+          "funding_complete_count": 0,
+          "mean_funding_pnl_r": 0.0,
+          "median_funding_pnl_r": 0.0,
+          "settlements_total": 0,
+          "total_funding_pnl_r": 0.0
+        },
+        "gross_R": {
+          "mean": null,
+          "median": null,
+          "total": 0.0
+        },
+        "holding_time": {
+          "mean_holding_time_ms": null,
+          "mean_time_to_fill_ms": null,
+          "median_holding_time_ms": null,
+          "median_time_to_fill_ms": null
+        },
+        "long_actionable_count": 0,
+        "long_short_wait_distribution": {
+          "LONG": {
+            "count": 0,
+            "share": 0.0
+          },
+          "SHORT": {
+            "count": 0,
+            "share": 0.0
+          },
+          "WAIT": {
+            "count": 16945,
+            "share": 1.0
+          }
+        },
+        "mean_R": null,
+        "mean_gross_R": null,
+        "mean_net_R": null,
+        "median_R": null,
+        "median_gross_R": null,
+        "median_net_R": null,
+        "net_R": {
+          "mean": null,
+          "mean_ex_funding": null,
+          "median": null,
+          "median_ex_funding": null,
+          "total": 0.0
+        },
+        "no_fill_count": 0,
+        "policy_shift": {
+          "directional_policy_shift_count": 0,
+          "directional_policy_shift_rate": 0.0
+        },
+        "sample_count": 16945,
+        "short_actionable_count": 0,
+        "slippage": {
+          "mean_slippage_r": 0.0,
+          "slippage_bps_per_side": 2.0,
+          "total_slippage_r": 0.0
+        },
+        "stop_before_target": null,
+        "stop_before_target_count": 0,
+        "stop_rate_all_filled": null,
+        "target_stop_resolved_count": 0,
+        "timeout_count": 0,
+        "tp1_before_sl": null,
+        "tp1_before_sl_count": 0,
+        "tp2_before_sl": null,
+        "tp2_before_sl_count": 0,
+        "trend_transition": {
+          "shadow_trend_transition_distribution": {},
+          "technical_trend_transition_count": 0,
+          "technical_trend_transition_rate": 0.0
+        }
+      },
+      "TREND_PULLBACK__WAIT": {
+        "MAE": {
+          "max_r": null,
+          "mean_r": null,
+          "median_r": null
+        },
+        "MFE": {
+          "max_r": null,
+          "mean_r": null,
+          "median_r": null
+        },
+        "action_frequency": 0.0,
+        "actionable_evaluation_count": 0,
+        "actionable_signal_count": 0,
+        "boundary_breach": {
+          "invalidation_breach_count": 8,
+          "stop_boundary_breach_count": 0,
+          "stop_boundary_breach_rate": null
+        },
+        "cohort_label": "TREND_PULLBACK__WAIT",
+        "drawdown_adverse_excursion": {
+          "max_adverse_excursion_r": null,
+          "max_cumulative_net_r_drawdown": 0.0,
+          "mean_adverse_excursion_r": null,
+          "median_adverse_excursion_r": null
+        },
+        "fees": {
+          "maker_fee_rate": 0.0002,
+          "mean_fee_r": 0.0,
+          "taker_fee_rate": 0.0005,
+          "total_fee_r": 0.0
+        },
+        "fill_rate": null,
+        "filled_count": 0,
+        "funding": {
+          "funding_complete_count": 0,
+          "mean_funding_pnl_r": 0.0,
+          "median_funding_pnl_r": 0.0,
+          "settlements_total": 0,
+          "total_funding_pnl_r": 0.0
+        },
+        "gross_R": {
+          "mean": null,
+          "median": null,
+          "total": 0.0
+        },
+        "holding_time": {
+          "mean_holding_time_ms": null,
+          "mean_time_to_fill_ms": null,
+          "median_holding_time_ms": null,
+          "median_time_to_fill_ms": null
+        },
+        "long_actionable_count": 0,
+        "long_short_wait_distribution": {
+          "LONG": {
+            "count": 0,
+            "share": 0.0
+          },
+          "SHORT": {
+            "count": 0,
+            "share": 0.0
+          },
+          "WAIT": {
+            "count": 78,
+            "share": 1.0
+          }
+        },
+        "mean_R": null,
+        "mean_gross_R": null,
+        "mean_net_R": null,
+        "median_R": null,
+        "median_gross_R": null,
+        "median_net_R": null,
+        "net_R": {
+          "mean": null,
+          "mean_ex_funding": null,
+          "median": null,
+          "median_ex_funding": null,
+          "total": 0.0
+        },
+        "no_fill_count": 0,
+        "policy_shift": {
+          "directional_policy_shift_count": 0,
+          "directional_policy_shift_rate": 0.0
+        },
+        "sample_count": 78,
+        "short_actionable_count": 0,
+        "slippage": {
+          "mean_slippage_r": 0.0,
+          "slippage_bps_per_side": 2.0,
+          "total_slippage_r": 0.0
+        },
+        "stop_before_target": null,
+        "stop_before_target_count": 0,
+        "stop_rate_all_filled": null,
+        "target_stop_resolved_count": 0,
+        "timeout_count": 0,
+        "tp1_before_sl": null,
+        "tp1_before_sl_count": 0,
+        "tp2_before_sl": null,
+        "tp2_before_sl_count": 0,
+        "trend_transition": {
+          "shadow_trend_transition_distribution": {},
+          "technical_trend_transition_count": 0,
+          "technical_trend_transition_rate": 0.0
+        }
+      },
+      "VOLATILITY_EXPANSION__SHORT": {
+        "MAE": {
+          "max_r": 1.0,
+          "mean_r": 0.55,
+          "median_r": 0.555
+        },
+        "MFE": {
+          "max_r": 1.7,
+          "mean_r": 0.8675,
+          "median_r": 0.885
+        },
+        "action_frequency": 1.0,
+        "actionable_evaluation_count": 6,
+        "actionable_signal_count": 4,
+        "boundary_breach": {
+          "invalidation_breach_count": 0,
+          "stop_boundary_breach_count": 2,
+          "stop_boundary_breach_rate": 0.5
+        },
+        "cohort_label": "VOLATILITY_EXPANSION__SHORT",
+        "drawdown_adverse_excursion": {
+          "max_adverse_excursion_r": 1.0,
+          "max_cumulative_net_r_drawdown": 2.265971,
+          "mean_adverse_excursion_r": 0.55,
+          "median_adverse_excursion_r": 0.555
+        },
+        "fees": {
+          "maker_fee_rate": 0.0002,
+          "mean_fee_r": 0.096768,
+          "taker_fee_rate": 0.0005,
+          "total_fee_r": 0.387071
+        },
+        "fill_rate": 1.0,
+        "filled_count": 4,
+        "funding": {
+          "funding_complete_count": 4,
+          "mean_funding_pnl_r": 0.005978,
+          "median_funding_pnl_r": 0.006969,
+          "settlements_total": 3,
+          "total_funding_pnl_r": 0.023913
+        },
+        "gross_R": {
+          "mean": 0.340563,
+          "median": 0.331126,
+          "total": 1.362252
+        },
+        "holding_time": {
+          "mean_holding_time_ms": 7425000.0,
+          "mean_time_to_fill_ms": 900000.0,
+          "median_holding_time_ms": 7650000.0,
+          "median_time_to_fill_ms": 900000.0
+        },
+        "long_actionable_count": 0,
+        "long_short_wait_distribution": {
+          "LONG": {
+            "count": 0,
+            "share": 0.0
+          },
+          "SHORT": {
+            "count": 6,
+            "share": 1.0
+          },
+          "WAIT": {
+            "count": 0,
+            "share": 0.0
+          }
+        },
+        "mean_R": 0.211066,
+        "mean_gross_R": 0.340563,
+        "mean_net_R": 0.211066,
+        "median_R": 0.206564,
+        "median_gross_R": 0.331126,
+        "median_net_R": 0.206564,
+        "net_R": {
+          "mean": 0.211066,
+          "mean_ex_funding": 0.205088,
+          "median": 0.206564,
+          "median_ex_funding": 0.201576,
+          "total": 0.844264
+        },
+        "no_fill_count": 0,
+        "policy_shift": {
+          "directional_policy_shift_count": 0,
+          "directional_policy_shift_rate": 0.0
+        },
+        "sample_count": 6,
+        "short_actionable_count": 4,
+        "slippage": {
+          "mean_slippage_r": 0.038707,
+          "slippage_bps_per_side": 2.0,
+          "total_slippage_r": 0.154829
+        },
+        "stop_before_target": 0.5,
+        "stop_before_target_count": 2,
+        "stop_rate_all_filled": 0.5,
+        "target_stop_resolved_count": 4,
+        "timeout_count": 0,
+        "tp1_before_sl": 0.5,
+        "tp1_before_sl_count": 2,
+        "tp2_before_sl": 0.0,
+        "tp2_before_sl_count": 0,
+        "trend_transition": {
+          "shadow_trend_transition_distribution": {},
+          "technical_trend_transition_count": 0,
+          "technical_trend_transition_rate": 0.0
+        }
+      },
+      "VOLATILITY_EXPANSION__WAIT": {
+        "MAE": {
+          "max_r": null,
+          "mean_r": null,
+          "median_r": null
+        },
+        "MFE": {
+          "max_r": null,
+          "mean_r": null,
+          "median_r": null
+        },
+        "action_frequency": 0.0,
+        "actionable_evaluation_count": 0,
+        "actionable_signal_count": 0,
+        "boundary_breach": {
+          "invalidation_breach_count": 0,
+          "stop_boundary_breach_count": 0,
+          "stop_boundary_breach_rate": null
+        },
+        "cohort_label": "VOLATILITY_EXPANSION__WAIT",
+        "drawdown_adverse_excursion": {
+          "max_adverse_excursion_r": null,
+          "max_cumulative_net_r_drawdown": 0.0,
+          "mean_adverse_excursion_r": null,
+          "median_adverse_excursion_r": null
+        },
+        "fees": {
+          "maker_fee_rate": 0.0002,
+          "mean_fee_r": 0.0,
+          "taker_fee_rate": 0.0005,
+          "total_fee_r": 0.0
+        },
+        "fill_rate": null,
+        "filled_count": 0,
+        "funding": {
+          "funding_complete_count": 0,
+          "mean_funding_pnl_r": 0.0,
+          "median_funding_pnl_r": 0.0,
+          "settlements_total": 0,
+          "total_funding_pnl_r": 0.0
+        },
+        "gross_R": {
+          "mean": null,
+          "median": null,
+          "total": 0.0
+        },
+        "holding_time": {
+          "mean_holding_time_ms": null,
+          "mean_time_to_fill_ms": null,
+          "median_holding_time_ms": null,
+          "median_time_to_fill_ms": null
+        },
+        "long_actionable_count": 0,
+        "long_short_wait_distribution": {
+          "LONG": {
+            "count": 0,
+            "share": 0.0
+          },
+          "SHORT": {
+            "count": 0,
+            "share": 0.0
+          },
+          "WAIT": {
+            "count": 88,
+            "share": 1.0
+          }
+        },
+        "mean_R": null,
+        "mean_gross_R": null,
+        "mean_net_R": null,
+        "median_R": null,
+        "median_gross_R": null,
+        "median_net_R": null,
+        "net_R": {
+          "mean": null,
+          "mean_ex_funding": null,
+          "median": null,
+          "median_ex_funding": null,
+          "total": 0.0
+        },
+        "no_fill_count": 0,
+        "policy_shift": {
+          "directional_policy_shift_count": 0,
+          "directional_policy_shift_rate": 0.0
+        },
+        "sample_count": 88,
+        "short_actionable_count": 0,
+        "slippage": {
+          "mean_slippage_r": 0.0,
+          "slippage_bps_per_side": 2.0,
+          "total_slippage_r": 0.0
+        },
+        "stop_before_target": null,
+        "stop_before_target_count": 0,
+        "stop_rate_all_filled": null,
+        "target_stop_resolved_count": 0,
+        "timeout_count": 0,
+        "tp1_before_sl": null,
+        "tp1_before_sl_count": 0,
+        "tp2_before_sl": null,
+        "tp2_before_sl_count": 0,
+        "trend_transition": {
+          "shadow_trend_transition_distribution": {},
+          "technical_trend_transition_count": 0,
+          "technical_trend_transition_rate": 0.0
+        }
+      }
+    },
+    "stability_by_market_regime": {
+      "HIGH_VOLATILITY": {
+        "MAE": {
+          "max_r": 1.0,
+          "mean_r": 0.727143,
+          "median_r": 1.0
+        },
+        "MFE": {
+          "max_r": 3.18,
+          "mean_r": 1.252857,
+          "median_r": 0.38
+        },
+        "action_frequency": 0.00224,
+        "actionable_evaluation_count": 8,
+        "actionable_signal_count": 7,
+        "boundary_breach": {
+          "invalidation_breach_count": 13,
+          "stop_boundary_breach_count": 5,
+          "stop_boundary_breach_rate": 0.714286
+        },
+        "cohort_label": "HIGH_VOLATILITY",
+        "drawdown_adverse_excursion": {
+          "max_adverse_excursion_r": 1.0,
+          "max_cumulative_net_r_drawdown": 4.1648,
+          "mean_adverse_excursion_r": 0.727143,
+          "median_adverse_excursion_r": 1.0
+        },
+        "fees": {
+          "maker_fee_rate": 0.0002,
+          "mean_fee_r": 0.233337,
+          "taker_fee_rate": 0.0005,
+          "total_fee_r": 1.633357
+        },
+        "fill_rate": 1.0,
+        "filled_count": 7,
+        "funding": {
+          "funding_complete_count": 7,
+          "mean_funding_pnl_r": 0.0,
+          "median_funding_pnl_r": 0.0,
+          "settlements_total": 0,
+          "total_funding_pnl_r": 0.0
+        },
+        "gross_R": {
+          "mean": 0.1545,
+          "median": -1.0,
+          "total": 1.0815
+        },
+        "holding_time": {
+          "mean_holding_time_ms": 1928571.43,
+          "mean_time_to_fill_ms": 540000.0,
+          "median_holding_time_ms": 900000.0,
+          "median_time_to_fill_ms": 900000.0
+        },
+        "long_actionable_count": 4,
+        "long_short_wait_distribution": {
+          "LONG": {
+            "count": 4,
+            "share": 0.00112
+          },
+          "SHORT": {
+            "count": 4,
+            "share": 0.00112
+          },
+          "WAIT": {
+            "count": 3564,
+            "share": 0.99776
+          }
+        },
+        "mean_R": -0.172171,
+        "mean_gross_R": 0.1545,
+        "mean_net_R": -0.172171,
+        "median_R": -1.2107,
+        "median_gross_R": -1.0,
+        "median_net_R": -1.2107,
+        "net_R": {
+          "mean": -0.172171,
+          "mean_ex_funding": -0.172171,
+          "median": -1.2107,
+          "median_ex_funding": -1.2107,
+          "total": -1.2052
+        },
+        "no_fill_count": 0,
+        "policy_shift": {
+          "directional_policy_shift_count": 0,
+          "directional_policy_shift_rate": 0.0
+        },
+        "sample_count": 3572,
+        "short_actionable_count": 3,
+        "slippage": {
+          "mean_slippage_r": 0.093335,
+          "slippage_bps_per_side": 2.0,
+          "total_slippage_r": 0.653343
+        },
+        "stop_before_target": 0.714286,
+        "stop_before_target_count": 5,
+        "stop_rate_all_filled": 0.714286,
+        "target_stop_resolved_count": 7,
+        "timeout_count": 0,
+        "tp1_before_sl": 0.285714,
+        "tp1_before_sl_count": 2,
+        "tp2_before_sl": 0.0,
+        "tp2_before_sl_count": 0,
+        "trend_transition": {
+          "shadow_trend_transition_distribution": {},
+          "technical_trend_transition_count": 0,
+          "technical_trend_transition_rate": 0.0
+        }
+      },
+      "RANGE": {
+        "MAE": {
+          "max_r": 1.0,
+          "mean_r": 1.0,
+          "median_r": 1.0
+        },
+        "MFE": {
+          "max_r": 0.2,
+          "mean_r": 0.11,
+          "median_r": 0.11
+        },
+        "action_frequency": 0.000489,
+        "actionable_evaluation_count": 2,
+        "actionable_signal_count": 2,
+        "boundary_breach": {
+          "invalidation_breach_count": 45,
+          "stop_boundary_breach_count": 2,
+          "stop_boundary_breach_rate": 1.0
+        },
+        "cohort_label": "RANGE",
+        "drawdown_adverse_excursion": {
+          "max_adverse_excursion_r": 1.0,
+          "max_cumulative_net_r_drawdown": 3.2643,
+          "mean_adverse_excursion_r": 1.0,
+          "median_adverse_excursion_r": 1.0
+        },
+        "fees": {
+          "maker_fee_rate": 0.0002,
+          "mean_fee_r": 0.451536,
+          "taker_fee_rate": 0.0005,
+          "total_fee_r": 0.903071
+        },
+        "fill_rate": 1.0,
+        "filled_count": 2,
+        "funding": {
+          "funding_complete_count": 2,
+          "mean_funding_pnl_r": 0.0,
+          "median_funding_pnl_r": 0.0,
+          "settlements_total": 0,
+          "total_funding_pnl_r": 0.0
+        },
+        "gross_R": {
+          "mean": -1.0,
+          "median": -1.0,
+          "total": -2.0
+        },
+        "holding_time": {
+          "mean_holding_time_ms": 240000.0,
+          "mean_time_to_fill_ms": 60000.0,
+          "median_holding_time_ms": 240000.0,
+          "median_time_to_fill_ms": 60000.0
+        },
+        "long_actionable_count": 2,
+        "long_short_wait_distribution": {
+          "LONG": {
+            "count": 2,
+            "share": 0.000489
+          },
+          "SHORT": {
+            "count": 0,
+            "share": 0.0
+          },
+          "WAIT": {
+            "count": 4086,
+            "share": 0.999511
+          }
+        },
+        "mean_R": -1.63215,
+        "mean_gross_R": -1.0,
+        "mean_net_R": -1.63215,
+        "median_R": -1.63215,
+        "median_gross_R": -1.0,
+        "median_net_R": -1.63215,
+        "net_R": {
+          "mean": -1.63215,
+          "mean_ex_funding": -1.63215,
+          "median": -1.63215,
+          "median_ex_funding": -1.63215,
+          "total": -3.2643
+        },
+        "no_fill_count": 0,
+        "policy_shift": {
+          "directional_policy_shift_count": 0,
+          "directional_policy_shift_rate": 0.0
+        },
+        "sample_count": 4088,
+        "short_actionable_count": 0,
+        "slippage": {
+          "mean_slippage_r": 0.180614,
+          "slippage_bps_per_side": 2.0,
+          "total_slippage_r": 0.361229
+        },
+        "stop_before_target": 1.0,
+        "stop_before_target_count": 2,
+        "stop_rate_all_filled": 1.0,
+        "target_stop_resolved_count": 2,
+        "timeout_count": 0,
+        "tp1_before_sl": 0.0,
+        "tp1_before_sl_count": 0,
+        "tp2_before_sl": 0.0,
+        "tp2_before_sl_count": 0,
+        "trend_transition": {
+          "shadow_trend_transition_distribution": {},
+          "technical_trend_transition_count": 0,
+          "technical_trend_transition_rate": 0.0
+        }
+      },
+      "TRANSITION": {
+        "MAE": {
+          "max_r": 1.0,
+          "mean_r": 0.636,
+          "median_r": 1.0
+        },
+        "MFE": {
+          "max_r": 5.06,
+          "mean_r": 1.896,
+          "median_r": 1.68
+        },
+        "action_frequency": 0.002419,
+        "actionable_evaluation_count": 22,
+        "actionable_signal_count": 20,
+        "boundary_breach": {
+          "invalidation_breach_count": 49,
+          "stop_boundary_breach_count": 11,
+          "stop_boundary_breach_rate": 0.55
+        },
+        "cohort_label": "TRANSITION",
+        "drawdown_adverse_excursion": {
+          "max_adverse_excursion_r": 1.0,
+          "max_cumulative_net_r_drawdown": 6.277339,
+          "mean_adverse_excursion_r": 0.636,
+          "median_adverse_excursion_r": 1.0
+        },
+        "fees": {
+          "maker_fee_rate": 0.0002,
+          "mean_fee_r": 0.275721,
+          "taker_fee_rate": 0.0005,
+          "total_fee_r": 5.514429
+        },
+        "fill_rate": 1.0,
+        "filled_count": 20,
+        "funding": {
+          "funding_complete_count": 20,
+          "mean_funding_pnl_r": 0.002659,
+          "median_funding_pnl_r": 0.0,
+          "settlements_total": 7,
+          "total_funding_pnl_r": 0.053189
+        },
+        "gross_R": {
+          "mean": 0.741776,
+          "median": -1.0,
+          "total": 14.835513
+        },
+        "holding_time": {
+          "mean_holding_time_ms": 6330000.0,
+          "mean_time_to_fill_ms": 774000.0,
+          "median_holding_time_ms": 4500000.0,
+          "median_time_to_fill_ms": 900000.0
+        },
+        "long_actionable_count": 4,
+        "long_short_wait_distribution": {
+          "LONG": {
+            "count": 4,
+            "share": 0.00044
+          },
+          "SHORT": {
+            "count": 18,
+            "share": 0.001979
+          },
+          "WAIT": {
+            "count": 9074,
+            "share": 0.997581
+          }
+        },
+        "mean_R": 0.358425,
+        "mean_gross_R": 0.741776,
+        "mean_net_R": 0.358425,
+        "median_R": -1.1678,
+        "median_gross_R": -1.0,
+        "median_net_R": -1.1678,
+        "net_R": {
+          "mean": 0.358425,
+          "mean_ex_funding": 0.355766,
+          "median": -1.1678,
+          "median_ex_funding": -1.1678,
+          "total": 7.168502
+        },
+        "no_fill_count": 0,
+        "policy_shift": {
+          "directional_policy_shift_count": 0,
+          "directional_policy_shift_rate": 0.0
+        },
+        "sample_count": 9096,
+        "short_actionable_count": 16,
+        "slippage": {
+          "mean_slippage_r": 0.110289,
+          "slippage_bps_per_side": 2.0,
+          "total_slippage_r": 2.205771
+        },
+        "stop_before_target": 0.55,
+        "stop_before_target_count": 11,
+        "stop_rate_all_filled": 0.55,
+        "target_stop_resolved_count": 20,
+        "timeout_count": 0,
+        "tp1_before_sl": 0.45,
+        "tp1_before_sl_count": 9,
+        "tp2_before_sl": 0.1,
+        "tp2_before_sl_count": 2,
+        "trend_transition": {
+          "shadow_trend_transition_distribution": {},
+          "technical_trend_transition_count": 0,
+          "technical_trend_transition_rate": 0.0
+        }
+      },
+      "TREND_DOWN": {
+        "MAE": {
+          "max_r": 1.0,
+          "mean_r": 0.93,
+          "median_r": 1.0
+        },
+        "MFE": {
+          "max_r": 1.74,
+          "mean_r": 0.673333,
+          "median_r": 0.465
+        },
+        "action_frequency": 0.004373,
+        "actionable_evaluation_count": 6,
+        "actionable_signal_count": 6,
+        "boundary_breach": {
+          "invalidation_breach_count": 3,
+          "stop_boundary_breach_count": 5,
+          "stop_boundary_breach_rate": 0.833333
+        },
+        "cohort_label": "TREND_DOWN",
+        "drawdown_adverse_excursion": {
+          "max_adverse_excursion_r": 1.0,
+          "max_cumulative_net_r_drawdown": 5.984539,
+          "mean_adverse_excursion_r": 0.93,
+          "median_adverse_excursion_r": 1.0
+        },
+        "fees": {
+          "maker_fee_rate": 0.0002,
+          "mean_fee_r": 0.280214,
+          "taker_fee_rate": 0.0005,
+          "total_fee_r": 1.681286
+        },
+        "fill_rate": 1.0,
+        "filled_count": 6,
+        "funding": {
+          "funding_complete_count": 5,
+          "mean_funding_pnl_r": 0.000775,
+          "median_funding_pnl_r": 0.0,
+          "settlements_total": 3,
+          "total_funding_pnl_r": 0.003876
+        },
+        "gross_R": {
+          "mean": -0.605769,
+          "median": -1.0,
+          "total": -3.634615
+        },
+        "holding_time": {
+          "mean_holding_time_ms": 3290000.0,
+          "mean_time_to_fill_ms": 620000.0,
+          "median_holding_time_ms": 2250000.0,
+          "median_time_to_fill_ms": 900000.0
+        },
+        "long_actionable_count": 1,
+        "long_short_wait_distribution": {
+          "LONG": {
+            "count": 1,
+            "share": 0.000729
+          },
+          "SHORT": {
+            "count": 5,
+            "share": 0.003644
+          },
+          "WAIT": {
+            "count": 1366,
+            "share": 0.995627
+          }
+        },
+        "mean_R": -0.997423,
+        "mean_gross_R": -0.605769,
+        "mean_net_R": -0.997423,
+        "median_R": -1.46315,
+        "median_gross_R": -1.0,
+        "median_net_R": -1.46315,
+        "net_R": {
+          "mean": -0.997423,
+          "mean_ex_funding": -0.998069,
+          "median": -1.46315,
+          "median_ex_funding": -1.46315,
+          "total": -5.984539
+        },
+        "no_fill_count": 0,
+        "policy_shift": {
+          "directional_policy_shift_count": 0,
+          "directional_policy_shift_rate": 0.0
+        },
+        "sample_count": 1372,
+        "short_actionable_count": 5,
+        "slippage": {
+          "mean_slippage_r": 0.112086,
+          "slippage_bps_per_side": 2.0,
+          "total_slippage_r": 0.672514
+        },
+        "stop_before_target": 0.833333,
+        "stop_before_target_count": 5,
+        "stop_rate_all_filled": 0.833333,
+        "target_stop_resolved_count": 6,
+        "timeout_count": 0,
+        "tp1_before_sl": 0.166667,
+        "tp1_before_sl_count": 1,
+        "tp2_before_sl": 0.0,
+        "tp2_before_sl_count": 0,
+        "trend_transition": {
+          "shadow_trend_transition_distribution": {},
+          "technical_trend_transition_count": 0,
+          "technical_trend_transition_rate": 0.0
+        }
+      },
+      "TREND_UP": {
+        "MAE": {
+          "max_r": 1.0,
+          "mean_r": 0.794444,
+          "median_r": 1.0
+        },
+        "MFE": {
+          "max_r": 4.7,
+          "mean_r": 1.447778,
+          "median_r": 0.89
+        },
+        "action_frequency": 0.004891,
+        "actionable_evaluation_count": 9,
+        "actionable_signal_count": 9,
+        "boundary_breach": {
+          "invalidation_breach_count": 17,
+          "stop_boundary_breach_count": 6,
+          "stop_boundary_breach_rate": 0.666667
+        },
+        "cohort_label": "TREND_UP",
+        "drawdown_adverse_excursion": {
+          "max_adverse_excursion_r": 1.0,
+          "max_cumulative_net_r_drawdown": 7.3312,
+          "mean_adverse_excursion_r": 0.794444,
+          "median_adverse_excursion_r": 1.0
+        },
+        "fees": {
+          "maker_fee_rate": 0.0002,
+          "mean_fee_r": 0.305595,
+          "taker_fee_rate": 0.0005,
+          "total_fee_r": 2.750357
+        },
+        "fill_rate": 1.0,
+        "filled_count": 9,
+        "funding": {
+          "funding_complete_count": 8,
+          "mean_funding_pnl_r": -0.003072,
+          "median_funding_pnl_r": 0.0,
+          "settlements_total": 3,
+          "total_funding_pnl_r": -0.024578
+        },
+        "gross_R": {
+          "mean": 0.14951,
+          "median": -1.0,
+          "total": 1.345586
+        },
+        "holding_time": {
+          "mean_holding_time_ms": 7766666.67,
+          "mean_time_to_fill_ms": 806666.67,
+          "median_holding_time_ms": 3600000.0,
+          "median_time_to_fill_ms": 900000.0
+        },
+        "long_actionable_count": 9,
+        "long_short_wait_distribution": {
+          "LONG": {
+            "count": 9,
+            "share": 0.004891
+          },
+          "SHORT": {
+            "count": 0,
+            "share": 0.0
+          },
+          "WAIT": {
+            "count": 1831,
+            "share": 0.995109
+          }
+        },
+        "mean_R": -0.281055,
+        "mean_gross_R": 0.14951,
+        "mean_net_R": -0.281055,
+        "median_R": -1.4054,
+        "median_gross_R": -1.0,
+        "median_net_R": -1.4054,
+        "net_R": {
+          "mean": -0.281055,
+          "mean_ex_funding": -0.278324,
+          "median": -1.4054,
+          "median_ex_funding": -1.4054,
+          "total": -2.529492
+        },
+        "no_fill_count": 0,
+        "policy_shift": {
+          "directional_policy_shift_count": 0,
+          "directional_policy_shift_rate": 0.0
+        },
+        "sample_count": 1840,
+        "short_actionable_count": 0,
+        "slippage": {
+          "mean_slippage_r": 0.122238,
+          "slippage_bps_per_side": 2.0,
+          "total_slippage_r": 1.100143
+        },
+        "stop_before_target": 0.666667,
+        "stop_before_target_count": 6,
+        "stop_rate_all_filled": 0.666667,
+        "target_stop_resolved_count": 9,
+        "timeout_count": 0,
+        "tp1_before_sl": 0.333333,
+        "tp1_before_sl_count": 3,
+        "tp2_before_sl": 0.111111,
+        "tp2_before_sl_count": 1,
+        "trend_transition": {
+          "shadow_trend_transition_distribution": {},
+          "technical_trend_transition_count": 0,
+          "technical_trend_transition_rate": 0.0
+        }
+      }
+    }
+  },
+  "task_id": "B_LINE_RC2_TACTICAL_SUCCESSOR_R1_IMPLEMENTATION"
+}

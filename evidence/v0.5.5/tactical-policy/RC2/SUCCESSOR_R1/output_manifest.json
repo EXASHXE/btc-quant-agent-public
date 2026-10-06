@@ -1,0 +1,17 @@
+{
+  "actionable_oos_count": 44,
+  "aggregate_oos_mean_net_R": -0.13216,
+  "aggregate_oos_median_net_R": -1.235369,
+  "config_hash": "bba61849e64f37f9",
+  "evidence_ids_sha256": "fd0566a25e32255bb188bf3b5fa911240fa43d7297cc3dd161a147a0258351a5",
+  "grid_evaluation_ids_sha256": "27265560b6109ae1b247f18672db5610c5687108c1303ad8072dc96fd352fa96",
+  "input_manifest_hash": "6da0ff14f1c4cb53c53bc33a92dae5cf3e365b0e011054c406d73c95b96cc4ae",
+  "manifest_version": "RC1_WP_B_REPLAY_OUTPUT_MANIFEST_V1",
+  "oos_evaluations_count": 44,
+  "oos_evidences_count": 19968,
+  "output_manifest_hash": "6247915466c0aff765020215a0a19ba7e0e5c963f1a659e9fb36432e20ed1ace",
+  "policy_version": "TACTICAL_POLICY_R2_B1",
+  "shadow_evaluation_ids_sha256": "919bee92401f222ac753f14906e7a5bba386fcf5a9e17d4fd7148a047a736634",
+  "total_evidences_count": 21512,
+  "trend_shadow_ids_sha256": "58deec1415d01f8b8a633bc4cb136d68eb21383dfc779c03df4a53b740c0dae9"
+}

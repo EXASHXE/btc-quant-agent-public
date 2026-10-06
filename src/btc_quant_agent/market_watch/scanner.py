@@ -80,6 +80,7 @@ from .state import (
     compute_decision_fingerprint,
     evaluate_alert_emission,
 )
+from .trend_shadow import compute_trend_evidence_v2_shadow
 
 logger = logging.getLogger(__name__)
 
@@ -447,6 +448,29 @@ class MarketWatchScanner:
             source_receipt_timestamps=source_receipt_timestamps,
         )
 
+        # Compute TrendEvidenceV2Shadow strictly from confirmed PIT closed candles
+        trend_evidence = None
+        if len(raw_15m) >= 30 and len(raw_1h) >= 30:
+            try:
+                p_fund, p_basis = (None, None)
+                if hasattr(self.client, "prior_funding_and_basis"):
+                    p_fund, p_basis = self.client.prior_funding_and_basis(symbol)
+                trend_evidence = compute_trend_evidence_v2_shadow(
+                    snapshot=snapshot,
+                    closed_candles_15m=raw_15m,
+                    closed_candles_1h=raw_1h,
+                    closed_candles_4h=raw_4h,
+                    config=self.config,
+                    prior_funding_rate=p_fund,
+                    prior_basis_bps=p_basis,
+                )
+            except Exception as exc:  # noqa: BLE001
+                logger.debug("Trend evidence computation failed for %s: %s", symbol, exc)
+                trend_evidence = None
+
+        if trend_evidence is not None:
+            snapshot = replace(snapshot, trend_evidence=trend_evidence)
+
         return snapshot, health, tuple(health_reasons)
 
     def assess_symbol(
@@ -613,6 +637,7 @@ class MarketWatchScanner:
 
         # 8. Fatal Vetoes (Enforced before ranking)
         input_fatal = gated_decision
+        trend_ev = getattr(snapshot, "trend_evidence", None)
         has_fatal_veto, fatal_reasons = check_fatal_vetoes(
             decision=gated_decision,
             exhaustion=exhaustion,
@@ -621,6 +646,8 @@ class MarketWatchScanner:
             derivatives=derivatives,
             benchmark_context=bench_context,
             config=self.config,
+            trend_evidence=trend_ev,
+            enforce_promoted_evidence=True,
         )
         if has_fatal_veto:
             gated_decision = DirectionalDecision.WAIT

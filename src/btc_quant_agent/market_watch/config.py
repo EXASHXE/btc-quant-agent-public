@@ -119,6 +119,13 @@ class MarketWatchThresholdsConfig:
     top_trader_crowding_ratio: float = 2.0
     max_spread_bps: float = 8.0
     min_quote_volume_24h: float = 5_000_000.0
+    min_trend_persistence: float = 0.60
+    disallowed_structure_transitions: tuple[str, ...] = (
+        "TREND_TO_RANGE",
+        "RANGE_TO_TREND_UP",
+        "RANGE_TO_TREND_DOWN",
+    )
+    enable_promoted_trend_filter: bool = True
 
     def __post_init__(self) -> None:
         int_fields = (
@@ -139,9 +146,14 @@ class MarketWatchThresholdsConfig:
         for name in int_fields:
             _require_positive_int(getattr(self, name), f"thresholds.{name}")
         _require_real(self.min_volume_z, "thresholds.min_volume_z")
+        ignored_fields = ("min_volume_z", "disallowed_structure_transitions", "enable_promoted_trend_filter")
         for f in fields(self):
-            if f.name not in int_fields and f.name != "min_volume_z":
+            if f.name not in int_fields and f.name not in ignored_fields:
                 _require_nonnegative_real(getattr(self, f.name), f"thresholds.{f.name}")
+        if type(self.enable_promoted_trend_filter) is not bool:
+            raise TypeError("thresholds.enable_promoted_trend_filter must be a boolean")
+        if not isinstance(self.disallowed_structure_transitions, tuple):
+            raise TypeError("thresholds.disallowed_structure_transitions must be a tuple")
 
 
 @dataclass(frozen=True)
