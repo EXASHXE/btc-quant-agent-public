@@ -497,5 +497,23 @@
       "manifest_blob_sha": "828d1eda0146d1b06e3a4df3bb1647d505bf82a3",
       "controller_dispatch_sha": "f8e894f2f39adb66340f6bc8cbd803e1b9515b2a"
     }
+  },
+  "rc1_repairs": {
+    "wp_b": {
+      "task_id": "B_LINE_TACTICAL_DECISION_QUALITY_R1_REPAIR_1M_EVIDENCE",
+      "branch": "feature/b-line-rc1-wp-b-decision-quality",
+      "start_sha": "9e1c73c38213f30f0064c6b4b25509c109b1cd84",
+      "controller_dispatch_sha": "b5ad376f4fd00d5609c678989eae3156a9e14737",
+      "prompt_path": "prompts/v0.5/rc1/v0.5.5_RC1_WP_B_REPAIR_1M_EVIDENCE.md",
+      "prompt_blob_sha": "fcc415f9f86991b61a32fe35296ccd8ca399795e"
+    },
+    "wp_d": {
+      "task_id": "B_LINE_RELEASE_ENGINEERING_R1_REPAIR_IDENTITY_BINDING",
+      "branch": "feature/b-line-rc1-wp-d-release-engineering",
+      "start_sha": "07fa03883ef1956535eaa2ff7f718a4e5a72d9d1",
+      "controller_dispatch_sha": "b5ad376f4fd00d5609c678989eae3156a9e14737",
+      "prompt_path": "prompts/v0.5/rc1/v0.5.5_RC1_WP_D_REPAIR_IDENTITY_BINDING.md",
+      "prompt_blob_sha": "75a49e949c06f5a801c0b39a15080456a83b5763"
+    }
   }
 }
