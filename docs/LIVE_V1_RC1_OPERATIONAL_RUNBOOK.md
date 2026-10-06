@@ -1,8 +1,14 @@
 # B-Line Live V1 RC1 Operational & Persistence Runbook
 
 - **Release ID**: `B_LINE_INITIAL_USABLE_RELEASE_V1_RC1`
-- **Work Package**: `WP_D` (`B_LINE_RELEASE_ENGINEERING_R1`)
-- **Startup Contract**: `SERIALIZED_SINGLE_RUNTIME_INITIALIZER`
+- **Work Package**: `WP_D` (`B_LINE_RELEASE_ENGINEERING_R1_REPAIR_IDENTITY_BINDING`)
+- **Work Package Base SHA**: `08e81bec003d645a0a0582db183a1b6916887eff` (WP-D worktree base only; **not** final RC1 release `source_sha`)
+- **Release Source Identity**: `UNBOUND_PENDING_RC_INTEGRATION` in WP-D template; bound to exact 40-hex integration `source_sha` at RC closure
+- **Startup Contract**: `SERIALIZED_SINGLE_RUNTIME_INITIALIZER` (`startup_mechanical_certification = PENDING_WP_A` until accepted WP-A evidence is bound)
+- **Python Runtime Separation**:
+  - `requires_python`: `>=3.11` (package metadata)
+  - `container_build_python`: `3.12` (`Dockerfile` base image)
+  - `rc1_certified_python`: `PENDING_WP_A` until supplied from accepted WP-A evidence (Python `3.13` is not RC1-certified unless independently certified by WP-A)
 - **Supported Execution Modes**: `DRY_RUN` (default), `TESTNET` (explicit opt-in required)
 - **Unavailable Mode**: `LIVE` (hard-rejected at configuration and runtime boundaries)
 - **Safety Authority**:

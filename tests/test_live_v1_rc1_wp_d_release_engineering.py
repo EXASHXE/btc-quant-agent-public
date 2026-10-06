@@ -465,6 +465,23 @@ def test_release_manifest_determinism_and_luna_mechanical_verification(
     assert built_1 == built_2
     assert persisted == built_1
 
+    # WP-D template must NOT claim 08e81bec... as final release source_sha
+    assert persisted["source_sha"] == "UNBOUND_PENDING_RC_INTEGRATION"
+    assert persisted["release_identity_state"] == "UNBOUND_PENDING_RC_INTEGRATION"
+    assert persisted["work_package_base_sha"] == "08e81bec003d645a0a0582db183a1b6916887eff"
+    assert persisted["source_sha"] != persisted["work_package_base_sha"]
+
+    # Startup mechanical certification and RC1 certified Python remain PENDING_WP_A until WP-A binds
+    assert persisted["startup_mechanical_certification"] == "PENDING_WP_A"
+    assert persisted["supported_python"] == {
+        "requires_python": ">=3.11",
+        "container_build_python": "3.12",
+        "rc1_certified_python": "PENDING_WP_A",
+        "rc1_certified_python_source": "PENDING_WP_A",
+    }
+    assert "supported_versions" not in persisted["supported_python"]
+    assert "3.13" not in json.dumps(persisted["supported_python"])
+
     ok, errors = api.verify_rc1_release_manifest(persisted)
     assert ok is True, errors
     assert errors == []
@@ -487,6 +504,113 @@ def test_release_manifest_determinism_and_luna_mechanical_verification(
     bad_out = json.loads(capsys.readouterr().out)
     assert bad_out["valid"] is False
     assert any("real_funds_write_authority" in e for e in bad_out["errors"])
+
+
+def test_release_manifest_integration_source_sha_and_wp_a_certification_binding(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    # 1. Pre-integration WP-D base SHA (08e81bec...) must NEVER be accepted as final release source_sha
+    with pytest.raises(ValueError, match="cannot be the pre-integration WP-D work_package_base_sha"):
+        api.build_rc1_release_manifest(source_sha="08e81bec003d645a0a0582db183a1b6916887eff")
+
+    masquerade = api.build_rc1_release_manifest()
+    masquerade["source_sha"] = "08e81bec003d645a0a0582db183a1b6916887eff"
+    ok, errs = api.verify_rc1_release_manifest(masquerade)
+    assert ok is False
+    assert any("work_package_base_sha" in e for e in errs)
+
+    # 2. Invalid 40-hex formats must be rejected
+    for bad_sha in ("not-a-sha", "abc123", "A" * 40, "g" * 40, ""):
+        with pytest.raises(ValueError, match="40-character lowercase hexadecimal"):
+            api.build_rc1_release_manifest(source_sha=bad_sha)
+
+    # 3. Unbound template fails when require_bound=True or expected_source_sha is supplied
+    unbound = api.build_rc1_release_manifest()
+    ok_bound, bound_errs = api.verify_rc1_release_manifest(unbound, require_bound=True)
+    assert ok_bound is False
+    assert any("UNBOUND_PENDING_RC_INTEGRATION" in e for e in bound_errs)
+    assert any("rc1_certified_python is PENDING_WP_A" in e for e in bound_errs)
+    assert any("startup_mechanical_certification is PENDING_WP_A" in e for e in bound_errs)
+
+    # 4. Python 3.13 must be rejected unless WP-A independently certifies it
+    wp_a_ev = "evidence/v0.5.5/live_v1/RC1/WP_A/EVIDENCE.json"
+    with pytest.raises(ValueError, match="Python 3.13 cannot be listed as RC1-certified"):
+        api.build_rc1_release_manifest(
+            rc1_certified_python=["3.12", "3.13"],
+            wp_a_evidence_identity=wp_a_ev,
+        )
+
+    # 5. Binding rc1_certified_python or startup_mechanical_certification without WP-A evidence fails
+    with pytest.raises(ValueError, match="accepted wp_a_evidence_identity"):
+        api.build_rc1_release_manifest(
+            rc1_certified_python=["3.12"],
+            wp_a_evidence_identity=None,
+        )
+    with pytest.raises(ValueError, match="accepted wp_a_evidence_identity"):
+        api.build_rc1_release_manifest(
+            startup_mechanical_certification="CERTIFIED_BY_WP_A",
+            wp_a_evidence_identity=None,
+        )
+
+    # 6. Full integration-time binding with valid 40-hex source_sha and WP-A evidence passes
+    integration_sha = "a" * 40
+    integration_parent = "b" * 40
+    bound_manifest = api.build_rc1_release_manifest(
+        source_sha=integration_sha,
+        parent_sha=integration_parent,
+        rc1_certified_python=["3.12"],
+        startup_mechanical_certification="CERTIFIED_BY_WP_A",
+        wp_a_evidence_identity=wp_a_ev,
+        require_bound_source_sha=True,
+    )
+    assert bound_manifest["source_sha"] == integration_sha
+    assert bound_manifest["parent_sha"] == integration_parent
+    assert bound_manifest["release_identity_state"] == "BOUND_RC_INTEGRATION"
+    assert bound_manifest["startup_mechanical_certification"] == "CERTIFIED_BY_WP_A"
+    assert bound_manifest["supported_python"]["rc1_certified_python"] == ["3.12"]
+    assert bound_manifest["supported_python"]["rc1_certified_python_source"] == wp_a_ev
+
+    ok_full, full_errs = api.verify_rc1_release_manifest(
+        bound_manifest,
+        expected_source_sha=integration_sha,
+        require_bound=True,
+    )
+    assert ok_full is True, full_errs
+
+    bound_path = tmp_path / "bound_manifest.json"
+    assert (
+        api.main(
+            [
+                "--print-manifest",
+                "--source-sha",
+                integration_sha,
+                "--parent-sha",
+                integration_parent,
+                "--rc1-certified-python",
+                "3.12",
+                "--startup-certification",
+                "CERTIFIED_BY_WP_A",
+                "--wp-a-evidence",
+                wp_a_ev,
+                "--require-bound",
+            ]
+        )
+        == 0
+    )
+    bound_path.write_text(capsys.readouterr().out, encoding="utf-8")
+    assert (
+        api.main(
+            [
+                "--verify-manifest",
+                str(bound_path),
+                "--source-sha",
+                integration_sha,
+                "--require-bound",
+            ]
+        )
+        == 0
+    )
+    capsys.readouterr()
 
 
 # ---------------------------------------------------------------------------

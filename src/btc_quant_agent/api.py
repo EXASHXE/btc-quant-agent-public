@@ -5,6 +5,7 @@ import json
 import logging
 import math
 import os
+import re
 import secrets
 import sqlite3
 import sys
@@ -32,14 +33,23 @@ except ImportError as exc:  # pragma: no cover - optional dependency guard
 
 _bearer = HTTPBearer(auto_error=False)
 _readiness_logger = logging.getLogger("btc_quant_agent.live_v1.readiness")
+_HEX40_RE = re.compile(r"^[0-9a-f]{40}$")
+_PYTHON_MINOR_RE = re.compile(r"^3\.(1[1-9]|[2-9][0-9])$")
 
 RC1_RELEASE_ID = "B_LINE_INITIAL_USABLE_RELEASE_V1_RC1"
-RC1_TASK_ID = "B_LINE_RELEASE_ENGINEERING_R1"
-RC1_SOURCE_SHA = "08e81bec003d645a0a0582db183a1b6916887eff"
+RC1_TASK_ID = "B_LINE_RELEASE_ENGINEERING_R1_REPAIR_IDENTITY_BINDING"
+RC1_INITIAL_TASK_ID = "B_LINE_RELEASE_ENGINEERING_R1"
+RC1_UNBOUND_SOURCE_SHA = "UNBOUND_PENDING_RC_INTEGRATION"
+RC1_WORK_PACKAGE_BASE_SHA = "08e81bec003d645a0a0582db183a1b6916887eff"
 RC1_PARENT_SHA = "08e81bec003d645a0a0582db183a1b6916887eff"
 RC1_BASELINE_PARENT_SHA = "fde61dafb301d5bd5af3dc7eb81e5618f979036c"
-RC1_CONTROLLER_DISPATCH_SHA = "f8e894f2f39adb66340f6bc8cbd803e1b9515b2a"
+RC1_INITIAL_CONTROLLER_DISPATCH_SHA = "f8e894f2f39adb66340f6bc8cbd803e1b9515b2a"
+RC1_CONTROLLER_DISPATCH_SHA = "b5ad376f4fd00d5609c678989eae3156a9e14737"
 RC1_STARTUP_CONTRACT = "SERIALIZED_SINGLE_RUNTIME_INITIALIZER"
+RC1_STARTUP_MECHANICAL_CERTIFICATION = "PENDING_WP_A"
+RC1_CERTIFIED_PYTHON_PENDING = "PENDING_WP_A"
+RC1_REQUIRES_PYTHON = ">=3.11"
+RC1_CONTAINER_BUILD_PYTHON = "3.12"
 RC1_CANONICAL_STARTUP_COMMAND = (
     "uvicorn btc_quant_agent.api:app --host 127.0.0.1 --port 8787 --workers 1"
 )
@@ -445,6 +455,7 @@ def build_live_v1_readiness(
             "execution_mode": "DISABLED",
             "kill_switch_state": "DISABLED",
             "startup_contract": RC1_STARTUP_CONTRACT,
+            "startup_mechanical_certification": RC1_STARTUP_MECHANICAL_CERTIFICATION,
             "runtime_mode": "DISABLED",
             "accepting_risk": False,
             "blocked_reason": "LIVE_V1_DISABLED",
@@ -581,6 +592,7 @@ def build_live_v1_readiness(
         "execution_mode": exec_mode,
         "kill_switch_state": kill_switch_state,
         "startup_contract": RC1_STARTUP_CONTRACT,
+        "startup_mechanical_certification": RC1_STARTUP_MECHANICAL_CERTIFICATION,
         "runtime_mode": "B4_RUNTIME" if runtime_mode else "B3_CONTROL",
         "accepting_risk": accepting_risk,
         "blocked_reason": blocked_reason,
@@ -771,8 +783,148 @@ def create_app(
     return app
 
 
-def build_rc1_release_manifest() -> dict[str, Any]:
-    """Deterministically build the B_LINE_INITIAL_USABLE_RELEASE_V1_RC1 release manifest."""
+def _validate_git_sha40(
+    value: str,
+    *,
+    field_name: str,
+    reject_work_package_base: bool = False,
+) -> str:
+    """Validate that a git SHA is a 40-character lowercase hexadecimal string."""
+    cleaned = value.strip()
+    if not _HEX40_RE.fullmatch(cleaned):
+        raise ValueError(f"{field_name} must be a 40-character lowercase hexadecimal git SHA")
+    if reject_work_package_base and cleaned == RC1_WORK_PACKAGE_BASE_SHA:
+        raise ValueError(
+            f"{field_name} cannot be the pre-integration WP-D work_package_base_sha "
+            f"({RC1_WORK_PACKAGE_BASE_SHA}); supply the final integrated RC1 source SHA"
+        )
+    return cleaned
+
+
+def _resolve_wp_a_runtime_certification(
+    *,
+    rc1_certified_python: list[str] | tuple[str, ...] | str | None,
+    startup_mechanical_certification: str | None,
+    wp_a_evidence_identity: str | None,
+    wp_a_independent_313_certification: bool,
+) -> tuple[str | list[str], str, str]:
+    """Resolve and validate WP-A runtime certification and Python version bindings."""
+    resolved_wp_a_evidence = (
+        wp_a_evidence_identity.strip()
+        if isinstance(wp_a_evidence_identity, str) and wp_a_evidence_identity.strip()
+        else RC1_CERTIFIED_PYTHON_PENDING
+    )
+    has_accepted_wp_a_evidence = resolved_wp_a_evidence != RC1_CERTIFIED_PYTHON_PENDING
+
+    if (
+        rc1_certified_python is None
+        or rc1_certified_python == RC1_CERTIFIED_PYTHON_PENDING
+    ):
+        resolved_certified_python: str | list[str] = RC1_CERTIFIED_PYTHON_PENDING
+    else:
+        if not has_accepted_wp_a_evidence:
+            raise ValueError(
+                "rc1_certified_python cannot be bound without accepted wp_a_evidence_identity"
+            )
+        raw_items: list[str]
+        if isinstance(rc1_certified_python, str):
+            raw_items = [
+                item.strip() for item in rc1_certified_python.split(",") if item.strip()
+            ]
+        elif isinstance(rc1_certified_python, (list, tuple)):
+            raw_items = [str(item).strip() for item in rc1_certified_python if str(item).strip()]
+        else:
+            raise ValueError("rc1_certified_python must be 'PENDING_WP_A' or a list of versions")
+        if not raw_items:
+            raise ValueError("rc1_certified_python list must not be empty when bound")
+        normalized_versions: list[str] = []
+        for ver in raw_items:
+            if not _PYTHON_MINOR_RE.fullmatch(ver):
+                raise ValueError(
+                    f"Invalid Python version '{ver}' in rc1_certified_python; must match 3.11+"
+                )
+            if ver == "3.13" and not wp_a_independent_313_certification:
+                raise ValueError(
+                    "Python 3.13 cannot be listed as RC1-certified unless WP-A independently certifies it"
+                )
+            if ver not in normalized_versions:
+                normalized_versions.append(ver)
+        resolved_certified_python = normalized_versions
+
+    resolved_startup_cert = (
+        startup_mechanical_certification.strip()
+        if isinstance(startup_mechanical_certification, str)
+        and startup_mechanical_certification.strip()
+        else RC1_STARTUP_MECHANICAL_CERTIFICATION
+    )
+    if resolved_startup_cert not in {RC1_STARTUP_MECHANICAL_CERTIFICATION, "CERTIFIED_BY_WP_A"}:
+        raise ValueError(
+            "startup_mechanical_certification must be 'PENDING_WP_A' or 'CERTIFIED_BY_WP_A'"
+        )
+    if resolved_startup_cert == "CERTIFIED_BY_WP_A" and not has_accepted_wp_a_evidence:
+        raise ValueError(
+            "startup_mechanical_certification='CERTIFIED_BY_WP_A' requires accepted wp_a_evidence_identity"
+        )
+
+    return resolved_certified_python, resolved_startup_cert, resolved_wp_a_evidence
+
+
+def build_rc1_release_manifest(
+    *,
+    source_sha: str | None = None,
+    parent_sha: str | None = None,
+    rc1_certified_python: list[str] | tuple[str, ...] | str | None = None,
+    startup_mechanical_certification: str | None = None,
+    wp_a_evidence_identity: str | None = None,
+    wp_a_independent_313_certification: bool = False,
+    require_bound_source_sha: bool = False,
+) -> dict[str, Any]:
+    """Deterministically build the B_LINE_INITIAL_USABLE_RELEASE_V1_RC1 release manifest.
+
+    In the WP-D worktree template (prior to final RC integration), ``source_sha``
+    defaults to ``UNBOUND_PENDING_RC_INTEGRATION`` and WP-A runtime certification
+    fields remain ``PENDING_WP_A``. At RC integration time, an explicit 40-hex
+    integration ``source_sha`` (not the WP-D base SHA ``08e81bec...``) and
+    accepted WP-A certification evidence can be bound.
+    """
+    if require_bound_source_sha and (
+        source_sha is None or source_sha.strip() == RC1_UNBOUND_SOURCE_SHA
+    ):
+        raise ValueError(
+            "Final RC1 release manifest requires an explicit 40-hex integration source_sha"
+        )
+
+    if source_sha is None or (
+        isinstance(source_sha, str) and source_sha.strip() == RC1_UNBOUND_SOURCE_SHA
+    ):
+        resolved_source_sha = RC1_UNBOUND_SOURCE_SHA
+        release_identity_state = "UNBOUND_PENDING_RC_INTEGRATION"
+    else:
+        resolved_source_sha = _validate_git_sha40(
+            source_sha,
+            field_name="source_sha",
+            reject_work_package_base=True,
+        )
+        release_identity_state = "BOUND_RC_INTEGRATION"
+
+    if parent_sha is None:
+        resolved_parent_sha = RC1_PARENT_SHA
+    else:
+        resolved_parent_sha = _validate_git_sha40(
+            parent_sha,
+            field_name="parent_sha",
+            reject_work_package_base=False,
+        )
+
+    resolved_certified_python, resolved_startup_cert, resolved_wp_a_evidence = (
+        _resolve_wp_a_runtime_certification(
+            rc1_certified_python=rc1_certified_python,
+            startup_mechanical_certification=startup_mechanical_certification,
+            wp_a_evidence_identity=wp_a_evidence_identity,
+            wp_a_independent_313_certification=wp_a_independent_313_certification,
+        )
+    )
+
     schema_identity: dict[str, Any] = {
         "default_live_v1_db_path": "./var/live_v1.db",
         "default_host_db_path": "./var/quant.db",
@@ -802,12 +954,26 @@ def build_rc1_release_manifest() -> dict[str, Any]:
         "release_id": RC1_RELEASE_ID,
         "work_package": "WP_D",
         "task_id": RC1_TASK_ID,
-        "source_sha": RC1_SOURCE_SHA,
-        "parent_sha": RC1_PARENT_SHA,
+        "initial_task_id": RC1_INITIAL_TASK_ID,
+        "release_identity_state": release_identity_state,
+        "source_sha": resolved_source_sha,
+        "work_package_base_sha": RC1_WORK_PACKAGE_BASE_SHA,
+        "parent_sha": resolved_parent_sha,
         "baseline_parent_sha": RC1_BASELINE_PARENT_SHA,
+        "initial_controller_dispatch_sha": RC1_INITIAL_CONTROLLER_DISPATCH_SHA,
         "controller_dispatch_sha": RC1_CONTROLLER_DISPATCH_SHA,
         "startup_contract": RC1_STARTUP_CONTRACT,
+        "startup_mechanical_certification": resolved_startup_cert,
         "canonical_startup_command": RC1_CANONICAL_STARTUP_COMMAND,
+        "runtime_certification_binding": {
+            "release_identity_state": release_identity_state,
+            "work_package_base_sha": RC1_WORK_PACKAGE_BASE_SHA,
+            "integration_source_sha": resolved_source_sha,
+            "startup_contract": RC1_STARTUP_CONTRACT,
+            "startup_mechanical_certification": resolved_startup_cert,
+            "rc1_certified_python": resolved_certified_python,
+            "wp_a_evidence_identity": resolved_wp_a_evidence,
+        },
         "component_versions": {
             "package_name": "btc-quant-agent",
             "package_version": __version__,
@@ -824,9 +990,10 @@ def build_rc1_release_manifest() -> dict[str, Any]:
             "position_observation_schema": "PositionObservationV1",
         },
         "supported_python": {
-            "requires_python": ">=3.11",
-            "supported_versions": ["3.11", "3.12", "3.13"],
-            "container_runtime_version": "3.12",
+            "requires_python": RC1_REQUIRES_PYTHON,
+            "container_build_python": RC1_CONTAINER_BUILD_PYTHON,
+            "rc1_certified_python": resolved_certified_python,
+            "rc1_certified_python_source": resolved_wp_a_evidence,
         },
         "execution_modes": {
             "canonical_modes": list(RC1_SUPPORTED_MODES),
@@ -906,6 +1073,7 @@ def build_rc1_release_manifest() -> dict[str, Any]:
             "b3_day1_validation": "evidence/v0.5.5/live_v1/B3_DAY1_VALIDATION.json",
             "b3_day1_public_data_dry_run": "evidence/v0.5.5/live_v1/B3_DAY1_PUBLIC_DATA_DRY_RUN.json",
             "b4_day2_validation": "evidence/v0.5.5/live_v1/B4_DAY2_VALIDATION.json",
+            "wp_a_runtime_certification_evidence": resolved_wp_a_evidence,
             "wp_d_evidence": "evidence/v0.5.5/live_v1/RC1/WP_D/EVIDENCE.json",
             "wp_d_release_manifest": "evidence/v0.5.5/live_v1/RC1/WP_D/B_LINE_INITIAL_USABLE_RELEASE_V1_RC1_MANIFEST.json",
             "operational_runbook": "docs/LIVE_V1_RC1_OPERATIONAL_RUNBOOK.md",
@@ -914,6 +1082,8 @@ def build_rc1_release_manifest() -> dict[str, Any]:
         "known_limitations": [
             "LIVE execution mode is unavailable in RC1; only DRY_RUN and TESTNET are supported.",
             "Real-money write authority is NONE; LIVE_APPROVAL_ONLY is NOT_AUTHORIZED; AUTONOMOUS_LIVE is FORBIDDEN.",
+            "Final RC1 release source_sha is an integration-time binding (UNBOUND_PENDING_RC_INTEGRATION in WP-D worktree template; work_package_base_sha 08e81bec003d645a0a0582db183a1b6916887eff is not final release identity).",
+            "Startup mechanical certification under SERIALIZED_SINGLE_RUNTIME_INITIALIZER and rc1_certified_python remain PENDING_WP_A until accepted WP-A runtime certification evidence is bound.",
             "Runtime must be started as a single serialized process (--workers 1) under SERIALIZED_SINGLE_RUNTIME_INITIALIZER.",
             "Single configured symbol (default BTCUSDT) and ONE_WAY position mode only; foreign or unconfigured nonzero positions block new risk.",
             "Provider (Responses/Codex), Feishu notification, or Binance stream/REST outages fail closed to MANUAL or block new risk until reconciled.",
@@ -928,13 +1098,24 @@ def build_rc1_release_manifest() -> dict[str, Any]:
     }
 
 
-def verify_rc1_release_manifest(manifest: dict[str, Any]) -> tuple[bool, list[str]]:
+def verify_rc1_release_manifest(
+    manifest: dict[str, Any],
+    *,
+    expected_source_sha: str | None = None,
+    require_bound: bool = False,
+    wp_a_independent_313_certification: bool = False,
+) -> tuple[bool, list[str]]:
     """Mechanically verify RC1 release manifest completeness, determinism, and safety invariants."""
     errors: list[str] = []
     required_top_keys = (
         "release_id",
+        "release_identity_state",
         "source_sha",
+        "work_package_base_sha",
         "parent_sha",
+        "startup_contract",
+        "startup_mechanical_certification",
+        "runtime_certification_binding",
         "component_versions",
         "supported_python",
         "execution_modes",
@@ -950,11 +1131,108 @@ def verify_rc1_release_manifest(manifest: dict[str, Any]) -> tuple[bool, list[st
         if key not in manifest:
             errors.append(f"missing required key: {key}")
 
-    expected = build_rc1_release_manifest()
     if manifest.get("release_id") != RC1_RELEASE_ID:
         errors.append(f"release_id mismatch: {manifest.get('release_id')}")
     if manifest.get("startup_contract") != RC1_STARTUP_CONTRACT:
         errors.append(f"startup_contract mismatch: {manifest.get('startup_contract')}")
+    if manifest.get("work_package_base_sha") != RC1_WORK_PACKAGE_BASE_SHA:
+        errors.append(
+            f"work_package_base_sha mismatch: {manifest.get('work_package_base_sha')}"
+        )
+
+    raw_source_sha = manifest.get("source_sha")
+    if not isinstance(raw_source_sha, str):
+        errors.append("source_sha must be a string")
+    elif raw_source_sha == RC1_WORK_PACKAGE_BASE_SHA:
+        errors.append(
+            f"source_sha must not claim pre-integration work_package_base_sha "
+            f"({RC1_WORK_PACKAGE_BASE_SHA}) as final RC1 release identity"
+        )
+    elif raw_source_sha == RC1_UNBOUND_SOURCE_SHA:
+        if require_bound or expected_source_sha is not None:
+            errors.append(
+                "source_sha is UNBOUND_PENDING_RC_INTEGRATION; bound 40-hex integration source_sha required"
+            )
+        if manifest.get("release_identity_state") != "UNBOUND_PENDING_RC_INTEGRATION":
+            errors.append(
+                "release_identity_state must be 'UNBOUND_PENDING_RC_INTEGRATION' when source_sha is unbound"
+            )
+    elif not _HEX40_RE.fullmatch(raw_source_sha):
+        errors.append("source_sha must be 'UNBOUND_PENDING_RC_INTEGRATION' or a 40-hex git SHA")
+    elif manifest.get("release_identity_state") != "BOUND_RC_INTEGRATION":
+        errors.append(
+            "release_identity_state must be 'BOUND_RC_INTEGRATION' when source_sha is a bound 40-hex git SHA"
+        )
+
+    if expected_source_sha is not None:
+        try:
+            validated_expected = _validate_git_sha40(
+                expected_source_sha,
+                field_name="expected_source_sha",
+                reject_work_package_base=True,
+            )
+            if raw_source_sha != validated_expected:
+                errors.append(
+                    f"source_sha mismatch: expected {validated_expected}, got {raw_source_sha}"
+                )
+        except ValueError as exc:
+            errors.append(str(exc))
+
+    raw_parent_sha = manifest.get("parent_sha")
+    if not isinstance(raw_parent_sha, str) or not _HEX40_RE.fullmatch(raw_parent_sha):
+        errors.append("parent_sha must be a 40-character lowercase hexadecimal git SHA")
+
+    supported_py = manifest.get("supported_python")
+    if not isinstance(supported_py, dict):
+        errors.append("supported_python must be a dict")
+    else:
+        if supported_py.get("requires_python") != RC1_REQUIRES_PYTHON:
+            errors.append(f"supported_python.requires_python must be '{RC1_REQUIRES_PYTHON}'")
+        if supported_py.get("container_build_python") != RC1_CONTAINER_BUILD_PYTHON:
+            errors.append(
+                f"supported_python.container_build_python must be '{RC1_CONTAINER_BUILD_PYTHON}'"
+            )
+        if "supported_versions" in supported_py:
+            errors.append(
+                "supported_python must not contain uncertified 'supported_versions' list; "
+                "use requires_python, container_build_python, and rc1_certified_python"
+            )
+        cert_py = supported_py.get("rc1_certified_python")
+        cert_source = supported_py.get("rc1_certified_python_source")
+        if cert_py == RC1_CERTIFIED_PYTHON_PENDING:
+            if require_bound:
+                errors.append(
+                    "supported_python.rc1_certified_python is PENDING_WP_A; bound WP-A certification required"
+                )
+            if cert_source != RC1_CERTIFIED_PYTHON_PENDING:
+                errors.append(
+                    "supported_python.rc1_certified_python_source must be 'PENDING_WP_A' when rc1_certified_python is pending"
+                )
+        elif isinstance(cert_py, list):
+            if not cert_py:
+                errors.append("supported_python.rc1_certified_python must not be empty when bound")
+            if not isinstance(cert_source, str) or cert_source in {"", RC1_CERTIFIED_PYTHON_PENDING}:
+                errors.append(
+                    "supported_python.rc1_certified_python requires accepted WP-A evidence source"
+                )
+            if "3.13" in cert_py and not wp_a_independent_313_certification:
+                errors.append(
+                    "Python 3.13 must not be listed in rc1_certified_python without independent WP-A certification"
+                )
+        else:
+            errors.append(
+                "supported_python.rc1_certified_python must be 'PENDING_WP_A' or a list of WP-A certified versions"
+            )
+
+    startup_cert = manifest.get("startup_mechanical_certification")
+    if startup_cert not in {RC1_STARTUP_MECHANICAL_CERTIFICATION, "CERTIFIED_BY_WP_A"}:
+        errors.append(
+            "startup_mechanical_certification must be 'PENDING_WP_A' or 'CERTIFIED_BY_WP_A'"
+        )
+    elif require_bound and startup_cert != "CERTIFIED_BY_WP_A":
+        errors.append(
+            "startup_mechanical_certification is PENDING_WP_A; CERTIFIED_BY_WP_A required for bound release"
+        )
 
     modes = manifest.get("execution_modes", {})
     if not isinstance(modes, dict) or modes.get("canonical_modes") != ["DRY_RUN", "TESTNET"]:
@@ -974,8 +1252,28 @@ def verify_rc1_release_manifest(manifest: dict[str, Any]) -> tuple[bool, list[st
         if authority.get("grants_trading_authority") is not False:
             errors.append("real_money_authority.grants_trading_authority must be False")
 
-    if manifest != expected:
-        errors.append("manifest payload diverges from deterministic build_rc1_release_manifest()")
+    if not errors:
+        try:
+            expected = build_rc1_release_manifest(
+                source_sha=raw_source_sha if isinstance(raw_source_sha, str) else None,
+                parent_sha=raw_parent_sha if isinstance(raw_parent_sha, str) else None,
+                rc1_certified_python=supported_py.get("rc1_certified_python")
+                if isinstance(supported_py, dict)
+                else None,
+                startup_mechanical_certification=startup_cert
+                if isinstance(startup_cert, str)
+                else None,
+                wp_a_evidence_identity=supported_py.get("rc1_certified_python_source")
+                if isinstance(supported_py, dict)
+                else None,
+                wp_a_independent_313_certification=wp_a_independent_313_certification,
+            )
+            if manifest != expected:
+                errors.append(
+                    "manifest payload diverges from deterministic build_rc1_release_manifest()"
+                )
+        except ValueError as exc:
+            errors.append(str(exc))
 
     return (len(errors) == 0, errors)
 
@@ -1006,13 +1304,58 @@ def main(argv: list[str] | None = None) -> int:
         type=Path,
         help="Mechanically verify a release manifest JSON file against RC1 invariants",
     )
+    parser.add_argument(
+        "--source-sha",
+        default=None,
+        help="Integration 40-hex git source SHA to bind when building or verifying the RC1 manifest",
+    )
+    parser.add_argument(
+        "--parent-sha",
+        default=None,
+        help="Optional 40-hex git parent SHA to bind when building the RC1 manifest",
+    )
+    parser.add_argument(
+        "--rc1-certified-python",
+        default=None,
+        help="Comma-separated WP-A certified Python minor version(s) (requires --wp-a-evidence)",
+    )
+    parser.add_argument(
+        "--startup-certification",
+        default=None,
+        help="Startup mechanical certification state: PENDING_WP_A or CERTIFIED_BY_WP_A",
+    )
+    parser.add_argument(
+        "--wp-a-evidence",
+        default=None,
+        help="Accepted WP-A runtime certification evidence path/identity",
+    )
+    parser.add_argument(
+        "--require-bound",
+        action="store_true",
+        help="Require manifest source_sha and WP-A runtime certification to be bound",
+    )
     parser.add_argument("--host", default="127.0.0.1", help="Bind host (default: 127.0.0.1)")
     parser.add_argument("--port", type=int, default=8787, help="Bind port (default: 8787)")
     args = parser.parse_args(argv)
 
     if args.print_manifest:
-        print(json.dumps(build_rc1_release_manifest(), indent=2, sort_keys=True))
-        return 0
+        try:
+            manifest = build_rc1_release_manifest(
+                source_sha=args.source_sha,
+                parent_sha=args.parent_sha,
+                rc1_certified_python=args.rc1_certified_python,
+                startup_mechanical_certification=args.startup_certification,
+                wp_a_evidence_identity=args.wp_a_evidence,
+                require_bound_source_sha=args.require_bound,
+            )
+            print(json.dumps(manifest, indent=2, sort_keys=True))
+            return 0
+        except ValueError as exc:
+            print(
+                json.dumps({"valid": False, "errors": [str(exc)]}, indent=2, sort_keys=True),
+                file=sys.stderr,
+            )
+            return 2
 
     if args.verify_manifest is not None:
         if not args.verify_manifest.is_file():
@@ -1025,7 +1368,11 @@ def main(argv: list[str] | None = None) -> int:
             )
             return 2
         loaded = json.loads(args.verify_manifest.read_text(encoding="utf-8"))
-        ok, errs = verify_rc1_release_manifest(loaded)
+        ok, errs = verify_rc1_release_manifest(
+            loaded,
+            expected_source_sha=args.source_sha,
+            require_bound=args.require_bound,
+        )
         print(json.dumps({"valid": ok, "errors": errs}, indent=2, sort_keys=True))
         return 0 if ok else 2
 

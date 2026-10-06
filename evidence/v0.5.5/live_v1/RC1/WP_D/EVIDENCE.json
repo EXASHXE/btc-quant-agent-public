@@ -2,22 +2,47 @@
   "schema_version": "B_LINE_RC1_WP_D_EVIDENCE_V1",
   "release_id": "B_LINE_INITIAL_USABLE_RELEASE_V1_RC1",
   "work_package": "WP_D",
-  "task_id": "B_LINE_RELEASE_ENGINEERING_R1",
+  "task_id": "B_LINE_RELEASE_ENGINEERING_R1_REPAIR_IDENTITY_BINDING",
+  "initial_task_id": "B_LINE_RELEASE_ENGINEERING_R1",
   "repository": "EXASHXE/btc-quant-agent-public",
   "branch": "feature/b-line-rc1-wp-d-release-engineering",
-  "start_sha": "08e81bec003d645a0a0582db183a1b6916887eff",
-  "parent_sha": "08e81bec003d645a0a0582db183a1b6916887eff",
+  "start_sha": "07fa03883ef1956535eaa2ff7f718a4e5a72d9d1",
+  "work_package_base_sha": "08e81bec003d645a0a0582db183a1b6916887eff",
+  "parent_sha": "07fa03883ef1956535eaa2ff7f718a4e5a72d9d1",
   "baseline_parent_sha": "fde61dafb301d5bd5af3dc7eb81e5618f979036c",
-  "controller_dispatch_sha": "f8e894f2f39adb66340f6bc8cbd803e1b9515b2a",
-  "decision": "RELEASE_ENGINEERING_PASS",
+  "initial_controller_dispatch_sha": "f8e894f2f39adb66340f6bc8cbd803e1b9515b2a",
+  "controller_dispatch_sha": "b5ad376f4fd00d5609c678989eae3156a9e14737",
+  "decision": "RELEASE_ENGINEERING_INCOMPLETE",
+  "known_incomplete": [
+    "Final RC1 release source_sha is an integration-time binding (UNBOUND_PENDING_RC_INTEGRATION in WP-D template; work_package_base_sha 08e81bec003d645a0a0582db183a1b6916887eff is not final release identity).",
+    "Startup mechanical certification (startup_mechanical_certification = PENDING_WP_A) and RC1 certified Python (rc1_certified_python = PENDING_WP_A) await accepted WP-A runtime certification evidence at RC integration."
+  ],
+  "release_identity_and_runtime_certification_binding": {
+    "release_identity_state": "UNBOUND_PENDING_RC_INTEGRATION",
+    "source_sha": "UNBOUND_PENDING_RC_INTEGRATION",
+    "work_package_base_sha": "08e81bec003d645a0a0582db183a1b6916887eff",
+    "work_package_base_sha_is_final_release_identity": false,
+    "integration_source_sha_format_validation": "^[0-9a-f]{40}$ (rejects 08e81bec003d645a0a0582db183a1b6916887eff)",
+    "startup_contract": "SERIALIZED_SINGLE_RUNTIME_INITIALIZER",
+    "startup_mechanical_certification": "PENDING_WP_A",
+    "python_separation": {
+      "requires_python": ">=3.11",
+      "container_build_python": "3.12",
+      "rc1_certified_python": "PENDING_WP_A",
+      "rc1_certified_python_source": "PENDING_WP_A",
+      "python_313_listed_as_rc1_certified": false
+    }
+  },
   "canonical_startup": {
     "startup_contract": "SERIALIZED_SINGLE_RUNTIME_INITIALIZER",
+    "startup_mechanical_certification": "PENDING_WP_A",
     "canonical_startup_command": "uvicorn btc_quant_agent.api:app --host 127.0.0.1 --port 8787 --workers 1",
     "container_startup_command": "uvicorn btc_quant_agent.api:app --host 0.0.0.0 --port 8787 --workers 1",
     "config_check_command": "python -m btc_quant_agent.api --check-config",
     "readiness_print_command": "python -m btc_quant_agent.api --print-readiness",
     "manifest_print_command": "python -m btc_quant_agent.api --print-manifest",
     "manifest_verify_command": "python -m btc_quant_agent.api --verify-manifest evidence/v0.5.5/live_v1/RC1/WP_D/B_LINE_INITIAL_USABLE_RELEASE_V1_RC1_MANIFEST.json",
+    "manifest_bound_verify_command": "python -m btc_quant_agent.api --verify-manifest <manifest.json> --source-sha <40-hex-sha> --require-bound",
     "legacy_quantd_removed_from_compose_and_docs": true
   },
   "config_template_identity": {
@@ -90,7 +115,7 @@
   },
   "runbook": {
     "path": "docs/LIVE_V1_RC1_OPERATIONAL_RUNBOOK.md",
-    "sha256": "0de66a0671a98d0cc16869437be9c1d3e042f858abdb2672a2d6f8a74cd92268",
+    "sha256": "cbfb82c40a234f2e0873549ea7123a3642fd596385cc7f6f276f1178d79ffe1e",
     "architecture_doc_path": "docs/CURRENT_ARCHITECTURE.md",
     "covered_operational_scenarios": [
       "first_start",
@@ -111,7 +136,7 @@
   },
   "release_manifest": {
     "path": "evidence/v0.5.5/live_v1/RC1/WP_D/B_LINE_INITIAL_USABLE_RELEASE_V1_RC1_MANIFEST.json",
-    "sha256": "b47f3e83828be004a1adba288c4dd9523f69b20d0589780a2c2e35f557a30504",
+    "sha256": "0327c0c4a41ccdc5ad741fff6b672b3f193549d5d3479c83dcc071a3983d1e64",
     "deterministic_verifier": "btc_quant_agent.api:verify_rc1_release_manifest",
     "verification_result": {
       "valid": true,
@@ -138,7 +163,7 @@
   "tests_and_static_results": {
     "focused_tests": {
       "command": "pytest tests/test_live_v1_rc1_wp_d_release_engineering.py -q",
-      "passed": 32,
+      "passed": 33,
       "failed": 0,
       "status": "PASS"
     },

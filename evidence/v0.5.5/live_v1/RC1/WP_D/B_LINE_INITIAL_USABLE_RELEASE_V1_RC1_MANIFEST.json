@@ -16,7 +16,7 @@
     "trade_intent_schema": "TradeIntentV1",
     "trade_proposal_schema": "TradeProposalV1"
   },
-  "controller_dispatch_sha": "f8e894f2f39adb66340f6bc8cbd803e1b9515b2a",
+  "controller_dispatch_sha": "b5ad376f4fd00d5609c678989eae3156a9e14737",
   "database_identity": {
     "b3_tables": [
       "live_cases",
@@ -102,6 +102,7 @@
     "config_template": ".env.example",
     "operational_runbook": "docs/LIVE_V1_RC1_OPERATIONAL_RUNBOOK.md",
     "rc1_release_contract": "reviews/v0.5/live_v1/V0.5.5_B_LINE_INITIAL_USABLE_RELEASE_V1_RC1_CONTRACT.md",
+    "wp_a_runtime_certification_evidence": "PENDING_WP_A",
     "wp_d_evidence": "evidence/v0.5.5/live_v1/RC1/WP_D/EVIDENCE.json",
     "wp_d_release_manifest": "evidence/v0.5.5/live_v1/RC1/WP_D/B_LINE_INITIAL_USABLE_RELEASE_V1_RC1_MANIFEST.json"
   },
@@ -154,9 +155,13 @@
       "type": "bool"
     }
   },
+  "initial_controller_dispatch_sha": "f8e894f2f39adb66340f6bc8cbd803e1b9515b2a",
+  "initial_task_id": "B_LINE_RELEASE_ENGINEERING_R1",
   "known_limitations": [
     "LIVE execution mode is unavailable in RC1; only DRY_RUN and TESTNET are supported.",
     "Real-money write authority is NONE; LIVE_APPROVAL_ONLY is NOT_AUTHORIZED; AUTONOMOUS_LIVE is FORBIDDEN.",
+    "Final RC1 release source_sha is an integration-time binding (UNBOUND_PENDING_RC_INTEGRATION in WP-D worktree template; work_package_base_sha 08e81bec003d645a0a0582db183a1b6916887eff is not final release identity).",
+    "Startup mechanical certification under SERIALIZED_SINGLE_RUNTIME_INITIALIZER and rc1_certified_python remain PENDING_WP_A until accepted WP-A runtime certification evidence is bound.",
     "Runtime must be started as a single serialized process (--workers 1) under SERIALIZED_SINGLE_RUNTIME_INITIALIZER.",
     "Single configured symbol (default BTCUSDT) and ONE_WAY position mode only; foreign or unconfigured nonzero positions block new risk.",
     "Provider (Responses/Codex), Feishu notification, or Binance stream/REST outages fail closed to MANUAL or block new risk until reconciled.",
@@ -217,6 +222,16 @@
     "real_funds_write_authority": "NONE"
   },
   "release_id": "B_LINE_INITIAL_USABLE_RELEASE_V1_RC1",
+  "release_identity_state": "UNBOUND_PENDING_RC_INTEGRATION",
+  "runtime_certification_binding": {
+    "integration_source_sha": "UNBOUND_PENDING_RC_INTEGRATION",
+    "rc1_certified_python": "PENDING_WP_A",
+    "release_identity_state": "UNBOUND_PENDING_RC_INTEGRATION",
+    "startup_contract": "SERIALIZED_SINGLE_RUNTIME_INITIALIZER",
+    "startup_mechanical_certification": "PENDING_WP_A",
+    "work_package_base_sha": "08e81bec003d645a0a0582db183a1b6916887eff",
+    "wp_a_evidence_identity": "PENDING_WP_A"
+  },
   "schema_identity": {
     "b3_tables": [
       "live_cases",
@@ -296,17 +311,16 @@
     "synchronous": "FULL"
   },
   "schema_version": "B_LINE_RC1_RELEASE_MANIFEST_V1",
-  "source_sha": "08e81bec003d645a0a0582db183a1b6916887eff",
+  "source_sha": "UNBOUND_PENDING_RC_INTEGRATION",
   "startup_contract": "SERIALIZED_SINGLE_RUNTIME_INITIALIZER",
+  "startup_mechanical_certification": "PENDING_WP_A",
   "supported_python": {
-    "container_runtime_version": "3.12",
-    "requires_python": ">=3.11",
-    "supported_versions": [
-      "3.11",
-      "3.12",
-      "3.13"
-    ]
+    "container_build_python": "3.12",
+    "rc1_certified_python": "PENDING_WP_A",
+    "rc1_certified_python_source": "PENDING_WP_A",
+    "requires_python": ">=3.11"
   },
-  "task_id": "B_LINE_RELEASE_ENGINEERING_R1",
-  "work_package": "WP_D"
+  "task_id": "B_LINE_RELEASE_ENGINEERING_R1_REPAIR_IDENTITY_BINDING",
+  "work_package": "WP_D",
+  "work_package_base_sha": "08e81bec003d645a0a0582db183a1b6916887eff"
 }
