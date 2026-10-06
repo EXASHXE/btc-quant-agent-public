@@ -1,0 +1,33 @@
+{
+  "schema_version": "B_LINE_RC2_TACTICAL_SUCCESSOR_DISPATCH_V1",
+  "task_id": "B_LINE_RC2_TACTICAL_SUCCESSOR_R1_IMPLEMENTATION",
+  "release_id": "B_LINE_INITIAL_USABLE_RELEASE_V1_RC2",
+  "branch": "feature/b-line-rc2-tactical-successor-r1",
+  "start_sha": "597d2dd7452d6e2ab11e8500d253be1e6d53f8db",
+  "controller_dispatch_sha": "2480e60816b28cb9afbc972cee4029d424d2fd25",
+  "recommended_executor": "Gemini 3.8 Flash",
+  "development_symbols": [
+    "BTCUSDT",
+    "ETHUSDT",
+    "SOLUSDT",
+    "LINKUSDT",
+    "SUIUSDT",
+    "XRPUSDT",
+    "DOGEUSDT",
+    "BNBUSDT"
+  ],
+  "protected_validation_symbols": [
+    "ADAUSDT",
+    "AVAXUSDT",
+    "LTCUSDT",
+    "TRXUSDT",
+    "BCHUSDT",
+    "DOTUSDT",
+    "ATOMUSDT",
+    "NEARUSDT"
+  ],
+  "candidate_budget_including_baseline": 6,
+  "protected_validation_access_allowed": false,
+  "next_on_selected": "FRESH_INDEPENDENT_PROTECTED_HOLDOUT_VALIDATION",
+  "real_funds_write_authority": "NONE"
+}

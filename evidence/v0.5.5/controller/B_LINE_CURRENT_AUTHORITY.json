@@ -1,6 +1,6 @@
 {
   "line": "B_LINE",
-  "stage": "B_LINE_INITIAL_USABLE_RELEASE_V1_RC2__TACTICAL_SUCCESSOR_PREVALIDATION",
+  "stage": "B_LINE_INITIAL_USABLE_RELEASE_V1_RC2__TACTICAL_SUCCESSOR_IMPLEMENTATION_AUTHORIZED",
   "code_branch": "feature/tactical-policy-r2",
   "accepted_code_sha": "52c16a28153de307dc6132c0975fe29341a0a918",
   "docs_authority_commit": "6319ddbaddd69d5522696992ec1565169da88e03",
@@ -259,7 +259,11 @@
       "DOTUSDT",
       "ATOMUSDT",
       "NEARUSDT"
-    ]
+    ],
+    "rc2_tactical_branch": "feature/b-line-rc2-tactical-successor-r1",
+    "rc2_tactical_task_id": "B_LINE_RC2_TACTICAL_SUCCESSOR_R1_IMPLEMENTATION",
+    "rc2_tactical_dispatch_sha": "2480e60816b28cb9afbc972cee4029d424d2fd25",
+    "rc2_protected_validation_access": "FORBIDDEN_DURING_IMPLEMENTATION"
   },
   "must_read": [],
   "validation_authority": {
@@ -570,5 +574,13 @@
     "release_contract_blob_sha": "d7751f5eec4b1a31abd819a75239b0efaebb6d94",
     "evaluation_contract_path": "reviews/v0.5/rc2/V0.5.5_B_LINE_RC2_TACTICAL_SUCCESSOR_R1_EVALUATION_CONTRACT.md",
     "evaluation_contract_blob_sha": "3d4164e602b3928c91b849184ac390ee1fa1bfaf"
+  },
+  "rc2_tactical_dispatch": {
+    "prompt_path": "prompts/v0.5/rc2/v0.5.5_B_LINE_RC2_TACTICAL_SUCCESSOR_IMPLEMENTATION_R1.md",
+    "prompt_blob_sha": "11b141969262720a75e01d3592ecf17dbb794d06",
+    "manifest_path": "evidence/v0.5.5/controller/B_LINE_RC2_TACTICAL_SUCCESSOR_DISPATCH.json",
+    "manifest_blob_sha": "95f48eeb8912f30bfa8479c3ee4023e93ac261a2",
+    "controller_dispatch_sha": "2480e60816b28cb9afbc972cee4029d424d2fd25",
+    "start_sha": "597d2dd7452d6e2ab11e8500d253be1e6d53f8db"
   }
 }
