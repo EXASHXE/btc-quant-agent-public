@@ -1,6 +1,6 @@
 {
   "line": "B_LINE",
-  "stage": "B_LINE_INITIAL_USABLE_RELEASE_V1_RC2__HOLDOUT_HARNESS_R2_QUALIFICATION_PREP",
+  "stage": "B_LINE_INITIAL_USABLE_RELEASE_V1_RC2__HOLDOUT_HARNESS_R2_AUTHORIZED",
   "code_branch": "feature/tactical-policy-r2",
   "accepted_code_sha": "52c16a28153de307dc6132c0975fe29341a0a918",
   "docs_authority_commit": "6319ddbaddd69d5522696992ec1565169da88e03",
@@ -327,7 +327,11 @@
       "ARBUSDT",
       "OPUSDT"
     ],
-    "rc2_third_protected_holdout_authorized": false
+    "rc2_third_protected_holdout_authorized": false,
+    "rc2_holdout_harness_r2_branch": "validation/b-line-rc2-holdout-harness-r2",
+    "rc2_holdout_harness_r2_start_sha": "c166899d714e6a03eb43ab53c65eea9a0e2bc966",
+    "rc2_holdout_harness_r2_dispatch_sha": "06d2d82f51560552196f20f5b51d508d2dc40b1d",
+    "rc2_holdout_harness_r2_new_protected_access": "FORBIDDEN"
   },
   "must_read": [],
   "validation_authority": {
@@ -685,5 +689,12 @@
     "adjudication_blob_sha": "6b72bcb479f9426432afcbbb52249d110c1a1b2e",
     "evidence_path": "evidence/v0.5.5/controller/B_LINE_RC2_HOLDOUT_R1_1_ADJUDICATION.json",
     "evidence_blob_sha": "60fea6f7ef040304079ccc3a46e9949c615ca587"
+  },
+  "rc2_holdout_harness_r2_dispatch": {
+    "prompt_path": "prompts/v0.5/rc2/v0.5.5_B_LINE_RC2_HOLDOUT_HARNESS_QUALIFICATION_R2.md",
+    "prompt_blob_sha": "a5c9cb093208b428b0c22cb7003c1b58e893fbc2",
+    "manifest_path": "evidence/v0.5.5/controller/B_LINE_RC2_HOLDOUT_HARNESS_R2_DISPATCH.json",
+    "manifest_blob_sha": "a5dd1c8449cf3a51e45f0fcc5335eebcc19c1292",
+    "controller_dispatch_sha": "06d2d82f51560552196f20f5b51d508d2dc40b1d"
   }
 }

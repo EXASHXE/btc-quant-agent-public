@@ -1,0 +1,13 @@
+{
+  "schema_version": "B_LINE_RC2_HOLDOUT_HARNESS_R2_DISPATCH_V1",
+  "task_id": "B_LINE_RC2_HOLDOUT_HARNESS_QUALIFICATION_R2",
+  "branch": "validation/b-line-rc2-holdout-harness-r2",
+  "start_sha": "c166899d714e6a03eb43ab53c65eea9a0e2bc966",
+  "frozen_policy_sha": "10be512f2cf4d7eccdc8a9849c925b5f73c568fd",
+  "controller_dispatch_sha": "06d2d82f51560552196f20f5b51d508d2dc40b1d",
+  "new_protected_outcomes_allowed": false,
+  "src_changes_allowed": false,
+  "recommended_executor": "Gemini 3.8 Flash",
+  "next_on_pass": "CONTROLLER_FREEZE_NEW_PROTECTED_UNIVERSE",
+  "real_funds_write_authority": "NONE"
+}
