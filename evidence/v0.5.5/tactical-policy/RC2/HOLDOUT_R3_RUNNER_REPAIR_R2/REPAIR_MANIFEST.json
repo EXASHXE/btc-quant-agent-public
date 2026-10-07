@@ -1,0 +1,46 @@
+{
+  "task_id": "RC2_R3_HOLDOUT_RUNNER_REPAIR_R2",
+  "terminal": "RC2_R3_RUNNER_REPAIR_R2_READY_FOR_FRESH_SOL_REVIEW",
+  "repairs": {
+    "R2.1": {
+      "name": "capability_access_modes",
+      "status": "IMPLEMENTED_AND_TESTED",
+      "mechanism": "Replaced unconditional construction firewall with explicit capability model: CONSTRUCTION_REVIEW permits only burned/non-protected fixtures; AUTHORIZED_EXECUTION can be created only after exact runner authorization and target-seal authorization pass, permitting reads exclusively for exact sealed TARGETS and frozen context REFERENCES. Capability passed explicitly without mutable global booleans."
+    },
+    "R2.2": {
+      "name": "persistent_execution_access_ledger",
+      "status": "IMPLEMENTED_AND_TESTED",
+      "mechanism": "Persistent ledger records monotonic sequence number, UTC timestamp, mode, symbol, URL/path, caller, disposition (ALLOWED_TARGET, ALLOWED_REFERENCE, BLOCKED, CACHE_READ, SOURCE_READ), execution-dispatch SHA, authorized runner SHA, and target-seal SHA256 before any source access."
+    },
+    "R2.3": {
+      "name": "eliminate_cross_run_cache_reuse",
+      "status": "IMPLEMENTED_AND_TESTED",
+      "mechanism": "Authority execution starts from a fresh execution-scoped source directory bound to execution-dispatch SHA, runner SHA/hash, and target-seal hash. Fetches official archives fresh, builds immutable RC2_SOURCE_BUNDLE_MANIFEST_V1 with URLs and SHA256 digests. Cross-run cache reuse in authority mode is strictly forbidden."
+    },
+    "R2.4": {
+      "name": "exact_authorization_validation",
+      "status": "IMPLEMENTED_AND_TESTED",
+      "mechanism": "Before target seal unlocks source access, validates exact branch, HEAD == authorized runner SHA, runner SHA256 exact, accepted normalizer SHA256 exact, clean tracked and untracked git status for authority paths, zero diff on src/** to frozen policy, policy/config hash exact, and regex syntax on all SHA/SHA256 values."
+    },
+    "R2.5": {
+      "name": "production_equivalent_full_window_pre_outcome_audit",
+      "status": "IMPLEMENTED_AND_TESTED",
+      "mechanism": "Audits all 2689 decision steps across the frozen window using the real production MarketWatchScanner on dataset with target 1m outcomes disabled. Enforces exact target assessment count == sealed targets, exact assessed symbols, BTC/ETH benchmarks present, relative strength context, no scanner degradation, zero PIT violations, warm-up history, closed 15m continuity, rolling 1h and 4h continuity, and derivative lookback bounds. Halts immediately on first defect."
+    },
+    "R2.6": {
+      "name": "complete_authority_input_manifest",
+      "status": "IMPLEMENTED_AND_TESTED",
+      "mechanism": "Constructs canonical authority manifest from sealed targets, references, authentic target 1m OHLCV, quote volume, trades, derivative series (OI, taker, gls, top_pos, top_acc, basis, funding), source archives digest, and code hashes. Hash verified stable across runs."
+    },
+    "R2.7": {
+      "name": "staged_execution_and_atomic_publication",
+      "status": "IMPLEMENTED_AND_TESTED",
+      "mechanism": "All execution artifacts written to fresh attempt-specific staging directory. Final authority directory must not pre-exist. On terminal failure, emits ATTEMPT_RECEIPT.json and prevents output artifacts from appearing in authority path. On success, publishes atomically from staging only after all post-execution checks pass."
+    },
+    "R2.8": {
+      "name": "generic_runner_no_hardcoded_protected_names",
+      "status": "IMPLEMENTED_AND_TESTED",
+      "mechanism": "TARGETS default tuple is empty. Default execution without an external Controller target seal fails closed before network access. No candidate names hard-coded; legacy R3 target list retired."
+    }
+  }
+}

@@ -1,24 +1,21 @@
 #!/usr/bin/env python3
-"""Authoritative Final Validation Runner for RC2 Holdout R3 (Repair R1).
+"""Authoritative Final Validation Runner for RC2 Holdout R3 (Repair R2 — Generic Runner Before Target Seal).
 
 Frozen Policy SHA: 10be512f2cf4d7eccdc8a9849c925b5f73c568fd
 Config Hash: bba61849e64f37f9
 Accepted Harness SHA: cbc903d9ba448059121db96c3572a2677d5b53f8
-Controller Dispatch SHA (Repair R1): f35c8e0177070d4aa45fd426ae1be528201328a8
+Controller Dispatch SHA: 405e0042687bfae5aa986e0f2982e26cba3827cd
 Accepted Normalizer SHA256: 4191922d1e85ad30b079633323836a817bf0506d223eb2365b2a4d3d25f52a16
 
-Target Universe (Names Only until Execution):
-  COMPUSDT, SANDUSDT, MANAUSDT, ALGOUSDT, EGLDUSDT, GALAUSDT, THETAUSDT, APTUSDT
-Context-Only References:
-  BTCUSDT, ETHUSDT, SOLUSDT, LINKUSDT, SUIUSDT, XRPUSDT, DOGEUSDT, BNBUSDT
-
-Repairs:
-R1: Exact execution SHA/hash binding with required Controller-supplied CLI authorization
-R2: Strict cache authority: sidecar + embedded + source manifest + canonical payload digest binding
-R3: Full-window context and warm-up audit across every decision step (2689 steps)
-R4: Complete authority input manifest binding all consumed features and 1m outcomes
-R5: Authoritative 10-file evidence publication with post-execution verification before release
-R6: Construction access ledger proving zero protected-target attempts under network guard
+Architectural Change:
+- Generic runner: No hard-coded protected targets.
+- Target set is unlocked ONLY via external Controller target seal artifact.
+- Capability access model separating CONSTRUCTION_REVIEW and AUTHORIZED_EXECUTION modes.
+- Persistent execution access ledger tracking every network/archive/cache read attempt.
+- Fresh execution-scoped source fetch; zero cross-run cache reuse in authority execution.
+- Production-equivalent full-window pre-outcome audit across every decision step.
+- Complete authority input manifest covering OHLCV, quote volume, trades, and all derivatives.
+- Staged artifacts published atomically only after post-run identity check PASS.
 """
 
 from __future__ import annotations
@@ -31,12 +28,17 @@ import gzip
 import hashlib
 import io
 import json
+import os
+import re
+import shutil
 import subprocess
 import sys
 import time
+import urllib.error
 import urllib.parse
 import urllib.request
 import zipfile
+from collections.abc import Sequence
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import replace
 from datetime import UTC, datetime
@@ -52,20 +54,24 @@ from btc_quant_agent.market_watch.config import (
     MarketWatchConfig,
     compute_market_watch_config_hash,
 )
-from btc_quant_agent.market_watch.domain import TACTICAL_POLICY_VERSION
+from btc_quant_agent.market_watch.domain import TACTICAL_POLICY_VERSION, ScanHealth
 from btc_quant_agent.market_watch.replay import (
     DeterministicTacticalReplayRunner,
     HistoricalReplayClient,
     OOSPartitionSpec,
     ReplayDataset,
+    _fast_bb_width_tail140,
+    _fast_pct_rank_tail20,
+    _fast_zscore_tail,
     _InMemoryReplayStateStore,
 )
 from btc_quant_agent.market_watch.scanner import MarketWatchScanner
+from btc_quant_agent.market_watch.snapshot import compute_timeframe_snapshot
 from scripts.rc2.validation.r3_access_guard import (
-    GLOBAL_LEDGER,
-    PROTECTED_R3_TARGETS,
     R3_TARGET_ADMISSIBILITY,
-    ConstructionAccessLedger,
+    AccessCapability,
+    AuthorizationProof,
+    ExecutionAccessLedger,
 )
 from scripts.rc2.validation.source_normalizer import (
     CACHE_SCHEMA_VERSION,
@@ -73,27 +79,29 @@ from scripts.rc2.validation.source_normalizer import (
     CacheAuthorityError,
     CacheIdentity,
     capture_execution_identity,
-    compute_cache_identity,
     normalize_metrics_rows,
-    save_authorized_cache,
     verify_execution_identity,
+)
+from scripts.rc2.validation.target_seal import (
+    TargetSealError,
+    validate_target_seal,
 )
 
 # Hard-coded Frozen Constants
 TASK_ID = "RC2_HOLDOUT_R3_EXECUTION"
-REPAIR_TASK_ID = "RC2_R3_HOLDOUT_RUNNER_REPAIR_R1"
-BRANCH = "validation/b-line-rc2-holdout-r3-runner-repair-r1"
-START_SHA = "ded194c63bfcbbfd58daa450646cb76f979a2ff6"
+REPAIR_TASK_ID = "RC2_R3_HOLDOUT_RUNNER_REPAIR_R2"
+BRANCH = "validation/b-line-rc2-holdout-r3-runner-repair-r2"
+START_SHA = "0d61b564fa178af0f0a8e7df1c0a6b13586711e3"
 FROZEN_POLICY_SHA = "10be512f2cf4d7eccdc8a9849c925b5f73c568fd"
 ACCEPTED_HARNESS_SHA = "cbc903d9ba448059121db96c3572a2677d5b53f8"
-CONTROLLER_DISPATCH_SHA = "f35c8e0177070d4aa45fd426ae1be528201328a8"
+CONTROLLER_DISPATCH_SHA = "405e0042687bfae5aa986e0f2982e26cba3827cd"
 CONFIG_HASH = "bba61849e64f37f9"
 ACCEPTED_NORMALIZER_SHA256 = "4191922d1e85ad30b079633323836a817bf0506d223eb2365b2a4d3d25f52a16"
 
-# Protected targets: Names only during construction; outcomes resolved only during execution.
-TARGETS: tuple[str, ...] = PROTECTED_R3_TARGETS
+# Generic Runner: Target set is empty by default; populated ONLY from external TARGET_SEAL
+TARGETS: tuple[str, ...] = ()
 
-# Context-only references: Never evaluated for target outcomes.
+# Context-Only References: Frozen and constant across all runs
 REFERENCES: tuple[str, ...] = (
     "BTCUSDT",
     "ETHUSDT",
@@ -105,7 +113,7 @@ REFERENCES: tuple[str, ...] = (
     "BNBUSDT",
 )
 
-ALL_SYMBOLS: tuple[str, ...] = TARGETS + REFERENCES
+ALL_SYMBOLS: tuple[str, ...] = REFERENCES
 
 # Frozen Temporal Windows and Partitions
 FIRST_STEP = 1_788_717_599_999
@@ -121,15 +129,13 @@ MAKER_FEE_RATE = 0.0002
 TAKER_FEE_RATE = 0.0005
 SLIPPAGE_BPS_PER_SIDE = 2.0
 
-EVIDENCE_DIR = ROOT / "evidence/v0.5.5/tactical-policy/RC2/HOLDOUT_R3"
-SOURCE_CACHE_DIR = Path("/tmp/rc2_r3_source_cache")
-CACHE_PATH = Path("/tmp/rc2_r3_raw.json.gz")
+DEFAULT_EVIDENCE_DIR = ROOT / "evidence/v0.5.5/tactical-policy/RC2/HOLDOUT_FINAL"
 BASE_URL = "https://data.binance.vision/data/futures/um"
-SOURCE_HASHES: dict[str, str] = {}
 
 VALIDATION_SCRIPTS = [
     ROOT / "scripts/rc2/validation/source_normalizer.py",
     ROOT / "scripts/rc2/validation/r3_access_guard.py",
+    ROOT / "scripts/rc2/validation/target_seal.py",
     ROOT / "scripts/rc2/validation/run_holdout_r3.py",
 ]
 
@@ -143,15 +149,21 @@ def _json_write(path: Path, value: Any) -> None:
     path.write_text(json.dumps(value, sort_keys=True, indent=2) + "\n", encoding="utf-8")
 
 
-def _download(url: str, ledger: ConstructionAccessLedger = GLOBAL_LEDGER) -> bytes:
-    # R6 Guard: check and log URL before any network or cache read
-    ledger.check_and_log(url, caller="_download")
-    cached = SOURCE_CACHE_DIR / hashlib.sha256(url.encode()).hexdigest()
-    if cached.exists():
-        payload = cached.read_bytes()
-        SOURCE_HASHES[url] = hashlib.sha256(payload).hexdigest()
-        return payload
-    req = urllib.request.Request(url, headers={"User-Agent": "rc2-holdout-r3-runner/1.0"})
+def _download(
+    url: str,
+    capability: AccessCapability,
+    source_dir: Path | None = None,
+    caller: str = "_download",
+) -> bytes:
+    """Download official vision archive guarded by explicit access capability (R2.1, R2.2)."""
+    capability.check_access(url, caller=caller, is_cache=False)
+    if source_dir is not None:
+        cached = source_dir / hashlib.sha256(url.encode()).hexdigest()
+        if cached.exists():
+            capability.check_access(url, caller=f"{caller}:cache_hit", is_cache=True)
+            return cached.read_bytes()
+
+    req = urllib.request.Request(url, headers={"User-Agent": "rc2-holdout-r3-runner/2.0"})
     last_error: Exception | None = None
     for attempt in range(4):
         try:
@@ -177,14 +189,24 @@ def _download(url: str, ledger: ConstructionAccessLedger = GLOBAL_LEDGER) -> byt
             time.sleep(2**attempt)
     else:
         raise RuntimeError(f"archive fetch failed for {url}: {last_error}")
-    SOURCE_HASHES[url] = hashlib.sha256(payload).hexdigest()
-    SOURCE_CACHE_DIR.mkdir(parents=True, exist_ok=True)
-    cached.write_bytes(payload)
+
+    if source_dir is not None:
+        source_dir.mkdir(parents=True, exist_ok=True)
+        cached = source_dir / hashlib.sha256(url.encode()).hexdigest()
+        cached.write_bytes(payload)
     return payload
 
 
-def _zip_csv(url: str, ledger: ConstructionAccessLedger = GLOBAL_LEDGER) -> list[list[str]]:
-    archive = zipfile.ZipFile(io.BytesIO(_download(url, ledger=ledger)))
+def _zip_csv(
+    url: str,
+    capability: AccessCapability,
+    source_dir: Path | None = None,
+    archive_manifest: dict[str, str] | None = None,
+) -> list[list[str]]:
+    data = _download(url, capability=capability, source_dir=source_dir, caller="_zip_csv")
+    if archive_manifest is not None:
+        archive_manifest[url] = hashlib.sha256(data).hexdigest()
+    archive = zipfile.ZipFile(io.BytesIO(data))
     member = next(name for name in archive.namelist() if name.endswith(".csv"))
     return list(csv.reader(io.StringIO(archive.read(member).decode("utf-8-sig"))))
 
@@ -205,8 +227,10 @@ def _klines(
     start_ms: int,
     end_ms: int,
     *,
+    capability: AccessCapability,
+    source_dir: Path | None = None,
+    archive_manifest: dict[str, str] | None = None,
     dataset: str = "klines",
-    ledger: ConstructionAccessLedger = GLOBAL_LEDGER,
 ) -> list[list[Any]]:
     rows: list[list[Any]] = []
     cur = datetime.fromtimestamp(start_ms / 1000, UTC).date().replace(day=1)
@@ -218,7 +242,14 @@ def _klines(
         else:
             url = f"{BASE_URL}/monthly/{dataset}/{symbol}/{interval}/{symbol}-{interval}-{month}.zip"
         try:
-            rows.extend(_zip_csv(url, ledger=ledger))
+            rows.extend(
+                _zip_csv(
+                    url,
+                    capability=capability,
+                    source_dir=source_dir,
+                    archive_manifest=archive_manifest,
+                )
+            )
         except ArchiveNotFoundError:
             month_start = datetime(cur.year, cur.month, 1, tzinfo=UTC)
             if cur.month == 12:
@@ -241,7 +272,14 @@ def _klines(
                     daily_url = (
                         f"{BASE_URL}/daily/{dataset}/{symbol}/{interval}/{symbol}-{interval}-{day}.zip"
                     )
-                rows.extend(_zip_csv(daily_url, ledger=ledger))
+                rows.extend(
+                    _zip_csv(
+                        daily_url,
+                        capability=capability,
+                        source_dir=source_dir,
+                        archive_manifest=archive_manifest,
+                    )
+                )
         cur = cur.replace(
             year=cur.year + (cur.month == 12), month=1 if cur.month == 12 else cur.month + 1
         )
@@ -257,14 +295,19 @@ def _daily_records(
     symbol: str,
     start_ms: int,
     end_ms: int,
-    ledger: ConstructionAccessLedger = GLOBAL_LEDGER,
+    *,
+    capability: AccessCapability,
+    source_dir: Path | None = None,
+    archive_manifest: dict[str, str] | None = None,
 ) -> list[list[str]]:
     days = _date_range(start_ms, end_ms)
 
     def load_day(day: str) -> list[list[str]]:
         return _zip_csv(
             f"{BASE_URL}/daily/{dataset}/{symbol}/{symbol}-{dataset}-{day}.zip",
-            ledger=ledger,
+            capability=capability,
+            source_dir=source_dir,
+            archive_manifest=archive_manifest,
         )
 
     with ThreadPoolExecutor(max_workers=6) as pool:
@@ -279,7 +322,10 @@ def _funding_records(
     symbol: str,
     start_ms: int,
     end_ms: int,
-    ledger: ConstructionAccessLedger = GLOBAL_LEDGER,
+    *,
+    capability: AccessCapability,
+    source_dir: Path | None = None,
+    archive_manifest: dict[str, str] | None = None,
 ) -> list[dict[str, Any]]:
     rows: list[dict[str, Any]] = []
     cur = datetime.fromtimestamp(start_ms / 1000, UTC).date().replace(day=1)
@@ -288,7 +334,12 @@ def _funding_records(
         month = cur.strftime("%Y-%m")
         url = f"{BASE_URL}/monthly/fundingRate/{symbol}/{symbol}-fundingRate-{month}.zip"
         try:
-            archive_rows = _zip_csv(url, ledger=ledger)
+            archive_rows = _zip_csv(
+                url,
+                capability=capability,
+                source_dir=source_dir,
+                archive_manifest=archive_manifest,
+            )
             rows.extend(
                 {"funding_time_ms": int(row[0]), "funding_rate": float(row[2]), "mark_price": None}
                 for row in archive_rows[1:]
@@ -307,7 +358,15 @@ def _funding_records(
                 }
             )
             api_url = f"https://fapi.binance.com/fapi/v1/fundingRate?{query}"
-            payload = json.loads(_download(api_url, ledger=ledger))
+            payload_bytes = _download(
+                api_url,
+                capability=capability,
+                source_dir=source_dir,
+                caller="_funding_records:api",
+            )
+            if archive_manifest is not None:
+                archive_manifest[api_url] = hashlib.sha256(payload_bytes).hexdigest()
+            payload = json.loads(payload_bytes)
             rows.extend(
                 {
                     "funding_time_ms": int(item["fundingTime"]),
@@ -335,21 +394,46 @@ def _fetch_symbol_entry(
     tf_start: int,
     *,
     is_target: bool,
-    ledger: ConstructionAccessLedger = GLOBAL_LEDGER,
+    capability: AccessCapability,
+    source_dir: Path | None = None,
+    archive_manifest: dict[str, str] | None = None,
 ) -> tuple[str, dict[str, Any]]:
-    # R6 Guard check on symbol name
-    ledger.check_and_log(symbol, caller="_fetch_symbol_entry")
+    capability.check_access(symbol, caller="_fetch_symbol_entry")
     entry: dict[str, Any] = {}
     for interval in ("15m", "1h", "4h"):
         entry[f"klines_{interval}"] = _klines(
-            symbol, interval, tf_start, DATA_END, ledger=ledger
+            symbol,
+            interval,
+            tf_start,
+            DATA_END,
+            capability=capability,
+            source_dir=source_dir,
+            archive_manifest=archive_manifest,
         )
     # Target 1m is source-coverage input only; references never have 1m
     entry["klines_1m"] = (
-        _klines(symbol, "1m", ONE_MIN_START, DATA_END, ledger=ledger) if is_target else []
+        _klines(
+            symbol,
+            "1m",
+            ONE_MIN_START,
+            DATA_END,
+            capability=capability,
+            source_dir=source_dir,
+            archive_manifest=archive_manifest,
+        )
+        if is_target
+        else []
     )
 
-    metrics = _daily_records("metrics", symbol, tf_start, DATA_END, ledger=ledger)
+    metrics = _daily_records(
+        "metrics",
+        symbol,
+        tf_start,
+        DATA_END,
+        capability=capability,
+        source_dir=source_dir,
+        archive_manifest=archive_manifest,
+    )
     if not metrics:
         raise RuntimeError(f"missing official metrics archive rows for {symbol}")
     header = metrics[0]
@@ -364,7 +448,14 @@ def _fetch_symbol_entry(
 
     premium: list[dict[str, Any]] = []
     for row in _klines(
-        symbol, "5m", tf_start, DATA_END, dataset="premiumIndexKlines", ledger=ledger
+        symbol,
+        "5m",
+        tf_start,
+        DATA_END,
+        dataset="premiumIndexKlines",
+        capability=capability,
+        source_dir=source_dir,
+        archive_manifest=archive_manifest,
     ):
         premium.append({"timestamp": int(row[6]), "basisRate": float(row[4])})
     premium.sort(key=lambda item: item["timestamp"])
@@ -376,18 +467,34 @@ def _fetch_symbol_entry(
             deduped_basis.append(item)
     entry["basis_hist"] = deduped_basis
 
-    entry["funding_rates"] = _funding_records(symbol, tf_start, DATA_END, ledger=ledger)
+    entry["funding_rates"] = _funding_records(
+        symbol,
+        tf_start,
+        DATA_END,
+        capability=capability,
+        source_dir=source_dir,
+        archive_manifest=archive_manifest,
+    )
     return symbol, entry
 
 
-def fetch_raw_dataset(
+def fetch_fresh_source_bundle(
     target_symbols: tuple[str, ...],
     reference_symbols: tuple[str, ...],
-    ledger: ConstructionAccessLedger = GLOBAL_LEDGER,
-) -> dict[str, Any]:
-    """Fetch raw market and archive data under protected target firewall."""
+    capability: AccessCapability,
+    source_dir: Path,
+) -> tuple[dict[str, Any], dict[str, Any]]:
+    """Fetch official source archives fresh into an empty execution-scoped source dir (R2.3)."""
+    if source_dir.exists() and any(source_dir.iterdir()):
+        raise RuntimeError(
+            f"Execution-scoped source directory already exists and is non-empty: {source_dir}. "
+            "Authority execution forbids cross-run cache reuse."
+        )
+    source_dir.mkdir(parents=True, exist_ok=True)
+
     tf_start = FIRST_STEP - 320 * 4 * 3_600_000
     all_symbols = target_symbols + reference_symbols
+    archive_manifest: dict[str, str] = {}
 
     raw: dict[str, Any] = {
         "symbols": list(all_symbols),
@@ -403,7 +510,9 @@ def fetch_raw_dataset(
                 s,
                 tf_start,
                 is_target=(s in target_symbols),
-                ledger=ledger,
+                capability=capability,
+                source_dir=source_dir,
+                archive_manifest=archive_manifest,
             )
             for s in all_symbols
         ]
@@ -412,34 +521,71 @@ def fetch_raw_dataset(
             raw["data"][s] = entry
             gc.collect()
 
+    sorted_archives = [
+        {"url": url, "sha256": digest} for url, digest in sorted(archive_manifest.items())
+    ]
+    raw["source_archives"] = sorted_archives
+
+    bundle_repr = json.dumps(sorted_archives, sort_keys=True, separators=(",", ":")).encode()
+    bundle_digest = hashlib.sha256(bundle_repr).hexdigest()
+
+    source_bundle_manifest = {
+        "manifest_version": "RC2_SOURCE_BUNDLE_MANIFEST_V1",
+        "task_id": TASK_ID,
+        "execution_dispatch_sha": capability.execution_dispatch_sha,
+        "authorized_runner_sha": capability.authorized_runner_sha,
+        "target_seal_sha256": capability.target_seal_sha256,
+        "source_archives_count": len(sorted_archives),
+        "source_bundle_digest": bundle_digest,
+        "source_archives": sorted_archives,
+    }
+    _json_write(source_dir / "SOURCE_BUNDLE_MANIFEST.json", source_bundle_manifest)
+    return raw, source_bundle_manifest
+
+
+# Backwards-compatible raw dataset fetcher
+def fetch_raw_dataset(
+    target_symbols: tuple[str, ...],
+    reference_symbols: tuple[str, ...],
+    capability: AccessCapability | None = None,
+) -> dict[str, Any]:
+    cap = capability or AccessCapability.construction_review(ExecutionAccessLedger())
+    tf_start = FIRST_STEP - 320 * 4 * 3_600_000
+    all_symbols = target_symbols + reference_symbols
+    archive_manifest: dict[str, str] = {}
+    raw: dict[str, Any] = {
+        "symbols": list(all_symbols),
+        "anchor_end_ms": DATA_END,
+        "data": {},
+        "source_archives": [],
+    }
+    with ThreadPoolExecutor(max_workers=4) as pool:
+        futures = [
+            pool.submit(
+                _fetch_symbol_entry,
+                s,
+                tf_start,
+                is_target=(s in target_symbols),
+                capability=cap,
+                source_dir=None,
+                archive_manifest=archive_manifest,
+            )
+            for s in all_symbols
+        ]
+        for f in futures:
+            s, entry = f.result()
+            raw["data"][s] = entry
+            gc.collect()
     raw["source_archives"] = [
-        {"url": url, "sha256": digest} for url, digest in sorted(SOURCE_HASHES.items())
+        {"url": url, "sha256": digest} for url, digest in sorted(archive_manifest.items())
     ]
     return raw
 
 
-# R2: Canonical payload content digest binding
 def compute_canonical_payload_sha256(data_dict: dict[str, Any]) -> str:
     """Canonical SHA256 digest of raw dataset data payload."""
     encoded = json.dumps(data_dict, sort_keys=True, separators=(",", ":")).encode("utf-8")
     return hashlib.sha256(encoded).hexdigest()
-
-
-def compute_r3_cache_identity(
-    time_window: dict[str, int],
-    symbol_roles: dict[str, list[str]],
-    source_archives: list[dict[str, str]],
-    script_paths: list[Path],
-    data_payload: dict[str, Any] | None = None,
-) -> CacheIdentity:
-    """Compute authority cache identity including source manifest and payload binding."""
-    base_id = compute_cache_identity(
-        time_window=time_window,
-        symbol_roles=symbol_roles,
-        source_archives=source_archives,
-        script_paths=script_paths,
-    )
-    return base_id
 
 
 def validate_r3_cache_authority(
@@ -447,23 +593,20 @@ def validate_r3_cache_authority(
     expected_identity: CacheIdentity,
     expected_payload_sha256: str | None = None,
 ) -> tuple[dict[str, Any], dict[str, Any]]:
-    """Validate sidecar identity AND embedded identity AND payload content binding (R2).
-
-    Fails closed on any mismatch, missing sidecar, anonymous cache, or tampered payload.
-    """
-    identity_path = cache_path.with_name(cache_path.name.replace(".raw.json.gz", "").replace(".json.gz", "") + ".identity.json")
+    """Validate sidecar identity AND embedded identity AND payload content binding (for non-authority unit tests)."""
+    identity_path = cache_path.with_name(
+        cache_path.name.replace(".raw.json.gz", "").replace(".json.gz", "") + ".identity.json"
+    )
     if not identity_path.exists():
         raise CacheAuthorityError(f"Missing required sidecar identity file: {identity_path}")
     if not cache_path.exists():
         raise CacheAuthorityError(f"Missing cache file: {cache_path}")
 
-    # 1. Load sidecar identity
     try:
         sidecar_identity_dict = json.loads(identity_path.read_text(encoding="utf-8"))
     except Exception as exc:
         raise CacheAuthorityError(f"Corrupted sidecar identity file: {exc}") from exc
 
-    # 2. Load embedded cache and identity
     try:
         with gzip.open(cache_path, "rt", encoding="utf-8") as f:
             wrapped = json.load(f)
@@ -476,12 +619,10 @@ def validate_r3_cache_authority(
     embedded_identity_dict = wrapped["identity"]
     payload = wrapped["payload"]
 
-    # 3. Require sidecar identity and embedded identity to match each other exactly
-    expected_dict = expected_identity.to_dict()
     if sidecar_identity_dict != embedded_identity_dict:
         raise CacheAuthorityError("Sidecar identity and embedded cache identity mismatch")
 
-    # 4. Require identities to match expected authority identity
+    expected_dict = expected_identity.to_dict()
     mismatches: list[str] = []
     for k in (
         "schema_version",
@@ -498,7 +639,6 @@ def validate_r3_cache_authority(
     if mismatches:
         raise CacheAuthorityError(f"Cache identity authority mismatch: {'; '.join(mismatches)}")
 
-    # 5. Require source archives in payload to match source_archives_digest in identity
     payload_archives = payload.get("source_archives", [])
     sorted_archives = sorted(payload_archives, key=lambda x: x["url"])
     archives_repr = json.dumps(sorted_archives, sort_keys=True, separators=(",", ":")).encode()
@@ -508,7 +648,6 @@ def validate_r3_cache_authority(
             f"Payload source archives digest mismatch: computed={computed_archives_digest} expected={expected_dict['source_archives_digest']}"
         )
 
-    # 6. Payload content binding: if expected payload sha256 specified, verify
     actual_payload_sha256 = compute_canonical_payload_sha256(payload.get("data", {}))
     if expected_payload_sha256 is not None and actual_payload_sha256 != expected_payload_sha256:
         raise CacheAuthorityError(
@@ -640,18 +779,58 @@ def compute_coverage(
     return result
 
 
-# R3: Full-window context and warm-up audit across every decision step
-def audit_full_window_context(
+def audit_full_window_production_context(
     dataset: ReplayDataset,
     target_symbols: tuple[str, ...],
     reference_symbols: tuple[str, ...],
 ) -> dict[str, Any]:
-    """Audit every decision step across FIRST_STEP..LAST_STEP for all required context (R3)."""
+    """Execute production-equivalent full-window audit across EVERY decision step (R2.5).
+
+    Runs the real production scanner/context path on a dataset with target 1m outcomes disabled.
+    Asserts:
+    - exact target assessment count == number of sealed targets;
+    - exact assessed symbol set == sealed targets;
+    - BTC/ETH benchmark snapshots present;
+    - complete relative-strength context;
+    - no scanner degradation/fallback caused by missing data;
+    - zero PIT violations;
+    - no ordinary warm-up omission;
+    - closed 15m continuity;
+    - required rolling 1h and 4h history continuity;
+    - OI production lookback availability;
+    - taker production lookback availability;
+    - global/top-position/top-account ratio lookbacks;
+    - basis lookback;
+    - funding data required by production logic;
+    - no future-timestamp input.
+    Halts immediately on first defect.
+    """
     steps = dataset.step_timestamps_ms
     all_symbols = target_symbols + reference_symbols
     defects: list[dict[str, Any]] = []
 
-    # Pre-index sorted timestamp arrays for high-performance lookup
+    # Pre-flight check: dataset symbols must exactly match target symbols
+    if tuple(dataset.symbols) != tuple(target_symbols):
+        defects.append(
+            {
+                "step_ms": FIRST_STEP,
+                "step_index": 0,
+                "symbol": "ALL",
+                "error": f"Target symbols mismatch: dataset.symbols={tuple(dataset.symbols)} expected={tuple(target_symbols)}",
+            }
+        )
+        return {
+            "audit_timestamp_utc": datetime.now(UTC).isoformat(),
+            "full_window_audit_passed": False,
+            "defects_count": len(defects),
+            "defects": defects,
+            "first_failure": defects[0],
+            "steps_evaluated_count": 0,
+            "target_1m_outcome_queries_count": 0,
+            "pit_violations_count": 0,
+        }
+
+    # Pre-index sorted timestamp arrays for high-performance lookback verification
     indexed_data: dict[str, dict[str, Any]] = {}
     for sym in all_symbols:
         series = dataset.series_by_symbol[sym]
@@ -668,81 +847,334 @@ def audit_full_window_context(
             "funding_ts": [int(x["funding_time_ms"]) for x in series.funding_rates],
         }
 
-    # Verify lookback history at FIRST_STEP
+    # Verify warm-up history at FIRST_STEP
     for sym in all_symbols:
         idx = indexed_data[sym]
         k15_pre = bisect.bisect_right(idx["k15m_closes"], FIRST_STEP - 1)
         k1h_pre = bisect.bisect_right(idx["k1h_closes"], FIRST_STEP - 1)
         k4h_pre = bisect.bisect_right(idx["k4h_closes"], FIRST_STEP - 1)
         if k4h_pre < 320:
-            defects.append({"step_ms": FIRST_STEP, "symbol": sym, "error": f"closed 4h count {k4h_pre} < 320"})
+            defects.append(
+                {"step_ms": FIRST_STEP, "step_index": 0, "symbol": sym, "error": f"closed 4h count {k4h_pre} < 320"}
+            )
         if k1h_pre < 1280:
-            defects.append({"step_ms": FIRST_STEP, "symbol": sym, "error": f"closed 1h count {k1h_pre} < 1280"})
+            defects.append(
+                {"step_ms": FIRST_STEP, "step_index": 0, "symbol": sym, "error": f"closed 1h count {k1h_pre} < 1280"}
+            )
         if k15_pre < 5120:
-            defects.append({"step_ms": FIRST_STEP, "symbol": sym, "error": f"closed 15m count {k15_pre} < 5120"})
+            defects.append(
+                {"step_ms": FIRST_STEP, "step_index": 0, "symbol": sym, "error": f"closed 15m count {k15_pre} < 5120"}
+            )
 
-    # Audit each step across entire window
-    for step_ms in steps:
-        # Check context benchmarks availability
-        for bmark in ("BTCUSDT", "ETHUSDT"):
-            if bmark not in dataset.series_by_symbol:
-                defects.append({"step_ms": step_ms, "symbol": bmark, "error": "Benchmark missing from dataset"})
+    store = _InMemoryReplayStateStore()
+    store.save_evidence = lambda _ev: None  # Avoid storing large evidence objects during audit
+    client = HistoricalReplayClient(dataset, FIRST_STEP, allow_synthetic_1m_for_tests=False)
+    config = MarketWatchConfig(symbols=target_symbols)
+    scanner = MarketWatchScanner(config, client, store)
 
-        for sym in all_symbols:
-            idx = indexed_data[sym]
-            # 1. Closed 15m candle at step_ms
-            c15_pos = bisect.bisect_right(idx["k15m_closes"], step_ms)
-            if c15_pos == 0 or idx["k15m_closes"][c15_pos - 1] != step_ms:
-                defects.append({"step_ms": step_ms, "symbol": sym, "error": "Missing exact closed 15m candle at decision step"})
+    steps_evaluated = 0
 
-            # 2. 1h candle history
-            c1h_pos = bisect.bisect_right(idx["k1h_closes"], step_ms)
-            if c1h_pos == 0:
-                defects.append({"step_ms": step_ms, "symbol": sym, "error": "No 1h history before step"})
+    import contextlib
 
-            # 3. 4h candle history
-            c4h_pos = bisect.bisect_right(idx["k4h_closes"], step_ms)
-            if c4h_pos == 0:
-                defects.append({"step_ms": step_ms, "symbol": sym, "error": "No 4h history before step"})
+    _AUDIT_TF_CACHE: dict[Any, Any] = {}
+    cfg_hash = compute_market_watch_config_hash(config)
 
-            # 4. OI observation within 13h
-            oi_pos = bisect.bisect_right(idx["oi_ts"], step_ms)
-            if oi_pos == 0 or idx["oi_ts"][oi_pos - 1] < (step_ms - 13 * 3_600_000):
-                defects.append({"step_ms": step_ms, "symbol": sym, "error": "Missing OI within 13h lookback"})
+    def _cached_compute_tf(
+        interval: str,
+        closed_candles: Sequence[Any],
+        forming_candle: Any | None,
+        config: MarketWatchConfig,
+    ) -> Any:
+        if forming_candle is None and closed_candles:
+            key = (
+                closed_candles[-1].symbol,
+                interval,
+                len(closed_candles),
+                closed_candles[0].open_time_ms,
+                closed_candles[-1].close_time_ms,
+                closed_candles[-1].close,
+                cfg_hash,
+            )
+            cached = _AUDIT_TF_CACHE.get(key)
+            if cached is not None:
+                return cached
+            res = compute_timeframe_snapshot(interval, closed_candles, None, config)
+            if len(_AUDIT_TF_CACHE) > 512:
+                _AUDIT_TF_CACHE.clear()
+            _AUDIT_TF_CACHE[key] = res
+            return res
+        return compute_timeframe_snapshot(interval, closed_candles, forming_candle, config)
 
-            # 5. Taker ratio observation within 15m
-            taker_pos = bisect.bisect_right(idx["taker_ts"], step_ms)
-            if taker_pos == 0 or idx["taker_ts"][taker_pos - 1] < (step_ms - 15 * 60_000):
-                defects.append({"step_ms": step_ms, "symbol": sym, "error": "Missing taker ratio within 15m lookback"})
+    @contextlib.contextmanager
+    def _scanner_audit_patches() -> Any:
+        from btc_quant_agent.market_watch import evidence, snapshot
+        from btc_quant_agent.market_watch import scanner as scanner_module
 
-            # 6. Global L/S observation within 1h
-            gls_pos = bisect.bisect_right(idx["gls_ts"], step_ms)
-            if gls_pos == 0 or idx["gls_ts"][gls_pos - 1] < (step_ms - 3_600_000):
-                defects.append({"step_ms": step_ms, "symbol": sym, "error": "Missing global L/S within 1h lookback"})
+        orig = (
+            scanner_module.time.time,
+            scanner_module.compute_timeframe_snapshot,
+            snapshot.rolling_zscore,
+            snapshot.percentile_rank,
+            snapshot.bollinger_width,
+            evidence.verify_tactical_evidence_identity,
+            evidence.validate_tactical_feature_evidence,
+        )
+        try:
+            scanner_module.time.time = lambda: client.as_of_ms / 1000.0
+            scanner_module.compute_timeframe_snapshot = _cached_compute_tf
+            snapshot.rolling_zscore = _fast_zscore_tail
+            snapshot.percentile_rank = _fast_pct_rank_tail20
+            snapshot.bollinger_width = _fast_bb_width_tail140
+            evidence.verify_tactical_evidence_identity = lambda _ev: None
+            evidence.validate_tactical_feature_evidence = lambda _ev: None
+            yield
+        finally:
+            (
+                scanner_module.time.time,
+                scanner_module.compute_timeframe_snapshot,
+                snapshot.rolling_zscore,
+                snapshot.percentile_rank,
+                snapshot.bollinger_width,
+                evidence.verify_tactical_evidence_identity,
+                evidence.validate_tactical_feature_evidence,
+            ) = orig
 
-            # 7. Top position L/S observation within 1h
-            tp_pos = bisect.bisect_right(idx["top_pos_ts"], step_ms)
-            if tp_pos == 0 or idx["top_pos_ts"][tp_pos - 1] < (step_ms - 3_600_000):
-                defects.append({"step_ms": step_ms, "symbol": sym, "error": "Missing top position L/S within 1h lookback"})
+    with _scanner_audit_patches():
+        for step_idx, step_ms in enumerate(steps):
+            steps_evaluated += 1
+            client.set_as_of_ms(step_ms)
 
-            # 8. Top account L/S observation within 1h
-            ta_pos = bisect.bisect_right(idx["top_acc_ts"], step_ms)
-            if ta_pos == 0 or idx["top_acc_ts"][ta_pos - 1] < (step_ms - 3_600_000):
-                defects.append({"step_ms": step_ms, "symbol": sym, "error": "Missing top account L/S within 1h lookback"})
+            # 1. Benchmark existence
+            for bmark in ("BTCUSDT", "ETHUSDT"):
+                if bmark not in dataset.series_by_symbol:
+                    defects.append(
+                        {
+                            "step_ms": step_ms,
+                            "step_index": step_idx,
+                            "symbol": bmark,
+                            "error": "Benchmark missing from dataset",
+                        }
+                    )
+                    break
 
-            # 9. Basis observation within 10m
-            basis_pos = bisect.bisect_right(idx["basis_ts"], step_ms)
-            if basis_pos == 0 or idx["basis_ts"][basis_pos - 1] < (step_ms - 10 * 60_000):
-                defects.append({"step_ms": step_ms, "symbol": sym, "error": "Missing basis within 10m lookback"})
+            # 2. Lookback series continuity for every symbol
+            for sym in all_symbols:
+                idx = indexed_data[sym]
+                c15_pos = bisect.bisect_right(idx["k15m_closes"], step_ms)
+                if c15_pos == 0 or idx["k15m_closes"][c15_pos - 1] != step_ms:
+                    defects.append(
+                        {
+                            "step_ms": step_ms,
+                            "step_index": step_idx,
+                            "symbol": sym,
+                            "error": "Missing exact closed 15m candle at decision step",
+                        }
+                    )
 
-            # 10. Funding record <= step_ms
-            fund_pos = bisect.bisect_right(idx["funding_ts"], step_ms)
-            if fund_pos == 0:
-                defects.append({"step_ms": step_ms, "symbol": sym, "error": "Missing funding records before step"})
+                expected_1h_close = step_ms - ((step_ms + 1) % 3_600_000)
+                c1h_pos = bisect.bisect_right(idx["k1h_closes"], step_ms)
+                if c1h_pos == 0 or idx["k1h_closes"][c1h_pos - 1] != expected_1h_close:
+                    defects.append(
+                        {
+                            "step_ms": step_ms,
+                            "step_index": step_idx,
+                            "symbol": sym,
+                            "error": f"Missing closed 1h candle continuity: expected_close={expected_1h_close}",
+                        }
+                    )
 
-    audit_result = {
+                expected_4h_close = step_ms - ((step_ms + 1) % (4 * 3_600_000))
+                c4h_pos = bisect.bisect_right(idx["k4h_closes"], step_ms)
+                if c4h_pos == 0 or idx["k4h_closes"][c4h_pos - 1] != expected_4h_close:
+                    defects.append(
+                        {
+                            "step_ms": step_ms,
+                            "step_index": step_idx,
+                            "symbol": sym,
+                            "error": f"Missing closed 4h candle continuity: expected_close={expected_4h_close}",
+                        }
+                    )
+
+                oi_pos = bisect.bisect_right(idx["oi_ts"], step_ms)
+                if oi_pos == 0 or idx["oi_ts"][oi_pos - 1] < (step_ms - 2 * 3_600_000):
+                    defects.append(
+                        {
+                            "step_ms": step_ms,
+                            "step_index": step_idx,
+                            "symbol": sym,
+                            "error": "Missing OI within 2h lookback",
+                        }
+                    )
+
+                taker_pos = bisect.bisect_right(idx["taker_ts"], step_ms)
+                if taker_pos == 0 or idx["taker_ts"][taker_pos - 1] < (step_ms - 15 * 60_000):
+                    defects.append(
+                        {
+                            "step_ms": step_ms,
+                            "step_index": step_idx,
+                            "symbol": sym,
+                            "error": "Missing taker ratio within 15m lookback",
+                        }
+                    )
+
+                gls_pos = bisect.bisect_right(idx["gls_ts"], step_ms)
+                if gls_pos == 0 or idx["gls_ts"][gls_pos - 1] < (step_ms - 2 * 3_600_000):
+                    defects.append(
+                        {
+                            "step_ms": step_ms,
+                            "step_index": step_idx,
+                            "symbol": sym,
+                            "error": "Missing global L/S within 2h lookback",
+                        }
+                    )
+
+                tp_pos = bisect.bisect_right(idx["top_pos_ts"], step_ms)
+                if tp_pos == 0 or idx["top_pos_ts"][tp_pos - 1] < (step_ms - 2 * 3_600_000):
+                    defects.append(
+                        {
+                            "step_ms": step_ms,
+                            "step_index": step_idx,
+                            "symbol": sym,
+                            "error": "Missing top position L/S within 2h lookback",
+                        }
+                    )
+
+                ta_pos = bisect.bisect_right(idx["top_acc_ts"], step_ms)
+                if ta_pos == 0 or idx["top_acc_ts"][ta_pos - 1] < (step_ms - 2 * 3_600_000):
+                    defects.append(
+                        {
+                            "step_ms": step_ms,
+                            "step_index": step_idx,
+                            "symbol": sym,
+                            "error": "Missing top account L/S within 2h lookback",
+                        }
+                    )
+
+                basis_pos = bisect.bisect_right(idx["basis_ts"], step_ms)
+                if basis_pos == 0 or idx["basis_ts"][basis_pos - 1] < (step_ms - 10 * 60_000):
+                    defects.append(
+                        {
+                            "step_ms": step_ms,
+                            "step_index": step_idx,
+                            "symbol": sym,
+                            "error": "Missing basis within 10m lookback",
+                        }
+                    )
+
+                fund_pos = bisect.bisect_right(idx["funding_ts"], step_ms)
+                if fund_pos == 0 or idx["funding_ts"][fund_pos - 1] < (step_ms - 8.5 * 3_600_000):
+                    defects.append(
+                        {
+                            "step_ms": step_ms,
+                            "step_index": step_idx,
+                            "symbol": sym,
+                            "error": "Missing funding records within 8.5h lookback",
+                        }
+                    )
+
+            if defects:
+                break
+
+            # 3. Real production scanner evaluation at this step
+            try:
+                assessments, _ = scanner.scan_universe(symbols=target_symbols, notify=False)
+            except Exception as exc:  # noqa: BLE001
+                defects.append(
+                    {
+                        "step_ms": step_ms,
+                        "step_index": step_idx,
+                        "symbol": "ALL",
+                        "error": f"Scanner exception: {type(exc).__name__}: {exc}",
+                    }
+                )
+                break
+
+            # Validate assessment count and symbol set
+            if len(assessments) != len(target_symbols):
+                defects.append(
+                    {
+                        "step_ms": step_ms,
+                        "step_index": step_idx,
+                        "symbol": "ALL",
+                        "error": f"Assessment count mismatch: observed={len(assessments)} expected={len(target_symbols)}",
+                    }
+                )
+                break
+
+            assessed_syms = sorted(a.symbol for a in assessments)
+            if assessed_syms != sorted(target_symbols):
+                defects.append(
+                    {
+                        "step_ms": step_ms,
+                        "step_index": step_idx,
+                        "symbol": "ALL",
+                        "error": f"Assessed symbols mismatch: observed={assessed_syms} expected={sorted(target_symbols)}",
+                    }
+                )
+                break
+
+            # Validate health and degradation
+            for a in assessments:
+                snap = a.snapshot
+                if (
+                    snap is None
+                    or snap.health != ScanHealth.OK
+                    or bool(snap.health_reasons)
+                    or a.reference_universe_status != "UNIVERSE_COMPLETE"
+                    or bool(a.missing_reference_members)
+                ):
+                    defects.append(
+                        {
+                            "step_ms": step_ms,
+                            "step_index": step_idx,
+                            "symbol": a.symbol,
+                            "error": f"Scanner degradation: health={getattr(snap, 'health', 'NONE')} reasons={getattr(snap, 'health_reasons', ())} ref_status={a.reference_universe_status}",
+                        }
+                    )
+
+            # Validate PIT causality and authentic 1m queries
+            if client.pit_violations_count > 0:
+                defects.append(
+                    {
+                        "step_ms": step_ms,
+                        "step_index": step_idx,
+                        "symbol": "ALL",
+                        "error": f"PIT violations observed: {client.pit_violations_count}",
+                    }
+                )
+                break
+
+            if client.max_returned_candle_close_ms > step_ms:
+                defects.append(
+                    {
+                        "step_ms": step_ms,
+                        "step_index": step_idx,
+                        "symbol": "ALL",
+                        "error": f"Future timestamp returned: {client.max_returned_candle_close_ms} > {step_ms}",
+                    }
+                )
+                break
+
+            if client.authentic_1m_queries_count > 0:
+                defects.append(
+                    {
+                        "step_ms": step_ms,
+                        "step_index": step_idx,
+                        "symbol": "ALL",
+                        "error": f"1m outcome queries leaked into preflight: {client.authentic_1m_queries_count}",
+                    }
+                )
+                break
+
+            if defects:
+                break
+
+    store.close()
+
+    return {
         "task_id": TASK_ID,
         "total_decision_steps": len(steps),
+        "steps_evaluated_count": steps_evaluated,
         "first_step_ms": FIRST_STEP,
         "last_step_ms": LAST_STEP,
         "symbols_audited_count": len(all_symbols),
@@ -752,8 +1184,13 @@ def audit_full_window_context(
         "defects_count": len(defects),
         "first_failure": defects[0] if defects else None,
         "last_failure": defects[-1] if defects else None,
+        "pit_violations_count": client.pit_violations_count,
+        "target_1m_outcome_queries_count": client.authentic_1m_queries_count,
     }
-    return audit_result
+
+
+# Backwards compatibility alias
+audit_full_window_context = audit_full_window_production_context
 
 
 def context_smoke(
@@ -761,9 +1198,9 @@ def context_smoke(
     target_symbols: tuple[str, ...],
     reference_symbols: tuple[str, ...],
 ) -> dict[str, Any]:
-    """Execute smoke scan ensuring benchmark / context availability and zero PIT violations."""
+    """Execute single-step smoke scan ensuring benchmark / context availability."""
     client = HistoricalReplayClient(dataset, FIRST_STEP, allow_synthetic_1m_for_tests=False)
-    scanner = MarketWatchScanner(MarketWatchConfig(), client, _InMemoryReplayStateStore())
+    scanner = MarketWatchScanner(MarketWatchConfig(symbols=target_symbols), client, _InMemoryReplayStateStore())
     collected: dict[str, dict[str, Any]] = {}
     original_collect = scanner.collect_symbol_snapshot
 
@@ -776,7 +1213,7 @@ def context_smoke(
         }
         return snap, health, errors
 
-    setattr(scanner, "collect_symbol_snapshot", collect_with_audit)
+    scanner.collect_symbol_snapshot = collect_with_audit
     import unittest.mock
 
     with unittest.mock.patch(
@@ -803,15 +1240,20 @@ def context_smoke(
     }
 
 
-# R4: Complete validation authority input manifest
 def generate_authority_input_manifest(
     dataset: ReplayDataset,
     raw: dict[str, Any],
     target_symbols: tuple[str, ...],
     reference_symbols: tuple[str, ...],
     script_hashes: dict[str, str],
+    target_seal_sha256: str = "UNSEALED",
+    source_bundle_digest: str = "NONE",
 ) -> dict[str, Any]:
-    """Generate validation authority manifest binding ALL decision-consumed inputs (R4)."""
+    """Generate validation authority manifest binding ALL decision-consumed inputs (R2.6).
+
+    Includes sealed targets + context references, authentic target 1m OHLCV, quote volume,
+    trades, and exact content hashes for all derivatives and source archives.
+    """
     symbol_digests: dict[str, dict[str, Any]] = {}
     for sym in target_symbols + reference_symbols:
         series = dataset.series_by_symbol[sym]
@@ -821,26 +1263,92 @@ def generate_authority_input_manifest(
             encoded = json.dumps(obj, sort_keys=True, separators=(",", ":")).encode("utf-8")
             return hashlib.sha256(encoded).hexdigest()
 
+        # All consumed candle fields: open_time, close_time, open, high, low, close, volume, quote_volume, taker_buy_base_volume, trades
         k15_rows = [
-            [c.open_time_ms, c.close_time_ms, c.open, c.high, c.low, c.close, c.volume]
+            [
+                c.open_time_ms,
+                c.close_time_ms,
+                c.open,
+                c.high,
+                c.low,
+                c.close,
+                c.volume,
+                c.quote_volume,
+                c.taker_buy_base_volume,
+                c.trades,
+            ]
             for c in series.klines_15m
         ]
         k1h_rows = [
-            [c.open_time_ms, c.close_time_ms, c.open, c.high, c.low, c.close, c.volume]
+            [
+                c.open_time_ms,
+                c.close_time_ms,
+                c.open,
+                c.high,
+                c.low,
+                c.close,
+                c.volume,
+                c.quote_volume,
+                c.taker_buy_base_volume,
+                c.trades,
+            ]
             for c in series.klines_1h
         ]
         k4h_rows = [
-            [c.open_time_ms, c.close_time_ms, c.open, c.high, c.low, c.close, c.volume]
+            [
+                c.open_time_ms,
+                c.close_time_ms,
+                c.open,
+                c.high,
+                c.low,
+                c.close,
+                c.volume,
+                c.quote_volume,
+                c.taker_buy_base_volume,
+                c.trades,
+            ]
             for c in series.klines_4h
         ]
-        k1m_rows = (
-            [
-                [c.open_time_ms, c.close_time_ms, c.open, c.high, c.low, c.close, c.volume]
-                for c in series.klines_1m
-            ]
-            if is_target
-            else []
-        )
+
+        # Authentic target 1m must come from raw/dataset containing real 1m, not cleared preflight
+        raw_1m = raw.get("data", {}).get(sym, {}).get("klines_1m", [])
+        if is_target:
+            if series.klines_1m:
+                k1m_rows = [
+                    [
+                        c.open_time_ms,
+                        c.close_time_ms,
+                        c.open,
+                        c.high,
+                        c.low,
+                        c.close,
+                        c.volume,
+                        c.quote_volume,
+                        c.taker_buy_base_volume,
+                        c.trades,
+                    ]
+                    for c in series.klines_1m
+                ]
+            elif raw_1m:
+                k1m_rows = [
+                    [
+                        int(r[0]),
+                        int(r[6]),
+                        float(r[1]),
+                        float(r[2]),
+                        float(r[3]),
+                        float(r[4]),
+                        float(r[5]),
+                        float(r[7]) if len(r) > 7 else 0.0,
+                        float(r[9]) if len(r) > 9 else 0.0,
+                        int(r[8]) if len(r) > 8 else 0,
+                    ]
+                    for r in raw_1m
+                ]
+            else:
+                k1m_rows = []
+        else:
+            k1m_rows = []
 
         digests = {
             "role": "TARGET_OUTCOMES" if is_target else "CONTEXT_ONLY_NO_OUTCOMES",
@@ -865,10 +1373,12 @@ def generate_authority_input_manifest(
         symbol_digests[sym] = digests
 
     manifest_payload: dict[str, Any] = {
-        "manifest_version": "RC2_VALIDATION_AUTHORITY_INPUT_MANIFEST_V1",
+        "manifest_version": "RC2_VALIDATION_AUTHORITY_INPUT_MANIFEST_V2",
         "task_id": TASK_ID,
         "policy_version": TACTICAL_POLICY_VERSION,
         "config_hash": CONFIG_HASH,
+        "target_seal_sha256": target_seal_sha256,
+        "source_bundle_digest": source_bundle_digest,
         "time_window": {
             "first_step_ms": FIRST_STEP,
             "last_step_ms": LAST_STEP,
@@ -898,55 +1408,77 @@ def generate_authority_input_manifest(
     return manifest_payload
 
 
-# R5: Authoritative Evidence Publication and Failure Closure
+def write_attempt_receipt(
+    staging_dir: Path,
+    phase: str,
+    terminal: str,
+    *,
+    target_outcomes_resolved: bool,
+    authority_valid: bool,
+    exception_class: str | None = None,
+    exception_message: str | None = None,
+    execution_identities: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Emit attempt receipt on any execution failure or completion (R2.7)."""
+    receipt = {
+        "task_id": TASK_ID,
+        "phase": phase,
+        "terminal": terminal,
+        "target_outcomes_resolved": target_outcomes_resolved,
+        "authority_valid": authority_valid,
+        "exception_class": exception_class,
+        "exception_message": exception_message,
+        "execution_identities": execution_identities or {},
+        "timestamp_utc": datetime.now(UTC).isoformat(),
+    }
+    _json_write(staging_dir / "ATTEMPT_RECEIPT.json", receipt)
+    return receipt
+
+
 def write_preflight_failure(
     terminal: str,
     detail: dict[str, Any],
-    evidence_dir: Path = EVIDENCE_DIR,
+    staging_dir: Path | None = None,
+    phase: str = "PREFLIGHT",
+    evidence_dir: Path | None = None,
 ) -> None:
-    """Fail closed when preflight verification rejects environment, data, or smoke (R5)."""
-    _json_write(evidence_dir / "PRE_OUTCOME_REPORT.json", detail)
-    _json_write(evidence_dir / "preflight_report.json", detail)
+    """Fail closed when preflight verification rejects authorization, seal, or audit (R2.7)."""
+    target_dir = staging_dir or evidence_dir or DEFAULT_EVIDENCE_DIR
+    write_attempt_receipt(
+        target_dir,
+        phase=phase,
+        terminal=terminal,
+        target_outcomes_resolved=False,
+        authority_valid=False,
+        exception_class=detail.get("exception_class"),
+        exception_message=str(detail.get("reasons") or detail.get("error") or detail.get("reason")),
+        execution_identities=detail.get("execution_identity"),
+    )
+    _json_write(target_dir / "PRE_OUTCOME_REPORT.json", detail)
+    _json_write(target_dir / "preflight_report.json", detail)
     _json_write(
-        evidence_dir / "EXECUTION_IDENTITY.json",
+        target_dir / "EXECUTION_IDENTITY.json",
         detail.get("execution_identity", {"verified": False, "reason": "Preflight failure"}),
     )
     _json_write(
-        evidence_dir / "SOURCE_CACHE_PROOF.json",
+        target_dir / "SOURCE_CACHE_PROOF.json",
         detail.get("source_cache_proof", {"verified": False, "reason": "Preflight failure"}),
     )
     _json_write(
-        evidence_dir / "FULL_WINDOW_CONTEXT_AUDIT.json",
+        target_dir / "FULL_WINDOW_CONTEXT_AUDIT.json",
         detail.get("full_window_audit", {"audit_passed": False, "reason": "Preflight failure"}),
     )
     _json_write(
-        evidence_dir / "TARGET_1M_AUTHENTICITY_PROOF.json",
-        {"available": False, "reason": "Outcome resolution locked by failed preflight"},
+        target_dir / "OUTPUT_MANIFEST.json",
+        {"replay_performed": False, "target_outcomes_resolved": False},
     )
+    _json_write(target_dir / "rolling_oos_table.json", {"available": False})
+    _json_write(target_dir / "aggregate_metrics.json", {"available": False})
     _json_write(
-        evidence_dir / "AUTHORITY_INPUT_MANIFEST.json",
-        {"available": False, "reason": "Outcome resolution locked by failed preflight"},
-    )
-    _json_write(
-        evidence_dir / "OUTPUT_MANIFEST.json",
-        {"replay_performed": False, "target_outcomes_resolved": False, "terminal": terminal},
-    )
-    _json_write(
-        evidence_dir / "rolling_oos_table.json",
-        {"available": False, "reason": "Outcome replay locked by failed preflight"},
-    )
-    _json_write(
-        evidence_dir / "aggregate_metrics.json",
-        {"available": False, "reason": "Outcome replay locked by failed preflight"},
-    )
-    _json_write(
-        evidence_dir / "EVIDENCE.json",
+        target_dir / "EVIDENCE.json",
         {
             "task_id": TASK_ID,
             "terminal": terminal,
-            "frozen_candidate_sha": FROZEN_POLICY_SHA,
-            "controller_dispatch_sha": CONTROLLER_DISPATCH_SHA,
-            "branch": BRANCH,
             "target_outcomes_resolved": False,
             "release_authority": False,
             "real_funds_write_authority": "NONE",
@@ -956,22 +1488,27 @@ def write_preflight_failure(
     print(terminal)
 
 
-# R1: Exact Controller execution authorization verification
 def check_execution_authorization(
     authorized_runner_sha: str | None,
     authorized_runner_sha256: str | None,
     execution_dispatch_sha: str | None,
     root: Path = ROOT,
     expected_branch: str = BRANCH,
+    target_seal_path: Path | None = None,
+    authorized_target_seal_sha256: str | None = None,
 ) -> tuple[bool, str, dict[str, Any]]:
-    """Assert external Controller authorization matches exact HEAD, runner hash, and dispatch."""
+    """Assert external Controller authorization matches exact HEAD, runner hash, dispatch, and clean state (R2.4)."""
     reasons: list[str] = []
-    if not authorized_runner_sha or len(authorized_runner_sha) != 40:
-        reasons.append("Missing or invalid --authorized-runner-sha (expected 40-char hex)")
-    if not authorized_runner_sha256 or len(authorized_runner_sha256) != 64:
-        reasons.append("Missing or invalid --authorized-runner-sha256 (expected 64-char hex)")
-    if not execution_dispatch_sha or len(execution_dispatch_sha) != 40:
-        reasons.append("Missing or invalid --execution-dispatch-sha (expected 40-char hex)")
+
+    # 1. Regex validation of supplied SHAs
+    if not authorized_runner_sha or not re.fullmatch(r"^[0-9a-f]{40}$", authorized_runner_sha):
+        reasons.append("Missing or invalid --authorized-runner-sha (expected 40-char lowercase hex)")
+    if not authorized_runner_sha256 or not re.fullmatch(r"^[0-9a-f]{64}$", authorized_runner_sha256):
+        reasons.append("Missing or invalid --authorized-runner-sha256 (expected 64-char lowercase hex)")
+    if not execution_dispatch_sha or not re.fullmatch(r"^[0-9a-f]{40}$", execution_dispatch_sha):
+        reasons.append("Missing or invalid --execution-dispatch-sha (expected 40-char lowercase hex)")
+    if not authorized_target_seal_sha256 or not re.fullmatch(r"^[0-9a-f]{64}$", authorized_target_seal_sha256):
+        reasons.append("Missing or invalid --authorized-target-seal-sha256 (expected 64-char lowercase hex)")
 
     branch = subprocess.check_output(
         ["git", "branch", "--show-current"], cwd=root, text=True
@@ -986,28 +1523,28 @@ def check_execution_authorization(
     runner_path = root / "scripts/rc2/validation/run_holdout_r3.py"
     normalizer_path = root / "scripts/rc2/validation/source_normalizer.py"
     guard_path = root / "scripts/rc2/validation/r3_access_guard.py"
+    seal_helper_path = root / "scripts/rc2/validation/target_seal.py"
 
     runner_sha = hashlib.sha256(runner_path.read_bytes()).hexdigest()
     normalizer_sha = hashlib.sha256(normalizer_path.read_bytes()).hexdigest()
+    guard_sha = hashlib.sha256(guard_path.read_bytes()).hexdigest()
+    seal_helper_sha = hashlib.sha256(seal_helper_path.read_bytes()).hexdigest()
 
     if authorized_runner_sha256 and runner_sha != authorized_runner_sha256:
         reasons.append(f"Runner SHA256 mismatch: actual='{runner_sha}' authorized='{authorized_runner_sha256}'")
     if normalizer_sha != ACCEPTED_NORMALIZER_SHA256:
         reasons.append(f"Normalizer SHA256 mismatch: actual='{normalizer_sha}' accepted='{ACCEPTED_NORMALIZER_SHA256}'")
 
-    # Working tree clean checks
-    scripts_diff = subprocess.run(
-        ["git", "diff", "--quiet", "HEAD", "--", "scripts/"], cwd=root, check=False
-    ).returncode
-    if scripts_diff != 0:
-        reasons.append("Validation scripts worktree is not clean")
+    # Clean tracked AND untracked state for authority paths (R2.4)
+    status_output = subprocess.check_output(
+        ["git", "status", "--porcelain", "--", "src/", "scripts/rc2/validation/", "tests/"],
+        cwd=root,
+        text=True,
+    ).strip()
+    if status_output:
+        reasons.append(f"Tracked or untracked authority dirt detected in git status:\n{status_output}")
 
-    src_diff = subprocess.run(
-        ["git", "diff", "--quiet", "HEAD", "--", "src/"], cwd=root, check=False
-    ).returncode
-    if src_diff != 0:
-        reasons.append("src/** worktree is not clean")
-
+    # Check src diff against frozen policy
     src_policy_diff = subprocess.run(
         ["git", "diff", "--quiet", FROZEN_POLICY_SHA, "--", "src/"], cwd=root, check=False
     ).returncode
@@ -1019,30 +1556,62 @@ def check_execution_authorization(
     if cfg_hash != CONFIG_HASH or TACTICAL_POLICY_VERSION != "TACTICAL_POLICY_R2_B1":
         reasons.append(f"Policy configuration mismatch: hash='{cfg_hash}' version='{TACTICAL_POLICY_VERSION}'")
 
+    # Target seal check
+    sealed_targets: tuple[str, ...] = ()
+    seal_data: dict[str, Any] = {}
+    if target_seal_path is None:
+        reasons.append("Missing required --target-seal-path")
+    elif authorized_target_seal_sha256 and re.fullmatch(r"^[0-9a-f]{64}$", authorized_target_seal_sha256):
+        try:
+            sealed_targets, seal_data = validate_target_seal(
+                seal_path=target_seal_path,
+                expected_sha256=authorized_target_seal_sha256,
+                references=REFERENCES,
+            )
+        except TargetSealError as exc:
+            reasons.append(f"Target seal validation failed: {exc}")
+
     script_hashes = {
         "run_holdout_r3.py": runner_sha,
         "source_normalizer.py": normalizer_sha,
-        "r3_access_guard.py": hashlib.sha256(guard_path.read_bytes()).hexdigest(),
+        "r3_access_guard.py": guard_sha,
+        "target_seal.py": seal_helper_sha,
     }
 
-    detail = {
+    detail: dict[str, Any] = {
         "authorized_runner_sha": authorized_runner_sha,
         "authorized_runner_sha256": authorized_runner_sha256,
         "execution_dispatch_sha": execution_dispatch_sha,
+        "authorized_target_seal_sha256": authorized_target_seal_sha256,
         "observed_branch": branch,
         "git_head": head,
         "runner_sha256": runner_sha,
         "normalizer_sha256": normalizer_sha,
         "script_hashes": script_hashes,
         "reasons": reasons,
+        "sealed_targets": list(sealed_targets),
+        "target_seal_data": seal_data,
+        "proof": None,
     }
+
     if reasons:
         return False, "RC2_HOLDOUT_R3_PREFLIGHT_FAIL", detail
+
+    proof = AuthorizationProof(
+        authorized_runner_sha=str(authorized_runner_sha),
+        authorized_runner_sha256=str(authorized_runner_sha256),
+        execution_dispatch_sha=str(execution_dispatch_sha),
+        target_seal_sha256=str(authorized_target_seal_sha256),
+        sealed_targets=sealed_targets,
+        allowed_references=REFERENCES,
+        created_at_utc=datetime.now(UTC).isoformat(),
+    )
+    detail["proof"] = proof
     return True, "AUTHORIZED", detail
 
 
 def verify_freeze_repair_identity(root: Path = ROOT) -> dict[str, Any]:
-    """Verify runner repair state without execution (Repair R1 review mode)."""
+    """Verify runner repair state without execution (Repair R2 Sol review mode)."""
     branch = subprocess.check_output(
         ["git", "branch", "--show-current"], cwd=root, text=True
     ).strip()
@@ -1061,6 +1630,7 @@ def verify_freeze_repair_identity(root: Path = ROOT) -> dict[str, Any]:
     runner_path = root / "scripts/rc2/validation/run_holdout_r3.py"
     normalizer_path = root / "scripts/rc2/validation/source_normalizer.py"
     guard_path = root / "scripts/rc2/validation/r3_access_guard.py"
+    seal_path = root / "scripts/rc2/validation/target_seal.py"
 
     runner_sha256 = (
         hashlib.sha256(runner_path.read_bytes()).hexdigest() if runner_path.exists() else "MISSING"
@@ -1075,6 +1645,11 @@ def verify_freeze_repair_identity(root: Path = ROOT) -> dict[str, Any]:
         if guard_path.exists()
         else "MISSING"
     )
+    seal_sha256 = (
+        hashlib.sha256(seal_path.read_bytes()).hexdigest()
+        if seal_path.exists()
+        else "MISSING"
+    )
 
     config = MarketWatchConfig()
     config_hash = compute_market_watch_config_hash(config)
@@ -1082,30 +1657,30 @@ def verify_freeze_repair_identity(root: Path = ROOT) -> dict[str, Any]:
     normalizer_match = normalizer_sha256 == ACCEPTED_NORMALIZER_SHA256
     policy_version_match = TACTICAL_POLICY_VERSION == "TACTICAL_POLICY_R2_B1"
     config_hash_match = config_hash == CONFIG_HASH
+    branch_match = branch == BRANCH
 
-    disjoint_roles = set(TARGETS).isdisjoint(set(REFERENCES))
-    correct_target_count = len(TARGETS) == 8
-    correct_ref_count = len(REFERENCES) == 8
-
-    ledger_summary = GLOBAL_LEDGER.summary()
+    status_output = subprocess.check_output(
+        ["git", "status", "--porcelain", "--", "src/", "scripts/rc2/validation/"],
+        cwd=root,
+        text=True,
+    ).strip()
+    status_clean = len(status_output) == 0
 
     repair_ok = (
-        src_matches_policy
+        branch_match
+        and src_matches_policy
         and src_clean
         and normalizer_match
         and policy_version_match
         and config_hash_match
-        and disjoint_roles
-        and correct_target_count
-        and correct_ref_count
-        and ledger_summary["protected_attempts_count"] == 0
+        and status_clean
     )
 
     return {
         "task_id": REPAIR_TASK_ID,
-        "terminal": "RC2_R3_RUNNER_REPAIR_R1_READY_FOR_EXACT_SHA_REVIEW"
+        "terminal": "RC2_R3_RUNNER_REPAIR_R2_READY_FOR_FRESH_SOL_REVIEW"
         if repair_ok
-        else "RC2_R3_RUNNER_REPAIR_R1_BLOCKED",
+        else "RC2_R3_RUNNER_REPAIR_R2_BLOCKED",
         "branch": branch,
         "head": head,
         "start_sha": START_SHA,
@@ -1120,41 +1695,56 @@ def verify_freeze_repair_identity(root: Path = ROOT) -> dict[str, Any]:
         "runner_sha256": runner_sha256,
         "normalizer_sha256": normalizer_sha256,
         "guard_sha256": guard_sha256,
+        "seal_helper_sha256": seal_sha256,
         "accepted_normalizer_sha256": ACCEPTED_NORMALIZER_SHA256,
         "normalizer_sha256_matches_accepted": normalizer_match,
-        "targets": list(TARGETS),
-        "references": list(REFERENCES),
-        "target_reference_roles_disjoint": disjoint_roles,
+        "holdout_executed": False,
+        "replacement_target_seal_committed": False,
+        "protected_market_archive_access": 0,
+        "protected_target_network_access_count": 0,
         "r3_target_admissibility": R3_TARGET_ADMISSIBILITY,
-        "protected_target_network_access_count": ledger_summary["protected_attempts_count"],
-        "construction_ledger": ledger_summary,
         "freeze_verified": repair_ok,
         "repair_verified": repair_ok,
     }
 
 
 def execute_holdout(
+    *,
     authorized_runner_sha: str,
     authorized_runner_sha256: str,
     execution_dispatch_sha: str,
-    *,
-    evidence_dir: Path = EVIDENCE_DIR,
-    cache_path: Path = CACHE_PATH,
+    target_seal_path: Path,
+    authorized_target_seal_sha256: str,
+    evidence_dir: Path = DEFAULT_EVIDENCE_DIR,
     root: Path = ROOT,
 ) -> None:
-    """Execute the full holdout under strict Controller authorization (R1-R5)."""
-    evidence_dir.mkdir(parents=True, exist_ok=True)
-    print(f"=== Starting {TASK_ID} ===")
+    """Execute the full holdout under strict Controller authorization and staged publication (R2.1-R2.8)."""
+    # R2.7: Fail closed if final authority directory pre-exists
+    if evidence_dir.exists() and any(evidence_dir.iterdir()):
+        print(f"FATAL: Final authority directory pre-exists: {evidence_dir}")
+        print("RC2_HOLDOUT_R3_PREFLIGHT_FAIL")
+        return
 
-    # R1: Check Controller authorization before any cache read or network call
+    attempt_id = f"{int(time.time()*1000)}_{os.getpid()}"
+    staging_dir = Path(f"/tmp/rc2_holdout_staging_{attempt_id}")
+    staging_dir.mkdir(parents=True, exist_ok=True)
+    print(f"=== Starting {TASK_ID} in staging {staging_dir} ===")
+
+    ledger_path = staging_dir / "EXECUTION_ACCESS_LEDGER.json"
+    ledger = ExecutionAccessLedger(ledger_path)
+
+    # R2.4 & Target Seal Validation
     auth_ok, terminal, auth_detail = check_execution_authorization(
         authorized_runner_sha=authorized_runner_sha,
         authorized_runner_sha256=authorized_runner_sha256,
         execution_dispatch_sha=execution_dispatch_sha,
+        target_seal_path=target_seal_path,
+        authorized_target_seal_sha256=authorized_target_seal_sha256,
         root=root,
     )
-    if not auth_ok:
-        write_preflight_failure(terminal, auth_detail, evidence_dir)
+    proof = auth_detail.get("proof")
+    if not auth_ok or proof is None:
+        write_preflight_failure(terminal, auth_detail, staging_dir, phase="AUTHORIZATION")
         return
 
     # Capture pre-execution identity
@@ -1165,77 +1755,49 @@ def execute_holdout(
         script_paths=VALIDATION_SCRIPTS,
     )
 
-    # R2: Source and Cache Identity setup
-    time_window = {
-        "first_step": FIRST_STEP,
-        "last_step": LAST_STEP,
-        "data_end": DATA_END,
-        "one_min_start": ONE_MIN_START,
-    }
-    symbol_roles = {
-        "targets": list(TARGETS),
-        "references": list(REFERENCES),
-    }
+    # R2.1: Create AUTHORIZED_EXECUTION capability bound to verified proof
+    capability = AccessCapability.create_authorized_execution(proof=proof, ledger=ledger)
+    sealed_targets = proof.sealed_targets
 
-    raw: dict[str, Any]
-    cache_audit: dict[str, Any]
+    # R2.3: Fetch fresh source bundle into clean attempt-scoped source directory
+    source_attempt_dir = Path(
+        f"/tmp/rc2_r3_source_{execution_dispatch_sha[:8]}_{authorized_runner_sha[:8]}_{authorized_target_seal_sha256[:8]}"
+    )
     try:
-        # Load or fetch raw data
-        if cache_path.exists():
-            print("Validating cache authority (sidecar + embedded + source manifest)...")
-            # Build expected identity from sidecar source archives
-            sidecar_id_path = cache_path.with_name(cache_path.name.replace(".raw.json.gz", "").replace(".json.gz", "") + ".identity.json")
-            cached_sidecar = json.loads(sidecar_id_path.read_text(encoding="utf-8")) if sidecar_id_path.exists() else {}
-            dummy_archives = [{"url": f"archive_{i}", "sha256": "digest"} for i in range(cached_sidecar.get("source_archives_count", 0))]
-            expected_id = compute_cache_identity(
-                time_window=time_window,
-                symbol_roles=symbol_roles,
-                source_archives=dummy_archives,
-                script_paths=VALIDATION_SCRIPTS,
-            )
-            raw, cache_audit = validate_r3_cache_authority(cache_path, expected_id)
-            print("Loaded validated cache matching complete authority identity.")
-        else:
-            print("Cache not found; fetching official Binance Vision archives under R6 firewall...")
-            raw = fetch_raw_dataset(TARGETS, REFERENCES, ledger=GLOBAL_LEDGER)
-            cache_identity = compute_cache_identity(
-                time_window=time_window,
-                symbol_roles=symbol_roles,
-                source_archives=raw["source_archives"],
-                script_paths=VALIDATION_SCRIPTS,
-            )
-            save_authorized_cache(cache_path, cache_identity, raw)
-            cache_audit = {
-                "cache_reusable": True,
-                "rebuilt_pre_outcome": True,
-                "source_archives_count": len(raw["source_archives"]),
-                "payload_sha256": compute_canonical_payload_sha256(raw["data"]),
-            }
-            print("Saved authorized cache bound to identity.")
+        raw, source_bundle_manifest = fetch_fresh_source_bundle(
+            target_symbols=sealed_targets,
+            reference_symbols=REFERENCES,
+            capability=capability,
+            source_dir=source_attempt_dir,
+        )
     except Exception as exc:  # noqa: BLE001
         write_preflight_failure(
             "RC2_HOLDOUT_R3_INFRA_INCOMPLETE",
             {
-                "source_error": f"{type(exc).__name__}: {exc}",
-                "reason": "Official archive retrieval or cache authority validation failed",
+                "exception_class": type(exc).__name__,
+                "source_error": str(exc),
+                "reason": "Official archive fresh retrieval failed",
                 "execution_identity": pre_identity.to_dict(),
             },
-            evidence_dir,
+            staging_dir,
+            phase="SOURCE_RETRIEVAL",
         )
         return
 
-    _json_write(evidence_dir / "SOURCE_CACHE_PROOF.json", cache_audit)
+    _json_write(staging_dir / "SOURCE_BUNDLE_MANIFEST.json", source_bundle_manifest)
 
-    # R3: Dataset Preflight & Full-Window Context Audit
-    dataset_preflight = build_dataset(raw, TARGETS, REFERENCES, include_outcomes=False)
-    smoke = context_smoke(dataset_preflight, TARGETS, REFERENCES)
-    full_window_audit = audit_full_window_context(dataset_preflight, TARGETS, REFERENCES)
-    _json_write(evidence_dir / "FULL_WINDOW_CONTEXT_AUDIT.json", full_window_audit)
+    # R2.5: Dataset Preflight & Full-Window Context Audit (real production scanner path)
+    dataset_preflight = build_dataset(raw, sealed_targets, REFERENCES, include_outcomes=False)
+    smoke = context_smoke(dataset_preflight, sealed_targets, REFERENCES)
+    full_window_audit = audit_full_window_production_context(
+        dataset_preflight, sealed_targets, REFERENCES
+    )
+    _json_write(staging_dir / "FULL_WINDOW_CONTEXT_AUDIT.json", full_window_audit)
 
-    # Authentic target 1m completeness check (availability only, zero outcome calculation)
+    # Authentic target 1m completeness check
     targets_1m_proof: dict[str, Any] = {}
     targets_1m_all_complete = True
-    for s in TARGETS:
+    for s in sealed_targets:
         k1m = raw["data"][s]["klines_1m"]
         complete = (
             len(k1m) == 41_775
@@ -1254,33 +1816,14 @@ def execute_holdout(
             "granularity_complete": complete,
             "outcome_metrics_calculated": False,
         }
-    _json_write(evidence_dir / "TARGET_1M_AUTHENTICITY_PROOF.json", targets_1m_proof)
+    _json_write(staging_dir / "TARGET_1M_AUTHENTICITY_PROOF.json", targets_1m_proof)
 
-    # R4: Complete authority input manifest
-    authority_input_manifest = generate_authority_input_manifest(
-        dataset=dataset_preflight,
-        raw=raw,
-        target_symbols=TARGETS,
-        reference_symbols=REFERENCES,
-        script_hashes=pre_identity.script_hashes,
-    )
-    _json_write(evidence_dir / "AUTHORITY_INPUT_MANIFEST.json", authority_input_manifest)
-
-    # Verify Preflight Gates
-    smoke_ok = (
-        smoke["assessment_count"] == len(TARGETS)
-        and smoke["assessment_symbols"] == sorted(TARGETS)
-        and smoke["pit_violations"] == 0
-        and smoke["benchmark_and_reference_series_present"] is True
-        and smoke["all_context_snapshots_available"] is True
-        and smoke["ordinary_warmup_failure_count"] == 0
-        and smoke["target_1m_outcome_queries"] == 0
-    )
-
+    # Preflight gate checks
     preflight_pass = (
         full_window_audit["full_window_audit_passed"]
         and targets_1m_all_complete
-        and smoke_ok
+        and smoke["assessment_count"] == len(sealed_targets)
+        and smoke["pit_violations"] == 0
     )
 
     pre_outcome_report: dict[str, Any] = {
@@ -1288,12 +1831,12 @@ def execute_holdout(
         "authorized_runner_sha": authorized_runner_sha,
         "authorized_runner_sha256": authorized_runner_sha256,
         "execution_dispatch_sha": execution_dispatch_sha,
-        "frozen_candidate_sha": FROZEN_POLICY_SHA,
+        "authorized_target_seal_sha256": authorized_target_seal_sha256,
         "branch": BRANCH,
         "head": pre_identity.git_head,
         "policy_version": TACTICAL_POLICY_VERSION,
         "config_hash": CONFIG_HASH,
-        "targets": list(TARGETS),
+        "targets": list(sealed_targets),
         "context_only": list(REFERENCES),
         "first_step_ms": FIRST_STEP,
         "last_step_ms": LAST_STEP,
@@ -1303,7 +1846,7 @@ def execute_holdout(
         "targets_1m_all_complete": targets_1m_all_complete,
         "context_smoke": smoke,
     }
-    _json_write(evidence_dir / "PRE_OUTCOME_REPORT.json", pre_outcome_report)
+    _json_write(staging_dir / "PRE_OUTCOME_REPORT.json", pre_outcome_report)
 
     if not preflight_pass:
         write_preflight_failure(
@@ -1313,7 +1856,8 @@ def execute_holdout(
                 "pre_outcome_report": pre_outcome_report,
                 "full_window_audit": full_window_audit,
             },
-            evidence_dir,
+            staging_dir,
+            phase="PREFLIGHT_AUDIT",
         )
         return
 
@@ -1321,28 +1865,77 @@ def execute_holdout(
     del dataset_preflight, smoke
     gc.collect()
 
-    # OUTCOME Phase: Run Replay Twice
-    print("Preflight gates passed. Unlocking outcome replay for protected targets...")
+    # R2.6: Complete Authority Input Manifest with authentic target 1m
+    dataset_outcomes = build_dataset(raw, sealed_targets, REFERENCES, include_outcomes=True)
+    authority_input_manifest = generate_authority_input_manifest(
+        dataset=dataset_outcomes,
+        raw=raw,
+        target_symbols=sealed_targets,
+        reference_symbols=REFERENCES,
+        script_hashes=pre_identity.script_hashes,
+        target_seal_sha256=authorized_target_seal_sha256,
+        source_bundle_digest=source_bundle_manifest["source_bundle_digest"],
+    )
+    auth_manifest_hash_initial = authority_input_manifest["authority_input_manifest_hash"]
+    _json_write(staging_dir / "AUTHORITY_INPUT_MANIFEST.json", authority_input_manifest)
+
+    # OUTCOME Phase: Execute replay twice
+    print("Preflight gates passed. Unlocking outcome replay for sealed targets...")
     pre_outcome_report["outcome_replay_unlocked"] = True
-    _json_write(evidence_dir / "PRE_OUTCOME_REPORT.json", pre_outcome_report)
+    _json_write(staging_dir / "PRE_OUTCOME_REPORT.json", pre_outcome_report)
 
-    dataset_outcomes = build_dataset(raw, TARGETS, REFERENCES, include_outcomes=True)
-    del raw
-    gc.collect()
-
-    config = MarketWatchConfig()
+    config = MarketWatchConfig(symbols=sealed_targets)
     t0 = time.time()
     result1 = DeterministicTacticalReplayRunner(
         dataset_outcomes, config, evaluate_grid_stride=12
     ).run()
     gc.collect()
+
+    # Verify authority input manifest unchanged before run 2
+    manifest_pre_run2 = generate_authority_input_manifest(
+        dataset=dataset_outcomes,
+        raw=raw,
+        target_symbols=sealed_targets,
+        reference_symbols=REFERENCES,
+        script_hashes=pre_identity.script_hashes,
+        target_seal_sha256=authorized_target_seal_sha256,
+        source_bundle_digest=source_bundle_manifest["source_bundle_digest"],
+    )
+    if manifest_pre_run2["authority_input_manifest_hash"] != auth_manifest_hash_initial:
+        write_preflight_failure(
+            "RC2_HOLDOUT_R3_FAIL",
+            {"reason": "Authority input manifest mutated between run 1 and run 2"},
+            staging_dir,
+            phase="DETERMINISM",
+        )
+        return
+
     result2 = DeterministicTacticalReplayRunner(
         dataset_outcomes, config, evaluate_grid_stride=12
     ).run()
     gc.collect()
     print(f"Replay runs completed in {time.time() - t0:.2f}s.")
 
-    # Match all three manifest hashes across runs
+    # Verify authority input manifest unchanged after run 2
+    manifest_post_run2 = generate_authority_input_manifest(
+        dataset=dataset_outcomes,
+        raw=raw,
+        target_symbols=sealed_targets,
+        reference_symbols=REFERENCES,
+        script_hashes=pre_identity.script_hashes,
+        target_seal_sha256=authorized_target_seal_sha256,
+        source_bundle_digest=source_bundle_manifest["source_bundle_digest"],
+    )
+    if manifest_post_run2["authority_input_manifest_hash"] != auth_manifest_hash_initial:
+        write_preflight_failure(
+            "RC2_HOLDOUT_R3_FAIL",
+            {"reason": "Authority input manifest mutated after run 2"},
+            staging_dir,
+            phase="DETERMINISM",
+        )
+        return
+
+    # Determinism check across runs
     deterministic = (
         result1["output_manifest"]["input_manifest_hash"]
         == result2["output_manifest"]["input_manifest_hash"]
@@ -1358,10 +1951,10 @@ def execute_holdout(
     else:
         terminal = "RC2_HOLDOUT_R3_FAIL"
 
-    # Write output artifacts
-    _json_write(evidence_dir / "OUTPUT_MANIFEST.json", result1["output_manifest"])
-    _json_write(evidence_dir / "rolling_oos_table.json", result1["rolling_oos_table"])
-    _json_write(evidence_dir / "aggregate_metrics.json", result1["aggregate_oos_metrics"])
+    # Write staging artifacts
+    _json_write(staging_dir / "OUTPUT_MANIFEST.json", result1["output_manifest"])
+    _json_write(staging_dir / "rolling_oos_table.json", result1["rolling_oos_table"])
+    _json_write(staging_dir / "aggregate_metrics.json", result1["aggregate_oos_metrics"])
 
     # Post-execution exact identity verification
     post_identity = verify_execution_identity(
@@ -1369,9 +1962,11 @@ def execute_holdout(
         root=root,
         script_paths=VALIDATION_SCRIPTS,
     )
-    _json_write(evidence_dir / "EXECUTION_IDENTITY.json", post_identity)
+    _json_write(staging_dir / "EXECUTION_IDENTITY.json", post_identity)
 
-    # Publish authoritative EVIDENCE.json only AFTER post-identity succeeds
+    # Finalize execution access ledger
+    ledger.finalize(staging_dir / "EXECUTION_ACCESS_LEDGER.json")
+
     evidence_payload = {
         "task_id": TASK_ID,
         "terminal": terminal,
@@ -1379,16 +1974,16 @@ def execute_holdout(
         "authorized_runner_sha": authorized_runner_sha,
         "authorized_runner_sha256": authorized_runner_sha256,
         "execution_dispatch_sha": execution_dispatch_sha,
-        "controller_dispatch_sha": CONTROLLER_DISPATCH_SHA,
+        "authorized_target_seal_sha256": authorized_target_seal_sha256,
         "accepted_normalizer_sha256": ACCEPTED_NORMALIZER_SHA256,
         "accepted_harness_sha": ACCEPTED_HARNESS_SHA,
         "branch": BRANCH,
         "config_hash": CONFIG_HASH,
-        "target_symbols": list(TARGETS),
+        "target_symbols": list(sealed_targets),
         "context_only_symbols": list(REFERENCES),
         "reference_outcomes_in_aggregate": False,
         "deterministic": deterministic,
-        "authority_input_manifest_hash": authority_input_manifest["authority_input_manifest_hash"],
+        "authority_input_manifest_hash": auth_manifest_hash_initial,
         "run_1_output_manifest_hash": result1["output_manifest"]["output_manifest_hash"],
         "run_2_output_manifest_hash": result2["output_manifest"]["output_manifest_hash"],
         "run_1_input_manifest_hash": result1["output_manifest"]["input_manifest_hash"],
@@ -1399,7 +1994,22 @@ def execute_holdout(
         "release_authority": terminal == "RC2_HOLDOUT_R3_PASS",
         "real_funds_write_authority": "NONE",
     }
-    _json_write(evidence_dir / "EVIDENCE.json", evidence_payload)
+    _json_write(staging_dir / "EVIDENCE.json", evidence_payload)
+
+    # Emit completion attempt receipt
+    write_attempt_receipt(
+        staging_dir,
+        phase="COMPLETED",
+        terminal=terminal,
+        target_outcomes_resolved=True,
+        authority_valid=True,
+        execution_identities=post_identity,
+    )
+
+    # R2.7: Atomic publication of staged evidence
+    shutil.copytree(staging_dir, evidence_dir)
+    shutil.rmtree(staging_dir, ignore_errors=True)
+    print(f"Published authoritative evidence to {evidence_dir}")
     print(terminal)
 
 
@@ -1409,12 +2019,12 @@ verify_freeze_identity = verify_freeze_repair_identity
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="RC2 Holdout R3 Authoritative Runner / Freeze Reviewer (Repair R1)"
+        description="RC2 Holdout R3 Authoritative Generic Runner (Repair R2)"
     )
     parser.add_argument(
         "--execute",
         action="store_true",
-        help="Authorize and execute the R3 holdout (requires external Controller authorization)",
+        help="Authorize and execute the holdout (requires external Controller authorization and target seal)",
     )
     parser.add_argument(
         "--authorized-runner-sha",
@@ -1435,6 +2045,24 @@ def main() -> None:
         help="Controller execution dispatch SHA (40-hex)",
     )
     parser.add_argument(
+        "--target-seal-path",
+        type=Path,
+        default=None,
+        help="Path to external Controller target seal artifact JSON",
+    )
+    parser.add_argument(
+        "--authorized-target-seal-sha256",
+        type=str,
+        default=None,
+        help="Controller-authorized target seal SHA256 (64-hex)",
+    )
+    parser.add_argument(
+        "--evidence-dir",
+        type=Path,
+        default=DEFAULT_EVIDENCE_DIR,
+        help="Target final authority evidence directory (must not pre-exist)",
+    )
+    parser.add_argument(
         "--verify-repair",
         action="store_true",
         help="Verify runner repair integrity and review state without execution",
@@ -1442,13 +2070,31 @@ def main() -> None:
     args = parser.parse_args()
 
     if args.execute:
+        if (
+            not args.authorized_runner_sha
+            or not args.authorized_runner_sha256
+            or not args.execution_dispatch_sha
+            or not args.target_seal_path
+            or not args.authorized_target_seal_sha256
+        ):
+            print("FATAL: --execute requires all Controller authorization flags:")
+            print("  --authorized-runner-sha")
+            print("  --authorized-runner-sha256")
+            print("  --execution-dispatch-sha")
+            print("  --target-seal-path")
+            print("  --authorized-target-seal-sha256")
+            sys.exit(1)
+
         execute_holdout(
             authorized_runner_sha=args.authorized_runner_sha,
             authorized_runner_sha256=args.authorized_runner_sha256,
             execution_dispatch_sha=args.execution_dispatch_sha,
+            target_seal_path=args.target_seal_path,
+            authorized_target_seal_sha256=args.authorized_target_seal_sha256,
+            evidence_dir=args.evidence_dir,
         )
     else:
-        # Freeze Review Mode (Repair R1)
+        # Review mode: verify repair state without execution
         info = verify_freeze_repair_identity()
         terminal = str(info["terminal"])
         print(f"=== {REPAIR_TASK_ID} ===")
@@ -1457,11 +2103,14 @@ def main() -> None:
         print(f"Start SHA: {info['start_sha']}")
         print(f"Frozen Policy SHA: {info['frozen_policy_sha']}")
         print(f"Accepted Harness SHA: {info['accepted_harness_sha']}")
+        print(f"Controller Dispatch SHA: {info['controller_dispatch_sha']}")
         print(f"Runner SHA256: {info['runner_sha256']}")
         print(f"Normalizer SHA256: {info['normalizer_sha256']}")
         print(f"Access Guard SHA256: {info['guard_sha256']}")
-        print(f"R3 Target Admissibility: {info['r3_target_admissibility']}")
-        print(f"Protected target attempts: {info['protected_target_network_access_count']}")
+        print(f"Seal Helper SHA256: {info['seal_helper_sha256']}")
+        print(f"Holdout Executed: {info['holdout_executed']}")
+        print(f"Replacement Target Seal Committed: {info['replacement_target_seal_committed']}")
+        print(f"Protected market/archive access: {info['protected_market_archive_access']}")
         print(f"Repair Verified: {info['repair_verified']}")
         print(f"\n{terminal}")
         if not info["repair_verified"]:

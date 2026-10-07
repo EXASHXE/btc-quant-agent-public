@@ -1,0 +1,49 @@
+{
+  "task_id": "RC2_R3_HOLDOUT_RUNNER_REPAIR_R2",
+  "changed_files": [
+    {
+      "path": "scripts/rc2/validation/r3_access_guard.py",
+      "sha256": "db7540b1c385bf7887679c09a57a7d85b6a731144a17e8fd865727aebb78cf52"
+    },
+    {
+      "path": "scripts/rc2/validation/run_holdout_r3.py",
+      "sha256": "4ee95ea687b37eabfe357108e0e03d3c55f5170bd6fd0817c0fd13c404961c4a"
+    },
+    {
+      "path": "scripts/rc2/validation/target_seal.py",
+      "sha256": "c77d3a28966025b05a28b2c2bf80a20bb95a0ad1f3e933def595609e577b604d"
+    },
+    {
+      "path": "tests/test_rc2_holdout_r3_runner_freeze.py",
+      "sha256": "e40f15f02672db0db630e88fe65ef07842a39a1d5b1f3b6a8641652b23849939"
+    },
+    {
+      "path": "tests/test_rc2_holdout_r3_runner_repair_r1.py",
+      "sha256": "f6d73ca8e9b9fe943715418345a6f0e9372c9b7f4627c07474140334d22681b8"
+    },
+    {
+      "path": "tests/test_rc2_holdout_r3_runner_repair_r2.py",
+      "sha256": "f249007dfa9b378ca05967bb6f0c6ddab98751840998601e87a01dbe0fa47653"
+    },
+    {
+      "path": "evidence/v0.5.5/tactical-policy/RC2/HOLDOUT_R3_RUNNER_REPAIR_R2/EVIDENCE.json",
+      "sha256": "d4a685d1723fe31f7a98530b1c3d74599f9058d70191f291e3ba1efecd454615"
+    },
+    {
+      "path": "evidence/v0.5.5/tactical-policy/RC2/HOLDOUT_R3_RUNNER_REPAIR_R2/FIREWALL_PROOF.json",
+      "sha256": "6a3d2c957489ca731c3a29a24b86ba61050c2814352a8fca9f825560cc053737"
+    },
+    {
+      "path": "evidence/v0.5.5/tactical-policy/RC2/HOLDOUT_R3_RUNNER_REPAIR_R2/REPAIR_MANIFEST.json",
+      "sha256": "dc40162a970d31ea32d9f5915f390d55f221b5545b6870fb6548f16957f8afbd"
+    },
+    {
+      "path": "evidence/v0.5.5/tactical-policy/RC2/HOLDOUT_R3_RUNNER_REPAIR_R2/RUNNER_IDENTITY.json",
+      "sha256": "e438d615adc65d74bae166b82e1cdedce51c2d75036005eb484b0fa3e015789a"
+    },
+    {
+      "path": "evidence/v0.5.5/tactical-policy/RC2/HOLDOUT_R3_RUNNER_REPAIR_R2/TEST_STATIC_REPORT.json",
+      "sha256": "770b8ca5a960c8ab78b05d00506b7e1e9a66af0297d735d368138ec5806bfcba"
+    }
+  ]
+}

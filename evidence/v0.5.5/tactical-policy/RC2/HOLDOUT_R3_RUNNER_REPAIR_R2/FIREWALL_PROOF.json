@@ -1,0 +1,30 @@
+{
+  "task_id": "RC2_R3_HOLDOUT_RUNNER_REPAIR_R2",
+  "firewall_status": "ENFORCED_ZERO_PROTECTED_ACCESS",
+  "protected_market_archive_access": 0,
+  "protected_target_network_access_count": 0,
+  "holdout_executed": false,
+  "outcome_metrics_generated": false,
+  "replacement_target_seal_committed": false,
+  "committed_generic_runner_targets": [],
+  "retired_r3_targets_status": "STATIC_RETIRED_NOT_FETCHED",
+  "burned_fixtures_used": [
+    "FILUSDT",
+    "ETCUSDT",
+    "BTCUSDT",
+    "ETHUSDT",
+    "SOLUSDT",
+    "LINKUSDT",
+    "SUIUSDT",
+    "XRPUSDT",
+    "DOGEUSDT",
+    "BNBUSDT"
+  ],
+  "access_capability_modes": [
+    "CONSTRUCTION_REVIEW",
+    "AUTHORIZED_EXECUTION"
+  ],
+  "persistent_ledger_verified": true,
+  "cache_reuse_in_authority_mode": "ELIMINATED",
+  "cross_run_cache_reuse": "FORBIDDEN"
+}
