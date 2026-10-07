@@ -1,0 +1,25 @@
+{
+  "schema_version": "RC2_TARGET_SEAL_V1",
+  "task_id": "RC2_FINAL_FRESH_HOLDOUT_TARGET_SEAL",
+  "created_at_utc": "2026-10-07T08:43:11.479Z",
+  "target_symbols": [
+    "ZECUSDT",
+    "HYPEUSDT",
+    "ORCAUSDT",
+    "PUMPUSDT",
+    "NMRUSDT",
+    "BRUSDT",
+    "RLCUSDT",
+    "QNTUSDT"
+  ],
+  "context_only_references": [
+    "BTCUSDT",
+    "ETHUSDT",
+    "SOLUSDT",
+    "LINKUSDT",
+    "SUIUSDT",
+    "XRPUSDT",
+    "DOGEUSDT",
+    "BNBUSDT"
+  ]
+}
