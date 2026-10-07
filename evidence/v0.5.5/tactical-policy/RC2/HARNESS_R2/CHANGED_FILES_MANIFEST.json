@@ -1,0 +1,16 @@
+{
+  "changed_files": [
+    {
+      "path": "scripts/rc2/validation/source_normalizer.py",
+      "sha256": "4191922d1e85ad30b079633323836a817bf0506d223eb2365b2a4d3d25f52a16"
+    },
+    {
+      "path": "scripts/rc2/validation/run_harness_qualification_r2.py",
+      "sha256": "25175297303da53a6e3f67ace4ec32707e479483da575c25d8cd0e5eac4f5c55"
+    },
+    {
+      "path": "tests/test_rc2_holdout_harness_r2.py",
+      "sha256": "dc9610722dd623970340e0d1d18ecaab63e935e1fab16c78b5d2352411fbf5ef"
+    }
+  ]
+}

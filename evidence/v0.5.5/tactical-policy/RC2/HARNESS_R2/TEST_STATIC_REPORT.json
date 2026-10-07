@@ -1,0 +1,26 @@
+{
+  "compileall": {
+    "returncode": 0,
+    "status": "PASS"
+  },
+  "git_diff_check": {
+    "returncode": 0,
+    "status": "PASS"
+  },
+  "mypy": {
+    "output": "Success: no issues found in 154 source files",
+    "returncode": 0,
+    "status": "PASS"
+  },
+  "pytest_validation_suite": {
+    "elapsed_seconds": 1.97,
+    "returncode": 0,
+    "status": "PASS",
+    "stdout": "============================= test session starts ==============================\nplatform linux -- Python 3.13.13, pytest-8.4.2, pluggy-1.6.0\nrootdir: /root/workspace/project/rc2-tactical-successor\nconfigfile: pyproject.toml\nplugins: anyio-4.12.1, langsmith-0.8.5, cov-7.1.0\ncollected 8 items\n\ntests/test_rc2_holdout_harness_r2.py ........                            [100%]\n\n============================== 8 passed in 0.26s ==============================="
+  },
+  "ruff": {
+    "output": "All checks passed!",
+    "returncode": 0,
+    "status": "PASS"
+  }
+}

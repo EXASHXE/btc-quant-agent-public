@@ -1,0 +1,12 @@
+{
+  "branch": "validation/b-line-rc2-holdout-harness-r2",
+  "exact_runner_identity_verified": true,
+  "git_head": "c166899d714e6a03eb43ab53c65eea9a0e2bc966",
+  "post_timestamp_utc": "2026-10-07T10:00:30.859041+00:00",
+  "pre_timestamp_utc": "2026-10-07T09:54:30.067838+00:00",
+  "script_hashes": {
+    "scripts/rc2/validation/run_harness_qualification_r2.py": "25175297303da53a6e3f67ace4ec32707e479483da575c25d8cd0e5eac4f5c55",
+    "scripts/rc2/validation/source_normalizer.py": "4191922d1e85ad30b079633323836a817bf0506d223eb2365b2a4d3d25f52a16"
+  },
+  "src_clean": true
+}

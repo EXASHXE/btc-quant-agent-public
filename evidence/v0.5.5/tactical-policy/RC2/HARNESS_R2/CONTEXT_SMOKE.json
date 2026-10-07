@@ -1,0 +1,187 @@
+{
+  "context_smoke": {
+    "all_context_snapshots_available": true,
+    "assessment_count": 8,
+    "assessment_symbols": [
+      "AAVEUSDT",
+      "ARBUSDT",
+      "ETCUSDT",
+      "FILUSDT",
+      "ICPUSDT",
+      "OPUSDT",
+      "UNIUSDT",
+      "XLMUSDT"
+    ],
+    "benchmark_and_reference_series_present": true,
+    "collected_symbol_snapshots": {
+      "AAVEUSDT": {
+        "errors": {},
+        "health": "OK",
+        "snapshot_available": true
+      },
+      "ARBUSDT": {
+        "errors": {},
+        "health": "OK",
+        "snapshot_available": true
+      },
+      "BNBUSDT": {
+        "errors": {},
+        "health": "OK",
+        "snapshot_available": true
+      },
+      "BTCUSDT": {
+        "errors": {},
+        "health": "OK",
+        "snapshot_available": true
+      },
+      "DOGEUSDT": {
+        "errors": {},
+        "health": "OK",
+        "snapshot_available": true
+      },
+      "ETCUSDT": {
+        "errors": {},
+        "health": "OK",
+        "snapshot_available": true
+      },
+      "ETHUSDT": {
+        "errors": {},
+        "health": "OK",
+        "snapshot_available": true
+      },
+      "FILUSDT": {
+        "errors": {},
+        "health": "OK",
+        "snapshot_available": true
+      },
+      "ICPUSDT": {
+        "errors": {},
+        "health": "OK",
+        "snapshot_available": true
+      },
+      "LINKUSDT": {
+        "errors": {},
+        "health": "OK",
+        "snapshot_available": true
+      },
+      "OPUSDT": {
+        "errors": {},
+        "health": "OK",
+        "snapshot_available": true
+      },
+      "SOLUSDT": {
+        "errors": {},
+        "health": "OK",
+        "snapshot_available": true
+      },
+      "SUIUSDT": {
+        "errors": {},
+        "health": "OK",
+        "snapshot_available": true
+      },
+      "UNIUSDT": {
+        "errors": {},
+        "health": "OK",
+        "snapshot_available": true
+      },
+      "XLMUSDT": {
+        "errors": {},
+        "health": "OK",
+        "snapshot_available": true
+      },
+      "XRPUSDT": {
+        "errors": {},
+        "health": "OK",
+        "snapshot_available": true
+      }
+    },
+    "max_candle_close_ms": 1788717599999,
+    "ordinary_warmup_failure_count": 0,
+    "pit_violations": 0,
+    "target_1m_outcome_queries": 0
+  },
+  "coverage_summary": {
+    "AAVEUSDT": {
+      "closed_15m_before_first_step": 5120,
+      "closed_1h_before_first_step": 1280,
+      "closed_4h_before_first_step": 320
+    },
+    "ARBUSDT": {
+      "closed_15m_before_first_step": 5120,
+      "closed_1h_before_first_step": 1280,
+      "closed_4h_before_first_step": 320
+    },
+    "BNBUSDT": {
+      "closed_15m_before_first_step": 5120,
+      "closed_1h_before_first_step": 1280,
+      "closed_4h_before_first_step": 320
+    },
+    "BTCUSDT": {
+      "closed_15m_before_first_step": 5120,
+      "closed_1h_before_first_step": 1280,
+      "closed_4h_before_first_step": 320
+    },
+    "DOGEUSDT": {
+      "closed_15m_before_first_step": 5120,
+      "closed_1h_before_first_step": 1280,
+      "closed_4h_before_first_step": 320
+    },
+    "ETCUSDT": {
+      "closed_15m_before_first_step": 5120,
+      "closed_1h_before_first_step": 1280,
+      "closed_4h_before_first_step": 320
+    },
+    "ETHUSDT": {
+      "closed_15m_before_first_step": 5120,
+      "closed_1h_before_first_step": 1280,
+      "closed_4h_before_first_step": 320
+    },
+    "FILUSDT": {
+      "closed_15m_before_first_step": 5120,
+      "closed_1h_before_first_step": 1280,
+      "closed_4h_before_first_step": 320
+    },
+    "ICPUSDT": {
+      "closed_15m_before_first_step": 5120,
+      "closed_1h_before_first_step": 1280,
+      "closed_4h_before_first_step": 320
+    },
+    "LINKUSDT": {
+      "closed_15m_before_first_step": 5120,
+      "closed_1h_before_first_step": 1280,
+      "closed_4h_before_first_step": 320
+    },
+    "OPUSDT": {
+      "closed_15m_before_first_step": 5120,
+      "closed_1h_before_first_step": 1280,
+      "closed_4h_before_first_step": 320
+    },
+    "SOLUSDT": {
+      "closed_15m_before_first_step": 5120,
+      "closed_1h_before_first_step": 1280,
+      "closed_4h_before_first_step": 320
+    },
+    "SUIUSDT": {
+      "closed_15m_before_first_step": 5120,
+      "closed_1h_before_first_step": 1280,
+      "closed_4h_before_first_step": 320
+    },
+    "UNIUSDT": {
+      "closed_15m_before_first_step": 5120,
+      "closed_1h_before_first_step": 1280,
+      "closed_4h_before_first_step": 320
+    },
+    "XLMUSDT": {
+      "closed_15m_before_first_step": 5120,
+      "closed_1h_before_first_step": 1280,
+      "closed_4h_before_first_step": 320
+    },
+    "XRPUSDT": {
+      "closed_15m_before_first_step": 5120,
+      "closed_1h_before_first_step": 1280,
+      "closed_4h_before_first_step": 320
+    }
+  },
+  "status": "PASS",
+  "task_id": "B_LINE_RC2_HOLDOUT_HARNESS_QUALIFICATION_R2"
+}

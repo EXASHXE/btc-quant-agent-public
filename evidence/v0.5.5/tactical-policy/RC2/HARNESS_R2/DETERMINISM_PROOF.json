@@ -1,0 +1,17 @@
+{
+  "diagnostic_targets": [
+    "FILUSDT",
+    "ETCUSDT"
+  ],
+  "manifests_identical": true,
+  "permutation_identical": true,
+  "profitability_label": "DIAGNOSTIC_ONLY_NON_AUTHORITY",
+  "release_authority": false,
+  "run_1_input_manifest_hash": "717f6cf083ed3d893b03fbf5ff8d7322ce1330b467058001de295dfcfac365cd",
+  "run_1_output_manifest_hash": "e62422f06089f948db8e79b105a4e1551fa76f1c6388ba6e99413e2aaa475da6",
+  "run_2_input_manifest_hash": "717f6cf083ed3d893b03fbf5ff8d7322ce1330b467058001de295dfcfac365cd",
+  "run_2_output_manifest_hash": "e62422f06089f948db8e79b105a4e1551fa76f1c6388ba6e99413e2aaa475da6",
+  "run_3_permuted_input_manifest_hash": "717f6cf083ed3d893b03fbf5ff8d7322ce1330b467058001de295dfcfac365cd",
+  "run_3_permuted_output_manifest_hash": "e62422f06089f948db8e79b105a4e1551fa76f1c6388ba6e99413e2aaa475da6",
+  "task_id": "B_LINE_RC2_HOLDOUT_HARNESS_QUALIFICATION_R2"
+}

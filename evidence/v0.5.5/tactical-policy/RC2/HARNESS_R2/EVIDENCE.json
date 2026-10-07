@@ -1,0 +1,34 @@
+{
+  "allowed_symbols_whitelist_count": 48,
+  "cache_authority_proven": true,
+  "cache_schema_version": "RC2_CACHE_AUTHORITY_V2",
+  "context_smoke_proven": true,
+  "controller_dispatch_sha": "06d2d82f51560552196f20f5b51d508d2dc40b1d",
+  "determinism_proven": true,
+  "direct_parent": "c166899d714e6a03eb43ab53c65eea9a0e2bc966",
+  "execution_identity": {
+    "branch": "validation/b-line-rc2-holdout-harness-r2",
+    "exact_runner_identity_verified": true,
+    "git_head": "c166899d714e6a03eb43ab53c65eea9a0e2bc966",
+    "post_timestamp_utc": "2026-10-07T10:00:30.859041+00:00",
+    "pre_timestamp_utc": "2026-10-07T09:54:30.067838+00:00",
+    "script_hashes": {
+      "scripts/rc2/validation/run_harness_qualification_r2.py": "25175297303da53a6e3f67ace4ec32707e479483da575c25d8cd0e5eac4f5c55",
+      "scripts/rc2/validation/source_normalizer.py": "4191922d1e85ad30b079633323836a817bf0506d223eb2365b2a4d3d25f52a16"
+    },
+    "src_clean": true
+  },
+  "frozen_candidate_sha": "10be512f2cf4d7eccdc8a9849c925b5f73c568fd",
+  "new_protected_symbols_accessed": 0,
+  "parser_schema_version": "RC2_METRICS_EVENT_TIME_NORMALIZER_V2",
+  "permutation_invariance_proven": true,
+  "profitability_authority": "DIAGNOSTIC_ONLY_NON_AUTHORITY",
+  "real_funds_write_authority": "NONE",
+  "release_authority": false,
+  "source_normalization_proven": true,
+  "start_sha": "c166899d714e6a03eb43ab53c65eea9a0e2bc966",
+  "static_and_unit_checks": "ALL_PASS",
+  "task_id": "B_LINE_RC2_HOLDOUT_HARNESS_QUALIFICATION_R2",
+  "terminal": "RC2_HOLDOUT_HARNESS_R2_PASS",
+  "validation_branch": "validation/b-line-rc2-holdout-harness-r2"
+}

@@ -1,0 +1,125 @@
+{
+  "bound_identity": {
+    "harness_code_hashes": {
+      "run_harness_qualification_r2.py": "25175297303da53a6e3f67ace4ec32707e479483da575c25d8cd0e5eac4f5c55",
+      "source_normalizer.py": "4191922d1e85ad30b079633323836a817bf0506d223eb2365b2a4d3d25f52a16"
+    },
+    "parser_schema_version": "RC2_METRICS_EVENT_TIME_NORMALIZER_V2",
+    "schema_version": "RC2_CACHE_AUTHORITY_V2",
+    "source_archives_count": 1328,
+    "source_archives_digest": "3bd7c9d0f1bd51130c253dd12acf08e40c50ef2648f8aac3f45daf6ad172624f",
+    "symbol_roles": {
+      "burned_targets": [
+        "AAVEUSDT",
+        "ARBUSDT",
+        "ETCUSDT",
+        "FILUSDT",
+        "ICPUSDT",
+        "OPUSDT",
+        "UNIUSDT",
+        "XLMUSDT"
+      ],
+      "diagnostic_targets": [
+        "ETCUSDT",
+        "FILUSDT"
+      ],
+      "references": [
+        "BNBUSDT",
+        "BTCUSDT",
+        "DOGEUSDT",
+        "ETHUSDT",
+        "LINKUSDT",
+        "SOLUSDT",
+        "SUIUSDT",
+        "XRPUSDT"
+      ]
+    },
+    "time_window": {
+      "data_end_ms": 1791223199999,
+      "first_step_ms": 1788717599999,
+      "last_step_ms": 1791136799999,
+      "one_min_start_ms": 1788716700000,
+      "tf_start_ms": 1784109599999
+    }
+  },
+  "cache_path": "/tmp/rc2_harness_r2_raw.json.gz",
+  "cache_schema_version": "RC2_CACHE_AUTHORITY_V2",
+  "parser_schema_version": "RC2_METRICS_EVENT_TIME_NORMALIZER_V2",
+  "reusable_audit": {
+    "cache_exists": true,
+    "cache_path": "/tmp/rc2_harness_r2_raw.json.gz",
+    "identity_file_exists": true,
+    "matched_identity": {
+      "harness_code_hashes": {
+        "run_harness_qualification_r2.py": "25175297303da53a6e3f67ace4ec32707e479483da575c25d8cd0e5eac4f5c55",
+        "source_normalizer.py": "4191922d1e85ad30b079633323836a817bf0506d223eb2365b2a4d3d25f52a16"
+      },
+      "parser_schema_version": "RC2_METRICS_EVENT_TIME_NORMALIZER_V2",
+      "schema_version": "RC2_CACHE_AUTHORITY_V2",
+      "source_archives_count": 1328,
+      "source_archives_digest": "3bd7c9d0f1bd51130c253dd12acf08e40c50ef2648f8aac3f45daf6ad172624f",
+      "symbol_roles": {
+        "burned_targets": [
+          "AAVEUSDT",
+          "ARBUSDT",
+          "ETCUSDT",
+          "FILUSDT",
+          "ICPUSDT",
+          "OPUSDT",
+          "UNIUSDT",
+          "XLMUSDT"
+        ],
+        "diagnostic_targets": [
+          "ETCUSDT",
+          "FILUSDT"
+        ],
+        "references": [
+          "BNBUSDT",
+          "BTCUSDT",
+          "DOGEUSDT",
+          "ETHUSDT",
+          "LINKUSDT",
+          "SOLUSDT",
+          "SUIUSDT",
+          "XRPUSDT"
+        ]
+      },
+      "time_window": {
+        "data_end_ms": 1791223199999,
+        "first_step_ms": 1788717599999,
+        "last_step_ms": 1791136799999,
+        "one_min_start_ms": 1788716700000,
+        "tf_start_ms": 1784109599999
+      }
+    },
+    "mismatch_reasons": [],
+    "reusable": true
+  },
+  "stale_parser_rejection_audit": {
+    "cache_exists": true,
+    "cache_path": "/tmp/rc2_harness_r2_raw.json.gz",
+    "identity_file_exists": true,
+    "mismatch_reasons": [
+      "PARSER_SCHEMA_VERSION: cached=RC2_METRICS_EVENT_TIME_NORMALIZER_V2 expected=STALE_PARSER_V1"
+    ],
+    "reusable": false
+  },
+  "stale_script_rejection_audit": {
+    "cache_exists": true,
+    "cache_path": "/tmp/rc2_harness_r2_raw.json.gz",
+    "identity_file_exists": true,
+    "mismatch_reasons": [
+      "HARNESS_CODE_HASHES: cached={'run_harness_qualification_r2.py': '25175297303da53a6e3f67ace4ec32707e479483da575c25d8cd0e5eac4f5c55', 'source_normalizer.py': '4191922d1e85ad30b079633323836a817bf0506d223eb2365b2a4d3d25f52a16'} expected={'scripts/rc2/validation/source_normalizer.py': '0000000000000000000000000000000000000000000000000000000000000000'}"
+    ],
+    "reusable": false
+  },
+  "stale_source_rejection_audit": {
+    "cache_exists": true,
+    "cache_path": "/tmp/rc2_harness_r2_raw.json.gz",
+    "identity_file_exists": true,
+    "mismatch_reasons": [
+      "SOURCE_ARCHIVES_DIGEST: cached=3bd7c9d0f1bd51130c253dd12acf08e40c50ef2648f8aac3f45daf6ad172624f expected=altered_source_archives_digest"
+    ],
+    "reusable": false
+  }
+}
