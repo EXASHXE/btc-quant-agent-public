@@ -1,0 +1,22 @@
+{
+  "schema_version": "B_LINE_RC2_R3_RUNNER_REPAIR_R2_DISPATCH_V1",
+  "task_id": "RC2_R3_HOLDOUT_RUNNER_REPAIR_R2",
+  "branch": "validation/b-line-rc2-holdout-r3-runner-repair-r2",
+  "start_sha": "0d61b564fa178af0f0a8e7df1c0a6b13586711e3",
+  "frozen_policy_sha": "10be512f2cf4d7eccdc8a9849c925b5f73c568fd",
+  "accepted_harness_sha": "cbc903d9ba448059121db96c3572a2677d5b53f8",
+  "controller_dispatch_sha": "405e0042687bfae5aa986e0f2982e26cba3827cd",
+  "prior_review_result": "RC2_PRE_HOLDOUT_EXACT_SHA_REPAIR_REQUIRED",
+  "prior_target_admissibility": "R3_TARGET_ADMISSIBILITY_BLOCKED",
+  "current_target_set_state": "RETIRED_UNVERIFIABLE_PROVENANCE_NOT_KNOWN_EXPOSED",
+  "replacement_target_set_state": "NOT_YET_FROZEN",
+  "target_seal_required": true,
+  "final_target_seal_allowed_during_task": false,
+  "protected_market_access_allowed": false,
+  "holdout_execution_allowed": false,
+  "src_changes_allowed": false,
+  "accepted_normalizer_changes_allowed": false,
+  "recommended_executor": "Gemini 3.8 Flash",
+  "next_gate": "FRESH_SOL_EXACT_SHA_REVIEW_GENERIC_RUNNER_BEFORE_TARGET_SEAL",
+  "real_funds_write_authority": "NONE"
+}
