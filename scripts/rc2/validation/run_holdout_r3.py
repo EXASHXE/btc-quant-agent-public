@@ -1408,6 +1408,56 @@ def generate_authority_input_manifest(
     return manifest_payload
 
 
+VALID_GATE_TO_TERMINAL: dict[str, str] = {
+    "TACTICAL_DECISION_QUALITY_PASS": "RC2_HOLDOUT_R3_PASS",
+    "TACTICAL_DECISION_QUALITY_FAIL": "RC2_HOLDOUT_R3_FAIL",
+    "TACTICAL_DECISION_QUALITY_DIAGNOSTIC_ONLY": "RC2_HOLDOUT_R3_DIAGNOSTIC_ONLY",
+    "TACTICAL_DECISION_QUALITY_DIAGNOSTIC_ONLY_DATA_GRANULARITY_INSUFFICIENT": (
+        "RC2_HOLDOUT_R3_DIAGNOSTIC_ONLY"
+    ),
+}
+
+
+def classify_holdout_terminal(
+    gate_decision: str,
+    *,
+    deterministic: bool,
+) -> str:
+    """Classify final holdout terminal state according to exact frozen semantics.
+
+    Case A — Nondeterministic replay:
+        deterministic == False -> RC2_HOLDOUT_R3_INFRA_INCOMPLETE
+    Case B — Tactical PASS:
+        deterministic == True and gate == TACTICAL_DECISION_QUALITY_PASS -> RC2_HOLDOUT_R3_PASS
+    Case C — Tactical FAIL:
+        deterministic == True and gate == TACTICAL_DECISION_QUALITY_FAIL -> RC2_HOLDOUT_R3_FAIL
+    Case D — Tactical DIAGNOSTIC_ONLY:
+        deterministic == True and gate == TACTICAL_DECISION_QUALITY_DIAGNOSTIC_ONLY* -> RC2_HOLDOUT_R3_DIAGNOSTIC_ONLY
+    Case E — Unexpected / unknown gate decision:
+        deterministic == True and unrecognized gate -> RC2_HOLDOUT_R3_INFRA_INCOMPLETE
+    """
+    if not deterministic:
+        return "RC2_HOLDOUT_R3_INFRA_INCOMPLETE"
+    return VALID_GATE_TO_TERMINAL.get(gate_decision, "RC2_HOLDOUT_R3_INFRA_INCOMPLETE")
+
+
+def classify_policy_quality_authority(terminal: str) -> str:
+    """Map holdout terminal to explicit policy quality authority status.
+
+    RC2_HOLDOUT_R3_PASS -> PASS
+    RC2_HOLDOUT_R3_FAIL -> FAIL
+    RC2_HOLDOUT_R3_DIAGNOSTIC_ONLY -> DIAGNOSTIC_ONLY
+    RC2_HOLDOUT_R3_INFRA_INCOMPLETE -> NONE_INFRA_INCOMPLETE
+    """
+    if terminal == "RC2_HOLDOUT_R3_PASS":
+        return "PASS"
+    if terminal == "RC2_HOLDOUT_R3_FAIL":
+        return "FAIL"
+    if terminal == "RC2_HOLDOUT_R3_DIAGNOSTIC_ONLY":
+        return "DIAGNOSTIC_ONLY"
+    return "NONE_INFRA_INCOMPLETE"
+
+
 def write_attempt_receipt(
     staging_dir: Path,
     phase: str,
@@ -1479,6 +1529,7 @@ def write_preflight_failure(
         {
             "task_id": TASK_ID,
             "terminal": terminal,
+            "policy_quality_authority": "NONE_INFRA_INCOMPLETE",
             "target_outcomes_resolved": False,
             "release_authority": False,
             "real_funds_write_authority": "NONE",
@@ -1903,7 +1954,7 @@ def execute_holdout(
     )
     if manifest_pre_run2["authority_input_manifest_hash"] != auth_manifest_hash_initial:
         write_preflight_failure(
-            "RC2_HOLDOUT_R3_FAIL",
+            "RC2_HOLDOUT_R3_INFRA_INCOMPLETE",
             {"reason": "Authority input manifest mutated between run 1 and run 2"},
             staging_dir,
             phase="DETERMINISM",
@@ -1928,7 +1979,7 @@ def execute_holdout(
     )
     if manifest_post_run2["authority_input_manifest_hash"] != auth_manifest_hash_initial:
         write_preflight_failure(
-            "RC2_HOLDOUT_R3_FAIL",
+            "RC2_HOLDOUT_R3_INFRA_INCOMPLETE",
             {"reason": "Authority input manifest mutated after run 2"},
             staging_dir,
             phase="DETERMINISM",
@@ -1944,12 +1995,8 @@ def execute_holdout(
     )
 
     gate_decision = str(result1["gate_evaluation"]["decision"])
-    if deterministic and gate_decision.endswith("_PASS"):
-        terminal = "RC2_HOLDOUT_R3_PASS"
-    elif deterministic and gate_decision.endswith("_FAIL"):
-        terminal = "RC2_HOLDOUT_R3_FAIL"
-    else:
-        terminal = "RC2_HOLDOUT_R3_FAIL"
+    terminal = classify_holdout_terminal(gate_decision, deterministic=deterministic)
+    policy_quality_authority = classify_policy_quality_authority(terminal)
 
     # Write staging artifacts
     _json_write(staging_dir / "OUTPUT_MANIFEST.json", result1["output_manifest"])
@@ -1969,7 +2016,10 @@ def execute_holdout(
 
     evidence_payload = {
         "task_id": TASK_ID,
+        "gate_decision": gate_decision,
         "terminal": terminal,
+        "deterministic": deterministic,
+        "policy_quality_authority": policy_quality_authority,
         "frozen_candidate_sha": FROZEN_POLICY_SHA,
         "authorized_runner_sha": authorized_runner_sha,
         "authorized_runner_sha256": authorized_runner_sha256,
@@ -1982,7 +2032,6 @@ def execute_holdout(
         "target_symbols": list(sealed_targets),
         "context_only_symbols": list(REFERENCES),
         "reference_outcomes_in_aggregate": False,
-        "deterministic": deterministic,
         "authority_input_manifest_hash": auth_manifest_hash_initial,
         "run_1_output_manifest_hash": result1["output_manifest"]["output_manifest_hash"],
         "run_2_output_manifest_hash": result2["output_manifest"]["output_manifest_hash"],
@@ -1997,12 +2046,17 @@ def execute_holdout(
     _json_write(staging_dir / "EVIDENCE.json", evidence_payload)
 
     # Emit completion attempt receipt
+    authority_valid = terminal in (
+        "RC2_HOLDOUT_R3_PASS",
+        "RC2_HOLDOUT_R3_FAIL",
+        "RC2_HOLDOUT_R3_DIAGNOSTIC_ONLY",
+    )
     write_attempt_receipt(
         staging_dir,
         phase="COMPLETED",
         terminal=terminal,
         target_outcomes_resolved=True,
-        authority_valid=True,
+        authority_valid=authority_valid,
         execution_identities=post_identity,
     )
 

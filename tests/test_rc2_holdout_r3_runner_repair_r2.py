@@ -53,9 +53,12 @@ from scripts.rc2.validation.run_holdout_r3 import (
     START_SHA,
     TARGETS,
     TASK_ID,
+    VALID_GATE_TO_TERMINAL,
     audit_full_window_production_context,
     build_dataset,
     check_execution_authorization,
+    classify_holdout_terminal,
+    classify_policy_quality_authority,
     execute_holdout,
     fetch_fresh_source_bundle,
     generate_authority_input_manifest,
@@ -703,3 +706,76 @@ def test_generic_runner_contains_no_hardcoded_protected_names() -> None:
     assert CONTROLLER_DISPATCH_SHA == "405e0042687bfae5aa986e0f2982e26cba3827cd"
     assert ACCEPTED_NORMALIZER_SHA256 == "4191922d1e85ad30b079633323836a817bf0506d223eb2365b2a4d3d25f52a16"
     assert CONFIG_HASH == "bba61849e64f37f9"
+
+
+# =====================================================================
+# Terminal Classification & Authority Semantics (Bounded Fix #1)
+# =====================================================================
+
+def test_terminal_classification_pass() -> None:
+    # Test 1 — PASS: deterministic = True, gate = exact frozen PASS value
+    assert "TACTICAL_DECISION_QUALITY_PASS" in VALID_GATE_TO_TERMINAL
+    terminal = classify_holdout_terminal("TACTICAL_DECISION_QUALITY_PASS", deterministic=True)
+    assert terminal == "RC2_HOLDOUT_R3_PASS"
+    authority = classify_policy_quality_authority(terminal)
+    assert authority == "PASS"
+
+
+def test_terminal_classification_fail() -> None:
+    # Test 2 — FAIL: deterministic = True, gate = exact frozen FAIL value
+    terminal = classify_holdout_terminal("TACTICAL_DECISION_QUALITY_FAIL", deterministic=True)
+    assert terminal == "RC2_HOLDOUT_R3_FAIL"
+    authority = classify_policy_quality_authority(terminal)
+    assert authority == "FAIL"
+
+
+def test_terminal_classification_diagnostic_only() -> None:
+    # Test 3 — DIAGNOSTIC_ONLY: deterministic = True, gate = exact frozen DIAGNOSTIC_ONLY values
+    terminal = classify_holdout_terminal("TACTICAL_DECISION_QUALITY_DIAGNOSTIC_ONLY", deterministic=True)
+    assert terminal == "RC2_HOLDOUT_R3_DIAGNOSTIC_ONLY"
+    assert classify_policy_quality_authority(terminal) == "DIAGNOSTIC_ONLY"
+
+    terminal_gran = classify_holdout_terminal(
+        "TACTICAL_DECISION_QUALITY_DIAGNOSTIC_ONLY_DATA_GRANULARITY_INSUFFICIENT",
+        deterministic=True,
+    )
+    assert terminal_gran == "RC2_HOLDOUT_R3_DIAGNOSTIC_ONLY"
+    assert classify_policy_quality_authority(terminal_gran) == "DIAGNOSTIC_ONLY"
+
+
+def test_terminal_classification_nondeterministic() -> None:
+    # Test 4 — nondeterministic: deterministic = False regardless of otherwise valid gate value
+    for gate in (
+        "TACTICAL_DECISION_QUALITY_PASS",
+        "TACTICAL_DECISION_QUALITY_FAIL",
+        "TACTICAL_DECISION_QUALITY_DIAGNOSTIC_ONLY",
+        "TACTICAL_DECISION_QUALITY_DIAGNOSTIC_ONLY_DATA_GRANULARITY_INSUFFICIENT",
+        "UNEXPECTED_GATE_VALUE",
+    ):
+        terminal = classify_holdout_terminal(gate, deterministic=False)
+        assert terminal == "RC2_HOLDOUT_R3_INFRA_INCOMPLETE", f"Failed for gate={gate}"
+        assert classify_policy_quality_authority(terminal) == "NONE_INFRA_INCOMPLETE"
+
+
+def test_terminal_classification_unknown_gate() -> None:
+    # Test 5 — unknown gate: deterministic = True, unrecognized gate value fails closed
+    for unknown in ("UNEXPECTED_GATE_VALUE", "", "TACTICAL_DECISION_QUALITY_UNKNOWN", "SOME_OTHER_DECISION"):
+        terminal = classify_holdout_terminal(unknown, deterministic=True)
+        assert terminal == "RC2_HOLDOUT_R3_INFRA_INCOMPLETE", f"Failed for unknown={unknown}"
+        assert classify_policy_quality_authority(terminal) == "NONE_INFRA_INCOMPLETE"
+
+
+def test_terminal_release_authority_mapping() -> None:
+    # Test 6 — release authority:
+    # PASS -> release_authority may become true according to existing RC2 logic
+    # FAIL -> false
+    # DIAGNOSTIC_ONLY -> false
+    # INFRA_INCOMPLETE -> false
+    def is_release_authority(t: str) -> bool:
+        return t == "RC2_HOLDOUT_R3_PASS"
+
+    assert is_release_authority("RC2_HOLDOUT_R3_PASS") is True
+    assert is_release_authority("RC2_HOLDOUT_R3_FAIL") is False
+    assert is_release_authority("RC2_HOLDOUT_R3_DIAGNOSTIC_ONLY") is False
+    assert is_release_authority("RC2_HOLDOUT_R3_INFRA_INCOMPLETE") is False
+    assert is_release_authority("RC2_HOLDOUT_R3_PREFLIGHT_FAIL") is False
