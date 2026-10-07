@@ -1,0 +1,30 @@
+{
+  "compileall": {
+    "command": "python3 -m compileall src scripts tests",
+    "returncode": 0,
+    "status": "PASS"
+  },
+  "git_diff_check": {
+    "command": "git diff --check",
+    "returncode": 0,
+    "status": "PASS"
+  },
+  "mypy": {
+    "command": "mypy",
+    "output": "Success: no issues found in 154 source files",
+    "returncode": 0,
+    "status": "PASS"
+  },
+  "pytest_freeze_suite": {
+    "command": "pytest tests/test_rc2_holdout_r3_runner_freeze.py -v",
+    "returncode": 0,
+    "status": "PASS",
+    "summary": "10 passed in 110.09s"
+  },
+  "ruff": {
+    "command": "ruff check src scripts tests",
+    "output": "All checks passed!",
+    "returncode": 0,
+    "status": "PASS"
+  }
+}

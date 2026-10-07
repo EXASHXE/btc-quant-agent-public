@@ -1,0 +1,33 @@
+{
+  "task_id": "RC2_HOLDOUT_R3_RUNNER_CONSTRUCTION_FREEZE",
+  "changed_files": [
+    {
+      "path": "scripts/rc2/validation/run_holdout_r3.py",
+      "sha256": "c6bc2f13bf8a7a540919b97282596b8c725ac88369fe99f177221aaa2f19a15a"
+    },
+    {
+      "path": "tests/test_rc2_holdout_r3_runner_freeze.py",
+      "sha256": "2ea68b61512ab2d6dd1b62b3b29a0bb767f8993d7495bc10d4971e5f0bc0d51d"
+    },
+    {
+      "path": "evidence/v0.5.5/tactical-policy/RC2/HOLDOUT_R3_RUNNER_FREEZE/TEST_STATIC_REPORT.json",
+      "sha256": "6dd24c4dd4451ed20b5bfd2952fbaa2a0e5364988dda2c911f303870332df481"
+    },
+    {
+      "path": "evidence/v0.5.5/tactical-policy/RC2/HOLDOUT_R3_RUNNER_FREEZE/FIREWALL_PROOF.json",
+      "sha256": "451dfc4f18513a6f9f49c10fc0f2f0508834fddc3360a1aa41914f9c59533b17"
+    },
+    {
+      "path": "evidence/v0.5.5/tactical-policy/RC2/HOLDOUT_R3_RUNNER_FREEZE/RUNNER_IDENTITY.json",
+      "sha256": "5fddcefd87645cd8f78fd0c7d49fb1080fd6553413d6b7253c2366ac9914b8a4"
+    },
+    {
+      "path": "evidence/v0.5.5/tactical-policy/RC2/HOLDOUT_R3_RUNNER_FREEZE/CONSTRUCTION_MANIFEST.json",
+      "sha256": "6a1a935c649d51029b20f7d72c5781e0145b1ce257963926402729e8cc901ca2"
+    },
+    {
+      "path": "evidence/v0.5.5/tactical-policy/RC2/HOLDOUT_R3_RUNNER_FREEZE/EVIDENCE.json",
+      "sha256": "81298f2c8a8242333d2d85f88a2b822a532cc8de90be517ee906c9f810f11a11"
+    }
+  ]
+}

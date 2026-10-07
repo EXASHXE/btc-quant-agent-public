@@ -1,0 +1,35 @@
+{
+  "task_id": "RC2_HOLDOUT_R3_RUNNER_CONSTRUCTION_FREEZE",
+  "firewall_status": "ENFORCED_ZERO_PROTECTED_ACCESS",
+  "protected_target_network_access_count": 0,
+  "protected_targets": [
+    "COMPUSDT",
+    "SANDUSDT",
+    "MANAUSDT",
+    "ALGOUSDT",
+    "EGLDUSDT",
+    "GALAUSDT",
+    "THETAUSDT",
+    "APTUSDT"
+  ],
+  "protected_targets_status": "NAMES_ONLY_NO_MARKET_OR_ARCHIVE_DATA_ACCESSED",
+  "market_data_fetched": false,
+  "prices_checked": false,
+  "archive_data_downloaded": false,
+  "holdout_executed": false,
+  "outcome_metrics_generated": false,
+  "test_fixtures_used": [
+    "FILUSDT",
+    "ETCUSDT",
+    "BTCUSDT",
+    "ETHUSDT",
+    "SOLUSDT",
+    "LINKUSDT",
+    "SUIUSDT",
+    "XRPUSDT",
+    "DOGEUSDT",
+    "BNBUSDT"
+  ],
+  "burned_only_fixtures_verified": true,
+  "normalizer_firewall_rejection_verified": true
+}
