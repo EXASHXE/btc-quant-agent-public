@@ -1,0 +1,32 @@
+{
+  "schema_version": "B_LINE_RC2_HOLDOUT_R1_1_CONTROLLER_ADJUDICATION_V1",
+  "validation_sha": "c166899d714e6a03eb43ab53c65eea9a0e2bc966",
+  "frozen_candidate_sha": "10be512f2cf4d7eccdc8a9849c925b5f73c568fd",
+  "executor_terminal": "RC2_HOLDOUT_R1_1_BLOCKED",
+  "controller_disposition": "RC2_HOLDOUT_R1_1_INVALID_EXECUTION_STATE__NOT_POLICY_FAIL__TARGETS_BURNED",
+  "accepted_repairs": [
+    "PRODUCTION_REFERENCE_CONTEXT",
+    "SUFFICIENT_PRE_DECISION_WARMUP",
+    "ZERO_ORDINARY_WARMUP_OOS_DROP",
+    "TARGET_REFERENCE_ROLE_ISOLATION"
+  ],
+  "blocking_findings": [
+    "BINANCE_METRICS_ARCHIVE_ORDER_NOT_EVENT_TIME_AUTHORITY",
+    "COMMITTED_RUNNER_AND_COMMITTED_EVIDENCE_NOT_SAME_REPRODUCIBLE_EXECUTION_STATE"
+  ],
+  "burned_targets": [
+    "FILUSDT",
+    "ETCUSDT",
+    "AAVEUSDT",
+    "XLMUSDT",
+    "UNIUSDT",
+    "ICPUSDT",
+    "ARBUSDT",
+    "OPUSDT"
+  ],
+  "candidate_policy_fail": false,
+  "candidate_mutation_allowed": false,
+  "third_protected_holdout_authorized": false,
+  "next_task": "B_LINE_RC2_HOLDOUT_HARNESS_QUALIFICATION_R2",
+  "real_funds_write_authority": "NONE"
+}

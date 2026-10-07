@@ -1,6 +1,6 @@
 {
   "line": "B_LINE",
-  "stage": "B_LINE_INITIAL_USABLE_RELEASE_V1_RC2__FRESH_HOLDOUT_R1_1_AUTHORIZED",
+  "stage": "B_LINE_INITIAL_USABLE_RELEASE_V1_RC2__HOLDOUT_HARNESS_R2_QUALIFICATION_PREP",
   "code_branch": "feature/tactical-policy-r2",
   "accepted_code_sha": "52c16a28153de307dc6132c0975fe29341a0a918",
   "docs_authority_commit": "6319ddbaddd69d5522696992ec1565169da88e03",
@@ -144,7 +144,7 @@
     "live_v1_b4_r6_parent_sha": "a663921abf90504412d0d67b2b9c9f134f204d85",
     "live_v1_b4_r6_controller_sealed": true,
     "live_v1_b5_r6_authorized": false,
-    "live_v1_next_action": "RC2_TACTICAL_SUCCESSOR_FRESH_HOLDOUT_R1_1",
+    "live_v1_next_action": "B_LINE_RC2_HOLDOUT_HARNESS_QUALIFICATION_R2",
     "live_v1_b5_r5_findings": [
       "HIGH_PROTECTIVE_TYPED_ALIAS_AMBIGUITY",
       "HIGH_RUNTIME_AUTHORITY_ASYNC_HANDOFF_STALE",
@@ -264,7 +264,7 @@
     "rc2_tactical_task_id": "B_LINE_RC2_TACTICAL_SUCCESSOR_R1_IMPLEMENTATION",
     "rc2_tactical_dispatch_sha": "2480e60816b28cb9afbc972cee4029d424d2fd25",
     "rc2_protected_validation_access": "FORBIDDEN_DURING_IMPLEMENTATION",
-    "rc2_tactical_candidate_state": "FROZEN_PENDING_FRESH_HOLDOUT",
+    "rc2_tactical_candidate_state": "FROZEN_PENDING_HARNESS_QUALIFICATION",
     "rc2_tactical_candidate_sha": "10be512f2cf4d7eccdc8a9849c925b5f73c568fd",
     "rc2_tactical_policy_version": "TACTICAL_POLICY_R2_B1",
     "rc2_tactical_config_hash": "bba61849e64f37f9",
@@ -314,7 +314,20 @@
     "rc2_holdout_r1_1_dispatch_sha": "f7ca663d6d661ae7b88d6c5e44e670d3d2898445",
     "rc2_holdout_r1_1_exact_candidate_sha": "10be512f2cf4d7eccdc8a9849c925b5f73c568fd",
     "rc2_holdout_r1_1_attempts_authorized": 1,
-    "rc2_holdout_r1_1_policy_mutation": "FORBIDDEN"
+    "rc2_holdout_r1_1_policy_mutation": "FORBIDDEN",
+    "rc2_holdout_r1_1_validation_sha": "c166899d714e6a03eb43ab53c65eea9a0e2bc966",
+    "rc2_holdout_r1_1_controller_disposition": "INVALID_EXECUTION_STATE_NOT_POLICY_FAIL",
+    "rc2_holdout_r1_1_burned_targets": [
+      "FILUSDT",
+      "ETCUSDT",
+      "AAVEUSDT",
+      "XLMUSDT",
+      "UNIUSDT",
+      "ICPUSDT",
+      "ARBUSDT",
+      "OPUSDT"
+    ],
+    "rc2_third_protected_holdout_authorized": false
   },
   "must_read": [],
   "validation_authority": {
@@ -339,7 +352,7 @@
     "evidence_path": "evidence/v0.5.5/controller/V0.5.5_B2B_CONTROLLER_ACCEPTANCE.json",
     "evidence_blob_sha": "73a11708a85b5f1896397d745c3b7252d3c51f8d"
   },
-  "parallel_authorized_next_stage": "RC2_TACTICAL_SUCCESSOR_FRESH_HOLDOUT_R1_1",
+  "parallel_authorized_next_stage": "B_LINE_RC2_HOLDOUT_HARNESS_QUALIFICATION_R2",
   "live_v1_acceptance_authority": {
     "report_path": "reviews/v0.5/live_v1/V0.5.5_LIVE_V1_B3_CONTROLLER_ACCEPTANCE.md",
     "report_blob_sha": "21ad4492feb4750f5fc85a5f88b54d1da36c157d",
@@ -664,5 +677,13 @@
     "manifest_blob_sha": "2152cf4e6953e4dbd3ff37811fb3bdb7edd72a01",
     "controller_dispatch_sha": "f7ca663d6d661ae7b88d6c5e44e670d3d2898445",
     "exact_candidate_sha": "10be512f2cf4d7eccdc8a9849c925b5f73c568fd"
+  },
+  "rc2_holdout_harness_r2_contract": {
+    "contract_path": "reviews/v0.5/rc2/V0.5.5_RC2_HOLDOUT_HARNESS_QUALIFICATION_R2_CONTRACT.md",
+    "contract_blob_sha": "46ed78d52be44b65ef0459bab2b528e532a7611d",
+    "adjudication_path": "reviews/v0.5/rc2/V0.5.5_RC2_HOLDOUT_R1_1_CONTROLLER_ADJUDICATION.md",
+    "adjudication_blob_sha": "6b72bcb479f9426432afcbbb52249d110c1a1b2e",
+    "evidence_path": "evidence/v0.5.5/controller/B_LINE_RC2_HOLDOUT_R1_1_ADJUDICATION.json",
+    "evidence_blob_sha": "60fea6f7ef040304079ccc3a46e9949c615ca587"
   }
 }
