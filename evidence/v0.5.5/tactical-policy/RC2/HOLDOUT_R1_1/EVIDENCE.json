@@ -1,0 +1,158 @@
+{
+  "aggregation_symbol_scope": [
+    "FILUSDT",
+    "ETCUSDT",
+    "AAVEUSDT",
+    "XLMUSDT",
+    "UNIUSDT",
+    "ICPUSDT",
+    "ARBUSDT",
+    "OPUSDT"
+  ],
+  "authority_valid": false,
+  "blocked_reason": "BINANCE_METRICS_CSV_NOT_CHRONOLOGICAL",
+  "branch": "validation/b-line-rc2-successor-r1-holdout-r1-1",
+  "candidate_sha": "10be512f2cf4d7eccdc8a9849c925b5f73c568fd",
+  "config_hash": "bba61849e64f37f9",
+  "context_only_outcomes_count": 0,
+  "context_only_symbols": [
+    "BTCUSDT",
+    "ETHUSDT",
+    "SOLUSDT",
+    "LINKUSDT",
+    "SUIUSDT",
+    "XRPUSDT",
+    "DOGEUSDT",
+    "BNBUSDT"
+  ],
+  "controller_dispatch_sha": "f7ca663d6d661ae7b88d6c5e44e670d3d2898445",
+  "deterministic": true,
+  "deterministic_identical_manifest_replay": {
+    "identical_input_manifest_hashes": true,
+    "identical_output_manifest_hashes": true,
+    "run_1_input_manifest_hash": "0d4c2ec2c6a3d53c6ca19870ac34b4c2194b6826e1a5d0ec6ac56f6df56bc0cf",
+    "run_1_output_manifest_hash": "2646a035fed98aa81f6277603f9eb1d1890b0da97f311918ec0d05e27054c795",
+    "run_2_input_manifest_hash": "0d4c2ec2c6a3d53c6ca19870ac34b4c2194b6826e1a5d0ec6ac56f6df56bc0cf",
+    "run_2_output_manifest_hash": "2646a035fed98aa81f6277603f9eb1d1890b0da97f311918ec0d05e27054c795"
+  },
+  "frozen_candidate_sha": "10be512f2cf4d7eccdc8a9849c925b5f73c568fd",
+  "gate_evaluation": {
+    "contract_version": "V0.5.5_B_LINE_TACTICAL_DECISION_QUALITY_R1",
+    "decision": "TACTICAL_DECISION_QUALITY_FAIL",
+    "gross_to_net_sign_flip_observed": false,
+    "hard_negative_gates": {
+      "any_triggered": true,
+      "mean_net_r_le_minus_0_10_with_100_actionable": false,
+      "median_net_r_le_minus_0_20_with_100_actionable": false,
+      "stop_before_target_gt_0_70_with_100_resolved": false,
+      "systematic_cost_omission_sign_flip": false,
+      "two_supported_partitions_mean_net_r_le_minus_0_25": true
+    },
+    "integrity_gates": {
+      "all_passed": true,
+      "authentic_1m_data_granularity_complete": true,
+      "deterministic_manifest_replay_identical": true,
+      "no_outcome_informed_policy_retuning": true,
+      "no_protected_a_line_outcomes_accessed": true,
+      "pit_chronology_manifest_integrity": true,
+      "transaction_costs_included_in_net_r": true
+    },
+    "pass_band_gates": {
+      "all_passed": false,
+      "mean_net_r_ge_plus_0_05": false,
+      "median_net_r_ge_minus_0_05": false,
+      "positive_supported_partition_ratio": 0.0,
+      "positive_supported_partitions_count": 0,
+      "stop_before_target_le_0_65": false,
+      "supported_partitions_count": 3,
+      "supported_partitions_non_negative_ge_2_of_3": false
+    },
+    "reasons": [
+      "HARD_NEGATIVE_GATE_TRIGGERED:two_supported_partitions_mean_net_r_le_minus_0_25"
+    ],
+    "stability_gate": {
+      "oos_partitions": 3,
+      "positive_mean_net_r_partitions": 0,
+      "severe_negative_partitions": 3,
+      "status": "FAIL",
+      "supported_partitions": 3
+    },
+    "subgroup_rescue_applied": false,
+    "subgroup_rescue_permitted": false,
+    "support_gates": {
+      "actionable_oos_count": 75,
+      "all_passed": false,
+      "long_actionable_count": 30,
+      "long_actionable_count_ge_20": true,
+      "oos_actionable_count_ge_100": false,
+      "oos_partitions_count": 3,
+      "oos_partitions_ge_3": true,
+      "short_actionable_count": 45,
+      "short_actionable_count_ge_20": true,
+      "supported_partitions_count": 3,
+      "supported_partitions_ge_2": true
+    },
+    "thresholds": {
+      "hard_fail_mean_net_r_max": -0.1,
+      "hard_fail_median_net_r_max": -0.2,
+      "hard_fail_min_actionable_support": 100,
+      "hard_fail_partition_count_min": 2,
+      "hard_fail_partition_mean_net_r_max": -0.25,
+      "hard_fail_stop_before_target_min": 0.7,
+      "min_long_actionable_count": 20,
+      "min_oos_actionable_count": 100,
+      "min_oos_partitions": 3,
+      "min_partition_actionable_count": 20,
+      "min_short_actionable_count": 20,
+      "min_supported_partitions": 2,
+      "pass_mean_net_r_min": 0.05,
+      "pass_median_net_r_min": -0.05,
+      "pass_positive_partition_ratio_min": 0.6666666666666666,
+      "pass_stop_before_target_max": 0.65
+    }
+  },
+  "hard_fail_reasons": [
+    "HARD_NEGATIVE_GATE_TRIGGERED:two_supported_partitions_mean_net_r_le_minus_0_25"
+  ],
+  "no_further_outcome_replay_performed": true,
+  "no_reference_outcomes_in_aggregate": true,
+  "non_authoritative_observed_gate_decision": "TACTICAL_DECISION_QUALITY_FAIL",
+  "one_authorized_holdout_attempt_consumed": true,
+  "oos_decision_step_count": 2496,
+  "oos_steps_dropped_due_to_ordinary_warmup": 0,
+  "outcome_artifacts_authoritative": false,
+  "real_money_authority": false,
+  "reference_context_archive_count": 952,
+  "reference_outcomes_in_aggregate": false,
+  "release_authority": false,
+  "run_1_output_manifest_hash": "2646a035fed98aa81f6277603f9eb1d1890b0da97f311918ec0d05e27054c795",
+  "run_2_output_manifest_hash": "2646a035fed98aa81f6277603f9eb1d1890b0da97f311918ec0d05e27054c795",
+  "source_order_audit": {
+    "additional_outcome_replay_permitted": false,
+    "archive_order_selected_timestamp": "2026-09-06 17:35:00",
+    "authority_effect": "Derivative series and replay input manifest do not match the frozen latest-per-hour sampling semantics; the two replay outputs are non-authoritative.",
+    "issue": "BINANCE_METRICS_CSV_NOT_CHRONOLOGICAL",
+    "latest_timestamp_by_event_time": "2026-09-06 17:55:00",
+    "one_authorized_attempt_consumed": true,
+    "source_archive_sha256": "243c6be13f15ca98089306c4b1f679e44d8069550cf0b2438cfa5a2741b1bd0b",
+    "source_archive_url": "https://data.binance.vision/data/futures/um/daily/metrics/FILUSDT/FILUSDT-metrics-2026-09-06.zip",
+    "source_rows_in_17h_bucket": 12,
+    "staleness_ms": 1200000
+  },
+  "target_input_manifest_hash": "0d4c2ec2c6a3d53c6ca19870ac34b4c2194b6826e1a5d0ec6ac56f6df56bc0cf",
+  "target_outcomes_resolved": true,
+  "target_symbols": [
+    "FILUSDT",
+    "ETCUSDT",
+    "AAVEUSDT",
+    "XLMUSDT",
+    "UNIUSDT",
+    "ICPUSDT",
+    "ARBUSDT",
+    "OPUSDT"
+  ],
+  "task_id": "B_LINE_RC2_TACTICAL_SUCCESSOR_FRESH_HOLDOUT_R1_1",
+  "terminal": "RC2_HOLDOUT_R1_1_BLOCKED",
+  "validation_branch": "validation/b-line-rc2-successor-r1-holdout-r1-1",
+  "validation_script_sha256": "605275865fc603436ab6b03e831ad44df311520b2098afeea86869ed510662e8"
+}

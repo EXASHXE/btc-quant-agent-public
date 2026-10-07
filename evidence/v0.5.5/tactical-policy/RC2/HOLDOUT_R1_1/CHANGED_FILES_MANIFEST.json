@@ -1,0 +1,19 @@
+{
+  "base_candidate_sha": "10be512f2cf4d7eccdc8a9849c925b5f73c568fd",
+  "branch": "validation/b-line-rc2-successor-r1-holdout-r1-1",
+  "files": [
+    "scripts/rc2/validation/run_holdout_r1_1.py",
+    "evidence/v0.5.5/tactical-policy/RC2/HOLDOUT_R1_1/EVIDENCE.json",
+    "evidence/v0.5.5/tactical-policy/RC2/HOLDOUT_R1_1/TARGET_INPUT_MANIFEST.json",
+    "evidence/v0.5.5/tactical-policy/RC2/HOLDOUT_R1_1/REFERENCE_CONTEXT_MANIFEST.json",
+    "evidence/v0.5.5/tactical-policy/RC2/HOLDOUT_R1_1/OUTPUT_MANIFEST.json",
+    "evidence/v0.5.5/tactical-policy/RC2/HOLDOUT_R1_1/rolling_oos_table.json",
+    "evidence/v0.5.5/tactical-policy/RC2/HOLDOUT_R1_1/aggregate_metrics.json",
+    "evidence/v0.5.5/tactical-policy/RC2/HOLDOUT_R1_1/preflight_report.json",
+    "evidence/v0.5.5/tactical-policy/RC2/HOLDOUT_R1_1/CHANGED_FILES_MANIFEST.json",
+    "evidence/v0.5.5/tactical-policy/RC2/HOLDOUT_R1_1/OUTCOME_ADJUDICATION.json"
+  ],
+  "only_validation_script_and_evidence": true,
+  "policy_config_rule_threshold_changes": [],
+  "production_source_changes": []
+}

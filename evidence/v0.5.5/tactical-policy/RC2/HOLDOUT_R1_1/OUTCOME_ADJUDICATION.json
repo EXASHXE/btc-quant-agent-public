@@ -1,0 +1,12 @@
+{
+  "additional_outcome_replay_permitted": false,
+  "archive_order_selected_timestamp": "2026-09-06 17:35:00",
+  "authority_effect": "Derivative series and replay input manifest do not match the frozen latest-per-hour sampling semantics; the two replay outputs are non-authoritative.",
+  "issue": "BINANCE_METRICS_CSV_NOT_CHRONOLOGICAL",
+  "latest_timestamp_by_event_time": "2026-09-06 17:55:00",
+  "one_authorized_attempt_consumed": true,
+  "source_archive_sha256": "243c6be13f15ca98089306c4b1f679e44d8069550cf0b2438cfa5a2741b1bd0b",
+  "source_archive_url": "https://data.binance.vision/data/futures/um/daily/metrics/FILUSDT/FILUSDT-metrics-2026-09-06.zip",
+  "source_rows_in_17h_bucket": 12,
+  "staleness_ms": 1200000
+}
