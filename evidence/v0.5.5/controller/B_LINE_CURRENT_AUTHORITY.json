@@ -1,6 +1,6 @@
 {
   "line": "B_LINE",
-  "stage": "B_LINE_INITIAL_USABLE_RELEASE_V1_RC2__HARNESS_ACCEPTED__R3_RUNNER_FREEZE_PREP",
+  "stage": "B_LINE_INITIAL_USABLE_RELEASE_V1_RC2__R3_RUNNER_CONSTRUCTION_AUTHORIZED",
   "code_branch": "feature/tactical-policy-r2",
   "accepted_code_sha": "52c16a28153de307dc6132c0975fe29341a0a918",
   "docs_authority_commit": "6319ddbaddd69d5522696992ec1565169da88e03",
@@ -354,7 +354,11 @@
       "DOGEUSDT",
       "BNBUSDT"
     ],
-    "rc2_r3_outcome_access": "FORBIDDEN_UNTIL_RUNNER_FREEZE_ACCEPTED"
+    "rc2_r3_outcome_access": "FORBIDDEN_DURING_RUNNER_CONSTRUCTION",
+    "rc2_r3_runner_branch": "validation/b-line-rc2-holdout-r3-runner",
+    "rc2_r3_runner_start_sha": "cbc903d9ba448059121db96c3572a2677d5b53f8",
+    "rc2_r3_runner_dispatch_sha": "2898f21a358177a02cb7e7f8812cec6984885388",
+    "rc2_r3_protected_network_access": "FORBIDDEN_DURING_RUNNER_CONSTRUCTION"
   },
   "must_read": [],
   "validation_authority": {
@@ -727,5 +731,12 @@
     "evidence_blob_sha": "c91f4c9cf528c63edab06fac45d3c45bd81e1b95",
     "r3_contract_path": "reviews/v0.5/rc2/V0.5.5_RC2_HOLDOUT_R3_RUNNER_FREEZE_CONTRACT.md",
     "r3_contract_blob_sha": "351f2b2bcd5b837f9e25115853d5a05e87f6c8a6"
+  },
+  "rc2_r3_runner_dispatch": {
+    "prompt_path": "prompts/v0.5/rc2/v0.5.5_RC2_HOLDOUT_R3_RUNNER_CONSTRUCTION_FREEZE.md",
+    "prompt_blob_sha": "702053895d04da8a0041f3e60c4a9b3ddb44016c",
+    "manifest_path": "evidence/v0.5.5/controller/B_LINE_RC2_HOLDOUT_R3_RUNNER_DISPATCH.json",
+    "manifest_blob_sha": "2d0aaf3a8aa70c5cc3efc64d7c73971f18d587b1",
+    "controller_dispatch_sha": "2898f21a358177a02cb7e7f8812cec6984885388"
   }
 }
