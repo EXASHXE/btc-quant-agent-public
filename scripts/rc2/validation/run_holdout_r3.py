@@ -78,6 +78,7 @@ from scripts.rc2.validation.source_normalizer import (
     PARSER_SCHEMA_VERSION,
     CacheAuthorityError,
     CacheIdentity,
+    RunnerIdentityMismatchError,
     capture_execution_identity,
     normalize_metrics_rows,
     verify_execution_identity,
@@ -1465,23 +1466,183 @@ def write_attempt_receipt(
     *,
     target_outcomes_resolved: bool,
     authority_valid: bool,
+    protected_source_access_started: bool = False,
+    target_outcome_replay_started: bool = False,
     exception_class: str | None = None,
     exception_message: str | None = None,
+    authorized_runner_sha: str | None = None,
+    authorized_runner_sha256: str | None = None,
+    execution_dispatch_sha: str | None = None,
+    target_seal_sha256: str | None = None,
+    target_symbols: Sequence[str] | None = None,
+    access_ledger: dict[str, Any] | list[Any] | None = None,
+    pre_identity: dict[str, Any] | None = None,
+    post_identity: dict[str, Any] | None = None,
+    source_bundle_status: str | None = None,
     execution_identities: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
-    """Emit attempt receipt on any execution failure or completion (R2.7)."""
+    """Emit attempt receipt on any execution failure or completion (R2.7, Fix #2)."""
     receipt = {
         "task_id": TASK_ID,
         "phase": phase,
         "terminal": terminal,
-        "target_outcomes_resolved": target_outcomes_resolved,
         "authority_valid": authority_valid,
+        "protected_source_access_started": protected_source_access_started,
+        "target_outcome_replay_started": target_outcome_replay_started,
+        "target_outcomes_resolved": target_outcomes_resolved,
         "exception_class": exception_class,
         "exception_message": exception_message,
+        "authorized_runner_sha": authorized_runner_sha,
+        "authorized_runner_sha256": authorized_runner_sha256,
+        "execution_dispatch_sha": execution_dispatch_sha,
+        "target_seal_sha256": target_seal_sha256,
+        "target_symbols": list(target_symbols or []),
+        "access_ledger": access_ledger if access_ledger is not None else {},
+        "pre_identity": pre_identity or {},
+        "post_identity": post_identity or {},
+        "source_bundle_status": source_bundle_status or "NOT_AVAILABLE",
         "execution_identities": execution_identities or {},
         "timestamp_utc": datetime.now(UTC).isoformat(),
     }
     _json_write(staging_dir / "ATTEMPT_RECEIPT.json", receipt)
+    return receipt
+
+
+def finalize_failed_attempt(
+    staging_dir: Path,
+    *,
+    evidence_dir: Path,
+    phase: str,
+    terminal: str = "RC2_HOLDOUT_R3_INFRA_INCOMPLETE",
+    exception_class: str | None = None,
+    exception_message: str | None = None,
+    protected_source_access_started: bool = False,
+    outcome_replay_started: bool = False,
+    target_outcomes_resolved: bool = False,
+    authorized_runner_sha: str | None = None,
+    authorized_runner_sha256: str | None = None,
+    execution_dispatch_sha: str | None = None,
+    authorized_target_seal_sha256: str | None = None,
+    target_symbols: Sequence[str] | None = None,
+    ledger: ExecutionAccessLedger | None = None,
+    pre_identity: Any | None = None,
+    post_identity: dict[str, Any] | None = None,
+    source_bundle_manifest: dict[str, Any] | None = None,
+    detail: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Centralized failure closure helper for execution defects and exceptions (Fix #2).
+
+    Ensures that once protected source access begins, every terminal failure path
+    produces a durable, self-contained authority receipt and evidence payload before returning.
+    """
+    pre_id_dict: dict[str, Any] = {}
+    if pre_identity is not None:
+        if hasattr(pre_identity, "to_dict"):
+            pre_id_dict = pre_identity.to_dict()
+        elif isinstance(pre_identity, dict):
+            pre_id_dict = pre_identity
+    ledger_summary: dict[str, Any] = {}
+    if ledger is not None:
+        try:
+            ledger_summary = ledger.finalize(staging_dir / "EXECUTION_ACCESS_LEDGER.json")
+        except Exception:  # noqa: BLE001
+            try:
+                ledger_summary = ledger.summary()
+            except Exception:  # noqa: BLE001, S110
+                pass
+
+    # Ensure baseline auxiliary stubs exist in staging
+    if not (staging_dir / "OUTPUT_MANIFEST.json").exists():
+        _json_write(
+            staging_dir / "OUTPUT_MANIFEST.json",
+            {
+                "replay_performed": outcome_replay_started,
+                "target_outcomes_resolved": target_outcomes_resolved,
+                "available": False,
+            },
+        )
+    if not (staging_dir / "rolling_oos_table.json").exists():
+        _json_write(staging_dir / "rolling_oos_table.json", {"available": False})
+    if not (staging_dir / "aggregate_metrics.json").exists():
+        _json_write(staging_dir / "aggregate_metrics.json", {"available": False})
+    if not (staging_dir / "EXECUTION_IDENTITY.json").exists():
+        _json_write(
+            staging_dir / "EXECUTION_IDENTITY.json",
+            post_identity or pre_id_dict or {"verified": False, "phase": phase},
+        )
+
+    receipt = write_attempt_receipt(
+        staging_dir,
+        phase=phase,
+        terminal=terminal,
+        target_outcomes_resolved=target_outcomes_resolved,
+        authority_valid=False,
+        protected_source_access_started=protected_source_access_started,
+        target_outcome_replay_started=outcome_replay_started,
+        exception_class=exception_class,
+        exception_message=exception_message,
+        authorized_runner_sha=authorized_runner_sha,
+        authorized_runner_sha256=authorized_runner_sha256,
+        execution_dispatch_sha=execution_dispatch_sha,
+        target_seal_sha256=authorized_target_seal_sha256,
+        target_symbols=list(target_symbols or []),
+        access_ledger=ledger_summary,
+        pre_identity=pre_id_dict,
+        post_identity=post_identity,
+        source_bundle_status="AVAILABLE" if source_bundle_manifest else "NOT_AVAILABLE",
+        execution_identities=post_identity or pre_id_dict,
+    )
+
+    evidence_payload = {
+        "task_id": TASK_ID,
+        "terminal": terminal,
+        "phase": phase,
+        "authority_valid": False,
+        "policy_quality_authority": "NONE_INFRA_INCOMPLETE",
+        "release_authority": False,
+        "real_funds_write_authority": "NONE",
+        "protected_source_access_started": protected_source_access_started,
+        "target_outcome_replay_started": outcome_replay_started,
+        "target_outcomes_resolved": target_outcomes_resolved,
+        "exception_class": exception_class,
+        "exception_message": exception_message,
+        "authorized_runner_sha": authorized_runner_sha,
+        "authorized_runner_sha256": authorized_runner_sha256,
+        "execution_dispatch_sha": execution_dispatch_sha,
+        "authorized_target_seal_sha256": authorized_target_seal_sha256,
+        "accepted_normalizer_sha256": ACCEPTED_NORMALIZER_SHA256,
+        "accepted_harness_sha": ACCEPTED_HARNESS_SHA,
+        "branch": BRANCH,
+        "config_hash": CONFIG_HASH,
+        "target_symbols": list(target_symbols or []),
+        "context_only_symbols": list(REFERENCES),
+        "reference_outcomes_in_aggregate": False,
+        "full_window_audit_passed": False,
+        "access_ledger": ledger_summary,
+        "pre_identity": pre_id_dict,
+        "post_identity": post_identity,
+        "source_bundle_status": "AVAILABLE" if source_bundle_manifest else "NOT_AVAILABLE",
+        "timestamp_utc": datetime.now(UTC).isoformat(),
+        **(detail or {}),
+    }
+    _json_write(staging_dir / "EVIDENCE.json", evidence_payload)
+
+    # Durably publish to evidence_dir if protected source access was started
+    if protected_source_access_started:
+        try:
+            if not evidence_dir.exists():
+                shutil.copytree(staging_dir, evidence_dir)
+            elif not any(evidence_dir.iterdir()):
+                shutil.copytree(staging_dir, evidence_dir, dirs_exist_ok=True)
+            else:
+                attempt_name = staging_dir.name
+                shutil.copytree(staging_dir, evidence_dir / f"failure_{attempt_name}")
+            shutil.rmtree(staging_dir, ignore_errors=True)
+            print(f"Durably published failure evidence ({phase}) to {evidence_dir}")
+        except Exception as pub_exc:  # noqa: BLE001
+            print(f"WARNING: Failed to publish failure evidence to {evidence_dir}: {pub_exc}")
+
+    print(terminal)
     return receipt
 
 
@@ -1784,6 +1945,15 @@ def execute_holdout(
     ledger_path = staging_dir / "EXECUTION_ACCESS_LEDGER.json"
     ledger = ExecutionAccessLedger(ledger_path)
 
+    phase = "AUTHORIZATION"
+    protected_source_access_started = False
+    outcome_replay_started = False
+    target_outcomes_resolved = False
+    pre_identity: Any | None = None
+    post_identity: dict[str, Any] | None = None
+    source_bundle_manifest: dict[str, Any] | None = None
+    sealed_targets: tuple[str, ...] = ()
+
     # R2.4 & Target Seal Validation
     auth_ok, terminal, auth_detail = check_execution_authorization(
         authorized_runner_sha=authorized_runner_sha,
@@ -1809,262 +1979,405 @@ def execute_holdout(
     # R2.1: Create AUTHORIZED_EXECUTION capability bound to verified proof
     capability = AccessCapability.create_authorized_execution(proof=proof, ledger=ledger)
     sealed_targets = proof.sealed_targets
+    protected_source_access_started = True
 
-    # R2.3: Fetch fresh source bundle into clean attempt-scoped source directory
-    source_attempt_dir = Path(
-        f"/tmp/rc2_r3_source_{execution_dispatch_sha[:8]}_{authorized_runner_sha[:8]}_{authorized_target_seal_sha256[:8]}"
-    )
     try:
+        # Step 1: SOURCE_RETRIEVAL
+        phase = "SOURCE_RETRIEVAL"
+        source_attempt_dir = Path(
+            f"/tmp/rc2_r3_source_{execution_dispatch_sha[:8]}_{authorized_runner_sha[:8]}_{authorized_target_seal_sha256[:8]}"
+        )
         raw, source_bundle_manifest = fetch_fresh_source_bundle(
             target_symbols=sealed_targets,
             reference_symbols=REFERENCES,
             capability=capability,
             source_dir=source_attempt_dir,
         )
-    except Exception as exc:  # noqa: BLE001
-        write_preflight_failure(
-            "RC2_HOLDOUT_R3_INFRA_INCOMPLETE",
-            {
-                "exception_class": type(exc).__name__,
-                "source_error": str(exc),
-                "reason": "Official archive fresh retrieval failed",
-                "execution_identity": pre_identity.to_dict(),
-            },
-            staging_dir,
-            phase="SOURCE_RETRIEVAL",
+        _json_write(staging_dir / "SOURCE_BUNDLE_MANIFEST.json", source_bundle_manifest)
+
+        # Step 2: DATASET_BUILD
+        phase = "DATASET_BUILD"
+        dataset_preflight = build_dataset(raw, sealed_targets, REFERENCES, include_outcomes=False)
+
+        # Step 3: CONTEXT_AUDIT
+        phase = "CONTEXT_AUDIT"
+        smoke = context_smoke(dataset_preflight, sealed_targets, REFERENCES)
+        full_window_audit = audit_full_window_production_context(
+            dataset_preflight, sealed_targets, REFERENCES
         )
-        return
+        _json_write(staging_dir / "FULL_WINDOW_CONTEXT_AUDIT.json", full_window_audit)
 
-    _json_write(staging_dir / "SOURCE_BUNDLE_MANIFEST.json", source_bundle_manifest)
+        # Step 4: TARGET_1M_AUTHENTICITY
+        phase = "TARGET_1M_AUTHENTICITY"
+        targets_1m_proof: dict[str, Any] = {}
+        targets_1m_all_complete = True
+        for s in sealed_targets:
+            k1m = raw["data"][s]["klines_1m"]
+            complete = (
+                len(k1m) == 41_775
+                and int(k1m[0][0]) == ONE_MIN_START
+                and int(k1m[-1][6]) == DATA_END
+                and all(int(b[0]) - int(a[0]) == 60_000 for a, b in pairwise(k1m))
+            )
+            if not complete:
+                targets_1m_all_complete = False
+            targets_1m_proof[s] = {
+                "candle_count": len(k1m),
+                "expected_count": 41_775,
+                "open_start_ms": int(k1m[0][0]) if k1m else None,
+                "close_end_ms": int(k1m[-1][6]) if k1m else None,
+                "contiguous_60s": complete,
+                "granularity_complete": complete,
+                "outcome_metrics_calculated": False,
+            }
+        _json_write(staging_dir / "TARGET_1M_AUTHENTICITY_PROOF.json", targets_1m_proof)
 
-    # R2.5: Dataset Preflight & Full-Window Context Audit (real production scanner path)
-    dataset_preflight = build_dataset(raw, sealed_targets, REFERENCES, include_outcomes=False)
-    smoke = context_smoke(dataset_preflight, sealed_targets, REFERENCES)
-    full_window_audit = audit_full_window_production_context(
-        dataset_preflight, sealed_targets, REFERENCES
-    )
-    _json_write(staging_dir / "FULL_WINDOW_CONTEXT_AUDIT.json", full_window_audit)
-
-    # Authentic target 1m completeness check
-    targets_1m_proof: dict[str, Any] = {}
-    targets_1m_all_complete = True
-    for s in sealed_targets:
-        k1m = raw["data"][s]["klines_1m"]
-        complete = (
-            len(k1m) == 41_775
-            and int(k1m[0][0]) == ONE_MIN_START
-            and int(k1m[-1][6]) == DATA_END
-            and all(int(b[0]) - int(a[0]) == 60_000 for a, b in pairwise(k1m))
+        # Preflight gate checks
+        preflight_pass = (
+            bool(full_window_audit.get("full_window_audit_passed", False))
+            and targets_1m_all_complete
+            and smoke.get("assessment_count") == len(sealed_targets)
+            and smoke.get("pit_violations") == 0
         )
-        if not complete:
-            targets_1m_all_complete = False
-        targets_1m_proof[s] = {
-            "candle_count": len(k1m),
-            "expected_count": 41_775,
-            "open_start_ms": int(k1m[0][0]) if k1m else None,
-            "close_end_ms": int(k1m[-1][6]) if k1m else None,
-            "contiguous_60s": complete,
-            "granularity_complete": complete,
-            "outcome_metrics_calculated": False,
+
+        pre_outcome_report: dict[str, Any] = {
+            "task_id": TASK_ID,
+            "authorized_runner_sha": authorized_runner_sha,
+            "authorized_runner_sha256": authorized_runner_sha256,
+            "execution_dispatch_sha": execution_dispatch_sha,
+            "authorized_target_seal_sha256": authorized_target_seal_sha256,
+            "branch": BRANCH,
+            "head": pre_identity.git_head,
+            "policy_version": TACTICAL_POLICY_VERSION,
+            "config_hash": CONFIG_HASH,
+            "targets": list(sealed_targets),
+            "context_only": list(REFERENCES),
+            "first_step_ms": FIRST_STEP,
+            "last_step_ms": LAST_STEP,
+            "preflight_pass": preflight_pass,
+            "outcome_replay_unlocked": False,
+            "full_window_audit_passed": full_window_audit.get("full_window_audit_passed", False),
+            "targets_1m_all_complete": targets_1m_all_complete,
+            "context_smoke": smoke,
         }
-    _json_write(staging_dir / "TARGET_1M_AUTHENTICITY_PROOF.json", targets_1m_proof)
+        _json_write(staging_dir / "PRE_OUTCOME_REPORT.json", pre_outcome_report)
 
-    # Preflight gate checks
-    preflight_pass = (
-        full_window_audit["full_window_audit_passed"]
-        and targets_1m_all_complete
-        and smoke["assessment_count"] == len(sealed_targets)
-        and smoke["pit_violations"] == 0
-    )
+        if not preflight_pass:
+            fail_phase = "TARGET_1M_AUTHENTICITY" if not targets_1m_all_complete else "CONTEXT_AUDIT"
+            finalize_failed_attempt(
+                staging_dir,
+                evidence_dir=evidence_dir,
+                terminal="RC2_HOLDOUT_R3_INFRA_INCOMPLETE",
+                phase=fail_phase,
+                exception_class="PreflightAuditFailure",
+                exception_message="Preflight validation failed: full_window_audit, target_1m, or pit audit defect",
+                protected_source_access_started=True,
+                outcome_replay_started=False,
+                target_outcomes_resolved=False,
+                authorized_runner_sha=authorized_runner_sha,
+                authorized_runner_sha256=authorized_runner_sha256,
+                execution_dispatch_sha=execution_dispatch_sha,
+                authorized_target_seal_sha256=authorized_target_seal_sha256,
+                target_symbols=sealed_targets,
+                ledger=ledger,
+                pre_identity=pre_identity,
+                source_bundle_manifest=source_bundle_manifest,
+                detail={
+                    "pre_outcome_report": pre_outcome_report,
+                    "full_window_audit": full_window_audit,
+                    "targets_1m_proof": targets_1m_proof,
+                },
+            )
+            return
 
-    pre_outcome_report: dict[str, Any] = {
-        "task_id": TASK_ID,
-        "authorized_runner_sha": authorized_runner_sha,
-        "authorized_runner_sha256": authorized_runner_sha256,
-        "execution_dispatch_sha": execution_dispatch_sha,
-        "authorized_target_seal_sha256": authorized_target_seal_sha256,
-        "branch": BRANCH,
-        "head": pre_identity.git_head,
-        "policy_version": TACTICAL_POLICY_VERSION,
-        "config_hash": CONFIG_HASH,
-        "targets": list(sealed_targets),
-        "context_only": list(REFERENCES),
-        "first_step_ms": FIRST_STEP,
-        "last_step_ms": LAST_STEP,
-        "preflight_pass": preflight_pass,
-        "outcome_replay_unlocked": False,
-        "full_window_audit_passed": full_window_audit["full_window_audit_passed"],
-        "targets_1m_all_complete": targets_1m_all_complete,
-        "context_smoke": smoke,
-    }
-    _json_write(staging_dir / "PRE_OUTCOME_REPORT.json", pre_outcome_report)
+        # Clean preflight dataset
+        del dataset_preflight, smoke
+        gc.collect()
 
-    if not preflight_pass:
-        write_preflight_failure(
-            "RC2_HOLDOUT_R3_PREFLIGHT_FAIL",
-            {
-                "reason": "Preflight gates failed",
-                "pre_outcome_report": pre_outcome_report,
-                "full_window_audit": full_window_audit,
-            },
-            staging_dir,
-            phase="PREFLIGHT_AUDIT",
+        # Step 5: AUTHORITY_MANIFEST
+        phase = "AUTHORITY_MANIFEST"
+        dataset_outcomes = build_dataset(raw, sealed_targets, REFERENCES, include_outcomes=True)
+        authority_input_manifest = generate_authority_input_manifest(
+            dataset=dataset_outcomes,
+            raw=raw,
+            target_symbols=sealed_targets,
+            reference_symbols=REFERENCES,
+            script_hashes=pre_identity.script_hashes,
+            target_seal_sha256=authorized_target_seal_sha256,
+            source_bundle_digest=source_bundle_manifest["source_bundle_digest"],
         )
-        return
+        auth_manifest_hash_initial = authority_input_manifest["authority_input_manifest_hash"]
+        _json_write(staging_dir / "AUTHORITY_INPUT_MANIFEST.json", authority_input_manifest)
 
-    # Clean preflight dataset
-    del dataset_preflight, smoke
-    gc.collect()
+        print("Preflight gates passed. Unlocking outcome replay for sealed targets...")
+        pre_outcome_report["outcome_replay_unlocked"] = True
+        _json_write(staging_dir / "PRE_OUTCOME_REPORT.json", pre_outcome_report)
 
-    # R2.6: Complete Authority Input Manifest with authentic target 1m
-    dataset_outcomes = build_dataset(raw, sealed_targets, REFERENCES, include_outcomes=True)
-    authority_input_manifest = generate_authority_input_manifest(
-        dataset=dataset_outcomes,
-        raw=raw,
-        target_symbols=sealed_targets,
-        reference_symbols=REFERENCES,
-        script_hashes=pre_identity.script_hashes,
-        target_seal_sha256=authorized_target_seal_sha256,
-        source_bundle_digest=source_bundle_manifest["source_bundle_digest"],
-    )
-    auth_manifest_hash_initial = authority_input_manifest["authority_input_manifest_hash"]
-    _json_write(staging_dir / "AUTHORITY_INPUT_MANIFEST.json", authority_input_manifest)
+        # Step 6: REPLAY_1
+        phase = "REPLAY_1"
+        outcome_replay_started = True
+        config = MarketWatchConfig(symbols=sealed_targets)
+        t0 = time.time()
+        result1 = DeterministicTacticalReplayRunner(
+            dataset_outcomes, config, evaluate_grid_stride=12
+        ).run()
+        gc.collect()
 
-    # OUTCOME Phase: Execute replay twice
-    print("Preflight gates passed. Unlocking outcome replay for sealed targets...")
-    pre_outcome_report["outcome_replay_unlocked"] = True
-    _json_write(staging_dir / "PRE_OUTCOME_REPORT.json", pre_outcome_report)
-
-    config = MarketWatchConfig(symbols=sealed_targets)
-    t0 = time.time()
-    result1 = DeterministicTacticalReplayRunner(
-        dataset_outcomes, config, evaluate_grid_stride=12
-    ).run()
-    gc.collect()
-
-    # Verify authority input manifest unchanged before run 2
-    manifest_pre_run2 = generate_authority_input_manifest(
-        dataset=dataset_outcomes,
-        raw=raw,
-        target_symbols=sealed_targets,
-        reference_symbols=REFERENCES,
-        script_hashes=pre_identity.script_hashes,
-        target_seal_sha256=authorized_target_seal_sha256,
-        source_bundle_digest=source_bundle_manifest["source_bundle_digest"],
-    )
-    if manifest_pre_run2["authority_input_manifest_hash"] != auth_manifest_hash_initial:
-        write_preflight_failure(
-            "RC2_HOLDOUT_R3_INFRA_INCOMPLETE",
-            {"reason": "Authority input manifest mutated between run 1 and run 2"},
-            staging_dir,
-            phase="DETERMINISM",
+        # Step 7: DETERMINISM (pre-run 2)
+        phase = "DETERMINISM"
+        manifest_pre_run2 = generate_authority_input_manifest(
+            dataset=dataset_outcomes,
+            raw=raw,
+            target_symbols=sealed_targets,
+            reference_symbols=REFERENCES,
+            script_hashes=pre_identity.script_hashes,
+            target_seal_sha256=authorized_target_seal_sha256,
+            source_bundle_digest=source_bundle_manifest["source_bundle_digest"],
         )
-        return
+        if manifest_pre_run2["authority_input_manifest_hash"] != auth_manifest_hash_initial:
+            finalize_failed_attempt(
+                staging_dir,
+                evidence_dir=evidence_dir,
+                terminal="RC2_HOLDOUT_R3_INFRA_INCOMPLETE",
+                phase="DETERMINISM",
+                exception_class="ManifestMutationError",
+                exception_message="Authority input manifest mutated between run 1 and run 2",
+                protected_source_access_started=True,
+                outcome_replay_started=True,
+                target_outcomes_resolved=False,
+                authorized_runner_sha=authorized_runner_sha,
+                authorized_runner_sha256=authorized_runner_sha256,
+                execution_dispatch_sha=execution_dispatch_sha,
+                authorized_target_seal_sha256=authorized_target_seal_sha256,
+                target_symbols=sealed_targets,
+                ledger=ledger,
+                pre_identity=pre_identity,
+                source_bundle_manifest=source_bundle_manifest,
+            )
+            return
 
-    result2 = DeterministicTacticalReplayRunner(
-        dataset_outcomes, config, evaluate_grid_stride=12
-    ).run()
-    gc.collect()
-    print(f"Replay runs completed in {time.time() - t0:.2f}s.")
+        # Step 8: REPLAY_2
+        phase = "REPLAY_2"
+        result2 = DeterministicTacticalReplayRunner(
+            dataset_outcomes, config, evaluate_grid_stride=12
+        ).run()
+        gc.collect()
+        target_outcomes_resolved = True
+        print(f"Replay runs completed in {time.time() - t0:.2f}s.")
 
-    # Verify authority input manifest unchanged after run 2
-    manifest_post_run2 = generate_authority_input_manifest(
-        dataset=dataset_outcomes,
-        raw=raw,
-        target_symbols=sealed_targets,
-        reference_symbols=REFERENCES,
-        script_hashes=pre_identity.script_hashes,
-        target_seal_sha256=authorized_target_seal_sha256,
-        source_bundle_digest=source_bundle_manifest["source_bundle_digest"],
-    )
-    if manifest_post_run2["authority_input_manifest_hash"] != auth_manifest_hash_initial:
-        write_preflight_failure(
-            "RC2_HOLDOUT_R3_INFRA_INCOMPLETE",
-            {"reason": "Authority input manifest mutated after run 2"},
-            staging_dir,
-            phase="DETERMINISM",
+        # Step 9: DETERMINISM (post-run 2)
+        phase = "DETERMINISM"
+        manifest_post_run2 = generate_authority_input_manifest(
+            dataset=dataset_outcomes,
+            raw=raw,
+            target_symbols=sealed_targets,
+            reference_symbols=REFERENCES,
+            script_hashes=pre_identity.script_hashes,
+            target_seal_sha256=authorized_target_seal_sha256,
+            source_bundle_digest=source_bundle_manifest["source_bundle_digest"],
         )
-        return
+        if manifest_post_run2["authority_input_manifest_hash"] != auth_manifest_hash_initial:
+            finalize_failed_attempt(
+                staging_dir,
+                evidence_dir=evidence_dir,
+                terminal="RC2_HOLDOUT_R3_INFRA_INCOMPLETE",
+                phase="DETERMINISM",
+                exception_class="ManifestMutationError",
+                exception_message="Authority input manifest mutated after run 2",
+                protected_source_access_started=True,
+                outcome_replay_started=True,
+                target_outcomes_resolved=True,
+                authorized_runner_sha=authorized_runner_sha,
+                authorized_runner_sha256=authorized_runner_sha256,
+                execution_dispatch_sha=execution_dispatch_sha,
+                authorized_target_seal_sha256=authorized_target_seal_sha256,
+                target_symbols=sealed_targets,
+                ledger=ledger,
+                pre_identity=pre_identity,
+                source_bundle_manifest=source_bundle_manifest,
+            )
+            return
 
-    # Determinism check across runs
-    deterministic = (
-        result1["output_manifest"]["input_manifest_hash"]
-        == result2["output_manifest"]["input_manifest_hash"]
-        and result1["output_manifest"]["output_manifest_hash"]
-        == result2["output_manifest"]["output_manifest_hash"]
-    )
+        deterministic = (
+            result1["output_manifest"]["input_manifest_hash"]
+            == result2["output_manifest"]["input_manifest_hash"]
+            and result1["output_manifest"]["output_manifest_hash"]
+            == result2["output_manifest"]["output_manifest_hash"]
+        )
 
-    gate_decision = str(result1["gate_evaluation"]["decision"])
-    terminal = classify_holdout_terminal(gate_decision, deterministic=deterministic)
-    policy_quality_authority = classify_policy_quality_authority(terminal)
+        if not deterministic:
+            finalize_failed_attempt(
+                staging_dir,
+                evidence_dir=evidence_dir,
+                terminal="RC2_HOLDOUT_R3_INFRA_INCOMPLETE",
+                phase="DETERMINISM",
+                exception_class="NondeterministicReplayError",
+                exception_message="Replay runs produced non-identical input or output manifests",
+                protected_source_access_started=True,
+                outcome_replay_started=True,
+                target_outcomes_resolved=True,
+                authorized_runner_sha=authorized_runner_sha,
+                authorized_runner_sha256=authorized_runner_sha256,
+                execution_dispatch_sha=execution_dispatch_sha,
+                authorized_target_seal_sha256=authorized_target_seal_sha256,
+                target_symbols=sealed_targets,
+                ledger=ledger,
+                pre_identity=pre_identity,
+                source_bundle_manifest=source_bundle_manifest,
+                detail={
+                    "run_1_input_manifest_hash": result1["output_manifest"]["input_manifest_hash"],
+                    "run_2_input_manifest_hash": result2["output_manifest"]["input_manifest_hash"],
+                    "run_1_output_manifest_hash": result1["output_manifest"]["output_manifest_hash"],
+                    "run_2_output_manifest_hash": result2["output_manifest"]["output_manifest_hash"],
+                },
+            )
+            return
 
-    # Write staging artifacts
-    _json_write(staging_dir / "OUTPUT_MANIFEST.json", result1["output_manifest"])
-    _json_write(staging_dir / "rolling_oos_table.json", result1["rolling_oos_table"])
-    _json_write(staging_dir / "aggregate_metrics.json", result1["aggregate_oos_metrics"])
+        # Step 10: GATE_EVALUATION
+        phase = "GATE_EVALUATION"
+        gate_decision = str(result1["gate_evaluation"]["decision"])
+        terminal = classify_holdout_terminal(gate_decision, deterministic=deterministic)
+        policy_quality_authority = classify_policy_quality_authority(terminal)
 
-    # Post-execution exact identity verification
-    post_identity = verify_execution_identity(
-        pre_identity=pre_identity,
-        root=root,
-        script_paths=VALIDATION_SCRIPTS,
-    )
-    _json_write(staging_dir / "EXECUTION_IDENTITY.json", post_identity)
+        if terminal == "RC2_HOLDOUT_R3_INFRA_INCOMPLETE":
+            finalize_failed_attempt(
+                staging_dir,
+                evidence_dir=evidence_dir,
+                terminal="RC2_HOLDOUT_R3_INFRA_INCOMPLETE",
+                phase="GATE_EVALUATION",
+                exception_class="UnknownGateDecisionError",
+                exception_message=f"Gate evaluation returned unrecognized decision: {gate_decision}",
+                protected_source_access_started=True,
+                outcome_replay_started=True,
+                target_outcomes_resolved=True,
+                authorized_runner_sha=authorized_runner_sha,
+                authorized_runner_sha256=authorized_runner_sha256,
+                execution_dispatch_sha=execution_dispatch_sha,
+                authorized_target_seal_sha256=authorized_target_seal_sha256,
+                target_symbols=sealed_targets,
+                ledger=ledger,
+                pre_identity=pre_identity,
+                source_bundle_manifest=source_bundle_manifest,
+                detail={"gate_decision": gate_decision},
+            )
+            return
 
-    # Finalize execution access ledger
-    ledger.finalize(staging_dir / "EXECUTION_ACCESS_LEDGER.json")
+        # Step 11: POST_IDENTITY
+        phase = "POST_IDENTITY"
+        post_identity = verify_execution_identity(
+            pre_identity=pre_identity,
+            root=root,
+            script_paths=VALIDATION_SCRIPTS,
+        )
+        if not post_identity or not post_identity.get("exact_runner_identity_verified", False):
+            raise RunnerIdentityMismatchError(
+                f"Post-execution identity verification failed: {post_identity}"
+            )
 
-    evidence_payload = {
-        "task_id": TASK_ID,
-        "gate_decision": gate_decision,
-        "terminal": terminal,
-        "deterministic": deterministic,
-        "policy_quality_authority": policy_quality_authority,
-        "frozen_candidate_sha": FROZEN_POLICY_SHA,
-        "authorized_runner_sha": authorized_runner_sha,
-        "authorized_runner_sha256": authorized_runner_sha256,
-        "execution_dispatch_sha": execution_dispatch_sha,
-        "authorized_target_seal_sha256": authorized_target_seal_sha256,
-        "accepted_normalizer_sha256": ACCEPTED_NORMALIZER_SHA256,
-        "accepted_harness_sha": ACCEPTED_HARNESS_SHA,
-        "branch": BRANCH,
-        "config_hash": CONFIG_HASH,
-        "target_symbols": list(sealed_targets),
-        "context_only_symbols": list(REFERENCES),
-        "reference_outcomes_in_aggregate": False,
-        "authority_input_manifest_hash": auth_manifest_hash_initial,
-        "run_1_output_manifest_hash": result1["output_manifest"]["output_manifest_hash"],
-        "run_2_output_manifest_hash": result2["output_manifest"]["output_manifest_hash"],
-        "run_1_input_manifest_hash": result1["output_manifest"]["input_manifest_hash"],
-        "run_2_input_manifest_hash": result2["output_manifest"]["input_manifest_hash"],
-        "gate_evaluation": result1["gate_evaluation"],
-        "execution_identity": post_identity,
-        "full_window_audit_passed": True,
-        "release_authority": terminal == "RC2_HOLDOUT_R3_PASS",
-        "real_funds_write_authority": "NONE",
-    }
-    _json_write(staging_dir / "EVIDENCE.json", evidence_payload)
+        # Step 12: FINALIZATION
+        phase = "FINALIZATION"
+        _json_write(staging_dir / "OUTPUT_MANIFEST.json", result1["output_manifest"])
+        _json_write(staging_dir / "rolling_oos_table.json", result1["rolling_oos_table"])
+        _json_write(staging_dir / "aggregate_metrics.json", result1["aggregate_oos_metrics"])
+        _json_write(staging_dir / "EXECUTION_IDENTITY.json", post_identity)
 
-    # Emit completion attempt receipt
-    authority_valid = terminal in (
-        "RC2_HOLDOUT_R3_PASS",
-        "RC2_HOLDOUT_R3_FAIL",
-        "RC2_HOLDOUT_R3_DIAGNOSTIC_ONLY",
-    )
-    write_attempt_receipt(
-        staging_dir,
-        phase="COMPLETED",
-        terminal=terminal,
-        target_outcomes_resolved=True,
-        authority_valid=authority_valid,
-        execution_identities=post_identity,
-    )
+        ledger.finalize(staging_dir / "EXECUTION_ACCESS_LEDGER.json")
 
-    # R2.7: Atomic publication of staged evidence
-    shutil.copytree(staging_dir, evidence_dir)
-    shutil.rmtree(staging_dir, ignore_errors=True)
-    print(f"Published authoritative evidence to {evidence_dir}")
-    print(terminal)
+        evidence_payload = {
+            "task_id": TASK_ID,
+            "gate_decision": gate_decision,
+            "terminal": terminal,
+            "deterministic": deterministic,
+            "policy_quality_authority": policy_quality_authority,
+            "frozen_candidate_sha": FROZEN_POLICY_SHA,
+            "authorized_runner_sha": authorized_runner_sha,
+            "authorized_runner_sha256": authorized_runner_sha256,
+            "execution_dispatch_sha": execution_dispatch_sha,
+            "authorized_target_seal_sha256": authorized_target_seal_sha256,
+            "accepted_normalizer_sha256": ACCEPTED_NORMALIZER_SHA256,
+            "accepted_harness_sha": ACCEPTED_HARNESS_SHA,
+            "branch": BRANCH,
+            "config_hash": CONFIG_HASH,
+            "target_symbols": list(sealed_targets),
+            "context_only_symbols": list(REFERENCES),
+            "reference_outcomes_in_aggregate": False,
+            "authority_input_manifest_hash": auth_manifest_hash_initial,
+            "run_1_output_manifest_hash": result1["output_manifest"]["output_manifest_hash"],
+            "run_2_output_manifest_hash": result2["output_manifest"]["output_manifest_hash"],
+            "run_1_input_manifest_hash": result1["output_manifest"]["input_manifest_hash"],
+            "run_2_input_manifest_hash": result2["output_manifest"]["input_manifest_hash"],
+            "gate_evaluation": result1["gate_evaluation"],
+            "execution_identity": post_identity,
+            "full_window_audit_passed": True,
+            "release_authority": terminal == "RC2_HOLDOUT_R3_PASS",
+            "real_funds_write_authority": "NONE",
+            "protected_source_access_started": True,
+            "target_outcome_replay_started": True,
+            "target_outcomes_resolved": True,
+            "access_ledger": ledger.summary(),
+        }
+        _json_write(staging_dir / "EVIDENCE.json", evidence_payload)
+
+        # Emit completion attempt receipt
+        authority_valid = terminal in (
+            "RC2_HOLDOUT_R3_PASS",
+            "RC2_HOLDOUT_R3_FAIL",
+            "RC2_HOLDOUT_R3_DIAGNOSTIC_ONLY",
+        )
+        write_attempt_receipt(
+            staging_dir,
+            phase="COMPLETED",
+            terminal=terminal,
+            target_outcomes_resolved=True,
+            authority_valid=authority_valid,
+            protected_source_access_started=True,
+            target_outcome_replay_started=True,
+            authorized_runner_sha=authorized_runner_sha,
+            authorized_runner_sha256=authorized_runner_sha256,
+            execution_dispatch_sha=execution_dispatch_sha,
+            target_seal_sha256=authorized_target_seal_sha256,
+            target_symbols=sealed_targets,
+            execution_identities=post_identity,
+            post_identity=post_identity,
+            pre_identity=pre_identity.to_dict(),
+            source_bundle_status="AVAILABLE",
+            access_ledger=ledger.summary(),
+        )
+
+        # Step 13: PUBLICATION
+        phase = "PUBLICATION"
+        if not evidence_dir.exists():
+            shutil.copytree(staging_dir, evidence_dir)
+        elif not any(evidence_dir.iterdir()):
+            shutil.copytree(staging_dir, evidence_dir, dirs_exist_ok=True)
+        else:
+            attempt_dir = evidence_dir / f"attempt_{staging_dir.name}"
+            shutil.copytree(staging_dir, attempt_dir)
+        shutil.rmtree(staging_dir, ignore_errors=True)
+        print(f"Published authoritative evidence to {evidence_dir}")
+        print(terminal)
+
+    except Exception as exc:  # noqa: BLE001
+        finalize_failed_attempt(
+            staging_dir,
+            evidence_dir=evidence_dir,
+            terminal="RC2_HOLDOUT_R3_INFRA_INCOMPLETE",
+            phase=phase,
+            exception_class=type(exc).__name__,
+            exception_message=str(exc),
+            protected_source_access_started=protected_source_access_started,
+            outcome_replay_started=outcome_replay_started,
+            target_outcomes_resolved=target_outcomes_resolved,
+            authorized_runner_sha=authorized_runner_sha,
+            authorized_runner_sha256=authorized_runner_sha256,
+            execution_dispatch_sha=execution_dispatch_sha,
+            authorized_target_seal_sha256=authorized_target_seal_sha256,
+            target_symbols=sealed_targets,
+            ledger=ledger,
+            pre_identity=pre_identity,
+            post_identity=post_identity,
+            source_bundle_manifest=source_bundle_manifest,
+        )
 
 
 # Alias for backwards compatibility

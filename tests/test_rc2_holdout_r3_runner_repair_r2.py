@@ -24,7 +24,7 @@ import subprocess
 import sys
 from pathlib import Path
 from typing import Any
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 import pytest
 
@@ -66,6 +66,7 @@ from scripts.rc2.validation.run_holdout_r3 import (
 )
 from scripts.rc2.validation.source_normalizer import (
     ProtectedSymbolFirewallViolation,
+    RunnerIdentityMismatchError,
 )
 from scripts.rc2.validation.target_seal import (
     TARGET_SEAL_SCHEMA_VERSION,
@@ -779,3 +780,482 @@ def test_terminal_release_authority_mapping() -> None:
     assert is_release_authority("RC2_HOLDOUT_R3_DIAGNOSTIC_ONLY") is False
     assert is_release_authority("RC2_HOLDOUT_R3_INFRA_INCOMPLETE") is False
     assert is_release_authority("RC2_HOLDOUT_R3_PREFLIGHT_FAIL") is False
+
+
+# =====================================================================
+# Bounded Fix #2: Durable Failure Publication & Terminal Authority (A - J)
+# =====================================================================
+
+def _make_dummy_bundle_manifest(targets: tuple[str, ...]) -> dict[str, Any]:
+    return {
+        "manifest_version": "SOURCE_BUNDLE_MANIFEST_V1",
+        "task_id": TASK_ID,
+        "timestamp_utc": "2026-10-07T20:00:00Z",
+        "target_symbols": list(targets),
+        "reference_symbols": list(REFERENCES),
+        "source_bundle_digest": "bundle_digest_" + "0" * 50,
+        "archives": [],
+    }
+
+
+def _make_dummy_replay_result(
+    gate_decision: str = "TACTICAL_DECISION_QUALITY_PASS",
+    manifest_suffix: str = "1",
+) -> dict[str, Any]:
+    return {
+        "output_manifest": {
+            "input_manifest_hash": f"input_hash_{manifest_suffix}",
+            "output_manifest_hash": f"output_hash_{manifest_suffix}",
+        },
+        "rolling_oos_table": {"rows": []},
+        "aggregate_oos_metrics": {"sharpe": 1.5},
+        "gate_evaluation": {
+            "decision": gate_decision,
+            "pass": gate_decision == "TACTICAL_DECISION_QUALITY_PASS",
+        },
+    }
+
+
+def _setup_holdout_proof(
+    tmp_path: Path,
+    targets: tuple[str, ...] = ("FILUSDT", "ETCUSDT"),
+) -> tuple[Path, str, AuthorizationProof]:
+    seal_path, seal_sha = _make_dummy_target_seal(tmp_path / "seal.json", targets=targets)
+    proof = AuthorizationProof(
+        authorized_runner_sha="0" * 40,
+        authorized_runner_sha256="0" * 64,
+        execution_dispatch_sha="0" * 40,
+        target_seal_sha256=seal_sha,
+        sealed_targets=targets,
+        allowed_references=REFERENCES,
+        created_at_utc="2026-10-07T20:00:00Z",
+    )
+    return seal_path, seal_sha, proof
+
+
+def test_durable_failure_source_retrieval_after_attempted_access(tmp_path: Path) -> None:
+    """A. Source failure after attempted protected read durably publishes INFRA_INCOMPLETE."""
+    targets = ("FILUSDT", "ETCUSDT")
+    seal_path, seal_sha, proof = _setup_holdout_proof(tmp_path, targets=targets)
+    evidence_dir = tmp_path / "evidence_source_fail"
+
+    def mock_fetch(target_symbols: Any, reference_symbols: Any, capability: Any, source_dir: Any) -> Any:
+        capability.check_access("FILUSDT", caller="test_source_fetch")
+        raise RuntimeError("Simulated network timeout on archive 2")
+
+    with patch("scripts.rc2.validation.run_holdout_r3.check_execution_authorization") as mock_auth, \
+         patch("scripts.rc2.validation.run_holdout_r3.fetch_fresh_source_bundle", side_effect=mock_fetch):
+        mock_auth.return_value = (True, "AUTHORIZED", {"proof": proof, "sealed_targets": list(targets)})
+        execute_holdout(
+            authorized_runner_sha="0" * 40,
+            authorized_runner_sha256="0" * 64,
+            execution_dispatch_sha="0" * 40,
+            target_seal_path=seal_path,
+            authorized_target_seal_sha256=seal_sha,
+            evidence_dir=evidence_dir,
+            root=ROOT,
+        )
+
+    assert evidence_dir.exists()
+    receipt = json.loads((evidence_dir / "ATTEMPT_RECEIPT.json").read_text(encoding="utf-8"))
+    assert receipt["terminal"] == "RC2_HOLDOUT_R3_INFRA_INCOMPLETE"
+    assert receipt["phase"] == "SOURCE_RETRIEVAL"
+    assert receipt["authority_valid"] is False
+    assert receipt["protected_source_access_started"] is True
+    assert receipt["target_outcomes_resolved"] is False
+    assert receipt["exception_class"] == "RuntimeError"
+
+    ledger_path = evidence_dir / "EXECUTION_ACCESS_LEDGER.json"
+    assert ledger_path.exists()
+    ledger_data = json.loads(ledger_path.read_text(encoding="utf-8"))
+    assert ledger_data["total_entries"] > 0
+
+    evidence = json.loads((evidence_dir / "EVIDENCE.json").read_text(encoding="utf-8"))
+    assert evidence["terminal"] == "RC2_HOLDOUT_R3_INFRA_INCOMPLETE"
+    assert evidence["policy_quality_authority"] == "NONE_INFRA_INCOMPLETE"
+    assert evidence["authority_valid"] is False
+    assert evidence["release_authority"] is False
+
+
+def test_durable_failure_dataset_build_exception(tmp_path: Path) -> None:
+    """B. Dataset build exception durably publishes INFRA_INCOMPLETE."""
+    raw = _get_burned_raw_data()
+    targets = ("FILUSDT", "ETCUSDT")
+    seal_path, seal_sha, proof = _setup_holdout_proof(tmp_path, targets=targets)
+    evidence_dir = tmp_path / "evidence_dataset_fail"
+    manifest = _make_dummy_bundle_manifest(targets)
+
+    with patch("scripts.rc2.validation.run_holdout_r3.check_execution_authorization") as mock_auth, \
+         patch("scripts.rc2.validation.run_holdout_r3.fetch_fresh_source_bundle", return_value=(raw, manifest)), \
+         patch("scripts.rc2.validation.run_holdout_r3.build_dataset", side_effect=RuntimeError("Simulated corrupt klines in dataset build")):
+        mock_auth.return_value = (True, "AUTHORIZED", {"proof": proof, "sealed_targets": list(targets)})
+        execute_holdout(
+            authorized_runner_sha="0" * 40,
+            authorized_runner_sha256="0" * 64,
+            execution_dispatch_sha="0" * 40,
+            target_seal_path=seal_path,
+            authorized_target_seal_sha256=seal_sha,
+            evidence_dir=evidence_dir,
+            root=ROOT,
+        )
+
+    assert evidence_dir.exists()
+    receipt = json.loads((evidence_dir / "ATTEMPT_RECEIPT.json").read_text(encoding="utf-8"))
+    assert receipt["terminal"] == "RC2_HOLDOUT_R3_INFRA_INCOMPLETE"
+    assert receipt["phase"] == "DATASET_BUILD"
+    assert receipt["authority_valid"] is False
+    assert receipt["protected_source_access_started"] is True
+    assert receipt["target_outcomes_resolved"] is False
+
+    evidence = json.loads((evidence_dir / "EVIDENCE.json").read_text(encoding="utf-8"))
+    assert evidence["terminal"] == "RC2_HOLDOUT_R3_INFRA_INCOMPLETE"
+    assert evidence["policy_quality_authority"] == "NONE_INFRA_INCOMPLETE"
+    assert (evidence_dir / "EXECUTION_ACCESS_LEDGER.json").exists()
+
+
+def test_durable_failure_context_audit_exception(tmp_path: Path) -> None:
+    """C. Context audit exception durably publishes INFRA_INCOMPLETE."""
+    raw = _get_burned_raw_data()
+    targets = ("FILUSDT", "ETCUSDT")
+    seal_path, seal_sha, proof = _setup_holdout_proof(tmp_path, targets=targets)
+    evidence_dir = tmp_path / "evidence_audit_fail"
+    manifest = _make_dummy_bundle_manifest(targets)
+
+    with patch("scripts.rc2.validation.run_holdout_r3.check_execution_authorization") as mock_auth, \
+         patch("scripts.rc2.validation.run_holdout_r3.fetch_fresh_source_bundle", return_value=(raw, manifest)), \
+         patch("scripts.rc2.validation.run_holdout_r3.context_smoke", return_value={"assessment_count": 2, "pit_violations": 0}), \
+         patch("scripts.rc2.validation.run_holdout_r3.audit_full_window_production_context", side_effect=RuntimeError("Simulated audit defect")):
+        mock_auth.return_value = (True, "AUTHORIZED", {"proof": proof, "sealed_targets": list(targets)})
+        execute_holdout(
+            authorized_runner_sha="0" * 40,
+            authorized_runner_sha256="0" * 64,
+            execution_dispatch_sha="0" * 40,
+            target_seal_path=seal_path,
+            authorized_target_seal_sha256=seal_sha,
+            evidence_dir=evidence_dir,
+            root=ROOT,
+        )
+
+    assert evidence_dir.exists()
+    receipt = json.loads((evidence_dir / "ATTEMPT_RECEIPT.json").read_text(encoding="utf-8"))
+    assert receipt["terminal"] == "RC2_HOLDOUT_R3_INFRA_INCOMPLETE"
+    assert receipt["phase"] == "CONTEXT_AUDIT"
+    assert receipt["authority_valid"] is False
+    assert receipt["protected_source_access_started"] is True
+
+    evidence = json.loads((evidence_dir / "EVIDENCE.json").read_text(encoding="utf-8"))
+    assert evidence["terminal"] == "RC2_HOLDOUT_R3_INFRA_INCOMPLETE"
+    assert evidence["policy_quality_authority"] == "NONE_INFRA_INCOMPLETE"
+
+
+def test_durable_failure_replay_1_exception(tmp_path: Path) -> None:
+    """D. Replay 1 exception sets outcome_replay_started=True and authority_valid=False."""
+    raw = _get_burned_raw_data()
+    targets = ("FILUSDT", "ETCUSDT")
+    seal_path, seal_sha, proof = _setup_holdout_proof(tmp_path, targets=targets)
+    evidence_dir = tmp_path / "evidence_replay1_fail"
+    manifest = _make_dummy_bundle_manifest(targets)
+
+    mock_runner_instance = MagicMock()
+    mock_runner_instance.run.side_effect = RuntimeError("Simulated replay 1 out-of-memory crash")
+
+    with patch("scripts.rc2.validation.run_holdout_r3.check_execution_authorization") as mock_auth, \
+         patch("scripts.rc2.validation.run_holdout_r3.fetch_fresh_source_bundle", return_value=(raw, manifest)), \
+         patch("scripts.rc2.validation.run_holdout_r3.context_smoke", return_value={"assessment_count": 2, "pit_violations": 0}), \
+         patch("scripts.rc2.validation.run_holdout_r3.audit_full_window_production_context", return_value={"full_window_audit_passed": True, "defects_count": 0}), \
+         patch("scripts.rc2.validation.run_holdout_r3.DeterministicTacticalReplayRunner", return_value=mock_runner_instance):
+        mock_auth.return_value = (True, "AUTHORIZED", {"proof": proof, "sealed_targets": list(targets)})
+        execute_holdout(
+            authorized_runner_sha="0" * 40,
+            authorized_runner_sha256="0" * 64,
+            execution_dispatch_sha="0" * 40,
+            target_seal_path=seal_path,
+            authorized_target_seal_sha256=seal_sha,
+            evidence_dir=evidence_dir,
+            root=ROOT,
+        )
+
+    assert evidence_dir.exists()
+    receipt = json.loads((evidence_dir / "ATTEMPT_RECEIPT.json").read_text(encoding="utf-8"))
+    assert receipt["terminal"] == "RC2_HOLDOUT_R3_INFRA_INCOMPLETE"
+    assert receipt["phase"] == "REPLAY_1"
+    assert receipt["authority_valid"] is False
+    assert receipt["protected_source_access_started"] is True
+    assert receipt["target_outcome_replay_started"] is True
+    assert receipt["target_outcomes_resolved"] is False
+
+    evidence = json.loads((evidence_dir / "EVIDENCE.json").read_text(encoding="utf-8"))
+    assert evidence["terminal"] == "RC2_HOLDOUT_R3_INFRA_INCOMPLETE"
+    assert evidence["policy_quality_authority"] == "NONE_INFRA_INCOMPLETE"
+    assert evidence["release_authority"] is False
+
+
+def test_durable_failure_replay_2_exception_emits_no_policy_authority(tmp_path: Path) -> None:
+    """E. Replay 2 exception produces no policy authority even if run 1 had metrics."""
+    raw = _get_burned_raw_data()
+    targets = ("FILUSDT", "ETCUSDT")
+    seal_path, seal_sha, proof = _setup_holdout_proof(tmp_path, targets=targets)
+    evidence_dir = tmp_path / "evidence_replay2_fail"
+    manifest = _make_dummy_bundle_manifest(targets)
+
+    mock_result_1 = _make_dummy_replay_result(gate_decision="TACTICAL_DECISION_QUALITY_PASS", manifest_suffix="1")
+
+    mock_runner_instance = MagicMock()
+    mock_runner_instance.run.side_effect = [
+        mock_result_1,
+        RuntimeError("Simulated replay 2 thread panic"),
+    ]
+
+    with patch("scripts.rc2.validation.run_holdout_r3.check_execution_authorization") as mock_auth, \
+         patch("scripts.rc2.validation.run_holdout_r3.fetch_fresh_source_bundle", return_value=(raw, manifest)), \
+         patch("scripts.rc2.validation.run_holdout_r3.context_smoke", return_value={"assessment_count": 2, "pit_violations": 0}), \
+         patch("scripts.rc2.validation.run_holdout_r3.audit_full_window_production_context", return_value={"full_window_audit_passed": True, "defects_count": 0}), \
+         patch("scripts.rc2.validation.run_holdout_r3.DeterministicTacticalReplayRunner", return_value=mock_runner_instance):
+        mock_auth.return_value = (True, "AUTHORIZED", {"proof": proof, "sealed_targets": list(targets)})
+        execute_holdout(
+            authorized_runner_sha="0" * 40,
+            authorized_runner_sha256="0" * 64,
+            execution_dispatch_sha="0" * 40,
+            target_seal_path=seal_path,
+            authorized_target_seal_sha256=seal_sha,
+            evidence_dir=evidence_dir,
+            root=ROOT,
+        )
+
+    assert evidence_dir.exists()
+    receipt = json.loads((evidence_dir / "ATTEMPT_RECEIPT.json").read_text(encoding="utf-8"))
+    assert receipt["terminal"] == "RC2_HOLDOUT_R3_INFRA_INCOMPLETE"
+    assert receipt["phase"] == "REPLAY_2"
+    assert receipt["authority_valid"] is False
+    assert receipt["protected_source_access_started"] is True
+    assert receipt["target_outcome_replay_started"] is True
+    assert receipt["target_outcomes_resolved"] is False
+
+    evidence = json.loads((evidence_dir / "EVIDENCE.json").read_text(encoding="utf-8"))
+    assert evidence["terminal"] == "RC2_HOLDOUT_R3_INFRA_INCOMPLETE"
+    assert evidence["policy_quality_authority"] == "NONE_INFRA_INCOMPLETE"
+    assert evidence["release_authority"] is False
+
+
+def test_durable_failure_post_identity_failure_yields_infra_incomplete(tmp_path: Path) -> None:
+    """F. Post-identity exception/failure yields INFRA_INCOMPLETE, not prior gate result."""
+    raw = _get_burned_raw_data()
+    targets = ("FILUSDT", "ETCUSDT")
+    seal_path, seal_sha, proof = _setup_holdout_proof(tmp_path, targets=targets)
+    evidence_dir = tmp_path / "evidence_post_id_fail"
+    manifest = _make_dummy_bundle_manifest(targets)
+
+    mock_result = _make_dummy_replay_result(gate_decision="TACTICAL_DECISION_QUALITY_PASS", manifest_suffix="det")
+    mock_runner_instance = MagicMock()
+    mock_runner_instance.run.return_value = mock_result
+
+    with patch("scripts.rc2.validation.run_holdout_r3.check_execution_authorization") as mock_auth, \
+         patch("scripts.rc2.validation.run_holdout_r3.fetch_fresh_source_bundle", return_value=(raw, manifest)), \
+         patch("scripts.rc2.validation.run_holdout_r3.context_smoke", return_value={"assessment_count": 2, "pit_violations": 0}), \
+         patch("scripts.rc2.validation.run_holdout_r3.audit_full_window_production_context", return_value={"full_window_audit_passed": True, "defects_count": 0}), \
+         patch("scripts.rc2.validation.run_holdout_r3.DeterministicTacticalReplayRunner", return_value=mock_runner_instance), \
+         patch("scripts.rc2.validation.run_holdout_r3.verify_execution_identity", side_effect=RunnerIdentityMismatchError("BRANCH_MISMATCH: observed=dirty")):
+        mock_auth.return_value = (True, "AUTHORIZED", {"proof": proof, "sealed_targets": list(targets)})
+        execute_holdout(
+            authorized_runner_sha="0" * 40,
+            authorized_runner_sha256="0" * 64,
+            execution_dispatch_sha="0" * 40,
+            target_seal_path=seal_path,
+            authorized_target_seal_sha256=seal_sha,
+            evidence_dir=evidence_dir,
+            root=ROOT,
+        )
+
+    assert evidence_dir.exists()
+    receipt = json.loads((evidence_dir / "ATTEMPT_RECEIPT.json").read_text(encoding="utf-8"))
+    assert receipt["terminal"] == "RC2_HOLDOUT_R3_INFRA_INCOMPLETE"
+    assert receipt["phase"] == "POST_IDENTITY"
+    assert receipt["authority_valid"] is False
+    assert receipt["protected_source_access_started"] is True
+    assert receipt["target_outcomes_resolved"] is True
+
+    evidence = json.loads((evidence_dir / "EVIDENCE.json").read_text(encoding="utf-8"))
+    assert evidence["terminal"] == "RC2_HOLDOUT_R3_INFRA_INCOMPLETE"
+    assert evidence["policy_quality_authority"] == "NONE_INFRA_INCOMPLETE"
+    assert evidence["release_authority"] is False
+
+
+def test_durable_failure_nondeterministic_replay(tmp_path: Path) -> None:
+    """G. Nondeterministic replay produces durable INFRA_INCOMPLETE."""
+    raw = _get_burned_raw_data()
+    targets = ("FILUSDT", "ETCUSDT")
+    seal_path, seal_sha, proof = _setup_holdout_proof(tmp_path, targets=targets)
+    evidence_dir = tmp_path / "evidence_nondet"
+    manifest = _make_dummy_bundle_manifest(targets)
+
+    mock_result_1 = _make_dummy_replay_result(manifest_suffix="run1")
+    mock_result_2 = _make_dummy_replay_result(manifest_suffix="run2")
+    mock_runner_instance = MagicMock()
+    mock_runner_instance.run.side_effect = [mock_result_1, mock_result_2]
+
+    with patch("scripts.rc2.validation.run_holdout_r3.check_execution_authorization") as mock_auth, \
+         patch("scripts.rc2.validation.run_holdout_r3.fetch_fresh_source_bundle", return_value=(raw, manifest)), \
+         patch("scripts.rc2.validation.run_holdout_r3.context_smoke", return_value={"assessment_count": 2, "pit_violations": 0}), \
+         patch("scripts.rc2.validation.run_holdout_r3.audit_full_window_production_context", return_value={"full_window_audit_passed": True, "defects_count": 0}), \
+         patch("scripts.rc2.validation.run_holdout_r3.DeterministicTacticalReplayRunner", return_value=mock_runner_instance):
+        mock_auth.return_value = (True, "AUTHORIZED", {"proof": proof, "sealed_targets": list(targets)})
+        execute_holdout(
+            authorized_runner_sha="0" * 40,
+            authorized_runner_sha256="0" * 64,
+            execution_dispatch_sha="0" * 40,
+            target_seal_path=seal_path,
+            authorized_target_seal_sha256=seal_sha,
+            evidence_dir=evidence_dir,
+            root=ROOT,
+        )
+
+    assert evidence_dir.exists()
+    receipt = json.loads((evidence_dir / "ATTEMPT_RECEIPT.json").read_text(encoding="utf-8"))
+    assert receipt["terminal"] == "RC2_HOLDOUT_R3_INFRA_INCOMPLETE"
+    assert receipt["phase"] == "DETERMINISM"
+    assert receipt["authority_valid"] is False
+    assert receipt["protected_source_access_started"] is True
+    assert receipt["target_outcomes_resolved"] is True
+
+    evidence = json.loads((evidence_dir / "EVIDENCE.json").read_text(encoding="utf-8"))
+    assert evidence["terminal"] == "RC2_HOLDOUT_R3_INFRA_INCOMPLETE"
+    assert evidence["policy_quality_authority"] == "NONE_INFRA_INCOMPLETE"
+    assert evidence["release_authority"] is False
+
+
+def test_durable_success_pass_published_only_after_post_identity(tmp_path: Path) -> None:
+    """H. Valid PASS success path publishes only after post-identity PASS."""
+    raw = _get_burned_raw_data()
+    targets = ("FILUSDT", "ETCUSDT")
+    seal_path, seal_sha, proof = _setup_holdout_proof(tmp_path, targets=targets)
+    evidence_dir = tmp_path / "evidence_pass"
+    manifest = _make_dummy_bundle_manifest(targets)
+
+    mock_result = _make_dummy_replay_result(gate_decision="TACTICAL_DECISION_QUALITY_PASS", manifest_suffix="det")
+    mock_runner_instance = MagicMock()
+    mock_runner_instance.run.return_value = mock_result
+
+    with patch("scripts.rc2.validation.run_holdout_r3.check_execution_authorization") as mock_auth, \
+         patch("scripts.rc2.validation.run_holdout_r3.fetch_fresh_source_bundle", return_value=(raw, manifest)), \
+         patch("scripts.rc2.validation.run_holdout_r3.context_smoke", return_value={"assessment_count": 2, "pit_violations": 0}), \
+         patch("scripts.rc2.validation.run_holdout_r3.audit_full_window_production_context", return_value={"full_window_audit_passed": True, "defects_count": 0}), \
+         patch("scripts.rc2.validation.run_holdout_r3.DeterministicTacticalReplayRunner", return_value=mock_runner_instance), \
+         patch("scripts.rc2.validation.run_holdout_r3.verify_execution_identity", return_value={"exact_runner_identity_verified": True}):
+        mock_auth.return_value = (True, "AUTHORIZED", {"proof": proof, "sealed_targets": list(targets)})
+        execute_holdout(
+            authorized_runner_sha="0" * 40,
+            authorized_runner_sha256="0" * 64,
+            execution_dispatch_sha="0" * 40,
+            target_seal_path=seal_path,
+            authorized_target_seal_sha256=seal_sha,
+            evidence_dir=evidence_dir,
+            root=ROOT,
+        )
+
+    assert evidence_dir.exists()
+    receipt = json.loads((evidence_dir / "ATTEMPT_RECEIPT.json").read_text(encoding="utf-8"))
+    assert receipt["terminal"] == "RC2_HOLDOUT_R3_PASS"
+    assert receipt["phase"] == "COMPLETED"
+    assert receipt["authority_valid"] is True
+    assert receipt["protected_source_access_started"] is True
+    assert receipt["target_outcome_replay_started"] is True
+    assert receipt["target_outcomes_resolved"] is True
+
+    evidence = json.loads((evidence_dir / "EVIDENCE.json").read_text(encoding="utf-8"))
+    assert evidence["terminal"] == "RC2_HOLDOUT_R3_PASS"
+    assert evidence["policy_quality_authority"] == "PASS"
+    assert evidence["release_authority"] is True
+
+    assert (evidence_dir / "OUTPUT_MANIFEST.json").exists()
+    assert (evidence_dir / "EXECUTION_IDENTITY.json").exists()
+    assert (evidence_dir / "EXECUTION_ACCESS_LEDGER.json").exists()
+
+
+def test_durable_success_fail_remains_valid_policy_fail(tmp_path: Path) -> None:
+    """I. Valid FAIL remains valid policy FAIL."""
+    raw = _get_burned_raw_data()
+    targets = ("FILUSDT", "ETCUSDT")
+    seal_path, seal_sha, proof = _setup_holdout_proof(tmp_path, targets=targets)
+    evidence_dir = tmp_path / "evidence_fail"
+    manifest = _make_dummy_bundle_manifest(targets)
+
+    mock_result = _make_dummy_replay_result(gate_decision="TACTICAL_DECISION_QUALITY_FAIL", manifest_suffix="det")
+    mock_runner_instance = MagicMock()
+    mock_runner_instance.run.return_value = mock_result
+
+    with patch("scripts.rc2.validation.run_holdout_r3.check_execution_authorization") as mock_auth, \
+         patch("scripts.rc2.validation.run_holdout_r3.fetch_fresh_source_bundle", return_value=(raw, manifest)), \
+         patch("scripts.rc2.validation.run_holdout_r3.context_smoke", return_value={"assessment_count": 2, "pit_violations": 0}), \
+         patch("scripts.rc2.validation.run_holdout_r3.audit_full_window_production_context", return_value={"full_window_audit_passed": True, "defects_count": 0}), \
+         patch("scripts.rc2.validation.run_holdout_r3.DeterministicTacticalReplayRunner", return_value=mock_runner_instance), \
+         patch("scripts.rc2.validation.run_holdout_r3.verify_execution_identity", return_value={"exact_runner_identity_verified": True}):
+        mock_auth.return_value = (True, "AUTHORIZED", {"proof": proof, "sealed_targets": list(targets)})
+        execute_holdout(
+            authorized_runner_sha="0" * 40,
+            authorized_runner_sha256="0" * 64,
+            execution_dispatch_sha="0" * 40,
+            target_seal_path=seal_path,
+            authorized_target_seal_sha256=seal_sha,
+            evidence_dir=evidence_dir,
+            root=ROOT,
+        )
+
+    assert evidence_dir.exists()
+    receipt = json.loads((evidence_dir / "ATTEMPT_RECEIPT.json").read_text(encoding="utf-8"))
+    assert receipt["terminal"] == "RC2_HOLDOUT_R3_FAIL"
+    assert receipt["phase"] == "COMPLETED"
+    assert receipt["authority_valid"] is True
+    assert receipt["protected_source_access_started"] is True
+    assert receipt["target_outcome_replay_started"] is True
+    assert receipt["target_outcomes_resolved"] is True
+
+    evidence = json.loads((evidence_dir / "EVIDENCE.json").read_text(encoding="utf-8"))
+    assert evidence["terminal"] == "RC2_HOLDOUT_R3_FAIL"
+    assert evidence["policy_quality_authority"] == "FAIL"
+    assert evidence["release_authority"] is False
+
+
+def test_durable_success_diagnostic_only_remains_diagnostic_only(tmp_path: Path) -> None:
+    """J. DIAGNOSTIC_ONLY remains DIAGNOSTIC_ONLY."""
+    raw = _get_burned_raw_data()
+    targets = ("FILUSDT", "ETCUSDT")
+    seal_path, seal_sha, proof = _setup_holdout_proof(tmp_path, targets=targets)
+    evidence_dir = tmp_path / "evidence_diag"
+    manifest = _make_dummy_bundle_manifest(targets)
+
+    mock_result = _make_dummy_replay_result(
+        gate_decision="TACTICAL_DECISION_QUALITY_DIAGNOSTIC_ONLY", manifest_suffix="det"
+    )
+    mock_runner_instance = MagicMock()
+    mock_runner_instance.run.return_value = mock_result
+
+    with patch("scripts.rc2.validation.run_holdout_r3.check_execution_authorization") as mock_auth, \
+         patch("scripts.rc2.validation.run_holdout_r3.fetch_fresh_source_bundle", return_value=(raw, manifest)), \
+         patch("scripts.rc2.validation.run_holdout_r3.context_smoke", return_value={"assessment_count": 2, "pit_violations": 0}), \
+         patch("scripts.rc2.validation.run_holdout_r3.audit_full_window_production_context", return_value={"full_window_audit_passed": True, "defects_count": 0}), \
+         patch("scripts.rc2.validation.run_holdout_r3.DeterministicTacticalReplayRunner", return_value=mock_runner_instance), \
+         patch("scripts.rc2.validation.run_holdout_r3.verify_execution_identity", return_value={"exact_runner_identity_verified": True}):
+        mock_auth.return_value = (True, "AUTHORIZED", {"proof": proof, "sealed_targets": list(targets)})
+        execute_holdout(
+            authorized_runner_sha="0" * 40,
+            authorized_runner_sha256="0" * 64,
+            execution_dispatch_sha="0" * 40,
+            target_seal_path=seal_path,
+            authorized_target_seal_sha256=seal_sha,
+            evidence_dir=evidence_dir,
+            root=ROOT,
+        )
+
+    assert evidence_dir.exists()
+    receipt = json.loads((evidence_dir / "ATTEMPT_RECEIPT.json").read_text(encoding="utf-8"))
+    assert receipt["terminal"] == "RC2_HOLDOUT_R3_DIAGNOSTIC_ONLY"
+    assert receipt["phase"] == "COMPLETED"
+    assert receipt["authority_valid"] is True
+    assert receipt["protected_source_access_started"] is True
+    assert receipt["target_outcome_replay_started"] is True
+    assert receipt["target_outcomes_resolved"] is True
+
+    evidence = json.loads((evidence_dir / "EVIDENCE.json").read_text(encoding="utf-8"))
+    assert evidence["terminal"] == "RC2_HOLDOUT_R3_DIAGNOSTIC_ONLY"
+    assert evidence["policy_quality_authority"] == "DIAGNOSTIC_ONLY"
+    assert evidence["release_authority"] is False
