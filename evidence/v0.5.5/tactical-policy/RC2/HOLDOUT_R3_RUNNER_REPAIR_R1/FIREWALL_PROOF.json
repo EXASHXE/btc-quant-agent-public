@@ -1,0 +1,41 @@
+{
+  "task_id": "RC2_R3_HOLDOUT_RUNNER_REPAIR_R1",
+  "firewall_status": "ENFORCED_ZERO_PROTECTED_ACCESS",
+  "protected_target_network_access_count": 0,
+  "protected_targets": [
+    "COMPUSDT",
+    "SANDUSDT",
+    "MANAUSDT",
+    "ALGOUSDT",
+    "EGLDUSDT",
+    "GALAUSDT",
+    "THETAUSDT",
+    "APTUSDT"
+  ],
+  "protected_targets_status": "NAMES_ONLY_NO_MARKET_OR_ARCHIVE_DATA_ACCESSED",
+  "market_data_fetched": false,
+  "prices_checked": false,
+  "archive_data_downloaded": false,
+  "holdout_executed": false,
+  "outcome_metrics_generated": false,
+  "r3_target_admissibility": "UNPROVEN_PENDING_FRESH_REVIEW",
+  "test_fixtures_used": [
+    "FILUSDT",
+    "ETCUSDT",
+    "BTCUSDT",
+    "ETHUSDT",
+    "SOLUSDT",
+    "LINKUSDT",
+    "SUIUSDT",
+    "XRPUSDT",
+    "DOGEUSDT",
+    "BNBUSDT"
+  ],
+  "burned_only_fixtures_verified": true,
+  "access_guard_active": true,
+  "construction_access_ledger": {
+    "protected_attempts_count": 0,
+    "allowed_queries_count": 2,
+    "protected_attempts": []
+  }
+}

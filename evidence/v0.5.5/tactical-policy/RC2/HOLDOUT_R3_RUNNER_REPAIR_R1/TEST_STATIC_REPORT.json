@@ -1,0 +1,42 @@
+{
+  "compileall": {
+    "command": "python3 -m compileall src scripts tests",
+    "returncode": 0,
+    "status": "PASS"
+  },
+  "git_diff_check": {
+    "command": "git diff --check",
+    "returncode": 0,
+    "status": "PASS"
+  },
+  "mypy_src": {
+    "command": "mypy",
+    "output": "Success: no issues found in 154 source files",
+    "returncode": 0,
+    "status": "PASS"
+  },
+  "mypy_scripts": {
+    "command": "mypy --explicit-package-bases --ignore-missing-imports scripts/rc2/validation/r3_access_guard.py scripts/rc2/validation/run_holdout_r3.py",
+    "output": "Success: no issues found in 2 source files",
+    "returncode": 0,
+    "status": "PASS"
+  },
+  "ruff": {
+    "command": "ruff check scripts/rc2/validation/ tests/test_rc2_holdout_r3*",
+    "output": "All checks passed!",
+    "returncode": 0,
+    "status": "PASS"
+  },
+  "pytest_repair_suite": {
+    "command": "pytest tests/test_rc2_holdout_r3_runner_repair_r1.py -v",
+    "returncode": 0,
+    "status": "PASS",
+    "summary": "11 passed in 9.03s"
+  },
+  "pytest_freeze_suite": {
+    "command": "pytest tests/test_rc2_holdout_r3_runner_freeze.py -v",
+    "returncode": 0,
+    "status": "PASS",
+    "summary": "10 passed in 106.77s"
+  }
+}

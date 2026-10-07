@@ -1,0 +1,41 @@
+{
+  "task_id": "RC2_R3_HOLDOUT_RUNNER_REPAIR_R1",
+  "changed_files": [
+    {
+      "path": "scripts/rc2/validation/run_holdout_r3.py",
+      "sha256": "46ba79f6a53c1fad44ca04e77b7e08b6407904ae6a2cd191ce37aca88f8fc951"
+    },
+    {
+      "path": "scripts/rc2/validation/r3_access_guard.py",
+      "sha256": "8ab3364abc332b05818c12ab39c4a9c39dfbac0801a074fcebde614cd58c6f35"
+    },
+    {
+      "path": "tests/test_rc2_holdout_r3_runner_repair_r1.py",
+      "sha256": "a50b5f4a75c436043315f3783f18036a0df4d76f799d17adc46fc017624567b4"
+    },
+    {
+      "path": "tests/test_rc2_holdout_r3_runner_freeze.py",
+      "sha256": "c159e3b1c0927895cd509ec9f00ea710eb7da93811003b494231cad1c3e81595"
+    },
+    {
+      "path": "evidence/v0.5.5/tactical-policy/RC2/HOLDOUT_R3_RUNNER_REPAIR_R1/TEST_STATIC_REPORT.json",
+      "sha256": "fdc22e853cf5a72e381173adf6c073dea6003e7645b92e6d4ae46dedcc597927"
+    },
+    {
+      "path": "evidence/v0.5.5/tactical-policy/RC2/HOLDOUT_R3_RUNNER_REPAIR_R1/FIREWALL_PROOF.json",
+      "sha256": "51efd4c54332e4b909bb77d8825758661a6d20163a20e4c1fcb151a291fedaa1"
+    },
+    {
+      "path": "evidence/v0.5.5/tactical-policy/RC2/HOLDOUT_R3_RUNNER_REPAIR_R1/RUNNER_IDENTITY.json",
+      "sha256": "8f8de35bcb2710446560fec8ad9747f0418f498760b2da4fa08c21380037d5c3"
+    },
+    {
+      "path": "evidence/v0.5.5/tactical-policy/RC2/HOLDOUT_R3_RUNNER_REPAIR_R1/REPAIR_MANIFEST.json",
+      "sha256": "6d2f34e9116e4773c80048be38328e9edcfc704f2a46e0a2eb2445fbb73090bf"
+    },
+    {
+      "path": "evidence/v0.5.5/tactical-policy/RC2/HOLDOUT_R3_RUNNER_REPAIR_R1/EVIDENCE.json",
+      "sha256": "6e41bee243c0cad3070ab333e0317b13aab13b105d6cbe6c86a20a596e7629b2"
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "task_id": "RC2_R3_HOLDOUT_RUNNER_REPAIR_R1",
+  "terminal": "RC2_R3_RUNNER_REPAIR_R1_READY_FOR_EXACT_SHA_REVIEW",
+  "repairs": {
+    "R1": {
+      "name": "exact_execution_sha_binding",
+      "status": "IMPLEMENTED_AND_TESTED",
+      "mechanism": "Requires external CLI flags --authorized-runner-sha, --authorized-runner-sha256, and --execution-dispatch-sha at execution preflight. Fails closed before any cache read or network call unless current git branch matches expected validation branch, HEAD matches authorized runner SHA, runner SHA256 matches authorized hash, normalizer SHA256 matches accepted normalizer, validation scripts are clean, and src/** exactly matches frozen policy SHA. Verifies post-execution runner and script identity before releasing final evidence."
+    },
+    "R2": {
+      "name": "cache_authority_binding",
+      "status": "IMPLEMENTED_AND_TESTED",
+      "mechanism": "Validates sidecar identity AND embedded cache identity. Requires both identities to match expected authority identity. Requires source archive URL/digest set to match source manifest. Binds payload content with a canonical payload SHA256. Weak empty-source fallback eliminated. Rejects corrupted, anonymous, or tampered cache."
+    },
+    "R3": {
+      "name": "full_window_context_and_warmup_audit",
+      "status": "IMPLEMENTED_AND_TESTED",
+      "mechanism": "Audits all 2689 decision steps across FIRST_STEP..LAST_STEP for all 8 targets and 8 references. Asserts closed 15m candle, 1h lookback, 4h lookback, non-empty metrics series (oi, taker, gls, top_pos, top_acc), BTC/ETH reference presence, and relative-strength snapshots. Fail-closed before outcome replay on any defect."
+    },
+    "R4": {
+      "name": "validation_authority_input_manifest",
+      "status": "IMPLEMENTED_AND_TESTED",
+      "mechanism": "Computes a canonical validation authority input manifest covering all raw inputs consumed by replay: 15m, 1h, 4h closed candles, 1m outcome candles, all 5 metrics series, and validation scripts for all target and reference symbols. Binds with SHA256."
+    },
+    "R5": {
+      "name": "authoritative_evidence_publication_and_failure_closure",
+      "status": "IMPLEMENTED_AND_TESTED",
+      "mechanism": "Generates 10 standard authority evidence files: PRE_OUTCOME_REPORT.json (with preflight_report.json alias), EXECUTION_IDENTITY.json, SOURCE_CACHE_PROOF.json, FULL_WINDOW_CONTEXT_AUDIT.json, TARGET_1M_AUTHENTICITY_PROOF.json, AUTHORITY_INPUT_MANIFEST.json, OUTPUT_MANIFEST.json, rolling_oos_table.json, aggregate_metrics.json, and EVIDENCE.json. Fails closed with complete evidence set on preflight failure."
+    },
+    "R6": {
+      "name": "admissibility_and_fresh_execution_firewall",
+      "status": "IMPLEMENTED_AND_TESTED",
+      "mechanism": "Marks R3_TARGET_ADMISSIBILITY as UNPROVEN_PENDING_FRESH_REVIEW. Disallows any prior R3 outcome data reuse. Guards all network/disk access with ConstructionAccessLedger ensuring zero protected target access during construction and tests."
+    }
+  }
+}
