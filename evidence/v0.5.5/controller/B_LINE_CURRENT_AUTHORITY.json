@@ -1,6 +1,6 @@
 {
   "line": "B_LINE",
-  "stage": "B_LINE_INITIAL_USABLE_RELEASE_V1_RC2__R3_RUNNER_REPAIR_R2_BOUNDED_FIX_2",
+  "stage": "B_LINE_INITIAL_USABLE_RELEASE_V1_RC2__FINAL_FRESH_HOLDOUT_AUTHORIZED",
   "code_branch": "feature/tactical-policy-r2",
   "accepted_code_sha": "52c16a28153de307dc6132c0975fe29341a0a918",
   "docs_authority_commit": "6319ddbaddd69d5522696992ec1565169da88e03",
@@ -144,7 +144,7 @@
     "live_v1_b4_r6_parent_sha": "a663921abf90504412d0d67b2b9c9f134f204d85",
     "live_v1_b4_r6_controller_sealed": true,
     "live_v1_b5_r6_authorized": false,
-    "live_v1_next_action": "REPAIR_R2_BOUNDED_FIX_2_FAILURE_PUBLICATION",
+    "live_v1_next_action": "EXECUTE_ONE_SHOT_FRESH_HOLDOUT_IN_PARALLEL_WITH_OUTCOME_BLIND_SOL_READINESS",
     "live_v1_b5_r5_findings": [
       "HIGH_PROTECTIVE_TYPED_ALIAS_AMBIGUITY",
       "HIGH_RUNTIME_AUTHORITY_ASYNC_HANDOFF_STALE",
@@ -407,7 +407,15 @@
     ],
     "rc2_final_target_substitution": "FORBIDDEN",
     "rc2_r3_runner_bounded_fix_1_sha": "d58a43f973500131073ba6803b5ab9e060058754",
-    "rc2_r3_runner_bounded_fix_1_status": "SEMANTIC_MAPPING_FIXED_BUT_EXECUTION_STILL_LOCKED"
+    "rc2_r3_runner_bounded_fix_1_status": "SEMANTIC_MAPPING_FIXED_BUT_EXECUTION_STILL_LOCKED",
+    "rc2_final_runner_sha": "d51abdcfa982be132a6fae6c84776f343fae893c",
+    "rc2_final_runner_sha256": "ab7a5795a1f002f93e5ffff658c4be2dd9708b8b23a11801ec122f32e5f05ebd",
+    "rc2_final_execution_dispatch_sha": "ffceccbb1ee28f190d4a8b3340248c753e22d374",
+    "rc2_final_holdout_authorized": true,
+    "rc2_final_holdout_attempt_budget": 1,
+    "rc2_parallel_sol_prompt_commit": "58a143f2e5e4663e43feac7dc74e19328929dd96",
+    "rc2_parallel_sol_mode": "OUTCOME_BLIND_DOWNSTREAM_READINESS",
+    "real_funds_write_authority": "NONE"
   },
   "must_read": [],
   "validation_authority": {
@@ -432,7 +440,7 @@
     "evidence_path": "evidence/v0.5.5/controller/V0.5.5_B2B_CONTROLLER_ACCEPTANCE.json",
     "evidence_blob_sha": "73a11708a85b5f1896397d745c3b7252d3c51f8d"
   },
-  "parallel_authorized_next_stage": "REPAIR_R2_BOUNDED_FIX_2_FAILURE_PUBLICATION",
+  "parallel_authorized_next_stage": "FINAL_FRESH_HOLDOUT_PLUS_OUTCOME_BLIND_SOL_READINESS",
   "live_v1_acceptance_authority": {
     "report_path": "reviews/v0.5/live_v1/V0.5.5_LIVE_V1_B3_CONTROLLER_ACCEPTANCE.md",
     "report_blob_sha": "21ad4492feb4750f5fc85a5f88b54d1da36c157d",
