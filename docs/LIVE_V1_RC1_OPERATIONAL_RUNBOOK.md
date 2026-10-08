@@ -33,7 +33,7 @@ uvicorn btc_quant_agent.api:app --host 127.0.0.1 --port 8787 --workers 1
   ```bash
   python -m btc_quant_agent.api --check-config
   python -m btc_quant_agent.api --print-readiness
-  python -m btc_quant_agent.api --verify-manifest evidence/v0.5.5/live_v1/RC1/WP_D/B_LINE_INITIAL_USABLE_RELEASE_V1_RC1_MANIFEST.json
+  python -m btc_quant_agent.api --verify-manifest evidence/v0.6/b_line/engineering_preview_r1/RELEASE_MANIFEST_TEMPLATE_UNBOUND.json
   ```
 
 ### 1.2 Container & Compose Startup
@@ -314,7 +314,7 @@ Under `SERIALIZED_SINGLE_RUNTIME_INITIALIZER`, `create_app()` runs `_initialize_
 
 ## 6. Evidence, Manifest & Log Locations
 
-- **WP-D Release Manifest**: `evidence/v0.5.5/live_v1/RC1/WP_D/B_LINE_INITIAL_USABLE_RELEASE_V1_RC1_MANIFEST.json`
+- **WP-D Release Manifest**: `evidence/v0.6/b_line/engineering_preview_r1/RELEASE_MANIFEST_TEMPLATE_UNBOUND.json`
 - **WP-D Release Engineering Evidence**: `evidence/v0.5.5/live_v1/RC1/WP_D/EVIDENCE.json`
 - **Prior B-Line Validation Evidence**:
   - `evidence/v0.5.5/live_v1/B3_DAY1_VALIDATION.json`

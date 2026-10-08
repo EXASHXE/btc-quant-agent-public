@@ -24,7 +24,7 @@ from btc_quant_agent.position_supervisor.kill_switch import KillSwitch
 ROOT = Path(__file__).resolve().parents[1]
 MANIFEST_PATH = (
     ROOT
-    / "evidence/v0.5.5/live_v1/RC1/WP_D/B_LINE_INITIAL_USABLE_RELEASE_V1_RC1_MANIFEST.json"
+    / "evidence/v0.6/b_line/engineering_preview_r1/RELEASE_MANIFEST_TEMPLATE_UNBOUND.json"
 )
 RUNBOOK_PATH = ROOT / "docs/LIVE_V1_RC1_OPERATIONAL_RUNBOOK.md"
 ENV_EXAMPLE_PATH = ROOT / ".env.example"

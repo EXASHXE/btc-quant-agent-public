@@ -104,7 +104,7 @@
     "rc1_release_contract": "reviews/v0.5/live_v1/V0.5.5_B_LINE_INITIAL_USABLE_RELEASE_V1_RC1_CONTRACT.md",
     "wp_a_runtime_certification_evidence": "PENDING_WP_A",
     "wp_d_evidence": "evidence/v0.5.5/live_v1/RC1/WP_D/EVIDENCE.json",
-    "wp_d_release_manifest": "evidence/v0.5.5/live_v1/RC1/WP_D/B_LINE_INITIAL_USABLE_RELEASE_V1_RC1_MANIFEST.json"
+    "wp_d_release_manifest": "evidence/v0.6/b_line/engineering_preview_r1/RELEASE_MANIFEST_TEMPLATE_UNBOUND.json"
   },
   "execution_modes": {
     "aliases_normalized_to_dry_run": [

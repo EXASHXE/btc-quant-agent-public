@@ -1086,7 +1086,7 @@ def build_rc1_release_manifest(
             "b4_day2_validation": "evidence/v0.5.5/live_v1/B4_DAY2_VALIDATION.json",
             "wp_a_runtime_certification_evidence": resolved_wp_a_evidence,
             "wp_d_evidence": "evidence/v0.5.5/live_v1/RC1/WP_D/EVIDENCE.json",
-            "wp_d_release_manifest": "evidence/v0.5.5/live_v1/RC1/WP_D/B_LINE_INITIAL_USABLE_RELEASE_V1_RC1_MANIFEST.json",
+            "wp_d_release_manifest": "evidence/v0.6/b_line/engineering_preview_r1/RELEASE_MANIFEST_TEMPLATE_UNBOUND.json",
             "operational_runbook": "docs/LIVE_V1_RC1_OPERATIONAL_RUNBOOK.md",
             "config_template": ".env.example",
         },
