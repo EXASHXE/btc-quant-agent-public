@@ -120,6 +120,13 @@ def main() -> None:
     if mode != "full" and not chosen:
         raise RuntimeError("EMPTY_RISK_SELECTED_SUITE_FAIL_CLOSED")
     cmd = ["pytest", "-q", "--durations=20", "--junitxml=ci-junit.xml", *chosen]
+    # CI planner self-tests alone have no operational IO and do not need the
+    # repository-wide application fixture/import graph. All application tests
+    # must retain conftest hermetic guards.
+    if mode == "focused" and chosen and all(
+        x.startswith("tests/test_ci_") for x in chosen
+    ):
+        cmd.insert(1, "--noconftest")
     print("PROFILE", mode, "CMD", cmd, flush=True)
     subprocess.run(cmd, cwd=ROOT, check=True)
 
