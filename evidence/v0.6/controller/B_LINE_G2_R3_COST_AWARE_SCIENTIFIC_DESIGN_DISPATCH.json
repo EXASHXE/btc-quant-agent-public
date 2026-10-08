@@ -1,0 +1,57 @@
+{
+  "schema_version": "V06_B_LINE_G2_R3_COST_AWARE_SCIENTIFIC_DESIGN_DISPATCH_V1",
+  "task_id": "V06_B_LINE_G2_R3_COST_AWARE_CAMPAIGN_DESIGN_R1",
+  "controller_role": "CHATGPT_0_B_LINE_PRIMARY_CONTROLLER",
+  "decision": "AUTHORIZE_NEW_METHOD_AND_CAMPAIGN_DESIGN_ONLY__NO_NEW_PRICE_READS_OR_REPLAY",
+  "repository": "EXASHXE/btc-quant-agent-public",
+  "docs_parent_sha": "4ad7cf9486d4768ac3e6c4304df353665f90f3cf",
+  "code_baseline_sha": "e0ff8c3473de4bfa3e66fe7928d42992a4d38a32",
+  "source_r2_sha": "2e922f486cf5b3f6cb7fa3aa7823cd096f24c17e",
+  "source_r2_method_preregistered_sha": "66aad50500bf6e860e76bf3ae8c0ef70799d5f47",
+  "source_r2_implementation_sha": "d38f7b45983cd74dc9e28439ebfb2fa60971122a",
+  "evidence_outcome": "EIGHT_DIRECTIONAL_NET_NEGATIVE_BOTH_COST_CASES__ZERO_SHORTLIST__DIAGNOSTIC_ONLY",
+  "target_branch": "feature/v06-bline-g2-r3-cost-aware-method-design",
+  "local_worktree": "/root/workspace/project/quant-v0.6/g2-r3-cost-aware-method-design",
+  "avoid_worktrees": [
+    "/root/workspace/project/rc2-tactical-successor",
+    "/root/workspace/project/quant-v0.6/g1-engineering-preview",
+    "/root/workspace/project/quant-v0.6/g2-strategy-discovery",
+    "/root/workspace/project/quant-v0.6/g2-perp-reconstruction-r2",
+    "/root/workspace/project/quant-v0.6/g3-operational-readiness",
+    "/root/workspace/project/quant-v0.6/controller-review"
+  ],
+  "executor_preference": "SOL_HIGH_PRIMARY_METHOD_DESIGN; GEMINI_CAN_DRAFT_IMPLEMENTATION_PLAN; LUNA_MECHANICAL_ONLY",
+  "scope": "DESIGN_ONLY_NO_NEW_REAL_PRICE_OR_OUTCOME_ACCESS",
+  "allowed_paths": [
+    "docs/strategy_research/g2_r3/**",
+    "evidence/v0.6/b_line/g2_r3_design/**"
+  ],
+  "forbidden_paths": [
+    "src/**",
+    "tests/**",
+    "scripts/**",
+    ".github/workflows/**",
+    "configs/**",
+    "evidence/v0.5.5/**",
+    "evidence/v0.6/controller/**",
+    "evidence/v0.6/b_line/g2_reconstruction_r2/**"
+  ],
+  "research_universe": "BTCUSDT_ETHUSDT_SOLUSDT_BINANCE_USDT_M_PERPETUAL_ALLOWLIST",
+  "candidate_budget": "MAX_12_PER_LATER_SEPARATE_PREREG_CAMPAIGN",
+  "data_requirement": "DEVELOPMENT_EXPOSED; FUTURE_INDEPENDENT_PARTITION_REQUIRES_SEPARATE_AUTHORITY",
+  "protected_rc2": "NO_READ_NO_RETRY",
+  "testnet": "NOT_AUTHORIZED",
+  "real_funds_write_authority": "NONE",
+  "autonomous_live": "FORBIDDEN",
+  "no_360_day_wait_mandate": true,
+  "design_outputs": [
+    "METHOD_DESIGN.md",
+    "SOURCE_QUALITY_AND_COST_FEASIBILITY.md",
+    "CANDIDATE_REGISTER_PROPOSAL.json",
+    "R3_EXECUTION_GATE_PLAN.md",
+    "DESIGN_RECEIPT.json"
+  ],
+  "auto_commit_push": "YES_VERIFY_EXACT_REMOTE_SHA",
+  "next_gate": "CONTROLLER_L2_METHOD_DESIGN_SCIENTIFIC_AUDIT_THEN_SEPARATE_NEW_PREREG_IMPLEMENTATION_DISPATCH",
+  "prompt_path": "prompts/v0.6/b_line/V06_G2_R3_COST_AWARE_STRATEGY_DESIGN_SOL.md"
+}
