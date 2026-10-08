@@ -19,6 +19,13 @@ class FakeResponse:
 
 
 class BinanceSignedTests(unittest.TestCase):
+    def setUp(self) -> None:
+        self.patcher = patch.object(BinanceSignedClient, "_require_mutation_authority", return_value=None)
+        self.patcher.start()
+
+    def tearDown(self) -> None:
+        self.patcher.stop()
+
     @patch(
         "btc_quant_agent.execution.binance_signed.urllib.request.urlopen",
         return_value=FakeResponse(),

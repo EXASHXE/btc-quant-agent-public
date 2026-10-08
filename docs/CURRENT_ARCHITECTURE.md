@@ -38,6 +38,18 @@ versioned configs are retained because current code and guards machine-read them
 Defaults remain `DISABLED`, `auto_execute=false`, `allow_live=false`.
 The legacy performance reader remains explicitly diagnostic-only and read-only.
 
+For the opt-in B-Line Live V1 RC1 service (`B_LINE_INITIAL_USABLE_RELEASE_V1_RC1`),
+the single canonical startup contract is `SERIALIZED_SINGLE_RUNTIME_INITIALIZER`:
+
+```bash
+uvicorn btc_quant_agent.api:app --host 127.0.0.1 --port 8787 --workers 1
+```
+
+Supported Live V1 modes are `DRY_RUN` and `TESTNET` (`LIVE` is unavailable;
+`REAL_FUNDS_WRITE_AUTHORITY = NONE`). Full configuration, readiness matrix,
+persistence, and failure/recovery procedures are documented in
+[LIVE_V1_RC1_OPERATIONAL_RUNBOOK.md](LIVE_V1_RC1_OPERATIONAL_RUNBOOK.md).
+
 ## Deliberately retained leaves
 
 `data/funding.py` and `data/resample.py` provide neutral data primitives.
