@@ -1,0 +1,13 @@
+# R1.1 Controller handoff
+
+Terminal proposal: **R3_METHOD_ADDENDUM_READY_FOR_CONTROLLER_MARK_METADATA_FOUND**. Original design `e5b2006a89441f7eb2ec900e508aff451106b87a` remains immutable ancestor; audit `12793bc04db7414d11a0961684fd14f5df3ce16e` read-only. Addendum closes explicit clock/state/accounting proposals and the official mark-path/object-existence lead. Twelve HEAD200 objects do not establish candle coverage, source receipts, funding cashflow or economic edge.
+
+Controller may responsibly consider **one finite nonprotected DEVELOPMENT DIAGNOSTIC campaign**, only after accepting this method version, resolving remaining proxy constants/reserve bounds/licence publication scope and separately authorizing its frozen preregistration and market-body admission. This is a conditional recommendation, not authorization or a freeze-ready empirical artifact. No immediate positive-shortlist route is certified: fees/impact/filter/funding semantics remain proxy-only and actual mark/trade paths unassessed.
+
+Before price bodies: approve diagnostic-only claim tier, exact8 unchanged proposals/windows/cost cases/reserve parameters/available clocks/controls/support/early stops, licence scope/attribution and budget. Independently verify pushed prereg SHA. After that gate only, admit authentic allowlisted trade/mark bodies and checksums, verify complete active1m paths/contract/schema/clock lineage, no filler. Unknown interval/cap cannot justify fair negative screening;12h stress-geometry ineligibility remains a reported non-evaluation reason.
+
+Block on permission mismatch/commercial intended use without rights, protected source, unknown host/429/403, missing/corrupt active price or mark, unbounded required cost/reserve, lookahead, changed method or inability to push. If no credible diagnostic contract can be frozen, terminate this source route without another open-ended audit or candidate replacement. Sparse negative diagnostics still end the campaign at its fixed budget; supported NO_GO requires its pre-frozen upper-bound/effect rule and reliable costs. No360-day forward is started.
+
+Licence status NONCOMMERCIAL_RESEARCH_SUITABILITY_UNDER_REVIEW; raw redistribution forbidden. Empirical evaluations0, price/ZIP/CSV/rate bodies0, account/provider/API writes0, protected reads0, implementation tests0. RC2_PROTECTED_RETRY=NOT_AUTHORIZED; G4_TESTNET=NOT_AUTHORIZED; REAL_FUNDS_WRITE_AUTHORITY=NONE.
+
+Next: Controller L2 METHOD/SOURCE review, then a separate pushed pre-outcome prereg/body-admission/replay dispatch if accepted. G1/G3 source/ops, H40/H41 issues and release authority are independent; this design does not run or certify them.

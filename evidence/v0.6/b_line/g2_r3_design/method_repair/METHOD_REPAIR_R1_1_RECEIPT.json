@@ -1,0 +1,292 @@
+{
+  "schema_version": "METHOD_REPAIR_R1_1_RECEIPT_V1",
+  "task_id": "V06_G2_R3_METHOD_MARK_SOURCE_REPAIR_R1",
+  "executor_profile": "SOL_HIGH",
+  "controller_dispatch_sha": "52e41bbed246a4c0257834a8d56365beac7ee04e",
+  "code_mainline_sha": "e0ff8c3473de4bfa3e66fe7928d42992a4d38a32",
+  "original_method_sha": "e5b2006a89441f7eb2ec900e508aff451106b87a",
+  "source_audit_sha": "12793bc04db7414d11a0961684fd14f5df3ce16e",
+  "official_source_sha": "f446ce3812bd4e5521f21faecd4ae3c6460e49fc",
+  "branch": "feature/v06-bline-g2-r3-cost-aware-method-design",
+  "worktree": "/root/workspace/project/quant-v0.6/g2-r3-cost-aware-method-design",
+  "environment": {
+    "python": "3.13.13",
+    "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+    "machine": "x86_64",
+    "use": "metadata/document orchestration only;Python3.12 strategy integration not tested or claimed"
+  },
+  "created_utc": "2026-10-08T17:12:04.761687+00:00",
+  "selected_git_inputs": [
+    {
+      "ref": "e5b2006a89441f7eb2ec900e508aff451106b87a",
+      "path": "docs/strategy_research/g2_r3/METHOD_DESIGN.md",
+      "sha256": "14378dde7668291dc87aef91e3e55fadddad3a444d1d49284efa2c3cbcba9a77",
+      "bytes": 17739,
+      "scope": "IMMUTABLE_DESIGN_AUDIT_AUTHORITY_DOCUMENT_ONLY"
+    },
+    {
+      "ref": "e5b2006a89441f7eb2ec900e508aff451106b87a",
+      "path": "docs/strategy_research/g2_r3/SOURCE_QUALITY_AND_COST_FEASIBILITY.md",
+      "sha256": "8095fb8c4c608b548ca143f121c297d03498876fa4512232d06a265659f225a8",
+      "bytes": 8030,
+      "scope": "IMMUTABLE_DESIGN_AUDIT_AUTHORITY_DOCUMENT_ONLY"
+    },
+    {
+      "ref": "e5b2006a89441f7eb2ec900e508aff451106b87a",
+      "path": "docs/strategy_research/g2_r3/R3_EXECUTION_GATE_PLAN.md",
+      "sha256": "8a12d40ebbaf0edb1355f039b0b5adb6d11f4dfda1ba52898f2f3ebdfb938dce",
+      "bytes": 7308,
+      "scope": "IMMUTABLE_DESIGN_AUDIT_AUTHORITY_DOCUMENT_ONLY"
+    },
+    {
+      "ref": "e5b2006a89441f7eb2ec900e508aff451106b87a",
+      "path": "evidence/v0.6/b_line/g2_r3_design/CANDIDATE_REGISTER_PROPOSAL.json",
+      "sha256": "d0f89bddfaec0e57c959cec043969059da10fec8aa45f81669dde8b80ea35a9b",
+      "bytes": 7361,
+      "scope": "IMMUTABLE_DESIGN_AUDIT_AUTHORITY_DOCUMENT_ONLY"
+    },
+    {
+      "ref": "12793bc04db7414d11a0961684fd14f5df3ce16e",
+      "path": "docs/strategy_research/g2_r3/source_audit/SOURCE_SEMANTICS_AND_COST_FEASIBILITY.md",
+      "sha256": "435fe0c8a74912e34087c72246047d3843116d54dc7526ec5ffdffa9fa5320a0",
+      "bytes": 17265,
+      "scope": "IMMUTABLE_DESIGN_AUDIT_AUTHORITY_DOCUMENT_ONLY"
+    },
+    {
+      "ref": "12793bc04db7414d11a0961684fd14f5df3ce16e",
+      "path": "docs/strategy_research/g2_r3/source_audit/METHOD_REPAIR_DECISION.md",
+      "sha256": "f7fefe2b4d798dd712a039f8dc5b76d064e17b94171e2dcc4263518899b59dbf",
+      "bytes": 9265,
+      "scope": "IMMUTABLE_DESIGN_AUDIT_AUTHORITY_DOCUMENT_ONLY"
+    },
+    {
+      "ref": "52e41bbed246a4c0257834a8d56365beac7ee04e",
+      "path": "evidence/v0.6/controller/B_LINE_G2_R3_METHOD_MARK_SOURCE_REPAIR_R1_DISPATCH.json",
+      "sha256": "de89b5fb4e72bfcff0aa2b08d93711f00ecc50e63f0cffa1280f2a3f291c115e",
+      "bytes": 2558,
+      "scope": "IMMUTABLE_DESIGN_AUDIT_AUTHORITY_DOCUMENT_ONLY"
+    },
+    {
+      "ref": "52e41bbed246a4c0257834a8d56365beac7ee04e",
+      "path": "reviews/v0.6/b_line/V06_G2_R3_SOURCE_AUDIT_CONTROLLER_L2_REVIEW.md",
+      "sha256": "2bdabf7389999efbb110770ddea343f7111545cb17ca60253ccd3983ecbc3554",
+      "bytes": 7293,
+      "scope": "IMMUTABLE_DESIGN_AUDIT_AUTHORITY_DOCUMENT_ONLY"
+    }
+  ],
+  "metadata_operations": 17,
+  "metadata_body_bytes": 30785,
+  "metadata_body_plus_retained_headers_bytes": 34220,
+  "budget_max_operations": 40,
+  "budget_max_bytes": 1000000,
+  "objects_head_found": 12,
+  "zip_body_reads": 0,
+  "price_ohlcv_mark_body_reads": 0,
+  "funding_history_reads": 0,
+  "protected_reads": 0,
+  "account_or_signed_api_calls": 0,
+  "orders": 0,
+  "provider_activity": 0,
+  "implementation_tests": 0,
+  "ci_reruns": 0,
+  "empirical_backtests": 0,
+  "candidate_count": 8,
+  "candidate_ids_changed": 0,
+  "source_formula_files_changed": 0,
+  "licensing_status": "NONCOMMERCIAL_RESEARCH_SUITABILITY_UNDER_REVIEW",
+  "scope_terms_preflight": {
+    "current_task_use": "NONCOMMERCIAL_SOURCE_SPECIFICATION_AND_OBJECT_METADATA_RESEARCH_ONLY",
+    "not_authorized_use": [
+      "commercial/live execution",
+      "paid signals",
+      "raw dataset redistribution",
+      "ZIP/CSV download or decoding"
+    ],
+    "basis": "User explicitly authorizes known-path HEAD-only feasibility; retrieved terms describe noncommercial research, no current commercial/live use is exercised",
+    "future_dataset_permission": "CONDITIONAL_CONTROLLER_REVIEW_REQUIRED_BEFORE_PRICE_BODY_ADMISSION",
+    "legal_guarantee": false,
+    "terms_version": "1.0",
+    "terms_last_updated": "2026-08-26",
+    "terms_sha256": "dcf358e9d18f598a7a635fac80f6e643fa24a0e111a4d39bda47f1e246b31eb1",
+    "official_path_claim_review": "four exact Controller-pinned source files checked; downloader never executed"
+  },
+  "sibling_preservation": {
+    "before": [
+      {
+        "path": "/root/workspace/project/rc2-tactical-successor",
+        "head": "1a5756663ecf56ed6c02a7355840f33e6715ea22",
+        "branch": "validation/b-line-rc2-final-holdout-infra-repair-r1",
+        "tracked_dirty_count": 0,
+        "untracked_count": 0
+      },
+      {
+        "path": "/root/workspace/project/quant-v0.6/g1-engineering-preview",
+        "head": "efd73496d01a71a158d67343b64695d33fab16a8",
+        "branch": "feature/v06-bline-engineering-preview-r1",
+        "tracked_dirty_count": 0,
+        "untracked_count": 0
+      },
+      {
+        "path": "/root/workspace/project/quant-v0.6/g2-strategy-discovery",
+        "head": "aab31f8735c8be8f88651ef4677bd0c3a4068cae",
+        "branch": "feature/v06-bline-g2-strategy-discovery-r1",
+        "tracked_dirty_count": 0,
+        "untracked_count": 0
+      },
+      {
+        "path": "/root/workspace/project/quant-v0.6/g2-perp-reconstruction-r2",
+        "head": "2e922f486cf5b3f6cb7fa3aa7823cd096f24c17e",
+        "branch": "feature/v06-bline-g2-perp-reconstruction-r2",
+        "tracked_dirty_count": 0,
+        "untracked_count": 0
+      },
+      {
+        "path": "/root/workspace/project/quant-v0.6/g3-operational-readiness",
+        "head": "1b4ba5ace44a84af03a734462b468e597e62c85b",
+        "branch": "feature/v06-bline-g3-operational-readiness-r1",
+        "tracked_dirty_count": 0,
+        "untracked_count": 0
+      },
+      {
+        "path": "/root/workspace/project/quant-v0.6/controller-review",
+        "head": "d6500140f3141d179181f2360ad815b5bfe9c954",
+        "branch": "",
+        "tracked_dirty_count": 0,
+        "untracked_count": 0
+      },
+      {
+        "path": "/root/workspace/project/quant-v0.6/g2-r3-source-feasibility-r1",
+        "head": "12793bc04db7414d11a0961684fd14f5df3ce16e",
+        "branch": "feature/v06-bline-g2-r3-source-feasibility-r1",
+        "tracked_dirty_count": 0,
+        "untracked_count": 0
+      }
+    ],
+    "after": [
+      {
+        "path": "/root/workspace/project/rc2-tactical-successor",
+        "head": "1a5756663ecf56ed6c02a7355840f33e6715ea22",
+        "branch": "validation/b-line-rc2-final-holdout-infra-repair-r1",
+        "tracked_dirty_count": 0,
+        "untracked_count": 0
+      },
+      {
+        "path": "/root/workspace/project/quant-v0.6/g1-engineering-preview",
+        "head": "efd73496d01a71a158d67343b64695d33fab16a8",
+        "branch": "feature/v06-bline-engineering-preview-r1",
+        "tracked_dirty_count": 0,
+        "untracked_count": 0
+      },
+      {
+        "path": "/root/workspace/project/quant-v0.6/g2-strategy-discovery",
+        "head": "aab31f8735c8be8f88651ef4677bd0c3a4068cae",
+        "branch": "feature/v06-bline-g2-strategy-discovery-r1",
+        "tracked_dirty_count": 0,
+        "untracked_count": 0
+      },
+      {
+        "path": "/root/workspace/project/quant-v0.6/g2-perp-reconstruction-r2",
+        "head": "2e922f486cf5b3f6cb7fa3aa7823cd096f24c17e",
+        "branch": "feature/v06-bline-g2-perp-reconstruction-r2",
+        "tracked_dirty_count": 0,
+        "untracked_count": 0
+      },
+      {
+        "path": "/root/workspace/project/quant-v0.6/g3-operational-readiness",
+        "head": "1b4ba5ace44a84af03a734462b468e597e62c85b",
+        "branch": "feature/v06-bline-g3-operational-readiness-r1",
+        "tracked_dirty_count": 0,
+        "untracked_count": 0
+      },
+      {
+        "path": "/root/workspace/project/quant-v0.6/controller-review",
+        "head": "d6500140f3141d179181f2360ad815b5bfe9c954",
+        "branch": "",
+        "tracked_dirty_count": 0,
+        "untracked_count": 0
+      },
+      {
+        "path": "/root/workspace/project/quant-v0.6/g2-r3-source-feasibility-r1",
+        "head": "12793bc04db7414d11a0961684fd14f5df3ce16e",
+        "branch": "feature/v06-bline-g2-r3-source-feasibility-r1",
+        "tracked_dirty_count": 0,
+        "untracked_count": 0
+      }
+    ],
+    "match": true,
+    "scope": "seven other checkout HEAD/branch/tracked-dirty/untracked counts only;authorized Git ref fetch/design append excluded"
+  },
+  "terminal_status": "R3_METHOD_ADDENDUM_READY_FOR_CONTROLLER_MARK_METADATA_FOUND",
+  "validation": {
+    "json_syntax": "PASS",
+    "changed_scope": "PASS",
+    "diff_check": "PASS",
+    "readability_and_proposal_vs_observation": "PASS",
+    "actual_static_doc_hashes_verified": 5,
+    "selected_immutable_git_input_hashes_verified": 8,
+    "original_design_artifacts_byte_identical": 7,
+    "sibling_worktrees_preserved": 7,
+    "metadata_request_budget": "17/40 operations;30785/1000000 allowed body bytes",
+    "metadata_plus_retained_headers_bytes": 34220,
+    "zip_or_price_body_reads": 0,
+    "implementation_tests_run": 0,
+    "commands": [
+      "JSON parse all3 new evidence files",
+      "SHA2565 allowed static documents and8 named Git inputs",
+      "byte compare7 original design artifacts to e5b2006a89441f7eb2ec900e508aff451106b87a",
+      "7 sibling HEAD/branch/status count comparison",
+      "git diff --cached --check",
+      "git diff --cached --name-only prefix whitelist",
+      "git show :<each new staged path> exact reviewed byte match"
+    ],
+    "source_and_preservation_check_seconds": 0.454289
+  },
+  "local_commit_sha": "Bound by subsequent publication receipt;no circular self SHA",
+  "final_remote_sha": "Independently verified after final push and reported in terminal",
+  "real_funds_write_authority": "NONE",
+  "g4_testnet": "NOT_AUTHORIZED",
+  "rc2_protected_retry": "NOT_AUTHORIZED",
+  "proof_scope": "Scoped executor actions/HTTP and Git receipts;not OS/network-wide telemetry about other actors",
+  "next_controller_gate": "CONTROLLER_L2_METHOD_SOURCE_REVIEW_THEN_SEPARATE_PREOUTCOME_PREREG_AND_BODY_ADMISSION_IF_ACCEPTED",
+  "original_seven_design_artifact_sha256_unchanged": {
+    "docs/strategy_research/g2_r3/METHOD_DESIGN.md": "14378dde7668291dc87aef91e3e55fadddad3a444d1d49284efa2c3cbcba9a77",
+    "docs/strategy_research/g2_r3/SOURCE_QUALITY_AND_COST_FEASIBILITY.md": "8095fb8c4c608b548ca143f121c297d03498876fa4512232d06a265659f225a8",
+    "docs/strategy_research/g2_r3/R3_EXECUTION_GATE_PLAN.md": "8a12d40ebbaf0edb1355f039b0b5adb6d11f4dfda1ba52898f2f3ebdfb938dce",
+    "evidence/v0.6/b_line/g2_r3_design/CANDIDATE_REGISTER_PROPOSAL.json": "d0f89bddfaec0e57c959cec043969059da10fec8aa45f81669dde8b80ea35a9b",
+    "evidence/v0.6/b_line/g2_r3_design/DESIGN_RECEIPT.json": "5b362e230be6886255dca33bef64f9a61637ff88c26fe3e90ff1f2e64da8fdbd",
+    "evidence/v0.6/b_line/g2_r3_design/WORKTREE_PRESERVATION.json": "182f702c8f69190073afcf64ff2f8152945cb3ade016afe3c9c2a8381f8f3c5d",
+    "evidence/v0.6/b_line/g2_r3_design/PUBLICATION_RECEIPT.json": "af45fba5c08d36e1fa06674b17a3f456bb4b61a8f382b272052208e1ebae77df"
+  },
+  "independent_review": {
+    "reviewer": "/root/r2_kernel_review",
+    "iterations": 1,
+    "scope": "seven new draft artifacts only;no network/code/tests/cache/outcomes",
+    "finding": "No additional material contradiction beyond parent-identified reserve/ack/target details",
+    "parent_repairs": [
+      "explicit1.10 scenario buffer,closed reserve/sizing equations and release-once bookkeeping",
+      "typed acknowledgment priority and delayed funding ownership acknowledgment",
+      "same-open gapSL/gapTP/expiry and forced target cap",
+      "explicit high-water/cooldown timing"
+    ],
+    "parent_post_repair_document_checks": "PASS",
+    "independent_second_review": false,
+    "not_claimed": "implemented/tested ledger or source/alpha certification"
+  },
+  "changed_paths": [
+    "docs/strategy_research/g2_r3/method_repair/METHOD_R1_1_PIT_COST_ACCOUNTING.md",
+    "docs/strategy_research/g2_r3/method_repair/R1_1_CONTROLLER_HANDOFF.md",
+    "docs/strategy_research/g2_r3/method_repair/R1_1_FUNDING_COST_AND_SUPPORT.md",
+    "docs/strategy_research/g2_r3/method_repair/R1_1_SOURCE_AND_LICENSE_ADMISSION.md",
+    "evidence/v0.6/b_line/g2_r3_design/method_repair/MARK_ARCHIVE_METADATA_HEAD_LEDGER.json",
+    "evidence/v0.6/b_line/g2_r3_design/method_repair/METHOD_REPAIR_R1_1_GATE_MATRIX.json",
+    "evidence/v0.6/b_line/g2_r3_design/method_repair/METHOD_REPAIR_R1_1_RECEIPT.json"
+  ],
+  "new_artifact_sha256_excluding_self": {
+    "docs/strategy_research/g2_r3/method_repair/METHOD_R1_1_PIT_COST_ACCOUNTING.md": "a2943c9a541d93eaceb62a664edf0d03f0c9bbab6f4c4f73752831bcf14eb026",
+    "docs/strategy_research/g2_r3/method_repair/R1_1_CONTROLLER_HANDOFF.md": "793c2a9621e4859393c96f6eca31c09f0908e0de08313ef212c12b6d6574156b",
+    "docs/strategy_research/g2_r3/method_repair/R1_1_FUNDING_COST_AND_SUPPORT.md": "f64520650a00e6784da94c4687caa8809430895fa268b56600ed7b47aad71415",
+    "docs/strategy_research/g2_r3/method_repair/R1_1_SOURCE_AND_LICENSE_ADMISSION.md": "784b437193c9ea10d4de1b650e319fd8445022a0c3a0d12494734d1cf90d7963",
+    "evidence/v0.6/b_line/g2_r3_design/method_repair/MARK_ARCHIVE_METADATA_HEAD_LEDGER.json": "dd5d3de3f8a4d4c7f393e253b7fa390834830c5671bcb5ac7e74c2fc3990de53",
+    "evidence/v0.6/b_line/g2_r3_design/method_repair/METHOD_REPAIR_R1_1_GATE_MATRIX.json": "175b608ca111dbd4f34ef5caadbcfbe3f340c7be3f183645269fcd2135d02cf9"
+  }
+}

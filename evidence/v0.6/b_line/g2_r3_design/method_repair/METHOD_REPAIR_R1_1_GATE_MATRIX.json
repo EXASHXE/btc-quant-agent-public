@@ -1,0 +1,91 @@
+{
+  "schema_version": "METHOD_REPAIR_R1_1_GATE_MATRIX_V1",
+  "task_id": "V06_G2_R3_METHOD_MARK_SOURCE_REPAIR_R1",
+  "terminal_status": "R3_METHOD_ADDENDUM_READY_FOR_CONTROLLER_MARK_METADATA_FOUND",
+  "verdict_vocabulary": [
+    "OPEN",
+    "CLOSED_FOR_DESIGN",
+    "BLOCKED",
+    "PROXY_ONLY"
+  ],
+  "gates": [
+    {
+      "gate": "IMMUTABLE_TASK_AND_ORIGINAL_METHOD",
+      "verdict": "CLOSED_FOR_DESIGN",
+      "reason": "Exact clean starting design/mainline/authority/source audit identities verified;8 original proposals unchanged"
+    },
+    {
+      "gate": "OFFICIAL_MARK_PATH",
+      "verdict": "CLOSED_FOR_DESIGN",
+      "reason": "Four pinned official files verify explicit UM1m monthly symbol path, no downloader execution"
+    },
+    {
+      "gate": "TWELVE_MARK_OBJECT_HEADERS",
+      "verdict": "CLOSED_FOR_DESIGN",
+      "reason": "12 HEAD200, zero ZIP bytes; object existence metadata only"
+    },
+    {
+      "gate": "ACTUAL_MARK_TRADE_CONTINUITY",
+      "verdict": "OPEN",
+      "reason": "Every body/schema/gap/duplicate/hash/contract/price path remains NOT_ASSESSED; future authority required"
+    },
+    {
+      "gate": "TWO_CLOCK_ORDERING",
+      "verdict": "CLOSED_FOR_DESIGN",
+      "reason": "Explicit lag/ack message order,delayed risk action,SL-first/funding ownership/kill/rounding and independent books proposed; no implementation certification"
+    },
+    {
+      "gate": "RESERVE_AND_CAP_PARAMETERS",
+      "verdict": "OPEN",
+      "reason": "Explicit1.10 scenario buffer,closed sizing/reserve equations and release-once contract proposed;actual interval/cap/filter bounds remain unverified before future freeze."
+    },
+    {
+      "gate": "FUNDING_SCHEDULE_PUBLICATION",
+      "verdict": "PROXY_ONLY",
+      "reason": "FUNDING_EVENT_SCHEDULE_UNVERIFIED;4/8bp/hypothetical hourly scenario,12h geometry ineligible not alpha failure"
+    },
+    {
+      "gate": "COST_AND_FILTER_MEASUREMENT",
+      "verdict": "PROXY_ONLY",
+      "reason": "6/2/3 versus12/4/6 unchanged,fees/impact/history unknown;PROXY_COST_DIAGNOSTIC_ONLY"
+    },
+    {
+      "gate": "SUPPORT_INFORMATION_CLASSES",
+      "verdict": "CLOSED_FOR_DESIGN",
+      "reason": "Positive100/fold distinct from sparse diagnostic and supported upper-bound<5bp economic NO_GO;future approval needed"
+    },
+    {
+      "gate": "NONCOMMERCIAL_PERMISSION",
+      "verdict": "OPEN",
+      "reason": "NONCOMMERCIAL_RESEARCH_SUITABILITY_UNDER_REVIEW;present metadata scope reviewed,future body/publication rights conditional"
+    },
+    {
+      "gate": "COMMERCIAL_LIVE_OR_RAW_REDISTRIBUTION",
+      "verdict": "BLOCKED",
+      "reason": "No rights/authority established;no raw datasets,orders,paid signals or live use"
+    },
+    {
+      "gate": "FINITE_DIAGNOSTIC_PIPELINE_BUDGET",
+      "verdict": "OPEN",
+      "reason": "12 mark objects metadata size estimate only;full1GB/250-request pipeline not certified"
+    },
+    {
+      "gate": "FUTURE_FIRST_PUSH_PREREG",
+      "verdict": "BLOCKED",
+      "reason": "This addendum is not prereg/execution authority;new Controller dispatch and verified freeze required"
+    },
+    {
+      "gate": "SOURCE_PROTECTION_NO_OUTCOMES",
+      "verdict": "CLOSED_FOR_DESIGN",
+      "reason": "17 admissible metadata operations,price/rate/ZIP/CSV reads0,protected reads0,tests0"
+    }
+  ],
+  "freeze_ready": false,
+  "addendum_ready_for_controller": true,
+  "candidate_count_unchanged": 8,
+  "empirical_evaluations": 0,
+  "source_body_quality": "NOT_ASSESSED",
+  "licensing_status": "NONCOMMERCIAL_RESEARCH_SUITABILITY_UNDER_REVIEW",
+  "diagnostic_campaign_recommendation": "CONDITIONAL_ONE_FINITE_CAMPAIGN_ONLY_AFTER_SEPARATE_ACCEPTED_PREREG_SOURCE_PERMISSION_CLOSURE",
+  "alpha_or_shortlist_certified": false
+}

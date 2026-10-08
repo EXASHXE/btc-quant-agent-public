@@ -1,0 +1,762 @@
+{
+  "requests": [
+    {
+      "id": 1,
+      "url": "https://raw.githubusercontent.com/binance/binance-public-data/f446ce3812bd4e5521f21faecd4ae3c6460e49fc/python/README.md",
+      "initial_url": "https://raw.githubusercontent.com/binance/binance-public-data/f446ce3812bd4e5521f21faecd4ae3c6460e49fc/python/README.md",
+      "method": "GET",
+      "purpose": "PINNED_OFFICIAL_TECHNICAL_SOURCE_ONLY",
+      "retrieved_utc": "2026-10-08T17:00:54.500242+00:00",
+      "authenticated": false,
+      "body_bytes_read": 9378,
+      "body_sha256": "5d5e3a0bd69469bad8addb0e2db3015b6bf8ada10ce71a8ae81d5d1e5b792b8c",
+      "redirect_hop": 0,
+      "source_sha": "f446ce3812bd4e5521f21faecd4ae3c6460e49fc",
+      "http_status": 200,
+      "headers": {
+        "Content-Length": "9378",
+        "Content-Type": "text/plain; charset=utf-8",
+        "ETag": "\"b4004953240d9f0b0ec9d63b4e694fa34af919976ae4586599a6772e18308e5e\"",
+        "Date": "Thu, 08 Oct 2026 17:00:55 GMT"
+      },
+      "final_host": "raw.githubusercontent.com",
+      "cache_name": "official_README_md.txt",
+      "result": "STATIC_DOCUMENT_ONLY",
+      "retained_header_serialization_bytes": 192
+    },
+    {
+      "id": 2,
+      "url": "https://raw.githubusercontent.com/binance/binance-public-data/f446ce3812bd4e5521f21faecd4ae3c6460e49fc/python/download-futures-markPriceKlines.py",
+      "initial_url": "https://raw.githubusercontent.com/binance/binance-public-data/f446ce3812bd4e5521f21faecd4ae3c6460e49fc/python/download-futures-markPriceKlines.py",
+      "method": "GET",
+      "purpose": "PINNED_OFFICIAL_TECHNICAL_SOURCE_ONLY",
+      "retrieved_utc": "2026-10-08T17:00:55.446940+00:00",
+      "authenticated": false,
+      "body_bytes_read": 4992,
+      "body_sha256": "e701b6dc4104c688285b1a17ef42833f65061a34d1555e7c94dedc1c5ed156a3",
+      "redirect_hop": 0,
+      "source_sha": "f446ce3812bd4e5521f21faecd4ae3c6460e49fc",
+      "http_status": 200,
+      "headers": {
+        "Content-Length": "4992",
+        "Content-Type": "text/plain; charset=utf-8",
+        "ETag": "\"b48c8f67f2c1e9112a284f0aede438b85ba36b5efab6da93d270c9820ad7e1de\"",
+        "Date": "Thu, 08 Oct 2026 17:00:56 GMT"
+      },
+      "final_host": "raw.githubusercontent.com",
+      "cache_name": "official_download-futures-markPriceKlines_py.txt",
+      "result": "STATIC_DOCUMENT_ONLY",
+      "retained_header_serialization_bytes": 192
+    },
+    {
+      "id": 3,
+      "url": "https://raw.githubusercontent.com/binance/binance-public-data/f446ce3812bd4e5521f21faecd4ae3c6460e49fc/python/utility.py",
+      "initial_url": "https://raw.githubusercontent.com/binance/binance-public-data/f446ce3812bd4e5521f21faecd4ae3c6460e49fc/python/utility.py",
+      "method": "GET",
+      "purpose": "PINNED_OFFICIAL_TECHNICAL_SOURCE_ONLY",
+      "retrieved_utc": "2026-10-08T17:00:56.407713+00:00",
+      "authenticated": false,
+      "body_bytes_read": 6073,
+      "body_sha256": "c5371fc1ef92e7dd9c4090656dddc6b64d473d33c9e1beee3e14f90e8d88faeb",
+      "redirect_hop": 0,
+      "source_sha": "f446ce3812bd4e5521f21faecd4ae3c6460e49fc",
+      "http_status": 200,
+      "headers": {
+        "Content-Length": "6073",
+        "Content-Type": "text/plain; charset=utf-8",
+        "ETag": "\"22ba9b350df737e3c4cfb3e4a75da4989f71fd90e92241a203cfef67498a428d\"",
+        "Date": "Thu, 08 Oct 2026 17:00:57 GMT"
+      },
+      "final_host": "raw.githubusercontent.com",
+      "cache_name": "official_utility_py.txt",
+      "result": "STATIC_DOCUMENT_ONLY",
+      "retained_header_serialization_bytes": 192
+    },
+    {
+      "id": 4,
+      "url": "https://raw.githubusercontent.com/binance/binance-public-data/f446ce3812bd4e5521f21faecd4ae3c6460e49fc/python/enums.py",
+      "initial_url": "https://raw.githubusercontent.com/binance/binance-public-data/f446ce3812bd4e5521f21faecd4ae3c6460e49fc/python/enums.py",
+      "method": "GET",
+      "purpose": "PINNED_OFFICIAL_TECHNICAL_SOURCE_ONLY",
+      "retrieved_utc": "2026-10-08T17:00:57.233739+00:00",
+      "authenticated": false,
+      "body_bytes_read": 544,
+      "body_sha256": "a9c5409125fcc29b95ca9807450b6189701c366b9a2c93c8b693c219e1606293",
+      "redirect_hop": 0,
+      "source_sha": "f446ce3812bd4e5521f21faecd4ae3c6460e49fc",
+      "http_status": 200,
+      "headers": {
+        "Content-Length": "544",
+        "Content-Type": "text/plain; charset=utf-8",
+        "ETag": "\"49bca1009bfc5f8591aae30401c3281b73e0e58118fff074f8e5f09e8594113f\"",
+        "Date": "Thu, 08 Oct 2026 17:00:58 GMT"
+      },
+      "final_host": "raw.githubusercontent.com",
+      "cache_name": "official_enums_py.txt",
+      "result": "STATIC_DOCUMENT_ONLY",
+      "retained_header_serialization_bytes": 191
+    },
+    {
+      "id": 5,
+      "url": "https://raw.githubusercontent.com/binance/binance-public-data/master/TERMS_AND_CONDITIONS.md",
+      "initial_url": "https://raw.githubusercontent.com/binance/binance-public-data/master/TERMS_AND_CONDITIONS.md",
+      "method": "GET",
+      "purpose": "OFFICIAL_CURRENT_TERMS_ONLY",
+      "retrieved_utc": "2026-10-08T17:00:58.034094+00:00",
+      "authenticated": false,
+      "body_bytes_read": 9798,
+      "body_sha256": "dcf358e9d18f598a7a635fac80f6e643fa24a0e111a4d39bda47f1e246b31eb1",
+      "redirect_hop": 0,
+      "http_status": 200,
+      "headers": {
+        "Content-Length": "9798",
+        "Content-Type": "text/plain; charset=utf-8",
+        "ETag": "\"b5f503f7e64c6b9a735da0f635f9b36cf8e7242403bb5c845c17f3e3a4c10748\"",
+        "Date": "Thu, 08 Oct 2026 17:00:59 GMT"
+      },
+      "final_host": "raw.githubusercontent.com",
+      "cache_name": "current_dataset_terms.txt",
+      "result": "STATIC_DOCUMENT_ONLY",
+      "retained_header_serialization_bytes": 192
+    },
+    {
+      "id": 6,
+      "url": "https://data.binance.vision/data/futures/um/monthly/markPriceKlines/BTCUSDT/1m/BTCUSDT-1m-2026-01.zip",
+      "initial_url": "https://data.binance.vision/data/futures/um/monthly/markPriceKlines/BTCUSDT/1m/BTCUSDT-1m-2026-01.zip",
+      "method": "HEAD",
+      "purpose": "EXACT_ALLOWLIST_ZIP_HEAD_ONLY",
+      "retrieved_utc": "2026-10-08T17:05:15.645514+00:00",
+      "authenticated": false,
+      "body_bytes_read": 0,
+      "body_sha256": null,
+      "redirect_hop": 0,
+      "symbol": "BTCUSDT",
+      "month": "2026-01",
+      "http_status": 200,
+      "headers": {
+        "Content-Type": "binary/octet-stream",
+        "Content-Length": "1034512",
+        "Date": "Thu, 08 Oct 2026 17:05:17 GMT",
+        "Last-Modified": "Mon, 02 Feb 2026 10:10:27 GMT",
+        "ETag": "\"fea4208529f949fda2901d5b372f3e0d\""
+      },
+      "final_host": "data.binance.vision",
+      "result": "FOUND_OBJECT_METADATA",
+      "coverage": "NOT_ASSESSED",
+      "zip_downloaded": false,
+      "retained_header_serialization_bytes": 207
+    },
+    {
+      "id": 7,
+      "url": "https://data.binance.vision/data/futures/um/monthly/markPriceKlines/BTCUSDT/1m/BTCUSDT-1m-2026-02.zip",
+      "initial_url": "https://data.binance.vision/data/futures/um/monthly/markPriceKlines/BTCUSDT/1m/BTCUSDT-1m-2026-02.zip",
+      "method": "HEAD",
+      "purpose": "EXACT_ALLOWLIST_ZIP_HEAD_ONLY",
+      "retrieved_utc": "2026-10-08T17:05:15.951737+00:00",
+      "authenticated": false,
+      "body_bytes_read": 0,
+      "body_sha256": null,
+      "redirect_hop": 0,
+      "symbol": "BTCUSDT",
+      "month": "2026-02",
+      "http_status": 200,
+      "headers": {
+        "Content-Type": "binary/octet-stream",
+        "Content-Length": "979761",
+        "Date": "Thu, 08 Oct 2026 17:05:17 GMT",
+        "Last-Modified": "Mon, 02 Mar 2026 09:25:08 GMT",
+        "ETag": "\"1bb1009d5bbb37e081900336986c3052\""
+      },
+      "final_host": "data.binance.vision",
+      "result": "FOUND_OBJECT_METADATA",
+      "coverage": "NOT_ASSESSED",
+      "zip_downloaded": false,
+      "retained_header_serialization_bytes": 206
+    },
+    {
+      "id": 8,
+      "url": "https://data.binance.vision/data/futures/um/monthly/markPriceKlines/BTCUSDT/1m/BTCUSDT-1m-2026-03.zip",
+      "initial_url": "https://data.binance.vision/data/futures/um/monthly/markPriceKlines/BTCUSDT/1m/BTCUSDT-1m-2026-03.zip",
+      "method": "HEAD",
+      "purpose": "EXACT_ALLOWLIST_ZIP_HEAD_ONLY",
+      "retrieved_utc": "2026-10-08T17:05:16.646673+00:00",
+      "authenticated": false,
+      "body_bytes_read": 0,
+      "body_sha256": null,
+      "redirect_hop": 0,
+      "symbol": "BTCUSDT",
+      "month": "2026-03",
+      "http_status": 200,
+      "headers": {
+        "Content-Type": "binary/octet-stream",
+        "Content-Length": "1085521",
+        "Date": "Thu, 08 Oct 2026 17:05:18 GMT",
+        "Last-Modified": "Thu, 02 Apr 2026 09:14:56 GMT",
+        "ETag": "\"b016ab17bfcc2a21f935214b05f2f1e4\""
+      },
+      "final_host": "data.binance.vision",
+      "result": "FOUND_OBJECT_METADATA",
+      "coverage": "NOT_ASSESSED",
+      "zip_downloaded": false,
+      "retained_header_serialization_bytes": 207
+    },
+    {
+      "id": 9,
+      "url": "https://data.binance.vision/data/futures/um/monthly/markPriceKlines/BTCUSDT/1m/BTCUSDT-1m-2026-04.zip",
+      "initial_url": "https://data.binance.vision/data/futures/um/monthly/markPriceKlines/BTCUSDT/1m/BTCUSDT-1m-2026-04.zip",
+      "method": "HEAD",
+      "purpose": "EXACT_ALLOWLIST_ZIP_HEAD_ONLY",
+      "retrieved_utc": "2026-10-08T17:05:16.878442+00:00",
+      "authenticated": false,
+      "body_bytes_read": 0,
+      "body_sha256": null,
+      "redirect_hop": 0,
+      "symbol": "BTCUSDT",
+      "month": "2026-04",
+      "http_status": 200,
+      "headers": {
+        "Content-Type": "binary/octet-stream",
+        "Content-Length": "1020190",
+        "Date": "Thu, 08 Oct 2026 17:05:18 GMT",
+        "Last-Modified": "Sat, 02 May 2026 09:16:05 GMT",
+        "ETag": "\"30c1b5a67cab48562669612ea5b66cf7\""
+      },
+      "final_host": "data.binance.vision",
+      "result": "FOUND_OBJECT_METADATA",
+      "coverage": "NOT_ASSESSED",
+      "zip_downloaded": false,
+      "retained_header_serialization_bytes": 207
+    },
+    {
+      "id": 10,
+      "url": "https://data.binance.vision/data/futures/um/monthly/markPriceKlines/ETHUSDT/1m/ETHUSDT-1m-2026-01.zip",
+      "initial_url": "https://data.binance.vision/data/futures/um/monthly/markPriceKlines/ETHUSDT/1m/ETHUSDT-1m-2026-01.zip",
+      "method": "HEAD",
+      "purpose": "EXACT_ALLOWLIST_ZIP_HEAD_ONLY",
+      "retrieved_utc": "2026-10-08T17:05:17.173970+00:00",
+      "authenticated": false,
+      "body_bytes_read": 0,
+      "body_sha256": null,
+      "redirect_hop": 0,
+      "symbol": "ETHUSDT",
+      "month": "2026-01",
+      "http_status": 200,
+      "headers": {
+        "Content-Type": "binary/octet-stream",
+        "Content-Length": "975251",
+        "Date": "Thu, 08 Oct 2026 17:05:18 GMT",
+        "Last-Modified": "Mon, 02 Feb 2026 10:10:40 GMT",
+        "ETag": "\"3ad276382dadd244592020ee9afb9824\""
+      },
+      "final_host": "data.binance.vision",
+      "result": "FOUND_OBJECT_METADATA",
+      "coverage": "NOT_ASSESSED",
+      "zip_downloaded": false,
+      "retained_header_serialization_bytes": 206
+    },
+    {
+      "id": 11,
+      "url": "https://data.binance.vision/data/futures/um/monthly/markPriceKlines/ETHUSDT/1m/ETHUSDT-1m-2026-02.zip",
+      "initial_url": "https://data.binance.vision/data/futures/um/monthly/markPriceKlines/ETHUSDT/1m/ETHUSDT-1m-2026-02.zip",
+      "method": "HEAD",
+      "purpose": "EXACT_ALLOWLIST_ZIP_HEAD_ONLY",
+      "retrieved_utc": "2026-10-08T17:05:17.476483+00:00",
+      "authenticated": false,
+      "body_bytes_read": 0,
+      "body_sha256": null,
+      "redirect_hop": 0,
+      "symbol": "ETHUSDT",
+      "month": "2026-02",
+      "http_status": 200,
+      "headers": {
+        "Content-Type": "binary/octet-stream",
+        "Content-Length": "909147",
+        "Date": "Thu, 08 Oct 2026 17:05:18 GMT",
+        "Last-Modified": "Mon, 02 Mar 2026 09:25:24 GMT",
+        "ETag": "\"47f9ad6ad41b4811a9926ac1d45d5fb1\""
+      },
+      "final_host": "data.binance.vision",
+      "result": "FOUND_OBJECT_METADATA",
+      "coverage": "NOT_ASSESSED",
+      "zip_downloaded": false,
+      "retained_header_serialization_bytes": 206
+    },
+    {
+      "id": 12,
+      "url": "https://data.binance.vision/data/futures/um/monthly/markPriceKlines/ETHUSDT/1m/ETHUSDT-1m-2026-03.zip",
+      "initial_url": "https://data.binance.vision/data/futures/um/monthly/markPriceKlines/ETHUSDT/1m/ETHUSDT-1m-2026-03.zip",
+      "method": "HEAD",
+      "purpose": "EXACT_ALLOWLIST_ZIP_HEAD_ONLY",
+      "retrieved_utc": "2026-10-08T17:05:17.711037+00:00",
+      "authenticated": false,
+      "body_bytes_read": 0,
+      "body_sha256": null,
+      "redirect_hop": 0,
+      "symbol": "ETHUSDT",
+      "month": "2026-03",
+      "http_status": 200,
+      "headers": {
+        "Content-Type": "binary/octet-stream",
+        "Content-Length": "1000079",
+        "Date": "Thu, 08 Oct 2026 17:05:19 GMT",
+        "Last-Modified": "Thu, 02 Apr 2026 09:15:11 GMT",
+        "ETag": "\"b1125689d79977e60ba4df4edf90a583\""
+      },
+      "final_host": "data.binance.vision",
+      "result": "FOUND_OBJECT_METADATA",
+      "coverage": "NOT_ASSESSED",
+      "zip_downloaded": false,
+      "retained_header_serialization_bytes": 207
+    },
+    {
+      "id": 13,
+      "url": "https://data.binance.vision/data/futures/um/monthly/markPriceKlines/ETHUSDT/1m/ETHUSDT-1m-2026-04.zip",
+      "initial_url": "https://data.binance.vision/data/futures/um/monthly/markPriceKlines/ETHUSDT/1m/ETHUSDT-1m-2026-04.zip",
+      "method": "HEAD",
+      "purpose": "EXACT_ALLOWLIST_ZIP_HEAD_ONLY",
+      "retrieved_utc": "2026-10-08T17:05:17.994913+00:00",
+      "authenticated": false,
+      "body_bytes_read": 0,
+      "body_sha256": null,
+      "redirect_hop": 0,
+      "symbol": "ETHUSDT",
+      "month": "2026-04",
+      "http_status": 200,
+      "headers": {
+        "Content-Type": "binary/octet-stream",
+        "Content-Length": "942345",
+        "Date": "Thu, 08 Oct 2026 17:05:19 GMT",
+        "Last-Modified": "Sat, 02 May 2026 09:16:22 GMT",
+        "ETag": "\"ce138d0068566d41068f33acca59b689\""
+      },
+      "final_host": "data.binance.vision",
+      "result": "FOUND_OBJECT_METADATA",
+      "coverage": "NOT_ASSESSED",
+      "zip_downloaded": false,
+      "retained_header_serialization_bytes": 206
+    },
+    {
+      "id": 14,
+      "url": "https://data.binance.vision/data/futures/um/monthly/markPriceKlines/SOLUSDT/1m/SOLUSDT-1m-2026-01.zip",
+      "initial_url": "https://data.binance.vision/data/futures/um/monthly/markPriceKlines/SOLUSDT/1m/SOLUSDT-1m-2026-01.zip",
+      "method": "HEAD",
+      "purpose": "EXACT_ALLOWLIST_ZIP_HEAD_ONLY",
+      "retrieved_utc": "2026-10-08T17:05:18.261136+00:00",
+      "authenticated": false,
+      "body_bytes_read": 0,
+      "body_sha256": null,
+      "redirect_hop": 0,
+      "symbol": "SOLUSDT",
+      "month": "2026-01",
+      "http_status": 200,
+      "headers": {
+        "Content-Type": "binary/octet-stream",
+        "Content-Length": "919128",
+        "Date": "Thu, 08 Oct 2026 17:05:19 GMT",
+        "Last-Modified": "Mon, 02 Feb 2026 10:11:24 GMT",
+        "ETag": "\"e6c3e79d38e84aff38b80365103ab3b5\""
+      },
+      "final_host": "data.binance.vision",
+      "result": "FOUND_OBJECT_METADATA",
+      "coverage": "NOT_ASSESSED",
+      "zip_downloaded": false,
+      "retained_header_serialization_bytes": 206
+    },
+    {
+      "id": 15,
+      "url": "https://data.binance.vision/data/futures/um/monthly/markPriceKlines/SOLUSDT/1m/SOLUSDT-1m-2026-02.zip",
+      "initial_url": "https://data.binance.vision/data/futures/um/monthly/markPriceKlines/SOLUSDT/1m/SOLUSDT-1m-2026-02.zip",
+      "method": "HEAD",
+      "purpose": "EXACT_ALLOWLIST_ZIP_HEAD_ONLY",
+      "retrieved_utc": "2026-10-08T17:05:18.553907+00:00",
+      "authenticated": false,
+      "body_bytes_read": 0,
+      "body_sha256": null,
+      "redirect_hop": 0,
+      "symbol": "SOLUSDT",
+      "month": "2026-02",
+      "http_status": 200,
+      "headers": {
+        "Content-Type": "binary/octet-stream",
+        "Content-Length": "833021",
+        "Date": "Thu, 08 Oct 2026 17:05:19 GMT",
+        "Last-Modified": "Mon, 02 Mar 2026 09:26:13 GMT",
+        "ETag": "\"16ca9541f1f003668ba0958b53abc8d0\""
+      },
+      "final_host": "data.binance.vision",
+      "result": "FOUND_OBJECT_METADATA",
+      "coverage": "NOT_ASSESSED",
+      "zip_downloaded": false,
+      "retained_header_serialization_bytes": 206
+    },
+    {
+      "id": 16,
+      "url": "https://data.binance.vision/data/futures/um/monthly/markPriceKlines/SOLUSDT/1m/SOLUSDT-1m-2026-03.zip",
+      "initial_url": "https://data.binance.vision/data/futures/um/monthly/markPriceKlines/SOLUSDT/1m/SOLUSDT-1m-2026-03.zip",
+      "method": "HEAD",
+      "purpose": "EXACT_ALLOWLIST_ZIP_HEAD_ONLY",
+      "retrieved_utc": "2026-10-08T17:05:18.830265+00:00",
+      "authenticated": false,
+      "body_bytes_read": 0,
+      "body_sha256": null,
+      "redirect_hop": 0,
+      "symbol": "SOLUSDT",
+      "month": "2026-03",
+      "http_status": 200,
+      "headers": {
+        "Content-Type": "binary/octet-stream",
+        "Content-Length": "918688",
+        "Date": "Thu, 08 Oct 2026 17:05:20 GMT",
+        "Last-Modified": "Thu, 02 Apr 2026 09:15:58 GMT",
+        "ETag": "\"b29ce86d782454d09bd8145d398a1386\""
+      },
+      "final_host": "data.binance.vision",
+      "result": "FOUND_OBJECT_METADATA",
+      "coverage": "NOT_ASSESSED",
+      "zip_downloaded": false,
+      "retained_header_serialization_bytes": 206
+    },
+    {
+      "id": 17,
+      "url": "https://data.binance.vision/data/futures/um/monthly/markPriceKlines/SOLUSDT/1m/SOLUSDT-1m-2026-04.zip",
+      "initial_url": "https://data.binance.vision/data/futures/um/monthly/markPriceKlines/SOLUSDT/1m/SOLUSDT-1m-2026-04.zip",
+      "method": "HEAD",
+      "purpose": "EXACT_ALLOWLIST_ZIP_HEAD_ONLY",
+      "retrieved_utc": "2026-10-08T17:05:19.190686+00:00",
+      "authenticated": false,
+      "body_bytes_read": 0,
+      "body_sha256": null,
+      "redirect_hop": 0,
+      "symbol": "SOLUSDT",
+      "month": "2026-04",
+      "http_status": 200,
+      "headers": {
+        "Content-Type": "binary/octet-stream",
+        "Content-Length": "861050",
+        "Date": "Thu, 08 Oct 2026 17:05:20 GMT",
+        "Last-Modified": "Sat, 02 May 2026 09:17:17 GMT",
+        "ETag": "\"88ee45f89f05b58ecd700e188fd20111\""
+      },
+      "final_host": "data.binance.vision",
+      "result": "FOUND_OBJECT_METADATA",
+      "coverage": "NOT_ASSESSED",
+      "zip_downloaded": false,
+      "retained_header_serialization_bytes": 206
+    }
+  ],
+  "max_operations": 40,
+  "max_allowed_metadata_bytes": 1000000,
+  "operations": 17,
+  "metadata_body_bytes": 30785,
+  "stop_reason": null,
+  "market_bodies_read": 0,
+  "license_status": "NONCOMMERCIAL_RESEARCH_SUITABILITY_UNDER_REVIEW",
+  "head_admission": true,
+  "scope_terms_preflight": {
+    "current_task_use": "NONCOMMERCIAL_SOURCE_SPECIFICATION_AND_OBJECT_METADATA_RESEARCH_ONLY",
+    "not_authorized_use": [
+      "commercial/live execution",
+      "paid signals",
+      "raw dataset redistribution",
+      "ZIP/CSV download or decoding"
+    ],
+    "basis": "User explicitly authorizes known-path HEAD-only feasibility; retrieved terms describe noncommercial research, no current commercial/live use is exercised",
+    "future_dataset_permission": "CONDITIONAL_CONTROLLER_REVIEW_REQUIRED_BEFORE_PRICE_BODY_ADMISSION",
+    "legal_guarantee": false,
+    "terms_version": "1.0",
+    "terms_last_updated": "2026-08-26",
+    "terms_sha256": "dcf358e9d18f598a7a635fac80f6e643fa24a0e111a4d39bda47f1e246b31eb1",
+    "official_path_claim_review": "four exact Controller-pinned source files checked; downloader never executed"
+  },
+  "task_id": "V06_G2_R3_METHOD_MARK_SOURCE_REPAIR_R1",
+  "controller_dispatch_sha": "52e41bbed246a4c0257834a8d56365beac7ee04e",
+  "official_source_sha": "f446ce3812bd4e5521f21faecd4ae3c6460e49fc",
+  "object_matrix": [
+    {
+      "symbol": "BTCUSDT",
+      "month": "2026-01",
+      "market": "UM_PERPETUAL_MARK_PRICE_SOURCE_PATH",
+      "timeframe": "1m",
+      "url": "https://data.binance.vision/data/futures/um/monthly/markPriceKlines/BTCUSDT/1m/BTCUSDT-1m-2026-01.zip",
+      "result": "FOUND_OBJECT_METADATA",
+      "coverage": "NOT_ASSESSED",
+      "http_operation_ids": [
+        6
+      ],
+      "zip_body_bytes_read": 0,
+      "zip_downloaded": false,
+      "checksum_text_requested": false,
+      "expected_zip_sha256": null,
+      "actual_zip_sha256": null,
+      "uncertainties": [
+        "object HEAD only",
+        "body/schema/contract/continuity not assessed",
+        "ETag not SHA256",
+        "server modification time not historical feature receipt"
+      ]
+    },
+    {
+      "symbol": "BTCUSDT",
+      "month": "2026-02",
+      "market": "UM_PERPETUAL_MARK_PRICE_SOURCE_PATH",
+      "timeframe": "1m",
+      "url": "https://data.binance.vision/data/futures/um/monthly/markPriceKlines/BTCUSDT/1m/BTCUSDT-1m-2026-02.zip",
+      "result": "FOUND_OBJECT_METADATA",
+      "coverage": "NOT_ASSESSED",
+      "http_operation_ids": [
+        7
+      ],
+      "zip_body_bytes_read": 0,
+      "zip_downloaded": false,
+      "checksum_text_requested": false,
+      "expected_zip_sha256": null,
+      "actual_zip_sha256": null,
+      "uncertainties": [
+        "object HEAD only",
+        "body/schema/contract/continuity not assessed",
+        "ETag not SHA256",
+        "server modification time not historical feature receipt"
+      ]
+    },
+    {
+      "symbol": "BTCUSDT",
+      "month": "2026-03",
+      "market": "UM_PERPETUAL_MARK_PRICE_SOURCE_PATH",
+      "timeframe": "1m",
+      "url": "https://data.binance.vision/data/futures/um/monthly/markPriceKlines/BTCUSDT/1m/BTCUSDT-1m-2026-03.zip",
+      "result": "FOUND_OBJECT_METADATA",
+      "coverage": "NOT_ASSESSED",
+      "http_operation_ids": [
+        8
+      ],
+      "zip_body_bytes_read": 0,
+      "zip_downloaded": false,
+      "checksum_text_requested": false,
+      "expected_zip_sha256": null,
+      "actual_zip_sha256": null,
+      "uncertainties": [
+        "object HEAD only",
+        "body/schema/contract/continuity not assessed",
+        "ETag not SHA256",
+        "server modification time not historical feature receipt"
+      ]
+    },
+    {
+      "symbol": "BTCUSDT",
+      "month": "2026-04",
+      "market": "UM_PERPETUAL_MARK_PRICE_SOURCE_PATH",
+      "timeframe": "1m",
+      "url": "https://data.binance.vision/data/futures/um/monthly/markPriceKlines/BTCUSDT/1m/BTCUSDT-1m-2026-04.zip",
+      "result": "FOUND_OBJECT_METADATA",
+      "coverage": "NOT_ASSESSED",
+      "http_operation_ids": [
+        9
+      ],
+      "zip_body_bytes_read": 0,
+      "zip_downloaded": false,
+      "checksum_text_requested": false,
+      "expected_zip_sha256": null,
+      "actual_zip_sha256": null,
+      "uncertainties": [
+        "object HEAD only",
+        "body/schema/contract/continuity not assessed",
+        "ETag not SHA256",
+        "server modification time not historical feature receipt"
+      ]
+    },
+    {
+      "symbol": "ETHUSDT",
+      "month": "2026-01",
+      "market": "UM_PERPETUAL_MARK_PRICE_SOURCE_PATH",
+      "timeframe": "1m",
+      "url": "https://data.binance.vision/data/futures/um/monthly/markPriceKlines/ETHUSDT/1m/ETHUSDT-1m-2026-01.zip",
+      "result": "FOUND_OBJECT_METADATA",
+      "coverage": "NOT_ASSESSED",
+      "http_operation_ids": [
+        10
+      ],
+      "zip_body_bytes_read": 0,
+      "zip_downloaded": false,
+      "checksum_text_requested": false,
+      "expected_zip_sha256": null,
+      "actual_zip_sha256": null,
+      "uncertainties": [
+        "object HEAD only",
+        "body/schema/contract/continuity not assessed",
+        "ETag not SHA256",
+        "server modification time not historical feature receipt"
+      ]
+    },
+    {
+      "symbol": "ETHUSDT",
+      "month": "2026-02",
+      "market": "UM_PERPETUAL_MARK_PRICE_SOURCE_PATH",
+      "timeframe": "1m",
+      "url": "https://data.binance.vision/data/futures/um/monthly/markPriceKlines/ETHUSDT/1m/ETHUSDT-1m-2026-02.zip",
+      "result": "FOUND_OBJECT_METADATA",
+      "coverage": "NOT_ASSESSED",
+      "http_operation_ids": [
+        11
+      ],
+      "zip_body_bytes_read": 0,
+      "zip_downloaded": false,
+      "checksum_text_requested": false,
+      "expected_zip_sha256": null,
+      "actual_zip_sha256": null,
+      "uncertainties": [
+        "object HEAD only",
+        "body/schema/contract/continuity not assessed",
+        "ETag not SHA256",
+        "server modification time not historical feature receipt"
+      ]
+    },
+    {
+      "symbol": "ETHUSDT",
+      "month": "2026-03",
+      "market": "UM_PERPETUAL_MARK_PRICE_SOURCE_PATH",
+      "timeframe": "1m",
+      "url": "https://data.binance.vision/data/futures/um/monthly/markPriceKlines/ETHUSDT/1m/ETHUSDT-1m-2026-03.zip",
+      "result": "FOUND_OBJECT_METADATA",
+      "coverage": "NOT_ASSESSED",
+      "http_operation_ids": [
+        12
+      ],
+      "zip_body_bytes_read": 0,
+      "zip_downloaded": false,
+      "checksum_text_requested": false,
+      "expected_zip_sha256": null,
+      "actual_zip_sha256": null,
+      "uncertainties": [
+        "object HEAD only",
+        "body/schema/contract/continuity not assessed",
+        "ETag not SHA256",
+        "server modification time not historical feature receipt"
+      ]
+    },
+    {
+      "symbol": "ETHUSDT",
+      "month": "2026-04",
+      "market": "UM_PERPETUAL_MARK_PRICE_SOURCE_PATH",
+      "timeframe": "1m",
+      "url": "https://data.binance.vision/data/futures/um/monthly/markPriceKlines/ETHUSDT/1m/ETHUSDT-1m-2026-04.zip",
+      "result": "FOUND_OBJECT_METADATA",
+      "coverage": "NOT_ASSESSED",
+      "http_operation_ids": [
+        13
+      ],
+      "zip_body_bytes_read": 0,
+      "zip_downloaded": false,
+      "checksum_text_requested": false,
+      "expected_zip_sha256": null,
+      "actual_zip_sha256": null,
+      "uncertainties": [
+        "object HEAD only",
+        "body/schema/contract/continuity not assessed",
+        "ETag not SHA256",
+        "server modification time not historical feature receipt"
+      ]
+    },
+    {
+      "symbol": "SOLUSDT",
+      "month": "2026-01",
+      "market": "UM_PERPETUAL_MARK_PRICE_SOURCE_PATH",
+      "timeframe": "1m",
+      "url": "https://data.binance.vision/data/futures/um/monthly/markPriceKlines/SOLUSDT/1m/SOLUSDT-1m-2026-01.zip",
+      "result": "FOUND_OBJECT_METADATA",
+      "coverage": "NOT_ASSESSED",
+      "http_operation_ids": [
+        14
+      ],
+      "zip_body_bytes_read": 0,
+      "zip_downloaded": false,
+      "checksum_text_requested": false,
+      "expected_zip_sha256": null,
+      "actual_zip_sha256": null,
+      "uncertainties": [
+        "object HEAD only",
+        "body/schema/contract/continuity not assessed",
+        "ETag not SHA256",
+        "server modification time not historical feature receipt"
+      ]
+    },
+    {
+      "symbol": "SOLUSDT",
+      "month": "2026-02",
+      "market": "UM_PERPETUAL_MARK_PRICE_SOURCE_PATH",
+      "timeframe": "1m",
+      "url": "https://data.binance.vision/data/futures/um/monthly/markPriceKlines/SOLUSDT/1m/SOLUSDT-1m-2026-02.zip",
+      "result": "FOUND_OBJECT_METADATA",
+      "coverage": "NOT_ASSESSED",
+      "http_operation_ids": [
+        15
+      ],
+      "zip_body_bytes_read": 0,
+      "zip_downloaded": false,
+      "checksum_text_requested": false,
+      "expected_zip_sha256": null,
+      "actual_zip_sha256": null,
+      "uncertainties": [
+        "object HEAD only",
+        "body/schema/contract/continuity not assessed",
+        "ETag not SHA256",
+        "server modification time not historical feature receipt"
+      ]
+    },
+    {
+      "symbol": "SOLUSDT",
+      "month": "2026-03",
+      "market": "UM_PERPETUAL_MARK_PRICE_SOURCE_PATH",
+      "timeframe": "1m",
+      "url": "https://data.binance.vision/data/futures/um/monthly/markPriceKlines/SOLUSDT/1m/SOLUSDT-1m-2026-03.zip",
+      "result": "FOUND_OBJECT_METADATA",
+      "coverage": "NOT_ASSESSED",
+      "http_operation_ids": [
+        16
+      ],
+      "zip_body_bytes_read": 0,
+      "zip_downloaded": false,
+      "checksum_text_requested": false,
+      "expected_zip_sha256": null,
+      "actual_zip_sha256": null,
+      "uncertainties": [
+        "object HEAD only",
+        "body/schema/contract/continuity not assessed",
+        "ETag not SHA256",
+        "server modification time not historical feature receipt"
+      ]
+    },
+    {
+      "symbol": "SOLUSDT",
+      "month": "2026-04",
+      "market": "UM_PERPETUAL_MARK_PRICE_SOURCE_PATH",
+      "timeframe": "1m",
+      "url": "https://data.binance.vision/data/futures/um/monthly/markPriceKlines/SOLUSDT/1m/SOLUSDT-1m-2026-04.zip",
+      "result": "FOUND_OBJECT_METADATA",
+      "coverage": "NOT_ASSESSED",
+      "http_operation_ids": [
+        17
+      ],
+      "zip_body_bytes_read": 0,
+      "zip_downloaded": false,
+      "checksum_text_requested": false,
+      "expected_zip_sha256": null,
+      "actual_zip_sha256": null,
+      "uncertainties": [
+        "object HEAD only",
+        "body/schema/contract/continuity not assessed",
+        "ETag not SHA256",
+        "server modification time not historical feature receipt"
+      ]
+    }
+  ],
+  "objects_found": 12,
+  "head_zip_body_bytes_read": 0,
+  "checksum_gets": 0,
+  "range_gets": 0,
+  "zip_decodings": 0,
+  "redirect_operations": 0,
+  "zip_content_length_sum_not_downloaded": 11478693,
+  "metadata_body_plus_retained_headers_bytes": 34220,
+  "wire_byte_count": "NOT_INSTRUMENTED; response payload and retained header serialization counted, ZIP Content-Length not read",
+  "git_transport": "Separately authorized repository refs/publication; wire operations/bytes not instrumented"
+}
