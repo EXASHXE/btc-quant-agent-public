@@ -1,0 +1,45 @@
+{
+  "schema_version": "G3_L2_EVIDENCE_INTEGRITY_REPAIR_RECEIPT_V1",
+  "repair_task_id": "V06_G3_EVIDENCE_INTEGRITY_REPAIR_R1",
+  "original_task_id": "V06_B_LINE_G3_OPERATIONAL_READINESS_R1",
+  "controller_dispatch_sha": "f315edeaa8986e01af5206eb0d964092e087a839",
+  "prior_controller_dispatch_sha": "ba60efc078e9bb75bdc728e8875ba48fb69d1752",
+  "base_start_sha": "a56cc413d87a71111f2be02f10052dced9ff0275",
+  "controller_mode_fix_sha": "9e753972beab43b4ea8397150dab42f7f66d6968",
+  "initial_g3_sha": "2db580bb8c9e4e7811a4d892312584e55b4fa8e6",
+  "timestamp_iso": "2026-10-08T14:58:20.190960+00:00",
+  "findings_repaired": {
+    "G3-F01": {
+      "title": "Status fabrication eliminated",
+      "severity": "BLOCKER",
+      "resolution": "Replaced hardcoded PASS with JUnit XML machine parser mapping exact test nodes to scenarios. Added hermetic negative tests in tests/test_v06_g3_runner_integrity.py."
+    },
+    "G3-F02": {
+      "title": "False provider/Feishu success eliminated",
+      "severity": "BLOCKER",
+      "resolution": "Replaced potential ENABLED_PASS on env var presence with fail-closed EXTERNAL_SMOKE_NOT_IMPLEMENTED and NOT_RUN_NO_TEST_CREDENTIALS. Zero credentials leaked; zero provider calls made."
+    },
+    "G3-F03": {
+      "title": "Fabricated runtime measurement & platform claim corrected",
+      "severity": "HIGH",
+      "resolution": "Replaced synthetic formula migration_ms * 1.1 with genuine timed runtime cold start function. Mislabeled steady_state_rss_mb renamed to process_peak_rss_mb with ru_maxrss semantics. Platform classified as WSL2_LINUX_KERNEL with native_vm_certification=NOT_RUN and CONTAINER_NOT_VERIFIED."
+    },
+    "G3-F04": {
+      "title": "Worktree preservation baseline comparison implemented",
+      "severity": "HIGH",
+      "resolution": "Replaced unconditional preserved=true with pre/post baseline Git metadata comparison. Counts only; no inspection of independent worktree files."
+    },
+    "G3-F05": {
+      "title": "Real process semantics qualified",
+      "severity": "HIGH",
+      "resolution": "Explicitly qualified SIGTERM_SYNTHETIC_DAEMON_PASSED, ACTUAL_APP_SIGTERM_NOT_VERIFIED, and CONTAINER_NOT_VERIFIED. Validated CLI health command in test suite."
+    },
+    "G3-F06": {
+      "title": "Reporter correctness & consistency enforced",
+      "severity": "HIGH",
+      "resolution": "Review markdown generated dynamically from machine outputs. Mechanical consistency checker enforces TERMINAL_PASS only when all scenarios pass and worktrees remain preserved."
+    }
+  },
+  "terminal_state": "G3_R1_EVIDENCE_INTEGRITY_REPAIRED_SCOPED_PASS_DEPLOYMENT_PENDING",
+  "all_scenarios_verified": true
+}

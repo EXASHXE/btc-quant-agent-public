@@ -1,9 +1,12 @@
 {
-  "timestamp_iso": "2026-10-08T13:29:08.397016+00:00",
-  "schema_migration_ms": 111.77,
-  "runtime_cold_start_ms": 122.95,
-  "cold_recovery_ms": 6.07,
-  "steady_state_rss_mb": 408.11,
+  "timestamp_iso": "2026-10-08T14:58:13.249870+00:00",
+  "schema_migration_ms": 137.27,
+  "runtime_cold_start_ms": 26.05,
+  "cold_recovery_ms": 10.22,
+  "process_peak_rss_mb": 446.75,
+  "memory_metric_kind": "RUSAGE_SELF_PEAK_RSS_LINUX_KIB_CONVERTED_MIB",
   "process_model": "single-worker uvicorn / Linux Python 3.12 POSIX process",
-  "extrapolation_disclaimer": "Measured on isolated Linux VM fixture; not a trading signal throughput benchmark and not an extrapolation to production."
+  "timing_methodology": "Exact time.perf_counter() boundaries for each stage; no calculated multipliers.",
+  "extrapolation_disclaimer": "Measured on isolated Linux VM fixture; not a trading signal throughput benchmark and not an extrapolation to production.",
+  "invalidated_prior_claim": "Prior 2db580bb version calculated runtime_cold_start_ms as migration_ms * 1.1 and mislabeled ru_maxrss as steady_state_rss_mb."
 }

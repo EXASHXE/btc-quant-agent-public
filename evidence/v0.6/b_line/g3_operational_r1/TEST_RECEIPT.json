@@ -1,15 +1,18 @@
 {
-  "schema_version": "G3_TEST_RECEIPT_V1",
+  "schema_version": "G3_TEST_RECEIPT_V2",
   "task_id": "V06_B_LINE_G3_OPERATIONAL_READINESS_R1",
-  "controller_dispatch_sha": "ba60efc078e9bb75bdc728e8875ba48fb69d1752",
+  "repair_task_id": "V06_G3_EVIDENCE_INTEGRITY_REPAIR_R1",
+  "controller_dispatch_sha": "f315edeaa8986e01af5206eb0d964092e087a839",
   "base_start_sha": "a56cc413d87a71111f2be02f10052dced9ff0275",
-  "timestamp_iso": "2026-10-08T13:29:12.813127+00:00",
+  "timestamp_iso": "2026-10-08T14:58:20.190827+00:00",
   "pytest_summary": {
-    "total_passed": 11,
+    "total_collected": 21,
+    "total_passed": 21,
     "total_failed": 0,
     "total_skipped": 0,
-    "duration_seconds": 4.257,
+    "duration_seconds": 6.85,
     "exit_code": 0
   },
-  "all_passed": true
+  "all_passed": true,
+  "terminal_state": "G3_R1_EVIDENCE_INTEGRITY_REPAIRED_SCOPED_PASS_DEPLOYMENT_PENDING"
 }
