@@ -1,0 +1,78 @@
+{
+  "schema_version": "V06_G2_R3_PARALLEL_P0_OFFLINE_PREPARATION_DISPATCH_V1",
+  "task_id": "V06_G2_R3_PARALLEL_P0_OFFLINE_PREPARATION",
+  "controller_decision": "ACCEPT_METHOD_ADDENDUM_AS_DESIGN_ONLY__DISPATCH_TWO_OFFLINE_CODE_PREP_TASKS__EMPIRICAL_BODY_HOLD",
+  "repository": "EXASHXE/btc-quant-agent-public",
+  "docs_parent_sha": "b2152682497b5f0dd0827f2ee9be6065adbc6ccf",
+  "code_base_sha": "e0ff8c3473de4bfa3e66fe7928d42992a4d38a32",
+  "method_addendum_head_sha": "cf2d5cc33774cdcff7d709636305bba830e977ef",
+  "method_addendum_commit_sha": "35d2b8488fd6fbdab0d3d7ff8cf2b84ee5b60b6f",
+  "method_start_sha": "e5b2006a89441f7eb2ec900e508aff451106b87a",
+  "source_audit_sha": "12793bc04db7414d11a0961684fd14f5df3ce16e",
+  "previous_controller_dispatch_sha": "52e41bbed246a4c0257834a8d56365beac7ee04e",
+  "expected_candidate_count": 8,
+  "recommended_start_cwd": "~/workspace/project/quant-v0.6",
+  "trusted_repo": "EXASHXE/btc-quant-agent-public",
+  "two_workers": [
+    {
+      "role": "GEMINI_A",
+      "branch": "feature/v06-bline-g2-overnight-discovery-a",
+      "worktree": "~/workspace/project/quant-v0.6/g2-overnight-discovery-a",
+      "scope": "SYNTHETIC_ONLY_STRATEGY_REPLAY_RESEARCH_SIDECAR",
+      "allowed_paths": [
+        "src/btc_quant_agent/strategy_research/r3_overnight/**",
+        "tests/test_strategy_research_r3_*.py",
+        "docs/strategy_research/g2_r3/prep_a/**",
+        "evidence/v0.6/b_line/g2_overnight_p0_a/**"
+      ],
+      "data_access": "METADATA_FILENAMES_EXISTING_PUBLIC_MANIFEST_ONLY__NO_RAW_PRICE_BODIES"
+    },
+    {
+      "role": "GEMINI_B",
+      "branch": "feature/v06-bline-g2-overnight-verifier-b",
+      "worktree": "~/workspace/project/quant-v0.6/g2-overnight-verifier-b",
+      "scope": "INDEPENDENT_SYNTHETIC_PIT_FILL_COST_RISK_ORACLE",
+      "allowed_paths": [
+        "scripts/strategy_research/r3_verification/**",
+        "tests/test_v06_g2_r3_verifier_*.py",
+        "docs/strategy_research/g2_r3/prep_b/**",
+        "evidence/v0.6/b_line/g2_overnight_p0_b/**"
+      ],
+      "data_access": "SYNTHETIC_TESTS_STATIC_SPEC_AND_IMMUTABLE_A_IMPL_SHA_ONLY"
+    }
+  ],
+  "protected_holdout_conflict": "OLDER_V03_BTC_FINAL_HOLDOUT_2026_02_TO_2026_08_OVERLAPS_R3_PROPOSED_FEB_TO_APR_DEVELOPMENT__NO_SILENT_RECLASSIFICATION",
+  "prior_btc_history": "2021_01_TO_2026_07_EXISTS_IN_OLD_AUDIT_AND_MANIFEST__LOCAL_PHYSICAL_AVAILABILITY_UNVERIFIED",
+  "unresolved": [
+    "NONCOMMERCIAL_DATASET_RIGHTS_SCOPE",
+    "FEES_HISTORICAL_TICK_LOT_SPREAD_FUNDING_UNVERIFIED",
+    "ACTIVE_MARK_TRADE_1M_BODY_INTEGRITY_UNVERIFIED",
+    "EXACT_FROZEN_DEVELOPMENT_WINDOWS",
+    "R3_12H_STRESS_GEOMETRY_INELIGIBLE",
+    "PREREG_FIRST_PUSH_PENDING"
+  ],
+  "no_access": [
+    "ANY_NEW_OR_LOCAL_MARKET_PRICE_OHLCV_MARK_FUNDING_RATE_BODY",
+    "OLD_SEALED_V03_HOLDOUT_BODY",
+    "RC2_PROTECTED_SYMBOLS_OR_OUTCOMES",
+    "ACCOUNT_OR_PRIVATE_SIGNED_BINANCE_APIS",
+    "AUTOTRADE",
+    "TESTNET",
+    "REAL_FUNDS"
+  ],
+  "worktree_bootstrap": "SERIALIZE_GIT_WORKTREE_CREATION_USING_FLOCK__NEVER_SHARED_MUTABLE_SOURCE",
+  "active_tasks": "OFFLINE_SYNTHETIC_IMPLEMENTATION_ONLY",
+  "source_code_merge_authority": "NONE",
+  "empirical_execution_authority": "NONE",
+  "future_dispatch_required": "SEPARATE_CONTROLLER_FIRST_PUSH_PREREG_AND_BODY_ADMISSION_DISPATCH",
+  "real_funds_write_authority": "NONE",
+  "future_overnight_templates_status": "STILL_INACTIVE",
+  "prompts": {
+    "A": "prompts/v0.6/b_line/V06_G2_R3_PARALLEL_P0_GEMINI_A_SYNTHETIC_BUILD_R1.md",
+    "B": "prompts/v0.6/b_line/V06_G2_R3_PARALLEL_P0_GEMINI_B_INDEPENDENT_ORACLE_R1.md"
+  },
+  "review_path": "reviews/v0.6/b_line/V06_G2_R3_METHOD_R1_1_CONTROLLER_L2_ACCEPTANCE.md",
+  "auto_push_each_worker": true,
+  "ci_policy": "CHANGED_L0_PLUS_RESEARCH_SCOPED_L1_ONCE__NO_GLOBAL_FULL_SUITE_EVERY_EDIT",
+  "time_budget": "MAX_8H_PER_WORKER_STOP_EARLY_WHEN_DONE"
+}
