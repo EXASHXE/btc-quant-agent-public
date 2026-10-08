@@ -1,6 +1,6 @@
 {
   "line": "B_LINE",
-  "stage": "B_LINE_V06_FOUNDATION_R1_DISPATCHED__PROTECTED_RETRY_L3_LOCKED",
+  "stage": "B_LINE_V06_FOUNDATION_R1_L2_ACCEPTED__ENGINEERING_INTEGRATION_PENDING_CODE_FF",
   "code_branch": "v0.6",
   "accepted_code_sha": "52c16a28153de307dc6132c0975fe29341a0a918",
   "docs_authority_commit": "6319ddbaddd69d5522696992ec1565169da88e03",
@@ -917,7 +917,7 @@
   "version_authority_note": "Original accepted_code_sha 52c16a... is historical B-line Tactical acceptance, NOT v0.6 tip or final release. v0.6 starts from stable v0.5.5 code at 8ecff4ec. Prior B-line work remains unintegrated.",
   "v06_foundation_r1": {
     "task_id": "V06_B_LINE_ACCEPTED_TACTICAL_FOUNDATION_AND_CI_FAST_PATH_R1",
-    "status": "DISPATCHED_TO_GEMINI__IMPLEMENTATION_NOT_YET_RECEIVED",
+    "status": "CONTROLLER_L2_ACCEPTED_ENGINEERING_ONLY",
     "prompt_path": "prompts/v0.6/b_line/v0.6_B_LINE_FOUNDATION_AND_CI_FAST_PATH_R1.md",
     "controller_dispatch_sha": "9bca4d5e13084569096077ced3bb8dfc09482c1f",
     "dispatch_authority_path": "evidence/v0.6/controller/B_LINE_FOUNDATION_R1_DEV_DISPATCH_AUTHORITY.json",
@@ -929,6 +929,18 @@
     "ci_fast_path_sha": "430becb96389a62481e4d4def07065054e658eee",
     "protected_access": "FORBIDDEN",
     "real_funds_write_authority": "NONE",
-    "next_gate": "GEMINI_L1_TERMINAL_IMPLEMENTATION_THEN_CONTROLLER_L2_REVIEW"
+    "next_gate": "GEMINI_L1_TERMINAL_IMPLEMENTATION_THEN_CONTROLLER_L2_REVIEW",
+    "implementation_sha": "abcb8fb9c975288a2579e1202a3472c80c965a8c",
+    "evidence_sha": "5706a1f6e54fbd2deb2e940119952d16c1356148",
+    "accepted_feature_head_sha": "d6500140f3141d179181f2360ad815b5bfe9c954",
+    "review_path": "reviews/v0.6/b_line/V06_B_LINE_FOUNDATION_R1_CONTROLLER_L2_ACCEPTANCE.md",
+    "independent_ci_full_foundation": "https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/37731939480",
+    "independent_ci_rename_patch": "https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/37741245947",
+    "focused_foundation_result": "314_PASS_2_WARNINGS__MYPY_129_SOURCE_OK",
+    "ci_rename_regression": "12_PASS_0_FAIL",
+    "review_outcome": "ACCEPT_V06_B_LINE_FOUNDATION_R1_ENGINEERING_ONLY",
+    "auto_push_required": true,
+    "controller_integration_mode": "EXACT_SHA_FAST_FORWARD_TO_V06",
+    "protected_retry": "NOT_AUTHORIZED"
   }
 }
