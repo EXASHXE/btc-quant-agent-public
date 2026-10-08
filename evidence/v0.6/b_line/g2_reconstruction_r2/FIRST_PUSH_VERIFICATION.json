@@ -1,0 +1,10 @@
+{
+  "branch": "feature/v06-bline-g2-perp-reconstruction-r2",
+  "empirical_body_reads_before_verification": 0,
+  "method_sha256": "30245c01d445eaa1336faabd99140b791eb66b38a3ba4604ef6cbd30f25e0948",
+  "parent_sha": "a56cc413d87a71111f2be02f10052dced9ff0275",
+  "pre_reg_r2_sha": "66aad50500bf6e860e76bf3ae8c0ef70799d5f47",
+  "remote": "origin",
+  "verified_remote_head": "66aad50500bf6e860e76bf3ae8c0ef70799d5f47",
+  "verified_utc": "2026-10-08T13:06:28.762400+00:00"
+}
