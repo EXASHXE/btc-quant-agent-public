@@ -1,6 +1,6 @@
 {
   "line": "B_LINE",
-  "stage": "V06_G1_G3_SCOPED_ENGINEERING_INTEGRATED_POST_G3_CI_PENDING__G2_R2_DIAGNOSTIC_ZERO_SHORTLIST__G2_R3_DESIGN_DISPATCHED__NO_TESTNET_LIVE",
+  "stage": "V06_G1_G3_SCOPED_INTEGRATED_G3_MAINLINE_CI_H40_KNOWN_FAIL__G2_R2_ZERO_SHORTLIST__G2_R3_DESIGN_CONDITIONAL_ACCEPT_SOURCE_AUDIT_DISPATCHED__NO_TESTNET_LIVE",
   "code_branch": "v0.6",
   "accepted_code_sha": "52c16a28153de307dc6132c0975fe29341a0a918",
   "docs_authority_commit": "6319ddbaddd69d5522696992ec1565169da88e03",
@@ -1146,14 +1146,15 @@
     "terminal_ci_run": "https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/37796933670",
     "terminal_ci_result": "PASS_2785_PASSED_2_SKIPPED_9_WARNINGS",
     "post_merge_ci": "https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/37799770194",
-    "post_merge_ci_status": "PENDING",
+    "post_merge_ci_status": "FAILED_INHERITED_H40_GOLDEN_2784_PASS_1_FAIL_2_SKIP",
     "external_provider_status": "OPENAI_NOT_RUN__FEISHU_NOT_RUN",
     "platform_scope": "WSL2_LINUX_KERNEL_NOT_NATIVE_DEPLOYMENT",
-    "container_status": "NOT_VERIFIED"
+    "container_status": "NOT_VERIFIED",
+    "post_merge_ci_failure_test": "tests/test_v051_h40_m3a_production_discovery_producer.py::test_p09_through_p18_exact_scientific_graph"
   },
   "v06_g2_r3_design_r1": {
     "task_id": "V06_B_LINE_G2_R3_COST_AWARE_CAMPAIGN_DESIGN_R1",
-    "status": "CONTROLLER_DESIGN_ONLY_DISPATCHED_NO_NEW_OUTCOMES",
+    "status": "CONTROLLER_L2_CONDITIONALLY_ACCEPTED__SOURCE_FEASIBILITY_HOLD",
     "controller_dispatch_sha": "05ad881995cb5a8b93e086c79edd4bbc7c051bd4",
     "code_base_sha": "e0ff8c3473de4bfa3e66fe7928d42992a4d38a32",
     "source_g2_r2_sha": "2e922f486cf5b3f6cb7fa3aa7823cd096f24c17e",
@@ -1164,6 +1165,33 @@
     "permit_protected_outcomes": false,
     "permit_execution": false,
     "auto_push_required": true,
+    "real_funds_write_authority": "NONE",
+    "design_commit_sha": "9eb87d57247e5838f0becd9d78aa7bc5861674b9",
+    "final_design_sha": "e5b2006a89441f7eb2ec900e508aff451106b87a",
+    "candidate_count": 8,
+    "evaluated_candidates": 0,
+    "remote_ci": "https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/37807666877",
+    "ci_scope": "DOCS_ONLY_NO_TESTS",
+    "review_path": "reviews/v0.6/b_line/V06_G2_R3_DESIGN_CONTROLLER_L2_SCIENTIFIC_REVIEW.md",
+    "next_dispatch_sha": "290664c17e14a4fd7530b5308b5fbdebb69b8a1e",
+    "method_audit_prompt_path": "prompts/v0.6/b_line/V06_G2_R3_SOURCE_COST_FEASIBILITY_AUDIT_R1.md",
+    "quality_authority": "NONE"
+  },
+  "v06_g2_r3_source_audit_r1": {
+    "task_id": "V06_G2_R3_SOURCE_COST_FEASIBILITY_AUDIT_R1",
+    "status": "DISPATCHED_METADATA_ONLY_NO_NEW_PRICE_OUTCOMES",
+    "dispatch_sha": "290664c17e14a4fd7530b5308b5fbdebb69b8a1e",
+    "base_code_sha": "e0ff8c3473de4bfa3e66fe7928d42992a4d38a32",
+    "read_only_design_sha": "e5b2006a89441f7eb2ec900e508aff451106b87a",
+    "branch": "feature/v06-bline-g2-r3-source-feasibility-r1",
+    "worktree": "/root/workspace/project/quant-v0.6/g2-r3-source-feasibility-r1",
+    "prompt_path": "prompts/v0.6/b_line/V06_G2_R3_SOURCE_COST_FEASIBILITY_AUDIT_R1.md",
+    "request_budget": 30,
+    "metadata_byte_budget": 10000000,
+    "read_empirical_market_bodies": false,
+    "protected_reads": "FORBIDDEN",
+    "signed_exchange_writes": "FORBIDDEN",
+    "testnet": "NOT_AUTHORIZED",
     "real_funds_write_authority": "NONE"
   }
 }
