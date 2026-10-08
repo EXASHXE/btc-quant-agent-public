@@ -1,6 +1,6 @@
 {
   "line": "B_LINE",
-  "stage": "B_LINE_INITIAL_USABLE_RELEASE_V1_RC2__FINAL_FRESH_HOLDOUT_AUTHORIZED",
+  "stage": "B_LINE_INITIAL_USABLE_RELEASE_V1_RC2__FINAL_HOLDOUT_INFRA_INCIDENT_RETRY_LOCKED",
   "code_branch": "feature/tactical-policy-r2",
   "accepted_code_sha": "52c16a28153de307dc6132c0975fe29341a0a918",
   "docs_authority_commit": "6319ddbaddd69d5522696992ec1565169da88e03",
@@ -144,7 +144,7 @@
     "live_v1_b4_r6_parent_sha": "a663921abf90504412d0d67b2b9c9f134f204d85",
     "live_v1_b4_r6_controller_sealed": true,
     "live_v1_b5_r6_authorized": false,
-    "live_v1_next_action": "EXECUTE_ONE_SHOT_FRESH_HOLDOUT_IN_PARALLEL_WITH_OUTCOME_BLIND_SOL_READINESS",
+    "live_v1_next_action": "PUBLISH_ORIGINAL_ATTEMPT_EVIDENCE_AND_REPAIR_NORMALIZER_DISPATCH_BINDING_WITHOUT_PROTECTED_ACCESS",
     "live_v1_b5_r5_findings": [
       "HIGH_PROTECTIVE_TYPED_ALIAS_AMBIGUITY",
       "HIGH_RUNTIME_AUTHORITY_ASYNC_HANDOFF_STALE",
@@ -411,11 +411,26 @@
     "rc2_final_runner_sha": "d51abdcfa982be132a6fae6c84776f343fae893c",
     "rc2_final_runner_sha256": "ab7a5795a1f002f93e5ffff658c4be2dd9708b8b23a11801ec122f32e5f05ebd",
     "rc2_final_execution_dispatch_sha": "ffceccbb1ee28f190d4a8b3340248c753e22d374",
-    "rc2_final_holdout_authorized": true,
+    "rc2_final_holdout_authorized": false,
     "rc2_final_holdout_attempt_budget": 1,
     "rc2_parallel_sol_prompt_commit": "58a143f2e5e4663e43feac7dc74e19328929dd96",
     "rc2_parallel_sol_mode": "OUTCOME_BLIND_DOWNSTREAM_READINESS",
-    "real_funds_write_authority": "NONE"
+    "real_funds_write_authority": "NONE",
+    "rc2_final_holdout_reported_terminal": "RC2_HOLDOUT_R3_INFRA_INCOMPLETE",
+    "rc2_final_holdout_reported_phase": "SOURCE_RETRIEVAL",
+    "rc2_final_holdout_reported_error": "ORCAUSDT top_pos_idx empty string in Binance metrics",
+    "rc2_final_holdout_reported_ledger_entries": 1986,
+    "rc2_final_holdout_remote_evidence": "NOT_YET_PUBLISHED",
+    "rc2_final_holdout_actual_dispatch_reported": "405e0042687bfae5aa986e0f2982e26cba3827cd",
+    "rc2_final_holdout_authorized_dispatch": "ffceccbb1ee28f190d4a8b3340248c753e22d374",
+    "rc2_final_holdout_dispatch_disposition": "MISMATCH_PENDING_RECEIPT_RECONCILIATION",
+    "rc2_final_holdout_policy_quality_authority": "NONE_PENDING_EVIDENCE",
+    "rc2_final_holdout_retry_authorized": false,
+    "rc2_final_holdout_protected_source_access": "REPORTED_NONZERO_UNVERIFIED",
+    "rc2_final_holdout_outcome_replay": "REPORTED_NOT_STARTED_UNVERIFIED",
+    "rc2_final_holdout_infra_repair_branch": "validation/b-line-rc2-final-holdout-infra-repair-r1",
+    "rc2_final_holdout_infra_repair_dispatch_sha": "f1f08ddce7c2820ca7aa0faafadb339a60838ca1",
+    "rc2_final_holdout_infra_repair_prompt_commit": "5f93eaa474b6d48e357b5fdec33dee9f0106add3"
   },
   "must_read": [],
   "validation_authority": {
@@ -440,7 +455,7 @@
     "evidence_path": "evidence/v0.5.5/controller/V0.5.5_B2B_CONTROLLER_ACCEPTANCE.json",
     "evidence_blob_sha": "73a11708a85b5f1896397d745c3b7252d3c51f8d"
   },
-  "parallel_authorized_next_stage": "FINAL_FRESH_HOLDOUT_PLUS_OUTCOME_BLIND_SOL_READINESS",
+  "parallel_authorized_next_stage": "FINAL_HOLDOUT_INFRA_REPAIR_SOURCE_ONLY",
   "live_v1_acceptance_authority": {
     "report_path": "reviews/v0.5/live_v1/V0.5.5_LIVE_V1_B3_CONTROLLER_ACCEPTANCE.md",
     "report_blob_sha": "21ad4492feb4750f5fc85a5f88b54d1da36c157d",
@@ -826,5 +841,15 @@
     "start_sha": "0d61b564fa178af0f0a8e7df1c0a6b13586711e3",
     "final_target_seal": "MUST_NOT_EXIST_DURING_REPAIR_R2",
     "next_gate": "FRESH_SOL_EXACT_SHA_REVIEW_GENERIC_RUNNER_BEFORE_TARGET_SEAL"
+  },
+  "rc2_final_holdout_infra_incident": {
+    "disposition": "REPORTED_INFRA_INCOMPLETE_EVIDENCE_UNVERIFIED_RETRY_LOCKED",
+    "incident_path": "reviews/v0.5/rc2/V0.5.5_RC2_FINAL_FRESH_HOLDOUT_INFRA_INCIDENT_R1_CONTROLLER_DISPOSITION.md",
+    "repair_prompt_path": "prompts/v0.5/rc2/v0.5.5_RC2_FINAL_HOLDOUT_INFRA_REPAIR_R1.md",
+    "repair_branch": "validation/b-line-rc2-final-holdout-infra-repair-r1",
+    "repair_start_sha": "d51abdcfa982be132a6fae6c84776f343fae893c",
+    "controller_dispatch_sha": "f1f08ddce7c2820ca7aa0faafadb339a60838ca1",
+    "next_gate": "VERIFY_ORIGINAL_EVIDENCE_AND_SCOPED_INFRA_REPAIR",
+    "protected_retry": "FORBIDDEN_WITHOUT_NEW_ONE_SHOT_AUTHORITY"
   }
 }
