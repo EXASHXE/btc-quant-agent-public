@@ -1,0 +1,55 @@
+{
+  "schema_version": "G2_R3_DESIGN_PUBLICATION_V1",
+  "task_id": "V06_B_LINE_G2_R3_COST_AWARE_CAMPAIGN_DESIGN_R1",
+  "controller_dispatch_sha": "05ad881995cb5a8b93e086c79edd4bbc7c051bd4",
+  "code_start_sha": "e0ff8c3473de4bfa3e66fe7928d42992a4d38a32",
+  "source_r2_sha": "2e922f486cf5b3f6cb7fa3aa7823cd096f24c17e",
+  "design_commit_sha": "9eb87d57247e5838f0becd9d78aa7bc5861674b9",
+  "design_parent_sha": "e0ff8c3473de4bfa3e66fe7928d42992a4d38a32",
+  "verified_remote": "https://github.com/EXASHXE/btc-quant-agent-public.git",
+  "branch": "feature/v06-bline-g2-r3-cost-aware-method-design",
+  "design_remote_push_verified": true,
+  "verification_utc": "2026-10-08T16:17:39.901272+00:00",
+  "independent_remote_checks": [
+    "git ls-remote origin refs/heads/feature/v06-bline-g2-r3-cost-aware-method-design returned exact design SHA",
+    "git fetch --no-tags origin refs/heads/feature/v06-bline-g2-r3-cost-aware-method-design:refs/remotes/origin/feature/v06-bline-g2-r3-cost-aware-method-design",
+    "fetched remote object parent equals pinned baseline; six changed paths within authorized scope"
+  ],
+  "changed_paths": [
+    "docs/strategy_research/g2_r3/METHOD_DESIGN.md",
+    "docs/strategy_research/g2_r3/R3_EXECUTION_GATE_PLAN.md",
+    "docs/strategy_research/g2_r3/SOURCE_QUALITY_AND_COST_FEASIBILITY.md",
+    "evidence/v0.6/b_line/g2_r3_design/CANDIDATE_REGISTER_PROPOSAL.json",
+    "evidence/v0.6/b_line/g2_r3_design/DESIGN_RECEIPT.json",
+    "evidence/v0.6/b_line/g2_r3_design/WORKTREE_PRESERVATION.json"
+  ],
+  "validation": {
+    "committed_json_files_parsed": 3,
+    "diff_check": "PASS",
+    "scope": "PASS",
+    "candidate_count": 8,
+    "evaluated": 0,
+    "worktrees_preserved": 6,
+    "tests_run": 0,
+    "tests": "NOT_APPLICABLE_DESIGN_ONLY",
+    "duration_seconds": 0.27751
+  },
+  "first_design_artifact_sha256": {
+    "docs/strategy_research/g2_r3/METHOD_DESIGN.md": "14378dde7668291dc87aef91e3e55fadddad3a444d1d49284efa2c3cbcba9a77",
+    "docs/strategy_research/g2_r3/R3_EXECUTION_GATE_PLAN.md": "8a12d40ebbaf0edb1355f039b0b5adb6d11f4dfda1ba52898f2f3ebdfb938dce",
+    "docs/strategy_research/g2_r3/SOURCE_QUALITY_AND_COST_FEASIBILITY.md": "8095fb8c4c608b548ca143f121c297d03498876fa4512232d06a265659f225a8",
+    "evidence/v0.6/b_line/g2_r3_design/CANDIDATE_REGISTER_PROPOSAL.json": "d0f89bddfaec0e57c959cec043969059da10fec8aa45f81669dde8b80ea35a9b",
+    "evidence/v0.6/b_line/g2_r3_design/DESIGN_RECEIPT.json": "5b362e230be6886255dca33bef64f9a61637ff88c26fe3e90ff1f2e64da8fdbd",
+    "evidence/v0.6/b_line/g2_r3_design/WORKTREE_PRESERVATION.json": "182f702c8f69190073afcf64ff2f8152945cb3ade016afe3c9c2a8381f8f3c5d"
+  },
+  "publication_self_reference": "This evidence-only follow-up records its already verified parent. Its own final remote SHA/parent/path verification is reported in terminal after push; no circular claim.",
+  "terminal_design_decision": "G2_R3_DESIGN_READY_FOR_CONTROLLER_SCIENTIFIC_REVIEW",
+  "data_grade": "DESIGN_ONLY_EXISTING_EXPOSED_AGGREGATES; NO_NEW_EMPIRICAL_DATA",
+  "new_market_outcome_reads": 0,
+  "protected_reads": 0,
+  "exchange_writes": 0,
+  "provider_actions": 0,
+  "real_funds_write_authority": "NONE",
+  "testnet": "NOT_AUTHORIZED",
+  "next_gate": "CONTROLLER_L2_METHOD_DESIGN_SCIENTIFIC_AUDIT_THEN_SEPARATE_NEW_PREREG_IMPLEMENTATION_DISPATCH"
+}
