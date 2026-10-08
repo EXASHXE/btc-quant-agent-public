@@ -948,6 +948,7 @@
     "v06_merge_strategy": "FAST_FORWARD_ANCESTRY_PRESERVED",
     "v06_integrated_sha": "d6500140f3141d179181f2360ad815b5bfe9c954",
     "post_integration_ci": "https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/37741446854",
-    "post_integration_ci_state": "PENDING_AT_PUBLICATION"
+    "post_integration_ci_state": "SUCCESS__316_PASS_2_WARNINGS__MYPY_129_FILES_OK",
+    "controller_post_integration_result": "ENGINEERING_ACCEPTED__NO_RELEASE_AUTHORITY"
   }
 }
