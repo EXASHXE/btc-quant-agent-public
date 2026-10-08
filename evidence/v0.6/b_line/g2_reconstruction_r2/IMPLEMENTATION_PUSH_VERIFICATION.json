@@ -1,0 +1,18 @@
+{
+  "branch": "feature/v06-bline-g2-perp-reconstruction-r2",
+  "changed_files": [
+    "evidence/v0.6/b_line/g2_reconstruction_r2/FIRST_PUSH_VERIFICATION.json",
+    "scripts/strategy_research/fetch_perp_r2.py",
+    "scripts/strategy_research/replay_perp_r2.py",
+    "src/btc_quant_agent/strategy_research/__init__.py",
+    "src/btc_quant_agent/strategy_research/perp_analysis.py",
+    "src/btc_quant_agent/strategy_research/perp_replay.py",
+    "src/btc_quant_agent/strategy_research/perp_source.py",
+    "tests/test_strategy_research_perp_r2.py"
+  ],
+  "implementation_sha": "d38f7b45983cd74dc9e28439ebfb2fa60971122a",
+  "parent_sha": "66aad50500bf6e860e76bf3ae8c0ef70799d5f47",
+  "remote": "origin",
+  "remote_push_verified": true,
+  "verified_remote_head": "d38f7b45983cd74dc9e28439ebfb2fa60971122a"
+}

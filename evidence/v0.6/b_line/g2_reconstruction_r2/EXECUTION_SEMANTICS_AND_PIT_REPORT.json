@@ -1,0 +1,114 @@
+{
+  "all_source_archive_checksums_verified": true,
+  "candidate_trades_unique": 997,
+  "collision": "SL-first; adverse gap stop, capped favorable target gap; no favorable unknown extrema credit",
+  "counterfactual_control_semantics": "matched LONG/SHORT are paired event-study episodes, may overlap across episodes; not funded portfolios; unconditional controls and candidates enforce no overlapping same-symbol positions",
+  "data_grade": "ARCHIVAL_EVENT_TIME_RECONSTRUCTED",
+  "decision_at": "last hourly end+60000ms",
+  "determinism": {
+    "candidate_parameters_changed": false,
+    "global_observation_identity": "role,parent_candidate,trade_identity",
+    "identical_compressed_derived_rows": true,
+    "identical_result_json": true,
+    "no_overlapping_candidate_positions": true,
+    "registered_candidate_trades": 997,
+    "scientific_digest": "888e60749be7ceb9a5236eae95f4f90c02dc885e2eb139a4f6fc5597b8710192",
+    "source_arrays_minutes": 527040,
+    "unique_observations": 9233
+  },
+  "entry_at": "decision+60000ms, next-minute open proxy",
+  "exchange_writes": 0,
+  "exit_timing": "stop/target event reported at containing minute end as conservative holding/funding proxy; intraminute actual timing unknown",
+  "features": "exact25 closed hourly bars from contiguous authentic1m; ATR24/SMA24 and signed24h return; no derivatives used as signals",
+  "fees": {
+    "base_bps_per_leg": {
+      "half_spread": "2",
+      "maker_fee": "2",
+      "slippage": "3",
+      "taker_fee": "6"
+    },
+    "fee_semantics": "fee applied to modeled adverse entry/exit prices; spread and slippage separately charged; no discounts or fee rebates",
+    "funding_actual": "public recorded event rates and intervals, charges where entry_ms<settlement_ms<=exit_ms; direction*rate positive charges, negative benefits conservatively discarded",
+    "funding_missing": "uniform whole-campaign PROXY_STRESS_ONLY if any symbol-month absent, checksum invalid or schedule gap >8h; base adverse 0.0004 and stress 0.0008 at every UTC 00/08/16h settlement",
+    "funding_missing_verdict": "DIAGNOSTIC_ONLY; do not treat proxy-only historical funding as measured cost",
+    "funding_price_proxy": "quantity*max(raw entry,settlement minute high) as funding notional; actual mark price not available, explicitly proxy not measured payment",
+    "funding_stress": "2*max(adverse recorded rate,0.0004) per verified settlement; no favorable funding assumed",
+    "latency_stress": "entry delayed one extra minute, same decisions/maxhold/partition rules; no new signals",
+    "liquidity_stress": "same decisions/trades, participation <=0.0001; otherwise unfilled, no reoptimization",
+    "neighborhood": "NOT_RUN; no candidate tuning or extra strategies",
+    "stress_bps_per_leg": {
+      "half_spread": "4",
+      "maker_fee": "4",
+      "slippage": "6",
+      "taker_fee": "12"
+    }
+  },
+  "funding_grade": "PROXY_STRESS_ONLY_FOR_WHOLE_CAMPAIGN",
+  "funding_timestamp_handling": "exact public calculation milliseconds preserved; jitter makes exact cadence incomplete, activating frozen uniform adverse fallback",
+  "global_observation_identity": "role,parent_candidate,trade_identity",
+  "grid": "NOT_APPLICABLE_NO_GRID_REGISTERED",
+  "implementation_sha": "d38f7b45983cd74dc9e28439ebfb2fa60971122a",
+  "independent_review": {
+    "access": "read-only, no market archives or empirical outcomes inspected",
+    "fixed_findings": [
+      "nonzero fallback funding schedule",
+      "Feature bound to verified Series",
+      "fresh cache admission",
+      "URL/record product and symbol binding",
+      "dynamic funding terminal completeness",
+      "zero-volume entry and exit-path handling",
+      "checksum receipt hash assertion"
+    ],
+    "post_review_admission_hardening": "unknown cache/output path denied before metadata reads, decisive negative test passed",
+    "tests": "10 passed,41 deselected under Python3.12"
+  },
+  "invalid_funding_checksum_interpretation": "HARD_STOP wins over conflicting fallback phrase; no unverified-rate reuse. No invalid checksum observed",
+  "liquidity": "latest completed minute available at entry under60s lag (entry-120s minute); entry-minute volume only conservative no-fill veto",
+  "no_candidate_overlapping_positions": true,
+  "observed_equity": "fixed-notional realized PnL curve, not self-financing/live MTM account",
+  "pinned_replay": {
+    "candidate_parameters_changed": false,
+    "code_sha": "d38f7b45983cd74dc9e28439ebfb2fa60971122a",
+    "command": [
+      "/usr/bin/python3.12",
+      "scripts/strategy_research/replay_perp_r2.py",
+      "--cache",
+      "/tmp/v06-g2-r2-8",
+      "--out",
+      "/tmp/v06-g2-r2-8/replay_pinned_implementation"
+    ],
+    "computational_identical_input_checks": 3,
+    "duration_seconds": 17.5229,
+    "exit_code": 0,
+    "identical_to_prior_result_and_rows": true,
+    "independent_empirical_campaigns": 1,
+    "scientific_digest": "888e60749be7ceb9a5236eae95f4f90c02dc885e2eb139a4f6fc5597b8710192"
+  },
+  "pre_reg_r2_sha": "66aad50500bf6e860e76bf3ae8c0ef70799d5f47",
+  "protected_reads": 0,
+  "proxy_available_at": "exclusive bar end+60000ms",
+  "receipt_proven_PIT": false,
+  "risk": {
+    "MFE_MAE": "full extrema on completed pre-exit minutes; stop minute MFE excludes unknown pre-stop extremes; TP minute MAE uses conservative full-minute adverse excursion",
+    "collision": "SL-first in same minute; gaps worse stop min(stop,open) LONG / max(stop,open) SHORT; favorable target gaps receive target only",
+    "embargo_hours": 12,
+    "equity_usdt": "1000",
+    "leverage": "<=1x entry notional accounting; no margin-return amplification, compounding, borrowing, liquidation profit or martingale",
+    "liquidity": "entry notional <=0.001*preceding completed minute quote volume; zero volume/stale/missing bars deny fill",
+    "maker": "no maker orders, no guaranteed limit fills; target executions also taker",
+    "notional_per_asset_usdt": "333.333333333333",
+    "positions": "one open trade per symbol per strategy; no new signal until preceding exit end; at most three asset positions",
+    "precision": "fresh Decimal Context(prec=28,ROUND_HALF_EVEN), derived strings quantized 12 decimals; no ambient precision dependency",
+    "purge": "entry >=partition_start+12h; entry+maxhold <=partition_end-12h; no cross-boundary outcomes",
+    "risk_fraction_eligible": [
+      "0.002",
+      "0.05"
+    ],
+    "stop": "fixed raw entry +/-1.5 ATR; entry fee/spread/slippage charged separately",
+    "stop_ATR": "1.5",
+    "target_R": "2",
+    "timeout": "last minute close after exact 4h/12h max hold"
+  },
+  "source_admission_attempt_failed_before_candidate_replay": "initial funding decoder incorrectly assumed price-minute alignment; corrected to preserve publisher calculation clock, never alter candidate parameters or funding threshold",
+  "stale_exit": "zero-volume open path hard-stops, no invented stop/target fill"
+}

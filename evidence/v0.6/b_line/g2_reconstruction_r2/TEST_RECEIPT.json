@@ -1,0 +1,160 @@
+{
+  "CI_observation": {
+    "claim": "No CI success claim; shared planner unchanged, may fail-closed to FULL",
+    "conclusion": null,
+    "full_duration_seconds": null,
+    "head_sha": "d38f7b45983cd74dc9e28439ebfb2fa60971122a",
+    "id": 37791553048,
+    "status": "in_progress",
+    "url": "https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/37791553048"
+  },
+  "G1_source_changes": 0,
+  "N_A_tests": [
+    "grid inventory/paired-profit/underwater/maker queue because NO_GRID relinquishes4 slots",
+    "live receipt/source feed measurement, not authorized by historical reconstruction"
+  ],
+  "R1_changes": 0,
+  "canonical_python": "3.12.3",
+  "canonical_python312": "SCOPED_TESTS_CERTIFIED; not release certification",
+  "commands": [
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "duration_seconds": 0.0396,
+      "exit_code": 0,
+      "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "summary": ""
+    },
+    {
+      "command": [
+        "/root/miniconda3/bin/python",
+        "-m",
+        "ruff",
+        "check",
+        "src/btc_quant_agent/strategy_research",
+        "scripts/strategy_research",
+        "tests/test_strategy_research_perp_r2.py"
+      ],
+      "duration_seconds": 0.107,
+      "exit_code": 0,
+      "output_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "summary": "All checks passed!\n"
+    },
+    {
+      "command": [
+        "/root/miniconda3/bin/python",
+        "-m",
+        "mypy",
+        "--follow-imports=skip",
+        "src/btc_quant_agent/strategy_research",
+        "scripts/strategy_research"
+      ],
+      "duration_seconds": 0.5558,
+      "exit_code": 0,
+      "output_sha256": "ab35ee42183d4d6d3ba483825ab037d18a5a15622d03be01d82220b1564851ff",
+      "summary": "Success: no issues found in 6 source files\n"
+    },
+    {
+      "command": [
+        "/usr/bin/python3.12",
+        "-m",
+        "compileall",
+        "-q",
+        "src/btc_quant_agent/strategy_research",
+        "scripts/strategy_research",
+        "tests/test_strategy_research_perp_r2.py"
+      ],
+      "duration_seconds": 0.0942,
+      "exit_code": 0,
+      "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "summary": ""
+    },
+    {
+      "command": [
+        "/usr/bin/python3.12",
+        "-m",
+        "pytest",
+        "-q",
+        "tests/test_strategy_research_perp_r2.py",
+        "-o",
+        "cache_dir=/tmp/v06-g2-r2-8/pytest-cache",
+        "--tb=short",
+        "--durations=5"
+      ],
+      "duration_seconds": 2.6292,
+      "exit_code": 0,
+      "output_sha256": "1f32bd0b44874543ed8782f14bf198af1fdb5b417f06889a75a46cca882a9b0b",
+      "summary": "....................................................                     [100%]\n============================= slowest 5 durations ==============================\n0.09s call     tests/test_strategy_research_perp_r2.py::test_time_block_bootstrap_common_shocks_not_iid_and_fixed_seed\n0.06s call     tests/test_strategy_research_perp_r2.py::test_ambiguous_stop_before_target_and_bad_gap[LONG]\n0.06s call     tests/test_strategy_research_perp_r2.py::test_ambiguous_stop_before_target_and_bad_gap[SHORT]\n0.05s call     tests/test_strategy_research_perp_r2.py::test_resampling_closed_bar_availability_epoch[1]\n0.05s call     tests/test_strategy_research_perp_r2.py::test_zero_volume_entry_or_open_exit_path_cannot_be_filled\n52 passed in 0.83s\n"
+    }
+  ],
+  "created_utc": "2026-10-08T14:43:37.549973+00:00",
+  "cross_version_synthetic_digests": [
+    {
+      "python": "3.12.3",
+      "scientific_sha256": "d9bd4c1aa39b1d605ba846aa9a057d318c50738f41e934077bdc5520ab84c2e1"
+    },
+    {
+      "python": "3.13.13",
+      "scientific_sha256": "d9bd4c1aa39b1d605ba846aa9a057d318c50738f41e934077bdc5520ab84c2e1"
+    }
+  ],
+  "data_manifest_sha256": "94bbecd5144705a2998198a9a48f29979e66b92e872cd40b59c50546c5525a77",
+  "data_rows_sha256": {
+    "decision_rows_uncompressed_sha256": "e0ce8ebe996e462038997dbf5e289a79fc0d90ad442c418e3afa9fe313de425c",
+    "trade_rows_uncompressed_sha256": "0906155ce43e068491f49081461d7f9139b81c4c29fa2ffe1657e07535091ea9"
+  },
+  "dependency_hash": "a379f28a1d649de6b853f35093f3b72cecdcf814907e01e716480f183e5bb31f",
+  "exchange_writes": 0,
+  "failed": 0,
+  "fixtures": "synthetic in-memory only; no empirical cache read by pytest",
+  "host_python": "3.13.13 | packaged by Anaconda, Inc. | (main, Apr 14 2026, 06:19:41) [GCC 14.3.0]",
+  "implementation_sha": "d38f7b45983cd74dc9e28439ebfb2fa60971122a",
+  "packages_host_static_tools": {
+    "mypy": "1.20.2",
+    "pytest": "8.4.2",
+    "ruff": "0.16.9"
+  },
+  "parent_sha": "66aad50500bf6e860e76bf3ae8c0ef70799d5f47",
+  "passed": 52,
+  "pinned_empirical_replay": {
+    "candidate_parameters_changed": false,
+    "code_sha": "d38f7b45983cd74dc9e28439ebfb2fa60971122a",
+    "command": [
+      "/usr/bin/python3.12",
+      "scripts/strategy_research/replay_perp_r2.py",
+      "--cache",
+      "/tmp/v06-g2-r2-8",
+      "--out",
+      "/tmp/v06-g2-r2-8/replay_pinned_implementation"
+    ],
+    "computational_identical_input_checks": 3,
+    "duration_seconds": 17.5229,
+    "exit_code": 0,
+    "identical_to_prior_result_and_rows": true,
+    "independent_empirical_campaigns": 1,
+    "scientific_digest": "888e60749be7ceb9a5236eae95f4f90c02dc885e2eb139a4f6fc5597b8710192"
+  },
+  "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+  "pre_reg_r2_sha": "66aad50500bf6e860e76bf3ae8c0ef70799d5f47",
+  "protected_reads": 0,
+  "pyproject_sha256": "3af5e434ba20b16ad4356fa22dbad71155fadcd0cade08b575209f2e83c13efb",
+  "pytest_reported_duration_seconds": 0.83,
+  "scientific_digest": "888e60749be7ceb9a5236eae95f4f90c02dc885e2eb139a4f6fc5597b8710192",
+  "skipped": 0,
+  "source_and_test_sha256": {
+    "scripts/strategy_research/fetch_perp_r2.py": "61b4911fbd541c7d847473f7977a05068370fe692e4c0b5c382f686a73e2fa6b",
+    "scripts/strategy_research/replay_perp_r2.py": "62fefba21769c4fbd15fd9b4e2c59d60423cd17416b6d2ce5938b040f9ccbd3c",
+    "src/btc_quant_agent/strategy_research/__init__.py": "0212fa1aa7f5e6c36f812ebc4984daa94b7f6fb75cffe57c2012868536feac91",
+    "src/btc_quant_agent/strategy_research/perp_analysis.py": "1ffbe51a3141e68c194daeb46a78c4863a5438d3727eeaebb967719ef1982004",
+    "src/btc_quant_agent/strategy_research/perp_replay.py": "23144c9e401eaea78f03429bd5321a5ffd4c1d7a890102689dcfd954066c9eb0",
+    "src/btc_quant_agent/strategy_research/perp_source.py": "470fb73165c8426228b5de97d0baf99f7534ee969f4bfac5aad9585bbf6abec8",
+    "tests/test_strategy_research_perp_r2.py": "0af85ebf166c0b873c0114d2a71662f4a63aee0aa793efafbf0b7fea9f0c71d2"
+  },
+  "stage": "L1_FINAL",
+  "terminal_push_identity_location": "immutable final evidence commit reported at remote HEAD in terminal; avoids self-referential commit SHA",
+  "test_selection": "all tests/test_strategy_research_*.py, one R2 file52tests; MarketWatch runtime imports none, imported-caller tests N/A",
+  "total_wall_seconds": 3.4258
+}

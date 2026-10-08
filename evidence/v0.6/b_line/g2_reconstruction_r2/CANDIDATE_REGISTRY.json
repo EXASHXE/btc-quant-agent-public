@@ -1,0 +1,192 @@
+{
+  "candidates": [
+    {
+      "direction": "LONG",
+      "empirical_campaign_count": 1,
+      "family": "BREAKOUT",
+      "holding_hours": 4,
+      "id": "BREAKOUT_LONG_04H",
+      "n_trades": 153,
+      "parameters_changed_after_freeze": false,
+      "partition_trades": [
+        44,
+        45,
+        64
+      ],
+      "reasons": [
+        "NEGATIVE_BASE_AND_HIGHER_COST_MEAN_NET_R",
+        "LESS_THAN_100_TRADES_IN_EACH_PARTITION",
+        "PROXY_FUNDING_COST_UNCERTAINTY"
+      ],
+      "sample_support": false,
+      "shortlisted": false,
+      "status": "EVALUATED_DEVELOPMENT_ONLY"
+    },
+    {
+      "direction": "LONG",
+      "empirical_campaign_count": 1,
+      "family": "BREAKOUT",
+      "holding_hours": 12,
+      "id": "BREAKOUT_LONG_12H",
+      "n_trades": 137,
+      "parameters_changed_after_freeze": false,
+      "partition_trades": [
+        42,
+        41,
+        54
+      ],
+      "reasons": [
+        "NEGATIVE_BASE_AND_HIGHER_COST_MEAN_NET_R",
+        "LESS_THAN_100_TRADES_IN_EACH_PARTITION",
+        "PROXY_FUNDING_COST_UNCERTAINTY"
+      ],
+      "sample_support": false,
+      "shortlisted": false,
+      "status": "EVALUATED_DEVELOPMENT_ONLY"
+    },
+    {
+      "direction": "SHORT",
+      "empirical_campaign_count": 1,
+      "family": "BREAKOUT",
+      "holding_hours": 4,
+      "id": "BREAKOUT_SHORT_04H",
+      "n_trades": 166,
+      "parameters_changed_after_freeze": false,
+      "partition_trades": [
+        51,
+        66,
+        49
+      ],
+      "reasons": [
+        "NEGATIVE_BASE_AND_HIGHER_COST_MEAN_NET_R",
+        "LESS_THAN_100_TRADES_IN_EACH_PARTITION",
+        "PROXY_FUNDING_COST_UNCERTAINTY"
+      ],
+      "sample_support": false,
+      "shortlisted": false,
+      "status": "EVALUATED_DEVELOPMENT_ONLY"
+    },
+    {
+      "direction": "SHORT",
+      "empirical_campaign_count": 1,
+      "family": "BREAKOUT",
+      "holding_hours": 12,
+      "id": "BREAKOUT_SHORT_12H",
+      "n_trades": 143,
+      "parameters_changed_after_freeze": false,
+      "partition_trades": [
+        47,
+        60,
+        36
+      ],
+      "reasons": [
+        "NEGATIVE_BASE_AND_HIGHER_COST_MEAN_NET_R",
+        "LESS_THAN_100_TRADES_IN_EACH_PARTITION",
+        "PROXY_FUNDING_COST_UNCERTAINTY"
+      ],
+      "sample_support": false,
+      "shortlisted": false,
+      "status": "EVALUATED_DEVELOPMENT_ONLY"
+    },
+    {
+      "direction": "LONG",
+      "empirical_campaign_count": 1,
+      "family": "TREND_PULLBACK",
+      "holding_hours": 4,
+      "id": "TREND_PULLBACK_LONG_04H",
+      "n_trades": 125,
+      "parameters_changed_after_freeze": false,
+      "partition_trades": [
+        44,
+        46,
+        35
+      ],
+      "reasons": [
+        "NEGATIVE_BASE_AND_HIGHER_COST_MEAN_NET_R",
+        "LESS_THAN_100_TRADES_IN_EACH_PARTITION",
+        "PROXY_FUNDING_COST_UNCERTAINTY"
+      ],
+      "sample_support": false,
+      "shortlisted": false,
+      "status": "EVALUATED_DEVELOPMENT_ONLY"
+    },
+    {
+      "direction": "LONG",
+      "empirical_campaign_count": 1,
+      "family": "TREND_PULLBACK",
+      "holding_hours": 12,
+      "id": "TREND_PULLBACK_LONG_12H",
+      "n_trades": 104,
+      "parameters_changed_after_freeze": false,
+      "partition_trades": [
+        36,
+        38,
+        30
+      ],
+      "reasons": [
+        "NEGATIVE_BASE_AND_HIGHER_COST_MEAN_NET_R",
+        "LESS_THAN_100_TRADES_IN_EACH_PARTITION",
+        "PROXY_FUNDING_COST_UNCERTAINTY"
+      ],
+      "sample_support": false,
+      "shortlisted": false,
+      "status": "EVALUATED_DEVELOPMENT_ONLY"
+    },
+    {
+      "direction": "SHORT",
+      "empirical_campaign_count": 1,
+      "family": "TREND_PULLBACK",
+      "holding_hours": 4,
+      "id": "TREND_PULLBACK_SHORT_04H",
+      "n_trades": 92,
+      "parameters_changed_after_freeze": false,
+      "partition_trades": [
+        30,
+        39,
+        23
+      ],
+      "reasons": [
+        "NEGATIVE_BASE_AND_HIGHER_COST_MEAN_NET_R",
+        "LESS_THAN_100_TRADES_IN_EACH_PARTITION",
+        "PROXY_FUNDING_COST_UNCERTAINTY"
+      ],
+      "sample_support": false,
+      "shortlisted": false,
+      "status": "EVALUATED_DEVELOPMENT_ONLY"
+    },
+    {
+      "direction": "SHORT",
+      "empirical_campaign_count": 1,
+      "family": "TREND_PULLBACK",
+      "holding_hours": 12,
+      "id": "TREND_PULLBACK_SHORT_12H",
+      "n_trades": 77,
+      "parameters_changed_after_freeze": false,
+      "partition_trades": [
+        25,
+        32,
+        20
+      ],
+      "reasons": [
+        "NEGATIVE_BASE_AND_HIGHER_COST_MEAN_NET_R",
+        "LESS_THAN_100_TRADES_IN_EACH_PARTITION",
+        "PROXY_FUNDING_COST_UNCERTAINTY"
+      ],
+      "sample_support": false,
+      "shortlisted": false,
+      "status": "EVALUATED_DEVELOPMENT_ONLY"
+    }
+  ],
+  "evaluated": 8,
+  "grid": "NO_GRID_PREREGISTERED; no grid inference",
+  "identical_input_verification_passes": 3,
+  "independent_empirical_campaigns": 1,
+  "maximum": 12,
+  "method_sha256": "30245c01d445eaa1336faabd99140b791eb66b38a3ba4604ef6cbd30f25e0948",
+  "parameter_search_trials": 8,
+  "pre_reg_r2_sha": "66aad50500bf6e860e76bf3ae8c0ef70799d5f47",
+  "registered": 8,
+  "retuning": 0,
+  "shortlist": [],
+  "unused_budget": 4
+}

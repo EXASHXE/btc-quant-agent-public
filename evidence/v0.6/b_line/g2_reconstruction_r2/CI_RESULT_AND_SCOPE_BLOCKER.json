@@ -1,0 +1,34 @@
+{
+  "G2_local_L1": {
+    "failed": 0,
+    "passed": 52,
+    "python": "3.12.3",
+    "skipped": 0
+  },
+  "H40_source_or_test_changes": 0,
+  "action": "CONTROLLER_OUT_OF_SCOPE_H40_GRAPH_CI_TRIAGE_REQUIRED; no golden hash update, shared source fix or unsafe skip attempted",
+  "actual_hash": "ee185f1fce50bdf710295a23506a5c29d83a70c361aff72e2b6be9e54526643d",
+  "cause_adjudicated": false,
+  "classification": "CI_SYNTHETIC_TEST_HASH_METADATA_ONLY; no H40 market archive or protected outcome values inspected",
+  "code_sha": "d38f7b45983cd74dc9e28439ebfb2fa60971122a",
+  "conclusion": "failure",
+  "exchange_writes": 0,
+  "expected_hash": "d5a962cd9c9556b573a890b6af8cbeb09d7201187511f477d727c8670bf0b2e0",
+  "failure_kind": "exact scientific graph hash mismatch in hermetic CI test",
+  "failure_test": "tests/test_v051_h40_m3a_production_discovery_producer.py::test_p09_through_p18_exact_scientific_graph",
+  "job_duration_seconds": 558,
+  "overall_CI_PASS_claim": false,
+  "profile": "fail-closed broad regression for unmapped research source; planner unchanged",
+  "protected_reads": 0,
+  "run_id": 37791553048,
+  "static_steps": "Ruff, mypy, compile, changed JSON validation passed",
+  "tests": {
+    "duration_seconds": 527.81,
+    "failed": 1,
+    "passed": 2819,
+    "skipped": 2,
+    "warnings": 8
+  },
+  "url": "https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/37791553048",
+  "workflow_elapsed_seconds": 564
+}

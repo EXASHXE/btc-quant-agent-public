@@ -1,0 +1,34 @@
+{
+  "cross_version_synthetic_digests": [
+    {
+      "python": "3.12.3",
+      "scientific_sha256": "d9bd4c1aa39b1d605ba846aa9a057d318c50738f41e934077bdc5520ab84c2e1"
+    },
+    {
+      "python": "3.13.13",
+      "scientific_sha256": "d9bd4c1aa39b1d605ba846aa9a057d318c50738f41e934077bdc5520ab84c2e1"
+    }
+  ],
+  "decision_rows_uncompressed_sha256": "e0ce8ebe996e462038997dbf5e289a79fc0d90ad442c418e3afa9fe313de425c",
+  "observation_identity": "role,parent_candidate,trade_identity",
+  "pinned": {
+    "candidate_parameters_changed": false,
+    "code_sha": "d38f7b45983cd74dc9e28439ebfb2fa60971122a",
+    "command": [
+      "/usr/bin/python3.12",
+      "scripts/strategy_research/replay_perp_r2.py",
+      "--cache",
+      "/tmp/v06-g2-r2-8",
+      "--out",
+      "/tmp/v06-g2-r2-8/replay_pinned_implementation"
+    ],
+    "computational_identical_input_checks": 3,
+    "duration_seconds": 17.5229,
+    "exit_code": 0,
+    "identical_to_prior_result_and_rows": true,
+    "independent_empirical_campaigns": 1,
+    "scientific_digest": "888e60749be7ceb9a5236eae95f4f90c02dc885e2eb139a4f6fc5597b8710192"
+  },
+  "trade_rows_uncompressed_sha256": "0906155ce43e068491f49081461d7f9139b81c4c29fa2ffe1657e07535091ea9",
+  "verified_equal_result_json_and_compressed_rows": true
+}
