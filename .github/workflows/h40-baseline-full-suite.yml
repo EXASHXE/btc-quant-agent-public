@@ -1,0 +1,37 @@
+name: H40 Baseline Full-Suite Differential L2 (one-shot)
+on:
+  push:
+    branches: [validation/v06-h40-baseline-full-suite-r1]
+permissions:
+  contents: read
+jobs:
+  baseline:
+    name: Pinned v0.6 pre-G1 baseline complete hermetic suite
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: d6500140f3141d179181f2360ad815b5bfe9c954
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install exact baseline dependencies
+        run: python -m pip install -e '.[dev,research]'
+      - name: Immutable identity
+        run: |
+          test "$(git rev-parse HEAD)" = "d6500140f3141d179181f2360ad815b5bfe9c954"
+          python --version
+          python -m pytest --version
+      - name: One-shot full suite for H40 inherited-versus-G1 differential
+        run: |
+          python -m pytest -q --durations=20 --junitxml=/tmp/h40-baseline-l2-junit.xml
+      - name: Retain terminal evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: h40-baseline-once
+          path: /tmp/h40-baseline-l2-junit.xml
+          if-no-files-found: warn
+          retention-days: 14
