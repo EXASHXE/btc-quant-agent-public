@@ -1,0 +1,61 @@
+{
+  "schema": "V06_G2_R3_METHOD_MARK_SOURCE_REPAIR_R1_CONTROLLER_DISPATCH_V1",
+  "task_id": "V06_G2_R3_METHOD_MARK_SOURCE_REPAIR_R1",
+  "controller_decision": "ACCEPT_SOURCE_AUDIT_FAIL_CLOSED__AUTHORIZE_BOUNDED_METHOD_AND_OFFICIAL_MARK_ARCHIVE_METADATA_REPAIR",
+  "repository": "EXASHXE/btc-quant-agent-public",
+  "docs_parent_sha": "df7f873d276caf9b07fd9c1e1a4c939bdc51a238",
+  "source_audit_head_sha": "12793bc04db7414d11a0961684fd14f5df3ce16e",
+  "source_audit_first_sha": "e9945cb92641fc8977def7aa1a572eef3ae294d0",
+  "design_branch": "feature/v06-bline-g2-r3-cost-aware-method-design",
+  "design_start_sha": "e5b2006a89441f7eb2ec900e508aff451106b87a",
+  "code_mainline": "e0ff8c3473de4bfa3e66fe7928d42992a4d38a32",
+  "official_spec_repo": "binance/binance-public-data",
+  "official_spec_exact_sha": "f446ce3812bd4e5521f21faecd4ae3c6460e49fc",
+  "official_paths": [
+    "python/README.md",
+    "python/download-futures-markPriceKlines.py",
+    "python/utility.py",
+    "python/enums.py"
+  ],
+  "source_lead": "https://data.binance.vision/data/futures/um/monthly/markPriceKlines/{symbol}/1m/{symbol}-1m-{yyyy}-{mm}.zip",
+  "permission": "EXACT_PATH_HEAD_ONLY_AND_OPTIONAL_SPECIFIC_CHECKSUM_TEXT__NO_ZIP_PRICE_BODIES",
+  "symbols": [
+    "BTCUSDT",
+    "ETHUSDT",
+    "SOLUSDT"
+  ],
+  "metadata_months": [
+    "2026-01",
+    "2026-02",
+    "2026-03",
+    "2026-04"
+  ],
+  "max_requests": 40,
+  "max_metadata_bytes": 1000000,
+  "allowed_new_paths": [
+    "docs/strategy_research/g2_r3/method_repair/**",
+    "evidence/v0.6/b_line/g2_r3_design/method_repair/**"
+  ],
+  "forbidden": [
+    "any trading src/scripts/test/CI files",
+    "rewriting prior method/design/source audit artifact",
+    "1m market OHLCV ZIP/CSV content",
+    "mark price actual price body",
+    "funding rate history bodies",
+    "strategy replay/outcomes",
+    "RC2 protected symbols",
+    "all-symbol API endpoints",
+    "signed/exchange private endpoints",
+    "credentials",
+    "TESTNET",
+    "LIVE"
+  ],
+  "local_worktree": "/root/workspace/project/quant-v0.6/g2-r3-cost-aware-method-design",
+  "reuse_worktree": true,
+  "allowed_research_stage": "METHOD_REPAIR_DESIGN_AND_MARK_ARCHIVE_METADATA_AVAILABILITY_ONLY",
+  "development_quality": "NONE",
+  "real_funds_write_authority": "NONE",
+  "next_after_completion": "CONTROLLER_L2_REVIEW_THEN_SEPARATE_FIRST_PUSH_PREREG_AND_NONPROTECTED_R3_EXPLORATORY_REPLAY",
+  "prompt_path": "prompts/v0.6/b_line/V06_G2_R3_METHOD_MARK_SOURCE_REPAIR_R1.md",
+  "review_path": "reviews/v0.6/b_line/V06_G2_R3_SOURCE_AUDIT_CONTROLLER_L2_REVIEW.md"
+}
