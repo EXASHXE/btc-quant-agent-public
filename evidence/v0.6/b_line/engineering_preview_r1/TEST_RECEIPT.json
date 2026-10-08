@@ -1,0 +1,79 @@
+{
+  "task_id": "V06_B_LINE_WP_A_C_D_ENGINEERING_PREVIEW_R1",
+  "environment": {
+    "python_version": "3.12.3",
+    "pytest_version": "9.0.3",
+    "os": "Linux 6.6.137+ #1 SMP PREEMPT_DYNAMIC x86_64",
+    "linter": "ruff 0.9.10"
+  },
+  "python_compilation": {
+    "command": "python3.12 -m compileall -q src tests",
+    "status": "PASS",
+    "error_count": 0
+  },
+  "ruff_linter": {
+    "command": "ruff check src/btc_quant_agent tests",
+    "status": "PASS",
+    "error_count": 0
+  },
+  "test_suites": [
+    {
+      "suite_name": "dedicated_engineering_preview_r1",
+      "test_file": "tests/test_v06_engineering_preview_r1.py",
+      "passed": 4,
+      "failed": 0,
+      "duration_seconds": 1.38
+    },
+    {
+      "suite_name": "wp_a_operational_readiness",
+      "test_file": "tests/test_live_v1_rc1_operational_readiness.py",
+      "passed": 8,
+      "failed": 0,
+      "duration_seconds": 2.95
+    },
+    {
+      "suite_name": "wp_c_llm_approval_integration",
+      "test_file": "tests/test_live_v1_rc1_llm_approval_integration.py",
+      "passed": 44,
+      "failed": 0,
+      "duration_seconds": 1.82
+    },
+    {
+      "suite_name": "wp_d_release_engineering",
+      "test_file": "tests/test_live_v1_rc1_wp_d_release_engineering.py",
+      "passed": 33,
+      "failed": 0,
+      "duration_seconds": 1.91
+    },
+    {
+      "suite_name": "live_v1_day2_e2e_and_signed",
+      "test_files": [
+        "tests/test_live_v1_day2_e2e.py",
+        "tests/test_binance_signed.py"
+      ],
+      "passed": 5,
+      "failed": 0,
+      "duration_seconds": 0.85
+    },
+    {
+      "suite_name": "tactical_and_market_watch_regression",
+      "test_files": [
+        "tests/test_market_watch.py",
+        "tests/test_tactical_feature_evidence_v2.py",
+        "tests/test_tactical_grid_shadow_evaluation_v1.py",
+        "tests/test_tactical_policy_b0.py",
+        "tests/test_tactical_shadow_evaluation_v2.py",
+        "tests/test_v050_r02_orchestration_guards.py"
+      ],
+      "passed": 291,
+      "failed": 0,
+      "duration_seconds": 11.55
+    }
+  ],
+  "a_line_regression_diff_zero": {
+    "command": "git diff --exit-code d6500140f3141d179181f2360ad815b5bfe9c954 -- src/btc_quant_agent/h40 src/btc_quant_agent/h41 tests/h41",
+    "status": "PASS",
+    "exit_code": 0,
+    "diff_lines": 0
+  }
+}

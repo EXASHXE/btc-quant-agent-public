@@ -1,0 +1,88 @@
+{
+  "task_id": "V06_G1_ENGINEERING_PREVIEW_L2_FINDINGS_REPAIR_R1",
+  "controller_dispatch_sha": "deecefafff67f3ce81962477a17af7cf1c97cb7f",
+  "finding_2_description": "Full-suite H40 scientific golden mismatch observed in G1 CI #37755191706 on test_p09_through_p18_exact_scientific_graph (observed ee185f1f... vs expected d5a962cd...)",
+  "source_equivalence_verification": {
+    "command": "git diff --exit-code d6500140f3141d179181f2360ad815b5bfe9c954 -- src/btc_quant_agent/h40 src/btc_quant_agent/h41 tests/h41 tests/test_v051_h40*",
+    "diff_lines": 0,
+    "exit_code": 0,
+    "verdict": "IDENTICAL_BYTE_FOR_BYTE"
+  },
+  "diagnosis_passes_executed": [
+    {
+      "pass": 1,
+      "name": "isolated_h40_golden_and_producer_test",
+      "commands": [
+        "PYTHONPATH=src pytest tests/test_v051_h40_m3a_production_discovery_producer.py::test_p09_through_p18_exact_scientific_graph -v",
+        "PYTHONPATH=src pytest tests/test_v051_h40_m3a_production_discovery_producer.py -v"
+      ],
+      "results": [
+        {
+          "command": "isolated golden test",
+          "passed": 1,
+          "failed": 0,
+          "duration_seconds": 23.43,
+          "observed_graph_digest": "d5a962cd67a7b819fbc74d8121f64964646700c0f9949d0124ad49b8095b5463",
+          "expected_graph_digest": "d5a962cd67a7b819fbc74d8121f64964646700c0f9949d0124ad49b8095b5463",
+          "match": true
+        },
+        {
+          "command": "full producer module",
+          "passed": 26,
+          "failed": 0,
+          "duration_seconds": 272.55
+        }
+      ],
+      "conclusion": "Isolated execution passes completely on G1 branch with zero discrepancy."
+    },
+    {
+      "pass": 2,
+      "name": "g1_imports_and_authority_suite_chaining",
+      "commands": [
+        "PYTHONPATH=src pytest tests/test_live_v1_*.py tests/test_binance_signed.py tests/test_v06_engineering_preview_r1.py tests/test_v051_h40_m3a_production_discovery_producer.py::test_p09_through_p18_exact_scientific_graph -v",
+        "PYTHONPATH=src pytest tests/test_v051_h40_f01_*.py tests/test_v051_h40_implementation_authority_publication.py tests/test_v051_h40_m3a_production_discovery_producer.py::test_p09_through_p18_exact_scientific_graph -v"
+      ],
+      "results": [
+        {
+          "chain": "all_g1_live_v1_and_preview_tests_preceding_h40_golden",
+          "tests_run": 696,
+          "passed": 696,
+          "failed": 0,
+          "duration_seconds": 112.59,
+          "observed_graph_digest": "d5a962cd67a7b819fbc74d8121f64964646700c0f9949d0124ad49b8095b5463",
+          "expected_graph_digest": "d5a962cd67a7b819fbc74d8121f64964646700c0f9949d0124ad49b8095b5463",
+          "match": true
+        },
+        {
+          "chain": "h40_authority_and_f01_tests_preceding_h40_golden",
+          "tests_run": 189,
+          "passed": 189,
+          "failed": 0,
+          "duration_seconds": 123.93,
+          "observed_graph_digest": "d5a962cd67a7b819fbc74d8121f64964646700c0f9949d0124ad49b8095b5463",
+          "expected_graph_digest": "d5a962cd67a7b819fbc74d8121f64964646700c0f9949d0124ad49b8095b5463",
+          "match": true
+        }
+      ],
+      "conclusion": "No G1 live_v1/v06 test module or H40 authority test introduces collection-time or execution-time side effects altering H40 output."
+    }
+  ],
+  "maximum_diagnosis_passes_limit": 2,
+  "diagnostic_classification": {
+    "ISOLATED_BOTH_PASS": true,
+    "COMBINED_REPRODUCED": false,
+    "ATTRIBUTED_TO_G1": false,
+    "INHERITED_BASELINE_REPRODUCED": false,
+    "UNRESOLVED": true,
+    "terminal_status": "G1_L2_H40_CROSS_SUITE_BLOCKED"
+  },
+  "technical_hypotheses": [
+    "Cross-suite global state leakage in pre-existing non-G1 tests: One or more test files in the remaining ~2,000 repository test suite modifies global PRNG state, numpy random state, Decimal context, or sys.modules caching, affecting the downstream deterministic graph generation.",
+    "Monolithic alphabetical pytest order sensitivity: In CI #37755191706, tests are executed in a single monolithic process in alphabetical order across 2,770 tests. The failure does not occur when running G1 modules and H40 modules together, indicating the inducer is an older legacy test module executed earlier in the alphabetical sequence.",
+    "Zero G1 causality: H40/H41 code, golden constants, and tests are byte-identical to baseline d6500140f3141d179181f2360ad815b5bfe9c954. G1 feature code does not import, reference, or configure any H40/H41 components."
+  ],
+  "recommendations": [
+    "Execute the monolithic all-suite test run on pure baseline v0.6 commit d650014 to verify whether the golden mismatch reproduces identically without G1 changes.",
+    "Isolate scientific golden tests (such as test_v051_h40_m3a_production_discovery_producer.py) into an isolated test job or runner process to guarantee process hygiene against global PRNG pollution."
+  ]
+}

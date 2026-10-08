@@ -1,0 +1,41 @@
+{
+  "task_id": "V06_G1_ENGINEERING_PREVIEW_L2_FINDINGS_REPAIR_R1",
+  "controller_dispatch_sha": "deecefafff67f3ce81962477a17af7cf1c97cb7f",
+  "base_branch": "feature/v06-bline-engineering-preview-r1",
+  "start_head_sha": "6eef811961bfbe1341eee79b2450a4266d277302",
+  "repository": "EXASHXE/btc-quant-agent-public",
+  "finding_1_remediation": {
+    "action": "HISTORICAL_EVIDENCE_IMPORT_PURGE_AND_UNBOUND_TEMPLATE_REHOMING",
+    "purged_historical_file": "evidence/v0.5.5/live_v1/RC1/WP_D/B_LINE_INITIAL_USABLE_RELEASE_V1_RC1_MANIFEST.json",
+    "unbound_template_path": "evidence/v0.6/b_line/engineering_preview_r1/RELEASE_MANIFEST_TEMPLATE_UNBOUND.json",
+    "consumers_rebound": [
+      {
+        "file": "src/btc_quant_agent/api.py",
+        "line": 1089,
+        "description": "Updated wp_d_release_manifest artifact map entry to point to v0.6 unbound template"
+      },
+      {
+        "file": "tests/test_live_v1_rc1_wp_d_release_engineering.py",
+        "line": 27,
+        "description": "Updated MANIFEST_PATH constant to point to v0.6 unbound template"
+      },
+      {
+        "file": "docs/LIVE_V1_RC1_OPERATIONAL_RUNBOOK.md",
+        "lines": [36, 317],
+        "description": "Updated operational runbook CLI verification command and evidence section reference"
+      }
+    ],
+    "template_properties": {
+      "authoritative": false,
+      "unbound": true,
+      "contains_pending_markers": true,
+      "pending_fields": [
+        "source_sha = PENDING_INTEGRATION_SOURCE_SHA",
+        "runtime_certification_commit_sha = PENDING_WP_A_RUNTIME_CERTIFICATION_SHA",
+        "integration_authority_commit_sha = PENDING_INTEGRATION_AUTHORITY_COMMIT_SHA"
+      ],
+      "cli_verification_status": "PASSED"
+    },
+    "historical_firewall_status": "COMPLIANT - No other files under evidence/v0.5.5/** modified or created"
+  }
+}

@@ -1,28 +1,43 @@
 services:
-  quantd:
-    build: .
-    restart: unless-stopped
-    environment:
-      BTC_QUANT_CONFIG: /app/configs/default.toml
-      BTC_QUANT_DB_PATH: /app/var/quant.db
-      FEISHU_WEBHOOK_URL: ${FEISHU_WEBHOOK_URL:-}
-      FEISHU_WEBHOOK_SECRET: ${FEISHU_WEBHOOK_SECRET:-}
-      BTC_QUANT_API_TOKEN: ${BTC_QUANT_API_TOKEN:-}
-    volumes:
-      - ./var:/app/var
-      - ./configs:/app/configs:ro
-    command: ["quantctl", "daemon", "--poll-seconds", "30"]
-
   api:
     build: .
     restart: unless-stopped
     environment:
       BTC_QUANT_CONFIG: /app/configs/default.toml
       BTC_QUANT_DB_PATH: /app/var/quant.db
+      BTC_QUANT_LIVE_V1_DB_PATH: /app/var/live_v1.db
+      BTC_QUANT_LIVE_V1_RUNTIME_ENABLED: ${BTC_QUANT_LIVE_V1_RUNTIME_ENABLED:-true}
+      BTC_QUANT_LIVE_V1_ENABLED: ${BTC_QUANT_LIVE_V1_ENABLED:-false}
+      BTC_QUANT_LIVE_V1_EXECUTION_MODE: ${BTC_QUANT_LIVE_V1_EXECUTION_MODE:-DRY_RUN}
+      BTC_QUANT_LIVE_V1_TESTNET_EXECUTION_ENABLED: ${BTC_QUANT_LIVE_V1_TESTNET_EXECUTION_ENABLED:-false}
+      BTC_QUANT_LIVE_V1_SYMBOL: ${BTC_QUANT_LIVE_V1_SYMBOL:-BTCUSDT}
+      BTC_QUANT_LIVE_V1_ACCOUNT_ID: ${BTC_QUANT_LIVE_V1_ACCOUNT_ID:-DEFAULT_ACCOUNT}
+      BTC_QUANT_LIVE_V1_WS_URL: ${BTC_QUANT_LIVE_V1_WS_URL:-wss://fstream.binance.com}
+      BTC_QUANT_LIVE_V1_REST_RECONCILE_SECONDS: ${BTC_QUANT_LIVE_V1_REST_RECONCILE_SECONDS:-30}
+      BTC_QUANT_LIVE_RESPONSES_MODEL: ${BTC_QUANT_LIVE_RESPONSES_MODEL:-gpt-5.4}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      BTC_QUANT_LIVE_CODEX_ENABLED: ${BTC_QUANT_LIVE_CODEX_ENABLED:-false}
+      BTC_QUANT_LIVE_CODEX_MODEL: ${BTC_QUANT_LIVE_CODEX_MODEL:-gpt-5.3-codex-spark}
+      BTC_QUANT_LIVE_ANALYSIS_TIMEOUT: ${BTC_QUANT_LIVE_ANALYSIS_TIMEOUT:-60}
+      BTC_QUANT_LIVE_CASE_TTL_MS: ${BTC_QUANT_LIVE_CASE_TTL_MS:-120000}
+      FEISHU_APP_ID: ${FEISHU_APP_ID:-}
+      FEISHU_APP_SECRET: ${FEISHU_APP_SECRET:-}
+      FEISHU_RECEIVE_ID: ${FEISHU_RECEIVE_ID:-}
+      FEISHU_RECEIVE_ID_TYPE: ${FEISHU_RECEIVE_ID_TYPE:-chat_id}
+      FEISHU_VERIFICATION_TOKEN: ${FEISHU_VERIFICATION_TOKEN:-}
+      FEISHU_ENCRYPT_KEY: ${FEISHU_ENCRYPT_KEY:-}
+      FEISHU_APPROVER_OPEN_IDS: ${FEISHU_APPROVER_OPEN_IDS:-}
+      FEISHU_WEBHOOK_URL: ${FEISHU_WEBHOOK_URL:-}
+      FEISHU_WEBHOOK_SECRET: ${FEISHU_WEBHOOK_SECRET:-}
+      BINANCE_TESTNET_API_KEY: ${BINANCE_TESTNET_API_KEY:-}
+      BINANCE_TESTNET_API_SECRET: ${BINANCE_TESTNET_API_SECRET:-}
       BTC_QUANT_API_TOKEN: ${BTC_QUANT_API_TOKEN:-}
+      REAL_FUNDS_WRITE_AUTHORITY: NONE
+      LIVE_APPROVAL_ONLY: NOT_AUTHORIZED
+      AUTONOMOUS_LIVE: FORBIDDEN
     volumes:
       - ./var:/app/var
       - ./configs:/app/configs:ro
-    command: ["uvicorn", "btc_quant_agent.api:app", "--host", "0.0.0.0", "--port", "8787"]
+    command: ["uvicorn", "btc_quant_agent.api:app", "--host", "0.0.0.0", "--port", "8787", "--workers", "1"]
     ports:
       - "127.0.0.1:8787:8787"

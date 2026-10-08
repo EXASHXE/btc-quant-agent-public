@@ -1,0 +1,12 @@
+{
+  "entry_repository_path": "/root/workspace/project/rc2-tactical-successor",
+  "verified_head_sha": "1a5756663ecf56ed6c02a7355840f33e6715ea22",
+  "verified_branch": "validation/b-line-rc2-final-holdout-infra-repair-r1",
+  "git_status_porcelain": "",
+  "unstaged_changes_count": 0,
+  "untracked_files_count": 0,
+  "dirty_files_count": 0,
+  "untouched_verification": "PASSED - ENTRY repository was strictly read-only, never checked out, modified, stashed, reset, or cleaned.",
+  "dedicated_sibling_worktree_path": "/root/workspace/project/quant-v0.6/g1-engineering-preview",
+  "dedicated_task_branch": "feature/v06-bline-engineering-preview-r1"
+}

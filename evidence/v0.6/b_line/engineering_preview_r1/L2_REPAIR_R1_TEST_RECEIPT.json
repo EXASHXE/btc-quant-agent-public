@@ -1,0 +1,76 @@
+{
+  "task_id": "V06_G1_ENGINEERING_PREVIEW_L2_FINDINGS_REPAIR_R1",
+  "controller_dispatch_sha": "deecefafff67f3ce81962477a17af7cf1c97cb7f",
+  "environment": {
+    "python_version": "3.13.13",
+    "pytest_version": "8.4.2",
+    "os": "Linux 6.6.137+ #1 SMP PREEMPT_DYNAMIC x86_64",
+    "linter": "ruff 0.16.9"
+  },
+  "python_compilation": {
+    "command": "python3 -m compileall -q src tests",
+    "status": "PASS",
+    "error_count": 0
+  },
+  "ruff_linter": {
+    "command": "ruff check src/btc_quant_agent tests",
+    "status": "PASS",
+    "error_count": 0
+  },
+  "wp_d_manifest_verification": {
+    "command": "PYTHONPATH=src python -m btc_quant_agent.api --verify-manifest evidence/v0.6/b_line/engineering_preview_r1/RELEASE_MANIFEST_TEMPLATE_UNBOUND.json",
+    "status": "PASS",
+    "valid": true,
+    "errors": []
+  },
+  "test_suites": [
+    {
+      "suite_name": "wp_d_release_engineering",
+      "test_file": "tests/test_live_v1_rc1_wp_d_release_engineering.py",
+      "passed": 33,
+      "failed": 0,
+      "duration_seconds": 1.77
+    },
+    {
+      "suite_name": "v06_dedicated_engineering_preview_r1",
+      "test_file": "tests/test_v06_engineering_preview_r1.py",
+      "passed": 4,
+      "failed": 0,
+      "duration_seconds": 1.06
+    },
+    {
+      "suite_name": "h40_golden_isolated",
+      "test_target": "tests/test_v051_h40_m3a_production_discovery_producer.py::test_p09_through_p18_exact_scientific_graph",
+      "passed": 1,
+      "failed": 0,
+      "duration_seconds": 23.43
+    },
+    {
+      "suite_name": "h40_producer_module",
+      "test_file": "tests/test_v051_h40_m3a_production_discovery_producer.py",
+      "passed": 26,
+      "failed": 0,
+      "duration_seconds": 272.55
+    },
+    {
+      "suite_name": "g1_chain_preceding_h40_golden",
+      "test_files": "tests/test_live_v1_*.py + test_binance_signed.py + test_v06_engineering_preview_r1.py + test_p09_through_p18_exact_scientific_graph",
+      "passed": 696,
+      "failed": 0,
+      "duration_seconds": 112.59
+    },
+    {
+      "suite_name": "h40_authority_chain_preceding_h40_golden",
+      "test_files": "tests/test_v051_h40_f01_*.py + test_v051_h40_implementation_authority_publication.py + test_p09_through_p18_exact_scientific_graph",
+      "passed": 189,
+      "failed": 0,
+      "duration_seconds": 123.93
+    }
+  ],
+  "a_line_regression_diff_zero": {
+    "command": "git diff --exit-code d6500140f3141d179181f2360ad815b5bfe9c954 -- src/btc_quant_agent/h40 src/btc_quant_agent/h41 tests/h41 tests/test_v051_h40*",
+    "status": "PASS",
+    "exit_code": 0,
+    "diff_lines": 0
+  }
+}
