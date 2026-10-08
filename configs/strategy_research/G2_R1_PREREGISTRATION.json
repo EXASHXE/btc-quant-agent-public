@@ -1,0 +1,346 @@
+{
+  "availability": {
+    "allowed_basis": "CONTEMPORANEOUS_RECEIPT_PROVEN only for empirical signals; SYNTHETIC_TEST only for unit tests",
+    "archive_rule": "Last-Modified and current download receipt do not prove historical online receipt; never fabricate event+lag as measured availability. Archive-only source is outcome-only, cannot serve historical decision features",
+    "empirical_source_gate": "If all allowed sources lack contemporaneous receipt evidence, stop empirical replay, retain harness and report G2_R1_METHOD_OR_SOURCE_BLOCKED. Do not download prices just to discover an already known availability failure",
+    "fields": [
+      "event_ms",
+      "end_ms",
+      "receipt_ms",
+      "available_ms",
+      "decision_ms",
+      "execution_ms",
+      "origin_sha256",
+      "availability_basis"
+    ],
+    "missing_derivatives": "none required by registered spot candidates; Tactical benchmark ineligible; no forward fill",
+    "strict_rule": "event <= end <= receipt <= available <= decision < execution for every signal input"
+  },
+  "candidates": [
+    {
+      "direction": "LONG",
+      "family": "BREAKOUT",
+      "holding_hours": 4,
+      "horizon_band": "2-6h",
+      "id": "BREAKOUT_04H",
+      "max_positions_per_symbol": 1,
+      "stop_atr": 1.5,
+      "target_R": 2
+    },
+    {
+      "direction": "LONG",
+      "family": "BREAKOUT",
+      "holding_hours": 8,
+      "horizon_band": "6-12h",
+      "id": "BREAKOUT_08H",
+      "max_positions_per_symbol": 1,
+      "stop_atr": 1.5,
+      "target_R": 2
+    },
+    {
+      "direction": "LONG",
+      "family": "BREAKOUT",
+      "holding_hours": 16,
+      "horizon_band": "12-24h",
+      "id": "BREAKOUT_16H",
+      "max_positions_per_symbol": 1,
+      "stop_atr": 1.5,
+      "target_R": 2
+    },
+    {
+      "direction": "LONG",
+      "family": "BREAKOUT",
+      "holding_hours": 24,
+      "horizon_band": "12-24h",
+      "id": "BREAKOUT_24H",
+      "max_positions_per_symbol": 1,
+      "stop_atr": 1.5,
+      "target_R": 2
+    },
+    {
+      "direction": "LONG",
+      "family": "TREND_PULLBACK",
+      "holding_hours": 4,
+      "horizon_band": "2-6h",
+      "id": "TREND_PULLBACK_04H",
+      "max_positions_per_symbol": 1,
+      "stop_atr": 1.5,
+      "target_R": 2
+    },
+    {
+      "direction": "LONG",
+      "family": "TREND_PULLBACK",
+      "holding_hours": 8,
+      "horizon_band": "6-12h",
+      "id": "TREND_PULLBACK_08H",
+      "max_positions_per_symbol": 1,
+      "stop_atr": 1.5,
+      "target_R": 2
+    },
+    {
+      "direction": "LONG",
+      "family": "TREND_PULLBACK",
+      "holding_hours": 16,
+      "horizon_band": "12-24h",
+      "id": "TREND_PULLBACK_16H",
+      "max_positions_per_symbol": 1,
+      "stop_atr": 1.5,
+      "target_R": 2
+    },
+    {
+      "direction": "LONG",
+      "family": "TREND_PULLBACK",
+      "holding_hours": 24,
+      "horizon_band": "12-24h",
+      "id": "TREND_PULLBACK_24H",
+      "max_positions_per_symbol": 1,
+      "stop_atr": 1.5,
+      "target_R": 2
+    },
+    {
+      "direction": "LONG",
+      "family": "RANGE_REVERSION",
+      "holding_hours": 4,
+      "horizon_band": "2-6h",
+      "id": "RANGE_REVERSION_04H",
+      "max_positions_per_symbol": 1,
+      "stop_atr": 1.5,
+      "target_R": 2
+    },
+    {
+      "direction": "LONG",
+      "family": "RANGE_REVERSION",
+      "holding_hours": 8,
+      "horizon_band": "6-12h",
+      "id": "RANGE_REVERSION_08H",
+      "max_positions_per_symbol": 1,
+      "stop_atr": 1.5,
+      "target_R": 2
+    },
+    {
+      "direction": "LONG",
+      "family": "RANGE_REVERSION",
+      "holding_hours": 16,
+      "horizon_band": "12-24h",
+      "id": "RANGE_REVERSION_16H",
+      "max_positions_per_symbol": 1,
+      "stop_atr": 1.5,
+      "target_R": 2
+    },
+    {
+      "direction": "LONG",
+      "family": "RANGE_REVERSION",
+      "holding_hours": 24,
+      "horizon_band": "12-24h",
+      "id": "RANGE_REVERSION_24H",
+      "max_positions_per_symbol": 1,
+      "stop_atr": 1.5,
+      "target_R": 2
+    }
+  ],
+  "code_start_sha": "d6500140f3141d179181f2360ad815b5bfe9c954",
+  "controller_dispatch_sha": "0cc3d6e14d5c4e301c987b9e760fabb393e8141a",
+  "controls": {
+    "FROZEN_TACTICAL": "TACTICAL_POLICY_R2_B0 immutable diagnostic only; NOT_COMPUTABLE if required PIT derivative/universe inputs absent; never approximate or import protected baseline outcomes",
+    "NAIVE_LONG": "enter each available hourly slot with identical hold/stop/target/cost and single-position limit, four horizon controls",
+    "NAIVE_MOMENTUM_LONG": "last close > close24h earlier, same four horizon controls",
+    "NO_TRADE": "same zero-exposure control separately labelled",
+    "WAIT": "all decision slots, zero exposure/cost/PnL; net_R undefined"
+  },
+  "costs": {
+    "base": {
+      "half_spread_per_leg": "0.0002",
+      "slippage_per_leg": "0.0003",
+      "taker_fee_per_leg": "0.001"
+    },
+    "funding": "zero by spot market identity; reject any derivative funding input; no funding income claim",
+    "higher_cost": {
+      "half_spread_per_leg": "0.0004",
+      "slippage_per_leg": "0.0006",
+      "taker_fee_per_leg": "0.0015"
+    },
+    "liquidity_stress": "preceding minute notional participation <=0.0001; decisions fixed, no new candidates",
+    "maker_not_filled": "taker-only candidates have no maker dependency; optional maker scenario NEVER converts market fills into maker fills",
+    "measured_liquidity": "archive quote volume only; historical order book unavailable, spread/slippage are explicit scenarios, never measurement"
+  },
+  "data": {
+    "allowed_local_fixtures": "NONE; no permission manifest exists",
+    "archive_fields": [
+      "open_time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "volume",
+      "close_time",
+      "quote_volume",
+      "trades",
+      "taker_base",
+      "taker_quote",
+      "ignore"
+    ],
+    "checksums": "official .CHECKSUM plus local SHA256",
+    "metadata_only_before_first_push": true,
+    "months": [
+      "2026-05",
+      "2026-06",
+      "2026-07",
+      "2026-08"
+    ],
+    "origin": "https://data.binance.vision",
+    "raw_cache": "unique /tmp/v06-g2-r1-<pid> only; never commit raw archives",
+    "time_unit": "microseconds",
+    "url_template": "https://data.binance.vision/data/spot/monthly/klines/{symbol}/1m/{symbol}-1m-{month}.zip"
+  },
+  "diagnostics": {
+    "grid": "NOT_APPLICABLE; no grid registered; no paired-profit comparison",
+    "market_timing": "entry delay +1 minute diagnostic only",
+    "metrics": [
+      "decision_count",
+      "LONG",
+      "SHORT",
+      "WAIT",
+      "coverage",
+      "action_frequency",
+      "fill_rate",
+      "holding_quantiles",
+      "exposure_days",
+      "concentration",
+      "gross_R",
+      "net_R",
+      "mean_R",
+      "median_R",
+      "maker_fee",
+      "taker_fee",
+      "spread",
+      "slippage",
+      "funding",
+      "hit_rate",
+      "TP1_before_SL",
+      "SL_before_TP1",
+      "MFE",
+      "MAE",
+      "drawdown",
+      "tail_loss",
+      "symbol",
+      "regime",
+      "partition",
+      "cost_stress",
+      "liquidity_stress",
+      "block_interval"
+    ],
+    "parameter_neighborhood": "fixed ATR stop multipliers 1.35/1.65, diagnostic only and only if empirical source/support gate succeeds; never selection candidates"
+  },
+  "execution": {
+    "collision": "SL first; MFE on SL collision capped at entry or worse; no credit for unknown pre-stop high",
+    "decision_ms": "last hourly end exclusive + 60000; all feature receipt and available timestamps must be <= decision",
+    "direction": "LONG only, spot SHORT ineligible without measured borrow; no borrowing, leverage, martingale or grid",
+    "entry_ms": "decision_ms + 60000 at following 1m open; never same bar",
+    "fill": "all market taker fills conditional on entry notional <=0.001 * preceding complete minute quote volume; failure => NO_FILL; no invented maker profit",
+    "margin": "equals notional; return never multiplied by leverage",
+    "missing": "missing minute anywhere in requested trade path => NOT_COMPUTABLE entire observation, no filling/interpolation",
+    "notional_usdt": 1000,
+    "precision": "Decimal 28 digits; canonical round-half-even 12 fractional digits in derived output",
+    "purge": "first 24h of each OOS partition embargoed; entry and full max horizon must fit strictly inside partition; one open position per candidate/symbol; no crossing or reused trade IDs",
+    "risk": "1.5 * hourly ATR in quote price at decision; immutable through trade; entry risk fraction must be between 0.001 and 0.10",
+    "stop": "entry raw open - risk; gaps fill min(stop,minute open)",
+    "target": "entry raw open + 2*risk; target gaps receive target only",
+    "timeout": "final minute close after exactly registered holding hours"
+  },
+  "executor_profile": "SOL_HIGH",
+  "exposure": "PRIOR_EXPOSED_OR_DEVELOPMENT",
+  "features": {
+    "ATR": "arithmetic mean of last 24 completed hourly true ranges using their preceding closes",
+    "BREAKOUT": "last close > maximum highs of preceding 24 hours and last close > SMA24",
+    "RANGE_REVERSION": "abs(last close / close 24h earlier - 1) <= 0.01; last close < SMA24 - ATR24; last close > last open",
+    "SMA": "arithmetic mean of last 24 completed hourly closes",
+    "TREND_PULLBACK": "last close > close 24h earlier; last low <= SMA24; last close > SMA24; last close > last open",
+    "calendar": "UTC 60-minute bars assembled from exactly 60 authentic contiguous 1m rows, anchored on epoch hours",
+    "lookback_hours": 25,
+    "regime_diagnostic": "UP/DOWN/RANGE from 24h return >+1%/<-1%/otherwise; never select subgroup"
+  },
+  "market_type": "SPOT",
+  "partitions": {
+    "boundary_semantics": "start inclusive, end exclusive; no retrospective window substitution",
+    "calibration": [
+      "2026-05-01T00:00:00Z",
+      "2026-06-01T00:00:00Z"
+    ],
+    "exploratory_oos": [
+      [
+        "2026-06-01T00:00:00Z",
+        "2026-07-01T00:00:00Z"
+      ],
+      [
+        "2026-07-01T00:00:00Z",
+        "2026-08-01T00:00:00Z"
+      ],
+      [
+        "2026-08-01T00:00:00Z",
+        "2026-09-01T00:00:00Z"
+      ]
+    ],
+    "independent": "FUTURE_NOT_YET_AVAILABLE_OR_NOT_AUTHORIZED; earliest 2026-10-09T00:00:00Z, separate Controller dispatch required"
+  },
+  "question": "Do simple unleveraged long-only spot signals justify a separately authorized fresh independent experiment after realistic frictions?",
+  "ranking": {
+    "eligibility": "all source/PIT/cost integrity gates and support first; lower bootstrap bound > 0 and nonnegative higher_cost mean in at least 2 of 3 partitions",
+    "no_go": "usable complete evidence/support but no eligible economic survivor",
+    "score": "minimum(base mean net_R, higher_cost mean net_R) across pooled eligible trades; descending; candidate_id lexical tie break",
+    "shortlist_max": 2,
+    "unsupported": "do not use a thin profitable subgroup or select best horizon after viewing outcomes"
+  },
+  "schema": "G2_R1_PREREGISTRATION_V1",
+  "search_budget": {
+    "adaptive_tuning": 0,
+    "empirical_replays_per_candidate": 1,
+    "registered": 12,
+    "selection_max": 2
+  },
+  "stop_rules": [
+    "unknown source lineage",
+    "protected read capability",
+    "unproven historical availability",
+    "strict PIT violation",
+    "same-bar fill",
+    "missing outcome minute",
+    "lookahead",
+    "outcome-informed method change",
+    "silent derivative fill",
+    "unmeasured costs presented as measured",
+    "unstable accounting",
+    "historical/exposed data represented as blind",
+    "first remote push not verified"
+  ],
+  "support": {
+    "block_days": 7,
+    "bootstrap_replicates": 2000,
+    "bootstrap_seed": 62026,
+    "cluster": "resample UTC 7-day blocks jointly across symbols; shared shocks not independent samples",
+    "coverage_min": "0.999 of expected authentic minutes for each symbol/partition, plus 100% per-trade and feature window",
+    "interval": "percentile 95%, exploratory only; no iid standard errors",
+    "long_min_total": 20,
+    "minimum_blocks": 12,
+    "multiple_candidates": "12-way exploratory screening, no confirmatory p-values; no alpha claim",
+    "partitions_min": 3,
+    "short": "structurally zero/ineligible, not a balanced directional result",
+    "trades_per_partition_reference": 100,
+    "weak_support": "DIAGNOSTIC_ONLY, no ranking-based shortlist"
+  },
+  "task_id": "V06_B_LINE_G2_PROSPECTIVE_STRATEGY_DISCOVERY_R1",
+  "terminal_authority": {
+    "G1_shared_source_changes": "ZERO",
+    "exchange_writes": 0,
+    "policy_quality": "NONE",
+    "protected_retry": "NOT_AUTHORIZED",
+    "real_funds": "NONE",
+    "testnet": "NOT_AUTHORIZED"
+  },
+  "universe": [
+    "BTCUSDT",
+    "ETHUSDT",
+    "SOLUSDT"
+  ],
+  "venue": "BINANCE",
+  "workspace_override_sha": "595d0b87cdad43f924f1e0040b8d6b33ae241237"
+}
