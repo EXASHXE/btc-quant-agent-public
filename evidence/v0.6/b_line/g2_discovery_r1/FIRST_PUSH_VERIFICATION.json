@@ -1,0 +1,11 @@
+{
+  "pre_registration_sha": "a46b0537c592f5d90a166aebe94737363f1706c0",
+  "parent_sha": "d6500140f3141d179181f2360ad815b5bfe9c954",
+  "remote": "origin",
+  "branch": "feature/v06-bline-g2-strategy-discovery-r1",
+  "verified_remote_head": "a46b0537c592f5d90a166aebe94737363f1706c0",
+  "verified_utc": "2026-10-08T08:29:27.072325+00:00",
+  "method_sha256": "2471442e4a1e317464465fcd91c1af7d0ba28a08a03fb433f174d6cc92647abe",
+  "empirical_reads_before_verification": 0,
+  "protected_reads": 0
+}
