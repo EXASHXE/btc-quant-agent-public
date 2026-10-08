@@ -1,0 +1,265 @@
+{
+  "a_impl_static_audit": {
+    "a_impl_sha": "3b8befb0112cfe2d314ad65964762a3fb251e710",
+    "audit_performed": true,
+    "candidate_ids_verified": [
+      "STRUCTURAL_CONTINUATION_LONG_04H",
+      "STRUCTURAL_CONTINUATION_LONG_12H",
+      "STRUCTURAL_CONTINUATION_SHORT_04H",
+      "STRUCTURAL_CONTINUATION_SHORT_12H",
+      "CLOSED_RETEST_LONG_04H",
+      "CLOSED_RETEST_LONG_12H",
+      "CLOSED_RETEST_SHORT_04H",
+      "CLOSED_RETEST_SHORT_12H"
+    ],
+    "changed_files": [
+      "docs/strategy_research/g2_r3/prep_a/LEGACY_BTC_DEVELOPMENT_PARTITION_PROPOSAL.md",
+      "docs/strategy_research/g2_r3/prep_a/SOURCE_AND_LICENSE_STATUS_A.md",
+      "docs/strategy_research/g2_r3/prep_a/SYNTHETIC_REPLAY_ARCHITECTURE_A.md",
+      "evidence/v0.6/b_line/g2_overnight_p0_a/AUDIT_MANIFEST_INSPECTION_RECEIPT.json",
+      "evidence/v0.6/b_line/g2_overnight_p0_a/P0_A_HANDOFF_RECORD.json",
+      "evidence/v0.6/b_line/g2_overnight_p0_a/P0_A_MOCK_RESULTS_EMPTY.json",
+      "evidence/v0.6/b_line/g2_overnight_p0_a/SYNTHETIC_TEST_EXECUTION_RECEIPT.json",
+      "src/btc_quant_agent/strategy_research/__init__.py",
+      "src/btc_quant_agent/strategy_research/r3_overnight/candidate_registry.py",
+      "src/btc_quant_agent/strategy_research/r3_overnight/constants.py",
+      "src/btc_quant_agent/strategy_research/r3_overnight/cost_model.py",
+      "src/btc_quant_agent/strategy_research/r3_overnight/indicators.py",
+      "src/btc_quant_agent/strategy_research/r3_overnight/ledger.py",
+      "src/btc_quant_agent/strategy_research/r3_overnight/replay_engine.py",
+      "src/btc_quant_agent/strategy_research/r3_overnight/signals.py",
+      "src/btc_quant_agent/strategy_research/r3_overnight/synthetic_fixtures.py",
+      "src/btc_quant_agent/strategy_research/r3_overnight/types.py",
+      "tests/test_strategy_research_r3_cost_and_ledger.py",
+      "tests/test_strategy_research_r3_hermetic_fixtures.py",
+      "tests/test_strategy_research_r3_indicators.py",
+      "tests/test_strategy_research_r3_registry.py",
+      "tests/test_strategy_research_r3_replay_engine.py"
+    ],
+    "changed_files_count": 22,
+    "discrepancies": [
+      "ROLE_A_PATH_OUTSIDE_ALLOWLIST:src/btc_quant_agent/strategy_research/__init__.py",
+      "DISCREPANCY_A02_MANIFEST_ROW_COUNT_MISMATCH:evidence/v0.6/b_line/g2_overnight_p0_a/AUDIT_MANIFEST_INSPECTION_RECEIPT.json:reported=2933280,expected=2934720",
+      "DISCREPANCY_A03_STAGE1_FILL_ACK_OVERWRITES_POSITION_MAX_HOLD_MS_ZERO:src/btc_quant_agent/strategy_research/r3_overnight/ledger.py:L280-L294",
+      "DISCREPANCY_A06_STAGE2_MARK_UPDATE_AND_BAR_OPEN_TIMESTAMP_AGE_CHECK:src/btc_quant_agent/strategy_research/r3_overnight/ledger.py:L147,L331-L341",
+      "DISCREPANCY_A07A_COOLDOWN_ANCHORED_TO_ACK_TIME_INSTEAD_OF_ECONOMIC_EXIT_CEIL:src/btc_quant_agent/strategy_research/r3_overnight/ledger.py:L139,L309",
+      "DISCREPANCY_A08_STAGE5_EXIT_COMMITMENT_OMITS_TICK_SIZE_TERM:src/btc_quant_agent/strategy_research/r3_overnight/ledger.py:L556-L559",
+      "DISCREPANCY_A04_SHARED_SIGNAL_GENERATOR_CORRUPTS_RETEST_STATE_ACROSS_04H_AND_12H:src/btc_quant_agent/strategy_research/r3_overnight/replay_engine.py:L42,signals.py:L260",
+      "DISCREPANCY_A07B_REPLAY_ENGINE_OMITS_COOLDOWN_AND_4H_DEDUP_ARGS:src/btc_quant_agent/strategy_research/r3_overnight/replay_engine.py:L129-L134",
+      "DISCREPANCY_A05_CLOSED_RETEST_TOUCH_ZONE_INEQUALITY_AND_STOP_EXTREMUM_OMITS_BREAKOUT_BAR:src/btc_quant_agent/strategy_research/r3_overnight/signals.py:L295-L307,L323-L335"
+    ],
+    "live_a_worktree_reads": 0,
+    "passed": false,
+    "remote_branch": "feature/v06-bline-g2-overnight-discovery-a",
+    "terminal_status": "P0_B_DISCREPANCY_BLOCKED"
+  },
+  "controller_dispatch_sha": "56f8a9faa1a4539124ab006b49bf42b6e7c997e3",
+  "empirical_execution_authority": "NONE",
+  "external_network_calls": 0,
+  "frozen_code_base_sha": "e0ff8c3473de4bfa3e66fe7928d42992a4d38a32",
+  "manifest_verification": {
+    "daily_mark_archive_count": 9,
+    "dataset_checksum_sha256": "82d058b2e9e5bfbd20bf36026abec045fb778ddb72582277e0dac00846ae9901",
+    "errors": [],
+    "funding_checksum_sha256": "4fd56440f275c351e521f483309b8a368ab8da66b5b6e070e164f985fc0e6ba3",
+    "funding_row_count": 6114,
+    "manifest_relpath": "artifacts/research/run0-dev-frozen-v022-seed7-20260825/data_manifest.json",
+    "month_count": 67,
+    "monthly_funding_archive_count": 67,
+    "monthly_kline_archive_count": 67,
+    "monthly_mark_archive_count": 67,
+    "parquet_or_zip_reads": 0,
+    "row_count": 2934720,
+    "valid": true
+  },
+  "method_addendum_head_sha": "cf2d5cc33774cdcff7d709636305bba830e977ef",
+  "original_design_sha": "e5b2006a89441f7eb2ec900e508aff451106b87a",
+  "protected_data_reads": 0,
+  "raw_market_body_reads": 0,
+  "real_funds_write_authority": "NONE",
+  "role": "GEMINI_B",
+  "role_branch": "feature/v06-bline-g2-overnight-verifier-b",
+  "role_dir": "g2-overnight-verifier-b",
+  "schema_version": "V06_G2_R3_P0_B_ORACLE_REPORT_V1",
+  "source_audit_sha": "12793bc04db7414d11a0961684fd14f5df3ce16e",
+  "source_data_grade": "ARCHIVAL_EVENT_TIME_RECONSTRUCTED",
+  "synthetic_invariants": {
+    "cost_scenarios": {
+      "base_round_trip_bps": "22",
+      "stress_round_trip_bps": "44"
+    },
+    "negative_boundary_checks": {
+      "holdout_parquet_path_blocked": true,
+      "rc2_symbol_blocked": true,
+      "spot_product_blocked": true
+    },
+    "pit_aggregation_check": {
+      "completed_1h_count": 1,
+      "dropped_unfinished_1h_count": 1,
+      "validation_errors": []
+    },
+    "sl_first_and_funding_check": {
+      "executed_entries": [
+        "ORACLE_STRESS_POS_000005"
+      ],
+      "funding_charges_count": 1,
+      "funding_debit_usdt": "0.240240000000",
+      "intrabar_exit_reason": "INTRABAR_SL_FIRST_COLLISION"
+    },
+    "stress_geometry_by_candidate": {
+      "CLOSED_RETEST_LONG_04H": {
+        "claim_class": "DIAGNOSTIC_CANDIDATE_EVALUABLE",
+        "eligible": true,
+        "registry_preserved": true,
+        "required_min_stop_bps": "152",
+        "status": "ELIGIBLE",
+        "stress_cost_bps_cs": "76"
+      },
+      "CLOSED_RETEST_LONG_12H": {
+        "claim_class": "NEGATIVE_UNDERPOWERED_DIAGNOSTIC",
+        "eligible": false,
+        "registry_preserved": true,
+        "required_min_stop_bps": "280",
+        "status": "STRESS_COST_GEOMETRY_INELIGIBLE",
+        "stress_cost_bps_cs": "140"
+      },
+      "CLOSED_RETEST_SHORT_04H": {
+        "claim_class": "DIAGNOSTIC_CANDIDATE_EVALUABLE",
+        "eligible": true,
+        "registry_preserved": true,
+        "required_min_stop_bps": "152",
+        "status": "ELIGIBLE",
+        "stress_cost_bps_cs": "76"
+      },
+      "CLOSED_RETEST_SHORT_12H": {
+        "claim_class": "NEGATIVE_UNDERPOWERED_DIAGNOSTIC",
+        "eligible": false,
+        "registry_preserved": true,
+        "required_min_stop_bps": "280",
+        "status": "STRESS_COST_GEOMETRY_INELIGIBLE",
+        "stress_cost_bps_cs": "140"
+      },
+      "STRUCTURAL_CONTINUATION_LONG_04H": {
+        "claim_class": "DIAGNOSTIC_CANDIDATE_EVALUABLE",
+        "eligible": true,
+        "registry_preserved": true,
+        "required_min_stop_bps": "152",
+        "status": "ELIGIBLE",
+        "stress_cost_bps_cs": "76"
+      },
+      "STRUCTURAL_CONTINUATION_LONG_12H": {
+        "claim_class": "NEGATIVE_UNDERPOWERED_DIAGNOSTIC",
+        "eligible": false,
+        "registry_preserved": true,
+        "required_min_stop_bps": "280",
+        "status": "STRESS_COST_GEOMETRY_INELIGIBLE",
+        "stress_cost_bps_cs": "140"
+      },
+      "STRUCTURAL_CONTINUATION_SHORT_04H": {
+        "claim_class": "DIAGNOSTIC_CANDIDATE_EVALUABLE",
+        "eligible": true,
+        "registry_preserved": true,
+        "required_min_stop_bps": "152",
+        "status": "ELIGIBLE",
+        "stress_cost_bps_cs": "76"
+      },
+      "STRUCTURAL_CONTINUATION_SHORT_12H": {
+        "claim_class": "NEGATIVE_UNDERPOWERED_DIAGNOSTIC",
+        "eligible": false,
+        "registry_preserved": true,
+        "required_min_stop_bps": "280",
+        "status": "STRESS_COST_GEOMETRY_INELIGIBLE",
+        "stress_cost_bps_cs": "140"
+      }
+    }
+  },
+  "task_id": "V06_G2_R3_PARALLEL_P0_OFFLINE_PREPARATION",
+  "terminal_status": "P0_B_DISCREPANCY_BLOCKED",
+  "v03_holdout_conflict": {
+    "conflict_detected": true,
+    "eligible_exposed_pre2026_btc_months_count": 60,
+    "overlapping_r3_folds": [
+      {
+        "fold_label": "DEV_FOLD_1",
+        "overlap_end_ms": 1772323200000,
+        "overlap_minutes": 40320,
+        "overlap_start_ms": 1769904000000,
+        "reason": "OVERLAPS_V03_BTC_FINAL_HOLDOUT_2026_02_TO_2026_08",
+        "window_end_ms": 1772323200000,
+        "window_start_ms": 1769904000000
+      },
+      {
+        "fold_label": "DEV_FOLD_2",
+        "overlap_end_ms": 1775001600000,
+        "overlap_minutes": 44640,
+        "overlap_start_ms": 1772323200000,
+        "reason": "OVERLAPS_V03_BTC_FINAL_HOLDOUT_2026_02_TO_2026_08",
+        "window_end_ms": 1775001600000,
+        "window_start_ms": 1772323200000
+      },
+      {
+        "fold_label": "DEV_FOLD_3",
+        "overlap_end_ms": 1777593600000,
+        "overlap_minutes": 43200,
+        "overlap_start_ms": 1775001600000,
+        "reason": "OVERLAPS_V03_BTC_FINAL_HOLDOUT_2026_02_TO_2026_08",
+        "window_end_ms": 1777593600000,
+        "window_start_ms": 1775001600000
+      }
+    ],
+    "proposed_calendar_only_substitute_options": [
+      {
+        "development_folds": [
+          "2025-10",
+          "2025-11",
+          "2025-12"
+        ],
+        "exposure_grade": "HISTORICAL_EXPOSED_DEVELOPMENT",
+        "option_id": "CALENDAR_OPTION_A_2025_Q4",
+        "requires_controller_method_amendment": true,
+        "requires_eth_sol_archive_admission": true,
+        "returns_inspected": false,
+        "selection_basis": "MOST_RECENT_CONTIGUOUS_PRE_2026_QUARTER_CALENDAR_ONLY",
+        "source_data_grade": "ARCHIVAL_EVENT_TIME_RECONSTRUCTED",
+        "v03_holdout_overlap_minutes": 0,
+        "warmup_month": "2025-09"
+      },
+      {
+        "development_folds": [
+          "2025-04",
+          "2025-05",
+          "2025-06"
+        ],
+        "exposure_grade": "HISTORICAL_EXPOSED_DEVELOPMENT",
+        "option_id": "CALENDAR_OPTION_B_2025_Q2",
+        "requires_controller_method_amendment": true,
+        "requires_eth_sol_archive_admission": true,
+        "returns_inspected": false,
+        "selection_basis": "CONTIGUOUS_PRE_2026_H1_CALENDAR_ONLY",
+        "source_data_grade": "ARCHIVAL_EVENT_TIME_RECONSTRUCTED",
+        "v03_holdout_overlap_minutes": 0,
+        "warmup_month": "2025-03"
+      },
+      {
+        "development_folds": [
+          "2024-10",
+          "2024-11",
+          "2024-12"
+        ],
+        "exposure_grade": "HISTORICAL_EXPOSED_DEVELOPMENT",
+        "option_id": "CALENDAR_OPTION_C_2024_Q4",
+        "requires_controller_method_amendment": true,
+        "requires_eth_sol_archive_admission": true,
+        "returns_inspected": false,
+        "selection_basis": "CONTIGUOUS_2024_Q4_CALENDAR_ONLY",
+        "source_data_grade": "ARCHIVAL_EVENT_TIME_RECONSTRUCTED",
+        "v03_holdout_overlap_minutes": 0,
+        "warmup_month": "2024-09"
+      }
+    ],
+    "status": "HOLDOUT_OVERLAP_BLOCKED",
+    "total_overlapping_minutes_per_symbol": 128160,
+    "v03_holdout_end_ms": 1785542400000,
+    "v03_holdout_start_ms": 1769904000000
+  }
+}

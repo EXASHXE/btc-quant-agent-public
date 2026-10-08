@@ -1,0 +1,135 @@
+{
+  "schema_version": "V06_G2_R3_P0_B_MANIFEST_AND_HOLDOUT_CONFLICT_REPORT_V1",
+  "task_id": "V06_G2_R3_PARALLEL_P0_OFFLINE_PREPARATION",
+  "role": "GEMINI_B",
+  "controller_dispatch_sha": "56f8a9faa1a4539124ab006b49bf42b6e7c997e3",
+  "frozen_code_base_sha": "e0ff8c3473de4bfa3e66fe7928d42992a4d38a32",
+  "method_addendum_head_sha": "cf2d5cc33774cdcff7d709636305bba830e977ef",
+  "source_audit_sha": "12793bc04db7414d11a0961684fd14f5df3ce16e",
+  "inspection_scope": "STATIC_PUBLIC_MANIFEST_DOCUMENT_ONLY",
+  "raw_market_body_reads": 0,
+  "parquet_or_zip_opens": 0,
+  "du_a_worktree_scans": 0,
+  "full_sha256_data_body_passes": 0,
+  "btc_manifest_verification": {
+    "manifest_relpath": "artifacts/research/run0-dev-frozen-v022-seed7-20260825/data_manifest.json",
+    "valid": true,
+    "symbol": "BTCUSDT",
+    "market": "USD-M PERPETUAL",
+    "timeframe": "1m",
+    "start_utc": "2021-01-01T00:00:00Z",
+    "end_utc_exclusive": "2026-08-01T00:00:00Z",
+    "month_count": 67,
+    "first_partition": "1m/year=2021/month=01/data.parquet",
+    "last_partition": "1m/year=2026/month=07/data.parquet",
+    "expected_bars": 2934720,
+    "row_count": 2934720,
+    "missing_count": 0,
+    "duplicate_count": 0,
+    "out_of_order_count": 0,
+    "invalid_ohlc_count": 0,
+    "negative_volume_count": 0,
+    "known_gaps_count": 0,
+    "largest_gap_missing_bars": 0,
+    "zero_volume_count": 367,
+    "dataset_checksum_sha256": "82d058b2e9e5bfbd20bf36026abec045fb778ddb72582277e0dac00846ae9901",
+    "funding": {
+      "checksum_sha256": "4fd56440f275c351e521f483309b8a368ab8da66b5b6e070e164f985fc0e6ba3",
+      "row_count": 6114,
+      "missing_mark_prices": 0,
+      "mark_price_source": "official_binance_data_vision_markPriceKlines_1m_open"
+    },
+    "official_archive_checksums": {
+      "total_entries": 210,
+      "monthly_klines_1m_zips": 67,
+      "monthly_markPriceKlines_1m_zips": 67,
+      "monthly_fundingRate_zips": 67,
+      "daily_markPriceKlines_1m_zips_2026_05_23_to_31": 9
+    },
+    "source_data_grade": "ARCHIVAL_EVENT_TIME_RECONSTRUCTED",
+    "prior_exposures_remain_exposed": true,
+    "blind_oos_claim_permitted": false
+  },
+  "eth_sol_manifest_status": {
+    "ethusdt_manifest_present_in_repo": false,
+    "solusdt_manifest_present_in_repo": false,
+    "coverage_or_continuity_inferred": false
+  },
+  "v03_holdout_conflict_report": {
+    "conflict_detected": true,
+    "status": "HOLDOUT_OVERLAP_BLOCKED",
+    "v03_btc_final_holdout_window": {
+      "start_utc": "2026-02-01T00:00:00Z",
+      "start_ms": 1769904000000,
+      "end_utc_exclusive": "2026-08-01T00:00:00Z",
+      "end_ms_exclusive": 1785542400000
+    },
+    "overlapping_r3_proposed_folds": [
+      {
+        "fold_id": "2026-02",
+        "fold_start_ms": 1769904000000,
+        "fold_end_ms": 1772323200000,
+        "overlap_start_ms": 1769904000000,
+        "overlap_end_ms": 1772323200000,
+        "overlapping_minutes": 40320,
+        "overlapping_days": 28
+      },
+      {
+        "fold_id": "2026-03",
+        "fold_start_ms": 1772323200000,
+        "fold_end_ms": 1775001600000,
+        "overlap_start_ms": 1772323200000,
+        "overlap_end_ms": 1775001600000,
+        "overlapping_minutes": 44640,
+        "overlapping_days": 31
+      },
+      {
+        "fold_id": "2026-04",
+        "fold_start_ms": 1775001600000,
+        "fold_end_ms": 1777593600000,
+        "overlap_start_ms": 1775001600000,
+        "overlap_end_ms": 1777593600000,
+        "overlapping_minutes": 43200,
+        "overlapping_days": 30
+      }
+    ],
+    "total_overlapping_minutes_per_symbol": 128160,
+    "total_overlapping_days_per_symbol": 89,
+    "silent_reclassification_permitted": false,
+    "return_based_date_selection_permitted": false,
+    "eligible_exposed_pre2026_btc_months_count": 60,
+    "eligible_exposed_pre2026_btc_months_range": "2021-01..2025-12",
+    "proposed_calendar_only_substitute_options": [
+      {
+        "option_id": "CALENDAR_OPTION_A_2025_Q4_CONTIGUOUS",
+        "warmup_month": "2025-09",
+        "development_folds": ["2025-10", "2025-11", "2025-12"],
+        "selection_basis": "CALENDAR_PROXIMITY_IMMEDIATELY_PRECEDING_2026_WITHOUT_RETURN_INSPECTION",
+        "source_data_grade": "ARCHIVAL_EVENT_TIME_RECONSTRUCTED",
+        "prior_exposure_status": "EXPOSED_DEVELOPMENT_HISTORY_NOT_BLIND_OOS",
+        "v03_holdout_overlap_minutes": 0,
+        "returns_inspected": false
+      },
+      {
+        "option_id": "CALENDAR_OPTION_B_2025_Q3_CONTIGUOUS",
+        "warmup_month": "2025-06",
+        "development_folds": ["2025-07", "2025-08", "2025-09"],
+        "selection_basis": "CALENDAR_CONTIGUITY_IN_2025_H2_WITHOUT_RETURN_INSPECTION",
+        "source_data_grade": "ARCHIVAL_EVENT_TIME_RECONSTRUCTED",
+        "prior_exposure_status": "EXPOSED_DEVELOPMENT_HISTORY_NOT_BLIND_OOS",
+        "v03_holdout_overlap_minutes": 0,
+        "returns_inspected": false
+      },
+      {
+        "option_id": "CALENDAR_OPTION_C_2024_Q4_CONTIGUOUS",
+        "warmup_month": "2024-09",
+        "development_folds": ["2024-10", "2024-11", "2024-12"],
+        "selection_basis": "CALENDAR_EQUIVALENT_Q4_SEASONALITY_WITHOUT_RETURN_INSPECTION",
+        "source_data_grade": "ARCHIVAL_EVENT_TIME_RECONSTRUCTED",
+        "prior_exposure_status": "EXPOSED_DEVELOPMENT_HISTORY_NOT_BLIND_OOS",
+        "v03_holdout_overlap_minutes": 0,
+        "returns_inspected": false
+      }
+    ]
+  }
+}

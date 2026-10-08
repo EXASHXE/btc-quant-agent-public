@@ -1,0 +1,83 @@
+{
+  "schema_version": "V06_G2_R3_P0_B_EXECUTION_RECEIPT_V1",
+  "task_id": "V06_G2_R3_PARALLEL_P0_OFFLINE_PREPARATION",
+  "role": "GEMINI_B",
+  "role_title": "Independent PIT, Fill, Cost & MTM Verifier",
+  "workspace_root": "/root/workspace/project/quant-v0.6",
+  "worktree_path": "/root/workspace/project/quant-v0.6/g2-overnight-verifier-b",
+  "role_branch": "feature/v06-bline-g2-overnight-verifier-b",
+  "controller_dispatch_sha": "56f8a9faa1a4539124ab006b49bf42b6e7c997e3",
+  "frozen_code_base_sha": "e0ff8c3473de4bfa3e66fe7928d42992a4d38a32",
+  "method_addendum_head_sha": "cf2d5cc33774cdcff7d709636305bba830e977ef",
+  "original_design_sha": "e5b2006a89441f7eb2ec900e508aff451106b87a",
+  "source_audit_sha": "12793bc04db7414d11a0961684fd14f5df3ce16e",
+  "audited_a_remote_branch": "feature/v06-bline-g2-overnight-discovery-a",
+  "audited_a_remote_tip_sha": "3b8befb0112cfe2d314ad65964762a3fb251e710",
+  "audited_a_handoff_impl_sha": "3ebb7db9a1043e58843b518af9381218d9f25af1",
+  "standalone_b_oracle_status": "P0_B_ORACLE_READY_FOR_CONTROLLER",
+  "cross_audit_a_status": "P0_B_DISCREPANCY_BLOCKED",
+  "terminal_status": "P0_B_DISCREPANCY_BLOCKED",
+  "empirical_validation_status": "INCOMPLETE_BY_P0_SCOPE_AUTHORIZATION__NO_EMPIRICAL_REPLAY_PERFORMED",
+  "profitability_claim": "NONE",
+  "live_pit_claim": "NONE",
+  "source_data_grade": "ARCHIVAL_EVENT_TIME_RECONSTRUCTED",
+  "REAL_FUNDS_WRITE_AUTHORITY": "NONE",
+  "EMPIRICAL_EXECUTION_AUTHORITY": "NONE",
+  "safety_and_isolation_counters": {
+    "raw_parquet_or_zip_body_reads": 0,
+    "protected_holdout_or_forward_reads": 0,
+    "rc2_protected_symbol_reads": 0,
+    "live_sibling_worktree_reads": 0,
+    "du_a_worktree_scans": 0,
+    "full_sha256_data_body_passes": 0,
+    "external_http_or_websocket_calls": 0,
+    "testnet_or_live_orders": 0
+  },
+  "runner_environment": {
+    "primary_python_312": {
+      "executable": "/usr/bin/python3.12",
+      "version": "Python 3.12.3",
+      "pytest_version": "9.0.3",
+      "py312_certified": true
+    },
+    "secondary_python_313": {
+      "executable": "/root/miniconda3/bin/python",
+      "version": "Python 3.13.13",
+      "pytest_version": "8.4.2"
+    },
+    "ruff_version": "0.16.9"
+  },
+  "focused_l1_test_summary": {
+    "test_files": [
+      "tests/test_v06_g2_r3_verifier_pit_and_signals.py",
+      "tests/test_v06_g2_r3_verifier_accounting_and_risk.py",
+      "tests/test_v06_g2_r3_verifier_manifest_and_negatives.py"
+    ],
+    "total_tests": 20,
+    "passed": 20,
+    "failed": 0,
+    "skipped": 0,
+    "ruff_errors": 0,
+    "compileall_errors": 0
+  },
+  "role_b_changed_files": [
+    "docs/strategy_research/g2_r3/prep_b/CONTROLLER_CONTRACTS_AND_A_AUDIT_PROTOCOL.md",
+    "docs/strategy_research/g2_r3/prep_b/MANIFEST_LINEAGE_AND_V03_HOLDOUT_CONFLICT.md",
+    "docs/strategy_research/g2_r3/prep_b/ORACLE_SPECIFICATION_AND_INVARIANTS.md",
+    "evidence/v0.6/b_line/g2_overnight_p0_b/A_IMPL_STATIC_COMPARISON_RECEIPT.json",
+    "evidence/v0.6/b_line/g2_overnight_p0_b/MANIFEST_AND_HOLDOUT_CONFLICT_REPORT.json",
+    "evidence/v0.6/b_line/g2_overnight_p0_b/P0_B_EXECUTION_RECEIPT.json",
+    "evidence/v0.6/b_line/g2_overnight_p0_b/P0_B_SUMMARY.md",
+    "evidence/v0.6/b_line/g2_overnight_p0_b/SYNTHETIC_ORACLE_VERIFICATION_REPORT.json",
+    "scripts/strategy_research/r3_verification/__init__.py",
+    "scripts/strategy_research/r3_verification/a_impl_static_auditor.py",
+    "scripts/strategy_research/r3_verification/manifest_and_boundary_oracle.py",
+    "scripts/strategy_research/r3_verification/oracle_specs.py",
+    "scripts/strategy_research/r3_verification/pit_bar_and_signal_oracle.py",
+    "scripts/strategy_research/r3_verification/run_r3_p0_b_oracle.py",
+    "scripts/strategy_research/r3_verification/two_clock_accounting_oracle.py",
+    "tests/test_v06_g2_r3_verifier_accounting_and_risk.py",
+    "tests/test_v06_g2_r3_verifier_manifest_and_negatives.py",
+    "tests/test_v06_g2_r3_verifier_pit_and_signals.py"
+  ]
+}

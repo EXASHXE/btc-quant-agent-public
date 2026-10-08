@@ -1,0 +1,99 @@
+{
+  "schema_version": "V06_G2_R3_P0_B_A_IMPL_STATIC_COMPARISON_RECEIPT_V1",
+  "task_id": "V06_G2_R3_PARALLEL_P0_OFFLINE_PREPARATION",
+  "role": "GEMINI_B",
+  "controller_dispatch_sha": "56f8a9faa1a4539124ab006b49bf42b6e7c997e3",
+  "frozen_code_base_sha": "e0ff8c3473de4bfa3e66fe7928d42992a4d38a32",
+  "method_addendum_head_sha": "cf2d5cc33774cdcff7d709636305bba830e977ef",
+  "audited_role_a_branch": "feature/v06-bline-g2-overnight-discovery-a",
+  "audited_role_a_remote_tip_sha": "3b8befb0112cfe2d314ad65964762a3fb251e710",
+  "audited_role_a_handoff_impl_sha": "3ebb7db9a1043e58843b518af9381218d9f25af1",
+  "live_a_worktree_reads": 0,
+  "a_branch_modified_or_merged_by_b": false,
+  "audit_performed": true,
+  "passed": false,
+  "terminal_status": "P0_B_DISCREPANCY_BLOCKED",
+  "discrepancies_count": 8,
+  "discrepancies": [
+    {
+      "id": "DISCREPANCY_A01",
+      "code": "ROLE_A_PATH_OUTSIDE_ALLOWLIST:src/btc_quant_agent/strategy_research/__init__.py",
+      "severity": "BLOCKING_SCOPE_VIOLATION",
+      "file": "src/btc_quant_agent/strategy_research/__init__.py",
+      "lines": "L1",
+      "specification_reference": "B_LINE_G2_R3_PARALLEL_P0_OFFLINE_PREPARATION_DISPATCH.json (role_a.allowed_changed_paths)",
+      "description": "Role A added src/btc_quant_agent/strategy_research/__init__.py outside the allowed src/btc_quant_agent/strategy_research/r3_overnight/** prefix.",
+      "reproduction": "git diff --name-only e0ff8c3473de4bfa3e66fe7928d42992a4d38a32 3b8befb0112cfe2d314ad65964762a3fb251e710"
+    },
+    {
+      "id": "DISCREPANCY_A02",
+      "code": "DISCREPANCY_A02_MANIFEST_ROW_COUNT_MISMATCH:evidence/v0.6/b_line/g2_overnight_p0_a/AUDIT_MANIFEST_INSPECTION_RECEIPT.json:reported=2933280,expected=2934720",
+      "severity": "BLOCKING_MANIFEST_AUDIT_ERROR",
+      "file": "evidence/v0.6/b_line/g2_overnight_p0_a/AUDIT_MANIFEST_INSPECTION_RECEIPT.json",
+      "lines": "L22",
+      "specification_reference": "artifacts/research/run0-dev-frozen-v022-seed7-20260825/data_manifest.json (expected_bars=2934720, row_count=2934720)",
+      "description": "Role A reported reported_row_count=2933280 instead of the actual 2,934,720 rows in data_manifest.json (omitting 1,440 minutes = 1 leap day).",
+      "reproduction": "git show 3b8befb0112cfe2d314ad65964762a3fb251e710:evidence/v0.6/b_line/g2_overnight_p0_a/AUDIT_MANIFEST_INSPECTION_RECEIPT.json"
+    },
+    {
+      "id": "DISCREPANCY_A03",
+      "code": "DISCREPANCY_A03_STAGE1_FILL_ACK_OVERWRITES_POSITION_MAX_HOLD_MS_ZERO:src/btc_quant_agent/strategy_research/r3_overnight/ledger.py:L280-L294",
+      "severity": "CRITICAL_ACCOUNTING_AND_HOLDING_BUG",
+      "file": "src/btc_quant_agent/strategy_research/r3_overnight/ledger.py",
+      "lines": "L280-L294, L544-L581, L614",
+      "specification_reference": "V06_G2_R3_METHOD_R1_1_CONTROLLER_L2_ACCEPTANCE.md (Two-Clock 8-Stage Execution Contract & 4h/12h Holding Horizons)",
+      "description": "In _stage_5_due_entries at t0, Role A creates self.positions[sym] = Position(..., max_hold_ms=candidate_max_hold_ms) AND queues VirtualFill(available_at_ms=t0+60_000). At t0+60_000, _stage_1_available_messages unconditionally overwrites self.positions[fill.symbol] with a new Position(..., max_hold_ms=0). Consequently: (a) any surviving trade has max_hold_ms reset to 0 at t0+60s, causing _stage_6_intraminute_protection (L614: open_time_ms + 60_000 >= pos.entry_time_ms + pos.max_hold_ms) to immediately trigger ExitReason.EXPIRY after 2 minutes instead of 4h/12h and wiping out any Stage 7 funding charged at t0; (b) any trade that already closed via same-minute SL/TP at t0 is resurrected as a zombie position at t0+60s and closes a second time.",
+      "reproduction": "git show 3b8befb0112cfe2d314ad65964762a3fb251e710:src/btc_quant_agent/strategy_research/r3_overnight/ledger.py | sed -n '264,298p;543,645p'"
+    },
+    {
+      "id": "DISCREPANCY_A04",
+      "code": "DISCREPANCY_A04_SHARED_SIGNAL_GENERATOR_CORRUPTS_RETEST_STATE_ACROSS_04H_AND_12H:src/btc_quant_agent/strategy_research/r3_overnight/replay_engine.py:L42,signals.py:L260",
+      "severity": "CRITICAL_CANDIDATE_ISOLATION_BUG",
+      "file": "src/btc_quant_agent/strategy_research/r3_overnight/replay_engine.py",
+      "lines": "replay_engine.py:L42,L108-L137; signals.py:L57-L59,L260-L350",
+      "specification_reference": "V06_G2_R3_METHOD_R1_1_CONTROLLER_L2_ACCEPTANCE.md (Per-Candidate Non-Overlapping Isolated Virtual Books & Family 2 Closed Retest State)",
+      "description": "ReplayEngine shares a single SignalGenerator instance across all 8 candidates while SignalGenerator._active_breakouts is keyed by (symbol, candidate.direction) without candidate.id. Under CostScenario.BASE, CLOSED_RETEST_LONG_04H and CLOSED_RETEST_LONG_12H both call evaluate_hourly_decision in the same hourly loop: on the breakout hour, 04H registers _active_breakouts[(sym, LONG)], and 12H (evaluated microseconds later for the same hour) sees the active breakout, treats the breakout hour itself as retest bar #1 (bars_since_breakout += 1), and on confirmation 04H consumes _consumed_retest_events so 12H never receives the confirmation signal.",
+      "reproduction": "git show 3b8befb0112cfe2d314ad65964762a3fb251e710:src/btc_quant_agent/strategy_research/r3_overnight/replay_engine.py | sed -n '35,50p;105,138p'"
+    },
+    {
+      "id": "DISCREPANCY_A05",
+      "code": "DISCREPANCY_A05_CLOSED_RETEST_TOUCH_ZONE_INEQUALITY_AND_STOP_EXTREMUM_OMITS_BREAKOUT_BAR:src/btc_quant_agent/strategy_research/r3_overnight/signals.py:L295-L307,L323-L335",
+      "severity": "SPECIFICATION_SIGNAL_MISMATCH",
+      "file": "src/btc_quant_agent/strategy_research/r3_overnight/signals.py",
+      "lines": "L295-L307, L323-L335",
+      "specification_reference": "V06_G2_R3_METHOD_R1_1_CONTROLLER_L2_ACCEPTANCE.md (Family 2 Closed Retest Touch Zone & Initial Stop Placement)",
+      "description": "For LONG retest confirmation, R1.1 requires low in [B - 0.25*ATR_b, B + 0.25*ATR_b], whereas Role A checks range overlap (low <= B + 0.25*ATR_b and high >= B - 0.25*ATR_b), admitting deep wicks below B - 0.25*ATR_b. In addition, min(breakout.intermediate_lows) (L306) and max(breakout.intermediate_highs) (L334) omit breakout.breakout_low and breakout.breakout_high from the breakout-through-confirmation stop extremum.",
+      "reproduction": "git show 3b8befb0112cfe2d314ad65964762a3fb251e710:src/btc_quant_agent/strategy_research/r3_overnight/signals.py | sed -n '292,349p'"
+    },
+    {
+      "id": "DISCREPANCY_A06",
+      "code": "DISCREPANCY_A06_STAGE2_MARK_UPDATE_AND_BAR_OPEN_TIMESTAMP_AGE_CHECK:src/btc_quant_agent/strategy_research/r3_overnight/ledger.py:L147,L331-L341",
+      "severity": "SPECIFICATION_CLOCK_MISMATCH",
+      "file": "src/btc_quant_agent/strategy_research/r3_overnight/ledger.py",
+      "lines": "L147, L331-L341",
+      "specification_reference": "V06_G2_R3_METHOD_R1_1_CONTROLLER_L2_ACCEPTANCE.md (8-Stage Minute Open Ordering & 120s Mark Freshness)",
+      "description": "Role A updates self.last_available_marks inside _stage_2_account_risk instead of _stage_1_available_messages, and stores mbar.timestamp_ms (bar open time) instead of mbar.close_ms (bar close time) for the 120s mark staleness calculation.",
+      "reproduction": "git show 3b8befb0112cfe2d314ad65964762a3fb251e710:src/btc_quant_agent/strategy_research/r3_overnight/ledger.py | sed -n '142,149p;324,342p'"
+    },
+    {
+      "id": "DISCREPANCY_A07",
+      "code": "DISCREPANCY_A07_COOLDOWN_ORIGIN_AND_OMITTED_4H_DEDUP_ARGS:src/btc_quant_agent/strategy_research/r3_overnight/ledger.py:L139,L309;replay_engine.py:L129-L134",
+      "severity": "SPECIFICATION_DEDUP_AND_COOLDOWN_MISMATCH",
+      "file": "src/btc_quant_agent/strategy_research/r3_overnight/ledger.py",
+      "lines": "ledger.py:L139,L309; replay_engine.py:L129-L134",
+      "specification_reference": "V06_G2_R3_METHOD_R1_1_CONTROLLER_L2_ACCEPTANCE.md (4h Cooldown From ceil_to_minute(economic_exit_at) & Structural Continuation 4h Dedup)",
+      "description": "Stage 1 sets cooldown_until_ms = open_time_ms + COOLDOWN_DURATION_MS at acknowledgment time rather than ceil_to_minute(economic_exit_at) + 4h, compares signal.decision_time_ms < cooldown_until_ms instead of signal.available_at_ms, and ReplayEngine.run_simulation never passes last_exit_time_ms or last_entry_4h_time_ms to SignalGenerator.evaluate_hourly_decision, bypassing the Structural Continuation 4h-bar deduplication rule.",
+      "reproduction": "git show 3b8befb0112cfe2d314ad65964762a3fb251e710:src/btc_quant_agent/strategy_research/r3_overnight/replay_engine.py | sed -n '129,135p'"
+    },
+    {
+      "id": "DISCREPANCY_A08",
+      "code": "DISCREPANCY_A08_STAGE5_EXIT_COMMITMENT_OMITS_TICK_SIZE_TERM:src/btc_quant_agent/strategy_research/r3_overnight/ledger.py:L556-L559",
+      "severity": "SPECIFICATION_RESERVE_FORMULA_MISMATCH",
+      "file": "src/btc_quant_agent/strategy_research/r3_overnight/ledger.py",
+      "lines": "L556-L559",
+      "specification_reference": "V06_G2_R3_METHOD_R1_1_CONTROLLER_L2_ACCEPTANCE.md (Exit Reserve Commitment c_exit = 1.10 * price * (fee + friction) + tick_size)",
+      "description": "_stage_5_due_entries computes Position.cost_commitment_exit_usdt without adding sym_filter.tick_size * order.quantity and releases pending commitments in _stage_5_due_entries without retaining active position exit/funding reserves in cost_commitment_o / funding_reserve_rf.",
+      "reproduction": "git show 3b8befb0112cfe2d314ad65964762a3fb251e710:src/btc_quant_agent/strategy_research/r3_overnight/ledger.py | sed -n '507,511p;556,561p'"
+    }
+  ]
+}
