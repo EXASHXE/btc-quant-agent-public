@@ -1,6 +1,6 @@
 {
   "line": "B_LINE",
-  "stage": "B_LINE_INITIAL_USABLE_RELEASE_V1_RC2__FINAL_HOLDOUT_INFRA_REPAIR_PENDING_RETRY_LOCKED",
+  "stage": "B_LINE_INITIAL_USABLE_RELEASE_V1_RC2__INFRA_REPAIR_R1_L2_BOUNDED_FOLLOWUP",
   "code_branch": "feature/tactical-policy-r2",
   "accepted_code_sha": "52c16a28153de307dc6132c0975fe29341a0a918",
   "docs_authority_commit": "6319ddbaddd69d5522696992ec1565169da88e03",
@@ -856,15 +856,24 @@
     "repair_branch": "validation/b-line-rc2-final-holdout-infra-repair-r1",
     "repair_start_sha": "d51abdcfa982be132a6fae6c84776f343fae893c",
     "controller_dispatch_sha": "f1f08ddce7c2820ca7aa0faafadb339a60838ca1",
-    "next_gate": "COMPLETE_SCOPED_INFRA_REPAIR_AND_CONTROLLER_L2_REVIEW",
+    "next_gate": "GEMINI_TERMINAL_BOUNDED_REPAIR_AND_FOCUSED_TEST_RECEIPT",
     "protected_retry": "NOT_AUTHORIZED__NEW_IMMUTABLE_ONE_SHOT_REQUIRED",
     "incident_evidence_commit": "6f9b9bd1606c06664129b43293699fd05abd3297",
-    "evidence_reconciliation_path": "reviews/v0.5/rc2/V0.5.5_RC2_FINAL_HOLDOUT_INCIDENT_R2_EVIDENCE_RECONCILIATION.md"
+    "evidence_reconciliation_path": "reviews/v0.5/rc2/V0.5.5_RC2_FINAL_HOLDOUT_INCIDENT_R2_EVIDENCE_RECONCILIATION.md",
+    "repair_l2_status": "BOUNDED_REPAIR_REQUIRED__NO_PROTECTED_EXECUTION",
+    "repair_l2_reviewed_sha": "abbe5450018f93809939b9fa0d8810b4def833e0",
+    "repair_l2_review_path": "reviews/v0.5/rc2/V0.5.5_RC2_FINAL_HOLDOUT_INFRA_REPAIR_R1_CONTROLLER_L2_REVIEW.md"
   },
   "rc2_final_holdout_evidence_reconciliation": {
     "decision": "ACCEPT_ORIGINAL_INFRA_INCIDENT_EVIDENCE__INVALID_EXECUTION_DISPATCH__RETRY_LOCKED",
     "source_commit": "6f9b9bd1606c06664129b43293699fd05abd3297",
     "report_path": "reviews/v0.5/rc2/V0.5.5_RC2_FINAL_HOLDOUT_INCIDENT_R2_EVIDENCE_RECONCILIATION.md",
     "scope": "INCIDENT_CLASSIFICATION_ONLY_NOT_POLICY_QUALITY_OR_EXECUTION_AUTHORIZATION"
+  },
+  "b_line_ci_economy": {
+    "policy_path": "docs/project/B_LINE_TEST_AND_CI_ECONOMY_V1.md",
+    "stage": "PARALLEL_MECHANICAL_CI_REFACTOR_TO_IMPLEMENT",
+    "full_suite_each_push": false,
+    "protected_and_live_gates": "UNCHANGED"
   }
 }
