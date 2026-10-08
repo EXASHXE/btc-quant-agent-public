@@ -1,0 +1,54 @@
+{
+  "schema_version": "B_LINE_V06_PARALLEL_WORKSPACE_OVERRIDE_AUTHORITY_V1",
+  "decision": "AUTHORIZE_LOCAL_DIRECTORY_ONLY_OVERRIDE_AND_WORKTREE_BOOTSTRAP",
+  "repository": "EXASHXE/btc-quant-agent-public",
+  "controller_role": "CHATGPT_0_B_LINE_PRIMARY_CONTROLLER",
+  "docs_parent_sha": "a4fedcef0ac35704f33c054dcd7a33fee66f77c1",
+  "code_base_sha": "d6500140f3141d179181f2360ad815b5bfe9c954",
+  "local_entry_checkout": "/root/workspace/project/rc2-tactical-successor",
+  "workspace_root": "/root/workspace/project/quant-v0.6",
+  "path_override_scope": "WORKTREE_LOCATION_ONLY; NO_CODE_OR_STRATEGY_AUTHORITY_CHANGE",
+  "g1": {
+    "task_id": "V06_B_LINE_WP_A_C_D_ENGINEERING_PREVIEW_R1",
+    "original_dispatch_sha": "8f0ccb2dbbc0612e3218ea554309d123959118f7",
+    "branch": "feature/v06-bline-engineering-preview-r1",
+    "old_worktree": "/root/workspace/project/rc2-tactical-successor-v06-preview-r1",
+    "new_worktree": "/root/workspace/project/quant-v0.6/g1-engineering-preview",
+    "code_start_sha": "d6500140f3141d179181f2360ad815b5bfe9c954"
+  },
+  "g2": {
+    "task_id": "V06_B_LINE_G2_PROSPECTIVE_STRATEGY_DISCOVERY_R1",
+    "original_dispatch_sha": "0cc3d6e14d5c4e301c987b9e760fabb393e8141a",
+    "branch": "feature/v06-bline-g2-strategy-discovery-r1",
+    "old_worktree": "/root/workspace/project/rc2-tactical-successor-v06-g2-r1",
+    "new_worktree": "/root/workspace/project/quant-v0.6/g2-strategy-discovery",
+    "code_start_sha": "d6500140f3141d179181f2360ad815b5bfe9c954"
+  },
+  "review_worktree": {
+    "path": "/root/workspace/project/quant-v0.6/controller-review",
+    "detached": true,
+    "base_sha": "d6500140f3141d179181f2360ad815b5bfe9c954",
+    "no_commits": true
+  },
+  "local_artifacts": {
+    "dir": "/root/workspace/project/quant-v0.6/_artifacts",
+    "subdirs": [
+      "g1",
+      "g2",
+      "review"
+    ],
+    "never_commit": true
+  },
+  "local_metadata": {
+    "dir": "/root/workspace/project/quant-v0.6/_meta",
+    "never_commit": true
+  },
+  "safe_collisions": "STOP_ON_EXISTING_TASK_WORKTREE_OR_GIT_BRANCH_CONFLICT; NEVER_MOVE_RESET_CLEAN_OR_DELETE",
+  "protected_market_data": "FORBIDDEN",
+  "live_write_authority": "NONE",
+  "rc2_protected_retry": "NOT_AUTHORIZED",
+  "remote_push_by_bootstrap": "NO_GIT_CONTENT_CHANGES_NO_PUSH_NEEDED",
+  "executor_terminal": "WORKSPACE_READY_WITH_VERIFIED_WORKTREE_BRANCH_HEADS_OR_BLOCKED_WITHOUT_MUTATION",
+  "prompt_path": "prompts/v0.6/ops/V06_PARALLEL_WORKTREE_BOOTSTRAP_R1.md",
+  "layout_contract_path": "docs/project/V0.6_PARALLEL_LOCAL_WORKTREE_LAYOUT_V1.md"
+}
