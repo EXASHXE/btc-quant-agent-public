@@ -322,7 +322,24 @@
     ],
     "metadata_source_check_seconds": 1.733792
   },
-  "publication": "PENDING_DRAFT_COMMIT_AND_INDEPENDENT_REMOTE_CHECK;no empiricalfreeze identity",
+  "publication": {
+    "status": "REMOTE_REVIEWABLE_DRAFT_VERIFIED_NOT_EFFECTIVE_PREREG",
+    "remote_reviewable_draft_sha": "17a8412448dbe367d28821742201da3ea6e2abda",
+    "remote_reviewable_draft_parent_sha": "e0ff8c3473de4bfa3e66fe7928d42992a4d38a32",
+    "remote_reviewable_draft_tree_sha": "2d2698477c7a93466d91c98be654195f81264a61",
+    "remote_push_verified_for_draft": true,
+    "verification_utc": "2026-10-08T18:11:49.971504+00:00",
+    "checks": [
+      "fresh git ls-remote exact ownbranchSHA",
+      "fresh locked git fetch remoteobject",
+      "remote SHA/parent/tree and6filewhitelist matched",
+      "committeddiff--checkPASS,ownworktreeclean",
+      "fixedcheckoutHEAD/branch/statusunchanged;A/Bexternallymutable"
+    ],
+    "followup_identity": "This own receipt-only follow-up binds its verified DRAFT parent;its final remote SHA/parent/scope are independently verified after push and returned in terminal,avoiding circular self-reference",
+    "effective_preregistration": false,
+    "empirical_permission": "NOT_GRANTED"
+  },
   "proof_scope": "Scoped executor actions/immutable text blobs and metadata receipts,not universalOStelemetry",
   "next_controller_action": "SELECT_SAFE_OPTION_AND_UNIVERSE_OR_EXPLICIT_PROTECTION_RECONCILIATION_THEN_SEPARATE_EFFECTIVE_PREREG_BODY_ADMISSION",
   "sibling_preservation": [
@@ -697,5 +714,347 @@
       "datedlicenceapplicabilityunknown"
     ],
     "independent_second_review": false
-  }
+  },
+  "final_preservation_checks": [
+    {
+      "before": {
+        "path": "/root/workspace/project/Quant-agent-market-watch",
+        "head": "fde61dafb301d5bd5af3dc7eb81e5618f979036c",
+        "branch": "feature/b-line-live-v1",
+        "tracked_dirty_count": 6,
+        "untracked_count": 1,
+        "external_concurrent": false
+      },
+      "after": {
+        "path": "/root/workspace/project/Quant-agent-market-watch",
+        "head": "fde61dafb301d5bd5af3dc7eb81e5618f979036c",
+        "branch": "feature/b-line-live-v1",
+        "tracked_dirty_count": 6,
+        "untracked_count": 1,
+        "external_concurrent": false
+      },
+      "external_concurrent_delta": false,
+      "scope": "Count/HEAD/branchmetadataonly;Solnoeditsinthischeckout,activeA/Ballowedtoadvance"
+    },
+    {
+      "before": {
+        "path": "/root/workspace/project/quant-v0.6/controller-review",
+        "head": "d6500140f3141d179181f2360ad815b5bfe9c954",
+        "branch": "",
+        "tracked_dirty_count": 0,
+        "untracked_count": 0,
+        "external_concurrent": false
+      },
+      "after": {
+        "path": "/root/workspace/project/quant-v0.6/controller-review",
+        "head": "d6500140f3141d179181f2360ad815b5bfe9c954",
+        "branch": "",
+        "tracked_dirty_count": 0,
+        "untracked_count": 0,
+        "external_concurrent": false
+      },
+      "external_concurrent_delta": false,
+      "scope": "Count/HEAD/branchmetadataonly;Solnoeditsinthischeckout,activeA/Ballowedtoadvance"
+    },
+    {
+      "before": {
+        "path": "/root/workspace/project/quant-v0.6/g1-engineering-preview",
+        "head": "efd73496d01a71a158d67343b64695d33fab16a8",
+        "branch": "feature/v06-bline-engineering-preview-r1",
+        "tracked_dirty_count": 0,
+        "untracked_count": 0,
+        "external_concurrent": false
+      },
+      "after": {
+        "path": "/root/workspace/project/quant-v0.6/g1-engineering-preview",
+        "head": "efd73496d01a71a158d67343b64695d33fab16a8",
+        "branch": "feature/v06-bline-engineering-preview-r1",
+        "tracked_dirty_count": 0,
+        "untracked_count": 0,
+        "external_concurrent": false
+      },
+      "external_concurrent_delta": false,
+      "scope": "Count/HEAD/branchmetadataonly;Solnoeditsinthischeckout,activeA/Ballowedtoadvance"
+    },
+    {
+      "before": {
+        "path": "/root/workspace/project/quant-v0.6/g2-overnight-discovery-a",
+        "head": "e0ff8c3473de4bfa3e66fe7928d42992a4d38a32",
+        "branch": "feature/v06-bline-g2-overnight-discovery-a",
+        "tracked_dirty_count": 0,
+        "untracked_count": 15,
+        "external_concurrent": true
+      },
+      "after": {
+        "path": "/root/workspace/project/quant-v0.6/g2-overnight-discovery-a",
+        "head": "3b8befb0112cfe2d314ad65964762a3fb251e710",
+        "branch": "feature/v06-bline-g2-overnight-discovery-a",
+        "tracked_dirty_count": 0,
+        "untracked_count": 1,
+        "external_concurrent": true
+      },
+      "external_concurrent_delta": true,
+      "scope": "Count/HEAD/branchmetadataonly;Solnoeditsinthischeckout,activeA/Ballowedtoadvance"
+    },
+    {
+      "before": {
+        "path": "/root/workspace/project/quant-v0.6/g2-overnight-verifier-b",
+        "head": "e0ff8c3473de4bfa3e66fe7928d42992a4d38a32",
+        "branch": "feature/v06-bline-g2-overnight-verifier-b",
+        "tracked_dirty_count": 0,
+        "untracked_count": 3,
+        "external_concurrent": true
+      },
+      "after": {
+        "path": "/root/workspace/project/quant-v0.6/g2-overnight-verifier-b",
+        "head": "e0ff8c3473de4bfa3e66fe7928d42992a4d38a32",
+        "branch": "feature/v06-bline-g2-overnight-verifier-b",
+        "tracked_dirty_count": 0,
+        "untracked_count": 13,
+        "external_concurrent": true
+      },
+      "external_concurrent_delta": true,
+      "scope": "Count/HEAD/branchmetadataonly;Solnoeditsinthischeckout,activeA/Ballowedtoadvance"
+    },
+    {
+      "before": {
+        "path": "/root/workspace/project/quant-v0.6/g2-perp-reconstruction-r2",
+        "head": "2e922f486cf5b3f6cb7fa3aa7823cd096f24c17e",
+        "branch": "feature/v06-bline-g2-perp-reconstruction-r2",
+        "tracked_dirty_count": 0,
+        "untracked_count": 0,
+        "external_concurrent": false
+      },
+      "after": {
+        "path": "/root/workspace/project/quant-v0.6/g2-perp-reconstruction-r2",
+        "head": "2e922f486cf5b3f6cb7fa3aa7823cd096f24c17e",
+        "branch": "feature/v06-bline-g2-perp-reconstruction-r2",
+        "tracked_dirty_count": 0,
+        "untracked_count": 0,
+        "external_concurrent": false
+      },
+      "external_concurrent_delta": false,
+      "scope": "Count/HEAD/branchmetadataonly;Solnoeditsinthischeckout,activeA/Ballowedtoadvance"
+    },
+    {
+      "before": {
+        "path": "/root/workspace/project/quant-v0.6/g2-r3-cost-aware-method-design",
+        "head": "cf2d5cc33774cdcff7d709636305bba830e977ef",
+        "branch": "feature/v06-bline-g2-r3-cost-aware-method-design",
+        "tracked_dirty_count": 0,
+        "untracked_count": 0,
+        "external_concurrent": false
+      },
+      "after": {
+        "path": "/root/workspace/project/quant-v0.6/g2-r3-cost-aware-method-design",
+        "head": "cf2d5cc33774cdcff7d709636305bba830e977ef",
+        "branch": "feature/v06-bline-g2-r3-cost-aware-method-design",
+        "tracked_dirty_count": 0,
+        "untracked_count": 0,
+        "external_concurrent": false
+      },
+      "external_concurrent_delta": false,
+      "scope": "Count/HEAD/branchmetadataonly;Solnoeditsinthischeckout,activeA/Ballowedtoadvance"
+    },
+    {
+      "before": {
+        "path": "/root/workspace/project/quant-v0.6/g2-r3-source-feasibility-r1",
+        "head": "12793bc04db7414d11a0961684fd14f5df3ce16e",
+        "branch": "feature/v06-bline-g2-r3-source-feasibility-r1",
+        "tracked_dirty_count": 0,
+        "untracked_count": 0,
+        "external_concurrent": false
+      },
+      "after": {
+        "path": "/root/workspace/project/quant-v0.6/g2-r3-source-feasibility-r1",
+        "head": "12793bc04db7414d11a0961684fd14f5df3ce16e",
+        "branch": "feature/v06-bline-g2-r3-source-feasibility-r1",
+        "tracked_dirty_count": 0,
+        "untracked_count": 0,
+        "external_concurrent": false
+      },
+      "external_concurrent_delta": false,
+      "scope": "Count/HEAD/branchmetadataonly;Solnoeditsinthischeckout,activeA/Ballowedtoadvance"
+    },
+    {
+      "before": {
+        "path": "/root/workspace/project/quant-v0.6/g2-strategy-discovery",
+        "head": "aab31f8735c8be8f88651ef4677bd0c3a4068cae",
+        "branch": "feature/v06-bline-g2-strategy-discovery-r1",
+        "tracked_dirty_count": 0,
+        "untracked_count": 0,
+        "external_concurrent": false
+      },
+      "after": {
+        "path": "/root/workspace/project/quant-v0.6/g2-strategy-discovery",
+        "head": "aab31f8735c8be8f88651ef4677bd0c3a4068cae",
+        "branch": "feature/v06-bline-g2-strategy-discovery-r1",
+        "tracked_dirty_count": 0,
+        "untracked_count": 0,
+        "external_concurrent": false
+      },
+      "external_concurrent_delta": false,
+      "scope": "Count/HEAD/branchmetadataonly;Solnoeditsinthischeckout,activeA/Ballowedtoadvance"
+    },
+    {
+      "before": {
+        "path": "/root/workspace/project/quant-v0.6/g3-operational-readiness",
+        "head": "1b4ba5ace44a84af03a734462b468e597e62c85b",
+        "branch": "feature/v06-bline-g3-operational-readiness-r1",
+        "tracked_dirty_count": 0,
+        "untracked_count": 0,
+        "external_concurrent": false
+      },
+      "after": {
+        "path": "/root/workspace/project/quant-v0.6/g3-operational-readiness",
+        "head": "1b4ba5ace44a84af03a734462b468e597e62c85b",
+        "branch": "feature/v06-bline-g3-operational-readiness-r1",
+        "tracked_dirty_count": 0,
+        "untracked_count": 0,
+        "external_concurrent": false
+      },
+      "external_concurrent_delta": false,
+      "scope": "Count/HEAD/branchmetadataonly;Solnoeditsinthischeckout,activeA/Ballowedtoadvance"
+    },
+    {
+      "before": {
+        "path": "/root/workspace/project/rc1-wp-a-operational",
+        "head": "606f286dbb5d7af46776043d1287d9b3e7b1e679",
+        "branch": "feature/b-line-rc1-wp-a-operational-readiness",
+        "tracked_dirty_count": 0,
+        "untracked_count": 0,
+        "external_concurrent": false
+      },
+      "after": {
+        "path": "/root/workspace/project/rc1-wp-a-operational",
+        "head": "606f286dbb5d7af46776043d1287d9b3e7b1e679",
+        "branch": "feature/b-line-rc1-wp-a-operational-readiness",
+        "tracked_dirty_count": 0,
+        "untracked_count": 0,
+        "external_concurrent": false
+      },
+      "external_concurrent_delta": false,
+      "scope": "Count/HEAD/branchmetadataonly;Solnoeditsinthischeckout,activeA/Ballowedtoadvance"
+    },
+    {
+      "before": {
+        "path": "/root/workspace/project/rc1-wp-b-decision-quality",
+        "head": "597d2dd7452d6e2ab11e8500d253be1e6d53f8db",
+        "branch": "feature/b-line-rc1-wp-b-decision-quality",
+        "tracked_dirty_count": 0,
+        "untracked_count": 0,
+        "external_concurrent": false
+      },
+      "after": {
+        "path": "/root/workspace/project/rc1-wp-b-decision-quality",
+        "head": "597d2dd7452d6e2ab11e8500d253be1e6d53f8db",
+        "branch": "feature/b-line-rc1-wp-b-decision-quality",
+        "tracked_dirty_count": 0,
+        "untracked_count": 0,
+        "external_concurrent": false
+      },
+      "external_concurrent_delta": false,
+      "scope": "Count/HEAD/branchmetadataonly;Solnoeditsinthischeckout,activeA/Ballowedtoadvance"
+    },
+    {
+      "before": {
+        "path": "/root/workspace/project/rc1-wp-c-llm-approval",
+        "head": "72b39de71024b3051357c17eee7922e657dcb81f",
+        "branch": "feature/b-line-rc1-wp-c-llm-approval",
+        "tracked_dirty_count": 0,
+        "untracked_count": 0,
+        "external_concurrent": false
+      },
+      "after": {
+        "path": "/root/workspace/project/rc1-wp-c-llm-approval",
+        "head": "72b39de71024b3051357c17eee7922e657dcb81f",
+        "branch": "feature/b-line-rc1-wp-c-llm-approval",
+        "tracked_dirty_count": 0,
+        "untracked_count": 0,
+        "external_concurrent": false
+      },
+      "external_concurrent_delta": false,
+      "scope": "Count/HEAD/branchmetadataonly;Solnoeditsinthischeckout,activeA/Ballowedtoadvance"
+    },
+    {
+      "before": {
+        "path": "/root/workspace/project/rc1-wp-d-release-engineering",
+        "head": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea",
+        "branch": "feature/b-line-rc1-wp-d-release-engineering",
+        "tracked_dirty_count": 0,
+        "untracked_count": 0,
+        "external_concurrent": false
+      },
+      "after": {
+        "path": "/root/workspace/project/rc1-wp-d-release-engineering",
+        "head": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea",
+        "branch": "feature/b-line-rc1-wp-d-release-engineering",
+        "tracked_dirty_count": 0,
+        "untracked_count": 0,
+        "external_concurrent": false
+      },
+      "external_concurrent_delta": false,
+      "scope": "Count/HEAD/branchmetadataonly;Solnoeditsinthischeckout,activeA/Ballowedtoadvance"
+    },
+    {
+      "before": {
+        "path": "/root/workspace/project/rc2-tactical-successor",
+        "head": "1a5756663ecf56ed6c02a7355840f33e6715ea22",
+        "branch": "validation/b-line-rc2-final-holdout-infra-repair-r1",
+        "tracked_dirty_count": 0,
+        "untracked_count": 0,
+        "external_concurrent": false
+      },
+      "after": {
+        "path": "/root/workspace/project/rc2-tactical-successor",
+        "head": "1a5756663ecf56ed6c02a7355840f33e6715ea22",
+        "branch": "validation/b-line-rc2-final-holdout-infra-repair-r1",
+        "tracked_dirty_count": 0,
+        "untracked_count": 0,
+        "external_concurrent": false
+      },
+      "external_concurrent_delta": false,
+      "scope": "Count/HEAD/branchmetadataonly;Solnoeditsinthischeckout,activeA/Ballowedtoadvance"
+    },
+    {
+      "before": {
+        "path": "/root/workspace/project/rc2-tactical-successor-v06-foundation-r1",
+        "head": "5706a1f6e54fbd2deb2e940119952d16c1356148",
+        "branch": "feature/v06-bline-foundation-r1",
+        "tracked_dirty_count": 0,
+        "untracked_count": 0,
+        "external_concurrent": false
+      },
+      "after": {
+        "path": "/root/workspace/project/rc2-tactical-successor-v06-foundation-r1",
+        "head": "5706a1f6e54fbd2deb2e940119952d16c1356148",
+        "branch": "feature/v06-bline-foundation-r1",
+        "tracked_dirty_count": 0,
+        "untracked_count": 0,
+        "external_concurrent": false
+      },
+      "external_concurrent_delta": false,
+      "scope": "Count/HEAD/branchmetadataonly;Solnoeditsinthischeckout,activeA/Ballowedtoadvance"
+    },
+    {
+      "before": {
+        "path": "/tmp/rc2-downstream-readiness-report",
+        "head": "1c4bc2a9dd26dde9553653408452cb0a80c7c7d3",
+        "branch": "docs/rc2-downstream-readiness-outcome-blind",
+        "tracked_dirty_count": 0,
+        "untracked_count": 0,
+        "external_concurrent": false
+      },
+      "after": {
+        "path": "/tmp/rc2-downstream-readiness-report",
+        "head": "1c4bc2a9dd26dde9553653408452cb0a80c7c7d3",
+        "branch": "docs/rc2-downstream-readiness-outcome-blind",
+        "tracked_dirty_count": 0,
+        "untracked_count": 0,
+        "external_concurrent": false
+      },
+      "external_concurrent_delta": false,
+      "scope": "Count/HEAD/branchmetadataonly;Solnoeditsinthischeckout,activeA/Ballowedtoadvance"
+    }
+  ]
 }
