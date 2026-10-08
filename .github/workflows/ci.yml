@@ -37,12 +37,47 @@ jobs:
           BEFORE_SHA: "${{ github.event.before }}"
           EVENT_NAME: "${{ github.event_name }}"
         run: python scripts/ci/test_plan.py plan --before "$BEFORE_SHA" --event "$EVENT_NAME"
-      - run: python -m pip install -e '.[dev,research]'
-      - name: All Ruff rules; bounded legacy EXE001 debt check
+      - name: Classify impact before heavy dependency installation
+        id: impact
+        env:
+          PROFILE: "${{ github.event_name == 'workflow_dispatch' && inputs.profile || (github.event_name == 'schedule' && 'full' || 'focused') }}"
+        run: |
+          python - <<'PY' >> "$GITHUB_OUTPUT"
+          import json, os
+          p=json.load(open("ci-test-plan.json",encoding="utf-8"))
+          changed=p["changed"]
+          docs_only=(p["mode"]=="none" and os.environ["PROFILE"]=="focused")
+          ci_only=(os.environ["PROFILE"]=="focused" and bool(changed) and
+                   all(x.startswith((".github/workflows/","scripts/ci/")) or
+                       x=="tests/test_ci_test_plan.py" for x in changed))
+          print("docs_only="+str(docs_only).lower())
+          print("ci_only="+str(ci_only).lower())
+          PY
+      - name: Install tiny CI-planner dependencies
+        if: steps.impact.outputs.ci_only == 'true'
+        run: python -m pip install 'pytest>=8,<9' 'ruff>=0.9,<1'
+      - name: Install production/research validation dependencies
+        if: steps.impact.outputs.ci_only != 'true' && steps.impact.outputs.docs_only != 'true'
+        run: python -m pip install -e '.[dev,research]'
+      - name: Ruff with bounded historical EXE001 debt
+        if: steps.impact.outputs.docs_only != 'true'
         run: python scripts/ci/test_plan.py lint
-      - run: mypy
-      - run: python -m compileall -q src scripts tests
+      - name: Type-check production package on production changes
+        if: steps.impact.outputs.docs_only != 'true' && steps.impact.outputs.ci_only != 'true'
+        run: mypy
+      - name: Compile Python
+        run: python -m compileall -q src scripts tests
+      - name: Validate changed JSON artifacts
+        run: |
+          python - <<'PY'
+          import json, pathlib
+          p=json.loads(pathlib.Path("ci-test-plan.json").read_text())
+          for name in p["changed"]:
+              if name.endswith(".json") and pathlib.Path(name).is_file():
+                  json.loads(pathlib.Path(name).read_text(encoding="utf-8"))
+          PY
       - name: Tests selected by risk/changed scope
+        if: steps.impact.outputs.docs_only != 'true'
         env:
           PROFILE: "${{ github.event_name == 'workflow_dispatch' && inputs.profile || (github.event_name == 'schedule' && 'full' || 'focused') }}"
         run: python scripts/ci/test_plan.py run --profile "$PROFILE"
