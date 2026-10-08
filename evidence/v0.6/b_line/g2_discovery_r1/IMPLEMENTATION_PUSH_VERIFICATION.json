@@ -1,0 +1,18 @@
+{
+  "branch": "feature/v06-bline-g2-strategy-discovery-r1",
+  "changed_files": [
+    "evidence/v0.6/b_line/g2_discovery_r1/FIRST_PUSH_VERIFICATION.json",
+    "scripts/strategy_research/audit_sources.py",
+    "src/btc_quant_agent/strategy_research/__init__.py",
+    "src/btc_quant_agent/strategy_research/replay.py",
+    "src/btc_quant_agent/strategy_research/source.py",
+    "tests/test_strategy_research_contract.py"
+  ],
+  "implementation_sha": "4fc923b18330cde8873a93eb5fbb594531b5fcf5",
+  "parent_sha": "a46b0537c592f5d90a166aebe94737363f1706c0",
+  "protected_reads": 0,
+  "remote": "origin",
+  "remote_head_verified": "4fc923b18330cde8873a93eb5fbb594531b5fcf5",
+  "remote_push_verified": true,
+  "staged_scope_review": "authorized surfaces only; production imports zero"
+}

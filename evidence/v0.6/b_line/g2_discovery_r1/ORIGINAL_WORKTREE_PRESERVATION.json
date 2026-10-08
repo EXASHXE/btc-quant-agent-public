@@ -1,0 +1,24 @@
+{
+  "G1_worktree_edits": 0,
+  "entry": "/root/workspace/project/rc2-tactical-successor",
+  "exchange_writes": 0,
+  "old_task_worktree_collisions": false,
+  "other_worktree_edits": 0,
+  "post": {
+    "branch": "validation/b-line-rc2-final-holdout-infra-repair-r1",
+    "head": "1a5756663ecf56ed6c02a7355840f33e6715ea22",
+    "tracked_dirty": 0,
+    "untracked": 0
+  },
+  "pre": {
+    "branch": "validation/b-line-rc2-final-holdout-infra-repair-r1",
+    "head": "1a5756663ecf56ed6c02a7355840f33e6715ea22",
+    "tracked_dirty": 0,
+    "untracked": 0
+  },
+  "protected_reads": 0,
+  "published_file_names": false,
+  "schema": "G2_R1_ORIGINAL_WORKTREE_PRESERVATION_V1",
+  "shared_git_metadata": "authorized G2 index/commits/push and pinned fetch only; no other checkout changes",
+  "unchanged": true
+}

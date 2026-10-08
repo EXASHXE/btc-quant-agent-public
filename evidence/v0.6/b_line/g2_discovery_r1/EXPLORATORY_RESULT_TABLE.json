@@ -1,0 +1,1801 @@
+{
+  "benchmarks": [
+    {
+      "id": "WAIT",
+      "metrics": null,
+      "reason": "NO_ELIGIBLE_EMPIRICAL_DECISION_SLOTS",
+      "status": "NOT_COMPUTABLE"
+    },
+    {
+      "id": "NO_TRADE",
+      "metrics": null,
+      "reason": "NO_ELIGIBLE_EMPIRICAL_DECISION_SLOTS",
+      "status": "NOT_COMPUTABLE"
+    },
+    {
+      "id": "NAIVE_LONG_04H",
+      "metrics": null,
+      "reason": "NO_CONTEMPORANEOUS_SIGNAL_RECEIPT_PROOF",
+      "status": "NOT_COMPUTABLE"
+    },
+    {
+      "id": "NAIVE_LONG_08H",
+      "metrics": null,
+      "reason": "NO_CONTEMPORANEOUS_SIGNAL_RECEIPT_PROOF",
+      "status": "NOT_COMPUTABLE"
+    },
+    {
+      "id": "NAIVE_LONG_16H",
+      "metrics": null,
+      "reason": "NO_CONTEMPORANEOUS_SIGNAL_RECEIPT_PROOF",
+      "status": "NOT_COMPUTABLE"
+    },
+    {
+      "id": "NAIVE_LONG_24H",
+      "metrics": null,
+      "reason": "NO_CONTEMPORANEOUS_SIGNAL_RECEIPT_PROOF",
+      "status": "NOT_COMPUTABLE"
+    },
+    {
+      "id": "NAIVE_MOMENTUM_LONG_04H",
+      "metrics": null,
+      "reason": "NO_CONTEMPORANEOUS_SIGNAL_RECEIPT_PROOF",
+      "status": "NOT_COMPUTABLE"
+    },
+    {
+      "id": "NAIVE_MOMENTUM_LONG_08H",
+      "metrics": null,
+      "reason": "NO_CONTEMPORANEOUS_SIGNAL_RECEIPT_PROOF",
+      "status": "NOT_COMPUTABLE"
+    },
+    {
+      "id": "NAIVE_MOMENTUM_LONG_16H",
+      "metrics": null,
+      "reason": "NO_CONTEMPORANEOUS_SIGNAL_RECEIPT_PROOF",
+      "status": "NOT_COMPUTABLE"
+    },
+    {
+      "id": "NAIVE_MOMENTUM_LONG_24H",
+      "metrics": null,
+      "reason": "NO_CONTEMPORANEOUS_SIGNAL_RECEIPT_PROOF",
+      "status": "NOT_COMPUTABLE"
+    },
+    {
+      "id": "FROZEN_TACTICAL_POLICY_R2_B0",
+      "metrics": null,
+      "reason": "MISSING_PIT_DERIVATIVES_AND_FROZEN_REFERENCE_UNIVERSE_INPUTS; NO_APPROXIMATION",
+      "status": "NOT_COMPUTABLE"
+    }
+  ],
+  "candidate_results": [
+    {
+      "candidate_id": "BREAKOUT_04H",
+      "confidence_interval": null,
+      "directional_status": {
+        "LONG": {
+          "computable": false,
+          "metrics": null
+        },
+        "SHORT": {
+          "computable": false,
+          "reason": "UNREGISTERED_SPOT_BORROW_COSTS"
+        },
+        "WAIT": {
+          "computable": false,
+          "reason": "NO_ELIGIBLE_EMPIRICAL_DECISION_SLOTS"
+        }
+      },
+      "holding_hours": 4,
+      "horizon_band": "2-6h",
+      "metrics": {
+        "LONG": null,
+        "MAE": null,
+        "MFE": null,
+        "SHORT": null,
+        "SL_before_TP1": null,
+        "TP1_before_SL": null,
+        "WAIT": null,
+        "action_frequency": null,
+        "block_interval": null,
+        "concentration": null,
+        "cost_stress": null,
+        "coverage": null,
+        "decision_count": null,
+        "drawdown": null,
+        "exposure_days": null,
+        "fill_rate": null,
+        "funding": null,
+        "gross_R": null,
+        "hit_rate": null,
+        "holding_quantiles": null,
+        "liquidity_stress": null,
+        "maker_fee": null,
+        "mean_R": null,
+        "median_R": null,
+        "net_R": null,
+        "partition": null,
+        "regime": null,
+        "slippage": null,
+        "spread": null,
+        "symbol": null,
+        "tail_loss": null,
+        "taker_fee": null
+      },
+      "observed_empirical_decisions": 0,
+      "observed_empirical_trades": 0,
+      "partition_support": [
+        {
+          "coverage": null,
+          "end_exclusive": "2026-07-01T00:00:00Z",
+          "id": "P1",
+          "start": "2026-06-01T00:00:00Z",
+          "support_met": false,
+          "trades_observed": 0
+        },
+        {
+          "coverage": null,
+          "end_exclusive": "2026-08-01T00:00:00Z",
+          "id": "P2",
+          "start": "2026-07-01T00:00:00Z",
+          "support_met": false,
+          "trades_observed": 0
+        },
+        {
+          "coverage": null,
+          "end_exclusive": "2026-09-01T00:00:00Z",
+          "id": "P3",
+          "start": "2026-08-01T00:00:00Z",
+          "support_met": false,
+          "trades_observed": 0
+        }
+      ],
+      "per_regime": {
+        "DOWN": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "RANGE": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "UP": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        }
+      },
+      "per_symbol": {
+        "BTCUSDT": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "ETHUSDT": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "SOLUSDT": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        }
+      },
+      "ranking_score": null,
+      "scenarios": {
+        "base": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "entry_delay_1m": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "higher_cost": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "liquidity_stress": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "maker_not_filled": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "stop_1.35_ATR": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "stop_1.65_ATR": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        }
+      },
+      "shortlisted": false,
+      "status": "NOT_COMPUTABLE_SOURCE_BLOCKED"
+    },
+    {
+      "candidate_id": "BREAKOUT_08H",
+      "confidence_interval": null,
+      "directional_status": {
+        "LONG": {
+          "computable": false,
+          "metrics": null
+        },
+        "SHORT": {
+          "computable": false,
+          "reason": "UNREGISTERED_SPOT_BORROW_COSTS"
+        },
+        "WAIT": {
+          "computable": false,
+          "reason": "NO_ELIGIBLE_EMPIRICAL_DECISION_SLOTS"
+        }
+      },
+      "holding_hours": 8,
+      "horizon_band": "6-12h",
+      "metrics": {
+        "LONG": null,
+        "MAE": null,
+        "MFE": null,
+        "SHORT": null,
+        "SL_before_TP1": null,
+        "TP1_before_SL": null,
+        "WAIT": null,
+        "action_frequency": null,
+        "block_interval": null,
+        "concentration": null,
+        "cost_stress": null,
+        "coverage": null,
+        "decision_count": null,
+        "drawdown": null,
+        "exposure_days": null,
+        "fill_rate": null,
+        "funding": null,
+        "gross_R": null,
+        "hit_rate": null,
+        "holding_quantiles": null,
+        "liquidity_stress": null,
+        "maker_fee": null,
+        "mean_R": null,
+        "median_R": null,
+        "net_R": null,
+        "partition": null,
+        "regime": null,
+        "slippage": null,
+        "spread": null,
+        "symbol": null,
+        "tail_loss": null,
+        "taker_fee": null
+      },
+      "observed_empirical_decisions": 0,
+      "observed_empirical_trades": 0,
+      "partition_support": [
+        {
+          "coverage": null,
+          "end_exclusive": "2026-07-01T00:00:00Z",
+          "id": "P1",
+          "start": "2026-06-01T00:00:00Z",
+          "support_met": false,
+          "trades_observed": 0
+        },
+        {
+          "coverage": null,
+          "end_exclusive": "2026-08-01T00:00:00Z",
+          "id": "P2",
+          "start": "2026-07-01T00:00:00Z",
+          "support_met": false,
+          "trades_observed": 0
+        },
+        {
+          "coverage": null,
+          "end_exclusive": "2026-09-01T00:00:00Z",
+          "id": "P3",
+          "start": "2026-08-01T00:00:00Z",
+          "support_met": false,
+          "trades_observed": 0
+        }
+      ],
+      "per_regime": {
+        "DOWN": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "RANGE": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "UP": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        }
+      },
+      "per_symbol": {
+        "BTCUSDT": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "ETHUSDT": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "SOLUSDT": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        }
+      },
+      "ranking_score": null,
+      "scenarios": {
+        "base": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "entry_delay_1m": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "higher_cost": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "liquidity_stress": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "maker_not_filled": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "stop_1.35_ATR": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "stop_1.65_ATR": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        }
+      },
+      "shortlisted": false,
+      "status": "NOT_COMPUTABLE_SOURCE_BLOCKED"
+    },
+    {
+      "candidate_id": "BREAKOUT_16H",
+      "confidence_interval": null,
+      "directional_status": {
+        "LONG": {
+          "computable": false,
+          "metrics": null
+        },
+        "SHORT": {
+          "computable": false,
+          "reason": "UNREGISTERED_SPOT_BORROW_COSTS"
+        },
+        "WAIT": {
+          "computable": false,
+          "reason": "NO_ELIGIBLE_EMPIRICAL_DECISION_SLOTS"
+        }
+      },
+      "holding_hours": 16,
+      "horizon_band": "12-24h",
+      "metrics": {
+        "LONG": null,
+        "MAE": null,
+        "MFE": null,
+        "SHORT": null,
+        "SL_before_TP1": null,
+        "TP1_before_SL": null,
+        "WAIT": null,
+        "action_frequency": null,
+        "block_interval": null,
+        "concentration": null,
+        "cost_stress": null,
+        "coverage": null,
+        "decision_count": null,
+        "drawdown": null,
+        "exposure_days": null,
+        "fill_rate": null,
+        "funding": null,
+        "gross_R": null,
+        "hit_rate": null,
+        "holding_quantiles": null,
+        "liquidity_stress": null,
+        "maker_fee": null,
+        "mean_R": null,
+        "median_R": null,
+        "net_R": null,
+        "partition": null,
+        "regime": null,
+        "slippage": null,
+        "spread": null,
+        "symbol": null,
+        "tail_loss": null,
+        "taker_fee": null
+      },
+      "observed_empirical_decisions": 0,
+      "observed_empirical_trades": 0,
+      "partition_support": [
+        {
+          "coverage": null,
+          "end_exclusive": "2026-07-01T00:00:00Z",
+          "id": "P1",
+          "start": "2026-06-01T00:00:00Z",
+          "support_met": false,
+          "trades_observed": 0
+        },
+        {
+          "coverage": null,
+          "end_exclusive": "2026-08-01T00:00:00Z",
+          "id": "P2",
+          "start": "2026-07-01T00:00:00Z",
+          "support_met": false,
+          "trades_observed": 0
+        },
+        {
+          "coverage": null,
+          "end_exclusive": "2026-09-01T00:00:00Z",
+          "id": "P3",
+          "start": "2026-08-01T00:00:00Z",
+          "support_met": false,
+          "trades_observed": 0
+        }
+      ],
+      "per_regime": {
+        "DOWN": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "RANGE": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "UP": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        }
+      },
+      "per_symbol": {
+        "BTCUSDT": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "ETHUSDT": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "SOLUSDT": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        }
+      },
+      "ranking_score": null,
+      "scenarios": {
+        "base": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "entry_delay_1m": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "higher_cost": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "liquidity_stress": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "maker_not_filled": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "stop_1.35_ATR": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "stop_1.65_ATR": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        }
+      },
+      "shortlisted": false,
+      "status": "NOT_COMPUTABLE_SOURCE_BLOCKED"
+    },
+    {
+      "candidate_id": "BREAKOUT_24H",
+      "confidence_interval": null,
+      "directional_status": {
+        "LONG": {
+          "computable": false,
+          "metrics": null
+        },
+        "SHORT": {
+          "computable": false,
+          "reason": "UNREGISTERED_SPOT_BORROW_COSTS"
+        },
+        "WAIT": {
+          "computable": false,
+          "reason": "NO_ELIGIBLE_EMPIRICAL_DECISION_SLOTS"
+        }
+      },
+      "holding_hours": 24,
+      "horizon_band": "12-24h",
+      "metrics": {
+        "LONG": null,
+        "MAE": null,
+        "MFE": null,
+        "SHORT": null,
+        "SL_before_TP1": null,
+        "TP1_before_SL": null,
+        "WAIT": null,
+        "action_frequency": null,
+        "block_interval": null,
+        "concentration": null,
+        "cost_stress": null,
+        "coverage": null,
+        "decision_count": null,
+        "drawdown": null,
+        "exposure_days": null,
+        "fill_rate": null,
+        "funding": null,
+        "gross_R": null,
+        "hit_rate": null,
+        "holding_quantiles": null,
+        "liquidity_stress": null,
+        "maker_fee": null,
+        "mean_R": null,
+        "median_R": null,
+        "net_R": null,
+        "partition": null,
+        "regime": null,
+        "slippage": null,
+        "spread": null,
+        "symbol": null,
+        "tail_loss": null,
+        "taker_fee": null
+      },
+      "observed_empirical_decisions": 0,
+      "observed_empirical_trades": 0,
+      "partition_support": [
+        {
+          "coverage": null,
+          "end_exclusive": "2026-07-01T00:00:00Z",
+          "id": "P1",
+          "start": "2026-06-01T00:00:00Z",
+          "support_met": false,
+          "trades_observed": 0
+        },
+        {
+          "coverage": null,
+          "end_exclusive": "2026-08-01T00:00:00Z",
+          "id": "P2",
+          "start": "2026-07-01T00:00:00Z",
+          "support_met": false,
+          "trades_observed": 0
+        },
+        {
+          "coverage": null,
+          "end_exclusive": "2026-09-01T00:00:00Z",
+          "id": "P3",
+          "start": "2026-08-01T00:00:00Z",
+          "support_met": false,
+          "trades_observed": 0
+        }
+      ],
+      "per_regime": {
+        "DOWN": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "RANGE": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "UP": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        }
+      },
+      "per_symbol": {
+        "BTCUSDT": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "ETHUSDT": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "SOLUSDT": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        }
+      },
+      "ranking_score": null,
+      "scenarios": {
+        "base": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "entry_delay_1m": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "higher_cost": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "liquidity_stress": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "maker_not_filled": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "stop_1.35_ATR": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "stop_1.65_ATR": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        }
+      },
+      "shortlisted": false,
+      "status": "NOT_COMPUTABLE_SOURCE_BLOCKED"
+    },
+    {
+      "candidate_id": "TREND_PULLBACK_04H",
+      "confidence_interval": null,
+      "directional_status": {
+        "LONG": {
+          "computable": false,
+          "metrics": null
+        },
+        "SHORT": {
+          "computable": false,
+          "reason": "UNREGISTERED_SPOT_BORROW_COSTS"
+        },
+        "WAIT": {
+          "computable": false,
+          "reason": "NO_ELIGIBLE_EMPIRICAL_DECISION_SLOTS"
+        }
+      },
+      "holding_hours": 4,
+      "horizon_band": "2-6h",
+      "metrics": {
+        "LONG": null,
+        "MAE": null,
+        "MFE": null,
+        "SHORT": null,
+        "SL_before_TP1": null,
+        "TP1_before_SL": null,
+        "WAIT": null,
+        "action_frequency": null,
+        "block_interval": null,
+        "concentration": null,
+        "cost_stress": null,
+        "coverage": null,
+        "decision_count": null,
+        "drawdown": null,
+        "exposure_days": null,
+        "fill_rate": null,
+        "funding": null,
+        "gross_R": null,
+        "hit_rate": null,
+        "holding_quantiles": null,
+        "liquidity_stress": null,
+        "maker_fee": null,
+        "mean_R": null,
+        "median_R": null,
+        "net_R": null,
+        "partition": null,
+        "regime": null,
+        "slippage": null,
+        "spread": null,
+        "symbol": null,
+        "tail_loss": null,
+        "taker_fee": null
+      },
+      "observed_empirical_decisions": 0,
+      "observed_empirical_trades": 0,
+      "partition_support": [
+        {
+          "coverage": null,
+          "end_exclusive": "2026-07-01T00:00:00Z",
+          "id": "P1",
+          "start": "2026-06-01T00:00:00Z",
+          "support_met": false,
+          "trades_observed": 0
+        },
+        {
+          "coverage": null,
+          "end_exclusive": "2026-08-01T00:00:00Z",
+          "id": "P2",
+          "start": "2026-07-01T00:00:00Z",
+          "support_met": false,
+          "trades_observed": 0
+        },
+        {
+          "coverage": null,
+          "end_exclusive": "2026-09-01T00:00:00Z",
+          "id": "P3",
+          "start": "2026-08-01T00:00:00Z",
+          "support_met": false,
+          "trades_observed": 0
+        }
+      ],
+      "per_regime": {
+        "DOWN": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "RANGE": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "UP": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        }
+      },
+      "per_symbol": {
+        "BTCUSDT": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "ETHUSDT": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "SOLUSDT": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        }
+      },
+      "ranking_score": null,
+      "scenarios": {
+        "base": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "entry_delay_1m": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "higher_cost": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "liquidity_stress": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "maker_not_filled": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "stop_1.35_ATR": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "stop_1.65_ATR": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        }
+      },
+      "shortlisted": false,
+      "status": "NOT_COMPUTABLE_SOURCE_BLOCKED"
+    },
+    {
+      "candidate_id": "TREND_PULLBACK_08H",
+      "confidence_interval": null,
+      "directional_status": {
+        "LONG": {
+          "computable": false,
+          "metrics": null
+        },
+        "SHORT": {
+          "computable": false,
+          "reason": "UNREGISTERED_SPOT_BORROW_COSTS"
+        },
+        "WAIT": {
+          "computable": false,
+          "reason": "NO_ELIGIBLE_EMPIRICAL_DECISION_SLOTS"
+        }
+      },
+      "holding_hours": 8,
+      "horizon_band": "6-12h",
+      "metrics": {
+        "LONG": null,
+        "MAE": null,
+        "MFE": null,
+        "SHORT": null,
+        "SL_before_TP1": null,
+        "TP1_before_SL": null,
+        "WAIT": null,
+        "action_frequency": null,
+        "block_interval": null,
+        "concentration": null,
+        "cost_stress": null,
+        "coverage": null,
+        "decision_count": null,
+        "drawdown": null,
+        "exposure_days": null,
+        "fill_rate": null,
+        "funding": null,
+        "gross_R": null,
+        "hit_rate": null,
+        "holding_quantiles": null,
+        "liquidity_stress": null,
+        "maker_fee": null,
+        "mean_R": null,
+        "median_R": null,
+        "net_R": null,
+        "partition": null,
+        "regime": null,
+        "slippage": null,
+        "spread": null,
+        "symbol": null,
+        "tail_loss": null,
+        "taker_fee": null
+      },
+      "observed_empirical_decisions": 0,
+      "observed_empirical_trades": 0,
+      "partition_support": [
+        {
+          "coverage": null,
+          "end_exclusive": "2026-07-01T00:00:00Z",
+          "id": "P1",
+          "start": "2026-06-01T00:00:00Z",
+          "support_met": false,
+          "trades_observed": 0
+        },
+        {
+          "coverage": null,
+          "end_exclusive": "2026-08-01T00:00:00Z",
+          "id": "P2",
+          "start": "2026-07-01T00:00:00Z",
+          "support_met": false,
+          "trades_observed": 0
+        },
+        {
+          "coverage": null,
+          "end_exclusive": "2026-09-01T00:00:00Z",
+          "id": "P3",
+          "start": "2026-08-01T00:00:00Z",
+          "support_met": false,
+          "trades_observed": 0
+        }
+      ],
+      "per_regime": {
+        "DOWN": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "RANGE": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "UP": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        }
+      },
+      "per_symbol": {
+        "BTCUSDT": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "ETHUSDT": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "SOLUSDT": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        }
+      },
+      "ranking_score": null,
+      "scenarios": {
+        "base": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "entry_delay_1m": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "higher_cost": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "liquidity_stress": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "maker_not_filled": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "stop_1.35_ATR": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "stop_1.65_ATR": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        }
+      },
+      "shortlisted": false,
+      "status": "NOT_COMPUTABLE_SOURCE_BLOCKED"
+    },
+    {
+      "candidate_id": "TREND_PULLBACK_16H",
+      "confidence_interval": null,
+      "directional_status": {
+        "LONG": {
+          "computable": false,
+          "metrics": null
+        },
+        "SHORT": {
+          "computable": false,
+          "reason": "UNREGISTERED_SPOT_BORROW_COSTS"
+        },
+        "WAIT": {
+          "computable": false,
+          "reason": "NO_ELIGIBLE_EMPIRICAL_DECISION_SLOTS"
+        }
+      },
+      "holding_hours": 16,
+      "horizon_band": "12-24h",
+      "metrics": {
+        "LONG": null,
+        "MAE": null,
+        "MFE": null,
+        "SHORT": null,
+        "SL_before_TP1": null,
+        "TP1_before_SL": null,
+        "WAIT": null,
+        "action_frequency": null,
+        "block_interval": null,
+        "concentration": null,
+        "cost_stress": null,
+        "coverage": null,
+        "decision_count": null,
+        "drawdown": null,
+        "exposure_days": null,
+        "fill_rate": null,
+        "funding": null,
+        "gross_R": null,
+        "hit_rate": null,
+        "holding_quantiles": null,
+        "liquidity_stress": null,
+        "maker_fee": null,
+        "mean_R": null,
+        "median_R": null,
+        "net_R": null,
+        "partition": null,
+        "regime": null,
+        "slippage": null,
+        "spread": null,
+        "symbol": null,
+        "tail_loss": null,
+        "taker_fee": null
+      },
+      "observed_empirical_decisions": 0,
+      "observed_empirical_trades": 0,
+      "partition_support": [
+        {
+          "coverage": null,
+          "end_exclusive": "2026-07-01T00:00:00Z",
+          "id": "P1",
+          "start": "2026-06-01T00:00:00Z",
+          "support_met": false,
+          "trades_observed": 0
+        },
+        {
+          "coverage": null,
+          "end_exclusive": "2026-08-01T00:00:00Z",
+          "id": "P2",
+          "start": "2026-07-01T00:00:00Z",
+          "support_met": false,
+          "trades_observed": 0
+        },
+        {
+          "coverage": null,
+          "end_exclusive": "2026-09-01T00:00:00Z",
+          "id": "P3",
+          "start": "2026-08-01T00:00:00Z",
+          "support_met": false,
+          "trades_observed": 0
+        }
+      ],
+      "per_regime": {
+        "DOWN": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "RANGE": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "UP": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        }
+      },
+      "per_symbol": {
+        "BTCUSDT": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "ETHUSDT": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "SOLUSDT": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        }
+      },
+      "ranking_score": null,
+      "scenarios": {
+        "base": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "entry_delay_1m": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "higher_cost": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "liquidity_stress": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "maker_not_filled": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "stop_1.35_ATR": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "stop_1.65_ATR": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        }
+      },
+      "shortlisted": false,
+      "status": "NOT_COMPUTABLE_SOURCE_BLOCKED"
+    },
+    {
+      "candidate_id": "TREND_PULLBACK_24H",
+      "confidence_interval": null,
+      "directional_status": {
+        "LONG": {
+          "computable": false,
+          "metrics": null
+        },
+        "SHORT": {
+          "computable": false,
+          "reason": "UNREGISTERED_SPOT_BORROW_COSTS"
+        },
+        "WAIT": {
+          "computable": false,
+          "reason": "NO_ELIGIBLE_EMPIRICAL_DECISION_SLOTS"
+        }
+      },
+      "holding_hours": 24,
+      "horizon_band": "12-24h",
+      "metrics": {
+        "LONG": null,
+        "MAE": null,
+        "MFE": null,
+        "SHORT": null,
+        "SL_before_TP1": null,
+        "TP1_before_SL": null,
+        "WAIT": null,
+        "action_frequency": null,
+        "block_interval": null,
+        "concentration": null,
+        "cost_stress": null,
+        "coverage": null,
+        "decision_count": null,
+        "drawdown": null,
+        "exposure_days": null,
+        "fill_rate": null,
+        "funding": null,
+        "gross_R": null,
+        "hit_rate": null,
+        "holding_quantiles": null,
+        "liquidity_stress": null,
+        "maker_fee": null,
+        "mean_R": null,
+        "median_R": null,
+        "net_R": null,
+        "partition": null,
+        "regime": null,
+        "slippage": null,
+        "spread": null,
+        "symbol": null,
+        "tail_loss": null,
+        "taker_fee": null
+      },
+      "observed_empirical_decisions": 0,
+      "observed_empirical_trades": 0,
+      "partition_support": [
+        {
+          "coverage": null,
+          "end_exclusive": "2026-07-01T00:00:00Z",
+          "id": "P1",
+          "start": "2026-06-01T00:00:00Z",
+          "support_met": false,
+          "trades_observed": 0
+        },
+        {
+          "coverage": null,
+          "end_exclusive": "2026-08-01T00:00:00Z",
+          "id": "P2",
+          "start": "2026-07-01T00:00:00Z",
+          "support_met": false,
+          "trades_observed": 0
+        },
+        {
+          "coverage": null,
+          "end_exclusive": "2026-09-01T00:00:00Z",
+          "id": "P3",
+          "start": "2026-08-01T00:00:00Z",
+          "support_met": false,
+          "trades_observed": 0
+        }
+      ],
+      "per_regime": {
+        "DOWN": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "RANGE": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "UP": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        }
+      },
+      "per_symbol": {
+        "BTCUSDT": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "ETHUSDT": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "SOLUSDT": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        }
+      },
+      "ranking_score": null,
+      "scenarios": {
+        "base": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "entry_delay_1m": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "higher_cost": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "liquidity_stress": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "maker_not_filled": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "stop_1.35_ATR": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "stop_1.65_ATR": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        }
+      },
+      "shortlisted": false,
+      "status": "NOT_COMPUTABLE_SOURCE_BLOCKED"
+    },
+    {
+      "candidate_id": "RANGE_REVERSION_04H",
+      "confidence_interval": null,
+      "directional_status": {
+        "LONG": {
+          "computable": false,
+          "metrics": null
+        },
+        "SHORT": {
+          "computable": false,
+          "reason": "UNREGISTERED_SPOT_BORROW_COSTS"
+        },
+        "WAIT": {
+          "computable": false,
+          "reason": "NO_ELIGIBLE_EMPIRICAL_DECISION_SLOTS"
+        }
+      },
+      "holding_hours": 4,
+      "horizon_band": "2-6h",
+      "metrics": {
+        "LONG": null,
+        "MAE": null,
+        "MFE": null,
+        "SHORT": null,
+        "SL_before_TP1": null,
+        "TP1_before_SL": null,
+        "WAIT": null,
+        "action_frequency": null,
+        "block_interval": null,
+        "concentration": null,
+        "cost_stress": null,
+        "coverage": null,
+        "decision_count": null,
+        "drawdown": null,
+        "exposure_days": null,
+        "fill_rate": null,
+        "funding": null,
+        "gross_R": null,
+        "hit_rate": null,
+        "holding_quantiles": null,
+        "liquidity_stress": null,
+        "maker_fee": null,
+        "mean_R": null,
+        "median_R": null,
+        "net_R": null,
+        "partition": null,
+        "regime": null,
+        "slippage": null,
+        "spread": null,
+        "symbol": null,
+        "tail_loss": null,
+        "taker_fee": null
+      },
+      "observed_empirical_decisions": 0,
+      "observed_empirical_trades": 0,
+      "partition_support": [
+        {
+          "coverage": null,
+          "end_exclusive": "2026-07-01T00:00:00Z",
+          "id": "P1",
+          "start": "2026-06-01T00:00:00Z",
+          "support_met": false,
+          "trades_observed": 0
+        },
+        {
+          "coverage": null,
+          "end_exclusive": "2026-08-01T00:00:00Z",
+          "id": "P2",
+          "start": "2026-07-01T00:00:00Z",
+          "support_met": false,
+          "trades_observed": 0
+        },
+        {
+          "coverage": null,
+          "end_exclusive": "2026-09-01T00:00:00Z",
+          "id": "P3",
+          "start": "2026-08-01T00:00:00Z",
+          "support_met": false,
+          "trades_observed": 0
+        }
+      ],
+      "per_regime": {
+        "DOWN": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "RANGE": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "UP": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        }
+      },
+      "per_symbol": {
+        "BTCUSDT": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "ETHUSDT": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "SOLUSDT": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        }
+      },
+      "ranking_score": null,
+      "scenarios": {
+        "base": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "entry_delay_1m": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "higher_cost": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "liquidity_stress": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "maker_not_filled": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "stop_1.35_ATR": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "stop_1.65_ATR": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        }
+      },
+      "shortlisted": false,
+      "status": "NOT_COMPUTABLE_SOURCE_BLOCKED"
+    },
+    {
+      "candidate_id": "RANGE_REVERSION_08H",
+      "confidence_interval": null,
+      "directional_status": {
+        "LONG": {
+          "computable": false,
+          "metrics": null
+        },
+        "SHORT": {
+          "computable": false,
+          "reason": "UNREGISTERED_SPOT_BORROW_COSTS"
+        },
+        "WAIT": {
+          "computable": false,
+          "reason": "NO_ELIGIBLE_EMPIRICAL_DECISION_SLOTS"
+        }
+      },
+      "holding_hours": 8,
+      "horizon_band": "6-12h",
+      "metrics": {
+        "LONG": null,
+        "MAE": null,
+        "MFE": null,
+        "SHORT": null,
+        "SL_before_TP1": null,
+        "TP1_before_SL": null,
+        "WAIT": null,
+        "action_frequency": null,
+        "block_interval": null,
+        "concentration": null,
+        "cost_stress": null,
+        "coverage": null,
+        "decision_count": null,
+        "drawdown": null,
+        "exposure_days": null,
+        "fill_rate": null,
+        "funding": null,
+        "gross_R": null,
+        "hit_rate": null,
+        "holding_quantiles": null,
+        "liquidity_stress": null,
+        "maker_fee": null,
+        "mean_R": null,
+        "median_R": null,
+        "net_R": null,
+        "partition": null,
+        "regime": null,
+        "slippage": null,
+        "spread": null,
+        "symbol": null,
+        "tail_loss": null,
+        "taker_fee": null
+      },
+      "observed_empirical_decisions": 0,
+      "observed_empirical_trades": 0,
+      "partition_support": [
+        {
+          "coverage": null,
+          "end_exclusive": "2026-07-01T00:00:00Z",
+          "id": "P1",
+          "start": "2026-06-01T00:00:00Z",
+          "support_met": false,
+          "trades_observed": 0
+        },
+        {
+          "coverage": null,
+          "end_exclusive": "2026-08-01T00:00:00Z",
+          "id": "P2",
+          "start": "2026-07-01T00:00:00Z",
+          "support_met": false,
+          "trades_observed": 0
+        },
+        {
+          "coverage": null,
+          "end_exclusive": "2026-09-01T00:00:00Z",
+          "id": "P3",
+          "start": "2026-08-01T00:00:00Z",
+          "support_met": false,
+          "trades_observed": 0
+        }
+      ],
+      "per_regime": {
+        "DOWN": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "RANGE": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "UP": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        }
+      },
+      "per_symbol": {
+        "BTCUSDT": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "ETHUSDT": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "SOLUSDT": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        }
+      },
+      "ranking_score": null,
+      "scenarios": {
+        "base": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "entry_delay_1m": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "higher_cost": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "liquidity_stress": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "maker_not_filled": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "stop_1.35_ATR": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "stop_1.65_ATR": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        }
+      },
+      "shortlisted": false,
+      "status": "NOT_COMPUTABLE_SOURCE_BLOCKED"
+    },
+    {
+      "candidate_id": "RANGE_REVERSION_16H",
+      "confidence_interval": null,
+      "directional_status": {
+        "LONG": {
+          "computable": false,
+          "metrics": null
+        },
+        "SHORT": {
+          "computable": false,
+          "reason": "UNREGISTERED_SPOT_BORROW_COSTS"
+        },
+        "WAIT": {
+          "computable": false,
+          "reason": "NO_ELIGIBLE_EMPIRICAL_DECISION_SLOTS"
+        }
+      },
+      "holding_hours": 16,
+      "horizon_band": "12-24h",
+      "metrics": {
+        "LONG": null,
+        "MAE": null,
+        "MFE": null,
+        "SHORT": null,
+        "SL_before_TP1": null,
+        "TP1_before_SL": null,
+        "WAIT": null,
+        "action_frequency": null,
+        "block_interval": null,
+        "concentration": null,
+        "cost_stress": null,
+        "coverage": null,
+        "decision_count": null,
+        "drawdown": null,
+        "exposure_days": null,
+        "fill_rate": null,
+        "funding": null,
+        "gross_R": null,
+        "hit_rate": null,
+        "holding_quantiles": null,
+        "liquidity_stress": null,
+        "maker_fee": null,
+        "mean_R": null,
+        "median_R": null,
+        "net_R": null,
+        "partition": null,
+        "regime": null,
+        "slippage": null,
+        "spread": null,
+        "symbol": null,
+        "tail_loss": null,
+        "taker_fee": null
+      },
+      "observed_empirical_decisions": 0,
+      "observed_empirical_trades": 0,
+      "partition_support": [
+        {
+          "coverage": null,
+          "end_exclusive": "2026-07-01T00:00:00Z",
+          "id": "P1",
+          "start": "2026-06-01T00:00:00Z",
+          "support_met": false,
+          "trades_observed": 0
+        },
+        {
+          "coverage": null,
+          "end_exclusive": "2026-08-01T00:00:00Z",
+          "id": "P2",
+          "start": "2026-07-01T00:00:00Z",
+          "support_met": false,
+          "trades_observed": 0
+        },
+        {
+          "coverage": null,
+          "end_exclusive": "2026-09-01T00:00:00Z",
+          "id": "P3",
+          "start": "2026-08-01T00:00:00Z",
+          "support_met": false,
+          "trades_observed": 0
+        }
+      ],
+      "per_regime": {
+        "DOWN": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "RANGE": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "UP": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        }
+      },
+      "per_symbol": {
+        "BTCUSDT": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "ETHUSDT": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "SOLUSDT": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        }
+      },
+      "ranking_score": null,
+      "scenarios": {
+        "base": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "entry_delay_1m": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "higher_cost": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "liquidity_stress": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "maker_not_filled": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "stop_1.35_ATR": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "stop_1.65_ATR": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        }
+      },
+      "shortlisted": false,
+      "status": "NOT_COMPUTABLE_SOURCE_BLOCKED"
+    },
+    {
+      "candidate_id": "RANGE_REVERSION_24H",
+      "confidence_interval": null,
+      "directional_status": {
+        "LONG": {
+          "computable": false,
+          "metrics": null
+        },
+        "SHORT": {
+          "computable": false,
+          "reason": "UNREGISTERED_SPOT_BORROW_COSTS"
+        },
+        "WAIT": {
+          "computable": false,
+          "reason": "NO_ELIGIBLE_EMPIRICAL_DECISION_SLOTS"
+        }
+      },
+      "holding_hours": 24,
+      "horizon_band": "12-24h",
+      "metrics": {
+        "LONG": null,
+        "MAE": null,
+        "MFE": null,
+        "SHORT": null,
+        "SL_before_TP1": null,
+        "TP1_before_SL": null,
+        "WAIT": null,
+        "action_frequency": null,
+        "block_interval": null,
+        "concentration": null,
+        "cost_stress": null,
+        "coverage": null,
+        "decision_count": null,
+        "drawdown": null,
+        "exposure_days": null,
+        "fill_rate": null,
+        "funding": null,
+        "gross_R": null,
+        "hit_rate": null,
+        "holding_quantiles": null,
+        "liquidity_stress": null,
+        "maker_fee": null,
+        "mean_R": null,
+        "median_R": null,
+        "net_R": null,
+        "partition": null,
+        "regime": null,
+        "slippage": null,
+        "spread": null,
+        "symbol": null,
+        "tail_loss": null,
+        "taker_fee": null
+      },
+      "observed_empirical_decisions": 0,
+      "observed_empirical_trades": 0,
+      "partition_support": [
+        {
+          "coverage": null,
+          "end_exclusive": "2026-07-01T00:00:00Z",
+          "id": "P1",
+          "start": "2026-06-01T00:00:00Z",
+          "support_met": false,
+          "trades_observed": 0
+        },
+        {
+          "coverage": null,
+          "end_exclusive": "2026-08-01T00:00:00Z",
+          "id": "P2",
+          "start": "2026-07-01T00:00:00Z",
+          "support_met": false,
+          "trades_observed": 0
+        },
+        {
+          "coverage": null,
+          "end_exclusive": "2026-09-01T00:00:00Z",
+          "id": "P3",
+          "start": "2026-08-01T00:00:00Z",
+          "support_met": false,
+          "trades_observed": 0
+        }
+      ],
+      "per_regime": {
+        "DOWN": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "RANGE": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "UP": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        }
+      },
+      "per_symbol": {
+        "BTCUSDT": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "ETHUSDT": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "SOLUSDT": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        }
+      },
+      "ranking_score": null,
+      "scenarios": {
+        "base": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "entry_delay_1m": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "higher_cost": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "liquidity_stress": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "maker_not_filled": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "stop_1.35_ATR": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        },
+        "stop_1.65_ATR": {
+          "metrics": null,
+          "status": "NOT_COMPUTABLE"
+        }
+      },
+      "shortlisted": false,
+      "status": "NOT_COMPUTABLE_SOURCE_BLOCKED"
+    }
+  ],
+  "data_classification": "PRIOR_EXPOSED_OR_DEVELOPMENT",
+  "decision": "G2_R1_METHOD_OR_SOURCE_BLOCKED",
+  "economic_viability": "UNKNOWN_NOT_TESTED",
+  "empirical_outcome_evaluation_performed": false,
+  "grid": "NOT_APPLICABLE_NO_GRID_REGISTERED",
+  "implementation_sha": "4fc923b18330cde8873a93eb5fbb594531b5fcf5",
+  "pre_registration_sha": "a46b0537c592f5d90a166aebe94737363f1706c0",
+  "ranked_candidates": [],
+  "schema": "G2_R1_EXPLORATORY_RESULT_TABLE_V1",
+  "selection_bias": "12 configurations preregistered, zero empirical tests; no alpha inference",
+  "shortlist": [],
+  "statistical_intervals": "NOT_COMPUTABLE; no empirical observations, no bootstrap samples",
+  "synthetic_metrics_included": false
+}

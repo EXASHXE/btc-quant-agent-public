@@ -1,0 +1,54 @@
+{
+  "empirical_method_integrity": "BLOCKED",
+  "exchange_writes": 0,
+  "implementation_sha": "4fc923b18330cde8873a93eb5fbb594531b5fcf5",
+  "independent_review": {
+    "access": "READ_ONLY_HERMETIC",
+    "disposition": "No remaining blocking correctness issue for SOURCE_BLOCKED terminal; not empirical replay acceptance",
+    "findings_fixed": [
+      "zero-risk WAIT rejected",
+      "stop reason changed with ambient decimal context",
+      "hourly volume and derived quantize depended on decimal context"
+    ],
+    "observed_checks": "earlier scoped suite 40 passed; final four focused regressions 4 passed, 39 deselected",
+    "role": "reviewer"
+  },
+  "invariants_tested": [
+    "symbol and window allowlist before URL/access",
+    "archive timestamps cannot be relabelled contemporaneous or synthetic",
+    "microsecond epoch/calendar normalization",
+    "source digest/version/cache identity",
+    "permutation invariance and duplicate identity rejection",
+    "contiguous minute/hour calendar without interpolation",
+    "late features and shift-by-one attack",
+    "next-minute execution and fill-time liquidity",
+    "SL-first collisions and conservative stop/target gaps",
+    "missing path minute fails even before early exit",
+    "zero-range WAIT has no trade",
+    "spot derivative/short rejection and zero funding",
+    "partition purge/embargo and no overlap",
+    "fee/spread/slippage split and higher-cost stress",
+    "notional-normalized R",
+    "low liquidity no fill",
+    "restart determinism and output synthetic provenance",
+    "decimal precision/rounding/trap independence",
+    "metadata HEAD only with no body read or redirect"
+  ],
+  "not_tested_or_not_proven": {
+    "MarketWatch_imported_behavior": "NONE; read-only interface inspection, no runtime imports",
+    "derivative_funding_sign": "NOT_APPLICABLE_SPOT_ONLY; derivative market rejection tested",
+    "empirical_decision_feature_link": "NOT_PROVEN; arbitrary self-declared identity is insufficient",
+    "empirical_frozen_runner_settings": "NO_EMPIRICAL_RUNNER; kernel alternatives are test-only",
+    "empirical_minute_coverage": "NOT_MEASURED",
+    "empirical_statistics_and_ranking": "NOT_IMPLEMENTED_OR_EXECUTED_AFTER_SOURCE_STOP",
+    "grid_accounting": "NOT_APPLICABLE_NO_GRID_REGISTERED",
+    "historical_original_receipts": "ABSENT",
+    "maker_fill_model": "NOT_APPLICABLE_TAKER_ONLY; no maker-profit claim",
+    "official_price_checksum": "NO_PRICE_BODY_DOWNLOADED"
+  },
+  "pre_registration_sha": "a46b0537c592f5d90a166aebe94737363f1706c0",
+  "protected_reads": 0,
+  "schema": "G2_R1_REPLAY_AND_PIT_VALIDATION_V1",
+  "strict_receipt_gate": "archive receipts cannot qualify historical signals; nonsynthetic replay always denied",
+  "synthetic_kernel_tests": "43_PASS; never empirical PIT proof"
+}

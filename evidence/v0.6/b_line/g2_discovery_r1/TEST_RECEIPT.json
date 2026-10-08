@@ -1,0 +1,135 @@
+{
+  "G1_shared_source_changes": 0,
+  "ci_at_receipt_time": {
+    "claim": "NO_REMOTE_CI_SUCCESS_CLAIM; shared planner unmodified, unknown paths may trigger FULL",
+    "conclusion": null,
+    "duration_seconds": null,
+    "head_sha": "4fc923b18330cde8873a93eb5fbb594531b5fcf5",
+    "status": "in_progress",
+    "url": "https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/37751133387"
+  },
+  "claims": "local hermetic engineering checks only, no strategy quality or release PASS",
+  "code_sha": "4fc923b18330cde8873a93eb5fbb594531b5fcf5",
+  "commands": [
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "duration_seconds": 0.0317,
+      "exit_code": 0,
+      "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "summary": ""
+    },
+    {
+      "command": [
+        "/root/miniconda3/bin/python",
+        "-m",
+        "ruff",
+        "check",
+        "src/btc_quant_agent/strategy_research",
+        "scripts/strategy_research",
+        "tests/test_strategy_research_contract.py"
+      ],
+      "duration_seconds": 0.1167,
+      "exit_code": 0,
+      "output_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "summary": "All checks passed!\n"
+    },
+    {
+      "command": [
+        "/root/miniconda3/bin/python",
+        "-m",
+        "compileall",
+        "-q",
+        "src/btc_quant_agent/strategy_research",
+        "scripts/strategy_research",
+        "tests/test_strategy_research_contract.py"
+      ],
+      "duration_seconds": 0.073,
+      "exit_code": 0,
+      "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "summary": ""
+    },
+    {
+      "command": [
+        "/root/miniconda3/bin/python",
+        "-m",
+        "mypy",
+        "--follow-imports=skip",
+        "src/btc_quant_agent/strategy_research",
+        "scripts/strategy_research"
+      ],
+      "duration_seconds": 0.3259,
+      "exit_code": 0,
+      "output_sha256": "71144743c83babea384888a735db0c4daba3d4d7b7942b6839984bd5c21b52bb",
+      "summary": "Success: no issues found in 4 source files\n"
+    },
+    {
+      "command": [
+        "/root/miniconda3/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "tests/test_strategy_research_contract.py",
+        "-o",
+        "cache_dir=/tmp/v06-g2-r1-6/pytest-cache",
+        "--tb=short",
+        "--durations=5"
+      ],
+      "duration_seconds": 1.7011,
+      "exit_code": 0,
+      "output_sha256": "c694b2dc5b084630d99d10ab85d215c900b016b3acd2b1bd4e1dc9644079ce0b",
+      "summary": "...........................................                              [100%]\n============================= slowest 5 durations ==============================\n0.02s call     tests/test_strategy_research_contract.py::test_zero_range_wait_remains_no_trade\n0.01s call     tests/test_strategy_research_contract.py::test_feature_availability_lag_and_shift_by_one_attack\n0.01s call     tests/test_strategy_research_contract.py::test_signal_fails_without_explicit_test_context\n0.01s call     tests/test_strategy_research_contract.py::test_permutation_determinism_and_duplicate_denial\n\n(1 durations < 0.005s hidden.  Use -vv to show these durations.)\n43 passed in 0.16s\n"
+    }
+  ],
+  "created_utc": "2026-10-08T08:40:51.661702+00:00",
+  "data_coverage": null,
+  "deferred_empirical_checks": [
+    "original contemporaneous signal receipts",
+    "official archive checksum authenticity",
+    "empirical minute coverage",
+    "empirical walk-forward outcomes",
+    "block-bootstrap/candidate ranking/cost-neighborhood outputs"
+  ],
+  "dependency_hash": "44d5c0ee5dbbdbec98cf1139d31ac7205d5a3631849687c1bf96ee1cbbb903ae",
+  "deterministic_output_hash_assertions": "passed in test_restart_identical_input_hash_and_explicit_output_provenance",
+  "empirical_manifest_hashes": [],
+  "exchange_writes": 0,
+  "failed": 0,
+  "fixtures": "SYNTHETIC_UNIT_TEST only, generated in tests; no historical fixture reads",
+  "l1_total_wall_seconds": 2.2484,
+  "not_applicable": [
+    "grid",
+    "derivative funding profit",
+    "maker-dependent candidate",
+    "runtime MarketWatch causality callers"
+  ],
+  "packages": {
+    "mypy": "1.20.2",
+    "pytest": "8.4.2",
+    "ruff": "0.16.9",
+    "websockets": "16.1.1"
+  },
+  "parent_sha": "a46b0537c592f5d90a166aebe94737363f1706c0",
+  "passed": 43,
+  "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+  "pre_registration_sha": "a46b0537c592f5d90a166aebe94737363f1706c0",
+  "protected_reads": 0,
+  "pyproject_sha256": "78c40cae6799d61e95ccf91b3c27df94ee7c1925a370f827d8e32a731245fb70",
+  "pytest_reported_seconds": 0.16,
+  "python": "3.13.13 | packaged by Anaconda, Inc. | (main, Apr 14 2026, 06:19:41) [GCC 14.3.0]",
+  "schema": "G2_R1_TEST_RECEIPT_V1",
+  "skipped": 0,
+  "source_and_test_sha256": {
+    "scripts/strategy_research/audit_sources.py": "6eae34130815fd2b428d1667af2a52e5b875ff4ef91b02e3ca70d3eb1a590fde",
+    "src/btc_quant_agent/strategy_research/__init__.py": "d2c8e418445cf2ff36fa1a91969ae055bc39979ee3c647ac7a2fb8ea318b708f",
+    "src/btc_quant_agent/strategy_research/replay.py": "ec467f07c7d28bc59b06068b6a0e230471ab7c0cddf3acc6b0aac3b229f86c85",
+    "src/btc_quant_agent/strategy_research/source.py": "e1fcccdb094e3ef7041a5c5f2e090389565999ea2810e2f9a99bb668103133c6",
+    "tests/test_strategy_research_contract.py": "13a8e36c8dcc442826d115955a196064cab4361b93f20ec862eb7fd84010fb91"
+  },
+  "source_ledger_sha256": "831817a54eb31685889e61106de23eb2582c4771327d67c3cd27b9245dc9ead1",
+  "stage": "L1_FINAL",
+  "test_selection": "all tests/test_strategy_research_*.py (one file, 43 collected); no MarketWatch runtime imports"
+}
