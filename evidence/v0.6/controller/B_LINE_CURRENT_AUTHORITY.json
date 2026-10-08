@@ -1099,5 +1099,20 @@
     "release_policy_quality": "NONE",
     "real_funds_write_authority": "NONE",
     "auto_push_verified_required": true
+  },
+  "v06_g3_operational_readiness_r1": {
+    "task_id": "V06_B_LINE_G3_OPERATIONAL_READINESS_R1",
+    "status": "DISPATCHED_CONDITIONAL_POSTMERGE_CI_SUCCESS",
+    "dispatch_sha": "ba60efc078e9bb75bdc728e8875ba48fb69d1752",
+    "baseline_sha": "a56cc413d87a71111f2be02f10052dced9ff0275",
+    "worktree": "/root/workspace/project/quant-v0.6/g3-operational-readiness",
+    "branch": "feature/v06-bline-g3-operational-readiness-r1",
+    "prompt_path": "prompts/v0.6/b_line/V06_B_LINE_G3_OPERATIONAL_READINESS_R1.md",
+    "operating_mode": "DRY_RUN_ONLY",
+    "provider_smoke": "OPTIONAL_EXPLICIT_OPERATOR_TEST_CREDENTIALS_NONTRADING",
+    "protected_reads": "FORBIDDEN",
+    "testnet_authority": "NONE",
+    "real_funds_write_authority": "NONE",
+    "auto_push_required": true
   }
 }
