@@ -1,0 +1,268 @@
+{
+  "candidate_budget": {
+    "all_in": 8,
+    "empirical_replay_campaigns": 1,
+    "maximum": 12,
+    "retuning": 0,
+    "shortlist_max": 2,
+    "unused": 4
+  },
+  "candidates": [
+    {
+      "direction": "LONG",
+      "family": "BREAKOUT",
+      "holding_hours": 4,
+      "id": "BREAKOUT_LONG_04H"
+    },
+    {
+      "direction": "LONG",
+      "family": "BREAKOUT",
+      "holding_hours": 12,
+      "id": "BREAKOUT_LONG_12H"
+    },
+    {
+      "direction": "SHORT",
+      "family": "BREAKOUT",
+      "holding_hours": 4,
+      "id": "BREAKOUT_SHORT_04H"
+    },
+    {
+      "direction": "SHORT",
+      "family": "BREAKOUT",
+      "holding_hours": 12,
+      "id": "BREAKOUT_SHORT_12H"
+    },
+    {
+      "direction": "LONG",
+      "family": "TREND_PULLBACK",
+      "holding_hours": 4,
+      "id": "TREND_PULLBACK_LONG_04H"
+    },
+    {
+      "direction": "LONG",
+      "family": "TREND_PULLBACK",
+      "holding_hours": 12,
+      "id": "TREND_PULLBACK_LONG_12H"
+    },
+    {
+      "direction": "SHORT",
+      "family": "TREND_PULLBACK",
+      "holding_hours": 4,
+      "id": "TREND_PULLBACK_SHORT_04H"
+    },
+    {
+      "direction": "SHORT",
+      "family": "TREND_PULLBACK",
+      "holding_hours": 12,
+      "id": "TREND_PULLBACK_SHORT_12H"
+    }
+  ],
+  "causality": {
+    "actual_receipt": "present-day retrieval UTC recorded separately, never backdated; proxy available_at=end+lag",
+    "availability_grade": "ARCHIVAL_EVENT_TIME_RECONSTRUCTED; original live receipts not claimed",
+    "bar_lag_ms": 60000,
+    "decision_ms": "last hourly exclusive end +60000",
+    "entry_ms": "decision+60000, following 1m open",
+    "funding_available_lag_ms": 60000,
+    "funding_features": "NONE; realized ex-post settlement records only, never future funding as a signal"
+  },
+  "code_start_sha": "a56cc413d87a71111f2be02f10052dced9ff0275",
+  "controller_dispatch_sha": "fdcac0bfc7126f9715c4db3ba84581eb7a93256c",
+  "controls": {
+    "Tactical": "known RC1 Controller hard-FAIL reference only; NOT_COMPUTABLE without matching derivative/reference-universe inputs; no old outcomes re-execution or policy resurrection",
+    "WAIT_NO_TRADE": "zero capital exposure and PnL, undefined risk-normalized return; counts every fixed slot",
+    "matched": "for each candidate filled entry, naive LONG and SHORT at identical entry time, risk, maxhold; independent diagnostic controls cannot affect candidate trades; compare to balanced 50/50 mean of matched directions",
+    "unconditional": [
+      "NAIVE_LONG_04H",
+      "NAIVE_SHORT_04H",
+      "NAIVE_LONG_12H",
+      "NAIVE_SHORT_12H"
+    ],
+    "unconditional_signal": "every eligible hourly decision slot, same ATR stop, exits/costs/liquidity/purge/no-overlap"
+  },
+  "costs": {
+    "base_bps_per_leg": {
+      "half_spread": "2",
+      "maker_fee": "2",
+      "slippage": "3",
+      "taker_fee": "6"
+    },
+    "fee_semantics": "fee applied to modeled adverse entry/exit prices; spread and slippage separately charged; no discounts or fee rebates",
+    "funding_actual": "public recorded event rates and intervals, charges where entry_ms<settlement_ms<=exit_ms; direction*rate positive charges, negative benefits conservatively discarded",
+    "funding_missing": "uniform whole-campaign PROXY_STRESS_ONLY if any symbol-month absent, checksum invalid or schedule gap >8h; base adverse 0.0004 and stress 0.0008 at every UTC 00/08/16h settlement",
+    "funding_missing_verdict": "DIAGNOSTIC_ONLY; do not treat proxy-only historical funding as measured cost",
+    "funding_price_proxy": "quantity*max(raw entry,settlement minute high) as funding notional; actual mark price not available, explicitly proxy not measured payment",
+    "funding_stress": "2*max(adverse recorded rate,0.0004) per verified settlement; no favorable funding assumed",
+    "latency_stress": "entry delayed one extra minute, same decisions/maxhold/partition rules; no new signals",
+    "liquidity_stress": "same decisions/trades, participation <=0.0001; otherwise unfilled, no reoptimization",
+    "neighborhood": "NOT_RUN; no candidate tuning or extra strategies",
+    "stress_bps_per_leg": {
+      "half_spread": "4",
+      "maker_fee": "4",
+      "slippage": "6",
+      "taker_fee": "12"
+    }
+  },
+  "data_grade": "ARCHIVAL_EVENT_TIME_RECONSTRUCTED",
+  "diagnostics": [
+    "all decision/trade rows before selection",
+    "LONG/SHORT/WAIT and no-fill/overlap/embargo counts",
+    "unique input/decision/trade identities",
+    "coverage and holding distribution",
+    "gross/net R and PnL_USDT, return on allocated unleveraged capital",
+    "fee/spread/slippage/funding splits",
+    "TP1/SL order, MFE/MAE",
+    "realized portfolio drawdown and tail net_R; not full minute MTM drawdown",
+    "symbol/regime/partition statistics without subgroup selection",
+    "time blocks and joint block bootstrap",
+    "matched-time LONG/SHORT controls",
+    "2x friction/funding and liquidity/latency sensitivities",
+    "exposure days, asset/partition concentration"
+  ],
+  "eligibility": {
+    "OHLC": "positive finite low<=open/close<=high, nonnegative volumes, timestamp order; discontinuous price open vs prior close is valid market gap, not missing row",
+    "funding_coverage": "timestamps unique in exact month; interval >0 <=8h; complete start/end/cadence across whole May-July for every asset or uniform adverse proxy fallback",
+    "minute_coverage": "100% each selected price symbol-month; any gap/duplicate/corrupt clock/source =>SOURCE_OR_METHOD_BLOCKED, no outcome filler",
+    "signal_wait": "missing/flat or risk outside bounds ->WAIT; never forward fill derivative or price data"
+  },
+  "execution": {
+    "MFE_MAE": "full extrema on completed pre-exit minutes; stop minute MFE excludes unknown pre-stop extremes; TP minute MAE uses conservative full-minute adverse excursion",
+    "collision": "SL-first in same minute; gaps worse stop min(stop,open) LONG / max(stop,open) SHORT; favorable target gaps receive target only",
+    "embargo_hours": 12,
+    "equity_usdt": "1000",
+    "leverage": "<=1x entry notional accounting; no margin-return amplification, compounding, borrowing, liquidation profit or martingale",
+    "liquidity": "entry notional <=0.001*preceding completed minute quote volume; zero volume/stale/missing bars deny fill",
+    "maker": "no maker orders, no guaranteed limit fills; target executions also taker",
+    "notional_per_asset_usdt": "333.333333333333",
+    "positions": "one open trade per symbol per strategy; no new signal until preceding exit end; at most three asset positions",
+    "precision": "fresh Decimal Context(prec=28,ROUND_HALF_EVEN), derived strings quantized 12 decimals; no ambient precision dependency",
+    "purge": "entry >=partition_start+12h; entry+maxhold <=partition_end-12h; no cross-boundary outcomes",
+    "risk_fraction_eligible": [
+      "0.002",
+      "0.05"
+    ],
+    "stop": "fixed raw entry +/-1.5 ATR; entry fee/spread/slippage charged separately",
+    "stop_ATR": "1.5",
+    "target_R": "2",
+    "timeout": "last minute close after exact 4h/12h max hold"
+  },
+  "executor_profile": "SOL_HIGH",
+  "exposure": "PRIOR_EXPOSED_OR_DEVELOPMENT",
+  "features": {
+    "ATR24": "arithmetic mean last 24 true ranges against preceding closes",
+    "BREAKOUT_LONG": "last close > max highs preceding 24 hours",
+    "BREAKOUT_SHORT": "last close < min lows preceding 24 hours",
+    "SMA24": "last 24 completed hourly closes",
+    "TREND_PULLBACK_LONG": "24h return >0.01; last low <= SMA24 < last close; close > open",
+    "TREND_PULLBACK_SHORT": "24h return <-0.01; last high >= SMA24 > last close; close < open",
+    "clock": "UTC epoch-aligned completed 1m -> 15m/1h/4h, no interpolation; primary signals 1h only",
+    "lookback": 25,
+    "regime": "24h return >1% UP, <-1% DOWN, otherwise RANGE; diagnostic only",
+    "training_use": "warm-up only; no parameter fitting"
+  },
+  "grid": {
+    "mode": "NO_GRID",
+    "reason": "OHLCV does not prove queue priority or intraminute limit-fill order; credible empirical maker grid not implemented; relinquish four candidate slots",
+    "registered_grid_candidates": 0
+  },
+  "hard_stops": [
+    "first push not verified",
+    "unknown or protected source/symbol/market",
+    "unverified archive checksum",
+    "missing/duplicate/corrupt 1m price row",
+    "future bar signal or same-bar execution",
+    "hidden outcome access",
+    "post-outcome method change",
+    "unstable decimal accounting",
+    "wrong contract type",
+    "unknown raw cache protection",
+    "source legal/rate-limit rejection"
+  ],
+  "market_type": "USDT_M_PERPETUAL_FUTURES",
+  "r1_preserved_sha": "aab31f8735c8be8f88651ef4677bd0c3a4068cae",
+  "ranking": {
+    "NO_GO": "complete data/actual rate schedules, all eight support gates met, and every candidate stress mean<=0; otherwise unsupported/uncertain =>DIAGNOSTIC_ONLY",
+    "positive_interpretation": "exploratory developmental candidates only; no independently validated alpha",
+    "score": "pooled higher-cost mean net_R descending, candidate_id lexical tie break; full table precedes ranking",
+    "shortlist_max": 2,
+    "shortlist_requirements": [
+      "all source/causality/funding coverage gates",
+      "all support gates",
+      "base and stress mean net_R>0",
+      "Bonferroni stress lower bound>0",
+      "Bonferroni matched-control incremental lower bound>0",
+      "at least2 of3 partition stress means>=0"
+    ]
+  },
+  "safety": {
+    "exchange_writes": 0,
+    "production_changes": "NONE",
+    "protected_rc2_retry": "FORBIDDEN",
+    "protected_reads": 0,
+    "real_funds": "NONE",
+    "testnet": "NOT_AUTHORIZED"
+  },
+  "schema": "G2_R2_PERP_PREREGISTRATION_V1",
+  "sources": {
+    "checksum": "each official .CHECKSUM required, SHA256 archive and uncompressed CSV; unique fresh /tmp cache only",
+    "funding_months": [
+      "2026-05",
+      "2026-06",
+      "2026-07"
+    ],
+    "funding_template": "https://data.binance.vision/data/futures/um/monthly/fundingRate/{symbol}/{symbol}-fundingRate-{month}.zip",
+    "local_sources": "NONE_AUTHORIZED; no existing market cache reads",
+    "price_months": [
+      "2026-04",
+      "2026-05",
+      "2026-06",
+      "2026-07"
+    ],
+    "price_template": "https://data.binance.vision/data/futures/um/monthly/klines/{symbol}/1m/{symbol}-1m-{month}.zip",
+    "product_identity": "official futures/um publisher namespace plus exact unsuffixed BTCUSDT/ETHUSDT/SOLUSDT perpetual contracts; quarterly/spot/COIN-M rejected",
+    "time_unit": "milliseconds; exact close=open+59999; end exclusive=open+60000"
+  },
+  "support": {
+    "active_direction_total_min": 20,
+    "bootstrap_replicates": 2000,
+    "bootstrap_rng": "SHA256 ASCII G2R2:{seed}:{replicate}:{draw}, first8 bytes big-endian modulo number of blocks; exact draws stable across Python versions",
+    "bootstrap_seed": 620262,
+    "classification": "development heuristics only; unsupported =>DIAGNOSTIC_ONLY",
+    "cluster": "UTC seven-day blocks anchored 2026-05-01 jointly across symbols; preserve common shocks; trades cluster by entry; partial final block retained/disclosed",
+    "interval": "95% descriptive two-sided plus one-sided Bonferroni lower 0.05/(8*2)=0.003125 quantile for stress net and incremental matched balanced control, no confirmatory p-value",
+    "partition_min": 3,
+    "single_asset_exposure_max": "0.60",
+    "time_blocks_min": 12,
+    "trades_per_partition_min": 100
+  },
+  "symbols": [
+    "BTCUSDT",
+    "ETHUSDT",
+    "SOLUSDT"
+  ],
+  "task_id": "V06_B_LINE_G2_R2_HISTORICAL_PERP_RECONSTRUCTION",
+  "venue": "BINANCE",
+  "windows": {
+    "ends": "exclusive",
+    "extension": "NONE; August not included",
+    "independent": "NONE_AUTHORIZED; future R3 separate dispatch",
+    "partitions": [
+      [
+        "2026-05-01T00:00:00Z",
+        "2026-06-01T00:00:00Z"
+      ],
+      [
+        "2026-06-01T00:00:00Z",
+        "2026-07-01T00:00:00Z"
+      ],
+      [
+        "2026-07-01T00:00:00Z",
+        "2026-08-01T00:00:00Z"
+      ]
+    ],
+    "training": [
+      "2026-04-01T00:00:00Z",
+      "2026-05-01T00:00:00Z"
+    ]
+  }
+}

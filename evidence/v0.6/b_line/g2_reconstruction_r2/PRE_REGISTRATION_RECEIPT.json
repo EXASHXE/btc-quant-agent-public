@@ -1,0 +1,26 @@
+{
+  "authority_ancestry_verified": true,
+  "base_sha": "a56cc413d87a71111f2be02f10052dced9ff0275",
+  "candidate_count": 8,
+  "controller_dispatch_sha": "fdcac0bfc7126f9715c4db3ba84581eb7a93256c",
+  "created_utc": "2026-10-08T13:02:42.014848+00:00",
+  "exchange_writes": 0,
+  "executor_profile": "SOL_HIGH",
+  "first_push_gate": "mandatory before any selected market/funding body read",
+  "freeze_sha_location": "subsequent FIRST_PUSH_VERIFICATION.json",
+  "funding_body_reads": 0,
+  "grid": "NO_GRID; four budget slots unused",
+  "metadata_only_probes": {
+    "BTC_funding_May": 200,
+    "BTC_price_April": 200
+  },
+  "method_sha256": "30245c01d445eaa1336faabd99140b791eb66b38a3ba4604ef6cbd30f25e0948",
+  "price_body_reads": 0,
+  "protected_reads": 0,
+  "remote_identity_verified": "EXASHXE/btc-quant-agent-public",
+  "remote_v06_head": "a56cc413d87a71111f2be02f10052dced9ff0275",
+  "schema": "G2_R2_PRE_REGISTRATION_RECEIPT_V1",
+  "source_reuse": "NONE; R2 implementation new, no R1 blobs imported",
+  "task_id": "V06_B_LINE_G2_R2_HISTORICAL_PERP_RECONSTRUCTION",
+  "trusted_docs_head": "a7f25cf02e172baa560cb407c026584794d2c4ac"
+}
