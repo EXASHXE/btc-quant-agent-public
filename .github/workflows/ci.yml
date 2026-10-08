@@ -30,6 +30,8 @@ jobs:
       - name: Fetch v0.6 immutable base for merge-base resolution
         run: |
           git fetch --no-tags origin v0.6 || true
+      - name: Ensure cache directory exists for docs-only/zero-pip FAST paths
+        run: mkdir -p "$HOME/.cache/pip"
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
