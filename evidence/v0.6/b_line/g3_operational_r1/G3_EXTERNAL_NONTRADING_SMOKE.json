@@ -1,0 +1,12 @@
+{
+  "schema_version": "G3_EXTERNAL_NONTRADING_SMOKE_V1",
+  "task_id": "V06_B_LINE_G3_OPERATIONAL_READINESS_R1",
+  "status": "NOT_RUN_NO_TEST_CREDENTIALS",
+  "flag_enabled": false,
+  "credentials_provided": false,
+  "details": "Operator did not set BTC_QUANT_G3_EXTERNAL_SMOKE or test-only credentials. Offline evaluation certified without pretending external pass.",
+  "openai_provider_smoke": "NOT_RUN",
+  "feishu_nontrading_smoke": "NOT_RUN",
+  "signed_writes_count": 0,
+  "terminal_state": "G3_R1_OFFLINE_OPERATIONAL_PASS_EXTERNAL_SMOKE_PENDING"
+}

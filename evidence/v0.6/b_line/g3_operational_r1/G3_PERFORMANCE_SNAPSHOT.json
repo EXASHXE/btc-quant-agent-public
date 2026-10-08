@@ -1,0 +1,9 @@
+{
+  "timestamp_iso": "2026-10-08T13:29:08.397016+00:00",
+  "schema_migration_ms": 111.77,
+  "runtime_cold_start_ms": 122.95,
+  "cold_recovery_ms": 6.07,
+  "steady_state_rss_mb": 408.11,
+  "process_model": "single-worker uvicorn / Linux Python 3.12 POSIX process",
+  "extrapolation_disclaimer": "Measured on isolated Linux VM fixture; not a trading signal throughput benchmark and not an extrapolation to production."
+}

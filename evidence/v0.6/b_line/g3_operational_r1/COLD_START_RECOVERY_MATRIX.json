@@ -1,0 +1,58 @@
+{
+  "schema_version": "G3_COLD_START_RECOVERY_MATRIX_V1",
+  "task_id": "V06_B_LINE_G3_OPERATIONAL_READINESS_R1",
+  "timestamp_iso": "2026-10-08T13:29:08.397427+00:00",
+  "scenarios": [
+    {
+      "scenario_id": "G3-SCN-01-PARALLEL-INITIALIZER-FCNTL",
+      "name": "Parallel Initializer Process Locking",
+      "description": "Two contending processes on identical DB path: fcntl flock elects single canonical worker, rejects second process upon timeout.",
+      "status": "PASS",
+      "lock_primitive": "POSIX fcntl.flock LOCK_EX | LOCK_NB",
+      "verified": true
+    },
+    {
+      "scenario_id": "G3-SCN-02-COLD-START-SIGTERM-RECOVERY",
+      "name": "Cold Start, SIGTERM, and Fresh Restart",
+      "description": "Process handles SIGTERM cleanly; fresh restart on same DB verifies unapproved intents never execute and transaction deduplication holds.",
+      "status": "PASS",
+      "signal": "SIGTERM",
+      "verified": true
+    },
+    {
+      "scenario_id": "G3-SCN-03-FAULT-INJECTION-CRASH-CHECKPOINTS",
+      "name": "Unexpected Death at Transaction Checkpoints",
+      "description": "Synthetic fault injection pre-approval, post-approval, tripped kill switch, and corrupt store: fail-closed and idempotent recovery.",
+      "status": "PASS",
+      "verified": true
+    },
+    {
+      "scenario_id": "G3-SCN-04-NEGATIVE-CALLBACK-MATRIX",
+      "name": "Negative Approval Callback Matrix",
+      "description": "Duplicate callback (idempotent), differing replay (rejected), stale TTL (expired), forged hash (rejected), unauthorized actor (HTTP 403).",
+      "status": "PASS",
+      "verified": true
+    },
+    {
+      "scenario_id": "G3-SCN-05-CONFIG-SEGREGATION-MAINNET-REJECTION",
+      "name": "Config Segregation & Mainnet Credential Rejection",
+      "description": "Mainnet credentials rejected during pre-parse; LIVE mode hard-disabled; LIVE_WRITE_AUTHORITY is NONE.",
+      "status": "PASS",
+      "verified": true
+    },
+    {
+      "scenario_id": "G3-SCN-06-SINGLE-WORKER-UVICORN-LINT",
+      "name": "Service Pattern & Static Container Spec Lint",
+      "description": "Single-worker uvicorn enforced; non-root user quant; Dockerfile and docker-compose statically verified.",
+      "status": "PASS",
+      "verified": true
+    },
+    {
+      "scenario_id": "G3-SCN-07-RESOURCE-PERFORMANCE-SNAPSHOT",
+      "name": "Linux Python 3.12 Performance & Memory Snapshot",
+      "description": "Measured schema migration (<1s), cold start (<2s), cold recovery (<1s), and RSS memory (<2GB).",
+      "status": "PASS",
+      "verified": true
+    }
+  ]
+}

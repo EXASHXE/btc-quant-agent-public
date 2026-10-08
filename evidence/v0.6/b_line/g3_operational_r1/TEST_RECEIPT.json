@@ -1,0 +1,15 @@
+{
+  "schema_version": "G3_TEST_RECEIPT_V1",
+  "task_id": "V06_B_LINE_G3_OPERATIONAL_READINESS_R1",
+  "controller_dispatch_sha": "ba60efc078e9bb75bdc728e8875ba48fb69d1752",
+  "base_start_sha": "a56cc413d87a71111f2be02f10052dced9ff0275",
+  "timestamp_iso": "2026-10-08T13:29:12.813127+00:00",
+  "pytest_summary": {
+    "total_passed": 11,
+    "total_failed": 0,
+    "total_skipped": 0,
+    "duration_seconds": 4.257,
+    "exit_code": 0
+  },
+  "all_passed": true
+}
