@@ -1,6 +1,6 @@
 {
   "line": "B_LINE",
-  "stage": "B_LINE_V06_INITIAL_ENGINEERING__R11_L2_ACCEPTED_SCOPED__L3_RETRY_LOCKED",
+  "stage": "B_LINE_V06_FOUNDATION_R1_DISPATCHED__PROTECTED_RETRY_L3_LOCKED",
   "code_branch": "v0.6",
   "accepted_code_sha": "52c16a28153de307dc6132c0975fe29341a0a918",
   "docs_authority_commit": "6319ddbaddd69d5522696992ec1565169da88e03",
@@ -914,5 +914,21 @@
     "ci_fast_integrated": false,
     "next_scope": "RISK_BASED_CI_PORT_ON_V06_FEATURE_BRANCH_AND_L3_RETRY_ADMISSION_DESIGN"
   },
-  "version_authority_note": "Original accepted_code_sha 52c16a... is historical B-line Tactical acceptance, NOT v0.6 tip or final release. v0.6 starts from stable v0.5.5 code at 8ecff4ec. Prior B-line work remains unintegrated."
+  "version_authority_note": "Original accepted_code_sha 52c16a... is historical B-line Tactical acceptance, NOT v0.6 tip or final release. v0.6 starts from stable v0.5.5 code at 8ecff4ec. Prior B-line work remains unintegrated.",
+  "v06_foundation_r1": {
+    "task_id": "V06_B_LINE_ACCEPTED_TACTICAL_FOUNDATION_AND_CI_FAST_PATH_R1",
+    "status": "DISPATCHED_TO_GEMINI__IMPLEMENTATION_NOT_YET_RECEIVED",
+    "prompt_path": "prompts/v0.6/b_line/v0.6_B_LINE_FOUNDATION_AND_CI_FAST_PATH_R1.md",
+    "controller_dispatch_sha": "9bca4d5e13084569096077ced3bb8dfc09482c1f",
+    "dispatch_authority_path": "evidence/v0.6/controller/B_LINE_FOUNDATION_R1_DEV_DISPATCH_AUTHORITY.json",
+    "code_start_sha": "8ecff4ec4b25bf73a35309689fd3ecfacc0d3399",
+    "implementation_branch": "feature/v06-bline-foundation-r1",
+    "local_entry_directory": "/root/workspace/project/rc2-tactical-successor",
+    "isolated_worktree": "/root/workspace/project/rc2-tactical-successor-v06-foundation-r1",
+    "accepted_tactical_sha": "52c16a28153de307dc6132c0975fe29341a0a918",
+    "ci_fast_path_sha": "430becb96389a62481e4d4def07065054e658eee",
+    "protected_access": "FORBIDDEN",
+    "real_funds_write_authority": "NONE",
+    "next_gate": "GEMINI_L1_TERMINAL_IMPLEMENTATION_THEN_CONTROLLER_L2_REVIEW"
+  }
 }
