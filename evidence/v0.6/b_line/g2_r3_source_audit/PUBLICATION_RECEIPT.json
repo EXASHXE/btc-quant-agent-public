@@ -1,0 +1,49 @@
+{
+  "schema_version": "G2_R3_SOURCE_AUDIT_PUBLICATION_V1",
+  "task_id": "V06_G2_R3_SOURCE_COST_FEASIBILITY_AUDIT_R1",
+  "controller_dispatch_sha": "290664c17e14a4fd7530b5308b5fbdebb69b8a1e",
+  "code_base_sha": "e0ff8c3473de4bfa3e66fe7928d42992a4d38a32",
+  "design_source_sha": "e5b2006a89441f7eb2ec900e508aff451106b87a",
+  "audit_commit_sha": "e9945cb92641fc8977def7aa1a572eef3ae294d0",
+  "audit_parent_sha": "e0ff8c3473de4bfa3e66fe7928d42992a4d38a32",
+  "audit_tree_sha": "905246b54224733195b2ba0ec60f15078c8ce6ee",
+  "verified_remote": "https://github.com/EXASHXE/btc-quant-agent-public.git",
+  "branch": "feature/v06-bline-g2-r3-source-feasibility-r1",
+  "audit_remote_push_verified": true,
+  "verification_utc": "2026-10-08T16:49:57.973141+00:00",
+  "independent_checks": [
+    "fresh git ls-remote returned exact audit SHA",
+    "fresh git fetch obtained published object",
+    "remote object SHA/parent/tree and five changed paths verified; staged/committed diff whitespace PASS",
+    "seven original checkout HEAD/branch/status counts still match"
+  ],
+  "audit_changed_paths": [
+    "docs/strategy_research/g2_r3/source_audit/METHOD_REPAIR_DECISION.md",
+    "docs/strategy_research/g2_r3/source_audit/SOURCE_SEMANTICS_AND_COST_FEASIBILITY.md",
+    "evidence/v0.6/b_line/g2_r3_source_audit/AUDIT_RECEIPT.json",
+    "evidence/v0.6/b_line/g2_r3_source_audit/GATE_MATRIX.json",
+    "evidence/v0.6/b_line/g2_r3_source_audit/SOURCE_METADATA_LEDGER.json"
+  ],
+  "audit_artifact_sha256": {
+    "docs/strategy_research/g2_r3/source_audit/METHOD_REPAIR_DECISION.md": "f7fefe2b4d798dd712a039f8dc5b76d064e17b94171e2dcc4263518899b59dbf",
+    "docs/strategy_research/g2_r3/source_audit/SOURCE_SEMANTICS_AND_COST_FEASIBILITY.md": "435fe0c8a74912e34087c72246047d3843116d54dc7526ec5ffdffa9fa5320a0",
+    "evidence/v0.6/b_line/g2_r3_source_audit/AUDIT_RECEIPT.json": "38a1cb2fe158d82229fb3a4427fb983aa9c643549c4bd02d25d15c5590101208",
+    "evidence/v0.6/b_line/g2_r3_source_audit/GATE_MATRIX.json": "b6e9d8daa20201786801229ea2b066e464f05bdab8e65871d3bd7068a5fe5ffc",
+    "evidence/v0.6/b_line/g2_r3_source_audit/SOURCE_METADATA_LEDGER.json": "66255105f58c1ee192b75e4b4761bc579841a53774cb045caacda687db31d5e5"
+  },
+  "metadata_requests": 11,
+  "metadata_body_bytes": 54249,
+  "metadata_plus_retained_header_serialization_bytes": 55787,
+  "terminal_decision": "G2_R3_METHOD_REPAIR_REQUIRED_BEFORE_PREREG",
+  "new_price_or_rate_bodies": 0,
+  "protected_reads": 0,
+  "exchange_api_calls": 0,
+  "implementation_tests_run": 0,
+  "original_candidate_proposals": 8,
+  "new_candidates": 0,
+  "empirical_evaluations": 0,
+  "real_funds_write_authority": "NONE",
+  "g4_testnet": "NOT_AUTHORIZED",
+  "self_sha": "Evidence follow-up binds its independently verified parent; final follow-up remote SHA/parent/tree/changed paths reported in terminal after push, avoiding circular commit identity",
+  "next_controller_action": "CONTROLLER_L2_SOURCE_AUDIT_REVIEW_THEN_SEPARATE_METHOD_REPAIR_AND_SOURCE_CLOSURE_DISPATCH"
+}
