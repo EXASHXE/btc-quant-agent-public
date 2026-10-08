@@ -1,6 +1,6 @@
 {
   "line": "B_LINE",
-  "stage": "V06_G2_R3_SOURCE_AUDIT_L2_ACCEPTED_METHOD_REPAIR_DISPATCHED__G1_G3_SCOPED_MERGED__G2_QUALITY_NONE__NO_TESTNET_LIVE",
+  "stage": "V06_G2_R3_METHOD_DESIGN_ACCEPTED_PARALLEL_OFFLINE_P0_AUTHORIZED__G2_EMPIRICAL_BODY_HOLD__G3_EXTERNAL_PENDING__NO_TESTNET_LIVE",
   "code_branch": "v0.6",
   "accepted_code_sha": "52c16a28153de307dc6132c0975fe29341a0a918",
   "docs_authority_commit": "6319ddbaddd69d5522696992ec1565169da88e03",
@@ -1209,7 +1209,7 @@
   },
   "v06_g2_r3_method_repair_r1": {
     "task_id": "V06_G2_R3_METHOD_MARK_SOURCE_REPAIR_R1",
-    "status": "DISPATCHED_ADDENDUM_AND_KNOWN_MARK_ARCHIVE_HEAD_ONLY",
+    "status": "L2_ACCEPTED_DESIGN_ONLY__HEAD12_FOUND__FREEZE_NOT_READY",
     "controller_dispatch_sha": "52e41bbed246a4c0257834a8d56365beac7ee04e",
     "source_audit_sha": "12793bc04db7414d11a0961684fd14f5df3ce16e",
     "design_sha": "e5b2006a89441f7eb2ec900e508aff451106b87a",
@@ -1222,6 +1222,36 @@
     "funding_rate_body_reads": "FORBIDDEN",
     "replay_authority": "NONE",
     "testnet": "NOT_AUTHORIZED",
+    "real_funds_write_authority": "NONE",
+    "final_sha": "cf2d5cc33774cdcff7d709636305bba830e977ef",
+    "commit_sha": "35d2b8488fd6fbdab0d3d7ff8cf2b84ee5b60b6f",
+    "mark_head_objects": 12,
+    "actual_coverage": "NOT_ASSESSED",
+    "licence": "NONCOMMERCIAL_RESEARCH_SUITABILITY_UNDER_REVIEW",
+    "ci": "https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/37815770073",
+    "ci_scope": "DOCS_ONLY_NO_TESTS",
+    "L2_review": "reviews/v0.6/b_line/V06_G2_R3_METHOD_R1_1_CONTROLLER_L2_ACCEPTANCE.md",
+    "empirical_body_authority": "NONE"
+  },
+  "v06_g2_r3_parallel_p0": {
+    "status": "CONTROLLER_ACTIVE_OFFLINE_SYNTHETIC_PREPARATION_ONLY",
+    "dispatch_sha": "56f8a9faa1a4539124ab006b49bf42b6e7c997e3",
+    "base_sha": "e0ff8c3473de4bfa3e66fe7928d42992a4d38a32",
+    "accepted_method_sha": "cf2d5cc33774cdcff7d709636305bba830e977ef",
+    "root": "~/workspace/project/quant-v0.6",
+    "gemini_a": {
+      "prompt": "prompts/v0.6/b_line/V06_G2_R3_PARALLEL_P0_GEMINI_A_SYNTHETIC_BUILD_R1.md",
+      "branch": "feature/v06-bline-g2-overnight-discovery-a",
+      "worktree": "g2-overnight-discovery-a"
+    },
+    "gemini_b": {
+      "prompt": "prompts/v0.6/b_line/V06_G2_R3_PARALLEL_P0_GEMINI_B_INDEPENDENT_ORACLE_R1.md",
+      "branch": "feature/v06-bline-g2-overnight-verifier-b",
+      "worktree": "g2-overnight-verifier-b"
+    },
+    "source_body_permission": "NONE",
+    "old_holdout_conflict": "UNRESOLVED",
+    "first_pushed_r3_prereg": "NONE",
     "real_funds_write_authority": "NONE"
   }
 }
