@@ -1,0 +1,55 @@
+{
+  "schema_version": "G3_WORKTREE_PRESERVATION_V2",
+  "task_id": "V06_B_LINE_G3_OPERATIONAL_READINESS_R1",
+  "repair_task_id": "V06_G3_EVIDENCE_INTEGRITY_REPAIR_R1",
+  "timestamp_iso": "2026-10-08T14:58:20.190562+00:00",
+  "worktrees": {
+    "rc2-tactical-successor": {
+      "path": "/root/workspace/project/rc2-tactical-successor",
+      "head_sha": "1a5756663ecf56ed6c02a7355840f33e6715ea22",
+      "branch": "validation/b-line-rc2-final-holdout-infra-repair-r1",
+      "dirty_file_count": 0,
+      "baseline_head_sha": "1a5756663ecf56ed6c02a7355840f33e6715ea22",
+      "baseline_dirty_file_count": 0,
+      "preserved": true
+    },
+    "g1-engineering-preview": {
+      "path": "/root/workspace/project/quant-v0.6/g1-engineering-preview",
+      "head_sha": "efd73496d01a71a158d67343b64695d33fab16a8",
+      "branch": "feature/v06-bline-engineering-preview-r1",
+      "dirty_file_count": 0,
+      "baseline_head_sha": "efd73496d01a71a158d67343b64695d33fab16a8",
+      "baseline_dirty_file_count": 0,
+      "preserved": true
+    },
+    "g2-strategy-discovery": {
+      "path": "/root/workspace/project/quant-v0.6/g2-strategy-discovery",
+      "head_sha": "aab31f8735c8be8f88651ef4677bd0c3a4068cae",
+      "branch": "feature/v06-bline-g2-strategy-discovery-r1",
+      "dirty_file_count": 0,
+      "baseline_head_sha": "aab31f8735c8be8f88651ef4677bd0c3a4068cae",
+      "baseline_dirty_file_count": 0,
+      "preserved": true
+    },
+    "g2-perp-reconstruction-r2": {
+      "path": "/root/workspace/project/quant-v0.6/g2-perp-reconstruction-r2",
+      "head_sha": "d38f7b45983cd74dc9e28439ebfb2fa60971122a",
+      "branch": "feature/v06-bline-g2-perp-reconstruction-r2",
+      "dirty_file_count": 11,
+      "baseline_head_sha": "d38f7b45983cd74dc9e28439ebfb2fa60971122a",
+      "baseline_dirty_file_count": 11,
+      "preserved": true
+    },
+    "controller-review": {
+      "path": "/root/workspace/project/quant-v0.6/controller-review",
+      "head_sha": "d6500140f3141d179181f2360ad815b5bfe9c954",
+      "branch": "DETACHED",
+      "dirty_file_count": 0,
+      "baseline_head_sha": "d6500140f3141d179181f2360ad815b5bfe9c954",
+      "baseline_dirty_file_count": 0,
+      "preserved": true
+    }
+  },
+  "all_worktrees_preserved": true,
+  "invalidated_prior_claim": "Prior 2db580bb version emitted unconditional preserved=true without baseline comparison. Corrected to pre/post baseline comparison."
+}

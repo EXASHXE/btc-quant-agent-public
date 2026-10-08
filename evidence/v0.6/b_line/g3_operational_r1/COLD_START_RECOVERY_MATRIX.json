@@ -1,0 +1,111 @@
+{
+  "schema_version": "G3_COLD_START_RECOVERY_MATRIX_V2",
+  "task_id": "V06_B_LINE_G3_OPERATIONAL_READINESS_R1",
+  "repair_task_id": "V06_G3_EVIDENCE_INTEGRITY_REPAIR_R1",
+  "timestamp_iso": "2026-10-08T14:58:20.190321+00:00",
+  "scenarios": [
+    {
+      "scenario_id": "G3-SCN-01-PARALLEL-INITIALIZER-FCNTL",
+      "name": "Parallel Initializer Process Locking",
+      "description": "Two contending processes on identical DB path: fcntl flock elects single canonical worker, rejects second process upon timeout.",
+      "required_test_names": [
+        "test_g3_matrix_1_parallel_initializers_elect_single_worker"
+      ],
+      "lock_primitive": "POSIX fcntl.flock LOCK_EX | LOCK_NB",
+      "status": "PASS",
+      "verified": true,
+      "observed_tests": {
+        "test_g3_matrix_1_parallel_initializers_elect_single_worker": "PASS"
+      }
+    },
+    {
+      "scenario_id": "G3-SCN-02-COLD-START-SIGTERM-RECOVERY",
+      "name": "Cold Start, SIGTERM, and Fresh Restart",
+      "description": "Process handles SIGTERM cleanly; fresh restart on same DB verifies unapproved intents never execute and transaction deduplication holds.",
+      "required_test_names": [
+        "test_g3_matrix_2_cold_start_sigterm_and_fresh_restart_recovery"
+      ],
+      "signal": "SIGTERM",
+      "qualifications": [
+        "SIGTERM_SYNTHETIC_DAEMON_PASSED",
+        "ACTUAL_APP_SIGTERM_NOT_VERIFIED"
+      ],
+      "status": "PASS",
+      "verified": true,
+      "observed_tests": {
+        "test_g3_matrix_2_cold_start_sigterm_and_fresh_restart_recovery": "PASS"
+      }
+    },
+    {
+      "scenario_id": "G3-SCN-03-FAULT-INJECTION-CRASH-CHECKPOINTS",
+      "name": "Unexpected Death at Transaction Checkpoints",
+      "description": "Synthetic fault injection pre-approval, post-approval, tripped kill switch, and corrupt store: fail-closed and idempotent recovery.",
+      "required_test_names": [
+        "test_g3_matrix_3_unexpected_death_synthetic_fault_injection_reconciliation"
+      ],
+      "status": "PASS",
+      "verified": true,
+      "observed_tests": {
+        "test_g3_matrix_3_unexpected_death_synthetic_fault_injection_reconciliation": "PASS"
+      }
+    },
+    {
+      "scenario_id": "G3-SCN-04-NEGATIVE-CALLBACK-MATRIX",
+      "name": "Negative Approval Callback Matrix",
+      "description": "Duplicate callback (idempotent), differing replay (rejected), stale TTL (expired), forged hash (rejected), unauthorized actor (HTTP 403).",
+      "required_test_names": [
+        "test_g3_matrix_4_negative_callback_and_approval_matrix"
+      ],
+      "status": "PASS",
+      "verified": true,
+      "observed_tests": {
+        "test_g3_matrix_4_negative_callback_and_approval_matrix": "PASS"
+      }
+    },
+    {
+      "scenario_id": "G3-SCN-05-CONFIG-SEGREGATION-MAINNET-REJECTION",
+      "name": "Config Segregation & Mainnet Credential Rejection",
+      "description": "Mainnet credentials rejected during pre-parse; LIVE mode hard-disabled; LIVE_WRITE_AUTHORITY is NONE.",
+      "required_test_names": [
+        "test_g3_matrix_5_config_segregation_and_mainnet_credential_rejection"
+      ],
+      "status": "PASS",
+      "verified": true,
+      "observed_tests": {
+        "test_g3_matrix_5_config_segregation_and_mainnet_credential_rejection": "PASS"
+      }
+    },
+    {
+      "scenario_id": "G3-SCN-06-SINGLE-WORKER-UVICORN-LINT",
+      "name": "Service Pattern & Static Container Spec Lint",
+      "description": "Single-worker uvicorn enforced; non-root user quant; Dockerfile and docker-compose statically verified.",
+      "required_test_names": [
+        "test_g3_matrix_6_startup_service_patterns_and_container_lint"
+      ],
+      "qualifications": [
+        "CONTAINER_NOT_VERIFIED",
+        "CONTAINER_LINT_ONLY"
+      ],
+      "status": "PASS",
+      "verified": true,
+      "observed_tests": {
+        "test_g3_matrix_6_startup_service_patterns_and_container_lint": "PASS"
+      }
+    },
+    {
+      "scenario_id": "G3-SCN-07-RESOURCE-PERFORMANCE-SNAPSHOT",
+      "name": "Linux Python 3.12 Performance & Memory Snapshot",
+      "description": "Measured schema migration (<1s), cold start (<2s), cold recovery (<1s), and peak RSS memory.",
+      "required_test_names": [
+        "test_g3_matrix_7_performance_and_resource_snapshot"
+      ],
+      "status": "PASS",
+      "verified": true,
+      "observed_tests": {
+        "test_g3_matrix_7_performance_and_resource_snapshot": "PASS"
+      }
+    }
+  ],
+  "all_passed": true,
+  "invalidated_prior_claim": "Prior 2db580bb version emitted hardcoded PASS before test execution. Corrected to machine-derived parsing via JUnit XML."
+}
