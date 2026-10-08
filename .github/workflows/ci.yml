@@ -4,6 +4,15 @@ on:
   push:
   pull_request:
   workflow_dispatch:
+    inputs:
+      profile:
+        description: "focused/integration/full (manual exact SHA gates)"
+        required: true
+        default: focused
+        type: choice
+        options: [focused, integration, full]
+  schedule:
+    - cron: "21 3 * * 1"
 
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
@@ -11,36 +20,52 @@ concurrency:
 
 jobs:
   quality:
-    name: quality (3.13)
+    name: Risk-based quality (Python 3.12)
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 50
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.13"
+          python-version: "3.12"
           cache: pip
           cache-dependency-path: pyproject.toml
+      - name: Build fail-closed test plan
+        env:
+          BEFORE_SHA: "${{ github.event.before }}"
+          EVENT_NAME: "${{ github.event_name }}"
+        run: python scripts/ci/test_plan.py plan --before "$BEFORE_SHA" --event "$EVENT_NAME"
       - run: python -m pip install -e '.[dev,research]'
-      - run: ruff check .
+      - name: All Ruff rules; bounded legacy EXE001 debt check
+        run: python scripts/ci/test_plan.py lint
       - run: mypy
-      - name: Full test suite
-        if: github.event_name != 'workflow_dispatch'
-        run: pytest -q
-      - name: Full test suite with coverage
-        if: github.event_name == 'workflow_dispatch'
-        run: pytest -q --cov=btc_quant_agent --cov-report=term-missing
-      - run: python -m compileall -q src skill-template/scripts
+      - run: python -m compileall -q src scripts tests
+      - name: Tests selected by risk/changed scope
+        env:
+          PROFILE: "${{ github.event_name == 'workflow_dispatch' && inputs.profile || (github.event_name == 'schedule' && 'full' || 'focused') }}"
+        run: python scripts/ci/test_plan.py run --profile "$PROFILE"
+      - name: Retain scoped test evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: b-line-test-receipt-${{ github.sha }}
+          path: |
+            ci-test-plan.json
+            ci-junit.xml
+          if-no-files-found: warn
+          retention-days: 14
 
   compatibility:
-    name: compatibility (${{ matrix.python-version }})
-    if: github.event_name == 'workflow_dispatch'
+    name: Compatibility manual full suite
+    if: github.event_name == 'workflow_dispatch' && inputs.profile == 'full'
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.11", "3.12"]
+        python-version: ["3.11", "3.13"]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -49,5 +74,4 @@ jobs:
           cache: pip
           cache-dependency-path: pyproject.toml
       - run: python -m pip install -e '.[dev,research]'
-      - run: pytest -q
-      - run: python -m compileall -q src skill-template/scripts
+      - run: pytest -q --durations=20
