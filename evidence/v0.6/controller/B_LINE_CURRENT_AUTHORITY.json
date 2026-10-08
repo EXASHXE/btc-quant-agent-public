@@ -1,6 +1,6 @@
 {
   "line": "B_LINE",
-  "stage": "V06_G1_ENGINEERING_PREVIEW_INTEGRATED_POST_MERGE_CI_PENDING__G2_R2_PROSPECTIVE_DEVELOPMENT_DISPATCHED__NO_TESTNET_LIVE",
+  "stage": "V06_G1_INTEGRATED_POST_CI_SUCCESS__G3_L2_EVIDENCE_REPAIR_DISPATCHED__G2_R2_RUNNING__NO_TESTNET_LIVE",
   "code_branch": "v0.6",
   "accepted_code_sha": "52c16a28153de307dc6132c0975fe29341a0a918",
   "docs_authority_commit": "6319ddbaddd69d5522696992ec1565169da88e03",
@@ -1020,7 +1020,7 @@
     "integration_sha": "a56cc413d87a71111f2be02f10052dced9ff0275",
     "feature_source_sha": "efd73496d01a71a158d67343b64695d33fab16a8",
     "post_merge_ci": "https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/37778010147",
-    "post_merge_ci_status": "PENDING",
+    "post_merge_ci_status": "SUCCESS",
     "engineering_authority": "DRY_RUN_ONLY",
     "h40_baseline_reproduction": "CONFIRMED_SAME_GOLDEN_FAIL__EXTRA_BASELINE_RUNNER_FAILURES",
     "g1_repaired_ci": "2768_PASSED_2_SKIPPED_8_WARNINGS",
@@ -1085,7 +1085,7 @@
   },
   "v06_g2_r2_perpetual_discovery": {
     "task_id": "V06_B_LINE_G2_R2_HISTORICAL_PERP_RECONSTRUCTION",
-    "status": "DISPATCHED_NONPROTECTED_DEVELOPMENT_PRE_REGISTER_FIRST",
+    "status": "PRE_REGISTERED_RUNNING__NO_TERMINAL_RESULT",
     "dispatch_sha": "fdcac0bfc7126f9715c4db3ba84581eb7a93256c",
     "base_code_sha": "a56cc413d87a71111f2be02f10052dced9ff0275",
     "branch": "feature/v06-bline-g2-perp-reconstruction-r2",
@@ -1098,11 +1098,12 @@
     "protected_cohort": "NOT_AUTHORIZED",
     "release_policy_quality": "NONE",
     "real_funds_write_authority": "NONE",
-    "auto_push_verified_required": true
+    "auto_push_verified_required": true,
+    "latest_seen_pre_registration_sha": "66aad50500bf6e860e76bf3ae8c0ef70799d5f47"
   },
   "v06_g3_operational_readiness_r1": {
     "task_id": "V06_B_LINE_G3_OPERATIONAL_READINESS_R1",
-    "status": "DISPATCHED_CONDITIONAL_POSTMERGE_CI_SUCCESS",
+    "status": "L2_EVIDENCE_INTEGRITY_BLOCKED_BOUNDED_REPAIR_DISPATCHED",
     "dispatch_sha": "ba60efc078e9bb75bdc728e8875ba48fb69d1752",
     "baseline_sha": "a56cc413d87a71111f2be02f10052dced9ff0275",
     "worktree": "/root/workspace/project/quant-v0.6/g3-operational-readiness",
@@ -1113,6 +1114,17 @@
     "protected_reads": "FORBIDDEN",
     "testnet_authority": "NONE",
     "real_funds_write_authority": "NONE",
-    "auto_push_required": true
+    "auto_push_required": true,
+    "initial_g3_sha": "2db580bb8c9e4e7811a4d892312584e55b4fa8e6",
+    "controller_mode_fix_sha": "9e753972beab43b4ea8397150dab42f7f66d6968",
+    "repair_dispatch_sha": "f315edeaa8986e01af5206eb0d964092e087a839",
+    "repair_prompt_path": "prompts/v0.6/b_line/V06_G3_EVIDENCE_INTEGRITY_L2_REPAIR_R1.md",
+    "review_path": "reviews/v0.6/b_line/V06_G3_R1_CONTROLLER_L2_INITIAL_REVIEW.md",
+    "initial_remote_ci": "FAIL_EXE001_NO_TESTS",
+    "followup_ci": "https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/37789769108",
+    "real_provider_smoke": "NOT_VERIFIED",
+    "feishu_smoke": "NOT_VERIFIED",
+    "actual_native_container_deployment": "NOT_VERIFIED",
+    "environment": "WSL2_PY312"
   }
 }
