@@ -1,0 +1,14 @@
+{
+  "expected_branch": "validation/b-line-rc2-holdout-r3-runner-repair-r2",
+  "git_head": "d51abdcfa982be132a6fae6c84776f343fae893c",
+  "observed_branch": "validation/b-line-rc2-holdout-r3-runner-repair-r2",
+  "script_hashes": {
+    "scripts/rc2/validation/r3_access_guard.py": "db7540b1c385bf7887679c09a57a7d85b6a731144a17e8fd865727aebb78cf52",
+    "scripts/rc2/validation/run_holdout_r3.py": "ab7a5795a1f002f93e5ffff658c4be2dd9708b8b23a11801ec122f32e5f05ebd",
+    "scripts/rc2/validation/source_normalizer.py": "4191922d1e85ad30b079633323836a817bf0506d223eb2365b2a4d3d25f52a16",
+    "scripts/rc2/validation/target_seal.py": "c77d3a28966025b05a28b2c2bf80a20bb95a0ad1f3e933def595609e577b604d"
+  },
+  "src_clean": true,
+  "task_id": "RC2_HOLDOUT_R3_EXECUTION",
+  "timestamp_utc": "2026-10-07T19:24:14.621762+00:00"
+}
