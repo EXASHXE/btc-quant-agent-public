@@ -179,3 +179,56 @@ def test_10_exe001_inherited_allowlist_shrinks_and_fails_on_new() -> None:
         import pytest
         with pytest.raises(RuntimeError, match="New/touched EXE001 violation"):
             lint_baseline(["src/new_script.py"])
+
+def test_11_git_rename_from_test_to_docs_must_not_skip_original_path(tmp_path: Path) -> None:
+    """A rename with an innocuous destination must preserve the deleted test path."""
+    from scripts.ci import test_plan as planner
+
+    repo = tmp_path / "rename-fixture"
+    repo.mkdir()
+    subprocess.run(["git", "init", "-b", "main"], cwd=repo, check=True, capture_output=True)
+    subprocess.run(["git", "config", "user.name", "CI Renames"], cwd=repo, check=True)
+    subprocess.run(["git", "config", "user.email", "ci-renames@example.invalid"], cwd=repo, check=True)
+    (repo / "tests").mkdir()
+    old_file = repo / "tests/test_critical.py"
+    old_file.write_text("def test_critical(): assert True\\n", encoding="utf-8")
+    subprocess.run(["git", "add", "--", "tests/test_critical.py"], cwd=repo, check=True)
+    subprocess.run(["git", "commit", "-m", "baseline critical test"], cwd=repo, check=True, capture_output=True)
+    oldsha = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=repo, text=True).strip()
+    (repo / "docs").mkdir()
+    subprocess.run(["git", "mv", "tests/test_critical.py", "docs/suppressed.md"], cwd=repo, check=True)
+    subprocess.run(["git", "commit", "-m", "rename test into docs"], cwd=repo, check=True, capture_output=True)
+
+    with patch.object(planner, "ROOT", repo):
+        changed = planner.changed_paths(before=oldsha, event="push")
+        assert changed is not None
+        assert "docs/suppressed.md" in changed
+        assert "tests/test_critical.py" in changed
+        assert planner.classify(changed)["mode"] == "full"
+
+
+def test_12_git_rename_from_source_to_docs_must_not_skip_original_path(tmp_path: Path) -> None:
+    """A source file renamed to docs must not be treated as docs-only."""
+    from scripts.ci import test_plan as planner
+
+    repo = tmp_path / "source-rename-fixture"
+    repo.mkdir()
+    subprocess.run(["git", "init", "-b", "main"], cwd=repo, check=True, capture_output=True)
+    subprocess.run(["git", "config", "user.name", "CI Renames"], cwd=repo, check=True)
+    subprocess.run(["git", "config", "user.email", "ci-renames@example.invalid"], cwd=repo, check=True)
+    source_dir = repo / "src/btc_quant_agent"
+    source_dir.mkdir(parents=True)
+    (source_dir / "safety.py").write_text("SAFETY = True\\n", encoding="utf-8")
+    subprocess.run(["git", "add", "--", "src/btc_quant_agent/safety.py"], cwd=repo, check=True)
+    subprocess.run(["git", "commit", "-m", "baseline safety module"], cwd=repo, check=True, capture_output=True)
+    oldsha = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=repo, text=True).strip()
+    (repo / "docs").mkdir()
+    subprocess.run(["git", "mv", "src/btc_quant_agent/safety.py", "docs/safety.md"], cwd=repo, check=True)
+    subprocess.run(["git", "commit", "-m", "rename source into docs"], cwd=repo, check=True, capture_output=True)
+
+    with patch.object(planner, "ROOT", repo):
+        changed = planner.changed_paths(before=oldsha, event="push")
+        assert changed is not None
+        assert "docs/safety.md" in changed
+        assert "src/btc_quant_agent/safety.py" in changed
+        assert planner.classify(changed)["mode"] == "full"

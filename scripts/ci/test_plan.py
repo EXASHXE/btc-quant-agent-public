@@ -115,9 +115,11 @@ def changed_paths(
     if base is None or git("cat-file", "-e", f"{base}^{{commit}}").returncode != 0:
         return None
 
-    # Diff against resolved base. Notice: no restrictive --diff-filter=ACMRT
-    # so that deleted and renamed files are captured non-silently.
-    out = git("diff", "--name-only", base, "HEAD")
+    # Deliberately disable rename detection: otherwise --name-only returns ONLY the
+    # destination for R100 (e.g. tests/test_critical.py -> docs/suppressed.md).
+    # Both original deletion and destination addition must be risk-classified.
+    # No restrictive --diff-filter: deleted files are security-relevant.
+    out = git("diff", "--no-renames", "--name-only", base, "HEAD")
     return out.stdout.splitlines() if out.returncode == 0 else None
 
 
