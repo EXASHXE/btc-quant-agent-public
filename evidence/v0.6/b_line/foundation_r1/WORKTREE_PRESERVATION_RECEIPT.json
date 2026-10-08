@@ -1,0 +1,25 @@
+{
+  "schema_version": "B_LINE_WORKTREE_PRESERVATION_RECEIPT_V1",
+  "task_id": "V06_B_LINE_ACCEPTED_TACTICAL_FOUNDATION_AND_CI_FAST_PATH_R1",
+  "local_entry_directory": "/root/workspace/project/rc2-tactical-successor",
+  "dedicated_worktree_directory": "/root/workspace/project/rc2-tactical-successor-v06-foundation-r1",
+  "repository_remote_identity": "https://github.com/EXASHXE/btc-quant-agent-public.git",
+  "target_branch": "feature/v06-bline-foundation-r1",
+  "code_start_sha": "8ecff4ec4b25bf73a35309689fd3ecfacc0d3399",
+  "implementation_sha": "abcb8fb9c975288a2579e1202a3472c80c965a8c",
+  "original_workspace_preflight": {
+    "branch": "validation/b-line-rc2-final-holdout-infra-repair-r1",
+    "head_sha": "1a5756663ecf56ed6c02a7355840f33e6715ea22",
+    "tracked_modified_count": 0,
+    "untracked_files_count": 0,
+    "status": "CLEAN"
+  },
+  "original_workspace_postflight": {
+    "branch": "validation/b-line-rc2-final-holdout-infra-repair-r1",
+    "head_sha": "1a5756663ecf56ed6c02a7355840f33e6715ea22",
+    "tracked_modified_count": 0,
+    "untracked_files_count": 0,
+    "status": "CLEAN"
+  },
+  "preservation_affirmation": "The original checkout /root/workspace/project/rc2-tactical-successor was inspected read-only and preserved completely intact. Zero files were added, modified, staged, committed, or deleted in the original checkout. Branch and HEAD remain exactly at validation/b-line-rc2-final-holdout-infra-repair-r1 (1a5756663ecf56ed6c02a7355840f33e6715ea22). All development occurred strictly within the isolated sibling worktree /root/workspace/project/rc2-tactical-successor-v06-foundation-r1."
+}

@@ -1,0 +1,99 @@
+{
+  "schema_version": "B_LINE_VALIDATION_RESULTS_V1",
+  "task_id": "V06_B_LINE_ACCEPTED_TACTICAL_FOUNDATION_AND_CI_FAST_PATH_R1",
+  "implementation_sha": "abcb8fb9c975288a2579e1202a3472c80c965a8c",
+  "target_branch": "feature/v06-bline-foundation-r1",
+  "execution_environment": {
+    "os": "linux",
+    "python_version": "3.13.13",
+    "python312_binary": "/usr/bin/python3.12"
+  },
+  "l0_and_l1_verification_commands": [
+    {
+      "command": "git diff --check",
+      "exit_code": 0,
+      "result": "PASS (zero whitespace or conflict marker errors)"
+    },
+    {
+      "command": "python3 -m compileall -q src scripts tests tools",
+      "exit_code": 0,
+      "result": "PASS (all Python sources compiled successfully)"
+    },
+    {
+      "command": "python3 scripts/ci/test_plan.py lint",
+      "exit_code": 0,
+      "result": "PASS (Ruff check clean; EXE001 allowlist empty, zero violations)"
+    },
+    {
+      "command": "pytest -q --noconftest tests/test_ci_test_plan.py",
+      "exit_code": 0,
+      "test_count": 10,
+      "passed": 10,
+      "failed": 0,
+      "skipped": 0,
+      "elapsed_seconds": 0.20,
+      "result": "PASS"
+    },
+    {
+      "command": "pytest -q tests/test_ci_test_plan.py",
+      "exit_code": 0,
+      "test_count": 10,
+      "passed": 10,
+      "failed": 0,
+      "skipped": 0,
+      "elapsed_seconds": 0.11,
+      "result": "PASS"
+    },
+    {
+      "command": "python3 scripts/ci/test_plan.py plan --before 0000000000000000000000000000000000000000 --event push --base-ref v0.6",
+      "exit_code": 0,
+      "mode": "focused",
+      "suites_selected": 17,
+      "changed_files_detected": 38,
+      "result": "PASS"
+    },
+    {
+      "command": "python3 scripts/ci/test_plan.py run --profile focused",
+      "exit_code": 0,
+      "test_count": 314,
+      "passed": 314,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "elapsed_seconds": 14.05,
+      "result": "PASS"
+    },
+    {
+      "command": "git diff --exit-code 8ecff4ec4b25bf73a35309689fd3ecfacc0d3399 -- src/btc_quant_agent/h40 src/btc_quant_agent/h41 tests/h41",
+      "exit_code": 0,
+      "result": "PASS (exact zero diff on A-line research modules)"
+    }
+  ],
+  "focused_test_coverage_breakdown": {
+    "tests/test_ci_test_plan.py": 10,
+    "tests/test_binance_archive.py": 1,
+    "tests/test_binance_signed.py": 2,
+    "tests/test_binance_spot_archive.py": 1,
+    "tests/test_config.py": 1,
+    "tests/test_data_manifest.py": 4,
+    "tests/test_derivatives.py": 2,
+    "tests/test_explain.py": 2,
+    "tests/test_forward_derivatives.py": 15,
+    "tests/test_market_watch.py": 137,
+    "tests/test_notify.py": 3,
+    "tests/test_shadow.py": 3,
+    "tests/test_structure.py": 4,
+    "tests/test_tactical_feature_evidence_v2.py": 31,
+    "tests/test_tactical_grid_shadow_evaluation_v1.py": 50,
+    "tests/test_tactical_policy_b0.py": 23,
+    "tests/test_tactical_shadow_evaluation_v2.py": 25,
+    "total_passed": 314,
+    "total_failed": 0,
+    "total_skipped": 0
+  },
+  "protected_access_audit": {
+    "protected_reads": 0,
+    "protected_writes": 0,
+    "unverified_fixtures": 0
+  }
+}

@@ -1,0 +1,117 @@
+{
+  "schema_version": "B_LINE_CI_TEST_SELECTION_PROOF_V1",
+  "task_id": "V06_B_LINE_ACCEPTED_TACTICAL_FOUNDATION_AND_CI_FAST_PATH_R1",
+  "implementation_sha": "abcb8fb9c975288a2579e1202a3472c80c965a8c",
+  "target_branch": "feature/v06-bline-foundation-r1",
+  "first_push_fix_details": {
+    "inherited_risk": "On first push of a new branch where github.event.before == '0'*40, the original planner evaluated 'base = HEAD^', which only examined the single top commit on the branch, silently omitting all earlier branch commits.",
+    "resolution": "Resolved via explicitly verified merge-base against fetched immutable base v0.6 (8ecff4ec4b25bf73a35309689fd3ecfacc0d3399 / origin/v0.6 / base_ref), capturing the complete branch diff.",
+    "fail_closed_guarantee": "If merge-base is missing, unfetched, or unresolvable, changed_paths returns None and classify fails closed to mode 'full' with reason 'unknown-base-fail-closed'."
+  },
+  "rename_and_delete_fix_details": {
+    "inherited_risk": "Original planner diff used --diff-filter=ACMRT which excluded 'D' (deleted files), causing test deletions or file removals to pass silently as none.",
+    "resolution": "Removed restrictive diff-filter to capture all changed, deleted, and renamed paths. If a test file is removed or renamed, classify detects that the file no longer exists on disk and fails closed to mode 'full'."
+  },
+  "synthetic_event_cases_tested": [
+    {
+      "scenario": "docs_only",
+      "changed": ["docs/project/a.md", "README.md", "evidence/v0.6/report.json"],
+      "expected_mode": "none",
+      "expected_tests": [],
+      "result": "PASS"
+    },
+    {
+      "scenario": "ci_only",
+      "changed": [".github/workflows/ci.yml", "scripts/ci/test_plan.py"],
+      "expected_mode": "focused",
+      "expected_tests": ["tests/test_ci_test_plan.py"],
+      "result": "PASS"
+    },
+    {
+      "scenario": "market_watch",
+      "changed": ["src/btc_quant_agent/market_watch/scanner.py"],
+      "expected_mode": "focused",
+      "expected_tests_subset": ["tests/test_market_watch.py", "tests/test_tactical_feature_evidence_v2.py", "tests/test_tactical_policy_b0.py"],
+      "result": "PASS"
+    },
+    {
+      "scenario": "shared_config",
+      "changed": ["configs/default.toml", "src/btc_quant_agent/config.py"],
+      "expected_mode": "focused",
+      "expected_tests_subset": ["tests/test_config.py", "tests/test_market_watch.py", "tests/test_tactical*.py"],
+      "result": "PASS"
+    },
+    {
+      "scenario": "shared_data",
+      "changed": ["src/btc_quant_agent/data/binance.py"],
+      "expected_mode": "focused",
+      "expected_tests_subset": ["tests/test_binance_archive.py", "tests/test_derivatives.py", "tests/test_market_watch.py"],
+      "result": "PASS"
+    },
+    {
+      "scenario": "shared_notify",
+      "changed": ["src/btc_quant_agent/notify/feishu.py"],
+      "expected_mode": "focused",
+      "expected_tests_subset": ["tests/test_notify.py", "tests/test_market_watch.py"],
+      "result": "PASS"
+    },
+    {
+      "scenario": "shared_cli",
+      "changed": ["src/btc_quant_agent/cli.py"],
+      "expected_mode": "focused",
+      "expected_tests_subset": ["tests/test_explain.py", "tests/test_market_watch.py"],
+      "result": "PASS"
+    },
+    {
+      "scenario": "shared_domain",
+      "changed": ["src/btc_quant_agent/domain.py"],
+      "expected_mode": "focused",
+      "expected_tests_subset": ["tests/test_structure.py", "tests/test_derivatives.py"],
+      "result": "PASS"
+    },
+    {
+      "scenario": "unknown_executable",
+      "changed": ["src/btc_quant_agent/unknown_module.py"],
+      "expected_mode": "full",
+      "result": "PASS"
+    },
+    {
+      "scenario": "first_branch_push_with_multiple_commits",
+      "condition": "before == '0'*40, event == 'push', base_ref == 'v0.6'",
+      "expected_result": "resolves merge-base against v0.6 and lists full branch diff",
+      "result": "PASS"
+    },
+    {
+      "scenario": "missing_unfetched_merge_base",
+      "condition": "unresolvable git base ref",
+      "expected_mode": "full",
+      "expected_reason": "unknown-base-fail-closed",
+      "result": "PASS"
+    },
+    {
+      "scenario": "deleted_test_file_non_silent",
+      "changed": ["tests/test_nonexistent_deleted_synthetic.py"],
+      "expected_mode": "full",
+      "result": "PASS"
+    },
+    {
+      "scenario": "pull_request_merge_base_resolution",
+      "condition": "event == 'pull_request', pr_base_sha provided",
+      "expected_result": "resolves merge-base against PR target",
+      "result": "PASS"
+    },
+    {
+      "scenario": "manual_full_profile",
+      "condition": "--profile full",
+      "expected_mode": "full",
+      "result": "PASS"
+    }
+  ],
+  "unit_test_verification": {
+    "test_file": "tests/test_ci_test_plan.py",
+    "tests_count": 10,
+    "passed": 10,
+    "failed": 0,
+    "elapsed_seconds": 0.11
+  }
+}
