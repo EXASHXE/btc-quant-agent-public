@@ -97,7 +97,9 @@ class DerivativesSnapshot:
     observed_at_ms: int
     mark_price: float | None = None
     funding_rate: float | None = None
-    funding_time_ms: int | None = None
+    funding_time_ms: int | None = None  # Legacy alias for premium_index_time_ms (premium["time"]); NOT a future funding schedule
+    premium_index_time_ms: int | None = None
+    next_funding_time_ms: int | None = None
     open_interest: float | None = None
     open_interest_time_ms: int | None = None
     taker_buy_sell_ratio: float | None = None

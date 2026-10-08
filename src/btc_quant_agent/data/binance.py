@@ -338,6 +338,12 @@ class BinancePublicClient:
                 "LOCAL_CLOCK_DISCONTINUITY",
                 False,
             )
+        premium_time_val = int(premium["time"]) if "time" in premium and premium["time"] is not None else None
+        next_funding_time_val = (
+            int(premium["nextFundingTime"])
+            if "nextFundingTime" in premium and premium["nextFundingTime"] is not None
+            else None
+        )
         snapshot = DerivativesSnapshot(
             observed_at_ms=local_observed_at,
             mark_price=mark_price,
@@ -346,9 +352,11 @@ class BinancePublicClient:
             if mark_price is not None and index_price
             else None,
             funding_rate=float(premium["lastFundingRate"])
-            if "lastFundingRate" in premium
+            if "lastFundingRate" in premium and premium["lastFundingRate"] is not None
             else None,
-            funding_time_ms=int(premium["time"]) if "time" in premium else None,
+            funding_time_ms=premium_time_val,
+            premium_index_time_ms=premium_time_val,
+            next_funding_time_ms=next_funding_time_val,
             open_interest=float(oi["openInterest"]) if "openInterest" in oi else None,
             open_interest_time_ms=int(oi["time"]) if "time" in oi else None,
             open_interest_change_pct=oi_change,
@@ -470,3 +478,38 @@ class BinancePublicClient:
     def connectivity(self) -> bool:
         self._get("/fapi/v1/ping")
         return True
+
+    def funding_rate_history(
+        self,
+        symbol: str,
+        start_time_ms: int | None = None,
+        end_time_ms: int | None = None,
+        limit: int = 1000,
+    ) -> list[dict[str, Any]]:
+        """Fetch public USDT-M funding rate history from Binance /fapi/v1/fundingRate."""
+        params: dict[str, Any] = {"symbol": symbol.upper(), "limit": min(max(1, limit), 1000)}
+        if start_time_ms is not None:
+            params["startTime"] = int(start_time_ms)
+        if end_time_ms is not None:
+            params["endTime"] = int(end_time_ms)
+        payload = self._get("/fapi/v1/fundingRate", params)
+        if not isinstance(payload, list):
+            raise BinanceDataError("Unexpected funding rate history payload", "SCHEMA_ERROR")
+        records: list[dict[str, Any]] = []
+        for item in payload:
+            if isinstance(item, dict):
+                mp_raw = item.get("markPrice")
+                mark_price = (
+                    float(mp_raw)
+                    if mp_raw is not None and str(mp_raw).strip() != ""
+                    else None
+                )
+                records.append(
+                    {
+                        "symbol": str(item.get("symbol", "")),
+                        "funding_time_ms": int(item["fundingTime"]),
+                        "funding_rate": float(item["fundingRate"]),
+                        "mark_price": mark_price,
+                    }
+                )
+        return records

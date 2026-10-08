@@ -854,7 +854,8 @@ class ForwardDerivativeStore:
         writer = csv.DictWriter(handle, fieldnames=DERIVATIVE_FIELDS)
         writer.writeheader()
         for row in rows:
-            writer.writerow({field: row[field] for field in DERIVATIVE_FIELDS})
+            row_dict = dict(row)
+            writer.writerow({field: row_dict.get(field) for field in DERIVATIVE_FIELDS})
         encoded = handle.getvalue().encode("utf-8")
         checksum = hashlib.sha256(encoded).hexdigest()
         if target.exists() and target.read_bytes() != encoded:

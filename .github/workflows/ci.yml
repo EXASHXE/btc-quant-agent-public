@@ -4,6 +4,15 @@ on:
   push:
   pull_request:
   workflow_dispatch:
+    inputs:
+      profile:
+        description: "focused/integration/full (manual exact SHA gates)"
+        required: true
+        default: focused
+        type: choice
+        options: [focused, integration, full]
+  schedule:
+    - cron: "21 3 * * 1"
 
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
@@ -11,36 +20,92 @@ concurrency:
 
 jobs:
   quality:
-    name: quality (3.13)
+    name: Risk-based quality (Python 3.12)
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Fetch v0.6 immutable base for merge-base resolution
+        run: |
+          git fetch --no-tags origin v0.6 || true
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.13"
+          python-version: "3.12"
           cache: pip
           cache-dependency-path: pyproject.toml
-      - run: python -m pip install -e '.[dev,research]'
-      - run: ruff check .
-      - run: mypy
-      - name: Full test suite
-        if: github.event_name != 'workflow_dispatch'
-        run: pytest -q
-      - name: Full test suite with coverage
-        if: github.event_name == 'workflow_dispatch'
-        run: pytest -q --cov=btc_quant_agent --cov-report=term-missing
-      - run: python -m compileall -q src skill-template/scripts
+      - name: Build fail-closed test plan
+        env:
+          BEFORE_SHA: "${{ github.event.before }}"
+          EVENT_NAME: "${{ github.event_name }}"
+          BASE_REF: "${{ github.base_ref }}"
+          PR_BASE_SHA: "${{ github.event.pull_request.base.sha }}"
+        run: python scripts/ci/test_plan.py plan --before "$BEFORE_SHA" --event "$EVENT_NAME" --base-ref "$BASE_REF" --pr-base-sha "$PR_BASE_SHA"
+      - name: Classify impact before heavy dependency installation
+        id: impact
+        env:
+          PROFILE: "${{ github.event_name == 'workflow_dispatch' && inputs.profile || (github.event_name == 'schedule' && 'full' || 'focused') }}"
+        run: |
+          python - <<'PY' >> "$GITHUB_OUTPUT"
+          import json, os
+          p=json.load(open("ci-test-plan.json",encoding="utf-8"))
+          changed=p.get("changed", [])
+          docs_only=(p.get("mode")=="none" and os.environ["PROFILE"]=="focused")
+          ci_only=(os.environ["PROFILE"]=="focused" and bool(changed) and
+                   all(x.startswith((".github/workflows/","scripts/ci/")) or
+                       x=="tests/test_ci_test_plan.py" for x in changed))
+          print("docs_only="+str(docs_only).lower())
+          print("ci_only="+str(ci_only).lower())
+          PY
+      - name: Install tiny CI-planner dependencies
+        if: steps.impact.outputs.ci_only == 'true'
+        run: python -m pip install 'pytest>=8,<9' 'ruff>=0.9,<1'
+      - name: Install production/research validation dependencies
+        if: steps.impact.outputs.ci_only != 'true' && steps.impact.outputs.docs_only != 'true'
+        run: python -m pip install -e '.[dev,research]'
+      - name: Ruff with bounded historical EXE001 debt
+        if: steps.impact.outputs.docs_only != 'true'
+        run: python scripts/ci/test_plan.py lint
+      - name: Type-check production package on production changes
+        if: steps.impact.outputs.docs_only != 'true' && steps.impact.outputs.ci_only != 'true'
+        run: mypy
+      - name: Compile Python
+        run: python -m compileall -q src scripts tests
+      - name: Validate changed JSON artifacts
+        run: |
+          python - <<'PY'
+          import json, pathlib
+          p = json.loads(pathlib.Path("ci-test-plan.json").read_text(encoding="utf-8"))
+          for name in p.get("changed", []):
+              if name.endswith(".json") and pathlib.Path(name).is_file():
+                  json.loads(pathlib.Path(name).read_text(encoding="utf-8"))
+          PY
+      - name: Tests selected by risk/changed scope
+        if: steps.impact.outputs.docs_only != 'true'
+        env:
+          PROFILE: "${{ github.event_name == 'workflow_dispatch' && inputs.profile || (github.event_name == 'schedule' && 'full' || 'focused') }}"
+        run: python scripts/ci/test_plan.py run --profile "$PROFILE"
+      - name: Retain scoped test evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: b-line-test-receipt-${{ github.sha }}
+          path: |
+            ci-test-plan.json
+            ci-junit.xml
+          if-no-files-found: warn
+          retention-days: 14
 
   compatibility:
-    name: compatibility (${{ matrix.python-version }})
-    if: github.event_name == 'workflow_dispatch'
+    name: Compatibility manual full suite
+    if: github.event_name == 'workflow_dispatch' && inputs.profile == 'full'
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.11", "3.12"]
+        python-version: ["3.11", "3.13"]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -49,5 +114,4 @@ jobs:
           cache: pip
           cache-dependency-path: pyproject.toml
       - run: python -m pip install -e '.[dev,research]'
-      - run: pytest -q
-      - run: python -m compileall -q src skill-template/scripts
+      - run: pytest -q --durations=20

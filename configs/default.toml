@@ -96,3 +96,19 @@ sqlite_path = "./var/quant.db"
 
 [notify]
 feishu_enabled = false
+
+[market_watch]
+enabled = false
+symbols = ["BTCUSDT", "ETHUSDT", "SOLUSDT", "LINKUSDT", "SUIUSDT", "XRPUSDT", "DOGEUSDT", "BNBUSDT"]
+benchmark_symbols = ["BTCUSDT", "ETHUSDT"]
+relative_strength_universe = ["BTCUSDT", "ETHUSDT", "SOLUSDT", "LINKUSDT", "SUIUSDT", "XRPUSDT", "DOGEUSDT", "BNBUSDT"]
+scan_interval_minutes = 15
+fast_watch_interval_minutes = 5
+notify_only_on_change = true
+max_alert_symbols = 3
+min_net_rr = 1.5
+high_quality_net_rr = 2.0
+min_action_entry_quality = "GOOD"
+min_alert_severity = "WATCH"
+feishu_enabled = false
+sqlite_path = "./var/market_watch.db"
