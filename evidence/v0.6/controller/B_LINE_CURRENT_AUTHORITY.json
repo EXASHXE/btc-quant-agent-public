@@ -1,6 +1,6 @@
 {
   "line": "B_LINE",
-  "stage": "B_LINE_V06_ENGINEERING_PREVIEW_R1_DISPATCHED__STRATEGY_QUALITY_NONE__NO_TESTNET_OR_LIVE",
+  "stage": "V06_G1_L2_HOLD_FINDINGS_REPAIR__G2_METHOD_SOURCE_BLOCKED_ACCEPTED__CI_DOCS_ONLY_REPAIRED",
   "code_branch": "v0.6",
   "accepted_code_sha": "52c16a28153de307dc6132c0975fe29341a0a918",
   "docs_authority_commit": "6319ddbaddd69d5522696992ec1565169da88e03",
@@ -913,9 +913,14 @@
     "ci_fast_candidate_sha": "430becb96389a62481e4d4def07065054e658eee",
     "ci_fast_integrated": true,
     "next_scope": "NONPROTECTED_WP_A_WP_C_WP_D_INTEGRATION_READINESS_AND_L3_RETRY_ADJUDICATION_SEPARATE",
-    "code_head_sha": "d6500140f3141d179181f2360ad815b5bfe9c954",
+    "code_head_sha": "03c4b5ebea299a11a5f0c64f45572b27cc4ad4b8",
     "integrated_tactical_baseline_sha": "52c16a28153de307dc6132c0975fe29341a0a918",
-    "immutable_branch_initial_base_sha": "8ecff4ec4b25bf73a35309689fd3ecfacc0d3399"
+    "immutable_branch_initial_base_sha": "8ecff4ec4b25bf73a35309689fd3ecfacc0d3399",
+    "ci_docs_only_cache_bug_fix": {
+      "sha": "03c4b5ebea299a11a5f0c64f45572b27cc4ad4b8",
+      "status": "INTEGRATED_CI_ONLY_TWO_SUCCESSFUL_FEATURE_RUNS",
+      "mainline_post_ci": "https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/37759495789"
+    }
   },
   "version_authority_note": "Original accepted_code_sha 52c16a... is historical B-line Tactical acceptance, NOT v0.6 tip or final release. v0.6 starts from stable v0.5.5 code at 8ecff4ec. Prior B-line work remains unintegrated.",
   "v06_foundation_r1": {
@@ -978,17 +983,27 @@
     "required_terminal": "REMOTE_PUSH_VERIFIED_TRUE_OR_BLOCKED_NOT_PUSHED",
     "next_gate": "CONTROLLER_L2_EXACT_SHA_REVIEW",
     "historical_isolated_worktree": "/root/workspace/project/rc2-tactical-successor-v06-preview-r1",
-    "workspace_override_sha": "595d0b87cdad43f924f1e0040b8d6b33ae241237"
+    "workspace_override_sha": "595d0b87cdad43f924f1e0040b8d6b33ae241237",
+    "status": "CONTROLLER_L2_HOLD_PENDING_BOUNDED_REPAIR",
+    "implementation_sha": "0a37146aa76ae0a113760ebf88bc1ecca27b5123",
+    "evidence_sha": "6eef811961bfbe1341eee79b2450a4266d277302",
+    "independent_ci": "https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/37755191706",
+    "independent_ci_outcome": "FAILED_2767_PASS_1_H40_GOLDEN_FAIL_2_SKIP",
+    "isolated_h40_comparison_ci": "https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/37759244599",
+    "isolated_h40_comparison": "BASELINE_AND_G1_BOTH_PASS__FULL_SUITE_INTERACTION_UNRESOLVED",
+    "source_scope_violation": "NEW_HISTORICAL_EVIDENCE_v0.5.5_WP_D_RELEASE_MANIFEST",
+    "controller_disposition": "HOLD_ENGINEERING_INTEGRATION_PENDING_BOUNDED_REPAIR",
+    "review_path": "reviews/v0.6/b_line/V06_G1_G2_PARALLEL_CONTROLLER_L2_REVIEW_R1.md"
   },
   "v06_real_funds_test_path": {
-    "status": "G0_COMPLETE_G1_DISPATCHED_G2_DISPATCHED_NONPROTECTED_G3_TO_G6_UNAUTHORIZED",
+    "status": "G0_DONE_G1_L2_HOLD_G2_METHOD_SOURCE_BLOCKED_G3_TO_G6_UNAUTHORIZED",
     "gate_doc": "docs/project/V0.6_REAL_FUNDS_TEST_READINESS_GATES.md",
     "real_money_authority": "NONE",
     "project_live": "FORBIDDEN"
   },
   "v06_g2_strategy_discovery_r1": {
     "task_id": "V06_B_LINE_G2_PROSPECTIVE_STRATEGY_DISCOVERY_R1",
-    "status": "DISPATCHED_NONPROTECTED_EXPLORATORY_RESEARCH_PENDING_EXECUTOR",
+    "status": "CONTROLLER_ACCEPT_METHOD_SOURCE_BLOCKED__NO_ALPHA_INFERENCE",
     "controller_dispatch_sha": "0cc3d6e14d5c4e301c987b9e760fabb393e8141a",
     "prompt_path": "prompts/v0.6/b_line/V06_B_LINE_G2_PROSPECTIVE_STRATEGY_DISCOVERY_R1.md",
     "method_contract_path": "docs/project/V0.6_G2_STRATEGY_DISCOVERY_R1_CONTRACT.md",
@@ -1007,7 +1022,20 @@
     "auto_commit_push_verify_required": true,
     "next_gate": "CONTROLLER_L2_EXPLORATORY_EVIDENCE_REVIEW_AND_FUTURE_R2_DECISION",
     "historical_isolated_worktree": "/root/workspace/project/rc2-tactical-successor-v06-g2-r1",
-    "workspace_override_sha": "595d0b87cdad43f924f1e0040b8d6b33ae241237"
+    "workspace_override_sha": "595d0b87cdad43f924f1e0040b8d6b33ae241237",
+    "first_prereg_sha": "a46b0537c592f5d90a166aebe94737363f1706c0",
+    "implementation_sha": "4fc923b18330cde8873a93eb5fbb594531b5fcf5",
+    "evidence_sha": "aab31f8735c8be8f88651ef4677bd0c3a4068cae",
+    "prereg_blob_sha": "2b29d3c208f9a73e3acc5e7fb790fb9b9cea3bba",
+    "candidate_count": 12,
+    "evaluated_real_market_candidates": 0,
+    "terminal": "G2_R1_METHOD_OR_SOURCE_BLOCKED",
+    "local_synthetic_tests": "43_PASS_0_FAIL_0_SKIP",
+    "terminal_ci": "https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/37751788524",
+    "terminal_ci_failure": "DOCS_ONLY_SETUP_PYTHON_PIP_CACHE_PATH_MISSING",
+    "controller_disposition": "ACCEPT_METHOD_FREEZE_AND_VALID_SOURCE_BLOCKED_NO_ALPHA",
+    "review_path": "reviews/v0.6/b_line/V06_G1_G2_PARALLEL_CONTROLLER_L2_REVIEW_R1.md",
+    "next_research_contract": "NEW_R2_HISTORICAL_RECONSTRUCTION_ASSUMPTIONS_OR_FORWARD_PIT__CONTROLLER_FREEZE_FIRST"
   },
   "v06_parallel_local_workspace": {
     "status": "PATH_OVERRIDE_AUTHORIZED__LOCAL_CREATION_NOT_YET_VERIFIED",
