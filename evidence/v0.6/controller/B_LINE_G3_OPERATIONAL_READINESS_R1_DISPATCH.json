@@ -1,0 +1,33 @@
+{
+  "schema_version": "V06_B_LINE_G3_OPERATIONAL_READINESS_R1_DEV_DISPATCH_V1",
+  "task_id": "V06_B_LINE_G3_OPERATIONAL_READINESS_R1",
+  "decision": "AUTHORIZE_OFFLINE_RUNTIME_AND_OPTIONAL_EXTERNAL_NONTRADING_SMOKE_ONLY",
+  "code_start_sha": "a56cc413d87a71111f2be02f10052dced9ff0275",
+  "precondition_postmerge_ci_run": "https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/37778010147",
+  "precondition": "POST_MERGE_CI_MUST_CONCLUDE_SUCCESS_BEFORE_G3_EXECUTOR_STARTS",
+  "target_branch": "feature/v06-bline-g3-operational-readiness-r1",
+  "worktree": "/root/workspace/project/quant-v0.6/g3-operational-readiness",
+  "protected_paths": [
+    "/root/workspace/project/rc2-tactical-successor",
+    "/root/workspace/project/quant-v0.6/g1-engineering-preview",
+    "/root/workspace/project/quant-v0.6/g2-strategy-discovery",
+    "/root/workspace/project/quant-v0.6/g2-perp-reconstruction-r2",
+    "/root/workspace/project/quant-v0.6/controller-review"
+  ],
+  "allowed_paths": [
+    "tests/test_v06_g3_*.py",
+    "scripts/ops_g3/**",
+    "docs/operations/g3/**",
+    "evidence/v0.6/b_line/g3_operational_r1/**"
+  ],
+  "runtime": "Linux Python 3.12.3 POSIX serialised one worker",
+  "provider_smoke": "OFFLINE_DEFAULT; OPTIONAL_NONTRADING_ONLY_WITH_OPERATOR_PROVIDED_DEDICATED_TEST_CREDENTIALS_AND_EXPLICIT_RUNTIME_OPT_IN",
+  "testnet_exchange": "FORBIDDEN",
+  "real_account_exchange": "FORBIDDEN",
+  "signed_binance_client": "FORBIDDEN",
+  "protected_rc2": "FORBIDDEN",
+  "real_funds_write_authority": "NONE",
+  "source_edits": "NOT_AUTHORIZED; OBSERVED_BUG_ESCALATE_NEW_BOUND_REPAIR",
+  "automated_terminal": "AUTO_COMMIT_PUSH_VERIFY_BRANCH",
+  "prompt_path": "prompts/v0.6/b_line/V06_B_LINE_G3_OPERATIONAL_READINESS_R1.md"
+}
