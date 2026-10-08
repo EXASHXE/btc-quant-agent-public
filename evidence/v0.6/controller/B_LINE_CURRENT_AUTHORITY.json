@@ -993,7 +993,19 @@
     "isolated_h40_comparison": "BASELINE_AND_G1_BOTH_PASS__FULL_SUITE_INTERACTION_UNRESOLVED",
     "source_scope_violation": "NEW_HISTORICAL_EVIDENCE_v0.5.5_WP_D_RELEASE_MANIFEST",
     "controller_disposition": "HOLD_ENGINEERING_INTEGRATION_PENDING_BOUNDED_REPAIR",
-    "review_path": "reviews/v0.6/b_line/V06_G1_G2_PARALLEL_CONTROLLER_L2_REVIEW_R1.md"
+    "review_path": "reviews/v0.6/b_line/V06_G1_G2_PARALLEL_CONTROLLER_L2_REVIEW_R1.md",
+    "repair_r1_dispatch": {
+      "task_id": "V06_G1_ENGINEERING_PREVIEW_L2_FINDINGS_REPAIR_R1",
+      "controller_dispatch_sha": "deecefafff67f3ce81962477a17af7cf1c97cb7f",
+      "prompt_path": "prompts/v0.6/b_line/V06_G1_ENGINEERING_PREVIEW_L2_FINDINGS_REPAIR_R1.md",
+      "target_branch": "feature/v06-bline-engineering-preview-r1",
+      "start_sha": "6eef811961bfbe1341eee79b2450a4266d277302",
+      "allowed_edits": "HISTORICAL_MANIFEST_DELETION_AND_H40_CROSS_SUITE_ROOT_CAUSE_ONLY",
+      "auto_commit_push": true,
+      "protected_access": "FORBIDDEN",
+      "live_authority": "NONE",
+      "status": "DISPATCHED_NOT_YET_IMPLEMENTED"
+    }
   },
   "v06_real_funds_test_path": {
     "status": "G0_DONE_G1_L2_HOLD_G2_METHOD_SOURCE_BLOCKED_G3_TO_G6_UNAUTHORIZED",
