@@ -862,7 +862,11 @@
     "evidence_reconciliation_path": "reviews/v0.5/rc2/V0.5.5_RC2_FINAL_HOLDOUT_INCIDENT_R2_EVIDENCE_RECONCILIATION.md",
     "repair_l2_status": "BOUNDED_REPAIR_REQUIRED__NO_PROTECTED_EXECUTION",
     "repair_l2_reviewed_sha": "abbe5450018f93809939b9fa0d8810b4def833e0",
-    "repair_l2_review_path": "reviews/v0.5/rc2/V0.5.5_RC2_FINAL_HOLDOUT_INFRA_REPAIR_R1_CONTROLLER_L2_REVIEW.md"
+    "repair_l2_review_path": "reviews/v0.5/rc2/V0.5.5_RC2_FINAL_HOLDOUT_INFRA_REPAIR_R1_CONTROLLER_L2_REVIEW.md",
+    "repair_r1_1_prompt_path": "prompts/v0.5/rc2/v0.5.5_RC2_FINAL_HOLDOUT_INFRA_REPAIR_R1_1_BOUNDED_COMPLETION.md",
+    "repair_r1_1_start_sha": "abbe5450018f93809939b9fa0d8810b4def833e0",
+    "repair_r1_1_dispatch_sha": "f1f08ddce7c2820ca7aa0faafadb339a60838ca1",
+    "repair_r1_1_status": "DISPATCHED_BOUNDED_IMPLEMENTATION_PENDING_EVIDENCE"
   },
   "rc2_final_holdout_evidence_reconciliation": {
     "decision": "ACCEPT_ORIGINAL_INFRA_INCIDENT_EVIDENCE__INVALID_EXECUTION_DISPATCH__RETRY_LOCKED",
