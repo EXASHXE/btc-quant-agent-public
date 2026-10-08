@@ -1,6 +1,6 @@
 {
   "line": "B_LINE",
-  "stage": "V06_G1_L2_HOLD_FINDINGS_REPAIR__G2_METHOD_SOURCE_BLOCKED_ACCEPTED__CI_DOCS_ONLY_REPAIRED",
+  "stage": "V06_G1_MANIFEST_REPAIR_ACCEPTED__H40_L2_DIFF_RUNNING__G2_SOURCE_BLOCKED__NO_TESTNET_LIVE",
   "code_branch": "v0.6",
   "accepted_code_sha": "52c16a28153de307dc6132c0975fe29341a0a918",
   "docs_authority_commit": "6319ddbaddd69d5522696992ec1565169da88e03",
@@ -984,9 +984,9 @@
     "next_gate": "CONTROLLER_L2_EXACT_SHA_REVIEW",
     "historical_isolated_worktree": "/root/workspace/project/rc2-tactical-successor-v06-preview-r1",
     "workspace_override_sha": "595d0b87cdad43f924f1e0040b8d6b33ae241237",
-    "status": "CONTROLLER_L2_HOLD_PENDING_BOUNDED_REPAIR",
+    "status": "CONTROLLER_L2_ACCEPT_MANIFEST_REPAIR__H40_FULL_SUITE_HOLD",
     "implementation_sha": "0a37146aa76ae0a113760ebf88bc1ecca27b5123",
-    "evidence_sha": "6eef811961bfbe1341eee79b2450a4266d277302",
+    "evidence_sha": "efd73496d01a71a158d67343b64695d33fab16a8",
     "independent_ci": "https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/37755191706",
     "independent_ci_outcome": "FAILED_2767_PASS_1_H40_GOLDEN_FAIL_2_SKIP",
     "isolated_h40_comparison_ci": "https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/37759244599",
@@ -1005,7 +1005,18 @@
       "protected_access": "FORBIDDEN",
       "live_authority": "NONE",
       "status": "DISPATCHED_NOT_YET_IMPLEMENTED"
-    }
+    },
+    "latest_feature_head_sha": "efd73496d01a71a158d67343b64695d33fab16a8",
+    "repair_implementation_sha": "9867a4e3994b3ab98064e01f2a20eb446b30d18c",
+    "repair_evidence_sha": "efd73496d01a71a158d67343b64695d33fab16a8",
+    "repair_dispatch_sha": "deecefafff67f3ce81962477a17af7cf1c97cb7f",
+    "manifest_scope_finding": "CLOSED_ACCEPTED",
+    "h40_full_suite_finding": "UNRESOLVED_WAITING_EXACT_SHA_FULL_SUITE_DIFFERENTIAL",
+    "h40_digest_receipt_discrepancy": "REJECT_ASSERTED_GOLDEN_DIGEST_FIELD_UNVERIFIED_SOURCE_MISMATCH",
+    "h40_base_full_ci": "https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/37773542782",
+    "h40_g1_repair_ci": "https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/37772124985",
+    "integration_into_v06": "HELD",
+    "l2_review": "reviews/v0.6/b_line/V06_G1_PREVIEW_L2_FINDINGS_REPAIR_R1_CONTROLLER_DISPOSITION.md"
   },
   "v06_real_funds_test_path": {
     "status": "G0_DONE_G1_L2_HOLD_G2_METHOD_SOURCE_BLOCKED_G3_TO_G6_UNAUTHORIZED",
