@@ -1,6 +1,6 @@
 {
   "line": "B_LINE",
-  "stage": "B_LINE_INITIAL_USABLE_RELEASE_V1_RC2__FINAL_HOLDOUT_INFRA_INCIDENT_RETRY_LOCKED",
+  "stage": "B_LINE_INITIAL_USABLE_RELEASE_V1_RC2__FINAL_HOLDOUT_INFRA_REPAIR_PENDING_RETRY_LOCKED",
   "code_branch": "feature/tactical-policy-r2",
   "accepted_code_sha": "52c16a28153de307dc6132c0975fe29341a0a918",
   "docs_authority_commit": "6319ddbaddd69d5522696992ec1565169da88e03",
@@ -420,17 +420,24 @@
     "rc2_final_holdout_reported_phase": "SOURCE_RETRIEVAL",
     "rc2_final_holdout_reported_error": "ORCAUSDT top_pos_idx empty string in Binance metrics",
     "rc2_final_holdout_reported_ledger_entries": 1986,
-    "rc2_final_holdout_remote_evidence": "NOT_YET_PUBLISHED",
+    "rc2_final_holdout_remote_evidence": "ORIGINAL_RECEIPT_LEDGER_PUBLISHED_AND_RECONCILED",
     "rc2_final_holdout_actual_dispatch_reported": "405e0042687bfae5aa986e0f2982e26cba3827cd",
     "rc2_final_holdout_authorized_dispatch": "ffceccbb1ee28f190d4a8b3340248c753e22d374",
-    "rc2_final_holdout_dispatch_disposition": "MISMATCH_PENDING_RECEIPT_RECONCILIATION",
-    "rc2_final_holdout_policy_quality_authority": "NONE_PENDING_EVIDENCE",
+    "rc2_final_holdout_dispatch_disposition": "VERIFIED_MISMATCH_DEVELOPMENT_DISPATCH_NOT_EXECUTION_AUTHORITY",
+    "rc2_final_holdout_policy_quality_authority": "NONE_INFRA_INCOMPLETE_EXECUTION_IDENTITY_INVALID",
     "rc2_final_holdout_retry_authorized": false,
-    "rc2_final_holdout_protected_source_access": "REPORTED_NONZERO_UNVERIFIED",
-    "rc2_final_holdout_outcome_replay": "REPORTED_NOT_STARTED_UNVERIFIED",
+    "rc2_final_holdout_protected_source_access": "CONFIRMED_NONZERO__978_TARGET_SOURCE_READS_IN_PUBLISHED_LEDGER",
+    "rc2_final_holdout_outcome_replay": "NO_REPLAY_RECORDED__OUTPUT_MANIFEST_UNAVAILABLE",
     "rc2_final_holdout_infra_repair_branch": "validation/b-line-rc2-final-holdout-infra-repair-r1",
     "rc2_final_holdout_infra_repair_dispatch_sha": "f1f08ddce7c2820ca7aa0faafadb339a60838ca1",
-    "rc2_final_holdout_infra_repair_prompt_commit": "5f93eaa474b6d48e357b5fdec33dee9f0106add3"
+    "rc2_final_holdout_infra_repair_prompt_commit": "5f93eaa474b6d48e357b5fdec33dee9f0106add3",
+    "rc2_final_holdout_original_evidence_commit": "6f9b9bd1606c06664129b43293699fd05abd3297",
+    "rc2_final_holdout_original_execution_authority_valid": false,
+    "rc2_final_holdout_original_ledger_total": 1986,
+    "rc2_final_holdout_original_source_reads": 1970,
+    "rc2_final_holdout_original_target_source_reads": 978,
+    "rc2_final_holdout_original_reference_source_reads": 992,
+    "rc2_final_holdout_original_post_identity": "INCOMPLETE_RECEIPT_EMPTY_EVIDENCE_NULL"
   },
   "must_read": [],
   "validation_authority": {
@@ -843,13 +850,21 @@
     "next_gate": "FRESH_SOL_EXACT_SHA_REVIEW_GENERIC_RUNNER_BEFORE_TARGET_SEAL"
   },
   "rc2_final_holdout_infra_incident": {
-    "disposition": "REPORTED_INFRA_INCOMPLETE_EVIDENCE_UNVERIFIED_RETRY_LOCKED",
+    "disposition": "ORIGINAL_INFRA_EVIDENCE_ACCEPTED__EXECUTION_DISPATCH_INVALID__RETRY_LOCKED",
     "incident_path": "reviews/v0.5/rc2/V0.5.5_RC2_FINAL_FRESH_HOLDOUT_INFRA_INCIDENT_R1_CONTROLLER_DISPOSITION.md",
     "repair_prompt_path": "prompts/v0.5/rc2/v0.5.5_RC2_FINAL_HOLDOUT_INFRA_REPAIR_R1.md",
     "repair_branch": "validation/b-line-rc2-final-holdout-infra-repair-r1",
     "repair_start_sha": "d51abdcfa982be132a6fae6c84776f343fae893c",
     "controller_dispatch_sha": "f1f08ddce7c2820ca7aa0faafadb339a60838ca1",
-    "next_gate": "VERIFY_ORIGINAL_EVIDENCE_AND_SCOPED_INFRA_REPAIR",
-    "protected_retry": "FORBIDDEN_WITHOUT_NEW_ONE_SHOT_AUTHORITY"
+    "next_gate": "COMPLETE_SCOPED_INFRA_REPAIR_AND_CONTROLLER_L2_REVIEW",
+    "protected_retry": "NOT_AUTHORIZED__NEW_IMMUTABLE_ONE_SHOT_REQUIRED",
+    "incident_evidence_commit": "6f9b9bd1606c06664129b43293699fd05abd3297",
+    "evidence_reconciliation_path": "reviews/v0.5/rc2/V0.5.5_RC2_FINAL_HOLDOUT_INCIDENT_R2_EVIDENCE_RECONCILIATION.md"
+  },
+  "rc2_final_holdout_evidence_reconciliation": {
+    "decision": "ACCEPT_ORIGINAL_INFRA_INCIDENT_EVIDENCE__INVALID_EXECUTION_DISPATCH__RETRY_LOCKED",
+    "source_commit": "6f9b9bd1606c06664129b43293699fd05abd3297",
+    "report_path": "reviews/v0.5/rc2/V0.5.5_RC2_FINAL_HOLDOUT_INCIDENT_R2_EVIDENCE_RECONCILIATION.md",
+    "scope": "INCIDENT_CLASSIFICATION_ONLY_NOT_POLICY_QUALITY_OR_EXECUTION_AUTHORIZATION"
   }
 }
