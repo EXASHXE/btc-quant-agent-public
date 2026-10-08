@@ -1,0 +1,800 @@
+{
+  "task_id": "V06_B_LINE_WP_A_C_D_ENGINEERING_PREVIEW_R1",
+  "repository": "EXASHXE/btc-quant-agent-public",
+  "base_branch": "v0.6",
+  "start_sha": "d6500140f3141d179181f2360ad815b5bfe9c954",
+  "implementation_sha": "0a37146aa76ae0a113760ebf88bc1ecca27b5123",
+  "controller_dispatch_sha": "8f0ccb2dbbc0612e3218ea554309d123959118f7",
+  "controller_workspace_override_sha": "595d0b87cdad43f924f1e0040b8d6b33ae241237",
+  "pinned_dependencies": {
+    "r8_live_v1_baseline": "08e81bec003d645a0a0582db183a1b6916887eff",
+    "wp_a_operational_readiness": "606f286dbb5d7af46776043d1287d9b3e7b1e679",
+    "wp_c_llm_approval_integration": "72b39de71024b3051357c17eee7922e657dcb81f",
+    "wp_d_release_engineering": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea"
+  },
+  "runtime_operating_mode": "DRY_RUN",
+  "real_funds_permission": "NONE",
+  "live_write_authority": null,
+  "a_line_preservation": {
+    "h40_modified": false,
+    "h41_modified": false,
+    "tests_h41_modified": false,
+    "market_watch_canonical_diff_zero": true,
+    "git_diff_exit_code": 0
+  },
+  "semantic_conflict_resolutions": [
+    {
+      "area": "config.py / pyproject.toml",
+      "resolution": "B-line configuration extensions (feishu, live_v1, execution) added additively without altering A-line defaults.",
+      "policy": "B-line config precedence for Live V1 surfaces; A-line preserved."
+    },
+    {
+      "area": "api.py pre-parse gate",
+      "resolution": "Added FEISHU_RECEIVE_ID_TYPE validation to _validate_env_pre_parse to ensure early rejection of invalid webhook configuration.",
+      "policy": "Strict fail-closed pre-parse gate before starting application server."
+    },
+    {
+      "area": "execution backend default",
+      "resolution": "Enforced DRY_RUN as the structural default. LIVE execution mode raises ValueError on initialization.",
+      "policy": "Non-negotiable offline safety fence."
+    }
+  ],
+  "file_manifest": [
+    {
+      "path": ".env.example",
+      "change_type": "M",
+      "current_blob_sha": "8848ec9fcfe0cd8848b43d9fe4563d8075327ca8",
+      "base_blob_sha": "7a888596d0601df1b712a4534026c5940b56ce7a",
+      "source_component": "WP-D",
+      "source_commit": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea",
+      "integration_method": "byte_identical"
+    },
+    {
+      "path": "Dockerfile",
+      "change_type": "M",
+      "current_blob_sha": "32aa3ccbbbc80365a33c00485ce3f2a97dcc2506",
+      "base_blob_sha": "278e37f6eabee49691b53339f9b79d59124a7aa8",
+      "source_component": "WP-D",
+      "source_commit": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea",
+      "integration_method": "byte_identical"
+    },
+    {
+      "path": "docker-compose.yml",
+      "change_type": "M",
+      "current_blob_sha": "f856a2587dc1f42eb3ab813cb706b669b8e78f07",
+      "base_blob_sha": "5515058682e240ffa844b93f305d7a74abbb637e",
+      "source_component": "WP-D",
+      "source_commit": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea",
+      "integration_method": "byte_identical"
+    },
+    {
+      "path": "docs/CURRENT_ARCHITECTURE.md",
+      "change_type": "M",
+      "current_blob_sha": "3cf0ec90d3d63f38e1cae4cd1ed702b64bfd7290",
+      "base_blob_sha": "e8e63f7f6aab53817478e9dd20e319b080745cb1",
+      "source_component": "WP-D",
+      "source_commit": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea",
+      "integration_method": "byte_identical"
+    },
+    {
+      "path": "docs/LIVE_V1_RC1_OPERATIONAL_RUNBOOK.md",
+      "change_type": "A",
+      "current_blob_sha": "68d85b77571e10a5fb19c89c48233d4e5481e79e",
+      "base_blob_sha": null,
+      "source_component": "WP-D",
+      "source_commit": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea",
+      "integration_method": "byte_identical"
+    },
+    {
+      "path": "evidence/v0.5.5/live_v1/RC1/WP_D/B_LINE_INITIAL_USABLE_RELEASE_V1_RC1_MANIFEST.json",
+      "change_type": "A",
+      "current_blob_sha": "a41cbfb4c2d4b7170bcc9075dc852583d0afed1c",
+      "base_blob_sha": null,
+      "source_component": "WP-D",
+      "source_commit": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea",
+      "integration_method": "byte_identical"
+    },
+    {
+      "path": "pyproject.toml",
+      "change_type": "M",
+      "current_blob_sha": "df82ea07b74dc9b6d839783758e9deaea264c8c9",
+      "base_blob_sha": "8d94d707cbdbea85d695603d4323644b9ad088a7",
+      "source_component": "WP-D",
+      "source_commit": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea",
+      "integration_method": "byte_identical"
+    },
+    {
+      "path": "src/btc_quant_agent/account_watch/__init__.py",
+      "change_type": "A",
+      "current_blob_sha": "17e78f366db03a68b6db9a0678c2ffa663bace44",
+      "base_blob_sha": null,
+      "source_component": "WP-D",
+      "source_commit": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea",
+      "integration_method": "byte_identical"
+    },
+    {
+      "path": "src/btc_quant_agent/account_watch/models.py",
+      "change_type": "A",
+      "current_blob_sha": "ca6001e1b097f52e32592879810c9556db38610c",
+      "base_blob_sha": null,
+      "source_component": "WP-D",
+      "source_commit": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea",
+      "integration_method": "byte_identical"
+    },
+    {
+      "path": "src/btc_quant_agent/account_watch/service.py",
+      "change_type": "A",
+      "current_blob_sha": "a73f453ca8add76b01fd4d87207344acb1720c9d",
+      "base_blob_sha": null,
+      "source_component": "WP-D",
+      "source_commit": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea",
+      "integration_method": "byte_identical"
+    },
+    {
+      "path": "src/btc_quant_agent/account_watch/store.py",
+      "change_type": "A",
+      "current_blob_sha": "f02f0a9b2a3e1fdcedfbd20662aa45676a9524b9",
+      "base_blob_sha": null,
+      "source_component": "WP-D",
+      "source_commit": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea",
+      "integration_method": "byte_identical"
+    },
+    {
+      "path": "src/btc_quant_agent/api.py",
+      "change_type": "M",
+      "current_blob_sha": "58a3149a2b7999e6f357608317b500bcd286a848",
+      "base_blob_sha": "1f978edd5557cc308a009898887940c9356933bf",
+      "source_component": "WP-D",
+      "source_commit": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea",
+      "integration_method": "integrated_delta"
+    },
+    {
+      "path": "src/btc_quant_agent/approval/__init__.py",
+      "change_type": "A",
+      "current_blob_sha": "a9b50a556dd54e0b4b2b862b7edcc4c1a35269ce",
+      "base_blob_sha": null,
+      "source_component": "WP-D",
+      "source_commit": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea",
+      "integration_method": "byte_identical"
+    },
+    {
+      "path": "src/btc_quant_agent/approval/callback.py",
+      "change_type": "A",
+      "current_blob_sha": "435c466709d7eac4d9f6546ab08356295ccf8ad4",
+      "base_blob_sha": null,
+      "source_component": "WP-D",
+      "source_commit": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea",
+      "integration_method": "byte_identical"
+    },
+    {
+      "path": "src/btc_quant_agent/approval/feishu.py",
+      "change_type": "A",
+      "current_blob_sha": "a3689ee1a717cae1131e0d16da0301a6503f59ae",
+      "base_blob_sha": null,
+      "source_component": "WP-D",
+      "source_commit": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea",
+      "integration_method": "integrated_delta"
+    },
+    {
+      "path": "src/btc_quant_agent/approval/store.py",
+      "change_type": "A",
+      "current_blob_sha": "3ea865e954814aea7500f469274c32e045a2cbba",
+      "base_blob_sha": null,
+      "source_component": "WP-D",
+      "source_commit": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea",
+      "integration_method": "byte_identical"
+    },
+    {
+      "path": "src/btc_quant_agent/config.py",
+      "change_type": "M",
+      "current_blob_sha": "fc89a4a8c6645ebbfe1d53fd4c6cbcfeba865e90",
+      "base_blob_sha": "0be66125a3ad463e961b71e6de396f9491ddc93d",
+      "source_component": "WP-D",
+      "source_commit": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea",
+      "integration_method": "integrated_delta"
+    },
+    {
+      "path": "src/btc_quant_agent/decision/__init__.py",
+      "change_type": "A",
+      "current_blob_sha": "240609bedde8a6e89a1e52aad6b91a743581ac0e",
+      "base_blob_sha": null,
+      "source_component": "WP-D",
+      "source_commit": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea",
+      "integration_method": "byte_identical"
+    },
+    {
+      "path": "src/btc_quant_agent/decision/api.py",
+      "change_type": "A",
+      "current_blob_sha": "0e8cff147ed852c4817f5cc0141498118224d6a4",
+      "base_blob_sha": null,
+      "source_component": "WP-D",
+      "source_commit": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea",
+      "integration_method": "byte_identical"
+    },
+    {
+      "path": "src/btc_quant_agent/decision/backends.py",
+      "change_type": "A",
+      "current_blob_sha": "0587ec35ca085ddb117a90452aa8d595e41bad65",
+      "base_blob_sha": null,
+      "source_component": "WP-D",
+      "source_commit": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea",
+      "integration_method": "integrated_delta"
+    },
+    {
+      "path": "src/btc_quant_agent/decision/case.py",
+      "change_type": "A",
+      "current_blob_sha": "d43038048a555d24020d7380767670b06ecb2524",
+      "base_blob_sha": null,
+      "source_component": "WP-D",
+      "source_commit": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea",
+      "integration_method": "byte_identical"
+    },
+    {
+      "path": "src/btc_quant_agent/decision/fusion.py",
+      "change_type": "A",
+      "current_blob_sha": "6019e6441b454faa50938cb5c7a19a222922e5b0",
+      "base_blob_sha": null,
+      "source_component": "WP-D",
+      "source_commit": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea",
+      "integration_method": "integrated_delta"
+    },
+    {
+      "path": "src/btc_quant_agent/decision/models.py",
+      "change_type": "A",
+      "current_blob_sha": "bd5ee2303b8046a846b5016b53395bf56bdd08fd",
+      "base_blob_sha": null,
+      "source_component": "WP-D",
+      "source_commit": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea",
+      "integration_method": "byte_identical"
+    },
+    {
+      "path": "src/btc_quant_agent/decision/risk.py",
+      "change_type": "A",
+      "current_blob_sha": "0400f7b46e84de985f6ec7f550fe36324d6c8d7f",
+      "base_blob_sha": null,
+      "source_component": "WP-D",
+      "source_commit": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea",
+      "integration_method": "byte_identical"
+    },
+    {
+      "path": "src/btc_quant_agent/decision/service.py",
+      "change_type": "A",
+      "current_blob_sha": "96adfac8145bd6157ce4ff7b713b79a030c9255c",
+      "base_blob_sha": null,
+      "source_component": "WP-D",
+      "source_commit": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea",
+      "integration_method": "integrated_delta"
+    },
+    {
+      "path": "src/btc_quant_agent/execution/__init__.py",
+      "change_type": "M",
+      "current_blob_sha": "47c9e89bb4f68b76014fbb6b7a22fa61558d2f9b",
+      "base_blob_sha": "845c19e56febfc8348b387d7bfceab7872d55fb4",
+      "source_component": "WP-D",
+      "source_commit": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea",
+      "integration_method": "byte_identical"
+    },
+    {
+      "path": "src/btc_quant_agent/execution/authorization.py",
+      "change_type": "A",
+      "current_blob_sha": "4399f844a4e597a810b6d598e425e1570cdde54f",
+      "base_blob_sha": null,
+      "source_component": "WP-D",
+      "source_commit": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea",
+      "integration_method": "byte_identical"
+    },
+    {
+      "path": "src/btc_quant_agent/execution/backend.py",
+      "change_type": "A",
+      "current_blob_sha": "e1fc97e8fd3ea2bdf4a765e78214744c19429477",
+      "base_blob_sha": null,
+      "source_component": "WP-D",
+      "source_commit": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea",
+      "integration_method": "byte_identical"
+    },
+    {
+      "path": "src/btc_quant_agent/execution/binance_signed.py",
+      "change_type": "M",
+      "current_blob_sha": "ef26e94cb37fe2616d7b5508cc7b446e23cfa67c",
+      "base_blob_sha": "225d25506bd3379efdac9bf05ba2c2acc1453cd3",
+      "source_component": "WP-D",
+      "source_commit": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea",
+      "integration_method": "byte_identical"
+    },
+    {
+      "path": "src/btc_quant_agent/execution/executor.py",
+      "change_type": "A",
+      "current_blob_sha": "5c0e9e1445323ff8c7624d50b8dae770ad2bfd8d",
+      "base_blob_sha": null,
+      "source_component": "WP-D",
+      "source_commit": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea",
+      "integration_method": "byte_identical"
+    },
+    {
+      "path": "src/btc_quant_agent/execution/intents.py",
+      "change_type": "A",
+      "current_blob_sha": "cb6eece92b281dd0dc32261b8eb9eab9fbf8c74f",
+      "base_blob_sha": null,
+      "source_component": "WP-D",
+      "source_commit": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea",
+      "integration_method": "byte_identical"
+    },
+    {
+      "path": "src/btc_quant_agent/execution/policy.py",
+      "change_type": "A",
+      "current_blob_sha": "8e3d55dffbbe652787dc50bb0fcdb2cf5be9327c",
+      "base_blob_sha": null,
+      "source_component": "WP-D",
+      "source_commit": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea",
+      "integration_method": "byte_identical"
+    },
+    {
+      "path": "src/btc_quant_agent/execution/protection.py",
+      "change_type": "A",
+      "current_blob_sha": "e473e65d623a6990ec28937c59ed46df92c9022e",
+      "base_blob_sha": null,
+      "source_component": "WP-D",
+      "source_commit": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea",
+      "integration_method": "byte_identical"
+    },
+    {
+      "path": "src/btc_quant_agent/execution/validator.py",
+      "change_type": "A",
+      "current_blob_sha": "8c121f23dab58543d357b1ff74bf5837c5e85afa",
+      "base_blob_sha": null,
+      "source_component": "WP-D",
+      "source_commit": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea",
+      "integration_method": "byte_identical"
+    },
+    {
+      "path": "src/btc_quant_agent/live_db.py",
+      "change_type": "A",
+      "current_blob_sha": "faef12ca4391b93a49349a1bfac2c512a9f78f40",
+      "base_blob_sha": null,
+      "source_component": "WP-D",
+      "source_commit": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea",
+      "integration_method": "integrated_delta"
+    },
+    {
+      "path": "src/btc_quant_agent/live_market/__init__.py",
+      "change_type": "A",
+      "current_blob_sha": "4b15059a81990836c422b4b93f1552a20e573c3f",
+      "base_blob_sha": null,
+      "source_component": "WP-D",
+      "source_commit": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea",
+      "integration_method": "byte_identical"
+    },
+    {
+      "path": "src/btc_quant_agent/live_market/models.py",
+      "change_type": "A",
+      "current_blob_sha": "578550801a8ed02d0f878af9de4ae7b5d44b222e",
+      "base_blob_sha": null,
+      "source_component": "WP-D",
+      "source_commit": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea",
+      "integration_method": "byte_identical"
+    },
+    {
+      "path": "src/btc_quant_agent/live_market/service.py",
+      "change_type": "A",
+      "current_blob_sha": "de56a468a1bfac0c3e5230df8e2eeaad7d510695",
+      "base_blob_sha": null,
+      "source_component": "WP-D",
+      "source_commit": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea",
+      "integration_method": "byte_identical"
+    },
+    {
+      "path": "src/btc_quant_agent/live_runtime.py",
+      "change_type": "A",
+      "current_blob_sha": "a02d8613d7bca62205ffd630ab0b75fb76061de0",
+      "base_blob_sha": null,
+      "source_component": "WP-D",
+      "source_commit": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea",
+      "integration_method": "integrated_delta"
+    },
+    {
+      "path": "src/btc_quant_agent/position_supervisor/__init__.py",
+      "change_type": "A",
+      "current_blob_sha": "ab4bfd6bb9a921a6654d137e823286c1467a63a6",
+      "base_blob_sha": null,
+      "source_component": "WP-D",
+      "source_commit": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea",
+      "integration_method": "byte_identical"
+    },
+    {
+      "path": "src/btc_quant_agent/position_supervisor/kill_switch.py",
+      "change_type": "A",
+      "current_blob_sha": "96805ff4b40506862f0b026e3b024c71968eb996",
+      "base_blob_sha": null,
+      "source_component": "WP-D",
+      "source_commit": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea",
+      "integration_method": "byte_identical"
+    },
+    {
+      "path": "src/btc_quant_agent/position_supervisor/models.py",
+      "change_type": "A",
+      "current_blob_sha": "8e284f1e17471e8c9d5a20fdf77284b984304956",
+      "base_blob_sha": null,
+      "source_component": "WP-D",
+      "source_commit": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea",
+      "integration_method": "byte_identical"
+    },
+    {
+      "path": "src/btc_quant_agent/position_supervisor/supervisor.py",
+      "change_type": "A",
+      "current_blob_sha": "a4809b907271fbe0a919c726111385d3b6dd70d2",
+      "base_blob_sha": null,
+      "source_component": "WP-D",
+      "source_commit": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea",
+      "integration_method": "integrated_delta"
+    },
+    {
+      "path": "tests/test_binance_signed.py",
+      "change_type": "M",
+      "current_blob_sha": "a0bcd3a936578bcceda84ab74deca970486130f8",
+      "base_blob_sha": "b782df81fec22d3564efe811ea5ffcabf5290818",
+      "source_component": "WP-D",
+      "source_commit": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea",
+      "integration_method": "byte_identical"
+    },
+    {
+      "path": "tests/test_live_v1_account_stream_r2.py",
+      "change_type": "A",
+      "current_blob_sha": "3380270b494a86316f91b437d36d009f001756b9",
+      "base_blob_sha": null,
+      "source_component": "WP-D",
+      "source_commit": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea",
+      "integration_method": "byte_identical"
+    },
+    {
+      "path": "tests/test_live_v1_account_watch.py",
+      "change_type": "A",
+      "current_blob_sha": "b1ce1e43c2c4bd8e84a55adf2b68ba6800f0f73c",
+      "base_blob_sha": null,
+      "source_component": "WP-D",
+      "source_commit": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea",
+      "integration_method": "byte_identical"
+    },
+    {
+      "path": "tests/test_live_v1_approval_environment_r4.py",
+      "change_type": "A",
+      "current_blob_sha": "eb206a3d629fe6a468c3f176acaf06f45364b42f",
+      "base_blob_sha": null,
+      "source_component": "WP-D",
+      "source_commit": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea",
+      "integration_method": "byte_identical"
+    },
+    {
+      "path": "tests/test_live_v1_day2_e2e.py",
+      "change_type": "A",
+      "current_blob_sha": "3dc7fe36e145c955de41bf9ef59ea4638a1d5624",
+      "base_blob_sha": null,
+      "source_component": "WP-D",
+      "source_commit": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea",
+      "integration_method": "byte_identical"
+    },
+    {
+      "path": "tests/test_live_v1_decision_api.py",
+      "change_type": "A",
+      "current_blob_sha": "7f6d34606a34f5d34d32d78e4f2f57eff370f0aa",
+      "base_blob_sha": null,
+      "source_component": "WP-D",
+      "source_commit": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea",
+      "integration_method": "byte_identical"
+    },
+    {
+      "path": "tests/test_live_v1_decision_approval.py",
+      "change_type": "A",
+      "current_blob_sha": "76fde9740ba4a4c08ec45d1e62f955359dc280ea",
+      "base_blob_sha": null,
+      "source_component": "WP-D",
+      "source_commit": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea",
+      "integration_method": "byte_identical"
+    },
+    {
+      "path": "tests/test_live_v1_decision_backends.py",
+      "change_type": "A",
+      "current_blob_sha": "0fc878367320542dc729863910c75b78e0570c5a",
+      "base_blob_sha": null,
+      "source_component": "WP-D",
+      "source_commit": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea",
+      "integration_method": "byte_identical"
+    },
+    {
+      "path": "tests/test_live_v1_decision_case.py",
+      "change_type": "A",
+      "current_blob_sha": "f977a59bc13619024dd18a40896ab079929838e7",
+      "base_blob_sha": null,
+      "source_component": "WP-D",
+      "source_commit": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea",
+      "integration_method": "byte_identical"
+    },
+    {
+      "path": "tests/test_live_v1_decision_e2e.py",
+      "change_type": "A",
+      "current_blob_sha": "a27e6640a754db1890954c71f47a81a0b7b0f816",
+      "base_blob_sha": null,
+      "source_component": "WP-D",
+      "source_commit": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea",
+      "integration_method": "byte_identical"
+    },
+    {
+      "path": "tests/test_live_v1_decision_models.py",
+      "change_type": "A",
+      "current_blob_sha": "02e9a96aecd65f9243d31b80f54067962513663c",
+      "base_blob_sha": null,
+      "source_component": "WP-D",
+      "source_commit": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea",
+      "integration_method": "byte_identical"
+    },
+    {
+      "path": "tests/test_live_v1_decision_risk.py",
+      "change_type": "A",
+      "current_blob_sha": "1b40e7014fde666f5d38d42359862914720765e1",
+      "base_blob_sha": null,
+      "source_component": "WP-D",
+      "source_commit": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea",
+      "integration_method": "byte_identical"
+    },
+    {
+      "path": "tests/test_live_v1_execution_authorization_r2.py",
+      "change_type": "A",
+      "current_blob_sha": "d4305797770084d4eaf05be5bf3016cdf0da36cd",
+      "base_blob_sha": null,
+      "source_component": "WP-D",
+      "source_commit": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea",
+      "integration_method": "byte_identical"
+    },
+    {
+      "path": "tests/test_live_v1_execution_backend.py",
+      "change_type": "A",
+      "current_blob_sha": "ceba1089b63d53d39467f5a2cc461b863c6d9cbf",
+      "base_blob_sha": null,
+      "source_component": "WP-D",
+      "source_commit": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea",
+      "integration_method": "byte_identical"
+    },
+    {
+      "path": "tests/test_live_v1_execution_compilation_r2.py",
+      "change_type": "A",
+      "current_blob_sha": "14b93773f0e73e155e47f97e146005580386d1d9",
+      "base_blob_sha": null,
+      "source_component": "WP-D",
+      "source_commit": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea",
+      "integration_method": "byte_identical"
+    },
+    {
+      "path": "tests/test_live_v1_execution_identity_r3.py",
+      "change_type": "A",
+      "current_blob_sha": "f74a4631d0c1362d6b11a19676a5e9a45f458e80",
+      "base_blob_sha": null,
+      "source_component": "WP-D",
+      "source_commit": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea",
+      "integration_method": "byte_identical"
+    },
+    {
+      "path": "tests/test_live_v1_execution_intent.py",
+      "change_type": "A",
+      "current_blob_sha": "8ebdc0aafe8b79d5f1f579669e9d07e63a677d57",
+      "base_blob_sha": null,
+      "source_component": "WP-D",
+      "source_commit": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea",
+      "integration_method": "byte_identical"
+    },
+    {
+      "path": "tests/test_live_v1_execution_placement_r3.py",
+      "change_type": "A",
+      "current_blob_sha": "6071ecd7912c79193101713506ee811b42f08b5d",
+      "base_blob_sha": null,
+      "source_component": "WP-D",
+      "source_commit": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea",
+      "integration_method": "byte_identical"
+    },
+    {
+      "path": "tests/test_live_v1_execution_protection_r3.py",
+      "change_type": "A",
+      "current_blob_sha": "3d0de913f0c74021039663f002f883a74ab3a52c",
+      "base_blob_sha": null,
+      "source_component": "WP-D",
+      "source_commit": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea",
+      "integration_method": "byte_identical"
+    },
+    {
+      "path": "tests/test_live_v1_execution_protection_r4.py",
+      "change_type": "A",
+      "current_blob_sha": "7e75ff96512afe981edc2f1d1270623e5622c222",
+      "base_blob_sha": null,
+      "source_component": "WP-D",
+      "source_commit": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea",
+      "integration_method": "byte_identical"
+    },
+    {
+      "path": "tests/test_live_v1_execution_protection_r5.py",
+      "change_type": "A",
+      "current_blob_sha": "6745f3b55137d89942ff5e3aa35b734d9f5703b6",
+      "base_blob_sha": null,
+      "source_component": "WP-D",
+      "source_commit": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea",
+      "integration_method": "byte_identical"
+    },
+    {
+      "path": "tests/test_live_v1_execution_protection_r6.py",
+      "change_type": "A",
+      "current_blob_sha": "66b0a4bc2a2a02be368c188f2442e1382bd12360",
+      "base_blob_sha": null,
+      "source_component": "WP-D",
+      "source_commit": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea",
+      "integration_method": "byte_identical"
+    },
+    {
+      "path": "tests/test_live_v1_execution_recovery_r3.py",
+      "change_type": "A",
+      "current_blob_sha": "4b3bf7f63d80ca0e5cc29932772615c69b7e5dfc",
+      "base_blob_sha": null,
+      "source_component": "WP-D",
+      "source_commit": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea",
+      "integration_method": "byte_identical"
+    },
+    {
+      "path": "tests/test_live_v1_execution_storage.py",
+      "change_type": "A",
+      "current_blob_sha": "a36ee7b30738bee8129a9df3e53946d49158662f",
+      "base_blob_sha": null,
+      "source_component": "WP-D",
+      "source_commit": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea",
+      "integration_method": "byte_identical"
+    },
+    {
+      "path": "tests/test_live_v1_execution_validator.py",
+      "change_type": "A",
+      "current_blob_sha": "e08b1c812f6180e978c845df90a599f7c766e84d",
+      "base_blob_sha": null,
+      "source_component": "WP-D",
+      "source_commit": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea",
+      "integration_method": "byte_identical"
+    },
+    {
+      "path": "tests/test_live_v1_position_authority_r4.py",
+      "change_type": "A",
+      "current_blob_sha": "2854f40ebaea3e4cda348a26875693d9dd6508de",
+      "base_blob_sha": null,
+      "source_component": "WP-D",
+      "source_commit": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea",
+      "integration_method": "byte_identical"
+    },
+    {
+      "path": "tests/test_live_v1_position_kill.py",
+      "change_type": "A",
+      "current_blob_sha": "f84948a53b521a9ac70530922b3a0c0c2cf99582",
+      "base_blob_sha": null,
+      "source_component": "WP-D",
+      "source_commit": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea",
+      "integration_method": "byte_identical"
+    },
+    {
+      "path": "tests/test_live_v1_position_lease_r2.py",
+      "change_type": "A",
+      "current_blob_sha": "9962da0e395a1b092a28fb679e50e1000ce135d0",
+      "base_blob_sha": null,
+      "source_component": "WP-D",
+      "source_commit": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea",
+      "integration_method": "byte_identical"
+    },
+    {
+      "path": "tests/test_live_v1_position_outbox_r5.py",
+      "change_type": "A",
+      "current_blob_sha": "d1c66487948da8b6344ecb99ea4bc219ff62b9ec",
+      "base_blob_sha": null,
+      "source_component": "WP-D",
+      "source_commit": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea",
+      "integration_method": "byte_identical"
+    },
+    {
+      "path": "tests/test_live_v1_position_outbox_r6.py",
+      "change_type": "A",
+      "current_blob_sha": "98f1b79dbe5d6afebf4daed6e4f36450a5c87300",
+      "base_blob_sha": null,
+      "source_component": "WP-D",
+      "source_commit": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea",
+      "integration_method": "byte_identical"
+    },
+    {
+      "path": "tests/test_live_v1_position_outbox_r7.py",
+      "change_type": "A",
+      "current_blob_sha": "fb12e8e2816b42b176efb0e51386ae3fdf749b32",
+      "base_blob_sha": null,
+      "source_component": "WP-D",
+      "source_commit": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea",
+      "integration_method": "byte_identical"
+    },
+    {
+      "path": "tests/test_live_v1_position_outbox_r8.py",
+      "change_type": "A",
+      "current_blob_sha": "2e793eb4b9938ac4193a0fa510be30d54e92bb53",
+      "base_blob_sha": null,
+      "source_component": "WP-D",
+      "source_commit": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea",
+      "integration_method": "byte_identical"
+    },
+    {
+      "path": "tests/test_live_v1_position_supervisor.py",
+      "change_type": "A",
+      "current_blob_sha": "6b4ab9410a622f5e86c283286108ad5c7f6b9f7c",
+      "base_blob_sha": null,
+      "source_component": "WP-D",
+      "source_commit": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea",
+      "integration_method": "byte_identical"
+    },
+    {
+      "path": "tests/test_live_v1_rc1_llm_approval_integration.py",
+      "change_type": "A",
+      "current_blob_sha": "03882fe7627a9b1cde07ca1eab9d94d13ea08878",
+      "base_blob_sha": null,
+      "source_component": "WP-C",
+      "source_commit": "72b39de71024b3051357c17eee7922e657dcb81f",
+      "integration_method": "byte_identical"
+    },
+    {
+      "path": "tests/test_live_v1_rc1_operational_readiness.py",
+      "change_type": "A",
+      "current_blob_sha": "36782de034cfe34359609358ebe851732ac16c42",
+      "base_blob_sha": null,
+      "source_component": "WP-A",
+      "source_commit": "606f286dbb5d7af46776043d1287d9b3e7b1e679",
+      "integration_method": "byte_identical"
+    },
+    {
+      "path": "tests/test_live_v1_rc1_wp_d_release_engineering.py",
+      "change_type": "A",
+      "current_blob_sha": "09161214e55a8cf99c52830b7a434773fa8c38af",
+      "base_blob_sha": null,
+      "source_component": "WP-D",
+      "source_commit": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea",
+      "integration_method": "byte_identical"
+    },
+    {
+      "path": "tests/test_live_v1_runtime_authority_r5.py",
+      "change_type": "A",
+      "current_blob_sha": "733c032bbe804f80e0860d998f0dab35c3eff1a4",
+      "base_blob_sha": null,
+      "source_component": "WP-D",
+      "source_commit": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea",
+      "integration_method": "byte_identical"
+    },
+    {
+      "path": "tests/test_live_v1_runtime_authority_r6.py",
+      "change_type": "A",
+      "current_blob_sha": "a1ca27a0d4ce1ee48d768de7fea13a98a552bbb0",
+      "base_blob_sha": null,
+      "source_component": "WP-D",
+      "source_commit": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea",
+      "integration_method": "byte_identical"
+    },
+    {
+      "path": "tests/test_live_v1_runtime_r2.py",
+      "change_type": "A",
+      "current_blob_sha": "a37f6a2687704b851a68deef15434a22db373236",
+      "base_blob_sha": null,
+      "source_component": "WP-D",
+      "source_commit": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea",
+      "integration_method": "byte_identical"
+    },
+    {
+      "path": "tests/test_live_v1_runtime_recovery_r3.py",
+      "change_type": "A",
+      "current_blob_sha": "348811c18f29ada952ef15f02854832f3222bc62",
+      "base_blob_sha": null,
+      "source_component": "WP-D",
+      "source_commit": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea",
+      "integration_method": "byte_identical"
+    },
+    {
+      "path": "tests/test_v06_engineering_preview_r1.py",
+      "change_type": "A",
+      "current_blob_sha": "19542565946eff7b09929190e91f1a9fcc876ce5",
+      "base_blob_sha": null,
+      "source_component": "ENGINEERING_PREVIEW_R1",
+      "source_commit": "0a37146aa76ae0a113760ebf88bc1ecca27b5123",
+      "integration_method": "new_suite"
+    }
+  ]
+}

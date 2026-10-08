@@ -1,0 +1,85 @@
+{
+  "task_id": "V06_B_LINE_WP_A_C_D_ENGINEERING_PREVIEW_R1",
+  "operating_profile": "DRY_RUN",
+  "live_write_authority": "NONE",
+  "real_funds_write_authority": "NONE",
+  "signed_client_calls_count": 0,
+  "protected_resources_read_count": 0,
+  "positive_dry_run_flow": {
+    "status": "VERIFIED_PASS",
+    "flow_steps": [
+      "1. Offline synthetic OHLCV multi-timeframe market watch fixture generated (1m/5m/15m/1h/4h)",
+      "2. Scanner assessed symbol BTCUSDT -> Direction LONG, Entry Quality EXCELLENT, Data Quality OK",
+      "3. Immutable CasePackageV1 built with deterministic case_hash and 120s TTL",
+      "4. Mocked ResponsesBackend produced primary AnalysisResultV1 (model=gpt-5.4, confidence=0.92, thesis_strength=0.85, action=OPEN_LONG)",
+      "5. DecisionFusion selected OPEN_LONG without requiring manual review",
+      "6. RiskCompilerV1 compiled TradeProposalV1 (leverage capped at 3x <= policy max 3x, notional capped at ~200 USDT <= policy max 500 USDT)",
+      "7. Mock Feishu interactive card template constructed with action buttons",
+      "8. Human callback APPROVE recorded into LiveStore with event_id=preview-appr-evt-001",
+      "9. AccountWatch produced reconciled AccountSnapshotV1 in paper mode",
+      "10. build_trade_intent created immutable TradeIntentV1 bound to approval_event_id and case_hash",
+      "11. PreExecutionValidator verified intent, market observation (spread < 10 bps, drift < 50 bps), and account snapshot",
+      "12. DryRunExecutionBackend executed simulated entry order (FILLED, qty=1.998, avg_price=100.1) and placed simulated protective stop order",
+      "13. LiveExecutionService verified exactly-once execution (subsequent execution returned RECONCILED fill with 0 duplicate orders)",
+      "14. PositionSupervisor recorded position observation into live_position_events (POSITION_OPENED, STOP_NEAR) and updated live_position_lifecycle_v2"
+    ],
+    "sample_hashes": {
+      "case_hash": "70d506eb094e5aa303371b17fd439f0b11322daf08e4812120da7e8b0ef6c653",
+      "proposal_hash": "b04ea5e63cf64aae6fc0dcee5762c12f0bce41c078a748e46c2de304724bfa7f",
+      "approval_event_id": "preview-appr-evt-001"
+    }
+  },
+  "negative_safety_matrix": {
+    "status": "VERIFIED_PASS",
+    "scenarios": [
+      {
+        "scenario": "Path A: LLM Refusal / Provider Failure",
+        "result": "AnalysisResultV1.fail_closed produced NO_ACTION with risk_modifier=BLOCK; RiskCompiler produced proposal with MODEL_BLOCK and requires_manual_review=True; NO trade intent can be created."
+      },
+      {
+        "scenario": "Path B: Primary/Secondary Model Disagreement",
+        "result": "DecisionFusion flagged MODEL_DISAGREEMENT and set requires_manual_review=True; unapproved automated execution is prohibited."
+      },
+      {
+        "scenario": "Path C: Human REJECT Callback",
+        "result": "LiveStore recorded REJECTED state; build_trade_intent failed closed with ExecutionBlocked: approval record does not match proposal or case."
+      },
+      {
+        "scenario": "Path D: Expired Proposal TTL",
+        "result": "LiveStore rejected approval callback with ValueError: proposal expired; state transitioned to EXPIRED."
+      },
+      {
+        "scenario": "Path E: Forged / Tampered Proposal Hash",
+        "result": "LiveStore rejected mismatched callback identity with ValueError: stale or mismatched callback identity."
+      },
+      {
+        "scenario": "Path F: Duplicate Callback Collision and Replay",
+        "result": "Differing callback event rejected with ValueError: callback event collision; identical replay returned replay=True without re-transitioning."
+      }
+    ]
+  },
+  "mode_escalation_fences": {
+    "status": "VERIFIED_PASS",
+    "fences": [
+      "LiveV1Config rejects execution_mode=LIVE with ValueError.",
+      "LiveV1Config rejects execution_mode=TESTNET when testnet_execution_enabled is False.",
+      "create_testnet_signed_client rejects non-testnet URLs with BinanceExecutionError.",
+      "api._validate_env_pre_parse rejects mainnet credentials and non-NONE authority."
+    ]
+  },
+  "cold_restart_durability": {
+    "status": "VERIFIED_PASS",
+    "serialized_initializer_fcntl": "Verified across fresh cold starts and service re-instantiation.",
+    "triggers_verified": [
+      "trg_live_position_events_immutable_update",
+      "trg_live_position_events_immutable_delete",
+      "trg_live_position_dispatches_immutable_authority",
+      "trg_live_position_dispatch_blank_insert",
+      "trg_live_position_dispatch_admission_immutable",
+      "trg_live_position_dispatch_done_requires_completion",
+      "trg_live_position_analysis_completion_guard",
+      "trg_live_position_dispatches_immutable_delete"
+    ],
+    "recovered_trade_intent_status": "FILLED"
+  }
+}
