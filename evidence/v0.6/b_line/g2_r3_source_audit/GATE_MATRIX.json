@@ -1,0 +1,114 @@
+{
+  "schema_version": "G2_R3_SOURCE_GATE_MATRIX_V1",
+  "task_id": "V06_G2_R3_SOURCE_COST_FEASIBILITY_AUDIT_R1",
+  "terminal_decision": "G2_R3_METHOD_REPAIR_REQUIRED_BEFORE_PREREG",
+  "verdict_vocabulary": [
+    "VERIFIED",
+    "POTENTIAL",
+    "PROXY_DIAGNOSTIC_ONLY",
+    "BLOCKED"
+  ],
+  "gates": [
+    {
+      "gate": "AUTHORITY_AND_WORKTREE",
+      "verdict": "VERIFIED",
+      "uncertainty": "Pinned baseline/docs ancestry/design head,unused target,seven clean preserved checkouts verified",
+      "evidence_ref": "git_sources.json and AUDIT_RECEIPT"
+    },
+    {
+      "gate": "ISSUER_TECHNICAL_DOCUMENT_PROVENANCE",
+      "verdict": "VERIFIED",
+      "uncertainty": "Official README/terms/SDK provenance and exact payload digests; only static source schema context",
+      "evidence_ref": "requests5,6,8,9,10"
+    },
+    {
+      "gate": "PRODUCT_SYMBOL_IDENTITY",
+      "verdict": "POTENTIAL",
+      "uncertainty": "Target proposed USDT-M PERPETUAL; no admissible symbol snapshot,quote/margin/status not certified",
+      "evidence_ref": "design SHA and requests1,9"
+    },
+    {
+      "gate": "CURRENT_FILTERS",
+      "verdict": "BLOCKED",
+      "uncertainty": "All-symbol exchangeInfo UNSUPPORTED_BY_SCOPE, explicit-symbol alternative not verified",
+      "evidence_ref": "ledger not_requested"
+    },
+    {
+      "gate": "HISTORICAL_FILTERS",
+      "verdict": "PROXY_DIAGNOSTIC_ONLY",
+      "uncertainty": "Jan\u2013Apr effective versions unknown; proxy values themselves not yet frozen",
+      "evidence_ref": "source report Identity"
+    },
+    {
+      "gate": "FEES",
+      "verdict": "BLOCKED",
+      "uncertainty": "COST_SOURCE_NOT_VERIFIED: current/historical applicable standard rate unknown,6/12bp remain assumptions",
+      "evidence_ref": "request2 HTTP202"
+    },
+    {
+      "gate": "FUNDING_SCHEDULE",
+      "verdict": "PROXY_DIAGNOSTIC_ONLY",
+      "uncertainty": "SCHEDULE_UNKNOWN_PROXY_ONLY: clock mapping/cadence/caps/mark settlement unavailable; no rates read",
+      "evidence_ref": "requests3,4 HTTP202"
+    },
+    {
+      "gate": "FUNDING_CAP_ENVELOPE",
+      "verdict": "BLOCKED",
+      "uncertainty": "Fixed8bp not bounded cap stress; verified cap/event-count bound needed for positive inference",
+      "evidence_ref": "source report Funding"
+    },
+    {
+      "gate": "MINUTE_MARK_SCHEMA_RETENTION",
+      "verdict": "BLOCKED",
+      "uncertainty": "Only potential issuer lead, no verified archive path/retention/HEAD; absence of proof not nonexistence",
+      "evidence_ref": "requests1,5,9,11"
+    },
+    {
+      "gate": "MINUTE_MARK_BODY_COVERAGE",
+      "verdict": "BLOCKED",
+      "uncertainty": "NOT_ASSESSED: zero mark-body/HEAD reads; potential endpoint lead does not evidence any coverage. Future authorization and source admission required.",
+      "evidence_ref": "source report Minute-mark"
+    },
+    {
+      "gate": "SPREAD_IMPACT",
+      "verdict": "PROXY_DIAGNOSTIC_ONLY",
+      "uncertainty": "No book/quotes/fills;2/3 and4/6bp unmeasured; no positive certification",
+      "evidence_ref": "source report Cost envelope"
+    },
+    {
+      "gate": "PIT_LEDGER_ORDERING",
+      "verdict": "BLOCKED",
+      "uncertainty": "Minute-mark available_at versus forced exits and funding reserve need pre-freeze amendment",
+      "evidence_ref": "source report Canonical timeline"
+    },
+    {
+      "gate": "SUPPORT_AND_POWER",
+      "verdict": "BLOCKED",
+      "uncertainty": "100/fold implausible without measured frequency; positive/negative diagnostic/supported no-go rules need separate approval",
+      "evidence_ref": "METHOD_REPAIR_DECISION"
+    },
+    {
+      "gate": "DATASET_PERMISSION",
+      "verdict": "POTENTIAL",
+      "uncertainty": "Retrieved noncommercial terms with attribution/share-alike conditions; future source/redistribution admission not adjudicated",
+      "evidence_ref": "request6 terms effective2026-08-26"
+    },
+    {
+      "gate": "REQUEST_BUDGET",
+      "verdict": "VERIFIED",
+      "uncertainty": "11 requests/54249 body bytes; bounded stop,0 market/metadata exchange API calls",
+      "evidence_ref": "SOURCE_METADATA_LEDGER"
+    },
+    {
+      "gate": "NO_STRATEGY_PROMOTION",
+      "verdict": "VERIFIED",
+      "uncertainty": "8 original IDs untouched,0 added/evaluated;necessary geometry not sufficiency,no new holdout",
+      "evidence_ref": "design registry and AUDIT_RECEIPT"
+    }
+  ],
+  "acceptable_for_prereg": false,
+  "diagnostic_execution_authorized": false,
+  "actual_historical_coverage_certified": false,
+  "realistic_net_performance_certified": false,
+  "scope": "Audit evidence and proposed separate method repairs only"
+}

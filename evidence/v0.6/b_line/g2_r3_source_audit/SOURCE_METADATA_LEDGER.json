@@ -1,0 +1,271 @@
+{
+  "requests": [
+    {
+      "id": 1,
+      "url": "https://developers.binance.com/en/docs/catalog/core-trading-derivatives-trading-usd-s-m-futures/api/rest-api/market-data",
+      "method": "GET",
+      "purpose": "OFFICIAL_SPEC_NOT_EMPIRICAL",
+      "retrieved_utc": "2026-10-08T16:34:00.842368+00:00",
+      "authenticated": false,
+      "symbol_classification": "OFFICIAL_STATIC_DOCUMENTATION_WITH_ILLUSTRATIVE_EXAMPLES_NO_EMPIRICAL_QUERY",
+      "body_bytes": 0,
+      "body_sha256": null,
+      "http_status": 202,
+      "response_headers": {
+        "Date": "Thu, 08 Oct 2026 16:34:02 GMT",
+        "Content-Length": "0",
+        "Content-Type": "text/html; charset=UTF-8"
+      },
+      "status": "NOT_VERIFIED_NO_ERROR_BODY_READ",
+      "retained_header_metadata_utf8_bytes": 108,
+      "header_metadata_sha256": "57ee090580711dc01d9fa8075ac324d2800814959a801a7004b407cfeb016323"
+    },
+    {
+      "id": 2,
+      "url": "https://www.binance.com/en-NZ/support/faq/detail/360033544231",
+      "method": "GET",
+      "purpose": "OFFICIAL_FEE_SPEC",
+      "retrieved_utc": "2026-10-08T16:34:01.077983+00:00",
+      "authenticated": false,
+      "symbol_classification": "OFFICIAL_STATIC_DOCUMENTATION_WITH_ILLUSTRATIVE_EXAMPLES_NO_EMPIRICAL_QUERY",
+      "body_bytes": 0,
+      "body_sha256": null,
+      "http_status": 202,
+      "response_headers": {
+        "Date": "Thu, 08 Oct 2026 16:34:02 GMT",
+        "Content-Length": "0",
+        "Content-Type": "text/html; charset=UTF-8"
+      },
+      "status": "NOT_VERIFIED_NO_ERROR_BODY_READ",
+      "retained_header_metadata_utf8_bytes": 108,
+      "header_metadata_sha256": "57ee090580711dc01d9fa8075ac324d2800814959a801a7004b407cfeb016323"
+    },
+    {
+      "id": 3,
+      "url": "https://www.binance.com/en/support/faq/detail/360033525031",
+      "method": "GET",
+      "purpose": "OFFICIAL_FUNDING_SPEC",
+      "retrieved_utc": "2026-10-08T16:34:01.318915+00:00",
+      "authenticated": false,
+      "symbol_classification": "OFFICIAL_STATIC_DOCUMENTATION_WITH_ILLUSTRATIVE_EXAMPLES_NO_EMPIRICAL_QUERY",
+      "body_bytes": 0,
+      "body_sha256": null,
+      "http_status": 202,
+      "response_headers": {
+        "Date": "Thu, 08 Oct 2026 16:34:03 GMT",
+        "Content-Length": "0",
+        "Content-Type": "text/html; charset=UTF-8"
+      },
+      "status": "NOT_VERIFIED_NO_ERROR_BODY_READ",
+      "retained_header_metadata_utf8_bytes": 108,
+      "header_metadata_sha256": "b3d86fd754f4d3a54ede4632d7a13f118aefa457596695a8ed06696162634489"
+    },
+    {
+      "id": 4,
+      "url": "https://www.binance.com/en/support/announcement/detail/e4445d0389ce4defa6009021fcf6ee46",
+      "method": "GET",
+      "purpose": "OFFICIAL_EFFECTIVE_INTERVAL_NOTICE",
+      "retrieved_utc": "2026-10-08T16:34:02.012847+00:00",
+      "authenticated": false,
+      "symbol_classification": "OFFICIAL_STATIC_DOCUMENTATION_WITH_ILLUSTRATIVE_EXAMPLES_NO_EMPIRICAL_QUERY",
+      "body_bytes": 0,
+      "body_sha256": null,
+      "http_status": 202,
+      "response_headers": {
+        "Date": "Thu, 08 Oct 2026 16:34:05 GMT",
+        "Content-Length": "0",
+        "Content-Type": "text/html; charset=UTF-8"
+      },
+      "status": "NOT_VERIFIED_NO_ERROR_BODY_READ",
+      "retained_header_metadata_utf8_bytes": 108,
+      "header_metadata_sha256": "4953a5aa0bf1b765e72c81f7540c05eaf99e01104016bc7a32fe4d9ac90ba81d"
+    },
+    {
+      "id": 5,
+      "url": "https://raw.githubusercontent.com/binance/binance-public-data/master/README.md",
+      "method": "GET",
+      "purpose": "OFFICIAL_ARCHIVE_FORMAT_AND_CHECKSUM_SPEC",
+      "retrieved_utc": "2026-10-08T16:34:03.538914+00:00",
+      "authenticated": false,
+      "symbol_classification": "OFFICIAL_STATIC_DOCUMENTATION_WITH_ILLUSTRATIVE_EXAMPLES_NO_EMPIRICAL_QUERY",
+      "body_bytes": 5282,
+      "body_sha256": "2e133d9945a9263a02781369078e72805eff074680f305cd5460016471c6caad",
+      "http_status": 200,
+      "response_headers": {
+        "Content-Length": "5282",
+        "Content-Type": "text/plain; charset=utf-8",
+        "ETag": "\"df58a8b6d8c2fe4bc24833b7ce5ec85f539845feb5bd1dfc0505ce6c2c6f3993\"",
+        "Date": "Thu, 08 Oct 2026 16:34:06 GMT"
+      },
+      "local_cache_name": "archive_readme_5.txt",
+      "status": "DOCUMENTATION_BODY_ONLY",
+      "retained_header_metadata_utf8_bytes": 192,
+      "header_metadata_sha256": "9140bf6795e94fe9172ecc95758b31e540456607a9fb7da36b0228d3be518801"
+    },
+    {
+      "id": 6,
+      "url": "https://raw.githubusercontent.com/binance/binance-public-data/master/TERMS_AND_CONDITIONS.md",
+      "method": "GET",
+      "purpose": "OFFICIAL_DATASET_PERMISSION_SPEC",
+      "retrieved_utc": "2026-10-08T16:34:52.339869+00:00",
+      "authenticated": false,
+      "symbol_classification": "OFFICIAL_STATIC_DOCUMENTATION_WITH_ILLUSTRATIVE_EXAMPLES_NO_EMPIRICAL_QUERY",
+      "body_bytes": 9798,
+      "body_sha256": "dcf358e9d18f598a7a635fac80f6e643fa24a0e111a4d39bda47f1e246b31eb1",
+      "http_status": 200,
+      "response_headers": {
+        "Content-Length": "9798",
+        "Content-Type": "text/plain; charset=utf-8",
+        "ETag": "\"b5f503f7e64c6b9a735da0f635f9b36cf8e7242403bb5c845c17f3e3a4c10748\"",
+        "Date": "Thu, 08 Oct 2026 16:34:54 GMT"
+      },
+      "local_cache_name": "dataset_terms_6.txt",
+      "status": "DOCUMENTATION_BODY_ONLY",
+      "retained_header_metadata_utf8_bytes": 192,
+      "header_metadata_sha256": "2003982b27d81da5a2e5c33b406d18745241f8951fdeb57e9b81d0e8dba44be2"
+    },
+    {
+      "id": 7,
+      "url": "https://raw.githubusercontent.com/binance/binance-api-swagger/master/futures-api.yaml",
+      "method": "GET",
+      "purpose": "OFFICIAL_OPENAPI_TECHNICAL_SPEC",
+      "retrieved_utc": "2026-10-08T16:34:53.573424+00:00",
+      "authenticated": false,
+      "symbol_classification": "OFFICIAL_STATIC_DOCUMENTATION_WITH_ILLUSTRATIVE_EXAMPLES_NO_EMPIRICAL_QUERY",
+      "body_bytes": 0,
+      "body_sha256": null,
+      "http_status": 404,
+      "response_headers": {
+        "Content-Length": "14",
+        "Content-Type": "text/plain; charset=utf-8",
+        "Date": "Thu, 08 Oct 2026 16:34:55 GMT"
+      },
+      "status": "NOT_VERIFIED_NO_ERROR_BODY_READ",
+      "retained_header_metadata_utf8_bytes": 110,
+      "header_metadata_sha256": "d0e55dad431b30bfb607d506eb5c1b9dcf36773cbb182031fa21fd4102f106a4"
+    },
+    {
+      "id": 8,
+      "url": "https://raw.githubusercontent.com/binance/binance-connector-python/master/README.md",
+      "method": "GET",
+      "purpose": "OFFICIAL_SDK_SPECIFICATION_INDEX",
+      "retrieved_utc": "2026-10-08T16:35:55.059986+00:00",
+      "authenticated": false,
+      "symbol_classification": "OFFICIAL_STATIC_DOCUMENTATION_WITH_ILLUSTRATIVE_EXAMPLES_NO_EMPIRICAL_QUERY",
+      "body_bytes": 8372,
+      "body_sha256": "381dc82aac2e997d63a785d8cfbcfaf718da605ea8bfb98dd48b8ddb6831eceb",
+      "http_status": 200,
+      "response_headers": {
+        "Content-Length": "8372",
+        "Content-Type": "text/plain; charset=utf-8",
+        "ETag": "\"bd414b489bb65c550ec1d8a293d50f8c42e062127db8c3cbdae9da542875583a\"",
+        "Date": "Thu, 08 Oct 2026 16:35:57 GMT"
+      },
+      "local_cache_name": "sdk_readme_8.txt",
+      "status": "DOCUMENTATION_BODY_ONLY",
+      "retained_header_metadata_utf8_bytes": 192,
+      "header_metadata_sha256": "8a737984295bf2226a620643f3271708d233bb7b84a5083a46c59be404ab39a6"
+    },
+    {
+      "id": 9,
+      "url": "https://raw.githubusercontent.com/binance/binance-connector-python/master/clients/derivatives_trading_usds_futures/README.md",
+      "method": "GET",
+      "purpose": "OFFICIAL_USDT_M_SDK_DOCUMENTATION_INDEX",
+      "retrieved_utc": "2026-10-08T16:36:13.522313+00:00",
+      "authenticated": false,
+      "symbol_classification": "OFFICIAL_STATIC_DOCUMENTATION_WITH_ILLUSTRATIVE_EXAMPLES_NO_EMPIRICAL_QUERY",
+      "body_bytes": 20460,
+      "body_sha256": "ae9366345bfc6ba1c871ea2f292b4bac9bfe087136a35b66cd2325f399ad6ece",
+      "http_status": 200,
+      "response_headers": {
+        "Content-Length": "20460",
+        "Content-Type": "text/plain; charset=utf-8",
+        "ETag": "\"746007b5c385bab2968673a77bed54d6985f8eaff9b7aab0d81ee0afd67ddbc7\"",
+        "Date": "Thu, 08 Oct 2026 16:36:14 GMT"
+      },
+      "local_cache_name": "usds_readme_9.txt",
+      "status": "DOCUMENTATION_BODY_ONLY",
+      "retained_header_metadata_utf8_bytes": 193,
+      "header_metadata_sha256": "30f44368a461123f160191a57a80e8a50b66c779c34b24c5048efa6b2140244c"
+    },
+    {
+      "id": 10,
+      "url": "https://api.github.com/repos/binance/binance-connector-python/contents/clients/derivatives_trading_usds_futures?ref=master",
+      "method": "GET",
+      "purpose": "OFFICIAL_SDK_FILE_METADATA_NOT_EXCHANGE_ENDPOINT_DISCOVERY",
+      "retrieved_utc": "2026-10-08T16:37:15.735624+00:00",
+      "authenticated": false,
+      "symbol_classification": "OFFICIAL_STATIC_DOCUMENTATION_WITH_ILLUSTRATIVE_EXAMPLES_NO_EMPIRICAL_QUERY",
+      "body_bytes": 10337,
+      "body_sha256": "2eb160801f06db2b18eacc921cba0115b1ed00f0f57338d31a82dacd8b385233",
+      "http_status": 200,
+      "response_headers": {
+        "Content-Length": "10337",
+        "Content-Type": "application/json; charset=utf-8",
+        "Date": "Thu, 08 Oct 2026 16:37:16 GMT",
+        "ETag": "\"f85c7ae6455b4b31360fb2e804f2ee035f3b2d69\"",
+        "Last-Modified": "Thu, 08 Oct 2026 10:12:00 GMT"
+      },
+      "local_cache_name": "usds_file_index_10.txt",
+      "status": "DOCUMENTATION_BODY_ONLY",
+      "retained_header_metadata_utf8_bytes": 225,
+      "header_metadata_sha256": "c3d90cd912750bd2f04a610917a09602c236b99da0e7112d4460bb0aff8dff43"
+    },
+    {
+      "id": 11,
+      "url": "https://api.github.com/repos/binance/binance-connector-python/contents/clients/derivatives_trading_usds_futures/src?ref=master",
+      "method": "GET",
+      "purpose": "OFFICIAL_SDK_SCHEMA_FILE_METADATA",
+      "retrieved_utc": "2026-10-08T16:37:34.584493+00:00",
+      "authenticated": false,
+      "symbol_classification": "OFFICIAL_STATIC_DOCUMENTATION_WITH_ILLUSTRATIVE_EXAMPLES_NO_EMPIRICAL_QUERY",
+      "body_bytes": 0,
+      "body_sha256": null,
+      "http_status": null,
+      "error": "<urlopen error [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1032)>",
+      "status": "NOT_VERIFIED",
+      "retained_header_metadata_utf8_bytes": 2,
+      "header_metadata_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    }
+  ],
+  "max_requests": 30,
+  "max_bytes": 10000000,
+  "body_bytes": 54249,
+  "count": 11,
+  "stop_reason": "TRANSPORT_UNAVAILABLE",
+  "authentication": false,
+  "forbidden_body_requests": 0,
+  "task_id": "V06_G2_R3_SOURCE_COST_FEASIBILITY_AUDIT_R1",
+  "controller_dispatch_sha": "290664c17e14a4fd7530b5308b5fbdebb69b8a1e",
+  "body_bytes_plus_retained_header_metadata_bytes": 55787,
+  "price_body_downloads": 0,
+  "funding_rate_history_body_downloads": 0,
+  "mark_candle_body_downloads": 0,
+  "order_book_downloads": 0,
+  "archive_head_requests": 0,
+  "exchange_api_requests": 0,
+  "git_transport": "Separately authorized public repository refs/publication, not market metadata budget; wire counts not instrumented",
+  "proxy_environment": "Standard transport only; no proxy discovery or credential recovery",
+  "budget_status": "WITHIN_BUDGET_STOPPED_AFTER_TRANSPORT_UNAVAILABLE",
+  "wire_bytes": "NOT_MEASURED; documentation payload and retained header serialization counted",
+  "not_requested": [
+    {
+      "endpoint": "/fapi/v1/exchangeInfo",
+      "status": "UNSUPPORTED_BY_SCOPE",
+      "reason": "ALL_SYMBOL_RESPONSE"
+    },
+    {
+      "endpoint": "markPrice ZIP HEADs",
+      "status": "NOT_ADMITTED",
+      "reason": "NO_VERIFIED_MARK_ARCHIVE_PATH_SCHEMA_OR_RETENTION; no guessed-path discovery"
+    },
+    {
+      "endpoint": "/fapi/v1/fundingRate",
+      "status": "FORBIDDEN_BODY"
+    },
+    {
+      "endpoint": "/fapi/v1/markPriceKlines",
+      "status": "FORBIDDEN_BODY"
+    }
+  ]
+}

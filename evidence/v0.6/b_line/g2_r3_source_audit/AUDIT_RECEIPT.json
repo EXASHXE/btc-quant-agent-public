@@ -1,0 +1,248 @@
+{
+  "schema_version": "G2_R3_SOURCE_AUDIT_RECEIPT_V1",
+  "task_id": "V06_G2_R3_SOURCE_COST_FEASIBILITY_AUDIT_R1",
+  "executor_profile": "SOL_HIGH",
+  "controller_dispatch_sha": "290664c17e14a4fd7530b5308b5fbdebb69b8a1e",
+  "code_start_sha": "e0ff8c3473de4bfa3e66fe7928d42992a4d38a32",
+  "design_sha": "e5b2006a89441f7eb2ec900e508aff451106b87a",
+  "branch": "feature/v06-bline-g2-r3-source-feasibility-r1",
+  "worktree": "/root/workspace/project/quant-v0.6/g2-r3-source-feasibility-r1",
+  "repository": "EXASHXE/btc-quant-agent-public",
+  "source_inputs": [
+    {
+      "ref": "e5b2006a89441f7eb2ec900e508aff451106b87a",
+      "path": "docs/strategy_research/g2_r3/METHOD_DESIGN.md",
+      "sha256": "14378dde7668291dc87aef91e3e55fadddad3a444d1d49284efa2c3cbcba9a77",
+      "bytes": 17739,
+      "classification": "PUBLISHED_DESIGN_AUTHORITY_OR_AGGREGATE_NOT_RAW_OUTCOME"
+    },
+    {
+      "ref": "e5b2006a89441f7eb2ec900e508aff451106b87a",
+      "path": "docs/strategy_research/g2_r3/SOURCE_QUALITY_AND_COST_FEASIBILITY.md",
+      "sha256": "8095fb8c4c608b548ca143f121c297d03498876fa4512232d06a265659f225a8",
+      "bytes": 8030,
+      "classification": "PUBLISHED_DESIGN_AUTHORITY_OR_AGGREGATE_NOT_RAW_OUTCOME"
+    },
+    {
+      "ref": "e5b2006a89441f7eb2ec900e508aff451106b87a",
+      "path": "docs/strategy_research/g2_r3/R3_EXECUTION_GATE_PLAN.md",
+      "sha256": "8a12d40ebbaf0edb1355f039b0b5adb6d11f4dfda1ba52898f2f3ebdfb938dce",
+      "bytes": 7308,
+      "classification": "PUBLISHED_DESIGN_AUTHORITY_OR_AGGREGATE_NOT_RAW_OUTCOME"
+    },
+    {
+      "ref": "e5b2006a89441f7eb2ec900e508aff451106b87a",
+      "path": "evidence/v0.6/b_line/g2_r3_design/CANDIDATE_REGISTER_PROPOSAL.json",
+      "sha256": "d0f89bddfaec0e57c959cec043969059da10fec8aa45f81669dde8b80ea35a9b",
+      "bytes": 7361,
+      "classification": "PUBLISHED_DESIGN_AUTHORITY_OR_AGGREGATE_NOT_RAW_OUTCOME"
+    },
+    {
+      "ref": "2e922f486cf5b3f6cb7fa3aa7823cd096f24c17e",
+      "path": "evidence/v0.6/b_line/g2_reconstruction_r2/G2_R2_RESEARCH_REPORT.md",
+      "sha256": "31bf7ac8d056af07d081d4479556271ee56a004b76826669b5c2c994b07888e0",
+      "bytes": 12510,
+      "classification": "PUBLISHED_DESIGN_AUTHORITY_OR_AGGREGATE_NOT_RAW_OUTCOME"
+    },
+    {
+      "ref": "290664c17e14a4fd7530b5308b5fbdebb69b8a1e",
+      "path": "evidence/v0.6/controller/B_LINE_G2_R3_SOURCE_METHOD_FEASIBILITY_AUDIT_R1_DISPATCH.json",
+      "sha256": "7bb57438a99bcc8bf6e0214b7452f6cc23f23308a63ef1ddd1f2173bb6a09fe8",
+      "bytes": 2815,
+      "classification": "PUBLISHED_DESIGN_AUTHORITY_OR_AGGREGATE_NOT_RAW_OUTCOME"
+    },
+    {
+      "ref": "290664c17e14a4fd7530b5308b5fbdebb69b8a1e",
+      "path": "reviews/v0.6/b_line/V06_G2_R3_DESIGN_CONTROLLER_L2_SCIENTIFIC_REVIEW.md",
+      "sha256": "a510c735329872216cae9865707ef15f337ba32a792b622c27bec158f3c0da1f",
+      "bytes": 7066,
+      "classification": "PUBLISHED_DESIGN_AUTHORITY_OR_AGGREGATE_NOT_RAW_OUTCOME"
+    }
+  ],
+  "metadata_requests": 11,
+  "metadata_body_bytes": 54249,
+  "metadata_plus_retained_headers_bytes": 55787,
+  "collection_stop_reason": "TRANSPORT_UNAVAILABLE",
+  "new_market_price_bodies": 0,
+  "new_funding_rate_bodies": 0,
+  "protected_reads": 0,
+  "account_private_signed_api_calls": 0,
+  "credentials_read": 0,
+  "exchange_writes": 0,
+  "provider_runtime_actions": 0,
+  "order_calls": 0,
+  "implementation_tests_run": 0,
+  "implementation_tests_authorized": false,
+  "ci_reruns": 0,
+  "new_candidates": 0,
+  "candidates_evaluated": 0,
+  "original_proposals": 8,
+  "design_modified": false,
+  "worktree_preservation": {
+    "before": [
+      {
+        "path": "/root/workspace/project/rc2-tactical-successor",
+        "head": "1a5756663ecf56ed6c02a7355840f33e6715ea22",
+        "branch": "validation/b-line-rc2-final-holdout-infra-repair-r1",
+        "tracked_dirty_count": 0,
+        "untracked_count": 0
+      },
+      {
+        "path": "/root/workspace/project/quant-v0.6/g1-engineering-preview",
+        "head": "efd73496d01a71a158d67343b64695d33fab16a8",
+        "branch": "feature/v06-bline-engineering-preview-r1",
+        "tracked_dirty_count": 0,
+        "untracked_count": 0
+      },
+      {
+        "path": "/root/workspace/project/quant-v0.6/g2-strategy-discovery",
+        "head": "aab31f8735c8be8f88651ef4677bd0c3a4068cae",
+        "branch": "feature/v06-bline-g2-strategy-discovery-r1",
+        "tracked_dirty_count": 0,
+        "untracked_count": 0
+      },
+      {
+        "path": "/root/workspace/project/quant-v0.6/g2-perp-reconstruction-r2",
+        "head": "2e922f486cf5b3f6cb7fa3aa7823cd096f24c17e",
+        "branch": "feature/v06-bline-g2-perp-reconstruction-r2",
+        "tracked_dirty_count": 0,
+        "untracked_count": 0
+      },
+      {
+        "path": "/root/workspace/project/quant-v0.6/g2-r3-cost-aware-method-design",
+        "head": "e5b2006a89441f7eb2ec900e508aff451106b87a",
+        "branch": "feature/v06-bline-g2-r3-cost-aware-method-design",
+        "tracked_dirty_count": 0,
+        "untracked_count": 0
+      },
+      {
+        "path": "/root/workspace/project/quant-v0.6/g3-operational-readiness",
+        "head": "1b4ba5ace44a84af03a734462b468e597e62c85b",
+        "branch": "feature/v06-bline-g3-operational-readiness-r1",
+        "tracked_dirty_count": 0,
+        "untracked_count": 0
+      },
+      {
+        "path": "/root/workspace/project/quant-v0.6/controller-review",
+        "head": "d6500140f3141d179181f2360ad815b5bfe9c954",
+        "branch": "",
+        "tracked_dirty_count": 0,
+        "untracked_count": 0
+      }
+    ],
+    "after": [
+      {
+        "path": "/root/workspace/project/rc2-tactical-successor",
+        "head": "1a5756663ecf56ed6c02a7355840f33e6715ea22",
+        "branch": "validation/b-line-rc2-final-holdout-infra-repair-r1",
+        "tracked_dirty_count": 0,
+        "untracked_count": 0
+      },
+      {
+        "path": "/root/workspace/project/quant-v0.6/g1-engineering-preview",
+        "head": "efd73496d01a71a158d67343b64695d33fab16a8",
+        "branch": "feature/v06-bline-engineering-preview-r1",
+        "tracked_dirty_count": 0,
+        "untracked_count": 0
+      },
+      {
+        "path": "/root/workspace/project/quant-v0.6/g2-strategy-discovery",
+        "head": "aab31f8735c8be8f88651ef4677bd0c3a4068cae",
+        "branch": "feature/v06-bline-g2-strategy-discovery-r1",
+        "tracked_dirty_count": 0,
+        "untracked_count": 0
+      },
+      {
+        "path": "/root/workspace/project/quant-v0.6/g2-perp-reconstruction-r2",
+        "head": "2e922f486cf5b3f6cb7fa3aa7823cd096f24c17e",
+        "branch": "feature/v06-bline-g2-perp-reconstruction-r2",
+        "tracked_dirty_count": 0,
+        "untracked_count": 0
+      },
+      {
+        "path": "/root/workspace/project/quant-v0.6/g2-r3-cost-aware-method-design",
+        "head": "e5b2006a89441f7eb2ec900e508aff451106b87a",
+        "branch": "feature/v06-bline-g2-r3-cost-aware-method-design",
+        "tracked_dirty_count": 0,
+        "untracked_count": 0
+      },
+      {
+        "path": "/root/workspace/project/quant-v0.6/g3-operational-readiness",
+        "head": "1b4ba5ace44a84af03a734462b468e597e62c85b",
+        "branch": "feature/v06-bline-g3-operational-readiness-r1",
+        "tracked_dirty_count": 0,
+        "untracked_count": 0
+      },
+      {
+        "path": "/root/workspace/project/quant-v0.6/controller-review",
+        "head": "d6500140f3141d179181f2360ad815b5bfe9c954",
+        "branch": "",
+        "tracked_dirty_count": 0,
+        "untracked_count": 0
+      }
+    ],
+    "match": true,
+    "scope": "HEAD/branch/tracked-dirty/untracked counts only; authorized new shared Git refs/worktree registration excluded"
+  },
+  "proof_scope": "Scoped executor command receipts/named source hashes; no universal OS telemetry or claims about other actors",
+  "terminal_decision": "G2_R3_METHOD_REPAIR_REQUIRED_BEFORE_PREREG",
+  "validation": {
+    "json_syntax": "PASS",
+    "documentation_readability_and_claim_scope": "PASS; proposal/issuer-claim/retrieved metadata separated",
+    "documentation_body_hashes_matched": 5,
+    "immutable_git_input_hashes_matched": 7,
+    "allowed_scope": "PASS",
+    "diff_check": "PASS",
+    "request_budget": "PASS; stopped after TLS EOF",
+    "protected_market_endpoint_requests": 0,
+    "implementation_tests": {
+      "run": 0,
+      "status": "NOT_AUTHORIZED_NOT_APPLICABLE"
+    },
+    "worktree_preservation": "7 of7 HEAD/branch/status counts unchanged",
+    "commands": [
+      "JSON parse all three audit JSONs",
+      "SHA256 five retrieved static bodies and seven named Git inputs",
+      "git diff --cached --check",
+      "git diff --cached --name-only plus exact prefix whitelist",
+      "git show :<each staged path> equals validated content",
+      "seven worktree HEAD/branch/status count comparison"
+    ],
+    "source_check_duration_seconds": 0.161964
+  },
+  "local_audit_commit": "Recorded by subsequent publication receipt; no circular self SHA",
+  "remote_audit_commit": "Not yet pushed; independent remote verification required",
+  "real_funds_write_authority": "NONE",
+  "g4_testnet": "NOT_AUTHORIZED",
+  "protected_retry": "FORBIDDEN",
+  "next_controller_action": "CONTROLLER_L2_SOURCE_AUDIT_REVIEW_THEN_SEPARATE_METHOD_REPAIR_AND_SOURCE_CLOSURE_DISPATCH",
+  "new_or_event_level_market_outcome_rows_read": 0,
+  "existing_published_r2_aggregate_report_read": true,
+  "independent_review": {
+    "reviewer": "/root/r2_kernel_review",
+    "iterations": 1,
+    "scope": "only five draft audit artifacts; no network/code/tests/cache/outcomes",
+    "material_findings": 3,
+    "repairs": [
+      "exact TLS EOF failure matches ledger",
+      "minute-mark body coverage BLOCKED/NOT_ASSESSED",
+      "ex-post economic insolvency cannot backdate causal halt"
+    ],
+    "arithmetic": "request/body/header counts, calendar/pagination, funding geometry, rate/power examples checked",
+    "parent_post_repair_verification": "PASS",
+    "independent_second_review": false
+  },
+  "changed_paths": [
+    "docs/strategy_research/g2_r3/source_audit/METHOD_REPAIR_DECISION.md",
+    "docs/strategy_research/g2_r3/source_audit/SOURCE_SEMANTICS_AND_COST_FEASIBILITY.md",
+    "evidence/v0.6/b_line/g2_r3_source_audit/AUDIT_RECEIPT.json",
+    "evidence/v0.6/b_line/g2_r3_source_audit/GATE_MATRIX.json",
+    "evidence/v0.6/b_line/g2_r3_source_audit/SOURCE_METADATA_LEDGER.json"
+  ],
+  "artifact_sha256_excluding_self": {
+    "docs/strategy_research/g2_r3/source_audit/METHOD_REPAIR_DECISION.md": "f7fefe2b4d798dd712a039f8dc5b76d064e17b94171e2dcc4263518899b59dbf",
+    "docs/strategy_research/g2_r3/source_audit/SOURCE_SEMANTICS_AND_COST_FEASIBILITY.md": "435fe0c8a74912e34087c72246047d3843116d54dc7526ec5ffdffa9fa5320a0",
+    "evidence/v0.6/b_line/g2_r3_source_audit/GATE_MATRIX.json": "b6e9d8daa20201786801229ea2b066e464f05bdab8e65871d3bd7068a5fe5ffc",
+    "evidence/v0.6/b_line/g2_r3_source_audit/SOURCE_METADATA_LEDGER.json": "66255105f58c1ee192b75e4b4761bc579841a53774cb045caacda687db31d5e5"
+  }
+}
