@@ -35,3 +35,9 @@ Gemini B: failing and passing causal attacks, tested cost/funding/clock semantic
 **REAL_FUNDS_WRITE_AUTHORITY=NONE; TESTNET=NOT_AUTHORIZED; PROTECTED_RC2_RETRY=FORBIDDEN.**
 
 Templates: prompts/v0.6/b_line/V06_G2_OVERNIGHT_GEMINI_A_DISCOVERY_TEMPLATE_V1.md and prompts/v0.6/b_line/V06_G2_OVERNIGHT_GEMINI_B_VERIFICATION_TEMPLATE_V1.md. Neither is executable until replaced or explicitly incorporated by a future approved dispatch.
+
+## Mandatory historical-data reuse / prior holdout reconciliation (added Controller planning addendum)
+
+Before any new empirical R3 dispatch, see [local history reuse and exposure guard](../../docs/project/V06_G2_LOCAL_HISTORICAL_DATA_REUSE_AND_EXPOSURE_GUARD_V1.md). A prior v0.3.0 audited BTCUSDT dataset from 2021-01 through 2026-07 exists in earlier history and repository manifest (67 Parquet partitions, 2,934,720 1m rows, 6,114 funding events, 210 official archive checksums); this DOES NOT prove those files are currently accessible on disk. Local ETH/SOL multi-year coverage unverified. Reuse already checksummed BTC datasets before redownloading, after a read-only inventory; compare checksum and source grade.
+
+**Critical leakage warning:** original v0.3.0 BTC development [2021-01,2026-02), final holdout [2026-02,2026-08). R3 proposed Feb-Apr development overlaps the old v0.3 holdout and MUST NOT be silently treated as new independent development or unexposed OOS. Controller must reconcile updated authority, exposure ledger and redesign fixed permissible windows BEFORE FIRST_PUSHED_PREREG_SHA/price reads; no change to the currently running R3 method repair dispatch is implied. All permissions and licence gates remain in force.

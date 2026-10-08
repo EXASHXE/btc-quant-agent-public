@@ -1,0 +1,23 @@
+# v0.6 G2 — Existing local multi-year BTC historical data reuse and exposure firewall V1
+
+**CONTROLLER SCOPE: REUSE PLANNING ONLY. No new empirical reads, no unsealing, no trading privileges, no new research dispatch.**
+
+## Previously collected, audited BTCUSDT historical dataset
+Historical v0.3.0 BTC data audit (2026-08-25) and existing public Git manifest establish an **audited historical dataset identity**, not proof the exact Parquet bytes remain on the present host:
+- Binance Public Data, BTCUSDT USD-M perpetual, UTC 1m klines/official mark-price/funding, range [2021-01-01,2026-08-01).
+- 67 year/month Zstandard Parquet partitions (~342 MiB), 2,934,720 1m rows, 0 missing/duplicate minutes, 6,114 funding events, zero missing settlement-associated mark values in the older audit, 210 official source ZIP checksums.
+- Existing Git manifest at `artifacts/research/run0-dev-frozen-v022-seed7-20260825/data_manifest.json` on `v0.6`: logical SHA256 `82d058b2e9e5bfbd20bf36026abec045fb778ddb72582277e0dac00846ae9901`, funding SHA `4fd56440f275c351e521f483309b8a368ab8da66b5b6e070e164f985fc0e6ba3`.
+- Nine historically incomplete monthly mark-price days were reconciled using checksummed official **daily** source, not a synthetic mark-price proxy; still independently revalidate data/checksum, schema and minute-MTM causal availability for G2 R3. Historical archive correctness does not authenticate contemporaneous PIT receipt or actual funding cashflow/settlement.
+- Exact local Parquet root path is **not established by the public manifest**, so future read-only inventory must locate it safely. Do not assert that files are present before filesystem metadata+hash verification. ETHUSDT / SOLUSDT multiple-year coverage is **UNKNOWN** and must be separately inventoried.
+
+## Critical earlier research partition and leakage risk
+Original v0.3.0 audit **declared development [2021-01-01,2026-02-01)** and final HOLDOUT **[2026-02-01,2026-08-01)** for the BTCUSDT dataset. The proposed new R3 development calendar **Feb/Mar/Apr 2026 overlaps that exact historical holdout**, and R2 May/Jun/Jul research also falls inside it by calendar. No newer R3 plan may simply relabel an older historically sealed outcome as a fresh, untouched development cohort.
+Controller must check latest protection authority and whether any partition was already explicitly exposed by past research. Under no circumstances claim such reused or revealed months are **independent blinded OOS**, even if engineering licenses data access. Before new R3 prereg, choose a development window inside already exposed permissible data such as 2021-2025, or separately adjudicate the historical holdout fence; any new calendar requires an ex-ante method amendment and frozen dispatch, NOT agent discretion. No protected v0.3/RC2/H40/H41/A-line outcome body access from this note.
+
+## Practical reuse implementation at future authorized empirical gate
+1. **Read-only inventory first:** locate manifests and Parquet directories, record canonical path, bytes, symbol/product, partition date ranges, schema version, checksums, provenance, original access class and local availability. Do not open return/price rows until active R3 first-pushed prereg+Controller empirical authority. Metadata filename checks are not the same as completeness revalidation.
+2. **Compatible data, no duplicate downloads:** link/copy by immutable read-only local path or a content-addressed fixture cache into task-isolated containers if approved; verify original Git manifest/data sha and immutable sources. Never mutate or move historical dataset, never share a writable DB between Gemini A and B. If BTC already complete, fetch **only missing allowed assets/months/mark/funding**, after separate source/licensing permission and exact prereg.
+3. **Independent verification:** Gemini B validates cached source SHA/schema/timestamp/gap/funding and original mark daily patch, reconciles with developer-A offline snapshots. Historical price/mark/funding are allowed only as **archival-event-time reconstructed** at explicit lag; OI, taker ratios, basis, multi-year L2 cannot be assumed PIT by association. WSL forward derivatives receipts are a distinct, shorter sample.
+4. **Discovery:** make regime-indexing and trade-count/support forecasts from permitted exposed development segments, then run exactly the future frozen candidate budget once. Data breadth increases historical diversity but does not increase the number of *independent signals* by magic.
+
+**READINESS: DATA_REUSE_PLAN_IDENTIFIED, LOCAL_EXISTENCE_NOT_VERIFIED, R3_EMPIRICAL_PERMISSION_NOT_GRANTED. REAL_FUNDS_WRITE_AUTHORITY=NONE.**
