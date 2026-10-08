@@ -1,0 +1,71 @@
+{
+  "schema_version": "B_LINE_V06_G2_R2_HISTORICAL_PERP_RECONSTRUCTION_DISPATCH_V1",
+  "task_id": "V06_B_LINE_G2_R2_HISTORICAL_PERP_RECONSTRUCTION",
+  "controller": "CHATGPT_0_PRIMARY_CONTROLLER_B_LINE",
+  "decision": "AUTHORIZE_NONPROTECTED_DEVELOPMENT_DATA_HISTORICAL_RECONSTRUCTION_ONLY",
+  "repo": "EXASHXE/btc-quant-agent-public",
+  "code_start_sha": "a56cc413d87a71111f2be02f10052dced9ff0275",
+  "source_lineage": {
+    "g2_r1_terminal": "aab31f8735c8be8f88651ef4677bd0c3a4068cae",
+    "g2_r1_first_pushed_method": "a46b0537c592f5d90a166aebe94737363f1706c0",
+    "g2_r1_decision": "VALID_SOURCE_BLOCKED__NOT_NO_GO__ZERO_EMPIRICAL_OUTCOMES",
+    "g1_integrated_code_sha": "a56cc413d87a71111f2be02f10052dced9ff0275"
+  },
+  "working_branch": "feature/v06-bline-g2-perp-reconstruction-r2",
+  "isolated_worktree": "/root/workspace/project/quant-v0.6/g2-perp-reconstruction-r2",
+  "protected_worktrees": [
+    "/root/workspace/project/rc2-tactical-successor",
+    "/root/workspace/project/quant-v0.6/g1-engineering-preview",
+    "/root/workspace/project/quant-v0.6/g2-strategy-discovery",
+    "/root/workspace/project/quant-v0.6/controller-review"
+  ],
+  "data_contract": {
+    "venue": "Binance",
+    "market_type": "USDT_M_PERPETUAL_FUTURES",
+    "symbols": [
+      "BTCUSDT",
+      "ETHUSDT",
+      "SOLUSDT"
+    ],
+    "data_privilege": "PUBLIC_UNAUTHENTICATED_READ_ONLY",
+    "historical_dataset": "ARCHIVAL_EVENT_TIME_RECONSTRUCTION_NOT_CONTEMPORANEOUS_RECEIPT_PROOF",
+    "protected_rc2_symbols": "FORBIDDEN_ZEC_HYPE_ORCA_PUMP_NMR_BR_RLC_QNT",
+    "candidate_max": 12,
+    "before_outcomes": "REQUIRED_IMMUTABLE_PREREG_COMMIT_AND_REMOTE_PUSH",
+    "cost_model": "FROZEN_CONSERVATIVE_COST_AND_FUNDING_STRESS",
+    "sample_classification": "PRIOR_EXPOSED_DEVELOPMENT_NO_INDEPENDENT_HOLDOUT"
+  },
+  "source_reuse": "R1_SIDE_CAR_CODE_REUSABLE_VIA_PROVENANCE_LOGGED_FILE_LEVEL_IMPORT_ONLY__R1_PREREG_READ_ONLY",
+  "editable_paths": [
+    "src/btc_quant_agent/strategy_research/**",
+    "scripts/strategy_research/**",
+    "configs/strategy_research/**",
+    "tests/test_strategy_research_*.py",
+    "docs/strategy_research/**",
+    "evidence/v0.6/b_line/g2_reconstruction_r2/**"
+  ],
+  "forbidden_paths": [
+    "src/btc_quant_agent/h40/**",
+    "src/btc_quant_agent/h41/**",
+    "src/btc_quant_agent/market_watch/**",
+    "src/btc_quant_agent/approval/**",
+    "src/btc_quant_agent/decision/**",
+    "src/btc_quant_agent/execution/**",
+    "src/btc_quant_agent/api.py",
+    "src/btc_quant_agent/config.py",
+    "scripts/rc2/validation/**",
+    "evidence/v0.5.5/**",
+    "evidence/v0.6/controller/**",
+    ".github/workflows/**"
+  ],
+  "protected_outcome_reads": "FORBIDDEN",
+  "rc2_retry": "NOT_AUTHORIZED",
+  "testnet": "NOT_AUTHORIZED",
+  "real_funds_write_authority": "NONE",
+  "terminal_quality": "EXPLORATORY_ONLY__NO_ALPHA_PASS__NO_RELEASE",
+  "executor": "SOL_HIGH_METHOD_DESIGN_AND_CRITIQUE__GEMINI_DATA_IMPLEMENTATION",
+  "executor_terminal": "AUTO_COMMIT_PUSH_VERIFY_SHA_FIRST_FREEZE_AND_FINAL_CODE",
+  "g1_post_merge_ci": "https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/37778010147",
+  "prompt_path": "prompts/v0.6/b_line/V06_G2_R2_HISTORICAL_PERP_RECONSTRUCTION_DISCOVERY.md",
+  "contract_path": "docs/project/V0.6_G2_R2_PERP_HISTORICAL_RECONSTRUCTION_CONTRACT.md"
+}
