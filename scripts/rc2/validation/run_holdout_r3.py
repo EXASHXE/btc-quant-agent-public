@@ -92,7 +92,7 @@ from scripts.rc2.validation.target_seal import (
 
 # Hard-coded Frozen Constants
 TASK_ID = "RC2_HOLDOUT_R3_EXECUTION"
-REPAIR_TASK_ID = "RC2_FINAL_HOLDOUT_SOURCE_NORMALIZER_AND_DISPATCH_INFRA_REPAIR_R1"
+REPAIR_TASK_ID = "RC2_FINAL_HOLDOUT_SOURCE_NORMALIZER_AND_DISPATCH_INFRA_REPAIR_R1_1_BOUNDED_COMPLETION"
 BRANCH = "validation/b-line-rc2-final-holdout-infra-repair-r1"
 START_SHA = "d51abdcfa982be132a6fae6c84776f343fae893c"
 FROZEN_POLICY_SHA = "10be512f2cf4d7eccdc8a9849c925b5f73c568fd"
@@ -104,8 +104,29 @@ ACCEPTED_NORMALIZER_SHA256 = "04d0dd3c21800ca2df9cbabada1a010cb6c02396f3b3c17e0d
 RETRY_AUTHORITY_REL_PATH = "evidence/v0.5.5/controller/B_LINE_RC2_FINAL_HOLDOUT_RETRY_AUTHORITY.json"
 ORIGINAL_INCIDENT_EVIDENCE_COMMIT = "6f9b9bd1606c06664129b43293699fd05abd3297"
 CONTROLLER_DOCS_REF = "origin/v0.5.5-docs"
-RETRY_AUTHORITY_SCHEMA_VERSION_PREFIX = "B_LINE_RC2_FINAL_HOLDOUT_RETRY_AUTHORITY"
+RETRY_AUTHORITY_SCHEMA_VERSION = "B_LINE_RC2_FINAL_HOLDOUT_RETRY_AUTHORITY_V1"
 REQUIRED_DECISION = "AUTHORIZE_ONE_SAME_TARGET_INFRA_RETRY"
+
+REQUIRED_AUTHORITY_KEYS: frozenset[str] = frozenset(
+    {
+        "schema_version",
+        "decision",
+        "max_attempts",
+        "real_funds_write_authority",
+        "authorized_runner_sha",
+        "authorized_runner_sha256",
+        "target_seal_sha256",
+        "frozen_policy_sha",
+        "original_incident_evidence_commit",
+        "target_symbols",
+    }
+)
+
+DEFAULT_CLAIM_DIR = ROOT / "evidence/v0.5.5/tactical-policy/RC2/.claims"
+CLAIM_STATUS_CLAIMED = "CLAIMED"
+CLAIM_STATUS_CONSUMED = "CONSUMED"
+CLAIM_STATUS_FAILED = "FAILED"
+L3_DISTRIBUTED_ONE_SHOT_FENCE_STATUS = "L3_DISTRIBUTED_ONE_SHOT_FENCE_NOT_PROVEN"
 
 # Generic Runner: Target set is empty by default; populated ONLY from external TARGET_SEAL
 TARGETS: tuple[str, ...] = ()
@@ -1521,6 +1542,103 @@ def write_attempt_receipt(
     return receipt
 
 
+def compute_claim_key(dispatch_sha: str, runner_sha: str, seal_sha256: str) -> str:
+    """Deterministic hash binding dispatch SHA, runner SHA, and target seal SHA256."""
+    return hashlib.sha256(f"{dispatch_sha}:{runner_sha}:{seal_sha256}".encode()).hexdigest()
+
+
+def claim_one_shot_dispatch(
+    dispatch_sha: str,
+    runner_sha: str,
+    seal_sha256: str,
+    claim_dir: Path = DEFAULT_CLAIM_DIR,
+) -> tuple[bool, str, dict[str, Any]]:
+    """Atomically claim a one-shot execution dispatch (Finding B).
+
+    Guarantees:
+    - POSIX atomic mutual exclusion on the local filesystem via O_CREAT | O_EXCL.
+    - Transitions from UNUSED -> CLAIMED.
+    - Subsequent executions on the same dispatch_sha/runner/seal key are rejected fail-closed.
+    - If a crash occurs after claiming, state remains CLAIMED and budget is never automatically reset.
+    - Note: Cross-host distributed one-shot safety across unshared filesystems is explicitly
+      unproven without an external distributed consensus coordinator.
+    """
+    claim_key = compute_claim_key(dispatch_sha, runner_sha, seal_sha256)
+    claim_dir.mkdir(parents=True, exist_ok=True)
+    claim_path = claim_dir / f"{claim_key}.json"
+
+    if claim_path.exists():
+        try:
+            existing = json.loads(claim_path.read_text(encoding="utf-8"))
+        except Exception:  # noqa: BLE001
+            existing = {"raw": "unparseable"}
+        status = existing.get("status", "UNKNOWN")
+        claimed_at = existing.get("claimed_at_utc", "unknown")
+        pid = existing.get("pid", "unknown")
+        terminal = existing.get("terminal")
+        msg = (
+            f"One-shot dispatch '{dispatch_sha}' has already been claimed/consumed "
+            f"(claim_key='{claim_key}', status='{status}', claimed_at='{claimed_at}', pid={pid}, terminal={terminal})"
+        )
+        return False, msg, existing
+
+    payload = {
+        "schema_version": "RC2_ONE_SHOT_CLAIM_V1",
+        "claim_key": claim_key,
+        "dispatch_sha": dispatch_sha,
+        "authorized_runner_sha": runner_sha,
+        "target_seal_sha256": seal_sha256,
+        "status": CLAIM_STATUS_CLAIMED,
+        "claimed_at_utc": datetime.now(UTC).isoformat(),
+        "pid": os.getpid(),
+        "hostname": os.uname().nodename,
+        "distributed_one_shot_fence": L3_DISTRIBUTED_ONE_SHOT_FENCE_STATUS,
+        "finalized_at_utc": None,
+        "terminal": None,
+    }
+
+    try:
+        fd = os.open(str(claim_path), os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o644)
+        with os.fdopen(fd, "w", encoding="utf-8") as f:
+            f.write(json.dumps(payload, indent=2) + "\n")
+        return True, "", payload
+    except FileExistsError:
+        try:
+            existing = json.loads(claim_path.read_text(encoding="utf-8"))
+        except Exception:  # noqa: BLE001
+            existing = {"raw": "unparseable"}
+        msg = f"Concurrent contender claimed one-shot dispatch '{dispatch_sha}' simultaneously"
+        return False, msg, existing
+
+
+def finalize_one_shot_claim(
+    dispatch_sha: str,
+    runner_sha: str,
+    seal_sha256: str,
+    terminal: str,
+    status: str,
+    claim_dir: Path = DEFAULT_CLAIM_DIR,
+) -> dict[str, Any]:
+    """Transition claim status to CONSUMED or FAILED upon completion or terminal defect."""
+    claim_key = compute_claim_key(dispatch_sha, runner_sha, seal_sha256)
+    claim_path = claim_dir / f"{claim_key}.json"
+    if not claim_path.exists():
+        return {}
+    try:
+        payload = json.loads(claim_path.read_text(encoding="utf-8"))
+    except Exception:  # noqa: BLE001
+        payload = {"claim_key": claim_key}
+
+    payload["status"] = status
+    payload["finalized_at_utc"] = datetime.now(UTC).isoformat()
+    payload["terminal"] = terminal
+    try:
+        claim_path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+    except Exception:  # noqa: BLE001, S110
+        pass
+    return payload
+
+
 def finalize_failed_attempt(
     staging_dir: Path,
     *,
@@ -1542,8 +1660,9 @@ def finalize_failed_attempt(
     post_identity: dict[str, Any] | None = None,
     source_bundle_manifest: dict[str, Any] | None = None,
     detail: dict[str, Any] | None = None,
+    claim_dir: Path = DEFAULT_CLAIM_DIR,
 ) -> dict[str, Any]:
-    """Centralized failure closure helper for execution defects and exceptions (Fix #2).
+    """Centralized failure closure helper for execution defects and exceptions (Fix #2, Findings B & C).
 
     Ensures that once protected source access begins, every terminal failure path
     produces a durable, self-contained authority receipt and evidence payload before returning.
@@ -1564,6 +1683,63 @@ def finalize_failed_attempt(
             except Exception:  # noqa: BLE001, S110
                 pass
 
+    # Finding C: Safely recapture post-failure runtime identity without reading protected data
+    if post_identity is None:
+        try:
+            captured_post = capture_execution_identity(
+                task_id=TASK_ID,
+                root=ROOT,
+                expected_branch=BRANCH,
+                script_paths=VALIDATION_SCRIPTS,
+            )
+            captured_dict = captured_post.to_dict()
+            if pre_identity is not None:
+                try:
+                    verified_post = verify_execution_identity(
+                        pre_identity=pre_identity,
+                        root=ROOT,
+                        script_paths=VALIDATION_SCRIPTS,
+                    )
+                    post_identity = {
+                        "status": "CAPTURED",
+                        "recaptured_post_failure": True,
+                        "identity": verified_post,
+                        "exact_runner_identity_verified": verified_post.get("exact_runner_identity_verified", False),
+                    }
+                except Exception as verify_err:  # noqa: BLE001
+                    post_identity = {
+                        "status": "UNKNOWN_OR_INVALID",
+                        "recaptured_post_failure": True,
+                        "capture_error": f"Verification error: {type(verify_err).__name__}: {verify_err}",
+                        "exact_runner_identity_verified": False,
+                        "raw_post_identity": captured_dict,
+                    }
+            else:
+                post_identity = {
+                    "status": "CAPTURED_NO_PRE_IDENTITY",
+                    "recaptured_post_failure": True,
+                    "identity": captured_dict,
+                    "exact_runner_identity_verified": False,
+                }
+        except Exception as capture_err:  # noqa: BLE001
+            post_identity = {
+                "status": "UNKNOWN_OR_INVALID",
+                "recaptured_post_failure": False,
+                "capture_error": f"{type(capture_err).__name__}: {capture_err}",
+                "exact_runner_identity_verified": False,
+            }
+
+    # Finding B: Finalize one-shot dispatch claim to FAILED on failure
+    if execution_dispatch_sha and authorized_runner_sha and authorized_target_seal_sha256:
+        finalize_one_shot_claim(
+            dispatch_sha=execution_dispatch_sha,
+            runner_sha=authorized_runner_sha,
+            seal_sha256=authorized_target_seal_sha256,
+            terminal=terminal,
+            status=CLAIM_STATUS_FAILED,
+            claim_dir=claim_dir,
+        )
+
     # Ensure baseline auxiliary stubs exist in staging
     if not (staging_dir / "OUTPUT_MANIFEST.json").exists():
         _json_write(
@@ -1581,7 +1757,7 @@ def finalize_failed_attempt(
     if not (staging_dir / "EXECUTION_IDENTITY.json").exists():
         _json_write(
             staging_dir / "EXECUTION_IDENTITY.json",
-            post_identity or pre_id_dict or {"verified": False, "phase": phase},
+            post_identity,
         )
 
     receipt = write_attempt_receipt(
@@ -1634,6 +1810,8 @@ def finalize_failed_attempt(
         "access_ledger": ledger_summary,
         "pre_identity": pre_id_dict,
         "post_identity": post_identity,
+        "execution_identity": post_identity,
+        "distributed_one_shot_fence": L3_DISTRIBUTED_ONE_SHOT_FENCE_STATUS,
         "source_bundle_status": "AVAILABLE" if source_bundle_manifest else "NOT_AVAILABLE",
         "timestamp_utc": datetime.now(UTC).isoformat(),
         **(detail or {}),
@@ -1722,22 +1900,24 @@ def validate_retry_dispatch_authority(
     root: Path = ROOT,
     docs_ref: str = CONTROLLER_DOCS_REF,
 ) -> tuple[bool, list[str], dict[str, Any]]:
-    """Validate external Controller retry dispatch authority from immutable Git docs commit (R1 Finding II).
+    """Validate external Controller retry dispatch authority from immutable Git docs commit (Finding A).
 
     Preflight assertions:
     1. Docs trust root ref (origin/v0.5.5-docs) must exist in local repository (fails closed if not fetched).
     2. Dispatch commit must be an ancestor of docs trust root ref (git merge-base --is-ancestor).
     3. Immutable authority artifact B_LINE_RC2_FINAL_HOLDOUT_RETRY_AUTHORITY.json must exist in dispatch commit (git show).
     4. Authority JSON must conform to strict fixed schema:
+       - Exact schema version == "B_LINE_RC2_FINAL_HOLDOUT_RETRY_AUTHORITY_V1" (no prefix/suffix tolerance)
+       - Exact required key set: no missing required keys, no unknown/extra unsupported keys
        - decision == "AUTHORIZE_ONE_SAME_TARGET_INFRA_RETRY"
-       - max_attempts == 1
+       - max_attempts == 1 of exact type int (bool-as-int rejected)
        - real_funds_write_authority == "NONE"
-       - exact match on authorized_runner_sha
-       - exact match on authorized_runner_sha256
-       - exact match on target_seal_sha256
-       - exact match on frozen_policy_sha
+       - exact match on authorized_runner_sha (40-hex lowercase)
+       - exact match on authorized_runner_sha256 (64-hex lowercase)
+       - exact match on target_seal_sha256 (64-hex lowercase)
+       - exact match on frozen_policy_sha ("10be512f2cf4d7eccdc8a9849c925b5f73c568fd")
        - exact match on original_incident_evidence_commit ("6f9b9bd1606c06664129b43293699fd05abd3297")
-       - if target_symbols present: exact match on sealed_targets (no target substitution)
+       - target_symbols is mandatory list[str], non-empty, uppercase, distinct, exact content AND order == sealed_targets
     """
     reasons: list[str] = []
     auth_data: dict[str, Any] = {}
@@ -1801,67 +1981,108 @@ def validate_retry_dispatch_authority(
         reasons.append("Authority artifact JSON root must be an object")
         return False, reasons, auth_data
 
-    # 4. Strict Schema & Field Validations
+    # 4. Strict Schema & Field Validations (Finding A)
+    keys_present = set(auth_data.keys())
+    missing_keys = REQUIRED_AUTHORITY_KEYS - keys_present
+    if missing_keys:
+        reasons.append(f"Authority artifact missing required fields: {sorted(missing_keys)}")
+
+    extra_keys = keys_present - REQUIRED_AUTHORITY_KEYS
+    if extra_keys:
+        reasons.append(f"Authority artifact contains unsupported extra fields: {sorted(extra_keys)}")
+
+    # Exact schema version match (rejects prefix/suffix manipulation)
     schema_version = auth_data.get("schema_version")
-    if not isinstance(schema_version, str) or not schema_version.startswith(RETRY_AUTHORITY_SCHEMA_VERSION_PREFIX):
+    if schema_version != RETRY_AUTHORITY_SCHEMA_VERSION:
         reasons.append(
             f"Authority schema_version mismatch: observed='{schema_version}' "
-            f"expected prefix '{RETRY_AUTHORITY_SCHEMA_VERSION_PREFIX}'"
+            f"expected exact '{RETRY_AUTHORITY_SCHEMA_VERSION}'"
         )
 
     decision = auth_data.get("decision")
     if decision != REQUIRED_DECISION:
         reasons.append(f"Authority decision mismatch: observed='{decision}' expected='{REQUIRED_DECISION}'")
 
+    # Strict type checking: bool-as-int rejected!
     max_attempts = auth_data.get("max_attempts")
-    if max_attempts != 1:
-        reasons.append(f"Authority max_attempts mismatch: observed={max_attempts} expected=1")
+    if type(max_attempts) is not int or max_attempts != 1:
+        reasons.append(
+            f"Authority max_attempts mismatch: observed={max_attempts!r} (type={type(max_attempts).__name__}) "
+            "expected int 1 (bool-as-int rejected)"
+        )
 
     real_funds = auth_data.get("real_funds_write_authority")
     if real_funds != "NONE":
         reasons.append(f"Authority real_funds_write_authority mismatch: observed='{real_funds}' expected='NONE'")
 
+    # SHA formatting and exact value checks
     auth_runner_sha = auth_data.get("authorized_runner_sha")
-    if auth_runner_sha != authorized_runner_sha:
+    if not isinstance(auth_runner_sha, str) or not re.fullmatch(r"^[0-9a-f]{40}$", auth_runner_sha):
+        reasons.append(f"Authority runner SHA invalid format: observed='{auth_runner_sha}'")
+    elif auth_runner_sha != authorized_runner_sha:
         reasons.append(
             f"Authority runner SHA mismatch: authority='{auth_runner_sha}' "
             f"caller='{authorized_runner_sha}'"
         )
 
     auth_runner_sha256 = auth_data.get("authorized_runner_sha256")
-    if auth_runner_sha256 != authorized_runner_sha256:
+    if not isinstance(auth_runner_sha256, str) or not re.fullmatch(r"^[0-9a-f]{64}$", auth_runner_sha256):
+        reasons.append(f"Authority runner SHA256 invalid format: observed='{auth_runner_sha256}'")
+    elif auth_runner_sha256 != authorized_runner_sha256:
         reasons.append(
             f"Authority runner SHA256 mismatch: authority='{auth_runner_sha256}' "
             f"caller='{authorized_runner_sha256}'"
         )
 
     auth_seal_sha256 = auth_data.get("target_seal_sha256")
-    if auth_seal_sha256 != authorized_target_seal_sha256:
+    if not isinstance(auth_seal_sha256, str) or not re.fullmatch(r"^[0-9a-f]{64}$", auth_seal_sha256):
+        reasons.append(f"Authority target seal SHA256 invalid format: observed='{auth_seal_sha256}'")
+    elif auth_seal_sha256 != authorized_target_seal_sha256:
         reasons.append(
             f"Authority target seal SHA256 mismatch: authority='{auth_seal_sha256}' "
             f"caller='{authorized_target_seal_sha256}'"
         )
 
     frozen_pol_sha = auth_data.get("frozen_policy_sha")
-    if frozen_pol_sha != FROZEN_POLICY_SHA:
+    if not isinstance(frozen_pol_sha, str) or not re.fullmatch(r"^[0-9a-f]{40}$", frozen_pol_sha):
+        reasons.append(f"Authority frozen policy SHA invalid format: observed='{frozen_pol_sha}'")
+    elif frozen_pol_sha != FROZEN_POLICY_SHA:
         reasons.append(
             f"Authority frozen policy SHA mismatch: authority='{frozen_pol_sha}' "
             f"expected='{FROZEN_POLICY_SHA}'"
         )
 
     bound_incident_commit = auth_data.get("original_incident_evidence_commit")
-    if bound_incident_commit != ORIGINAL_INCIDENT_EVIDENCE_COMMIT:
+    if not isinstance(bound_incident_commit, str) or not re.fullmatch(r"^[0-9a-f]{40}$", bound_incident_commit):
+        reasons.append(f"Authority original incident commit invalid format: observed='{bound_incident_commit}'")
+    elif bound_incident_commit != ORIGINAL_INCIDENT_EVIDENCE_COMMIT:
         reasons.append(
             f"Authority original incident commit mismatch: authority='{bound_incident_commit}' "
             f"expected='{ORIGINAL_INCIDENT_EVIDENCE_COMMIT}'"
         )
 
+    # Mandatory, strictly ordered target_symbols validation (Finding A.2)
     auth_targets = auth_data.get("target_symbols")
-    if auth_targets is not None and tuple(auth_targets) != sealed_targets:
+    if not isinstance(auth_targets, list) or isinstance(auth_targets, (str, bytes)):
         reasons.append(
-            f"Authority target substitution detected: authority={tuple(auth_targets)} "
-            f"sealed={sealed_targets}"
+            f"Authority target_symbols must be a list: observed type {type(auth_targets).__name__}"
         )
+    elif len(auth_targets) == 0:
+        reasons.append("Authority target_symbols must not be empty")
+    else:
+        bad_symbols = [
+            s for s in auth_targets
+            if not isinstance(s, str) or not s.isupper() or not re.fullmatch(r"^[A-Z0-9]+$", s)
+        ]
+        if bad_symbols:
+            reasons.append(f"Authority target_symbols contains malformed symbols: {bad_symbols}")
+        elif len(auth_targets) != len(set(auth_targets)):
+            reasons.append(f"Authority target_symbols contains duplicates: {auth_targets}")
+        elif tuple(auth_targets) != sealed_targets:
+            reasons.append(
+                f"Authority target_symbols mismatch (substitution, omission, or ordering): "
+                f"authority={tuple(auth_targets)} sealed={sealed_targets}"
+            )
 
     return len(reasons) == 0, reasons, auth_data
 
@@ -2082,9 +2303,9 @@ def verify_freeze_repair_identity(root: Path = ROOT) -> dict[str, Any]:
 
     return {
         "task_id": REPAIR_TASK_ID,
-        "terminal": "RC2_FINAL_HOLDOUT_INFRA_REPAIR_R1_READY_FOR_CONTROLLER"
+        "terminal": "RC2_FINAL_HOLDOUT_INFRA_REPAIR_R1_1_READY_FOR_CONTROLLER"
         if repair_ok
-        else "RC2_FINAL_HOLDOUT_INFRA_REPAIR_R1_BLOCKED",
+        else "RC2_FINAL_HOLDOUT_INFRA_REPAIR_R1_1_BLOCKED",
         "branch": branch,
         "head": head,
         "start_sha": START_SHA,
@@ -2107,6 +2328,7 @@ def verify_freeze_repair_identity(root: Path = ROOT) -> dict[str, Any]:
         "protected_market_archive_access": 0,
         "protected_target_network_access_count": 0,
         "r3_target_admissibility": R3_TARGET_ADMISSIBILITY,
+        "distributed_one_shot_fence": L3_DISTRIBUTED_ONE_SHOT_FENCE_STATUS,
         "freeze_verified": repair_ok,
         "repair_verified": repair_ok,
     }
@@ -2122,6 +2344,7 @@ def execute_holdout(
     evidence_dir: Path = DEFAULT_EVIDENCE_DIR,
     root: Path = ROOT,
     docs_ref: str = CONTROLLER_DOCS_REF,
+    claim_dir: Path = DEFAULT_CLAIM_DIR,
 ) -> None:
     """Execute the full holdout under strict Controller authorization and staged publication (R2.1-R2.8)."""
     # R2.7: Fail closed if final authority directory pre-exists
@@ -2160,6 +2383,22 @@ def execute_holdout(
     proof = auth_detail.get("proof")
     if not auth_ok or proof is None:
         write_preflight_failure(terminal, auth_detail, staging_dir, phase="AUTHORIZATION")
+        return
+
+    # Finding B: Atomically claim one-shot dispatch before creating capability
+    claim_ok, claim_err, claim_payload = claim_one_shot_dispatch(
+        dispatch_sha=execution_dispatch_sha,
+        runner_sha=authorized_runner_sha,
+        seal_sha256=authorized_target_seal_sha256,
+        claim_dir=claim_dir,
+    )
+    if not claim_ok:
+        write_preflight_failure(
+            "RC2_HOLDOUT_R3_PREFLIGHT_FAIL",
+            {"error": claim_err, "claim_payload": claim_payload},
+            staging_dir,
+            phase="AUTHORIZATION",
+        )
         return
 
     # Capture pre-execution identity
@@ -2509,6 +2748,7 @@ def execute_holdout(
             "target_outcome_replay_started": True,
             "target_outcomes_resolved": True,
             "access_ledger": ledger.summary(),
+            "distributed_one_shot_fence": L3_DISTRIBUTED_ONE_SHOT_FENCE_STATUS,
         }
         _json_write(staging_dir / "EVIDENCE.json", evidence_payload)
 
@@ -2536,6 +2776,16 @@ def execute_holdout(
             pre_identity=pre_identity.to_dict(),
             source_bundle_status="AVAILABLE",
             access_ledger=ledger.summary(),
+        )
+
+        # Finding B: Finalize claim to CONSUMED upon completion
+        finalize_one_shot_claim(
+            dispatch_sha=execution_dispatch_sha,
+            runner_sha=authorized_runner_sha,
+            seal_sha256=authorized_target_seal_sha256,
+            terminal=terminal,
+            status=CLAIM_STATUS_CONSUMED,
+            claim_dir=claim_dir,
         )
 
         # Step 13: PUBLICATION
@@ -2571,6 +2821,7 @@ def execute_holdout(
             pre_identity=pre_identity,
             post_identity=post_identity,
             source_bundle_manifest=source_bundle_manifest,
+            claim_dir=claim_dir,
         )
 
 
@@ -2580,7 +2831,7 @@ verify_freeze_identity = verify_freeze_repair_identity
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="RC2 Holdout R3 Authoritative Generic Runner (Repair R2)"
+        description="RC2 Holdout R3 Authoritative Generic Runner (Infra Repair R1.1 Bounded Completion)"
     )
     parser.add_argument(
         "--execute",
@@ -2624,6 +2875,12 @@ def main() -> None:
         help="Target final authority evidence directory (must not pre-exist)",
     )
     parser.add_argument(
+        "--claim-dir",
+        type=Path,
+        default=DEFAULT_CLAIM_DIR,
+        help="One-shot dispatch claim directory (default: evidence/v0.5.5/tactical-policy/RC2/.claims)",
+    )
+    parser.add_argument(
         "--docs-ref",
         type=str,
         default=CONTROLLER_DOCS_REF,
@@ -2660,6 +2917,7 @@ def main() -> None:
             authorized_target_seal_sha256=args.authorized_target_seal_sha256,
             evidence_dir=args.evidence_dir,
             docs_ref=args.docs_ref,
+            claim_dir=args.claim_dir,
         )
     else:
         # Review mode: verify repair state without execution
@@ -2679,6 +2937,7 @@ def main() -> None:
         print(f"Holdout Executed: {info['holdout_executed']}")
         print(f"Replacement Target Seal Committed: {info['replacement_target_seal_committed']}")
         print(f"Protected market/archive access: {info['protected_market_archive_access']}")
+        print(f"Distributed One-Shot Fence: {info.get('distributed_one_shot_fence')}")
         print(f"Repair Verified: {info['repair_verified']}")
         print(f"\n{terminal}")
         if not info["repair_verified"]:

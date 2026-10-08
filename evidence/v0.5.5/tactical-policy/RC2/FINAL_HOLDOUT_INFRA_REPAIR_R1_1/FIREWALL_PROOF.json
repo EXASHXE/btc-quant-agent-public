@@ -1,0 +1,31 @@
+{
+  "task_id": "RC2_FINAL_HOLDOUT_SOURCE_NORMALIZER_AND_DISPATCH_INFRA_REPAIR_R1_1_BOUNDED_COMPLETION",
+  "evidence_mode": "HERMETIC_SYNTHETIC_ONLY",
+  "protected_targets": [
+    "ZECUSDT",
+    "HYPEUSDT",
+    "ORCAUSDT",
+    "PUMPUSDT",
+    "NMRUSDT",
+    "BRUSDT",
+    "RLCUSDT",
+    "QNTUSDT"
+  ],
+  "context_only_references": [
+    "BTCUSDT",
+    "ETHUSDT",
+    "SOLUSDT",
+    "LINKUSDT",
+    "SUIUSDT",
+    "XRPUSDT",
+    "DOGEUSDT",
+    "BNBUSDT"
+  ],
+  "protected_target_network_access_count": 0,
+  "protected_market_archive_access_count": 0,
+  "protected_outcome_replay_started": false,
+  "protected_target_outcomes_resolved": false,
+  "holdout_executed": false,
+  "execution_decision": "BOUNDED_REPAIR_REQUIRED__NO_PROTECTED_EXECUTION",
+  "firewall_intact": true
+}

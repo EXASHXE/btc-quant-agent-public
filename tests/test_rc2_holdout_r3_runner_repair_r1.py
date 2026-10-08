@@ -339,11 +339,13 @@ def test_r6_real_guarded_downloader_with_burned_symbol() -> None:
 def test_freeze_repair_identity_function() -> None:
     info = verify_freeze_repair_identity(ROOT)
     assert info["terminal"] in (
+        "RC2_FINAL_HOLDOUT_INFRA_REPAIR_R1_1_READY_FOR_CONTROLLER",
+        "RC2_FINAL_HOLDOUT_INFRA_REPAIR_R1_1_BLOCKED",
+        "RC2_FINAL_HOLDOUT_INFRA_REPAIR_R1_READY_FOR_CONTROLLER",
+        "RC2_FINAL_HOLDOUT_INFRA_REPAIR_R1_BLOCKED",
         "RC2_R3_RUNNER_REPAIR_R1_READY_FOR_EXACT_SHA_REVIEW",
         "RC2_R3_RUNNER_REPAIR_R2_READY_FOR_FRESH_SOL_REVIEW",
         "RC2_R3_RUNNER_REPAIR_R2_BLOCKED",
-        "RC2_FINAL_HOLDOUT_INFRA_REPAIR_R1_READY_FOR_CONTROLLER",
-        "RC2_FINAL_HOLDOUT_INFRA_REPAIR_R1_BLOCKED",
     )
     assert info["branch"] == BRANCH
     assert info["start_sha"] == START_SHA

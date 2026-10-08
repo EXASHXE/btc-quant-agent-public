@@ -40,16 +40,25 @@ from scripts.rc2.validation.r3_access_guard import (
     ExecutionAccessLedger,
 )
 from scripts.rc2.validation.run_holdout_r3 import (
+    CLAIM_STATUS_CLAIMED,
+    CLAIM_STATUS_CONSUMED,
+    CLAIM_STATUS_FAILED,
+    CONTROLLER_DISPATCH_SHA,
+    CONTROLLER_DOCS_REF,
     FROZEN_POLICY_SHA,
+    L3_DISTRIBUTED_ONE_SHOT_FENCE_STATUS,
     ORIGINAL_INCIDENT_EVIDENCE_COMMIT,
     REFERENCES,
     REQUIRED_DECISION,
     RETRY_AUTHORITY_REL_PATH,
+    RETRY_AUTHORITY_SCHEMA_VERSION,
     TASK_ID,
     audit_full_window_production_context,
     build_dataset,
     check_execution_authorization,
+    claim_one_shot_dispatch,
     finalize_failed_attempt,
+    finalize_one_shot_claim,
     validate_retry_dispatch_authority,
 )
 from scripts.rc2.validation.source_normalizer import (
@@ -404,13 +413,15 @@ def test_hermetic_controller_dispatch_authority_positive_and_negative(tmp_path: 
 
     - valid Controller dispatch authority is accepted;
     - decision tampering is rejected;
-    - max_attempts > 1 is rejected;
-    - runner SHA mismatch is rejected;
-    - runner SHA256 mismatch is rejected;
-    - target seal SHA256 mismatch is rejected;
-    - frozen policy SHA mismatch is rejected;
-    - original incident commit mismatch is rejected;
-    - target substitution is rejected;
+    - max_attempts > 1, bool True, float 1.0, string '1' are rejected;
+    - runner SHA mismatch and format errors are rejected;
+    - runner SHA256 mismatch and format errors are rejected;
+    - target seal SHA256 mismatch and format errors are rejected;
+    - frozen policy SHA mismatch and format errors are rejected;
+    - original incident commit mismatch and format errors are rejected;
+    - target substitution, reordering, duplicate, omission, and malformed symbols are rejected;
+    - schema suffix trick and extra unsupported fields are rejected;
+    - missing required fields are rejected;
     - missing docs trust root ref is rejected fail-closed.
     """
     git_dir = tmp_path / "fixture_repo"
@@ -425,8 +436,7 @@ def test_hermetic_controller_dispatch_authority_positive_and_negative(tmp_path: 
     sealed_targets = ("FILUSDT", "ETCUSDT")
 
     valid_authority_payload = {
-        "schema_version": "B_LINE_RC2_FINAL_HOLDOUT_RETRY_AUTHORITY_V1",
-        "task_id": TASK_ID,
+        "schema_version": RETRY_AUTHORITY_SCHEMA_VERSION,
         "decision": REQUIRED_DECISION,
         "max_attempts": 1,
         "authorized_runner_sha": dummy_runner_sha,
@@ -498,32 +508,269 @@ def test_hermetic_controller_dispatch_authority_positive_and_negative(tmp_path: 
         assert mut_ok is False, f"Expected rejection for {expected_err_fragment}"
         assert any(expected_err_fragment in r for r in mut_reasons), f"Reasons: {mut_reasons}"
 
+    def test_rejected_raw_payload(payload: dict[str, Any], expected_err_fragment: str) -> None:
+        auth_file_path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+        subprocess.check_call(["git", "commit", "-am", f"raw mutate {expected_err_fragment}"], cwd=git_dir)
+        mut_sha = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=git_dir, text=True).strip()
+        subprocess.check_call(["git", "branch", "-f", "mock-docs", mut_sha], cwd=git_dir)
+
+        mut_ok, mut_reasons, _ = validate_retry_dispatch_authority(
+            dispatch_sha=mut_sha,
+            authorized_runner_sha=dummy_runner_sha,
+            authorized_runner_sha256=dummy_runner_sha256,
+            authorized_target_seal_sha256=dummy_seal_sha256,
+            sealed_targets=sealed_targets,
+            root=git_dir,
+            docs_ref="mock-docs",
+        )
+        assert mut_ok is False, f"Expected rejection for {expected_err_fragment}"
+        assert any(expected_err_fragment in r for r in mut_reasons), f"Reasons: {mut_reasons}"
+
     # 3. Decision mismatch
     test_rejected_payload({"decision": "UNAUTHORIZED_DECISION"}, "Authority decision mismatch")
 
-    # 4. max_attempts > 1
+    # 4. max_attempts variations (bool, float, string, > 1)
     test_rejected_payload({"max_attempts": 2}, "Authority max_attempts mismatch")
+    test_rejected_payload({"max_attempts": True}, "Authority max_attempts mismatch")
+    test_rejected_payload({"max_attempts": 1.0}, "Authority max_attempts mismatch")
+    test_rejected_payload({"max_attempts": "1"}, "Authority max_attempts mismatch")
 
     # 5. real_funds != NONE
     test_rejected_payload({"real_funds_write_authority": "WRITE"}, "real_funds_write_authority mismatch")
 
-    # 6. runner SHA mismatch
+    # 6. runner SHA mismatch and format
     test_rejected_payload({"authorized_runner_sha": "f" * 40}, "Authority runner SHA mismatch")
+    test_rejected_payload({"authorized_runner_sha": "not_hex"}, "Authority runner SHA invalid format")
+    test_rejected_payload({"authorized_runner_sha": "A" * 40}, "Authority runner SHA invalid format")
 
-    # 7. runner SHA256 mismatch
+    # 7. runner SHA256 mismatch and format
     test_rejected_payload({"authorized_runner_sha256": "f" * 64}, "Authority runner SHA256 mismatch")
+    test_rejected_payload({"authorized_runner_sha256": "short"}, "Authority runner SHA256 invalid format")
 
-    # 8. target seal SHA256 mismatch
+    # 8. target seal SHA256 mismatch and format
     test_rejected_payload({"target_seal_sha256": "f" * 64}, "Authority target seal SHA256 mismatch")
+    test_rejected_payload({"target_seal_sha256": "invalid_seal_hash"}, "target seal SHA256 invalid format")
 
-    # 9. frozen policy SHA mismatch
+    # 9. frozen policy SHA mismatch and format
     test_rejected_payload({"frozen_policy_sha": "0" * 40}, "Authority frozen policy SHA mismatch")
+    test_rejected_payload({"frozen_policy_sha": "bad"}, "frozen policy SHA invalid format")
 
-    # 10. original incident commit mismatch
+    # 10. original incident commit mismatch and format
     test_rejected_payload({"original_incident_evidence_commit": "0" * 40}, "original incident commit mismatch")
+    test_rejected_payload({"original_incident_evidence_commit": "bad"}, "original incident commit invalid format")
 
-    # 11. Target substitution
-    test_rejected_payload({"target_symbols": ["BTCUSDT", "ETHUSDT"]}, "target substitution detected")
+    # 11. Schema suffix trick & extra unsupported fields
+    test_rejected_payload(
+        {"schema_version": f"{RETRY_AUTHORITY_SCHEMA_VERSION}_MALICIOUS"},
+        "Authority schema_version mismatch",
+    )
+    test_rejected_payload({"unsupported_extra_field": "val"}, "unsupported extra fields")
+
+    # 12. Mandatory target_symbols tests:
+    # A. Missing target_symbols
+    test_rejected_raw_payload(
+        {k: v for k, v in valid_authority_payload.items() if k != "target_symbols"},
+        "missing required fields",
+    )
+    # B. None, string, dict target_symbols
+    test_rejected_payload({"target_symbols": None}, "target_symbols must be a list")
+    test_rejected_payload({"target_symbols": "FILUSDT,ETCUSDT"}, "target_symbols must be a list")
+    test_rejected_payload({"target_symbols": {"a": "FILUSDT"}}, "target_symbols must be a list")
+    # C. Empty target_symbols
+    test_rejected_payload({"target_symbols": []}, "target_symbols must not be empty")
+    # D. Malformed symbols (lowercase)
+    test_rejected_payload({"target_symbols": ["filusdt", "etcusdt"]}, "malformed symbols")
+    # E. Duplicate symbols
+    test_rejected_payload({"target_symbols": ["FILUSDT", "FILUSDT"]}, "contains duplicates")
+    # F. Reordered symbols
+    test_rejected_payload({"target_symbols": ["ETCUSDT", "FILUSDT"]}, "target_symbols mismatch")
+    # G. Substituted symbols
+    test_rejected_payload({"target_symbols": ["BTCUSDT", "ETHUSDT"]}, "target_symbols mismatch")
+    # H. Extra symbols
+    test_rejected_payload({"target_symbols": ["FILUSDT", "ETCUSDT", "SOLUSDT"]}, "target_symbols mismatch")
+
+
+def test_development_dispatch_rejected_from_minting_authority() -> None:
+    """Prove that development dispatch CONTROLLER_DISPATCH_SHA cannot mint execution authority."""
+    head = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip()
+    runner_sha256 = hashlib.sha256((ROOT / "scripts/rc2/validation/run_holdout_r3.py").read_bytes()).hexdigest()
+
+    ok, reasons, _ = validate_retry_dispatch_authority(
+        dispatch_sha=CONTROLLER_DISPATCH_SHA,
+        authorized_runner_sha=head,
+        authorized_runner_sha256=runner_sha256,
+        authorized_target_seal_sha256="c" * 64,
+        sealed_targets=("FILUSDT", "ETCUSDT"),
+        root=ROOT,
+        docs_ref=CONTROLLER_DOCS_REF,
+    )
+    assert ok is False
+    assert any("Failed to read authority artifact" in r for r in reasons)
+
+
+def test_one_shot_dispatch_claim_lifecycle_and_concurrency(tmp_path: Path) -> None:
+    """Finding B: Verify durable atomic one-shot dispatch claim lifecycle, crash safety, and contention."""
+    claim_dir = tmp_path / ".claims"
+    dispatch_sha = "d" * 40
+    runner_sha = "r" * 40
+    seal_sha256 = "s" * 64
+
+    # 1. First claim succeeds and enters CLAIMED state
+    ok1, err1, payload1 = claim_one_shot_dispatch(
+        dispatch_sha=dispatch_sha,
+        runner_sha=runner_sha,
+        seal_sha256=seal_sha256,
+        claim_dir=claim_dir,
+    )
+    assert ok1 is True
+    assert err1 == ""
+    assert payload1["status"] == CLAIM_STATUS_CLAIMED
+    assert payload1["distributed_one_shot_fence"] == L3_DISTRIBUTED_ONE_SHOT_FENCE_STATUS
+
+    # 2. Replay attempt with same dispatch is rejected fail-closed
+    ok2, err2, payload2 = claim_one_shot_dispatch(
+        dispatch_sha=dispatch_sha,
+        runner_sha=runner_sha,
+        seal_sha256=seal_sha256,
+        claim_dir=claim_dir,
+    )
+    assert ok2 is False
+    assert "already been claimed/consumed" in err2
+    assert payload2["status"] == CLAIM_STATUS_CLAIMED
+
+    # 3. Simulate crash/restart: process restart sees existing CLAIMED file, no budget reset
+    ok_restart, err_restart, _ = claim_one_shot_dispatch(
+        dispatch_sha=dispatch_sha,
+        runner_sha=runner_sha,
+        seal_sha256=seal_sha256,
+        claim_dir=claim_dir,
+    )
+    assert ok_restart is False
+    assert "already been claimed/consumed" in err_restart
+
+    # 4. Finalize claim transitions: transition to FAILED
+    failed_payload = finalize_one_shot_claim(
+        dispatch_sha=dispatch_sha,
+        runner_sha=runner_sha,
+        seal_sha256=seal_sha256,
+        terminal="RC2_HOLDOUT_R3_INFRA_INCOMPLETE",
+        status=CLAIM_STATUS_FAILED,
+        claim_dir=claim_dir,
+    )
+    assert failed_payload["status"] == CLAIM_STATUS_FAILED
+    assert failed_payload["terminal"] == "RC2_HOLDOUT_R3_INFRA_INCOMPLETE"
+    assert failed_payload["finalized_at_utc"] is not None
+
+    # After failure, subsequent attempt still fails closed
+    ok_after_fail, err_after_fail, _ = claim_one_shot_dispatch(
+        dispatch_sha=dispatch_sha,
+        runner_sha=runner_sha,
+        seal_sha256=seal_sha256,
+        claim_dir=claim_dir,
+    )
+    assert ok_after_fail is False
+    assert "status='FAILED'" in err_after_fail
+
+    # 5. Success transitions to CONSUMED
+    dispatch_success = "e" * 40
+    ok_s, _, _ = claim_one_shot_dispatch(
+        dispatch_sha=dispatch_success,
+        runner_sha=runner_sha,
+        seal_sha256=seal_sha256,
+        claim_dir=claim_dir,
+    )
+    assert ok_s is True
+    consumed_payload = finalize_one_shot_claim(
+        dispatch_sha=dispatch_success,
+        runner_sha=runner_sha,
+        seal_sha256=seal_sha256,
+        terminal="RC2_HOLDOUT_R3_PASS",
+        status=CLAIM_STATUS_CONSUMED,
+        claim_dir=claim_dir,
+    )
+    assert consumed_payload["status"] == CLAIM_STATUS_CONSUMED
+    assert consumed_payload["terminal"] == "RC2_HOLDOUT_R3_PASS"
+
+
+def test_post_failure_identity_recapture_and_resilience(tmp_path: Path) -> None:
+    """Finding C: Recapture post-failure execution identity and handle capture exceptions fail-closed."""
+    evidence_dir = tmp_path / "evidence_recapture"
+    staging_dir = tmp_path / "staging_recapture"
+    staging_dir.mkdir()
+    claim_dir = tmp_path / ".claims"
+
+    ledger = ExecutionAccessLedger(staging_dir / "EXECUTION_ACCESS_LEDGER.json")
+    cap = AccessCapability.construction_review(ledger)
+    cap.check_access("FILUSDT", caller="test")
+
+    # Case 1: Post identity is None -> safely recaptures identity
+    finalize_failed_attempt(
+        staging_dir=staging_dir,
+        evidence_dir=evidence_dir,
+        terminal="RC2_HOLDOUT_R3_INFRA_INCOMPLETE",
+        phase="SOURCE_RETRIEVAL",
+        exception_class="ValueError",
+        exception_message="unexpected empty string",
+        protected_source_access_started=True,
+        outcome_replay_started=False,
+        target_outcomes_resolved=False,
+        authorized_runner_sha="0" * 40,
+        authorized_runner_sha256="0" * 64,
+        execution_dispatch_sha="1" * 40,
+        authorized_target_seal_sha256="2" * 64,
+        target_symbols=("FILUSDT",),
+        ledger=ledger,
+        pre_identity=None,
+        post_identity=None,
+        source_bundle_manifest=None,
+        claim_dir=claim_dir,
+    )
+
+    receipt = json.loads((evidence_dir / "ATTEMPT_RECEIPT.json").read_text())
+    assert receipt["terminal"] == "RC2_HOLDOUT_R3_INFRA_INCOMPLETE"
+    assert receipt["post_identity"] is not None
+    assert receipt["post_identity"]["status"] in ("CAPTURED", "CAPTURED_NO_PRE_IDENTITY")
+
+    evidence = json.loads((evidence_dir / "EVIDENCE.json").read_text())
+    assert evidence["terminal"] == "RC2_HOLDOUT_R3_INFRA_INCOMPLETE"
+    assert evidence["policy_quality_authority"] == "NONE_INFRA_INCOMPLETE"
+    assert evidence["release_authority"] is False
+    assert evidence["real_funds_write_authority"] == "NONE"
+    assert evidence["distributed_one_shot_fence"] == L3_DISTRIBUTED_ONE_SHOT_FENCE_STATUS
+
+    # Case 2: Monkeypatched capture failure -> records UNKNOWN_OR_INVALID without crash
+    staging_dir2 = tmp_path / "staging_recapture_2"
+    staging_dir2.mkdir()
+    evidence_dir2 = tmp_path / "evidence_recapture_2"
+
+    from unittest.mock import patch
+    with patch("scripts.rc2.validation.run_holdout_r3.capture_execution_identity", side_effect=RuntimeError("git failure")):
+        finalize_failed_attempt(
+            staging_dir=staging_dir2,
+            evidence_dir=evidence_dir2,
+            terminal="RC2_HOLDOUT_R3_INFRA_INCOMPLETE",
+            phase="SOURCE_RETRIEVAL",
+            exception_class="RuntimeError",
+            exception_message="git failure",
+            protected_source_access_started=True,
+            outcome_replay_started=False,
+            target_outcomes_resolved=False,
+            authorized_runner_sha="0" * 40,
+            authorized_runner_sha256="0" * 64,
+            execution_dispatch_sha="2" * 40,
+            authorized_target_seal_sha256="2" * 64,
+            target_symbols=("FILUSDT",),
+            ledger=ledger,
+            pre_identity=None,
+            post_identity=None,
+            source_bundle_manifest=None,
+            claim_dir=claim_dir,
+        )
+
+    receipt2 = json.loads((evidence_dir2 / "ATTEMPT_RECEIPT.json").read_text())
+    assert receipt2["post_identity"]["status"] == "UNKNOWN_OR_INVALID"
+    assert receipt2["post_identity"]["exact_runner_identity_verified"] is False
+    assert "git failure" in receipt2["post_identity"]["capture_error"]
 
 
 def test_durable_failure_publication_on_source_retrieval_exception(tmp_path: Path) -> None:

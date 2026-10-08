@@ -1,0 +1,43 @@
+{
+  "task_id": "RC2_FINAL_HOLDOUT_SOURCE_NORMALIZER_AND_DISPATCH_INFRA_REPAIR_R1_1_BOUNDED_COMPLETION",
+  "terminal": "RC2_FINAL_HOLDOUT_INFRA_REPAIR_R1_1_READY_FOR_CONTROLLER",
+  "validation_branch": "validation/b-line-rc2-final-holdout-infra-repair-r1",
+  "start_sha": "abbe5450018f93809939b9fa0d8810b4def833e0",
+  "direct_parent": "abbe5450018f93809939b9fa0d8810b4def833e0",
+  "controller_dispatch_sha": "f1f08ddce7c2820ca7aa0faafadb339a60838ca1",
+  "frozen_policy_sha": "10be512f2cf4d7eccdc8a9849c925b5f73c568fd",
+  "policy_version": "TACTICAL_POLICY_R2_B1",
+  "config_hash": "bba61849e64f37f9",
+  "runner_sha256": "6171994ab839550c0bb42a19217a7bebbf60d43245f03acb7fccddb185e1d4c1",
+  "accepted_normalizer_sha256": "04d0dd3c21800ca2df9cbabada1a010cb6c02396f3b3c17e0df7c8bdb0a23e69",
+  "access_guard_sha256": "db7540b1c385bf7887679c09a57a7d85b6a731144a17e8fd865727aebb78cf52",
+  "target_seal_helper_sha256": "c77d3a28966025b05a28b2c2bf80a20bb95a0ad1f3e933def595609e577b604d",
+  "authorized_target_seal_sha256": "c0fc3577a5b5dd20a20a682f6fcd769196f27bdbb7031b93dd6be2bbfaab9a80",
+  "original_incident_evidence_commit": "6f9b9bd1606c06664129b43293699fd05abd3297",
+  "retry_authority_schema_version": "B_LINE_RC2_FINAL_HOLDOUT_RETRY_AUTHORITY_V1",
+  "distributed_one_shot_fence": "L3_DISTRIBUTED_ONE_SHOT_FENCE_NOT_PROVEN",
+  "findings_addressed": [
+    "FINDING_A_STRICT_IMMUTABLE_EXECUTION_AUTHORITY_SCHEMA",
+    "FINDING_B_ONE_SHOT_EXECUTION_CONSUMPTION",
+    "FINDING_C_EXECUTION_IDENTITY_RECAPTURE_AND_FAILURE_PUBLICATION"
+  ],
+  "preserved_r1_properties": [
+    "STRICT_FINITE_FLOAT_PARSING_PER_FIELD",
+    "ZERO_FILLER_BAN",
+    "DETERMINISTIC_BUCKET_SELECTION_PRESERVED",
+    "FIL_1755_REGRESSION_PRESERVED",
+    "PERMUTATION_INVARIANCE_PRESERVED",
+    "FULL_WINDOW_LOOKBACK_SCANNER_BEFORE_OUTCOME_RESOLUTION"
+  ],
+  "holdout_executed": false,
+  "release_authority": false,
+  "real_funds_write_authority": "NONE",
+  "protected_market_archive_access": 0,
+  "protected_target_network_access_count": 0,
+  "test_static_results": "ALL_PASS",
+  "static_checks": {
+    "compileall": "PASS",
+    "ruff": "PASS",
+    "git_diff_check": "PASS"
+  }
+}

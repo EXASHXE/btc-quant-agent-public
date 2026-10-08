@@ -399,6 +399,8 @@ def test_verify_freeze_identity_function() -> None:
     freeze_info = verify_freeze_identity(ROOT)
 
     assert freeze_info["terminal"] in (
+        "RC2_FINAL_HOLDOUT_INFRA_REPAIR_R1_1_READY_FOR_CONTROLLER",
+        "RC2_FINAL_HOLDOUT_INFRA_REPAIR_R1_1_BLOCKED",
         "RC2_FINAL_HOLDOUT_INFRA_REPAIR_R1_READY_FOR_CONTROLLER",
         "RC2_FINAL_HOLDOUT_INFRA_REPAIR_R1_BLOCKED",
         "RC2_R3_RUNNER_REPAIR_R1_READY_FOR_EXACT_SHA_REVIEW",

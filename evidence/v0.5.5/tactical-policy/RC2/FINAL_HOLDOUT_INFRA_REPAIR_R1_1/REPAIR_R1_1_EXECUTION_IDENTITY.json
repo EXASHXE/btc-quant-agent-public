@@ -1,0 +1,20 @@
+{
+  "task_id": "RC2_FINAL_HOLDOUT_SOURCE_NORMALIZER_AND_DISPATCH_INFRA_REPAIR_R1_1_BOUNDED_COMPLETION",
+  "branch": "validation/b-line-rc2-final-holdout-infra-repair-r1",
+  "start_sha": "abbe5450018f93809939b9fa0d8810b4def833e0",
+  "direct_parent": "abbe5450018f93809939b9fa0d8810b4def833e0",
+  "frozen_policy_sha": "10be512f2cf4d7eccdc8a9849c925b5f73c568fd",
+  "accepted_harness_sha": "cbc903d9ba448059121db96c3572a2677d5b53f8",
+  "controller_dispatch_sha": "f1f08ddce7c2820ca7aa0faafadb339a60838ca1",
+  "original_incident_evidence_commit": "6f9b9bd1606c06664129b43293699fd05abd3297",
+  "config_hash": "bba61849e64f37f9",
+  "policy_version": "TACTICAL_POLICY_R2_B1",
+  "scripts": {
+    "scripts/rc2/validation/run_holdout_r3.py": "6171994ab839550c0bb42a19217a7bebbf60d43245f03acb7fccddb185e1d4c1",
+    "scripts/rc2/validation/source_normalizer.py": "04d0dd3c21800ca2df9cbabada1a010cb6c02396f3b3c17e0df7c8bdb0a23e69",
+    "scripts/rc2/validation/r3_access_guard.py": "db7540b1c385bf7887679c09a57a7d85b6a731144a17e8fd865727aebb78cf52",
+    "scripts/rc2/validation/target_seal.py": "c77d3a28966025b05a28b2c2bf80a20bb95a0ad1f3e933def595609e577b604d"
+  },
+  "authorized_target_seal_sha256": "c0fc3577a5b5dd20a20a682f6fcd769196f27bdbb7031b93dd6be2bbfaab9a80",
+  "distributed_one_shot_fence": "L3_DISTRIBUTED_ONE_SHOT_FENCE_NOT_PROVEN"
+}

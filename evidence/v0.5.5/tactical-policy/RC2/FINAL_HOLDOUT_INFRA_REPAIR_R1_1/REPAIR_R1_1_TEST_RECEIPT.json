@@ -1,0 +1,48 @@
+{
+  "task_id": "RC2_FINAL_HOLDOUT_SOURCE_NORMALIZER_AND_DISPATCH_INFRA_REPAIR_R1_1_BOUNDED_COMPLETION",
+  "test_suites": {
+    "test_rc2_final_holdout_infra_repair_r1": {
+      "file": "tests/test_rc2_final_holdout_infra_repair_r1.py",
+      "status": "PASS",
+      "passed_count": 14,
+      "failed_count": 0,
+      "duration_seconds": 5.34,
+      "tests": [
+        "test_source_normalizer_schema_and_finite_float_parsing",
+        "test_zero_filler_banned",
+        "test_known_fil_archive_regression_remains_1755",
+        "test_pre_first_step_bucket_selection_is_deterministic",
+        "test_metrics_row_permutation_invariance",
+        "test_full_window_missing_middle_lookback_fails_before_outcome_resolution",
+        "test_hermetic_controller_dispatch_authority_positive_and_negative",
+        "test_wrong_execution_dispatch_rejected_before_network",
+        "test_durable_failure_publication_on_source_retrieval_exception",
+        "test_zero_cross_run_cache_reuse_enforced",
+        "test_generic_runner_no_hardcoded_protected_names",
+        "test_development_dispatch_rejected_from_minting_authority",
+        "test_one_shot_dispatch_claim_lifecycle_and_concurrency",
+        "test_post_failure_identity_recapture_and_resilience"
+      ]
+    },
+    "test_rc2_holdout_r3_runner_freeze": {
+      "file": "tests/test_rc2_holdout_r3_runner_freeze.py",
+      "status": "PASS",
+      "passed_count": 10,
+      "failed_count": 0,
+      "duration_seconds": 117.69
+    },
+    "test_rc2_holdout_r3_runner_repair_r1": {
+      "file": "tests/test_rc2_holdout_r3_runner_repair_r1.py",
+      "status": "PASS",
+      "passed_count": 11,
+      "failed_count": 0,
+      "duration_seconds": 107.50
+    }
+  },
+  "static_checks": {
+    "ruff_check": "PASS (0 errors)",
+    "python_compileall": "PASS (0 errors)",
+    "git_diff_check": "PASS (0 errors)"
+  },
+  "protected_target_reads": 0
+}
