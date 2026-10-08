@@ -1,6 +1,6 @@
 """Signal evaluation engine for Structural Continuation and Closed Retest families."""
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from decimal import Decimal
 
 from btc_quant_agent.strategy_research.r3_overnight.constants import (
@@ -37,15 +37,15 @@ class RetestBreakoutState:
     breakout_high: Decimal
     breakout_low: Decimal
     bars_since_breakout: int = 0
-    intermediate_highs: list[Decimal] = None
-    intermediate_lows: list[Decimal] = None
+    intermediate_highs: list[Decimal] = field(default_factory=list)
+    intermediate_lows: list[Decimal] = field(default_factory=list)
     confirmed: bool = False
     canceled: bool = False
 
-    def __post_init__(self):
-        if self.intermediate_highs is None:
+    def __post_init__(self) -> None:
+        if not self.intermediate_highs:
             self.intermediate_highs = [self.breakout_high]
-        if self.intermediate_lows is None:
+        if not self.intermediate_lows:
             self.intermediate_lows = [self.breakout_low]
 
 
@@ -162,10 +162,11 @@ class SignalGenerator:
         ema20_now = ema20_series[-1]
         ema50_now = ema50_series[-1]
 
-        # EMA20 3 bars earlier (need at least 4 valid 4h EMA points)
         if len(ema20_series) < 4 or ema20_series[-4] is None:
             return None
         ema20_3_bars_ago = ema20_series[-4]
+        if ema20_now is None or ema50_now is None or ema20_3_bars_ago is None:
+            return None
 
         # 4h ATR20
         atr20_4h = compute_atr20_4h(bars_4h)

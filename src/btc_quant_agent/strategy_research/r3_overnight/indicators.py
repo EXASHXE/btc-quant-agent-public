@@ -38,7 +38,7 @@ def aggregate_1m_to_1h(bars_1m: list[Bar1m]) -> list[Bar1h]:
         high_val = max(b.high for b in hour_bars)
         low_val = min(b.low for b in hour_bars)
         close_val = hour_bars[-1].close
-        vol_val = sum(b.volume for b in hour_bars)
+        vol_val = sum((b.volume for b in hour_bars), Decimal(0))
 
         result_1h.append(
             Bar1h(
@@ -86,7 +86,7 @@ def aggregate_1m_to_4h(bars_1m: list[Bar1m]) -> list[Bar4h]:
         high_val = max(b.high for b in period_bars)
         low_val = min(b.low for b in period_bars)
         close_val = period_bars[-1].close
-        vol_val = sum(b.volume for b in period_bars)
+        vol_val = sum((b.volume for b in period_bars), Decimal(0))
 
         result_4h.append(
             Bar4h(

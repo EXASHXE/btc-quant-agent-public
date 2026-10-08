@@ -1,0 +1,53 @@
+{
+  "schema_version": "G2_R3_SYNTHETIC_TEST_EXECUTION_RECEIPT_V1",
+  "task_id": "V06_G2_R3_PARALLEL_P0_OFFLINE_PREPARATION",
+  "role": "GEMINI_A",
+  "controller_dispatch_sha": "56f8a9faa1a4539124ab006b49bf42b6e7c997e3",
+  "implementation_sha": "3ebb7db9a1043e58843b518af9381218d9f25af1",
+  "test_framework": "pytest-9.0.3",
+  "python_versions": {
+    "python_3_12": {
+      "path": "/usr/bin/python3.12",
+      "version": "3.12.3",
+      "certified": true,
+      "passed_count": 28,
+      "failed_count": 0,
+      "skipped_count": 0,
+      "exit_code": 0
+    },
+    "python_3_13": {
+      "path": "/root/miniconda3/bin/python3",
+      "version": "3.13.13",
+      "certified": true,
+      "passed_count": 28,
+      "failed_count": 0,
+      "skipped_count": 0,
+      "exit_code": 0
+    }
+  },
+  "linter_status": {
+    "tool": "ruff 0.16.9",
+    "files_checked": 20,
+    "violations_remaining": 0,
+    "exit_code": 0
+  },
+  "fixtures_verified": [
+    "constructed_win_long",
+    "constructed_win_short",
+    "constructed_loss_long_and_short",
+    "stop_before_target_collision_sl_first",
+    "adverse_gap_stop_uses_worse_open",
+    "favorable_target_gap_capped_at_target",
+    "mark_staleness_triggers_veto_and_exit",
+    "negative_collateral_preserved_without_clipping",
+    "funding_charge_across_settlement_window",
+    "no_fill_gap_veto",
+    "future_price_leak_detection_raises_error",
+    "double_fee_check_zero_duplicate_debits"
+  ],
+  "deterministic_book_receipt_hashes": {
+    "base_scenario_hash": "b53cd3089779f54da0d72dd404cae49c43bb8c9683bb304df4fcc20525ad85f9",
+    "stress_scenario_hash": "c476cece5fed6bac9f24511821f8925a6e7ce76933b8bc8177b8a808c1eb1ae7"
+  },
+  "execution_boundary_status": "HERMETIC_NONMARKET_SYNTHETIC_ONLY__ZERO_RAW_MARKET_ACCESS"
+}

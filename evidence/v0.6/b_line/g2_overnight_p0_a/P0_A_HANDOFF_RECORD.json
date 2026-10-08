@@ -1,0 +1,27 @@
+{
+  "schema_version": "G2_R3_HANDOFF_RECORD_V1",
+  "task_id": "V06_G2_R3_PARALLEL_P0_OFFLINE_PREPARATION",
+  "role": "GEMINI_A",
+  "branch": "feature/v06-bline-g2-overnight-discovery-a",
+  "worktree": "g2-overnight-discovery-a",
+  "controller_dispatch_sha": "56f8a9faa1a4539124ab006b49bf42b6e7c997e3",
+  "code_base_sha": "e0ff8c3473de4bfa3e66fe7928d42992a4d38a32",
+  "method_addendum_head_sha": "cf2d5cc33774cdcff7d709636305bba830e977ef",
+  "a_impl_sha": "3ebb7db9a1043e58843b518af9381218d9f25af1",
+  "status": "P0_A_SYNTHETIC_REPLAY_READY_FOR_CONTROLLER",
+  "tests_summary": {
+    "total": 28,
+    "passed": 28,
+    "failed": 0,
+    "skipped": 0,
+    "python_3_12_certified": true,
+    "python_3_13_certified": true
+  },
+  "candidate_count": 8,
+  "ineligible_candidate_status": "STRESS_COST_GEOMETRY_INELIGIBLE_FOR_12H_STRESS",
+  "raw_market_bodies_accessed": 0,
+  "real_funds_write_authority": "NONE",
+  "autotrade": "DISABLED",
+  "testnet": "NOT_AUTHORIZED",
+  "handoff_instructions_for_b": "GEMINI_B may independently audit immutable pushed A_IMPL_SHA (3ebb7db9a1043e58843b518af9381218d9f25af1). B may not edit A source code."
+}

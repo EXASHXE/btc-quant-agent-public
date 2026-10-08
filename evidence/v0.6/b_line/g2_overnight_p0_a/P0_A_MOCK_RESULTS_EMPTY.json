@@ -1,0 +1,82 @@
+{
+  "schema_version": "G2_R3_MOCK_RESULT_SCHEMA_V1",
+  "task_id": "V06_G2_R3_PARALLEL_P0_OFFLINE_PREPARATION",
+  "role": "GEMINI_A",
+  "controller_dispatch_sha": "56f8a9faa1a4539124ab006b49bf42b6e7c997e3",
+  "status": "NO_EMPIRICAL_RESULTS",
+  "empirical_evaluation_authorized": false,
+  "market_data_accessed": false,
+  "candidate_count": 8,
+  "candidates": [
+    {
+      "id": "STRUCTURAL_CONTINUATION_LONG_04H",
+      "family": "STRUCTURAL_CONTINUATION",
+      "direction": "LONG",
+      "horizon": "04H",
+      "geometry_status": "ELIGIBLE",
+      "empirical_results": null
+    },
+    {
+      "id": "STRUCTURAL_CONTINUATION_LONG_12H",
+      "family": "STRUCTURAL_CONTINUATION",
+      "direction": "LONG",
+      "horizon": "12H",
+      "geometry_status": "STRESS_COST_GEOMETRY_INELIGIBLE",
+      "empirical_results": null
+    },
+    {
+      "id": "STRUCTURAL_CONTINUATION_SHORT_04H",
+      "family": "STRUCTURAL_CONTINUATION",
+      "direction": "SHORT",
+      "horizon": "04H",
+      "geometry_status": "ELIGIBLE",
+      "empirical_results": null
+    },
+    {
+      "id": "STRUCTURAL_CONTINUATION_SHORT_12H",
+      "family": "STRUCTURAL_CONTINUATION",
+      "direction": "SHORT",
+      "horizon": "12H",
+      "geometry_status": "STRESS_COST_GEOMETRY_INELIGIBLE",
+      "empirical_results": null
+    },
+    {
+      "id": "CLOSED_RETEST_LONG_04H",
+      "family": "CLOSED_RETEST",
+      "direction": "LONG",
+      "horizon": "04H",
+      "geometry_status": "ELIGIBLE",
+      "empirical_results": null
+    },
+    {
+      "id": "CLOSED_RETEST_LONG_12H",
+      "family": "CLOSED_RETEST",
+      "direction": "LONG",
+      "horizon": "12H",
+      "geometry_status": "STRESS_COST_GEOMETRY_INELIGIBLE",
+      "empirical_results": null
+    },
+    {
+      "id": "CLOSED_RETEST_SHORT_04H",
+      "family": "CLOSED_RETEST",
+      "direction": "SHORT",
+      "horizon": "04H",
+      "geometry_status": "ELIGIBLE",
+      "empirical_results": null
+    },
+    {
+      "id": "CLOSED_RETEST_SHORT_12H",
+      "family": "CLOSED_RETEST",
+      "direction": "SHORT",
+      "horizon": "12H",
+      "geometry_status": "STRESS_COST_GEOMETRY_INELIGIBLE",
+      "empirical_results": null
+    }
+  ],
+  "market_signal_ranking": null,
+  "shortlist": null,
+  "orders_generated": 0,
+  "real_funds_write_authority": "NONE",
+  "testnet": "NOT_AUTHORIZED",
+  "autotrade": "DISABLED"
+}

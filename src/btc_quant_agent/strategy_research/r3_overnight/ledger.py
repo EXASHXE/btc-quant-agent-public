@@ -744,7 +744,8 @@ class VirtualBook:
         """Record minute-close mark-to-market equity."""
         unrealized = Decimal(0)
         for sym, pos in self.positions.items():
-            mark_price = marks_1m.get(sym).close if (sym in marks_1m) else pos.effective_entry
+            m_bar = marks_1m.get(sym)
+            mark_price = m_bar.close if m_bar is not None else pos.effective_entry
             unrealized += pos.quantity * Decimal(pos.direction.sign) * (mark_price - pos.effective_entry)
 
         self.economic_equity = self.cash + unrealized
