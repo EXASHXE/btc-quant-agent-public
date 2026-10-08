@@ -1,9 +1,12 @@
 # v0.6 B-Line G3 Operational Readiness R1 Runbook & Architecture
 
 **TASK_ID:** `V06_B_LINE_G3_OPERATIONAL_READINESS_R1`  
+**REPAIR_TASK_ID:** `V06_G3_EVIDENCE_INTEGRITY_REPAIR_R1`  
+**CONTROLLER_DISPATCH_SHA:** `f315edeaa8986e01af5206eb0d964092e087a839`  
+**PRIOR_DISPATCH_SHA:** `ba60efc078e9bb75bdc728e8875ba48fb69d1752`  
 **BASELINE_SHA:** `a56cc413d87a71111f2be02f10052dced9ff0275`  
 **TARGET_BRANCH:** `feature/v06-bline-g3-operational-readiness-r1`  
-**RUNTIME_SPECIFICATION:** Linux CPython 3.12.3 POSIX Single-Worker  
+**RUNTIME_SPECIFICATION:** Linux CPython 3.12.3 POSIX Single-Worker (WSL2_LINUX_KERNEL Scoped POSIX; Native VM & Container Deployment Unverified)  
 
 ---
 

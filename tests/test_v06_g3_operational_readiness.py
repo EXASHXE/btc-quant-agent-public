@@ -297,6 +297,11 @@ def test_g3_matrix_2_cold_start_sigterm_and_fresh_restart_recovery() -> None:
     - Unapproved intents never convert into orders.
     - Transaction deduplication: identical inserts or intents are idempotent.
     - No orphan positions; PositionSupervisor maintains deterministic state.
+
+    Qualifications:
+    - SIGTERM_SYNTHETIC_DAEMON_PASSED: Synthetic subprocess intercepts SIGTERM and exits 0.
+    - ACTUAL_APP_SIGTERM_NOT_VERIFIED: Full uvicorn web listener not executed under SIGTERM.
+    - Real CLI process execution verified via quantctl health returning 0 with fail-closed security.
     """
     tmp_root = _get_isolated_tmp_root()
     db_path = tmp_root / "cold_sigterm_recovery.sqlite"
@@ -381,6 +386,20 @@ while True:
     # Assert no orphan positions
     active_qty = supervisor.current_quantity("DEFAULT_ACCOUNT", "BTCUSDT", "DRY_RUN", "NONE")
     assert active_qty == 0.0
+
+    # Real process CLI invocation: test quantctl health with fail-closed security guarantees
+    cli_proc = subprocess.run(
+        [sys.executable, "-m", "btc_quant_agent.cli", "health"],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert cli_proc.returncode == 0
+    health_payload = json.loads(cli_proc.stdout)
+    assert health_payload["execution"]["allow_live"] is False
+    assert health_payload["execution"]["credentials_present"] is False
+    assert health_payload["execution"]["execution_write_authority"] == "NONE"
+    assert health_payload["execution"]["mode"] == "disabled"
 
 
 # ==============================================================================
@@ -781,7 +800,23 @@ def test_g3_matrix_7_performance_and_resource_snapshot() -> None:
 
     assert migration_duration_ms < 1000.0, f"Migration too slow: {migration_duration_ms:.2f}ms"
 
-    # 2. Populate small fixture
+    # 2. Genuine runtime cold start measurement (opening initialized DB & verifying guards)
+    t_cs_0 = time.perf_counter()
+    with serialized_initializer(db_path):
+        cs_live = LiveStore(db_path)
+        AccountStore(db_path)
+        cs_intents = IntentStore(db_path)
+        ProtectionStore(db_path)
+        KillSwitch(db_path)
+        cs_sup = PositionSupervisor(db_path)
+        cs_sup.assert_guards_installed()
+        _ = cs_live.queued_codex_reviews()
+        _ = cs_intents.unfinished_intent_ids()
+    t_cs_1 = time.perf_counter()
+    cold_start_duration_ms = (t_cs_1 - t_cs_0) * 1000
+    assert cold_start_duration_ms < 2000.0, f"Cold start too slow: {cold_start_duration_ms:.2f}ms"
+
+    # 3. Populate small fixture
     live_store = LiveStore(db_path)
     _, case = _create_synthetic_case(tmp_root, ttl_ms=120_000)
     live_store.save_case(case)
@@ -791,7 +826,7 @@ def test_g3_matrix_7_performance_and_resource_snapshot() -> None:
     proposal = compiler.compile(case, analysis, now_ms=now_ms)
     live_store.save_proposal(proposal)
 
-    # 3. Cold recovery time
+    # 4. Cold recovery time
     t2 = time.perf_counter()
     with serialized_initializer(db_path):
         rec_live = LiveStore(db_path)
@@ -806,10 +841,10 @@ def test_g3_matrix_7_performance_and_resource_snapshot() -> None:
 
     assert cold_recovery_duration_ms < 1000.0, f"Recovery too slow: {cold_recovery_duration_ms:.2f}ms"
 
-    # 4. Memory footprint
+    # 5. Process peak RSS memory footprint
     ru = resource.getrusage(resource.RUSAGE_SELF)
     # ru_maxrss is in kilobytes on Linux
-    rss_mb = ru.ru_maxrss / 1024.0
+    peak_rss_mb = ru.ru_maxrss / 1024.0
 
-    assert rss_mb > 0
-    assert rss_mb < 2048.0, f"Memory usage abnormally high: {rss_mb:.2f}MB"
+    assert peak_rss_mb > 0
+    assert peak_rss_mb < 2048.0, f"Peak RSS memory usage abnormally high: {peak_rss_mb:.2f}MB"
