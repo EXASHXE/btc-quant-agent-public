@@ -1,0 +1,57 @@
+{
+  "schema_version": "V06_B_LINE_G2_R3_SOL_SCIENCE_GATE_R1_DISPATCH_V1",
+  "task_id": "V06_G2_R3_SOL_SCIENCE_GATE_R1",
+  "decision": "AUTHORIZE_PARALLEL_SOL_SCIENTIFIC_GATE_DESIGN__NO_EMPIRICAL_DATA_OR_PREREG_FREEZE",
+  "repo": "EXASHXE/btc-quant-agent-public",
+  "docs_parent_sha": "11d4f023112c6a0ba65e3b4510340f9da38ed706",
+  "code_base_sha": "e0ff8c3473de4bfa3e66fe7928d42992a4d38a32",
+  "accepted_R3_design_addendum_sha": "cf2d5cc33774cdcff7d709636305bba830e977ef",
+  "R3_original_design_sha": "e5b2006a89441f7eb2ec900e508aff451106b87a",
+  "previous_offline_p0_controller_dispatch_sha": "56f8a9faa1a4539124ab006b49bf42b6e7c997e3",
+  "source_audit_sha": "12793bc04db7414d11a0961684fd14f5df3ce16e",
+  "v03_btc_history_manifest_path": "artifacts/research/run0-dev-frozen-v022-seed7-20260825/data_manifest.json",
+  "v03_btc_history_manifest_logical_sha256": "82d058b2e9e5bfbd20bf36026abec045fb778ddb72582277e0dac00846ae9901",
+  "v03_initial_data_development_window": "[2021-01-01,2026-02-01)",
+  "v03_initial_final_holdout": "[2026-02-01,2026-08-01)",
+  "R3_proposed_development_window": "[2026-02-01,2026-05-01)",
+  "worktree_root": "~/workspace/project/quant-v0.6",
+  "sol_worktree": "~/workspace/project/quant-v0.6/g2-r3-sol-science-gate-r1",
+  "sol_branch": "feature/v06-bline-g2-r3-sol-science-gate-r1",
+  "allowed_paths": [
+    "docs/strategy_research/g2_r3/science_gate/**",
+    "evidence/v0.6/b_line/g2_r3_science_gate/**"
+  ],
+  "read_only_published_inputs": [
+    "docs/strategy_research/g2_r3/**",
+    "docs/project/V06_G2_LOCAL_HISTORICAL_DATA_REUSE_AND_EXPOSURE_GUARD_V1.md",
+    "artifacts/research/run0-dev-frozen-v022-seed7-20260825/data_manifest.json",
+    "evidence/v0.6/b_line/g2_r3_design/**",
+    "evidence/v0.6/b_line/g2_r3_source_audit/**",
+    "evidence/v0.6/controller/B_LINE_G2_R3_PARALLEL_P0_OFFLINE_PREPARATION_DISPATCH.json"
+  ],
+  "forbidden": [
+    "any_market_price_mark_or_funding_rate_rows",
+    "any_protected_v03_or_RC2_holdout_outcome_or_derived_replay",
+    "any_new_historical_market_data_requests",
+    "any_strategy_backtest_or_signals_from_real_market",
+    "any_trade_or_testnet_write",
+    "any_prior_published_method_or_strategy_registry_mutation",
+    "G1_G3_or_Gemini_A_B_code_or_worktree_changes"
+  ],
+  "allowed_action": "WRITE_SCIENTIFIC_EXPOSURE_GATE_AND_DRAFT_PREREG__NO_EMPIRICAL_AUTHORITY",
+  "sol_deliverables": [
+    "docs/strategy_research/g2_r3/science_gate/PRIOR_HOLDOUT_EXPOSURE_AND_AUTHORITY_MATRIX.md",
+    "docs/strategy_research/g2_r3/science_gate/LOCAL_DATA_REUSE_AND_WINDOW_FREEZE_OPTIONS.md",
+    "docs/strategy_research/g2_r3/science_gate/R3_EIGHT_CANDIDATE_PREREG_DRAFT.md",
+    "docs/strategy_research/g2_r3/science_gate/SCIENCE_ECONOMICS_AND_POWER_GATES.md",
+    "evidence/v0.6/b_line/g2_r3_science_gate/SCIENCE_GATE_MATRIX.json",
+    "evidence/v0.6/b_line/g2_r3_science_gate/SCIENCE_GATE_RECEIPT.json"
+  ],
+  "no_experiment_budget": "NO_NEW_PRICES_NO_NEW_TRIALS",
+  "future_execution_gate": "SEPARATE_CONTROLLER_FROZEN_PREREG_AND_SOURCE_BODY_ADMISSION",
+  "time_budget": "UP_TO_3H_STOP_EARLY",
+  "must_push": true,
+  "real_funds_write_authority": "NONE",
+  "testnet": "NOT_AUTHORIZED",
+  "prompt_path": "prompts/v0.6/b_line/V06_G2_R3_SOL_SCIENCE_GATE_AND_PREREG_DRAFT_R1.md"
+}
