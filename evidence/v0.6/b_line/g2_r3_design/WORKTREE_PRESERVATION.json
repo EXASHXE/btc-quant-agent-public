@@ -1,0 +1,92 @@
+{
+  "before": [
+    {
+      "path": "/root/workspace/project/rc2-tactical-successor",
+      "head": "1a5756663ecf56ed6c02a7355840f33e6715ea22",
+      "branch": "validation/b-line-rc2-final-holdout-infra-repair-r1",
+      "tracked_dirty_count": 0,
+      "untracked_count": 0
+    },
+    {
+      "path": "/root/workspace/project/quant-v0.6/g1-engineering-preview",
+      "head": "efd73496d01a71a158d67343b64695d33fab16a8",
+      "branch": "feature/v06-bline-engineering-preview-r1",
+      "tracked_dirty_count": 0,
+      "untracked_count": 0
+    },
+    {
+      "path": "/root/workspace/project/quant-v0.6/g2-strategy-discovery",
+      "head": "aab31f8735c8be8f88651ef4677bd0c3a4068cae",
+      "branch": "feature/v06-bline-g2-strategy-discovery-r1",
+      "tracked_dirty_count": 0,
+      "untracked_count": 0
+    },
+    {
+      "path": "/root/workspace/project/quant-v0.6/g2-perp-reconstruction-r2",
+      "head": "2e922f486cf5b3f6cb7fa3aa7823cd096f24c17e",
+      "branch": "feature/v06-bline-g2-perp-reconstruction-r2",
+      "tracked_dirty_count": 0,
+      "untracked_count": 0
+    },
+    {
+      "path": "/root/workspace/project/quant-v0.6/g3-operational-readiness",
+      "head": "1b4ba5ace44a84af03a734462b468e597e62c85b",
+      "branch": "feature/v06-bline-g3-operational-readiness-r1",
+      "tracked_dirty_count": 0,
+      "untracked_count": 0
+    },
+    {
+      "path": "/root/workspace/project/quant-v0.6/controller-review",
+      "head": "d6500140f3141d179181f2360ad815b5bfe9c954",
+      "branch": "",
+      "tracked_dirty_count": 0,
+      "untracked_count": 0
+    }
+  ],
+  "after": [
+    {
+      "path": "/root/workspace/project/rc2-tactical-successor",
+      "head": "1a5756663ecf56ed6c02a7355840f33e6715ea22",
+      "branch": "validation/b-line-rc2-final-holdout-infra-repair-r1",
+      "tracked_dirty_count": 0,
+      "untracked_count": 0
+    },
+    {
+      "path": "/root/workspace/project/quant-v0.6/g1-engineering-preview",
+      "head": "efd73496d01a71a158d67343b64695d33fab16a8",
+      "branch": "feature/v06-bline-engineering-preview-r1",
+      "tracked_dirty_count": 0,
+      "untracked_count": 0
+    },
+    {
+      "path": "/root/workspace/project/quant-v0.6/g2-strategy-discovery",
+      "head": "aab31f8735c8be8f88651ef4677bd0c3a4068cae",
+      "branch": "feature/v06-bline-g2-strategy-discovery-r1",
+      "tracked_dirty_count": 0,
+      "untracked_count": 0
+    },
+    {
+      "path": "/root/workspace/project/quant-v0.6/g2-perp-reconstruction-r2",
+      "head": "2e922f486cf5b3f6cb7fa3aa7823cd096f24c17e",
+      "branch": "feature/v06-bline-g2-perp-reconstruction-r2",
+      "tracked_dirty_count": 0,
+      "untracked_count": 0
+    },
+    {
+      "path": "/root/workspace/project/quant-v0.6/g3-operational-readiness",
+      "head": "1b4ba5ace44a84af03a734462b468e597e62c85b",
+      "branch": "feature/v06-bline-g3-operational-readiness-r1",
+      "tracked_dirty_count": 0,
+      "untracked_count": 0
+    },
+    {
+      "path": "/root/workspace/project/quant-v0.6/controller-review",
+      "head": "d6500140f3141d179181f2360ad815b5bfe9c954",
+      "branch": "",
+      "tracked_dirty_count": 0,
+      "untracked_count": 0
+    }
+  ],
+  "match": true,
+  "scope": "checkout HEAD/branch/status counts unchanged; shared git new refs/worktree registration authorized; no private filenames published"
+}

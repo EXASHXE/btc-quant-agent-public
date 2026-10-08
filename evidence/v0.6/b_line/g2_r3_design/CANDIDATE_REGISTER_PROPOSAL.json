@@ -1,0 +1,232 @@
+{
+  "schema_version": "G2_R3_CANDIDATE_PROPOSAL_V1",
+  "task_id": "V06_B_LINE_G2_R3_COST_AWARE_CAMPAIGN_DESIGN_R1",
+  "controller_dispatch_sha": "05ad881995cb5a8b93e086c79edd4bbc7c051bd4",
+  "status": "DESIGN_ONLY_NOT_LATER_PREREGISTRATION",
+  "execution_authorized": false,
+  "candidate_count": 8,
+  "maximum_authority_budget": 12,
+  "unused_slots_relinquished": 4,
+  "candidates_evaluated": 0,
+  "training_or_search_trials": 0,
+  "retunes": 0,
+  "shortlist_max": 2,
+  "market": "BINANCE_USDT_M_PERPETUAL",
+  "controls": [
+    "PAUSE",
+    "MATCHED_LONG",
+    "MATCHED_SHORT",
+    "BALANCED_MATCHED_DIRECTION",
+    "UNCONDITIONAL_LONG",
+    "UNCONDITIONAL_SHORT"
+  ],
+  "exclusions": [
+    "EXECUTABLE_GRID",
+    "RANGE_PROXY",
+    "CROSS_ASSET_RANKING",
+    "CLASSIFIER",
+    "24H_VARIANTS",
+    "TACTICAL_RERUN"
+  ],
+  "candidates": [
+    {
+      "id": "STRUCTURAL_CONTINUATION_LONG_04H",
+      "family": "STRUCTURAL_CONTINUATION",
+      "direction": "LONG",
+      "max_holding_hours": 4,
+      "horizon_band": "2-6h",
+      "symbols": [
+        "BTCUSDT",
+        "ETHUSDT",
+        "SOLUSDT"
+      ],
+      "status": "PROPOSED_NOT_REGISTERED_NOT_EVALUATED",
+      "rule_reference": "docs/strategy_research/g2_r3/METHOD_DESIGN.md (Concrete hypotheses and finite budget; STRUCTURAL_CONTINUATION row)",
+      "new_hypothesis": true,
+      "empirical_metrics": null
+    },
+    {
+      "id": "STRUCTURAL_CONTINUATION_LONG_12H",
+      "family": "STRUCTURAL_CONTINUATION",
+      "direction": "LONG",
+      "max_holding_hours": 12,
+      "horizon_band": "6-12h",
+      "symbols": [
+        "BTCUSDT",
+        "ETHUSDT",
+        "SOLUSDT"
+      ],
+      "status": "PROPOSED_NOT_REGISTERED_NOT_EVALUATED",
+      "rule_reference": "docs/strategy_research/g2_r3/METHOD_DESIGN.md (Concrete hypotheses and finite budget; STRUCTURAL_CONTINUATION row)",
+      "new_hypothesis": true,
+      "empirical_metrics": null
+    },
+    {
+      "id": "STRUCTURAL_CONTINUATION_SHORT_04H",
+      "family": "STRUCTURAL_CONTINUATION",
+      "direction": "SHORT",
+      "max_holding_hours": 4,
+      "horizon_band": "2-6h",
+      "symbols": [
+        "BTCUSDT",
+        "ETHUSDT",
+        "SOLUSDT"
+      ],
+      "status": "PROPOSED_NOT_REGISTERED_NOT_EVALUATED",
+      "rule_reference": "docs/strategy_research/g2_r3/METHOD_DESIGN.md (Concrete hypotheses and finite budget; STRUCTURAL_CONTINUATION row)",
+      "new_hypothesis": true,
+      "empirical_metrics": null
+    },
+    {
+      "id": "STRUCTURAL_CONTINUATION_SHORT_12H",
+      "family": "STRUCTURAL_CONTINUATION",
+      "direction": "SHORT",
+      "max_holding_hours": 12,
+      "horizon_band": "6-12h",
+      "symbols": [
+        "BTCUSDT",
+        "ETHUSDT",
+        "SOLUSDT"
+      ],
+      "status": "PROPOSED_NOT_REGISTERED_NOT_EVALUATED",
+      "rule_reference": "docs/strategy_research/g2_r3/METHOD_DESIGN.md (Concrete hypotheses and finite budget; STRUCTURAL_CONTINUATION row)",
+      "new_hypothesis": true,
+      "empirical_metrics": null
+    },
+    {
+      "id": "CLOSED_RETEST_LONG_04H",
+      "family": "CLOSED_RETEST",
+      "direction": "LONG",
+      "max_holding_hours": 4,
+      "horizon_band": "2-6h",
+      "symbols": [
+        "BTCUSDT",
+        "ETHUSDT",
+        "SOLUSDT"
+      ],
+      "status": "PROPOSED_NOT_REGISTERED_NOT_EVALUATED",
+      "rule_reference": "docs/strategy_research/g2_r3/METHOD_DESIGN.md (Concrete hypotheses and finite budget; CLOSED_RETEST row)",
+      "new_hypothesis": true,
+      "empirical_metrics": null
+    },
+    {
+      "id": "CLOSED_RETEST_LONG_12H",
+      "family": "CLOSED_RETEST",
+      "direction": "LONG",
+      "max_holding_hours": 12,
+      "horizon_band": "6-12h",
+      "symbols": [
+        "BTCUSDT",
+        "ETHUSDT",
+        "SOLUSDT"
+      ],
+      "status": "PROPOSED_NOT_REGISTERED_NOT_EVALUATED",
+      "rule_reference": "docs/strategy_research/g2_r3/METHOD_DESIGN.md (Concrete hypotheses and finite budget; CLOSED_RETEST row)",
+      "new_hypothesis": true,
+      "empirical_metrics": null
+    },
+    {
+      "id": "CLOSED_RETEST_SHORT_04H",
+      "family": "CLOSED_RETEST",
+      "direction": "SHORT",
+      "max_holding_hours": 4,
+      "horizon_band": "2-6h",
+      "symbols": [
+        "BTCUSDT",
+        "ETHUSDT",
+        "SOLUSDT"
+      ],
+      "status": "PROPOSED_NOT_REGISTERED_NOT_EVALUATED",
+      "rule_reference": "docs/strategy_research/g2_r3/METHOD_DESIGN.md (Concrete hypotheses and finite budget; CLOSED_RETEST row)",
+      "new_hypothesis": true,
+      "empirical_metrics": null
+    },
+    {
+      "id": "CLOSED_RETEST_SHORT_12H",
+      "family": "CLOSED_RETEST",
+      "direction": "SHORT",
+      "max_holding_hours": 12,
+      "horizon_band": "6-12h",
+      "symbols": [
+        "BTCUSDT",
+        "ETHUSDT",
+        "SOLUSDT"
+      ],
+      "status": "PROPOSED_NOT_REGISTERED_NOT_EVALUATED",
+      "rule_reference": "docs/strategy_research/g2_r3/METHOD_DESIGN.md (Concrete hypotheses and finite budget; CLOSED_RETEST row)",
+      "new_hypothesis": true,
+      "empirical_metrics": null
+    }
+  ],
+  "proposed_windows": {
+    "warmup": [
+      "2026-01-01T00:00:00Z",
+      "2026-02-01T00:00:00Z"
+    ],
+    "development": [
+      [
+        "2026-02-01T00:00:00Z",
+        "2026-03-01T00:00:00Z"
+      ],
+      [
+        "2026-03-01T00:00:00Z",
+        "2026-04-01T00:00:00Z"
+      ],
+      [
+        "2026-04-01T00:00:00Z",
+        "2026-05-01T00:00:00Z"
+      ]
+    ],
+    "ends": "EXCLUSIVE",
+    "grade": "NONPROTECTED_DEVELOPMENT_INDIRECT_EXPOSURE_AUDIT_REQUIRED"
+  },
+  "costs": {
+    "base_bps_per_leg": {
+      "taker_fee": 6,
+      "half_spread": 2,
+      "slippage": 3
+    },
+    "stress_bps_per_leg": {
+      "taker_fee": 12,
+      "half_spread": 4,
+      "slippage": 6
+    },
+    "maker_fills": false,
+    "benefits_in_selection_stress": false,
+    "funding_proxy_base_bps": 4,
+    "funding_proxy_stress_bps": 8,
+    "funding_cadence": "VERIFY_EFFECTIVE_SCHEDULE_ELSE_EACH_POSSIBLE_HOUR_PROXY_ONLY",
+    "measured_execution_cost": false
+  },
+  "freeze_required_fields": [
+    "new_dispatch_sha",
+    "all_candidate_parameters_and_rule_doc_hash",
+    "exact_windows_and_exposure_ledger",
+    "source_urls_versions_checksums_and_permission",
+    "funding_settlement_publication_mark_filter_semantics",
+    "availability_lag_and_clock_fields",
+    "fee_applicability_and_cost_scenarios",
+    "sizing_and_capital_risk_exits",
+    "controls_counterfactual_overlap",
+    "unique_trade_identity_and_fold_embargo",
+    "support_multiplicity_bootstrap_seed_and_ranking",
+    "early_stops_no_extensions_or_replacements",
+    "request_storage_time_budget",
+    "first_pushed_prereg_sha_verified_before_prices"
+  ],
+  "real_funds_write_authority": "NONE",
+  "testnet": "NOT_AUTHORIZED",
+  "accounting": {
+    "independent_virtual_books": true,
+    "initial_equity_usdt": 1000,
+    "allocation_ceiling_per_asset_usdt": "333.333333333333",
+    "equity_reserve_fraction": "0.05",
+    "mtm_interval": "EVERY_COMPLETED_MINUTE_MARK_CLOSE",
+    "drawdown_stop": "10% peak-to-trough initial-equity-scaled dollar drawdown; liquidate next minute and disable for rest of campaign",
+    "stop_target_collision": "SL_FIRST",
+    "stop_gap": "WORSE_OPEN",
+    "target_gap": "FIXED_TARGET_NO_OVERCREDIT",
+    "minute_mark_missing": "HARD_STOP",
+    "funding_settlement_mapping_missing": "PROXY_DIAGNOSTIC_ONLY_WITH_COMPLETE_MINUTE_MARK_PATH"
+  }
+}

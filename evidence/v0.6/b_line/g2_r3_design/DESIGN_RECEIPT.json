@@ -1,0 +1,157 @@
+{
+  "schema_version": "G2_R3_DESIGN_RECEIPT_V1",
+  "task_id": "V06_B_LINE_G2_R3_COST_AWARE_CAMPAIGN_DESIGN_R1",
+  "executor_profile": "SOL_HIGH",
+  "controller_dispatch_sha": "05ad881995cb5a8b93e086c79edd4bbc7c051bd4",
+  "code_start_sha": "e0ff8c3473de4bfa3e66fe7928d42992a4d38a32",
+  "source_r2_sha": "2e922f486cf5b3f6cb7fa3aa7823cd096f24c17e",
+  "source_r2_preregistration_sha": "66aad50500bf6e860e76bf3ae8c0ef70799d5f47",
+  "source_r2_implementation_sha": "d38f7b45983cd74dc9e28439ebfb2fa60971122a",
+  "branch": "feature/v06-bline-g2-r3-cost-aware-method-design",
+  "worktree": "/root/workspace/project/quant-v0.6/g2-r3-cost-aware-method-design",
+  "created_utc": "2026-10-08T16:11:40.914357+00:00",
+  "candidate_count": 8,
+  "candidates_evaluated": 0,
+  "empirical_execution": false,
+  "new_market_price_body_reads": 0,
+  "new_funding_body_reads": 0,
+  "protected_reads": 0,
+  "account_api_calls": 0,
+  "exchange_writes": 0,
+  "provider_actions": 0,
+  "forward_collection_started": false,
+  "code_test_or_config_changes": 0,
+  "sources": [
+    {
+      "ref": "2e922f486cf5b3f6cb7fa3aa7823cd096f24c17e",
+      "path": "evidence/v0.6/b_line/g2_reconstruction_r2/G2_R2_RESEARCH_REPORT.md",
+      "sha256": "31bf7ac8d056af07d081d4479556271ee56a004b76826669b5c2c994b07888e0",
+      "usage": "EXISTING_PUBLISHED_AGGREGATE_OR_METHOD_METADATA_ONLY"
+    },
+    {
+      "ref": "2e922f486cf5b3f6cb7fa3aa7823cd096f24c17e",
+      "path": "evidence/v0.6/b_line/g2_reconstruction_r2/SOURCE_AND_EXPOSURE_LEDGER.json",
+      "sha256": "e5be81966655da33db8169276ec591cc7ef72f252ae342bb8763f176994d8e00",
+      "usage": "EXISTING_PUBLISHED_AGGREGATE_OR_METHOD_METADATA_ONLY"
+    },
+    {
+      "ref": "2e922f486cf5b3f6cb7fa3aa7823cd096f24c17e",
+      "path": "configs/strategy_research/G2_R2_PERP_PREREGISTRATION.json",
+      "sha256": "30245c01d445eaa1336faabd99140b791eb66b38a3ba4604ef6cbd30f25e0948",
+      "usage": "EXISTING_PUBLISHED_AGGREGATE_OR_METHOD_METADATA_ONLY"
+    },
+    {
+      "ref": "2e922f486cf5b3f6cb7fa3aa7823cd096f24c17e",
+      "path": "evidence/v0.6/b_line/g2_reconstruction_r2/CANDIDATE_REGISTRY.json",
+      "sha256": "dfe6e67eebe93d0ef624e990c5eb76c84c60e6c754d85f6a87ba5ddd8657f40f",
+      "usage": "EXISTING_PUBLISHED_AGGREGATE_OR_METHOD_METADATA_ONLY"
+    },
+    {
+      "ref": "2e922f486cf5b3f6cb7fa3aa7823cd096f24c17e",
+      "path": "evidence/v0.6/b_line/g2_reconstruction_r2/EXECUTION_SEMANTICS_AND_PIT_REPORT.json",
+      "sha256": "d9ddcb44ddeb21d0ac394adac004c3af7356a2731da1846114dccea63d51602d",
+      "usage": "EXISTING_PUBLISHED_AGGREGATE_OR_METHOD_METADATA_ONLY"
+    },
+    {
+      "ref": "2e922f486cf5b3f6cb7fa3aa7823cd096f24c17e",
+      "path": "evidence/v0.6/b_line/g2_reconstruction_r2/EXPLORATORY_RESULT_TABLE.json",
+      "sha256": "264a0d6a760253a83d17773e7407974c760882696d6b697431daab82b61a949a",
+      "usage": "EXISTING_PUBLISHED_AGGREGATE_OR_METHOD_METADATA_ONLY"
+    },
+    {
+      "ref": "76d8e1da49efe7ce9ebb548dfe9524fca3095d46",
+      "path": "reviews/v0.6/b_line/V06_G2_R2_CONTROLLER_L2_DIAGNOSTIC_REVIEW.md",
+      "sha256": "1a2cfdbf23acdf7c68b260fcabcd633f9b25336a2818c63c07b07831238286a1",
+      "usage": "EXISTING_PUBLISHED_AGGREGATE_OR_METHOD_METADATA_ONLY"
+    },
+    {
+      "ref": "76d8e1da49efe7ce9ebb548dfe9524fca3095d46",
+      "path": "docs/project/V0.6_G2_R2_PERP_HISTORICAL_RECONSTRUCTION_CONTRACT.md",
+      "sha256": "7ea7a8393e82d1149b4ec5b501efb55a616c837cc59536a26ded87f3521754d1",
+      "usage": "EXISTING_PUBLISHED_AGGREGATE_OR_METHOD_METADATA_ONLY"
+    },
+    {
+      "ref": "05ad881995cb5a8b93e086c79edd4bbc7c051bd4",
+      "path": "evidence/v0.6/controller/B_LINE_G2_R3_COST_AWARE_SCIENTIFIC_DESIGN_DISPATCH.json",
+      "sha256": "089f7e4778286200f184956fac1091e4989c32341919cf0d9838e9eb0c2e4a3b",
+      "usage": "EXISTING_PUBLISHED_AGGREGATE_OR_METHOD_METADATA_ONLY"
+    }
+  ],
+  "specification_urls": [
+    "https://developers.binance.com/en/docs/catalog/core-trading-derivatives-trading-usd-s-m-futures/api/rest-api/market-data",
+    "https://www.binance.com/en-NZ/support/faq/detail/360033544231",
+    "https://www.binance.com/en/support/faq/detail/360033525031",
+    "https://www.binance.com/en/support/announcement/detail/e4445d0389ce4defa6009021fcf6ee46",
+    "https://github.com/binance/binance-public-data/blob/master/README.md"
+  ],
+  "proof_scope": "Executor action receipt plus named immutable aggregate source hashes; no OS-wide access telemetry or universal proof of other actors. Specification reads contain examples, not selected empirical bodies. No raw/cache/derived-trade access.",
+  "completed": [
+    "negative_economics_units_and_controls_diagnosis",
+    "eight_materially_different_design_variants",
+    "source_cost_and_funding_feasibility_gates",
+    "data_authority_and_budget_hierarchy"
+  ],
+  "not_completed": [
+    "later_preregistration",
+    "implementation",
+    "empirical_screening",
+    "measured_cost_or_cashflow_certification",
+    "independent_alpha_validation",
+    "forward_collection"
+  ],
+  "validation": {
+    "json_syntax": "PASS",
+    "diff_check": "PASS",
+    "allowed_paths": "PASS",
+    "design_checks": [
+      "8 unique candidate IDs,2 families\u00d72 directions\u00d72 horizons",
+      "0 evaluated,0 search trials,4 slots relinquished",
+      "required freeze fields and independent book/exit/source semantics specified"
+    ],
+    "tests_run": 0,
+    "tests_status": "NOT_APPLICABLE_DESIGN_ONLY; no implementation tests authorized",
+    "worktree_preservation": "6 of6 matching HEAD/branch/dirty-untracked counts",
+    "parent_repair_verification": "PASS: isolated-books/minute clock, minute-mark hard stop vs funding proxy, SL-first/gap contracts present",
+    "commands": [
+      "git diff --cached --check",
+      "JSON parse every staged *.json; assert eight unique IDs and zero evaluations",
+      "git diff --cached --name-only; assert only the two authorized prefixes",
+      "git diff --cached --stat; staged path/content review",
+      "six-worktree HEAD/branch/status-count comparison"
+    ],
+    "receipt_preparation_duration_seconds": 0.000526
+  },
+  "remote_publication": "NOT_YET_PUSHED_AT_DESIGN_COMMIT; subsequent PUBLICATION_RECEIPT binds independently verified design commit; terminal binds final remote commit",
+  "real_funds_write_authority": "NONE",
+  "testnet": "NOT_AUTHORIZED",
+  "protected_rc2_retry": "FORBIDDEN",
+  "next_gate": "CONTROLLER_L2_METHOD_DESIGN_SCIENTIFIC_AUDIT_THEN_SEPARATE_NEW_PREREG_IMPLEMENTATION_DISPATCH",
+  "independent_review": {
+    "reviewer": "/root/r2_kernel_review",
+    "iterations": 1,
+    "scope": "three proposed docs and two proposal/receipt JSONs only; no code/raw data/outcomes/tests/network",
+    "material_findings": 3,
+    "repairs": [
+      "isolated per-candidate/control virtual ledgers and minute enforcement",
+      "trade/minute-mark path hard stop distinguished from funding settlement mapping diagnostic proxy",
+      "SL-first collision, worse stop gap and no target gap overcredit"
+    ],
+    "independent_post_repair_review": false,
+    "remaining_review_need": "Controller scientific audit; no empirical or release certification"
+  },
+  "changed_paths": [
+    "docs/strategy_research/g2_r3/METHOD_DESIGN.md",
+    "docs/strategy_research/g2_r3/R3_EXECUTION_GATE_PLAN.md",
+    "docs/strategy_research/g2_r3/SOURCE_QUALITY_AND_COST_FEASIBILITY.md",
+    "evidence/v0.6/b_line/g2_r3_design/CANDIDATE_REGISTER_PROPOSAL.json",
+    "evidence/v0.6/b_line/g2_r3_design/DESIGN_RECEIPT.json",
+    "evidence/v0.6/b_line/g2_r3_design/WORKTREE_PRESERVATION.json"
+  ],
+  "artifact_sha256_excluding_self": {
+    "docs/strategy_research/g2_r3/METHOD_DESIGN.md": "14378dde7668291dc87aef91e3e55fadddad3a444d1d49284efa2c3cbcba9a77",
+    "docs/strategy_research/g2_r3/R3_EXECUTION_GATE_PLAN.md": "8a12d40ebbaf0edb1355f039b0b5adb6d11f4dfda1ba52898f2f3ebdfb938dce",
+    "docs/strategy_research/g2_r3/SOURCE_QUALITY_AND_COST_FEASIBILITY.md": "8095fb8c4c608b548ca143f121c297d03498876fa4512232d06a265659f225a8",
+    "evidence/v0.6/b_line/g2_r3_design/CANDIDATE_REGISTER_PROPOSAL.json": "d0f89bddfaec0e57c959cec043969059da10fec8aa45f81669dde8b80ea35a9b",
+    "evidence/v0.6/b_line/g2_r3_design/WORKTREE_PRESERVATION.json": "182f702c8f69190073afcf64ff2f8152945cb3ade016afe3c9c2a8381f8f3c5d"
+  }
+}
