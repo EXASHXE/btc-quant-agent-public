@@ -15,6 +15,7 @@ import gzip
 import hashlib
 import io
 import json
+import math
 import random
 import subprocess
 from collections.abc import Iterable
@@ -80,8 +81,8 @@ ALLOWED_NON_PROTECTED_SYMBOLS: frozenset[str] = frozenset(
     }
 )
 
-PARSER_SCHEMA_VERSION = "RC2_METRICS_EVENT_TIME_NORMALIZER_V2"
-CACHE_SCHEMA_VERSION = "RC2_CACHE_AUTHORITY_V2"
+PARSER_SCHEMA_VERSION = "RC2_METRICS_EVENT_TIME_NORMALIZER_V3"
+CACHE_SCHEMA_VERSION = "RC2_CACHE_AUTHORITY_V3"
 
 
 class ProtectedSymbolFirewallViolation(PermissionError):
@@ -111,6 +112,35 @@ def assert_all_symbols_allowed(symbols: Iterable[str]) -> None:
         assert_symbol_allowed(s)
 
 
+def parse_finite_float(val: Any) -> tuple[float | None, str]:
+    """Parse numeric input only when stripped text is present and produces finite float.
+
+    Returns (parsed_float, status), where status is:
+    - 'VALID': stripped text produces finite float
+    - 'MISSING': value is None, empty string, or whitespace-only
+    - 'INVALID': value cannot be converted to finite float (text garbage, NaN, Inf, overflow)
+    """
+    if val is None:
+        return None, "MISSING"
+    if isinstance(val, (int, float)):
+        f = float(val)
+        if math.isfinite(f):
+            return f, "VALID"
+        return None, "INVALID"
+    if isinstance(val, str):
+        s = val.strip()
+        if not s:
+            return None, "MISSING"
+        try:
+            f = float(s)
+        except (ValueError, TypeError):
+            return None, "INVALID"
+        if math.isfinite(f):
+            return f, "VALID"
+        return None, "INVALID"
+    return None, "INVALID"
+
+
 def parse_event_timestamp(ts_val: str | int) -> int:
     """Parse create_time / event timestamp explicitly to UTC millisecond epoch."""
     if isinstance(ts_val, int):
@@ -128,16 +158,26 @@ def normalize_metrics_rows(
     header: list[str],
     tf_start: int,
     data_end: int,
+    symbol: str = "",
 ) -> dict[str, Any]:
     """Normalize Binance metrics archive rows into chronological derivative series.
 
     Guarantees:
-    1. Event timestamp parsed explicitly from create_time.
-    2. Stable-sorted by (timestamp, tuple(row)) for canonical ordering.
-    3. Deterministically deduplicated on equal timestamps.
-    4. Hourly series choose max event timestamp inside each UTC hour bucket.
-    5. 15m series choose max event timestamp inside each UTC 15m bucket.
-    6. Row order in archive has ZERO influence on normalized output.
+    1. Event timestamp parsed explicitly from create_time; malformed headers/timestamps
+       are tracked and dropped fail-closed.
+    2. Explicit, deterministic missing-value semantics:
+       - Convert numeric input only when stripped text is present and produces finite float.
+       - No silent replacement with 0, NaN, constant, interpolation, or unbounded forward-fill.
+       - Do not discard a whole metrics row when only one metric is missing.
+    3. Deterministic per-field event selection within the original hourly/15m bucket:
+       - Select the maximum event timestamp at which THAT field is valid.
+       - Equal-time tie-break: canonical sorted order by row content (minimal tuple(r)).
+       - If no valid observation exists in a bucket, that bucket is recorded as missing.
+       - Never choose a future event relative to an observation.
+    4. Exact output and digest preservation on fully complete inputs; preserves FIL 2026-09-06
+       17:55 regression and archive row-permutation invariance.
+    5. Detailed reporting of missing, invalid, dropped, selected, and missing-bucket values
+       per field, symbol, and time window.
     """
     indexes = {name: header.index(name) for name in header}
     create_time_idx = indexes["create_time"]
@@ -147,71 +187,132 @@ def normalize_metrics_rows(
     top_pos_idx = indexes["sum_toptrader_long_short_ratio"]
     top_acc_idx = indexes["count_toptrader_long_short_ratio"]
 
-    parsed_records: list[tuple[int, list[str]]] = []
+    malformed_rows_count = 0
+    malformed_timestamp_count = 0
+    header_rows_count = 0
+    out_of_window_count = 0
+
+    in_scope_records: list[tuple[int, list[str]]] = []
     for r in rows:
         if not r or len(r) < len(header):
+            malformed_rows_count += 1
             continue
-        if r[create_time_idx].lower() in {"create_time", "calc_time"}:
+        first_cell = r[create_time_idx].strip().lower()
+        if first_cell in {"create_time", "calc_time"}:
+            header_rows_count += 1
             continue
-        ts = parse_event_timestamp(r[create_time_idx])
+        try:
+            ts = parse_event_timestamp(r[create_time_idx])
+        except (ValueError, TypeError):
+            malformed_timestamp_count += 1
+            continue
         if tf_start <= ts <= data_end:
-            parsed_records.append((ts, r))
+            in_scope_records.append((ts, r))
+        else:
+            out_of_window_count += 1
 
-    # 1. Deterministic sort by (timestamp, tuple(row))
-    sorted_records = sorted(parsed_records, key=lambda item: (item[0], tuple(item[1])))
+    deduped_ts_set = {ts for ts, _ in in_scope_records}
 
-    # 2. Deterministic deduplication for equal timestamps
-    deduped_records: list[tuple[int, list[str]]] = []
-    seen_ts: set[int] = set()
-    for ts, r in sorted_records:
-        if ts not in seen_ts:
-            seen_ts.add(ts)
-            deduped_records.append((ts, r))
-
-    # 3. Downsample hourly (oi, gls, top_pos, top_acc) - select max event timestamp in bucket
-    hourly_selected: dict[int, tuple[int, list[str]]] = {}
-    for ts, r in deduped_records:
-        bucket = ts // 3_600_000
-        # Since deduped_records is strictly increasing in ts, replacing ensures max ts in bucket
-        hourly_selected[bucket] = (ts, r)
-
-    hourly_sorted = [hourly_selected[b] for b in sorted(hourly_selected.keys())]
-
-    oi_hist = [
-        {"timestamp": ts, "sumOpenInterest": float(r[oi_idx])} for ts, r in hourly_sorted
-    ]
-    gls_hist = [
-        {"timestamp": ts, "longShortRatio": float(r[gls_idx])} for ts, r in hourly_sorted
-    ]
-    top_pos_hist = [
-        {"timestamp": ts, "longShortRatio": float(r[top_pos_idx])} for ts, r in hourly_sorted
-    ]
-    top_acc_hist = [
-        {"timestamp": ts, "longShortRatio": float(r[top_acc_idx])} for ts, r in hourly_sorted
+    field_specs = [
+        ("sum_open_interest", oi_idx, 3_600_000, "sumOpenInterest", "oi_hist"),
+        ("sum_taker_long_short_vol_ratio", taker_idx, 900_000, "buySellRatio", "taker_hist"),
+        ("count_long_short_ratio", gls_idx, 3_600_000, "longShortRatio", "gls_hist"),
+        ("sum_toptrader_long_short_ratio", top_pos_idx, 3_600_000, "longShortRatio", "top_pos_hist"),
+        ("count_toptrader_long_short_ratio", top_acc_idx, 3_600_000, "longShortRatio", "top_acc_hist"),
     ]
 
-    # 4. Downsample 15m (taker) - select max event timestamp in bucket
-    taker_selected: dict[int, tuple[int, list[str]]] = {}
-    for ts, r in deduped_records:
-        bucket = ts // 900_000
-        taker_selected[bucket] = (ts, r)
+    field_audit: dict[str, dict[str, Any]] = {}
+    normalized_series: dict[str, list[dict[str, Any]]] = {}
 
-    taker_sorted = [taker_selected[b] for b in sorted(taker_selected.keys())]
-    taker_hist = [
-        {"timestamp": ts, "buySellRatio": float(r[taker_idx])} for ts, r in taker_sorted
-    ]
+    for field_name, col_idx, bucket_ms, output_key, series_name in field_specs:
+        start_bucket = tf_start // bucket_ms
+        end_bucket = data_end // bucket_ms
+        expected_buckets = set(range(start_bucket, end_bucket + 1))
+
+        valid_candidates: list[tuple[int, float, list[str]]] = []
+        missing_count = 0
+        invalid_count = 0
+        valid_count = 0
+
+        for ts, r in in_scope_records:
+            val, status = parse_finite_float(r[col_idx])
+            if status == "VALID":
+                valid_count += 1
+                valid_candidates.append((ts, val, r))  # type: ignore[arg-type]
+            elif status == "MISSING":
+                missing_count += 1
+            else:  # INVALID
+                invalid_count += 1
+
+        # 1. Deterministic sort by (ts, tuple(r))
+        sorted_candidates = sorted(valid_candidates, key=lambda item: (item[0], tuple(item[2])))
+
+        # 2. Deterministic deduplication on equal timestamps:
+        # If multiple valid rows have identical ts, choose the first in canonical sorted order (minimal tuple(r)).
+        deduped_candidates_by_ts: dict[int, tuple[int, float, list[str]]] = {}
+        for ts, val, r in sorted_candidates:
+            if ts not in deduped_candidates_by_ts:
+                deduped_candidates_by_ts[ts] = (ts, val, r)
+
+        # 3. Downsample to bucket:
+        # Within each bucket, select the candidate with maximum event timestamp.
+        # By iterating sorted ts ascending, replacing ensures the maximum ts in the bucket is chosen.
+        bucket_selected: dict[int, tuple[int, float]] = {}
+        for ts in sorted(deduped_candidates_by_ts.keys()):
+            cand_ts, cand_val, _ = deduped_candidates_by_ts[ts]
+            bucket = cand_ts // bucket_ms
+            bucket_selected[bucket] = (cand_ts, cand_val)
+
+        # 4. Construct sorted series
+        series = [
+            {"timestamp": cand_ts, output_key: cand_val}
+            for bucket in sorted(bucket_selected.keys())
+            for cand_ts, cand_val in [bucket_selected[bucket]]
+        ]
+        normalized_series[series_name] = series
+
+        selected_buckets = set(bucket_selected.keys())
+        missing_bucket_count = len(expected_buckets - selected_buckets)
+
+        field_audit[field_name] = {
+            "field_name": field_name,
+            "valid_count": valid_count,
+            "missing_count": missing_count,
+            "invalid_count": invalid_count,
+            "selected_count": len(selected_buckets),
+            "missing_bucket_count": missing_bucket_count,
+            "expected_buckets_count": len(expected_buckets),
+        }
+
+    hourly_buckets_count = len(normalized_series["oi_hist"])
+    taker_buckets_count = len(normalized_series["taker_hist"])
 
     return {
-        "oi_hist": oi_hist,
-        "taker_hist": taker_hist,
-        "gls_hist": gls_hist,
-        "top_pos_hist": top_pos_hist,
-        "top_acc_hist": top_acc_hist,
+        "oi_hist": normalized_series["oi_hist"],
+        "taker_hist": normalized_series["taker_hist"],
+        "gls_hist": normalized_series["gls_hist"],
+        "top_pos_hist": normalized_series["top_pos_hist"],
+        "top_acc_hist": normalized_series["top_acc_hist"],
         "raw_record_count": len(rows),
-        "in_scope_record_count": len(parsed_records),
-        "deduped_record_count": len(deduped_records),
-        "hourly_buckets_count": len(hourly_sorted),
-        "taker_buckets_count": len(taker_sorted),
+        "in_scope_record_count": len(in_scope_records),
+        "deduped_record_count": len(deduped_ts_set),
+        "hourly_buckets_count": hourly_buckets_count,
+        "taker_buckets_count": taker_buckets_count,
+        "field_audit": field_audit,
+        "dropped_records": {
+            "malformed_rows_count": malformed_rows_count,
+            "malformed_timestamp_count": malformed_timestamp_count,
+            "header_rows_count": header_rows_count,
+            "out_of_window_count": out_of_window_count,
+        },
+        "audit_summary": {
+            "symbol": symbol,
+            "time_window": {"tf_start": tf_start, "data_end": data_end},
+            "raw_record_count": len(rows),
+            "in_scope_record_count": len(in_scope_records),
+            "total_missing_observations": sum(f["missing_count"] for f in field_audit.values()),
+            "total_invalid_observations": sum(f["invalid_count"] for f in field_audit.values()),
+        },
     }
 
 

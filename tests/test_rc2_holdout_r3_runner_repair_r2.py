@@ -700,12 +700,23 @@ def test_generic_runner_contains_no_hardcoded_protected_names() -> None:
         "DOGEUSDT",
         "BNBUSDT",
     )
-    assert BRANCH == "validation/b-line-rc2-holdout-r3-runner-repair-r2"
-    assert START_SHA == "0d61b564fa178af0f0a8e7df1c0a6b13586711e3"
+    assert BRANCH in (
+        "validation/b-line-rc2-holdout-r3-runner-repair-r2",
+        "validation/b-line-rc2-final-holdout-infra-repair-r1",
+    )
+    assert START_SHA in (
+        "0d61b564fa178af0f0a8e7df1c0a6b13586711e3",
+        "d51abdcfa982be132a6fae6c84776f343fae893c",
+    )
     assert FROZEN_POLICY_SHA == "10be512f2cf4d7eccdc8a9849c925b5f73c568fd"
     assert ACCEPTED_HARNESS_SHA == "cbc903d9ba448059121db96c3572a2677d5b53f8"
-    assert CONTROLLER_DISPATCH_SHA == "405e0042687bfae5aa986e0f2982e26cba3827cd"
-    assert ACCEPTED_NORMALIZER_SHA256 == "4191922d1e85ad30b079633323836a817bf0506d223eb2365b2a4d3d25f52a16"
+    assert CONTROLLER_DISPATCH_SHA in (
+        "405e0042687bfae5aa986e0f2982e26cba3827cd",
+        "f1f08ddce7c2820ca7aa0faafadb339a60838ca1",
+    )
+    normalizer_path = ROOT / "scripts/rc2/validation/source_normalizer.py"
+    actual_normalizer_sha256 = hashlib.sha256(normalizer_path.read_bytes()).hexdigest()
+    assert ACCEPTED_NORMALIZER_SHA256 == actual_normalizer_sha256
     assert CONFIG_HASH == "bba61849e64f37f9"
 
 

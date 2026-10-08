@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
-"""Authoritative Final Validation Runner for RC2 Holdout R3 (Repair R2 — Generic Runner Before Target Seal).
+"""Authoritative Final Validation Runner for RC2 Holdout R3 (Infra Repair R1).
 
 Frozen Policy SHA: 10be512f2cf4d7eccdc8a9849c925b5f73c568fd
 Config Hash: bba61849e64f37f9
 Accepted Harness SHA: cbc903d9ba448059121db96c3572a2677d5b53f8
-Controller Dispatch SHA: 405e0042687bfae5aa986e0f2982e26cba3827cd
-Accepted Normalizer SHA256: 4191922d1e85ad30b079633323836a817bf0506d223eb2365b2a4d3d25f52a16
+Controller Dispatch SHA: f1f08ddce7c2820ca7aa0faafadb339a60838ca1
+Accepted Normalizer SHA256: 04d0dd3c21800ca2df9cbabada1a010cb6c02396f3b3c17e0df7c8bdb0a23e69
 
-Architectural Change:
+Architectural Properties:
 - Generic runner: No hard-coded protected targets.
 - Target set is unlocked ONLY via external Controller target seal artifact.
 - Capability access model separating CONSTRUCTION_REVIEW and AUTHORIZED_EXECUTION modes.
@@ -16,6 +16,8 @@ Architectural Change:
 - Production-equivalent full-window pre-outcome audit across every decision step.
 - Complete authority input manifest covering OHLCV, quote volume, trades, and all derivatives.
 - Staged artifacts published atomically only after post-run identity check PASS.
+- Immutable Controller Git docs commit authority binding for execution dispatch (Finding II).
+- Explicit, fail-closed per-field event selection and audit reporting (Finding I).
 """
 
 from __future__ import annotations
@@ -90,14 +92,20 @@ from scripts.rc2.validation.target_seal import (
 
 # Hard-coded Frozen Constants
 TASK_ID = "RC2_HOLDOUT_R3_EXECUTION"
-REPAIR_TASK_ID = "RC2_R3_HOLDOUT_RUNNER_REPAIR_R2"
-BRANCH = "validation/b-line-rc2-holdout-r3-runner-repair-r2"
-START_SHA = "0d61b564fa178af0f0a8e7df1c0a6b13586711e3"
+REPAIR_TASK_ID = "RC2_FINAL_HOLDOUT_SOURCE_NORMALIZER_AND_DISPATCH_INFRA_REPAIR_R1"
+BRANCH = "validation/b-line-rc2-final-holdout-infra-repair-r1"
+START_SHA = "d51abdcfa982be132a6fae6c84776f343fae893c"
 FROZEN_POLICY_SHA = "10be512f2cf4d7eccdc8a9849c925b5f73c568fd"
 ACCEPTED_HARNESS_SHA = "cbc903d9ba448059121db96c3572a2677d5b53f8"
-CONTROLLER_DISPATCH_SHA = "405e0042687bfae5aa986e0f2982e26cba3827cd"
+CONTROLLER_DISPATCH_SHA = "f1f08ddce7c2820ca7aa0faafadb339a60838ca1"
 CONFIG_HASH = "bba61849e64f37f9"
-ACCEPTED_NORMALIZER_SHA256 = "4191922d1e85ad30b079633323836a817bf0506d223eb2365b2a4d3d25f52a16"
+ACCEPTED_NORMALIZER_SHA256 = "04d0dd3c21800ca2df9cbabada1a010cb6c02396f3b3c17e0df7c8bdb0a23e69"
+
+RETRY_AUTHORITY_REL_PATH = "evidence/v0.5.5/controller/B_LINE_RC2_FINAL_HOLDOUT_RETRY_AUTHORITY.json"
+ORIGINAL_INCIDENT_EVIDENCE_COMMIT = "6f9b9bd1606c06664129b43293699fd05abd3297"
+CONTROLLER_DOCS_REF = "origin/v0.5.5-docs"
+RETRY_AUTHORITY_SCHEMA_VERSION_PREFIX = "B_LINE_RC2_FINAL_HOLDOUT_RETRY_AUTHORITY"
+REQUIRED_DECISION = "AUTHORIZE_ONE_SAME_TARGET_INFRA_RETRY"
 
 # Generic Runner: Target set is empty by default; populated ONLY from external TARGET_SEAL
 TARGETS: tuple[str, ...] = ()
@@ -440,12 +448,17 @@ def _fetch_symbol_entry(
     header = metrics[0]
     metric_rows = [row for row in metrics[1:] if row and row[0].lower() != "create_time"]
 
-    norm = normalize_metrics_rows(metric_rows, header, tf_start, DATA_END)
+    norm = normalize_metrics_rows(metric_rows, header, tf_start, DATA_END, symbol=symbol)
     entry["oi_hist"] = norm["oi_hist"]
     entry["taker_hist"] = norm["taker_hist"]
     entry["gls_hist"] = norm["gls_hist"]
     entry["top_pos_hist"] = norm["top_pos_hist"]
     entry["top_acc_hist"] = norm["top_acc_hist"]
+    entry["metrics_normalizer_audit"] = {
+        "field_audit": norm["field_audit"],
+        "dropped_records": norm["dropped_records"],
+        "audit_summary": norm["audit_summary"],
+    }
 
     premium: list[dict[str, Any]] = []
     for row in _klines(
@@ -1700,6 +1713,159 @@ def write_preflight_failure(
     print(terminal)
 
 
+def validate_retry_dispatch_authority(
+    dispatch_sha: str,
+    authorized_runner_sha: str,
+    authorized_runner_sha256: str,
+    authorized_target_seal_sha256: str,
+    sealed_targets: tuple[str, ...],
+    root: Path = ROOT,
+    docs_ref: str = CONTROLLER_DOCS_REF,
+) -> tuple[bool, list[str], dict[str, Any]]:
+    """Validate external Controller retry dispatch authority from immutable Git docs commit (R1 Finding II).
+
+    Preflight assertions:
+    1. Docs trust root ref (origin/v0.5.5-docs) must exist in local repository (fails closed if not fetched).
+    2. Dispatch commit must be an ancestor of docs trust root ref (git merge-base --is-ancestor).
+    3. Immutable authority artifact B_LINE_RC2_FINAL_HOLDOUT_RETRY_AUTHORITY.json must exist in dispatch commit (git show).
+    4. Authority JSON must conform to strict fixed schema:
+       - decision == "AUTHORIZE_ONE_SAME_TARGET_INFRA_RETRY"
+       - max_attempts == 1
+       - real_funds_write_authority == "NONE"
+       - exact match on authorized_runner_sha
+       - exact match on authorized_runner_sha256
+       - exact match on target_seal_sha256
+       - exact match on frozen_policy_sha
+       - exact match on original_incident_evidence_commit ("6f9b9bd1606c06664129b43293699fd05abd3297")
+       - if target_symbols present: exact match on sealed_targets (no target substitution)
+    """
+    reasons: list[str] = []
+    auth_data: dict[str, Any] = {}
+
+    if not dispatch_sha or not re.fullmatch(r"^[0-9a-f]{40}$", dispatch_sha):
+        reasons.append("Invalid or missing execution_dispatch_sha (expected 40-char lowercase hex)")
+        return False, reasons, auth_data
+
+    # 1. Require docs_ref to be present in local git repository (fail closed if not fetched)
+    docs_check = subprocess.run(
+        ["git", "rev-parse", "--verify", docs_ref],
+        cwd=root,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if docs_check.returncode != 0:
+        reasons.append(
+            f"Controller docs trust root '{docs_ref}' is missing or not fetched. "
+            "Execute 'git fetch origin v0.5.5-docs' before running."
+        )
+        return False, reasons, auth_data
+
+    # 2. Require dispatch_sha to be an ancestor of docs_ref
+    ancestor_check = subprocess.run(
+        ["git", "merge-base", "--is-ancestor", dispatch_sha, docs_ref],
+        cwd=root,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if ancestor_check.returncode != 0:
+        reasons.append(
+            f"Execution dispatch commit '{dispatch_sha}' is not an ancestor of "
+            f"trusted Controller docs ref '{docs_ref}'"
+        )
+        return False, reasons, auth_data
+
+    # 3. Read authority JSON directly from immutable git commit object
+    git_show = subprocess.run(
+        ["git", "show", f"{dispatch_sha}:{RETRY_AUTHORITY_REL_PATH}"],
+        cwd=root,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if git_show.returncode != 0:
+        reasons.append(
+            f"Failed to read authority artifact '{RETRY_AUTHORITY_REL_PATH}' from "
+            f"dispatch commit '{dispatch_sha}': git show failed with code {git_show.returncode}"
+        )
+        return False, reasons, auth_data
+
+    try:
+        auth_data = json.loads(git_show.stdout)
+    except json.JSONDecodeError as exc:
+        reasons.append(f"Authority artifact in dispatch commit is invalid JSON: {exc}")
+        return False, reasons, auth_data
+
+    if not isinstance(auth_data, dict):
+        reasons.append("Authority artifact JSON root must be an object")
+        return False, reasons, auth_data
+
+    # 4. Strict Schema & Field Validations
+    schema_version = auth_data.get("schema_version")
+    if not isinstance(schema_version, str) or not schema_version.startswith(RETRY_AUTHORITY_SCHEMA_VERSION_PREFIX):
+        reasons.append(
+            f"Authority schema_version mismatch: observed='{schema_version}' "
+            f"expected prefix '{RETRY_AUTHORITY_SCHEMA_VERSION_PREFIX}'"
+        )
+
+    decision = auth_data.get("decision")
+    if decision != REQUIRED_DECISION:
+        reasons.append(f"Authority decision mismatch: observed='{decision}' expected='{REQUIRED_DECISION}'")
+
+    max_attempts = auth_data.get("max_attempts")
+    if max_attempts != 1:
+        reasons.append(f"Authority max_attempts mismatch: observed={max_attempts} expected=1")
+
+    real_funds = auth_data.get("real_funds_write_authority")
+    if real_funds != "NONE":
+        reasons.append(f"Authority real_funds_write_authority mismatch: observed='{real_funds}' expected='NONE'")
+
+    auth_runner_sha = auth_data.get("authorized_runner_sha")
+    if auth_runner_sha != authorized_runner_sha:
+        reasons.append(
+            f"Authority runner SHA mismatch: authority='{auth_runner_sha}' "
+            f"caller='{authorized_runner_sha}'"
+        )
+
+    auth_runner_sha256 = auth_data.get("authorized_runner_sha256")
+    if auth_runner_sha256 != authorized_runner_sha256:
+        reasons.append(
+            f"Authority runner SHA256 mismatch: authority='{auth_runner_sha256}' "
+            f"caller='{authorized_runner_sha256}'"
+        )
+
+    auth_seal_sha256 = auth_data.get("target_seal_sha256")
+    if auth_seal_sha256 != authorized_target_seal_sha256:
+        reasons.append(
+            f"Authority target seal SHA256 mismatch: authority='{auth_seal_sha256}' "
+            f"caller='{authorized_target_seal_sha256}'"
+        )
+
+    frozen_pol_sha = auth_data.get("frozen_policy_sha")
+    if frozen_pol_sha != FROZEN_POLICY_SHA:
+        reasons.append(
+            f"Authority frozen policy SHA mismatch: authority='{frozen_pol_sha}' "
+            f"expected='{FROZEN_POLICY_SHA}'"
+        )
+
+    bound_incident_commit = auth_data.get("original_incident_evidence_commit")
+    if bound_incident_commit != ORIGINAL_INCIDENT_EVIDENCE_COMMIT:
+        reasons.append(
+            f"Authority original incident commit mismatch: authority='{bound_incident_commit}' "
+            f"expected='{ORIGINAL_INCIDENT_EVIDENCE_COMMIT}'"
+        )
+
+    auth_targets = auth_data.get("target_symbols")
+    if auth_targets is not None and tuple(auth_targets) != sealed_targets:
+        reasons.append(
+            f"Authority target substitution detected: authority={tuple(auth_targets)} "
+            f"sealed={sealed_targets}"
+        )
+
+    return len(reasons) == 0, reasons, auth_data
+
+
 def check_execution_authorization(
     authorized_runner_sha: str | None,
     authorized_runner_sha256: str | None,
@@ -1708,8 +1874,9 @@ def check_execution_authorization(
     expected_branch: str = BRANCH,
     target_seal_path: Path | None = None,
     authorized_target_seal_sha256: str | None = None,
+    docs_ref: str = CONTROLLER_DOCS_REF,
 ) -> tuple[bool, str, dict[str, Any]]:
-    """Assert external Controller authorization matches exact HEAD, runner hash, dispatch, and clean state (R2.4)."""
+    """Assert external Controller authorization matches exact HEAD, runner hash, dispatch, and clean state (R2.4 & Finding II)."""
     reasons: list[str] = []
 
     # 1. Regex validation of supplied SHAs
@@ -1783,6 +1950,30 @@ def check_execution_authorization(
         except TargetSealError as exc:
             reasons.append(f"Target seal validation failed: {exc}")
 
+    # Controller Retry Dispatch Authority Verification (Finding II)
+    retry_authority_data: dict[str, Any] = {}
+    if (
+        execution_dispatch_sha
+        and re.fullmatch(r"^[0-9a-f]{40}$", execution_dispatch_sha)
+        and authorized_runner_sha
+        and re.fullmatch(r"^[0-9a-f]{40}$", authorized_runner_sha)
+        and authorized_runner_sha256
+        and re.fullmatch(r"^[0-9a-f]{64}$", authorized_runner_sha256)
+        and authorized_target_seal_sha256
+        and re.fullmatch(r"^[0-9a-f]{64}$", authorized_target_seal_sha256)
+    ):
+        dispatch_ok, dispatch_reasons, retry_authority_data = validate_retry_dispatch_authority(
+            dispatch_sha=execution_dispatch_sha,
+            authorized_runner_sha=authorized_runner_sha,
+            authorized_runner_sha256=authorized_runner_sha256,
+            authorized_target_seal_sha256=authorized_target_seal_sha256,
+            sealed_targets=sealed_targets,
+            root=root,
+            docs_ref=docs_ref,
+        )
+        if not dispatch_ok:
+            reasons.extend(dispatch_reasons)
+
     script_hashes = {
         "run_holdout_r3.py": runner_sha,
         "source_normalizer.py": normalizer_sha,
@@ -1803,6 +1994,7 @@ def check_execution_authorization(
         "reasons": reasons,
         "sealed_targets": list(sealed_targets),
         "target_seal_data": seal_data,
+        "retry_authority_data": retry_authority_data,
         "proof": None,
     }
 
@@ -1890,9 +2082,9 @@ def verify_freeze_repair_identity(root: Path = ROOT) -> dict[str, Any]:
 
     return {
         "task_id": REPAIR_TASK_ID,
-        "terminal": "RC2_R3_RUNNER_REPAIR_R2_READY_FOR_FRESH_SOL_REVIEW"
+        "terminal": "RC2_FINAL_HOLDOUT_INFRA_REPAIR_R1_READY_FOR_CONTROLLER"
         if repair_ok
-        else "RC2_R3_RUNNER_REPAIR_R2_BLOCKED",
+        else "RC2_FINAL_HOLDOUT_INFRA_REPAIR_R1_BLOCKED",
         "branch": branch,
         "head": head,
         "start_sha": START_SHA,
@@ -1929,6 +2121,7 @@ def execute_holdout(
     authorized_target_seal_sha256: str,
     evidence_dir: Path = DEFAULT_EVIDENCE_DIR,
     root: Path = ROOT,
+    docs_ref: str = CONTROLLER_DOCS_REF,
 ) -> None:
     """Execute the full holdout under strict Controller authorization and staged publication (R2.1-R2.8)."""
     # R2.7: Fail closed if final authority directory pre-exists
@@ -1962,6 +2155,7 @@ def execute_holdout(
         target_seal_path=target_seal_path,
         authorized_target_seal_sha256=authorized_target_seal_sha256,
         root=root,
+        docs_ref=docs_ref,
     )
     proof = auth_detail.get("proof")
     if not auth_ok or proof is None:
@@ -2430,6 +2624,12 @@ def main() -> None:
         help="Target final authority evidence directory (must not pre-exist)",
     )
     parser.add_argument(
+        "--docs-ref",
+        type=str,
+        default=CONTROLLER_DOCS_REF,
+        help="Controller docs trust root ref (default: origin/v0.5.5-docs)",
+    )
+    parser.add_argument(
         "--verify-repair",
         action="store_true",
         help="Verify runner repair integrity and review state without execution",
@@ -2459,6 +2659,7 @@ def main() -> None:
             target_seal_path=args.target_seal_path,
             authorized_target_seal_sha256=args.authorized_target_seal_sha256,
             evidence_dir=args.evidence_dir,
+            docs_ref=args.docs_ref,
         )
     else:
         # Review mode: verify repair state without execution

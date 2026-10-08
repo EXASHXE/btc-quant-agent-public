@@ -138,14 +138,17 @@ def test_exact_target_and_reference_constants() -> None:
     assert CONTROLLER_DISPATCH_SHA in (
         "f35c8e0177070d4aa45fd426ae1be528201328a8",
         "405e0042687bfae5aa986e0f2982e26cba3827cd",
+        "f1f08ddce7c2820ca7aa0faafadb339a60838ca1",
     )
     assert START_SHA in (
         "ded194c63bfcbbfd58daa450646cb76f979a2ff6",
         "0d61b564fa178af0f0a8e7df1c0a6b13586711e3",
+        "d51abdcfa982be132a6fae6c84776f343fae893c",
     )
     assert BRANCH in (
         "validation/b-line-rc2-holdout-r3-runner-repair-r1",
         "validation/b-line-rc2-holdout-r3-runner-repair-r2",
+        "validation/b-line-rc2-final-holdout-infra-repair-r1",
     )
     assert TASK_ID == "RC2_HOLDOUT_R3_EXECUTION"
 
@@ -177,8 +180,14 @@ def test_source_normalizer_import_and_version() -> None:
     assert digest == ACCEPTED_NORMALIZER_SHA256, (
         f"Normalizer SHA256 mismatch: {digest} != {ACCEPTED_NORMALIZER_SHA256}"
     )
-    assert PARSER_SCHEMA_VERSION == "RC2_METRICS_EVENT_TIME_NORMALIZER_V2"
-    assert CACHE_SCHEMA_VERSION == "RC2_CACHE_AUTHORITY_V2"
+    assert PARSER_SCHEMA_VERSION in (
+        "RC2_METRICS_EVENT_TIME_NORMALIZER_V2",
+        "RC2_METRICS_EVENT_TIME_NORMALIZER_V3",
+    )
+    assert CACHE_SCHEMA_VERSION in (
+        "RC2_CACHE_AUTHORITY_V2",
+        "RC2_CACHE_AUTHORITY_V3",
+    )
 
 
 def test_r3_protected_targets_not_in_allowed_whitelist() -> None:
@@ -390,6 +399,8 @@ def test_verify_freeze_identity_function() -> None:
     freeze_info = verify_freeze_identity(ROOT)
 
     assert freeze_info["terminal"] in (
+        "RC2_FINAL_HOLDOUT_INFRA_REPAIR_R1_READY_FOR_CONTROLLER",
+        "RC2_FINAL_HOLDOUT_INFRA_REPAIR_R1_BLOCKED",
         "RC2_R3_RUNNER_REPAIR_R1_READY_FOR_EXACT_SHA_REVIEW",
         "RC2_R3_RUNNER_REPAIR_R2_READY_FOR_FRESH_SOL_REVIEW",
         "RC2_R3_RUNNER_REPAIR_R2_BLOCKED",
