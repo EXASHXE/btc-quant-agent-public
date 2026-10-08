@@ -45,3 +45,10 @@ Initial soft targets (monitor, do not weaken validation to satisfy): L0 <30 s, L
 ## Governance
 
 DEVELOPMENT_FAST_PATH remains default. Dispatch one complete work package; Gemini performs same-scope fixes without repeated prompts, Luna deterministic validation, Sol novel semantic/safety review only, Astra exceptional independent pre-live/scientific audit. Testing evidence is not an authority grant. `REAL_FUNDS_WRITE_AUTHORITY=NONE` continues.
+
+## Implemented parallel engineering track (not merged into release)
+
+- [Fast-path CI implementation](https://github.com/EXASHXE/btc-quant-agent-public/tree/430becb96389a62481e4d4def07065054e658eee) on `feature/b-line-ci-fast-path-r1`, based on accepted pre-v0.6 code ancestor `08e81bec003d645a0a0582db183a1b6916887eff`.
+- [CI verification #37721973690](https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/37721973690): **SUCCESS**, all 6 planner self-tests passed with production/research dependency installation and mypy intentionally skipped for CI-mechanics-only diff. The prior general 3.12 smoke at `a66e238f` also succeeded with mypy + compile + same tests. These verify the CI planner, **not the RC2 infra repair or protected retry**.
+- Files: `.github/workflows/ci.yml`, `scripts/ci/test_plan.py`, `tests/test_ci_test_plan.py`. FAST checks changed paths, maintains Ruff with exact inherited EXE001 ledger, changed JSON parse validation, path-risk mapping with unknown executable -> full fallback, L3 manual integration/full profiles, and periodic weekly full. Planner self-tests alone bypass global conftest; all actual B-line suites retain hermetic guards.
+- **Not active on the pre-v0.6 development branches until controlled integration**. Post-repair Controller review, cut `v0.6` and cherry-pick/merge this isolated CI package subject to normal L2 checking; **never** merge or use validation-only runner as product base.

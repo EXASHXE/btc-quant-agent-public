@@ -872,7 +872,11 @@
   },
   "b_line_ci_economy": {
     "policy_path": "docs/project/B_LINE_TEST_AND_CI_ECONOMY_V1.md",
-    "stage": "PARALLEL_MECHANICAL_CI_REFACTOR_TO_IMPLEMENT",
+    "branch": "feature/b-line-ci-fast-path-r1",
+    "candidate_sha": "430becb96389a62481e4d4def07065054e658eee",
+    "base_sha": "08e81bec003d645a0a0582db183a1b6916887eff",
+    "ci_run": "https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/37721973690",
+    "ci_status": "FAST_PATH_PLANNER_CI_PASSED__AWAITING_V06_INTEGRATION",
     "full_suite_each_push": false,
     "protected_and_live_gates": "UNCHANGED"
   }
