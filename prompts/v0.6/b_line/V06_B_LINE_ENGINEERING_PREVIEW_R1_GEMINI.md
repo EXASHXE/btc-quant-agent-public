@@ -1,3 +1,5 @@
+> **Local-worktree location override (Controller-approved, no other authority change):** [V0.6 workspace layout](https://github.com/EXASHXE/btc-quant-agent-public/blob/v0.6-docs/docs/project/V0.6_PARALLEL_LOCAL_WORKTREE_LAYOUT_V1.md), `CONTROLLER_WORKSPACE_OVERRIDE_SHA=595d0b87cdad43f924f1e0040b8d6b33ae241237`. The formerly specified sibling worktree path is replaced by `/root/workspace/project/quant-v0.6/g1-engineering-preview`. The original G1 CONTROLLER_DISPATCH_SHA, allowed source scope, base code SHA, DRY_RUN limitation, security fences, and proactive branch push all remain unchanged. Run [bootstrap prompt](https://github.com/EXASHXE/btc-quant-agent-public/blob/v0.6-docs/prompts/v0.6/ops/V06_PARALLEL_WORKTREE_BOOTSTRAP_R1.md) first; if old task worktree exists, stop for migration rather than moving it.
+
 # v0.6 B-line Engineering Preview R1 — WP-A/C/D controlled integration and offline end-to-end DRY_RUN
 
 **Executor:** Gemini implementation engineer; **Controller:** ChatGPT-0 (B-line). One coherent work package with terminal push, not a fresh strategic research or protected-holdout task.
@@ -10,7 +12,7 @@
 | BASE BRANCH / exact START_SHA | `v0.6` / `d6500140f3141d179181f2360ad815b5bfe9c954` |
 | NEW IMPLEMENTATION BRANCH | `feature/v06-bline-engineering-preview-r1` from the exact START_SHA |
 | LOCAL ENTRY CHECKOUT | `/root/workspace/project/rc2-tactical-successor` |
-| DEDICATED SIBLING WORKTREE | `/root/workspace/project/rc2-tactical-successor-v06-preview-r1` |
+| DEDICATED SIBLING WORKTREE | `/root/workspace/project/quant-v0.6/g1-engineering-preview` |
 | R8 Live V1 baseline | `08e81bec003d645a0a0582db183a1b6916887eff` — safety semantics accepted, **independent TESTNET release held** |
 | WP-A Controller-accepted | `606f286dbb5d7af46776043d1287d9b3e7b1e679` — startup & operational |
 | WP-C Controller-accepted | `72b39de71024b3051357c17eee7922e657dcb81f` — LLM/approval, external smoke pending |
@@ -50,7 +52,7 @@ Read-only preflight:
 
 ```bash
 ENTRY=/root/workspace/project/rc2-tactical-successor
-WT=/root/workspace/project/rc2-tactical-successor-v06-preview-r1
+WT=/root/workspace/project/quant-v0.6/g1-engineering-preview
 cd "$ENTRY" || exit 1
 pwd -P
 git rev-parse --show-toplevel

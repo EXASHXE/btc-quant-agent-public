@@ -1,3 +1,5 @@
+> **Local-worktree location override (Controller-approved, no other authority change):** [V0.6 workspace layout](https://github.com/EXASHXE/btc-quant-agent-public/blob/v0.6-docs/docs/project/V0.6_PARALLEL_LOCAL_WORKTREE_LAYOUT_V1.md), `CONTROLLER_WORKSPACE_OVERRIDE_SHA=595d0b87cdad43f924f1e0040b8d6b33ae241237`. The formerly specified sibling worktree path is replaced by `/root/workspace/project/quant-v0.6/g2-strategy-discovery`. G2 method-freeze-first-push, nonprotected source and independent test rules, code base SHA, original CONTROLLER_DISPATCH_SHA and terminal auto-push remain unchanged. Run [bootstrap prompt](https://github.com/EXASHXE/btc-quant-agent-public/blob/v0.6-docs/prompts/v0.6/ops/V06_PARALLEL_WORKTREE_BOOTSTRAP_R1.md) first; if old task worktree exists, stop for migration.
+
 # V06 B-line G2 — prospective Strategy Discovery R1 (NONPROTECTED, parallel with G1)
 
 ## Dispatch identity and executor role
@@ -12,7 +14,7 @@ This is one **bounded scientific-research work package** with a forced PRE-REGIS
 | G2 code START_SHA | `d6500140f3141d179181f2360ad815b5bfe9c954` — separate `v0.6` baseline |
 | Target feature branch | `feature/v06-bline-g2-strategy-discovery-r1` |
 | Existing entry checkout | `/root/workspace/project/rc2-tactical-successor` |
-| G2 isolated worktree | `/root/workspace/project/rc2-tactical-successor-v06-g2-r1` |
+| G2 isolated worktree | `/root/workspace/project/quant-v0.6/g2-strategy-discovery` |
 | G1 concurrent worktree | `/root/workspace/project/rc2-tactical-successor-v06-preview-r1` — **DO NOT TOUCH** |
 | Allowed test capability | hermetic, nonprotected development only |
 | Protected RC2 retry | `NOT_AUTHORIZED`; neither archive read nor outcome resolution |
@@ -59,7 +61,7 @@ Read-only preflight in original entry checkout:
 
 ```bash
 ENTRY=/root/workspace/project/rc2-tactical-successor
-WT=/root/workspace/project/rc2-tactical-successor-v06-g2-r1
+WT=/root/workspace/project/quant-v0.6/g2-strategy-discovery
 cd "$ENTRY" || exit 1
 pwd -P
 git rev-parse --show-toplevel
@@ -176,7 +178,7 @@ executor_profile: SOL_HIGH | GEMINI | LUNA_MECHANICAL
 controller_dispatch_sha: 0cc3d6e14d5c4e301c987b9e760fabb393e8141a
 code_start_sha: d6500140f3141d179181f2360ad815b5bfe9c954
 original_entry_checkout: /root/workspace/project/rc2-tactical-successor
-new_worktree: /root/workspace/project/rc2-tactical-successor-v06-g2-r1
+new_worktree: /root/workspace/project/quant-v0.6/g2-strategy-discovery
 branch: feature/v06-bline-g2-strategy-discovery-r1
 pre_registration_sha: <FIRST_PUSHED_COMMIT_SHA>
 implementation_sha: <EXACT_CODE_SHA_OR_NONE>
