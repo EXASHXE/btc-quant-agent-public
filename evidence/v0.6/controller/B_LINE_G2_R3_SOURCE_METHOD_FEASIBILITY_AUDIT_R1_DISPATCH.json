@@ -1,0 +1,65 @@
+{
+  "schema": "V06_G2_R3_SOURCE_COST_FEASIBILITY_AUDIT_R1",
+  "task_id": "V06_G2_R3_SOURCE_COST_FEASIBILITY_AUDIT_R1",
+  "controller_disposition": "G2_R3_DESIGN_CONDITIONALLY_ACCEPTED_SOURCE_AND_COST_FEASIBILITY_HOLD",
+  "repository": "EXASHXE/btc-quant-agent-public",
+  "docs_start_sha": "76d8e1da49efe7ce9ebb548dfe9524fca3095d46",
+  "code_base_sha": "e0ff8c3473de4bfa3e66fe7928d42992a4d38a32",
+  "accepted_design_source_sha": "e5b2006a89441f7eb2ec900e508aff451106b87a",
+  "design_commit_sha": "9eb87d57247e5838f0becd9d78aa7bc5861674b9",
+  "previous_g2_r2_terminal_sha": "2e922f486cf5b3f6cb7fa3aa7823cd096f24c17e",
+  "worktree": "/root/workspace/project/quant-v0.6/g2-r3-source-feasibility-r1",
+  "branch": "feature/v06-bline-g2-r3-source-feasibility-r1",
+  "mode": "SOURCE_SPEC_AND_PROVENANCE_METADATA_ONLY__NO_EMPIRICAL_OUTCOME_READ",
+  "allowed_prefixes": [
+    "docs/strategy_research/g2_r3/source_audit/",
+    "evidence/v0.6/b_line/g2_r3_source_audit/"
+  ],
+  "prohibited": {
+    "price_bodies": "NO",
+    "funding_rate_bodies": "NO",
+    "new_backtest": "NO",
+    "candidate_ranking": "NO",
+    "candidate_config_change": "NO",
+    "G2_R3_prior_design_mutation": "NO",
+    "production_source_change": "NO",
+    "RC2_protected_universe": "NO",
+    "account_or_exchange_private_API": "NO",
+    "testnet": "NO",
+    "real_funds_write": "NONE"
+  },
+  "allowlisted_symbol_metadata": [
+    "BTCUSDT",
+    "ETHUSDT",
+    "SOLUSDT"
+  ],
+  "public_metadata_budget": {
+    "max_http_requests": 30,
+    "max_bytes": 10000000,
+    "allowlist_static_official_spec_and_per_symbol_non_price_endpoints": true
+  },
+  "mandatory_findings": [
+    "REAL_WORLD_FEE_APPLICATION_BY_PRODUCT_AND_TIME_OR_PROXY_BOUND",
+    "FUNDING_SETTLEMENT_AND_CALC_TIME_MAPPING_OR_UNKNOWN",
+    "MARK_PRICE_1MIN_HISTORICAL_COVERAGE_FEASIBILITY_WITHOUT_PRICE_BODY_READ",
+    "PRICE_FILTER_LOT_SIZE_MIN_NOTIONAL_EFFECTIVE_HISTORY_OR_PROXY",
+    "SPREAD_IMPACT_STRESS_ENVELOPE_NOT_DIRECTLY_PROVEN_BY_OHLCV",
+    "THREE_FOLD_SUPPORT_100_TRADE_PER_PARTITION_FEASIBILITY_GIVEN_SELECTIVE_SIGNALS",
+    "MODEL_FUNDING_SIGN_AND_POSITIONS_EQUITY_MTM_ADMISSION",
+    "G3_POST_MERGE_H40_FULL_SUITE_INHERITED_FAILURE_NOT_G2_DESIGN_RESULT"
+  ],
+  "terminal_states": [
+    "G2_R3_SOURCE_FEASIBILITY_ACCEPTABLE_FOR_SEPARATE_PREREG",
+    "G2_R3_SOURCE_PROXY_DIAGNOSTIC_ONLY",
+    "G2_R3_METHOD_REPAIR_REQUIRED_BEFORE_PREREG",
+    "G2_R3_SOURCE_BLOCKED",
+    "BLOCKED_NOT_PUSHED"
+  ],
+  "automatic_commit_push": true,
+  "controller_prompt_path": "prompts/v0.6/b_line/V06_G2_R3_SOURCE_COST_FEASIBILITY_AUDIT_R1.md",
+  "controller_review_path": "reviews/v0.6/b_line/V06_G2_R3_DESIGN_CONTROLLER_L2_SCIENTIFIC_REVIEW.md",
+  "release_policy_quality": "NONE",
+  "protected_retry": "NOT_AUTHORIZED",
+  "testnet": "NOT_AUTHORIZED",
+  "real_funds_write_authority": "NONE"
+}
