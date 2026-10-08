@@ -1,0 +1,16 @@
+# Gemini B — R3 Overnight Independent Verifier (INACTIVE TEMPLATE)
+
+**STOP** without future exact Controller active dispatch binding accepted R3 method repair, source admissions, first *pushed* preregistration and separate B independent verification scope; this template alone authorizes ZERO price-body reads or implementation. Report BLOCKED_MISSING_CONTROLLER_EMPIRICAL_DISPATCH if absent.
+
+Repository EXASHXE/btc-quant-agent-public; future worktree /root/workspace/project/quant-v0.6/g2-overnight-verifier-b; branch feature/v06-bline-g2-overnight-verifier-b, separate venv/temp/cache from Gemini A. Verify exact pinned code SHA/branch against remote and preserve all existing original/G1/G2 R1/R2/R3/G3 and Controller review trees. Never edit Gemini A code, its results, candidate ID registry or its branch.
+
+**Mission:** independently challenge PIT, fill, funding, fees and portfolio risk semantics of Gemini A's eight *frozen* development hypotheses, not propose or tune further candidates.
+
+1. Begin with only approved static schemas and synthetic adversarial fixtures; verify method, protected denylist and no new empirical outcomes prior to first remotely-pushed prereg SHA. Verify official BTC/ETH/SOL USDT-M source product type, month/checksum and contemporaneous receipt vs archival reconstruction classification.
+2. Independent oracle/tests for completed 1m/1h/4h bars, 60s source availability lag and later earliest fill, clock-bound funding information, stale/missing trade and mark minute, stop+target same bar SL-first, adverse gap and no target over-credit, lot/tick/min-notional, fee/slip once, signed funding direction, unsettled reserve, <=1x collateral, 5% reserve, 10% equity drawdown next-open kill and no backdated insolvency.
+3. A source implementation commit must be frozen before cross-verification. After separate empirical authorization, compare source checksums, trade/no-fill/event identities for all eight variants and controls; independently reconcile fixed-seed sampled winning and losing episodes, extreme gaps, all aggregate bps/R/USDT and account minute MTM, costs base/stress and error bars. No cherry-picked-only winner audit, no extra candidate selection.
+4. Check risk/fee proxy confidence and power: 100/fold positive proposed sample constraint; pre-registered separate negative sufficient-support vs sparse diagnostic statuses. Require global 8x2 trial correction, joint weekly blocks/cross-asset dependence, no overlapping independent n inflation or fake holdout.
+5. Publish detailed discrepancy with exact original input/output hashes and minimal synthetic reproducer. Material mismatch = DISCREPANCY_BLOCKED, not code rewrite by B or waiver. Missing A frozen implementation/outcome = INCOMPLETE, never VERIFIED.
+6. Time budget <=8h if authorized, actual measurements and early stop; targeted tests not continuous full-suite. Independently auto-commit/push verifier-only artifacts to its own feature branch, read remote HEAD parent/diff and report VERIFIED_WITH_LIMITATIONS / DISCREPANCY_BLOCKED / INCOMPLETE / BLOCKED_NOT_PUSHED.
+
+**No signed Binance/API account/private data, RC2 sealed assets, production Tactical/MarketWatch edits, provider notifications, TESTNET or real funds writes.** No release/alpha authority.
