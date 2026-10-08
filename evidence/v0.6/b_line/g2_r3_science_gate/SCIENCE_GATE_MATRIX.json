@@ -1,0 +1,1659 @@
+{
+  "schema_version": "G2_R3_SOL_SCIENCE_GATE_MATRIX_V1",
+  "task_id": "V06_G2_R3_SOL_SCIENCE_GATE_R1",
+  "controller_dispatch_sha": "647e2e6e1e2e375817ec7a07f2ea11fc57484827",
+  "status": "G2_R3_PROTECTION_CONFLICT_REQUIRES_CONTROLLER",
+  "verdict_vocabulary": [
+    "READY_FOR_CONTROLLER_REVIEW",
+    "PENDING_EXTERNAL_SOURCE",
+    "DISPUTED_PROTECTED_WINDOW",
+    "PROXY_ONLY",
+    "BLOCKED"
+  ],
+  "gates": [
+    {
+      "gate": "OLD_BTC_FINAL_HOLDOUT_OVERLAP",
+      "verdict": "DISPUTED_PROTECTED_WINDOW",
+      "evidence": "BTCFeb\u2013Jul2026 remains old finalholdout despiteR2 exposure;release documentUNVERIFIED",
+      "required_next_fact_or_authority": "SelectOptionA or publish exact OptionB protection reconciliation"
+    },
+    {
+      "gate": "OLDER_BTC_PARTITION_PROPOSAL",
+      "verdict": "READY_FOR_CONTROLLER_REVIEW",
+      "evidence": "March warm-up/April folds2021,2023,2025 within old declareddevelopment;not current body authority",
+      "required_next_fact_or_authority": "Choose exact option/universe and new empirical grant"
+    },
+    {
+      "gate": "ETH_SOL_MATCHED_COVERAGE_AUTHORITY",
+      "verdict": "PENDING_EXTERNAL_SOURCE",
+      "evidence": "OldBTC manifest cannot establish ETH/SOL histories;Apr\u2013Jul2026 R2 exposure context only",
+      "required_next_fact_or_authority": "Named perasset approved-window manifests/authority,or explicit BTC-only diagnostic universe amendment"
+    },
+    {
+      "gate": "GLOBAL_ATTEMPT_EXPOSURE_LEDGER",
+      "verdict": "READY_FOR_CONTROLLER_REVIEW",
+      "evidence": "R1/v03 detailed countsUNKNOWN,R2 prior8,R3 planned8;all exposed historical claims exploratory",
+      "required_next_fact_or_authority": "Controller preserve full search/exposure caveat;no old winner rescue"
+    },
+    {
+      "gate": "LOCAL_BTC_PARQUET_ROOT_AND_BYTES",
+      "verdict": "PENDING_EXTERNAL_SOURCE",
+      "evidence": "Manifest text PRESENT_METADATA_ONLY;0 marketfiles stat/hash;67 physicalfiles NOT_VERIFIED",
+      "required_next_fact_or_authority": "Owner-supplied positively identified canonicalroot/schema;bounded metadata inventory then future content grant"
+    },
+    {
+      "gate": "CONTINUOUS_TRUE_MARK_VS_SETTLEMENT_MARK",
+      "verdict": "PENDING_EXTERNAL_SOURCE",
+      "evidence": "Funding mark minute-open!=continuousminute-closeMTM;9 old daily repairs require lineage",
+      "required_next_fact_or_authority": "Verify selectedtrue mark schema/path/checksums/continuity only after approved freeze/body grant"
+    },
+    {
+      "gate": "CONTROLLED_CACHE_AND_PROTECTION",
+      "verdict": "READY_FOR_CONTROLLER_REVIEW",
+      "evidence": "Selected-only read-only contentaddress/mount plan;no full67-month hash or mixed funding blob read to filter after access.",
+      "required_next_fact_or_authority": "Approve immutable selectedcache and restricted A/B filecapabilities"
+    },
+    {
+      "gate": "CANDIDATE_FORMULAS_AND_8_BUDGET",
+      "verdict": "READY_FOR_CONTROLLER_REVIEW",
+      "evidence": "8 exactIDs/hypotheses copied,one campaign,zero sweeps;original registry unchanged",
+      "required_next_fact_or_authority": "Controller select draft and code/oracle identities,no effectivefreeze yet"
+    },
+    {
+      "gate": "TWO_LEDGER_EVENT_CLOCK",
+      "verdict": "READY_FOR_CONTROLLER_REVIEW",
+      "evidence": "Accepted addendum lag/ack/reserve/protection semantics inherited by exactsha;not implementationtested",
+      "required_next_fact_or_authority": "A/B own synthetic proof underP0 plus later source/empirical dispatch"
+    },
+    {
+      "gate": "FEES_TICK_LOT_SPREAD_FUNDING",
+      "verdict": "PROXY_ONLY",
+      "evidence": "22/44bp+4/8bp assumptions;applicablefees/filterhistory/settlement/caps/impactunknown",
+      "required_next_fact_or_authority": "Frozen declared diagnostic proxies or credible strongerenvelope before strongerclaims"
+    },
+    {
+      "gate": "TWELVE_HOUR_STRESS_GEOMETRY",
+      "verdict": "PROXY_ONLY",
+      "evidence": "140bp cost/280bp minstop>250bp means ineligible scenario,not empiricalloss",
+      "required_next_fact_or_authority": "Retain12hIDs/statuses;no clandestine relaxation"
+    },
+    {
+      "gate": "MULTIPLICITY_AND_SUPPORT",
+      "verdict": "READY_FOR_CONTROLLER_REVIEW",
+      "evidence": "8x2 correction,+5bp effect,100/foldpositive,30/fold+adjusteduppernegativeproposal;epochstratifiedbootstrap",
+      "required_next_fact_or_authority": "Approve all effect/support/cluster/seed amendments before future outcomes"
+    },
+    {
+      "gate": "LICENCE_REGULATORY_AND_PUBLICATION",
+      "verdict": "PENDING_EXTERNAL_SOURCE",
+      "evidence": "Noncommercial suitabilityUNDER_REVIEW;Aug25 legacy download vsAug26 terms update,dated applicabilityUNVERIFIED;no live/paid licence.",
+      "required_next_fact_or_authority": "Document intendedscope/datedterms/attribution and derived-publication permission;blockcommercialoutsidegrant"
+    },
+    {
+      "gate": "FUTURE_EFFECTIVE_PREREG_BODY_AUTHORITY",
+      "verdict": "BLOCKED",
+      "evidence": "ThisDRAFT and A/B syntheticP0 grants zero empirical permission",
+      "required_next_fact_or_authority": "SeparateController selection,frozen prereg pushverification and scoped bodyadmission"
+    },
+    {
+      "gate": "H40_INHERITED_FULL_SUITE_TRACK",
+      "verdict": "PENDING_EXTERNAL_SOURCE",
+      "evidence": "Prior inheritedhash issue not tested/triaged here,not G2science draft result",
+      "required_next_fact_or_authority": "SeparateController engineering triage,no golden/CIchange"
+    },
+    {
+      "gate": "G3_NONTRADING_PROVIDER_AND_G4_FUNDS",
+      "verdict": "BLOCKED",
+      "evidence": "No provider/account actions,TESTNET/livewriteauthorityNONE",
+      "required_next_fact_or_authority": "Separate nontrading/runtime or tradingauthorization;not Sol task"
+    }
+  ],
+  "month_asset_authority_matrix": [
+    {
+      "month": "2021-01",
+      "BTCUSDT": {
+        "status": "EXPOSED_DEVELOPMENT",
+        "authority_grade": "CONTROLLER_ATTESTED_V03_DECLARATION",
+        "source_grade": "OLD_BTC_MANIFEST_COVERAGE_CLAIM_NOT_PHYSICAL_VERIFICATION",
+        "exposure": "PRIOR_RESEARCH_DEVELOPMENT_OR_EXPOSURE_UNKNOWN",
+        "release_reclassification": "NO_RECLASSIFICATION_NEEDED_FOR_OLD_DEVELOPMENT_BUT_NEW_R3_ADMISSION_REQUIRED"
+      },
+      "ETHUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "SOLUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "future_admission": "CONTROLLER_DECISION_REQUIRED"
+    },
+    {
+      "month": "2021-02",
+      "BTCUSDT": {
+        "status": "EXPOSED_DEVELOPMENT",
+        "authority_grade": "CONTROLLER_ATTESTED_V03_DECLARATION",
+        "source_grade": "OLD_BTC_MANIFEST_COVERAGE_CLAIM_NOT_PHYSICAL_VERIFICATION",
+        "exposure": "PRIOR_RESEARCH_DEVELOPMENT_OR_EXPOSURE_UNKNOWN",
+        "release_reclassification": "NO_RECLASSIFICATION_NEEDED_FOR_OLD_DEVELOPMENT_BUT_NEW_R3_ADMISSION_REQUIRED"
+      },
+      "ETHUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "SOLUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "future_admission": "CONTROLLER_DECISION_REQUIRED"
+    },
+    {
+      "month": "2021-03",
+      "BTCUSDT": {
+        "status": "EXPOSED_DEVELOPMENT",
+        "authority_grade": "CONTROLLER_ATTESTED_V03_DECLARATION",
+        "source_grade": "OLD_BTC_MANIFEST_COVERAGE_CLAIM_NOT_PHYSICAL_VERIFICATION",
+        "exposure": "PRIOR_RESEARCH_DEVELOPMENT_OR_EXPOSURE_UNKNOWN",
+        "release_reclassification": "NO_RECLASSIFICATION_NEEDED_FOR_OLD_DEVELOPMENT_BUT_NEW_R3_ADMISSION_REQUIRED"
+      },
+      "ETHUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "SOLUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "future_admission": "CONTROLLER_DECISION_REQUIRED"
+    },
+    {
+      "month": "2021-04",
+      "BTCUSDT": {
+        "status": "EXPOSED_DEVELOPMENT",
+        "authority_grade": "CONTROLLER_ATTESTED_V03_DECLARATION",
+        "source_grade": "OLD_BTC_MANIFEST_COVERAGE_CLAIM_NOT_PHYSICAL_VERIFICATION",
+        "exposure": "PRIOR_RESEARCH_DEVELOPMENT_OR_EXPOSURE_UNKNOWN",
+        "release_reclassification": "NO_RECLASSIFICATION_NEEDED_FOR_OLD_DEVELOPMENT_BUT_NEW_R3_ADMISSION_REQUIRED"
+      },
+      "ETHUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "SOLUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "future_admission": "CONTROLLER_DECISION_REQUIRED"
+    },
+    {
+      "month": "2021-05",
+      "BTCUSDT": {
+        "status": "EXPOSED_DEVELOPMENT",
+        "authority_grade": "CONTROLLER_ATTESTED_V03_DECLARATION",
+        "source_grade": "OLD_BTC_MANIFEST_COVERAGE_CLAIM_NOT_PHYSICAL_VERIFICATION",
+        "exposure": "PRIOR_RESEARCH_DEVELOPMENT_OR_EXPOSURE_UNKNOWN",
+        "release_reclassification": "NO_RECLASSIFICATION_NEEDED_FOR_OLD_DEVELOPMENT_BUT_NEW_R3_ADMISSION_REQUIRED"
+      },
+      "ETHUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "SOLUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "future_admission": "CONTROLLER_DECISION_REQUIRED"
+    },
+    {
+      "month": "2021-06",
+      "BTCUSDT": {
+        "status": "EXPOSED_DEVELOPMENT",
+        "authority_grade": "CONTROLLER_ATTESTED_V03_DECLARATION",
+        "source_grade": "OLD_BTC_MANIFEST_COVERAGE_CLAIM_NOT_PHYSICAL_VERIFICATION",
+        "exposure": "PRIOR_RESEARCH_DEVELOPMENT_OR_EXPOSURE_UNKNOWN",
+        "release_reclassification": "NO_RECLASSIFICATION_NEEDED_FOR_OLD_DEVELOPMENT_BUT_NEW_R3_ADMISSION_REQUIRED"
+      },
+      "ETHUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "SOLUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "future_admission": "CONTROLLER_DECISION_REQUIRED"
+    },
+    {
+      "month": "2021-07",
+      "BTCUSDT": {
+        "status": "EXPOSED_DEVELOPMENT",
+        "authority_grade": "CONTROLLER_ATTESTED_V03_DECLARATION",
+        "source_grade": "OLD_BTC_MANIFEST_COVERAGE_CLAIM_NOT_PHYSICAL_VERIFICATION",
+        "exposure": "PRIOR_RESEARCH_DEVELOPMENT_OR_EXPOSURE_UNKNOWN",
+        "release_reclassification": "NO_RECLASSIFICATION_NEEDED_FOR_OLD_DEVELOPMENT_BUT_NEW_R3_ADMISSION_REQUIRED"
+      },
+      "ETHUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "SOLUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "future_admission": "CONTROLLER_DECISION_REQUIRED"
+    },
+    {
+      "month": "2021-08",
+      "BTCUSDT": {
+        "status": "EXPOSED_DEVELOPMENT",
+        "authority_grade": "CONTROLLER_ATTESTED_V03_DECLARATION",
+        "source_grade": "OLD_BTC_MANIFEST_COVERAGE_CLAIM_NOT_PHYSICAL_VERIFICATION",
+        "exposure": "PRIOR_RESEARCH_DEVELOPMENT_OR_EXPOSURE_UNKNOWN",
+        "release_reclassification": "NO_RECLASSIFICATION_NEEDED_FOR_OLD_DEVELOPMENT_BUT_NEW_R3_ADMISSION_REQUIRED"
+      },
+      "ETHUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "SOLUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "future_admission": "CONTROLLER_DECISION_REQUIRED"
+    },
+    {
+      "month": "2021-09",
+      "BTCUSDT": {
+        "status": "EXPOSED_DEVELOPMENT",
+        "authority_grade": "CONTROLLER_ATTESTED_V03_DECLARATION",
+        "source_grade": "OLD_BTC_MANIFEST_COVERAGE_CLAIM_NOT_PHYSICAL_VERIFICATION",
+        "exposure": "PRIOR_RESEARCH_DEVELOPMENT_OR_EXPOSURE_UNKNOWN",
+        "release_reclassification": "NO_RECLASSIFICATION_NEEDED_FOR_OLD_DEVELOPMENT_BUT_NEW_R3_ADMISSION_REQUIRED"
+      },
+      "ETHUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "SOLUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "future_admission": "CONTROLLER_DECISION_REQUIRED"
+    },
+    {
+      "month": "2021-10",
+      "BTCUSDT": {
+        "status": "EXPOSED_DEVELOPMENT",
+        "authority_grade": "CONTROLLER_ATTESTED_V03_DECLARATION",
+        "source_grade": "OLD_BTC_MANIFEST_COVERAGE_CLAIM_NOT_PHYSICAL_VERIFICATION",
+        "exposure": "PRIOR_RESEARCH_DEVELOPMENT_OR_EXPOSURE_UNKNOWN",
+        "release_reclassification": "NO_RECLASSIFICATION_NEEDED_FOR_OLD_DEVELOPMENT_BUT_NEW_R3_ADMISSION_REQUIRED"
+      },
+      "ETHUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "SOLUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "future_admission": "CONTROLLER_DECISION_REQUIRED"
+    },
+    {
+      "month": "2021-11",
+      "BTCUSDT": {
+        "status": "EXPOSED_DEVELOPMENT",
+        "authority_grade": "CONTROLLER_ATTESTED_V03_DECLARATION",
+        "source_grade": "OLD_BTC_MANIFEST_COVERAGE_CLAIM_NOT_PHYSICAL_VERIFICATION",
+        "exposure": "PRIOR_RESEARCH_DEVELOPMENT_OR_EXPOSURE_UNKNOWN",
+        "release_reclassification": "NO_RECLASSIFICATION_NEEDED_FOR_OLD_DEVELOPMENT_BUT_NEW_R3_ADMISSION_REQUIRED"
+      },
+      "ETHUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "SOLUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "future_admission": "CONTROLLER_DECISION_REQUIRED"
+    },
+    {
+      "month": "2021-12",
+      "BTCUSDT": {
+        "status": "EXPOSED_DEVELOPMENT",
+        "authority_grade": "CONTROLLER_ATTESTED_V03_DECLARATION",
+        "source_grade": "OLD_BTC_MANIFEST_COVERAGE_CLAIM_NOT_PHYSICAL_VERIFICATION",
+        "exposure": "PRIOR_RESEARCH_DEVELOPMENT_OR_EXPOSURE_UNKNOWN",
+        "release_reclassification": "NO_RECLASSIFICATION_NEEDED_FOR_OLD_DEVELOPMENT_BUT_NEW_R3_ADMISSION_REQUIRED"
+      },
+      "ETHUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "SOLUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "future_admission": "CONTROLLER_DECISION_REQUIRED"
+    },
+    {
+      "month": "2022-01",
+      "BTCUSDT": {
+        "status": "EXPOSED_DEVELOPMENT",
+        "authority_grade": "CONTROLLER_ATTESTED_V03_DECLARATION",
+        "source_grade": "OLD_BTC_MANIFEST_COVERAGE_CLAIM_NOT_PHYSICAL_VERIFICATION",
+        "exposure": "PRIOR_RESEARCH_DEVELOPMENT_OR_EXPOSURE_UNKNOWN",
+        "release_reclassification": "NO_RECLASSIFICATION_NEEDED_FOR_OLD_DEVELOPMENT_BUT_NEW_R3_ADMISSION_REQUIRED"
+      },
+      "ETHUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "SOLUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "future_admission": "CONTROLLER_DECISION_REQUIRED"
+    },
+    {
+      "month": "2022-02",
+      "BTCUSDT": {
+        "status": "EXPOSED_DEVELOPMENT",
+        "authority_grade": "CONTROLLER_ATTESTED_V03_DECLARATION",
+        "source_grade": "OLD_BTC_MANIFEST_COVERAGE_CLAIM_NOT_PHYSICAL_VERIFICATION",
+        "exposure": "PRIOR_RESEARCH_DEVELOPMENT_OR_EXPOSURE_UNKNOWN",
+        "release_reclassification": "NO_RECLASSIFICATION_NEEDED_FOR_OLD_DEVELOPMENT_BUT_NEW_R3_ADMISSION_REQUIRED"
+      },
+      "ETHUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "SOLUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "future_admission": "CONTROLLER_DECISION_REQUIRED"
+    },
+    {
+      "month": "2022-03",
+      "BTCUSDT": {
+        "status": "EXPOSED_DEVELOPMENT",
+        "authority_grade": "CONTROLLER_ATTESTED_V03_DECLARATION",
+        "source_grade": "OLD_BTC_MANIFEST_COVERAGE_CLAIM_NOT_PHYSICAL_VERIFICATION",
+        "exposure": "PRIOR_RESEARCH_DEVELOPMENT_OR_EXPOSURE_UNKNOWN",
+        "release_reclassification": "NO_RECLASSIFICATION_NEEDED_FOR_OLD_DEVELOPMENT_BUT_NEW_R3_ADMISSION_REQUIRED"
+      },
+      "ETHUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "SOLUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "future_admission": "CONTROLLER_DECISION_REQUIRED"
+    },
+    {
+      "month": "2022-04",
+      "BTCUSDT": {
+        "status": "EXPOSED_DEVELOPMENT",
+        "authority_grade": "CONTROLLER_ATTESTED_V03_DECLARATION",
+        "source_grade": "OLD_BTC_MANIFEST_COVERAGE_CLAIM_NOT_PHYSICAL_VERIFICATION",
+        "exposure": "PRIOR_RESEARCH_DEVELOPMENT_OR_EXPOSURE_UNKNOWN",
+        "release_reclassification": "NO_RECLASSIFICATION_NEEDED_FOR_OLD_DEVELOPMENT_BUT_NEW_R3_ADMISSION_REQUIRED"
+      },
+      "ETHUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "SOLUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "future_admission": "CONTROLLER_DECISION_REQUIRED"
+    },
+    {
+      "month": "2022-05",
+      "BTCUSDT": {
+        "status": "EXPOSED_DEVELOPMENT",
+        "authority_grade": "CONTROLLER_ATTESTED_V03_DECLARATION",
+        "source_grade": "OLD_BTC_MANIFEST_COVERAGE_CLAIM_NOT_PHYSICAL_VERIFICATION",
+        "exposure": "PRIOR_RESEARCH_DEVELOPMENT_OR_EXPOSURE_UNKNOWN",
+        "release_reclassification": "NO_RECLASSIFICATION_NEEDED_FOR_OLD_DEVELOPMENT_BUT_NEW_R3_ADMISSION_REQUIRED"
+      },
+      "ETHUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "SOLUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "future_admission": "CONTROLLER_DECISION_REQUIRED"
+    },
+    {
+      "month": "2022-06",
+      "BTCUSDT": {
+        "status": "EXPOSED_DEVELOPMENT",
+        "authority_grade": "CONTROLLER_ATTESTED_V03_DECLARATION",
+        "source_grade": "OLD_BTC_MANIFEST_COVERAGE_CLAIM_NOT_PHYSICAL_VERIFICATION",
+        "exposure": "PRIOR_RESEARCH_DEVELOPMENT_OR_EXPOSURE_UNKNOWN",
+        "release_reclassification": "NO_RECLASSIFICATION_NEEDED_FOR_OLD_DEVELOPMENT_BUT_NEW_R3_ADMISSION_REQUIRED"
+      },
+      "ETHUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "SOLUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "future_admission": "CONTROLLER_DECISION_REQUIRED"
+    },
+    {
+      "month": "2022-07",
+      "BTCUSDT": {
+        "status": "EXPOSED_DEVELOPMENT",
+        "authority_grade": "CONTROLLER_ATTESTED_V03_DECLARATION",
+        "source_grade": "OLD_BTC_MANIFEST_COVERAGE_CLAIM_NOT_PHYSICAL_VERIFICATION",
+        "exposure": "PRIOR_RESEARCH_DEVELOPMENT_OR_EXPOSURE_UNKNOWN",
+        "release_reclassification": "NO_RECLASSIFICATION_NEEDED_FOR_OLD_DEVELOPMENT_BUT_NEW_R3_ADMISSION_REQUIRED"
+      },
+      "ETHUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "SOLUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "future_admission": "CONTROLLER_DECISION_REQUIRED"
+    },
+    {
+      "month": "2022-08",
+      "BTCUSDT": {
+        "status": "EXPOSED_DEVELOPMENT",
+        "authority_grade": "CONTROLLER_ATTESTED_V03_DECLARATION",
+        "source_grade": "OLD_BTC_MANIFEST_COVERAGE_CLAIM_NOT_PHYSICAL_VERIFICATION",
+        "exposure": "PRIOR_RESEARCH_DEVELOPMENT_OR_EXPOSURE_UNKNOWN",
+        "release_reclassification": "NO_RECLASSIFICATION_NEEDED_FOR_OLD_DEVELOPMENT_BUT_NEW_R3_ADMISSION_REQUIRED"
+      },
+      "ETHUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "SOLUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "future_admission": "CONTROLLER_DECISION_REQUIRED"
+    },
+    {
+      "month": "2022-09",
+      "BTCUSDT": {
+        "status": "EXPOSED_DEVELOPMENT",
+        "authority_grade": "CONTROLLER_ATTESTED_V03_DECLARATION",
+        "source_grade": "OLD_BTC_MANIFEST_COVERAGE_CLAIM_NOT_PHYSICAL_VERIFICATION",
+        "exposure": "PRIOR_RESEARCH_DEVELOPMENT_OR_EXPOSURE_UNKNOWN",
+        "release_reclassification": "NO_RECLASSIFICATION_NEEDED_FOR_OLD_DEVELOPMENT_BUT_NEW_R3_ADMISSION_REQUIRED"
+      },
+      "ETHUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "SOLUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "future_admission": "CONTROLLER_DECISION_REQUIRED"
+    },
+    {
+      "month": "2022-10",
+      "BTCUSDT": {
+        "status": "EXPOSED_DEVELOPMENT",
+        "authority_grade": "CONTROLLER_ATTESTED_V03_DECLARATION",
+        "source_grade": "OLD_BTC_MANIFEST_COVERAGE_CLAIM_NOT_PHYSICAL_VERIFICATION",
+        "exposure": "PRIOR_RESEARCH_DEVELOPMENT_OR_EXPOSURE_UNKNOWN",
+        "release_reclassification": "NO_RECLASSIFICATION_NEEDED_FOR_OLD_DEVELOPMENT_BUT_NEW_R3_ADMISSION_REQUIRED"
+      },
+      "ETHUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "SOLUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "future_admission": "CONTROLLER_DECISION_REQUIRED"
+    },
+    {
+      "month": "2022-11",
+      "BTCUSDT": {
+        "status": "EXPOSED_DEVELOPMENT",
+        "authority_grade": "CONTROLLER_ATTESTED_V03_DECLARATION",
+        "source_grade": "OLD_BTC_MANIFEST_COVERAGE_CLAIM_NOT_PHYSICAL_VERIFICATION",
+        "exposure": "PRIOR_RESEARCH_DEVELOPMENT_OR_EXPOSURE_UNKNOWN",
+        "release_reclassification": "NO_RECLASSIFICATION_NEEDED_FOR_OLD_DEVELOPMENT_BUT_NEW_R3_ADMISSION_REQUIRED"
+      },
+      "ETHUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "SOLUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "future_admission": "CONTROLLER_DECISION_REQUIRED"
+    },
+    {
+      "month": "2022-12",
+      "BTCUSDT": {
+        "status": "EXPOSED_DEVELOPMENT",
+        "authority_grade": "CONTROLLER_ATTESTED_V03_DECLARATION",
+        "source_grade": "OLD_BTC_MANIFEST_COVERAGE_CLAIM_NOT_PHYSICAL_VERIFICATION",
+        "exposure": "PRIOR_RESEARCH_DEVELOPMENT_OR_EXPOSURE_UNKNOWN",
+        "release_reclassification": "NO_RECLASSIFICATION_NEEDED_FOR_OLD_DEVELOPMENT_BUT_NEW_R3_ADMISSION_REQUIRED"
+      },
+      "ETHUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "SOLUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "future_admission": "CONTROLLER_DECISION_REQUIRED"
+    },
+    {
+      "month": "2023-01",
+      "BTCUSDT": {
+        "status": "EXPOSED_DEVELOPMENT",
+        "authority_grade": "CONTROLLER_ATTESTED_V03_DECLARATION",
+        "source_grade": "OLD_BTC_MANIFEST_COVERAGE_CLAIM_NOT_PHYSICAL_VERIFICATION",
+        "exposure": "PRIOR_RESEARCH_DEVELOPMENT_OR_EXPOSURE_UNKNOWN",
+        "release_reclassification": "NO_RECLASSIFICATION_NEEDED_FOR_OLD_DEVELOPMENT_BUT_NEW_R3_ADMISSION_REQUIRED"
+      },
+      "ETHUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "SOLUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "future_admission": "CONTROLLER_DECISION_REQUIRED"
+    },
+    {
+      "month": "2023-02",
+      "BTCUSDT": {
+        "status": "EXPOSED_DEVELOPMENT",
+        "authority_grade": "CONTROLLER_ATTESTED_V03_DECLARATION",
+        "source_grade": "OLD_BTC_MANIFEST_COVERAGE_CLAIM_NOT_PHYSICAL_VERIFICATION",
+        "exposure": "PRIOR_RESEARCH_DEVELOPMENT_OR_EXPOSURE_UNKNOWN",
+        "release_reclassification": "NO_RECLASSIFICATION_NEEDED_FOR_OLD_DEVELOPMENT_BUT_NEW_R3_ADMISSION_REQUIRED"
+      },
+      "ETHUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "SOLUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "future_admission": "CONTROLLER_DECISION_REQUIRED"
+    },
+    {
+      "month": "2023-03",
+      "BTCUSDT": {
+        "status": "EXPOSED_DEVELOPMENT",
+        "authority_grade": "CONTROLLER_ATTESTED_V03_DECLARATION",
+        "source_grade": "OLD_BTC_MANIFEST_COVERAGE_CLAIM_NOT_PHYSICAL_VERIFICATION",
+        "exposure": "PRIOR_RESEARCH_DEVELOPMENT_OR_EXPOSURE_UNKNOWN",
+        "release_reclassification": "NO_RECLASSIFICATION_NEEDED_FOR_OLD_DEVELOPMENT_BUT_NEW_R3_ADMISSION_REQUIRED"
+      },
+      "ETHUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "SOLUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "future_admission": "CONTROLLER_DECISION_REQUIRED"
+    },
+    {
+      "month": "2023-04",
+      "BTCUSDT": {
+        "status": "EXPOSED_DEVELOPMENT",
+        "authority_grade": "CONTROLLER_ATTESTED_V03_DECLARATION",
+        "source_grade": "OLD_BTC_MANIFEST_COVERAGE_CLAIM_NOT_PHYSICAL_VERIFICATION",
+        "exposure": "PRIOR_RESEARCH_DEVELOPMENT_OR_EXPOSURE_UNKNOWN",
+        "release_reclassification": "NO_RECLASSIFICATION_NEEDED_FOR_OLD_DEVELOPMENT_BUT_NEW_R3_ADMISSION_REQUIRED"
+      },
+      "ETHUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "SOLUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "future_admission": "CONTROLLER_DECISION_REQUIRED"
+    },
+    {
+      "month": "2023-05",
+      "BTCUSDT": {
+        "status": "EXPOSED_DEVELOPMENT",
+        "authority_grade": "CONTROLLER_ATTESTED_V03_DECLARATION",
+        "source_grade": "OLD_BTC_MANIFEST_COVERAGE_CLAIM_NOT_PHYSICAL_VERIFICATION",
+        "exposure": "PRIOR_RESEARCH_DEVELOPMENT_OR_EXPOSURE_UNKNOWN",
+        "release_reclassification": "NO_RECLASSIFICATION_NEEDED_FOR_OLD_DEVELOPMENT_BUT_NEW_R3_ADMISSION_REQUIRED"
+      },
+      "ETHUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "SOLUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "future_admission": "CONTROLLER_DECISION_REQUIRED"
+    },
+    {
+      "month": "2023-06",
+      "BTCUSDT": {
+        "status": "EXPOSED_DEVELOPMENT",
+        "authority_grade": "CONTROLLER_ATTESTED_V03_DECLARATION",
+        "source_grade": "OLD_BTC_MANIFEST_COVERAGE_CLAIM_NOT_PHYSICAL_VERIFICATION",
+        "exposure": "PRIOR_RESEARCH_DEVELOPMENT_OR_EXPOSURE_UNKNOWN",
+        "release_reclassification": "NO_RECLASSIFICATION_NEEDED_FOR_OLD_DEVELOPMENT_BUT_NEW_R3_ADMISSION_REQUIRED"
+      },
+      "ETHUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "SOLUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "future_admission": "CONTROLLER_DECISION_REQUIRED"
+    },
+    {
+      "month": "2023-07",
+      "BTCUSDT": {
+        "status": "EXPOSED_DEVELOPMENT",
+        "authority_grade": "CONTROLLER_ATTESTED_V03_DECLARATION",
+        "source_grade": "OLD_BTC_MANIFEST_COVERAGE_CLAIM_NOT_PHYSICAL_VERIFICATION",
+        "exposure": "PRIOR_RESEARCH_DEVELOPMENT_OR_EXPOSURE_UNKNOWN",
+        "release_reclassification": "NO_RECLASSIFICATION_NEEDED_FOR_OLD_DEVELOPMENT_BUT_NEW_R3_ADMISSION_REQUIRED"
+      },
+      "ETHUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "SOLUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "future_admission": "CONTROLLER_DECISION_REQUIRED"
+    },
+    {
+      "month": "2023-08",
+      "BTCUSDT": {
+        "status": "EXPOSED_DEVELOPMENT",
+        "authority_grade": "CONTROLLER_ATTESTED_V03_DECLARATION",
+        "source_grade": "OLD_BTC_MANIFEST_COVERAGE_CLAIM_NOT_PHYSICAL_VERIFICATION",
+        "exposure": "PRIOR_RESEARCH_DEVELOPMENT_OR_EXPOSURE_UNKNOWN",
+        "release_reclassification": "NO_RECLASSIFICATION_NEEDED_FOR_OLD_DEVELOPMENT_BUT_NEW_R3_ADMISSION_REQUIRED"
+      },
+      "ETHUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "SOLUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "future_admission": "CONTROLLER_DECISION_REQUIRED"
+    },
+    {
+      "month": "2023-09",
+      "BTCUSDT": {
+        "status": "EXPOSED_DEVELOPMENT",
+        "authority_grade": "CONTROLLER_ATTESTED_V03_DECLARATION",
+        "source_grade": "OLD_BTC_MANIFEST_COVERAGE_CLAIM_NOT_PHYSICAL_VERIFICATION",
+        "exposure": "PRIOR_RESEARCH_DEVELOPMENT_OR_EXPOSURE_UNKNOWN",
+        "release_reclassification": "NO_RECLASSIFICATION_NEEDED_FOR_OLD_DEVELOPMENT_BUT_NEW_R3_ADMISSION_REQUIRED"
+      },
+      "ETHUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "SOLUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "future_admission": "CONTROLLER_DECISION_REQUIRED"
+    },
+    {
+      "month": "2023-10",
+      "BTCUSDT": {
+        "status": "EXPOSED_DEVELOPMENT",
+        "authority_grade": "CONTROLLER_ATTESTED_V03_DECLARATION",
+        "source_grade": "OLD_BTC_MANIFEST_COVERAGE_CLAIM_NOT_PHYSICAL_VERIFICATION",
+        "exposure": "PRIOR_RESEARCH_DEVELOPMENT_OR_EXPOSURE_UNKNOWN",
+        "release_reclassification": "NO_RECLASSIFICATION_NEEDED_FOR_OLD_DEVELOPMENT_BUT_NEW_R3_ADMISSION_REQUIRED"
+      },
+      "ETHUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "SOLUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "future_admission": "CONTROLLER_DECISION_REQUIRED"
+    },
+    {
+      "month": "2023-11",
+      "BTCUSDT": {
+        "status": "EXPOSED_DEVELOPMENT",
+        "authority_grade": "CONTROLLER_ATTESTED_V03_DECLARATION",
+        "source_grade": "OLD_BTC_MANIFEST_COVERAGE_CLAIM_NOT_PHYSICAL_VERIFICATION",
+        "exposure": "PRIOR_RESEARCH_DEVELOPMENT_OR_EXPOSURE_UNKNOWN",
+        "release_reclassification": "NO_RECLASSIFICATION_NEEDED_FOR_OLD_DEVELOPMENT_BUT_NEW_R3_ADMISSION_REQUIRED"
+      },
+      "ETHUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "SOLUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "future_admission": "CONTROLLER_DECISION_REQUIRED"
+    },
+    {
+      "month": "2023-12",
+      "BTCUSDT": {
+        "status": "EXPOSED_DEVELOPMENT",
+        "authority_grade": "CONTROLLER_ATTESTED_V03_DECLARATION",
+        "source_grade": "OLD_BTC_MANIFEST_COVERAGE_CLAIM_NOT_PHYSICAL_VERIFICATION",
+        "exposure": "PRIOR_RESEARCH_DEVELOPMENT_OR_EXPOSURE_UNKNOWN",
+        "release_reclassification": "NO_RECLASSIFICATION_NEEDED_FOR_OLD_DEVELOPMENT_BUT_NEW_R3_ADMISSION_REQUIRED"
+      },
+      "ETHUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "SOLUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "future_admission": "CONTROLLER_DECISION_REQUIRED"
+    },
+    {
+      "month": "2024-01",
+      "BTCUSDT": {
+        "status": "EXPOSED_DEVELOPMENT",
+        "authority_grade": "CONTROLLER_ATTESTED_V03_DECLARATION",
+        "source_grade": "OLD_BTC_MANIFEST_COVERAGE_CLAIM_NOT_PHYSICAL_VERIFICATION",
+        "exposure": "PRIOR_RESEARCH_DEVELOPMENT_OR_EXPOSURE_UNKNOWN",
+        "release_reclassification": "NO_RECLASSIFICATION_NEEDED_FOR_OLD_DEVELOPMENT_BUT_NEW_R3_ADMISSION_REQUIRED"
+      },
+      "ETHUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "SOLUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "future_admission": "CONTROLLER_DECISION_REQUIRED"
+    },
+    {
+      "month": "2024-02",
+      "BTCUSDT": {
+        "status": "EXPOSED_DEVELOPMENT",
+        "authority_grade": "CONTROLLER_ATTESTED_V03_DECLARATION",
+        "source_grade": "OLD_BTC_MANIFEST_COVERAGE_CLAIM_NOT_PHYSICAL_VERIFICATION",
+        "exposure": "PRIOR_RESEARCH_DEVELOPMENT_OR_EXPOSURE_UNKNOWN",
+        "release_reclassification": "NO_RECLASSIFICATION_NEEDED_FOR_OLD_DEVELOPMENT_BUT_NEW_R3_ADMISSION_REQUIRED"
+      },
+      "ETHUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "SOLUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "future_admission": "CONTROLLER_DECISION_REQUIRED"
+    },
+    {
+      "month": "2024-03",
+      "BTCUSDT": {
+        "status": "EXPOSED_DEVELOPMENT",
+        "authority_grade": "CONTROLLER_ATTESTED_V03_DECLARATION",
+        "source_grade": "OLD_BTC_MANIFEST_COVERAGE_CLAIM_NOT_PHYSICAL_VERIFICATION",
+        "exposure": "PRIOR_RESEARCH_DEVELOPMENT_OR_EXPOSURE_UNKNOWN",
+        "release_reclassification": "NO_RECLASSIFICATION_NEEDED_FOR_OLD_DEVELOPMENT_BUT_NEW_R3_ADMISSION_REQUIRED"
+      },
+      "ETHUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "SOLUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "future_admission": "CONTROLLER_DECISION_REQUIRED"
+    },
+    {
+      "month": "2024-04",
+      "BTCUSDT": {
+        "status": "EXPOSED_DEVELOPMENT",
+        "authority_grade": "CONTROLLER_ATTESTED_V03_DECLARATION",
+        "source_grade": "OLD_BTC_MANIFEST_COVERAGE_CLAIM_NOT_PHYSICAL_VERIFICATION",
+        "exposure": "PRIOR_RESEARCH_DEVELOPMENT_OR_EXPOSURE_UNKNOWN",
+        "release_reclassification": "NO_RECLASSIFICATION_NEEDED_FOR_OLD_DEVELOPMENT_BUT_NEW_R3_ADMISSION_REQUIRED"
+      },
+      "ETHUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "SOLUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "future_admission": "CONTROLLER_DECISION_REQUIRED"
+    },
+    {
+      "month": "2024-05",
+      "BTCUSDT": {
+        "status": "EXPOSED_DEVELOPMENT",
+        "authority_grade": "CONTROLLER_ATTESTED_V03_DECLARATION",
+        "source_grade": "OLD_BTC_MANIFEST_COVERAGE_CLAIM_NOT_PHYSICAL_VERIFICATION",
+        "exposure": "PRIOR_RESEARCH_DEVELOPMENT_OR_EXPOSURE_UNKNOWN",
+        "release_reclassification": "NO_RECLASSIFICATION_NEEDED_FOR_OLD_DEVELOPMENT_BUT_NEW_R3_ADMISSION_REQUIRED"
+      },
+      "ETHUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "SOLUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "future_admission": "CONTROLLER_DECISION_REQUIRED"
+    },
+    {
+      "month": "2024-06",
+      "BTCUSDT": {
+        "status": "EXPOSED_DEVELOPMENT",
+        "authority_grade": "CONTROLLER_ATTESTED_V03_DECLARATION",
+        "source_grade": "OLD_BTC_MANIFEST_COVERAGE_CLAIM_NOT_PHYSICAL_VERIFICATION",
+        "exposure": "PRIOR_RESEARCH_DEVELOPMENT_OR_EXPOSURE_UNKNOWN",
+        "release_reclassification": "NO_RECLASSIFICATION_NEEDED_FOR_OLD_DEVELOPMENT_BUT_NEW_R3_ADMISSION_REQUIRED"
+      },
+      "ETHUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "SOLUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "future_admission": "CONTROLLER_DECISION_REQUIRED"
+    },
+    {
+      "month": "2024-07",
+      "BTCUSDT": {
+        "status": "EXPOSED_DEVELOPMENT",
+        "authority_grade": "CONTROLLER_ATTESTED_V03_DECLARATION",
+        "source_grade": "OLD_BTC_MANIFEST_COVERAGE_CLAIM_NOT_PHYSICAL_VERIFICATION",
+        "exposure": "PRIOR_RESEARCH_DEVELOPMENT_OR_EXPOSURE_UNKNOWN",
+        "release_reclassification": "NO_RECLASSIFICATION_NEEDED_FOR_OLD_DEVELOPMENT_BUT_NEW_R3_ADMISSION_REQUIRED"
+      },
+      "ETHUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "SOLUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "future_admission": "CONTROLLER_DECISION_REQUIRED"
+    },
+    {
+      "month": "2024-08",
+      "BTCUSDT": {
+        "status": "EXPOSED_DEVELOPMENT",
+        "authority_grade": "CONTROLLER_ATTESTED_V03_DECLARATION",
+        "source_grade": "OLD_BTC_MANIFEST_COVERAGE_CLAIM_NOT_PHYSICAL_VERIFICATION",
+        "exposure": "PRIOR_RESEARCH_DEVELOPMENT_OR_EXPOSURE_UNKNOWN",
+        "release_reclassification": "NO_RECLASSIFICATION_NEEDED_FOR_OLD_DEVELOPMENT_BUT_NEW_R3_ADMISSION_REQUIRED"
+      },
+      "ETHUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "SOLUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "future_admission": "CONTROLLER_DECISION_REQUIRED"
+    },
+    {
+      "month": "2024-09",
+      "BTCUSDT": {
+        "status": "EXPOSED_DEVELOPMENT",
+        "authority_grade": "CONTROLLER_ATTESTED_V03_DECLARATION",
+        "source_grade": "OLD_BTC_MANIFEST_COVERAGE_CLAIM_NOT_PHYSICAL_VERIFICATION",
+        "exposure": "PRIOR_RESEARCH_DEVELOPMENT_OR_EXPOSURE_UNKNOWN",
+        "release_reclassification": "NO_RECLASSIFICATION_NEEDED_FOR_OLD_DEVELOPMENT_BUT_NEW_R3_ADMISSION_REQUIRED"
+      },
+      "ETHUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "SOLUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "future_admission": "CONTROLLER_DECISION_REQUIRED"
+    },
+    {
+      "month": "2024-10",
+      "BTCUSDT": {
+        "status": "EXPOSED_DEVELOPMENT",
+        "authority_grade": "CONTROLLER_ATTESTED_V03_DECLARATION",
+        "source_grade": "OLD_BTC_MANIFEST_COVERAGE_CLAIM_NOT_PHYSICAL_VERIFICATION",
+        "exposure": "PRIOR_RESEARCH_DEVELOPMENT_OR_EXPOSURE_UNKNOWN",
+        "release_reclassification": "NO_RECLASSIFICATION_NEEDED_FOR_OLD_DEVELOPMENT_BUT_NEW_R3_ADMISSION_REQUIRED"
+      },
+      "ETHUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "SOLUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "future_admission": "CONTROLLER_DECISION_REQUIRED"
+    },
+    {
+      "month": "2024-11",
+      "BTCUSDT": {
+        "status": "EXPOSED_DEVELOPMENT",
+        "authority_grade": "CONTROLLER_ATTESTED_V03_DECLARATION",
+        "source_grade": "OLD_BTC_MANIFEST_COVERAGE_CLAIM_NOT_PHYSICAL_VERIFICATION",
+        "exposure": "PRIOR_RESEARCH_DEVELOPMENT_OR_EXPOSURE_UNKNOWN",
+        "release_reclassification": "NO_RECLASSIFICATION_NEEDED_FOR_OLD_DEVELOPMENT_BUT_NEW_R3_ADMISSION_REQUIRED"
+      },
+      "ETHUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "SOLUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "future_admission": "CONTROLLER_DECISION_REQUIRED"
+    },
+    {
+      "month": "2024-12",
+      "BTCUSDT": {
+        "status": "EXPOSED_DEVELOPMENT",
+        "authority_grade": "CONTROLLER_ATTESTED_V03_DECLARATION",
+        "source_grade": "OLD_BTC_MANIFEST_COVERAGE_CLAIM_NOT_PHYSICAL_VERIFICATION",
+        "exposure": "PRIOR_RESEARCH_DEVELOPMENT_OR_EXPOSURE_UNKNOWN",
+        "release_reclassification": "NO_RECLASSIFICATION_NEEDED_FOR_OLD_DEVELOPMENT_BUT_NEW_R3_ADMISSION_REQUIRED"
+      },
+      "ETHUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "SOLUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "future_admission": "CONTROLLER_DECISION_REQUIRED"
+    },
+    {
+      "month": "2025-01",
+      "BTCUSDT": {
+        "status": "EXPOSED_DEVELOPMENT",
+        "authority_grade": "CONTROLLER_ATTESTED_V03_DECLARATION",
+        "source_grade": "OLD_BTC_MANIFEST_COVERAGE_CLAIM_NOT_PHYSICAL_VERIFICATION",
+        "exposure": "PRIOR_RESEARCH_DEVELOPMENT_OR_EXPOSURE_UNKNOWN",
+        "release_reclassification": "NO_RECLASSIFICATION_NEEDED_FOR_OLD_DEVELOPMENT_BUT_NEW_R3_ADMISSION_REQUIRED"
+      },
+      "ETHUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "SOLUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "future_admission": "CONTROLLER_DECISION_REQUIRED"
+    },
+    {
+      "month": "2025-02",
+      "BTCUSDT": {
+        "status": "EXPOSED_DEVELOPMENT",
+        "authority_grade": "CONTROLLER_ATTESTED_V03_DECLARATION",
+        "source_grade": "OLD_BTC_MANIFEST_COVERAGE_CLAIM_NOT_PHYSICAL_VERIFICATION",
+        "exposure": "PRIOR_RESEARCH_DEVELOPMENT_OR_EXPOSURE_UNKNOWN",
+        "release_reclassification": "NO_RECLASSIFICATION_NEEDED_FOR_OLD_DEVELOPMENT_BUT_NEW_R3_ADMISSION_REQUIRED"
+      },
+      "ETHUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "SOLUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "future_admission": "CONTROLLER_DECISION_REQUIRED"
+    },
+    {
+      "month": "2025-03",
+      "BTCUSDT": {
+        "status": "EXPOSED_DEVELOPMENT",
+        "authority_grade": "CONTROLLER_ATTESTED_V03_DECLARATION",
+        "source_grade": "OLD_BTC_MANIFEST_COVERAGE_CLAIM_NOT_PHYSICAL_VERIFICATION",
+        "exposure": "PRIOR_RESEARCH_DEVELOPMENT_OR_EXPOSURE_UNKNOWN",
+        "release_reclassification": "NO_RECLASSIFICATION_NEEDED_FOR_OLD_DEVELOPMENT_BUT_NEW_R3_ADMISSION_REQUIRED"
+      },
+      "ETHUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "SOLUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "future_admission": "CONTROLLER_DECISION_REQUIRED"
+    },
+    {
+      "month": "2025-04",
+      "BTCUSDT": {
+        "status": "EXPOSED_DEVELOPMENT",
+        "authority_grade": "CONTROLLER_ATTESTED_V03_DECLARATION",
+        "source_grade": "OLD_BTC_MANIFEST_COVERAGE_CLAIM_NOT_PHYSICAL_VERIFICATION",
+        "exposure": "PRIOR_RESEARCH_DEVELOPMENT_OR_EXPOSURE_UNKNOWN",
+        "release_reclassification": "NO_RECLASSIFICATION_NEEDED_FOR_OLD_DEVELOPMENT_BUT_NEW_R3_ADMISSION_REQUIRED"
+      },
+      "ETHUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "SOLUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "future_admission": "CONTROLLER_DECISION_REQUIRED"
+    },
+    {
+      "month": "2025-05",
+      "BTCUSDT": {
+        "status": "EXPOSED_DEVELOPMENT",
+        "authority_grade": "CONTROLLER_ATTESTED_V03_DECLARATION",
+        "source_grade": "OLD_BTC_MANIFEST_COVERAGE_CLAIM_NOT_PHYSICAL_VERIFICATION",
+        "exposure": "PRIOR_RESEARCH_DEVELOPMENT_OR_EXPOSURE_UNKNOWN",
+        "release_reclassification": "NO_RECLASSIFICATION_NEEDED_FOR_OLD_DEVELOPMENT_BUT_NEW_R3_ADMISSION_REQUIRED"
+      },
+      "ETHUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "SOLUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "future_admission": "CONTROLLER_DECISION_REQUIRED"
+    },
+    {
+      "month": "2025-06",
+      "BTCUSDT": {
+        "status": "EXPOSED_DEVELOPMENT",
+        "authority_grade": "CONTROLLER_ATTESTED_V03_DECLARATION",
+        "source_grade": "OLD_BTC_MANIFEST_COVERAGE_CLAIM_NOT_PHYSICAL_VERIFICATION",
+        "exposure": "PRIOR_RESEARCH_DEVELOPMENT_OR_EXPOSURE_UNKNOWN",
+        "release_reclassification": "NO_RECLASSIFICATION_NEEDED_FOR_OLD_DEVELOPMENT_BUT_NEW_R3_ADMISSION_REQUIRED"
+      },
+      "ETHUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "SOLUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "future_admission": "CONTROLLER_DECISION_REQUIRED"
+    },
+    {
+      "month": "2025-07",
+      "BTCUSDT": {
+        "status": "EXPOSED_DEVELOPMENT",
+        "authority_grade": "CONTROLLER_ATTESTED_V03_DECLARATION",
+        "source_grade": "OLD_BTC_MANIFEST_COVERAGE_CLAIM_NOT_PHYSICAL_VERIFICATION",
+        "exposure": "PRIOR_RESEARCH_DEVELOPMENT_OR_EXPOSURE_UNKNOWN",
+        "release_reclassification": "NO_RECLASSIFICATION_NEEDED_FOR_OLD_DEVELOPMENT_BUT_NEW_R3_ADMISSION_REQUIRED"
+      },
+      "ETHUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "SOLUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "future_admission": "CONTROLLER_DECISION_REQUIRED"
+    },
+    {
+      "month": "2025-08",
+      "BTCUSDT": {
+        "status": "EXPOSED_DEVELOPMENT",
+        "authority_grade": "CONTROLLER_ATTESTED_V03_DECLARATION",
+        "source_grade": "OLD_BTC_MANIFEST_COVERAGE_CLAIM_NOT_PHYSICAL_VERIFICATION",
+        "exposure": "PRIOR_RESEARCH_DEVELOPMENT_OR_EXPOSURE_UNKNOWN",
+        "release_reclassification": "NO_RECLASSIFICATION_NEEDED_FOR_OLD_DEVELOPMENT_BUT_NEW_R3_ADMISSION_REQUIRED"
+      },
+      "ETHUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "SOLUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "future_admission": "CONTROLLER_DECISION_REQUIRED"
+    },
+    {
+      "month": "2025-09",
+      "BTCUSDT": {
+        "status": "EXPOSED_DEVELOPMENT",
+        "authority_grade": "CONTROLLER_ATTESTED_V03_DECLARATION",
+        "source_grade": "OLD_BTC_MANIFEST_COVERAGE_CLAIM_NOT_PHYSICAL_VERIFICATION",
+        "exposure": "PRIOR_RESEARCH_DEVELOPMENT_OR_EXPOSURE_UNKNOWN",
+        "release_reclassification": "NO_RECLASSIFICATION_NEEDED_FOR_OLD_DEVELOPMENT_BUT_NEW_R3_ADMISSION_REQUIRED"
+      },
+      "ETHUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "SOLUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "future_admission": "CONTROLLER_DECISION_REQUIRED"
+    },
+    {
+      "month": "2025-10",
+      "BTCUSDT": {
+        "status": "EXPOSED_DEVELOPMENT",
+        "authority_grade": "CONTROLLER_ATTESTED_V03_DECLARATION",
+        "source_grade": "OLD_BTC_MANIFEST_COVERAGE_CLAIM_NOT_PHYSICAL_VERIFICATION",
+        "exposure": "PRIOR_RESEARCH_DEVELOPMENT_OR_EXPOSURE_UNKNOWN",
+        "release_reclassification": "NO_RECLASSIFICATION_NEEDED_FOR_OLD_DEVELOPMENT_BUT_NEW_R3_ADMISSION_REQUIRED"
+      },
+      "ETHUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "SOLUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "future_admission": "CONTROLLER_DECISION_REQUIRED"
+    },
+    {
+      "month": "2025-11",
+      "BTCUSDT": {
+        "status": "EXPOSED_DEVELOPMENT",
+        "authority_grade": "CONTROLLER_ATTESTED_V03_DECLARATION",
+        "source_grade": "OLD_BTC_MANIFEST_COVERAGE_CLAIM_NOT_PHYSICAL_VERIFICATION",
+        "exposure": "PRIOR_RESEARCH_DEVELOPMENT_OR_EXPOSURE_UNKNOWN",
+        "release_reclassification": "NO_RECLASSIFICATION_NEEDED_FOR_OLD_DEVELOPMENT_BUT_NEW_R3_ADMISSION_REQUIRED"
+      },
+      "ETHUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "SOLUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "future_admission": "CONTROLLER_DECISION_REQUIRED"
+    },
+    {
+      "month": "2025-12",
+      "BTCUSDT": {
+        "status": "EXPOSED_DEVELOPMENT",
+        "authority_grade": "CONTROLLER_ATTESTED_V03_DECLARATION",
+        "source_grade": "OLD_BTC_MANIFEST_COVERAGE_CLAIM_NOT_PHYSICAL_VERIFICATION",
+        "exposure": "PRIOR_RESEARCH_DEVELOPMENT_OR_EXPOSURE_UNKNOWN",
+        "release_reclassification": "NO_RECLASSIFICATION_NEEDED_FOR_OLD_DEVELOPMENT_BUT_NEW_R3_ADMISSION_REQUIRED"
+      },
+      "ETHUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "SOLUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "future_admission": "CONTROLLER_DECISION_REQUIRED"
+    },
+    {
+      "month": "2026-01",
+      "BTCUSDT": {
+        "status": "EXPOSED_DEVELOPMENT",
+        "authority_grade": "CONTROLLER_ATTESTED_V03_DECLARATION",
+        "source_grade": "OLD_BTC_MANIFEST_COVERAGE_CLAIM_NOT_PHYSICAL_VERIFICATION",
+        "exposure": "PRIOR_RESEARCH_DEVELOPMENT_OR_EXPOSURE_UNKNOWN",
+        "release_reclassification": "NO_RECLASSIFICATION_NEEDED_FOR_OLD_DEVELOPMENT_BUT_NEW_R3_ADMISSION_REQUIRED"
+      },
+      "ETHUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "SOLUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "future_admission": "CONTROLLER_DECISION_REQUIRED"
+    },
+    {
+      "month": "2026-02",
+      "BTCUSDT": {
+        "status": "PROTECTED_OR_DISPUTED",
+        "authority_grade": "CONTROLLER_ATTESTED_V03_DECLARATION",
+        "source_grade": "OLD_BTC_MANIFEST_COVERAGE_CLAIM_NOT_PHYSICAL_VERIFICATION",
+        "exposure": "PRIOR_RESEARCH_DEVELOPMENT_OR_EXPOSURE_UNKNOWN",
+        "release_reclassification": "UNVERIFIED"
+      },
+      "ETHUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "SOLUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "future_admission": "CONTROLLER_DECISION_REQUIRED"
+    },
+    {
+      "month": "2026-03",
+      "BTCUSDT": {
+        "status": "PROTECTED_OR_DISPUTED",
+        "authority_grade": "CONTROLLER_ATTESTED_V03_DECLARATION",
+        "source_grade": "OLD_BTC_MANIFEST_COVERAGE_CLAIM_NOT_PHYSICAL_VERIFICATION",
+        "exposure": "PRIOR_RESEARCH_DEVELOPMENT_OR_EXPOSURE_UNKNOWN",
+        "release_reclassification": "UNVERIFIED"
+      },
+      "ETHUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "SOLUSDT": {
+        "status": "SOURCE_UNCONFIRMED",
+        "authority_grade": "UNKNOWN_OLD_ASSET_AUTHORITY",
+        "source_grade": "MULTIYEAR_SOURCE_UNCONFIRMED"
+      },
+      "future_admission": "CONTROLLER_DECISION_REQUIRED"
+    },
+    {
+      "month": "2026-04",
+      "BTCUSDT": {
+        "status": "PROTECTED_OR_DISPUTED",
+        "authority_grade": "CONTROLLER_ATTESTED_V03_DECLARATION",
+        "source_grade": "OLD_BTC_MANIFEST_COVERAGE_CLAIM_NOT_PHYSICAL_VERIFICATION",
+        "exposure": "R2_WARMUP_EXPOSED",
+        "release_reclassification": "UNVERIFIED"
+      },
+      "ETHUSDT": {
+        "status": "EXPOSED_DEVELOPMENT",
+        "authority_grade": "PRIOR_R2_DEVELOPMENT_SCOPE_CONTEXT",
+        "source_grade": "R2_PUBLISHED_CONTEXT_NOT_CURRENT_FILE_VERIFICATION"
+      },
+      "SOLUSDT": {
+        "status": "EXPOSED_DEVELOPMENT",
+        "authority_grade": "PRIOR_R2_DEVELOPMENT_SCOPE_CONTEXT",
+        "source_grade": "R2_PUBLISHED_CONTEXT_NOT_CURRENT_FILE_VERIFICATION"
+      },
+      "future_admission": "CONTROLLER_DECISION_REQUIRED"
+    },
+    {
+      "month": "2026-05",
+      "BTCUSDT": {
+        "status": "PROTECTED_OR_DISPUTED",
+        "authority_grade": "CONTROLLER_ATTESTED_V03_DECLARATION",
+        "source_grade": "OLD_BTC_MANIFEST_COVERAGE_CLAIM_NOT_PHYSICAL_VERIFICATION",
+        "exposure": "R2_EVALUATION_EXPOSED",
+        "release_reclassification": "UNVERIFIED"
+      },
+      "ETHUSDT": {
+        "status": "EXPOSED_DEVELOPMENT",
+        "authority_grade": "PRIOR_R2_DEVELOPMENT_SCOPE_CONTEXT",
+        "source_grade": "R2_PUBLISHED_CONTEXT_NOT_CURRENT_FILE_VERIFICATION"
+      },
+      "SOLUSDT": {
+        "status": "EXPOSED_DEVELOPMENT",
+        "authority_grade": "PRIOR_R2_DEVELOPMENT_SCOPE_CONTEXT",
+        "source_grade": "R2_PUBLISHED_CONTEXT_NOT_CURRENT_FILE_VERIFICATION"
+      },
+      "future_admission": "CONTROLLER_DECISION_REQUIRED"
+    },
+    {
+      "month": "2026-06",
+      "BTCUSDT": {
+        "status": "PROTECTED_OR_DISPUTED",
+        "authority_grade": "CONTROLLER_ATTESTED_V03_DECLARATION",
+        "source_grade": "OLD_BTC_MANIFEST_COVERAGE_CLAIM_NOT_PHYSICAL_VERIFICATION",
+        "exposure": "R2_EVALUATION_EXPOSED",
+        "release_reclassification": "UNVERIFIED"
+      },
+      "ETHUSDT": {
+        "status": "EXPOSED_DEVELOPMENT",
+        "authority_grade": "PRIOR_R2_DEVELOPMENT_SCOPE_CONTEXT",
+        "source_grade": "R2_PUBLISHED_CONTEXT_NOT_CURRENT_FILE_VERIFICATION"
+      },
+      "SOLUSDT": {
+        "status": "EXPOSED_DEVELOPMENT",
+        "authority_grade": "PRIOR_R2_DEVELOPMENT_SCOPE_CONTEXT",
+        "source_grade": "R2_PUBLISHED_CONTEXT_NOT_CURRENT_FILE_VERIFICATION"
+      },
+      "future_admission": "CONTROLLER_DECISION_REQUIRED"
+    },
+    {
+      "month": "2026-07",
+      "BTCUSDT": {
+        "status": "PROTECTED_OR_DISPUTED",
+        "authority_grade": "CONTROLLER_ATTESTED_V03_DECLARATION",
+        "source_grade": "OLD_BTC_MANIFEST_COVERAGE_CLAIM_NOT_PHYSICAL_VERIFICATION",
+        "exposure": "R2_EVALUATION_EXPOSED",
+        "release_reclassification": "UNVERIFIED"
+      },
+      "ETHUSDT": {
+        "status": "EXPOSED_DEVELOPMENT",
+        "authority_grade": "PRIOR_R2_DEVELOPMENT_SCOPE_CONTEXT",
+        "source_grade": "R2_PUBLISHED_CONTEXT_NOT_CURRENT_FILE_VERIFICATION"
+      },
+      "SOLUSDT": {
+        "status": "EXPOSED_DEVELOPMENT",
+        "authority_grade": "PRIOR_R2_DEVELOPMENT_SCOPE_CONTEXT",
+        "source_grade": "R2_PUBLISHED_CONTEXT_NOT_CURRENT_FILE_VERIFICATION"
+      },
+      "future_admission": "CONTROLLER_DECISION_REQUIRED"
+    }
+  ],
+  "matrix_cells": 201,
+  "candidate_ids": [
+    "STRUCTURAL_CONTINUATION_LONG_04H",
+    "STRUCTURAL_CONTINUATION_LONG_12H",
+    "STRUCTURAL_CONTINUATION_SHORT_04H",
+    "STRUCTURAL_CONTINUATION_SHORT_12H",
+    "CLOSED_RETEST_LONG_04H",
+    "CLOSED_RETEST_LONG_12H",
+    "CLOSED_RETEST_SHORT_04H",
+    "CLOSED_RETEST_SHORT_12H"
+  ],
+  "candidate_count": 8,
+  "empirical_evaluations": 0,
+  "preregistration_status": "DRAFT_NOT_EFFECTIVE_NOT_A_SOURCE_ADMISSION_GRANT",
+  "window_selection": "PENDING_CONTROLLER_SELECTION",
+  "options": {
+    "A": {
+      "warmup_months": [
+        "2021-03",
+        "2023-03",
+        "2025-03"
+      ],
+      "development_months": [
+        "2021-04",
+        "2023-04",
+        "2025-04"
+      ],
+      "original_universe": [
+        "BTCUSDT",
+        "ETHUSDT",
+        "SOLUSDT"
+      ],
+      "alternative": "BTC_ONLY_REQUIRES_EXPLICIT_PROSPECTIVE_UNIVERSE_AMENDMENT_AND_DIAGNOSTIC_ONLY"
+    },
+    "B": {
+      "warmup": [
+        "2026-01"
+      ],
+      "development": [
+        "2026-02",
+        "2026-03",
+        "2026-04"
+      ],
+      "authority": "EXPLICIT_SEPARATE_BTC_HOLDOUT_RECONCILIATION_REQUIRED"
+    }
+  },
+  "source_inputs": [
+    {
+      "ref": "e0ff8c3473de4bfa3e66fe7928d42992a4d38a32",
+      "path": "artifacts/research/run0-dev-frozen-v022-seed7-20260825/data_manifest.json",
+      "git_blob": "0a24f58272ffb7ac625265e50eff741bb22a4453",
+      "sha256": "928e913f41e74077359cbdf804aaf95d452ee1e1b80d5f05d28eafe4e0b639f2",
+      "bytes": 45234
+    },
+    {
+      "ref": "647e2e6e1e2e375817ec7a07f2ea11fc57484827",
+      "path": "docs/project/V06_G2_LOCAL_HISTORICAL_DATA_REUSE_AND_EXPOSURE_GUARD_V1.md",
+      "git_blob": "3488a13ea607a52c32aedeebf19ca9910c472b71",
+      "sha256": "4bc9ac01cdfe851cfa84871263a7a41c01c36b35cb7075cb195ab45b1705ff46",
+      "bytes": 4649
+    },
+    {
+      "ref": "647e2e6e1e2e375817ec7a07f2ea11fc57484827",
+      "path": "evidence/v0.6/controller/B_LINE_G2_R3_SOL_SCIENCE_GATE_R1_DISPATCH.json",
+      "git_blob": "d7dc3ea3cbb5d5ab74e9f68bea7c3e1fea0801d4",
+      "sha256": "cca21f0ec247ce66473c91365004dcfdc562bd1d30b90e527d71e27f8cee8d65",
+      "bytes": 3251
+    },
+    {
+      "ref": "e5b2006a89441f7eb2ec900e508aff451106b87a",
+      "path": "evidence/v0.6/b_line/g2_r3_design/CANDIDATE_REGISTER_PROPOSAL.json",
+      "git_blob": "d337542f6482938c37eb6b4e43255cdf4d09751a",
+      "sha256": "d0f89bddfaec0e57c959cec043969059da10fec8aa45f81669dde8b80ea35a9b",
+      "bytes": 7361
+    },
+    {
+      "ref": "cf2d5cc33774cdcff7d709636305bba830e977ef",
+      "path": "docs/strategy_research/g2_r3/METHOD_DESIGN.md",
+      "git_blob": "fb701b0be825f85801377f86eb80ba4f766ebaed",
+      "sha256": "14378dde7668291dc87aef91e3e55fadddad3a444d1d49284efa2c3cbcba9a77",
+      "bytes": 17739
+    },
+    {
+      "ref": "cf2d5cc33774cdcff7d709636305bba830e977ef",
+      "path": "docs/strategy_research/g2_r3/method_repair/METHOD_R1_1_PIT_COST_ACCOUNTING.md",
+      "git_blob": "7def37d7c8aad02dd0c2769882fad61622e262db",
+      "sha256": "a2943c9a541d93eaceb62a664edf0d03f0c9bbab6f4c4f73752831bcf14eb026",
+      "bytes": 16387
+    },
+    {
+      "ref": "cf2d5cc33774cdcff7d709636305bba830e977ef",
+      "path": "docs/strategy_research/g2_r3/method_repair/R1_1_FUNDING_COST_AND_SUPPORT.md",
+      "git_blob": "a8ba636ec863a5ef410dd749aefa87c2ef31ed35",
+      "sha256": "f64520650a00e6784da94c4687caa8809430895fa268b56600ed7b47aad71415",
+      "bytes": 7979
+    },
+    {
+      "ref": "cf2d5cc33774cdcff7d709636305bba830e977ef",
+      "path": "docs/strategy_research/g2_r3/method_repair/R1_1_SOURCE_AND_LICENSE_ADMISSION.md",
+      "git_blob": "ebe5116ba5994c1a67b8bd4018a249b3a5909d82",
+      "sha256": "784b437193c9ea10d4de1b650e319fd8445022a0c3a0d12494734d1cf90d7963",
+      "bytes": 6004
+    },
+    {
+      "ref": "cf2d5cc33774cdcff7d709636305bba830e977ef",
+      "path": "docs/strategy_research/g2_r3/method_repair/R1_1_CONTROLLER_HANDOFF.md",
+      "git_blob": "41d0c7224b6f3886b8d76cb62efb83028266a8aa",
+      "sha256": "793c2a9621e4859393c96f6eca31c09f0908e0de08313ef212c12b6d6574156b",
+      "bytes": 2663
+    },
+    {
+      "ref": "cf2d5cc33774cdcff7d709636305bba830e977ef",
+      "path": "evidence/v0.6/b_line/g2_r3_design/method_repair/MARK_ARCHIVE_METADATA_HEAD_LEDGER.json",
+      "git_blob": "d1edd6ee02809f666fc2d9dfb05d51ca5ee8d998",
+      "sha256": "dd5d3de3f8a4d4c7f393e253b7fa390834830c5671bcb5ac7e74c2fc3990de53",
+      "bytes": 29591
+    },
+    {
+      "ref": "647e2e6e1e2e375817ec7a07f2ea11fc57484827",
+      "path": "evidence/v0.6/controller/B_LINE_G2_R3_PARALLEL_P0_OFFLINE_PREPARATION_DISPATCH.json",
+      "git_blob": "28f68e1ca4e568f7f2afd6a4a9ca31ed20416265",
+      "sha256": "26de41899b099033352f2e80ecf861eefde5ddb71087fecd4fdbf6d7cb520978",
+      "bytes": 3846
+    }
+  ],
+  "local_physical_inventory": {
+    "path": "/root/workspace/project/quant-v0.6/g2-r3-sol-science-gate-r1/artifacts/research/run0-dev-frozen-v022-seed7-20260825/data_manifest.json",
+    "object": "GIT_TEXT_MANIFEST_ONLY",
+    "status": "PRESENT_METADATA_ONLY",
+    "bytes": 45234,
+    "mtime_ns": 1791481961109815052,
+    "market_parquet_files_statted": 0,
+    "partition_bytes_hashed": 0,
+    "dataset_root": "NOT_VERIFIED",
+    "reason": "Manifest source_root is issuer URL;only relative partition keys,no authorized local base path"
+  },
+  "license_status": "NONCOMMERCIAL_RESEARCH_SUITABILITY_UNDER_REVIEW",
+  "cost_grade": "PROXY_DIAGNOSTIC_ONLY",
+  "recommendation": "FiniteOptionA diagnostic after future protection/source/licence/universe grants;otherwise stop/repair,no unlimitedmetadata loop"
+}
