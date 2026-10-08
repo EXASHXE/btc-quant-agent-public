@@ -1,6 +1,6 @@
 {
   "line": "B_LINE",
-  "stage": "B_LINE_V06_FOUNDATION_R1_L2_ACCEPTED__ENGINEERING_INTEGRATION_PENDING_CODE_FF",
+  "stage": "B_LINE_V06_TACTICAL_FOUNDATION_INTEGRATED__RC2_QUALITY_NONE__L3_RETRY_LOCKED",
   "code_branch": "v0.6",
   "accepted_code_sha": "52c16a28153de307dc6132c0975fe29341a0a918",
   "docs_authority_commit": "6319ddbaddd69d5522696992ec1565169da88e03",
@@ -890,7 +890,7 @@
     "protected_and_live_gates": "UNCHANGED"
   },
   "v06_migration": {
-    "status": "BRANCHES_CREATED__ENGINEERING_NOT_RELEASE",
+    "status": "B_LINE_FOUNDATION_INTEGRATED_ENGINEERING_ONLY",
     "code_branch": "v0.6",
     "code_base_sha": "8ecff4ec4b25bf73a35309689fd3ecfacc0d3399",
     "code_source": "v0.5.5",
@@ -911,13 +911,16 @@
       "08e81bec003d645a0a0582db183a1b6916887eff"
     ],
     "ci_fast_candidate_sha": "430becb96389a62481e4d4def07065054e658eee",
-    "ci_fast_integrated": false,
-    "next_scope": "RISK_BASED_CI_PORT_ON_V06_FEATURE_BRANCH_AND_L3_RETRY_ADMISSION_DESIGN"
+    "ci_fast_integrated": true,
+    "next_scope": "NONPROTECTED_WP_A_WP_C_WP_D_INTEGRATION_READINESS_AND_L3_RETRY_ADJUDICATION_SEPARATE",
+    "code_head_sha": "d6500140f3141d179181f2360ad815b5bfe9c954",
+    "integrated_tactical_baseline_sha": "52c16a28153de307dc6132c0975fe29341a0a918",
+    "immutable_branch_initial_base_sha": "8ecff4ec4b25bf73a35309689fd3ecfacc0d3399"
   },
   "version_authority_note": "Original accepted_code_sha 52c16a... is historical B-line Tactical acceptance, NOT v0.6 tip or final release. v0.6 starts from stable v0.5.5 code at 8ecff4ec. Prior B-line work remains unintegrated.",
   "v06_foundation_r1": {
     "task_id": "V06_B_LINE_ACCEPTED_TACTICAL_FOUNDATION_AND_CI_FAST_PATH_R1",
-    "status": "CONTROLLER_L2_ACCEPTED_ENGINEERING_ONLY",
+    "status": "CONTROLLER_L2_ACCEPTED__FF_INTEGRATED_V06",
     "prompt_path": "prompts/v0.6/b_line/v0.6_B_LINE_FOUNDATION_AND_CI_FAST_PATH_R1.md",
     "controller_dispatch_sha": "9bca4d5e13084569096077ced3bb8dfc09482c1f",
     "dispatch_authority_path": "evidence/v0.6/controller/B_LINE_FOUNDATION_R1_DEV_DISPATCH_AUTHORITY.json",
@@ -941,6 +944,10 @@
     "review_outcome": "ACCEPT_V06_B_LINE_FOUNDATION_R1_ENGINEERING_ONLY",
     "auto_push_required": true,
     "controller_integration_mode": "EXACT_SHA_FAST_FORWARD_TO_V06",
-    "protected_retry": "NOT_AUTHORIZED"
+    "protected_retry": "NOT_AUTHORIZED",
+    "v06_merge_strategy": "FAST_FORWARD_ANCESTRY_PRESERVED",
+    "v06_integrated_sha": "d6500140f3141d179181f2360ad815b5bfe9c954",
+    "post_integration_ci": "https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/37741446854",
+    "post_integration_ci_state": "PENDING_AT_PUBLICATION"
   }
 }
