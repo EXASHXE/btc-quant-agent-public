@@ -979,9 +979,30 @@
     "next_gate": "CONTROLLER_L2_EXACT_SHA_REVIEW"
   },
   "v06_real_funds_test_path": {
-    "status": "G0_COMPLETE_G1_DISPATCHED_G2_BLOCKED_G3_TO_G6_UNAUTHORIZED",
+    "status": "G0_COMPLETE_G1_DISPATCHED_G2_DISPATCHED_NONPROTECTED_G3_TO_G6_UNAUTHORIZED",
     "gate_doc": "docs/project/V0.6_REAL_FUNDS_TEST_READINESS_GATES.md",
     "real_money_authority": "NONE",
     "project_live": "FORBIDDEN"
+  },
+  "v06_g2_strategy_discovery_r1": {
+    "task_id": "V06_B_LINE_G2_PROSPECTIVE_STRATEGY_DISCOVERY_R1",
+    "status": "DISPATCHED_NONPROTECTED_EXPLORATORY_RESEARCH_PENDING_EXECUTOR",
+    "controller_dispatch_sha": "0cc3d6e14d5c4e301c987b9e760fabb393e8141a",
+    "prompt_path": "prompts/v0.6/b_line/V06_B_LINE_G2_PROSPECTIVE_STRATEGY_DISCOVERY_R1.md",
+    "method_contract_path": "docs/project/V0.6_G2_STRATEGY_DISCOVERY_R1_CONTRACT.md",
+    "start_code_sha": "d6500140f3141d179181f2360ad815b5bfe9c954",
+    "task_branch": "feature/v06-bline-g2-strategy-discovery-r1",
+    "parallel_g1_branch": "feature/v06-bline-engineering-preview-r1",
+    "original_checkout": "/root/workspace/project/rc2-tactical-successor",
+    "isolated_worktree": "/root/workspace/project/rc2-tactical-successor-v06-g2-r1",
+    "candidate_budget_max": 12,
+    "method_freeze_requires_first_push_before_outcomes": true,
+    "historical_outcomes": "PRIOR_EXPOSED_OR_DEVELOPMENT__NO_BLIND_OOS",
+    "protected_rc2_holdout": "NOT_AUTHORIZED",
+    "live_authority": "NONE",
+    "real_funds_write_authority": "NONE",
+    "executor_preference": "SOL_HIGH_METHOD_DESIGN__GEMINI_IMPLEMENTATION__LUNA_MECHANICAL",
+    "auto_commit_push_verify_required": true,
+    "next_gate": "CONTROLLER_L2_EXPLORATORY_EVIDENCE_REVIEW_AND_FUTURE_R2_DECISION"
   }
 }
