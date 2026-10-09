@@ -1415,7 +1415,7 @@
     "ci_conclusion": "FAILURE_2819_PASS_1_H40_GOLDEN_FAIL_2_SKIP"
   },
   "v06_g2_r3_p1_engine_architecture_rebuild_v1": {
-    "status": "P1_A_FINAL_CI_AND_E2E_RECEIPT_ACCEPTED__INDEPENDENT_B_ARCH_AUDIT_DISPATCHED_NOT_YET_ACCEPTED",
+    "status": "P1_ARCH_V1_INDEPENDENT_B_TERMINAL_NO_GO__CURRENT_VIRTUALBOOK_REPAIR_ROUTE_TERMINATED",
     "task_id": "V06_G2_R3_P1_ENGINE_ARCHITECTURE_REBUILD_V1",
     "controller_dispatch_sha": "e5fcd76370a1b03d7d83b825af6a8cac842b1ae5",
     "controller_adjudication_path": "reviews/v0.6/b_line/V06_G2_R3_B_R2_TERMINAL_CONTROLLER_ADJUDICATION_AND_ENGINE_ARCHITECTURE_REPLAN_R1.md",
@@ -1425,10 +1425,10 @@
     "expected_start_sha": "2c60b0653d3619eedf457753511a9ecc84c1cd5b",
     "independent_b_source_sha": "068a4005f68b5ee4a970063cb1f3bc524a08784a",
     "scope": "ONE_BOUNDED_POSITION_ID_EVENT_CLOCK_RESERVE_LEDGER_ARCHITECTURE_REFACTOR",
-    "next_gate": "ONE_FINAL_INDEPENDENT_B_ARCHITECTURE_SEMANTIC_AUDIT_AT_EXACT_A_HEAD",
+    "next_gate": "ONE_BOUNDED_SOL_HIGH_ALTERNATIVE_ENGINE_ARCHITECTURE_DESIGN_ONLY",
     "fail_stop": "ARCH_V1_FAILURE_REPLAN_ALTERNATIVE_ENGINE_NO_R4_R5_PATCH_LOOP",
     "h40_golden": "REPRODUCIBLE_MISMATCH_NOT_WAIVED",
-    "p1_engine_acceptance": "PENDING_INDEPENDENT_B",
+    "p1_engine_acceptance": "NO",
     "empirical_market_body_authority": "NONE",
     "effective_prereg_sha": "NONE",
     "testnet": "NOT_AUTHORIZED",
@@ -1450,7 +1450,30 @@
     "independent_b_prompt_path": "prompts/v0.6/b_line/V06_G2_R3_P1_ARCH_V1_GEMINI_B_FINAL_INDEPENDENT_SEMANTIC_AUDIT_R1.md",
     "independent_b_branch": "feature/v06-bline-g2-overnight-verifier-b",
     "independent_b_start_sha": "068a4005f68b5ee4a970063cb1f3bc524a08784a",
-    "independent_b_a_target_sha": "b5d34aacd36dc27454944a22436db555c3f6eeb8"
+    "independent_b_a_target_sha": "b5d34aacd36dc27454944a22436db555c3f6eeb8",
+    "final_b_branch": "feature/v06-bline-g2-overnight-verifier-b",
+    "final_b_sha": "52ee5f1e582defbfb0bb3c8bb29101a1d40d9cd7",
+    "final_b_parent_sha": "068a4005f68b5ee4a970063cb1f3bc524a08784a",
+    "final_b_verdict": "ARCH_V1_B_SEMANTIC_BLOCKED_REPLAN_ALTERNATIVE_ENGINE",
+    "final_b_items_pass": [
+      "B04"
+    ],
+    "final_b_items_blocked": [
+      "B01",
+      "B02",
+      "B03",
+      "B05",
+      "B06",
+      "B07"
+    ],
+    "final_b_ci": "FAILURE_2828_PASS_1_H40_GOLDEN_FAIL_2_SKIP_9_WARN",
+    "final_b_ci_url": "https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/37928939579",
+    "controller_terminal_no_go_sha": "b74b932da32e4b5bbe2477c2de014f94719d6a93",
+    "no_more_patch_loop": "R4_R5_NOT_AUTHORIZED",
+    "evidence_qualifications": [
+      "B03_S_MINUS_5000_MS_OPEN_OUTSIDE_NORMAL_MINUTE_STEP_DOMAIN",
+      "STAGE8_EX_POST_CURRENT_BAR_MUST_BE_SEPARATED_FROM_DECISION_LOOKAHEAD"
+    ]
   },
   "v06_g2_r3_parallel_scientific_strategy_review_sol_high_r1": {
     "status": "CONTROLLER_L2_ACCEPTED_SCIENCE_READY_CONDITIONAL_PROXY_DIAGNOSTIC_ONLY",
@@ -1488,5 +1511,23 @@
     "ci_run": "https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/37912110684",
     "ci_conclusion": "FAILURE_REPO_WIDE_RUFF_SIX_H41_UNCHANGED_EVIDENCE_FINDINGS",
     "controller_l2_sha": "dca82909aeaef380a5c2e9866238ccbbe0114fad"
+  },
+  "v06_g2_r3_p1_alt_engine_sol_high_r1": {
+    "status": "SOL_ALT_ENGINE_DESIGN_DISPATCHED_NOT_EXECUTED",
+    "task_id": "V06_G2_R3_P1_ALTERNATIVE_ENGINE_ARCHITECTURE_SELECTION_SOL_HIGH_R1",
+    "controller_dispatch_sha": "b74b932da32e4b5bbe2477c2de014f94719d6a93",
+    "prompt_sha": "770e910596bfbd82c28bd92705cf71ef981f0564",
+    "prompt_path": "prompts/v0.6/b_line/V06_G2_R3_P1_ALTERNATIVE_ENGINE_ARCHITECTURE_SELECTION_SOL_HIGH_R1.md",
+    "isolated_branch": "feature/v06-bline-g2-r3-p1-alternative-engine-design-sol61-r1",
+    "branch_start_sha": "b74b932da32e4b5bbe2477c2de014f94719d6a93",
+    "a_frozen_target_sha": "b5d34aacd36dc27454944a22436db555c3f6eeb8",
+    "b_frozen_failure_sha": "52ee5f1e582defbfb0bb3c8bb29101a1d40d9cd7",
+    "scope": "ONE_FINITE_DESIGN_ONLY_ARCHITECTURE_CHOICE_REUSE_VS_EVENT_SOURCED_DOUBLE_ENTRY_MICRO_ENGINE",
+    "p1_engine_code_implementation_authority": "NONE_UNTIL_CONTROLLER_NEW_DISPATCH",
+    "p2_status": "LOCAL_ROOT_UNKNOWN",
+    "p3_prereg": "NONE",
+    "empirical_market_body_access": "NONE",
+    "testnet": "NOT_AUTHORIZED",
+    "real_funds_write_authority": "NONE"
   }
 }
