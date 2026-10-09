@@ -1306,7 +1306,7 @@
     "empirical_price_body_authority": "NONE"
   },
   "v06_g2_r3_p0_a_repair_r1": {
-    "status": "CONTROLLER_LINT_FIXED__CI_FOCUSED_7_PASS__AWAITING_B_INDEPENDENT_REAUDIT",
+    "status": "CONTROLLER_NOT_ACCEPTED__SUPERSEDED_BY_A_INTERACTION_REPAIR_R2",
     "initial_repair_sha": "2f0383816127cb7d87cf5deb559aeda0b04f1624",
     "controller_lint_fixed_sha": "5c542edd418a74b440162610fd540b1f01e423d3",
     "initial_ci": "https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/37873215393",
@@ -1319,21 +1319,25 @@
     "real_funds_write_authority": "NONE"
   },
   "v06_g2_r3_p0_b_reaudit_r1": {
-    "status": "DISPATCHED_PROMPT_BINDING_CORRECTED__AWAITING_B_INDEPENDENT_REAUDIT",
+    "status": "CONTROLLER_L2_B_R1_TERMINAL_DISCREPANCY_BLOCKED__A_R2_AUTHORIZED",
     "dispatch_sha": "3fb4508110c031eb0ff9226a7e42d918684c554f",
     "prompt_path": "prompts/v0.6/b_line/V06_G2_R3_P0_GEMINI_B_INDEPENDENT_REAUDIT_R1.md",
     "branch": "feature/v06-bline-g2-overnight-verifier-b",
     "expected_b_head": "a0aacd105ac3f3173b15d91c869990748178e222",
     "a_target_sha": "5c542edd418a74b440162610fd540b1f01e423d3",
     "worktree": "~/workspace/project/quant-v0.6/g2-overnight-verifier-b",
-    "independent_behavioral_acceptance": "PENDING",
+    "independent_behavioral_acceptance": "FAILED_7_INTERACTION_BLOCKERS",
     "empirical_data_access": "NONE",
     "real_funds_write_authority": "NONE",
     "original_dispatch_sha": "3fb4508110c031eb0ff9226a7e42d918684c554f",
     "corrective_controller_dispatch_sha": "ffd10e0693dea106c744dc4b9aa904c4526863f6",
     "immutable_prompt_ref": "be92966f4f0c8f0f152204973e4296ac5d5cd405",
     "immutable_prompt_blob_sha": "b0c17854fd7605dfb508acd319af1535d8707d82",
-    "original_prompt_missing_at_original_dispatch_sha": true
+    "original_prompt_missing_at_original_dispatch_sha": true,
+    "b_final_sha": "f1ec703b7c7276582f324ac25b9d1000f1b5ef14",
+    "b_terminal_verdict": "P0_B_REPAIR_DISCREPANCY_BLOCKED",
+    "ci_run": "https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/37879674645",
+    "controller_adjudication_sha": "218c126c9fd5395767fa27af984bf14b265c4a8f"
   },
   "v06_g2_r3_p1_p2_controller_handover_r1": {
     "status": "CONTROLLER_P1_PENDING_INDEPENDENT_BEHAVIOR__P2_METADATA_RESULT_ACCEPTED_NOT_ADMITTED",
@@ -1345,6 +1349,32 @@
     "source_root": "UNKNOWN",
     "source_body_authority": "NONE",
     "effective_prereg_sha": "NONE",
+    "testnet": "NOT_AUTHORIZED",
+    "real_funds_write_authority": "NONE"
+  },
+  "v06_g2_r3_p0_a_interaction_repair_r2": {
+    "status": "CONTROLLER_DISPATCHED_A_R2__AWAITING_REMOTE_DELIVERY",
+    "task_id": "V06_G2_R3_P0_A_INTERACTION_REPAIR_R2",
+    "controller_dispatch_sha": "218c126c9fd5395767fa27af984bf14b265c4a8f",
+    "controller_adjudication_path": "reviews/v0.6/b_line/V06_G2_R3_P0_B_REAUDIT_CONTROLLER_L2_ADJUDICATION_AND_A_R2_DISPATCH.md",
+    "prompt_path": "prompts/v0.6/b_line/V06_G2_R3_P0_A_INTERACTION_REPAIR_R2_GEMINI.md",
+    "prompt_published_commit": "b54d38ffb9f4a4310425b46ecda4f53ffafbaab4",
+    "branch": "feature/v06-bline-g2-overnight-discovery-a",
+    "start_sha": "5c542edd418a74b440162610fd540b1f01e423d3",
+    "b_finding_sha": "f1ec703b7c7276582f324ac25b9d1000f1b5ef14",
+    "b_new_blocker_ids": [
+      "B01",
+      "B02",
+      "B03",
+      "B04",
+      "B05",
+      "B06",
+      "B07"
+    ],
+    "bounded_attempts": "ONE_COHERENT_R2_WITH_MAX_ONE_LOCAL_CORRECTION",
+    "next_independent_check": "ONE_B_CHANGE_SCOPED_BEHAVIOR_REAUDIT",
+    "on_failure": "REPLAN_ENGINE_ARCHITECTURE_NOT_OPEN_ENDED_R3_R4",
+    "empirical_market_body_authority": "NONE",
     "testnet": "NOT_AUTHORIZED",
     "real_funds_write_authority": "NONE"
   }
