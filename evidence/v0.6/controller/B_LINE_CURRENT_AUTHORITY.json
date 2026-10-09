@@ -1291,7 +1291,7 @@
     "real_funds_write_authority": "NONE"
   },
   "v06_g2_r3_sol61_data_readiness_fastpath": {
-    "status": "ACTIVE_METADATA_ONLY",
+    "status": "CONTROLLER_RECEIVED_LOCAL_ROOT_UNKNOWN__NO_DATA_ADMISSION",
     "dispatch_sha": "06d5c7bf373468a797cabf6ba906dbca29719558",
     "prompt_path": "prompts/v0.6/b_line/V06_G2_R3_SOL61_DATA_READINESS_FASTPATH_R1.md",
     "start_base_sha": "e0ff8c3473de4bfa3e66fe7928d42992a4d38a32",
@@ -1300,7 +1300,10 @@
     "zero_market_body_reads_required": true,
     "old_btc_holdout": "2026-02-01..2026-08-01 PROTECTED/DISPUTED",
     "price_replay_authority": "NONE",
-    "real_funds_write_authority": "NONE"
+    "real_funds_write_authority": "NONE",
+    "terminal_report_sha": "7f96369b1209ffdaca5d7f1233c2c9c0ae17ae29",
+    "next_bound": "ONE_EXACT_OWNER_DATASET_ROOT_OR_TERMINATE_LOCAL_REUSE",
+    "empirical_price_body_authority": "NONE"
   },
   "v06_g2_r3_p0_a_repair_r1": {
     "status": "CONTROLLER_LINT_FIXED__CI_FOCUSED_7_PASS__AWAITING_B_INDEPENDENT_REAUDIT",
@@ -1316,7 +1319,7 @@
     "real_funds_write_authority": "NONE"
   },
   "v06_g2_r3_p0_b_reaudit_r1": {
-    "status": "DISPATCHED_NOT_YET_EXECUTED",
+    "status": "DISPATCHED_PROMPT_BINDING_CORRECTED__AWAITING_B_INDEPENDENT_REAUDIT",
     "dispatch_sha": "3fb4508110c031eb0ff9226a7e42d918684c554f",
     "prompt_path": "prompts/v0.6/b_line/V06_G2_R3_P0_GEMINI_B_INDEPENDENT_REAUDIT_R1.md",
     "branch": "feature/v06-bline-g2-overnight-verifier-b",
@@ -1325,6 +1328,24 @@
     "worktree": "~/workspace/project/quant-v0.6/g2-overnight-verifier-b",
     "independent_behavioral_acceptance": "PENDING",
     "empirical_data_access": "NONE",
+    "real_funds_write_authority": "NONE",
+    "original_dispatch_sha": "3fb4508110c031eb0ff9226a7e42d918684c554f",
+    "corrective_controller_dispatch_sha": "ffd10e0693dea106c744dc4b9aa904c4526863f6",
+    "immutable_prompt_ref": "be92966f4f0c8f0f152204973e4296ac5d5cd405",
+    "immutable_prompt_blob_sha": "b0c17854fd7605dfb508acd319af1535d8707d82",
+    "original_prompt_missing_at_original_dispatch_sha": true
+  },
+  "v06_g2_r3_p1_p2_controller_handover_r1": {
+    "status": "CONTROLLER_P1_PENDING_INDEPENDENT_BEHAVIOR__P2_METADATA_RESULT_ACCEPTED_NOT_ADMITTED",
+    "controller_dispatch_sha": "ffd10e0693dea106c744dc4b9aa904c4526863f6",
+    "report_path": "evidence/v0.6/controller/B_LINE_G2_R3_P1_P2_CONTROLLER_HANDOVER_AND_B_PROMPT_BINDING_R1.md",
+    "a_repair_sha": "5c542edd418a74b440162610fd540b1f01e423d3",
+    "b_awaited_head": "a0aacd105ac3f3173b15d91c869990748178e222",
+    "p2_terminal_sha": "7f96369b1209ffdaca5d7f1233c2c9c0ae17ae29",
+    "source_root": "UNKNOWN",
+    "source_body_authority": "NONE",
+    "effective_prereg_sha": "NONE",
+    "testnet": "NOT_AUTHORIZED",
     "real_funds_write_authority": "NONE"
   }
 }
