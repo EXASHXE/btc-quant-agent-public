@@ -1,0 +1,227 @@
+{
+  "budget_exhausted": false,
+  "confirmed_root": null,
+  "counters": {
+    "depth_reached": 3,
+    "dir_entries_scanned": 73,
+    "forbidden_roots_rejected": 0,
+    "hidden_paths_skipped": 5,
+    "lstat_calls": 34,
+    "permission_denied_entries": 0,
+    "protected_body_or_partition_accesses": 0,
+    "protected_paths_excluded": 0,
+    "real_data_body_bytes_read": 0,
+    "remote_market_calls": 0,
+    "selected_partition_lstat_calls": 12,
+    "symlinks_encountered": 0,
+    "symlinks_followed": 0,
+    "wall_clock_seconds": 0.0013
+  },
+  "duration_seconds": 0.0013,
+  "end_time_iso": "2026-10-09T18:28:39Z",
+  "evaluated_roots": [
+    {
+      "candidate_root": "/root/workspace/project/quant-v0.6",
+      "certainty": "ROOT_UNKNOWN",
+      "exists": true,
+      "is_dir": true,
+      "is_symlink": false,
+      "market_like_indicators": [],
+      "ownership_authorized": true,
+      "rejection_reason": null,
+      "safe_partitions_checked": {
+        "2021-03": {
+          "declared_sha256": "ec395168d9a2c4bdb73fc26843e726b92a58a0ffb167802a3e4a4a45d6178c1f",
+          "lstat_mtime": null,
+          "lstat_size_bytes": null,
+          "month": "2021-03",
+          "physical_exists": false,
+          "reason": "ENOENT_UNDER_CANDIDATE_ROOT",
+          "relative_path": "1m/year=2021/month=03/data.parquet",
+          "status": "MISSING_VERIFIED_SELECTED_PATH"
+        },
+        "2021-04": {
+          "declared_sha256": "a94c0afe0a235c33d04abe048e51e0a3e5079922f05bd7c14a30d384db51fff1",
+          "lstat_mtime": null,
+          "lstat_size_bytes": null,
+          "month": "2021-04",
+          "physical_exists": false,
+          "reason": "ENOENT_UNDER_CANDIDATE_ROOT",
+          "relative_path": "1m/year=2021/month=04/data.parquet",
+          "status": "MISSING_VERIFIED_SELECTED_PATH"
+        },
+        "2023-03": {
+          "declared_sha256": "368b1b7bb7cf5e8ae7f894548d08bbb63e93680c7f55f7bdb5f715d16f3b618a",
+          "lstat_mtime": null,
+          "lstat_size_bytes": null,
+          "month": "2023-03",
+          "physical_exists": false,
+          "reason": "ENOENT_UNDER_CANDIDATE_ROOT",
+          "relative_path": "1m/year=2023/month=03/data.parquet",
+          "status": "MISSING_VERIFIED_SELECTED_PATH"
+        },
+        "2023-04": {
+          "declared_sha256": "1dfdf9e4c02c538fc738370f25047594144ff497bbb7e83976bfa1b014e08677",
+          "lstat_mtime": null,
+          "lstat_size_bytes": null,
+          "month": "2023-04",
+          "physical_exists": false,
+          "reason": "ENOENT_UNDER_CANDIDATE_ROOT",
+          "relative_path": "1m/year=2023/month=04/data.parquet",
+          "status": "MISSING_VERIFIED_SELECTED_PATH"
+        },
+        "2025-03": {
+          "declared_sha256": "2d97729d1c4dd9bc644987cb93fdf06eb15f60dcb4a86f5219a84e45617c023c",
+          "lstat_mtime": null,
+          "lstat_size_bytes": null,
+          "month": "2025-03",
+          "physical_exists": false,
+          "reason": "ENOENT_UNDER_CANDIDATE_ROOT",
+          "relative_path": "1m/year=2025/month=03/data.parquet",
+          "status": "MISSING_VERIFIED_SELECTED_PATH"
+        },
+        "2025-04": {
+          "declared_sha256": "5d6776bf5cc053e65bc11809101251c8cc348b886bbcd4b0245e9bfd07670239",
+          "lstat_mtime": null,
+          "lstat_size_bytes": null,
+          "month": "2025-04",
+          "physical_exists": false,
+          "reason": "ENOENT_UNDER_CANDIDATE_ROOT",
+          "relative_path": "1m/year=2025/month=04/data.parquet",
+          "status": "MISSING_VERIFIED_SELECTED_PATH"
+        }
+      },
+      "subdirectories_found": [
+        "/root/workspace/project/quant-v0.6/_artifacts",
+        "/root/workspace/project/quant-v0.6/_artifacts/g1",
+        "/root/workspace/project/quant-v0.6/_artifacts/g2",
+        "/root/workspace/project/quant-v0.6/_artifacts/review",
+        "/root/workspace/project/quant-v0.6/_meta",
+        "/root/workspace/project/quant-v0.6/_venvs"
+      ]
+    },
+    {
+      "candidate_root": "/root/workspace/project",
+      "certainty": "ROOT_UNKNOWN",
+      "exists": true,
+      "is_dir": true,
+      "is_symlink": false,
+      "market_like_indicators": [],
+      "ownership_authorized": true,
+      "rejection_reason": null,
+      "safe_partitions_checked": {
+        "2021-03": {
+          "declared_sha256": "ec395168d9a2c4bdb73fc26843e726b92a58a0ffb167802a3e4a4a45d6178c1f",
+          "lstat_mtime": null,
+          "lstat_size_bytes": null,
+          "month": "2021-03",
+          "physical_exists": false,
+          "reason": "ENOENT_UNDER_CANDIDATE_ROOT",
+          "relative_path": "1m/year=2021/month=03/data.parquet",
+          "status": "MISSING_VERIFIED_SELECTED_PATH"
+        },
+        "2021-04": {
+          "declared_sha256": "a94c0afe0a235c33d04abe048e51e0a3e5079922f05bd7c14a30d384db51fff1",
+          "lstat_mtime": null,
+          "lstat_size_bytes": null,
+          "month": "2021-04",
+          "physical_exists": false,
+          "reason": "ENOENT_UNDER_CANDIDATE_ROOT",
+          "relative_path": "1m/year=2021/month=04/data.parquet",
+          "status": "MISSING_VERIFIED_SELECTED_PATH"
+        },
+        "2023-03": {
+          "declared_sha256": "368b1b7bb7cf5e8ae7f894548d08bbb63e93680c7f55f7bdb5f715d16f3b618a",
+          "lstat_mtime": null,
+          "lstat_size_bytes": null,
+          "month": "2023-03",
+          "physical_exists": false,
+          "reason": "ENOENT_UNDER_CANDIDATE_ROOT",
+          "relative_path": "1m/year=2023/month=03/data.parquet",
+          "status": "MISSING_VERIFIED_SELECTED_PATH"
+        },
+        "2023-04": {
+          "declared_sha256": "1dfdf9e4c02c538fc738370f25047594144ff497bbb7e83976bfa1b014e08677",
+          "lstat_mtime": null,
+          "lstat_size_bytes": null,
+          "month": "2023-04",
+          "physical_exists": false,
+          "reason": "ENOENT_UNDER_CANDIDATE_ROOT",
+          "relative_path": "1m/year=2023/month=04/data.parquet",
+          "status": "MISSING_VERIFIED_SELECTED_PATH"
+        },
+        "2025-03": {
+          "declared_sha256": "2d97729d1c4dd9bc644987cb93fdf06eb15f60dcb4a86f5219a84e45617c023c",
+          "lstat_mtime": null,
+          "lstat_size_bytes": null,
+          "month": "2025-03",
+          "physical_exists": false,
+          "reason": "ENOENT_UNDER_CANDIDATE_ROOT",
+          "relative_path": "1m/year=2025/month=03/data.parquet",
+          "status": "MISSING_VERIFIED_SELECTED_PATH"
+        },
+        "2025-04": {
+          "declared_sha256": "5d6776bf5cc053e65bc11809101251c8cc348b886bbcd4b0245e9bfd07670239",
+          "lstat_mtime": null,
+          "lstat_size_bytes": null,
+          "month": "2025-04",
+          "physical_exists": false,
+          "reason": "ENOENT_UNDER_CANDIDATE_ROOT",
+          "relative_path": "1m/year=2025/month=04/data.parquet",
+          "status": "MISSING_VERIFIED_SELECTED_PATH"
+        }
+      },
+      "subdirectories_found": [
+        "/root/workspace/project/quant-v0.6",
+        "/root/workspace/project/quant-v0.6/_artifacts",
+        "/root/workspace/project/quant-v0.6/_artifacts/g1",
+        "/root/workspace/project/quant-v0.6/_artifacts/g2",
+        "/root/workspace/project/quant-v0.6/_artifacts/review",
+        "/root/workspace/project/quant-v0.6/_meta",
+        "/root/workspace/project/quant-v0.6/_venvs"
+      ]
+    },
+    {
+      "candidate_root": "/root/data",
+      "certainty": "ROOT_UNKNOWN",
+      "exists": false,
+      "is_dir": false,
+      "is_symlink": false,
+      "market_like_indicators": [],
+      "ownership_authorized": true,
+      "rejection_reason": "ENOENT_ROOT_DOES_NOT_EXIST",
+      "safe_partitions_checked": {},
+      "subdirectories_found": []
+    },
+    {
+      "candidate_root": "/data",
+      "certainty": "ROOT_UNKNOWN",
+      "exists": false,
+      "is_dir": false,
+      "is_symlink": false,
+      "market_like_indicators": [],
+      "ownership_authorized": true,
+      "rejection_reason": "ENOENT_ROOT_DOES_NOT_EXIST",
+      "safe_partitions_checked": {},
+      "subdirectories_found": []
+    },
+    {
+      "candidate_root": "/mnt/data",
+      "certainty": "ROOT_UNKNOWN",
+      "exists": false,
+      "is_dir": false,
+      "is_symlink": false,
+      "market_like_indicators": [],
+      "ownership_authorized": true,
+      "rejection_reason": "ENOENT_ROOT_DOES_NOT_EXIST",
+      "safe_partitions_checked": {},
+      "subdirectories_found": []
+    }
+  ],
+  "one_owner_request": "Please provide one exact local owner data root path binding via --approved-root (e.g. where 1m/year=YYYY/month=MM/data.parquet reside), or confirm market files reside on remote storage.",
+  "schema_version": "P2_SCAN_BUDGET_AND_TEST_RECEIPT_V1",
+  "start_time_iso": "2026-10-09T18:28:39Z",
+  "stop_reason": null,
+  "task_id": "V06_POST_P1_GEMINI_LONG_P2_METADATA_ROOT_AND_SOURCE_READINESS_R1",
+  "terminal_verdict": "P2_LOCAL_ROOT_UNKNOWN_WITH_BOUNDED_NEGATIVE_EVIDENCE"
+}

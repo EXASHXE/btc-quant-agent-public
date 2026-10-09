@@ -1,0 +1,679 @@
+{
+  "canonical_root_status": "UNKNOWN",
+  "feasibility": {
+    "btc_only_amendment_feasible": false,
+    "btc_only_rationale": "A prospective BTC-only diagnostic amendment would evaluate only 1 of 3 assets (33.3%). The frozen research protocol strictly enforces a >=60% positive-support screen across the asset universe. 1/3 = 33.3% < 60%, so BTC-only fails the support gate. This boundary cannot be quietly waived by workers; it requires explicit Controller amendment.",
+    "btc_only_verdict": "BTC_ONLY_AMENDMENT_BLOCKED_BY_PROTOCOL_GATE",
+    "option_a_rationale": "Option A requires three symbols (BTC, ETH, SOL) across the selected folds. ETH and SOL sources, licenses, and local paths are completely unadmitted and unknown. Even for BTC, canonical local root is unconfirmed without owner path binding. Option A cannot be executed without admitted multi-asset sources and confirmed local root.",
+    "option_a_three_symbol_feasible": false,
+    "option_a_verdict": "OPTION_A_NOT_FEASIBLE"
+  },
+  "grid": [
+    {
+      "month": "2021-03",
+      "reason": "Canonical local root unknown in bounded project mounts; unprobed, not absent",
+      "role": "1m_kline",
+      "status": "UNKNOWN_UNPROBED",
+      "symbol": "BTCUSDT"
+    },
+    {
+      "month": "2021-03",
+      "reason": "Canonical local root unknown in bounded project mounts; unprobed, not absent",
+      "role": "true_1m_mark",
+      "status": "UNKNOWN_UNPROBED",
+      "symbol": "BTCUSDT"
+    },
+    {
+      "month": "2021-03",
+      "reason": "Canonical local root unknown in bounded project mounts; unprobed, not absent",
+      "role": "funding_rates",
+      "status": "UNKNOWN_UNPROBED",
+      "symbol": "BTCUSDT"
+    },
+    {
+      "month": "2021-03",
+      "reason": "Canonical local root unknown in bounded project mounts; unprobed, not absent",
+      "role": "symbol_filters_fees",
+      "status": "UNKNOWN_UNPROBED",
+      "symbol": "BTCUSDT"
+    },
+    {
+      "month": "2021-03",
+      "reason": "Canonical local root unknown in bounded project mounts; unprobed, not absent",
+      "role": "spread_impact_licence",
+      "status": "UNKNOWN_UNPROBED",
+      "symbol": "BTCUSDT"
+    },
+    {
+      "month": "2021-04",
+      "reason": "Canonical local root unknown in bounded project mounts; unprobed, not absent",
+      "role": "1m_kline",
+      "status": "UNKNOWN_UNPROBED",
+      "symbol": "BTCUSDT"
+    },
+    {
+      "month": "2021-04",
+      "reason": "Canonical local root unknown in bounded project mounts; unprobed, not absent",
+      "role": "true_1m_mark",
+      "status": "UNKNOWN_UNPROBED",
+      "symbol": "BTCUSDT"
+    },
+    {
+      "month": "2021-04",
+      "reason": "Canonical local root unknown in bounded project mounts; unprobed, not absent",
+      "role": "funding_rates",
+      "status": "UNKNOWN_UNPROBED",
+      "symbol": "BTCUSDT"
+    },
+    {
+      "month": "2021-04",
+      "reason": "Canonical local root unknown in bounded project mounts; unprobed, not absent",
+      "role": "symbol_filters_fees",
+      "status": "UNKNOWN_UNPROBED",
+      "symbol": "BTCUSDT"
+    },
+    {
+      "month": "2021-04",
+      "reason": "Canonical local root unknown in bounded project mounts; unprobed, not absent",
+      "role": "spread_impact_licence",
+      "status": "UNKNOWN_UNPROBED",
+      "symbol": "BTCUSDT"
+    },
+    {
+      "month": "2023-03",
+      "reason": "Canonical local root unknown in bounded project mounts; unprobed, not absent",
+      "role": "1m_kline",
+      "status": "UNKNOWN_UNPROBED",
+      "symbol": "BTCUSDT"
+    },
+    {
+      "month": "2023-03",
+      "reason": "Canonical local root unknown in bounded project mounts; unprobed, not absent",
+      "role": "true_1m_mark",
+      "status": "UNKNOWN_UNPROBED",
+      "symbol": "BTCUSDT"
+    },
+    {
+      "month": "2023-03",
+      "reason": "Canonical local root unknown in bounded project mounts; unprobed, not absent",
+      "role": "funding_rates",
+      "status": "UNKNOWN_UNPROBED",
+      "symbol": "BTCUSDT"
+    },
+    {
+      "month": "2023-03",
+      "reason": "Canonical local root unknown in bounded project mounts; unprobed, not absent",
+      "role": "symbol_filters_fees",
+      "status": "UNKNOWN_UNPROBED",
+      "symbol": "BTCUSDT"
+    },
+    {
+      "month": "2023-03",
+      "reason": "Canonical local root unknown in bounded project mounts; unprobed, not absent",
+      "role": "spread_impact_licence",
+      "status": "UNKNOWN_UNPROBED",
+      "symbol": "BTCUSDT"
+    },
+    {
+      "month": "2023-04",
+      "reason": "Canonical local root unknown in bounded project mounts; unprobed, not absent",
+      "role": "1m_kline",
+      "status": "UNKNOWN_UNPROBED",
+      "symbol": "BTCUSDT"
+    },
+    {
+      "month": "2023-04",
+      "reason": "Canonical local root unknown in bounded project mounts; unprobed, not absent",
+      "role": "true_1m_mark",
+      "status": "UNKNOWN_UNPROBED",
+      "symbol": "BTCUSDT"
+    },
+    {
+      "month": "2023-04",
+      "reason": "Canonical local root unknown in bounded project mounts; unprobed, not absent",
+      "role": "funding_rates",
+      "status": "UNKNOWN_UNPROBED",
+      "symbol": "BTCUSDT"
+    },
+    {
+      "month": "2023-04",
+      "reason": "Canonical local root unknown in bounded project mounts; unprobed, not absent",
+      "role": "symbol_filters_fees",
+      "status": "UNKNOWN_UNPROBED",
+      "symbol": "BTCUSDT"
+    },
+    {
+      "month": "2023-04",
+      "reason": "Canonical local root unknown in bounded project mounts; unprobed, not absent",
+      "role": "spread_impact_licence",
+      "status": "UNKNOWN_UNPROBED",
+      "symbol": "BTCUSDT"
+    },
+    {
+      "month": "2025-03",
+      "reason": "Canonical local root unknown in bounded project mounts; unprobed, not absent",
+      "role": "1m_kline",
+      "status": "UNKNOWN_UNPROBED",
+      "symbol": "BTCUSDT"
+    },
+    {
+      "month": "2025-03",
+      "reason": "Canonical local root unknown in bounded project mounts; unprobed, not absent",
+      "role": "true_1m_mark",
+      "status": "UNKNOWN_UNPROBED",
+      "symbol": "BTCUSDT"
+    },
+    {
+      "month": "2025-03",
+      "reason": "Canonical local root unknown in bounded project mounts; unprobed, not absent",
+      "role": "funding_rates",
+      "status": "UNKNOWN_UNPROBED",
+      "symbol": "BTCUSDT"
+    },
+    {
+      "month": "2025-03",
+      "reason": "Canonical local root unknown in bounded project mounts; unprobed, not absent",
+      "role": "symbol_filters_fees",
+      "status": "UNKNOWN_UNPROBED",
+      "symbol": "BTCUSDT"
+    },
+    {
+      "month": "2025-03",
+      "reason": "Canonical local root unknown in bounded project mounts; unprobed, not absent",
+      "role": "spread_impact_licence",
+      "status": "UNKNOWN_UNPROBED",
+      "symbol": "BTCUSDT"
+    },
+    {
+      "month": "2025-04",
+      "reason": "Canonical local root unknown in bounded project mounts; unprobed, not absent",
+      "role": "1m_kline",
+      "status": "UNKNOWN_UNPROBED",
+      "symbol": "BTCUSDT"
+    },
+    {
+      "month": "2025-04",
+      "reason": "Canonical local root unknown in bounded project mounts; unprobed, not absent",
+      "role": "true_1m_mark",
+      "status": "UNKNOWN_UNPROBED",
+      "symbol": "BTCUSDT"
+    },
+    {
+      "month": "2025-04",
+      "reason": "Canonical local root unknown in bounded project mounts; unprobed, not absent",
+      "role": "funding_rates",
+      "status": "UNKNOWN_UNPROBED",
+      "symbol": "BTCUSDT"
+    },
+    {
+      "month": "2025-04",
+      "reason": "Canonical local root unknown in bounded project mounts; unprobed, not absent",
+      "role": "symbol_filters_fees",
+      "status": "UNKNOWN_UNPROBED",
+      "symbol": "BTCUSDT"
+    },
+    {
+      "month": "2025-04",
+      "reason": "Canonical local root unknown in bounded project mounts; unprobed, not absent",
+      "role": "spread_impact_licence",
+      "status": "UNKNOWN_UNPROBED",
+      "symbol": "BTCUSDT"
+    },
+    {
+      "month": "2021-03",
+      "reason": "No approved source manifest, schema, or verified physical path for ETHUSDT",
+      "role": "1m_kline",
+      "status": "UNKNOWN_UNPROBED",
+      "symbol": "ETHUSDT"
+    },
+    {
+      "month": "2021-03",
+      "reason": "No approved source manifest, schema, or verified physical path for ETHUSDT",
+      "role": "true_1m_mark",
+      "status": "UNKNOWN_UNPROBED",
+      "symbol": "ETHUSDT"
+    },
+    {
+      "month": "2021-03",
+      "reason": "No approved source manifest, schema, or verified physical path for ETHUSDT",
+      "role": "funding_rates",
+      "status": "UNKNOWN_UNPROBED",
+      "symbol": "ETHUSDT"
+    },
+    {
+      "month": "2021-03",
+      "reason": "No approved source manifest, schema, or verified physical path for ETHUSDT",
+      "role": "symbol_filters_fees",
+      "status": "UNKNOWN_UNPROBED",
+      "symbol": "ETHUSDT"
+    },
+    {
+      "month": "2021-03",
+      "reason": "No approved source manifest, schema, or verified physical path for ETHUSDT",
+      "role": "spread_impact_licence",
+      "status": "UNKNOWN_UNPROBED",
+      "symbol": "ETHUSDT"
+    },
+    {
+      "month": "2021-04",
+      "reason": "No approved source manifest, schema, or verified physical path for ETHUSDT",
+      "role": "1m_kline",
+      "status": "UNKNOWN_UNPROBED",
+      "symbol": "ETHUSDT"
+    },
+    {
+      "month": "2021-04",
+      "reason": "No approved source manifest, schema, or verified physical path for ETHUSDT",
+      "role": "true_1m_mark",
+      "status": "UNKNOWN_UNPROBED",
+      "symbol": "ETHUSDT"
+    },
+    {
+      "month": "2021-04",
+      "reason": "No approved source manifest, schema, or verified physical path for ETHUSDT",
+      "role": "funding_rates",
+      "status": "UNKNOWN_UNPROBED",
+      "symbol": "ETHUSDT"
+    },
+    {
+      "month": "2021-04",
+      "reason": "No approved source manifest, schema, or verified physical path for ETHUSDT",
+      "role": "symbol_filters_fees",
+      "status": "UNKNOWN_UNPROBED",
+      "symbol": "ETHUSDT"
+    },
+    {
+      "month": "2021-04",
+      "reason": "No approved source manifest, schema, or verified physical path for ETHUSDT",
+      "role": "spread_impact_licence",
+      "status": "UNKNOWN_UNPROBED",
+      "symbol": "ETHUSDT"
+    },
+    {
+      "month": "2023-03",
+      "reason": "No approved source manifest, schema, or verified physical path for ETHUSDT",
+      "role": "1m_kline",
+      "status": "UNKNOWN_UNPROBED",
+      "symbol": "ETHUSDT"
+    },
+    {
+      "month": "2023-03",
+      "reason": "No approved source manifest, schema, or verified physical path for ETHUSDT",
+      "role": "true_1m_mark",
+      "status": "UNKNOWN_UNPROBED",
+      "symbol": "ETHUSDT"
+    },
+    {
+      "month": "2023-03",
+      "reason": "No approved source manifest, schema, or verified physical path for ETHUSDT",
+      "role": "funding_rates",
+      "status": "UNKNOWN_UNPROBED",
+      "symbol": "ETHUSDT"
+    },
+    {
+      "month": "2023-03",
+      "reason": "No approved source manifest, schema, or verified physical path for ETHUSDT",
+      "role": "symbol_filters_fees",
+      "status": "UNKNOWN_UNPROBED",
+      "symbol": "ETHUSDT"
+    },
+    {
+      "month": "2023-03",
+      "reason": "No approved source manifest, schema, or verified physical path for ETHUSDT",
+      "role": "spread_impact_licence",
+      "status": "UNKNOWN_UNPROBED",
+      "symbol": "ETHUSDT"
+    },
+    {
+      "month": "2023-04",
+      "reason": "No approved source manifest, schema, or verified physical path for ETHUSDT",
+      "role": "1m_kline",
+      "status": "UNKNOWN_UNPROBED",
+      "symbol": "ETHUSDT"
+    },
+    {
+      "month": "2023-04",
+      "reason": "No approved source manifest, schema, or verified physical path for ETHUSDT",
+      "role": "true_1m_mark",
+      "status": "UNKNOWN_UNPROBED",
+      "symbol": "ETHUSDT"
+    },
+    {
+      "month": "2023-04",
+      "reason": "No approved source manifest, schema, or verified physical path for ETHUSDT",
+      "role": "funding_rates",
+      "status": "UNKNOWN_UNPROBED",
+      "symbol": "ETHUSDT"
+    },
+    {
+      "month": "2023-04",
+      "reason": "No approved source manifest, schema, or verified physical path for ETHUSDT",
+      "role": "symbol_filters_fees",
+      "status": "UNKNOWN_UNPROBED",
+      "symbol": "ETHUSDT"
+    },
+    {
+      "month": "2023-04",
+      "reason": "No approved source manifest, schema, or verified physical path for ETHUSDT",
+      "role": "spread_impact_licence",
+      "status": "UNKNOWN_UNPROBED",
+      "symbol": "ETHUSDT"
+    },
+    {
+      "month": "2025-03",
+      "reason": "No approved source manifest, schema, or verified physical path for ETHUSDT",
+      "role": "1m_kline",
+      "status": "UNKNOWN_UNPROBED",
+      "symbol": "ETHUSDT"
+    },
+    {
+      "month": "2025-03",
+      "reason": "No approved source manifest, schema, or verified physical path for ETHUSDT",
+      "role": "true_1m_mark",
+      "status": "UNKNOWN_UNPROBED",
+      "symbol": "ETHUSDT"
+    },
+    {
+      "month": "2025-03",
+      "reason": "No approved source manifest, schema, or verified physical path for ETHUSDT",
+      "role": "funding_rates",
+      "status": "UNKNOWN_UNPROBED",
+      "symbol": "ETHUSDT"
+    },
+    {
+      "month": "2025-03",
+      "reason": "No approved source manifest, schema, or verified physical path for ETHUSDT",
+      "role": "symbol_filters_fees",
+      "status": "UNKNOWN_UNPROBED",
+      "symbol": "ETHUSDT"
+    },
+    {
+      "month": "2025-03",
+      "reason": "No approved source manifest, schema, or verified physical path for ETHUSDT",
+      "role": "spread_impact_licence",
+      "status": "UNKNOWN_UNPROBED",
+      "symbol": "ETHUSDT"
+    },
+    {
+      "month": "2025-04",
+      "reason": "No approved source manifest, schema, or verified physical path for ETHUSDT",
+      "role": "1m_kline",
+      "status": "UNKNOWN_UNPROBED",
+      "symbol": "ETHUSDT"
+    },
+    {
+      "month": "2025-04",
+      "reason": "No approved source manifest, schema, or verified physical path for ETHUSDT",
+      "role": "true_1m_mark",
+      "status": "UNKNOWN_UNPROBED",
+      "symbol": "ETHUSDT"
+    },
+    {
+      "month": "2025-04",
+      "reason": "No approved source manifest, schema, or verified physical path for ETHUSDT",
+      "role": "funding_rates",
+      "status": "UNKNOWN_UNPROBED",
+      "symbol": "ETHUSDT"
+    },
+    {
+      "month": "2025-04",
+      "reason": "No approved source manifest, schema, or verified physical path for ETHUSDT",
+      "role": "symbol_filters_fees",
+      "status": "UNKNOWN_UNPROBED",
+      "symbol": "ETHUSDT"
+    },
+    {
+      "month": "2025-04",
+      "reason": "No approved source manifest, schema, or verified physical path for ETHUSDT",
+      "role": "spread_impact_licence",
+      "status": "UNKNOWN_UNPROBED",
+      "symbol": "ETHUSDT"
+    },
+    {
+      "month": "2021-03",
+      "reason": "No approved source manifest, schema, or verified physical path for SOLUSDT",
+      "role": "1m_kline",
+      "status": "UNKNOWN_UNPROBED",
+      "symbol": "SOLUSDT"
+    },
+    {
+      "month": "2021-03",
+      "reason": "No approved source manifest, schema, or verified physical path for SOLUSDT",
+      "role": "true_1m_mark",
+      "status": "UNKNOWN_UNPROBED",
+      "symbol": "SOLUSDT"
+    },
+    {
+      "month": "2021-03",
+      "reason": "No approved source manifest, schema, or verified physical path for SOLUSDT",
+      "role": "funding_rates",
+      "status": "UNKNOWN_UNPROBED",
+      "symbol": "SOLUSDT"
+    },
+    {
+      "month": "2021-03",
+      "reason": "No approved source manifest, schema, or verified physical path for SOLUSDT",
+      "role": "symbol_filters_fees",
+      "status": "UNKNOWN_UNPROBED",
+      "symbol": "SOLUSDT"
+    },
+    {
+      "month": "2021-03",
+      "reason": "No approved source manifest, schema, or verified physical path for SOLUSDT",
+      "role": "spread_impact_licence",
+      "status": "UNKNOWN_UNPROBED",
+      "symbol": "SOLUSDT"
+    },
+    {
+      "month": "2021-04",
+      "reason": "No approved source manifest, schema, or verified physical path for SOLUSDT",
+      "role": "1m_kline",
+      "status": "UNKNOWN_UNPROBED",
+      "symbol": "SOLUSDT"
+    },
+    {
+      "month": "2021-04",
+      "reason": "No approved source manifest, schema, or verified physical path for SOLUSDT",
+      "role": "true_1m_mark",
+      "status": "UNKNOWN_UNPROBED",
+      "symbol": "SOLUSDT"
+    },
+    {
+      "month": "2021-04",
+      "reason": "No approved source manifest, schema, or verified physical path for SOLUSDT",
+      "role": "funding_rates",
+      "status": "UNKNOWN_UNPROBED",
+      "symbol": "SOLUSDT"
+    },
+    {
+      "month": "2021-04",
+      "reason": "No approved source manifest, schema, or verified physical path for SOLUSDT",
+      "role": "symbol_filters_fees",
+      "status": "UNKNOWN_UNPROBED",
+      "symbol": "SOLUSDT"
+    },
+    {
+      "month": "2021-04",
+      "reason": "No approved source manifest, schema, or verified physical path for SOLUSDT",
+      "role": "spread_impact_licence",
+      "status": "UNKNOWN_UNPROBED",
+      "symbol": "SOLUSDT"
+    },
+    {
+      "month": "2023-03",
+      "reason": "No approved source manifest, schema, or verified physical path for SOLUSDT",
+      "role": "1m_kline",
+      "status": "UNKNOWN_UNPROBED",
+      "symbol": "SOLUSDT"
+    },
+    {
+      "month": "2023-03",
+      "reason": "No approved source manifest, schema, or verified physical path for SOLUSDT",
+      "role": "true_1m_mark",
+      "status": "UNKNOWN_UNPROBED",
+      "symbol": "SOLUSDT"
+    },
+    {
+      "month": "2023-03",
+      "reason": "No approved source manifest, schema, or verified physical path for SOLUSDT",
+      "role": "funding_rates",
+      "status": "UNKNOWN_UNPROBED",
+      "symbol": "SOLUSDT"
+    },
+    {
+      "month": "2023-03",
+      "reason": "No approved source manifest, schema, or verified physical path for SOLUSDT",
+      "role": "symbol_filters_fees",
+      "status": "UNKNOWN_UNPROBED",
+      "symbol": "SOLUSDT"
+    },
+    {
+      "month": "2023-03",
+      "reason": "No approved source manifest, schema, or verified physical path for SOLUSDT",
+      "role": "spread_impact_licence",
+      "status": "UNKNOWN_UNPROBED",
+      "symbol": "SOLUSDT"
+    },
+    {
+      "month": "2023-04",
+      "reason": "No approved source manifest, schema, or verified physical path for SOLUSDT",
+      "role": "1m_kline",
+      "status": "UNKNOWN_UNPROBED",
+      "symbol": "SOLUSDT"
+    },
+    {
+      "month": "2023-04",
+      "reason": "No approved source manifest, schema, or verified physical path for SOLUSDT",
+      "role": "true_1m_mark",
+      "status": "UNKNOWN_UNPROBED",
+      "symbol": "SOLUSDT"
+    },
+    {
+      "month": "2023-04",
+      "reason": "No approved source manifest, schema, or verified physical path for SOLUSDT",
+      "role": "funding_rates",
+      "status": "UNKNOWN_UNPROBED",
+      "symbol": "SOLUSDT"
+    },
+    {
+      "month": "2023-04",
+      "reason": "No approved source manifest, schema, or verified physical path for SOLUSDT",
+      "role": "symbol_filters_fees",
+      "status": "UNKNOWN_UNPROBED",
+      "symbol": "SOLUSDT"
+    },
+    {
+      "month": "2023-04",
+      "reason": "No approved source manifest, schema, or verified physical path for SOLUSDT",
+      "role": "spread_impact_licence",
+      "status": "UNKNOWN_UNPROBED",
+      "symbol": "SOLUSDT"
+    },
+    {
+      "month": "2025-03",
+      "reason": "No approved source manifest, schema, or verified physical path for SOLUSDT",
+      "role": "1m_kline",
+      "status": "UNKNOWN_UNPROBED",
+      "symbol": "SOLUSDT"
+    },
+    {
+      "month": "2025-03",
+      "reason": "No approved source manifest, schema, or verified physical path for SOLUSDT",
+      "role": "true_1m_mark",
+      "status": "UNKNOWN_UNPROBED",
+      "symbol": "SOLUSDT"
+    },
+    {
+      "month": "2025-03",
+      "reason": "No approved source manifest, schema, or verified physical path for SOLUSDT",
+      "role": "funding_rates",
+      "status": "UNKNOWN_UNPROBED",
+      "symbol": "SOLUSDT"
+    },
+    {
+      "month": "2025-03",
+      "reason": "No approved source manifest, schema, or verified physical path for SOLUSDT",
+      "role": "symbol_filters_fees",
+      "status": "UNKNOWN_UNPROBED",
+      "symbol": "SOLUSDT"
+    },
+    {
+      "month": "2025-03",
+      "reason": "No approved source manifest, schema, or verified physical path for SOLUSDT",
+      "role": "spread_impact_licence",
+      "status": "UNKNOWN_UNPROBED",
+      "symbol": "SOLUSDT"
+    },
+    {
+      "month": "2025-04",
+      "reason": "No approved source manifest, schema, or verified physical path for SOLUSDT",
+      "role": "1m_kline",
+      "status": "UNKNOWN_UNPROBED",
+      "symbol": "SOLUSDT"
+    },
+    {
+      "month": "2025-04",
+      "reason": "No approved source manifest, schema, or verified physical path for SOLUSDT",
+      "role": "true_1m_mark",
+      "status": "UNKNOWN_UNPROBED",
+      "symbol": "SOLUSDT"
+    },
+    {
+      "month": "2025-04",
+      "reason": "No approved source manifest, schema, or verified physical path for SOLUSDT",
+      "role": "funding_rates",
+      "status": "UNKNOWN_UNPROBED",
+      "symbol": "SOLUSDT"
+    },
+    {
+      "month": "2025-04",
+      "reason": "No approved source manifest, schema, or verified physical path for SOLUSDT",
+      "role": "symbol_filters_fees",
+      "status": "UNKNOWN_UNPROBED",
+      "symbol": "SOLUSDT"
+    },
+    {
+      "month": "2025-04",
+      "reason": "No approved source manifest, schema, or verified physical path for SOLUSDT",
+      "role": "spread_impact_licence",
+      "status": "UNKNOWN_UNPROBED",
+      "symbol": "SOLUSDT"
+    }
+  ],
+  "protected_holdout_summary": {
+    "access_count": 0,
+    "holdout_window": "[2026-02-01, 2026-08-01)",
+    "policy": "Strictly sealed; zero file open, zero lstat inside protected subtree.",
+    "protected_months": [
+      "2026-02",
+      "2026-03",
+      "2026-04",
+      "2026-05",
+      "2026-06",
+      "2026-07"
+    ],
+    "status": "PROTECTED_EXCLUDED"
+  },
+  "roles": [
+    "1m_kline",
+    "true_1m_mark",
+    "funding_rates",
+    "symbol_filters_fees",
+    "spread_impact_licence"
+  ],
+  "safe_months": [
+    "2021-03",
+    "2021-04",
+    "2023-03",
+    "2023-04",
+    "2025-03",
+    "2025-04"
+  ],
+  "schema_version": "P2_SCOPED_PATH_AND_PROTECTION_MATRIX_V1",
+  "symbols": [
+    "BTCUSDT",
+    "ETHUSDT",
+    "SOLUSDT"
+  ],
+  "task_id": "V06_POST_P1_GEMINI_LONG_P2_METADATA_ROOT_AND_SOURCE_READINESS_R1"
+}
