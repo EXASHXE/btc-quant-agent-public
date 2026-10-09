@@ -1544,7 +1544,7 @@
     "next_gate": "ONE_IMPLEMENTATION_PLUS_ONE_INDEPENDENT_EXACT_SHA_SEMANTIC_AUDIT"
   },
   "v06_g2_r3_p1_alt_engine_gemini_a_implementation_r1": {
-    "status": "A_IMPLEMENTATION_PUSH_VERIFIED__CONTROLLER_EVIDENCE_GATE_INSUFFICIENT__ONE_FINAL_B_AUDIT_DISPATCHED",
+    "status": "ALT_ENGINE_P1_TERMINAL_NO_GO_CONTROLLER_ACCEPTED__NO_NEW_PATCH_OR_REAUDIT",
     "task_id": "V06_G2_R3_P1_ALT_ENGINE_GEMINI_A_IMPLEMENTATION_R1",
     "branch": "feature/v06-bline-g2-r3-p1-alt-engine-gemini-a-r1",
     "code_baseline_start_sha": "e0ff8c3473de4bfa3e66fe7928d42992a4d38a32",
@@ -1558,7 +1558,7 @@
     "tests_required": "T01_TO_T34_RUNTIME_WITH_I01_TO_I17_PER_TRANSITION_4H_12H_FULL_SYNTHETIC",
     "implementation_authority": "SYNTHETIC_ONLY_NEW_R3_ALT_ENGINE_PACKAGE",
     "independent_b_verification": "REQUIRED_ONE_FINAL_EXACT_SHA_AUDIT",
-    "p1_engine_acceptance": "NO",
+    "p1_engine_acceptance": "NO_TERMINAL_REJECTED",
     "p2_data_admission": "LOCAL_ROOT_UNKNOWN",
     "p3_prereg": "NONE",
     "p4_market_body_authority": "NONE",
@@ -1579,7 +1579,7 @@
       "TERMINAL_ALL_ZERO_CHECK_EXCLUDES_PENDING_ACKS_AND_CASH_RECONCILIATION"
     ],
     "final_independent_b": {
-      "status": "REASSIGNED_TO_SOL_HIGH_NOT_EXECUTED",
+      "status": "INDEPENDENT_FINAL_PUSH_VERIFIED_CONTROLLER_L2_TERMINAL_NO_GO_ACCEPTED",
       "branch": "feature/v06-bline-g2-r3-p1-alt-engine-final-independent-b-r1",
       "start_sha": "ed9dc16f3dbeaada88806b69ad032526886a2ae4",
       "controller_dispatch_sha": "d2669953e896850b1bf749b5e5fdcf831ba26b88",
@@ -1591,7 +1591,60 @@
       "executor": "GPT-6_SOL_HIGH_AS_INDEPENDENT_B_ROLE",
       "previous_controller_dispatch_sha": "ed9dc16f3dbeaada88806b69ad032526886a2ae4",
       "one_shot_budget": "UNCHANGED_NO_PARALLEL_GEMINI_B_AUDIT",
-      "controller_final_adjudicator": "ChatGPT-0_Primary_Controller"
-    }
+      "controller_final_adjudicator": "ChatGPT-0_Primary_Controller",
+      "final_remote_sha": "fc0e4a2faedbd87880ad0fa3d415756add5bf72d",
+      "final_parent_sha": "ed9dc16f3dbeaada88806b69ad032526886a2ae4",
+      "executor_terminal_verdict": "ALT_ENGINE_B_TERMINAL_NO_GO__STOP_ENGINE_CAMPAIGN",
+      "controller_terminal_dispatch_sha": "fd3c13645df9ad2506293b109d3891cf57936208",
+      "controller_decision": "CONTROLLER_ACCEPT_B_FINAL_ALTERNATIVE_ENGINE_MATERIAL_NO_GO__TERMINATE_P1_ALT_ENGINE_ROUTE__NO_NEW_PATCH_OR_REAUDIT__STRATEGY_HYPOTHESES_UNJUDGED",
+      "remote_ci_url": "https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/37967346627",
+      "remote_ci": "FAILURE_SIX_UNCHANGED_H41_RUFF_ON_DOCS_BRANCH_SAFETY",
+      "independent_focused_py312": "12_PASS_REPRODUCING_BLOCKERS_NOT_ENGINE_PASS",
+      "independent_focused_py313": "12_PASS_REPRODUCING_BLOCKERS_NOT_ENGINE_PASS",
+      "verified_trade_counts": {
+        "T28_4h_paths": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "T29_12h_base": 0,
+        "independent_valid_ohlc_240h": 0
+      },
+      "T01_T34_counts": {
+        "BLOCKED": 5,
+        "NOT_RUN_DUE_TO_TERMINAL_BLOCKER": 27,
+        "PASS": 1,
+        "UNVERIFIED": 1
+      },
+      "I01_I17_counts": {
+        "BLOCKED": 6,
+        "UNVERIFIED": 11
+      },
+      "material_breaks": [
+        "FULL_REPLAY_DUPLICATE_SOURCE_CLOSE_MARK_INPUT_ORDER_DEPENDENT_NO_FAIL_CLOSED",
+        "PUBLIC_REDUCER_OVEREXIT_QUANTITY_EXCEEDS_INVENTORY_ACCEPTED",
+        "EIGHT_POLICY_BOOKS_POOLED_BY_COST_SCENARIO",
+        "FUNDING_SHORTFALL_AND_CASH_POSTING_VALIDATION_INCOMPLETE",
+        "TERMINAL_ALL_ZERO_OMITS_UNPAID_FEE_IN_INJECTED_STATE",
+        "T28_T29_NONEMPTY_CHAIN_UNPROVEN"
+      ],
+      "model_setting_attestation": "REQUESTED_GPT6_SOL_HIGH_VARIANT_EFFORT_NOT_EXPOSED_BY_CODEX_EXECUTOR"
+    },
+    "new_engine_route_open": false,
+    "next_authorized_parallel_work": "P2_SOURCE_ADMISSION_INVENTORY_WITHOUT_MARKET_BODIES; CONTROLLER_NEW_RESEARCH_ROADMAP_DESIGN_ONLY_IF_SEPARATELY_AUTHORIZED"
+  },
+  "v06_g2_r3_p1_p1_engine_terminal_controller": {
+    "status": "P1_ENGINE_ROUTE_TERMINATED_NO_GO",
+    "controller_terminal_authority_sha": "fd3c13645df9ad2506293b109d3891cf57936208",
+    "audited_alternative_a_sha": "164243b770f74f98876b55a7f070b1adf2f554d5",
+    "independent_b_sha": "fc0e4a2faedbd87880ad0fa3d415756add5bf72d",
+    "p1_engine_acceptance": "NONE_REJECTED",
+    "strategy_hypotheses_efficacy": "UNTESTED_NOT_NEGATIVE_RESULT",
+    "source_data_admission": "LOCAL_ROOT_UNKNOWN",
+    "prereg_first_pushed": "NONE",
+    "historical_market_body_reads": "NOT_AUTHORIZED",
+    "testnet_live_real_funds": "NONE",
+    "stop_policy": "NO_AUTO_ALTERNATIVE_ENGINE_PATCHES_REAUDIT_OR_ANOTHER_ENGINE_UNDER_THIS_CAMPAIGN"
   }
 }
