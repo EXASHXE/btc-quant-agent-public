@@ -95,6 +95,7 @@ class ReplayEngine:
             marks_by_sym[sym] = sorted_m
 
         mark_idx_by_sym: dict[str, int] = {sym: 0 for sym in marks_by_sym}
+        last_seen_mark_by_sym: dict[str, MarkBar1m] = {}
 
         # Running lists of completed 1m bars for aggregation
         accumulated_1m: dict[str, list[Bar1m]] = {sym: [] for sym in bars_1m}
@@ -104,21 +105,31 @@ class ReplayEngine:
             current_bars = bars_by_minute.get(current_open_ms, {})
 
             # Causal mark stream: collect marks that became effectively available at or before current_open_ms
+            # Invariant B01: newest completed close_ms wins among eligible marks; older arrivals cannot overwrite
             current_marks: dict[str, MarkBar1m] = {}
             for sym, m_list in marks_by_sym.items():
                 idx = mark_idx_by_sym[sym]
-                latest_eligible: MarkBar1m | None = None
+                newly_eligible: list[MarkBar1m] = []
                 while idx < len(m_list):
                     m = m_list[idx]
                     effective_avail = max(m.close_ms, m.available_at_ms)
                     if effective_avail <= current_open_ms:
-                        latest_eligible = m
+                        newly_eligible.append(m)
                         idx += 1
                     else:
                         break
                 mark_idx_by_sym[sym] = idx
-                if latest_eligible is not None:
-                    current_marks[sym] = latest_eligible
+
+                if newly_eligible:
+                    # Select mark with highest completed close_ms, tiebreak with greatest available_at_ms
+                    best_eligible = max(
+                        newly_eligible,
+                        key=lambda m: (m.close_ms, m.available_at_ms),
+                    )
+                    prev_seen = last_seen_mark_by_sym.get(sym)
+                    if prev_seen is None or best_eligible.close_ms >= prev_seen.close_ms:
+                        current_marks[sym] = best_eligible
+                        last_seen_mark_by_sym[sym] = best_eligible
 
             # Append current bars to history
             for sym, bar in current_bars.items():

@@ -219,6 +219,7 @@ class Position:
     funding_reserves_usdt: Decimal = Decimal(0)
     total_funding_charged_usdt: Decimal = Decimal(0)
     is_acknowledged: bool = False
+    unacked_entry_commitment_usdt: Decimal = Decimal(0)
 
     @property
     def expiry_time_ms(self) -> int:
@@ -252,6 +253,7 @@ class CompletedTrade:
     net_bps: Decimal
     net_r: Decimal | None
     retest_event_id: str | None = None
+    position_id: str = ""
 
 
 @dataclass
