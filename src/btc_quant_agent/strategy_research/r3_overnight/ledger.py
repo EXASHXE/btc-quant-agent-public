@@ -901,21 +901,21 @@ class VirtualBook:
 
                 # Attribute charge to exact position owner
                 # Owner 1: Position is active in self.positions or self.all_positions_by_id
-                pos = None
+                owner_pos: Position | None = None
                 if sym in self.positions and self.positions[sym].position_id == interval.position_id:
-                    pos = self.positions[sym]
+                    owner_pos = self.positions[sym]
                 else:
                     for p in self.positions.values():
                         if p.position_id == interval.position_id:
-                            pos = p
+                            owner_pos = p
                             break
 
-                if pos is not None:
-                    pos.total_funding_charged_usdt += debit
+                if owner_pos is not None:
+                    owner_pos.total_funding_charged_usdt += debit
                     # Invariant B07: consume only available owner reserve; do not steal from others
-                    avail_res = pos.funding_reserves_usdt
+                    avail_res = owner_pos.funding_reserves_usdt
                     consumed = min(avail_res, debit)
-                    pos.funding_reserves_usdt -= consumed
+                    owner_pos.funding_reserves_usdt -= consumed
                     self.funding_reserve_rf -= consumed
                 else:
                     # Owner 2: Position in pending_exit_acks

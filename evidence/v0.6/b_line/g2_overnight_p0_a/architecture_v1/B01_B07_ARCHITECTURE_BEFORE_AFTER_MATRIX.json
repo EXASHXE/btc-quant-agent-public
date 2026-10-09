@@ -2,8 +2,11 @@
   "schema_version": "G2_R3_P1_ARCHITECTURE_BEFORE_AFTER_MATRIX_V1",
   "task_id": "V06_G2_R3_P1_ENGINE_ARCHITECTURE_REBUILD_V1",
   "role": "GEMINI_A",
-  "controller_dispatch_sha": "e5fcd76370a1b03d7d83b825af6a8cac842b1ae5",
-  "a_start_sha": "2c60b0653d3619eedf457753511a9ecc84c1cd5b",
+  "controller_dispatch_sha": "dca82909aeaef380a5c2e9866238ccbbe0114fad",
+  "original_arch_controller_sha": "e5fcd76370a1b03d7d83b825af6a8cac842b1ae5",
+  "prompt_pinned_sha": "97a3708d5c6063c6926b2aa1c26be3d98e7a7c78",
+  "a_start_sha": "398e6bab0cdedf07a93827019ca4bf1bf913c7f9",
+  "prior_start_sha": "2c60b0653d3619eedf457753511a9ecc84c1cd5b",
   "implementation_sha": "89d0c211cff96286203e4fb7459a51042c1257f1",
   "b_evidence_sha": "068a4005f68b5ee4a970063cb1f3bc524a08784a",
   "summary_counts": {
@@ -13,7 +16,7 @@
     "BLOCKED": 0,
     "INCOMPLETE": 0
   },
-  "terminal_verdict": "ARCH_V1_SYNTHETIC_READY_FOR_INDEPENDENT_REVIEW",
+  "terminal_verdict": "ARCH_V1_SYNTHETIC_READY_FOR_FINAL_INDEPENDENT_B_AUDIT",
   "findings": [
     {
       "id": "B01",

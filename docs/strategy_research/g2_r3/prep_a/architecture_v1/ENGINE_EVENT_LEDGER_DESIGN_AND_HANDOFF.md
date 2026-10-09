@@ -179,3 +179,18 @@ The external API remains 100% backward-compatible:
 - `VirtualBook.positions` provides symbol-keyed lookup compatible with legacy assertions.
 - Candidate definitions and registry IDs unchanged.
 - Deterministic receipt hash computation preserved.
+
+---
+
+## 7. Appendix: Maintenance Pass CI/Type and Executed Evidence Convergence
+
+This appendix records the maintenance convergence under Controller Dispatch `dca82909aeaef380a5c2e9866238ccbbe0114fad` and Prompt `97a3708d5c6063c6926b2aa1c26be3d98e7a7c78`:
+
+1. **Stage 7 Funding Attribution Typing**: In `ledger.py`, the Stage 7 owner position resolution variable was typed cleanly as `owner_pos: Position | None = None`, eliminating the `[assignment]` / `[no-redef]` mypy CI failure without modifying runtime branching or using type suppressions.
+2. **Authoritative Candidate Registry**: Machine receipts and before-after matrices reflect the frozen 8 strategy candidate IDs (`STRUCTURAL_CONTINUATION_LONG_04H`, `STRUCTURAL_CONTINUATION_LONG_12H`, `STRUCTURAL_CONTINUATION_SHORT_04H`, `STRUCTURAL_CONTINUATION_SHORT_12H`, `CLOSED_RETEST_LONG_04H`, `CLOSED_RETEST_LONG_12H`, `CLOSED_RETEST_SHORT_04H`, `CLOSED_RETEST_SHORT_12H`) directly verified against `CandidateRegistry().list_candidates()`.
+3. **Executable Non-Empty Synthetic E2E Evidence**: Verified two separate production-path test fixtures:
+   - `test_synthetic_e2e_empty_book_case`: Verifies flat invariant with zero signals, zero trades, zero fees, zero funding, and exact 1000.00000000 -> 1000.00000000 USDT cash preservation.
+   - `test_synthetic_e2e_nonempty_executed_book_case`: Verifies non-empty end-to-end execution through `ReplayEngine.run_simulation` covering 240h warmup, Donchian breakout, 1h closed retest confirmation, order sizing, fill ACK, 4h holding crossing multiple UTC hourly funding settlements, max-hold expiry exit, and final exit ACK. Realized:
+     - `CLOSED_RETEST_LONG_04H`: 1 trade (`0.006 BTC`), Entry Fee: `0.18010836 USDT`, Exit Fee: `0.17992764 USDT`, Total Funding: `0.48004800 USDT`, Net PnL: `-1.14128400 USDT`, Cash: `1000.00000000 -> 998.85871600 USDT`, with exact algebraic cash conservation: $\Delta \text{Cash} == \text{Net PnL}$.
+     - `CLOSED_RETEST_LONG_12H`: 1 trade (`0.006 BTC`), Total Funding: `1.44014400 USDT`, Net PnL: `-2.10138000 USDT`, Cash: `1000.00000000 -> 997.89862000 USDT`, with exact algebraic cash conservation.
+   - Terminal flat books possess exactly zero owner reserves ($R_f = 0$), zero cost commitments ($C_o = 0$), and zero pending obligations.

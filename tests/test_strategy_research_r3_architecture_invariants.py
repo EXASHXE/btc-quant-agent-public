@@ -598,8 +598,35 @@ def test_b07_positive_funding_reserve_exhaustion_no_cross_theft_and_conservation
 # =============================================================================
 
 
-def test_synthetic_e2e_flat_book_full_reconciliation() -> None:
-    """Verify integrated synthetic scenario with non-zero trades ends in flat reconciled book."""
+def test_synthetic_e2e_empty_book_case() -> None:
+    """Honest empty book fixture: flat market generates 0 signals, 0 trades, exactly 1000->1000 cash."""
+    start_ms = (1_700_000_000_000 // 14_400_000) * 14_400_000
+    bars_flat: list[Bar1m] = []
+    marks_flat: list[MarkBar1m] = []
+    p = Decimal("50000.00")
+    for m in range(120):
+        t = start_ms + m * ONE_MINUTE_MS
+        bars_flat.append(Bar1m(t, p, p, p, p, Decimal(10), "BTCUSDT"))
+        marks_flat.append(MarkBar1m(t, p, p, p, p, "BTCUSDT", t + ONE_MINUTE_MS))
+
+    eng = ReplayEngine(cost_scenario=CostScenario.BASE)
+    results = eng.run_simulation({"BTCUSDT": bars_flat}, {"BTCUSDT": marks_flat})
+
+    for cid in CandidateRegistry().list_candidates():
+        book = eng.books[cid.id]
+        assert len(results[cid.id]) == 0
+        assert len(book.completed_trades) == 0
+        assert book.cash == INITIAL_EQUITY_USDT
+        assert book.cost_commitment_o == Decimal(0)
+        assert book.funding_reserve_rf == Decimal(0)
+        assert len(book.positions) == 0
+        assert len(book.pending_orders) == 0
+        assert len(book.pending_fill_acks) == 0
+        assert len(book.pending_exit_acks) == 0
+
+
+def test_synthetic_e2e_nonempty_executed_book_case() -> None:
+    """Nonempty synthetic execution fixture: real ReplayEngine simulation with signal, fill, funding, and expiry."""
     start_ms = (1_700_000_000_000 // 14_400_000) * 14_400_000
     bars: list[Bar1m] = []
     marks: list[MarkBar1m] = []
@@ -635,7 +662,7 @@ def test_synthetic_e2e_flat_book_full_reconciliation() -> None:
         bars.append(Bar1m(t, o, h_p, l_p, c, Decimal(100), "BTCUSDT"))
         marks.append(MarkBar1m(t, c, c, c, c, "BTCUSDT", t + ONE_MINUTE_MS))
 
-    # Hours 242..255 (allow positions to reach expiry, exit, settle and flatten)
+    # Hours 242..255 (holding, 4 funding settlements, 240m max hold expiry, exit and settle)
     for h in range(242, 256):
         t_h = start_ms + h * ONE_HOUR_MS
         p = Decimal("50005.00")
@@ -647,23 +674,47 @@ def test_synthetic_e2e_flat_book_full_reconciliation() -> None:
     eng = ReplayEngine(cost_scenario=CostScenario.BASE)
     results = eng.run_simulation({"BTCUSDT": bars}, {"BTCUSDT": marks})
 
-    # Both 4h and 12h candidates executed trades
-    assert len(results["CLOSED_RETEST_LONG_04H"]) > 0
-    assert len(results["CLOSED_RETEST_LONG_12H"]) > 0
+    # Verify exact executed trade details for CLOSED_RETEST_LONG_04H
+    assert len(results["CLOSED_RETEST_LONG_04H"]) == 1
+    trade_4h = results["CLOSED_RETEST_LONG_04H"][0]
+    assert trade_4h.trade_id == "TRD_POS_ORD_CLOSED_RETEST_LONG_04H_BTCUSDT_1700863320000_1700877720000"
+    assert trade_4h.position_id == "POS_ORD_CLOSED_RETEST_LONG_04H_BTCUSDT_1700863320000"
+    assert trade_4h.quantity == Decimal("0.006")
+    assert trade_4h.effective_entry == Decimal("50030.10")
+    assert trade_4h.effective_exit == Decimal("49979.90")
+    assert trade_4h.entry_time_ms == 1700863320000
+    assert trade_4h.exit_time_ms == 1700877720000
+    assert trade_4h.exit_reason == ExitReason.EXPIRY
+    assert trade_4h.entry_fee_usdt == Decimal("0.180108360")
+    assert trade_4h.exit_fee_usdt == Decimal("0.179927640")
+    assert trade_4h.total_funding_usdt == Decimal("0.480048000")
+    assert trade_4h.net_pnl_usdt == Decimal("-1.141284000")
 
+    # Verify book state and algebraic cash conservation
     book_4h = eng.books["CLOSED_RETEST_LONG_04H"]
-    book_12h = eng.books["CLOSED_RETEST_LONG_12H"]
-
-    # Invariant: Terminal flat books have exactly zero owned commitments and reserves!
+    assert book_4h.cash == Decimal("998.858716000000")
+    cash_delta_4h = book_4h.cash - INITIAL_EQUITY_USDT
+    assert cash_delta_4h == trade_4h.net_pnl_usdt
     assert book_4h.cost_commitment_o == Decimal(0)
     assert book_4h.funding_reserve_rf == Decimal(0)
     assert len(book_4h.positions) == 0
+    assert len(book_4h.pending_orders) == 0
+    assert len(book_4h.pending_fill_acks) == 0
+    assert len(book_4h.pending_exit_acks) == 0
+    assert len(book_4h._unsettled_exit_trades) == 0
 
+    # Verify CLOSED_RETEST_LONG_12H
+    assert len(results["CLOSED_RETEST_LONG_12H"]) == 1
+    trade_12h = results["CLOSED_RETEST_LONG_12H"][0]
+    assert trade_12h.total_funding_usdt == Decimal("1.440144000")
+    assert trade_12h.net_pnl_usdt == Decimal("-2.101380000")
+    book_12h = eng.books["CLOSED_RETEST_LONG_12H"]
+    assert book_12h.cash == Decimal("997.898620000000")
+    assert (book_12h.cash - INITIAL_EQUITY_USDT) == trade_12h.net_pnl_usdt
     assert book_12h.cost_commitment_o == Decimal(0)
     assert book_12h.funding_reserve_rf == Decimal(0)
-    assert len(book_12h.positions) == 0
 
-    # Invariant: Terminal cash delta reconciles to the sum of finalized trade net PnL!
-    cash_delta_4h = book_4h.cash - INITIAL_EQUITY_USDT
-    total_net_pnl_4h = sum(t.net_pnl_usdt for t in book_4h.completed_trades)
-    assert cash_delta_4h == total_net_pnl_4h
+
+def test_synthetic_e2e_flat_book_full_reconciliation() -> None:
+    """Verify integrated synthetic scenario ends in flat reconciled book (alias)."""
+    test_synthetic_e2e_nonempty_executed_book_case()

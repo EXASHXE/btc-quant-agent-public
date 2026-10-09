@@ -2,15 +2,18 @@
   "schema_version": "G2_R3_P1_SYNTHETIC_EXECUTION_RECEIPT_V1",
   "task_id": "V06_G2_R3_P1_ENGINE_ARCHITECTURE_REBUILD_V1",
   "role": "GEMINI_A",
-  "controller_dispatch_sha": "e5fcd76370a1b03d7d83b825af6a8cac842b1ae5",
-  "prompt_pinned_sha": "35575f11772dba871b079b0b7f6a8c7ac32e2f30",
+  "controller_dispatch_sha": "dca82909aeaef380a5c2e9866238ccbbe0114fad",
+  "original_arch_controller_sha": "e5fcd76370a1b03d7d83b825af6a8cac842b1ae5",
+  "prompt_pinned_sha": "97a3708d5c6063c6926b2aa1c26be3d98e7a7c78",
+  "prior_prompt_sha": "35575f11772dba871b079b0b7f6a8c7ac32e2f30",
   "original_prompt_sha": "9398c016b8b7134905eb40f61426f91a2cfb8e43",
-  "a_start_sha": "2c60b0653d3619eedf457753511a9ecc84c1cd5b",
+  "a_start_sha": "398e6bab0cdedf07a93827019ca4bf1bf913c7f9",
+  "prior_start_sha": "2c60b0653d3619eedf457753511a9ecc84c1cd5b",
   "implementation_sha": "89d0c211cff96286203e4fb7459a51042c1257f1",
   "b_evidence_sha": "068a4005f68b5ee4a970063cb1f3bc524a08784a",
   "branch": "feature/v06-bline-g2-overnight-discovery-a",
   "remote_repository": "https://github.com/EXASHXE/btc-quant-agent-public.git",
-  "terminal_verdict": "ARCH_V1_SYNTHETIC_READY_FOR_INDEPENDENT_REVIEW",
+  "terminal_verdict": "ARCH_V1_SYNTHETIC_READY_FOR_FINAL_INDEPENDENT_B_AUDIT",
   "authority_guards": {
     "live_b_worktree_reads": 0,
     "raw_market_body_reads": 0,
@@ -23,16 +26,18 @@
     "cost_geometry_frozen": true
   },
   "candidate_registry_integrity": {
+    "registry_source_path": "src/btc_quant_agent/strategy_research/r3_overnight/candidate_registry.py",
+    "frozen_design_sha": "e5b2006a89441f7eb2ec900e508aff451106b87a",
     "exact_candidate_count": 8,
     "candidates": [
-      "c01_donchian_breakout_12h_tight",
-      "c02_bollinger_reversal_4h_normal",
-      "c03_keltner_pullback_12h_loose",
-      "c04_macd_momentum_4h_normal",
-      "c05_rsi_divergence_12h_tight",
-      "c06_vwap_cross_4h_loose",
-      "c07_atr_breakout_12h_normal",
-      "c08_ema_cloud_4h_tight"
+      "STRUCTURAL_CONTINUATION_LONG_04H",
+      "STRUCTURAL_CONTINUATION_LONG_12H",
+      "STRUCTURAL_CONTINUATION_SHORT_04H",
+      "STRUCTURAL_CONTINUATION_SHORT_12H",
+      "CLOSED_RETEST_LONG_04H",
+      "CLOSED_RETEST_LONG_12H",
+      "CLOSED_RETEST_SHORT_04H",
+      "CLOSED_RETEST_SHORT_12H"
     ],
     "prohibit_ninth_candidate_verified": true
   },
@@ -41,7 +46,7 @@
     "python_3_12": {
       "path": "/usr/bin/python3.12",
       "version": "3.12.3",
-      "passed_count": 57,
+      "passed_count": 59,
       "failed_count": 0,
       "skipped_count": 0,
       "exit_code": 0
@@ -49,13 +54,19 @@
     "python_3_13": {
       "path": "/root/miniconda3/bin/python3.13",
       "version": "3.13.13",
-      "passed_count": 57,
+      "passed_count": 59,
       "failed_count": 0,
       "skipped_count": 0,
       "exit_code": 0
     },
     "linter_status": {
       "tool": "ruff",
+      "violations_remaining": 0,
+      "exit_code": 0
+    },
+    "type_check_status": {
+      "tool": "mypy",
+      "source_files_checked": 170,
       "violations_remaining": 0,
       "exit_code": 0
     },
@@ -68,21 +79,94 @@
       "exit_code": 0
     }
   },
-  "flat_book_algebraic_reconciliation": {
-    "initial_capital_usdt": "10000.00000000",
-    "final_cash_usdt": "10000.00000000",
-    "final_cost_commitment_o_usdt": "0.00000000",
-    "final_funding_reserve_rf_usdt": "0.00000000",
-    "final_active_positions_count": 0,
-    "final_pending_entry_orders_count": 0,
-    "final_pending_exit_orders_count": 0,
-    "final_unsettled_exit_trades_count": 0,
-    "net_closed_trades_pnl_usdt": "0.00000000",
-    "net_closed_trades_funding_usdt": "0.00000000",
-    "net_closed_trades_fees_usdt": "0.00000000",
-    "cash_conservation_exact_delta": "0.00000000",
-    "reserve_conservation_exact_delta": "0.00000000",
-    "flat_book_zero_liability_invariant_satisfied": true
+  "synthetic_e2e_reconciliation_fixtures": {
+    "empty_book_case": {
+      "fixture_test": "tests/test_strategy_research_r3_architecture_invariants.py::test_synthetic_e2e_empty_book_case",
+      "description": "Flat market generates zero signals, zero orders, zero trades, verifying baseline flat book preservation.",
+      "initial_capital_usdt": "1000.000000000000",
+      "final_cash_usdt": "1000.000000000000",
+      "trades_count": 0,
+      "fees_paid_usdt": "0.000000000000",
+      "funding_paid_usdt": "0.000000000000",
+      "net_pnl_usdt": "0.000000000000",
+      "cash_delta_usdt": "0.000000000000",
+      "terminal_cost_commitment_o_usdt": "0.000000000000",
+      "terminal_funding_reserve_rf_usdt": "0.000000000000",
+      "active_positions_count": 0,
+      "pending_orders_count": 0,
+      "pending_fill_acks_count": 0,
+      "pending_exit_acks_count": 0,
+      "unsettled_exit_trades_count": 0,
+      "conservation_exact_delta": "0.000000000000"
+    },
+    "nonempty_executed_book_case": {
+      "fixture_test": "tests/test_strategy_research_r3_architecture_invariants.py::test_synthetic_e2e_nonempty_executed_book_case",
+      "description": "Full ReplayEngine.run_simulation path with 240h warmup, breakout, retest, entry fill, holding crossing UTC hour funding settlements, max-hold expiry exit, and exit ACK.",
+      "candidates_executed_count": 2,
+      "candidate_04h_execution": {
+        "candidate_id": "CLOSED_RETEST_LONG_04H",
+        "trade_id": "TRD_POS_ORD_CLOSED_RETEST_LONG_04H_BTCUSDT_1700863320000_1700877720000",
+        "position_id": "POS_ORD_CLOSED_RETEST_LONG_04H_BTCUSDT_1700863320000",
+        "direction": "LONG",
+        "quantity": "0.006",
+        "entry_price": "50030.10",
+        "exit_price": "49979.90",
+        "entry_time_ms": 1700863320000,
+        "exit_time_ms": 1700877720000,
+        "exit_reason": "EXPIRY",
+        "holding_minutes": 240,
+        "entry_fee_usdt": "0.180108360",
+        "exit_fee_usdt": "0.179927640",
+        "total_fees_paid_usdt": "0.360036000",
+        "total_funding_charged_usdt": "0.480048000",
+        "gross_pnl_usdt": "-0.301200000",
+        "net_pnl_usdt": "-1.141284000",
+        "initial_cash_usdt": "1000.000000000000",
+        "final_cash_usdt": "998.858716000000",
+        "cash_delta_usdt": "-1.141284000000",
+        "cash_conservation_exact_delta": "0.000000000000",
+        "terminal_cost_commitment_o_usdt": "0.000000000000",
+        "terminal_funding_reserve_rf_usdt": "0.000000000000",
+        "active_positions_count": 0,
+        "pending_orders_count": 0,
+        "pending_fill_acks_count": 0,
+        "pending_exit_acks_count": 0,
+        "unsettled_exit_trades_count": 0
+      },
+      "candidate_12h_execution": {
+        "candidate_id": "CLOSED_RETEST_LONG_12H",
+        "trade_id": "TRD_POS_ORD_CLOSED_RETEST_LONG_12H_BTCUSDT_1700863320000_1700906520000",
+        "position_id": "POS_ORD_CLOSED_RETEST_LONG_12H_BTCUSDT_1700863320000",
+        "direction": "LONG",
+        "quantity": "0.006",
+        "entry_price": "50030.10",
+        "exit_price": "49979.90",
+        "entry_time_ms": 1700863320000,
+        "exit_time_ms": 1700906520000,
+        "exit_reason": "EXPIRY",
+        "holding_minutes": 720,
+        "total_fees_paid_usdt": "0.360036000",
+        "total_funding_charged_usdt": "1.440144000",
+        "gross_pnl_usdt": "-0.301200000",
+        "net_pnl_usdt": "-2.101380000",
+        "initial_cash_usdt": "1000.000000000000",
+        "final_cash_usdt": "997.898620000000",
+        "cash_delta_usdt": "-2.101380000000",
+        "cash_conservation_exact_delta": "0.000000000000",
+        "terminal_cost_commitment_o_usdt": "0.000000000000",
+        "terminal_funding_reserve_rf_usdt": "0.000000000000",
+        "active_positions_count": 0,
+        "pending_orders_count": 0,
+        "pending_fill_acks_count": 0,
+        "pending_exit_acks_count": 0,
+        "unsettled_exit_trades_count": 0
+      }
+    }
+  },
+  "multi_position_owner_reserve_algebra": {
+    "conservation_law": "book.funding_reserve_rf == sum(pos.funding_reserves_usdt for pos in book.positions.values()) + sum(item[3] for item in book.pending_exit_acks)",
+    "cross_position_theft_prohibited": true,
+    "verified": true
   },
   "defect_resolution_verdicts": {
     "B01": "PASS",
@@ -93,5 +177,5 @@
     "B06": "PASS",
     "B07": "PASS"
   },
-  "inherited_ci_note": "Inherited H40 golden hash discrepancy in root repository CI remains independent of R3 overnight architecture scope and was untouched per instructions."
+  "inherited_ci_note": "Inherited H40 golden hash discrepancy in root repository CI remains independent of R3 overnight architecture scope and was untouched per instructions. New A code mypy error in ledger.py:904 was fully resolved and validated across 170 source files."
 }
