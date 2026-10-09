@@ -1,0 +1,706 @@
+{
+  "schema_version": "G2_DATA_READINESS_EXECUTION_GIT_RECEIPT_V1",
+  "task_id": "V06_G2_R3_DATA_READINESS_FASTPATH_SOL61_R1",
+  "controller_dispatch_sha": "06d5c7bf373468a797cabf6ba906dbca29719558",
+  "code_base_sha": "e0ff8c3473de4bfa3e66fe7928d42992a4d38a32",
+  "science_draft_sha": "fc89f05014b61c51a55141cb419948f4eee9d8f3",
+  "method_sha": "cf2d5cc33774cdcff7d709636305bba830e977ef",
+  "branch": "feature/v06-bline-g2-data-readiness-sol61-r1",
+  "worktree": "/root/workspace/project/quant-v0.6/g2-r3-data-readiness-sol61-r1",
+  "executor": "CURRENT_SESSION_METADATA_EXECUTOR",
+  "recommended_model": "GPT_6_1_SOL_HIGH_IF_SELECTABLE",
+  "model_selection_automatically_performed": false,
+  "actual_model_selection": "NOT_CHANGED_OR_CLAIMED",
+  "created_utc": "2026-10-09T02:40:39.099607+00:00",
+  "inputs": [
+    {
+      "ref": "e0ff8c3473de4bfa3e66fe7928d42992a4d38a32",
+      "path": "artifacts/research/run0-dev-frozen-v022-seed7-20260825/data_manifest.json",
+      "git_blob": "0a24f58272ffb7ac625265e50eff741bb22a4453",
+      "sha256": "928e913f41e74077359cbdf804aaf95d452ee1e1b80d5f05d28eafe4e0b639f2",
+      "bytes": 45234,
+      "purpose": "STATIC_SOURCE_CONFIG_MANIFEST_AUTHORITY_AND_ACCEPTED_DESIGN_ONLY"
+    },
+    {
+      "ref": "06d5c7bf373468a797cabf6ba906dbca29719558",
+      "path": "evidence/v0.6/controller/B_LINE_G2_R3_DATA_READINESS_FASTPATH_SOL61_R1_DISPATCH.json",
+      "git_blob": "c6e5bf34f3e73190e429acef3ea76ebd8362fea8",
+      "sha256": "af72945823e910f74821648381a2b577c6e6b2c76e06e17fdb4d96052d3faddc",
+      "bytes": 3501,
+      "purpose": "STATIC_SOURCE_CONFIG_MANIFEST_AUTHORITY_AND_ACCEPTED_DESIGN_ONLY"
+    },
+    {
+      "ref": "fc89f05014b61c51a55141cb419948f4eee9d8f3",
+      "path": "docs/strategy_research/g2_r3/science_gate/LOCAL_DATA_REUSE_AND_WINDOW_FREEZE_OPTIONS.md",
+      "git_blob": "b5dd58703e3cc22f935b2a547cefde232c25f773",
+      "sha256": "4b22b056c4cc96bc3de5e66809651beb17f65d4dd1e6127107ed1d96df9d8ecc",
+      "bytes": 7907,
+      "purpose": "STATIC_SOURCE_CONFIG_MANIFEST_AUTHORITY_AND_ACCEPTED_DESIGN_ONLY"
+    },
+    {
+      "ref": "fc89f05014b61c51a55141cb419948f4eee9d8f3",
+      "path": "docs/strategy_research/g2_r3/science_gate/PRIOR_HOLDOUT_EXPOSURE_AND_AUTHORITY_MATRIX.md",
+      "git_blob": "bb65efbfdcc09e596463f1e88cd68f16b60e42fa",
+      "sha256": "5fc3d479bc0e07de86e6b896cd7b83029e945b14d8e1bb8f799d43839b306c64",
+      "bytes": 13651,
+      "purpose": "STATIC_SOURCE_CONFIG_MANIFEST_AUTHORITY_AND_ACCEPTED_DESIGN_ONLY"
+    },
+    {
+      "ref": "cf2d5cc33774cdcff7d709636305bba830e977ef",
+      "path": "docs/strategy_research/g2_r3/method_repair/R1_1_SOURCE_AND_LICENSE_ADMISSION.md",
+      "git_blob": "ebe5116ba5994c1a67b8bd4018a249b3a5909d82",
+      "sha256": "784b437193c9ea10d4de1b650e319fd8445022a0c3a0d12494734d1cf90d7963",
+      "bytes": 6004,
+      "purpose": "STATIC_SOURCE_CONFIG_MANIFEST_AUTHORITY_AND_ACCEPTED_DESIGN_ONLY"
+    },
+    {
+      "ref": "e5b2006a89441f7eb2ec900e508aff451106b87a",
+      "path": "evidence/v0.6/b_line/g2_r3_design/CANDIDATE_REGISTER_PROPOSAL.json",
+      "git_blob": "d337542f6482938c37eb6b4e43255cdf4d09751a",
+      "sha256": "d0f89bddfaec0e57c959cec043969059da10fec8aa45f81669dde8b80ea35a9b",
+      "bytes": 7361,
+      "purpose": "STATIC_SOURCE_CONFIG_MANIFEST_AUTHORITY_AND_ACCEPTED_DESIGN_ONLY"
+    },
+    {
+      "path": "artifacts/research/run0-dev-frozen-v022-seed7-20260825/config.toml",
+      "ref": "e0ff8c3473de4bfa3e66fe7928d42992a4d38a32",
+      "git_blob": "d17d9cdd6d7924ec9b138886d1f9a804e2b9aefc",
+      "sha256": "dff244d1dac3a6a34971236f39b3ed584ad099f63384abede482b3b477c6a6a2",
+      "bytes": 2137
+    },
+    {
+      "path": "configs/default.toml",
+      "ref": "e0ff8c3473de4bfa3e66fe7928d42992a4d38a32",
+      "git_blob": "2daff4512db68da973b6e8292f6b644fdaadab35",
+      "sha256": "de26a394436b81444328ec8e8c5dbca7e7ed8ec0e18e4cdab79d695ffe33a1da",
+      "bytes": 2791
+    },
+    {
+      "path": "configs/frozen/v0.2.2.toml",
+      "ref": "e0ff8c3473de4bfa3e66fe7928d42992a4d38a32",
+      "git_blob": "408acae0dd036fa8565bf846e9f876cd4eb3cebb",
+      "sha256": "8051f0419e4f5039181447a915fc9d09a0833dd4d1a3b69386e1bfc03a642823",
+      "bytes": 2138
+    },
+    {
+      "path": "artifacts/research/run0-dev-frozen-v022-seed7-20260825/artifact_manifest.json",
+      "ref": "e0ff8c3473de4bfa3e66fe7928d42992a4d38a32",
+      "git_blob": "43d88a631e26f638dfe1cb83689c2f9b1c0c919f",
+      "sha256": "2f7f23ee15ca3e0ea8e969507fd77cf0b1d8517c0fcec4cfb1de94fbbfe5c1fb",
+      "bytes": 1587
+    },
+    {
+      "path": "configs/research_registry.json",
+      "ref": "e0ff8c3473de4bfa3e66fe7928d42992a4d38a32",
+      "git_blob": "12215cbd20bf1aeaf3c1a2085ce6141aa0bca008",
+      "sha256": "018c46a34cc960dc53d53e96768d11ede39e5d973fd25175cbdaee240d170334",
+      "bytes": 7863
+    },
+    {
+      "path": "configs/research/v0.3.2_mechanism_protocol.json",
+      "ref": "e0ff8c3473de4bfa3e66fe7928d42992a4d38a32",
+      "git_blob": "5e02296e0d5bf96fdebfe5277a476e2e39e0dbf9",
+      "sha256": "bc78058df1972e1271ef5feab614d96cff332384135a0fdbef932908f2e31de3",
+      "bytes": 4934
+    }
+  ],
+  "stat_budget_max": 120,
+  "explicit_inventory_lstat_calls": 9,
+  "market_files_statted": 0,
+  "no_body_counters": {
+    "parquet_opens": 0,
+    "csv_opens": 0,
+    "zip_opens": 0,
+    "market_file_hashes": 0,
+    "market_decodings": 0,
+    "market_copies": 0,
+    "new_market_downloads": 0,
+    "funding_history_queries": 0,
+    "protected_market_body_reads": 0,
+    "symlink_follows": 0
+  },
+  "new_source_http_requests": 0,
+  "new_empirical_trials": 0,
+  "candidate_replays": 0,
+  "new_strategy_designs": 0,
+  "original_candidate_ids": [
+    "STRUCTURAL_CONTINUATION_LONG_04H",
+    "STRUCTURAL_CONTINUATION_LONG_12H",
+    "STRUCTURAL_CONTINUATION_SHORT_04H",
+    "STRUCTURAL_CONTINUATION_SHORT_12H",
+    "CLOSED_RETEST_LONG_04H",
+    "CLOSED_RETEST_LONG_12H",
+    "CLOSED_RETEST_SHORT_04H",
+    "CLOSED_RETEST_SHORT_12H"
+  ],
+  "protected_outcome_reads": 0,
+  "account_provider_order_calls": 0,
+  "empirical_price_body_authority": "NONE",
+  "testnet": "NOT_AUTHORIZED",
+  "real_funds_write_authority": "NONE",
+  "environment": {
+    "python": "3.13.13",
+    "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+    "purpose": "staticdocument/metadataorchestrationonly"
+  },
+  "preflight": {
+    "anchor_clean": true,
+    "root_not_git": true,
+    "remote_identity_verified": true,
+    "pinned_remote_v06_exact": true,
+    "dispatch_fetched_exact_sha": true,
+    "own_initial_head_exact": true,
+    "own_initial_status_clean": true,
+    "shared_git_lock": "/root/workspace/project/quant-v0.6/.g2_p0_worktree.lock"
+  },
+  "other_worktrees_before": [
+    {
+      "path": "/root/workspace/project/Quant-agent-market-watch",
+      "head": "fde61dafb301d5bd5af3dc7eb81e5618f979036c",
+      "branch": "feature/b-line-live-v1",
+      "tracked_dirty_count": 6,
+      "untracked_count": 1,
+      "external_active": false
+    },
+    {
+      "path": "/root/workspace/project/quant-v0.6/controller-review",
+      "head": "d6500140f3141d179181f2360ad815b5bfe9c954",
+      "branch": "",
+      "tracked_dirty_count": 0,
+      "untracked_count": 0,
+      "external_active": false
+    },
+    {
+      "path": "/root/workspace/project/quant-v0.6/g1-engineering-preview",
+      "head": "efd73496d01a71a158d67343b64695d33fab16a8",
+      "branch": "feature/v06-bline-engineering-preview-r1",
+      "tracked_dirty_count": 0,
+      "untracked_count": 0,
+      "external_active": false
+    },
+    {
+      "path": "/root/workspace/project/quant-v0.6/g2-overnight-discovery-a",
+      "head": "2f0383816127cb7d87cf5deb559aeda0b04f1624",
+      "branch": "feature/v06-bline-g2-overnight-discovery-a",
+      "tracked_dirty_count": 0,
+      "untracked_count": 0,
+      "external_active": true
+    },
+    {
+      "path": "/root/workspace/project/quant-v0.6/g2-overnight-verifier-b",
+      "head": "a0aacd105ac3f3173b15d91c869990748178e222",
+      "branch": "feature/v06-bline-g2-overnight-verifier-b",
+      "tracked_dirty_count": 0,
+      "untracked_count": 0,
+      "external_active": true
+    },
+    {
+      "path": "/root/workspace/project/quant-v0.6/g2-perp-reconstruction-r2",
+      "head": "2e922f486cf5b3f6cb7fa3aa7823cd096f24c17e",
+      "branch": "feature/v06-bline-g2-perp-reconstruction-r2",
+      "tracked_dirty_count": 0,
+      "untracked_count": 0,
+      "external_active": false
+    },
+    {
+      "path": "/root/workspace/project/quant-v0.6/g2-r3-cost-aware-method-design",
+      "head": "cf2d5cc33774cdcff7d709636305bba830e977ef",
+      "branch": "feature/v06-bline-g2-r3-cost-aware-method-design",
+      "tracked_dirty_count": 0,
+      "untracked_count": 0,
+      "external_active": false
+    },
+    {
+      "path": "/root/workspace/project/quant-v0.6/g2-r3-sol-science-gate-r1",
+      "head": "fc89f05014b61c51a55141cb419948f4eee9d8f3",
+      "branch": "feature/v06-bline-g2-r3-sol-science-gate-r1",
+      "tracked_dirty_count": 0,
+      "untracked_count": 0,
+      "external_active": false
+    },
+    {
+      "path": "/root/workspace/project/quant-v0.6/g2-r3-source-feasibility-r1",
+      "head": "12793bc04db7414d11a0961684fd14f5df3ce16e",
+      "branch": "feature/v06-bline-g2-r3-source-feasibility-r1",
+      "tracked_dirty_count": 0,
+      "untracked_count": 0,
+      "external_active": false
+    },
+    {
+      "path": "/root/workspace/project/quant-v0.6/g2-strategy-discovery",
+      "head": "aab31f8735c8be8f88651ef4677bd0c3a4068cae",
+      "branch": "feature/v06-bline-g2-strategy-discovery-r1",
+      "tracked_dirty_count": 0,
+      "untracked_count": 0,
+      "external_active": false
+    },
+    {
+      "path": "/root/workspace/project/quant-v0.6/g3-operational-readiness",
+      "head": "1b4ba5ace44a84af03a734462b468e597e62c85b",
+      "branch": "feature/v06-bline-g3-operational-readiness-r1",
+      "tracked_dirty_count": 0,
+      "untracked_count": 0,
+      "external_active": false
+    },
+    {
+      "path": "/root/workspace/project/rc1-wp-a-operational",
+      "head": "606f286dbb5d7af46776043d1287d9b3e7b1e679",
+      "branch": "feature/b-line-rc1-wp-a-operational-readiness",
+      "tracked_dirty_count": 0,
+      "untracked_count": 0,
+      "external_active": false
+    },
+    {
+      "path": "/root/workspace/project/rc1-wp-b-decision-quality",
+      "head": "597d2dd7452d6e2ab11e8500d253be1e6d53f8db",
+      "branch": "feature/b-line-rc1-wp-b-decision-quality",
+      "tracked_dirty_count": 0,
+      "untracked_count": 0,
+      "external_active": false
+    },
+    {
+      "path": "/root/workspace/project/rc1-wp-c-llm-approval",
+      "head": "72b39de71024b3051357c17eee7922e657dcb81f",
+      "branch": "feature/b-line-rc1-wp-c-llm-approval",
+      "tracked_dirty_count": 0,
+      "untracked_count": 0,
+      "external_active": false
+    },
+    {
+      "path": "/root/workspace/project/rc1-wp-d-release-engineering",
+      "head": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea",
+      "branch": "feature/b-line-rc1-wp-d-release-engineering",
+      "tracked_dirty_count": 0,
+      "untracked_count": 0,
+      "external_active": false
+    },
+    {
+      "path": "/root/workspace/project/rc2-tactical-successor",
+      "head": "1a5756663ecf56ed6c02a7355840f33e6715ea22",
+      "branch": "validation/b-line-rc2-final-holdout-infra-repair-r1",
+      "tracked_dirty_count": 0,
+      "untracked_count": 0,
+      "external_active": false
+    },
+    {
+      "path": "/root/workspace/project/rc2-tactical-successor-v06-foundation-r1",
+      "head": "5706a1f6e54fbd2deb2e940119952d16c1356148",
+      "branch": "feature/v06-bline-foundation-r1",
+      "tracked_dirty_count": 0,
+      "untracked_count": 0,
+      "external_active": false
+    },
+    {
+      "path": "/tmp/rc2-downstream-readiness-report",
+      "head": "1c4bc2a9dd26dde9553653408452cb0a80c7c7d3",
+      "branch": "docs/rc2-downstream-readiness-outcome-blind",
+      "tracked_dirty_count": 0,
+      "untracked_count": 0,
+      "external_active": false
+    }
+  ],
+  "validation": {
+    "json_parse": "PASS_4_FILES",
+    "diff_check": "PASS",
+    "allowed_scope": "PASS_5_ONLY",
+    "named_static_inputs_sha256_and_git_blob": "PASS_12",
+    "original_eight_ids": "PASS_UNCHANGED",
+    "inventory_budget": "PASS_9_OF_120_EXPLICIT_LSTAT_0_MARKET_STAT",
+    "readability_and_unknown_vs_absent": "PASS",
+    "tests_run": 0,
+    "tests_status": "NOT_APPLICABLE_METADATA_ONLY",
+    "ruff_mypy_compile": "NOT_APPLICABLE_DOC_JSON_ONLY",
+    "checks": [
+      "JSON parse4files",
+      "12namedstaticsourcehash/blobcomparison",
+      "9lstatbudget/source/no-symlinkrecordvalidation",
+      "18asset-monthUNKNOWNrows/8uniqueimmutableIDs",
+      "fixedworktreecountsunchanged;A/Bexternaldeltasrecorded",
+      "git diff --cached --check",
+      "git diff --cached --name-only whitelist",
+      "stagedbyteverification"
+    ],
+    "static_validation_seconds": 1.065567
+  },
+  "terminal_verdict": "LOCAL_ROOT_UNKNOWN",
+  "publication": "PENDING;receiptfollowupwillbindverifiedownreportSHAwithoutcircularselfidentity",
+  "effective_prereg": false,
+  "scope_proof": "Scopedtoolactions anddeclaredsourceidentities;notglobalOStelemetry;Gitinternalstats/wiretrafficnotinstrumented",
+  "original_registry_blob_unchanged": "d337542f6482938c37eb6b4e43255cdf4d09751a",
+  "other_worktree_preservation": [
+    {
+      "before": {
+        "path": "/root/workspace/project/Quant-agent-market-watch",
+        "head": "fde61dafb301d5bd5af3dc7eb81e5618f979036c",
+        "branch": "feature/b-line-live-v1",
+        "tracked_dirty_count": 6,
+        "untracked_count": 1,
+        "external_active": false
+      },
+      "after": {
+        "path": "/root/workspace/project/Quant-agent-market-watch",
+        "head": "fde61dafb301d5bd5af3dc7eb81e5618f979036c",
+        "branch": "feature/b-line-live-v1",
+        "tracked_dirty_count": 6,
+        "untracked_count": 1,
+        "external_active": false
+      },
+      "external_state_delta": false,
+      "scope": "Gitmetadataonly;externalA/Bmayadvance.Noeditsfromthisworker."
+    },
+    {
+      "before": {
+        "path": "/root/workspace/project/quant-v0.6/controller-review",
+        "head": "d6500140f3141d179181f2360ad815b5bfe9c954",
+        "branch": "",
+        "tracked_dirty_count": 0,
+        "untracked_count": 0,
+        "external_active": false
+      },
+      "after": {
+        "path": "/root/workspace/project/quant-v0.6/controller-review",
+        "head": "d6500140f3141d179181f2360ad815b5bfe9c954",
+        "branch": "",
+        "tracked_dirty_count": 0,
+        "untracked_count": 0,
+        "external_active": false
+      },
+      "external_state_delta": false,
+      "scope": "Gitmetadataonly;externalA/Bmayadvance.Noeditsfromthisworker."
+    },
+    {
+      "before": {
+        "path": "/root/workspace/project/quant-v0.6/g1-engineering-preview",
+        "head": "efd73496d01a71a158d67343b64695d33fab16a8",
+        "branch": "feature/v06-bline-engineering-preview-r1",
+        "tracked_dirty_count": 0,
+        "untracked_count": 0,
+        "external_active": false
+      },
+      "after": {
+        "path": "/root/workspace/project/quant-v0.6/g1-engineering-preview",
+        "head": "efd73496d01a71a158d67343b64695d33fab16a8",
+        "branch": "feature/v06-bline-engineering-preview-r1",
+        "tracked_dirty_count": 0,
+        "untracked_count": 0,
+        "external_active": false
+      },
+      "external_state_delta": false,
+      "scope": "Gitmetadataonly;externalA/Bmayadvance.Noeditsfromthisworker."
+    },
+    {
+      "before": {
+        "path": "/root/workspace/project/quant-v0.6/g2-overnight-discovery-a",
+        "head": "2f0383816127cb7d87cf5deb559aeda0b04f1624",
+        "branch": "feature/v06-bline-g2-overnight-discovery-a",
+        "tracked_dirty_count": 0,
+        "untracked_count": 0,
+        "external_active": true
+      },
+      "after": {
+        "path": "/root/workspace/project/quant-v0.6/g2-overnight-discovery-a",
+        "head": "2f0383816127cb7d87cf5deb559aeda0b04f1624",
+        "branch": "feature/v06-bline-g2-overnight-discovery-a",
+        "tracked_dirty_count": 0,
+        "untracked_count": 0,
+        "external_active": true
+      },
+      "external_state_delta": false,
+      "scope": "Gitmetadataonly;externalA/Bmayadvance.Noeditsfromthisworker."
+    },
+    {
+      "before": {
+        "path": "/root/workspace/project/quant-v0.6/g2-overnight-verifier-b",
+        "head": "a0aacd105ac3f3173b15d91c869990748178e222",
+        "branch": "feature/v06-bline-g2-overnight-verifier-b",
+        "tracked_dirty_count": 0,
+        "untracked_count": 0,
+        "external_active": true
+      },
+      "after": {
+        "path": "/root/workspace/project/quant-v0.6/g2-overnight-verifier-b",
+        "head": "a0aacd105ac3f3173b15d91c869990748178e222",
+        "branch": "feature/v06-bline-g2-overnight-verifier-b",
+        "tracked_dirty_count": 0,
+        "untracked_count": 0,
+        "external_active": true
+      },
+      "external_state_delta": false,
+      "scope": "Gitmetadataonly;externalA/Bmayadvance.Noeditsfromthisworker."
+    },
+    {
+      "before": {
+        "path": "/root/workspace/project/quant-v0.6/g2-perp-reconstruction-r2",
+        "head": "2e922f486cf5b3f6cb7fa3aa7823cd096f24c17e",
+        "branch": "feature/v06-bline-g2-perp-reconstruction-r2",
+        "tracked_dirty_count": 0,
+        "untracked_count": 0,
+        "external_active": false
+      },
+      "after": {
+        "path": "/root/workspace/project/quant-v0.6/g2-perp-reconstruction-r2",
+        "head": "2e922f486cf5b3f6cb7fa3aa7823cd096f24c17e",
+        "branch": "feature/v06-bline-g2-perp-reconstruction-r2",
+        "tracked_dirty_count": 0,
+        "untracked_count": 0,
+        "external_active": false
+      },
+      "external_state_delta": false,
+      "scope": "Gitmetadataonly;externalA/Bmayadvance.Noeditsfromthisworker."
+    },
+    {
+      "before": {
+        "path": "/root/workspace/project/quant-v0.6/g2-r3-cost-aware-method-design",
+        "head": "cf2d5cc33774cdcff7d709636305bba830e977ef",
+        "branch": "feature/v06-bline-g2-r3-cost-aware-method-design",
+        "tracked_dirty_count": 0,
+        "untracked_count": 0,
+        "external_active": false
+      },
+      "after": {
+        "path": "/root/workspace/project/quant-v0.6/g2-r3-cost-aware-method-design",
+        "head": "cf2d5cc33774cdcff7d709636305bba830e977ef",
+        "branch": "feature/v06-bline-g2-r3-cost-aware-method-design",
+        "tracked_dirty_count": 0,
+        "untracked_count": 0,
+        "external_active": false
+      },
+      "external_state_delta": false,
+      "scope": "Gitmetadataonly;externalA/Bmayadvance.Noeditsfromthisworker."
+    },
+    {
+      "before": {
+        "path": "/root/workspace/project/quant-v0.6/g2-r3-sol-science-gate-r1",
+        "head": "fc89f05014b61c51a55141cb419948f4eee9d8f3",
+        "branch": "feature/v06-bline-g2-r3-sol-science-gate-r1",
+        "tracked_dirty_count": 0,
+        "untracked_count": 0,
+        "external_active": false
+      },
+      "after": {
+        "path": "/root/workspace/project/quant-v0.6/g2-r3-sol-science-gate-r1",
+        "head": "fc89f05014b61c51a55141cb419948f4eee9d8f3",
+        "branch": "feature/v06-bline-g2-r3-sol-science-gate-r1",
+        "tracked_dirty_count": 0,
+        "untracked_count": 0,
+        "external_active": false
+      },
+      "external_state_delta": false,
+      "scope": "Gitmetadataonly;externalA/Bmayadvance.Noeditsfromthisworker."
+    },
+    {
+      "before": {
+        "path": "/root/workspace/project/quant-v0.6/g2-r3-source-feasibility-r1",
+        "head": "12793bc04db7414d11a0961684fd14f5df3ce16e",
+        "branch": "feature/v06-bline-g2-r3-source-feasibility-r1",
+        "tracked_dirty_count": 0,
+        "untracked_count": 0,
+        "external_active": false
+      },
+      "after": {
+        "path": "/root/workspace/project/quant-v0.6/g2-r3-source-feasibility-r1",
+        "head": "12793bc04db7414d11a0961684fd14f5df3ce16e",
+        "branch": "feature/v06-bline-g2-r3-source-feasibility-r1",
+        "tracked_dirty_count": 0,
+        "untracked_count": 0,
+        "external_active": false
+      },
+      "external_state_delta": false,
+      "scope": "Gitmetadataonly;externalA/Bmayadvance.Noeditsfromthisworker."
+    },
+    {
+      "before": {
+        "path": "/root/workspace/project/quant-v0.6/g2-strategy-discovery",
+        "head": "aab31f8735c8be8f88651ef4677bd0c3a4068cae",
+        "branch": "feature/v06-bline-g2-strategy-discovery-r1",
+        "tracked_dirty_count": 0,
+        "untracked_count": 0,
+        "external_active": false
+      },
+      "after": {
+        "path": "/root/workspace/project/quant-v0.6/g2-strategy-discovery",
+        "head": "aab31f8735c8be8f88651ef4677bd0c3a4068cae",
+        "branch": "feature/v06-bline-g2-strategy-discovery-r1",
+        "tracked_dirty_count": 0,
+        "untracked_count": 0,
+        "external_active": false
+      },
+      "external_state_delta": false,
+      "scope": "Gitmetadataonly;externalA/Bmayadvance.Noeditsfromthisworker."
+    },
+    {
+      "before": {
+        "path": "/root/workspace/project/quant-v0.6/g3-operational-readiness",
+        "head": "1b4ba5ace44a84af03a734462b468e597e62c85b",
+        "branch": "feature/v06-bline-g3-operational-readiness-r1",
+        "tracked_dirty_count": 0,
+        "untracked_count": 0,
+        "external_active": false
+      },
+      "after": {
+        "path": "/root/workspace/project/quant-v0.6/g3-operational-readiness",
+        "head": "1b4ba5ace44a84af03a734462b468e597e62c85b",
+        "branch": "feature/v06-bline-g3-operational-readiness-r1",
+        "tracked_dirty_count": 0,
+        "untracked_count": 0,
+        "external_active": false
+      },
+      "external_state_delta": false,
+      "scope": "Gitmetadataonly;externalA/Bmayadvance.Noeditsfromthisworker."
+    },
+    {
+      "before": {
+        "path": "/root/workspace/project/rc1-wp-a-operational",
+        "head": "606f286dbb5d7af46776043d1287d9b3e7b1e679",
+        "branch": "feature/b-line-rc1-wp-a-operational-readiness",
+        "tracked_dirty_count": 0,
+        "untracked_count": 0,
+        "external_active": false
+      },
+      "after": {
+        "path": "/root/workspace/project/rc1-wp-a-operational",
+        "head": "606f286dbb5d7af46776043d1287d9b3e7b1e679",
+        "branch": "feature/b-line-rc1-wp-a-operational-readiness",
+        "tracked_dirty_count": 0,
+        "untracked_count": 0,
+        "external_active": false
+      },
+      "external_state_delta": false,
+      "scope": "Gitmetadataonly;externalA/Bmayadvance.Noeditsfromthisworker."
+    },
+    {
+      "before": {
+        "path": "/root/workspace/project/rc1-wp-b-decision-quality",
+        "head": "597d2dd7452d6e2ab11e8500d253be1e6d53f8db",
+        "branch": "feature/b-line-rc1-wp-b-decision-quality",
+        "tracked_dirty_count": 0,
+        "untracked_count": 0,
+        "external_active": false
+      },
+      "after": {
+        "path": "/root/workspace/project/rc1-wp-b-decision-quality",
+        "head": "597d2dd7452d6e2ab11e8500d253be1e6d53f8db",
+        "branch": "feature/b-line-rc1-wp-b-decision-quality",
+        "tracked_dirty_count": 0,
+        "untracked_count": 0,
+        "external_active": false
+      },
+      "external_state_delta": false,
+      "scope": "Gitmetadataonly;externalA/Bmayadvance.Noeditsfromthisworker."
+    },
+    {
+      "before": {
+        "path": "/root/workspace/project/rc1-wp-c-llm-approval",
+        "head": "72b39de71024b3051357c17eee7922e657dcb81f",
+        "branch": "feature/b-line-rc1-wp-c-llm-approval",
+        "tracked_dirty_count": 0,
+        "untracked_count": 0,
+        "external_active": false
+      },
+      "after": {
+        "path": "/root/workspace/project/rc1-wp-c-llm-approval",
+        "head": "72b39de71024b3051357c17eee7922e657dcb81f",
+        "branch": "feature/b-line-rc1-wp-c-llm-approval",
+        "tracked_dirty_count": 0,
+        "untracked_count": 0,
+        "external_active": false
+      },
+      "external_state_delta": false,
+      "scope": "Gitmetadataonly;externalA/Bmayadvance.Noeditsfromthisworker."
+    },
+    {
+      "before": {
+        "path": "/root/workspace/project/rc1-wp-d-release-engineering",
+        "head": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea",
+        "branch": "feature/b-line-rc1-wp-d-release-engineering",
+        "tracked_dirty_count": 0,
+        "untracked_count": 0,
+        "external_active": false
+      },
+      "after": {
+        "path": "/root/workspace/project/rc1-wp-d-release-engineering",
+        "head": "3a83ccd9dbf7b627c98f70a9ad7ee4b0e19eeaea",
+        "branch": "feature/b-line-rc1-wp-d-release-engineering",
+        "tracked_dirty_count": 0,
+        "untracked_count": 0,
+        "external_active": false
+      },
+      "external_state_delta": false,
+      "scope": "Gitmetadataonly;externalA/Bmayadvance.Noeditsfromthisworker."
+    },
+    {
+      "before": {
+        "path": "/root/workspace/project/rc2-tactical-successor",
+        "head": "1a5756663ecf56ed6c02a7355840f33e6715ea22",
+        "branch": "validation/b-line-rc2-final-holdout-infra-repair-r1",
+        "tracked_dirty_count": 0,
+        "untracked_count": 0,
+        "external_active": false
+      },
+      "after": {
+        "path": "/root/workspace/project/rc2-tactical-successor",
+        "head": "1a5756663ecf56ed6c02a7355840f33e6715ea22",
+        "branch": "validation/b-line-rc2-final-holdout-infra-repair-r1",
+        "tracked_dirty_count": 0,
+        "untracked_count": 0,
+        "external_active": false
+      },
+      "external_state_delta": false,
+      "scope": "Gitmetadataonly;externalA/Bmayadvance.Noeditsfromthisworker."
+    },
+    {
+      "before": {
+        "path": "/root/workspace/project/rc2-tactical-successor-v06-foundation-r1",
+        "head": "5706a1f6e54fbd2deb2e940119952d16c1356148",
+        "branch": "feature/v06-bline-foundation-r1",
+        "tracked_dirty_count": 0,
+        "untracked_count": 0,
+        "external_active": false
+      },
+      "after": {
+        "path": "/root/workspace/project/rc2-tactical-successor-v06-foundation-r1",
+        "head": "5706a1f6e54fbd2deb2e940119952d16c1356148",
+        "branch": "feature/v06-bline-foundation-r1",
+        "tracked_dirty_count": 0,
+        "untracked_count": 0,
+        "external_active": false
+      },
+      "external_state_delta": false,
+      "scope": "Gitmetadataonly;externalA/Bmayadvance.Noeditsfromthisworker."
+    },
+    {
+      "before": {
+        "path": "/tmp/rc2-downstream-readiness-report",
+        "head": "1c4bc2a9dd26dde9553653408452cb0a80c7c7d3",
+        "branch": "docs/rc2-downstream-readiness-outcome-blind",
+        "tracked_dirty_count": 0,
+        "untracked_count": 0,
+        "external_active": false
+      },
+      "after": {
+        "path": "/tmp/rc2-downstream-readiness-report",
+        "head": "1c4bc2a9dd26dde9553653408452cb0a80c7c7d3",
+        "branch": "docs/rc2-downstream-readiness-outcome-blind",
+        "tracked_dirty_count": 0,
+        "untracked_count": 0,
+        "external_active": false
+      },
+      "external_state_delta": false,
+      "scope": "Gitmetadataonly;externalA/Bmayadvance.Noeditsfromthisworker."
+    }
+  ],
+  "elapsed_seconds_from_preflight_receipt": 687.619,
+  "changed_paths": [
+    "docs/strategy_research/g2_r3/data_readiness_fastpath/ONE_CAMPAGIN_SOURCE_AND_PREREG_FASTPATH.md",
+    "evidence/v0.6/b_line/g2_r3_data_readiness_fastpath/DATA_READINESS_DECISION.json",
+    "evidence/v0.6/b_line/g2_r3_data_readiness_fastpath/DATA_SOURCE_MATCH_AND_PROTECTION_MATRIX.json",
+    "evidence/v0.6/b_line/g2_r3_data_readiness_fastpath/EXECUTION_AND_GIT_RECEIPT.json",
+    "evidence/v0.6/b_line/g2_r3_data_readiness_fastpath/LOCAL_MARKET_METADATA_INVENTORY.json"
+  ],
+  "artifact_sha256_excluding_self": {
+    "docs/strategy_research/g2_r3/data_readiness_fastpath/ONE_CAMPAGIN_SOURCE_AND_PREREG_FASTPATH.md": "b9177c8f0db6214dc144f63b8e0585d500e4eecf50a1c5289c7f7cef14eecdf5",
+    "evidence/v0.6/b_line/g2_r3_data_readiness_fastpath/DATA_READINESS_DECISION.json": "6624acfbd2bd2f5a9ee0cad295af18db0654c88214d86326a1c1720c4c447de8",
+    "evidence/v0.6/b_line/g2_r3_data_readiness_fastpath/DATA_SOURCE_MATCH_AND_PROTECTION_MATRIX.json": "b3c3ee41478c40aa966c5f61ba5a032f6dee6580eab344ac20795e70509f70d3",
+    "evidence/v0.6/b_line/g2_r3_data_readiness_fastpath/LOCAL_MARKET_METADATA_INVENTORY.json": "56a994a6600fbef362dcd989adab11f9d7b7f6edf6bbdeb77e1cf9dedf3398a1"
+  }
+}

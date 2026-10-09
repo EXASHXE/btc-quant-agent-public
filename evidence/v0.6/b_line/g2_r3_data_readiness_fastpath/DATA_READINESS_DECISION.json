@@ -1,0 +1,41 @@
+{
+  "schema_version": "G2_DATA_READINESS_DECISION_V1",
+  "task_id": "V06_G2_R3_DATA_READINESS_FASTPATH_SOL61_R1",
+  "controller_dispatch_sha": "06d5c7bf373468a797cabf6ba906dbca29719558",
+  "terminal_verdict": "LOCAL_ROOT_UNKNOWN",
+  "verdict_choices": [
+    "FULL_THREE_SYMBOL_OPTION_A_CANDIDATE",
+    "BTC_ONLY_DIAGNOSTIC_AMENDMENT_RECOMMENDED",
+    "BLOCKED_SOURCE_OR_PROTECTION",
+    "LOCAL_ROOT_UNKNOWN"
+  ],
+  "brief": "Canonical local BTCroot not confirmed throughbounded trustedstaticpathinputs;expectedfilesUNKNOWN,notABSENT.Noassetsreadyclaim.",
+  "one_finite_recommendation": "Get oneexactownerrootbindingorabortlocalreuse;thenControllercanapproveoneexplicitBTC-onlydiagnosticOptionA/sourceadmissionrouteorstop.Noindefinitemetadataaudit.",
+  "automatic_followup_authorized": false,
+  "scope_conflict": "OptionB BTCFeb-Apr2026 remainsoldprotectedholdout;R2exposuredoesnotreleaseit",
+  "local_btc_status": "UNKNOWN",
+  "local_eth_status": "UNKNOWN",
+  "local_sol_status": "UNKNOWN",
+  "candidate_ids": [
+    "STRUCTURAL_CONTINUATION_LONG_04H",
+    "STRUCTURAL_CONTINUATION_LONG_12H",
+    "STRUCTURAL_CONTINUATION_SHORT_04H",
+    "STRUCTURAL_CONTINUATION_SHORT_12H",
+    "CLOSED_RETEST_LONG_04H",
+    "CLOSED_RETEST_LONG_12H",
+    "CLOSED_RETEST_SHORT_04H",
+    "CLOSED_RETEST_SHORT_12H"
+  ],
+  "candidate_count": 8,
+  "formula_changes": 0,
+  "licence": "NONCOMMERCIAL_RESEARCH_SUITABILITY_UNDER_REVIEW",
+  "cost_funding": "PROXY_DIAGNOSTIC_ONLY",
+  "empirical_price_body_authority": "NONE",
+  "testnet": "NOT_AUTHORIZED",
+  "real_funds_write_authority": "NONE",
+  "stat_calls": 9,
+  "market_file_stat_calls": 0,
+  "market_file_body_actions": 0,
+  "effective_prereg": false,
+  "pending_question": "Canonicalroot/staticpathconfigurationrequested;noanswerorpathbindingreceivedwhenprepared"
+}

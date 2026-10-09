@@ -1,0 +1,115 @@
+{
+  "schema_version": "G2_DATA_SOURCE_MATCH_PROTECTION_V1",
+  "task_id": "V06_G2_R3_DATA_READINESS_FASTPATH_SOL61_R1",
+  "controller_dispatch_sha": "06d5c7bf373468a797cabf6ba906dbca29719558",
+  "terminal_verdict": "LOCAL_ROOT_UNKNOWN",
+  "gates": [
+    {
+      "gate": "BTC_LOCAL_CANONICAL_ROOT",
+      "status": "UNKNOWN",
+      "evidence": "Checkedmanifest/configs supply no filesystemroot;0 marketfilestats",
+      "required_next": "Owner-supplied exactroot/staticbinding or terminate reuse"
+    },
+    {
+      "gate": "BTC_SIX_OPTION_A_FILES",
+      "status": "UNKNOWN",
+      "evidence": "Relativechecksumkeys known;physicalpresence unknown,not absent",
+      "required_next": "Only named lstat after positiverootbinding"
+    },
+    {
+      "gate": "ETH_SOL_DISTINCT_MATCHED_METADATA",
+      "status": "UNKNOWN",
+      "evidence": "No credible distinctsamewindow manifest/root metadata established",
+      "required_next": "Do not infercoverage;explicitsource/universeControllerdecision"
+    },
+    {
+      "gate": "OPTION_A_OLDER_DEVELOPMENT",
+      "status": "PROPOSED_NOT_SELECTED",
+      "evidence": "Marchwarmup/April2021,2023,2025 withinoldBTCdevelopment",
+      "required_next": "SeparateControllerselection/bodyadmission"
+    },
+    {
+      "gate": "OPTION_B_2026_HOLDOUT",
+      "status": "BLOCKED_PROTECTION",
+      "evidence": "BTCFeb-Juloldholdout remainsdisputed despiteexposure",
+      "required_next": "Separate exactprotection reconciliation;nonegrantedhere"
+    },
+    {
+      "gate": "TRADE_1M_BODY_INTEGRITY",
+      "status": "UNVERIFIED",
+      "evidence": "Legacycounts/checksumdeclarations only,nocurrentbodyidentity",
+      "required_next": "Futureapprovedselectedsubsethash/schema/gapcheck"
+    },
+    {
+      "gate": "TRUE_MARK_1M_CLOSE_PATH",
+      "status": "UNVERIFIED",
+      "evidence": "Settlementminute-openmark !=continuousminute-closeMTM",
+      "required_next": "Admitvalidatedseparatemarkpath afterprereg"
+    },
+    {
+      "gate": "FUNDING_SETTLEMENT_CAP_PUBLICATION",
+      "status": "PROXY_ONLY",
+      "evidence": "4/8bp scenariosnotrates/caps;old6114countnotcashflowproof",
+      "required_next": "Verifiedboundedsemanticsorstrictdiagnosticlabel"
+    },
+    {
+      "gate": "FEES_TICK_LOT_SPREAD",
+      "status": "PROXY_ONLY",
+      "evidence": "22/44bp assumptions;history/impact/fee-tierunverified",
+      "required_next": "No privatetier;diagnosticonlyuntilcredibleenvelope"
+    },
+    {
+      "gate": "LICENSE_AND_DERIVED_PUBLICATION",
+      "status": "UNDER_REVIEW",
+      "evidence": "No blanketlive/commercialrights;datedlegacy/currentlicenceapplicabilityunknown",
+      "required_next": "Statednoncommercialscope/attribution/rightsgate beforebody transfer"
+    },
+    {
+      "gate": "CANDIDATE_BUDGET_METHOD",
+      "status": "PRESERVED_READ_ONLY",
+      "evidence": "Exact8registryIDs/formulassourceimmutable,no newdesign",
+      "required_next": "Useacceptedmethod onlyafterseparatefuturegrant"
+    },
+    {
+      "gate": "EFFECTIVE_PREREG_AND_EMPIRICAL_READS",
+      "status": "NOT_AUTHORIZED",
+      "evidence": "Ownpublishedfastpath ismetadataonly",
+      "required_next": "Controllerselectednewfreeze/bodydispatch required"
+    }
+  ],
+  "option_a": {
+    "warmup": [
+      "2021-03",
+      "2023-03",
+      "2025-03"
+    ],
+    "development": [
+      "2021-04",
+      "2023-04",
+      "2025-04"
+    ],
+    "status": "PENDING_CONTROLLER_SELECTION",
+    "original_universe": [
+      "BTCUSDT",
+      "ETHUSDT",
+      "SOLUSDT"
+    ],
+    "btc_only": "EXPLICIT_AMENDMENT_DIAGNOSTIC_ONLY_NOT_ADOPTED"
+  },
+  "option_b": "BLOCKED_OLD_BTC_HOLDOUT_WITHOUT_NEW_AUTHORITY",
+  "candidate_ids": [
+    "STRUCTURAL_CONTINUATION_LONG_04H",
+    "STRUCTURAL_CONTINUATION_LONG_12H",
+    "STRUCTURAL_CONTINUATION_SHORT_04H",
+    "STRUCTURAL_CONTINUATION_SHORT_12H",
+    "CLOSED_RETEST_LONG_04H",
+    "CLOSED_RETEST_LONG_12H",
+    "CLOSED_RETEST_SHORT_04H",
+    "CLOSED_RETEST_SHORT_12H"
+  ],
+  "original_registry_sha": "e5b2006a89441f7eb2ec900e508aff451106b87a",
+  "original_method_sha": "cf2d5cc33774cdcff7d709636305bba830e977ef",
+  "empirical_evaluations": 0,
+  "effective_prereg": false,
+  "licensing_status": "NONCOMMERCIAL_RESEARCH_SUITABILITY_UNDER_REVIEW"
+}
