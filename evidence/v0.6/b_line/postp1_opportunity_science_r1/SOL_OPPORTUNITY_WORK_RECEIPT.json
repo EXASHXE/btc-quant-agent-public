@@ -1,0 +1,397 @@
+{
+  "checkpoints": [
+    {
+      "evidence": "remote start exact; clean own fresh worktree; HTTP prompt equals Git blob; 9 pinned governance/method objects",
+      "phase": "P0",
+      "status": "COMPLETE"
+    },
+    {
+      "mechanism_falsifiers": 14,
+      "payoff_cases": 140,
+      "phase": "P1_P2_INPUT_FREEZE",
+      "power_cases": 18,
+      "proportion_cases": 8,
+      "rubric_sha256": "2aa91b9d056b798b5b1b036c24f7459e22133ef05651529d073730f62f2f2aa9",
+      "scenario_sha256": "e41b232cfbc608b41ec7408fa02e21b631a429bba3f6d917db46514da3c598ba",
+      "status": "COMPLETE_BEFORE_COMPUTATION"
+    },
+    {
+      "original_count": 8,
+      "phase": "P1_P3_PRIORITY_INPUT_FREEZE",
+      "priority_input_sha256": "836718568407fb3ca71b3e9dd9aa9690242fd24c9add86a86e8505e19516ec37",
+      "proposed_count": 3,
+      "status": "COMPLETE_BEFORE_RANK_COMPUTATION"
+    },
+    {
+      "dependence": 6,
+      "invariant_mutants_rejected": 16,
+      "mean_power": 18,
+      "mechanism_falsifiers_rejected": 14,
+      "payoff_rows": 140,
+      "phase": "P2_ACTUAL_EXECUTION",
+      "proportion_power": 8,
+      "status": "COMPLETE"
+    },
+    {
+      "LOO_rankings": 54,
+      "LOO_top4_changes": 21,
+      "all_source_blocked": true,
+      "conditional_preference": "B",
+      "options": 3,
+      "phase": "P3_COMPETING_DESIGNS_AND_RANK_SENSITIVITY",
+      "rankings": 9,
+      "status": "COMPLETE"
+    },
+    {
+      "focused_tests": {
+        "3.12": "208PASS/0FAIL/0SKIP",
+        "3.13": "208PASS/0FAIL/0SKIP"
+      },
+      "frozen_inputs_unchanged": true,
+      "phase": "P4_SCOPED_QA",
+      "scoped_ruff": "PASS",
+      "status": "COMPLETE"
+    },
+    {
+      "canonical_json_and_line_whitespace": "PASS",
+      "changed_paths_verified": "17 NEW ALLOWED FILES ONLY; tracked baseline unchanged",
+      "git_diff_check_exit": 0,
+      "input_output_script_test_hash_checks": "PASS",
+      "json_files_parsed": 8,
+      "phase": "P5_ARTIFACTS_READY",
+      "pinned_source_objects_verified": 9,
+      "publication_checks": "Exact parent/path/remote/CI require post-commit verification",
+      "source_register_formula_identity": "PASS_ORIGINAL_EIGHT_EXACT",
+      "status": "PRE_PUBLICATION"
+    }
+  ],
+  "code_start_sha": "e0ff8c3473de4bfa3e66fe7928d42992a4d38a32",
+  "controller_dispatch_sha": "858735e0ae81b1ca0ced8cfa4c2e9ee5d01532e2",
+  "cross_python_output_bytes_identical": {
+    "payoff": true,
+    "priorities": true
+  },
+  "development_history": [
+    {
+      "result": "PASS",
+      "scope": "algebra only, initial hand controls",
+      "test_count": 201
+    },
+    {
+      "result": "PASS each Python3.12/3.13",
+      "scope": "added priorities QA",
+      "test_count": 206
+    },
+    {
+      "result": "PASS each Python3.12/3.13",
+      "scope": "two additional explicit half-tick hand controls; frozen 140 scenarios unchanged",
+      "test_count": 208
+    }
+  ],
+  "executions": [
+    {
+      "command": "PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=src python3.12 -m pytest -q tests/test_v06_postp1_science_algebra.py tests/test_v06_postp1_science_priorities.py --junitxml=/tmp/postp1_published_py312.xml",
+      "counts": {
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 208
+      },
+      "interpretation": "Algebra and finite audit-predicate QA, not engine/strategy acceptance",
+      "kind": "focused_pytest",
+      "python": "Python 3.12.3",
+      "subprocess_exit_code": 0,
+      "xml_sha256": "5375b931cc80c6a665fe25b22b15f111a7a70f875d25750e7ff6252c7a7117d8"
+    },
+    {
+      "command": "PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=src python3.13 -m pytest -q tests/test_v06_postp1_science_algebra.py tests/test_v06_postp1_science_priorities.py --junitxml=/tmp/postp1_published_py313.xml",
+      "counts": {
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 208
+      },
+      "interpretation": "Algebra and finite audit-predicate QA, not engine/strategy acceptance",
+      "kind": "focused_pytest",
+      "python": "Python 3.13.13",
+      "subprocess_exit_code": 0,
+      "xml_sha256": "d43590f766708c9649bbe834460f5c3e76b3dc3045df6d3984521ce2a06f61b1"
+    },
+    {
+      "actual_output_path": "/root/workspace/project/quant-v0.6/postp1-sol61-opportunity-science-r1/evidence/v0.6/b_line/postp1_opportunity_science_r1/SYNTHETIC_PAYOFF_AND_POWER_CASES.json",
+      "command": "PYTHONDONTWRITEBYTECODE=1 python3.12 scripts/strategy_research/postp1_science_algebra/run.py --output evidence/v0.6/b_line/postp1_opportunity_science_r1/SYNTHETIC_PAYOFF_AND_POWER_CASES.json",
+      "kind": "actual_frozen_scenario_cli",
+      "python": "3.12",
+      "stdout": {
+        "counts": {
+          "dependence_cases": 6,
+          "mean_power_cases": 18,
+          "mechanism_falsifiers_rejected": 14,
+          "mutants_rejected": 16,
+          "payoff_cases": 140,
+          "proportion_power_cases": 8
+        },
+        "input_sha256": "e41b232cfbc608b41ec7408fa02e21b631a429bba3f6d917db46514da3c598ba",
+        "output_sha256": "676d316a3febb441018df209f6f2b07f3f5cce83295e5874f61c6f577d1c759c"
+      },
+      "subprocess_exit_code": 0
+    },
+    {
+      "actual_output_path": "/tmp/postp1_py313_results.json",
+      "command": "PYTHONDONTWRITEBYTECODE=1 python3.13 scripts/strategy_research/postp1_science_algebra/run.py --output /tmp/postp1_py313_results.json",
+      "kind": "actual_frozen_scenario_cli",
+      "python": "3.13",
+      "stdout": {
+        "counts": {
+          "dependence_cases": 6,
+          "mean_power_cases": 18,
+          "mechanism_falsifiers_rejected": 14,
+          "mutants_rejected": 16,
+          "payoff_cases": 140,
+          "proportion_power_cases": 8
+        },
+        "input_sha256": "e41b232cfbc608b41ec7408fa02e21b631a429bba3f6d917db46514da3c598ba",
+        "output_sha256": "676d316a3febb441018df209f6f2b07f3f5cce83295e5874f61c6f577d1c759c"
+      },
+      "subprocess_exit_code": 0
+    },
+    {
+      "command": "python3.12 scripts/strategy_research/postp1_science_algebra/priorities.py --output evidence/v0.6/b_line/postp1_opportunity_science_r1/SCIENCE_DECISION_MATRIX_AND_SENSITIVITY.json",
+      "kind": "actual_priorities_cli",
+      "python": "3.12",
+      "stdout": {
+        "observed_computations": {
+          "base_rankings": 9,
+          "base_rows": 99,
+          "sensitivity_rankings": 54,
+          "sensitivity_rows": 594
+        },
+        "output_sha256": "aadb044bbf48f64701132cccc2e832b05c1c5e4764185ca8d92442fb44772f9b",
+        "top4_instabilities": 21
+      },
+      "subprocess_exit_code": 0
+    },
+    {
+      "command": "python3.13 scripts/strategy_research/postp1_science_algebra/priorities.py --output /tmp/postp1_py313_priorities.json",
+      "kind": "actual_priorities_cli",
+      "output_sha256": "aadb044bbf48f64701132cccc2e832b05c1c5e4764185ca8d92442fb44772f9b",
+      "python": "3.13",
+      "subprocess_exit_code": 0
+    }
+  ],
+  "executor": {
+    "model_switch_claim": false,
+    "observed_effort": "NOT_EXPOSED",
+    "observed_variant": "NOT_EXPOSED",
+    "requested": "GPT-6 Sol High",
+    "system_description": "Codex GPT-6"
+  },
+  "external_documentation_only": [
+    {
+      "access_date": "2026-10-10",
+      "class_": "PUBLIC_METHOD_DOCUMENTATION_NO_MARKET_RESPONSE",
+      "url": "https://nautilustrader.io/docs/latest/concepts/backtesting/"
+    },
+    {
+      "access_date": "2026-10-10",
+      "class_": "PUBLIC_METHOD_DOCUMENTATION_NO_MARKET_RESPONSE",
+      "url": "https://nautilustrader.io/docs/latest/concepts/data/"
+    },
+    {
+      "access_date": "2026-10-10",
+      "class_": "PUBLIC_METHOD_DOCUMENTATION_NO_MARKET_RESPONSE",
+      "url": "https://nautilustrader.io/docs/latest/concepts/backtesting/bar-execution/"
+    },
+    {
+      "access_date": "2026-10-10",
+      "class_": "PUBLIC_METHOD_DOCUMENTATION_NO_MARKET_RESPONSE",
+      "url": "https://nautilustrader.io/docs/latest/concepts/backtesting/accounts-and-margin/"
+    },
+    {
+      "access_date": "2026-10-10",
+      "class_": "PUBLIC_METHOD_DOCUMENTATION_NO_MARKET_RESPONSE",
+      "url": "https://nautilustrader.io/docs/latest/developer_guide/testing/"
+    },
+    {
+      "access_date": "2026-10-10",
+      "class_": "PUBLIC_METHOD_DOCUMENTATION_NO_MARKET_RESPONSE",
+      "url": "https://www.itl.nist.gov/div898/handbook/prc/section2/prc242.htm"
+    }
+  ],
+  "fixture_changes_after_execution": 0,
+  "input_hashes": {
+    "priority_scores": "836718568407fb3ca71b3e9dd9aa9690242fd24c9add86a86e8505e19516ec37",
+    "rubric": "2aa91b9d056b798b5b1b036c24f7459e22133ef05651529d073730f62f2f2aa9",
+    "scenario": "e41b232cfbc608b41ec7408fa02e21b631a429bba3f6d917db46514da3c598ba"
+  },
+  "limitations": [
+    "Scenario labels HALF_TICK are not proof of exact ties; separate handcrafted10.005/.01 controls test true ties",
+    "Synthetic predicate enforcement is not external-library/engine enforcement",
+    "No observed market variance/covariance, sample density, costs or expectancy",
+    "Both payoff expressions lack funded-book state and original full minute MTM path",
+    "Counters trace task-authorized reads/tools rather than OS-wide telemetry"
+  ],
+  "lint": {
+    "final_exit": 0,
+    "final_result": "PASS_SCOPED_ONLY",
+    "fix_scope": "new algebra/runner/test files only; constant defaults and import/literal formatting",
+    "initial_errors": 8,
+    "initial_exit": 1,
+    "reason": "new code lint B008/C408/I001/RUF100"
+  },
+  "next_controller_gate": "Verify exact pushed SHA/parent/scope/raw observations and independently adjudicate P2 metadata certainty x R4 prereg design readiness; no P3/P4/trading authority",
+  "observed_counts": {
+    "dependence_cases": 6,
+    "mean_power_cases": 18,
+    "mechanism_falsifiers_rejected": 14,
+    "mutants_rejected": 16,
+    "payoff_cases": 140,
+    "proportion_power_cases": 8
+  },
+  "output_hashes": {
+    "payoff": "676d316a3febb441018df209f6f2b07f3f5cce83295e5874f61c6f577d1c759c",
+    "priorities": "aadb044bbf48f64701132cccc2e832b05c1c5e4764185ca8d92442fb44772f9b"
+  },
+  "pinned_prompt_sha": "d029a8f974c3809652f6a54c0f99dc1c7abfebc6",
+  "priority_computations": {
+    "base_rankings": 9,
+    "base_rows": 99,
+    "sensitivity_rankings": 54,
+    "sensitivity_rows": 594
+  },
+  "priority_instability_count": 21,
+  "publication": {
+    "final_sha": "POST_COMMIT_EXTERNAL_RETURN_NOT_SELF_REFERENCED",
+    "remote_CI": "REPORT_ACTUAL_AFTER_PUSH_NO_GLOBAL_LOCAL_RERUN",
+    "remote_exact_sha_parent_files": "MUST_VERIFY_AFTER_ONE_NON_FORCE_PUSH"
+  },
+  "remote_branch": "feature/v06-bline-postp1-sol61-opportunity-science-r1",
+  "research_delivery": {
+    "exact_option_count": 3,
+    "implementation_authorized": false,
+    "preferred": "B_CONDITIONAL_FINITE_DUAL_ORACLE_ACCEPTANCE_FIRST",
+    "status_all": "CONDITIONALLY_UNACCEPTABLE_PENDING_INDEPENDENTLY_EXECUTED_ENFORCEMENT"
+  },
+  "scientific_readiness": "DESIGN_COMPLETE_ALL_HYPOTHESES_SOURCE_BLOCKED_NOT_SCIENCE_EXECUTION_READY",
+  "scope_counters": {
+    "P2_root_discovery": 0,
+    "candidate_retunes": 0,
+    "engine_implementation": 0,
+    "exchange_api_calls": 0,
+    "market_body_reads": 0,
+    "market_replays": 0,
+    "parallel_Gemini_artifact_reads": 0,
+    "protected_body_reads": 0,
+    "trading_writes": 0
+  },
+  "script_hash_scope": "Final published bytes. Initial Python3.12 CLI preceded lint-only default/import/literal cleanup; Python3.13 CLI and final focused tests executed the final algebra source. Output identity independently checked; frozen inputs never edited.",
+  "script_import_allowlist_proof": {
+    "scripts/strategy_research/postp1_science_algebra/algebra.py": [
+      "__future__",
+      "decimal",
+      "math",
+      "statistics"
+    ],
+    "scripts/strategy_research/postp1_science_algebra/priorities.py": [
+      "__future__",
+      "argparse",
+      "hashlib",
+      "json",
+      "pathlib"
+    ],
+    "scripts/strategy_research/postp1_science_algebra/run.py": [
+      "__future__",
+      "algebra",
+      "argparse",
+      "decimal",
+      "hashlib",
+      "json",
+      "pathlib"
+    ]
+  },
+  "script_sha256": {
+    "scripts/strategy_research/postp1_science_algebra/algebra.py": "effb7b8d57cfd6cee956e899e5dd9a8316d8ee5276a1e7d2c8f6f925dad91345",
+    "scripts/strategy_research/postp1_science_algebra/priorities.py": "e1fe8ec87724600598cf0895907e8b7da52d61e2df05115f1c23692d7e0530ae",
+    "scripts/strategy_research/postp1_science_algebra/run.py": "b77bc6433f17df5640631585b1846add14b9c3551211c5c8a0af7076434d2024"
+  },
+  "source_manifest": [
+    {
+      "alias": "prompt",
+      "blob": "286e0e681a783677defa20f849d87a4f26437cd0",
+      "path": "prompts/v0.6/b_line/V06_POST_P1_SOL_HIGH_LONG_OPPORTUNITY_SCIENCE_AND_MEASUREMENT_REPLAN_R1.md",
+      "sha": "d029a8f974c3809652f6a54c0f99dc1c7abfebc6",
+      "sha256": "740413b85423d399dd8dceb7aa12ba1692cf482a60364c914494f8c3bb876bd1",
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/d029a8f974c3809652f6a54c0f99dc1c7abfebc6/prompts/v0.6/b_line/V06_POST_P1_SOL_HIGH_LONG_OPPORTUNITY_SCIENCE_AND_MEASUREMENT_REPLAN_R1.md"
+    },
+    {
+      "alias": "dispatch",
+      "blob": "c5684b4428321901bb21c087c3fd2d4b344b7fc7",
+      "path": "reviews/v0.6/b_line/V06_POST_P1_TERMINAL_PARALLEL_P2_METADATA_AND_OPPORTUNITY_SCIENCE_CONTROLLER_DISPATCH_R1.md",
+      "sha": "858735e0ae81b1ca0ced8cfa4c2e9ee5d01532e2",
+      "sha256": "dcf84d5ab8966ec582f85c65c227c19ceb8bcd4702ab85043cea581e28705f8a",
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/858735e0ae81b1ca0ced8cfa4c2e9ee5d01532e2/reviews/v0.6/b_line/V06_POST_P1_TERMINAL_PARALLEL_P2_METADATA_AND_OPPORTUNITY_SCIENCE_CONTROLLER_DISPATCH_R1.md"
+    },
+    {
+      "alias": "method",
+      "blob": "fb701b0be825f85801377f86eb80ba4f766ebaed",
+      "path": "docs/strategy_research/g2_r3/METHOD_DESIGN.md",
+      "sha": "e5b2006a89441f7eb2ec900e508aff451106b87a",
+      "sha256": "14378dde7668291dc87aef91e3e55fadddad3a444d1d49284efa2c3cbcba9a77",
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/e5b2006a89441f7eb2ec900e508aff451106b87a/docs/strategy_research/g2_r3/METHOD_DESIGN.md"
+    },
+    {
+      "alias": "register",
+      "blob": "d337542f6482938c37eb6b4e43255cdf4d09751a",
+      "path": "evidence/v0.6/b_line/g2_r3_design/CANDIDATE_REGISTER_PROPOSAL.json",
+      "sha": "e5b2006a89441f7eb2ec900e508aff451106b87a",
+      "sha256": "d0f89bddfaec0e57c959cec043969059da10fec8aa45f81669dde8b80ea35a9b",
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/e5b2006a89441f7eb2ec900e508aff451106b87a/evidence/v0.6/b_line/g2_r3_design/CANDIDATE_REGISTER_PROPOSAL.json"
+    },
+    {
+      "alias": "r11",
+      "blob": "7def37d7c8aad02dd0c2769882fad61622e262db",
+      "path": "docs/strategy_research/g2_r3/method_repair/METHOD_R1_1_PIT_COST_ACCOUNTING.md",
+      "sha": "cf2d5cc33774cdcff7d709636305bba830e977ef",
+      "sha256": "a2943c9a541d93eaceb62a664edf0d03f0c9bbab6f4c4f73752831bcf14eb026",
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/cf2d5cc33774cdcff7d709636305bba830e977ef/docs/strategy_research/g2_r3/method_repair/METHOD_R1_1_PIT_COST_ACCOUNTING.md"
+    },
+    {
+      "alias": "support",
+      "blob": "a8ba636ec863a5ef410dd749aefa87c2ef31ed35",
+      "path": "docs/strategy_research/g2_r3/method_repair/R1_1_FUNDING_COST_AND_SUPPORT.md",
+      "sha": "cf2d5cc33774cdcff7d709636305bba830e977ef",
+      "sha256": "f64520650a00e6784da94c4687caa8809430895fa268b56600ed7b47aad71415",
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/cf2d5cc33774cdcff7d709636305bba830e977ef/docs/strategy_research/g2_r3/method_repair/R1_1_FUNDING_COST_AND_SUPPORT.md"
+    },
+    {
+      "alias": "r12",
+      "blob": "ecafeec0100f8881a700f9e3372a717aeab93b2b",
+      "path": "reviews/v0.6/b_line/V06_G2_R3_P1_ALT_ENGINE_AM01_AM02_CONTROLLER_SPEC_FREEZE_R1.md",
+      "sha": "821d23427a5f6d0b4635f32f226ddc779358ab72",
+      "sha256": "cea538034ea7695a326a2f2c91dcf4d246f2fafaa456f5935f4f375ce1d6e16f",
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/821d23427a5f6d0b4635f32f226ddc779358ab72/reviews/v0.6/b_line/V06_G2_R3_P1_ALT_ENGINE_AM01_AM02_CONTROLLER_SPEC_FREEZE_R1.md"
+    },
+    {
+      "alias": "prior_science",
+      "blob": "3085e7d8198f2173d251cca12e92be4a0666f0c2",
+      "path": "docs/strategy_research/g2_r3/scientific_strategy_review_r1/ECONOMIC_MECHANISM_COST_POWER_REPORT.md",
+      "sha": "57818b967a836382caa3fa95516d3e027e990f61",
+      "sha256": "46db2d32e250bc6ecc464f80f3490bb02a2afdd7632fdef0ebc28f0f036104f0",
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/57818b967a836382caa3fa95516d3e027e990f61/docs/strategy_research/g2_r3/scientific_strategy_review_r1/ECONOMIC_MECHANISM_COST_POWER_REPORT.md"
+    },
+    {
+      "alias": "p1_terminal",
+      "blob": "9dfcf9f4ff8284765240c212550beb460438c0a5",
+      "path": "reviews/v0.6/b_line/V06_G2_R3_P1_ALT_ENGINE_FINAL_INDEPENDENT_AUDIT_CONTROLLER_TERMINAL_NO_GO_R1.md",
+      "sha": "fd3c13645df9ad2506293b109d3891cf57936208",
+      "sha256": "b9eba432a5a61a1e9a110279c8fc157173abaf62a588e36b7d8b22c9784a59ce",
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/fd3c13645df9ad2506293b109d3891cf57936208/reviews/v0.6/b_line/V06_G2_R3_P1_ALT_ENGINE_FINAL_INDEPENDENT_AUDIT_CONTROLLER_TERMINAL_NO_GO_R1.md"
+    }
+  ],
+  "task_id": "V06_POST_P1_SOL_HIGH_LONG_OPPORTUNITY_SCIENCE_AND_MEASUREMENT_REPLAN_R1",
+  "terminal": "R4_SCIENCE_PRIORITIES_DESIGNED_PENDING_CONTROLLER_AND_P2",
+  "test_sha256": {
+    "tests/test_v06_postp1_science_algebra.py": "1424d4a699dc9412eac9ae4e0d5af0ebe8662157b58a3ffe48425b301d746f04",
+    "tests/test_v06_postp1_science_priorities.py": "87ffe2d752ed787eb23502dacbdd1489ec0069177cdf1e754ad25bd186e0c196"
+  }
+}

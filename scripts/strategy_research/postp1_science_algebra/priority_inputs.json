@@ -1,0 +1,213 @@
+{
+  "rows": [
+    {
+      "horizon_hours": 4,
+      "id": "STRUCTURAL_CONTINUATION_LONG_04H",
+      "kind": "ORIGINAL_EIGHT_UNCHANGED",
+      "score_inputs": {
+        "audit_cost": 3,
+        "causal": 4,
+        "falsifiable": 3,
+        "power": 2,
+        "source": 1
+      },
+      "score_reasons": {
+        "audit_cost": "Retest AM01 chronology costs more proof; neither engine route accepted",
+        "causal": "Simpler closed-bar continuation has fewer causal state obligations; retest requires three-hour cursor",
+        "falsifiable": "Retest boundary/first-confirmation admits more specific invalidation than persistence narrative",
+        "power": "4h continuation is less occupancy/filter constrained by definition; no measured rate",
+        "source": "No physical source/rights/true Mark admitted; score1 is prospective data type simplicity only"
+      }
+    },
+    {
+      "horizon_hours": 12,
+      "id": "STRUCTURAL_CONTINUATION_LONG_12H",
+      "kind": "ORIGINAL_EIGHT_UNCHANGED",
+      "score_inputs": {
+        "audit_cost": 3,
+        "causal": 4,
+        "falsifiable": 3,
+        "power": 1,
+        "source": 1
+      },
+      "score_reasons": {
+        "audit_cost": "Retest AM01 chronology costs more proof; neither engine route accepted",
+        "causal": "Simpler closed-bar continuation has fewer causal state obligations; retest requires three-hour cursor",
+        "falsifiable": "Retest boundary/first-confirmation admits more specific invalidation than persistence narrative",
+        "power": "4h continuation is less occupancy/filter constrained by definition; no measured rate",
+        "source": "No physical source/rights/true Mark admitted; score1 is prospective data type simplicity only"
+      }
+    },
+    {
+      "horizon_hours": 4,
+      "id": "STRUCTURAL_CONTINUATION_SHORT_04H",
+      "kind": "ORIGINAL_EIGHT_UNCHANGED",
+      "score_inputs": {
+        "audit_cost": 3,
+        "causal": 4,
+        "falsifiable": 3,
+        "power": 2,
+        "source": 1
+      },
+      "score_reasons": {
+        "audit_cost": "Retest AM01 chronology costs more proof; neither engine route accepted",
+        "causal": "Simpler closed-bar continuation has fewer causal state obligations; retest requires three-hour cursor",
+        "falsifiable": "Retest boundary/first-confirmation admits more specific invalidation than persistence narrative",
+        "power": "4h continuation is less occupancy/filter constrained by definition; no measured rate",
+        "source": "No physical source/rights/true Mark admitted; score1 is prospective data type simplicity only"
+      }
+    },
+    {
+      "horizon_hours": 12,
+      "id": "STRUCTURAL_CONTINUATION_SHORT_12H",
+      "kind": "ORIGINAL_EIGHT_UNCHANGED",
+      "score_inputs": {
+        "audit_cost": 3,
+        "causal": 4,
+        "falsifiable": 3,
+        "power": 1,
+        "source": 1
+      },
+      "score_reasons": {
+        "audit_cost": "Retest AM01 chronology costs more proof; neither engine route accepted",
+        "causal": "Simpler closed-bar continuation has fewer causal state obligations; retest requires three-hour cursor",
+        "falsifiable": "Retest boundary/first-confirmation admits more specific invalidation than persistence narrative",
+        "power": "4h continuation is less occupancy/filter constrained by definition; no measured rate",
+        "source": "No physical source/rights/true Mark admitted; score1 is prospective data type simplicity only"
+      }
+    },
+    {
+      "horizon_hours": 4,
+      "id": "CLOSED_RETEST_LONG_04H",
+      "kind": "ORIGINAL_EIGHT_UNCHANGED",
+      "score_inputs": {
+        "audit_cost": 1,
+        "causal": 3,
+        "falsifiable": 4,
+        "power": 1,
+        "source": 1
+      },
+      "score_reasons": {
+        "audit_cost": "Retest AM01 chronology costs more proof; neither engine route accepted",
+        "causal": "Simpler closed-bar continuation has fewer causal state obligations; retest requires three-hour cursor",
+        "falsifiable": "Retest boundary/first-confirmation admits more specific invalidation than persistence narrative",
+        "power": "4h continuation is less occupancy/filter constrained by definition; no measured rate",
+        "source": "No physical source/rights/true Mark admitted; score1 is prospective data type simplicity only"
+      }
+    },
+    {
+      "horizon_hours": 12,
+      "id": "CLOSED_RETEST_LONG_12H",
+      "kind": "ORIGINAL_EIGHT_UNCHANGED",
+      "score_inputs": {
+        "audit_cost": 1,
+        "causal": 3,
+        "falsifiable": 4,
+        "power": 1,
+        "source": 1
+      },
+      "score_reasons": {
+        "audit_cost": "Retest AM01 chronology costs more proof; neither engine route accepted",
+        "causal": "Simpler closed-bar continuation has fewer causal state obligations; retest requires three-hour cursor",
+        "falsifiable": "Retest boundary/first-confirmation admits more specific invalidation than persistence narrative",
+        "power": "4h continuation is less occupancy/filter constrained by definition; no measured rate",
+        "source": "No physical source/rights/true Mark admitted; score1 is prospective data type simplicity only"
+      }
+    },
+    {
+      "horizon_hours": 4,
+      "id": "CLOSED_RETEST_SHORT_04H",
+      "kind": "ORIGINAL_EIGHT_UNCHANGED",
+      "score_inputs": {
+        "audit_cost": 1,
+        "causal": 3,
+        "falsifiable": 4,
+        "power": 1,
+        "source": 1
+      },
+      "score_reasons": {
+        "audit_cost": "Retest AM01 chronology costs more proof; neither engine route accepted",
+        "causal": "Simpler closed-bar continuation has fewer causal state obligations; retest requires three-hour cursor",
+        "falsifiable": "Retest boundary/first-confirmation admits more specific invalidation than persistence narrative",
+        "power": "4h continuation is less occupancy/filter constrained by definition; no measured rate",
+        "source": "No physical source/rights/true Mark admitted; score1 is prospective data type simplicity only"
+      }
+    },
+    {
+      "horizon_hours": 12,
+      "id": "CLOSED_RETEST_SHORT_12H",
+      "kind": "ORIGINAL_EIGHT_UNCHANGED",
+      "score_inputs": {
+        "audit_cost": 1,
+        "causal": 3,
+        "falsifiable": 4,
+        "power": 1,
+        "source": 1
+      },
+      "score_reasons": {
+        "audit_cost": "Retest AM01 chronology costs more proof; neither engine route accepted",
+        "causal": "Simpler closed-bar continuation has fewer causal state obligations; retest requires three-hour cursor",
+        "falsifiable": "Retest boundary/first-confirmation admits more specific invalidation than persistence narrative",
+        "power": "4h continuation is less occupancy/filter constrained by definition; no measured rate",
+        "source": "No physical source/rights/true Mark admitted; score1 is prospective data type simplicity only"
+      }
+    },
+    {
+      "horizon_hours": 4,
+      "id": "PROPOSED_FAILED_BREAKOUT_REVERSAL_SHORT_04H",
+      "kind": "PROPOSED_ONLY_NOT_FROZEN",
+      "score_inputs": {
+        "audit_cost": 2,
+        "causal": 3,
+        "falsifiable": 3,
+        "power": 1,
+        "source": 1
+      },
+      "score_reasons": {
+        "audit_cost": "Novel source adapters create new unaudited obligations",
+        "causal": "New source timing or failed-breakout chronological definition not yet frozen",
+        "falsifiable": "Mechanism permits a distinct hostile falsifier, not evidence of edge",
+        "power": "Conditional event density unknown",
+        "source": "No new source rights/availability established"
+      }
+    },
+    {
+      "horizon_hours": 12,
+      "id": "PROPOSED_POSITIVE_FUNDING_CROWDING_SHORT_12H",
+      "kind": "PROPOSED_ONLY_NOT_FROZEN",
+      "score_inputs": {
+        "audit_cost": 0,
+        "causal": 2,
+        "falsifiable": 2,
+        "power": 1,
+        "source": 0
+      },
+      "score_reasons": {
+        "audit_cost": "Novel source adapters create new unaudited obligations",
+        "causal": "New source timing or failed-breakout chronological definition not yet frozen",
+        "falsifiable": "Mechanism permits a distinct hostile falsifier, not evidence of edge",
+        "power": "Conditional event density unknown",
+        "source": "No new source rights/availability established"
+      }
+    },
+    {
+      "horizon_hours": 4,
+      "id": "PROPOSED_LIQUIDITY_ABSORPTION_LONG_04H",
+      "kind": "PROPOSED_ONLY_NOT_FROZEN",
+      "score_inputs": {
+        "audit_cost": 0,
+        "causal": 2,
+        "falsifiable": 4,
+        "power": 1,
+        "source": 0
+      },
+      "score_reasons": {
+        "audit_cost": "Novel source adapters create new unaudited obligations",
+        "causal": "New source timing or failed-breakout chronological definition not yet frozen",
+        "falsifiable": "Mechanism permits a distinct hostile falsifier, not evidence of edge",
+        "power": "Conditional event density unknown",
+        "source": "No new source rights/availability established"
+      }
+    }
+  ]
+}

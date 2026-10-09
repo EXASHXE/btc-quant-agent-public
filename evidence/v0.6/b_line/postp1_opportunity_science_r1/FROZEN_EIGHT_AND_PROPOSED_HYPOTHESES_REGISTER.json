@@ -1,0 +1,642 @@
+{
+  "entries": [
+    {
+      "conservative_no_go": "Source/proof failure stops; static ineligible remains WAIT; no empirical economic verdict from toy payoff; all-WAIT diagnostic can retire resource path",
+      "entry_stop_target_reference": "Exact shared execution text plus family clause, no new gate; actual stop30-250bp; target2R; absolute gap<=.25ATR; SL-first/worse stop gap/fixed TP cap",
+      "exact_family_rule": "LONG: last completed 4h close > EMA20 > EMA50; EMA20 now > EMA20 three 4h bars earlier; ER12 >=0.35. SHORT mirrors inequalities. Last 1h close breaks the highs/lows of the prior three complete 1h bars, its signed close-open body >=0.5 ATR20, and its range <=2 ATR20. Distance from 4h EMA20 <= one 4h ATR20 (same TR definition on 4h bars). Initial stop is decision close minus d\u00d71.5 hourly ATR20. Hypothesis: persistent structure plus contained confirmation avoids first-spike false positives.",
+      "falsifiable_sign": "Higher-cost net notional bps >0 AND incremental paired higher-cost bps >0 versus fixed controls, with simultaneous bounds; untested",
+      "family_rule_sha256": "50f256e73aefcdd14e67f809c568c7c9d2e3f8c0a144ad6553d7b0a1bf023722",
+      "formula_commit": "e5b2006a89441f7eb2ec900e508aff451106b87a",
+      "formula_file_sha256": "14378dde7668291dc87aef91e3e55fadddad3a444d1d49284efa2c3cbcba9a77",
+      "formula_verification": "EXACT_PINNED_TEXT_AND_ROSTER_MATCH",
+      "horizon_caveat": "4h hourly stress4/5 settlements requires stop152/168bp before tick",
+      "horizon_hours": 4,
+      "id": "STRUCTURAL_CONTINUATION_LONG_04H",
+      "invalidation": "EMA/ER structure may be exhaustion or chop rather than persistent price adjustment",
+      "kind": "ORIGINAL_EIGHT_UNCHANGED",
+      "legal_inputs": [
+        "Complete 1m trade Kline for hourly/4h indicators",
+        "Continuous true-minute Mark for separate MTM",
+        "Settlement IDs/schedules/rates and PIT identity if actual funding claimed",
+        "Historical tick/lot/minimum filter and applicable fee/spread/impact provenance"
+      ],
+      "mechanism": "Persistent directional structure: slower counterparties/late liquidity repricing must fund continuation after delay",
+      "missingness": "Missing Kline or true-minute Mark hard stop; unknown funding is proxy-only, not zero; unknown filters/rights block",
+      "original_record": {
+        "direction": "LONG",
+        "empirical_metrics": null,
+        "family": "STRUCTURAL_CONTINUATION",
+        "horizon_band": "2-6h",
+        "id": "STRUCTURAL_CONTINUATION_LONG_04H",
+        "max_holding_hours": 4,
+        "new_hypothesis": true,
+        "rule_reference": "docs/strategy_research/g2_r3/METHOD_DESIGN.md (Concrete hypotheses and finite budget; STRUCTURAL_CONTINUATION row)",
+        "status": "PROPOSED_NOT_REGISTERED_NOT_EVALUATED",
+        "symbols": [
+          "BTCUSDT",
+          "ETHUSDT",
+          "SOLUSDT"
+        ]
+      },
+      "proof_floor": "Trade/Mark minute [O,O+60000) available O+120000; 1h decision H+60000; fill earliest H+120000; R1.2 ACK >= max(event+60000,required proof,extra delay)",
+      "score_inputs": {
+        "audit_cost": 3,
+        "causal": 4,
+        "falsifiable": 3,
+        "power": 2,
+        "source": 1
+      },
+      "score_reasons": {
+        "audit_cost": "Retest AM01 chronology costs more proof; neither engine route accepted",
+        "causal": "Simpler closed-bar continuation has fewer causal state obligations; retest requires three-hour cursor",
+        "falsifiable": "Retest boundary/first-confirmation admits more specific invalidation than persistence narrative",
+        "power": "4h continuation is less occupancy/filter constrained by definition; no measured rate",
+        "source": "No physical source/rights/true Mark admitted; score1 is prospective data type simplicity only"
+      },
+      "side": "LONG",
+      "side_tail_caveat": "Crowded LONG/down-gap and positive funding can be adverse",
+      "source_established": false,
+      "source_status": "SOURCE_BLOCKED_PENDING_P2",
+      "sparse_liquidity_caveat": "More filters/delay can lower support; no guaranteed fill/sample rate; spread/impact shocks can exceed proxies",
+      "universe_caveat": "Original BTC/ETH/SOL identical rules; BTC-only exposure100% fails <=60% positive cap; 3 assets share shocks, not independent replication"
+    },
+    {
+      "conservative_no_go": "Source/proof failure stops; static ineligible remains WAIT; no empirical economic verdict from toy payoff; all-WAIT diagnostic can retire resource path",
+      "entry_stop_target_reference": "Exact shared execution text plus family clause, no new gate; actual stop30-250bp; target2R; absolute gap<=.25ATR; SL-first/worse stop gap/fixed TP cap",
+      "exact_family_rule": "LONG: last completed 4h close > EMA20 > EMA50; EMA20 now > EMA20 three 4h bars earlier; ER12 >=0.35. SHORT mirrors inequalities. Last 1h close breaks the highs/lows of the prior three complete 1h bars, its signed close-open body >=0.5 ATR20, and its range <=2 ATR20. Distance from 4h EMA20 <= one 4h ATR20 (same TR definition on 4h bars). Initial stop is decision close minus d\u00d71.5 hourly ATR20. Hypothesis: persistent structure plus contained confirmation avoids first-spike false positives.",
+      "falsifiable_sign": "Higher-cost net notional bps >0 AND incremental paired higher-cost bps >0 versus fixed controls, with simultaneous bounds; untested",
+      "family_rule_sha256": "50f256e73aefcdd14e67f809c568c7c9d2e3f8c0a144ad6553d7b0a1bf023722",
+      "formula_commit": "e5b2006a89441f7eb2ec900e508aff451106b87a",
+      "formula_file_sha256": "14378dde7668291dc87aef91e3e55fadddad3a444d1d49284efa2c3cbcba9a77",
+      "formula_verification": "EXACT_PINNED_TEXT_AND_ROSTER_MATCH",
+      "horizon_caveat": "12h hourly stress12/13 settlements requires280/296bp >250, static ineligible; hypothetical verified8h max2 requires120bp before tick",
+      "horizon_hours": 12,
+      "id": "STRUCTURAL_CONTINUATION_LONG_12H",
+      "invalidation": "EMA/ER structure may be exhaustion or chop rather than persistent price adjustment",
+      "kind": "ORIGINAL_EIGHT_UNCHANGED",
+      "legal_inputs": [
+        "Complete 1m trade Kline for hourly/4h indicators",
+        "Continuous true-minute Mark for separate MTM",
+        "Settlement IDs/schedules/rates and PIT identity if actual funding claimed",
+        "Historical tick/lot/minimum filter and applicable fee/spread/impact provenance"
+      ],
+      "mechanism": "Persistent directional structure: slower counterparties/late liquidity repricing must fund continuation after delay",
+      "missingness": "Missing Kline or true-minute Mark hard stop; unknown funding is proxy-only, not zero; unknown filters/rights block",
+      "original_record": {
+        "direction": "LONG",
+        "empirical_metrics": null,
+        "family": "STRUCTURAL_CONTINUATION",
+        "horizon_band": "6-12h",
+        "id": "STRUCTURAL_CONTINUATION_LONG_12H",
+        "max_holding_hours": 12,
+        "new_hypothesis": true,
+        "rule_reference": "docs/strategy_research/g2_r3/METHOD_DESIGN.md (Concrete hypotheses and finite budget; STRUCTURAL_CONTINUATION row)",
+        "status": "PROPOSED_NOT_REGISTERED_NOT_EVALUATED",
+        "symbols": [
+          "BTCUSDT",
+          "ETHUSDT",
+          "SOLUSDT"
+        ]
+      },
+      "proof_floor": "Trade/Mark minute [O,O+60000) available O+120000; 1h decision H+60000; fill earliest H+120000; R1.2 ACK >= max(event+60000,required proof,extra delay)",
+      "score_inputs": {
+        "audit_cost": 3,
+        "causal": 4,
+        "falsifiable": 3,
+        "power": 1,
+        "source": 1
+      },
+      "score_reasons": {
+        "audit_cost": "Retest AM01 chronology costs more proof; neither engine route accepted",
+        "causal": "Simpler closed-bar continuation has fewer causal state obligations; retest requires three-hour cursor",
+        "falsifiable": "Retest boundary/first-confirmation admits more specific invalidation than persistence narrative",
+        "power": "4h continuation is less occupancy/filter constrained by definition; no measured rate",
+        "source": "No physical source/rights/true Mark admitted; score1 is prospective data type simplicity only"
+      },
+      "side": "LONG",
+      "side_tail_caveat": "Crowded LONG/down-gap and positive funding can be adverse",
+      "source_established": false,
+      "source_status": "SOURCE_BLOCKED_PENDING_P2",
+      "sparse_liquidity_caveat": "More filters/delay can lower support; no guaranteed fill/sample rate; spread/impact shocks can exceed proxies",
+      "universe_caveat": "Original BTC/ETH/SOL identical rules; BTC-only exposure100% fails <=60% positive cap; 3 assets share shocks, not independent replication"
+    },
+    {
+      "conservative_no_go": "Source/proof failure stops; static ineligible remains WAIT; no empirical economic verdict from toy payoff; all-WAIT diagnostic can retire resource path",
+      "entry_stop_target_reference": "Exact shared execution text plus family clause, no new gate; actual stop30-250bp; target2R; absolute gap<=.25ATR; SL-first/worse stop gap/fixed TP cap",
+      "exact_family_rule": "LONG: last completed 4h close > EMA20 > EMA50; EMA20 now > EMA20 three 4h bars earlier; ER12 >=0.35. SHORT mirrors inequalities. Last 1h close breaks the highs/lows of the prior three complete 1h bars, its signed close-open body >=0.5 ATR20, and its range <=2 ATR20. Distance from 4h EMA20 <= one 4h ATR20 (same TR definition on 4h bars). Initial stop is decision close minus d\u00d71.5 hourly ATR20. Hypothesis: persistent structure plus contained confirmation avoids first-spike false positives.",
+      "falsifiable_sign": "Higher-cost net notional bps >0 AND incremental paired higher-cost bps >0 versus fixed controls, with simultaneous bounds; untested",
+      "family_rule_sha256": "50f256e73aefcdd14e67f809c568c7c9d2e3f8c0a144ad6553d7b0a1bf023722",
+      "formula_commit": "e5b2006a89441f7eb2ec900e508aff451106b87a",
+      "formula_file_sha256": "14378dde7668291dc87aef91e3e55fadddad3a444d1d49284efa2c3cbcba9a77",
+      "formula_verification": "EXACT_PINNED_TEXT_AND_ROSTER_MATCH",
+      "horizon_caveat": "4h hourly stress4/5 settlements requires stop152/168bp before tick",
+      "horizon_hours": 4,
+      "id": "STRUCTURAL_CONTINUATION_SHORT_04H",
+      "invalidation": "EMA/ER structure may be exhaustion or chop rather than persistent price adjustment",
+      "kind": "ORIGINAL_EIGHT_UNCHANGED",
+      "legal_inputs": [
+        "Complete 1m trade Kline for hourly/4h indicators",
+        "Continuous true-minute Mark for separate MTM",
+        "Settlement IDs/schedules/rates and PIT identity if actual funding claimed",
+        "Historical tick/lot/minimum filter and applicable fee/spread/impact provenance"
+      ],
+      "mechanism": "Persistent directional structure: slower counterparties/late liquidity repricing must fund continuation after delay",
+      "missingness": "Missing Kline or true-minute Mark hard stop; unknown funding is proxy-only, not zero; unknown filters/rights block",
+      "original_record": {
+        "direction": "SHORT",
+        "empirical_metrics": null,
+        "family": "STRUCTURAL_CONTINUATION",
+        "horizon_band": "2-6h",
+        "id": "STRUCTURAL_CONTINUATION_SHORT_04H",
+        "max_holding_hours": 4,
+        "new_hypothesis": true,
+        "rule_reference": "docs/strategy_research/g2_r3/METHOD_DESIGN.md (Concrete hypotheses and finite budget; STRUCTURAL_CONTINUATION row)",
+        "status": "PROPOSED_NOT_REGISTERED_NOT_EVALUATED",
+        "symbols": [
+          "BTCUSDT",
+          "ETHUSDT",
+          "SOLUSDT"
+        ]
+      },
+      "proof_floor": "Trade/Mark minute [O,O+60000) available O+120000; 1h decision H+60000; fill earliest H+120000; R1.2 ACK >= max(event+60000,required proof,extra delay)",
+      "score_inputs": {
+        "audit_cost": 3,
+        "causal": 4,
+        "falsifiable": 3,
+        "power": 2,
+        "source": 1
+      },
+      "score_reasons": {
+        "audit_cost": "Retest AM01 chronology costs more proof; neither engine route accepted",
+        "causal": "Simpler closed-bar continuation has fewer causal state obligations; retest requires three-hour cursor",
+        "falsifiable": "Retest boundary/first-confirmation admits more specific invalidation than persistence narrative",
+        "power": "4h continuation is less occupancy/filter constrained by definition; no measured rate",
+        "source": "No physical source/rights/true Mark admitted; score1 is prospective data type simplicity only"
+      },
+      "side": "SHORT",
+      "side_tail_caveat": "SHORT squeeze/up-gap and negative funding can be adverse",
+      "source_established": false,
+      "source_status": "SOURCE_BLOCKED_PENDING_P2",
+      "sparse_liquidity_caveat": "More filters/delay can lower support; no guaranteed fill/sample rate; spread/impact shocks can exceed proxies",
+      "universe_caveat": "Original BTC/ETH/SOL identical rules; BTC-only exposure100% fails <=60% positive cap; 3 assets share shocks, not independent replication"
+    },
+    {
+      "conservative_no_go": "Source/proof failure stops; static ineligible remains WAIT; no empirical economic verdict from toy payoff; all-WAIT diagnostic can retire resource path",
+      "entry_stop_target_reference": "Exact shared execution text plus family clause, no new gate; actual stop30-250bp; target2R; absolute gap<=.25ATR; SL-first/worse stop gap/fixed TP cap",
+      "exact_family_rule": "LONG: last completed 4h close > EMA20 > EMA50; EMA20 now > EMA20 three 4h bars earlier; ER12 >=0.35. SHORT mirrors inequalities. Last 1h close breaks the highs/lows of the prior three complete 1h bars, its signed close-open body >=0.5 ATR20, and its range <=2 ATR20. Distance from 4h EMA20 <= one 4h ATR20 (same TR definition on 4h bars). Initial stop is decision close minus d\u00d71.5 hourly ATR20. Hypothesis: persistent structure plus contained confirmation avoids first-spike false positives.",
+      "falsifiable_sign": "Higher-cost net notional bps >0 AND incremental paired higher-cost bps >0 versus fixed controls, with simultaneous bounds; untested",
+      "family_rule_sha256": "50f256e73aefcdd14e67f809c568c7c9d2e3f8c0a144ad6553d7b0a1bf023722",
+      "formula_commit": "e5b2006a89441f7eb2ec900e508aff451106b87a",
+      "formula_file_sha256": "14378dde7668291dc87aef91e3e55fadddad3a444d1d49284efa2c3cbcba9a77",
+      "formula_verification": "EXACT_PINNED_TEXT_AND_ROSTER_MATCH",
+      "horizon_caveat": "12h hourly stress12/13 settlements requires280/296bp >250, static ineligible; hypothetical verified8h max2 requires120bp before tick",
+      "horizon_hours": 12,
+      "id": "STRUCTURAL_CONTINUATION_SHORT_12H",
+      "invalidation": "EMA/ER structure may be exhaustion or chop rather than persistent price adjustment",
+      "kind": "ORIGINAL_EIGHT_UNCHANGED",
+      "legal_inputs": [
+        "Complete 1m trade Kline for hourly/4h indicators",
+        "Continuous true-minute Mark for separate MTM",
+        "Settlement IDs/schedules/rates and PIT identity if actual funding claimed",
+        "Historical tick/lot/minimum filter and applicable fee/spread/impact provenance"
+      ],
+      "mechanism": "Persistent directional structure: slower counterparties/late liquidity repricing must fund continuation after delay",
+      "missingness": "Missing Kline or true-minute Mark hard stop; unknown funding is proxy-only, not zero; unknown filters/rights block",
+      "original_record": {
+        "direction": "SHORT",
+        "empirical_metrics": null,
+        "family": "STRUCTURAL_CONTINUATION",
+        "horizon_band": "6-12h",
+        "id": "STRUCTURAL_CONTINUATION_SHORT_12H",
+        "max_holding_hours": 12,
+        "new_hypothesis": true,
+        "rule_reference": "docs/strategy_research/g2_r3/METHOD_DESIGN.md (Concrete hypotheses and finite budget; STRUCTURAL_CONTINUATION row)",
+        "status": "PROPOSED_NOT_REGISTERED_NOT_EVALUATED",
+        "symbols": [
+          "BTCUSDT",
+          "ETHUSDT",
+          "SOLUSDT"
+        ]
+      },
+      "proof_floor": "Trade/Mark minute [O,O+60000) available O+120000; 1h decision H+60000; fill earliest H+120000; R1.2 ACK >= max(event+60000,required proof,extra delay)",
+      "score_inputs": {
+        "audit_cost": 3,
+        "causal": 4,
+        "falsifiable": 3,
+        "power": 1,
+        "source": 1
+      },
+      "score_reasons": {
+        "audit_cost": "Retest AM01 chronology costs more proof; neither engine route accepted",
+        "causal": "Simpler closed-bar continuation has fewer causal state obligations; retest requires three-hour cursor",
+        "falsifiable": "Retest boundary/first-confirmation admits more specific invalidation than persistence narrative",
+        "power": "4h continuation is less occupancy/filter constrained by definition; no measured rate",
+        "source": "No physical source/rights/true Mark admitted; score1 is prospective data type simplicity only"
+      },
+      "side": "SHORT",
+      "side_tail_caveat": "SHORT squeeze/up-gap and negative funding can be adverse",
+      "source_established": false,
+      "source_status": "SOURCE_BLOCKED_PENDING_P2",
+      "sparse_liquidity_caveat": "More filters/delay can lower support; no guaranteed fill/sample rate; spread/impact shocks can exceed proxies",
+      "universe_caveat": "Original BTC/ETH/SOL identical rules; BTC-only exposure100% fails <=60% positive cap; 3 assets share shocks, not independent replication"
+    },
+    {
+      "conservative_no_go": "Source/proof failure stops; static ineligible remains WAIT; no empirical economic verdict from toy payoff; all-WAIT diagnostic can retire resource path",
+      "entry_stop_target_reference": "Exact shared execution text plus family clause, no new gate; actual stop30-250bp; target2R; absolute gap<=.25ATR; SL-first/worse stop gap/fixed TP cap",
+      "exact_family_rule": "Same 4h EMA direction ordering, without ER or EMA-slope gate. A completed 1h close breaks the preceding 24 hourly high/low by >=0.25 ATR20, signed body >=0.5 ATR20. Freeze boundary and ATR at breakout. Only the next three closed hourly bars may confirm: LONG low touches [boundary-0.25ATR,boundary+0.25ATR], close >=boundary+0.10ATR and close>open; SHORT mirrored. First confirmation only. A preceding hourly close beyond boundary by 0.25ATR in the wrong direction cancels the event. Stop LONG is minimum low from breakout through confirmation minus 0.25 frozen ATR; SHORT is maximum high plus 0.25ATR. Hypothesis: rejection and recovery after breakout filters chasing.",
+      "falsifiable_sign": "Higher-cost net notional bps >0 AND incremental paired higher-cost bps >0 versus fixed controls, with simultaneous bounds; untested",
+      "family_rule_sha256": "e1f35adb5ca30e758d928279d68682a5f5c29a3bff83488a50e97ac933365bc7",
+      "formula_commit": "e5b2006a89441f7eb2ec900e508aff451106b87a",
+      "formula_file_sha256": "14378dde7668291dc87aef91e3e55fadddad3a444d1d49284efa2c3cbcba9a77",
+      "formula_verification": "EXACT_PINNED_TEXT_AND_ROSTER_MATCH",
+      "horizon_caveat": "4h hourly stress4/5 settlements requires stop152/168bp before tick",
+      "horizon_hours": 4,
+      "id": "CLOSED_RETEST_LONG_04H",
+      "invalidation": "A retest may be false recovery, delayed adverse selection, or simply miss the move",
+      "kind": "ORIGINAL_EIGHT_UNCHANGED",
+      "legal_inputs": [
+        "Complete 1m trade Kline for hourly/4h indicators",
+        "Continuous true-minute Mark for separate MTM",
+        "Settlement IDs/schedules/rates and PIT identity if actual funding claimed",
+        "Historical tick/lot/minimum filter and applicable fee/spread/impact provenance"
+      ],
+      "mechanism": "Boundary rejection and recovery: late chasers or trapped opposite inventory must fund continuation after confirmation",
+      "missingness": "Missing Kline or true-minute Mark hard stop; unknown funding is proxy-only, not zero; unknown filters/rights block",
+      "original_record": {
+        "direction": "LONG",
+        "empirical_metrics": null,
+        "family": "CLOSED_RETEST",
+        "horizon_band": "2-6h",
+        "id": "CLOSED_RETEST_LONG_04H",
+        "max_holding_hours": 4,
+        "new_hypothesis": true,
+        "rule_reference": "docs/strategy_research/g2_r3/METHOD_DESIGN.md (Concrete hypotheses and finite budget; CLOSED_RETEST row)",
+        "status": "PROPOSED_NOT_REGISTERED_NOT_EVALUATED",
+        "symbols": [
+          "BTCUSDT",
+          "ETHUSDT",
+          "SOLUSDT"
+        ]
+      },
+      "proof_floor": "Trade/Mark minute [O,O+60000) available O+120000; 1h decision H+60000; fill earliest H+120000; R1.2 ACK >= max(event+60000,required proof,extra delay)",
+      "score_inputs": {
+        "audit_cost": 1,
+        "causal": 3,
+        "falsifiable": 4,
+        "power": 1,
+        "source": 1
+      },
+      "score_reasons": {
+        "audit_cost": "Retest AM01 chronology costs more proof; neither engine route accepted",
+        "causal": "Simpler closed-bar continuation has fewer causal state obligations; retest requires three-hour cursor",
+        "falsifiable": "Retest boundary/first-confirmation admits more specific invalidation than persistence narrative",
+        "power": "4h continuation is less occupancy/filter constrained by definition; no measured rate",
+        "source": "No physical source/rights/true Mark admitted; score1 is prospective data type simplicity only"
+      },
+      "side": "LONG",
+      "side_tail_caveat": "Crowded LONG/down-gap and positive funding can be adverse",
+      "source_established": false,
+      "source_status": "SOURCE_BLOCKED_PENDING_P2",
+      "sparse_liquidity_caveat": "More filters/delay can lower support; no guaranteed fill/sample rate; spread/impact shocks can exceed proxies",
+      "universe_caveat": "Original BTC/ETH/SOL identical rules; BTC-only exposure100% fails <=60% positive cap; 3 assets share shocks, not independent replication"
+    },
+    {
+      "conservative_no_go": "Source/proof failure stops; static ineligible remains WAIT; no empirical economic verdict from toy payoff; all-WAIT diagnostic can retire resource path",
+      "entry_stop_target_reference": "Exact shared execution text plus family clause, no new gate; actual stop30-250bp; target2R; absolute gap<=.25ATR; SL-first/worse stop gap/fixed TP cap",
+      "exact_family_rule": "Same 4h EMA direction ordering, without ER or EMA-slope gate. A completed 1h close breaks the preceding 24 hourly high/low by >=0.25 ATR20, signed body >=0.5 ATR20. Freeze boundary and ATR at breakout. Only the next three closed hourly bars may confirm: LONG low touches [boundary-0.25ATR,boundary+0.25ATR], close >=boundary+0.10ATR and close>open; SHORT mirrored. First confirmation only. A preceding hourly close beyond boundary by 0.25ATR in the wrong direction cancels the event. Stop LONG is minimum low from breakout through confirmation minus 0.25 frozen ATR; SHORT is maximum high plus 0.25ATR. Hypothesis: rejection and recovery after breakout filters chasing.",
+      "falsifiable_sign": "Higher-cost net notional bps >0 AND incremental paired higher-cost bps >0 versus fixed controls, with simultaneous bounds; untested",
+      "family_rule_sha256": "e1f35adb5ca30e758d928279d68682a5f5c29a3bff83488a50e97ac933365bc7",
+      "formula_commit": "e5b2006a89441f7eb2ec900e508aff451106b87a",
+      "formula_file_sha256": "14378dde7668291dc87aef91e3e55fadddad3a444d1d49284efa2c3cbcba9a77",
+      "formula_verification": "EXACT_PINNED_TEXT_AND_ROSTER_MATCH",
+      "horizon_caveat": "12h hourly stress12/13 settlements requires280/296bp >250, static ineligible; hypothetical verified8h max2 requires120bp before tick",
+      "horizon_hours": 12,
+      "id": "CLOSED_RETEST_LONG_12H",
+      "invalidation": "A retest may be false recovery, delayed adverse selection, or simply miss the move",
+      "kind": "ORIGINAL_EIGHT_UNCHANGED",
+      "legal_inputs": [
+        "Complete 1m trade Kline for hourly/4h indicators",
+        "Continuous true-minute Mark for separate MTM",
+        "Settlement IDs/schedules/rates and PIT identity if actual funding claimed",
+        "Historical tick/lot/minimum filter and applicable fee/spread/impact provenance"
+      ],
+      "mechanism": "Boundary rejection and recovery: late chasers or trapped opposite inventory must fund continuation after confirmation",
+      "missingness": "Missing Kline or true-minute Mark hard stop; unknown funding is proxy-only, not zero; unknown filters/rights block",
+      "original_record": {
+        "direction": "LONG",
+        "empirical_metrics": null,
+        "family": "CLOSED_RETEST",
+        "horizon_band": "6-12h",
+        "id": "CLOSED_RETEST_LONG_12H",
+        "max_holding_hours": 12,
+        "new_hypothesis": true,
+        "rule_reference": "docs/strategy_research/g2_r3/METHOD_DESIGN.md (Concrete hypotheses and finite budget; CLOSED_RETEST row)",
+        "status": "PROPOSED_NOT_REGISTERED_NOT_EVALUATED",
+        "symbols": [
+          "BTCUSDT",
+          "ETHUSDT",
+          "SOLUSDT"
+        ]
+      },
+      "proof_floor": "Trade/Mark minute [O,O+60000) available O+120000; 1h decision H+60000; fill earliest H+120000; R1.2 ACK >= max(event+60000,required proof,extra delay)",
+      "score_inputs": {
+        "audit_cost": 1,
+        "causal": 3,
+        "falsifiable": 4,
+        "power": 1,
+        "source": 1
+      },
+      "score_reasons": {
+        "audit_cost": "Retest AM01 chronology costs more proof; neither engine route accepted",
+        "causal": "Simpler closed-bar continuation has fewer causal state obligations; retest requires three-hour cursor",
+        "falsifiable": "Retest boundary/first-confirmation admits more specific invalidation than persistence narrative",
+        "power": "4h continuation is less occupancy/filter constrained by definition; no measured rate",
+        "source": "No physical source/rights/true Mark admitted; score1 is prospective data type simplicity only"
+      },
+      "side": "LONG",
+      "side_tail_caveat": "Crowded LONG/down-gap and positive funding can be adverse",
+      "source_established": false,
+      "source_status": "SOURCE_BLOCKED_PENDING_P2",
+      "sparse_liquidity_caveat": "More filters/delay can lower support; no guaranteed fill/sample rate; spread/impact shocks can exceed proxies",
+      "universe_caveat": "Original BTC/ETH/SOL identical rules; BTC-only exposure100% fails <=60% positive cap; 3 assets share shocks, not independent replication"
+    },
+    {
+      "conservative_no_go": "Source/proof failure stops; static ineligible remains WAIT; no empirical economic verdict from toy payoff; all-WAIT diagnostic can retire resource path",
+      "entry_stop_target_reference": "Exact shared execution text plus family clause, no new gate; actual stop30-250bp; target2R; absolute gap<=.25ATR; SL-first/worse stop gap/fixed TP cap",
+      "exact_family_rule": "Same 4h EMA direction ordering, without ER or EMA-slope gate. A completed 1h close breaks the preceding 24 hourly high/low by >=0.25 ATR20, signed body >=0.5 ATR20. Freeze boundary and ATR at breakout. Only the next three closed hourly bars may confirm: LONG low touches [boundary-0.25ATR,boundary+0.25ATR], close >=boundary+0.10ATR and close>open; SHORT mirrored. First confirmation only. A preceding hourly close beyond boundary by 0.25ATR in the wrong direction cancels the event. Stop LONG is minimum low from breakout through confirmation minus 0.25 frozen ATR; SHORT is maximum high plus 0.25ATR. Hypothesis: rejection and recovery after breakout filters chasing.",
+      "falsifiable_sign": "Higher-cost net notional bps >0 AND incremental paired higher-cost bps >0 versus fixed controls, with simultaneous bounds; untested",
+      "family_rule_sha256": "e1f35adb5ca30e758d928279d68682a5f5c29a3bff83488a50e97ac933365bc7",
+      "formula_commit": "e5b2006a89441f7eb2ec900e508aff451106b87a",
+      "formula_file_sha256": "14378dde7668291dc87aef91e3e55fadddad3a444d1d49284efa2c3cbcba9a77",
+      "formula_verification": "EXACT_PINNED_TEXT_AND_ROSTER_MATCH",
+      "horizon_caveat": "4h hourly stress4/5 settlements requires stop152/168bp before tick",
+      "horizon_hours": 4,
+      "id": "CLOSED_RETEST_SHORT_04H",
+      "invalidation": "A retest may be false recovery, delayed adverse selection, or simply miss the move",
+      "kind": "ORIGINAL_EIGHT_UNCHANGED",
+      "legal_inputs": [
+        "Complete 1m trade Kline for hourly/4h indicators",
+        "Continuous true-minute Mark for separate MTM",
+        "Settlement IDs/schedules/rates and PIT identity if actual funding claimed",
+        "Historical tick/lot/minimum filter and applicable fee/spread/impact provenance"
+      ],
+      "mechanism": "Boundary rejection and recovery: late chasers or trapped opposite inventory must fund continuation after confirmation",
+      "missingness": "Missing Kline or true-minute Mark hard stop; unknown funding is proxy-only, not zero; unknown filters/rights block",
+      "original_record": {
+        "direction": "SHORT",
+        "empirical_metrics": null,
+        "family": "CLOSED_RETEST",
+        "horizon_band": "2-6h",
+        "id": "CLOSED_RETEST_SHORT_04H",
+        "max_holding_hours": 4,
+        "new_hypothesis": true,
+        "rule_reference": "docs/strategy_research/g2_r3/METHOD_DESIGN.md (Concrete hypotheses and finite budget; CLOSED_RETEST row)",
+        "status": "PROPOSED_NOT_REGISTERED_NOT_EVALUATED",
+        "symbols": [
+          "BTCUSDT",
+          "ETHUSDT",
+          "SOLUSDT"
+        ]
+      },
+      "proof_floor": "Trade/Mark minute [O,O+60000) available O+120000; 1h decision H+60000; fill earliest H+120000; R1.2 ACK >= max(event+60000,required proof,extra delay)",
+      "score_inputs": {
+        "audit_cost": 1,
+        "causal": 3,
+        "falsifiable": 4,
+        "power": 1,
+        "source": 1
+      },
+      "score_reasons": {
+        "audit_cost": "Retest AM01 chronology costs more proof; neither engine route accepted",
+        "causal": "Simpler closed-bar continuation has fewer causal state obligations; retest requires three-hour cursor",
+        "falsifiable": "Retest boundary/first-confirmation admits more specific invalidation than persistence narrative",
+        "power": "4h continuation is less occupancy/filter constrained by definition; no measured rate",
+        "source": "No physical source/rights/true Mark admitted; score1 is prospective data type simplicity only"
+      },
+      "side": "SHORT",
+      "side_tail_caveat": "SHORT squeeze/up-gap and negative funding can be adverse",
+      "source_established": false,
+      "source_status": "SOURCE_BLOCKED_PENDING_P2",
+      "sparse_liquidity_caveat": "More filters/delay can lower support; no guaranteed fill/sample rate; spread/impact shocks can exceed proxies",
+      "universe_caveat": "Original BTC/ETH/SOL identical rules; BTC-only exposure100% fails <=60% positive cap; 3 assets share shocks, not independent replication"
+    },
+    {
+      "conservative_no_go": "Source/proof failure stops; static ineligible remains WAIT; no empirical economic verdict from toy payoff; all-WAIT diagnostic can retire resource path",
+      "entry_stop_target_reference": "Exact shared execution text plus family clause, no new gate; actual stop30-250bp; target2R; absolute gap<=.25ATR; SL-first/worse stop gap/fixed TP cap",
+      "exact_family_rule": "Same 4h EMA direction ordering, without ER or EMA-slope gate. A completed 1h close breaks the preceding 24 hourly high/low by >=0.25 ATR20, signed body >=0.5 ATR20. Freeze boundary and ATR at breakout. Only the next three closed hourly bars may confirm: LONG low touches [boundary-0.25ATR,boundary+0.25ATR], close >=boundary+0.10ATR and close>open; SHORT mirrored. First confirmation only. A preceding hourly close beyond boundary by 0.25ATR in the wrong direction cancels the event. Stop LONG is minimum low from breakout through confirmation minus 0.25 frozen ATR; SHORT is maximum high plus 0.25ATR. Hypothesis: rejection and recovery after breakout filters chasing.",
+      "falsifiable_sign": "Higher-cost net notional bps >0 AND incremental paired higher-cost bps >0 versus fixed controls, with simultaneous bounds; untested",
+      "family_rule_sha256": "e1f35adb5ca30e758d928279d68682a5f5c29a3bff83488a50e97ac933365bc7",
+      "formula_commit": "e5b2006a89441f7eb2ec900e508aff451106b87a",
+      "formula_file_sha256": "14378dde7668291dc87aef91e3e55fadddad3a444d1d49284efa2c3cbcba9a77",
+      "formula_verification": "EXACT_PINNED_TEXT_AND_ROSTER_MATCH",
+      "horizon_caveat": "12h hourly stress12/13 settlements requires280/296bp >250, static ineligible; hypothetical verified8h max2 requires120bp before tick",
+      "horizon_hours": 12,
+      "id": "CLOSED_RETEST_SHORT_12H",
+      "invalidation": "A retest may be false recovery, delayed adverse selection, or simply miss the move",
+      "kind": "ORIGINAL_EIGHT_UNCHANGED",
+      "legal_inputs": [
+        "Complete 1m trade Kline for hourly/4h indicators",
+        "Continuous true-minute Mark for separate MTM",
+        "Settlement IDs/schedules/rates and PIT identity if actual funding claimed",
+        "Historical tick/lot/minimum filter and applicable fee/spread/impact provenance"
+      ],
+      "mechanism": "Boundary rejection and recovery: late chasers or trapped opposite inventory must fund continuation after confirmation",
+      "missingness": "Missing Kline or true-minute Mark hard stop; unknown funding is proxy-only, not zero; unknown filters/rights block",
+      "original_record": {
+        "direction": "SHORT",
+        "empirical_metrics": null,
+        "family": "CLOSED_RETEST",
+        "horizon_band": "6-12h",
+        "id": "CLOSED_RETEST_SHORT_12H",
+        "max_holding_hours": 12,
+        "new_hypothesis": true,
+        "rule_reference": "docs/strategy_research/g2_r3/METHOD_DESIGN.md (Concrete hypotheses and finite budget; CLOSED_RETEST row)",
+        "status": "PROPOSED_NOT_REGISTERED_NOT_EVALUATED",
+        "symbols": [
+          "BTCUSDT",
+          "ETHUSDT",
+          "SOLUSDT"
+        ]
+      },
+      "proof_floor": "Trade/Mark minute [O,O+60000) available O+120000; 1h decision H+60000; fill earliest H+120000; R1.2 ACK >= max(event+60000,required proof,extra delay)",
+      "score_inputs": {
+        "audit_cost": 1,
+        "causal": 3,
+        "falsifiable": 4,
+        "power": 1,
+        "source": 1
+      },
+      "score_reasons": {
+        "audit_cost": "Retest AM01 chronology costs more proof; neither engine route accepted",
+        "causal": "Simpler closed-bar continuation has fewer causal state obligations; retest requires three-hour cursor",
+        "falsifiable": "Retest boundary/first-confirmation admits more specific invalidation than persistence narrative",
+        "power": "4h continuation is less occupancy/filter constrained by definition; no measured rate",
+        "source": "No physical source/rights/true Mark admitted; score1 is prospective data type simplicity only"
+      },
+      "side": "SHORT",
+      "side_tail_caveat": "SHORT squeeze/up-gap and negative funding can be adverse",
+      "source_established": false,
+      "source_status": "SOURCE_BLOCKED_PENDING_P2",
+      "sparse_liquidity_caveat": "More filters/delay can lower support; no guaranteed fill/sample rate; spread/impact shocks can exceed proxies",
+      "universe_caveat": "Original BTC/ETH/SOL identical rules; BTC-only exposure100% fails <=60% positive cap; 3 assets share shocks, not independent replication"
+    },
+    {
+      "conservative_no_go": "Do not fund a future test without unique payer/control identification, complete sources and prospective budget",
+      "cost_geometry": "Same 22/44bp and adverse4/8bp per event comparator; 12h unknown-hourly stress ineligible",
+      "entry": "Breakout above a frozen boundary, later completed close back below; exact thresholds, lookback, cancel/time-out and side scope NOT_FROZEN; never invert original retest silently",
+      "falsifiable_sign": "Future fixed paired incremental higher-cost bps positive; no expectancy asserted",
+      "family": "FAILED_BREAKOUT_REVERSAL",
+      "formula_commit": null,
+      "formula_verification": "NO_FROZEN_FORMULA_NO_EXECUTION_AUTHORITY",
+      "horizon_hours": 4,
+      "id": "PROPOSED_FAILED_BREAKOUT_REVERSAL_SHORT_04H",
+      "invalidation": "Invalidated by persistent information trend or false recross; paired direction/timing controls must separate reversal from unconditional short",
+      "kind": "PROPOSED_ONLY_NOT_FROZEN",
+      "legal_inputs": "Kline+true Mark+funding/filter/fee rights; no added OI/L2 assumed",
+      "mechanism": "Failed resistance breakout reverses when trapped long inventory unwinds; opposite directional mechanism to continuation",
+      "missingness": "Missing any required source/rights/PIT proof: blocked; no cheaper replacement or OI/L2 assumption",
+      "proof_floor": "Future source-specific event/publication/receipt proof must be frozen; archive retrieval is not availability",
+      "score_inputs": {
+        "audit_cost": 2,
+        "causal": 3,
+        "falsifiable": 3,
+        "power": 1,
+        "source": 1
+      },
+      "score_reasons": {
+        "audit_cost": "Novel source adapters create new unaudited obligations",
+        "causal": "New source timing or failed-breakout chronological definition not yet frozen",
+        "falsifiable": "Mechanism permits a distinct hostile falsifier, not evidence of edge",
+        "power": "Conditional event density unknown",
+        "source": "No new source rights/availability established"
+      },
+      "side": "SHORT",
+      "source_established": false,
+      "source_status": "SOURCE_BLOCKED_PENDING_P2",
+      "sparse_liquidity_caveat": "More sources/conditional events may reduce effective support; low liquidity raises impact",
+      "stop_target": "Proposed comparator convention only: fixed stop30-250bp,target2R,no stop widening; exact construction NOT_FROZEN",
+      "universe_caveat": "No BTC-only positive waiver; common three-asset shocks retained"
+    },
+    {
+      "conservative_no_go": "Do not fund a future test without unique payer/control identification, complete sources and prospective budget",
+      "cost_geometry": "Same 22/44bp and adverse4/8bp per event comparator; 12h unknown-hourly stress ineligible",
+      "entry": "Only causally published funding/basis signal before decision; exact statistic/threshold/normalization NOT_FROZEN; positive payment benefits excluded from selection stress",
+      "falsifiable_sign": "Future fixed paired incremental higher-cost bps positive; no expectancy asserted",
+      "family": "FUNDING_CROWDING_REVERSAL",
+      "formula_commit": null,
+      "formula_verification": "NO_FROZEN_FORMULA_NO_EXECUTION_AUTHORITY",
+      "horizon_hours": 12,
+      "id": "PROPOSED_POSITIVE_FUNDING_CROWDING_SHORT_12H",
+      "invalidation": "Funding can reflect persistent information rather than crowding; public rate/basis cannot authenticate positioning; schedule/caps unknown",
+      "kind": "PROPOSED_ONLY_NOT_FROZEN",
+      "legal_inputs": "Synchronized admitted funding publication history+index/basis+Kline+true Mark+filters; OI optional separate blocked grant",
+      "mechanism": "Predictably expensive crowded longs unwind, a financing/positioning payer distinct from price confirmation",
+      "missingness": "Missing any required source/rights/PIT proof: blocked; no cheaper replacement or OI/L2 assumption",
+      "proof_floor": "Future source-specific event/publication/receipt proof must be frozen; archive retrieval is not availability",
+      "score_inputs": {
+        "audit_cost": 0,
+        "causal": 2,
+        "falsifiable": 2,
+        "power": 1,
+        "source": 0
+      },
+      "score_reasons": {
+        "audit_cost": "Novel source adapters create new unaudited obligations",
+        "causal": "New source timing or failed-breakout chronological definition not yet frozen",
+        "falsifiable": "Mechanism permits a distinct hostile falsifier, not evidence of edge",
+        "power": "Conditional event density unknown",
+        "source": "No new source rights/availability established"
+      },
+      "side": "SHORT",
+      "source_established": false,
+      "source_status": "SOURCE_BLOCKED_PENDING_P2",
+      "sparse_liquidity_caveat": "More sources/conditional events may reduce effective support; low liquidity raises impact",
+      "stop_target": "Proposed comparator convention only: fixed stop30-250bp,target2R,no stop widening; exact construction NOT_FROZEN",
+      "universe_caveat": "No BTC-only positive waiver; common three-asset shocks retained"
+    },
+    {
+      "conservative_no_go": "Do not fund a future test without unique payer/control identification, complete sources and prospective budget",
+      "cost_geometry": "Same 22/44bp and adverse4/8bp per event comparator; 12h unknown-hourly stress ineligible",
+      "entry": "Archived sequence-correct L2 and signed trades demonstrating absorption; persistence/window/imbalance threshold NOT_FROZEN, observation must survive latency",
+      "falsifiable_sign": "Future fixed paired incremental higher-cost bps positive; no expectancy asserted",
+      "family": "LIQUIDITY_ABSORPTION_REVERSAL",
+      "formula_commit": null,
+      "formula_verification": "NO_FROZEN_FORMULA_NO_EXECUTION_AUTHORITY",
+      "horizon_hours": 4,
+      "id": "PROPOSED_LIQUIDITY_ABSORPTION_LONG_04H",
+      "invalidation": "Spoofed quotes, hidden inventory, adverse selection and disappearing depth can erase absorption; no queue/maker benefit assumed",
+      "kind": "PROPOSED_ONLY_NOT_FROZEN",
+      "legal_inputs": "Rights-approved sequence-correct L2/signed trades/synchronized receipts+true Mark+Kline+funding/filter; all L2 availability unestablished",
+      "mechanism": "Aggressive selling absorbed by replenishing bids exhausts forced sellers; microstructure inventory payer distinct from closed-bar trend",
+      "missingness": "Missing any required source/rights/PIT proof: blocked; no cheaper replacement or OI/L2 assumption",
+      "proof_floor": "Future source-specific event/publication/receipt proof must be frozen; archive retrieval is not availability",
+      "score_inputs": {
+        "audit_cost": 0,
+        "causal": 2,
+        "falsifiable": 4,
+        "power": 1,
+        "source": 0
+      },
+      "score_reasons": {
+        "audit_cost": "Novel source adapters create new unaudited obligations",
+        "causal": "New source timing or failed-breakout chronological definition not yet frozen",
+        "falsifiable": "Mechanism permits a distinct hostile falsifier, not evidence of edge",
+        "power": "Conditional event density unknown",
+        "source": "No new source rights/availability established"
+      },
+      "side": "LONG",
+      "source_established": false,
+      "source_status": "SOURCE_BLOCKED_PENDING_P2",
+      "sparse_liquidity_caveat": "More sources/conditional events may reduce effective support; low liquidity raises impact",
+      "stop_target": "Proposed comparator convention only: fixed stop30-250bp,target2R,no stop widening; exact construction NOT_FROZEN",
+      "universe_caveat": "No BTC-only positive waiver; common three-asset shocks retained"
+    }
+  ],
+  "frozen_rule_summary": {
+    "BTC_protected": "[2026-02-01,2026-08-01) sealed; includes Option B Feb-Apr2026",
+    "base_adverse_funding_bp_per_event": 4,
+    "base_round_trip_bp": 22,
+    "capital_buffer": "0.05",
+    "funding_buffer": "1.10",
+    "horizons_hours": [
+      4,
+      12
+    ],
+    "initial_candidate_scenario_usdt": 1000,
+    "kill_drawdown_usdt": 100,
+    "max_intended_notional_leverage": "1",
+    "max_single_asset_positive_support_fraction": "0.60",
+    "per_asset_ceiling": "333.333333333333",
+    "stop_bp": [
+      30,
+      250
+    ],
+    "stress_adverse_funding_bp_per_event": 8,
+    "stress_round_trip_bp": 44,
+    "target_R": 2
+  },
+  "method_lineage": {
+    "R1_1": "cf2d5cc33774cdcff7d709636305bba830e977ef",
+    "R1_2": "821d23427a5f6d0b4635f32f226ddc779358ab72",
+    "R1_2_NOT_EQUIVALENT_R1_1": true
+  },
+  "multiplicity": {
+    "baseline": "8 candidates x BASE/STRESS descriptive paths; selection only higher-cost net and incremental: original16 one-sided comparisons alpha.05/16",
+    "combined_release": "No combined inference now. Any future common-family claim must preallocate global error across baseline/proposed families before outcomes",
+    "proposed": "3 new concept proposals, not reused four relinquished slots; NONE admitted; separate future new campaign/budget; direction/horizon/filter choices count as tests"
+  },
+  "original_count": 8,
+  "original_formula_authority": {
+    "alias": "method",
+    "blob": "fb701b0be825f85801377f86eb80ba4f766ebaed",
+    "path": "docs/strategy_research/g2_r3/METHOD_DESIGN.md",
+    "sha": "e5b2006a89441f7eb2ec900e508aff451106b87a",
+    "sha256": "14378dde7668291dc87aef91e3e55fadddad3a444d1d49284efa2c3cbcba9a77",
+    "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/e5b2006a89441f7eb2ec900e508aff451106b87a/docs/strategy_research/g2_r3/METHOD_DESIGN.md"
+  },
+  "original_shared_common_verbatim": "Common definitions: closed epoch-UTC 1m bars form 1h and 4h bars; missing minutes invalidate bars. ATR20 is the arithmetic mean of 20 hourly true ranges using prior closes. EMA20/EMA50 on 4h closes use SMA seeds then alpha 2/(N+1); require at least 60 completed 4h bars. ER12 is absolute 12-bar close displacement divided by sum of absolute consecutive displacements, with zero denominator ineligible. Direction sign d is +1 LONG, -1 SHORT. Thresholds below are design constants, not fitted to R2 returns; approval may amend them only before the later outcome campaign freeze.",
+  "original_shared_execution_verbatim": "For both families: hourly decision at exclusive hour end+60s assumed availability; earliest fill at following minute open (hour end+120s). At decision ATR20/close must be 30\u2013250bps. At fill, signed gap from decision close >0.25 ATR20 or an invalid stop vetoes entry; adverse and favorable gaps use the same absolute-gap veto. Risk distance at actual modeled entry must be 30\u2013250bps. Fixed stop is not moved to pass economics. Target is entry+d\u00d72\u00d7initial risk distance; maximum hold is exactly 4h or12h from fill. Stop/target/time exit, no trailing, partial TP, averaging down or new position within an open same-symbol position. If a1m bar touches both stop and target, SL resolves first. An open beyond the adverse stop executes at that worse open; an ordinary stop executes at stop, then adverse friction. Target executes at its fixed price even if the open gaps favorably beyond it, with taker friction and no gap overcredit. Time exit uses the first minute open at/after entry+maxhold; stop at that open takes precedence. All exits use adverse tick rounding and friction exactly once; no same-bar hindsight fill. After exit, four-hour cooldown; structural family additionally needs a newer completed 4h bar than its preceding entry. Retest event identity is symbol/direction/breakout-hour; at most one entry per event per variant, even after cooldown. Gap-veto/no-fill never retries the event. Every WAIT/veto/overlap is retained.",
+  "proposed_count": 3,
+  "schema": "POSTP1_HYPOTHESES_REGISTER_V1",
+  "total_count": 11
+}

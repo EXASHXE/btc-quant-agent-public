@@ -1,0 +1,50 @@
+{
+  "cost_assumptions": {
+    "BASE_FROZEN_PROXY": {
+      "adverse_event_bp": 4,
+      "round_trip_bp": 22
+    },
+    "LOW_NONSELECTABLE_ILLUSTRATION": {
+      "adverse_event_bp": 2,
+      "round_trip_bp": 11
+    },
+    "STRESS_FROZEN_PROXY": {
+      "adverse_event_bp": 8,
+      "round_trip_bp": 44
+    }
+  },
+  "economics_scores": {
+    "12": {
+      "BASE_FROZEN_PROXY": 1,
+      "LOW_NONSELECTABLE_ILLUSTRATION": 2,
+      "STRESS_FROZEN_PROXY": 0
+    },
+    "4": {
+      "BASE_FROZEN_PROXY": 3,
+      "LOW_NONSELECTABLE_ILLUSTRATION": 4,
+      "STRESS_FROZEN_PROXY": 2
+    }
+  },
+  "missing_source_hard_gate": "SOURCE_BLOCKED_PENDING_P2",
+  "priorities_are_conditional": true,
+  "rank_scope": "CONDITIONAL_RESEARCH_TEST_PRIORITY_NOT_RETURN_RANK",
+  "schema": "EX_ANTE_RESEARCH_PRIORITY_RUBRIC_V1",
+  "score_scale": [
+    0,
+    4
+  ],
+  "source_states": [
+    "READY_METADATA_ONLY",
+    "UNKNOWN",
+    "MULTIASSET_INCOMPLETE"
+  ],
+  "tie_rule": "Equal scores are substantive ties; lexical IDs only stabilize display",
+  "weights": {
+    "audit_cost": 10,
+    "causal": 20,
+    "economics": 20,
+    "falsifiable": 20,
+    "power": 15,
+    "source": 15
+  }
+}
