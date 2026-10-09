@@ -1415,7 +1415,7 @@
     "ci_conclusion": "FAILURE_2819_PASS_1_H40_GOLDEN_FAIL_2_SKIP"
   },
   "v06_g2_r3_p1_engine_architecture_rebuild_v1": {
-    "status": "CONTROLLER_ADJUDICATED_B_R2_FAILURE__GEMINI_A_ARCH_V1_DISPATCHED_NOT_YET_EXECUTED",
+    "status": "ARCH_V1_RECEIVED_SCOPE_VALID_NOT_ACCEPTED__CI_TYPE_AND_E2E_EVIDENCE_REPAIR_REQUIRED",
     "task_id": "V06_G2_R3_P1_ENGINE_ARCHITECTURE_REBUILD_V1",
     "controller_dispatch_sha": "e5fcd76370a1b03d7d83b825af6a8cac842b1ae5",
     "controller_adjudication_path": "reviews/v0.6/b_line/V06_G2_R3_B_R2_TERMINAL_CONTROLLER_ADJUDICATION_AND_ENGINE_ARCHITECTURE_REPLAN_R1.md",
@@ -1425,17 +1425,30 @@
     "expected_start_sha": "2c60b0653d3619eedf457753511a9ecc84c1cd5b",
     "independent_b_source_sha": "068a4005f68b5ee4a970063cb1f3bc524a08784a",
     "scope": "ONE_BOUNDED_POSITION_ID_EVENT_CLOCK_RESERVE_LEDGER_ARCHITECTURE_REFACTOR",
-    "next_gate": "ONE_INDEPENDENT_SYNTHETIC_ENGINE_BEHAVIOR_REVIEW",
+    "next_gate": "ONE_SAME_TASK_MAINTENANCE_CORRECTION_THEN_ONE_INDEPENDENT_B_BEHAVIOR_AUDIT",
     "fail_stop": "ARCH_V1_FAILURE_REPLAN_ALTERNATIVE_ENGINE_NO_R4_R5_PATCH_LOOP",
     "h40_golden": "REPRODUCIBLE_MISMATCH_NOT_WAIVED",
     "p1_engine_acceptance": "NO",
     "empirical_market_body_authority": "NONE",
     "effective_prereg_sha": "NONE",
     "testnet": "NOT_AUTHORIZED",
-    "real_funds_write_authority": "NONE"
+    "real_funds_write_authority": "NONE",
+    "a_delivered_implementation_sha": "89d0c211cff96286203e4fb7459a51042c1257f1",
+    "a_delivered_evidence_head_sha": "398e6bab0cdedf07a93827019ca4bf1bf913c7f9",
+    "a_ci_run": "https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/37910374856",
+    "a_ci_conclusion": "FAILURE_NEW_MYPY_LEDGER_L904_BEFORE_PYTEST",
+    "controller_l2_sha": "dca82909aeaef380a5c2e9866238ccbbe0114fad",
+    "ci_evidence_closure_dispatch_sha": "dca82909aeaef380a5c2e9866238ccbbe0114fad",
+    "ci_evidence_closure_prompt_sha": "97a3708d5c6063c6926b2aa1c26be3d98e7a7c78",
+    "ci_evidence_closure_prompt_path": "prompts/v0.6/b_line/V06_G2_R3_P1_ARCH_V1_GEMINI_A_FINAL_CI_EVIDENCE_CLOSURE_R1.md",
+    "evidence_discrepancies": [
+      "RECEIPT_FALSE_EIGHT_CANDIDATE_NAMES_WHILE_SOURCE_REGISTRY_CORRECT",
+      "RECEIPT_ZERO_TRADE_FLAT_BOOK_NOT_NONEMPTY_REPLAY_E2E",
+      "NEW_MYPY_ERROR_LEDGER_904"
+    ]
   },
   "v06_g2_r3_parallel_scientific_strategy_review_sol_high_r1": {
-    "status": "CONTROLLER_DISPATCHED__SOL_NOT_YET_EXECUTED",
+    "status": "CONTROLLER_L2_ACCEPTED_SCIENCE_READY_CONDITIONAL_PROXY_DIAGNOSTIC_ONLY",
     "task_id": "V06_G2_R3_SCIENTIFIC_STRATEGY_REVIEW_SOL_HIGH_R1",
     "review_kind": "INCREMENTAL_OUTCOME_BLIND_MECHANISM_COST_POWER",
     "executor_preference": "GPT_6_SOL_HIGH_WHEN_EXTERNALLY_SELECTABLE",
@@ -1455,13 +1468,20 @@
       "ECONOMIC_NO_GO",
       "INSUFFICIENT_EVIDENCE"
     ],
-    "astra": "NOT_AUTHORIZED_PENDING_SOL_CONTROLLER_MATERIAL_DISPUTE_GATE",
+    "astra": "NOT_REQUIRED_FOR_RESTRICTED_DESCRIPTIVE_A",
     "p1_status_preserved": "ARCH_V1_IMPLEMENTATION_DISPATCHED",
     "p2_status_preserved": "LOCAL_ROOT_UNKNOWN",
     "p3_p4_permissions": "NONE",
     "protected_holdout_access": "NONE",
     "empirical_market_body_access": "NONE",
     "testnet": "NOT_AUTHORIZED",
-    "real_funds_write_authority": "NONE"
+    "real_funds_write_authority": "NONE",
+    "sol_final_sha": "57818b967a836382caa3fa95516d3e027e990f61",
+    "verdict": "SCIENCE_READY",
+    "claim_scope": "ONE_OUTCOME_BLIND_CONDITIONAL_PROXY_DEVELOPMENT_DIAGNOSTIC_NO_FORMAL_ALPHA_OR_ECONOMIC_NO_GO",
+    "recommendation": "A_CURRENT_8_UNCHANGED_ONE_FINITE_DIAGNOSTIC",
+    "ci_run": "https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/37912110684",
+    "ci_conclusion": "FAILURE_REPO_WIDE_RUFF_SIX_H41_UNCHANGED_EVIDENCE_FINDINGS",
+    "controller_l2_sha": "dca82909aeaef380a5c2e9866238ccbbe0114fad"
   }
 }
