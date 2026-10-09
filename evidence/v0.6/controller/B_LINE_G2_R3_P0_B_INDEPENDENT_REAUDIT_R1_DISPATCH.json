@@ -1,0 +1,68 @@
+{
+  "schema_version": "V06_G2_R3_P0_B_INDEPENDENT_REAUDIT_R1_DISPATCH_V1",
+  "task_id": "V06_G2_R3_P0_B_INDEPENDENT_REAUDIT_R1",
+  "decision": "A_REPAIR_RECEIVED_NOT_ACCEPTED__GEMINI_B_INDEPENDENT_ADVERSARIAL_REAUDIT_AUTHORIZED",
+  "repo": "EXASHXE/btc-quant-agent-public",
+  "docs_parent_sha": "b31130c41f5a66975ef54a91d884567562e066bd",
+  "a_original_sha": "3b8befb0112cfe2d314ad65964762a3fb251e710",
+  "a_repair_initial_sha": "2f0383816127cb7d87cf5deb559aeda0b04f1624",
+  "a_repair_exact_sha": "5c542edd418a74b440162610fd540b1f01e423d3",
+  "a_controller_lint_fix_parent": "2f0383816127cb7d87cf5deb559aeda0b04f1624",
+  "a_repair_branch": "feature/v06-bline-g2-overnight-discovery-a",
+  "b_existing_sha": "a0aacd105ac3f3173b15d91c869990748178e222",
+  "b_branch": "feature/v06-bline-g2-overnight-verifier-b",
+  "b_worktree": "~/workspace/project/quant-v0.6/g2-overnight-verifier-b",
+  "start_cwd": "~/workspace/project/quant-v0.6",
+  "code_baseline_sha": "e0ff8c3473de4bfa3e66fe7928d42992a4d38a32",
+  "method_sha": "cf2d5cc33774cdcff7d709636305bba830e977ef",
+  "previous_controller_dispatch_sha": "e94d53c1f98f16d8d3881737564f773bc2584f28",
+  "a_initial_ci": {
+    "run": 37873215393,
+    "conclusion": "FAILURE",
+    "reason": "F821 missing typing.Any import in new tests; pytest not entered"
+  },
+  "a_post_controller_one_line_ci": {
+    "run": 37875087577,
+    "status_at_dispatch": "IN_PROGRESS",
+    "conclusion": "NOT_YET_VERIFIED",
+    "must_terminal_verify": true
+  },
+  "scope": "INDEPENDENT_SYNTHETIC_ORACLE_STATIC_AND_DYNAMIC_REAUDIT_ONLY",
+  "allowed_changes": [
+    "scripts/strategy_research/r3_verification/**",
+    "tests/test_v06_g2_r3_verifier_*.py",
+    "docs/strategy_research/g2_r3/prep_b/repair_r1/**",
+    "evidence/v0.6/b_line/g2_overnight_p0_b/repair_r1/**"
+  ],
+  "forbidden": [
+    "editing A source/branch or live worktree",
+    "reading actual market price mark or funding bodies",
+    "protected v03 BTC holdout",
+    "protected RC2/H40/H41 outcome",
+    "experimental historical signal replay",
+    "candidate tuning",
+    "signed/exchange private API",
+    "testnet or real trades",
+    "changing frozen B original evidence"
+  ],
+  "mandatory_findings": [
+    "A01",
+    "A02",
+    "A03",
+    "A04",
+    "A05",
+    "A06",
+    "A07",
+    "A08"
+  ],
+  "must_independently_reproduce": true,
+  "must_verify_a_scope_and_metamorphic_invariants": true,
+  "allow_oracle_fix_if_reported_and_tested": true,
+  "claimed_status_at_activation": "REVIEW_AUTHORIZED__NO_PASS_ASSUMED",
+  "if_a_remote_moves": "STOP_AND_REBIND",
+  "if_b_remote_moves": "STOP_AND_REBIND",
+  "historical_market_body_authority": "NONE",
+  "testnet": "NOT_AUTHORIZED",
+  "real_funds_write_authority": "NONE",
+  "prompt_path": "prompts/v0.6/b_line/V06_G2_R3_P0_GEMINI_B_INDEPENDENT_REAUDIT_R1.md"
+}
