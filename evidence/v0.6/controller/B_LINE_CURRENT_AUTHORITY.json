@@ -1433,5 +1433,35 @@
     "effective_prereg_sha": "NONE",
     "testnet": "NOT_AUTHORIZED",
     "real_funds_write_authority": "NONE"
+  },
+  "v06_g2_r3_parallel_scientific_strategy_review_sol_high_r1": {
+    "status": "CONTROLLER_DISPATCHED__SOL_NOT_YET_EXECUTED",
+    "task_id": "V06_G2_R3_SCIENTIFIC_STRATEGY_REVIEW_SOL_HIGH_R1",
+    "review_kind": "INCREMENTAL_OUTCOME_BLIND_MECHANISM_COST_POWER",
+    "executor_preference": "GPT_6_SOL_HIGH_WHEN_EXTERNALLY_SELECTABLE",
+    "controller_dispatch_sha": "7da2b9e65848c3c547d940ded60a57f71314c64f",
+    "dispatch_path": "reviews/v0.6/b_line/V06_G2_R3_SCIENTIFIC_STRATEGY_REVIEW_CONTROLLER_DISPATCH_R1.md",
+    "prompt_sha": "07c84a0abde67248d0fa53c38533426d2c26af08",
+    "prompt_path": "prompts/v0.6/b_line/V06_G2_R3_SCIENTIFIC_STRATEGY_REVIEW_SOL_HIGH_R1.md",
+    "science_branch": "feature/v06-bline-g2-r3-scientific-strategy-review-sol61-r1",
+    "branch_start_sha": "7da2b9e65848c3c547d940ded60a57f71314c64f",
+    "prior_sol_science_sha": "fc89f05014b61c51a55141cb419948f4eee9d8f3",
+    "frozen_eight_sha": "e5b2006a89441f7eb2ec900e508aff451106b87a",
+    "method_publication_sha": "cf2d5cc33774cdcff7d709636305bba830e977ef",
+    "audit_evidence_domain": "PUBLISHED_METHODS_AND_ALREADY_ACCEPTED_R2_AGGREGATE_ONLY",
+    "possible_verdicts": [
+      "SCIENCE_READY",
+      "METHOD_REPAIR_REQUIRED",
+      "ECONOMIC_NO_GO",
+      "INSUFFICIENT_EVIDENCE"
+    ],
+    "astra": "NOT_AUTHORIZED_PENDING_SOL_CONTROLLER_MATERIAL_DISPUTE_GATE",
+    "p1_status_preserved": "ARCH_V1_IMPLEMENTATION_DISPATCHED",
+    "p2_status_preserved": "LOCAL_ROOT_UNKNOWN",
+    "p3_p4_permissions": "NONE",
+    "protected_holdout_access": "NONE",
+    "empirical_market_body_access": "NONE",
+    "testnet": "NOT_AUTHORIZED",
+    "real_funds_write_authority": "NONE"
   }
 }
