@@ -1,0 +1,1925 @@
+{
+  "A_frozen_target": "b5d34aacd36dc27454944a22436db555c3f6eeb8",
+  "A_parent": "398e6bab0cdedf07a93827019ca4bf1bf913c7f9",
+  "B_dispatch_sha": "5f9b7f75215b394ad86d49b468e7acd9a89c23a2",
+  "B_final_sha": "52ee5f1e582defbfb0bb3c8bb29101a1d40d9cd7",
+  "B_parent": "068a4005f68b5ee4a970063cb1f3bc524a08784a",
+  "candidate_ids_unchanged": [
+    "STRUCTURAL_CONTINUATION_LONG_04H",
+    "STRUCTURAL_CONTINUATION_LONG_12H",
+    "STRUCTURAL_CONTINUATION_SHORT_04H",
+    "STRUCTURAL_CONTINUATION_SHORT_12H",
+    "CLOSED_RETEST_LONG_04H",
+    "CLOSED_RETEST_LONG_12H",
+    "CLOSED_RETEST_SHORT_04H",
+    "CLOSED_RETEST_SHORT_12H"
+  ],
+  "claim_scope": "一次有界选型，推荐 A 并提供完整条件实施合同；Controller 冻结 AM01/AM02 前不得实施，不存在 accepted engine、有效 prereg 或行情正文权限。",
+  "code_baseline_sha": "e0ff8c3473de4bfa3e66fe7928d42992a4d38a32",
+  "controller_action": "一次裁定并冻结 AM01 Retest 双角色/首次确认/策略时钟及 AM02 可见 pending 风险/来源证明/覆盖并集；通过后另发 Gemini A 一次完整实现、B/Sol 一次独立审计任务，重大失败则停止。",
+  "controller_dispatch_sha": "b74b932da32e4b5bbe2477c2de014f94719d6a93",
+  "counter_scope": "Executor/teamtaskactions only, not globalnetworktelemetry. Exactsource/hermeticsyntheticartifacts/publiclibrarydocsread; noactualsyntheticexperimentsrerun.",
+  "design_static_review": "Independent read-only contract check identified and corrected: nonnegative admission assertion, T12 ExitAck clock, pending slice gain/loss netting, atomic visible-fee cover conversion. No runtime tests or market data.",
+  "downstream_gemini_contract": {
+    "acceptance_thresholds": "34/34 independently executed semantic cases, 0 FAIL/0 SKIP/0 XFAIL; all applicable transition invariants; nonempty winning/losing 4h and 12h BASE full replays; all terminal balances zero; exact 8 IDs; deterministic Decimal/context/platform checks; 0 market/protected/private/live actions. Report full CI accurately; never edit or waive H40 golden.",
+    "after_acceptance": "Independent Controller engine acceptance + P2 source/rights/true-mark admission + existing restricted science contract -> separately authorized NEW first-pushed prereg at docs/strategy_research/g2_r3/preregistration_r1/** -> remote exact-SHA verification -> separate P4 body capability. No such authority is granted here.",
+    "allowed_new_implementation_paths": [
+      "src/btc_quant_agent/strategy_research/r3_alt_engine/**",
+      "tests/test_r3_alt_events_money.py",
+      "tests/test_r3_alt_clock_execution.py",
+      "tests/test_r3_alt_retest_replay.py",
+      "scripts/strategy_research/r3_alt_engine/run_synthetic.py",
+      "docs/strategy_research/g2_r3/p1_alt_engine_impl_r1/**",
+      "evidence/v0.6/b_line/g2_r3_p1_alt_engine_impl_r1/**"
+    ],
+    "arch_design_source": "This artifact final remoteSHA supplied externally aftercommit; Controller must bind it by exactSHA plus AM01/AM02 adoptedmethodversion.",
+    "book_kill": "Orthogonal, permanent latch; financial owners continue settling after new entries are disabled.",
+    "branch_start": "NEW_CONTROLLER_IMPLEMENTATION_DISPATCH_SHA explicitly bound to codebase; no inventeddispatch or branch created by this design.",
+    "code_base_sha": "e0ff8c3473de4bfa3e66fe7928d42992a4d38a32",
+    "event_kinds": 12,
+    "final_independent_budget": "ONE independent behavioral audit after ONE coherent build. Any material failure stops the alternative-engine route; no automatic implementation patch/re-audit cycle.",
+    "forbidden": [
+      "existing src/** except newpackage",
+      "existing tests/** except namednewtests",
+      "originalA/Bcode/evidence/refs/worktrees",
+      "candidate_registry andoriginalformula artifacts",
+      "P2data/contracts",
+      "H40golden/CI/workflows/projectstatus",
+      "marketread/fetchers/CSV/Parquet/ZIP/archive/bodies",
+      "privateaccount/secrets/live/testnet"
+    ],
+    "implementation_branch": "feature/v06-bline-g2-r3-p1-alt-engine-gemini-a-r1",
+    "implementation_scope": "One coherent build, focused synthetic checks during development, one final independent exact-SHA behavioral audit. No parallel architecture prototypes or R4/R5 repair sequence after a material final-audit failure.",
+    "implementation_worktree_suggestion": "/root/workspace/project/quant-v0.6/g2-p1-alt-engine-gemini-a-r1 (inspectabsence/owner beforecreate)",
+    "independent_branch_suggestion": "feature/v06-bline-g2-r3-p1-alt-engine-gemini-b-r1, newControllerauditstartdescendsfrozenimplementationSHA; neverreuseoldBbranch.",
+    "module_plan": [
+      [
+        "model.py",
+        "8 个 frozen records：Event、Posting、OwnerLedger、RetestState、Projection、EngineState、ReplayConfig、ReplayReport；规范 Bar/Mark 值类型与枚举。",
+        "新包内单一职责；禁止旧 mutable lifecycle import。"
+      ],
+      [
+        "journal.py",
+        "validate_event、稳定 ID/digest、source-close 冲突、balanced posting batch、append sequence/hash；不读外部 I/O。",
+        "新包内单一职责；禁止旧 mutable lifecycle import。"
+      ],
+      [
+        "money.py",
+        "post_owner_flow、project_asof、assert_money_invariants；owner 子账为权威，派生聚合、Decimal 局部上下文。",
+        "新包内单一职责；禁止旧 mutable lifecycle import。"
+      ],
+      [
+        "reducer.py",
+        "reduce(state,event,config)->new_state,postings,scheduled_events；事务性不可变归约；报告不能调度风控。",
+        "新包内单一职责；禁止旧 mutable lifecycle import。"
+      ],
+      [
+        "clock.py",
+        "ingest/advance_to(aligned O)，available 过滤、因果拓扑/typed tie、ACK queue；执行与知识索引分开。",
+        "新包内单一职责；禁止旧 mutable lifecycle import。"
+      ],
+      [
+        "execution.py",
+        "resolve_exit 和 effective_fill 纯函数；SL-first/worse gap/全部有利退出封顶/精确到期/一次摩擦。",
+        "新包内单一职责；禁止旧 mutable lifecycle import。"
+      ],
+      [
+        "signals.py",
+        "reduce_completed_hour，规范 Retest cursor 和结构纯谓词；AM01 已冻结才启用，variant 消费不共享。",
+        "新包内单一职责；禁止旧 mutable lifecycle import。"
+      ],
+      [
+        "frozen_primitives.py",
+        "按固定 A/method 捕获原 registry/constants、纯聚合/ATR/EMA/ER/cost/rounding，附 hash；只改 imports，不导入旧生命周期。",
+        "新包内单一职责；禁止旧 mutable lifecycle import。"
+      ],
+      [
+        "replay.py",
+        "ReplayEngine.run_simulation(SyntheticDataset,ReplayConfig)->ReplayReport；只接收内存合成输入，无 fetcher/交易接口。",
+        "新包内单一职责；禁止旧 mutable lifecycle import。"
+      ]
+    ],
+    "owner_phase_names": [
+      "FLAT",
+      "RESERVED",
+      "UNACKED_OPEN",
+      "ACKED_OPEN",
+      "EXIT_PENDING",
+      "CLOSED_UNSETTLED",
+      "COOLDOWN"
+    ],
+    "owner_phases": 7,
+    "proof_protocol": "Separate B/Sol authors a runtime oracle from this contract. Archive the exact implementation SHA, verify imported module paths and source hashes, execute every case, and reconstruct expected money from the account journal independently of production money helpers. Saved matrix assertions are publication checks, not runtime proof.",
+    "record_types": 8,
+    "required_configuration": "Exact 8 formulas/IDs; unchanged 22/44bp transactions, 4/8bp adverse funding proxies, 50-digit Decimal and 12dp postings; synthetic filters/proof clocks; Controller-adopted AM01/AM02 root; all 34 oracle cases.",
+    "retest_phases": [
+      "IDLE",
+      "AWAITING",
+      "CONFIRMED",
+      "CANCELED",
+      "EXPIRED"
+    ],
+    "status": "DRAFT_BLOCKED_ON_AM01_AM02_NEW_CONTROLLER_DISPATCH"
+  },
+  "eight_formula_sha": "e5b2006a89441f7eb2ec900e508aff451106b87a",
+  "engine_options": [
+    {
+      "PIT": "经济执行、可见风险、ACK 现金分离；所有风险事件受 available_at 和来源证明约束。",
+      "dependency_license": "标准库 Decimal，无新增运行依赖。复制项目源片段保留许可/来源说明。",
+      "disposition": "选择；实施前须冻结 AM01/AM02",
+      "eight_candidates": "八候选不变；仅捕获核验过的纯公式/值类型，重建生命周期和 Retest 状态。",
+      "funding": "owner/settlement 子账保留条件覆盖、最终 payable、短缺，直到 ACK；关闭仓位不会删除义务。",
+      "id": "A",
+      "incremental_benefit": "相比失败 A，资金权威来自统一账本而非 Stage1/7、ID set、side dict；pending 亏损不会随仓位删除消失。",
+      "isolation_migration": "独立新包、新分支；禁止导入或继承 VirtualBook，无伪兼容 wrapper。",
+      "name": "A：事件溯源研究微引擎",
+      "state_and_events": "8 immutable records; 12 event kinds; 7 owner phases, an orthogonal permanent book-kill latch, and 5 Retest phases.",
+      "stop": "未冻结规范或一次最终独立审计存在重大失败即停止，不进入 R4/R5。",
+      "surface": "9 个功能模块及 __init__，共 10 个生产文件；3 个实现方测试模块、1 个合成 runner；独立审计方另写 oracle。数量是拟定范围，不是工期承诺。",
+      "testability": "每笔分录守恒、每个 owner 余额可重建；独立 oracle 不调用生产资本函数。"
+    },
+    {
+      "PIT": "固定版本文档规定 close ts_init 和合成 OHLC 路径；R3 仍需 +60s 可用性、下一分钟开盘及 SL-first。",
+      "dependency_license": "官方 release/tag/commit 已固定；Python >=3.12,<3.15；LGPL-3.0-or-later 元数据和 LGPL3 LICENSE。编译平台、版本与分发义务增加集成风险；未安装。",
+      "disposition": "本任务拒绝采用；不否定该框架的一般能力",
+      "eight_candidates": "可通过策略适配保留，但不能假设原生 netting、撮合和组合账户自动满足八个独立 book。",
+      "funding": "原生资金费边界结算不证明 ±15s 所有权、延迟 ACK、短缺和关闭 owner 保留。",
+      "id": "B",
+      "incremental_benefit": "成熟事件运行时对大系统有价值；本次小型 bar 研究无法抵销适配面。",
+      "isolation_migration": "可隔离，但需替换足够多原生行为，额外维护两套调度/账本语义。",
+      "name": "B：NautilusTrader v1.231.0 + R3 适配器",
+      "state_and_events": "Framework state inventory not counted without implementation; additional R3 owner/reserve/payable/proof state remains unavoidable. No fabricated total.",
+      "stop": "不做原型或交易所探测；未来采用需新的版本/适配证明和权限。",
+      "surface": "至少需要来源/时钟、撮合、ACK、资金费 owner 账本、风控资本、候选/独立 book 六类适配，以及集成测试；仍需自写核心资金模型。",
+      "testability": "需框架集成验证与独立 R3 oracle；框架成熟不替代语义证明。"
+    },
+    {
+      "PIT": "纯函数不自动阻止未来 close 输入或跳过小时。",
+      "dependency_license": "无必需的新运行依赖；确定性排列使用标准库和已安装测试工具即可。",
+      "disposition": "不单独采用快照资金模型；纯 reducer 技术纳入 A",
+      "eight_candidates": "可保留公式，但仍依赖相同 Retest 规范裁定。",
+      "funding": "没有 owner 分录时仍可能重复欠款缺失、提前释放和聚合余额错误。",
+      "id": "C",
+      "incremental_benefit": "保留不可变 reduce 技术；拒绝省略付款义务和 journal 的精简。",
+      "isolation_migration": "独立新包可行；仅快照难以证明每次现金/覆盖变动的原因。",
+      "name": "C：确定性事件归约器 + 属性 oracle",
+      "state_and_events": "Could omit posting/journal account types and retain state snapshots; same12 economic event semantics and owner liabilities still needed.",
+      "stop": "不另开 C 原型；若 A 的最小完整范围仍不可行，应停止而不是删掉负债。",
+      "surface": "约五类核心职责，较少模块不等于较少资金状态；补上审计分录后接近 A。",
+      "testability": "属性测试可能复用错误公式；须独立资金 oracle，不能只镜像实现。"
+    }
+  ],
+  "event_envelope": {
+    "available_at_ms": "Earliest lawful decision/risk knowledge; never earlier than causal price/ownership proof. Cash ACK event has its own later available time.",
+    "candidate_id": "Exact original ID or frozen control ID; book key additionally includes scenario/policy, no crossbook funds.",
+    "cause_ids": "Exact source/order/fill/exit/settlement IDs; parent metadata retained.",
+    "duplicate_policy": "Same ID and same immutable payload idempotent; different payload CONFLICT_FAIL_CLOSED before any posting. Same source/symbol/close conflicting Mark fatal even with different event IDs.",
+    "economic_at_ms": "UTC integer economic event time; can be earlier than knowledge/append time for ex-post reconstruction.",
+    "event_id": "Stable namespace hash of (semantic_version,book_id,event_type,source_key,owner_id,cause_id,phase); payload excluded from identity so conflicts are detectable.",
+    "journal_seq": "Deterministic append sequence in legal knowledge order; chain digest excludes global process state.",
+    "owner_id": "(book_id,position_id); never substring match or symbol-only fallback.",
+    "payload_digest": "Canonical type+all immutable payload/clocks/causes digest; Decimal as preserved decimal strings, no float.",
+    "symbol": "BTCUSDT/ETHUSDT/SOLUSDT or null for book checkpoint/report."
+  },
+  "event_types": [
+    {
+      "clocks": "一分钟 [O,O+60000)，完整 bar available=O+120000",
+      "transition": "已完成 OHLCV 和来源身份；当前分钟 H/L/C 不进入当前决策。",
+      "type": "ObservedMinuteBar"
+    },
+    {
+      "clocks": "close=T，available=T+60000",
+      "transition": "true minute Mark、单调 close 水位、同 close 冲突检查；age<=120000ms。",
+      "type": "ObservedMark"
+    },
+    {
+      "clocks": "小时 close=H，available=H+60000，earliest fill=H+120000",
+      "transition": "冻结 formula、ATR、boundary，禁止 entry-minute feature。",
+      "type": "SignalAtDecision"
+    },
+    {
+      "clocks": "决策 cut=O",
+      "transition": "owner 级 notional/cost/funding cover；due>=O+60000，无未来入场价。",
+      "type": "OrderReserved"
+    },
+    {
+      "clocks": "经济 fill=F；模型 FillAck 默认 F+60000",
+      "transition": "执行平面记录量/价格/费用；若合法证据要求更晚，ACK 不能早于该证明。任何这种 proof-floor 均须 AM02 明确冻结。",
+      "type": "EconomicFill"
+    },
+    {
+      "clocks": "available>=max(F+60000, admitted fill proof)",
+      "transition": "精确 order/fill/owner/quantity；扣一次 entry fee，notional 转 G，禁止 auto-ACK。",
+      "type": "FillAck"
+    },
+    {
+      "clocks": "开盘 exit=F，或 barrier=O+59999；risk notice 等来源证明",
+      "transition": "关闭物理 inventory，保留每个 slice 的 gross/fee payable/receivable；不回写早先风险。",
+      "type": "EconomicExit"
+    },
+    {
+      "clocks": "available>=max(exit+60000, exit proof, declared delay)",
+      "transition": "逐 slice 结算；释放已满足成本，不释放尚未解决的 funding cover。",
+      "type": "ExitAck"
+    },
+    {
+      "clocks": "economic=S；phase=CONDITIONAL/FINAL，各自稳定 ID",
+      "transition": "S 时只有因果可知的条件覆盖；完整 ±15s 窗口可知后才能最终记 payable。",
+      "type": "FundingObligation"
+    },
+    {
+      "clocks": "max(S+60000,last-window-minute-end+60000,rate proof,declared delay)",
+      "transition": "最终 owner/S payable 结算一次，关闭 owner 仍保留；现金、cover、shortfall 原子更新。",
+      "type": "FundingAck"
+    },
+    {
+      "clocks": "合法 as-of checkpoint O",
+      "transition": "永久 latch；取消 pending entries，已知仓位退出不早于 O+60000。",
+      "type": "RiskKill"
+    },
+    {
+      "clocks": "已完成分钟的经济标签；无决策回调",
+      "transition": "E_e、drawdown/insolvency/exposure 标签与 E_d/E_r 读集隔离。",
+      "type": "EndOfMinuteReport"
+    }
+  ],
+  "execution_branch": "feature/v06-bline-g2-r3-p1-alternative-engine-design-sol61-r1",
+  "external_engine_provenance": {
+    "annotated_tag_object": "d3e1685e979925d7b0ffacd1b3f442547686e18f",
+    "commit": "27a8e54e7ac3c57d6cbf8891f0283dfbaee97317",
+    "current_doc_lookup_used_for_discovery_only": "https://nautilustrader.io/docs/latest/concepts/backtesting/",
+    "license": "LGPL-3.0-or-later (metadata), LGPLv3 LICENSE",
+    "name": "NautilusTrader",
+    "no_install_or_prototype": true,
+    "pinned_sources": [
+      {
+        "classification": "PINNED_EXTERNAL_LIBRARY_SPECIFICATION_NOT_R3_ACCEPTANCE",
+        "path": "LICENSE",
+        "ref": "27a8e54e7ac3c57d6cbf8891f0283dfbaee97317",
+        "sha256": "ee907919ec88c9c017b1f8b608db20960b6598aefcc4fe58820bde955d65ed3c",
+        "url": "https://github.com/nautechsystems/nautilus_trader/blob/27a8e54e7ac3c57d6cbf8891f0283dfbaee97317/LICENSE"
+      },
+      {
+        "classification": "PINNED_EXTERNAL_LIBRARY_SPECIFICATION_NOT_R3_ACCEPTANCE",
+        "path": "pyproject.toml",
+        "ref": "27a8e54e7ac3c57d6cbf8891f0283dfbaee97317",
+        "sha256": "5dbc4591408bd65f7b35c2274348a7a02ff7b034a15f46d5f8628d3c8fbafa36",
+        "url": "https://github.com/nautechsystems/nautilus_trader/blob/27a8e54e7ac3c57d6cbf8891f0283dfbaee97317/pyproject.toml"
+      },
+      {
+        "classification": "PINNED_EXTERNAL_LIBRARY_SPECIFICATION_NOT_R3_ACCEPTANCE",
+        "path": "docs/concepts/backtesting/execution-flow.md",
+        "ref": "27a8e54e7ac3c57d6cbf8891f0283dfbaee97317",
+        "sha256": "9f4c4e63c8db9a59c5acbc58f38344d1f59fb1f6ba8b926fb294602d9e6f4686",
+        "url": "https://github.com/nautechsystems/nautilus_trader/blob/27a8e54e7ac3c57d6cbf8891f0283dfbaee97317/docs/concepts/backtesting/execution-flow.md"
+      },
+      {
+        "classification": "PINNED_EXTERNAL_LIBRARY_SPECIFICATION_NOT_R3_ACCEPTANCE",
+        "path": "docs/concepts/backtesting/bar-execution.md",
+        "ref": "27a8e54e7ac3c57d6cbf8891f0283dfbaee97317",
+        "sha256": "01ba774d55f60c4e4e941d7df8e3c1d565697f8e2bde9f30dce8a121b2e0c97c",
+        "url": "https://github.com/nautechsystems/nautilus_trader/blob/27a8e54e7ac3c57d6cbf8891f0283dfbaee97317/docs/concepts/backtesting/bar-execution.md"
+      },
+      {
+        "classification": "PINNED_EXTERNAL_LIBRARY_SPECIFICATION_NOT_R3_ACCEPTANCE",
+        "path": "docs/concepts/backtesting/accounts-and-margin.md",
+        "ref": "27a8e54e7ac3c57d6cbf8891f0283dfbaee97317",
+        "sha256": "91956a8c435fa2d211888b8575dcccb2730fe5c056f1767cfcc0cc11e4c71029",
+        "url": "https://github.com/nautechsystems/nautilus_trader/blob/27a8e54e7ac3c57d6cbf8891f0283dfbaee97317/docs/concepts/backtesting/accounts-and-margin.md"
+      }
+    ],
+    "python_requires": ">=3.12,<3.15",
+    "release_published_at": "2026-08-02T18:53:49Z",
+    "release_tag": "v1.231.0"
+  },
+  "finding_to_redesign_matrix": [
+    {
+      "acceptance": "Both conflict permutations fail with same key before a decision; older marks never replace; changing report-only future fields leaves earlier decisions identical.",
+      "evidence": "Same-close50000/52000 changes with input order; late48000 duplicate overwrites. Current-minute Stage8 report value alone is not a decision leak.",
+      "id": "B01",
+      "minimal_case": "Two admitted marks for one source/symbol/close with conflicting value in both permutations; same-close late conflict; future report marker changed independently.",
+      "reachability": "SAME_CLOSE_MARK_CONFLICT_VERIFIED_IN_REPLAY_AND_STAGE_API; STAGE8_LOOKAHEAD_NOT_PROVEN",
+      "redesign": "Input identity registry checks source/symbol/close payload before max selection; conflict fatal. Monotone available-mark watermark. Reports have no reference in decision projection.",
+      "severity": "HIGH"
+    },
+    {
+      "acceptance": "Identical ACK posts once, conflicting ACK fails before cash; old owner ACK cannot modify current owner or lower cooldown.",
+      "evidence": "ID-only ACK dedupe accepts contradictory payloads; late old exit ACK rewinds cooldown; fill/position-ID mismatch permits auto-ACK.",
+      "id": "B02",
+      "minimal_case": "Same ACK ID with changed fee/quantity, identical2x/3x ACK, old-position ACK after new cooldown.",
+      "reachability": "ACK_DIRECT_STAGE_API_VERIFIED; NO_FULL_REPLAY_PROOF_FOR_EVERY_ARBITRARY_TUPLE",
+      "redesign": "Immutable ID->digest map plus exact causal order/position/quantity key; no symbol fallback/auto-ACK; monotone max cooldown.",
+      "severity": "HIGH"
+    },
+    {
+      "acceptance": "BTC payable1.00, cover0.40, shortfall0.60, ETH2.00 unchanged; no release or cash untilACK; invalid API time rejected rather than called production proof.",
+      "evidence": "Funding1.00 vs reserve0.40 creates0.60 uncovered liability; payables absent until ACK. POS_1 substring can hit POS_10. Early ACK atS-5000 is not legal ReplayEngine minute open.",
+      "id": "B03",
+      "minimal_case": "OwnerBTC reserve0.40, ETH2.00; dueFunding1.00, laterACK; exactPOS_1/POS_10; separate invalid stepS-5000.",
+      "reachability": "DELAYED_FUNDING_LIABILITY_VERIFIED_STAGED_PATH; S_MINUS5000_API_ONLY_NONALIGNED",
+      "redesign": "Conditional/final owner FundingObligation and cover/shortfall retained throughACK; exact composite owner keys; scheduler rejects nonaligned step.",
+      "severity": "CRITICAL"
+    },
+    {
+      "acceptance": "RawSL49000 or worse48000, rawTP51000; every favorable forced/time exit capped; barrier economic timeO+59999; fees/friction once.",
+      "evidence": "SL-first collision, adverse open48000, target51000 cap, minute-end economic exit and4h cooldown passed.",
+      "id": "B04",
+      "minimal_case": "LONG entry50000 stop49000 target51000, bar touching both; adverse open48000; favorable open52000.",
+      "reachability": "SYNTHETIC_STOP_TARGET_GAP_AND_CLOCK_BEHAVIOR_VERIFIED; NOT_ALL_FORCED_EXIT_BRANCHES",
+      "redesign": "Pure standing-exit price function with separate reporting/ACK clocks. Extend accepted cap to time/kill/reduction exits explicitly; oldStage4 else branch is not certified.",
+      "severity": "PRESERVE_PASS"
+    },
+    {
+      "acceptance": "BeforeT no future loss; at first legalT risk830.663455, drawdown169.336545, killed=true, free0; ACK settles once and cannot reset kill. Normalized oracle is not a claimed replication of original fee split.",
+      "evidence": "Published pending exit gross-157.425/net-169.336545 is omitted from risk after live-position deletion; killed=false and available933.7769. Fixture subfees not reconstructed here.",
+      "id": "B05",
+      "minimal_case": "Normalized EconomicExit net loss169.336545, source proof availableT, ExitAckT+60s, cash1000 beforeACK; compare decision before/atT.",
+      "reachability": "ALIGNED_STEP_MINUTE_OPEN_LIFECYCLE_WITH_SYNTHETIC_INJECTED_ORDER_AND_DELAY; NOT_A_NEW_MARKET_REPLAY",
+      "redesign": "Owner pending trade payable survives EXIT_PENDING; risk notice admitted only at factual proof availability, negative unsettled net included while positive gain excluded.",
+      "severity": "CRITICAL"
+    },
+    {
+      "acceptance": "Dense vs skipped-call state reduction identical for alreadyavailable bars, no retroactive fills; AM01_REQUIRED prevents silent same-bar reseeding.",
+      "evidence": "Latest-only1h advancement misses earlier cancellation/low. Same-bar cancel then new breakout is not specified by original method.",
+      "id": "B06",
+      "minimal_case": "Boundary47400,frozenATR1000; skippedH26 close46000 low45500, H27 recover. H26 must cancel, no old H27 confirmation; cancellation+new-breakout bar requires gate.",
+      "reachability": "SKIPPED_SIGNAL_INVOCATION_HISTORY_CASE_VERIFIED; DUAL_ROLE_BAR_AUTHORITY_UNRESOLVED",
+      "redesign": "Per family/symbol/direction chronological cursor and immutable Retest event; reduce every completed unprocessed hour before book gates. Dual-role ambiguity halts until Controller amendment.",
+      "severity": "HIGH_AND_SPEC_BLOCKER"
+    },
+    {
+      "acceptance": "PreACK free940, BTCencumbrance1, ETH2 unchanged; postACK cash999 and free940.05 withC_o7/ETH2; all summed owner invariants exact.",
+      "evidence": "Stage7 releases owner cover before later debit; Stage1 side dictionary loses cross-stage owner sum. Published available941 instead of conservative940.",
+      "id": "B07",
+      "minimal_case": "Normalized cash1000,C_o7, ETHfutureR2, BTCcoveredR0.40/P1/L0.60 throughACK.",
+      "reachability": "OWNER_RESERVE_AND_DELAYED_CASH_STAGED_PATH_VERIFIED",
+      "redesign": "One owner ledger retains settled/closed owners until funding-window finalization andACK; totals derived from ledger, no reserve side dictionaries.",
+      "severity": "CRITICAL"
+    }
+  ],
+  "funding_causality": {
+    "ack": "max(S+60000,lastminute_end+60000,admitted_rate_available_at,declared_cash_ACK_delay); ownersurvivesexitACK",
+    "at_S": "Onlyconditionalknownschedule/possibleownerreserve; nofuturewindowfinalization",
+    "earliest_regular_final_checkpoint": "EndlastintersectingminuteS+60000 +60000availability = S+120000 forwholehourS; rateproofcanbelater",
+    "quantity": "maxpre/postabsownedquantity forreduction, neversum; exactowner/Sid",
+    "synthetic_replay_schedule_scope": "T28 fixed hourly 4h BASE/STRESS. T29 fixed synthetic known-8h 12h BASE (same4/8bp rates, original stress geometry) and separately fixed unknown-hourly12h STRESS ineligible. No actual schedule claim or outcome-guided favorable cost switch.",
+    "window": "[S-15000,S+15000], adverseboundaryambiguity"
+  },
+  "limited_method_sha": "cf2d5cc33774cdcff7d709636305bba830e977ef",
+  "minute_clock_order": [
+    [
+      "0 validate",
+      "对齐分钟、稳定 ID/payload/source/cause 校验；冲突批次先拒绝。"
+    ],
+    [
+      "1 eligible batch",
+      "available<=cut，因果拓扑和接受 typed ties，ACK 批次在风险前完成。"
+    ],
+    [
+      "2 facts/risk",
+      "合法可见 fee/loss/funding notice，原子 cover 转换，风险/kill；不读报告。"
+    ],
+    [
+      "3 scheduling",
+      "逐完成小时 cursor，原公式再 book gates，同 snapshot/canonical owner commitments。"
+    ],
+    [
+      "4 exits",
+      "kill/reduction/gap SL/gap TP/expiry，逐 slice，所有有利 exit 封顶。"
+    ],
+    [
+      "5 entries",
+      "仅预留 due order、合法 open/volume/gap/risk/lot/cost，kill 或 overlap 时 WAIT。"
+    ],
+    [
+      "6 protection",
+      "执行平面站立 SL-first；经济 label 不提前进入决策。"
+    ],
+    [
+      "7 funding",
+      "条件窗口→完整证明→FINAL→合法 ACK；期间保留 owner cover/shortfall。"
+    ],
+    [
+      "8 report/assert",
+      "经济报告隔离，每笔实际/memo 平衡，owner 聚合/锁/cooldown/时间不变量。"
+    ]
+  ],
+  "money_account_types": [
+    [
+      "CASH",
+      "Debit-balance settlement asset",
+      "Changes only from initial deposit/authorized itemized flows and exact typedACK settlements."
+    ],
+    [
+      "TRADE_RECEIVABLE(owner,exit)",
+      "Debit asset",
+      "Positive crystallized gross awaiting exitACK; excluded from spendability untilACK."
+    ],
+    [
+      "TRADE_PAYABLE(owner,exit)",
+      "Credit liability",
+      "Negative crystallized gross awaiting exitACK; counted when lawful risk evidence available."
+    ],
+    [
+      "FEE_PAYABLE(owner,fill/exit)",
+      "Credit liability",
+      "Entry/exit taker fees accrued once, settled on associatedACK; pending fee counted exactly once."
+    ],
+    [
+      "FUNDING_PAYABLE(owner,S)",
+      "Credit liability",
+      "Final funding amount due; not merely remaining reserve. Retained untilFundingAck."
+    ],
+    [
+      "REALIZED_GAIN / REALIZED_LOSS",
+      "Credit income / debit expense",
+      "Signed effective-price PnL; spread/slip embedded in effectiveprice, no extra friction debit."
+    ],
+    [
+      "FEE_EXPENSE / FUNDING_EXPENSE",
+      "Debit expenses",
+      "Accrual itemization separate from settledcash; no mark/cash doublecount."
+    ],
+    [
+      "OPENING_EQUITY / ITEMIZED_FLOWS",
+      "Credit equity / signed declaredflow",
+      "Initial1000 perbook; no borrowing/topup/restart or imaginary yield."
+    ],
+    [
+      "ENC_COST(owner,component) / ENC_CONTRA",
+      "Balanced memo encumbrance pair",
+      "Pending entrynotional/fees/exitcost commitments; reduces admission only, not economic PnL."
+    ],
+    [
+      "ENC_FUNDING(owner,S,status) / ENC_CONTRA",
+      "Balanced memo encumbrance pair",
+      "Future/conditional reserve and cover for payable persist. Rcov overlapsP intentionally and is not added twice."
+    ],
+    [
+      "ENC_SHORTFALL(owner,S) / ENC_CONTRA",
+      "Balanced memo liability allocation",
+      "L = max(0, required conditional/final cover - Rcov). Dedicated owner obligation; never consume another owner reserve."
+    ]
+  ],
+  "money_equations": {
+    "C_o": "Σ owner remaining entry notional and cost memo commitments. At the lawful fee-visibility transition, release only the matching fee-cover component once; retain unACKed entry notional. Surplus exit buffer remains until ExitAck.",
+    "E_c": "CASH + U_ack_live + Σ min(0, U_unack_live) - Σ visible unpaid TRADE_PAYABLE per exit slice - Σ visible unpaid FEE_PAYABLE per fee item. Exclude every unACKed TRADE_RECEIVABLE independently; do not net opposite slices or gross gains against fees. On lawful exit visibility, remove its open MTM before adding realized payable.",
+    "E_d": "Settled CASH + acknowledged live-position MTM at last available mark; no report-plane values.",
+    "E_r": "E_c - P_f, where only causally FINAL unpaid funding is risk expense. Unfinalized conditional exposure stays in admission reserves.",
+    "L_f": "Σ owner max(0, required conditional/final cover - dedicated cover). Each shortfall has owner/settlement ID.",
+    "P_f": "Σ owner FINAL unpaid FUNDING_PAYABLE. Conditional exposure is reserved separately until causal finalization.",
+    "R_f": "Σ owner future/conditional funding reserve + reserved cover for unpaid funding; include closed, unsettled owners.",
+    "asset_budget": "B = max(0, min(333.333333333333, A/3, A-G)). Use one prior snapshot and canonical BTC/ETH/SOL sequential commitments; pending entry notional remains committed until FillAck.",
+    "cash_reconciliation": "CASH-CASH0 = settled effective gross PnL - settled entry fees - settled exit fees - settled funding + authorized itemized flows. At flat/all-ACK terminal this equals Σ final trade net PnL + flows, without residual payables or reserves.",
+    "economic_equity": "Report-only CASH + true open unrealized PnL + TRADE_RECEIVABLE - TRADE_PAYABLE - FEE_PAYABLE - FUNDING_PAYABLE; economic accruals are dated by event time, but cannot backfill decision history.",
+    "free_before_kill": "A = 0 if killed or insolvent else max(0, A_raw). Assert the untruncated upper bound only when A_raw >= 0. This floor applies to new spending, never to CASH or economic losses.",
+    "funding_encumbrance_union": "R_f + L_f = R_future + Σ max(R_covered, P_owner_or_conditional_required). Cover and its payable are the same obligation; do not add P_f again to admission.",
+    "raw_admission": "A_raw = 0.95 * E_c - C_o - R_f - L_f.",
+    "risk_and_buffer_caveat": "The 5% admission buffer is applied to conservative trade-capital E_c; funding is deducted once through the cover/shortfall union. E_r also reflects FINAL funding for the 100-USDT risk kill. AM02 must explicitly bind these distinct projections before implementation."
+  },
+  "money_journal_transfers": [
+    [
+      "OrderReserved",
+      "Memo DrENC_COST(C)/CrENC_CONTRA(C); DrENC_FUNDING(R)/CrENC_CONTRA(R)",
+      "No cash/PnL movement. Preserve actualowner components and ordercause."
+    ],
+    [
+      "EconomicFill / lawful fee notice / FillAck",
+      "Accrue Dr FEE_EXPENSE(f) / Cr FEE_PAYABLE(f). On lawful fee visibility, atomically expose this payable to E_c and release its matching fee memo cover. FillAck: Dr FEE_PAYABLE(f) / Cr CASH(f).",
+      "Entry notional commitment stays until FillAck conversion to acknowledged G. No later second release of the already converted fee cover; no cash debit before ACK."
+    ],
+    [
+      "EconomicExit loss",
+      "DrREALIZED_LOSS(abs(gross))/CrTRADE_PAYABLE(abs(gross)); DrFEE_EXPENSE(f_exit)/CrFEE_PAYABLE(f_exit)",
+      "No cash untilACK; pending visible loss/fee blocks risk and spending; never delete financial owner with physicalposition."
+    ],
+    [
+      "EconomicExit gain",
+      "DrTRADE_RECEIVABLE(gross)/CrREALIZED_GAIN(gross); accrue exitfee separately",
+      "Receivable retained but no preACK positivecash/gain admission."
+    ],
+    [
+      "ExitAck loss/gain",
+      "Loss DrTRADE_PAYABLE/CrCASH; gain DrCASH/CrTRADE_RECEIVABLE; fee DrFEE_PAYABLE/CrCASH",
+      "Each exactslice once; costcover release once; ownerfunding stays unsettled if anypossible settlement remains."
+    ],
+    [
+      "Funding conditional",
+      "Memo cover for causal maximumpossible q/mark/rate; explicit conditionalshortfall allocation",
+      "No actual FUNDING_PAYABLE/final expense before ownershipproof. Frozen adverse proxy/cap is scenario, no future S+15s knowledge."
+    ],
+    [
+      "Funding final",
+      "DrFUNDING_EXPENSE(P)/CrFUNDING_PAYABLE(P); preserveRcov; L=max(0,P-Rcov)",
+      "Record exactowner/payable even ifRcov0.40 vsP1.00; L0.60 explicit. Do not consume/releaseRcov merely because finalexpense posted."
+    ],
+    [
+      "FundingAck",
+      "DrFUNDING_PAYABLE(P)/CrCASH(P); reverse satisfied ownerRcov/L memo entries",
+      "BTCcashdebit1 once; ETH2 untouched. Futureunrelatedreserve persists. No payable retained aftersettled, no reserve usedasexpense."
+    ],
+    [
+      "RiskKill / reduction",
+      "No artificial cashposting for kill; cancel unfilledorder memos; actual reductions use EconomicExit+ExitAck slices",
+      "Kill permanent, settlement continues. Partial reduction retains positionID/stop/target and maxprepostfundingquantity; no overcredit."
+    ]
+  ],
+  "oracle_cases_count": 34,
+  "oracle_status": "IMPLEMENTATION_READY_NOT_YET_RUN; SPEC_AMENDMENT_REQUIRED gates AM01/AM02. 34 defined cases, not PASS results.",
+  "owner_state_transitions": [
+    [
+      "FLAT -> RESERVED",
+      "OrderReserved",
+      "owner 承诺并锁 symbol"
+    ],
+    [
+      "RESERVED -> UNACKED_OPEN",
+      "EconomicFill",
+      "fee accrual 与 source visibility 分开；notice 原子覆盖转换"
+    ],
+    [
+      "UNACKED_OPEN -> ACKED_OPEN",
+      "FillAck",
+      "fee cash 一次；entry notional→G；无二次 fee-cover release"
+    ],
+    [
+      "OPEN -> EXIT_PENDING",
+      "EconomicExit",
+      "保留逐 slice gross/fee 和可能资金费义务"
+    ],
+    [
+      "EXIT_PENDING -> CLOSED_UNSETTLED",
+      "ExitAck",
+      "结算 gross/fee；未决资金费 owner 不删除"
+    ],
+    [
+      "CLOSED_UNSETTLED -> COOLDOWN",
+      "全部 funding final/ACK",
+      "金融义务清零，保留 tombstone 和 monotone cooldown"
+    ],
+    [
+      "COOLDOWN -> FLAT",
+      "合法截止后无 pending",
+      "新 owner ID；永久 book kill 仍约束入场"
+    ]
+  ],
+  "pinned_prompt_sha": "770e910596bfbd82c28bd92705cf71ef981f0564",
+  "preflight": {
+    "fresh_worktree_initially_absent": true,
+    "immutable_objects_and_B_direct_parent_verified": true,
+    "initial_clean": true,
+    "prompt_http_git_bytes_identical": true,
+    "remote_branch_firstuse_exact_start": true
+  },
+  "project_gates": {
+    "AUTONOMOUS_LIVE": "FORBIDDEN",
+    "P1": "TERMINAL_ARCH_V1_NO_GO_ALT_DESIGN_ONLY",
+    "P2": "LOCAL_ROOT_UNKNOWN",
+    "P3_PREREG_EFFECTIVE": "NONE",
+    "P4_EMPIRICAL_BODY_AUTHORITY": "NONE",
+    "REAL_FUNDS_WRITE_AUTHORITY": "NONE",
+    "SCIENCE_REVIEW": "IMMUTABLE_PRIOR_SCIENCE_READY_RESTRICTED_DIAGNOSTIC",
+    "TESTNET": "NONE"
+  },
+  "publication": {
+    "CI": "ACTUAL_MODE_STATUS_IN_EXTERNAL_COMPLETION_RECEIPT_NOT_PROOF_OF_ENGINE_SAFETY",
+    "expected_changed_paths": [
+      "docs/strategy_research/g2_r3/p1_alt_engine_sol_r1/ENGINE_OPTION_DECISION_AND_EVENT_LEDGER_DESIGN.md",
+      "evidence/v0.6/b_line/g2_r3_p1_alt_engine_sol_r1/ENGINE_OPTIONS_AND_INVARIANT_ORACLE_MATRIX.json",
+      "reviews/v0.6/b_line/p1_alt_engine_sol_r1/P1_ALTERNATIVE_ENGINE_CONTROLLER_HANDOFF.md"
+    ],
+    "final_sha": "OMITTED_TO_AVOID_SAME_COMMIT_SELF_REFERENCE",
+    "remote_status": "POST_COMMIT_EXACT_SHA_VERIFICATION_EXTERNAL_FINAL_RECEIPT",
+    "required_direct_parent": "b74b932da32e4b5bbe2477c2de014f94719d6a93"
+  },
+  "reuse_replace_matrix": [
+    [
+      "CandidateRegistry/8 IDs",
+      "STATIC_ID_BINDING_CHECKED_NOT_FULL_BEHAVIORAL_PROOF",
+      "candidate_registry.py1-121; compare immutableoriginalproposal; preserve2families×2sides×2holds; classification wordingpre-registered must not conferauthority."
+    ],
+    [
+      "Bar1m/MarkBar1m value shapes",
+      "COPY_CANONICAL_VALUE_CONTRACT_WITH_PIT_ENVELOPE",
+      "types.py55-148 frozenrecords; Bar1m has noavailablefield, so wrap canonical observedavailability; strictlyone symbol/contiguous UTCminutes."
+    ],
+    [
+      "aggregation/ATR/EMA",
+      "PURE_SOURCE_REVIEWED_CONDITIONAL_REUSE",
+      "indicators.py8-194 matchesepochcontiguity/arithmeticTR20/SMAseed. Rejectmixedsymbols/duplicates beforefunction, do notfillgaps; independent syntheticequivalence required beforeacceptance."
+    ],
+    [
+      "ER12",
+      "FORMULA_REUSE_WITH_EXPLICIT_ZERO_PATH_GUARD",
+      "indicators.py195-212 returns0 onzerodenominator; frozenmethod saysineligible. GuardERpath==0 explicitly rather than promote0; sourcefunction alone notfullcontract."
+    ],
+    [
+      "structural formula",
+      "STATIC_FORMULA_CONJUNCTION_CHECKED_EXTRACT_ONLY",
+      "signals.py191-288 matchesEMAordering/slope/ER>=.35/body>=.5ATR/range<=2ATR/prior3break/1.5ATRstop; clock/cooldown suppliedbynewstate, noSignalGenerator reuse."
+    ],
+    [
+      "cost/rounding",
+      "PURE_FORMULAS_CHECKED_INPUT_PRECONDITIONS_REQUIRED",
+      "cost_model.py24-132; fees6/12, spread+slip5/10bp embedded once. Old helper returnsunchangedvalue oninvalidtick/lot: newwrapperfails; nofavorablecostchange."
+    ],
+    [
+      "B04 exit behavior",
+      "SPEC_AND_FIXTURES_REUSE_NOT_MUTABLE_METHOD",
+      "ledger.py727-799 stopfirst/gaps/targetbarriers; purefunction reimplemented. Stage4 elsebranch rawopen for forced/time exits is not generaltargetcap proof; use acceptedmethod all-exitcap."
+    ],
+    [
+      "VirtualBook/Stage1/Stage7/ACKsets/risk",
+      "REPLACE_ENTIRE_LIFECYCLE",
+      "ledger.py52-999, IDsets/side dictionaries/totalcounters; neverimport/inherit/adapt. NoautoACK, substringID, earlyreserveconsume, positiondeletionofpayables."
+    ],
+    [
+      "replay scheduler and Retest mutable state",
+      "REPLACE",
+      "replay_engine.py65-197 marksmax/wholebodyinput; signals.py29-190/289-421 latesthour/cancelrebreakout; independent cursor plus normativeclock."
+    ]
+  ],
+  "sanity_validation": {
+    "A_B_parents": "PASS",
+    "JSON_deterministic": true,
+    "candidate_ids": 8,
+    "events": 12,
+    "exact_arithmetic": "PASS",
+    "external_pinned_spec_hashes": 5,
+    "invariants": 17,
+    "markdown_links": 27,
+    "market_reads": 0,
+    "oracle_cases_not_run": 34,
+    "protected_reads": 0,
+    "runtime_tests": 0,
+    "source_objects": 20,
+    "status": "PASS",
+    "three_path_allowlist": true
+  },
+  "schema_version": "V06_G2_R3_P1_ALT_ENGINE_DESIGN_R1",
+  "scope_counters": {
+    "A_B_modifications": 0,
+    "empirical_backtests": 0,
+    "exchange_private_calls": 0,
+    "external_engine_installs": 0,
+    "live_writes": 0,
+    "new_engine_tests_run": 0,
+    "new_market_price_mark_funding_oi_body_reads": 0,
+    "production_code_writes": 0,
+    "protected_reads": 0
+  },
+  "selected_option": "A",
+  "source_manifest": [
+    {
+      "classification": "TASK_AUTHORITY",
+      "git_blob": "8e25cddcf42b50f5c92cf502c050aa56d34d7449",
+      "path": "prompts/v0.6/b_line/V06_G2_R3_P1_ALTERNATIVE_ENGINE_ARCHITECTURE_SELECTION_SOL_HIGH_R1.md",
+      "ref": "770e910596bfbd82c28bd92705cf71ef981f0564",
+      "sha256": "e502bfcbbf64dbf5ae453654f28f1529c6f319509324eab9811ccd93ddd7925d",
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/770e910596bfbd82c28bd92705cf71ef981f0564/prompts/v0.6/b_line/V06_G2_R3_P1_ALTERNATIVE_ENGINE_ARCHITECTURE_SELECTION_SOL_HIGH_R1.md"
+    },
+    {
+      "classification": "ACCEPTED_CONTROLLER_TERMINAL_AUTHORITY",
+      "git_blob": "d1a987cd13fded9308bc1fd066efdebde65c352a",
+      "path": "reviews/v0.6/b_line/V06_G2_R3_P1_FINAL_B_ARCHITECTURE_NO_GO_AND_ALTERNATIVE_ENGINE_CONTROLLER_R1.md",
+      "ref": "b74b932da32e4b5bbe2477c2de014f94719d6a93",
+      "sha256": "e3ba0bb20309ffa8b72d3c7c7d79000c883a152fa062a511c3cb7cfaaab1e5b7",
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/b74b932da32e4b5bbe2477c2de014f94719d6a93/reviews/v0.6/b_line/V06_G2_R3_P1_FINAL_B_ARCHITECTURE_NO_GO_AND_ALTERNATIVE_ENGINE_CONTROLLER_R1.md"
+    },
+    {
+      "classification": "READ_ONLY_FAILED_ENGINE_SOURCE_NOT_AUTHORITY",
+      "git_blob": "97b283d9292a10e8c5ecd73d1a7f046dea4d527b",
+      "path": "src/btc_quant_agent/strategy_research/r3_overnight/candidate_registry.py",
+      "ref": "b5d34aacd36dc27454944a22436db555c3f6eeb8",
+      "sha256": "3cc3c9ac0d939ce7f83b31beb067b65b5f91495def41c29aafa4719398e00f0e",
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/b5d34aacd36dc27454944a22436db555c3f6eeb8/src/btc_quant_agent/strategy_research/r3_overnight/candidate_registry.py"
+    },
+    {
+      "classification": "READ_ONLY_FAILED_ENGINE_SOURCE_NOT_AUTHORITY",
+      "git_blob": "2afeb4cd3ad5c61c8b95f93933b6f6a81b6677cf",
+      "path": "src/btc_quant_agent/strategy_research/r3_overnight/constants.py",
+      "ref": "b5d34aacd36dc27454944a22436db555c3f6eeb8",
+      "sha256": "09e23c1696981e141b4f2581dff2ff646793e947cb7f201dd24518920b85b485",
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/b5d34aacd36dc27454944a22436db555c3f6eeb8/src/btc_quant_agent/strategy_research/r3_overnight/constants.py"
+    },
+    {
+      "classification": "READ_ONLY_FAILED_ENGINE_SOURCE_NOT_AUTHORITY",
+      "git_blob": "7a1b9138e3039716fe87c7b66bdeb4694611b8ba",
+      "path": "src/btc_quant_agent/strategy_research/r3_overnight/cost_model.py",
+      "ref": "b5d34aacd36dc27454944a22436db555c3f6eeb8",
+      "sha256": "f649dc57af9c34e253b31c022d1a07614690f29ade596be81bba6863ad56ac5e",
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/b5d34aacd36dc27454944a22436db555c3f6eeb8/src/btc_quant_agent/strategy_research/r3_overnight/cost_model.py"
+    },
+    {
+      "classification": "READ_ONLY_FAILED_ENGINE_SOURCE_NOT_AUTHORITY",
+      "git_blob": "b6b91b7631c9d8ae14c2da8775ea4f7f3087176e",
+      "path": "src/btc_quant_agent/strategy_research/r3_overnight/indicators.py",
+      "ref": "b5d34aacd36dc27454944a22436db555c3f6eeb8",
+      "sha256": "37eb4a91feadd07b4a0eff23b3ce82b0139c1c56679ae17f10126deaf7b572cc",
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/b5d34aacd36dc27454944a22436db555c3f6eeb8/src/btc_quant_agent/strategy_research/r3_overnight/indicators.py"
+    },
+    {
+      "classification": "READ_ONLY_FAILED_ENGINE_SOURCE_NOT_AUTHORITY",
+      "git_blob": "975fd3c14f98da381efce1089c47d50a07ef7912",
+      "path": "src/btc_quant_agent/strategy_research/r3_overnight/ledger.py",
+      "ref": "b5d34aacd36dc27454944a22436db555c3f6eeb8",
+      "sha256": "44283856ecb4b7090bae76ada53feb7dad44d5a55b512568984ed77b2e026c95",
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/b5d34aacd36dc27454944a22436db555c3f6eeb8/src/btc_quant_agent/strategy_research/r3_overnight/ledger.py"
+    },
+    {
+      "classification": "READ_ONLY_FAILED_ENGINE_SOURCE_NOT_AUTHORITY",
+      "git_blob": "79c31ecddfac31fef3370631c526d87c69e98585",
+      "path": "src/btc_quant_agent/strategy_research/r3_overnight/replay_engine.py",
+      "ref": "b5d34aacd36dc27454944a22436db555c3f6eeb8",
+      "sha256": "63ee3330108df10ce2a9ee3ef7a95b1503f8a8f988b3cf3f2a8d9f0285c784fc",
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/b5d34aacd36dc27454944a22436db555c3f6eeb8/src/btc_quant_agent/strategy_research/r3_overnight/replay_engine.py"
+    },
+    {
+      "classification": "READ_ONLY_FAILED_ENGINE_SOURCE_NOT_AUTHORITY",
+      "git_blob": "ea0608f1bce4af342560098f8c8fe7604a0350ec",
+      "path": "src/btc_quant_agent/strategy_research/r3_overnight/signals.py",
+      "ref": "b5d34aacd36dc27454944a22436db555c3f6eeb8",
+      "sha256": "1cbcd7d619dc064734cbf62c969cbf9643cd0405a6bd12ccde24d52453516f23",
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/b5d34aacd36dc27454944a22436db555c3f6eeb8/src/btc_quant_agent/strategy_research/r3_overnight/signals.py"
+    },
+    {
+      "classification": "READ_ONLY_FAILED_ENGINE_SOURCE_NOT_AUTHORITY",
+      "git_blob": "6d37f351e37ead16216194ad18a16da0acfba9b2",
+      "path": "src/btc_quant_agent/strategy_research/r3_overnight/types.py",
+      "ref": "b5d34aacd36dc27454944a22436db555c3f6eeb8",
+      "sha256": "5543eca624f3a90096f4d29f04b013b8e310cec917a74ad20af742a83aa3594e",
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/b5d34aacd36dc27454944a22436db555c3f6eeb8/src/btc_quant_agent/strategy_research/r3_overnight/types.py"
+    },
+    {
+      "classification": "INDEPENDENT_SYNTHETIC_VERIFICATION_OR_SOURCE_NOT_MARKET_RESULTS",
+      "git_blob": "13535edd1390ed397b6e145c219faddae94621ae",
+      "path": "docs/strategy_research/g2_r3/prep_b/architecture_v1/B_FINAL_INDEPENDENT_ARCHITECTURE_VERDICT.md",
+      "ref": "52ee5f1e582defbfb0bb3c8bb29101a1d40d9cd7",
+      "sha256": "6d46b1116ace642bf8c09f0f5bc7babc9b20ca7b7447f41ed16f2692acf16eb4",
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/52ee5f1e582defbfb0bb3c8bb29101a1d40d9cd7/docs/strategy_research/g2_r3/prep_b/architecture_v1/B_FINAL_INDEPENDENT_ARCHITECTURE_VERDICT.md"
+    },
+    {
+      "classification": "INDEPENDENT_SYNTHETIC_VERIFICATION_OR_SOURCE_NOT_MARKET_RESULTS",
+      "git_blob": "bc6adde43086ae3ada328f5b2d52ce44682d976a",
+      "path": "evidence/v0.6/b_line/g2_overnight_p0_b/architecture_v1/B01_B07_FINAL_INDEPENDENT_BEHAVIOR_MATRIX.json",
+      "ref": "52ee5f1e582defbfb0bb3c8bb29101a1d40d9cd7",
+      "sha256": "aff73fe5cf4d5684a3e352fa86779328673345de05580fea77829f199ac88821",
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/52ee5f1e582defbfb0bb3c8bb29101a1d40d9cd7/evidence/v0.6/b_line/g2_overnight_p0_b/architecture_v1/B01_B07_FINAL_INDEPENDENT_BEHAVIOR_MATRIX.json"
+    },
+    {
+      "classification": "INDEPENDENT_SYNTHETIC_VERIFICATION_OR_SOURCE_NOT_MARKET_RESULTS",
+      "git_blob": "8125d548ae2886c95215f5aec6e8313f63d4c081",
+      "path": "evidence/v0.6/b_line/g2_overnight_p0_b/architecture_v1/B_FINAL_SYNTHETIC_EXECUTION_RECEIPT.json",
+      "ref": "52ee5f1e582defbfb0bb3c8bb29101a1d40d9cd7",
+      "sha256": "05a0813ea9163601dd618fe3467bf25db7f6670a5a406031418fe7aac36d029b",
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/52ee5f1e582defbfb0bb3c8bb29101a1d40d9cd7/evidence/v0.6/b_line/g2_overnight_p0_b/architecture_v1/B_FINAL_SYNTHETIC_EXECUTION_RECEIPT.json"
+    },
+    {
+      "classification": "INDEPENDENT_SYNTHETIC_VERIFICATION_OR_SOURCE_NOT_MARKET_RESULTS",
+      "git_blob": "dface656010d76bf62431242b977786812b059bb",
+      "path": "scripts/strategy_research/r3_verification/architecture_v1/a_arch_v1_auditor.py",
+      "ref": "52ee5f1e582defbfb0bb3c8bb29101a1d40d9cd7",
+      "sha256": "3c0c548b92c5c53a129c99667b45ab2a6ba5a0dcfa4aed8242d209ee82649b0e",
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/52ee5f1e582defbfb0bb3c8bb29101a1d40d9cd7/scripts/strategy_research/r3_verification/architecture_v1/a_arch_v1_auditor.py"
+    },
+    {
+      "classification": "INDEPENDENT_SYNTHETIC_VERIFICATION_OR_SOURCE_NOT_MARKET_RESULTS",
+      "git_blob": "dabc08e4c0c146d197298d6cef304b0b3de5fb41",
+      "path": "tests/test_v06_g2_r3_verifier_architecture_v1_audit.py",
+      "ref": "52ee5f1e582defbfb0bb3c8bb29101a1d40d9cd7",
+      "sha256": "70d4b0d96fcb5bd2861cc2037250c01ca045eb1c67e31989b131f428e85e595b",
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/52ee5f1e582defbfb0bb3c8bb29101a1d40d9cd7/tests/test_v06_g2_r3_verifier_architecture_v1_audit.py"
+    },
+    {
+      "classification": "FROZEN_FORMULA_DESIGN",
+      "git_blob": "fb701b0be825f85801377f86eb80ba4f766ebaed",
+      "path": "docs/strategy_research/g2_r3/METHOD_DESIGN.md",
+      "ref": "e5b2006a89441f7eb2ec900e508aff451106b87a",
+      "sha256": "14378dde7668291dc87aef91e3e55fadddad3a444d1d49284efa2c3cbcba9a77",
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/e5b2006a89441f7eb2ec900e508aff451106b87a/docs/strategy_research/g2_r3/METHOD_DESIGN.md"
+    },
+    {
+      "classification": "FROZEN_EIGHT_PROPOSAL_NOT_EFFECTIVE_PREREG",
+      "git_blob": "d337542f6482938c37eb6b4e43255cdf4d09751a",
+      "path": "evidence/v0.6/b_line/g2_r3_design/CANDIDATE_REGISTER_PROPOSAL.json",
+      "ref": "e5b2006a89441f7eb2ec900e508aff451106b87a",
+      "sha256": "d0f89bddfaec0e57c959cec043969059da10fec8aa45f81669dde8b80ea35a9b",
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/e5b2006a89441f7eb2ec900e508aff451106b87a/evidence/v0.6/b_line/g2_r3_design/CANDIDATE_REGISTER_PROPOSAL.json"
+    },
+    {
+      "classification": "ACCEPTED_LIMITED_DESIGN_METHOD",
+      "git_blob": "7def37d7c8aad02dd0c2769882fad61622e262db",
+      "path": "docs/strategy_research/g2_r3/method_repair/METHOD_R1_1_PIT_COST_ACCOUNTING.md",
+      "ref": "cf2d5cc33774cdcff7d709636305bba830e977ef",
+      "sha256": "a2943c9a541d93eaceb62a664edf0d03f0c9bbab6f4c4f73752831bcf14eb026",
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/cf2d5cc33774cdcff7d709636305bba830e977ef/docs/strategy_research/g2_r3/method_repair/METHOD_R1_1_PIT_COST_ACCOUNTING.md"
+    },
+    {
+      "classification": "IMPLEMENTER_SYNTHETIC_SELF_CHECK_NOT_INDEPENDENT_CLEARANCE",
+      "git_blob": "5673af2f32fbd90d6f9fdf7e70f0c4a68f291269",
+      "path": "tests/test_strategy_research_r3_architecture_invariants.py",
+      "ref": "b5d34aacd36dc27454944a22436db555c3f6eeb8",
+      "sha256": "df616aea8dd9171c9d7bdb9c88bb0c8f380e206092bb617ecc8735492ff198fc",
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/b5d34aacd36dc27454944a22436db555c3f6eeb8/tests/test_strategy_research_r3_architecture_invariants.py"
+    },
+    {
+      "classification": "IMPLEMENTER_SYNTHETIC_SELF_CHECK_NOT_INDEPENDENT_CLEARANCE",
+      "git_blob": "ae8330671d30f605c31502f00f3998a05e4fbddb",
+      "path": "evidence/v0.6/b_line/g2_overnight_p0_a/architecture_v1/ARCHITECTURE_SYNTHETIC_EXECUTION_RECEIPT.json",
+      "ref": "b5d34aacd36dc27454944a22436db555c3f6eeb8",
+      "sha256": "b680194a7a536137beb00869418171f0c775777f3c8c1eebf44dac99bceccf29",
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/b5d34aacd36dc27454944a22436db555c3f6eeb8/evidence/v0.6/b_line/g2_overnight_p0_a/architecture_v1/ARCHITECTURE_SYNTHETIC_EXECUTION_RECEIPT.json"
+    }
+  ],
+  "spec_amendments": [
+    {
+      "adjacent_required_details": "Firstconfirmation recognized chronologically even if policy bookWAIT; consume that event for that variant, no later or backdated confirmationretry. Freeze this clock/policy interaction withAM01, and horizon-local consumption with shared featurecursor.",
+      "choice_to_freeze": "Proposed narrow interpretation: a bar that cancels/confirms/expires an existing Retest cannot seed a new event of that family/symbol/direction at that same close; next distinct completedhour may seed. This is a PROPOSAL, not assumed original authority. Controller may select another explicit deterministic interpretation before build.",
+      "evidence": "Original METHOD_DESIGN CLOSED_RETEST defines cancellation and next3 confirmations, but not same-bar terminal transition plus new-breakout registration; old signals.py289-421 and A test490 assert such reseeding without frozen authority.",
+      "id": "AM01",
+      "status": "P3_METHOD_AMENDMENT_REQUIRED_BEFORE_IMPLEMENTATION",
+      "until_frozen": "Reducer returns SPEC_AMENDMENT_REQUIRED on unresolveddualrole; no implementation work/replaybodygrant. Preserve old8 formulas; amend only event progression semantics under distinctmethodversion/root."
+    },
+    {
+      "choice_to_freeze": "Adopt separate risk projection for lawful visiblepending losses/fees, no positivependinggain, ownerfunding union and firstlegalcheckpoint kill, while economicreport cannotbackfill. Keep100USDTthreshold/5%buffer/1x/1.10reserve unchanged.",
+      "evidence": "Task explicitly requires conservative pendingloss/payable capital. Accepted R1.1 acknowledges E_d positions/cash andcommits reserve bridges; revised E_c/E_r and earliest factualnotice policy must be bound explicitly, not silently substituted into old method.",
+      "id": "AM02",
+      "status": "CONTROLLER_RISK_CONTRACT_ADOPTION_REQUIRED_BEFORE_IMPLEMENTATION",
+      "until_frozen": "Design only. CashACK/modelclock stays source-proof conservative; no magically earlierACK or unseenloss."
+    }
+  ],
+  "start_sha": "b74b932da32e4b5bbe2477c2de014f94719d6a93",
+  "synthetic_oracle_cases": [
+    {
+      "assert_invariants_each_transition": [
+        "I01",
+        "I02",
+        "I03",
+        "I04",
+        "I05",
+        "I06",
+        "I07",
+        "I08",
+        "I09",
+        "I10",
+        "I11",
+        "I12",
+        "I13",
+        "I14",
+        "I15",
+        "I16",
+        "I17"
+      ],
+      "expected": "两种排列都在决策前以同一 source key 报 CONFLICT_FAIL_CLOSED，无任意获胜价格。",
+      "finding_refs": [
+        "B01"
+      ],
+      "id": "T01",
+      "inputs": "同一 BTC 来源/close=S，价格 50000 和 52000，两个输入排列。",
+      "name": "同 close 冲突",
+      "status": "SYNTHETIC_NOT_YET_RUN"
+    },
+    {
+      "assert_invariants_each_transition": [
+        "I01",
+        "I02",
+        "I03",
+        "I04",
+        "I05",
+        "I06",
+        "I07",
+        "I08",
+        "I09",
+        "I10",
+        "I11",
+        "I12",
+        "I13",
+        "I14",
+        "I15",
+        "I16",
+        "I17"
+      ],
+      "expected": "S+60s 只用 50000，S+120s 用 51000；水位不倒退，未来消息不进入读集。",
+      "finding_refs": [
+        "B01"
+      ],
+      "id": "T02",
+      "inputs": "close=S/price=50000/available=S+60s；close=S+60s/51000/available=S+120s；旧 close 迟到；未来 available=S+180s。",
+      "name": "延迟/未来 Mark",
+      "status": "SYNTHETIC_NOT_YET_RUN"
+    },
+    {
+      "assert_invariants_each_transition": [
+        "I01",
+        "I02",
+        "I03",
+        "I04",
+        "I05",
+        "I06",
+        "I07",
+        "I08",
+        "I09",
+        "I10",
+        "I11",
+        "I12",
+        "I13",
+        "I14",
+        "I15",
+        "I16",
+        "I17"
+      ],
+      "expected": "冲突致命；不回写历史，也不重算早先订单。",
+      "finding_refs": [
+        "B01"
+      ],
+      "id": "T03",
+      "inputs": "先接受 close=S/50000，再收到同 close/48000。",
+      "name": "迟到同 close 冲突",
+      "status": "SYNTHETIC_NOT_YET_RUN"
+    },
+    {
+      "assert_invariants_each_transition": [
+        "I01",
+        "I02",
+        "I03",
+        "I04",
+        "I05",
+        "I06",
+        "I07",
+        "I08",
+        "I09",
+        "I10",
+        "I11",
+        "I12",
+        "I13",
+        "I14",
+        "I15",
+        "I16",
+        "I17"
+      ],
+      "expected": "证明前 E_d/E_c=1000；经济报告可标记 2000，但任何早先决策不变。该例仅验证读集隔离。",
+      "finding_refs": [
+        "B01"
+      ],
+      "id": "T04",
+      "inputs": "标准化 API book：cash=1000、LONG q=1、entry=50000；合法 Mark=50000；未来报告 Mark=51000。q=1 明确不作为合规资金入场。",
+      "name": "报告与决策隔离",
+      "status": "SYNTHETIC_NOT_YET_RUN"
+    },
+    {
+      "assert_invariants_each_transition": [
+        "I01",
+        "I02",
+        "I03",
+        "I04",
+        "I05",
+        "I06",
+        "I07",
+        "I08",
+        "I09",
+        "I10",
+        "I11",
+        "I12",
+        "I13",
+        "I14",
+        "I15",
+        "I16",
+        "I17"
+      ],
+      "expected": "120s 有效；180s WAIT_STALE 并安排下一分钟退出；不得猜测 MTM。",
+      "finding_refs": [
+        "B01"
+      ],
+      "id": "T05",
+      "inputs": "最后 Mark close=S；检查 cut=S+120s 和 S+180s。",
+      "name": "Mark 过期边界",
+      "status": "SYNTHETIC_NOT_YET_RUN"
+    },
+    {
+      "assert_invariants_each_transition": [
+        "I01",
+        "I02",
+        "I03",
+        "I04",
+        "I05",
+        "I06",
+        "I07",
+        "I08",
+        "I09",
+        "I10",
+        "I11",
+        "I12",
+        "I13",
+        "I14",
+        "I15",
+        "I16",
+        "I17"
+      ],
+      "expected": "cash=998，费用=2，仅一笔现金分录，重复不改变有效 journal。",
+      "finding_refs": [
+        "B02"
+      ],
+      "id": "T06",
+      "inputs": "cash=1000；同一 FillAck 费用 2，完全相同 payload 重复两次、三次。",
+      "name": "ACK 重复 2x/3x",
+      "status": "SYNTHETIC_NOT_YET_RUN"
+    },
+    {
+      "assert_invariants_each_transition": [
+        "I01",
+        "I02",
+        "I03",
+        "I04",
+        "I05",
+        "I06",
+        "I07",
+        "I08",
+        "I09",
+        "I10",
+        "I11",
+        "I12",
+        "I13",
+        "I14",
+        "I15",
+        "I16",
+        "I17"
+      ],
+      "expected": "第二次分录前 fail closed；原余额不变，不能静默忽略。",
+      "finding_refs": [
+        "B02"
+      ],
+      "id": "T07",
+      "inputs": "同一 ACK ID 改费用 2→3 或数量 1→2。",
+      "name": "ACK payload 冲突",
+      "status": "SYNTHETIC_NOT_YET_RUN"
+    },
+    {
+      "assert_invariants_each_transition": [
+        "I01",
+        "I02",
+        "I03",
+        "I04",
+        "I05",
+        "I06",
+        "I07",
+        "I08",
+        "I09",
+        "I10",
+        "I11",
+        "I12",
+        "I13",
+        "I14",
+        "I15",
+        "I16",
+        "I17"
+      ],
+      "expected": "cooldown 保持 1700017140000；只能结算 P1，不修改 P2。",
+      "finding_refs": [
+        "B02"
+      ],
+      "id": "T08",
+      "inputs": "新 P2 cooldown=1700017140000；旧 P1 ACK 给出较早 1700010000000。",
+      "name": "旧 ACK 不倒退 cooldown",
+      "status": "SYNTHETIC_NOT_YET_RUN"
+    },
+    {
+      "assert_invariants_each_transition": [
+        "I01",
+        "I02",
+        "I03",
+        "I04",
+        "I05",
+        "I06",
+        "I07",
+        "I08",
+        "I09",
+        "I10",
+        "I11",
+        "I12",
+        "I13",
+        "I14",
+        "I15",
+        "I16",
+        "I17"
+      ],
+      "expected": "CAUSE_OR_OWNER_FAIL_CLOSED，无 auto-ACK 或 symbol fallback；合法承诺不被释放。",
+      "finding_refs": [
+        "B02"
+      ],
+      "id": "T09",
+      "inputs": "ACK 指向不匹配的 order/fill/position。",
+      "name": "ACK owner/cause 错配",
+      "status": "SYNTHETIC_NOT_YET_RUN"
+    },
+    {
+      "assert_invariants_each_transition": [
+        "I01",
+        "I02",
+        "I03",
+        "I04",
+        "I05",
+        "I06",
+        "I07",
+        "I08",
+        "I09",
+        "I10",
+        "I11",
+        "I12",
+        "I13",
+        "I14",
+        "I15",
+        "I16",
+        "I17"
+      ],
+      "expected": "ACK 前 R=2.40、P=1、BTC L=.60、free=940；ACK 后 cash=999、BTC P/Rcov/L=0、ETH=2、free=940.05。",
+      "finding_refs": [
+        "B03",
+        "B07"
+      ],
+      "id": "T10",
+      "inputs": "cash=1000、C_o=7、BTC Rcov=.40、ETH Rfuture=2；最终 BTC payable=1，ACK 延迟。",
+      "name": "资金费短缺与 owner",
+      "status": "SYNTHETIC_NOT_YET_RUN"
+    },
+    {
+      "assert_invariants_each_transition": [
+        "I01",
+        "I02",
+        "I03",
+        "I04",
+        "I05",
+        "I06",
+        "I07",
+        "I08",
+        "I09",
+        "I10",
+        "I11",
+        "I12",
+        "I13",
+        "I14",
+        "I15",
+        "I16",
+        "I17"
+      ],
+      "expected": "等待合法 cause 与 available；独立到达顺序归一化；payable/覆盖/短缺保留到 ACK，重复只扣一次。",
+      "finding_refs": [
+        "B03",
+        "B07"
+      ],
+      "id": "T11",
+      "inputs": "T10 的 ACK available=final_cut+120s；到达顺序 ACK 先于 cause，或 ACK 晚可用。",
+      "name": "资金费 ACK 延迟/乱序",
+      "status": "SYNTHETIC_NOT_YET_RUN"
+    },
+    {
+      "assert_invariants_each_transition": [
+        "I01",
+        "I02",
+        "I03",
+        "I04",
+        "I05",
+        "I06",
+        "I07",
+        "I08",
+        "I09",
+        "I10",
+        "I11",
+        "I12",
+        "I13",
+        "I14",
+        "I15",
+        "I16",
+        "I17"
+      ],
+      "expected": "S 时 EXIT_PENDING；S+60s 合法 ExitAck 后 CLOSED_UNSETTLED，仍保留条件资金费覆盖；S+120s 才可 FINAL，FundingAck 不早于该证明。",
+      "finding_refs": [
+        "B03",
+        "B07"
+      ],
+      "id": "T12",
+      "inputs": "exit=S−10000ms；退出 ACK available 至少 exit+60000ms=S+50000ms，首个对齐 cut=S+60000ms；窗口证明 available=S+120000ms。",
+      "name": "S 前退出仍属窗口",
+      "status": "SYNTHETIC_NOT_YET_RUN"
+    },
+    {
+      "assert_invariants_each_transition": [
+        "I01",
+        "I02",
+        "I03",
+        "I04",
+        "I05",
+        "I06",
+        "I07",
+        "I08",
+        "I09",
+        "I10",
+        "I11",
+        "I12",
+        "I13",
+        "I14",
+        "I15",
+        "I16",
+        "I17"
+      ],
+      "expected": "INVALID_MINUTE_CLOCK，状态不变；该例是 API 防御，不宣称正常 replay 可达。",
+      "finding_refs": [
+        "B03"
+      ],
+      "id": "T13",
+      "inputs": "advance_to(S−5000ms)，S 为整分钟。",
+      "name": "拒绝非分钟 API",
+      "status": "SYNTHETIC_NOT_YET_RUN"
+    },
+    {
+      "assert_invariants_each_transition": [
+        "I01",
+        "I02",
+        "I03",
+        "I04",
+        "I05",
+        "I06",
+        "I07",
+        "I08",
+        "I09",
+        "I10",
+        "I11",
+        "I12",
+        "I13",
+        "I14",
+        "I15",
+        "I16",
+        "I17"
+      ],
+      "expected": "精确键各付一次，无 substring 匹配；各自保留资金 tombstone。",
+      "finding_refs": [
+        "B03"
+      ],
+      "id": "T14",
+      "inputs": "POS_1 应付 1，POS_10 应付 .20，独立 exposure/cause。",
+      "name": "精确持仓身份",
+      "status": "SYNTHETIC_NOT_YET_RUN"
+    },
+    {
+      "assert_invariants_each_transition": [
+        "I01",
+        "I02",
+        "I03",
+        "I04",
+        "I05",
+        "I06",
+        "I07",
+        "I08",
+        "I09",
+        "I10",
+        "I11",
+        "I12",
+        "I13",
+        "I14",
+        "I15",
+        "I16",
+        "I17"
+      ],
+      "expected": "S 时只有条件覆盖，不提前确认未来数量/payable；最终数量用 max(pre,post)，不能相加。",
+      "finding_refs": [
+        "B03",
+        "B07"
+      ],
+      "id": "T15",
+      "inputs": "窗口至 S+15s；未来入场可能发生；最后交叠分钟证据 available=S+120s。",
+      "name": "S 时不能知未来所有权",
+      "status": "SYNTHETIC_NOT_YET_RUN"
+    },
+    {
+      "assert_invariants_each_transition": [
+        "I01",
+        "I02",
+        "I03",
+        "I04",
+        "I05",
+        "I06",
+        "I07",
+        "I08",
+        "I09",
+        "I10",
+        "I11",
+        "I12",
+        "I13",
+        "I14",
+        "I15",
+        "I16",
+        "I17"
+      ],
+      "expected": "证明前不见未来亏损；S+60s E_c/E_r=830.663455，drawdown=169.336545，kill=true/free=0；ACK 后 cash=830.663455、payable=0，kill 不复位。",
+      "finding_refs": [
+        "B05"
+      ],
+      "id": "T16",
+      "inputs": "cash=1000、trade payable=169.336545，无额外费用；economic exit=S−1ms、proof available=S+60s、ExitAck=S+120s。并非原 B05 价格/费用拆分。",
+      "name": "标准化 −169.336545",
+      "status": "SYNTHETIC_NOT_YET_RUN"
+    },
+    {
+      "assert_invariants_each_transition": [
+        "I01",
+        "I02",
+        "I03",
+        "I04",
+        "I05",
+        "I06",
+        "I07",
+        "I08",
+        "I09",
+        "I10",
+        "I11",
+        "I12",
+        "I13",
+        "I14",
+        "I15",
+        "I16",
+        "I17"
+      ],
+      "expected": "ACK 前 E_c=1000/free=950；ACK 后 cash=1050/free=997.5（若无其他约束）。",
+      "finding_refs": [
+        "B05"
+      ],
+      "id": "T17",
+      "inputs": "cash=1000、独立 trade receivable=50、费用 0，ACK 延迟。",
+      "name": "未 ACK 盈利不可复用",
+      "status": "SYNTHETIC_NOT_YET_RUN"
+    },
+    {
+      "assert_invariants_each_transition": [
+        "I01",
+        "I02",
+        "I03",
+        "I04",
+        "I05",
+        "I06",
+        "I07",
+        "I08",
+        "I09",
+        "I10",
+        "I11",
+        "I12",
+        "I13",
+        "I14",
+        "I15",
+        "I16",
+        "I17"
+      ],
+      "expected": "E_c/E_r=980，drawdown=20，不 kill，free=931；不能仍报 950。",
+      "finding_refs": [
+        "B05"
+      ],
+      "id": "T18",
+      "inputs": "cash=1000、合法可见 pending loss=20、其他覆盖 0。",
+      "name": "小亏损仍减少资本",
+      "status": "SYNTHETIC_NOT_YET_RUN"
+    },
+    {
+      "assert_invariants_each_transition": [
+        "I01",
+        "I02",
+        "I03",
+        "I04",
+        "I05",
+        "I06",
+        "I07",
+        "I08",
+        "I09",
+        "I10",
+        "I11",
+        "I12",
+        "I13",
+        "I14",
+        "I15",
+        "I16",
+        "I17"
+      ],
+      "expected": "合法结算继续，但新订单 WAIT_DISABLED/free=0；high-water/kill 不重置；退出只在下一合法 open。",
+      "finding_refs": [
+        "B05"
+      ],
+      "id": "T19",
+      "inputs": "T16 kill 后又到达盈利 ACK、新 fold、信号。",
+      "name": "kill 永久",
+      "status": "SYNTHETIC_NOT_YET_RUN"
+    },
+    {
+      "assert_invariants_each_transition": [
+        "I01",
+        "I02",
+        "I03",
+        "I04",
+        "I05",
+        "I06",
+        "I07",
+        "I08",
+        "I09",
+        "I10",
+        "I11",
+        "I12",
+        "I13",
+        "I14",
+        "I15",
+        "I16",
+        "I17"
+      ],
+      "expected": "raw exit=49000/SL，economic_at=O+59999ms；一次成本，无 TP 盈利。",
+      "finding_refs": [
+        "B04"
+      ],
+      "id": "T20",
+      "inputs": "LONG entry=50000、stop=49000、target=51000；O/H/L/C=50000/52000/48000/50000。",
+      "name": "同 bar SL-first",
+      "status": "SYNTHETIC_NOT_YET_RUN"
+    },
+    {
+      "assert_invariants_each_transition": [
+        "I01",
+        "I02",
+        "I03",
+        "I04",
+        "I05",
+        "I06",
+        "I07",
+        "I08",
+        "I09",
+        "I10",
+        "I11",
+        "I12",
+        "I13",
+        "I14",
+        "I15",
+        "I16",
+        "I17"
+      ],
+      "expected": "raw exit=48000；保留 gap 亏损和资本越界标记，不用有利 49000。",
+      "finding_refs": [
+        "B04"
+      ],
+      "id": "T21",
+      "inputs": "同 LONG，bar open=48000<stop=49000。",
+      "name": "不利 gap",
+      "status": "SYNTHETIC_NOT_YET_RUN"
+    },
+    {
+      "assert_invariants_each_transition": [
+        "I01",
+        "I02",
+        "I03",
+        "I04",
+        "I05",
+        "I06",
+        "I07",
+        "I08",
+        "I09",
+        "I10",
+        "I11",
+        "I12",
+        "I13",
+        "I14",
+        "I15",
+        "I16",
+        "I17"
+      ],
+      "expected": "LONG raw=51000、SHORT raw=49000；各类型均封顶，再加一次不利摩擦/tick。",
+      "finding_refs": [
+        "B04"
+      ],
+      "id": "T22",
+      "inputs": "LONG target=51000/open=52000；SHORT target=49000/open=48000；分别 TP/time/kill/reduction。",
+      "name": "所有有利退出封顶",
+      "status": "SYNTHETIC_NOT_YET_RUN"
+    },
+    {
+      "assert_invariants_each_transition": [
+        "I01",
+        "I02",
+        "I03",
+        "I04",
+        "I05",
+        "I06",
+        "I07",
+        "I08",
+        "I09",
+        "I10",
+        "I11",
+        "I12",
+        "I13",
+        "I14",
+        "I15",
+        "I16",
+        "I17"
+      ],
+      "expected": "不提前到期；首个合法 F+hold open time exit；该 open 的 stop 优先，报告不得回流。",
+      "finding_refs": [
+        "B04"
+      ],
+      "id": "T23",
+      "inputs": "fill=F、hold=4h 或 12h，无提前 SL/TP；到期前一分钟与 F+hold 开盘。",
+      "name": "4h/12h 精确到期",
+      "status": "SYNTHETIC_NOT_YET_RUN"
+    },
+    {
+      "assert_invariants_each_transition": [
+        "I01",
+        "I02",
+        "I03",
+        "I04",
+        "I05",
+        "I06",
+        "I07",
+        "I08",
+        "I09",
+        "I10",
+        "I11",
+        "I12",
+        "I13",
+        "I14",
+        "I15",
+        "I16",
+        "I17"
+      ],
+      "expected": "顺序 reduce H26/H27，旧事件在 H26 取消；H27 无旧确认/伪 stop；密集调用与跳过调用的状态一致。",
+      "finding_refs": [
+        "B06"
+      ],
+      "id": "T24",
+      "inputs": "LONG boundary=47400、ATR=1000，H25 突破；H26 close=46000/low=45500；H27 恢复；全部已完成小时证据可用。",
+      "name": "跳过小时仍取消",
+      "status": "SYNTHETIC_NOT_YET_RUN"
+    },
+    {
+      "assert_invariants_each_transition": [
+        "I01",
+        "I02",
+        "I03",
+        "I04",
+        "I05",
+        "I06",
+        "I07",
+        "I08",
+        "I09",
+        "I10",
+        "I11",
+        "I12",
+        "I13",
+        "I14",
+        "I15",
+        "I16",
+        "I17"
+      ],
+      "expected": "stop=49700−250=49450；只在 hour3 确认，hour4 不可确认；迟调用不补发过去入场；各 variant 消费隔离。",
+      "finding_refs": [
+        "B06"
+      ],
+      "id": "T25",
+      "inputs": "boundary=50000、ATR=1000；H+1 low=49800、不确认，H+2 low=49700、不确认；H+3 low=49900/close=50100/open<close 首次确认。",
+      "name": "三小时与 extrema",
+      "status": "SYNTHETIC_NOT_YET_RUN"
+    },
+    {
+      "assert_invariants_each_transition": [
+        "I01",
+        "I02",
+        "I03",
+        "I04",
+        "I05",
+        "I06",
+        "I07",
+        "I08",
+        "I09",
+        "I10",
+        "I11",
+        "I12",
+        "I13",
+        "I14",
+        "I15",
+        "I16",
+        "I17"
+      ],
+      "expected": "未冻结 AM01 时 SPEC_AMENDMENT_REQUIRED；若 Controller 采纳建议，只终止旧事件，下一根不同小时方可注册。",
+      "finding_refs": [
+        "B06"
+      ],
+      "id": "T26",
+      "inputs": "同一小时 bar 取消/过期旧事件，并满足新突破谓词。",
+      "name": "双角色规范门",
+      "status": "SYNTHETIC_NOT_YET_RUN"
+    },
+    {
+      "assert_invariants_each_transition": [
+        "I01",
+        "I02",
+        "I03",
+        "I04",
+        "I05",
+        "I06",
+        "I07",
+        "I08",
+        "I09",
+        "I10",
+        "I11",
+        "I12",
+        "I13",
+        "I14",
+        "I15",
+        "I16",
+        "I17"
+      ],
+      "expected": "4h 需 d>=152 且其他规则通过；12h stress 需 280>250，明确 ineligible，无虚构亏损；book/case 独立，不降成本。",
+      "finding_refs": [
+        "B04"
+      ],
+      "id": "T27",
+      "inputs": "原始 8 IDs；base/stress 22/44bp，小时资金费 4/8bp；4h c=76，12h c=140，stop cap=250。",
+      "name": "八候选与成本几何",
+      "status": "SYNTHETIC_NOT_YET_RUN"
+    },
+    {
+      "assert_invariants_each_transition": [
+        "I01",
+        "I02",
+        "I03",
+        "I04",
+        "I05",
+        "I06",
+        "I07",
+        "I08",
+        "I09",
+        "I10",
+        "I11",
+        "I12",
+        "I13",
+        "I14",
+        "I15",
+        "I16",
+        "I17"
+      ],
+      "expected": "实际 run_simulation，4h BASE/STRESS 的 winning/losing 路径各 n>=1，所有原费用不变；净值由独立 quantity/fee/funding oracle 重建；terminal positions/ACK/payables/C_o/R/L=0。不是实证或候选参数优化。",
+      "finding_refs": [
+        "B04",
+        "B05",
+        "B07"
+      ],
+      "id": "T28",
+      "inputs": ">=240h warm-up、固定结构触发和合法尺寸；4h BASE/STRESS 各执行预定义 winning/losing 两条完整路径（共4个 full replay）；synthetic known hourly schedule、原4/8bp费率、stop200bp满足4h stress几何；全部 source/ACK tail 在固定边界内。",
+      "name": "完整非空 4h replay",
+      "status": "SYNTHETIC_NOT_YET_RUN"
+    },
+    {
+      "assert_invariants_each_transition": [
+        "I01",
+        "I02",
+        "I03",
+        "I04",
+        "I05",
+        "I06",
+        "I07",
+        "I08",
+        "I09",
+        "I10",
+        "I11",
+        "I12",
+        "I13",
+        "I14",
+        "I15",
+        "I16",
+        "I17"
+      ],
+      "expected": "Known-schedule BASE12h 实际 run_simulation n>=1，cash/net逐笔对账；unknown-hourly STRESS12h=0fills+明确ineligible。不能因为旧 registry helper 的 horizon硬编码跳过funding schedule；该helper只复用ID，不复用eligibility捷径。terminal余额0。",
+      "finding_refs": [
+        "B04",
+        "B07"
+      ],
+      "id": "T29",
+      "inputs": ">=240h warm-up 的12h BASE，明确定义合成 known 8h settlement schedule（费率仍4/8bp，非实际交易所来源），stop200bp按原 stress hurdle c60/d>=120通过；另一个固定12h STRESS unknown-hourly scenario c140/d>=280不通过。两个fixture事前固定，不能由结果切换。",
+      "name": "完整 12h BASE 与 stress",
+      "status": "SYNTHETIC_NOT_YET_RUN"
+    },
+    {
+      "assert_invariants_each_transition": [
+        "I01",
+        "I02",
+        "I03",
+        "I04",
+        "I05",
+        "I06",
+        "I07",
+        "I08",
+        "I09",
+        "I10",
+        "I11",
+        "I12",
+        "I13",
+        "I14",
+        "I15",
+        "I16",
+        "I17"
+      ],
+      "expected": "12dp 分录/checkpoint/hash 相同；资金费用 max pre/post=1 而非 1.6；退出 slice 数量和<=1；费用/资金费各一次。",
+      "finding_refs": [
+        "B01",
+        "B02",
+        "B07"
+      ],
+      "id": "T30",
+      "inputs": "环境 Decimal precision 28/50、Python3.12/3.13；BTC/ETH 独立输入排列；q=1→.6→0 的部分退出，保留因果顺序。",
+      "name": "Decimal/排列/部分减仓",
+      "status": "SYNTHETIC_NOT_YET_RUN"
+    },
+    {
+      "assert_invariants_each_transition": [
+        "I01",
+        "I02",
+        "I03",
+        "I04",
+        "I05",
+        "I06",
+        "I07",
+        "I08",
+        "I09",
+        "I10",
+        "I11",
+        "I12",
+        "I13",
+        "I14",
+        "I15",
+        "I16",
+        "I17"
+      ],
+      "expected": "按规范 SOURCE/COST_BLOCKED 或命名 WAIT；无伪填充价格、maker 优势、下一月读取；market/protected/private/live=0。",
+      "finding_refs": [
+        "B01",
+        "B04"
+      ],
+      "id": "T31",
+      "inputs": "缺 active trade/true-mark、非正 volume、非法 tick/lot/min-notional、fold tail 越界；禁止网络/实证 CLI。",
+      "name": "权限/缺失/边界",
+      "status": "SYNTHETIC_NOT_YET_RUN"
+    },
+    {
+      "assert_invariants_each_transition": [
+        "I01",
+        "I02",
+        "I03",
+        "I04",
+        "I05",
+        "I06",
+        "I07",
+        "I08",
+        "I09",
+        "I10",
+        "I11",
+        "I12",
+        "I13",
+        "I14",
+        "I15",
+        "I16",
+        "I17"
+      ],
+      "expected": "ACK 前 E_c/E_r=900，drawdown=100，kill=true/free=0；不能先 net 得 0。盈利 ACK 后 cash=1100、仍 pending loss100，kill 保持；全部 ACK 后 cash=1000、余额 0。",
+      "finding_refs": [
+        "B05",
+        "B05"
+      ],
+      "id": "T32",
+      "inputs": "同 owner 两个已可见未 ACK slice：payable=100、receivable=100、费用 0，cash=1000；两个 ACK 均未来可用且到达排列可交换。",
+      "name": "不同 pending slice 盈亏不互抵",
+      "status": "SYNTHETIC_NOT_YET_RUN"
+    },
+    {
+      "assert_invariants_each_transition": [
+        "I01",
+        "I02",
+        "I03",
+        "I04",
+        "I05",
+        "I06",
+        "I07",
+        "I08",
+        "I09",
+        "I10",
+        "I11",
+        "I12",
+        "I13",
+        "I14",
+        "I15",
+        "I16",
+        "I17"
+      ],
+      "expected": "free=0 合法，I06 不错误要求 0<=负数；实际 cash/经济亏损不截断；非正风险净值 kill。",
+      "finding_refs": [
+        "B07",
+        "B05"
+      ],
+      "id": "T33",
+      "inputs": "独立 projection 输入：E_c=100、C_o=100，A_raw=−5；以及 E_c=−10。",
+      "name": "资本不足/负净值下界",
+      "status": "SYNTHETIC_NOT_YET_RUN"
+    },
+    {
+      "assert_invariants_each_transition": [
+        "I01",
+        "I02",
+        "I03",
+        "I04",
+        "I05",
+        "I06",
+        "I07",
+        "I08",
+        "I09",
+        "I10",
+        "I11",
+        "I12",
+        "I13",
+        "I14",
+        "I15",
+        "I16",
+        "I17"
+      ],
+      "expected": "notice 同步 E_c=998、entry fee payable=2、C_o=101、free=847.1，未 ACK notional100保留；ACK 后 cash998/payable0/C_o1/free947.1，G=100；无二次费用覆盖释放。",
+      "finding_refs": [
+        "B02",
+        "B05"
+      ],
+      "id": "T34",
+      "inputs": "cash=1000；entry notional cover=100、entry fee cover=2、exit cover=1，C_o=103；合法费 notice=2，FillAck 延迟。",
+      "name": "费用可见时原子覆盖转换",
+      "status": "SYNTHETIC_NOT_YET_RUN"
+    }
+  ],
+  "task_id": "V06_G2_R3_P1_ALTERNATIVE_ENGINE_ARCHITECTURE_SELECTION_SOL_HIGH_R1",
+  "terminal_verdict": "P1_SPEC_AMENDMENT_REQUIRED",
+  "transition_invariants": [
+    {
+      "assertion": "sum(dr_USDT)==sum(cr_USDT) for everyeconomicposting; independently sum memo dr==cr; currencies never mixed.",
+      "id": "I01"
+    },
+    {
+      "assertion": "total_reserved_funding==sum(ownerR_f for ALL live/pending/closed_unsettled owners).",
+      "id": "I02"
+    },
+    {
+      "assertion": "total_unpaid_funding==sum(owner FINAL FUNDING_PAYABLE); provisional andfinal distinguished.",
+      "id": "I03"
+    },
+    {
+      "assertion": "total_cost_commitments==sum(owner remainingC_o components); no side-state counter authority.",
+      "id": "I04"
+    },
+    {
+      "assertion": "shortfall>0 implies explicit exactowner/settlement ENC_SHORTFALL; no cross-owner cover transfer.",
+      "id": "I05"
+    },
+    {
+      "assertion": "I06: A == (0 if killed/insolvent else max(0, 0.95*E_c-C_o-R_f-L_f)); if A_raw>=0, A<=A_raw. Negative CASH and economic equity are preserved, never floored.",
+      "id": "I06"
+    },
+    {
+      "assertion": "every settledcash change has exactACKposting/cause; allACK flatcashdelta==sumfinalnet+itemizedflows.",
+      "id": "I07"
+    },
+    {
+      "assertion": "within a book one symbol has <=1 live/pendingentry owner; exitedowner retained financially without liveinventory. Booksindependent.",
+      "id": "I08"
+    },
+    {
+      "assertion": "cooldown_until[symbol]==max(previous,ceil_valid_exit+14400000); lateACK cannotlower orresurrectowner.",
+      "id": "I09"
+    },
+    {
+      "assertion": "latestavailablemarkclose monotonically nondecreasing; sameclose conflictingprice fatal regardlessinputpermutation.",
+      "id": "I10"
+    },
+    {
+      "assertion": "idempotentIDs postonce; sameID/differentdigest CONFLICT_FAIL_CLOSED; exactowner/cause IDs match, no substring/fallback.",
+      "id": "I11"
+    },
+    {
+      "assertion": "Every decision/risk cause has available_at <= cut. Full-bar H/L/C need completed-bar proof; Funding FINAL needs the complete ownership-window proof. Reports are outside the decision readset.",
+      "id": "I12"
+    },
+    {
+      "assertion": "quantity/cost/tick/lot checks exactDecimal(localcontextprecision50,ROUND_HALF_EVEN), postingquantize12dp; no ambientcontext dependence.",
+      "id": "I13"
+    },
+    {
+      "assertion": "kill monotonicallyfalse->true; ACK/closedposition/foldtransition cannotreset highwater orkill; preservedlosses/insolvency.",
+      "id": "I14"
+    },
+    {
+      "assertion": "eachRetesthourcursor advances once in chronologicalorder; 3hourlimit and firstconfirmation/consumption fixed; no latebackdatedfill.",
+      "id": "I15"
+    },
+    {
+      "assertion": "eachpartialexitslice quantities sum<=originalfill; funding exposure charge maxprepost notsum; eachowner/S settlesonce.",
+      "id": "I16"
+    },
+    {
+      "assertion": "Pending positive receivables cannot offset any visible negative exit slice or unpaid fee; truncate positive components before aggregation, not owner net PnL.",
+      "id": "I17"
+    }
+  ]
+}
