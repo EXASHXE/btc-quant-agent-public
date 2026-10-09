@@ -1,0 +1,571 @@
+{
+  "schema_version": "1.0.0",
+  "task_id": "V06_G2_R3_P0_B_INDEPENDENT_R2_FINAL_BEHAVIOR_REAUDIT",
+  "audit_role": "GEMINI_B_INDEPENDENT_VERIFIER",
+  "controller_dispatch_sha": "20ad1e442fb7cce58c618c4aac1e2a3b6241f647",
+  "prompt_pinned_sha": "16fde9a2ece7a9f2a0099b3f36a289d80e72aaf9",
+  "b_start_sha": "f1ec703b7c7276582f324ac25b9d1000f1b5ef14",
+  "a_immutable_target_sha": "2c60b0653d3619eedf457753511a9ecc84c1cd5b",
+  "a_r2_parent_sha": "5c542edd418a74b440162610fd540b1f01e423d3",
+  "a_r1_initial_sha": "2f0383816127cb7d87cf5deb559aeda0b04f1624",
+  "a_original_blocked_sha": "3b8befb0112cfe2d314ad65964762a3fb251e710",
+  "code_baseline_sha": "e0ff8c3473de4bfa3e66fe7928d42992a4d38a32",
+  "method_sha": "cf2d5cc33774cdcff7d709636305bba830e977ef",
+  "original_design_sha": "e5b2006a89441f7eb2ec900e508aff451106b87a",
+  "terminal_verdict": "R2_B_SEMANTIC_BLOCKED__REPLAN_ENGINE_ARCHITECTURE",
+  "summary_counts": {
+    "total_b_items": 7,
+    "PASS": 2,
+    "BLOCKED": 5,
+    "INCOMPLETE": 0
+  },
+  "r1_closed_findings_stability_check": {
+    "A01_src_init_untouched": {
+      "status": "PASS",
+      "src_init_absent_at_r2_sha": true,
+      "out_of_allowlist_files_r1_to_r2": [],
+      "out_of_allowlist_files_vs_base": []
+    },
+    "A02_manifest_supersession_preserved": {
+      "status": "PASS",
+      "old_receipt_preserved_byte_for_byte": true,
+      "correction_receipt_canonical_15_months": true,
+      "untouched_in_r2_diff": true
+    },
+    "A04_per_candidate_signal_state_isolation_preserved": {
+      "status": "PASS",
+      "permutation_invariant_across_candidates": true,
+      "candidate_count": 8
+    },
+    "A05_partial_band_and_stop_subcases_preserved": {
+      "status": "PASS",
+      "retest_band_0_25_atr": true,
+      "retest_stop_extremum_minus_0_50_atr": true
+    }
+  },
+  "b01_to_b07_findings": [
+    {
+      "finding_id": "B01",
+      "title": "Mark PIT & ReplayEngine.run_simulation Mark Ingress",
+      "related_r1_findings": [
+        "A06"
+      ],
+      "severity": "HIGH_BLOCKER",
+      "r1_sha": "5c542edd418a74b440162610fd540b1f01e423d3",
+      "r1_status": "OPEN_BLOCKED",
+      "r2_sha": "2c60b0653d3619eedf457753511a9ecc84c1cd5b",
+      "r2_status": "BLOCKED",
+      "repaired_from_r1": [
+        "ReplayEngine.run_simulation now sorts marks by (max(close_ms, available_at_ms), close_ms) and ingests nonzero completed marks (8 across 8 books vs 0 in R1)",
+        "Future marks (close_ms > open_time_ms) and unavailable marks (available_at_ms > open_time_ms) are rejected at minute open",
+        "Multi-symbol marks and 120s MARK_STALENESS timeout operate on mark close_ms"
+      ],
+      "residual_or_new_r2_defects": [
+        "In ReplayEngine.run_simulation (replay_engine.py:L94,L110-L121), sorting by effective_avail = max(close_ms, available_at_ms) and overwriting a single scalar latest_eligible = m causes a delayed older mark M_stale (close_ms=S, available_at_ms=S+120s) to overwrite a newer mark M_fresh (close_ms=S+60s, available_at_ms=S+90s) in the same minute step S+120s, permanently dropping M_fresh from VirtualBook.last_available_marks."
+      ],
+      "subcases": [
+        {
+          "subcase_id": "B01_C1_ORDERED_ELIGIBLE_AND_LAGGED_INGRESS",
+          "description": "Ordered mark ingress into ReplayEngine.run_simulation without current-minute close access",
+          "oracle_expected": {
+            "replay_marks_ingested_count": 8,
+            "future_rejected": true,
+            "unavailable_rejected": true
+          },
+          "a_r1_observed": {
+            "replay_marks_ingested_count": 0,
+            "future_rejected": true,
+            "unavailable_rejected": true
+          },
+          "a_r2_observed": {
+            "replay_marks_ingested_count": 8,
+            "future_rejected": true,
+            "unavailable_rejected": true
+          },
+          "status": "PASS",
+          "source_reference": "src/btc_quant_agent/strategy_research/r3_overnight/replay_engine.py:L92-L121; ledger.py:L298-L311",
+          "counterexample_summary": null
+        },
+        {
+          "subcase_id": "B01_C2_OUT_OF_ORDER_SAME_SYMBOL_MARK_IN_REPLAY_ENGINE",
+          "description": "Out-of-order same-symbol mark stream in ReplayEngine.run_simulation where M_fresh (close_ms=S+60s, avail=S+90s) and delayed M_stale (close_ms=S, avail=S+120s) both become eligible by S+120s",
+          "oracle_expected": {
+            "mark_close": "51000",
+            "mark_close_ms": 1700002860000
+          },
+          "a_r1_observed": {
+            "mark_close": null,
+            "mark_close_ms": null
+          },
+          "a_r2_observed": {
+            "mark_close": "49000",
+            "mark_close_ms": 1700002800000
+          },
+          "status": "BLOCKED",
+          "source_reference": "src/btc_quant_agent/strategy_research/r3_overnight/replay_engine.py:L94,L110-L121",
+          "counterexample_summary": "while loop in ReplayEngine.run_simulation overwrites latest_eligible = M_fresh (close=51000, close_ms=S+60s) with M_stale (close=49000, close_ms=S) and passes only M_stale to step_minute_open, permanently dropping M_fresh."
+        }
+      ],
+      "smallest_counterexample": {
+        "file_and_lines": "src/btc_quant_agent/strategy_research/r3_overnight/replay_engine.py:L94,L110-L121",
+        "inputs": "M_fresh(timestamp_ms=S, close_ms=S+60000, available_at_ms=S+90000, close=51000), M_stale(timestamp_ms=S-60000, close_ms=S, available_at_ms=S+120000, close=49000)",
+        "expected": "last_available_marks['BTCUSDT'] == (Decimal('51000'), S+60000, S+90000)",
+        "observed": "last_available_marks['BTCUSDT'] == (Decimal('49000'), 1700002800000, 1700002920000)"
+      },
+      "concrete_b_tests": [
+        "tests/test_v06_g2_r3_verifier_repair_r2_reaudit.py::test_r2_b01_mark_pit_and_out_of_order_replay_engine_drop"
+      ]
+    },
+    {
+      "finding_id": "B02",
+      "title": "Stage 1 ACK Idempotency Across Entry, Exit, and Funding Messages",
+      "related_r1_findings": [
+        "A03",
+        "A08"
+      ],
+      "severity": "HIGH_BLOCKER",
+      "r1_sha": "5c542edd418a74b440162610fd540b1f01e423d3",
+      "r1_status": "OPEN_BLOCKED",
+      "r2_sha": "2c60b0653d3619eedf457753511a9ecc84c1cd5b",
+      "r2_status": "PASS",
+      "repaired_from_r1": [
+        "VirtualBook tracks acknowledged_fill_ids, acknowledged_exit_ids, and acknowledged_funding_ids (ledger.py:L113-L115)",
+        "2x/3x duplicate entry fill ACKs, exit ACKs, and funding ACKs apply fee/cash/PnL/reserve deltas exactly once",
+        "Stale entry fill ACK after position close does not resurrect closed position; distinct orders across time have unique IDs"
+      ],
+      "residual_or_new_r2_defects": [],
+      "subcases": [
+        {
+          "subcase_id": "B02_C1_DUPLICATE_2X_3X_AND_STALE_ACKS",
+          "description": "Deliver entry fill ACK, exit ACK, and funding ACK 2x/3x and after economic position close",
+          "oracle_expected": {
+            "dup_ack_fee_debited_times": "1",
+            "trades_count": 1,
+            "funding_count": 1,
+            "positions_count": 0,
+            "cash_reconciled": true
+          },
+          "a_r1_observed": {
+            "dup_ack_fee_debited_times": "2.0000"
+          },
+          "a_r2_observed": {
+            "dup_ack_fee_debited_times": "1.0000",
+            "trades_count": 1,
+            "funding_count": 1,
+            "positions_count": 0,
+            "cash_reconciled": true
+          },
+          "status": "PASS",
+          "source_reference": "src/btc_quant_agent/strategy_research/r3_overnight/ledger.py:L113-L115,L313-L376",
+          "counterexample_summary": null
+        }
+      ],
+      "smallest_counterexample": null,
+      "concrete_b_tests": [
+        "tests/test_v06_g2_r3_verifier_repair_r2_reaudit.py::test_r2_b02_ack_idempotency_2x_3x_stale_and_distinct_orders"
+      ]
+    },
+    {
+      "finding_id": "B03",
+      "title": "Hourly Settlement Ownership [S-15000, S+15000] & Multi-Position Attribution",
+      "related_r1_findings": [
+        "A03"
+      ],
+      "severity": "CRITICAL_BLOCKER",
+      "r1_sha": "5c542edd418a74b440162610fd540b1f01e423d3",
+      "r1_status": "OPEN_BLOCKED",
+      "r2_sha": "2c60b0653d3619eedf457753511a9ecc84c1cd5b",
+      "r2_status": "BLOCKED",
+      "repaired_from_r1": [
+        "Single position entering at S (or S-60s) and hitting Stage 6 SL in minute S (end_ms = S + 59,999) is now charged funding at S (0.20 USDT vs 0 in R1)",
+        "Single position closed before S-15,000 (at S-120,000, end_ms = S-60,001) pays 0 funding at S"
+      ],
+      "residual_or_new_r2_defects": [
+        "B03-D1 (Pre-S minute [S-60s, S) Stage 6 exit ACK race): A position exiting via Stage 6 SL/TP in minute S-60,000 gets end_ms = S-1 (inside [S-15000, S+15000]) and ack_available_at_ms = S. At minute S, Stage 1 consumes the exit ACK into completed_trades (with total_funding_usdt=0) and releases 100% of rem_funding BEFORE Stage 7 at S runs. Stage 7 then charges funding (0.20) on cash and subtracts 0.20 from funding_reserve_rf again, but fails to update completed_trades[0].total_funding_usdt (0).",
+        "B03-D2 (Close-then-reopen at S max(quantity) aggregation & wrong position attribution): charged_settlements is keyed by (sym, S) and takes max(i.quantity for i in intersecting) (ledger.py:L841,L856). When POS_1 (qty=0.05) closes in Stage 4 at S and POS_2 (qty=0.01) opens in Stage 5 at S, Stage 7 charges POS_1's 0.05 debit (1.00 USDT) entirely to POS_2 while charging POS_1 0.",
+        "B03-D3 (Pending exit ACK matched by symbol instead of position_id): In ledger.py:L869-L883, Stage 7 matches pending_exit_acks by `if trade.symbol == sym:` and breaks on index 0, attributing POS_AT_S's funding at S to an earlier POS_EARLY (closed at S-120s outside the window) whose exit ACK was delayed."
+      ],
+      "subcases": [
+        {
+          "subcase_id": "B03_C1_SINGLE_SAME_MINUTE_SL_AT_S",
+          "description": "Single position entering at S and hitting Stage 6 SL in minute S",
+          "oracle_expected": {
+            "sl_at_s_funding_charged": "0.200000"
+          },
+          "a_r1_observed": {
+            "sl_at_s_funding_charged": "0"
+          },
+          "a_r2_observed": {
+            "sl_at_s_funding_charged": "0.200000"
+          },
+          "status": "PASS",
+          "source_reference": "src/btc_quant_agent/strategy_research/r3_overnight/ledger.py:L834-L884",
+          "counterexample_summary": null
+        },
+        {
+          "subcase_id": "B03_C2_PRE_S_INTRAMINUTE_SL_EXIT_ACK_RACE",
+          "description": "Position enters at S-60s and hits Stage 6 SL in minute S-60s (econ_exit = S-1 inside [S-15s, S+15s], exit ACK at S)",
+          "oracle_expected": {
+            "trade_total_funding_usdt": "0.200000",
+            "cash_minus_pnl_diff": "0.000000",
+            "eth_witness_rf_preserved": "2.00"
+          },
+          "a_r1_observed": {
+            "trade_total_funding_usdt": "0",
+            "ledger_funding_charged": "0"
+          },
+          "a_r2_observed": {
+            "trade_total_funding_usdt": "0",
+            "ledger_funding_charged": "0.200000",
+            "cash_delta": "-11.289003000000",
+            "trade_net_pnl": "-11.08900300",
+            "rf_after_s": "1.800000"
+          },
+          "status": "BLOCKED",
+          "source_reference": "src/btc_quant_agent/strategy_research/r3_overnight/ledger.py:L347-L363,L730-L735,L863-L886",
+          "counterexample_summary": "Stage 1 at S pops trade into completed_trades (total_funding_usdt=0) and releases full rem_funding=2.00 before Stage 7 at S runs; Stage 7 then debits 0.20 cash and steals 0.20 from ETHUSDT's funding_reserve_rf (1.80 vs 2.00) while leaving trade.total_funding_usdt=0."
+        },
+        {
+          "subcase_id": "B03_C3_CLOSE_THEN_REOPEN_AT_S_MULTI_POSITION",
+          "description": "POS_1 (qty=0.05) closes at S in Stage 4 and POS_2 (qty=0.01) opens at S in Stage 5",
+          "oracle_expected": {
+            "pos1_funding_usdt": "1.000000",
+            "pos2_funding_usdt": "0.200000"
+          },
+          "a_r1_observed": {
+            "pos1_funding_usdt": "0",
+            "pos2_funding_usdt": "0.200000"
+          },
+          "a_r2_observed": {
+            "pos1_funding_usdt": "0",
+            "pos2_funding_usdt": "1.000000"
+          },
+          "status": "BLOCKED",
+          "source_reference": "src/btc_quant_agent/strategy_research/r3_overnight/ledger.py:L841,L856-L867",
+          "counterexample_summary": "Stage 7 aggregates intersecting intervals by max(quantity)=0.05 and charges POS_1's 1.00 USDT debit entirely to POS_2 (qty=0.01) while POS_1 in pending_exit_acks is charged 0."
+        },
+        {
+          "subcase_id": "B03_C4_DISJOINT_POSITIONS_PENDING_EXIT_ACK_SYMBOL_MATCH",
+          "description": "POS_EARLY closed at S-120s (outside window, delayed exit ACK) and POS_AT_S closed via Stage 6 SL at S",
+          "oracle_expected": {
+            "pos_early_funding_usdt": "0",
+            "pos_at_s_funding_usdt": "0.400000"
+          },
+          "a_r1_observed": {
+            "pos_early_funding_usdt": "0",
+            "pos_at_s_funding_usdt": "0"
+          },
+          "a_r2_observed": {
+            "pos_early_funding_usdt": "0.400000",
+            "pos_at_s_funding_usdt": "0"
+          },
+          "status": "BLOCKED",
+          "source_reference": "src/btc_quant_agent/strategy_research/r3_overnight/ledger.py:L869-L883",
+          "counterexample_summary": "Stage 7 matches pending_exit_acks by `if trade.symbol == sym:` and breaks on index 0, charging POS_AT_S's 0.40 USDT funding to POS_EARLY (which exited before S-15s)."
+        }
+      ],
+      "smallest_counterexample": {
+        "file_and_lines": "src/btc_quant_agent/strategy_research/r3_overnight/ledger.py:L841,L856-L886",
+        "inputs": "1) ORD_PRE_S_SL fills at S-60000 and hits Stage 6 SL at S-60000 (end_ms=S-1, exit ACK at S); 2) POS_1(qty=0.05) exits at S in Stage 4 and POS_2(qty=0.01) opens at S in Stage 5",
+        "expected": "1) trade.total_funding_usdt == 0.200000 and rf_after_s == 2.00; 2) pos1_funding == 1.000000 and pos2_funding == 0.200000",
+        "observed": "1) trade.total_funding_usdt == 0 (cash debited 0.200000) and rf_after_s == 1.800000; 2) pos1_funding == 0 and pos2_funding == 1.000000"
+      },
+      "concrete_b_tests": [
+        "tests/test_v06_g2_r3_verifier_repair_r2_reaudit.py::test_r2_b03_settlement_window_ack_race_and_multi_position_misattribution"
+      ]
+    },
+    {
+      "finding_id": "B04",
+      "title": "Minute-End SL/TP Timestamps, Causal OHLC, Cooldown & 4h/12h Horizon",
+      "related_r1_findings": [
+        "A07"
+      ],
+      "severity": "HIGH_BLOCKER",
+      "r1_sha": "5c542edd418a74b440162610fd540b1f01e423d3",
+      "r1_status": "OPEN_BLOCKED",
+      "r2_sha": "2c60b0653d3619eedf457753511a9ecc84c1cd5b",
+      "r2_status": "PASS",
+      "repaired_from_r1": [
+        "Stage 6 intraminute SL/TP stamps exit_time_ms = open_time_ms + 59,999 (minute end) with holding_minutes >= 1",
+        "Cooldown anchored consistently to ceil_to_minute(exit_time_ms) + 4h across ledger.py and signals.py",
+        "Same-bar SL+TP collision resolves SL first; adverse open gap uses worse open; favorable TP is capped at target; 4h (240m) and 12h (720m) expiries verified"
+      ],
+      "residual_or_new_r2_defects": [],
+      "subcases": [
+        {
+          "subcase_id": "B04_C1_MINUTE_END_EXIT_HOLDING_AND_COOLDOWN",
+          "description": "Same-minute SL at S stamps minute-end exit_time_ms = S + 59,999, holding_minutes = 1, and cooldown = S + 60,000 + 4h",
+          "oracle_expected": {
+            "exit_ms": 1700002859999,
+            "holding_minutes": 1,
+            "cooldown_until_ms": 1700017260000
+          },
+          "a_r1_observed": {
+            "exit_ms": 1700002800000,
+            "holding_minutes": 0,
+            "cooldown_until_ms": 1700017200000
+          },
+          "a_r2_observed": {
+            "exit_ms": 1700002859999,
+            "holding_minutes": 1,
+            "cooldown_until_ms": 1700017260000
+          },
+          "status": "PASS",
+          "source_reference": "src/btc_quant_agent/strategy_research/r3_overnight/ledger.py:L730-L784; signals.py:L124-L127",
+          "counterexample_summary": null
+        }
+      ],
+      "smallest_counterexample": null,
+      "concrete_b_tests": [
+        "tests/test_v06_g2_r3_verifier_repair_r2_reaudit.py::test_r2_b04_minute_end_sl_tp_causal_ohlc_and_horizons"
+      ]
+    },
+    {
+      "finding_id": "B05",
+      "title": "Decision/Economic Equity Valuation, Pre-ACK Safety & Pre-Clamp Reserve Conservation",
+      "related_r1_findings": [
+        "A06",
+        "A08"
+      ],
+      "severity": "HIGH_BLOCKER",
+      "r1_sha": "5c542edd418a74b440162610fd540b1f01e423d3",
+      "r1_status": "OPEN_BLOCKED",
+      "r2_sha": "2c60b0653d3619eedf457753511a9ecc84c1cd5b",
+      "r2_status": "BLOCKED",
+      "repaired_from_r1": [
+        "Unacknowledged positions with unrealized gains no longer inflate decision_equity before fill ACK arrives",
+        "_trigger_kill_liquidation cancels pending orders and releases only their commitments while retaining open position reserves until exit ACK"
+      ],
+      "residual_or_new_r2_defects": [
+        "B05-D1 (Pre-ACK unrealized loss ignored by risk/kill supervisor & entry notional commitment released before fill ACK): Stage 5 (ledger.py:L658-L659) releases pending_entry_released = order.cost_commitment_usdt - c_exit at fill creation time O before the entry fill ACK arrives, while Stage 2 (ledger.py:L396-L420) ignores unacknowledged positions and never evaluates economic_equity against DRAWDOWN_KILL_THRESHOLD_USDT ($100) or insolvency (<=0). A -$125 pre-ACK mark crash (economic_equity = 874.1248750000 < 900) leaves decision_equity = 1000, killed = False, and available_capital = 942.96.",
+        "B05-D2 (Pre-clamp negative reserves masked by max(0, ...)): ledger.py uses max(Decimal(0), ...) in 7 places (L355, L356, L425, L426, L866, L881, L886), masking negative pre-clamp reserve deltas when funding reserve is exhausted or when pre-S intraminute exits release reserves in Stage 1 before Stage 7 debits funding_reserve_rf."
+      ],
+      "subcases": [
+        {
+          "subcase_id": "B05_C1_POST_KILL_EXIT_ACK_RESERVE_RELEASE",
+          "description": "Drawdown kill cancels pending orders and releases active position reserves once on liquidation exit ACK",
+          "oracle_expected": {
+            "post_kill_cost_commitment_o": "0.0000000000",
+            "post_kill_funding_reserve_rf": "0.00"
+          },
+          "a_r1_observed": {
+            "post_kill_cost_commitment_o": "-3.0315125000",
+            "post_kill_funding_reserve_rf": "-5.00"
+          },
+          "a_r2_observed": {
+            "post_kill_cost_commitment_o": "0",
+            "post_kill_funding_reserve_rf": "0"
+          },
+          "status": "PASS",
+          "source_reference": "src/btc_quant_agent/strategy_research/r3_overnight/ledger.py:L355-L356,L421-L435",
+          "counterexample_summary": null
+        },
+        {
+          "subcase_id": "B05_C2_PRE_ACK_CATASTROPHIC_LOSS_AND_PREMATURE_ENTRY_RELEASE",
+          "description": "Unacknowledged position suffers -$125 mark crash to 47500 (economic_equity=874.1248750000, drawdown=125.88 >= $100 kill threshold) while entry notional commitment was already released in Stage 5",
+          "oracle_expected": {
+            "economic_equity": "874.1248750000",
+            "economic_drawdown_breached": true,
+            "entry_notional_reserved_until_fill_ack": true
+          },
+          "a_r1_observed": {
+            "killed": true
+          },
+          "a_r2_observed": {
+            "economic_equity": "872.749500000000",
+            "decision_equity": "998.999500000000",
+            "killed": false,
+            "available_capital_usdt": "945.01851250000000"
+          },
+          "status": "BLOCKED",
+          "source_reference": "src/btc_quant_agent/strategy_research/r3_overnight/ledger.py:L395-L420,L658-L659,L907-L914",
+          "counterexample_summary": "Stage 5 releases entry notional commitment at S before fill ACK arrives, and Stage 2 ignores the -$125 pre-ACK loss (economic_equity=874.12), leaving killed=False and available_capital=942.96 USDT."
+        }
+      ],
+      "smallest_counterexample": {
+        "file_and_lines": "src/btc_quant_agent/strategy_research/r3_overnight/ledger.py:L395-L420,L658-L659,L866,L886",
+        "inputs": "ORD_UNACKED_CRASH (qty=0.05, entry=50000) fills at S; mark crashes to 47500 (-$125 loss > $100 kill threshold) before fill ACK is consumed",
+        "expected": "Economic safety latch triggered or entry notional commitment (~2500 USDT) retained until fill ACK so spendable available_capital is 0",
+        "observed": "economic_equity=872.749500000000, decision_equity=998.999500000000, killed=False, available_capital=945.01851250000000"
+      },
+      "concrete_b_tests": [
+        "tests/test_v06_g2_r3_verifier_repair_r2_reaudit.py::test_r2_b05_decision_economic_equity_and_pre_clamp_reserve_algebra"
+      ]
+    },
+    {
+      "finding_id": "B06",
+      "title": "Closed Retest 3-Hour Elapsed Window, Intermediate Extrema & Cooldown Clock",
+      "related_r1_findings": [
+        "A05",
+        "A04"
+      ],
+      "severity": "HIGH_BLOCKER",
+      "r1_sha": "5c542edd418a74b440162610fd540b1f01e423d3",
+      "r1_status": "OPEN_BLOCKED",
+      "r2_sha": "2c60b0653d3619eedf457753511a9ecc84c1cd5b",
+      "r2_status": "BLOCKED",
+      "repaired_from_r1": [
+        "_advance_active_breakout advances bars_since_breakout and records intermediate extrema before vol_bps and 4h EMA filter returns when last_exit_time_ms is None (1 vs 0 in R1)",
+        "last_advanced_hour_ms prevents double-stepping on the same completed 1h bar"
+      ],
+      "residual_or_new_r2_defects": [
+        "B06-D1 (Cooldown return before _advance_active_breakout & call-count increment): In signals.py:L124-L131, the 4h cooldown check returns None BEFORE calling _advance_active_breakout, and _advance_active_breakout increments bars_since_breakout += 1 by call count instead of elapsed hours (current_1h.close_ms - breakout.breakout_hour_ms) // 3_600_000. When a symbol is in cooldown during hours H+1..H+4 after a breakout at H, bars_since_breakout stays 0, intermediate extrema are skipped, and hour H+5 (5 elapsed hours post-breakout!) confirms a stale retest with bars_since_breakout == 1.",
+        "B06-D2 (Unconfirmed 3rd hour leaves breakout.canceled = False and blocks new breakout on hour 3): In signals.py:L94-L95,L316-L376, at bars_since_breakout == 3 (the 3rd post-breakout hour), if confirmation fails, _evaluate_closed_retest returns None without marking breakout.canceled = True or falling through to evaluate a new 24h breakout on hour 3."
+      ],
+      "subcases": [
+        {
+          "subcase_id": "B06_C1_INTERMEDIATE_EMA_DIP_WITHOUT_COOLDOWN",
+          "description": "Intermediate hour post-breakout fails 4h EMA alignment with last_exit_time_ms=None",
+          "oracle_expected": {
+            "skipped_hour_bars_since_breakout": 1
+          },
+          "a_r1_observed": {
+            "skipped_hour_bars_since_breakout": 0
+          },
+          "a_r2_observed": {
+            "skipped_hour_bars_since_breakout": 1
+          },
+          "status": "PASS",
+          "source_reference": "src/btc_quant_agent/strategy_research/r3_overnight/signals.py:L59-L97,L130-L131",
+          "counterexample_summary": null
+        },
+        {
+          "subcase_id": "B06_C2_STALE_5TH_HOUR_CONFIRMATION_AFTER_COOLDOWN_HOURS",
+          "description": "Breakout registered at H_25 while position open; position exits at H_25+10m placing H_26..H_29 in 4h cooldown; H_30 (5 elapsed hours after H_25) touches zone",
+          "oracle_expected": {
+            "elapsed_hours": 5,
+            "stale_5th_hour_confirmed": false
+          },
+          "a_r1_observed": {
+            "elapsed_hours": 5,
+            "stale_5th_hour_confirmed": true,
+            "bars_since_breakout": 1
+          },
+          "a_r2_observed": {
+            "elapsed_hours": 5,
+            "stale_5th_hour_confirmed": true,
+            "bars_since_breakout": 1
+          },
+          "status": "BLOCKED",
+          "source_reference": "src/btc_quant_agent/strategy_research/r3_overnight/signals.py:L79,L124-L131",
+          "counterexample_summary": "Cooldown check at signals.py:L124-L127 returns None before _advance_active_breakout at L131; at hour H_30 (5 elapsed hours after H_25), bars_since_breakout increments from 0 to 1 and emits a stale retest SignalEvent."
+        },
+        {
+          "subcase_id": "B06_C3_UNCONFIRMED_3RD_HOUR_SUPPRESSES_NEW_BREAKOUT",
+          "description": "Breakout 1 at H_25 fails confirmation on H_26, H_27, and H_28 (3rd bar), while H_28 itself forms a new 24h breakout",
+          "oracle_expected": {
+            "active_breakout_hour_ms": 1700110800000
+          },
+          "a_r1_observed": {
+            "active_breakout_hour_ms": 1700100000000,
+            "canceled": false
+          },
+          "a_r2_observed": {
+            "active_breakout_hour_ms": 1700100000000,
+            "canceled": false
+          },
+          "status": "BLOCKED",
+          "source_reference": "src/btc_quant_agent/strategy_research/r3_overnight/signals.py:L94-L95,L316-L376",
+          "counterexample_summary": "At bars_since_breakout == 3, unconfirmed Breakout 1 returns None at L376 with canceled=False, suppressing registration of the new H_28 breakout."
+        }
+      ],
+      "smallest_counterexample": {
+        "file_and_lines": "src/btc_quant_agent/strategy_research/r3_overnight/signals.py:L79,L94-L95,L124-L131,L316-L376",
+        "inputs": "Breakout at H_25; last_exit_time_ms = H_25_close + 600_000 active across H_26..H_29; confirmation bar at H_30 (5 hours after H_25)",
+        "expected": "stale_sig_h30 is None (5 elapsed hours > 3-bar confirmation window)",
+        "observed": "stale_sig_h30 confirmed=True with bars_since_breakout=1 after 5 elapsed hours"
+      },
+      "concrete_b_tests": [
+        "tests/test_v06_g2_r3_verifier_repair_r2_reaudit.py::test_r2_b06_retest_elapsed_hours_cooldown_freeze_and_third_bar_expiry"
+      ]
+    },
+    {
+      "finding_id": "B07",
+      "title": "Funding Ledger Cash/Reserve Conservation, Exhaustion & ACK Permutations",
+      "related_r1_findings": [
+        "A08",
+        "A03"
+      ],
+      "severity": "CRITICAL_BLOCKER",
+      "r1_sha": "5c542edd418a74b440162610fd540b1f01e423d3",
+      "r1_status": "OPEN_BLOCKED",
+      "r2_sha": "2c60b0653d3619eedf457753511a9ecc84c1cd5b",
+      "r2_status": "BLOCKED",
+      "repaired_from_r1": [
+        "Single-position trade with sufficient funding_reserves_usdt (>= debit) that exits after S now decrements funding_reserve_rf in Stage 7 and reaches 0 residual reserve on close (0 vs 0.200000 in R1)"
+      ],
+      "residual_or_new_r2_defects": [
+        "B07-D1 (Reserve exhaustion before settlement breaks per-position vs aggregate exactness and drives pre-clamp negative): When pos.funding_reserves_usdt (0.40) < debit (1.00) at Stage 7 (ledger.py:L866,L886), pos.funding_reserves_usdt is clamped to max(0, 0.40 - 1.00) = 0.00 (actual reduction 0.40), but self.funding_reserve_rf subtracts the full debit = 1.00. With another position open (ETHUSDT reserve = 2.00), self.funding_reserve_rf drops from 2.40 to 1.40 while sum(pos.funding_reserves_usdt) is 2.00 (a -0.60 USDT conservation deficit that inflates available capital and causes a -0.60 pre-clamp underflow when ETHUSDT closes). On a single-position book, pre-clamp funding_reserve_rf - debit = 0.40 - 1.00 = -0.60 < 0.",
+        "B07-D2 (Exit ACK at S + Stage 7 settlement at S permutation double-releases reserve and breaks cash-vs-trade PnL conservation): When a position exits via Stage 6 SL in minute S-60,000 (end_ms = S-1), Stage 1 at S releases 100% of its funding reserve (2.00) and moves the trade to completed_trades before Stage 7 at S subtracts debit (0.20) from funding_reserve_rf a second time (pre-clamp -0.20) and debits cash by 0.20 without updating completed_trades[0].total_funding_usdt."
+      ],
+      "subcases": [
+        {
+          "subcase_id": "B07_C1_SINGLE_TRADE_SUFFICIENT_RESERVE_CLOSE",
+          "description": "Single position with funding_reserves_usdt=2.00 >= debit=0.20 crossing settlement S and closing at S+60s",
+          "oracle_expected": {
+            "leaked_funding_reserve_after_close": "0"
+          },
+          "a_r1_observed": {
+            "leaked_funding_reserve_after_close": "0.200000"
+          },
+          "a_r2_observed": {
+            "leaked_funding_reserve_after_close": "0"
+          },
+          "status": "PASS",
+          "source_reference": "src/btc_quant_agent/strategy_research/r3_overnight/ledger.py:L356,L866,L886",
+          "counterexample_summary": null
+        },
+        {
+          "subcase_id": "B07_C2_RESERVE_EXHAUSTED_BEFORE_SETTLEMENT_CONSERVATION",
+          "description": "POS_BTC has remaining funding_reserves_usdt=0.40 < debit=1.00 at S while POS_ETH has funding_reserves_usdt=2.00",
+          "oracle_expected": {
+            "sum_position_rf": "2.00",
+            "aggregate_funding_reserve_rf": "2.00",
+            "pre_clamp_non_negative": true
+          },
+          "a_r1_observed": {
+            "sum_position_rf": "2.00",
+            "aggregate_funding_reserve_rf": "2.40"
+          },
+          "a_r2_observed": {
+            "sum_position_rf": "2.00",
+            "aggregate_funding_reserve_rf": "1.400000",
+            "single_book_pre_clamp_rf": "-0.60"
+          },
+          "status": "BLOCKED",
+          "source_reference": "src/btc_quant_agent/strategy_research/r3_overnight/ledger.py:L866,L886",
+          "counterexample_summary": "pos_btc.funding_reserves_usdt decreases by 0.40 (clamped at 0), but book.funding_reserve_rf subtracts full debit 1.00, leaving aggregate_rf=1.40 != sum_position_rf=2.00 and single-book pre-clamp = -0.60."
+        },
+        {
+          "subcase_id": "B07_C3_PRE_S_EXIT_ACK_AND_SETTLEMENT_PERMUTATION",
+          "description": "Stage 1 exit ACK at S followed by Stage 7 settlement at S for position closed at S-1",
+          "oracle_expected": {
+            "cash_delta_matches_trade_net_pnl": true,
+            "eth_witness_rf": "2.00"
+          },
+          "a_r1_observed": {
+            "cash_delta_matches_trade_net_pnl": true,
+            "funding_charged": "0"
+          },
+          "a_r2_observed": {
+            "cash_delta": "-11.289003000000",
+            "trade_net_pnl": "-11.08900300",
+            "eth_witness_rf_after_s": "1.800000"
+          },
+          "status": "BLOCKED",
+          "source_reference": "src/btc_quant_agent/strategy_research/r3_overnight/ledger.py:L356,L869-L886",
+          "counterexample_summary": "Stage 1 at S releases full 2.00 reserve and finalizes trade before Stage 7 at S debits 0.20 cash and subtracts 0.20 from funding_reserve_rf again."
+        }
+      ],
+      "smallest_counterexample": {
+        "file_and_lines": "src/btc_quant_agent/strategy_research/r3_overnight/ledger.py:L356,L866,L881,L886",
+        "inputs": "POS_BTC(qty=0.05, mark=50000, funding_reserves_usdt=0.40, debit_at_S=1.00) + POS_ETH(funding_reserves_usdt=2.00); initial book.funding_reserve_rf = 2.40",
+        "expected": "After Stage 7 at S: book.funding_reserve_rf == Decimal('2.00') == sum(p.funding_reserves_usdt for p in book.positions.values())",
+        "observed": "book.funding_reserve_rf == Decimal('1.400000') != sum(pos.funding_reserves_usdt) == Decimal('2.00'); single-book pre-clamp == Decimal('-0.60')"
+      },
+      "concrete_b_tests": [
+        "tests/test_v06_g2_r3_verifier_repair_r2_reaudit.py::test_r2_b07_funding_reserve_exhaustion_and_ack_permutation_conservation"
+      ]
+    }
+  ]
+}

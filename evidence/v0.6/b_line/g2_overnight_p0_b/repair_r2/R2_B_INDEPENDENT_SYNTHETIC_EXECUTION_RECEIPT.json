@@ -1,0 +1,261 @@
+{
+  "schema_version": "1.0.0",
+  "task_id": "V06_G2_R3_P0_B_INDEPENDENT_R2_FINAL_BEHAVIOR_REAUDIT",
+  "audit_role": "GEMINI_B_INDEPENDENT_VERIFIER",
+  "controller_dispatch_sha": "20ad1e442fb7cce58c618c4aac1e2a3b6241f647",
+  "prompt_pinned_sha": "16fde9a2ece7a9f2a0099b3f36a289d80e72aaf9",
+  "b_start_sha": "f1ec703b7c7276582f324ac25b9d1000f1b5ef14",
+  "a_immutable_target_sha": "2c60b0653d3619eedf457753511a9ecc84c1cd5b",
+  "a_r2_parent_sha": "5c542edd418a74b440162610fd540b1f01e423d3",
+  "code_baseline_sha": "e0ff8c3473de4bfa3e66fe7928d42992a4d38a32",
+  "method_sha": "cf2d5cc33774cdcff7d709636305bba830e977ef",
+  "original_design_sha": "e5b2006a89441f7eb2ec900e508aff451106b87a",
+  "terminal_verdict": "R2_B_SEMANTIC_BLOCKED__REPLAN_ENGINE_ARCHITECTURE",
+  "authority_guards": {
+    "live_a_worktree_reads": 0,
+    "raw_market_body_reads": 0,
+    "empirical_price_body_authority": "NONE",
+    "protected_holdout_2024_01_01_to_2025_11_30_touched": false,
+    "future_blind_2025_12_01_plus_touched": false,
+    "testnet_authority": "NOT_AUTHORIZED",
+    "real_funds_write_authority": "NONE"
+  },
+  "isolation_and_materialization": {
+    "mechanism": "git archive 2c60b0653d3619eedf457753511a9ecc84c1cd5b | tar -x -C /tmp/g2_r3_b_r2_final_*",
+    "compared_commits": [
+      "5c542edd418a74b440162610fd540b1f01e423d3",
+      "2c60b0653d3619eedf457753511a9ecc84c1cd5b"
+    ],
+    "a_live_worktree_path_accessed": false
+  },
+  "git_lineage_and_scope": {
+    "a_target_sha": "2c60b0653d3619eedf457753511a9ecc84c1cd5b",
+    "a_parent_sha": "5c542edd418a74b440162610fd540b1f01e423d3",
+    "a_parent_matches_expected": true,
+    "controller_dispatch_sha": "20ad1e442fb7cce58c618c4aac1e2a3b6241f647",
+    "controller_decision_verified": true,
+    "prompt_pinned_sha": "16fde9a2ece7a9f2a0099b3f36a289d80e72aaf9",
+    "prompt_parent_matches_controller_dispatch": true,
+    "prompt_pins_controller_sha": true,
+    "r2_changed_files": [
+      "docs/strategy_research/g2_r3/prep_a/repair_r2/R2_CONTROLLER_HANDOFF.md",
+      "evidence/v0.6/b_line/g2_overnight_p0_a/repair_r2/R2_B01_B07_BEFORE_AFTER_MATRIX.json",
+      "evidence/v0.6/b_line/g2_overnight_p0_a/repair_r2/R2_SYNTHETIC_EXECUTION_RECEIPT.json",
+      "src/btc_quant_agent/strategy_research/r3_overnight/ledger.py",
+      "src/btc_quant_agent/strategy_research/r3_overnight/replay_engine.py",
+      "src/btc_quant_agent/strategy_research/r3_overnight/signals.py",
+      "tests/test_strategy_research_r3_r2_invariants.py"
+    ],
+    "r2_changed_files_match_expected_7": true,
+    "out_of_allowlist_files_r1_to_r2": [],
+    "out_of_allowlist_files_vs_base": [],
+    "diff_from_base_count": 30,
+    "a02_manifest_files_untouched_in_r2": true
+  },
+  "ci_context_on_a_r2": {
+    "github_actions_run_id": 37888079460,
+    "target_sha": "2c60b0653d3619eedf457753511a9ecc84c1cd5b",
+    "lint_and_type_check_python_3_12": "SUCCESS",
+    "unit_and_audit_tests_python_3_12": {
+      "status": "FAILURE_ON_INHERITED_V051_H40_GOLDEN_DEBT_ONLY",
+      "passed": 2830,
+      "failed": 1,
+      "skipped": 2,
+      "warnings": 9,
+      "failed_test_nodeid": "tests/test_v051_h40_m3a_production_discovery_producer.py::test_m3a_production_discovery_producer_generates_locked_artifacts",
+      "caused_by_a_r2_diff": false,
+      "controller_adjudication": "INHERITED_V051_H40_FULL_SUITE_GOLDEN_STABILITY_DEBT"
+    }
+  },
+  "scoped_verification_commands_and_results": [
+    {
+      "command": "/usr/bin/python3.12 -m pytest tests/test_v06_g2_r3_verifier_*.py -v",
+      "interpreter": "Python 3.12.3",
+      "passed": 35,
+      "failed": 0,
+      "status": "PASS"
+    },
+    {
+      "command": "/root/miniconda3/bin/python -m pytest tests/test_v06_g2_r3_verifier_*.py -v",
+      "interpreter": "Python 3.13.13",
+      "passed": 35,
+      "failed": 0,
+      "status": "PASS"
+    },
+    {
+      "command": "git archive 2c60b0653d3619eedf457753511a9ecc84c1cd5b -> /tmp -> /usr/bin/python3.12 -m pytest tests/test_strategy_research_r3_*.py -v",
+      "interpreter": "Python 3.12.3",
+      "passed": 46,
+      "failed": 0,
+      "status": "PASS_ON_NARROW_UNIT_FIXTURES_ONLY"
+    },
+    {
+      "command": "/root/miniconda3/bin/ruff check scripts/strategy_research/r3_verification tests/test_v06_g2_r3_verifier_*.py",
+      "status": "PASS_0_ERRORS"
+    },
+    {
+      "command": "/usr/bin/python3.12 -m compileall -q scripts/strategy_research/r3_verification tests/test_v06_g2_r3_verifier_*.py",
+      "status": "PASS_0_ERRORS"
+    }
+  ],
+  "coverage_summary": {
+    "candidates_verified": [
+      "STRUCTURAL_CONTINUATION_LONG_04H",
+      "STRUCTURAL_CONTINUATION_LONG_12H",
+      "STRUCTURAL_CONTINUATION_SHORT_04H",
+      "STRUCTURAL_CONTINUATION_SHORT_12H",
+      "CLOSED_RETEST_LONG_04H",
+      "CLOSED_RETEST_LONG_12H",
+      "CLOSED_RETEST_SHORT_04H",
+      "CLOSED_RETEST_SHORT_12H"
+    ],
+    "candidate_count": 8,
+    "cost_scenarios_verified": [
+      "BASE",
+      "STRESS"
+    ],
+    "horizons_verified": [
+      "04H (240 minutes)",
+      "12H (720 minutes)"
+    ],
+    "b01_b07_verdicts": {
+      "B01": "BLOCKED",
+      "B02": "PASS",
+      "B03": "BLOCKED",
+      "B04": "PASS",
+      "B05": "BLOCKED",
+      "B06": "BLOCKED",
+      "B07": "BLOCKED"
+    }
+  },
+  "dynamic_observations": {
+    "r1_probe_on_r1": {
+      "a01_init_absent": true,
+      "a02_old_intact": true,
+      "a02_new_canonical": true,
+      "candidate_count": 8,
+      "leaked_funding_reserve_after_close": "0.200000",
+      "charged_funding_on_trade": "0.200000",
+      "dup_ack_fee_debited_times": "2.0000",
+      "pre_s_funding_charged": "0",
+      "sl_at_s_entry_ms": 1700002800000,
+      "sl_at_s_exit_ms": 1700002800000,
+      "sl_at_s_holding_minutes": 0,
+      "sl_at_s_funding_charged": "0",
+      "sl_at_s_cooldown_until_ms": 1700017200000,
+      "sl_at_s_expected_cooldown_until_ms": 1700017260000,
+      "post_kill_cost_commitment_o": "-3.0315125000",
+      "post_kill_funding_reserve_rf": "-5.00",
+      "replay_engine_marks_ingested_count": 0,
+      "skipped_hour_bars_since_breakout": 0
+    },
+    "r1_probe_on_r2": {
+      "a01_init_absent": true,
+      "a02_old_intact": true,
+      "a02_new_canonical": true,
+      "candidate_count": 8,
+      "leaked_funding_reserve_after_close": "0",
+      "charged_funding_on_trade": "0.200000",
+      "dup_ack_fee_debited_times": "1.0000",
+      "pre_s_funding_charged": "0.200000",
+      "sl_at_s_entry_ms": 1700002800000,
+      "sl_at_s_exit_ms": 1700002859999,
+      "sl_at_s_holding_minutes": 1,
+      "sl_at_s_funding_charged": "0.200000",
+      "sl_at_s_cooldown_until_ms": 1700017260000,
+      "sl_at_s_expected_cooldown_until_ms": 1700017260000,
+      "post_kill_cost_commitment_o": "0",
+      "post_kill_funding_reserve_rf": "0",
+      "replay_engine_marks_ingested_count": 8,
+      "skipped_hour_bars_since_breakout": 1
+    },
+    "cost_proxy_verified": true,
+    "b01_probes": {
+      "future_mark_rejected": true,
+      "unavailable_mark_rejected": true,
+      "sol_mark_ingested": true,
+      "r1_replay_marks_ingested_count": 0,
+      "r2_replay_marks_ingested_count": 8,
+      "ooo_expected_mark_close": "51000",
+      "ooo_expected_mark_close_ms": 1700002860000,
+      "ooo_observed_mark_close": "49000",
+      "ooo_observed_mark_close_ms": 1700002800000
+    },
+    "b02_probes": {
+      "r1_dup_ack_fee_debited_times": "2.0000",
+      "r2_dup_ack_fee_debited_times": "1.0000",
+      "b02_3x_trades_count": 1,
+      "b02_3x_funding_count": 1,
+      "b02_3x_positions_count": 0,
+      "b02_3x_cash_reconciled": true
+    },
+    "b03_probes": {
+      "r1_sl_at_s_funding_charged": "0",
+      "r2_sl_at_s_funding_charged": "0.200000",
+      "pre_s_sl_funding_on_trade": "0",
+      "pre_s_sl_funding_on_ledger": "0.200000",
+      "pre_s_sl_cash_delta": "-11.289003000000",
+      "pre_s_sl_trade_net_pnl": "-11.08900300",
+      "pre_s_sl_rf_after_s": "1.800000",
+      "pre_s_sl_eth_required_rf": "2.00",
+      "reopen_pos1_funding": "0",
+      "reopen_pos2_funding": "1.000000",
+      "reopen_pos1_expected_funding": "1.000000",
+      "reopen_pos2_expected_funding": "0.200000",
+      "disjoint_early_trade_funding": "0.400000",
+      "disjoint_at_s_trade_funding": "0"
+    },
+    "b04_probes": {
+      "r1_sl_at_s_exit_ms": 1700002800000,
+      "r2_sl_at_s_exit_ms": 1700002859999,
+      "r1_sl_at_s_holding_minutes": 0,
+      "r2_sl_at_s_holding_minutes": 1,
+      "r1_sl_at_s_cooldown_until_ms": 1700017200000,
+      "r2_sl_at_s_cooldown_until_ms": 1700017260000,
+      "expected_cooldown_until_ms": 1700017260000
+    },
+    "b05_probes": {
+      "r1_post_kill_cost_commitment_o": "-3.0315125000",
+      "r2_post_kill_cost_commitment_o": "0",
+      "r1_post_kill_funding_reserve_rf": "-5.00",
+      "r2_post_kill_funding_reserve_rf": "0",
+      "unacked_crash_economic_equity": "872.749500000000",
+      "unacked_crash_decision_equity": "998.999500000000",
+      "unacked_crash_killed": false,
+      "unacked_crash_available_cap": "945.01851250000000"
+    },
+    "b06_probes": {
+      "r1_skipped_hour_bars_since_breakout": 0,
+      "r2_skipped_hour_bars_since_breakout": 1,
+      "stale_5th_hour_confirmed": true,
+      "stale_5th_hour_bars_counter": 1,
+      "stale_5th_hour_elapsed_hours": 5,
+      "h3_breakout_hour_ms": 1700100000000,
+      "h3_expected_new_breakout_hour_ms": 1700110800000,
+      "h3_canceled_flag": false
+    },
+    "b07_probes": {
+      "r1_leaked_funding_reserve_after_close": "0.200000",
+      "r2_leaked_funding_reserve_after_close": "0",
+      "exhaust_sum_position_rf": "2.00",
+      "exhaust_aggregate_rf": "1.400000",
+      "single_pre_clamp_rf": "-0.60"
+    },
+    "e2e_replay_engine": {
+      "base_04h_trades": 1,
+      "base_04h_holding_minutes": 240,
+      "base_04h_funding_count": 4,
+      "base_04h_flat_co": "0",
+      "base_04h_flat_rf": "0",
+      "base_12h_trades": 1,
+      "base_12h_holding_minutes": 720,
+      "base_12h_funding_count": 12,
+      "base_12h_flat_co": "0",
+      "base_12h_flat_rf": "0",
+      "stress_04h_trades": 1,
+      "stress_12h_trades": 0,
+      "base_receipt_hash": "47ee136411bfed29a2abfd2a6e89c96829f0c0c125a7b5a626e65ff1bd4e74e0",
+      "stress_receipt_hash": "ab292fca90adcfb227a99bcb535ad0dc8b50086f2d2938a6259e4de6fbb7e981"
+    }
+  }
+}
