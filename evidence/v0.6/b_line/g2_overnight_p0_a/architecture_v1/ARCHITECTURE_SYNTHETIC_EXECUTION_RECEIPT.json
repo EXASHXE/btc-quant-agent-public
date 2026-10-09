@@ -1,0 +1,97 @@
+{
+  "schema_version": "G2_R3_P1_SYNTHETIC_EXECUTION_RECEIPT_V1",
+  "task_id": "V06_G2_R3_P1_ENGINE_ARCHITECTURE_REBUILD_V1",
+  "role": "GEMINI_A",
+  "controller_dispatch_sha": "e5fcd76370a1b03d7d83b825af6a8cac842b1ae5",
+  "prompt_pinned_sha": "35575f11772dba871b079b0b7f6a8c7ac32e2f30",
+  "original_prompt_sha": "9398c016b8b7134905eb40f61426f91a2cfb8e43",
+  "a_start_sha": "2c60b0653d3619eedf457753511a9ecc84c1cd5b",
+  "implementation_sha": "89d0c211cff96286203e4fb7459a51042c1257f1",
+  "b_evidence_sha": "068a4005f68b5ee4a970063cb1f3bc524a08784a",
+  "branch": "feature/v06-bline-g2-overnight-discovery-a",
+  "remote_repository": "https://github.com/EXASHXE/btc-quant-agent-public.git",
+  "terminal_verdict": "ARCH_V1_SYNTHETIC_READY_FOR_INDEPENDENT_REVIEW",
+  "authority_guards": {
+    "live_b_worktree_reads": 0,
+    "raw_market_body_reads": 0,
+    "empirical_price_body_authority": "NONE",
+    "protected_holdout_2024_01_01_to_2025_11_30_touched": false,
+    "future_blind_2025_12_01_plus_touched": false,
+    "testnet_authority": "NOT_AUTHORIZED",
+    "real_funds_write_authority": "NONE",
+    "strategy_parameters_frozen": true,
+    "cost_geometry_frozen": true
+  },
+  "candidate_registry_integrity": {
+    "exact_candidate_count": 8,
+    "candidates": [
+      "c01_donchian_breakout_12h_tight",
+      "c02_bollinger_reversal_4h_normal",
+      "c03_keltner_pullback_12h_loose",
+      "c04_macd_momentum_4h_normal",
+      "c05_rsi_divergence_12h_tight",
+      "c06_vwap_cross_4h_loose",
+      "c07_atr_breakout_12h_normal",
+      "c08_ema_cloud_4h_tight"
+    ],
+    "prohibit_ninth_candidate_verified": true
+  },
+  "execution_verification": {
+    "test_framework": "pytest",
+    "python_3_12": {
+      "path": "/usr/bin/python3.12",
+      "version": "3.12.3",
+      "passed_count": 57,
+      "failed_count": 0,
+      "skipped_count": 0,
+      "exit_code": 0
+    },
+    "python_3_13": {
+      "path": "/root/miniconda3/bin/python3.13",
+      "version": "3.13.13",
+      "passed_count": 57,
+      "failed_count": 0,
+      "skipped_count": 0,
+      "exit_code": 0
+    },
+    "linter_status": {
+      "tool": "ruff",
+      "violations_remaining": 0,
+      "exit_code": 0
+    },
+    "compilation_status": {
+      "tool": "compileall",
+      "exit_code": 0
+    },
+    "git_diff_whitespace_status": {
+      "clean": true,
+      "exit_code": 0
+    }
+  },
+  "flat_book_algebraic_reconciliation": {
+    "initial_capital_usdt": "10000.00000000",
+    "final_cash_usdt": "10000.00000000",
+    "final_cost_commitment_o_usdt": "0.00000000",
+    "final_funding_reserve_rf_usdt": "0.00000000",
+    "final_active_positions_count": 0,
+    "final_pending_entry_orders_count": 0,
+    "final_pending_exit_orders_count": 0,
+    "final_unsettled_exit_trades_count": 0,
+    "net_closed_trades_pnl_usdt": "0.00000000",
+    "net_closed_trades_funding_usdt": "0.00000000",
+    "net_closed_trades_fees_usdt": "0.00000000",
+    "cash_conservation_exact_delta": "0.00000000",
+    "reserve_conservation_exact_delta": "0.00000000",
+    "flat_book_zero_liability_invariant_satisfied": true
+  },
+  "defect_resolution_verdicts": {
+    "B01": "PASS",
+    "B02": "PASS",
+    "B03": "PASS",
+    "B04": "PASS",
+    "B05": "PASS",
+    "B06": "PASS",
+    "B07": "PASS"
+  },
+  "inherited_ci_note": "Inherited H40 golden hash discrepancy in root repository CI remains independent of R3 overnight architecture scope and was untouched per instructions."
+}

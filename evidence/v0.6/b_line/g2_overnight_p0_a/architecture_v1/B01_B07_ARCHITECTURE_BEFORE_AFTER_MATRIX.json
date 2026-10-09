@@ -1,0 +1,397 @@
+{
+  "schema_version": "G2_R3_P1_ARCHITECTURE_BEFORE_AFTER_MATRIX_V1",
+  "task_id": "V06_G2_R3_P1_ENGINE_ARCHITECTURE_REBUILD_V1",
+  "role": "GEMINI_A",
+  "controller_dispatch_sha": "e5fcd76370a1b03d7d83b825af6a8cac842b1ae5",
+  "a_start_sha": "2c60b0653d3619eedf457753511a9ecc84c1cd5b",
+  "implementation_sha": "89d0c211cff96286203e4fb7459a51042c1257f1",
+  "b_evidence_sha": "068a4005f68b5ee4a970063cb1f3bc524a08784a",
+  "summary_counts": {
+    "total_findings": 7,
+    "total_subcases": 16,
+    "PASS": 16,
+    "BLOCKED": 0,
+    "INCOMPLETE": 0
+  },
+  "terminal_verdict": "ARCH_V1_SYNTHETIC_READY_FOR_INDEPENDENT_REVIEW",
+  "findings": [
+    {
+      "id": "B01",
+      "severity": "CRITICAL",
+      "title": "Causal Mark Price Stream Delivery and Monotonic Ingress",
+      "files_modified": [
+        "src/btc_quant_agent/strategy_research/r3_overnight/replay_engine.py",
+        "src/btc_quant_agent/strategy_research/r3_overnight/ledger.py"
+      ],
+      "defect_id": "B01-D1",
+      "subcases": [
+        {
+          "subcase_id": "B01_C1_ORDERED_ELIGIBLE_AND_LAGGED_INGRESS",
+          "description": "Ordered mark ingress into ReplayEngine without current-minute close access",
+          "b_r2_status": "PASS",
+          "p1_status": "PASS",
+          "test_node_id": "tests/test_strategy_research_r3_r2_invariants.py::test_b01_causal_mark_ingestion_and_future_stale_rejection"
+        },
+        {
+          "subcase_id": "B01_C2_OUT_OF_ORDER_SAME_SYMBOL_MARK_IN_REPLAY_ENGINE",
+          "description": "Out-of-order same-symbol mark stream in ReplayEngine where M_fresh (close_ms=S+60s, avail=S+90s) and delayed M_stale (close_ms=S, avail=S+120s) both become eligible by S+120s",
+          "b_r2_status": "BLOCKED",
+          "p1_status": "PASS",
+          "test_node_id": "tests/test_strategy_research_r3_architecture_invariants.py::test_b01_positive_out_of_order_and_delayed_marks",
+          "before_after_comparison": {
+            "b_r2_observed": {
+              "selected_mark_close": "49000",
+              "selected_mark_close_ms": 1700002800000,
+              "fresh_mark_dropped": true
+            },
+            "oracle_expected": {
+              "selected_mark_close": "51000",
+              "selected_mark_close_ms": 1700002860000,
+              "fresh_mark_dropped": false
+            },
+            "p1_observed": {
+              "selected_mark_close": "51000",
+              "selected_mark_close_ms": 1700002860000,
+              "fresh_mark_dropped": false
+            }
+          },
+          "root_cause_and_rebuild": "ReplayEngine now collects all newly eligible marks at minute open, computes the freshest mark per symbol via max(close_ms, available_at_ms), and enforces monotonic ingress via last_seen_mark_by_sym so older/delayed arrivals never displace fresher marks."
+        }
+      ]
+    },
+    {
+      "id": "B02",
+      "severity": "CRITICAL",
+      "title": "Stage 1 ACK Idempotency Across Entry, Exit, and Funding Messages",
+      "files_modified": [
+        "src/btc_quant_agent/strategy_research/r3_overnight/ledger.py"
+      ],
+      "defect_id": "NONE_REGRESSION_GUARD",
+      "subcases": [
+        {
+          "subcase_id": "B02_C1_DUPLICATE_2X_3X_AND_STALE_ACKS",
+          "description": "Duplicate (2x, 3x) and post-close fill/exit ACKs do not alter cash, positions, or reserves",
+          "b_r2_status": "PASS",
+          "p1_status": "PASS",
+          "test_node_id": "tests/test_strategy_research_r3_architecture_invariants.py::test_b02_positive_ack_idempotency_2x_3x_and_post_close",
+          "before_after_comparison": {
+            "b_r2_observed": {
+              "entry_acked_once": true,
+              "exit_acked_once": true,
+              "funding_deduped": true
+            },
+            "oracle_expected": {
+              "entry_acked_once": true,
+              "exit_acked_once": true,
+              "funding_deduped": true
+            },
+            "p1_observed": {
+              "entry_acked_once": true,
+              "exit_acked_once": true,
+              "funding_deduped": true
+            }
+          },
+          "root_cause_and_rebuild": "Retained strict deduplication sets processed_fill_acks and processed_settlement_keys, ensuring duplicate ACKs are dropped silently without mutating ledger state."
+        }
+      ]
+    },
+    {
+      "id": "B03",
+      "severity": "CRITICAL",
+      "title": "Hourly Settlement Ownership [S-15000, S+15000] and Multi-Position Attribution",
+      "files_modified": [
+        "src/btc_quant_agent/strategy_research/r3_overnight/ledger.py",
+        "src/btc_quant_agent/strategy_research/r3_overnight/types.py"
+      ],
+      "defect_id": "B03-D1, B03-D2, B03-D3",
+      "subcases": [
+        {
+          "subcase_id": "B03_C1_SINGLE_SAME_MINUTE_SL_AT_S",
+          "description": "Single position same-minute stop loss at settlement minute S",
+          "b_r2_status": "PASS",
+          "p1_status": "PASS",
+          "test_node_id": "tests/test_strategy_research_r3_r2_invariants.py::test_b03_hourly_settlement_ownership_window"
+        },
+        {
+          "subcase_id": "B03_C2_PRE_S_INTRAMINUTE_SL_EXIT_ACK_RACE",
+          "description": "B03-D1: Position exiting at S-1s has exit ACK arrive at S. Stage 1 previously released funding reserve before Stage 7 ran, causing double debit or missing funding on completed trade.",
+          "b_r2_status": "BLOCKED",
+          "p1_status": "PASS",
+          "test_node_id": "tests/test_strategy_research_r3_architecture_invariants.py::test_b03_positive_pre_s_exit_ack_race_and_reconciliation",
+          "before_after_comparison": {
+            "b_r2_observed": {
+              "funding_deducted_from_trade": false,
+              "trade_funding_usdt": "0.00000000",
+              "reserve_released_prematurely": true
+            },
+            "oracle_expected": {
+              "funding_deducted_from_trade": true,
+              "trade_funding_usdt": "-0.50000000",
+              "reserve_released_prematurely": false
+            },
+            "p1_observed": {
+              "funding_deducted_from_trade": true,
+              "trade_funding_usdt": "-0.50000000",
+              "reserve_released_prematurely": false
+            }
+          },
+          "root_cause_and_rebuild": "In Stage 1, if an exit ACK closes a position whose holding interval overlaps settlement minute S, the trade is quarantined in _unsettled_exit_trades with its funding reserve held intact until Stage 7 attributes funding and releases the remainder."
+        },
+        {
+          "subcase_id": "B03_C3_CLOSE_THEN_REOPEN_AT_S_MULTI_POSITION",
+          "description": "B03-D2: Position A closes at S-1s, Position B opens at S. Both overlap [S-15000, S+15000]. charged_settlements previously keyed by symbol, causing only 1 position to be charged instead of both.",
+          "b_r2_status": "BLOCKED",
+          "p1_status": "PASS",
+          "test_node_id": "tests/test_strategy_research_r3_architecture_invariants.py::test_b03_positive_close_then_reopen_at_s_independent_attribution",
+          "before_after_comparison": {
+            "b_r2_observed": {
+              "positions_charged_count": 1,
+              "pos_b_charged": false,
+              "charged_settlements_key": "(BTCUSDT, S)"
+            },
+            "oracle_expected": {
+              "positions_charged_count": 2,
+              "pos_b_charged": true,
+              "charged_settlements_key": "(position_id, S)"
+            },
+            "p1_observed": {
+              "positions_charged_count": 2,
+              "pos_b_charged": true,
+              "charged_settlements_key": "(position_id, S)"
+            }
+          },
+          "root_cause_and_rebuild": "Keyed charged_settlements and settlement interval matching strictly by (position_id, S) rather than (symbol, S). Both position A and position B are independently evaluated and charged."
+        },
+        {
+          "subcase_id": "B03_C4_DISJOINT_POSITIONS_PENDING_EXIT_ACK_SYMBOL_MATCH",
+          "description": "B03-D3: Two disjoint positions P1 and P2 for the same symbol in pending_exit_acks. Stage 7 previously matched solely by symbol and max(quantity), misattributing funding.",
+          "b_r2_status": "BLOCKED",
+          "p1_status": "PASS",
+          "test_node_id": "tests/test_strategy_research_r3_architecture_invariants.py::test_b03_positive_disjoint_positions_pending_exit_matching",
+          "before_after_comparison": {
+            "b_r2_observed": {
+              "matched_by_symbol_and_max_qty": true,
+              "exact_position_id_attribution": false
+            },
+            "oracle_expected": {
+              "matched_by_symbol_and_max_qty": false,
+              "exact_position_id_attribution": true
+            },
+            "p1_observed": {
+              "matched_by_symbol_and_max_qty": false,
+              "exact_position_id_attribution": true
+            }
+          },
+          "root_cause_and_rebuild": "Added position_id to CompletedTrade and VirtualFill. Stage 7 matches positions and completed trades strictly by position_id, guaranteeing exact 1:1 attribution."
+        }
+      ]
+    },
+    {
+      "id": "B04",
+      "severity": "CRITICAL",
+      "title": "Minute-End SL/TP Timestamps, Causal OHLC, Cooldown & 4h/12h Horizon",
+      "files_modified": [
+        "src/btc_quant_agent/strategy_research/r3_overnight/ledger.py"
+      ],
+      "defect_id": "NONE_REGRESSION_GUARD",
+      "subcases": [
+        {
+          "subcase_id": "B04_C1_MINUTE_END_EXIT_HOLDING_AND_COOLDOWN",
+          "description": "Exit timestamps anchored at minute end; cooldown clock anchored at economic exit; max hold evaluated correctly",
+          "b_r2_status": "PASS",
+          "p1_status": "PASS",
+          "test_node_id": "tests/test_strategy_research_r3_architecture_invariants.py::test_b04_positive_minute_end_sl_tp_and_cooldown_and_horizons",
+          "before_after_comparison": {
+            "b_r2_observed": {
+              "exit_time_anchored_correctly": true,
+              "cooldown_anchored_at_exit": true,
+              "horizon_respected": true
+            },
+            "oracle_expected": {
+              "exit_time_anchored_correctly": true,
+              "cooldown_anchored_at_exit": true,
+              "horizon_respected": true
+            },
+            "p1_observed": {
+              "exit_time_anchored_correctly": true,
+              "cooldown_anchored_at_exit": true,
+              "horizon_respected": true
+            }
+          },
+          "root_cause_and_rebuild": "Preserved causal minute-end evaluation and cooldown start time anchoring from economic exit bar close."
+        }
+      ]
+    },
+    {
+      "id": "B05",
+      "severity": "CRITICAL",
+      "title": "Decision/Economic Equity Valuation, Pre-ACK Safety & Pre-Clamp Reserve Conservation",
+      "files_modified": [
+        "src/btc_quant_agent/strategy_research/r3_overnight/ledger.py",
+        "src/btc_quant_agent/strategy_research/r3_overnight/types.py"
+      ],
+      "defect_id": "B05-D1, B05-D2",
+      "subcases": [
+        {
+          "subcase_id": "B05_C1_POST_KILL_EXIT_ACK_RESERVE_RELEASE",
+          "description": "Post-drawdown-kill exit ACKs release remaining reserves cleanly without negative clipping",
+          "b_r2_status": "PASS",
+          "p1_status": "PASS",
+          "test_node_id": "tests/test_strategy_research_r3_r2_invariants.py::test_b05_drawdown_kill_preserves_obligations_and_prevents_negative_reserves"
+        },
+        {
+          "subcase_id": "B05_C2_PRE_ACK_CATASTROPHIC_LOSS_AND_PREMATURE_ENTRY_RELEASE",
+          "description": "B05-D1 & B05-D2: Pre-ACK position experiences catastrophic mark crash. In R2, pre-ACK positions were excluded from risk equity and entry commitments were prematurely released, failing to trip drawdown kill.",
+          "b_r2_status": "BLOCKED",
+          "p1_status": "PASS",
+          "test_node_id": "tests/test_strategy_research_r3_architecture_invariants.py::test_b05_positive_pre_ack_loss_trips_drawdown_kill_and_no_phantom_capital",
+          "before_after_comparison": {
+            "b_r2_observed": {
+              "kill_latched": false,
+              "available_capital_inflated": true,
+              "risk_equity": "10000.00000000"
+            },
+            "oracle_expected": {
+              "kill_latched": true,
+              "available_capital_inflated": false,
+              "risk_equity": "-1000.00000000"
+            },
+            "p1_observed": {
+              "kill_latched": true,
+              "available_capital_inflated": false,
+              "risk_equity": "-1000.00000000"
+            }
+          },
+          "root_cause_and_rebuild": "Introduced unacked_entry_commitment_usdt retained until Stage 1 fill ACK; incorporated conservative pre-ACK mark losses min(0, unrealized_pnl) into risk_equity to trip the 100 USDT drawdown kill latch immediately upon mark crash; removed max(0, ...) clamping on order cancellation."
+        }
+      ]
+    },
+    {
+      "id": "B06",
+      "severity": "CRITICAL",
+      "title": "Closed Retest 3-Hour Elapsed Window, Intermediate Extrema & Cooldown Clock",
+      "files_modified": [
+        "src/btc_quant_agent/strategy_research/r3_overnight/signals.py"
+      ],
+      "defect_id": "B06-D1, B06-D2",
+      "subcases": [
+        {
+          "subcase_id": "B06_C1_INTERMEDIATE_EMA_DIP_WITHOUT_COOLDOWN",
+          "description": "Retest progression across intermediate dip without cooldown interference",
+          "b_r2_status": "PASS",
+          "p1_status": "PASS",
+          "test_node_id": "tests/test_strategy_research_r3_r2_invariants.py::test_b06_retest_progression_across_invalid_intermediate_hour"
+        },
+        {
+          "subcase_id": "B06_C2_STALE_5TH_HOUR_CONFIRMATION_AFTER_COOLDOWN_HOURS",
+          "description": "B06-D1: Retest counter paused during 4h cooldown, allowing a stale 5th-hour confirmation to generate an order.",
+          "b_r2_status": "BLOCKED",
+          "p1_status": "PASS",
+          "test_node_id": "tests/test_strategy_research_r3_architecture_invariants.py::test_b06_positive_retest_elapsed_wall_clock_hours_across_cooldown",
+          "before_after_comparison": {
+            "b_r2_observed": {
+              "stale_5th_hour_accepted": true,
+              "elapsed_hours_clock": "stepped_only_outside_cooldown"
+            },
+            "oracle_expected": {
+              "stale_5th_hour_accepted": false,
+              "elapsed_hours_clock": "wall_clock_linear"
+            },
+            "p1_observed": {
+              "stale_5th_hour_accepted": false,
+              "elapsed_hours_clock": "wall_clock_linear"
+            }
+          },
+          "root_cause_and_rebuild": "Moved breakout retest progression before candidate cooldown check and computed elapsed_hours directly from wall-clock timestamps (close_ms - breakout_hour_ms) // 3_600_000. Hour 5 is strictly > 3 and correctly rejected."
+        },
+        {
+          "subcase_id": "B06_C3_UNCONFIRMED_3RD_HOUR_SUPPRESSES_NEW_BREAKOUT",
+          "description": "B06-D2: Unconfirmed 3rd-hour retest stayed active until bar end, suppressing a valid fresh 24h breakout occurring on the same bar.",
+          "b_r2_status": "BLOCKED",
+          "p1_status": "PASS",
+          "test_node_id": "tests/test_strategy_research_r3_architecture_invariants.py::test_b06_positive_retest_third_hour_unconfirmed_expiry_and_fresh_breakout",
+          "before_after_comparison": {
+            "b_r2_observed": {
+              "fresh_breakout_suppressed": true,
+              "breakout_canceled": false
+            },
+            "oracle_expected": {
+              "fresh_breakout_suppressed": false,
+              "breakout_canceled": true
+            },
+            "p1_observed": {
+              "fresh_breakout_suppressed": false,
+              "breakout_canceled": true
+            }
+          },
+          "root_cause_and_rebuild": "When a retest reaches hour 3 without confirmation, breakout.canceled is immediately set to True and execution falls through on the same bar to evaluate a fresh 24h breakout."
+        }
+      ]
+    },
+    {
+      "id": "B07",
+      "severity": "CRITICAL",
+      "title": "Funding Ledger Cash/Reserve Conservation, Exhaustion & ACK Permutations",
+      "files_modified": [
+        "src/btc_quant_agent/strategy_research/r3_overnight/ledger.py"
+      ],
+      "defect_id": "B07-D1, B07-D2",
+      "subcases": [
+        {
+          "subcase_id": "B07_C1_SINGLE_TRADE_SUFFICIENT_RESERVE_CLOSE",
+          "description": "Clean reserve release on closed trade when funding reserve was sufficient",
+          "b_r2_status": "PASS",
+          "p1_status": "PASS",
+          "test_node_id": "tests/test_strategy_research_r3_r2_invariants.py::test_b07_exact_funding_reserve_conservation"
+        },
+        {
+          "subcase_id": "B07_C2_RESERVE_EXHAUSTED_BEFORE_SETTLEMENT_CONSERVATION",
+          "description": "B07-D1: Funding debit exceeds position reserve. In R2, aggregate reserve was subtracted by full debit while position reserve clamped to 0, stealing reserve from witness positions.",
+          "b_r2_status": "BLOCKED",
+          "p1_status": "PASS",
+          "test_node_id": "tests/test_strategy_research_r3_architecture_invariants.py::test_b07_positive_funding_reserve_exhaustion_no_cross_theft_and_conservation",
+          "before_after_comparison": {
+            "b_r2_observed": {
+              "witness_reserve_stolen": true,
+              "aggregate_reserve_clamped": false,
+              "pos2_reserve_shortfall": true
+            },
+            "oracle_expected": {
+              "witness_reserve_stolen": false,
+              "aggregate_reserve_clamped": false,
+              "pos2_reserve_shortfall": false
+            },
+            "p1_observed": {
+              "witness_reserve_stolen": false,
+              "aggregate_reserve_clamped": false,
+              "pos2_reserve_shortfall": false
+            }
+          },
+          "root_cause_and_rebuild": "In Stage 7, reserve consumption is bounded by min(owner_pos.funding_reserve_rf, debit). Only the position's own reserve is consumed; witness positions' reserves are strictly preserved, and flat-book reconciliation matches cash, reserves, and net trade outcomes to 8 decimal places."
+        },
+        {
+          "subcase_id": "B07_C3_PRE_S_EXIT_ACK_AND_SETTLEMENT_PERMUTATION",
+          "description": "B07-D2: Exit ACK at S for position closing at S-1s combined with funding settlement at S.",
+          "b_r2_status": "BLOCKED",
+          "p1_status": "PASS",
+          "test_node_id": "tests/test_strategy_research_r3_architecture_invariants.py::test_b03_positive_pre_s_exit_ack_race_and_reconciliation",
+          "before_after_comparison": {
+            "b_r2_observed": {
+              "reserve_conservation_broken": true,
+              "trade_funding_omitted": true
+            },
+            "oracle_expected": {
+              "reserve_conservation_broken": false,
+              "trade_funding_omitted": false
+            },
+            "p1_observed": {
+              "reserve_conservation_broken": false,
+              "trade_funding_omitted": false
+            }
+          },
+          "root_cause_and_rebuild": "Resolved via _unsettled_exit_trades holding reserve across Stage 1 and Stage 7 until settlement reconciliation completes, satisfying exact conservation."
+        }
+      ]
+    }
+  ]
+}
