@@ -1,0 +1,320 @@
+{
+  "matrix_metadata": {
+    "task_id": "V06_G2_R3_P1_ALT_ENGINE_GEMINI_A_IMPLEMENTATION_R1",
+    "total_cases": 34,
+    "executed_cases": 34,
+    "passed_cases": 34,
+    "failed_cases": 0,
+    "skipped_cases": 0,
+    "xfail_cases": 0,
+    "unexecuted_claims": 0
+  },
+  "cases": [
+    {
+      "id": "T01",
+      "test_node": "tests/test_r3_alt_events_money.py::test_t01_same_close_mark_conflict",
+      "provenance": "Hermetic synthetic mark bars with identical close timestamps and different prices (50000.0 vs 49000.0)",
+      "expected": "ConflictFailClosedError raised on second mark event without state mutation",
+      "observed": "ConflictFailClosedError raised, mark price stays at 50000.0",
+      "status": "PASS",
+      "invariants_checked": ["I01", "I15"]
+    },
+    {
+      "id": "T02",
+      "test_node": "tests/test_r3_alt_events_money.py::test_t02_delayed_future_mark",
+      "provenance": "Synthetic mark event with future close timestamp ahead of available_at_ms",
+      "expected": "Mark rejected / unconsumed prior to availability",
+      "observed": "Future mark rejected, causality preserved",
+      "status": "PASS",
+      "invariants_checked": ["I15"]
+    },
+    {
+      "id": "T03",
+      "test_node": "tests/test_r3_alt_events_money.py::test_t03_late_same_close_mark_conflict",
+      "provenance": "Late-arriving synthetic mark event for already recorded close timestamp",
+      "expected": "ConflictFailClosedError raised even when late",
+      "observed": "ConflictFailClosedError raised, fail-closed behavior confirmed",
+      "status": "PASS",
+      "invariants_checked": ["I01", "I15"]
+    },
+    {
+      "id": "T04",
+      "test_node": "tests/test_r3_alt_events_money.py::test_t04_report_decision_isolation",
+      "provenance": "Standardized injected book evaluated with REPORT_SNAPSHOT event",
+      "expected": "Report event produces zero ledger postings and does not mutate decision/risk readset",
+      "observed": "Zero postings produced, state and projections unchanged",
+      "status": "PASS",
+      "invariants_checked": ["I01", "I08", "I10"]
+    },
+    {
+      "id": "T05",
+      "test_node": "tests/test_r3_alt_events_money.py::test_t05_mark_staleness_boundary",
+      "provenance": "Synthetic marks evaluated at exact staleness boundary",
+      "expected": "Stale marks beyond allowed threshold rejected",
+      "observed": "Boundary conditions strictly upheld",
+      "status": "PASS",
+      "invariants_checked": ["I15"]
+    },
+    {
+      "id": "T06",
+      "test_node": "tests/test_r3_alt_events_money.py::test_t06_ack_duplicate_idempotent",
+      "provenance": "Identical ACK event submitted twice with matching payload digest",
+      "expected": "First ACK debits fee 2 USDT (cash 1000 -> 998); second duplicate accepted idempotently with 0 postings",
+      "observed": "Cash settled stays 998 USDT, zero duplicate postings",
+      "status": "PASS",
+      "invariants_checked": ["I01", "I02", "I05"]
+    },
+    {
+      "id": "T07",
+      "test_node": "tests/test_r3_alt_events_money.py::test_t07_ack_payload_conflict",
+      "provenance": "Same event ID submitted with mutated payload (fee 2 -> 3 USDT)",
+      "expected": "ConflictFailClosedError raised before any mutation",
+      "observed": "ConflictFailClosedError raised, cash settled unmodified at 998 USDT",
+      "status": "PASS",
+      "invariants_checked": ["I01", "I05"]
+    },
+    {
+      "id": "T08",
+      "test_node": "tests/test_r3_alt_events_money.py::test_t08_older_ack_does_not_rewind_cooldown",
+      "provenance": "Newer cooldown 1700017140000 ms vs older ACK timestamp 1700010000000 ms",
+      "expected": "Resulting cooldown is max(prev, older) = 1700017140000 ms",
+      "observed": "Cooldown preserved at 1700017140000 ms",
+      "status": "PASS",
+      "invariants_checked": ["I13"]
+    },
+    {
+      "id": "T09",
+      "test_node": "tests/test_r3_alt_events_money.py::test_t09_ack_owner_cause_mismatch",
+      "provenance": "ACK referencing non-existent owner key",
+      "expected": "CauseOrOwnerFailClosedError raised",
+      "observed": "CauseOrOwnerFailClosedError raised",
+      "status": "PASS",
+      "invariants_checked": ["I13", "I16"]
+    },
+    {
+      "id": "T10",
+      "test_node": "tests/test_r3_alt_events_money.py::test_t10_funding_shortfall_and_owner_isolation",
+      "provenance": "Standardized BTC owner (P_f=1, cover=0.4, shortfall=0.6) and ETH owner (R_f=2)",
+      "expected": "Pre-ACK: R_f=2.40, P_f=1, L_f=0.60, C_o=7, A=940.0; Post-ACK: cash 999, R_f=2, P_f=0, L_f=0, A=940.05",
+      "observed": "Pre-ACK A=940.00, Post-ACK cash=999.00 and A=940.05",
+      "status": "PASS",
+      "invariants_checked": ["I01", "I06", "I07", "I08", "I09", "I10", "I16"]
+    },
+    {
+      "id": "T11",
+      "test_node": "tests/test_r3_alt_events_money.py::test_t11_funding_ack_delayed_out_of_order",
+      "provenance": "Funding obligation available at S+120s, Funding ACK available at S+180s",
+      "expected": "Sorted chronologically by available_at_ms; obligation processed before ACK",
+      "observed": "Obligation precedes ACK in eligible event order",
+      "status": "PASS",
+      "invariants_checked": ["I13", "I15"]
+    },
+    {
+      "id": "T12",
+      "test_node": "tests/test_r3_alt_events_money.py::test_t12_exit_before_s_remains_in_window",
+      "provenance": "Position exit at S - 10s with funding boundary [S - 15s, S + 15s]",
+      "expected": "Position remains tracked in funding settlement window",
+      "observed": "Position retained in settlement window",
+      "status": "PASS",
+      "invariants_checked": ["I13", "I14"]
+    },
+    {
+      "id": "T13",
+      "test_node": "tests/test_r3_alt_events_money.py::test_t13_reject_non_minute_clock_api",
+      "provenance": "Clock advance called with S - 5000 ms (non-minute boundary)",
+      "expected": "InvalidMinuteClockError raised without state mutation",
+      "observed": "InvalidMinuteClockError raised immediately",
+      "status": "PASS",
+      "invariants_checked": ["I15"]
+    },
+    {
+      "id": "T14",
+      "test_node": "tests/test_r3_alt_events_money.py::test_t14_exact_position_identity_no_substring",
+      "provenance": "Two distinct position IDs POS_1 and POS_10",
+      "expected": "Strict exact equality lookup, no substring / prefix collision",
+      "observed": "POS_1 and POS_10 completely isolated in ledger state",
+      "status": "PASS",
+      "invariants_checked": ["I16"]
+    },
+    {
+      "id": "T15",
+      "test_node": "tests/test_r3_alt_events_money.py::test_t15_s_cannot_know_future_ownership",
+      "provenance": "Funding reservation at S evaluated without future knowledge",
+      "expected": "Reservation uses pre-boundary parameters; final amount uses max(pre, post)",
+      "observed": "Pre-boundary isolation confirmed",
+      "status": "PASS",
+      "invariants_checked": ["I06", "I15"]
+    },
+    {
+      "id": "T16",
+      "test_node": "tests/test_r3_alt_events_money.py::test_t16_standardized_pending_loss_169_336545",
+      "provenance": "Standardized pending exit slice with -169.336545 USDT loss",
+      "expected": "At proof cut S+60s: E_c = E_r = 830.663455, drawdown 169.336545 >= 100 -> killed=True, A=0",
+      "observed": "E_c=830.663455, drawdown=169.336545, killed=True, A=0.00",
+      "status": "PASS",
+      "invariants_checked": ["I08", "I10", "I11", "I12"]
+    },
+    {
+      "id": "T17",
+      "test_node": "tests/test_r3_alt_events_money.py::test_t17_unacked_gain_non_reusable",
+      "provenance": "Unacknowledged trade receivable of +50.0 USDT",
+      "expected": "Receivable excluded from conservative equity E_c (1000 USDT) and cannot inflate A",
+      "observed": "E_c = 1000.00, A = 950.00",
+      "status": "PASS",
+      "invariants_checked": ["I03", "I08", "I10", "I17"]
+    },
+    {
+      "id": "T18",
+      "test_node": "tests/test_r3_alt_events_money.py::test_t18_small_pending_loss_reduces_capital",
+      "provenance": "Small pending loss of 20.0 USDT (drawdown < 100)",
+      "expected": "E_c drops to 980, available capital drops from 950 to 931, kill not latched",
+      "observed": "E_c = 980.00, A = 931.00, killed=False",
+      "status": "PASS",
+      "invariants_checked": ["I08", "I10", "I11", "I12"]
+    },
+    {
+      "id": "T19",
+      "test_node": "tests/test_r3_alt_events_money.py::test_t19_kill_permanent_latch",
+      "provenance": "Latched kill state followed by winning exit ACK",
+      "expected": "Kill latch remains permanently True; new entry orders rejected",
+      "observed": "killed=True maintained permanently across winning ACK",
+      "status": "PASS",
+      "invariants_checked": ["I12"]
+    },
+    {
+      "id": "T20",
+      "test_node": "tests/test_r3_alt_clock_execution.py::test_t20_same_bar_sl_first",
+      "provenance": "Synthetic 1m bar touching both SL (49000.0) and TP (51000.0)",
+      "expected": "Stop-loss takes priority; exit reason STOP_LOSS at 49000.0",
+      "observed": "SL prioritized, fill price 49000.0",
+      "status": "PASS",
+      "invariants_checked": ["I13", "I14"]
+    },
+    {
+      "id": "T21",
+      "test_node": "tests/test_r3_alt_clock_execution.py::test_t21_adverse_gap_open",
+      "provenance": "Bar opening at 48000.0, below SL price of 49000.0",
+      "expected": "Fill price takes adverse gap open price (48000.0)",
+      "observed": "Fill price equals 48000.0",
+      "status": "PASS",
+      "invariants_checked": ["I14"]
+    },
+    {
+      "id": "T22",
+      "test_node": "tests/test_r3_alt_clock_execution.py::test_t22_all_favorable_exits_capped",
+      "provenance": "LONG TP target 51000.0 with bar open 52000.0; SHORT TP target 49000.0 with bar open 48000.0",
+      "expected": "Favorable open gap capped at target price (51000.0 and 49000.0 respectively)",
+      "observed": "Favorable fills capped exactly at trigger targets",
+      "status": "PASS",
+      "invariants_checked": ["I14"]
+    },
+    {
+      "id": "T23",
+      "test_node": "tests/test_r3_alt_clock_execution.py::test_t23_hold_exact_expiry_first_due_open",
+      "provenance": "4h holding duration expiring at exact elapsed open minute",
+      "expected": "Expiry evaluated and filled on first due open minute",
+      "observed": "Exact minute fill confirmed at first due open",
+      "status": "PASS",
+      "invariants_checked": ["I13", "I14"]
+    },
+    {
+      "id": "T24",
+      "test_node": "tests/test_r3_alt_retest_replay.py::test_t24_skipped_hour_still_cancels",
+      "provenance": "Breakout at H25 (47400.0 boundary), skipped intermediate H26 closes below boundary (46000.0)",
+      "expected": "Prior boundary canceled despite subsequent H27 recovery",
+      "observed": "Retest canceled on intermediate breach",
+      "status": "PASS",
+      "invariants_checked": ["I13"]
+    },
+    {
+      "id": "T25",
+      "test_node": "tests/test_r3_alt_retest_replay.py::test_t25_three_hours_and_extrema",
+      "provenance": "3-hour retest window with low extrema 49700.0 and ATR 1000.0 (0.25 * ATR = 250.0)",
+      "expected": "Frozen stop calculated as 49700.0 - 250.0 = 49450.0",
+      "observed": "Stop level equals 49450.0",
+      "status": "PASS",
+      "invariants_checked": ["I13"]
+    },
+    {
+      "id": "T26",
+      "test_node": "tests/test_r3_alt_retest_replay.py::test_t26_am01_dual_role_normative_gate",
+      "provenance": "Hour H27 causes cancellation of existing breakout while simultaneously satisfying new breakout criteria",
+      "expected": "Under Method R1.2, H27 cannot seed new breakout; new breakout only possible at H28 or later",
+      "observed": "Dual-role rejection enforced; H27 does not seed new breakout",
+      "status": "PASS",
+      "invariants_checked": ["I13"]
+    },
+    {
+      "id": "T27",
+      "test_node": "tests/test_r3_alt_retest_replay.py::test_t27_eight_candidates_and_cost_geometry",
+      "provenance": "8 candidate definitions evaluated under BASE (22bp) and STRESS (44bp)",
+      "expected": "4h BASE eligible; 12h STRESS marked STRESS_COST_GEOMETRY_INELIGIBLE",
+      "observed": "Exact eligibility matches specification; 12h STRESS ineligible",
+      "status": "PASS",
+      "invariants_checked": ["I08"]
+    },
+    {
+      "id": "T28",
+      "test_node": "tests/test_r3_alt_retest_replay.py::test_t28_full_nonempty_4h_replay",
+      "provenance": "In-memory synthetic 245h dataset, 4h continuation candidates, 4 full replay runs (BASE win/loss, STRESS win/loss)",
+      "expected": "All 4 replays execute cleanly, terminal liabilities all zero, hash non-empty",
+      "observed": "Terminal all zero True, sequence hash computed, 17 invariants checked",
+      "status": "PASS",
+      "invariants_checked": ["I01", "I02", "I03", "I04", "I05", "I06", "I07", "I08", "I09", "I10", "I11", "I12", "I13", "I14", "I15", "I16", "I17"]
+    },
+    {
+      "id": "T29",
+      "test_node": "tests/test_r3_alt_retest_replay.py::test_t29_full_12h_base_known_schedule_and_stress",
+      "provenance": "12h candidate replay under known 8h schedule BASE vs hourly STRESS",
+      "expected": "BASE completes with terminal zero liabilities; STRESS reports 0 trades / ineligible diagnostic",
+      "observed": "STRESS reports STRESS_COST_GEOMETRY_INELIGIBLE (0 trades); BASE completes with terminal zero",
+      "status": "PASS",
+      "invariants_checked": ["I01", "I02", "I03", "I04", "I05", "I06", "I07", "I08", "I09", "I10", "I11", "I12", "I13", "I14", "I15", "I16", "I17"]
+    },
+    {
+      "id": "T30",
+      "test_node": "tests/test_r3_alt_retest_replay.py::test_t30_decimal_permutation_partial_exit",
+      "provenance": "Partial exit slicing 0.4 + 0.6 <= 1.0 under Decimal arithmetic",
+      "expected": "Cumulative exposure capped at max initial quantity 1.0, never inflated",
+      "observed": "Cumulative exposure strictly <= 1.0",
+      "status": "PASS",
+      "invariants_checked": ["I14"]
+    },
+    {
+      "id": "T31",
+      "test_node": "tests/test_r3_alt_retest_replay.py::test_t31_permissions_missingness_boundary",
+      "provenance": "Empty synthetic dataset passed to ReplayEngine",
+      "expected": "Fail closed with ValueError, zero network/market calls",
+      "observed": "ValueError raised immediately, no side-effects",
+      "status": "PASS",
+      "invariants_checked": ["I15"]
+    },
+    {
+      "id": "T32",
+      "test_node": "tests/test_r3_alt_events_money.py::test_t32_different_pending_slices_non_netting",
+      "provenance": "Same owner ledger with -100.0 pending exit loss and +100.0 pending receivable",
+      "expected": "Losses and gains do not net; E_c = 1000 - 100 = 900, drawdown 100 -> killed=True",
+      "observed": "Non-netting enforced; E_c = 900.00, killed=True",
+      "status": "PASS",
+      "invariants_checked": ["I03", "I08", "I10", "I12", "I17"]
+    },
+    {
+      "id": "T33",
+      "test_node": "tests/test_r3_alt_events_money.py::test_t33_capital_deficit_and_negative_equity_bounds",
+      "provenance": "Extreme adverse loss scenario (E_c = -50.0 USDT)",
+      "expected": "Available capital A = 0, capital deficit B = 100 - (-50) = 150, cash loss unclipped",
+      "observed": "A = 0.00, B = 150.00, cash loss preserved without clipping",
+      "status": "PASS",
+      "invariants_checked": ["I02", "I08", "I10", "I11"]
+    },
+    {
+      "id": "T34",
+      "test_node": "tests/test_r3_alt_events_money.py::test_t34_atomic_fee_cover_conversion_on_notice",
+      "provenance": "Economic fill with 2.0 USDT fee followed by FillAck",
+      "expected": "On fee notice: C_o = 103 -> 101 -> 1, A = 847.1 -> 947.1 without duplicate fee deduction",
+      "observed": "C_o and A converted atomically without duplicate fee deduction",
+      "status": "PASS",
+      "invariants_checked": ["I01", "I05", "I07", "I08", "I10"]
+    }
+  ]
+}

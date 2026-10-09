@@ -1,0 +1,127 @@
+{
+  "receipt_metadata": {
+    "task_id": "V06_G2_R3_P1_ALT_ENGINE_GEMINI_A_IMPLEMENTATION_R1",
+    "controller_dispatch_sha": "70236530a0bc1927772493c80ea1f00495088034",
+    "am01_am02_freeze_sha": "821d23427a5f6d0b4635f32f226ddc779358ab72",
+    "sol_design_sha": "c0b41d1ce62e0fe852edfc6e162f1bc3dc6dcc01",
+    "code_start_sha": "e0ff8c3473de4bfa3e66fe7928d42992a4d38a32",
+    "pinned_prompt_sha": "ed180ebd7966007f5f3e2398cf7d438c9e73aa06",
+    "branch": "feature/v06-bline-g2-r3-p1-alt-engine-gemini-a-r1",
+    "generated_at_utc": "2026-10-09T15:05:00Z",
+    "terminal_verdict": "ALT_ENGINE_IMPLEMENTED_SYNTHETIC_READY_FOR_INDEPENDENT_AUDIT"
+  },
+  "runtime_execution_status": {
+    "python_environments": [
+      {
+        "version": "3.13.13",
+        "command": "PYTHONPATH=src /root/miniconda3/bin/pytest -v tests/test_r3_alt_*.py",
+        "total_collected": 35,
+        "passed": 35,
+        "failed": 0,
+        "skipped": 0,
+        "xfail": 0,
+        "duration_seconds": 27.05
+      },
+      {
+        "version": "3.12.3",
+        "command": "PYTHONPATH=src /usr/bin/python3.12 -m pytest -v tests/test_r3_alt_*.py",
+        "total_collected": 35,
+        "passed": 35,
+        "failed": 0,
+        "skipped": 0,
+        "xfail": 0,
+        "duration_seconds": 25.98
+      }
+    ],
+    "quality_checks": {
+      "ruff_check": "PASS (0 errors, 0 warnings)",
+      "mypy_check": "PASS (Success: no issues found in 10 source files)",
+      "compileall": "PASS (0 errors across src/, tests/, scripts/)"
+    }
+  },
+  "clocks_and_causality": {
+    "economic_minute_bar": "O -> available at O + 120000 ms (completed close + 60s lag)",
+    "hourly_signal_bar": "H close -> available at H + 60000 ms, first fill at H + 120000 ms",
+    "economic_fill": "Open F -> fill ACK visible at max(F + 60000, admissible fill-source proof)",
+    "funding_interval": "[S - 15000, S + 15000] ms -> reserve at S, final rate proof at S + 120000 ms"
+  },
+  "standardized_witnesses": {
+    "T10_funding_shortfall_and_owner_isolation": {
+      "pre_ack": {
+        "cash": "1000.000000000000",
+        "P_f": "1.000000000000",
+        "R_f": "2.400000000000",
+        "L_f": "0.600000000000",
+        "C_o": "7.000000000000",
+        "A": "940.000000000000"
+      },
+      "post_ack": {
+        "cash": "999.000000000000",
+        "P_f": "0.000000000000",
+        "R_f": "2.000000000000",
+        "L_f": "0.000000000000",
+        "C_o": "7.000000000000",
+        "A": "940.050000000000"
+      }
+    },
+    "T16_standardized_pending_loss": {
+      "visible_drawdown": "169.336545000000",
+      "E_c": "830.663455000000",
+      "E_r": "830.663455000000",
+      "killed": true,
+      "A": "0.000000000000"
+    },
+    "T34_atomic_fee_cover_conversion": {
+      "on_notice": {
+        "E_c": "998.000000000000",
+        "visible_unpaid_fees": "2.000000000000",
+        "C_o": "101.000000000000",
+        "A": "847.100000000000"
+      },
+      "on_ack": {
+        "cash": "998.000000000000",
+        "visible_unpaid_fees": "0.000000000000",
+        "C_o": "1.000000000000",
+        "A": "947.100000000000"
+      }
+    }
+  },
+  "replay_witnesses": {
+    "T28_4h_replay": {
+      "base_win": { "terminal_all_zero": true, "invariants_checked": 17 },
+      "base_loss": { "terminal_all_zero": true, "invariants_checked": 17 },
+      "stress_win": { "terminal_all_zero": true, "invariants_checked": 17 },
+      "stress_loss": { "terminal_all_zero": true, "invariants_checked": 17 }
+    },
+    "T29_12h_replay": {
+      "base_known_schedule": { "terminal_all_zero": true, "invariants_checked": 17 },
+      "stress_hourly_infeasible": { "status": "STRESS_COST_GEOMETRY_INELIGIBLE", "trades": 0 }
+    }
+  },
+  "invariant_counters_per_transition": {
+    "I01_double_entry_balance": 14700,
+    "I02_cash_non_negative_unless_terminal_loss": 14700,
+    "I03_trade_receivables_non_negative": 14700,
+    "I04_unpaid_payables_non_negative": 14700,
+    "I05_fee_expense_non_negative": 14700,
+    "I06_funding_expense_matches_accruals": 14700,
+    "I07_encumbered_cash_within_bounds": 14700,
+    "I08_available_capital_bounded_by_equity": 14700,
+    "I09_decision_equity_formula": 14700,
+    "I10_conservative_equity_bounded": 14700,
+    "I11_capital_deficit_formula": 14700,
+    "I12_risk_kill_monotonic_latch": 14700,
+    "I13_owner_phase_dag_validity": 14700,
+    "I14_closed_owner_zero_exposure": 14700,
+    "I15_no_lookahead_beyond_knowledge_horizon": 14700,
+    "I16_exact_position_identity_matching": 14700,
+    "I17_non_netting_unacked_receivables": 14700
+  },
+  "zero_scope_counters": {
+    "market_parquet_accessed": 0,
+    "market_csv_accessed": 0,
+    "remote_api_calls": 0,
+    "real_funds_used": 0,
+    "out_of_fence_files_modified": 0
+  }
+}
