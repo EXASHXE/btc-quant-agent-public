@@ -1,6 +1,6 @@
 {
   "line": "B_LINE",
-  "stage": "V06_G2_R3_METHOD_DESIGN_ACCEPTED__GEMINI_A_B_P0_SYNTHETIC_ACTIVE__SOL_SCIENCE_GATE_DISPATCHED__EMPIRICAL_HOLD__NO_TESTNET_LIVE",
+  "stage": "V06_G2_R3_P0_A_REJECTED_8_B_FINDINGS_REPAIR_R1_DISPATCHED__P0_B_ORACLE_ACCEPTED_BLOCKED_COMPARATOR__SOL_DRAFT_ACCEPTED_HOLDOUT_CONFLICT__EMPIRICAL_NONE",
   "code_branch": "v0.6",
   "accepted_code_sha": "52c16a28153de307dc6132c0975fe29341a0a918",
   "docs_authority_commit": "6319ddbaddd69d5522696992ec1565169da88e03",
@@ -1234,7 +1234,7 @@
     "empirical_body_authority": "NONE"
   },
   "v06_g2_r3_parallel_p0": {
-    "status": "CONTROLLER_ACTIVE_OFFLINE_SYNTHETIC_PREPARATION_ONLY",
+    "status": "CONTROLLER_L2_A_REPAIR_REQUIRED__B_DISCREPANCY_BLOCKED__SOL_DRAFT_ONLY",
     "dispatch_sha": "56f8a9faa1a4539124ab006b49bf42b6e7c997e3",
     "base_sha": "e0ff8c3473de4bfa3e66fe7928d42992a4d38a32",
     "accepted_method_sha": "cf2d5cc33774cdcff7d709636305bba830e977ef",
@@ -1252,7 +1252,28 @@
     "source_body_permission": "NONE",
     "old_holdout_conflict": "UNRESOLVED",
     "first_pushed_r3_prereg": "NONE",
-    "real_funds_write_authority": "NONE"
+    "real_funds_write_authority": "NONE",
+    "a_final_sha": "3b8befb0112cfe2d314ad65964762a3fb251e710",
+    "a_impl_sha": "3ebb7db9a1043e58843b518af9381218d9f25af1",
+    "b_final_sha": "a0aacd105ac3f3173b15d91c869990748178e222",
+    "sol_final_sha": "fc89f05014b61c51a55141cb419948f4eee9d8f3",
+    "a_ci": "https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/37821635147",
+    "a_ci_summary": "2813_PASSED_2_SKIPPED_FULL_CI",
+    "b_ci": "https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/37824913667",
+    "b_ci_summary": "2805_PASSED_2_SKIPPED_FULL_CI",
+    "sol_ci": "https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/37822422457",
+    "sol_ci_scope": "DOCS_ONLY_0_PYTEST",
+    "b_material_discrepancies": 8,
+    "controller_l2_review": "reviews/v0.6/b_line/V06_G2_R3_TRIPLE_P0_CONTROLLER_L2_REVIEW.md",
+    "repair_dispatch_sha": "e94d53c1f98f16d8d3881737564f773bc2584f28",
+    "repair_prompt_path": "prompts/v0.6/b_line/V06_G2_R3_P0_GEMINI_A_FINDINGS_REPAIR_R1.md",
+    "repair_branch": "feature/v06-bline-g2-overnight-discovery-a",
+    "repair_expected_start_sha": "3b8befb0112cfe2d314ad65964762a3fb251e710",
+    "re_audit_template_path": "prompts/v0.6/b_line/V06_G2_R3_P0_GEMINI_B_REAUDIT_TEMPLATE_R1.md",
+    "re_audit_status": "INACTIVE_PENDING_REPAIR_SHA",
+    "sol_protection_decision": "DISPUTED_LEGACY_BTC_HOLDOUT__NO_RECLASSIFICATION",
+    "real_market_body_authority": "NONE",
+    "release_authority": "NONE"
   },
   "v06_g2_r3_sol_science_gate_r1": {
     "status": "CONTROLLER_DISPATCHED_SCIENCE_GATE_ONLY__NO_DATA_OR_FREEZE_AUTHORITY",

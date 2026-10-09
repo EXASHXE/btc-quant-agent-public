@@ -1,0 +1,15 @@
+# G2 R3 P0 — Gemini B Independent A-Repair Re-audit R1 (INACTIVE UNTIL A_REPAIR_SHA PINNED)
+
+**Status:** This is a future bounded **RE-AUDIT TEMPLATE**, not active cross-branch signoff and not an instruction to start now. It becomes executable only after Controller reviews new Gemini A pushed repair and supplies exact `A_REPAIR_SHA` in a separate immutable permission record/update; preserve current B accepted-original-audit state at `a0aacd105ac3f3173b15d91c869990748178e222`.
+
+Dispatch linked: `CONTROLLER_DISPATCH_SHA=e94d53c1f98f16d8d3881737564f773bc2584f28`; current Controller repair authority [link](https://github.com/EXASHXE/btc-quant-agent-public/blob/e94d53c1f98f16d8d3881737564f773bc2584f28/evidence/v0.6/controller/B_LINE_G2_R3_P0_A_FINDINGS_REPAIR_R1_DISPATCH.json). Do not substitute changing A remote HEAD for a pinned SHA. If A_REPAIR_SHA or subsequent explicit Controller B activation missing, return `BLOCKED_WAITING_CONTROLLER_A_REPAIR_SHA` without checkout, branch update or outcome inspection.
+
+User shell CWD `~/workspace/project/quant-v0.6`. Resume only existing B worktree `g2-overnight-verifier-b` at exact B HEAD `a0aacd105ac3f3173b15d91c869990748178e222`, branch `feature/v06-bline-g2-overnight-verifier-b` and a clean status. No A writable worktree access, no cross-branch merges, rebase, reset, cherry-pick or force.
+
+**Future re-audit scope once authorized:** independently fetch immutable A_REPAIR_SHA to a detached read-only Git object (coordinate fetch using common `.g2_p0_worktree.lock` if ref needs hydration); run B fixed eight static checks plus manually inspect code and run independent hermetic synthetic adversarial cases. Require each A01–A08 associated RED->GREEN regression, especially ACK max_hold/zombie, candidate isolation order permutation, retest touch/stop extrema, mark close freshness, cooldown/dedup and tick/funding reserve. Test original B oracle Python3.12, verify A's 8 candidate identities/cost/model unchanged and no new historical market data. Enforce strict scope whitelist with special original A01 deletion. Do not modify A implementation or its tests.
+
+Publish ONLY new append-only B evidence under `evidence/v0.6/b_line/g2_overnight_p0_b/repair_r1/**`, B's own verifier scripts/tests if a necessary proven checker correction, and new review note `docs/strategy_research/g2_r3/prep_b/repair_r1/**`. Preserve original B discrepancy evidence. Pushed B SHA alone does not grant Controller code/strategy/release acceptance.
+
+Terminal `P0_B_REPAIR_REAUDIT_PASS_SCOPED_SYNTHETIC` / `P0_B_REPAIR_DISCREPANCY_BLOCKED` / `P0_B_WAITING_A_REPAIR_SHA`. May report static-only portions pending dynamic tests as INCOMPLETE, no manufactured pass. Exact remote B publication, no new price bodies/RC2 outcomes/TESTNET/real money.
+
+**NEXT ACTION: wait for A to push; Controller will bind exact repaired A SHA and activate B.**
