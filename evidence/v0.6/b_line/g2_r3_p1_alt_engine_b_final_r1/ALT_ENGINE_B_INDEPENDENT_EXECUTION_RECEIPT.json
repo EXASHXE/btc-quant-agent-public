@@ -1,0 +1,2029 @@
+{
+  "A_ci_controller_record": "2819PASS/1inheritedH40FAIL/2SKIP; no new full-suite rerun.",
+  "A_ci_observed": "failure",
+  "A_ci_url": "https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/37949429222",
+  "A_parent_sha": "e0ff8c3473de4bfa3e66fe7928d42992a4d38a32",
+  "A_target_sha": "164243b770f74f98876b55a7f070b1adf2f554d5",
+  "B_start_parent_sha": "470ef693c4313db4f16da3fe1fe27e1ba492e83d",
+  "B_start_sha": "ed9dc16f3dbeaada88806b69ad032526886a2ae4",
+  "G1_G5": {
+    "G1": {
+      "observed": "A T28四条、T29 BASE和独立有效OHLC/240h fixture均0 trades；仅ObservedMark事件。未知小时12h STRESS另有明确ineligible。",
+      "qualification": "并未证明每个fixture预先满足全部信号谓词，也不声称引擎在所有数据上永远零交易；原A fixture的后300根OHLC不一致。零结果是实际运行观察，不能认证非空交易/资金费/现金链。",
+      "scope": "FULL_REPLAY",
+      "source": "src/btc_quant_agent/strategy_research/r3_alt_engine/replay.py:73; tests/test_r3_alt_retest_replay.py:275-380",
+      "status": "BLOCKED_REQUIRED_NONEMPTY_REPLAY_EVIDENCE"
+    },
+    "G2": {
+      "observed": "正常replay入口静默覆盖同close冲突Mark且顺序改变最后价格；归约器接受exit2/fill1；缺短缺和无journal现金通过assert_invariants；同ID仅改时钟被当成重复。",
+      "qualification": "超量退出和损坏state为公共API/状态负控，未宣称普通策略会自然生成这些输入；实际source入口冲突属于FULL_REPLAY，无状态注入。",
+      "scope": "FULL_REPLAY_AND_PUBLIC_API",
+      "source": "src/btc_quant_agent/strategy_research/r3_alt_engine/replay.py:99-115; src/btc_quant_agent/strategy_research/r3_alt_engine/money.py:174-278; src/btc_quant_agent/strategy_research/r3_alt_engine/reducer.py:255-333; src/btc_quant_agent/strategy_research/r3_alt_engine/journal.py:72-91",
+      "status": "BLOCKED_REPRODUCED_MATERIAL_CONTRACT_VIOLATIONS"
+    },
+    "G3": {
+      "observed": "A solo、B solo、A+B及B+A都仅BASE一个1000-USDT余额；组合不提供各候选独立余额。公共API的共享BASE损失100令池kill/A0，而B solo是E1000/A950。",
+      "qualification": "所有标准fixture成交0，因此真实非空交易、费用、cooldown的候选间干扰未证明；共享资金结构、结果schema与标准化loss/kill已观测，不能冒称独立政策book。",
+      "scope": "FULL_REPLAY_AND_PUBLIC_API_NORMALIZED_LOSS",
+      "source": "src/btc_quant_agent/strategy_research/r3_alt_engine/replay.py:79-96,594-602,694-709; tests/test_v06_r3_alt_independent_semantics.py::test_capture_shared_book_loss_kills_unrelated_candidate",
+      "status": "BLOCKED_PER_CANDIDATE_BOOK_COMPLETENESS"
+    },
+    "G4": {
+      "observed": "标准资金费free940/ACK后999及940.05；亏损proof前1000、proof后830.663455/kill/A0；ACKed MTM盈利例E_d/E_c1003、E_r1002.9、A952.75均通过。报告E_d=C-Pf、缺.95及E_c<=100与实际source不符。",
+      "qualification": "文档错误不是同一个运行公式bug。T34费用覆盖完整链、AM01/Retest复合状态、资金费窗口因果链未运行，保持未验证。",
+      "scope": "PUBLIC_API_AND_DOCUMENT_ONLY",
+      "source": "src/btc_quant_agent/strategy_research/r3_alt_engine/money.py:107-170; docs/strategy_research/g2_r3/p1_alt_engine_impl_r1/ALT_ENGINE_IMPLEMENTATION_AND_HANDOFF.md:105-122",
+      "status": "RUNTIME_NORMALIZED_SUBCASES_PASS_REPORT_INACCURATE_OTHER_CASES_NOT_RUN"
+    },
+    "G5": {
+      "observed": "注入cash1000/fee_payable2的closed owner后执行完整run_simulation；终端cash1000/E_c998/A948.1，却terminal_all_zero=True。",
+      "qualification": "这是明确的初始state注入，不是普通source naturally生成的未付费路径。正常replay均空，只做了平凡1000-1000=0对账，不能证明非空全部ACK守恒。",
+      "scope": "INSTRUMENTED_FULL_REPLAY_INITIAL_STATE",
+      "source": "src/btc_quant_agent/strategy_research/r3_alt_engine/replay.py:711-718",
+      "status": "BLOCKED_TERMINAL_CLEARANCE_PREDICATE"
+    }
+  },
+  "G1_eligible_trade_counts": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "I01_I17": [
+    {
+      "assert_invariants_function_grade": "WEAK_POSTING_FORMAT_ONLY",
+      "enforcing_source_location": [
+        "src/btc_quant_agent/strategy_research/r3_alt_engine/money.py:200"
+      ],
+      "frozen_assertion": "sum(dr_USDT)==sum(cr_USDT) for everyeconomicposting; independently sum memo dr==cr; currencies never mixed.",
+      "id": "I01",
+      "independent_mutation": {
+        "definition": "unbalanced owner/chart-of-accounts versus postings",
+        "executed": false
+      },
+      "observed_exception_or_state": "not independently tested as I01; posting-format sum alone is tautological",
+      "property_actually_checked": false,
+      "property_check_meaning": "BLOCKED means independently falsified, not passed; UNVERIFIED includes unrun negative controls after STOP.",
+      "status": "UNVERIFIED",
+      "test_node": null
+    },
+    {
+      "assert_invariants_function_grade": "PARTIAL_REAL_CHECK_NOT_FULL_SEMANTIC_PROOF",
+      "enforcing_source_location": [
+        "src/btc_quant_agent/strategy_research/r3_alt_engine/money.py:209"
+      ],
+      "frozen_assertion": "total_reserved_funding==sum(ownerR_f for ALL live/pending/closed_unsettled owners).",
+      "id": "I02",
+      "independent_mutation": {
+        "definition": "projection R_f inconsistent with owner covers",
+        "executed": false
+      },
+      "observed_exception_or_state": "not run after terminal blocker",
+      "property_actually_checked": false,
+      "property_check_meaning": "BLOCKED means independently falsified, not passed; UNVERIFIED includes unrun negative controls after STOP.",
+      "status": "UNVERIFIED",
+      "test_node": null
+    },
+    {
+      "assert_invariants_function_grade": "PARTIAL_REAL_CHECK_NOT_FULL_SEMANTIC_PROOF",
+      "enforcing_source_location": [
+        "src/btc_quant_agent/strategy_research/r3_alt_engine/money.py:215"
+      ],
+      "frozen_assertion": "total_unpaid_funding==sum(owner FINAL FUNDING_PAYABLE); provisional andfinal distinguished.",
+      "id": "I03",
+      "independent_mutation": {
+        "definition": "projection P_f inconsistent with final owner payable",
+        "executed": false
+      },
+      "observed_exception_or_state": "not run after terminal blocker",
+      "property_actually_checked": false,
+      "property_check_meaning": "BLOCKED means independently falsified, not passed; UNVERIFIED includes unrun negative controls after STOP.",
+      "status": "UNVERIFIED",
+      "test_node": null
+    },
+    {
+      "assert_invariants_function_grade": "PARTIAL_REAL_CHECK_NOT_FULL_SEMANTIC_PROOF",
+      "enforcing_source_location": [
+        "src/btc_quant_agent/strategy_research/r3_alt_engine/money.py:221"
+      ],
+      "frozen_assertion": "total_cost_commitments==sum(owner remainingC_o components); no side-state counter authority.",
+      "id": "I04",
+      "independent_mutation": {
+        "definition": "projection C_o inconsistent with owner memo sum",
+        "executed": false
+      },
+      "observed_exception_or_state": "not run after terminal blocker",
+      "property_actually_checked": false,
+      "property_check_meaning": "BLOCKED means independently falsified, not passed; UNVERIFIED includes unrun negative controls after STOP.",
+      "status": "UNVERIFIED",
+      "test_node": null
+    },
+    {
+      "assert_invariants_function_grade": "PARTIAL_REAL_CHECK_NOT_FULL_SEMANTIC_PROOF",
+      "enforcing_source_location": [
+        "src/btc_quant_agent/strategy_research/r3_alt_engine/money.py:227"
+      ],
+      "frozen_assertion": "shortfall>0 implies explicit exactowner/settlement ENC_SHORTFALL; no cross-owner cover transfer.",
+      "id": "I05",
+      "independent_mutation": {
+        "definition": "FINAL payable1/cover.4/shortfall0",
+        "executed": true
+      },
+      "observed_exception_or_state": "accepted; I05 True, A949.6 instead of normative949",
+      "property_actually_checked": true,
+      "property_check_meaning": "BLOCKED means independently falsified, not passed; UNVERIFIED includes unrun negative controls after STOP.",
+      "status": "BLOCKED",
+      "test_node": "tests/test_v06_r3_alt_independent_semantics.py::test_capture_missing_shortfall_accepted"
+    },
+    {
+      "assert_invariants_function_grade": "PARTIAL_REAL_CHECK_NOT_FULL_SEMANTIC_PROOF",
+      "enforcing_source_location": [
+        "src/btc_quant_agent/strategy_research/r3_alt_engine/money.py:237"
+      ],
+      "frozen_assertion": "I06: A == (0 if killed/insolvent else max(0, 0.95*E_c-C_o-R_f-L_f)); if A_raw>=0, A<=A_raw. Negative CASH and economic equity are preserved, never floored.",
+      "id": "I06",
+      "independent_mutation": {
+        "definition": "corrupt A versus required max0 equality",
+        "executed": false
+      },
+      "observed_exception_or_state": "not run after terminal blocker; normalized G4 formulas correct",
+      "property_actually_checked": false,
+      "property_check_meaning": "BLOCKED means independently falsified, not passed; UNVERIFIED includes unrun negative controls after STOP.",
+      "status": "UNVERIFIED",
+      "test_node": null
+    },
+    {
+      "assert_invariants_function_grade": "UNENFORCED_BY_THIS_FUNCTION",
+      "enforcing_source_location": [
+        "src/btc_quant_agent/strategy_research/r3_alt_engine/money.py:240"
+      ],
+      "frozen_assertion": "every settledcash change has exactACKposting/cause; allACK flatcashdelta==sumfinalnet+itemizedflows.",
+      "id": "I07",
+      "independent_mutation": {
+        "definition": "owner cash1234 with zero journal/ACK postings",
+        "executed": true
+      },
+      "observed_exception_or_state": "accepted; I07 True",
+      "property_actually_checked": true,
+      "property_check_meaning": "BLOCKED means independently falsified, not passed; UNVERIFIED includes unrun negative controls after STOP.",
+      "status": "BLOCKED",
+      "test_node": "tests/test_v06_r3_alt_independent_semantics.py::test_capture_unposted_cash_accepted"
+    },
+    {
+      "assert_invariants_function_grade": "PARTIAL_REAL_CHECK_NOT_FULL_SEMANTIC_PROOF",
+      "enforcing_source_location": [
+        "src/btc_quant_agent/strategy_research/r3_alt_engine/money.py:249",
+        "src/btc_quant_agent/strategy_research/r3_alt_engine/replay.py:79-96,594-602"
+      ],
+      "frozen_assertion": "within a book one symbol has <=1 live/pendingentry owner; exitedowner retained financially without liveinventory. Booksindependent.",
+      "id": "I08",
+      "independent_mutation": {
+        "definition": "two policies share BASE; normalized A loss100 and B cash0 in pooled1000",
+        "executed": true
+      },
+      "observed_exception_or_state": "FULL_REPLAY one-book report and PUBLIC_API pooled loss-kill; not nonempty trade interference",
+      "property_actually_checked": true,
+      "property_check_meaning": "BLOCKED means independently falsified, not passed; UNVERIFIED includes unrun negative controls after STOP.",
+      "status": "BLOCKED",
+      "test_node": "tests/test_v06_r3_alt_independent_semantics.py::test_capture_shared_book_loss_kills_unrelated_candidate"
+    },
+    {
+      "assert_invariants_function_grade": "UNENFORCED_BY_THIS_FUNCTION",
+      "enforcing_source_location": [
+        "src/btc_quant_agent/strategy_research/r3_alt_engine/money.py:252",
+        "src/btc_quant_agent/strategy_research/r3_alt_engine/reducer.py:328-333"
+      ],
+      "frozen_assertion": "cooldown_until[symbol]==max(previous,ceil_valid_exit+14400000); lateACK cannotlower orresurrectowner.",
+      "id": "I09",
+      "independent_mutation": {
+        "definition": "late old ACK lowers newer cooldown",
+        "executed": false
+      },
+      "observed_exception_or_state": "not run; reducer source max at333 may enforce it",
+      "property_actually_checked": false,
+      "property_check_meaning": "BLOCKED means independently falsified, not passed; UNVERIFIED includes unrun negative controls after STOP.",
+      "status": "UNVERIFIED",
+      "test_node": null
+    },
+    {
+      "assert_invariants_function_grade": "UNENFORCED_BY_THIS_FUNCTION",
+      "enforcing_source_location": [
+        "src/btc_quant_agent/strategy_research/r3_alt_engine/money.py:255",
+        "src/btc_quant_agent/strategy_research/r3_alt_engine/journal.py:93-110",
+        "src/btc_quant_agent/strategy_research/r3_alt_engine/replay.py:104-115"
+      ],
+      "frozen_assertion": "latestavailablemarkclose monotonically nondecreasing; sameclose conflictingprice fatal regardlessinputpermutation.",
+      "id": "I10",
+      "independent_mutation": {
+        "definition": "same source/symbol/close conflicting Mark, both source orderings",
+        "executed": true
+      },
+      "observed_exception_or_state": "PUBLIC_API guard raises; FULL_REPLAY bypass silently picks last row100/101",
+      "property_actually_checked": true,
+      "property_check_meaning": "BLOCKED means independently falsified, not passed; UNVERIFIED includes unrun negative controls after STOP.",
+      "status": "BLOCKED",
+      "test_node": "tests/test_v06_r3_alt_independent_semantics.py::test_capture_full_replay_duplicate_mark_ingestion"
+    },
+    {
+      "assert_invariants_function_grade": "UNENFORCED_BY_THIS_FUNCTION",
+      "enforcing_source_location": [
+        "src/btc_quant_agent/strategy_research/r3_alt_engine/money.py:258",
+        "src/btc_quant_agent/strategy_research/r3_alt_engine/journal.py:83-91"
+      ],
+      "frozen_assertion": "idempotentIDs postonce; sameID/differentdigest CONFLICT_FAIL_CLOSED; exactowner/cause IDs match, no substring/fallback.",
+      "id": "I11",
+      "independent_mutation": {
+        "definition": "same immutable event ID changes available_at only",
+        "executed": true
+      },
+      "observed_exception_or_state": "accepted as idempotent; no CONFLICT_FAIL_CLOSED",
+      "property_actually_checked": true,
+      "property_check_meaning": "BLOCKED means independently falsified, not passed; UNVERIFIED includes unrun negative controls after STOP.",
+      "status": "BLOCKED",
+      "test_node": "tests/test_v06_r3_alt_independent_semantics.py::test_capture_immutable_clock_conflict_ignored"
+    },
+    {
+      "assert_invariants_function_grade": "UNENFORCED_BY_THIS_FUNCTION",
+      "enforcing_source_location": [
+        "src/btc_quant_agent/strategy_research/r3_alt_engine/money.py:261"
+      ],
+      "frozen_assertion": "Every decision/risk cause has available_at <= cut. Full-bar H/L/C need completed-bar proof; Funding FINAL needs the complete ownership-window proof. Reports are outside the decision readset.",
+      "id": "I12",
+      "independent_mutation": {
+        "definition": "future source proof admitted before decision cut",
+        "executed": false
+      },
+      "observed_exception_or_state": "not run as an independent clock mutation",
+      "property_actually_checked": false,
+      "property_check_meaning": "BLOCKED means independently falsified, not passed; UNVERIFIED includes unrun negative controls after STOP.",
+      "status": "UNVERIFIED",
+      "test_node": null
+    },
+    {
+      "assert_invariants_function_grade": "UNENFORCED_BY_THIS_FUNCTION",
+      "enforcing_source_location": [
+        "src/btc_quant_agent/strategy_research/r3_alt_engine/money.py:264"
+      ],
+      "frozen_assertion": "quantity/cost/tick/lot checks exactDecimal(localcontextprecision50,ROUND_HALF_EVEN), postingquantize12dp; no ambientcontext dependence.",
+      "id": "I13",
+      "independent_mutation": {
+        "definition": "invalid tick/lot or external Decimal context mutation",
+        "executed": false
+      },
+      "observed_exception_or_state": "not run; cross-Python normalized witnesses only",
+      "property_actually_checked": false,
+      "property_check_meaning": "BLOCKED means independently falsified, not passed; UNVERIFIED includes unrun negative controls after STOP.",
+      "status": "UNVERIFIED",
+      "test_node": null
+    },
+    {
+      "assert_invariants_function_grade": "UNENFORCED_BY_THIS_FUNCTION",
+      "enforcing_source_location": [
+        "src/btc_quant_agent/strategy_research/r3_alt_engine/money.py:267"
+      ],
+      "frozen_assertion": "kill monotonicallyfalse->true; ACK/closedposition/foldtransition cannotreset highwater orkill; preservedlosses/insolvency.",
+      "id": "I14",
+      "independent_mutation": {
+        "definition": "late ACK resets previously latched kill/highwater",
+        "executed": false
+      },
+      "observed_exception_or_state": "not run as a complete lifecycle",
+      "property_actually_checked": false,
+      "property_check_meaning": "BLOCKED means independently falsified, not passed; UNVERIFIED includes unrun negative controls after STOP.",
+      "status": "UNVERIFIED",
+      "test_node": null
+    },
+    {
+      "assert_invariants_function_grade": "UNENFORCED_BY_THIS_FUNCTION",
+      "enforcing_source_location": [
+        "src/btc_quant_agent/strategy_research/r3_alt_engine/money.py:270"
+      ],
+      "frozen_assertion": "eachRetesthourcursor advances once in chronologicalorder; 3hourlimit and firstconfirmation/consumption fixed; no latebackdatedfill.",
+      "id": "I15",
+      "independent_mutation": {
+        "definition": "missing intermediate Retest cancellation hour",
+        "executed": false
+      },
+      "observed_exception_or_state": "not run; first-wave policies structural only",
+      "property_actually_checked": false,
+      "property_check_meaning": "BLOCKED means independently falsified, not passed; UNVERIFIED includes unrun negative controls after STOP.",
+      "status": "UNVERIFIED",
+      "test_node": null
+    },
+    {
+      "assert_invariants_function_grade": "UNENFORCED_BY_THIS_FUNCTION",
+      "enforcing_source_location": [
+        "src/btc_quant_agent/strategy_research/r3_alt_engine/money.py:273",
+        "src/btc_quant_agent/strategy_research/r3_alt_engine/reducer.py:255-293"
+      ],
+      "frozen_assertion": "eachpartialexitslice quantities sum<=originalfill; funding exposure charge maxprepost notsum; eachowner/S settlesonce.",
+      "id": "I16",
+      "independent_mutation": {
+        "definition": "exit quantity2 after owned/fill quantity1",
+        "executed": true
+      },
+      "observed_exception_or_state": "PUBLIC_API accepted; loss20 and pending slice2; I16 True",
+      "property_actually_checked": true,
+      "property_check_meaning": "BLOCKED means independently falsified, not passed; UNVERIFIED includes unrun negative controls after STOP.",
+      "status": "BLOCKED",
+      "test_node": "tests/test_v06_r3_alt_independent_semantics.py::test_capture_over_exit_public_reducer"
+    },
+    {
+      "assert_invariants_function_grade": "UNENFORCED_BY_THIS_FUNCTION",
+      "enforcing_source_location": [
+        "src/btc_quant_agent/strategy_research/r3_alt_engine/money.py:276"
+      ],
+      "frozen_assertion": "Pending positive receivables cannot offset any visible negative exit slice or unpaid fee; truncate positive components before aggregation, not owner net PnL.",
+      "id": "I17",
+      "independent_mutation": {
+        "definition": "positive pending slice offsets different negative slice",
+        "executed": false
+      },
+      "observed_exception_or_state": "not run; one negative slice does not prove non-netting",
+      "property_actually_checked": false,
+      "property_check_meaning": "BLOCKED means independently falsified, not passed; UNVERIFIED includes unrun negative controls after STOP.",
+      "status": "UNVERIFIED",
+      "test_node": null
+    }
+  ],
+  "I_status_counts": {
+    "BLOCKED": 6,
+    "UNVERIFIED": 11
+  },
+  "archived_source_root": "/tmp/p1-final-a-164243-le6kpcae",
+  "controller_dispatch_sha": "d2669953e896850b1bf749b5e5fdcf831ba26b88",
+  "execution_branch": "feature/v06-bline-g2-r3-p1-alt-engine-final-independent-b-r1",
+  "executor_model_and_effort": {
+    "actual_variant_and_effort": "NOT_EXPOSED_BY_SESSION_API; no fake model switch claimed",
+    "requested": "GPT-6 Sol High",
+    "session": "Codex/GPT-6 as system-described"
+  },
+  "focused_executions": [
+    {
+      "command": "P1_FINAL_TARGET_ROOT=/tmp/p1-final-a-164243-le6kpcae PYTHONDONTWRITEBYTECODE=1 python3.12 -m pytest -q -p no:cacheprovider tests/test_v06_r3_alt_independent_semantics.py",
+      "interpretation": "Verifier PASS reproduces explicit negative witnesses and normalized positive subcases; not engine acceptance.",
+      "junit_summary": {
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 12
+      },
+      "nodes": [
+        "test_exact_archive_import_identity",
+        "test_normalized_funding_projection",
+        "test_normalized_pending_loss_proof_floor",
+        "test_acknowledged_live_profit_formula",
+        "test_capture_missing_shortfall_accepted",
+        "test_capture_unposted_cash_accepted",
+        "test_capture_over_exit_public_reducer",
+        "test_capture_immutable_clock_conflict_ignored",
+        "test_same_close_mark_conflict_enforced[prices0]",
+        "test_same_close_mark_conflict_enforced[prices1]",
+        "test_capture_shared_book_loss_kills_unrelated_candidate",
+        "test_capture_full_replay_duplicate_mark_ingestion"
+      ],
+      "python": "3.12",
+      "subprocess_exit_code": 0
+    },
+    {
+      "command": "P1_FINAL_TARGET_ROOT=/tmp/p1-final-a-164243-le6kpcae PYTHONDONTWRITEBYTECODE=1 python3.13 -m pytest -q -p no:cacheprovider tests/test_v06_r3_alt_independent_semantics.py",
+      "interpretation": "Verifier PASS reproduces explicit negative witnesses and normalized positive subcases; not engine acceptance.",
+      "junit_summary": {
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 12
+      },
+      "nodes": [
+        "test_exact_archive_import_identity",
+        "test_normalized_funding_projection",
+        "test_normalized_pending_loss_proof_floor",
+        "test_acknowledged_live_profit_formula",
+        "test_capture_missing_shortfall_accepted",
+        "test_capture_unposted_cash_accepted",
+        "test_capture_over_exit_public_reducer",
+        "test_capture_immutable_clock_conflict_ignored",
+        "test_same_close_mark_conflict_enforced[prices0]",
+        "test_same_close_mark_conflict_enforced[prices1]",
+        "test_capture_shared_book_loss_kills_unrelated_candidate",
+        "test_capture_full_replay_duplicate_mark_ingestion"
+      ],
+      "python": "3.13",
+      "subprocess_exit_code": 0
+    }
+  ],
+  "full_replay_mark_conflict": {
+    "python312": {
+      "expected": "CONFLICT_FAIL_CLOSED in both source orderings",
+      "observed": [
+        {
+          "candidates": [
+            "STRUCTURAL_CONTINUATION_LONG_04H"
+          ],
+          "event_counts": {
+            "ObservedMark": 1
+          },
+          "exception": null,
+          "independent_cash_posting_delta": "0",
+          "observed_final_marks": {
+            "BTCUSDT": "101"
+          },
+          "pending_trade_and_fee_liabilities": "0",
+          "postings_count": 0,
+          "report": {
+            "book_balances": {
+              "BASE": {
+                "A": "950.000000000000",
+                "C_o": "0E-12",
+                "E_c": "1000.000000000000",
+                "E_r": "1000.000000000000",
+                "L_f": "0E-12",
+                "R_f": "0E-12",
+                "cash": "1000.000000000000",
+                "drawdown": "0E-12"
+              }
+            },
+            "candidate_outcomes": {
+              "STRUCTURAL_CONTINUATION_LONG_04H": {
+                "fees": "0",
+                "funding": "0",
+                "gross_pnl": "0",
+                "ineligible": false,
+                "ineligible_reason": null,
+                "net_pnl": "0",
+                "status": "ACTIVE",
+                "trades": 0
+              }
+            },
+            "clock_end_ms": 1699999380000,
+            "clock_start_ms": 1699999200000,
+            "completed_trades": [],
+            "event_sequence_hash": "60e05bd1b195af2f94112fa7197a5c88289058840ce7c6df9693756bc6250f55",
+            "invariants_checked_counts": {
+              "I01": 1,
+              "I02": 1,
+              "I03": 1,
+              "I04": 1,
+              "I05": 1,
+              "I06": 1,
+              "I07": 1,
+              "I08": 1,
+              "I09": 1,
+              "I10": 1,
+              "I11": 1,
+              "I12": 1,
+              "I13": 1,
+              "I14": 1,
+              "I15": 1,
+              "I16": 1,
+              "I17": 1
+            },
+            "source": "INDEPENDENT_CONFLICTING_SOURCE_CLOSE",
+            "terminal_all_zero": true
+          },
+          "residual_owners": {},
+          "scenario": "BASE",
+          "seconds": 0.0002,
+          "true_live_quantity": "0"
+        },
+        {
+          "candidates": [
+            "STRUCTURAL_CONTINUATION_LONG_04H"
+          ],
+          "event_counts": {
+            "ObservedMark": 1
+          },
+          "exception": null,
+          "independent_cash_posting_delta": "0",
+          "observed_final_marks": {
+            "BTCUSDT": "100"
+          },
+          "pending_trade_and_fee_liabilities": "0",
+          "postings_count": 0,
+          "report": {
+            "book_balances": {
+              "BASE": {
+                "A": "950.000000000000",
+                "C_o": "0E-12",
+                "E_c": "1000.000000000000",
+                "E_r": "1000.000000000000",
+                "L_f": "0E-12",
+                "R_f": "0E-12",
+                "cash": "1000.000000000000",
+                "drawdown": "0E-12"
+              }
+            },
+            "candidate_outcomes": {
+              "STRUCTURAL_CONTINUATION_LONG_04H": {
+                "fees": "0",
+                "funding": "0",
+                "gross_pnl": "0",
+                "ineligible": false,
+                "ineligible_reason": null,
+                "net_pnl": "0",
+                "status": "ACTIVE",
+                "trades": 0
+              }
+            },
+            "clock_end_ms": 1699999380000,
+            "clock_start_ms": 1699999200000,
+            "completed_trades": [],
+            "event_sequence_hash": "60e05bd1b195af2f94112fa7197a5c88289058840ce7c6df9693756bc6250f55",
+            "invariants_checked_counts": {
+              "I01": 1,
+              "I02": 1,
+              "I03": 1,
+              "I04": 1,
+              "I05": 1,
+              "I06": 1,
+              "I07": 1,
+              "I08": 1,
+              "I09": 1,
+              "I10": 1,
+              "I11": 1,
+              "I12": 1,
+              "I13": 1,
+              "I14": 1,
+              "I15": 1,
+              "I16": 1,
+              "I17": 1
+            },
+            "source": "INDEPENDENT_CONFLICTING_SOURCE_CLOSE",
+            "terminal_all_zero": true
+          },
+          "residual_owners": {},
+          "scenario": "BASE",
+          "seconds": 0.0004,
+          "true_live_quantity": "0"
+        }
+      ],
+      "scope": "FULL_REPLAY",
+      "status": "BLOCKED"
+    },
+    "python313": {
+      "expected": "CONFLICT_FAIL_CLOSED in both source orderings",
+      "observed": [
+        {
+          "candidates": [
+            "STRUCTURAL_CONTINUATION_LONG_04H"
+          ],
+          "event_counts": {
+            "ObservedMark": 1
+          },
+          "exception": null,
+          "independent_cash_posting_delta": "0",
+          "observed_final_marks": {
+            "BTCUSDT": "101"
+          },
+          "pending_trade_and_fee_liabilities": "0",
+          "postings_count": 0,
+          "report": {
+            "book_balances": {
+              "BASE": {
+                "A": "950.000000000000",
+                "C_o": "0E-12",
+                "E_c": "1000.000000000000",
+                "E_r": "1000.000000000000",
+                "L_f": "0E-12",
+                "R_f": "0E-12",
+                "cash": "1000.000000000000",
+                "drawdown": "0E-12"
+              }
+            },
+            "candidate_outcomes": {
+              "STRUCTURAL_CONTINUATION_LONG_04H": {
+                "fees": "0",
+                "funding": "0",
+                "gross_pnl": "0",
+                "ineligible": false,
+                "ineligible_reason": null,
+                "net_pnl": "0",
+                "status": "ACTIVE",
+                "trades": 0
+              }
+            },
+            "clock_end_ms": 1699999380000,
+            "clock_start_ms": 1699999200000,
+            "completed_trades": [],
+            "event_sequence_hash": "60e05bd1b195af2f94112fa7197a5c88289058840ce7c6df9693756bc6250f55",
+            "invariants_checked_counts": {
+              "I01": 1,
+              "I02": 1,
+              "I03": 1,
+              "I04": 1,
+              "I05": 1,
+              "I06": 1,
+              "I07": 1,
+              "I08": 1,
+              "I09": 1,
+              "I10": 1,
+              "I11": 1,
+              "I12": 1,
+              "I13": 1,
+              "I14": 1,
+              "I15": 1,
+              "I16": 1,
+              "I17": 1
+            },
+            "source": "INDEPENDENT_CONFLICTING_SOURCE_CLOSE",
+            "terminal_all_zero": true
+          },
+          "residual_owners": {},
+          "scenario": "BASE",
+          "seconds": 0.0002,
+          "true_live_quantity": "0"
+        },
+        {
+          "candidates": [
+            "STRUCTURAL_CONTINUATION_LONG_04H"
+          ],
+          "event_counts": {
+            "ObservedMark": 1
+          },
+          "exception": null,
+          "independent_cash_posting_delta": "0",
+          "observed_final_marks": {
+            "BTCUSDT": "100"
+          },
+          "pending_trade_and_fee_liabilities": "0",
+          "postings_count": 0,
+          "report": {
+            "book_balances": {
+              "BASE": {
+                "A": "950.000000000000",
+                "C_o": "0E-12",
+                "E_c": "1000.000000000000",
+                "E_r": "1000.000000000000",
+                "L_f": "0E-12",
+                "R_f": "0E-12",
+                "cash": "1000.000000000000",
+                "drawdown": "0E-12"
+              }
+            },
+            "candidate_outcomes": {
+              "STRUCTURAL_CONTINUATION_LONG_04H": {
+                "fees": "0",
+                "funding": "0",
+                "gross_pnl": "0",
+                "ineligible": false,
+                "ineligible_reason": null,
+                "net_pnl": "0",
+                "status": "ACTIVE",
+                "trades": 0
+              }
+            },
+            "clock_end_ms": 1699999380000,
+            "clock_start_ms": 1699999200000,
+            "completed_trades": [],
+            "event_sequence_hash": "60e05bd1b195af2f94112fa7197a5c88289058840ce7c6df9693756bc6250f55",
+            "invariants_checked_counts": {
+              "I01": 1,
+              "I02": 1,
+              "I03": 1,
+              "I04": 1,
+              "I05": 1,
+              "I06": 1,
+              "I07": 1,
+              "I08": 1,
+              "I09": 1,
+              "I10": 1,
+              "I11": 1,
+              "I12": 1,
+              "I13": 1,
+              "I14": 1,
+              "I15": 1,
+              "I16": 1,
+              "I17": 1
+            },
+            "source": "INDEPENDENT_CONFLICTING_SOURCE_CLOSE",
+            "terminal_all_zero": true
+          },
+          "residual_owners": {},
+          "scenario": "BASE",
+          "seconds": 0.0002,
+          "true_live_quantity": "0"
+        }
+      ],
+      "scope": "FULL_REPLAY",
+      "status": "BLOCKED"
+    }
+  },
+  "identity_preflight": {
+    "existing_B_worktree_clean": true,
+    "prompt_HTTP_bytes_match_fixed_Git_blob": true,
+    "reassignment_and_original_authorities_read": true,
+    "remote_A_exact_target": true,
+    "remote_B_first_use_exact_start": true
+  },
+  "instrumentation_scope": "Replay reduce observer does not alter inputs/results. G5 initial-fee injection and G3 normalized pooled-loss are explicitly instrumented/API probes, not claimed ordinary market scenarios.",
+  "isolated_import_proof": {
+    "ReplayEngine": {
+      "file": "/tmp/p1-final-a-164243-le6kpcae/src/btc_quant_agent/strategy_research/r3_alt_engine/replay.py",
+      "sha256": "50a80b9242d757e8f69d5ac9f4ad15e3fb348a5ee0c52a8474eec4666147ffdd"
+    },
+    "assert_invariants": {
+      "file": "/tmp/p1-final-a-164243-le6kpcae/src/btc_quant_agent/strategy_research/r3_alt_engine/money.py",
+      "sha256": "649d07456d9d567468f584406f471ca7dd34b51c6e693c1cbe9acc3c8a2bd0e7"
+    },
+    "project_as_of": {
+      "file": "/tmp/p1-final-a-164243-le6kpcae/src/btc_quant_agent/strategy_research/r3_alt_engine/money.py",
+      "sha256": "649d07456d9d567468f584406f471ca7dd34b51c6e693c1cbe9acc3c8a2bd0e7"
+    },
+    "reduce": {
+      "file": "/tmp/p1-final-a-164243-le6kpcae/src/btc_quant_agent/strategy_research/r3_alt_engine/reducer.py",
+      "sha256": "cf3425c9c1b3bf45841945ad473639f42731964432f75208ebb8ae4b005aac9c"
+    }
+  },
+  "local_ruff": {
+    "command": "ruff check --no-cache scripts/strategy_research/r3_alt_verification/final_audit.py tests/test_v06_r3_alt_independent_semantics.py",
+    "scope": "two new verifier Python files only",
+    "status": "PASS"
+  },
+  "network_scope": "Public Git/GitHub source/CI metadata and authorized publication traffic occurred; zero refers to exchange/market/private/trading access within this audit, not global network telemetry.",
+  "next_controller_action": "Terminate this alternative-engine campaign and withhold P1 acceptance. No automatic A patch/re-audit, P2 admission, P3 prereg, P4 bodies or TESTNET/LIVE grant.",
+  "nonempty_replay_trade_count": 0,
+  "normal_replay_cash_reconciliation_scope": "Only zero-trade idle arithmetic1000-1000=0; no nonempty net/funding/fees/ACK conservation was proven.",
+  "old_b_dispatch_sha": "ed9dc16f3dbeaada88806b69ad032526886a2ae4",
+  "original_prompt_sha": "18ad412969e224bb19e56d77444c23f766b367f6",
+  "pinned_prompt_sha": "d4f79c38f6f0dfc3431dcb597bd284b530804644",
+  "preserved_gates": {
+    "P1_ENGINE_ACCEPTED": "NO",
+    "P2": "LOCAL_ROOT_UNKNOWN",
+    "P3_PREREG": "NONE",
+    "P4_MARKET_BODY": "NONE",
+    "REAL_FUNDS": "NONE",
+    "TESTNET": "NONE"
+  },
+  "publication": {
+    "B_final_remote_sha": "OMITTED_SAME_COMMIT_SELF_REFERENCE; final external receipt verifies exactremote",
+    "CI": "POST_PUSH_METADATA_CHECK_EXTERNAL_FINAL_RESPONSE",
+    "remote_push_verified": "POST_COMMIT_EXTERNAL_CHECK",
+    "required_parent": "ed9dc16f3dbeaada88806b69ad032526886a2ae4"
+  },
+  "runtime_observations": {
+    "archive_root": "/tmp/p1-final-a-164243-le6kpcae",
+    "confirmatory_probes": {
+      "clock_only_duplicate": {
+        "expected": "CONFLICT_FAIL_CLOSED",
+        "same_state_returned": true,
+        "scope": "PUBLIC_API_EVENT",
+        "status": "BLOCKED"
+      },
+      "funding_940": {
+        "ETH_after": {
+          "candidate_id": "STRUCTURAL_CONTINUATION_LONG_12H",
+          "cash_settled": "0",
+          "direction": 1,
+          "enc_exit_fee": "0",
+          "enc_fee": "0",
+          "enc_funding_dedicated": "0",
+          "enc_funding_future": "2",
+          "enc_notional": "0",
+          "enc_shortfall": "0",
+          "entry_price": "0",
+          "entry_time_ms": 0,
+          "fee_expense": "0",
+          "fee_payable": "0",
+          "funding_expense": "0",
+          "funding_payable": "0",
+          "initial_stop": "0",
+          "is_tombstone": false,
+          "max_hold_ms": 0,
+          "owner_key": {
+            "book_id": "BASE",
+            "position_id": "ETH_WITNESS",
+            "settlement_id": ""
+          },
+          "pending_exit_slices": [],
+          "phase": "CLOSED_UNSETTLED",
+          "quantity": "0",
+          "realized_gain": "0",
+          "realized_loss": "0",
+          "retest_event_id": null,
+          "symbol": "ETHUSDT",
+          "target": "0",
+          "trade_payable": "0",
+          "trade_receivable": "0"
+        },
+        "after": {
+          "A": "940.050000000000",
+          "A_raw": "940.050000000000",
+          "B": "313.350000000000",
+          "C_o": "7.000000000000",
+          "E_c": "999.000000000000",
+          "E_d": "999.000000000000",
+          "E_r": "999.000000000000",
+          "L_f": "0E-12",
+          "P_f": "0E-12",
+          "R_f": "2.000000000000",
+          "acknowledged_live_mtm": "0E-12",
+          "as_of_ms": 1699999200000,
+          "cash": "999.000000000000",
+          "drawdown": "1.000000000000",
+          "killed": false,
+          "peak_E_r": "1000.000000000000",
+          "unacked_live_mtm": "0E-12",
+          "visible_unpaid_exit_losses": "0E-12",
+          "visible_unpaid_fees": "0E-12"
+        },
+        "before": {
+          "A": "940.000000000000",
+          "A_raw": "940.000000000000",
+          "B": "313.333333333333",
+          "C_o": "7.000000000000",
+          "E_c": "1000.000000000000",
+          "E_d": "1000.000000000000",
+          "E_r": "999.000000000000",
+          "L_f": "0.600000000000",
+          "P_f": "1.000000000000",
+          "R_f": "2.400000000000",
+          "acknowledged_live_mtm": "0E-12",
+          "as_of_ms": 1699999200000,
+          "cash": "1000.000000000000",
+          "drawdown": "1.000000000000",
+          "killed": false,
+          "peak_E_r": "1000.000000000000",
+          "unacked_live_mtm": "0E-12",
+          "visible_unpaid_exit_losses": "0E-12",
+          "visible_unpaid_fees": "0E-12"
+        },
+        "expected": {
+          "after_cash": "999",
+          "after_free": "940.05",
+          "before_free": "940"
+        },
+        "scope": "PUBLIC_API_NORMALIZED_LEDGER",
+        "status": "PASS"
+      },
+      "loss_proof": {
+        "after": {
+          "A": "0E-12",
+          "A_raw": "789.130282250000",
+          "B": "0E-12",
+          "C_o": "0E-12",
+          "E_c": "830.663455000000",
+          "E_d": "1000.000000000000",
+          "E_r": "830.663455000000",
+          "L_f": "0E-12",
+          "P_f": "0E-12",
+          "R_f": "0E-12",
+          "acknowledged_live_mtm": "0E-12",
+          "as_of_ms": 1699999260000,
+          "cash": "1000.000000000000",
+          "drawdown": "169.336545000000",
+          "killed": true,
+          "peak_E_r": "1000.000000000000",
+          "unacked_live_mtm": "0E-12",
+          "visible_unpaid_exit_losses": "169.336545000000",
+          "visible_unpaid_fees": "0E-12"
+        },
+        "before": {
+          "A": "950.000000000000",
+          "A_raw": "950.000000000000",
+          "B": "316.666666666667",
+          "C_o": "0E-12",
+          "E_c": "1000.000000000000",
+          "E_d": "1000.000000000000",
+          "E_r": "1000.000000000000",
+          "L_f": "0E-12",
+          "P_f": "0E-12",
+          "R_f": "0E-12",
+          "acknowledged_live_mtm": "0E-12",
+          "as_of_ms": 1699999200000,
+          "cash": "1000.000000000000",
+          "drawdown": "0E-12",
+          "killed": false,
+          "peak_E_r": "1000.000000000000",
+          "unacked_live_mtm": "0E-12",
+          "visible_unpaid_exit_losses": "0E-12",
+          "visible_unpaid_fees": "0E-12"
+        },
+        "expected": {
+          "after_E_r": "830.663455",
+          "after_kill": true,
+          "before_E_r": "1000"
+        },
+        "scope": "PUBLIC_API_NORMALIZED_LEDGER",
+        "status": "PASS"
+      },
+      "missing_shortfall": {
+        "expected_free_without_other_covers": "949",
+        "expected_shortfall": "0.6",
+        "invariants": {
+          "I01": true,
+          "I02": true,
+          "I03": true,
+          "I04": true,
+          "I05": true,
+          "I06": true,
+          "I07": true,
+          "I08": true,
+          "I09": true,
+          "I10": true,
+          "I11": true,
+          "I12": true,
+          "I13": true,
+          "I14": true,
+          "I15": true,
+          "I16": true,
+          "I17": true
+        },
+        "observed": {
+          "A": "949.600000000000",
+          "A_raw": "949.600000000000",
+          "B": "316.533333333333",
+          "C_o": "0E-12",
+          "E_c": "1000.000000000000",
+          "E_d": "1000.000000000000",
+          "E_r": "999.000000000000",
+          "L_f": "0E-12",
+          "P_f": "1.000000000000",
+          "R_f": "0.400000000000",
+          "acknowledged_live_mtm": "0E-12",
+          "as_of_ms": 1699999200000,
+          "cash": "1000.000000000000",
+          "drawdown": "1.000000000000",
+          "killed": false,
+          "peak_E_r": "1000.000000000000",
+          "unacked_live_mtm": "0E-12",
+          "visible_unpaid_exit_losses": "0E-12",
+          "visible_unpaid_fees": "0E-12"
+        },
+        "scope": "PUBLIC_API_STATE_MUTATION",
+        "status": "BLOCKED"
+      },
+      "over_exit": {
+        "expected": "reject exit2 when filled1",
+        "invariants": {
+          "I01": true,
+          "I02": true,
+          "I03": true,
+          "I04": true,
+          "I05": true,
+          "I06": true,
+          "I07": true,
+          "I08": true,
+          "I09": true,
+          "I10": true,
+          "I11": true,
+          "I12": true,
+          "I13": true,
+          "I14": true,
+          "I15": true,
+          "I16": true,
+          "I17": true
+        },
+        "owner": {
+          "candidate_id": "STRUCTURAL_CONTINUATION_LONG_04H",
+          "cash_settled": "1000",
+          "direction": 1,
+          "enc_exit_fee": "0",
+          "enc_fee": "0",
+          "enc_funding_dedicated": "0",
+          "enc_funding_future": "0",
+          "enc_notional": "0",
+          "enc_shortfall": "0",
+          "entry_price": "100",
+          "entry_time_ms": 0,
+          "fee_expense": "0E-12",
+          "fee_payable": "0E-12",
+          "funding_expense": "0",
+          "funding_payable": "0",
+          "initial_stop": "90",
+          "is_tombstone": false,
+          "max_hold_ms": 0,
+          "owner_key": {
+            "book_id": "BASE",
+            "position_id": "BTC_OWNER",
+            "settlement_id": ""
+          },
+          "pending_exit_slices": [
+            {
+              "available_at_ms": 1699999200000,
+              "effective_price": "90",
+              "exit_fee": "0E-12",
+              "exit_reason": "STOP_LOSS",
+              "exit_time_ms": 1699999200000,
+              "gross_pnl": "-20.000000000000",
+              "is_acknowledged": false,
+              "is_loss": true,
+              "quantity": "2",
+              "raw_price": "90",
+              "slice_id": "OVER_EXIT"
+            }
+          ],
+          "phase": "EXIT_PENDING",
+          "quantity": "0",
+          "realized_gain": "0",
+          "realized_loss": "20.000000000000",
+          "retest_event_id": null,
+          "symbol": "BTCUSDT",
+          "target": "120",
+          "trade_payable": "20.000000000000",
+          "trade_receivable": "0"
+        },
+        "scope": "PUBLIC_API_EVENT",
+        "status": "BLOCKED"
+      },
+      "terminal_fee_orphan": {
+        "expected": "terminal_all_zero=False while fee_payable2 remains",
+        "initial_injected_fee": "2",
+        "report": {
+          "book_balances": {
+            "BASE": {
+              "A": "948.100000000000",
+              "C_o": "0E-12",
+              "E_c": "998.000000000000",
+              "E_r": "998.000000000000",
+              "L_f": "0E-12",
+              "R_f": "0E-12",
+              "cash": "1000.000000000000",
+              "drawdown": "2.000000000000"
+            }
+          },
+          "candidate_outcomes": {
+            "STRUCTURAL_CONTINUATION_LONG_04H": {
+              "fees": "0",
+              "funding": "0",
+              "gross_pnl": "0",
+              "ineligible": false,
+              "ineligible_reason": null,
+              "net_pnl": "0",
+              "status": "ACTIVE",
+              "trades": 0
+            }
+          },
+          "clock_end_ms": 1700920920000,
+          "clock_start_ms": 1699999200000,
+          "completed_trades": [],
+          "event_sequence_hash": "3d9d61e24f27abe263c345eee67f3875c52facb6e658a7bcd38197ce9e4eeadd",
+          "invariants_checked_counts": {
+            "I01": 15360,
+            "I02": 15360,
+            "I03": 15360,
+            "I04": 15360,
+            "I05": 15360,
+            "I06": 15360,
+            "I07": 15360,
+            "I08": 15360,
+            "I09": 15360,
+            "I10": 15360,
+            "I11": 15360,
+            "I12": 15360,
+            "I13": 15360,
+            "I14": 15360,
+            "I15": 15360,
+            "I16": 15360,
+            "I17": 15360
+          },
+          "source": "INDEPENDENT_FIXED_VALID_OHLC_240H_V1",
+          "terminal_all_zero": true
+        },
+        "scope": "INSTRUMENTED_FULL_REPLAY_INITIAL_STATE",
+        "status": "BLOCKED"
+      },
+      "unposted_cash": {
+        "cash": "1234",
+        "cash_postings": 0,
+        "expected": "I07 fail closed for unposted CASH1234",
+        "observed": {
+          "I01": true,
+          "I02": true,
+          "I03": true,
+          "I04": true,
+          "I05": true,
+          "I06": true,
+          "I07": true,
+          "I08": true,
+          "I09": true,
+          "I10": true,
+          "I11": true,
+          "I12": true,
+          "I13": true,
+          "I14": true,
+          "I15": true,
+          "I16": true,
+          "I17": true
+        },
+        "scope": "PUBLIC_API_STATE_MUTATION",
+        "status": "BLOCKED"
+      }
+    },
+    "g1_runs": [
+      {
+        "candidates": [
+          "STRUCTURAL_CONTINUATION_LONG_04H"
+        ],
+        "event_counts": {
+          "ObservedMark": 14700
+        },
+        "exception": null,
+        "expected_min_trades": 1,
+        "expected_net_sign": 1,
+        "fixture": "A_T28_BASE_win",
+        "independent_cash_posting_delta": "0",
+        "invalid_ohlc_bars": 300,
+        "pending_trade_and_fee_liabilities": "0",
+        "postings_count": 0,
+        "report": {
+          "book_balances": {
+            "BASE": {
+              "A": "950.000000000000",
+              "C_o": "0E-12",
+              "E_c": "1000.000000000000",
+              "E_r": "1000.000000000000",
+              "L_f": "0E-12",
+              "R_f": "0E-12",
+              "cash": "1000.000000000000",
+              "drawdown": "0E-12"
+            }
+          },
+          "candidate_outcomes": {
+            "STRUCTURAL_CONTINUATION_LONG_04H": {
+              "fees": "0",
+              "funding": "0",
+              "gross_pnl": "0",
+              "ineligible": false,
+              "ineligible_reason": null,
+              "net_pnl": "0",
+              "status": "ACTIVE",
+              "trades": 0
+            }
+          },
+          "clock_end_ms": 1700881320000,
+          "clock_start_ms": 1699999200000,
+          "completed_trades": [],
+          "event_sequence_hash": "a489e97f9804d1f4cd353f5cdd0f22dc9c1bdfded38a6462254b66ddfcf55d74",
+          "invariants_checked_counts": {
+            "I01": 14700,
+            "I02": 14700,
+            "I03": 14700,
+            "I04": 14700,
+            "I05": 14700,
+            "I06": 14700,
+            "I07": 14700,
+            "I08": 14700,
+            "I09": 14700,
+            "I10": 14700,
+            "I11": 14700,
+            "I12": 14700,
+            "I13": 14700,
+            "I14": 14700,
+            "I15": 14700,
+            "I16": 14700,
+            "I17": 14700
+          },
+          "source": "SYNTHETIC_WIN",
+          "terminal_all_zero": true
+        },
+        "residual_owners": {},
+        "scenario": "BASE",
+        "seconds": 5.4701,
+        "true_live_quantity": "0"
+      },
+      {
+        "candidates": [
+          "STRUCTURAL_CONTINUATION_LONG_04H"
+        ],
+        "event_counts": {
+          "ObservedMark": 14700
+        },
+        "exception": null,
+        "expected_min_trades": 1,
+        "expected_net_sign": -1,
+        "fixture": "A_T28_BASE_loss",
+        "independent_cash_posting_delta": "0",
+        "invalid_ohlc_bars": 300,
+        "pending_trade_and_fee_liabilities": "0",
+        "postings_count": 0,
+        "report": {
+          "book_balances": {
+            "BASE": {
+              "A": "950.000000000000",
+              "C_o": "0E-12",
+              "E_c": "1000.000000000000",
+              "E_r": "1000.000000000000",
+              "L_f": "0E-12",
+              "R_f": "0E-12",
+              "cash": "1000.000000000000",
+              "drawdown": "0E-12"
+            }
+          },
+          "candidate_outcomes": {
+            "STRUCTURAL_CONTINUATION_LONG_04H": {
+              "fees": "0",
+              "funding": "0",
+              "gross_pnl": "0",
+              "ineligible": false,
+              "ineligible_reason": null,
+              "net_pnl": "0",
+              "status": "ACTIVE",
+              "trades": 0
+            }
+          },
+          "clock_end_ms": 1700881320000,
+          "clock_start_ms": 1699999200000,
+          "completed_trades": [],
+          "event_sequence_hash": "a489e97f9804d1f4cd353f5cdd0f22dc9c1bdfded38a6462254b66ddfcf55d74",
+          "invariants_checked_counts": {
+            "I01": 14700,
+            "I02": 14700,
+            "I03": 14700,
+            "I04": 14700,
+            "I05": 14700,
+            "I06": 14700,
+            "I07": 14700,
+            "I08": 14700,
+            "I09": 14700,
+            "I10": 14700,
+            "I11": 14700,
+            "I12": 14700,
+            "I13": 14700,
+            "I14": 14700,
+            "I15": 14700,
+            "I16": 14700,
+            "I17": 14700
+          },
+          "source": "SYNTHETIC_LOSS",
+          "terminal_all_zero": true
+        },
+        "residual_owners": {},
+        "scenario": "BASE",
+        "seconds": 4.946,
+        "true_live_quantity": "0"
+      },
+      {
+        "candidates": [
+          "STRUCTURAL_CONTINUATION_LONG_04H"
+        ],
+        "event_counts": {
+          "ObservedMark": 14700
+        },
+        "exception": null,
+        "expected_min_trades": 1,
+        "expected_net_sign": 1,
+        "fixture": "A_T28_STRESS_win",
+        "independent_cash_posting_delta": "0",
+        "invalid_ohlc_bars": 300,
+        "pending_trade_and_fee_liabilities": "0",
+        "postings_count": 0,
+        "report": {
+          "book_balances": {
+            "STRESS": {
+              "A": "950.000000000000",
+              "C_o": "0E-12",
+              "E_c": "1000.000000000000",
+              "E_r": "1000.000000000000",
+              "L_f": "0E-12",
+              "R_f": "0E-12",
+              "cash": "1000.000000000000",
+              "drawdown": "0E-12"
+            }
+          },
+          "candidate_outcomes": {
+            "STRUCTURAL_CONTINUATION_LONG_04H": {
+              "fees": "0",
+              "funding": "0",
+              "gross_pnl": "0",
+              "ineligible": false,
+              "ineligible_reason": null,
+              "net_pnl": "0",
+              "status": "ACTIVE",
+              "trades": 0
+            }
+          },
+          "clock_end_ms": 1700881320000,
+          "clock_start_ms": 1699999200000,
+          "completed_trades": [],
+          "event_sequence_hash": "a489e97f9804d1f4cd353f5cdd0f22dc9c1bdfded38a6462254b66ddfcf55d74",
+          "invariants_checked_counts": {
+            "I01": 14700,
+            "I02": 14700,
+            "I03": 14700,
+            "I04": 14700,
+            "I05": 14700,
+            "I06": 14700,
+            "I07": 14700,
+            "I08": 14700,
+            "I09": 14700,
+            "I10": 14700,
+            "I11": 14700,
+            "I12": 14700,
+            "I13": 14700,
+            "I14": 14700,
+            "I15": 14700,
+            "I16": 14700,
+            "I17": 14700
+          },
+          "source": "SYNTHETIC_WIN",
+          "terminal_all_zero": true
+        },
+        "residual_owners": {},
+        "scenario": "STRESS",
+        "seconds": 4.8617,
+        "true_live_quantity": "0"
+      },
+      {
+        "candidates": [
+          "STRUCTURAL_CONTINUATION_LONG_04H"
+        ],
+        "event_counts": {
+          "ObservedMark": 14700
+        },
+        "exception": null,
+        "expected_min_trades": 1,
+        "expected_net_sign": -1,
+        "fixture": "A_T28_STRESS_loss",
+        "independent_cash_posting_delta": "0",
+        "invalid_ohlc_bars": 300,
+        "pending_trade_and_fee_liabilities": "0",
+        "postings_count": 0,
+        "report": {
+          "book_balances": {
+            "STRESS": {
+              "A": "950.000000000000",
+              "C_o": "0E-12",
+              "E_c": "1000.000000000000",
+              "E_r": "1000.000000000000",
+              "L_f": "0E-12",
+              "R_f": "0E-12",
+              "cash": "1000.000000000000",
+              "drawdown": "0E-12"
+            }
+          },
+          "candidate_outcomes": {
+            "STRUCTURAL_CONTINUATION_LONG_04H": {
+              "fees": "0",
+              "funding": "0",
+              "gross_pnl": "0",
+              "ineligible": false,
+              "ineligible_reason": null,
+              "net_pnl": "0",
+              "status": "ACTIVE",
+              "trades": 0
+            }
+          },
+          "clock_end_ms": 1700881320000,
+          "clock_start_ms": 1699999200000,
+          "completed_trades": [],
+          "event_sequence_hash": "a489e97f9804d1f4cd353f5cdd0f22dc9c1bdfded38a6462254b66ddfcf55d74",
+          "invariants_checked_counts": {
+            "I01": 14700,
+            "I02": 14700,
+            "I03": 14700,
+            "I04": 14700,
+            "I05": 14700,
+            "I06": 14700,
+            "I07": 14700,
+            "I08": 14700,
+            "I09": 14700,
+            "I10": 14700,
+            "I11": 14700,
+            "I12": 14700,
+            "I13": 14700,
+            "I14": 14700,
+            "I15": 14700,
+            "I16": 14700,
+            "I17": 14700
+          },
+          "source": "SYNTHETIC_LOSS",
+          "terminal_all_zero": true
+        },
+        "residual_owners": {},
+        "scenario": "STRESS",
+        "seconds": 5.0629,
+        "true_live_quantity": "0"
+      },
+      {
+        "candidates": [
+          "STRUCTURAL_CONTINUATION_LONG_12H"
+        ],
+        "event_counts": {
+          "ObservedMark": 14700
+        },
+        "exception": null,
+        "expected_min_trades": 1,
+        "fixture": "A_T29_BASE",
+        "independent_cash_posting_delta": "0",
+        "pending_trade_and_fee_liabilities": "0",
+        "postings_count": 0,
+        "report": {
+          "book_balances": {
+            "BASE": {
+              "A": "950.000000000000",
+              "C_o": "0E-12",
+              "E_c": "1000.000000000000",
+              "E_r": "1000.000000000000",
+              "L_f": "0E-12",
+              "R_f": "0E-12",
+              "cash": "1000.000000000000",
+              "drawdown": "0E-12"
+            }
+          },
+          "candidate_outcomes": {
+            "STRUCTURAL_CONTINUATION_LONG_12H": {
+              "fees": "0",
+              "funding": "0",
+              "gross_pnl": "0",
+              "ineligible": false,
+              "ineligible_reason": null,
+              "net_pnl": "0",
+              "status": "ACTIVE",
+              "trades": 0
+            }
+          },
+          "clock_end_ms": 1700881320000,
+          "clock_start_ms": 1699999200000,
+          "completed_trades": [],
+          "event_sequence_hash": "a489e97f9804d1f4cd353f5cdd0f22dc9c1bdfded38a6462254b66ddfcf55d74",
+          "invariants_checked_counts": {
+            "I01": 14700,
+            "I02": 14700,
+            "I03": 14700,
+            "I04": 14700,
+            "I05": 14700,
+            "I06": 14700,
+            "I07": 14700,
+            "I08": 14700,
+            "I09": 14700,
+            "I10": 14700,
+            "I11": 14700,
+            "I12": 14700,
+            "I13": 14700,
+            "I14": 14700,
+            "I15": 14700,
+            "I16": 14700,
+            "I17": 14700
+          },
+          "source": "SYNTHETIC_WIN",
+          "terminal_all_zero": true
+        },
+        "residual_owners": {},
+        "scenario": "BASE",
+        "seconds": 4.8827,
+        "true_live_quantity": "0"
+      },
+      {
+        "candidates": [
+          "STRUCTURAL_CONTINUATION_LONG_12H"
+        ],
+        "event_counts": {
+          "ObservedMark": 14700
+        },
+        "exception": null,
+        "expected_min_trades": 0,
+        "fixture": "A_T29_STRESS",
+        "independent_cash_posting_delta": "0",
+        "pending_trade_and_fee_liabilities": "0",
+        "postings_count": 0,
+        "report": {
+          "book_balances": {
+            "STRESS": {
+              "A": "950.000000000000",
+              "C_o": "0E-12",
+              "E_c": "1000.000000000000",
+              "E_r": "1000.000000000000",
+              "L_f": "0E-12",
+              "R_f": "0E-12",
+              "cash": "1000.000000000000",
+              "drawdown": "0E-12"
+            }
+          },
+          "candidate_outcomes": {
+            "STRUCTURAL_CONTINUATION_LONG_12H": {
+              "fees": "0",
+              "funding": "0",
+              "gross_pnl": "0",
+              "ineligible": true,
+              "ineligible_reason": "STRESS_COST_GEOMETRY_INELIGIBLE",
+              "net_pnl": "0",
+              "status": "STRESS_COST_GEOMETRY_INELIGIBLE",
+              "trades": 0
+            }
+          },
+          "clock_end_ms": 1700881320000,
+          "clock_start_ms": 1699999200000,
+          "completed_trades": [],
+          "event_sequence_hash": "a489e97f9804d1f4cd353f5cdd0f22dc9c1bdfded38a6462254b66ddfcf55d74",
+          "invariants_checked_counts": {
+            "I01": 14700,
+            "I02": 14700,
+            "I03": 14700,
+            "I04": 14700,
+            "I05": 14700,
+            "I06": 14700,
+            "I07": 14700,
+            "I08": 14700,
+            "I09": 14700,
+            "I10": 14700,
+            "I11": 14700,
+            "I12": 14700,
+            "I13": 14700,
+            "I14": 14700,
+            "I15": 14700,
+            "I16": 14700,
+            "I17": 14700
+          },
+          "source": "SYNTHETIC_WIN",
+          "terminal_all_zero": true
+        },
+        "residual_owners": {},
+        "scenario": "STRESS",
+        "seconds": 2.3519,
+        "true_live_quantity": "0"
+      },
+      {
+        "candidates": [
+          "STRUCTURAL_CONTINUATION_LONG_04H"
+        ],
+        "event_counts": {
+          "ObservedMark": 15360
+        },
+        "exception": null,
+        "expected_min_trades": 1,
+        "fixture": "INDEPENDENT_FIXED_VALID_OHLC_240H_V1",
+        "independent_cash_posting_delta": "0",
+        "input_sha256": "9dba4a6bfa3d1d7b2401003217fd78666b00ae79ac055e410a2d7ecd83733e0b",
+        "invalid_ohlc_bars": 0,
+        "pending_trade_and_fee_liabilities": "0",
+        "postings_count": 0,
+        "report": {
+          "book_balances": {
+            "BASE": {
+              "A": "950.000000000000",
+              "C_o": "0E-12",
+              "E_c": "1000.000000000000",
+              "E_r": "1000.000000000000",
+              "L_f": "0E-12",
+              "R_f": "0E-12",
+              "cash": "1000.000000000000",
+              "drawdown": "0E-12"
+            }
+          },
+          "candidate_outcomes": {
+            "STRUCTURAL_CONTINUATION_LONG_04H": {
+              "fees": "0",
+              "funding": "0",
+              "gross_pnl": "0",
+              "ineligible": false,
+              "ineligible_reason": null,
+              "net_pnl": "0",
+              "status": "ACTIVE",
+              "trades": 0
+            }
+          },
+          "clock_end_ms": 1700920920000,
+          "clock_start_ms": 1699999200000,
+          "completed_trades": [],
+          "event_sequence_hash": "3d9d61e24f27abe263c345eee67f3875c52facb6e658a7bcd38197ce9e4eeadd",
+          "invariants_checked_counts": {
+            "I01": 15360,
+            "I02": 15360,
+            "I03": 15360,
+            "I04": 15360,
+            "I05": 15360,
+            "I06": 15360,
+            "I07": 15360,
+            "I08": 15360,
+            "I09": 15360,
+            "I10": 15360,
+            "I11": 15360,
+            "I12": 15360,
+            "I13": 15360,
+            "I14": 15360,
+            "I15": 15360,
+            "I16": 15360,
+            "I17": 15360
+          },
+          "source": "INDEPENDENT_FIXED_VALID_OHLC_240H_V1",
+          "terminal_all_zero": true
+        },
+        "residual_owners": {},
+        "scenario": "BASE",
+        "seconds": 5.064,
+        "true_live_quantity": "0",
+        "warmup_minutes": 14400
+      }
+    ],
+    "g3_isolation_runs": [
+      {
+        "candidates": [
+          "STRUCTURAL_CONTINUATION_LONG_12H"
+        ],
+        "event_counts": {
+          "ObservedMark": 15360
+        },
+        "exception": null,
+        "independent_cash_posting_delta": "0",
+        "pending_trade_and_fee_liabilities": "0",
+        "postings_count": 0,
+        "report": {
+          "book_balances": {
+            "BASE": {
+              "A": "950.000000000000",
+              "C_o": "0E-12",
+              "E_c": "1000.000000000000",
+              "E_r": "1000.000000000000",
+              "L_f": "0E-12",
+              "R_f": "0E-12",
+              "cash": "1000.000000000000",
+              "drawdown": "0E-12"
+            }
+          },
+          "candidate_outcomes": {
+            "STRUCTURAL_CONTINUATION_LONG_12H": {
+              "fees": "0",
+              "funding": "0",
+              "gross_pnl": "0",
+              "ineligible": false,
+              "ineligible_reason": null,
+              "net_pnl": "0",
+              "status": "ACTIVE",
+              "trades": 0
+            }
+          },
+          "clock_end_ms": 1700920920000,
+          "clock_start_ms": 1699999200000,
+          "completed_trades": [],
+          "event_sequence_hash": "3d9d61e24f27abe263c345eee67f3875c52facb6e658a7bcd38197ce9e4eeadd",
+          "invariants_checked_counts": {
+            "I01": 15360,
+            "I02": 15360,
+            "I03": 15360,
+            "I04": 15360,
+            "I05": 15360,
+            "I06": 15360,
+            "I07": 15360,
+            "I08": 15360,
+            "I09": 15360,
+            "I10": 15360,
+            "I11": 15360,
+            "I12": 15360,
+            "I13": 15360,
+            "I14": 15360,
+            "I15": 15360,
+            "I16": 15360,
+            "I17": 15360
+          },
+          "source": "INDEPENDENT_FIXED_VALID_OHLC_240H_V1",
+          "terminal_all_zero": true
+        },
+        "residual_owners": {},
+        "scenario": "BASE",
+        "seconds": 5.2122,
+        "true_live_quantity": "0"
+      },
+      {
+        "candidates": [
+          "STRUCTURAL_CONTINUATION_LONG_04H",
+          "STRUCTURAL_CONTINUATION_LONG_12H"
+        ],
+        "event_counts": {
+          "ObservedMark": 15360
+        },
+        "exception": null,
+        "independent_cash_posting_delta": "0",
+        "pending_trade_and_fee_liabilities": "0",
+        "postings_count": 0,
+        "report": {
+          "book_balances": {
+            "BASE": {
+              "A": "950.000000000000",
+              "C_o": "0E-12",
+              "E_c": "1000.000000000000",
+              "E_r": "1000.000000000000",
+              "L_f": "0E-12",
+              "R_f": "0E-12",
+              "cash": "1000.000000000000",
+              "drawdown": "0E-12"
+            }
+          },
+          "candidate_outcomes": {
+            "STRUCTURAL_CONTINUATION_LONG_04H": {
+              "fees": "0",
+              "funding": "0",
+              "gross_pnl": "0",
+              "ineligible": false,
+              "ineligible_reason": null,
+              "net_pnl": "0",
+              "status": "ACTIVE",
+              "trades": 0
+            },
+            "STRUCTURAL_CONTINUATION_LONG_12H": {
+              "fees": "0",
+              "funding": "0",
+              "gross_pnl": "0",
+              "ineligible": false,
+              "ineligible_reason": null,
+              "net_pnl": "0",
+              "status": "ACTIVE",
+              "trades": 0
+            }
+          },
+          "clock_end_ms": 1700920920000,
+          "clock_start_ms": 1699999200000,
+          "completed_trades": [],
+          "event_sequence_hash": "3d9d61e24f27abe263c345eee67f3875c52facb6e658a7bcd38197ce9e4eeadd",
+          "invariants_checked_counts": {
+            "I01": 15360,
+            "I02": 15360,
+            "I03": 15360,
+            "I04": 15360,
+            "I05": 15360,
+            "I06": 15360,
+            "I07": 15360,
+            "I08": 15360,
+            "I09": 15360,
+            "I10": 15360,
+            "I11": 15360,
+            "I12": 15360,
+            "I13": 15360,
+            "I14": 15360,
+            "I15": 15360,
+            "I16": 15360,
+            "I17": 15360
+          },
+          "source": "INDEPENDENT_FIXED_VALID_OHLC_240H_V1",
+          "terminal_all_zero": true
+        },
+        "residual_owners": {},
+        "scenario": "BASE",
+        "seconds": 7.6507,
+        "true_live_quantity": "0"
+      },
+      {
+        "candidates": [
+          "STRUCTURAL_CONTINUATION_LONG_12H",
+          "STRUCTURAL_CONTINUATION_LONG_04H"
+        ],
+        "event_counts": {
+          "ObservedMark": 15360
+        },
+        "exception": null,
+        "independent_cash_posting_delta": "0",
+        "pending_trade_and_fee_liabilities": "0",
+        "postings_count": 0,
+        "report": {
+          "book_balances": {
+            "BASE": {
+              "A": "950.000000000000",
+              "C_o": "0E-12",
+              "E_c": "1000.000000000000",
+              "E_r": "1000.000000000000",
+              "L_f": "0E-12",
+              "R_f": "0E-12",
+              "cash": "1000.000000000000",
+              "drawdown": "0E-12"
+            }
+          },
+          "candidate_outcomes": {
+            "STRUCTURAL_CONTINUATION_LONG_04H": {
+              "fees": "0",
+              "funding": "0",
+              "gross_pnl": "0",
+              "ineligible": false,
+              "ineligible_reason": null,
+              "net_pnl": "0",
+              "status": "ACTIVE",
+              "trades": 0
+            },
+            "STRUCTURAL_CONTINUATION_LONG_12H": {
+              "fees": "0",
+              "funding": "0",
+              "gross_pnl": "0",
+              "ineligible": false,
+              "ineligible_reason": null,
+              "net_pnl": "0",
+              "status": "ACTIVE",
+              "trades": 0
+            }
+          },
+          "clock_end_ms": 1700920920000,
+          "clock_start_ms": 1699999200000,
+          "completed_trades": [],
+          "event_sequence_hash": "3d9d61e24f27abe263c345eee67f3875c52facb6e658a7bcd38197ce9e4eeadd",
+          "invariants_checked_counts": {
+            "I01": 15360,
+            "I02": 15360,
+            "I03": 15360,
+            "I04": 15360,
+            "I05": 15360,
+            "I06": 15360,
+            "I07": 15360,
+            "I08": 15360,
+            "I09": 15360,
+            "I10": 15360,
+            "I11": 15360,
+            "I12": 15360,
+            "I13": 15360,
+            "I14": 15360,
+            "I15": 15360,
+            "I16": 15360,
+            "I17": 15360
+          },
+          "source": "INDEPENDENT_FIXED_VALID_OHLC_240H_V1",
+          "terminal_all_zero": true
+        },
+        "residual_owners": {},
+        "scenario": "BASE",
+        "seconds": 7.5347,
+        "true_live_quantity": "0"
+      }
+    ],
+    "import_proof": {
+      "ReplayEngine": {
+        "file": "/tmp/p1-final-a-164243-le6kpcae/src/btc_quant_agent/strategy_research/r3_alt_engine/replay.py",
+        "sha256": "50a80b9242d757e8f69d5ac9f4ad15e3fb348a5ee0c52a8474eec4666147ffdd"
+      },
+      "assert_invariants": {
+        "file": "/tmp/p1-final-a-164243-le6kpcae/src/btc_quant_agent/strategy_research/r3_alt_engine/money.py",
+        "sha256": "649d07456d9d567468f584406f471ca7dd34b51c6e693c1cbe9acc3c8a2bd0e7"
+      },
+      "project_as_of": {
+        "file": "/tmp/p1-final-a-164243-le6kpcae/src/btc_quant_agent/strategy_research/r3_alt_engine/money.py",
+        "sha256": "649d07456d9d567468f584406f471ca7dd34b51c6e693c1cbe9acc3c8a2bd0e7"
+      },
+      "reduce": {
+        "file": "/tmp/p1-final-a-164243-le6kpcae/src/btc_quant_agent/strategy_research/r3_alt_engine/reducer.py",
+        "sha256": "cf3425c9c1b3bf45841945ad473639f42731964432f75208ebb8ae4b005aac9c"
+      }
+    },
+    "observer_note": "Replay reduce wrapper only records events/state; G5 injected initial fee state is explicitly instrumented, not an ordinary production fixture.",
+    "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+    "target_sha": "164243b770f74f98876b55a7f070b1adf2f554d5",
+    "zero_access_counters": {
+      "exchange_calls": 0,
+      "live_writes": 0,
+      "market_body_reads": 0,
+      "protected_reads": 0
+    }
+  },
+  "schema_version": "P1_ALT_FINAL_B_EXECUTION_V1",
+  "scope_counters": {
+    "A_source_writes": 0,
+    "exchange_public_or_private_calls": 0,
+    "full_global_pytest_runs": 0,
+    "live_or_testnet_writes": 0,
+    "protected_reads": 0,
+    "real_market_body_reads": 0
+  },
+  "source_archive_sha256": "c01d08b7a396732185c000e0cf43315d2e865a7b048df17533536a7eca19004a",
+  "source_isolation": "Only allowed target package/tests/synthetic artifacts archived. Target parents use explicit archive-only namespaces;13 pinned Python file SHA256 enforced by final reproducer, no installed/source fallback.",
+  "source_manifest": [
+    {
+      "git_blob": "f4d71d1d08d38ab5efab6683840907c57fbabe80",
+      "path": "prompts/v0.6/b_line/V06_G2_R3_P1_ALT_ENGINE_SOL_HIGH_FINAL_INDEPENDENT_AUDIT_R1.md",
+      "ref": "d4f79c38f6f0dfc3431dcb597bd284b530804644",
+      "sha256": "a94f31de60d7b3e5c73b599d26e2f761ae08cbfa9a8f3dc17068315247090839"
+    },
+    {
+      "git_blob": "9ca1acbedeef77f45872fd8e27200613370405dd",
+      "path": "reviews/v0.6/b_line/V06_G2_R3_P1_ALT_ENGINE_FINAL_AUDIT_SOL_HIGH_EXECUTOR_REASSIGNMENT_R1.md",
+      "ref": "d2669953e896850b1bf749b5e5fdcf831ba26b88",
+      "sha256": "8d7a68b9d6a1e5578b0d51a7ee9134ce78e4ffdae3ac3effd10f1eb5a0f44c57"
+    },
+    {
+      "git_blob": "f84a234fe4f9059c9cacd977708a20288cc7e0cf",
+      "path": "prompts/v0.6/b_line/V06_G2_R3_P1_ALT_ENGINE_FINAL_INDEPENDENT_B_SOURCE_AND_RUNTIME_AUDIT_R1.md",
+      "ref": "18ad412969e224bb19e56d77444c23f766b367f6",
+      "sha256": "f19ca8cf86868a5ced5964a475592d934c92dcc83befde6637cd3eb671c9aeb5"
+    },
+    {
+      "git_blob": "478fe18aa905a99fbcf85a880b7c3a4b11540273",
+      "path": "reviews/v0.6/b_line/V06_G2_R3_P1_ALT_ENGINE_A_DELIVERY_CONTROLLER_EVIDENCE_GATE_AND_FINAL_B_DISPATCH_R1.md",
+      "ref": "ed9dc16f3dbeaada88806b69ad032526886a2ae4",
+      "sha256": "86769d15e821865fcf79265132ffc4324b8830dde70d3313d9538841b4bde4a2"
+    },
+    {
+      "git_blob": "ecafeec0100f8881a700f9e3372a717aeab93b2b",
+      "path": "reviews/v0.6/b_line/V06_G2_R3_P1_ALT_ENGINE_AM01_AM02_CONTROLLER_SPEC_FREEZE_R1.md",
+      "ref": "821d23427a5f6d0b4635f32f226ddc779358ab72",
+      "sha256": "cea538034ea7695a326a2f2c91dcf4d246f2fafaa456f5935f4f375ce1d6e16f"
+    },
+    {
+      "git_blob": "998d9df0b3453988b5638a6dce37725ab4388df7",
+      "path": "evidence/v0.6/b_line/g2_r3_p1_alt_engine_sol_r1/ENGINE_OPTIONS_AND_INVARIANT_ORACLE_MATRIX.json",
+      "ref": "c0b41d1ce62e0fe852edfc6e162f1bc3dc6dcc01",
+      "sha256": "88b9660726cdecbf1effa50bcc73a1beb849df2478ef05f2a8d66022c0633a5c"
+    },
+    {
+      "git_blob": "d337542f6482938c37eb6b4e43255cdf4d09751a",
+      "path": "evidence/v0.6/b_line/g2_r3_design/CANDIDATE_REGISTER_PROPOSAL.json",
+      "ref": "e5b2006a89441f7eb2ec900e508aff451106b87a",
+      "sha256": "d0f89bddfaec0e57c959cec043969059da10fec8aa45f81669dde8b80ea35a9b"
+    },
+    {
+      "git_blob": "7def37d7c8aad02dd0c2769882fad61622e262db",
+      "path": "docs/strategy_research/g2_r3/method_repair/METHOD_R1_1_PIT_COST_ACCOUNTING.md",
+      "ref": "cf2d5cc33774cdcff7d709636305bba830e977ef",
+      "sha256": "a2943c9a541d93eaceb62a664edf0d03f0c9bbab6f4c4f73752831bcf14eb026"
+    },
+    {
+      "git_blob": "15996ed3896479f6ac2e66a04f73f9ba48e2f978",
+      "path": "tests/test_r3_alt_events_money.py",
+      "ref": "164243b770f74f98876b55a7f070b1adf2f554d5",
+      "sha256": "d25538d756dc41d625128ec01abb54c341f01e276c1d1958eee48dc7f287fe06"
+    },
+    {
+      "git_blob": "b4b01c18b5bc8391e92ab0a3f5836099baacafc5",
+      "path": "tests/test_r3_alt_retest_replay.py",
+      "ref": "164243b770f74f98876b55a7f070b1adf2f554d5",
+      "sha256": "717bbaca8a03b7854c0deeda8815486a1bcea60fee0bbf337771bf2eaff5ada7"
+    },
+    {
+      "git_blob": "49d372e400ae6565101a4b7eafe8d74ea2b93627",
+      "path": "tests/test_r3_alt_clock_execution.py",
+      "ref": "164243b770f74f98876b55a7f070b1adf2f554d5",
+      "sha256": "25cc4e97190af3ea6f30aeced0a9a57a110a51d0b2dc98925d66d117d030a8ea"
+    },
+    {
+      "git_blob": "d9531b888aa7c55ec8b784cd8b29ffb22be105c5",
+      "path": "src/btc_quant_agent/strategy_research/r3_alt_engine/clock.py",
+      "ref": "164243b770f74f98876b55a7f070b1adf2f554d5",
+      "sha256": "50f2fa2c66f2952c0729bd8637dd5e8e9f23230c1737e12d466fbca80116cb55"
+    },
+    {
+      "git_blob": "8956199be3a2c738e6b47c9dbfc655fb17100d4c",
+      "path": "src/btc_quant_agent/strategy_research/r3_alt_engine/replay.py",
+      "ref": "164243b770f74f98876b55a7f070b1adf2f554d5",
+      "sha256": "50a80b9242d757e8f69d5ac9f4ad15e3fb348a5ee0c52a8474eec4666147ffdd"
+    },
+    {
+      "git_blob": "f53c1df77faf1109b47981e921eed02470ebe94a",
+      "path": "src/btc_quant_agent/strategy_research/r3_alt_engine/reducer.py",
+      "ref": "164243b770f74f98876b55a7f070b1adf2f554d5",
+      "sha256": "cf3425c9c1b3bf45841945ad473639f42731964432f75208ebb8ae4b005aac9c"
+    },
+    {
+      "git_blob": "2bbd0f28d1857c3b333f2dc01d9e6f73688abd12",
+      "path": "src/btc_quant_agent/strategy_research/r3_alt_engine/execution.py",
+      "ref": "164243b770f74f98876b55a7f070b1adf2f554d5",
+      "sha256": "5a9157e4ae0fe2dba99d4ad4383f600ff1e0efb6db07548b4746841e0dbedad6"
+    },
+    {
+      "git_blob": "cbb48f48a8428c3d137f512277c9c6d454993cab",
+      "path": "src/btc_quant_agent/strategy_research/r3_alt_engine/__init__.py",
+      "ref": "164243b770f74f98876b55a7f070b1adf2f554d5",
+      "sha256": "b5f8a24f1b141a9c9df8a7e961f18c2b5e7718699e55ff00dfc250385ce35b78"
+    },
+    {
+      "git_blob": "6a2fbc6ca9647b854efad60de2d1f2f7fa44f886",
+      "path": "src/btc_quant_agent/strategy_research/r3_alt_engine/signals.py",
+      "ref": "164243b770f74f98876b55a7f070b1adf2f554d5",
+      "sha256": "b4ca80132f851842a048e3197f3b4b90a6c8495d0360ee6f4d56045a371b990d"
+    },
+    {
+      "git_blob": "be065551e5762e241b7b30eb9adc60a4dc1c4f28",
+      "path": "src/btc_quant_agent/strategy_research/r3_alt_engine/journal.py",
+      "ref": "164243b770f74f98876b55a7f070b1adf2f554d5",
+      "sha256": "896986ef11de8d752f6623f2f9d5221288f9b115ed1b9dbb16e7d4e756ba30ee"
+    },
+    {
+      "git_blob": "35ada0b34a2a86ae17ca440d8553e614db2860ca",
+      "path": "src/btc_quant_agent/strategy_research/r3_alt_engine/frozen_primitives.py",
+      "ref": "164243b770f74f98876b55a7f070b1adf2f554d5",
+      "sha256": "5d06f3f77993ae9eb1e76e29042d3375250477e5c7efdc67788d7a696ffa054f"
+    },
+    {
+      "git_blob": "483276a32186a069ca062918c9bb6c7067ad0889",
+      "path": "src/btc_quant_agent/strategy_research/r3_alt_engine/money.py",
+      "ref": "164243b770f74f98876b55a7f070b1adf2f554d5",
+      "sha256": "649d07456d9d567468f584406f471ca7dd34b51c6e693c1cbe9acc3c8a2bd0e7"
+    },
+    {
+      "git_blob": "45e5c268726da04a32a10b54cb4384c20a8e4180",
+      "path": "src/btc_quant_agent/strategy_research/r3_alt_engine/model.py",
+      "ref": "164243b770f74f98876b55a7f070b1adf2f554d5",
+      "sha256": "cb31085e8a389bbb4f58d6472e8890ea29f1606b43c5605e10e46c1ce228b23a"
+    },
+    {
+      "git_blob": "84bad6e24f8925ab656ef1bc8f8d7398c2c6c520",
+      "path": "docs/strategy_research/g2_r3/p1_alt_engine_impl_r1/ALT_ENGINE_IMPLEMENTATION_AND_HANDOFF.md",
+      "ref": "164243b770f74f98876b55a7f070b1adf2f554d5",
+      "sha256": "cb706708ec2912da4e34acecb32ee0d4f6c0386eef3f87f6fe3930f14f91b318"
+    },
+    {
+      "git_blob": "60557c5d982d5c777ea446c072094e6fdec981f4",
+      "path": "evidence/v0.6/b_line/g2_r3_p1_alt_engine_impl_r1/ALT_ENGINE_IMPLEMENTATION_SYNTHETIC_RECEIPT.json",
+      "ref": "164243b770f74f98876b55a7f070b1adf2f554d5",
+      "sha256": "529612a1a5f7e4c7b91839677b2b7b101ba5a2e9a1f1ddca1dcce5addba606e5"
+    },
+    {
+      "git_blob": "48796e50c992c3ef9942baaca33bd15b2567bdf3",
+      "path": "evidence/v0.6/b_line/g2_r3_p1_alt_engine_impl_r1/T01_T34_EXECUTED_TEST_MATRIX.json",
+      "ref": "164243b770f74f98876b55a7f070b1adf2f554d5",
+      "sha256": "9d19ffc0106e1b2a50c3c9a09bbd7a4395d8388df082d80b01ff7348b4774d21"
+    }
+  ],
+  "standalone_execution": {
+    "command": "PYTHONDONTWRITEBYTECODE=1 python3.12 scripts/strategy_research/r3_alt_verification/final_audit.py --target-root /tmp/p1-final-a-164243-le6kpcae --output evidence/v0.6/b_line/g2_r3_p1_alt_engine_b_final_r1/RUNTIME_OBSERVATIONS.json",
+    "note": "Raw observations consolidated verbatim below. Later verifier-only lint cleanup/source-pin checks/extra final-Mark recording do not alter the fixed datasets or immutable A target; final focused cases run against final verifier files.",
+    "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+    "raw_observation_sha256": "46c377e57f651bc0317421b142f67d245ec60b1c5feb207757053d61eb8ece1c",
+    "subprocess_exit_code": 0
+  },
+  "task_id": "V06_G2_R3_P1_ALT_ENGINE_FINAL_INDEPENDENT_B_AUDIT_R1",
+  "terminal_verdict": "ALT_ENGINE_B_TERMINAL_NO_GO__STOP_ENGINE_CAMPAIGN"
+}

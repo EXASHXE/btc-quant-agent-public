@@ -1,0 +1,1430 @@
+{
+  "A_target_sha": "164243b770f74f98876b55a7f070b1adf2f554d5",
+  "STOP_scope": "G1/G2 first-wave blockers; additional bounded confirmatory probes only, no exhaustive34 or full global pytest.",
+  "case_count": 34,
+  "cases": [
+    {
+      "clock_or_source_note": "一分钟合法OHLC和合法close+60s Mark available；完整入口先按timestamp覆盖，尚无策略决策也必须拒绝冲突。公共journal成功不覆盖真实入口失败。",
+      "id": "T01",
+      "input_source": "immutable Sol oracle c0b41d1ce62e0fe852edfc6e162f1bc3dc6dcc01 + Controller AM01/AM02",
+      "name": "同 close 冲突",
+      "observed": {
+        "journal_guard": "both PUBLIC_API permutations raise ConflictFailClosedError",
+        "python313_same_witness": {
+          "expected": "CONFLICT_FAIL_CLOSED in both source orderings",
+          "observed": [
+            {
+              "candidates": [
+                "STRUCTURAL_CONTINUATION_LONG_04H"
+              ],
+              "event_counts": {
+                "ObservedMark": 1
+              },
+              "exception": null,
+              "independent_cash_posting_delta": "0",
+              "observed_final_marks": {
+                "BTCUSDT": "101"
+              },
+              "pending_trade_and_fee_liabilities": "0",
+              "postings_count": 0,
+              "report": {
+                "book_balances": {
+                  "BASE": {
+                    "A": "950.000000000000",
+                    "C_o": "0E-12",
+                    "E_c": "1000.000000000000",
+                    "E_r": "1000.000000000000",
+                    "L_f": "0E-12",
+                    "R_f": "0E-12",
+                    "cash": "1000.000000000000",
+                    "drawdown": "0E-12"
+                  }
+                },
+                "candidate_outcomes": {
+                  "STRUCTURAL_CONTINUATION_LONG_04H": {
+                    "fees": "0",
+                    "funding": "0",
+                    "gross_pnl": "0",
+                    "ineligible": false,
+                    "ineligible_reason": null,
+                    "net_pnl": "0",
+                    "status": "ACTIVE",
+                    "trades": 0
+                  }
+                },
+                "clock_end_ms": 1699999380000,
+                "clock_start_ms": 1699999200000,
+                "completed_trades": [],
+                "event_sequence_hash": "60e05bd1b195af2f94112fa7197a5c88289058840ce7c6df9693756bc6250f55",
+                "invariants_checked_counts": {
+                  "I01": 1,
+                  "I02": 1,
+                  "I03": 1,
+                  "I04": 1,
+                  "I05": 1,
+                  "I06": 1,
+                  "I07": 1,
+                  "I08": 1,
+                  "I09": 1,
+                  "I10": 1,
+                  "I11": 1,
+                  "I12": 1,
+                  "I13": 1,
+                  "I14": 1,
+                  "I15": 1,
+                  "I16": 1,
+                  "I17": 1
+                },
+                "source": "INDEPENDENT_CONFLICTING_SOURCE_CLOSE",
+                "terminal_all_zero": true
+              },
+              "residual_owners": {},
+              "scenario": "BASE",
+              "seconds": 0.0002,
+              "true_live_quantity": "0"
+            },
+            {
+              "candidates": [
+                "STRUCTURAL_CONTINUATION_LONG_04H"
+              ],
+              "event_counts": {
+                "ObservedMark": 1
+              },
+              "exception": null,
+              "independent_cash_posting_delta": "0",
+              "observed_final_marks": {
+                "BTCUSDT": "100"
+              },
+              "pending_trade_and_fee_liabilities": "0",
+              "postings_count": 0,
+              "report": {
+                "book_balances": {
+                  "BASE": {
+                    "A": "950.000000000000",
+                    "C_o": "0E-12",
+                    "E_c": "1000.000000000000",
+                    "E_r": "1000.000000000000",
+                    "L_f": "0E-12",
+                    "R_f": "0E-12",
+                    "cash": "1000.000000000000",
+                    "drawdown": "0E-12"
+                  }
+                },
+                "candidate_outcomes": {
+                  "STRUCTURAL_CONTINUATION_LONG_04H": {
+                    "fees": "0",
+                    "funding": "0",
+                    "gross_pnl": "0",
+                    "ineligible": false,
+                    "ineligible_reason": null,
+                    "net_pnl": "0",
+                    "status": "ACTIVE",
+                    "trades": 0
+                  }
+                },
+                "clock_end_ms": 1699999380000,
+                "clock_start_ms": 1699999200000,
+                "completed_trades": [],
+                "event_sequence_hash": "60e05bd1b195af2f94112fa7197a5c88289058840ce7c6df9693756bc6250f55",
+                "invariants_checked_counts": {
+                  "I01": 1,
+                  "I02": 1,
+                  "I03": 1,
+                  "I04": 1,
+                  "I05": 1,
+                  "I06": 1,
+                  "I07": 1,
+                  "I08": 1,
+                  "I09": 1,
+                  "I10": 1,
+                  "I11": 1,
+                  "I12": 1,
+                  "I13": 1,
+                  "I14": 1,
+                  "I15": 1,
+                  "I16": 1,
+                  "I17": 1
+                },
+                "source": "INDEPENDENT_CONFLICTING_SOURCE_CLOSE",
+                "terminal_all_zero": true
+              },
+              "residual_owners": {},
+              "scenario": "BASE",
+              "seconds": 0.0002,
+              "true_live_quantity": "0"
+            }
+          ],
+          "scope": "FULL_REPLAY",
+          "status": "BLOCKED"
+        },
+        "replay_ingestion": {
+          "expected": "CONFLICT_FAIL_CLOSED in both source orderings",
+          "observed": [
+            {
+              "candidates": [
+                "STRUCTURAL_CONTINUATION_LONG_04H"
+              ],
+              "event_counts": {
+                "ObservedMark": 1
+              },
+              "exception": null,
+              "independent_cash_posting_delta": "0",
+              "observed_final_marks": {
+                "BTCUSDT": "101"
+              },
+              "pending_trade_and_fee_liabilities": "0",
+              "postings_count": 0,
+              "report": {
+                "book_balances": {
+                  "BASE": {
+                    "A": "950.000000000000",
+                    "C_o": "0E-12",
+                    "E_c": "1000.000000000000",
+                    "E_r": "1000.000000000000",
+                    "L_f": "0E-12",
+                    "R_f": "0E-12",
+                    "cash": "1000.000000000000",
+                    "drawdown": "0E-12"
+                  }
+                },
+                "candidate_outcomes": {
+                  "STRUCTURAL_CONTINUATION_LONG_04H": {
+                    "fees": "0",
+                    "funding": "0",
+                    "gross_pnl": "0",
+                    "ineligible": false,
+                    "ineligible_reason": null,
+                    "net_pnl": "0",
+                    "status": "ACTIVE",
+                    "trades": 0
+                  }
+                },
+                "clock_end_ms": 1699999380000,
+                "clock_start_ms": 1699999200000,
+                "completed_trades": [],
+                "event_sequence_hash": "60e05bd1b195af2f94112fa7197a5c88289058840ce7c6df9693756bc6250f55",
+                "invariants_checked_counts": {
+                  "I01": 1,
+                  "I02": 1,
+                  "I03": 1,
+                  "I04": 1,
+                  "I05": 1,
+                  "I06": 1,
+                  "I07": 1,
+                  "I08": 1,
+                  "I09": 1,
+                  "I10": 1,
+                  "I11": 1,
+                  "I12": 1,
+                  "I13": 1,
+                  "I14": 1,
+                  "I15": 1,
+                  "I16": 1,
+                  "I17": 1
+                },
+                "source": "INDEPENDENT_CONFLICTING_SOURCE_CLOSE",
+                "terminal_all_zero": true
+              },
+              "residual_owners": {},
+              "scenario": "BASE",
+              "seconds": 0.0002,
+              "true_live_quantity": "0"
+            },
+            {
+              "candidates": [
+                "STRUCTURAL_CONTINUATION_LONG_04H"
+              ],
+              "event_counts": {
+                "ObservedMark": 1
+              },
+              "exception": null,
+              "independent_cash_posting_delta": "0",
+              "observed_final_marks": {
+                "BTCUSDT": "100"
+              },
+              "pending_trade_and_fee_liabilities": "0",
+              "postings_count": 0,
+              "report": {
+                "book_balances": {
+                  "BASE": {
+                    "A": "950.000000000000",
+                    "C_o": "0E-12",
+                    "E_c": "1000.000000000000",
+                    "E_r": "1000.000000000000",
+                    "L_f": "0E-12",
+                    "R_f": "0E-12",
+                    "cash": "1000.000000000000",
+                    "drawdown": "0E-12"
+                  }
+                },
+                "candidate_outcomes": {
+                  "STRUCTURAL_CONTINUATION_LONG_04H": {
+                    "fees": "0",
+                    "funding": "0",
+                    "gross_pnl": "0",
+                    "ineligible": false,
+                    "ineligible_reason": null,
+                    "net_pnl": "0",
+                    "status": "ACTIVE",
+                    "trades": 0
+                  }
+                },
+                "clock_end_ms": 1699999380000,
+                "clock_start_ms": 1699999200000,
+                "completed_trades": [],
+                "event_sequence_hash": "60e05bd1b195af2f94112fa7197a5c88289058840ce7c6df9693756bc6250f55",
+                "invariants_checked_counts": {
+                  "I01": 1,
+                  "I02": 1,
+                  "I03": 1,
+                  "I04": 1,
+                  "I05": 1,
+                  "I06": 1,
+                  "I07": 1,
+                  "I08": 1,
+                  "I09": 1,
+                  "I10": 1,
+                  "I11": 1,
+                  "I12": 1,
+                  "I13": 1,
+                  "I14": 1,
+                  "I15": 1,
+                  "I16": 1,
+                  "I17": 1
+                },
+                "source": "INDEPENDENT_CONFLICTING_SOURCE_CLOSE",
+                "terminal_all_zero": true
+              },
+              "residual_owners": {},
+              "scenario": "BASE",
+              "seconds": 0.0004,
+              "true_live_quantity": "0"
+            }
+          ],
+          "scope": "FULL_REPLAY",
+          "status": "BLOCKED"
+        }
+      },
+      "original_expected": "两种排列都在决策前以同一 source key 报 CONFLICT_FAIL_CLOSED，无任意获胜价格。",
+      "original_input_contract": "同一 BTC 来源/close=S，价格 50000 和 52000，两个输入排列。",
+      "scope": "FULL_REPLAY + PUBLIC_API",
+      "status": "BLOCKED",
+      "test_node": "tests/test_v06_r3_alt_independent_semantics.py::test_capture_full_replay_duplicate_mark_ingestion"
+    },
+    {
+      "clock_or_source_note": "G1/G2 material blockers已复现后停止穷举；未用A自报PASS代替结果。",
+      "id": "T02",
+      "input_source": "immutable Sol oracle c0b41d1ce62e0fe852edfc6e162f1bc3dc6dcc01 + Controller AM01/AM02",
+      "name": "延迟/未来 Mark",
+      "observed": null,
+      "original_expected": "S+60s 只用 50000，S+120s 用 51000；水位不倒退，未来消息不进入读集。",
+      "original_input_contract": "close=S/price=50000/available=S+60s；close=S+60s/51000/available=S+120s；旧 close 迟到；未来 available=S+180s。",
+      "scope": "NOT_RUN",
+      "status": "NOT_RUN_DUE_TO_TERMINAL_BLOCKER",
+      "test_node": null
+    },
+    {
+      "clock_or_source_note": "G1/G2 material blockers已复现后停止穷举；未用A自报PASS代替结果。",
+      "id": "T03",
+      "input_source": "immutable Sol oracle c0b41d1ce62e0fe852edfc6e162f1bc3dc6dcc01 + Controller AM01/AM02",
+      "name": "迟到同 close 冲突",
+      "observed": null,
+      "original_expected": "冲突致命；不回写历史，也不重算早先订单。",
+      "original_input_contract": "先接受 close=S/50000，再收到同 close/48000。",
+      "scope": "NOT_RUN",
+      "status": "NOT_RUN_DUE_TO_TERMINAL_BLOCKER",
+      "test_node": null
+    },
+    {
+      "clock_or_source_note": "G1/G2 material blockers已复现后停止穷举；未用A自报PASS代替结果。",
+      "id": "T04",
+      "input_source": "immutable Sol oracle c0b41d1ce62e0fe852edfc6e162f1bc3dc6dcc01 + Controller AM01/AM02",
+      "name": "报告与决策隔离",
+      "observed": null,
+      "original_expected": "证明前 E_d/E_c=1000；经济报告可标记 2000，但任何早先决策不变。该例仅验证读集隔离。",
+      "original_input_contract": "标准化 API book：cash=1000、LONG q=1、entry=50000；合法 Mark=50000；未来报告 Mark=51000。q=1 明确不作为合规资金入场。",
+      "scope": "NOT_RUN",
+      "status": "NOT_RUN_DUE_TO_TERMINAL_BLOCKER",
+      "test_node": null
+    },
+    {
+      "clock_or_source_note": "G1/G2 material blockers已复现后停止穷举；未用A自报PASS代替结果。",
+      "id": "T05",
+      "input_source": "immutable Sol oracle c0b41d1ce62e0fe852edfc6e162f1bc3dc6dcc01 + Controller AM01/AM02",
+      "name": "Mark 过期边界",
+      "observed": null,
+      "original_expected": "120s 有效；180s WAIT_STALE 并安排下一分钟退出；不得猜测 MTM。",
+      "original_input_contract": "最后 Mark close=S；检查 cut=S+120s 和 S+180s。",
+      "scope": "NOT_RUN",
+      "status": "NOT_RUN_DUE_TO_TERMINAL_BLOCKER",
+      "test_node": null
+    },
+    {
+      "clock_or_source_note": "G1/G2 material blockers已复现后停止穷举；未用A自报PASS代替结果。",
+      "id": "T06",
+      "input_source": "immutable Sol oracle c0b41d1ce62e0fe852edfc6e162f1bc3dc6dcc01 + Controller AM01/AM02",
+      "name": "ACK 重复 2x/3x",
+      "observed": null,
+      "original_expected": "cash=998，费用=2，仅一笔现金分录，重复不改变有效 journal。",
+      "original_input_contract": "cash=1000；同一 FillAck 费用 2，完全相同 payload 重复两次、三次。",
+      "scope": "NOT_RUN",
+      "status": "NOT_RUN_DUE_TO_TERMINAL_BLOCKER",
+      "test_node": null
+    },
+    {
+      "clock_or_source_note": "G1/G2 material blockers已复现后停止穷举；未用A自报PASS代替结果。",
+      "id": "T07",
+      "input_source": "immutable Sol oracle c0b41d1ce62e0fe852edfc6e162f1bc3dc6dcc01 + Controller AM01/AM02",
+      "name": "ACK payload 冲突",
+      "observed": null,
+      "original_expected": "第二次分录前 fail closed；原余额不变，不能静默忽略。",
+      "original_input_contract": "同一 ACK ID 改费用 2→3 或数量 1→2。",
+      "scope": "NOT_RUN",
+      "status": "NOT_RUN_DUE_TO_TERMINAL_BLOCKER",
+      "test_node": null
+    },
+    {
+      "clock_or_source_note": "G1/G2 material blockers已复现后停止穷举；未用A自报PASS代替结果。",
+      "id": "T08",
+      "input_source": "immutable Sol oracle c0b41d1ce62e0fe852edfc6e162f1bc3dc6dcc01 + Controller AM01/AM02",
+      "name": "旧 ACK 不倒退 cooldown",
+      "observed": null,
+      "original_expected": "cooldown 保持 1700017140000；只能结算 P1，不修改 P2。",
+      "original_input_contract": "新 P2 cooldown=1700017140000；旧 P1 ACK 给出较早 1700010000000。",
+      "scope": "NOT_RUN",
+      "status": "NOT_RUN_DUE_TO_TERMINAL_BLOCKER",
+      "test_node": null
+    },
+    {
+      "clock_or_source_note": "G1/G2 material blockers已复现后停止穷举；未用A自报PASS代替结果。",
+      "id": "T09",
+      "input_source": "immutable Sol oracle c0b41d1ce62e0fe852edfc6e162f1bc3dc6dcc01 + Controller AM01/AM02",
+      "name": "ACK owner/cause 错配",
+      "observed": null,
+      "original_expected": "CAUSE_OR_OWNER_FAIL_CLOSED，无 auto-ACK 或 symbol fallback；合法承诺不被释放。",
+      "original_input_contract": "ACK 指向不匹配的 order/fill/position。",
+      "scope": "NOT_RUN",
+      "status": "NOT_RUN_DUE_TO_TERMINAL_BLOCKER",
+      "test_node": null
+    },
+    {
+      "clock_or_source_note": "独立标准化FINAL义务快照及FundingAck前后；不把此PASS推广为T11-T15资金费所有权/source时钟PASS。",
+      "id": "T10",
+      "input_source": "immutable Sol oracle c0b41d1ce62e0fe852edfc6e162f1bc3dc6dcc01 + Controller AM01/AM02",
+      "name": "资金费短缺与 owner",
+      "observed": {
+        "ETH_after": {
+          "candidate_id": "STRUCTURAL_CONTINUATION_LONG_12H",
+          "cash_settled": "0",
+          "direction": 1,
+          "enc_exit_fee": "0",
+          "enc_fee": "0",
+          "enc_funding_dedicated": "0",
+          "enc_funding_future": "2",
+          "enc_notional": "0",
+          "enc_shortfall": "0",
+          "entry_price": "0",
+          "entry_time_ms": 0,
+          "fee_expense": "0",
+          "fee_payable": "0",
+          "funding_expense": "0",
+          "funding_payable": "0",
+          "initial_stop": "0",
+          "is_tombstone": false,
+          "max_hold_ms": 0,
+          "owner_key": {
+            "book_id": "BASE",
+            "position_id": "ETH_WITNESS",
+            "settlement_id": ""
+          },
+          "pending_exit_slices": [],
+          "phase": "CLOSED_UNSETTLED",
+          "quantity": "0",
+          "realized_gain": "0",
+          "realized_loss": "0",
+          "retest_event_id": null,
+          "symbol": "ETHUSDT",
+          "target": "0",
+          "trade_payable": "0",
+          "trade_receivable": "0"
+        },
+        "after": {
+          "A": "940.050000000000",
+          "A_raw": "940.050000000000",
+          "B": "313.350000000000",
+          "C_o": "7.000000000000",
+          "E_c": "999.000000000000",
+          "E_d": "999.000000000000",
+          "E_r": "999.000000000000",
+          "L_f": "0E-12",
+          "P_f": "0E-12",
+          "R_f": "2.000000000000",
+          "acknowledged_live_mtm": "0E-12",
+          "as_of_ms": 1699999200000,
+          "cash": "999.000000000000",
+          "drawdown": "1.000000000000",
+          "killed": false,
+          "peak_E_r": "1000.000000000000",
+          "unacked_live_mtm": "0E-12",
+          "visible_unpaid_exit_losses": "0E-12",
+          "visible_unpaid_fees": "0E-12"
+        },
+        "before": {
+          "A": "940.000000000000",
+          "A_raw": "940.000000000000",
+          "B": "313.333333333333",
+          "C_o": "7.000000000000",
+          "E_c": "1000.000000000000",
+          "E_d": "1000.000000000000",
+          "E_r": "999.000000000000",
+          "L_f": "0.600000000000",
+          "P_f": "1.000000000000",
+          "R_f": "2.400000000000",
+          "acknowledged_live_mtm": "0E-12",
+          "as_of_ms": 1699999200000,
+          "cash": "1000.000000000000",
+          "drawdown": "1.000000000000",
+          "killed": false,
+          "peak_E_r": "1000.000000000000",
+          "unacked_live_mtm": "0E-12",
+          "visible_unpaid_exit_losses": "0E-12",
+          "visible_unpaid_fees": "0E-12"
+        },
+        "expected": {
+          "after_cash": "999",
+          "after_free": "940.05",
+          "before_free": "940"
+        },
+        "scope": "PUBLIC_API_NORMALIZED_LEDGER",
+        "status": "PASS"
+      },
+      "original_expected": "ACK 前 R=2.40、P=1、BTC L=.60、free=940；ACK 后 cash=999、BTC P/Rcov/L=0、ETH=2、free=940.05。",
+      "original_input_contract": "cash=1000、C_o=7、BTC Rcov=.40、ETH Rfuture=2；最终 BTC payable=1，ACK 延迟。",
+      "scope": "PUBLIC_API_NORMALIZED_LEDGER",
+      "status": "PASS",
+      "test_node": "tests/test_v06_r3_alt_independent_semantics.py::test_normalized_funding_projection"
+    },
+    {
+      "clock_or_source_note": "G1/G2 material blockers已复现后停止穷举；未用A自报PASS代替结果。",
+      "id": "T11",
+      "input_source": "immutable Sol oracle c0b41d1ce62e0fe852edfc6e162f1bc3dc6dcc01 + Controller AM01/AM02",
+      "name": "资金费 ACK 延迟/乱序",
+      "observed": null,
+      "original_expected": "等待合法 cause 与 available；独立到达顺序归一化；payable/覆盖/短缺保留到 ACK，重复只扣一次。",
+      "original_input_contract": "T10 的 ACK available=final_cut+120s；到达顺序 ACK 先于 cause，或 ACK 晚可用。",
+      "scope": "NOT_RUN",
+      "status": "NOT_RUN_DUE_TO_TERMINAL_BLOCKER",
+      "test_node": null
+    },
+    {
+      "clock_or_source_note": "G1/G2 material blockers已复现后停止穷举；未用A自报PASS代替结果。",
+      "id": "T12",
+      "input_source": "immutable Sol oracle c0b41d1ce62e0fe852edfc6e162f1bc3dc6dcc01 + Controller AM01/AM02",
+      "name": "S 前退出仍属窗口",
+      "observed": null,
+      "original_expected": "S 时 EXIT_PENDING；S+60s 合法 ExitAck 后 CLOSED_UNSETTLED，仍保留条件资金费覆盖；S+120s 才可 FINAL，FundingAck 不早于该证明。",
+      "original_input_contract": "exit=S−10000ms；退出 ACK available 至少 exit+60000ms=S+50000ms，首个对齐 cut=S+60000ms；窗口证明 available=S+120000ms。",
+      "scope": "NOT_RUN",
+      "status": "NOT_RUN_DUE_TO_TERMINAL_BLOCKER",
+      "test_node": null
+    },
+    {
+      "clock_or_source_note": "G1/G2 material blockers已复现后停止穷举；未用A自报PASS代替结果。",
+      "id": "T13",
+      "input_source": "immutable Sol oracle c0b41d1ce62e0fe852edfc6e162f1bc3dc6dcc01 + Controller AM01/AM02",
+      "name": "拒绝非分钟 API",
+      "observed": null,
+      "original_expected": "INVALID_MINUTE_CLOCK，状态不变；该例是 API 防御，不宣称正常 replay 可达。",
+      "original_input_contract": "advance_to(S−5000ms)，S 为整分钟。",
+      "scope": "NOT_RUN",
+      "status": "NOT_RUN_DUE_TO_TERMINAL_BLOCKER",
+      "test_node": null
+    },
+    {
+      "clock_or_source_note": "G1/G2 material blockers已复现后停止穷举；未用A自报PASS代替结果。",
+      "id": "T14",
+      "input_source": "immutable Sol oracle c0b41d1ce62e0fe852edfc6e162f1bc3dc6dcc01 + Controller AM01/AM02",
+      "name": "精确持仓身份",
+      "observed": null,
+      "original_expected": "精确键各付一次，无 substring 匹配；各自保留资金 tombstone。",
+      "original_input_contract": "POS_1 应付 1，POS_10 应付 .20，独立 exposure/cause。",
+      "scope": "NOT_RUN",
+      "status": "NOT_RUN_DUE_TO_TERMINAL_BLOCKER",
+      "test_node": null
+    },
+    {
+      "clock_or_source_note": "G1/G2 material blockers已复现后停止穷举；未用A自报PASS代替结果。",
+      "id": "T15",
+      "input_source": "immutable Sol oracle c0b41d1ce62e0fe852edfc6e162f1bc3dc6dcc01 + Controller AM01/AM02",
+      "name": "S 时不能知未来所有权",
+      "observed": null,
+      "original_expected": "S 时只有条件覆盖，不提前确认未来数量/payable；最终数量用 max(pre,post)，不能相加。",
+      "original_input_contract": "窗口至 S+15s；未来入场可能发生；最后交叠分钟证据 available=S+120s。",
+      "scope": "NOT_RUN",
+      "status": "NOT_RUN_DUE_TO_TERMINAL_BLOCKER",
+      "test_node": null
+    },
+    {
+      "clock_or_source_note": "proof前后风险和kill已测；退出ACK及后续永久latch链未执行，所以完整T16不标PASS。",
+      "id": "T16",
+      "input_source": "immutable Sol oracle c0b41d1ce62e0fe852edfc6e162f1bc3dc6dcc01 + Controller AM01/AM02",
+      "name": "标准化 −169.336545",
+      "observed": {
+        "after": {
+          "A": "0E-12",
+          "A_raw": "789.130282250000",
+          "B": "0E-12",
+          "C_o": "0E-12",
+          "E_c": "830.663455000000",
+          "E_d": "1000.000000000000",
+          "E_r": "830.663455000000",
+          "L_f": "0E-12",
+          "P_f": "0E-12",
+          "R_f": "0E-12",
+          "acknowledged_live_mtm": "0E-12",
+          "as_of_ms": 1699999260000,
+          "cash": "1000.000000000000",
+          "drawdown": "169.336545000000",
+          "killed": true,
+          "peak_E_r": "1000.000000000000",
+          "unacked_live_mtm": "0E-12",
+          "visible_unpaid_exit_losses": "169.336545000000",
+          "visible_unpaid_fees": "0E-12"
+        },
+        "before": {
+          "A": "950.000000000000",
+          "A_raw": "950.000000000000",
+          "B": "316.666666666667",
+          "C_o": "0E-12",
+          "E_c": "1000.000000000000",
+          "E_d": "1000.000000000000",
+          "E_r": "1000.000000000000",
+          "L_f": "0E-12",
+          "P_f": "0E-12",
+          "R_f": "0E-12",
+          "acknowledged_live_mtm": "0E-12",
+          "as_of_ms": 1699999200000,
+          "cash": "1000.000000000000",
+          "drawdown": "0E-12",
+          "killed": false,
+          "peak_E_r": "1000.000000000000",
+          "unacked_live_mtm": "0E-12",
+          "visible_unpaid_exit_losses": "0E-12",
+          "visible_unpaid_fees": "0E-12"
+        },
+        "expected": {
+          "after_E_r": "830.663455",
+          "after_kill": true,
+          "before_E_r": "1000"
+        },
+        "scope": "PUBLIC_API_NORMALIZED_LEDGER",
+        "status": "PASS"
+      },
+      "original_expected": "证明前不见未来亏损；S+60s E_c/E_r=830.663455，drawdown=169.336545，kill=true/free=0；ACK 后 cash=830.663455、payable=0，kill 不复位。",
+      "original_input_contract": "cash=1000、trade payable=169.336545，无额外费用；economic exit=S−1ms、proof available=S+60s、ExitAck=S+120s。并非原 B05 价格/费用拆分。",
+      "scope": "PUBLIC_API_NORMALIZED_LEDGER_PARTIAL",
+      "status": "UNVERIFIED",
+      "test_node": "tests/test_v06_r3_alt_independent_semantics.py::test_normalized_pending_loss_proof_floor"
+    },
+    {
+      "clock_or_source_note": "G1/G2 material blockers已复现后停止穷举；未用A自报PASS代替结果。",
+      "id": "T17",
+      "input_source": "immutable Sol oracle c0b41d1ce62e0fe852edfc6e162f1bc3dc6dcc01 + Controller AM01/AM02",
+      "name": "未 ACK 盈利不可复用",
+      "observed": null,
+      "original_expected": "ACK 前 E_c=1000/free=950；ACK 后 cash=1050/free=997.5（若无其他约束）。",
+      "original_input_contract": "cash=1000、独立 trade receivable=50、费用 0，ACK 延迟。",
+      "scope": "NOT_RUN",
+      "status": "NOT_RUN_DUE_TO_TERMINAL_BLOCKER",
+      "test_node": null
+    },
+    {
+      "clock_or_source_note": "G1/G2 material blockers已复现后停止穷举；未用A自报PASS代替结果。",
+      "id": "T18",
+      "input_source": "immutable Sol oracle c0b41d1ce62e0fe852edfc6e162f1bc3dc6dcc01 + Controller AM01/AM02",
+      "name": "小亏损仍减少资本",
+      "observed": null,
+      "original_expected": "E_c/E_r=980，drawdown=20，不 kill，free=931；不能仍报 950。",
+      "original_input_contract": "cash=1000、合法可见 pending loss=20、其他覆盖 0。",
+      "scope": "NOT_RUN",
+      "status": "NOT_RUN_DUE_TO_TERMINAL_BLOCKER",
+      "test_node": null
+    },
+    {
+      "clock_or_source_note": "G1/G2 material blockers已复现后停止穷举；未用A自报PASS代替结果。",
+      "id": "T19",
+      "input_source": "immutable Sol oracle c0b41d1ce62e0fe852edfc6e162f1bc3dc6dcc01 + Controller AM01/AM02",
+      "name": "kill 永久",
+      "observed": null,
+      "original_expected": "合法结算继续，但新订单 WAIT_DISABLED/free=0；high-water/kill 不重置；退出只在下一合法 open。",
+      "original_input_contract": "T16 kill 后又到达盈利 ACK、新 fold、信号。",
+      "scope": "NOT_RUN",
+      "status": "NOT_RUN_DUE_TO_TERMINAL_BLOCKER",
+      "test_node": null
+    },
+    {
+      "clock_or_source_note": "G1/G2 material blockers已复现后停止穷举；未用A自报PASS代替结果。",
+      "id": "T20",
+      "input_source": "immutable Sol oracle c0b41d1ce62e0fe852edfc6e162f1bc3dc6dcc01 + Controller AM01/AM02",
+      "name": "同 bar SL-first",
+      "observed": null,
+      "original_expected": "raw exit=49000/SL，economic_at=O+59999ms；一次成本，无 TP 盈利。",
+      "original_input_contract": "LONG entry=50000、stop=49000、target=51000；O/H/L/C=50000/52000/48000/50000。",
+      "scope": "NOT_RUN",
+      "status": "NOT_RUN_DUE_TO_TERMINAL_BLOCKER",
+      "test_node": null
+    },
+    {
+      "clock_or_source_note": "G1/G2 material blockers已复现后停止穷举；未用A自报PASS代替结果。",
+      "id": "T21",
+      "input_source": "immutable Sol oracle c0b41d1ce62e0fe852edfc6e162f1bc3dc6dcc01 + Controller AM01/AM02",
+      "name": "不利 gap",
+      "observed": null,
+      "original_expected": "raw exit=48000；保留 gap 亏损和资本越界标记，不用有利 49000。",
+      "original_input_contract": "同 LONG，bar open=48000<stop=49000。",
+      "scope": "NOT_RUN",
+      "status": "NOT_RUN_DUE_TO_TERMINAL_BLOCKER",
+      "test_node": null
+    },
+    {
+      "clock_or_source_note": "G1/G2 material blockers已复现后停止穷举；未用A自报PASS代替结果。",
+      "id": "T22",
+      "input_source": "immutable Sol oracle c0b41d1ce62e0fe852edfc6e162f1bc3dc6dcc01 + Controller AM01/AM02",
+      "name": "所有有利退出封顶",
+      "observed": null,
+      "original_expected": "LONG raw=51000、SHORT raw=49000；各类型均封顶，再加一次不利摩擦/tick。",
+      "original_input_contract": "LONG target=51000/open=52000；SHORT target=49000/open=48000；分别 TP/time/kill/reduction。",
+      "scope": "NOT_RUN",
+      "status": "NOT_RUN_DUE_TO_TERMINAL_BLOCKER",
+      "test_node": null
+    },
+    {
+      "clock_or_source_note": "G1/G2 material blockers已复现后停止穷举；未用A自报PASS代替结果。",
+      "id": "T23",
+      "input_source": "immutable Sol oracle c0b41d1ce62e0fe852edfc6e162f1bc3dc6dcc01 + Controller AM01/AM02",
+      "name": "4h/12h 精确到期",
+      "observed": null,
+      "original_expected": "不提前到期；首个合法 F+hold open time exit；该 open 的 stop 优先，报告不得回流。",
+      "original_input_contract": "fill=F、hold=4h 或 12h，无提前 SL/TP；到期前一分钟与 F+hold 开盘。",
+      "scope": "NOT_RUN",
+      "status": "NOT_RUN_DUE_TO_TERMINAL_BLOCKER",
+      "test_node": null
+    },
+    {
+      "clock_or_source_note": "G1/G2 material blockers已复现后停止穷举；未用A自报PASS代替结果。",
+      "id": "T24",
+      "input_source": "immutable Sol oracle c0b41d1ce62e0fe852edfc6e162f1bc3dc6dcc01 + Controller AM01/AM02",
+      "name": "跳过小时仍取消",
+      "observed": null,
+      "original_expected": "顺序 reduce H26/H27，旧事件在 H26 取消；H27 无旧确认/伪 stop；密集调用与跳过调用的状态一致。",
+      "original_input_contract": "LONG boundary=47400、ATR=1000，H25 突破；H26 close=46000/low=45500；H27 恢复；全部已完成小时证据可用。",
+      "scope": "NOT_RUN",
+      "status": "NOT_RUN_DUE_TO_TERMINAL_BLOCKER",
+      "test_node": null
+    },
+    {
+      "clock_or_source_note": "G1/G2 material blockers已复现后停止穷举；未用A自报PASS代替结果。",
+      "id": "T25",
+      "input_source": "immutable Sol oracle c0b41d1ce62e0fe852edfc6e162f1bc3dc6dcc01 + Controller AM01/AM02",
+      "name": "三小时与 extrema",
+      "observed": null,
+      "original_expected": "stop=49700−250=49450；只在 hour3 确认，hour4 不可确认；迟调用不补发过去入场；各 variant 消费隔离。",
+      "original_input_contract": "boundary=50000、ATR=1000；H+1 low=49800、不确认，H+2 low=49700、不确认；H+3 low=49900/close=50100/open<close 首次确认。",
+      "scope": "NOT_RUN",
+      "status": "NOT_RUN_DUE_TO_TERMINAL_BLOCKER",
+      "test_node": null
+    },
+    {
+      "clock_or_source_note": "G1/G2 material blockers已复现后停止穷举；未用A自报PASS代替结果。",
+      "id": "T26",
+      "input_source": "immutable Sol oracle c0b41d1ce62e0fe852edfc6e162f1bc3dc6dcc01 + Controller AM01/AM02",
+      "name": "双角色规范门",
+      "observed": null,
+      "original_expected": "未冻结 AM01 时 SPEC_AMENDMENT_REQUIRED；若 Controller 采纳建议，只终止旧事件，下一根不同小时方可注册。",
+      "original_input_contract": "同一小时 bar 取消/过期旧事件，并满足新突破谓词。",
+      "scope": "NOT_RUN",
+      "status": "NOT_RUN_DUE_TO_TERMINAL_BLOCKER",
+      "test_node": null
+    },
+    {
+      "clock_or_source_note": "12h未知小时stress ineligible子项正确；policy book独立性不满足，交易级互扰在0-trade fixtures中未证明。",
+      "id": "T27",
+      "input_source": "immutable Sol oracle c0b41d1ce62e0fe852edfc6e162f1bc3dc6dcc01 + Controller AM01/AM02",
+      "name": "八候选与成本几何",
+      "observed": {
+        "combined_book_results": [
+          {
+            "balances": {
+              "BASE": {
+                "A": "950.000000000000",
+                "C_o": "0E-12",
+                "E_c": "1000.000000000000",
+                "E_r": "1000.000000000000",
+                "L_f": "0E-12",
+                "R_f": "0E-12",
+                "cash": "1000.000000000000",
+                "drawdown": "0E-12"
+              }
+            },
+            "candidates": [
+              "STRUCTURAL_CONTINUATION_LONG_12H"
+            ]
+          },
+          {
+            "balances": {
+              "BASE": {
+                "A": "950.000000000000",
+                "C_o": "0E-12",
+                "E_c": "1000.000000000000",
+                "E_r": "1000.000000000000",
+                "L_f": "0E-12",
+                "R_f": "0E-12",
+                "cash": "1000.000000000000",
+                "drawdown": "0E-12"
+              }
+            },
+            "candidates": [
+              "STRUCTURAL_CONTINUATION_LONG_04H",
+              "STRUCTURAL_CONTINUATION_LONG_12H"
+            ]
+          },
+          {
+            "balances": {
+              "BASE": {
+                "A": "950.000000000000",
+                "C_o": "0E-12",
+                "E_c": "1000.000000000000",
+                "E_r": "1000.000000000000",
+                "L_f": "0E-12",
+                "R_f": "0E-12",
+                "cash": "1000.000000000000",
+                "drawdown": "0E-12"
+              }
+            },
+            "candidates": [
+              "STRUCTURAL_CONTINUATION_LONG_12H",
+              "STRUCTURAL_CONTINUATION_LONG_04H"
+            ]
+          }
+        ],
+        "normalized_shared_loss": {
+          "pooled_A": "0",
+          "pooled_E_r": "900",
+          "pooled_killed": true,
+          "solo_B_A": "950",
+          "solo_B_E_r": "1000"
+        },
+        "t29_stress_outcome": {
+          "STRUCTURAL_CONTINUATION_LONG_12H": {
+            "fees": "0",
+            "funding": "0",
+            "gross_pnl": "0",
+            "ineligible": true,
+            "ineligible_reason": "STRESS_COST_GEOMETRY_INELIGIBLE",
+            "net_pnl": "0",
+            "status": "STRESS_COST_GEOMETRY_INELIGIBLE",
+            "trades": 0
+          }
+        }
+      },
+      "original_expected": "4h 需 d>=152 且其他规则通过；12h stress 需 280>250，明确 ineligible，无虚构亏损；book/case 独立，不降成本。",
+      "original_input_contract": "原始 8 IDs；base/stress 22/44bp，小时资金费 4/8bp；4h c=76，12h c=140，stop cap=250。",
+      "scope": "FULL_REPLAY + PUBLIC_API",
+      "status": "BLOCKED",
+      "test_node": "tests/test_v06_r3_alt_independent_semantics.py::test_capture_shared_book_loss_kills_unrelated_candidate"
+    },
+    {
+      "clock_or_source_note": "A原4条fixture逐条真实执行，没有任何trade或完整链；未改fixture求绿。",
+      "id": "T28",
+      "input_source": "immutable Sol oracle c0b41d1ce62e0fe852edfc6e162f1bc3dc6dcc01 + Controller AM01/AM02",
+      "name": "完整非空 4h replay",
+      "observed": [
+        {
+          "candidates": [
+            "STRUCTURAL_CONTINUATION_LONG_04H"
+          ],
+          "event_counts": {
+            "ObservedMark": 14700
+          },
+          "exception": null,
+          "expected_min_trades": 1,
+          "expected_net_sign": 1,
+          "fixture": "A_T28_BASE_win",
+          "independent_cash_posting_delta": "0",
+          "invalid_ohlc_bars": 300,
+          "pending_trade_and_fee_liabilities": "0",
+          "postings_count": 0,
+          "report": {
+            "book_balances": {
+              "BASE": {
+                "A": "950.000000000000",
+                "C_o": "0E-12",
+                "E_c": "1000.000000000000",
+                "E_r": "1000.000000000000",
+                "L_f": "0E-12",
+                "R_f": "0E-12",
+                "cash": "1000.000000000000",
+                "drawdown": "0E-12"
+              }
+            },
+            "candidate_outcomes": {
+              "STRUCTURAL_CONTINUATION_LONG_04H": {
+                "fees": "0",
+                "funding": "0",
+                "gross_pnl": "0",
+                "ineligible": false,
+                "ineligible_reason": null,
+                "net_pnl": "0",
+                "status": "ACTIVE",
+                "trades": 0
+              }
+            },
+            "clock_end_ms": 1700881320000,
+            "clock_start_ms": 1699999200000,
+            "completed_trades": [],
+            "event_sequence_hash": "a489e97f9804d1f4cd353f5cdd0f22dc9c1bdfded38a6462254b66ddfcf55d74",
+            "invariants_checked_counts": {
+              "I01": 14700,
+              "I02": 14700,
+              "I03": 14700,
+              "I04": 14700,
+              "I05": 14700,
+              "I06": 14700,
+              "I07": 14700,
+              "I08": 14700,
+              "I09": 14700,
+              "I10": 14700,
+              "I11": 14700,
+              "I12": 14700,
+              "I13": 14700,
+              "I14": 14700,
+              "I15": 14700,
+              "I16": 14700,
+              "I17": 14700
+            },
+            "source": "SYNTHETIC_WIN",
+            "terminal_all_zero": true
+          },
+          "residual_owners": {},
+          "scenario": "BASE",
+          "seconds": 5.4701,
+          "true_live_quantity": "0"
+        },
+        {
+          "candidates": [
+            "STRUCTURAL_CONTINUATION_LONG_04H"
+          ],
+          "event_counts": {
+            "ObservedMark": 14700
+          },
+          "exception": null,
+          "expected_min_trades": 1,
+          "expected_net_sign": -1,
+          "fixture": "A_T28_BASE_loss",
+          "independent_cash_posting_delta": "0",
+          "invalid_ohlc_bars": 300,
+          "pending_trade_and_fee_liabilities": "0",
+          "postings_count": 0,
+          "report": {
+            "book_balances": {
+              "BASE": {
+                "A": "950.000000000000",
+                "C_o": "0E-12",
+                "E_c": "1000.000000000000",
+                "E_r": "1000.000000000000",
+                "L_f": "0E-12",
+                "R_f": "0E-12",
+                "cash": "1000.000000000000",
+                "drawdown": "0E-12"
+              }
+            },
+            "candidate_outcomes": {
+              "STRUCTURAL_CONTINUATION_LONG_04H": {
+                "fees": "0",
+                "funding": "0",
+                "gross_pnl": "0",
+                "ineligible": false,
+                "ineligible_reason": null,
+                "net_pnl": "0",
+                "status": "ACTIVE",
+                "trades": 0
+              }
+            },
+            "clock_end_ms": 1700881320000,
+            "clock_start_ms": 1699999200000,
+            "completed_trades": [],
+            "event_sequence_hash": "a489e97f9804d1f4cd353f5cdd0f22dc9c1bdfded38a6462254b66ddfcf55d74",
+            "invariants_checked_counts": {
+              "I01": 14700,
+              "I02": 14700,
+              "I03": 14700,
+              "I04": 14700,
+              "I05": 14700,
+              "I06": 14700,
+              "I07": 14700,
+              "I08": 14700,
+              "I09": 14700,
+              "I10": 14700,
+              "I11": 14700,
+              "I12": 14700,
+              "I13": 14700,
+              "I14": 14700,
+              "I15": 14700,
+              "I16": 14700,
+              "I17": 14700
+            },
+            "source": "SYNTHETIC_LOSS",
+            "terminal_all_zero": true
+          },
+          "residual_owners": {},
+          "scenario": "BASE",
+          "seconds": 4.946,
+          "true_live_quantity": "0"
+        },
+        {
+          "candidates": [
+            "STRUCTURAL_CONTINUATION_LONG_04H"
+          ],
+          "event_counts": {
+            "ObservedMark": 14700
+          },
+          "exception": null,
+          "expected_min_trades": 1,
+          "expected_net_sign": 1,
+          "fixture": "A_T28_STRESS_win",
+          "independent_cash_posting_delta": "0",
+          "invalid_ohlc_bars": 300,
+          "pending_trade_and_fee_liabilities": "0",
+          "postings_count": 0,
+          "report": {
+            "book_balances": {
+              "STRESS": {
+                "A": "950.000000000000",
+                "C_o": "0E-12",
+                "E_c": "1000.000000000000",
+                "E_r": "1000.000000000000",
+                "L_f": "0E-12",
+                "R_f": "0E-12",
+                "cash": "1000.000000000000",
+                "drawdown": "0E-12"
+              }
+            },
+            "candidate_outcomes": {
+              "STRUCTURAL_CONTINUATION_LONG_04H": {
+                "fees": "0",
+                "funding": "0",
+                "gross_pnl": "0",
+                "ineligible": false,
+                "ineligible_reason": null,
+                "net_pnl": "0",
+                "status": "ACTIVE",
+                "trades": 0
+              }
+            },
+            "clock_end_ms": 1700881320000,
+            "clock_start_ms": 1699999200000,
+            "completed_trades": [],
+            "event_sequence_hash": "a489e97f9804d1f4cd353f5cdd0f22dc9c1bdfded38a6462254b66ddfcf55d74",
+            "invariants_checked_counts": {
+              "I01": 14700,
+              "I02": 14700,
+              "I03": 14700,
+              "I04": 14700,
+              "I05": 14700,
+              "I06": 14700,
+              "I07": 14700,
+              "I08": 14700,
+              "I09": 14700,
+              "I10": 14700,
+              "I11": 14700,
+              "I12": 14700,
+              "I13": 14700,
+              "I14": 14700,
+              "I15": 14700,
+              "I16": 14700,
+              "I17": 14700
+            },
+            "source": "SYNTHETIC_WIN",
+            "terminal_all_zero": true
+          },
+          "residual_owners": {},
+          "scenario": "STRESS",
+          "seconds": 4.8617,
+          "true_live_quantity": "0"
+        },
+        {
+          "candidates": [
+            "STRUCTURAL_CONTINUATION_LONG_04H"
+          ],
+          "event_counts": {
+            "ObservedMark": 14700
+          },
+          "exception": null,
+          "expected_min_trades": 1,
+          "expected_net_sign": -1,
+          "fixture": "A_T28_STRESS_loss",
+          "independent_cash_posting_delta": "0",
+          "invalid_ohlc_bars": 300,
+          "pending_trade_and_fee_liabilities": "0",
+          "postings_count": 0,
+          "report": {
+            "book_balances": {
+              "STRESS": {
+                "A": "950.000000000000",
+                "C_o": "0E-12",
+                "E_c": "1000.000000000000",
+                "E_r": "1000.000000000000",
+                "L_f": "0E-12",
+                "R_f": "0E-12",
+                "cash": "1000.000000000000",
+                "drawdown": "0E-12"
+              }
+            },
+            "candidate_outcomes": {
+              "STRUCTURAL_CONTINUATION_LONG_04H": {
+                "fees": "0",
+                "funding": "0",
+                "gross_pnl": "0",
+                "ineligible": false,
+                "ineligible_reason": null,
+                "net_pnl": "0",
+                "status": "ACTIVE",
+                "trades": 0
+              }
+            },
+            "clock_end_ms": 1700881320000,
+            "clock_start_ms": 1699999200000,
+            "completed_trades": [],
+            "event_sequence_hash": "a489e97f9804d1f4cd353f5cdd0f22dc9c1bdfded38a6462254b66ddfcf55d74",
+            "invariants_checked_counts": {
+              "I01": 14700,
+              "I02": 14700,
+              "I03": 14700,
+              "I04": 14700,
+              "I05": 14700,
+              "I06": 14700,
+              "I07": 14700,
+              "I08": 14700,
+              "I09": 14700,
+              "I10": 14700,
+              "I11": 14700,
+              "I12": 14700,
+              "I13": 14700,
+              "I14": 14700,
+              "I15": 14700,
+              "I16": 14700,
+              "I17": 14700
+            },
+            "source": "SYNTHETIC_LOSS",
+            "terminal_all_zero": true
+          },
+          "residual_owners": {},
+          "scenario": "STRESS",
+          "seconds": 5.0629,
+          "true_live_quantity": "0"
+        }
+      ],
+      "original_expected": "实际 run_simulation，4h BASE/STRESS 的 winning/losing 路径各 n>=1，所有原费用不变；净值由独立 quantity/fee/funding oracle 重建；terminal positions/ACK/payables/C_o/R/L=0。不是实证或候选参数优化。",
+      "original_input_contract": ">=240h warm-up、固定结构触发和合法尺寸；4h BASE/STRESS 各执行预定义 winning/losing 两条完整路径（共4个 full replay）；synthetic known hourly schedule、原4/8bp费率、stop200bp满足4h stress几何；全部 source/ACK tail 在固定边界内。",
+      "scope": "FULL_REPLAY",
+      "status": "BLOCKED",
+      "test_node": "scripts/strategy_research/r3_alt_verification/final_audit.py::g1"
+    },
+    {
+      "clock_or_source_note": "BASE known-config仍0；STRESS明确ineligible。A known-config只列warmup前8h/16h，未认证实际持仓资金费链。",
+      "id": "T29",
+      "input_source": "immutable Sol oracle c0b41d1ce62e0fe852edfc6e162f1bc3dc6dcc01 + Controller AM01/AM02",
+      "name": "完整 12h BASE 与 stress",
+      "observed": [
+        {
+          "candidates": [
+            "STRUCTURAL_CONTINUATION_LONG_12H"
+          ],
+          "event_counts": {
+            "ObservedMark": 14700
+          },
+          "exception": null,
+          "expected_min_trades": 1,
+          "fixture": "A_T29_BASE",
+          "independent_cash_posting_delta": "0",
+          "pending_trade_and_fee_liabilities": "0",
+          "postings_count": 0,
+          "report": {
+            "book_balances": {
+              "BASE": {
+                "A": "950.000000000000",
+                "C_o": "0E-12",
+                "E_c": "1000.000000000000",
+                "E_r": "1000.000000000000",
+                "L_f": "0E-12",
+                "R_f": "0E-12",
+                "cash": "1000.000000000000",
+                "drawdown": "0E-12"
+              }
+            },
+            "candidate_outcomes": {
+              "STRUCTURAL_CONTINUATION_LONG_12H": {
+                "fees": "0",
+                "funding": "0",
+                "gross_pnl": "0",
+                "ineligible": false,
+                "ineligible_reason": null,
+                "net_pnl": "0",
+                "status": "ACTIVE",
+                "trades": 0
+              }
+            },
+            "clock_end_ms": 1700881320000,
+            "clock_start_ms": 1699999200000,
+            "completed_trades": [],
+            "event_sequence_hash": "a489e97f9804d1f4cd353f5cdd0f22dc9c1bdfded38a6462254b66ddfcf55d74",
+            "invariants_checked_counts": {
+              "I01": 14700,
+              "I02": 14700,
+              "I03": 14700,
+              "I04": 14700,
+              "I05": 14700,
+              "I06": 14700,
+              "I07": 14700,
+              "I08": 14700,
+              "I09": 14700,
+              "I10": 14700,
+              "I11": 14700,
+              "I12": 14700,
+              "I13": 14700,
+              "I14": 14700,
+              "I15": 14700,
+              "I16": 14700,
+              "I17": 14700
+            },
+            "source": "SYNTHETIC_WIN",
+            "terminal_all_zero": true
+          },
+          "residual_owners": {},
+          "scenario": "BASE",
+          "seconds": 4.8827,
+          "true_live_quantity": "0"
+        },
+        {
+          "candidates": [
+            "STRUCTURAL_CONTINUATION_LONG_12H"
+          ],
+          "event_counts": {
+            "ObservedMark": 14700
+          },
+          "exception": null,
+          "expected_min_trades": 0,
+          "fixture": "A_T29_STRESS",
+          "independent_cash_posting_delta": "0",
+          "pending_trade_and_fee_liabilities": "0",
+          "postings_count": 0,
+          "report": {
+            "book_balances": {
+              "STRESS": {
+                "A": "950.000000000000",
+                "C_o": "0E-12",
+                "E_c": "1000.000000000000",
+                "E_r": "1000.000000000000",
+                "L_f": "0E-12",
+                "R_f": "0E-12",
+                "cash": "1000.000000000000",
+                "drawdown": "0E-12"
+              }
+            },
+            "candidate_outcomes": {
+              "STRUCTURAL_CONTINUATION_LONG_12H": {
+                "fees": "0",
+                "funding": "0",
+                "gross_pnl": "0",
+                "ineligible": true,
+                "ineligible_reason": "STRESS_COST_GEOMETRY_INELIGIBLE",
+                "net_pnl": "0",
+                "status": "STRESS_COST_GEOMETRY_INELIGIBLE",
+                "trades": 0
+              }
+            },
+            "clock_end_ms": 1700881320000,
+            "clock_start_ms": 1699999200000,
+            "completed_trades": [],
+            "event_sequence_hash": "a489e97f9804d1f4cd353f5cdd0f22dc9c1bdfded38a6462254b66ddfcf55d74",
+            "invariants_checked_counts": {
+              "I01": 14700,
+              "I02": 14700,
+              "I03": 14700,
+              "I04": 14700,
+              "I05": 14700,
+              "I06": 14700,
+              "I07": 14700,
+              "I08": 14700,
+              "I09": 14700,
+              "I10": 14700,
+              "I11": 14700,
+              "I12": 14700,
+              "I13": 14700,
+              "I14": 14700,
+              "I15": 14700,
+              "I16": 14700,
+              "I17": 14700
+            },
+            "source": "SYNTHETIC_WIN",
+            "terminal_all_zero": true
+          },
+          "residual_owners": {},
+          "scenario": "STRESS",
+          "seconds": 2.3519,
+          "true_live_quantity": "0"
+        }
+      ],
+      "original_expected": "Known-schedule BASE12h 实际 run_simulation n>=1，cash/net逐笔对账；unknown-hourly STRESS12h=0fills+明确ineligible。不能因为旧 registry helper 的 horizon硬编码跳过funding schedule；该helper只复用ID，不复用eligibility捷径。terminal余额0。",
+      "original_input_contract": ">=240h warm-up 的12h BASE，明确定义合成 known 8h settlement schedule（费率仍4/8bp，非实际交易所来源），stop200bp按原 stress hurdle c60/d>=120通过；另一个固定12h STRESS unknown-hourly scenario c140/d>=280不通过。两个fixture事前固定，不能由结果切换。",
+      "scope": "FULL_REPLAY",
+      "status": "BLOCKED",
+      "test_node": "scripts/strategy_research/r3_alt_verification/final_audit.py::g1"
+    },
+    {
+      "clock_or_source_note": "fill quantity1却接受exit quantity2，记录loss20并把remaining夹为0；正常1→.6→0及Decimal/permutation组合未穷举。",
+      "id": "T30",
+      "input_source": "immutable Sol oracle c0b41d1ce62e0fe852edfc6e162f1bc3dc6dcc01 + Controller AM01/AM02",
+      "name": "Decimal/排列/部分减仓",
+      "observed": {
+        "expected": "reject exit2 when filled1",
+        "invariants": {
+          "I01": true,
+          "I02": true,
+          "I03": true,
+          "I04": true,
+          "I05": true,
+          "I06": true,
+          "I07": true,
+          "I08": true,
+          "I09": true,
+          "I10": true,
+          "I11": true,
+          "I12": true,
+          "I13": true,
+          "I14": true,
+          "I15": true,
+          "I16": true,
+          "I17": true
+        },
+        "owner": {
+          "candidate_id": "STRUCTURAL_CONTINUATION_LONG_04H",
+          "cash_settled": "1000",
+          "direction": 1,
+          "enc_exit_fee": "0",
+          "enc_fee": "0",
+          "enc_funding_dedicated": "0",
+          "enc_funding_future": "0",
+          "enc_notional": "0",
+          "enc_shortfall": "0",
+          "entry_price": "100",
+          "entry_time_ms": 0,
+          "fee_expense": "0E-12",
+          "fee_payable": "0E-12",
+          "funding_expense": "0",
+          "funding_payable": "0",
+          "initial_stop": "90",
+          "is_tombstone": false,
+          "max_hold_ms": 0,
+          "owner_key": {
+            "book_id": "BASE",
+            "position_id": "BTC_OWNER",
+            "settlement_id": ""
+          },
+          "pending_exit_slices": [
+            {
+              "available_at_ms": 1699999200000,
+              "effective_price": "90",
+              "exit_fee": "0E-12",
+              "exit_reason": "STOP_LOSS",
+              "exit_time_ms": 1699999200000,
+              "gross_pnl": "-20.000000000000",
+              "is_acknowledged": false,
+              "is_loss": true,
+              "quantity": "2",
+              "raw_price": "90",
+              "slice_id": "OVER_EXIT"
+            }
+          ],
+          "phase": "EXIT_PENDING",
+          "quantity": "0",
+          "realized_gain": "0",
+          "realized_loss": "20.000000000000",
+          "retest_event_id": null,
+          "symbol": "BTCUSDT",
+          "target": "120",
+          "trade_payable": "20.000000000000",
+          "trade_receivable": "0"
+        },
+        "scope": "PUBLIC_API_EVENT",
+        "status": "BLOCKED"
+      },
+      "original_expected": "12dp 分录/checkpoint/hash 相同；资金费用 max pre/post=1 而非 1.6；退出 slice 数量和<=1；费用/资金费各一次。",
+      "original_input_contract": "环境 Decimal precision 28/50、Python3.12/3.13；BTC/ETH 独立输入排列；q=1→.6→0 的部分退出，保留因果顺序。",
+      "scope": "PUBLIC_API_EXTRA_PARTIAL_QUANTITY_COUNTEREXAMPLE",
+      "status": "BLOCKED",
+      "test_node": "tests/test_v06_r3_alt_independent_semantics.py::test_capture_over_exit_public_reducer"
+    },
+    {
+      "clock_or_source_note": "G1/G2 material blockers已复现后停止穷举；未用A自报PASS代替结果。",
+      "id": "T31",
+      "input_source": "immutable Sol oracle c0b41d1ce62e0fe852edfc6e162f1bc3dc6dcc01 + Controller AM01/AM02",
+      "name": "权限/缺失/边界",
+      "observed": null,
+      "original_expected": "按规范 SOURCE/COST_BLOCKED 或命名 WAIT；无伪填充价格、maker 优势、下一月读取；market/protected/private/live=0。",
+      "original_input_contract": "缺 active trade/true-mark、非正 volume、非法 tick/lot/min-notional、fold tail 越界；禁止网络/实证 CLI。",
+      "scope": "NOT_RUN",
+      "status": "NOT_RUN_DUE_TO_TERMINAL_BLOCKER",
+      "test_node": null
+    },
+    {
+      "clock_or_source_note": "G1/G2 material blockers已复现后停止穷举；未用A自报PASS代替结果。",
+      "id": "T32",
+      "input_source": "immutable Sol oracle c0b41d1ce62e0fe852edfc6e162f1bc3dc6dcc01 + Controller AM01/AM02",
+      "name": "不同 pending slice 盈亏不互抵",
+      "observed": null,
+      "original_expected": "ACK 前 E_c/E_r=900，drawdown=100，kill=true/free=0；不能先 net 得 0。盈利 ACK 后 cash=1100、仍 pending loss100，kill 保持；全部 ACK 后 cash=1000、余额 0。",
+      "original_input_contract": "同 owner 两个已可见未 ACK slice：payable=100、receivable=100、费用 0，cash=1000；两个 ACK 均未来可用且到达排列可交换。",
+      "scope": "NOT_RUN",
+      "status": "NOT_RUN_DUE_TO_TERMINAL_BLOCKER",
+      "test_node": null
+    },
+    {
+      "clock_or_source_note": "G1/G2 material blockers已复现后停止穷举；未用A自报PASS代替结果。",
+      "id": "T33",
+      "input_source": "immutable Sol oracle c0b41d1ce62e0fe852edfc6e162f1bc3dc6dcc01 + Controller AM01/AM02",
+      "name": "资本不足/负净值下界",
+      "observed": null,
+      "original_expected": "free=0 合法，I06 不错误要求 0<=负数；实际 cash/经济亏损不截断；非正风险净值 kill。",
+      "original_input_contract": "独立 projection 输入：E_c=100、C_o=100，A_raw=−5；以及 E_c=−10。",
+      "scope": "NOT_RUN",
+      "status": "NOT_RUN_DUE_TO_TERMINAL_BLOCKER",
+      "test_node": null
+    },
+    {
+      "clock_or_source_note": "G1/G2 material blockers已复现后停止穷举；未用A自报PASS代替结果。",
+      "id": "T34",
+      "input_source": "immutable Sol oracle c0b41d1ce62e0fe852edfc6e162f1bc3dc6dcc01 + Controller AM01/AM02",
+      "name": "费用可见时原子覆盖转换",
+      "observed": null,
+      "original_expected": "notice 同步 E_c=998、entry fee payable=2、C_o=101、free=847.1，未 ACK notional100保留；ACK 后 cash998/payable0/C_o1/free947.1，G=100；无二次费用覆盖释放。",
+      "original_input_contract": "cash=1000；entry notional cover=100、entry fee cover=2、exit cover=1，C_o=103；合法费 notice=2，FillAck 延迟。",
+      "scope": "NOT_RUN",
+      "status": "NOT_RUN_DUE_TO_TERMINAL_BLOCKER",
+      "test_node": null
+    }
+  ],
+  "controller_dispatch_sha": "d2669953e896850b1bf749b5e5fdcf831ba26b88",
+  "original_b_dispatch_sha": "ed9dc16f3dbeaada88806b69ad032526886a2ae4",
+  "original_prompt_sha": "18ad412969e224bb19e56d77444c23f766b367f6",
+  "pinned_prompt_sha": "d4f79c38f6f0dfc3431dcb597bd284b530804644",
+  "schema_version": "P1_ALT_FINAL_B_T01_T34_V1",
+  "status_counts": {
+    "BLOCKED": 5,
+    "NOT_RUN_DUE_TO_TERMINAL_BLOCKER": 27,
+    "PASS": 1,
+    "UNVERIFIED": 1
+  },
+  "task_id": "V06_G2_R3_P1_ALT_ENGINE_FINAL_INDEPENDENT_B_AUDIT_R1",
+  "terminal_verdict": "ALT_ENGINE_B_TERMINAL_NO_GO__STOP_ENGINE_CAMPAIGN"
+}
