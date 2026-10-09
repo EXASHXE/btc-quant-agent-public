@@ -1,0 +1,52 @@
+# quant-agent v0.6 — B-line G2 R3 P1 independent R2 terminal adjudication and bounded architecture replan
+
+**CONTROLLER DECISION:** `ACCEPT_B_R2_EVIDENCE__REJECT_P1_ENGINE_ACCEPTANCE__TERMINATE_PATCH_LOOP__AUTHORIZE_BOUNDED_ARCHITECTURE_REBUILD`.
+
+**Type:** B-line Controller docs-only immutable engineering authority. This is NOT a retroactive R2 implementation PASS, actual historical source permission, G2 Alpha quality authorization, TESTNET permission or live trading grant.
+
+## 1. Verified source / immutable evidence
+
+- Main `v0.6@e0ff8c3473de4bfa3e66fe7928d42992a4d38a32` unchanged; docs pre-decision HEAD `4f3d2d4db93a159f828dfdbe49e2db4a47c8973f`.
+- Gemini A R2 `feature/v06-bline-g2-overnight-discovery-a@2c60b0653d3619eedf457753511a9ecc84c1cd5b`, parent `5c542edd418a74b440162610fd540b1f01e423d3`.
+- Gemini B R2 independently assessed A exact SHA from isolated Git source; branch `feature/v06-bline-g2-overnight-verifier-b@068a4005f68b5ee4a970063cb1f3bc524a08784a`, parent `f1ec703b7c7276582f324ac25b9d1000f1b5ef14` and exactly five files within its permitted B paths. Original audit [matrix](https://github.com/EXASHXE/btc-quant-agent-public/blob/068a4005f68b5ee4a970063cb1f3bc524a08784a/evidence/v0.6/b_line/g2_overnight_p0_b/repair_r2/B01_B07_R2_INDEPENDENT_BEHAVIOR_MATRIX.json), [dynamic receipt](https://github.com/EXASHXE/btc-quant-agent-public/blob/068a4005f68b5ee4a970063cb1f3bc524a08784a/evidence/v0.6/b_line/g2_overnight_p0_b/repair_r2/R2_B_INDEPENDENT_SYNTHETIC_EXECUTION_RECEIPT.json), [human-readable report](https://github.com/EXASHXE/btc-quant-agent-public/blob/068a4005f68b5ee4a970063cb1f3bc524a08784a/docs/strategy_research/g2_r3/prep_b/repair_r2/B_R2_FINAL_CONTROLLER_HANDOFF.md). Terminal verdict `R2_B_SEMANTIC_BLOCKED__REPLAN_ENGINE_ARCHITECTURE`: B02 and B04 scoped PASS; B01/B03/B05/B06/B07 BLOCKED with executable counterexamples. B focused suites 35 PASS on Python 3.12 and Python 3.13 (reported in independent receipt). These are synthetic behavior results, not economic evidence.
+- [GitHub CI 37900503469](https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/37900503469) on B exact SHA **FAILURE**: 2819 passed, 1 failed, 2 skipped, 9 warnings, 753.46s. Sole failure is unmodified `tests/test_v051_h40_m3a_production_discovery_producer.py::test_p09_through_p18_exact_scientific_graph`, expected hash `d5a962cd9c9556b573a890b6af8cbeb09d7201187511f477d727c8670bf0b2e0`, observed `ee185f1fce50bdf710295a23506a5c29d83a70c361aff72e2b6be9e54526643d`. Same failure on A R2 full CI. Do not call CI PASS or dismiss recurring hash mismatch as transient; track separately, **never** change/skip protected golden solely for green CI. Only changed-scope independent tests may be used for next architecture development, full suite at appropriate acceptance boundary.
+
+## 2. Controller finding disposition — no repair-by-waiver
+
+1. `B01 BLOCKED` — `ReplayEngine` sorts marks by effective availability and retains only the last popped item. Late older mark supersedes a fresher eligible mark and latter is lost; as-of ordering must be by completed close time after time eligibility.
+2. `B02 SCOPED PASS` — duplicate entry/exit/funding ACK idempotence, preserve as regression guard.
+3. `B03 BLOCKED` — funding ownership keyed `(symbol, S)` and `max(quantity)` loses `position_id` attribution; Stage1 exit ACK before Stage7 settlement incorrectly finalizes/reclaims reserves; symbol-only pending exit match assigns funding to unrelated earlier position.
+4. `B04 SCOPED PASS` — minute-end effective SL/TP event timing/cooldown and 4h/12h horizons, preserve.
+5. `B05 BLOCKED` — entry notional reservation released before ACK while decision risk ignores economic loss of unacked live exposure, permitting spendable capital despite >100 USDT drawdown. `max(0, reserve - debit)` masks conservation failure.
+6. `B06 BLOCKED` — cooldown early-return suppresses state progression; call count rather than elapsed completed hours permits stale fifth-hour confirmation. End-of-third-hour expiry and eligible new breakout handling must match **existing accepted** rule, not outcome-driven reinterpretation.
+7. `B07 BLOCKED` — booked funding debit can exceed individual remaining reserve; aggregate debited by full charge, per-position capped, causing cross-position reserve theft. Stage1/Stage7 ordering can leave trade net PnL different from cash movements.
+
+B's small synthetic counterexamples are credible **failure evidence**, not automatic acceptance of every proposed engineering mechanism. Before implementation adopt the following non-negotiable design constraints; report an accepted-method conflict instead of redefining outcome logic.
+
+## 3. Required architecture contract (design authority, no code quality PASS)
+
+**A. One event/position identity authority.** Every economic position, fill, exit, funding, and ACK has an immutable event ID and `position_id`. Keep a per-symbol active-position index only as a constraint/index, never as the primary accounting identity. Close→reopen same symbol within a settlement window is two distinct lifecycles. Funding once per `(position_id, settlement_S)`, not `(symbol, S)`; determine eligibility using frozen `[S-15s,S+15s]` and completed interval boundaries. Charge each qualifying position by its own quantity/mark and link to its own trade.
+
+**B. An explicit as-of/event lifecycle.** Separate economic event time, market body completion, availability/ACK time, and report finalization. One minute OHLC may resolve an intraminute exit only at the conservative allowed minute end; not at open. A trade cannot be terminally settled/release all reserves until intersecting scheduled funding obligations have been adjudicated and relevant messages are available. Pre-S minute exit acknowledged at S must still receive S funding if interval overlaps. No future market close, stale mark or pending message may affect an earlier decision.
+
+**C. Single-owner reserve and cash invariants.** Implement a deterministic per-order/per-position reserve ledger or derived-sum liabilities. At every stage assert `aggregate_reserved == sum(outstanding_owned_reservations)`; never use clamping to hide an underflow. Fee/funding payment exceeding prepaid reserve is a real extra cash liability/risk event, **not** a negative reserve or debit to other symbol's reserve. Keep total economic equity, available decision equity and conservative risk equity distinct; pre-ACK live exposure still participates in loss/insolvency/kill risk while never allowing unacknowledged profit to raise spendable capital. Upon killed/cancelled/closed all obligations clear only on exactly-once transitions; observed cash delta must reconcile to final net trades plus documented unsettled liabilities.
+
+**D. Monotonic symbol mark state.** A MarkBar1m becomes eligible no sooner than `max(close_ms,available_at_ms)`. Of all newly eligible marks for a symbol, latest completed `close_ms` wins; late older marks cannot permanently suppress newer eligible marks. Enforce 120s staleness, duplicates, gaps, multiple assets, and no price-body/lookahead access.
+
+**E. Wall-clock candidate state.** Retest `bars_since_breakout` derived from elapsed closed one-hour bars since frozen breakout, including hours where vol/EMA or cooldown prevent entry. Never decrement/reset by a missed call; expire the existing 3-hour window exactly per frozen rule and do not rescue stale retests. Preserve candidate key isolation, eight IDs, 4h/12h positions, unchanged rules/cost grades and lookahead fences.
+
+**F. Failure semantics.** On inconsistent event identity, clock ordering, missing/late mark, underflow or irreconcilable book, fail closed with a typed diagnostic; do not silently repair by clipping, rewinding or changing cost/strategy thresholds. No protected market body, dataset provenance, testnet/private API, or trading permissions follow.
+
+## 4. One bounded engineering architecture implementation, not repeated repairs
+
+**New stage:** `P1_ENGINE_ARCHITECTURE_REBUILD_V1`. Gemini A remains principal implementer. One coherent refactor behind same v0.6 R3 research sidecar APIs with compatibility tests. Reuse existing A worktree and original A branch from exact A R2 SHA; B remains independent oracle with unmodified original receipts. Controller will publish a subsequent immutable **implementation Prompt**, pinned to the real commit containing this adjudication (the `CONTROLLER_DISPATCH_SHA`). A must proactively commit/push and verify remote identity after scoped tests.
+
+Independent B's red regressions must be transformed into **positive** tests on new immutable A source. Required critical fixtures: late older mark + simultaneous fresh mark, same S pre-S exit ACK, same-symbol close/reopen, distinct position pending exit assignment, reserve exhaustion in one asset with another asset's positive reserve, unacked crash crossing kill threshold, cooldown crossing 5 elapsed hours, third-hour confirmation/expiry, duplicate ACK, kill/restart-equivalent, 4h/12h, BASE/STRESS deterministic end-to-end nonzero trades. At least one closed multi-position exact conservation scenario and monotonic PIT replay must PASS; no untested workaround accepted.
+
+**Bound:** one architecture implementation work package with at most one internal same-architecture correction and **one** final independent cross-implementation assessment. If an accepted-method ambiguity blocks invariants, terminate as `BLOCKED_SPEC_CONFLICT` for Controller scientific adjudication. If an independent architectural blocker persists after that bounded attempt, stop P1, publish evidence and select a smaller alternative certified backtester/engine instead of an R4/R5 chain. This is not a commitment to spend unlimited iterations.
+
+## 5. Parallel P2 and next permissions
+
+P2 Sol data-readiness remains `LOCAL_ROOT_UNKNOWN`, no canonical local BTC Parquet root; ETH/SOL, actual minute mark, funding/fee quality and licence remain unadmitted. Demand at most one operator-provided exact canonical root for separately authorized selected-only metadata check or terminate local discovery and select one bounded source replacement. Old BTC `[2026-02-01,2026-08-01)` v0.3 FINAL HOLDOUT remains PROTECTED/DISPUTED. No effective `FIRST_PUSHED_PREREG_SHA`; P3/P4 forbidden until P1/P2 gate.
+
+**Authority limits:** `EMPIRICAL_PRICE_BODY_AUTHORITY=NONE`; `TESTNET=NOT_AUTHORIZED`; `REAL_FUNDS_WRITE_AUTHORITY=NONE`; `LIVE_APPROVAL_ONLY=NOT_AUTHORIZED`; `AUTONOMOUS_LIVE=FORBIDDEN`.
