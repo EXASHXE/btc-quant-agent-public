@@ -1353,7 +1353,7 @@
     "real_funds_write_authority": "NONE"
   },
   "v06_g2_r3_p0_a_interaction_repair_r2": {
-    "status": "CONTROLLER_DISPATCHED_A_R2__AWAITING_REMOTE_DELIVERY",
+    "status": "R2_DELIVERED_SCOPE_VALID__CI_FAILED_H40_GOLDEN__AWAITING_B_INDEPENDENT_REVIEW",
     "task_id": "V06_G2_R3_P0_A_INTERACTION_REPAIR_R2",
     "controller_dispatch_sha": "218c126c9fd5395767fa27af984bf14b265c4a8f",
     "controller_adjudication_path": "reviews/v0.6/b_line/V06_G2_R3_P0_B_REAUDIT_CONTROLLER_L2_ADJUDICATION_AND_A_R2_DISPATCH.md",
@@ -1375,6 +1375,29 @@
     "next_independent_check": "ONE_B_CHANGE_SCOPED_BEHAVIOR_REAUDIT",
     "on_failure": "REPLAN_ENGINE_ARCHITECTURE_NOT_OPEN_ENDED_R3_R4",
     "empirical_market_body_authority": "NONE",
+    "testnet": "NOT_AUTHORIZED",
+    "real_funds_write_authority": "NONE",
+    "terminal_remote_sha": "2c60b0653d3619eedf457753511a9ecc84c1cd5b",
+    "remote_parent_sha": "5c542edd418a74b440162610fd540b1f01e423d3",
+    "a_executor_verdict": "R2_SYNTHETIC_REPAIR_READY_FOR_INDEPENDENT_B_REVIEW",
+    "ci_run": "https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/37888079460",
+    "ci_conclusion": "FAILURE_ONE_INHERITED_H40_GOLDEN_SHA_MISMATCH_2830_PASS_1_FAIL_2_SKIP",
+    "p1_engine_acceptance": "PENDING_B_INDEPENDENT_BEHAVIOR"
+  },
+  "v06_g2_r3_p0_b_r2_final_independent_reaudit": {
+    "status": "CONTROLLER_DISPATCHED__AWAITING_GEMINI_B_REMOTE_DELIVERY",
+    "task_id": "V06_G2_R3_P0_B_INDEPENDENT_R2_FINAL_BEHAVIOR_REAUDIT",
+    "controller_dispatch_sha": "20ad1e442fb7cce58c618c4aac1e2a3b6241f647",
+    "controller_adjudication_path": "reviews/v0.6/b_line/V06_G2_R3_P0_A_R2_CONTROLLER_RECEIPT_CI_ADJUDICATION_AND_B_REAUDIT_DISPATCH.md",
+    "prompt_path": "prompts/v0.6/b_line/V06_G2_R3_P0_B_R2_FINAL_INDEPENDENT_REAUDIT_R1.md",
+    "immutable_prompt_commit": "16fde9a2ece7a9f2a0099b3f36a289d80e72aaf9",
+    "a_exact_target_sha": "2c60b0653d3619eedf457753511a9ecc84c1cd5b",
+    "b_branch": "feature/v06-bline-g2-overnight-verifier-b",
+    "b_expected_start_sha": "f1ec703b7c7276582f324ac25b9d1000f1b5ef14",
+    "verification_scope": "ONE_B_INDEPENDENT_SYNTHETIC_ORACLE_REAUDIT_B01_B07",
+    "unrelated_ci_fail": "INHERITED_H40_GOLDEN_RECORDED_NOT_WAIVED",
+    "if_semantic_fail": "REPLAN_ENGINE_ARCHITECTURE_NO_AUTOMATIC_R3_R4",
+    "empirical_price_body_authority": "NONE",
     "testnet": "NOT_AUTHORIZED",
     "real_funds_write_authority": "NONE"
   }
