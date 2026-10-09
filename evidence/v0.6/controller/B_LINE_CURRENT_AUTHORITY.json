@@ -1,6 +1,6 @@
 {
   "line": "B_LINE",
-  "stage": "V06_G2_R3_P0_A_REPAIR_PENDING__B_REAUDIT_PENDING__SOL61_DATA_READINESS_FASTPATH_ACTIVE__EMPIRICAL_DATA_HOLD__NO_TESTNET_LIVE",
+  "stage": "V06_G2_R3_A_REPAIR_RECEIVED_CI_FOCUSED_7_PASS__B_INDEPENDENT_REAUDIT_DISPATCHED__SOL_DATA_READINESS_PENDING__NO_EMPIRICAL_OR_TESTNET_LIVE",
   "code_branch": "v0.6",
   "accepted_code_sha": "52c16a28153de307dc6132c0975fe29341a0a918",
   "docs_authority_commit": "6319ddbaddd69d5522696992ec1565169da88e03",
@@ -1300,6 +1300,31 @@
     "zero_market_body_reads_required": true,
     "old_btc_holdout": "2026-02-01..2026-08-01 PROTECTED/DISPUTED",
     "price_replay_authority": "NONE",
+    "real_funds_write_authority": "NONE"
+  },
+  "v06_g2_r3_p0_a_repair_r1": {
+    "status": "CONTROLLER_LINT_FIXED__CI_FOCUSED_7_PASS__AWAITING_B_INDEPENDENT_REAUDIT",
+    "initial_repair_sha": "2f0383816127cb7d87cf5deb559aeda0b04f1624",
+    "controller_lint_fixed_sha": "5c542edd418a74b440162610fd540b1f01e423d3",
+    "initial_ci": "https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/37873215393",
+    "initial_ci_conclusion": "FAILURE_RUFF_F821",
+    "new_ci": "https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/37875087577",
+    "new_ci_conclusion": "SUCCESS_FOCUSED_7_TESTS",
+    "scope": "A01_A08_SYNTHETIC_ONLY",
+    "candidate_count": 8,
+    "empirical_authority": "NONE",
+    "real_funds_write_authority": "NONE"
+  },
+  "v06_g2_r3_p0_b_reaudit_r1": {
+    "status": "DISPATCHED_NOT_YET_EXECUTED",
+    "dispatch_sha": "3fb4508110c031eb0ff9226a7e42d918684c554f",
+    "prompt_path": "prompts/v0.6/b_line/V06_G2_R3_P0_GEMINI_B_INDEPENDENT_REAUDIT_R1.md",
+    "branch": "feature/v06-bline-g2-overnight-verifier-b",
+    "expected_b_head": "a0aacd105ac3f3173b15d91c869990748178e222",
+    "a_target_sha": "5c542edd418a74b440162610fd540b1f01e423d3",
+    "worktree": "~/workspace/project/quant-v0.6/g2-overnight-verifier-b",
+    "independent_behavioral_acceptance": "PENDING",
+    "empirical_data_access": "NONE",
     "real_funds_write_authority": "NONE"
   }
 }
