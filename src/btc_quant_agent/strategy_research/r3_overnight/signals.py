@@ -53,8 +53,8 @@ class SignalGenerator:
     """Evaluates hourly bars at exclusive close + 60s lag for all 8 candidates."""
 
     def __init__(self) -> None:
-        # Per symbol/direction active breakout states
-        self._active_breakouts: dict[tuple[str, Direction], RetestBreakoutState] = {}
+        # Per (candidate_id, symbol, direction) active breakout states
+        self._active_breakouts: dict[tuple[str, str, Direction], RetestBreakoutState] = {}
         # Completed/consumed retest event IDs to guarantee single-use
         self._consumed_retest_events: set[str] = set()
 
@@ -257,7 +257,7 @@ class SignalGenerator:
         current_1h = bars_1h[-1]
         decision_close = current_1h.close
         last_4h = bars_4h[-1]
-        key = (symbol, candidate.direction)
+        key = (candidate.id, symbol, candidate.direction)
 
         # 4h EMA direction ordering check
         if candidate.direction == Direction.LONG:
@@ -291,19 +291,19 @@ class SignalGenerator:
 
             # Check confirmation
             if candidate.direction == Direction.LONG:
-                # low touches [boundary - 0.25 ATR, boundary + 0.25 ATR]
-                touches_zone = (
-                    current_1h.low <= breakout.boundary + Decimal("0.25") * breakout.frozen_atr
-                    and current_1h.high >= breakout.boundary - Decimal("0.25") * breakout.frozen_atr
-                )
+                # low inside exact inclusive [boundary - 0.25 ATR, boundary + 0.25 ATR]
+                band_lower = breakout.boundary - Decimal("0.25") * breakout.frozen_atr
+                band_upper = breakout.boundary + Decimal("0.25") * breakout.frozen_atr
+                touches_zone = (band_lower <= current_1h.low <= band_upper)
                 close_above = current_1h.close >= breakout.boundary + Decimal("0.10") * breakout.frozen_atr
                 bullish_bar = current_1h.close > current_1h.open
 
                 if touches_zone and close_above and bullish_bar:
                     breakout.confirmed = True
                     self._consumed_retest_events.add(breakout.event_id)
-                    # Stop LONG is minimum low from breakout through confirmation minus 0.25 frozen ATR
-                    min_low = min(breakout.intermediate_lows)
+                    # Stop LONG is minimum low from breakout bar through confirmation bar minus 0.25 frozen ATR
+                    all_lows = [breakout.breakout_low] + list(breakout.intermediate_lows) + [current_1h.low]
+                    min_low = min(all_lows)
                     stop = min_low - Decimal("0.25") * breakout.frozen_atr
                     return SignalEvent(
                         candidate_id=candidate.id,
@@ -320,18 +320,19 @@ class SignalGenerator:
                     )
 
             else:  # SHORT
-                touches_zone = (
-                    current_1h.high >= breakout.boundary - Decimal("0.25") * breakout.frozen_atr
-                    and current_1h.low <= breakout.boundary + Decimal("0.25") * breakout.frozen_atr
-                )
+                # high inside exact inclusive [boundary - 0.25 ATR, boundary + 0.25 ATR]
+                band_lower = breakout.boundary - Decimal("0.25") * breakout.frozen_atr
+                band_upper = breakout.boundary + Decimal("0.25") * breakout.frozen_atr
+                touches_zone = (band_lower <= current_1h.high <= band_upper)
                 close_below = current_1h.close <= breakout.boundary - Decimal("0.10") * breakout.frozen_atr
                 bearish_bar = current_1h.close < current_1h.open
 
                 if touches_zone and close_below and bearish_bar:
                     breakout.confirmed = True
                     self._consumed_retest_events.add(breakout.event_id)
-                    # Stop SHORT is maximum high from breakout through confirmation plus 0.25 frozen ATR
-                    max_high = max(breakout.intermediate_highs)
+                    # Stop SHORT is maximum high from breakout bar through confirmation bar plus 0.25 frozen ATR
+                    all_highs = [breakout.breakout_high] + list(breakout.intermediate_highs) + [current_1h.high]
+                    max_high = max(all_highs)
                     stop = max_high + Decimal("0.25") * breakout.frozen_atr
                     return SignalEvent(
                         candidate_id=candidate.id,
@@ -351,7 +352,7 @@ class SignalGenerator:
 
         # Check for new breakout
         prior_24_1h = bars_1h[-25:-1]
-        event_id = f"RETEST_{symbol}_{candidate.direction.name}_{decision_time_ms}"
+        event_id = f"RETEST_{candidate.id}_{symbol}_{candidate.direction.name}_{decision_time_ms}"
         if event_id in self._consumed_retest_events:
             return None
 

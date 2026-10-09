@@ -1,0 +1,113 @@
+{
+  "schema_version": "G2_R3_TEST_RECEIPT_V1",
+  "task_id": "V06_G2_R3_P0_A_FINDINGS_REPAIR_R1",
+  "role": "GEMINI_A",
+  "controller_dispatch_sha": "e94d53c1f98f16d8d3881737564f773bc2584f28",
+  "environment": {
+    "python_312_version": "3.12.3",
+    "python_313_version": "3.13.13",
+    "pytest_version": "9.0.3",
+    "os": "Linux"
+  },
+  "test_execution_summary": {
+    "total_tests_collected": 35,
+    "total_passed": 35,
+    "total_failed": 0,
+    "total_skipped": 0,
+    "python_312_passed": 35,
+    "python_313_passed": 35,
+    "duration_seconds": 0.35
+  },
+  "test_suites": [
+    {
+      "file": "tests/test_strategy_research_r3_repair_regressions.py",
+      "test_count": 7,
+      "passed": 7,
+      "tests": [
+        "test_a03_entry_ack_preserves_max_hold_and_does_not_expire_early",
+        "test_a03_no_zombie_resurrection_after_same_minute_stop_loss",
+        "test_a04_candidate_isolation_and_metamorphic_order_invariance",
+        "test_a05_retest_touch_zone_deep_wick_rejection",
+        "test_a06_mark_available_in_stage_1_and_close_time_freshness",
+        "test_a07_cooldown_starts_from_economic_exit",
+        "test_a08_reserve_includes_tick_size_times_quantity"
+      ]
+    },
+    {
+      "file": "tests/test_strategy_research_r3_hermetic_fixtures.py",
+      "test_count": 12,
+      "passed": 12,
+      "tests": [
+        "test_constructed_win_long",
+        "test_constructed_win_short",
+        "test_constructed_loss_long_and_short",
+        "test_stop_before_target_collision",
+        "test_adverse_gap_stop_uses_worse_open",
+        "test_favorable_target_gap_capped_at_target",
+        "test_mark_staleness_triggers_veto_and_exit",
+        "test_negative_collateral_preserved_without_clipping",
+        "test_funding_charge_across_settlement_window",
+        "test_no_fill_gap_veto",
+        "test_future_price_leak_detection",
+        "test_double_fee_check"
+      ]
+    },
+    {
+      "file": "tests/test_strategy_research_r3_cost_and_ledger.py",
+      "test_count": 4,
+      "passed": 4,
+      "tests": [
+        "test_cost_model_rates_and_friction",
+        "test_tick_and_lot_rounding",
+        "test_virtual_book_initial_capital_and_reserves",
+        "test_drawdown_kill_latch"
+      ]
+    },
+    {
+      "file": "tests/test_strategy_research_r3_indicators.py",
+      "test_count": 5,
+      "passed": 5,
+      "tests": [
+        "test_aggregate_1m_to_1h",
+        "test_aggregate_incomplete_hour_rejected",
+        "test_compute_atr20_1h",
+        "test_compute_ema_series",
+        "test_compute_er12"
+      ]
+    },
+    {
+      "file": "tests/test_strategy_research_r3_registry.py",
+      "test_count": 4,
+      "passed": 4,
+      "tests": [
+        "test_registry_contains_exact_eight_candidates",
+        "test_registry_families_and_horizons",
+        "test_prohibit_ninth_candidate",
+        "test_stress_cost_geometry_ineligibility"
+      ]
+    },
+    {
+      "file": "tests/test_strategy_research_r3_replay_engine.py",
+      "test_count": 3,
+      "passed": 3,
+      "tests": [
+        "test_replay_engine_instantiation_and_isolation",
+        "test_replay_engine_deterministic_hash",
+        "test_replay_engine_run_synthetic_flat"
+      ]
+    }
+  ],
+  "linter_and_static_analysis": {
+    "ruff_status": "ALL_CHECKS_PASSED",
+    "mypy_status": "SUCCESS_NO_ISSUES_FOUND_IN_SOURCE",
+    "compileall_status": "SUCCESS_ZERO_ERRORS"
+  },
+  "constraints_verification": {
+    "raw_historical_market_bodies_read_bytes": 0,
+    "empirical_replays_performed": 0,
+    "real_funds_write_authority": "NONE",
+    "autotrade": "DISABLED",
+    "testnet": "NOT_AUTHORIZED",
+    "candidate_count_invariant": 8
+  }
+}

@@ -39,7 +39,11 @@ class ReplayEngine:
     ) -> None:
         self.cost_scenario = cost_scenario
         self.registry = registry or get_default_registry()
-        self.signal_generator = SignalGenerator()
+        # Per-candidate signal generators for complete state isolation
+        self.signal_generators: dict[str, SignalGenerator] = {
+            candidate.id: SignalGenerator() for candidate in self.registry.list_candidates()
+        }
+        self.signal_generator = SignalGenerator()  # Retained for backward compatibility
 
         # Instantiate separate virtual books for each of the 8 candidates
         self.books: dict[str, VirtualBook] = {}
@@ -126,11 +130,15 @@ class ReplayEngine:
                                     f"which is after decision time {decision_time}"
                                 )
 
-                        sig = self.signal_generator.evaluate_hourly_decision(
+                        book = self.books[candidate.id]
+                        gen = self.signal_generators[candidate.id]
+                        sig = gen.evaluate_hourly_decision(
                             candidate=candidate,
                             symbol=sym,
                             bars_1h=bars_1h,
                             bars_4h=bars_4h,
+                            last_exit_time_ms=book.last_economic_exit_time_ms.get(sym),
+                            last_entry_4h_time_ms=book.last_entry_4h_time_ms.get(sym),
                         )
                         if sig:
                             signals_by_candidate[candidate.id] = sig

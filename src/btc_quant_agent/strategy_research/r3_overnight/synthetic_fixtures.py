@@ -38,7 +38,7 @@ def make_mark_bar(
 ) -> MarkBar1m:
     """Helper to construct a 1m mark price bar."""
     return MarkBar1m(
-        timestamp_ms=timestamp_ms,
+        timestamp_ms=timestamp_ms - 60_000,
         open=price,
         high=price,
         low=price,

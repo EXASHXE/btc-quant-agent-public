@@ -112,6 +112,10 @@ class MarkBar1m:
     symbol: str
     available_at_ms: int  # When this mark became available to the book
 
+    @property
+    def close_ms(self) -> int:
+        return self.timestamp_ms + 60_000
+
 
 @dataclass(frozen=True)
 class SymbolFilters:
@@ -214,6 +218,7 @@ class Position:
     retest_event_id: str | None = None
     funding_reserves_usdt: Decimal = Decimal(0)
     total_funding_charged_usdt: Decimal = Decimal(0)
+    is_acknowledged: bool = False
 
     @property
     def expiry_time_ms(self) -> int:

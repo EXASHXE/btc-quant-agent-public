@@ -21,7 +21,7 @@ Under explicit Controller dispatch authority, the static metadata of the existin
 - **Start Timestamp**: `1609459200000` (`2021-01-01T00:00:00Z`)
 - **End Timestamp (Exclusive)**: `1785542400000` (`2026-08-01T00:00:00Z`)
 - **Total Monthly Partitions**: 67 monthly Parquet partitions (`1m/year=2021/month=01` through `1m/year=2026/month=07`)
-- **Reported Rows**: 2,933,280 rows
+- **Canonical Rows**: 2,934,720 rows (corrected from initial receipt 2,933,280 which omitted 1,440 minutes for leap day 2024-02-29)
 
 ---
 
@@ -74,9 +74,9 @@ $$\text{Universe} = \{\text{BTCUSDT}, \text{ETHUSDT}, \text{SOLUSDT}\}$$
 
 ### Audit Findings
 1. **Single Symbol Coverage**: The legacy manifest `artifacts/research/run0-dev-frozen-v022-seed7-20260825/data_manifest.json` covers **only BTCUSDT**.
-2. **ETH and SOL Absence**: No historical 1m trade candles or mark candles for `ETHUSDT` or `SOLUSDT` exist in the legacy manifest.
+2. **ETH and SOL Status**: Multi-year physical availability of `ETHUSDT` and `SOLUSDT` remains **UNKNOWN** (not asserted to be false across the entire environment, but absent from this BTC-specific legacy manifest).
 3. **No Inference Permitted**: Presence of BTCUSDT does not imply or certify availability, continuity, tick/lot rules, or data integrity for ETHUSDT or SOLUSDT.
-4. **Prerequisite for Multi-Asset Campaign**: A formal public archive download, checksum verification, and manifest creation for ETHUSDT and SOLUSDT must be authorized by a future Controller dispatch before multi-asset empirical evaluation can proceed.
+4. **Prerequisite for Multi-Asset Campaign**: A formal public archive verification, checksum audit, and manifest creation for ETHUSDT and SOLUSDT must be authorized by a future Controller dispatch before multi-asset empirical evaluation can proceed.
 
 ---
 

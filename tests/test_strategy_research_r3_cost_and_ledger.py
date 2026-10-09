@@ -95,7 +95,7 @@ def test_drawdown_kill_latch():
     # Equity = 1000 - 125 = 875 USDT -> Drawdown = 125 USDT > 100 USDT threshold!
     marks = {
         "BTCUSDT": MarkBar1m(
-            timestamp_ms=t + 60_000,
+            timestamp_ms=t,
             open=Decimal(47500),
             high=Decimal(47500),
             low=Decimal(47500),

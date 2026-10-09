@@ -1,0 +1,104 @@
+{
+  "schema_version": "G2_R3_FINDINGS_REPAIR_MATRIX_V1",
+  "task_id": "V06_G2_R3_P0_A_FINDINGS_REPAIR_R1",
+  "role": "GEMINI_A",
+  "controller_dispatch_sha": "e94d53c1f98f16d8d3881737564f773bc2584f28",
+  "base_code_sha": "e0ff8c3473de4bfa3e66fe7928d42992a4d38a32",
+  "initial_a_sha": "3b8befb0112cfe2d314ad65964762a3fb251e710",
+  "findings_audited_count": 8,
+  "findings_repaired_count": 8,
+  "findings": [
+    {
+      "id": "A01",
+      "discrepancy_code": "DISCREPANCY_A01_OUT_OF_WHITELIST_INIT",
+      "severity": "SCOPE_BLOCKER",
+      "repair_action": "DELETED_OUT_OF_SCOPE_FILE",
+      "files_modified": [
+        "src/btc_quant_agent/strategy_research/__init__.py [DELETED]"
+      ],
+      "red_before_evidence": "File existed at commit 3b8befb0112cfe2d314ad65964762a3fb251e710 violating allowed paths whitelist.",
+      "green_after_evidence": "File deleted. Verified PEP 420 namespace package imports work cleanly on Python 3.12 and Python 3.13 without this file."
+    },
+    {
+      "id": "A02",
+      "discrepancy_code": "DISCREPANCY_A02_MANIFEST_ROW_COUNT_MISMATCH",
+      "severity": "BLOCKING_MANIFEST_AUDIT_ERROR",
+      "repair_action": "PUBLISHED_CORRECTION_RECEIPT_AND_DOC_RECONCILIATION",
+      "files_modified": [
+        "evidence/v0.6/b_line/g2_overnight_p0_a/repair_r1/AUDIT_MANIFEST_CORRECTION_RECEIPT.json [NEW]",
+        "docs/strategy_research/g2_r3/prep_a/LEGACY_BTC_DEVELOPMENT_PARTITION_PROPOSAL.md [UPDATED]"
+      ],
+      "red_before_evidence": "AUDIT_MANIFEST_INSPECTION_RECEIPT.json reported 2,933,280 rows, omitting 1,440 minutes from leap day 2024-02-29.",
+      "green_after_evidence": "AUDIT_MANIFEST_CORRECTION_RECEIPT.json reconciles canonical count 2,934,720 (2,038 calendar days * 1,440 min). Sum of 67 monthly partitions metadata lengths invariant verified. Physical availability of ETH/SOL status confirmed UNKNOWN."
+    },
+    {
+      "id": "A03",
+      "discrepancy_code": "DISCREPANCY_A03_STAGE1_FILL_ACK_OVERWRITES_POSITION_MAX_HOLD_MS_ZERO",
+      "severity": "CRITICAL_ACCOUNTING_AND_HOLDING_BUG",
+      "repair_action": "STAGE1_FILL_ACK_IDEMPOTENT_PRESERVES_MAX_HOLD_AND_PREVENTS_ZOMBIE_RESURRECTION",
+      "files_modified": [
+        "src/btc_quant_agent/strategy_research/r3_overnight/ledger.py"
+      ],
+      "red_before_evidence": "tests/test_strategy_research_r3_repair_regressions.py::test_a03_fill_ack_preserves_position_max_hold_ms and test_a03_no_zombie_resurrection_after_same_minute_stop_loss FAILED with early EXPIRY and zombie double close.",
+      "green_after_evidence": "Both A03 regression tests PASS. max_hold_ms preserved through ACK; same-minute closed position tracked in closed_position_ids and never resurrected."
+    },
+    {
+      "id": "A04",
+      "discrepancy_code": "DISCREPANCY_A04_SHARED_SIGNAL_GENERATOR_CORRUPTS_RETEST_STATE_ACROSS_04H_AND_12H",
+      "severity": "CRITICAL_CANDIDATE_ISOLATION_BUG",
+      "repair_action": "CANDIDATE_SCOPED_BREAKOUT_STATE_AND_ISOLATED_SIGNAL_GENERATORS",
+      "files_modified": [
+        "src/btc_quant_agent/strategy_research/r3_overnight/signals.py",
+        "src/btc_quant_agent/strategy_research/r3_overnight/replay_engine.py"
+      ],
+      "red_before_evidence": "tests/test_strategy_research_r3_repair_regressions.py::test_a04_candidate_isolation_breakout_state and test_a04_signal_isolation_order_invariance FAILED with cross-candidate breakout leakage and evaluation order dependence.",
+      "green_after_evidence": "Both A04 regression tests PASS. SignalGenerator._active_breakouts keyed by (candidate_id, symbol, direction). ReplayEngine assigns dedicated SignalGenerator instances per candidate."
+    },
+    {
+      "id": "A05",
+      "discrepancy_code": "DISCREPANCY_A05_CLOSED_RETEST_TOUCH_ZONE_INEQUALITY_AND_STOP_EXTREMUM_OMITS_BREAKOUT_BAR",
+      "severity": "SPECIFICATION_SIGNAL_MISMATCH",
+      "repair_action": "RETEST_TOUCH_ZONE_INCLUSIVE_BAND_AND_FULL_STOP_EXTREMA",
+      "files_modified": [
+        "src/btc_quant_agent/strategy_research/r3_overnight/signals.py"
+      ],
+      "red_before_evidence": "tests/test_strategy_research_r3_repair_regressions.py::test_a05_retest_touch_zone_deep_wick_rejection FAILED (admitted deep wicks below band_lower).",
+      "green_after_evidence": "A05 regression test PASS. Long requires band_lower <= current_1h.low <= band_upper; short requires band_lower <= current_1h.high <= band_upper. Breakout bar extrema included in stop distance calculation."
+    },
+    {
+      "id": "A06",
+      "discrepancy_code": "DISCREPANCY_A06_STAGE2_MARK_UPDATE_AND_BAR_OPEN_TIMESTAMP_AGE_CHECK",
+      "severity": "SPECIFICATION_CLOCK_MISMATCH",
+      "repair_action": "STAGE1_MARK_PROCESSING_WITH_CLOSE_MS_FRESHNESS",
+      "files_modified": [
+        "src/btc_quant_agent/strategy_research/r3_overnight/ledger.py",
+        "src/btc_quant_agent/strategy_research/r3_overnight/synthetic_fixtures.py"
+      ],
+      "red_before_evidence": "tests/test_strategy_research_r3_repair_regressions.py::test_a06_mark_available_in_stage_1_and_close_time_freshness FAILED (mark processed in Stage 2 with candle open timestamp).",
+      "green_after_evidence": "A06 regression test PASS. Mark updates processed in Stage 1 with close_ms timestamp. Future mark rejection enforced."
+    },
+    {
+      "id": "A07",
+      "discrepancy_code": "DISCREPANCY_A07_COOLDOWN_ORIGIN_AND_OMITTED_4H_DEDUP_ARGS",
+      "severity": "SPECIFICATION_DEDUP_AND_COOLDOWN_MISMATCH",
+      "repair_action": "COOLDOWN_FROM_ECONOMIC_EXIT_AND_4H_DEDUP_ARGS",
+      "files_modified": [
+        "src/btc_quant_agent/strategy_research/r3_overnight/ledger.py",
+        "src/btc_quant_agent/strategy_research/r3_overnight/replay_engine.py"
+      ],
+      "red_before_evidence": "tests/test_strategy_research_r3_repair_regressions.py::test_a07_cooldown_starts_from_economic_exit FAILED (cooldown started at ACK arrival, 4h dedup args omitted).",
+      "green_after_evidence": "A07 regression test PASS. Cooldown starts from ceil_to_minute(trade.exit_time_ms) + 4h. Order sizing compares signal.available_at_ms. ReplayEngine passes last_exit_time_ms and last_entry_4h_time_ms."
+    },
+    {
+      "id": "A08",
+      "discrepancy_code": "DISCREPANCY_A08_STAGE5_EXIT_COMMITMENT_OMITS_TICK_SIZE_TERM",
+      "severity": "SPECIFICATION_RESERVE_FORMULA_MISMATCH",
+      "repair_action": "EXIT_RESERVE_TICK_SIZE_TERM_AND_RETAINED_ACTIVE_COMMITMENTS",
+      "files_modified": [
+        "src/btc_quant_agent/strategy_research/r3_overnight/ledger.py"
+      ],
+      "red_before_evidence": "tests/test_strategy_research_r3_repair_regressions.py::test_a08_exit_commitment_includes_tick_size_and_retained_reserves FAILED (c_exit omitted tick_size * qty; active position reserves dropped).",
+      "green_after_evidence": "A08 regression test PASS. c_exit incorporates tick_size * quantity. Outstanding commitments retain exit and funding reserves until Stage 1 exit ACK releases them."
+    }
+  ]
+}

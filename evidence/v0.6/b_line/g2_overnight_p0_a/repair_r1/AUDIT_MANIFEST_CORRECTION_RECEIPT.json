@@ -1,0 +1,52 @@
+{
+  "schema_version": "G2_R3_AUDIT_MANIFEST_CORRECTION_RECEIPT_V1",
+  "task_id": "V06_G2_R3_P0_A_FINDINGS_REPAIR_R1",
+  "role": "GEMINI_A",
+  "controller_dispatch_sha": "e94d53c1f98f16d8d3881737564f773bc2584f28",
+  "supersedes_prior_receipt": {
+    "prior_receipt_path": "evidence/v0.6/b_line/g2_overnight_p0_a/AUDIT_MANIFEST_INSPECTION_RECEIPT.json",
+    "prior_commit_sha": "3b8befb0112cfe2d314ad65964762a3fb251e710",
+    "finding_id": "DISCREPANCY_A02"
+  },
+  "manifest_path": "artifacts/research/run0-dev-frozen-v022-seed7-20260825/data_manifest.json",
+  "inspection_scope": "STATIC_METADATA_ONLY__ZERO_PARQUET_OR_ZIP_BODY_READS",
+  "raw_body_bytes_read": 0,
+  "du_a_worktree_scans_performed": false,
+  "full_sha256_data_body_scans_performed": false,
+  "reconciliation_summary": {
+    "symbol": "BTCUSDT",
+    "timeframe": "1m",
+    "start_utc": "2021-01-01T00:00:00Z",
+    "start_ms": 1609459200000,
+    "end_utc_exclusive": "2026-08-01T00:00:00Z",
+    "end_ms_exclusive": 1785542400000,
+    "total_monthly_partitions": 67,
+    "prior_reported_row_count": 2933280,
+    "canonical_manifest_row_count": 2934720,
+    "canonical_expected_bars": 2934720,
+    "row_count_delta": 1440,
+    "delta_root_cause": "LEAP_DAY_2024_02_29_INCLUSION__1440_MINUTES",
+    "sum_of_partitions_invariant_satisfied": true,
+    "partition_breakdown_days": {
+      "year_2021_days": 365,
+      "year_2022_days": 365,
+      "year_2023_days": 365,
+      "year_2024_leap_days": 366,
+      "year_2025_days": 365,
+      "year_2026_jan_through_jul_days": 212,
+      "total_calendar_days": 2038,
+      "calculated_total_minutes": 2934720
+    }
+  },
+  "asset_availability_status": {
+    "btcusdt_manifest_coverage": "VERIFIED_PRESENT_IN_LEGACY_MANIFEST",
+    "ethusdt_physical_availability": "UNKNOWN",
+    "solusdt_physical_availability": "UNKNOWN",
+    "rationale": "Legacy manifest covers only BTCUSDT archive. Multi-year physical availability of ETH and SOL is unknown and not verified false across the system. Dedicated verification required prior to empirical multi-asset execution."
+  },
+  "protected_holdout_status": {
+    "sealed_interval": "[2026-02-01T00:00:00Z, 2026-08-01T00:00:00Z)",
+    "status": "PROTECTED_HOLD_OUT__ZERO_EMPIRICAL_READS__SEALED_AGAINST_UNAUTHORIZED_UNBLINDING",
+    "proposed_development_remedy": "REUSE_LEGACY_2021_TO_2025_NONPROTECTED_DEVELOPMENT_PARTITIONS_PENDING_CONTROLLER_DISPATCH"
+  }
+}
