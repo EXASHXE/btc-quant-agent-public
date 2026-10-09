@@ -1,0 +1,233 @@
+{
+  "schema_version": "V06_G2_R3_P0_B_A01_A08_INDEPENDENT_MATRIX_V1",
+  "task_id": "V06_G2_R3_P0_B_INDEPENDENT_REAUDIT_R1",
+  "role": "GEMINI_B",
+  "controller_dispatch_sha": "3fb4508110c031eb0ff9226a7e42d918684c554f",
+  "previous_a_repair_dispatch_sha": "e94d53c1f98f16d8d3881737564f773bc2584f28",
+  "code_baseline_sha": "e0ff8c3473de4bfa3e66fe7928d42992a4d38a32",
+  "method_sha": "cf2d5cc33774cdcff7d709636305bba830e977ef",
+  "original_design_sha": "e5b2006a89441f7eb2ec900e508aff451106b87a",
+  "b_previous_head_sha": "a0aacd105ac3f3173b15d91c869990748178e222",
+  "a_original_blocked_sha": "3b8befb0112cfe2d314ad65964762a3fb251e710",
+  "a_repair_initial_sha": "2f0383816127cb7d87cf5deb559aeda0b04f1624",
+  "a_repair_exact_sha": "5c542edd418a74b440162610fd540b1f01e423d3",
+  "candidate_count_verified": 8,
+  "terminal_status": "P0_B_REPAIR_DISCREPANCY_BLOCKED",
+  "findings_summary": {
+    "total_original_findings": 8,
+    "fully_repaired_and_verified": ["A01", "A02", "A04"],
+    "partially_repaired_with_residual_or_new_blockers": ["A03", "A05", "A06", "A07", "A08"],
+    "new_or_residual_blockers_count": 7
+  },
+  "findings_matrix": [
+    {
+      "finding_id": "A01",
+      "discrepancy_code": "ROLE_A_PATH_OUTSIDE_ALLOWLIST:src/btc_quant_agent/strategy_research/__init__.py",
+      "severity": "BLOCKING_SCOPE_VIOLATION",
+      "before_sha": "3b8befb0112cfe2d314ad65964762a3fb251e710",
+      "before_status": "OPEN_BLOCKED",
+      "after_sha": "5c542edd418a74b440162610fd540b1f01e423d3",
+      "after_status": "REPAIRED_VERIFIED",
+      "repaired_aspects": [
+        "Deleted src/btc_quant_agent/strategy_research/__init__.py in 2f0383816127cb7d87cf5deb559aeda0b04f1624",
+        "All 26 changed files relative to e0ff8c3473de4bfa3e66fe7928d42992a4d38a32 strictly within Role A allowlist",
+        "PEP 420 implicit namespace package imports verified in isolated scratch on Python 3.12.3 and Python 3.13.13"
+      ],
+      "residual_or_new_blockers": [],
+      "concrete_b_test": "tests/test_v06_g2_r3_verifier_repair_r1_reaudit.py::test_reaudit_a01_and_a02_scope_and_manifest_supersession",
+      "observed_trace": "git diff --name-status 3b8befb0..5c542edd shows D src/btc_quant_agent/strategy_research/__init__.py; out_of_allowlist_files_vs_base=[]",
+      "residual_risk": "NONE"
+    },
+    {
+      "finding_id": "A02",
+      "discrepancy_code": "DISCREPANCY_A02_MANIFEST_ROW_COUNT_MISMATCH",
+      "severity": "BLOCKING_MANIFEST_AUDIT_ERROR",
+      "before_sha": "3b8befb0112cfe2d314ad65964762a3fb251e710",
+      "before_status": "OPEN_BLOCKED",
+      "after_sha": "5c542edd418a74b440162610fd540b1f01e423d3",
+      "after_status": "REPAIRED_VERIFIED",
+      "repaired_aspects": [
+        "Original AUDIT_MANIFEST_INSPECTION_RECEIPT.json (reported_row_count=2933280) preserved intact without rewriting historical evidence",
+        "Superseding evidence/v0.6/b_line/g2_overnight_p0_a/repair_r1/AUDIT_MANIFEST_CORRECTION_RECEIPT.json reconciles canonical 2,934,720 rows (+1,440 leap-day 2024-02-29 minutes across 2,038 calendar days and 67 partitions)",
+        "Updated LEGACY_BTC_DEVELOPMENT_PARTITION_PROPOSAL.md and recorded ETHUSDT/SOLUSDT physical availability as UNKNOWN"
+      ],
+      "residual_or_new_blockers": [],
+      "concrete_b_test": "tests/test_v06_g2_r3_verifier_repair_r1_reaudit.py::test_reaudit_a01_and_a02_scope_and_manifest_supersession",
+      "observed_trace": "a02_old_intact=True, a02_new_canonical=True, canonical_manifest_row_count=2934720, delta_rows=1440",
+      "residual_risk": "NONE"
+    },
+    {
+      "finding_id": "A03",
+      "discrepancy_code": "DISCREPANCY_A03_STAGE1_FILL_ACK_OVERWRITES_POSITION_MAX_HOLD_MS_ZERO",
+      "severity": "CRITICAL_ACCOUNTING_AND_HOLDING_BUG",
+      "before_sha": "3b8befb0112cfe2d314ad65964762a3fb251e710",
+      "before_status": "OPEN_BLOCKED",
+      "after_sha": "5c542edd418a74b440162610fd540b1f01e423d3",
+      "after_status": "PARTIAL_REPAIR_RESIDUAL_BLOCKED",
+      "repaired_aspects": [
+        "Stage 1 fill ACK no longer overwrites self.positions[sym] with max_hold_ms=0; 4h and 12h lifetimes are preserved across fill ACK",
+        "Same-minute SL/TP closed positions are tracked in closed_position_ids and are not resurrected as zombie positions when fill ACK arrives at t0+60s"
+      ],
+      "residual_or_new_blockers": [
+        "NEW_BLOCKER_B02",
+        "NEW_BLOCKER_B03"
+      ],
+      "concrete_b_test": "tests/test_v06_g2_r3_verifier_repair_r1_reaudit.py::test_reaudit_a03_and_a08_duplicate_ack_and_funding_reserve_leak, test_reaudit_a03_and_a07_funding_escape_and_intraminute_exit_timestamp",
+      "observed_trace": "dup_ack_fee_debited_times=2 (expected 1); pre_s_funding_charged=0 (expected 0.200000); sl_at_s_funding_charged=0 (expected 0.200000)",
+      "residual_risk": "HIGH_NON_IDEMPOTENT_ACK_DOUBLE_FEE_AND_BOUNDARY_FUNDING_ESCAPE"
+    },
+    {
+      "finding_id": "A04",
+      "discrepancy_code": "DISCREPANCY_A04_SHARED_SIGNAL_GENERATOR_CORRUPTS_RETEST_STATE_ACROSS_04H_AND_12H",
+      "severity": "CRITICAL_CANDIDATE_ISOLATION_BUG",
+      "before_sha": "3b8befb0112cfe2d314ad65964762a3fb251e710",
+      "before_status": "OPEN_BLOCKED",
+      "after_sha": "5c542edd418a74b440162610fd540b1f01e423d3",
+      "after_status": "REPAIRED_VERIFIED",
+      "repaired_aspects": [
+        "SignalGenerator._active_breakouts keyed by (candidate.id, symbol, candidate.direction)",
+        "Retest event_id prefixed with candidate.id",
+        "ReplayEngine instantiates dedicated SignalGenerator instances per candidate in self.signal_generators",
+        "Verified invariant under candidate iteration order permutation (04H, 12H) vs (12H, 04H) and repeatable BASE/STRESS receipt hashes"
+      ],
+      "residual_or_new_blockers": [],
+      "concrete_b_test": "tests/test_v06_g2_r3_verifier_repair_r1_reaudit.py::test_reaudit_a04_candidate_isolation_and_permutation_invariance",
+      "observed_trace": "sig_04_fwd.proposed_stop == sig_04_rev.proposed_stop and sig_12_fwd.proposed_stop == sig_12_rev.proposed_stop",
+      "residual_risk": "NONE"
+    },
+    {
+      "finding_id": "A05",
+      "discrepancy_code": "DISCREPANCY_A05_CLOSED_RETEST_TOUCH_ZONE_INEQUALITY_AND_STOP_EXTREMUM_OMITS_BREAKOUT_BAR",
+      "severity": "SPECIFICATION_SIGNAL_MISMATCH",
+      "before_sha": "3b8befb0112cfe2d314ad65964762a3fb251e710",
+      "before_status": "OPEN_BLOCKED",
+      "after_sha": "5c542edd418a74b440162610fd540b1f01e423d3",
+      "after_status": "PARTIAL_REPAIR_RESIDUAL_BLOCKED",
+      "repaired_aspects": [
+        "LONG retest requires band_lower <= current_1h.low <= band_upper and SHORT retest requires band_lower <= current_1h.high <= band_upper (deep wicks rejected)",
+        "Stop extremum includes breakout.breakout_low and breakout.breakout_high"
+      ],
+      "residual_or_new_blockers": [
+        "NEW_BLOCKER_B06"
+      ],
+      "concrete_b_test": "tests/test_v06_g2_r3_verifier_repair_r1_reaudit.py::test_reaudit_a05_retest_band_stop_and_intermediate_bar_skip_bug",
+      "observed_trace": "When an intermediate hour post-breakout fails 4h EMA alignment (signals.py:L263-L268) or 1h vol_bps filter (L96), evaluate_hourly_decision returns None before incrementing bars_since_breakout (observed skipped_hour_bars_since_breakout=0 instead of 1)",
+      "residual_risk": "MEDIUM_STALE_RETEST_CONFIRMATION_PAST_3_BAR_WINDOW_AND_OMITTED_INTERMEDIATE_EXTREMUM"
+    },
+    {
+      "finding_id": "A06",
+      "discrepancy_code": "DISCREPANCY_A06_STAGE2_MARK_UPDATE_AND_BAR_OPEN_TIMESTAMP_AGE_CHECK",
+      "severity": "CRITICAL_REPLAY_ENGINE_REGRESSION",
+      "before_sha": "3b8befb0112cfe2d314ad65964762a3fb251e710",
+      "before_status": "OPEN_BLOCKED",
+      "after_sha": "5c542edd418a74b440162610fd540b1f01e423d3",
+      "after_status": "BROKEN_INTERACTION_BLOCKED",
+      "repaired_aspects": [
+        "Standalone VirtualBook._stage_1_available_messages ingests marks using close_ms and rejects future marks"
+      ],
+      "residual_or_new_blockers": [
+        "NEW_BLOCKER_B01",
+        "NEW_BLOCKER_B05A"
+      ],
+      "concrete_b_test": "tests/test_v06_g2_r3_verifier_repair_r1_reaudit.py::test_reaudit_a06_replay_engine_mark_starvation_and_unacked_valuation",
+      "observed_trace": "replay_engine_marks_ingested_count=0 across all 8 books in ReplayEngine.run_simulation because marks_by_minute is keyed by m.timestamp_ms=O while Stage 1 requires mbar.close_ms=O+60000 <= O (always False), vetoing 100% of signals",
+      "residual_risk": "CRITICAL_REPLAY_ENGINE_ZERO_TRADES_POSSIBLE"
+    },
+    {
+      "finding_id": "A07",
+      "discrepancy_code": "DISCREPANCY_A07_COOLDOWN_ORIGIN_AND_OMITTED_4H_DEDUP_ARGS",
+      "severity": "SPECIFICATION_DEDUP_AND_COOLDOWN_MISMATCH",
+      "before_sha": "3b8befb0112cfe2d314ad65964762a3fb251e710",
+      "before_status": "OPEN_BLOCKED",
+      "after_sha": "5c542edd418a74b440162610fd540b1f01e423d3",
+      "after_status": "PARTIAL_REPAIR_RESIDUAL_BLOCKED",
+      "repaired_aspects": [
+        "ReplayEngine passes last_exit_time_ms and last_entry_4h_time_ms to SignalGenerator.evaluate_hourly_decision",
+        "Stage 4 scheduled open exits anchor cooldown to ceil_to_minute(open_time_ms) + 4h"
+      ],
+      "residual_or_new_blockers": [
+        "NEW_BLOCKER_B04"
+      ],
+      "concrete_b_test": "tests/test_v06_g2_r3_verifier_repair_r1_reaudit.py::test_reaudit_a03_and_a07_funding_escape_and_intraminute_exit_timestamp",
+      "observed_trace": "Stage 6 intraminute SL/TP passes economic_exit_ms=open_time_ms (bar open O) instead of bar close O+60000, yielding holding_minutes=0 and shifting cooldown_until_ms 60s early (1700017200000 vs expected 1700017260000); signals.py:L86 checks decision_time_ms while ledger.py:L145 checks signal.available_at_ms",
+      "residual_risk": "HIGH_INTRAMINUTE_EXIT_TIMESTAMP_AND_COOLDOWN_CLOCK_MISMATCH"
+    },
+    {
+      "finding_id": "A08",
+      "discrepancy_code": "DISCREPANCY_A08_STAGE5_EXIT_COMMITMENT_OMITS_TICK_SIZE_TERM",
+      "severity": "CRITICAL_RESERVE_ACCOUNTING_BUG",
+      "before_sha": "3b8befb0112cfe2d314ad65964762a3fb251e710",
+      "before_status": "OPEN_BLOCKED",
+      "after_sha": "5c542edd418a74b440162610fd540b1f01e423d3",
+      "after_status": "PARTIAL_REPAIR_RESIDUAL_BLOCKED",
+      "repaired_aspects": [
+        "Stage 5 Position.cost_commitment_exit_usdt now includes + sym_filter.tick_size * order.quantity"
+      ],
+      "residual_or_new_blockers": [
+        "NEW_BLOCKER_B07",
+        "NEW_BLOCKER_B05B"
+      ],
+      "concrete_b_test": "tests/test_v06_g2_r3_verifier_repair_r1_reaudit.py::test_reaudit_a03_and_a08_duplicate_ack_and_funding_reserve_leak",
+      "observed_trace": "leaked_funding_reserve_after_close=0.200000 (expected 0) after trade crosses 1 funding settlement and closes; post_kill_cost_commitment_o=-3.0315125000 and post_kill_funding_reserve_rf=-5.00 after drawdown kill exit ACK",
+      "residual_risk": "CRITICAL_PERMANENT_FUNDING_RESERVE_LEAK_AND_NEGATIVE_POST_KILL_RESERVES"
+    }
+  ],
+  "new_or_residual_blockers": [
+    {
+      "blocker_id": "NEW_BLOCKER_B01",
+      "related_findings": ["A06"],
+      "severity": "CRITICAL_BLOCKER",
+      "file_and_lines": "src/btc_quant_agent/strategy_research/r3_overnight/replay_engine.py:L89-L100; ledger.py:L149-L151,L277-L280",
+      "description": "ReplayEngine.run_simulation indexes marks_by_minute by m.timestamp_ms (bar open O), passing mbar only at current_open_ms = O, while VirtualBook._stage_1_available_messages requires mbar.close_ms <= open_time_ms (where mbar.close_ms = O + 60,000). Because O + 60,000 <= O is always False, ReplayEngine.run_simulation never ingests any mark bars into last_available_marks and calculate_order_sizing vetoes 100% of signals across all 8 candidates.",
+      "reproduction_test": "tests/test_v06_g2_r3_verifier_repair_r1_reaudit.py::test_reaudit_a06_replay_engine_mark_starvation_and_unacked_valuation"
+    },
+    {
+      "blocker_id": "NEW_BLOCKER_B02",
+      "related_findings": ["A03", "A08"],
+      "severity": "HIGH_BLOCKER",
+      "file_and_lines": "src/btc_quant_agent/strategy_research/r3_overnight/ledger.py:L284-L330",
+      "description": "Stage 1 ACK processing lacks message-ID idempotency: a repeated VirtualFill ACK debits fill.fee_usdt from cash a second time (dup_ack_fee_debited_times=2); a repeated exit ACK double-credits PnL and subtracts reserves a second time.",
+      "reproduction_test": "tests/test_v06_g2_r3_verifier_repair_r1_reaudit.py::test_reaudit_a03_and_a08_duplicate_ack_and_funding_reserve_leak"
+    },
+    {
+      "blocker_id": "NEW_BLOCKER_B03",
+      "related_findings": ["A03"],
+      "severity": "HIGH_BLOCKER",
+      "file_and_lines": "src/btc_quant_agent/strategy_research/r3_overnight/ledger.py:L658-L669,L731-L755",
+      "description": "Stage 7 funding ownership check uses strict `hour_s + 3_600_000 < minute_end` (L744), which evaluates to False at pre-hour minute open_time_ms = S - 60,000 (minute_end = S), missing the [S - 15s, S) half of the ownership window for positions exiting at S. Moreover, positions entering at S that hit same-minute SL/TP in Stage 6 are deleted before Stage 7 runs at S, also escaping funding at S.",
+      "reproduction_test": "tests/test_v06_g2_r3_verifier_repair_r1_reaudit.py::test_reaudit_a03_and_a07_funding_escape_and_intraminute_exit_timestamp"
+    },
+    {
+      "blocker_id": "NEW_BLOCKER_B04",
+      "related_findings": ["A07"],
+      "severity": "HIGH_BLOCKER",
+      "file_and_lines": "src/btc_quant_agent/strategy_research/r3_overnight/ledger.py:L145,L658,L667,L685-L701; signals.py:L86",
+      "description": "Stage 6 intraminute SL/TP passes economic_exit_ms=open_time_ms (1m bar open O) instead of bar close O + 60,000, producing holding_minutes=0 on same-minute exits, shifting ceil_to_minute(economic_exit_at) cooldown 60s early, and mutating last_economic_exit_time_ms in Stage 6 before Stage 1 exit ACK. Furthermore, signals.py:L86 compares decision_time_ms while ledger.py:L145 compares signal.available_at_ms.",
+      "reproduction_test": "tests/test_v06_g2_r3_verifier_repair_r1_reaudit.py::test_reaudit_a03_and_a07_funding_escape_and_intraminute_exit_timestamp"
+    },
+    {
+      "blocker_id": "NEW_BLOCKER_B05",
+      "related_findings": ["A06", "A08"],
+      "severity": "HIGH_BLOCKER",
+      "file_and_lines": "src/btc_quant_agent/strategy_research/r3_overnight/ledger.py:L313-L314,L349-L381",
+      "description": "(A) _stage_2_account_risk values all self.positions in decision_equity without checking pos.is_acknowledged. (B) _trigger_kill_liquidation zeroes cost_commitment_o and funding_reserve_rf at kill latch while positions remain open; when the subsequent DRAWDOWN_KILL exit ACK arrives in Stage 1, exit_reserve and rem_funding are subtracted again, driving cost_commitment_o (-3.0315125000) and funding_reserve_rf (-5.00) negative.",
+      "reproduction_test": "tests/test_v06_g2_r3_verifier_repair_r1_reaudit.py::test_reaudit_a03_and_a08_duplicate_ack_and_funding_reserve_leak"
+    },
+    {
+      "blocker_id": "NEW_BLOCKER_B06",
+      "related_findings": ["A05"],
+      "severity": "MEDIUM_BLOCKER",
+      "file_and_lines": "src/btc_quant_agent/strategy_research/r3_overnight/signals.py:L96,L263-L276",
+      "description": "If an intermediate hourly bar after a registered breakout temporarily fails the 1h vol_bps filter (L96) or 4h EMA ordering check (L263-L268), SignalGenerator.evaluate_hourly_decision returns None before incrementing breakout.bars_since_breakout or appending intermediate_highs/intermediate_lows.",
+      "reproduction_test": "tests/test_v06_g2_r3_verifier_repair_r1_reaudit.py::test_reaudit_a05_retest_band_stop_and_intermediate_bar_skip_bug"
+    },
+    {
+      "blocker_id": "NEW_BLOCKER_B07",
+      "related_findings": ["A08", "A03"],
+      "severity": "CRITICAL_BLOCKER",
+      "file_and_lines": "src/btc_quant_agent/strategy_research/r3_overnight/ledger.py:L314,L588,L729,L761",
+      "description": "In Stage 7 (L761), pos.funding_reserves_usdt is reduced by each funding debit while book.funding_reserve_rf is not reduced in Stage 7 or Stage 1 funding ACK. When the position exits and its exit ACK arrives in Stage 1 (L314), book.funding_reserve_rf only subtracts the reduced pos.funding_reserves_usdt, permanently leaking the sum of charged funding debits (0.200000 USDT after 1 settlement) in book.funding_reserve_rf after all positions close.",
+      "reproduction_test": "tests/test_v06_g2_r3_verifier_repair_r1_reaudit.py::test_reaudit_a03_and_a08_duplicate_ack_and_funding_reserve_leak"
+    }
+  ]
+}

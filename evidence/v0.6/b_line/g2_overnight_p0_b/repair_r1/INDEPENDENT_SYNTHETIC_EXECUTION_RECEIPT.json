@@ -1,0 +1,117 @@
+{
+  "schema_version": "V06_G2_R3_P0_B_INDEPENDENT_SYNTHETIC_EXECUTION_RECEIPT_V1",
+  "task_id": "V06_G2_R3_P0_B_INDEPENDENT_REAUDIT_R1",
+  "role": "GEMINI_B",
+  "controller_dispatch_sha": "3fb4508110c031eb0ff9226a7e42d918684c554f",
+  "previous_a_repair_dispatch_sha": "e94d53c1f98f16d8d3881737564f773bc2584f28",
+  "code_baseline_sha": "e0ff8c3473de4bfa3e66fe7928d42992a4d38a32",
+  "method_sha": "cf2d5cc33774cdcff7d709636305bba830e977ef",
+  "original_design_sha": "e5b2006a89441f7eb2ec900e508aff451106b87a",
+  "b_previous_head_sha": "a0aacd105ac3f3173b15d91c869990748178e222",
+  "a_original_sha": "3b8befb0112cfe2d314ad65964762a3fb251e710",
+  "a_repair_initial_sha": "2f0383816127cb7d87cf5deb559aeda0b04f1624",
+  "a_repair_exact_sha": "5c542edd418a74b440162610fd540b1f01e423d3",
+  "terminal_status": "P0_B_REPAIR_DISCREPANCY_BLOCKED",
+  "authorities": {
+    "EMPIRICAL_PRICE_BODY_AUTHORITY": "NONE",
+    "G4_TESTNET": "NOT_AUTHORIZED",
+    "REAL_FUNDS_WRITE_AUTHORITY": "NONE"
+  },
+  "isolation_and_safety_counters": {
+    "live_a_worktree_reads": 0,
+    "live_a_worktree_writes": 0,
+    "original_b_evidence_files_modified": 0,
+    "raw_parquet_or_zip_body_reads": 0,
+    "funding_rate_body_reads": 0,
+    "v03_protected_holdout_reads": 0,
+    "rc2_h40_h41_protected_reads": 0,
+    "external_exchange_or_testnet_calls": 0
+  },
+  "remote_a_ci_audit": {
+    "initial_repair_ci_run": {
+      "run_id": 37873215393,
+      "commit_sha": "2f0383816127cb7d87cf5deb559aeda0b04f1624",
+      "conclusion": "FAILURE",
+      "failure_step": "Ruff with bounded historical EXE001 debt",
+      "failure_reason": "F821 undefined name Any in tests/test_strategy_research_r3_repair_regressions.py:223; pytest not entered"
+    },
+    "post_controller_one_line_ci_run": {
+      "run_id": 37875087577,
+      "job_id": 113641718935,
+      "commit_sha": "5c542edd418a74b440162610fd540b1f01e423d3",
+      "conclusion": "SUCCESS",
+      "mode": "focused",
+      "changed_files_in_push_range": [
+        "tests/test_strategy_research_r3_repair_regressions.py"
+      ],
+      "tests_executed_count": 7,
+      "tests_passed_count": 7,
+      "pytest_output": "7 passed in 0.09s",
+      "full_suite_certified": false,
+      "scope_note": "Focused mode selected only the 1 test file modified between 2f0383816127cb7d87cf5deb559aeda0b04f1624 and 5c542edd418a74b440162610fd540b1f01e423d3; not full-suite certification."
+    }
+  },
+  "local_test_and_linter_execution": {
+    "role_b_focused_suite_python_312": {
+      "executable": "/usr/bin/python3.12",
+      "version": "Python 3.12.3",
+      "pytest_version": "9.0.3",
+      "test_files": [
+        "tests/test_v06_g2_r3_verifier_pit_and_signals.py",
+        "tests/test_v06_g2_r3_verifier_accounting_and_risk.py",
+        "tests/test_v06_g2_r3_verifier_manifest_and_negatives.py",
+        "tests/test_v06_g2_r3_verifier_repair_r1_reaudit.py"
+      ],
+      "total_tests": 26,
+      "passed": 26,
+      "failed": 0,
+      "skipped": 0
+    },
+    "role_b_focused_suite_python_313": {
+      "executable": "/root/miniconda3/bin/python",
+      "version": "Python 3.13.13",
+      "pytest_version": "8.4.2",
+      "total_tests": 26,
+      "passed": 26,
+      "failed": 0,
+      "skipped": 0
+    },
+    "secondary_isolated_scratch_a_suite_python_312": {
+      "source_materialization": "git archive 5c542edd418a74b440162610fd540b1f01e423d3 into ephemeral /tmp directory",
+      "total_tests": 35,
+      "passed": 35,
+      "failed": 0,
+      "skipped": 0,
+      "note": "Role A's own 35 unit tests pass in isolation but miss the 7 cross-stage and ReplayEngine runtime interaction defects caught by Role B's adversarial oracle."
+    },
+    "ruff_check": {
+      "version": "0.16.9",
+      "status": "ALL_CHECKS_PASSED",
+      "errors": 0
+    },
+    "compileall_python_312": {
+      "status": "SUCCESS",
+      "errors": 0
+    }
+  },
+  "dynamic_crosscheck_observations": {
+    "a01_init_absent": true,
+    "a02_old_intact": true,
+    "a02_new_canonical": true,
+    "candidate_count": 8,
+    "replay_engine_marks_ingested_count": 0,
+    "leaked_funding_reserve_after_close_usdt": "0.200000",
+    "charged_funding_on_trade_usdt": "0.200000",
+    "dup_ack_fee_debited_times": "2",
+    "pre_s_funding_charged_usdt": "0",
+    "sl_at_s_entry_ms": 1700002800000,
+    "sl_at_s_exit_ms": 1700002800000,
+    "sl_at_s_holding_minutes": 0,
+    "sl_at_s_funding_charged_usdt": "0",
+    "sl_at_s_cooldown_until_ms": 1700017200000,
+    "sl_at_s_expected_cooldown_until_ms": 1700017260000,
+    "post_kill_cost_commitment_o_usdt": "-3.0315125000",
+    "post_kill_funding_reserve_rf_usdt": "-5.00",
+    "skipped_hour_bars_since_breakout": 0
+  }
+}
