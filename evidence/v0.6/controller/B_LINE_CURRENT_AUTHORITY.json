@@ -1646,5 +1646,58 @@
     "historical_market_body_reads": "NOT_AUTHORIZED",
     "testnet_live_real_funds": "NONE",
     "stop_policy": "NO_AUTO_ALTERNATIVE_ENGINE_PATCHES_REAUDIT_OR_ANOTHER_ENGINE_UNDER_THIS_CAMPAIGN"
+  },
+  "v06_postp1_parallel_p2_metadata_and_r4_opportunity_science_r1": {
+    "status": "TWO_INDEPENDENT_TASKS_CONTROLLER_DISPATCHED_NOT_EXECUTED",
+    "controller_dispatch_sha": "858735e0ae81b1ca0ced8cfa4c2e9ee5d01532e2",
+    "controller_dispatch_path": "reviews/v0.6/b_line/V06_POST_P1_TERMINAL_PARALLEL_P2_METADATA_AND_OPPORTUNITY_SCIENCE_CONTROLLER_DISPATCH_R1.md",
+    "start_code_sha": "e0ff8c3473de4bfa3e66fe7928d42992a4d38a32",
+    "gemini": {
+      "task_id": "V06_POST_P1_GEMINI_LONG_P2_METADATA_ROOT_AND_SOURCE_READINESS_R1",
+      "role": "P2_BOUNDED_LOCAL_DIRECTORY_METADATA_PROVENANCE",
+      "branch": "feature/v06-bline-postp1-gemini-p2-metadata-r1",
+      "worktree": "/root/workspace/project/quant-v0.6/postp1-gemini-p2-metadata-r1",
+      "pinned_prompt_sha": "fd47ff5c6b534a6f66925e5f984fe630e9ff0702",
+      "prompt_path": "prompts/v0.6/b_line/V06_POST_P1_GEMINI_LONG_P2_METADATA_ROOT_AND_SOURCE_READINESS_R1.md",
+      "stage": "NOT_EXECUTED",
+      "bounds": {
+        "max_depth": 5,
+        "max_dir_entries": 1500,
+        "max_lstat": 2500,
+        "max_safe_selected_partition_lstat": 36,
+        "max_wallclock_safety_seconds": 7200,
+        "real_market_body_bytes": 0,
+        "protected_partition_access": 0
+      },
+      "source_authority": "METADATA_ONLY_NOT_P2_ADMISSION"
+    },
+    "sol_high": {
+      "task_id": "V06_POST_P1_SOL_HIGH_LONG_OPPORTUNITY_SCIENCE_AND_MEASUREMENT_REPLAN_R1",
+      "role": "OUTCOME_BLIND_R4_TEST_PRIORITY_AND_SYNTHETIC_COST_POWER_ALGEBRA_NOT_ALPHA",
+      "branch": "feature/v06-bline-postp1-sol61-opportunity-science-r1",
+      "worktree": "/root/workspace/project/quant-v0.6/postp1-sol61-opportunity-science-r1",
+      "pinned_prompt_sha": "d029a8f974c3809652f6a54c0f99dc1c7abfebc6",
+      "prompt_path": "prompts/v0.6/b_line/V06_POST_P1_SOL_HIGH_LONG_OPPORTUNITY_SCIENCE_AND_MEASUREMENT_REPLAN_R1.md",
+      "stage": "NOT_EXECUTED",
+      "deterministic_synthetic_payoff_case_min": 64,
+      "adversarial_mutations_min": 12,
+      "new_proposed_hypotheses_max": 4,
+      "original_eight_unchanged": true,
+      "alpha_authority": "NONE"
+    },
+    "reuse_frozen_eight_sha": "e5b2006a89441f7eb2ec900e508aff451106b87a",
+    "prior_p2_evidence_sha": "7f96369b1209ffdaca5d7f1233c2c9c0ae17ae29",
+    "prior_sol_science_sha": "57818b967a836382caa3fa95516d3e027e990f61",
+    "last_terminal_p1_controller_sha": "fd3c13645df9ad2506293b109d3891cf57936208",
+    "last_independent_no_go_sha": "fc0e4a2faedbd87880ad0fa3d415756add5bf72d",
+    "p1_engine_acceptance": "NO_TERMINAL",
+    "p2_data_admission": "NONE_ROOT_UNKNOWN",
+    "p3_prereg": "NONE",
+    "p4_empirical_market_body_access": "NONE",
+    "testnet_live_real_funds": "NONE",
+    "shared_file_write_overlap": 0,
+    "cross_worker_dependency": "NONE_UNTIL_FINAL_CONTROLLER_RECONCILIATION",
+    "controller_next_gate": "AFTER_BOTH_REMOTE_PUSH_INDEPENDENT_IDENTITY_CI_EVIDENCE_AND_COMPATIBILITY_ACCEPTANCE",
+    "no_new_engine_implementation": true
   }
 }
