@@ -1,0 +1,1106 @@
+{
+  "astra_disputes": [
+    {
+      "classification": "SOL_RESOLVED_CONTROLLER_CAN_FREEZE",
+      "issue": "true_power_support_clearly_inadequate",
+      "material_for_recommended_A": false,
+      "unresolved_decision": "Controller accepts finite diagnostic information rather than +5bp powered formal success. Actual rates/SD unknown; toy shows low precision, not observed inadequacy.",
+      "what_astra_could_change": "Only if Controller insists on formal positive/futility claims: review exact ratio-estimator synthetic support/power envelope and shortest fixed design. Astra cannot manufacture extra calendar information."
+    },
+    {
+      "classification": "SOL_RESOLVED_CONTROLLER_CAN_FREEZE",
+      "issue": "hidden_multiplicity_design_selection",
+      "material_for_recommended_A": false,
+      "unresolved_decision": "Keep all8 and all16 comparisons; no aliases proven, no best R2 subgroup, no whole-program Alpha claim.",
+      "what_astra_could_change": "If B/C or formal budget reduction proposed, independently assess symbolic equivalence/full pipeline and discarded choices before a NEW roster. No routine A re-review needed."
+    },
+    {
+      "classification": "SOL_RESOLVED_CONTROLLER_CAN_FREEZE",
+      "issue": "cost_funding_partial_fills_identifiability",
+      "material_for_recommended_A": false,
+      "unresolved_decision": "Proxy-only reference-cost diagnosis, all12h hourly statuses retained; actual funding/caps/spread/impact unresolved, partial fills remain conservative modeled execution rather than authenticated fills.",
+      "what_astra_could_change": "If actual-cost support claimed, arbitrate estimand/bounds/partial-fill/ownership contract after evidence exists. Cannot replace P2 source or private execution evidence."
+    },
+    {
+      "classification": "NOT_MATERIAL_NOW",
+      "issue": "conflict_with_H41_H42_or_R3_method",
+      "material_for_recommended_A": false,
+      "unresolved_decision": "No imported H41 thresholds/120h inference or H42 results. R1.1 negative upper-alpha choice is closed conservatively to16 by the prior draft; Controller adoption pending.",
+      "what_astra_could_change": "If formal studentized/joint-max, sequential looks, new source/estimand or roster are requested, audit that substantive amendment; current descriptive A requires none."
+    }
+  ],
+  "branch_start_sha": "7da2b9e65848c3c547d940ded60a57f71314c64f",
+  "break_even_scenarios": {
+    "base_per_leg_bp": [
+      6,
+      2,
+      3
+    ],
+    "base_transaction_bp": 22,
+    "cost_source_status": [
+      {
+        "item": "funding_schedule",
+        "minimum_evidence": "Dated symbol-specific effective schedule/changes, settlement identity, boundary ownership and publication semantics; no snapping calculation timestamps. Freeze event rule before bodies.",
+        "proxy_claim": "A declared hourly adverse scenario only; no actual event count.",
+        "status": "UNRESOLVED_SCENARIO_ONLY"
+      },
+      {
+        "item": "funding_cap_and_scenario_envelope",
+        "minimum_evidence": "Effective caps/minimum intervals, bounded ownership/cap-shock and mark-notional envelope for every possible settlement.",
+        "proxy_claim": "4/8bp per event is a scenario, never a guaranteed worst case.",
+        "status": "UNBOUNDED_ACTUAL_CAP"
+      },
+      {
+        "item": "fill_and_minute_mark_pit",
+        "minimum_evidence": "P1 independent acceptance plus admitted complete price/true-minute-mark identity, event/available/ack clocks, missingness and funding-mark ownership; reconstruction distinct from receipt-time proof.",
+        "proxy_claim": "Conservative modeled taker fill and 60-second latency, not authenticated execution.",
+        "status": "P1_P2_CONDITIONAL_NOT_REAUDITED"
+      },
+      {
+        "item": "tick_lot_and_minimums",
+        "minimum_evidence": "Historical instrument/filter version effective for selected folds, multiplier, tick, lot/min-notional and adverse rounding.",
+        "proxy_claim": "Frozen proxy filters require explicit diagnostic label.",
+        "status": "DATED_APPLICABILITY_UNVERIFIED"
+      },
+      {
+        "item": "fee_tier",
+        "minimum_evidence": "Dated public standard taker applicability for instruments/periods, no inferred private VIP/discount; bind fees to actual executed entry/exit notional.",
+        "proxy_claim": "6/12bp is a reference scenario, no private-tier claim.",
+        "status": "6_12BP_PER_LEG_PROXY"
+      },
+      {
+        "item": "spread_and_impact",
+        "minimum_evidence": "Independent authorized time/size/side-specific spread, depth/impact or fill telemetry envelope with uncertainty, especially stop/gap/latency stress; no double counting.",
+        "proxy_claim": "Can remain a declared bounded sensitivity model for reference-cost support; actual tradability stays unverified if no credible bound.",
+        "status": "2_3_AND_4_6BP_PER_LEG_PROXY"
+      }
+    ],
+    "derivation": "E[net_bp]=p*(2d-c)+(1-p)*(-d-c)=3dp-d-c; p_BE=(d+c)/(3d). E[R]=3p-1-c/d only for fixed d and ideal complete binary payoffs.",
+    "event_count_and_cap": "UNRESOLVED_ACTUAL_HISTORY_SCENARIO_ONLY",
+    "funding_proxy_bp_per_event": [
+      4,
+      8
+    ],
+    "geometry_equations": "d>=2c and 2d>=3c; d<=250 implies c<=125 necessary. Tick and ownership tail may increase c.",
+    "not_account_equity_or_leverage_return": true,
+    "scenarios": [
+      {
+        "cost_bp": 22,
+        "cost_in_r": 0.22,
+        "geometry_pass": true,
+        "label": "BASE_TRANSACTIONS_ONLY",
+        "p_break_even": 0.4066666666666667,
+        "status": "IDEALIZED_SYMBOLIC_NOT_OBSERVED_NO_GAP_TIMEOUT_TICK_OR_VARIABLE_NOTIONAL",
+        "stop_bp": 100
+      },
+      {
+        "cost_bp": 44,
+        "cost_in_r": 0.44,
+        "geometry_pass": true,
+        "label": "STRESS_TRANSACTIONS_ONLY",
+        "p_break_even": 0.48,
+        "status": "IDEALIZED_SYMBOLIC_NOT_OBSERVED_NO_GAP_TIMEOUT_TICK_OR_VARIABLE_NOTIONAL",
+        "stop_bp": 100
+      },
+      {
+        "cost_bp": 26,
+        "cost_in_r": 0.26,
+        "geometry_pass": true,
+        "label": "BASE_PLUS_ONE_4BP_PROXY_EVENT",
+        "p_break_even": 0.42,
+        "status": "IDEALIZED_SYMBOLIC_NOT_OBSERVED_NO_GAP_TIMEOUT_TICK_OR_VARIABLE_NOTIONAL",
+        "stop_bp": 100
+      },
+      {
+        "cost_bp": 52,
+        "cost_in_r": 0.52,
+        "geometry_pass": false,
+        "label": "STRESS_PLUS_ONE_8BP_PROXY_EVENT",
+        "p_break_even": 0.5066666666666667,
+        "status": "IDEALIZED_SYMBOLIC_NOT_OBSERVED_NO_GAP_TIMEOUT_TICK_OR_VARIABLE_NOTIONAL",
+        "stop_bp": 100
+      },
+      {
+        "cost_bp": 76,
+        "cost_in_r": 0.5,
+        "geometry_pass": true,
+        "label": "4H_HOURLY_STRESS_EXAMPLE_GEOMETRY_BOUNDARY",
+        "p_break_even": 0.5,
+        "status": "IDEALIZED_SYMBOLIC_NOT_OBSERVED_NO_GAP_TIMEOUT_TICK_OR_VARIABLE_NOTIONAL",
+        "stop_bp": 152
+      },
+      {
+        "cost_bp": 140,
+        "cost_in_r": 0.56,
+        "geometry_pass": false,
+        "label": "12H_HOURLY_STRESS_EXAMPLE_GEOMETRY_INELIGIBLE",
+        "p_break_even": 0.52,
+        "status": "IDEALIZED_SYMBOLIC_NOT_OBSERVED_NO_GAP_TIMEOUT_TICK_OR_VARIABLE_NOTIONAL",
+        "stop_bp": 250
+      }
+    ],
+    "stress_per_leg_bp": [
+      12,
+      4,
+      6
+    ],
+    "stress_transaction_bp": 44,
+    "unit": "entry_notional_bp"
+  },
+  "candidate_rows": [
+    {
+      "causal_availability_and_entry_delay": {
+        "decision_at": "Signal/confirmation exclusive hour end + 60 seconds (assumed availability).",
+        "earliest_entry_at": "That hour end + 120 seconds; 60 seconds after decision, 120 seconds after signal close.",
+        "feature_cutoff": "Completed 1h and 4h bars only; all required bars available at decision.",
+        "fill_ack": "Economic execution + 60 seconds; acknowledgment delay cannot backdate decisions.",
+        "retest_additional_delay": "First qualifying closed confirmation among next 1/2/3 hours after breakout; total breakout-close to fill delay is 1/2/3 hours + 120 seconds.",
+        "status": "ACCEPTED_DESIGN_ONLY_ASSUMED_LATENCY_NOT_MEASURED_RECEIPT"
+      },
+      "common_definition_and_execution_binding": "verbatim_common_definitions_and_execution",
+      "dependence": "Shares family/direction trigger with other horizon; mirrored sides share state; both families share 4h EMA filter; assets share calendar shocks. Different exits and funded occupancy prevent exact alias assumption.",
+      "direction": "LONG",
+      "economic_source_and_payer": "Slow directional portfolio adjustment and continuation after liquidity absorption; late forced/chasing flow could pay an earlier position. OHLC/EMA/ER do not identify that flow.",
+      "exact_original_family_formula": "LONG: last completed 4h close > EMA20 > EMA50; EMA20 now > EMA20 three 4h bars earlier; ER12 >=0.35. SHORT mirrors inequalities. Last 1h close breaks the highs/lows of the prior three complete 1h bars, its signed close-open body >=0.5 ATR20, and its range <=2 ATR20. Distance from 4h EMA20 <= one 4h ATR20 (same TR definition on 4h bars). Initial stop is decision close minus d×1.5 hourly ATR20. Hypothesis: persistent structure plus contained confirmation avoids first-spike false positives.",
+      "failure_regimes": [
+        "Chop/false breakout despite ER gate",
+        "Exhausted trend or reversal",
+        "Signal decays during 120-second entry delay",
+        "Macro/gap shock",
+        "Uncertain funding and executable costs"
+      ],
+      "family": "STRUCTURAL_CONTINUATION",
+      "formula_binding": "LONG clause as quoted",
+      "hold_hours": 4,
+      "horizon_band": "2-6h",
+      "id": "STRUCTURAL_CONTINUATION_LONG_04H",
+      "mechanism_grade": "TESTABLE_UNVERIFIED_ASSUMPTION",
+      "mirror_economics": "A crowded LONG could pay adverse funding and fail in downside liquidation gaps; hypotheses only, not observed crowding, rates or liquidations.",
+      "original_symbols": [
+        "BTCUSDT",
+        "ETHUSDT",
+        "SOLUSDT"
+      ],
+      "outcomes_read_or_computed": false,
+      "permitted_current_exclusions": "Only original EMA/ER/body/range/ATR or retest conditions, absolute gap veto, unchanged stop/cost geometry, missingness/fold/position/cooldown and accepted risk gates; no new volume/macro/regime filter.",
+      "prospective_wait_effect": "A new WAIT filter might improve conditional mean but reduces filled events and may select a different estimand; requires route B new root, never applied to this row.",
+      "stress_feasibility": {
+        "conditional_stop_interval_bp": [
+          152,
+          250
+        ],
+        "endpoint_extra_event_example": {
+          "cost_bp": 84,
+          "events": 5,
+          "minimum_stop_bp": 168
+        },
+        "hourly_example_events": 4,
+        "minimum_stop_bp": 152,
+        "status": "CONDITIONALLY_GEOMETRY_ELIGIBLE_NOT_EXPECTANCY",
+        "stress_cost_bp": 76
+      }
+    },
+    {
+      "causal_availability_and_entry_delay": {
+        "decision_at": "Signal/confirmation exclusive hour end + 60 seconds (assumed availability).",
+        "earliest_entry_at": "That hour end + 120 seconds; 60 seconds after decision, 120 seconds after signal close.",
+        "feature_cutoff": "Completed 1h and 4h bars only; all required bars available at decision.",
+        "fill_ack": "Economic execution + 60 seconds; acknowledgment delay cannot backdate decisions.",
+        "retest_additional_delay": "First qualifying closed confirmation among next 1/2/3 hours after breakout; total breakout-close to fill delay is 1/2/3 hours + 120 seconds.",
+        "status": "ACCEPTED_DESIGN_ONLY_ASSUMED_LATENCY_NOT_MEASURED_RECEIPT"
+      },
+      "common_definition_and_execution_binding": "verbatim_common_definitions_and_execution",
+      "dependence": "Shares family/direction trigger with other horizon; mirrored sides share state; both families share 4h EMA filter; assets share calendar shocks. Different exits and funded occupancy prevent exact alias assumption.",
+      "direction": "LONG",
+      "economic_source_and_payer": "Slow directional portfolio adjustment and continuation after liquidity absorption; late forced/chasing flow could pay an earlier position. OHLC/EMA/ER do not identify that flow. Persistence through 12h is an additional unverified assumption; a longer hold does not itself establish a new economic payer.",
+      "exact_original_family_formula": "LONG: last completed 4h close > EMA20 > EMA50; EMA20 now > EMA20 three 4h bars earlier; ER12 >=0.35. SHORT mirrors inequalities. Last 1h close breaks the highs/lows of the prior three complete 1h bars, its signed close-open body >=0.5 ATR20, and its range <=2 ATR20. Distance from 4h EMA20 <= one 4h ATR20 (same TR definition on 4h bars). Initial stop is decision close minus d×1.5 hourly ATR20. Hypothesis: persistent structure plus contained confirmation avoids first-spike false positives.",
+      "failure_regimes": [
+        "Chop/false breakout despite ER gate",
+        "Exhausted trend or reversal",
+        "Signal decays during 120-second entry delay",
+        "Macro/gap shock",
+        "Uncertain funding and executable costs"
+      ],
+      "family": "STRUCTURAL_CONTINUATION",
+      "formula_binding": "LONG clause as quoted",
+      "hold_hours": 12,
+      "horizon_band": "6-12h",
+      "id": "STRUCTURAL_CONTINUATION_LONG_12H",
+      "mechanism_grade": "TESTABLE_UNVERIFIED_ASSUMPTION",
+      "mirror_economics": "A crowded LONG could pay adverse funding and fail in downside liquidation gaps; hypotheses only, not observed crowding, rates or liquidations.",
+      "original_symbols": [
+        "BTCUSDT",
+        "ETHUSDT",
+        "SOLUSDT"
+      ],
+      "outcomes_read_or_computed": false,
+      "permitted_current_exclusions": "Only original EMA/ER/body/range/ATR or retest conditions, absolute gap veto, unchanged stop/cost geometry, missingness/fold/position/cooldown and accepted risk gates; no new volume/macro/regime filter.",
+      "prospective_wait_effect": "A new WAIT filter might improve conditional mean but reduces filled events and may select a different estimand; requires route B new root, never applied to this row.",
+      "stress_feasibility": {
+        "conditional_stop_interval_bp": null,
+        "endpoint_extra_event_example": {
+          "cost_bp": 148,
+          "events": 13,
+          "minimum_stop_bp": 296
+        },
+        "hourly_example_events": 12,
+        "minimum_stop_bp": 280,
+        "status": "STRESS_COST_GEOMETRY_INELIGIBLE",
+        "stress_cost_bp": 140
+      }
+    },
+    {
+      "causal_availability_and_entry_delay": {
+        "decision_at": "Signal/confirmation exclusive hour end + 60 seconds (assumed availability).",
+        "earliest_entry_at": "That hour end + 120 seconds; 60 seconds after decision, 120 seconds after signal close.",
+        "feature_cutoff": "Completed 1h and 4h bars only; all required bars available at decision.",
+        "fill_ack": "Economic execution + 60 seconds; acknowledgment delay cannot backdate decisions.",
+        "retest_additional_delay": "First qualifying closed confirmation among next 1/2/3 hours after breakout; total breakout-close to fill delay is 1/2/3 hours + 120 seconds.",
+        "status": "ACCEPTED_DESIGN_ONLY_ASSUMED_LATENCY_NOT_MEASURED_RECEIPT"
+      },
+      "common_definition_and_execution_binding": "verbatim_common_definitions_and_execution",
+      "dependence": "Shares family/direction trigger with other horizon; mirrored sides share state; both families share 4h EMA filter; assets share calendar shocks. Different exits and funded occupancy prevent exact alias assumption.",
+      "direction": "SHORT",
+      "economic_source_and_payer": "Slow directional portfolio adjustment and continuation after liquidity absorption; late forced/chasing flow could pay an earlier position. OHLC/EMA/ER do not identify that flow.",
+      "exact_original_family_formula": "LONG: last completed 4h close > EMA20 > EMA50; EMA20 now > EMA20 three 4h bars earlier; ER12 >=0.35. SHORT mirrors inequalities. Last 1h close breaks the highs/lows of the prior three complete 1h bars, its signed close-open body >=0.5 ATR20, and its range <=2 ATR20. Distance from 4h EMA20 <= one 4h ATR20 (same TR definition on 4h bars). Initial stop is decision close minus d×1.5 hourly ATR20. Hypothesis: persistent structure plus contained confirmation avoids first-spike false positives.",
+      "failure_regimes": [
+        "Chop/false breakout despite ER gate",
+        "Exhausted trend or reversal",
+        "Signal decays during 120-second entry delay",
+        "Macro/gap shock",
+        "Uncertain funding and executable costs"
+      ],
+      "family": "STRUCTURAL_CONTINUATION",
+      "formula_binding": "SHORT mirrored clause as quoted; no threshold amendment",
+      "hold_hours": 4,
+      "horizon_band": "2-6h",
+      "id": "STRUCTURAL_CONTINUATION_SHORT_04H",
+      "mechanism_grade": "TESTABLE_UNVERIFIED_ASSUMPTION",
+      "mirror_economics": "A crowded SHORT could pay adverse funding and fail in upside squeeze gaps; hypotheses only, not observed crowding, rates or liquidations.",
+      "original_symbols": [
+        "BTCUSDT",
+        "ETHUSDT",
+        "SOLUSDT"
+      ],
+      "outcomes_read_or_computed": false,
+      "permitted_current_exclusions": "Only original EMA/ER/body/range/ATR or retest conditions, absolute gap veto, unchanged stop/cost geometry, missingness/fold/position/cooldown and accepted risk gates; no new volume/macro/regime filter.",
+      "prospective_wait_effect": "A new WAIT filter might improve conditional mean but reduces filled events and may select a different estimand; requires route B new root, never applied to this row.",
+      "stress_feasibility": {
+        "conditional_stop_interval_bp": [
+          152,
+          250
+        ],
+        "endpoint_extra_event_example": {
+          "cost_bp": 84,
+          "events": 5,
+          "minimum_stop_bp": 168
+        },
+        "hourly_example_events": 4,
+        "minimum_stop_bp": 152,
+        "status": "CONDITIONALLY_GEOMETRY_ELIGIBLE_NOT_EXPECTANCY",
+        "stress_cost_bp": 76
+      }
+    },
+    {
+      "causal_availability_and_entry_delay": {
+        "decision_at": "Signal/confirmation exclusive hour end + 60 seconds (assumed availability).",
+        "earliest_entry_at": "That hour end + 120 seconds; 60 seconds after decision, 120 seconds after signal close.",
+        "feature_cutoff": "Completed 1h and 4h bars only; all required bars available at decision.",
+        "fill_ack": "Economic execution + 60 seconds; acknowledgment delay cannot backdate decisions.",
+        "retest_additional_delay": "First qualifying closed confirmation among next 1/2/3 hours after breakout; total breakout-close to fill delay is 1/2/3 hours + 120 seconds.",
+        "status": "ACCEPTED_DESIGN_ONLY_ASSUMED_LATENCY_NOT_MEASURED_RECEIPT"
+      },
+      "common_definition_and_execution_binding": "verbatim_common_definitions_and_execution",
+      "dependence": "Shares family/direction trigger with other horizon; mirrored sides share state; both families share 4h EMA filter; assets share calendar shocks. Different exits and funded occupancy prevent exact alias assumption.",
+      "direction": "SHORT",
+      "economic_source_and_payer": "Slow directional portfolio adjustment and continuation after liquidity absorption; late forced/chasing flow could pay an earlier position. OHLC/EMA/ER do not identify that flow. Persistence through 12h is an additional unverified assumption; a longer hold does not itself establish a new economic payer.",
+      "exact_original_family_formula": "LONG: last completed 4h close > EMA20 > EMA50; EMA20 now > EMA20 three 4h bars earlier; ER12 >=0.35. SHORT mirrors inequalities. Last 1h close breaks the highs/lows of the prior three complete 1h bars, its signed close-open body >=0.5 ATR20, and its range <=2 ATR20. Distance from 4h EMA20 <= one 4h ATR20 (same TR definition on 4h bars). Initial stop is decision close minus d×1.5 hourly ATR20. Hypothesis: persistent structure plus contained confirmation avoids first-spike false positives.",
+      "failure_regimes": [
+        "Chop/false breakout despite ER gate",
+        "Exhausted trend or reversal",
+        "Signal decays during 120-second entry delay",
+        "Macro/gap shock",
+        "Uncertain funding and executable costs"
+      ],
+      "family": "STRUCTURAL_CONTINUATION",
+      "formula_binding": "SHORT mirrored clause as quoted; no threshold amendment",
+      "hold_hours": 12,
+      "horizon_band": "6-12h",
+      "id": "STRUCTURAL_CONTINUATION_SHORT_12H",
+      "mechanism_grade": "TESTABLE_UNVERIFIED_ASSUMPTION",
+      "mirror_economics": "A crowded SHORT could pay adverse funding and fail in upside squeeze gaps; hypotheses only, not observed crowding, rates or liquidations.",
+      "original_symbols": [
+        "BTCUSDT",
+        "ETHUSDT",
+        "SOLUSDT"
+      ],
+      "outcomes_read_or_computed": false,
+      "permitted_current_exclusions": "Only original EMA/ER/body/range/ATR or retest conditions, absolute gap veto, unchanged stop/cost geometry, missingness/fold/position/cooldown and accepted risk gates; no new volume/macro/regime filter.",
+      "prospective_wait_effect": "A new WAIT filter might improve conditional mean but reduces filled events and may select a different estimand; requires route B new root, never applied to this row.",
+      "stress_feasibility": {
+        "conditional_stop_interval_bp": null,
+        "endpoint_extra_event_example": {
+          "cost_bp": 148,
+          "events": 13,
+          "minimum_stop_bp": 296
+        },
+        "hourly_example_events": 12,
+        "minimum_stop_bp": 280,
+        "status": "STRESS_COST_GEOMETRY_INELIGIBLE",
+        "stress_cost_bp": 140
+      }
+    },
+    {
+      "causal_availability_and_entry_delay": {
+        "decision_at": "Signal/confirmation exclusive hour end + 60 seconds (assumed availability).",
+        "earliest_entry_at": "That hour end + 120 seconds; 60 seconds after decision, 120 seconds after signal close.",
+        "feature_cutoff": "Completed 1h and 4h bars only; all required bars available at decision.",
+        "fill_ack": "Economic execution + 60 seconds; acknowledgment delay cannot backdate decisions.",
+        "retest_additional_delay": "First qualifying closed confirmation among next 1/2/3 hours after breakout; total breakout-close to fill delay is 1/2/3 hours + 120 seconds.",
+        "status": "ACCEPTED_DESIGN_ONLY_ASSUMED_LATENCY_NOT_MEASURED_RECEIPT"
+      },
+      "common_definition_and_execution_binding": "verbatim_common_definitions_and_execution",
+      "dependence": "Shares family/direction trigger with other horizon; mirrored sides share state; both families share 4h EMA filter; assets share calendar shocks. Different exits and funded occupancy prevent exact alias assumption.",
+      "direction": "LONG",
+      "economic_source_and_payer": "Boundary rejection followed by recovery may screen late-chase adverse selection; late breakout participants and subsequently forced opposite inventory could transfer PnL. No orderflow or sweep is observed.",
+      "exact_original_family_formula": "Same 4h EMA direction ordering, without ER or EMA-slope gate. A completed 1h close breaks the preceding 24 hourly high/low by >=0.25 ATR20, signed body >=0.5 ATR20. Freeze boundary and ATR at breakout. Only the next three closed hourly bars may confirm: LONG low touches [boundary-0.25ATR,boundary+0.25ATR], close >=boundary+0.10ATR and close>open; SHORT mirrored. First confirmation only. A preceding hourly close beyond boundary by 0.25ATR in the wrong direction cancels the event. Stop LONG is minimum low from breakout through confirmation minus 0.25 frozen ATR; SHORT is maximum high plus 0.25ATR. Hypothesis: rejection and recovery after breakout filters chasing.",
+      "failure_regimes": [
+        "False retest/temporary recovery",
+        "Boundary loss or adverse inventory",
+        "Next-three-hour wait misses persistence",
+        "Macro/gap shock",
+        "Uncertain funding and executable costs"
+      ],
+      "family": "CLOSED_RETEST",
+      "formula_binding": "LONG clause as quoted",
+      "hold_hours": 4,
+      "horizon_band": "2-6h",
+      "id": "CLOSED_RETEST_LONG_04H",
+      "mechanism_grade": "TESTABLE_UNVERIFIED_ASSUMPTION",
+      "mirror_economics": "A crowded LONG could pay adverse funding and fail in downside liquidation gaps; hypotheses only, not observed crowding, rates or liquidations.",
+      "original_symbols": [
+        "BTCUSDT",
+        "ETHUSDT",
+        "SOLUSDT"
+      ],
+      "outcomes_read_or_computed": false,
+      "permitted_current_exclusions": "Only original EMA/ER/body/range/ATR or retest conditions, absolute gap veto, unchanged stop/cost geometry, missingness/fold/position/cooldown and accepted risk gates; no new volume/macro/regime filter.",
+      "prospective_wait_effect": "A new WAIT filter might improve conditional mean but reduces filled events and may select a different estimand; requires route B new root, never applied to this row.",
+      "stress_feasibility": {
+        "conditional_stop_interval_bp": [
+          152,
+          250
+        ],
+        "endpoint_extra_event_example": {
+          "cost_bp": 84,
+          "events": 5,
+          "minimum_stop_bp": 168
+        },
+        "hourly_example_events": 4,
+        "minimum_stop_bp": 152,
+        "status": "CONDITIONALLY_GEOMETRY_ELIGIBLE_NOT_EXPECTANCY",
+        "stress_cost_bp": 76
+      }
+    },
+    {
+      "causal_availability_and_entry_delay": {
+        "decision_at": "Signal/confirmation exclusive hour end + 60 seconds (assumed availability).",
+        "earliest_entry_at": "That hour end + 120 seconds; 60 seconds after decision, 120 seconds after signal close.",
+        "feature_cutoff": "Completed 1h and 4h bars only; all required bars available at decision.",
+        "fill_ack": "Economic execution + 60 seconds; acknowledgment delay cannot backdate decisions.",
+        "retest_additional_delay": "First qualifying closed confirmation among next 1/2/3 hours after breakout; total breakout-close to fill delay is 1/2/3 hours + 120 seconds.",
+        "status": "ACCEPTED_DESIGN_ONLY_ASSUMED_LATENCY_NOT_MEASURED_RECEIPT"
+      },
+      "common_definition_and_execution_binding": "verbatim_common_definitions_and_execution",
+      "dependence": "Shares family/direction trigger with other horizon; mirrored sides share state; both families share 4h EMA filter; assets share calendar shocks. Different exits and funded occupancy prevent exact alias assumption.",
+      "direction": "LONG",
+      "economic_source_and_payer": "Boundary rejection followed by recovery may screen late-chase adverse selection; late breakout participants and subsequently forced opposite inventory could transfer PnL. No orderflow or sweep is observed. Persistence through 12h is an additional unverified assumption; a longer hold does not itself establish a new economic payer.",
+      "exact_original_family_formula": "Same 4h EMA direction ordering, without ER or EMA-slope gate. A completed 1h close breaks the preceding 24 hourly high/low by >=0.25 ATR20, signed body >=0.5 ATR20. Freeze boundary and ATR at breakout. Only the next three closed hourly bars may confirm: LONG low touches [boundary-0.25ATR,boundary+0.25ATR], close >=boundary+0.10ATR and close>open; SHORT mirrored. First confirmation only. A preceding hourly close beyond boundary by 0.25ATR in the wrong direction cancels the event. Stop LONG is minimum low from breakout through confirmation minus 0.25 frozen ATR; SHORT is maximum high plus 0.25ATR. Hypothesis: rejection and recovery after breakout filters chasing.",
+      "failure_regimes": [
+        "False retest/temporary recovery",
+        "Boundary loss or adverse inventory",
+        "Next-three-hour wait misses persistence",
+        "Macro/gap shock",
+        "Uncertain funding and executable costs"
+      ],
+      "family": "CLOSED_RETEST",
+      "formula_binding": "LONG clause as quoted",
+      "hold_hours": 12,
+      "horizon_band": "6-12h",
+      "id": "CLOSED_RETEST_LONG_12H",
+      "mechanism_grade": "TESTABLE_UNVERIFIED_ASSUMPTION",
+      "mirror_economics": "A crowded LONG could pay adverse funding and fail in downside liquidation gaps; hypotheses only, not observed crowding, rates or liquidations.",
+      "original_symbols": [
+        "BTCUSDT",
+        "ETHUSDT",
+        "SOLUSDT"
+      ],
+      "outcomes_read_or_computed": false,
+      "permitted_current_exclusions": "Only original EMA/ER/body/range/ATR or retest conditions, absolute gap veto, unchanged stop/cost geometry, missingness/fold/position/cooldown and accepted risk gates; no new volume/macro/regime filter.",
+      "prospective_wait_effect": "A new WAIT filter might improve conditional mean but reduces filled events and may select a different estimand; requires route B new root, never applied to this row.",
+      "stress_feasibility": {
+        "conditional_stop_interval_bp": null,
+        "endpoint_extra_event_example": {
+          "cost_bp": 148,
+          "events": 13,
+          "minimum_stop_bp": 296
+        },
+        "hourly_example_events": 12,
+        "minimum_stop_bp": 280,
+        "status": "STRESS_COST_GEOMETRY_INELIGIBLE",
+        "stress_cost_bp": 140
+      }
+    },
+    {
+      "causal_availability_and_entry_delay": {
+        "decision_at": "Signal/confirmation exclusive hour end + 60 seconds (assumed availability).",
+        "earliest_entry_at": "That hour end + 120 seconds; 60 seconds after decision, 120 seconds after signal close.",
+        "feature_cutoff": "Completed 1h and 4h bars only; all required bars available at decision.",
+        "fill_ack": "Economic execution + 60 seconds; acknowledgment delay cannot backdate decisions.",
+        "retest_additional_delay": "First qualifying closed confirmation among next 1/2/3 hours after breakout; total breakout-close to fill delay is 1/2/3 hours + 120 seconds.",
+        "status": "ACCEPTED_DESIGN_ONLY_ASSUMED_LATENCY_NOT_MEASURED_RECEIPT"
+      },
+      "common_definition_and_execution_binding": "verbatim_common_definitions_and_execution",
+      "dependence": "Shares family/direction trigger with other horizon; mirrored sides share state; both families share 4h EMA filter; assets share calendar shocks. Different exits and funded occupancy prevent exact alias assumption.",
+      "direction": "SHORT",
+      "economic_source_and_payer": "Boundary rejection followed by recovery may screen late-chase adverse selection; late breakout participants and subsequently forced opposite inventory could transfer PnL. No orderflow or sweep is observed.",
+      "exact_original_family_formula": "Same 4h EMA direction ordering, without ER or EMA-slope gate. A completed 1h close breaks the preceding 24 hourly high/low by >=0.25 ATR20, signed body >=0.5 ATR20. Freeze boundary and ATR at breakout. Only the next three closed hourly bars may confirm: LONG low touches [boundary-0.25ATR,boundary+0.25ATR], close >=boundary+0.10ATR and close>open; SHORT mirrored. First confirmation only. A preceding hourly close beyond boundary by 0.25ATR in the wrong direction cancels the event. Stop LONG is minimum low from breakout through confirmation minus 0.25 frozen ATR; SHORT is maximum high plus 0.25ATR. Hypothesis: rejection and recovery after breakout filters chasing.",
+      "failure_regimes": [
+        "False retest/temporary recovery",
+        "Boundary loss or adverse inventory",
+        "Next-three-hour wait misses persistence",
+        "Macro/gap shock",
+        "Uncertain funding and executable costs"
+      ],
+      "family": "CLOSED_RETEST",
+      "formula_binding": "SHORT mirrored clause as quoted; no threshold amendment",
+      "hold_hours": 4,
+      "horizon_band": "2-6h",
+      "id": "CLOSED_RETEST_SHORT_04H",
+      "mechanism_grade": "TESTABLE_UNVERIFIED_ASSUMPTION",
+      "mirror_economics": "A crowded SHORT could pay adverse funding and fail in upside squeeze gaps; hypotheses only, not observed crowding, rates or liquidations.",
+      "original_symbols": [
+        "BTCUSDT",
+        "ETHUSDT",
+        "SOLUSDT"
+      ],
+      "outcomes_read_or_computed": false,
+      "permitted_current_exclusions": "Only original EMA/ER/body/range/ATR or retest conditions, absolute gap veto, unchanged stop/cost geometry, missingness/fold/position/cooldown and accepted risk gates; no new volume/macro/regime filter.",
+      "prospective_wait_effect": "A new WAIT filter might improve conditional mean but reduces filled events and may select a different estimand; requires route B new root, never applied to this row.",
+      "stress_feasibility": {
+        "conditional_stop_interval_bp": [
+          152,
+          250
+        ],
+        "endpoint_extra_event_example": {
+          "cost_bp": 84,
+          "events": 5,
+          "minimum_stop_bp": 168
+        },
+        "hourly_example_events": 4,
+        "minimum_stop_bp": 152,
+        "status": "CONDITIONALLY_GEOMETRY_ELIGIBLE_NOT_EXPECTANCY",
+        "stress_cost_bp": 76
+      }
+    },
+    {
+      "causal_availability_and_entry_delay": {
+        "decision_at": "Signal/confirmation exclusive hour end + 60 seconds (assumed availability).",
+        "earliest_entry_at": "That hour end + 120 seconds; 60 seconds after decision, 120 seconds after signal close.",
+        "feature_cutoff": "Completed 1h and 4h bars only; all required bars available at decision.",
+        "fill_ack": "Economic execution + 60 seconds; acknowledgment delay cannot backdate decisions.",
+        "retest_additional_delay": "First qualifying closed confirmation among next 1/2/3 hours after breakout; total breakout-close to fill delay is 1/2/3 hours + 120 seconds.",
+        "status": "ACCEPTED_DESIGN_ONLY_ASSUMED_LATENCY_NOT_MEASURED_RECEIPT"
+      },
+      "common_definition_and_execution_binding": "verbatim_common_definitions_and_execution",
+      "dependence": "Shares family/direction trigger with other horizon; mirrored sides share state; both families share 4h EMA filter; assets share calendar shocks. Different exits and funded occupancy prevent exact alias assumption.",
+      "direction": "SHORT",
+      "economic_source_and_payer": "Boundary rejection followed by recovery may screen late-chase adverse selection; late breakout participants and subsequently forced opposite inventory could transfer PnL. No orderflow or sweep is observed. Persistence through 12h is an additional unverified assumption; a longer hold does not itself establish a new economic payer.",
+      "exact_original_family_formula": "Same 4h EMA direction ordering, without ER or EMA-slope gate. A completed 1h close breaks the preceding 24 hourly high/low by >=0.25 ATR20, signed body >=0.5 ATR20. Freeze boundary and ATR at breakout. Only the next three closed hourly bars may confirm: LONG low touches [boundary-0.25ATR,boundary+0.25ATR], close >=boundary+0.10ATR and close>open; SHORT mirrored. First confirmation only. A preceding hourly close beyond boundary by 0.25ATR in the wrong direction cancels the event. Stop LONG is minimum low from breakout through confirmation minus 0.25 frozen ATR; SHORT is maximum high plus 0.25ATR. Hypothesis: rejection and recovery after breakout filters chasing.",
+      "failure_regimes": [
+        "False retest/temporary recovery",
+        "Boundary loss or adverse inventory",
+        "Next-three-hour wait misses persistence",
+        "Macro/gap shock",
+        "Uncertain funding and executable costs"
+      ],
+      "family": "CLOSED_RETEST",
+      "formula_binding": "SHORT mirrored clause as quoted; no threshold amendment",
+      "hold_hours": 12,
+      "horizon_band": "6-12h",
+      "id": "CLOSED_RETEST_SHORT_12H",
+      "mechanism_grade": "TESTABLE_UNVERIFIED_ASSUMPTION",
+      "mirror_economics": "A crowded SHORT could pay adverse funding and fail in upside squeeze gaps; hypotheses only, not observed crowding, rates or liquidations.",
+      "original_symbols": [
+        "BTCUSDT",
+        "ETHUSDT",
+        "SOLUSDT"
+      ],
+      "outcomes_read_or_computed": false,
+      "permitted_current_exclusions": "Only original EMA/ER/body/range/ATR or retest conditions, absolute gap veto, unchanged stop/cost geometry, missingness/fold/position/cooldown and accepted risk gates; no new volume/macro/regime filter.",
+      "prospective_wait_effect": "A new WAIT filter might improve conditional mean but reduces filled events and may select a different estimand; requires route B new root, never applied to this row.",
+      "stress_feasibility": {
+        "conditional_stop_interval_bp": null,
+        "endpoint_extra_event_example": {
+          "cost_bp": 148,
+          "events": 13,
+          "minimum_stop_bp": 296
+        },
+        "hourly_example_events": 12,
+        "minimum_stop_bp": 280,
+        "status": "STRESS_COST_GEOMETRY_INELIGIBLE",
+        "stress_cost_bp": 140
+      }
+    }
+  ],
+  "controller_dispatch_sha": "7da2b9e65848c3c547d940ded60a57f71314c64f",
+  "counter_scope": "Executor work-scope actions only, not global OS/network telemetry. Public Git/GitHub document reads occurred; prior receipt counters are historical attestations, not new verification.",
+  "delta_vs_prior_sol_r1": [
+    "Per-ID payer/mechanism and latency thesis with fixed formula binding",
+    "Derived symbolic break-even and per-horizon cost geometry/source-evidence claim ladder",
+    "Definition-only8x8 alias matrix; retain16 without economic mirror assumption",
+    "Overlap pseudo-power and trigger/fill/cooldown information distinction",
+    "One A recommendation versus explicit new-root B/C costs; no substantive Astra need for descriptive A",
+    "Dense P3 minimum-delta/stop contract, explicit zero-event inference failure and conservative16 upper-budget adoption pending"
+  ],
+  "effective_blocks_power_toy": {
+    "bootstrap_draws_proposed": 10000,
+    "bootstrap_status": "DRAFT_NOT_EFFECTIVE_EXPLORATORY_NO_FWER_CERTIFICATION",
+    "economic_effect_bp": 5,
+    "filled_rate_needed_for_100": 3.4482758620689653,
+    "filled_rate_needed_for_30": 1.0344827586206897,
+    "finite_tail_expected_draws": 31.25,
+    "formal_slots": 16,
+    "fwer_budget": 0.05,
+    "normal_one_sided_critical": 2.734368786533176,
+    "overlap_toy": {
+      "actual_nominal_calendar_weeks_about": [
+        12,
+        13
+      ],
+      "at_sigma10_naive288_power": 0.9999999955618499,
+      "naive_12weeks_times_3assets_times_8policies": 288,
+      "serial_design_effect_2_example_effective_weeks": 6
+    },
+    "per_fold_occupied_floor_proposed": 4,
+    "planning_power": 0.8,
+    "rates": [
+      {
+        "eligible_days": 29,
+        "expected_fills_per_fold": 14.5,
+        "filled_rate_per_eligible_day": 0.5,
+        "hundred_floor_in_expectation": false,
+        "thirty_floor_in_expectation": false
+      },
+      {
+        "eligible_days": 29,
+        "expected_fills_per_fold": 29,
+        "filled_rate_per_eligible_day": 1,
+        "hundred_floor_in_expectation": false,
+        "thirty_floor_in_expectation": false
+      },
+      {
+        "eligible_days": 29,
+        "expected_fills_per_fold": 58,
+        "filled_rate_per_eligible_day": 2,
+        "hundred_floor_in_expectation": false,
+        "thirty_floor_in_expectation": true
+      },
+      {
+        "eligible_days": 29,
+        "expected_fills_per_fold": 116,
+        "filled_rate_per_eligible_day": 4,
+        "hundred_floor_in_expectation": true,
+        "thirty_floor_in_expectation": true
+      }
+    ],
+    "ratio_estimator_caveat": "sigma_block means hypothetical equal-information influence SD, not measured SD of unequal-count nonempty weekly means; equal-era stratification/serial tails/missingness can change variance.",
+    "scope": "HYPOTHETICAL_NOT_OBSERVED_NOT_METHOD_POWER_VALIDATION",
+    "seed_string_prior_draft": "G2_R3_SOL_DRAFT_R1_20261009",
+    "sensitivity_days": 14,
+    "sigma_grid": [
+      {
+        "hypothetical_sigma_block_bp": 5,
+        "mde_80pct_at_12_weeks_bp": 5.161496068647797,
+        "toy_power_if_12_independent_equal_information_weeks": 0.7672232448351529,
+        "toy_power_if_6_independent_equal_information_weeks": 0.38786840584646093,
+        "weeks_required": 13
+      },
+      {
+        "hypothetical_sigma_block_bp": 10,
+        "mde_80pct_at_12_weeks_bp": 10.322992137295595,
+        "toy_power_if_12_independent_equal_information_weeks": 0.15809502093901873,
+        "toy_power_if_6_independent_equal_information_weeks": 0.06556970773047494,
+        "weeks_required": 52
+      },
+      {
+        "hypothetical_sigma_block_bp": 20,
+        "mde_80pct_at_12_weeks_bp": 20.64598427459119,
+        "toy_power_if_12_independent_equal_information_weeks": 0.03085711164816579,
+        "toy_power_if_6_independent_equal_information_weeks": 0.016919022241867865,
+        "weeks_required": 205
+      }
+    ],
+    "trigger_to_fill": "expected filled count = 29 * trigger_rate * eligible_fill_fraction; WAIT/no-fill/geometry reduce fraction; frequency is not expected net return.",
+    "weekly_cluster_floor_proposed": 12,
+    "weekly_equation": "ceil(12.7877*(sigma_block/5)^2)"
+  },
+  "execution_branch": "feature/v06-bline-g2-r3-scientific-strategy-review-sol61-r1",
+  "method_proposal_sha": "35d2b8488fd6fbdab0d3d7ff8cf2b84ee5b60b6f",
+  "method_sha": "cf2d5cc33774cdcff7d709636305bba830e977ef",
+  "original_eight_sha": "e5b2006a89441f7eb2ec900e508aff451106b87a",
+  "outcome_blind_alias_matrix": {
+    "formal_comparison_slots_retained": 16,
+    "legend": {
+      "D": "mirrored side, not economic symmetry",
+      "DH": "side mirror and horizon change",
+      "F": "different family; shared EMA filter",
+      "FD": "family and direction change",
+      "FDH": "family/direction/horizon change",
+      "FH": "family and horizon change",
+      "H": "same trigger, different horizon/payoff/occupancy",
+      "SELF": "identity"
+    },
+    "ordered_ids": [
+      "STRUCTURAL_CONTINUATION_LONG_04H",
+      "STRUCTURAL_CONTINUATION_LONG_12H",
+      "STRUCTURAL_CONTINUATION_SHORT_04H",
+      "STRUCTURAL_CONTINUATION_SHORT_12H",
+      "CLOSED_RETEST_LONG_04H",
+      "CLOSED_RETEST_LONG_12H",
+      "CLOSED_RETEST_SHORT_04H",
+      "CLOSED_RETEST_SHORT_12H"
+    ],
+    "proven_exact_cross_candidate_aliases": 0,
+    "reduction_authority": "NEW prereg only after symbolic all-admissible-path equivalence of features, entry/exit/funding/quantity/control estimand or removal before outcomes with immutable discarded ledger; no return-correlation pruning, slot refill or current-row edit.",
+    "relations": [
+      [
+        "SELF",
+        "H",
+        "D",
+        "DH",
+        "F",
+        "FH",
+        "FD",
+        "FDH"
+      ],
+      [
+        "H",
+        "SELF",
+        "DH",
+        "D",
+        "FH",
+        "F",
+        "FDH",
+        "FD"
+      ],
+      [
+        "D",
+        "DH",
+        "SELF",
+        "H",
+        "FD",
+        "FDH",
+        "F",
+        "FH"
+      ],
+      [
+        "DH",
+        "D",
+        "H",
+        "SELF",
+        "FDH",
+        "FD",
+        "FH",
+        "F"
+      ],
+      [
+        "F",
+        "FH",
+        "FD",
+        "FDH",
+        "SELF",
+        "H",
+        "D",
+        "DH"
+      ],
+      [
+        "FH",
+        "F",
+        "FDH",
+        "FD",
+        "H",
+        "SELF",
+        "DH",
+        "D"
+      ],
+      [
+        "FD",
+        "FDH",
+        "F",
+        "FH",
+        "D",
+        "DH",
+        "SELF",
+        "H"
+      ],
+      [
+        "FDH",
+        "FD",
+        "FH",
+        "F",
+        "DH",
+        "D",
+        "H",
+        "SELF"
+      ]
+    ]
+  },
+  "p3_required_delta": [
+    {
+      "category": "ALREADY_ACCEPTED_FROZEN_NOT_TO_ALTER",
+      "decision": "Preserve exact IDs/formulas/4h/12h/30-250bp stops/2R targets/stop>=2 stress cost/target>=3 stress cost and original positive gates; retain ineligible rows.",
+      "item": "original_eight_and_economic_geometry"
+    },
+    {
+      "category": "ALREADY_ACCEPTED_FROZEN_NOT_TO_ALTER",
+      "decision": "R1.1 dual clocks, next-minute entry, adverse exits, independent funded controls, 1x/reserve/100USDT drawdown kill and carry-forward across folds; engine conformance belongs to P1.",
+      "item": "clock_books_risk_and_controls"
+    },
+    {
+      "category": "DEPENDS_ON_P1_ENGINE_ACCEPTANCE",
+      "decision": "Independent Controller acceptance of exact engine/oracle SHA and applicable synthetic invariants; engine failure stops path, no science waiver or re-audit here.",
+      "item": "P1_implementation_identity"
+    },
+    {
+      "category": "DEPENDS_ON_P2_SOURCE_PERMISSIONS_LICENCE",
+      "decision": "Exact permitted local root/schema/selected symbol-month/price and true minute mark identities/continuity, dated filters and rights; no file probes here. Missing mark/rights/protected admission stops.",
+      "item": "P2_sources_and_rights"
+    },
+    {
+      "category": "NEEDS_CONTROLLER_P3_FREEZE",
+      "decision": "Select A older 3-era window once, March warmups/April scoring 2021/2023/2025, edge embargo/exit-ack tail; prefer BTC-only if that is the only finite admitted universe, explicitly amend scope diagnostic-only and retain 60% positive concentration gate. No 2026 option or silent ETH/SOL omission.",
+      "item": "one_window_and_universe"
+    },
+    {
+      "category": "NEEDS_CONTROLLER_P3_FREEZE",
+      "decision": "Bind 22/44bp actual-notional mechanics, adverse 4/8bp event scenarios, hourly grid/ownership/endpoint conventions and tick/funding/cap limitations. No after-result switch to cheaper cadence. 12h geometry-ineligible in hourly example.",
+      "item": "cost_event_rule_and_grades"
+    },
+    {
+      "category": "NEEDS_CONTROLLER_P3_FREEZE",
+      "decision": "Adopt prior draft equal-1/3 fold means of within-fold trade-weighted entry-notional netbp; paired incremental means retain parent-event identities. UTC-epoch 7d blocks within folds, common indices for all assets/candidates/comparisons; 14d sensitivity never joins years. Keep 16 slots, 10000 draws and exact seed/RNG/index/quantile implementation identity. Any zero-event replicate/fold yields INFERENCE_UNAVAILABLE; no dropping/reseed/substitute. Empty blocks retained in bundle and occupancy reporting. These are proposed clarifications, not operative authority.",
+      "item": "estimands_and_resampler"
+    },
+    {
+      "category": "NEEDS_CONTROLLER_P3_FREEZE",
+      "decision": "Original 100/fold positive and 12-week gate unchanged. Explicitly adopt or reject draft >=4 occupied weeks/fold and 30/fold futility detail before bodies. For recommended proxy A, estimates/intervals exploratory only; no FWER-validity/power certification, no positive shortlist or supported actual-cost NO_GO. Retain 16-slot correction including upper diagnostics; formal claims would need separate R3-specific synthetic adequacy validation.",
+      "item": "support_and_inferential_claims"
+    },
+    {
+      "category": "NEEDS_CONTROLLER_P3_FREEZE",
+      "decision": "Approve one dataset/universe campaign and fixed inherited budget ceilings after source-size preflight; all8/controls/base-stress book divergence/WAIT/ineligible/gaps/kills/insolvency retained. No peek-promotion, retuning, option sequencing, result-driven months or 360d follow-up.",
+      "item": "budget_stops_and_all_status_reporting"
+    },
+    {
+      "category": "NEEDS_CONTROLLER_P3_FREEZE",
+      "decision": "Freeze exact completed contract/engine/data identities and verify new remote first-pushed prereg before separate body-reading dispatch. This review and prior draft provide neither.",
+      "item": "new_first_pushed_prereg_and_body_capability"
+    },
+    {
+      "category": "PROSPECTIVE_DIAGNOSTIC_ONLY_CAVEAT",
+      "decision": "Actual counts/dispersion/occupancy/inference limitations are measured only at authorized P4 terminal under fixed rules. Sparse/zero-event outcomes -> INSUFFICIENT_EVIDENCE; cannot redefine support or become universal no-edge.",
+      "item": "sparse_events_and_proxy_costs"
+    },
+    {
+      "category": "PROSPECTIVE_DIAGNOSTIC_ONLY_CAVEAT",
+      "decision": "Prior v0.3/R1 trial budget unknown; R2 and proposed R3 count separately. Within-R3 16 correction does not erase historical design selection or create unexposed release Alpha.",
+      "item": "global_prior_exposure"
+    }
+  ],
+  "previous_docs_sha": "35575f11772dba871b079b0b7f6a8c7ac32e2f30",
+  "prior_sol_science_sha": "fc89f05014b61c51a55141cb419948f4eee9d8f3",
+  "prompt_sha": "07c84a0abde67248d0fa53c38533426d2c26af08",
+  "publication_contract": {
+    "ci_status": "PENDING_POST_PUSH_METADATA_CHECK_NOT_SCIENTIFIC_VALIDATION",
+    "cohesive_commit_parent": "7da2b9e65848c3c547d940ded60a57f71314c64f",
+    "expected_changed_paths": [
+      "docs/strategy_research/g2_r3/scientific_strategy_review_r1/ECONOMIC_MECHANISM_COST_POWER_REPORT.md",
+      "evidence/v0.6/b_line/g2_r3_scientific_strategy_review_r1/SCIENCE_REVIEW_MATRIX.json",
+      "reviews/v0.6/b_line/scientific_strategy_review_r1/P3_MINIMUM_DELTA_AND_ASTRA_GATE.md"
+    ],
+    "final_sha_location": "External final response and fresh remote ls-remote; omitted from own committed bytes to avoid circular identity.",
+    "remote_push_verified": "PENDING_EXTERNAL_POST_COMMIT_CHECK"
+  },
+  "restricted_sources_read": {
+    "allowed_pinned_sources": [
+      {
+        "classification": "ACCEPTED_TASK_AUTHORITY",
+        "git_blob": "71b68c4d8e8732e0f76491f4a560ac1ce688dee5",
+        "path": "prompts/v0.6/b_line/V06_G2_R3_SCIENTIFIC_STRATEGY_REVIEW_SOL_HIGH_R1.md",
+        "read_scope": "DOCUMENT_OR_DESIGN_METADATA_ONLY",
+        "ref": "07c84a0abde67248d0fa53c38533426d2c26af08",
+        "sha256": "15d88b4cdebef5540a2a5c0783d5c22113b83dce28c8248349ebfea16c1727e7",
+        "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/07c84a0abde67248d0fa53c38533426d2c26af08/prompts/v0.6/b_line/V06_G2_R3_SCIENTIFIC_STRATEGY_REVIEW_SOL_HIGH_R1.md"
+      },
+      {
+        "classification": "ACCEPTED_TASK_AUTHORITY",
+        "git_blob": "1981eb73f9b511a641bbbe973c80a1d0499e5b3a",
+        "path": "reviews/v0.6/b_line/V06_G2_R3_SCIENTIFIC_STRATEGY_REVIEW_CONTROLLER_DISPATCH_R1.md",
+        "read_scope": "DOCUMENT_OR_DESIGN_METADATA_ONLY",
+        "ref": "7da2b9e65848c3c547d940ded60a57f71314c64f",
+        "sha256": "1680fbac575542a14e4e94bb60f0e711764f8035daecd4010a3b1bc9e4ed03ac",
+        "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/7da2b9e65848c3c547d940ded60a57f71314c64f/reviews/v0.6/b_line/V06_G2_R3_SCIENTIFIC_STRATEGY_REVIEW_CONTROLLER_DISPATCH_R1.md"
+      },
+      {
+        "classification": "ACCEPTED_AGGREGATE_DEVELOPMENT_RESULT",
+        "git_blob": "8fc814ff176acf12a6451e2d9cd4b10a8ae26fcc",
+        "path": "reviews/v0.6/b_line/V06_G2_R2_CONTROLLER_L2_DIAGNOSTIC_REVIEW.md",
+        "read_scope": "DOCUMENT_OR_DESIGN_METADATA_ONLY",
+        "ref": "35575f11772dba871b079b0b7f6a8c7ac32e2f30",
+        "sha256": "1a2cfdbf23acdf7c68b260fcabcd633f9b25336a2818c63c07b07831238286a1",
+        "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/35575f11772dba871b079b0b7f6a8c7ac32e2f30/reviews/v0.6/b_line/V06_G2_R2_CONTROLLER_L2_DIAGNOSTIC_REVIEW.md"
+      },
+      {
+        "classification": "ACCEPTED_CONDITIONAL_DESIGN_AUTHORITY",
+        "git_blob": "f0fce0ff48f2331168d39ea5eb7de7d40eb7de08",
+        "path": "reviews/v0.6/b_line/V06_G2_R3_DESIGN_CONTROLLER_L2_SCIENTIFIC_REVIEW.md",
+        "read_scope": "DOCUMENT_OR_DESIGN_METADATA_ONLY",
+        "ref": "35575f11772dba871b079b0b7f6a8c7ac32e2f30",
+        "sha256": "a510c735329872216cae9865707ef15f337ba32a792b622c27bec158f3c0da1f",
+        "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/35575f11772dba871b079b0b7f6a8c7ac32e2f30/reviews/v0.6/b_line/V06_G2_R3_DESIGN_CONTROLLER_L2_SCIENTIFIC_REVIEW.md"
+      },
+      {
+        "classification": "ACCEPTED_DESIGN_ONLY_METHOD_AUTHORITY",
+        "git_blob": "88fe41ae14b8cd8b2220fe0e34bb4bcd67f3b2da",
+        "path": "reviews/v0.6/b_line/V06_G2_R3_METHOD_R1_1_CONTROLLER_L2_ACCEPTANCE.md",
+        "read_scope": "DOCUMENT_OR_DESIGN_METADATA_ONLY",
+        "ref": "35575f11772dba871b079b0b7f6a8c7ac32e2f30",
+        "sha256": "1c014e68aa53797379ea6b793749c5121ae6aaeb3de469007e8aab8f34529586",
+        "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/35575f11772dba871b079b0b7f6a8c7ac32e2f30/reviews/v0.6/b_line/V06_G2_R3_METHOD_R1_1_CONTROLLER_L2_ACCEPTANCE.md"
+      },
+      {
+        "classification": "ACCEPTED_PUBLIC_TERMINAL_AGGREGATE_GOVERNANCE",
+        "git_blob": "6c6a123ba68a9b6e8f1f5fae5a61ea583faebbbb",
+        "path": "reviews/v0.5/V0.5.1_H41_EXPLORATORY_NO_GO_CONTROLLER_ADJUDICATION_R1.md",
+        "read_scope": "DOCUMENT_OR_DESIGN_METADATA_ONLY",
+        "ref": "35575f11772dba871b079b0b7f6a8c7ac32e2f30",
+        "sha256": "013ecad78f38513ce198ce488379e7d9264d10726a9c07cf254aeb0dff28631f",
+        "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/35575f11772dba871b079b0b7f6a8c7ac32e2f30/reviews/v0.5/V0.5.1_H41_EXPLORATORY_NO_GO_CONTROLLER_ADJUDICATION_R1.md"
+      },
+      {
+        "classification": "ACCEPTED_FOR_AUDIT_NOT_FROZEN",
+        "git_blob": "29e70bb654a701337269def0424b7e510f4f47b1",
+        "path": "reviews/v0.5/V0.5.1_H41_SUCCESSOR_SCIENTIFIC_CAMPAIGN_V1_DESIGN_R1_CONTROLLER_ACCEPTANCE.md",
+        "read_scope": "DOCUMENT_OR_DESIGN_METADATA_ONLY",
+        "ref": "35575f11772dba871b079b0b7f6a8c7ac32e2f30",
+        "sha256": "48eb284340339004649f78171b12feb77f5c694f67180d1cb542f894db629e99",
+        "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/35575f11772dba871b079b0b7f6a8c7ac32e2f30/reviews/v0.5/V0.5.1_H41_SUCCESSOR_SCIENTIFIC_CAMPAIGN_V1_DESIGN_R1_CONTROLLER_ACCEPTANCE.md"
+      },
+      {
+        "classification": "PUBLIC_METHOD_AUDIT_NOT_R3_AUTHORITY",
+        "git_blob": "4b42fdbf1b42e39a676f3fa1506916f80f58be88",
+        "path": "reviews/v0.5/astra-h41-successor-design/V0.5.1_H41_SUCCESSOR_SCIENTIFIC_CAMPAIGN_V1_ASTRA_DESIGN_AUDIT_R1.md",
+        "read_scope": "DOCUMENT_OR_DESIGN_METADATA_ONLY",
+        "ref": "35575f11772dba871b079b0b7f6a8c7ac32e2f30",
+        "sha256": "99dc426a43f259578964468eb2bc8e8bb21a3041b1cd6714e8af23b6b06a4054",
+        "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/35575f11772dba871b079b0b7f6a8c7ac32e2f30/reviews/v0.5/astra-h41-successor-design/V0.5.1_H41_SUCCESSOR_SCIENTIFIC_CAMPAIGN_V1_ASTRA_DESIGN_AUDIT_R1.md"
+      },
+      {
+        "classification": "PUBLIC_FEASIBILITY_REMIT_NOT_FINDINGS",
+        "git_blob": "93bb4cc56b04ddd5e25ed0729bcd8a051478d0cf",
+        "path": "prompts/v0.5/research/v0.5.5_H42_STRATEGY_DISCOVERY_HYBRID_CAPABLE_FEASIBILITY_R1.md",
+        "read_scope": "DOCUMENT_OR_DESIGN_METADATA_ONLY",
+        "ref": "35575f11772dba871b079b0b7f6a8c7ac32e2f30",
+        "sha256": "0fa755a104cb5f2837fe95c3380d900d5cb7847c5d93bd9202d0ee82c25b80fc",
+        "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/35575f11772dba871b079b0b7f6a8c7ac32e2f30/prompts/v0.5/research/v0.5.5_H42_STRATEGY_DISCOVERY_HYBRID_CAPABLE_FEASIBILITY_R1.md"
+      },
+      {
+        "classification": "IMMUTABLE_DESIGN_PROPOSAL_CONDITIONALLY_ACCEPTED",
+        "git_blob": "fb701b0be825f85801377f86eb80ba4f766ebaed",
+        "path": "docs/strategy_research/g2_r3/METHOD_DESIGN.md",
+        "read_scope": "DOCUMENT_OR_DESIGN_METADATA_ONLY",
+        "ref": "e5b2006a89441f7eb2ec900e508aff451106b87a",
+        "sha256": "14378dde7668291dc87aef91e3e55fadddad3a444d1d49284efa2c3cbcba9a77",
+        "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/e5b2006a89441f7eb2ec900e508aff451106b87a/docs/strategy_research/g2_r3/METHOD_DESIGN.md"
+      },
+      {
+        "classification": "IMMUTABLE_PROPOSED_NOT_EFFECTIVE_ROSTER",
+        "git_blob": "d337542f6482938c37eb6b4e43255cdf4d09751a",
+        "path": "evidence/v0.6/b_line/g2_r3_design/CANDIDATE_REGISTER_PROPOSAL.json",
+        "read_scope": "DOCUMENT_OR_DESIGN_METADATA_ONLY",
+        "ref": "e5b2006a89441f7eb2ec900e508aff451106b87a",
+        "sha256": "d0f89bddfaec0e57c959cec043969059da10fec8aa45f81669dde8b80ea35a9b",
+        "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/e5b2006a89441f7eb2ec900e508aff451106b87a/evidence/v0.6/b_line/g2_r3_design/CANDIDATE_REGISTER_PROPOSAL.json"
+      },
+      {
+        "classification": "ACCEPTED_METHOD_DESIGN_WITH_PENDING_FUTILITY_PROPOSAL",
+        "git_blob": "a8ba636ec863a5ef410dd749aefa87c2ef31ed35",
+        "path": "docs/strategy_research/g2_r3/method_repair/R1_1_FUNDING_COST_AND_SUPPORT.md",
+        "read_scope": "DOCUMENT_OR_DESIGN_METADATA_ONLY",
+        "ref": "cf2d5cc33774cdcff7d709636305bba830e977ef",
+        "sha256": "f64520650a00e6784da94c4687caa8809430895fa268b56600ed7b47aad71415",
+        "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/cf2d5cc33774cdcff7d709636305bba830e977ef/docs/strategy_research/g2_r3/method_repair/R1_1_FUNDING_COST_AND_SUPPORT.md"
+      },
+      {
+        "classification": "ACCEPTED_DESIGN_ONLY_CLOCK_ACCOUNTING",
+        "git_blob": "7def37d7c8aad02dd0c2769882fad61622e262db",
+        "path": "docs/strategy_research/g2_r3/method_repair/METHOD_R1_1_PIT_COST_ACCOUNTING.md",
+        "read_scope": "DOCUMENT_OR_DESIGN_METADATA_ONLY",
+        "ref": "cf2d5cc33774cdcff7d709636305bba830e977ef",
+        "sha256": "a2943c9a541d93eaceb62a664edf0d03f0c9bbab6f4c4f73752831bcf14eb026",
+        "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/cf2d5cc33774cdcff7d709636305bba830e977ef/docs/strategy_research/g2_r3/method_repair/METHOD_R1_1_PIT_COST_ACCOUNTING.md"
+      },
+      {
+        "classification": "PRIOR_NON_EFFECTIVE_PROSPECTIVE_DRAFT",
+        "git_blob": "0192d6bb95e643cf16ecab72692104c1823b48c9",
+        "path": "docs/strategy_research/g2_r3/science_gate/SCIENCE_ECONOMICS_AND_POWER_GATES.md",
+        "read_scope": "DOCUMENT_OR_DESIGN_METADATA_ONLY",
+        "ref": "fc89f05014b61c51a55141cb419948f4eee9d8f3",
+        "sha256": "42caef42072cb8d38531a91eeb73824547cf19cdaeb2ddaf50b03acd2da9a308",
+        "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/fc89f05014b61c51a55141cb419948f4eee9d8f3/docs/strategy_research/g2_r3/science_gate/SCIENCE_ECONOMICS_AND_POWER_GATES.md"
+      },
+      {
+        "classification": "PRIOR_NON_EFFECTIVE_PREREG_DRAFT",
+        "git_blob": "226389946ab75873173b81b4956af65637a5f2b9",
+        "path": "docs/strategy_research/g2_r3/science_gate/R3_EIGHT_CANDIDATE_PREREG_DRAFT.md",
+        "read_scope": "DOCUMENT_OR_DESIGN_METADATA_ONLY",
+        "ref": "fc89f05014b61c51a55141cb419948f4eee9d8f3",
+        "sha256": "3f802ed407e264078f0afd7eea6530baf6aef73be4afe03c203aed1544880952",
+        "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/fc89f05014b61c51a55141cb419948f4eee9d8f3/docs/strategy_research/g2_r3/science_gate/R3_EIGHT_CANDIDATE_PREREG_DRAFT.md"
+      },
+      {
+        "classification": "PRIOR_SOURCE_EXPOSURE_DRAFT_MATRIX",
+        "git_blob": "17cd02d664c0c213de9f8c4675139699c96678b6",
+        "path": "evidence/v0.6/b_line/g2_r3_science_gate/SCIENCE_GATE_MATRIX.json",
+        "read_scope": "DOCUMENT_OR_DESIGN_METADATA_ONLY",
+        "ref": "fc89f05014b61c51a55141cb419948f4eee9d8f3",
+        "sha256": "bf6da56ccb7d79cdcaba83a5049e10a70e1f29f13a12cf311e2c7837c669f784",
+        "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/fc89f05014b61c51a55141cb419948f4eee9d8f3/evidence/v0.6/b_line/g2_r3_science_gate/SCIENCE_GATE_MATRIX.json"
+      },
+      {
+        "classification": "PRIOR_SCOPED_PUBLIC_RECEIPT_NOT_NEW_VALIDATION",
+        "git_blob": "d8afa7e6f22bcaed4eb292293d2cbf0213ddbec1",
+        "path": "evidence/v0.6/b_line/g2_r3_science_gate/SCIENCE_GATE_RECEIPT.json",
+        "read_scope": "PUBLIC_RECEIPT_DOCUMENT_ONLY",
+        "ref": "fc89f05014b61c51a55141cb419948f4eee9d8f3",
+        "sha256": "95346e639986dd292a8a49cb49c368f91baec19de4ff9c746670d5e225bd09fb",
+        "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/fc89f05014b61c51a55141cb419948f4eee9d8f3/evidence/v0.6/b_line/g2_r3_science_gate/SCIENCE_GATE_RECEIPT.json"
+      }
+    ],
+    "excluded_categories": [
+      "RAW_PRICE_MARK_FUNDING_ORDERBOOK_OI_TRADE_ROWS",
+      "A_LINE_SEALED_OUTCOMES_H41_WF1_VALIDATION",
+      "2026_BTC_FINAL_HOLDOUT",
+      "H42_UNACCEPTED_FINDINGS",
+      "P1_P2_CODE_TESTS_DATA_BODIES"
+    ],
+    "protected_or_unknown_bodies_read": [],
+    "source_existence_validation": "All listed exact ref/path Git objects exist; SHA256 and Git blobs verified. No new exchange requests. GitHub Prompt bytes independently matched exact Git object."
+  },
+  "safety_state": {
+    "AUTONOMOUS_LIVE": "FORBIDDEN",
+    "G4_TESTNET": "NOT_AUTHORIZED",
+    "P1": "IN_PROGRESS",
+    "P2": "LOCAL_ROOT_UNKNOWN",
+    "P3_PREREG_EFFECTIVE": "NONE",
+    "P4_EMPIRICAL_BODY_AUTHORITY": "NONE",
+    "REAL_FUNDS_WRITE_AUTHORITY": "NONE"
+  },
+  "sanity_validation": {
+    "JSON_deterministic": "PASS",
+    "business_tests": 0,
+    "exact_candidates": 8,
+    "files": 3,
+    "hermetic_arithmetic": "PASS",
+    "market_bodies": 0,
+    "path_allowlist": "PASS",
+    "protected_reads": 0,
+    "source_and_artifact_links": 19,
+    "source_objects": 17,
+    "status": "PASS"
+  },
+  "schema_version": "V06_G2_R3_SCIENTIFIC_STRATEGY_REVIEW_R1",
+  "startup_verification": {
+    "controller_exact_object_verified": true,
+    "own_worktree_initial_status": "CLEAN",
+    "own_worktree_initially_unoccupied": true,
+    "p1_p2_worktree_files_edited": 0,
+    "prompt_git_bytes_match_http": true,
+    "remote_branch_first_use_exact_match": true,
+    "remote_branch_first_use_sha": "7da2b9e65848c3c547d940ded60a57f71314c64f"
+  },
+  "task_id": "V06_G2_R3_SCIENTIFIC_STRATEGY_REVIEW_SOL_HIGH_R1",
+  "terminal_verdict": {
+    "astra_necessary_now": false,
+    "authority_effect": "NONE_P3_AND_P4_REMAIN_UNAUTHORIZED",
+    "claim_scope": "P3 science design is sufficient for ONE conditional proxy DEVELOPMENT_DIAGNOSTIC of unchanged eight, subject to listed Controller freeze and independent P1/P2 gates; no empirical Alpha or formal economic/no-edge certification.",
+    "empirical_evidence": "INSUFFICIENT_EVIDENCE_NO_R3_OUTCOMES_ACCESSED",
+    "recommendation": "A_CURRENT_8_UNCHANGED_ONE_BOUNDED_DEVELOPMENT_DIAGNOSTIC",
+    "source_grade": "DESIGN_ONLY_PUBLIC_PINNED_METHODS_AND_ACCEPTED_AGGREGATES; FUTURE_A_AT_MOST_PROXY_DIAGNOSTIC_ONLY",
+    "stop_condition": "If the single approved finite budget cannot close P1/P2, safe selected data/true-mark integrity/rights, or produce usable diagnostic information, STOP this route; after its terminal sparse/all-WAIT/unfavorable result do not extend or repair from outcomes. Any later C requires a new Controller design decision.",
+    "value": "SCIENCE_READY"
+  },
+  "three_route_comparison": [
+    {
+      "P3_date_risk": "Earliest qualitative path; contingent on P1/P2 completion, no calendar-date promise.",
+      "engineering_source_cost": "Lowest incremental cost if selected local inputs/P1 reusable; inherited proposed <=3 engineer-days/8 CPU-hours/1GB/250 HTTP total requires preflight and Controller approval.",
+      "expected_information_value": "Moderate for a finite spend/retire decision; low for +5bp identification or Alpha.",
+      "fallback_trigger": "Single fixed-budget attempt cannot meet integrity/admission or ends sparse/all WAIT/unfavorable: stop this campaign, preserve statuses; consider separate C design only after Controller decision.",
+      "hypothesis_diversity": "Two unverified price-continuation/confirmation mechanisms; mirrored sides and different holds.",
+      "market_body_permissions_required": "NEW exact first-pushed prereg SHA verified, then separate capability for only admitted March warmups/April scoring in 2021/2023/2025 and approved universe; NONE now.",
+      "name": "CURRENT_8_UNCHANGED",
+      "optional_stopping_risk": "One terminal analysis; no outcome-guided extension, replacements or cost switches.",
+      "real_cost_identifiability": "Proxy-only initially; freeze event/endpoint scenario and mark path. No positive shortlist or actual-cost NO_GO.",
+      "reused_or_new_authority": "Original 8 and accepted R1.1 clocks/cost/risk; P1/P2 independent acceptance; Controller must accept older window/universe and diagnostic statistics/cost caveats. Prior draft is not effective.",
+      "route": "A",
+      "statistical_power_caveat": "100/fold needs 3.448 filled events/day in expectation; 12 nominal weeks is not +5bp power. BTC-only violates unchanged 60% concentration positive gate."
+    },
+    {
+      "P3_date_risk": "Medium extra design/statistical latency; no automatic improvement.",
+      "engineering_source_cost": "Medium; exact missingness/equality/clock/root/control and synthetic adequacy contracts required.",
+      "expected_information_value": "Uncertain: a stronger conditional thesis may lose more power through filtering.",
+      "fallback_trigger": "No outcome-blind distinct mechanism/support justification: do not commission B or expand its roster.",
+      "hypothesis_diversity": "Low to moderate; WAIT or event merging may just relabel existing continuation.",
+      "market_body_permissions_required": "Separate design/roster/root, P3 prereg and body capability; no current or exposed R2 subgroup replay.",
+      "name": "LIMITED_PROSPECTIVE_DESIGN_CHANGE",
+      "optional_stopping_risk": "High if refinements follow replay results; firewall and discarded-choice ledger required.",
+      "real_cost_identifiability": "Same unresolved execution/funding evidence unless a separately evidenced execution contract changes it.",
+      "reused_or_new_authority": "Old 8 unchanged historical roster. New authority for at most two explicitly enumerated refinements: one complete causal WAIT gate and one trigger-level horizon de-aliasing rule. Neither is specified/authorized for execution here.",
+      "route": "B",
+      "statistical_power_caveat": "N_new approximately N_old times retained fraction; deduplicating names is not an independent-event gain. No numerical gates chosen from R2."
+    },
+    {
+      "P3_date_risk": "Highest source/design risk; derivatives OI/funding/basis depth/revisions remain unverified.",
+      "engineering_source_cost": "High; new adapters/canonicalization/universe/holdout contracts. No unsupported day/week estimate.",
+      "expected_information_value": "Potentially higher mechanism diversity; uncertain effective information rate and more expensive source closure.",
+      "fallback_trigger": "Source/PIT or distinctness cannot close in finite design budget: stop that root, no endpoint proliferation.",
+      "hypothesis_diversity": "Higher if relative momentum/reversal or positioning/basis mechanism has explicit payer, two-leg inventory/hedging and distinct event functional.",
+      "market_body_permissions_required": "Entirely new root/IDs, independent source and sealed time/asset/venue holdout authority, own prereg and explicit bodies; no H41/H42 protected access or probes.",
+      "name": "NEW_MECHANISM_FAMILY",
+      "optional_stopping_risk": "High from family/universe/venue selection; count all considered alternatives before freeze.",
+      "real_cost_identifiability": "New fee/financing, synchronized receipts, mark/index/OI revision and cross-venue fill constraints; apparent basis is not net executable arbitrage.",
+      "reused_or_new_authority": "Reuse public PIT/provenance/exposure/common-clock principles only. H42 remit is architecture context, no accepted H42 findings or R3 source grant.",
+      "route": "C",
+      "statistical_power_caveat": "Many asset/venue rows still share crypto factor, arbitrage flow and calendar shocks. Require common-time inference and prospective exposure-sealed replication."
+    }
+  ],
+  "verbatim_common_definitions_and_execution": {
+    "definitions": "Common definitions: closed epoch-UTC 1m bars form 1h and 4h bars; missing minutes invalidate bars. ATR20 is the arithmetic mean of 20 hourly true ranges using prior closes. EMA20/EMA50 on 4h closes use SMA seeds then alpha 2/(N+1); require at least 60 completed 4h bars. ER12 is absolute 12-bar close displacement divided by sum of absolute consecutive displacements, with zero denominator ineligible. Direction sign d is +1 LONG, -1 SHORT. Thresholds below are design constants, not fitted to R2 returns; approval may amend them only before the later outcome campaign freeze.",
+    "execution": "For both families: hourly decision at exclusive hour end+60s assumed availability; earliest fill at following minute open (hour end+120s). At decision ATR20/close must be 30–250bps. At fill, signed gap from decision close >0.25 ATR20 or an invalid stop vetoes entry; adverse and favorable gaps use the same absolute-gap veto. Risk distance at actual modeled entry must be 30–250bps. Fixed stop is not moved to pass economics. Target is entry+d×2×initial risk distance; maximum hold is exactly 4h or12h from fill. Stop/target/time exit, no trailing, partial TP, averaging down or new position within an open same-symbol position. If a1m bar touches both stop and target, SL resolves first. An open beyond the adverse stop executes at that worse open; an ordinary stop executes at stop, then adverse friction. Target executes at its fixed price even if the open gaps favorably beyond it, with taker friction and no gap overcredit. Time exit uses the first minute open at/after entry+maxhold; stop at that open takes precedence. All exits use adverse tick rounding and friction exactly once; no same-bar hindsight fill. After exit, four-hour cooldown; structural family additionally needs a newer completed 4h bar than its preceding entry. Retest event identity is symbol/direction/breakout-hour; at most one entry per event per variant, even after cooldown. Gap-veto/no-fill never retries the event. Every WAIT/veto/overlap is retained.",
+    "sha256": "f271a1ed586e0763638aadf416de08b42e7ad805303b99bcab3836d6a46ff78e"
+  },
+  "zero_access_counters": {
+    "astra_invocations": 0,
+    "business_or_python_tests": 0,
+    "exchange_private_calls": 0,
+    "live_writes": 0,
+    "new_empirical_price_reads": 0,
+    "new_exchange_empirical_endpoint_requests": 0,
+    "new_market_mark_funding_oi_trade_body_reads": 0,
+    "p1_p2_reaudits": 0,
+    "parameter_sweeps": 0,
+    "protected_reads": 0,
+    "r3_backtests": 0
+  }
+}
