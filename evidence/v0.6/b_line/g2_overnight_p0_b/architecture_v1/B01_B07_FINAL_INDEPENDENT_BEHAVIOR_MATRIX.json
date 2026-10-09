@@ -1,0 +1,276 @@
+{
+  "schema_version": "1.0",
+  "task_id": "V06_G2_R3_P1_ARCH_V1_B_FINAL_INDEPENDENT_SEMANTIC_AUDIT_R1",
+  "auditor_role": "GEMINI_B_INDEPENDENT_VERIFIER",
+  "controller_dispatch_sha": "5f9b7f75215b394ad86d49b468e7acd9a89c23a2",
+  "pinned_prompt_sha": "f2ff646bb317c7a7cb4de8bf6515e1d3cbe9e5f0",
+  "a_target_sha": "b5d34aacd36dc27454944a22436db555c3f6eeb8",
+  "a_parent_r2_reaudit_verdict_sha": "398e6bab0cdedf07a93827019ca4bf1bf913c7f9",
+  "a_r2_patch_sha": "2c60b0653d3619eedf457753511a9ecc84c1cd5b",
+  "b_start_sha": "068a4005f68b5ee4a970063cb1f3bc524a08784a",
+  "b_r1_baseline_sha": "f1ec703b7c7276582f324ac25b9d1000f1b5ef14",
+  "frozen_design_sha": "e5b2006a89441f7eb2ec900e508aff451106b87a",
+  "method_addendum_sha": "cf2d5cc33774cdcff7d709636305bba830e977ef",
+  "code_baseline_sha": "cd907b09d4d2ebfdcf6eb0fc5ca1bd62ce2bc8aa",
+  "terminal_verdict": "ARCH_V1_B_SEMANTIC_BLOCKED_REPLAN_ALTERNATIVE_ENGINE",
+  "summary_counts": {
+    "total_items": 7,
+    "positive_case_passed_count": 7,
+    "adversarial_case_passed_count": 1,
+    "final_passed_items": [
+      "B04"
+    ],
+    "final_blocked_items": [
+      "B01",
+      "B02",
+      "B03",
+      "B05",
+      "B06",
+      "B07"
+    ]
+  },
+  "items": {
+    "B01": {
+      "item_id": "B01",
+      "title": "Mark Bar As-Of Visibility, Monotonicity, Duplicate Conflict & Stage 8 MTM Audit",
+      "r2_2c60b065_status": "FAIL",
+      "arch_v1_b5d34aac_role_a_claimed_status": "PASS",
+      "arch_v1_b5d34aac_positive_case_status": "PASS",
+      "arch_v1_b5d34aac_adversarial_case_status": "BLOCKED",
+      "arch_v1_b5d34aac_final_status": "BLOCKED",
+      "positive_verification": {
+        "scenario": "Delayed stale mark M_stale(close_ms=S, avail=S+120s, close=49000) arriving after fresher mark M_fresh(close_ms=S+60s, avail=S+90s, close=51000)",
+        "mark_price_after_stale_arrival": "51000",
+        "expected_mark_price": "51000",
+        "passed": true
+      },
+      "adversarial_verification": {
+        "b01_d1_same_close_conflict_and_late_overwrite": {
+          "virtual_book_order_ab_mark": "52000",
+          "virtual_book_order_ba_mark": "50000",
+          "replay_engine_order_ab_mark": "50000",
+          "replay_engine_order_ba_mark": "52000",
+          "late_same_close_overwritten_mark_at_s_plus_60s": "48000",
+          "defect_summary": "Conflicting duplicate marks with identical close_ms=S (50000 vs 52000) do not fail closed; ReplayEngine picks the first (50000) via strict `>` while VirtualBook picks the last (52000) via `>=`, and a late duplicate with the same close_ms=S (avail=S+60s, close=48000) overwrites the settled mark at S+60s because best_eligible.close_ms >= prev_seen.close_ms (S >= S)."
+        },
+        "b01_d2_stage8_future_mark_leak_and_mtm_reset": {
+          "stage1_pit_safe_mark_ingested": false,
+          "stage8_economic_equity_from_unclosed_future_bar": "1100.000000000000",
+          "stage8_economic_equity_when_current_marks_empty": "1000.000000000000",
+          "expected_pit_safe_economic_equity_from_last_available_mark": "1010",
+          "defect_summary": "Stage 8 (_stage_8_ex_post_report, ledger.py:L943-L944) reads marks_1m.get(sym) without checking close_ms <= open_time_ms or available_at_ms <= open_time_ms, leaking future mark closes (60000 -> equity 1100) into economic_equity, and resets mark_price to effective_entry (50000 -> equity 1000) instead of last_available_marks (51000 -> equity 1010) when current_marks is empty."
+        }
+      },
+      "code_citations": [
+        "src/btc_quant_agent/strategy_research/r3_overnight/replay_engine.py:L95",
+        "src/btc_quant_agent/strategy_research/r3_overnight/replay_engine.py:L118-L126",
+        "src/btc_quant_agent/strategy_research/r3_overnight/ledger.py:L320-L331",
+        "src/btc_quant_agent/strategy_research/r3_overnight/ledger.py:L943-L947"
+      ]
+    },
+    "B02": {
+      "item_id": "B02",
+      "title": "ACK Idempotency, Contradictory Payload Rejection & Out-of-Order Late ACK Integrity",
+      "r2_2c60b065_status": "FAIL",
+      "arch_v1_b5d34aac_role_a_claimed_status": "PASS",
+      "arch_v1_b5d34aac_positive_case_status": "PASS",
+      "arch_v1_b5d34aac_adversarial_case_status": "BLOCKED",
+      "arch_v1_b5d34aac_final_status": "BLOCKED",
+      "positive_verification": {
+        "cash_after_3x_identical_fill_ack": "999.700000000000",
+        "cash_after_2x_identical_exit_ack": "1000.400000000000",
+        "cash_after_3x_identical_funding_ack": "1000.350000000000",
+        "passed": true
+      },
+      "adversarial_verification": {
+        "b02_d1_contradictory_reused_ack_id_silently_ignored": {
+          "exception_raised_on_contradictory_payload": false,
+          "defect_summary": "Stage 1 tracks only set[str] IDs (acknowledged_fill_ids, acknowledged_exit_ids, acknowledged_funding_ids) at ledger.py:L336,L366,L400. Reusing fill_id/trade_id/event_id with mutated quantity, price, fee, or funding debit is silently ignored instead of failing closed."
+        },
+        "b02_d2_late_exit_ack_rewinds_cooldown_until_ms": {
+          "cooldown_after_p2_prompt_ack_ms": 1700017140000,
+          "cooldown_after_p1_late_ack_ms": 1700010000000,
+          "cooldown_rewound_by_ms": 7140000,
+          "defect_summary": "Stage 1 (ledger.py:L395-L396) unconditionally sets cooldown_until_ms[sym] = ceil(trade.exit_time_ms) + 4h without max(existing, new). A late exit ACK from an earlier trade P1 overwrites a newer trade P2's active cooldown backwards by 2 hours."
+        },
+        "b02_d3_fill_id_vs_position_id_premature_auto_ack": {
+          "delayed_fill_ack_available_at_ms": 1700002920000,
+          "position_acknowledged_at_s": true,
+          "cost_commitment_o_at_s": "0.00",
+          "defect_summary": "Stage 1 (ledger.py:L351-L360) checks `not any(f.fill_id == pos.position_id ...)` and prematurely auto-acknowledges the position at entry_available_at_ms whenever VirtualFill.fill_id != pos.position_id, releasing unacked_entry_commitment_usdt before the delayed fill ACK arrives."
+        }
+      },
+      "code_citations": [
+        "src/btc_quant_agent/strategy_research/r3_overnight/ledger.py:L336-L360",
+        "src/btc_quant_agent/strategy_research/r3_overnight/ledger.py:L366-L407"
+      ]
+    },
+    "B03": {
+      "item_id": "B03",
+      "title": "Funding Tolerance Window [S-15000, S+15000], Ownership Attribution & Reserve Retention",
+      "r2_2c60b065_status": "FAIL",
+      "arch_v1_b5d34aac_role_a_claimed_status": "PASS",
+      "arch_v1_b5d34aac_positive_case_status": "PASS",
+      "arch_v1_b5d34aac_adversarial_case_status": "BLOCKED",
+      "arch_v1_b5d34aac_final_status": "BLOCKED",
+      "positive_verification": {
+        "pre_s_exit_at_s_minus_1_funding_cost_usdt": "0.200000",
+        "expected_funding_cost_usdt": "0.200000",
+        "passed": true
+      },
+      "adversarial_verification": {
+        "b03_d1_premature_reserve_release_before_funding_ack": {
+          "funding_reserve_rf_at_s_plus_60k": "0.00",
+          "cash_at_s_plus_60k": "1000.000000000000",
+          "available_capital_at_s_plus_60k": "945.00000000000000",
+          "unpaid_pending_funding_debit_usdt": "1.000000",
+          "defect_summary": "Violates METHOD_R1_1_PIT_COST_ACCOUNTING.md ('past unresolved funding ownership retains its reserve until FUNDING_ACK'). Stage 7 at S immediately decrements funding_reserve_rf to 0.0 while the 1.00 USDT funding debit sits in pending_funding_acks until S+120s, leaving unpaid funding completely unreserved and un-deducted at S+60s (available capital 945.00 instead of 944.00)."
+        },
+        "b03_d2_pre_s_exit_ack_before_s_releases_reserve_early": {
+          "exit_time_ms": 1700002790000,
+          "exit_ack_processed_at_ms": 1700002795000,
+          "funding_reserve_rf_before_s": "0.00",
+          "unsettled_exit_trades_count": 0,
+          "defect_summary": "Stage 1 (ledger.py:L385-L393) only defers reserve release into _unsettled_exit_trades if `open_time_ms == target_s`. When an exit inside [S-15000, S) has its exit ACK processed before S, 100% of rem_funding is released before S occurs."
+        },
+        "b03_d3_substring_collision_pos1_in_pos10": {
+          "trade_pos10_charged_usdt": "0.200000",
+          "trade_pos1_charged_usdt": "0",
+          "defect_summary": "Stage 7 (ledger.py:L889,L914) uses `interval.position_id in trade.trade_id` as a fallback, causing `POS_1` to match `TRD_POS_10_OLD` instead of `TRD_POS_1_ACTUAL`."
+        }
+      },
+      "code_citations": [
+        "src/btc_quant_agent/strategy_research/r3_overnight/ledger.py:L384-L394",
+        "src/btc_quant_agent/strategy_research/r3_overnight/ledger.py:L848-L926"
+      ]
+    },
+    "B04": {
+      "item_id": "B04",
+      "title": "Exit Semantics: SL-First Tie-Break, Gap Open Execution, Minute-End Timestamp & Expiry",
+      "r2_2c60b065_status": "FAIL",
+      "arch_v1_b5d34aac_role_a_claimed_status": "PASS",
+      "arch_v1_b5d34aac_positive_case_status": "PASS",
+      "arch_v1_b5d34aac_adversarial_case_status": "PASS",
+      "arch_v1_b5d34aac_final_status": "PASS",
+      "positive_verification": {
+        "sl_tp_collision_reason": "STOP_LOSS",
+        "sl_tp_collision_exit_time_ms": 1700002859999,
+        "sl_tp_collision_holding_minutes_floor": 1,
+        "cooldown_until_ms": 1700017260000,
+        "adverse_gap_sl_raw_exit_price": "48000",
+        "favorable_gap_tp_raw_exit_price": "51000",
+        "passed": true
+      },
+      "adversarial_verification": {
+        "summary": "Intraminute SL+TP collision deterministically resolves STOP_LOSS first, adverse stop gap uses bar.open (48000), favorable TP gap is capped at target (51000), minute-end close is open_time_ms + 59999, holding_minutes >= 1 floor holds, and 4h cooldown anchors to ceil_to_minute(exit_time_ms) + 4h."
+      },
+      "code_citations": [
+        "src/btc_quant_agent/strategy_research/r3_overnight/ledger.py:L469-L598",
+        "src/btc_quant_agent/strategy_research/r3_overnight/ledger.py:L679-L839"
+      ]
+    },
+    "B05": {
+      "item_id": "B05",
+      "title": "Unacknowledged Fill/Exit Exposure, Conservative Risk Equity & Available Capital",
+      "r2_2c60b065_status": "FAIL",
+      "arch_v1_b5d34aac_role_a_claimed_status": "PASS",
+      "arch_v1_b5d34aac_positive_case_status": "PASS",
+      "arch_v1_b5d34aac_adversarial_case_status": "BLOCKED",
+      "arch_v1_b5d34aac_final_status": "BLOCKED",
+      "positive_verification": {
+        "open_unacked_position_loss_trips_kill": true,
+        "passed": true
+      },
+      "adversarial_verification": {
+        "b05_d1_pending_exit_ack_loss_invisible_to_stage2_kill_and_capital": {
+          "pending_exit_gross_pnl_usdt": "-157.4250",
+          "pending_exit_net_pnl_usdt": "-169.33654500",
+          "killed_at_s_plus_60k": false,
+          "decision_equity_at_s_plus_60k": "992.496250000000",
+          "available_capital_at_s_plus_60k": "933.77690000000000",
+          "defect_summary": "When a position closes in Stage 4/6 with a -$157.425 loss (>= $100 kill threshold), `del self.positions[sym]` removes it from `self.positions` while the -$157.425 debit waits in `pending_exit_acks`. In Stage 2 (`ledger.py:L423-L455`), only `self.positions.values()` is inspected (`pending_exit_acks` is completely ignored). Once the entry fill ACK releases `unacked_entry_commitment_usdt`, `risk_equity` rebounds to ~992.50 USDT, `killed` stays False, and `compute_available_capital()` reports ~933.78 USDT of phantom capital despite a crystallized -$169.34 loss!"
+        },
+        "b05_d2_compute_available_capital_ignores_unacked_unrealized_loss": {
+          "unacked_unrealized_loss_usdt": "-90.3018",
+          "decision_equity_usdt": "999.799900000000",
+          "reported_available_capital_usdt": "443.01000500000000",
+          "defect_summary": "`compute_available_capital()` (`ledger.py:L135`) uses `0.95 * self.decision_equity` (~999.80) instead of `0.95 * risk_equity` (~909.50), ignoring unacknowledged unrealized losses < $100 and unpaid fees/funding in `pending_fill_acks` / `pending_funding_acks`."
+        }
+      },
+      "code_citations": [
+        "src/btc_quant_agent/strategy_research/r3_overnight/ledger.py:L134-L140",
+        "src/btc_quant_agent/strategy_research/r3_overnight/ledger.py:L423-L455",
+        "src/btc_quant_agent/strategy_research/r3_overnight/ledger.py:L551-L558"
+      ]
+    },
+    "B06": {
+      "item_id": "B06",
+      "title": "Signal State Machine Progression, Skipped-Bar History Scan & 12h Geometry Gate",
+      "r2_2c60b065_status": "FAIL",
+      "arch_v1_b5d34aac_role_a_claimed_status": "PASS",
+      "arch_v1_b5d34aac_positive_case_status": "PASS",
+      "arch_v1_b5d34aac_adversarial_case_status": "BLOCKED",
+      "arch_v1_b5d34aac_final_status": "BLOCKED",
+      "positive_verification": {
+        "stale_5th_hour_signal_after_4h_cooldown": null,
+        "passed": true
+      },
+      "adversarial_verification": {
+        "b06_d1_skipped_intermediate_hour_drops_cancellation_and_low": {
+          "intermediate_bar_26_close": "46000",
+          "intermediate_bar_26_low": "45500",
+          "breakout_level": "47400",
+          "signal_emitted_at_bar_27_despite_bar_26_crash": "RETEST_CLOSED_RETEST_LONG_04H_BTCUSDT_LONG_1700093600000",
+          "proposed_stop_ignoring_bar_26_low": "47418.75",
+          "defect_summary": "`_advance_active_breakout` (`signals.py:L62-L96`) computes `hours_elapsed` from timestamps (`round((current_1h.close_ms - last_advanced_hour_ms) / 3_600_000)`), but only checks `current_1h` (`bars_1h[-1]`) for cancellation and `lowest_low` instead of iterating through all unadvanced bars in `bars_1h`. Any skipped hour call drops intermediate crashes (46000) and lows (45500), emitting a false signal!"
+        },
+        "b06_d2_same_bar_cancel_and_rebreakout_fallthrough": {
+          "same_bar_rebreakout_registered_on_hour_3": true,
+          "defect_summary": "In `signals.py:L88-L96,L377-L382`, when an active breakout cancels on hour 1, 2, or 3, execution falls through on the same 1h bar to register a brand-new 24h breakout (`bars_since_breakout = 0`), a dual-role bar transition not authorized by `METHOD_DESIGN.md`."
+        }
+      },
+      "code_citations": [
+        "src/btc_quant_agent/strategy_research/r3_overnight/signals.py:L62-L96",
+        "src/btc_quant_agent/strategy_research/r3_overnight/signals.py:L361-L398"
+      ]
+    },
+    "B07": {
+      "item_id": "B07",
+      "title": "Per-Position Funding Reserve Cap, Shortfall Liability & Cross-Stage Conservation",
+      "r2_2c60b065_status": "FAIL",
+      "arch_v1_b5d34aac_role_a_claimed_status": "PASS",
+      "arch_v1_b5d34aac_positive_case_status": "PASS",
+      "arch_v1_b5d34aac_adversarial_case_status": "BLOCKED",
+      "arch_v1_b5d34aac_final_status": "BLOCKED",
+      "positive_verification": {
+        "eth_witness_reserve_at_s_usdt": "2.00",
+        "btc_owner_reserve_at_s_usdt": "0.00",
+        "book_total_funding_reserve_at_s_usdt": "2.00",
+        "passed": true
+      },
+      "adversarial_verification": {
+        "b07_d1_unreserved_shortfall_and_released_reserve_before_funding_ack": {
+          "owner_initial_reserve_usdt": "0.40",
+          "actual_settlement_debit_usdt": "1.000000",
+          "shortfall_usdt": "0.600000",
+          "cash_before_funding_ack_usdt": "1000.000000000000",
+          "decision_equity_before_funding_ack_usdt": "1000.000000000000",
+          "book_funding_reserve_rf_before_funding_ack_usdt": "2.00",
+          "available_capital_before_funding_ack_usdt": "941.00000000000000",
+          "conservative_available_capital_if_unpaid_debit_held_usdt": "940.00",
+          "defect_summary": "At S, Stage 7 releases POS_BTC's 0.40 USDT reserve from `funding_reserve_rf` and records no shortfall liability for the remaining 0.60 USDT, while the 1.00 USDT cash debit sits in `pending_funding_acks`. Between S and `f_rec.available_at_ms`, neither the 0.40 reserve nor the 0.60 shortfall is deducted from `compute_available_capital()` (reporting 941.00 instead of 940.00)."
+        },
+        "b07_d2_stage2_stage3_conservation_equation_mismatch_at_s": {
+          "book_funding_reserve_rf_during_stage2_at_s": "0.50",
+          "sum_open_pos_plus_pending_exit_acks_during_stage2_at_s": "0",
+          "hidden_in_unsettled_exit_trades_usdt": "0.50",
+          "defect_summary": "Role A's claimed conservation invariant `book.funding_reserve_rf == sum(pos.funding_reserves_usdt) + sum(item[3] for item in pending_exit_acks)` fails during Stage 2 and Stage 3 at S because Stage 1 moves `rem_funding` out of `pending_exit_acks` into the private side-list `_unsettled_exit_trades`."
+        }
+      },
+      "code_citations": [
+        "src/btc_quant_agent/strategy_research/r3_overnight/ledger.py:L384-L394",
+        "src/btc_quant_agent/strategy_research/r3_overnight/ledger.py:L882-L911"
+      ]
+    }
+  }
+}

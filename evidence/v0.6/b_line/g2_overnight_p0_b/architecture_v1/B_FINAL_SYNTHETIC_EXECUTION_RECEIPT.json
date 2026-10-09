@@ -1,0 +1,147 @@
+{
+  "schema_version": "1.0",
+  "task_id": "V06_G2_R3_P1_ARCH_V1_B_FINAL_INDEPENDENT_SEMANTIC_AUDIT_R1",
+  "auditor_role": "GEMINI_B_INDEPENDENT_VERIFIER",
+  "controller_dispatch_sha": "5f9b7f75215b394ad86d49b468e7acd9a89c23a2",
+  "pinned_prompt_sha": "f2ff646bb317c7a7cb4de8bf6515e1d3cbe9e5f0",
+  "a_target_sha": "b5d34aacd36dc27454944a22436db555c3f6eeb8",
+  "b_start_sha": "068a4005f68b5ee4a970063cb1f3bc524a08784a",
+  "terminal_verdict": "ARCH_V1_B_SEMANTIC_BLOCKED_REPLAN_ALTERNATIVE_ENGINE",
+  "isolated_runtime_binding": {
+    "extracted_archive_root": "/tmp/g2_r3_p1_arch_v1_b_audit_b5d34aac_a31h4_xr",
+    "module_file_paths": {
+      "types": "/tmp/g2_r3_p1_arch_v1_b_audit_b5d34aac_a31h4_xr/src/btc_quant_agent/strategy_research/r3_overnight/types.py",
+      "signals": "/tmp/g2_r3_p1_arch_v1_b_audit_b5d34aac_a31h4_xr/src/btc_quant_agent/strategy_research/r3_overnight/signals.py",
+      "ledger": "/tmp/g2_r3_p1_arch_v1_b_audit_b5d34aac_a31h4_xr/src/btc_quant_agent/strategy_research/r3_overnight/ledger.py",
+      "replay_engine": "/tmp/g2_r3_p1_arch_v1_b_audit_b5d34aac_a31h4_xr/src/btc_quant_agent/strategy_research/r3_overnight/replay_engine.py"
+    },
+    "verified_isolated_from_role_b_src": true
+  },
+  "git_lineage_and_scope_audit": {
+    "lineage_verified": true,
+    "resolved_a_target_sha": "b5d34aacd36dc27454944a22436db555c3f6eeb8",
+    "a_parent_sha_398e6bab": "398e6bab0cdedf07a93827019ca4bf1bf913c7f9",
+    "a_grandparent_sha_89d0c211": "89d0c211cff96286203e4fb7459a51042c1257f1",
+    "a_great_grandparent_sha_2c60b065": "2c60b0653d3619eedf457753511a9ecc84c1cd5b",
+    "resolved_controller_dispatch_sha": "5f9b7f75215b394ad86d49b468e7acd9a89c23a2",
+    "resolved_pinned_prompt_sha": "f2ff646bb317c7a7cb4de8bf6515e1d3cbe9e5f0",
+    "pinned_prompt_parent_sha": "5f9b7f75215b394ad86d49b468e7acd9a89c23a2",
+    "a_modified_files_since_2c60b065": [
+      "docs/strategy_research/g2_r3/prep_a/architecture_v1/ENGINE_EVENT_LEDGER_DESIGN_AND_HANDOFF.md",
+      "evidence/v0.6/b_line/g2_overnight_p0_a/architecture_v1/ARCHITECTURE_SYNTHETIC_EXECUTION_RECEIPT.json",
+      "evidence/v0.6/b_line/g2_overnight_p0_a/architecture_v1/B01_B07_ARCHITECTURE_BEFORE_AFTER_MATRIX.json",
+      "src/btc_quant_agent/strategy_research/r3_overnight/ledger.py",
+      "src/btc_quant_agent/strategy_research/r3_overnight/replay_engine.py",
+      "src/btc_quant_agent/strategy_research/r3_overnight/signals.py",
+      "src/btc_quant_agent/strategy_research/r3_overnight/types.py",
+      "tests/test_strategy_research_r3_architecture_invariants.py"
+    ],
+    "forbidden_or_protected_files_touched_by_a": [],
+    "a_ci_engineering_hygiene_reference": {
+      "workflow_run_id": "24259930270",
+      "check_run_id": "37918930513",
+      "engineering_ci_conclusion": "SUCCESS",
+      "scope_note": "CI run 24259930270 / check_run 37918930513 proves only engineering hygiene (ruff, compileall, and Role A self-authored pytest suite on happy-path fixtures) and does not constitute Role B semantic or adversarial architecture acceptance."
+    },
+    "a_claimed_receipt_summary": {
+      "target_version": null,
+      "code_baseline_sha": null,
+      "overall_status": null,
+      "claimed_item_statuses": {}
+    }
+  },
+  "synthetic_e2e_audit": {
+    "warmup_hours_verified": 240,
+    "total_simulation_hours": 256,
+    "happy_path_reconciled_with_role_a_receipt": true,
+    "profiles": {
+      "CLOSED_RETEST_LONG_04H_BASE": {
+        "trades_count": 1,
+        "trade_id": "TRD_POS_ORD_CLOSED_RETEST_LONG_04H_BTCUSDT_1700863320000_1700877720000",
+        "position_id": "POS_ORD_CLOSED_RETEST_LONG_04H_BTCUSDT_1700863320000",
+        "quantity": "0.006",
+        "effective_entry": "50030.10",
+        "effective_exit": "49979.90",
+        "total_fees_usdt": "0.360036000",
+        "total_funding_usdt": "0.480048000",
+        "net_pnl_usdt": "-1.141284000",
+        "final_cash_usdt": "998.858716000000",
+        "final_cost_commitment_o": "0E-11",
+        "final_funding_reserve_rf": "0E-11"
+      },
+      "CLOSED_RETEST_LONG_12H_BASE": {
+        "trades_count": 1,
+        "trade_id": "TRD_POS_ORD_CLOSED_RETEST_LONG_12H_BTCUSDT_1700863320000_1700906520000",
+        "position_id": "POS_ORD_CLOSED_RETEST_LONG_12H_BTCUSDT_1700863320000",
+        "quantity": "0.006",
+        "effective_entry": "50030.10",
+        "effective_exit": "49979.90",
+        "total_fees_usdt": "0.360036000",
+        "total_funding_usdt": "1.440144000",
+        "net_pnl_usdt": "-2.101380000",
+        "final_cash_usdt": "997.898620000000",
+        "final_cost_commitment_o": "0E-11",
+        "final_funding_reserve_rf": "0E-11"
+      },
+      "CLOSED_RETEST_LONG_12H_STRESS": {
+        "trades_count": 0,
+        "final_cash_usdt": "1000.000000000000",
+        "retained_as_geometry_ineligible_witness": true
+      }
+    },
+    "candidate_order_permutation_check": {
+      "btc_then_eth_trades": [
+        [
+          "BTCUSDT",
+          "-1.141284000"
+        ]
+      ],
+      "eth_then_btc_trades": [
+        [
+          "BTCUSDT",
+          "-1.141284000"
+        ]
+      ],
+      "btc_then_eth_final_cash": "998.858716000000",
+      "eth_then_btc_final_cash": "998.858716000000",
+      "permutation_invariant": true
+    }
+  },
+  "cross_stage_compound_conservation_audit": {
+    "stage1_to_stage7_settlement_reserve_gap_at_s": {
+      "book_funding_reserve_rf_during_stage2_at_s": "0.50",
+      "sum_open_pos_plus_pending_exit_acks_during_stage2_at_s": "0",
+      "hidden_in_unsettled_exit_trades_usdt": "0.50",
+      "defect_summary": "Role A's claimed conservation invariant `book.funding_reserve_rf == sum(pos.funding_reserves_usdt) + sum(item[3] for item in pending_exit_acks)` fails during Stage 2 and Stage 3 at S because Stage 1 moves `rem_funding` out of `pending_exit_acks` into the private side-list `_unsettled_exit_trades`."
+    },
+    "post_stage7_to_funding_ack_unreserved_liability_gap": {
+      "funding_reserve_rf_at_s_plus_60k": "0.00",
+      "cash_at_s_plus_60k": "1000.000000000000",
+      "available_capital_at_s_plus_60k": "945.00000000000000",
+      "unpaid_pending_funding_debit_usdt": "1.000000",
+      "defect_summary": "Violates METHOD_R1_1_PIT_COST_ACCOUNTING.md ('past unresolved funding ownership retains its reserve until FUNDING_ACK'). Stage 7 at S immediately decrements funding_reserve_rf to 0.0 while the 1.00 USDT funding debit sits in pending_funding_acks until S+120s, leaving unpaid funding completely unreserved and un-deducted at S+60s (available capital 945.00 instead of 944.00)."
+    },
+    "pre_s_exit_early_ack_reserve_release_gap": {
+      "exit_time_ms": 1700002790000,
+      "exit_ack_processed_at_ms": 1700002795000,
+      "funding_reserve_rf_before_s": "0.00",
+      "unsettled_exit_trades_count": 0,
+      "defect_summary": "Stage 1 (ledger.py:L385-L393) only defers reserve release into _unsettled_exit_trades if `open_time_ms == target_s`. When an exit inside [S-15000, S) has its exit ACK processed before S, 100% of rem_funding is released before S occurs."
+    },
+    "unacked_exit_loss_stage2_risk_and_capital_blindspot": {
+      "pending_exit_gross_pnl_usdt": "-157.4250",
+      "pending_exit_net_pnl_usdt": "-169.33654500",
+      "killed_at_s_plus_60k": false,
+      "decision_equity_at_s_plus_60k": "992.496250000000",
+      "available_capital_at_s_plus_60k": "933.77690000000000",
+      "defect_summary": "When a position closes in Stage 4/6 with a -$157.425 loss (>= $100 kill threshold), `del self.positions[sym]` removes it from `self.positions` while the -$157.425 debit waits in `pending_exit_acks`. In Stage 2 (`ledger.py:L423-L455`), only `self.positions.values()` is inspected (`pending_exit_acks` is completely ignored). Once the entry fill ACK releases `unacked_entry_commitment_usdt`, `risk_equity` rebounds to ~992.50 USDT, `killed` stays False, and `compute_available_capital()` reports ~933.78 USDT of phantom capital despite a crystallized -$169.34 loss!"
+    }
+  },
+  "data_hygiene_attestation": {
+    "synthetic_in_memory_only": true,
+    "real_market_data_read": false,
+    "protected_holdout_touched": false,
+    "network_or_live_trading_invoked": false,
+    "role_a_worktree_modified": false
+  }
+}
