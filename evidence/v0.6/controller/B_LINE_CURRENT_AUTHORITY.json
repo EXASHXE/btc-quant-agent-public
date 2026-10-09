@@ -1382,10 +1382,10 @@
     "a_executor_verdict": "R2_SYNTHETIC_REPAIR_READY_FOR_INDEPENDENT_B_REVIEW",
     "ci_run": "https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/37888079460",
     "ci_conclusion": "FAILURE_ONE_INHERITED_H40_GOLDEN_SHA_MISMATCH_2830_PASS_1_FAIL_2_SKIP",
-    "p1_engine_acceptance": "PENDING_B_INDEPENDENT_BEHAVIOR"
+    "p1_engine_acceptance": "REJECTED_BY_B_R2_INDEPENDENT_SEMANTIC_BLOCKERS"
   },
   "v06_g2_r3_p0_b_r2_final_independent_reaudit": {
-    "status": "CONTROLLER_DISPATCHED__AWAITING_GEMINI_B_REMOTE_DELIVERY",
+    "status": "CONTROLLER_L2_TERMINAL_REJECT_P1_ENGINE__ARCHITECTURE_REPLAN_ACCEPTED",
     "task_id": "V06_G2_R3_P0_B_INDEPENDENT_R2_FINAL_BEHAVIOR_REAUDIT",
     "controller_dispatch_sha": "20ad1e442fb7cce58c618c4aac1e2a3b6241f647",
     "controller_adjudication_path": "reviews/v0.6/b_line/V06_G2_R3_P0_A_R2_CONTROLLER_RECEIPT_CI_ADJUDICATION_AND_B_REAUDIT_DISPATCH.md",
@@ -1398,6 +1398,39 @@
     "unrelated_ci_fail": "INHERITED_H40_GOLDEN_RECORDED_NOT_WAIVED",
     "if_semantic_fail": "REPLAN_ENGINE_ARCHITECTURE_NO_AUTOMATIC_R3_R4",
     "empirical_price_body_authority": "NONE",
+    "testnet": "NOT_AUTHORIZED",
+    "real_funds_write_authority": "NONE",
+    "b_final_sha": "068a4005f68b5ee4a970063cb1f3bc524a08784a",
+    "b_terminal_verdict": "R2_B_SEMANTIC_BLOCKED__REPLAN_ENGINE_ARCHITECTURE",
+    "b01_b07_scoped_verdicts": {
+      "B01": "BLOCKED",
+      "B02": "SCOPED_PASS",
+      "B03": "BLOCKED",
+      "B04": "SCOPED_PASS",
+      "B05": "BLOCKED",
+      "B06": "BLOCKED",
+      "B07": "BLOCKED"
+    },
+    "ci_run": "https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/37900503469",
+    "ci_conclusion": "FAILURE_2819_PASS_1_H40_GOLDEN_FAIL_2_SKIP"
+  },
+  "v06_g2_r3_p1_engine_architecture_rebuild_v1": {
+    "status": "CONTROLLER_ADJUDICATED_B_R2_FAILURE__GEMINI_A_ARCH_V1_DISPATCHED_NOT_YET_EXECUTED",
+    "task_id": "V06_G2_R3_P1_ENGINE_ARCHITECTURE_REBUILD_V1",
+    "controller_dispatch_sha": "e5fcd76370a1b03d7d83b825af6a8cac842b1ae5",
+    "controller_adjudication_path": "reviews/v0.6/b_line/V06_G2_R3_B_R2_TERMINAL_CONTROLLER_ADJUDICATION_AND_ENGINE_ARCHITECTURE_REPLAN_R1.md",
+    "prompt_path": "prompts/v0.6/b_line/V06_G2_R3_P1_ENGINE_ARCHITECTURE_REBUILD_V1_GEMINI_A.md",
+    "immutable_prompt_sha": "9398c016b8b7134905eb40f61426f91a2cfb8e43",
+    "branch": "feature/v06-bline-g2-overnight-discovery-a",
+    "expected_start_sha": "2c60b0653d3619eedf457753511a9ecc84c1cd5b",
+    "independent_b_source_sha": "068a4005f68b5ee4a970063cb1f3bc524a08784a",
+    "scope": "ONE_BOUNDED_POSITION_ID_EVENT_CLOCK_RESERVE_LEDGER_ARCHITECTURE_REFACTOR",
+    "next_gate": "ONE_INDEPENDENT_SYNTHETIC_ENGINE_BEHAVIOR_REVIEW",
+    "fail_stop": "ARCH_V1_FAILURE_REPLAN_ALTERNATIVE_ENGINE_NO_R4_R5_PATCH_LOOP",
+    "h40_golden": "REPRODUCIBLE_MISMATCH_NOT_WAIVED",
+    "p1_engine_acceptance": "NO",
+    "empirical_market_body_authority": "NONE",
+    "effective_prereg_sha": "NONE",
     "testnet": "NOT_AUTHORIZED",
     "real_funds_write_authority": "NONE"
   }
