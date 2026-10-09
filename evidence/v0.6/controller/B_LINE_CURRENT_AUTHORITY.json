@@ -1,6 +1,6 @@
 {
   "line": "B_LINE",
-  "stage": "V06_G2_R3_P0_A_REJECTED_8_B_FINDINGS_REPAIR_R1_DISPATCHED__P0_B_ORACLE_ACCEPTED_BLOCKED_COMPARATOR__SOL_DRAFT_ACCEPTED_HOLDOUT_CONFLICT__EMPIRICAL_NONE",
+  "stage": "V06_G2_R3_P0_A_REPAIR_PENDING__B_REAUDIT_PENDING__SOL61_DATA_READINESS_FASTPATH_ACTIVE__EMPIRICAL_DATA_HOLD__NO_TESTNET_LIVE",
   "code_branch": "v0.6",
   "accepted_code_sha": "52c16a28153de307dc6132c0975fe29341a0a918",
   "docs_authority_commit": "6319ddbaddd69d5522696992ec1565169da88e03",
@@ -1288,6 +1288,18 @@
     "historical_market_body_access": false,
     "release_prereg_authority": false,
     "testnet": "NOT_AUTHORIZED",
+    "real_funds_write_authority": "NONE"
+  },
+  "v06_g2_r3_sol61_data_readiness_fastpath": {
+    "status": "ACTIVE_METADATA_ONLY",
+    "dispatch_sha": "06d5c7bf373468a797cabf6ba906dbca29719558",
+    "prompt_path": "prompts/v0.6/b_line/V06_G2_R3_SOL61_DATA_READINESS_FASTPATH_R1.md",
+    "start_base_sha": "e0ff8c3473de4bfa3e66fe7928d42992a4d38a32",
+    "worktree": "~/workspace/project/quant-v0.6/g2-r3-data-readiness-sol61-r1",
+    "branch": "feature/v06-bline-g2-data-readiness-sol61-r1",
+    "zero_market_body_reads_required": true,
+    "old_btc_holdout": "2026-02-01..2026-08-01 PROTECTED/DISPUTED",
+    "price_replay_authority": "NONE",
     "real_funds_write_authority": "NONE"
   }
 }
