@@ -1,0 +1,61 @@
+{
+  "schema_version": "V06_G2_R3_DATA_READINESS_FASTPATH_SOL61_R1_DISPATCH_V1",
+  "task_id": "V06_G2_R3_DATA_READINESS_FASTPATH_SOL61_R1",
+  "decision": "AUTHORIZE_PARALLEL_SOL61_LOCAL_METADATA_AND_PREREG_READINESS_FASTPATH_NO_MARKET_BODIES",
+  "controller_docs_start_sha": "7fc3081020f89d60d405765a9396649431f3cba6",
+  "code_base_sha": "e0ff8c3473de4bfa3e66fe7928d42992a4d38a32",
+  "repo": "EXASHXE/btc-quant-agent-public",
+  "sol_science_source_sha": "fc89f05014b61c51a55141cb419948f4eee9d8f3",
+  "r3_method_sha": "cf2d5cc33774cdcff7d709636305bba830e977ef",
+  "a_p0_head": "3b8befb0112cfe2d314ad65964762a3fb251e710",
+  "b_p0_head": "a0aacd105ac3f3173b15d91c869990748178e222",
+  "a_repair_controller_dispatch_sha": "e94d53c1f98f16d8d3881737564f773bc2584f28",
+  "executor_recommendation": "CODEX_GPT_6_1_SOL_HIGH_IF_AVAILABLE_NO_CLAIM_MODEL_CHANGED",
+  "local_parent": "~/workspace/project/quant-v0.6",
+  "exclusive_branch": "feature/v06-bline-g2-data-readiness-sol61-r1",
+  "exclusive_worktree": "~/workspace/project/quant-v0.6/g2-r3-data-readiness-sol61-r1",
+  "allowed_changes": [
+    "docs/strategy_research/g2_r3/data_readiness_fastpath/**",
+    "evidence/v0.6/b_line/g2_r3_data_readiness_fastpath/**"
+  ],
+  "allowed_reads": [
+    "public/static git R3 design, method, Sol science draft and manifests",
+    "safe allowlisted local pathname/stat metadata with no symlink follow",
+    "public issuer static dataset terms document only"
+  ],
+  "strictly_forbidden": [
+    "reading local Parquet/CSV/ZIP market rows or bytes",
+    "hashing entire protected market bodies",
+    "web API market data queries",
+    "funding rate history bodies",
+    "manipulating protected old v0.3 Feb-July holdout",
+    "RC2/H40/H41 protected outcome access",
+    "new hypothesis, strategy parameters or market replay",
+    "edit another worker's branch or worktree",
+    "edit controller authority or public baseline",
+    "orders, private signed API, TESTNET, real money"
+  ],
+  "work_products": [
+    "LOCAL_MARKET_METADATA_INVENTORY.json",
+    "DATA_SOURCE_MATCH_AND_PROTECTION_MATRIX.json",
+    "ONE_CAMPAGIN_SOURCE_AND_PREREG_FASTPATH.md",
+    "DATA_READINESS_DECISION.json",
+    "EXECUTION_AND_GIT_RECEIPT.json"
+  ],
+  "science_scope": "R3 original eight candidates only; old v0.3 BTC 2026-02..2026-07 holdout conflict unresolved; use prospective OptionA nonprotected 2021/2023/2025 ONLY as plan",
+  "requirements": [
+    "identify actual reusable physical BTC 2021-2025 archive paths through bounded stat-only inventory, not read data bodies",
+    "declare ETH/SOL availability UNKNOWN until supported by metadata, no inferred existence",
+    "evaluate strategy source sufficiency (trade 1m, mark 1m, funding grade, historical fee, tick/lot, rights) as per-source readiness without treating HEAD as continuity",
+    "produce one minimal executable preregistration checklist and exact remaining authority decisions, no effective first-pushed prereg",
+    "give decisive finite path: FULL_3_SYMBOL_OPTION_A / BTC_ONLY_DIAGNOSTIC_AMENDMENT / SOURCE_BLOCKED, not more indefinite studies",
+    "neither touch ongoing A repair nor B static verifier",
+    "preserve immutable eight candidates and old holdout"
+  ],
+  "time_budget": "UP_TO_3_HOURS_STOP_ON_COMPLETION",
+  "historical_market_body_authority": "NONE",
+  "candidate_replay_authority": "NONE",
+  "G4_testnet": "NOT_AUTHORIZED",
+  "real_funds_write_authority": "NONE",
+  "prompt_path": "prompts/v0.6/b_line/V06_G2_R3_SOL61_DATA_READINESS_FASTPATH_R1.md"
+}
