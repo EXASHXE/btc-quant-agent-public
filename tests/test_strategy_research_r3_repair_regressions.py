@@ -1,6 +1,7 @@
 """Red-before regression test suite targeting B-line findings A03-A08."""
 
 from decimal import Decimal
+from typing import Any
 
 import pytest
 
