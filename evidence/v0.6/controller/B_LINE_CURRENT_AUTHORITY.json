@@ -1544,7 +1544,7 @@
     "next_gate": "ONE_IMPLEMENTATION_PLUS_ONE_INDEPENDENT_EXACT_SHA_SEMANTIC_AUDIT"
   },
   "v06_g2_r3_p1_alt_engine_gemini_a_implementation_r1": {
-    "status": "CONTROLLER_DISPATCHED_NOT_EXECUTED",
+    "status": "A_IMPLEMENTATION_PUSH_VERIFIED__CONTROLLER_EVIDENCE_GATE_INSUFFICIENT__ONE_FINAL_B_AUDIT_DISPATCHED",
     "task_id": "V06_G2_R3_P1_ALT_ENGINE_GEMINI_A_IMPLEMENTATION_R1",
     "branch": "feature/v06-bline-g2-r3-p1-alt-engine-gemini-a-r1",
     "code_baseline_start_sha": "e0ff8c3473de4bfa3e66fe7928d42992a4d38a32",
@@ -1558,11 +1558,36 @@
     "tests_required": "T01_TO_T34_RUNTIME_WITH_I01_TO_I17_PER_TRANSITION_4H_12H_FULL_SYNTHETIC",
     "implementation_authority": "SYNTHETIC_ONLY_NEW_R3_ALT_ENGINE_PACKAGE",
     "independent_b_verification": "REQUIRED_ONE_FINAL_EXACT_SHA_AUDIT",
-    "p1_engine_acceptance": "NONE_PENDING_IMPLEMENTATION_AND_INDEPENDENT_AUDIT",
+    "p1_engine_acceptance": "NO",
     "p2_data_admission": "LOCAL_ROOT_UNKNOWN",
     "p3_prereg": "NONE",
     "p4_market_body_authority": "NONE",
     "testnet": "NOT_AUTHORIZED",
-    "real_funds_write_authority": "NONE"
+    "real_funds_write_authority": "NONE",
+    "implementation_final_sha": "164243b770f74f98876b55a7f070b1adf2f554d5",
+    "implementation_parent_sha": "e0ff8c3473de4bfa3e66fe7928d42992a4d38a32",
+    "remote_ci_url": "https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/37949429222",
+    "remote_ci": "FAILURE_2819_PASS_1_INHERITED_H40_GOLDEN_FAIL_2_SKIP_9_WARN",
+    "implementation_self_reported_terminal": "ALT_ENGINE_IMPLEMENTED_SYNTHETIC_READY_FOR_INDEPENDENT_AUDIT",
+    "controller_l2_readiness": "NOT_ESTABLISHED_NEEDS_FINAL_INDEPENDENT_FALSIFICATION",
+    "controller_delivery_gate_sha": "ed9dc16f3dbeaada88806b69ad032526886a2ae4",
+    "source_level_evidence_gaps": [
+      "T28_T29_NO_NONZERO_TRADE_COUNT_ASSERTIONS_OR_ACCOUNT_TRACE",
+      "I07_AND_I09_TO_I17_UNCONDITIONAL_TRUE_IN_ASSERT_INVARIANTS",
+      "REPLAY_BOOK_ID_ONLY_COST_SCENARIO_SHARED_ACROSS_CANDIDATES",
+      "IMPLEMENTATION_REPORT_RISK_EQUATIONS_AND_INVARIANTS_DISAGREE_WITH_R1_2_AND_RUNTIME",
+      "TERMINAL_ALL_ZERO_CHECK_EXCLUDES_PENDING_ACKS_AND_CASH_RECONCILIATION"
+    ],
+    "final_independent_b": {
+      "status": "AUTHORIZED_NOT_EXECUTED",
+      "branch": "feature/v06-bline-g2-r3-p1-alt-engine-final-independent-b-r1",
+      "start_sha": "ed9dc16f3dbeaada88806b69ad032526886a2ae4",
+      "controller_dispatch_sha": "ed9dc16f3dbeaada88806b69ad032526886a2ae4",
+      "prompt_sha": "18ad412969e224bb19e56d77444c23f766b367f6",
+      "prompt_path": "prompts/v0.6/b_line/V06_G2_R3_P1_ALT_ENGINE_FINAL_INDEPENDENT_B_SOURCE_AND_RUNTIME_AUDIT_R1.md",
+      "immutable_a_target_sha": "164243b770f74f98876b55a7f070b1adf2f554d5",
+      "scope": "ONCE_ONLY_EXACT_SOURCE_SYNTHETIC_INDEPENDENT_G1_G5_T01_T34_FALSIFICATION",
+      "no_engineering_repair": "TRUE_TERMINAL_IF_MATERIAL_FAILURE"
+    }
   }
 }
