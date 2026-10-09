@@ -1579,15 +1579,19 @@
       "TERMINAL_ALL_ZERO_CHECK_EXCLUDES_PENDING_ACKS_AND_CASH_RECONCILIATION"
     ],
     "final_independent_b": {
-      "status": "AUTHORIZED_NOT_EXECUTED",
+      "status": "REASSIGNED_TO_SOL_HIGH_NOT_EXECUTED",
       "branch": "feature/v06-bline-g2-r3-p1-alt-engine-final-independent-b-r1",
       "start_sha": "ed9dc16f3dbeaada88806b69ad032526886a2ae4",
-      "controller_dispatch_sha": "ed9dc16f3dbeaada88806b69ad032526886a2ae4",
-      "prompt_sha": "18ad412969e224bb19e56d77444c23f766b367f6",
-      "prompt_path": "prompts/v0.6/b_line/V06_G2_R3_P1_ALT_ENGINE_FINAL_INDEPENDENT_B_SOURCE_AND_RUNTIME_AUDIT_R1.md",
+      "controller_dispatch_sha": "d2669953e896850b1bf749b5e5fdcf831ba26b88",
+      "prompt_sha": "d4f79c38f6f0dfc3431dcb597bd284b530804644",
+      "prompt_path": "prompts/v0.6/b_line/V06_G2_R3_P1_ALT_ENGINE_SOL_HIGH_FINAL_INDEPENDENT_AUDIT_R1.md",
       "immutable_a_target_sha": "164243b770f74f98876b55a7f070b1adf2f554d5",
       "scope": "ONCE_ONLY_EXACT_SOURCE_SYNTHETIC_INDEPENDENT_G1_G5_T01_T34_FALSIFICATION",
-      "no_engineering_repair": "TRUE_TERMINAL_IF_MATERIAL_FAILURE"
+      "no_engineering_repair": "TRUE_TERMINAL_IF_MATERIAL_FAILURE",
+      "executor": "GPT-6_SOL_HIGH_AS_INDEPENDENT_B_ROLE",
+      "previous_controller_dispatch_sha": "ed9dc16f3dbeaada88806b69ad032526886a2ae4",
+      "one_shot_budget": "UNCHANGED_NO_PARALLEL_GEMINI_B_AUDIT",
+      "controller_final_adjudicator": "ChatGPT-0_Primary_Controller"
     }
   }
 }
