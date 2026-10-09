@@ -1,0 +1,228 @@
+{
+  "schema_version": "G2_R3_R2_BEFORE_AFTER_MATRIX_V1",
+  "task_id": "V06_G2_R3_P0_A_INTERACTION_REPAIR_R2",
+  "role": "GEMINI_A",
+  "controller_dispatch_sha": "218c126c9fd5395767fa27af984bf14b265c4a8f",
+  "b_finding_source_sha": "f1ec703b7c7276582f324ac25b9d1000f1b5ef14",
+  "start_sha": "5c542edd418a74b440162610fd540b1f01e423d3",
+  "r3_method_sha": "cf2d5cc33774cdcff7d709636305bba830e977ef",
+  "eight_candidates_sha": "e5b2006a89441f7eb2ec900e508aff451106b87a",
+  "base_code_sha": "e0ff8c3473de4bfa3e66fe7928d42992a4d38a32",
+  "findings_audited_count": 7,
+  "findings_repaired_count": 7,
+  "findings": [
+    {
+      "id": "B01",
+      "severity": "CRITICAL",
+      "title": "Causal Mark Price Stream Delivery by Effective Availability",
+      "files_modified": [
+        "src/btc_quant_agent/strategy_research/r3_overnight/replay_engine.py",
+        "src/btc_quant_agent/strategy_research/r3_overnight/ledger.py"
+      ],
+      "r1_observed_failing_invariant": "ReplayEngine passed MarkBar1m with timestamp at bar open O only to same minute O. Stage 1 required close_ms <= O and available_at_ms <= O; thus marks were rejected at open, leaving last_available_marks permanently empty (0 marks admitted in R1 test probe).",
+      "r2_positive_behavior_invariant": "ReplayEngine indexes mark stream by effective availability max(close_ms, available_at_ms) <= current_open_ms. Stage 1 causal filtering admits marks upon completed close and availability, enforces 120s staleness fail-close, rejects future marks, and discards out-of-order stale arrivals.",
+      "invariant_test_names": [
+        "tests/test_strategy_research_r3_r2_invariants.py::test_b01_causal_mark_ingestion_and_future_stale_rejection",
+        "tests/test_strategy_research_r3_r2_invariants.py::test_b01_mark_freshness_staleness_exit"
+      ],
+      "expected_vs_observed": {
+        "marks_admitted_when_eligible": {
+          "expected": true,
+          "observed": true
+        },
+        "future_mark_rejected": {
+          "expected": true,
+          "observed": true
+        },
+        "out_of_order_stale_mark_ignored": {
+          "expected": true,
+          "observed": true
+        },
+        "staleness_gt_120s_due_exit": {
+          "expected": "MARK_STALENESS",
+          "observed": "MARK_STALENESS"
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "id": "B02",
+      "severity": "HIGH",
+      "title": "ACK Exactly-Once Idempotency Across Entry, Exit, and Funding",
+      "files_modified": [
+        "src/btc_quant_agent/strategy_research/r3_overnight/ledger.py"
+      ],
+      "r1_observed_failing_invariant": "Duplicate ACK delivery of entry fills debited taker fees multiple times, credited duplicate cash flows, or duplicated completed trades upon duplicate exit ACKs (fee multiplier 2.0x on 2x delivery in R1 probe).",
+      "r2_positive_behavior_invariant": "Introduced acknowledged_fill_ids, acknowledged_exit_ids, and acknowledged_funding_ids tracking sets. One economic event produces exactly one cash, fee, funding, and commitment effect. Duplicate deliveries 2x or 3x are idempotently ignored without zombie revival.",
+      "invariant_test_names": [
+        "tests/test_strategy_research_r3_r2_invariants.py::test_b02_ack_idempotency_entry_exit_and_funding"
+      ],
+      "expected_vs_observed": {
+        "duplicate_fill_ack_fee_multiplier": {
+          "expected": "1.0000",
+          "observed": "1.0000"
+        },
+        "duplicate_exit_ack_trade_count": {
+          "expected": 1,
+          "observed": 1
+        },
+        "duplicate_funding_ack_debit_count": {
+          "expected": 1,
+          "observed": 1
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "id": "B03",
+      "severity": "HIGH",
+      "title": "Hourly Settlement Ownership Across Frozen [S-15s, S+15s] Interval",
+      "files_modified": [
+        "src/btc_quant_agent/strategy_research/r3_overnight/ledger.py"
+      ],
+      "r1_observed_failing_invariant": "Positions active at S were checked with strict inequality that missed positions entering at S-60s or exiting intraminute at S via Stage 6 Stop Loss (0.0 funding charged for same-minute SL at S in R1 probe).",
+      "r2_positive_behavior_invariant": "VirtualBook models position economic occupancy via ExposureInterval. Overlap with [S-15000, S+15000] evaluates active, exiting, and same-minute SL positions, updating pending exit acks and debiting funding once per settlement ID per position.",
+      "invariant_test_names": [
+        "tests/test_strategy_research_r3_r2_invariants.py::test_b03_hourly_settlement_ownership_window"
+      ],
+      "expected_vs_observed": {
+        "sl_at_s_funding_charged": {
+          "expected": "1.00000000",
+          "observed": "1.00000000"
+        },
+        "closed_before_window_funding_charged": {
+          "expected": 0,
+          "observed": 0
+        },
+        "duplicate_settlement_id_dedup": {
+          "expected": true,
+          "observed": true
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "id": "B04",
+      "severity": "HIGH",
+      "title": "Deterministic Minute-End Economic Exit Timestamps and Cooldown Alignment",
+      "files_modified": [
+        "src/btc_quant_agent/strategy_research/r3_overnight/ledger.py",
+        "src/btc_quant_agent/strategy_research/r3_overnight/signals.py"
+      ],
+      "r1_observed_failing_invariant": "Intraminute SL/TP exits were stamped at open_time_ms (bar open O), leaking 1m bar outcome into opening timestamp, producing holding_minutes=0 on 1m bars, and causing minute-start vs minute-end cooldown anchoring misalignment.",
+      "r2_positive_behavior_invariant": "Intraminute SL/TP exits stamped at deterministic minute-end effective timestamp open_time_ms + 60_000 - 1. holding_minutes is bounded by max(1, ...). Cooldown consistently anchored to ((exit_time_ms + 59_999) // 60_000) * 60_000 + 4 * 3_600_000 across ledger and signals.",
+      "invariant_test_names": [
+        "tests/test_strategy_research_r3_r2_invariants.py::test_b04_intraminute_exit_timestamp_and_cooldown_anchoring"
+      ],
+      "expected_vs_observed": {
+        "intraminute_sl_exit_timestamp": {
+          "expected": "open_time_ms + 59999",
+          "observed": "open_time_ms + 59999"
+        },
+        "holding_minutes_for_intraminute_exit": {
+          "expected": 1,
+          "observed": 1
+        },
+        "cooldown_anchored_consistent": {
+          "expected": true,
+          "observed": true
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "id": "B05",
+      "severity": "HIGH",
+      "title": "Economic vs Available Equity Valuation and Kill Reservation Integrity",
+      "files_modified": [
+        "src/btc_quant_agent/strategy_research/r3_overnight/ledger.py"
+      ],
+      "r1_observed_failing_invariant": "Decision equity counted unrealized PnL of unacknowledged positions before fill ACK arrived. On drawdown kill, cost_commitment_o and funding_reserve_rf were cleared to 0 while open positions remained live, turning negative (-5.00) when positions liquidated.",
+      "r2_positive_behavior_invariant": "decision_equity values only positions where pos.is_acknowledged is True. On drawdown kill, pending order commitments are cancelled while live position commitments are preserved. Live reserves are released exactly once upon exit ACK arrival without negative drift.",
+      "invariant_test_names": [
+        "tests/test_strategy_research_r3_r2_invariants.py::test_b05_unacked_position_excluded_from_decision_equity",
+        "tests/test_strategy_research_r3_r2_invariants.py::test_b05_drawdown_kill_preserves_obligations_and_prevents_negative_reserves"
+      ],
+      "expected_vs_observed": {
+        "unacked_position_in_decision_equity": {
+          "expected": false,
+          "observed": false
+        },
+        "post_kill_commitments_non_negative": {
+          "expected": true,
+          "observed": true
+        },
+        "post_liquidation_residual_reserves": {
+          "expected": "0",
+          "observed": "0"
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "id": "B06",
+      "severity": "MEDIUM",
+      "title": "Retest State Progression and Intervening Extrema Across Intermediate Invalid Hours",
+      "files_modified": [
+        "src/btc_quant_agent/strategy_research/r3_overnight/signals.py"
+      ],
+      "r1_observed_failing_invariant": "SignalGenerator.evaluate_hourly_decision evaluated vol/EMA filters before updating retest state. When an intermediate hourly bar failed a filter, it returned None without incrementing bars_since_breakout, freezing state at 0 and skipping time.",
+      "r2_positive_behavior_invariant": "Added _advance_active_breakout called for candidate.family == CLOSED_RETEST before any filter checks. Every completed post-breakout hourly bar increments bars_since_breakout, records intermediate highs/lows, and enforces 3-bar confirmation cancellation.",
+      "invariant_test_names": [
+        "tests/test_strategy_research_r3_r2_invariants.py::test_b06_retest_progression_across_invalid_intermediate_hour"
+      ],
+      "expected_vs_observed": {
+        "intermediate_failed_hour_advances_bars": {
+          "expected": 1,
+          "observed": 1
+        },
+        "intermediate_extrema_recorded": {
+          "expected": true,
+          "observed": true
+        },
+        "rebound_confirmation_after_invalid_hour": {
+          "expected": true,
+          "observed": true
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "id": "B07",
+      "severity": "CRITICAL",
+      "title": "Exact Funding Reserve Debit and Destination Conservation",
+      "files_modified": [
+        "src/btc_quant_agent/strategy_research/r3_overnight/ledger.py"
+      ],
+      "r1_observed_failing_invariant": "VirtualBook debited pos.funding_reserves_usdt upon Stage 7 funding charge but failed to debit aggregate funding_reserve_rf. Upon position exit, the released reserve differed from initial allocation, leaking residual funding reserve (0.20 leaked in R1 probe).",
+      "r2_positive_behavior_invariant": "Stage 7 debits debit from both pos.funding_reserves_usdt and aggregate funding_reserve_rf with exact Decimal equality. Upon position exit ACK, remaining funding reserve is cleanly decremented, guaranteeing exactly 0 leaked funding reserve.",
+      "invariant_test_names": [
+        "tests/test_strategy_research_r3_r2_invariants.py::test_b07_exact_funding_reserve_conservation"
+      ],
+      "expected_vs_observed": {
+        "aggregate_reserve_debited_at_stage7": {
+          "expected": true,
+          "observed": true
+        },
+        "leaked_funding_reserve_after_close": {
+          "expected": "0",
+          "observed": "0"
+        },
+        "terminal_flat_book_reserves": {
+          "expected": "0",
+          "observed": "0"
+        }
+      },
+      "status": "PASS"
+    }
+  ],
+  "verification_summary": {
+    "all_7_findings_resolved": true,
+    "targeted_regression_tests_passed": 46,
+    "targeted_regression_tests_failed": 0,
+    "r2_invariant_tests_count": 11,
+    "r2_invariant_tests_passed": 11,
+    "ruff_violations_count": 0,
+    "git_diff_whitespace_clean": true
+  }
+}

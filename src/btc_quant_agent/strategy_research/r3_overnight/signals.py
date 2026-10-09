@@ -41,6 +41,7 @@ class RetestBreakoutState:
     intermediate_lows: list[Decimal] = field(default_factory=list)
     confirmed: bool = False
     canceled: bool = False
+    last_advanced_hour_ms: int = 0
 
     def __post_init__(self) -> None:
         if not self.intermediate_highs:
@@ -57,6 +58,43 @@ class SignalGenerator:
         self._active_breakouts: dict[tuple[str, str, Direction], RetestBreakoutState] = {}
         # Completed/consumed retest event IDs to guarantee single-use
         self._consumed_retest_events: set[str] = set()
+
+    def _advance_active_breakout(
+        self,
+        candidate: CandidateDefinition,
+        symbol: str,
+        current_1h: Bar1h,
+    ) -> RetestBreakoutState | None:
+        """Advance retest state and intervening extrema for completed hourly bar (B06)."""
+        key = (candidate.id, symbol, candidate.direction)
+        breakout = self._active_breakouts.get(key)
+        if breakout is None or breakout.confirmed or breakout.canceled:
+            return None
+
+        # Check if this 1h bar has already advanced the breakout or is breakout bar itself
+        if current_1h.close_ms <= breakout.breakout_hour_ms:
+            return breakout
+        if current_1h.close_ms <= breakout.last_advanced_hour_ms:
+            return breakout
+
+        breakout.bars_since_breakout += 1
+        breakout.intermediate_highs.append(current_1h.high)
+        breakout.intermediate_lows.append(current_1h.low)
+        breakout.last_advanced_hour_ms = current_1h.close_ms
+
+        # Check cancellation: close beyond boundary by 0.25 frozen ATR in wrong direction
+        if candidate.direction == Direction.LONG:
+            if current_1h.close < breakout.boundary - Decimal("0.25") * breakout.frozen_atr:
+                breakout.canceled = True
+        else:
+            if current_1h.close > breakout.boundary + Decimal("0.25") * breakout.frozen_atr:
+                breakout.canceled = True
+
+        # Only next 3 closed hourly bars may confirm
+        if breakout.bars_since_breakout > 3:
+            breakout.canceled = True
+
+        return breakout
 
     def evaluate_hourly_decision(
         self,
@@ -82,9 +120,15 @@ class SignalGenerator:
         available_at_ms = decision_time_ms + DECISION_AVAILABILITY_LAG_MS
         earliest_entry_ms = decision_time_ms + FILL_DELAY_FROM_DECISION_MS + DECISION_AVAILABILITY_LAG_MS
 
-        # Check 4h cooldown
-        if last_exit_time_ms is not None and decision_time_ms < last_exit_time_ms + 4 * 3_600_000:
-            return None
+        # Check 4h cooldown (A07, B04)
+        if last_exit_time_ms is not None:
+            cooldown_end_ms = ((last_exit_time_ms + 59_999) // 60_000) * 60_000 + 4 * 3_600_000
+            if decision_time_ms < cooldown_end_ms:
+                return None
+
+        # Maintain retest state progression for each completed post-breakout hour before any filter veto (B06)
+        if candidate.family == CandidateFamily.CLOSED_RETEST:
+            self._advance_active_breakout(candidate, symbol, current_1h)
 
         # Hourly ATR20 check
         atr20_1h = compute_atr20_1h(bars_1h)
@@ -270,25 +314,6 @@ class SignalGenerator:
         # Check existing breakout state
         breakout = self._active_breakouts.get(key)
         if breakout is not None and not breakout.confirmed and not breakout.canceled:
-            breakout.bars_since_breakout += 1
-            breakout.intermediate_highs.append(current_1h.high)
-            breakout.intermediate_lows.append(current_1h.low)
-
-            # Check cancellation: close beyond boundary by 0.25 frozen ATR in wrong direction
-            if candidate.direction == Direction.LONG:
-                if current_1h.close < breakout.boundary - Decimal("0.25") * breakout.frozen_atr:
-                    breakout.canceled = True
-                    return None
-            else:
-                if current_1h.close > breakout.boundary + Decimal("0.25") * breakout.frozen_atr:
-                    breakout.canceled = True
-                    return None
-
-            # Only next 3 closed hourly bars may confirm
-            if breakout.bars_since_breakout > 3:
-                breakout.canceled = True
-                return None
-
             # Check confirmation
             if candidate.direction == Direction.LONG:
                 # low inside exact inclusive [boundary - 0.25 ATR, boundary + 0.25 ATR]

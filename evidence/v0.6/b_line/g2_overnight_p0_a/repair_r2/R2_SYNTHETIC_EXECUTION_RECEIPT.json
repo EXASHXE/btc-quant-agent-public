@@ -1,0 +1,79 @@
+{
+  "schema_version": "G2_R3_R2_SYNTHETIC_EXECUTION_RECEIPT_V1",
+  "task_id": "V06_G2_R3_P0_A_INTERACTION_REPAIR_R2",
+  "role": "GEMINI_A",
+  "controller_dispatch_sha": "218c126c9fd5395767fa27af984bf14b265c4a8f",
+  "start_sha": "5c542edd418a74b440162610fd540b1f01e423d3",
+  "branch": "feature/v06-bline-g2-overnight-discovery-a",
+  "remote_repository": "https://github.com/EXASHXE/btc-quant-agent-public.git",
+  "test_framework": "pytest",
+  "python_versions": {
+    "python_3_12": {
+      "path": "/usr/bin/python3.12",
+      "version": "3.12.3",
+      "certified": true,
+      "passed_count": 46,
+      "failed_count": 0,
+      "skipped_count": 0,
+      "exit_code": 0
+    },
+    "python_3_13": {
+      "path": "/root/miniconda3/bin/python3",
+      "version": "3.13.13",
+      "certified": true,
+      "passed_count": 46,
+      "failed_count": 0,
+      "skipped_count": 0,
+      "exit_code": 0
+    }
+  },
+  "linter_status": {
+    "tool": "ruff 0.16.9",
+    "files_checked": 21,
+    "violations_remaining": 0,
+    "exit_code": 0
+  },
+  "git_diff_whitespace_status": {
+    "exit_code": 0,
+    "clean": true
+  },
+  "fixtures_verified": [
+    "b01_causal_mark_ingestion_and_future_stale_rejection",
+    "b01_mark_freshness_staleness_exit",
+    "b02_ack_idempotency_entry_exit_and_funding",
+    "b03_hourly_settlement_ownership_window",
+    "b04_intraminute_exit_timestamp_and_cooldown_anchoring",
+    "b05_unacked_position_excluded_from_decision_equity",
+    "b05_drawdown_kill_preserves_obligations_and_prevents_negative_reserves",
+    "b06_retest_progression_across_invalid_intermediate_hour",
+    "b07_exact_funding_reserve_conservation",
+    "replay_engine_e2e_synthetic_take_profit",
+    "replay_engine_e2e_synthetic_expiry_4h",
+    "constructed_win_long",
+    "constructed_win_short",
+    "constructed_loss_long_and_short",
+    "stop_before_target_collision_sl_first",
+    "adverse_gap_stop_uses_worse_open",
+    "favorable_target_gap_capped_at_target",
+    "mark_staleness_triggers_veto_and_exit",
+    "negative_collateral_preserved_without_clipping",
+    "funding_charge_across_settlement_window",
+    "no_fill_gap_veto",
+    "future_price_leak_detection_raises_error",
+    "double_fee_check_zero_duplicate_debits"
+  ],
+  "e2e_synthetic_simulation_verification": {
+    "mark_stream_causality": "VERIFIED_EFFECTIVE_AVAILABILITY",
+    "controlled_signal_generation": "CLOSED_RETEST_LONG_04H_TRIGGERED",
+    "order_fill_and_ack": "STAGE5_FILL_STAGE1_ACK_CONSUMED",
+    "holding_and_reconciliation": "TAKE_PROFIT_AND_4H_EXPIRY_RECONCILED",
+    "funding_reserve_leak_count": 0,
+    "residual_cost_commitments": "0"
+  },
+  "deterministic_book_receipt_hashes": {
+    "base_scenario_hash": "b53cd3089779f54da0d72dd404cae49c43bb8c9683bb304df4fcc20525ad85f9",
+    "stress_scenario_hash": "c476cece5fed6bac9f24511821f8925a6e7ce76933b8bc8177b8a808c1eb1ae7"
+  },
+  "execution_boundary_status": "HERMETIC_NONMARKET_SYNTHETIC_ONLY__ZERO_RAW_MARKET_ACCESS",
+  "terminal_status": "R2_SYNTHETIC_REPAIR_READY_FOR_INDEPENDENT_B_REVIEW"
+}

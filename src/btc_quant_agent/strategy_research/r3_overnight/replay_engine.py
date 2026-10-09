@@ -14,7 +14,9 @@ from btc_quant_agent.strategy_research.r3_overnight.indicators import (
 from btc_quant_agent.strategy_research.r3_overnight.ledger import VirtualBook
 from btc_quant_agent.strategy_research.r3_overnight.signals import SignalGenerator
 from btc_quant_agent.strategy_research.r3_overnight.types import (
+    Bar1h,
     Bar1m,
+    Bar4h,
     CompletedTrade,
     CostScenario,
     MarkBar1m,
@@ -86,10 +88,13 @@ class ReplayEngine:
             for b in b_list:
                 bars_by_minute.setdefault(b.timestamp_ms, {})[sym] = b
 
-        marks_by_minute: dict[int, dict[str, MarkBar1m]] = {}
+        # Collect and sort all marks causally by effective availability (B01)
+        marks_by_sym: dict[str, list[MarkBar1m]] = {}
         for sym, m_list in marks_1m.items():
-            for m in m_list:
-                marks_by_minute.setdefault(m.timestamp_ms, {})[sym] = m
+            sorted_m = sorted(m_list, key=lambda m: (max(m.close_ms, m.available_at_ms), m.close_ms))
+            marks_by_sym[sym] = sorted_m
+
+        mark_idx_by_sym: dict[str, int] = {sym: 0 for sym in marks_by_sym}
 
         # Running lists of completed 1m bars for aggregation
         accumulated_1m: dict[str, list[Bar1m]] = {sym: [] for sym in bars_1m}
@@ -97,7 +102,23 @@ class ReplayEngine:
         # Step minute by minute
         for current_open_ms in sorted_minutes:
             current_bars = bars_by_minute.get(current_open_ms, {})
-            current_marks = marks_by_minute.get(current_open_ms, {})
+
+            # Causal mark stream: collect marks that became effectively available at or before current_open_ms
+            current_marks: dict[str, MarkBar1m] = {}
+            for sym, m_list in marks_by_sym.items():
+                idx = mark_idx_by_sym[sym]
+                latest_eligible: MarkBar1m | None = None
+                while idx < len(m_list):
+                    m = m_list[idx]
+                    effective_avail = max(m.close_ms, m.available_at_ms)
+                    if effective_avail <= current_open_ms:
+                        latest_eligible = m
+                        idx += 1
+                    else:
+                        break
+                mark_idx_by_sym[sym] = idx
+                if latest_eligible is not None:
+                    current_marks[sym] = latest_eligible
 
             # Append current bars to history
             for sym, bar in current_bars.items():
@@ -109,27 +130,30 @@ class ReplayEngine:
             if current_open_ms % 3_600_000 == 60_000:
                 # 60s after whole hour close: compute hourly signals
                 # Bars available are strictly completed bars up to current_open_ms - 60_000
+                decision_time = (current_open_ms // 3_600_000) * 3_600_000
+                aggregated_by_sym: dict[str, tuple[list[Bar1h], list[Bar4h]]] = {}
+                for sym, hist in accumulated_1m.items():
+                    completed_1m = [b for b in hist if b.close_ms <= current_open_ms - 60_000]
+                    bars_1h = aggregate_1m_to_1h(completed_1m)
+                    bars_4h = aggregate_1m_to_4h(completed_1m)
+
+                    # Prevent future leak: verify no bar in bars_1h has close > decision_time
+                    for bh in bars_1h:
+                        if bh.close_ms > decision_time:
+                            raise FuturePriceLeakError(
+                                f"Future price leak detected: 1h bar closed at {bh.close_ms} "
+                                f"which is after decision time {decision_time}"
+                            )
+                    aggregated_by_sym[sym] = (bars_1h, bars_4h)
+
                 for candidate in self.registry.list_candidates():
                     if candidate.id in self.ineligible_candidates:
                         continue
 
-                    # For simplicity, evaluate symbol BTCUSDT
                     for sym in candidate.symbols:
-                        if sym not in accumulated_1m:
+                        if sym not in aggregated_by_sym:
                             continue
-                        completed_1m = [b for b in accumulated_1m[sym] if b.close_ms <= current_open_ms - 60_000]
-                        bars_1h = aggregate_1m_to_1h(completed_1m)
-                        bars_4h = aggregate_1m_to_4h(completed_1m)
-
-                        # Prevent future leak: verify no bar in bars_1h has close > decision_time
-                        decision_time = (current_open_ms // 3_600_000) * 3_600_000
-                        for bh in bars_1h:
-                            if bh.close_ms > decision_time:
-                                raise FuturePriceLeakError(
-                                    f"Future price leak detected: 1h bar closed at {bh.close_ms} "
-                                    f"which is after decision time {decision_time}"
-                                )
-
+                        bars_1h, bars_4h = aggregated_by_sym[sym]
                         book = self.books[candidate.id]
                         gen = self.signal_generators[candidate.id]
                         sig = gen.evaluate_hourly_decision(

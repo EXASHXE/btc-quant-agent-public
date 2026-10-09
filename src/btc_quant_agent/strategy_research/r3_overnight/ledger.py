@@ -1,5 +1,6 @@
 """Virtual book ledger implementing deterministic 8-stage execution and accounting."""
 
+from dataclasses import dataclass
 from decimal import Decimal
 from typing import Any
 
@@ -34,6 +35,18 @@ from btc_quant_agent.strategy_research.r3_overnight.types import (
     VirtualFill,
     VirtualOrder,
 )
+
+
+@dataclass
+class ExposureInterval:
+    """Historical exposure interval for deterministic funding ownership evaluation."""
+    position_id: str
+    symbol: str
+    direction: Direction
+    start_ms: int
+    end_ms: int | None
+    quantity: Decimal
+    entry_price: Decimal
 
 
 class VirtualBook:
@@ -93,6 +106,14 @@ class VirtualBook:
         self.last_economic_exit_time_ms: dict[str, int] = {}
         self.last_entry_4h_time_ms: dict[str, int] = {}
 
+        # Exposure intervals for deterministic funding ownership tracking (B03)
+        self.exposure_intervals: list[ExposureInterval] = []
+
+        # Exactly-once acknowledgment tracking (B02)
+        self.acknowledged_fill_ids: set[str] = set()
+        self.acknowledged_exit_ids: set[str] = set()
+        self.acknowledged_funding_ids: set[str] = set()
+
         # Charged settlement window IDs to prevent double charge: (symbol, settlement_time_ms)
         self.charged_settlements: set[tuple[str, int]] = set()
 
@@ -141,11 +162,11 @@ class VirtualBook:
             return None
         if signal.symbol in self.positions:
             return None
-        # Check cooldown against decision availability timestamp (A07)
-        if signal.available_at_ms < self.cooldown_until_ms.get(signal.symbol, 0):
+        # Check cooldown against decision timestamp (A07, B04)
+        if signal.decision_time_ms < self.cooldown_until_ms.get(signal.symbol, 0):
             return None
 
-        # Check mark freshness (age <= 120s from completed mark close time) (A06)
+        # Check mark freshness (age <= 120s from completed mark close time) (A06, B01)
         mark_info = self.last_available_marks.get(signal.symbol)
         if mark_info is None:
             return None
@@ -270,32 +291,51 @@ class VirtualBook:
     def _stage_1_available_messages(
         self,
         open_time_ms: int,
-        marks_1m: dict[str, MarkBar1m] | None = None,
+        marks_1m: dict[str, MarkBar1m] | list[MarkBar1m] | None = None,
     ) -> None:
         """Consume all messages with available_at_ms <= open_time_ms."""
-        # Process available marks in Stage 1 (A06)
+        # Process available marks in Stage 1 (A06, B01)
         if marks_1m:
-            for sym, mbar in marks_1m.items():
+            mark_items = marks_1m.values() if isinstance(marks_1m, dict) else marks_1m
+            for mbar in mark_items:
                 if mbar.available_at_ms <= open_time_ms and mbar.close_ms <= open_time_ms:
+                    sym = mbar.symbol
+                    if sym in self.last_available_marks:
+                        _prev_close_px, prev_close_ms, prev_avail_ms = self.last_available_marks[sym]
+                        # Reject out-of-order marks
+                        if mbar.close_ms < prev_close_ms:
+                            continue
+                        if mbar.close_ms == prev_close_ms and mbar.available_at_ms < prev_avail_ms:
+                            continue
                     self.last_available_marks[sym] = (mbar.close, mbar.close_ms, mbar.available_at_ms)
 
-        # Process available entry fills (A03)
+        # Process available entry fills (A03, B02)
         remaining_fills: list[VirtualFill] = []
         for fill in self.pending_fill_acks:
             if fill.available_at_ms <= open_time_ms:
-                # Fill acknowledged: debit actual entry fee exactly once
-                self.cash -= fill.fee_usdt
-                # If position is active in self.positions, mark acknowledged
-                pos = self.positions.get(fill.symbol)
-                if pos is not None and pos.position_id == fill.fill_id:
-                    pos.is_acknowledged = True
-                # If position was already closed (e.g. SL/TP in Stage 6 of same minute),
-                # it is tracked in self.closed_position_ids and must NEVER be resurrected as a zombie!
+                if fill.fill_id not in self.acknowledged_fill_ids:
+                    self.acknowledged_fill_ids.add(fill.fill_id)
+                    # Fill acknowledged: debit actual entry fee exactly once
+                    self.cash -= fill.fee_usdt
+                    # If position is active in self.positions, mark acknowledged
+                    pos = self.positions.get(fill.symbol)
+                    if pos is not None and pos.position_id == fill.fill_id:
+                        pos.is_acknowledged = True
+                # Duplicate fill ACK: ignored (B02)
             else:
                 remaining_fills.append(fill)
         self.pending_fill_acks = remaining_fills
 
-        # Process available exit acks (A07, A08)
+        # Auto-acknowledge positions created without pending_fill_acks once entry_available_at_ms is reached
+        for sym, pos in self.positions.items():
+            if (
+                not pos.is_acknowledged
+                and pos.entry_available_at_ms <= open_time_ms
+                and not any(f.fill_id == pos.position_id for f in self.pending_fill_acks)
+            ):
+                pos.is_acknowledged = True
+
+        # Process available exit acks (A07, A08, B02, B07)
         remaining_exits: list[tuple[Any, ...]] = []
         for item in self.pending_exit_acks:
             if len(item) == 4:
@@ -305,26 +345,32 @@ class VirtualBook:
                 exit_reserve, rem_funding = Decimal(0), Decimal(0)
 
             if ack_time <= open_time_ms:
-                # Realize cash delta:
-                gross_pnl = trade.quantity * Decimal(trade.direction.sign) * (trade.effective_exit - trade.effective_entry)
-                self.cash += gross_pnl - trade.exit_fee_usdt
-                self.completed_trades.append(trade)
-                # Release exit commitment and remaining funding reserve
-                self.cost_commitment_o -= exit_reserve
-                self.funding_reserve_rf -= rem_funding
-                # Cooldown starts from ceil_to_minute(economic_exit_at) + COOLDOWN_DURATION_MS (A07)
-                ceil_exit_ms = ((trade.exit_time_ms + 59_999) // 60_000) * 60_000
-                self.cooldown_until_ms[trade.symbol] = ceil_exit_ms + COOLDOWN_DURATION_MS
+                if trade.trade_id not in self.acknowledged_exit_ids:
+                    self.acknowledged_exit_ids.add(trade.trade_id)
+                    # Realize cash delta:
+                    gross_pnl = trade.quantity * Decimal(trade.direction.sign) * (trade.effective_exit - trade.effective_entry)
+                    self.cash += gross_pnl - trade.exit_fee_usdt
+                    self.completed_trades.append(trade)
+                    # Release exit commitment and remaining funding reserve without negative drift (B05B, B07)
+                    self.cost_commitment_o = max(Decimal(0), self.cost_commitment_o - exit_reserve)
+                    self.funding_reserve_rf = max(Decimal(0), self.funding_reserve_rf - rem_funding)
+                    # Cooldown starts from ceil_to_minute(economic_exit_at) + COOLDOWN_DURATION_MS (A07, B04)
+                    ceil_exit_ms = ((trade.exit_time_ms + 59_999) // 60_000) * 60_000
+                    self.cooldown_until_ms[trade.symbol] = ceil_exit_ms + COOLDOWN_DURATION_MS
+                # Duplicate exit ACK: ignored (B02)
             else:
                 remaining_exits.append(item)
         self.pending_exit_acks = remaining_exits
 
-        # Process available funding charges
+        # Process available funding charges (B02)
         remaining_funding: list[FundingEventRecord] = []
         for f_rec in self.pending_funding_acks:
             if f_rec.available_at_ms <= open_time_ms:
-                self.cash -= f_rec.cashflow_debit_usdt
-                self.funding_charges.append(f_rec)
+                if f_rec.event_id not in self.acknowledged_funding_ids:
+                    self.acknowledged_funding_ids.add(f_rec.event_id)
+                    self.cash -= f_rec.cashflow_debit_usdt
+                    self.funding_charges.append(f_rec)
+                # Duplicate funding ACK: ignored (B02)
             else:
                 remaining_funding.append(f_rec)
         self.pending_funding_acks = remaining_funding
@@ -345,11 +391,12 @@ class VirtualBook:
             ) and not any(e[0] == sym and e[1] == ExitReason.MARK_STALENESS for e in self.due_exits):
                 self.due_exits.append((sym, ExitReason.MARK_STALENESS, open_time_ms + 60_000))
 
-        # Value acknowledged positions
+        # Value acknowledged positions only (B05A)
         unrealized_pnl = Decimal(0)
         for sym, pos in self.positions.items():
-            mark_price = self.last_available_marks.get(sym, (pos.effective_entry, 0, 0))[0]
-            unrealized_pnl += pos.quantity * Decimal(pos.direction.sign) * (mark_price - pos.effective_entry)
+            if pos.is_acknowledged:
+                mark_price = self.last_available_marks.get(sym, (pos.effective_entry, 0, 0))[0]
+                unrealized_pnl += pos.quantity * Decimal(pos.direction.sign) * (mark_price - pos.effective_entry)
 
         self.decision_equity = self.cash + unrealized_pnl
 
@@ -373,9 +420,15 @@ class VirtualBook:
 
     def _trigger_kill_liquidation(self, open_time_ms: int) -> None:
         """On kill latch, cancel pending commitments and queue immediate liquidation."""
+        # Cancel pending orders and release their pending commitments (B05B)
+        for order in self.pending_orders:
+            self.cost_commitment_o = max(Decimal(0), self.cost_commitment_o - order.cost_commitment_usdt)
+            self.funding_reserve_rf = max(Decimal(0), self.funding_reserve_rf - order.funding_reserve_usdt)
         self.pending_orders.clear()
-        self.cost_commitment_o = Decimal(0)
-        self.funding_reserve_rf = Decimal(0)
+
+        # Do NOT zero out cost_commitment_o or funding_reserve_rf for active positions (B05B).
+        # Active positions remain open and will release their exit/funding reserves
+        # exactly once when their liquidation exit ACK arrives in Stage 1.
         for sym in self.positions:
             if not any(e[0] == sym and e[1] == ExitReason.DRAWDOWN_KILL for e in self.due_exits):
                 self.due_exits.append((sym, ExitReason.DRAWDOWN_KILL, open_time_ms + 60_000))
@@ -449,6 +502,12 @@ class VirtualBook:
             self.cooldown_until_ms[sym] = ceil_exit_ms + COOLDOWN_DURATION_MS
             processed_exits.append(exit_item)
 
+            # Close active exposure interval (B03)
+            for interval in reversed(self.exposure_intervals):
+                if interval.position_id == pos.position_id and interval.end_ms is None:
+                    interval.end_ms = open_time_ms
+                    break
+
             # Build completed trade
             entry_notional = pos.quantity * pos.effective_entry
             gross_pnl = pos.quantity * Decimal(pos.direction.sign) * (effective_exit - pos.effective_entry)
@@ -459,7 +518,7 @@ class VirtualBook:
             net_bps = (net_pnl / entry_notional) * Decimal(10000) if entry_notional > Decimal(0) else Decimal(0)
             net_r = (net_pnl / initial_risk_dollars) if initial_risk_dollars > Decimal(0) else None
 
-            holding_min = (open_time_ms - pos.entry_time_ms) // 60_000
+            holding_min = max(1, (open_time_ms - pos.entry_time_ms) // 60_000) if open_time_ms > pos.entry_time_ms else 1
 
             trade = CompletedTrade(
                 trade_id=f"TRD_{pos.position_id}_{open_time_ms}",
@@ -582,6 +641,19 @@ class VirtualBook:
             )
             self.positions[sym] = pos
 
+            # Record exposure interval for funding ownership tracking (B03)
+            self.exposure_intervals.append(
+                ExposureInterval(
+                    position_id=pos.position_id,
+                    symbol=sym,
+                    direction=order.direction,
+                    start_ms=open_time_ms,
+                    end_ms=None,
+                    quantity=order.quantity,
+                    entry_price=effective_entry,
+                )
+            )
+
             # Release pending entry notional and fee, but retain exit commitment in cost_commitment_o (A08)
             pending_entry_released = order.cost_commitment_usdt - c_exit
             self.cost_commitment_o -= pending_entry_released
@@ -655,8 +727,13 @@ class VirtualBook:
                     raw_exit = max(bar.open, pos.stop)
 
                 effective_exit = self.cost_model.model_execution_price(raw_exit, is_buy_exit, sym_filter)
-                self._record_closed_position(pos, effective_exit, raw_exit, ExitReason.STOP_LOSS, open_time_ms + 60_000, economic_exit_ms=open_time_ms)
+                econ_exit = open_time_ms + 60_000 - 1
+                self._record_closed_position(pos, effective_exit, raw_exit, ExitReason.STOP_LOSS, open_time_ms + 60_000, economic_exit_ms=econ_exit)
                 del self.positions[sym]
+                for interval in reversed(self.exposure_intervals):
+                    if interval.position_id == pos.position_id and interval.end_ms is None:
+                        interval.end_ms = econ_exit
+                        break
 
             elif tp_hit:
                 # Take profit triggered (fixed target price, no overcredit)
@@ -664,8 +741,13 @@ class VirtualBook:
                 is_buy_exit = (pos.direction == Direction.SHORT)
                 raw_exit = pos.target
                 effective_exit = self.cost_model.model_execution_price(raw_exit, is_buy_exit, sym_filter)
-                self._record_closed_position(pos, effective_exit, raw_exit, ExitReason.TAKE_PROFIT, open_time_ms + 60_000, economic_exit_ms=open_time_ms)
+                econ_exit = open_time_ms + 60_000 - 1
+                self._record_closed_position(pos, effective_exit, raw_exit, ExitReason.TAKE_PROFIT, open_time_ms + 60_000, economic_exit_ms=econ_exit)
                 del self.positions[sym]
+                for interval in reversed(self.exposure_intervals):
+                    if interval.position_id == pos.position_id and interval.end_ms is None:
+                        interval.end_ms = econ_exit
+                        break
 
             elif expiry_hit:
                 # Schedule expiry exit for the following open
@@ -698,7 +780,7 @@ class VirtualBook:
         initial_risk_dollars = pos.quantity * abs(pos.effective_entry - pos.stop)
         net_bps = (net_pnl / entry_notional) * Decimal(10000) if entry_notional > Decimal(0) else Decimal(0)
         net_r = (net_pnl / initial_risk_dollars) if initial_risk_dollars > Decimal(0) else None
-        holding_min = (econ_exit - pos.entry_time_ms) // 60_000
+        holding_min = max(1, (ceil_exit_ms - pos.entry_time_ms) // 60_000)
 
         trade = CompletedTrade(
             trade_id=f"TRD_{pos.position_id}_{econ_exit}",
@@ -734,44 +816,87 @@ class VirtualBook:
         Ownership window is [S - 15000ms, S + 15000ms].
         Charge each settlement ID once per position.
         """
-        # Determine if this minute intersects a whole UTC hour
-        # S is the nearest hour
-        minute_start = open_time_ms
-        minute_end = open_time_ms + 60_000
+        # Ensure manually injected positions in tests have exposure intervals
+        for sym, pos in self.positions.items():
+            if not any(i.position_id == pos.position_id for i in self.exposure_intervals):
+                self.exposure_intervals.append(
+                    ExposureInterval(
+                        position_id=pos.position_id,
+                        symbol=sym,
+                        direction=pos.direction,
+                        start_ms=pos.entry_time_ms,
+                        end_ms=None,
+                        quantity=pos.quantity,
+                        entry_price=pos.effective_entry,
+                    )
+                )
 
-        # Hourly boundary in this minute:
-        hour_s = (minute_start // 3_600_000) * 3_600_000
-        if minute_start <= hour_s < minute_end or minute_start <= hour_s + 3_600_000 < minute_end:
-            target_s = hour_s if (minute_start <= hour_s < minute_end) else (hour_s + 3_600_000)
+        target_s = (open_time_ms // 3_600_000) * 3_600_000
+        if open_time_ms == target_s:
             window_start = target_s - FUNDING_OWNERSHIP_HALF_WINDOW_MS
             window_end = target_s + FUNDING_OWNERSHIP_HALF_WINDOW_MS
 
-            # Check overlap with [minute_start, minute_end]
-            if max(minute_start, window_start) <= min(minute_end, window_end):
-                for sym, pos in self.positions.items():
-                    key = (sym, target_s)
-                    if key in self.charged_settlements:
-                        continue
-                    self.charged_settlements.add(key)
+            symbols_to_check = {i.symbol for i in self.exposure_intervals}
+            for sym in sorted(symbols_to_check):
+                key = (sym, target_s)
+                if key in self.charged_settlements:
+                    continue
 
-                    # Charge funding
-                    mark_price = self.last_available_marks.get(sym, (pos.effective_entry, 0, 0))[0]
-                    debit = self.cost_model.compute_funding_charge(pos.quantity, mark_price)
+                # Find exposure intervals intersecting [window_start, window_end]
+                intersecting = [
+                    i for i in self.exposure_intervals
+                    if i.symbol == sym
+                    and i.start_ms <= window_end
+                    and (i.end_ms is None or i.end_ms >= window_start)
+                ]
+                if not intersecting:
+                    continue
+
+                self.charged_settlements.add(key)
+                chargeable_qty = max(i.quantity for i in intersecting)
+                latest_interval = intersecting[-1]
+
+                mark_price = self.last_available_marks.get(sym, (latest_interval.entry_price, 0, 0))[0]
+                debit = self.cost_model.compute_funding_charge(chargeable_qty, mark_price)
+
+                # If symbol is still open in self.positions, update position
+                if sym in self.positions:
+                    pos = self.positions[sym]
                     pos.total_funding_charged_usdt += debit
                     pos.funding_reserves_usdt = max(Decimal(0), pos.funding_reserves_usdt - debit)
+                else:
+                    # Position was closed in Stage 4 or Stage 6 of this minute, update pending_exit_acks
+                    for idx, item in enumerate(self.pending_exit_acks):
+                        trade = item[0]
+                        if trade.symbol == sym:
+                            trade.total_funding_usdt += debit
+                            trade.net_pnl_usdt -= debit
+                            if trade.entry_notional_usdt > Decimal(0):
+                                trade.net_bps = (trade.net_pnl_usdt / trade.entry_notional_usdt) * Decimal(10000)
+                            if trade.initial_risk_dollars > Decimal(0):
+                                trade.net_r = trade.net_pnl_usdt / trade.initial_risk_dollars
+                            ack_time = item[1]
+                            exit_res = item[2]
+                            rem_fund = item[3]
+                            new_rem_fund = max(Decimal(0), rem_fund - debit)
+                            self.pending_exit_acks[idx] = (trade, ack_time, exit_res, new_rem_fund)
+                            break
 
-                    f_rec = FundingEventRecord(
-                        event_id=f"FUND_{sym}_{target_s}",
-                        symbol=sym,
-                        settlement_time_ms=target_s,
-                        rate=self.cost_model.funding_rate,
-                        settlement_mark=mark_price,
-                        position_quantity=pos.quantity,
-                        cashflow_debit_usdt=debit,
-                        charged_at_ms=open_time_ms,
-                        available_at_ms=target_s + 60_000,
-                    )
-                    self.pending_funding_acks.append(f_rec)
+                # Decrement aggregate funding reserve (B07 conservation)
+                self.funding_reserve_rf = max(Decimal(0), self.funding_reserve_rf - debit)
+
+                f_rec = FundingEventRecord(
+                    event_id=f"FUND_{sym}_{target_s}",
+                    symbol=sym,
+                    settlement_time_ms=target_s,
+                    rate=self.cost_model.funding_rate,
+                    settlement_mark=mark_price,
+                    position_quantity=chargeable_qty,
+                    cashflow_debit_usdt=debit,
+                    charged_at_ms=open_time_ms,
+                    available_at_ms=target_s + 60_000,
+                )
+                self.pending_funding_acks.append(f_rec)
 
     def _stage_8_ex_post_report(
         self,
