@@ -1,0 +1,577 @@
+{
+  "TASK_ID": "V06_G2_BTC_PUBLIC_EMPIRICAL_FAST_DISCOVERY_R1",
+  "barriers": {
+    "account_privateAPI_trading": "NONE",
+    "owner_Quant_agent_data": "NO_ACCESS",
+    "protected2026_Forward_H39_H40_H41_A_line_results": "NO_ACCESS"
+  },
+  "candidate_count": 12,
+  "candidates": [
+    {
+      "allocation_fraction": 0.3333333333333333,
+      "cooldown_hours": 4,
+      "diagnostic_symbols": [
+        "BTCUSDT"
+      ],
+      "eligible_for_shortlist": false,
+      "family": "STRUCTURAL_CONTINUATION",
+      "horizon_hours": 4,
+      "id": "STRUCTURAL_CONTINUATION_LONG_04H",
+      "measurement_identity": "BTC_PRICE_ONLY_SHADOW_OF_ORIGINAL_SIGNAL_RULE_NOT_ORIGINAL_PROTOCOL_PASS",
+      "origin": "ORIGINAL8_UNCHANGED_FORMULAS",
+      "original_protocol_economic_status": "NOT_EVALUABLE_MISSING_TRUE_MARK_FUNDING_FILTER_FEE_SOURCE_AND_MULTI_ASSET_SUPPORT",
+      "original_symbols": [
+        "BTCUSDT",
+        "ETHUSDT",
+        "SOLUSDT"
+      ],
+      "risk_max_bps": 250,
+      "risk_min_bps": 30,
+      "side": "LONG",
+      "stop_atr_multiplier": 1.5,
+      "stress_geometry": {
+        "C": "44+8*max_holding_hours+20000*tick/entry",
+        "cadence": "UNKNOWN_HOURLY_BOUND_NOT_REAL_FUNDING",
+        "stop_ge_2C": true,
+        "target_ge_3C": true
+      },
+      "target_R": 2
+    },
+    {
+      "allocation_fraction": 0.3333333333333333,
+      "cooldown_hours": 4,
+      "diagnostic_symbols": [
+        "BTCUSDT"
+      ],
+      "eligible_for_shortlist": false,
+      "family": "STRUCTURAL_CONTINUATION",
+      "horizon_hours": 12,
+      "id": "STRUCTURAL_CONTINUATION_LONG_12H",
+      "measurement_identity": "BTC_PRICE_ONLY_SHADOW_OF_ORIGINAL_SIGNAL_RULE_NOT_ORIGINAL_PROTOCOL_PASS",
+      "origin": "ORIGINAL8_UNCHANGED_FORMULAS",
+      "original_protocol_economic_status": "NOT_EVALUABLE_MISSING_TRUE_MARK_FUNDING_FILTER_FEE_SOURCE_AND_MULTI_ASSET_SUPPORT",
+      "original_symbols": [
+        "BTCUSDT",
+        "ETHUSDT",
+        "SOLUSDT"
+      ],
+      "risk_max_bps": 250,
+      "risk_min_bps": 30,
+      "side": "LONG",
+      "stop_atr_multiplier": 1.5,
+      "stress_geometry": {
+        "C": "44+8*max_holding_hours+20000*tick/entry",
+        "cadence": "UNKNOWN_HOURLY_BOUND_NOT_REAL_FUNDING",
+        "stop_ge_2C": true,
+        "target_ge_3C": true
+      },
+      "target_R": 2
+    },
+    {
+      "allocation_fraction": 0.3333333333333333,
+      "cooldown_hours": 4,
+      "diagnostic_symbols": [
+        "BTCUSDT"
+      ],
+      "eligible_for_shortlist": false,
+      "family": "STRUCTURAL_CONTINUATION",
+      "horizon_hours": 4,
+      "id": "STRUCTURAL_CONTINUATION_SHORT_04H",
+      "measurement_identity": "BTC_PRICE_ONLY_SHADOW_OF_ORIGINAL_SIGNAL_RULE_NOT_ORIGINAL_PROTOCOL_PASS",
+      "origin": "ORIGINAL8_UNCHANGED_FORMULAS",
+      "original_protocol_economic_status": "NOT_EVALUABLE_MISSING_TRUE_MARK_FUNDING_FILTER_FEE_SOURCE_AND_MULTI_ASSET_SUPPORT",
+      "original_symbols": [
+        "BTCUSDT",
+        "ETHUSDT",
+        "SOLUSDT"
+      ],
+      "risk_max_bps": 250,
+      "risk_min_bps": 30,
+      "side": "SHORT",
+      "stop_atr_multiplier": 1.5,
+      "stress_geometry": {
+        "C": "44+8*max_holding_hours+20000*tick/entry",
+        "cadence": "UNKNOWN_HOURLY_BOUND_NOT_REAL_FUNDING",
+        "stop_ge_2C": true,
+        "target_ge_3C": true
+      },
+      "target_R": 2
+    },
+    {
+      "allocation_fraction": 0.3333333333333333,
+      "cooldown_hours": 4,
+      "diagnostic_symbols": [
+        "BTCUSDT"
+      ],
+      "eligible_for_shortlist": false,
+      "family": "STRUCTURAL_CONTINUATION",
+      "horizon_hours": 12,
+      "id": "STRUCTURAL_CONTINUATION_SHORT_12H",
+      "measurement_identity": "BTC_PRICE_ONLY_SHADOW_OF_ORIGINAL_SIGNAL_RULE_NOT_ORIGINAL_PROTOCOL_PASS",
+      "origin": "ORIGINAL8_UNCHANGED_FORMULAS",
+      "original_protocol_economic_status": "NOT_EVALUABLE_MISSING_TRUE_MARK_FUNDING_FILTER_FEE_SOURCE_AND_MULTI_ASSET_SUPPORT",
+      "original_symbols": [
+        "BTCUSDT",
+        "ETHUSDT",
+        "SOLUSDT"
+      ],
+      "risk_max_bps": 250,
+      "risk_min_bps": 30,
+      "side": "SHORT",
+      "stop_atr_multiplier": 1.5,
+      "stress_geometry": {
+        "C": "44+8*max_holding_hours+20000*tick/entry",
+        "cadence": "UNKNOWN_HOURLY_BOUND_NOT_REAL_FUNDING",
+        "stop_ge_2C": true,
+        "target_ge_3C": true
+      },
+      "target_R": 2
+    },
+    {
+      "allocation_fraction": 0.3333333333333333,
+      "cooldown_hours": 4,
+      "diagnostic_symbols": [
+        "BTCUSDT"
+      ],
+      "eligible_for_shortlist": false,
+      "family": "CLOSED_RETEST",
+      "horizon_hours": 4,
+      "id": "CLOSED_RETEST_LONG_04H",
+      "measurement_identity": "BTC_PRICE_ONLY_SHADOW_OF_ORIGINAL_SIGNAL_RULE_NOT_ORIGINAL_PROTOCOL_PASS",
+      "origin": "ORIGINAL8_UNCHANGED_FORMULAS",
+      "original_protocol_economic_status": "NOT_EVALUABLE_MISSING_TRUE_MARK_FUNDING_FILTER_FEE_SOURCE_AND_MULTI_ASSET_SUPPORT",
+      "original_symbols": [
+        "BTCUSDT",
+        "ETHUSDT",
+        "SOLUSDT"
+      ],
+      "risk_max_bps": 250,
+      "risk_min_bps": 30,
+      "side": "LONG",
+      "stop_atr_multiplier": null,
+      "stress_geometry": {
+        "C": "44+8*max_holding_hours+20000*tick/entry",
+        "cadence": "UNKNOWN_HOURLY_BOUND_NOT_REAL_FUNDING",
+        "stop_ge_2C": true,
+        "target_ge_3C": true
+      },
+      "target_R": 2
+    },
+    {
+      "allocation_fraction": 0.3333333333333333,
+      "cooldown_hours": 4,
+      "diagnostic_symbols": [
+        "BTCUSDT"
+      ],
+      "eligible_for_shortlist": false,
+      "family": "CLOSED_RETEST",
+      "horizon_hours": 12,
+      "id": "CLOSED_RETEST_LONG_12H",
+      "measurement_identity": "BTC_PRICE_ONLY_SHADOW_OF_ORIGINAL_SIGNAL_RULE_NOT_ORIGINAL_PROTOCOL_PASS",
+      "origin": "ORIGINAL8_UNCHANGED_FORMULAS",
+      "original_protocol_economic_status": "NOT_EVALUABLE_MISSING_TRUE_MARK_FUNDING_FILTER_FEE_SOURCE_AND_MULTI_ASSET_SUPPORT",
+      "original_symbols": [
+        "BTCUSDT",
+        "ETHUSDT",
+        "SOLUSDT"
+      ],
+      "risk_max_bps": 250,
+      "risk_min_bps": 30,
+      "side": "LONG",
+      "stop_atr_multiplier": null,
+      "stress_geometry": {
+        "C": "44+8*max_holding_hours+20000*tick/entry",
+        "cadence": "UNKNOWN_HOURLY_BOUND_NOT_REAL_FUNDING",
+        "stop_ge_2C": true,
+        "target_ge_3C": true
+      },
+      "target_R": 2
+    },
+    {
+      "allocation_fraction": 0.3333333333333333,
+      "cooldown_hours": 4,
+      "diagnostic_symbols": [
+        "BTCUSDT"
+      ],
+      "eligible_for_shortlist": false,
+      "family": "CLOSED_RETEST",
+      "horizon_hours": 4,
+      "id": "CLOSED_RETEST_SHORT_04H",
+      "measurement_identity": "BTC_PRICE_ONLY_SHADOW_OF_ORIGINAL_SIGNAL_RULE_NOT_ORIGINAL_PROTOCOL_PASS",
+      "origin": "ORIGINAL8_UNCHANGED_FORMULAS",
+      "original_protocol_economic_status": "NOT_EVALUABLE_MISSING_TRUE_MARK_FUNDING_FILTER_FEE_SOURCE_AND_MULTI_ASSET_SUPPORT",
+      "original_symbols": [
+        "BTCUSDT",
+        "ETHUSDT",
+        "SOLUSDT"
+      ],
+      "risk_max_bps": 250,
+      "risk_min_bps": 30,
+      "side": "SHORT",
+      "stop_atr_multiplier": null,
+      "stress_geometry": {
+        "C": "44+8*max_holding_hours+20000*tick/entry",
+        "cadence": "UNKNOWN_HOURLY_BOUND_NOT_REAL_FUNDING",
+        "stop_ge_2C": true,
+        "target_ge_3C": true
+      },
+      "target_R": 2
+    },
+    {
+      "allocation_fraction": 0.3333333333333333,
+      "cooldown_hours": 4,
+      "diagnostic_symbols": [
+        "BTCUSDT"
+      ],
+      "eligible_for_shortlist": false,
+      "family": "CLOSED_RETEST",
+      "horizon_hours": 12,
+      "id": "CLOSED_RETEST_SHORT_12H",
+      "measurement_identity": "BTC_PRICE_ONLY_SHADOW_OF_ORIGINAL_SIGNAL_RULE_NOT_ORIGINAL_PROTOCOL_PASS",
+      "origin": "ORIGINAL8_UNCHANGED_FORMULAS",
+      "original_protocol_economic_status": "NOT_EVALUABLE_MISSING_TRUE_MARK_FUNDING_FILTER_FEE_SOURCE_AND_MULTI_ASSET_SUPPORT",
+      "original_symbols": [
+        "BTCUSDT",
+        "ETHUSDT",
+        "SOLUSDT"
+      ],
+      "risk_max_bps": 250,
+      "risk_min_bps": 30,
+      "side": "SHORT",
+      "stop_atr_multiplier": null,
+      "stress_geometry": {
+        "C": "44+8*max_holding_hours+20000*tick/entry",
+        "cadence": "UNKNOWN_HOURLY_BOUND_NOT_REAL_FUNDING",
+        "stop_ge_2C": true,
+        "target_ge_3C": true
+      },
+      "target_R": 2
+    },
+    {
+      "allocation_fraction": 1.0,
+      "cooldown_hours": 1,
+      "eligible_for_shortlist": true,
+      "family": "TREND_PULLBACK",
+      "horizon_hours": 8,
+      "id": "TREND_PULLBACK_08H",
+      "measurement_identity": "BTC_ONLY_EXPLORATORY_COST_PROXY_EXCLUDING_FUNDING",
+      "origin": "NEW_FIXED_PRICE_VOLUME_CHALLENGER",
+      "risk_max_bps": 300,
+      "risk_min_bps": 30,
+      "side": "BOTH",
+      "stop_atr_multiplier": 1.5,
+      "target_R": 2
+    },
+    {
+      "allocation_fraction": 1.0,
+      "cooldown_hours": 1,
+      "eligible_for_shortlist": true,
+      "family": "RANGE_EXPANSION",
+      "horizon_hours": 8,
+      "id": "RANGE_EXPANSION_08H",
+      "measurement_identity": "BTC_ONLY_EXPLORATORY_COST_PROXY_EXCLUDING_FUNDING",
+      "origin": "NEW_FIXED_PRICE_VOLUME_CHALLENGER",
+      "risk_max_bps": 300,
+      "risk_min_bps": 30,
+      "side": "BOTH",
+      "stop_atr_multiplier": 1.5,
+      "target_R": 2
+    },
+    {
+      "allocation_fraction": 1.0,
+      "cooldown_hours": 1,
+      "eligible_for_shortlist": true,
+      "family": "FAILED_BREAKOUT",
+      "horizon_hours": 8,
+      "id": "FAILED_BREAKOUT_08H",
+      "measurement_identity": "BTC_ONLY_EXPLORATORY_COST_PROXY_EXCLUDING_FUNDING",
+      "origin": "NEW_FIXED_PRICE_VOLUME_CHALLENGER",
+      "risk_max_bps": 300,
+      "risk_min_bps": 30,
+      "side": "BOTH",
+      "stop_atr_multiplier": null,
+      "target_R": 2
+    },
+    {
+      "allocation_fraction": 1.0,
+      "cooldown_hours": 4,
+      "eligible_for_shortlist": true,
+      "family": "IMPULSE_COMPRESSION",
+      "horizon_hours": 24,
+      "id": "IMPULSE_COMPRESSION_24H",
+      "measurement_identity": "BTC_ONLY_EXPLORATORY_COST_PROXY_EXCLUDING_FUNDING",
+      "origin": "NEW_FIXED_PRICE_VOLUME_CHALLENGER",
+      "risk_max_bps": 300,
+      "risk_min_bps": 30,
+      "side": "BOTH",
+      "stop_atr_multiplier": 2,
+      "target_R": 2
+    }
+  ],
+  "common_indicators": {
+    "ATR20": "arithmetic mean of20 true ranges max(H-L,abs(H-prevClose),abs(L-prevClose)); firstTR=H-L",
+    "EMA": "SMA seedN, subsequent alpha2/(N+1); EMA20/50 4h andEMA20 15m",
+    "ER12": "abs(C[t]-C[t-12])/sum(abs(deltaC) over12); zero denominator ineligible",
+    "bar_grid": "UTC epoch-aligned complete1m unions; bars missing any minute ineligible",
+    "current_bar_feature_availability": "exclusive_end+60000ms ARCHIVAL_EVENT_TIME_RECONSTRUCTED assumption, not historical publication proof",
+    "minimum_closed_4h_bars": 60
+  },
+  "controller_dispatch_sha": "4259846a64a422c3eced029bb791ed7e29dc9265",
+  "controls": {
+    "PAUSE": "zeroorders/fees/exposure/return,USDTcashnoassumed yield,Rundefined",
+    "time_matched": "unfunded LONG/SHORT episodes at SAME parententrytime andinitialriskdistance/hold/costcase, sameparentqty; balancedmean. Parententrynotionaldenominator forboth; neverportfolioROI. No-signal directionalcontrol doesnotselectnewentrytimes."
+  },
+  "costs": {
+    "BASE": {
+      "fee_bps": 6,
+      "name": "BASE",
+      "round_trip_nominal_bps": 22,
+      "slippage_bps": 3,
+      "spread_bps": 2
+    },
+    "STRESS": {
+      "fee_bps": 12,
+      "name": "STRESS",
+      "round_trip_nominal_bps": 44,
+      "slippage_bps": 6,
+      "spread_bps": 4
+    },
+    "fee_basis": "actual executednotional eachlegonce; spread/slip embeddedonce, noextra subtraction",
+    "funding_sensitivity": "4bp/8bp adverseperpossibleUTC8hwindow inclboundary+-15s; unknownhourlyscenarioalso4bp/8bp perpossiblehour. No credits. Expostnotional latestminutehigh conservative; neverfeedsdecisions; showholdhorizonworstcase4/8/12/24."
+  },
+  "data_bodies_read_before_freeze": 0,
+  "exact_start_sha": "e0ff8c3473de4bfa3e66fe7928d42992a4d38a32",
+  "execution": {
+    "ack_delay_ms": 60000,
+    "adverse_stop_gap": "WORSE_OPEN",
+    "all_WAIT": "retaincountandprivateeventledgerreason, includingno-fill/overlap/cooldown/geometry",
+    "challenger_book": "BTConeposition95%equity allocation; independent1000resetperearafold; noyieldoutsidefold",
+    "dd_clock": "lastavailablepriceclose atopen (minutei-2); nextopenqueuedliquidation, noexpostbackdating",
+    "decision_delay_ms": 60000,
+    "drawdown_kill_usdt": 100,
+    "entry_delay_after_decision_ms": 60000,
+    "entry_delay_after_event_ms": 120000,
+    "equity_reserve_fraction": 0.05,
+    "event_time": "exclusive bar end",
+    "favorable_target_gap": "FIXED_TARGET_NO_EXTRA_CREDIT",
+    "fills": "next permissible1mopen, adverse spread+slip andtick rounding",
+    "filter_status": "ASSUMED_PROXY_NOT_VERIFIED_HISTORICAL_BINANCE_FILTERS",
+    "funding_cash": "NOT_MEASURED_NOT_CREDITED_BASE_STRESS_REPORT_EXCLUDES_FUNDING",
+    "gap_veto_atr": 0.25,
+    "geometry_source_blockers": "Originalfullprotocolnon-evaluable; shadowretains hourlymaxhold stressgeometry, neverwidenstop toforcefill",
+    "initial_equity_usdt": 1000,
+    "leverage": 1,
+    "lot_btc": 0.001,
+    "margin_reserve_factor": 1.1,
+    "minimum_notional_usdt": 5,
+    "one_position_per_candidate_cost_book": true,
+    "original_book": "1/3allocation andcarrycash/highwater acrossfivefolds; nointerveningexposure/yield",
+    "price_for_mtm": "TRADE_CLOSE_PROXY_NOT_TRUE_MARK",
+    "source_grade": "PROXY_DIAGNOSTIC_ONLY",
+    "stop_target_collision": "SL_FIRST",
+    "tick_usdt": 0.1,
+    "time_exit": "firstminuteopen>=entry+hold; gapstop precedesexpiry; favorabletargetcapretained",
+    "timestamp_unit": "UTC milliseconds"
+  },
+  "folds": [
+    {
+      "april_end": "2021-05-01T00:00:00Z",
+      "april_start": "2021-04-01T00:00:00Z",
+      "grade": "DEVELOPMENT_SCREEN_NOT_PRISTINE_OOS",
+      "id": "2021",
+      "purge_hours_each_edge": 24,
+      "score_end": "2021-04-30T00:00:00Z",
+      "score_start": "2021-04-02T00:00:00Z",
+      "warmup_end": "2021-04-01T00:00:00Z",
+      "warmup_start": "2021-03-01T00:00:00Z",
+      "year": 2021
+    },
+    {
+      "april_end": "2022-05-01T00:00:00Z",
+      "april_start": "2022-04-01T00:00:00Z",
+      "grade": "DEVELOPMENT_SCREEN_NOT_PRISTINE_OOS",
+      "id": "2022",
+      "purge_hours_each_edge": 24,
+      "score_end": "2022-04-30T00:00:00Z",
+      "score_start": "2022-04-02T00:00:00Z",
+      "warmup_end": "2022-04-01T00:00:00Z",
+      "warmup_start": "2022-03-01T00:00:00Z",
+      "year": 2022
+    },
+    {
+      "april_end": "2023-05-01T00:00:00Z",
+      "april_start": "2023-04-01T00:00:00Z",
+      "grade": "DEVELOPMENT_SCREEN_NOT_PRISTINE_OOS",
+      "id": "2023",
+      "purge_hours_each_edge": 24,
+      "score_end": "2023-04-30T00:00:00Z",
+      "score_start": "2023-04-02T00:00:00Z",
+      "warmup_end": "2023-04-01T00:00:00Z",
+      "warmup_start": "2023-03-01T00:00:00Z",
+      "year": 2023
+    },
+    {
+      "april_end": "2024-05-01T00:00:00Z",
+      "april_start": "2024-04-01T00:00:00Z",
+      "grade": "DEVELOPMENT_SCREEN_NOT_PRISTINE_OOS",
+      "id": "2024",
+      "purge_hours_each_edge": 24,
+      "score_end": "2024-04-30T00:00:00Z",
+      "score_start": "2024-04-02T00:00:00Z",
+      "warmup_end": "2024-04-01T00:00:00Z",
+      "warmup_start": "2024-03-01T00:00:00Z",
+      "year": 2024
+    },
+    {
+      "april_end": "2025-05-01T00:00:00Z",
+      "april_start": "2025-04-01T00:00:00Z",
+      "grade": "DEVELOPMENT_SCREEN_NOT_PRISTINE_OOS",
+      "id": "2025",
+      "purge_hours_each_edge": 24,
+      "score_end": "2025-04-30T00:00:00Z",
+      "score_start": "2025-04-02T00:00:00Z",
+      "warmup_end": "2025-04-01T00:00:00Z",
+      "warmup_start": "2025-03-01T00:00:00Z",
+      "year": 2025
+    }
+  ],
+  "formula_definitions": {
+    "CLOSED_RETEST": "4h EMA directionalordering at breakout and confirmation for explicitprice-onlyshadow; normative timing ambiguity remainsnon-evaluable. 1h C breaks prior24hourhigh/low by>=.25ATR20_1h, signedbody>=.5ATR. Freezeboundary/ATR. Onlynext3closedhours: LONG LOW liesin[boundary-.25A,boundary+.25A],C>=boundary+.1A,C>O; SHORT HIGH inband,C<=boundary-.1A,C<O. Precedingwrongdirectionclose beyond.25A cancels. Firstconfirmation. Stopminlowbreakthroughconfirm-.25A/maxhigh+.25A. ConfirmationATRhour/C30..250bp; geometry ATR andgap use currentconfirmationhourATR, frozenbreakoutATR stopconstruction. Oneevent=side/breakouthour, firstattempt consumedincludinggapveto.",
+    "FAILED_BREAKOUT": "SHORT current15mH>prior16HIGH+.25ATR20_15,C<priorHIGH-.10ATR20_15,C<O; LONG L<prior16LOW-.25ATR20_15,C>priorLOW+.10ATR20_15,C>O. Stop currentH+.25ATR15 orL-.25ATR15;hold8h.",
+    "IMPULSE_COMPRESSION": "j=k-3 impulse signedbody>=1.5ATR20_15[j-1],range<=3frozenA; j+1,j+2ranges<=.75frozenA andhighlowcontainedimpulse. CurrentkC beyondtwo-compressionbarH/L by.10frozenA,signedbody>=.5frozenA,current4hC>EMA20>EMA50/mirror. Stop=C15-d*2ATR20_1h;hold24h.",
+    "RANGE_EXPANSION": "15mC beyond prior16barHIGH/LOW,signedbody>=.5ATR20_15,volume>=1.25meanPREVIOUS20volumes,ER12_1h>=.25. Stop=C15-d*1.5ATR20_1h;hold8h.",
+    "STRUCTURAL_CONTINUATION": "LONG closed4h C>EMA20>EMA50, EMA20[t]>EMA20[t-3], ER12_4h>=.35; SHORT mirrors. Closed1h C breaks prior3completehours high/low, signedbody>=.5ATR20_1h,range<=2ATR20_1h,abs(C1h-EMA20_4h)<=ATR20_4h. Stop=C1h-d*1.5ATR20_1h. ATR20_1h/C1h30..250bp. Hourdecisionclose+60s/fill+120s. New4hbar sinceprecedingentry.",
+    "TREND_PULLBACK": "Current4h C>EMA20>EMA50/mirror,ER12_4h>=.25. LONG previous15mC<=previousEMA20_15, currentLOW<=currentEMA20_15,C>EMA20_15,C>O; SHORT mirrors. Stop=C15-d*1.5ATR20_1h;hold8h.",
+    "challenger_common": "ATR20_1h/C15 15..250bp,60completed4h; eachone bidirectionalrule nottwo additionaltrials; nofit/parametergrid"
+  },
+  "inference": {
+    "blocks": "sharedUTCweek clusters, resampleweeks withinera, equalera mean; missingno-tradeweekssuppliedfromcalendar; noresample seed search",
+    "bootstrap_resamples": 10000,
+    "ci_interval": [
+      0.025,
+      0.975
+    ],
+    "comparisons": 24,
+    "estimands": [
+      "stress_net_bps",
+      "stress_incremental_bps_vs_balanced_control"
+    ],
+    "familywise_alpha": 0.05,
+    "gate": {
+      "adjusted_net_and_increment_LCB_gt": 0,
+      "max_trade_close_proxy_drawdown_pct": 10,
+      "min_total_trades": "20*fullfoldcount",
+      "minimum_full_era_folds": 3,
+      "minimum_nonnegative_stress_folds_fraction": 0.8,
+      "minimum_trades_per_full_fold": 20,
+      "original8_full_protocol_gate": "NOT_EVALUABLE_NOT_POSITIVE; BTConlyfailsoriginal<=60%singleasset criterion",
+      "stress_equal_era_mean_min_bps": 5,
+      "stress_median_min_bps": -5,
+      "stress_profit_factor_min": 1.1,
+      "two_week_adjusted_LCB_gt": 0,
+      "worst5pct_trade_mean_min_bps": -300
+    },
+    "max_cards": 3,
+    "no_tuning_after_outcomes": true,
+    "one_sided_lower_quantile": 0.0020833333333333333,
+    "ranking": "eligiblechallengersonly descendingmin(adjustednetLCB,incrementLCB), lowerDD tie thenlexicalID",
+    "seed": 17012025,
+    "selection_cost_case": "STRESS",
+    "two_week_sensitivity": "fixed14dayblocks fromscorestart byera, samefixedseed"
+  },
+  "model": {
+    "actual_effort": "NOT_EXPOSED",
+    "actual_model": "NOT_EXPOSED",
+    "requested": "Codex GPT-6 Sol High"
+  },
+  "original_source_references": [
+    {
+      "path": "docs/strategy_research/g2_r3/METHOD_DESIGN.md",
+      "sha": "e5b2006a89441f7eb2ec900e508aff451106b87a"
+    },
+    {
+      "path": "docs/strategy_research/g2_r3/METHOD_DESIGN.md",
+      "sha": "cf2d5cc33774cdcff7d709636305bba830e977ef"
+    },
+    {
+      "path": "docs/strategy_research/g2_r3/scientific_strategy_review_r1/ECONOMIC_MECHANISM_COST_POWER_REPORT.md",
+      "sha": "57818b967a836382caa3fa95516d3e027e990f61"
+    }
+  ],
+  "original_source_register_sha256": "d0f89bddfaec0e57c959cec043969059da10fec8aa45f81669dde8b80ea35a9b",
+  "prompt_commit_sha": "7717b229a5d600170b1e33947eec200c997d3221",
+  "registry_version": 1,
+  "retunes_allowed": 0,
+  "rights": {
+    "commercial_live_signal_authority": "NONE",
+    "data_derived_artifacts_license": "CC BY-NC-SA4.0 withBinanceVisionattribution; genericcode not relicensed",
+    "dataset_terms": "https://github.com/binance/binance-public-data/blob/master/TERMS_AND_CONDITIONS.md",
+    "provider": "Binance Vision",
+    "raw_data_rehosting": false,
+    "scope": "NONCOMMERCIAL_PERSONAL_NONPRODUCTION_RESEARCH",
+    "terms_version": "1.0 dated2026-08-26 observed2026-10-11"
+  },
+  "source_plan": [
+    {
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2021-03.zip.CHECKSUM",
+      "month": 3,
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2021-03.zip",
+      "year": 2021
+    },
+    {
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2021-04.zip.CHECKSUM",
+      "month": 4,
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2021-04.zip",
+      "year": 2021
+    },
+    {
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2022-03.zip.CHECKSUM",
+      "month": 3,
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2022-03.zip",
+      "year": 2022
+    },
+    {
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2022-04.zip.CHECKSUM",
+      "month": 4,
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2022-04.zip",
+      "year": 2022
+    },
+    {
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2023-03.zip.CHECKSUM",
+      "month": 3,
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2023-03.zip",
+      "year": 2023
+    },
+    {
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2023-04.zip.CHECKSUM",
+      "month": 4,
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2023-04.zip",
+      "year": 2023
+    },
+    {
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2024-03.zip.CHECKSUM",
+      "month": 3,
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2024-03.zip",
+      "year": 2024
+    },
+    {
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2024-04.zip.CHECKSUM",
+      "month": 4,
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2024-04.zip",
+      "year": 2024
+    },
+    {
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2025-03.zip.CHECKSUM",
+      "month": 3,
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2025-03.zip",
+      "year": 2025
+    },
+    {
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2025-04.zip.CHECKSUM",
+      "month": 4,
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2025-04.zip",
+      "year": 2025
+    }
+  ],
+  "status": "OUTCOME_BLIND_FIXED_EXPLORATORY_EXPERIMENT_NOT_EFFECTIVE_P3_PREREG"
+}

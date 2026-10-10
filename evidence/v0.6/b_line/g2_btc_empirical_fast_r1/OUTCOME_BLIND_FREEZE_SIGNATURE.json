@@ -1,0 +1,24 @@
+{
+  "first_remote_freeze_SHA": "externalaftercommit no selfreference",
+  "payload_serialization": "UTF8json sort_keys=True separators comma/colon no newline",
+  "payload_sha256": "cd7a0bb6bc99ae4e8dddce8122c945ad616ccef1956f70942215a7f58fd9fa71",
+  "public_key_raw_base64": "vNOZZBBWRR6K9IzVwgtO6ZGSg23Jsq/eUByXiQdZtdI=",
+  "public_key_sha256": "fee7f56a4a8cb15e2e962af373bcbd9e60aa64aefb7b1797df2e68037c61d9ca",
+  "registry_signature_base64": "oZfvV1MAD6Y63pPU7MQEGUj1OvcBalMtdNEEFlnKYq2Cf6gvvr/LA9fEO/X+A8HNbfYY8jQPnZNe44OsEFz0Bw==",
+  "schema": "OUTCOME_BLIND_FREEZE_SIGNATURE_V1",
+  "second_commit_must_not_change_these_two_files": true,
+  "signature_algorithm": "Ed25519",
+  "signature_base64": "5yZU009TKX5nRGIVJxvVarfSXD+I354g9zbPvOzFozK9kSJ1NfIjhTyQqfyeR9+OFYUIYCDG0HE5+mO7g7TODw==",
+  "signature_scope": "canonical signed_payload includes UTC timestamp andexactregistrySHA; second signature coversregistrybytes",
+  "signed_payload": {
+    "candidate_count": 12,
+    "controller_dispatch_sha": "4259846a64a422c3eced029bb791ed7e29dc9265",
+    "created_at_utc": "2026-10-10T16:47:56.067784+00:00",
+    "expected_first_parent": "e0ff8c3473de4bfa3e66fe7928d42992a4d38a32",
+    "fold_count": 5,
+    "prices_read_at_signing": 0,
+    "registry_path": "evidence/v0.6/b_line/g2_btc_empirical_fast_r1/FROZEN_STRATEGY_REGISTRY.json",
+    "registry_sha256": "79fc9e020f258c410b5612b44c60e94563df8c659053ff15aba89efd4daf7b35"
+  },
+  "signer": "ephemeralresearchkeygeneratedforthistask, NOT externalidentity/timestampauthority"
+}
