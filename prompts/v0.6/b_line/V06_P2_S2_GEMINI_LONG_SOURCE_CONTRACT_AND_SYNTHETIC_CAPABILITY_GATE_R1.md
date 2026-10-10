@@ -1,0 +1,51 @@
+# Gemini — P2 S2 bounded source authority contract + executable synthetic capability gate R1
+
+**TASK_ID:** `V06_P2_S2_GEMINI_LONG_SOURCE_CONTRACT_AND_SYNTHETIC_CAPABILITY_GATE_R1`.
+**ROLE:** Gemini primary engineering implementer on B-line; design the real *future* data qualification gates and prove their boundary with synthetic fixtures, NOT an old P2 locator repair, a source body reader, a trading replay engine or Alpha research.
+**CONTROLLER_DISPATCH_SHA:** `b176f4361cd97d1d89c3e25173b2c72a6af93ec4`.
+**Mandatory authority:** [Controller prospective P2 S2 dual-workstream dispatch](https://github.com/EXASHXE/btc-quant-agent-public/blob/b176f4361cd97d1d89c3e25173b2c72a6af93ec4/reviews/v0.6/b_line/V06_P2_S2_SOURCE_READINESS_AND_PIT_PROSPECTIVE_PARALLEL_DISPATCH_R1.md). Read FIRST and conform to its latest security/role constraints; it governs over this text if conflict.
+**REPOSITORY:** `EXASHXE/btc-quant-agent-public`.
+**YOUR REMOTE BRANCH ALREADY CREATED:** `feature/v06-bline-p2-s2-gemini-source-contract-r1`.
+**CODE_START_SHA / initial remote branch HEAD:** `e0ff8c3473de4bfa3e66fe7928d42992a4d38a32`. Branch starts at original v0.6 CODE, not docs. Verify before work.
+**Suggested new isolated worktree:** `/root/workspace/project/quant-v0.6/p2-s2-gemini-source-contract-r1`. Verify unowned path absent/clean; do not reset/stash/clean existing worktree.
+**Independent parallel Sol:** `feature/v06-bline-p2-s2-sol61-pit-science-r1`. No dependency or shared writable files. Run to *completion* of all substantive gates, don't exit after first passing smoke test.
+
+## 0. Verified source baseline, no-data authority
+
+Owner WSL data root: `/root/workspace/project/Quant-agent/data`; candidate `research/BTCUSDT`. Original stat receipt exact SHA `c6823dbc46249cac43aa10400aacbbe9f4542410` proved six selected **NON-PROTECTED** BTC perp 1m Parquet monthly file METADATA positions: March and April in 2021, 2023, 2025. `data_manifest.json`, `funding_events.csv`, `raw/{mark_price,funding,klines}` **metadata parent locations only**; BTC spot and ETH hourly distinct, SOL 1m unknown. This does NOT prove schema, row continuity, source permission, true continuous 1m Mark, funding clock, or economic utility.
+
+Prior one-shot locator `4a1fcc2871708f0e9e3a7c40036ecaab39ba99b8` had 2831 test CI SUCCESS but was **TERMINATED AS UNSAFE** (production CLI automatically bypassed fixed root if a nondefault --data-root supplied; direct stat calls bypassed counted budget). Final Controller `ca0b6ea62613e6981b6f818f37f45be8c1d74901`. Treat as a COUNTEREXAMPLE only. Do not copy its source/import/fork/cherry-pick, implement old scripts or run it on physical data. Preserve all old Git artifacts as immutable.
+
+Current Controller design [P2 source admission R1](https://github.com/EXASHXE/btc-quant-agent-public/blob/519b2e9ba2ca847e76ad9c0a7fbafcec5fcda158/reviews/v0.6/b_line/V06_P2_POST_LOCATOR_TRUE_MINUTE_MARK_FUNDING_PIT_SOURCE_ADMISSION_DESIGN_R1.md). P1 old/new engines terminal NO-GO, Sol R4 conditional research not Alpha; original 8 research formulas not to be retuned. P3/P4/TESTNET/LIVE/REAL_FUNDS closed.
+
+**HARD NO-READ:** do not lstat the actual WSL market root again, open original Parquet footer, read real market row/candle/Mark/Funding/CSV header or ZIP, hash raw market file, list raw folders, visit protected 2026-02→07, `data/forward`, H39 ledgers, A-line heldout, credentials or trading APIs. No market downloads, no source reconstruction from remembered prices. **ALL executable tests must use synthetic temporary files and invented prices/times only**; do not package a deployable runnable reader pointed at owner data. GitHub docs and published immutable *research method text* are allowed.
+
+## 1. Real task program (autonomous, bounded, outcome blind)
+
+**P0 — exact identity and immutable evidence matrix.** Verify clean worktree, remote branch start and immutable Controller SHA. Derive one machine-readable data SOURCE MAP by role (BTC perp 1m Kline six selected, raw Kline directory, raw true-minute Mark directory, funding_events CSV and raw parent, spot, ETH 1h, old derivative hourly, absent/unproven ETH/SOL perp 1m), evidence certainty `OWNER_DECLARED`, `PHYSICAL_METADATA_EXECUTOR_OBSERVED`, `UNVERIFIED_RIGHTS`, `UNKNOWN_FILE_CONTINUITY`, `PROTECTED_DO_NOT_TOUCH`. Each selected file exact *relative* path, candidate source role, original source SHA, and expected future fields (data clock event_ts, known_at, corrections available_at). **Do not inject manifest contents not read**. Include a rights/owner-data-grant questionnaire in report as PROPOSED, not assert clearance.
+
+**P1 — reader capability safety specification, positive-only.** Author a fully explicit CONTRACT for future independent safe reader:
+- level L0 fixed locator known (no new scan), L1 metadata only, L2 explicit schema/footer permission, L3 timestamp/quality QA (only with bounded source permission), L4 real value/economic/experiment (requires fresh authority and prereg); default deny. No grant escalation.
+- allowlist **exact six path identities** under immutable owner root, no --root override in production; synthetic test mode only through a test-only harness that never runs a production CLI flag. open file exclusively descriptor-based (future design: dirfd component walk, O_DIRECTORY|O_NOFOLLOW/O_CLOEXEC when platform supported), reject symlink at every component / mount/TOCTOU race, EACCES distinct from ENOENT, S3 object-store fallback denied.
+- system call counting must instrument **actual OS calls**, not cache unique paths; byte-read accounting at syscall boundary, `max_bytes=0` under THIS task. Model maximum allowed bytes/rows/files/CPU/time/memory for future separate grant **as a proposal**, not active caps allowing actual content. Verify no network code or implicit Parquet convenience library read path, handle schema/footer read distinction and file size overflow.
+- explicit capability denies `[2026-02-01,2026-08-01)`, 2026 year descendants, forward/H39, other WSL repos and credentials. Zero room for an accidental global flag to elevate permission.
+- distinguish positive existence from true 1m Mark continuous proof / funding settlement+available_at / historical filter+fees/rights. Define exactly what future input evidence is needed; fail-closed unknown.
+
+**P2 — implement only an EXECUTABLE *synthetic* contract checker / pure policy kernel.** Own stdlib Python package that **accepts only injected fake stat/open hooks and fixture roots** under test. NO production entrypoint able to access user's WSL root or any real data; no direct market APIs. Provide a deterministic fake syscall interface with counters and path/type predicates, policy decisions for READ_META vs READ_SCHEMA vs READ_ROWS as enums, positive and negative grant tokens (fake IDs). Executor demonstrates that bad contexts are rejected *before* simulated reads, and that the code itself does not contain an actual open/read of owner's root. Use `os.path.commonpath` only as one layer, never as a substitute for component-safe descriptor path design. Policy scope and test fixtures should be small (<1000 lines runnable main code unless necessary).
+
+**P3 — adversarial and independent witness tests.** Actually run **>=30 focused synthetic tests**, not mere collection/counting. Cover CLI fixed-root bypass counterexample, absolute/canonical-path alias, `data-v2` sibling, `..`, all intermediate symlinks, root symlink, fake mount/device boundary, non-directory ancestor, time-of-check/time-of-use symlink replacement, permission denied, missing, duplicate Mark source conflict, 1m Mark vs Kline type, future funding known-at, late settlement, hash full-file reading blocked, 2026 protection path, forward/H39, unsigned capability, expired capability, capability escalation, 0-byte policy, complete syscall accounting, repeated path calls, error propagation and deterministic audit receipts. Produce a machine decision matrix for all input cases; negative witnesses must genuinely reject. Include at least 3 deliberate mutants (e.g. auto-enable test mode, uncounted direct stat, silent EACCES) proving the test suite detects them — no need to introduce mutant code into production package.
+
+**P4 — QA, source vs test proof.** Scoped Ruff and pytest; JSON parse all evidence; command `git diff --check`; if CI plan invokes full pytest, report its actual outcome honestly including inherited H40 if any. All test data created within ephemeral temp directories; owner WSL data root never lstat/opened. Separate source-evidence statement from syntax/test claims. **A passing simulator does NOT itself authorize any actual market access.**
+
+**P5 — report and nonforce push.** Write ONLY:
+- `docs/strategy_research/g2_r3/p2_s2_source_contract_r1/SOURCE_LOCATION_ROLE_RIGHTS_AND_CLOCK_MATRIX.md`
+- `docs/strategy_research/g2_r3/p2_s2_source_contract_r1/NEXT_STAGE_MINIMAL_SOURCE_READER_SECURITY_CONTRACT.md`
+- `evidence/v0.6/b_line/p2_s2_source_contract_r1/SOURCE_SCOPE_AND_AUTHORITY_MATRIX.json`
+- `evidence/v0.6/b_line/p2_s2_source_contract_r1/SYNTHETIC_SECURITY_ORACLE_RESULTS.json`
+- `evidence/v0.6/b_line/p2_s2_source_contract_r1/GEMINI_P2_S2_EXECUTION_RECEIPT.json`
+- `scripts/strategy_research/p2_s2_source_contract/**`, `tests/test_v06_p2_s2_source_contract_*.py`.
+No changes elsewhere, no old verifier fixes. After focused checks, proactively commit and **push automatically** using non-force fast-forward to your exact authorized branch, verify `git ls-remote` and direct parent CODE_START_SHA, exact changed allowlist, capture GitHub CI link if available; no wait for user to remind push. If remote push blocked, truthfully `BLOCKED_NOT_PUSHED`.
+
+**ONE terminal:** `P2_S2_SOURCE_CONTRACT_DESIGNED_SYNTHETIC_PROVEN_PENDING_CONTROLLER`, `P2_S2_SOURCE_CONTRACT_INCOMPLETE_STOP`, `BLOCKED_IDENTITY_OR_SCOPE` or `BLOCKED_NOT_PUSHED`.
+
+**Human final:** pinned Controller/prompt SHAs; branch exact final SHA/parent/push VERIFIED; roles/capability model, 30+ actual adversarial tests and mutant detection; true-minute Mark/Funding/cost rights unknown clearly itemized; bounded next **separate** permission grant proposal; CI status; terminal. Do not propose additional lint-only or root-scan stages.
