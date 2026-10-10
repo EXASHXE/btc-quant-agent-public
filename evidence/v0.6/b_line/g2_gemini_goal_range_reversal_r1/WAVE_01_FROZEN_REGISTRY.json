@@ -1,0 +1,449 @@
+{
+  "TASK_ID": "V06_G2_GEMINI_GOAL_B_RANGE_REVERSAL_VOL_MULTI_WAVE_DISCOVERY_R1",
+  "agent_role": "GEMINI_B_GOAL_R_RANGE_REVERSAL_VOL",
+  "barriers": {
+    "a_line_or_protected_2026_forward_H39_H40_H41": "NO_ACCESS",
+    "codex_r2_or_2024_2025_2026_btc_data": "NO_ACCESS",
+    "gemini_a_trend_flow_branch_or_worktree": "NO_ACCESS",
+    "owner_Quant_agent_data_and_sanitized": "NO_ACCESS",
+    "p2_custom_reader": "NO_ACCESS",
+    "private_exchange_api_or_live_orders": "NO_ACCESS"
+  },
+  "branch": "feature/v06-bline-gemini-goal-range-reversal-r1",
+  "budget": {
+    "agent_max_candidates_per_wave": 6,
+    "agent_max_total_candidates": 24,
+    "agent_max_waves": 4,
+    "combined_project_bline_discovery_budget": 48,
+    "current_wave_candidate_count": 6,
+    "current_wave_index": 1,
+    "prior_agent_waves_used": 0,
+    "prior_r1_public_exposure": {
+      "r1_branch": "feature/v06-bline-g2-btc-public-empirical-fast-r1",
+      "r1_candidates_evaluated": 12,
+      "r1_exposed_months_in_2021_2023": [
+        "2021-03",
+        "2021-04",
+        "2022-03",
+        "2022-04",
+        "2023-03",
+        "2023-04"
+      ],
+      "r1_freeze_sha": "21ee4c11b789d54aca6c602ce5c84426a3944fde",
+      "r1_result_sha": "920b244d06541da5cb9fc3dcaa39e5b15e914d32",
+      "r1_terminal": "NO_STRATEGY_CLEARS_COST_AND_SUPPORT_GATE",
+      "treatment": "EXPLICIT_PRIOR_EXPOSURE_LOGGED_ENTIRE_2021_2023_TREATED_AS_DEVELOPMENT_SEARCH_NOT_BLIND_OOS"
+    }
+  },
+  "candidates": [
+    {
+      "book": {
+        "allocation_fraction": 0.95,
+        "carry_across_months": true,
+        "cooldown_hours": 1,
+        "initial_equity_usdt": 1000.0,
+        "leverage": 1.0,
+        "max_concurrent_positions": 1,
+        "no_cross_month_positions": true,
+        "no_drawdown_truncation_kill_switch": true
+      },
+      "candidate_id": "W1_C01_FAILED_ACCEPTANCE_REENTRY_04H",
+      "completed_bar_features": [
+        "15m_OHLCV_completed",
+        "15m_taker_buy_volume_completed",
+        "15m_signed_flow_ratio=(2*taker_buy_vol-vol)/vol",
+        "15m_prior_24bar_high_low_[k-26:k-2]",
+        "15m_ATR20",
+        "1h_ATR20_completed"
+      ],
+      "controls": [
+        "PAUSE",
+        "NO_SIGNAL_LONG_SAME_TIMESTAMP_AND_STOP_DISTANCE",
+        "NO_SIGNAL_SHORT_SAME_TIMESTAMP_AND_STOP_DISTANCE",
+        "BALANCED_LONG_SHORT_MEAN"
+      ],
+      "counterparty_hypothesis": "Breakout chasers and stop-triggered market orders push price outside the prior 6-hour (24x15m) range at bar k-2 or k-1, but fail to achieve price acceptance for N=2 consecutive completed 15m bars (k-1 and k close back inside the range) while aggressive taker order-flow flips toward the interior. Trapped breakout positions liquidate over the next 4h.",
+      "decision_delay": "closed_bar_end_ms + 60000ms (1 full minute after 15m bar close)",
+      "family": "FAILED_ACCEPTANCE_REENTRY",
+      "first_fill": "closed_bar_end_ms + 120000ms (next 1m bar open after decision)",
+      "formula": "Let boundary_high = max(high_15m[k-26:k-2]), boundary_low = min(low_15m[k-26:k-2]), A15 = ATR20_15m[k], A1h = ATR20_1h[h]. For LONG (side=+1): min(low_15m[k-2], low_15m[k-1]) < boundary_low - 0.10*A15 AND close_15m[k-1] >= boundary_low AND close_15m[k] >= boundary_low + 0.05*A15 AND close_15m[k] > open_15m[k] AND signed_flow_ratio_15m[k] >= +0.04. For SHORT (side=-1): max(high_15m[k-2], high_15m[k-1]) > boundary_high + 0.10*A15 AND close_15m[k-1] <= boundary_high AND close_15m[k] <= boundary_high - 0.05*A15 AND close_15m[k] < open_15m[k] AND signed_flow_ratio_15m[k] <= -0.04.",
+      "gap_filter": "abs(entry_open_1m - decision_close) <= 0.25 * ATR20_1h[h]",
+      "horizon": 4,
+      "horizon_hours": 4,
+      "regime_wait": {
+        "atr_1h_bps_bounds": [
+          15.0,
+          250.0
+        ],
+        "cooldown_hours": 1,
+        "min_completed_4h_bars": 60,
+        "monthly_edge_purge_hours": 24,
+        "risk_bps_bounds": [
+          30.0,
+          300.0
+        ]
+      },
+      "seed": 20261011,
+      "side": "BOTH",
+      "source_version": "BINANCE_VISION_UM_BTCUSDT_1M_2021_2023_V1",
+      "stop_tp": {
+        "collision_rule": "SL_FIRST_SAME_1M_BAR",
+        "stop_formula": "excursion_extreme = min(low_15m[k-2:k+1]) for LONG else max(high_15m[k-2:k+1]); raw_dist = max(abs(close_15m[k] - excursion_extreme) + 0.35*ATR20_15m[k], 0.80*ATR20_1h[h]); stop = close_15m[k] - side * raw_dist",
+        "target_R": 2.0,
+        "target_mode": "FIXED_2R"
+      },
+      "wave_id": "WAVE_01"
+    },
+    {
+      "book": {
+        "allocation_fraction": 0.95,
+        "carry_across_months": true,
+        "cooldown_hours": 1,
+        "initial_equity_usdt": 1000.0,
+        "leverage": 1.0,
+        "max_concurrent_positions": 1,
+        "no_cross_month_positions": true,
+        "no_drawdown_truncation_kill_switch": true
+      },
+      "candidate_id": "W1_C02_RANGE_MEAN_REVERT_WITH_VOLUME_04H",
+      "completed_bar_features": [
+        "4h_ER12_completed",
+        "15m_OHLCV_completed",
+        "15m_SMA20_volume_completed",
+        "15m_signed_flow_ratio_completed",
+        "15m_frozen_16bar_range_[k-16:k]",
+        "15m_ATR20",
+        "1h_ATR20_completed"
+      ],
+      "controls": [
+        "PAUSE",
+        "NO_SIGNAL_LONG_SAME_TIMESTAMP_AND_STOP_DISTANCE",
+        "NO_SIGNAL_SHORT_SAME_TIMESTAMP_AND_STOP_DISTANCE",
+        "BALANCED_LONG_SHORT_MEAN"
+      ],
+      "counterparty_hypothesis": "When 4h price efficiency ER12 is low (<=0.30), directional trend traders overpay at the outer edges of the established 4h (16x15m) range. A completed 15m bar that tests the outer 20% band and reclaims inside on above-baseline volume and positive reversal taker flow captures mean reversion back toward the range midline over 4h.",
+      "decision_delay": "closed_bar_end_ms + 60000ms",
+      "family": "RANGE_MEAN_REVERT_WITH_VOLUME",
+      "first_fill": "closed_bar_end_ms + 120000ms",
+      "formula": "Require completed 4h ER12_4h[j] <= 0.30. Let H16 = max(high_15m[k-16:k]), L16 = min(low_15m[k-16:k]), W = H16 - L16, mid = 0.5*(H16 + L16). Require 1.2*ATR20_1h[h] <= W <= 4.5*ATR20_1h[h] and volume_15m[k] >= 0.90*SMA20_vol_15m[k-1]. For LONG (side=+1): low_15m[k] <= L16 + 0.20*W AND L16 + 0.22*W <= close_15m[k] <= mid - 0.10*W AND close_15m[k] > open_15m[k] AND signed_flow_ratio_15m[k] >= +0.02. For SHORT (side=-1): high_15m[k] >= H16 - 0.20*W AND mid + 0.10*W <= close_15m[k] <= H16 - 0.22*W AND close_15m[k] < open_15m[k] AND signed_flow_ratio_15m[k] <= -0.02.",
+      "gap_filter": "abs(entry_open_1m - decision_close) <= 0.25 * ATR20_1h[h]",
+      "horizon": 4,
+      "horizon_hours": 4,
+      "regime_wait": {
+        "atr_1h_bps_bounds": [
+          15.0,
+          250.0
+        ],
+        "cooldown_hours": 1,
+        "min_completed_4h_bars": 60,
+        "monthly_edge_purge_hours": 24,
+        "risk_bps_bounds": [
+          30.0,
+          300.0
+        ]
+      },
+      "seed": 20261011,
+      "side": "BOTH",
+      "source_version": "BINANCE_VISION_UM_BTCUSDT_1M_2021_2023_V1",
+      "stop_tp": {
+        "collision_rule": "SL_FIRST_SAME_1M_BAR",
+        "stop_formula": "raw_stop = (L16 - 0.40*ATR20_15m[k]) for LONG else (H16 + 0.40*ATR20_15m[k]); raw_dist = max(abs(close_15m[k] - raw_stop), 0.90*ATR20_1h[h]); stop = close_15m[k] - side * raw_dist",
+        "target_R": 2.0,
+        "target_mode": "CONSERVATIVE_MIN_OF_MIDLINE_AND_2R_FLOOR_1_5R"
+      },
+      "wave_id": "WAVE_01"
+    },
+    {
+      "book": {
+        "allocation_fraction": 0.95,
+        "carry_across_months": true,
+        "cooldown_hours": 2,
+        "initial_equity_usdt": 1000.0,
+        "leverage": 1.0,
+        "max_concurrent_positions": 1,
+        "no_cross_month_positions": true,
+        "no_drawdown_truncation_kill_switch": true
+      },
+      "candidate_id": "W1_C03_VOL_COMPRESSION_TO_REVERT_08H",
+      "completed_bar_features": [
+        "15m_ATR8_completed",
+        "15m_ATR32_completed",
+        "15m_ATR20_completed",
+        "15m_prior_12bar_high_low_[k-12:k]",
+        "15m_SMA20_volume_completed",
+        "15m_signed_flow_ratio_completed",
+        "1h_ATR20_completed"
+      ],
+      "controls": [
+        "PAUSE",
+        "NO_SIGNAL_LONG_SAME_TIMESTAMP_AND_STOP_DISTANCE",
+        "NO_SIGNAL_SHORT_SAME_TIMESTAMP_AND_STOP_DISTANCE",
+        "BALANCED_LONG_SHORT_MEAN"
+      ],
+      "counterparty_hypothesis": "During short-horizon volatility compression (ATR8_15m / ATR32_15m <= 0.82), the first bar attempting to break the compressed 3-hour (12x15m) range often lacks genuine participation (either sub-breakout volume or opposing taker flow) and closes back inside the range. Fading this premature expansion captures the return across the compressed range over 8h.",
+      "decision_delay": "closed_bar_end_ms + 60000ms",
+      "family": "VOL_COMPRESSION_TO_REVERT",
+      "first_fill": "closed_bar_end_ms + 120000ms",
+      "formula": "Require ATR8_15m[k-1] / ATR32_15m[k-1] <= 0.82. Let H12 = max(high_15m[k-12:k]), L12 = min(low_15m[k-12:k]), A15 = ATR20_15m[k]. Lack of follow-through: (volume_15m[k] <= 1.35 * SMA20_vol_15m[k-1] OR side * signed_flow_ratio_15m[k] >= 0.02). For LONG (side=+1): low_15m[k] < L12 - 0.15*A15 AND close_15m[k] >= L12 AND close_15m[k] > open_15m[k]. For SHORT (side=-1): high_15m[k] > H12 + 0.15*A15 AND close_15m[k] <= H12 AND close_15m[k] < open_15m[k].",
+      "gap_filter": "abs(entry_open_1m - decision_close) <= 0.25 * ATR20_1h[h]",
+      "horizon": 8,
+      "horizon_hours": 8,
+      "regime_wait": {
+        "atr_1h_bps_bounds": [
+          15.0,
+          250.0
+        ],
+        "cooldown_hours": 2,
+        "min_completed_4h_bars": 60,
+        "monthly_edge_purge_hours": 24,
+        "risk_bps_bounds": [
+          30.0,
+          300.0
+        ]
+      },
+      "seed": 20261011,
+      "side": "BOTH",
+      "source_version": "BINANCE_VISION_UM_BTCUSDT_1M_2021_2023_V1",
+      "stop_tp": {
+        "collision_rule": "SL_FIRST_SAME_1M_BAR",
+        "stop_formula": "stop = close_15m[k] - side * 1.40 * ATR20_1h[h]",
+        "target_R": 2.0,
+        "target_mode": "FIXED_2R"
+      },
+      "wave_id": "WAVE_01"
+    },
+    {
+      "book": {
+        "allocation_fraction": 0.95,
+        "carry_across_months": true,
+        "cooldown_hours": 2,
+        "initial_equity_usdt": 1000.0,
+        "leverage": 1.0,
+        "max_concurrent_positions": 1,
+        "no_cross_month_positions": true,
+        "no_drawdown_truncation_kill_switch": true
+      },
+      "candidate_id": "W1_C04_AGGRESSIVE_FLOW_EXHAUSTION_08H",
+      "completed_bar_features": [
+        "15m_OHLCV_completed",
+        "15m_taker_buy_volume_completed",
+        "15m_signed_flow_ratio_completed",
+        "15m_SMA20_volume_completed",
+        "15m_ATR20_completed",
+        "1h_ATR20_completed"
+      ],
+      "controls": [
+        "PAUSE",
+        "NO_SIGNAL_LONG_SAME_TIMESTAMP_AND_STOP_DISTANCE",
+        "NO_SIGNAL_SHORT_SAME_TIMESTAMP_AND_STOP_DISTANCE",
+        "BALANCED_LONG_SHORT_MEAN"
+      ],
+      "counterparty_hypothesis": "When 3 consecutive completed 15m bars [k-3, k-2, k-1] exhibit heavy one-sided aggressive taker flow with above-average volume but decaying net price displacement per bar (absorption divergence by passive liquidity), and the next completed 15m bar k closes strongly in the opposite direction with supportive taker flow, late aggressive market orders are trapped and unwind over 8h.",
+      "decision_delay": "closed_bar_end_ms + 60000ms",
+      "family": "AGGRESSIVE_FLOW_EXHAUSTION",
+      "first_fill": "closed_bar_end_ms + 120000ms",
+      "formula": "Over [k-3, k-2, k-1]: require sum(volume_15m[k-3:k]) >= 3.0 * SMA20_vol_15m[k-1], aggressive flow pressure (-side) * mean(signed_flow_ratio_15m[k-3:k]) >= 0.05, directional push (-side) * (close_15m[k-1] - open_15m[k-3]) >= 0.60 * ATR20_15m[k-1], and price impact decay abs(close_15m[k-1] - open_15m[k-1]) <= 0.85 * max(abs(close_15m[k-3] - open_15m[k-3]), abs(close_15m[k-2] - open_15m[k-2])). On completed bar k: require side * (close_15m[k] - open_15m[k]) >= 0.30 * ATR20_15m[k] AND side * signed_flow_ratio_15m[k] >= 0.0.",
+      "gap_filter": "abs(entry_open_1m - decision_close) <= 0.25 * ATR20_1h[h]",
+      "horizon": 8,
+      "horizon_hours": 8,
+      "regime_wait": {
+        "atr_1h_bps_bounds": [
+          15.0,
+          250.0
+        ],
+        "cooldown_hours": 2,
+        "min_completed_4h_bars": 60,
+        "monthly_edge_purge_hours": 24,
+        "risk_bps_bounds": [
+          30.0,
+          300.0
+        ]
+      },
+      "seed": 20261011,
+      "side": "BOTH",
+      "source_version": "BINANCE_VISION_UM_BTCUSDT_1M_2021_2023_V1",
+      "stop_tp": {
+        "collision_rule": "SL_FIRST_SAME_1M_BAR",
+        "stop_formula": "stop = close_15m[k] - side * 1.50 * ATR20_1h[h]",
+        "target_R": 2.0,
+        "target_mode": "FIXED_2R"
+      },
+      "wave_id": "WAVE_01"
+    },
+    {
+      "book": {
+        "allocation_fraction": 0.95,
+        "carry_across_months": true,
+        "cooldown_hours": 4,
+        "initial_equity_usdt": 1000.0,
+        "leverage": 1.0,
+        "max_concurrent_positions": 1,
+        "no_cross_month_positions": true,
+        "no_drawdown_truncation_kill_switch": true
+      },
+      "candidate_id": "W1_C05_OVERNIGHT_SESSION_BOUNDARY_RETURN_12H",
+      "completed_bar_features": [
+        "UTC_00_to_08_completed_session_high_low",
+        "15m_OHLCV_completed_in_0815_to_1600_UTC",
+        "15m_signed_flow_ratio_completed",
+        "15m_ATR20_completed",
+        "1h_ATR20_completed"
+      ],
+      "controls": [
+        "PAUSE",
+        "NO_SIGNAL_LONG_SAME_TIMESTAMP_AND_STOP_DISTANCE",
+        "NO_SIGNAL_SHORT_SAME_TIMESTAMP_AND_STOP_DISTANCE",
+        "BALANCED_LONG_SHORT_MEAN"
+      ],
+      "counterparty_hypothesis": "The UTC [00:00, 08:00) Asian session sets a benchmark liquidity box. When European/early-US trading [08:15, 16:00] UTC extends beyond the completed Asian session high/low by >=0.20 ATR20_1h but fails to sustain a runaway trend (<2.5 ATR20_1h) and closes a 15m bar back toward the session box with confirming taker flow, dealer inventory rebalancing pulls price back into the session range over 12h.",
+      "decision_delay": "closed_bar_end_ms + 60000ms",
+      "family": "OVERNIGHT_SESSION_BOUNDARY_RETURN",
+      "first_fill": "closed_bar_end_ms + 120000ms",
+      "formula": "For each UTC day, once 08:00 UTC is reached, freeze S_high = max(high_15m in [00:00, 08:00) UTC) and S_low = min(low_15m in [00:00, 08:00) UTC). For completed 15m bar k with end_ms in [08:15, 16:00] UTC (at most 1 signal per UTC day per side): For LONG (side=+1): min(low_15m[k-1], low_15m[k]) <= S_low - 0.20*ATR20_1h[h] AND low_15m[k] >= S_low - 2.50*ATR20_1h[h] AND close_15m[k] >= S_low - 0.10*ATR20_1h[h] AND (close_15m[k] - open_15m[k]) >= 0.20*ATR20_15m[k] AND signed_flow_ratio_15m[k] >= 0.0. For SHORT (side=-1): max(high_15m[k-1], high_15m[k]) >= S_high + 0.20*ATR20_1h[h] AND high_15m[k] <= S_high + 2.50*ATR20_1h[h] AND close_15m[k] <= S_high + 0.10*ATR20_1h[h] AND (open_15m[k] - close_15m[k]) >= 0.20*ATR20_15m[k] AND signed_flow_ratio_15m[k] <= 0.0.",
+      "gap_filter": "abs(entry_open_1m - decision_close) <= 0.25 * ATR20_1h[h]",
+      "horizon": 12,
+      "horizon_hours": 12,
+      "regime_wait": {
+        "atr_1h_bps_bounds": [
+          15.0,
+          250.0
+        ],
+        "cooldown_hours": 4,
+        "min_completed_4h_bars": 60,
+        "monthly_edge_purge_hours": 24,
+        "risk_bps_bounds": [
+          30.0,
+          300.0
+        ]
+      },
+      "seed": 20261011,
+      "side": "BOTH",
+      "source_version": "BINANCE_VISION_UM_BTCUSDT_1M_2021_2023_V1",
+      "stop_tp": {
+        "collision_rule": "SL_FIRST_SAME_1M_BAR",
+        "stop_formula": "stop = close_15m[k] - side * 1.60 * ATR20_1h[h]",
+        "target_R": 2.0,
+        "target_mode": "FIXED_2R"
+      },
+      "wave_id": "WAVE_01"
+    },
+    {
+      "book": {
+        "allocation_fraction": 0.95,
+        "carry_across_months": true,
+        "cooldown_hours": 6,
+        "initial_equity_usdt": 1000.0,
+        "leverage": 1.0,
+        "max_concurrent_positions": 1,
+        "no_cross_month_positions": true,
+        "no_drawdown_truncation_kill_switch": true
+      },
+      "candidate_id": "W1_C06_REGIME_TRANSITION_REVERSAL_24H",
+      "completed_bar_features": [
+        "4h_OHLCV_completed",
+        "4h_ER6_completed",
+        "4h_ATR20_completed",
+        "1h_OHLCV_completed",
+        "1h_ATR20_completed",
+        "1h_signed_flow_ratio_completed"
+      ],
+      "controls": [
+        "PAUSE",
+        "NO_SIGNAL_LONG_SAME_TIMESTAMP_AND_STOP_DISTANCE",
+        "NO_SIGNAL_SHORT_SAME_TIMESTAMP_AND_STOP_DISTANCE",
+        "BALANCED_LONG_SHORT_MEAN"
+      ],
+      "counterparty_hypothesis": "After a multi-bar 4h directional trend (prior 4h efficiency ratio ER6 >= 0.42 and directional displacement >= 1.0 ATR20_4h), trend momentum stalls as ER6 decelerates or drops below 0.45 and two adjacent completed 4h bars (j-1 and j) fail to extend the extreme by >0.35 ATR20_4h while bar j closes in the reversal direction with supportive 1h taker flow. Late trend followers unwind over 24h.",
+      "decision_delay": "closed_bar_end_ms + 60000ms",
+      "family": "REGIME_TRANSITION_REVERSAL",
+      "first_fill": "closed_bar_end_ms + 120000ms",
+      "formula": "Evaluated at each completed 4h bar j (with matching completed 1h bar h where end_ms_1h[h] == end_ms_4h[j]). Require max(ER6_4h[j-3:j]) >= 0.42 AND (ER6_4h[j] <= ER6_4h[j-1] OR ER6_4h[j] <= 0.45). For LONG (side=+1): (close_4h[j-4] - min(low_4h[j-3:j])) >= 1.0*ATR20_4h[j] AND low_4h[j] >= low_4h[j-1] - 0.35*ATR20_4h[j] AND close_4h[j] > open_4h[j] AND signed_flow_ratio_1h[h] >= -0.02. For SHORT (side=-1): (max(high_4h[j-3:j]) - close_4h[j-4]) >= 1.0*ATR20_4h[j] AND high_4h[j] <= high_4h[j-1] + 0.35*ATR20_4h[j] AND close_4h[j] < open_4h[j] AND signed_flow_ratio_1h[h] <= +0.02.",
+      "gap_filter": "abs(entry_open_1m - decision_close) <= 0.25 * ATR20_1h[h]",
+      "horizon": 24,
+      "horizon_hours": 24,
+      "regime_wait": {
+        "atr_1h_bps_bounds": [
+          15.0,
+          250.0
+        ],
+        "cooldown_hours": 6,
+        "min_completed_4h_bars": 60,
+        "monthly_edge_purge_hours": 24,
+        "risk_bps_bounds": [
+          30.0,
+          300.0
+        ]
+      },
+      "seed": 20261011,
+      "side": "BOTH",
+      "source_version": "BINANCE_VISION_UM_BTCUSDT_1M_2021_2023_V1",
+      "stop_tp": {
+        "collision_rule": "SL_FIRST_SAME_1M_BAR",
+        "stop_formula": "stop = close_4h[j] - side * 1.80 * ATR20_1h[h]",
+        "target_R": 2.0,
+        "target_mode": "FIXED_2R"
+      },
+      "wave_id": "WAVE_01"
+    }
+  ],
+  "controller_dispatch_sha": "6c6ff831868701cea05499d0b0adb0e62db67f0e",
+  "costs": {
+    "BASE": {
+      "fee_bps": 6.0,
+      "name": "BASE",
+      "round_trip_nominal_bps": 22.0,
+      "slippage_bps": 3.0,
+      "spread_bps": 2.0
+    },
+    "STRESS": {
+      "fee_bps": 12.0,
+      "name": "STRESS",
+      "round_trip_nominal_bps": 44.0,
+      "slippage_bps": 6.0,
+      "spread_bps": 4.0
+    },
+    "economic_grade": "COST_PROXY_DEV_ONLY",
+    "fee_basis": "actual executed notional once per leg; adverse spread+slippage applied once via tick rounding; no double subtraction",
+    "funding_sensitivity": "Ex-post adverse 4bp and 8bp per touched UTC 8h boundary (+/-15s) and unknown-hourly stress scenario; never credited"
+  },
+  "data_source": {
+    "archive_prefix": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/",
+    "authorized_months": "2021-01 through 2023-12 (36 monthly archives + 36 .CHECKSUM files)",
+    "contract": "BTCUSDT USD-M Perpetual",
+    "forbidden_years": [
+      2024,
+      2025,
+      2026
+    ],
+    "initial_warmup": "2021-01 full month (>30d) warmup; scoring starts 2021-02 after 24h month-start purge",
+    "license": "Binance Vision public data terms v1.0 (CC BY-NC-SA 4.0 noncommercial research attribution)",
+    "monthly_isolation": "24h purge at start and end of every calendar month; no cross-month positions; reset indicator state if prior month missing",
+    "new_2021_2023_csv_bodies_opened_before_wave1_freeze": 0,
+    "source_version": "BINANCE_VISION_UM_BTCUSDT_1M_2021_2023_V1"
+  },
+  "exact_parent_sha": "920b244d06541da5cb9fc3dcaa39e5b15e914d32",
+  "exact_start_sha": "920b244d06541da5cb9fc3dcaa39e5b15e914d32",
+  "promotion_gate": {
+    "adjusted_block_bootstrap_net_LCB_bps_gt": 0.0,
+    "annual_worst_year_stress_mean_net_bps_min": -10.0,
+    "bootstrap_blocks": [
+      "UTC_7D_WEEK",
+      "FIXED_14D_BLOCK"
+    ],
+    "bootstrap_resamples": 10000,
+    "bootstrap_seed": 20261011,
+    "combined_project_familywise_comparisons": 48,
+    "equal_year_stress_incremental_vs_balanced_bps_gt": 0.0,
+    "equal_year_stress_mean_net_bps_gt": 0.0,
+    "familywise_alpha": 0.05,
+    "max_1x_account_dense_mtm_drawdown_pct": 12.0,
+    "min_distinct_calendar_months": 6,
+    "min_distinct_years": 2,
+    "min_stress_closed_trades": 100,
+    "one_sided_lower_quantile": 0.0010416666666666667,
+    "stress_profit_factor_min": 1.15
+  },
+  "prompt_commit_sha": "e2101b58556a660e504cfdef66d33a64b42d9c21",
+  "schema": "GEMINI_GOAL_B_WAVE_FROZEN_REGISTRY_V1",
+  "wave_id": "WAVE_01"
+}
