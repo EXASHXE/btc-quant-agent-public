@@ -1866,5 +1866,53 @@
     "next_controller_research_gate": "P2_NONPROTECTED_SOURCE_MANIFEST_AND_RIGHTS_DESIGN_R2_DOCS_ONLY_OR_SEPARATE_EXPLICIT_READ_AUTHORIZATION",
     "source_admission_design_sha": "519b2e9ba2ca847e76ad9c0a7fbafcec5fcda158",
     "source_admission_design_status": "CONTROLLER_PROSPECTIVE_DESIGN_ONLY_NO_CONTENT_READ"
+  },
+  "v06_p2_s2_parallel_source_contract_and_pit_science_r1": {
+    "decision": "AUTHORIZE_PARALLEL_P2_S2_GEMINI_SYNTHETIC_SOURCE_GATE__SOL_PIT_SCIENCE_PREREG_BLUEPRINT__NO_MARKET_READ",
+    "status": "TWO_BRANCHES_AND_PROMPTS_PUBLISHED__BOTH_NOT_EXECUTED",
+    "controller_dispatch_sha": "b176f4361cd97d1d89c3e25173b2c72a6af93ec4",
+    "controller_dispatch_path": "reviews/v0.6/b_line/V06_P2_S2_SOURCE_READINESS_AND_PIT_PROSPECTIVE_PARALLEL_DISPATCH_R1.md",
+    "code_start_sha": "e0ff8c3473de4bfa3e66fe7928d42992a4d38a32",
+    "pinned_authority_source_status_sha": "aec922f2b040ec9cac7f120347b3f6a82899486b",
+    "gemini": {
+      "task": "V06_P2_S2_GEMINI_LONG_SOURCE_CONTRACT_AND_SYNTHETIC_CAPABILITY_GATE_R1",
+      "branch": "feature/v06-bline-p2-s2-gemini-source-contract-r1",
+      "worktree": "/root/workspace/project/quant-v0.6/p2-s2-gemini-source-contract-r1",
+      "pinned_prompt_sha": "f65a29f48ed4ecc4c02d72c3d28f099c2748d150",
+      "prompt_path": "prompts/v0.6/b_line/V06_P2_S2_GEMINI_LONG_SOURCE_CONTRACT_AND_SYNTHETIC_CAPABILITY_GATE_R1.md",
+      "status": "NOT_EXECUTED",
+      "scope": "INDEPENDENT_SOURCE_RIGHTS_MATRIX_AND_SYNTHETIC_CAPABILITY_SECURITY_MODEL",
+      "synthetic_test_min": 30,
+      "real_market_data_bytes_authorized": 0
+    },
+    "sol_high": {
+      "task": "V06_P2_S2_SOL_HIGH_PIT_FUNDING_MARK_AND_BTC_DIAGNOSTIC_PREREG_R1",
+      "branch": "feature/v06-bline-p2-s2-sol61-pit-science-r1",
+      "worktree": "/root/workspace/project/quant-v0.6/p2-s2-sol61-pit-science-r1",
+      "pinned_prompt_sha": "90b20f441ebefff3da0bf8457604b2ef98e25326",
+      "prompt_path": "prompts/v0.6/b_line/V06_P2_S2_SOL_HIGH_PIT_FUNDING_MARK_AND_BTC_DIAGNOSTIC_PREREG_R1.md",
+      "status": "NOT_EXECUTED",
+      "scope": "OUTCOME_BLIND_MARK_FUNDING_PIT_CLOCK_ORACLE_AND_BTC_ONLY_DIAGNOSTIC_PREREG_BLUEPRINT",
+      "synthetic_case_min": 32,
+      "adversarial_witness_min": 24,
+      "metamorphic_invariant_min": 10,
+      "real_market_data_bytes_authorized": 0
+    },
+    "known_data_root": "/root/workspace/project/Quant-agent/data",
+    "original_six_month_metadata_sha": "c6823dbc46249cac43aa10400aacbbe9f4542410",
+    "unsafe_old_locator_last_sha": "4a1fcc2871708f0e9e3a7c40036ecaab39ba99b8",
+    "old_locator_controller_terminal_sha": "ca0b6ea62613e6981b6f818f37f45be8c1d74901",
+    "original_8_frozen_sha": "e5b2006a89441f7eb2ec900e508aff451106b87a",
+    "sol_r4_science_evidence_sha": "5032259954e001635c97110c9c50e4a35a2c95b5",
+    "protected_access_authority": "NONE",
+    "physical_market_body_access_authority": "NONE",
+    "legacy_p1_reopening": "FORBIDDEN",
+    "p2_source_admission": "NONE",
+    "p3_effective_prereg": "NONE",
+    "p4_empirical_backtest": "NONE",
+    "testnet_live_real_funds": "NONE",
+    "controller_future_gate": "JOINT_IDENTITY_CI_SEMANTIC_ACCEPTANCE_THEN_DECIDE_SEPARATELY_AUTHORIZED_MINIMAL_NONPROTECTED_SCHEMA_SOURCE_QA",
+    "cross_task_file_overlap": "NONE",
+    "cross_task_dependency": "NONE"
   }
 }
