@@ -1648,7 +1648,7 @@
     "stop_policy": "NO_AUTO_ALTERNATIVE_ENGINE_PATCHES_REAUDIT_OR_ANOTHER_ENGINE_UNDER_THIS_CAMPAIGN"
   },
   "v06_postp1_parallel_p2_metadata_and_r4_opportunity_science_r1": {
-    "status": "BOTH_DELIVERED_CONTROLLER_L2_ACCEPTED_AS_BOUNDED_EVIDENCE_JOINT_SOURCE_BLOCKED_NO_PREREG",
+    "status": "BOTH_DELIVERED_R4_OUTCOME_BLIND_SCIENCE_DESIGN_CONDITIONAL_P2_PHYSICAL_METADATA_ROOT_LOCATED__VERIFIER_SECURITY_NO_GO__NO_P3_P4",
     "controller_dispatch_sha": "858735e0ae81b1ca0ced8cfa4c2e9ee5d01532e2",
     "controller_dispatch_path": "reviews/v0.6/b_line/V06_POST_P1_TERMINAL_PARALLEL_P2_METADATA_AND_OPPORTUNITY_SCIENCE_CONTROLLER_DISPATCH_R1.md",
     "start_code_sha": "e0ff8c3473de4bfa3e66fe7928d42992a4d38a32",
@@ -1743,7 +1743,7 @@
     "next_required_fact": "EXACT_OWNER_CANONICAL_ROOT_BINDING_OR_REMOTE_SOURCE_CONFIRMED; NO_AUTOMATIC_RESCAN"
   },
   "v06_p2_owner_exact_wsl_root_metadata_r1": {
-    "status": "EXACT_LSTAT_SIX_MONTHS_METADATA_EVIDENCE_CONTROLLER_L2_ACCEPTED_BUT_NEW_VERIFIER_CI_AND_SECURITY_ONESHOT_REPAIR_DISPATCHED",
+    "status": "P2_SELECTED_BTC_METADATA_LOCATION_ACCEPTED__VERIFIER_ONESHOT_CI_SUCCESS_BUT_FINAL_FAIL_CLOSED_SEMANTIC_NO_GO",
     "task_id": "V06_P2_OWNER_EXACT_WSL_ROOT_LSTAT_ONLY_VERIFICATION_R1",
     "controller_dispatch_sha": "b6120e2557d26fc822e740b7d889714a8c0124e6",
     "controller_dispatch_path": "reviews/v0.6/b_line/V06_P2_OWNER_SUPPLIED_EXACT_WSL_DATA_ROOT_BINDING_AND_METADATA_VERIFICATION_DISPATCH_R1.md",
@@ -1754,7 +1754,7 @@
     "worktree": "/root/workspace/project/quant-v0.6/p2-owner-exact-root-metadata-r1",
     "owner_declared_path_wsl": "/root/workspace/project/Quant-agent/data",
     "owner_declared_perp_root_wsl": "/root/workspace/project/Quant-agent/data/research/BTCUSDT",
-    "root_status": "OWNER_DECLARED_NOT_PHYSICALLY_LSTAT_VERIFIED",
+    "root_status": "SIX_SELECTED_SAFE_BTC_PARQUET_FILES_PRESENT_BY_EXECUTOR_LSTAT_METADATA_ONLY_NOT_SOURCE_ADMITTED",
     "prior_p2_status": "P2_LOCAL_ROOT_UNKNOWN_WITH_BOUNDED_NEGATIVE_EVIDENCE_IN_PREVIOUS_ALLOWLIST_NOT_A_CLAIM_OF_ABSENCE",
     "permitted_eras": [
       "2021-03",
@@ -1784,7 +1784,7 @@
     "max_selected_month_listings": 6,
     "max_entries_per_month": 16,
     "physical_market_file_bodies_read_authority": "NONE",
-    "p2_source_admission": "NONE_METADATA_EXISTS_ONLY",
+    "p2_source_admission": "NONE_ROOT_LOCATED_METADATA_ONLY_VERIFIER_TOOL_NO_GO",
     "p3_prereg": "NONE",
     "p4_market_body_access": "NONE",
     "testnet_live_real_funds": "NONE",
@@ -1834,6 +1834,35 @@
     "repair_branch": "feature/v06-bline-p2-owner-exact-root-metadata-r1",
     "repair_start_sha": "c6823dbc46249cac43aa10400aacbbe9f4542410",
     "repair_scope": "ONE_BOUNDED_NEW_VERIFIER_RUFF_AND_SYMLINK_FAIL_CLOSED_FIX_SYNTHETIC_TESTS_ONLY",
-    "repair_status": "DISPATCHED_NOT_EXECUTED"
+    "repair_status": "ONESHOT_COMPLETE_CI_GREEN_CONTROLLER_SEMANTIC_NO_GO_STOP_VERIFIER_CAMPAIGN",
+    "repair_final_sha": "4a1fcc2871708f0e9e3a7c40036ecaab39ba99b8",
+    "repair_final_parent_sha": "c6823dbc46249cac43aa10400aacbbe9f4542410",
+    "repair_changed_paths_count": 9,
+    "repair_ci_url": "https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/38017621125",
+    "repair_ci": "SUCCESS_RUFF_MYPY_COMPILE_JSON_2831_TESTS_2_SKIPPED_9_WARNINGS",
+    "repair_ci_tests": {
+      "passed": 2831,
+      "skipped": 2,
+      "warnings": 9,
+      "duration_seconds": 875.97
+    },
+    "repair_positive_evidence": [
+      "20_NEW_RUFF_CI_ISSUES_RESOLVED",
+      "ADDED_INTERMEDIATE_COMPONENT_SYMLINK_CHECKS",
+      "NARROWED_BROAD_EXCEPTION_HANDLERS",
+      "ORIGINAL_SIX_MONTH_METADATA_EVIDENCE_PRESERVED"
+    ],
+    "repair_unresolved_material": [
+      "CLI_RUN_CLI_NONDEFAULT_DATA_ROOT_AUTO_SETS_ALLOW_CUSTOM_ROOT_WITHOUT_TEST_ONLY_FLAG",
+      "DIRECT_OS_LSTAT_IN_MONTH_AND_TARGET_PASSES_BYPASSES_MAX_LSTAT_COUNTER_AND_CAP"
+    ],
+    "repair_unresolved_secondary": [
+      "ROOT_PERMISSION_DENIED_RETURNS_NOT_PRESENT_TERMINAL",
+      "EXISTING_NON_DIRECTORY_ANCESTOR_NOT_HARD_FAIL"
+    ],
+    "controller_final_semantic_decision_sha": "ca0b6ea62613e6981b6f818f37f45be8c1d74901",
+    "controller_final_semantic_disposition": "REJECT_PRODUCTION_FAIL_CLOSED_VERIFIER_ACCEPT_GITHUB_CI_AND_HISTORICAL_METADATA_RECEIPT",
+    "verifier_patch_budget": "TERMINATED_NO_MORE_IMPLICIT_PATCHES_OR_REAUDITS_THIS_ROUTE",
+    "next_controller_research_gate": "SEPARATELY_AUTHORIZED_DOCS_ONLY_P2_TRUE_MARK_FUNDING_PIT_SOURCE_ADMISSION_METHOD_DESIGN"
   }
 }
