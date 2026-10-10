@@ -1,0 +1,45 @@
+{
+  "TASK_ID": "V06_G2_GEMINI_GOAL_A_TREND_FLOW_MULTI_WAVE_DISCOVERY_R1",
+  "CONTROLLER_DISPATCH_SHA": "6c6ff831868701cea05499d0b0adb0e62db67f0e",
+  "max_waves": 4,
+  "max_candidates_per_wave": 6,
+  "max_agent_trial_budget": 24,
+  "joint_dual_agent_budget": 48,
+  "cumulative_trials_evaluated": 0,
+  "remaining_trial_budget": 24,
+  "completed_waves": 0,
+  "active_wave": "WAVE_01",
+  "waves": {
+    "WAVE_01": {
+      "status": "FROZEN_AWAITING_EXECUTION",
+      "frozen_registry_file": "evidence/v0.6/b_line/g2_gemini_goal_trend_flow_r1/WAVE_01_FROZEN_REGISTRY.json",
+      "candidate_count": 6,
+      "candidate_ids": [
+        "W1_C01_MULTISCALE_TREND_ADOPTION_08H",
+        "W1_C02_PERSISTENT_TAKER_PRESSURE_08H",
+        "W1_C03_BREAKOUT_RETEST_WITH_FLOW_04H",
+        "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H",
+        "W1_C05_CROSS_SESSION_CONTINUATION_08H",
+        "W1_C06_PERSISTENT_TREND_24H"
+      ],
+      "evaluation_result_file": null,
+      "promoted_candidates": [],
+      "falsified_candidates": []
+    },
+    "WAVE_02": {
+      "status": "UNINITIALIZED",
+      "candidate_count": 0,
+      "candidate_ids": []
+    },
+    "WAVE_03": {
+      "status": "UNINITIALIZED",
+      "candidate_count": 0,
+      "candidate_ids": []
+    },
+    "WAVE_04": {
+      "status": "UNINITIALIZED",
+      "candidate_count": 0,
+      "candidate_ids": []
+    }
+  }
+}
