@@ -1,0 +1,989 @@
+{
+  "TASK_ID": "V06_P2_S3A_CODEX_SOL_HIGH_INDEPENDENT_EXACT_SHA_FD_SYSCALL_AND_SOURCE_AUDIT_R1",
+  "access_barrier": {
+    "market_APIs": 0,
+    "no_other_worktree_modifications": true,
+    "owner_root_only_literal": true,
+    "private_account_or_credentials_reads": 0,
+    "protected_data_or_outcome_reads": 0,
+    "real_owner_root_FS_calls": 0,
+    "real_owner_root_body_reads": 0,
+    "scope_of_claim": "Task tool activity and own-child tested boundaries, not universal machine surveillance; Git shared metadata is distinct from owner data",
+    "trade_writes": 0
+  },
+  "authority": {
+    "S2_scientific_fences_preserved": "No real footer/header/schema/Mark/Funding/PIT source admission; no P3 effective prereg/P4/P1 engine revival/Alpha/live/testnet grants",
+    "frozen_controller_read": true,
+    "prompt_read": true,
+    "real_source_QA_authorized": false,
+    "repairs_authorized": false
+  },
+  "baseline_CI": {
+    "conclusion": "success",
+    "head_sha": "999cf7005c741bdbabae727f10f90f23330fb035",
+    "independently_checked": "GitHub run metadata only",
+    "run_id": 38039633974,
+    "status": "completed",
+    "test_counts": "2843 passed / 2 skipped per frozen Controller; no outcome logs fetched",
+    "url": "https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/38039633974"
+  },
+  "branch": "feature/v06-bline-p2-s3a-codex-sol-audit-r1",
+  "checkpoints": {
+    "P0": "COMPLETE_AUTHORITY_AND_IDENTITIES",
+    "P1": "COMPLETE_NATIVE_FALSIFIED",
+    "P2": "COMPLETE_BOUNDED_SYNTHETIC_ATTACKS_AND_LIMITATIONS",
+    "P3": "COMPLETE_SOURCE_ERRATUM",
+    "P4": "COMPLETE_LOCAL_VALIDATION_PUBLICATION_PENDING"
+  },
+  "code_start_sha": "999cf7005c741bdbabae727f10f90f23330fb035",
+  "controller_dispatch_sha": "874c42e8e3e4121955710f3207870aebb473e5da",
+  "environment": {
+    "OS": "Linux",
+    "automatic_approval_rejection": false,
+    "machine": "x86_64",
+    "native_ptrace_default_sandbox": "DENIED; child exits before trace; no fake trace used",
+    "native_ptrace_escalated": "SUPPORTED own newly forked child only",
+    "primary_python": "3.12.3",
+    "strace": "NOT_INSTALLED_NOT_INSTALLED_BY_AUDIT",
+    "tool_limits": "20000 trace steps, 2MiB child JSON; no general native blocking wall-clock watchdog; fork-with-threads warning remains"
+  },
+  "fixed_source_objects": [
+    {
+      "alias": "prompt",
+      "blob": "93d9469af5ddb25cd589da8c140436aff311c09a",
+      "commit": "a6338e86a61c9349c3236da1d3e4ce81d03a54a2",
+      "path": "prompts/v0.6/b_line/V06_P2_S3A_CODEX_SOL_HIGH_INDEPENDENT_FD_SYSCALL_AND_PROVENANCE_SECURITY_AUDIT_R1.md",
+      "sha256": "d99a68dfb5a65ac6e1df2101c03666d7076bd5463c249eb2bed5e31722515925"
+    },
+    {
+      "alias": "dispatch",
+      "blob": "e35d6bcc82422d79afe9b38c9fce380d930c0704",
+      "commit": "874c42e8e3e4121955710f3207870aebb473e5da",
+      "path": "reviews/v0.6/b_line/V06_P2_S3A_R2_CODEX_INDEPENDENT_SECURITY_AUDIT_DISPATCH_R1.md",
+      "sha256": "d4853721026fc01419fe298d687c4c335e233eb3f1e6f6f74228f4107aaa3450"
+    },
+    {
+      "alias": "original_metadata",
+      "blob": "d0bbf4c514298289b9fe715af2fe09ea943bc936",
+      "commit": "c6823dbc46249cac43aa10400aacbbe9f4542410",
+      "path": "evidence/v0.6/b_line/p2_owner_root_metadata_r1/P2_OWNER_ROOT_EXACT_SCAN_RECEIPT.json",
+      "sha256": "a3c9169dcbeb31edce492791ef253e42c580411cdb014337e8084229aaaaf3f2"
+    },
+    {
+      "alias": "target_0",
+      "blob": "0b70cd0718710314f93b3bf16860fc6dffc449f2",
+      "commit": "999cf7005c741bdbabae727f10f90f23330fb035",
+      "path": "docs/strategy_research/g2_r3/p2_s3_footer_reader_r1/S3A_R2_BOUNDED_SECURITY_REPAIR_AND_ERRATA_REPORT.md",
+      "sha256": "0557dde49bdf8ebfd7dce2f276c816494f1bfed30e50a793b556d5e4643ad9a9"
+    },
+    {
+      "alias": "target_1",
+      "blob": "dff6a15205ce026922e7ad6bce1209b5634025d3",
+      "commit": "999cf7005c741bdbabae727f10f90f23330fb035",
+      "path": "docs/strategy_research/g2_r3/p2_s3_footer_reader_r1/S3A_READER_BOUNDARY_IMPLEMENTATION_AND_FALSIFICATION_REPORT.md",
+      "sha256": "fd727d92a30de2c42bc5b4aeb68e71cac4ed306f8c3601aaca56d5da44c709c3"
+    },
+    {
+      "alias": "target_2",
+      "blob": "a4366962d757a688c9aa92a82cd04d30faf5b67c",
+      "commit": "999cf7005c741bdbabae727f10f90f23330fb035",
+      "path": "docs/strategy_research/g2_r3/p2_s3_footer_reader_r1/S3B_PROPOSED_ONE_FILE_FOOTER_QA_GRANT_CONTRACT.md",
+      "sha256": "936814eebc00e93cc72652bac5a6d95079c5a35fed3fc003752805519ac9859d"
+    },
+    {
+      "alias": "target_3",
+      "blob": "fcf777318a2976fc2e81ce6f858e38339fb70550",
+      "commit": "999cf7005c741bdbabae727f10f90f23330fb035",
+      "path": "evidence/v0.6/b_line/p2_s3_footer_reader_r1/S3A_FS_SYSCALL_SECURITY_ORACLE_RESULTS.json",
+      "sha256": "28773055ee78aafb107e678a03bc1be0a70b35dbc5178554db33cd60e4c06f5a"
+    },
+    {
+      "alias": "target_4",
+      "blob": "3211b01bb5e45851e1a42fa27900a9e5df991a13",
+      "commit": "999cf7005c741bdbabae727f10f90f23330fb035",
+      "path": "evidence/v0.6/b_line/p2_s3_footer_reader_r1/S3A_IMPLEMENTATION_EXECUTION_RECEIPT.json",
+      "sha256": "5bb8cf5272ddf65a86b61a6d9aab24fa3de84b401b65ab544a01438c330e226e"
+    },
+    {
+      "alias": "target_5",
+      "blob": "dd9f72c0e5364adfea704ffb5b9dd1db3b88ec26",
+      "commit": "999cf7005c741bdbabae727f10f90f23330fb035",
+      "path": "evidence/v0.6/b_line/p2_s3_footer_reader_r1/S3A_R2_BOUNDED_REPAIR_EXECUTION_RECEIPT.json",
+      "sha256": "d2a17c16b04651ea5bc033ef41025d77bd95cf14d2b4f11a48e828eb4a1507f7"
+    },
+    {
+      "alias": "target_6",
+      "blob": "b36bfb5024c1f55e272718b2c50e2173173c8d0e",
+      "commit": "999cf7005c741bdbabae727f10f90f23330fb035",
+      "path": "evidence/v0.6/b_line/p2_s3_footer_reader_r1/S3A_R2_FS_SYSCALL_SECURITY_ORACLE_RESULTS.json",
+      "sha256": "6910e6141abda0780f7b29197d4f20b0bd4bc15a5281f98f6490052ad7113771"
+    },
+    {
+      "alias": "target_7",
+      "blob": "ac5c9a2455044e81798615c008455627d1743917",
+      "commit": "999cf7005c741bdbabae727f10f90f23330fb035",
+      "path": "scripts/strategy_research/p2_s3_footer_reader/__init__.py",
+      "sha256": "f02a1ceff9b682d3cb5fc85380961b251954a1116e1cb9283d3c42d0fb8fb29e"
+    },
+    {
+      "alias": "target_8",
+      "blob": "f2de736be82f9bda897cbb9170e88ea2dcdff076",
+      "commit": "999cf7005c741bdbabae727f10f90f23330fb035",
+      "path": "scripts/strategy_research/p2_s3_footer_reader/constants.py",
+      "sha256": "b9d56e0a018c8f0ddcc8989dc34ffc43fa7fd5cacbdf0bc30f01d36f1eeec76a"
+    },
+    {
+      "alias": "target_9",
+      "blob": "03b14ada8e59ae48673bc125a7968e6ba954d47d",
+      "commit": "999cf7005c741bdbabae727f10f90f23330fb035",
+      "path": "scripts/strategy_research/p2_s3_footer_reader/errors.py",
+      "sha256": "3efa1382dd99cc67429c883053530af2a9cd908e547ce6134611f0875d3fef64"
+    },
+    {
+      "alias": "target_10",
+      "blob": "50ca4959f1f33b813a61428f2f314348eace65bc",
+      "commit": "999cf7005c741bdbabae727f10f90f23330fb035",
+      "path": "scripts/strategy_research/p2_s3_footer_reader/fd_syscall_wrapper.py",
+      "sha256": "077044acabbe1b3e8f270f6ec3c9e3c15eadad30bae87e2d0dfc4674c90056a0"
+    },
+    {
+      "alias": "target_11",
+      "blob": "c83393121584f1384927d1721b448baee5247949",
+      "commit": "999cf7005c741bdbabae727f10f90f23330fb035",
+      "path": "scripts/strategy_research/p2_s3_footer_reader/footer_parser.py",
+      "sha256": "1be989c9d645fc2402047e7d99357d9f61e4f66c9240492ad37db785e08ff563"
+    },
+    {
+      "alias": "target_12",
+      "blob": "1f2e17152eab27901fa15087b5959a38d196f939",
+      "commit": "999cf7005c741bdbabae727f10f90f23330fb035",
+      "path": "scripts/strategy_research/p2_s3_footer_reader/oracle_runner.py",
+      "sha256": "699e69cd3cbaa79d23a854dc29c8da374f4aa416017f35ee5ab9ff8bc517829f"
+    },
+    {
+      "alias": "target_13",
+      "blob": "de884bce7bdcc8838ac4595f15389c2ffdcbc2c6",
+      "commit": "999cf7005c741bdbabae727f10f90f23330fb035",
+      "path": "scripts/strategy_research/p2_s3_footer_reader/reader.py",
+      "sha256": "bf002e053832aaa51e29d5560c1ba0355aee7bef6508a10e6a0cbc4a7a03d792"
+    },
+    {
+      "alias": "target_14",
+      "blob": "0d55e354d7cebeb5bdbf9da6b30361772c3cdd2e",
+      "commit": "999cf7005c741bdbabae727f10f90f23330fb035",
+      "path": "scripts/strategy_research/p2_s3_footer_reader/synthetic_fixtures.py",
+      "sha256": "42f60653689def3349a850a3646d0094d2c844c63d9d2ba8eb641f22da66bf0c"
+    },
+    {
+      "alias": "target_15",
+      "blob": "04074ee22ca0046b628cc51cd57260debdb46c9b",
+      "commit": "999cf7005c741bdbabae727f10f90f23330fb035",
+      "path": "scripts/strategy_research/p2_s3_footer_reader/types.py",
+      "sha256": "27343eef040edb6d496d8ed864d657839dcd3a423464c2846a8a8d08668791e0"
+    },
+    {
+      "alias": "target_16",
+      "blob": "7eda30145c8c94bd7349010c826e071624bd69a5",
+      "commit": "999cf7005c741bdbabae727f10f90f23330fb035",
+      "path": "tests/test_v06_p2_s3_footer_reader_adversarial.py",
+      "sha256": "aff9f7c45e024bfcd8f472469a4a96d7fd9881768efad50568811ecb2fe3e19f"
+    },
+    {
+      "alias": "target_17",
+      "blob": "737badc0184a8a3eb958cfb769b57c3882a36ccf",
+      "commit": "999cf7005c741bdbabae727f10f90f23330fb035",
+      "path": "tests/test_v06_p2_s3_footer_reader_unit.py",
+      "sha256": "cfcc63893f499f84d6aaabcbad12068559462e4fdb28c7eb931c39e94f1e3f89"
+    }
+  ],
+  "fixture_freeze": {
+    "case_count": 27,
+    "fixtures_sha256": "534f9cbfc2b7f7bbe5e1fae19abd697fb18b66a8a7c358d90913a42a3134caf9",
+    "frozen_before_first_execution": true,
+    "generation": "Installed PyArrow25.0.1 in-RAM invented 2-row table only, no source market bodies",
+    "parquet_sha256": "bb1a544bee08d5be9ae814c97dcd3730068e31723a7a87977d06eacb05d41cc1",
+    "unchanged_after_auditor_assertion_repair": true
+  },
+  "frozen_R2_changed_files": [
+    {
+      "path": "docs/strategy_research/g2_r3/p2_s3_footer_reader_r1/S3A_R2_BOUNDED_SECURITY_REPAIR_AND_ERRATA_REPORT.md",
+      "status": "A"
+    },
+    {
+      "path": "evidence/v0.6/b_line/p2_s3_footer_reader_r1/S3A_R2_BOUNDED_REPAIR_EXECUTION_RECEIPT.json",
+      "status": "A"
+    },
+    {
+      "path": "evidence/v0.6/b_line/p2_s3_footer_reader_r1/S3A_R2_FS_SYSCALL_SECURITY_ORACLE_RESULTS.json",
+      "status": "A"
+    },
+    {
+      "path": "scripts/strategy_research/p2_s3_footer_reader/__init__.py",
+      "status": "M"
+    },
+    {
+      "path": "scripts/strategy_research/p2_s3_footer_reader/constants.py",
+      "status": "M"
+    },
+    {
+      "path": "scripts/strategy_research/p2_s3_footer_reader/errors.py",
+      "status": "M"
+    },
+    {
+      "path": "scripts/strategy_research/p2_s3_footer_reader/fd_syscall_wrapper.py",
+      "status": "M"
+    },
+    {
+      "path": "scripts/strategy_research/p2_s3_footer_reader/oracle_runner.py",
+      "status": "M"
+    },
+    {
+      "path": "scripts/strategy_research/p2_s3_footer_reader/reader.py",
+      "status": "M"
+    },
+    {
+      "path": "scripts/strategy_research/p2_s3_footer_reader/types.py",
+      "status": "M"
+    },
+    {
+      "path": "tests/test_v06_p2_s3_footer_reader_adversarial.py",
+      "status": "M"
+    },
+    {
+      "path": "tests/test_v06_p2_s3_footer_reader_unit.py",
+      "status": "M"
+    }
+  ],
+  "frozen_target_sha": "999cf7005c741bdbabae727f10f90f23330fb035",
+  "model": {
+    "requested": "Codex GPT-6 Sol High",
+    "selected_effort": "NOT_EXPOSED",
+    "selected_exact_model": "NOT_EXPOSED",
+    "selection_claimed": false,
+    "system_description": "Codex, agent based on GPT-6; exact Sol and High controls not observable"
+  },
+  "native_execution": {
+    "API_native_core_counts_match_every_case": true,
+    "all_Linux_syscalls_or_whole_host_proven": false,
+    "attestation_only_cases": 1,
+    "cases": [
+      {
+        "actual_held_fds": 0,
+        "allowed": true,
+        "cap": 100,
+        "cleanup": [],
+        "decision": "ALLOWED_SINGLE_FILE_FOOTER_SCHEMA_PARSED",
+        "delta": 9,
+        "id": "normal_cap_100",
+        "kernel_API_counts_match": "KERNEL_AND_INDEPENDENT_BOUNDARY_COUNTS_MATCH",
+        "native_common": 36,
+        "native_family_counts": {
+          "close": 11,
+          "fstat": 12,
+          "open": 11,
+          "pread": 2
+        },
+        "reported_common": 27,
+        "scope": "READER_OPERATION"
+      },
+      {
+        "actual_held_fds": 0,
+        "allowed": false,
+        "cap": 1,
+        "cleanup": [],
+        "decision": "BUDGET_INSUFFICIENT_STOP",
+        "delta": 0,
+        "id": "normal_cap_1",
+        "kernel_API_counts_match": "KERNEL_AND_INDEPENDENT_BOUNDARY_COUNTS_MATCH",
+        "native_common": 0,
+        "native_family_counts": {},
+        "reported_common": 0,
+        "scope": "READER_OPERATION"
+      },
+      {
+        "actual_held_fds": 0,
+        "allowed": false,
+        "cap": 2,
+        "cleanup": [],
+        "decision": "BUDGET_INSUFFICIENT_STOP",
+        "delta": 9,
+        "id": "normal_cap_2",
+        "kernel_API_counts_match": "KERNEL_AND_INDEPENDENT_BOUNDARY_COUNTS_MATCH",
+        "native_common": 11,
+        "native_family_counts": {
+          "close": 4,
+          "fstat": 3,
+          "open": 4
+        },
+        "reported_common": 2,
+        "scope": "READER_OPERATION"
+      },
+      {
+        "actual_held_fds": 0,
+        "allowed": false,
+        "cap": 3,
+        "cleanup": [],
+        "decision": "BUDGET_INSUFFICIENT_STOP",
+        "delta": 9,
+        "id": "normal_cap_3",
+        "kernel_API_counts_match": "KERNEL_AND_INDEPENDENT_BOUNDARY_COUNTS_MATCH",
+        "native_common": 12,
+        "native_family_counts": {
+          "close": 4,
+          "fstat": 4,
+          "open": 4
+        },
+        "reported_common": 3,
+        "scope": "READER_OPERATION"
+      },
+      {
+        "actual_held_fds": 0,
+        "allowed": false,
+        "cap": 25,
+        "cleanup": [],
+        "decision": "BUDGET_INSUFFICIENT_STOP",
+        "delta": 9,
+        "id": "normal_cap_25",
+        "kernel_API_counts_match": "KERNEL_AND_INDEPENDENT_BOUNDARY_COUNTS_MATCH",
+        "native_common": 33,
+        "native_family_counts": {
+          "close": 10,
+          "fstat": 11,
+          "open": 10,
+          "pread": 2
+        },
+        "reported_common": 24,
+        "scope": "READER_OPERATION"
+      },
+      {
+        "actual_held_fds": 0,
+        "allowed": true,
+        "cap": 27,
+        "cleanup": [],
+        "decision": "ALLOWED_SINGLE_FILE_FOOTER_SCHEMA_PARSED",
+        "delta": 9,
+        "id": "normal_cap_27",
+        "kernel_API_counts_match": "KERNEL_AND_INDEPENDENT_BOUNDARY_COUNTS_MATCH",
+        "native_common": 36,
+        "native_family_counts": {
+          "close": 11,
+          "fstat": 12,
+          "open": 11,
+          "pread": 2
+        },
+        "reported_common": 27,
+        "scope": "READER_OPERATION"
+      },
+      {
+        "actual_held_fds": 0,
+        "allowed": true,
+        "cap": 100,
+        "cleanup": [],
+        "decision": "ALLOWED_SINGLE_FILE_FOOTER_SCHEMA_PARSED",
+        "delta": 117,
+        "id": "deep_cap100",
+        "kernel_API_counts_match": "KERNEL_AND_INDEPENDENT_BOUNDARY_COUNTS_MATCH",
+        "native_common": 144,
+        "native_family_counts": {
+          "close": 47,
+          "fstat": 48,
+          "open": 47,
+          "pread": 2
+        },
+        "reported_common": 27,
+        "scope": "READER_OPERATION"
+      },
+      {
+        "actual_held_fds": 0,
+        "allowed": false,
+        "cap": 100,
+        "cleanup": [],
+        "decision": "S3A_HARNESS_ROOT_IDENTITY_NOT_PROVEN",
+        "delta": 9,
+        "id": "missing_ancestor",
+        "kernel_API_counts_match": "KERNEL_AND_INDEPENDENT_BOUNDARY_COUNTS_MATCH",
+        "native_common": 10,
+        "native_family_counts": {
+          "close": 3,
+          "fstat": 2,
+          "open": 5
+        },
+        "reported_common": 1,
+        "scope": "READER_OPERATION"
+      },
+      {
+        "actual_held_fds": 0,
+        "allowed": false,
+        "cap": 100,
+        "cleanup": [],
+        "decision": "DENIED_SYMLINK_DETECTED",
+        "delta": 9,
+        "id": "ancestor_symlink",
+        "kernel_API_counts_match": "KERNEL_AND_INDEPENDENT_BOUNDARY_COUNTS_MATCH",
+        "native_common": 11,
+        "native_family_counts": {
+          "close": 3,
+          "fstat": 2,
+          "open": 6
+        },
+        "reported_common": 2,
+        "scope": "READER_OPERATION"
+      },
+      {
+        "actual_held_fds": 0,
+        "allowed": false,
+        "cap": 100,
+        "cleanup": [],
+        "decision": "DENIED_NOT_A_DIRECTORY_COMPONENT",
+        "delta": 9,
+        "id": "ancestor_nondirectory",
+        "kernel_API_counts_match": "KERNEL_AND_INDEPENDENT_BOUNDARY_COUNTS_MATCH",
+        "native_common": 12,
+        "native_family_counts": {
+          "close": 4,
+          "fstat": 2,
+          "open": 6
+        },
+        "reported_common": 3,
+        "scope": "READER_OPERATION"
+      },
+      {
+        "actual_held_fds": 0,
+        "allowed": false,
+        "cap": 100,
+        "cleanup": [],
+        "decision": "DENIED_EACCES_PERMISSION",
+        "delta": 9,
+        "id": "permission_eacces",
+        "kernel_API_counts_match": "KERNEL_AND_INDEPENDENT_BOUNDARY_COUNTS_MATCH",
+        "native_common": 10,
+        "native_family_counts": {
+          "close": 3,
+          "fstat": 2,
+          "open": 5
+        },
+        "reported_common": 1,
+        "scope": "READER_OPERATION"
+      },
+      {
+        "actual_held_fds": 1,
+        "allowed": null,
+        "cap": 100,
+        "cleanup": [
+          {
+            "audit_closed": true,
+            "fd": 5
+          }
+        ],
+        "decision": "OSError",
+        "delta": 4,
+        "id": "close_root_fault",
+        "kernel_API_counts_match": "KERNEL_AND_INDEPENDENT_BOUNDARY_COUNTS_MATCH",
+        "native_common": 4,
+        "native_family_counts": {
+          "close": 2,
+          "open": 2
+        },
+        "reported_common": 0,
+        "scope": "READER_OPERATION"
+      },
+      {
+        "actual_held_fds": 1,
+        "allowed": false,
+        "cap": 100,
+        "cleanup": [
+          {
+            "audit_closed": true,
+            "fd": 11
+          }
+        ],
+        "decision": "DENIED_FD_CLEANUP_CLOSE_FAILED",
+        "delta": 9,
+        "id": "close_leaf_fault",
+        "kernel_API_counts_match": "KERNEL_AND_INDEPENDENT_BOUNDARY_COUNTS_MATCH",
+        "native_common": 36,
+        "native_family_counts": {
+          "close": 11,
+          "fstat": 12,
+          "open": 11,
+          "pread": 2
+        },
+        "reported_common": 27,
+        "scope": "READER_OPERATION"
+      },
+      {
+        "actual_held_fds": 0,
+        "allowed": null,
+        "cap": 100,
+        "cleanup": [],
+        "decision": "ATTESTATION_SETUP_ONLY",
+        "delta": 12,
+        "id": "attestation_only",
+        "kernel_API_counts_match": "KERNEL_AND_INDEPENDENT_BOUNDARY_COUNTS_MATCH",
+        "native_common": 12,
+        "native_family_counts": {
+          "close": 4,
+          "fstat": 4,
+          "open": 4
+        },
+        "reported_common": 0,
+        "scope": "GRANT_ATTESTATION_SETUP"
+      },
+      {
+        "actual_held_fds": 0,
+        "allowed": false,
+        "cap": 100,
+        "cleanup": [],
+        "decision": "S3A_HARNESS_ROOT_IDENTITY_NOT_PROVEN",
+        "delta": 9,
+        "id": "root_replaced",
+        "kernel_API_counts_match": "KERNEL_AND_INDEPENDENT_BOUNDARY_COUNTS_MATCH",
+        "native_common": 12,
+        "native_family_counts": {
+          "close": 4,
+          "fstat": 4,
+          "open": 4
+        },
+        "reported_common": 3,
+        "scope": "READER_OPERATION"
+      },
+      {
+        "actual_held_fds": 0,
+        "allowed": false,
+        "cap": 100,
+        "cleanup": [],
+        "decision": "DENIED_SYMLINK_DETECTED",
+        "delta": 9,
+        "id": "multihop_symlink",
+        "kernel_API_counts_match": "KERNEL_AND_INDEPENDENT_BOUNDARY_COUNTS_MATCH",
+        "native_common": 11,
+        "native_family_counts": {
+          "close": 3,
+          "fstat": 3,
+          "open": 5
+        },
+        "reported_common": 2,
+        "scope": "READER_OPERATION"
+      },
+      {
+        "actual_held_fds": 0,
+        "allowed": false,
+        "cap": 100,
+        "cleanup": [],
+        "decision": "S3A_HARNESS_ROOT_IDENTITY_NOT_PROVEN",
+        "delta": 0,
+        "id": "forbidden_surrogate",
+        "kernel_API_counts_match": "KERNEL_AND_INDEPENDENT_BOUNDARY_COUNTS_MATCH",
+        "native_common": 0,
+        "native_family_counts": {
+          "stat": 1
+        },
+        "reported_common": 0,
+        "scope": "READER_OPERATION"
+      },
+      {
+        "actual_held_fds": 0,
+        "allowed": false,
+        "cap": 100,
+        "cleanup": [],
+        "decision": "DENIED_HARDLINK_OR_INODE_ALIAS",
+        "delta": 9,
+        "id": "leaf_hardlink",
+        "kernel_API_counts_match": "KERNEL_AND_INDEPENDENT_BOUNDARY_COUNTS_MATCH",
+        "native_common": 30,
+        "native_family_counts": {
+          "close": 10,
+          "fstat": 10,
+          "open": 10
+        },
+        "reported_common": 21,
+        "scope": "READER_OPERATION"
+      },
+      {
+        "actual_held_fds": 0,
+        "allowed": false,
+        "cap": 100,
+        "cleanup": [],
+        "decision": "DENIED_TOCTOU_OR_FD_IDENTITY_MISMATCH",
+        "delta": 9,
+        "id": "leaf_replaced_after_trailer",
+        "kernel_API_counts_match": "KERNEL_AND_INDEPENDENT_BOUNDARY_COUNTS_MATCH",
+        "native_common": 36,
+        "native_family_counts": {
+          "close": 11,
+          "fstat": 12,
+          "open": 11,
+          "pread": 2,
+          "rename": 1
+        },
+        "reported_common": 27,
+        "scope": "READER_OPERATION"
+      },
+      {
+        "actual_held_fds": 0,
+        "allowed": false,
+        "cap": 100,
+        "cleanup": [],
+        "decision": "DENIED_INVALID_PARQUET_FOOTER_LENGTH",
+        "delta": 9,
+        "id": "footer_oversize",
+        "kernel_API_counts_match": "KERNEL_AND_INDEPENDENT_BOUNDARY_COUNTS_MATCH",
+        "native_common": 31,
+        "native_family_counts": {
+          "close": 10,
+          "fstat": 10,
+          "open": 10,
+          "pread": 1
+        },
+        "reported_common": 22,
+        "scope": "READER_OPERATION"
+      },
+      {
+        "actual_held_fds": 0,
+        "allowed": false,
+        "cap": 100,
+        "cleanup": [],
+        "decision": "DENIED_CORRUPTED_PARQUET_THRIFT_FOOTER",
+        "delta": 9,
+        "id": "footer_corrupt",
+        "kernel_API_counts_match": "KERNEL_AND_INDEPENDENT_BOUNDARY_COUNTS_MATCH",
+        "native_common": 36,
+        "native_family_counts": {
+          "close": 11,
+          "fstat": 12,
+          "open": 11,
+          "pread": 2
+        },
+        "reported_common": 27,
+        "scope": "READER_OPERATION"
+      },
+      {
+        "actual_held_fds": 0,
+        "allowed": false,
+        "cap": 100,
+        "cleanup": [],
+        "decision": "S3A_HARNESS_ROOT_IDENTITY_NOT_PROVEN",
+        "delta": 9,
+        "id": "self_minted_no_custody",
+        "kernel_API_counts_match": "KERNEL_AND_INDEPENDENT_BOUNDARY_COUNTS_MATCH",
+        "native_common": 9,
+        "native_family_counts": {
+          "close": 3,
+          "fstat": 3,
+          "open": 3
+        },
+        "reported_common": 0,
+        "scope": "READER_OPERATION"
+      },
+      {
+        "actual_held_fds": 0,
+        "allowed": true,
+        "cap": 100,
+        "cleanup": [],
+        "decision": "ALLOWED_SINGLE_FILE_FOOTER_SCHEMA_PARSED",
+        "delta": 9,
+        "id": "self_minted_factory",
+        "kernel_API_counts_match": "KERNEL_AND_INDEPENDENT_BOUNDARY_COUNTS_MATCH",
+        "native_common": 36,
+        "native_family_counts": {
+          "close": 11,
+          "fstat": 12,
+          "open": 11,
+          "pread": 2
+        },
+        "reported_common": 27,
+        "scope": "READER_OPERATION"
+      },
+      {
+        "actual_held_fds": 0,
+        "allowed": false,
+        "cap": 100,
+        "cleanup": [],
+        "decision": "DENIED_PRODUCTION_OR_OWNER_ROOT_FORBIDDEN",
+        "delta": 0,
+        "id": "production_mode",
+        "kernel_API_counts_match": "KERNEL_AND_INDEPENDENT_BOUNDARY_COUNTS_MATCH",
+        "native_common": 0,
+        "native_family_counts": {},
+        "reported_common": 0,
+        "scope": "READER_OPERATION"
+      },
+      {
+        "actual_held_fds": 0,
+        "allowed": false,
+        "cap": 100,
+        "cleanup": [],
+        "decision": "DENIED_MOUNT_BOUNDARY_ESCAPE",
+        "delta": 9,
+        "id": "simulated_crossdevice",
+        "kernel_API_counts_match": "KERNEL_AND_INDEPENDENT_BOUNDARY_COUNTS_MATCH",
+        "native_common": 15,
+        "native_family_counts": {
+          "close": 5,
+          "fstat": 5,
+          "open": 5
+        },
+        "reported_common": 6,
+        "scope": "READER_OPERATION"
+      },
+      {
+        "actual_held_fds": 0,
+        "allowed": false,
+        "cap": 100,
+        "cleanup": [],
+        "decision": "S3A_HARNESS_ROOT_IDENTITY_NOT_PROVEN",
+        "delta": 0,
+        "id": "borrowed_custody",
+        "kernel_API_counts_match": "KERNEL_AND_INDEPENDENT_BOUNDARY_COUNTS_MATCH",
+        "native_common": 0,
+        "native_family_counts": {},
+        "reported_common": 0,
+        "scope": "READER_OPERATION"
+      },
+      {
+        "actual_held_fds": 0,
+        "allowed": false,
+        "cap": 100,
+        "cleanup": [],
+        "decision": "DENIED_PATH_SYNTAX_OR_TRAVERSAL",
+        "delta": 0,
+        "id": "temp_path_escape",
+        "kernel_API_counts_match": "KERNEL_AND_INDEPENDENT_BOUNDARY_COUNTS_MATCH",
+        "native_common": 0,
+        "native_family_counts": {},
+        "reported_common": 0,
+        "scope": "READER_OPERATION"
+      }
+    ],
+    "close_fault": "One explicit close(-1) native argument substitution per case gives EBADF; ordinary valid close spontaneous failure not claimed",
+    "core_families": [
+      "open",
+      "fstat",
+      "pread",
+      "close"
+    ],
+    "crossdevice": "Synthetic grant expected-device perturbation only, no actual mounts",
+    "dedicated_attestation_native_calls": 12,
+    "executed_cases": 27,
+    "held_fd_confirmation": "Independent native fstat after reader scope; audit-owned FDs closed outside scope",
+    "initial_attestation_boundary_calls": 12,
+    "method": "Linux ptrace TRACEME + GET_SYSCALL_INFO of newly forked own child; independent Python OS observer corroboration",
+    "missing_ancestor_and_ENOTDIR_and_EACCES_two_failed_native_opens": true,
+    "native_initial_setup_globally_traced": false,
+    "reader_cases": 26,
+    "results_sha256": "09653b2fd0513bf2f1c08c6bae04e44a01f4ba65925aeaaedb016141a456571a",
+    "scope": "Only reader-operation SIGSTOP window except dedicated setup case; fixture preparation/import/attestation and post-target auditor fstat/cleanup excluded",
+    "trace_nondeterminism": "PIDs, pointers, temp names vary; repeated counts and decisions checked, no byte-identical cross-runtime result claim"
+  },
+  "next_controller_action": "Reject reader security admission; hold S3B; distinct bounded Codex implementation dispatch or STOP. This receipt grants neither.",
+  "original_R1_preservation": [
+    {
+      "matches_R1_parent": true,
+      "path": "docs/strategy_research/g2_r3/p2_s3_footer_reader_r1/S3A_READER_BOUNDARY_IMPLEMENTATION_AND_FALSIFICATION_REPORT.md",
+      "sha256": "fd727d92a30de2c42bc5b4aeb68e71cac4ed306f8c3601aaca56d5da44c709c3"
+    },
+    {
+      "matches_R1_parent": true,
+      "path": "docs/strategy_research/g2_r3/p2_s3_footer_reader_r1/S3B_PROPOSED_ONE_FILE_FOOTER_QA_GRANT_CONTRACT.md",
+      "sha256": "936814eebc00e93cc72652bac5a6d95079c5a35fed3fc003752805519ac9859d"
+    },
+    {
+      "matches_R1_parent": true,
+      "path": "evidence/v0.6/b_line/p2_s3_footer_reader_r1/S3A_FS_SYSCALL_SECURITY_ORACLE_RESULTS.json",
+      "sha256": "28773055ee78aafb107e678a03bc1be0a70b35dbc5178554db33cd60e4c06f5a"
+    },
+    {
+      "matches_R1_parent": true,
+      "path": "evidence/v0.6/b_line/p2_s3_footer_reader_r1/S3A_IMPLEMENTATION_EXECUTION_RECEIPT.json",
+      "sha256": "5bb8cf5272ddf65a86b61a6d9aab24fa3de84b401b65ab544a01438c330e226e"
+    }
+  ],
+  "prompt_commit_sha": "a6338e86a61c9349c3236da1d3e4ce81d03a54a2",
+  "publication": {
+    "exact_new_file_allowlist": [
+      "evidence/v0.6/b_line/p2_s3a_codex_independent_audit_r1/S3A_R2_CODEX_AUDIT_EXECUTION_RECEIPT.json",
+      "evidence/v0.6/b_line/p2_s3a_codex_independent_audit_r1/S3A_R2_NATIVE_OS_SYSCALL_TRACE_COMPARISON.json",
+      "reviews/v0.6/b_line/s3a_codex_independent_audit_r1/S3A_R2_CODEX_SOL_INDEPENDENT_SECURITY_VERDICT.md",
+      "reviews/v0.6/b_line/s3a_codex_independent_audit_r1/S3A_R2_SOURCE_PROVENANCE_ERRATUM.md",
+      "scripts/strategy_research/p2_s3a_independent_audit_r1/fixtures.json",
+      "scripts/strategy_research/p2_s3a_independent_audit_r1/fixtures.sha256",
+      "scripts/strategy_research/p2_s3a_independent_audit_r1/harness.py",
+      "scripts/strategy_research/p2_s3a_independent_audit_r1/native.py",
+      "tests/test_v06_p2_s3a_independent_audit_native.py"
+    ],
+    "in_commit_final_own_SHA": "NOT_SELF_REFERENCED",
+    "policy": "ONE non-force commit and push; direct parent999cf700 required; exact ls-remote verification and CI final status returned externally after commit",
+    "post_push_outcome": "Reported in final response; receipt cannot contain future own commit SHA without violating one-commit constraint"
+  },
+  "required_audit_direct_parent": "999cf7005c741bdbabae727f10f90f23330fb035",
+  "role": "Independent B-line security/scientific-evidence auditor; no implementation repair",
+  "runtime_target_modules": [
+    {
+      "byte_identical_to_frozen": true,
+      "getfile": "/root/workspace/project/quant-v0.6/p2-s3a-codex-sol-audit-r1/scripts/strategy_research/p2_s3_footer_reader/reader.py",
+      "module": "scripts.strategy_research.p2_s3_footer_reader.reader",
+      "repo_path": "scripts/strategy_research/p2_s3_footer_reader/reader.py",
+      "sha256": "bf002e053832aaa51e29d5560c1ba0355aee7bef6508a10e6a0cbc4a7a03d792"
+    },
+    {
+      "byte_identical_to_frozen": true,
+      "getfile": "/root/workspace/project/quant-v0.6/p2-s3a-codex-sol-audit-r1/scripts/strategy_research/p2_s3_footer_reader/fd_syscall_wrapper.py",
+      "module": "scripts.strategy_research.p2_s3_footer_reader.fd_syscall_wrapper",
+      "repo_path": "scripts/strategy_research/p2_s3_footer_reader/fd_syscall_wrapper.py",
+      "sha256": "077044acabbe1b3e8f270f6ec3c9e3c15eadad30bae87e2d0dfc4674c90056a0"
+    },
+    {
+      "byte_identical_to_frozen": true,
+      "getfile": "/root/workspace/project/quant-v0.6/p2-s3a-codex-sol-audit-r1/scripts/strategy_research/p2_s3_footer_reader/types.py",
+      "module": "scripts.strategy_research.p2_s3_footer_reader.types",
+      "repo_path": "scripts/strategy_research/p2_s3_footer_reader/types.py",
+      "sha256": "27343eef040edb6d496d8ed864d657839dcd3a423464c2846a8a8d08668791e0"
+    },
+    {
+      "byte_identical_to_frozen": true,
+      "getfile": "/root/workspace/project/quant-v0.6/p2-s3a-codex-sol-audit-r1/scripts/strategy_research/p2_s3_footer_reader/footer_parser.py",
+      "module": "scripts.strategy_research.p2_s3_footer_reader.footer_parser",
+      "repo_path": "scripts/strategy_research/p2_s3_footer_reader/footer_parser.py",
+      "sha256": "1be989c9d645fc2402047e7d99357d9f61e4f66c9240492ad37db785e08ff563"
+    },
+    {
+      "byte_identical_to_frozen": true,
+      "getfile": "/root/workspace/project/quant-v0.6/p2-s3a-codex-sol-audit-r1/scripts/strategy_research/p2_s3_footer_reader/constants.py",
+      "module": "scripts.strategy_research.p2_s3_footer_reader.constants",
+      "repo_path": "scripts/strategy_research/p2_s3_footer_reader/constants.py",
+      "sha256": "b9d56e0a018c8f0ddcc8989dc34ffc43fa7fd5cacbdf0bc30f01d36f1eeec76a"
+    }
+  ],
+  "schema": "S3A_CODEX_INDEPENDENT_AUDIT_EXECUTION_RECEIPT_V1",
+  "source_provenance": {
+    "invented_key_target_Checks_present": false,
+    "narrative_correct_matching_paths": {
+      "research/BTCUSDT/1m/year=2021/month=03/data.parquet": 2756024,
+      "research/BTCUSDT/1m/year=2021/month=04/data.parquet": 2621313,
+      "research/BTCUSDT/1m/year=2023/month=03/data.parquet": 2415597,
+      "research/BTCUSDT/1m/year=2023/month=04/data.parquet": 2201521,
+      "research/BTCUSDT/1m/year=2025/month=03/data.parquet": 2352476,
+      "research/BTCUSDT/1m/year=2025/month=04/data.parquet": 2329220
+    },
+    "narrative_section43": {
+      "BTCUSDT_perp_1h.parquet": 2616951,
+      "BTCUSDT_spot_1h.parquet": 2913841,
+      "ETHUSDT_1h_klines.parquet": 2522069,
+      "SOLUSDT_1h_klines.parquet": 2000906,
+      "raw/funding/BTCUSDT_funding_rate_2020_202601.csv": 679115,
+      "research/BTCUSDT/1m/year=2021/month=03/data.parquet": 2756024,
+      "research/BTCUSDT/1m/year=2021/month=04/data.parquet": 2621313,
+      "research/BTCUSDT/1m/year=2023/month=03/data.parquet": 2415597,
+      "research/BTCUSDT/1m/year=2023/month=04/data.parquet": 2201521,
+      "research/BTCUSDT/1m/year=2025/month=03/data.parquet": 2352476,
+      "research/BTCUSDT/1m/year=2025/month=04/data.parquet": 2329220,
+      "research/BTCUSDT/data_manifest.json": 475,
+      "research/BTCUSDT/funding_events.csv": 424781
+    },
+    "narrative_unbacked_paths": {
+      "BTCUSDT_perp_1h.parquet": 2616951,
+      "BTCUSDT_spot_1h.parquet": 2913841,
+      "ETHUSDT_1h_klines.parquet": 2522069,
+      "SOLUSDT_1h_klines.parquet": 2000906,
+      "raw/funding/BTCUSDT_funding_rate_2020_202601.csv": 679115
+    },
+    "narrative_wrong_sizes": {
+      "research/BTCUSDT/data_manifest.json": {
+        "immutable_original": 45234,
+        "narrative": 475
+      },
+      "research/BTCUSDT/funding_events.csv": {
+        "immutable_original": 219066,
+        "narrative": 424781
+      }
+    },
+    "original_actual_keys": [
+      "candidate_month_observations",
+      "additional_target_observations"
+    ],
+    "original_blob_sha256": "a3c9169dcbeb31edce492791ef253e42c580411cdb014337e8084229aaaaf3f2",
+    "original_paths_omitted_from_narrative": {
+      "research/BTCUSDT_SPOT/data_manifest.json": 19855,
+      "research/cross_asset_1h/ETHUSDT.parquet": 2907000,
+      "research/cross_asset_1h/basket_manifest.json": 56012,
+      "research/v0.3.19_official_derivatives/hourly_inputs.parquet": 3101084,
+      "research/v0.3.19_official_derivatives/raw_data_manifest.json": 420725
+    },
+    "original_sha": "c6823dbc46249cac43aa10400aacbbe9f4542410",
+    "original_sizes": {
+      "research/BTCUSDT/1m/year=2021/month=03/data.parquet": 2756024,
+      "research/BTCUSDT/1m/year=2021/month=04/data.parquet": 2621313,
+      "research/BTCUSDT/1m/year=2023/month=03/data.parquet": 2415597,
+      "research/BTCUSDT/1m/year=2023/month=04/data.parquet": 2201521,
+      "research/BTCUSDT/1m/year=2025/month=03/data.parquet": 2352476,
+      "research/BTCUSDT/1m/year=2025/month=04/data.parquet": 2329220,
+      "research/BTCUSDT/data_manifest.json": 45234,
+      "research/BTCUSDT/funding_events.csv": 219066,
+      "research/BTCUSDT_SPOT/data_manifest.json": 19855,
+      "research/cross_asset_1h/ETHUSDT.parquet": 2907000,
+      "research/cross_asset_1h/basket_manifest.json": 56012,
+      "research/v0.3.19_official_derivatives/hourly_inputs.parquet": 3101084,
+      "research/v0.3.19_official_derivatives/raw_data_manifest.json": 420725
+    },
+    "regular_file_count": 13,
+    "scope": "Git metadata receipt only, zero actual data-root remeasurement",
+    "target_R2_JSON_match_all13": true,
+    "target_constants_match_all13": true
+  },
+  "target_direct_parent": "30833953804bd965c80913ee6a3ecd4ae7457b40",
+  "terminal": "S3A_CODEX_INDEPENDENT_AUDIT_FAIL_HARD_SYSCALL_ACCOUNTING_OR_ROOT_ISOLATION",
+  "validation": {
+    "JSON_validity": "Two new evidence JSON plus fixtures parsed; all manifest digests verified",
+    "compileall": {
+      "exit_code": 0,
+      "scope": "new audit scripts and new audit test only"
+    },
+    "focused_pytest": [
+      {
+        "command": "PYTHONDONTWRITEBYTECODE=1 python3.12 -m pytest --noconftest -q tests/test_v06_p2_s3a_independent_audit_native.py",
+        "elapsed_seconds": 0.929,
+        "errors": 0,
+        "exit_code": 0,
+        "failures": 0,
+        "junit_sha256": "a12261fc8a23c62fae9ac4b52ae8f111a259b10ca613faf98120692728f5f768",
+        "live_native_cases": 27,
+        "python": "3.12",
+        "skipped": 0,
+        "tests": 29,
+        "warning": "CPython fork with threads DeprecationWarning; not suppressed, general deadlock safety not certified",
+        "warning_count": 27
+      },
+      {
+        "command": "PYTHONDONTWRITEBYTECODE=1 python3.13 -m pytest --noconftest -q tests/test_v06_p2_s3a_independent_audit_native.py",
+        "elapsed_seconds": 0.756,
+        "errors": 0,
+        "exit_code": 0,
+        "failures": 0,
+        "junit_sha256": "720dd3abe34c2d06873174a95a3a28d16434b97b8ef7b7977c7aae310352a107",
+        "live_native_cases": 27,
+        "python": "3.13",
+        "skipped": 0,
+        "tests": 29,
+        "warning": "CPython fork with threads DeprecationWarning; not suppressed, general deadlock safety not certified",
+        "warning_count": 27
+      }
+    ],
+    "git_diff_check": "PASS before commit, new-only whitelist checked",
+    "initial_tests": {
+      "each_runtime_failed": 4,
+      "each_runtime_passed": 25,
+      "reason": "Auditor initially rejected suppression flag key names; corrected only own assertions to require suppression and forbid actual statistics/KV values; no target changes"
+    },
+    "local_full_suite": "NOT_RUN per frozen authority; exact-head inherited CI runs after push",
+    "mypy": "Not separately run; untyped ptrace audit harness, inherited project CI remains unchanged",
+    "ruff": {
+      "final_exit_code": 0,
+      "initial_errors": 5,
+      "repairs": "Own audit imports/unused import/blind except annotations/constant comparison only",
+      "scope": "scripts/strategy_research/p2_s3a_independent_audit_r1 tests/test_v06_p2_s3a_independent_audit_native.py"
+    },
+    "standalone_noconftest": "Avoid inherited application fixtures touching/normalizing protected paths; pytest real asserts live native results",
+    "working_tracked_changes_before_stage": []
+  },
+  "worktree": "/root/workspace/project/quant-v0.6/p2-s3a-codex-sol-audit-r1"
+}

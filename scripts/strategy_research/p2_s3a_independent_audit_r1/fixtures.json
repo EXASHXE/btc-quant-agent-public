@@ -1,0 +1,149 @@
+{
+  "deep_directory_count": 36,
+  "expectations": "Native common OS count equals independently delegated boundary count; target reported count compared rather than trusted. Capture reproductions, never relabel target FAIL as target PASS.",
+  "fault_description": "Close fault delegates a real close(-1) yielding native EBADF; substituted argument labeled, original owned FD remains for excluded audit cleanup",
+  "footer_cap": 65536,
+  "frozen_target_sha": "999cf7005c741bdbabae727f10f90f23330fb035",
+  "parquet_hex": "504152311504152015204c15041500120000010000000000000002000000000000001500151215122c15041510150615061c18080200000000000000180801000000000000001600280802000000000000001808010000000000000011110000000200000004010103021504152015204c15041500120000070000000000000008000000000000001500151215122c15041510150615061c18080800000000000000180807000000000000001600280808000000000000001808070000000000000011110000000200000004010103021504193c35001806736368656d6115040015042502180d696e76656e7465645f7469636b0015042502180e696e76656e7465645f6c6576656c001604191c192c26001c1504193500061019180d696e76656e7465645f7469636b1500160416cc0116cc01264426081c180802000000000000001808010000000000000016002808020000000000000018080100000000000000111100192c15041500150200150015101502003c29061926000400000026001c1504193500061019180e696e76656e7465645f6c6576656c1500160416cc0116cc0126900226d4011c180808000000000000001808070000000000000016002808080000000000000018080700000000000000111100192c15041500150200150015101502003c2906192600040000001698031604260816980300192c180c61756469745f6d61726b6572181953594e5448455449435f4f4e4c595f4e4f545f4d41524b455400180c4152524f573a736368656d611880032f2f2f2f2f78674241414151414141414141414b414134414267414641416741436741414141414242414151414141414141414b414177414141414541416741436741414146674141414145414141414151414141417741414141494141774142414149414167414141416f414141414241414141426b4141414254575535555345565553554e665430354d5756394f5431526654554653533056554141414144414141414746315a476c3058323168636d746c6367414141414143414141415541414141415141414144492f2f2f2f4141414241684141414141674141414142414141414141414141414f41414141615735325a5735305a575266624756325a577741414c6a2f2f2f384141414142514141414142414146414149414159414277414d41414141454141514141414141414142416841414141416f4141414142414141414141414141414e41414141615735325a5735305a57526664476c6a6177414141416741444141494141634143414141414141414141464141414141001820706172717565742d6370702d6172726f772076657273696f6e2032352e302e31192c1c00001c0000001703000050415231",
+  "parquet_sha256": "bb1a544bee08d5be9ae814c97dcd3730068e31723a7a87977d06eacb05d41cc1",
+  "scenarios": [
+    {
+      "cap": 100,
+      "id": "normal_cap_100",
+      "mode": "normal"
+    },
+    {
+      "cap": 1,
+      "id": "normal_cap_1",
+      "mode": "normal"
+    },
+    {
+      "cap": 2,
+      "id": "normal_cap_2",
+      "mode": "normal"
+    },
+    {
+      "cap": 3,
+      "id": "normal_cap_3",
+      "mode": "normal"
+    },
+    {
+      "cap": 25,
+      "id": "normal_cap_25",
+      "mode": "normal"
+    },
+    {
+      "cap": 27,
+      "id": "normal_cap_27",
+      "mode": "normal"
+    },
+    {
+      "cap": 100,
+      "id": "deep_cap100",
+      "mode": "deep_cap100"
+    },
+    {
+      "cap": 100,
+      "id": "missing_ancestor",
+      "mode": "missing_ancestor"
+    },
+    {
+      "cap": 100,
+      "id": "ancestor_symlink",
+      "mode": "ancestor_symlink"
+    },
+    {
+      "cap": 100,
+      "id": "ancestor_nondirectory",
+      "mode": "ancestor_nondirectory"
+    },
+    {
+      "cap": 100,
+      "id": "permission_eacces",
+      "mode": "permission_eacces"
+    },
+    {
+      "cap": 100,
+      "id": "close_root_fault",
+      "mode": "close_root_fault"
+    },
+    {
+      "cap": 100,
+      "id": "close_leaf_fault",
+      "mode": "close_leaf_fault"
+    },
+    {
+      "cap": 100,
+      "id": "attestation_only",
+      "mode": "attestation_only"
+    },
+    {
+      "cap": 100,
+      "id": "root_replaced",
+      "mode": "root_replaced"
+    },
+    {
+      "cap": 100,
+      "id": "multihop_symlink",
+      "mode": "multihop_symlink"
+    },
+    {
+      "cap": 100,
+      "id": "forbidden_surrogate",
+      "mode": "forbidden_surrogate"
+    },
+    {
+      "cap": 100,
+      "id": "leaf_hardlink",
+      "mode": "leaf_hardlink"
+    },
+    {
+      "cap": 100,
+      "id": "leaf_replaced_after_trailer",
+      "mode": "leaf_replaced_after_trailer"
+    },
+    {
+      "cap": 100,
+      "id": "footer_oversize",
+      "mode": "footer_oversize"
+    },
+    {
+      "cap": 100,
+      "id": "footer_corrupt",
+      "mode": "footer_corrupt"
+    },
+    {
+      "cap": 100,
+      "id": "self_minted_no_custody",
+      "mode": "self_minted_no_custody"
+    },
+    {
+      "cap": 100,
+      "id": "self_minted_factory",
+      "mode": "self_minted_factory"
+    },
+    {
+      "cap": 100,
+      "id": "production_mode",
+      "mode": "production_mode"
+    },
+    {
+      "cap": 100,
+      "id": "simulated_crossdevice",
+      "mode": "simulated_crossdevice"
+    },
+    {
+      "cap": 100,
+      "id": "borrowed_custody",
+      "mode": "borrowed_custody"
+    },
+    {
+      "cap": 100,
+      "id": "temp_path_escape",
+      "mode": "temp_path_escape"
+    }
+  ],
+  "schema": "S3A_INDEPENDENT_AUDIT_FROZEN_SYNTHETIC_FIXTURES_V1",
+  "scope": "Temporary files and invented Parquet only; owner root is a forbidden literal",
+  "trailer_bytes": 8
+}
