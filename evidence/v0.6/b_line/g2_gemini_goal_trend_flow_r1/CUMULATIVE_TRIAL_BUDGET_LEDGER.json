@@ -5,9 +5,9 @@
   "max_candidates_per_wave": 6,
   "max_agent_trial_budget": 24,
   "joint_dual_agent_budget": 48,
-  "cumulative_trials_evaluated": 6,
-  "remaining_trial_budget": 18,
-  "completed_waves": 1,
+  "cumulative_trials_evaluated": 12,
+  "remaining_trial_budget": 12,
+  "completed_waves": 2,
   "active_wave": "WAVE_02",
   "waves": {
     "WAVE_01": {
@@ -34,7 +34,7 @@
       ]
     },
     "WAVE_02": {
-      "status": "FROZEN_AWAITING_EXECUTION",
+      "status": "COMPLETED",
       "frozen_registry_file": "evidence/v0.6/b_line/g2_gemini_goal_trend_flow_r1/WAVE_02_FROZEN_REGISTRY.json",
       "candidate_count": 6,
       "candidate_ids": [
@@ -45,9 +45,16 @@
         "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H",
         "W2_C06_EXTREME_FLOW_EXHAUSTION_REVERSAL_TO_TREND_04H"
       ],
-      "evaluation_result_file": null,
+      "evaluation_result_file": "evidence/v0.6/b_line/g2_gemini_goal_trend_flow_r1/WAVE_02_RESULT.json",
       "promoted_candidates": [],
-      "falsified_candidates": []
+      "falsified_candidates": [
+        "W2_C01_VOLUME_WEIGHTED_MOMENTUM_SURGE_08H",
+        "W2_C02_MULTI_TIMEFRAME_CHOP_EXIT_TREND_12H",
+        "W2_C03_AGGRESSIVE_FLOW_CUMULATIVE_DELTA_DIVERGENCE_08H",
+        "W2_C04_DONCHIAN_MIDLINE_PULLBACK_CONTINUATION_08H",
+        "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H",
+        "W2_C06_EXTREME_FLOW_EXHAUSTION_REVERSAL_TO_TREND_04H"
+      ]
     },
     "WAVE_03": {
       "status": "UNINITIALIZED",
