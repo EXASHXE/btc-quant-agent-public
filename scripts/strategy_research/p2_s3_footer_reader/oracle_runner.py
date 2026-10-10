@@ -1,26 +1,10 @@
-"""Synthetic POSIX FS and Parquet footer security oracle runner for P2 S3A (R1 & R2).
+"""Synthetic historical scenario regressions evaluated under the R3 contract.
 
-Executes:
-- 30 core positive and adversarial negative scenarios against real temporary
-  directory trees created via ``tempfile.TemporaryDirectory()``
-- 3 deliberate mutant falsification proofs
-- R2 supplemental bounded security repair verification suite covering:
-  - F01: Two-temp-tree ancestor symlink escape (allowed tree + forbidden owner
-    surrogate tree), proving old unguarded ``os.open(root, O_NOFOLLOW)`` reaches
-    the forbidden surrogate while the repaired R2 reader rejects before reading
-    any footer bytes; plus multi-hop parent symlinks, ``../``, relative aliases,
-    hardlinks, dangling/renamed parents, mock bind-mount, and unattested roots
-    returning ``S3A_HARNESS_ROOT_IDENTITY_NOT_PROVEN``.
-  - F02: Honest ``TEST_ONLY_INTEGRITY_CHECKSUM_NOT_AUTHORIZATION`` token
-    semantics proving a caller can recompute the public SHA-256 checksum and
-    that self-minted tokens never grant access to unattested, surrogate, or
-    owner roots.
-  - F03: First-open close slot reservation across ``max_attempted_fs_calls =
-    1, 2, 3, 25, 27, 100`` with ``BUDGET_INSUFFICIENT_STOP`` classification,
-    zero FD leaks, and non-aborting ``os.close`` failure handling.
-  - F04: Row-wise verification of all 6 BTC 1m monthly file sizes and 7
-    auxiliary file sizes against the parsed immutable ``c6823dbc46249cac43aa10400aacbbe9f4542410``
-    JSON receipt (SHA-256 ``a3c9169dcbeb31edce492791ef253e42c580411cdb014337e8084229aaaaf3f2``).
+R1/R2 published artifacts remain immutable. Runtime predicates now include
+preparation and all ancestry in the hard budget, fresh single-use grants, and
+explicit pre-entry close uncertainty. Fixture lifecycle clearing/teardown is
+outside the supported one-file invocation. These Python scenario checks are
+not independent native proof: r3_oracle.py supplies that separate evidence.
 """
 
 from __future__ import annotations
@@ -34,9 +18,11 @@ import struct
 import subprocess
 import tempfile
 import zlib
+from contextlib import contextmanager
 from pathlib import Path
 from typing import Any
 
+from scripts.strategy_research.p2_s3_footer_reader import types as fixture_types
 from scripts.strategy_research.p2_s3_footer_reader.constants import (
     BUDGET_INSUFFICIENT_STOP_CODE,
     CODE_START_SHA,
@@ -189,6 +175,17 @@ def extract_file_sizes_from_c6823dbc_json(
     return extracted
 
 
+@contextmanager
+def _oracle_fixture_directory(**kwargs):
+    """Independent scenario fixture lifecycle, outside the reader invocation."""
+    with tempfile.TemporaryDirectory(**kwargs) as tmp:
+        fixture_types._FORBIDDEN_SURROGATE_TREES.clear()
+        try:
+            yield tmp
+        finally:
+            fixture_types._FORBIDDEN_SURROGATE_TREES.clear()
+
+
 def _record_scenario(
     scenario_id: str,
     category: str,
@@ -201,7 +198,11 @@ def _record_scenario(
     passed = (
         receipt.allowed == expected_allowed
         and receipt.decision_code == expected_decision_code
-        and snap.open_fds_remaining == 0
+        and (snap.open_fds_remaining == 0 or (
+            expected_decision_code == "FD_CLOSE_UNCONFIRMED_FAIL_CLOSED"
+            and snap.open_fds_remaining == len(snap.unconfirmed_fds)
+            and not snap.close_complete
+        ))
         and snap.owner_root_touched is False
         and receipt.header_verification_status == HEADER_STATUS_NOT_VERIFIED
         and receipt.grant_token_semantics == SYNTHETIC_GRANT_TOKEN_SEMANTICS
@@ -233,7 +234,7 @@ def run_all_s3a_security_oracle_scenarios() -> dict[str, Any]:
 
     # --- POSITIVE SCENARIOS (4) ---
     # POS-01: Standard valid synthetic 2021-03 Parquet file with stats & KV suppressed
-    with tempfile.TemporaryDirectory(prefix="s3a_pos01_") as tmp:
+    with _oracle_fixture_directory(prefix="s3a_pos01_") as tmp:
         materialize_synthetic_pilot_tree(tmp)
         grant = create_valid_synthetic_grant(tmp)
         reader = SingleFileParquetFooterReader(synthetic_fixture_root=tmp, grant=grant)
@@ -250,7 +251,7 @@ def run_all_s3a_security_oracle_scenarios() -> dict[str, Any]:
         )
 
     # POS-02: Large synthetic body (300 KB body + compact footer) reads only trailer + footer
-    with tempfile.TemporaryDirectory(prefix="s3a_pos02_") as tmp:
+    with _oracle_fixture_directory(prefix="s3a_pos02_") as tmp:
         base_pq = build_synthetic_parquet_bytes(num_rows=64, write_statistics=True)
         footer_len = struct.unpack("<i", base_pq[-8:-4])[0]
         padded_pq = (
@@ -274,7 +275,7 @@ def run_all_s3a_security_oracle_scenarios() -> dict[str, Any]:
         )
 
     # POS-03: Uncompressed Parquet without embedded statistics parses cleanly
-    with tempfile.TemporaryDirectory(prefix="s3a_pos03_") as tmp:
+    with _oracle_fixture_directory(prefix="s3a_pos03_") as tmp:
         pq_no_stats = build_synthetic_parquet_bytes(
             num_rows=4,
             write_statistics=False,
@@ -296,16 +297,16 @@ def run_all_s3a_security_oracle_scenarios() -> dict[str, Any]:
         )
 
     # POS-04: Tight but sufficient syscall budget (30 calls <= 100) succeeds cleanly
-    with tempfile.TemporaryDirectory(prefix="s3a_pos04_") as tmp:
+    with _oracle_fixture_directory(prefix="s3a_pos04_") as tmp:
         materialize_synthetic_pilot_tree(tmp)
-        grant = create_valid_synthetic_grant(tmp, max_attempted_fs_calls=30)
+        grant = create_valid_synthetic_grant(tmp, max_attempted_fs_calls=60)
         reader = SingleFileParquetFooterReader(synthetic_fixture_root=tmp, grant=grant)
         rec = reader.evaluate_to_receipt()
         scenarios.append(
             _record_scenario(
-                "POS_04_BOUNDED_30_SYSCALL_BUDGET_SUCCEEDS",
+                "POS_04_R3_INCLUSIVE_60_SYSCALL_BUDGET_SUCCEEDS",
                 "POSITIVE_FOOTER_READ",
-                "Full 6-component dir_fd walk + pread + TOCTOU reopen completes in 27 syscalls.",
+                "R3 includes preparation, complete ancestry, pread and cleanup under60.",
                 True,
                 "ALLOWED_SINGLE_FILE_FOOTER_SCHEMA_PARSED",
                 rec,
@@ -314,7 +315,7 @@ def run_all_s3a_security_oracle_scenarios() -> dict[str, Any]:
 
     # --- NEGATIVE ADVERSARIAL SCENARIOS (26 >= 18 required) ---
     # NEG-01: CLI --data-root / --root override attempt
-    with tempfile.TemporaryDirectory(prefix="s3a_neg01_") as tmp:
+    with _oracle_fixture_directory(prefix="s3a_neg01_") as tmp:
         materialize_synthetic_pilot_tree(tmp)
         grant = create_valid_synthetic_grant(tmp)
         reader = SingleFileParquetFooterReader(
@@ -335,7 +336,7 @@ def run_all_s3a_security_oracle_scenarios() -> dict[str, Any]:
         )
 
     # NEG-02: Environment variable root override attempt
-    with tempfile.TemporaryDirectory(prefix="s3a_neg02_") as tmp:
+    with _oracle_fixture_directory(prefix="s3a_neg02_") as tmp:
         materialize_synthetic_pilot_tree(tmp)
         grant = create_valid_synthetic_grant(tmp)
         reader = SingleFileParquetFooterReader(
@@ -356,7 +357,7 @@ def run_all_s3a_security_oracle_scenarios() -> dict[str, Any]:
         )
 
     # NEG-03: Direct reference to real owner data root (/root/workspace/project/Quant-agent/data)
-    with tempfile.TemporaryDirectory(prefix="s3a_neg03_") as tmp:
+    with _oracle_fixture_directory(prefix="s3a_neg03_") as tmp:
         grant = create_valid_synthetic_grant(tmp)
         reader = SingleFileParquetFooterReader(
             synthetic_fixture_root=IMMUTABLE_OWNER_DATA_ROOT,
@@ -375,7 +376,7 @@ def run_all_s3a_security_oracle_scenarios() -> dict[str, Any]:
         )
 
     # NEG-04: Production mode flag enabled
-    with tempfile.TemporaryDirectory(prefix="s3a_neg04_") as tmp:
+    with _oracle_fixture_directory(prefix="s3a_neg04_") as tmp:
         materialize_synthetic_pilot_tree(tmp)
         grant = create_valid_synthetic_grant(tmp)
         reader = SingleFileParquetFooterReader(
@@ -396,7 +397,7 @@ def run_all_s3a_security_oracle_scenarios() -> dict[str, Any]:
         )
 
     # NEG-05: Root directory itself is a symlink
-    with tempfile.TemporaryDirectory(prefix="s3a_neg05_") as tmp:
+    with _oracle_fixture_directory(prefix="s3a_neg05_") as tmp:
         real_root = Path(tmp) / "real_root"
         sym_root = Path(tmp) / "sym_root"
         materialize_synthetic_pilot_tree(real_root)
@@ -419,7 +420,7 @@ def run_all_s3a_security_oracle_scenarios() -> dict[str, Any]:
         )
 
     # NEG-06: Intermediate symlink at 'research'
-    with tempfile.TemporaryDirectory(prefix="s3a_neg06_") as tmp:
+    with _oracle_fixture_directory(prefix="s3a_neg06_") as tmp:
         outside_dir = Path(tmp) / "outside_research"
         os.makedirs(outside_dir, exist_ok=True)
         root_dir = Path(tmp) / "fixture_root"
@@ -443,7 +444,7 @@ def run_all_s3a_security_oracle_scenarios() -> dict[str, Any]:
         )
 
     # NEG-07: Intermediate symlink at 'month=03'
-    with tempfile.TemporaryDirectory(prefix="s3a_neg07_") as tmp:
+    with _oracle_fixture_directory(prefix="s3a_neg07_") as tmp:
         outside_month = Path(tmp) / "outside_month03"
         os.makedirs(outside_month, exist_ok=True)
         (outside_month / "data.parquet").write_bytes(build_synthetic_parquet_bytes())
@@ -469,7 +470,7 @@ def run_all_s3a_security_oracle_scenarios() -> dict[str, Any]:
         )
 
     # NEG-08: Final leaf target 'data.parquet' is a symlink
-    with tempfile.TemporaryDirectory(prefix="s3a_neg08_") as tmp:
+    with _oracle_fixture_directory(prefix="s3a_neg08_") as tmp:
         root_dir = Path(tmp) / "fixture_root"
         month_dir = root_dir / "research" / "BTCUSDT" / "1m" / "year=2021" / "month=03"
         os.makedirs(month_dir, exist_ok=True)
@@ -494,7 +495,7 @@ def run_all_s3a_security_oracle_scenarios() -> dict[str, Any]:
         )
 
     # NEG-09: '..' traversal segment in relative path
-    with tempfile.TemporaryDirectory(prefix="s3a_neg09_") as tmp:
+    with _oracle_fixture_directory(prefix="s3a_neg09_") as tmp:
         materialize_synthetic_pilot_tree(tmp)
         grant = create_valid_synthetic_grant(tmp)
         reader = SingleFileParquetFooterReader(synthetic_fixture_root=tmp, grant=grant)
@@ -513,7 +514,7 @@ def run_all_s3a_security_oracle_scenarios() -> dict[str, Any]:
         )
 
     # NEG-10: Absolute path or empty/backslash segment
-    with tempfile.TemporaryDirectory(prefix="s3a_neg10_") as tmp:
+    with _oracle_fixture_directory(prefix="s3a_neg10_") as tmp:
         materialize_synthetic_pilot_tree(tmp)
         grant = create_valid_synthetic_grant(tmp)
         reader = SingleFileParquetFooterReader(synthetic_fixture_root=tmp, grant=grant)
@@ -532,7 +533,7 @@ def run_all_s3a_security_oracle_scenarios() -> dict[str, Any]:
         )
 
     # NEG-11: Intermediate component is a regular file (NotADirectoryError)
-    with tempfile.TemporaryDirectory(prefix="s3a_neg11_") as tmp:
+    with _oracle_fixture_directory(prefix="s3a_neg11_") as tmp:
         root_dir = Path(tmp) / "fixture_root"
         btc_dir = root_dir / "research" / "BTCUSDT"
         os.makedirs(btc_dir, exist_ok=True)
@@ -555,7 +556,7 @@ def run_all_s3a_security_oracle_scenarios() -> dict[str, Any]:
         )
 
     # NEG-12: Final target is a directory instead of a regular file
-    with tempfile.TemporaryDirectory(prefix="s3a_neg12_") as tmp:
+    with _oracle_fixture_directory(prefix="s3a_neg12_") as tmp:
         root_dir = Path(tmp) / "fixture_root"
         leaf_as_dir = (
             root_dir
@@ -585,7 +586,7 @@ def run_all_s3a_security_oracle_scenarios() -> dict[str, Any]:
         )
 
     # NEG-13: Final target is a named FIFO pipe instead of a regular file
-    with tempfile.TemporaryDirectory(prefix="s3a_neg13_") as tmp:
+    with _oracle_fixture_directory(prefix="s3a_neg13_") as tmp:
         root_dir = Path(tmp) / "fixture_root"
         month_dir = root_dir / "research" / "BTCUSDT" / "1m" / "year=2021" / "month=03"
         os.makedirs(month_dir, exist_ok=True)
@@ -608,7 +609,7 @@ def run_all_s3a_security_oracle_scenarios() -> dict[str, Any]:
         )
 
     # NEG-14: Cross-device st_dev change across directory or leaf component
-    with tempfile.TemporaryDirectory(prefix="s3a_neg14_") as tmp:
+    with _oracle_fixture_directory(prefix="s3a_neg14_") as tmp:
         materialize_synthetic_pilot_tree(tmp)
         grant = create_valid_synthetic_grant(tmp)
         reader = SingleFileParquetFooterReader(
@@ -629,7 +630,7 @@ def run_all_s3a_security_oracle_scenarios() -> dict[str, Any]:
         )
 
     # NEG-15: Hardlink / multi-link target file (st_nlink > 1)
-    with tempfile.TemporaryDirectory(prefix="s3a_neg15_") as tmp:
+    with _oracle_fixture_directory(prefix="s3a_neg15_") as tmp:
         leaf = materialize_synthetic_pilot_tree(tmp)
         hardlink_alias = Path(tmp) / "hardlink_alias.parquet"
         os.link(leaf, hardlink_alias)
@@ -648,7 +649,7 @@ def run_all_s3a_security_oracle_scenarios() -> dict[str, Any]:
         )
 
     # NEG-16: TOCTOU replacement of directory entry between trailer pread and post-read check
-    with tempfile.TemporaryDirectory(prefix="s3a_neg16_") as tmp:
+    with _oracle_fixture_directory(prefix="s3a_neg16_") as tmp:
         leaf = materialize_synthetic_pilot_tree(tmp)
 
         def _swap_file_during_read() -> None:
@@ -675,7 +676,7 @@ def run_all_s3a_security_oracle_scenarios() -> dict[str, Any]:
         )
 
     # NEG-17: EACCES permission denied vs ENOENT distinct classification
-    with tempfile.TemporaryDirectory(prefix="s3a_neg17_") as tmp:
+    with _oracle_fixture_directory(prefix="s3a_neg17_") as tmp:
         leaf = materialize_synthetic_pilot_tree(tmp)
         os.chmod(leaf, 0)
         grant = create_valid_synthetic_grant(tmp)
@@ -703,7 +704,7 @@ def run_all_s3a_security_oracle_scenarios() -> dict[str, Any]:
         )
 
     # NEG-18: ENOENT missing file classification
-    with tempfile.TemporaryDirectory(prefix="s3a_neg18_") as tmp:
+    with _oracle_fixture_directory(prefix="s3a_neg18_") as tmp:
         os.makedirs(
             Path(tmp) / "research" / "BTCUSDT" / "1m" / "year=2021" / "month=03",
             exist_ok=True,
@@ -723,7 +724,7 @@ def run_all_s3a_security_oracle_scenarios() -> dict[str, Any]:
         )
 
     # NEG-19: Non-pilot month (e.g. 2021-04) rejected under single-file S3 scope
-    with tempfile.TemporaryDirectory(prefix="s3a_neg19_") as tmp:
+    with _oracle_fixture_directory(prefix="s3a_neg19_") as tmp:
         materialize_synthetic_pilot_tree(tmp)
         grant = create_valid_synthetic_grant(tmp)
         reader = SingleFileParquetFooterReader(synthetic_fixture_root=tmp, grant=grant)
@@ -742,7 +743,7 @@ def run_all_s3a_security_oracle_scenarios() -> dict[str, Any]:
         )
 
     # NEG-20: Protected 2026 path / forward / H39 rejected
-    with tempfile.TemporaryDirectory(prefix="s3a_neg20_") as tmp:
+    with _oracle_fixture_directory(prefix="s3a_neg20_") as tmp:
         materialize_synthetic_pilot_tree(tmp)
         grant = create_valid_synthetic_grant(tmp)
         reader = SingleFileParquetFooterReader(synthetic_fixture_root=tmp, grant=grant)
@@ -761,7 +762,7 @@ def run_all_s3a_security_oracle_scenarios() -> dict[str, Any]:
         )
 
     # NEG-21: Missing, unsigned, or expired grant rejected
-    with tempfile.TemporaryDirectory(prefix="s3a_neg21_") as tmp:
+    with _oracle_fixture_directory(prefix="s3a_neg21_") as tmp:
         materialize_synthetic_pilot_tree(tmp)
         expired_grant = create_valid_synthetic_grant(
             tmp,
@@ -786,7 +787,7 @@ def run_all_s3a_security_oracle_scenarios() -> dict[str, Any]:
         )
 
     # NEG-22: Invalid Parquet trailer magic (!= b'PAR1')
-    with tempfile.TemporaryDirectory(prefix="s3a_neg22_") as tmp:
+    with _oracle_fixture_directory(prefix="s3a_neg22_") as tmp:
         bad_magic_bytes = craft_custom_trailer_parquet_bytes(
             body_and_footer_bytes=b"0123456789ABCDEF",
             declared_footer_len=8,
@@ -808,7 +809,7 @@ def run_all_s3a_security_oracle_scenarios() -> dict[str, Any]:
         )
 
     # NEG-23: Parquet footer_len > 65,536 bytes
-    with tempfile.TemporaryDirectory(prefix="s3a_neg23_") as tmp:
+    with _oracle_fixture_directory(prefix="s3a_neg23_") as tmp:
         oversized_footer_bytes = craft_custom_trailer_parquet_bytes(
             body_and_footer_bytes=(b"\x00" * 70_000),
             declared_footer_len=70_000,
@@ -830,7 +831,7 @@ def run_all_s3a_security_oracle_scenarios() -> dict[str, Any]:
         )
 
     # NEG-24: Parquet footer_len + 8 > file_size - 4 (extent overlap)
-    with tempfile.TemporaryDirectory(prefix="s3a_neg24_") as tmp:
+    with _oracle_fixture_directory(prefix="s3a_neg24_") as tmp:
         extent_overflow_bytes = craft_custom_trailer_parquet_bytes(
             body_and_footer_bytes=b"12345678",
             declared_footer_len=500,
@@ -852,7 +853,7 @@ def run_all_s3a_security_oracle_scenarios() -> dict[str, Any]:
         )
 
     # NEG-25: Truncated file (< 13 bytes) or short pread
-    with tempfile.TemporaryDirectory(prefix="s3a_neg25_") as tmp:
+    with _oracle_fixture_directory(prefix="s3a_neg25_") as tmp:
         materialize_synthetic_pilot_tree(tmp)
         grant = create_valid_synthetic_grant(tmp)
         reader = SingleFileParquetFooterReader(
@@ -873,7 +874,7 @@ def run_all_s3a_security_oracle_scenarios() -> dict[str, Any]:
         )
 
     # NEG-26: Corrupted Thrift footer bytes
-    with tempfile.TemporaryDirectory(prefix="s3a_neg26_") as tmp:
+    with _oracle_fixture_directory(prefix="s3a_neg26_") as tmp:
         corrupted_thrift = craft_custom_trailer_parquet_bytes(
             body_and_footer_bytes=(b"\xff\xfe\xfd\xfc" * 16),
             declared_footer_len=64,
@@ -894,6 +895,7 @@ def run_all_s3a_security_oracle_scenarios() -> dict[str, Any]:
             )
         )
 
+    fixture_types._FORBIDDEN_SURROGATE_TREES.clear()  # prior temporary fixture contexts ended
     mutants = _run_mutant_falsification_suite()
     pos_count = sum(1 for s in scenarios if s["expected_allowed"])
     neg_count = sum(1 for s in scenarios if not s["expected_allowed"])
@@ -938,7 +940,7 @@ def run_all_s3a_r2_supplemental_oracle_scenarios() -> dict[str, Any]:
     # R2-F01-01: Two temp trees (allowed_tree + forbidden_owner_surrogate) with
     # ancestor symlink alias: prove old os.open(alias_root, O_NOFOLLOW) reaches
     # the forbidden surrogate while repaired R2 reader rejects with 0 bytes read.
-    with tempfile.TemporaryDirectory(prefix="s3a_r2_f01_01_") as tmp:
+    with _oracle_fixture_directory(prefix="s3a_r2_f01_01_") as tmp:
         allowed_tree = Path(tmp) / "allowed_tree"
         os.makedirs(allowed_tree, exist_ok=True)
         forbidden_surrogate = Path(tmp) / "forbidden_owner_surrogate"
@@ -967,7 +969,7 @@ def run_all_s3a_r2_supplemental_oracle_scenarios() -> dict[str, Any]:
 
         # Now run repaired R2 reader on the exact same alias_root_path:
         self_minted_grant = create_valid_synthetic_grant(
-            alias_root_path, attest_root_custody=False
+            alias_root_path, attest_root_custody=True
         )
         reader = SingleFileParquetFooterReader(
             synthetic_fixture_root=alias_root_path,
@@ -993,7 +995,7 @@ def run_all_s3a_r2_supplemental_oracle_scenarios() -> dict[str, Any]:
         r2_scenarios.append(entry)
 
     # R2-F01-02: Multi-hop parent symlink chain (hop1 -> hop2 -> forbidden_surrogate/data_root)
-    with tempfile.TemporaryDirectory(prefix="s3a_r2_f01_02_") as tmp:
+    with _oracle_fixture_directory(prefix="s3a_r2_f01_02_") as tmp:
         forbidden_surrogate = Path(tmp) / "forbidden_surrogate_hop"
         materialize_synthetic_pilot_tree(forbidden_surrogate / "data_root")
         register_forbidden_owner_surrogate_tree(forbidden_surrogate)
@@ -1005,7 +1007,7 @@ def run_all_s3a_r2_supplemental_oracle_scenarios() -> dict[str, Any]:
         multi_alias_root = str(hop1 / "data_root")
 
         grant = create_valid_synthetic_grant(
-            multi_alias_root, attest_root_custody=False
+            multi_alias_root, attest_root_custody=True
         )
         reader = SingleFileParquetFooterReader(
             synthetic_fixture_root=multi_alias_root,
@@ -1024,7 +1026,7 @@ def run_all_s3a_r2_supplemental_oracle_scenarios() -> dict[str, Any]:
         )
 
     # R2-F01-03: '..' traversal in synthetic_fixture_root
-    with tempfile.TemporaryDirectory(prefix="s3a_r2_f01_03_") as tmp:
+    with _oracle_fixture_directory(prefix="s3a_r2_f01_03_") as tmp:
         allowed = Path(tmp) / "allowed"
         forbidden = Path(tmp) / "forbidden"
         os.makedirs(allowed, exist_ok=True)
@@ -1049,7 +1051,7 @@ def run_all_s3a_r2_supplemental_oracle_scenarios() -> dict[str, Any]:
         )
 
     # R2-F01-04: Relative path alias for synthetic_fixture_root
-    with tempfile.TemporaryDirectory(prefix="s3a_r2_f01_04_") as tmp:
+    with _oracle_fixture_directory(prefix="s3a_r2_f01_04_") as tmp:
         rel_alias = "relative_temp_alias/fixture_root"
         grant = create_valid_synthetic_grant(rel_alias, attest_root_custody=False)
         reader = SingleFileParquetFooterReader(
@@ -1069,7 +1071,7 @@ def run_all_s3a_r2_supplemental_oracle_scenarios() -> dict[str, Any]:
         )
 
     # R2-F01-05: Direct forbidden owner-surrogate temp tree rejected with S3A_HARNESS_ROOT_IDENTITY_NOT_PROVEN
-    with tempfile.TemporaryDirectory(prefix="s3a_r2_f01_05_") as tmp:
+    with _oracle_fixture_directory(prefix="s3a_r2_f01_05_") as tmp:
         forbidden = Path(tmp) / "forbidden_owner_surrogate_direct"
         materialize_synthetic_pilot_tree(forbidden)
         register_forbidden_owner_surrogate_tree(forbidden)
@@ -1091,7 +1093,7 @@ def run_all_s3a_r2_supplemental_oracle_scenarios() -> dict[str, Any]:
         )
 
     # R2-F01-06: Dangling / renamed parent or root directory after custody attestation
-    with tempfile.TemporaryDirectory(prefix="s3a_r2_f01_06_") as tmp:
+    with _oracle_fixture_directory(prefix="s3a_r2_f01_06_") as tmp:
         parent_dir = Path(tmp) / "ephemeral_parent"
         root_dir = parent_dir / "fixture_root"
         materialize_synthetic_pilot_tree(root_dir)
@@ -1120,7 +1122,7 @@ def run_all_s3a_r2_supplemental_oracle_scenarios() -> dict[str, Any]:
         )
 
     # R2-F01-07: Mock bind-mount equivalent (ancestor/root st_dev override or surrogate inode)
-    with tempfile.TemporaryDirectory(prefix="s3a_r2_f01_07_") as tmp:
+    with _oracle_fixture_directory(prefix="s3a_r2_f01_07_") as tmp:
         root_dir = Path(tmp) / "bind_mount_target"
         materialize_synthetic_pilot_tree(root_dir)
         grant = create_valid_synthetic_grant(str(root_dir), attest_root_custody=True)
@@ -1142,7 +1144,7 @@ def run_all_s3a_r2_supplemental_oracle_scenarios() -> dict[str, Any]:
         )
 
     # R2-F02-01: Self-minted grant with recomputed public SHA-256 checksum rejected without custody
-    with tempfile.TemporaryDirectory(prefix="s3a_r2_f02_01_") as tmp:
+    with _oracle_fixture_directory(prefix="s3a_r2_f02_01_") as tmp:
         unattested_root = Path(tmp) / "unattested_caller_root"
         materialize_synthetic_pilot_tree(unattested_root)
         # Caller self-mints grant and recomputes public SHA-256 checksum without harness custody
@@ -1168,7 +1170,7 @@ def run_all_s3a_r2_supplemental_oracle_scenarios() -> dict[str, Any]:
 
     # R2-F03-01..06: Syscall cap matrix max_attempted_fs_calls = 1, 2, 3, 25, 27, 100
     for cap in (1, 2, 3, 25, 27, 100):
-        with tempfile.TemporaryDirectory(prefix=f"s3a_r2_f03_cap{cap}_") as tmp:
+        with _oracle_fixture_directory(prefix=f"s3a_r2_f03_cap{cap}_") as tmp:
             materialize_synthetic_pilot_tree(tmp)
             grant = create_valid_synthetic_grant(tmp, max_attempted_fs_calls=cap)
             reader = SingleFileParquetFooterReader(
@@ -1176,7 +1178,7 @@ def run_all_s3a_r2_supplemental_oracle_scenarios() -> dict[str, Any]:
                 grant=grant,
             )
             rec = reader.evaluate_to_receipt()
-            expect_ok = cap >= 27
+            expect_ok = cap >= 6 * len(Path(tmp).parts[1:]) + 32
             expect_code = (
                 "ALLOWED_SINGLE_FILE_FOOTER_SCHEMA_PARSED"
                 if expect_ok
@@ -1198,7 +1200,7 @@ def run_all_s3a_r2_supplemental_oracle_scenarios() -> dict[str, Any]:
             r2_scenarios.append(scen)
 
     # R2-F03-07: Non-aborting os.close failure during cleanup (all remaining FDs closed, not PASS)
-    with tempfile.TemporaryDirectory(prefix="s3a_r2_f03_close_err_") as tmp:
+    with _oracle_fixture_directory(prefix="s3a_r2_f03_close_err_") as tmp:
         materialize_synthetic_pilot_tree(tmp)
         grant = create_valid_synthetic_grant(tmp)
         reader = SingleFileParquetFooterReader(
@@ -1210,18 +1212,24 @@ def run_all_s3a_r2_supplemental_oracle_scenarios() -> dict[str, Any]:
         scen = _record_scenario(
             "R2_F03_CLOSE_FAILURE_DOES_NOT_ABORT_CLEANUP_OR_PASS",
             "R2_F03_SYSCALL_BUDGET_AND_CLEANUP",
-            "Simulated EIO on os.close('month=03') closes all other 7 FDs and rejects as DENIED_FD_CLEANUP_CLOSE_FAILED.",
+            "Explicit pre-entry close injection leaves one FD unconfirmed, closes all others and rejects.",
             False,
-            "DENIED_FD_CLEANUP_CLOSE_FAILED",
+            "FD_CLOSE_UNCONFIRMED_FAIL_CLOSED",
             rec,
         )
         scen["oracle_assertion_passed"] = (
             scen["oracle_assertion_passed"]
-            and rec.syscall_accounting.close_attempted == 8
-            and rec.syscall_accounting.close_failed == 1
-            and rec.syscall_accounting.close_succeeded == 7
-            and rec.syscall_accounting.open_fds_remaining == 0
+            and rec.syscall_accounting.close_attempted == rec.syscall_accounting.openat_succeeded - 1
+            and rec.syscall_accounting.close_failed == 0
+            and rec.syscall_accounting.simulated_pre_close_failures == 1
+            and rec.syscall_accounting.close_succeeded == rec.syscall_accounting.close_attempted
+            and rec.syscall_accounting.open_fds_remaining == 1
+            and len(rec.syscall_accounting.unconfirmed_fds) == 1
         )
+        # Test-harness-owned synthetic FD recovery is outside the tool scope.
+        for fd, _label in rec.syscall_accounting.unconfirmed_fds:
+            os.fstat(fd)
+            os.close(fd)
         r2_scenarios.append(scen)
 
     # R2-F04: Pinned c6823dbc46249cac43aa10400aacbbe9f4542410 JSON parse verification
@@ -1289,7 +1297,7 @@ def _run_mutant_falsification_suite() -> list[dict[str, Any]]:
 
     # Mutant M1: Omit O_NOFOLLOW when opening a symlinked leaf -> production reader
     # raises SymlinkDetectedError; mutant follows symlink, which our assertion detects.
-    with tempfile.TemporaryDirectory(prefix="s3a_mut01_") as tmp:
+    with _oracle_fixture_directory(prefix="s3a_mut01_") as tmp:
         root_dir = Path(tmp) / "fixture_root"
         month_dir = root_dir / "research" / "BTCUSDT" / "1m" / "year=2021" / "month=03"
         os.makedirs(month_dir, exist_ok=True)
@@ -1344,7 +1352,7 @@ def _run_mutant_falsification_suite() -> list[dict[str, Any]]:
     )
 
     # Mutant M3: Leak column min/max statistics or custom KV metadata in output dict
-    with tempfile.TemporaryDirectory(prefix="s3a_mut03_") as tmp:
+    with _oracle_fixture_directory(prefix="s3a_mut03_") as tmp:
         materialize_synthetic_pilot_tree(
             tmp,
             parquet_bytes=build_synthetic_parquet_bytes(

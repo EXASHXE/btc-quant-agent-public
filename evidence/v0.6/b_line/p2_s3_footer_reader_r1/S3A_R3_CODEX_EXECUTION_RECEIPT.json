@@ -1,0 +1,1048 @@
+{
+  "QA": {
+    "JSON_validation": "all new JSON parsed; input/native digests and normal actual ranges asserted",
+    "compileall": {
+      "exit_code": 0,
+      "scope": "S3A package and affected3 test modules"
+    },
+    "focused_versions": [
+      {
+        "errors": 0,
+        "exit_code": 0,
+        "failures": 0,
+        "fork_with_threads_warnings": 43,
+        "group_counts": {
+          "tests.test_v050_r01_surface_reduction": 3,
+          "tests.test_v06_p2_s3_footer_reader_adversarial": 40,
+          "tests.test_v06_p2_s3_footer_reader_unit": 18,
+          "tests.test_v06_p2_s3a_codex_r3_native": 46
+        },
+        "junit_sha256": "d2047a46dd36592eec8b09ca27a6ce22af77b0a2fc38b777d3434bece4cbfcb1",
+        "no_local_full_suite": true,
+        "python": "3.12",
+        "skipped": 0,
+        "tests": 107,
+        "wall_seconds": 11.429
+      },
+      {
+        "errors": 0,
+        "exit_code": 0,
+        "failures": 0,
+        "fork_with_threads_warnings": 43,
+        "group_counts": {
+          "tests.test_v050_r01_surface_reduction": 3,
+          "tests.test_v06_p2_s3_footer_reader_adversarial": 40,
+          "tests.test_v06_p2_s3_footer_reader_unit": 18,
+          "tests.test_v06_p2_s3a_codex_r3_native": 46
+        },
+        "junit_sha256": "368b42f9698043adf287b0f731dc275a0facca49899b1a49b15aa5e832dde12f",
+        "no_local_full_suite": true,
+        "python": "3.13",
+        "skipped": 0,
+        "tests": 107,
+        "wall_seconds": 10.259
+      }
+    ],
+    "git_diff_check": "PASS before staging",
+    "intermediate_findings": "Initial legacy27/zero-setup/reuse expectations corrected semantically, not deleted. read_metadata unsupported Thrift args replaced by RAM ParquetFile metadata. Reviewer reproduced fork replay, closed via PID. Final init preserves prep across invalidcaps/platformdeny. New oracle deep36ALLOW assertion corrected to requireSTOP; fixture unchanged.",
+    "legacy_semantics": "Inclusive counts, reader0 distinguished from prep, fresh grants, close uncertainty, strictRAM bounded Thrift constructor, external surrogate fixture lifecycle",
+    "legacy_tests_deleted_skipped_xfailed": 0,
+    "ruff": {
+      "exit_code": 0,
+      "scope": "S3A script package and affected3 test modules"
+    },
+    "test_nodes": [
+      "tests/test_v06_p2_s3_footer_reader_unit.py",
+      "tests/test_v06_p2_s3_footer_reader_adversarial.py",
+      "tests/test_v06_p2_s3a_codex_r3_native.py",
+      "tests/test_v050_r01_surface_reduction.py::test_catalog_reports_actual_paths_and_parser_without_service",
+      "tests/test_v050_r01_surface_reduction.py::test_catalog_default_stdout_never_recreates_reviews",
+      "tests/test_v050_r01_surface_reduction.py::test_catalog_refuses_agent_documents_on_code_branch"
+    ]
+  },
+  "TASK_ID": "V06_P2_S3A_CODEX_ONE_SHOT_NATIVE_FS_ACCOUNTING_AND_FD_CLEANUP_CORRECTNESS_R3",
+  "access_barrier": {
+    "CI_observation_policy": "Final exact-head GitHub status/steps metadata only, no protected outcome body/log retrieval",
+    "actual_Quant_agent_data_FS_calls": 0,
+    "actual_source_body_reads": 0,
+    "market_or_private_account_APIs": 0,
+    "only_Git_code_governance_metadata_and_new_synthetic_tmp_files": true,
+    "other_worktree_modifications": 0,
+    "protected_H39_H40_H41_Forward_A_line_outcome_reads": 0,
+    "trade_writes": 0
+  },
+  "audit_files_inherited": false,
+  "audit_reference_sha": "91bf48e007dc36239a79ec38ce01f4f77abadc4c",
+  "authority": {
+    "BTC_spot": "SEPARATE_MARKET",
+    "ETH_cross_asset_1h": "NOT_ETH_PERP_1M",
+    "P1": "TERMINATED_UNCHANGED",
+    "P3_P4_Alpha_TESTNET_LIVE": "NO_NEW_AUTHORITY",
+    "S3B": "NO_GRANT",
+    "SOL_1m": "UNKNOWN_NOT_VERIFIED_NOT_ADMITTED",
+    "funding_known_at_corrected_at_settlement": "UNKNOWN",
+    "grants": "TEST_ONLY_INTEGRITY_CHECKSUM_NOT_AUTHORIZATION",
+    "real_source_admitted": false,
+    "source_rights": "UNKNOWN",
+    "source_sizes_only_from_Git": true,
+    "temp_inodes_measured_only_in_temp_trees": true,
+    "true_continuous_1m_mark": "UNKNOWN"
+  },
+  "branch": "feature/v06-bline-p2-s3a-codex-one-shot-fd-r3",
+  "changes": {
+    "all_7_original_docs_and_receipts_preserved": [
+      {
+        "byte_identical_to_start": true,
+        "path": "docs/strategy_research/g2_r3/p2_s3_footer_reader_r1/S3A_R2_BOUNDED_SECURITY_REPAIR_AND_ERRATA_REPORT.md",
+        "sha256": "0557dde49bdf8ebfd7dce2f276c816494f1bfed30e50a793b556d5e4643ad9a9"
+      },
+      {
+        "byte_identical_to_start": true,
+        "path": "docs/strategy_research/g2_r3/p2_s3_footer_reader_r1/S3A_READER_BOUNDARY_IMPLEMENTATION_AND_FALSIFICATION_REPORT.md",
+        "sha256": "fd727d92a30de2c42bc5b4aeb68e71cac4ed306f8c3601aaca56d5da44c709c3"
+      },
+      {
+        "byte_identical_to_start": true,
+        "path": "docs/strategy_research/g2_r3/p2_s3_footer_reader_r1/S3B_PROPOSED_ONE_FILE_FOOTER_QA_GRANT_CONTRACT.md",
+        "sha256": "936814eebc00e93cc72652bac5a6d95079c5a35fed3fc003752805519ac9859d"
+      },
+      {
+        "byte_identical_to_start": true,
+        "path": "evidence/v0.6/b_line/p2_s3_footer_reader_r1/S3A_FS_SYSCALL_SECURITY_ORACLE_RESULTS.json",
+        "sha256": "28773055ee78aafb107e678a03bc1be0a70b35dbc5178554db33cd60e4c06f5a"
+      },
+      {
+        "byte_identical_to_start": true,
+        "path": "evidence/v0.6/b_line/p2_s3_footer_reader_r1/S3A_IMPLEMENTATION_EXECUTION_RECEIPT.json",
+        "sha256": "5bb8cf5272ddf65a86b61a6d9aab24fa3de84b401b65ab544a01438c330e226e"
+      },
+      {
+        "byte_identical_to_start": true,
+        "path": "evidence/v0.6/b_line/p2_s3_footer_reader_r1/S3A_R2_BOUNDED_REPAIR_EXECUTION_RECEIPT.json",
+        "sha256": "d2a17c16b04651ea5bc033ef41025d77bd95cf14d2b4f11a48e828eb4a1507f7"
+      },
+      {
+        "byte_identical_to_start": true,
+        "path": "evidence/v0.6/b_line/p2_s3_footer_reader_r1/S3A_R2_FS_SYSCALL_SECURITY_ORACLE_RESULTS.json",
+        "sha256": "6910e6141abda0780f7b29197d4f20b0bd4bc15a5281f98f6490052ad7113771"
+      }
+    ],
+    "artifact_sha256_excluding_self": [
+      {
+        "path": "docs/strategy_research/g2_r3/p2_s3_footer_reader_r1/S3A_R3_ONE_SHOT_NATIVE_ACCOUNTING_AND_FD_DESIGN.md",
+        "sha256": "f8ba52b9d4be1c6213580e8380badab82c6eb83cb493e1f01bf93a4918bd3907"
+      },
+      {
+        "path": "docs/strategy_research/g2_r3/p2_s3_footer_reader_r1/S3A_R3_SOURCE_PROVENANCE_AND_SCOPE_ADDENDUM.md",
+        "sha256": "661ce138e5583a61b9dbaaef2f3f3b2be1ae558ac948021fe75208af8f4151e8"
+      },
+      {
+        "path": "evidence/v0.6/b_line/p2_s3_footer_reader_r1/S3A_R3_NATIVE_SYSCALL_AND_FD_RESULTS.json",
+        "sha256": "86a3be91c407a1b1aebdc025ed4712a096807a985f088cc2f80fd5802686a0f9"
+      },
+      {
+        "path": "scripts/strategy_research/p2_s3_footer_reader/r3_fixtures.json",
+        "sha256": "2a5dde13fff75458f0fc78a35c5e4a0108e93b521c3fa25a6b026c500439c1c7"
+      },
+      {
+        "path": "scripts/strategy_research/p2_s3_footer_reader/r3_fixtures.sha256",
+        "sha256": "779b0a62ad2622c7b01f5657e67306671de0ebaa59274cdbbd9bfced6f26a81d"
+      }
+    ],
+    "code_and_test_sha256": [
+      {
+        "path": "scripts/strategy_research/p2_s3_footer_reader/errors.py",
+        "sha256": "ba88cc3bdfff6bfb8b16e3377a7ea0ffb6b946746120249b7727b851cf585459"
+      },
+      {
+        "path": "scripts/strategy_research/p2_s3_footer_reader/fd_syscall_wrapper.py",
+        "sha256": "63d4c6fed29fcc1822e656e4e37bf2a81ec1366a57fb389d55fde0c3e46414a2"
+      },
+      {
+        "path": "scripts/strategy_research/p2_s3_footer_reader/footer_parser.py",
+        "sha256": "34fe534277924f480410293b883a3ba472079b75db9dd97bb6bfe7bc504f9cc8"
+      },
+      {
+        "path": "scripts/strategy_research/p2_s3_footer_reader/oracle_runner.py",
+        "sha256": "8277600c92f6c53ad5f58bd3caa4ae7b2f744786b998948151f75522982e3cb3"
+      },
+      {
+        "path": "scripts/strategy_research/p2_s3_footer_reader/r3_native_probe.py",
+        "sha256": "dbfb612fe0d2636f192257239dc9f7708c41bd57a6c33021a5d8dac81f12e437"
+      },
+      {
+        "path": "scripts/strategy_research/p2_s3_footer_reader/r3_oracle.py",
+        "sha256": "ce2ee180ed6ec333557fe669fcfa31879a4f91ccad70a2223c1049a2f9969e29"
+      },
+      {
+        "path": "scripts/strategy_research/p2_s3_footer_reader/reader.py",
+        "sha256": "a9a9139cf5785e55b3a8f63d9dcb1e067b7df4be16db36bf1f61e67ce75ff37a"
+      },
+      {
+        "path": "scripts/strategy_research/p2_s3_footer_reader/types.py",
+        "sha256": "326152baf9e5e18374fa33d71bba34d77a4a833fc8a72720ff521970599de5ba"
+      },
+      {
+        "path": "tests/test_v06_p2_s3_footer_reader_adversarial.py",
+        "sha256": "9153f14d05deecf396a58ad4844b3fe13071b20da50b9ccb476a4d86c0aef69f"
+      },
+      {
+        "path": "tests/test_v06_p2_s3_footer_reader_unit.py",
+        "sha256": "c714f611239678df802685837f65df70be0f40dc9e61e6917c792f7310f27b18"
+      },
+      {
+        "path": "tests/test_v06_p2_s3a_codex_r3_native.py",
+        "sha256": "f29e2eef010e875967486f72fbf3cdfd3381fe42cc6316748e81b15c5bbc2ab2"
+      }
+    ],
+    "exact_file_allowlist": [
+      "docs/strategy_research/g2_r3/p2_s3_footer_reader_r1/S3A_R3_ONE_SHOT_NATIVE_ACCOUNTING_AND_FD_DESIGN.md",
+      "docs/strategy_research/g2_r3/p2_s3_footer_reader_r1/S3A_R3_SOURCE_PROVENANCE_AND_SCOPE_ADDENDUM.md",
+      "evidence/v0.6/b_line/p2_s3_footer_reader_r1/S3A_R3_CODEX_EXECUTION_RECEIPT.json",
+      "evidence/v0.6/b_line/p2_s3_footer_reader_r1/S3A_R3_NATIVE_SYSCALL_AND_FD_RESULTS.json",
+      "scripts/strategy_research/p2_s3_footer_reader/errors.py",
+      "scripts/strategy_research/p2_s3_footer_reader/fd_syscall_wrapper.py",
+      "scripts/strategy_research/p2_s3_footer_reader/footer_parser.py",
+      "scripts/strategy_research/p2_s3_footer_reader/oracle_runner.py",
+      "scripts/strategy_research/p2_s3_footer_reader/r3_fixtures.json",
+      "scripts/strategy_research/p2_s3_footer_reader/r3_fixtures.sha256",
+      "scripts/strategy_research/p2_s3_footer_reader/r3_native_probe.py",
+      "scripts/strategy_research/p2_s3_footer_reader/r3_oracle.py",
+      "scripts/strategy_research/p2_s3_footer_reader/reader.py",
+      "scripts/strategy_research/p2_s3_footer_reader/types.py",
+      "tests/test_v06_p2_s3_footer_reader_adversarial.py",
+      "tests/test_v06_p2_s3_footer_reader_unit.py",
+      "tests/test_v06_p2_s3a_codex_r3_native.py"
+    ],
+    "modified_existing_files": 8,
+    "new_files": 9
+  },
+  "controller_dispatch_sha": "63f21db61980c209a90a5585375f761bf842bfaa",
+  "environment": {
+    "OS": "Linux",
+    "local_pyarrow_note": "Installed25.0.1 reused without dependency changes; exact-head CI installs declared range. Do not equate local version with full CI dependency validation.",
+    "machine": "x86_64",
+    "native_ptrace": "Ownchild supported with authorized escalation; no strace install/process enumeration/proc reads",
+    "primary_python": "3.12.3",
+    "project_research_pyarrow_constraint": ">=18,<24",
+    "pyarrow": "25.0.1",
+    "pytest": "9.0.3"
+  },
+  "exact_start_sha": "999cf7005c741bdbabae727f10f90f23330fb035",
+  "fixture": {
+    "actual_fixture_bytes": 1009,
+    "frozen_before_initial_execution": true,
+    "frozen_cases": 32,
+    "input_sha256": "2a5dde13fff75458f0fc78a35c5e4a0108e93b521c3fa25a6b026c500439c1c7",
+    "input_unchanged_after_assertion_repairs": true,
+    "invented_rows_only": true,
+    "parquet_sha256": "64a54ac364b5e994a3577e69475ff10ef2f848fb0119c546a13835136557e8e8"
+  },
+  "governance": [
+    {
+      "commit": "d194497342076b9cafd24fa94a54e32186c65f06",
+      "path": "prompts/v0.6/b_line/V06_P2_S3A_CODEX_SOL_HIGH_ONE_SHOT_NATIVE_SYSCALL_FD_CLEANUP_REDESIGN_R3.md",
+      "read_complete": true,
+      "sha256": "ccee812554464b0c79dc9e81fcb2da7cd31ce4594e191ed9fb2f7491217755da"
+    },
+    {
+      "commit": "63f21db61980c209a90a5585375f761bf842bfaa",
+      "path": "reviews/v0.6/b_line/V06_P2_S3A_CODEX_NATIVE_AUDIT_CONTROLLER_FINAL_FAIL_AND_ONE_SHOT_R3_DISPATCH.md",
+      "read_complete": true,
+      "sha256": "32118fc1dfda303118a62278284fa6c78ece0e7b328775d88c5a164a6a604219"
+    }
+  ],
+  "implementation": {
+    "FD_lifecycle": "Ownership immediate, successful native close precedes removal; failed close preserves unconfirmed FD/status; no unsafe numeric-FD retry, close_complete false, sanitized success aborted",
+    "budget": "Actual primitive delegation checked before entry with cleanup slots; max100 inclusive; no identical failed-open replay",
+    "meter": "Same immutable-bounds meter carried in PID-bound single-use preparation registry; total no reset; per-phase/family breakdown",
+    "source_scope": "Same one string-only2021-03 path and byte bounds, no general filesystem/strategy engine",
+    "structurederrors": "OSError/MemoryError and unsupported constructor get structured receipt; fallback no duplicate platform constructor"
+  },
+  "limitations": [
+    "Same-device bind mounts/unknown owner aliases cannot be proven absent without forbidden root inspection; synthetic candidate only.",
+    "Unconfirmed close may or may not leave FD live; no unconditional closure claim/retry.",
+    "Thrift string65536/container10000 and input65536 bound, no exhaustive CPU/RSS/walltime proof or general parser sandbox.",
+    "Linux x86-64 ownchild tracer,43 fork-with-threads warnings each version preserved; no general deadlock proof.",
+    "Tracer step/output ceilings do not prove all native blocking has wallclock watchdog.",
+    "No-prep constructor-denial zero snapshot uses default cap100; invalidrequested grant bound not promoted or admitted."
+  ],
+  "model": {
+    "independent_tests": "Separate implementer-role author of actual native oracle; internal reviewer identified/rechecked fork replay; neither grants Controller approval",
+    "requested": "Codex GPT-6 Sol High",
+    "root_effort": "NOT_EXPOSED",
+    "root_exact_model": "NOT_EXPOSED",
+    "system_description": "Codex based on GPT-6; no unsupported claim of selectable Sol/High controls"
+  },
+  "native_evidence": {
+    "attack_actions": "root/leaf adversary rename/mkdir separately disclosed, not native tool accounting",
+    "byte_range_independent_check": {
+      "file_bytes": 1009,
+      "footer_length": 775,
+      "footer_offset": 226,
+      "header_bytes_read": 0,
+      "native_read_total": 783,
+      "normal_allowed_range_cases": [
+        "normal_cap_100",
+        "depth_5_cap_100",
+        "matched_r2_shallow"
+      ],
+      "page_region_read_bytes": 0,
+      "range_proof": "Actual pread arg3/arg2 equal frozen synthetic trailer/footer intervals, not wrapper metadata assertions",
+      "trailer_offset": 1001
+    },
+    "case_summary": [
+      {
+        "allowed": false,
+        "cap": 1,
+        "close_complete": true,
+        "decision": "BUDGET_INSUFFICIENT_STOP",
+        "depth": 1,
+        "family_actual": {
+          "close": 0,
+          "fstat": 0,
+          "open": 0,
+          "pread": 0
+        },
+        "id": "normal_cap_1",
+        "native_actual": 0,
+        "physically_held_fds_after_target": [],
+        "preparation": 0,
+        "reader": 0,
+        "reported": 0,
+        "unconfirmed_fds": []
+      },
+      {
+        "allowed": false,
+        "cap": 2,
+        "close_complete": true,
+        "decision": "BUDGET_INSUFFICIENT_STOP",
+        "depth": 1,
+        "family_actual": {
+          "close": 1,
+          "fstat": 0,
+          "open": 1,
+          "pread": 0
+        },
+        "id": "normal_cap_2",
+        "native_actual": 2,
+        "physically_held_fds_after_target": [],
+        "preparation": 2,
+        "reader": 0,
+        "reported": 2,
+        "unconfirmed_fds": []
+      },
+      {
+        "allowed": false,
+        "cap": 3,
+        "close_complete": true,
+        "decision": "BUDGET_INSUFFICIENT_STOP",
+        "depth": 1,
+        "family_actual": {
+          "close": 1,
+          "fstat": 1,
+          "open": 1,
+          "pread": 0
+        },
+        "id": "normal_cap_3",
+        "native_actual": 3,
+        "physically_held_fds_after_target": [],
+        "preparation": 3,
+        "reader": 0,
+        "reported": 3,
+        "unconfirmed_fds": []
+      },
+      {
+        "allowed": false,
+        "cap": 25,
+        "close_complete": true,
+        "decision": "BUDGET_INSUFFICIENT_STOP",
+        "depth": 1,
+        "family_actual": {
+          "close": 8,
+          "fstat": 9,
+          "open": 8,
+          "pread": 0
+        },
+        "id": "normal_cap_25",
+        "native_actual": 25,
+        "physically_held_fds_after_target": [],
+        "preparation": 16,
+        "reader": 9,
+        "reported": 25,
+        "unconfirmed_fds": []
+      },
+      {
+        "allowed": false,
+        "cap": 27,
+        "close_complete": true,
+        "decision": "BUDGET_INSUFFICIENT_STOP",
+        "depth": 1,
+        "family_actual": {
+          "close": 9,
+          "fstat": 9,
+          "open": 9,
+          "pread": 0
+        },
+        "id": "normal_cap_27",
+        "native_actual": 27,
+        "physically_held_fds_after_target": [],
+        "preparation": 16,
+        "reader": 11,
+        "reported": 27,
+        "unconfirmed_fds": []
+      },
+      {
+        "allowed": false,
+        "cap": 36,
+        "close_complete": true,
+        "decision": "BUDGET_INSUFFICIENT_STOP",
+        "depth": 1,
+        "family_actual": {
+          "close": 11,
+          "fstat": 13,
+          "open": 11,
+          "pread": 0
+        },
+        "id": "normal_cap_36",
+        "native_actual": 35,
+        "physically_held_fds_after_target": [],
+        "preparation": 16,
+        "reader": 19,
+        "reported": 35,
+        "unconfirmed_fds": []
+      },
+      {
+        "allowed": true,
+        "cap": 100,
+        "close_complete": true,
+        "decision": "ALLOWED_SINGLE_FILE_FOOTER_SCHEMA_PARSED",
+        "depth": 1,
+        "family_actual": {
+          "close": 17,
+          "fstat": 20,
+          "open": 17,
+          "pread": 2
+        },
+        "id": "normal_cap_100",
+        "native_actual": 56,
+        "physically_held_fds_after_target": [],
+        "preparation": 16,
+        "reader": 40,
+        "reported": 56,
+        "unconfirmed_fds": []
+      },
+      {
+        "allowed": true,
+        "cap": 100,
+        "close_complete": true,
+        "decision": "ALLOWED_SINGLE_FILE_FOOTER_SCHEMA_PARSED",
+        "depth": 5,
+        "family_actual": {
+          "close": 25,
+          "fstat": 28,
+          "open": 25,
+          "pread": 2
+        },
+        "id": "depth_5_cap_100",
+        "native_actual": 80,
+        "physically_held_fds_after_target": [],
+        "preparation": 28,
+        "reader": 52,
+        "reported": 80,
+        "unconfirmed_fds": []
+      },
+      {
+        "allowed": false,
+        "cap": 100,
+        "close_complete": true,
+        "decision": "BUDGET_INSUFFICIENT_STOP",
+        "depth": 36,
+        "family_actual": {
+          "close": 33,
+          "fstat": 33,
+          "open": 33,
+          "pread": 0
+        },
+        "id": "depth_36_cap_100",
+        "native_actual": 99,
+        "physically_held_fds_after_target": [],
+        "preparation": 99,
+        "reader": 0,
+        "reported": 99,
+        "unconfirmed_fds": []
+      },
+      {
+        "allowed": false,
+        "cap": 100,
+        "close_complete": true,
+        "decision": "DENIED_ENOENT_NOT_FOUND",
+        "depth": 1,
+        "family_actual": {
+          "close": 10,
+          "fstat": 12,
+          "open": 11,
+          "pread": 0
+        },
+        "id": "missing_ancestor",
+        "native_actual": 33,
+        "physically_held_fds_after_target": [],
+        "preparation": 16,
+        "reader": 17,
+        "reported": 33,
+        "unconfirmed_fds": []
+      },
+      {
+        "allowed": false,
+        "cap": 100,
+        "close_complete": true,
+        "decision": "DENIED_SYMLINK_DETECTED",
+        "depth": 1,
+        "family_actual": {
+          "close": 10,
+          "fstat": 12,
+          "open": 12,
+          "pread": 0
+        },
+        "id": "symlink_ancestor",
+        "native_actual": 34,
+        "physically_held_fds_after_target": [],
+        "preparation": 16,
+        "reader": 18,
+        "reported": 34,
+        "unconfirmed_fds": []
+      },
+      {
+        "allowed": false,
+        "cap": 100,
+        "close_complete": true,
+        "decision": "DENIED_NOT_A_DIRECTORY_COMPONENT",
+        "depth": 1,
+        "family_actual": {
+          "close": 11,
+          "fstat": 12,
+          "open": 12,
+          "pread": 0
+        },
+        "id": "nondirectory_ancestor",
+        "native_actual": 35,
+        "physically_held_fds_after_target": [],
+        "preparation": 16,
+        "reader": 19,
+        "reported": 35,
+        "unconfirmed_fds": []
+      },
+      {
+        "allowed": false,
+        "cap": 100,
+        "close_complete": true,
+        "decision": "DENIED_EACCES_PERMISSION",
+        "depth": 1,
+        "family_actual": {
+          "close": 10,
+          "fstat": 12,
+          "open": 11,
+          "pread": 0
+        },
+        "id": "permission_eacces",
+        "native_actual": 33,
+        "physically_held_fds_after_target": [],
+        "preparation": 16,
+        "reader": 17,
+        "reported": 33,
+        "unconfirmed_fds": []
+      },
+      {
+        "allowed": false,
+        "cap": 100,
+        "close_complete": true,
+        "decision": "DENIED_SYMLINK_DETECTED",
+        "depth": 1,
+        "family_actual": {
+          "close": 15,
+          "fstat": 17,
+          "open": 16,
+          "pread": 0
+        },
+        "id": "symlink_leaf",
+        "native_actual": 48,
+        "physically_held_fds_after_target": [],
+        "preparation": 16,
+        "reader": 32,
+        "reported": 48,
+        "unconfirmed_fds": []
+      },
+      {
+        "allowed": false,
+        "cap": 100,
+        "close_complete": true,
+        "decision": "S3A_HARNESS_ROOT_IDENTITY_NOT_PROVEN",
+        "depth": 1,
+        "family_actual": {
+          "close": 10,
+          "fstat": 11,
+          "open": 10,
+          "pread": 0
+        },
+        "id": "root_swap",
+        "native_actual": 31,
+        "physically_held_fds_after_target": [],
+        "preparation": 16,
+        "reader": 15,
+        "reported": 31,
+        "unconfirmed_fds": []
+      },
+      {
+        "allowed": false,
+        "cap": 100,
+        "close_complete": true,
+        "decision": "DENIED_TOCTOU_OR_FD_IDENTITY_MISMATCH",
+        "depth": 1,
+        "family_actual": {
+          "close": 17,
+          "fstat": 20,
+          "open": 17,
+          "pread": 2
+        },
+        "id": "leaf_swap",
+        "native_actual": 56,
+        "physically_held_fds_after_target": [],
+        "preparation": 16,
+        "reader": 40,
+        "reported": 56,
+        "unconfirmed_fds": []
+      },
+      {
+        "allowed": false,
+        "cap": 100,
+        "close_complete": true,
+        "decision": "DENIED_HARDLINK_OR_INODE_ALIAS",
+        "depth": 1,
+        "family_actual": {
+          "close": 16,
+          "fstat": 18,
+          "open": 16,
+          "pread": 0
+        },
+        "id": "hardlink_leaf",
+        "native_actual": 50,
+        "physically_held_fds_after_target": [],
+        "preparation": 16,
+        "reader": 34,
+        "reported": 50,
+        "unconfirmed_fds": []
+      },
+      {
+        "allowed": false,
+        "cap": 100,
+        "close_complete": false,
+        "decision": "FD_CLOSE_UNCONFIRMED_FAIL_CLOSED",
+        "depth": 1,
+        "family_actual": {
+          "close": 2,
+          "fstat": 2,
+          "open": 2,
+          "pread": 0
+        },
+        "id": "native_anchor_close_ebadf",
+        "native_actual": 6,
+        "physically_held_fds_after_target": [
+          {
+            "fd": 3,
+            "label": "/"
+          }
+        ],
+        "preparation": 6,
+        "reader": 0,
+        "reported": 6,
+        "unconfirmed_fds": [
+          {
+            "fd": 3,
+            "label": "<anchor>",
+            "status": "CLOSE_UNCONFIRMED"
+          }
+        ]
+      },
+      {
+        "allowed": false,
+        "cap": 100,
+        "close_complete": false,
+        "decision": "FD_CLOSE_UNCONFIRMED_FAIL_CLOSED",
+        "depth": 1,
+        "family_actual": {
+          "close": 17,
+          "fstat": 20,
+          "open": 17,
+          "pread": 2
+        },
+        "id": "native_leaf_close_ebadf",
+        "native_actual": 56,
+        "physically_held_fds_after_target": [
+          {
+            "fd": 11,
+            "label": "data.parquet"
+          }
+        ],
+        "preparation": 16,
+        "reader": 40,
+        "reported": 56,
+        "unconfirmed_fds": [
+          {
+            "fd": 11,
+            "label": "data.parquet",
+            "status": "CLOSE_UNCONFIRMED"
+          }
+        ]
+      },
+      {
+        "allowed": false,
+        "cap": 100,
+        "close_complete": false,
+        "decision": "FD_CLOSE_UNCONFIRMED_FAIL_CLOSED",
+        "depth": 1,
+        "family_actual": {
+          "close": 15,
+          "fstat": 20,
+          "open": 17,
+          "pread": 2
+        },
+        "id": "preentry_close_failure",
+        "native_actual": 54,
+        "physically_held_fds_after_target": [
+          {
+            "fd": 10,
+            "label": "data.parquet"
+          },
+          {
+            "fd": 11,
+            "label": "data.parquet"
+          }
+        ],
+        "preparation": 16,
+        "reader": 38,
+        "reported": 54,
+        "unconfirmed_fds": [
+          {
+            "fd": 10,
+            "label": "data.parquet",
+            "status": "CLOSE_UNCONFIRMED"
+          },
+          {
+            "fd": 11,
+            "label": "data.parquet",
+            "status": "CLOSE_UNCONFIRMED"
+          }
+        ]
+      },
+      {
+        "allowed": false,
+        "cap": 100,
+        "close_complete": true,
+        "decision": "DENIED_OS_OR_RESOURCE_ERROR",
+        "depth": 1,
+        "family_actual": {
+          "close": 16,
+          "fstat": 18,
+          "open": 16,
+          "pread": 0
+        },
+        "id": "fstat_failure",
+        "native_actual": 50,
+        "physically_held_fds_after_target": [],
+        "preparation": 16,
+        "reader": 34,
+        "reported": 50,
+        "unconfirmed_fds": []
+      },
+      {
+        "allowed": false,
+        "cap": 100,
+        "close_complete": true,
+        "decision": "DENIED_SHORT_READ_OR_TRUNCATED_FILE",
+        "depth": 1,
+        "family_actual": {
+          "close": 16,
+          "fstat": 18,
+          "open": 16,
+          "pread": 1
+        },
+        "id": "pread_short",
+        "native_actual": 51,
+        "physically_held_fds_after_target": [],
+        "preparation": 16,
+        "reader": 35,
+        "reported": 51,
+        "unconfirmed_fds": []
+      },
+      {
+        "allowed": false,
+        "cap": 100,
+        "close_complete": true,
+        "decision": "DENIED_INVALID_PARQUET_FOOTER_LENGTH",
+        "depth": 1,
+        "family_actual": {
+          "close": 16,
+          "fstat": 18,
+          "open": 16,
+          "pread": 1
+        },
+        "id": "footer_oversize",
+        "native_actual": 51,
+        "physically_held_fds_after_target": [],
+        "preparation": 16,
+        "reader": 35,
+        "reported": 51,
+        "unconfirmed_fds": []
+      },
+      {
+        "allowed": false,
+        "cap": 100,
+        "close_complete": true,
+        "decision": "DENIED_CORRUPTED_PARQUET_THRIFT_FOOTER",
+        "depth": 1,
+        "family_actual": {
+          "close": 17,
+          "fstat": 20,
+          "open": 17,
+          "pread": 2
+        },
+        "id": "footer_corrupt",
+        "native_actual": 56,
+        "physically_held_fds_after_target": [],
+        "preparation": 16,
+        "reader": 40,
+        "reported": 56,
+        "unconfirmed_fds": []
+      },
+      {
+        "allowed": false,
+        "cap": 100,
+        "close_complete": true,
+        "decision": "DENIED_INVALID_PARQUET_TRAILER_MAGIC",
+        "depth": 1,
+        "family_actual": {
+          "close": 16,
+          "fstat": 18,
+          "open": 16,
+          "pread": 1
+        },
+        "id": "invalid_magic",
+        "native_actual": 51,
+        "physically_held_fds_after_target": [],
+        "preparation": 16,
+        "reader": 35,
+        "reported": 51,
+        "unconfirmed_fds": []
+      },
+      {
+        "allowed": false,
+        "cap": 100,
+        "close_complete": true,
+        "decision": "DENIED_ROW_GROUP_DATA_READ_FORBIDDEN",
+        "depth": 1,
+        "family_actual": {
+          "close": 5,
+          "fstat": 6,
+          "open": 5,
+          "pread": 0
+        },
+        "id": "extra_byte_request",
+        "native_actual": 16,
+        "physically_held_fds_after_target": [],
+        "preparation": 16,
+        "reader": 0,
+        "reported": 16,
+        "unconfirmed_fds": []
+      },
+      {
+        "allowed": false,
+        "cap": 100,
+        "close_complete": true,
+        "decision": "DENIED_INVALID_OR_MISSING_GRANT",
+        "depth": 1,
+        "family_actual": {
+          "close": 5,
+          "fstat": 6,
+          "open": 5,
+          "pread": 0
+        },
+        "id": "wrong_grant",
+        "native_actual": 16,
+        "physically_held_fds_after_target": [],
+        "preparation": 16,
+        "reader": 0,
+        "reported": 16,
+        "unconfirmed_fds": []
+      },
+      {
+        "allowed": false,
+        "cap": 100,
+        "close_complete": true,
+        "decision": "DENIED_EXPIRED_GRANT",
+        "depth": 1,
+        "family_actual": {
+          "close": 5,
+          "fstat": 6,
+          "open": 5,
+          "pread": 0
+        },
+        "id": "expired_grant",
+        "native_actual": 16,
+        "physically_held_fds_after_target": [],
+        "preparation": 16,
+        "reader": 0,
+        "reported": 16,
+        "unconfirmed_fds": []
+      },
+      {
+        "allowed": false,
+        "cap": 100,
+        "close_complete": true,
+        "decision": "DENIED_INVALID_OR_MISSING_GRANT",
+        "depth": 1,
+        "family_actual": {
+          "close": 0,
+          "fstat": 0,
+          "open": 0,
+          "pread": 0
+        },
+        "id": "missing_grant",
+        "native_actual": 0,
+        "physically_held_fds_after_target": [],
+        "preparation": 0,
+        "reader": 0,
+        "reported": 0,
+        "unconfirmed_fds": []
+      },
+      {
+        "allowed": false,
+        "cap": 100,
+        "close_complete": true,
+        "decision": "DENIED_PRODUCTION_OR_OWNER_ROOT_FORBIDDEN",
+        "depth": 1,
+        "family_actual": {
+          "close": 0,
+          "fstat": 0,
+          "open": 0,
+          "pread": 0
+        },
+        "id": "owner_literal",
+        "native_actual": 0,
+        "physically_held_fds_after_target": [],
+        "preparation": 0,
+        "reader": 0,
+        "reported": 0,
+        "unconfirmed_fds": []
+      },
+      {
+        "allowed": false,
+        "cap": 100,
+        "close_complete": true,
+        "decision": "DENIED_PROTECTED_PATH_DOMAIN",
+        "depth": 1,
+        "family_actual": {
+          "close": 5,
+          "fstat": 6,
+          "open": 5,
+          "pread": 0
+        },
+        "id": "protected_target",
+        "native_actual": 16,
+        "physically_held_fds_after_target": [],
+        "preparation": 16,
+        "reader": 0,
+        "reported": 16,
+        "unconfirmed_fds": []
+      },
+      {
+        "allowed": false,
+        "cap": 100,
+        "close_complete": true,
+        "decision": "S3A_HARNESS_ROOT_IDENTITY_NOT_PROVEN",
+        "depth": 1,
+        "family_actual": {
+          "close": 0,
+          "fstat": 0,
+          "open": 0,
+          "pread": 0
+        },
+        "id": "self_minted_no_custody",
+        "native_actual": 0,
+        "physically_held_fds_after_target": [],
+        "preparation": 0,
+        "reader": 0,
+        "reported": 0,
+        "unconfirmed_fds": []
+      }
+    ],
+    "close_fault_native": "One substituted invalid -1 native argument per EBADF case; original FD confirmed held outside trace then auditor-closed; not spontaneous ordinary FD failure",
+    "close_fault_preentry": "No native close for injected pre-entry fault; separately counted2; unconfirmed2 remains in receipt, teardown outside tool",
+    "executed_frozen_cases": 32,
+    "fork_replay": "Child inherited parent prep denied with0 native; parent sole original remains allowed",
+    "independent_full_invocation_cases_in_JSON": 34,
+    "kernel_vs_API_vs_report_agree_in_full_scope_cases": true,
+    "matched_shallow": {
+      "geometry": "/tmp/base/root matches R2 audited short-root shape; R2 reader36/report27 differs in scope from R3 total",
+      "native": 50,
+      "preparation": 13,
+      "reader": 37,
+      "reported": 50
+    },
+    "method": "Linux x86-64 ptrace GET_SYSCALL_INFO on own newly forked child; independent OS API observer forwarding one-for-one",
+    "not_whole_host_surveillance": true,
+    "path": "evidence/v0.6/b_line/p2_s3_footer_reader_r1/S3A_R3_NATIVE_SYSCALL_AND_FD_RESULTS.json",
+    "prepared_platform_failure": {
+      "native_combined": 16,
+      "preparation": 16,
+      "reader": 0,
+      "reported_combined": 16,
+      "structured_denial": true
+    },
+    "report_scope_family": "open/openat,fstat,pread,close; no tool stat/lstat/readlink introduced; other native FS families observed must be explained or test FAIL",
+    "retuned_cap101_scope": "Native scope ONLY reader after prior preparation: native reader0/reported reader0. Prior prep16 retained in combined receipt, NOT claimed traced here.",
+    "sha256": "86a3be91c407a1b1aebdc025ed4712a096807a985f088cc2f80fd5802686a0f9",
+    "trace_scope": "Full preparation+reader+cleanup for frozen32, matched-shallow and prepared-platform; fixture creation/import and auditor held-FD fstat/cleanup excluded"
+  },
+  "next_controller_action": "Independently audit exactR3 code/nativeevidence; no automatic sourceQA. If hard contract notmet terminate reader route, no indefinite patches.",
+  "prompt_commit_sha": "d194497342076b9cafd24fa94a54e32186c65f06",
+  "publication": {
+    "final_SHA_and_CI_outcome": "Reported externally after commit to avoid self-referential receipt/second commit",
+    "one_commit_nonforce_push": true,
+    "pending_at_receipt_creation": true,
+    "remote_verification": "git ls-remote plus remote commitparent/filelist",
+    "required_parent": "999cf7005c741bdbabae727f10f90f23330fb035"
+  },
+  "required_direct_parent": "999cf7005c741bdbabae727f10f90f23330fb035",
+  "reviews_directory_present": false,
+  "role": "Codex implementation lead + security specialist; implementation candidate, not independent audit signoff",
+  "schema": "S3A_R3_ONE_SHOT_EXECUTION_RECEIPT_V1",
+  "source_provenance": {
+    "actual_keys": [
+      "candidate_month_observations",
+      "additional_target_observations"
+    ],
+    "all_13_correct_constants_preserved": true,
+    "blob": "d0bbf4c514298289b9fe715af2fe09ea943bc936",
+    "commit": "c6823dbc46249cac43aa10400aacbbe9f4542410",
+    "path": "evidence/v0.6/b_line/p2_owner_root_metadata_r1/P2_OWNER_ROOT_EXACT_SCAN_RECEIPT.json",
+    "real_data_root_remeasurement": false,
+    "regular_file_sizes": {
+      "research/BTCUSDT/1m/year=2021/month=03/data.parquet": 2756024,
+      "research/BTCUSDT/1m/year=2021/month=04/data.parquet": 2621313,
+      "research/BTCUSDT/1m/year=2023/month=03/data.parquet": 2415597,
+      "research/BTCUSDT/1m/year=2023/month=04/data.parquet": 2201521,
+      "research/BTCUSDT/1m/year=2025/month=03/data.parquet": 2352476,
+      "research/BTCUSDT/1m/year=2025/month=04/data.parquet": 2329220,
+      "research/BTCUSDT/data_manifest.json": 45234,
+      "research/BTCUSDT/funding_events.csv": 219066,
+      "research/BTCUSDT_SPOT/data_manifest.json": 19855,
+      "research/cross_asset_1h/ETHUSDT.parquet": 2907000,
+      "research/cross_asset_1h/basket_manifest.json": 56012,
+      "research/v0.3.19_official_derivatives/hourly_inputs.parquet": 3101084,
+      "research/v0.3.19_official_derivatives/raw_data_manifest.json": 420725
+    },
+    "sha256": "a3c9169dcbeb31edce492791ef253e42c580411cdb014337e8084229aaaaf3f2"
+  },
+  "terminal": "S3A_CODEX_R3_ONE_SHOT_SYNTHETIC_SECURITY_CANDIDATE_PENDING_INDEPENDENT_CONTROLLER_AUDIT",
+  "worktree": "/root/workspace/project/quant-v0.6/p2-s3a-codex-one-shot-fd-r3"
+}

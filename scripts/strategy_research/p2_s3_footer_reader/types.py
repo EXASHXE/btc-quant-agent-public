@@ -13,8 +13,6 @@ from __future__ import annotations
 import hashlib
 import os
 import secrets
-import stat
-import tempfile
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -56,6 +54,8 @@ class TrustedTempRootCustody:
 # Process-local registry of harness-attested temp root custody records and
 # designated forbidden owner-surrogate temp trees used in adversarial tests.
 _TRUSTED_CUSTODY_REGISTRY: dict[str, TrustedTempRootCustody] = {}
+# One preparation -> one reader. The exact meter is handed off, never reset.
+_TRUSTED_PREPARATIONS: dict[str, tuple[int, Any, Any]] = {}
 _FORBIDDEN_SURROGATE_TREES: dict[str, set[tuple[int, int]]] = {}
 
 
@@ -73,6 +73,11 @@ def register_forbidden_owner_surrogate_tree(surrogate_root: str | Path) -> None:
     entirely inside ``tmp_path`` without ever touching or referencing the real
     ``/root/workspace/project/Quant-agent/data`` directory.
     """
+    from scripts.strategy_research.p2_s3_footer_reader.fd_syscall_wrapper import (
+        validate_and_split_temp_root_path,
+    )
+
+    validate_and_split_temp_root_path(str(surrogate_root))
     _prune_stale_surrogates()
     norm = str(surrogate_root).replace("\\", "/").rstrip("/")
     inodes: set[tuple[int, int]] = set()
@@ -95,14 +100,12 @@ def register_forbidden_owner_surrogate_tree(surrogate_root: str | Path) -> None:
 
 def is_forbidden_surrogate_inode(dev: int, ino: int) -> bool:
     """Return True if (dev, ino) belongs to a live registered forbidden surrogate tree."""
-    _prune_stale_surrogates()
     key = (int(dev), int(ino))
     return any(key in inodes for inodes in _FORBIDDEN_SURROGATE_TREES.values())
 
 
 def is_forbidden_surrogate_path(candidate_path: str) -> bool:
     """Return True if candidate_path lexically matches or is inside a forbidden surrogate."""
-    _prune_stale_surrogates()
     norm = candidate_path.replace("\\", "/").rstrip("/")
     for surr in _FORBIDDEN_SURROGATE_TREES:
         if norm == surr or norm.startswith(surr + "/"):
@@ -117,81 +120,57 @@ def get_registered_trusted_custody(custody_id: str) -> TrustedTempRootCustody | 
     return _TRUSTED_CUSTODY_REGISTRY.get(custody_id)
 
 
-def _walk_and_attest_temp_root(temp_root_path: str) -> TrustedTempRootCustody | None:
-    """Walk from '/' with O_DIRECTORY|O_NOFOLLOW to attest a temp fixture root."""
-    if not isinstance(temp_root_path, str) or not temp_root_path.startswith("/"):
-        return None
-    if "\\" in temp_root_path or "\x00" in temp_root_path:
-        return None
-    stripped = temp_root_path.rstrip("/")
-    if not stripped:
-        return None
-    parts = stripped.lstrip("/").split("/")
-    if any(p in ("", ".", "..") for p in parts):
-        return None
+def consume_prepared_meter(custody_id: str) -> tuple[Any, Any] | None:
+    """Consume process-local TEST_ONLY preparation once; no filesystem lookup."""
+    prepared = _TRUSTED_PREPARATIONS.pop(custody_id, None)
+    if prepared is None or prepared[0] != os.getpid():
+        return None  # Forked copies cannot replay or reattribute parent preparation.
+    return prepared[1], prepared[2]
 
-    tmp_base = tempfile.gettempdir().replace("\\", "/").rstrip("/")
-    if not (stripped == tmp_base or stripped.startswith(tmp_base + "/")):
-        return None
-    if is_forbidden_surrogate_path(stripped):
-        return None
 
-    flags = os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW | os.O_CLOEXEC
-    cur_fd: int | None = None
+def _walk_and_attest_temp_root(
+    temp_root_path: str, *, max_calls: int, max_trailer: int,
+    max_footer: int, max_total: int,
+) -> TrustedTempRootCustody:
+    """Account preparation and its cleanup with the very same invocation meter."""
+    from scripts.strategy_research.p2_s3_footer_reader.errors import (
+        FDCloseFailureError,
+        S3FooterReaderError,
+    )
+    from scripts.strategy_research.p2_s3_footer_reader.fd_syscall_wrapper import (
+        MeteredPosixSyscallWrapper,
+    )
+
+    meter = MeteredPosixSyscallWrapper(
+        max_attempted_fs_calls=max_calls, max_trailer_read_bytes=max_trailer,
+        max_footer_read_bytes=max_footer, max_total_read_bytes=max_total,
+    )
+    failure: S3FooterReaderError | None = None
+    root_st = None
     try:
-        cur_fd = os.open("/", flags)
-        for comp in parts[:-1]:
-            next_fd = os.open(comp, flags, dir_fd=cur_fd)
-            os.close(cur_fd)
-            cur_fd = next_fd
-            st = os.fstat(cur_fd)
-            if not stat.S_ISDIR(st.st_mode):
-                return None
-            if is_forbidden_surrogate_inode(st.st_dev, st.st_ino):
-                return None
-
-        parent_st = os.fstat(cur_fd)
-        parent_dev = int(parent_st.st_dev)
-        parent_ino = int(parent_st.st_ino)
-
-        root_dev: int | None = None
-        root_ino: int | None = None
-        try:
-            leaf_fd = os.open(parts[-1], flags, dir_fd=cur_fd)
-        except OSError:
-            # Final root directory may be a symlink or missing in negative tests;
-            # parent custody is still recorded so the metered reader can test the leaf root.
-            pass
-        else:
-            try:
-                leaf_st = os.fstat(leaf_fd)
-                if stat.S_ISDIR(leaf_st.st_mode) and int(leaf_st.st_dev) == parent_dev:
-                    if is_forbidden_surrogate_inode(leaf_st.st_dev, leaf_st.st_ino):
-                        return None
-                    root_dev = int(leaf_st.st_dev)
-                    root_ino = int(leaf_st.st_ino)
-            finally:
-                os.close(leaf_fd)
-    except OSError:
-        return None
+        fd = meter.open_anchored_root_dir(temp_root_path)
+        root_st = meter.fstat_fd(fd)
+    except (S3FooterReaderError, OSError) as exc:
+        failure = exc if isinstance(exc, S3FooterReaderError) else S3FooterReaderError(
+            f"Preparation OS failure: errno={exc.errno}", decision_code="DENIED_OS_ERROR"
+        )
     finally:
-        if cur_fd is not None:
-            try:
-                os.close(cur_fd)
-            except OSError:
-                pass
-
-    custody_id = f"S3A-CUSTODY-{secrets.token_hex(12)}"
+        meter.close_all_open_fds(raise_on_failure=False)
+    if meter.open_fds_count or meter.close_failed_count:
+        failure = FDCloseFailureError("Preparation has unconfirmed FD closure.")
+    meter.finish_preparation()
+    parent_st = meter.last_root_parent_stat
     custody = TrustedTempRootCustody(
-        custody_id=custody_id,
-        canonical_temp_root=stripped,
-        expected_parent_dev=parent_dev,
-        expected_parent_ino=parent_ino,
-        expected_root_dev=root_dev,
-        expected_root_ino=root_ino,
+        custody_id=f"S3A-CUSTODY-{secrets.token_hex(12)}",
+        canonical_temp_root=temp_root_path.rstrip("/"),
+        expected_parent_dev=int(parent_st.st_dev) if parent_st else 0,
+        expected_parent_ino=int(parent_st.st_ino) if parent_st else 0,
+        expected_root_dev=int(root_st.st_dev) if root_st else None,
+        expected_root_ino=int(root_st.st_ino) if root_st else None,
         attested_uid=os.geteuid() if hasattr(os, "geteuid") else 0,
     )
-    _TRUSTED_CUSTODY_REGISTRY[custody_id] = custody
+    _TRUSTED_CUSTODY_REGISTRY[custody.custody_id] = custody
+    _TRUSTED_PREPARATIONS[custody.custody_id] = (os.getpid(), meter, failure)
     return custody
 
 
@@ -266,7 +245,11 @@ def create_valid_synthetic_grant(
     """Create a test-only structural grant and optionally attest temp root custody."""
     custody_id = ""
     if attest_root_custody:
-        custody = _walk_and_attest_temp_root(synthetic_fixture_root)
+        custody = _walk_and_attest_temp_root(
+            synthetic_fixture_root, max_calls=max_attempted_fs_calls,
+            max_trailer=max_trailer_read_bytes, max_footer=max_footer_read_bytes,
+            max_total=max_total_read_bytes,
+        )
         if custody is not None:
             custody_id = custody.custody_id
 
@@ -385,27 +368,34 @@ class SanitizedParquetFooterMetadata:
 class SyscallAccountingSnapshot:
     """Immutable snapshot of POSIX FS syscall and byte counters."""
 
-    max_attempted_fs_calls: int
-    attempted_fs_calls_total: int
-    openat_attempted: int
-    openat_succeeded: int
-    openat_failed: int
-    fstat_attempted: int
-    fstat_succeeded: int
-    fstat_failed: int
-    pread_attempted: int
-    pread_succeeded: int
-    pread_failed: int
-    close_attempted: int
-    close_succeeded: int
-    close_failed: int
-    open_fds_remaining: int
-    requested_read_bytes_total: int
-    actual_read_bytes_total: int
-    trailer_bytes_read: int
-    footer_bytes_read: int
-    short_read_events: int
+    max_attempted_fs_calls: int = MAX_ATTEMPTED_FS_CALLS
+    attempted_fs_calls_total: int = 0
+    openat_attempted: int = 0
+    openat_succeeded: int = 0
+    openat_failed: int = 0
+    fstat_attempted: int = 0
+    fstat_succeeded: int = 0
+    fstat_failed: int = 0
+    pread_attempted: int = 0
+    pread_succeeded: int = 0
+    pread_failed: int = 0
+    close_attempted: int = 0
+    close_succeeded: int = 0
+    close_failed: int = 0
+    open_fds_remaining: int = 0
+    requested_read_bytes_total: int = 0
+    actual_read_bytes_total: int = 0
+    trailer_bytes_read: int = 0
+    footer_bytes_read: int = 0
+    short_read_events: int = 0
     owner_root_touched: bool = False
+    preparation_attempted_fs_calls: int = 0
+    reader_attempted_fs_calls: int = 0
+    preparation_family_counts: tuple[tuple[str, int], ...] = ()
+    unconfirmed_fds: tuple[tuple[int, str], ...] = ()
+    close_complete: bool = True
+    simulated_pre_close_failures: int = 0
+    simulated_pre_open_failures: int = 0
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -430,6 +420,15 @@ class SyscallAccountingSnapshot:
             "footer_bytes_read": self.footer_bytes_read,
             "short_read_events": self.short_read_events,
             "owner_root_touched": self.owner_root_touched,
+            "accounting_scope": "SINGLE_USE_PREPARATION_PLUS_READER_AND_CLEANUP",
+            "preparation_attempted_fs_calls": self.preparation_attempted_fs_calls,
+            "reader_attempted_fs_calls": self.reader_attempted_fs_calls,
+            "preparation_family_counts": dict(self.preparation_family_counts),
+            "unconfirmed_fds": [{"fd": fd, "label": label, "status": "CLOSE_UNCONFIRMED"}
+                                for fd, label in self.unconfirmed_fds],
+            "close_complete": self.close_complete,
+            "simulated_pre_close_failures": self.simulated_pre_close_failures,
+            "simulated_pre_open_failures": self.simulated_pre_open_failures,
         }
 
 

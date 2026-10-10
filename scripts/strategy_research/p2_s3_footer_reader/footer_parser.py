@@ -110,7 +110,7 @@ def parse_in_memory_parquet_footer(
     """Parse Parquet FileMetaData strictly from in-memory footer + trailer bytes.
 
     Constructs an in-memory ``pyarrow.BufferReader`` over ``b"PAR1" + footer + trailer``
-    so that ``pyarrow.parquet.read_metadata`` never touches the filesystem or any OS FD,
+    so that the metadata-only ParquetFile never touches the filesystem or any OS FD,
     and never sees any row-group data pages.
     """
     raw_footer = _assert_strict_bytes_input(footer_bytes, arg_name="footer_bytes")
@@ -130,7 +130,12 @@ def parse_in_memory_parquet_footer(
     synthetic_ram_envelope = PARQUET_MAGIC_BYTES + raw_footer + raw_trailer
     buf_reader = pa.BufferReader(synthetic_ram_envelope)
     try:
-        file_meta = pq.read_metadata(buf_reader)
+        # Public metadata constructor accepts Thrift resource limits, unlike
+        # read_metadata. Source is the strict RAM BufferReader, never a path/FD.
+        file_meta = pq.ParquetFile(
+            buf_reader, pre_buffer=False,
+            thrift_string_size_limit=65_536, thrift_container_size_limit=10_000,
+        ).metadata
     except (pa.ArrowInvalid, pa.ArrowException, OSError, RuntimeError, ValueError) as exc:
         raise CorruptedParquetFooterError(
             f"Failed to decode Parquet Thrift FileMetaData from in-memory footer: {exc}"

@@ -73,6 +73,17 @@ def _assert_clean_rejection(exc: Exception, expected_code: str) -> None:
     assert receipt.syscall_accounting.owner_root_touched is False
 
 
+@pytest.fixture(autouse=True)
+def _isolated_test_surrogate_registry():
+    # External test fixture lifecycle. Reader checks stay purely in-memory;
+    # no stale-tree stat probes hide inside an invocation.
+    from scripts.strategy_research.p2_s3_footer_reader import types
+
+    types._FORBIDDEN_SURROGATE_TREES.clear()
+    yield
+    types._FORBIDDEN_SURROGATE_TREES.clear()
+
+
 def test_adv01_cli_data_root_override_flag_rejected(tmp_path: Path) -> None:
     """1. CLI --root / --data-root override attempt is rejected with 0 syscalls."""
     materialize_synthetic_pilot_tree(tmp_path)
@@ -85,7 +96,7 @@ def test_adv01_cli_data_root_override_flag_rejected(tmp_path: Path) -> None:
     with pytest.raises(CliOrEnvRootOverrideForbiddenError) as exc_info:
         reader.read_single_parquet_footer()
     _assert_clean_rejection(exc_info.value, "DENIED_CLI_OR_ENV_ROOT_OVERRIDE")
-    assert exc_info.value.receipt.syscall_accounting.attempted_fs_calls_total == 0
+    assert exc_info.value.receipt.syscall_accounting.reader_attempted_fs_calls == 0
 
 
 def test_adv02_env_var_root_override_rejected(tmp_path: Path) -> None:
@@ -100,7 +111,7 @@ def test_adv02_env_var_root_override_rejected(tmp_path: Path) -> None:
     with pytest.raises(CliOrEnvRootOverrideForbiddenError) as exc_info:
         reader.read_single_parquet_footer()
     _assert_clean_rejection(exc_info.value, "DENIED_CLI_OR_ENV_ROOT_OVERRIDE")
-    assert exc_info.value.receipt.syscall_accounting.attempted_fs_calls_total == 0
+    assert exc_info.value.receipt.syscall_accounting.reader_attempted_fs_calls == 0
 
 
 def test_adv03_real_owner_data_root_hard_blocked(tmp_path: Path) -> None:
@@ -115,7 +126,7 @@ def test_adv03_real_owner_data_root_hard_blocked(tmp_path: Path) -> None:
     _assert_clean_rejection(
         exc_info.value, "DENIED_PRODUCTION_OR_OWNER_ROOT_FORBIDDEN"
     )
-    assert exc_info.value.receipt.syscall_accounting.attempted_fs_calls_total == 0
+    assert exc_info.value.receipt.syscall_accounting.reader_attempted_fs_calls == 0
 
 
 def test_adv04_root_directory_itself_is_symlink(tmp_path: Path) -> None:
@@ -206,7 +217,7 @@ def test_adv11_dotdot_traversal_in_relative_path(tmp_path: Path) -> None:
             rel_path="research/BTCUSDT/../../BTCUSDT/1m/year=2021/month=03/data.parquet"
         )
     _assert_clean_rejection(exc_info.value, "DENIED_PATH_SYNTAX_OR_TRAVERSAL")
-    assert exc_info.value.receipt.syscall_accounting.attempted_fs_calls_total == 0
+    assert exc_info.value.receipt.syscall_accounting.reader_attempted_fs_calls == 0
 
 
 @pytest.mark.parametrize(
@@ -232,7 +243,7 @@ def test_adv12_to_adv15_absolute_empty_backslash_or_nul_segments(
     with pytest.raises(PathSyntaxOrTraversalError) as exc_info:
         reader.read_single_parquet_footer(rel_path=bad_rel_path)
     _assert_clean_rejection(exc_info.value, "DENIED_PATH_SYNTAX_OR_TRAVERSAL")
-    assert exc_info.value.receipt.syscall_accounting.attempted_fs_calls_total == 0
+    assert exc_info.value.receipt.syscall_accounting.reader_attempted_fs_calls == 0
 
 
 def test_adv16_intermediate_component_is_regular_file(tmp_path: Path) -> None:
@@ -355,7 +366,7 @@ def test_adv21_eacces_vs_enoent_distinct_classification(tmp_path: Path) -> None:
     materialize_synthetic_pilot_tree(tmp_path)
     reader_eacces = SingleFileParquetFooterReader(
         synthetic_fixture_root=str(tmp_path),
-        grant=grant,
+        grant=create_valid_synthetic_grant(str(tmp_path)),
         simulated_open_errno_by_label={"data.parquet": 13},
     )
     with pytest.raises(EACCESPermissionError) as exc_eacces:
@@ -441,8 +452,6 @@ def test_adv24_invalid_parquet_trailer_magic_and_footer_lengths(
     tmp_path: Path,
 ) -> None:
     """16 & 17. Invalid magic != PAR1, footer_len <= 0, > 65536, or > file_size."""
-    grant = create_valid_synthetic_grant(str(tmp_path))
-
     materialize_synthetic_pilot_tree(
         tmp_path,
         parquet_bytes=craft_custom_trailer_parquet_bytes(
@@ -451,11 +460,11 @@ def test_adv24_invalid_parquet_trailer_magic_and_footer_lengths(
             trailer_magic=b"BAD!",
         ),
     )
-    reader = SingleFileParquetFooterReader(
-        synthetic_fixture_root=str(tmp_path), grant=grant
-    )
     with pytest.raises(InvalidParquetMagicError) as exc_magic:
-        reader.read_single_parquet_footer()
+        SingleFileParquetFooterReader(
+            synthetic_fixture_root=str(tmp_path),
+            grant=create_valid_synthetic_grant(str(tmp_path)),
+        ).read_single_parquet_footer()
     _assert_clean_rejection(exc_magic.value, "DENIED_INVALID_PARQUET_TRAILER_MAGIC")
 
     materialize_synthetic_pilot_tree(
@@ -467,7 +476,10 @@ def test_adv24_invalid_parquet_trailer_magic_and_footer_lengths(
         ),
     )
     with pytest.raises(InvalidParquetFooterLengthError) as exc_zero:
-        reader.read_single_parquet_footer()
+        SingleFileParquetFooterReader(
+            synthetic_fixture_root=str(tmp_path),
+            grant=create_valid_synthetic_grant(str(tmp_path)),
+        ).read_single_parquet_footer()
     _assert_clean_rejection(exc_zero.value, "DENIED_INVALID_PARQUET_FOOTER_LENGTH")
 
     materialize_synthetic_pilot_tree(
@@ -479,7 +491,10 @@ def test_adv24_invalid_parquet_trailer_magic_and_footer_lengths(
         ),
     )
     with pytest.raises(InvalidParquetFooterLengthError) as exc_over:
-        reader.read_single_parquet_footer()
+        SingleFileParquetFooterReader(
+            synthetic_fixture_root=str(tmp_path),
+            grant=create_valid_synthetic_grant(str(tmp_path)),
+        ).read_single_parquet_footer()
     _assert_clean_rejection(exc_over.value, "DENIED_INVALID_PARQUET_FOOTER_LENGTH")
 
     materialize_synthetic_pilot_tree(
@@ -491,7 +506,10 @@ def test_adv24_invalid_parquet_trailer_magic_and_footer_lengths(
         ),
     )
     with pytest.raises(InvalidParquetFooterExtentError) as exc_ext:
-        reader.read_single_parquet_footer()
+        SingleFileParquetFooterReader(
+            synthetic_fixture_root=str(tmp_path),
+            grant=create_valid_synthetic_grant(str(tmp_path)),
+        ).read_single_parquet_footer()
     _assert_clean_rejection(exc_ext.value, "DENIED_PARQUET_FOOTER_EXCEEDS_FILE_EXTENT")
 
 
@@ -499,20 +517,18 @@ def test_adv25_truncated_file_short_pread_and_corrupted_thrift(
     tmp_path: Path,
 ) -> None:
     """18. Truncated file (< 13 bytes), short pread, and corrupted Thrift footer."""
-    grant = create_valid_synthetic_grant(str(tmp_path))
-
     materialize_synthetic_pilot_tree(tmp_path, parquet_bytes=b"PAR1PAR1")
-    reader = SingleFileParquetFooterReader(
-        synthetic_fixture_root=str(tmp_path), grant=grant
-    )
     with pytest.raises(ShortReadOrTruncatedFileError) as exc_trunc:
-        reader.read_single_parquet_footer()
+        SingleFileParquetFooterReader(
+            synthetic_fixture_root=str(tmp_path),
+            grant=create_valid_synthetic_grant(str(tmp_path)),
+        ).read_single_parquet_footer()
     _assert_clean_rejection(exc_trunc.value, "DENIED_SHORT_READ_OR_TRUNCATED_FILE")
 
     materialize_synthetic_pilot_tree(tmp_path)
     reader_short = SingleFileParquetFooterReader(
         synthetic_fixture_root=str(tmp_path),
-        grant=grant,
+        grant=create_valid_synthetic_grant(str(tmp_path)),
         short_read_truncate_bytes=3,
     )
     with pytest.raises(ShortReadOrTruncatedFileError) as exc_short:
@@ -529,7 +545,10 @@ def test_adv25_truncated_file_short_pread_and_corrupted_thrift(
         ),
     )
     with pytest.raises(CorruptedParquetFooterError) as exc_thrift:
-        reader.read_single_parquet_footer()
+        SingleFileParquetFooterReader(
+            synthetic_fixture_root=str(tmp_path),
+            grant=create_valid_synthetic_grant(str(tmp_path)),
+        ).read_single_parquet_footer()
     _assert_clean_rejection(
         exc_thrift.value, "DENIED_CORRUPTED_PARQUET_THRIFT_FOOTER"
     )
@@ -563,17 +582,22 @@ def test_adv26_syscall_budget_exhaustion_and_row_group_read_forbidden(
     _assert_clean_rejection(exc_tight.value, BUDGET_INSUFFICIENT_STOP_CODE)
     assert exc_tight.value.receipt.syscall_accounting.attempted_fs_calls_total <= 10
 
-    # 99 failed openat calls leave 1 slot; the 100th openat requires 1 open + 1
-    # reserved close = 2 slots, so it stops at 99 <= 100 with BUDGET_INSUFFICIENT_STOP.
+    # Real failed leaf opens each consume one native attempt. Open the root
+    # once with accounted ancestry, then keep its reserved close slot.
     wrapper = MeteredPosixSyscallWrapper(max_attempted_fs_calls=100)
-    for _ in range(99):
+    root_fd = wrapper.open_anchored_root_dir(str(tmp_path))
+    before = wrapper.attempted_fs_calls_total
+    while wrapper.attempted_fs_calls_total < 98:
         with pytest.raises(ENOENTNotFoundError):
-            wrapper.open_anchored_root_dir(str(tmp_path / "does_not_exist"))
-    assert wrapper.attempted_fs_calls_total == 99
+            wrapper.openat_regular_leaf(root_fd, "does_not_exist")
+    assert wrapper.attempted_fs_calls_total == 98
+    assert wrapper.attempted_fs_calls_total > before
     with pytest.raises(SyscallBudgetExceededError) as exc_100:
-        wrapper.open_anchored_root_dir(str(tmp_path / "does_not_exist"))
+        wrapper.openat_regular_leaf(root_fd, "does_not_exist")
     assert exc_100.value.decision_code == BUDGET_INSUFFICIENT_STOP_CODE
+    wrapper.close_all_open_fds()
     assert wrapper.attempted_fs_calls_total == 99
+    assert wrapper.snapshot().close_complete
 
     with pytest.raises(ByteBudgetExceededError):
         MeteredPosixSyscallWrapper(max_footer_read_bytes=70_000)
@@ -620,7 +644,7 @@ def test_adv27_r2_f01_two_temp_trees_ancestor_symlink_escape_blocked(
 
     # 2. Prove repaired R2 reader rejects alias_root before reading any footer bytes:
     self_minted_grant = create_valid_synthetic_grant(
-        alias_root, attest_root_custody=False
+        alias_root, attest_root_custody=True
     )
     reader = SingleFileParquetFooterReader(
         synthetic_fixture_root=alias_root,
@@ -647,7 +671,7 @@ def test_adv28_r2_f01_multi_hop_parent_symlinks_and_dangling_parent(
     multi_hop_root = str(hop1 / "data_root")
 
     grant_multi = create_valid_synthetic_grant(
-        multi_hop_root, attest_root_custody=False
+        multi_hop_root, attest_root_custody=True
     )
     reader_multi = SingleFileParquetFooterReader(
         synthetic_fixture_root=multi_hop_root,
@@ -662,7 +686,7 @@ def test_adv28_r2_f01_multi_hop_parent_symlinks_and_dangling_parent(
     os.symlink(tmp_path / "nonexistent_target", dangling_parent)
     dangling_root = str(dangling_parent / "data_root")
     grant_dangling = create_valid_synthetic_grant(
-        dangling_root, attest_root_custody=False
+        dangling_root, attest_root_custody=True
     )
     reader_dangling = SingleFileParquetFooterReader(
         synthetic_fixture_root=dangling_root,
@@ -812,7 +836,7 @@ def test_adv31_to_adv36_r2_f03_syscall_cap_matrix_1_2_3_25_27_100(
         synthetic_fixture_root=str(tmp_path),
         grant=grant,
     )
-    if cap < 27:
+    if cap < 6 * len(tmp_path.parts[1:]) + 32:
         with pytest.raises(SyscallBudgetExceededError) as exc_info:
             reader.read_single_parquet_footer()
         _assert_clean_rejection(exc_info.value, BUDGET_INSUFFICIENT_STOP_CODE)
@@ -823,7 +847,7 @@ def test_adv31_to_adv36_r2_f03_syscall_cap_matrix_1_2_3_25_27_100(
         receipt = reader.read_single_parquet_footer()
         assert receipt.allowed is True
         assert receipt.decision_code == "ALLOWED_SINGLE_FILE_FOOTER_SCHEMA_PARSED"
-        assert receipt.syscall_accounting.attempted_fs_calls_total == 27
+        assert receipt.syscall_accounting.attempted_fs_calls_total == 6 * len(tmp_path.parts[1:]) + 32
         assert receipt.syscall_accounting.attempted_fs_calls_total <= cap
         assert receipt.syscall_accounting.open_fds_remaining == 0
 
@@ -841,12 +865,24 @@ def test_adv37_r2_f03_os_close_failure_does_not_abort_cleanup_or_pass(
     )
     with pytest.raises(FDCloseFailureError) as exc_info:
         reader.read_single_parquet_footer()
-    _assert_clean_rejection(exc_info.value, "DENIED_FD_CLEANUP_CLOSE_FAILED")
+    receipt = exc_info.value.receipt
+    assert not receipt.allowed
+    assert receipt.decision_code == "FD_CLOSE_UNCONFIRMED_FAIL_CLOSED"
+    assert receipt.header_verification_status == HEADER_STATUS_NOT_VERIFIED
+    assert not receipt.syscall_accounting.owner_root_touched
     snap = exc_info.value.receipt.syscall_accounting
-    assert snap.close_attempted == 8
-    assert snap.close_failed == 1
-    assert snap.close_succeeded == 7
-    assert snap.open_fds_remaining == 0
+    assert snap.close_attempted == snap.openat_succeeded - 1
+    assert snap.close_failed == 0  # test-only pre-entry injection, no kernel call
+    assert snap.close_succeeded == snap.close_attempted
+    assert snap.simulated_pre_close_failures == 1
+    assert snap.open_fds_remaining == 1
+    assert not snap.close_complete
+    assert len(snap.unconfirmed_fds) == 1
+    # This test owns the synthetic FD: verify/cleanup after the tool receipt.
+    for fd, label in snap.unconfirmed_fds:
+        assert label == "month=03"
+        os.fstat(fd)
+        os.close(fd)
 
 
 # --- DELIBERATE MUTANT FALSIFICATION TESTS (3) ---

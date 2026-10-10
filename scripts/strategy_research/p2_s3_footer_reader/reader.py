@@ -23,8 +23,8 @@ Enforces:
    Thrift footer (``<= 65,544`` bytes total), followed by post-read ``fstat`` and
    parent-directory reopen ``(st_dev, st_ino, st_size, st_mtime_ns)`` TOCTOU
    identity verification.
-8. Deterministic ``finally:`` closure of all opened directory and file FDs, with
-   any ``os.close`` failure raising ``FDCloseFailureError``.
+8. R3: one shared preparation+reader meter, cleanup reservations, and one-attempt
+   FD close. Failed close preserves explicit unresolved liability, never false zero.
 """
 
 from __future__ import annotations
@@ -45,6 +45,7 @@ from scripts.strategy_research.p2_s3_footer_reader.constants import (
 )
 from scripts.strategy_research.p2_s3_footer_reader.errors import (
     CliOrEnvRootOverrideForbiddenError,
+    FDCloseFailureError,
     GrantAuthorizationError,
     GrantExpiredError,
     GrantScopeEscalationError,
@@ -66,6 +67,7 @@ from scripts.strategy_research.p2_s3_footer_reader.fd_syscall_wrapper import (
     MeteredPosixSyscallWrapper,
     assert_not_owner_data_root,
     validate_and_split_temp_root_path,
+    verify_posix_fd_platform_support,
 )
 from scripts.strategy_research.p2_s3_footer_reader.footer_parser import (
     parse_in_memory_parquet_footer,
@@ -74,7 +76,9 @@ from scripts.strategy_research.p2_s3_footer_reader.footer_parser import (
 from scripts.strategy_research.p2_s3_footer_reader.types import (
     FooterReadExecutionReceipt,
     SyntheticTestGrant,
+    SyscallAccountingSnapshot,
     TrustedTempRootCustody,
+    consume_prepared_meter,
     get_registered_trusted_custody,
     is_forbidden_surrogate_inode,
 )
@@ -307,17 +311,37 @@ class SingleFileParquetFooterReader:
         observed_file_size: int | None = None
 
         try:
-            wrapper = MeteredPosixSyscallWrapper(
-                max_attempted_fs_calls=max_calls,
-                max_trailer_read_bytes=max_trailer,
-                max_footer_read_bytes=max_footer,
-                max_total_read_bytes=max_total,
-                simulated_dev_overrides=self._simulated_dev_overrides,
-                simulated_open_errno_by_label=self._simulated_open_errno_by_label,
-                simulated_close_errno_by_label=self._simulated_close_errno_by_label,
-                short_read_truncate_bytes=self._short_read_truncate_bytes,
-                post_trailer_pread_hook=self._post_trailer_pread_hook,
-            )
+            # Select the prior preparation BEFORE validating mutable grant
+            # bounds/platform. Even rejected/tampered invocations must not hide
+            # native work already done on their behalf.
+            prepared = (consume_prepared_meter(self._grant.trusted_custody_id)
+                        if isinstance(self._grant, SyntheticTestGrant) else None)
+            preparation_error = None
+            if prepared is not None:
+                wrapper, preparation_error = prepared
+                verify_posix_fd_platform_support()  # pure capability check
+                # Test-only controls apply only to reader phase.
+                wrapper._simulated_dev_overrides = dict(self._simulated_dev_overrides or {})
+                wrapper._simulated_open_errno_by_label = dict(self._simulated_open_errno_by_label or {})
+                wrapper._simulated_close_errno_by_label = dict(self._simulated_close_errno_by_label or {})
+                wrapper._short_read_truncate_bytes = self._short_read_truncate_bytes
+                wrapper._post_trailer_pread_hook = self._post_trailer_pread_hook
+            else:
+                wrapper = MeteredPosixSyscallWrapper(
+                    max_attempted_fs_calls=max_calls,
+                    max_trailer_read_bytes=max_trailer,
+                    max_footer_read_bytes=max_footer,
+                    max_total_read_bytes=max_total,
+                    simulated_dev_overrides=self._simulated_dev_overrides,
+                    simulated_open_errno_by_label=self._simulated_open_errno_by_label,
+                    simulated_close_errno_by_label=self._simulated_close_errno_by_label,
+                    short_read_truncate_bytes=self._short_read_truncate_bytes,
+                    post_trailer_pread_hook=self._post_trailer_pread_hook,
+                )
+                if isinstance(self._grant, SyntheticTestGrant):
+                    preparation_error = UntrustedRootCustodyError(
+                        "SOURCE_ROOT_CUSTODY_UNKNOWN: preparation missing, foreign PID or already consumed."
+                    )
 
             # 1. Reject CLI / environment overrides before any syscall.
             validate_no_cli_or_env_overrides(self._cli_args, self._env_vars)
@@ -346,6 +370,11 @@ class SingleFileParquetFooterReader:
                 synthetic_fixture_root=self._synthetic_fixture_root,
                 current_epoch_s=self._current_epoch_s,
             )
+
+            if preparation_error is not None:
+                raise preparation_error
+            if wrapper.invocation_limits != (max_calls, max_trailer, max_footer, max_total):
+                raise GrantAuthorizationError("Prepared invocation limits differ from grant.")
 
             # 7. Open anchored root directory FD via component-by-component ancestor walk
             #    and verify harness root custody (R2 F01).
@@ -500,13 +529,17 @@ class SingleFileParquetFooterReader:
             # 15. Close all remaining open FDs and fail closed if any close failed (R2 F03).
             wrapper.close_all_open_fds(raise_on_failure=True)
 
-        except S3FooterReaderError as exc:
+        except (S3FooterReaderError, OSError, MemoryError) as original:
+            exc = original if isinstance(original, S3FooterReaderError) else S3FooterReaderError(
+                f"OS/resource failure: {type(original).__name__}", decision_code="DENIED_OS_OR_RESOURCE_ERROR"
+            )
             if wrapper is not None:
                 wrapper.close_all_open_fds(raise_on_failure=False)
                 snap = wrapper.snapshot()
+                if snap.unconfirmed_fds or snap.close_failed:
+                    exc = FDCloseFailureError("FD closure is unconfirmed; sanitized success aborted.")
             else:
-                fallback = MeteredPosixSyscallWrapper()
-                snap = fallback.snapshot()
+                snap = SyscallAccountingSnapshot()  # no platform retry or native work
             err_receipt = FooterReadExecutionReceipt(
                 allowed=False,
                 decision_code=exc.decision_code,
@@ -520,7 +553,7 @@ class SingleFileParquetFooterReader:
                 grant_token_semantics=SYNTHETIC_GRANT_TOKEN_SEMANTICS,
             )
             exc.receipt = err_receipt  # type: ignore[attr-defined]
-            raise
+            raise exc from original if exc is not original else None
         finally:
             if wrapper is not None:
                 wrapper.close_all_open_fds(raise_on_failure=False)

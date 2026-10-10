@@ -52,6 +52,17 @@ from scripts.strategy_research.p2_s3_footer_reader import (
 )
 
 
+@pytest.fixture(autouse=True)
+def _isolated_test_surrogate_registry():
+    # External test fixture lifecycle. Reader checks stay purely in-memory;
+    # no stale-tree stat probes hide inside an invocation.
+    from scripts.strategy_research.p2_s3_footer_reader import types
+
+    types._FORBIDDEN_SURROGATE_TREES.clear()
+    yield
+    types._FORBIDDEN_SURROGATE_TREES.clear()
+
+
 def test_u01_pinned_authority_shas_and_budget_constants() -> None:
     """Verify pinned Controller/Code/Prompt/Stat SHAs and hard S3 budgets."""
     assert CONTROLLER_DISPATCH_SHA == "e150be89bef2540a4aebe7b11e921dd25104fe16"
@@ -181,16 +192,16 @@ def test_u04_positive_synthetic_single_file_footer_read(tmp_path: Path) -> None:
     snap = receipt.syscall_accounting
     assert snap.open_fds_remaining == 0
     assert snap.owner_root_touched is False
-    assert snap.attempted_fs_calls_total == 27
+    assert snap.attempted_fs_calls_total == 6 * len(tmp_path.parts[1:]) + 32
     assert snap.attempted_fs_calls_total <= MAX_ATTEMPTED_FS_CALLS
-    assert snap.openat_attempted == 8
-    assert snap.openat_succeeded == 8
-    assert snap.fstat_attempted == 9
-    assert snap.fstat_succeeded == 9
+    assert snap.openat_attempted == 2 * len(tmp_path.parts[1:]) + 9
+    assert snap.openat_succeeded == snap.openat_attempted
+    assert snap.fstat_attempted == 2 * len(tmp_path.parts[1:]) + 12
+    assert snap.fstat_succeeded == snap.fstat_attempted
     assert snap.pread_attempted == 2
     assert snap.pread_succeeded == 2
-    assert snap.close_attempted == 8
-    assert snap.close_succeeded == 8
+    assert snap.close_attempted == snap.openat_succeeded
+    assert snap.close_succeeded == snap.close_attempted
     assert snap.trailer_bytes_read == 8
     assert 0 < snap.footer_bytes_read <= MAX_FOOTER_READ_BYTES
     assert snap.actual_read_bytes_total == 8 + snap.footer_bytes_read
@@ -325,7 +336,8 @@ def test_u09_zero_path_based_stat_or_convenience_parquet_calls_in_package() -> N
     production_files = [
         p
         for p in pkg_dir.glob("*.py")
-        if p.name not in ("synthetic_fixtures.py", "oracle_runner.py", "types.py")
+        if p.name not in ("synthetic_fixtures.py", "oracle_runner.py", "types.py",
+            "r3_oracle.py", "r3_native_probe.py")
     ]
     forbidden_os_calls = {"stat", "lstat", "scandir", "walk", "listdir"}
     forbidden_pq_calls = {"read_table", "read_pandas", "ParquetFile", "ParquetDataset"}
@@ -342,6 +354,17 @@ def test_u09_zero_path_based_stat_or_convenience_parquet_calls_in_package() -> N
                             f"Forbidden os.{attr} call in {py_file.name}"
                         )
                     if mod in ("pq", "parquet"):
+                        if attr == "ParquetFile" and py_file.name == "footer_parser.py":
+                            # R3: bounded Thrift metadata constructor, RAM only.
+                            assert len(node.args) == 1
+                            assert isinstance(node.args[0], ast.Name)
+                            assert node.args[0].id == "buf_reader"
+                            keywords = {k.arg: k.value for k in node.keywords}
+                            assert isinstance(keywords["pre_buffer"], ast.Constant)
+                            assert keywords["pre_buffer"].value is False
+                            assert keywords["thrift_string_size_limit"].value == 65_536
+                            assert keywords["thrift_container_size_limit"].value == 10_000
+                            continue
                         assert attr not in forbidden_pq_calls, (
                             f"Forbidden pq.{attr} call in {py_file.name}"
                         )

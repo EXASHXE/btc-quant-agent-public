@@ -134,7 +134,7 @@ class SyscallBudgetExceededError(S3FooterReaderError):
 class FDCloseFailureError(S3FooterReaderError):
     """Raised when one or more os.close calls fail during file descriptor cleanup."""
 
-    default_decision_code = "DENIED_FD_CLEANUP_CLOSE_FAILED"
+    default_decision_code = "FD_CLOSE_UNCONFIRMED_FAIL_CLOSED"
 
 
 class ByteBudgetExceededError(S3FooterReaderError):

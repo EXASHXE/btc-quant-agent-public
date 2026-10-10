@@ -1,0 +1,200 @@
+{
+  "cases": [
+    {
+      "cap": 1,
+      "depth": 1,
+      "id": "normal_cap_1",
+      "kind": "normal"
+    },
+    {
+      "cap": 2,
+      "depth": 1,
+      "id": "normal_cap_2",
+      "kind": "normal"
+    },
+    {
+      "cap": 3,
+      "depth": 1,
+      "id": "normal_cap_3",
+      "kind": "normal"
+    },
+    {
+      "cap": 25,
+      "depth": 1,
+      "id": "normal_cap_25",
+      "kind": "normal"
+    },
+    {
+      "cap": 27,
+      "depth": 1,
+      "id": "normal_cap_27",
+      "kind": "normal"
+    },
+    {
+      "cap": 36,
+      "depth": 1,
+      "id": "normal_cap_36",
+      "kind": "normal"
+    },
+    {
+      "cap": 100,
+      "depth": 1,
+      "id": "normal_cap_100",
+      "kind": "normal"
+    },
+    {
+      "cap": 100,
+      "depth": 5,
+      "id": "depth_5_cap_100",
+      "kind": "normal"
+    },
+    {
+      "cap": 100,
+      "depth": 36,
+      "id": "depth_36_cap_100",
+      "kind": "normal"
+    },
+    {
+      "cap": 100,
+      "depth": 1,
+      "id": "missing_ancestor",
+      "kind": "missing_ancestor"
+    },
+    {
+      "cap": 100,
+      "depth": 1,
+      "id": "symlink_ancestor",
+      "kind": "symlink_ancestor"
+    },
+    {
+      "cap": 100,
+      "depth": 1,
+      "id": "nondirectory_ancestor",
+      "kind": "nondirectory_ancestor"
+    },
+    {
+      "cap": 100,
+      "depth": 1,
+      "id": "permission_eacces",
+      "kind": "permission_eacces"
+    },
+    {
+      "cap": 100,
+      "depth": 1,
+      "id": "symlink_leaf",
+      "kind": "symlink_leaf"
+    },
+    {
+      "cap": 100,
+      "depth": 1,
+      "id": "root_swap",
+      "kind": "root_swap"
+    },
+    {
+      "cap": 100,
+      "depth": 1,
+      "id": "leaf_swap",
+      "kind": "leaf_swap"
+    },
+    {
+      "cap": 100,
+      "depth": 1,
+      "id": "hardlink_leaf",
+      "kind": "hardlink_leaf"
+    },
+    {
+      "cap": 100,
+      "depth": 1,
+      "id": "native_anchor_close_ebadf",
+      "kind": "native_anchor_close_ebadf"
+    },
+    {
+      "cap": 100,
+      "depth": 1,
+      "id": "native_leaf_close_ebadf",
+      "kind": "native_leaf_close_ebadf"
+    },
+    {
+      "cap": 100,
+      "depth": 1,
+      "id": "preentry_close_failure",
+      "kind": "preentry_close_failure"
+    },
+    {
+      "cap": 100,
+      "depth": 1,
+      "id": "fstat_failure",
+      "kind": "fstat_failure"
+    },
+    {
+      "cap": 100,
+      "depth": 1,
+      "id": "pread_short",
+      "kind": "pread_short"
+    },
+    {
+      "cap": 100,
+      "depth": 1,
+      "id": "footer_oversize",
+      "kind": "footer_oversize"
+    },
+    {
+      "cap": 100,
+      "depth": 1,
+      "id": "footer_corrupt",
+      "kind": "footer_corrupt"
+    },
+    {
+      "cap": 100,
+      "depth": 1,
+      "id": "invalid_magic",
+      "kind": "invalid_magic"
+    },
+    {
+      "cap": 100,
+      "depth": 1,
+      "id": "extra_byte_request",
+      "kind": "extra_byte_request"
+    },
+    {
+      "cap": 100,
+      "depth": 1,
+      "id": "wrong_grant",
+      "kind": "wrong_grant"
+    },
+    {
+      "cap": 100,
+      "depth": 1,
+      "id": "expired_grant",
+      "kind": "expired_grant"
+    },
+    {
+      "cap": 100,
+      "depth": 1,
+      "id": "missing_grant",
+      "kind": "missing_grant"
+    },
+    {
+      "cap": 100,
+      "depth": 1,
+      "id": "owner_literal",
+      "kind": "owner_literal"
+    },
+    {
+      "cap": 100,
+      "depth": 1,
+      "id": "protected_target",
+      "kind": "protected_target"
+    },
+    {
+      "cap": 100,
+      "depth": 1,
+      "id": "self_minted_no_custody",
+      "kind": "self_minted_no_custody"
+    }
+  ],
+  "fixture_version": 1,
+  "note": "All numeric values invented. Setup bytes are synthetic and outside observed reader boundary.",
+  "parquet_hex": "504152311504153015304c150615001200000100000000000000020000000000000003000000000000001500151415142c15061510150615061c1808030000000000000018080100000000000000160028080300000000000000180801000000000000001111000000020000000601020324001504153015304c150615001200000700000000000000080000000000000009000000000000001500151415142c15061510150615061c1808090000000000000018080700000000000000160028080900000000000000180807000000000000001111000000020000000601020324001504193c35001806736368656d6115040015042502180d696e76656e7465645f7469636b0015042502180e696e76656e7465645f6c6576656c001606191c192c26001c1504193500061019180d696e76656e7465645f7469636b1500160616de0116de01265426081c180803000000000000001808010000000000000016002808030000000000000018080100000000000000111100192c15041500150200150015101502003c29061926000600000026001c1504193500061019180e696e76656e7465645f6c6576656c1500160616de0116de0126b20226e6011c180809000000000000001808070000000000000016002808090000000000000018080700000000000000111100192c15041500150200150015101502003c29061926000600000016bc031606260816bc0300192c180c61756469745f6d61726b6572181152335f53594e5448455449435f4f4e4c5900180c4152524f573a736368656d6118f8022f2f2f2f2f78414241414151414141414141414b414134414267414641416741436741414141414242414151414141414141414b4141774141414145414167414367414141464141414141454141414141514141414177414141414941417741424141494141674141414167414141414241414141424541414142534d313954575535555345565553554e665430354d575141414141774141414268645752706446397459584a725a584941414141414167414141464141414141454141414179502f2f2f7741414151495141414141494141414141514141414141414141414467414141476c75646d56756447566b5832786c646d5673414143342f2f2f2f4141414141554141414141514142514143414147414163414441414141424141454141414141414141514951414141414b4141414141514141414141414141414451414141476c75646d56756447566b58335270593273414141414941417741434141484141674141414141414141425141414141413d3d001820706172717565742d6370702d6172726f772076657273696f6e2032352e302e31192c1c00001c0000000703000050415231",
+  "parquet_sha256": "64a54ac364b5e994a3577e69475ff10ef2f848fb0119c546a13835136557e8e8"
+}
