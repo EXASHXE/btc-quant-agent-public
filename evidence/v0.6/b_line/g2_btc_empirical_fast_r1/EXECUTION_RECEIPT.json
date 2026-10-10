@@ -1,0 +1,136 @@
+{
+  "account_fold_replays": 120,
+  "actual_root_effort": "NOT_EXPOSED",
+  "actual_root_model": "NOT_EXPOSED",
+  "aggregate_sha256": "101991bbfa9f22b4e7299b7f0dd306ddd8f16449de177a992ccd8fb4c60162e0",
+  "authority": {
+    "P4_TESTNET_LIVE_REALFUNDS": "NONE",
+    "alpha_claim": "NONE",
+    "effective_P3": "NONE"
+  },
+  "branch": "feature/v06-bline-g2-btc-public-empirical-fast-r1",
+  "candidate_cost_trade_observations": 665,
+  "changed_namespace_allowlist": [
+    "scripts/strategy_research/g2_btc_empirical_fast_r1/**",
+    "tests/test_v06_g2_btc_empirical_fast_*.py",
+    "docs/strategy_research/g2_r3/empirical_fast_r1/**",
+    "evidence/v0.6/b_line/g2_btc_empirical_fast_r1/**"
+  ],
+  "ci_final_exact_SHA_status": "OBSERVE_EXTERNALLY_AFTER_FINAL_PUSH_NO_THIRD_COMMIT_NO_WAIT_WAIVER",
+  "code_test_sha256": {
+    "scripts/strategy_research/g2_btc_empirical_fast_r1/audit.py": "c7a1c1be2154162fb785971fd9094a059784c04b618f3cd856e640bd6bc23918",
+    "scripts/strategy_research/g2_btc_empirical_fast_r1/metrics.py": "6f29be1624c1739b162fbd12b236d7f1a5e40a475c2544f0c62c304ff28a3e9a",
+    "scripts/strategy_research/g2_btc_empirical_fast_r1/replay.py": "eac5bad4afa9280d781da2b0df820d81f21daf868fc7362ea587a1bebabcc4d5",
+    "scripts/strategy_research/g2_btc_empirical_fast_r1/report.py": "b64b42430be17e9690caf22cb6d968633f9d1f930345496f48fffbdd78e6e954",
+    "scripts/strategy_research/g2_btc_empirical_fast_r1/run.py": "4c45ed09887ff317846b69786d9ce03e2a1eb2c6aeab610af05fe0ecdd2e7e71",
+    "scripts/strategy_research/g2_btc_empirical_fast_r1/signals.py": "451f11e9cda64d5d6b48a2c17a270dabf811760e7016f6c6972f26f64d2bc307",
+    "scripts/strategy_research/g2_btc_empirical_fast_r1/sources.py": "ef07d5aae8ec1e65ab4a76228c167f65f58d41e950bb2158a45ce6d58d1b834a",
+    "scripts/strategy_research/g2_btc_empirical_fast_r1/verify.py": "7078a79d2a70add6ed1e76eda6ca92e3f5d28a6b957649bc7842c71debcea166",
+    "tests/test_v06_g2_btc_empirical_fast_metrics_source.py": "d4592e3e572119518c841e9b7c64a56e8a26a6773f86c43c736d7b49948cd6ad",
+    "tests/test_v06_g2_btc_empirical_fast_replay.py": "016f5db3c017263727948a33e064845c330287ba26cfa71033003e34cc72726a",
+    "tests/test_v06_g2_btc_empirical_fast_signals.py": "68e8c8b49c8eef9c78efc3bc1ebe723e758bd0b6f54103c379017b9c527f26ab"
+  },
+  "constants_or_candidates_retuned_after_outcomes": 0,
+  "controller_dispatch_sha": "4259846a64a422c3eced029bb791ed7e29dc9265",
+  "cost_cases": 2,
+  "decision_events": 4462,
+  "dependencies": {
+    "cryptography": "41.0.7",
+    "numpy": "2.4.4",
+    "pytest": "9.0.3",
+    "ruff": "0.17.0"
+  },
+  "economic_grade": "EXPLORATORY_COST_PROXY_ONLY",
+  "effective_unique_independent_trade_sample": "NOT_CLAIMED_SAME_TRIGGER_COST_CASE_AND_WEEK_DEPENDENCE",
+  "era_folds": [
+    2021,
+    2022,
+    2023,
+    2024,
+    2025
+  ],
+  "exact_start_sha": "e0ff8c3473de4bfa3e66fe7928d42992a4d38a32",
+  "executed_at_utc": "2026-10-10T17:13:19.744203+00:00",
+  "final_commit_expected_parent": "21ee4c11b789d54aca6c602ce5c84426a3944fde",
+  "focused_validation": [
+    {
+      "command": "pytest -q tests/test_v06_g2_btc_empirical_fast_*.py",
+      "elapsed_seconds": 0.57,
+      "exit_code": 0,
+      "output_sha256": "7ca3eb09a283c77e74240eb40a32dd3acf7b98d639086b1f21cee4be2a70a320",
+      "passed": 53
+    },
+    {
+      "command": "ruff check scripts/strategy_research/g2_btc_empirical_fast_r1 tests/test_v06_g2_btc_empirical_fast_*.py",
+      "exit_code": 0
+    },
+    {
+      "command": "python3.12 -m compileall -q scripts/strategy_research/g2_btc_empirical_fast_r1 tests/test_v06_g2_btc_empirical_fast_*.py (explicit test paths)",
+      "exit_code": 0
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0
+    },
+    {
+      "command": "python3.12 -m scripts.strategy_research.g2_btc_empirical_fast_r1.audit",
+      "exit_code": 0,
+      "independent_real_trade_decimal_assertions": 3
+    }
+  ],
+  "freeze_commit_sha": "21ee4c11b789d54aca6c602ce5c84426a3944fde",
+  "frozen_files_mutated": false,
+  "frozen_signature_verification": "PASS_ED25519_REGISTRY_AND_CANONICAL_PAYLOAD",
+  "implementation_workers": {
+    "replay": "implementer observable GPT-6 Sol Medium synthetic-only",
+    "signals": "implementer observable GPT-6 Sol Medium synthetic-only"
+  },
+  "initial_collection_failure": "bare pytest did not include repository root on import path; allowed task tests now bootstrap repo-relative path; final bare pytest53PASS",
+  "machine_cross_checks": {
+    "account_fold_reconciliation": 120,
+    "all_candidate_fold_and_cost_rows": 120,
+    "causal_trade_clocks": 665,
+    "daily_pnl_reconciliation": 120,
+    "fate_for_every_generated_event": 4462,
+    "ledger_hashes_verified": 122
+  },
+  "mark_funding_fees_filters_source_PIT": "UNKNOWN_NOT_ADMITTED",
+  "no_full_repository_test_suite_run": true,
+  "original_formula_implementation_repairs": [
+    "ATR firstTR H-L",
+    "pending retest cancellation regardless currenthour volatility; confirmation-only volatility screen",
+    "FAILED_BREAKOUT strict close boundary",
+    "registered target_R and slippage_bps binding",
+    "expiry STOP_GAP before TIME_CAP",
+    "1.10 exit reserve and original highwater carry",
+    "all generated events include excluded-tail WAIT fate"
+  ],
+  "partial_reductions": 0,
+  "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+  "policy_variants": 12,
+  "prompt_sha": "7717b229a5d600170b1e33947eec200c997d3221",
+  "protected_owner_private_body_reads": 0,
+  "public_archives": 10,
+  "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+  "reproduction_verified": "PASS_BYTE_IDENTICAL_AGGREGATE_AND_ALL_LEDGER_HASHES",
+  "requested_model": "Codex GPT-6 Sol High",
+  "rights": {
+    "commercial_live_signal_authority": "NONE",
+    "data_derived_artifacts_license": "CC BY-NC-SA4.0 withBinanceVisionattribution; genericcode not relicensed",
+    "dataset_terms": "https://github.com/binance/binance-public-data/blob/master/TERMS_AND_CONDITIONS.md",
+    "provider": "Binance Vision",
+    "raw_data_rehosting": false,
+    "scope": "NONCOMMERCIAL_PERSONAL_NONPRODUCTION_RESEARCH",
+    "terms_version": "1.0 dated2026-08-26 observed2026-10-11"
+  },
+  "schema": "EMPIRICAL_EXECUTION_RECEIPT_V1",
+  "scored_minutes_per_era": 40320,
+  "second_run": "SAME_FIXED_EXPERIMENT_REPRODUCTION_NOT_ADDITIONAL_SEARCH",
+  "source_integrity_gate": "PASS_PUBLIC_TRADE_PRICE_ONLY",
+  "source_manifest_sha256": "e1e8862c58923081b1f1b98a0889089d6ea432a5bc2fa7fa999cea5d03896f34",
+  "source_rows": 439200,
+  "task_id": "V06_G2_BTC_PUBLIC_EMPIRICAL_FAST_DISCOVERY_R1",
+  "terminal": "NO_STRATEGY_CLEARS_COST_AND_SUPPORT_GATE",
+  "trade_ledger_sha256": "4071ebf70f4b2b9635af8f653b8209ed90908e1c98cf820e270a950340f95d77",
+  "worktree": "/root/workspace/project/quant-v0.6/g2-btc-empirical-fast-r1"
+}
