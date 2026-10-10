@@ -1,25 +1,34 @@
-"""Adversarial negative POSIX/Parquet and mutant falsification tests for P2 S3A.
+"""Adversarial negative POSIX/Parquet, R2 F01-F03 repair, and mutant tests for P2 S3A.
 
-Tests 26 negative security/OS/format scenarios and 3 deliberate security mutants
-using real temporary files, symlinks, FIFOs, hardlinks, and corrupted footers
-created inside ``tmp_path``. Never touches the physical owner WSL data root.
+Tests 26 core negative scenarios, 11 R2-specific adversarial regressions (F01
+two-temp-tree ancestor symlink alias, multi-hop parent symlinks, root '..',
+relative root, forbidden surrogate custody, renamed parent/root, mock bind-mount;
+F02 self-minted public SHA-256 checksum token; F03 syscall caps 1, 2, 3, 25, 27, 100
+and non-aborting os.close failure), and 3 deliberate security mutants inside
+``tmp_path``. Never touches ``/root/workspace/project/Quant-agent/data``.
 """
 
 from __future__ import annotations
 
+import errno
+import hashlib
 import os
 from pathlib import Path
 
 import pytest
 
 from scripts.strategy_research.p2_s3_footer_reader import (
+    BUDGET_INSUFFICIENT_STOP_CODE,
+    HARNESS_ROOT_NOT_PROVEN_CODE,
     HEADER_STATUS_NOT_VERIFIED,
     IMMUTABLE_OWNER_DATA_ROOT,
+    SYNTHETIC_GRANT_TOKEN_SEMANTICS,
     ByteBudgetExceededError,
     CliOrEnvRootOverrideForbiddenError,
     CorruptedParquetFooterError,
     EACCESPermissionError,
     ENOENTNotFoundError,
+    FDCloseFailureError,
     GrantAuthorizationError,
     GrantExpiredError,
     GrantScopeEscalationError,
@@ -43,11 +52,13 @@ from scripts.strategy_research.p2_s3_footer_reader import (
     SyscallBudgetExceededError,
     TOCTOUOrFDIdentityError,
     UnapprovedTargetFileError,
+    UntrustedRootCustodyError,
     build_synthetic_parquet_bytes,
     craft_custom_trailer_parquet_bytes,
     create_valid_synthetic_grant,
     materialize_synthetic_pilot_tree,
     parse_in_memory_parquet_footer,
+    register_forbidden_owner_surrogate_tree,
 )
 
 
@@ -57,6 +68,7 @@ def _assert_clean_rejection(exc: Exception, expected_code: str) -> None:
     assert receipt.allowed is False
     assert receipt.decision_code == expected_code
     assert receipt.header_verification_status == HEADER_STATUS_NOT_VERIFIED
+    assert receipt.grant_token_semantics == SYNTHETIC_GRANT_TOKEN_SEMANTICS
     assert receipt.syscall_accounting.open_fds_remaining == 0
     assert receipt.syscall_accounting.owner_root_touched is False
 
@@ -242,7 +254,6 @@ def test_adv16_intermediate_component_is_regular_file(tmp_path: Path) -> None:
 
 def test_adv17_final_target_is_directory_or_fifo(tmp_path: Path) -> None:
     """9. Final target is a directory or FIFO instead of a regular file."""
-    # Subcase A: directory
     dir_root = tmp_path / "dir_case"
     os.makedirs(
         dir_root
@@ -263,7 +274,6 @@ def test_adv17_final_target_is_directory_or_fifo(tmp_path: Path) -> None:
         reader_a.read_single_parquet_footer()
     _assert_clean_rejection(exc_a.value, "DENIED_NON_REGULAR_FILE")
 
-    # Subcase B: FIFO pipe
     fifo_root = tmp_path / "fifo_case"
     month_dir = fifo_root / "research" / "BTCUSDT" / "1m" / "year=2021" / "month=03"
     os.makedirs(month_dir, exist_ok=True)
@@ -329,7 +339,6 @@ def test_adv20_toctou_replacement_or_mutation_between_open_and_read(
 
 def test_adv21_eacces_vs_enoent_distinct_classification(tmp_path: Path) -> None:
     """13. EACCES permission denied vs ENOENT missing file distinct classification."""
-    # ENOENT on missing leaf
     os.makedirs(
         tmp_path / "research" / "BTCUSDT" / "1m" / "year=2021" / "month=03",
         exist_ok=True,
@@ -343,7 +352,6 @@ def test_adv21_eacces_vs_enoent_distinct_classification(tmp_path: Path) -> None:
         reader_enoent.read_single_parquet_footer()
     _assert_clean_rejection(exc_enoent.value, "DENIED_ENOENT_NOT_FOUND")
 
-    # EACCES on permission denied
     materialize_synthetic_pilot_tree(tmp_path)
     reader_eacces = SingleFileParquetFooterReader(
         synthetic_fixture_root=str(tmp_path),
@@ -388,7 +396,6 @@ def test_adv23_missing_unsigned_or_expired_grant_rejected(tmp_path: Path) -> Non
     """15. Missing, unsigned, tampered, or expired grant rejected."""
     materialize_synthetic_pilot_tree(tmp_path)
 
-    # Missing grant
     r_none = SingleFileParquetFooterReader(
         synthetic_fixture_root=str(tmp_path),
         grant=None,
@@ -397,7 +404,6 @@ def test_adv23_missing_unsigned_or_expired_grant_rejected(tmp_path: Path) -> Non
         r_none.read_single_parquet_footer()
     _assert_clean_rejection(exc_none.value, "DENIED_INVALID_OR_MISSING_GRANT")
 
-    # Tampered signature
     valid_grant = create_valid_synthetic_grant(str(tmp_path))
     tampered = SyntheticTestGrant(
         **{**valid_grant.__dict__, "signature_hex": "00" * 32}
@@ -410,7 +416,6 @@ def test_adv23_missing_unsigned_or_expired_grant_rejected(tmp_path: Path) -> Non
         r_tampered.read_single_parquet_footer()
     _assert_clean_rejection(exc_tamp.value, "DENIED_INVALID_OR_MISSING_GRANT")
 
-    # Expired grant
     r_exp = SingleFileParquetFooterReader(
         synthetic_fixture_root=str(tmp_path),
         grant=valid_grant,
@@ -420,7 +425,6 @@ def test_adv23_missing_unsigned_or_expired_grant_rejected(tmp_path: Path) -> Non
         r_exp.read_single_parquet_footer()
     _assert_clean_rejection(exc_exp.value, "DENIED_EXPIRED_GRANT")
 
-    # Scope escalation grant
     escalated = SyntheticTestGrant(
         **{**valid_grant.__dict__, "allow_real_owner_root": True}
     )
@@ -439,7 +443,6 @@ def test_adv24_invalid_parquet_trailer_magic_and_footer_lengths(
     """16 & 17. Invalid magic != PAR1, footer_len <= 0, > 65536, or > file_size."""
     grant = create_valid_synthetic_grant(str(tmp_path))
 
-    # Bad magic
     materialize_synthetic_pilot_tree(
         tmp_path,
         parquet_bytes=craft_custom_trailer_parquet_bytes(
@@ -455,7 +458,6 @@ def test_adv24_invalid_parquet_trailer_magic_and_footer_lengths(
         reader.read_single_parquet_footer()
     _assert_clean_rejection(exc_magic.value, "DENIED_INVALID_PARQUET_TRAILER_MAGIC")
 
-    # footer_len <= 0
     materialize_synthetic_pilot_tree(
         tmp_path,
         parquet_bytes=craft_custom_trailer_parquet_bytes(
@@ -468,7 +470,6 @@ def test_adv24_invalid_parquet_trailer_magic_and_footer_lengths(
         reader.read_single_parquet_footer()
     _assert_clean_rejection(exc_zero.value, "DENIED_INVALID_PARQUET_FOOTER_LENGTH")
 
-    # footer_len > 65536
     materialize_synthetic_pilot_tree(
         tmp_path,
         parquet_bytes=craft_custom_trailer_parquet_bytes(
@@ -481,7 +482,6 @@ def test_adv24_invalid_parquet_trailer_magic_and_footer_lengths(
         reader.read_single_parquet_footer()
     _assert_clean_rejection(exc_over.value, "DENIED_INVALID_PARQUET_FOOTER_LENGTH")
 
-    # footer_len + 8 > file_size - 4
     materialize_synthetic_pilot_tree(
         tmp_path,
         parquet_bytes=craft_custom_trailer_parquet_bytes(
@@ -501,7 +501,6 @@ def test_adv25_truncated_file_short_pread_and_corrupted_thrift(
     """18. Truncated file (< 13 bytes), short pread, and corrupted Thrift footer."""
     grant = create_valid_synthetic_grant(str(tmp_path))
 
-    # Truncated 8-byte file
     materialize_synthetic_pilot_tree(tmp_path, parquet_bytes=b"PAR1PAR1")
     reader = SingleFileParquetFooterReader(
         synthetic_fixture_root=str(tmp_path), grant=grant
@@ -510,7 +509,6 @@ def test_adv25_truncated_file_short_pread_and_corrupted_thrift(
         reader.read_single_parquet_footer()
     _assert_clean_rejection(exc_trunc.value, "DENIED_SHORT_READ_OR_TRUNCATED_FILE")
 
-    # Short pread
     materialize_synthetic_pilot_tree(tmp_path)
     reader_short = SingleFileParquetFooterReader(
         synthetic_fixture_root=str(tmp_path),
@@ -522,7 +520,6 @@ def test_adv25_truncated_file_short_pread_and_corrupted_thrift(
     _assert_clean_rejection(exc_short.value, "DENIED_SHORT_READ_OR_TRUNCATED_FILE")
     assert exc_short.value.receipt.syscall_accounting.short_read_events == 1
 
-    # Corrupted Thrift footer bytes
     materialize_synthetic_pilot_tree(
         tmp_path,
         parquet_bytes=craft_custom_trailer_parquet_bytes(
@@ -544,7 +541,6 @@ def test_adv26_syscall_budget_exhaustion_and_row_group_read_forbidden(
     """19. Attempted FS call budget exhaustion (including failed calls) & row page read block."""
     materialize_synthetic_pilot_tree(tmp_path)
 
-    # Row-group page read request blocked
     grant = create_valid_synthetic_grant(str(tmp_path))
     reader_row = SingleFileParquetFooterReader(
         synthetic_fixture_root=str(tmp_path),
@@ -555,7 +551,6 @@ def test_adv26_syscall_budget_exhaustion_and_row_group_read_forbidden(
         reader_row.read_single_parquet_footer()
     _assert_clean_rejection(exc_row.value, "DENIED_ROW_GROUP_DATA_READ_FORBIDDEN")
 
-    # Tight budget (10 calls) exhausted mid-walk, with all opened FDs cleanly closed
     tight_grant = create_valid_synthetic_grant(
         str(tmp_path), max_attempted_fs_calls=10
     )
@@ -565,21 +560,293 @@ def test_adv26_syscall_budget_exhaustion_and_row_group_read_forbidden(
     )
     with pytest.raises(SyscallBudgetExceededError) as exc_tight:
         reader_tight.read_single_parquet_footer()
-    _assert_clean_rejection(exc_tight.value, "DENIED_SYSCALL_BUDGET_EXCEEDED")
+    _assert_clean_rejection(exc_tight.value, BUDGET_INSUFFICIENT_STOP_CODE)
     assert exc_tight.value.receipt.syscall_accounting.attempted_fs_calls_total <= 10
 
-    # 100 failed openat calls hit hard ceiling of 100 on the 101st attempt
+    # 99 failed openat calls leave 1 slot; the 100th openat requires 1 open + 1
+    # reserved close = 2 slots, so it stops at 99 <= 100 with BUDGET_INSUFFICIENT_STOP.
     wrapper = MeteredPosixSyscallWrapper(max_attempted_fs_calls=100)
-    for _ in range(100):
+    for _ in range(99):
         with pytest.raises(ENOENTNotFoundError):
             wrapper.open_anchored_root_dir(str(tmp_path / "does_not_exist"))
-    assert wrapper.attempted_fs_calls_total == 100
-    with pytest.raises(SyscallBudgetExceededError):
+    assert wrapper.attempted_fs_calls_total == 99
+    with pytest.raises(SyscallBudgetExceededError) as exc_100:
         wrapper.open_anchored_root_dir(str(tmp_path / "does_not_exist"))
+    assert exc_100.value.decision_code == BUDGET_INSUFFICIENT_STOP_CODE
+    assert wrapper.attempted_fs_calls_total == 99
 
-    # Byte budget exceeded on wrapper
     with pytest.raises(ByteBudgetExceededError):
         MeteredPosixSyscallWrapper(max_footer_read_bytes=70_000)
+
+
+# --- R2 F01, F02, F03 ADVERSARIAL REGRESSIONS (11 tests) ---
+
+
+def test_adv27_r2_f01_two_temp_trees_ancestor_symlink_escape_blocked(
+    tmp_path: Path,
+) -> None:
+    """R2 F01: Two temp trees (allowed + forbidden surrogate) with ancestor symlink alias.
+
+    Proves old R1 unguarded ``os.open(alias_root, O_DIRECTORY|O_NOFOLLOW)`` reaches
+    the forbidden surrogate inode, while the repaired R2 reader rejects before
+    reading any footer bytes.
+    """
+    allowed_tree = tmp_path / "allowed_fixture_tree"
+    os.makedirs(allowed_tree, exist_ok=True)
+    forbidden_surrogate = tmp_path / "forbidden_owner_surrogate"
+    surrogate_data_root = forbidden_surrogate / "data_root"
+    materialize_synthetic_pilot_tree(surrogate_data_root)
+    register_forbidden_owner_surrogate_tree(forbidden_surrogate)
+
+    ancestor_symlink = allowed_tree / "ancestor_symlink_to_surrogate"
+    os.symlink(forbidden_surrogate, ancestor_symlink)
+    alias_root = str(ancestor_symlink / "data_root")
+
+    # 1. Prove old unguarded os.open(alias_root, O_DIRECTORY|O_NOFOLLOW) followed
+    #    ancestor_symlink right into forbidden_surrogate/data_root:
+    old_fd = os.open(
+        alias_root,
+        os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW | os.O_CLOEXEC,
+    )
+    try:
+        old_st = os.fstat(old_fd)
+    finally:
+        os.close(old_fd)
+    surrogate_st = os.stat(surrogate_data_root, follow_symlinks=False)
+    assert (old_st.st_dev, old_st.st_ino) == (
+        surrogate_st.st_dev,
+        surrogate_st.st_ino,
+    )
+
+    # 2. Prove repaired R2 reader rejects alias_root before reading any footer bytes:
+    self_minted_grant = create_valid_synthetic_grant(
+        alias_root, attest_root_custody=False
+    )
+    reader = SingleFileParquetFooterReader(
+        synthetic_fixture_root=alias_root,
+        grant=self_minted_grant,
+    )
+    with pytest.raises(SymlinkDetectedError) as exc_info:
+        reader.read_single_parquet_footer()
+    _assert_clean_rejection(exc_info.value, "DENIED_SYMLINK_DETECTED")
+    assert exc_info.value.receipt.syscall_accounting.actual_read_bytes_total == 0
+
+
+def test_adv28_r2_f01_multi_hop_parent_symlinks_and_dangling_parent(
+    tmp_path: Path,
+) -> None:
+    """R2 F01: Multi-hop parent symlink chain and dangling parent symlink rejected."""
+    forbidden_surrogate = tmp_path / "forbidden_surrogate"
+    materialize_synthetic_pilot_tree(forbidden_surrogate / "data_root")
+    register_forbidden_owner_surrogate_tree(forbidden_surrogate)
+
+    hop2 = tmp_path / "hop2_sym"
+    hop1 = tmp_path / "hop1_sym"
+    os.symlink(forbidden_surrogate, hop2)
+    os.symlink(hop2, hop1)
+    multi_hop_root = str(hop1 / "data_root")
+
+    grant_multi = create_valid_synthetic_grant(
+        multi_hop_root, attest_root_custody=False
+    )
+    reader_multi = SingleFileParquetFooterReader(
+        synthetic_fixture_root=multi_hop_root,
+        grant=grant_multi,
+    )
+    with pytest.raises(SymlinkDetectedError) as exc_multi:
+        reader_multi.read_single_parquet_footer()
+    _assert_clean_rejection(exc_multi.value, "DENIED_SYMLINK_DETECTED")
+
+    # Dangling parent symlink
+    dangling_parent = tmp_path / "dangling_sym"
+    os.symlink(tmp_path / "nonexistent_target", dangling_parent)
+    dangling_root = str(dangling_parent / "data_root")
+    grant_dangling = create_valid_synthetic_grant(
+        dangling_root, attest_root_custody=False
+    )
+    reader_dangling = SingleFileParquetFooterReader(
+        synthetic_fixture_root=dangling_root,
+        grant=grant_dangling,
+    )
+    with pytest.raises(SymlinkDetectedError) as exc_dang:
+        reader_dangling.read_single_parquet_footer()
+    _assert_clean_rejection(exc_dang.value, "DENIED_SYMLINK_DETECTED")
+
+
+def test_adv29_r2_f01_root_dotdot_relative_surrogate_renamed_and_bind_mount(
+    tmp_path: Path,
+) -> None:
+    """R2 F01: Root '..', relative path, forbidden surrogate, renamed parent, and bind-mount."""
+    allowed = tmp_path / "allowed"
+    forbidden = tmp_path / "forbidden_surrogate"
+    os.makedirs(allowed, exist_ok=True)
+    surrogate_leaf = materialize_synthetic_pilot_tree(forbidden)
+    register_forbidden_owner_surrogate_tree(forbidden)
+
+    # 1. '..' in synthetic_fixture_root
+    dotdot_root = f"{allowed}/../forbidden_surrogate"
+    grant_dd = create_valid_synthetic_grant(dotdot_root, attest_root_custody=False)
+    with pytest.raises(PathSyntaxOrTraversalError) as exc_dd:
+        SingleFileParquetFooterReader(
+            synthetic_fixture_root=dotdot_root, grant=grant_dd
+        ).read_single_parquet_footer()
+    _assert_clean_rejection(exc_dd.value, "DENIED_PATH_SYNTAX_OR_TRAVERSAL")
+
+    # 2. Relative synthetic_fixture_root
+    rel_root = "relative/fixture/root"
+    grant_rel = create_valid_synthetic_grant(rel_root, attest_root_custody=False)
+    with pytest.raises(PathSyntaxOrTraversalError) as exc_rel:
+        SingleFileParquetFooterReader(
+            synthetic_fixture_root=rel_root, grant=grant_rel
+        ).read_single_parquet_footer()
+    _assert_clean_rejection(exc_rel.value, "DENIED_PATH_SYNTAX_OR_TRAVERSAL")
+
+    # 3. Direct forbidden owner-surrogate root -> S3A_HARNESS_ROOT_IDENTITY_NOT_PROVEN
+    grant_surr = create_valid_synthetic_grant(str(forbidden), attest_root_custody=True)
+    with pytest.raises(UntrustedRootCustodyError) as exc_surr:
+        SingleFileParquetFooterReader(
+            synthetic_fixture_root=str(forbidden), grant=grant_surr
+        ).read_single_parquet_footer()
+    _assert_clean_rejection(exc_surr.value, HARNESS_ROOT_NOT_PROVEN_CODE)
+
+    # 4. Renamed parent/root after custody attestation -> S3A_HARNESS_ROOT_IDENTITY_NOT_PROVEN
+    ephem_parent = tmp_path / "ephem_parent"
+    ephem_root = ephem_parent / "root"
+    materialize_synthetic_pilot_tree(ephem_root)
+    grant_ephem = create_valid_synthetic_grant(str(ephem_root), attest_root_custody=True)
+    os.rename(ephem_parent, tmp_path / "ephem_parent_old")
+    os.makedirs(ephem_root, exist_ok=True)
+    materialize_synthetic_pilot_tree(ephem_root)
+    with pytest.raises(UntrustedRootCustodyError) as exc_ren:
+        SingleFileParquetFooterReader(
+            synthetic_fixture_root=str(ephem_root), grant=grant_ephem
+        ).read_single_parquet_footer()
+    _assert_clean_rejection(exc_ren.value, HARNESS_ROOT_NOT_PROVEN_CODE)
+
+    # 5. Hardlink from allowed tree leaf to forbidden surrogate leaf
+    hardlink_root = tmp_path / "hardlink_to_surrogate_root"
+    month_dir = hardlink_root / "research" / "BTCUSDT" / "1m" / "year=2021" / "month=03"
+    os.makedirs(month_dir, exist_ok=True)
+    os.link(surrogate_leaf, month_dir / "data.parquet")
+    grant_hl = create_valid_synthetic_grant(str(hardlink_root), attest_root_custody=True)
+    with pytest.raises((UntrustedRootCustodyError, HardlinkOrAliasError)) as exc_hl:
+        SingleFileParquetFooterReader(
+            synthetic_fixture_root=str(hardlink_root), grant=grant_hl
+        ).read_single_parquet_footer()
+    assert exc_hl.value.receipt.allowed is False
+    assert exc_hl.value.receipt.syscall_accounting.actual_read_bytes_total == 0
+
+    # 6. Mock bind-mount on root FD (st_dev change)
+    bm_root = tmp_path / "bind_mount_root"
+    materialize_synthetic_pilot_tree(bm_root)
+    grant_bm = create_valid_synthetic_grant(str(bm_root), attest_root_custody=True)
+    with pytest.raises(MountBoundaryEscapeError) as exc_bm:
+        SingleFileParquetFooterReader(
+            synthetic_fixture_root=str(bm_root),
+            grant=grant_bm,
+            simulated_dev_overrides={"<root>": 777_777_777},
+        ).read_single_parquet_footer()
+    _assert_clean_rejection(exc_bm.value, "DENIED_MOUNT_BOUNDARY_ESCAPE")
+
+
+def test_adv30_r2_f02_public_checksum_self_mint_and_honest_semantics(
+    tmp_path: Path,
+) -> None:
+    """R2 F02: Caller can recompute public SHA-256 checksum; self-minted token never grants access."""
+    unattested_dir = tmp_path / "self_minted_target"
+    materialize_synthetic_pilot_tree(unattested_dir)
+
+    # Caller manually constructs a grant and computes its public unkeyed SHA-256 checksum
+    raw_grant = SyntheticTestGrant(
+        grant_id="CALLER-SELF-MINTED-999",
+        stage_scope="S3A_SYNTHETIC_FOOTER_ONLY",
+        allowed_rel_path="research/BTCUSDT/1m/year=2021/month=03/data.parquet",
+        synthetic_fixture_root=str(unattested_dir),
+        issued_at_epoch_s=1_700_000_000,
+        expires_at_epoch_s=1_900_000_000,
+    )
+    recomputed_sha256 = hashlib.sha256(
+        (
+            f"TEST_ONLY_INTEGRITY_CHECKSUM_NOT_AUTHORIZATION_V2|"
+            f"semantics={SYNTHETIC_GRANT_TOKEN_SEMANTICS}|"
+            f"grant_id={raw_grant.grant_id}|"
+            f"stage_scope={raw_grant.stage_scope}|"
+            f"allowed_rel_path={raw_grant.allowed_rel_path}|"
+            f"synthetic_fixture_root={raw_grant.synthetic_fixture_root}|"
+            f"issued_at={raw_grant.issued_at_epoch_s}|"
+            f"expires_at={raw_grant.expires_at_epoch_s}|"
+            f"max_calls={raw_grant.max_attempted_fs_calls}|"
+            f"max_trailer={raw_grant.max_trailer_read_bytes}|"
+            f"max_footer={raw_grant.max_footer_read_bytes}|"
+            f"max_total={raw_grant.max_total_read_bytes}|"
+            f"allow_rows=0|allow_owner=0"
+        ).encode()
+    ).hexdigest()
+    assert recomputed_sha256 == raw_grant.compute_expected_checksum()
+
+    self_minted = SyntheticTestGrant(
+        **{**raw_grant.__dict__, "signature_hex": recomputed_sha256}
+    )
+    assert self_minted.token_semantics == "TEST_ONLY_INTEGRITY_CHECKSUM_NOT_AUTHORIZATION"
+    assert self_minted.is_external_authority_grant is False
+
+    # Self-minted token without proven harness custody is rejected fail-closed:
+    reader = SingleFileParquetFooterReader(
+        synthetic_fixture_root=str(unattested_dir),
+        grant=self_minted,
+    )
+    with pytest.raises(UntrustedRootCustodyError) as exc_info:
+        reader.read_single_parquet_footer()
+    _assert_clean_rejection(exc_info.value, HARNESS_ROOT_NOT_PROVEN_CODE)
+
+
+@pytest.mark.parametrize("cap", [1, 2, 3, 25, 27, 100])
+def test_adv31_to_adv36_r2_f03_syscall_cap_matrix_1_2_3_25_27_100(
+    tmp_path: Path,
+    cap: int,
+) -> None:
+    """R2 F03: Syscall caps 1, 2, 3, 25, 27, 100 never exceed cap or leak FDs."""
+    materialize_synthetic_pilot_tree(tmp_path)
+    grant = create_valid_synthetic_grant(str(tmp_path), max_attempted_fs_calls=cap)
+    reader = SingleFileParquetFooterReader(
+        synthetic_fixture_root=str(tmp_path),
+        grant=grant,
+    )
+    if cap < 27:
+        with pytest.raises(SyscallBudgetExceededError) as exc_info:
+            reader.read_single_parquet_footer()
+        _assert_clean_rejection(exc_info.value, BUDGET_INSUFFICIENT_STOP_CODE)
+        snap = exc_info.value.receipt.syscall_accounting
+        assert snap.attempted_fs_calls_total <= cap
+        assert snap.open_fds_remaining == 0
+    else:
+        receipt = reader.read_single_parquet_footer()
+        assert receipt.allowed is True
+        assert receipt.decision_code == "ALLOWED_SINGLE_FILE_FOOTER_SCHEMA_PARSED"
+        assert receipt.syscall_accounting.attempted_fs_calls_total == 27
+        assert receipt.syscall_accounting.attempted_fs_calls_total <= cap
+        assert receipt.syscall_accounting.open_fds_remaining == 0
+
+
+def test_adv37_r2_f03_os_close_failure_does_not_abort_cleanup_or_pass(
+    tmp_path: Path,
+) -> None:
+    """R2 F03: Simulated os.close error closes all other FDs and fails closed."""
+    materialize_synthetic_pilot_tree(tmp_path)
+    grant = create_valid_synthetic_grant(str(tmp_path))
+    reader = SingleFileParquetFooterReader(
+        synthetic_fixture_root=str(tmp_path),
+        grant=grant,
+        simulated_close_errno_by_label={"month=03": errno.EIO},
+    )
+    with pytest.raises(FDCloseFailureError) as exc_info:
+        reader.read_single_parquet_footer()
+    _assert_clean_rejection(exc_info.value, "DENIED_FD_CLEANUP_CLOSE_FAILED")
+    snap = exc_info.value.receipt.syscall_accounting
+    assert snap.close_attempted == 8
+    assert snap.close_failed == 1
+    assert snap.close_succeeded == 7
+    assert snap.open_fds_remaining == 0
 
 
 # --- DELIBERATE MUTANT FALSIFICATION TESTS (3) ---

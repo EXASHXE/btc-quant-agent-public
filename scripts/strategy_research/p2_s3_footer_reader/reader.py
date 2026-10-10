@@ -4,18 +4,27 @@ Enforces:
 1. Zero production/owner-root execution: any reference to
    ``/root/workspace/project/Quant-agent/data`` or CLI/env overrides is rejected
    before any OS syscall.
-2. Exact single pilot relative path allowlist:
+2. Trusted temporary fixture root custody (R2 F01): ancestor components from ``/``
+   are walked with ``O_DIRECTORY | O_NOFOLLOW | O_CLOEXEC`` and verified against
+   harness-attested ``TrustedTempRootCustody`` ``(st_dev, st_ino)`` expectations
+   and forbidden owner-surrogate inode sets; unattested roots fail closed with
+   ``S3A_HARNESS_ROOT_IDENTITY_NOT_PROVEN``.
+3. Honest synthetic token semantics (R2 F02): ``SyntheticTestGrant`` uses a
+   public SHA-256 checksum labeled ``TEST_ONLY_INTEGRITY_CHECKSUM_NOT_AUTHORIZATION``
+   and cannot authorize unattested or production roots.
+4. Exact single pilot relative path allowlist:
    ``research/BTCUSDT/1m/year=2021/month=03/data.parquet``.
-3. Component-by-component ``os.open(..., dir_fd=parent_fd)`` walk with
+5. Component-by-component ``os.open(..., dir_fd=parent_fd)`` walk with
    ``O_DIRECTORY | O_NOFOLLOW | O_CLOEXEC`` for intermediate directories and
    ``O_RDONLY | O_NOFOLLOW | O_CLOEXEC | O_NONBLOCK`` for the leaf file.
-4. Per-hop ``fstat`` verification of directory/regular-file mode, constant
+6. Per-hop ``fstat`` verification of directory/regular-file mode, constant
    ``st_dev`` (no mount escape), and ``st_nlink == 1`` on the leaf file.
-5. Bounded two-step ``os.pread`` of the 8-byte trailer and ``<= 65,536``-byte
+7. Bounded two-step ``os.pread`` of the 8-byte trailer and ``<= 65,536``-byte
    Thrift footer (``<= 65,544`` bytes total), followed by post-read ``fstat`` and
    parent-directory reopen ``(st_dev, st_ino, st_size, st_mtime_ns)`` TOCTOU
    identity verification.
-6. Deterministic ``finally:`` closure of all opened directory and file FDs.
+8. Deterministic ``finally:`` closure of all opened directory and file FDs, with
+   any ``os.close`` failure raising ``FDCloseFailureError``.
 """
 
 from __future__ import annotations
@@ -32,6 +41,7 @@ from scripts.strategy_research.p2_s3_footer_reader.constants import (
     PROTECTED_PATH_TOKENS,
     S3_SINGLE_PILOT_COMPONENTS,
     S3_SINGLE_PILOT_REL_PATH,
+    SYNTHETIC_GRANT_TOKEN_SEMANTICS,
 )
 from scripts.strategy_research.p2_s3_footer_reader.errors import (
     CliOrEnvRootOverrideForbiddenError,
@@ -50,10 +60,12 @@ from scripts.strategy_research.p2_s3_footer_reader.errors import (
     ShortReadOrTruncatedFileError,
     TOCTOUOrFDIdentityError,
     UnapprovedTargetFileError,
+    UntrustedRootCustodyError,
 )
 from scripts.strategy_research.p2_s3_footer_reader.fd_syscall_wrapper import (
     MeteredPosixSyscallWrapper,
     assert_not_owner_data_root,
+    validate_and_split_temp_root_path,
 )
 from scripts.strategy_research.p2_s3_footer_reader.footer_parser import (
     parse_in_memory_parquet_footer,
@@ -62,6 +74,9 @@ from scripts.strategy_research.p2_s3_footer_reader.footer_parser import (
 from scripts.strategy_research.p2_s3_footer_reader.types import (
     FooterReadExecutionReceipt,
     SyntheticTestGrant,
+    TrustedTempRootCustody,
+    get_registered_trusted_custody,
+    is_forbidden_surrogate_inode,
 )
 
 
@@ -100,8 +115,8 @@ def validate_synthetic_grant(
     *,
     synthetic_fixture_root: str,
     current_epoch_s: int,
-) -> None:
-    """Validate synthetic test grant authenticity, expiry, and scope before any syscall."""
+) -> TrustedTempRootCustody | None:
+    """Validate synthetic test grant structure, expiry, scope, and custody reference."""
     if grant is None or not isinstance(grant, SyntheticTestGrant):
         raise GrantAuthorizationError(
             "Missing or invalid SyntheticTestGrant; default policy is fail-closed DENY."
@@ -114,6 +129,15 @@ def validate_synthetic_grant(
         raise RowGroupDataReadForbiddenError(
             "Grant attempts to authorize row-group or page data reads (forbidden in S3)."
         )
+    if grant.is_external_authority_grant:
+        raise GrantScopeEscalationError(
+            "SyntheticTestGrant falsely claims external authority (forbidden in S3A)."
+        )
+    if grant.token_semantics != SYNTHETIC_GRANT_TOKEN_SEMANTICS:
+        raise GrantAuthorizationError(
+            f"Invalid grant token_semantics={grant.token_semantics!r}; must be "
+            f"{SYNTHETIC_GRANT_TOKEN_SEMANTICS!r}."
+        )
     if grant.stage_scope != "S3A_SYNTHETIC_FOOTER_ONLY":
         raise GrantScopeEscalationError(
             f"Unsupported grant stage_scope={grant.stage_scope!r}; "
@@ -121,12 +145,12 @@ def validate_synthetic_grant(
         )
     if not grant.grant_id or not grant.signature_hex:
         raise GrantAuthorizationError(
-            "Grant is missing grant_id or cryptographic signature_hex."
+            "Grant is missing grant_id or structural integrity checksum."
         )
-    expected_sig = grant.compute_expected_signature()
-    if grant.signature_hex != expected_sig:
+    expected_checksum = grant.compute_expected_checksum()
+    if grant.signature_hex != expected_checksum:
         raise GrantAuthorizationError(
-            "Grant signature verification failed (tampered or forged grant)."
+            "Grant structural integrity checksum mismatch (tampered grant)."
         )
     if grant.expires_at_epoch_s <= grant.issued_at_epoch_s:
         raise GrantExpiredError(
@@ -152,6 +176,7 @@ def validate_synthetic_grant(
             f"Grant allowed_rel_path {grant.allowed_rel_path!r} is not the single "
             f"S3 pilot path {S3_SINGLE_PILOT_REL_PATH!r}."
         )
+    return get_registered_trusted_custody(grant.trusted_custody_id)
 
 
 def validate_and_split_single_pilot_rel_path(rel_path: str) -> tuple[str, ...]:
@@ -222,6 +247,7 @@ class SingleFileParquetFooterReader:
         env_vars: Mapping[str, str] | None = None,
         simulated_dev_overrides: dict[str, int] | None = None,
         simulated_open_errno_by_label: dict[str, int] | None = None,
+        simulated_close_errno_by_label: dict[str, int] | None = None,
         short_read_truncate_bytes: int | None = None,
         post_trailer_pread_hook: Callable[[], None] | None = None,
         request_extra_row_page_read: bool = False,
@@ -236,6 +262,9 @@ class SingleFileParquetFooterReader:
         self._simulated_dev_overrides: dict[str, int] | None = simulated_dev_overrides
         self._simulated_open_errno_by_label: dict[str, int] | None = (
             simulated_open_errno_by_label
+        )
+        self._simulated_close_errno_by_label: dict[str, int] | None = (
+            simulated_close_errno_by_label
         )
         self._short_read_truncate_bytes: int | None = short_read_truncate_bytes
         self._post_trailer_pread_hook: Callable[[], None] | None = (
@@ -285,6 +314,7 @@ class SingleFileParquetFooterReader:
                 max_total_read_bytes=max_total,
                 simulated_dev_overrides=self._simulated_dev_overrides,
                 simulated_open_errno_by_label=self._simulated_open_errno_by_label,
+                simulated_close_errno_by_label=self._simulated_close_errno_by_label,
                 short_read_truncate_bytes=self._short_read_truncate_bytes,
                 post_trailer_pread_hook=self._post_trailer_pread_hook,
             )
@@ -298,14 +328,8 @@ class SingleFileParquetFooterReader:
                     "Production mode or disabled synthetic_test_mode is forbidden in S3A."
                 )
 
-            # 3. Reject any reference to the physical owner WSL data root before any syscall.
-            if not isinstance(self._synthetic_fixture_root, str) or not (
-                self._synthetic_fixture_root.strip()
-            ):
-                raise PathSyntaxOrTraversalError(
-                    "synthetic_fixture_root must be a non-empty string."
-                )
-            assert_not_owner_data_root(self._synthetic_fixture_root)
+            # 3. Validate fixture root path syntax, owner-root block, and temp prefix.
+            validate_and_split_temp_root_path(self._synthetic_fixture_root)
 
             # 4. Reject any request to read row-group / data pages.
             if self._request_extra_row_page_read:
@@ -316,21 +340,48 @@ class SingleFileParquetFooterReader:
             # 5. Validate relative target path before any syscall.
             components = validate_and_split_single_pilot_rel_path(rel_path)
 
-            # 6. Validate synthetic test grant authenticity, expiry, and scope.
-            validate_synthetic_grant(
+            # 6. Validate synthetic test grant structure, expiry, scope, and custody.
+            trusted_custody = validate_synthetic_grant(
                 self._grant,
                 synthetic_fixture_root=self._synthetic_fixture_root,
                 current_epoch_s=self._current_epoch_s,
             )
 
-            # 7. Open anchored root directory FD with O_DIRECTORY | O_NOFOLLOW | O_CLOEXEC.
-            root_fd = wrapper.open_anchored_root_dir(self._synthetic_fixture_root)
+            # 7. Open anchored root directory FD via component-by-component ancestor walk
+            #    and verify harness root custody (R2 F01).
+            root_fd = wrapper.open_anchored_root_dir(
+                self._synthetic_fixture_root,
+                trusted_custody=trusted_custody,
+                require_trusted_custody=True,
+            )
             root_st = wrapper.fstat_fd(root_fd)
             if not stat.S_ISDIR(root_st.st_mode):
                 raise NotADirectoryComponentError(
                     "Anchored root FD is not a directory after fstat."
                 )
             root_dev = int(root_st.st_dev)
+            root_ino = int(root_st.st_ino)
+            if is_forbidden_surrogate_inode(root_dev, root_ino):
+                raise UntrustedRootCustodyError(
+                    "Anchored root FD resolves to a forbidden owner-surrogate inode."
+                )
+            if trusted_custody is not None:
+                if root_dev != trusted_custody.expected_parent_dev:
+                    raise MountBoundaryEscapeError(
+                        f"Root st_dev={root_dev} differs from attested parent "
+                        f"st_dev={trusted_custody.expected_parent_dev}."
+                    )
+                if (
+                    trusted_custody.expected_root_ino is not None
+                    and (
+                        root_dev != trusted_custody.expected_root_dev
+                        or root_ino != trusted_custody.expected_root_ino
+                    )
+                ):
+                    raise UntrustedRootCustodyError(
+                        "Root directory (st_dev, st_ino) changed after harness "
+                        "custody attestation."
+                    )
 
             # 8. Walk intermediate directories component-by-component via openat(dir_fd).
             parent_fd = root_fd
@@ -345,6 +396,11 @@ class SingleFileParquetFooterReader:
                     raise MountBoundaryEscapeError(
                         f"Cross-device mount boundary escape detected at directory "
                         f"{comp!r}: st_dev={dir_st.st_dev} != root_dev={root_dev}."
+                    )
+                if is_forbidden_surrogate_inode(dir_st.st_dev, dir_st.st_ino):
+                    raise UntrustedRootCustodyError(
+                        f"Directory component {comp!r} aliases a forbidden "
+                        "owner-surrogate inode."
                     )
                 parent_fd = next_dir_fd
 
@@ -362,6 +418,11 @@ class SingleFileParquetFooterReader:
                 raise MountBoundaryEscapeError(
                     f"Cross-device mount boundary escape detected at leaf "
                     f"{leaf_name!r}: st_dev={leaf_st_pre.st_dev} != root_dev={root_dev}."
+                )
+            if is_forbidden_surrogate_inode(leaf_st_pre.st_dev, leaf_st_pre.st_ino):
+                raise UntrustedRootCustodyError(
+                    f"Target leaf {leaf_name!r} aliases a forbidden "
+                    "owner-surrogate inode."
                 )
             if int(leaf_st_pre.st_nlink) > 1:
                 raise HardlinkOrAliasError(
@@ -436,9 +497,12 @@ class SingleFileParquetFooterReader:
                 max_footer_bytes=max_footer,
             )
 
+            # 15. Close all remaining open FDs and fail closed if any close failed (R2 F03).
+            wrapper.close_all_open_fds(raise_on_failure=True)
+
         except S3FooterReaderError as exc:
             if wrapper is not None:
-                wrapper.close_all_open_fds()
+                wrapper.close_all_open_fds(raise_on_failure=False)
                 snap = wrapper.snapshot()
             else:
                 fallback = MeteredPosixSyscallWrapper()
@@ -453,12 +517,13 @@ class SingleFileParquetFooterReader:
                 header_verification_status=HEADER_STATUS_NOT_VERIFIED,
                 syscall_accounting=snap,
                 schema_metadata=None,
+                grant_token_semantics=SYNTHETIC_GRANT_TOKEN_SEMANTICS,
             )
             exc.receipt = err_receipt  # type: ignore[attr-defined]
             raise
         finally:
             if wrapper is not None:
-                wrapper.close_all_open_fds()
+                wrapper.close_all_open_fds(raise_on_failure=False)
 
         final_snap = wrapper.snapshot()
         return FooterReadExecutionReceipt(
@@ -471,6 +536,7 @@ class SingleFileParquetFooterReader:
             header_verification_status=HEADER_STATUS_NOT_VERIFIED,
             syscall_accounting=final_snap,
             schema_metadata=sanitized_meta,
+            grant_token_semantics=SYNTHETIC_GRANT_TOKEN_SEMANTICS,
         )
 
     def evaluate_to_receipt(

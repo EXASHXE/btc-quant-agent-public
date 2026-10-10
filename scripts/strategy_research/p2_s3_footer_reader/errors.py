@@ -6,6 +6,11 @@ execution receipts and security oracle verification.
 
 from __future__ import annotations
 
+from scripts.strategy_research.p2_s3_footer_reader.constants import (
+    BUDGET_INSUFFICIENT_STOP_CODE,
+    HARNESS_ROOT_NOT_PROVEN_CODE,
+)
+
 
 class S3FooterReaderError(Exception):
     """Base exception for all fail-closed violations in the S3A footer reader."""
@@ -22,6 +27,12 @@ class ProductionExecutionForbiddenError(S3FooterReaderError):
     """Raised when attempting to target the real owner data root or run in production."""
 
     default_decision_code = "DENIED_PRODUCTION_OR_OWNER_ROOT_FORBIDDEN"
+
+
+class UntrustedRootCustodyError(S3FooterReaderError):
+    """Raised when fixture root custody/identity is not proven by the test harness."""
+
+    default_decision_code = HARNESS_ROOT_NOT_PROVEN_CODE
 
 
 class CliOrEnvRootOverrideForbiddenError(S3FooterReaderError):
@@ -67,13 +78,13 @@ class UnapprovedTargetFileError(S3FooterReaderError):
 
 
 class SymlinkDetectedError(S3FooterReaderError):
-    """Raised when the root, any intermediate directory, or the leaf file is a symlink."""
+    """Raised when the root, any ancestor, any intermediate directory, or leaf is a symlink."""
 
     default_decision_code = "DENIED_SYMLINK_DETECTED"
 
 
 class NotADirectoryComponentError(S3FooterReaderError):
-    """Raised when the root or an intermediate path component is not a directory."""
+    """Raised when the root, an ancestor, or an intermediate component is not a directory."""
 
     default_decision_code = "DENIED_NOT_A_DIRECTORY_COMPONENT"
 
@@ -115,9 +126,15 @@ class ENOENTNotFoundError(S3FooterReaderError):
 
 
 class SyscallBudgetExceededError(S3FooterReaderError):
-    """Raised when attempted FS syscalls would exceed max_attempted_fs_calls."""
+    """Raised when attempted FS syscalls (plus reserved closes) exceed max_attempted_fs_calls."""
 
-    default_decision_code = "DENIED_SYSCALL_BUDGET_EXCEEDED"
+    default_decision_code = BUDGET_INSUFFICIENT_STOP_CODE
+
+
+class FDCloseFailureError(S3FooterReaderError):
+    """Raised when one or more os.close calls fail during file descriptor cleanup."""
+
+    default_decision_code = "DENIED_FD_CLEANUP_CLOSE_FAILED"
 
 
 class ByteBudgetExceededError(S3FooterReaderError):
@@ -192,6 +209,7 @@ __all__ = [
     "CorruptedParquetFooterError",
     "EACCESPermissionError",
     "ENOENTNotFoundError",
+    "FDCloseFailureError",
     "GrantAuthorizationError",
     "GrantExpiredError",
     "GrantScopeEscalationError",
@@ -216,4 +234,5 @@ __all__ = [
     "TOCTOUOrFDIdentityError",
     "UnapprovedTargetFileError",
     "UnsupportedPlatformError",
+    "UntrustedRootCustodyError",
 ]

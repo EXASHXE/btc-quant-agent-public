@@ -1,35 +1,71 @@
-"""Synthetic POSIX FS and Parquet footer security oracle runner for P2 S3A.
+"""Synthetic POSIX FS and Parquet footer security oracle runner for P2 S3A (R1 & R2).
 
-Executes 30 deterministic positive and adversarial negative scenarios against
-real temporary directory trees created via ``tempfile.TemporaryDirectory()``,
-plus 3 deliberate mutant falsification proofs. Never touches the physical owner
-WSL data root ``/root/workspace/project/Quant-agent/data``.
+Executes:
+- 30 core positive and adversarial negative scenarios against real temporary
+  directory trees created via ``tempfile.TemporaryDirectory()``
+- 3 deliberate mutant falsification proofs
+- R2 supplemental bounded security repair verification suite covering:
+  - F01: Two-temp-tree ancestor symlink escape (allowed tree + forbidden owner
+    surrogate tree), proving old unguarded ``os.open(root, O_NOFOLLOW)`` reaches
+    the forbidden surrogate while the repaired R2 reader rejects before reading
+    any footer bytes; plus multi-hop parent symlinks, ``../``, relative aliases,
+    hardlinks, dangling/renamed parents, mock bind-mount, and unattested roots
+    returning ``S3A_HARNESS_ROOT_IDENTITY_NOT_PROVEN``.
+  - F02: Honest ``TEST_ONLY_INTEGRITY_CHECKSUM_NOT_AUTHORIZATION`` token
+    semantics proving a caller can recompute the public SHA-256 checksum and
+    that self-minted tokens never grant access to unattested, surrogate, or
+    owner roots.
+  - F03: First-open close slot reservation across ``max_attempted_fs_calls =
+    1, 2, 3, 25, 27, 100`` with ``BUDGET_INSUFFICIENT_STOP`` classification,
+    zero FD leaks, and non-aborting ``os.close`` failure handling.
+  - F04: Row-wise verification of all 6 BTC 1m monthly file sizes and 7
+    auxiliary file sizes against the parsed immutable ``c6823dbc46249cac43aa10400aacbbe9f4542410``
+    JSON receipt (SHA-256 ``a3c9169dcbeb31edce492791ef253e42c580411cdb014337e8084229aaaaf3f2``).
 """
 
 from __future__ import annotations
 
+import base64
+import errno
+import hashlib
+import json
 import os
 import struct
+import subprocess
 import tempfile
+import zlib
 from pathlib import Path
 from typing import Any
 
 from scripts.strategy_research.p2_s3_footer_reader.constants import (
+    BUDGET_INSUFFICIENT_STOP_CODE,
     CODE_START_SHA,
     CONTROLLER_DISPATCH_SHA,
     CONTROLLER_S2_JOINT_DECISION_SHA,
+    ETH_SOL_1M_PERP_STATUS,
+    HARNESS_ROOT_NOT_PROVEN_CODE,
     HEADER_STATUS_NOT_VERIFIED,
     IMMUTABLE_OWNER_DATA_ROOT,
     MAX_ATTEMPTED_FS_CALLS,
     MAX_FOOTER_READ_BYTES,
     MAX_TOTAL_FILE_READ_BYTES,
     MAX_TRAILER_READ_BYTES,
+    ORIGINAL_STAT_RECEIPT_JSON_SHA256,
     ORIGINAL_STAT_RECEIPT_SHA,
     PROMPT_SHA,
+    R1_TO_R2_BTC_SIZE_ERRATA_MAP,
+    R2_CONTROLLER_DISPATCH_SHA,
+    R2_EXACT_START_SHA,
+    R2_PROMPT_SHA,
+    R2_TASK_ID,
     S3_SINGLE_PILOT_EXPECTED_SIZE_BYTES,
     S3_SINGLE_PILOT_REL_PATH,
+    S3A_R2_TERMINAL_STATUS,
     S3A_TERMINAL_STATUS,
+    SYNTHETIC_GRANT_TOKEN_SEMANTICS,
     TASK_ID,
+    VERIFIED_C6823DBC_BTC_CANDIDATE_MONTH_SIZES_BYTES,
+    VERIFIED_C6823DBC_FILE_SIZES_BYTES,
 )
 from scripts.strategy_research.p2_s3_footer_reader.errors import (
     ParserInputViolationError,
@@ -53,7 +89,104 @@ from scripts.strategy_research.p2_s3_footer_reader.types import (
     FooterReadExecutionReceipt,
     SyntheticTestGrant,
     create_valid_synthetic_grant,
+    register_forbidden_owner_surrogate_tree,
 )
+
+# Exact zlib-compressed, base64-encoded snapshot of Git blob
+# c6823dbc46249cac43aa10400aacbbe9f4542410:evidence/v0.6/b_line/p2_owner_root_metadata_r1/P2_OWNER_ROOT_EXACT_SCAN_RECEIPT.json
+# Verified by SHA-256 digest a3c9169dcbeb31edce492791ef253e42c580411cdb014337e8084229aaaaf3f2.
+_PINNED_C6823DBC_JSON_ZLIB_B64: str = (
+    "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"
+    "cXg0OBNHxyBncHhjU3/31/8AK35Vfg=="
+)
+
+
+def load_pinned_c6823dbc_scan_receipt_json() -> tuple[bytes, dict[str, Any]]:
+    """Load and SHA-256 verify the immutable c6823dbc46249cac43aa10400aacbbe9f4542410 receipt.
+
+    If the commit object is available in the local git object database, also
+    verifies byte-for-byte identity against ``git show c6823dbc...:...``.
+    """
+    embedded_raw = zlib.decompress(base64.b64decode(_PINNED_C6823DBC_JSON_ZLIB_B64))
+    digest = hashlib.sha256(embedded_raw).hexdigest()
+    if digest != ORIGINAL_STAT_RECEIPT_JSON_SHA256:
+        raise ValueError(
+            f"Pinned c6823dbc JSON SHA-256 mismatch: {digest} != "
+            f"{ORIGINAL_STAT_RECEIPT_JSON_SHA256}"
+        )
+
+    git_obj = (
+        f"{ORIGINAL_STAT_RECEIPT_SHA}:"
+        "evidence/v0.6/b_line/p2_owner_root_metadata_r1/P2_OWNER_ROOT_EXACT_SCAN_RECEIPT.json"
+    )
+    try:
+        git_raw = subprocess.check_output(
+            ["git", "show", git_obj],
+            stderr=subprocess.DEVNULL,
+        )
+    except (subprocess.SubprocessError, OSError):
+        raw_bytes = embedded_raw
+    else:
+        if git_raw != embedded_raw:
+            raise ValueError(
+                "Git object c6823dbc scan receipt bytes differ from embedded snapshot."
+            )
+        raw_bytes = git_raw
+
+    parsed = json.loads(raw_bytes.decode("utf-8"))
+    return raw_bytes, parsed
+
+
+def extract_file_sizes_from_c6823dbc_json(
+    parsed_receipt: dict[str, Any],
+) -> dict[str, int]:
+    """Extract all (rel_path, size_bytes) file observations from the c6823dbc receipt."""
+    extracted: dict[str, int] = {}
+    for item in parsed_receipt.get("candidate_month_observations", []):
+        rel_path = str(item["file_rel_path"])
+        extracted[rel_path] = int(item["file_size_bytes"])
+    for item in parsed_receipt.get("additional_target_observations", []):
+        if item.get("expected_type") == "file":
+            rel_path = str(item["rel_path"])
+            extracted[rel_path] = int(item["size_bytes"])
+    return extracted
 
 
 def _record_scenario(
@@ -71,6 +204,7 @@ def _record_scenario(
         and snap.open_fds_remaining == 0
         and snap.owner_root_touched is False
         and receipt.header_verification_status == HEADER_STATUS_NOT_VERIFIED
+        and receipt.grant_token_semantics == SYNTHETIC_GRANT_TOKEN_SEMANTICS
     )
     return {
         "scenario_id": scenario_id,
@@ -82,6 +216,7 @@ def _record_scenario(
         "actual_decision_code": receipt.decision_code,
         "error_type": receipt.error_type,
         "header_verification_status": receipt.header_verification_status,
+        "grant_token_semantics": receipt.grant_token_semantics,
         "open_fds_remaining": snap.open_fds_remaining,
         "attempted_fs_calls_total": snap.attempted_fs_calls_total,
         "actual_read_bytes_total": snap.actual_read_bytes_total,
@@ -549,8 +684,6 @@ def run_all_s3a_security_oracle_scenarios() -> dict[str, Any]:
                 synthetic_fixture_root=tmp, grant=grant
             )
         else:
-            # Under WSL root (euid==0), kernel CAP_DAC_OVERRIDE bypasses chmod 000;
-            # inject EACCES (errno 13) at the openat wrapper boundary on 'data.parquet'.
             reader = SingleFileParquetFooterReader(
                 synthetic_fixture_root=tmp,
                 grant=grant,
@@ -739,7 +872,7 @@ def run_all_s3a_security_oracle_scenarios() -> dict[str, Any]:
             )
         )
 
-    # NEG-26: Corrupted Thrift footer bytes or syscall budget exhaustion
+    # NEG-26: Corrupted Thrift footer bytes
     with tempfile.TemporaryDirectory(prefix="s3a_neg26_") as tmp:
         corrupted_thrift = craft_custom_trailer_parquet_bytes(
             body_and_footer_bytes=(b"\xff\xfe\xfd\xfc" * 16),
@@ -761,9 +894,7 @@ def run_all_s3a_security_oracle_scenarios() -> dict[str, Any]:
             )
         )
 
-    # --- DELIBERATE MUTANT FALSIFICATION PROOFS (3) ---
     mutants = _run_mutant_falsification_suite()
-
     pos_count = sum(1 for s in scenarios if s["expected_allowed"])
     neg_count = sum(1 for s in scenarios if not s["expected_allowed"])
     all_passed = all(s["oracle_assertion_passed"] for s in scenarios) and all(
@@ -800,6 +931,358 @@ def run_all_s3a_security_oracle_scenarios() -> dict[str, Any]:
     }
 
 
+def run_all_s3a_r2_supplemental_oracle_scenarios() -> dict[str, Any]:
+    """Execute the R2 supplemental security oracle covering F01, F02, F03, and F04."""
+    r2_scenarios: list[dict[str, Any]] = []
+
+    # R2-F01-01: Two temp trees (allowed_tree + forbidden_owner_surrogate) with
+    # ancestor symlink alias: prove old os.open(alias_root, O_NOFOLLOW) reaches
+    # the forbidden surrogate while repaired R2 reader rejects with 0 bytes read.
+    with tempfile.TemporaryDirectory(prefix="s3a_r2_f01_01_") as tmp:
+        allowed_tree = Path(tmp) / "allowed_tree"
+        os.makedirs(allowed_tree, exist_ok=True)
+        forbidden_surrogate = Path(tmp) / "forbidden_owner_surrogate"
+        surrogate_subroot = forbidden_surrogate / "data_root"
+        materialize_synthetic_pilot_tree(surrogate_subroot)
+        register_forbidden_owner_surrogate_tree(forbidden_surrogate)
+
+        # Create ancestor symlink inside allowed_tree pointing to forbidden_surrogate
+        sym_ancestor = allowed_tree / "ancestor_alias"
+        os.symlink(forbidden_surrogate, sym_ancestor)
+        alias_root_path = str(sym_ancestor / "data_root")
+
+        # Demonstrate old R1 unguarded os.open(alias_root_path, O_DIRECTORY|O_NOFOLLOW)
+        # followed the ancestor symlink right into forbidden_surrogate/data_root:
+        old_fd = os.open(
+            alias_root_path,
+            os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW | os.O_CLOEXEC,
+        )
+        old_st = os.fstat(old_fd)
+        os.close(old_fd)
+        surrogate_st = os.stat(surrogate_subroot, follow_symlinks=False)
+        old_unguarded_reached_forbidden_surrogate = (
+            int(old_st.st_dev) == int(surrogate_st.st_dev)
+            and int(old_st.st_ino) == int(surrogate_st.st_ino)
+        )
+
+        # Now run repaired R2 reader on the exact same alias_root_path:
+        self_minted_grant = create_valid_synthetic_grant(
+            alias_root_path, attest_root_custody=False
+        )
+        reader = SingleFileParquetFooterReader(
+            synthetic_fixture_root=alias_root_path,
+            grant=self_minted_grant,
+        )
+        rec = reader.evaluate_to_receipt()
+        entry = _record_scenario(
+            "R2_F01_01_ANCESTOR_SYMLINK_TO_FORBIDDEN_SURROGATE_BLOCKED",
+            "R2_F01_ANCESTOR_AND_CUSTODY_ISOLATION",
+            "Two-temp-tree ancestor symlink alias blocked by component walk from '/' before root open.",
+            False,
+            "DENIED_SYMLINK_DETECTED",
+            rec,
+        )
+        entry["old_r1_unguarded_reached_forbidden_surrogate"] = (
+            old_unguarded_reached_forbidden_surrogate
+        )
+        entry["oracle_assertion_passed"] = (
+            entry["oracle_assertion_passed"]
+            and old_unguarded_reached_forbidden_surrogate is True
+            and rec.syscall_accounting.actual_read_bytes_total == 0
+        )
+        r2_scenarios.append(entry)
+
+    # R2-F01-02: Multi-hop parent symlink chain (hop1 -> hop2 -> forbidden_surrogate/data_root)
+    with tempfile.TemporaryDirectory(prefix="s3a_r2_f01_02_") as tmp:
+        forbidden_surrogate = Path(tmp) / "forbidden_surrogate_hop"
+        materialize_synthetic_pilot_tree(forbidden_surrogate / "data_root")
+        register_forbidden_owner_surrogate_tree(forbidden_surrogate)
+
+        hop2 = Path(tmp) / "hop2_sym"
+        hop1 = Path(tmp) / "hop1_sym"
+        os.symlink(forbidden_surrogate, hop2)
+        os.symlink(hop2, hop1)
+        multi_alias_root = str(hop1 / "data_root")
+
+        grant = create_valid_synthetic_grant(
+            multi_alias_root, attest_root_custody=False
+        )
+        reader = SingleFileParquetFooterReader(
+            synthetic_fixture_root=multi_alias_root,
+            grant=grant,
+        )
+        rec = reader.evaluate_to_receipt()
+        r2_scenarios.append(
+            _record_scenario(
+                "R2_F01_02_MULTI_HOP_PARENT_SYMLINK_CHAIN_BLOCKED",
+                "R2_F01_ANCESTOR_AND_CUSTODY_ISOLATION",
+                "Multi-hop parent symlink chain hop1->hop2->forbidden_surrogate rejected at hop1.",
+                False,
+                "DENIED_SYMLINK_DETECTED",
+                rec,
+            )
+        )
+
+    # R2-F01-03: '..' traversal in synthetic_fixture_root
+    with tempfile.TemporaryDirectory(prefix="s3a_r2_f01_03_") as tmp:
+        allowed = Path(tmp) / "allowed"
+        forbidden = Path(tmp) / "forbidden"
+        os.makedirs(allowed, exist_ok=True)
+        materialize_synthetic_pilot_tree(forbidden)
+        register_forbidden_owner_surrogate_tree(forbidden)
+        dotdot_root = f"{allowed}/../forbidden"
+        grant = create_valid_synthetic_grant(dotdot_root, attest_root_custody=False)
+        reader = SingleFileParquetFooterReader(
+            synthetic_fixture_root=dotdot_root,
+            grant=grant,
+        )
+        rec = reader.evaluate_to_receipt()
+        r2_scenarios.append(
+            _record_scenario(
+                "R2_F01_03_ROOT_PATH_DOTDOT_TRAVERSAL_BLOCKED",
+                "R2_F01_ANCESTOR_AND_CUSTODY_ISOLATION",
+                "Fixture root containing '..' traversal segment rejected with 0 syscalls.",
+                False,
+                "DENIED_PATH_SYNTAX_OR_TRAVERSAL",
+                rec,
+            )
+        )
+
+    # R2-F01-04: Relative path alias for synthetic_fixture_root
+    with tempfile.TemporaryDirectory(prefix="s3a_r2_f01_04_") as tmp:
+        rel_alias = "relative_temp_alias/fixture_root"
+        grant = create_valid_synthetic_grant(rel_alias, attest_root_custody=False)
+        reader = SingleFileParquetFooterReader(
+            synthetic_fixture_root=rel_alias,
+            grant=grant,
+        )
+        rec = reader.evaluate_to_receipt()
+        r2_scenarios.append(
+            _record_scenario(
+                "R2_F01_04_RELATIVE_FIXTURE_ROOT_PATH_BLOCKED",
+                "R2_F01_ANCESTOR_AND_CUSTODY_ISOLATION",
+                "Relative path for synthetic_fixture_root rejected with 0 syscalls.",
+                False,
+                "DENIED_PATH_SYNTAX_OR_TRAVERSAL",
+                rec,
+            )
+        )
+
+    # R2-F01-05: Direct forbidden owner-surrogate temp tree rejected with S3A_HARNESS_ROOT_IDENTITY_NOT_PROVEN
+    with tempfile.TemporaryDirectory(prefix="s3a_r2_f01_05_") as tmp:
+        forbidden = Path(tmp) / "forbidden_owner_surrogate_direct"
+        materialize_synthetic_pilot_tree(forbidden)
+        register_forbidden_owner_surrogate_tree(forbidden)
+        grant = create_valid_synthetic_grant(str(forbidden), attest_root_custody=True)
+        reader = SingleFileParquetFooterReader(
+            synthetic_fixture_root=str(forbidden),
+            grant=grant,
+        )
+        rec = reader.evaluate_to_receipt()
+        r2_scenarios.append(
+            _record_scenario(
+                "R2_F01_05_FORBIDDEN_SURROGATE_ROOT_CUSTODY_DENIED",
+                "R2_F01_ANCESTOR_AND_CUSTODY_ISOLATION",
+                "Forbidden owner-surrogate temp root rejected with S3A_HARNESS_ROOT_IDENTITY_NOT_PROVEN.",
+                False,
+                HARNESS_ROOT_NOT_PROVEN_CODE,
+                rec,
+            )
+        )
+
+    # R2-F01-06: Dangling / renamed parent or root directory after custody attestation
+    with tempfile.TemporaryDirectory(prefix="s3a_r2_f01_06_") as tmp:
+        parent_dir = Path(tmp) / "ephemeral_parent"
+        root_dir = parent_dir / "fixture_root"
+        materialize_synthetic_pilot_tree(root_dir)
+        grant = create_valid_synthetic_grant(str(root_dir), attest_root_custody=True)
+
+        # Rename parent_dir and replace with a new directory connected to a forbidden surrogate
+        renamed_parent = Path(tmp) / "ephemeral_parent_old"
+        os.rename(parent_dir, renamed_parent)
+        os.makedirs(root_dir, exist_ok=True)
+        materialize_synthetic_pilot_tree(root_dir)
+
+        reader = SingleFileParquetFooterReader(
+            synthetic_fixture_root=str(root_dir),
+            grant=grant,
+        )
+        rec = reader.evaluate_to_receipt()
+        r2_scenarios.append(
+            _record_scenario(
+                "R2_F01_06_RENAMED_PARENT_OR_ROOT_INODE_MISMATCH_DENIED",
+                "R2_F01_ANCESTOR_AND_CUSTODY_ISOLATION",
+                "Renamed/recreated parent & root after custody attestation rejected as S3A_HARNESS_ROOT_IDENTITY_NOT_PROVEN.",
+                False,
+                HARNESS_ROOT_NOT_PROVEN_CODE,
+                rec,
+            )
+        )
+
+    # R2-F01-07: Mock bind-mount equivalent (ancestor/root st_dev override or surrogate inode)
+    with tempfile.TemporaryDirectory(prefix="s3a_r2_f01_07_") as tmp:
+        root_dir = Path(tmp) / "bind_mount_target"
+        materialize_synthetic_pilot_tree(root_dir)
+        grant = create_valid_synthetic_grant(str(root_dir), attest_root_custody=True)
+        reader = SingleFileParquetFooterReader(
+            synthetic_fixture_root=str(root_dir),
+            grant=grant,
+            simulated_dev_overrides={"<root>": 888_888_888},
+        )
+        rec = reader.evaluate_to_receipt()
+        r2_scenarios.append(
+            _record_scenario(
+                "R2_F01_07_MOCK_BIND_MOUNT_ON_ROOT_BLOCKED",
+                "R2_F01_ANCESTOR_AND_CUSTODY_ISOLATION",
+                "Simulated bind-mount st_dev change on root FD rejected before child walk.",
+                False,
+                "DENIED_MOUNT_BOUNDARY_ESCAPE",
+                rec,
+            )
+        )
+
+    # R2-F02-01: Self-minted grant with recomputed public SHA-256 checksum rejected without custody
+    with tempfile.TemporaryDirectory(prefix="s3a_r2_f02_01_") as tmp:
+        unattested_root = Path(tmp) / "unattested_caller_root"
+        materialize_synthetic_pilot_tree(unattested_root)
+        # Caller self-mints grant and recomputes public SHA-256 checksum without harness custody
+        self_minted = create_valid_synthetic_grant(
+            str(unattested_root),
+            attest_root_custody=False,
+        )
+        reader = SingleFileParquetFooterReader(
+            synthetic_fixture_root=str(unattested_root),
+            grant=self_minted,
+        )
+        rec = reader.evaluate_to_receipt()
+        r2_scenarios.append(
+            _record_scenario(
+                "R2_F02_01_SELF_MINTED_PUBLIC_CHECKSUM_GRANT_DENIED_WITHOUT_CUSTODY",
+                "R2_F02_HONEST_TOKEN_SEMANTICS",
+                "Caller-recomputed public SHA-256 checksum without harness root custody rejected as S3A_HARNESS_ROOT_IDENTITY_NOT_PROVEN.",
+                False,
+                HARNESS_ROOT_NOT_PROVEN_CODE,
+                rec,
+            )
+        )
+
+    # R2-F03-01..06: Syscall cap matrix max_attempted_fs_calls = 1, 2, 3, 25, 27, 100
+    for cap in (1, 2, 3, 25, 27, 100):
+        with tempfile.TemporaryDirectory(prefix=f"s3a_r2_f03_cap{cap}_") as tmp:
+            materialize_synthetic_pilot_tree(tmp)
+            grant = create_valid_synthetic_grant(tmp, max_attempted_fs_calls=cap)
+            reader = SingleFileParquetFooterReader(
+                synthetic_fixture_root=tmp,
+                grant=grant,
+            )
+            rec = reader.evaluate_to_receipt()
+            expect_ok = cap >= 27
+            expect_code = (
+                "ALLOWED_SINGLE_FILE_FOOTER_SCHEMA_PARSED"
+                if expect_ok
+                else BUDGET_INSUFFICIENT_STOP_CODE
+            )
+            scen = _record_scenario(
+                f"R2_F03_SYSCALL_CAP_{cap}",
+                "R2_F03_SYSCALL_BUDGET_AND_CLEANUP",
+                f"Syscall cap={cap} enforces attempted_fs_calls_total <= {cap} and 0 leaked FDs.",
+                expect_ok,
+                expect_code,
+                rec,
+            )
+            scen["oracle_assertion_passed"] = (
+                scen["oracle_assertion_passed"]
+                and rec.syscall_accounting.attempted_fs_calls_total <= cap
+                and rec.syscall_accounting.open_fds_remaining == 0
+            )
+            r2_scenarios.append(scen)
+
+    # R2-F03-07: Non-aborting os.close failure during cleanup (all remaining FDs closed, not PASS)
+    with tempfile.TemporaryDirectory(prefix="s3a_r2_f03_close_err_") as tmp:
+        materialize_synthetic_pilot_tree(tmp)
+        grant = create_valid_synthetic_grant(tmp)
+        reader = SingleFileParquetFooterReader(
+            synthetic_fixture_root=tmp,
+            grant=grant,
+            simulated_close_errno_by_label={"month=03": errno.EIO},
+        )
+        rec = reader.evaluate_to_receipt()
+        scen = _record_scenario(
+            "R2_F03_CLOSE_FAILURE_DOES_NOT_ABORT_CLEANUP_OR_PASS",
+            "R2_F03_SYSCALL_BUDGET_AND_CLEANUP",
+            "Simulated EIO on os.close('month=03') closes all other 7 FDs and rejects as DENIED_FD_CLEANUP_CLOSE_FAILED.",
+            False,
+            "DENIED_FD_CLEANUP_CLOSE_FAILED",
+            rec,
+        )
+        scen["oracle_assertion_passed"] = (
+            scen["oracle_assertion_passed"]
+            and rec.syscall_accounting.close_attempted == 8
+            and rec.syscall_accounting.close_failed == 1
+            and rec.syscall_accounting.close_succeeded == 7
+            and rec.syscall_accounting.open_fds_remaining == 0
+        )
+        r2_scenarios.append(scen)
+
+    # R2-F04: Pinned c6823dbc46249cac43aa10400aacbbe9f4542410 JSON parse verification
+    _, parsed_c6823 = load_pinned_c6823dbc_scan_receipt_json()
+    extracted_sizes = extract_file_sizes_from_c6823dbc_json(parsed_c6823)
+    f04_all_13_match = extracted_sizes == VERIFIED_C6823DBC_FILE_SIZES_BYTES
+    f04_btc_6_match = all(
+        extracted_sizes.get(k) == v
+        for k, v in VERIFIED_C6823DBC_BTC_CANDIDATE_MONTH_SIZES_BYTES.items()
+    )
+
+    base_oracle = run_all_s3a_security_oracle_scenarios()
+    all_r2_passed = (
+        all(s["oracle_assertion_passed"] for s in r2_scenarios)
+        and bool(base_oracle["summary"]["all_scenarios_passed"])
+        and f04_all_13_match
+        and f04_btc_6_match
+    )
+
+    return {
+        "r2_task_id": R2_TASK_ID,
+        "r2_controller_dispatch_sha": R2_CONTROLLER_DISPATCH_SHA,
+        "r2_prompt_sha": R2_PROMPT_SHA,
+        "r2_exact_start_sha": R2_EXACT_START_SHA,
+        "code_start_sha": CODE_START_SHA,
+        "original_stat_receipt_sha": ORIGINAL_STAT_RECEIPT_SHA,
+        "original_stat_receipt_json_sha256": ORIGINAL_STAT_RECEIPT_JSON_SHA256,
+        "r2_terminal_status": S3A_R2_TERMINAL_STATUS,
+        "supersedes_evidence_files": [
+            "evidence/v0.6/b_line/p2_s3_footer_reader_r1/S3A_FS_SYSCALL_SECURITY_ORACLE_RESULTS.json",
+            "evidence/v0.6/b_line/p2_s3_footer_reader_r1/S3A_IMPLEMENTATION_EXECUTION_RECEIPT.json",
+        ],
+        "f04_btc_monthly_size_errata_mapping": R1_TO_R2_BTC_SIZE_ERRATA_MAP,
+        "f04_verified_c6823dbc_file_sizes_bytes": VERIFIED_C6823DBC_FILE_SIZES_BYTES,
+        "f04_pinned_json_row_wise_equality_verified": f04_all_13_match,
+        "f02_grant_token_semantics": SYNTHETIC_GRANT_TOKEN_SEMANTICS,
+        "eth_sol_1m_perp_status": ETH_SOL_1M_PERP_STATUS,
+        "summary": {
+            "base_scenarios_rerun_total": base_oracle["summary"]["total_scenarios"],
+            "base_scenarios_rerun_passed": sum(
+                1 for s in base_oracle["scenarios"] if s["oracle_assertion_passed"]
+            ),
+            "r2_supplemental_scenarios_total": len(r2_scenarios),
+            "r2_supplemental_scenarios_passed": sum(
+                1 for s in r2_scenarios if s["oracle_assertion_passed"]
+            ),
+            "combined_scenarios_total": (
+                base_oracle["summary"]["total_scenarios"] + len(r2_scenarios)
+            ),
+            "deliberate_mutants_tested": base_oracle["summary"]["deliberate_mutants_tested"],
+            "deliberate_mutants_killed": base_oracle["summary"]["deliberate_mutants_killed"],
+            "f04_all_13_files_verified_against_c6823dbc_json": f04_all_13_match,
+            "all_r2_gates_passed": all_r2_passed,
+            "owner_data_root_syscalls": 0,
+        },
+        "r2_scenarios": r2_scenarios,
+        "base_30_scenarios_rerun_under_r2": base_oracle["scenarios"],
+        "mutant_falsification_proofs": base_oracle["mutant_falsification_proofs"],
+    }
+
+
 def _run_mutant_falsification_suite() -> list[dict[str, Any]]:
     """Run 3 deliberate in-test security mutants and prove the test oracle kills them."""
     results: list[dict[str, Any]] = []
@@ -822,7 +1305,6 @@ def _run_mutant_falsification_suite() -> list[dict[str, Any]]:
         )
         prod_receipt = prod_reader.evaluate_to_receipt()
 
-        # Mutant M1 opens without O_NOFOLLOW:
         mutant_fd = os.open(str(sym_leaf), os.O_RDONLY | os.O_CLOEXEC)
         os.close(mutant_fd)
         m1_killed = (
@@ -906,5 +1388,8 @@ __all__ = [
     "MeteredPosixSyscallWrapper",
     "S3FooterReaderError",
     "SyntheticTestGrant",
+    "extract_file_sizes_from_c6823dbc_json",
+    "load_pinned_c6823dbc_scan_receipt_json",
+    "run_all_s3a_r2_supplemental_oracle_scenarios",
     "run_all_s3a_security_oracle_scenarios",
 ]

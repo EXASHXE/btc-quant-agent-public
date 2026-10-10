@@ -1,0 +1,100 @@
+{
+  "r2_task_id": "V06_P2_S3A_GEMINI_ROOT_ALIAS_GRANT_BUDGET_AND_SOURCE_SIZE_BOUNDED_REPAIR_R2",
+  "branch": "feature/v06-bline-p2-s3-footer-reader-r1",
+  "r2_controller_dispatch_sha": "89c1caf07eebd3db81dc16314c3238c037e6fac3",
+  "r2_prompt_sha": "4227f46296b8f66fe33aebf8a7bdbacb6873dc2c",
+  "r2_exact_start_sha": "30833953804bd965c80913ee6a3ecd4ae7457b40",
+  "code_start_sha": "e0ff8c3473de4bfa3e66fe7928d42992a4d38a32",
+  "original_stat_receipt_sha": "c6823dbc46249cac43aa10400aacbbe9f4542410",
+  "original_stat_receipt_json_sha256": "a3c9169dcbeb31edce492791ef253e42c580411cdb014337e8084229aaaaf3f2",
+  "terminal_status": "S3A_R2_BOUNDED_SECURITY_REPAIR_DELIVERED_PENDING_CONTROLLER_SOL_AUDIT",
+  "supersedes_frozen_r1_artifacts": {
+    "docs/strategy_research/g2_r3/p2_s3_footer_reader_r1/S3A_READER_BOUNDARY_IMPLEMENTATION_AND_FALSIFICATION_REPORT.md": "fd727d92a30de2c42bc5b4aeb68e71cac4ed306f8c3601aaca56d5da44c709c3",
+    "docs/strategy_research/g2_r3/p2_s3_footer_reader_r1/S3B_PROPOSED_ONE_FILE_FOOTER_QA_GRANT_CONTRACT.md": "936814eebc00e93cc72652bac5a6d95079c5a35fed3fc003752805519ac9859d",
+    "evidence/v0.6/b_line/p2_s3_footer_reader_r1/S3A_FS_SYSCALL_SECURITY_ORACLE_RESULTS.json": "28773055ee78aafb107e678a03bc1be0a70b35dbc5178554db33cd60e4c06f5a",
+    "evidence/v0.6/b_line/p2_s3_footer_reader_r1/S3A_IMPLEMENTATION_EXECUTION_RECEIPT.json": "5bb8cf5272ddf65a86b61a6d9aab24fa3de84b401b65ab544a01438c330e226e"
+  },
+  "r2_security_repair_gates": {
+    "F01_trusted_fixture_root_custody_and_ancestor_walk": true,
+    "F01_decision_code_unproven_custody": "S3A_HARNESS_ROOT_IDENTITY_NOT_PROVEN",
+    "F02_honest_synthetic_token_semantics": "TEST_ONLY_INTEGRITY_CHECKSUM_NOT_AUTHORIZATION",
+    "F02_self_minted_grant_denied_without_custody": true,
+    "F03_first_fd_close_budget_reserved": true,
+    "F03_budget_stop_decision_code": "BUDGET_INSUFFICIENT_STOP",
+    "F03_syscall_caps_tested": [
+      1,
+      2,
+      3,
+      25,
+      27,
+      100
+    ],
+    "F03_non_aborting_close_cleanup_tested": true,
+    "F04_exact_c6823dbc_btc_6_month_sizes_bytes": {
+      "research/BTCUSDT/1m/year=2021/month=03/data.parquet": 2756024,
+      "research/BTCUSDT/1m/year=2021/month=04/data.parquet": 2621313,
+      "research/BTCUSDT/1m/year=2023/month=03/data.parquet": 2415597,
+      "research/BTCUSDT/1m/year=2023/month=04/data.parquet": 2201521,
+      "research/BTCUSDT/1m/year=2025/month=03/data.parquet": 2352476,
+      "research/BTCUSDT/1m/year=2025/month=04/data.parquet": 2329220
+    },
+    "F04_r1_to_r2_btc_errata_map": {
+      "research/BTCUSDT/1m/year=2021/month=04/data.parquet": {
+        "r1_wrong_bytes": 2492430,
+        "r2_verified_c6823dbc_bytes": 2621313
+      },
+      "research/BTCUSDT/1m/year=2023/month=03/data.parquet": {
+        "r1_wrong_bytes": 2672321,
+        "r2_verified_c6823dbc_bytes": 2415597
+      },
+      "research/BTCUSDT/1m/year=2023/month=04/data.parquet": {
+        "r1_wrong_bytes": 2075555,
+        "r2_verified_c6823dbc_bytes": 2201521
+      },
+      "research/BTCUSDT/1m/year=2025/month=03/data.parquet": {
+        "r1_wrong_bytes": 1970619,
+        "r2_verified_c6823dbc_bytes": 2352476
+      },
+      "research/BTCUSDT/1m/year=2025/month=04/data.parquet": {
+        "r1_wrong_bytes": 1942082,
+        "r2_verified_c6823dbc_bytes": 2329220
+      }
+    },
+    "F04_all_13_c6823dbc_files_verified_from_json": true
+  },
+  "qa_verification": {
+    "ruff_check_passed": true,
+    "compileall_passed": true,
+    "pytest_total_collected": 58,
+    "pytest_total_passed": 58,
+    "pytest_total_failed": 0,
+    "base_oracle_scenarios_rerun_passed": 30,
+    "r2_supplemental_oracle_scenarios_passed": 15,
+    "combined_oracle_scenarios_passed": 45,
+    "deliberate_mutants_killed": 3,
+    "git_diff_check_clean": true
+  },
+  "hard_no_read_compliance": {
+    "immutable_owner_data_root": "/root/workspace/project/Quant-agent/data",
+    "owner_data_root_lstat_count": 0,
+    "owner_data_root_stat_count": 0,
+    "owner_data_root_open_count": 0,
+    "owner_data_root_scandir_count": 0,
+    "owner_data_root_pread_bytes": 0,
+    "real_market_data_touched": false,
+    "s3b_real_data_execution_authorized_by_s3a_r2": false
+  },
+  "r2_changed_and_new_files_sha256": {
+    "scripts/strategy_research/p2_s3_footer_reader/__init__.py": "f02a1ceff9b682d3cb5fc85380961b251954a1116e1cb9283d3c42d0fb8fb29e",
+    "scripts/strategy_research/p2_s3_footer_reader/constants.py": "b9d56e0a018c8f0ddcc8989dc34ffc43fa7fd5cacbdf0bc30f01d36f1eeec76a",
+    "scripts/strategy_research/p2_s3_footer_reader/errors.py": "3efa1382dd99cc67429c883053530af2a9cd908e547ce6134611f0875d3fef64",
+    "scripts/strategy_research/p2_s3_footer_reader/types.py": "27343eef040edb6d496d8ed864d657839dcd3a423464c2846a8a8d08668791e0",
+    "scripts/strategy_research/p2_s3_footer_reader/fd_syscall_wrapper.py": "077044acabbe1b3e8f270f6ec3c9e3c15eadad30bae87e2d0dfc4674c90056a0",
+    "scripts/strategy_research/p2_s3_footer_reader/reader.py": "bf002e053832aaa51e29d5560c1ba0355aee7bef6508a10e6a0cbc4a7a03d792",
+    "scripts/strategy_research/p2_s3_footer_reader/oracle_runner.py": "699e69cd3cbaa79d23a854dc29c8da374f4aa416017f35ee5ab9ff8bc517829f",
+    "tests/test_v06_p2_s3_footer_reader_unit.py": "cfcc63893f499f84d6aaabcbad12068559462e4fdb28c7eb931c39e94f1e3f89",
+    "tests/test_v06_p2_s3_footer_reader_adversarial.py": "aff9f7c45e024bfcd8f472469a4a96d7fd9881768efad50568811ecb2fe3e19f",
+    "docs/strategy_research/g2_r3/p2_s3_footer_reader_r1/S3A_R2_BOUNDED_SECURITY_REPAIR_AND_ERRATA_REPORT.md": "0557dde49bdf8ebfd7dce2f276c816494f1bfed30e50a793b556d5e4643ad9a9",
+    "evidence/v0.6/b_line/p2_s3_footer_reader_r1/S3A_R2_FS_SYSCALL_SECURITY_ORACLE_RESULTS.json": "6910e6141abda0780f7b29197d4f20b0bd4bc15a5281f98f6490052ad7113771"
+  }
+}
