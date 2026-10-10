@@ -1,4 +1,4 @@
-"""Signal calculation and multi-scale feature extractors for Waves 1, 2, and 3 Trend & Flow candidates."""
+"""Signal calculation and multi-scale feature extractors for Waves 1, 2, 3, and 4 Trend & Flow candidates."""
 from __future__ import annotations
 
 import math
@@ -227,7 +227,16 @@ def generate_wave_signals(arr_1m: np.ndarray, cand_id: str, embargo_start_ms: in
     # Indicators on 4h (240m)
     ema20_4h = _ema_fast(agg240["close"], 20)
     ema50_4h = _ema_fast(agg240["close"], 50)
+    atr14_4h = _atr_fast(agg240["high"], agg240["low"], agg240["close"], 14)
+    atr56_4h = _atr_fast(agg240["high"], agg240["low"], agg240["close"], 56)
     adx_4h, di_plus_4h, di_minus_4h = _adx_full(agg240["high"], agg240["low"], agg240["close"], 14)
+
+    # 4h MACD
+    ema12_4h = _ema_fast(agg240["close"], 12)
+    ema26_4h = _ema_fast(agg240["close"], 26)
+    macd_line_4h = ema12_4h - ema26_4h
+    macd_signal_4h = _ema_fast(macd_line_4h, 9)
+    macd_hist_4h = macd_line_4h - macd_signal_4h
 
     idx_1h_for_15m = np.searchsorted(agg60["end_ms"], agg15["end_ms"])
     idx_4h_for_15m = np.searchsorted(agg240["end_ms"], agg15["end_ms"])
@@ -486,7 +495,6 @@ def generate_wave_signals(arr_1m: np.ndarray, cand_id: str, embargo_start_ms: in
             target_r = 2.0
             is_4h_bull = ema20_4h[h4_idx] > ema50_4h[h4_idx]
             is_4h_bear = ema20_4h[h4_idx] < ema50_4h[h4_idx]
-            # Fresh cross within last 2 1h bars
             cross_up = any(ema10_1h[j] > ema30_1h[j] and ema10_1h[j - 1] <= ema30_1h[j - 1] for j in range(h1_idx - 1, h1_idx + 1))
             cross_down = any(ema10_1h[j] < ema30_1h[j] and ema10_1h[j - 1] >= ema30_1h[j - 1] for j in range(h1_idx - 1, h1_idx + 1))
             if is_4h_bull and cross_up and (flow_15m > 0.20):
@@ -533,7 +541,7 @@ def generate_wave_signals(arr_1m: np.ndarray, cand_id: str, embargo_start_ms: in
             atr_exp = atr14_1h[h1_idx] > atr14_sma10_1h[h1_idx]
             flow_prev = agg15["signed_flow_ratio"][i - 1]
             if is_4h_bull and is_1h_bull and atr_exp and (flow_15m > 0.15) and (flow_prev > 0.15):
-                side = 1  # Long only
+                side = 1
 
         elif cand_id == "W3_C05_ASYMMETRIC_SHORT_BIASED_FLOW_COLLAPSE_08H":
             horizon_hours = 8
@@ -547,7 +555,7 @@ def generate_wave_signals(arr_1m: np.ndarray, cand_id: str, embargo_start_ms: in
             is_sharp_drop = (o_1h - c_1h) > 1.5 * atr_1h
             vol_surge = (not np.isnan(v_sma_h)) and (vol_1h > 2.0 * v_sma_h)
             if is_4h_bear and is_sharp_drop and vol_surge and (flow_15m < -0.25):
-                side = -1  # Short only
+                side = -1
 
         elif cand_id == "W3_C06_TIME_WEIGHTED_SESSION_PULLBACK_08H":
             horizon_hours = 8
@@ -565,6 +573,92 @@ def generate_wave_signals(arr_1m: np.ndarray, cand_id: str, embargo_start_ms: in
                     side = 1
                 elif is_4h_bear and touch_bear and (flow_15m < -0.15):
                     side = -1
+
+        # --- WAVE 4 CANDIDATES ---
+        elif cand_id == "W4_C01_DUAL_TIMEFRAME_VOLATILITY_EXPANSION_08H":
+            horizon_hours = 8
+            stop_mult = 1.5
+            target_r = 2.5
+            dual_exp = (atr14_4h[h4_idx] > atr56_4h[h4_idx]) and (atr14_1h[h1_idx] > 1.25 * atr14_sma10_1h[h1_idx])
+            v_sma_h = vol_sma1h[h1_idx]
+            vol_ok = (not np.isnan(v_sma_h)) and (agg60["volume"][h1_idx] > 1.3 * v_sma_h)
+            o_1h = agg60["open"][h1_idx]
+            c_1h = agg60["close"][h1_idx]
+            if dual_exp and vol_ok:
+                if (c_1h > o_1h) and (flow_15m > 0.15):
+                    side = 1
+                elif (c_1h < o_1h) and (flow_15m < -0.15):
+                    side = -1
+
+        elif cand_id == "W4_C02_VWAP_MEAN_DRIFT_ACCELERATION_08H":
+            horizon_hours = 8
+            stop_mult = 1.5
+            target_r = 2.0
+            if h1_idx >= 26:
+                vwap_now = vwap_24h[h1_idx]
+                vwap_prev = vwap_24h[h1_idx - 3]
+                all_above = all(agg60["close"][j] > vwap_24h[j] for j in range(h1_idx - 2, h1_idx + 1))
+                all_below = all(agg60["close"][j] < vwap_24h[j] for j in range(h1_idx - 2, h1_idx + 1))
+                if all_above and (vwap_now > vwap_prev) and (flow_15m > 0.20):
+                    side = 1
+                elif all_below and (vwap_now < vwap_prev) and (flow_15m < -0.20):
+                    side = -1
+
+        elif cand_id == "W4_C03_TREND_MOMENTUM_CONVERGENCE_DIVERGENCE_12H":
+            horizon_hours = 12
+            stop_mult = 1.8
+            target_r = 2.5
+            cross_bull = (macd_hist_4h[h4_idx] > 0) and (macd_hist_4h[h4_idx - 1] <= 0)
+            cross_bear = (macd_hist_4h[h4_idx] < 0) and (macd_hist_4h[h4_idx - 1] >= 0)
+            if cross_bull and (agg60["close"][h1_idx] > ema20_1h[h1_idx]) and (flow_15m > 0.15):
+                side = 1
+            elif cross_bear and (agg60["close"][h1_idx] < ema20_1h[h1_idx]) and (flow_15m < -0.15):
+                side = -1
+
+        elif cand_id == "W4_C04_DONCHIAN_CHANNEL_VOLATILITY_BREAKOUT_08H":
+            horizon_hours = 8
+            stop_mult = 1.2
+            target_r = 2.0
+            if h1_idx >= 24:
+                h24 = np.max(agg60["high"][h1_idx - 24 : h1_idx])
+                l24 = np.min(agg60["low"][h1_idx - 24 : h1_idx])
+                c_1h = agg60["close"][h1_idx]
+                v_sma_h = vol_sma1h[h1_idx]
+                vol_ok = (not np.isnan(v_sma_h)) and (agg60["volume"][h1_idx] > 1.5 * v_sma_h)
+                if vol_ok:
+                    if (c_1h > h24) and (flow_15m > 0.15):
+                        side = 1
+                    elif (c_1h < l24) and (flow_15m < -0.15):
+                        side = -1
+
+        elif cand_id == "W4_C05_CUMULATIVE_FLOW_PERCENTILE_SURGE_08H":
+            horizon_hours = 8
+            stop_mult = 1.5
+            target_r = 2.0
+            if i >= 48:
+                flow_window = agg15["signed_flow_ratio"][i - 48 : i]
+                p95 = np.percentile(flow_window, 95)
+                p05 = np.percentile(flow_window, 5)
+                v_sma_15 = vol_sma15[i]
+                vol_ok = (not np.isnan(v_sma_15)) and (vol_15m > 1.5 * v_sma_15)
+                is_4h_bull = ema20_4h[h4_idx] > ema50_4h[h4_idx]
+                is_4h_bear = ema20_4h[h4_idx] < ema50_4h[h4_idx]
+                if is_4h_bull and vol_ok and (flow_15m > p95):
+                    side = 1
+                elif is_4h_bear and vol_ok and (flow_15m < p05):
+                    side = -1
+
+        elif cand_id == "W4_C06_ASYMMETRIC_MOMENTUM_EXHAUSTION_CONTINUATION_24H":
+            horizon_hours = 24
+            stop_mult = 2.0
+            target_r = 3.0
+            adx_val = adx_4h[h4_idx]
+            is_4h_bull = (agg240["close"][h4_idx] > ema20_4h[h4_idx] > ema50_4h[h4_idx]) and (not np.isnan(adx_val) and adx_val > 22)
+            is_4h_bear = (agg240["close"][h4_idx] < ema20_4h[h4_idx] < ema50_4h[h4_idx]) and (not np.isnan(adx_val) and adx_val > 22)
+            if is_4h_bull and (agg60["close"][h1_idx] > ema20_1h[h1_idx]) and (flow_15m > 0.15):
+                side = 1
+            elif is_4h_bear and (agg60["close"][h1_idx] < ema20_1h[h1_idx]) and (flow_15m < -0.15):
+                side = -1
 
         if side != 0:
             stop_dist = stop_mult * atr_1h
