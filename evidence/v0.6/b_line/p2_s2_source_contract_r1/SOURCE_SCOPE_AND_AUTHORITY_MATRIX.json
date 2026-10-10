@@ -1,0 +1,441 @@
+{
+  "task_id": "V06_P2_S2_GEMINI_LONG_SOURCE_CONTRACT_AND_SYNTHETIC_CAPABILITY_GATE_R1",
+  "controller_dispatch_sha": "b176f4361cd97d1d89c3e25173b2c72a6af93ec4",
+  "code_start_sha": "e0ff8c3473de4bfa3e66fe7928d42992a4d38a32",
+  "stat_receipt_sha": "c6823dbc46249cac43aa10400aacbbe9f4542410",
+  "terminated_locator_counterexample_sha": "4a1fcc2871708f0e9e3a7c40036ecaab39ba99b8",
+  "controller_termination_sha": "ca0b6ea62613e6981b6f818f37f45be8c1d74901",
+  "controller_admission_design_sha": "519b2e9ba2ca847e76ad9c0a7fbafcec5fcda158",
+  "owner_wsl_data_root": "/root/workspace/project/Quant-agent/data",
+  "source_items_count": 16,
+  "source_items": [
+    {
+      "source_id": "btc_perp_1m_2021_03",
+      "relative_path": "research/BTCUSDT/1m/year=2021/month=03/data.parquet",
+      "role": "BTC_PERP_1M_KLINE",
+      "certainty": [
+        "PHYSICAL_METADATA_EXECUTOR_OBSERVED",
+        "UNVERIFIED_RIGHTS",
+        "UNKNOWN_FILE_CONTINUITY"
+      ],
+      "receipt_sha": "c6823dbc46249cac43aa10400aacbbe9f4542410",
+      "size_bytes": 2756024,
+      "is_regular_file": true,
+      "is_directory": false,
+      "expected_future_fields": [
+        "event_ts",
+        "known_at",
+        "available_at",
+        "open",
+        "high",
+        "low",
+        "close",
+        "volume",
+        "quote_volume",
+        "count",
+        "taker_buy_volume",
+        "taker_buy_quote_volume"
+      ],
+      "clock_definition": "UTC minute open [m, m+60000ms), available_at >= m+60000ms",
+      "rights_status": "PROPOSED_UNVERIFIED_PENDING_OWNER_GRANT",
+      "continuity_status": "UNKNOWN_PENDING_L3_QA",
+      "notes": "Verified regular parquet file via lstat receipt; zero data bytes read"
+    },
+    {
+      "source_id": "btc_perp_1m_2021_04",
+      "relative_path": "research/BTCUSDT/1m/year=2021/month=04/data.parquet",
+      "role": "BTC_PERP_1M_KLINE",
+      "certainty": [
+        "PHYSICAL_METADATA_EXECUTOR_OBSERVED",
+        "UNVERIFIED_RIGHTS",
+        "UNKNOWN_FILE_CONTINUITY"
+      ],
+      "receipt_sha": "c6823dbc46249cac43aa10400aacbbe9f4542410",
+      "size_bytes": 2621313,
+      "is_regular_file": true,
+      "is_directory": false,
+      "expected_future_fields": [
+        "event_ts",
+        "known_at",
+        "available_at",
+        "open",
+        "high",
+        "low",
+        "close",
+        "volume",
+        "quote_volume",
+        "count",
+        "taker_buy_volume",
+        "taker_buy_quote_volume"
+      ],
+      "clock_definition": "UTC minute open [m, m+60000ms), available_at >= m+60000ms",
+      "rights_status": "PROPOSED_UNVERIFIED_PENDING_OWNER_GRANT",
+      "continuity_status": "UNKNOWN_PENDING_L3_QA",
+      "notes": "Verified regular parquet file via lstat receipt; zero data bytes read"
+    },
+    {
+      "source_id": "btc_perp_1m_2023_03",
+      "relative_path": "research/BTCUSDT/1m/year=2023/month=03/data.parquet",
+      "role": "BTC_PERP_1M_KLINE",
+      "certainty": [
+        "PHYSICAL_METADATA_EXECUTOR_OBSERVED",
+        "UNVERIFIED_RIGHTS",
+        "UNKNOWN_FILE_CONTINUITY"
+      ],
+      "receipt_sha": "c6823dbc46249cac43aa10400aacbbe9f4542410",
+      "size_bytes": 2415597,
+      "is_regular_file": true,
+      "is_directory": false,
+      "expected_future_fields": [
+        "event_ts",
+        "known_at",
+        "available_at",
+        "open",
+        "high",
+        "low",
+        "close",
+        "volume",
+        "quote_volume",
+        "count",
+        "taker_buy_volume",
+        "taker_buy_quote_volume"
+      ],
+      "clock_definition": "UTC minute open [m, m+60000ms), available_at >= m+60000ms",
+      "rights_status": "PROPOSED_UNVERIFIED_PENDING_OWNER_GRANT",
+      "continuity_status": "UNKNOWN_PENDING_L3_QA",
+      "notes": "Verified regular parquet file via lstat receipt; zero data bytes read"
+    },
+    {
+      "source_id": "btc_perp_1m_2023_04",
+      "relative_path": "research/BTCUSDT/1m/year=2023/month=04/data.parquet",
+      "role": "BTC_PERP_1M_KLINE",
+      "certainty": [
+        "PHYSICAL_METADATA_EXECUTOR_OBSERVED",
+        "UNVERIFIED_RIGHTS",
+        "UNKNOWN_FILE_CONTINUITY"
+      ],
+      "receipt_sha": "c6823dbc46249cac43aa10400aacbbe9f4542410",
+      "size_bytes": 2201521,
+      "is_regular_file": true,
+      "is_directory": false,
+      "expected_future_fields": [
+        "event_ts",
+        "known_at",
+        "available_at",
+        "open",
+        "high",
+        "low",
+        "close",
+        "volume",
+        "quote_volume",
+        "count",
+        "taker_buy_volume",
+        "taker_buy_quote_volume"
+      ],
+      "clock_definition": "UTC minute open [m, m+60000ms), available_at >= m+60000ms",
+      "rights_status": "PROPOSED_UNVERIFIED_PENDING_OWNER_GRANT",
+      "continuity_status": "UNKNOWN_PENDING_L3_QA",
+      "notes": "Verified regular parquet file via lstat receipt; zero data bytes read"
+    },
+    {
+      "source_id": "btc_perp_1m_2025_03",
+      "relative_path": "research/BTCUSDT/1m/year=2025/month=03/data.parquet",
+      "role": "BTC_PERP_1M_KLINE",
+      "certainty": [
+        "PHYSICAL_METADATA_EXECUTOR_OBSERVED",
+        "UNVERIFIED_RIGHTS",
+        "UNKNOWN_FILE_CONTINUITY"
+      ],
+      "receipt_sha": "c6823dbc46249cac43aa10400aacbbe9f4542410",
+      "size_bytes": 2352476,
+      "is_regular_file": true,
+      "is_directory": false,
+      "expected_future_fields": [
+        "event_ts",
+        "known_at",
+        "available_at",
+        "open",
+        "high",
+        "low",
+        "close",
+        "volume",
+        "quote_volume",
+        "count",
+        "taker_buy_volume",
+        "taker_buy_quote_volume"
+      ],
+      "clock_definition": "UTC minute open [m, m+60000ms), available_at >= m+60000ms",
+      "rights_status": "PROPOSED_UNVERIFIED_PENDING_OWNER_GRANT",
+      "continuity_status": "UNKNOWN_PENDING_L3_QA",
+      "notes": "Verified regular parquet file via lstat receipt; zero data bytes read"
+    },
+    {
+      "source_id": "btc_perp_1m_2025_04",
+      "relative_path": "research/BTCUSDT/1m/year=2025/month=04/data.parquet",
+      "role": "BTC_PERP_1M_KLINE",
+      "certainty": [
+        "PHYSICAL_METADATA_EXECUTOR_OBSERVED",
+        "UNVERIFIED_RIGHTS",
+        "UNKNOWN_FILE_CONTINUITY"
+      ],
+      "receipt_sha": "c6823dbc46249cac43aa10400aacbbe9f4542410",
+      "size_bytes": 2329220,
+      "is_regular_file": true,
+      "is_directory": false,
+      "expected_future_fields": [
+        "event_ts",
+        "known_at",
+        "available_at",
+        "open",
+        "high",
+        "low",
+        "close",
+        "volume",
+        "quote_volume",
+        "count",
+        "taker_buy_volume",
+        "taker_buy_quote_volume"
+      ],
+      "clock_definition": "UTC minute open [m, m+60000ms), available_at >= m+60000ms",
+      "rights_status": "PROPOSED_UNVERIFIED_PENDING_OWNER_GRANT",
+      "continuity_status": "UNKNOWN_PENDING_L3_QA",
+      "notes": "Verified regular parquet file via lstat receipt; zero data bytes read"
+    },
+    {
+      "source_id": "btc_perp_data_manifest",
+      "relative_path": "research/BTCUSDT/data_manifest.json",
+      "role": "BTC_PERP_MANIFEST_METADATA",
+      "certainty": [
+        "PHYSICAL_METADATA_EXECUTOR_OBSERVED",
+        "UNVERIFIED_RIGHTS"
+      ],
+      "receipt_sha": "c6823dbc46249cac43aa10400aacbbe9f4542410",
+      "size_bytes": 45234,
+      "is_regular_file": true,
+      "is_directory": false,
+      "expected_future_fields": [
+        "partitions",
+        "checksums",
+        "provenance"
+      ],
+      "clock_definition": "Static manifest",
+      "rights_status": "PROPOSED_UNVERIFIED_PENDING_OWNER_GRANT",
+      "continuity_status": "NOT_APPLICABLE_MANIFEST",
+      "notes": "Metadata file observed; contents not parsed or trusted without cryptographic verification"
+    },
+    {
+      "source_id": "btc_perp_funding_events_csv",
+      "relative_path": "research/BTCUSDT/funding_events.csv",
+      "role": "BTC_PERP_FUNDING_EVENTS_CSV",
+      "certainty": [
+        "PHYSICAL_METADATA_EXECUTOR_OBSERVED",
+        "UNVERIFIED_RIGHTS",
+        "UNKNOWN_FILE_CONTINUITY"
+      ],
+      "receipt_sha": "c6823dbc46249cac43aa10400aacbbe9f4542410",
+      "size_bytes": 219066,
+      "is_regular_file": true,
+      "is_directory": false,
+      "expected_future_fields": [
+        "event_ts",
+        "known_at",
+        "settlement_at",
+        "funding_rate",
+        "mark_price",
+        "realized_cashflow"
+      ],
+      "clock_definition": "Published prediction vs settled actual rate at 8h/4h UTC boundaries",
+      "rights_status": "PROPOSED_UNVERIFIED_PENDING_OWNER_GRANT",
+      "continuity_status": "UNPROVEN_CLOCK_CAUSALITY",
+      "notes": "CSV presence does NOT prove point-in-time publication timing or signed cashflow causality"
+    },
+    {
+      "source_id": "btc_perp_raw_klines_dir",
+      "relative_path": "research/BTCUSDT/raw/klines",
+      "role": "BTC_PERP_RAW_KLINE_CONTAINER",
+      "certainty": [
+        "PHYSICAL_METADATA_EXECUTOR_OBSERVED"
+      ],
+      "receipt_sha": "c6823dbc46249cac43aa10400aacbbe9f4542410",
+      "size_bytes": 4096,
+      "is_regular_file": false,
+      "is_directory": true,
+      "expected_future_fields": [
+        "monthly_zip_archives"
+      ],
+      "clock_definition": "Raw ingestion timestamp",
+      "rights_status": "PROPOSED_UNVERIFIED_PENDING_OWNER_GRANT",
+      "continuity_status": "DIRECTORY_CONTAINER_ONLY",
+      "notes": "Directory container observed; descent into raw contents strictly excluded"
+    },
+    {
+      "source_id": "btc_perp_raw_mark_price_dir",
+      "relative_path": "research/BTCUSDT/raw/mark_price",
+      "role": "BTC_PERP_RAW_MARK_CONTAINER",
+      "certainty": [
+        "PHYSICAL_METADATA_EXECUTOR_OBSERVED"
+      ],
+      "receipt_sha": "c6823dbc46249cac43aa10400aacbbe9f4542410",
+      "size_bytes": 4096,
+      "is_regular_file": false,
+      "is_directory": true,
+      "expected_future_fields": [
+        "mark_price_1m_continuous"
+      ],
+      "clock_definition": "Exchange mark calculation index clock",
+      "rights_status": "PROPOSED_UNVERIFIED_PENDING_OWNER_GRANT",
+      "continuity_status": "UNPROVEN_TRUE_CONTINUOUS_1M_MARK",
+      "notes": "Raw mark price directory existence does NOT prove continuous true 1m PIT Mark prices"
+    },
+    {
+      "source_id": "btc_perp_raw_funding_dir",
+      "relative_path": "research/BTCUSDT/raw/funding",
+      "role": "BTC_PERP_RAW_FUNDING_CONTAINER",
+      "certainty": [
+        "PHYSICAL_METADATA_EXECUTOR_OBSERVED"
+      ],
+      "receipt_sha": "c6823dbc46249cac43aa10400aacbbe9f4542410",
+      "size_bytes": 4096,
+      "is_regular_file": false,
+      "is_directory": true,
+      "expected_future_fields": [
+        "funding_rate_events"
+      ],
+      "clock_definition": "Exchange funding rate settlement clock",
+      "rights_status": "PROPOSED_UNVERIFIED_PENDING_OWNER_GRANT",
+      "continuity_status": "DIRECTORY_CONTAINER_ONLY",
+      "notes": "Raw funding parent directory observed only"
+    },
+    {
+      "source_id": "btc_spot_manifest",
+      "relative_path": "research/BTCUSDT_SPOT/data_manifest.json",
+      "role": "BTC_SPOT_MANIFEST_AND_DATA",
+      "certainty": [
+        "PHYSICAL_METADATA_EXECUTOR_OBSERVED"
+      ],
+      "receipt_sha": "c6823dbc46249cac43aa10400aacbbe9f4542410",
+      "size_bytes": 19855,
+      "is_regular_file": true,
+      "is_directory": false,
+      "expected_future_fields": [
+        "spot_kline_partitions"
+      ],
+      "clock_definition": "UTC Spot Trade Clock",
+      "rights_status": "PROPOSED_UNVERIFIED_PENDING_OWNER_GRANT",
+      "continuity_status": "DISTINCT_SPOT_DATASET",
+      "notes": "Spot cash market cannot substitute for perpetual derivative mechanics or funding rates"
+    },
+    {
+      "source_id": "eth_hourly_auxiliary_parquet",
+      "relative_path": "research/cross_asset_1h/ETHUSDT.parquet",
+      "role": "ETH_HOURLY_AUXILIARY",
+      "certainty": [
+        "PHYSICAL_METADATA_EXECUTOR_OBSERVED"
+      ],
+      "receipt_sha": "c6823dbc46249cac43aa10400aacbbe9f4542410",
+      "size_bytes": 3391374,
+      "is_regular_file": true,
+      "is_directory": false,
+      "expected_future_fields": [
+        "hourly_open",
+        "hourly_close",
+        "hourly_volume"
+      ],
+      "clock_definition": "1h Macro Clock (NOT 1m)",
+      "rights_status": "PROPOSED_UNVERIFIED_PENDING_OWNER_GRANT",
+      "continuity_status": "HOURLY_AUXILIARY_ONLY",
+      "notes": "Hourly cross-asset data does NOT satisfy 1m multi-asset perpetual execution requirement"
+    },
+    {
+      "source_id": "legacy_v0319_derivatives",
+      "relative_path": "research/v0.3.19_official_derivatives/hourly_inputs.parquet",
+      "role": "LEGACY_DERIVATIVE_HOURLY",
+      "certainty": [
+        "PHYSICAL_METADATA_EXECUTOR_OBSERVED"
+      ],
+      "receipt_sha": "c6823dbc46249cac43aa10400aacbbe9f4542410",
+      "size_bytes": 2058958,
+      "is_regular_file": true,
+      "is_directory": false,
+      "expected_future_fields": [
+        "v0319_features"
+      ],
+      "clock_definition": "Historical Hourly",
+      "rights_status": "HISTORICAL_ARCHIVE_ONLY",
+      "continuity_status": "NOT_APPLICABLE_LEGACY",
+      "notes": "Historical archive for traceability only; no new live trading use"
+    },
+    {
+      "source_id": "unproven_eth_sol_perp_1m",
+      "relative_path": "research/{ETHUSDT,SOLUSDT}/1m/**",
+      "role": "UNPROVEN_ETH_SOL_PERP_1M",
+      "certainty": [
+        "UNKNOWN_FILE_CONTINUITY"
+      ],
+      "receipt_sha": "NONE",
+      "size_bytes": null,
+      "is_regular_file": false,
+      "is_directory": false,
+      "expected_future_fields": [
+        "continuous_1m_perp_trade",
+        "continuous_1m_mark",
+        "funding_rates"
+      ],
+      "clock_definition": "Unproven",
+      "rights_status": "ABSENT_OR_UNPROVEN",
+      "continuity_status": "STRICT_FAIL_CLOSED_NO_DATA",
+      "notes": "Multi-asset diversification claim requires unproven minute data; single-asset BTC fails <=60% screen"
+    },
+    {
+      "source_id": "protected_holdout_2026_and_forward",
+      "relative_path": "research/BTCUSDT/1m/year=2026/**, data/forward/**, data/research/h39_validation/**",
+      "role": "PROTECTED_HOLDOUT",
+      "certainty": [
+        "PROTECTED_DO_NOT_TOUCH"
+      ],
+      "receipt_sha": "PROTECTED_SEALED",
+      "size_bytes": null,
+      "is_regular_file": false,
+      "is_directory": false,
+      "expected_future_fields": [
+        "SEALED"
+      ],
+      "clock_definition": "[2026-02-01, 2026-08-01) strictly protected holdout",
+      "rights_status": "STRICTLY_FORBIDDEN",
+      "continuity_status": "PROTECTED_DO_NOT_TOUCH",
+      "notes": "Strict fail-closed zero metadata traversal and zero data byte access"
+    }
+  ],
+  "rights_questionnaire": [
+    {
+      "question_id": "Q1_COMMERCIAL_AND_RESEARCH_LICENSE",
+      "topic": "Data License and Terms of Service Conformance",
+      "question": "What is the specific legal terms-of-service and licensing authorization under which the historical Binance/exchange perpetual futures market data was acquired and may be queried by automated agents?",
+      "status": "PROPOSED_PENDING_OWNER_RESPONSE"
+    },
+    {
+      "question_id": "Q2_FEE_SCHEDULE_AND_VIP_TIER",
+      "topic": "Historical Execution Fee Schedule",
+      "question": "What explicit VIP tier maker/taker fee rates, BUSD/USDT discount schedules, and slippage assumptions are authorized to model historical execution friction accurately?",
+      "status": "PROPOSED_PENDING_OWNER_RESPONSE"
+    },
+    {
+      "question_id": "Q3_TRUE_CONTINUOUS_1M_MARK_PROVENANCE",
+      "topic": "Mark Price Source and Granularity",
+      "question": "Does the raw/mark_price landing zone contain actual uninterrupted 1-minute sampled Mark Price records matching the trade Kline timestamps, or is it composed solely of daily/sparse archives?",
+      "status": "PROPOSED_PENDING_OWNER_RESPONSE"
+    },
+    {
+      "question_id": "Q4_FUNDING_KNOWN_AT_AND_SETTLEMENT_CAUSALITY",
+      "topic": "Point-in-Time Funding Rate Timing",
+      "question": "Does funding_events.csv record the point-in-time timestamp at which funding rates were published by the exchange API (known_at), or does it record only the effective settlement timestamp (settlement_at)?",
+      "status": "PROPOSED_PENDING_OWNER_RESPONSE"
+    },
+    {
+      "question_id": "Q5_SCOPE_OF_READER_GRANT_LEVEL",
+      "topic": "Explicit Reader Capability Grant",
+      "question": "Will the owner grant a future explicit staged capability token permitting L2 (Parquet footer metadata only) or L3 (bounded timestamp audit sample), and what is the maximum allowed byte/row ceiling for that grant?",
+      "status": "PROPOSED_PENDING_OWNER_RESPONSE"
+    }
+  ]
+}

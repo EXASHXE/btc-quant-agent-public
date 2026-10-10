@@ -1,0 +1,868 @@
+{
+  "task_id": "V06_P2_S2_GEMINI_LONG_SOURCE_CONTRACT_AND_SYNTHETIC_CAPABILITY_GATE_R1",
+  "controller_dispatch_sha": "b176f4361cd97d1d89c3e25173b2c72a6af93ec4",
+  "code_start_sha": "e0ff8c3473de4bfa3e66fe7928d42992a4d38a32",
+  "stat_receipt_sha": "c6823dbc46249cac43aa10400aacbbe9f4542410",
+  "terminated_locator_counterexample_sha": "4a1fcc2871708f0e9e3a7c40036ecaab39ba99b8",
+  "controller_termination_sha": "ca0b6ea62613e6981b6f818f37f45be8c1d74901",
+  "controller_admission_design_sha": "519b2e9ba2ca847e76ad9c0a7fbafcec5fcda158",
+  "timestamp_utc": "2026-10-10T04:22:10.700509+00:00",
+  "summary": {
+    "total_cases_evaluated": 38,
+    "positive_cases_passed": 15,
+    "negative_security_witnesses_rejected": 20,
+    "deliberate_mutants_detected": 3,
+    "total_passed": 38,
+    "total_failed": 0
+  },
+  "scenarios": [
+    {
+      "case_id": "SEC_01_PINNED_AUTHORITIES",
+      "category": "AUTHORITY",
+      "name": "Verify immutable Controller & prompt SHAs",
+      "expected_decision": "VERIFIED",
+      "actual_decision": "VERIFIED",
+      "status": "PASS",
+      "notes": "Verified dispatch SHA b176f4361cd97d1d89c3e25173b2c72a6af93ec4 and code start e0ff8c3473de4bfa3e66fe7928d42992a4d38a32"
+    },
+    {
+      "case_id": "SEC_02_LEVEL_HIERARCHY",
+      "category": "AUTHORITY",
+      "name": "Verify L0 < L1 < L2 < L3 < L4 strict monotonic ordering",
+      "expected_decision": "VERIFIED",
+      "actual_decision": "VERIFIED",
+      "status": "PASS",
+      "notes": "Verified default-deny non-escalation ordering"
+    },
+    {
+      "case_id": "SEC_03_TOKEN_SIGNATURE",
+      "category": "TOKEN_SECURITY",
+      "name": "Cryptographic signature check rejects tampered token",
+      "expected_decision": "SIGNATURE_REJECTED",
+      "actual_decision": "SIGNATURE_REJECTED",
+      "status": "PASS",
+      "notes": "Tampered token max_level invalidates signature"
+    },
+    {
+      "case_id": "SEC_04_TOKEN_EXPIRATION",
+      "category": "TOKEN_SECURITY",
+      "name": "Expired token rejected",
+      "expected_decision": "DENIED_CAPABILITY_EXPIRED",
+      "actual_decision": "DENIED_CAPABILITY_EXPIRED",
+      "status": "PASS",
+      "receipt": {
+        "receipt_id": "rcpt_9dc4a04e6189",
+        "task_id": "V06_P2_S2_GEMINI_LONG_SOURCE_CONTRACT_AND_SYNTHETIC_CAPABILITY_GATE_R1",
+        "timestamp_utc": "2026-10-10T12:00:00Z",
+        "requested_path": "research/BTCUSDT/1m/year=2021/month=03/data.parquet",
+        "canonical_relative_path": "research/BTCUSDT/1m/year=2021/month=03/data.parquet",
+        "requested_level": "L1_METADATA",
+        "decision": "DENIED_CAPABILITY_EXPIRED",
+        "reason": "Capability token tok_exp expired at 2026-10-05T00:00:00Z (current: 2026-10-10T12:00:00Z).",
+        "syscall_accounting": {
+          "lstat_calls": 0,
+          "open_calls": 0,
+          "fstat_calls": 0,
+          "read_calls": 0,
+          "bytes_read": 0,
+          "scandir_calls": 0,
+          "close_calls": 0,
+          "total_calls": 0
+        },
+        "exception_class": "CapabilityTokenExpiredError",
+        "is_synthetic_fixture": true,
+        "metadata_size_bytes": null
+      }
+    },
+    {
+      "case_id": "SEC_05_LEVEL_ESCALATION",
+      "category": "CAPABILITY_ESCALATION",
+      "name": "L1 token attempting L2 schema access rejected",
+      "expected_decision": "DENIED_UNAUTHORIZED_LEVEL",
+      "actual_decision": "DENIED_UNAUTHORIZED_LEVEL",
+      "status": "PASS",
+      "receipt": {
+        "receipt_id": "rcpt_65072ce6fbd5",
+        "task_id": "V06_P2_S2_GEMINI_LONG_SOURCE_CONTRACT_AND_SYNTHETIC_CAPABILITY_GATE_R1",
+        "timestamp_utc": "2026-10-10T04:22:10.699250+00:00",
+        "requested_path": "research/BTCUSDT/1m/year=2021/month=03/data.parquet",
+        "canonical_relative_path": "research/BTCUSDT/1m/year=2021/month=03/data.parquet",
+        "requested_level": "L2_SCHEMA",
+        "decision": "DENIED_UNAUTHORIZED_LEVEL",
+        "reason": "Requested level L2_SCHEMA exceeds token grant L1_METADATA.",
+        "syscall_accounting": {
+          "lstat_calls": 0,
+          "open_calls": 0,
+          "fstat_calls": 0,
+          "read_calls": 0,
+          "bytes_read": 0,
+          "scandir_calls": 0,
+          "close_calls": 0,
+          "total_calls": 0
+        },
+        "exception_class": "CapabilityLevelEscalationError",
+        "is_synthetic_fixture": true,
+        "metadata_size_bytes": null
+      }
+    },
+    {
+      "case_id": "SEC_06_PATH_ESCALATION",
+      "category": "CAPABILITY_ESCALATION",
+      "name": "Token scoped to month 03 attempting month 04 rejected",
+      "expected_decision": "DENIED_CAPABILITY_INVALID",
+      "actual_decision": "DENIED_CAPABILITY_INVALID",
+      "status": "PASS",
+      "receipt": {
+        "receipt_id": "rcpt_2b4b8cf6f8bf",
+        "task_id": "V06_P2_S2_GEMINI_LONG_SOURCE_CONTRACT_AND_SYNTHETIC_CAPABILITY_GATE_R1",
+        "timestamp_utc": "2026-10-10T04:22:10.699309+00:00",
+        "requested_path": "research/BTCUSDT/1m/year=2021/month=04/data.parquet",
+        "canonical_relative_path": "research/BTCUSDT/1m/year=2021/month=04/data.parquet",
+        "requested_level": "L1_METADATA",
+        "decision": "DENIED_CAPABILITY_INVALID",
+        "reason": "Path research/BTCUSDT/1m/year=2021/month=04/data.parquet not authorized by capability token tok_p1.",
+        "syscall_accounting": {
+          "lstat_calls": 0,
+          "open_calls": 0,
+          "fstat_calls": 0,
+          "read_calls": 0,
+          "bytes_read": 0,
+          "scandir_calls": 0,
+          "close_calls": 0,
+          "total_calls": 0
+        },
+        "exception_class": "CapabilityTokenInvalidError",
+        "is_synthetic_fixture": true,
+        "metadata_size_bytes": null
+      }
+    },
+    {
+      "case_id": "SEC_07_POSITIVE_SIX_MONTHS",
+      "category": "POSITIVE_ALLOWLIST",
+      "name": "All six approved candidate monthly partitions permitted under L1",
+      "expected_decision": "PERMITTED",
+      "actual_decision": "PERMITTED",
+      "status": "PASS",
+      "receipt": {
+        "receipt_id": "rcpt_ccb0d3656ffa",
+        "task_id": "V06_P2_S2_GEMINI_LONG_SOURCE_CONTRACT_AND_SYNTHETIC_CAPABILITY_GATE_R1",
+        "timestamp_utc": "2026-10-10T04:22:10.699338+00:00",
+        "requested_path": "research/BTCUSDT/1m/year=2021/month=03/data.parquet",
+        "canonical_relative_path": "research/BTCUSDT/1m/year=2021/month=03/data.parquet",
+        "requested_level": "L1_METADATA",
+        "decision": "PERMITTED",
+        "reason": "All positive capability contract checks and component walk passed successfully.",
+        "syscall_accounting": {
+          "lstat_calls": 7,
+          "open_calls": 0,
+          "fstat_calls": 0,
+          "read_calls": 0,
+          "bytes_read": 0,
+          "scandir_calls": 0,
+          "close_calls": 0,
+          "total_calls": 7
+        },
+        "exception_class": null,
+        "is_synthetic_fixture": true,
+        "metadata_size_bytes": 2756024
+      }
+    },
+    {
+      "case_id": "SEC_08_NON_ALLOWLIST_MONTH",
+      "category": "POSITIVE_ALLOWLIST",
+      "name": "Unapproved month=05 rejected under allowlist policy",
+      "expected_decision": "DENIED_CAPABILITY_INVALID",
+      "actual_decision": "DENIED_CAPABILITY_INVALID",
+      "status": "PASS",
+      "receipt": {
+        "receipt_id": "rcpt_93137cfae3ea",
+        "task_id": "V06_P2_S2_GEMINI_LONG_SOURCE_CONTRACT_AND_SYNTHETIC_CAPABILITY_GATE_R1",
+        "timestamp_utc": "2026-10-10T04:22:10.699619+00:00",
+        "requested_path": "research/BTCUSDT/1m/year=2021/month=05/data.parquet",
+        "canonical_relative_path": "research/BTCUSDT/1m/year=2021/month=05/data.parquet",
+        "requested_level": "L1_METADATA",
+        "decision": "DENIED_CAPABILITY_INVALID",
+        "reason": "Path 'research/BTCUSDT/1m/year=2021/month=05/data.parquet' is not in the approved positive allowlist.",
+        "syscall_accounting": {
+          "lstat_calls": 0,
+          "open_calls": 0,
+          "fstat_calls": 0,
+          "read_calls": 0,
+          "bytes_read": 0,
+          "scandir_calls": 0,
+          "close_calls": 0,
+          "total_calls": 0
+        },
+        "exception_class": "CapabilityTokenInvalidError",
+        "is_synthetic_fixture": true,
+        "metadata_size_bytes": null
+      }
+    },
+    {
+      "case_id": "SEC_09_SYSCALL_ACCOUNTING_PRECISION",
+      "category": "SYSCALL_ACCOUNTING",
+      "name": "Every individual low-level OS call incremented at boundary",
+      "expected_decision": "VERIFIED",
+      "actual_decision": "VERIFIED",
+      "status": "PASS",
+      "notes": "Verified lstat, open, fstat, read, close call increments"
+    },
+    {
+      "case_id": "SEC_10_NO_UNIQUE_PATH_CACHE",
+      "category": "SYSCALL_ACCOUNTING",
+      "name": "Repeated calls to same path increment counters without cache bypass",
+      "expected_decision": "VERIFIED",
+      "actual_decision": "VERIFIED",
+      "status": "PASS",
+      "notes": "Five identical lstats yield exactly 5 recorded calls"
+    },
+    {
+      "case_id": "SEC_11_ZERO_BYTE_POLICY",
+      "category": "ZERO_BYTE_POLICY",
+      "name": "Attempting read > 0 bytes triggers ZeroBytePolicyViolationError",
+      "expected_decision": "DENIED_ZERO_BYTE_POLICY",
+      "actual_decision": "DENIED_ZERO_BYTE_POLICY",
+      "status": "PASS",
+      "notes": "max_bytes=0 strictly enforced; 1 byte read fails closed"
+    },
+    {
+      "case_id": "SEC_12_SYSCALL_BUDGET_CEILING",
+      "category": "BUDGET_CEILING",
+      "name": "Exceeding max_syscalls triggers BudgetExceededError",
+      "expected_decision": "DENIED_SYSCALL_BUDGET_EXCEEDED",
+      "actual_decision": "DENIED_SYSCALL_BUDGET_EXCEEDED",
+      "status": "PASS",
+      "notes": "Total call limit enforced before system call execution"
+    },
+    {
+      "case_id": "SEC_13_EACCES_DISTINCT_FROM_ENOENT",
+      "category": "ERROR_SPECIFICITY",
+      "name": "PermissionError (EACCES) strictly distinct from NotFound (ENOENT)",
+      "expected_decision": "VERIFIED_DISTINCT",
+      "actual_decision": "VERIFIED_DISTINCT",
+      "status": "PASS",
+      "notes": "EACCESAccessDeniedError != ENOENTNotFoundError in status and class"
+    },
+    {
+      "case_id": "SEC_14_SOURCE_MATRIX_INTEGRITY",
+      "category": "EVIDENCE_MAP",
+      "name": "Source scope matrix provides 16 items and 5 rights questions",
+      "expected_decision": "VERIFIED",
+      "actual_decision": "VERIFIED",
+      "status": "PASS",
+      "notes": "All six candidate months mapped with metadata hashes"
+    },
+    {
+      "case_id": "SEC_15_AUDIT_RECEIPT_SERIALIZATION",
+      "category": "AUDIT_RECEIPT",
+      "name": "AuditReceipt serializes to deterministic JSON",
+      "expected_decision": "VERIFIED",
+      "actual_decision": "VERIFIED",
+      "status": "PASS",
+      "notes": "Audit receipt contains full syscall accounting and decision metadata"
+    },
+    {
+      "case_id": "SEC_16_CLI_CUSTOM_ROOT_BYPASS",
+      "category": "CLI_COUNTEREXAMPLE_DEFENSE",
+      "name": "CLI custom root override in production rejected",
+      "expected_decision": "RAISES_ProductionRootOverrideDeniedError",
+      "actual_decision": "RAISES_ProductionRootOverrideDeniedError",
+      "status": "PASS",
+      "notes": "F01 vulnerability counterexample neutralized: production root is immutable"
+    },
+    {
+      "case_id": "SEC_17_PROD_REFUSES_PHYSICAL_EXECUTION",
+      "category": "PRODUCTION_BOUNDARY",
+      "name": "Kernel refuses to touch physical market root without test harness",
+      "expected_decision": "DENIED_PERMISSION_ERROR",
+      "actual_decision": "DENIED_PERMISSION_ERROR",
+      "status": "PASS",
+      "receipt": {
+        "receipt_id": "rcpt_150e1a5a0904",
+        "task_id": "V06_P2_S2_GEMINI_LONG_SOURCE_CONTRACT_AND_SYNTHETIC_CAPABILITY_GATE_R1",
+        "timestamp_utc": "2026-10-10T04:22:10.699650+00:00",
+        "requested_path": "research/BTCUSDT/1m/year=2021/month=03/data.parquet",
+        "canonical_relative_path": "research/BTCUSDT/1m/year=2021/month=03/data.parquet",
+        "requested_level": "L1_METADATA",
+        "decision": "DENIED_PERMISSION_ERROR",
+        "reason": "Security or OS error: Direct physical execution on owner data root is prohibited. Kernel runs exclusively with synthetic hooks.",
+        "syscall_accounting": {
+          "lstat_calls": 0,
+          "open_calls": 0,
+          "fstat_calls": 0,
+          "read_calls": 0,
+          "bytes_read": 0,
+          "scandir_calls": 0,
+          "close_calls": 0,
+          "total_calls": 0
+        },
+        "exception_class": "AccessDeniedError",
+        "is_synthetic_fixture": false,
+        "metadata_size_bytes": null
+      }
+    },
+    {
+      "case_id": "SEC_18_ABSOLUTE_PATH_ALIAS",
+      "category": "PATH_TRAVERSAL",
+      "name": "Target path with leading slash rejected",
+      "expected_decision": "DENIED_PARENT_TRAVERSAL",
+      "actual_decision": "DENIED_PARENT_TRAVERSAL",
+      "status": "PASS",
+      "receipt": {
+        "receipt_id": "rcpt_889f45a82c31",
+        "task_id": "V06_P2_S2_GEMINI_LONG_SOURCE_CONTRACT_AND_SYNTHETIC_CAPABILITY_GATE_R1",
+        "timestamp_utc": "2026-10-10T04:22:10.699664+00:00",
+        "requested_path": "/research/BTCUSDT/1m/year=2021/month=03/data.parquet",
+        "canonical_relative_path": "/research/BTCUSDT/1m/year=2021/month=03/data.parquet",
+        "requested_level": "L1_METADATA",
+        "decision": "DENIED_PARENT_TRAVERSAL",
+        "reason": "Leading slash not permitted in relative path.",
+        "syscall_accounting": {
+          "lstat_calls": 0,
+          "open_calls": 0,
+          "fstat_calls": 0,
+          "read_calls": 0,
+          "bytes_read": 0,
+          "scandir_calls": 0,
+          "close_calls": 0,
+          "total_calls": 0
+        },
+        "exception_class": "PathTraversalError",
+        "is_synthetic_fixture": true,
+        "metadata_size_bytes": null
+      }
+    },
+    {
+      "case_id": "SEC_19_PARENT_TRAVERSAL_DOT_DOT",
+      "category": "PATH_TRAVERSAL",
+      "name": "Path containing '..' traversal rejected",
+      "expected_decision": "DENIED_PARENT_TRAVERSAL",
+      "actual_decision": "DENIED_PARENT_TRAVERSAL",
+      "status": "PASS",
+      "receipt": {
+        "receipt_id": "rcpt_63ce5b915500",
+        "task_id": "V06_P2_S2_GEMINI_LONG_SOURCE_CONTRACT_AND_SYNTHETIC_CAPABILITY_GATE_R1",
+        "timestamp_utc": "2026-10-10T04:22:10.699680+00:00",
+        "requested_path": "research/../secret.txt",
+        "canonical_relative_path": "research/../secret.txt",
+        "requested_level": "L1_METADATA",
+        "decision": "DENIED_PARENT_TRAVERSAL",
+        "reason": "Traversal '..' rejected in path: research/../secret.txt",
+        "syscall_accounting": {
+          "lstat_calls": 0,
+          "open_calls": 0,
+          "fstat_calls": 0,
+          "read_calls": 0,
+          "bytes_read": 0,
+          "scandir_calls": 0,
+          "close_calls": 0,
+          "total_calls": 0
+        },
+        "exception_class": "PathTraversalError",
+        "is_synthetic_fixture": true,
+        "metadata_size_bytes": null
+      }
+    },
+    {
+      "case_id": "SEC_20_SIBLING_DATA_V2_ESCAPE",
+      "category": "PATH_TRAVERSAL",
+      "name": "Path escaping to sibling data-v2 directory rejected",
+      "expected_decision": "DENIED_PARENT_TRAVERSAL",
+      "actual_decision": "DENIED_PARENT_TRAVERSAL",
+      "status": "PASS",
+      "receipt": {
+        "receipt_id": "rcpt_f9cc27da1493",
+        "task_id": "V06_P2_S2_GEMINI_LONG_SOURCE_CONTRACT_AND_SYNTHETIC_CAPABILITY_GATE_R1",
+        "timestamp_utc": "2026-10-10T04:22:10.699695+00:00",
+        "requested_path": "research/../../data-v2/file.parquet",
+        "canonical_relative_path": "research/../../data-v2/file.parquet",
+        "requested_level": "L1_METADATA",
+        "decision": "DENIED_PARENT_TRAVERSAL",
+        "reason": "Traversal '..' rejected in path: research/../../data-v2/file.parquet",
+        "syscall_accounting": {
+          "lstat_calls": 0,
+          "open_calls": 0,
+          "fstat_calls": 0,
+          "read_calls": 0,
+          "bytes_read": 0,
+          "scandir_calls": 0,
+          "close_calls": 0,
+          "total_calls": 0
+        },
+        "exception_class": "PathTraversalError",
+        "is_synthetic_fixture": true,
+        "metadata_size_bytes": null
+      }
+    },
+    {
+      "case_id": "SEC_21_INTERMEDIATE_SYMLINK",
+      "category": "SYMLINK_DEFENSE",
+      "name": "Intermediate directory symlink detected and rejected",
+      "expected_decision": "DENIED_SYMLINK_TRAVERSAL",
+      "actual_decision": "DENIED_SYMLINK_TRAVERSAL",
+      "status": "PASS",
+      "receipt": {
+        "receipt_id": "rcpt_adaadb586ada",
+        "task_id": "V06_P2_S2_GEMINI_LONG_SOURCE_CONTRACT_AND_SYNTHETIC_CAPABILITY_GATE_R1",
+        "timestamp_utc": "2026-10-10T04:22:10.699769+00:00",
+        "requested_path": "research/BTCUSDT/1m/year=2021/month=03/data.parquet",
+        "canonical_relative_path": "research/BTCUSDT/1m/year=2021/month=03/data.parquet",
+        "requested_level": "L1_METADATA",
+        "decision": "DENIED_SYMLINK_TRAVERSAL",
+        "reason": "Symlink detected at intermediate component: /synthetic/data/research/BTCUSDT/1m",
+        "syscall_accounting": {
+          "lstat_calls": 0,
+          "open_calls": 0,
+          "fstat_calls": 0,
+          "read_calls": 0,
+          "bytes_read": 0,
+          "scandir_calls": 0,
+          "close_calls": 0,
+          "total_calls": 0
+        },
+        "exception_class": "SymlinkEncounteredError",
+        "is_synthetic_fixture": true,
+        "metadata_size_bytes": null
+      }
+    },
+    {
+      "case_id": "SEC_22_ROOT_SYMLINK",
+      "category": "SYMLINK_DEFENSE",
+      "name": "Root directory being a symlink detected and rejected",
+      "expected_decision": "DENIED_SYMLINK_TRAVERSAL",
+      "actual_decision": "DENIED_SYMLINK_TRAVERSAL",
+      "status": "PASS",
+      "receipt": {
+        "receipt_id": "rcpt_ac655deb8c59",
+        "task_id": "V06_P2_S2_GEMINI_LONG_SOURCE_CONTRACT_AND_SYNTHETIC_CAPABILITY_GATE_R1",
+        "timestamp_utc": "2026-10-10T04:22:10.699820+00:00",
+        "requested_path": "research/BTCUSDT/1m/year=2021/month=03/data.parquet",
+        "canonical_relative_path": "research/BTCUSDT/1m/year=2021/month=03/data.parquet",
+        "requested_level": "L1_METADATA",
+        "decision": "DENIED_SYMLINK_TRAVERSAL",
+        "reason": "Root path itself is a symlink: /synthetic/data",
+        "syscall_accounting": {
+          "lstat_calls": 0,
+          "open_calls": 0,
+          "fstat_calls": 0,
+          "read_calls": 0,
+          "bytes_read": 0,
+          "scandir_calls": 0,
+          "close_calls": 0,
+          "total_calls": 0
+        },
+        "exception_class": "SymlinkEncounteredError",
+        "is_synthetic_fixture": true,
+        "metadata_size_bytes": null
+      }
+    },
+    {
+      "case_id": "SEC_23_TARGET_LEAF_SYMLINK",
+      "category": "SYMLINK_DEFENSE",
+      "name": "Target leaf file being a symlink detected and rejected",
+      "expected_decision": "DENIED_SYMLINK_TRAVERSAL",
+      "actual_decision": "DENIED_SYMLINK_TRAVERSAL",
+      "status": "PASS",
+      "receipt": {
+        "receipt_id": "rcpt_d8238ce400ba",
+        "task_id": "V06_P2_S2_GEMINI_LONG_SOURCE_CONTRACT_AND_SYNTHETIC_CAPABILITY_GATE_R1",
+        "timestamp_utc": "2026-10-10T04:22:10.699902+00:00",
+        "requested_path": "research/BTCUSDT/1m/year=2021/month=03/data.parquet",
+        "canonical_relative_path": "research/BTCUSDT/1m/year=2021/month=03/data.parquet",
+        "requested_level": "L1_METADATA",
+        "decision": "DENIED_SYMLINK_TRAVERSAL",
+        "reason": "Symlink detected at leaf target: /synthetic/data/research/BTCUSDT/1m/year=2021/month=03/data.parquet",
+        "syscall_accounting": {
+          "lstat_calls": 0,
+          "open_calls": 0,
+          "fstat_calls": 0,
+          "read_calls": 0,
+          "bytes_read": 0,
+          "scandir_calls": 0,
+          "close_calls": 0,
+          "total_calls": 0
+        },
+        "exception_class": "SymlinkEncounteredError",
+        "is_synthetic_fixture": true,
+        "metadata_size_bytes": null
+      }
+    },
+    {
+      "case_id": "SEC_24_NON_DIRECTORY_ANCESTOR",
+      "category": "PATH_STRUCTURE",
+      "name": "Non-directory ancestor component detected and rejected",
+      "expected_decision": "DENIED_NON_DIRECTORY_ANCESTOR",
+      "actual_decision": "DENIED_NON_DIRECTORY_ANCESTOR",
+      "status": "PASS",
+      "receipt": {
+        "receipt_id": "rcpt_d160bddc8baf",
+        "task_id": "V06_P2_S2_GEMINI_LONG_SOURCE_CONTRACT_AND_SYNTHETIC_CAPABILITY_GATE_R1",
+        "timestamp_utc": "2026-10-10T04:22:10.699996+00:00",
+        "requested_path": "research/BTCUSDT/1m/year=2021/month=03/data.parquet",
+        "canonical_relative_path": "research/BTCUSDT/1m/year=2021/month=03/data.parquet",
+        "requested_level": "L1_METADATA",
+        "decision": "DENIED_NON_DIRECTORY_ANCESTOR",
+        "reason": "Ancestor component is not a directory: /synthetic/data/research/BTCUSDT/1m",
+        "syscall_accounting": {
+          "lstat_calls": 0,
+          "open_calls": 0,
+          "fstat_calls": 0,
+          "read_calls": 0,
+          "bytes_read": 0,
+          "scandir_calls": 0,
+          "close_calls": 0,
+          "total_calls": 0
+        },
+        "exception_class": "NotADirectoryError",
+        "is_synthetic_fixture": true,
+        "metadata_size_bytes": null
+      }
+    },
+    {
+      "case_id": "SEC_25_MOUNT_BOUNDARY_ESCAPE",
+      "category": "MOUNT_ISOLATION",
+      "name": "Crossing filesystem/device boundary (st_dev change) rejected",
+      "expected_decision": "DENIED_MOUNT_BOUNDARY_VIOLATION",
+      "actual_decision": "DENIED_MOUNT_BOUNDARY_VIOLATION",
+      "status": "PASS",
+      "receipt": {
+        "receipt_id": "rcpt_fa25ab76420f",
+        "task_id": "V06_P2_S2_GEMINI_LONG_SOURCE_CONTRACT_AND_SYNTHETIC_CAPABILITY_GATE_R1",
+        "timestamp_utc": "2026-10-10T04:22:10.700100+00:00",
+        "requested_path": "research/BTCUSDT/1m/year=2021/month=03/data.parquet",
+        "canonical_relative_path": "research/BTCUSDT/1m/year=2021/month=03/data.parquet",
+        "requested_level": "L1_METADATA",
+        "decision": "DENIED_MOUNT_BOUNDARY_VIOLATION",
+        "reason": "Mount/device boundary crossed at /synthetic/data/research/BTCUSDT/1m/year=2021/month=03 (dev=2 != root_dev=1)",
+        "syscall_accounting": {
+          "lstat_calls": 0,
+          "open_calls": 0,
+          "fstat_calls": 0,
+          "read_calls": 0,
+          "bytes_read": 0,
+          "scandir_calls": 0,
+          "close_calls": 0,
+          "total_calls": 0
+        },
+        "exception_class": "MountBoundaryViolationError",
+        "is_synthetic_fixture": true,
+        "metadata_size_bytes": null
+      }
+    },
+    {
+      "case_id": "SEC_26_TOCTOU_RACE_DEFENSE",
+      "category": "TOCTOU_RACE",
+      "name": "TOCTOU mutation between stat and descriptor open detected",
+      "expected_decision": "DENIED_SYMLINK_OR_PERMISSION",
+      "actual_decision": "DENIED_PERMISSION_ERROR",
+      "status": "PASS",
+      "receipt": {
+        "receipt_id": "rcpt_bc7c6311700e",
+        "task_id": "V06_P2_S2_GEMINI_LONG_SOURCE_CONTRACT_AND_SYNTHETIC_CAPABILITY_GATE_R1",
+        "timestamp_utc": "2026-10-10T04:22:10.700190+00:00",
+        "requested_path": "research/BTCUSDT/1m/year=2021/month=03/data.parquet",
+        "canonical_relative_path": "research/BTCUSDT/1m/year=2021/month=03/data.parquet",
+        "requested_level": "L2_SCHEMA",
+        "decision": "DENIED_PERMISSION_ERROR",
+        "reason": "Permission denied (EACCES) for open on: /synthetic/data/research/BTCUSDT/1m/year=2021/month=03/data.parquet",
+        "syscall_accounting": {
+          "lstat_calls": 0,
+          "open_calls": 0,
+          "fstat_calls": 0,
+          "read_calls": 0,
+          "bytes_read": 0,
+          "scandir_calls": 0,
+          "close_calls": 0,
+          "total_calls": 0
+        },
+        "exception_class": "EACCESAccessDeniedError",
+        "is_synthetic_fixture": true,
+        "metadata_size_bytes": null
+      }
+    },
+    {
+      "case_id": "SEC_27_PROTECTED_2026_REJECTION",
+      "category": "PROTECTED_PARTITION",
+      "name": "year=2026 partition rejected unconditionally",
+      "expected_decision": "DENIED_PROTECTED_PATH",
+      "actual_decision": "DENIED_PROTECTED_PATH",
+      "status": "PASS",
+      "receipt": {
+        "receipt_id": "rcpt_05fb9c736a4d",
+        "task_id": "V06_P2_S2_GEMINI_LONG_SOURCE_CONTRACT_AND_SYNTHETIC_CAPABILITY_GATE_R1",
+        "timestamp_utc": "2026-10-10T04:22:10.700250+00:00",
+        "requested_path": "research/BTCUSDT/1m/year=2026/month=03/data.parquet",
+        "canonical_relative_path": "research/BTCUSDT/1m/year=2026/month=03/data.parquet",
+        "requested_level": "L1_METADATA",
+        "decision": "DENIED_PROTECTED_PATH",
+        "reason": "Access denied to protected partition or sensitive file pattern: 'research/BTCUSDT/1m/year=2026' in 'research/BTCUSDT/1m/year=2026/month=03/data.parquet'",
+        "syscall_accounting": {
+          "lstat_calls": 0,
+          "open_calls": 0,
+          "fstat_calls": 0,
+          "read_calls": 0,
+          "bytes_read": 0,
+          "scandir_calls": 0,
+          "close_calls": 0,
+          "total_calls": 0
+        },
+        "exception_class": "ProtectedPartitionDeniedError",
+        "is_synthetic_fixture": true,
+        "metadata_size_bytes": null
+      }
+    },
+    {
+      "case_id": "SEC_28_PROTECTED_FORWARD_REJECTION",
+      "category": "PROTECTED_PARTITION",
+      "name": "data/forward/ partition rejected unconditionally",
+      "expected_decision": "DENIED_PROTECTED_PATH",
+      "actual_decision": "DENIED_PROTECTED_PATH",
+      "status": "PASS",
+      "receipt": {
+        "receipt_id": "rcpt_923d80929c14",
+        "task_id": "V06_P2_S2_GEMINI_LONG_SOURCE_CONTRACT_AND_SYNTHETIC_CAPABILITY_GATE_R1",
+        "timestamp_utc": "2026-10-10T04:22:10.700270+00:00",
+        "requested_path": "data/forward/BTCUSDT/trades.parquet",
+        "canonical_relative_path": "data/forward/BTCUSDT/trades.parquet",
+        "requested_level": "L1_METADATA",
+        "decision": "DENIED_PROTECTED_PATH",
+        "reason": "Access denied to protected partition or sensitive file pattern: 'data/forward' in 'data/forward/BTCUSDT/trades.parquet'",
+        "syscall_accounting": {
+          "lstat_calls": 0,
+          "open_calls": 0,
+          "fstat_calls": 0,
+          "read_calls": 0,
+          "bytes_read": 0,
+          "scandir_calls": 0,
+          "close_calls": 0,
+          "total_calls": 0
+        },
+        "exception_class": "ProtectedPartitionDeniedError",
+        "is_synthetic_fixture": true,
+        "metadata_size_bytes": null
+      }
+    },
+    {
+      "case_id": "SEC_29_PROTECTED_H39_REJECTION",
+      "category": "PROTECTED_PARTITION",
+      "name": "h39_validation partition rejected unconditionally",
+      "expected_decision": "DENIED_PROTECTED_PATH",
+      "actual_decision": "DENIED_PROTECTED_PATH",
+      "status": "PASS",
+      "receipt": {
+        "receipt_id": "rcpt_f72b6008f658",
+        "task_id": "V06_P2_S2_GEMINI_LONG_SOURCE_CONTRACT_AND_SYNTHETIC_CAPABILITY_GATE_R1",
+        "timestamp_utc": "2026-10-10T04:22:10.700288+00:00",
+        "requested_path": "research/h39_validation/results.json",
+        "canonical_relative_path": "research/h39_validation/results.json",
+        "requested_level": "L1_METADATA",
+        "decision": "DENIED_PROTECTED_PATH",
+        "reason": "Access denied to protected partition or sensitive file pattern: 'h39_validation' in 'research/h39_validation/results.json'",
+        "syscall_accounting": {
+          "lstat_calls": 0,
+          "open_calls": 0,
+          "fstat_calls": 0,
+          "read_calls": 0,
+          "bytes_read": 0,
+          "scandir_calls": 0,
+          "close_calls": 0,
+          "total_calls": 0
+        },
+        "exception_class": "ProtectedPartitionDeniedError",
+        "is_synthetic_fixture": true,
+        "metadata_size_bytes": null
+      }
+    },
+    {
+      "case_id": "SEC_30_SENSITIVE_CREDENTIALS_REJECTION",
+      "category": "PROTECTED_PARTITION",
+      "name": ".env and credentials files rejected unconditionally",
+      "expected_decision": "DENIED_PROTECTED_PATH",
+      "actual_decision": "DENIED_PROTECTED_PATH",
+      "status": "PASS",
+      "receipt": {
+        "receipt_id": "rcpt_70ccc155de50",
+        "task_id": "V06_P2_S2_GEMINI_LONG_SOURCE_CONTRACT_AND_SYNTHETIC_CAPABILITY_GATE_R1",
+        "timestamp_utc": "2026-10-10T04:22:10.700303+00:00",
+        "requested_path": ".env",
+        "canonical_relative_path": ".env",
+        "requested_level": "L1_METADATA",
+        "decision": "DENIED_PROTECTED_PATH",
+        "reason": "Access denied to protected partition or sensitive file pattern: '.env' in '.env'",
+        "syscall_accounting": {
+          "lstat_calls": 0,
+          "open_calls": 0,
+          "fstat_calls": 0,
+          "read_calls": 0,
+          "bytes_read": 0,
+          "scandir_calls": 0,
+          "close_calls": 0,
+          "total_calls": 0
+        },
+        "exception_class": "ProtectedPartitionDeniedError",
+        "is_synthetic_fixture": true,
+        "metadata_size_bytes": null
+      }
+    },
+    {
+      "case_id": "SEC_31_ROLE_MISMATCH_KLINE_VS_MARK",
+      "category": "SEMANTIC_TYPE",
+      "name": "Mark role requested for Kline file rejected with DENIED_TYPE_MISMATCH",
+      "expected_decision": "DENIED_TYPE_MISMATCH",
+      "actual_decision": "DENIED_TYPE_MISMATCH",
+      "status": "PASS",
+      "receipt": {
+        "receipt_id": "rcpt_81371d27e616",
+        "task_id": "V06_P2_S2_GEMINI_LONG_SOURCE_CONTRACT_AND_SYNTHETIC_CAPABILITY_GATE_R1",
+        "timestamp_utc": "2026-10-10T04:22:10.700316+00:00",
+        "requested_path": "research/BTCUSDT/1m/year=2021/month=03/data.parquet",
+        "canonical_relative_path": "research/BTCUSDT/1m/year=2021/month=03/data.parquet",
+        "requested_level": "L1_METADATA",
+        "decision": "DENIED_TYPE_MISMATCH",
+        "reason": "Raw mark role requested for non-mark path: research/BTCUSDT/1m/year=2021/month=03/data.parquet",
+        "syscall_accounting": {
+          "lstat_calls": 0,
+          "open_calls": 0,
+          "fstat_calls": 0,
+          "read_calls": 0,
+          "bytes_read": 0,
+          "scandir_calls": 0,
+          "close_calls": 0,
+          "total_calls": 0
+        },
+        "exception_class": "TypeMismatchError",
+        "is_synthetic_fixture": true,
+        "metadata_size_bytes": null
+      }
+    },
+    {
+      "case_id": "SEC_32_ROLE_MISMATCH_SPOT_VS_PERP",
+      "category": "SEMANTIC_TYPE",
+      "name": "Spot role requested for Perp file rejected with DENIED_TYPE_MISMATCH",
+      "expected_decision": "DENIED_TYPE_MISMATCH",
+      "actual_decision": "DENIED_TYPE_MISMATCH",
+      "status": "PASS",
+      "receipt": {
+        "receipt_id": "rcpt_f1b6e37d345e",
+        "task_id": "V06_P2_S2_GEMINI_LONG_SOURCE_CONTRACT_AND_SYNTHETIC_CAPABILITY_GATE_R1",
+        "timestamp_utc": "2026-10-10T04:22:10.700338+00:00",
+        "requested_path": "research/BTCUSDT/1m/year=2021/month=03/data.parquet",
+        "canonical_relative_path": "research/BTCUSDT/1m/year=2021/month=03/data.parquet",
+        "requested_level": "L1_METADATA",
+        "decision": "DENIED_TYPE_MISMATCH",
+        "reason": "Spot role specified for non-spot path: research/BTCUSDT/1m/year=2021/month=03/data.parquet",
+        "syscall_accounting": {
+          "lstat_calls": 0,
+          "open_calls": 0,
+          "fstat_calls": 0,
+          "read_calls": 0,
+          "bytes_read": 0,
+          "scandir_calls": 0,
+          "close_calls": 0,
+          "total_calls": 0
+        },
+        "exception_class": "TypeMismatchError",
+        "is_synthetic_fixture": true,
+        "metadata_size_bytes": null
+      }
+    },
+    {
+      "case_id": "SEC_33_MARK_PRICE_PIT_UNPROVEN",
+      "category": "CLOCK_PROVENANCE",
+      "name": "Unproven true continuous 1m Mark PIT fails closed",
+      "expected_decision": "DENIED_UNKNOWN_CLOCK_PROVENANCE",
+      "actual_decision": "DENIED_UNKNOWN_CLOCK_PROVENANCE",
+      "status": "PASS",
+      "receipt": {
+        "receipt_id": "rcpt_5914bb084387",
+        "task_id": "V06_P2_S2_GEMINI_LONG_SOURCE_CONTRACT_AND_SYNTHETIC_CAPABILITY_GATE_R1",
+        "timestamp_utc": "2026-10-10T04:22:10.700415+00:00",
+        "requested_path": "research/BTCUSDT/raw/mark_price",
+        "canonical_relative_path": "research/BTCUSDT/raw/mark_price",
+        "requested_level": "L1_METADATA",
+        "decision": "DENIED_UNKNOWN_CLOCK_PROVENANCE",
+        "reason": "Raw Mark price container existence does NOT prove continuous 1m PIT Mark. Proof missing.",
+        "syscall_accounting": {
+          "lstat_calls": 0,
+          "open_calls": 0,
+          "fstat_calls": 0,
+          "read_calls": 0,
+          "bytes_read": 0,
+          "scandir_calls": 0,
+          "close_calls": 0,
+          "total_calls": 0
+        },
+        "exception_class": "ClockProvenanceError",
+        "is_synthetic_fixture": true,
+        "metadata_size_bytes": null
+      }
+    },
+    {
+      "case_id": "SEC_34_FUNDING_CLOCK_UNPROVEN",
+      "category": "CLOCK_PROVENANCE",
+      "name": "Unproven funding known-at/settlement timing fails closed",
+      "expected_decision": "DENIED_UNKNOWN_CLOCK_PROVENANCE",
+      "actual_decision": "DENIED_UNKNOWN_CLOCK_PROVENANCE",
+      "status": "PASS",
+      "receipt": {
+        "receipt_id": "rcpt_c075b361a44e",
+        "task_id": "V06_P2_S2_GEMINI_LONG_SOURCE_CONTRACT_AND_SYNTHETIC_CAPABILITY_GATE_R1",
+        "timestamp_utc": "2026-10-10T04:22:10.700484+00:00",
+        "requested_path": "research/BTCUSDT/funding_events.csv",
+        "canonical_relative_path": "research/BTCUSDT/funding_events.csv",
+        "requested_level": "L1_METADATA",
+        "decision": "DENIED_UNKNOWN_CLOCK_PROVENANCE",
+        "reason": "Funding events existence does NOT prove known-at/settlement timing. Proof missing.",
+        "syscall_accounting": {
+          "lstat_calls": 0,
+          "open_calls": 0,
+          "fstat_calls": 0,
+          "read_calls": 0,
+          "bytes_read": 0,
+          "scandir_calls": 0,
+          "close_calls": 0,
+          "total_calls": 0
+        },
+        "exception_class": "ClockProvenanceError",
+        "is_synthetic_fixture": true,
+        "metadata_size_bytes": null
+      }
+    },
+    {
+      "case_id": "SEC_35_FULL_FILE_HASH_BLOCKED",
+      "category": "ZERO_BYTE_POLICY",
+      "name": "Full file body hashing blocked under max_bytes=0 policy",
+      "expected_decision": "DENIED_ZERO_BYTE_POLICY",
+      "actual_decision": "DENIED_ZERO_BYTE_POLICY",
+      "status": "PASS",
+      "notes": "Hashing requires file reading; zero-byte policy blocks file body reads"
+    },
+    {
+      "case_id": "MUT_01_AUTO_ENABLE_TEST_MODE_MUTANT",
+      "category": "MUTANT_DETECTION",
+      "name": "Deliberate Mutant 1: Silent auto-enable test mode in production caught",
+      "expected_decision": "MUTANT_CAUGHT_AND_REJECTED",
+      "actual_decision": "MUTANT_CAUGHT_AND_REJECTED",
+      "status": "PASS",
+      "notes": "TestSuite asserts that passing custom root without is_test_mode MUST raise ProductionRootOverrideDeniedError"
+    },
+    {
+      "case_id": "MUT_02_UNCOUNTED_STAT_MUTANT",
+      "category": "MUTANT_DETECTION",
+      "name": "Deliberate Mutant 2: Direct uncounted stat call bypass caught",
+      "expected_decision": "MUTANT_CAUGHT_AND_REJECTED",
+      "actual_decision": "MUTANT_CAUGHT_AND_REJECTED",
+      "status": "PASS",
+      "notes": "TestSuite verifies that uncounted stat hook records 0 calls while correct hook records 1"
+    },
+    {
+      "case_id": "MUT_03_SILENT_EACCES_MASKING_MUTANT",
+      "category": "MUTANT_DETECTION",
+      "name": "Deliberate Mutant 3: Silent EACCES to ENOENT conversion caught",
+      "expected_decision": "MUTANT_CAUGHT_AND_REJECTED",
+      "actual_decision": "MUTANT_CAUGHT_AND_REJECTED",
+      "status": "PASS",
+      "notes": "TestSuite distinguishes EACCESAccessDeniedError from ENOENTNotFoundError"
+    }
+  ]
+}
