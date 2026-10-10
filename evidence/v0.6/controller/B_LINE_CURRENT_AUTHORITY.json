@@ -1863,6 +1863,8 @@
     "controller_final_semantic_decision_sha": "ca0b6ea62613e6981b6f818f37f45be8c1d74901",
     "controller_final_semantic_disposition": "REJECT_PRODUCTION_FAIL_CLOSED_VERIFIER_ACCEPT_GITHUB_CI_AND_HISTORICAL_METADATA_RECEIPT",
     "verifier_patch_budget": "TERMINATED_NO_MORE_IMPLICIT_PATCHES_OR_REAUDITS_THIS_ROUTE",
-    "next_controller_research_gate": "SEPARATELY_AUTHORIZED_DOCS_ONLY_P2_TRUE_MARK_FUNDING_PIT_SOURCE_ADMISSION_METHOD_DESIGN"
+    "next_controller_research_gate": "P2_NONPROTECTED_SOURCE_MANIFEST_AND_RIGHTS_DESIGN_R2_DOCS_ONLY_OR_SEPARATE_EXPLICIT_READ_AUTHORIZATION",
+    "source_admission_design_sha": "519b2e9ba2ca847e76ad9c0a7fbafcec5fcda158",
+    "source_admission_design_status": "CONTROLLER_PROSPECTIVE_DESIGN_ONLY_NO_CONTENT_READ"
   }
 }
