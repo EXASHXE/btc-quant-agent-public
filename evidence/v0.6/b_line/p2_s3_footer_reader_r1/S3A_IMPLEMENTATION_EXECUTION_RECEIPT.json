@@ -1,0 +1,72 @@
+{
+  "task_id": "V06_P2_S3A_GEMINI_INDEPENDENT_ONEFILE_FOOTER_READER_BUILD_SYNTHETIC_R1",
+  "branch": "feature/v06-bline-p2-s3-footer-reader-r1",
+  "code_start_sha": "e0ff8c3473de4bfa3e66fe7928d42992a4d38a32",
+  "controller_dispatch_sha": "e150be89bef2540a4aebe7b11e921dd25104fe16",
+  "controller_s2_joint_decision_sha": "9782c68e9faa95988959ea8e7592aefe0b176067",
+  "prompt_sha": "559a56cef42e272c144c40876c2ba9e88f3ddeeb",
+  "original_stat_receipt_sha": "c6823dbc46249cac43aa10400aacbbe9f4542410",
+  "terminated_old_locator_counterexample_sha": "4a1fcc2871708f0e9e3a7c40036ecaab39ba99b8",
+  "terminated_old_locator_controller_sha": "ca0b6ea62613e6981b6f818f37f45be8c1d74901",
+  "terminal_status": "S3A_READER_BUILT_SYNTHETIC_VERIFIED_PENDING_INDEPENDENT_AUDIT",
+  "single_pilot_target": {
+    "immutable_owner_data_root": "/root/workspace/project/Quant-agent/data",
+    "rel_path": "research/BTCUSDT/1m/year=2021/month=03/data.parquet",
+    "expected_size_bytes_from_c6823dbc": 2756024,
+    "header_verification_status": "FILE_HEADER_NOT_VERIFIED",
+    "max_attempted_fs_calls": 100,
+    "max_trailer_read_bytes": 8,
+    "max_footer_read_bytes": 65536,
+    "max_total_file_read_bytes": 65544
+  },
+  "s2_errata_fixes_verified": {
+    "F01_exact_c6823dbc_sizes_restored": true,
+    "F01_corrected_auxiliary_sizes_bytes": {
+      "research/cross_asset_1h/ETHUSDT.parquet": 2907000,
+      "research/cross_asset_1h/basket_manifest.json": 56012,
+      "research/v0.3.19_official_derivatives/hourly_inputs.parquet": 3101084,
+      "research/v0.3.19_official_derivatives/raw_data_manifest.json": 420725
+    },
+    "F02_eth_sol_1m_perp_status": "UNKNOWN_NOT_VERIFIED_NOT_ADMITTED",
+    "F03_genuine_posix_dir_fd_reader_zero_s1_s2_imports": true,
+    "F04_single_pilot_2021_03_65544b_100calls_only": true
+  },
+  "qa_verification": {
+    "ruff_check_passed": true,
+    "compileall_passed": true,
+    "pytest_total_collected": 45,
+    "pytest_total_passed": 45,
+    "pytest_total_failed": 0,
+    "positive_oracle_scenarios_passed": 4,
+    "negative_adversarial_oracle_scenarios_passed": 26,
+    "deliberate_mutants_killed": 3,
+    "git_diff_check_clean": true
+  },
+  "hard_no_read_compliance": {
+    "immutable_owner_data_root": "/root/workspace/project/Quant-agent/data",
+    "owner_data_root_lstat_count": 0,
+    "owner_data_root_stat_count": 0,
+    "owner_data_root_open_count": 0,
+    "owner_data_root_scandir_count": 0,
+    "owner_data_root_pread_bytes": 0,
+    "real_market_data_touched": false,
+    "s3b_real_data_execution_authorized_by_s3a": false
+  },
+  "deliverables": [
+    "scripts/strategy_research/p2_s3_footer_reader/__init__.py",
+    "scripts/strategy_research/p2_s3_footer_reader/constants.py",
+    "scripts/strategy_research/p2_s3_footer_reader/errors.py",
+    "scripts/strategy_research/p2_s3_footer_reader/types.py",
+    "scripts/strategy_research/p2_s3_footer_reader/fd_syscall_wrapper.py",
+    "scripts/strategy_research/p2_s3_footer_reader/footer_parser.py",
+    "scripts/strategy_research/p2_s3_footer_reader/reader.py",
+    "scripts/strategy_research/p2_s3_footer_reader/synthetic_fixtures.py",
+    "scripts/strategy_research/p2_s3_footer_reader/oracle_runner.py",
+    "tests/test_v06_p2_s3_footer_reader_unit.py",
+    "tests/test_v06_p2_s3_footer_reader_adversarial.py",
+    "docs/strategy_research/g2_r3/p2_s3_footer_reader_r1/S3A_READER_BOUNDARY_IMPLEMENTATION_AND_FALSIFICATION_REPORT.md",
+    "docs/strategy_research/g2_r3/p2_s3_footer_reader_r1/S3B_PROPOSED_ONE_FILE_FOOTER_QA_GRANT_CONTRACT.md",
+    "evidence/v0.6/b_line/p2_s3_footer_reader_r1/S3A_FS_SYSCALL_SECURITY_ORACLE_RESULTS.json",
+    "evidence/v0.6/b_line/p2_s3_footer_reader_r1/S3A_IMPLEMENTATION_EXECUTION_RECEIPT.json"
+  ]
+}
