@@ -1741,5 +1741,56 @@
     "controller_joint_adjudication_path": "reviews/v0.6/b_line/V06_POST_P1_GEMINI_P2_AND_SOL_R4_PARALLEL_CONTROLLER_L2_COMPATIBILITY_AND_SOURCE_BLOCK_R1.md",
     "joint_decision": "SOURCE_BLOCKED_NO_PREREG",
     "next_required_fact": "EXACT_OWNER_CANONICAL_ROOT_BINDING_OR_REMOTE_SOURCE_CONFIRMED; NO_AUTOMATIC_RESCAN"
+  },
+  "v06_p2_owner_exact_wsl_root_metadata_r1": {
+    "status": "OWNER_EXACT_ROOT_DECLARED__TARGETED_LSTAT_TASK_DISPATCHED_NOT_EXECUTED",
+    "task_id": "V06_P2_OWNER_EXACT_WSL_ROOT_LSTAT_ONLY_VERIFICATION_R1",
+    "controller_dispatch_sha": "b6120e2557d26fc822e740b7d889714a8c0124e6",
+    "controller_dispatch_path": "reviews/v0.6/b_line/V06_P2_OWNER_SUPPLIED_EXACT_WSL_DATA_ROOT_BINDING_AND_METADATA_VERIFICATION_DISPATCH_R1.md",
+    "prompt_sha": "7becda2c752e1f557e72a9a8e735a698ab1a680f",
+    "prompt_path": "prompts/v0.6/b_line/V06_P2_GEMINI_OWNER_EXACT_WSL_ROOT_LSTAT_ONLY_VERIFICATION_R1.md",
+    "branch": "feature/v06-bline-p2-owner-exact-root-metadata-r1",
+    "code_start_sha": "1e12d6a6467d3bc39c0deedd97204604ac623f18",
+    "worktree": "/root/workspace/project/quant-v0.6/p2-owner-exact-root-metadata-r1",
+    "owner_declared_path_wsl": "/root/workspace/project/Quant-agent/data",
+    "owner_declared_perp_root_wsl": "/root/workspace/project/Quant-agent/data/research/BTCUSDT",
+    "root_status": "OWNER_DECLARED_NOT_PHYSICALLY_LSTAT_VERIFIED",
+    "prior_p2_status": "P2_LOCAL_ROOT_UNKNOWN_WITH_BOUNDED_NEGATIVE_EVIDENCE_IN_PREVIOUS_ALLOWLIST_NOT_A_CLAIM_OF_ABSENCE",
+    "permitted_eras": [
+      "2021-03",
+      "2021-04",
+      "2023-03",
+      "2023-04",
+      "2025-03",
+      "2025-04"
+    ],
+    "source_classes": [
+      "BTC_PERP_1M_SELECTED",
+      "BTC_PERP_RAW_MARK_DIR_METADATA",
+      "BTC_PERP_RAW_FUNDING_DIR_METADATA",
+      "BTC_PERP_FUNDING_EVENTS_CSV_METADATA",
+      "BTC_SPOT_META",
+      "CROSS_ASSET_1H_ETH_META",
+      "OFFICIAL_DERIVATIVE_HOURLY_META"
+    ],
+    "banned_trees": [
+      "data/forward/**",
+      "data/research/h39_validation/**",
+      "data/research/BTCUSDT/1m/year=2026/**",
+      "all BTC 2026-02 through 2026-07 market/Mark/funding partitions",
+      "Quant-agent-sanitized/**"
+    ],
+    "max_lstat_calls": 100,
+    "max_selected_month_listings": 6,
+    "max_entries_per_month": 16,
+    "physical_market_file_bodies_read_authority": "NONE",
+    "p2_source_admission": "NONE_OWNER_DECLARED_ONLY",
+    "p3_prereg": "NONE",
+    "p4_market_body_access": "NONE",
+    "testnet_live_real_funds": "NONE",
+    "p1_terminal_controller_sha": "fd3c13645df9ad2506293b109d3891cf57936208",
+    "sol_r4_science_exact_sha": "5032259954e001635c97110c9c50e4a35a2c95b5",
+    "user_machine_direct_access": "DESKTOP_COMMANDER_OFFLINE__NO_CONTROLLER_FILESYSTEM_PROOF",
+    "future_gate": "AFTER_GEMINI_PUSH_CONTROLLER_VERIFY_6_SELECTED_PHYSICAL_PARTITIONS_AND_METADATA_TRUTH_THEN_DECIDE_SELECTED_ONLY_SOURCE_ADMISSION_CONTRACT"
   }
 }
