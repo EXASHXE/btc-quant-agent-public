@@ -1,0 +1,31 @@
+# Codex Sol High — B-line S3A R3 CI-parity native noncore syscall diagnosis (NO REPAIR)
+
+**TASK_ID:** `V06_P2_S3A_R3_CODEX_CI_ENV_NATIVE_NONCORE_CLASSIFICATION_R1`.
+**ROLE:** independent Codex security and CI environment investigator, **one finite classification**, no code/reader test modifications or a second R3/R4 implementation.
+**CONTROLLER_DISPATCH_SHA:** `bfcc08f5819298f54a43b166b5cd08f201d162bf`
+**READ binding Controller HOLD:** [R3 exact-SHA CI HOLD and classification authority](https://github.com/EXASHXE/btc-quant-agent-public/blob/bfcc08f5819298f54a43b166b5cd08f201d162bf/reviews/v0.6/b_line/V06_P2_S3A_R3_CONTROLLER_EXACT_SHA_CI_HOLD_AND_FINITE_ENVIRONMENT_CLASSIFICATION_R1.md).
+**GitHub repo:** `EXASHXE/btc-quant-agent-public`; **precreated independent audit branch** `feature/v06-bline-p2-s3a-r3-ci-parity-diagnostic-r1` **starting at exact frozen Codex R3** `db77118b9fa49d4626b39c2120cc19ca2341245a`. This task's publication commit, if any, must directly parent that SHA. Suggested new worktree `/root/workspace/project/quant-v0.6/p2-s3a-r3-ci-parity-diagnostic-r1` if unused. No changes to R3 implementation branch/worktree, the earlier independent audit or any existing tests/config/golden/CI. Do not add `reviews/**` to code branch (three old CI tests assert absence); audit review in `v0.6-docs` belongs to Controller, not executor.
+
+## Ground truth, not executor optimism
+
+R3 implementation branch `feature/v06-bline-p2-s3a-codex-one-shot-fd-r3@db77118b9fa49d4626b39c2120cc19ca2341245a`, direct parent `999cf7005c741bdbabae727f10f90f23330fb035`, 17 in-scope changed paths. [Exact GitHub Actions 38057181760](https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/38057181760) FAILED: Ruff/mypy PASS; `2886 passed /3 failed /2 skipped /52 warnings`. One known H40 golden mismatch, but TWO new S3A native-test failures:
+`tests/test_v06_p2_s3a_codex_r3_native.py::test_one_native_synthetic_scenario[root_swap]`,
+`tests/test_v06_p2_s3a_codex_r3_native.py::test_one_native_synthetic_scenario[leaf_swap]`.
+Both failed `scripts/strategy_research/p2_s3_footer_reader/r3_oracle.py:282` on:
+```python
+assert all(event["family"] in {"rename", "renameat", "mkdir"}
+           for event in result["native_noncore_fs_events"])
+```
+Within CI these cases **already passed previous assertions** that native core call total was <= cap and equal to Python observer and reported `attempted_fs_calls_total`; failure is specifically unexpected *noncore* actual kernel FS event(s), which could be material hidden `stat/readlink/access`. The archived local synthetic trace lists only `rename` in both. **Do not assume harmless environment variation; prove source and FS budget scope.**
+
+## Explicit task — reproduce/classify without altering R3 code
+1. On independent worktree, verify HEAD/parent and CI logs/known frozen R3 evidence, dependency range `pyarrow>=18,<24`. Prefer Python3.12.15 and CI-compatible dependency version; if unavailable document exact environment gap rather than claiming matching.
+2. Re-run ONLY `root_swap` and `leaf_swap` using the original `run_case` against **new generated /tmp synthetic fixtures**, intercept resulting assertion and print full `result["native_noncore_fs_events"]` to a new diagnostic machine JSON. Capture exact syscall family, nr, path/errno, triggering call stack or position, attestation/preparation/reader/attack split and whether OS call is independently counted in hard limit. Use genuine Linux own-child native tracer when available; if not, compare Python hooks and qualify `KERNEL_UNAVAILABLE`. Do not create a false traced success.
+3. Test that `native_core_total==attempted_fs_calls_total`, all families including unexpected native FS are accounted according to the literal contract. For any new `stat/lstat/readlink/access`, classify whether it originates *within* the reader/custody/cleanup execution or is specifically attacker mutation / fixture/tracer action. Merely adding it to a test whitelist is NOT an acceptable answer. Include byte-limit and FD liabilities under both swap attacks.
+4. If reproducible only under supported dependency `pyarrow 18-23` or CI runner conditions, report versions and specific reason. If cannot reproduce in current machine, use CI exact log and mark `EVIDENCE_INCOMPLETE`, not a confident false positive. One finite bounded investigation: do not run full repo pytest or patch unrelated H40, do not change package code/tests, no new source admission/real market reads.
+5. Produce machine evidence and short independent report as **NEW files only**: `docs/strategy_research/g2_r3/p2_s3_footer_reader_r1/S3A_R3_CI_PARITY_DIAGNOSTIC_R1.md` and `evidence/v0.6/b_line/p2_s3_footer_reader_r1/S3A_R3_CI_PARITY_NONCORE_NATIVE_EVENTS_R1.json`. Optionally add NEW `scripts/strategy_research/p2_s3a_r3_ci_parity_diagnostic_r1/**` and NEW `tests/test_v06_p2_s3a_r3_ci_parity_diagnostic_*.py` if needed, but **never** modify original `r3_oracle.py` or its tests; do not leave extra unmetered IO or query owner WSL. No reviews folder, no direct code repair, no skipped/xfailed/modified existing test.
+6. Return one honest terminal: `CI_ONLY_AUDITOR_NONCORE_WHITELIST_OVERSTRICT_WITH_ORIGIN_PROOF`, `NATIVE_HARD_BUDGET_UNMETERED_CALL_FAIL`, `ENVIRONMENT_DEPENDENT_SECURITY_BEHAVIOR`, or `INCOMPLETE_EVIDENCE_STOP`. If FAIL hard, Controller terminates existing custom reader tool route. If whitelist-only proved, Controller decides subsequent independent bounded acceptance; **you cannot self-repair or self-authorize S3B**. Push at most one non-force audit-only commit, return exact SHA,parent,files,focused tests, trace and actual CI.
+
+## Hard NO-READ fence
+
+All OS calls must remain within **new synthetic /tmp invented fixtures** and read-only **public Git code/evidence**. Never `lstat/stat/open/realpath/read/hash/scandir` original `/root/workspace/project/Quant-agent/data`, protected 2026, Forward/H39/H40/H41 outcomes, private credentials, or another worktree; no market/API/real trading. Literal single pilot target `research/BTCUSDT/1m/year=2021/month=03/data.parquet` is NOT a permission to read its physical file. No P2 source admission, P3/P4/Alpha, TESTNET/LIVE/real funds. Hard original cap <=100 OS attempts and <=65544 Footer bytes may not be weakened or waived by this diagnosis. A-line & Performance unchanged.
