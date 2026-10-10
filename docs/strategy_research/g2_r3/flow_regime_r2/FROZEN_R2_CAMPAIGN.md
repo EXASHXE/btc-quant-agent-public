@@ -1,0 +1,15 @@
+# Frozen six-mechanism multi-season BTC experiment R2
+
+Parent `920b244d06541da5cb9fc3dcaa39e5b15e914d32`; Controller `b9e8ff64ac7c64fdbe0e84aa804b7a5582eecc96`; Prompt `437ad360b88e1ce8c9a57bcdc1747630a5f06d14`. All formulas, source columns, forty month addresses, split, economics, support and promotion are in FROZEN_R2_ROSTER.json and FROZEN_R2_SOURCE_SPLIT.json. Freeze SHA256 in OUTCOME_BLIND_R2_FREEZE_RECEIPT.json. No R2 source bodies or reserved metadata accessed before this freeze.
+
+R1 negative evidence is exposed: generic price-only continuations did not overcome44bp, structural/retest lacked support, and24h impulse compression produced zero. R2 changes economic mechanisms using independently checked base-volume taker pressure and completed regimes; these are hypotheses, not evidence of informed flow, liquidations, OI, maker liquidity or Alpha. No R1 rule/result is edited.
+
+DEVELOPMENT: Feb/Jun/Sep/Dec2021-2023, adjacent Jan/May/Aug/Nov warmups. VALIDATION: same exact new months2024-2025, no stat/download/body until dev promotion commit is pushed; exposed prior April years prevent pristine-yearOOS claim. At least9 complete devfolds spanning3years; at least6 validationfolds spanning2years. Do not replace missing periods. Any checksum/schema/clock corruption stops evidence.
+
+Six bidirectional mechanisms have exactly one hold each: FLOW_CONFIRMED_TREND8h; EXHAUSTION_FADE4h; LOW_ER_RANGE_REENTRY4h; VOL_COMPRESSION_RELEASE12h; FLOW_ABSORPTION_REVERSAL8h; SUSTAINED_FLOW24h. Inequalities and counterparties are prospectively explicit in roster. Indicator seed, flow sum ratio, causal clocks and conservative protections are fixed. No tuning after outcomes.
+
+Unmodified R1 standalone price replay is reused with2R targets, 50% allocation and independent1000USDT monthly accounts; month resets do not create continuous annual returns. Year cash-return statistic is meanofsampled monthly independent accounts; aggregate netUSDT never masquerades as return onone1000. BASE22/STRESS44bp are proxies excluding unknownFunding, historicalMark/fees/filters/known-at remainUNKNOWN. Funding sensitivity is separate arithmetic, no fakecredit.
+
+Development gate is literal Prompt support/economics:50STRESStrades,2years/6months,positive equalrepresentedyearmean,2nonnegativeyearmeans,PF>1,DD<=15%,positive pairedincrement. Fixed score ranks min(nettradebp,sampledmonthequityreturnbp)/max(1,DDpct), uniqueevents tie, lexicalID; max2promoted. Confidencebounds reported with6trialcorrection but notrequiredforreservation. Validation uses30trades,bothyears/4months,positiveequalyearmean,onepositiveyear,neither<-10bp,PF>=1.05,DD<=15%,pairedincrementpositive;95%CI<=0 meansuncertainexploratory,neverAlpha.
+
+No devpromotion -> measured DEVELOPMENT_NO_GO, commit2 thenstopwithoutreserveddata. Successful devpromotion is pushed before validation bodies; at mostoneadditional validationcommit. NoS3A/H40/CIrepair orowner/protected/account access. BinanceVisionattribution andCCBYNCSA4.0 derivedartifacts, noncommercialnonproductionresearchonly.

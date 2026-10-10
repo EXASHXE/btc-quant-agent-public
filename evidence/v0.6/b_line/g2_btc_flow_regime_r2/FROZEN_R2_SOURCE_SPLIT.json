@@ -1,0 +1,700 @@
+{
+  "column_spec": {
+    "accepted_header_aliases": [
+      [
+        "open_time"
+      ],
+      [
+        "open"
+      ],
+      [
+        "high"
+      ],
+      [
+        "low"
+      ],
+      [
+        "close"
+      ],
+      [
+        "volume"
+      ],
+      [
+        "close_time"
+      ],
+      [
+        "quote_volume",
+        "quote_asset_volume"
+      ],
+      [
+        "count",
+        "number_of_trades"
+      ],
+      [
+        "taker_buy_volume",
+        "taker_buy_base_asset_volume"
+      ],
+      [
+        "taker_buy_quote_volume",
+        "taker_buy_quote_asset_volume"
+      ],
+      [
+        "ignore"
+      ]
+    ],
+    "count": 12,
+    "feature_array": [
+      "open_time_ms",
+      "open",
+      "high",
+      "low",
+      "close",
+      "volume_BTC",
+      "taker_buy_volume_BTC"
+    ],
+    "header_policy": "noheader permitted by12-positiondocumentedUSD-Mlayout; header must exactlymatch declared aliases, never reorder silently",
+    "positional_fields": [
+      "open_time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "volume",
+      "close_time",
+      "quote_volume",
+      "count",
+      "taker_buy_volume",
+      "taker_buy_quote_volume",
+      "ignore"
+    ],
+    "source_doc": "https://github.com/binance/binance-public-data#futures",
+    "taker_column_zero_based": 9,
+    "timestamp_validation": "exact dense declared monthUTC1m calendar,close=open+59999,unique monotonic; no deletion interpolation",
+    "units": "millisecond UTC clocks; base volume BTC; quote volume USDT; mandatory actual schema and 0<=B<=V verification BEFORE flow computation",
+    "zero_volume": "B must0; signed imbalance undefined ->WAIT; never divide-by-zero or invent flow"
+  },
+  "development_minimum_full_folds": 9,
+  "development_required_years": [
+    2021,
+    2022,
+    2023
+  ],
+  "first_stage_archives": 24,
+  "folds": [
+    {
+      "grade": "DEVELOPMENT",
+      "id": "2021-02",
+      "maximum_exit_ACK_must_fit": true,
+      "month": 2,
+      "purge_hours_each_edge": 24,
+      "score_end": "2021-02-28T00:00:00+00:00",
+      "score_start": "2021-02-02T00:00:00+00:00",
+      "stage": "DEVELOPMENT",
+      "warmup_month": 1,
+      "year": 2021
+    },
+    {
+      "grade": "DEVELOPMENT",
+      "id": "2021-06",
+      "maximum_exit_ACK_must_fit": true,
+      "month": 6,
+      "purge_hours_each_edge": 24,
+      "score_end": "2021-06-30T00:00:00+00:00",
+      "score_start": "2021-06-02T00:00:00+00:00",
+      "stage": "DEVELOPMENT",
+      "warmup_month": 5,
+      "year": 2021
+    },
+    {
+      "grade": "DEVELOPMENT",
+      "id": "2021-09",
+      "maximum_exit_ACK_must_fit": true,
+      "month": 9,
+      "purge_hours_each_edge": 24,
+      "score_end": "2021-09-30T00:00:00+00:00",
+      "score_start": "2021-09-02T00:00:00+00:00",
+      "stage": "DEVELOPMENT",
+      "warmup_month": 8,
+      "year": 2021
+    },
+    {
+      "grade": "DEVELOPMENT",
+      "id": "2021-12",
+      "maximum_exit_ACK_must_fit": true,
+      "month": 12,
+      "purge_hours_each_edge": 24,
+      "score_end": "2021-12-31T00:00:00+00:00",
+      "score_start": "2021-12-02T00:00:00+00:00",
+      "stage": "DEVELOPMENT",
+      "warmup_month": 11,
+      "year": 2021
+    },
+    {
+      "grade": "DEVELOPMENT",
+      "id": "2022-02",
+      "maximum_exit_ACK_must_fit": true,
+      "month": 2,
+      "purge_hours_each_edge": 24,
+      "score_end": "2022-02-28T00:00:00+00:00",
+      "score_start": "2022-02-02T00:00:00+00:00",
+      "stage": "DEVELOPMENT",
+      "warmup_month": 1,
+      "year": 2022
+    },
+    {
+      "grade": "DEVELOPMENT",
+      "id": "2022-06",
+      "maximum_exit_ACK_must_fit": true,
+      "month": 6,
+      "purge_hours_each_edge": 24,
+      "score_end": "2022-06-30T00:00:00+00:00",
+      "score_start": "2022-06-02T00:00:00+00:00",
+      "stage": "DEVELOPMENT",
+      "warmup_month": 5,
+      "year": 2022
+    },
+    {
+      "grade": "DEVELOPMENT",
+      "id": "2022-09",
+      "maximum_exit_ACK_must_fit": true,
+      "month": 9,
+      "purge_hours_each_edge": 24,
+      "score_end": "2022-09-30T00:00:00+00:00",
+      "score_start": "2022-09-02T00:00:00+00:00",
+      "stage": "DEVELOPMENT",
+      "warmup_month": 8,
+      "year": 2022
+    },
+    {
+      "grade": "DEVELOPMENT",
+      "id": "2022-12",
+      "maximum_exit_ACK_must_fit": true,
+      "month": 12,
+      "purge_hours_each_edge": 24,
+      "score_end": "2022-12-31T00:00:00+00:00",
+      "score_start": "2022-12-02T00:00:00+00:00",
+      "stage": "DEVELOPMENT",
+      "warmup_month": 11,
+      "year": 2022
+    },
+    {
+      "grade": "DEVELOPMENT",
+      "id": "2023-02",
+      "maximum_exit_ACK_must_fit": true,
+      "month": 2,
+      "purge_hours_each_edge": 24,
+      "score_end": "2023-02-28T00:00:00+00:00",
+      "score_start": "2023-02-02T00:00:00+00:00",
+      "stage": "DEVELOPMENT",
+      "warmup_month": 1,
+      "year": 2023
+    },
+    {
+      "grade": "DEVELOPMENT",
+      "id": "2023-06",
+      "maximum_exit_ACK_must_fit": true,
+      "month": 6,
+      "purge_hours_each_edge": 24,
+      "score_end": "2023-06-30T00:00:00+00:00",
+      "score_start": "2023-06-02T00:00:00+00:00",
+      "stage": "DEVELOPMENT",
+      "warmup_month": 5,
+      "year": 2023
+    },
+    {
+      "grade": "DEVELOPMENT",
+      "id": "2023-09",
+      "maximum_exit_ACK_must_fit": true,
+      "month": 9,
+      "purge_hours_each_edge": 24,
+      "score_end": "2023-09-30T00:00:00+00:00",
+      "score_start": "2023-09-02T00:00:00+00:00",
+      "stage": "DEVELOPMENT",
+      "warmup_month": 8,
+      "year": 2023
+    },
+    {
+      "grade": "DEVELOPMENT",
+      "id": "2023-12",
+      "maximum_exit_ACK_must_fit": true,
+      "month": 12,
+      "purge_hours_each_edge": 24,
+      "score_end": "2023-12-31T00:00:00+00:00",
+      "score_start": "2023-12-02T00:00:00+00:00",
+      "stage": "DEVELOPMENT",
+      "warmup_month": 11,
+      "year": 2023
+    },
+    {
+      "grade": "NEW_MONTH_TEMPORAL_TEST_NOT_PRISTINE_YEAR_OOS",
+      "id": "2024-02",
+      "maximum_exit_ACK_must_fit": true,
+      "month": 2,
+      "purge_hours_each_edge": 24,
+      "score_end": "2024-02-29T00:00:00+00:00",
+      "score_start": "2024-02-02T00:00:00+00:00",
+      "stage": "VALIDATION",
+      "warmup_month": 1,
+      "year": 2024
+    },
+    {
+      "grade": "NEW_MONTH_TEMPORAL_TEST_NOT_PRISTINE_YEAR_OOS",
+      "id": "2024-06",
+      "maximum_exit_ACK_must_fit": true,
+      "month": 6,
+      "purge_hours_each_edge": 24,
+      "score_end": "2024-06-30T00:00:00+00:00",
+      "score_start": "2024-06-02T00:00:00+00:00",
+      "stage": "VALIDATION",
+      "warmup_month": 5,
+      "year": 2024
+    },
+    {
+      "grade": "NEW_MONTH_TEMPORAL_TEST_NOT_PRISTINE_YEAR_OOS",
+      "id": "2024-09",
+      "maximum_exit_ACK_must_fit": true,
+      "month": 9,
+      "purge_hours_each_edge": 24,
+      "score_end": "2024-09-30T00:00:00+00:00",
+      "score_start": "2024-09-02T00:00:00+00:00",
+      "stage": "VALIDATION",
+      "warmup_month": 8,
+      "year": 2024
+    },
+    {
+      "grade": "NEW_MONTH_TEMPORAL_TEST_NOT_PRISTINE_YEAR_OOS",
+      "id": "2024-12",
+      "maximum_exit_ACK_must_fit": true,
+      "month": 12,
+      "purge_hours_each_edge": 24,
+      "score_end": "2024-12-31T00:00:00+00:00",
+      "score_start": "2024-12-02T00:00:00+00:00",
+      "stage": "VALIDATION",
+      "warmup_month": 11,
+      "year": 2024
+    },
+    {
+      "grade": "NEW_MONTH_TEMPORAL_TEST_NOT_PRISTINE_YEAR_OOS",
+      "id": "2025-02",
+      "maximum_exit_ACK_must_fit": true,
+      "month": 2,
+      "purge_hours_each_edge": 24,
+      "score_end": "2025-02-28T00:00:00+00:00",
+      "score_start": "2025-02-02T00:00:00+00:00",
+      "stage": "VALIDATION",
+      "warmup_month": 1,
+      "year": 2025
+    },
+    {
+      "grade": "NEW_MONTH_TEMPORAL_TEST_NOT_PRISTINE_YEAR_OOS",
+      "id": "2025-06",
+      "maximum_exit_ACK_must_fit": true,
+      "month": 6,
+      "purge_hours_each_edge": 24,
+      "score_end": "2025-06-30T00:00:00+00:00",
+      "score_start": "2025-06-02T00:00:00+00:00",
+      "stage": "VALIDATION",
+      "warmup_month": 5,
+      "year": 2025
+    },
+    {
+      "grade": "NEW_MONTH_TEMPORAL_TEST_NOT_PRISTINE_YEAR_OOS",
+      "id": "2025-09",
+      "maximum_exit_ACK_must_fit": true,
+      "month": 9,
+      "purge_hours_each_edge": 24,
+      "score_end": "2025-09-30T00:00:00+00:00",
+      "score_start": "2025-09-02T00:00:00+00:00",
+      "stage": "VALIDATION",
+      "warmup_month": 8,
+      "year": 2025
+    },
+    {
+      "grade": "NEW_MONTH_TEMPORAL_TEST_NOT_PRISTINE_YEAR_OOS",
+      "id": "2025-12",
+      "maximum_exit_ACK_must_fit": true,
+      "month": 12,
+      "purge_hours_each_edge": 24,
+      "score_end": "2025-12-31T00:00:00+00:00",
+      "score_start": "2025-12-02T00:00:00+00:00",
+      "stage": "VALIDATION",
+      "warmup_month": 11,
+      "year": 2025
+    }
+  ],
+  "missing_policy": "FAIL_EXACT_FOLD_NO_REPLACEMENT_NO_ZERO_PADDING; any checksum/schema/clock corruption STOP; transport-missing tolerated only above coveragefloor",
+  "protected_owner_access": "NONE",
+  "requested_archives": 40,
+  "reserved_access_rule": "NO_STAT_DOWNLOAD_OPEN_RESERVED_BODY_UNTIL_DEV_PROMOTION_COMMIT_PUSH_EXACT_SHA_VERIFIED",
+  "reserved_stage_archives": 16,
+  "schema": "FROZEN_R2_EXACT_SOURCE_SPLIT_V1",
+  "source_plan": [
+    {
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2021-01.zip.CHECKSUM",
+      "fold": "2021-02",
+      "month": 1,
+      "role": "WARMUP_ONLY",
+      "stage": "DEVELOPMENT",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2021-01.zip",
+      "year": 2021
+    },
+    {
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2021-02.zip.CHECKSUM",
+      "fold": "2021-02",
+      "month": 2,
+      "role": "SCORING_WITH_24H_EDGE_PURGES",
+      "stage": "DEVELOPMENT",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2021-02.zip",
+      "year": 2021
+    },
+    {
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2021-05.zip.CHECKSUM",
+      "fold": "2021-06",
+      "month": 5,
+      "role": "WARMUP_ONLY",
+      "stage": "DEVELOPMENT",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2021-05.zip",
+      "year": 2021
+    },
+    {
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2021-06.zip.CHECKSUM",
+      "fold": "2021-06",
+      "month": 6,
+      "role": "SCORING_WITH_24H_EDGE_PURGES",
+      "stage": "DEVELOPMENT",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2021-06.zip",
+      "year": 2021
+    },
+    {
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2021-08.zip.CHECKSUM",
+      "fold": "2021-09",
+      "month": 8,
+      "role": "WARMUP_ONLY",
+      "stage": "DEVELOPMENT",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2021-08.zip",
+      "year": 2021
+    },
+    {
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2021-09.zip.CHECKSUM",
+      "fold": "2021-09",
+      "month": 9,
+      "role": "SCORING_WITH_24H_EDGE_PURGES",
+      "stage": "DEVELOPMENT",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2021-09.zip",
+      "year": 2021
+    },
+    {
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2021-11.zip.CHECKSUM",
+      "fold": "2021-12",
+      "month": 11,
+      "role": "WARMUP_ONLY",
+      "stage": "DEVELOPMENT",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2021-11.zip",
+      "year": 2021
+    },
+    {
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2021-12.zip.CHECKSUM",
+      "fold": "2021-12",
+      "month": 12,
+      "role": "SCORING_WITH_24H_EDGE_PURGES",
+      "stage": "DEVELOPMENT",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2021-12.zip",
+      "year": 2021
+    },
+    {
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2022-01.zip.CHECKSUM",
+      "fold": "2022-02",
+      "month": 1,
+      "role": "WARMUP_ONLY",
+      "stage": "DEVELOPMENT",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2022-01.zip",
+      "year": 2022
+    },
+    {
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2022-02.zip.CHECKSUM",
+      "fold": "2022-02",
+      "month": 2,
+      "role": "SCORING_WITH_24H_EDGE_PURGES",
+      "stage": "DEVELOPMENT",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2022-02.zip",
+      "year": 2022
+    },
+    {
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2022-05.zip.CHECKSUM",
+      "fold": "2022-06",
+      "month": 5,
+      "role": "WARMUP_ONLY",
+      "stage": "DEVELOPMENT",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2022-05.zip",
+      "year": 2022
+    },
+    {
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2022-06.zip.CHECKSUM",
+      "fold": "2022-06",
+      "month": 6,
+      "role": "SCORING_WITH_24H_EDGE_PURGES",
+      "stage": "DEVELOPMENT",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2022-06.zip",
+      "year": 2022
+    },
+    {
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2022-08.zip.CHECKSUM",
+      "fold": "2022-09",
+      "month": 8,
+      "role": "WARMUP_ONLY",
+      "stage": "DEVELOPMENT",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2022-08.zip",
+      "year": 2022
+    },
+    {
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2022-09.zip.CHECKSUM",
+      "fold": "2022-09",
+      "month": 9,
+      "role": "SCORING_WITH_24H_EDGE_PURGES",
+      "stage": "DEVELOPMENT",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2022-09.zip",
+      "year": 2022
+    },
+    {
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2022-11.zip.CHECKSUM",
+      "fold": "2022-12",
+      "month": 11,
+      "role": "WARMUP_ONLY",
+      "stage": "DEVELOPMENT",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2022-11.zip",
+      "year": 2022
+    },
+    {
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2022-12.zip.CHECKSUM",
+      "fold": "2022-12",
+      "month": 12,
+      "role": "SCORING_WITH_24H_EDGE_PURGES",
+      "stage": "DEVELOPMENT",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2022-12.zip",
+      "year": 2022
+    },
+    {
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2023-01.zip.CHECKSUM",
+      "fold": "2023-02",
+      "month": 1,
+      "role": "WARMUP_ONLY",
+      "stage": "DEVELOPMENT",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2023-01.zip",
+      "year": 2023
+    },
+    {
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2023-02.zip.CHECKSUM",
+      "fold": "2023-02",
+      "month": 2,
+      "role": "SCORING_WITH_24H_EDGE_PURGES",
+      "stage": "DEVELOPMENT",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2023-02.zip",
+      "year": 2023
+    },
+    {
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2023-05.zip.CHECKSUM",
+      "fold": "2023-06",
+      "month": 5,
+      "role": "WARMUP_ONLY",
+      "stage": "DEVELOPMENT",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2023-05.zip",
+      "year": 2023
+    },
+    {
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2023-06.zip.CHECKSUM",
+      "fold": "2023-06",
+      "month": 6,
+      "role": "SCORING_WITH_24H_EDGE_PURGES",
+      "stage": "DEVELOPMENT",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2023-06.zip",
+      "year": 2023
+    },
+    {
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2023-08.zip.CHECKSUM",
+      "fold": "2023-09",
+      "month": 8,
+      "role": "WARMUP_ONLY",
+      "stage": "DEVELOPMENT",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2023-08.zip",
+      "year": 2023
+    },
+    {
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2023-09.zip.CHECKSUM",
+      "fold": "2023-09",
+      "month": 9,
+      "role": "SCORING_WITH_24H_EDGE_PURGES",
+      "stage": "DEVELOPMENT",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2023-09.zip",
+      "year": 2023
+    },
+    {
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2023-11.zip.CHECKSUM",
+      "fold": "2023-12",
+      "month": 11,
+      "role": "WARMUP_ONLY",
+      "stage": "DEVELOPMENT",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2023-11.zip",
+      "year": 2023
+    },
+    {
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2023-12.zip.CHECKSUM",
+      "fold": "2023-12",
+      "month": 12,
+      "role": "SCORING_WITH_24H_EDGE_PURGES",
+      "stage": "DEVELOPMENT",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2023-12.zip",
+      "year": 2023
+    },
+    {
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2024-01.zip.CHECKSUM",
+      "fold": "2024-02",
+      "month": 1,
+      "role": "WARMUP_ONLY",
+      "stage": "VALIDATION",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2024-01.zip",
+      "year": 2024
+    },
+    {
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2024-02.zip.CHECKSUM",
+      "fold": "2024-02",
+      "month": 2,
+      "role": "SCORING_WITH_24H_EDGE_PURGES",
+      "stage": "VALIDATION",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2024-02.zip",
+      "year": 2024
+    },
+    {
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2024-05.zip.CHECKSUM",
+      "fold": "2024-06",
+      "month": 5,
+      "role": "WARMUP_ONLY",
+      "stage": "VALIDATION",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2024-05.zip",
+      "year": 2024
+    },
+    {
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2024-06.zip.CHECKSUM",
+      "fold": "2024-06",
+      "month": 6,
+      "role": "SCORING_WITH_24H_EDGE_PURGES",
+      "stage": "VALIDATION",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2024-06.zip",
+      "year": 2024
+    },
+    {
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2024-08.zip.CHECKSUM",
+      "fold": "2024-09",
+      "month": 8,
+      "role": "WARMUP_ONLY",
+      "stage": "VALIDATION",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2024-08.zip",
+      "year": 2024
+    },
+    {
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2024-09.zip.CHECKSUM",
+      "fold": "2024-09",
+      "month": 9,
+      "role": "SCORING_WITH_24H_EDGE_PURGES",
+      "stage": "VALIDATION",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2024-09.zip",
+      "year": 2024
+    },
+    {
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2024-11.zip.CHECKSUM",
+      "fold": "2024-12",
+      "month": 11,
+      "role": "WARMUP_ONLY",
+      "stage": "VALIDATION",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2024-11.zip",
+      "year": 2024
+    },
+    {
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2024-12.zip.CHECKSUM",
+      "fold": "2024-12",
+      "month": 12,
+      "role": "SCORING_WITH_24H_EDGE_PURGES",
+      "stage": "VALIDATION",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2024-12.zip",
+      "year": 2024
+    },
+    {
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2025-01.zip.CHECKSUM",
+      "fold": "2025-02",
+      "month": 1,
+      "role": "WARMUP_ONLY",
+      "stage": "VALIDATION",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2025-01.zip",
+      "year": 2025
+    },
+    {
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2025-02.zip.CHECKSUM",
+      "fold": "2025-02",
+      "month": 2,
+      "role": "SCORING_WITH_24H_EDGE_PURGES",
+      "stage": "VALIDATION",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2025-02.zip",
+      "year": 2025
+    },
+    {
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2025-05.zip.CHECKSUM",
+      "fold": "2025-06",
+      "month": 5,
+      "role": "WARMUP_ONLY",
+      "stage": "VALIDATION",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2025-05.zip",
+      "year": 2025
+    },
+    {
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2025-06.zip.CHECKSUM",
+      "fold": "2025-06",
+      "month": 6,
+      "role": "SCORING_WITH_24H_EDGE_PURGES",
+      "stage": "VALIDATION",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2025-06.zip",
+      "year": 2025
+    },
+    {
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2025-08.zip.CHECKSUM",
+      "fold": "2025-09",
+      "month": 8,
+      "role": "WARMUP_ONLY",
+      "stage": "VALIDATION",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2025-08.zip",
+      "year": 2025
+    },
+    {
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2025-09.zip.CHECKSUM",
+      "fold": "2025-09",
+      "month": 9,
+      "role": "SCORING_WITH_24H_EDGE_PURGES",
+      "stage": "VALIDATION",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2025-09.zip",
+      "year": 2025
+    },
+    {
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2025-11.zip.CHECKSUM",
+      "fold": "2025-12",
+      "month": 11,
+      "role": "WARMUP_ONLY",
+      "stage": "VALIDATION",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2025-11.zip",
+      "year": 2025
+    },
+    {
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2025-12.zip.CHECKSUM",
+      "fold": "2025-12",
+      "month": 12,
+      "role": "SCORING_WITH_24H_EDGE_PURGES",
+      "stage": "VALIDATION",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2025-12.zip",
+      "year": 2025
+    }
+  ],
+  "source_snapshot_grade": "CURRENT_ARCHIVE_EVENT_TIME_RECONSTRUCTION_NOT_HISTORICAL_AVAILABLE_AT_PROOF",
+  "validation_minimum_full_folds": 6,
+  "validation_required_years": [
+    2024,
+    2025
+  ],
+  "venue": "BINANCE_USD_M_BTCUSDT_PERPETUAL_TRADE_KLINE_NOT_SPOT_COINM_MARK"
+}

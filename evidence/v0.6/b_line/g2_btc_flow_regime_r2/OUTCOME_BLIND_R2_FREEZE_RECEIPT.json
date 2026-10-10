@@ -1,0 +1,13 @@
+{
+  "R2_archive_body_downloads_or_reads_at_freeze": 0,
+  "controller_sha": "b9e8ff64ac7c64fdbe0e84aa804b7a5582eecc96",
+  "created_at_utc": "2026-10-10T19:01:55.647559+00:00",
+  "exact_parent": "920b244d06541da5cb9fc3dcaa39e5b15e914d32",
+  "freeze_files_never_mutate": true,
+  "hash_not_external_signature_authority": true,
+  "prompt_sha": "437ad360b88e1ce8c9a57bcdc1747630a5f06d14",
+  "reserved_archive_stat_download_read_at_freeze": 0,
+  "roster_sha256": "2e9a9191be881edf790699d116fd89e03bd94fc280975619559c8251ecab220e",
+  "schema": "OUTCOME_BLIND_R2_FREEZE_RECEIPT_V1",
+  "source_split_sha256": "90c1340d89d3fa0df18b45a7594676600bc1dfc9a4a33174a23cd532bcb1887f"
+}
