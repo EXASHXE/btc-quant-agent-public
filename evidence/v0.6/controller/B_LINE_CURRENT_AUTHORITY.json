@@ -1869,7 +1869,7 @@
   },
   "v06_p2_s2_parallel_source_contract_and_pit_science_r1": {
     "decision": "AUTHORIZE_PARALLEL_P2_S2_GEMINI_SYNTHETIC_SOURCE_GATE__SOL_PIT_SCIENCE_PREREG_BLUEPRINT__NO_MARKET_READ",
-    "status": "TWO_BRANCHES_AND_PROMPTS_PUBLISHED__BOTH_NOT_EXECUTED",
+    "status": "BOTH_PUSHED__CONTROLLER_L2_ACCEPTED_SOL_SYNTHETIC_ONLY__GEMINI_DESIGN_ACCEPTED_WITH_SOURCE_MATRIX_ERRATUM__S3_DATA_READ_NOT_AUTHORIZED",
     "controller_dispatch_sha": "b176f4361cd97d1d89c3e25173b2c72a6af93ec4",
     "controller_dispatch_path": "reviews/v0.6/b_line/V06_P2_S2_SOURCE_READINESS_AND_PIT_PROSPECTIVE_PARALLEL_DISPATCH_R1.md",
     "code_start_sha": "e0ff8c3473de4bfa3e66fe7928d42992a4d38a32",
@@ -1880,10 +1880,45 @@
       "worktree": "/root/workspace/project/quant-v0.6/p2-s2-gemini-source-contract-r1",
       "pinned_prompt_sha": "f65a29f48ed4ecc4c02d72c3d28f099c2748d150",
       "prompt_path": "prompts/v0.6/b_line/V06_P2_S2_GEMINI_LONG_SOURCE_CONTRACT_AND_SYNTHETIC_CAPABILITY_GATE_R1.md",
-      "status": "NOT_EXECUTED",
+      "status": "DELIVERED_SYNTHETIC_DESIGN_ONLY_ERRATUM_REQUIRED_NOT_APPROVED_PRODUCTION_READER",
       "scope": "INDEPENDENT_SOURCE_RIGHTS_MATRIX_AND_SYNTHETIC_CAPABILITY_SECURITY_MODEL",
       "synthetic_test_min": 30,
-      "real_market_data_bytes_authorized": 0
+      "real_market_data_bytes_authorized": 0,
+      "final_sha": "01af4fcef012e28fd85eaa2550d9539bd23fcf3a",
+      "parent_sha": "e0ff8c3473de4bfa3e66fe7928d42992a4d38a32",
+      "changed_files": 16,
+      "ci_url": "https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/38025010704",
+      "ci": "FAIL_FULL_2822_PASS_1_INHERITED_H40_GOLDEN_2_SKIPPED_RUFF_MYPY_PASS",
+      "synthetic_cases": 38,
+      "synthetic_positive_cases": 15,
+      "synthetic_negative_witnesses": 20,
+      "mutants_rejected": 3,
+      "source_copy_errata": [
+        {
+          "path": "research/cross_asset_1h/ETHUSDT.parquet",
+          "immutable_receipt_bytes": 2907000,
+          "incorrect_s2_bytes": 3391374
+        },
+        {
+          "path": "research/cross_asset_1h/basket_manifest.json",
+          "immutable_receipt_bytes": 56012,
+          "incorrect_s2_bytes": 3674
+        },
+        {
+          "path": "research/v0.3.19_official_derivatives/hourly_inputs.parquet",
+          "immutable_receipt_bytes": 3101084,
+          "incorrect_s2_bytes": 2058958
+        },
+        {
+          "path": "research/v0.3.19_official_derivatives/raw_data_manifest.json",
+          "immutable_receipt_bytes": 420725,
+          "incorrect_s2_bytes": 4402
+        }
+      ],
+      "source_certainty_erratum": "ETH_SOL_1M_UNKNOWN_NOT_ABSENT",
+      "security_erratum": "SYNTHETIC_COMPONENT_WALK_IS_NOT_REAL_FD_DIRFD_OPENAT_READER",
+      "machine_source_matrix": "NOT_AUTHORITATIVE_FOR_FOUR_MISSTATED_SIZES_OR_ABSENCE_CLAIMS",
+      "real_owner_root_reads": 0
     },
     "sol_high": {
       "task": "V06_P2_S2_SOL_HIGH_PIT_FUNDING_MARK_AND_BTC_DIAGNOSTIC_PREREG_R1",
@@ -1891,12 +1926,27 @@
       "worktree": "/root/workspace/project/quant-v0.6/p2-s2-sol61-pit-science-r1",
       "pinned_prompt_sha": "90b20f441ebefff3da0bf8457604b2ef98e25326",
       "prompt_path": "prompts/v0.6/b_line/V06_P2_S2_SOL_HIGH_PIT_FUNDING_MARK_AND_BTC_DIAGNOSTIC_PREREG_R1.md",
-      "status": "NOT_EXECUTED",
+      "status": "DELIVERED_CONTROLLER_ACCEPTED_CONDITIONAL_SYNTHETIC_SCIENCE_ONLY_NO_ALPHAREG",
       "scope": "OUTCOME_BLIND_MARK_FUNDING_PIT_CLOCK_ORACLE_AND_BTC_ONLY_DIAGNOSTIC_PREREG_BLUEPRINT",
       "synthetic_case_min": 32,
       "adversarial_witness_min": 24,
       "metamorphic_invariant_min": 10,
-      "real_market_data_bytes_authorized": 0
+      "real_market_data_bytes_authorized": 0,
+      "final_sha": "e6bcaf62a69cde32149db3cd4997f7f2dad526ef",
+      "parent_sha": "e0ff8c3473de4bfa3e66fe7928d42992a4d38a32",
+      "changed_files": 12,
+      "ci_url": "https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/38025176018",
+      "ci": "SUCCESS_RUFF_MYPY_FULL_PYTEST_2854_PASS_2_SKIP_9_WARN",
+      "synthetic_cases": 52,
+      "hostile": 39,
+      "metamorphic_invariants": 13,
+      "synthetic_assertion_groups": 65,
+      "focused_tests_python312": 69,
+      "focused_tests_python313": 69,
+      "source_cadence_rights": "UNKNOWN",
+      "prereg_effective": false,
+      "body_reads": 0,
+      "model_variant_actual": "NOT_EXPOSED"
     },
     "known_data_root": "/root/workspace/project/Quant-agent/data",
     "original_six_month_metadata_sha": "c6823dbc46249cac43aa10400aacbbe9f4542410",
@@ -1913,6 +1963,15 @@
     "testnet_live_real_funds": "NONE",
     "controller_future_gate": "JOINT_IDENTITY_CI_SEMANTIC_ACCEPTANCE_THEN_DECIDE_SEPARATELY_AUTHORIZED_MINIMAL_NONPROTECTED_SCHEMA_SOURCE_QA",
     "cross_task_file_overlap": "NONE",
-    "cross_task_dependency": "NONE"
+    "cross_task_dependency": "NONE",
+    "controller_joint_l2_sha": "9782c68e9faa95988959ea8e7592aefe0b176067",
+    "controller_joint_l2_path": "reviews/v0.6/b_line/V06_P2_S2_GEMINI_SOURCE_CONTRACT_AND_SOL_PIT_SCIENCE_CONTROLLER_JOINT_L2_R1.md",
+    "s2_design_scope": "METADATA_DERIVED_AND_SYNTHETIC_ONLY_NO_REAL_MARKET_CONTENT",
+    "next_stage": "CONDITIONED_S3_ONE_FILE_NONPROTECTED_FOOTER_PILOT_AFTER_EXPLICIT_OWNER_CONSENT_AND_INDEPENDENT_TRUE_DESCRIPTOR_READER_AUTHORITY",
+    "next_pilot_path": "/root/workspace/project/Quant-agent/data/research/BTCUSDT/1m/year=2021/month=03/data.parquet",
+    "next_pilot_proposed_footer_content_max_bytes": 65544,
+    "next_pilot_proposed_actual_fs_calls_max": 100,
+    "next_pilot_source_rights": "PENDING_OWNER_EXPLICIT_CONSENT_NOT_AUTHORIZED",
+    "next_pilot_reader_status": "NO_INDEPENDENT_VERIFIED_REAL_READER"
   }
 }
