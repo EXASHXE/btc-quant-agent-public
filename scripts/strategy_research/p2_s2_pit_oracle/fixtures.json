@@ -1,0 +1,1558 @@
+{
+  "cases": [
+    {
+      "evidence_to_disambiguate": "Source-origin proof, immutable timestamp/version/rights manifest",
+      "expected_code": "VISIBLE_SYNTHETIC",
+      "expected_values": {},
+      "hostile": false,
+      "id": "C01",
+      "input": {
+        "available": 120000,
+        "decision": 180000,
+        "event": 60000,
+        "observed": 120000,
+        "proof_floor": 120000
+      },
+      "name": "Legal exclusive-minute visibility",
+      "op": "visibility"
+    },
+    {
+      "evidence_to_disambiguate": "Source-origin proof, immutable timestamp/version/rights manifest",
+      "expected_code": "LOOKAHEAD",
+      "expected_values": {},
+      "hostile": true,
+      "id": "C02",
+      "input": {
+        "available": 120000,
+        "decision": 180000,
+        "event": 200000,
+        "observed": 120000,
+        "proof_floor": 120000
+      },
+      "name": "Future event despite early availability",
+      "op": "visibility"
+    },
+    {
+      "evidence_to_disambiguate": "Source-origin proof, immutable timestamp/version/rights manifest",
+      "expected_code": "LOOKAHEAD",
+      "expected_values": {},
+      "hostile": true,
+      "id": "C03",
+      "input": {
+        "available": 200000,
+        "decision": 180000,
+        "event": 60000,
+        "observed": 120000,
+        "proof_floor": 120000
+      },
+      "name": "Availability after decision",
+      "op": "visibility"
+    },
+    {
+      "evidence_to_disambiguate": "Source-origin proof, immutable timestamp/version/rights manifest",
+      "expected_code": "SOURCE_UNPROVEN",
+      "expected_values": {},
+      "hostile": true,
+      "id": "C04",
+      "input": {
+        "available": null,
+        "decision": 180000,
+        "event": 60000,
+        "observed": 120000,
+        "proof_floor": 120000
+      },
+      "name": "Historical available_at missing",
+      "op": "visibility"
+    },
+    {
+      "evidence_to_disambiguate": "Source-origin proof, immutable timestamp/version/rights manifest",
+      "expected_code": "LOOKAHEAD",
+      "expected_values": {},
+      "hostile": true,
+      "id": "C05",
+      "input": {
+        "available": 90000,
+        "decision": 180000,
+        "event": 60000,
+        "observed": 120000,
+        "proof_floor": 120000
+      },
+      "name": "Availability before original observation",
+      "op": "visibility"
+    },
+    {
+      "evidence_to_disambiguate": "Source-origin proof, immutable timestamp/version/rights manifest",
+      "expected_code": "LOOKAHEAD",
+      "expected_values": {},
+      "hostile": true,
+      "id": "C06",
+      "input": {
+        "available": 60000,
+        "decision": 180000,
+        "event": 59999,
+        "observed": 60000,
+        "proof_floor": 120000
+      },
+      "name": "R1.2 minute proof floor backdated",
+      "op": "visibility"
+    },
+    {
+      "evidence_to_disambiguate": "Source-origin proof, immutable timestamp/version/rights manifest",
+      "expected_code": "SOURCE_UNPROVEN",
+      "expected_values": {},
+      "hostile": true,
+      "id": "C07",
+      "input": {
+        "available": 120000,
+        "decision": 180000,
+        "event": 59999,
+        "max_age": 120000,
+        "observed": 120000,
+        "proof_floor": 120000
+      },
+      "name": "Stale current-decision Mark",
+      "op": "visibility"
+    },
+    {
+      "evidence_to_disambiguate": "Source-origin proof, immutable timestamp/version/rights manifest",
+      "expected_code": "ASOF_SYNTHETIC",
+      "expected_values": {
+        "prices": {
+          "60000": "100"
+        }
+      },
+      "hostile": false,
+      "id": "C08",
+      "input": {
+        "decision": 180000,
+        "expected_closes": [
+          60000
+        ],
+        "observations": [
+          {
+            "available": 120000,
+            "close": 60000,
+            "id": "m0",
+            "kind": "MARK_1M",
+            "observed": 120000,
+            "price": "100",
+            "revision": 0,
+            "source": "MARK_ENDPOINT_A",
+            "start": 0,
+            "symbol": "BTCUSDT"
+          }
+        ],
+        "physical_monotonic": true,
+        "rights": true,
+        "trade_source": "TRADE_ENDPOINT_B"
+      },
+      "name": "Genuine Mark asof",
+      "op": "mark"
+    },
+    {
+      "evidence_to_disambiguate": "Source-origin proof, immutable timestamp/version/rights manifest",
+      "expected_code": "SOURCE_UNPROVEN",
+      "expected_values": {},
+      "hostile": true,
+      "id": "C09",
+      "input": {
+        "decision": 180000,
+        "expected_closes": [
+          60000
+        ],
+        "observations": [
+          {
+            "available": 120000,
+            "close": 60000,
+            "id": "m0",
+            "kind": "MARK_1M",
+            "observed": 120000,
+            "price": "100",
+            "revision": 0,
+            "source": "TRADE_ENDPOINT_B",
+            "start": 0,
+            "symbol": "BTCUSDT"
+          }
+        ],
+        "physical_monotonic": true,
+        "rights": true,
+        "trade_source": "TRADE_ENDPOINT_B"
+      },
+      "name": "Trade-price alias masquerades as Mark",
+      "op": "mark"
+    },
+    {
+      "evidence_to_disambiguate": "Source-origin proof, immutable timestamp/version/rights manifest",
+      "expected_code": "SOURCE_UNPROVEN",
+      "expected_values": {},
+      "hostile": true,
+      "id": "C10",
+      "input": {
+        "decision": 180000,
+        "expected_closes": [
+          60000
+        ],
+        "observations": [
+          {
+            "available": 120000,
+            "close": 60000,
+            "id": "m0",
+            "kind": "MARK_DAILY",
+            "observed": 120000,
+            "price": "100",
+            "revision": 0,
+            "source": "MARK_ENDPOINT_A",
+            "start": 0,
+            "symbol": "BTCUSDT"
+          }
+        ],
+        "physical_monotonic": true,
+        "rights": true,
+        "trade_source": "TRADE_ENDPOINT_B"
+      },
+      "name": "Daily Mark does not prove minute stream",
+      "op": "mark"
+    },
+    {
+      "evidence_to_disambiguate": "Source-origin proof, immutable timestamp/version/rights manifest",
+      "expected_code": "SOURCE_UNPROVEN",
+      "expected_values": {},
+      "hostile": true,
+      "id": "C11",
+      "input": {
+        "decision": 180000,
+        "expected_closes": [
+          60000,
+          120000
+        ],
+        "observations": [
+          {
+            "available": 120000,
+            "close": 60000,
+            "id": "m0",
+            "kind": "MARK_1M",
+            "observed": 120000,
+            "price": "100",
+            "revision": 0,
+            "source": "MARK_ENDPOINT_A",
+            "start": 0,
+            "symbol": "BTCUSDT"
+          }
+        ],
+        "physical_monotonic": true,
+        "rights": true,
+        "trade_source": "TRADE_ENDPOINT_B"
+      },
+      "name": "Missing required middle minute",
+      "op": "mark"
+    },
+    {
+      "evidence_to_disambiguate": "Source-origin proof, immutable timestamp/version/rights manifest",
+      "expected_code": "CONFLICT_SOURCE_FAIL_CLOSED",
+      "expected_values": {},
+      "hostile": true,
+      "id": "C12",
+      "input": {
+        "decision": 180000,
+        "expected_closes": [
+          60000
+        ],
+        "observations": [
+          {
+            "available": 120000,
+            "close": 60000,
+            "id": "m0",
+            "kind": "MARK_1M",
+            "observed": 120000,
+            "price": "100",
+            "revision": 0,
+            "source": "MARK_ENDPOINT_A",
+            "start": 0,
+            "symbol": "BTCUSDT"
+          },
+          {
+            "available": 120000,
+            "close": 60000,
+            "id": "m_other",
+            "kind": "MARK_1M",
+            "observed": 120000,
+            "price": "101",
+            "revision": 0,
+            "source": "MARK_ENDPOINT_A",
+            "start": 0,
+            "symbol": "BTCUSDT"
+          }
+        ],
+        "physical_monotonic": true,
+        "rights": true,
+        "trade_source": "TRADE_ENDPOINT_B"
+      },
+      "name": "Contradictory same source-close price",
+      "op": "mark"
+    },
+    {
+      "evidence_to_disambiguate": "Source-origin proof, immutable timestamp/version/rights manifest",
+      "expected_code": "CONFLICT_SOURCE_FAIL_CLOSED",
+      "expected_values": {},
+      "hostile": true,
+      "id": "C13",
+      "input": {
+        "decision": 180000,
+        "expected_closes": [
+          60000
+        ],
+        "observations": [
+          {
+            "available": 120000,
+            "close": 60000,
+            "id": "m0",
+            "kind": "MARK_1M",
+            "observed": 120000,
+            "price": "100",
+            "revision": 0,
+            "source": "MARK_ENDPOINT_A",
+            "start": 0,
+            "symbol": "BTCUSDT"
+          },
+          {
+            "available": 150000,
+            "close": 60000,
+            "id": "m0",
+            "kind": "MARK_1M",
+            "observed": 120000,
+            "price": "100",
+            "revision": 0,
+            "source": "MARK_ENDPOINT_A",
+            "start": 0,
+            "symbol": "BTCUSDT"
+          }
+        ],
+        "physical_monotonic": true,
+        "rights": true,
+        "trade_source": "TRADE_ENDPOINT_B"
+      },
+      "name": "Immutable ID clock contradiction",
+      "op": "mark"
+    },
+    {
+      "evidence_to_disambiguate": "Source-origin proof, immutable timestamp/version/rights manifest",
+      "expected_code": "ASOF_SYNTHETIC",
+      "expected_values": {
+        "prices": {
+          "60000": "100"
+        }
+      },
+      "hostile": false,
+      "id": "C14",
+      "input": {
+        "decision": 180000,
+        "expected_closes": [
+          60000
+        ],
+        "observations": [
+          {
+            "available": 120000,
+            "close": 60000,
+            "id": "m0",
+            "kind": "MARK_1M",
+            "observed": 120000,
+            "price": "100",
+            "revision": 0,
+            "source": "MARK_ENDPOINT_A",
+            "start": 0,
+            "symbol": "BTCUSDT"
+          },
+          {
+            "available": 240000,
+            "close": 60000,
+            "corrected": 240000,
+            "id": "m1",
+            "kind": "MARK_1M",
+            "observed": 240000,
+            "price": "101",
+            "revision": 1,
+            "source": "MARK_ENDPOINT_A",
+            "start": 0,
+            "supersedes": "m0",
+            "symbol": "BTCUSDT"
+          }
+        ],
+        "physical_monotonic": true,
+        "rights": true,
+        "trade_source": "TRADE_ENDPOINT_B"
+      },
+      "name": "Future correction preserves earlier asof",
+      "op": "mark"
+    },
+    {
+      "evidence_to_disambiguate": "Source-origin proof, immutable timestamp/version/rights manifest",
+      "expected_code": "ASOF_SYNTHETIC",
+      "expected_values": {
+        "prices": {
+          "60000": "101"
+        }
+      },
+      "hostile": false,
+      "id": "C15",
+      "input": {
+        "decision": 300000,
+        "expected_closes": [
+          60000
+        ],
+        "observations": [
+          {
+            "available": 240000,
+            "close": 60000,
+            "corrected": 240000,
+            "id": "m1",
+            "kind": "MARK_1M",
+            "observed": 240000,
+            "price": "101",
+            "revision": 1,
+            "source": "MARK_ENDPOINT_A",
+            "start": 0,
+            "supersedes": "m0",
+            "symbol": "BTCUSDT"
+          },
+          {
+            "available": 120000,
+            "close": 60000,
+            "id": "m0",
+            "kind": "MARK_1M",
+            "observed": 120000,
+            "price": "100",
+            "revision": 0,
+            "source": "MARK_ENDPOINT_A",
+            "start": 0,
+            "symbol": "BTCUSDT"
+          }
+        ],
+        "physical_monotonic": true,
+        "rights": true,
+        "trade_source": "TRADE_ENDPOINT_B"
+      },
+      "name": "Later legal correction changes later snapshot",
+      "op": "mark"
+    },
+    {
+      "evidence_to_disambiguate": "Source-origin proof, immutable timestamp/version/rights manifest",
+      "expected_code": "SOURCE_UNPROVEN",
+      "expected_values": {},
+      "hostile": true,
+      "id": "C16",
+      "input": {
+        "decision": 300000,
+        "expected_closes": [
+          60000
+        ],
+        "observations": [
+          {
+            "available": 120000,
+            "close": 60000,
+            "id": "m0",
+            "kind": "MARK_1M",
+            "observed": 120000,
+            "price": "100",
+            "revision": 0,
+            "source": "MARK_ENDPOINT_A",
+            "start": 0,
+            "symbol": "BTCUSDT"
+          },
+          {
+            "available": 240000,
+            "close": 60000,
+            "corrected": 240000,
+            "id": "m1",
+            "kind": "MARK_1M",
+            "observed": 240000,
+            "price": "101",
+            "revision": 1,
+            "source": "MARK_ENDPOINT_A",
+            "start": 0,
+            "supersedes": "missing",
+            "symbol": "BTCUSDT"
+          }
+        ],
+        "physical_monotonic": true,
+        "rights": true,
+        "trade_source": "TRADE_ENDPOINT_B"
+      },
+      "name": "Correction lacks parent provenance",
+      "op": "mark"
+    },
+    {
+      "evidence_to_disambiguate": "Source-origin proof, immutable timestamp/version/rights manifest",
+      "expected_code": "LOOKAHEAD",
+      "expected_values": {},
+      "hostile": true,
+      "id": "C17",
+      "input": {
+        "claimed_prices": {
+          "60000": "101"
+        },
+        "decision": 180000,
+        "expected_closes": [
+          60000
+        ],
+        "observations": [
+          {
+            "available": 120000,
+            "close": 60000,
+            "id": "m0",
+            "kind": "MARK_1M",
+            "observed": 120000,
+            "price": "100",
+            "revision": 0,
+            "source": "MARK_ENDPOINT_A",
+            "start": 0,
+            "symbol": "BTCUSDT"
+          },
+          {
+            "available": 240000,
+            "close": 60000,
+            "corrected": 240000,
+            "id": "m1",
+            "kind": "MARK_1M",
+            "observed": 240000,
+            "price": "101",
+            "revision": 1,
+            "source": "MARK_ENDPOINT_A",
+            "start": 0,
+            "supersedes": "m0",
+            "symbol": "BTCUSDT"
+          }
+        ],
+        "physical_monotonic": true,
+        "rights": true,
+        "trade_source": "TRADE_ENDPOINT_B"
+      },
+      "name": "Future correction substituted into old snapshot",
+      "op": "mark"
+    },
+    {
+      "evidence_to_disambiguate": "Source-origin proof, immutable timestamp/version/rights manifest",
+      "expected_code": "SOURCE_UNPROVEN",
+      "expected_values": {},
+      "hostile": true,
+      "id": "C18",
+      "input": {
+        "decision": 180000,
+        "expected_closes": [
+          60000
+        ],
+        "observations": [
+          {
+            "available": 120000,
+            "close": 60001,
+            "id": "m0",
+            "kind": "MARK_1M",
+            "observed": 120000,
+            "price": "100",
+            "revision": 0,
+            "source": "MARK_ENDPOINT_A",
+            "start": 1,
+            "symbol": "BTCUSDT"
+          }
+        ],
+        "physical_monotonic": true,
+        "rights": true,
+        "trade_source": "TRADE_ENDPOINT_B"
+      },
+      "name": "Minute starts not UTC aligned",
+      "op": "mark"
+    },
+    {
+      "evidence_to_disambiguate": "Source-origin proof, immutable timestamp/version/rights manifest",
+      "expected_code": "SOURCE_UNPROVEN",
+      "expected_values": {},
+      "hostile": true,
+      "id": "C19",
+      "input": {
+        "decision": 180000,
+        "expected_closes": [
+          60000
+        ],
+        "observations": [
+          {
+            "available": 120000,
+            "close": 60000,
+            "id": "m0",
+            "kind": "MARK_1M",
+            "observed": 120000,
+            "price": "100",
+            "revision": 0,
+            "source": "MARK_ENDPOINT_A",
+            "start": 0,
+            "symbol": "BTCUSDT"
+          }
+        ],
+        "physical_monotonic": false,
+        "rights": true,
+        "trade_source": "TRADE_ENDPOINT_B"
+      },
+      "name": "Raw physical timestamp ordering unproven",
+      "op": "mark"
+    },
+    {
+      "evidence_to_disambiguate": "Source-origin proof, immutable timestamp/version/rights manifest",
+      "expected_code": "SOURCE_UNPROVEN",
+      "expected_values": {},
+      "hostile": true,
+      "id": "C20",
+      "input": {
+        "decision": 180000,
+        "expected_closes": [
+          60000
+        ],
+        "observations": [
+          {
+            "available": 120000,
+            "close": 60000,
+            "id": "m0",
+            "kind": "MARK_1M",
+            "observed": 120000,
+            "price": "100",
+            "revision": 0,
+            "source": "MARK_ENDPOINT_A",
+            "start": 0,
+            "symbol": "BTCUSDT"
+          }
+        ],
+        "physical_monotonic": true,
+        "rights": null,
+        "trade_source": "TRADE_ENDPOINT_B"
+      },
+      "name": "Source usage rights missing",
+      "op": "mark"
+    },
+    {
+      "evidence_to_disambiguate": "Source-origin proof, immutable timestamp/version/rights manifest",
+      "expected_code": "ASOF_SYNTHETIC",
+      "expected_values": {
+        "prices": {
+          "60000": "100"
+        }
+      },
+      "hostile": false,
+      "id": "C21",
+      "input": {
+        "decision": 180000,
+        "expected_closes": [
+          60000
+        ],
+        "observations": [
+          {
+            "available": 120000,
+            "close": 60000,
+            "id": "m0",
+            "kind": "MARK_1M",
+            "observed": 120000,
+            "price": "100",
+            "revision": 0,
+            "source": "MARK_ENDPOINT_A",
+            "start": 0,
+            "symbol": "BTCUSDT"
+          }
+        ],
+        "physical_monotonic": true,
+        "rights": true,
+        "trade_source": "TRADE_ENDPOINT_B"
+      },
+      "name": "Independent Mark may numerically equal trade price",
+      "op": "mark"
+    },
+    {
+      "evidence_to_disambiguate": "Source-origin proof, immutable timestamp/version/rights manifest",
+      "expected_code": "METHOD_CONFLICT",
+      "expected_values": {},
+      "hostile": true,
+      "id": "C22",
+      "input": {
+        "decision": 180000,
+        "expected_closes": [
+          60000
+        ],
+        "observations": [
+          {
+            "available": 120000,
+            "close": 60000,
+            "id": "m0",
+            "kind": "MARK_1M",
+            "observed": 120000,
+            "price": "100",
+            "revision": 0,
+            "source": "MARK_ENDPOINT_A",
+            "start": 0,
+            "symbol": "BTCUSDT"
+          },
+          {
+            "available": 120000,
+            "close": 60000,
+            "id": "providerB",
+            "kind": "MARK_1M",
+            "observed": 120000,
+            "price": "100",
+            "revision": 0,
+            "source": "MARK_ENDPOINT_B",
+            "start": 0,
+            "symbol": "BTCUSDT"
+          }
+        ],
+        "physical_monotonic": true,
+        "rights": true,
+        "trade_source": "TRADE_ENDPOINT_B"
+      },
+      "name": "Multiple Mark providers not preselected",
+      "op": "mark"
+    },
+    {
+      "evidence_to_disambiguate": "Source-origin proof, immutable timestamp/version/rights manifest",
+      "expected_code": "LOOKAHEAD",
+      "expected_values": {},
+      "hostile": true,
+      "id": "C23",
+      "input": {
+        "ack_at": 180000,
+        "clock_proven": true,
+        "decision": 60000,
+        "final_at": 120000,
+        "knowledge": 150000,
+        "mark_multiplier": "1",
+        "notional": "1000",
+        "owed_fee": "0",
+        "ownership_proof": 120000,
+        "purpose": "FEATURE",
+        "rate_available": 120000,
+        "rate_bp": "4",
+        "rate_event": 120000,
+        "rate_kind": "SETTLED_ACTUAL",
+        "rate_observed": 120000,
+        "settlement": 120000,
+        "side": 1
+      },
+      "name": "Eventual actual rate used before settlement",
+      "op": "funding"
+    },
+    {
+      "evidence_to_disambiguate": "Source-origin proof, immutable timestamp/version/rights manifest",
+      "expected_code": "LOOKAHEAD",
+      "expected_values": {},
+      "hostile": true,
+      "id": "C24",
+      "input": {
+        "ack_at": 180000,
+        "clock_proven": true,
+        "decision": 150000,
+        "final_at": 120000,
+        "knowledge": 150000,
+        "mark_multiplier": "1",
+        "notional": "1000",
+        "owed_fee": "0",
+        "ownership_proof": 120000,
+        "purpose": "CASH",
+        "rate_available": 30000,
+        "rate_bp": "4",
+        "rate_event": -60000,
+        "rate_kind": "SETTLED_ACTUAL",
+        "rate_observed": 30000,
+        "settlement": 0,
+        "side": 1
+      },
+      "name": "Actual final rate event backdated before settlement",
+      "op": "funding"
+    },
+    {
+      "evidence_to_disambiguate": "Source-origin proof, immutable timestamp/version/rights manifest",
+      "expected_code": "SOURCE_UNPROVEN",
+      "expected_values": {},
+      "hostile": true,
+      "id": "C25",
+      "input": {
+        "ack_at": 180000,
+        "clock_proven": true,
+        "decision": 150000,
+        "final_at": 120000,
+        "knowledge": 150000,
+        "mark_multiplier": "1",
+        "notional": "1000",
+        "owed_fee": "0",
+        "ownership_proof": 120000,
+        "purpose": "CASH",
+        "rate_available": 30000,
+        "rate_bp": "4",
+        "rate_event": 0,
+        "rate_kind": "PREDICTED",
+        "rate_observed": 30000,
+        "settlement": 0,
+        "side": 1
+      },
+      "name": "Prediction treated as settled cash",
+      "op": "funding"
+    },
+    {
+      "evidence_to_disambiguate": "Source-origin proof, immutable timestamp/version/rights manifest",
+      "expected_code": "SOURCE_UNPROVEN",
+      "expected_values": {},
+      "hostile": true,
+      "id": "C26",
+      "input": {
+        "ack_at": 180000,
+        "clock_proven": true,
+        "decision": 150000,
+        "final_at": 120000,
+        "knowledge": 150000,
+        "mark_multiplier": "1",
+        "notional": "1000",
+        "owed_fee": "0",
+        "ownership_proof": 120000,
+        "purpose": "CASH",
+        "rate_available": null,
+        "rate_bp": "4",
+        "rate_event": 0,
+        "rate_kind": "SETTLED_ACTUAL",
+        "rate_observed": 30000,
+        "settlement": 0,
+        "side": 1
+      },
+      "name": "Funding initial publication missing",
+      "op": "funding"
+    },
+    {
+      "evidence_to_disambiguate": "Source-origin proof, immutable timestamp/version/rights manifest",
+      "expected_code": "LOOKAHEAD",
+      "expected_values": {},
+      "hostile": true,
+      "id": "C27",
+      "input": {
+        "ack_at": 180000,
+        "clock_proven": true,
+        "decision": 150000,
+        "final_at": 60000,
+        "knowledge": 150000,
+        "mark_multiplier": "1",
+        "notional": "1000",
+        "owed_fee": "0",
+        "ownership_proof": 120000,
+        "purpose": "CASH",
+        "rate_available": 30000,
+        "rate_bp": "4",
+        "rate_event": 0,
+        "rate_kind": "SETTLED_ACTUAL",
+        "rate_observed": 30000,
+        "settlement": 0,
+        "side": 1
+      },
+      "name": "Funding FINAL before intersecting minute proof",
+      "op": "funding"
+    },
+    {
+      "evidence_to_disambiguate": "Source-origin proof, immutable timestamp/version/rights manifest",
+      "expected_code": "LOOKAHEAD",
+      "expected_values": {},
+      "hostile": true,
+      "id": "C28",
+      "input": {
+        "ack_at": 60000,
+        "clock_proven": true,
+        "decision": 150000,
+        "final_at": 120000,
+        "knowledge": 150000,
+        "mark_multiplier": "1",
+        "notional": "1000",
+        "owed_fee": "0",
+        "ownership_proof": 120000,
+        "purpose": "CASH",
+        "rate_available": 30000,
+        "rate_bp": "4",
+        "rate_event": 0,
+        "rate_kind": "SETTLED_ACTUAL",
+        "rate_observed": 30000,
+        "settlement": 0,
+        "side": 1
+      },
+      "name": "ACK before legal source proof",
+      "op": "funding"
+    },
+    {
+      "evidence_to_disambiguate": "Source-origin proof, immutable timestamp/version/rights manifest",
+      "expected_code": "SOURCE_UNPROVEN",
+      "expected_values": {},
+      "hostile": true,
+      "id": "C29",
+      "input": {
+        "ack_at": 180000,
+        "clock_proven": true,
+        "decision": 150000,
+        "final_at": 120000,
+        "knowledge": 150000,
+        "mark_multiplier": "1",
+        "notional": "1000",
+        "owed_fee": "0",
+        "ownership_proof": null,
+        "purpose": "CASH",
+        "rate_available": 30000,
+        "rate_bp": "4",
+        "rate_event": 0,
+        "rate_kind": "SETTLED_ACTUAL",
+        "rate_observed": 30000,
+        "settlement": 0,
+        "side": 1
+      },
+      "name": "Ownership proof absent",
+      "op": "funding"
+    },
+    {
+      "evidence_to_disambiguate": "Source-origin proof, immutable timestamp/version/rights manifest",
+      "expected_code": "UNPAID_TERMINAL",
+      "expected_values": {},
+      "hostile": true,
+      "id": "C30",
+      "input": {
+        "ack_at": 180000,
+        "clock_proven": true,
+        "decision": 150000,
+        "final_at": 120000,
+        "knowledge": 180000,
+        "mark_multiplier": "1",
+        "notional": "1000",
+        "owed_fee": "2",
+        "ownership_proof": 120000,
+        "purpose": "CASH",
+        "rate_available": 30000,
+        "rate_bp": "4",
+        "rate_event": 0,
+        "rate_kind": "SETTLED_ACTUAL",
+        "rate_observed": 30000,
+        "settlement": 0,
+        "side": 1,
+        "terminal_clear_claim": true
+      },
+      "name": "Terminal unpaid fee cannot disappear",
+      "op": "funding"
+    },
+    {
+      "evidence_to_disambiguate": "Source-origin proof, immutable timestamp/version/rights manifest",
+      "expected_code": "ACCOUNTING_CONTRADICTION",
+      "expected_values": {},
+      "hostile": true,
+      "id": "C31",
+      "input": {
+        "ack_at": 180000,
+        "clock_proven": true,
+        "decision": 150000,
+        "final_at": 120000,
+        "knowledge": 180000,
+        "mark_multiplier": "1",
+        "notional": "1000",
+        "owed_fee": "0",
+        "ownership_proof": 120000,
+        "paid_but_still_claimed": true,
+        "purpose": "CASH",
+        "rate_available": 30000,
+        "rate_bp": "4",
+        "rate_event": 0,
+        "rate_kind": "SETTLED_ACTUAL",
+        "rate_observed": 30000,
+        "settlement": 0,
+        "side": 1
+      },
+      "name": "Paid funding still shown liable",
+      "op": "funding"
+    },
+    {
+      "evidence_to_disambiguate": "Source-origin proof, immutable timestamp/version/rights manifest",
+      "expected_code": "METHOD_CONFLICT",
+      "expected_values": {},
+      "hostile": true,
+      "id": "C32",
+      "input": {
+        "assume_eight_hours": true,
+        "cadence": "UNKNOWN",
+        "end": 14400000,
+        "fee_proven": true,
+        "filters_proven": true,
+        "start": 0,
+        "stop_bp": "200",
+        "synthetic_times": [
+          0,
+          3600000,
+          7200000,
+          10800000,
+          14400000
+        ],
+        "tick_bound": "0"
+      },
+      "name": "Unknown cadence silently replaced by8h",
+      "op": "geometry"
+    },
+    {
+      "evidence_to_disambiguate": "Source-origin proof, immutable timestamp/version/rights manifest",
+      "expected_code": "COST_UNKNOWN",
+      "expected_values": {},
+      "hostile": true,
+      "id": "C33",
+      "input": {
+        "assume_eight_hours": false,
+        "cadence": "UNKNOWN",
+        "end": 14400000,
+        "fee_proven": true,
+        "filters_proven": false,
+        "start": 0,
+        "stop_bp": "200",
+        "synthetic_times": [
+          0,
+          3600000,
+          7200000,
+          10800000,
+          14400000
+        ],
+        "tick_bound": "0"
+      },
+      "name": "Historical lot/tick provenance absent",
+      "op": "geometry"
+    },
+    {
+      "evidence_to_disambiguate": "Source-origin proof, immutable timestamp/version/rights manifest",
+      "expected_code": "COST_UNKNOWN",
+      "expected_values": {},
+      "hostile": true,
+      "id": "C34",
+      "input": {
+        "assume_eight_hours": false,
+        "cadence": "UNKNOWN",
+        "end": 14400000,
+        "fee_proven": false,
+        "filters_proven": true,
+        "start": 0,
+        "stop_bp": "200",
+        "synthetic_times": [
+          0,
+          3600000,
+          7200000,
+          10800000,
+          14400000
+        ],
+        "tick_bound": "0"
+      },
+      "name": "Historical fee applicability absent",
+      "op": "geometry"
+    },
+    {
+      "evidence_to_disambiguate": "Source-origin proof, immutable timestamp/version/rights manifest",
+      "expected_code": "STRESS_COST_GEOMETRY_INELIGIBLE",
+      "expected_values": {
+        "events": 13,
+        "minimum_stop_bp": "296.000000000000"
+      },
+      "hostile": true,
+      "id": "C35",
+      "input": {
+        "assume_eight_hours": false,
+        "cadence": "UNKNOWN",
+        "end": 43200000,
+        "fee_proven": true,
+        "filters_proven": true,
+        "start": 0,
+        "stop_bp": "250",
+        "synthetic_times": [
+          0,
+          3600000,
+          7200000,
+          10800000,
+          14400000,
+          18000000,
+          21600000,
+          25200000,
+          28800000,
+          32400000,
+          36000000,
+          39600000,
+          43200000
+        ],
+        "tick_bound": "0"
+      },
+      "name": "12h hourly STRESS cannot fit250stop",
+      "op": "geometry"
+    },
+    {
+      "evidence_to_disambiguate": "Source-origin proof, immutable timestamp/version/rights manifest",
+      "expected_code": "METHOD_CONFLICT",
+      "expected_values": {},
+      "hostile": true,
+      "id": "C36",
+      "input": {
+        "kind": "BTC_POSITIVE",
+        "single_asset_fraction": 1
+      },
+      "name": "BTC-only inheriting multiasset positive",
+      "op": "semantic"
+    },
+    {
+      "evidence_to_disambiguate": "Source-origin proof, immutable timestamp/version/rights manifest",
+      "expected_code": "INSUFFICIENT_SUPPORT",
+      "expected_values": {},
+      "hostile": true,
+      "id": "C37",
+      "input": {
+        "fold_counts": [
+          99,
+          150,
+          200
+        ],
+        "kind": "SUPPORT"
+      },
+      "name": "Sparse fold hidden by pooled counts",
+      "op": "semantic"
+    },
+    {
+      "evidence_to_disambiguate": "Source-origin proof, immutable timestamp/version/rights manifest",
+      "expected_code": "METHOD_CONFLICT",
+      "expected_values": {},
+      "hostile": true,
+      "id": "C38",
+      "input": {
+        "comparisons": 8,
+        "kind": "MULTIPLICITY"
+      },
+      "name": "Eight aliases used to cut sixteen endpoints",
+      "op": "semantic"
+    },
+    {
+      "evidence_to_disambiguate": "Source-origin proof, immutable timestamp/version/rights manifest",
+      "expected_code": "METHOD_CONFLICT",
+      "expected_values": {},
+      "hostile": true,
+      "id": "C39",
+      "input": {
+        "blind_claim": true,
+        "exposed": true,
+        "kind": "OOS"
+      },
+      "name": "Exposed development relabeled blind OOS",
+      "op": "semantic"
+    },
+    {
+      "evidence_to_disambiguate": "Source-origin proof, immutable timestamp/version/rights manifest",
+      "expected_code": "METHOD_CONFLICT",
+      "expected_values": {},
+      "hostile": true,
+      "id": "C40",
+      "input": {
+        "R11_equal_R12": true,
+        "kind": "METHOD"
+      },
+      "name": "R1.1 and R1.2 called identical",
+      "op": "semantic"
+    },
+    {
+      "evidence_to_disambiguate": "Source-origin proof, immutable timestamp/version/rights manifest",
+      "expected_code": "COST_UNKNOWN",
+      "expected_values": {},
+      "hostile": true,
+      "id": "C41",
+      "input": {
+        "impact_proven": false,
+        "kind": "PRICE_COST"
+      },
+      "name": "Proxy spread/slippage called actual cost",
+      "op": "semantic"
+    },
+    {
+      "evidence_to_disambiguate": "Source-origin proof, immutable timestamp/version/rights manifest",
+      "expected_code": "METHOD_CONFLICT",
+      "expected_values": {},
+      "hostile": true,
+      "id": "C42",
+      "input": {
+        "claimed_real_body_access": true,
+        "kind": "SCOPE"
+      },
+      "name": "Synthetic tests claimed to grant real-body access",
+      "op": "semantic"
+    },
+    {
+      "evidence_to_disambiguate": "Source-origin proof, immutable timestamp/version/rights manifest",
+      "expected_code": "FUNDING_SYNTHETIC",
+      "expected_values": {
+        "acknowledged_cash": "0.000000000000",
+        "cashflow": "-0.400000000000",
+        "liability": "0.400000000000",
+        "reserve": "0.440000000000"
+      },
+      "hostile": false,
+      "id": "C43",
+      "input": {
+        "ack_at": 180000,
+        "clock_proven": true,
+        "decision": 150000,
+        "final_at": 120000,
+        "knowledge": 150000,
+        "mark_multiplier": "1",
+        "notional": "1000",
+        "owed_fee": "0",
+        "ownership_proof": 120000,
+        "purpose": "CASH",
+        "rate_available": 30000,
+        "rate_bp": "4",
+        "rate_event": 0,
+        "rate_kind": "SETTLED_ACTUAL",
+        "rate_observed": 30000,
+        "settlement": 0,
+        "side": 1
+      },
+      "name": "Long positive rate pending debit",
+      "op": "funding"
+    },
+    {
+      "evidence_to_disambiguate": "Source-origin proof, immutable timestamp/version/rights manifest",
+      "expected_code": "FUNDING_SYNTHETIC",
+      "expected_values": {
+        "acknowledged_cash": "0.000000000000",
+        "cashflow": "0.400000000000",
+        "liability": "0.000000000000"
+      },
+      "hostile": false,
+      "id": "C44",
+      "input": {
+        "ack_at": 180000,
+        "clock_proven": true,
+        "decision": 150000,
+        "final_at": 120000,
+        "knowledge": 150000,
+        "mark_multiplier": "1",
+        "notional": "1000",
+        "owed_fee": "0",
+        "ownership_proof": 120000,
+        "purpose": "CASH",
+        "rate_available": 30000,
+        "rate_bp": "4",
+        "rate_event": 0,
+        "rate_kind": "SETTLED_ACTUAL",
+        "rate_observed": 30000,
+        "settlement": 0,
+        "side": -1
+      },
+      "name": "Short positive rate unACKed credit",
+      "op": "funding"
+    },
+    {
+      "evidence_to_disambiguate": "Source-origin proof, immutable timestamp/version/rights manifest",
+      "expected_code": "FUNDING_SYNTHETIC",
+      "expected_values": {
+        "cashflow": "-0.400000000000",
+        "liability": "0.400000000000"
+      },
+      "hostile": false,
+      "id": "C45",
+      "input": {
+        "ack_at": 180000,
+        "clock_proven": true,
+        "decision": 150000,
+        "final_at": 120000,
+        "knowledge": 150000,
+        "mark_multiplier": "1",
+        "notional": "1000",
+        "owed_fee": "0",
+        "ownership_proof": 120000,
+        "purpose": "CASH",
+        "rate_available": 30000,
+        "rate_bp": "-4",
+        "rate_event": 0,
+        "rate_kind": "SETTLED_ACTUAL",
+        "rate_observed": 30000,
+        "settlement": 0,
+        "side": -1
+      },
+      "name": "Short negative rate debit sign reversal",
+      "op": "funding"
+    },
+    {
+      "evidence_to_disambiguate": "Source-origin proof, immutable timestamp/version/rights manifest",
+      "expected_code": "FUNDING_SYNTHETIC",
+      "expected_values": {
+        "acknowledged_cash": "0.000000000000",
+        "cashflow": "0.400000000000"
+      },
+      "hostile": false,
+      "id": "C46",
+      "input": {
+        "ack_at": 180000,
+        "clock_proven": true,
+        "decision": 150000,
+        "final_at": 120000,
+        "knowledge": 150000,
+        "mark_multiplier": "1",
+        "notional": "1000",
+        "owed_fee": "0",
+        "ownership_proof": 120000,
+        "purpose": "CASH",
+        "rate_available": 30000,
+        "rate_bp": "-4",
+        "rate_event": 0,
+        "rate_kind": "SETTLED_ACTUAL",
+        "rate_observed": 30000,
+        "settlement": 0,
+        "side": 1
+      },
+      "name": "Long negative rate unACKed credit",
+      "op": "funding"
+    },
+    {
+      "evidence_to_disambiguate": "Source-origin proof, immutable timestamp/version/rights manifest",
+      "expected_code": "FUNDING_SYNTHETIC",
+      "expected_values": {
+        "acknowledged_cash": "-0.400000000000",
+        "liability": "0.000000000000"
+      },
+      "hostile": false,
+      "id": "C47",
+      "input": {
+        "ack_at": 180000,
+        "clock_proven": true,
+        "decision": 150000,
+        "final_at": 120000,
+        "knowledge": 180000,
+        "mark_multiplier": "1",
+        "notional": "1000",
+        "owed_fee": "0",
+        "ownership_proof": 120000,
+        "purpose": "CASH",
+        "rate_available": 30000,
+        "rate_bp": "4",
+        "rate_event": 0,
+        "rate_kind": "SETTLED_ACTUAL",
+        "rate_observed": 30000,
+        "settlement": 0,
+        "side": 1
+      },
+      "name": "ACK equality settles debit once",
+      "op": "funding"
+    },
+    {
+      "evidence_to_disambiguate": "Source-origin proof, immutable timestamp/version/rights manifest",
+      "expected_code": "GEOMETRY_POSSIBLE_CONDITIONAL",
+      "expected_values": {
+        "events": 2,
+        "minimum_stop_bp": "120.000000000000"
+      },
+      "hostile": false,
+      "id": "C48",
+      "input": {
+        "assume_eight_hours": false,
+        "cadence": "KNOWN_SYNTHETIC_8H",
+        "end": 43200000,
+        "fee_proven": true,
+        "filters_proven": true,
+        "start": 0,
+        "stop_bp": "200",
+        "synthetic_times": [
+          14400000,
+          43200000
+        ],
+        "tick_bound": "0"
+      },
+      "name": "12h synthetic known8h conditionally feasible",
+      "op": "geometry"
+    },
+    {
+      "evidence_to_disambiguate": "Source-origin proof, immutable timestamp/version/rights manifest",
+      "expected_code": "GEOMETRY_POSSIBLE_CONDITIONAL",
+      "expected_values": {
+        "events": 5,
+        "minimum_stop_bp": "168.000000000000"
+      },
+      "hostile": false,
+      "id": "C49",
+      "input": {
+        "assume_eight_hours": false,
+        "cadence": "UNKNOWN",
+        "end": 14400000,
+        "fee_proven": true,
+        "filters_proven": true,
+        "start": 0,
+        "stop_bp": "200",
+        "synthetic_times": [
+          0,
+          3600000,
+          7200000,
+          10800000,
+          14400000
+        ],
+        "tick_bound": "0"
+      },
+      "name": "4h conservative hourly conditionally feasible",
+      "op": "geometry"
+    },
+    {
+      "evidence_to_disambiguate": "Source-origin proof, immutable timestamp/version/rights manifest",
+      "expected_code": "PREDICTION_VISIBLE_NOT_SETTLED",
+      "expected_values": {},
+      "hostile": false,
+      "id": "C50",
+      "input": {
+        "ack_at": 180000,
+        "clock_proven": true,
+        "decision": 120000,
+        "final_at": 120000,
+        "knowledge": 150000,
+        "mark_multiplier": "1",
+        "notional": "1000",
+        "owed_fee": "0",
+        "ownership_proof": 120000,
+        "purpose": "FEATURE",
+        "rate_available": 60000,
+        "rate_bp": "4",
+        "rate_event": 30000,
+        "rate_kind": "PREDICTED",
+        "rate_observed": 60000,
+        "settlement": 600000,
+        "side": 1
+      },
+      "name": "Known prediction visible but never settlement cash",
+      "op": "funding"
+    },
+    {
+      "evidence_to_disambiguate": "Source-origin proof, immutable timestamp/version/rights manifest",
+      "expected_code": "METHOD_CONFLICT",
+      "expected_values": {},
+      "hostile": true,
+      "id": "C51",
+      "input": {
+        "assume_eight_hours": false,
+        "cadence": "UNKNOWN",
+        "end": 14400000,
+        "fee_proven": true,
+        "filters_proven": true,
+        "start": 0,
+        "stop_bp": "200",
+        "synthetic_times": [
+          14400000
+        ],
+        "tick_bound": "0"
+      },
+      "name": "Unknown cadence sparse grid cannot pass",
+      "op": "geometry"
+    },
+    {
+      "evidence_to_disambiguate": "Source-origin proof, immutable timestamp/version/rights manifest",
+      "expected_code": "FUNDING_SYNTHETIC",
+      "expected_values": {
+        "liability": "0.480000000000",
+        "reserve": "0.440000000000",
+        "shortfall": "0.040000000000"
+      },
+      "hostile": true,
+      "id": "C52",
+      "input": {
+        "ack_at": 180000,
+        "clock_proven": true,
+        "decision": 150000,
+        "final_at": 120000,
+        "knowledge": 150000,
+        "mark_multiplier": "1.2",
+        "notional": "1000",
+        "owed_fee": "0",
+        "ownership_proof": 120000,
+        "purpose": "CASH",
+        "rate_available": 30000,
+        "rate_bp": "4",
+        "rate_event": 0,
+        "rate_kind": "SETTLED_ACTUAL",
+        "rate_observed": 30000,
+        "settlement": 0,
+        "side": 1
+      },
+      "name": "Current Mark shock exceeds1.10 reserve",
+      "op": "funding"
+    }
+  ],
+  "clock_units": "invented UTC milliseconds; no market rows",
+  "counts": {
+    "cases": 52,
+    "hostile": 39
+  },
+  "expected_code_not_empirical_result": true,
+  "hand_controls": {
+    "correction": {
+      "available": 240000,
+      "close": 60000,
+      "corrected": 240000,
+      "id": "m1",
+      "kind": "MARK_1M",
+      "observed": 240000,
+      "price": "101",
+      "revision": 1,
+      "source": "MARK_ENDPOINT_A",
+      "start": 0,
+      "supersedes": "m0",
+      "symbol": "BTCUSDT"
+    },
+    "funding": {
+      "ack_at": 180000,
+      "clock_proven": true,
+      "decision": 150000,
+      "final_at": 120000,
+      "knowledge": 150000,
+      "mark_multiplier": "1",
+      "notional": "1000",
+      "owed_fee": "0",
+      "ownership_proof": 120000,
+      "purpose": "CASH",
+      "rate_available": 30000,
+      "rate_bp": "4",
+      "rate_event": 0,
+      "rate_kind": "SETTLED_ACTUAL",
+      "rate_observed": 30000,
+      "settlement": 0,
+      "side": 1
+    },
+    "geometry": {
+      "assume_eight_hours": false,
+      "cadence": "UNKNOWN",
+      "end": 14400000,
+      "fee_proven": true,
+      "filters_proven": true,
+      "start": 0,
+      "stop_bp": "200",
+      "synthetic_times": [
+        0,
+        3600000,
+        7200000,
+        10800000,
+        14400000
+      ],
+      "tick_bound": "0"
+    },
+    "mark": {
+      "decision": 180000,
+      "expected_closes": [
+        60000
+      ],
+      "observations": [
+        {
+          "available": 120000,
+          "close": 60000,
+          "id": "m0",
+          "kind": "MARK_1M",
+          "observed": 120000,
+          "price": "100",
+          "revision": 0,
+          "source": "MARK_ENDPOINT_A",
+          "start": 0,
+          "symbol": "BTCUSDT"
+        }
+      ],
+      "physical_monotonic": true,
+      "rights": true,
+      "trade_source": "TRADE_ENDPOINT_B"
+    },
+    "visibility": {
+      "available": 120000,
+      "decision": 180000,
+      "event": 60000,
+      "observed": 120000,
+      "proof_floor": 120000
+    }
+  },
+  "schema": "P2_S2_SYNTHETIC_FROZEN_INPUT_V1"
+}

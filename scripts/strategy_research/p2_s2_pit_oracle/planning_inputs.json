@@ -1,0 +1,47 @@
+{
+  "alpha": 0.05,
+  "comparisons": 16,
+  "delta_bp": 5,
+  "eligible_days_per_April_fold": 29,
+  "filled_per_day": [
+    0.5,
+    1,
+    2,
+    4
+  ],
+  "independent_weeks": 12,
+  "months_are_development_not_blind": true,
+  "partitions": [
+    [
+      2021,
+      3
+    ],
+    [
+      2021,
+      4
+    ],
+    [
+      2023,
+      3
+    ],
+    [
+      2023,
+      4
+    ],
+    [
+      2025,
+      3
+    ],
+    [
+      2025,
+      4
+    ]
+  ],
+  "sigma_block_bp": [
+    5,
+    10,
+    20
+  ],
+  "source": "Prior pinned R4 synthetic planning5032259954e001635c97110c9c50e4a35a2c95b5; proposal only",
+  "target_power": 0.8
+}

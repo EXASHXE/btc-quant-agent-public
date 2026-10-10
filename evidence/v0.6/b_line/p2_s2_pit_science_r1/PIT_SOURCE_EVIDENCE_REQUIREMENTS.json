@@ -1,0 +1,454 @@
+{
+  "actual_cadence": "UNKNOWN",
+  "actual_cost": "UNKNOWN",
+  "clock_contract": {
+    "R11": "Economic execution+60000 modeled ACK, with separate funding ownership proof; not true exchange receipt",
+    "R12": "Prospective ACK>=max(economic+60000, required admitted source proof, extra delay); NOT identical R1.1",
+    "asof_corrections": "Only linked immutable revisions known at cut; no future final series substitution; raw unique-minute proof separate from retransmissions",
+    "fields": [
+      "event_start",
+      "event_close_exclusive",
+      "publisher_close_inclusive",
+      "source_observed_at",
+      "available_at",
+      "corrected_at",
+      "settlement_at",
+      "feature_proof_floor",
+      "decision_at",
+      "economic_at",
+      "ack_at"
+    ],
+    "funding": "Possible ownership intersects [S-15000,S+15000] inclusively; FINAL after last intersecting minute end+60000 and rate proof",
+    "hour": "Decision>=H+60000; earliest hypothetical execution H+120000; no current orders",
+    "minute": "[O,O+60000); publisher close=O+59999; full minute proof>=O+120000 under frozen reconstruction",
+    "visibility": "event and available_at <= decision; required proof/correction/source observation floor cannot be backdated"
+  },
+  "controller_dispatch_sha": "b176f4361cd97d1d89c3e25173b2c72a6af93ec4",
+  "current_real_read_grants": [],
+  "future_read_grant_draft": {
+    "Funding_current_body_grant": false,
+    "Funding_known_file": "/root/workspace/project/Quant-agent/data/research/BTCUSDT/funding_events.csv",
+    "Mark_Funding_next": "Exact positive Mark file aliases and original availability/revision/settlement provenance must first be provided as non-outcome manifest; no directory wildcard, header read or API fallback",
+    "Mark_paths": [],
+    "permissible_after_QA": {
+      "FAIL": "Reproduced corruption/conflict/clock violation at tested scope; STOP relevant source",
+      "PASS": "Only tested schema or timestamp/provenance assertions at granted scope; never Alpha/source promotion by artifact alone",
+      "UNKNOWN": "Missing proof, over-cap, denied access, unbound Mark/Funding/rights; no absence or zero-cost inference"
+    },
+    "positive_Kline_paths": [
+      "/root/workspace/project/Quant-agent/data/research/BTCUSDT/1m/year=2021/month=03/data.parquet",
+      "/root/workspace/project/Quant-agent/data/research/BTCUSDT/1m/year=2021/month=04/data.parquet",
+      "/root/workspace/project/Quant-agent/data/research/BTCUSDT/1m/year=2023/month=03/data.parquet",
+      "/root/workspace/project/Quant-agent/data/research/BTCUSDT/1m/year=2023/month=04/data.parquet",
+      "/root/workspace/project/Quant-agent/data/research/BTCUSDT/1m/year=2025/month=03/data.parquet",
+      "/root/workspace/project/Quant-agent/data/research/BTCUSDT/1m/year=2025/month=04/data.parquet"
+    ],
+    "reader_preconditions": [
+      "Independent exact-SHA static/security review",
+      "Positive file capability separate from footer/timestamp/price/funding/strategy outcomes",
+      "No old locator import/reuse",
+      "FD/path identity, no symlink/mount/TOCTOU escapes",
+      "Meter every attempted syscall/range/read byte, not unique path counter",
+      "Specific permission errors remain UNKNOWN not absent",
+      "No traversal of protected2026/forward/H39/H40/H41/A-line"
+    ],
+    "rights_required": [
+      "Owner exact file consent",
+      "Provider/archive terms and permitted scientific purpose",
+      "Separate authorization for footer statistics-bearing bytes/timestamps/price/rate values",
+      "No private account/trade secrets"
+    ],
+    "stage_A": {
+      "decode_statistics": false,
+      "files": [
+        "/root/workspace/project/Quant-agent/data/research/BTCUSDT/1m/year=2021/month=03/data.parquet",
+        "/root/workspace/project/Quant-agent/data/research/BTCUSDT/1m/year=2021/month=04/data.parquet",
+        "/root/workspace/project/Quant-agent/data/research/BTCUSDT/1m/year=2023/month=03/data.parquet",
+        "/root/workspace/project/Quant-agent/data/research/BTCUSDT/1m/year=2023/month=04/data.parquet",
+        "/root/workspace/project/Quant-agent/data/research/BTCUSDT/1m/year=2025/month=03/data.parquet",
+        "/root/workspace/project/Quant-agent/data/research/BTCUSDT/1m/year=2025/month=04/data.parquet"
+      ],
+      "max_bytes_per_file": 65544,
+      "max_files": 6,
+      "max_logical_range_reads": 12,
+      "max_total_bytes": 393264,
+      "max_wall_seconds": 300,
+      "note": "Footer bytes may contain encoded price statistics: any byte access requires explicit approval; do not claim footer contains no market-derived bytes. No full-file checksum; oversize/unknown footer STOP UNKNOWN",
+      "purpose": "Smallest useful restricted schema/footer inspection only",
+      "row_body_bytes": 0
+    },
+    "stage_B_future_timestamp_QA": {
+      "columns": [
+        "UTC minute start/close only"
+      ],
+      "continuity_claim": "Full selected projected timestamp enumeration required; small sample cannot prove continuity; Mark paths still unbound",
+      "expected_calendar_minutes": 263520,
+      "files": [
+        "/root/workspace/project/Quant-agent/data/research/BTCUSDT/1m/year=2021/month=03/data.parquet",
+        "/root/workspace/project/Quant-agent/data/research/BTCUSDT/1m/year=2021/month=04/data.parquet",
+        "/root/workspace/project/Quant-agent/data/research/BTCUSDT/1m/year=2023/month=03/data.parquet",
+        "/root/workspace/project/Quant-agent/data/research/BTCUSDT/1m/year=2023/month=04/data.parquet",
+        "/root/workspace/project/Quant-agent/data/research/BTCUSDT/1m/year=2025/month=03/data.parquet",
+        "/root/workspace/project/Quant-agent/data/research/BTCUSDT/1m/year=2025/month=04/data.parquet"
+      ],
+      "max_decoded_timestamp_bytes": 8388608,
+      "max_encoded_bytes": 16777216,
+      "max_rows": 300000,
+      "max_wall_seconds": 900,
+      "status": "SEPARATE_BODY_CAPABILITY_AND_EXACT_P3_AS_REQUIRED_NOT_AUTHORIZED"
+    },
+    "status": "DRAFT_ONLY_NOT_EXECUTABLE",
+    "subsequent_body_QA": {
+      "proposed_max_Funding_rows": 18,
+      "proposed_max_Kline_rows": 360,
+      "proposed_max_Mark_rows": 360,
+      "proposed_max_encoded_bytes": 8388608,
+      "proposed_max_partitions": 6,
+      "proposed_max_time_windows": 6,
+      "proposed_window_seconds_each": 3600,
+      "selection": "Ex-ante first hour of each scoring/warmup month only if Controller freezes it; no price-driven sampling; limited QA cannot admit whole month completeness",
+      "status": "UNBOUND_NO_GRANT"
+    }
+  },
+  "method_choices": [
+    {
+      "issue": "R1.1 versus prospectiveR1.2",
+      "proposal": "BTC_DIAG_R1 explicitly cite R1.2 with original formulas, not retrospective equivalence",
+      "status": "NEEDS_CONTROLLER_METHOD_CHOICE"
+    },
+    {
+      "issue": "Actual funding cadence/publication and corrections",
+      "proposal": "No inference until evidence; hourly4/8 proxy only for diagnostic comparator; no actual cap bound",
+      "status": "NEEDS_CONTROLLER_METHOD_CHOICE"
+    },
+    {
+      "issue": "Future finite six-source partition roles",
+      "proposal": "March warmup and April score for2021/2023/2025; all six developmental inputs, three scoring folds; not effective",
+      "status": "NEEDS_CONTROLLER_METHOD_CHOICE"
+    },
+    {
+      "issue": "Historical filters/fees or multiple Mark providers",
+      "proposal": "Require effective/published versions and a single preselected Mark authority; no present-day substitution",
+      "status": "NEEDS_CONTROLLER_METHOD_CHOICE"
+    }
+  ],
+  "original_eight": [
+    {
+      "formula_commit": "e5b2006a89441f7eb2ec900e508aff451106b87a",
+      "formula_file_sha256": "14378dde7668291dc87aef91e3e55fadddad3a444d1d49284efa2c3cbcba9a77",
+      "original_record": {
+        "direction": "LONG",
+        "empirical_metrics": null,
+        "family": "STRUCTURAL_CONTINUATION",
+        "horizon_band": "2-6h",
+        "id": "STRUCTURAL_CONTINUATION_LONG_04H",
+        "max_holding_hours": 4,
+        "new_hypothesis": true,
+        "rule_reference": "docs/strategy_research/g2_r3/METHOD_DESIGN.md (Concrete hypotheses and finite budget; STRUCTURAL_CONTINUATION row)",
+        "status": "PROPOSED_NOT_REGISTERED_NOT_EVALUATED",
+        "symbols": [
+          "BTCUSDT",
+          "ETHUSDT",
+          "SOLUSDT"
+        ]
+      }
+    },
+    {
+      "formula_commit": "e5b2006a89441f7eb2ec900e508aff451106b87a",
+      "formula_file_sha256": "14378dde7668291dc87aef91e3e55fadddad3a444d1d49284efa2c3cbcba9a77",
+      "original_record": {
+        "direction": "LONG",
+        "empirical_metrics": null,
+        "family": "STRUCTURAL_CONTINUATION",
+        "horizon_band": "6-12h",
+        "id": "STRUCTURAL_CONTINUATION_LONG_12H",
+        "max_holding_hours": 12,
+        "new_hypothesis": true,
+        "rule_reference": "docs/strategy_research/g2_r3/METHOD_DESIGN.md (Concrete hypotheses and finite budget; STRUCTURAL_CONTINUATION row)",
+        "status": "PROPOSED_NOT_REGISTERED_NOT_EVALUATED",
+        "symbols": [
+          "BTCUSDT",
+          "ETHUSDT",
+          "SOLUSDT"
+        ]
+      }
+    },
+    {
+      "formula_commit": "e5b2006a89441f7eb2ec900e508aff451106b87a",
+      "formula_file_sha256": "14378dde7668291dc87aef91e3e55fadddad3a444d1d49284efa2c3cbcba9a77",
+      "original_record": {
+        "direction": "SHORT",
+        "empirical_metrics": null,
+        "family": "STRUCTURAL_CONTINUATION",
+        "horizon_band": "2-6h",
+        "id": "STRUCTURAL_CONTINUATION_SHORT_04H",
+        "max_holding_hours": 4,
+        "new_hypothesis": true,
+        "rule_reference": "docs/strategy_research/g2_r3/METHOD_DESIGN.md (Concrete hypotheses and finite budget; STRUCTURAL_CONTINUATION row)",
+        "status": "PROPOSED_NOT_REGISTERED_NOT_EVALUATED",
+        "symbols": [
+          "BTCUSDT",
+          "ETHUSDT",
+          "SOLUSDT"
+        ]
+      }
+    },
+    {
+      "formula_commit": "e5b2006a89441f7eb2ec900e508aff451106b87a",
+      "formula_file_sha256": "14378dde7668291dc87aef91e3e55fadddad3a444d1d49284efa2c3cbcba9a77",
+      "original_record": {
+        "direction": "SHORT",
+        "empirical_metrics": null,
+        "family": "STRUCTURAL_CONTINUATION",
+        "horizon_band": "6-12h",
+        "id": "STRUCTURAL_CONTINUATION_SHORT_12H",
+        "max_holding_hours": 12,
+        "new_hypothesis": true,
+        "rule_reference": "docs/strategy_research/g2_r3/METHOD_DESIGN.md (Concrete hypotheses and finite budget; STRUCTURAL_CONTINUATION row)",
+        "status": "PROPOSED_NOT_REGISTERED_NOT_EVALUATED",
+        "symbols": [
+          "BTCUSDT",
+          "ETHUSDT",
+          "SOLUSDT"
+        ]
+      }
+    },
+    {
+      "formula_commit": "e5b2006a89441f7eb2ec900e508aff451106b87a",
+      "formula_file_sha256": "14378dde7668291dc87aef91e3e55fadddad3a444d1d49284efa2c3cbcba9a77",
+      "original_record": {
+        "direction": "LONG",
+        "empirical_metrics": null,
+        "family": "CLOSED_RETEST",
+        "horizon_band": "2-6h",
+        "id": "CLOSED_RETEST_LONG_04H",
+        "max_holding_hours": 4,
+        "new_hypothesis": true,
+        "rule_reference": "docs/strategy_research/g2_r3/METHOD_DESIGN.md (Concrete hypotheses and finite budget; CLOSED_RETEST row)",
+        "status": "PROPOSED_NOT_REGISTERED_NOT_EVALUATED",
+        "symbols": [
+          "BTCUSDT",
+          "ETHUSDT",
+          "SOLUSDT"
+        ]
+      }
+    },
+    {
+      "formula_commit": "e5b2006a89441f7eb2ec900e508aff451106b87a",
+      "formula_file_sha256": "14378dde7668291dc87aef91e3e55fadddad3a444d1d49284efa2c3cbcba9a77",
+      "original_record": {
+        "direction": "LONG",
+        "empirical_metrics": null,
+        "family": "CLOSED_RETEST",
+        "horizon_band": "6-12h",
+        "id": "CLOSED_RETEST_LONG_12H",
+        "max_holding_hours": 12,
+        "new_hypothesis": true,
+        "rule_reference": "docs/strategy_research/g2_r3/METHOD_DESIGN.md (Concrete hypotheses and finite budget; CLOSED_RETEST row)",
+        "status": "PROPOSED_NOT_REGISTERED_NOT_EVALUATED",
+        "symbols": [
+          "BTCUSDT",
+          "ETHUSDT",
+          "SOLUSDT"
+        ]
+      }
+    },
+    {
+      "formula_commit": "e5b2006a89441f7eb2ec900e508aff451106b87a",
+      "formula_file_sha256": "14378dde7668291dc87aef91e3e55fadddad3a444d1d49284efa2c3cbcba9a77",
+      "original_record": {
+        "direction": "SHORT",
+        "empirical_metrics": null,
+        "family": "CLOSED_RETEST",
+        "horizon_band": "2-6h",
+        "id": "CLOSED_RETEST_SHORT_04H",
+        "max_holding_hours": 4,
+        "new_hypothesis": true,
+        "rule_reference": "docs/strategy_research/g2_r3/METHOD_DESIGN.md (Concrete hypotheses and finite budget; CLOSED_RETEST row)",
+        "status": "PROPOSED_NOT_REGISTERED_NOT_EVALUATED",
+        "symbols": [
+          "BTCUSDT",
+          "ETHUSDT",
+          "SOLUSDT"
+        ]
+      }
+    },
+    {
+      "formula_commit": "e5b2006a89441f7eb2ec900e508aff451106b87a",
+      "formula_file_sha256": "14378dde7668291dc87aef91e3e55fadddad3a444d1d49284efa2c3cbcba9a77",
+      "original_record": {
+        "direction": "SHORT",
+        "empirical_metrics": null,
+        "family": "CLOSED_RETEST",
+        "horizon_band": "6-12h",
+        "id": "CLOSED_RETEST_SHORT_12H",
+        "max_holding_hours": 12,
+        "new_hypothesis": true,
+        "rule_reference": "docs/strategy_research/g2_r3/METHOD_DESIGN.md (Concrete hypotheses and finite budget; CLOSED_RETEST row)",
+        "status": "PROPOSED_NOT_REGISTERED_NOT_EVALUATED",
+        "symbols": [
+          "BTCUSDT",
+          "ETHUSDT",
+          "SOLUSDT"
+        ]
+      }
+    }
+  ],
+  "prompt_sha": "90b20f441ebefff3da0bf8457604b2ef98e25326",
+  "protected": {
+    "BTC": "[2026-02-01,2026-08-01)",
+    "other": [
+      "data/forward/**",
+      "data/research/h39_validation/**",
+      "H40/H41 protected outcomes",
+      "A-line",
+      "Quant-agent-sanitized",
+      "credentials"
+    ]
+  },
+  "rights": "UNKNOWN",
+  "schema": "PIT_SOURCE_EVIDENCE_REQUIREMENTS_V1",
+  "scientific_error_budget": {
+    "BTC_diagnostic": "New separate protocol identity, same eight formulas, no proposed-only concepts selected; exploratory intervals only unless independently accepted adequacy",
+    "original": "8 candidates, two higher-cost net/incremental endpoints=16; BASE/STRESS descriptive cost paths; retain.05/16 for any future valid simultaneous claim",
+    "positive": "BTC-only100% fails original<=60% asset screen; no waiver",
+    "power": "100/fold and12 joint blocks are floors, not guaranteed power; overlap/correlation and unknown variance remain"
+  },
+  "source_admitted": false,
+  "source_blockers": {
+    "BTC_Funding": "funding_events.csv existence only; initial known-at, predicted/actual, corrected-at, settlement and ACK provenance UNKNOWN",
+    "BTC_Kline": "Six regular files reported by pinned original executor only; schema/body/PIT/rights UNKNOWN",
+    "BTC_Mark": "raw/mark_price parent only; exact true-minute path, continuity, revisions, clocks UNKNOWN",
+    "BTC_SPOT": "Separate market; cannot substitute for perp/Mark",
+    "ETH": "cross_asset_1h/ETHUSDT.parquet is hourly auxiliary, not perp1m",
+    "SOL": "True perp1m UNKNOWN",
+    "filters_fees_rights": "All UNKNOWN; current venue filters/retrospective retrieval do not prove historical applicable versions",
+    "measurement": "Old/new P1 TERMINATED; no replacement engine accepted",
+    "reader": "Old locator TERMINATED; new independent reader acceptance UNKNOWN"
+  },
+  "source_manifest": [
+    {
+      "alias": "prompt",
+      "blob": "c39c1616e157dc41e686c455daaec63a155a8389",
+      "commit": "90b20f441ebefff3da0bf8457604b2ef98e25326",
+      "path": "prompts/v0.6/b_line/V06_P2_S2_SOL_HIGH_PIT_FUNDING_MARK_AND_BTC_DIAGNOSTIC_PREREG_R1.md",
+      "sha256": "517b1f75ce59aa259568e667773c7470a6dba3ad070a3b42e175e9371de505a0",
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/90b20f441ebefff3da0bf8457604b2ef98e25326/prompts/v0.6/b_line/V06_P2_S2_SOL_HIGH_PIT_FUNDING_MARK_AND_BTC_DIAGNOSTIC_PREREG_R1.md"
+    },
+    {
+      "alias": "dispatch",
+      "blob": "05da916ce5d6590067c45fae6056017d3d9e0057",
+      "commit": "b176f4361cd97d1d89c3e25173b2c72a6af93ec4",
+      "path": "reviews/v0.6/b_line/V06_P2_S2_SOURCE_READINESS_AND_PIT_PROSPECTIVE_PARALLEL_DISPATCH_R1.md",
+      "sha256": "52e3f0f8293fd233669270d16af51bf1f5c67625fe3cb7b167418ed510a0b865",
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/b176f4361cd97d1d89c3e25173b2c72a6af93ec4/reviews/v0.6/b_line/V06_P2_S2_SOURCE_READINESS_AND_PIT_PROSPECTIVE_PARALLEL_DISPATCH_R1.md"
+    },
+    {
+      "alias": "source_design",
+      "blob": "a28e88792f4198cb6524421a475cd37eecfa695f",
+      "commit": "519b2e9ba2ca847e76ad9c0a7fbafcec5fcda158",
+      "path": "reviews/v0.6/b_line/V06_P2_POST_LOCATOR_TRUE_MINUTE_MARK_FUNDING_PIT_SOURCE_ADMISSION_DESIGN_R1.md",
+      "sha256": "0284e0df3df0a8c1549ffc746a5c2cce4460722e8137f2f33a77ae27850415ff",
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/519b2e9ba2ca847e76ad9c0a7fbafcec5fcda158/reviews/v0.6/b_line/V06_P2_POST_LOCATOR_TRUE_MINUTE_MARK_FUNDING_PIT_SOURCE_ADMISSION_DESIGN_R1.md"
+    },
+    {
+      "alias": "metadata_report",
+      "blob": "de98309b554546354815ae13a0f2a659001bed65",
+      "commit": "c6823dbc46249cac43aa10400aacbbe9f4542410",
+      "path": "docs/strategy_research/g2_r3/p2_owner_root_metadata_r1/P2_OWNER_ROOT_EXACT_METADATA_REPORT.md",
+      "sha256": "91c5cedec54e261b8afbfe2ea99e8db2b3c2c9f31fe14ab542d3ccb4558599c7",
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/c6823dbc46249cac43aa10400aacbbe9f4542410/docs/strategy_research/g2_r3/p2_owner_root_metadata_r1/P2_OWNER_ROOT_EXACT_METADATA_REPORT.md"
+    },
+    {
+      "alias": "reader_security_no_go",
+      "blob": "2e19a3e570593a5d665393d0d6e18933330cd317",
+      "commit": "ca0b6ea62613e6981b6f818f37f45be8c1d74901",
+      "path": "reviews/v0.6/b_line/V06_P2_OWNER_ROOT_VERIFIER_ONE_SHOT_REPAIR_CONTROLLER_FINAL_SECURITY_VERDICT_R1.md",
+      "sha256": "73740b3f091fd23fa611e4ee82278497eec315dd55f5026dbd1b992b298f9ef9",
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/ca0b6ea62613e6981b6f818f37f45be8c1d74901/reviews/v0.6/b_line/V06_P2_OWNER_ROOT_VERIFIER_ONE_SHOT_REPAIR_CONTROLLER_FINAL_SECURITY_VERDICT_R1.md"
+    },
+    {
+      "alias": "method",
+      "blob": "fb701b0be825f85801377f86eb80ba4f766ebaed",
+      "commit": "e5b2006a89441f7eb2ec900e508aff451106b87a",
+      "path": "docs/strategy_research/g2_r3/METHOD_DESIGN.md",
+      "sha256": "14378dde7668291dc87aef91e3e55fadddad3a444d1d49284efa2c3cbcba9a77",
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/e5b2006a89441f7eb2ec900e508aff451106b87a/docs/strategy_research/g2_r3/METHOD_DESIGN.md"
+    },
+    {
+      "alias": "original_register",
+      "blob": "d337542f6482938c37eb6b4e43255cdf4d09751a",
+      "commit": "e5b2006a89441f7eb2ec900e508aff451106b87a",
+      "path": "evidence/v0.6/b_line/g2_r3_design/CANDIDATE_REGISTER_PROPOSAL.json",
+      "sha256": "d0f89bddfaec0e57c959cec043969059da10fec8aa45f81669dde8b80ea35a9b",
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/e5b2006a89441f7eb2ec900e508aff451106b87a/evidence/v0.6/b_line/g2_r3_design/CANDIDATE_REGISTER_PROPOSAL.json"
+    },
+    {
+      "alias": "r11",
+      "blob": "7def37d7c8aad02dd0c2769882fad61622e262db",
+      "commit": "cf2d5cc33774cdcff7d709636305bba830e977ef",
+      "path": "docs/strategy_research/g2_r3/method_repair/METHOD_R1_1_PIT_COST_ACCOUNTING.md",
+      "sha256": "a2943c9a541d93eaceb62a664edf0d03f0c9bbab6f4c4f73752831bcf14eb026",
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/cf2d5cc33774cdcff7d709636305bba830e977ef/docs/strategy_research/g2_r3/method_repair/METHOD_R1_1_PIT_COST_ACCOUNTING.md"
+    },
+    {
+      "alias": "r12",
+      "blob": "ecafeec0100f8881a700f9e3372a717aeab93b2b",
+      "commit": "821d23427a5f6d0b4635f32f226ddc779358ab72",
+      "path": "reviews/v0.6/b_line/V06_G2_R3_P1_ALT_ENGINE_AM01_AM02_CONTROLLER_SPEC_FREEZE_R1.md",
+      "sha256": "cea538034ea7695a326a2f2c91dcf4d246f2fafaa456f5935f4f375ce1d6e16f",
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/821d23427a5f6d0b4635f32f226ddc779358ab72/reviews/v0.6/b_line/V06_G2_R3_P1_ALT_ENGINE_AM01_AM02_CONTROLLER_SPEC_FREEZE_R1.md"
+    },
+    {
+      "alias": "prior_science",
+      "blob": "ab4c6f8b12dccc75e4dbe335b917e53cba2543c2",
+      "commit": "5032259954e001635c97110c9c50e4a35a2c95b5",
+      "path": "docs/strategy_research/g2_r3/postp1_opportunity_science_r1/SCIENCE_OPPORTUNITY_PRIORITIES_AND_FALSIFIERS.md",
+      "sha256": "3fe629550992c073e4624e9958eceb62607f097f1b1ce54dbad2d4596456c03f",
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/5032259954e001635c97110c9c50e4a35a2c95b5/docs/strategy_research/g2_r3/postp1_opportunity_science_r1/SCIENCE_OPPORTUNITY_PRIORITIES_AND_FALSIFIERS.md"
+    },
+    {
+      "alias": "p1_no_go",
+      "blob": "9dfcf9f4ff8284765240c212550beb460438c0a5",
+      "commit": "fd3c13645df9ad2506293b109d3891cf57936208",
+      "path": "reviews/v0.6/b_line/V06_G2_R3_P1_ALT_ENGINE_FINAL_INDEPENDENT_AUDIT_CONTROLLER_TERMINAL_NO_GO_R1.md",
+      "sha256": "b9eba432a5a61a1e9a110279c8fc157173abaf62a588e36b7d8b22c9784a59ce",
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/fd3c13645df9ad2506293b109d3891cf57936208/reviews/v0.6/b_line/V06_G2_R3_P1_ALT_ENGINE_FINAL_INDEPENDENT_AUDIT_CONTROLLER_TERMINAL_NO_GO_R1.md"
+    }
+  ],
+  "status": "PROSPECTIVE_INTERFACE_FROZEN_FOR_REVIEW_NOT_SOURCE_ADMISSION",
+  "terminal_design": "P2_S2_PIT_SCIENCE_AND_DIAGNOSTIC_PREREG_DESIGNED_PENDING_CONTROLLER",
+  "thresholds": {
+    "ATR20_close_bp": [
+      30,
+      250
+    ],
+    "TP_R": 2,
+    "base_per_leg_fee_spread_slip_bp": [
+      6,
+      2,
+      3
+    ],
+    "capital_buffer": "0.05",
+    "funding_per_event_base_stress_bp": [
+      4,
+      8
+    ],
+    "horizons_h": [
+      4,
+      12
+    ],
+    "kill_drawdown_usdt": 100,
+    "positive_max_single_asset_fraction": ".60",
+    "reserve_factor": "1.10",
+    "stop_bp": [
+      30,
+      250
+    ],
+    "stress_per_leg": [
+      12,
+      4,
+      6
+    ]
+  }
+}

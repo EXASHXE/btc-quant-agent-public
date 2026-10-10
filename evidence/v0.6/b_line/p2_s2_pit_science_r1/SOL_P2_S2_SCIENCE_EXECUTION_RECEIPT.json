@@ -1,0 +1,313 @@
+{
+  "branch": "feature/v06-bline-p2-s2-sol61-pit-science-r1",
+  "checkpoints": [
+    {
+      "phase": "P0",
+      "proof": "remote exact start; new clean worktree; published prompt identified by path commit and blob; immutable governance/method/metadata only",
+      "status": "COMPLETE"
+    },
+    {
+      "counts": {
+        "cases": 52,
+        "hostile": 39
+      },
+      "fixture_sha256": "a3b53bcf823045db4cae80ce91b049375ff68b0a6b0ce1f58fb0f45ab1ff38a3",
+      "interface_sha256": "0270f2c5f94694b73a8548f97bb0d65d0121b0a5bf8472fd1928969a73ed8003",
+      "phase": "P1_INPUT_AND_INTERFACE_FREEZE",
+      "status": "COMPLETE_BEFORE_RUN"
+    },
+    {
+      "phase": "P3_PLANNING_INPUT_FREEZE",
+      "planning_sha256": "16d13fb1562fc7a1eb07b6ff027c64a36a9f2c0c89ca060d6b4d4479898c3faf",
+      "status": "BEFORE_PLANNING_EXECUTION"
+    },
+    {
+      "counts": {
+        "assertions_passed": 65,
+        "cases": 52,
+        "hostile_witnesses": 39,
+        "metamorphic_invariants": 13
+      },
+      "output_sha256": "91ee7fb0039d86a2d8c51c0ad47edb435ee1eb2f96b4edc35024bf3a72851f13",
+      "phase": "P2_ACTUAL_EXECUTION",
+      "status": "COMPLETE"
+    },
+    {
+      "conditional_preference": "B independent finite specialized traces, not implementation or full-book acceptance",
+      "measurement_options": 3,
+      "phase": "P3_SOURCE_DECISION_AND_PREREG_BLUEPRINT",
+      "source_states": "all actualUNKNOWN; originalBTC-positive invalid, BTC-only new diagnostic root proposed",
+      "status": "COMPLETE_DESIGN_ONLY"
+    },
+    {
+      "fixtures_and_interface_unchanged": true,
+      "phase": "P4_SCOPED_QA",
+      "python_tests": {
+        "3.12": "69PASS/0FAIL/0SKIP",
+        "3.13": "69PASS/0FAIL/0SKIP"
+      },
+      "ruff": "PASS",
+      "status": "COMPLETE"
+    },
+    {
+      "final_sha": "external return after commit",
+      "phase": "PUBLICATION",
+      "prepublication_validation": {
+        "allowed_new_files": 12,
+        "canonical_JSON_files": 5,
+        "exact_source_objects": 11,
+        "frozen_interface_inputs": "UNCHANGED",
+        "git_diff_check_exit": 0,
+        "nonduplicative_hostile_inputs": 39,
+        "original_eight_record_identity": "PASS",
+        "output_input_script_test_hashes": "PASS",
+        "tracked_baseline_changes": 0
+      },
+      "status": "READY_FOR_SCOPE_PARENT_REMOTE_CI_VERIFICATION"
+    }
+  ],
+  "clock_source_actual": "UNKNOWN",
+  "code_start_sha": "e0ff8c3473de4bfa3e66fe7928d42992a4d38a32",
+  "controller_dispatch_sha": "b176f4361cd97d1d89c3e25173b2c72a6af93ec4",
+  "count_semantics": "52 case assertion groups plus13 metamorphic groups; not a tally of every native Python assert call;69 unique pytest test items per Python",
+  "cross_python_output_bytes_identical": true,
+  "development_failures": [
+    {
+      "case": "C43",
+      "class": "zero serialization, arithmetic equal",
+      "execution": "initial CLI Python3.12",
+      "exit_code": 1,
+      "expected": "0.000000000000",
+      "observed": "0E-12",
+      "repair": "format fixed twelve decimals; fixture/expected untouched"
+    },
+    {
+      "errors": 1,
+      "execution": "first test lint",
+      "exit_code": 1,
+      "repair": "explicit check=False on intentionally rejected CLI call",
+      "rule": "PLW1510"
+    },
+    {
+      "case": "C47 ACK equality",
+      "execution": "hostile self-review after preliminary69-test PASS",
+      "fixtures_changed": false,
+      "observed_initial_reserve": "0.440000000000",
+      "repair": "Single finalized settlement cover releases after ACK; a known final credit has no debit cover; other obligations/fee stay independent; added explicit tests and metamorphic condition",
+      "required_final_reserve": "0.000000000000"
+    }
+  ],
+  "executions": [
+    {
+      "command": "PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=src python3.12 -m pytest -q tests/test_v06_p2_s2_pit_oracle_semantics.py --junitxml=/tmp/p2s2_published312.xml",
+      "exit_code": 0,
+      "junit_sha256": "4be2f459413d54d3fe6d0ce779633c632b2ae82976d434eaf0dd6e4644c534d2",
+      "kind": "focused_pytest",
+      "observed_counts": {
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 69
+      },
+      "python": "Python 3.12.3"
+    },
+    {
+      "command": "PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=src python3.13 -m pytest -q tests/test_v06_p2_s2_pit_oracle_semantics.py --junitxml=/tmp/p2s2_published313.xml",
+      "exit_code": 0,
+      "junit_sha256": "21dcd8e4c3e378e76dc35652559ea8cba4f95eada9bdc77919485e30de607db1",
+      "kind": "focused_pytest",
+      "observed_counts": {
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 69
+      },
+      "python": "Python 3.13.13"
+    },
+    {
+      "command": "PYTHONDONTWRITEBYTECODE=1 python3.12 scripts/strategy_research/p2_s2_pit_oracle/run.py",
+      "exit_code": 0,
+      "kind": "final_oracle_cli",
+      "python": "3.12",
+      "stdout": {
+        "counts": {
+          "assertions_passed": 65,
+          "cases": 52,
+          "hostile_witnesses": 39,
+          "metamorphic_invariants": 13
+        },
+        "output_sha256": "91ee7fb0039d86a2d8c51c0ad47edb435ee1eb2f96b4edc35024bf3a72851f13"
+      }
+    },
+    {
+      "command": "PYTHONDONTWRITEBYTECODE=1 python3.13 scripts/strategy_research/p2_s2_pit_oracle/run.py --stdout > /tmp/p2s2_published_cli313.json",
+      "exit_code": 0,
+      "kind": "final_oracle_cli",
+      "output_sha256": "91ee7fb0039d86a2d8c51c0ad47edb435ee1eb2f96b4edc35024bf3a72851f13",
+      "python": "3.13"
+    }
+  ],
+  "fixture_edits_after_first_execution": 0,
+  "focused_lint_final": {
+    "exit_code": 0,
+    "result": "PASS",
+    "scope": "two new oracle/runner Python files and one new test"
+  },
+  "future_read_grant": "DRAFT only: six exact known Kline paths; Mark positive paths empty; funding combined CSV body not granted; upstream nonprotected attestation/rights and independent reader mandatory",
+  "input_hashes": {
+    "fixtures": "a3b53bcf823045db4cae80ce91b049375ff68b0a6b0ce1f58fb0f45ab1ff38a3",
+    "planning": "16d13fb1562fc7a1eb07b6ff027c64a36a9f2c0c89ca060d6b4d4479898c3faf",
+    "sole_interface": "0270f2c5f94694b73a8548f97bb0d65d0121b0a5bf8472fd1928969a73ed8003"
+  },
+  "method_choices": "NEEDS_CONTROLLER_METHOD_CHOICE; R1.2 prospective, cadence/revisions/historical filters and six partition roles remain unaccepted proposals",
+  "model": {
+    "effort": "NOT_EXPOSED",
+    "requested": "GPT-6 Sol High",
+    "switch_claim": false,
+    "system_description": "Codex GPT-6",
+    "variant": "NOT_EXPOSED"
+  },
+  "next_controller_gate": "Independently audit S/G exact SHA/parent/scope, source/PIT/capability contracts; choose separate restricted schema/rights grant or STOP; no automatic P3/P4",
+  "observed_oracle_counts": {
+    "assertions_passed": 65,
+    "cases": 52,
+    "hostile_witnesses": 39,
+    "metamorphic_invariants": 13
+  },
+  "output_sha256": "91ee7fb0039d86a2d8c51c0ad47edb435ee1eb2f96b4edc35024bf3a72851f13",
+  "planning_counts": {
+    "calendar_partitions": 6,
+    "density_cases": 4,
+    "mean_power_toys": 3
+  },
+  "prereg_effective": false,
+  "prompt_sha": "90b20f441ebefff3da0bf8457604b2ef98e25326",
+  "publication": "Final SHA/remote parent/files/CI returned externally after commit; no impossible self-reference",
+  "rights_actual": "UNKNOWN",
+  "scope_counters": {
+    "Gemini_mutable_artifact_reads": 0,
+    "engine_implementation": 0,
+    "market_api_calls": 0,
+    "market_replay": 0,
+    "owner_root_scans": 0,
+    "private_account_calls": 0,
+    "protected_reads": 0,
+    "real_CSV_header_reads": 0,
+    "real_Parquet_footer_reads": 0,
+    "real_market_body_reads": 0
+  },
+  "script_hashes": {
+    "scripts/strategy_research/p2_s2_pit_oracle/oracle.py": "a859b363f94e3dfae9fa85abf8e5f34cc2866dea9d4e64779c19df9217563fd8",
+    "scripts/strategy_research/p2_s2_pit_oracle/run.py": "548ac8e8d9d324920ad4304b85bfc8249fd4c0e808621e2836fd612b45758965"
+  },
+  "self_review": "Single-settlement cover release fixed before publication; source calc_time not equated with rate_event, original field mapping and scope choices remain UNKNOWN/NEEDS_CONTROLLER_METHOD_CHOICE",
+  "source_admitted": false,
+  "source_manifest": [
+    {
+      "alias": "prompt",
+      "blob": "c39c1616e157dc41e686c455daaec63a155a8389",
+      "commit": "90b20f441ebefff3da0bf8457604b2ef98e25326",
+      "path": "prompts/v0.6/b_line/V06_P2_S2_SOL_HIGH_PIT_FUNDING_MARK_AND_BTC_DIAGNOSTIC_PREREG_R1.md",
+      "sha256": "517b1f75ce59aa259568e667773c7470a6dba3ad070a3b42e175e9371de505a0",
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/90b20f441ebefff3da0bf8457604b2ef98e25326/prompts/v0.6/b_line/V06_P2_S2_SOL_HIGH_PIT_FUNDING_MARK_AND_BTC_DIAGNOSTIC_PREREG_R1.md"
+    },
+    {
+      "alias": "dispatch",
+      "blob": "05da916ce5d6590067c45fae6056017d3d9e0057",
+      "commit": "b176f4361cd97d1d89c3e25173b2c72a6af93ec4",
+      "path": "reviews/v0.6/b_line/V06_P2_S2_SOURCE_READINESS_AND_PIT_PROSPECTIVE_PARALLEL_DISPATCH_R1.md",
+      "sha256": "52e3f0f8293fd233669270d16af51bf1f5c67625fe3cb7b167418ed510a0b865",
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/b176f4361cd97d1d89c3e25173b2c72a6af93ec4/reviews/v0.6/b_line/V06_P2_S2_SOURCE_READINESS_AND_PIT_PROSPECTIVE_PARALLEL_DISPATCH_R1.md"
+    },
+    {
+      "alias": "source_design",
+      "blob": "a28e88792f4198cb6524421a475cd37eecfa695f",
+      "commit": "519b2e9ba2ca847e76ad9c0a7fbafcec5fcda158",
+      "path": "reviews/v0.6/b_line/V06_P2_POST_LOCATOR_TRUE_MINUTE_MARK_FUNDING_PIT_SOURCE_ADMISSION_DESIGN_R1.md",
+      "sha256": "0284e0df3df0a8c1549ffc746a5c2cce4460722e8137f2f33a77ae27850415ff",
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/519b2e9ba2ca847e76ad9c0a7fbafcec5fcda158/reviews/v0.6/b_line/V06_P2_POST_LOCATOR_TRUE_MINUTE_MARK_FUNDING_PIT_SOURCE_ADMISSION_DESIGN_R1.md"
+    },
+    {
+      "alias": "metadata_report",
+      "blob": "de98309b554546354815ae13a0f2a659001bed65",
+      "commit": "c6823dbc46249cac43aa10400aacbbe9f4542410",
+      "path": "docs/strategy_research/g2_r3/p2_owner_root_metadata_r1/P2_OWNER_ROOT_EXACT_METADATA_REPORT.md",
+      "sha256": "91c5cedec54e261b8afbfe2ea99e8db2b3c2c9f31fe14ab542d3ccb4558599c7",
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/c6823dbc46249cac43aa10400aacbbe9f4542410/docs/strategy_research/g2_r3/p2_owner_root_metadata_r1/P2_OWNER_ROOT_EXACT_METADATA_REPORT.md"
+    },
+    {
+      "alias": "reader_security_no_go",
+      "blob": "2e19a3e570593a5d665393d0d6e18933330cd317",
+      "commit": "ca0b6ea62613e6981b6f818f37f45be8c1d74901",
+      "path": "reviews/v0.6/b_line/V06_P2_OWNER_ROOT_VERIFIER_ONE_SHOT_REPAIR_CONTROLLER_FINAL_SECURITY_VERDICT_R1.md",
+      "sha256": "73740b3f091fd23fa611e4ee82278497eec315dd55f5026dbd1b992b298f9ef9",
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/ca0b6ea62613e6981b6f818f37f45be8c1d74901/reviews/v0.6/b_line/V06_P2_OWNER_ROOT_VERIFIER_ONE_SHOT_REPAIR_CONTROLLER_FINAL_SECURITY_VERDICT_R1.md"
+    },
+    {
+      "alias": "method",
+      "blob": "fb701b0be825f85801377f86eb80ba4f766ebaed",
+      "commit": "e5b2006a89441f7eb2ec900e508aff451106b87a",
+      "path": "docs/strategy_research/g2_r3/METHOD_DESIGN.md",
+      "sha256": "14378dde7668291dc87aef91e3e55fadddad3a444d1d49284efa2c3cbcba9a77",
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/e5b2006a89441f7eb2ec900e508aff451106b87a/docs/strategy_research/g2_r3/METHOD_DESIGN.md"
+    },
+    {
+      "alias": "original_register",
+      "blob": "d337542f6482938c37eb6b4e43255cdf4d09751a",
+      "commit": "e5b2006a89441f7eb2ec900e508aff451106b87a",
+      "path": "evidence/v0.6/b_line/g2_r3_design/CANDIDATE_REGISTER_PROPOSAL.json",
+      "sha256": "d0f89bddfaec0e57c959cec043969059da10fec8aa45f81669dde8b80ea35a9b",
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/e5b2006a89441f7eb2ec900e508aff451106b87a/evidence/v0.6/b_line/g2_r3_design/CANDIDATE_REGISTER_PROPOSAL.json"
+    },
+    {
+      "alias": "r11",
+      "blob": "7def37d7c8aad02dd0c2769882fad61622e262db",
+      "commit": "cf2d5cc33774cdcff7d709636305bba830e977ef",
+      "path": "docs/strategy_research/g2_r3/method_repair/METHOD_R1_1_PIT_COST_ACCOUNTING.md",
+      "sha256": "a2943c9a541d93eaceb62a664edf0d03f0c9bbab6f4c4f73752831bcf14eb026",
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/cf2d5cc33774cdcff7d709636305bba830e977ef/docs/strategy_research/g2_r3/method_repair/METHOD_R1_1_PIT_COST_ACCOUNTING.md"
+    },
+    {
+      "alias": "r12",
+      "blob": "ecafeec0100f8881a700f9e3372a717aeab93b2b",
+      "commit": "821d23427a5f6d0b4635f32f226ddc779358ab72",
+      "path": "reviews/v0.6/b_line/V06_G2_R3_P1_ALT_ENGINE_AM01_AM02_CONTROLLER_SPEC_FREEZE_R1.md",
+      "sha256": "cea538034ea7695a326a2f2c91dcf4d246f2fafaa456f5935f4f375ce1d6e16f",
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/821d23427a5f6d0b4635f32f226ddc779358ab72/reviews/v0.6/b_line/V06_G2_R3_P1_ALT_ENGINE_AM01_AM02_CONTROLLER_SPEC_FREEZE_R1.md"
+    },
+    {
+      "alias": "prior_science",
+      "blob": "ab4c6f8b12dccc75e4dbe335b917e53cba2543c2",
+      "commit": "5032259954e001635c97110c9c50e4a35a2c95b5",
+      "path": "docs/strategy_research/g2_r3/postp1_opportunity_science_r1/SCIENCE_OPPORTUNITY_PRIORITIES_AND_FALSIFIERS.md",
+      "sha256": "3fe629550992c073e4624e9958eceb62607f097f1b1ce54dbad2d4596456c03f",
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/5032259954e001635c97110c9c50e4a35a2c95b5/docs/strategy_research/g2_r3/postp1_opportunity_science_r1/SCIENCE_OPPORTUNITY_PRIORITIES_AND_FALSIFIERS.md"
+    },
+    {
+      "alias": "p1_no_go",
+      "blob": "9dfcf9f4ff8284765240c212550beb460438c0a5",
+      "commit": "fd3c13645df9ad2506293b109d3891cf57936208",
+      "path": "reviews/v0.6/b_line/V06_G2_R3_P1_ALT_ENGINE_FINAL_INDEPENDENT_AUDIT_CONTROLLER_TERMINAL_NO_GO_R1.md",
+      "sha256": "b9eba432a5a61a1e9a110279c8fc157173abaf62a588e36b7d8b22c9784a59ce",
+      "url": "https://github.com/EXASHXE/btc-quant-agent-public/blob/fd3c13645df9ad2506293b109d3891cf57936208/reviews/v0.6/b_line/V06_G2_R3_P1_ALT_ENGINE_FINAL_INDEPENDENT_AUDIT_CONTROLLER_TERMINAL_NO_GO_R1.md"
+    }
+  ],
+  "task_id": "V06_P2_S2_SOL_HIGH_PIT_FUNDING_MARK_AND_BTC_DIAGNOSTIC_PREREG_R1",
+  "terminal": "P2_S2_PIT_SCIENCE_AND_DIAGNOSTIC_PREREG_DESIGNED_PENDING_CONTROLLER",
+  "test_hashes": {
+    "tests/test_v06_p2_s2_pit_oracle_semantics.py": "8d16ce23b20e2a849f674ba45ff6f6d7adafc4cb84231004bb33d878e858cab4"
+  },
+  "tool_boundary_proof": {
+    "inputs": "11 pinned public governance/method/metadata docs plus self-generated JSON",
+    "interpretation": "Task-scoped tool/read provenance; no OS-wide telemetry claim",
+    "network": "Git/GitHub governance and CI metadata only; zero market/private API",
+    "no_protected_log_reads": "CI head/job metadata only, no outcome logs",
+    "oracle_imports": [
+      "__future__",
+      "decimal"
+    ],
+    "owner_root_os_calls": 0,
+    "real_body_footer_header_calls": 0,
+    "runner_inputs": "Only its own frozen fixtures/planning JSON; no root/path argument; one fixed output file or stdout"
+  }
+}
