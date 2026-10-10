@@ -8,7 +8,7 @@
   "cumulative_trials_evaluated": 18,
   "remaining_trial_budget": 6,
   "completed_waves": 3,
-  "active_wave": "WAVE_03",
+  "active_wave": "WAVE_04",
   "waves": {
     "WAVE_01": {
       "status": "COMPLETED",
@@ -80,9 +80,20 @@
       ]
     },
     "WAVE_04": {
-      "status": "UNINITIALIZED",
-      "candidate_count": 0,
-      "candidate_ids": []
+      "status": "FROZEN_AWAITING_EXECUTION",
+      "frozen_registry_file": "evidence/v0.6/b_line/g2_gemini_goal_trend_flow_r1/WAVE_04_FROZEN_REGISTRY.json",
+      "candidate_count": 6,
+      "candidate_ids": [
+        "W4_C01_DUAL_TIMEFRAME_VOLATILITY_EXPANSION_08H",
+        "W4_C02_VWAP_MEAN_DRIFT_ACCELERATION_08H",
+        "W4_C03_TREND_MOMENTUM_CONVERGENCE_DIVERGENCE_12H",
+        "W4_C04_DONCHIAN_CHANNEL_VOLATILITY_BREAKOUT_08H",
+        "W4_C05_CUMULATIVE_FLOW_PERCENTILE_SURGE_08H",
+        "W4_C06_ASYMMETRIC_MOMENTUM_EXHAUSTION_CONTINUATION_24H"
+      ],
+      "evaluation_result_file": null,
+      "promoted_candidates": [],
+      "falsified_candidates": []
     }
   }
 }
