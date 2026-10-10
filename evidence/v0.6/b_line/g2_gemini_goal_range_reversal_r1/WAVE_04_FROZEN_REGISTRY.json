@@ -1,0 +1,288 @@
+{
+  "TASK_ID": "V06_G2_GEMINI_GOAL_B_RANGE_REVERSAL_VOL_MULTI_WAVE_DISCOVERY_R1",
+  "agent_id": "GEMINI_B_GOAL_R_RANGE_REVERSAL_VOL",
+  "allowed_data_window": {
+    "end_month": "2023-12",
+    "forbidden_years": [
+      2024,
+      2025,
+      2026
+    ],
+    "scored_months_end": "2023-12",
+    "scored_months_start": "2021-02",
+    "source": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/",
+    "start_month": "2021-01",
+    "warmup_month": "2021-01"
+  },
+  "candidates": [
+    {
+      "allocation_fraction": 0.12,
+      "book": {
+        "account_mode": "CONTINUOUS_1X_USD_ACCOUNT",
+        "allocation_fraction": 0.12,
+        "initial_capital_usd": 1000.0,
+        "max_leverage": 1.0,
+        "order_type": "MARKET_NEXT_1M_OPEN",
+        "overlapping_positions_allowed": false
+      },
+      "candidate_id": "W4_C01_WIDE_72H_RECLAIM_DYNAMIC_MIDLINE_12H",
+      "cooldown_bars_15m": 20,
+      "direction_mode": "LONG_SHORT_SYMMETRIC",
+      "entry_parameters": {
+        "check_every_n_bars_15m": 4,
+        "lookback_bars_15m": 288,
+        "max_range_width_bps": 1300.0,
+        "min_atr1h_bps": 55.0,
+        "min_range_width_bps": 240.0,
+        "reentry_depth_atr15": 0.3,
+        "taker_imbalance_4_aligned": 0.0
+      },
+      "exit_parameters": {
+        "max_hold_bars_15m": 48,
+        "stop_atr15_mult": 3.0,
+        "target_r": 1.85,
+        "time_stop_hours": 12
+      },
+      "expected_failure_mode": "Multi-day breakout continuation after a temporary 1h pullback inside the 72h range.",
+      "expected_regime": "Wide 72-hour horizontal ranges (240-1300 bps, 1h ATR >= 55 bps) where 1h boundary sweeps reject >= 0.30 ATR15 back inside the range with aligned 1h taker flow.",
+      "family": "FAILED_ACCEPTANCE_REENTRY",
+      "holding_horizon_hours": 12,
+      "hypothesis": "Preserving W2_C01's 12h horizon (which achieved +10.97 bp gross across 2021-2023 and +30.86 bp gross in high ATR, outperforming W3_C01's 24h hold) while requiring 1h ATR >= 55 bps, deeper 0.30 ATR15 reentry, positive 1h taker alignment, and 1.85R target.",
+      "signal_clock": "15m_closed_bar_on_1h_boundary",
+      "wave_id": "WAVE_04"
+    },
+    {
+      "allocation_fraction": 0.12,
+      "book": {
+        "account_mode": "CONTINUOUS_1X_USD_ACCOUNT",
+        "allocation_fraction": 0.12,
+        "initial_capital_usd": 1000.0,
+        "max_leverage": 1.0,
+        "order_type": "MARKET_NEXT_1M_OPEN",
+        "overlapping_positions_allowed": false
+      },
+      "candidate_id": "W4_C02_SQUEEZE_SNAPBACK_LOW_DRIFT_08H",
+      "cooldown_bars_15m": 16,
+      "direction_mode": "LONG_SHORT_SYMMETRIC",
+      "entry_parameters": {
+        "compression_ratio_max": 0.86,
+        "max_48h_drift_bps": 450.0,
+        "max_4h_er12": 0.38,
+        "max_dist_from_24h_mean_atr15": 0.75,
+        "min_2h_expansion_atr15": 1.65,
+        "min_30m_snapback_atr15": 0.45,
+        "min_sfr15": 0.02
+      },
+      "exit_parameters": {
+        "max_hold_bars_15m": 32,
+        "stop_atr15_mult": 2.6,
+        "target_r": 1.75,
+        "time_stop_hours": 8
+      },
+      "expected_failure_mode": "Whipsaw around the 24h mean in choppy markets.",
+      "expected_regime": "Bounded 48h regimes (drift <= 450 bps, 4h ER12 <= 0.38) where a 2h expansion out of volatility compression fails and snaps back to the 24h mean.",
+      "family": "VOL_COMPRESSION_TO_REVERT",
+      "holding_horizon_hours": 8,
+      "hypothesis": "Combining W2_C06's positive gross return in all 3 years (+7.10 bp) and W3_C02's strong 2023 performance (+17.92 bp gross) with a 48h macro drift filter (<= 450 bps, 4h ER12 <= 0.38) and 8h / 1.75R brackets avoids fading runaway 2021 trends.",
+      "signal_clock": "15m_closed_bar",
+      "wave_id": "WAVE_04"
+    },
+    {
+      "allocation_fraction": 0.12,
+      "book": {
+        "account_mode": "CONTINUOUS_1X_USD_ACCOUNT",
+        "allocation_fraction": 0.12,
+        "initial_capital_usd": 1000.0,
+        "max_leverage": 1.0,
+        "order_type": "MARKET_NEXT_1M_OPEN",
+        "overlapping_positions_allowed": false
+      },
+      "candidate_id": "W4_C03_BOUNDED_48H_RANGE_REJECTION_12H",
+      "cooldown_bars_15m": 20,
+      "direction_mode": "LONG_SHORT_SYMMETRIC",
+      "entry_parameters": {
+        "edge_zone_fraction": 0.16,
+        "lookback_hours": 48,
+        "max_4h_er12": 0.32,
+        "min_atr1h_bps": 50.0,
+        "min_range_width_atr1h": 2.4,
+        "min_sfr1": 0.03,
+        "min_vol1_mult_sma20": 0.95
+      },
+      "exit_parameters": {
+        "max_hold_bars_15m": 48,
+        "stop_atr1h_mult": 1.35,
+        "target_r": 1.8,
+        "time_stop_hours": 12
+      },
+      "expected_failure_mode": "Range breakdown at the 48h boundary before reaching the midline.",
+      "expected_regime": "Low-efficiency 48h ranges (4h ER12 <= 0.32, width >= 2.4x 1h ATR) with volume-supported 1h taker rejection at the outer 16% boundary.",
+      "family": "RANGE_MEAN_REVERT_WITH_VOLUME",
+      "holding_horizon_hours": 12,
+      "hypothesis": "W3_C03 beat balanced control in all 3 years (+6.80 bp equal-year) but gave back gains during hours 12-24 when waiting for 2.5R. Shortening hold to 12h with 1.80R midline target and requiring volume >= 0.95x SMA20 + |sfr1| >= 0.03 captures cleaner range rotations.",
+      "signal_clock": "1h_closed_bar",
+      "wave_id": "WAVE_04"
+    },
+    {
+      "allocation_fraction": 0.12,
+      "book": {
+        "account_mode": "CONTINUOUS_1X_USD_ACCOUNT",
+        "allocation_fraction": 0.12,
+        "initial_capital_usd": 1000.0,
+        "max_leverage": 1.0,
+        "order_type": "MARKET_NEXT_1M_OPEN",
+        "overlapping_positions_allowed": false
+      },
+      "candidate_id": "W4_C04_LOW_CONVICTION_EXTREME_FLOW_FLIP_08H",
+      "cooldown_bars_15m": 16,
+      "direction_mode": "LONG_SHORT_SYMMETRIC",
+      "entry_parameters": {
+        "lookback_bars_15m": 96,
+        "max_1h_vol_mult_sma20": 1.35,
+        "max_4h_er12": 0.36,
+        "min_15m_reversal_body_atr15": 0.35,
+        "min_1h_vol_mult_sma20": 0.55,
+        "min_opposing_taker_imb_2": 0.05
+      },
+      "exit_parameters": {
+        "max_hold_bars_15m": 32,
+        "stop_atr15_mult": 2.6,
+        "target_r": 1.8,
+        "time_stop_hours": 8
+      },
+      "expected_failure_mode": "Slow-grind directional creep along the 24h boundary that triggers the 2.6x ATR15 stop.",
+      "expected_regime": "24-hour range extremes probed on non-climax volume (0.55x-1.35x average) where aggressive 30m taker flow flips >= 5% against the probe.",
+      "family": "AGGRESSIVE_FLOW_EXHAUSTION",
+      "holding_horizon_hours": 8,
+      "hypothesis": "Waves 1-3 proved that high-volume climaxes (>= 3x SMA) often initiate genuine trend breakouts. Fading 24h extremes probed on moderate/exhausted volume (0.55-1.35x SMA) with a strong >= 5% opposing 30m taker-flow flip isolates true buyer/seller exhaustion.",
+      "signal_clock": "15m_closed_bar",
+      "wave_id": "WAVE_04"
+    },
+    {
+      "allocation_fraction": 0.12,
+      "book": {
+        "account_mode": "CONTINUOUS_1X_USD_ACCOUNT",
+        "allocation_fraction": 0.12,
+        "initial_capital_usd": 1000.0,
+        "max_leverage": 1.0,
+        "order_type": "MARKET_NEXT_1M_OPEN",
+        "overlapping_positions_allowed": false
+      },
+      "candidate_id": "W4_C05_ASIA_RANGE_EUROPE_SWEEP_RETURN_12H",
+      "cooldown_bars_15m": 20,
+      "direction_mode": "LONG_SHORT_SYMMETRIC",
+      "entry_parameters": {
+        "asia_session_utc_hours": [
+          0,
+          8
+        ],
+        "eval_window_utc_hours": [
+          8,
+          14
+        ],
+        "max_4h_er12": 0.42,
+        "min_reclaim_inside_atr1h": 0.05,
+        "min_sfr15": 0.02,
+        "min_sweep_atr1h": 0.15
+      },
+      "exit_parameters": {
+        "max_hold_bars_15m": 48,
+        "stop_atr1h_mult": 1.45,
+        "target_r": 1.85,
+        "time_stop_hours": 12
+      },
+      "expected_failure_mode": "European session breakout continuation when macro news hits during London hours.",
+      "expected_regime": "European session open (08:15-14:00 UTC) sweeping the 00:00-08:00 UTC Asia range extreme and closing strictly back inside the Asia range with supporting taker flow.",
+      "family": "OVERNIGHT_SESSION_BOUNDARY_RETURN",
+      "holding_horizon_hours": 12,
+      "hypothesis": "W1_C05 (Europe sweep of Asia range) achieved positive gross returns (+0.64 bp overall, +10.65 bp in 2021, +4.82 bp in 2022), outperforming W2_C05 and W3_C05. Adding a strict inside-Asia-range close, macro trend filter (4h ER12 <= 0.42), and stronger taker flow (sfr15 >= 0.02) sharpens this anomaly.",
+      "signal_clock": "15m_closed_bar",
+      "wave_id": "WAVE_04"
+    },
+    {
+      "allocation_fraction": 0.12,
+      "book": {
+        "account_mode": "CONTINUOUS_1X_USD_ACCOUNT",
+        "allocation_fraction": 0.12,
+        "initial_capital_usd": 1000.0,
+        "max_leverage": 1.0,
+        "order_type": "MARKET_NEXT_1M_OPEN",
+        "overlapping_positions_allowed": false
+      },
+      "candidate_id": "W4_C06_FOUR_HOUR_EXHAUSTION_MODERATE_VOL_24H",
+      "cooldown_bars_15m": 24,
+      "direction_mode": "LONG_SHORT_SYMMETRIC",
+      "entry_parameters": {
+        "adjacent_high_low_tolerance_atr4": 0.32,
+        "max_atr1h_bps": 115.0,
+        "min_16h_displacement_atr4": 1.1,
+        "min_4h_reversal_body_atr4": 0.15,
+        "min_prior_er4_6": 0.42
+      },
+      "exit_parameters": {
+        "max_hold_bars_15m": 96,
+        "stop_atr1h_mult": 1.65,
+        "target_r": 1.85,
+        "time_stop_hours": 24
+      },
+      "expected_failure_mode": "Multi-day trend continuation after a 4h double-top/bottom pause.",
+      "expected_regime": "Moderate volatility regimes (1h ATR <= 115 bps) where a 4h high-efficiency swing (ER6 >= 0.42) stalls at an adjacent 4h high/low and prints a >= 0.15 ATR4h reversal body with aligned 4h taker flow.",
+      "family": "REGIME_TRANSITION_REVERSAL",
+      "holding_horizon_hours": 24,
+      "hypothesis": "W1_C06 achieved positive gross return and +8.93 bp equal-year edge over balanced control across all 3 years, performing best when ATR < 100 bps, whereas W3_C06's 2.8R target was too wide. Capping 1h ATR <= 115 bps, requiring a >= 0.15 ATR4h reversal body and 4h taker alignment, and using a 1.85R target refines W1_C06.",
+      "signal_clock": "4h_closed_bar",
+      "wave_id": "WAVE_04"
+    }
+  ],
+  "controller_dispatch_sha": "6c6ff831868701cea05499d0b0adb0e62db67f0e",
+  "cost_tiers": {
+    "BASE": {
+      "execution": "next_1m_open_plus_adverse_slippage",
+      "fee_bps_per_side": 6.0,
+      "roundtrip_base_bps": 22.0,
+      "slippage_bps_per_side": 3.0,
+      "spread_bps_per_side": 2.0
+    },
+    "STRESS": {
+      "execution": "next_1m_open_plus_adverse_slippage",
+      "fee_bps_per_side": 12.0,
+      "roundtrip_base_bps": 44.0,
+      "slippage_bps_per_side": 6.0,
+      "spread_bps_per_side": 4.0
+    }
+  },
+  "exact_start_sha": "920b244d06541da5cb9fc3dcaa39e5b15e914d32",
+  "familywise_trial_budget": {
+    "agent_max_candidates": 24,
+    "agent_max_waves": 4,
+    "candidates_per_wave": 6,
+    "combined_project_max_candidates": 48,
+    "prior_waves_candidates": 18,
+    "this_wave_candidate_indices": [
+      19,
+      20,
+      21,
+      22,
+      23,
+      24
+    ]
+  },
+  "freeze_protocol": {
+    "prior_wave_result_sha": "7e4f407863ff7b7252365a254612518a1d517a72",
+    "status": "FROZEN_BEFORE_WAVE_04_IMPLEMENTATION_AND_EXECUTION",
+    "wave_04_returns_evaluated_before_freeze": 0
+  },
+  "promotion_gate_stress": {
+    "familywise_bootstrap_alpha": 0.0010416666666666667,
+    "max_1x_account_drawdown_pct": 12.0,
+    "min_closed_trades": 100,
+    "min_distinct_months": 6,
+    "min_distinct_years": 2,
+    "min_equal_year_mean_net_bps": 0.0,
+    "min_equal_year_paired_control_diff_bps": 0.0,
+    "min_profit_factor": 1.15,
+    "min_worst_year_mean_net_bps": -10.0
+  },
+  "schema": "GEMINI_GOAL_B_WAVE_FROZEN_REGISTRY_V1",
+  "wave_id": "WAVE_04"
+}
