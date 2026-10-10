@@ -49,6 +49,29 @@ def _validate_clock(data6: np.ndarray) -> None:
         raise ValueError("Duplicate, unsorted, or missing UTC minute")
 
 
+def _candidate_hours(candidate: dict[str, Any], event: dict[str, Any] | None = None) -> int:
+    if event is not None and "horizon_hours" in event:
+        return int(event["horizon_hours"])
+    exit_p = candidate.get("exit_parameters", {})
+    return int(
+        candidate.get(
+            "hold_hours",
+            candidate.get(
+                "horizon_hours",
+                candidate.get("holding_horizon_hours", exit_p.get("time_stop_hours", 4)),
+            ),
+        )
+    )
+
+
+def _cooldown_ms(candidate: dict[str, Any]) -> int:
+    if "cooldown_bars_15m" in candidate:
+        return int(candidate["cooldown_bars_15m"]) * 15 * MINUTE
+    book_cfg = candidate.get("book", {})
+    cool_hours = int(book_cfg.get("cooldown_hours", candidate.get("cooldown_hours", 1)))
+    return cool_hours * HOUR
+
+
 def _fast_index(data6: np.ndarray, clock: int) -> int:
     start0 = int(data6[0, 0])
     idx = (clock - start0) // MINUTE
@@ -100,7 +123,7 @@ def _proposed(
     gap = abs(raw - float(event["decision_close"]))
     if gap > 0.25 * float(event["atr_hour"]) + 1e-9:
         raise ValueError("late entry breached quarter-hour-ATR gap veto")
-    hours = _hours(candidate)
+    hours = _candidate_hours(candidate, event)
     if hours not in (4, 8, 12, 24):
         raise ValueError("unfrozen hold horizon")
     return {
@@ -173,8 +196,8 @@ def simulate_fold(
     if initial_equity <= 0:
         raise ValueError("initial equity must be positive")
 
-    book_cfg = candidate.get("book", {})
-    cool_hours = int(book_cfg.get("cooldown_hours", candidate.get("cooldown_hours", 1)))
+    cool_ms = _cooldown_ms(candidate)
+    cand_hours = _candidate_hours(candidate)
 
     event_list = sorted(events, key=lambda e: (int(e["entry_at"]), str(e.get("event_id", ""))))
     count: Counter[str] = Counter()
@@ -287,7 +310,7 @@ def simulate_fold(
                 whole["year"] = int(fold.get("year", 0))
                 whole["month"] = int(fold.get("month", 0))
                 trades.append(whole)
-                busy_until = max(busy_until, outcome["exit_ack_at"] + cool_hours * HOUR)
+                busy_until = max(busy_until, outcome["exit_ack_at"] + cool_ms)
                 active = None
                 kill_at = None
                 reduce_at = None
@@ -340,7 +363,7 @@ def simulate_fold(
             except ValueError:
                 note(ev, "LOOKAHEAD_OR_CLOCK")
                 continue
-            if entry < start or entry + _hours(candidate) * HOUR > end:
+            if entry < start or entry + cand_hours * HOUR > end:
                 note(ev, "PURGED_FOLD_EDGE")
                 continue
             if entry != t:
@@ -395,7 +418,7 @@ def simulate_fold(
                 trade["month"] = int(fold.get("month", 0))
                 trades.append(trade)
                 pending.append((planned["exit_ack_at"], trade["net_usdt"]))
-                busy_until = max(busy_until, planned["exit_ack_at"] + cool_hours * HOUR)
+                busy_until = max(busy_until, planned["exit_ack_at"] + cool_ms)
                 active = None
 
         economic_pending = sum(x[1] for x in pending)

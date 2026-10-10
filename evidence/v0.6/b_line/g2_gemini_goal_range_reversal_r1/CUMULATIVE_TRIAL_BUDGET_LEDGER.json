@@ -49,12 +49,14 @@
         "W2_C06_KELTNER_SQUEEZE_FALSE_EXPANSION_04H"
       ],
       "cumulative_agent_trials_after_wave": 12,
+      "decision_file": "docs/strategy_research/g2_r3/gemini_goal_range_reversal_r1/WAVE_02_DECISION.md",
+      "determinism_sha256": "720fe202887f6e43deb1743b56aa858793c1d46440275a73dc3cab242fba0d45",
       "freeze_parent_sha": "c116970123db2d116be2fbe740ce07df9e0523f2",
-      "freeze_sha": "PENDING_COMMIT",
+      "freeze_sha": "a6548f8e4b5b6fc4b63135d9cffeed8b97f23094",
       "promoted_candidates": [],
       "registry_file": "evidence/v0.6/b_line/g2_gemini_goal_range_reversal_r1/WAVE_02_FROZEN_REGISTRY.json",
-      "result_sha": null,
-      "status": "FROZEN_PENDING_EXECUTION",
+      "result_file": "evidence/v0.6/b_line/g2_gemini_goal_range_reversal_r1/WAVE_02_RESULT.json",
+      "status": "EXECUTED_ALL_FALSIFIED_PROCEED_TO_WAVE_03",
       "wave_id": "WAVE_02"
     }
   ]

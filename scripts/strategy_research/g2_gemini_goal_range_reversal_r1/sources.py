@@ -346,6 +346,13 @@ def ensure_2021_2023_sources(scratch: Path, freeze_sha: str, wave_id: str = "WAV
 
     verified_count = sum(1 for r in records if r["status"] == "VERIFIED_COMPLETE_PUBLIC_MONTH")
     integrity_fails = [r for r in records if r["status"] == "SOURCE_INTEGRITY_FAIL"]
+    if (
+        manifest_path.exists()
+        and verified_count == 36
+        and not integrity_fails
+        and old.get("gate") == "PASS_PUBLIC_BTC_2021_2023_COMPLETE"
+    ):
+        return old
     manifest = {
         "schema": "GEMINI_GOAL_B_PUBLIC_BTC_2021_2023_MANIFEST_V1",
         "initial_wave_freeze_sha": freeze_sha,

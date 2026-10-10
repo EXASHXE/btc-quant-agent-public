@@ -45,6 +45,15 @@ def _fmt(v: Any, digits: int = 2) -> str:
     return str(v)
 
 
+def _resolve_costs(registry: dict[str, Any]) -> dict[str, dict[str, float]]:
+    if "costs" in registry and "BASE" in registry["costs"] and "STRESS" in registry["costs"]:
+        return registry["costs"]
+    return {
+        "BASE": {"fee_bps": 6.0, "spread_bps": 2.0, "slip_bps": 3.0},
+        "STRESS": {"fee_bps": 12.0, "spread_bps": 4.0, "slip_bps": 6.0},
+    }
+
+
 def execute_single_pass(
     wave_id: str,
     freeze_sha: str,
@@ -58,6 +67,7 @@ def execute_single_pass(
     generated = signals.generate_wave_signals(data, registry)
     data6 = data[:, :6]
     replay._validate_clock(data6)
+    costs = _resolve_costs(registry)
 
     trade_file = scratch_out / "trade_ledger.jsonl"
     event_file = scratch_out / "decision_event_ledger.jsonl"
@@ -73,7 +83,7 @@ def execute_single_pass(
             by_event_id = {str(e["event_id"]): e for e in source_events}
 
             for cost_name in ("BASE", "STRESS"):
-                cost = registry["costs"][cost_name]
+                cost = costs[cost_name]
                 capital = 1000.0
                 highwater = 1000.0
                 busy_until = 0
@@ -288,8 +298,10 @@ def execute_single_pass(
                     {
                         "candidate": cid,
                         "family": cand["family"],
-                        "side_config": cand["side"],
-                        "horizon_hours": int(cand["horizon_hours"]),
+                        "side_config": cand.get(
+                            "side", cand.get("direction_mode", "LONG_SHORT_SYMMETRIC")
+                        ),
+                        "horizon_hours": replay._candidate_hours(cand),
                         "cost_case": cost_name,
                         "total_raw_signals_including_warmup": len(source_events),
                         "waits": dict(waits_total),
@@ -355,7 +367,7 @@ def execute_single_pass(
                     flush=True,
                 )
 
-    audited = audit.audit_candidate_trades(data6, all_trades, registry["costs"], max_per_candidate=5)
+    audited = audit.audit_candidate_trades(data6, all_trades, costs, max_per_candidate=5)
     stress_rows = [r for r in rows if r["cost_case"] == "STRESS"]
     promotable = [
         r["candidate"]
@@ -381,12 +393,19 @@ def execute_single_pass(
     strongest_id = ranked_stress[0]["candidate"] if ranked_stress else None
     weakest_id = ranked_stress[-1]["candidate"] if ranked_stress else None
 
+    parent_sha = registry.get(
+        "exact_parent_sha",
+        registry.get("freeze_protocol", {}).get(
+            "prior_wave_result_sha", registry.get("exact_start_sha")
+        ),
+    )
+
     result_payload = {
         "schema": "GEMINI_GOAL_B_WAVE_RESULT_V1",
         "TASK_ID": registry["TASK_ID"],
         "wave_id": wave_id,
         "freeze_sha": freeze_sha,
-        "exact_parent_sha": registry["exact_parent_sha"],
+        "exact_parent_sha": parent_sha,
         "executed_at_utc": utcnow(),
         "source_manifest_sha256": _sha256_file(EVIDENCE / "SOURCE_MANIFEST_2021_2023.json"),
         "registry_sha256": _sha256_file(EVIDENCE / f"{wave_id}_FROZEN_REGISTRY.json"),
