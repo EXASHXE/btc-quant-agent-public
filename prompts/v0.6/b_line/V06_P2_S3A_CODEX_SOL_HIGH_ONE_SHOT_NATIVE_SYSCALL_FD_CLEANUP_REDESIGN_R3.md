@@ -1,0 +1,62 @@
+# Codex GPT-6 Sol High — P2 S3A **ONE-SHOT R3** real syscall-accounting and FD cleanup correctness redesign
+
+**TASK_ID:** `V06_P2_S3A_CODEX_ONE_SHOT_NATIVE_FS_ACCOUNTING_AND_FD_CLEANUP_CORRECTNESS_R3`
+**ROLE:** Codex implementation lead + security specialist, **one bounded fix campaign**, not independent audit signoff.
+**CONTROLLER_DISPATCH_SHA:** `63f21db61980c209a90a5585375f761bf842bfaa`
+**Binding Controller final independent FAIL and R3 authorization:** [read complete adjudication FIRST](https://github.com/EXASHXE/btc-quant-agent-public/blob/63f21db61980c209a90a5585375f761bf842bfaa/reviews/v0.6/b_line/V06_P2_S3A_CODEX_NATIVE_AUDIT_CONTROLLER_FINAL_FAIL_AND_ONE_SHOT_R3_DISPATCH.md).
+**Frozen independent hostile native trace and limitations:** [audit `91bf48e0...` verdict](https://github.com/EXASHXE/btc-quant-agent-public/blob/91bf48e007dc36239a79ec38ce01f4f77abadc4c/reviews/v0.6/b_line/s3a_codex_independent_audit_r1/S3A_R2_CODEX_SOL_INDEPENDENT_SECURITY_VERDICT.md); [machine trace](https://github.com/EXASHXE/btc-quant-agent-public/blob/91bf48e007dc36239a79ec38ce01f4f77abadc4c/evidence/v0.6/b_line/p2_s3a_codex_independent_audit_r1/S3A_R2_NATIVE_OS_SYSCALL_TRACE_COMPARISON.json); [source evidence erratum](https://github.com/EXASHXE/btc-quant-agent-public/blob/91bf48e007dc36239a79ec38ce01f4f77abadc4c/reviews/v0.6/b_line/s3a_codex_independent_audit_r1/S3A_R2_SOURCE_PROVENANCE_ERRATUM.md).
+
+## Exact frozen git and worktree
+
+- Public repo `EXASHXE/btc-quant-agent-public`. A **new implementation branch precreated by Controller**: `feature/v06-bline-p2-s3a-codex-one-shot-fd-r3`.
+- **Exact initial remote branch HEAD / code base:** `999cf7005c741bdbabae727f10f90f23330fb035`, which is Gemini R2 code. Your **single new commit must have parent `999cf7005c741bdbabae727f10f90f23330fb035`**. Never branch from audit `91bf48e007dc36239a79ec38ce01f4f77abadc4c`: that audit code branch includes `reviews/**`, which provably triggers three baseline `tests/test_v050_r01_surface_reduction.py` failures. Audit is **reference only**, not cherry-pick/import.
+- Suggested separate worktree `/root/workspace/project/quant-v0.6/p2-s3a-codex-one-shot-fd-r3` created safely if absent; do not modify/stash/reset/clean Gemini or audit worktrees, code branch `v0.6`, original `Quant-agent`, `Quant-agent-sanitized`, docs branch `v0.6-docs`. If worktree already exists, check ownership and exact SHA, fail rather than destroying it.
+- Ask Codex UI for GPT-6 Sol High if selectable. Record actual model setting as `NOT_EXPOSED` if unobservable; no false claim.
+
+## Absolute no-real-market access — not a source-reading dispatch
+
+This entire R3 is **implementation and synthetic temp fixture tests only**. There is **NO permission to inspect** owner WSL root `/root/workspace/project/Quant-agent/data` or original data trees at all: not even `lstat`, parent listing, header, Footer, SHA, timestamp, Mark, Funding, or any market value. Treat root string and exact allowed eventual pilot filename `research/BTCUSDT/1m/year=2021/month=03/data.parquet` as **strings only**. Use only newly generated invented Parquet files under `tempfile`/pytest temporary dirs. Do not reach H39/H40/H41/Forward/2026 protected segments, private account, API/network data download or trading. No S3B grant; no P2 source admission or P3/P4/Alpha/TESTNET/LIVE.
+
+## Priority 0: choose the simplest defensible OS-level accounting architecture
+
+Your design has discretion to **replace/refactor R2 ancestor path walk and custody handoff**, but do not build a general-purpose filesystem explorer or new trading engine. The fundamental acceptance invariants are:
+
+1. **One well-defined hard budget on actual OS operations**, not only `wrapper`-counted ones. Count every attempted `os.open`/`openat`, `os.fstat`, `os.pread`, `os.close` and any `stat/lstat/readlink` introduced **inside the one-file reader execution boundary**, including ancestor root walk and failed operations, symlink/error probes and cleanup. If a custody/authorization preparation step executes filesystem calls *for this invocation*, report them separately and bind a clearly defined total inclusive budget for the *whole supported one-file QA invocation*; no hidden preparatory work may be presented as `0` OS. Fixture creation outside the tool can be excluded explicitly. Output actual attempted count with family breakdown and attestation-vs-read accounting. Cap is **100 actual attempted filesystem operations** end to end (unless Controller later explicitly replaces bound; NOT in R3). Enforce cap **before** kernel call and reserve safe cleanup, or STOP. Never count two failed `open` attempts as one. If path depth makes operation impossible under 100, reject/STOP, no silent cap inflation.
+2. Independent test instrumentation around **actual native OS entry calls**, preferably stdlib patching of `os.open/fstat/pread/close/stat` forwarding one-for-one; when possible reuse the audit scenario semantics and independent tracer fixture **but do not copy its audit branch `reviews` folder or modify its frozen reports**. All tests must assert `count_actual <= 100`, `count_actual == reported` for claimed budget scope (and if scoped, separately expose setup and combined counted scopes). Particularly reproduce the audited deep directory case: R2 **actual 144, reported 27, ALLOWED under cap100**; R3 must fail-close **before** cap violation. Also reproduce shallow 36 vs27, cap2 11 vs2, failed ancestor `ENOENT/EACCES/ENOTDIR`, and each failed close. Require adversarial cap values `1,2,3,25,27,36,100`, root depths 1, 5 and 36 beyond normal, no unmetered OS probe/retry.
+3. Reader must traverse trusted test-owned fixture path using genuine `dir_fd/openat(O_NOFOLLOW|O_DIRECTORY|O_CLOEXEC)` or a trusted, explicitly accounted pre-opened FD handoff; no untrusted absolute `os.open(path)` with symlinked parent. Existing public self-mintable SHA256 `SyntheticTestGrant` remains explicitly **TEST_ONLY_INTEGRITY_CHECKSUM_NOT_AUTHORIZATION**; no production Owner/Controller self-grant and no real owner path. Reject symlink (all ancestors/relative leaf), bind/mount aliases where testable, wrong type/FD identity, escape `..`/absolute/UNC, malicious root swap, hardlink aliasing. Existing positive synthetic one-file scope and 2021-03 string-only allowlist retained. If true custody cannot be independently attested, STOP and report `SOURCE_ROOT_CUSTODY_UNKNOWN`; do not add `--allow-root`.
+4. **FD life-cycle truth**: actual close may fail and descriptor may stay live. Do NOT mark `open_fds_remaining=0` or `close_complete=True` solely because a tracking dictionary entry is popped after failed `os.close`. Return explicit `FD_CLOSE_UNCONFIRMED_FAIL_CLOSED`/equivalent, preserve unresolved FD identity or status, count attempted OS, abort sanitized success, and ensure best-effort cleanup without unsafe repeated close after descriptor number could be reused. Distinguish kernel EBADF of a deliberately substituted invalid argument, genuine failed close and injected failure-before-close. An independently traced synthetic fault must verify any still-held actual FD is either properly closed by an authorized safe recovery or truthfully labeled unresolved (no false zero); audit-injected held FDs may be cleaned outside the tool by audit teardown but never concealed. Clean normal/error paths after open/fstat/pread/parser failures, including root ancestor exception after next FD opened, and make every error structured `REJECTED/STOP` not raw `OSError` falling out without receipt.
+5. **Footer hard byte cap remains unchanged**: exactly one 2021-03 candidate, <=8-byte trailer, <=65536-byte Footer, <=65544 bytes total source read, **zero actual Parquet row-group/page reads**, zero header read, no price values. In-memory parser only; Footer may still contain market-derived stats, so NO real Footer content permission implied by R3. Maintain `FILE_HEADER_NOT_VERIFIED` and scrub metadata/statistics in output. Unbounded Thrift/parser CPU/RSS remains a separate threat to identify and fail-closed or clearly constrain; do not claim to have proved real WSL safety.
+6. Immutable source evidence from `c6823dbc...`: six BTC candidate sizes correctly restored by R2; retain all 13 correct regular-file constants, metadata rights UNKNOWN. R2 prose §4.3 made **incorrect** claims (`data_manifest=475` vs real **45234**, `funding_events=424781` vs real **219066**, named paths absent from original receipt). Preserve immutable R1/R2 docs and receipts; write a NEW R3 erratum/addendum if needed, and test direct Git-pinned parsed original. Never fabricate real file changed or source contents.
+
+## Finite implementation and scientific falsification gates
+
+Write **one bounded code fix/rewrite** with a small cohesive abstraction. Spend implementation effort on B01 and B02 not huge families of decorative cases.
+
+Require **>=20 actual independent targeted new regression test cases** (not only nested documentation scenarios) covering:
+- normal shallow/deep temp path syscall native vs claimed count;
+- budget edge 1,2,3,25,27,36,100; one cap2 native <=2; one deep100 native <=100 with DENY instead of ALLOWED unless safely within;
+- symlinked root ancestor and leaf, swapped trusted root identity, EACCES/ENOENT/ENOTDIR failed native os.open **no replay**, same-device alias or mount boundaries;
+- actual FD leak in `close` native EBADF injection, close-failure normal/tracked/ancestor, accurate unresolved FD receipt, no implicit `os.close` success inference;
+- corrupted huge Footer, short `pread`, invalid trailer/footer length, no price/statistics in outputs, 65,545th attempted byte DENY;
+- public self-mint grant + wrong/expired/missing grant, 2026/other month and owner production disallowed; source size row-wise immutable Git test (without owner data);
+- no direct real-root `os.stat/open/scandir`, no code import from terminated S1/S2, no real market content.
+Run existing S3A unit/adversarial tests; update **existing S3A tests only if semantically required**, preserve checks rather than delete/xfail/skip. Assertions must independently compare actual OS calls with reported counters; tests using same wrapper counter on both sides are insufficient.
+
+## Publication scope, CI and hard stopping
+
+Allowed changes on **R3 implementation branch only**:
+- `scripts/strategy_research/p2_s3_footer_reader/**`;
+- `tests/test_v06_p2_s3_footer_reader_*.py`;
+- NEW `tests/test_v06_p2_s3a_codex_r3_*.py`;
+- NEW `docs/strategy_research/g2_r3/p2_s3_footer_reader_r1/S3A_R3_*.md`;
+- NEW `evidence/v0.6/b_line/p2_s3_footer_reader_r1/S3A_R3_*.json`.
+**FORBIDDEN `reviews/**` IN CODE BRANCH** — three CI assertions enforce its absence. Do not import/cherry-pick the audit branch 91bf... or write its reviews files. Old unchanged R1/R2 machine artifacts are historical evidence and must not be rewritten; write clearly superseding R3 machine receipt containing actual native-attempt accounting, close/FD uncertainty, confirmed source constants and initial bug→new outcome.
+- Run scoped Ruff, focused pytest, compileall, JSON checks, `git diff --check`; avoid local 15-minute whole suite repeatedly. A GitHub CI full test run will exercise full code scope, may produce unstable H40 exact hash. No CI waivers/marking false PASS, no `reviews/**` workaround.
+- One commit + **nonforce push** to new implementation branch; parent MUST **`999cf7005c741bdbabae727f10f90f23330fb035`**. Deliver exact changed paths, real native observed vs wrapper accounting across cases, CI run URL + actual outcome, verified Python versions, original-receipt hash, owner root read count 0, code/test sha and explicit limitations. If a real bug cannot be bounded within a single one-shot redesign, STOP with `S3A_CODEX_R3_HARD_SECURITY_CONTRACT_NOT_MET__TERMINATE_READER_ROUTE` rather than iterating or expanding scope.
+
+Valid terminal decisions:
+- `S3A_CODEX_R3_ONE_SHOT_SYNTHETIC_SECURITY_CANDIDATE_PENDING_INDEPENDENT_CONTROLLER_AUDIT`;
+- `S3A_CODEX_R3_HARD_SECURITY_CONTRACT_NOT_MET__TERMINATE_READER_ROUTE`;
+- `BLOCKED_IDENTITY_OR_SCOPE`.
+
+**No real file read, actual source admit, effective P3/P4, historical Alpha, TESTNET/LIVE or real funds under any of these.** Controller will independently check parent/files/code/CI and native evidence, and only then decide independent final audit and future one-file rights/consent. The purpose of this R3 is **to close the finite blocking implementation**, not to commission an indefinite safety-design campaign.
