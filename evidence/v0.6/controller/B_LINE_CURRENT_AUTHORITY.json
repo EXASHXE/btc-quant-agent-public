@@ -2058,7 +2058,7 @@
     "codex_s3a_audit_status": "BRANCH_CREATED__NOT_EXECUTED",
     "real_owner_root_content_permission": "NONE",
     "real_owner_root_metadata_permission": "NONE",
-    "reader_production_acceptance": "NONE_SECURITY_HOLD_CI_RED",
+    "reader_production_acceptance": "NONE_R3_CI_RED",
     "codex_s3a_audit_final_sha": "91bf48e007dc36239a79ec38ce01f4f77abadc4c",
     "codex_s3a_audit_exact_parent_sha": "999cf7005c741bdbabae727f10f90f23330fb035",
     "codex_s3a_audit_changed_paths": 9,
@@ -2113,9 +2113,23 @@
     "ci_parity_diagnostic_branch": "feature/v06-bline-p2-s3a-r3-ci-parity-diagnostic-r1",
     "ci_parity_diagnostic_start_sha": "db77118b9fa49d4626b39c2120cc19ca2341245a",
     "ci_parity_diagnostic_worktree": "/root/workspace/project/quant-v0.6/p2-s3a-r3-ci-parity-diagnostic-r1",
-    "ci_parity_diagnostic_status": "BRANCH_CREATED_PROMPT_PUBLISHED_NOT_EXECUTED",
+    "ci_parity_diagnostic_status": "PAUSED_DEPRIORITIZED_STRATEGY_FIRST",
     "ci_parity_diagnostic_repair_authority": "NONE_READ_ONLY_CAUSAL_CLASSIFICATION",
     "ci_parity_diagnostic_final_policy": "NATIVE_HARD_BUDGET_FAIL_TERMINATE_CUSTOM_S3_READER; UNKNOWN_INCOMPLETE_STOP; TEST_WHITELIST_ONLY_REQUIRE_SEPARATE_CONTROLLER_DECISION_NO_AUTOGRANT",
     "owner_real_data_metadata_permission": "NONE"
+  },
+  "v06_g2_public_btc_empirical_fast_discovery_r1": {
+    "status": "CODEX_DISPATCHED_PENDING_EXECUTION",
+    "priority": "P0_STRATEGY_FIRST",
+    "decision_sha": "4259846a64a422c3eced029bb791ed7e29dc9265",
+    "prompt_sha": "7717b229a5d600170b1e33947eec200c997d3221",
+    "branch": "feature/v06-bline-g2-btc-public-empirical-fast-r1",
+    "start_sha": "e0ff8c3473de4bfa3e66fe7928d42992a4d38a32",
+    "worktree": "/root/workspace/project/quant-v0.6/g2-btc-empirical-fast-r1",
+    "data": "BINANCE_OFFICIAL_PUBLIC_BTCUSDT_USDM_1M_2021_2025_MAR_APR",
+    "scope": "EXPLORATORY_8_FROZEN_PLUS_MAX4_NEW_VARIANTS_COST_22_44_BP",
+    "owner_root_access": "NONE",
+    "s3b_real_read": "NONE",
+    "p3_p4_live": "NONE"
   }
 }
