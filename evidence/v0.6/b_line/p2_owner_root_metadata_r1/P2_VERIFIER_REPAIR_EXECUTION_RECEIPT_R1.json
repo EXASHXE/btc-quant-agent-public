@@ -1,0 +1,57 @@
+{
+  "schema_version": "P2_VERIFIER_REPAIR_EXECUTION_RECEIPT_V1",
+  "repair_task_id": "V06_P2_OWNER_EXACT_ROOT_CI_AND_SYMLINK_FAIL_CLOSED_REPAIR_R1",
+  "controller_dispatch_sha": "52830a73adf9e8c318da8efa8f10c6323a6292b8",
+  "controller_dispatch_doc": "reviews/v0.6/b_line/V06_P2_OWNER_EXACT_ROOT_CONTROLLER_L2_METADATA_EVIDENCE_AND_CI_SEMANTIC_REPAIR_R1.md",
+  "prompt_pinned_sha": "6ef27e3d6a646786da691ad784497211a775fe83",
+  "prompt_pinned_doc": "prompts/v0.6/b_line/V06_P2_GEMINI_OWNER_EXACT_ROOT_CI_AND_SYMLINK_FAIL_CLOSED_REPAIR_R1.md",
+  "exact_start_sha": "c6823dbc46249cac43aa10400aacbbe9f4542410",
+  "inherited_parent_sha": "1e12d6a6467d3bc39c0deedd97204604ac623f18",
+  "execution_branch": "feature/v06-bline-p2-owner-exact-root-metadata-r1",
+  "owner_wsl_data_root": "/root/workspace/project/Quant-agent/data",
+  "terminal_verdict": "P2_VERIFIER_ONE_SHOT_REPAIR_DELIVERED_PENDING_CONTROLLER",
+  "repair_summary": {
+    "full_p2_suite_tests_passed": 46,
+    "original_evidence_preserved": true,
+    "protected_partition_accesses": 0,
+    "real_data_market_bytes_read": 0,
+    "real_market_data_modified": false,
+    "repo_wide_ruff_clean": true,
+    "ruff_violations_after_repair": 0,
+    "ruff_violations_baseline": 20,
+    "unit_and_adversarial_tests_passed": 25
+  },
+  "semantic_repairs_applied": [
+    {
+      "component": "intermediate_symlink_validation",
+      "description": "Implemented _verify_path_components_non_symlink in probe.py. Walks and verifies each intermediate directory component (e.g. 1m, year=YYYY, month=MM) using non-following os.lstat before child access. Immediately raises ProbeSecurityError upon encountering any symbolic link."
+    },
+    {
+      "component": "fail_closed_root_containment",
+      "description": "Replaced naive prefix checks with os.path.commonpath to prevent root escape attacks (e.g. data-v2, ../). Replaced os.path.exists() preflight with os.lstat() to prevent silent symlink resolution of data_root."
+    },
+    {
+      "component": "exception_narrowing_and_propagation",
+      "description": "Removed broad Exception catches (BLE001). ProbeSecurityError and ProbeBudgetExceededError now strictly propagate without suppression. PermissionError is distinguished as PERMISSION_DENIED and never collapsed into ENOENT/missing."
+    },
+    {
+      "component": "alternate_parquet_scandir_hardening",
+      "description": "Hardened scandir loop: removed except Exception: pass (S110), added traversal and protected pattern rejection for candidate filenames, fixed unused unpack variable full_p (RUF059), and ensured budget exceptions propagate out."
+    },
+    {
+      "component": "production_whitelist_vs_test_mode",
+      "description": "Added allow_custom_root parameter to OwnerRootProbe. Production runs strictly reject any root other than /root/workspace/project/Quant-agent/data, while synthetic temporary test fixtures explicitly enable allow_custom_root=True."
+    },
+    {
+      "component": "ruff_rule_compliance",
+      "description": "Resolved all 20 Ruff violations (I001, RUF022, F401, F541, ISC004, BLE001, RUF059, UP017) across own codebase without blanket noqa suppression."
+    }
+  ],
+  "script_hashes": {
+    "scripts/strategy_research/p2_owner_root_metadata/__init__.py": "7306b68fe706fe302c2304fb3a219a2f99b9d8e4e6d57ebd6ca8cf6def4d33b4",
+    "scripts/strategy_research/p2_owner_root_metadata/cli.py": "58473e728ae7c4611f2fc9080d8889f9162902aa5d3e822ba572d84126a79712",
+    "scripts/strategy_research/p2_owner_root_metadata/config.py": "0c7aa09e95eb50502e25dae0f94bb31507a1ceab82c7476269afc5b29ad452bc",
+    "scripts/strategy_research/p2_owner_root_metadata/matrix.py": "4cb19f696334a4bac2c9f670b5230b201f27c0aa0204598501c616af9c26349b",
+    "scripts/strategy_research/p2_owner_root_metadata/probe.py": "7fb40706228e3884f58297133029c29b431b7e0ff89ab33b32f65c8861f9bdd7"
+  }
+}

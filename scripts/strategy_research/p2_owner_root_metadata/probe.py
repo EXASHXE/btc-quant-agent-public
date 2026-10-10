@@ -5,7 +5,6 @@ from __future__ import annotations
 import os
 import stat
 import time
-from typing import Any
 
 from .config import (
     ADDITIONAL_TARGETS,
@@ -27,7 +26,7 @@ from .config import (
 
 
 class ProbeSecurityError(RuntimeError):
-    """Raised when an unauthorized or protected path access is attempted."""
+    """Raised when an unauthorized, symlink, or protected path access is attempted."""
 
 
 class ProbeBudgetExceededError(RuntimeError):
@@ -43,8 +42,19 @@ class OwnerRootProbe:
         max_lstat: int = MAX_LSTAT,
         max_dir_lists: int = MAX_SELECTED_DIR_LIST,
         max_dir_entries: int = MAX_SELECTED_DIR_ENTRIES,
+        allow_custom_root: bool = False,
     ) -> None:
-        self.data_root = os.path.abspath(data_root)
+        self.allow_custom_root = allow_custom_root
+        clean_root = os.path.abspath(data_root)
+
+        # Enforce authorized owner root unless explicit test mode is granted
+        if not self.allow_custom_root and clean_root != DEFAULT_OWNER_WSL_DATA_ROOT:
+            raise ProbeSecurityError(
+                f"Unauthorized data root: {clean_root}. In production only "
+                f"{DEFAULT_OWNER_WSL_DATA_ROOT} is authorized."
+            )
+
+        self.data_root = clean_root
         self.max_lstat = max_lstat
         self.max_dir_lists = max_dir_lists
         self.max_dir_entries = max_dir_entries
@@ -56,6 +66,7 @@ class OwnerRootProbe:
         self.terminal_verdict: TerminalVerdict = TerminalVerdict.BLOCKED_NOT_PUSHED
         self.stop_reason: str | None = None
         self._start_time: float = 0.0
+        self._verified_non_symlink_components: set[str] = set()
 
     def _safe_lstat(self, path: str) -> os.stat_result:
         """Perform os.lstat with cap checks, traversal rejection, and protected pattern rejection."""
@@ -74,6 +85,43 @@ class OwnerRootProbe:
 
         self.counters.lstat_calls += 1
         return os.lstat(path)
+
+    def _verify_path_components_non_symlink(self, rel_path: str) -> str:
+        """Walk and verify every intermediate component of a relative path under data_root."""
+        # Detect traversal or protected patterns before splitting
+        if is_path_traversal(rel_path):
+            self.counters.protected_body_or_partition_accesses += 1
+            raise ProbeSecurityError(f"Directory traversal detected in relative path: {rel_path}")
+
+        if is_path_protected(rel_path):
+            self.counters.protected_body_or_partition_accesses += 1
+            raise ProbeSecurityError(f"Protected path pattern detected in relative path: {rel_path}")
+
+        full_target = os.path.abspath(os.path.join(self.data_root, rel_path))
+
+        # Check mount/root escape via commonpath (prevent prefix tricks like data-v2)
+        try:
+            common = os.path.commonpath([self.data_root, full_target])
+            if common != self.data_root:
+                self.counters.protected_body_or_partition_accesses += 1
+                raise ProbeSecurityError(f"Path escapes authorized data root: {full_target}")
+        except ValueError as err:
+            self.counters.protected_body_or_partition_accesses += 1
+            raise ProbeSecurityError(f"Path escape attempt across drives/roots: {err}") from err
+
+        # Verify intermediate components from data_root down to target
+        rel_parts = os.path.relpath(full_target, self.data_root).split(os.sep)
+        curr = self.data_root
+        for part in rel_parts:
+            curr = os.path.join(curr, part)
+            if curr not in self._verified_non_symlink_components:
+                st = self._safe_lstat(curr)
+                if stat.S_ISLNK(st.st_mode):
+                    self.counters.symlinks_encountered += 1
+                    raise ProbeSecurityError(f"Symlink detected at intermediate component: {curr}")
+                self._verified_non_symlink_components.add(curr)
+
+        return full_target
 
     def verify_ancestors(self, custom_chain: list[str] | None = None) -> bool:
         """Verify non-symlink ancestor chain from /root down to research/BTCUSDT."""
@@ -99,9 +147,15 @@ class OwnerRootProbe:
                 obs.exists = False
                 obs.error = "ENOENT: ancestor directory does not exist"
                 all_ok = False
-            except Exception as e:
+            except PermissionError as e:
                 obs.exists = False
-                obs.error = f"{type(e).__name__}: {e}"
+                obs.error = f"PERMISSION_DENIED: {e}"
+                all_ok = False
+            except (ProbeSecurityError, ProbeBudgetExceededError):
+                raise
+            except OSError as e:
+                obs.exists = False
+                obs.error = f"OSError: {e}"
                 all_ok = False
 
             self.ancestor_observations.append(obs)
@@ -109,13 +163,12 @@ class OwnerRootProbe:
         return all_ok
 
     def scan_selected_months(self) -> None:
-        """Scan precisely the 6 approved nonprotected month partitions."""
+        """Scan precisely the 6 approved nonprotected month partitions with intermediate symlink checks."""
         for part in APPROVED_MONTH_PARTITIONS:
             label = part["label"]
             year = part["year"]
             month = part["month"]
             rel_dir = part["rel_dir"]
-            full_dir = os.path.join(self.data_root, rel_dir)
 
             obs = MonthPartitionObservation(
                 label=label,
@@ -124,9 +177,10 @@ class OwnerRootProbe:
                 rel_dir=rel_dir,
             )
 
-            # 1. Check directory existence via lstat
+            # 1. Verify directory and intermediate path components
             try:
-                dir_st = self._safe_lstat(full_dir)
+                full_dir = self._verify_path_components_non_symlink(rel_dir)
+                dir_st = os.lstat(full_dir)
                 obs.dir_exists = True
                 obs.dir_is_symlink = stat.S_ISLNK(dir_st.st_mode)
 
@@ -148,18 +202,28 @@ class OwnerRootProbe:
                 obs.notes = f"Directory not found: {rel_dir}"
                 self.month_observations.append(obs)
                 continue
+            except PermissionError as e:
+                obs.dir_exists = False
+                obs.status = FilePresenceStatus.PERMISSION_DENIED.value
+                obs.notes = f"Permission denied accessing directory {rel_dir}: {e}"
+                self.month_observations.append(obs)
+                continue
             except ProbeSecurityError as e:
-                obs.status = FilePresenceStatus.PROTECTED_EXCLUDED.value
+                if "Symlink" in str(e):
+                    obs.status = FilePresenceStatus.SYMLINK_REJECTED.value
+                else:
+                    obs.status = FilePresenceStatus.PROTECTED_EXCLUDED.value
                 obs.notes = f"Security rejection: {e}"
                 self.month_observations.append(obs)
                 continue
+            except ProbeBudgetExceededError:
+                raise
 
             # 2. Check exact default file `data.parquet` first
             default_file_rel = f"{rel_dir}/data.parquet"
-            default_file_full = os.path.join(self.data_root, default_file_rel)
-
             try:
-                file_st = self._safe_lstat(default_file_full)
+                default_file_full = self._verify_path_components_non_symlink(default_file_rel)
+                file_st = os.lstat(default_file_full)
                 obs.file_name = "data.parquet"
                 obs.file_rel_path = default_file_rel
                 obs.file_exists = True
@@ -186,11 +250,21 @@ class OwnerRootProbe:
             except FileNotFoundError:
                 # Default name missing; check if parquet basename differs via strictly capped scandir
                 pass
+            except PermissionError as e:
+                obs.status = FilePresenceStatus.PERMISSION_DENIED.value
+                obs.notes = f"Permission denied accessing default parquet: {e}"
+                self.month_observations.append(obs)
+                continue
             except ProbeSecurityError as e:
-                obs.status = FilePresenceStatus.PROTECTED_EXCLUDED.value
+                if "Symlink" in str(e):
+                    obs.status = FilePresenceStatus.SYMLINK_REJECTED.value
+                else:
+                    obs.status = FilePresenceStatus.PROTECTED_EXCLUDED.value
                 obs.notes = f"Security rejection on default file: {e}"
                 self.month_observations.append(obs)
                 continue
+            except ProbeBudgetExceededError:
+                raise
 
             # 3. If data.parquet missing, scandir only this approved directory (cap <= 16 entries)
             if self.counters.dir_list_calls >= self.max_dir_lists:
@@ -212,17 +286,30 @@ class OwnerRootProbe:
                             break
 
                         if entry.name.endswith(".parquet"):
-                            # lstat regular name
+                            # Validate entry name does not contain traversal or protected patterns
+                            if is_path_traversal(entry.name) or is_path_protected(entry.name):
+                                self.counters.protected_body_or_partition_accesses += 1
+                                raise ProbeSecurityError(
+                                    f"Malicious parquet filename in directory: {entry.name}"
+                                )
+
                             try:
                                 entry_st = self._safe_lstat(entry.path)
-                                if stat.S_ISREG(entry_st.st_mode) and not stat.S_ISLNK(entry_st.st_mode):
+                                if stat.S_ISLNK(entry_st.st_mode):
+                                    self.counters.symlinks_encountered += 1
+                                    raise ProbeSecurityError(
+                                        f"Symlink parquet found in alternate lookup: {entry.name}"
+                                    )
+                                if stat.S_ISREG(entry_st.st_mode):
                                     found_parquet = (entry.name, entry.path, entry_st)
                                     break
-                            except Exception:
-                                pass
+                            except FileNotFoundError:
+                                continue
+                            except (ProbeSecurityError, ProbeBudgetExceededError):
+                                raise
 
                 if found_parquet:
-                    name, full_p, st = found_parquet
+                    name, _full_p, st = found_parquet
                     obs.file_name = name
                     obs.file_rel_path = f"{rel_dir}/{name}"
                     obs.file_exists = True
@@ -238,7 +325,12 @@ class OwnerRootProbe:
                     obs.status = FilePresenceStatus.DIRECTORY_PRESENT_FILE_NAME_UNKNOWN.value
                     obs.notes = "Directory present, but no valid .parquet file located"
 
-            except Exception as e:
+            except (ProbeSecurityError, ProbeBudgetExceededError):
+                raise
+            except PermissionError as e:
+                obs.status = FilePresenceStatus.PERMISSION_DENIED.value
+                obs.notes = f"Permission denied during scandir: {e}"
+            except OSError as e:
                 obs.status = FilePresenceStatus.DIRECTORY_PRESENT_FILE_NAME_UNKNOWN.value
                 obs.notes = f"Error during capped scandir: {e}"
 
@@ -248,7 +340,6 @@ class OwnerRootProbe:
         """Scan additional exact parent directories and metadata files (NO OPEN)."""
         for item in ADDITIONAL_TARGETS:
             rel_path = item["rel_path"]
-            full_path = os.path.join(self.data_root, rel_path)
 
             obs = AdditionalTargetObservation(
                 target_id=item["target_id"],
@@ -260,7 +351,8 @@ class OwnerRootProbe:
             )
 
             try:
-                st = self._safe_lstat(full_path)
+                full_path = self._verify_path_components_non_symlink(rel_path)
+                st = os.lstat(full_path)
                 obs.exists = True
                 obs.is_symlink = stat.S_ISLNK(st.st_mode)
                 obs.is_dir = stat.S_ISDIR(st.st_mode)
@@ -288,9 +380,18 @@ class OwnerRootProbe:
                 obs.exists = False
                 obs.status = FilePresenceStatus.ENOENT.value
                 obs.notes = "Target not found at exact path"
+            except PermissionError as e:
+                obs.exists = False
+                obs.status = FilePresenceStatus.PERMISSION_DENIED.value
+                obs.notes = f"Permission denied accessing target {rel_path}: {e}"
             except ProbeSecurityError as e:
-                obs.status = FilePresenceStatus.PROTECTED_EXCLUDED.value
+                if "Symlink" in str(e):
+                    obs.status = FilePresenceStatus.SYMLINK_REJECTED.value
+                else:
+                    obs.status = FilePresenceStatus.PROTECTED_EXCLUDED.value
                 obs.notes = f"Security rejection: {e}"
+            except ProbeBudgetExceededError:
+                raise
 
             self.target_observations.append(obs)
 
@@ -298,34 +399,74 @@ class OwnerRootProbe:
         """Run full verification pipeline deterministically."""
         self._start_time = time.time()
 
-        # Check data root existence
-        if not os.path.exists(self.data_root):
+        # Check data root existence using safe lstat (do not follow symlinks)
+        try:
+            root_st = self._safe_lstat(self.data_root)
+            if stat.S_ISLNK(root_st.st_mode):
+                self.counters.symlinks_encountered += 1
+                self.terminal_verdict = TerminalVerdict.P2_PROTECTION_OR_IDENTITY_STOP
+                self.stop_reason = f"Owner data root is a symbolic link: {self.data_root}"
+                self.counters.wall_clock_seconds = time.time() - self._start_time
+                return self.terminal_verdict
+            if not stat.S_ISDIR(root_st.st_mode):
+                self.terminal_verdict = TerminalVerdict.P2_OWNER_ROOT_NOT_PRESENT_AT_EXACT_PATH
+                self.stop_reason = f"Owner data root exists but is not a directory: {self.data_root}"
+                self.counters.wall_clock_seconds = time.time() - self._start_time
+                return self.terminal_verdict
+            self._verified_non_symlink_components.add(self.data_root)
+        except FileNotFoundError:
             self.terminal_verdict = TerminalVerdict.P2_OWNER_ROOT_NOT_PRESENT_AT_EXACT_PATH
             self.stop_reason = f"Owner data root not present at exact path: {self.data_root}"
             self.counters.wall_clock_seconds = time.time() - self._start_time
             return self.terminal_verdict
+        except PermissionError as e:
+            self.terminal_verdict = TerminalVerdict.P2_OWNER_ROOT_NOT_PRESENT_AT_EXACT_PATH
+            self.stop_reason = f"Permission denied accessing data root: {e}"
+            self.counters.wall_clock_seconds = time.time() - self._start_time
+            return self.terminal_verdict
+        except ProbeSecurityError as e:
+            self.terminal_verdict = TerminalVerdict.P2_PROTECTION_OR_IDENTITY_STOP
+            self.stop_reason = f"Security violation on data root: {e}"
+            self.counters.wall_clock_seconds = time.time() - self._start_time
+            return self.terminal_verdict
 
         # Verify ancestor chain
-        ancestors_ok = self.verify_ancestors()
+        try:
+            ancestors_ok = self.verify_ancestors()
+        except ProbeSecurityError as e:
+            self.terminal_verdict = TerminalVerdict.P2_PROTECTION_OR_IDENTITY_STOP
+            self.stop_reason = f"Security violation in ancestor chain: {e}"
+            self.counters.wall_clock_seconds = time.time() - self._start_time
+            return self.terminal_verdict
+
         if not ancestors_ok:
-            # Check if failure was symlink vs missing
             has_symlink = any(a.is_symlink for a in self.ancestor_observations)
             if has_symlink:
                 self.terminal_verdict = TerminalVerdict.P2_PROTECTION_OR_IDENTITY_STOP
                 self.stop_reason = "Symlink detected in ancestor path hierarchy"
-                self.counters.wall_clock_seconds = time.time() - self._start_time
-                return self.terminal_verdict
             else:
                 self.terminal_verdict = TerminalVerdict.P2_OWNER_ROOT_NOT_PRESENT_AT_EXACT_PATH
                 self.stop_reason = "One or more ancestor paths failed to resolve"
-                self.counters.wall_clock_seconds = time.time() - self._start_time
-                return self.terminal_verdict
+            self.counters.wall_clock_seconds = time.time() - self._start_time
+            return self.terminal_verdict
 
         # Scan selected months
-        self.scan_selected_months()
+        try:
+            self.scan_selected_months()
+        except ProbeSecurityError as e:
+            self.terminal_verdict = TerminalVerdict.P2_PROTECTION_OR_IDENTITY_STOP
+            self.stop_reason = f"Security violation in month scan: {e}"
+            self.counters.wall_clock_seconds = time.time() - self._start_time
+            return self.terminal_verdict
 
         # Scan additional targets
-        self.scan_additional_targets()
+        try:
+            self.scan_additional_targets()
+        except ProbeSecurityError as e:
+            self.terminal_verdict = TerminalVerdict.P2_PROTECTION_OR_IDENTITY_STOP
+            self.stop_reason = f"Security violation in target scan: {e}"
+            self.counters.wall_clock_seconds = time.time() - self._start_time
+            return self.terminal_verdict
 
         self.counters.wall_clock_seconds = time.time() - self._start_time
 

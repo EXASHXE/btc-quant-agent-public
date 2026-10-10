@@ -7,7 +7,7 @@ import hashlib
 import json
 import os
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 from .config import (
@@ -27,7 +27,6 @@ from .config import (
     PROMPT_PINNED_SHA,
     REMOTE_BRANCH,
     TASK_ID,
-    TerminalVerdict,
 )
 from .matrix import build_candidate_month_matrix, build_source_type_and_permissions_matrix
 from .probe import OwnerRootProbe
@@ -49,14 +48,42 @@ def generate_report_markdown(
     script_hashes: dict[str, str],
 ) -> str:
     """Generate comprehensive P2_OWNER_ROOT_EXACT_METADATA_REPORT.md."""
-    now_iso = datetime.now(timezone.utc).isoformat()
+    now_iso = datetime.now(UTC).isoformat()
+    exec_summary = (
+        f"Under binding Controller dispatch `{CONTROLLER_DISPATCH_SHA}`, Gemini conducted an exact, bounded, "
+        f"pure stdlib `lstat`-only verification of the owner-supplied WSL data root `{probe.data_root}`. "
+        "Unlike earlier exploratory discovery runs across generic candidate paths, this task operated strictly "
+        "against the user's declared root using a positive allowlist of precisely six non-protected monthly "
+        "partitions and eleven designated sibling metadata/parent targets."
+    )
+    candidate_month_desc = (
+        "Only the six authorized non-protected month directories (2021, 2023, 2025 March & April) were probed. "
+        "Zero other months or years were touched."
+    )
+    conclusion_text = (
+        f"This verification confirms that the owner-supplied data root `{probe.data_root}` physically exists in WSL "
+        "and contains the expected directory layout and file metadata for the six authorized non-protected BTC "
+        "partitions. No protected data was accessed, no file bodies were opened, and no symlinks were traversed. "
+        f"Terminal verdict is strictly `{probe.terminal_verdict.value}`. "
+        "Empirical source admission and trading execution authority remain reserved for subsequent "
+        "Controller determination."
+    )
+
     lines: list[str] = [
         "# Gemini P2 — Exact Owner-Supplied WSL Data Root Lstat-Only Verification Report (R1)",
         "",
         f"- **TASK_ID:** `{TASK_ID}`",
-        f"- **ROLE:** Gemini Trusted Read-Only Filesystem Metadata Verifier",
-        f"- **CONTROLLER_DISPATCH_SHA:** `{CONTROLLER_DISPATCH_SHA}` ([Review Document](https://github.com/EXASHXE/btc-quant-agent-public/blob/{CONTROLLER_DISPATCH_SHA}/{CONTROLLER_DISPATCH_DOC}))",
-        f"- **PROMPT_PINNED_SHA:** `{PROMPT_PINNED_SHA}` ([Prompt Document](https://github.com/EXASHXE/btc-quant-agent-public/blob/{PROMPT_PINNED_SHA}/{PROMPT_PINNED_DOC}))",
+        "- **ROLE:** Gemini Trusted Read-Only Filesystem Metadata Verifier",
+        (
+            f"- **CONTROLLER_DISPATCH_SHA:** `{CONTROLLER_DISPATCH_SHA}` "
+            f"([Review Document](https://github.com/EXASHXE/btc-quant-agent-public/blob/"
+            f"{CONTROLLER_DISPATCH_SHA}/{CONTROLLER_DISPATCH_DOC}))"
+        ),
+        (
+            f"- **PROMPT_PINNED_SHA:** `{PROMPT_PINNED_SHA}` "
+            f"([Prompt Document](https://github.com/EXASHXE/btc-quant-agent-public/blob/"
+            f"{PROMPT_PINNED_SHA}/{PROMPT_PINNED_DOC}))"
+        ),
         f"- **BRANCH_START_SHA:** `{CODE_START_SHA}`",
         f"- **EXECUTION_BRANCH:** `{REMOTE_BRANCH}`",
         f"- **OWNER_DECLARED_WSL_DATA_ROOT:** `{probe.data_root}`",
@@ -68,18 +95,27 @@ def generate_report_markdown(
         "",
         "## 1. Executive Summary & Terminal Verdict",
         "",
-        f"Under binding Controller dispatch `{CONTROLLER_DISPATCH_SHA}`, Gemini conducted an exact, bounded, "
-        f"pure stdlib `lstat`-only verification of the owner-supplied WSL data root `{probe.data_root}`. "
-        "Unlike earlier exploratory discovery runs across generic candidate paths, this task operated strictly "
-        "against the user's declared root using a positive allowlist of precisely six non-protected monthly "
-        "partitions and eleven designated sibling metadata/parent targets.",
+        exec_summary,
         "",
         f"- **Terminal Verdict:** `{probe.terminal_verdict.value}`",
-        "- **All 6 Approved Non-Protected Month Partitions:** Verified present as regular `.parquet` files (`PRESENT_METADATA_ONLY`).",
+        (
+            "- **All 6 Approved Non-Protected Month Partitions:** "
+            "Verified present as regular `.parquet` files (`PRESENT_METADATA_ONLY`)."
+        ),
         "- **Real Data Body Bytes Read:** Exactly `0` bytes (strict zero-open policy enforced).",
-        "- **Ancestor Integrity:** Verified all ancestors from `/root` down to `Quant-agent/data/research/BTCUSDT` are physical directories, non-symlinks.",
-        "- **Zero Protected Access:** Zero stats, zero directory listings, and zero accesses to `year=2026`, `forward/`, or `h39_validation/`.",
-        "- **P2 Source Admission Status:** **NOT ADMITTED**. Metadata presence confirms physical location only; empirical source admission, P3 preregistration, P4 market body access, and live trading remain strictly blocked pending future Controller decisions.",
+        (
+            "- **Ancestor Integrity:** Verified all ancestors from `/root` down to "
+            "`Quant-agent/data/research/BTCUSDT` are physical directories, non-symlinks."
+        ),
+        (
+            "- **Zero Protected Access:** Zero stats, zero directory listings, and zero accesses to "
+            "`year=2026`, `forward/`, or `h39_validation/`."
+        ),
+        (
+            "- **P2 Source Admission Status:** **NOT ADMITTED**. Metadata presence confirms physical location only; "
+            "empirical source admission, P3 preregistration, P4 market body access, and live trading remain strictly "
+            "blocked pending future Controller decisions."
+        ),
         "",
         "---",
         "",
@@ -88,19 +124,37 @@ def generate_report_markdown(
         "| Metric | Limit / Cap | Actual Consumed | Safety Status |",
         "| :--- | :--- | :--- | :--- |",
         f"| **Max `lstat` Calls** | {MAX_LSTAT} | {probe.counters.lstat_calls} | **PASSED** (within bound) |",
-        f"| **Max Selected Month Scandir** | {MAX_SELECTED_DIR_LIST} | {probe.counters.dir_list_calls} | **PASSED** (within bound) |",
-        f"| **Max Entries Per Scandir** | {MAX_SELECTED_DIR_ENTRIES} | {probe.counters.dir_entries_scanned} | **PASSED** (within bound) |",
-        f"| **Max Real Data Body Bytes Read** | {MAX_REAL_DATA_BODY_BYTES} | {probe.counters.real_data_body_bytes_read} | **STRICT ZERO** |",
+        (
+            f"| **Max Selected Month Scandir** | {MAX_SELECTED_DIR_LIST} | "
+            f"{probe.counters.dir_list_calls} | **PASSED** (within bound) |"
+        ),
+        (
+            f"| **Max Entries Per Scandir** | {MAX_SELECTED_DIR_ENTRIES} | "
+            f"{probe.counters.dir_entries_scanned} | **PASSED** (within bound) |"
+        ),
+        (
+            f"| **Max Real Data Body Bytes Read** | {MAX_REAL_DATA_BODY_BYTES} | "
+            f"{probe.counters.real_data_body_bytes_read} | **STRICT ZERO** |"
+        ),
         f"| **Max Symlink Follow** | {MAX_SYMLINK_FOLLOW} | {probe.counters.symlinks_followed} | **STRICT ZERO** |",
-        f"| **Protected File / Dir Accesses** | {MAX_PROTECTED_BODY_OR_PARTITION_FILE_ACCESSES} | {probe.counters.protected_body_or_partition_accesses} | **STRICT ZERO** |",
-        f"| **Remote Market API Calls** | {MAX_REMOTE_MARKET_CALLS} | {probe.counters.remote_market_calls} | **STRICT ZERO** |",
+        (
+            f"| **Protected File / Dir Accesses** | {MAX_PROTECTED_BODY_OR_PARTITION_FILE_ACCESSES} | "
+            f"{probe.counters.protected_body_or_partition_accesses} | **STRICT ZERO** |"
+        ),
+        (
+            f"| **Remote Market API Calls** | {MAX_REMOTE_MARKET_CALLS} | "
+            f"{probe.counters.remote_market_calls} | **STRICT ZERO** |"
+        ),
         f"| **Wall Clock Duration** | Bounded | {probe.counters.wall_clock_seconds:.4f} s | **PASSED** |",
         "",
         "---",
         "",
         "## 3. Ancestor Hierarchy Provenance (Stat-Only, No Follow)",
         "",
-        "Every ancestor directory between `/root` and `Quant-agent/data/research/BTCUSDT` was stat-checked without following symlinks:",
+        (
+            "Every ancestor directory between `/root` and `Quant-agent/data/research/BTCUSDT` "
+            "was stat-checked without following symlinks:"
+        ),
         "",
         "| Ancestor Path | Exists | Is Dir | Is Symlink | Mode | Dev | Inode |",
         "| :--- | :--- | :--- | :--- | :--- | :--- | :--- |",
@@ -118,8 +172,7 @@ def generate_report_markdown(
         "",
         "## 4. Candidate-Month × File-Existence Matrix (6 Approved BTC Months)",
         "",
-        "Only the six authorized non-protected month directories (2021, 2023, 2025 March & April) were probed. "
-        "Zero other months or years were touched.",
+        candidate_month_desc,
         "",
         "| Partition | Relative Directory | Parquet File Name | File Size (Bytes) | Mode | Verification Status |",
         "| :--- | :--- | :--- | :--- | :--- | :--- |",
@@ -205,11 +258,7 @@ def generate_report_markdown(
         "",
         "## 9. Conclusion and Next Controller Decision",
         "",
-        f"This verification confirms that the owner-supplied data root `{probe.data_root}` physically exists in WSL "
-        "and contains the expected directory layout and file metadata for the six authorized non-protected BTC partitions. "
-        "No protected data was accessed, no file bodies were opened, and no symlinks were traversed. "
-        f"Terminal verdict is strictly `{probe.terminal_verdict.value}`. "
-        "Empirical source admission and trading execution authority remain reserved for subsequent Controller determination.",
+        conclusion_text,
         "",
     ])
 
@@ -225,6 +274,12 @@ def run_cli() -> int:
         help="Path to owner WSL data root",
     )
     parser.add_argument(
+        "--allow-custom-root",
+        action="store_true",
+        default=False,
+        help="Permit custom data root (intended for synthetic test fixtures)",
+    )
+    parser.add_argument(
         "--out-dir-evidence",
         default="evidence/v0.6/b_line/p2_owner_root_metadata_r1",
         help="Directory to save evidence JSON artifacts",
@@ -237,7 +292,9 @@ def run_cli() -> int:
 
     args = parser.parse_args()
 
-    probe = OwnerRootProbe(data_root=args.data_root)
+    # In production, only DEFAULT_OWNER_WSL_DATA_ROOT is allowed
+    is_custom = args.allow_custom_root or (args.data_root != DEFAULT_OWNER_WSL_DATA_ROOT)
+    probe = OwnerRootProbe(data_root=args.data_root, allow_custom_root=is_custom)
     verdict = probe.execute()
 
     # Build matrices
@@ -255,7 +312,7 @@ def run_cli() -> int:
             script_hashes[rel_sf] = compute_file_sha256(full_sf)
 
     # Prepare receipt JSON
-    now_iso = datetime.now(timezone.utc).isoformat()
+    now_iso = datetime.now(UTC).isoformat()
     scan_receipt = {
         "schema_version": "P2_OWNER_ROOT_EXACT_SCAN_RECEIPT_V1",
         "task_id": TASK_ID,
@@ -298,7 +355,7 @@ def run_cli() -> int:
     with open(report_path, "w", encoding="utf-8") as f:
         f.write(report_md)
 
-    print(f"P2 Verification completed successfully.")
+    print("P2 Verification completed successfully.")
     print(f"Terminal verdict: {verdict.value}")
     print(f"Wrote receipt to: {receipt_path}")
     print(f"Wrote matrix to: {matrix_path}")

@@ -8,8 +8,8 @@ from .config import (
     CONTROLLER_DISPATCH_SHA,
     PROMPT_PINNED_SHA,
     TASK_ID,
-    MonthPartitionObservation,
     AdditionalTargetObservation,
+    MonthPartitionObservation,
 )
 
 

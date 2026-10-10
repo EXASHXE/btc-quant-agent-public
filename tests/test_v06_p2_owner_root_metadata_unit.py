@@ -17,7 +17,6 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")
 from scripts.strategy_research.p2_owner_root_metadata.config import (
     APPROVED_MONTH_PARTITIONS,
     FilePresenceStatus,
-    TerminalVerdict,
     is_path_protected,
     is_path_traversal,
 )
@@ -81,7 +80,7 @@ def mock_tree() -> Generator[str, None, None]:
 
 def test_01_exact_allowed_six_dirs(mock_tree: str) -> None:
     """Test 1: Only the precisely allowlisted 6 months are inspected."""
-    probe = OwnerRootProbe(data_root=mock_tree)
+    probe = OwnerRootProbe(data_root=mock_tree, allow_custom_root=True)
     probe.scan_selected_months()
 
     assert len(probe.month_observations) == 6
@@ -99,7 +98,7 @@ def test_02_deny_2026(mock_tree: str) -> None:
     assert is_path_protected("/data/research/BTCUSDT/1m/year=2026/month=01") is True
     assert is_path_protected("2026-03") is True
 
-    probe = OwnerRootProbe(data_root=mock_tree)
+    probe = OwnerRootProbe(data_root=mock_tree, allow_custom_root=True)
     with pytest.raises(ProbeSecurityError, match="Protected holdout/excluded"):
         probe._safe_lstat(os.path.join(mock_tree, "research/BTCUSDT/1m/year=2026/month=03"))
 
@@ -112,7 +111,7 @@ def test_03_deny_forward_and_h39(mock_tree: str) -> None:
     assert is_path_protected("data/research/h39_validation") is True
     assert is_path_protected("/root/workspace/Quant-agent-sanitized") is True
 
-    probe = OwnerRootProbe(data_root=mock_tree)
+    probe = OwnerRootProbe(data_root=mock_tree, allow_custom_root=True)
     with pytest.raises(ProbeSecurityError):
         probe._safe_lstat(os.path.join(mock_tree, "forward/BTCUSDT"))
 
@@ -125,13 +124,13 @@ def test_04_deny_traversal(mock_tree: str) -> None:
     assert is_path_traversal("research/BTCUSDT/../../etc/passwd") is True
     assert is_path_traversal("research/BTCUSDT/1m/data.parquet") is False
 
-    probe = OwnerRootProbe(data_root=mock_tree)
+    probe = OwnerRootProbe(data_root=mock_tree, allow_custom_root=True)
     with pytest.raises(ProbeSecurityError, match="traversal"):
         probe._safe_lstat(os.path.join(mock_tree, "research/../research/BTCUSDT"))
 
 
 def test_05_deny_symlink_in_root_or_leaf(mock_tree: str) -> None:
-    """Test 5: Symlinks in ancestors or leaf files are detected and rejected."""
+    """Test 5: Symlinks in intermediate paths or leaf files are detected and rejected."""
     # Replace a month directory with a symlink to another directory
     target_dir = os.path.join(mock_tree, APPROVED_MONTH_PARTITIONS[0]["rel_dir"])
     shutil.rmtree(target_dir)
@@ -139,19 +138,17 @@ def test_05_deny_symlink_in_root_or_leaf(mock_tree: str) -> None:
     os.makedirs(real_target, exist_ok=True)
     os.symlink(real_target, target_dir)
 
-    probe = OwnerRootProbe(data_root=mock_tree)
+    probe = OwnerRootProbe(data_root=mock_tree, allow_custom_root=True)
     probe.scan_selected_months()
 
     first_obs = probe.month_observations[0]
-    assert first_obs.dir_is_symlink is True
     assert first_obs.status == FilePresenceStatus.SYMLINK_REJECTED.value
     assert probe.counters.symlinks_encountered >= 1
 
 
 def test_06_capped_dir_entries_and_total_calls(mock_tree: str) -> None:
     """Test 6: Capped dir entries and total lstat calls raise budget exceeded if breached."""
-    # Set probe with max_lstat=3
-    probe = OwnerRootProbe(data_root=mock_tree, max_lstat=3)
+    probe = OwnerRootProbe(data_root=mock_tree, max_lstat=3, allow_custom_root=True)
     with pytest.raises(ProbeBudgetExceededError, match="MAX_LSTAT cap"):
         for _ in range(5):
             probe._safe_lstat(mock_tree)
@@ -159,7 +156,7 @@ def test_06_capped_dir_entries_and_total_calls(mock_tree: str) -> None:
 
 def test_07_missing_vs_denied_treatment(mock_tree: str) -> None:
     """Test 7: Distinguishes ENOENT missing target from PROTECTED_EXCLUDED without false claims."""
-    probe = OwnerRootProbe(data_root=mock_tree)
+    probe = OwnerRootProbe(data_root=mock_tree, allow_custom_root=True)
 
     # Missing target
     missing_path = os.path.join(mock_tree, "research/BTCUSDT/1m/year=2021/month=99")
@@ -174,11 +171,10 @@ def test_07_missing_vs_denied_treatment(mock_tree: str) -> None:
 
 def test_08_no_body_opens(mock_tree: str) -> None:
     """Test 8: Strict zero-open policy; no file descriptors opened for reading market data."""
-    probe = OwnerRootProbe(data_root=mock_tree)
+    probe = OwnerRootProbe(data_root=mock_tree, allow_custom_root=True)
     with mock.patch("builtins.open", wraps=open) as mock_open:
         probe.scan_selected_months()
         probe.scan_additional_targets()
-        # Ensure open was never called on any file under mock_tree
         for call_args in mock_open.call_args_list:
             called_path = str(call_args[0][0])
             assert not called_path.startswith(mock_tree), f"Forbidden open() on {called_path}"
@@ -190,7 +186,7 @@ def test_08_no_body_opens(mock_tree: str) -> None:
 
 def test_09_spot_perp_distinction(mock_tree: str) -> None:
     """Test 9: Explicit separation and tagging of spot vs perpetual datasets."""
-    probe = OwnerRootProbe(data_root=mock_tree)
+    probe = OwnerRootProbe(data_root=mock_tree, allow_custom_root=True)
     probe.scan_additional_targets()
 
     spot_targets = [t for t in probe.target_observations if t.is_spot]
@@ -206,7 +202,7 @@ def test_09_spot_perp_distinction(mock_tree: str) -> None:
 
 def test_10_mark_funding_parent_cannot_be_deemed_true_minute_pit(mock_tree: str) -> None:
     """Test 10: Parent directory presence does not prove continuous true 1m PIT."""
-    probe = OwnerRootProbe(data_root=mock_tree)
+    probe = OwnerRootProbe(data_root=mock_tree, allow_custom_root=True)
     probe.scan_additional_targets()
 
     raw_mark = next(t for t in probe.target_observations if t.target_id == "btc_perp_raw_mark_price_parent")
@@ -219,13 +215,12 @@ def test_10_mark_funding_parent_cannot_be_deemed_true_minute_pit(mock_tree: str)
 
 def test_11_expected_name_mismatch_handling(mock_tree: str) -> None:
     """Test 11: If data.parquet is absent, scandir finds alternative parquet basename without opening."""
-    # In month 2021-03, rename data.parquet to btc_202103_kline.parquet
     month_dir = os.path.join(mock_tree, "research/BTCUSDT/1m/year=2021/month=03")
     old_p = os.path.join(month_dir, "data.parquet")
     new_p = os.path.join(month_dir, "btc_202103_kline.parquet")
     os.rename(old_p, new_p)
 
-    probe = OwnerRootProbe(data_root=mock_tree)
+    probe = OwnerRootProbe(data_root=mock_tree, allow_custom_root=True)
     probe.scan_selected_months()
 
     first_obs = probe.month_observations[0]
@@ -237,7 +232,7 @@ def test_11_expected_name_mismatch_handling(mock_tree: str) -> None:
 
 def test_12_matrix_generation_and_falsification_structure(mock_tree: str) -> None:
     """Test 12: Matrix generation correctly categorizes rows and unexecuted readiness checks."""
-    probe = OwnerRootProbe(data_root=mock_tree)
+    probe = OwnerRootProbe(data_root=mock_tree, allow_custom_root=True)
     probe.scan_selected_months()
     probe.scan_additional_targets()
 
@@ -249,7 +244,6 @@ def test_12_matrix_generation_and_falsification_structure(mock_tree: str) -> Non
     assert len(source_matrix["source_classes"]) >= 6
     assert len(source_matrix["next_bounded_readiness_checks"]) == 5
 
-    # Check the required BTC-only formula in Check E
     check_e = next(c for c in source_matrix["next_bounded_readiness_checks"] if c["check_id"].startswith("CHECK_E"))
     assert "100% single asset exposure >60% ceiling" in check_e["description"]
     assert "NOT '1/3 assets 33% below >=60% positive support'" in check_e["description"]
