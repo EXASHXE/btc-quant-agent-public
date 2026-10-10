@@ -1,0 +1,77 @@
+{
+  "decision_at_utc": "2026-10-10T19:23:32.433350+00:00",
+  "freeze_sha": "644f573c3d982ef97fc4317018eaa349fa403796",
+  "promoted_ids": [],
+  "ranking": [
+    {
+      "candidate": "FLOW_ABSORPTION_REVERSAL_08H",
+      "gate_failures": [
+        "TRADE_SUPPORT",
+        "YEAR_SUPPORT",
+        "MONTH_SUPPORT",
+        "INSUFFICIENT_NONNEGATIVE_YEARS"
+      ],
+      "ranking_score": 2.915659700000184
+    },
+    {
+      "candidate": "VOL_COMPRESSION_RELEASE_12H",
+      "gate_failures": [
+        "TRADE_SUPPORT",
+        "YEAR_SUPPORT",
+        "MONTH_SUPPORT",
+        "NONPOSITIVE_EQUAL_YEAR_NET",
+        "INSUFFICIENT_NONNEGATIVE_YEARS",
+        "NET_PROFIT_FACTOR"
+      ],
+      "ranking_score": -18.27916751085922
+    },
+    {
+      "candidate": "FLOW_CONFIRMED_TREND_08H",
+      "gate_failures": [
+        "TRADE_SUPPORT",
+        "NONPOSITIVE_EQUAL_YEAR_NET",
+        "INSUFFICIENT_NONNEGATIVE_YEARS",
+        "NET_PROFIT_FACTOR"
+      ],
+      "ranking_score": -19.768496881683635
+    },
+    {
+      "candidate": "LOW_ER_RANGE_REENTRY_04H",
+      "gate_failures": [
+        "NONPOSITIVE_EQUAL_YEAR_NET",
+        "NONPOSITIVE_PAIRED_INCREMENT",
+        "INSUFFICIENT_NONNEGATIVE_YEARS",
+        "NET_PROFIT_FACTOR"
+      ],
+      "ranking_score": -40.60778524489429
+    },
+    {
+      "candidate": "EXHAUSTION_FADE_04H",
+      "gate_failures": [
+        "TRADE_SUPPORT",
+        "MONTH_SUPPORT",
+        "NONPOSITIVE_EQUAL_YEAR_NET",
+        "NONPOSITIVE_PAIRED_INCREMENT",
+        "INSUFFICIENT_NONNEGATIVE_YEARS",
+        "NET_PROFIT_FACTOR"
+      ],
+      "ranking_score": -114.06812736370865
+    },
+    {
+      "candidate": "SUSTAINED_FLOW_24H",
+      "gate_failures": [
+        "TRADE_SUPPORT",
+        "MONTH_SUPPORT",
+        "NONPOSITIVE_EQUAL_YEAR_NET",
+        "NONPOSITIVE_PAIRED_INCREMENT",
+        "INSUFFICIENT_NONNEGATIVE_YEARS",
+        "NET_PROFIT_FACTOR"
+      ],
+      "ranking_score": -165.6397665558598
+    }
+  ],
+  "reserved_action": "DO_NOT_STAT_DOWNLOAD_READ_RESERVED_MONTHS",
+  "results_sha256": "d8ef8b8903fe18da6175aa10da2cae6b5bb0737525b1a431e1a98c5a42b86a44",
+  "stage": "DEVELOPMENT",
+  "terminal": "DEVELOPMENT_NO_GO"
+}
