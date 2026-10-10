@@ -1648,7 +1648,7 @@
     "stop_policy": "NO_AUTO_ALTERNATIVE_ENGINE_PATCHES_REAUDIT_OR_ANOTHER_ENGINE_UNDER_THIS_CAMPAIGN"
   },
   "v06_postp1_parallel_p2_metadata_and_r4_opportunity_science_r1": {
-    "status": "TWO_INDEPENDENT_TASKS_CONTROLLER_DISPATCHED_NOT_EXECUTED",
+    "status": "BOTH_DELIVERED_CONTROLLER_L2_ACCEPTED_AS_BOUNDED_EVIDENCE_JOINT_SOURCE_BLOCKED_NO_PREREG",
     "controller_dispatch_sha": "858735e0ae81b1ca0ced8cfa4c2e9ee5d01532e2",
     "controller_dispatch_path": "reviews/v0.6/b_line/V06_POST_P1_TERMINAL_PARALLEL_P2_METADATA_AND_OPPORTUNITY_SCIENCE_CONTROLLER_DISPATCH_R1.md",
     "start_code_sha": "e0ff8c3473de4bfa3e66fe7928d42992a4d38a32",
@@ -1659,7 +1659,7 @@
       "worktree": "/root/workspace/project/quant-v0.6/postp1-gemini-p2-metadata-r1",
       "pinned_prompt_sha": "fd47ff5c6b534a6f66925e5f984fe630e9ff0702",
       "prompt_path": "prompts/v0.6/b_line/V06_POST_P1_GEMINI_LONG_P2_METADATA_ROOT_AND_SOURCE_READINESS_R1.md",
-      "stage": "NOT_EXECUTED",
+      "stage": "DELIVERED_CONTROLLER_METADATA_ONLY_ACCEPTED_ROOT_UNKNOWN",
       "bounds": {
         "max_depth": 5,
         "max_dir_entries": 1500,
@@ -1669,7 +1669,23 @@
         "real_market_body_bytes": 0,
         "protected_partition_access": 0
       },
-      "source_authority": "METADATA_ONLY_NOT_P2_ADMISSION"
+      "source_authority": "METADATA_ONLY_NOT_P2_ADMISSION",
+      "final_remote_sha": "1e12d6a6467d3bc39c0deedd97204604ac623f18",
+      "final_parent_sha": "e0ff8c3473de4bfa3e66fe7928d42992a4d38a32",
+      "terminal": "P2_LOCAL_ROOT_UNKNOWN_WITH_BOUNDED_NEGATIVE_EVIDENCE",
+      "ci": "FAIL_2805_PASS_1_INHERITED_H40_GOLDEN_2_SKIP_9_WARN",
+      "ci_url": "https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/37973725403",
+      "results": {
+        "scanned_directory_entries": 73,
+        "lstat_calls": 34,
+        "selected_partition_lstat": 12,
+        "source_matrix_cells": 90,
+        "source_matrix_cells_unknown": 90,
+        "confirmed_root": null,
+        "local_tests": 21,
+        "real_market_body_bytes": 0
+      },
+      "controller_erratum": "FROZEN_SINGLE_ASSET_EXPOSURE_MAX_60PCT; BTC_ONLY_SINGLE_ASSET=100PCT_NOT_33PCT_AS_GEMINI_REPORTED; BTC_ONLY_DIAGNOSTIC_MAY_BE_SEPARATELY_AUTHORIZED_WITHOUT_POSITIVE_CLAIM"
     },
     "sol_high": {
       "task_id": "V06_POST_P1_SOL_HIGH_LONG_OPPORTUNITY_SCIENCE_AND_MEASUREMENT_REPLAN_R1",
@@ -1678,12 +1694,34 @@
       "worktree": "/root/workspace/project/quant-v0.6/postp1-sol61-opportunity-science-r1",
       "pinned_prompt_sha": "d029a8f974c3809652f6a54c0f99dc1c7abfebc6",
       "prompt_path": "prompts/v0.6/b_line/V06_POST_P1_SOL_HIGH_LONG_OPPORTUNITY_SCIENCE_AND_MEASUREMENT_REPLAN_R1.md",
-      "stage": "NOT_EXECUTED",
+      "stage": "DELIVERED_CONTROLLER_CONDITIONAL_OUTCOME_BLIND_SCIENCE_DESIGN_ACCEPTED",
       "deterministic_synthetic_payoff_case_min": 64,
       "adversarial_mutations_min": 12,
       "new_proposed_hypotheses_max": 4,
       "original_eight_unchanged": true,
-      "alpha_authority": "NONE"
+      "alpha_authority": "NONE",
+      "final_remote_sha": "5032259954e001635c97110c9c50e4a35a2c95b5",
+      "final_parent_sha": "e0ff8c3473de4bfa3e66fe7928d42992a4d38a32",
+      "terminal": "R4_SCIENCE_PRIORITIES_DESIGNED_PENDING_CONTROLLER_AND_P2",
+      "ci": "FAIL_2992_PASS_1_INHERITED_H40_GOLDEN_2_SKIP_9_WARN",
+      "ci_url": "https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/37975072212",
+      "results": {
+        "original_eight_unchanged": 8,
+        "new_hypotheses_unfrozen": 3,
+        "source_blocked_hypotheses": 11,
+        "actual_synthetic_payoff_cases": 140,
+        "mutation_checks": 16,
+        "mechanism_falsifiers": 14,
+        "mean_power": 18,
+        "proportion": 8,
+        "dependence": 6,
+        "focused_tests_per_python_version": 208,
+        "conditional_rankings": 9,
+        "leave_one_out_rankings": 54,
+        "top4_membership_changes": 21
+      },
+      "controller_design_acceptance": "SCIENCE_PRIORITIES_AND_SYNTHETIC_ALGEBRA_ONLY_NO_REAL_MARKET_PREDICTIVE_EFFICACY",
+      "preferred_measurement": "B_DUAL_SPECIALIZED_ACCOUNTING_PIT_ORACLE_DESIGN_ONLY_NOT_IMPLEMENTATION"
     },
     "reuse_frozen_eight_sha": "e5b2006a89441f7eb2ec900e508aff451106b87a",
     "prior_p2_evidence_sha": "7f96369b1209ffdaca5d7f1233c2c9c0ae17ae29",
@@ -1698,6 +1736,10 @@
     "shared_file_write_overlap": 0,
     "cross_worker_dependency": "NONE_UNTIL_FINAL_CONTROLLER_RECONCILIATION",
     "controller_next_gate": "AFTER_BOTH_REMOTE_PUSH_INDEPENDENT_IDENTITY_CI_EVIDENCE_AND_COMPATIBILITY_ACCEPTANCE",
-    "no_new_engine_implementation": true
+    "no_new_engine_implementation": true,
+    "controller_joint_adjudication_sha": "60850bd6292691392fd594007ea78de21ae71d24",
+    "controller_joint_adjudication_path": "reviews/v0.6/b_line/V06_POST_P1_GEMINI_P2_AND_SOL_R4_PARALLEL_CONTROLLER_L2_COMPATIBILITY_AND_SOURCE_BLOCK_R1.md",
+    "joint_decision": "SOURCE_BLOCKED_NO_PREREG",
+    "next_required_fact": "EXACT_OWNER_CANONICAL_ROOT_BINDING_OR_REMOTE_SOURCE_CONFIRMED; NO_AUTOMATIC_RESCAN"
   }
 }
