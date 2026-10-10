@@ -1976,7 +1976,7 @@
   },
   "v06_p2_s3a_singlefile_footer_reader_prospective_build_r1": {
     "decision": "AUTHORIZE_S3A_INDEPENDENT_REAL_FD_READER_IMPLEMENTATION_AND_SYNTHETIC_QA_ONLY__NO_OWNER_MARKET_FILESYSTEM_ACCESS__NO_REAL_FOOTER_READ",
-    "status": "GEMINI_S3A_R2_PUSHED_CI_GREEN__CONTROLLER_FROZEN_SECURITY_BUDGET_HOLD__CODEX_SOL_INDEPENDENT_AUDIT_DISPATCHED",
+    "status": "CODEX_NATIVE_INDEPENDENT_AUDIT_FAIL_HARD_CONTROLLER_ACCEPTED__ONE_SHOT_CODEX_R3_SYNTHETIC_IMPL_DISPATCHED",
     "dispatch_sha": "e150be89bef2540a4aebe7b11e921dd25104fe16",
     "dispatch_path": "reviews/v0.6/b_line/V06_P2_S3_SINGLE_NONPROTECTED_PARQUET_FOOTER_READER_PROSPECTIVE_BUILD_DISPATCH_R1.md",
     "gemini_prompt_sha": "559a56cef42e272c144c40876c2ba9e88f3ddeeb",
@@ -2058,6 +2058,36 @@
     "codex_s3a_audit_status": "BRANCH_CREATED__NOT_EXECUTED",
     "real_owner_root_content_permission": "NONE",
     "real_owner_root_metadata_permission": "NONE",
-    "reader_production_acceptance": "NONE_SECURITY_HOLD"
+    "reader_production_acceptance": "NONE_SECURITY_FAIL_HARD",
+    "codex_s3a_audit_final_sha": "91bf48e007dc36239a79ec38ce01f4f77abadc4c",
+    "codex_s3a_audit_exact_parent_sha": "999cf7005c741bdbabae727f10f90f23330fb035",
+    "codex_s3a_audit_changed_paths": 9,
+    "codex_s3a_audit_terminal": "S3A_CODEX_INDEPENDENT_AUDIT_FAIL_HARD_SYSCALL_ACCOUNTING_OR_ROOT_ISOLATION",
+    "codex_s3a_audit_ci_url": "https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/38046696680",
+    "codex_s3a_audit_ci": "FAIL_2868_PASS_4_FAIL_2_SKIP_36_WARN; THREE_CODE_BRANCH_REVIEWS_DIRECTORY_TEST_FAIL_AND_ONE_INHERITED_H40_HASH_MISMATCH",
+    "codex_s3a_audit_native_deep_cap100": {
+      "reported_attempts": 27,
+      "actual_kernel_attempts": 144,
+      "decision": "ALLOWED_SINGLE_FILE_FOOTER_SCHEMA_PARSED",
+      "falsifies_hard_budget": true
+    },
+    "codex_s3a_audit_native_shallow_cap100": {
+      "reported_attempts": 27,
+      "actual_kernel_attempts": 36
+    },
+    "codex_s3a_audit_fd_cleanup": "TWO_SYNTHETIC_CLOSE_FAULTS_LEFT_REAL_NATIVE_FD_OPEN_DESPITE_TRACKED_COUNT_ZERO",
+    "codex_s3a_audit_provenance": "R2_MACHINE_ALL_13_SIZES_MATCH_ORIGINAL; R2_PROSE_SECTION4_3_INCORRECT_MANIFEST_475_VS45234_FUNDING_424781_VS219066_PATHS_UNKNOWN",
+    "controller_codex_audit_final_decision_sha": "63f21db61980c209a90a5585375f761bf842bfaa",
+    "controller_codex_audit_final_decision_path": "reviews/v0.6/b_line/V06_P2_S3A_CODEX_NATIVE_AUDIT_CONTROLLER_FINAL_FAIL_AND_ONE_SHOT_R3_DISPATCH.md",
+    "code_branch_reviews_directory_rule": "FORBIDDEN__TRIGGERED_THREE_SCOPED_SURFACE_TEST_FAILURES",
+    "codex_one_shot_r3_prompt_sha": "d194497342076b9cafd24fa94a54e32186c65f06",
+    "codex_one_shot_r3_prompt_path": "prompts/v0.6/b_line/V06_P2_S3A_CODEX_SOL_HIGH_ONE_SHOT_NATIVE_SYSCALL_FD_CLEANUP_REDESIGN_R3.md",
+    "codex_one_shot_r3_dispatch_sha": "63f21db61980c209a90a5585375f761bf842bfaa",
+    "codex_one_shot_r3_task_id": "V06_P2_S3A_CODEX_ONE_SHOT_NATIVE_FS_ACCOUNTING_AND_FD_CLEANUP_CORRECTNESS_R3",
+    "codex_one_shot_r3_branch": "feature/v06-bline-p2-s3a-codex-one-shot-fd-r3",
+    "codex_one_shot_r3_worktree": "/root/workspace/project/quant-v0.6/p2-s3a-codex-one-shot-fd-r3",
+    "codex_one_shot_r3_exact_start_sha": "999cf7005c741bdbabae727f10f90f23330fb035",
+    "codex_one_shot_r3_status": "BRANCH_CREATED_NOT_EXECUTED_ONE_FINITE_ATTEMPT",
+    "codex_one_shot_r3_failure_policy": "TERMINATE_CURRENT_S3_READER_TOOL_ROUTE_NOT_ANOTHER_GEMINI_R4"
   }
 }
