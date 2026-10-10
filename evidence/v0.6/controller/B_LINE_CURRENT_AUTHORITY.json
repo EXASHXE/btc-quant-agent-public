@@ -2167,5 +2167,36 @@
     "protected_2026": "NO_ACCESS",
     "empirical_grade": "EXPLORATORY_NOT_PRISTINE_OOS_NOT_REAL_MARK_FUNDING",
     "p3_p4_testnet_live_real_funds": "NONE"
+  },
+  "v06_g2_two_gemini_goal_development_exploration_r1": {
+    "status": "TWO_INDEPENDENT_BRANCHES_AND_COMPLETE_PROMPTS_PUBLISHED_NOT_EXECUTED",
+    "controller_decision": "AUTHORIZE_TWO_PARALLEL_GEMINI_GOAL_DEV_DISCOVERY_ONLY__SPLIT_MECHANISMS__FINITE_EXPERIMENT_BUDGET__HOLDOUT_SEALED__NO_CI_BLOCK",
+    "controller_dispatch_sha": "6c6ff831868701cea05499d0b0adb0e62db67f0e",
+    "reference_r1_empirical_sha": "920b244d06541da5cb9fc3dcaa39e5b15e914d32",
+    "agent_a": {
+      "task_id": "V06_G2_GEMINI_GOAL_A_TREND_FLOW_MULTI_WAVE_DISCOVERY_R1",
+      "branch": "feature/v06-bline-gemini-goal-trend-flow-r1",
+      "start_sha": "920b244d06541da5cb9fc3dcaa39e5b15e914d32",
+      "prompt_sha": "c7839dae08ae5af136617b21d5de0337551ae2d0",
+      "worktree": "/root/workspace/project/quant-v0.6/gemini-goal-trend-flow-r1",
+      "role": "BTC_TREND_FLOW_4_24H_DEVELOPMENT"
+    },
+    "agent_b": {
+      "task_id": "V06_G2_GEMINI_GOAL_B_RANGE_REVERSAL_VOL_MULTI_WAVE_DISCOVERY_R1",
+      "branch": "feature/v06-bline-gemini-goal-range-reversal-r1",
+      "start_sha": "920b244d06541da5cb9fc3dcaa39e5b15e914d32",
+      "prompt_sha": "e2101b58556a660e504cfdef66d33a64b42d9c21",
+      "worktree": "/root/workspace/project/quant-v0.6/gemini-goal-range-reversal-r1",
+      "role": "BTC_RANGE_REVERSAL_VOL_4_24H_DEVELOPMENT"
+    },
+    "goal_loop": "CONTINUE_THROUGH_4_WAVES_UNLESS_STRICT_PROMOTABLE_DEV_HYPOTHESIS_OR_REAL_BLOCKER; EACH_AGENT_MAX_24_TRIALS; BOTH_MAX_48; NO_UNBOUNDED_CURVE_FIT",
+    "development_source_window": "BINANCE_OFFICIAL_VISION_BTCUSDT_USDM_1M_2021_2023_ONLY",
+    "reserved_2024_2025_2026_market_body_reads": "FORBIDDEN_NO_CONSUMPTION",
+    "costs": "22_BP_BASE_44_BP_STRESS_ADVERSE_FUNDING_SENSITIVITY",
+    "research_status": "DEVELOPMENT_ONLY_NOT_CONFIRMED_ALPHA",
+    "real_owner_data_access": "NONE",
+    "s3a_ci_repair": "PAUSED",
+    "codex_r2_independent": "NO_GIT_OR_WORKTREE_INTERFERENCE",
+    "p3_p4_testnet_live": "NONE"
   }
 }
