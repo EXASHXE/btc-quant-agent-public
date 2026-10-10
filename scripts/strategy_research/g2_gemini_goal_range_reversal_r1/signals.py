@@ -1591,4 +1591,490 @@ def generate_wave_signals(data: np.ndarray, registry: dict) -> dict[str, list[di
                         )
                     )
 
+    # --- WAVE 4 CANDIDATES ---
+    if any(k.startswith("W4_") for k in by_id):
+        atr15_14 = _atr_fast(q15, 14)
+        atr15_48 = _atr_fast(q15, 48)
+        atr15_192 = _atr_fast(q15, 192)
+        close_sma96 = _sma_fast(q15["close"], 96)
+        vol1_sma20 = _sma_fast(h1["volume"], 20)
+        sfr4 = f4["signed_flow_ratio"]
+
+        vol2 = _sma_fast(q15["volume"], 2) * 2.0
+        sf2 = _sma_fast(q15["signed_flow"], 2) * 2.0
+        taker_imb_2 = np.divide(sf2, vol2, out=np.zeros_like(sf2), where=vol2 > 0)
+
+        vol4_15 = _sma_fast(q15["volume"], 4) * 4.0
+        sf4_15 = _sma_fast(q15["signed_flow"], 4) * 4.0
+        taker_imb_4 = np.divide(sf4_15, vol4_15, out=np.zeros_like(sf4_15), where=vol4_15 > 0)
+
+        def _clamp_stop_w4(close_px: float, side_val: int, raw_dist: float, min_bps: float = 45.0) -> float:
+            dist = min(max(raw_dist, (min_bps / 10_000.0) * close_px), 0.0240 * close_px)
+            return close_px - side_val * dist
+
+        # 1. W4_C01_WIDE_72H_RECLAIM_DYNAMIC_MIDLINE_12H
+        if "W4_C01_WIDE_72H_RECLAIM_DYNAMIC_MIDLINE_12H" in by_id:
+            cid = "W4_C01_WIDE_72H_RECLAIM_DYNAMIC_MIDLINE_12H"
+            row = by_id[cid]
+            horizon = int(row.get("holding_horizon_hours", 12))
+            for k in range(292, len(q15["end_ms"])):
+                end = int(q15["end_ms"][k])
+                if end % HOUR_MS != 0:
+                    continue
+                h = _last_complete(h1["end_ms"], end)
+                j = _last_complete(f4["end_ms"], end)
+                if j < 59 or h < 20:
+                    continue
+                close = q15["close"][k]
+                a15 = atr15_14[k]
+                a1h = atr1_20[h]
+                if not (
+                    np.isfinite(a15)
+                    and a15 > 0
+                    and _eligible_vol(close, a1h)
+                    and 10_000.0 * a1h / close >= 55.0
+                ):
+                    continue
+                hi_72h = float(np.max(q15["high"][k - 291 : k - 3]))
+                lo_72h = float(np.min(q15["low"][k - 291 : k - 3]))
+                width_bps = (hi_72h - lo_72h) / lo_72h * 10_000.0
+                if not (240.0 <= width_bps <= 1300.0):
+                    continue
+                sweep_lo = float(np.min(q15["low"][k - 3 : k + 1]))
+                sweep_hi = float(np.max(q15["high"][k - 3 : k + 1]))
+                ret_1h = close - q15["open"][k - 3]
+                if (
+                    sweep_lo < lo_72h
+                    and close >= lo_72h + 0.30 * a15
+                    and ret_1h > 0
+                    and taker_imb_4[k] >= 0.0
+                ):
+                    stop = _clamp_stop_w4(close, 1, 3.0 * a15, 45.0)
+                    output[cid].append(
+                        _make_event(
+                            cid,
+                            row["family"],
+                            horizon,
+                            1,
+                            end,
+                            close,
+                            a1h,
+                            stop,
+                            f4["end_ms"][j],
+                            f"{cid}:1:{end}",
+                            1.85,
+                        )
+                    )
+                elif (
+                    sweep_hi > hi_72h
+                    and close <= hi_72h - 0.30 * a15
+                    and ret_1h < 0
+                    and taker_imb_4[k] <= 0.0
+                ):
+                    stop = _clamp_stop_w4(close, -1, 3.0 * a15, 45.0)
+                    output[cid].append(
+                        _make_event(
+                            cid,
+                            row["family"],
+                            horizon,
+                            -1,
+                            end,
+                            close,
+                            a1h,
+                            stop,
+                            f4["end_ms"][j],
+                            f"{cid}:-1:{end}",
+                            1.85,
+                        )
+                    )
+
+        # 2. W4_C02_SQUEEZE_SNAPBACK_LOW_DRIFT_08H
+        if "W4_C02_SQUEEZE_SNAPBACK_LOW_DRIFT_08H" in by_id:
+            cid = "W4_C02_SQUEEZE_SNAPBACK_LOW_DRIFT_08H"
+            row = by_id[cid]
+            horizon = int(row.get("holding_horizon_hours", 8))
+            for k in range(202, len(q15["end_ms"])):
+                end = int(q15["end_ms"][k])
+                h = _last_complete(h1["end_ms"], end)
+                j = _last_complete(f4["end_ms"], end)
+                if j < 59 or h < 20:
+                    continue
+                if not (np.isfinite(er4_12[j]) and er4_12[j] <= 0.38):
+                    continue
+                close = q15["close"][k]
+                a15 = atr15_14[k]
+                a48_pre = atr15_48[k - 8]
+                a192_pre = atr15_192[k - 8]
+                m96 = close_sma96[k]
+                a1h = atr1_20[h]
+                if not (
+                    np.isfinite(a15)
+                    and a15 > 0
+                    and np.isfinite(a48_pre)
+                    and np.isfinite(a192_pre)
+                    and a192_pre > 0
+                    and np.isfinite(m96)
+                    and _eligible_vol(close, a1h)
+                ):
+                    continue
+                drift_48h_bps = abs(close - q15["close"][k - 192]) / q15["close"][k - 192] * 10_000.0
+                if drift_48h_bps > 450.0:
+                    continue
+                if (a48_pre / a192_pre) > 0.86:
+                    continue
+                if abs(close - m96) > 0.75 * a15:
+                    continue
+                hi_8 = float(np.max(q15["high"][k - 8 : k]))
+                lo_8 = float(np.min(q15["low"][k - 8 : k]))
+                snap_30m = close - q15["close"][k - 2]
+                if (
+                    (m96 - lo_8) >= 1.65 * a15
+                    and snap_30m >= 0.45 * a15
+                    and sfr15[k] >= 0.02
+                ):
+                    stop = _clamp_stop_w4(close, 1, 2.6 * a15, 45.0)
+                    output[cid].append(
+                        _make_event(
+                            cid,
+                            row["family"],
+                            horizon,
+                            1,
+                            end,
+                            close,
+                            a1h,
+                            stop,
+                            f4["end_ms"][j],
+                            f"{cid}:1:{end}",
+                            1.75,
+                        )
+                    )
+                elif (
+                    (hi_8 - m96) >= 1.65 * a15
+                    and snap_30m <= -0.45 * a15
+                    and sfr15[k] <= -0.02
+                ):
+                    stop = _clamp_stop_w4(close, -1, 2.6 * a15, 45.0)
+                    output[cid].append(
+                        _make_event(
+                            cid,
+                            row["family"],
+                            horizon,
+                            -1,
+                            end,
+                            close,
+                            a1h,
+                            stop,
+                            f4["end_ms"][j],
+                            f"{cid}:-1:{end}",
+                            1.75,
+                        )
+                    )
+
+        # 3. W4_C03_BOUNDED_48H_RANGE_REJECTION_12H
+        if "W4_C03_BOUNDED_48H_RANGE_REJECTION_12H" in by_id:
+            cid = "W4_C03_BOUNDED_48H_RANGE_REJECTION_12H"
+            row = by_id[cid]
+            horizon = int(row.get("holding_horizon_hours", 12))
+            for h in range(50, len(h1["end_ms"])):
+                end = int(h1["end_ms"][h])
+                j = _last_complete(f4["end_ms"], end)
+                if j < 59:
+                    continue
+                if not (np.isfinite(er4_12[j]) and er4_12[j] <= 0.32):
+                    continue
+                close = h1["close"][h]
+                opened = h1["open"][h]
+                a1h = atr1_20[h]
+                v1_sma = vol1_sma20[h - 1]
+                if not (
+                    _eligible_vol(close, a1h)
+                    and 10_000.0 * a1h / close >= 50.0
+                    and np.isfinite(v1_sma)
+                    and v1_sma > 0
+                    and h1["volume"][h] >= 0.95 * v1_sma
+                ):
+                    continue
+                hi_48h = float(np.max(h1["high"][h - 48 : h]))
+                lo_48h = float(np.min(h1["low"][h - 48 : h]))
+                width = hi_48h - lo_48h
+                if width < 2.40 * a1h:
+                    continue
+                mid = 0.5 * (hi_48h + lo_48h)
+                if (
+                    h1["low"][h] <= lo_48h + 0.16 * width
+                    and lo_48h + 0.06 * width <= close <= mid
+                    and close > opened
+                    and sfr1[h] >= 0.03
+                ):
+                    stop = _clamp_stop_w4(close, 1, 1.35 * a1h, 50.0)
+                    output[cid].append(
+                        _make_event(
+                            cid,
+                            row["family"],
+                            horizon,
+                            1,
+                            end,
+                            close,
+                            a1h,
+                            stop,
+                            f4["end_ms"][j],
+                            f"{cid}:1:{end}",
+                            1.80,
+                        )
+                    )
+                elif (
+                    h1["high"][h] >= hi_48h - 0.16 * width
+                    and mid <= close <= hi_48h - 0.06 * width
+                    and close < opened
+                    and sfr1[h] <= -0.03
+                ):
+                    stop = _clamp_stop_w4(close, -1, 1.35 * a1h, 50.0)
+                    output[cid].append(
+                        _make_event(
+                            cid,
+                            row["family"],
+                            horizon,
+                            -1,
+                            end,
+                            close,
+                            a1h,
+                            stop,
+                            f4["end_ms"][j],
+                            f"{cid}:-1:{end}",
+                            1.80,
+                        )
+                    )
+
+        # 4. W4_C04_LOW_CONVICTION_EXTREME_FLOW_FLIP_08H
+        if "W4_C04_LOW_CONVICTION_EXTREME_FLOW_FLIP_08H" in by_id:
+            cid = "W4_C04_LOW_CONVICTION_EXTREME_FLOW_FLIP_08H"
+            row = by_id[cid]
+            horizon = int(row.get("holding_horizon_hours", 8))
+            for k in range(100, len(q15["end_ms"])):
+                end = int(q15["end_ms"][k])
+                h = _last_complete(h1["end_ms"], end)
+                j = _last_complete(f4["end_ms"], end)
+                if j < 59 or h < 20:
+                    continue
+                if not (np.isfinite(er4_12[j]) and er4_12[j] <= 0.36):
+                    continue
+                close = q15["close"][k]
+                opened = q15["open"][k]
+                a15 = atr15_14[k]
+                a1h = atr1_20[h]
+                v_sma = vol15_sma20[k - 1]
+                if not (
+                    np.isfinite(a15)
+                    and a15 > 0
+                    and np.isfinite(v_sma)
+                    and v_sma > 0
+                    and _eligible_vol(close, a1h)
+                ):
+                    continue
+                if not (0.55 * 4.0 * v_sma <= vol4_15[k] <= 1.35 * 4.0 * v_sma):
+                    continue
+                hi_24h = float(np.max(q15["high"][k - 99 : k - 3]))
+                lo_24h = float(np.min(q15["low"][k - 99 : k - 3]))
+                probe_lo = float(np.min(q15["low"][k - 3 : k + 1]))
+                probe_hi = float(np.max(q15["high"][k - 3 : k + 1]))
+                if (
+                    probe_lo <= lo_24h
+                    and (close - opened) >= 0.35 * a15
+                    and taker_imb_2[k] >= 0.05
+                ):
+                    stop = _clamp_stop_w4(close, 1, 2.6 * a15, 45.0)
+                    output[cid].append(
+                        _make_event(
+                            cid,
+                            row["family"],
+                            horizon,
+                            1,
+                            end,
+                            close,
+                            a1h,
+                            stop,
+                            f4["end_ms"][j],
+                            f"{cid}:1:{end}",
+                            1.80,
+                        )
+                    )
+                elif (
+                    probe_hi >= hi_24h
+                    and (opened - close) >= 0.35 * a15
+                    and taker_imb_2[k] <= -0.05
+                ):
+                    stop = _clamp_stop_w4(close, -1, 2.6 * a15, 45.0)
+                    output[cid].append(
+                        _make_event(
+                            cid,
+                            row["family"],
+                            horizon,
+                            -1,
+                            end,
+                            close,
+                            a1h,
+                            stop,
+                            f4["end_ms"][j],
+                            f"{cid}:-1:{end}",
+                            1.80,
+                        )
+                    )
+
+        # 5. W4_C05_ASIA_RANGE_EUROPE_SWEEP_RETURN_12H
+        if "W4_C05_ASIA_RANGE_EUROPE_SWEEP_RETURN_12H" in by_id:
+            cid = "W4_C05_ASIA_RANGE_EUROPE_SWEEP_RETURN_12H"
+            row = by_id[cid]
+            horizon = int(row.get("holding_horizon_hours", 12))
+            emitted_day_side: set[tuple[int, int]] = set()
+            for k in range(36, len(q15["end_ms"])):
+                end = int(q15["end_ms"][k])
+                day_start = (end // DAY_MS) * DAY_MS
+                tod_ms = end - day_start
+                if not (8 * HOUR_MS + 15 * MINUTE_MS <= tod_ms <= 14 * HOUR_MS):
+                    continue
+                h = _last_complete(h1["end_ms"], end)
+                j = _last_complete(f4["end_ms"], end)
+                if j < 59 or h < 20:
+                    continue
+                if not (np.isfinite(er4_12[j]) and er4_12[j] <= 0.42):
+                    continue
+                close = q15["close"][k]
+                opened = q15["open"][k]
+                a15 = atr15_20[k]
+                a1h = atr1_20[h]
+                if not (np.isfinite(a15) and a15 > 0 and _eligible_vol(close, a1h)):
+                    continue
+                s_idx_start = int(
+                    np.searchsorted(q15["end_ms"], day_start + 15 * MINUTE_MS, side="left")
+                )
+                s_idx_end = int(
+                    np.searchsorted(q15["end_ms"], day_start + 8 * HOUR_MS, side="right")
+                )
+                if s_idx_end - s_idx_start != 32:
+                    continue
+                s_high = float(np.max(q15["high"][s_idx_start:s_idx_end]))
+                s_low = float(np.min(q15["low"][s_idx_start:s_idx_end]))
+                day_id = day_start // DAY_MS
+                if (
+                    (day_id, 1) not in emitted_day_side
+                    and min(q15["low"][k - 1], q15["low"][k]) <= s_low - 0.15 * a1h
+                    and q15["low"][k] >= s_low - 2.20 * a1h
+                    and close >= s_low + 0.05 * a1h
+                    and (close - opened) >= 0.20 * a15
+                    and sfr15[k] >= 0.02
+                ):
+                    emitted_day_side.add((day_id, 1))
+                    stop = _clamp_stop_w4(close, 1, 1.45 * a1h, 45.0)
+                    output[cid].append(
+                        _make_event(
+                            cid,
+                            row["family"],
+                            horizon,
+                            1,
+                            end,
+                            close,
+                            a1h,
+                            stop,
+                            f4["end_ms"][j],
+                            f"{cid}:1:{end}",
+                            1.85,
+                        )
+                    )
+                elif (
+                    (day_id, -1) not in emitted_day_side
+                    and max(q15["high"][k - 1], q15["high"][k]) >= s_high + 0.15 * a1h
+                    and q15["high"][k] <= s_high + 2.20 * a1h
+                    and close <= s_high - 0.05 * a1h
+                    and (opened - close) >= 0.20 * a15
+                    and sfr15[k] <= -0.02
+                ):
+                    emitted_day_side.add((day_id, -1))
+                    stop = _clamp_stop_w4(close, -1, 1.45 * a1h, 45.0)
+                    output[cid].append(
+                        _make_event(
+                            cid,
+                            row["family"],
+                            horizon,
+                            -1,
+                            end,
+                            close,
+                            a1h,
+                            stop,
+                            f4["end_ms"][j],
+                            f"{cid}:-1:{end}",
+                            1.85,
+                        )
+                    )
+
+        # 6. W4_C06_FOUR_HOUR_EXHAUSTION_MODERATE_VOL_24H
+        if "W4_C06_FOUR_HOUR_EXHAUSTION_MODERATE_VOL_24H" in by_id:
+            cid = "W4_C06_FOUR_HOUR_EXHAUSTION_MODERATE_VOL_24H"
+            row = by_id[cid]
+            horizon = int(row.get("holding_horizon_hours", 24))
+            for j in range(60, len(f4["end_ms"])):
+                end = int(f4["end_ms"][j])
+                h = _last_complete(h1["end_ms"], end)
+                if h < 20 or int(h1["end_ms"][h]) != end:
+                    continue
+                close4 = f4["close"][j]
+                open4 = f4["open"][j]
+                a4 = atr4_20[j]
+                a1h = atr1_20[h]
+                if not (
+                    np.isfinite(a4)
+                    and a4 > 0
+                    and np.all(np.isfinite(er4_6[j - 3 : j + 1]))
+                    and _eligible_vol(close4, a1h)
+                    and 10_000.0 * a1h / close4 <= 115.0
+                ):
+                    continue
+                if float(np.max(er4_6[j - 3 : j])) < 0.42:
+                    continue
+                if not (er4_6[j] <= er4_6[j - 1] or er4_6[j] <= 0.44):
+                    continue
+                if (
+                    (f4["close"][j - 4] - float(np.min(f4["low"][j - 3 : j]))) >= 1.10 * a4
+                    and f4["low"][j] >= f4["low"][j - 1] - 0.32 * a4
+                    and (close4 - open4) >= 0.15 * a4
+                    and sfr4[j] >= -0.01
+                ):
+                    stop = _clamp_stop_w4(close4, 1, 1.65 * a1h, 50.0)
+                    output[cid].append(
+                        _make_event(
+                            cid,
+                            row["family"],
+                            horizon,
+                            1,
+                            end,
+                            close4,
+                            a1h,
+                            stop,
+                            end,
+                            f"{cid}:1:{end}",
+                            1.85,
+                        )
+                    )
+                elif (
+                    (float(np.max(f4["high"][j - 3 : j])) - f4["close"][j - 4]) >= 1.10 * a4
+                    and f4["high"][j] <= f4["high"][j - 1] + 0.32 * a4
+                    and (open4 - close4) >= 0.15 * a4
+                    and sfr4[j] <= 0.01
+                ):
+                    stop = _clamp_stop_w4(close4, -1, 1.65 * a1h, 50.0)
+                    output[cid].append(
+                        _make_event(
+                            cid,
+                            row["family"],
+                            horizon,
+                            -1,
+                            end,
+                            close4,
+                            a1h,
+                            stop,
+                            end,
+                            f"{cid}:-1:{end}",
+                            1.85,
+                        )
+                    )
+
     return output

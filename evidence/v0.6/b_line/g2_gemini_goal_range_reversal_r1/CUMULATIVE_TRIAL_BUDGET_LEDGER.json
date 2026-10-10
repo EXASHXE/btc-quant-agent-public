@@ -14,6 +14,7 @@
     "status": "DISCLOSED_PRIOR_DEVELOPMENT_EXPOSURE"
   },
   "schema": "GEMINI_GOAL_B_CUMULATIVE_TRIAL_LEDGER_V1",
+  "terminal_decision": "NO_PROMOTABLE_DEVELOPMENT_CANDIDATE_BUDGET_EXHAUSTED",
   "waves": [
     {
       "candidate_count": 6,
@@ -93,12 +94,14 @@
         "W4_C06_FOUR_HOUR_EXHAUSTION_MODERATE_VOL_24H"
       ],
       "cumulative_agent_trials_after_wave": 24,
+      "decision_file": "docs/strategy_research/g2_r3/gemini_goal_range_reversal_r1/WAVE_04_DECISION.md",
+      "determinism_sha256": "ae91ae09b370594ba1dc6750aa24905ee2cf52917a053db43974c410e817c73e",
       "freeze_parent_sha": "7e4f407863ff7b7252365a254612518a1d517a72",
-      "freeze_sha": "PENDING_COMMIT",
+      "freeze_sha": "4828e1532098e16b42e84e90952387b7cbd60d02",
       "promoted_candidates": [],
       "registry_file": "evidence/v0.6/b_line/g2_gemini_goal_range_reversal_r1/WAVE_04_FROZEN_REGISTRY.json",
-      "result_sha": null,
-      "status": "FROZEN_PENDING_EXECUTION",
+      "result_file": "evidence/v0.6/b_line/g2_gemini_goal_range_reversal_r1/WAVE_04_RESULT.json",
+      "status": "EXECUTED_ALL_FALSIFIED_BUDGET_EXHAUSTED_24_OF_24",
       "wave_id": "WAVE_04"
     }
   ]
