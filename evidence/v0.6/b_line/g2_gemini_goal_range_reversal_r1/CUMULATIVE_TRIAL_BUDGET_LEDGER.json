@@ -71,12 +71,14 @@
         "W3_C06_FOUR_HOUR_CLIMAX_STALL_REVERSAL_24H"
       ],
       "cumulative_agent_trials_after_wave": 18,
+      "decision_file": "docs/strategy_research/g2_r3/gemini_goal_range_reversal_r1/WAVE_03_DECISION.md",
+      "determinism_sha256": "f51cd09b0691bfbe04daea9854a4f572ef737ca6e67d438e8e9743925c9bbe12",
       "freeze_parent_sha": "bcd54875cb4f6ad85c5954dc96c5ba1c2dd5e12b",
-      "freeze_sha": "PENDING_COMMIT",
+      "freeze_sha": "0c24218938be740113b6c80a3e1c847d2b08ca76",
       "promoted_candidates": [],
       "registry_file": "evidence/v0.6/b_line/g2_gemini_goal_range_reversal_r1/WAVE_03_FROZEN_REGISTRY.json",
-      "result_sha": null,
-      "status": "FROZEN_PENDING_EXECUTION",
+      "result_file": "evidence/v0.6/b_line/g2_gemini_goal_range_reversal_r1/WAVE_03_RESULT.json",
+      "status": "EXECUTED_ALL_FALSIFIED_PROCEED_TO_WAVE_04",
       "wave_id": "WAVE_03"
     }
   ]

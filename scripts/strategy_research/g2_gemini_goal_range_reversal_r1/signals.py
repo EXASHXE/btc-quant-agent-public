@@ -1133,4 +1133,462 @@ def generate_wave_signals(data: np.ndarray, registry: dict) -> dict[str, list[di
                         )
                     )
 
+    # --- WAVE 3 CANDIDATES ---
+    if any(k.startswith("W3_") for k in by_id):
+        atr15_14 = _atr_fast(q15, 14)
+        atr15_48 = _atr_fast(q15, 48)
+        atr15_192 = _atr_fast(q15, 192)
+        close_sma96 = _sma_fast(q15["close"], 96)
+        vol1_sma20 = _sma_fast(h1["volume"], 20)
+
+        def _clamp_stop_bps(close_px: float, side_val: int, raw_dist: float, min_bps: float = 85.0) -> float:
+            dist = min(max(raw_dist, (min_bps / 10_000.0) * close_px), 0.0250 * close_px)
+            return close_px - side_val * dist
+
+        # 1. W3_C01_HIGH_VOL_72H_FAILED_BREAKOUT_WIDE_TARGET_24H
+        if "W3_C01_HIGH_VOL_72H_FAILED_BREAKOUT_WIDE_TARGET_24H" in by_id:
+            cid = "W3_C01_HIGH_VOL_72H_FAILED_BREAKOUT_WIDE_TARGET_24H"
+            row = by_id[cid]
+            horizon = int(row.get("holding_horizon_hours", 24))
+            for k in range(292, len(q15["end_ms"])):
+                end = int(q15["end_ms"][k])
+                if end % HOUR_MS != 0:
+                    continue
+                h = _last_complete(h1["end_ms"], end)
+                j = _last_complete(f4["end_ms"], end)
+                if j < 59 or h < 74:
+                    continue
+                close = q15["close"][k]
+                a15 = atr15_14[k]
+                a1h = atr1_20[h]
+                if not (np.isfinite(a15) and a15 > 0 and _eligible_vol(close, a1h)):
+                    continue
+                if 10_000.0 * a1h / close < 65.0:
+                    continue
+                hi_72h = float(np.max(h1["high"][h - 72 : h]))
+                lo_72h = float(np.min(h1["low"][h - 72 : h]))
+                width_bps = (hi_72h - lo_72h) / lo_72h * 10_000.0
+                if not (220.0 <= width_bps <= 1400.0):
+                    continue
+                sweep_lo = float(np.min(h1["low"][h - 1 : h + 1]))
+                sweep_hi = float(np.max(h1["high"][h - 1 : h + 1]))
+                # LONG: swept 72h low over last 2h, closed >= 0.15 ATR15 back inside 72h range, bullish 1h bar
+                if (
+                    sweep_lo < lo_72h
+                    and close >= lo_72h + 0.15 * a15
+                    and h1["close"][h] > h1["open"][h]
+                    and sfr1[h] >= -0.04
+                ):
+                    stop = _clamp_stop_bps(close, 1, 1.60 * a1h, 85.0)
+                    output[cid].append(
+                        _make_event(
+                            cid,
+                            row["family"],
+                            horizon,
+                            1,
+                            end,
+                            close,
+                            a1h,
+                            stop,
+                            f4["end_ms"][j],
+                            f"{cid}:1:{end}",
+                            2.6,
+                        )
+                    )
+                # SHORT: swept 72h high over last 2h, closed >= 0.15 ATR15 back inside 72h range, bearish 1h bar
+                elif (
+                    sweep_hi > hi_72h
+                    and close <= hi_72h - 0.15 * a15
+                    and h1["close"][h] < h1["open"][h]
+                    and sfr1[h] <= 0.04
+                ):
+                    stop = _clamp_stop_bps(close, -1, 1.60 * a1h, 85.0)
+                    output[cid].append(
+                        _make_event(
+                            cid,
+                            row["family"],
+                            horizon,
+                            -1,
+                            end,
+                            close,
+                            a1h,
+                            stop,
+                            f4["end_ms"][j],
+                            f"{cid}:-1:{end}",
+                            2.6,
+                        )
+                    )
+
+        # 2. W3_C02_FOUR_HOUR_FALSE_EXPANSION_SNAPBACK_12H
+        if "W3_C02_FOUR_HOUR_FALSE_EXPANSION_SNAPBACK_12H" in by_id:
+            cid = "W3_C02_FOUR_HOUR_FALSE_EXPANSION_SNAPBACK_12H"
+            row = by_id[cid]
+            horizon = int(row.get("holding_horizon_hours", 12))
+            for k in range(202, len(q15["end_ms"])):
+                if k % 2 != 1:
+                    continue
+                end = int(q15["end_ms"][k])
+                h = _last_complete(h1["end_ms"], end)
+                j = _last_complete(f4["end_ms"], end)
+                if j < 59 or h < 20:
+                    continue
+                close = q15["close"][k]
+                a15 = atr15_14[k]
+                a48_pre = atr15_48[k - 8]
+                a192_pre = atr15_192[k - 8]
+                m96 = close_sma96[k]
+                a1h = atr1_20[h]
+                if not (
+                    np.isfinite(a15)
+                    and a15 > 0
+                    and np.isfinite(a48_pre)
+                    and np.isfinite(a192_pre)
+                    and a192_pre > 0
+                    and np.isfinite(m96)
+                    and _eligible_vol(close, a1h)
+                ):
+                    continue
+                if 10_000.0 * a1h / close < 55.0:
+                    continue
+                if (a48_pre / a192_pre) > 0.90:
+                    continue
+                if abs(close - m96) > 0.85 * a15:
+                    continue
+                hi_8 = float(np.max(q15["high"][k - 8 : k]))
+                lo_8 = float(np.min(q15["low"][k - 8 : k]))
+                snap_30m = close - q15["close"][k - 2]
+                if (m96 - lo_8) >= 1.50 * a15 and snap_30m >= 0.40 * a15:
+                    stop = _clamp_stop_bps(close, 1, 1.50 * a1h, 80.0)
+                    output[cid].append(
+                        _make_event(
+                            cid,
+                            row["family"],
+                            horizon,
+                            1,
+                            end,
+                            close,
+                            a1h,
+                            stop,
+                            f4["end_ms"][j],
+                            f"{cid}:1:{end}",
+                            2.4,
+                        )
+                    )
+                elif (hi_8 - m96) >= 1.50 * a15 and snap_30m <= -0.40 * a15:
+                    stop = _clamp_stop_bps(close, -1, 1.50 * a1h, 80.0)
+                    output[cid].append(
+                        _make_event(
+                            cid,
+                            row["family"],
+                            horizon,
+                            -1,
+                            end,
+                            close,
+                            a1h,
+                            stop,
+                            f4["end_ms"][j],
+                            f"{cid}:-1:{end}",
+                            2.4,
+                        )
+                    )
+
+        # 3. W3_C03_MULTI_DAY_RANGE_MIDLINE_ROTATION_24H
+        if "W3_C03_MULTI_DAY_RANGE_MIDLINE_ROTATION_24H" in by_id:
+            cid = "W3_C03_MULTI_DAY_RANGE_MIDLINE_ROTATION_24H"
+            row = by_id[cid]
+            horizon = int(row.get("holding_horizon_hours", 24))
+            for h in range(50, len(h1["end_ms"])):
+                end = int(h1["end_ms"][h])
+                j = _last_complete(f4["end_ms"], end)
+                if j < 59:
+                    continue
+                if not (np.isfinite(er4_12[j]) and er4_12[j] <= 0.34):
+                    continue
+                close = h1["close"][h]
+                opened = h1["open"][h]
+                a1h = atr1_20[h]
+                if not (_eligible_vol(close, a1h) and 10_000.0 * a1h / close >= 60.0):
+                    continue
+                hi_48h = float(np.max(h1["high"][h - 48 : h]))
+                lo_48h = float(np.min(h1["low"][h - 48 : h]))
+                width = hi_48h - lo_48h
+                if width < 2.20 * a1h:
+                    continue
+                mid = 0.5 * (hi_48h + lo_48h)
+                # LONG: tested bottom 18% of 48h range and closed bullish below midline with non-negative 1h taker flow
+                if (
+                    h1["low"][h] <= lo_48h + 0.18 * width
+                    and lo_48h + 0.08 * width <= close <= mid
+                    and close > opened
+                    and sfr1[h] >= 0.0
+                ):
+                    stop = _clamp_stop_bps(close, 1, 1.60 * a1h, 85.0)
+                    output[cid].append(
+                        _make_event(
+                            cid,
+                            row["family"],
+                            horizon,
+                            1,
+                            end,
+                            close,
+                            a1h,
+                            stop,
+                            f4["end_ms"][j],
+                            f"{cid}:1:{end}",
+                            2.5,
+                        )
+                    )
+                # SHORT: tested top 18% of 48h range and closed bearish above midline with non-positive 1h taker flow
+                elif (
+                    h1["high"][h] >= hi_48h - 0.18 * width
+                    and mid <= close <= hi_48h - 0.08 * width
+                    and close < opened
+                    and sfr1[h] <= 0.0
+                ):
+                    stop = _clamp_stop_bps(close, -1, 1.60 * a1h, 85.0)
+                    output[cid].append(
+                        _make_event(
+                            cid,
+                            row["family"],
+                            horizon,
+                            -1,
+                            end,
+                            close,
+                            a1h,
+                            stop,
+                            f4["end_ms"][j],
+                            f"{cid}:-1:{end}",
+                            2.5,
+                        )
+                    )
+
+        # 4. W3_C04_HOURLY_TAKER_EXHAUSTION_WICK_REVERSAL_12H
+        if "W3_C04_HOURLY_TAKER_EXHAUSTION_WICK_REVERSAL_12H" in by_id:
+            cid = "W3_C04_HOURLY_TAKER_EXHAUSTION_WICK_REVERSAL_12H"
+            row = by_id[cid]
+            horizon = int(row.get("holding_horizon_hours", 12))
+            for h in range(25, len(h1["end_ms"])):
+                end = int(h1["end_ms"][h])
+                j = _last_complete(f4["end_ms"], end)
+                if j < 59:
+                    continue
+                close = h1["close"][h]
+                opened = h1["open"][h]
+                a1h = atr1_20[h]
+                v1_sma = vol1_sma20[h - 1]
+                if not (
+                    _eligible_vol(close, a1h)
+                    and 10_000.0 * a1h / close >= 60.0
+                    and np.isfinite(v1_sma)
+                    and v1_sma > 0
+                ):
+                    continue
+                vol3h = float(np.sum(h1["volume"][h - 3 : h]))
+                if vol3h < 3.20 * v1_sma:
+                    continue
+                disp3h = h1["close"][h - 1] - h1["open"][h - 3]
+                if (
+                    disp3h <= -1.40 * a1h
+                    and (close - opened) >= 0.25 * a1h
+                    and sfr1[h] >= 0.01
+                ):
+                    stop = _clamp_stop_bps(close, 1, 1.60 * a1h, 85.0)
+                    output[cid].append(
+                        _make_event(
+                            cid,
+                            row["family"],
+                            horizon,
+                            1,
+                            end,
+                            close,
+                            a1h,
+                            stop,
+                            f4["end_ms"][j],
+                            f"{cid}:1:{end}",
+                            2.4,
+                        )
+                    )
+                elif (
+                    disp3h >= 1.40 * a1h
+                    and (opened - close) >= 0.25 * a1h
+                    and sfr1[h] <= -0.01
+                ):
+                    stop = _clamp_stop_bps(close, -1, 1.60 * a1h, 85.0)
+                    output[cid].append(
+                        _make_event(
+                            cid,
+                            row["family"],
+                            horizon,
+                            -1,
+                            end,
+                            close,
+                            a1h,
+                            stop,
+                            f4["end_ms"][j],
+                            f"{cid}:-1:{end}",
+                            2.4,
+                        )
+                    )
+
+        # 5. W3_C05_REGIONAL_SESSION_SWEEP_RECLAIM_12H
+        if "W3_C05_REGIONAL_SESSION_SWEEP_RECLAIM_12H" in by_id:
+            cid = "W3_C05_REGIONAL_SESSION_SWEEP_RECLAIM_12H"
+            row = by_id[cid]
+            horizon = int(row.get("holding_horizon_hours", 12))
+            emitted_sess: set[tuple[int, int]] = set()
+            for k in range(40, len(q15["end_ms"])):
+                if k % 2 != 1:
+                    continue
+                end = int(q15["end_ms"][k])
+                # 8h session boundary index
+                sess_block = end // (8 * HOUR_MS)
+                sess_start = sess_block * (8 * HOUR_MS)
+                offset_ms = end - sess_start
+                if not (15 * MINUTE_MS <= offset_ms <= 2 * HOUR_MS):
+                    continue
+                h = _last_complete(h1["end_ms"], end)
+                j = _last_complete(f4["end_ms"], end)
+                if j < 59 or h < 20:
+                    continue
+                close = q15["close"][k]
+                opened = q15["open"][k]
+                a15 = atr15_14[k]
+                a1h = atr1_20[h]
+                if not (
+                    np.isfinite(a15)
+                    and a15 > 0
+                    and _eligible_vol(close, a1h)
+                    and 10_000.0 * a1h / close >= 55.0
+                ):
+                    continue
+                # Prior 8h session bars: [sess_start - 8h + 15m .. sess_start]
+                s_idx0 = int(
+                    np.searchsorted(
+                        q15["end_ms"], sess_start - 8 * HOUR_MS + 15 * MINUTE_MS, side="left"
+                    )
+                )
+                s_idx1 = int(np.searchsorted(q15["end_ms"], sess_start, side="right"))
+                if s_idx1 - s_idx0 != 32:
+                    continue
+                s_high = float(np.max(q15["high"][s_idx0:s_idx1]))
+                s_low = float(np.min(q15["low"][s_idx0:s_idx1]))
+                if (s_high - s_low) < 1.40 * a1h:
+                    continue
+                if (
+                    (sess_block, 1) not in emitted_sess
+                    and min(q15["low"][k - 1], q15["low"][k]) < s_low
+                    and close >= s_low
+                    and close > opened
+                    and sfr15[k] >= 0.0
+                ):
+                    emitted_sess.add((sess_block, 1))
+                    stop = _clamp_stop_bps(close, 1, 1.50 * a1h, 80.0)
+                    output[cid].append(
+                        _make_event(
+                            cid,
+                            row["family"],
+                            horizon,
+                            1,
+                            end,
+                            close,
+                            a1h,
+                            stop,
+                            f4["end_ms"][j],
+                            f"{cid}:1:{end}",
+                            2.5,
+                        )
+                    )
+                elif (
+                    (sess_block, -1) not in emitted_sess
+                    and max(q15["high"][k - 1], q15["high"][k]) > s_high
+                    and close <= s_high
+                    and close < opened
+                    and sfr15[k] <= 0.0
+                ):
+                    emitted_sess.add((sess_block, -1))
+                    stop = _clamp_stop_bps(close, -1, 1.50 * a1h, 80.0)
+                    output[cid].append(
+                        _make_event(
+                            cid,
+                            row["family"],
+                            horizon,
+                            -1,
+                            end,
+                            close,
+                            a1h,
+                            stop,
+                            f4["end_ms"][j],
+                            f"{cid}:-1:{end}",
+                            2.5,
+                        )
+                    )
+
+        # 6. W3_C06_FOUR_HOUR_CLIMAX_STALL_REVERSAL_24H
+        if "W3_C06_FOUR_HOUR_CLIMAX_STALL_REVERSAL_24H" in by_id:
+            cid = "W3_C06_FOUR_HOUR_CLIMAX_STALL_REVERSAL_24H"
+            row = by_id[cid]
+            horizon = int(row.get("holding_horizon_hours", 24))
+            for j in range(60, len(f4["end_ms"])):
+                end = int(f4["end_ms"][j])
+                h = _last_complete(h1["end_ms"], end)
+                if h < 20 or int(h1["end_ms"][h]) != end:
+                    continue
+                close4 = f4["close"][j]
+                open4 = f4["open"][j]
+                a4 = atr4_20[j]
+                a1h = atr1_20[h]
+                if not (
+                    np.isfinite(a4)
+                    and a4 > 0
+                    and np.all(np.isfinite(er4_6[j - 3 : j + 1]))
+                    and _eligible_vol(close4, a1h)
+                ):
+                    continue
+                if float(np.max(er4_6[j - 3 : j])) < 0.40:
+                    continue
+                if (
+                    (f4["close"][j - 4] - float(np.min(f4["low"][j - 3 : j]))) >= 1.35 * a4
+                    and f4["low"][j] >= f4["low"][j - 1] - 0.40 * a4
+                    and close4 > open4
+                    and sfr1[h] >= -0.01
+                ):
+                    stop = _clamp_stop_bps(close4, 1, 1.70 * a1h, 85.0)
+                    output[cid].append(
+                        _make_event(
+                            cid,
+                            row["family"],
+                            horizon,
+                            1,
+                            end,
+                            close4,
+                            a1h,
+                            stop,
+                            end,
+                            f"{cid}:1:{end}",
+                            2.8,
+                        )
+                    )
+                elif (
+                    (float(np.max(f4["high"][j - 3 : j])) - f4["close"][j - 4]) >= 1.35 * a4
+                    and f4["high"][j] <= f4["high"][j - 1] + 0.40 * a4
+                    and close4 < open4
+                    and sfr1[h] <= 0.01
+                ):
+                    stop = _clamp_stop_bps(close4, -1, 1.70 * a1h, 85.0)
+                    output[cid].append(
+                        _make_event(
+                            cid,
+                            row["family"],
+                            horizon,
+                            -1,
+                            end,
+                            close4,
+                            a1h,
+                            stop,
+                            end,
+                            f"{cid}:-1:{end}",
+                            2.8,
+                        )
+                    )
+
     return output
