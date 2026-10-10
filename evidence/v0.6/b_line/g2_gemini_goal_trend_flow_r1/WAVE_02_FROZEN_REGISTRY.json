@@ -1,0 +1,141 @@
+{
+  "TASK_ID": "V06_G2_GEMINI_GOAL_A_TREND_FLOW_MULTI_WAVE_DISCOVERY_R1",
+  "CONTROLLER_DISPATCH_SHA": "6c6ff831868701cea05499d0b0adb0e62db67f0e",
+  "PARENT_FREEZE_SHA": "5295eff5c63797fd28a5b7b5733a009536e4fdf3",
+  "WAVE": "WAVE_02",
+  "frozen_at_utc": "2026-10-11T04:14:00Z",
+  "protocol": {
+    "symbol": "BTCUSDT",
+    "market": "USD_M_PERP",
+    "resolution": "1m",
+    "data_grant": "2021-01 to 2023-12",
+    "warmup_month": "2021-01",
+    "scored_months": "2021-02 to 2023-12 (35 months)",
+    "sealed_holdout_prohibition": "2024-01 to 2026-12",
+    "cost_models": {
+      "BASE": {
+        "fee_bps": 8.0,
+        "spread_bps": 4.0,
+        "slip_bps": 10.0,
+        "nominal_roundtrip_bps": 22.0
+      },
+      "STRESS": {
+        "fee_bps": 10.0,
+        "spread_bps": 8.0,
+        "slip_bps": 26.0,
+        "nominal_roundtrip_bps": 44.0
+      }
+    }
+  },
+  "candidate_count": 6,
+  "candidates": [
+    {
+      "id": "W2_C01_VOLUME_WEIGHTED_MOMENTUM_SURGE_08H",
+      "family": "VOLUME_WEIGHTED_MOMENTUM_SURGE",
+      "horizon_hours": 8,
+      "timeframes": ["1h", "15m"],
+      "side": "SYMMETRIC_LONG_SHORT",
+      "stop_atr_multiplier": 1.5,
+      "target_R": 2.0,
+      "cooldown_hours": 4,
+      "economic_rationale": "Volume-weighted momentum breakout: 1h close breaks above 24h rolling VWAP by > 0.5 * 1h ATR with volume surge (> 1.5x 20h SMA) and strong signed taker flow (> 0.15). Symmetrical short for break below VWAP.",
+      "math_formulation": {
+        "long_entry": "(1h_close > 24h_VWAP + 0.5 * 1h_ATR) and (1h_vol > 1.5 * 1h_vol_SMA20) and (15m_signed_taker_ratio > 0.15)",
+        "short_entry": "(1h_close < 24h_VWAP - 0.5 * 1h_ATR) and (1h_vol > 1.5 * 1h_vol_SMA20) and (15m_signed_taker_ratio < -0.15)",
+        "stop_rule": "Entry +/- 1.5 * 1h_ATR(14)",
+        "target_rule": "Entry +/- 2.0 * StopDistance"
+      },
+      "falsification_criteria": "Volume surge leads to immediate liquidity exhaustion and reversal under 44 bp stress."
+    },
+    {
+      "id": "W2_C02_MULTI_TIMEFRAME_CHOP_EXIT_TREND_12H",
+      "family": "MULTI_TIMEFRAME_CHOP_EXIT_TREND",
+      "horizon_hours": 12,
+      "timeframes": ["4h", "1h"],
+      "side": "SYMMETRIC_LONG_SHORT",
+      "stop_atr_multiplier": 2.0,
+      "target_R": 2.0,
+      "cooldown_hours": 6,
+      "economic_rationale": "Regime transition from consolidation to directional expansion: 4h ADX(14) was below 18 for >= 3 bars (chop) and crosses above 20 with DI directional confirmation and 1h 12-hour high/low breakout.",
+      "math_formulation": {
+        "long_entry": "(min(4h_ADX[h4-3:h4]) < 18) and (4h_ADX > 20) and (4h_DI_plus > 4h_DI_minus) and (1h_close > max(1h_high[h1-12:h1]))",
+        "short_entry": "(min(4h_ADX[h4-3:h4]) < 18) and (4h_ADX > 20) and (4h_DI_minus > 4h_DI_plus) and (1h_close < min(1h_low[h1-12:h1]))",
+        "stop_rule": "Entry +/- 2.0 * 1h_ATR(14)",
+        "target_rule": "Entry +/- 2.0 * StopDistance"
+      },
+      "falsification_criteria": "Chop exit signals produce false starts that quickly collapse back into range."
+    },
+    {
+      "id": "W2_C03_AGGRESSIVE_FLOW_CUMULATIVE_DELTA_DIVERGENCE_08H",
+      "family": "FLOW_CUMULATIVE_DELTA_CONFIRMATION",
+      "horizon_hours": 8,
+      "timeframes": ["1h", "15m"],
+      "side": "SYMMETRIC_LONG_SHORT",
+      "stop_atr_multiplier": 1.5,
+      "target_R": 2.0,
+      "cooldown_hours": 4,
+      "economic_rationale": "Cumulative Volume Delta (CVD) momentum confirmation: 12h price breakout accompanied by simultaneous new 12h high in cumulative taker buy volume delta, verifying aggressive buying dominance.",
+      "math_formulation": {
+        "long_entry": "(1h_close > max(1h_high[h1-12:h1])) and (12h_CVD > max(12h_CVD[h1-12:h1])) and (15m_signed_taker_ratio > 0.10)",
+        "short_entry": "(1h_close < min(1h_low[h1-12:h1])) and (12h_CVD < min(12h_CVD[h1-12:h1])) and (15m_signed_taker_ratio < -0.10)",
+        "stop_rule": "Entry +/- 1.5 * 1h_ATR(14)",
+        "target_rule": "Entry +/- 2.0 * StopDistance"
+      },
+      "falsification_criteria": "Aggressive CVD surges fail to sustain drift and suffer negative net returns under stress fees."
+    },
+    {
+      "id": "W2_C04_DONCHIAN_MIDLINE_PULLBACK_CONTINUATION_08H",
+      "family": "DONCHIAN_MIDLINE_PULLBACK_CONTINUATION",
+      "horizon_hours": 8,
+      "timeframes": ["4h", "1h", "15m"],
+      "side": "SYMMETRIC_LONG_SHORT",
+      "stop_atr_multiplier": 1.5,
+      "target_R": 2.0,
+      "cooldown_hours": 4,
+      "economic_rationale": "Trend continuation on shallow pullbacks: In a 4h structural trend (EMA20 > EMA50 and close > EMA20), enter on a 15m pullback touching the 20-bar 1h Donchian midline when 15m close recovers with positive flow (> 0.10).",
+      "math_formulation": {
+        "long_entry": "(4h_close > 4h_EMA20 > 4h_EMA50) and (15m_low <= 1h_Donchian_Mid <= 15m_high) and (15m_close > 1h_Donchian_Mid) and (15m_signed_taker_ratio > 0.10)",
+        "short_entry": "(4h_close < 4h_EMA20 < 4h_EMA50) and (15m_low <= 1h_Donchian_Mid <= 15m_high) and (15m_close < 1h_Donchian_Mid) and (15m_signed_taker_ratio < -0.10)",
+        "stop_rule": "Entry +/- 1.5 * 1h_ATR(14)",
+        "target_rule": "Entry +/- 2.0 * StopDistance"
+      },
+      "falsification_criteria": "Midline pullbacks break through into deep trend reversals, hitting stop losses."
+    },
+    {
+      "id": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H",
+      "family": "ASYMMETRIC_VOLATILITY_BREAKOUT",
+      "horizon_hours": 12,
+      "timeframes": ["1h", "15m"],
+      "side": "SYMMETRIC_LONG_SHORT",
+      "stop_atr_multiplier": 1.8,
+      "target_R": 2.5,
+      "cooldown_hours": 6,
+      "economic_rationale": "Calibrated volatility expansion: 1h ATR compression (< 0.85 of 56-bar ATR) followed by 1h expansion (> 1.2x SMA10) with volume confirmation (> 1.5x) and 15m taker flow confirmation.",
+      "math_formulation": {
+        "long_entry": "(min(1h_ATR14/1h_ATR56 in prior 12h) < 0.85) and (1h_ATR14 > 1.20 * 1h_ATR14_SMA10) and (1h_vol > 1.5 * 1h_vol_SMA20) and (1h_close > 1h_high_20) and (15m_signed_taker_ratio > 0.10)",
+        "short_entry": "(min(1h_ATR14/1h_ATR56 in prior 12h) < 0.85) and (1h_ATR14 > 1.20 * 1h_ATR14_SMA10) and (1h_vol > 1.5 * 1h_vol_SMA20) and (1h_close < 1h_low_20) and (15m_signed_taker_ratio < -0.10)",
+        "stop_rule": "Entry +/- 1.8 * 1h_ATR(14)",
+        "target_rule": "Entry +/- 2.5 * StopDistance"
+      },
+      "falsification_criteria": "Sample size remains under 100 or net bps under stress fails to exceed 0."
+    },
+    {
+      "id": "W2_C06_EXTREME_FLOW_EXHAUSTION_REVERSAL_TO_TREND_04H",
+      "family": "FLOW_EXHAUSTION_REVERSAL_TO_TREND",
+      "horizon_hours": 4,
+      "timeframes": ["4h", "15m"],
+      "side": "SYMMETRIC_LONG_SHORT",
+      "stop_atr_multiplier": 1.2,
+      "target_R": 2.0,
+      "cooldown_hours": 4,
+      "economic_rationale": "Liquidity sweep exhaustion into trend: In 4h uptrend (EMA20 > EMA50), a temporary sharp sell-off occurs with 15m signed taker ratio < -0.30 and long lower wick (rejection), entering on the next 15m bar with positive flow (> 0.10). Symmetrical short for buying climax into downtrend.",
+      "math_formulation": {
+        "long_entry": "(4h_EMA20 > 4h_EMA50) and (prev 15m: flow < -0.30 and lower_wick > 2 * upper_wick) and (current 15m: close > prev_close and flow > 0.10)",
+        "short_entry": "(4h_EMA20 < 4h_EMA50) and (prev 15m: flow > 0.30 and upper_wick > 2 * lower_wick) and (current 15m: close < prev_close and flow < -0.10)",
+        "stop_rule": "Entry +/- 1.2 * 1h_ATR(14)",
+        "target_rule": "Entry +/- 2.0 * StopDistance"
+      },
+      "falsification_criteria": "Counter-trend momentum continues through stop loss, failing to revert to higher timeframe trend."
+    }
+  ]
+}
