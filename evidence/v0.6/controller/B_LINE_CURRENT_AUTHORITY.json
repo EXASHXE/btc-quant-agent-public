@@ -1976,7 +1976,7 @@
   },
   "v06_p2_s3a_singlefile_footer_reader_prospective_build_r1": {
     "decision": "AUTHORIZE_S3A_INDEPENDENT_REAL_FD_READER_IMPLEMENTATION_AND_SYNTHETIC_QA_ONLY__NO_OWNER_MARKET_FILESYSTEM_ACCESS__NO_REAL_FOOTER_READ",
-    "status": "CONTROLLER_DISPATCH_AND_PINNED_GEMINI_PROMPT_PUBLISHED__CODE_BRANCH_PRECREATED_UNEXECUTED",
+    "status": "GEMINI_R1_DELIVERED_L2_SECURITY_HOLD_F01_F04__ONE_BOUNDED_REPAIR_R2_DISPATCHED",
     "dispatch_sha": "e150be89bef2540a4aebe7b11e921dd25104fe16",
     "dispatch_path": "reviews/v0.6/b_line/V06_P2_S3_SINGLE_NONPROTECTED_PARQUET_FOOTER_READER_PROSPECTIVE_BUILD_DISPATCH_R1.md",
     "gemini_prompt_sha": "559a56cef42e272c144c40876c2ba9e88f3ddeeb",
@@ -2007,6 +2007,32 @@
     "p3_prereg": "NONE",
     "p4_empirical_body": "NONE",
     "testnet_live_real_funds": "NONE",
-    "science_priority": "S3A_PRODUCTION_CAPABILITY_SECURITY_IMPLEMENTATION_OVER_ADDITIONAL_SYNTHETIC_RESEARCH"
+    "science_priority": "S3A_PRODUCTION_CAPABILITY_SECURITY_IMPLEMENTATION_OVER_ADDITIONAL_SYNTHETIC_RESEARCH",
+    "r1_final_sha": "30833953804bd965c80913ee6a3ecd4ae7457b40",
+    "r1_parent_sha": "e0ff8c3473de4bfa3e66fe7928d42992a4d38a32",
+    "r1_changed_paths": 15,
+    "r1_ci_url": "https://github.com/EXASHXE/btc-quant-agent-public/actions/runs/38034873347",
+    "r1_ci": "FAILED_2829_PASS_1_INHERITED_H40_SCIENTIFIC_GRAPH_HASH_2_SKIP_9_WARN_RUFF_MYPY_PASS",
+    "r1_scoped_tests_reported": 45,
+    "r1_security_oracle_reported": 30,
+    "r1_hostile_reported": 26,
+    "r1_mutants_reported": 3,
+    "controller_security_l2_decision_sha": "89c1caf07eebd3db81dc16314c3238c037e6fac3",
+    "controller_security_l2_path": "reviews/v0.6/b_line/V06_P2_S3A_SINGLE_FILE_FD_READER_CONTROLLER_EXACT_SHA_SECURITY_HOLD_AND_BOUNDED_REPAIR_R1.md",
+    "controller_l2_disposition": "SECURITY_HOLD_PARENT_ALIAS_ROOT_ESCAPE_TEST_GRANT_UNAUTHENTICATED_FIRST_OPEN_CLOSE_BUDGET_AND_FIVE_BTC_SIZES",
+    "material_unresolved": [
+      "UNTRUSTED_ABSOLUTE_FIXTURE_ROOT_FOLLOWS_SYMLINKED_ANCESTOR_DESPITE_O_NOFOLLOW_FINAL",
+      "TEST_GRANT_USES_UNKEYED_RECOMPUTABLE_SHA256_NOT_HMAC_OR_EXTERNAL_AUTHORITY",
+      "FIRST_OPEN_SYSCALL_CLOSE_RESERVATION_MISSING_AT_MINIMUM_GRANT_BUDGET",
+      "FIVE_NONPILOT_BTC_SOURCE_FILE_SIZES_MISMATCH_IMMUTABLE_S1_RECEIPT"
+    ],
+    "r2_bounded_repair_prompt_sha": "4227f46296b8f66fe33aebf8a7bdbacb6873dc2c",
+    "r2_bounded_repair_prompt_path": "prompts/v0.6/b_line/V06_P2_S3A_GEMINI_ROOT_ALIAS_GRANT_BUDGET_AND_SOURCE_SIZE_BOUNDED_REPAIR_R2.md",
+    "r2_controller_dispatch_sha": "89c1caf07eebd3db81dc16314c3238c037e6fac3",
+    "r2_exact_start_sha": "30833953804bd965c80913ee6a3ecd4ae7457b40",
+    "r2_scope": "ONE_BOUNDED_SEMANTIC_SECURITY_REPAIR_SYNTHETIC_TEMP_FIXTURES_ONLY",
+    "r2_status": "PUBLISHED_AWAIT_EXECUTION",
+    "next_sol_independent_audit": "DEFER_UNTIL_GEMINI_R2_EXACT_SHA_CONTROLLER_CHECK_AND_ROOT_ISOLATION_CLAIM",
+    "s3b_pilot_real_owner_file_read_authority": "NONE"
   }
 }
