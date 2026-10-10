@@ -8,7 +8,7 @@
   "cumulative_trials_evaluated": 12,
   "remaining_trial_budget": 12,
   "completed_waves": 2,
-  "active_wave": "WAVE_02",
+  "active_wave": "WAVE_03",
   "waves": {
     "WAVE_01": {
       "status": "COMPLETED",
@@ -57,9 +57,20 @@
       ]
     },
     "WAVE_03": {
-      "status": "UNINITIALIZED",
-      "candidate_count": 0,
-      "candidate_ids": []
+      "status": "FROZEN_AWAITING_EXECUTION",
+      "frozen_registry_file": "evidence/v0.6/b_line/g2_gemini_goal_trend_flow_r1/WAVE_03_FROZEN_REGISTRY.json",
+      "candidate_count": 6,
+      "candidate_ids": [
+        "W3_C01_EMA_CROSS_MULTI_HORIZON_TREND_FILTER_08H",
+        "W3_C02_KAUFMAN_EFFICIENCY_RATIO_EXPANSION_08H",
+        "W3_C03_BOLLINGER_BAND_WIDTH_SQUEEZE_EXPLOSION_12H",
+        "W3_C04_ASYMMETRIC_LONG_BIASED_TREND_FLOW_12H",
+        "W3_C05_ASYMMETRIC_SHORT_BIASED_FLOW_COLLAPSE_08H",
+        "W3_C06_TIME_WEIGHTED_SESSION_PULLBACK_08H"
+      ],
+      "evaluation_result_file": null,
+      "promoted_candidates": [],
+      "falsified_candidates": []
     },
     "WAVE_04": {
       "status": "UNINITIALIZED",

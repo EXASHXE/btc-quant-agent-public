@@ -1,0 +1,141 @@
+{
+  "TASK_ID": "V06_G2_GEMINI_GOAL_A_TREND_FLOW_MULTI_WAVE_DISCOVERY_R1",
+  "CONTROLLER_DISPATCH_SHA": "6c6ff831868701cea05499d0b0adb0e62db67f0e",
+  "PARENT_FREEZE_SHA": "f82eda7d930e5e158be7cc2fa60967b871e84f0f",
+  "WAVE": "WAVE_03",
+  "frozen_at_utc": "2026-10-11T04:17:00Z",
+  "protocol": {
+    "symbol": "BTCUSDT",
+    "market": "USD_M_PERP",
+    "resolution": "1m",
+    "data_grant": "2021-01 to 2023-12",
+    "warmup_month": "2021-01",
+    "scored_months": "2021-02 to 2023-12 (35 months)",
+    "sealed_holdout_prohibition": "2024-01 to 2026-12",
+    "cost_models": {
+      "BASE": {
+        "fee_bps": 8.0,
+        "spread_bps": 4.0,
+        "slip_bps": 10.0,
+        "nominal_roundtrip_bps": 22.0
+      },
+      "STRESS": {
+        "fee_bps": 10.0,
+        "spread_bps": 8.0,
+        "slip_bps": 26.0,
+        "nominal_roundtrip_bps": 44.0
+      }
+    }
+  },
+  "candidate_count": 6,
+  "candidates": [
+    {
+      "id": "W3_C01_EMA_CROSS_MULTI_HORIZON_TREND_FILTER_08H",
+      "family": "EMA_CROSS_MULTI_HORIZON_TREND",
+      "horizon_hours": 8,
+      "timeframes": ["4h", "1h", "15m"],
+      "side": "SYMMETRIC_LONG_SHORT",
+      "stop_atr_multiplier": 1.5,
+      "target_R": 2.0,
+      "cooldown_hours": 4,
+      "economic_rationale": "Fresh 1h moving average cross aligned with 4h macro trend: 1h EMA10 crosses 1h EMA30 within the last 2 hours, confirmed by 4h EMA20 > EMA50, and current 15m signed flow ratio > 0.20.",
+      "math_formulation": {
+        "long_entry": "(4h_EMA20 > 4h_EMA50) and (1h_EMA10 crosses above 1h_EMA30 within 2h) and (15m_signed_taker_ratio > 0.20)",
+        "short_entry": "(4h_EMA20 < 4h_EMA50) and (1h_EMA10 crosses below 1h_EMA30 within 2h) and (15m_signed_taker_ratio < -0.20)",
+        "stop_rule": "Entry +/- 1.5 * 1h_ATR(14)",
+        "target_rule": "Entry +/- 2.0 * StopDistance"
+      },
+      "falsification_criteria": "MA crosses suffer from whipsaws and lagging entries under 44 bp stress fees."
+    },
+    {
+      "id": "W3_C02_KAUFMAN_EFFICIENCY_RATIO_EXPANSION_08H",
+      "family": "KAUFMAN_EFFICIENCY_RATIO_EXPANSION",
+      "horizon_hours": 8,
+      "timeframes": ["1h", "15m"],
+      "side": "SYMMETRIC_LONG_SHORT",
+      "stop_atr_multiplier": 1.5,
+      "target_R": 2.0,
+      "cooldown_hours": 4,
+      "economic_rationale": "Efficiency ratio transition: Kaufman ER on 1h bars surges from chop (< 0.30 in prior 12h) to directional trend (> 0.65), entering in the direction of the price change with 15m taker flow confirmation.",
+      "math_formulation": {
+        "long_entry": "(min(1h_ER[h1-12:h1]) < 0.30) and (1h_ER > 0.65) and (1h_close > 1h_close[h1-10]) and (15m_signed_taker_ratio > 0.15)",
+        "short_entry": "(min(1h_ER[h1-12:h1]) < 0.30) and (1h_ER > 0.65) and (1h_close < 1h_close[h1-10]) and (15m_signed_taker_ratio < -0.15)",
+        "stop_rule": "Entry +/- 1.5 * 1h_ATR(14)",
+        "target_rule": "Entry +/- 2.0 * StopDistance"
+      },
+      "falsification_criteria": "ER surges represent terminal exhaustion moves rather than persistent trends."
+    },
+    {
+      "id": "W3_C03_BOLLINGER_BAND_WIDTH_SQUEEZE_EXPLOSION_12H",
+      "family": "BOLLINGER_BAND_WIDTH_SQUEEZE",
+      "horizon_hours": 12,
+      "timeframes": ["1h", "15m"],
+      "side": "SYMMETRIC_LONG_SHORT",
+      "stop_atr_multiplier": 1.8,
+      "target_R": 2.5,
+      "cooldown_hours": 6,
+      "economic_rationale": "Volatility squeeze explosion: 1h Bollinger Bandwidth hits a 30-bar low, followed by a close breaking outside the outer band with volume > 1.5x and 15m signed flow > 0.15.",
+      "math_formulation": {
+        "long_entry": "(1h_BW < min(1h_BW[h1-30:h1-1])) and (1h_close > 1h_BB_upper) and (1h_vol > 1.5 * 1h_vol_SMA20) and (15m_signed_taker_ratio > 0.15)",
+        "short_entry": "(1h_BW < min(1h_BW[h1-30:h1-1])) and (1h_close < 1h_BB_lower) and (1h_vol > 1.5 * 1h_vol_SMA20) and (15m_signed_taker_ratio < -0.15)",
+        "stop_rule": "Entry +/- 1.8 * 1h_ATR(14)",
+        "target_rule": "Entry +/- 2.5 * StopDistance"
+      },
+      "falsification_criteria": "Bandwidth squeezes produce false breakouts with negative net returns after 44 bp friction."
+    },
+    {
+      "id": "W3_C04_ASYMMETRIC_LONG_BIASED_TREND_FLOW_12H",
+      "family": "ASYMMETRIC_LONG_BIASED_TREND",
+      "horizon_hours": 12,
+      "timeframes": ["4h", "1h", "15m"],
+      "side": "LONG_ONLY",
+      "stop_atr_multiplier": 1.5,
+      "target_R": 2.5,
+      "cooldown_hours": 6,
+      "economic_rationale": "Asymmetric long trend riding: Exploit BTC structural upward drift in bull regimes. Require 4h EMA20 > EMA50, 1h close > EMA20, 1h ATR expanding, and 2 consecutive 15m bars of strong taker buy flow (> 0.15).",
+      "math_formulation": {
+        "long_entry": "(4h_EMA20 > 4h_EMA50) and (1h_close > 1h_EMA20) and (1h_ATR14 > 1h_ATR14_SMA10) and (all last 2 15m bars: signed_taker_ratio > 0.15)",
+        "short_entry": "NONE (LONG ONLY)",
+        "stop_rule": "Entry - 1.5 * 1h_ATR(14)",
+        "target_rule": "Entry + 2.5 * StopDistance"
+      },
+      "falsification_criteria": "Long-only bias fails during bear year (2022) with equal-year net bps <= 0 or drawdown > 12%."
+    },
+    {
+      "id": "W3_C05_ASYMMETRIC_SHORT_BIASED_FLOW_COLLAPSE_08H",
+      "family": "ASYMMETRIC_SHORT_BIASED_COLLAPSE",
+      "horizon_hours": 8,
+      "timeframes": ["4h", "1h", "15m"],
+      "side": "SHORT_ONLY",
+      "stop_atr_multiplier": 1.2,
+      "target_R": 2.0,
+      "cooldown_hours": 4,
+      "economic_rationale": "Short-biased cascade expansion: In 4h downtrend (EMA20 < EMA50), a sharp 1h drop (> 1.5x ATR) occurs with heavy negative flow (< -0.25) and volume surge (> 2.0x), entering short for rapid cascade continuation over 8h.",
+      "math_formulation": {
+        "long_entry": "NONE (SHORT ONLY)",
+        "short_entry": "(4h_EMA20 < 4h_EMA50) and (1h_open - 1h_close > 1.5 * 1h_ATR) and (1h_vol > 2.0 * 1h_vol_SMA20) and (15m_signed_taker_ratio < -0.25)",
+        "stop_rule": "Entry + 1.2 * 1h_ATR(14)",
+        "target_rule": "Entry - 2.0 * StopDistance"
+      },
+      "falsification_criteria": "Cascade extensions reverse sharply (short squeeze) resulting in stop hits under stress."
+    },
+    {
+      "id": "W3_C06_TIME_WEIGHTED_SESSION_PULLBACK_08H",
+      "family": "SESSION_PULLBACK_TREND",
+      "horizon_hours": 8,
+      "timeframes": ["4h", "1h", "15m"],
+      "side": "SYMMETRIC_LONG_SHORT",
+      "stop_atr_multiplier": 1.5,
+      "target_R": 2.0,
+      "cooldown_hours": 6,
+      "economic_rationale": "Liquid session pullback continuation: During peak European/US liquidity hours (10:00 to 18:00 UTC), in aligned 4h trend, a 15m pullback touches 1h EMA10 and recovers with strong taker flow (> 0.15).",
+      "math_formulation": {
+        "long_entry": "(UTC_hour in [10..18]) and (4h_close > 4h_EMA20 > 4h_EMA50) and (15m_low <= 1h_EMA10 <= 15m_high) and (15m_close > 1h_EMA10) and (15m_signed_taker_ratio > 0.15)",
+        "short_entry": "(UTC_hour in [10..18]) and (4h_close < 4h_EMA20 < 4h_EMA50) and (15m_low <= 1h_EMA10 <= 15m_high) and (15m_close < 1h_EMA10) and (15m_signed_taker_ratio < -0.15)",
+        "stop_rule": "Entry +/- 1.5 * 1h_ATR(14)",
+        "target_rule": "Entry +/- 2.0 * StopDistance"
+      },
+      "falsification_criteria": "Session pullbacks continue moving against position, failing 44 bp stress roundtrip."
+    }
+  ]
+}
