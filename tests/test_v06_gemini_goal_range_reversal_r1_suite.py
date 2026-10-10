@@ -367,3 +367,37 @@ def test_14_quarter_hour_atr_gap_veto_and_dynamic_target_r() -> None:
     low_r = make_event(target_r=1.2)
     with pytest.raises(ValueError, match="1.5R"):
         replay.episode(d, low_r, CAND, BASE)
+
+
+def test_15_all_four_wave_registries_results_and_ledger_integrity() -> None:
+    import json
+
+    ev_dir = sources.EVIDENCE
+    manifest = json.loads((ev_dir / "SOURCE_MANIFEST_2021_2023.json").read_text())
+    assert manifest["gate"] == "PASS_PUBLIC_BTC_2021_2023_COMPLETE"
+    assert manifest["verified_complete_months"] == 36
+    assert manifest["total_verified_rows"] == 1_576_800
+    assert manifest["forbidden_years_accessed"] == 0
+    assert manifest["owner_or_protected_body_reads"] == 0
+
+    ledger = json.loads((ev_dir / "CUMULATIVE_TRIAL_BUDGET_LEDGER.json").read_text())
+    assert ledger["agent_candidates_registered_so_far"] == 24
+    assert ledger["agent_candidates_remaining"] == 0
+    assert len(ledger["waves"]) == 4
+
+    seen_cids: set[str] = set()
+    for w in ledger["waves"]:
+        wid = w["wave_id"]
+        reg = sources.verify_wave_freeze(wid, w["freeze_sha"])
+        assert len(reg["candidates"]) == 6
+        for c in reg["candidates"]:
+            cid = c.get("candidate_id", c.get("id"))
+            assert cid not in seen_cids
+            seen_cids.add(cid)
+        res = json.loads((ev_dir / f"{wid}_RESULT.json").read_text())
+        assert res["freeze_sha"] == w["freeze_sha"]
+        assert res["determinism_verified_two_runs"] is True
+        assert res["hand_audited_trades_count"] == 30
+        assert len(res["rows"]) == 12
+    assert len(seen_cids) == 24
+

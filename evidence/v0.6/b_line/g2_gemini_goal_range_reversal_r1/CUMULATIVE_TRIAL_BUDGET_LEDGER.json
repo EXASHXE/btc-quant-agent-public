@@ -101,6 +101,7 @@
       "promoted_candidates": [],
       "registry_file": "evidence/v0.6/b_line/g2_gemini_goal_range_reversal_r1/WAVE_04_FROZEN_REGISTRY.json",
       "result_file": "evidence/v0.6/b_line/g2_gemini_goal_range_reversal_r1/WAVE_04_RESULT.json",
+      "result_sha": "30fe821040bacec6b75163017b2d79b2874900fa",
       "status": "EXECUTED_ALL_FALSIFIED_BUDGET_EXHAUSTED_24_OF_24",
       "wave_id": "WAVE_04"
     }
