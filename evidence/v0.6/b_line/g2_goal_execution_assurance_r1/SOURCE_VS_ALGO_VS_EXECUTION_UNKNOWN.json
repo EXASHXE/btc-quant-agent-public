@@ -1,0 +1,134 @@
+{
+  "task_id": "V06_G2_GEMINI_GOAL_C_EXECUTION_ASSURANCE_R1",
+  "terminal": "EXECUTION_INDEPENDENT_DIAGNOSTIC_COMPLETE",
+  "goal_c_freeze_commit_sha": "4c0bac051767f788e6de173f6563a7b47af2ac69",
+  "claim_matrix": [
+    {
+      "claim_id": "C01_COMMIT_AND_CODE_FREEZE_LINEAGE",
+      "domain": "SOURCE_AND_GIT_PROVENANCE",
+      "classification": "VERIFIED_EXACT",
+      "claim": "Exit R1 freeze commit de2c1fb222970a93ca797868b91b8544261ebaad and final commit 55ac4c631c69f6edbd275462ad23e4486b9782ed descend from R31 990c02b5479b3b14996f90fdbf677cb672ada81e with zero post-freeze code edits across all 11 R1 and 66 inherited files.",
+      "evidence_summary": "Verified 11 R1 files and 66 inherited files byte-for-byte."
+    },
+    {
+      "claim_id": "C02_PUBLIC_ARCHIVE_AND_LEDGER_CRYPTOGRAPHIC_IDENTITY",
+      "domain": "SOURCE_AND_GIT_PROVENANCE",
+      "classification": "VERIFIED_EXACT",
+      "claim": "108 monthly Last/Mark/Funding ZIPs (2021-01..2023-12), 8 daily R31 Mark gap ZIPs, and all 24 committed R1 order/paired JSONL ledgers (1,068 rows) match committed SHA256 digests with zero cache writes.",
+      "evidence_summary": "108 monthly + 8 daily ZIPs + 24 ledgers verified; cache_writes=0."
+    },
+    {
+      "claim_id": "C03_E0_BASELINE_CURVE_AND_LEDGER_SEPARATION",
+      "domain": "ALGO_ACCOUNTING",
+      "classification": "VERIFIED_WITH_MANIFEST_BOUNDARY_NOTE",
+      "claim": "E0 trade/event/control digests match R2 and R31; R31 E0 baseline/overlay/funded minute curve .npz arrays and 16 R1 variant Mark curve .npz arrays are verified uncompressed on disk, while R2's earlier Last-price .npz is manifest-pinned in REANALYSIS_R2_RESULTS.json.",
+      "evidence_summary": "4 E0 R31 .npz curves and 16 R1 variant .npz curves verified uncompressed; derived *_E0_orders.jsonl matches R31 funded execution clocks, prices, quantities, and net cash."
+    },
+    {
+      "claim_id": "C04_INDEPENDENT_DUAL_DECIMAL_CASH_AND_QUANTITY_JOURNAL",
+      "domain": "ALGO_ACCOUNTING",
+      "classification": "VERIFIED_EXACT",
+      "claim": "Independent stdlib Dual-Decimal engine reproduces effective ticks, single entry fee, per-tier exit fees, odd-lot splits, signed Funding on remaining inventory at latest completed 1m Mark close, pending ACK receivable non-spendability, and minute-close Mark liquidation equity across >=40 forensic episodes and all 890 order ledger rows.",
+      "evidence_summary": "Audited 48 forensic episodes (24 STRESS, 24 BASE) and 890 total order ledger trades; defects=0."
+    },
+    {
+      "claim_id": "C05_REAL_TP1_TO_FUNDING_SETTLEMENT_60S_BOUNDARY_COVERAGE",
+      "domain": "EMPIRICAL_SAMPLE_SUPPORT",
+      "classification": "FALSIFIED_AS_EMPIRICALLY_COVERED__BOUNDED_LIMITATION_CONFIRMED",
+      "claim": "Historical 2021-2023 development sample contains real partial TP1 fills within <=60,000 ms of a funding settlement.",
+      "evidence_summary": "Falsified as empirically covered (confirming R1's own stop reason): closest real TP1-to-settlement across 3,285 funding events is 119999 ms (W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_1670792400000_-1); 0 real cases <=60s. Sub-60s arithmetic is verified only via synthetic fixtures F13..F17."
+    },
+    {
+      "claim_id": "C06_ADVERSARIAL_EVENT_COLLISION_AND_CAUSALITY_INVARIANTS",
+      "domain": "ALGO_ACCOUNTING",
+      "classification": "VERIFIED_EXACT",
+      "claim": "48 deterministic adversarial collision fixtures (STOP_GAP > TIME_CAP > open gaps > intraminute STOP > TP1 > next-bar TP2, E2 BE after TP1 ACK only, lot/min-notional gates, idempotency, fold censoring) hold without optimistic intra-minute fill invention.",
+      "evidence_summary": "48/48 deterministic collision fixtures passed."
+    },
+    {
+      "claim_id": "C07_H1_VS_E0_INCREMENT_INDEPENDENCE_FROM_ACCOUNT_ACK_GATING",
+      "domain": "ALGO_VS_SIGNAL_ATTRIBUTION",
+      "classification": "VERIFIED_MECHANISM__STATISTICALLY_UNPROVEN_EDGE",
+      "claim": "Observed H1-E0 mean net bps improvement (+37.35 bps W1 STRESS, +22.43 bps W2 STRESS) is a pure fixed-event horizon extension effect (converting 12h TIME_CAP exits in 12..18h) rather than an artifact of account ACK/cooldown gating, but is NOT statistically significant.",
+      "evidence_summary": "H1 and E0 accept the exact same signal event IDs (34 W1, 55 W2) with 0.000000 bps difference between paired and full-account mean net bps; all 7d/14d max-|T| 95% simultaneous CIs span zero."
+    },
+    {
+      "claim_id": "C08_LIMIT_QUEUE_AND_SUBMINUTE_PATH_OBSERVABILITY",
+      "domain": "EXECUTION_UNKNOWN",
+      "classification": "EXECUTION_UNKNOWN",
+      "claim": "1m OHLCV bars prove actual exchange L2 limit-order queue fills for TP1/TP2 and true intra-minute ordering between STOP and TP.",
+      "evidence_summary": "Unproven / unobservable from 1m OHLCV. Under 1-bar confirmation delay or first-confirmation non-fill (delay/unfilled modes), portfolio mean net bps shifts materially and individual trades shift by >100 bps."
+    },
+    {
+      "claim_id": "C09_EXCHANGE_SETTLEMENT_MARK_AND_HISTORICAL_KNOWN_AT",
+      "domain": "EXECUTION_UNKNOWN",
+      "classification": "EXECUTION_UNKNOWN",
+      "claim": "Exact sub-second exchange settlement Mark price at 00:00/08:00/16:00 UTC and real-time API publication timestamps (known-at) are proven by retrospective ZIP archives.",
+      "evidence_summary": "UNKNOWN in public archives. Bounded financial discrepancy of latest completed 1m Mark close proxy vs adjacent 1m Mark OHLC is <= 0.005167 bps per settlement."
+    },
+    {
+      "claim_id": "C10_1X_CASH_CAP_VS_10X_15X_LEVERAGE_SOLVENCY",
+      "domain": "RISK_AND_MARGIN_READINESS",
+      "classification": "1X_VERIFIED__NAIVE_10X_15X_FALSIFIED",
+      "claim": "1x cash cap (0.95 * min(cash, 1000)) keeps Mark notional/equity <= 1.0 across all 20 cells, and 1x returns can be scaled to 10x-15x leverage.",
+      "evidence_summary": "1x cap verified (max exposure ratio 0.9510, 0 minutes >1x). Naive 10x/15x scaling is FALSIFIED: planned 1R stop distances reach 7.5%-11.6% of entry price, triggering forced Mark liquidation before the strategy stop and negative-equity bankruptcy on stop gaps."
+    },
+    {
+      "claim_id": "C11_KNOWN_AT_PREFIX_CAUSALITY_AND_FOLD_PURGE",
+      "domain": "ALGO_ACCOUNTING",
+      "classification": "VERIFIED_EXACT",
+      "claim": "Signal generation, entry proposal, exit book, and as-of Mark lookup do not read unfinished bars or future data; Jan 2021 warmup, 35 scored folds, and 24h edge embargo prevent fold overflow.",
+      "evidence_summary": "Verified across AST, synthetic prefix truncation, and all 890 committed order ledger trades (0 overflows, 0 overlaps)."
+    }
+  ],
+  "worst_unknown_assumptions_ordered_by_materiality": [
+    {
+      "rank": 1,
+      "assumption_id": "UNK_01_HISTORICAL_MAINTENANCE_MARGIN_AND_NAIVE_LEVERAGE_LIQUIDATION",
+      "category": "MARGIN_AND_LIQUIDATION",
+      "status": "UNKNOWN_HISTORICAL_TIER__CATASTROPHIC_IF_NAIVELY_LEVERAGED",
+      "worst_credible_impact": "100% isolated margin wipeout + negative-equity bankruptcy deficit under 10x-15x naive notional scaling because W1_C04/W2_C05 1R stop distances (up to >10% of BTC price) exceed 10x/15x initial margin buffers.",
+      "mitigation_requirement": "Never multiply 1x P&L by leverage; enforce risk-budgeted isolated sizing where stop_distance + gap_buffer + MMR + fees <= max_account_risk_pct, backed by verified as-of exchange bracket tables."
+    },
+    {
+      "rank": 2,
+      "assumption_id": "UNK_02_FEE_SPREAD_SLIPPAGE_TIER_UNCERTAINTY",
+      "category": "EXECUTION_FRICTION",
+      "status": "UNKNOWN_HISTORICAL_ACCOUNT_TIER",
+      "worst_credible_impact": "Doubling friction from BASE (22 bps nominal RT) to STRESS (44 bps nominal RT) reduces mean net return by ~26.1 to 26.9 bps per trade; an additional +10 bps roundtrip fee tier shift reduces mean net return by another ~10.0 bps per trade, pushing E0/E1/E2 close to or below zero.",
+      "mitigation_requirement": "Require primary evaluation at STRESS (44 bps) and verifiable account VIP/maker-taker fee schedule before any TESTNET/LIVE gate."
+    },
+    {
+      "rank": 3,
+      "assumption_id": "UNK_03_LIMIT_FILL_QUEUE_AND_CONFIRMATION_DELAY",
+      "category": "ORDER_BOOK_QUEUE",
+      "status": "UNOBSERVABLE_IN_1M_OHLCV",
+      "worst_credible_impact": "Single-event discrepancy up to -350+ bps when a transient 1m wick trades through TP1/TP2 by >=1 tick but fails to fill in queue (unfilled/delay modes), converting a target fill into a later STOP or lower TIME_CAP.",
+      "mitigation_requirement": "Require L2 order-book / tick trade-through replay or conservative marketable-limit / stop-market execution assumptions."
+    },
+    {
+      "rank": 4,
+      "assumption_id": "UNK_04_CROSS_MINUTE_ADVERSE_STOP_GAP_TAILS",
+      "category": "STOP_EXECUTION",
+      "status": "BOUNDED_IN_SAMPLE_UNBOUNDED_IN_EXTREME_GAPS",
+      "worst_credible_impact": "Bar-open STOP_GAP executes at uncapped open price plus adverse spread/slippage; in flash crashes or liquidity halts, stop-market slippage can far exceed the 6 bps STRESS slippage proxy.",
+      "mitigation_requirement": "Enforce hard isolated margin caps and stress-test -5% to -12% bar-open gaps prior to any capital deployment."
+    },
+    {
+      "rank": 5,
+      "assumption_id": "UNK_05_EXECUTOR_ACK_AND_AMENDMENT_LATENCY_UNDER_60S",
+      "category": "EXECUTOR_STATE_MACHINE",
+      "status": "EMPIRICALLY_UNTESTED_UNDER_60S_IN_R1_SAMPLE",
+      "worst_credible_impact": "Closest real TP1-to-funding settlement in 2021-2023 is 119,999 ms (0 real cases <=60s). In live execution, network/exchange ACK jitter or cancel-replace race conditions between TP1 fill and STOP quantity reduction / E2 BE amendment could cause double-fills or unhedged flips.",
+      "mitigation_requirement": "Require reduceOnly flags on all exit legs, idempotent clientOrderId tracking, and sub-second synthetic + TESTNET race-condition injection tests."
+    },
+    {
+      "rank": 6,
+      "assumption_id": "UNK_06_EXACT_EXCHANGE_SETTLEMENT_MARK_AT_FUNDING_TIMESTAMP",
+      "category": "FUNDING_NOTIONAL_BASIS",
+      "status": "APPROXIMATED_BY_PRECEDING_1M_MARK_CLOSE",
+      "worst_credible_impact": "Bounded at <= 0.005167 bps (0.00047418 USDT) per settlement across all realized R1 funding events.",
+      "mitigation_requirement": "Low financial materiality on 1x spot-equivalent notional; log exact exchange funding settlement receipts in any future live/testnet shadow logger."
+    }
+  ]
+}

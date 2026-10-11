@@ -1,0 +1,553 @@
+{
+  "status": "PASS",
+  "total_fixtures": 48,
+  "passed_fixtures": 48,
+  "fixtures": [
+    {
+      "id": "F01_LONG_ADVERSE_OPEN_STOP_GAP",
+      "category": "GAP_PRECEDENCE",
+      "invariant": "LONG bar opening below stop executes STOP_GAP at uncapped bar open at minute start",
+      "fixture_id": "F01_LONG_ADVERSE_OPEN_STOP_GAP",
+      "status": "PASS",
+      "witness": {
+        "exit_reason": "STOP_GAP",
+        "raw_exit": 85.0,
+        "exit_at": 240000
+      }
+    },
+    {
+      "id": "F02_SHORT_ADVERSE_OPEN_STOP_GAP",
+      "category": "GAP_PRECEDENCE",
+      "invariant": "SHORT bar opening above stop executes STOP_GAP at uncapped bar open at minute start",
+      "fixture_id": "F02_SHORT_ADVERSE_OPEN_STOP_GAP",
+      "status": "PASS",
+      "witness": {
+        "exit_reason": "STOP_GAP",
+        "raw_exit": 115.0
+      }
+    },
+    {
+      "id": "F03_LONG_FAVORABLE_OPEN_SINGLE_TP1_GAP_CAPPED",
+      "category": "GAP_PRECEDENCE",
+      "invariant": "LONG bar opening between TP1 and TP2 fills TP1_GAP_CAPPED at TP1 limit without price improvement",
+      "fixture_id": "F03_LONG_FAVORABLE_OPEN_SINGLE_TP1_GAP_CAPPED",
+      "status": "PASS",
+      "witness": {
+        "tp1_raw_exit": 110.2,
+        "bar_open": 112.2
+      }
+    },
+    {
+      "id": "F04_SHORT_FAVORABLE_OPEN_SINGLE_TP1_GAP_CAPPED",
+      "category": "GAP_PRECEDENCE",
+      "invariant": "SHORT bar opening between TP1 and TP2 fills TP1_GAP_CAPPED at TP1 limit without price improvement",
+      "fixture_id": "F04_SHORT_FAVORABLE_OPEN_SINGLE_TP1_GAP_CAPPED",
+      "status": "PASS",
+      "witness": {
+        "tp1_raw_exit": 89.80000000000001,
+        "bar_open": 87.80000000000001
+      }
+    },
+    {
+      "id": "F05_LONG_FAVORABLE_OPEN_DOUBLE_TIER_GAP_CAPPED",
+      "category": "GAP_PRECEDENCE",
+      "invariant": "LONG bar opening beyond TP2 fills both TP1_GAP_CAPPED and TP2_GAP_CAPPED at their respective limits",
+      "fixture_id": "F05_LONG_FAVORABLE_OPEN_DOUBLE_TIER_GAP_CAPPED",
+      "status": "PASS",
+      "witness": {
+        "reasons": [
+          "TP1_GAP_CAPPED",
+          "TP2_GAP_CAPPED"
+        ]
+      }
+    },
+    {
+      "id": "F06_SHORT_FAVORABLE_OPEN_DOUBLE_TIER_GAP_CAPPED",
+      "category": "GAP_PRECEDENCE",
+      "invariant": "SHORT bar opening beyond TP2 fills both TP1_GAP_CAPPED and TP2_GAP_CAPPED at their respective limits",
+      "fixture_id": "F06_SHORT_FAVORABLE_OPEN_DOUBLE_TIER_GAP_CAPPED",
+      "status": "PASS",
+      "witness": {
+        "reasons": [
+          "TP1_GAP_CAPPED",
+          "TP2_GAP_CAPPED"
+        ]
+      }
+    },
+    {
+      "id": "F07_LONG_INTRABAR_STOP_TP1_TP2_TRIPLE_COLLISION",
+      "category": "INTRABAR_COLLISION",
+      "invariant": "LONG bar hitting STOP, TP1, and TP2 in the same minute rejects optimistic TP fills and exits full quantity at STOP",
+      "fixture_id": "F07_LONG_INTRABAR_STOP_TP1_TP2_TRIPLE_COLLISION",
+      "status": "PASS",
+      "witness": {
+        "exit_reason": "STOP",
+        "tiers_n": 1
+      }
+    },
+    {
+      "id": "F08_SHORT_INTRABAR_STOP_TP1_TP2_TRIPLE_COLLISION",
+      "category": "INTRABAR_COLLISION",
+      "invariant": "SHORT bar hitting STOP, TP1, and TP2 in the same minute rejects optimistic TP fills and exits full quantity at STOP",
+      "fixture_id": "F08_SHORT_INTRABAR_STOP_TP1_TP2_TRIPLE_COLLISION",
+      "status": "PASS",
+      "witness": {
+        "exit_reason": "STOP",
+        "tiers_n": 1
+      }
+    },
+    {
+      "id": "F09_LONG_INTRABAR_TP1_TP2_SIMULTANEOUS_NO_DOUBLE_FILL",
+      "category": "INTRABAR_COLLISION",
+      "invariant": "LONG non-gap bar reaching TP2 high fills only TP1 in that minute; TP2 deferred to subsequent minute",
+      "fixture_id": "F09_LONG_INTRABAR_TP1_TP2_SIMULTANEOUS_NO_DOUBLE_FILL",
+      "status": "PASS",
+      "witness": {
+        "t0_exit_at": 239999,
+        "t1_reason": "TIME_CAP"
+      }
+    },
+    {
+      "id": "F10_SHORT_INTRABAR_TP1_TP2_SIMULTANEOUS_NO_DOUBLE_FILL",
+      "category": "INTRABAR_COLLISION",
+      "invariant": "SHORT non-gap bar reaching TP2 low fills only TP1 in that minute; TP2 deferred to subsequent minute",
+      "fixture_id": "F10_SHORT_INTRABAR_TP1_TP2_SIMULTANEOUS_NO_DOUBLE_FILL",
+      "status": "PASS",
+      "witness": {
+        "t0_reason": "TP1",
+        "t1_reason": "TIME_CAP"
+      }
+    },
+    {
+      "id": "F11_TP1_OPEN_GAP_THEN_INTRABAR_TP2_BLOCKED_SAME_BAR",
+      "category": "TOCTOU_STAGE",
+      "invariant": "When TP1 fills on opening gap, intrabar high reaching TP2 in the same minute cannot fill TP2",
+      "fixture_id": "F11_TP1_OPEN_GAP_THEN_INTRABAR_TP2_BLOCKED_SAME_BAR",
+      "status": "PASS",
+      "witness": {
+        "tp1_exit_at": 180000,
+        "tp2_reason": "TIME_CAP"
+      }
+    },
+    {
+      "id": "F12_TP1_OPEN_GAP_THEN_INTRABAR_STOP_SAME_BAR",
+      "category": "TOCTOU_STAGE",
+      "invariant": "When TP1 fills on opening gap and bar subsequently breaches STOP intraminute, residual q2 exits at STOP",
+      "fixture_id": "F12_TP1_OPEN_GAP_THEN_INTRABAR_STOP_SAME_BAR",
+      "status": "PASS",
+      "witness": {
+        "reasons": [
+          "TP1_GAP_CAPPED",
+          "STOP"
+        ]
+      }
+    },
+    {
+      "id": "F13_TP1_AT_BAR_CLOSE_FUNDING_AT_NEXT_BAR_OPEN_1MS",
+      "category": "FUNDING_BOUNDARY",
+      "invariant": "TP1 at bar close (t_settle - 1ms) reduces inventory before funding at t_settle even while TP1 ACK is at t_settle + 60s",
+      "fixture_id": "F13_TP1_AT_BAR_CLOSE_FUNDING_AT_NEXT_BAR_OPEN_1MS",
+      "status": "PASS",
+      "witness": {
+        "distance_ms": 1,
+        "remaining_qty": "0.1"
+      }
+    },
+    {
+      "id": "F14_TP1_EXACTLY_AT_FUNDING_TIMESTAMP_OPEN_FILL",
+      "category": "FUNDING_BOUNDARY",
+      "invariant": "TP1_GAP_CAPPED at exact funding timestamp (exit_at == settlement_at) precedes funding bill and charges only residual q2",
+      "fixture_id": "F14_TP1_EXACTLY_AT_FUNDING_TIMESTAMP_OPEN_FILL",
+      "status": "PASS",
+      "witness": {
+        "tp1_exit_at": 28800000,
+        "funding_qty": "0.1"
+      }
+    },
+    {
+      "id": "F15_FLAT_EXIT_EXACTLY_AT_FUNDING_TIMESTAMP_EXCLUDED",
+      "category": "FUNDING_BOUNDARY",
+      "invariant": "Full exit at exact funding timestamp (exit_at == settlement_at) incurs zero funding bill",
+      "fixture_id": "F15_FLAT_EXIT_EXACTLY_AT_FUNDING_TIMESTAMP_EXCLUDED",
+      "status": "PASS",
+      "witness": {
+        "exit_at": 28800000,
+        "settlements_n": 0
+      }
+    },
+    {
+      "id": "F16_FUNDING_AT_ENTRY_TIMESTAMP_INCLUDED_FULL_QTY",
+      "category": "FUNDING_BOUNDARY",
+      "invariant": "Funding settlement at exact entry_at timestamp is charged on full initial quantity",
+      "fixture_id": "F16_FUNDING_AT_ENTRY_TIMESTAMP_INCLUDED_FULL_QTY",
+      "status": "PASS",
+      "witness": {
+        "settlement_at": 120000,
+        "qty": "0.2"
+      }
+    },
+    {
+      "id": "F17_FUNDING_1MS_BEFORE_TP1_CLOSE_USES_FULL_QTY",
+      "category": "FUNDING_BOUNDARY",
+      "invariant": "Funding at bar open (t) before TP1 at bar close (t + 59,999ms) charges full initial quantity q1 + q2",
+      "fixture_id": "F17_FUNDING_1MS_BEFORE_TP1_CLOSE_USES_FULL_QTY",
+      "status": "PASS",
+      "witness": {
+        "funding_qty": "0.2"
+      }
+    },
+    {
+      "id": "F18_TP1_ACK_LATENCY_BAR_CLOSE_VS_BAR_OPEN",
+      "category": "ACK_CAUSALITY",
+      "invariant": "Bar-open fill ACKs at +60,000ms; bar-close fill (minute+59,999ms) ACKs at next-next minute open (+60,001ms)",
+      "fixture_id": "F18_TP1_ACK_LATENCY_BAR_CLOSE_VS_BAR_OPEN",
+      "status": "PASS",
+      "witness": {
+        "open_ack": 660000,
+        "close_ack": 720000
+      }
+    },
+    {
+      "id": "F19_E2_STOP_MOVED_AFTER_TP1_ACK_ONLY_TOCTOU",
+      "category": "TOCTOU_STAGE",
+      "invariant": "E2 breakeven stop amendment is inactive during the minute between TP1 bar-close fill and TP1 ACK",
+      "fixture_id": "F19_E2_STOP_MOVED_AFTER_TP1_ACK_ONLY_TOCTOU",
+      "status": "PASS",
+      "witness": {
+        "tp1_ack": 300000,
+        "be_stop_exit_at": 359999
+      }
+    },
+    {
+      "id": "F20_E2_SHORT_BREAKEVEN_STOP_CLAMP_AND_ACK",
+      "category": "TOCTOU_STAGE",
+      "invariant": "SHORT E2 breakeven stop never loosens initial stop and activates strictly at/after TP1 ACK",
+      "fixture_id": "F20_E2_SHORT_BREAKEVEN_STOP_CLAMP_AND_ACK",
+      "status": "PASS",
+      "witness": {
+        "short_be": 99.6,
+        "orig_stop": 110.0
+      }
+    },
+    {
+      "id": "F21_EXACT_TOUCH_NO_FILL_VS_ONE_TICK_THROUGH_LONG",
+      "category": "LIMIT_SENSITIVITY",
+      "invariant": "LONG exact limit touch logs touch_no_fill=1 without filling; 1-tick trade-through (+0.1) fills at limit",
+      "fixture_id": "F21_EXACT_TOUCH_NO_FILL_VS_ONE_TICK_THROUGH_LONG",
+      "status": "PASS",
+      "witness": {
+        "touch_tiers": 1,
+        "thru_tiers": 2
+      }
+    },
+    {
+      "id": "F22_EXACT_TOUCH_NO_FILL_VS_ONE_TICK_THROUGH_SHORT",
+      "category": "LIMIT_SENSITIVITY",
+      "invariant": "SHORT exact limit touch logs touch_no_fill=1 without filling; 1-tick trade-through (-0.1) fills at limit",
+      "fixture_id": "F22_EXACT_TOUCH_NO_FILL_VS_ONE_TICK_THROUGH_SHORT",
+      "status": "PASS",
+      "witness": {
+        "touch_no_fill": 1
+      }
+    },
+    {
+      "id": "F23_E0_PRIMARY_TOUCH_VS_E0_THROUGH_SENSITIVITY",
+      "category": "LIMIT_SENSITIVITY",
+      "invariant": "Legacy E0 primary fills on exact touch whereas E0 through requires 1-tick trade-through",
+      "fixture_id": "F23_E0_PRIMARY_TOUCH_VS_E0_THROUGH_SENSITIVITY",
+      "status": "PASS",
+      "witness": {
+        "primary": "TARGET",
+        "through": "TIME_CAP"
+      }
+    },
+    {
+      "id": "F24_DELAY_MODE_CONFIRMATION_NEXT_OPEN_FAVORABLE",
+      "category": "LIMIT_SENSITIVITY",
+      "invariant": "fill_mode='delay' waits 1 bar after trade-through and fills when subsequent bar opens favorably",
+      "fixture_id": "F24_DELAY_MODE_CONFIRMATION_NEXT_OPEN_FAVORABLE",
+      "status": "PASS",
+      "witness": {
+        "delayed_exit_at": 240000
+      }
+    },
+    {
+      "id": "F25_DELAY_MODE_NEXT_OPEN_UNFAVORABLE_RECONFIRMS",
+      "category": "LIMIT_SENSITIVITY",
+      "invariant": "fill_mode='delay' rejects fill when next bar opens unfavorably even if high trades through again",
+      "fixture_id": "F25_DELAY_MODE_NEXT_OPEN_UNFAVORABLE_RECONFIRMS",
+      "status": "PASS",
+      "witness": {
+        "reconfirmed_exit_at": 300000
+      }
+    },
+    {
+      "id": "F26_UNFILLED_MODE_SKIPS_FIRST_CONFIRMATION_INCLUDING_OPEN_GAP",
+      "category": "LIMIT_SENSITIVITY",
+      "invariant": "fill_mode='unfilled' skips first confirmation bar (including opening gap) and fills on second confirmation",
+      "fixture_id": "F26_UNFILLED_MODE_SKIPS_FIRST_CONFIRMATION_INCLUDING_OPEN_GAP",
+      "status": "PASS",
+      "witness": {
+        "unfilled_second_bar_exit_at": 299999
+      }
+    },
+    {
+      "id": "F27_LOT_ROUNDING_ODD_LOTS_AND_FLOAT_ULPS",
+      "category": "LOT_AND_NOTIONAL",
+      "invariant": "Odd lot multiple (0.027 BTC) splits into floor half (0.013) + remainder (0.014); float ULP accepted; non-lot rejected",
+      "fixture_id": "F27_LOT_ROUNDING_ODD_LOTS_AND_FLOAT_ULPS",
+      "status": "PASS",
+      "witness": {
+        "odd_split": [
+          "0.013",
+          "0.014"
+        ],
+        "non_lot_rejected": true
+      }
+    },
+    {
+      "id": "F28_MIN_NOTIONAL_PER_TIER_REJECTION",
+      "category": "LOT_AND_NOTIONAL",
+      "invariant": "Position with total notional >= 5 USDT but half-tier notional < 5 USDT raises PartialIneligible",
+      "fixture_id": "F28_MIN_NOTIONAL_PER_TIER_REJECTION",
+      "status": "PASS",
+      "witness": {
+        "e0_valid": true,
+        "e1_min_notional_rejected": true
+      }
+    },
+    {
+      "id": "F29_ENTRY_FEE_CHARGED_ONCE_EXIT_FEES_PER_TIER",
+      "category": "FEE_ACCOUNTING",
+      "invariant": "Entry fee is charged exactly once at entry_at; allocated tier entry fees sum to fee_entry; exit fees sum across tiers",
+      "fixture_id": "F29_ENTRY_FEE_CHARGED_ONCE_EXIT_FEES_PER_TIER",
+      "status": "PASS",
+      "witness": {
+        "fee_entry": 0.024024,
+        "fee_exit": 0.027611999999999998
+      }
+    },
+    {
+      "id": "F30_FUNDING_SIGN_MATRIX_AND_ZERO_RATE",
+      "category": "FUNDING_ACCOUNTING",
+      "invariant": "Signed funding cash equals -side * open_qty * mark_close * rate across all (+/- side) x (+/-/0 rate) combinations",
+      "fixture_id": "F30_FUNDING_SIGN_MATRIX_AND_ZERO_RATE",
+      "status": "PASS",
+      "witness": {
+        "funding_bills": [
+          "-0.02000",
+          "0.02000",
+          "0.000",
+          "0.02000",
+          "-0.02000",
+          "0.000"
+        ]
+      }
+    },
+    {
+      "id": "F31_STOP_GAP_PRECEDES_TIME_CAP_AT_DEADLINE",
+      "category": "DEADLINE_PRECEDENCE",
+      "invariant": "At exact horizon deadline, adverse opening gap beyond stop executes STOP_GAP rather than TIME_CAP",
+      "fixture_id": "F31_STOP_GAP_PRECEDES_TIME_CAP_AT_DEADLINE",
+      "status": "PASS",
+      "witness": {
+        "exit_reason": "STOP_GAP",
+        "raw_exit": 85.0
+      }
+    },
+    {
+      "id": "F32_TIME_CAP_CAPPED_AT_FINAL_TARGET",
+      "category": "DEADLINE_PRECEDENCE",
+      "invariant": "At exact horizon deadline, favorable opening gap beyond target2 caps TIME_CAP raw exit at target2",
+      "fixture_id": "F32_TIME_CAP_CAPPED_AT_FINAL_TARGET",
+      "status": "PASS",
+      "witness": {
+        "exit_reason": "TIME_CAP",
+        "capped_raw_exit": 120.30000000000001
+      }
+    },
+    {
+      "id": "F33_FOLD_BOUNDARY_CENSORING_12H_18H_24H",
+      "category": "FOLD_BOUNDARY",
+      "invariant": "path_eligible prospectively censors entries where entry + horizon + 1m >= fold_end across 12h, 18h, and 24h",
+      "fixture_id": "F33_FOLD_BOUNDARY_CENSORING_12H_18H_24H",
+      "status": "PASS",
+      "witness": {
+        "horizons_verified": [
+          12,
+          18,
+          24
+        ]
+      }
+    },
+    {
+      "id": "F34_EXIT_ACK_OUTSIDE_FOLD_HARD_GUARD",
+      "category": "FOLD_BOUNDARY",
+      "invariant": "Account replay raises ValueError if any admitted trade's exit_ack_at reaches or exceeds fold end_ms",
+      "fixture_id": "F34_EXIT_ACK_OUTSIDE_FOLD_HARD_GUARD",
+      "status": "PASS",
+      "witness": {
+        "fates": {
+          "PROSPECTIVE_FOLD_CENSOR": 1
+        }
+      }
+    },
+    {
+      "id": "F35_PARTIAL_TP1_ACK_DOES_NOT_REOPEN_ENTRY_OR_BYPASS_COOLDOWN",
+      "category": "GATE_AND_COOLDOWN",
+      "invariant": "TP1 ACK while q2 remains open does not reopen single-position gate; post-exit cooldown blocks early re-entry",
+      "fixture_id": "F35_PARTIAL_TP1_ACK_DOES_NOT_REOPEN_ENTRY_OR_BYPASS_COOLDOWN",
+      "status": "PASS",
+      "witness": {
+        "fates": {
+          "FILLED": 2,
+          "POSITION_ACK_OR_COOLDOWN": 2
+        }
+      }
+    },
+    {
+      "id": "F36_MISSING_MARK_MINUTE_AT_SETTLEMENT_OR_CURVE_REJECTED",
+      "category": "SOURCE_INTEGRITY",
+      "invariant": "Missing completed 1m Mark bar at settlement or inside fold raises ValueError",
+      "fixture_id": "F36_MISSING_MARK_MINUTE_AT_SETTLEMENT_OR_CURVE_REJECTED",
+      "status": "PASS",
+      "witness": {
+        "missing_mark_rejected": true
+      }
+    },
+    {
+      "id": "F37_MISSING_LAST_MINUTE_ON_EXIT_PATH_REJECTED",
+      "category": "SOURCE_INTEGRITY",
+      "invariant": "Missing or non-contiguous 1m Last bar on exit path raises ValueError",
+      "fixture_id": "F37_MISSING_LAST_MINUTE_ON_EXIT_PATH_REJECTED",
+      "status": "PASS",
+      "witness": {
+        "missing_last_rejected": true
+      }
+    },
+    {
+      "id": "F38_NO_CASH_DEBT_AND_BUDGET_RESERVATION_INVARIANT",
+      "category": "CAPITAL_RESERVE",
+      "invariant": "size() enforces 0.95 * min(cash, 1000) budget with worst-entry, entry fee, 1.1x exit and 12h funding reserves",
+      "fixture_id": "F38_NO_CASH_DEBT_AND_BUDGET_RESERVATION_INVARIANT",
+      "status": "PASS",
+      "witness": {
+        "admitted_qty": 8.908,
+        "budget_cap": 950.0
+      }
+    },
+    {
+      "id": "F39_UNACKNOWLEDGED_CASH_AND_PAST_FUNDING_CANNOT_PREFUND_CONCURRENT_ENTRY",
+      "category": "CASH_CAUSALITY",
+      "invariant": "Unacknowledged exit P&L is held in pending receivable until exit_ack_at and cannot pre-fund concurrent entry",
+      "fixture_id": "F39_UNACKNOWLEDGED_CASH_AND_PAST_FUNDING_CANNOT_PREFUND_CONCURRENT_ENTRY",
+      "status": "PASS",
+      "witness": {
+        "settled_delta_before_ack": -0.018618000000000003
+      }
+    },
+    {
+      "id": "F40_RETRANSMISSION_IDEMPOTENCY_AND_DUPLICATE_EXIT_REJECTION",
+      "category": "IDEMPOTENCY",
+      "invariant": "Duplicate signal at same clock is blocked by position gate; duplicate tier exit in journal fails inventory conservation",
+      "fixture_id": "F40_RETRANSMISSION_IDEMPOTENCY_AND_DUPLICATE_EXIT_REJECTION",
+      "status": "PASS",
+      "witness": {
+        "duplicate_entry_blocked": true,
+        "double_exit_caught": true
+      }
+    },
+    {
+      "id": "F41_UNPROVEN_PROVIDER_SETTLEMENT_MARK_REJECTED",
+      "category": "SOURCE_INTEGRITY",
+      "invariant": "Funding event supplying mark_price without mark_price_source_proven=True raises ValueError",
+      "fixture_id": "F41_UNPROVEN_PROVIDER_SETTLEMENT_MARK_REJECTED",
+      "status": "PASS",
+      "witness": {
+        "unproven_mark_rejected": true
+      }
+    },
+    {
+      "id": "F42_QUARTER_ATR_ENTRY_GAP_VETO",
+      "category": "ENTRY_VETO",
+      "invariant": "Entry open diverging by more than 0.25 * atr_hour from decision_close is rejected",
+      "fixture_id": "F42_QUARTER_ATR_ENTRY_GAP_VETO",
+      "status": "PASS",
+      "witness": {
+        "fates": {
+          "ENTRY_OR_SIZE_REJECTED": 1
+        }
+      }
+    },
+    {
+      "id": "F43_WRONG_SIDE_STOP_OR_NONPOSITIVE_EFFECTIVE_RISK_VETO",
+      "category": "ENTRY_VETO",
+      "invariant": "Stop on wrong side of entry or effective entry slipping past stop is rejected",
+      "fixture_id": "F43_WRONG_SIDE_STOP_OR_NONPOSITIVE_EFFECTIVE_RISK_VETO",
+      "status": "PASS",
+      "witness": {
+        "fates": {
+          "ENTRY_OR_SIZE_REJECTED": 1
+        }
+      }
+    },
+    {
+      "id": "F44_AVAILABILITY_CAUSALITY_CLOCK_VIOLATION_REJECTED",
+      "category": "CAUSALITY_CLOCK",
+      "invariant": "Signal violating event_time + 60s <= decision_at + 60s <= entry_at raises ValueError and is not silently ignored",
+      "fixture_id": "F44_AVAILABILITY_CAUSALITY_CLOCK_VIOLATION_REJECTED",
+      "status": "PASS",
+      "witness": {
+        "clock_violation_raised": true
+      }
+    },
+    {
+      "id": "F45_MARK_CURVE_INSOLVENCY_ZERO_OR_NEGATIVE_EQUITY_GUARD",
+      "category": "SOLVENCY_GUARD",
+      "invariant": "Mark liquidation curve raises ValueError if marked account equity drops to or below zero",
+      "fixture_id": "F45_MARK_CURVE_INSOLVENCY_ZERO_OR_NEGATIVE_EQUITY_GUARD",
+      "status": "PASS",
+      "witness": {
+        "insolvency_guard_raised": true
+      }
+    },
+    {
+      "id": "F46_SYNTHETIC_LEVERAGE_10X_15X_LIQUIDATION_AND_GAP_DEFICIT",
+      "category": "LEVERAGE_STRESS",
+      "invariant": "Synthetic 10x/15x naive leverage triggers Mark liquidation before 1x stop and incurs gap deficit; risk-capped isolated survives",
+      "fixture_id": "F46_SYNTHETIC_LEVERAGE_10X_15X_LIQUIDATION_AND_GAP_DEFICIT",
+      "status": "PASS",
+      "witness": {
+        "naive_15x_liquidated": true,
+        "capped_15x_survived": true
+      }
+    },
+    {
+      "id": "F47_KNOWN_AT_SIGNAL_PREFIX_INDEPENDENCE_AND_WARMUP_PURGE",
+      "category": "KNOWN_AT_LINEAGE",
+      "invariant": "Signal generation and entry proposal are invariant to future Last/Mark/Funding mutations and strict prefix truncation",
+      "fixture_id": "F47_KNOWN_AT_SIGNAL_PREFIX_INDEPENDENCE_AND_WARMUP_PURGE",
+      "status": "PASS",
+      "witness": {
+        "status": "PASS",
+        "w1_c04_signal_emitted_at_decision_ms": 1613289600000,
+        "w2_c05_signals_emitted_count": 1,
+        "future_bar_mutation_invariant": true,
+        "strict_prefix_truncation_invariant": true,
+        "entry_proposal_intrabar_hlc_invariant": true,
+        "post_exit_last_and_future_mark_invariant": true,
+        "mark_close_asof_boundary_clock_verified": true
+      }
+    },
+    {
+      "id": "F48_AUDIT_TAMPER_DETECTION_CASH_FEE_FUNDING_CURVE_ARCHIVE",
+      "category": "ADVERSARIAL_TAMPER",
+      "invariant": "Independent Decimal audit deterministically catches cash, fee, residual qty, premature ACK, and curve tampering",
+      "fixture_id": "F48_AUDIT_TAMPER_DETECTION_CASH_FEE_FUNDING_CURVE_ARCHIVE",
+      "status": "PASS",
+      "witness": {
+        "tampers_detected": 4
+      }
+    }
+  ]
+}
