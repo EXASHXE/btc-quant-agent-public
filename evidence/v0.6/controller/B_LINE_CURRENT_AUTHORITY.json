@@ -2266,7 +2266,7 @@
     "controller_closure_sha": "bfe9f5df1bf55e7738cfbff58ce32e674edab683"
   },
   "v06_g2_gemini_a_code_as_executed_real_reanalysis_r2": {
-    "status": "NEW_BRANCH_AND_PINNED_PROMPT_PUBLISHED_NOT_EXECUTED",
+    "status": "REAL_PRICE_REANALYSIS_COMPLETED_CONTROLLER_ACCEPTED_EXPLORATORY_POSITIVES_ZERO_PROMOTIONS",
     "task_id": "V06_G2_GEMINI_A_CODE_AS_EXECUTED_23_TRIAL_ACTUAL_MARKET_REPLAY_R2",
     "priority": "P0_ONE_ACTUAL_REAL_PRICE_DEVELOPMENT_REANALYSIS_NOT_NEW_STRATEGIES",
     "branch": "feature/v06-bline-gemini-a-code-identity-exploratory-replay-r2",
@@ -2280,6 +2280,46 @@
     "checks": "REAL_DATA_23_CANDIDATE_REPLAY_35_DEV_FOLDS_PLUS_MATCHED_CONTROL_1X_MTM_48_TRIAL_ADJUSTMENT",
     "protected_2024_2025_2026": "NO_ACCESS",
     "owner_root": "NONE",
-    "p3_p4_testnet_live": "NONE"
+    "p3_p4_testnet_live": "NONE",
+    "final_sha": "d2477c1aaff601e0740a6899e60d85224c75a4dc",
+    "frozen_code_sha": "99c909f9a2dd52cf5a6ba89938851ddb9397d3dd",
+    "source_reported": "36_MONTHS_1576800_ROWS_35_SCORED_2021_2023",
+    "replayed_strategies": 23,
+    "method_invalid": "W1_C06_EXCLUDED",
+    "positive_cost_proxy_leads": [
+      "W1_C04_12H_N34_STRESS_PLUS_11_504_BPS",
+      "W2_C05_12H_N55_STRESS_PLUS_19_132_BPS",
+      "W3_C05_8H_N4_STRESS_PLUS_30_843_BPS_INSUFFICIENT"
+    ],
+    "descriptive_gate_passes": 0,
+    "ci": "EXACT_SHA_RUN_38130544513_IN_PROGRESS_AT_CONTROLLER_DECISION",
+    "decision_sha": "b351d5f193fda98f9f4274cb483a8d148eb797d9",
+    "current_next": "TWO_FIXED_12H_REAL_FUNDING_MARK_2021_23_ECONOMIC_ADMISSION",
+    "future_holdout": "NOT_AUTHORIZED_UNREAD"
+  },
+  "v06_g2_btc_two_12h_funding_mark_economic_admission_r3": {
+    "status": "NEW_CODE_BRANCH_CREATED_FULL_SOL_PROMPT_PUBLISHED_UNEXECUTED",
+    "task_id": "V06_G2_BTC_TWO_12H_FIXED_LEADS_ACTUAL_FUNDING_MARK_ECONOMICS_R3",
+    "controller_dispatch_sha": "b351d5f193fda98f9f4274cb483a8d148eb797d9",
+    "prompt_sha": "4833c245d868df160e93883ba1560fd1b97ba903",
+    "branch": "feature/v06-bline-btc-12h-funding-mark-economic-admission-r3",
+    "exact_start_sha": "d2477c1aaff601e0740a6899e60d85224c75a4dc",
+    "worktree": "/root/workspace/project/quant-v0.6/btc-12h-funding-mark-r3",
+    "executor": "Codex GPT-6 Sol High requested, actual effort must be observed",
+    "candidate_ids": [
+      "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H",
+      "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H"
+    ],
+    "input_source_scope": "OFFICIAL_USDM_BTCUSDT_2021_2023_LAST_TRADE_PLUS_MARK_AND_SIGNED_FUNDING",
+    "hypothesis_trials_added": 0,
+    "research_grade": "RETROSPECTIVE_DEVELOPMENT_ONLY_NO_OOS_NO_ALPHA",
+    "holdout_2024_2025_2026": "NOT_AUTHORIZED_UNREAD",
+    "owner_data": "NONE",
+    "testnet_live_real_funds": "NONE",
+    "freeze_requirement": "COMMIT_ONE_BEFORE_NEW_MARK_FUNDING_BODY_ACCESS",
+    "terminal_choices": [
+      "TWO_LEAD_REAL_FUNDING_MARK_ECONOMICS_COMPLETE_DEVELOPMENT_ONLY",
+      "MARK_FUNDING_SOURCE_OR_CAUSALITY_BLOCKED"
+    ]
   }
 }
