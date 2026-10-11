@@ -1,0 +1,2270 @@
+{
+  "method": "Independent stdlib CSV/ZIP and Decimal source reconstruction; -side*quantity*completedMark*actualRate; [entry+shift,exit+shift); no production economics imports",
+  "source_manifest_sha256": "1f06a24b892a24430f3d2f9e5f2c46e926ed24a437785614c400a1fa536b677c",
+  "episodes": [
+    {
+      "candidate": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H",
+      "event_id": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_1619401500000_1",
+      "side": 1,
+      "year": 2021,
+      "entry_at": 1619401560000,
+      "exit_at": 1619444760000,
+      "actual_boundary_sensitive": false,
+      "cases": [
+        {
+          "shift_entry_ms": 0,
+          "shift_exit_ms": 0,
+          "settlements": [
+            {
+              "settlement_at": 1619424000002,
+              "rate_fraction": "0.00010000",
+              "quantity": "0.018000000000000002",
+              "Mark_completed_close_at": 1619423999999,
+              "Mark_close": "52815.88419012",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "-0.09506859154221601056317683802"
+            }
+          ],
+          "independent_cash_usdt": "-0.09506859154221601056317683802",
+          "frozen_ledger_cash_usdt": "-0.09506859154221601056317683802",
+          "assertions": "PASS"
+        },
+        {
+          "shift_entry_ms": -60000,
+          "shift_exit_ms": -60000,
+          "settlements": [
+            {
+              "settlement_at": 1619424000002,
+              "rate_fraction": "0.00010000",
+              "quantity": "0.018000000000000002",
+              "Mark_completed_close_at": 1619423999999,
+              "Mark_close": "52815.88419012",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "-0.09506859154221601056317683802"
+            }
+          ],
+          "independent_cash_usdt": "-0.09506859154221601056317683802",
+          "frozen_ledger_cash_usdt": "-0.09506859154221601056317683802",
+          "assertions": "PASS"
+        },
+        {
+          "shift_entry_ms": 60000,
+          "shift_exit_ms": 60000,
+          "settlements": [
+            {
+              "settlement_at": 1619424000002,
+              "rate_fraction": "0.00010000",
+              "quantity": "0.018000000000000002",
+              "Mark_completed_close_at": 1619423999999,
+              "Mark_close": "52815.88419012",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "-0.09506859154221601056317683802"
+            }
+          ],
+          "independent_cash_usdt": "-0.09506859154221601056317683802",
+          "frozen_ledger_cash_usdt": "-0.09506859154221601056317683802",
+          "assertions": "PASS"
+        },
+        {
+          "shift_entry_ms": -60000,
+          "shift_exit_ms": 60000,
+          "settlements": [
+            {
+              "settlement_at": 1619424000002,
+              "rate_fraction": "0.00010000",
+              "quantity": "0.018000000000000002",
+              "Mark_completed_close_at": 1619423999999,
+              "Mark_close": "52815.88419012",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "-0.09506859154221601056317683802"
+            }
+          ],
+          "independent_cash_usdt": "-0.09506859154221601056317683802",
+          "frozen_ledger_cash_usdt": "-0.09506859154221601056317683802",
+          "assertions": "PASS"
+        },
+        {
+          "shift_entry_ms": 60000,
+          "shift_exit_ms": -60000,
+          "settlements": [
+            {
+              "settlement_at": 1619424000002,
+              "rate_fraction": "0.00010000",
+              "quantity": "0.018000000000000002",
+              "Mark_completed_close_at": 1619423999999,
+              "Mark_close": "52815.88419012",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "-0.09506859154221601056317683802"
+            }
+          ],
+          "independent_cash_usdt": "-0.09506859154221601056317683802",
+          "frozen_ledger_cash_usdt": "-0.09506859154221601056317683802",
+          "assertions": "PASS"
+        }
+      ]
+    },
+    {
+      "candidate": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H",
+      "event_id": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_1637028000000_-1",
+      "side": -1,
+      "year": 2021,
+      "entry_at": 1637028060000,
+      "exit_at": 1637057399999,
+      "actual_boundary_sensitive": false,
+      "cases": [
+        {
+          "shift_entry_ms": 0,
+          "shift_exit_ms": 0,
+          "settlements": [
+            {
+              "settlement_at": 1637049600001,
+              "rate_fraction": "0.00010000",
+              "quantity": "0.014",
+              "Mark_completed_close_at": 1637049599999,
+              "Mark_close": "60817.62330407",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "0.0851446726256980000"
+            }
+          ],
+          "independent_cash_usdt": "0.0851446726256980000",
+          "frozen_ledger_cash_usdt": "0.0851446726256980000",
+          "assertions": "PASS"
+        },
+        {
+          "shift_entry_ms": -60000,
+          "shift_exit_ms": -60000,
+          "settlements": [
+            {
+              "settlement_at": 1637049600001,
+              "rate_fraction": "0.00010000",
+              "quantity": "0.014",
+              "Mark_completed_close_at": 1637049599999,
+              "Mark_close": "60817.62330407",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "0.0851446726256980000"
+            }
+          ],
+          "independent_cash_usdt": "0.0851446726256980000",
+          "frozen_ledger_cash_usdt": "0.0851446726256980000",
+          "assertions": "PASS"
+        },
+        {
+          "shift_entry_ms": 60000,
+          "shift_exit_ms": 60000,
+          "settlements": [
+            {
+              "settlement_at": 1637049600001,
+              "rate_fraction": "0.00010000",
+              "quantity": "0.014",
+              "Mark_completed_close_at": 1637049599999,
+              "Mark_close": "60817.62330407",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "0.0851446726256980000"
+            }
+          ],
+          "independent_cash_usdt": "0.0851446726256980000",
+          "frozen_ledger_cash_usdt": "0.0851446726256980000",
+          "assertions": "PASS"
+        },
+        {
+          "shift_entry_ms": -60000,
+          "shift_exit_ms": 60000,
+          "settlements": [
+            {
+              "settlement_at": 1637049600001,
+              "rate_fraction": "0.00010000",
+              "quantity": "0.014",
+              "Mark_completed_close_at": 1637049599999,
+              "Mark_close": "60817.62330407",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "0.0851446726256980000"
+            }
+          ],
+          "independent_cash_usdt": "0.0851446726256980000",
+          "frozen_ledger_cash_usdt": "0.0851446726256980000",
+          "assertions": "PASS"
+        },
+        {
+          "shift_entry_ms": 60000,
+          "shift_exit_ms": -60000,
+          "settlements": [
+            {
+              "settlement_at": 1637049600001,
+              "rate_fraction": "0.00010000",
+              "quantity": "0.014",
+              "Mark_completed_close_at": 1637049599999,
+              "Mark_close": "60817.62330407",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "0.0851446726256980000"
+            }
+          ],
+          "independent_cash_usdt": "0.0851446726256980000",
+          "frozen_ledger_cash_usdt": "0.0851446726256980000",
+          "assertions": "PASS"
+        }
+      ]
+    },
+    {
+      "candidate": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H",
+      "event_id": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_1651979700000_-1",
+      "side": -1,
+      "year": 2022,
+      "entry_at": 1651979760000,
+      "exit_at": 1652022960000,
+      "actual_boundary_sensitive": false,
+      "cases": [
+        {
+          "shift_entry_ms": 0,
+          "shift_exit_ms": 0,
+          "settlements": [
+            {
+              "settlement_at": 1651996800007,
+              "rate_fraction": "0.00010000",
+              "quantity": "0.027",
+              "Mark_completed_close_at": 1651996799999,
+              "Mark_close": "34593.56606652",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "0.0934026283796040000"
+            }
+          ],
+          "independent_cash_usdt": "0.0934026283796040000",
+          "frozen_ledger_cash_usdt": "0.0934026283796040000",
+          "assertions": "PASS"
+        },
+        {
+          "shift_entry_ms": -60000,
+          "shift_exit_ms": -60000,
+          "settlements": [
+            {
+              "settlement_at": 1651996800007,
+              "rate_fraction": "0.00010000",
+              "quantity": "0.027",
+              "Mark_completed_close_at": 1651996799999,
+              "Mark_close": "34593.56606652",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "0.0934026283796040000"
+            }
+          ],
+          "independent_cash_usdt": "0.0934026283796040000",
+          "frozen_ledger_cash_usdt": "0.0934026283796040000",
+          "assertions": "PASS"
+        },
+        {
+          "shift_entry_ms": 60000,
+          "shift_exit_ms": 60000,
+          "settlements": [
+            {
+              "settlement_at": 1651996800007,
+              "rate_fraction": "0.00010000",
+              "quantity": "0.027",
+              "Mark_completed_close_at": 1651996799999,
+              "Mark_close": "34593.56606652",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "0.0934026283796040000"
+            }
+          ],
+          "independent_cash_usdt": "0.0934026283796040000",
+          "frozen_ledger_cash_usdt": "0.0934026283796040000",
+          "assertions": "PASS"
+        },
+        {
+          "shift_entry_ms": -60000,
+          "shift_exit_ms": 60000,
+          "settlements": [
+            {
+              "settlement_at": 1651996800007,
+              "rate_fraction": "0.00010000",
+              "quantity": "0.027",
+              "Mark_completed_close_at": 1651996799999,
+              "Mark_close": "34593.56606652",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "0.0934026283796040000"
+            }
+          ],
+          "independent_cash_usdt": "0.0934026283796040000",
+          "frozen_ledger_cash_usdt": "0.0934026283796040000",
+          "assertions": "PASS"
+        },
+        {
+          "shift_entry_ms": 60000,
+          "shift_exit_ms": -60000,
+          "settlements": [
+            {
+              "settlement_at": 1651996800007,
+              "rate_fraction": "0.00010000",
+              "quantity": "0.027",
+              "Mark_completed_close_at": 1651996799999,
+              "Mark_close": "34593.56606652",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "0.0934026283796040000"
+            }
+          ],
+          "independent_cash_usdt": "0.0934026283796040000",
+          "frozen_ledger_cash_usdt": "0.0934026283796040000",
+          "assertions": "PASS"
+        }
+      ]
+    },
+    {
+      "candidate": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H",
+      "event_id": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_1653896700000_1",
+      "side": 1,
+      "year": 2022,
+      "entry_at": 1653896760000,
+      "exit_at": 1653939960000,
+      "actual_boundary_sensitive": false,
+      "cases": [
+        {
+          "shift_entry_ms": 0,
+          "shift_exit_ms": 0,
+          "settlements": [
+            {
+              "settlement_at": 1653897600013,
+              "rate_fraction": "0.00010000",
+              "quantity": "0.03",
+              "Mark_completed_close_at": 1653897599999,
+              "Mark_close": "30627.20000000",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "-0.091881600000000000"
+            },
+            {
+              "settlement_at": 1653926400005,
+              "rate_fraction": "0.00010000",
+              "quantity": "0.03",
+              "Mark_completed_close_at": 1653926399999,
+              "Mark_close": "30619.74300365",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "-0.091859229010950000"
+            }
+          ],
+          "independent_cash_usdt": "-0.183740829010950000",
+          "frozen_ledger_cash_usdt": "-0.183740829010950000",
+          "assertions": "PASS"
+        },
+        {
+          "shift_entry_ms": -60000,
+          "shift_exit_ms": -60000,
+          "settlements": [
+            {
+              "settlement_at": 1653897600013,
+              "rate_fraction": "0.00010000",
+              "quantity": "0.03",
+              "Mark_completed_close_at": 1653897599999,
+              "Mark_close": "30627.20000000",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "-0.091881600000000000"
+            },
+            {
+              "settlement_at": 1653926400005,
+              "rate_fraction": "0.00010000",
+              "quantity": "0.03",
+              "Mark_completed_close_at": 1653926399999,
+              "Mark_close": "30619.74300365",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "-0.091859229010950000"
+            }
+          ],
+          "independent_cash_usdt": "-0.183740829010950000",
+          "frozen_ledger_cash_usdt": "-0.183740829010950000",
+          "assertions": "PASS"
+        },
+        {
+          "shift_entry_ms": 60000,
+          "shift_exit_ms": 60000,
+          "settlements": [
+            {
+              "settlement_at": 1653897600013,
+              "rate_fraction": "0.00010000",
+              "quantity": "0.03",
+              "Mark_completed_close_at": 1653897599999,
+              "Mark_close": "30627.20000000",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "-0.091881600000000000"
+            },
+            {
+              "settlement_at": 1653926400005,
+              "rate_fraction": "0.00010000",
+              "quantity": "0.03",
+              "Mark_completed_close_at": 1653926399999,
+              "Mark_close": "30619.74300365",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "-0.091859229010950000"
+            }
+          ],
+          "independent_cash_usdt": "-0.183740829010950000",
+          "frozen_ledger_cash_usdt": "-0.183740829010950000",
+          "assertions": "PASS"
+        },
+        {
+          "shift_entry_ms": -60000,
+          "shift_exit_ms": 60000,
+          "settlements": [
+            {
+              "settlement_at": 1653897600013,
+              "rate_fraction": "0.00010000",
+              "quantity": "0.03",
+              "Mark_completed_close_at": 1653897599999,
+              "Mark_close": "30627.20000000",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "-0.091881600000000000"
+            },
+            {
+              "settlement_at": 1653926400005,
+              "rate_fraction": "0.00010000",
+              "quantity": "0.03",
+              "Mark_completed_close_at": 1653926399999,
+              "Mark_close": "30619.74300365",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "-0.091859229010950000"
+            }
+          ],
+          "independent_cash_usdt": "-0.183740829010950000",
+          "frozen_ledger_cash_usdt": "-0.183740829010950000",
+          "assertions": "PASS"
+        },
+        {
+          "shift_entry_ms": 60000,
+          "shift_exit_ms": -60000,
+          "settlements": [
+            {
+              "settlement_at": 1653897600013,
+              "rate_fraction": "0.00010000",
+              "quantity": "0.03",
+              "Mark_completed_close_at": 1653897599999,
+              "Mark_close": "30627.20000000",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "-0.091881600000000000"
+            },
+            {
+              "settlement_at": 1653926400005,
+              "rate_fraction": "0.00010000",
+              "quantity": "0.03",
+              "Mark_completed_close_at": 1653926399999,
+              "Mark_close": "30619.74300365",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "-0.091859229010950000"
+            }
+          ],
+          "independent_cash_usdt": "-0.183740829010950000",
+          "frozen_ledger_cash_usdt": "-0.183740829010950000",
+          "assertions": "PASS"
+        }
+      ]
+    },
+    {
+      "candidate": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H",
+      "event_id": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_1654488000000_1",
+      "side": 1,
+      "year": 2022,
+      "entry_at": 1654488060000,
+      "exit_at": 1654531260000,
+      "actual_boundary_sensitive": true,
+      "cases": [
+        {
+          "shift_entry_ms": 0,
+          "shift_exit_ms": 0,
+          "settlements": [
+            {
+              "settlement_at": 1654502400017,
+              "rate_fraction": "0.00009656",
+              "quantity": "0.029",
+              "Mark_completed_close_at": 1654502399999,
+              "Mark_close": "31277.80000000",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "-0.0875853466720000000"
+            },
+            {
+              "settlement_at": 1654531200000,
+              "rate_fraction": "0.00010000",
+              "quantity": "0.029",
+              "Mark_completed_close_at": 1654531199999,
+              "Mark_close": "31532.43734935",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "-0.0914440683131150000"
+            }
+          ],
+          "independent_cash_usdt": "-0.1790294149851150000",
+          "frozen_ledger_cash_usdt": "-0.1790294149851150000",
+          "assertions": "PASS"
+        },
+        {
+          "shift_entry_ms": -60000,
+          "shift_exit_ms": -60000,
+          "settlements": [
+            {
+              "settlement_at": 1654502400017,
+              "rate_fraction": "0.00009656",
+              "quantity": "0.029",
+              "Mark_completed_close_at": 1654502399999,
+              "Mark_close": "31277.80000000",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "-0.0875853466720000000"
+            }
+          ],
+          "independent_cash_usdt": "-0.0875853466720000000",
+          "frozen_ledger_cash_usdt": "-0.087585346672",
+          "assertions": "PASS"
+        },
+        {
+          "shift_entry_ms": 60000,
+          "shift_exit_ms": 60000,
+          "settlements": [
+            {
+              "settlement_at": 1654502400017,
+              "rate_fraction": "0.00009656",
+              "quantity": "0.029",
+              "Mark_completed_close_at": 1654502399999,
+              "Mark_close": "31277.80000000",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "-0.0875853466720000000"
+            },
+            {
+              "settlement_at": 1654531200000,
+              "rate_fraction": "0.00010000",
+              "quantity": "0.029",
+              "Mark_completed_close_at": 1654531199999,
+              "Mark_close": "31532.43734935",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "-0.0914440683131150000"
+            }
+          ],
+          "independent_cash_usdt": "-0.1790294149851150000",
+          "frozen_ledger_cash_usdt": "-0.1790294149851150000",
+          "assertions": "PASS"
+        },
+        {
+          "shift_entry_ms": -60000,
+          "shift_exit_ms": 60000,
+          "settlements": [
+            {
+              "settlement_at": 1654502400017,
+              "rate_fraction": "0.00009656",
+              "quantity": "0.029",
+              "Mark_completed_close_at": 1654502399999,
+              "Mark_close": "31277.80000000",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "-0.0875853466720000000"
+            },
+            {
+              "settlement_at": 1654531200000,
+              "rate_fraction": "0.00010000",
+              "quantity": "0.029",
+              "Mark_completed_close_at": 1654531199999,
+              "Mark_close": "31532.43734935",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "-0.0914440683131150000"
+            }
+          ],
+          "independent_cash_usdt": "-0.1790294149851150000",
+          "frozen_ledger_cash_usdt": "-0.1790294149851150000",
+          "assertions": "PASS"
+        },
+        {
+          "shift_entry_ms": 60000,
+          "shift_exit_ms": -60000,
+          "settlements": [
+            {
+              "settlement_at": 1654502400017,
+              "rate_fraction": "0.00009656",
+              "quantity": "0.029",
+              "Mark_completed_close_at": 1654502399999,
+              "Mark_close": "31277.80000000",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "-0.0875853466720000000"
+            }
+          ],
+          "independent_cash_usdt": "-0.0875853466720000000",
+          "frozen_ledger_cash_usdt": "-0.087585346672",
+          "assertions": "PASS"
+        }
+      ]
+    },
+    {
+      "candidate": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H",
+      "event_id": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_1674058500000_-1",
+      "side": -1,
+      "year": 2023,
+      "entry_at": 1674058560000,
+      "exit_at": 1674101760000,
+      "actual_boundary_sensitive": false,
+      "cases": [
+        {
+          "shift_entry_ms": 0,
+          "shift_exit_ms": 0,
+          "settlements": [
+            {
+              "settlement_at": 1674086400000,
+              "rate_fraction": "0.00010000",
+              "quantity": "0.044",
+              "Mark_completed_close_at": 1674086399999,
+              "Mark_close": "20681.10000000",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "0.0909968400000000000"
+            }
+          ],
+          "independent_cash_usdt": "0.0909968400000000000",
+          "frozen_ledger_cash_usdt": "0.090996840000",
+          "assertions": "PASS"
+        },
+        {
+          "shift_entry_ms": -60000,
+          "shift_exit_ms": -60000,
+          "settlements": [
+            {
+              "settlement_at": 1674086400000,
+              "rate_fraction": "0.00010000",
+              "quantity": "0.044",
+              "Mark_completed_close_at": 1674086399999,
+              "Mark_close": "20681.10000000",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "0.0909968400000000000"
+            }
+          ],
+          "independent_cash_usdt": "0.0909968400000000000",
+          "frozen_ledger_cash_usdt": "0.090996840000",
+          "assertions": "PASS"
+        },
+        {
+          "shift_entry_ms": 60000,
+          "shift_exit_ms": 60000,
+          "settlements": [
+            {
+              "settlement_at": 1674086400000,
+              "rate_fraction": "0.00010000",
+              "quantity": "0.044",
+              "Mark_completed_close_at": 1674086399999,
+              "Mark_close": "20681.10000000",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "0.0909968400000000000"
+            }
+          ],
+          "independent_cash_usdt": "0.0909968400000000000",
+          "frozen_ledger_cash_usdt": "0.090996840000",
+          "assertions": "PASS"
+        },
+        {
+          "shift_entry_ms": -60000,
+          "shift_exit_ms": 60000,
+          "settlements": [
+            {
+              "settlement_at": 1674086400000,
+              "rate_fraction": "0.00010000",
+              "quantity": "0.044",
+              "Mark_completed_close_at": 1674086399999,
+              "Mark_close": "20681.10000000",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "0.0909968400000000000"
+            }
+          ],
+          "independent_cash_usdt": "0.0909968400000000000",
+          "frozen_ledger_cash_usdt": "0.090996840000",
+          "assertions": "PASS"
+        },
+        {
+          "shift_entry_ms": 60000,
+          "shift_exit_ms": -60000,
+          "settlements": [
+            {
+              "settlement_at": 1674086400000,
+              "rate_fraction": "0.00010000",
+              "quantity": "0.044",
+              "Mark_completed_close_at": 1674086399999,
+              "Mark_close": "20681.10000000",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "0.0909968400000000000"
+            }
+          ],
+          "independent_cash_usdt": "0.0909968400000000000",
+          "frozen_ledger_cash_usdt": "0.090996840000",
+          "assertions": "PASS"
+        }
+      ]
+    },
+    {
+      "candidate": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H",
+      "event_id": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_1674257400000_1",
+      "side": 1,
+      "year": 2023,
+      "entry_at": 1674257460000,
+      "exit_at": 1674300660000,
+      "actual_boundary_sensitive": false,
+      "cases": [
+        {
+          "shift_entry_ms": 0,
+          "shift_exit_ms": 0,
+          "settlements": [
+            {
+              "settlement_at": 1674259200013,
+              "rate_fraction": "0.00010000",
+              "quantity": "0.041",
+              "Mark_completed_close_at": 1674259199999,
+              "Mark_close": "22665.20902609",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "-0.0929273570069690000"
+            },
+            {
+              "settlement_at": 1674288000001,
+              "rate_fraction": "0.00010000",
+              "quantity": "0.041",
+              "Mark_completed_close_at": 1674287999999,
+              "Mark_close": "22633.37295560",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "-0.0927968291179600000"
+            }
+          ],
+          "independent_cash_usdt": "-0.1857241861249290000",
+          "frozen_ledger_cash_usdt": "-0.1857241861249290000",
+          "assertions": "PASS"
+        },
+        {
+          "shift_entry_ms": -60000,
+          "shift_exit_ms": -60000,
+          "settlements": [
+            {
+              "settlement_at": 1674259200013,
+              "rate_fraction": "0.00010000",
+              "quantity": "0.041",
+              "Mark_completed_close_at": 1674259199999,
+              "Mark_close": "22665.20902609",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "-0.0929273570069690000"
+            },
+            {
+              "settlement_at": 1674288000001,
+              "rate_fraction": "0.00010000",
+              "quantity": "0.041",
+              "Mark_completed_close_at": 1674287999999,
+              "Mark_close": "22633.37295560",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "-0.0927968291179600000"
+            }
+          ],
+          "independent_cash_usdt": "-0.1857241861249290000",
+          "frozen_ledger_cash_usdt": "-0.1857241861249290000",
+          "assertions": "PASS"
+        },
+        {
+          "shift_entry_ms": 60000,
+          "shift_exit_ms": 60000,
+          "settlements": [
+            {
+              "settlement_at": 1674259200013,
+              "rate_fraction": "0.00010000",
+              "quantity": "0.041",
+              "Mark_completed_close_at": 1674259199999,
+              "Mark_close": "22665.20902609",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "-0.0929273570069690000"
+            },
+            {
+              "settlement_at": 1674288000001,
+              "rate_fraction": "0.00010000",
+              "quantity": "0.041",
+              "Mark_completed_close_at": 1674287999999,
+              "Mark_close": "22633.37295560",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "-0.0927968291179600000"
+            }
+          ],
+          "independent_cash_usdt": "-0.1857241861249290000",
+          "frozen_ledger_cash_usdt": "-0.1857241861249290000",
+          "assertions": "PASS"
+        },
+        {
+          "shift_entry_ms": -60000,
+          "shift_exit_ms": 60000,
+          "settlements": [
+            {
+              "settlement_at": 1674259200013,
+              "rate_fraction": "0.00010000",
+              "quantity": "0.041",
+              "Mark_completed_close_at": 1674259199999,
+              "Mark_close": "22665.20902609",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "-0.0929273570069690000"
+            },
+            {
+              "settlement_at": 1674288000001,
+              "rate_fraction": "0.00010000",
+              "quantity": "0.041",
+              "Mark_completed_close_at": 1674287999999,
+              "Mark_close": "22633.37295560",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "-0.0927968291179600000"
+            }
+          ],
+          "independent_cash_usdt": "-0.1857241861249290000",
+          "frozen_ledger_cash_usdt": "-0.1857241861249290000",
+          "assertions": "PASS"
+        },
+        {
+          "shift_entry_ms": 60000,
+          "shift_exit_ms": -60000,
+          "settlements": [
+            {
+              "settlement_at": 1674259200013,
+              "rate_fraction": "0.00010000",
+              "quantity": "0.041",
+              "Mark_completed_close_at": 1674259199999,
+              "Mark_close": "22665.20902609",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "-0.0929273570069690000"
+            },
+            {
+              "settlement_at": 1674288000001,
+              "rate_fraction": "0.00010000",
+              "quantity": "0.041",
+              "Mark_completed_close_at": 1674287999999,
+              "Mark_close": "22633.37295560",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "-0.0927968291179600000"
+            }
+          ],
+          "independent_cash_usdt": "-0.1857241861249290000",
+          "frozen_ledger_cash_usdt": "-0.1857241861249290000",
+          "assertions": "PASS"
+        }
+      ]
+    },
+    {
+      "candidate": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H",
+      "event_id": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_1679932800000_-1",
+      "side": -1,
+      "year": 2023,
+      "entry_at": 1679932860000,
+      "exit_at": 1679976060000,
+      "actual_boundary_sensitive": true,
+      "cases": [
+        {
+          "shift_entry_ms": 0,
+          "shift_exit_ms": 0,
+          "settlements": [
+            {
+              "settlement_at": 1679961600007,
+              "rate_fraction": "-0.00001428",
+              "quantity": "0.034",
+              "Mark_completed_close_at": 1679961599999,
+              "Mark_close": "27112.10000000",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "-0.0131634667920000000"
+            }
+          ],
+          "independent_cash_usdt": "-0.0131634667920000000",
+          "frozen_ledger_cash_usdt": "-0.013163466792",
+          "assertions": "PASS"
+        },
+        {
+          "shift_entry_ms": -60000,
+          "shift_exit_ms": -60000,
+          "settlements": [
+            {
+              "settlement_at": 1679932800000,
+              "rate_fraction": "-0.00000396",
+              "quantity": "0.034",
+              "Mark_completed_close_at": 1679932799999,
+              "Mark_close": "26881.50000000",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "-0.0036193251600000000"
+            },
+            {
+              "settlement_at": 1679961600007,
+              "rate_fraction": "-0.00001428",
+              "quantity": "0.034",
+              "Mark_completed_close_at": 1679961599999,
+              "Mark_close": "27112.10000000",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "-0.0131634667920000000"
+            }
+          ],
+          "independent_cash_usdt": "-0.0167827919520000000",
+          "frozen_ledger_cash_usdt": "-0.016782791952",
+          "assertions": "PASS"
+        },
+        {
+          "shift_entry_ms": 60000,
+          "shift_exit_ms": 60000,
+          "settlements": [
+            {
+              "settlement_at": 1679961600007,
+              "rate_fraction": "-0.00001428",
+              "quantity": "0.034",
+              "Mark_completed_close_at": 1679961599999,
+              "Mark_close": "27112.10000000",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "-0.0131634667920000000"
+            }
+          ],
+          "independent_cash_usdt": "-0.0131634667920000000",
+          "frozen_ledger_cash_usdt": "-0.013163466792",
+          "assertions": "PASS"
+        },
+        {
+          "shift_entry_ms": -60000,
+          "shift_exit_ms": 60000,
+          "settlements": [
+            {
+              "settlement_at": 1679932800000,
+              "rate_fraction": "-0.00000396",
+              "quantity": "0.034",
+              "Mark_completed_close_at": 1679932799999,
+              "Mark_close": "26881.50000000",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "-0.0036193251600000000"
+            },
+            {
+              "settlement_at": 1679961600007,
+              "rate_fraction": "-0.00001428",
+              "quantity": "0.034",
+              "Mark_completed_close_at": 1679961599999,
+              "Mark_close": "27112.10000000",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "-0.0131634667920000000"
+            }
+          ],
+          "independent_cash_usdt": "-0.0167827919520000000",
+          "frozen_ledger_cash_usdt": "-0.016782791952",
+          "assertions": "PASS"
+        },
+        {
+          "shift_entry_ms": 60000,
+          "shift_exit_ms": -60000,
+          "settlements": [
+            {
+              "settlement_at": 1679961600007,
+              "rate_fraction": "-0.00001428",
+              "quantity": "0.034",
+              "Mark_completed_close_at": 1679961599999,
+              "Mark_close": "27112.10000000",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "-0.0131634667920000000"
+            }
+          ],
+          "independent_cash_usdt": "-0.0131634667920000000",
+          "frozen_ledger_cash_usdt": "-0.013163466792",
+          "assertions": "PASS"
+        }
+      ]
+    },
+    {
+      "candidate": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H",
+      "event_id": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_1699977600000_-1",
+      "side": -1,
+      "year": 2023,
+      "entry_at": 1699977660000,
+      "exit_at": 1699988039999,
+      "actual_boundary_sensitive": true,
+      "cases": [
+        {
+          "shift_entry_ms": 0,
+          "shift_exit_ms": 0,
+          "settlements": [],
+          "independent_cash_usdt": "0",
+          "frozen_ledger_cash_usdt": "0",
+          "assertions": "PASS"
+        },
+        {
+          "shift_entry_ms": -60000,
+          "shift_exit_ms": -60000,
+          "settlements": [
+            {
+              "settlement_at": 1699977600001,
+              "rate_fraction": "0.00014477",
+              "quantity": "0.025",
+              "Mark_completed_close_at": 1699977599999,
+              "Mark_close": "36161.16664902",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "0.1308763023944656350"
+            }
+          ],
+          "independent_cash_usdt": "0.1308763023944656350",
+          "frozen_ledger_cash_usdt": "0.1308763023944656350",
+          "assertions": "PASS"
+        },
+        {
+          "shift_entry_ms": 60000,
+          "shift_exit_ms": 60000,
+          "settlements": [],
+          "independent_cash_usdt": "0",
+          "frozen_ledger_cash_usdt": "0",
+          "assertions": "PASS"
+        },
+        {
+          "shift_entry_ms": -60000,
+          "shift_exit_ms": 60000,
+          "settlements": [
+            {
+              "settlement_at": 1699977600001,
+              "rate_fraction": "0.00014477",
+              "quantity": "0.025",
+              "Mark_completed_close_at": 1699977599999,
+              "Mark_close": "36161.16664902",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "0.1308763023944656350"
+            }
+          ],
+          "independent_cash_usdt": "0.1308763023944656350",
+          "frozen_ledger_cash_usdt": "0.1308763023944656350",
+          "assertions": "PASS"
+        },
+        {
+          "shift_entry_ms": 60000,
+          "shift_exit_ms": -60000,
+          "settlements": [],
+          "independent_cash_usdt": "0",
+          "frozen_ledger_cash_usdt": "0",
+          "assertions": "PASS"
+        }
+      ]
+    },
+    {
+      "candidate": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H",
+      "event_id": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_1619401500000_1",
+      "side": 1,
+      "year": 2021,
+      "entry_at": 1619401560000,
+      "exit_at": 1619444760000,
+      "actual_boundary_sensitive": false,
+      "cases": [
+        {
+          "shift_entry_ms": 0,
+          "shift_exit_ms": 0,
+          "settlements": [
+            {
+              "settlement_at": 1619424000002,
+              "rate_fraction": "0.00010000",
+              "quantity": "0.018000000000000002",
+              "Mark_completed_close_at": 1619423999999,
+              "Mark_close": "52815.88419012",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "-0.09506859154221601056317683802"
+            }
+          ],
+          "independent_cash_usdt": "-0.09506859154221601056317683802",
+          "frozen_ledger_cash_usdt": "-0.09506859154221601056317683802",
+          "assertions": "PASS"
+        },
+        {
+          "shift_entry_ms": -60000,
+          "shift_exit_ms": -60000,
+          "settlements": [
+            {
+              "settlement_at": 1619424000002,
+              "rate_fraction": "0.00010000",
+              "quantity": "0.018000000000000002",
+              "Mark_completed_close_at": 1619423999999,
+              "Mark_close": "52815.88419012",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "-0.09506859154221601056317683802"
+            }
+          ],
+          "independent_cash_usdt": "-0.09506859154221601056317683802",
+          "frozen_ledger_cash_usdt": "-0.09506859154221601056317683802",
+          "assertions": "PASS"
+        },
+        {
+          "shift_entry_ms": 60000,
+          "shift_exit_ms": 60000,
+          "settlements": [
+            {
+              "settlement_at": 1619424000002,
+              "rate_fraction": "0.00010000",
+              "quantity": "0.018000000000000002",
+              "Mark_completed_close_at": 1619423999999,
+              "Mark_close": "52815.88419012",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "-0.09506859154221601056317683802"
+            }
+          ],
+          "independent_cash_usdt": "-0.09506859154221601056317683802",
+          "frozen_ledger_cash_usdt": "-0.09506859154221601056317683802",
+          "assertions": "PASS"
+        },
+        {
+          "shift_entry_ms": -60000,
+          "shift_exit_ms": 60000,
+          "settlements": [
+            {
+              "settlement_at": 1619424000002,
+              "rate_fraction": "0.00010000",
+              "quantity": "0.018000000000000002",
+              "Mark_completed_close_at": 1619423999999,
+              "Mark_close": "52815.88419012",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "-0.09506859154221601056317683802"
+            }
+          ],
+          "independent_cash_usdt": "-0.09506859154221601056317683802",
+          "frozen_ledger_cash_usdt": "-0.09506859154221601056317683802",
+          "assertions": "PASS"
+        },
+        {
+          "shift_entry_ms": 60000,
+          "shift_exit_ms": -60000,
+          "settlements": [
+            {
+              "settlement_at": 1619424000002,
+              "rate_fraction": "0.00010000",
+              "quantity": "0.018000000000000002",
+              "Mark_completed_close_at": 1619423999999,
+              "Mark_close": "52815.88419012",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "-0.09506859154221601056317683802"
+            }
+          ],
+          "independent_cash_usdt": "-0.09506859154221601056317683802",
+          "frozen_ledger_cash_usdt": "-0.09506859154221601056317683802",
+          "assertions": "PASS"
+        }
+      ]
+    },
+    {
+      "candidate": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H",
+      "event_id": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_1627865100000_-1",
+      "side": -1,
+      "year": 2021,
+      "entry_at": 1627865160000,
+      "exit_at": 1627908360000,
+      "actual_boundary_sensitive": false,
+      "cases": [
+        {
+          "shift_entry_ms": 0,
+          "shift_exit_ms": 0,
+          "settlements": [
+            {
+              "settlement_at": 1627891200014,
+              "rate_fraction": "0.00010000",
+              "quantity": "0.023",
+              "Mark_completed_close_at": 1627891199999,
+              "Mark_close": "40106.52000000",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "0.0922449960000000000"
+            }
+          ],
+          "independent_cash_usdt": "0.0922449960000000000",
+          "frozen_ledger_cash_usdt": "0.0922449960000",
+          "assertions": "PASS"
+        },
+        {
+          "shift_entry_ms": -60000,
+          "shift_exit_ms": -60000,
+          "settlements": [
+            {
+              "settlement_at": 1627891200014,
+              "rate_fraction": "0.00010000",
+              "quantity": "0.023",
+              "Mark_completed_close_at": 1627891199999,
+              "Mark_close": "40106.52000000",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "0.0922449960000000000"
+            }
+          ],
+          "independent_cash_usdt": "0.0922449960000000000",
+          "frozen_ledger_cash_usdt": "0.0922449960000",
+          "assertions": "PASS"
+        },
+        {
+          "shift_entry_ms": 60000,
+          "shift_exit_ms": 60000,
+          "settlements": [
+            {
+              "settlement_at": 1627891200014,
+              "rate_fraction": "0.00010000",
+              "quantity": "0.023",
+              "Mark_completed_close_at": 1627891199999,
+              "Mark_close": "40106.52000000",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "0.0922449960000000000"
+            }
+          ],
+          "independent_cash_usdt": "0.0922449960000000000",
+          "frozen_ledger_cash_usdt": "0.0922449960000",
+          "assertions": "PASS"
+        },
+        {
+          "shift_entry_ms": -60000,
+          "shift_exit_ms": 60000,
+          "settlements": [
+            {
+              "settlement_at": 1627891200014,
+              "rate_fraction": "0.00010000",
+              "quantity": "0.023",
+              "Mark_completed_close_at": 1627891199999,
+              "Mark_close": "40106.52000000",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "0.0922449960000000000"
+            }
+          ],
+          "independent_cash_usdt": "0.0922449960000000000",
+          "frozen_ledger_cash_usdt": "0.0922449960000",
+          "assertions": "PASS"
+        },
+        {
+          "shift_entry_ms": 60000,
+          "shift_exit_ms": -60000,
+          "settlements": [
+            {
+              "settlement_at": 1627891200014,
+              "rate_fraction": "0.00010000",
+              "quantity": "0.023",
+              "Mark_completed_close_at": 1627891199999,
+              "Mark_close": "40106.52000000",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "0.0922449960000000000"
+            }
+          ],
+          "independent_cash_usdt": "0.0922449960000000000",
+          "frozen_ledger_cash_usdt": "0.0922449960000",
+          "assertions": "PASS"
+        }
+      ]
+    },
+    {
+      "candidate": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H",
+      "event_id": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_1642099500000_-1",
+      "side": -1,
+      "year": 2022,
+      "entry_at": 1642099560000,
+      "exit_at": 1642142760000,
+      "actual_boundary_sensitive": false,
+      "cases": [
+        {
+          "shift_entry_ms": 0,
+          "shift_exit_ms": 0,
+          "settlements": [
+            {
+              "settlement_at": 1642118400000,
+              "rate_fraction": "0.00000592",
+              "quantity": "0.021",
+              "Mark_completed_close_at": 1642118399999,
+              "Mark_close": "42555.75000000",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "0.0052905308400000000"
+            }
+          ],
+          "independent_cash_usdt": "0.0052905308400000000",
+          "frozen_ledger_cash_usdt": "0.0052905308400",
+          "assertions": "PASS"
+        },
+        {
+          "shift_entry_ms": -60000,
+          "shift_exit_ms": -60000,
+          "settlements": [
+            {
+              "settlement_at": 1642118400000,
+              "rate_fraction": "0.00000592",
+              "quantity": "0.021",
+              "Mark_completed_close_at": 1642118399999,
+              "Mark_close": "42555.75000000",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "0.0052905308400000000"
+            }
+          ],
+          "independent_cash_usdt": "0.0052905308400000000",
+          "frozen_ledger_cash_usdt": "0.0052905308400",
+          "assertions": "PASS"
+        },
+        {
+          "shift_entry_ms": 60000,
+          "shift_exit_ms": 60000,
+          "settlements": [
+            {
+              "settlement_at": 1642118400000,
+              "rate_fraction": "0.00000592",
+              "quantity": "0.021",
+              "Mark_completed_close_at": 1642118399999,
+              "Mark_close": "42555.75000000",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "0.0052905308400000000"
+            }
+          ],
+          "independent_cash_usdt": "0.0052905308400000000",
+          "frozen_ledger_cash_usdt": "0.0052905308400",
+          "assertions": "PASS"
+        },
+        {
+          "shift_entry_ms": -60000,
+          "shift_exit_ms": 60000,
+          "settlements": [
+            {
+              "settlement_at": 1642118400000,
+              "rate_fraction": "0.00000592",
+              "quantity": "0.021",
+              "Mark_completed_close_at": 1642118399999,
+              "Mark_close": "42555.75000000",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "0.0052905308400000000"
+            }
+          ],
+          "independent_cash_usdt": "0.0052905308400000000",
+          "frozen_ledger_cash_usdt": "0.0052905308400",
+          "assertions": "PASS"
+        },
+        {
+          "shift_entry_ms": 60000,
+          "shift_exit_ms": -60000,
+          "settlements": [
+            {
+              "settlement_at": 1642118400000,
+              "rate_fraction": "0.00000592",
+              "quantity": "0.021",
+              "Mark_completed_close_at": 1642118399999,
+              "Mark_close": "42555.75000000",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "0.0052905308400000000"
+            }
+          ],
+          "independent_cash_usdt": "0.0052905308400000000",
+          "frozen_ledger_cash_usdt": "0.0052905308400",
+          "assertions": "PASS"
+        }
+      ]
+    },
+    {
+      "candidate": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H",
+      "event_id": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_1644208200000_1",
+      "side": 1,
+      "year": 2022,
+      "entry_at": 1644208260000,
+      "exit_at": 1644251460000,
+      "actual_boundary_sensitive": false,
+      "cases": [
+        {
+          "shift_entry_ms": 0,
+          "shift_exit_ms": 0,
+          "settlements": [
+            {
+              "settlement_at": 1644220800014,
+              "rate_fraction": "0.00005264",
+              "quantity": "0.021",
+              "Mark_completed_close_at": 1644220799999,
+              "Mark_close": "42716.04779580",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "-0.0472200278753891520"
+            },
+            {
+              "settlement_at": 1644249600003,
+              "rate_fraction": "-0.00009617",
+              "quantity": "0.021",
+              "Mark_completed_close_at": 1644249599999,
+              "Mark_close": "43802.36765348",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "0.0884619476419386036"
+            }
+          ],
+          "independent_cash_usdt": "0.0412419197665494516",
+          "frozen_ledger_cash_usdt": "0.0412419197665494516",
+          "assertions": "PASS"
+        },
+        {
+          "shift_entry_ms": -60000,
+          "shift_exit_ms": -60000,
+          "settlements": [
+            {
+              "settlement_at": 1644220800014,
+              "rate_fraction": "0.00005264",
+              "quantity": "0.021",
+              "Mark_completed_close_at": 1644220799999,
+              "Mark_close": "42716.04779580",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "-0.0472200278753891520"
+            },
+            {
+              "settlement_at": 1644249600003,
+              "rate_fraction": "-0.00009617",
+              "quantity": "0.021",
+              "Mark_completed_close_at": 1644249599999,
+              "Mark_close": "43802.36765348",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "0.0884619476419386036"
+            }
+          ],
+          "independent_cash_usdt": "0.0412419197665494516",
+          "frozen_ledger_cash_usdt": "0.0412419197665494516",
+          "assertions": "PASS"
+        },
+        {
+          "shift_entry_ms": 60000,
+          "shift_exit_ms": 60000,
+          "settlements": [
+            {
+              "settlement_at": 1644220800014,
+              "rate_fraction": "0.00005264",
+              "quantity": "0.021",
+              "Mark_completed_close_at": 1644220799999,
+              "Mark_close": "42716.04779580",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "-0.0472200278753891520"
+            },
+            {
+              "settlement_at": 1644249600003,
+              "rate_fraction": "-0.00009617",
+              "quantity": "0.021",
+              "Mark_completed_close_at": 1644249599999,
+              "Mark_close": "43802.36765348",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "0.0884619476419386036"
+            }
+          ],
+          "independent_cash_usdt": "0.0412419197665494516",
+          "frozen_ledger_cash_usdt": "0.0412419197665494516",
+          "assertions": "PASS"
+        },
+        {
+          "shift_entry_ms": -60000,
+          "shift_exit_ms": 60000,
+          "settlements": [
+            {
+              "settlement_at": 1644220800014,
+              "rate_fraction": "0.00005264",
+              "quantity": "0.021",
+              "Mark_completed_close_at": 1644220799999,
+              "Mark_close": "42716.04779580",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "-0.0472200278753891520"
+            },
+            {
+              "settlement_at": 1644249600003,
+              "rate_fraction": "-0.00009617",
+              "quantity": "0.021",
+              "Mark_completed_close_at": 1644249599999,
+              "Mark_close": "43802.36765348",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "0.0884619476419386036"
+            }
+          ],
+          "independent_cash_usdt": "0.0412419197665494516",
+          "frozen_ledger_cash_usdt": "0.0412419197665494516",
+          "assertions": "PASS"
+        },
+        {
+          "shift_entry_ms": 60000,
+          "shift_exit_ms": -60000,
+          "settlements": [
+            {
+              "settlement_at": 1644220800014,
+              "rate_fraction": "0.00005264",
+              "quantity": "0.021",
+              "Mark_completed_close_at": 1644220799999,
+              "Mark_close": "42716.04779580",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "-0.0472200278753891520"
+            },
+            {
+              "settlement_at": 1644249600003,
+              "rate_fraction": "-0.00009617",
+              "quantity": "0.021",
+              "Mark_completed_close_at": 1644249599999,
+              "Mark_close": "43802.36765348",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "0.0884619476419386036"
+            }
+          ],
+          "independent_cash_usdt": "0.0412419197665494516",
+          "frozen_ledger_cash_usdt": "0.0412419197665494516",
+          "assertions": "PASS"
+        }
+      ]
+    },
+    {
+      "candidate": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H",
+      "event_id": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_1653336000000_-1",
+      "side": -1,
+      "year": 2022,
+      "entry_at": 1653336060000,
+      "exit_at": 1653379260000,
+      "actual_boundary_sensitive": true,
+      "cases": [
+        {
+          "shift_entry_ms": 0,
+          "shift_exit_ms": 0,
+          "settlements": [
+            {
+              "settlement_at": 1653350400011,
+              "rate_fraction": "-0.00012372",
+              "quantity": "0.032",
+              "Mark_completed_close_at": 1653350399999,
+              "Mark_close": "29097.50000000",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "-0.1151981664000000000"
+            },
+            {
+              "settlement_at": 1653379200000,
+              "rate_fraction": "-0.00000676",
+              "quantity": "0.032",
+              "Mark_completed_close_at": 1653379199999,
+              "Mark_close": "29390.16333189",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "-0.0063576801319544448"
+            }
+          ],
+          "independent_cash_usdt": "-0.1215558465319544448",
+          "frozen_ledger_cash_usdt": "-0.1215558465319544448",
+          "assertions": "PASS"
+        },
+        {
+          "shift_entry_ms": -60000,
+          "shift_exit_ms": -60000,
+          "settlements": [
+            {
+              "settlement_at": 1653350400011,
+              "rate_fraction": "-0.00012372",
+              "quantity": "0.032",
+              "Mark_completed_close_at": 1653350399999,
+              "Mark_close": "29097.50000000",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "-0.1151981664000000000"
+            }
+          ],
+          "independent_cash_usdt": "-0.1151981664000000000",
+          "frozen_ledger_cash_usdt": "-0.115198166400",
+          "assertions": "PASS"
+        },
+        {
+          "shift_entry_ms": 60000,
+          "shift_exit_ms": 60000,
+          "settlements": [
+            {
+              "settlement_at": 1653350400011,
+              "rate_fraction": "-0.00012372",
+              "quantity": "0.032",
+              "Mark_completed_close_at": 1653350399999,
+              "Mark_close": "29097.50000000",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "-0.1151981664000000000"
+            },
+            {
+              "settlement_at": 1653379200000,
+              "rate_fraction": "-0.00000676",
+              "quantity": "0.032",
+              "Mark_completed_close_at": 1653379199999,
+              "Mark_close": "29390.16333189",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "-0.0063576801319544448"
+            }
+          ],
+          "independent_cash_usdt": "-0.1215558465319544448",
+          "frozen_ledger_cash_usdt": "-0.1215558465319544448",
+          "assertions": "PASS"
+        },
+        {
+          "shift_entry_ms": -60000,
+          "shift_exit_ms": 60000,
+          "settlements": [
+            {
+              "settlement_at": 1653350400011,
+              "rate_fraction": "-0.00012372",
+              "quantity": "0.032",
+              "Mark_completed_close_at": 1653350399999,
+              "Mark_close": "29097.50000000",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "-0.1151981664000000000"
+            },
+            {
+              "settlement_at": 1653379200000,
+              "rate_fraction": "-0.00000676",
+              "quantity": "0.032",
+              "Mark_completed_close_at": 1653379199999,
+              "Mark_close": "29390.16333189",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "-0.0063576801319544448"
+            }
+          ],
+          "independent_cash_usdt": "-0.1215558465319544448",
+          "frozen_ledger_cash_usdt": "-0.1215558465319544448",
+          "assertions": "PASS"
+        },
+        {
+          "shift_entry_ms": 60000,
+          "shift_exit_ms": -60000,
+          "settlements": [
+            {
+              "settlement_at": 1653350400011,
+              "rate_fraction": "-0.00012372",
+              "quantity": "0.032",
+              "Mark_completed_close_at": 1653350399999,
+              "Mark_close": "29097.50000000",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "-0.1151981664000000000"
+            }
+          ],
+          "independent_cash_usdt": "-0.1151981664000000000",
+          "frozen_ledger_cash_usdt": "-0.115198166400",
+          "assertions": "PASS"
+        }
+      ]
+    },
+    {
+      "candidate": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H",
+      "event_id": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_1658793600000_-1",
+      "side": -1,
+      "year": 2022,
+      "entry_at": 1658793660000,
+      "exit_at": 1658836860000,
+      "actual_boundary_sensitive": true,
+      "cases": [
+        {
+          "shift_entry_ms": 0,
+          "shift_exit_ms": 0,
+          "settlements": [
+            {
+              "settlement_at": 1658822400000,
+              "rate_fraction": "0.00003654",
+              "quantity": "0.043000000000000003",
+              "Mark_completed_close_at": 1658822399999,
+              "Mark_close": "21056.10578297",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "0.03308377452831812570817031593"
+            }
+          ],
+          "independent_cash_usdt": "0.03308377452831812570817031593",
+          "frozen_ledger_cash_usdt": "0.03308377452831812570817031593",
+          "assertions": "PASS"
+        },
+        {
+          "shift_entry_ms": -60000,
+          "shift_exit_ms": -60000,
+          "settlements": [
+            {
+              "settlement_at": 1658793600010,
+              "rate_fraction": "0.00010000",
+              "quantity": "0.043000000000000003",
+              "Mark_completed_close_at": 1658793599999,
+              "Mark_close": "21294.16534326",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "0.09156491097601800638824960298"
+            },
+            {
+              "settlement_at": 1658822400000,
+              "rate_fraction": "0.00003654",
+              "quantity": "0.043000000000000003",
+              "Mark_completed_close_at": 1658822399999,
+              "Mark_close": "21056.10578297",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "0.03308377452831812570817031593"
+            }
+          ],
+          "independent_cash_usdt": "0.1246486855043361320964199189",
+          "frozen_ledger_cash_usdt": "0.1246486855043361320964199189",
+          "assertions": "PASS"
+        },
+        {
+          "shift_entry_ms": 60000,
+          "shift_exit_ms": 60000,
+          "settlements": [
+            {
+              "settlement_at": 1658822400000,
+              "rate_fraction": "0.00003654",
+              "quantity": "0.043000000000000003",
+              "Mark_completed_close_at": 1658822399999,
+              "Mark_close": "21056.10578297",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "0.03308377452831812570817031593"
+            }
+          ],
+          "independent_cash_usdt": "0.03308377452831812570817031593",
+          "frozen_ledger_cash_usdt": "0.03308377452831812570817031593",
+          "assertions": "PASS"
+        },
+        {
+          "shift_entry_ms": -60000,
+          "shift_exit_ms": 60000,
+          "settlements": [
+            {
+              "settlement_at": 1658793600010,
+              "rate_fraction": "0.00010000",
+              "quantity": "0.043000000000000003",
+              "Mark_completed_close_at": 1658793599999,
+              "Mark_close": "21294.16534326",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "0.09156491097601800638824960298"
+            },
+            {
+              "settlement_at": 1658822400000,
+              "rate_fraction": "0.00003654",
+              "quantity": "0.043000000000000003",
+              "Mark_completed_close_at": 1658822399999,
+              "Mark_close": "21056.10578297",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "0.03308377452831812570817031593"
+            }
+          ],
+          "independent_cash_usdt": "0.1246486855043361320964199189",
+          "frozen_ledger_cash_usdt": "0.1246486855043361320964199189",
+          "assertions": "PASS"
+        },
+        {
+          "shift_entry_ms": 60000,
+          "shift_exit_ms": -60000,
+          "settlements": [
+            {
+              "settlement_at": 1658822400000,
+              "rate_fraction": "0.00003654",
+              "quantity": "0.043000000000000003",
+              "Mark_completed_close_at": 1658822399999,
+              "Mark_close": "21056.10578297",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "0.03308377452831812570817031593"
+            }
+          ],
+          "independent_cash_usdt": "0.03308377452831812570817031593",
+          "frozen_ledger_cash_usdt": "0.03308377452831812570817031593",
+          "assertions": "PASS"
+        }
+      ]
+    },
+    {
+      "candidate": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H",
+      "event_id": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_1666713600000_1",
+      "side": 1,
+      "year": 2022,
+      "entry_at": 1666713660000,
+      "exit_at": 1666722479999,
+      "actual_boundary_sensitive": true,
+      "cases": [
+        {
+          "shift_entry_ms": 0,
+          "shift_exit_ms": 0,
+          "settlements": [],
+          "independent_cash_usdt": "0",
+          "frozen_ledger_cash_usdt": "0",
+          "assertions": "PASS"
+        },
+        {
+          "shift_entry_ms": -60000,
+          "shift_exit_ms": -60000,
+          "settlements": [
+            {
+              "settlement_at": 1666713600000,
+              "rate_fraction": "-0.00000166",
+              "quantity": "0.047",
+              "Mark_completed_close_at": 1666713599999,
+              "Mark_close": "19741.50000000",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "0.0015402318300000000"
+            }
+          ],
+          "independent_cash_usdt": "0.0015402318300000000",
+          "frozen_ledger_cash_usdt": "0.001540231830",
+          "assertions": "PASS"
+        },
+        {
+          "shift_entry_ms": 60000,
+          "shift_exit_ms": 60000,
+          "settlements": [],
+          "independent_cash_usdt": "0",
+          "frozen_ledger_cash_usdt": "0",
+          "assertions": "PASS"
+        },
+        {
+          "shift_entry_ms": -60000,
+          "shift_exit_ms": 60000,
+          "settlements": [
+            {
+              "settlement_at": 1666713600000,
+              "rate_fraction": "-0.00000166",
+              "quantity": "0.047",
+              "Mark_completed_close_at": 1666713599999,
+              "Mark_close": "19741.50000000",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "0.0015402318300000000"
+            }
+          ],
+          "independent_cash_usdt": "0.0015402318300000000",
+          "frozen_ledger_cash_usdt": "0.001540231830",
+          "assertions": "PASS"
+        },
+        {
+          "shift_entry_ms": 60000,
+          "shift_exit_ms": -60000,
+          "settlements": [],
+          "independent_cash_usdt": "0",
+          "frozen_ledger_cash_usdt": "0",
+          "assertions": "PASS"
+        }
+      ]
+    },
+    {
+      "candidate": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H",
+      "event_id": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_1672632000000_1",
+      "side": 1,
+      "year": 2023,
+      "entry_at": 1672632060000,
+      "exit_at": 1672675260000,
+      "actual_boundary_sensitive": true,
+      "cases": [
+        {
+          "shift_entry_ms": 0,
+          "shift_exit_ms": 0,
+          "settlements": [
+            {
+              "settlement_at": 1672646400008,
+              "rate_fraction": "-0.00004356",
+              "quantity": "0.056",
+              "Mark_completed_close_at": 1672646399999,
+              "Mark_close": "16711.20301482",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "0.0407646401862313152"
+            },
+            {
+              "settlement_at": 1672675200015,
+              "rate_fraction": "0.00002670",
+              "quantity": "0.056",
+              "Mark_completed_close_at": 1672675199999,
+              "Mark_close": "16729.10000000",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "-0.0250133503200000000"
+            }
+          ],
+          "independent_cash_usdt": "0.0157512898662313152",
+          "frozen_ledger_cash_usdt": "0.0157512898662313152",
+          "assertions": "PASS"
+        },
+        {
+          "shift_entry_ms": -60000,
+          "shift_exit_ms": -60000,
+          "settlements": [
+            {
+              "settlement_at": 1672646400008,
+              "rate_fraction": "-0.00004356",
+              "quantity": "0.056",
+              "Mark_completed_close_at": 1672646399999,
+              "Mark_close": "16711.20301482",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "0.0407646401862313152"
+            }
+          ],
+          "independent_cash_usdt": "0.0407646401862313152",
+          "frozen_ledger_cash_usdt": "0.0407646401862313152",
+          "assertions": "PASS"
+        },
+        {
+          "shift_entry_ms": 60000,
+          "shift_exit_ms": 60000,
+          "settlements": [
+            {
+              "settlement_at": 1672646400008,
+              "rate_fraction": "-0.00004356",
+              "quantity": "0.056",
+              "Mark_completed_close_at": 1672646399999,
+              "Mark_close": "16711.20301482",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "0.0407646401862313152"
+            },
+            {
+              "settlement_at": 1672675200015,
+              "rate_fraction": "0.00002670",
+              "quantity": "0.056",
+              "Mark_completed_close_at": 1672675199999,
+              "Mark_close": "16729.10000000",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "-0.0250133503200000000"
+            }
+          ],
+          "independent_cash_usdt": "0.0157512898662313152",
+          "frozen_ledger_cash_usdt": "0.0157512898662313152",
+          "assertions": "PASS"
+        },
+        {
+          "shift_entry_ms": -60000,
+          "shift_exit_ms": 60000,
+          "settlements": [
+            {
+              "settlement_at": 1672646400008,
+              "rate_fraction": "-0.00004356",
+              "quantity": "0.056",
+              "Mark_completed_close_at": 1672646399999,
+              "Mark_close": "16711.20301482",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "0.0407646401862313152"
+            },
+            {
+              "settlement_at": 1672675200015,
+              "rate_fraction": "0.00002670",
+              "quantity": "0.056",
+              "Mark_completed_close_at": 1672675199999,
+              "Mark_close": "16729.10000000",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "-0.0250133503200000000"
+            }
+          ],
+          "independent_cash_usdt": "0.0157512898662313152",
+          "frozen_ledger_cash_usdt": "0.0157512898662313152",
+          "assertions": "PASS"
+        },
+        {
+          "shift_entry_ms": 60000,
+          "shift_exit_ms": -60000,
+          "settlements": [
+            {
+              "settlement_at": 1672646400008,
+              "rate_fraction": "-0.00004356",
+              "quantity": "0.056",
+              "Mark_completed_close_at": 1672646399999,
+              "Mark_close": "16711.20301482",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "0.0407646401862313152"
+            }
+          ],
+          "independent_cash_usdt": "0.0407646401862313152",
+          "frozen_ledger_cash_usdt": "0.0407646401862313152",
+          "assertions": "PASS"
+        }
+      ]
+    },
+    {
+      "candidate": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H",
+      "event_id": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_1673222400000_1",
+      "side": 1,
+      "year": 2023,
+      "entry_at": 1673222460000,
+      "exit_at": 1673265660000,
+      "actual_boundary_sensitive": true,
+      "cases": [
+        {
+          "shift_entry_ms": 0,
+          "shift_exit_ms": 0,
+          "settlements": [
+            {
+              "settlement_at": 1673251200000,
+              "rate_fraction": "-0.00000666",
+              "quantity": "0.054",
+              "Mark_completed_close_at": 1673251199999,
+              "Mark_close": "17190.38157018",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "0.0061823488278995352"
+            }
+          ],
+          "independent_cash_usdt": "0.0061823488278995352",
+          "frozen_ledger_cash_usdt": "0.0061823488278995352",
+          "assertions": "PASS"
+        },
+        {
+          "shift_entry_ms": -60000,
+          "shift_exit_ms": -60000,
+          "settlements": [
+            {
+              "settlement_at": 1673222400003,
+              "rate_fraction": "0.00005796",
+              "quantity": "0.054",
+              "Mark_completed_close_at": 1673222399999,
+              "Mark_close": "17123.63438116",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "-0.0535942358315298144"
+            },
+            {
+              "settlement_at": 1673251200000,
+              "rate_fraction": "-0.00000666",
+              "quantity": "0.054",
+              "Mark_completed_close_at": 1673251199999,
+              "Mark_close": "17190.38157018",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "0.0061823488278995352"
+            }
+          ],
+          "independent_cash_usdt": "-0.0474118870036302792",
+          "frozen_ledger_cash_usdt": "-0.0474118870036302792",
+          "assertions": "PASS"
+        },
+        {
+          "shift_entry_ms": 60000,
+          "shift_exit_ms": 60000,
+          "settlements": [
+            {
+              "settlement_at": 1673251200000,
+              "rate_fraction": "-0.00000666",
+              "quantity": "0.054",
+              "Mark_completed_close_at": 1673251199999,
+              "Mark_close": "17190.38157018",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "0.0061823488278995352"
+            }
+          ],
+          "independent_cash_usdt": "0.0061823488278995352",
+          "frozen_ledger_cash_usdt": "0.0061823488278995352",
+          "assertions": "PASS"
+        },
+        {
+          "shift_entry_ms": -60000,
+          "shift_exit_ms": 60000,
+          "settlements": [
+            {
+              "settlement_at": 1673222400003,
+              "rate_fraction": "0.00005796",
+              "quantity": "0.054",
+              "Mark_completed_close_at": 1673222399999,
+              "Mark_close": "17123.63438116",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "-0.0535942358315298144"
+            },
+            {
+              "settlement_at": 1673251200000,
+              "rate_fraction": "-0.00000666",
+              "quantity": "0.054",
+              "Mark_completed_close_at": 1673251199999,
+              "Mark_close": "17190.38157018",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "0.0061823488278995352"
+            }
+          ],
+          "independent_cash_usdt": "-0.0474118870036302792",
+          "frozen_ledger_cash_usdt": "-0.0474118870036302792",
+          "assertions": "PASS"
+        },
+        {
+          "shift_entry_ms": 60000,
+          "shift_exit_ms": -60000,
+          "settlements": [
+            {
+              "settlement_at": 1673251200000,
+              "rate_fraction": "-0.00000666",
+              "quantity": "0.054",
+              "Mark_completed_close_at": 1673251199999,
+              "Mark_close": "17190.38157018",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "0.0061823488278995352"
+            }
+          ],
+          "independent_cash_usdt": "0.0061823488278995352",
+          "frozen_ledger_cash_usdt": "0.0061823488278995352",
+          "assertions": "PASS"
+        }
+      ]
+    },
+    {
+      "candidate": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H",
+      "event_id": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_1675620000000_-1",
+      "side": -1,
+      "year": 2023,
+      "entry_at": 1675620060000,
+      "exit_at": 1675643879999,
+      "actual_boundary_sensitive": false,
+      "cases": [
+        {
+          "shift_entry_ms": 0,
+          "shift_exit_ms": 0,
+          "settlements": [
+            {
+              "settlement_at": 1675641600001,
+              "rate_fraction": "0.00010000",
+              "quantity": "0.04",
+              "Mark_completed_close_at": 1675641599999,
+              "Mark_close": "22927.79263894",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "0.091711170555760000"
+            }
+          ],
+          "independent_cash_usdt": "0.091711170555760000",
+          "frozen_ledger_cash_usdt": "0.091711170555760000",
+          "assertions": "PASS"
+        },
+        {
+          "shift_entry_ms": -60000,
+          "shift_exit_ms": -60000,
+          "settlements": [
+            {
+              "settlement_at": 1675641600001,
+              "rate_fraction": "0.00010000",
+              "quantity": "0.04",
+              "Mark_completed_close_at": 1675641599999,
+              "Mark_close": "22927.79263894",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "0.091711170555760000"
+            }
+          ],
+          "independent_cash_usdt": "0.091711170555760000",
+          "frozen_ledger_cash_usdt": "0.091711170555760000",
+          "assertions": "PASS"
+        },
+        {
+          "shift_entry_ms": 60000,
+          "shift_exit_ms": 60000,
+          "settlements": [
+            {
+              "settlement_at": 1675641600001,
+              "rate_fraction": "0.00010000",
+              "quantity": "0.04",
+              "Mark_completed_close_at": 1675641599999,
+              "Mark_close": "22927.79263894",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "0.091711170555760000"
+            }
+          ],
+          "independent_cash_usdt": "0.091711170555760000",
+          "frozen_ledger_cash_usdt": "0.091711170555760000",
+          "assertions": "PASS"
+        },
+        {
+          "shift_entry_ms": -60000,
+          "shift_exit_ms": 60000,
+          "settlements": [
+            {
+              "settlement_at": 1675641600001,
+              "rate_fraction": "0.00010000",
+              "quantity": "0.04",
+              "Mark_completed_close_at": 1675641599999,
+              "Mark_close": "22927.79263894",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "0.091711170555760000"
+            }
+          ],
+          "independent_cash_usdt": "0.091711170555760000",
+          "frozen_ledger_cash_usdt": "0.091711170555760000",
+          "assertions": "PASS"
+        },
+        {
+          "shift_entry_ms": 60000,
+          "shift_exit_ms": -60000,
+          "settlements": [
+            {
+              "settlement_at": 1675641600001,
+              "rate_fraction": "0.00010000",
+              "quantity": "0.04",
+              "Mark_completed_close_at": 1675641599999,
+              "Mark_close": "22927.79263894",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "0.091711170555760000"
+            }
+          ],
+          "independent_cash_usdt": "0.091711170555760000",
+          "frozen_ledger_cash_usdt": "0.091711170555760000",
+          "assertions": "PASS"
+        }
+      ]
+    },
+    {
+      "candidate": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H",
+      "event_id": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_1681070400000_1",
+      "side": 1,
+      "year": 2023,
+      "entry_at": 1681070460000,
+      "exit_at": 1681113660000,
+      "actual_boundary_sensitive": true,
+      "cases": [
+        {
+          "shift_entry_ms": 0,
+          "shift_exit_ms": 0,
+          "settlements": [
+            {
+              "settlement_at": 1681084800000,
+              "rate_fraction": "0.00010000",
+              "quantity": "0.033",
+              "Mark_completed_close_at": 1681084799999,
+              "Mark_close": "28309.40000000",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "-0.0934210200000000000"
+            },
+            {
+              "settlement_at": 1681113600010,
+              "rate_fraction": "0.00010000",
+              "quantity": "0.033",
+              "Mark_completed_close_at": 1681113599999,
+              "Mark_close": "28278.30000000",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "-0.0933183900000000000"
+            }
+          ],
+          "independent_cash_usdt": "-0.1867394100000000000",
+          "frozen_ledger_cash_usdt": "-0.186739410000",
+          "assertions": "PASS"
+        },
+        {
+          "shift_entry_ms": -60000,
+          "shift_exit_ms": -60000,
+          "settlements": [
+            {
+              "settlement_at": 1681084800000,
+              "rate_fraction": "0.00010000",
+              "quantity": "0.033",
+              "Mark_completed_close_at": 1681084799999,
+              "Mark_close": "28309.40000000",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "-0.0934210200000000000"
+            }
+          ],
+          "independent_cash_usdt": "-0.0934210200000000000",
+          "frozen_ledger_cash_usdt": "-0.093421020000",
+          "assertions": "PASS"
+        },
+        {
+          "shift_entry_ms": 60000,
+          "shift_exit_ms": 60000,
+          "settlements": [
+            {
+              "settlement_at": 1681084800000,
+              "rate_fraction": "0.00010000",
+              "quantity": "0.033",
+              "Mark_completed_close_at": 1681084799999,
+              "Mark_close": "28309.40000000",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "-0.0934210200000000000"
+            },
+            {
+              "settlement_at": 1681113600010,
+              "rate_fraction": "0.00010000",
+              "quantity": "0.033",
+              "Mark_completed_close_at": 1681113599999,
+              "Mark_close": "28278.30000000",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "-0.0933183900000000000"
+            }
+          ],
+          "independent_cash_usdt": "-0.1867394100000000000",
+          "frozen_ledger_cash_usdt": "-0.186739410000",
+          "assertions": "PASS"
+        },
+        {
+          "shift_entry_ms": -60000,
+          "shift_exit_ms": 60000,
+          "settlements": [
+            {
+              "settlement_at": 1681084800000,
+              "rate_fraction": "0.00010000",
+              "quantity": "0.033",
+              "Mark_completed_close_at": 1681084799999,
+              "Mark_close": "28309.40000000",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "-0.0934210200000000000"
+            },
+            {
+              "settlement_at": 1681113600010,
+              "rate_fraction": "0.00010000",
+              "quantity": "0.033",
+              "Mark_completed_close_at": 1681113599999,
+              "Mark_close": "28278.30000000",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "-0.0933183900000000000"
+            }
+          ],
+          "independent_cash_usdt": "-0.1867394100000000000",
+          "frozen_ledger_cash_usdt": "-0.186739410000",
+          "assertions": "PASS"
+        },
+        {
+          "shift_entry_ms": 60000,
+          "shift_exit_ms": -60000,
+          "settlements": [
+            {
+              "settlement_at": 1681084800000,
+              "rate_fraction": "0.00010000",
+              "quantity": "0.033",
+              "Mark_completed_close_at": 1681084799999,
+              "Mark_close": "28309.40000000",
+              "Mark_source": "MONTHLY_AUTHORITY",
+              "signed_cash_usdt": "-0.0934210200000000000"
+            }
+          ],
+          "independent_cash_usdt": "-0.0934210200000000000",
+          "frozen_ledger_cash_usdt": "-0.093421020000",
+          "assertions": "PASS"
+        }
+      ]
+    }
+  ],
+  "episode_count": 20,
+  "checked_shift_cases": 100,
+  "all_frozen_boundary_sensitive_trades": 9,
+  "audited_boundary_sensitive_trades": 9,
+  "rate_event_count": 3285,
+  "historical_settlement_mark_basis": "LATEST_COMPLETED_1M_MARK_CLOSE_APPROXIMATION_NOT_EXACT_EXCHANGE_SETTLEMENT_MARK",
+  "status": "PASS"
+}

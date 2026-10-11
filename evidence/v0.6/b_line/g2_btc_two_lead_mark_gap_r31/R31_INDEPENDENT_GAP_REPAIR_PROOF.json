@@ -1,0 +1,101 @@
+{
+  "independent_method": "stdlib CSV/ZIP UTC clock set difference, no production adapter parser",
+  "months": [
+    {
+      "year": 2021,
+      "month": 7,
+      "monthly_zip_sha256": "f803d5e91d9a932bee0b816abc7c6fdedcd9cf9c327474b195ef72d0c9693a06",
+      "existing_rows": 37440,
+      "absent_minutes": 7200,
+      "independent_missing_clock_set_sha256": "8d8d92bd0b6397f508fbaa384157d7d341a6c603fac1c0fb581afe94c25f2d20",
+      "daily_repairs": [
+        {
+          "day": "2021-07-01",
+          "independent_stdlib_rows": 1440,
+          "daily_zip_sha256": "237538cdaff73b91a76edcbaee1797c59942751db36b0ed82d400d902cbed0a4",
+          "exact_missing_day_clocks_matched": true
+        },
+        {
+          "day": "2021-07-24",
+          "independent_stdlib_rows": 1440,
+          "daily_zip_sha256": "fc5569b14323e908f74b73c74f51c4152fcd7f8ca9e9be1f1e1d641c4dd1275a",
+          "exact_missing_day_clocks_matched": true
+        },
+        {
+          "day": "2021-07-25",
+          "independent_stdlib_rows": 1440,
+          "daily_zip_sha256": "9d92c79a0b84c86d4e2834305045b403088870de2403c8ef612b9ee40a6d14b2",
+          "exact_missing_day_clocks_matched": true
+        },
+        {
+          "day": "2021-07-26",
+          "independent_stdlib_rows": 1440,
+          "daily_zip_sha256": "d89bd409d52eac110a54fcfe68abcf1cc0bb2b03515b19557128d42cbcb8929b",
+          "exact_missing_day_clocks_matched": true
+        },
+        {
+          "day": "2021-07-27",
+          "independent_stdlib_rows": 1440,
+          "daily_zip_sha256": "851624bc74228bab9dbbc0140e701ba11b978f899c8121d496679a9430e9339b",
+          "exact_missing_day_clocks_matched": true
+        }
+      ],
+      "assertions": "PASS"
+    },
+    {
+      "year": 2022,
+      "month": 7,
+      "monthly_zip_sha256": "35d2afc48289d0c9e75b311672aae21c6d635f62bb3836eb63694f554d39f1c6",
+      "existing_rows": 43200,
+      "absent_minutes": 1440,
+      "independent_missing_clock_set_sha256": "1d192e61cb771bade795ec32e5ebaf4a092e6aa35834170cfb99db7edf331036",
+      "daily_repairs": [
+        {
+          "day": "2022-07-31",
+          "independent_stdlib_rows": 1440,
+          "daily_zip_sha256": "36cf465f70b01aa4128fc684ae678beb5a16ab544460cd617f9f712564cb1823",
+          "exact_missing_day_clocks_matched": true
+        }
+      ],
+      "assertions": "PASS"
+    },
+    {
+      "year": 2022,
+      "month": 10,
+      "monthly_zip_sha256": "e6bba74c7ccb41dcd8a7ea1a65f40dc01de05e3128a265d77cd882898037780f",
+      "existing_rows": 43200,
+      "absent_minutes": 1440,
+      "independent_missing_clock_set_sha256": "3c8493ffe10d434270dee86b1a2328d6cbcecd4d7e65990019635178f13c9f3f",
+      "daily_repairs": [
+        {
+          "day": "2022-10-02",
+          "independent_stdlib_rows": 1440,
+          "daily_zip_sha256": "1824ddc3736ebfe8f481e60529fa2f8870af7cabd8bd8fe660c229553a8a21f7",
+          "exact_missing_day_clocks_matched": true
+        }
+      ],
+      "assertions": "PASS"
+    },
+    {
+      "year": 2023,
+      "month": 2,
+      "monthly_zip_sha256": "f84b1b0c1524f381fadaaee37b7be4912cb21fe947106cf01d6a9f0248e38d78",
+      "existing_rows": 38880,
+      "absent_minutes": 1440,
+      "independent_missing_clock_set_sha256": "91791a32efdddb1f4b9cf9315bad0bb2410d64776633fbb355ea604e76dfc291",
+      "daily_repairs": [
+        {
+          "day": "2023-02-24",
+          "independent_stdlib_rows": 1440,
+          "daily_zip_sha256": "ca3745ada0d946c65407cb010a2a5fcac37bf2e2cceebbb19dc9cb30ecd2473e",
+          "exact_missing_day_clocks_matched": true
+        }
+      ],
+      "assertions": "PASS"
+    }
+  ],
+  "gap_days": 8,
+  "absent_and_repaired_minutes": 11520,
+  "api_requests": 0,
+  "status": "PASS"
+}

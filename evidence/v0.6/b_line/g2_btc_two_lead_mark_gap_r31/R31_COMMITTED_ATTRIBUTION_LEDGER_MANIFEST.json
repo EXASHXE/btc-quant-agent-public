@@ -1,0 +1,66 @@
+[
+  {
+    "candidate": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H",
+    "cost": "BASE",
+    "kind": "attribution_ledger",
+    "path": "evidence/v0.6/b_line/g2_btc_two_lead_mark_gap_r31/W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_BASE_full_attribution.jsonl",
+    "sha256": "0abd422b7972774e221df8e5c6232bc5a84ebafaf324142ad9144adbac678558",
+    "rows": 34
+  },
+  {
+    "candidate": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H",
+    "cost": "BASE",
+    "kind": "funded_attribution_ledger",
+    "path": "evidence/v0.6/b_line/g2_btc_two_lead_mark_gap_r31/W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_BASE_funded_full_attribution.jsonl",
+    "sha256": "d634594682c6565eb60758731cf1febd57cda96d6f8f2083ce64dae0a63827ab",
+    "rows": 34
+  },
+  {
+    "candidate": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H",
+    "cost": "STRESS",
+    "kind": "attribution_ledger",
+    "path": "evidence/v0.6/b_line/g2_btc_two_lead_mark_gap_r31/W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_STRESS_full_attribution.jsonl",
+    "sha256": "8a6a46b86675e6bd9e5c92868c5c64217c6bb223a35436d8a192ed780693c5d8",
+    "rows": 34
+  },
+  {
+    "candidate": "W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H",
+    "cost": "STRESS",
+    "kind": "funded_attribution_ledger",
+    "path": "evidence/v0.6/b_line/g2_btc_two_lead_mark_gap_r31/W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_STRESS_funded_full_attribution.jsonl",
+    "sha256": "2c837dc91022a0b06454f36a1fcc401e5b0b680f065fc2a861377bb9ad3dca32",
+    "rows": 34
+  },
+  {
+    "candidate": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H",
+    "cost": "BASE",
+    "kind": "attribution_ledger",
+    "path": "evidence/v0.6/b_line/g2_btc_two_lead_mark_gap_r31/W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_BASE_full_attribution.jsonl",
+    "sha256": "80add8f1a12f1ceaa005c838827854db311135d2650a947e26a8cc3f56f8d28c",
+    "rows": 55
+  },
+  {
+    "candidate": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H",
+    "cost": "BASE",
+    "kind": "funded_attribution_ledger",
+    "path": "evidence/v0.6/b_line/g2_btc_two_lead_mark_gap_r31/W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_BASE_funded_full_attribution.jsonl",
+    "sha256": "f816405076e0969311faaf6f15785ebc0c9f62e86aef72d4a40e25bc5624d202",
+    "rows": 55
+  },
+  {
+    "candidate": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H",
+    "cost": "STRESS",
+    "kind": "attribution_ledger",
+    "path": "evidence/v0.6/b_line/g2_btc_two_lead_mark_gap_r31/W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_STRESS_full_attribution.jsonl",
+    "sha256": "126786cbaa7eee695cd19652e0303337d024721ccb5a23659b42f2034f69ff3a",
+    "rows": 55
+  },
+  {
+    "candidate": "W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H",
+    "cost": "STRESS",
+    "kind": "funded_attribution_ledger",
+    "path": "evidence/v0.6/b_line/g2_btc_two_lead_mark_gap_r31/W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_STRESS_funded_full_attribution.jsonl",
+    "sha256": "7c724bf39bc3f133f8709fa290184c89be0111dc10c71ac72ffed72dd4c03976",
+    "rows": 55
+  }
+]

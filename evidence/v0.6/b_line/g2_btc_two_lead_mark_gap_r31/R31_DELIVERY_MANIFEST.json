@@ -1,0 +1,138 @@
+{
+  "start_sha": "057c47a4bfd248131f4fd94d12d3deef73c65e1f",
+  "first_commit_sha": "c36df02a438dd0b46a02168d910479853c294dd4",
+  "max_commits": 2,
+  "files_excluding_this_manifest": [
+    {
+      "path": "docs/strategy_research/g2_r3/two_lead_mark_gap_r31/R31_TWO_LEAD_OBSERVED_FUNDING_MARK_REPORT.md",
+      "sha256": "63aa4121932a2e9d5d7025cf177767c22471c6d5e3d18e5ed31a22e236f32fec",
+      "bytes": 31450
+    },
+    {
+      "path": "evidence/v0.6/b_line/g2_btc_two_lead_mark_gap_r31/R31_COMMITTED_ATTRIBUTION_LEDGER_MANIFEST.json",
+      "sha256": "f14242b2f3bbcdc5a67c0e3fee3a16de67b2d745901aafd99416e1703e1cad0d",
+      "bytes": 2899
+    },
+    {
+      "path": "evidence/v0.6/b_line/g2_btc_two_lead_mark_gap_r31/R31_COMPOSITE_SOURCE_MANIFEST.json",
+      "sha256": "bf96fa97133f976c688eb80afefba23b30bf6bd000d37c734dd82ed74ce4323a",
+      "bytes": 1552379
+    },
+    {
+      "path": "evidence/v0.6/b_line/g2_btc_two_lead_mark_gap_r31/R31_ECONOMIC_RESULTS.json",
+      "sha256": "85226f1905b6dae115582f84cb4d154f2e52e2f107e4f103e22781dd1c0d587c",
+      "bytes": 337766
+    },
+    {
+      "path": "evidence/v0.6/b_line/g2_btc_two_lead_mark_gap_r31/R31_FROZEN_MISSING_MARK_SOURCE_ROUTE_CONTRACT.json",
+      "sha256": "66b6cb378527eb625c91a5c1b50347f6f469eb0968cd99ce533fc307c2cb79d8",
+      "bytes": 17238
+    },
+    {
+      "path": "evidence/v0.6/b_line/g2_btc_two_lead_mark_gap_r31/R31_GAP_SOURCE_RECEIPTS.json",
+      "sha256": "3252b8103f8c7cd6032196c0ca825e9838f54485cb2d09ffbc74a29af3061527",
+      "bytes": 1433993
+    },
+    {
+      "path": "evidence/v0.6/b_line/g2_btc_two_lead_mark_gap_r31/R31_INDEPENDENT_GAP_REPAIR_PROOF.json",
+      "sha256": "d3ff4579cfd343ccaca7a6929847d6869c583ed12dbaaa447dac5b4593be74d5",
+      "bytes": 3693
+    },
+    {
+      "path": "evidence/v0.6/b_line/g2_btc_two_lead_mark_gap_r31/R31_INDEPENDENT_REAL_DECIMAL_BOUNDARY_AUDIT.json",
+      "sha256": "2eecedda31bcc75d2aa4996c2f6bf53506821585dbb8c5e85f3f6926a1b31a97",
+      "bytes": 81849
+    },
+    {
+      "path": "evidence/v0.6/b_line/g2_btc_two_lead_mark_gap_r31/R31_INDEPENDENT_REAL_DECIMAL_BOUNDARY_AUDIT_METHOD.py",
+      "sha256": "98d6c059a6f191e5883467394587bbb319a170b2c50f2f209ea7fcea154425b1",
+      "bytes": 5297
+    },
+    {
+      "path": "evidence/v0.6/b_line/g2_btc_two_lead_mark_gap_r31/R31_SCIENCE_EXECUTION_RECEIPT.json",
+      "sha256": "dd41b08e471a99e3a018823f0881e6290793dfd34bee44fb73510ab716410e7b",
+      "bytes": 3276
+    },
+    {
+      "path": "evidence/v0.6/b_line/g2_btc_two_lead_mark_gap_r31/W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_BASE_full_attribution.jsonl",
+      "sha256": "0abd422b7972774e221df8e5c6232bc5a84ebafaf324142ad9144adbac678558",
+      "bytes": 53215
+    },
+    {
+      "path": "evidence/v0.6/b_line/g2_btc_two_lead_mark_gap_r31/W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_BASE_funded_full_attribution.jsonl",
+      "sha256": "d634594682c6565eb60758731cf1febd57cda96d6f8f2083ce64dae0a63827ab",
+      "bytes": 44470
+    },
+    {
+      "path": "evidence/v0.6/b_line/g2_btc_two_lead_mark_gap_r31/W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_STRESS_full_attribution.jsonl",
+      "sha256": "8a6a46b86675e6bd9e5c92868c5c64217c6bb223a35436d8a192ed780693c5d8",
+      "bytes": 53786
+    },
+    {
+      "path": "evidence/v0.6/b_line/g2_btc_two_lead_mark_gap_r31/W1_C04_ATR_EXPANSION_TREND_FOLLOW_12H_STRESS_funded_full_attribution.jsonl",
+      "sha256": "2c837dc91022a0b06454f36a1fcc401e5b0b680f065fc2a861377bb9ad3dca32",
+      "bytes": 44903
+    },
+    {
+      "path": "evidence/v0.6/b_line/g2_btc_two_lead_mark_gap_r31/W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_BASE_full_attribution.jsonl",
+      "sha256": "80add8f1a12f1ceaa005c838827854db311135d2650a947e26a8cc3f56f8d28c",
+      "bytes": 87833
+    },
+    {
+      "path": "evidence/v0.6/b_line/g2_btc_two_lead_mark_gap_r31/W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_BASE_funded_full_attribution.jsonl",
+      "sha256": "f816405076e0969311faaf6f15785ebc0c9f62e86aef72d4a40e25bc5624d202",
+      "bytes": 73238
+    },
+    {
+      "path": "evidence/v0.6/b_line/g2_btc_two_lead_mark_gap_r31/W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_STRESS_full_attribution.jsonl",
+      "sha256": "126786cbaa7eee695cd19652e0303337d024721ccb5a23659b42f2034f69ff3a",
+      "bytes": 88043
+    },
+    {
+      "path": "evidence/v0.6/b_line/g2_btc_two_lead_mark_gap_r31/W2_C05_ASYMMETRIC_VOLATILITY_BREAKOUT_12H_STRESS_funded_full_attribution.jsonl",
+      "sha256": "7c724bf39bc3f133f8709fa290184c89be0111dc10c71ac72ffed72dd4c03976",
+      "bytes": 73510
+    },
+    {
+      "path": "scripts/strategy_research/g2_btc_two_lead_mark_gap_r31/gaps.py",
+      "sha256": "83aa566974894830e169979789d184faa41d4349d1f43cba9a71919a5e78fe85",
+      "bytes": 17921
+    },
+    {
+      "path": "scripts/strategy_research/g2_btc_two_lead_mark_gap_r31/monthly.py",
+      "sha256": "459d7fc5d3d513bdd60f25cadc4f621dc30e62f60ffba0493100dad29c8705ea",
+      "bytes": 6440
+    },
+    {
+      "path": "scripts/strategy_research/g2_btc_two_lead_mark_gap_r31/partial.py",
+      "sha256": "d55d6a830ab5b104e0374bac3067f836509ff28ad404c357134870745fc07f94",
+      "bytes": 13609
+    },
+    {
+      "path": "scripts/strategy_research/g2_btc_two_lead_mark_gap_r31/report.py",
+      "sha256": "7a13648681027ad976001ae685ed0319e49ab0a06abd1e4b6c935c76d78ce7d8",
+      "bytes": 10429
+    },
+    {
+      "path": "scripts/strategy_research/g2_btc_two_lead_mark_gap_r31/run.py",
+      "sha256": "e8ccd9a06fb9c2669d2a5ae2f912c5c368d562f21c32d71a66b820bd45bf07bd",
+      "bytes": 6002
+    },
+    {
+      "path": "tests/test_v06_g2_btc_two_lead_mark_gap_r31_gaps.py",
+      "sha256": "2e3b23de6c72f1ef284fc35ab6abddc648dbe3cdef23f1c3994dd3d265d5e9a0",
+      "bytes": 7948
+    },
+    {
+      "path": "tests/test_v06_g2_btc_two_lead_mark_gap_r31_monthly.py",
+      "sha256": "0418a20be5d5edfec46645e7821b287a16d229799abdbd7afb55e03864b93503",
+      "bytes": 1721
+    },
+    {
+      "path": "tests/test_v06_g2_btc_two_lead_mark_gap_r31_partial.py",
+      "sha256": "f249fddb103b083eb525776a2ed5e6078f38431f7857aef03c5f8fffbc07faa2",
+      "bytes": 4612
+    }
+  ],
+  "self_digest": "intentionally not recursive; final Git commit provides identity"
+}
